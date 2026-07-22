@@ -89,5 +89,11 @@ module.exports = {
     'Snel antwoorden geeft een klein beetje extra punten, maar goed nadenken levert het meest op.'),
   '/apps/foundation/zakgeld.html': G('Zakgeld: jouw eigen potje, sparen en uitgeven leren.',
     ['Houd bij wat erin komt en eruit gaat', 'Zet een spaardoel', 'Kijk hoe ver je bent'],
-    'Verdeel je zakgeld in potjes (sparen, uitgeven, geven); dan is kiezen ineens makkelijk.')
+    'Verdeel je zakgeld in potjes (sparen, uitgeven, geven); dan is kiezen ineens makkelijk.'),
+  '/apps/stad.html': G('Mijn Stad: het burgerloket van jouw stad binnen RTG.',
+    ['Bekijk wat er in je stad speelt', 'Regel je stadszaken digitaal', 'Meld iets aan de gemeente'],
+    'Een goede melding heeft een foto en een plek; dan kan de buitendienst er direct mee aan de slag.'),
+  '/apps/hardware-pda.html': G('De hardware-PDA: het Hardwarelab op locatie.',
+    ['Bekijk ontwerpen en prototypes', 'Leg testresultaten vast', 'Meld wat de werkplaats moet weten'],
+    'Een goed testverslag noemt ook wat er wél werkte.')
 };

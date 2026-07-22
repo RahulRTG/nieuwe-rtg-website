@@ -97,7 +97,4 @@ module.exports = {
   '/apps/vluchten.html': G('RTG Vluchten: je vluchten en de private aviation van partners.',
     ['Bekijk vluchten en beschikbaarheid', 'Vraag een boeking aan; de partner bevestigt', 'Volg je reis in de app'],
     'Boekingen zijn pas definitief na bevestiging; de app zegt dat ook eerlijk.'),
-  '/apps/stad.html': G('Mijn Stad: het burgerloket van jouw stad binnen RTG.',
-    ['Bekijk wat er in je stad speelt', 'Regel je stadszaken digitaal', 'Meld iets aan de gemeente'],
-    'Een goede melding heeft een foto en een plek; dan kan de buitendienst er direct mee aan de slag.'),
 };

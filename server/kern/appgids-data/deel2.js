@@ -96,7 +96,4 @@ module.exports = {
   '/apps/architect-pda.html': G('De architect-PDA: het architectenbureau op zak.',
     ['Bekijk projecten en hun fase', 'Leg bevindingen op locatie vast', 'Deel met het bureau'],
     'Foto\'s op locatie zeggen meer dan een pagina notities.'),
-  '/apps/hardware-pda.html': G('De hardware-PDA: het Hardwarelab op locatie.',
-    ['Bekijk ontwerpen en prototypes', 'Leg testresultaten vast', 'Meld wat de werkplaats moet weten'],
-    'Een goed testverslag noemt ook wat er wél werkte.'),
 };

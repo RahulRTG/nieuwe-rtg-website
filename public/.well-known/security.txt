@@ -1,4 +1,4 @@
 Contact: mailto:security@rahultravelgroup.example
 Preferred-Languages: nl, en
-Policy: https://rahultravelgroup.example/site/privacy.html
+Policy: https://rahultravelgroup.example/apps/juridisch/privacy.html
 Expires: 2027-07-01T00:00:00.000Z

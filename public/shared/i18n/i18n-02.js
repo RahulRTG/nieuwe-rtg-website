@@ -2,28 +2,47 @@
       s.id = 'rtg-i18n-styles';
       s.textContent = `
       .rtg-lang-scrim{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;
-        background:rgba(12,12,11,0.72);backdrop-filter:blur(6px);padding:1.5rem;-webkit-font-smoothing:antialiased;}
+        background:radial-gradient(120% 90% at 50% 0%,rgba(62,20,32,0.6),rgba(12,12,11,0.92) 60%);
+        backdrop-filter:blur(10px);padding:1.1rem;-webkit-font-smoothing:antialiased;}
       .rtg-lang-scrim.open{display:flex;}
-      .rtg-lang-card{width:100%;max-width:400px;background:#F7F5F1;color:#0C0C0B;border-radius:20px;
-        padding:2.5rem 2rem;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);
+      .rtg-lang-card{width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;
+        background:linear-gradient(180deg,#141110,#0C0C0B);color:#F5F3EF;border:1px solid rgba(201,162,75,0.22);
+        border-radius:22px;padding:1.2rem 1.3rem 1rem;text-align:center;box-shadow:0 40px 120px rgba(0,0,0,0.6);
         font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-        animation:rtgLangIn .35s cubic-bezier(.2,.8,.2,1);}
-      @keyframes rtgLangIn{from{opacity:0;transform:translateY(14px) scale(.97);}to{opacity:1;transform:none;}}
-      .rtg-lang-globe{font-size:2.4rem;line-height:1;}
-      .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.7rem;margin:1rem 0 0.15rem;letter-spacing:-0.01em;color:#0C0C0B;}
-      .rtg-lang-card p{color:#66625B;font-size:0.9rem;margin:0 0 1.6rem;}
-      .rtg-lang-opts{display:flex;flex-direction:column;gap:0.7rem;max-height:52vh;overflow:auto;padding:2px;}
-      .rtg-lang-code{display:inline-block;min-width:2rem;font-size:0.62rem;font-weight:700;letter-spacing:0.06em;
-        color:#7F1634;border:1px solid rgba(127,22,52,0.35);border-radius:6px;padding:0.15rem 0.25rem;text-align:center;}
-      .rtg-lang-opt{display:flex;align-items:center;gap:0.9rem;width:100%;text-align:left;cursor:pointer;
-        background:#fff;border:1px solid #DEDBD5;border-radius:13px;padding:0.95rem 1.1rem;
-        font-family:inherit;font-size:1rem;color:#0C0C0B;transition:border-color .18s,background .18s,transform .12s;}
-      .rtg-lang-opt:hover{border-color:#7F1634;background:#fff;}
-      .rtg-lang-opt:active{transform:scale(0.99);}
-      .rtg-lang-opt.rec{border-color:#7F1634;box-shadow:0 0 0 3px rgba(127,22,52,0.08);}
-      .rtg-lang-flag{font-size:1.4rem;line-height:1;}
-      .rtg-lang-name{font-weight:600;flex:1;}
-      .rtg-lang-rec{font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:#7F1634;font-weight:600;}
+        animation:rtgLangIn .4s cubic-bezier(.2,.8,.2,1);}
+      @keyframes rtgLangIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:none;}}
+      .rtg-lang-mond{display:block;width:200px;height:90px;margin:0.1rem auto -0.15rem;}
+      .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.55rem;margin:0.1rem 0 0.1rem;letter-spacing:-0.01em;color:#F7F3EC;}
+      .rtg-lang-card p{color:#B8B2A8;font-size:0.8rem;margin:0 0 0.85rem;}
+      .rtg-lang-ai{display:flex;align-items:center;gap:0.45rem;background:rgba(255,255,255,0.05);
+        border:1px solid rgba(222,219,213,0.16);border-radius:13px;padding:0.1rem 0.1rem 0.1rem 0.9rem;
+        margin:0 auto 0.5rem;max-width:520px;width:100%;transition:border-color .18s;}
+      .rtg-lang-ai:focus-within{border-color:#C9A24B;}
+      .rtg-lang-ai input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;
+        font-family:inherit;font-size:0.92rem;padding:0.7rem 0;}
+      .rtg-lang-ai input::placeholder{color:#8A8680;}
+      .rtg-lang-ai button{flex:none;background:linear-gradient(180deg,#9E1C40,#7F1634);color:#fff;border:none;cursor:pointer;
+        border-radius:10px;padding:0.55rem 0.72rem;font-size:1rem;line-height:1;transition:filter .18s,transform .12s;}
+      .rtg-lang-ai button:hover{filter:brightness(1.14);}
+      .rtg-lang-ai button:active{transform:scale(0.95);}
+      #rtg-lang-mic{background:rgba(255,255,255,0.08);}
+      #rtg-lang-mic.luistert{background:linear-gradient(180deg,#C23A5E,#9E1C40);animation:rtgMic 1.1s ease-in-out infinite;}
+      @keyframes rtgMic{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 6px rgba(194,58,94,0);}}
+      /* Rahuls voorstel: geen knoppenlijst, maar een enkele aantikbare regel */
+      .rtg-lang-hint{display:flex;align-items:center;gap:0.7rem;width:100%;max-width:520px;margin:0.1rem auto 0.2rem;
+        background:rgba(201,162,75,0.08);border:1px solid rgba(201,162,75,0.3);border-radius:13px;
+        padding:0.55rem 0.9rem;cursor:pointer;text-align:left;font-family:inherit;color:#EDE9E2;
+        transition:border-color .16s,background .16s,transform .12s;}
+      .rtg-lang-hint:hover{border-color:#F5E6B8;background:rgba(201,162,75,0.14);}
+      .rtg-lang-hint:active{transform:scale(0.99);}
+      .rtg-lang-hint[hidden]{display:none;}
+      .rtg-lang-flag{font-size:1.7rem;line-height:1;}
+      .rtg-lang-sug{display:flex;flex-direction:column;line-height:1.2;}
+      .rtg-lang-sug b{color:#F7F3EC;font-weight:600;font-size:0.98rem;}
+      .rtg-lang-go{font-size:0.66rem;letter-spacing:0.04em;color:#C9A24B;}
+      .rtg-lang-mis{color:#8A8680;font-size:0.82rem;}
+      .rtg-lang-code{display:inline-block;min-width:1.7rem;font-size:0.6rem;font-weight:700;letter-spacing:0.05em;
+        color:#C9A24B;border:1px solid rgba(201,162,75,0.4);border-radius:6px;padding:0.3rem 0.2rem;text-align:center;}
       .rtg-lang-switch{position:fixed;left:14px;bottom:14px;z-index:9990;display:inline-flex;align-items:center;gap:0.35rem;
         background:rgba(12,12,11,0.82);color:#fff;border:1px solid rgba(255,255,255,0.16);border-radius:999px;
         padding:0.42rem 0.8rem;font-family:'Inter',-apple-system,sans-serif;font-size:0.72rem;font-weight:600;
@@ -52,8 +71,21 @@
         .then(r => r.json())
         .then(d => {
           if (Array.isArray(d.talen) && d.talen.length >= 2) {
-            WERELD = d.talen;
-            this.buildModal(this.chosen ? this.lang : detectDevice()); // kiezer verversen met alle actieve talen
+            WERELD = d.talen; // de actieve set (voor de vertaling)
+            // de matcher kent meteen de HELE wereld (alle 114) voor typen/spreken
+            this._alleTalen = (Array.isArray(d.alle) && d.alle.length) ? d.alle : d.talen;
+            this._lijst = this._alleTalen;
+            // De site volgt de telefooninstelling: nu de hele wereld bekend is,
+            // kiezen we alsnog de toesteltaal (bijv. Duits of Japans), tenzij het
+            // lid zelf al een taal heeft gekozen. Engels blijft de terugval.
+            if (!this.chosen) {
+              const codes = this._alleTalen.map(t => t.code);
+              const dev = detectDevice(codes);
+              if (dev && dev !== this.lang) this.apply(dev);
+              this._aanbevolen = dev;
+            }
+            const m = document.getElementById('rtg-lang-modal');
+            if (!m || !m.classList.contains('open')) this.buildModal(this._aanbevolen || this.lang);
           }
         })
         .catch(() => {});
@@ -63,14 +95,15 @@
       this.injectStyles();
       let saved = null;
       try { saved = localStorage.getItem(STORE); } catch (e) {}
-      const device = detectDevice();
+      // De site volgt standaard de TELEFOON-/toestelinstelling (navigator.language);
+      // kan hij die taal (nog) niet, dan Engels als terugval. Er is geen gedwongen
+      // taalkeuze: wie wil wisselen opent de kiezer (de wereldbol linksonder) en
+      // typt of spreekt zijn taal. Een eerder gemaakte keuze blijft bewaard.
       if (saved && /^[a-z]{2}$/.test(saved)) {
         this.chosen = true;
         this.apply(saved);
       } else {
-        this.apply(device);          // meteen in de toesteltaal tonen
-        this.buildModal(device);     // en de keuze aanbieden
-        this.openModal();
+        this.apply(detectDevice()); // toesteltaal onder nl/en; laadTalen verruimt straks naar alle 114
       }
       this.buildSwitch();
       this.laadTalen();

@@ -1214,7 +1214,9 @@ app.post('/api/translate', async (req, res) => {
 // sleutel is de handtekening van de actieve set, dus een taal aan/uit zetten
 // verandert de sleutel en de cache is meteen ongeldig (geen staleness).
 const talenCache = require('./lib/cache').antwoordCache({ ttl: 3600000, max: 8, sleutel: () => 'talen:' + talen.handtekening() });
-app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve() }));
+// talen: de actieve set (voor autodetectie + vertaling) en de VOLLEDIGE wereld
+// (alle 114, met een aan/uit-vlag) zodat de taalkiezer alle landvlaggen toont.
+app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve(), alle: talen.alle() }));
 
 /* ---------- RTG Zegel: bewijs zonder tonen (offline verifieerbaar) ----------
    Een lid bewijst een FEIT aan een partner (18+, geldig lid, welke pas) zonder

@@ -10,6 +10,7 @@
 <link href="/apps/rtg-onthul.css" rel="stylesheet">
 <script src="/apps/rtg-onthul.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   :root{
@@ -50,7 +51,11 @@
   .demo p{font-size:0.82rem;line-height:1.45;color:var(--soft);}
   .demo b{color:var(--txt);font-weight:600;}
   .lead{color:var(--soft);font-size:0.9rem;margin-top:0.4rem;}
-.merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+/* Het RTG Apps-logoblok beweegt mee in de RTG-kleurenroulatie: de wijnrode
+   verankering blijft, maar mengt met de levende dagkleur die met zon en seizoen
+   meedraait, dus het vlak ademt subtiel met de rest van de pagina mee. */
+.merkvlak{display:inline-block;background:color-mix(in srgb, var(--dag-kleur,#9E1C40) 42%, #7F1734);color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;transition:background 1.2s ease;}
+@media (prefers-reduced-motion: reduce){.merkvlak{background:#7F1734;transition:none;}}
 </style>
 </head>
 <body>

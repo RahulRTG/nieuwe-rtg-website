@@ -73,5 +73,21 @@
     return { praat };
   }
 
-  window.RTGMond = { maak };
+  /* De mond als knop-icoon: HET vaste gezicht van Rahul, overal hetzelfde.
+     Geef een knop mee; er komt een klein mond-canvas in (met een toegankelijk
+     label op de knop zelf). Geeft { praat } terug zodat de knop kan
+     "meepraten" als Rahul antwoordt. */
+  function fab(knop, hoogte) {
+    if (!knop || knop.dataset.rtgMondFab) return { praat() {} };
+    knop.dataset.rtgMondFab = '1';
+    const c = document.createElement('canvas');
+    c.width = 440; c.height = 200;
+    c.style.cssText = 'display:block;width:' + (hoogte ? hoogte * 2.2 : 3.4) + 'rem;height:auto;pointer-events:none;';
+    c.setAttribute('aria-hidden', 'true');
+    knop.textContent = '';
+    knop.appendChild(c);
+    return maak(c);
+  }
+
+  window.RTGMond = { maak, fab };
 })();

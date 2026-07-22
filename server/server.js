@@ -2145,6 +2145,9 @@ Object.assign(kern, require('./kern/geloofbieb').maakGeloofBieb({ db, save }));
 Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto }));
 Object.assign(kern, require('./kern/rtfclubs')({ db, save, crypto }));
 Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropic }));
+/* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
+   vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
+Object.assign(kern, require('./kern/pestgrens')({ db, save }));
 /* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
    tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */

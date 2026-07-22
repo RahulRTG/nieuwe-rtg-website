@@ -39,6 +39,16 @@
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;
     var fab = maakEl('<button class="mgz-knop mgz-rahul" type="button" aria-label="Vraag Rahul">✨ Rahul</button>');
+    /* De signatuurmond als HET gezicht van Rahul: dezelfde lippen als op de
+       voorpagina, klein op de knop, altijd in de buurt. De mond-tekenlaag
+       (shared/mond.js) laden we er zelf bij; lukt dat niet, dan blijft de
+       tekstknop gewoon staan. */
+    var mond = { praat: function () {} };
+    (function () {
+      var zet = function () { if (window.RTGMond) { fab.style.padding = '.3rem .55rem'; fab.style.background = '#0C0C0B'; fab.style.border = '1px solid var(--gold,#857007)'; mond = RTGMond.fab(fab); } };
+      if (window.RTGMond) return zet();
+      var s = document.createElement('script'); s.src = '/shared/mond.js'; s.onload = zet; document.head.appendChild(s);
+    })();
     var sheet = maakEl('<section class="mgz-sheet" aria-label="Vraag Rahul" hidden>' +
       '<div class="mgz-kop"><span>✨ Vraag het Rahul</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
       '<div class="mgz-uit" aria-live="polite"></div>' +
@@ -53,7 +63,7 @@
       uit.textContent = 'Rahul denkt na...';
       fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ q: q }) })
         .then(function (r) { return r.json(); })
-        .then(function (d) { uit.textContent = (d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.'; })
+        .then(function (d) { uit.textContent = (d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400); })
         .catch(function () { uit.textContent = 'Even geen verbinding; probeer het zo weer.'; });
     });
   }

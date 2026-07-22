@@ -18,7 +18,7 @@ const MAX_POGING = 5; // koppel-pogingen per account per minuut
 
 function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, hasCred, DEMO,
   DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, rememberSession, logInlog, logActivity,
-  supplierState, officeState, magWerken }) {
+  supplierState, officeState, magWerken, pinInfo, pinCheck }) {
   const nu = () => new Date().toISOString();
   function lijst(key) {
     if (!db.data.accountRollen || typeof db.data.accountRollen !== 'object') db.data.accountRollen = {};
@@ -100,6 +100,14 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     const r = lijst(key).find(x => x.rol === wens.rol && (!wens.code || x.code === wens.code)
       && (wens.staffId == null || x.staffId === wens.staffId));
     if (!r) return { status: 404, error: 'Deze rol is niet aan uw account gekoppeld.' };
+    // de algemene pin: heeft dit lid er een gezet, dan opent er geen werk-app
+    // zonder (bevoegdheid = het ene account, bewijs = de pin). Zonder pin in
+    // het verzoek vragen we er netjes om, zonder een foutpoging te tellen.
+    if (pinInfo && pinCheck && pinInfo(key).gezet) {
+      if (!(body || {}).pin) return { status: 401, error: 'Voer uw algemene pin in.', pinNodig: true };
+      const p = pinCheck(key, body.pin);
+      if (p.error) return { status: p.status || 401, error: p.error, pinNodig: true };
+    }
     if (r.rol === 'kantoor') {
       const token = crypto.randomBytes(24).toString('hex');
       rememberSession(token, { role: 'office' });

@@ -77,7 +77,13 @@
     telGebruik(item);
     if (item.startsWith('tab:')) { const b = tabKnop(item.slice(4)); if (b) b.click(); }
     else if (item.startsWith('os:')) { openOsApp(item.slice(3)); }
-    else { const l = LINKS[item.slice(5)]; if (l) location.href = l.url; }
+    else {
+      const l = LINKS[item.slice(5)];
+      if (!l) return;
+      // prive-apps openen pas na de algemene pin (25-os-01a.js)
+      if (l.prive) return metAlgPin(() => { location.href = l.url; });
+      location.href = l.url;
+    }
   }
 
   /* ---------- de kiezer: Bellen, Videobellen en Snaps ----------
@@ -87,6 +93,8 @@
   function openOsApp(naam) {
     const app = OSAPPS[naam]; if (!app || !belScrim) return;
     sluitScrims();
+    // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
+    if (naam === 'werk') { openWerkKiezer(); return; }
     belTitel.textContent = app.icoon + ' ' + app.naam;
     belLijst.textContent = '';
     // RTFoundation: een leeftijdskeuze, daarna opent de juiste app (RTF-jas)

@@ -4,7 +4,11 @@
    en met het ene account een werk-sessie starten of een rol ontkoppelen. */
 module.exports = (kern) => {
   const { app, auth, accRollen, accKoppel, accStart, accOntkoppel } = kern;
-  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  // bij een weigering reizen ook de duidingsvelden mee (pinNodig: de app moet
+  // om de algemene pin vragen; venster: het werkvenster dat de deur dichthoudt)
+  const stuur = (res, r) => r.error
+    ? res.status(r.status || 400).json({ error: r.error, ...(r.pinNodig ? { pinNodig: true } : {}), ...(r.venster ? { venster: r.venster } : {}) })
+    : res.json(r);
   const echtAccount = (req, res) => {
     if (req.session.tier === 'guest' || !req.session.account) {
       res.status(403).json({ error: 'Maak eerst een (gratis) RTG-account; dat ene account is daarna uw sleutel tot alles.' });

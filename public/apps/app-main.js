@@ -443,6 +443,87 @@
     location.reload();
   }
 
+  /* Aanmelden als gesprek: Rahul in plaats van het ouderwetse formulier.
+     Het gesprek verzamelt de antwoorden menselijk (en legt op "waarom?" uit
+     waarvoor iets dient); aan het eind gaan de velden door dezelfde ene
+     registratieroute als het formulier (login() hierboven), dus er is geen
+     tweede toegangspad. Wie liever zelf invult, klapt het oude formulier
+     open. Deelt de IIFE-scope met 00-kern-03.js (toReg, login, API, T). */
+  (function aanmeldGesprek(){
+    const regForm = document.getElementById('regForm');
+    if (!regForm || !API.enabled) return;
+    const st = document.createElement('style');
+    st.textContent = '#regForm.ag-chat > :not(.ag-doos){display:none !important;}' +
+      '.ag-doos{display:flex;flex-direction:column;gap:0.5rem;width:100%;}' +
+      '.ag-log{display:flex;flex-direction:column;gap:0.45rem;max-height:46vh;overflow-y:auto;padding:0.2rem 0;}' +
+      '.ag-bericht{border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.75rem;font-size:0.82rem;line-height:1.5;max-width:92%;}' +
+      '.ag-bericht.van-rahul{align-self:flex-start;background:var(--card2,#1B1817);}' +
+      '.ag-bericht.van-mij{align-self:flex-end;background:var(--burgundy);color:#fff;border-color:var(--burgundy);}' +
+      '.ag-rij{display:flex;gap:0.4rem;}' +
+      '.ag-rij input{flex:1;min-width:0;}' +
+      '.ag-wissel{font-size:0.7rem;color:var(--soft);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0.2rem 0;font-family:inherit;}';
+    document.head.appendChild(st);
+
+    const doos = document.createElement('div');
+    doos.className = 'ag-doos';
+    doos.innerHTML = '<div class="ag-log" role="log" aria-live="polite" aria-label="' + T('ag.log','Gesprek met Rahul') + '"></div>' +
+      '<div class="ag-rij"><input id="agIn" autocomplete="off" aria-label="' + T('ag.in','Uw antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Typ gewoon wat u denkt...') + '">' +
+      '<button type="button" class="abtn" id="agGo">' + T('ag.stuur','Stuur') + '</button></div>' +
+      '<button type="button" class="ag-wissel" id="agWissel">' + T('ag.zelf','Liever zelf invullen? Open het formulier.') + '</button>';
+    regForm.insertBefore(doos, regForm.firstChild);
+    regForm.classList.add('ag-chat');
+
+    const log = doos.querySelector('.ag-log');
+    const inp = doos.querySelector('#agIn');
+    let gesprek = null, bezig = false, velden = null;
+
+    function zeg(wie, tekst){
+      const b = document.createElement('div');
+      b.className = 'ag-bericht van-' + wie;
+      b.textContent = tekst;
+      log.appendChild(b);
+      log.scrollTop = log.scrollHeight;
+    }
+    async function start(){
+      if (gesprek || bezig) return;
+      bezig = true;
+      try { const d = await API.call('/aanmeld/start', {}); gesprek = d.id; zeg('rahul', d.tekst); }
+      catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; het formulier hieronder werkt altijd.')); }
+      bezig = false;
+    }
+    async function stuur(){
+      const tekst = inp.value.trim();
+      if (!tekst || bezig || !gesprek) return;
+      zeg('mij', inp.type === 'password' ? '••••••••' : tekst);
+      inp.value = '';
+      bezig = true;
+      try {
+        const d = await API.call('/aanmeld/zeg', { id: gesprek, tekst });
+        zeg('rahul', d.tekst);
+        // bij de wachtwoord-stap kijkt niemand mee, ook op het scherm niet
+        inp.type = /wachtwoord/i.test(d.tekst) && !d.klaar ? 'password' : 'text';
+        if (d.klaar && d.velden){
+          velden = d.velden;
+          if (d.werkgever) { try { localStorage.setItem('rtg_ag_werkgever', JSON.stringify(d.werkgever)); } catch(e2){} }
+          // dezelfde ene registratieroute als het formulier
+          await login('rtg', { register: true, name: velden.name, u: velden.email, phone: velden.phone,
+            geboortedatum: velden.geboortedatum, p: velden.password, tier: velden.tier });
+        }
+      } catch(e){ zeg('rahul', e.message || T('ag.mis2','Dat ging even mis; zeg het nog eens.')); }
+      bezig = false;
+      inp.focus();
+    }
+    doos.querySelector('#agGo').addEventListener('click', stuur);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); stuur(); } });
+    doos.querySelector('#agWissel').addEventListener('click', () => {
+      const chat = regForm.classList.toggle('ag-chat');
+      doos.querySelector('#agWissel').textContent = chat
+        ? T('ag.zelf','Liever zelf invullen? Open het formulier.')
+        : T('ag.terug','Toch liever met Rahul praten? Sluit het formulier.');
+      if (chat) start();
+    });
+    if (toReg) toReg.addEventListener('click', start);
+  })();
   /* ================= SALON-CONNECTIES =================
      Leden voegen elkaar toe op codenaam, chatten 1-op-1, delen posts
      en bellen elkaar. Bellen is echte WebRTC: beeld en geluid gaan
@@ -2304,6 +2385,107 @@
   // hij verschijnt alleen op het springboard van die passen, vooraan op pagina twee.
   if (['lifestyle', 'business'].includes(pas)) INDELING[1].splice(1, 0, 'link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous');
 
+  /* ---------- Werk op het OS + de algemene pin ----------
+     De werk-apps zijn gewone apps op het RTG-OS: een tik op "Werk" toont de
+     werkplekken die aan het ene RTG-account gekoppeld zijn (bevoegdheid), en
+     openen gaat met de algemene pin (het bewijs), dezelfde pin die de
+     privacygevoelige apps op dit OS beschermt. Onder water munt
+     /api/account/start de werksessie, dus alle regels (zoals het werkvenster
+     van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
+     OSAPPS/INDELING/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
+  OSAPPS.werk = { naam: 'Werk', icoon: '💼' };
+  INDELING[1].push('os:werk');
+  // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
+  for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
+
+  let pinOkTot = 0; // de pin blijft vijf minuten geldig, zoals op een telefoon
+  const WERKDOEL = {
+    personeel: { icoon: '🧭', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
+    zaak:      { icoon: '🏛️', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
+    kantoor:   { icoon: '📊', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
+  };
+
+  /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
+  function metAlgPin(af) {
+    if (Date.now() < pinOkTot) return af(null);
+    API.call('/pin/status', {}).then(st => {
+      const zetten = !st.gezet;
+      belTitel.textContent = zetten ? '🔒 ' + T('pin.zet', 'Kies uw algemene pin') : '🔒 ' + T('pin.vraag', 'Algemene pin');
+      belLijst.textContent = '';
+      const uitleg = document.createElement('div');
+      uitleg.className = 'os-bel-leeg';
+      uitleg.textContent = zetten
+        ? T('pin.zetuit', 'Een pincode van 4 tot 8 cijfers, overal dezelfde: hij beschermt uw prive-apps en opent uw werk-apps.')
+        : T('pin.vrguit', 'Dezelfde pin die uw prive-apps beschermt.');
+      belLijst.appendChild(uitleg);
+      const inp = document.createElement('input');
+      inp.type = 'password'; inp.inputMode = 'numeric'; inp.maxLength = 8; inp.autocomplete = 'off';
+      inp.setAttribute('aria-label', T('pin.veld', 'Algemene pin'));
+      inp.style.cssText = 'width:100%;margin:0.5rem 0;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.8rem;font-size:1rem;letter-spacing:0.4em;text-align:center;color:var(--txt);';
+      belLijst.appendChild(inp);
+      const fout = document.createElement('div');
+      fout.className = 'os-bel-leeg'; fout.style.color = 'var(--burgundy-on-dark,#C23A5E)';
+      belLijst.appendChild(fout);
+      const ga = document.createElement('button');
+      ga.textContent = zetten ? T('pin.bewaar', 'Pin instellen') : T('pin.open', 'Ontgrendel');
+      const doe = async () => {
+        const pin = inp.value.trim();
+        if (!/^\d{4,8}$/.test(pin)) { fout.textContent = T('pin.vorm', '4 tot 8 cijfers.'); return; }
+        try {
+          if (zetten) await API.call('/pin/zet', { pin });
+          else await API.call('/pin/check', { pin });
+          pinOkTot = Date.now() + 5 * 60000;
+          sluitScrims();
+          af(pin);
+        } catch (e) { fout.textContent = e.message || T('pin.mis', 'Dat ging niet goed.'); inp.value = ''; inp.focus(); }
+      };
+      ga.addEventListener('click', doe);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') doe(); });
+      belLijst.appendChild(ga);
+      belScrim.classList.add('open');
+      setTimeout(() => inp.focus(), 60);
+    }).catch(() => af(null)); // geen account/lijn: niet blokkeren, de werk-app vraagt zelf
+  }
+
+  /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
+  function openWerkKiezer() {
+    belTitel.textContent = '💼 ' + T('werk.h', 'Werk');
+    belLijst.textContent = '';
+    API.call('/account/rollen', {}).then(d => {
+      const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
+      if (!rollen.length) {
+        const leeg = document.createElement('div');
+        leeg.className = 'os-bel-leeg';
+        leeg.textContent = T('werk.leeg', 'Nog geen werkplek gekoppeld. Bewijs eenmalig uw werk-inlog (bijvoorbeeld uw personeels-PIN in de leverancier-app); daarna opent uw werk hier met uw algemene pin.');
+        belLijst.appendChild(leeg);
+        return;
+      }
+      for (const r of rollen) {
+        const doel = WERKDOEL[r.rol];
+        const b = document.createElement('button');
+        const zi = document.createElement('span'); zi.className = 'zi'; zi.textContent = doel.icoon;
+        b.appendChild(zi);
+        b.appendChild(document.createTextNode(doel.app));
+        const m = document.createElement('span'); m.className = 'zm';
+        m.textContent = (r.zaakNaam || r.naam || '') + (r.naam && r.zaakNaam ? ' · ' + r.naam : '');
+        b.appendChild(m);
+        b.addEventListener('click', () => metAlgPin(async (pin) => {
+          try {
+            const s = await API.call('/account/start', { rol: r.rol, code: r.code, staffId: r.staffId, pin });
+            try { doel.bewaar(s.token, r); } catch (e2) {}
+            location.href = doel.url;
+          } catch (e) { bannerToon('💼', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
+        }));
+        belLijst.appendChild(b);
+      }
+    }).catch(() => {
+      const leeg = document.createElement('div');
+      leeg.className = 'os-bel-leeg';
+      leeg.textContent = T('werk.acc', 'Werk op het OS werkt met een echt RTG-account.');
+      belLijst.appendChild(leeg);
+    });
+    belScrim.classList.add('open');
+  }
   /* ---------- mappen: eigen namen ----------
      De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus
      (tik op de map) of via de Butler; de keuze staat per pas in localStorage. */
@@ -2383,7 +2565,13 @@
     telGebruik(item);
     if (item.startsWith('tab:')) { const b = tabKnop(item.slice(4)); if (b) b.click(); }
     else if (item.startsWith('os:')) { openOsApp(item.slice(3)); }
-    else { const l = LINKS[item.slice(5)]; if (l) location.href = l.url; }
+    else {
+      const l = LINKS[item.slice(5)];
+      if (!l) return;
+      // prive-apps openen pas na de algemene pin (25-os-01a.js)
+      if (l.prive) return metAlgPin(() => { location.href = l.url; });
+      location.href = l.url;
+    }
   }
 
   /* ---------- de kiezer: Bellen, Videobellen en Snaps ----------
@@ -2393,6 +2581,8 @@
   function openOsApp(naam) {
     const app = OSAPPS[naam]; if (!app || !belScrim) return;
     sluitScrims();
+    // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
+    if (naam === 'werk') { openWerkKiezer(); return; }
     belTitel.textContent = app.icoon + ' ' + app.naam;
     belLijst.textContent = '';
     // RTFoundation: een leeftijdskeuze, daarna opent de juiste app (RTF-jas)

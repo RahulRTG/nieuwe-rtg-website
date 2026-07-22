@@ -2419,6 +2419,15 @@ Object.assign(kern, require('./kern/wbw').maakWbw({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan,
   connectieTussen: kern.connectieTussen, verbActief: kern.verbActief, pay: kern.pay, notify
 }));
+/* Het aanmeldgesprek (kern/aanmeldgesprek.js): Rahul vervangt het ouderwetse
+   aanmeldformulier met een menselijk gesprek dat de velden voor de ene
+   registratieroute oplevert (en op "waarom?" eerlijk uitlegt waarvoor iets
+   dient). */
+Object.assign(kern, require('./kern/aanmeldgesprek').maakAanmeldgesprek({ db, schoon, leeftijdVan }));
+/* De algemene pin (kern/algpin.js): een pincode van het lid die de
+   privacygevoelige apps op het OS beschermt en waarmee de werk-apps openen
+   (het ene account = bevoegdheid, de pin = bewijs). */
+Object.assign(kern, require('./kern/algpin').maakAlgPin({ db, save, crypto }));
 /* Het werkvenster (kern/werkvenster.js): de werkgever bepaalt wanneer
    personeel op de werkpagina en de PDA mag; de server dwingt dat af bij elke
    ingang naar een personeelssessie. Rahul adviseert los daarvan (agenda,
@@ -2434,7 +2443,8 @@ Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
   db, save, crypto, accounts, findSupplier, checkCred: kern.checkCred, hasCred: kern.hasCred,
   DEMO: kern.DEMO, DEMO_SUPPLIER: kern.DEMO_SUPPLIER, OFFICE_CODE: kern.OFFICE_CODE,
   veiligGelijk: kern.veiligGelijk, totpOk: kern.totpOk, rememberSession, logInlog: kern.logInlog,
-  logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken
+  logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken,
+  pinInfo: kern.pinInfo, pinCheck: kern.pinCheck
 }));
 /* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
    (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een
@@ -2508,6 +2518,8 @@ for (const naam of gekozenDomeinen) {
 // De verplichte onboarding + het contract raken leden, gasten, de eigenaar en
 // leveranciers; net als de infra-endpoints draait dit altijd mee.
 require('./routes/onboarding')(kern);
+require('./routes/aanmeldgesprek')(kern);
+require('./routes/algpin')(kern);
 require('./routes/agenda')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/markt')(kern);

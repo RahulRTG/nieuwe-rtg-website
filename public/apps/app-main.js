@@ -2399,6 +2399,14 @@
   for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
 
   let pinOkTot = 0; // de pin blijft vijf minuten geldig, zoals op een telefoon
+  // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
+  // opnieuw proberen; de server vergelijkt en bewaart er niets van
+  const vraagPositie = () => new Promise(af => {
+    if (!navigator.geolocation) return af(null);
+    navigator.geolocation.getCurrentPosition(
+      p => af({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      () => af(null), { enableHighAccuracy: true, timeout: 8000 });
+  });
   const WERKDOEL = {
     personeel: { icoon: '🧭', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
     zaak:      { icoon: '🏛️', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
@@ -2471,7 +2479,15 @@
         b.appendChild(m);
         b.addEventListener('click', () => metAlgPin(async (pin) => {
           try {
-            const s = await API.call('/account/start', { rol: r.rol, code: r.code, staffId: r.staffId, pin });
+            const body = { rol: r.rol, code: r.code, staffId: r.staffId, pin };
+            let s;
+            try { s = await API.call('/account/start', body); }
+            catch (e1) {
+              if (!(e1.data && e1.data.locatieNodig)) throw e1;
+              const pos = await vraagPositie();
+              if (!pos) throw e1;
+              s = await API.call('/account/start', Object.assign({ positie: pos }, body));
+            }
             try { doel.bewaar(s.token, r); } catch (e2) {}
             location.href = doel.url;
           } catch (e) { bannerToon('💼', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }

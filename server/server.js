@@ -2433,7 +2433,7 @@ Object.assign(kern, require('./kern/algpin').maakAlgPin({ db, save, crypto }));
    ingang naar een personeelssessie. Rahul adviseert los daarvan (agenda,
    uren, zorgprofiel) maar blokkeert nooit. */
 Object.assign(kern, require('./kern/werkvenster').maakWerkvenster({
-  db, save, klokVan, zorgVan: kern.zorgVan
+  db, save, klokVan, zorgVan: kern.zorgVan, haversine
 }));
 /* Een account voor alles (kern/eenaccount.js): mensen registreren zich een
    keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene

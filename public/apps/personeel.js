@@ -381,9 +381,25 @@
       '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
       '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>';
     $('#gb3').addEventListener('click', () => stepWie(secId, c));
+    // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
+    // opnieuw proberen; de server vergelijkt en bewaart er niets van
+    const vraagPositie = () => new Promise(af => {
+      if (!navigator.geolocation) return af(null);
+      navigator.geolocation.getCurrentPosition(
+        p => af({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        () => af(null), { enableHighAccuracy: true, timeout: 8000 });
+    });
     const go = async () => {
       try {
-        const d = await API.call('/supplier/login', { code: c, staffId, pin: $('#pinInp').value });
+        const body = { code: c, staffId, pin: $('#pinInp').value };
+        let d;
+        try { d = await API.call('/supplier/login', body); }
+        catch(e1){
+          if (!(e1.data && e1.data.locatieNodig)) throw e1;
+          const pos = await vraagPositie();
+          if (!pos) throw e1;
+          d = await API.call('/supplier/login', Object.assign({ positie: pos }, body));
+        }
         API.token = d.token; state = d.state; code = c;
         me = { name: d.state.actor.name, role: d.state.actor.role, staffId: d.state.actor.staffId };
         try { localStorage.setItem('rtg_pda_token', API.token); localStorage.setItem('rtg_pda_code', code); } catch(e2){}

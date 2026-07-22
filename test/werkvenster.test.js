@@ -13,7 +13,8 @@ const fs = require('fs'); const os = require('os'); const path = require('path')
 function verseKern(klok) {
   const db = { data: { agendas: {}, live: {} } };
   const { maakWerkvenster } = require('../server/kern/werkvenster');
-  const kern = maakWerkvenster({ db, save: () => {}, klokVan: klok || (() => ({ vandaagUren: 0, weekUren: 0 })), zorgVan: () => null });
+  const { haversine } = require('../server/lib/geo');
+  const kern = maakWerkvenster({ db, save: () => {}, klokVan: klok || (() => ({ vandaagUren: 0, weekUren: 0 })), zorgVan: () => null, haversine });
   return { db, kern };
 }
 const wo12 = new Date('2026-07-22T12:00:00'); // woensdag 12:00 (lokale tijd)
@@ -57,6 +58,45 @@ test('2. kern: Rahul adviseert bij veel uren en een lege agenda, en zwijgt ander
   // niets aan de hand: geen gepush
   const { kern: rustig } = verseKern(() => ({ vandaagUren: 3, weekUren: 20 }));
   assert.equal(rustig.werkAdvies({ code: 'X', staffId: 7, lidKey: 'testlid', d: wo12 }), null, 'zonder reden zwijgt Rahul');
+});
+
+test('4. kern: per persoon (altijd/nooit/eigen tijden), de werkplek-zone en thuiswerk', () => {
+  const { kern } = verseKern();
+  const s = { settings: {} };
+  kern.zetWerkvenster(s, { aan: true, dagen: { 3: { van: '08:00', tot: '17:00' } } }); // woensdag
+  const staf = { staffId: 7, manager: false };
+  // nooit: de deur blijft dicht, ook midden in het zaakvenster
+  kern.zetWerkvenster(s, { perStaff: { 7: { stand: 'nooit' } } });
+  const nooit = kern.magWerken(s, staf, wo12);
+  assert.equal(nooit.ok, false, '"nooit" sluit de PDA voor deze persoon');
+  assert.match(nooit.error, /uitgezet/, 'de weigering legt het uit');
+  // altijd: ook buiten het zaakvenster open
+  kern.zetWerkvenster(s, { perStaff: { 7: { stand: 'altijd' } } });
+  assert.equal(kern.magWerken(s, staf, wo18).ok, true, '"altijd" gaat voor op het zaakvenster');
+  // eigen tijden: het eigen slot telt, niet dat van de zaak
+  kern.zetWerkvenster(s, { perStaff: { 7: { stand: 'eigen', van: '18:00', tot: '22:00' } } });
+  assert.equal(kern.magWerken(s, staf, wo12).ok, false, 'eigen tijden: overdag dicht');
+  assert.equal(kern.magWerken(s, staf, wo18).ok, true, 'eigen tijden: de avond open');
+  // eigen tijden zonder geldige tijden vallen terug op de zaak
+  kern.zetWerkvenster(s, { perStaff: { 7: { stand: 'eigen', van: 'kapot', tot: '' } } });
+  assert.equal(kern.magWerken(s, staf, wo12).ok, true, 'ongeldige eigen tijden = gewoon het zaakvenster');
+  // de werkplek-zone: eerst een onzin-plek (geweigerd), dan een echte
+  kern.zetWerkvenster(s, { plek: { lat: 999, lng: 4, radiusM: 200 } });
+  assert.equal(kern.magWerken(s, staf, wo12).ok, true, 'een onzin-plek wordt niet ingesteld');
+  kern.zetWerkvenster(s, { plek: { lat: 52.0, lng: 4.0, radiusM: 200 } });
+  const zonder = kern.magWerken(s, staf, wo12);
+  assert.equal(zonder.ok, false, 'zone aan + geen positie = dicht');
+  assert.equal(zonder.locatieNodig, true, 'de app weet dat een positie nodig is');
+  assert.equal(kern.magWerken(s, staf, wo12, { lat: 52.0005, lng: 4.0 }).ok, true, 'binnen de zone mag het');
+  const ver = kern.magWerken(s, staf, wo12, { lat: 52.1, lng: 4.0 });
+  assert.equal(ver.ok, false, 'ver buiten de zone niet');
+  assert.match(ver.error, /werkplek/, 'de weigering noemt de werkplek');
+  // thuiswerk-toestemming heft de zone op (net als op de desktop)
+  kern.zetWerkvenster(s, { perStaff: { 7: { stand: 'zaak', thuiswerk: true } } });
+  assert.equal(kern.magWerken(s, staf, wo12).ok, true, 'thuiswerk aan = ook zonder positie welkom');
+  // de zone weghalen
+  kern.zetWerkvenster(s, { perStaff: { 7: { stand: 'zaak', thuiswerk: false } }, plek: null });
+  assert.equal(kern.magWerken(s, staf, wo12).ok, true, 'zone weg = alleen nog het tijdvenster');
 });
 
 /* ---------- de echte ingangen ---------- */
@@ -111,6 +151,31 @@ test('3. ingangen: buiten het venster geen personeelssessie; de manager en het e
     // en de niet-manager mag het venster niet zetten
     const nee = await api(base, '/api/supplier/werkvenster', { aan: true }, open.body.token);
     assert.equal(nee.status, 403, 'alleen de manager stelt het werkvenster in');
+
+    // de werkplek-zone op de echte ingangen: dag weer open, zone aan
+    const zone = await api(base, '/api/supplier/werkvenster',
+      { aan: true, dagen: { [vandaag]: { dicht: false } }, plek: { lat: 52.0, lng: 4.0, radiusM: 200 } }, mtok);
+    assert.equal(zone.status, 200);
+    assert.equal(zone.body.werkvenster.plek.radiusM, 200, 'de zone staat in de instellingen');
+    const geenPos = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678' });
+    assert.equal(geenPos.status, 403, 'zone aan + geen positie = geen sessie');
+    assert.equal(geenPos.body.locatieNodig, true, 'de app hoort dat een positie nodig is');
+    const accPos = await api(base, '/api/account/start', { rol: 'personeel', code: 'KIKUNOI', staffId: lidStaf.id }, lid);
+    assert.equal(accPos.status, 403, 'het ene account volgt dezelfde zone-regel');
+    assert.equal(accPos.body.locatieNodig, true, 'ook daar reist locatieNodig mee');
+    const opPlek = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678', positie: { lat: 52.0005, lng: 4.0 } });
+    assert.equal(opPlek.status, 200, 'binnen de zone gewoon aan het werk');
+    const teVer = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678', positie: { lat: 52.1, lng: 4.0 } });
+    assert.equal(teVer.status, 403, 'ver buiten de zone niet');
+    // thuiswerk-toestemming: dan werkt het ook zonder positie, net als de desktop
+    const thuis = await api(base, '/api/supplier/werkvenster', { perStaff: { [lidStaf.id]: { stand: 'zaak', thuiswerk: true } } }, mtok);
+    assert.equal(thuis.status, 200);
+    const vanThuis = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678' });
+    assert.equal(vanThuis.status, 200, 'thuiswerk aan = inloggen van huis mag');
+    // en "nooit" sluit de PDA voor deze ene persoon, waar die ook is
+    await api(base, '/api/supplier/werkvenster', { perStaff: { [lidStaf.id]: { stand: 'nooit', thuiswerk: false } } }, mtok);
+    const dichtVoorMij = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678', positie: { lat: 52.0, lng: 4.0 } });
+    assert.equal(dichtVoorMij.status, 403, '"nooit" wint van alles behalve de manager');
   } finally {
     await stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

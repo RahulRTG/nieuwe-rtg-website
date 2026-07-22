@@ -132,8 +132,8 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     // het ene account is geen achterdeur: het werkvenster van de werkgever
     // geldt hier precies zo als bij de losse personeelslogin
     if (magWerken) {
-      const w = magWerken(s, { staffId: actor.staffId, manager: actor.manager });
-      if (!w.ok) return { status: 403, error: w.error, venster: w.venster || null };
+      const w = magWerken(s, { staffId: actor.staffId, manager: actor.manager }, null, (body || {}).positie);
+      if (!w.ok) return { status: 403, error: w.error, venster: w.venster || null, ...(w.locatieNodig ? { locatieNodig: true } : {}) };
     }
     const token = crypto.randomBytes(24).toString('hex');
     // lidKey reist mee zodat Rahuls werkadvies (alleen lezend) naar de eigen

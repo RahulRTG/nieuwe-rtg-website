@@ -45,10 +45,10 @@ app.post('/api/supplier/login', async (req, res) => {
     pinFails.delete(fk);
     // het werkvenster van de werkgever: buiten het venster geen sessie
     // (de manager valt er nooit onder; vrijstellingen stelt de zaak zelf in)
-    const wv = magWerken(s, { staffId: staff.id, manager: staff.role === 'manager' });
+    const wv = magWerken(s, { staffId: staff.id, manager: staff.role === 'manager' }, null, req.body.positie);
     if (!wv.ok) {
       logInlog('zaak', false, s.code + ' · ' + staff.name + ' (werkvenster)', req);
-      return res.status(403).json({ error: wv.error, venster: wv.venster || null });
+      return res.status(403).json({ error: wv.error, venster: wv.venster || null, ...(wv.locatieNodig ? { locatieNodig: true } : {}) });
     }
     logInlog('zaak', true, s.code + ' · ' + staff.name, req);
     actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
@@ -81,7 +81,8 @@ app.post('/api/supplier/login', async (req, res) => {
    bij de ingangen (login hierboven en het ene RTG-account), niet hier. */
 app.post('/api/supplier/werkvenster', supplierAuth, (req, res) => {
   const b = req.body || {};
-  const wilZetten = typeof b.aan === 'boolean' || (b.dagen && typeof b.dagen === 'object') || Array.isArray(b.vrijgesteld);
+  const wilZetten = typeof b.aan === 'boolean' || (b.dagen && typeof b.dagen === 'object') || Array.isArray(b.vrijgesteld) ||
+    b.plek !== undefined || (b.perStaff && typeof b.perStaff === 'object');
   if (wilZetten) {
     if (!managerOnly(req, res)) return;
     zetWerkvenster(req.supplier, b);

@@ -33,11 +33,27 @@
   }
   $('#spPinCancel').addEventListener('click', () => { $('#spPin').classList.remove('open'); pinBuf=''; });
 
+  // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
+  // opnieuw proberen; de server vergelijkt en bewaart er niets van
+  const vraagPositie = () => new Promise(af => {
+    if (!navigator.geolocation) return af(null);
+    navigator.geolocation.getCurrentPosition(
+      p => af({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      () => af(null), { enableHighAccuracy: true, timeout: 8000 });
+  });
+
   // Gemeenschappelijke login. Geeft true/false terug bij PIN, zodat de pad kan reageren.
   async function login(body, isCred, silent){
     if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return false; }
     try {
-      const d = await API.call('/supplier/login', body);
+      let d;
+      try { d = await API.call('/supplier/login', body); }
+      catch(e1){
+        if (!(e1.data && e1.data.locatieNodig)) throw e1;
+        const pos = await vraagPositie();
+        if (!pos) throw e1;
+        d = await API.call('/supplier/login', Object.assign({ positie: pos }, body));
+      }
       API.token = d.token;
       applyState(d.state);
       koppelAanRtgAccount(body, isCred); // een account voor alles: stil koppelen

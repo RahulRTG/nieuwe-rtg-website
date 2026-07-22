@@ -5,9 +5,10 @@
 module.exports = (kern) => {
   const { app, auth, accRollen, accKoppel, accStart, accOntkoppel } = kern;
   // bij een weigering reizen ook de duidingsvelden mee (pinNodig: de app moet
-  // om de algemene pin vragen; venster: het werkvenster dat de deur dichthoudt)
+  // om de algemene pin vragen; venster: het werkvenster dat de deur dichthoudt;
+  // locatieNodig: de werkplek-zone vraagt om een positie van het toestel)
   const stuur = (res, r) => r.error
-    ? res.status(r.status || 400).json({ error: r.error, ...(r.pinNodig ? { pinNodig: true } : {}), ...(r.venster ? { venster: r.venster } : {}) })
+    ? res.status(r.status || 400).json({ error: r.error, ...(r.pinNodig ? { pinNodig: true } : {}), ...(r.venster ? { venster: r.venster } : {}), ...(r.locatieNodig ? { locatieNodig: true } : {}) })
     : res.json(r);
   const echtAccount = (req, res) => {
     if (req.session.tier === 'guest' || !req.session.account) {

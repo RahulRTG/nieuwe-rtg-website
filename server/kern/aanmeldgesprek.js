@@ -119,9 +119,9 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
         const wilNieuw = /\b(eerste keer|voor het eerst|nieuw|aanmelden|lid worden|registreren|nog geen|account maken|nog niet)\b/i.test(tekst);
         const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
         if (wilIn && !wilNieuw) {
-          if (mail) { g.stap = 'login-af'; g.login = { u: mail[0].toLowerCase() }; return { tekst: 'Welkom terug. Dan alleen nog je wachtwoord; typ het in het veld hieronder, het gaat rechtstreeks de kluis in en niet door dit gesprek.', login: g.login }; }
+          if (mail) { g.stap = 'login-af'; g.login = { u: mail[0].toLowerCase() }; return { tekst: 'Kijk, daar ben je weer. Nog even je wachtwoord hieronder en je bent binnen; dat gaat rechtstreeks de kluis in, niet door dit gesprek.', login: g.login }; }
           g.stap = 'login-naam';
-          return { tekst: 'Welkom terug. Met welk e-mailadres of welke gebruikersnaam ken ik je?' };
+          return { tekst: 'Ha, welkom terug. Even kijken: welk e-mailadres of welke gebruikersnaam gebruik je hier?' };
         }
         if (wilNieuw && !wilIn) {
           g.stap = 'hallo';
@@ -134,17 +134,17 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
       case 'login-naam': {
         const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
         const u = mail ? mail[0].toLowerCase() : schoon(tekst.replace(/^(met\s+|mijn\s+(e-?mail(adres)?|gebruikersnaam|naam)\s+is\s+|het\s+is\s+)/i, ''), 80);
-        if (!u || u.length < 2) return { tekst: 'Met welk e-mailadres of welke gebruikersnaam ken ik je? Typ hem even voluit.' };
+        if (!u || u.length < 2) return { tekst: 'Welk e-mailadres of welke gebruikersnaam gebruik je hier? Typ hem even voluit.' };
         g.login = { u };
         g.stap = 'login-af';
-        return { tekst: 'Dank je. Dan nu alleen je wachtwoord; typ het in het veld hieronder. Het gaat rechtstreeks en versleuteld naar de inlogcontrole, niet door dit gesprek.', login: g.login };
+        return { tekst: 'Top. Nog even je wachtwoord hieronder en je bent binnen; dat gaat rechtstreeks en versleuteld de kluis in, niet door dit gesprek.', login: g.login };
       }
       case 'login-af': {
         if (/\b(opnieuw|ander (adres|account)|verkeerde?|toch (aanmelden|lid|nieuw))\b/i.test(tekst)) {
           g.stap = 'doel'; g.login = null;
           return { tekst: 'Geen punt, we beginnen gewoon opnieuw. Kom je inloggen, of word je lid?' };
         }
-        return { tekst: 'Het wachtwoordveld hieronder is aan zet. Lukt het niet, zeg dan "opnieuw", of gebruik "Wachtwoord vergeten?".', login: g.login || null };
+        return { tekst: 'Typ je wachtwoord gewoon hieronder, dan ben je zo binnen. Kom je er niet uit: zeg "opnieuw" of pak "Wachtwoord vergeten?".', login: g.login || null };
       }
       case 'hallo': {
         g.stap = 'naam';

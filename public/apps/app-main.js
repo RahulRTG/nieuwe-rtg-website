@@ -450,7 +450,8 @@
      via login() -> /auth/login; het wachtwoord van een terugkerend lid gaat
      NOOIT door het gesprek maar rechtstreeks naar de inlogroute. Boven het
      gesprek beweegt de AI-mond (goud, bordeaux, zwart, wit) als Rahul praat.
-     Wie liever klassiek werkt, klapt de formulieren open. Deelt de
+     Er is geen klassieke keuze: Rahul is de poort; de formulieren bestaan
+     alleen nog als vangnet voor wachtwoord-herstel. Deelt de
      IIFE-scope met 00-kern-03.js (toReg, toForgot, login, API, T). */
   (function aanmeldGesprek(){
     const loginFormEl = document.getElementById('loginForm');
@@ -478,10 +479,6 @@
       '.ag-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;' +
         'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
       '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
-      '.ag-voetjes{display:flex;justify-content:center;margin-top:1.4rem;}' +
-      '.ag-wissel{font-size:0.68rem;letter-spacing:0.06em;color:var(--soft);background:none;border:none;cursor:pointer;' +
-        'text-decoration:none;border-bottom:1px solid transparent;padding:0.2rem 0;font-family:inherit;}' +
-      '.ag-wissel:hover{border-bottom-color:var(--soft);}' +
       // de AI-mond: abstract-modern, goud op zwart met bordeaux lippen en een
       // wit accent; praat mee op het ritme van Rahul en respecteert wie
       // minder beweging wil
@@ -510,9 +507,8 @@
       '<path class="am-glans" d="M64 32 Q84 24 100 30" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>' +
       '</svg></div>' +
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
-      '<div class="ag-rij"><input id="agIn" autocomplete="off" aria-label="' + T('ag.in','Uw antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Zeg het gewoon...') + '">' +
-      '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
-      '<div class="ag-voetjes"><button type="button" class="ag-wissel" id="agWissel">' + T('ag.klassiek','Liever klassiek? Open de formulieren.') + '</button></div>';
+      '<div class="ag-rij"><input id="agIn" autocomplete="off" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Zeg het gewoon...') + '">' +
+      '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>';
     ouder.insertBefore(doos, loginFormEl);
     // een wachtwoord-herstel-link uit de e-mail heeft voorrang op het gesprek
     const herstel = new URLSearchParams(location.search).get('reset');
@@ -539,7 +535,7 @@
     }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';
-      inp.placeholder = placeholder || T('ag.ww','Uw wachtwoord');
+      inp.placeholder = placeholder || T('ag.ww','Je wachtwoord');
     }
     function tekstVeld(){
       inp.type = 'text';
@@ -597,20 +593,16 @@
       praat(false);
       inp.focus();
     }
+    // er is GEEN klassieke keuze meer: Rahul is de poort. De formulieren
+    // bestaan alleen nog als vangnet: voor wachtwoord-herstel (de knop
+    // hieronder en de e-maillink) en als het gesprek zelf niet kan starten.
     function klassiek(){
       ouder.classList.remove('ag-over');
-      doos.querySelector('#agWissel').textContent = T('ag.terug','Toch liever met Rahul praten?');
     }
     doos.querySelector('#agGo').addEventListener('click', stuur);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); stuur(); } });
     inp.addEventListener('input', () => inp.closest('.ag-rij').classList.toggle('vol', !!inp.value.trim()));
-    doos.querySelector('#agWissel').addEventListener('click', () => {
-      if (ouder.classList.contains('ag-over')) { klassiek(); return; }
-      ouder.classList.add('ag-over');
-      doos.querySelector('#agWissel').textContent = T('ag.klassiek','Liever klassiek? Open de formulieren.');
-      start();
-    });
-    // "Wachtwoord vergeten?" opent het klassieke herstel; het gesprek wijkt even
+    // "Wachtwoord vergeten?" opent het herstel; het gesprek wijkt even
     if (toForgot) toForgot.addEventListener('click', klassiek);
     // het gesprek begint vanzelf zodra duidelijk is dat er geen sessie ligt
     let onthouden = null;

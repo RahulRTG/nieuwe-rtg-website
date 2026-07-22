@@ -73,6 +73,18 @@ test('de leden-AI (volledig verhaal) en het AI-stuur dragen de doctrine ook', ()
   assert.match(lees('server/kern/stuur.js'), /liever te hard dan een liegbeest/i, 'tool-lus van het stuur');
 });
 
+test('de vertrouwelijkheid: de AI maakt nooit bedrijfsgeheimen openbaar, in elke promptlaag', () => {
+  const { RAHUL_LEAD } = require('../server/kern/rahul');
+  // het gedeelde karakter draagt de regel, plus de resolutie met de eerlijkheid
+  assert.match(RAHUL_LEAD, /bedrijfsgeheimen/i, 'de regel staat in het gedeelde karakter');
+  assert.match(RAHUL_LEAD, /NOOIT openbaar/i, 'nooit openbaar maken');
+  assert.match(RAHUL_LEAD, /de ene zaak gaan nooit naar een andere/i, 'geen lek tussen zaken');
+  assert.match(RAHUL_LEAD, /vertrouwelijkheid/i, 'vertrouwelijkheid staat bij de hardste regels');
+  // de leden-AI (volledig portret) en de tool-lus van het stuur dragen hem ook
+  assert.match(aiVerhaal(), /bedrijfsgeheimen/i, 'leden-AI draagt de vertrouwelijkheid');
+  assert.match(lees('server/kern/stuur.js'), /bedrijfsgeheimen/i, 'de tool-lus van het stuur draagt de vertrouwelijkheid');
+});
+
 test('elke gespreks-assistent begint met het gedeelde karakter (RAHUL_LEAD)', () => {
   // rahulLeadVoor IS het gedeelde karakter, aangevuld met de omgangsvormen
   // voor het lid (kern/rahul.js); beide vormen dragen dezelfde vaste kern.

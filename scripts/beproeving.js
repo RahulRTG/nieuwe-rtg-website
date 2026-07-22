@@ -318,9 +318,15 @@ async function tokens() {
   const mBus = (await post('/api/login', { tier: 'business' })).data.token;
   const office = (await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token;
   const sup = (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token;
+  // de eigenaar: boardroom-besluiten (de schakelkast) lopen sinds de
+  // boardroom-poort alleen nog via zijn eigen account; de anonieme
+  // kantoorcode blijft de office-rol in de gauntlet (en hoort daar 403 te
+  // krijgen op boardroom-paden). De eigenaar doet bewust NIET mee aan de
+  // rol-scheidingstest: dat account is echt lid en kantoor tegelijk.
+  const baas = (await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran', pasApp: 'business' })).data.token;
   return {
     member: [mLid, mBus].filter(Boolean), supplier: [sup].filter(Boolean),
-    office: [office].filter(Boolean), open: [null], _lid: mLid, _office: office
+    office: [office].filter(Boolean), open: [null], _lid: mLid, _office: office, _baas: baas || office
   };
 }
 // De grote hendel: elke functie bij iedereen aanzetten, zodat de asserties de
@@ -494,7 +500,7 @@ async function misbruikBeproeving(tok) {
   const tok = await tokens();
   const tokVoor = { member: tok.member, supplier: tok.supplier, office: tok.office, open: tok.open };
   rij('tokens', 'member ' + tok.member.length + ' - supplier ' + tok.supplier.length + ' - office ' + tok.office.length);
-  const aan = await allesAan(tok._office);
+  const aan = await allesAan(tok._baas);
   rij('schakelkast "alles aan"', aan === 200 ? 'ja (elke functie beschikbaar)' : 'status ' + aan);
 
   // ---------- FASE B: GELD (vaste asserties op schone staat) ----------
@@ -515,7 +521,7 @@ async function misbruikBeproeving(tok) {
     await stopNet(); const tB = Date.now(); await boot();   // nette herstart: de server flusht zijn write-behind
     rij('herstart-tijd', ((Date.now() - tB) / 1000).toFixed(1) + ' s');
     await new Promise(r => setTimeout(r, 1500));
-    const office2 = (await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token; await allesAan(office2);
+    const baas2 = (await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran', pasApp: 'business' })).data.token; await allesAan(baas2);
     const herA = (await post('/api/auth/login', { login: geld.A.email, password: geld.A.ww })).data.token;
     const herB = (await post('/api/auth/login', { login: geld.B.email, password: geld.B.ww })).data.token;
     if (!herA || !herB) duurFouten.push('opnieuw inloggen na herstart mislukte');
@@ -533,7 +539,7 @@ async function misbruikBeproeving(tok) {
   // na de herstart weer alle tokens vers ophalen voor de storm
   const tok2 = await tokens();
   tokVoor.member = tok2.member; tokVoor.supplier = tok2.supplier; tokVoor.office = tok2.office;
-  await allesAan(tok2._office);
+  await allesAan(tok2._baas);
 
   // ---------- machine-kalibratie (voor het LATENTIE-oordeel) ----------
   function spinBrok() { let x = 0; for (let i = 0; i < 4e6; i++) x = (x + i) % 9973; return x; }

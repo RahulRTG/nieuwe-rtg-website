@@ -500,12 +500,12 @@ app.use('/api/foundation', rtf.router);
 // een gezinsmelding voor een gekoppelde oppas/familie ook als telefoonmelding (web-push)
 rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch (e) {} });
 
-/* De voordeur is het RTG-OS-inlogscherm van de app. Er is geen losse
-   marketingsite meer: wie naar / gaat, komt meteen op het inlogscherm
-   (app.html toont het gate-scherm als je niet ingelogd bent, en de app zelf
-   als je dat wel bent). 302 zodat dit makkelijk terug te draaien is en niet
-   hard gecachet wordt. */
-app.get('/', (req, res) => res.redirect(302, '/apps/app.html'));
+/* De voordeur is het RTG-OS-bureaublad (ROS): wie naar / gaat, krijgt meteen
+   het besturingssysteem met alle apps als tegels. GEEN omleiding meer: we
+   serveren het bureaublad rechtstreeks (interne rewrite), zodat de nonce-/CSP-
+   laag hieronder er gewoon overheen gaat en er geen 302-sprong in de weg zit.
+   De losse apps regelen hun eigen inlog zodra je er een opent. */
+app.get('/', (req, res, next) => { req.url = '/apps/bureau.html'; next(); });
 
 /* Strengere CSP voor de app-pagina's: geen 'unsafe-inline' voor scripts, maar
    een per-antwoord nonce. We lezen het .html-bestand, geven elke <script> die

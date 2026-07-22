@@ -9,6 +9,8 @@
       (de server begrenst altijd al; dit voorkomt stil afgekapte invoer)
    4. leren: het ?-knopje linksonder opent de app-gids (wat is dit, wat kun je
       hier, een leerzame tip) via /api/gids/app
+   5. sfeer: laadt het lopende werk bij (shared/uurwerk.js), de gangreserve
+      van het huis die als een stil verhaal over alle pagina's doorloopt
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */
 (function () {
   'use strict';
@@ -45,6 +47,11 @@
   }
   window.addEventListener('offline', function () { toost(rtf ? 'Even geen internet; de app werkt gewoon door waar dat kan.' : 'Geen verbinding; de app werkt door waar dat kan.'); });
   window.addEventListener('online', function () { toost('De verbinding is terug.'); });
+
+  /* ---- 5. het lopende werk: de gangreserve-laag van het huis ---- */
+  var uw = document.createElement('script');
+  uw.src = '/shared/uurwerk.js'; uw.async = true;
+  (document.head || document.documentElement).appendChild(uw);
 
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {

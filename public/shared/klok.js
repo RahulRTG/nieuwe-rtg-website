@@ -49,6 +49,10 @@
     '.rtg-ring .rr-as{fill:var(--klok-goud,var(--gold,#C9A24B));fill-opacity:0.75;}' +
     '.rtg-ring .rr-onrust{fill:none;stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.6;stroke-width:1.1;}' +
     '.rtg-ring .rr-spiraal{fill:none;stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.45;stroke-width:0.35;}' +
+    // de gangreserve: een klein boogje met wijzertje, in hetzelfde gedempte goud
+    '.rtg-ring .rr-res{fill:none;stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.22;stroke-width:0.5;}' +
+    '.rtg-ring .rr-resvol{fill:none;stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.6;stroke-width:0.9;}' +
+    '.rtg-ring .rr-reswijzer{stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.85;stroke-width:0.8;stroke-linecap:round;}' +
     // de cijfers exact in het midden: naam en datumvenster staan er
     // symmetrisch omheen, zodat alles even ver van elkaar en de rand staat.
     // Het goud-accent van de milliseconden telt NIET mee voor het centreren
@@ -196,6 +200,40 @@
     onrust.appendChild(balans);
     // het echappementswiel tussen de onrust en het raderwerk, met puntige tanden
     const echap = rad(131.5, 138.5, 6.2, 15, true);
+    /* ---- de gangreserve: het kleine wijzertje linksboven ----
+       De veer van het huis: shared/uurwerk.js houdt over ALLE pagina's heen
+       bij hoe ver het werk is opgewonden (aanwezigheid windt op, dit horloge
+       zelf is de kroon). Het boogje beslaat 230 graden: links leeg, rechts
+       vol; de gevulde boog groeit mee met de wijzer. */
+    const RES_A = 115 * Math.PI / 180;
+    const resBoog = (a0, a1, r) => {
+      const groot = (a1 - a0) > Math.PI ? 1 : 0;
+      return 'M' + pt(r, a0) + 'A' + r + ' ' + r + ' 0 ' + groot + ' 1 ' + pt(r, a1);
+    };
+    const resG = maak('g', { transform: 'translate(59 72)' });
+    const resDeel = (klasse, d) => {
+      const q = document.createElementNS(NS, 'path');
+      q.setAttribute('class', klasse); q.setAttribute('d', d);
+      resG.appendChild(q);
+      return q;
+    };
+    resDeel('rr-res', resBoog(-RES_A, RES_A, 10));
+    for (let i = 0; i <= 4; i++) {
+      const a = -RES_A + i / 4 * 2 * RES_A, l = document.createElementNS(NS, 'line');
+      const b1 = pt(8.6, a).split(' '), b2 = pt(10, a).split(' ');
+      l.setAttribute('x1', b1[0]); l.setAttribute('y1', b1[1]); l.setAttribute('x2', b2[0]); l.setAttribute('y2', b2[1]);
+      l.setAttribute('class', 'rr-res');
+      resG.appendChild(l);
+    }
+    const resVol = resDeel('rr-resvol', '');
+    const resWijzer = document.createElementNS(NS, 'line');
+    resWijzer.setAttribute('x1', 0); resWijzer.setAttribute('y1', 1.6);
+    resWijzer.setAttribute('x2', 0); resWijzer.setAttribute('y2', -7.4);
+    resWijzer.setAttribute('class', 'rr-reswijzer');
+    resG.appendChild(resWijzer);
+    const resAs = document.createElementNS(NS, 'circle');
+    resAs.setAttribute('r', 1); resAs.setAttribute('class', 'rr-as');
+    resG.appendChild(resAs);
     // de signatuur: alleen de naam, in het goud van het huis, op vaste
     // breedte (textLength) exact gecentreerd
     const naam = maak('text', { x: 100, y: 41.5, class: 'rr-naam', 'text-anchor': 'middle',
@@ -299,6 +337,7 @@
     setTimeout(passenwerk, 1200);
     const cijfers = maakCijfers(tijd);
     let vorigeDag = '', vorigeDatum = '', vorigeKalenderdag = '';
+    let fase = 0, vorigeTik = 0, vorigeResHoek = -999;
     return d => {
       cijfers(d);
       /* De datum verspringt niet stilletjes: precies om 00:00 slaat de schijf
@@ -325,18 +364,34 @@
       vorigeKalenderdag = kalenderdag;
       const sec = d.getSeconds() + (RUSTIG ? 0 : d.getMilliseconds() / 1000);
       wijzer.setAttribute('transform', 'rotate(' + (sec * 6) + ' 100 100)');
-      /* het binnenwerk draait mee op de kloktijd: het secondewiel loopt
-         gelijk met de veger, de volgende raderen tegengesteld op hun
-         tandverhouding (18:12:8), de onrust slaat op 3 Hz en het
-         echappement klikt zes tanden per seconde door */
+      /* de gangreserve-wijzer volgt de veer van het huis (RTGUurwerk);
+         zonder die laag staat hij vol, zoals een horloge vers van de bank */
+      const uw = window.RTGUurwerk;
+      const res = uw ? uw.reserve() : 1;
+      const resHoek = -115 + 230 * res;
+      if (Math.abs(resHoek - vorigeResHoek) > 0.4) {
+        resWijzer.setAttribute('transform', 'rotate(' + resHoek.toFixed(1) + ')');
+        resVol.setAttribute('d', res > 0.004 ? resBoog(-RES_A, resHoek * Math.PI / 180, 10) : '');
+        vorigeResHoek = resHoek;
+      }
+      /* het binnenwerk loopt op een eigen fase: normaal in de maat van de
+         seconden (raderen op tandverhouding 18:12:8, onrust op 3 Hz, het
+         echappement klikt zes tanden per seconde door), maar wie het horloge
+         aanraakt draait aan de kroon: alles versnelt speels (tempo), en hoe
+         leger de veer, hoe lomer de gang. De veger en de cijfers blijven
+         ALTIJD op de echte tijd; alleen het decor speelt mee. */
       if (!RUSTIG) {
         const tt = d.getTime() / 1000;
-        const a1 = sec * 6;
-        rad1.g.setAttribute('transform', 'translate(' + rad1.cx + ' ' + rad1.cy + ') rotate(' + a1.toFixed(2) + ')');
-        rad2.g.setAttribute('transform', 'translate(' + rad2.cx + ' ' + rad2.cy + ') rotate(' + (-a1 * 1.5).toFixed(2) + ')');
-        rad3.g.setAttribute('transform', 'translate(' + rad3.cx + ' ' + rad3.cy + ') rotate(' + (a1 * 2.25).toFixed(2) + ')');
-        balans.setAttribute('transform', 'rotate(' + (42 * Math.sin(tt * P2 * 3)).toFixed(2) + ')');
-        echap.g.setAttribute('transform', 'translate(' + echap.cx + ' ' + echap.cy + ') rotate(' + ((Math.floor(tt * 6) % 15) * -24) + ')');
+        if (!vorigeTik) vorigeTik = tt;
+        const kracht = 0.25 + 0.75 * Math.sqrt(res);
+        fase += Math.min(0.25, Math.max(0, tt - vorigeTik)) * (uw ? uw.tempo() : 1) * kracht;
+        vorigeTik = tt;
+        const a1 = fase * 6;
+        rad1.g.setAttribute('transform', 'translate(' + rad1.cx + ' ' + rad1.cy + ') rotate(' + (a1 % 360).toFixed(2) + ')');
+        rad2.g.setAttribute('transform', 'translate(' + rad2.cx + ' ' + rad2.cy + ') rotate(' + ((-a1 * 1.5) % 360).toFixed(2) + ')');
+        rad3.g.setAttribute('transform', 'translate(' + rad3.cx + ' ' + rad3.cy + ') rotate(' + ((a1 * 2.25) % 360).toFixed(2) + ')');
+        balans.setAttribute('transform', 'rotate(' + (42 * (0.3 + 0.7 * res) * Math.sin(fase * P2 * 3)).toFixed(2) + ')');
+        echap.g.setAttribute('transform', 'translate(' + echap.cx + ' ' + echap.cy + ') rotate(' + ((Math.floor(fase * 6) % 15) * -24) + ')');
       }
     };
   }

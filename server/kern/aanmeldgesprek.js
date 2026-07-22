@@ -1,17 +1,22 @@
-/* Het aanmeldgesprek: Rahul vervangt het ouderwetse aanmeldformulier. Een
-   menselijk gesprek (eerst gewoon: hoe gaat het) waarin de antwoorden die hij
-   nodig heeft vanzelf bovenkomen, en waarin hij op elke "waarom?" eerlijk
-   uitlegt waarvoor iets dient. Aan het eind levert het gesprek precies de
-   velden op die de ENE registratieroute (/api/auth/register) al kent; het
-   gesprek is een vriendelijker ingang, nooit een tweede toegangspad.
+/* Het aanmeldgesprek: Rahul neemt de HELE poort over, inloggen en aanmelden.
+   Een menselijk gesprek waarin hij zelf ontdekt of je nieuw bent of terugkomt,
+   en waarin de antwoorden die hij nodig heeft vanzelf bovenkomen; op elke
+   "waarom?" legt hij eerlijk uit waarvoor iets dient. Aan het eind levert het
+   gesprek precies de velden op die de ENE registratieroute (/api/auth/register)
+   al kent, of de gebruikersnaam voor de ENE inlogroute (/api/auth/login); het
+   wachtwoord van een terugkerend lid gaat NOOIT door dit gesprek, dat typt de
+   app rechtstreeks naar de inlogroute. Het gesprek is een vriendelijker
+   ingang, nooit een tweede toegangspad.
 
    Afspraken die hier bewust in zitten:
    - Rahul heet Rahul. Nooit "butler" of een andere titel.
    - Warmtespiegel: hij begint vriendelijk-gewoon en wordt hoogstens warmer
      als de ander dat duidelijk zelf is, en dan altijd een stapje minder
      amicaal dan de gebruiker zelf.
-   - De woonplaats vraagt hij NIET uit: noemt iemand die terloops, dan pikt
-     hij het op en gebruikt hij het natuurlijk. Het komt vanzelf.
+   - De woonplaats komt het liefst vanzelf (terloops genoemd = opgepikt);
+     komt hij niet vanzelf, dan vraagt Rahul er een keer subtiel naar, met
+     uitleg waarom, en overslaan is altijd goed. Een volledig adres vraagt
+     hij hier nooit; dat komt pas als er echt iets bezorgd moet worden.
    - Het accounttype hoeft niemand op te zoeken: Rahul adviseert de RTG Pass;
      interesse in Lifestyle of Business noteert hij eerlijk als interesse,
      want die passen blijven op uitnodiging of na menselijke goedkeuring en
@@ -76,6 +81,10 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
 
   /* op elke "waarom?" een eerlijk antwoord, per stap */
   const WAAROM = {
+    doel: 'Ik vraag het alleen om je meteen goed te helpen: terugkerende leden log ik in, nieuwe gasten meld ik aan. Meer zit er niet achter.',
+    'login-naam': 'Je e-mailadres of gebruikersnaam is hoe de kluis jouw account terugvindt; zonder kan ik je niet inloggen.',
+    'login-af': 'Je wachtwoord typ je hieronder in een apart veld: het gaat rechtstreeks en versleuteld naar de inlogcontrole, niet door dit gesprek. Zo leest niemand het mee, ik ook niet.',
+    woonplaats: 'Je woonplaats helpt me met reistijden, aanraders in de buurt en de regels van je land. Alleen de plaatsnaam; je volledige adres vraag ik pas als er echt iets bezorgd moet worden, en overslaan is ook gewoon goed.',
     naam: 'Eerlijk antwoord: je naam staat straks op je pas en in de kluis met je echte gegevens; in de app zelf werk je onder een codenaam, zodat zaken en personeel je echte naam nooit hoeven te zien.',
     email: 'Je e-mailadres gebruik ik voor de bevestigingslink en om je account terug te geven als je ooit je wachtwoord kwijt bent. Reclame sturen we er niet mee.',
     telefoon: 'Je nummer is voor herstel en voor belangrijke seintjes (bijvoorbeeld als je ergens verwacht wordt). Niet voor spam; dat vinden wij zelf ook niks.',
@@ -87,9 +96,9 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
   function intakeStart() {
     opruimen();
     const id = 'ag' + nu().toString(36) + Math.random().toString(36).slice(2, 8);
-    const g = { stap: 'hallo', velden: {}, warmte: 0, beurten: 0, at: nu(), werkgever: null };
+    const g = { stap: 'doel', velden: {}, warmte: 0, beurten: 0, at: nu(), werkgever: null };
     gesprekken.set(id, g);
-    return { id, tekst: 'Hallo, ik ben Rahul. Geen formulier hier; wij regelen je aanmelding gewoon in dit gesprek. Maar eerst: hoe gaat het vandaag?' };
+    return { id, tekst: 'Hallo, ik ben Rahul. Geen formulieren hier; vertel gewoon. Ken ik je al, of is dit je eerste keer bij RTG?' };
   }
 
   function intakeZeg(id, ruwTekst) {
@@ -104,6 +113,39 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
     if (isWaarom(tekst) && WAAROM[g.stap]) return { tekst: WAAROM[g.stap] };
 
     switch (g.stap) {
+      case 'doel': {
+        // Rahul ontdekt zelf of iemand komt inloggen of aanmelden
+        const wilIn = /\b(inloggen|log in|al lid|al een account|ik ben lid|ken(t|nen)? (je )?m(e|ij)|welkom terug|terugkerend|bestaand account|weer hier)\b/i.test(tekst);
+        const wilNieuw = /\b(eerste keer|voor het eerst|nieuw|aanmelden|lid worden|registreren|nog geen|account maken|nog niet)\b/i.test(tekst);
+        const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
+        if (wilIn && !wilNieuw) {
+          if (mail) { g.stap = 'login-af'; g.login = { u: mail[0].toLowerCase() }; return { tekst: 'Welkom terug. Dan alleen nog je wachtwoord; typ het in het veld hieronder, het gaat rechtstreeks de kluis in en niet door dit gesprek.', login: g.login }; }
+          g.stap = 'login-naam';
+          return { tekst: 'Welkom terug. Met welk e-mailadres of welke gebruikersnaam ken ik je?' };
+        }
+        if (wilNieuw && !wilIn) {
+          g.stap = 'hallo';
+          return { tekst: toon(g, 'Leuk je te ontmoeten; dan regelen wij je aanmelding gewoon in dit gesprek. ', 'Wat leuk! Dan regelen we het hier samen. ') + 'Maar eerst: hoe gaat het vandaag?' };
+        }
+        // een los e-mailadres als eerste zin = vrijwel zeker een terugkerend lid
+        if (mail) { g.stap = 'login-af'; g.login = { u: mail[0].toLowerCase() }; return { tekst: 'Dat adres ken ik vast; typ je wachtwoord in het veld hieronder, dan kijken we meteen.', login: g.login }; }
+        return { tekst: 'Allebei goed hoor. Zeg het maar: kom je inloggen, of word je vandaag lid?' };
+      }
+      case 'login-naam': {
+        const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
+        const u = mail ? mail[0].toLowerCase() : schoon(tekst.replace(/^(met\s+|mijn\s+(e-?mail(adres)?|gebruikersnaam|naam)\s+is\s+|het\s+is\s+)/i, ''), 80);
+        if (!u || u.length < 2) return { tekst: 'Met welk e-mailadres of welke gebruikersnaam ken ik je? Typ hem even voluit.' };
+        g.login = { u };
+        g.stap = 'login-af';
+        return { tekst: 'Dank je. Dan nu alleen je wachtwoord; typ het in het veld hieronder. Het gaat rechtstreeks en versleuteld naar de inlogcontrole, niet door dit gesprek.', login: g.login };
+      }
+      case 'login-af': {
+        if (/\b(opnieuw|ander (adres|account)|verkeerde?|toch (aanmelden|lid|nieuw))\b/i.test(tekst)) {
+          g.stap = 'doel'; g.login = null;
+          return { tekst: 'Geen punt, we beginnen gewoon opnieuw. Kom je inloggen, of word je lid?' };
+        }
+        return { tekst: 'Het wachtwoordveld hieronder is aan zet. Lukt het niet, zeg dan "opnieuw", of gebruik "Wachtwoord vergeten?".', login: g.login || null };
+      }
       case 'hallo': {
         g.stap = 'naam';
         const somber = /\b(slecht|niet zo|moe|druk|stress|rot)\b/i.test(tekst);
@@ -131,8 +173,27 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
         const cijfers = tekst.replace(/\D/g, '');
         if (cijfers.length < 8) return { tekst: 'Dat lijkt me te kort voor een mobiel nummer; typ hem even helemaal.' };
         g.velden.phone = tekst.replace(/[^\d+ ]/g, '').trim().slice(0, 30);
+        // de woonplaats: het liefst kwam hij al terloops voorbij; zo niet,
+        // dan een keer subtiel vragen, met de reden erbij, en overslaan mag
+        if (!g.velden.woonplaats) {
+          g.stap = 'woonplaats';
+          return { tekst: toon(g, 'Dank je. ', 'Top. ') + 'En waar woon je zoal? Alleen de plaats; dat helpt me straks met reistijden en aanraders in de buurt. Liever niet zeggen is ook gewoon goed.' };
+        }
         g.stap = 'geboren';
         return { tekst: 'Dan de enige echt formele vraag: wanneer ben je geboren, precies zoals in je paspoort? (Vraag gerust waarom.)' };
+      }
+      case 'woonplaats': {
+        const slaatOver = /\b(overslaan|liever niet|zeg ik (liever )?niet|priv[eé]|gaat je niks aan|skip)\b/i.test(tekst);
+        if (!slaatOver && !g.velden.woonplaats) {
+          // een kale plaatsnaam is ook een antwoord ("Ibiza", "Den Haag")
+          const kaal = schoon(tekst.replace(/^(in|uit|ik woon in|gewoon)\s+/i, '').replace(/[.,!?].*$/, ''), 40);
+          if (/^[A-Za-zÀ-ÿ' -]{2,40}$/.test(kaal)) g.velden.woonplaats = kaal;
+        }
+        g.stap = 'geboren';
+        const dank = slaatOver || !g.velden.woonplaats
+          ? 'Helemaal goed, hoort er niet per se bij. '
+          : (g.velden.woonplaats + ', mooi. ');
+        return { tekst: dank + 'Dan de enige echt formele vraag: wanneer ben je geboren, precies zoals in je paspoort? (Vraag gerust waarom.)' };
       }
       case 'geboren': {
         let d = null;

@@ -199,7 +199,11 @@ function chaosBody(d) {
 }
 
 /* ---------- latentie-histogram (geheugen-veilig) ---------- */
-const GRENZEN = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 1000, 1600, 2600, 4200, 6800, 10000, Infinity];
+// Fibonacci-achtige fijne buckets onderin, en EXTRA fijn in de 500-2600 ms-zone
+// waar de SLO (2000 ms) ligt: anders sprong het van 610 naar 1000 naar 1600 en
+// werd een p99 van pakweg 1200 ms als "1600" gerapporteerd (een bucket-artefact,
+// geen echte cliff). Nu leest de staart op ~150 ms nauwkeurig af.
+const GRENZEN = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 500, 610, 750, 900, 1000, 1150, 1300, 1500, 1750, 2000, 2300, 2600, 3200, 4200, 5400, 6800, 8400, 10000, Infinity];
 const hist = new Array(GRENZEN.length).fill(0);
 let latN = 0, latMax = 0;
 function noteerLat(ms) { latN++; if (ms > latMax) latMax = ms; for (let i = 0; i < GRENZEN.length; i++) if (ms <= GRENZEN[i]) { hist[i]++; return; } }
@@ -621,6 +625,11 @@ async function misbruikBeproeving(tok) {
   rij('  5xx (SERVERFOUTEN)', buckets.s5xx === 0 ? '0' : '\x1b[31m' + buckets.s5xx + '\x1b[0m');
   if (vijfxx.size) for (const [p, n] of [...vijfxx.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15)) rij('    5xx bij', p + ' (' + n + 'x)');
   rij('latentie p50/p95/p99/max', pct(0.5) + ' / ' + pct(0.95) + ' / ' + pct(0.99) + ' / ' + latMax + ' ms');
+  // Waar zit de staart? De acht traagste endpoints (op piek-latentie), met hun
+  // gemiddelde erbij zodat een eenmalige uitschieter zich onderscheidt van een
+  // structureel traag pad. Dit is de kaart voor de volgende latentie-ronde.
+  const traagste = [...perEnd.entries()].filter(([, e]) => e.n >= 3).sort((a, b) => b[1].max - a[1].max).slice(0, 8);
+  if (traagste.length) { rij('traagste endpoints', 'piek / gemiddeld (aantal)'); for (const [pad, e] of traagste) rij('  ' + pad, e.max + ' / ' + Math.round(e.som / e.n) + ' ms  (' + nl(e.n) + 'x)'); }
   const dal = rssReeks.length ? Math.min(...rssReeks) : rssNa, piek = rssReeks.length ? Math.max(...rssReeks) : rssNa;
   rij('RAM (RSS) dal/piek onder last', dal + ' / ' + piek + ' MB');
   rij('heapUsed vers -> opgewarmd (na GC)', vloerVers + ' -> ' + vloers[0] + ' MB');

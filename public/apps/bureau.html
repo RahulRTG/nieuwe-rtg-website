@@ -8,6 +8,7 @@
 <title>RTG OS, het bureaublad</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/seizoen.css" rel="stylesheet">
 <link href="/shared/uitleg.css" rel="stylesheet">
 <link href="/shared/osmenu.css" rel="stylesheet">
@@ -24,10 +25,11 @@
     background:var(--grond); color:var(--inkt);
     font-family:'Inter',sans-serif; line-height:1.5; min-height:100vh;
     -webkit-font-smoothing:antialiased;
-    /* een rustige, gedempte gloed, zoals een bureaublad-achtergrond */
+    /* een rustige, gedempte gloed die met zon en seizoen meeademt: de levende
+       dagkleur kleurt de achtergrond, met een vaste terugval buiten het palet */
     background-image:
-      radial-gradient(1200px 700px at 78% -8%, rgba(194,58,94,0.10), transparent 60%),
-      radial-gradient(900px 600px at 8% 108%, rgba(169,143,28,0.08), transparent 60%);
+      radial-gradient(1200px 700px at 78% -8%, color-mix(in srgb, var(--dag-kleur, #C23A5E) 11%, transparent), transparent 60%),
+      radial-gradient(900px 600px at 8% 108%, color-mix(in srgb, var(--dag-kleur, #A98F1C) 8%, transparent), transparent 60%);
   }
   .skip{
     position:absolute; left:-999px; top:0; background:var(--paneel); color:var(--inkt);
@@ -45,7 +47,10 @@
   }
   .merk{font-family:'Bodoni Moda',serif; font-size:1.15rem; letter-spacing:0.04em;}
   .merk span{color:var(--goud); font-style:italic;}
-  .klok{margin-inline:auto; text-align:center; line-height:1.15;}
+  /* de klok veert mee met de RTG-kleurenroulatie: het goudaccent mengt het
+     huisgoud met de levende dagkleur, net als op de nieuwe startpagina's */
+  .klok{margin-inline:auto; text-align:center; line-height:1.15;
+    --klok-goud:color-mix(in srgb, var(--dag-kleur, var(--goud,#A98F1C)) 55%, var(--goud,#A98F1C));}
   .klok time{
     display:block; font-family:'Bodoni Moda',serif; font-size:1.5rem;
     font-variant-numeric:tabular-nums; letter-spacing:0.02em;
@@ -154,7 +159,7 @@
   <div class="merk">RTG <span>OS</span></div>
   <div class="klok">
     <time id="tijd" aria-label="Huidige tijd" data-rtg-klok>--:--</time>
-    <span class="datum" id="datum"></span>
+    <span class="datum" id="datum" data-rtg-datum></span>
   </div>
   <div class="account" id="account" aria-live="polite" aria-label="Accounts op dit toestel">
     <span class="chip leeg">Accounts laden…</span>
@@ -184,22 +189,20 @@
 </main>
 
 <script src="/shared/accounts-os.js"></script>
+<!-- de nieuwe start-laag: taalkiezer (standaard toesteltaal, terugval Engels),
+     de gedeelde meekleurende klok en de dagkleur-/seizoenmotor -->
+<script src="/shared/i18n.js"></script>
+<script src="/shared/klok.js" defer></script>
+<script src="/shared/seizoen.js" defer></script>
 <script src="/shared/uitleg.js" defer></script>
 <script src="/shared/osmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script>
 (function () {
   'use strict';
-  // ---- klok en datum ----
-  var DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
-  var MND = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-  function tik() {
-    var d = new Date();
-    document.getElementById('datum').textContent = DAGEN[d.getDay()] + ' ' + d.getDate() + ' ' + MND[d.getMonth()];
-  }
-  tik();
-  setInterval(tik, 15000);
+  // De klok en de lange datum komen nu van de gedeelde RTG-klok (klok.js): die
+  // vult data-rtg-klok en data-rtg-datum, in de taal van de pagina. Zo volgt het
+  // bureaublad de toesteltaal, net als de nieuwe startpagina's.
 
   // ---- de accountwisselaar ----
   // De accountkluis onthoudt aangemelde accounts per wereld; daarnaast lezen we

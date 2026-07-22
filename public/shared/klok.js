@@ -198,6 +198,9 @@
     };
     verf();
     setInterval(verf, 30000);
+    // volgt de taalkiezer: zodra de pagina van taal wisselt (rtglang), staat de
+    // lange datum meteen in de nieuwe taal, niet pas bij de volgende ronde
+    window.addEventListener('rtglang', verf);
   }
 
   function alles() {

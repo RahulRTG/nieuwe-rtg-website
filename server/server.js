@@ -2309,6 +2309,11 @@ Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, z
    belofte uit de voorwaarden blijft intact). Voor lidacties gemount, want
    de betaal-seams rekenen het voordeel mee. */
 Object.assign(kern, require('./kern/geldregie').maakGeldregie({ db, save }));
+/* Ledenregister (kern/ledenregister.js): het kantooroverzicht van alle leden op
+   codenaam, gesplitst per stad/land/alfabet/geslacht en pas, met de omzet per pas
+   en de 30%-foundationsplit (20% lokaal, 10% RTF). Na de geldregie gemount, want
+   het leunt op de pasprijzen daaruit. */
+Object.assign(kern, require('./kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal }));
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
    RTG Bank clearet: via de externe kaart-naad, als eigen emissie, of allebei.
@@ -2596,6 +2601,7 @@ require('./routes/geloofbieb')(kern);
 require('./routes/rtfkantoor')(kern);
 require('./routes/labfonds')(kern);
 require('./routes/aanmeldingen')(kern);
+require('./routes/ledenregister')(kern);
 /* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
    school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
    (kern/samenrtf.js): kindveilig meekijken binnen gezin en vrienden. */

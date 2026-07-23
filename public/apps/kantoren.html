@@ -312,6 +312,19 @@
       <div id="bFondsLijst" style="margin-top:.7rem;"><div class="leeg">Laden...</div></div>
     </div>
 
+    <h3 class="sec">Het ledenregister: alle leden per stad, land, geslacht en pas</h3>
+    <div class="kaart" id="bLeden">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);">Alle leden op codenaam (de echte naam blijft in de kluis), gesplitst per pas, geslacht, land en stad. Van elke maandbijdrage gaat 30% naar de RTFoundation: 20% blijft lokaal, 10% naar de foundation zelf. Cijfers zijn een rapportage, geen verwerkte betaling.</p>
+      <div class="rijveld" style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0;">
+        <select id="lrPas" class="veld" style="max-width:12rem;"><option value="">Alle passen</option></select>
+        <select id="lrGeslacht" class="veld" style="max-width:9rem;"><option value="">m/v/x</option><option value="v">Vrouw</option><option value="m">Man</option><option value="x">X</option></select>
+        <select id="lrLand" class="veld" style="max-width:10rem;"><option value="">Alle landen</option></select>
+        <select id="lrStad" class="veld" style="max-width:12rem;"><option value="">Alle steden</option></select>
+      </div>
+      <div id="bLedenSplit" style="margin-top:.4rem;"><div class="leeg">Laden...</div></div>
+      <div id="bLedenLijst" style="margin-top:.8rem;"></div>
+    </div>
+
     <h3 class="sec">De Mall-regie: elke leverancier in de RTG Mall bijstellen</h3>
     <div class="kaart" id="bMall">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">Elke partner staat in de Mall: op een koop-etage of in de gids per genre. Hier verbergt u een partner, verplaatst u een boutique naar een andere etage, of stelt u de tagline en de actie bij. Het eigen-merk beheert RTG apart.</p>
@@ -1993,6 +2006,7 @@ async function openBoard(){
   laadDoosRegie();
   laadMallRegie();
   laadFonds();
+  laadLedenregister();
   wereldWidget($('#bWereld'));
   api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
   $('#bAudit').innerHTML = (d.audit && d.audit.length) ? d.audit.map(a =>
@@ -2211,6 +2225,59 @@ async function laadFonds(){
   }).join('') || '<div class="leeg">Nog geen voorstellen.</div>';
   box.innerHTML = '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.2rem 0 .4rem;">Locaties</div>' + locs +
     '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.8rem 0 .4rem;">Voorstellen ('+(d.bijdragen||0)+' bijdragen totaal)</div>' + vs;
+}
+
+/* het ledenregister vanuit de boardroom: alle leden op codenaam, gesplitst per
+   stad/land/geslacht/pas, met de omzet per pas en de 30%-foundationsplit. Eigen
+   endpoint achter de boardroom-poort, dus een rechtstreekse fetch. */
+let LR_OPTIES_KLAAR = false;
+async function laadLedenregister(){
+  const box = $('#bLedenSplit'); if (!box) return;
+  const filter = { pas: $('#lrPas').value || undefined, geslacht: $('#lrGeslacht').value || undefined,
+    land: $('#lrLand').value || undefined, stad: $('#lrStad').value || undefined };
+  let d;
+  try {
+    const r = await fetch('/api/office/ledenregister', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(filter) });
+    d = await r.json(); if (!r.ok) throw new Error(d.error || 'Kon het register niet laden.');
+  } catch (e) { box.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; $('#bLedenLijst').innerHTML=''; return; }
+  const eur = c => '€ ' + (Math.round(Number(c)*100)/100).toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const kop = t => '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.7rem 0 .35rem;">'+t+'</div>';
+  const tegels = arr => '<div style="display:flex;flex-wrap:wrap;gap:.5rem;">'+arr.map(x =>
+    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:10px;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--gold);">'+x.aantal+'</span></span>').join('')+'</div>';
+  // de omzet + 30%-split
+  const omzetRijen = (d.omzet||[]).map(o =>
+    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw')+'</span></span>'+
+    '<span style="color:var(--gold);font-size:.82rem;">'+(o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd')+'</span></div>').join('');
+  const s = d.split || {};
+  box.innerHTML =
+    kop('Per pas') + tegels((d.perPas||[]).map(p => ({ naam: p.naam, aantal: p.aantal }))) +
+    kop('Per geslacht') + tegels(d.perGeslacht||[]) +
+    kop('Per land (top)') + tegels((d.perLand||[]).slice(0,12)) +
+    kop('Per stad (top)') + tegels((d.perStad||[]).slice(0,12)) +
+    kop('Omzet per pas') + omzetRijen +
+    '<div style="margin-top:.6rem;background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;line-height:1.7;font-size:.86rem;">'+
+      'Maandomzet (bekende prijzen): <b>'+eur(s.totaalOmzet)+'</b><br>'+
+      '30% naar de RTFoundation: <b style="color:var(--gold);">'+eur(s.foundation30)+'</b><br>'+
+      '&nbsp;&nbsp;20% lokaal: <b>'+eur(s.lokaal20)+'</b> · 10% RTFoundation: <b>'+eur(s.rtf10)+'</b>'+
+      (s.businessOpMaat ? '<br><span class="stil" style="color:var(--soft);font-size:.78rem;">'+s.businessOpMaat+' Business-lid(en) op maat: de 30% geldt ook daar, over de afgesproken prijs.</span>' : '')+
+    '</div>';
+  // de alfabetische, gefilterde ledenlijst
+  const lijst = d.lijst || [];
+  $('#bLedenLijst').innerHTML = kop('Leden op alfabet ('+lijst.length+')') +
+    (lijst.length ? '<div style="max-height:16rem;overflow:auto;">'+lijst.map(m =>
+      '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.35rem 0;gap:.5rem;"><span style="flex:1;"><b>'+esc(m.codenaam)+'</b></span>'+
+      '<span class="stil" style="color:var(--soft);font-size:.74rem;">'+esc(m.pasNaam)+(m.geslachtNaam?' · '+esc(m.geslachtNaam):'')+(m.stad?' · '+esc(m.stad):'')+(m.land?' · '+esc(m.land):'')+'</span></div>').join('')+'</div>'
+      : '<div class="leeg">Geen leden in deze selectie.</div>');
+  // de keuzelijsten eenmalig vullen uit de facetten
+  if (!LR_OPTIES_KLAAR) {
+    const vul = (sel, items, waardeVeld) => { const cur = sel.value; items.forEach(x => { const o = document.createElement('option'); o.value = waardeVeld ? x[waardeVeld] : x.naam; o.textContent = x.naam + ' (' + x.aantal + ')'; sel.appendChild(o); }); sel.value = cur; };
+    vul($('#lrPas'), (d.perPas||[]).filter(p=>p.aantal), 'pas');
+    vul($('#lrLand'), (d.perLand||[]).filter(x=>x.naam!=='Onbekend'));
+    vul($('#lrStad'), (d.perStad||[]).filter(x=>x.naam!=='Onbekend'));
+    LR_OPTIES_KLAAR = true;
+    ['#lrPas','#lrGeslacht','#lrLand','#lrStad'].forEach(id => $(id).addEventListener('change', laadLedenregister));
+  }
 }
 
 /* de identiteitskluis vanuit de boardroom (zelfde regels: alles in het auditlog) */

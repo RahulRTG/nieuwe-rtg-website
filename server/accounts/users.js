@@ -176,6 +176,21 @@ function conversations() {
   }).filter(x => x.conversation.length);
 }
 
+/* De leden voor het ledenregister (kantoor): codenaam, pas en de facetten
+   (geslacht v/m/x, land) uit de member_state. Nooit de echte naam -- die blijft
+   in de kluis. Begrensd (de boardroom leest een venster, geen miljoenen rijen);
+   met een echt grootboek (Postgres) zou dit aggregatie-per-facet worden. */
+function ledenRegisterRijen(limit) {
+  const n = Math.max(1, Math.min(Number(limit) || 5000, 20000));
+  const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users ORDER BY codename ASC LIMIT ?').all(n);
+  return rows.map(r => {
+    let md = {}; try { md = r.member_state ? (JSON.parse(r.member_state) || {}) : {}; } catch (e) {}
+    const gs = String(md.geslacht || '').toLowerCase();
+    return { id: r.id, key: 'user-' + r.id, tier: r.tier || 'rtg', codename: r.codename || null,
+      geslacht: (gs === 'v' || gs === 'm' || gs === 'x') ? gs : null, land: md.land || null };
+  });
+}
+
 /* AVG-vergetelheid: verwijdert het account definitief. Geeft de bestandsnaam
    van een eventueel geupload identiteitsdocument terug, zodat de server die
    ook van schijf kan wissen. */
@@ -192,5 +207,5 @@ module.exports = {
   renameUser, realNameOf, emailOf, phoneOf,
   issueToken, verifyToken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword,
-  getMemberState, saveMemberState, setVerification, listByVerification, conversations, deleteUser
+  getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

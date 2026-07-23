@@ -1098,7 +1098,8 @@
     background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:0.55rem 0.65rem;}
   .os-nu-open{display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0;background:none;border:none;text-align:left;cursor:pointer;padding:0;color:var(--txt);}
   .os-nu-hoes{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg, color-mix(in srgb, var(--gold) 30%, var(--card)), var(--card));font-size:1.25rem;}
+    background:linear-gradient(135deg, color-mix(in srgb, var(--gold) 30%, var(--card)), var(--card));font-size:1.25rem;color:var(--gold);}
+  .os-nu-hoes svg{display:block;}
   .os-nu-tekst{display:flex;flex-direction:column;min-width:0;}
   .os-nu-tekst b{font-size:0.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .os-nu-tekst small{font-size:0.66rem;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1124,7 +1125,8 @@
     background:var(--card2);color:var(--txt);font-size:0.6rem;
     transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), color 0.13s cubic-bezier(0.22,0.7,0.3,1);
   }
-  .os-cc-tegels button b{font-size:1.05rem;font-weight:400;}
+  .os-cc-tegels button b{font-size:1.05rem;font-weight:400;display:inline-flex;align-items:center;justify-content:center;height:20px;}
+  .os-cc-tegels button b svg{display:block;}
   .os-cc-tegels button.aan{border-color:var(--green);color:var(--green);}
 
   /* -------- App Store: apps installeren en verwijderen -------- */
@@ -1567,13 +1569,13 @@
       <div class="os-cc" role="dialog" aria-modal="true" aria-label="Bedieningspaneel">
         <div class="os-nu" id="osNu" hidden>
           <button class="os-nu-open" id="osNuOpen" aria-label="Open RTG Sound">
-            <span class="os-nu-hoes" id="osNuHoes">🎵</span>
+            <span class="os-nu-hoes" id="osNuHoes"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></span>
             <span class="os-nu-tekst"><b id="osNuTitel"></b><small id="osNuSub"></small></span>
           </button>
           <div class="os-nu-knoppen">
-            <button id="osNuVorige" aria-label="Vorige track">⏮</button>
-            <button id="osNuSpeel" aria-label="Afspelen of pauzeren">⏯</button>
-            <button id="osNuVolgende" aria-label="Volgende track">⏭</button>
+            <button id="osNuVorige" aria-label="Vorige track"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6zM19 6v12l-9-6z"/></svg></button>
+            <button id="osNuSpeel" aria-label="Afspelen of pauzeren"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+            <button id="osNuVolgende" aria-label="Volgende track"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M16 6h2v12h-2zM5 6l9 6-9 6z"/></svg></button>
           </div>
         </div>
         <div class="os-cc-rij" id="osCcThema">
@@ -1598,12 +1600,13 @@
           </div>
         </div>
         <div class="os-cc-tegels">
-          <button id="osCcTaal"><b>🌐</b><span data-i18n="os.cc.taal">Taal</span></button>
-          <button id="osCcLicht"><b>🌗</b><span data-i18n="os.cc.licht">Weergave</span></button>
-          <button id="osCcPush"><b>🔔</b><span data-i18n="os.cc.push">Push</span></button>
-          <button id="osCcSamen"><b>👥</b><span data-i18n="os.cc.samen">Samen</span></button>
-          <button id="osCcZoek"><b>🔍</b><span data-i18n="os.zoek">Zoeken</span></button>
-          <button id="osCcUit"><b>⏻</b><span data-i18n="app.logout">Uitloggen</span></button>
+          <button id="osCcBoardroom"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2.1"/><circle cx="9" cy="16" r="2.1"/></svg></b><span data-i18n="os.cc.boardroom">Boardroom</span></button>
+          <button id="osCcTaal"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg></b><span data-i18n="os.cc.taal">Taal</span></button>
+          <button id="osCcLicht"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></b><span data-i18n="os.cc.licht">Weergave</span></button>
+          <button id="osCcPush"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></b><span data-i18n="os.cc.push">Push</span></button>
+          <button id="osCcSamen"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.8M20.5 20a5.5 5.5 0 0 0-3.6-5.2"/></svg></b><span data-i18n="os.cc.samen">Samen</span></button>
+          <button id="osCcZoek"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></b><span data-i18n="os.zoek">Zoeken</span></button>
+          <button id="osCcUit"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"/><path d="M6.6 7a8 8 0 1 0 10.8 0"/></svg></b><span data-i18n="app.logout">Uitloggen</span></button>
         </div>
       </div>
     </div>

@@ -337,6 +337,9 @@
     /* ---------- kleine taalschakelaar (heropent de keuze) ---------- */
     buildSwitch() {
       if (document.getElementById('rtg-lang-switch')) return;
+      // op het leden-OS (app.html) hoort de taal in Instellingen, niet als een
+      // los knopje op het scherm; daar zet de tegel "Taal" de keuze open.
+      if (/\/apps\/app\.html$/.test(location.pathname)) return;
       const btn = document.createElement('button');
       btn.id = 'rtg-lang-switch';
       btn.className = 'rtg-lang-switch';

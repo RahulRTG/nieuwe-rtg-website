@@ -3423,7 +3423,7 @@
     sluitScrims();
     winkelLijst.textContent = '';
     var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
-    intro.textContent = T('os.store.uitleg', 'Kies wat je op je beginscherm wilt. Geïnstalleerde apps staan op pagina 2; je basis, het dock en de RTFoundation blijven altijd staan.');
+    intro.textContent = T('os.board.uitleg', 'Uw boardroom: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, de Butler, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
     winkelLijst.appendChild(intro);
     var n = 0;
     for (var i = 0; i < WINKEL_GROEPEN.length; i++) {
@@ -3459,8 +3459,17 @@
   if (ccSamen) ccSamen.addEventListener('click', function () {
     sluitScrims();
     if (window.RTGMetgezel && RTGMetgezel.samen) RTGMetgezel.samen();
-    else bannerToon('👥', T('os.samen', 'Samen'), T('os.samen.straks', 'Samen is zo beschikbaar.'));
+    else bannerToon('', T('os.samen', 'Samen'), T('os.samen.straks', 'Samen is zo beschikbaar.'));
   });
+
+  /* ---------- De Boardroom: functies aan en uit vanuit Instellingen ----------
+     Uw eigen boardroom: alle functies waar u recht op heeft, aan of uit te zetten.
+     De basis van het toestel (bellen, betalen, de Butler, uw pas-app en de
+     RTFoundation) blijft altijd staan - die valt niet uit te zetten, zodat het
+     systeem veilig en werkend blijft. Onder water is dit dezelfde install-laag
+     als de App Store. */
+  var ccBoard = $('#osCcBoardroom');
+  if (ccBoard) ccBoard.addEventListener('click', function () { openWinkel(); });
 
   /* ---------- Now Playing: je muziek bedienen vanaf de ROS ----------
      De muziek-apps melden hun stand via de gedeelde speler-laag
@@ -3472,14 +3481,19 @@
     var kaart = $('#osNu'), hoes = $('#osNuHoes'), titel = $('#osNuTitel'), sub = $('#osNuSub'), speelKnop = $('#osNuSpeel');
     if (!kaart) return;
     var nu = null;
+    // in huisstijl getekende tekens (geen emoji): een noot voor de hoes en
+    // een play/pauze die met de stand meewisselt
+    var SVG_NOOT = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>';
+    var SVG_PLAY = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+    var SVG_PAUZE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
     function toon(state) {
       nu = state;
       if (!state || !state.titel) { kaart.hidden = true; return; }
       kaart.hidden = false;
-      hoes.textContent = state.glyph || '🎵';
+      if (hoes) hoes.innerHTML = SVG_NOOT;   // de hoes blijft de RTG-noot; geen emoji
       titel.textContent = state.titel;
       sub.textContent = (state.artiest || 'RTG Sound') + (state.station ? ' · ' + state.station : '');
-      if (speelKnop) speelKnop.textContent = state.speelt ? '⏸' : '▶';
+      if (speelKnop) speelKnop.innerHTML = state.speelt ? SVG_PAUZE : SVG_PLAY;
     }
     function openSound(speel) {
       var q = '/apps/muziek.html';

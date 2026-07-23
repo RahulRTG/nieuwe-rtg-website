@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation &middot; Magazine</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation-192.png">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  /* Het magazine draagt de kleuren van het logo: koningsblauw en goud, op de
+     rustige donkere foundation-grond. Een editorial, ruim opgezet blad -- nooit
+     te druk, met veel lucht, zodat het op elk scherm leesbaar blijft. */
+  :root{ --blauw:#2B4B9C; --blauw-diep:#20386f; --room:#F3EEE2; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:var(--sans),'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;}
+  .serif{font-family:'Bodoni Moda',Georgia,serif;}
+  .blad{max-width:52rem;margin:0 auto;padding:0 1.15rem 5rem;}
+  a{color:inherit;}
+  /* kop-balk met terug */
+  .top{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.82));backdrop-filter:blur(8px);border-bottom:1px solid var(--lijn);padding:.7rem 1.15rem;display:flex;align-items:center;gap:.8rem;max-width:52rem;margin:0 auto;}
+  .terug{background:transparent;border:1px solid var(--lijn);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .top .merk{font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--goud);}
+  /* cover */
+  .cover{padding:2.6rem 0 1.4rem;text-align:center;}
+  .cover .logo-img{display:block;width:min(100%,34rem);margin:0 auto 1.6rem;border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  .cover .uitgave{font-size:.68rem;letter-spacing:.26em;text-transform:uppercase;color:var(--zacht);}
+  .cover h1{font-size:clamp(2.1rem,6vw,3.3rem);font-weight:500;line-height:1.08;margin:.7rem 0 .5rem;text-wrap:balance;}
+  .cover .sub{color:var(--zacht);font-size:1.02rem;max-width:34rem;margin:0 auto;line-height:1.6;}
+  .streep{height:2px;width:4rem;background:var(--goud);margin:2.4rem auto;border-radius:2px;}
+  /* artikel-blok */
+  .art{margin:3rem 0;}
+  .art .eyebrow{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--goud);font-weight:700;}
+  .art h2{font-size:clamp(1.5rem,4vw,2.1rem);font-weight:500;margin:.5rem 0 .8rem;text-wrap:balance;}
+  .art p{color:#e8e3d8;font-size:1.05rem;margin:.7rem 0;max-width:40rem;}
+  .art p .lead{color:var(--txt);}
+  .drop::first-letter{font-family:'Bodoni Moda',serif;font-size:3.4rem;line-height:.8;float:left;margin:.35rem .55rem 0 0;color:var(--goud);}
+  /* de 30%-verdeling als rustig diagram */
+  .split{background:var(--paneel);border:1px solid var(--lijn);border-radius:18px;padding:1.5rem;margin:1.4rem 0;}
+  .split h3{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.2rem;margin-bottom:.2rem;}
+  .split .h{color:var(--zacht);font-size:.9rem;margin-bottom:1.1rem;}
+  .balk{display:flex;height:2.6rem;border-radius:10px;overflow:hidden;border:1px solid var(--lijn);}
+  .balk span{display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#0c0c0b;}
+  .balk .lid{flex:70;background:#26221d;color:var(--zacht);}
+  .balk .lok{flex:20;background:var(--goud);}
+  .balk .rtf{flex:10;background:var(--blauw);color:#fff;}
+  .legenda{display:flex;flex-wrap:wrap;gap:1.1rem;margin-top:.9rem;font-size:.84rem;color:var(--zacht);}
+  .legenda i{display:inline-block;width:.8rem;height:.8rem;border-radius:3px;vertical-align:-.05em;margin-right:.4rem;}
+  /* drie pijlers */
+  .pijlers{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem;margin:1.4rem 0;}
+  .pijler{background:var(--paneel);border:1px solid var(--lijn);border-radius:16px;padding:1.2rem;border-top:3px solid var(--blauw);}
+  .pijler:nth-child(2){border-top-color:var(--goud);}
+  .pijler:nth-child(3){border-top-color:var(--groen);}
+  .pijler h3{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.15rem;margin-bottom:.35rem;}
+  .pijler p{color:var(--zacht);font-size:.92rem;line-height:1.55;}
+  /* citaat */
+  .quote{border-left:3px solid var(--goud);padding:.4rem 0 .4rem 1.3rem;margin:2.4rem 0;}
+  .quote p{font-family:'Bodoni Moda',serif;font-size:1.5rem;line-height:1.4;color:var(--txt);font-style:italic;}
+  .quote .bron{color:var(--goud);font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-top:.6rem;font-family:var(--sans);font-style:normal;}
+  /* uitgang-tegels */
+  .ingangen{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.8rem;margin-top:1.2rem;}
+  .ingang{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:1rem;text-decoration:none;color:var(--txt);transition:border-color .2s,transform .2s;display:block;}
+  .ingang:hover{border-color:var(--goud);transform:translateY(-2px);}
+  .ingang b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;}
+  .ingang span{display:block;color:var(--zacht);font-size:.85rem;margin-top:.2rem;line-height:1.5;}
+  .voet{margin-top:3rem;padding-top:1.4rem;border-top:1px solid var(--lijn);color:var(--zacht);font-size:.82rem;line-height:1.6;text-align:center;}
+</style>
+</head>
+<body>
+<div class="top">
+  <button class="terug" id="terug" aria-label="Terug">Terug</button>
+  <span class="merk">RTFoundation &middot; Magazine</span>
+</div>
+<main class="blad" role="main">
+
+  <header class="cover">
+    <img class="logo-img" src="beeld/rtf-logo.png" alt="Rahul Travel Foundation &mdash; Empowering Journeys, Building Futures">
+    <div class="uitgave">Uitgave I &middot; Wie we zijn</div>
+    <h1 class="serif">Reizen die vooruit brengen</h1>
+    <p class="sub">De Rahul Travel Foundation zet een deel van elke reis om in kansen &mdash; dichtbij en verder weg. Dit is wat we doen, waarom, en hoe.</p>
+  </header>
+
+  <div class="streep"></div>
+
+  <article class="art">
+    <div class="eyebrow">Wat we doen</div>
+    <h2 class="serif">Van elke bijdrage gaat 30% naar de toekomst</h2>
+    <p class="drop lead">De RTFoundation is het hart van Rahul Travel Group dat teruggeeft. Van elke maandelijkse bijdrage van een lid gaat automatisch <b>30% naar goede doelen</b>. Geen bijzaak, geen sluitpost: het is in het lidmaatschap ingebouwd, elke maand opnieuw.</p>
+    <p>Dat geld verdwijnt niet in een grote pot ver weg. Het wordt eerlijk verdeeld, en het grootste deel blijft in de omgeving waar het lid woont &mdash; zodat je ziet wat je bijdrage doet.</p>
+
+    <div class="split">
+      <h3>De verdeling van de 30%</h3>
+      <div class="h">Twee derde blijft lokaal, een derde bouwt de foundation zelf.</div>
+      <div class="balk">
+        <span class="lid" title="Bij het lid / de reis">70% blijft reizen &amp; diensten</span>
+        <span class="lok">20% lokaal</span>
+        <span class="rtf">10% RTF</span>
+      </div>
+      <div class="legenda">
+        <span><i style="background:#26221d;"></i>70% &mdash; de reis en de diensten zelf</span>
+        <span><i style="background:var(--goud);"></i>20% &mdash; lokaal geïnvesteerd, in de omgeving van het lid</span>
+        <span><i style="background:var(--blauw);"></i>10% &mdash; de RTFoundation zelf: lab, clubs en gezinnen</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="art">
+    <div class="eyebrow">Waarom</div>
+    <h2 class="serif">Empowering journeys, building futures</h2>
+    <p>Een reis is meer dan een bestemming. Wie de wereld ziet, groeit &mdash; en wie de kans krijgt, geeft die kans door. Dat is de gedachte achter de foundation: de vrijheid om te reizen verbinden aan de plicht om te bouwen. Aan een toekomst, voor wie die nog moet vinden.</p>
+    <div class="quote">
+      <p>&ldquo;Reizen opent de wereld. Wij zorgen dat die wereld ook terugopent, voor wie minder ver kan komen.&rdquo;</p>
+      <div class="bron">De belofte van de RTFoundation</div>
+    </div>
+  </article>
+
+  <article class="art">
+    <div class="eyebrow">Hoe</div>
+    <h2 class="serif">Drie manieren waarop het werkt</h2>
+    <div class="pijlers">
+      <div class="pijler">
+        <h3>Lokaal beslist</h3>
+        <p>De 20% die lokaal blijft, verdelen de leden zélf per locatie &mdash; samen, met een AI-scheidsrechter die op eerlijkheid let. Elke plek investeert in de eigen omgeving.</p>
+      </div>
+      <div class="pijler">
+        <h3>Het onderzoekslab</h3>
+        <p>Een deel bouwt aan het RTF Onderzoekslab: hardware, water, energie, landbouw en dorpshulp. Kleine, eerlijke proeven die echt verschil maken.</p>
+      </div>
+      <div class="pijler">
+        <h3>Gezinnen &amp; jeugd</h3>
+        <p>De foundation-app is gratis: leren, lezen, welzijn en begeleiding voor elk gezin en elke leeftijd. Van de allerkleinsten tot volwassenen.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="art">
+    <div class="eyebrow">Meedoen</div>
+    <h2 class="serif">Waar je verder kunt</h2>
+    <div class="ingangen">
+      <a class="ingang" href="/apps/labfonds.html"><b>Het Lab-fonds</b><span>Zamel samen in per locatie en beslis mee waar het naartoe gaat.</span></a>
+      <a class="ingang" href="clubswerk.html"><b>Clubs &amp; steden</b><span>Hoe de foundation met clubs in elke stad samenwerkt.</span></a>
+      <a class="ingang" href="index.html"><b>De foundation-app</b><span>Gratis hulp, leren en welzijn voor je hele gezin.</span></a>
+    </div>
+  </article>
+
+  <div class="voet">
+    Rahul Travel Foundation &middot; Empowering Journeys, Building Futures<br>
+    30% van elke bijdrage naar goede doelen &mdash; 20% lokaal, 10% de foundation zelf.
+  </div>
+</main>
+
+<script>
+  document.getElementById('terug').onclick = function(){ if (history.length > 1) history.back(); else location.href = 'index.html'; };
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

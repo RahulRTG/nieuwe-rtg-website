@@ -61,7 +61,7 @@ test('Fluister fluistert zelf: seintjes uit datums in weetjes en uit de agenda',
   const d = new Date(Date.now() + 5 * 86400000);
   await api('fluister', { q: 'onthoud dat mijn verjaardag op ' + d.getUTCDate() + ' ' + NL[d.getUTCMonth()] + ' valt' }, lid);
   const prof = (await api('fluister/profiel', {}, lid)).body;
-  const jarig = (prof.seintjes || []).find(s => s.icoon === '🎂');
+  const jarig = (prof.seintjes || []).find(s => s.soort === 'verjaardag');
   assert.ok(jarig, 'de verjaardag uit het weetje wordt een seintje');
   assert.ok(/over 5 dagen/.test(jarig.tekst));
   // een reservering voor morgen fluistert vanzelf mee

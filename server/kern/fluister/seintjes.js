@@ -55,40 +55,40 @@ module.exports = (ctx) => {
       if (!d) continue;
       const dgn = dagenTot(d);
       if (dgn > 21) continue;
-      s.push({ icoon: /verjaardag|jarig|birthday/i.test(w.tekst) ? '🎂' : '📅', tekst: w.tekst + ' · ' + wanneer(dgn) + ' (' + d + ')' });
+      s.push({ soort: /verjaardag|jarig|birthday/i.test(w.tekst) ? 'verjaardag' : 'agenda', tekst: w.tekst + ' · ' + wanneer(dgn) + ' (' + d + ')' });
     }
     // 2. de eerstvolgende reservering, zodra hij dichtbij komt
     const res = bron.res
       .filter(r => ['aangevraagd', 'bevestigd'].includes(r.status) && r.datum >= vandaag())
       .sort((a, b) => (a.datum + a.tijd).localeCompare(b.datum + b.tijd))[0];
     if (res && dagenTot(res.datum) <= 2)
-      s.push({ icoon: '🪑', tekst: wanneer(dagenTot(res.datum)) + ' ' + res.tijd + ' gereserveerd bij ' + res.supplierName + (res.status === 'aangevraagd' ? ' (wacht nog op bevestiging)' : '') });
+      s.push({ soort: 'reservering', tekst: wanneer(dagenTot(res.datum)) + ' ' + res.tijd + ' gereserveerd bij ' + res.supplierName + (res.status === 'aangevraagd' ? ' (wacht nog op bevestiging)' : '') });
     // 3. verblijf: de check-in nadert, of het is tijd om uit te checken
     for (const v of bron.vb) {
       if (v.status === 'bevestigd' && v.aankomst >= vandaag() && dagenTot(v.aankomst) <= 7)
-        s.push({ icoon: '🏨', tekst: 'Check-in ' + v.roomName + ' bij ' + v.supplierName + ' · ' + wanneer(dagenTot(v.aankomst)) });
+        s.push({ soort: 'incheck', tekst: 'Check-in ' + v.roomName + ' bij ' + v.supplierName + ' · ' + wanneer(dagenTot(v.aankomst)) });
       if (v.status === 'ingecheckt' && v.vertrek && dagenTot(v.vertrek) <= 1)
-        s.push({ icoon: '🧳', tekst: 'Uitchecken bij ' + v.supplierName + ' · ' + wanneer(dagenTot(v.vertrek)) });
+        s.push({ soort: 'uitcheck', tekst: 'Uitchecken bij ' + v.supplierName + ' · ' + wanneer(dagenTot(v.vertrek)) });
     }
     // 4. een geboekt 24-uursblok van een Shared Asset dat eraan komt
     for (const g of bron.gebruik.filter(g => g.datum >= vandaag() && dagenTot(g.datum) <= 7))
-      s.push({ icoon: '🔑', tekst: 'Uw 24 uur bij ' + g.assetNaam + ' · ' + wanneer(dagenTot(g.datum)) + ' (' + g.datum + ')' });
+      s.push({ soort: 'sleutel', tekst: 'Uw 24 uur bij ' + g.assetNaam + ' · ' + wanneer(dagenTot(g.datum)) + ' (' + g.datum + ')' });
     // 5. lopende asset-zaken: bedenktijd die nog loopt, terugkoop onderweg
     const bedenk = bron.tickets.filter(t => t.status === 'actief' &&
       Date.now() - Date.parse(t.at) < BEDENKTIJD_DAGEN * 86400000);
     if (bedenk.length) {
       const rest = Math.ceil(BEDENKTIJD_DAGEN - (Date.now() - Date.parse(bedenk[0].at)) / 86400000);
-      s.push({ icoon: '↩️', tekst: 'Nog ' + rest + ' dag(en) bedenktijd op ' + bedenk.length + ' ticket(s); herroepen is kosteloos' });
+      s.push({ soort: 'bedenktijd', tekst: 'Nog ' + rest + ' dag(en) bedenktijd op ' + bedenk.length + ' ticket(s); herroepen is kosteloos' });
     }
     for (const v of bron.terugkoop.filter(v => v.status === 'aangevraagd'))
-      s.push({ icoon: '⏳', tekst: 'Terugkoop ' + v.assetNaam + ': uiterlijk ' + v.uiterlijk + ' staat het bedrag in uw tegoed' });
+      s.push({ soort: 'terugkoop', tekst: 'Terugkoop ' + v.assetNaam + ': uiterlijk ' + v.uiterlijk + ' staat het bedrag in uw tegoed' });
     // 6. een vriendelijke duw: het jaar loopt en uw 24 uur staat nog nergens
     if (vandaag().slice(5, 7) >= '07') {
       const jaar = vandaag().slice(0, 4);
       const stil = bron.tickets.find(t => t.status === 'actief' &&
         Date.now() - Date.parse(t.at) >= BEDENKTIJD_DAGEN * 86400000 &&
         !bron.gebruik.some(g => g.assetId === t.assetId && g.datum.slice(0, 4) === jaar));
-      if (stil) s.push({ icoon: '💡', tekst: 'Uw 24 uur van dit jaar bij ' + (((db.data.sharedAssets || []).find(a => a.id === stil.assetId) || {}).naam || 'uw object') + ' staat nog niet gepland' });
+      if (stil) s.push({ soort: 'tip', tekst: 'Uw 24 uur van dit jaar bij ' + (((db.data.sharedAssets || []).find(a => a.id === stil.assetId) || {}).naam || 'uw object') + ' staat nog niet gepland' });
     }
     return s.slice(0, 5);
   }
@@ -103,7 +103,7 @@ module.exports = (ctx) => {
     for (const s of fluisterSeintjes(key, idx)) {
       if (p.geseind[s.tekst]) continue;
       p.geseind[s.tekst] = nu();
-      notify(key, { icon: s.icoon, title: 'Rahul', body: s.tekst, scope: 'fluister' });
+      notify(key, { title: 'Rahul', body: s.tekst, scope: 'fluister', soort: s.soort });
       n++;
     }
     // het piep-geheugen blijft klein: de oudste vermeldingen vallen eraf

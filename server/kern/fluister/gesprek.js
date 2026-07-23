@@ -104,7 +104,7 @@ module.exports = (ctx) => {
     }
     // de eigen regels: persoonlijk waar het kan, eerlijk waar het moet
     const groet = p.weetjes.length ? 'Ik denk aan uw ' + p.weetjes.length + ' weetje(s). ' : '';
-    const fluistert = seintjes.length ? ' Mijn seintjes: ' + seintjes.map(x => x.icoon + ' ' + x.tekst).join(' | ') + '.' : '';
+    const fluistert = seintjes.length ? ' Mijn seintjes: ' + seintjes.map(x => x.tekst).join(' | ') + '.' : '';
     if (stand.length || seintjes.length) return klaar(groet + (stand.length ? 'Dit speelt er nu voor u: ' + stand.join('; ') + '.' : 'Er staat niets open.') + fluistert + ' Vraag gerust door, of leer me iets met "onthoud dat...".');
     // niets persoonlijks te melden: pakte=false, zodat de app dit gesprek
     // aan de gewone gesprekslaag kan geven (het brein deed hier niets mee)

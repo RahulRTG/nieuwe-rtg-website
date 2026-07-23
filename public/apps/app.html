@@ -78,6 +78,13 @@
     display:flex;
     flex-direction:column;
     position:relative;
+    /* het OS meet zich naar zijn eigen venster, niet naar het scherm: op de
+       telefoon is de shell de viewport, op de computer het 820px tablet-kader.
+       Het springboard schaalt daarom mee met de shell (container-query), niet
+       met de browserbreedte, zodat de home op de desktop een nette tablet
+       i.p.v. een uitvergroot volscherm. */
+    container-type:inline-size;
+    container-name:os;
     overflow:hidden; /* off-screen panelen (meldingen) mogen de mobiele viewport niet oprekken */
   }
   /* op desktop: geen uitgerekte mobiele lay-out en geen kaal schermvullend
@@ -879,7 +886,7 @@
     display:grid;grid-template-columns:repeat(4,1fr);
     gap:1.5rem 0.7rem;margin-top:1.7rem;
   }
-  @media (min-width:700px){.os-grid{grid-template-columns:repeat(6,1fr);}}
+  @container os (min-width:600px){.os-grid{grid-template-columns:repeat(6,1fr);}}
   .os-app{
     background:none;border:none;color:var(--txt);
     display:flex;flex-direction:column;align-items:center;gap:0.42rem;
@@ -1267,39 +1274,32 @@
   .os-dock .os-app[data-tab="ai"] svg{width:30px;height:30px;stroke:#C9A24B;}
   .os-dock .os-app[data-tab="ai"].actief::after{background:var(--txt);}
 
-  /* -------- de super grote tablet: op ruime schermen groeit het OS mee --------
-     Het springboard vult het hele scherm zoals op een enorme telefoon of
-     tablet: grote tegels, een groot dock met de gouden orb, een brede
-     zoekpil. Dezelfde huisstijl; alleen de maat verandert. */
-  @media (min-width:900px){
+  /* -------- de tablet: in het 820px-kader op de computer groeit het OS mee --------
+     Het springboard voelt als een ruime tablet: iets grotere tegels dan op de
+     telefoon, meer lucht, een wat royaler dock. Geen uitvergroot volscherm:
+     de maten zijn afgestemd op het venster zelf (container-query), zodat alles
+     binnen het kader ademt in plaats van tegen de randen te duwen. */
+  @container os (min-width:640px){
     .os-grid{
-      grid-template-columns:repeat(6,1fr);gap:3rem 1.8rem;margin-top:1.9rem;
-      max-width:1180px;margin-left:auto;margin-right:auto;width:100%;
+      grid-template-columns:repeat(6,1fr);gap:2.1rem 0.9rem;margin-top:1.7rem;
     }
-    .os-app{gap:0.75rem;}
-    .os-app .os-tegel{width:110px;height:110px;border-radius:30px;}
-    .os-app svg{width:46px;height:46px;}
-    .os-app .os-tegel > span{font-size:2.7rem !important;}
-    .os-app .os-naam{font-size:0.72rem;letter-spacing:0.16em;}
-    .os-badge{width:16px;height:16px;top:-5px;right:-5px;}
-    .os-datum{font-size:0.95rem;max-width:1180px;margin-left:auto;margin-right:auto;width:100%;}
-    .os-pagina{padding:1.5rem 3rem calc(env(safe-area-inset-bottom, 0px) + 13rem);}
-    .os-dock{gap:1.5rem;padding:1rem 1.4rem;border-radius:26px;bottom:calc(env(safe-area-inset-bottom, 0px) + 1.1rem);}
-    .os-dock .os-app .os-tegel{width:84px;height:84px;border-radius:24px;}
-    .os-dock .os-app svg{width:38px;height:38px;}
-    .os-dock .os-app[data-tab="ai"]{margin-top:-20px;}
-    .os-dock .os-app[data-tab="ai"] .os-tegel{width:98px;height:98px;}
-    .os-dock .os-app[data-tab="ai"] svg{width:44px;height:44px;}
-    .os-zoekpil{bottom:calc(env(safe-area-inset-bottom, 0px) + 8.8rem);}
-    .os-dots{bottom:calc(env(safe-area-inset-bottom, 0px) + 11.2rem);gap:0.6rem;}
-    .os-dots button{width:9px;height:9px;}
-  }
-  @media (min-width:1500px){
-    .os-grid{max-width:1560px;gap:3rem 1.8rem;}
-    .os-app .os-tegel{width:128px;height:128px;border-radius:34px;}
-    .os-app svg{width:54px;height:54px;}
-    .os-app .os-tegel > span{font-size:3.1rem !important;}
-    .os-app .os-naam{font-size:0.8rem;}
+    .os-app{gap:0.55rem;}
+    .os-app .os-tegel{width:74px;height:74px;border-radius:22px;}
+    .os-app svg{width:34px;height:34px;}
+    .os-app .os-tegel > span{font-size:2rem !important;}
+    .os-app .os-naam{font-size:0.62rem;letter-spacing:0.15em;}
+    .os-badge{width:14px;height:14px;top:-4px;right:-4px;}
+    .os-datum{font-size:0.82rem;}
+    .os-pagina{padding:1.6rem 2.2rem calc(env(safe-area-inset-bottom, 0px) + 8.5rem);}
+    .os-dock{gap:1.2rem;padding:0.8rem 1.1rem;border-radius:22px;}
+    .os-dock .os-app .os-tegel{width:60px;height:60px;border-radius:18px;}
+    .os-dock .os-app svg{width:28px;height:28px;}
+    .os-dock .os-app[data-tab="ai"]{margin-top:-14px;}
+    .os-dock .os-app[data-tab="ai"] .os-tegel{width:70px;height:70px;}
+    .os-dock .os-app[data-tab="ai"] svg{width:32px;height:32px;}
+    .os-zoekpil{bottom:calc(env(safe-area-inset-bottom, 0px) + 6.6rem);}
+    .os-dots{bottom:calc(env(safe-area-inset-bottom, 0px) + 8.2rem);gap:0.5rem;}
+    .os-dots button{width:8px;height:8px;}
   }
 
   /* -------- notificatie-banner: glijdt bovenin binnen, zoals op een telefoon -------- */

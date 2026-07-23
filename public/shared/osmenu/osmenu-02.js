@@ -1,6 +1,6 @@
     function gpsAan() { try { return localStorage.getItem('rtg_os_gps') === '1'; } catch (e) { return false; } }
     var gpsRij = el('div', 'osmenu-toggle');
-    gpsRij.appendChild(el('span', 'ic', '📍'));
+    gpsRij.appendChild(icoNode('gps'));
     var gtl = el('div', 'tl'); gtl.appendChild(el('b', null, 'Locatie (GPS)'));
     gtl.appendChild(el('small', null, 'Voor kaarten, ritten en veiligheid'));
     gpsRij.appendChild(gtl);
@@ -22,7 +22,7 @@
 
     function vastRij(icoon, titel, uitlegTekst) {
       var rij = el('div', 'osmenu-toggle');
-      rij.appendChild(el('span', 'ic', icoon));
+      rij.appendChild(icoNode(icoon));
       var tl = el('div', 'tl');
       var b = el('b'); b.appendChild(d.createTextNode(titel + ' '));
       if (w.RTGUitleg && w.RTGUitleg.knop) b.appendChild(w.RTGUitleg.knop(uitlegTekst, 'Waarom kan dit niet?'));
@@ -35,15 +35,15 @@
       rij.appendChild(lab);
       return rij;
     }
-    var wifiRij = vastRij('📶', 'Wifi',
+    var wifiRij = vastRij('wifi', 'Wifi',
       'Een website mag de wifi van je toestel niet aan- of uitzetten; dat kan alleen je telefoon zelf, via de instellingen. RTG-OS toont de schakelaar, maar bedient de radio niet.');
-    var btRij = vastRij('🔵', 'Bluetooth',
+    var btRij = vastRij('bluetooth', 'Bluetooth',
       'Een website mag Bluetooth van je toestel niet aan- of uitzetten; dat kan alleen je telefoon zelf, via de instellingen. RTG-OS toont de schakelaar, maar bedient de radio niet.');
     // Zaakdoos: het lokale kastje van de zaak. Staat er een adres, dan probeert
     // elke app dat eerst en valt terug op de cloud als de doos niet reageert.
     function doosRij() {
       var rij = el('div', 'osmenu-conn');
-      rij.appendChild(el('span', 'ic', '🖧'));
+      rij.appendChild(icoNode('netwerk'));
       var tl = el('div', 'tl');
       tl.appendChild(el('b', null, 'Zaakdoos'));
       var opdoos = w.RTGdoos && w.RTGdoos.opDeDoos && w.RTGdoos.opDeDoos();
@@ -61,24 +61,24 @@
       rij.appendChild(inp); rij.appendChild(bwr);
       return rij;
     }
-    lijf.appendChild(sectie('📡', 'Verbinding', [gpsRij, wifiRij, btRij, doosRij()], false));
+    lijf.appendChild(sectie('antenne', 'Verbinding', [gpsRij, wifiRij, btRij, doosRij()], false));
 
     // ---- instellingen (incl. afmelden) ----
     var instKinderen = [
-      menurij(['🔒', 'Privacy', '/apps/juridisch/privacy.html']),
-      menurij(['📜', 'Voorwaarden', '/apps/juridisch/voorwaarden.html'])
+      menurij(['slot', 'Privacy', '/apps/juridisch/privacy.html']),
+      menurij(['juridisch', 'Voorwaarden', '/apps/juridisch/voorwaarden.html'])
     ];
     if (winfo && acc) {
-      instKinderen.push(knoprij('🚪', 'Afmelden', function () {
+      instKinderen.push(knoprij('uitloggen', 'Afmelden', function () {
         try { localStorage.removeItem(winfo.sleutel); } catch (e) {}
         try { if (kluis) kluis.wisVensterAccount(); } catch (e) {}
         w.location.reload();
       }));
     }
-    lijf.appendChild(sectie('⚙️', 'Instellingen & privacy', instKinderen, false));
+    lijf.appendChild(sectie('gear', 'Instellingen & privacy', instKinderen, false));
 
     // ---- hulp ----
-    lijf.appendChild(sectie('❓', 'Hulp & ondersteuning', HULP.map(menurij), false));
+    lijf.appendChild(sectie('help', 'Hulp & ondersteuning', HULP.map(menurij), false));
 
     paneel.appendChild(lijf);
     body.appendChild(scrim);

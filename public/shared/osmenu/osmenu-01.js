@@ -15,18 +15,18 @@
   'use strict';
 
   var APPS = [
-    ['🎫', 'RTG-app', '/apps/app.html'],
-    ['🏛️', 'Leverancier', '/apps/leverancier.html'],
-    ['🧭', 'Personeel', '/apps/personeel.html'],
-    ['📊', 'Backoffice', '/apps/backoffice.html'],
-    ['🗂️', 'Kantoren', '/apps/kantoren.html'],
-    ['💳', 'RTG Pay', '/apps/pay.html'],
-    ['♟️', 'Spelen', '/apps/spelen.html'],
-    ['🎛️', 'Boardroom', '/apps/boardroom.html'],
-    ['🤝', 'RTFoundation', '/apps/foundation/index.html']
+    ['pas', 'RTG-app', '/apps/app.html'],
+    ['maison', 'Leverancier', '/apps/leverancier.html'],
+    ['werk', 'Personeel', '/apps/personeel.html'],
+    ['office', 'Backoffice', '/apps/backoffice.html'],
+    ['gebouw', 'Kantoren', '/apps/kantoren.html'],
+    ['betalen', 'RTG Pay', '/apps/pay.html'],
+    ['spelen', 'Spelen', '/apps/spelen.html'],
+    ['paneel', 'Boardroom', '/apps/boardroom.html'],
+    ['rtf', 'RTFoundation', '/apps/foundation/index.html']
   ];
   var HULP = [
-    ['📜', 'Juridisch', '/apps/juridisch.html']
+    ['juridisch', 'Juridisch', '/apps/juridisch.html']
   ];
   var BUREAU = '/apps/bureau.html';
   var UIT_SLEUTEL = 'rtg_os_apps_uit';   // localStorage: apps die AAN uit staan
@@ -38,6 +38,28 @@
     return e;
   }
   function leeg(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+  /* De menu-iconen komen uit de gedeelde huisstijl-glyfen (shared/glyf.js),
+     geen emoji. Die set laden we er zelf bij; iconen die vóór het laden zijn
+     gebouwd, vullen we aan zodra hij binnen is. */
+  var glyfWacht = [];
+  function icoNode(naam) {
+    var s = el('span', 'ic');
+    var g = w.RTGGlyf && w.RTGGlyf.svg(naam);
+    if (g) s.appendChild(g); else glyfWacht.push([s, naam]);
+    return s;
+  }
+  (function laadGlyf() {
+    if (w.RTGGlyf) return;
+    var s = d.createElement('script'); s.src = '/shared/glyf.js'; s.async = true;
+    s.onload = function () {
+      for (var i = 0; i < glyfWacht.length; i++) {
+        var g = w.RTGGlyf.svg(glyfWacht[i][1]); if (g) glyfWacht[i][0].appendChild(g);
+      }
+      glyfWacht = [];
+    };
+    d.head.appendChild(s);
+  })();
 
   // ---- voorkeuren: welke apps staan uit ----
   function leesUit() {
@@ -55,20 +77,20 @@
 
   function tegel(rij) {
     var a = el('a', 'osmenu-tegel'); a.href = rij[2];
-    a.appendChild(el('span', 'ic', rij[0]));
+    a.appendChild(icoNode(rij[0]));
     a.appendChild(el('span', 'lb', rij[1]));
     return a;
   }
   function menurij(rij) {
     var a = el('a', 'osmenu-rij'); a.href = rij[2];
-    a.appendChild(el('span', 'ic', rij[0]));
+    a.appendChild(icoNode(rij[0]));
     a.appendChild(el('span', null, rij[1]));
     return a;
   }
   function knoprij(icoon, tekst, opKlik) {
     var b = el('button', 'osmenu-rij', null); b.type = 'button';
     b.style.width = '100%'; b.style.background = 'none'; b.style.border = '0'; b.style.cursor = 'pointer';
-    b.appendChild(el('span', 'ic', icoon));
+    b.appendChild(icoNode(icoon));
     b.appendChild(el('span', null, tekst));
     b.addEventListener('click', opKlik);
     return b;
@@ -82,7 +104,7 @@
   }
   function toggleRij(icoon, titel, sub, aan, opWissel) {
     var rij = el('div', 'osmenu-toggle');
-    rij.appendChild(el('span', 'ic', icoon));
+    rij.appendChild(icoNode(icoon));
     var tl = el('div', 'tl'); tl.appendChild(el('b', null, titel));
     if (sub) tl.appendChild(el('small', null, sub));
     rij.appendChild(tl);
@@ -92,7 +114,7 @@
   function sectie(icoon, titel, kinderen, open) {
     var det = el('details', 'osmenu-sectie'); if (open) det.open = true;
     var sum = el('summary');
-    sum.appendChild(el('span', 'ic', icoon));
+    sum.appendChild(icoNode(icoon));
     sum.appendChild(el('span', null, titel));
     sum.appendChild(el('span', 'pijl', '▾'));
     det.appendChild(sum);
@@ -199,7 +221,7 @@
     });
     var uitleg = el('p', null, 'Zet uit wat je niet gebruikt; het verdwijnt dan uit je app-raster. Dit geldt alleen op dit toestel.');
     uitleg.style.color = 'var(--osm-grijs-zacht)'; uitleg.style.fontSize = '0.78rem'; uitleg.style.margin = '0.2rem 0.2rem 0.6rem';
-    lijf.appendChild(sectie('🎛️', 'Bedieningspaneel', [uitleg].concat(appToggles), false));
+    lijf.appendChild(sectie('paneel', 'Bedieningspaneel', [uitleg].concat(appToggles), false));
 
     // ---- verbinding: GPS werkt echt; wifi/Bluetooth kan een website niet
     //      schakelen (alleen het toestel zelf), dus die staan vast met uitleg ----

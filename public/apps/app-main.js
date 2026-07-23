@@ -998,7 +998,8 @@
   function dmBubbel(m){
     const mijn = m.from === social.me;
     const tijd = new Date(m.at).toLocaleTimeString(lang()==='en'?'en-GB':'nl-NL',{hour:'2-digit',minute:'2-digit'});
-    const txt = mijn ? escT(m.text) : '<span class="xlate">' + escT(m.text) + '</span>';
+    const emo = s => window.RTGEmoji ? RTGEmoji.render(escT(s)) : escT(s);
+    const txt = mijn ? emo(m.text) : '<span class="xlate">' + escT(m.text) + '</span>';
     return '<div class="dm-m' + (mijn ? ' mine' : '') + '">' + txt +
       (m.post ? '<div class="dm-post"><b>↗ ' + escT(m.post.author) + ' · ' + escT(m.post.place) + '</b>' + escT(m.post.text) + '…</div>' : '') +
       '<span class="tijd">' + tijd + '</span></div>';
@@ -1015,6 +1016,8 @@
   }
   $('#dmSend').addEventListener('click', stuurDm);
   $('#dmInput').addEventListener('keydown', e => { if (e.key === 'Enter') stuurDm(); });
+  // RTG-eigen emoji-kiezer bij de DM-invoer
+  (function(){ const inp = $('#dmInput'); if (inp && inp.parentNode && window.RTGEmoji && !inp.parentNode.querySelector('.rtg-emo-knop')) { inp.parentNode.insertBefore(RTGEmoji.knop(inp), inp); } })();
   const dmDicht = () => { $('#dm-sheet').classList.remove('open'); $('#dm-scrim').classList.remove('open'); dmWith = null; };
   $('#dmClose').addEventListener('click', dmDicht);
   $('#rideGo').addEventListener('click', verstuurRit);

@@ -123,7 +123,27 @@
     sleutel: '<circle cx="8" cy="8" r="3.6"/><path d="M10.6 10.6L19 19M15.5 15.5l2.2-2.2M13.4 13.4l1.8-1.8"/>',
     boot: '<path d="M4.5 15.5h15l-2.2 4H6.7zM12 4.2v10M12 4.2l6.4 4.5L12 10.2"/>',
     parasol: '<path d="M12 3.2v2.4M4 12.5a8 8 0 0 1 16 0zM12 12.5v5.3a2 2 0 0 0 4 0"/>',
-    bar: '<path d="M4.5 5h15l-7.5 8zM12 13v6M8 19h8M15.5 8l2.5-3"/>'
+    bar: '<path d="M4.5 5h15l-7.5 8zM12 13v6M8 19h8M15.5 8l2.5-3"/>',
+
+    /* --- RTG-eigen emoji: huisstijl-smileys en tekens in dezelfde lijn-taal.
+       In de chat te gebruiken via de sneltekst :naam: (zie shared/emoji.js). --- */
+    'emo-blij': '<circle cx="12" cy="12" r="9"/><path d="M8.3 13a4.7 4.7 0 0 0 7.4 0M9 9.4v1.2M15 9.4v1.2"/>',
+    'emo-knipoog': '<circle cx="12" cy="12" r="9"/><path d="M8.3 13a4.7 4.7 0 0 0 7.4 0M8.2 10h1.7M15 9.4v1.2"/>',
+    'emo-lol': '<circle cx="12" cy="12" r="9"/><path d="M7.6 13a5 5 0 0 0 8.8 0zM9 9.4v1.2M15 9.4v1.2"/>',
+    'emo-verdriet': '<circle cx="12" cy="12" r="9"/><path d="M8.3 15.6a4.7 4.7 0 0 1 7.4 0M9 9.4v1.2M15 9.4v1.2"/>',
+    'emo-verrast': '<circle cx="12" cy="12" r="9"/><path d="M9 9.2v1.2M15 9.2v1.2"/><circle cx="12" cy="14.6" r="1.7"/>',
+    'emo-cool': '<circle cx="12" cy="12" r="9"/><path d="M6.4 9.6h4v1.4a1.2 1.2 0 0 1-2.4 0zM13.6 9.6h4v1.4a1.2 1.2 0 0 1-2.4 0M10.4 10.1h3.2M9 15.4h6"/>',
+    'emo-kus': '<circle cx="12" cy="12" r="9"/><path d="M9 9.4v1.2M15 9.4v1.2M10.6 14.4c.7-.9 2.1-.9 2.8 0-.7.9-2.1.9-2.8 0"/>',
+    'emo-tong': '<circle cx="12" cy="12" r="9"/><path d="M8.5 13a4.7 4.7 0 0 0 7 0M9 9.4v1.2M15 9.4v1.2M11.4 14.4v1.6a1.3 1.3 0 0 0 2.6-.3v-1"/>',
+    'emo-slaap': '<circle cx="12" cy="12" r="9"/><path d="M7.8 10a1.4 1.4 0 0 1 2.4 0M13.8 10a1.4 1.4 0 0 1 2.4 0M9.5 14.5h5"/>',
+    'emo-neutraal': '<circle cx="12" cy="12" r="9"/><path d="M9.5 14.4h5M9 9.4v1.2M15 9.4v1.2"/>',
+    'emo-duim': '<path d="M4.5 10.5H7v8H4.5zM7 11l3.4-6c.4-.8 1.6-.6 1.7.3l-.4 3.4h4.6a1.7 1.7 0 0 1 1.7 2l-1 5a1.7 1.7 0 0 1-1.7 1.3H7z"/>',
+    'emo-vuur': '<path d="M12.5 3c1.4 3 4 4.5 4 8a4.3 4.3 0 0 1-8.6 0c0-1.6.7-2.7 1.6-3.6-.3 1.1-.2 2.2.6 3 0-1.6.8-3.2 2.4-4.4-.5 1.8.4 2.7 1.2 3.3.2-2.3-.9-4.4-1.2-6.3z"/>',
+    'emo-feest': '<path d="M4 20l4.6-11.2 6.6 6.6zM10.2 8.2l7 3.4M11 8l1.2-3.2M13.4 9.6l3-2.3M14.6 12.4l3.4.4"/>',
+    'emo-ster': '<path d="M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/>',
+    'emo-hart': '<path d="M12 20.3l-1.4-1.3C6 14.9 3.5 12.6 3.5 9.4A3.9 3.9 0 0 1 7.4 5.5c1.5 0 2.9.7 3.6 1.9.7-1.2 2.1-1.9 3.6-1.9a3.9 3.9 0 0 1 3.9 3.9c0 3.2-2.5 5.5-7.1 9.6z"/>',
+    'emo-bloem': '<circle cx="12" cy="11.5" r="1.9"/><circle cx="12" cy="6.6" r="2.4"/><circle cx="16.7" cy="10" r="2.4"/><circle cx="14.9" cy="15.4" r="2.4"/><circle cx="9.1" cy="15.4" r="2.4"/><circle cx="7.3" cy="10" r="2.4"/>',
+    'emo-proost': '<path d="M5 4.5h4.5l-.7 5a1.5 1.5 0 0 1-3 0zM7 11v6.5M5.4 18h3.2M19 4.5h-4.5l.7 5a1.5 1.5 0 0 0 3 0zM17 11v6.5M15.4 18h3.2"/>'
   };
 
   /* De <svg>-jas als string (voor code die HTML samenstelt i.p.v. DOM-nodes).

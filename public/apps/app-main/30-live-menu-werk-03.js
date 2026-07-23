@@ -1,10 +1,10 @@
       if (!datum){ toast(T('as.kiesdag','Kies eerst een dag.')); return; }
-      try { const r = await API.call('/asset/gebruik', { assetId: b.dataset.id, datum }); toast('📅 ' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
+      try { const r = await API.call('/asset/gebruik', { assetId: b.dataset.id, datum }); toast('' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asuit').forEach(b => b.addEventListener('click', async () => {
       if (!window.confirm(T('as.uitvraag','Uitstappen? RTG betaalt de actuele ticketwaarde') + ' (' + eur(Number(b.dataset.w)) + ') ' + T('as.uitvraag2','uit via een Tik en het ticket gaat terug in de pool.'))) return;
-      try { const r = await API.call('/asset/uitstap', { ticketId: b.dataset.tid }); toast('💰 ' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
+      try { const r = await API.call('/asset/uitstap', { ticketId: b.dataset.tid }); toast('' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -37,15 +37,15 @@
     el.innerHTML =
       (v
         ? '<div class="live-start" style="margin-bottom:0.8rem;">' +
-            '<div class="lh">🔮 ' + T('vs.h','Rahul verwacht') + '</div>' +
+            '<div class="lh">' + T('vs.h','Rahul verwacht') + '</div>' +
             '<div class="ld">' + esc(v.wat) + ' · ' + esc(v.waarom) + '. ' +
               T('vs.d','Klopt het niet, dan negeert u dit gewoon; Rahul leert vanzelf bij.') + '</div>' +
-            '<button class="chip js-vsdoe" style="margin-top:0.5rem;">🤵 ' + T('vs.doe','Laat Rahul het klaarzetten') + '</button>' +
+            '<button class="chip js-vsdoe" style="margin-top:0.5rem;">' + T('vs.doe','Laat Rahul het klaarzetten') + '</button>' +
           '</div>'
         : '') +
       (pk.length
         ? '<div class="live-start" style="margin-bottom:0.8rem;">' +
-            '<div class="lh">🤝 ' + T('pk.h','Pakketten van onze huizen') + '</div>' +
+            '<div class="lh">' + T('pk.h','Pakketten van onze huizen') + '</div>' +
             pk.map(p => '<div style="margin-top:0.45rem;">' +
               '<div style="font-size:0.85rem;"><b>' + esc(p.naam) + '</b> · € ' + (p.prijsCenten/100).toFixed(2).replace('.', ',') + '</div>' +
               '<div style="font-size:0.72rem;color:var(--soft);">' + p.zaken.map(esc).join(' + ') +
@@ -54,7 +54,7 @@
           '</div>'
         : '') +
       '<div class="live-start" style="margin-bottom:0.8rem;">' +
-        '<div class="lh">🤵 ' + T('fl.h','Wat Rahul weet en ziet') + '</div>' +
+        '<div class="lh">' + T('fl.h','Wat Rahul weet en ziet') + '</div>' +
         '<div class="ld">' + T('fl.d','Hij onthoudt wat u vertelt ("onthoud dat..."), leert van wat u gebruikt en regelt alles in de chat hieronder: zoeken, reserveren, bestellen en afrekenen, uw 24 uur, een Tik of betaalverzoek. Vraag "wat kun je" voor het hele overzicht; geld gaat nooit zonder uw "ja" de deur uit.') + '</div>' +
         ((prof.seintjes || []).length
           ? '<div style="margin-top:0.55rem;border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;">' +
@@ -83,7 +83,7 @@
       if (!window.confirm(T('pk.zeker','Pakket boeken voor') + ' ' + prijs + '? ' + T('pk.zeker2','Het bedrag gaat direct van uw RTG Pay-saldo.'))) return;
       try {
         await API.call('/pakket/koop', { id: b.dataset.pk, idem: 'pk' + Date.now() });
-        toast('🤝 ' + T('pk.ok','Geboekt. De zaken weten ervan.'));
+        toast('' + T('pk.ok','Geboekt. De zaken weten ervan.'));
         renderFluister();
       } catch(e){ toast(e.message); }
     }));
@@ -100,7 +100,7 @@
     } catch(e){ el.innerHTML = ''; return; }
     el.innerHTML =
       '<div class="live-start" style="margin-top:0.8rem;">' +
-        '<div class="lh">🩺 ' + T('zorg.h','Mijn zorgprofiel') + '</div>' +
+        '<div class="lh">' + T('zorg.h','Mijn zorgprofiel') + '</div>' +
         '<div class="ld">' + T('zorg.d','Allergenen en aandachtspunten reizen automatisch mee met uw bestellingen en verblijven, alleen als u delen aanzet. De keuken en de receptie weten het dan meteen.') + '</div>' +
         '<input id="zAll" placeholder="' + T('zorg.all','Allergenen, gescheiden door komma (bijv. noten, schaaldieren)') + '" value="' + esc((zorg.allergenen || []).join(', ')) + '" style="width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
         '<input id="zDieet" placeholder="' + T('zorg.dieet','Dieet (bijv. vegetarisch, halal)') + '" value="' + esc(zorg.dieet || '') + '" style="width:100%;margin-top:0.4rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
@@ -108,18 +108,18 @@
         '<label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.55rem;font-size:0.74rem;color:var(--txt);"><input type="checkbox" id="zDelen"' + (zorg.delen ? ' checked' : '') + '> ' + T('zorg.delen','Deel dit automatisch met zaken waar ik bestel of verblijf') + '</label>' +
         '<button class="live-go" id="zOpslaan" style="margin-top:0.55rem;">' + T('zorg.opslaan','Bewaar zorgprofiel') + '</button>' +
         ((delen.actief || []).length
-          ? '<div style="margin-top:0.8rem;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">📍 ' + T('zorg.kijkt','Kijkt live met mij mee') + '</div>' +
+          ? '<div style="margin-top:0.8rem;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">' + T('zorg.kijkt','Kijkt live met mij mee') + '</div>' +
             delen.actief.map(d => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.4rem;font-size:0.78rem;"><span><b>' + esc(d.supplierName) + '</b> · ' + T('zorg.sinds','sinds') + ' ' + String(d.at).slice(11, 16) + '</span><button class="mo-code js-zstop" data-id="' + d.id + '">' + T('zorg.stop','Stop delen') + '</button></div>').join('')
-          : '<div style="margin-top:0.8rem;font-size:0.68rem;color:var(--soft);">📍 ' + T('zorg.niemand','Er kijkt nu niemand live met u mee.') + '</div>') +
+          : '<div style="margin-top:0.8rem;font-size:0.68rem;color:var(--soft);">' + T('zorg.niemand','Er kijkt nu niemand live met u mee.') + '</div>') +
       '</div>';
     $('#zOpslaan').addEventListener('click', async () => {
       try {
         await API.call('/zorgprofiel/zet', { allergenen: $('#zAll').value, dieet: $('#zDieet').value, medisch: $('#zMed').value, delen: $('#zDelen').checked });
-        toast('🩺 ' + T('zorg.bewaard','Zorgprofiel bewaard.'));
+        toast('' + T('zorg.bewaard','Zorgprofiel bewaard.'));
       } catch(e){ toast(e.message); }
     });
     el.querySelectorAll('.js-zstop').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/locatie/stop', { id: b.dataset.id }); toast('📍 ' + T('zorg.gestopt','Delen gestopt.')); renderZorg(); }
+      try { await API.call('/locatie/stop', { id: b.dataset.id }); toast('' + T('zorg.gestopt','Delen gestopt.')); renderZorg(); }
       catch(e){ toast(e.message); }
     }));
   }

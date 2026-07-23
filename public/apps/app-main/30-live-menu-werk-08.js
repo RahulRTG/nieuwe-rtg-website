@@ -4,7 +4,7 @@
     payWithFaceId(eur(o.total + fooi), async () => {
       await API.call('/order/pay', { ref: o.ref, fooi });
       return o;
-    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.' + (fooi ? ' 💛 ' + eur(fooi) + ' ' + T('erv.fooivoorteam','fooi voor het team.') : ''), after: () => renderTerPlaatse() });
+    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.' + (fooi ? '  ' + eur(fooi) + ' ' + T('erv.fooivoorteam','fooi voor het team.') : ''), after: () => renderTerPlaatse() });
   }
 
   $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
@@ -38,7 +38,7 @@
         return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;font-size:0.78rem;color:var(--muted);">'+
           '<span>'+a.company+' · '+a.func+'</span>'+
           '<span style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">'+
-          (a.chatId ? '<button class="chatb" style="width:auto;padding:0.2rem 0.55rem;font-size:0.7rem;" data-apchat="'+a.chatId+'" data-apco="'+encodeURIComponent(a.company)+'">💬 '+T('cv.chat','Chat')+'</button>' : '')+
+          (a.chatId ? '<button class="chatb" style="width:auto;padding:0.2rem 0.55rem;font-size:0.7rem;" data-apchat="'+a.chatId+'" data-apco="'+encodeURIComponent(a.company)+'">'+T('cv.chat','Chat')+'</button>' : '')+
           '<span style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:'+kleur+';border:1px solid '+kleur+';border-radius:999px;padding:0.15rem 0.55rem;">'+label+'</span></span></div>';
       }).join('')+'</div>' : '')+
       '<button class="vbtn" style="margin-top:0.8rem;" id="cvOpen">'+(myCvReady?T('cv.card.edit','Bewerk mijn cv'):T('cv.card.make','Maak mijn cv'))+'</button>';
@@ -85,7 +85,6 @@
 
   /* ---------- vacatures: dezelfde partnervacatures als in de RTFoundation,
      nu ook voor RTG-leden, met land- en afstandfilter en solliciteren met cv ---------- */
-  const VLAG = { NL:'🇳🇱', BE:'🇧🇪', DE:'🇩🇪', FR:'🇫🇷', ES:'🇪🇸', JP:'🇯🇵' };
   const VACSOORT = { bijbaan:'Bijbaan', vakantiewerk:'Vakantiewerk', parttime:'Parttime', fulltime:'Fulltime', stage:'Stage', vrijwilliger:'Vrijwilliger' };
   let vacs = [], vacLanden = [], vacLand = '';
   async function loadVacatures(){
@@ -105,8 +104,8 @@
     const rij = vacs.map(v => ({ v, km: mijnPlek && v.loc ? Geo.afstandKm(mijnPlek, v.loc) : null }));
     if (mijnPlek) rij.sort((a,b) => (a.km==null?1e9:a.km) - (b.km==null?1e9:b.km));
     const isApplied = (v) => myApps.some(a => a.func === v.func && a.company === v.bedrijf);
-    const landOpts = '<option value="">🌍 '+T('vac.overal','Overal')+'</option>' +
-      vacLanden.map(l => '<option value="'+l.code+'"'+(l.code===vacLand?' selected':'')+'>'+(VLAG[l.code]||'🏳️')+' '+esc(l.naam)+'</option>').join('');
+    const landOpts = '<option value="">'+T('vac.overal','Overal')+'</option>' +
+      vacLanden.map(l => '<option value="'+l.code+'"'+(l.code===vacLand?' selected':'')+'>'+(VLAG[l.code]||'')+' '+esc(l.naam)+'</option>').join('');
     let h = '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">💼 '+T('vac.k','Werk en vacatures')+'</div>'+
+      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('vac.k','Werk en vacatures')+'</div>'+
       '<select id="vacLand" style="background:var(--card2);color:var(--txt,#fff);border:1px solid var(--line);border-radius:999px;padding:0.3rem 0.6rem;font-size:0.72rem;">'+landOpts+'</select></div>';

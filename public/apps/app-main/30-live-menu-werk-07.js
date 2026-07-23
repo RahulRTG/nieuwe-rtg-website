@@ -1,14 +1,14 @@
     if (apart.length) html += '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">' + T('rt.m.apart','Voor u apart gelegd') + '</div>' +
       apart.map(a => '<div style="font-size:0.82rem;margin-top:0.3rem;">' + esc(a.artikelNaam) + ' · ' + esc(a.kleur) + ', ' + esc(a.maat) + ' <span style="color:var(--soft);">(' + T('rt.m.tot','tot') + ' ' + esc(a.tot) + ')</span></div>').join('') +
-      '<button class="rt-bezorg" style="margin-top:0.55rem;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem;font-weight:600;font-family:inherit;cursor:pointer;">🚚 ' + T('mb.laat','Veilig laten bezorgen') + '</button>' +
+      '<button class="rt-bezorg" style="margin-top:0.55rem;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('mb.laat','Veilig laten bezorgen') + '</button>' +
       '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.3rem;">' + T('mb.veiliguitleg','Met bezorgcode, live volgen en pas-aan-de-deur. Dure stukken: ID aan de deur.') + '</div></div>';
     // lopende bezorgingen van deze winkel
     const bez = (menuState.modeBezorg || []).filter(b => b.supplierName === r.supplier.name && !['afgeleverd','retour','geannuleerd'].includes(b.status));
-    if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">🚚 ' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
+    if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
       '<div style="font-size:0.85rem;margin-top:0.3rem;">' + T('mb.code','Bezorgcode') + ': <b style="letter-spacing:0.2em;font-size:1.05rem;">' + esc(b.bezorgcode) + '</b></div>' +
       '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + (b.koerier ? T('mb.koerieris','Koerier') + ': ' + esc(b.koerier) + (b.etaMin != null ? ' · ETA ' + b.etaMin + ' min' : '') : T('mb.geefcode','Geef deze code alleen aan de RTG-koerier aan de deur.')) + '</div></div>').join('');
     const styling = (mijn.styling || []).filter(v => v.supplierName === r.supplier.name);
-    if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">✨ ' + esc(v.titel) + '</div>' +
+    if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">' + esc(v.titel) + '</div>' +
       (v.bericht ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + esc(v.bericht) + '</div>' : '') +
       '<div style="font-size:0.8rem;margin-top:0.3rem;">' + v.items.map(i => esc(i.naam)).join(' · ') + '</div><div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + T('rt.m.van','van') + ' ' + esc(v.van) + '</div></div>').join('');
     // de artikelen
@@ -18,14 +18,14 @@
       const bes = a.beschikbaar || [];
       return '<div style="border:1px solid var(--line);border-radius:16px;padding:0.8rem;margin-bottom:0.7rem;" data-rart="' + escAttr(a.id) + '">' +
         '<div style="display:flex;gap:0.8rem;">' +
-        (a.foto ? '<img src="' + escAttr(a.foto) + '" alt="' + escAttr(a.naam) + '" style="width:72px;height:92px;object-fit:cover;border-radius:10px;flex-shrink:0;">' : '<div style="width:72px;height:92px;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem;">👗</div>') +
+        (a.foto ? '<img src="' + escAttr(a.foto) + '" alt="' + escAttr(a.naam) + '" style="width:72px;height:92px;object-fit:cover;border-radius:10px;flex-shrink:0;">' : '<div style="width:72px;height:92px;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem;"></div>') +
         '<div style="flex:1;min-width:0;">' +
         '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.92rem;">' + esc(a.naam) + '</b>' +
-        '<button class="rt-fav" data-rfav="' + escAttr(a.id) + '" style="background:none;border:none;font-size:1.1rem;flex-shrink:0;cursor:pointer;" aria-label="' + T('rt.m.verlang','Verlanglijst') + '">' + (a.opWishlist ? '💛' : '🤍') + '</button></div>' +
+        '<button class="rt-fav" data-rfav="' + escAttr(a.id) + '" style="background:none;border:none;font-size:1.1rem;flex-shrink:0;cursor:pointer;" aria-label="' + T('rt.m.verlang','Verlanglijst') + '">' + RTGGlyf.svgHTML('hart', a.opWishlist ? { fill: true } : {}) + '</button></div>' +
         '<div style="font-size:0.78rem;color:var(--soft);">' + esc(a.categorie || '') + (a.materiaal ? ' · ' + esc(a.materiaal) : '') + '</div>' +
         (a.kleuren && a.kleuren.length ? '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.2rem;">' + a.kleuren.map(k => esc(k)).join(' · ') + '</div>' : '') +
         '<div style="font-weight:600;margin-top:0.3rem;">' + eur(a.price) + '</div>' +
-        (drop ? '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.3rem;">⏳ ' + T('rt.m.drop','Drop') + ' ' + esc(a.drop.datum) + ' ' + esc(a.drop.tijd) + '</div>' : '') +
+        (drop ? '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.3rem;">' + T('rt.m.drop','Drop') + ' ' + esc(a.drop.datum) + ' ' + esc(a.drop.tijd) + '</div>' : '') +
         '</div></div>' +
         (!drop && bes.length ? '<div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.6rem;flex-wrap:wrap;">' +
           '<span style="font-size:0.72rem;color:var(--soft);">' + T('rt.m.paskamer','Vraag een maat in de paskamer:') + '</span>' +
@@ -49,7 +49,7 @@
       if (!adres || !adres.trim()) return;
       try {
         const r = await API.call('/mode/bezorg/aanvraag', { supplierCode: code, adres: adres.trim(), items });
-        toast('🚚 ' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + r.bezorging.bezorgcode);
+        toast('' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + r.bezorging.bezorgcode);
         try { menuState.modeBezorg = (await API.call('/mode/bezorg/mijn', {})).bezorgingen || []; } catch(e){}
         renderMenuSheet();
       } catch(e){ toast(e.message); }
@@ -57,7 +57,7 @@
     document.querySelectorAll('[data-rfav]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/retail/wishlist', { code, artikelId: b.dataset.rfav });
-        b.textContent = d.wishlist ? '💛' : '🤍';
+        b.innerHTML = RTGGlyf.svgHTML('hart', d.wishlist ? { fill: true } : {});
         const a = (menuState.retail.artikelen || []).find(x => x.id === b.dataset.rfav); if (a) a.opWishlist = d.wishlist;
         toast(d.wishlist ? T('rt.m.opverlang','Op uw verlanglijst. De boetiek ziet het.') : T('rt.m.afverlang','Van uw verlanglijst gehaald.'));
       } catch(e){ toast(e.message); }
@@ -68,7 +68,7 @@
       if (!sel || !sel.value) return;
       try {
         await API.call('/retail/paskamer', { code, vsku: sel.value });
-        toast('🚪 ' + T('rt.m.pasok','Uw maat is aangevraagd. Een medewerker brengt hem naar de paskamer.'));
+        toast('' + T('rt.m.pasok','Uw maat is aangevraagd. Een medewerker brengt hem naar de paskamer.'));
       } catch(e){ toast(e.message); }
     }));
   }
@@ -86,7 +86,7 @@
       const bots = e.status === 409 && e.data && e.data.allergieBotsing;
       if (bots && !opts.allergieAkkoord){
         const namen = bots.map(b => b.naam + ' (' + b.allergenen.map(a => tAlg(a)).join(', ') + ')').join('; ');
-        if (confirm('⚠️ ' + T('menu.allergiebevestig','Dit botst met je allergieprofiel') + ': ' + namen + '.\n\n' + T('menu.allergietochbestel','Weet je zeker dat je dit toch wilt bestellen?')))
+        if (confirm('' + T('menu.allergiebevestig','Dit botst met je allergieprofiel') + ': ' + namen + '.\n\n' + T('menu.allergietochbestel','Weet je zeker dat je dit toch wilt bestellen?')))
           return placeOrder(Object.assign({}, opts, { allergieAkkoord: true }));
         return;
       }
@@ -100,12 +100,12 @@
     } else if (d.order.aanBalie){
       // naar de kassa: de keuken maakt hem al; toon de code groot om aan de balie
       // te laten scannen of tonen
-      toast('🧾 ' + T('app.naarkassaok','Naar de kassa gestuurd. Toon je code aan de balie.'));
+      toast('' + T('app.naarkassaok','Naar de kassa gestuurd. Toon je code aan de balie.'));
       showGlow(d.order);
     } else {
       // deze zaak koos betaling achteraf: de bestelling loopt al; na het eten
       // vraagt u de rekening (alle bonnen in een keer) bij Mijn bestellingen
-      toast('🛎️ ' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalnaeten','Betaal na het eten: vraag de rekening bij Mijn bestellingen.'));
+      toast('' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalnaeten','Betaal na het eten: vraag de rekening bij Mijn bestellingen.'));
     }
     renderTerPlaatse();
   }

@@ -7,23 +7,23 @@
       let h = '';
       if (meerdan1) h += '<div class="label" style="margin:.4rem 0 .2rem;color:var(--burgundy);">'+esc(gz.gezinNaam)+'</div>';
       // Belangrijke info
-      h += '<div class="card"><div class="label">📋 Belangrijke info</div>';
+      h += '<div class="card"><div class="label">Belangrijke info</div>';
       h += (o.noodcontacten&&o.noodcontacten.length)
-        ? '<div style="margin:.2rem 0 .6rem;">'+o.noodcontacten.map(c=>'<a href="'+telHref(c.telefoon)+'" style="display:flex;align-items:center;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--txt);"><span>📞</span><b style="flex:1;">'+esc(c.naam||'Contact')+(c.wie?' <span class="meta">· '+esc(c.wie)+'</span>':'')+'</b><span style="color:var(--gold);">'+esc(c.telefoon)+'</span></a>').join('')+'</div>'
+        ? '<div style="margin:.2rem 0 .6rem;">'+o.noodcontacten.map(c=>'<a href="'+telHref(c.telefoon)+'" style="display:flex;align-items:center;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--txt);"><b style="flex:1;">'+esc(c.naam||'Contact')+(c.wie?' <span class="meta">· '+esc(c.wie)+'</span>':'')+'</b><span style="color:var(--gold);">'+esc(c.telefoon)+'</span></a>').join('')+'</div>'
         : '';
-      h += infoRij('💊 Allergieën en medisch', o.allergie);
-      h += infoRij('🍽️ Eten en bedtijden', o.eten);
-      h += infoRij('🏠 Huisregels', o.huisregels);
+      h += infoRij('Allergieën en medisch', o.allergie);
+      h += infoRij('Eten en bedtijden', o.eten);
+      h += infoRij('Huisregels', o.huisregels);
       if (!(o.noodcontacten&&o.noodcontacten.length) && !o.allergie && !o.eten && !o.huisregels) h += '<div class="meta">Het gezin heeft nog geen info ingevuld.</div>';
       h += '<div class="meta" style="margin-top:.6rem;">Bij nood: bel 112.</div></div>';
       // Agenda
       const ag = (gz.agenda||[]).filter(a=>!a.voorbij).slice(0,8);
-      h += '<div class="card"><div class="label">📅 Agenda</div>'+
+      h += '<div class="card"><div class="label">Agenda</div>'+
         (ag.length ? ag.map(a=>'<div style="display:flex;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);white-space:nowrap;">'+(a.tijd||datumKort(a.datum))+'</b><span style="flex:1;">'+esc(a.titel)+(a.wieNaam?' <span class="meta">· '+esc(a.wieNaam)+'</span>':'')+'<div class="meta">'+datumKort(a.datum)+'</div></span></div>').join('') : '<div class="meta">Niets gepland.</div>')+'</div>';
       // Waar is iedereen
       const loc = (gz.locaties||[]);
-      h += '<div class="card"><div class="label">📍 Waar is iedereen</div>'+
-        (loc.length ? loc.map(l=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);"><span style="width:1.8rem;height:1.8rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;">'+(l.avatar||'🙂')+'</span><div style="flex:1;"><b>'+esc(l.naam)+'</b><div class="meta">'+esc(l.status)+' · '+geleden(l.at)+'</div></div>'+(l.lat!=null?'<a href="geo:'+l.lat+','+l.lon+'?q='+l.lat+','+l.lon+'" target="_blank" rel="noopener" style="color:var(--gold);white-space:nowrap;">Kaart →</a>':'')+'</div>').join('') : '<div class="meta">Niemand deelt nu iets.</div>')+'</div>';
+      h += '<div class="card"><div class="label">Waar is iedereen</div>'+
+        (loc.length ? loc.map(l=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);"><span style="width:1.8rem;height:1.8rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#0C0C0B;">'+(l.avatar||esc((l.naam||'?').charAt(0).toUpperCase()))+'</span><div style="flex:1;"><b>'+esc(l.naam)+'</b><div class="meta">'+esc(l.status)+' · '+geleden(l.at)+'</div></div>'+(l.lat!=null?'<a href="geo:'+l.lat+','+l.lon+'?q='+l.lat+','+l.lon+'" target="_blank" rel="noopener" style="color:var(--gold);white-space:nowrap;">Kaart →</a>':'')+'</div>').join('') : '<div class="meta">Niemand deelt nu iets.</div>')+'</div>';
       return h;
     }).join('');
   }
@@ -85,7 +85,7 @@
 
   /* de reisagenda: alles met een datum (tafels, tickets, ritten, events)
      automatisch samengevoegd tot een dagprogramma onder de reis */
-  const AGENDA_ICO = { reservering: '🪑', ticket: '🎟', boeking: '🗓', rit: '🚗', event: '🎉' };
+  const AGENDA_ICO = {};  // geen emoji-markers meer; alle items dragen het rustige '·'
   async function renderAgenda(){
     if (!API.live) return;
     let wrap = $('#agendaWrap');
@@ -98,7 +98,7 @@
     try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch(e){ return; }
     if (!dagen.length){ wrap.innerHTML = ''; return; }
     const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang() === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
-    wrap.innerHTML = '<div class="sec-label" style="margin-top:1.2rem;">📅 ' + T('erv.agenda','Mijn programma') + '</div>' +
+    wrap.innerHTML = '<div class="sec-label" style="margin-top:1.2rem;">' + T('erv.agenda','Mijn programma') + '</div>' +
       dagen.map(d =>
         '<div style="font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin:0.7rem 0 0.35rem;">' + dagNaam(d.datum) + '</div>' +
         d.items.map(it =>

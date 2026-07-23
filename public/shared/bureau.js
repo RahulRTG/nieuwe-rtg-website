@@ -12,7 +12,9 @@
    plek in de app. */
 (function () {
   if (window.RTGBureau) return;
-  var MIN = 1360;
+  // het leden-OS staat op de computer op normaal (telefoon-)formaat; zodra er
+  // naast dat toestel ruimte is voor een widgetkolom, vult die zich vanzelf
+  var MIN = 1120;
   var BREED = 288;
   var SLEUTEL = 'rtg_bureau_v2';
   var RUSTIG = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -48,8 +50,16 @@
   }
   function bewaar() { try { localStorage.setItem(SLEUTEL, JSON.stringify(staat)); } catch (e) {} }
 
-  function rechterMarge() { return Math.round((window.innerWidth + 820) / 2 + 26); }
-  function linkerMarge() { return Math.max(16, Math.round((window.innerWidth - 820) / 2 - BREED - 26)); }
+  // de randen van het gecentreerde leden-OS-toestel (#shell), zodat de widgets
+  // er precies naast komen -- ongeacht welk formaat het toestel heeft
+  function osRect() {
+    var el = document.getElementById('shell');
+    if (el) return el.getBoundingClientRect();
+    var w = Math.min(460, window.innerWidth - 48);
+    return { left: (window.innerWidth - w) / 2, right: (window.innerWidth + w) / 2 };
+  }
+  function rechterMarge() { return Math.round(osRect().right + 26); }
+  function linkerMarge() { return Math.max(16, Math.round(osRect().left - BREED - 26)); }
   function beginX(w) { return w.x != null ? w.x : (w.kant === 'links' ? linkerMarge() : rechterMarge()); }
 
   function stijl() {

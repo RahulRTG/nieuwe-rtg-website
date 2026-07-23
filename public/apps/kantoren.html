@@ -306,6 +306,12 @@
       <div id="gStand" class="stil" style="margin-top:.8rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
     </div>
 
+    <h3 class="sec">Het Lab-fonds: wat de leden samen inzamelen voor het Onderzoekslab</h3>
+    <div class="kaart" id="bFonds">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);">Leden zamelen per locatie in voor het RTF Onderzoekslab en beslissen samen &mdash; met een AI-scheidsrechter &mdash; wat er in hun omgeving mee gebeurt. De boardroom ziet het hele fonds: de potten per plek en elk voorstel.</p>
+      <div id="bFondsLijst" style="margin-top:.7rem;"><div class="leeg">Laden...</div></div>
+    </div>
+
     <h3 class="sec">De Mall-regie: elke leverancier in de RTG Mall bijstellen</h3>
     <div class="kaart" id="bMall">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">Elke partner staat in de Mall: op een koop-etage of in de gids per genre. Hier verbergt u een partner, verplaatst u een boutique naar een andere etage, of stelt u de tagline en de actie bij. Het eigen-merk beheert RTG apart.</p>
@@ -1986,6 +1992,7 @@ async function openBoard(){
   laadRahul();
   laadDoosRegie();
   laadMallRegie();
+  laadFonds();
   wereldWidget($('#bWereld'));
   api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
   $('#bAudit').innerHTML = (d.audit && d.audit.length) ? d.audit.map(a =>
@@ -2175,6 +2182,35 @@ async function laadMallRegie(){
       catch (e) { meld(e.message); }
     });
   });
+}
+
+/* het Lab-fonds vanuit de boardroom: alle potten per locatie en elk voorstel.
+   Eigen endpoint (officeAuth), dus een rechtstreekse fetch i.p.v. de office-api. */
+async function laadFonds(){
+  const box = $('#bFondsLijst');
+  let d;
+  try {
+    const r = await fetch('/api/labfonds/boardroom', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: '{}' });
+    d = await r.json(); if (!r.ok) throw new Error(d.error || 'Kon het fonds niet laden.');
+  } catch (e) { box.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const eur = c => '€ ' + (Math.round(Number(c)*100)/100).toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const locs = (d.locaties || []).map(l =>
+    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.5rem 0;gap:.6rem;">'+
+      '<span style="flex:1;"><b>'+esc(l.naam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+esc(l.land||'')+'</span></span>'+
+      '<span class="stil" style="color:var(--soft);font-size:.78rem;">pot '+eur(l.pot)+' · opgehaald '+eur(l.opgehaald)+' · uitgekeerd '+eur(l.uitgekeerd)+'</span>'+
+    '</div>').join('') || '<div class="leeg">Nog geen locaties.</div>';
+  const vs = (d.voorstellen || []).slice(0, 30).map(v => {
+    const kleur = v.status === 'toegekend' ? 'var(--green,#7cc389)' : v.status === 'afgewezen' ? 'var(--burgundy)' : 'var(--gold)';
+    return '<div style="border-bottom:1px solid var(--line);padding:.5rem 0;">'+
+      '<b>'+esc(v.titel)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+esc(v.locId)+' · '+eur(v.bedrag)+'</span>'+
+      ' <span style="color:'+kleur+';font-size:.74rem;">'+esc(v.status)+'</span>'+
+      '<div class="stil" style="color:var(--soft);font-size:.74rem;">'+v.voor+' voor · '+v.tegen+' tegen'+
+        (v.scheids && v.scheids.oordeel ? ' · scheidsrechter: '+esc(v.scheids.oordeel) : '')+'</div>'+
+    '</div>';
+  }).join('') || '<div class="leeg">Nog geen voorstellen.</div>';
+  box.innerHTML = '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.2rem 0 .4rem;">Locaties</div>' + locs +
+    '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.8rem 0 .4rem;">Voorstellen ('+(d.bijdragen||0)+' bijdragen totaal)</div>' + vs;
 }
 
 /* de identiteitskluis vanuit de boardroom (zelfde regels: alles in het auditlog) */

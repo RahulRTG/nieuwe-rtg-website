@@ -51,6 +51,7 @@
     maison:      { naam: 'Maison',        url: '/apps/maison.html' },
     garderobe:   { naam: 'Garde-robe',    url: '/apps/garderobe.html' },
     mecenaat:    { naam: 'Mecenaat',      url: '/apps/mecenaat.html' },
+    labfonds:    { naam: 'Lab-fonds',     url: '/apps/labfonds.html' },
     nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/nalatenschap.html' },
     logboek:     { naam: 'Logboek',       url: '/apps/logboek.html' },
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
@@ -101,7 +102,7 @@
     { titel: 'Reizen & onderweg', items: ['tab:reizen', 'link:ov', 'link:vluchten', 'link:flits', 'link:stad', 'tab:terplaatse'] },
     { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:office'] },
     { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:sport'] },
-    { titel: 'Het huis & diensten', items: ['link:ontdek', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:juridisch', 'link:passkeys', 'os:werk'] },
+    { titel: 'Het huis & diensten', items: ['link:ontdek', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:labfonds', 'link:juridisch', 'link:passkeys', 'os:werk'] },
     { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],
       items: ['link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous'] }
   ];

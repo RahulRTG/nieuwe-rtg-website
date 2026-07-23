@@ -15,6 +15,9 @@ module.exports = {
   '/apps/lab.html': G('Het RTG Onderzoekslab: onderzoek en ontwikkeling voor RTG en de RTFoundation samen.',
     ['Start een project in een veld (hardware, software, dorpshulp, landbouw, meta-onderzoek)', 'Doorloop de vaste keten: idee, onderzoek, prototype, proef, uitrol', 'Laat een mens de veiligheids- en ethiektoets tekenen en bouw de kennisbank'],
     'Een kleine eerlijke proef verslaat een groot vaag plan; en de kennisbank vergeet nooit iets.'),
+  '/apps/labfonds.html': G('Het Lab-fonds: leden zamelen samen in voor het RTF Onderzoekslab, per locatie verdeeld.',
+    ['Zamel in voor de omgeving die jij kent; het geld gaat naar de pot van die plek', 'Doe een voorstel wat de pot in de omgeving kan betekenen', 'Beslis samen: de leden stemmen, de AI-scheidsrechter bewaakt de eerlijkheid'],
+    'Het fonds is er voor de omgeving, nooit voor prive gewin; daarom kijkt een scheidsrechter mee en beslis je samen.'),
   '/apps/pakketten.html': G('RTG Bedrijfspakketten: kies je bedrijfstype en krijg de juiste indeling voor je eigen zaak.',
     ['Kies je type (tech, horeca, retail, hotel, zorg, creatief)', 'Zie de werkplekken, werk-apps en technieken die je nodig hebt, met een 3D-plattegrond en QR-codes', 'Vertel je situatie en laat Rahul het pakket op maat bijkleuren'],
     'Dit gaat over jouw zaak; hoe de RTG-kantoren zelf werken blijft bedrijfsgeheim.')

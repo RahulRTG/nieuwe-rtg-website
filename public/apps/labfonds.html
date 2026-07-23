@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lab-fonds</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#141517; --card2:#1A1C1F; --line:rgba(255,255,255,0.10);
+    --txt:#F1F4F7; --muted:rgba(241,244,247,0.68); --soft:rgba(241,244,247,0.5);
+    /* pastelblauw: de kleur van het RTF Onderzoekslab */
+    --lab:#8FB8DE; --lab-diep:#5E8FBE; --gold:#A98F1C; --groen:#7cc389; --rood:#E0748A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--lab);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:820px;margin:0 auto;}
+  .intro{color:var(--muted);line-height:1.55;font-size:.92rem;margin:.2rem 0 1.3rem;}
+  .som{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.6rem;}
+  .som .c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem;text-align:center;}
+  .som .c .n{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
+  .som .c .v{font-family:'Bodoni Moda',serif;font-size:1.3rem;margin-top:.25rem;color:var(--lab);}
+  h2.sec{font-size:1.1rem;border-bottom:1px solid var(--line);padding-bottom:.5rem;margin:1.8rem 0 1rem;}
+  .locs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.9rem;}
+  .loc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;display:flex;flex-direction:column;gap:.5rem;}
+  .loc .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;}
+  .loc h3{font-size:1.1rem;}
+  .loc .land{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);}
+  .loc .pot{font-size:.85rem;color:var(--muted);}
+  .loc .pot b{color:var(--lab);}
+  .loc .mijn{font-size:.76rem;color:var(--soft);}
+  .loc .rij{display:flex;gap:.4rem;align-items:center;margin-top:.2rem;}
+  .loc input{flex:1;min-width:0;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.5rem .6rem;font:inherit;font-size:.85rem;}
+  .knop{background:var(--lab);color:#0C1420;border:none;border-radius:10px;padding:.5rem .8rem;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .knop:hover{background:var(--lab-diep);color:#fff;}
+  .knop.grijs{background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:500;}
+  .knop.klein{padding:.35rem .6rem;font-size:.76rem;}
+  .knop:disabled{opacity:.45;cursor:default;}
+  .voorstel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:.8rem;}
+  .voorstel .kop{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline;}
+  .voorstel h3{font-size:1.02rem;}
+  .voorstel .bedrag{color:var(--lab);font-size:.85rem;white-space:nowrap;}
+  .voorstel .loch{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-top:.15rem;}
+  .voorstel .doel{color:var(--muted);font-size:.88rem;line-height:1.5;margin:.5rem 0;}
+  .voorstel .door{font-size:.76rem;color:var(--soft);}
+  .scheids{border-left:3px solid var(--lab);background:var(--card2);border-radius:8px;padding:.55rem .75rem;margin:.6rem 0;font-size:.83rem;line-height:1.45;}
+  .scheids b{color:var(--lab);}
+  .scheids.afraden{border-left-color:var(--rood);} .scheids.afraden b{color:var(--rood);}
+  .scheids.twijfel{border-left-color:var(--gold);} .scheids.twijfel b{color:var(--gold);}
+  .stem{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin-top:.5rem;}
+  .stem .telling{font-size:.8rem;color:var(--muted);margin-left:auto;}
+  .stem .voor.aan{background:var(--groen);color:#08210f;} .stem .tegen.aan{background:var(--rood);color:#2a0c12;}
+  .besluit{margin-top:.5rem;padding:.5rem .75rem;border-radius:8px;font-size:.83rem;line-height:1.45;}
+  .besluit.toegekend{background:rgba(124,195,137,.12);color:var(--groen);}
+  .besluit.afgewezen{background:rgba(224,116,138,.12);color:var(--rood);}
+  .nieuw{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-top:1rem;}
+  .nieuw h3{font-size:1rem;margin-bottom:.2rem;}
+  .nieuw .h{color:var(--soft);font-size:.82rem;margin-bottom:.7rem;line-height:1.4;}
+  .nieuw .veld{display:block;width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.55rem .7rem;font:inherit;font-size:.88rem;margin-bottom:.5rem;}
+  .nieuw select.veld{appearance:none;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:1.4rem 0;text-align:center;}
+  .fout{color:var(--rood);font-size:.82rem;min-height:1.05rem;margin:.2rem 0;}
+  .anon{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem;text-align:center;color:var(--muted);line-height:1.5;}
+</style>
+</head>
+<body>
+<header>
+  <button class="terug" id="terug" aria-label="Terug">Terug</button>
+  <div>
+    <div class="ey">RTFoundation · Onderzoekslab</div>
+    <h1>Lab-fonds</h1>
+  </div>
+</header>
+<main role="main">
+  <p class="intro">Leden zamelen samen in voor het RTF Onderzoekslab. Het geld wordt <b>per locatie</b> verdeeld, zodat elke plek zelf in de eigen omgeving kan investeren. Wat er met de pot van een locatie gebeurt, beslissen de leden <b>gezamenlijk</b> &mdash; met een AI-scheidsrechter die let op eerlijkheid en of het echt de omgeving dient.</p>
+
+  <div id="anon" class="anon" style="display:none">Log in met je RTG-account om mee in te zamelen, voor te stellen en te stemmen.</div>
+
+  <div id="body" style="display:none">
+    <div class="som">
+      <div class="c"><div class="n">Samen opgehaald</div><div class="v" id="sOp">&euro; 0</div></div>
+      <div class="c"><div class="n">In de potten</div><div class="v" id="sPot">&euro; 0</div></div>
+      <div class="c"><div class="n">Mijn bijdrage</div><div class="v" id="sMijn">&euro; 0</div></div>
+    </div>
+
+    <h2 class="sec">Locaties &mdash; zamel in voor een omgeving</h2>
+    <div class="locs" id="locs"><div class="leeg">Laden&hellip;</div></div>
+
+    <h2 class="sec">Voorstellen &mdash; beslis samen</h2>
+    <div id="fout" class="fout"></div>
+    <div id="voorstellen"><div class="leeg">Laden&hellip;</div></div>
+
+    <div class="nieuw">
+      <h3>Een voorstel doen</h3>
+      <div class="h">Wat zou de pot van een locatie in de omgeving kunnen betekenen? De scheidsrechter geeft meteen een eerste oordeel; de leden stemmen.</div>
+      <select class="veld" id="nLoc"></select>
+      <input class="veld" id="nTitel" placeholder="Titel (bijv. Zonnepanelen strandtent)" maxlength="100">
+      <textarea class="veld" id="nDoel" rows="3" placeholder="Wat levert het de omgeving op?" maxlength="500"></textarea>
+      <input class="veld" id="nBedrag" inputmode="decimal" placeholder="Bedrag uit de pot (&euro;)">
+      <button class="knop" id="nMaak">Voorstel indienen</button>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+$('#terug').onclick = () => { if (history.length > 1) history.back(); else location.href = '/apps/app.html'; };
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+const euro = n => '€ ' + (Math.round(Number(n)*100)/100).toLocaleString('nl-NL',{minimumFractionDigits:0,maximumFractionDigits:2});
+
+async function api(pad, body){
+  const r = await fetch('/api/labfonds/'+pad, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+TOKEN }, body:JSON.stringify(body||{}) });
+  const d = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+}
+
+let LOCS = [];
+async function laad(){
+  if (!TOKEN){ $('#anon').style.display='block'; return; }
+  let d;
+  try { d = await api('overzicht'); }
+  catch(e){ $('#anon').style.display='block'; $('#anon').textContent = e.message; return; }
+  $('#anon').style.display='none'; $('#body').style.display='block';
+  LOCS = d.locaties || [];
+  $('#sOp').textContent = euro(d.totaalOpgehaald);
+  $('#sPot').textContent = euro(d.totaalPot);
+  $('#sMijn').textContent = euro(d.mijnBijdrage);
+  tekenLocs(LOCS);
+  tekenVoorstellen(d.voorstellen || []);
+  vulLocKeuze(LOCS);
+}
+
+function tekenLocs(locs){
+  const box = $('#locs');
+  if (!locs.length){ box.innerHTML = '<div class="leeg">Nog geen locaties.</div>'; return; }
+  box.innerHTML = locs.map(l =>
+    '<div class="loc">'+
+      '<div class="kop"><h3>'+esc(l.naam)+'</h3><span class="land">'+esc(l.land||'')+'</span></div>'+
+      '<div class="pot">In de pot: <b>'+euro(l.pot)+'</b> &middot; opgehaald '+euro(l.opgehaald)+'</div>'+
+      (l.uitgekeerd ? '<div class="mijn">Uitgekeerd aan de omgeving: '+euro(l.uitgekeerd)+'</div>' : '')+
+      '<div class="mijn">Mijn bijdrage hier: '+euro(l.mijnBijdrage)+' &middot; '+l.open+' open voorstel'+(l.open===1?'':'len')+'</div>'+
+      '<div class="rij"><input inputmode="decimal" placeholder="Bedrag &euro;" data-b="'+l.id+'"><button class="knop klein" data-doneer="'+l.id+'">Zamel in</button></div>'+
+    '</div>').join('');
+  box.querySelectorAll('[data-doneer]').forEach(b => b.onclick = () => doneer(b.dataset.doneer, box.querySelector('[data-b="'+b.dataset.doneer+'"]')));
+}
+
+async function doneer(locId, inp){
+  const bedrag = Number(String(inp.value).replace(',','.'));
+  if (!bedrag){ inp.focus(); return; }
+  try { await api('doneer', { locId, bedrag }); inp.value=''; laad(); }
+  catch(e){ alert(e.message); }
+}
+
+function tekenVoorstellen(vs){
+  const box = $('#voorstellen');
+  if (!vs.length){ box.innerHTML = '<div class="leeg">Nog geen open voorstellen. Doe hieronder het eerste voorstel.</div>'; return; }
+  box.innerHTML = vs.map(v => {
+    const sc = v.scheids || {};
+    const oordeel = sc.oordeel==='afraden'?'afraden':sc.oordeel==='twijfel'?'twijfel':'steun';
+    const woord = { steun:'Steunt', twijfel:'Twijfelt', afraden:'Raadt af' }[oordeel];
+    return '<div class="voorstel">'+
+      '<div class="kop"><h3>'+esc(v.titel)+'</h3><span class="bedrag">'+euro(v.bedrag)+'</span></div>'+
+      '<div class="loch">'+esc(v.locId)+'</div>'+
+      '<div class="doel">'+esc(v.doel)+'</div>'+
+      '<div class="door">Voorgesteld door '+esc(v.door)+'</div>'+
+      (sc.reden ? '<div class="scheids '+oordeel+'"><b>Scheidsrechter '+woord+'</b> &middot; '+esc(sc.reden)+'</div>' : '')+
+      '<div class="stem">'+
+        '<button class="knop klein voor'+(v.mijnStem==='voor'?' aan':' grijs')+'" data-stem="voor" data-id="'+v.id+'">Voor</button>'+
+        '<button class="knop klein tegen'+(v.mijnStem==='tegen'?' aan':' grijs')+'" data-stem="tegen" data-id="'+v.id+'">Tegen</button>'+
+        '<button class="knop klein" data-beslis="'+v.id+'">Nu beslissen</button>'+
+        '<span class="telling">'+v.voor+' voor &middot; '+v.tegen+' tegen</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  box.querySelectorAll('[data-stem]').forEach(b => b.onclick = () => stem(b.dataset.id, b.dataset.stem));
+  box.querySelectorAll('[data-beslis]').forEach(b => b.onclick = () => beslis(b.dataset.beslis));
+}
+
+async function stem(id, keuze){ try { await api('stem', { id, keuze }); laad(); } catch(e){ alert(e.message); } }
+async function beslis(id){
+  if (!confirm('De leden samen laten beslissen over dit voorstel? De scheidsrechter bewaakt de grenzen.')) return;
+  try { const d = await api('beslis', { id }); const b = d.voorstel && d.voorstel.besluit; if (b) alert(b.reden); laad(); }
+  catch(e){ alert(e.message); }
+}
+
+function vulLocKeuze(locs){
+  $('#nLoc').innerHTML = locs.map(l => '<option value="'+esc(l.id)+'">'+esc(l.naam)+'</option>').join('');
+}
+$('#nMaak').onclick = async () => {
+  $('#fout').textContent='';
+  const bedrag = Number(String($('#nBedrag').value).replace(',','.'));
+  try {
+    await api('voorstel/maak', { locId:$('#nLoc').value, titel:$('#nTitel').value, doel:$('#nDoel').value, bedrag });
+    $('#nTitel').value=''; $('#nDoel').value=''; $('#nBedrag').value=''; laad();
+  } catch(e){ $('#fout').textContent = e.message; }
+};
+
+laad();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

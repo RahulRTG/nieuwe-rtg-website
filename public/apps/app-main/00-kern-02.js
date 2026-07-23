@@ -82,15 +82,15 @@
      Business blijft klassiek donker. RTG en Lifestyle mogen terug naar
      klassiek; die keuze onthouden we per pas in localStorage. */
   // Het ROS-thema (Champagne=parelmoer, Donker=standaard, Bordeaux) is een keuze
-  // voor IEDEREEN, per apparaat onthouden. Zonder eigen keuze krijgt elke pas een
-  // passende standaard. De levende grond (kleur die met het moment meebeweegt)
-  // volgt de gekozen familie.
-  const THEMA_STANDAARD = { rtg: 'bordeaux', lifestyle: 'parelmoer', business: 'standaard' };
+  // voor IEDEREEN, per apparaat onthouden. Zonder eigen keuze is Bordeaux (rood)
+  // de standaard voor elke pas -- de huiskleur. De levende grond (kleur die met
+  // het moment meebeweegt) volgt de gekozen familie.
+  const THEMA_STANDAARD = { rtg: 'bordeaux', lifestyle: 'bordeaux', business: 'bordeaux' };
   function pasThemaKey(){ return 'rtg_ros_thema'; }
   function pasThemaHuidig(){
     let t = null; try { t = localStorage.getItem(pasThemaKey()); } catch(e){}
     if (t === 'standaard' || t === 'bordeaux' || t === 'parelmoer') return t;
-    return THEMA_STANDAARD[vastePas] || 'standaard';
+    return THEMA_STANDAARD[vastePas] || 'bordeaux';
   }
   function pasThemaToepassen(){
     const t = pasThemaHuidig();

@@ -4,7 +4,7 @@
    zodat je keuze meereist tussen al je RTG-schermen. Zet het attribuut op <html>
    (waardoor shared/rosthema.css de tokens omkleurt), stuurt de levende grond
    (shared/levendekleur.js) aan, en zet een zwevende kleurenkiezer linksonder.
-   Geen keuze? Dan het vertrouwde donker. */
+   Geen keuze? Dan Bordeaux (rood), de huiskleur. */
 (function (w, d) {
   'use strict';
   if (w.RTGRosThema) return;
@@ -16,7 +16,7 @@
   ];
   function huidig() {
     try { var t = localStorage.getItem(KEY); if (t === 'standaard' || t === 'bordeaux' || t === 'parelmoer') return t; } catch (e) {}
-    return 'standaard';
+    return 'bordeaux';
   }
   function pas(t) {
     var el = d.documentElement;

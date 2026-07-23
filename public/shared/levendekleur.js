@@ -179,8 +179,11 @@
     // de RTFoundation-app draait op een eigen familie: pastelblauw
     if (rtfWereld()) return 'pastel';
     var pas = el.getAttribute('data-pas-thema');
-    if (pas === 'bordeaux') return 'bordeaux';
     if (pas === 'parelmoer') return 'champagne';
+    // standaard (geen attribuut) valt terug op donker; zonder pas-thema is de
+    // huiskleur Bordeaux (rood), zodat de grond meteen rood is voordat het thema-
+    // script het attribuut zet
+    if (pas === 'bordeaux' || pas == null) return 'bordeaux';
     return 'donker';
   }
 

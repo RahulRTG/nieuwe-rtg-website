@@ -1,0 +1,36 @@
+/* Gedeelde ROS-huisstijl voor de kantoor- en PDA-schermen: dezelfde drie
+   thema's als het leden-OS (Champagne / Donker / Bordeaux), via een attribuut
+   op <html>. De tokens heten overal gelijk (--bg, --card, --txt, ...), dus deze
+   overrides kleuren elke pagina in een keer om. De levende grond (shared/
+   levendekleur.js) zet er de ademende, met-de-tijd-meebewegende was overheen.
+   Donker is de basis (geen attribuut); dit bestand voegt de twee andere toe. */
+
+:root[data-pas-thema="bordeaux"]{
+  --bg:#1E0912; --card:#2B0E1B; --card2:#371425;
+  --line:rgba(255,255,255,0.11);
+  --txt:#F7ECEF; --muted:rgba(247,236,239,0.74); --soft:rgba(247,236,239,0.60);
+  --burgundy:#E36385; --burgundy-deep:#C23A5E; --gold:#D0AC57; --green:#5BB98C;
+}
+:root[data-pas-thema="parelmoer"]{
+  color-scheme:light;
+  --bg:#ECE6DD; --card:#F7F3EC; --card2:#FCFAF5;
+  --line:rgba(30,20,24,0.12);
+  --txt:#241A1E; --muted:rgba(36,26,30,0.68); --soft:rgba(36,26,30,0.52);
+  --burgundy:#8A1B3B; --burgundy-deep:#7F1634; --gold:#7C6A0C; --green:#2F7256;
+}
+
+/* de zwevende themakiezer, linksonder: een pil met drie kleurstippen */
+.ros-thema{position:fixed;left:max(14px,env(safe-area-inset-left,0px));z-index:9990;
+  bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.4rem .55rem;border-radius:999px;
+  background:color-mix(in srgb, var(--card,#151312) 82%, transparent);
+  border:1px solid var(--line,rgba(255,255,255,.14));
+  box-shadow:0 10px 30px rgba(0,0,0,.4);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.ros-thema button{width:1.35rem;height:1.35rem;border-radius:50%;padding:0;cursor:pointer;
+  border:1px solid var(--line,rgba(255,255,255,.2));box-shadow:0 0 0 0 transparent;
+  transition:transform .12s ease, box-shadow .12s ease;}
+.ros-thema button:hover{transform:scale(1.08);}
+.ros-thema button.actief{box-shadow:0 0 0 2px var(--gold,#A98F1C);}
+.ros-thema button:focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}
+@media print{.ros-thema{display:none;}}

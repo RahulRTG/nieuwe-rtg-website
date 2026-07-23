@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Het uitzicht van RTG</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#141012;--line:rgba(235,215,160,0.14);
+    --txt:#F4F1EC;--soft:rgba(244,241,236,0.60);--gold:#C9A24B;--goud-zacht:#EBD79A;--burg:#C23A5E;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{min-height:100%;}
+  body{background:radial-gradient(120% 90% at 50% 6%, #17110f 0%, #0C0C0B 62%),var(--bg);
+    color:var(--txt);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:0 0 4rem;}
+  a{color:inherit;}
+  .kop{display:flex;align-items:center;gap:0.8rem;padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.2rem 0.6rem;
+    max-width:1080px;margin:0 auto;}
+  .kop a.terug{text-decoration:none;font-size:1.3rem;line-height:1;color:var(--soft);}
+  .kop .merk{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.05rem;letter-spacing:0.02em;}
+  .kop .rek{flex:1;}
+  .kop .pill{font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--goud-zacht);
+    border:1px solid var(--line);border-radius:999px;padding:0.28rem 0.62rem;}
+  main{max-width:1080px;margin:0 auto;padding:1rem 1.2rem;}
+  .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:1.2rem 0 0.4rem;}
+  .eyebrow{font-size:0.66rem;letter-spacing:0.34em;text-transform:uppercase;color:var(--goud-zacht);margin-bottom:0.9rem;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:clamp(2.1rem,6vw,3.4rem);line-height:1.05;
+    letter-spacing:0.01em;text-wrap:balance;margin-bottom:0.7rem;}
+  h1 em{font-style:italic;color:var(--goud-zacht);}
+  .lead{max-width:46ch;color:var(--soft);font-size:1.02rem;line-height:1.6;margin-bottom:1.4rem;}
+  /* de 3D-stad */
+  .stad{position:relative;width:min(960px,94vw);aspect-ratio:16/10;margin:0.4rem auto 1.2rem;
+    border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    background:radial-gradient(120% 80% at 50% 0%, #191316, #0C0C0B 70%);
+    box-shadow:0 40px 80px rgba(0,0,0,0.6);}
+  .stad canvas{display:block;width:100%;height:100%;}
+  /* de rustige analoge RTG-klok als tijd boven de stad */
+  .stad .tijd{position:absolute;top:0.9rem;right:0.9rem;width:74px;height:74px;pointer-events:none;
+    filter:drop-shadow(0 8px 18px rgba(0,0,0,0.6));}
+  .stad .tijd [data-rtg-klok]{width:100%;height:100%;}
+  .stad .glans{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(60% 40% at 50% -6%, rgba(255,255,255,0.06), transparent 70%);}
+  .stad .valterug{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    text-align:center;padding:2rem;color:var(--soft);font-size:0.9rem;line-height:1.6;}
+  .stad.geen-webgl .valterug{display:flex;}
+  .onder{font-size:0.8rem;color:var(--soft);letter-spacing:0.04em;margin-top:0.2rem;}
+  .onder b{color:var(--goud-zacht);font-weight:600;}
+  /* de drie noten */
+  .noten{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin:2.2rem 0 1.2rem;}
+  @media(max-width:640px){.noten{grid-template-columns:1fr;}}
+  .noot{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.15rem;}
+  .noot .van{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--goud-zacht);margin-bottom:0.5rem;}
+  .noot h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.08rem;margin-bottom:0.3rem;}
+  .noot p{font-size:0.9rem;line-height:1.55;color:var(--soft);}
+  .voet{margin-top:1.6rem;font-size:0.8rem;color:var(--soft);line-height:1.6;text-align:center;max-width:60ch;margin-left:auto;margin-right:auto;}
+  .voet a{color:var(--goud-zacht);}
+</style>
+</head>
+<body>
+<header class="kop">
+  <a class="terug" href="/apps/index.html" aria-label="Terug naar alle apps">&#8592;</a>
+  <span class="merk">Rahul Travel Group</span>
+  <span class="rek"></span>
+  <span class="pill">Signatuur</span>
+</header>
+
+<main>
+  <section class="hero">
+    <p class="eyebrow">Het huis in de nacht</p>
+    <h1>Het <em>uitzicht</em> van RTG</h1>
+    <p class="lead">Een stille skyline van het hele ecosysteem &mdash; elk blok een tak van het huis, langzaam ronddraaiend onder een gouden rasterlicht. Geheel in eigen huis getekend: geen three.js, geen extern beeld, geen mensen.</p>
+
+    <div class="stad" id="stad">
+      <canvas id="skyline" role="img" aria-label="Een langzaam draaiende 3D-skyline van het RTG-ecosysteem in de huiskleuren: donkere blokken met bordeaux en goud, op een rasterverlicht grondvlak."></canvas>
+      <span class="tijd"><span data-rtg-klok="ring" aria-hidden="true">--:--</span></span>
+      <div class="glans"></div>
+      <p class="valterug">Uw browser toont geen 3D. De skyline leeft alleen met WebGL; de rest van de pagina werkt gewoon.</p>
+    </div>
+    <p class="onder">Levende 3D-motor &middot; <b>eigen WebGL</b> &middot; draait op de klok van dit toestel</p>
+  </section>
+
+  <section class="noten" aria-label="Waar de skyline voor staat">
+    <article class="noot">
+      <p class="van">De grond</p>
+      <h3>Het rasterlicht</h3>
+      <p>Een fijn, dubbel raster van gedempt goud dat de vloer van het huis tekent &mdash; hetzelfde licht dat onder de RTG-navigatie ligt.</p>
+    </article>
+    <article class="noot">
+      <p class="van">De torens</p>
+      <h3>De takken</h3>
+      <p>Elk blok is een wereld van RTG: reizen, zorg, onderwijs, de foundation. Samen vormen ze één stad, in bordeaux en goud.</p>
+    </article>
+    <article class="noot">
+      <p class="van">De tijd</p>
+      <h3>De klok erboven</h3>
+      <p>Rechtsboven loopt de analoge RTG-klok mee, dezelfde wijzerplaat als op het vergrendelscherm. Het huis kent altijd het uur.</p>
+    </article>
+  </section>
+
+  <p class="voet">Alles is eigen werk: de 3D-motor staat los in <a href="/shared/drie.js">shared/drie.js</a> en wordt met een eigen testreeks bewaakt. Geen stockbeeld, geen extern merk &mdash; alleen SVG en WebGL in de huiskleuren, in eigen huis getekend.</p>
+</main>
+
+<script src="/shared/drie.js"></script>
+<script src="/shared/klok.js"></script>
+<script src="/apps/uitzicht.js"></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

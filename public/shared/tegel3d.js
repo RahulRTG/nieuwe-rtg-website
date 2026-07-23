@@ -6,6 +6,9 @@
       een zachte perspectief-kanteling die met de muis meebeweegt en een lichte
       schaduw, alsof hij iets van de plaat af ligt. Op touch/coarse pointer en bij
       prefers-reduced-motion gebeurt er niets (rustig en zuinig).
+   1b. Springboard-diepte: de bureaublad-tegels van het leden-OS (.os-app) kantelen
+      op dezelfde manier licht naar de cursor -- zo krijgt het hele bureaublad de
+      3D-taal, niet alleen de KPI-tegels. Ook hier: alleen desktop, stil bij rust.
    2. 3D-vonk: een <canvas data-vonk3d="3,5,4,8,6"> tekent een klein isometrisch
       staaf- of lijn-grafiekje (2.5D op een gewoon 2D-canvas, dus geen WebGL-
       context per tegel: goedkoop en overal betrouwbaar), in de huiskleuren.
@@ -86,6 +89,27 @@
     el.addEventListener('pointercancel', terug);
   }
 
+  /* 1b. zachte springboard-kanteling: de OS-tegels (icoon + naam samen) kantelen
+     licht naar de cursor toe -- een iOS/visionOS-parallax die het bureaublad
+     diepte geeft zonder een 3D-scene. We kantelen de knop (.os-app), niet de
+     tegel: de tegel houdt zo zijn eigen hover-lift en druk-schaal, die netjes
+     binnen de kanteling meebewegen. Alleen op desktop (fijne pointer), stil bij
+     reduced-motion. */
+  function springboard(el) {
+    if (el.dataset.kantel3d === 'aan') return; el.dataset.kantel3d = 'aan';
+    if (RUSTIG) return;
+    el.style.transition = 'transform .2s cubic-bezier(.22,.7,.3,1)';
+    el.style.transformStyle = 'preserve-3d';
+    el.addEventListener('pointermove', function (e) {
+      var r = el.getBoundingClientRect(); if (!r.width) return;
+      var k = kantel((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height, 8);
+      el.style.transform = 'perspective(560px) rotateX(' + k.rx.toFixed(2) + 'deg) rotateY(' + k.ry.toFixed(2) + 'deg)';
+    });
+    var terug = function () { el.style.transform = ''; };
+    el.addEventListener('pointerleave', terug);
+    el.addEventListener('pointercancel', terug);
+  }
+
   /* 2. 3D-vonk: een klein isometrisch grafiekje op een 2D-canvas */
   function tekenVonk(canvas) {
     if (canvas.dataset.vonkKlaar === '1') return; canvas.dataset.vonkKlaar = '1';
@@ -130,10 +154,11 @@
     var scope = root2 || doc;
     try {
       scope.querySelectorAll('[data-tegel3d], .kpi-tegel').forEach(kantelbaar);
+      scope.querySelectorAll('.os-app').forEach(springboard);
       scope.querySelectorAll('canvas[data-vonk3d]').forEach(tekenVonk);
     } catch (e) {}
   }
-  root.RTGTegel3D = { verrijk: verrijk, vonk: tekenVonk, kantelbaar: kantelbaar };
+  root.RTGTegel3D = { verrijk: verrijk, vonk: tekenVonk, kantelbaar: kantelbaar, springboard: springboard };
 
   function start() {
     verrijk(doc);

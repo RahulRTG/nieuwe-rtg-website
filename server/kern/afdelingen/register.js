@@ -10,7 +10,7 @@ module.exports = (ctx) => {
      kpis en lijsten lezen alleen; alles defensief, want niet elke installatie
      heeft elke collectie gevuld. */
   const AFDELINGEN = {
-    sales: { naam: 'Sales', emoji: '📈', missie: 'Nieuwe partners en hardware-omzet binnenhalen.',
+    sales: { naam: 'Sales', icoon: 'grafiek', missie: 'Nieuwe partners en hardware-omzet binnenhalen.',
       kpis: () => [
         ['Open partner-aanvragen', tel(lijst(d().partnerApplications).filter(a => a.status === 'nieuw'))],
         ['Winkelbestellingen open', tel(lijst(d().winkelBestellingen).filter(o => o.status === 'nieuw'))],
@@ -21,7 +21,7 @@ module.exports = (ctx) => {
         { titel: 'Winkelbestellingen om op te volgen', items: lijst(d().winkelBestellingen).filter(o => o.status === 'nieuw').slice(0, 8).map(o => o.aantal + 'x ' + o.productNaam + ' voor ' + o.company + ' (' + o.contactName + ')') },
         { titel: 'Nieuwe partner-aanvragen', items: lijst(d().partnerApplications).filter(a => a.status === 'nieuw').slice(0, 8).map(a => a.company + ' (' + a.type + ', ' + a.city + ')') }
       ] },
-    marketing: { naam: 'Marketing', emoji: '📣', missie: 'De Salon laten bruisen en de passen laten groeien.',
+    marketing: { naam: 'Marketing', icoon: 'megafoon', missie: 'De Salon laten bruisen en de passen laten groeien.',
       kpis: () => [
         ['Salon-posts totaal', tel(d().posts)],
         ['Posts deze week', recent(d().posts, 'at', 7)],
@@ -33,7 +33,7 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Nieuwste Salon-posts', items: lijst(d().posts).slice(0, 8).map(p => (p.author || p.codename || 'iemand') + ': ' + String(p.text || p.tekst || '').slice(0, 60)) }
       ] },
-    pr: { naam: 'PR & communicatie', emoji: '📰', missie: 'Het verhaal van RTG eerlijk en groots vertellen.',
+    pr: { naam: 'PR & communicatie', icoon: 'nieuws', missie: 'Het verhaal van RTG eerlijk en groots vertellen.',
       kpis: () => [
         ['Reviews totaal', tel(d().reviews)],
         ['Reviews deze week', recent(d().reviews, 'at', 7)],
@@ -43,7 +43,7 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Laatste reviews (de buitenwereld praat)', items: lijst(d().reviews).slice(0, 8).map(r => (r.rating ? r.rating + '★ ' : '') + String(r.text || r.tekst || '').slice(0, 60)) }
       ] },
-    hr: { naam: 'HR', emoji: '🧑‍💼', missie: 'Het beste team vinden, houden en laten groeien.',
+    hr: { naam: 'HR', icoon: 'netwerk', missie: 'Het beste team vinden, houden en laten groeien.',
       kpis: () => [
         ['Open vacatures', tel(lijst(d().vacatures).filter(v => v.open !== false))],
         ['Sollicitaties totaal', tel(d().applications)],
@@ -53,7 +53,7 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Verse sollicitaties', items: lijst(d().applications).slice(0, 8).map(a => (a.name || a.codename || 'kandidaat') + ' op ' + (a.role || a.vacature || 'functie')) }
       ] },
-    financien: { naam: 'Financiën', emoji: '💶', missie: 'Elke euro kloppend, elke afdracht op tijd.', naamInzage: true,
+    financien: { naam: 'Financiën', icoon: 'bank', missie: 'Elke euro kloppend, elke afdracht op tijd.', naamInzage: true,
       kpis: () => [
         ['Directe betalingen', tel(d().directBetalingen)],
         ['RTG Pay boekingen (24u)', recent(d().payBoekingen, 'at', 1)],
@@ -68,14 +68,14 @@ module.exports = (ctx) => {
         // het grootboek van RTG Pay: de laatste bewegingen door het huis
         { titel: 'RTG Pay (laatste grootboekregels)', items: lijst(d().payBoekingen).slice(0, 8).map(b => (b.centen / 100).toFixed(2) + ' euro, ' + b.soort + ': ' + b.van + ' naar ' + b.naar) }
       ] },
-    inkoop: { naam: 'Inkoop', emoji: '📦', missie: 'De juiste spullen, op tijd, voor de beste prijs.',
+    inkoop: { naam: 'Inkoop', icoon: 'store', missie: 'De juiste spullen, op tijd, voor de beste prijs.',
       kpis: () => [
         ['Groothandel-orders', tel(d().groothandelOrders)],
         ['Retail apart gezet', tel(d().retailApart)],
         ['Leveranciers actief', tel(d().suppliers)]
       ],
       lijsten: () => [] },
-    verkoop: { naam: 'Verkoop', emoji: '🧾', missie: 'De dagelijkse omzet over alle genres heen.',
+    verkoop: { naam: 'Verkoop', icoon: 'rekening', missie: 'De dagelijkse omzet over alle genres heen.',
       kpis: () => [
         ['Orders totaal', tel(d().orders)],
         ['Orders deze week', recent(d().orders, 'at', 7)],
@@ -88,7 +88,7 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Nieuwste orders', items: lijst(d().orders).slice(0, 8).map(o => (o.supplier || o.supplierCode || '') + ': ' + String(o.summary || o.item || o.ref || '').slice(0, 50)) }
       ] },
-    juridisch: { naam: 'Juridisch', emoji: '⚖️', missie: 'Alles netjes: contracten, akkoorden en AVG.', naamInzage: true,
+    juridisch: { naam: 'Juridisch', icoon: 'juridisch', missie: 'Alles netjes: contracten, akkoorden en AVG.', naamInzage: true,
       kpis: () => [
         ['Contracten getekend', tel(lijst(d().contracten).filter(c => c.getekend || c.status === 'getekend'))],
         ['Contracten open', tel(lijst(d().contracten).filter(c => !(c.getekend || c.status === 'getekend')))],
@@ -97,7 +97,7 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Openstaande contracten', items: lijst(d().contracten).filter(c => !(c.getekend || c.status === 'getekend')).slice(0, 8).map(c => String(c.titel || c.naam || c.id || 'contract')) }
       ] },
-    creatief: { naam: 'Creatief', emoji: '🎨', missie: 'Content en creators die het merk laten stralen.',
+    creatief: { naam: 'Creatief', icoon: 'ontwerp', missie: 'Content en creators die het merk laten stralen.',
       kpis: () => [
         ['Creator-oproepen', tel(d().creatorOproepen)],
         ['Verhalen (24u)', tel(d().stories)],
@@ -106,7 +106,7 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Open creator-oproepen', items: lijst(d().creatorOproepen).slice(0, 8).map(c => String(c.titel || c.wat || c.id)) }
       ] },
-    intern: { naam: 'Intern & IT', emoji: '🛠️', missie: 'Het huis draaiend houden: systemen, kloks en mensen.',
+    intern: { naam: 'Intern & IT', icoon: 'gear', missie: 'Het huis draaiend houden: systemen, kloks en mensen.',
       kpis: () => [
         ['Ingeklokte diensten', tel(d().klok)],
         ['Actieve sessies', Object.keys(d().sessions || {}).length],
@@ -126,7 +126,7 @@ module.exports = (ctx) => {
         { titel: 'Nachtwerk (dagrapport per doos)', items: lijst(d().doosRapporten).slice(0, 7).map(r => r.doos + ' ' + r.datum + ': ' + r.pings + ' pings, gem ' + r.rttGem + 'ms, ' + r.uitval + 'x lijn weg' + (r.lokaalMin ? ', ' + r.lokaalMin + ' min lokaal' : '')) },
         { titel: 'Verder kijken', items: ['Het volledige techniekbord staat op techniek.html (eigenaar-inlog).'] }
       ] },
-    onderzoek: { naam: 'Onderzoek & data', emoji: '🔬', missie: 'Weten wat werkt: cijfers, trends en eerlijke conclusies.',
+    onderzoek: { naam: 'Onderzoek & data', icoon: 'pulse', missie: 'Weten wat werkt: cijfers, trends en eerlijke conclusies.',
       kpis: () => [
         ['Leden in de gids', ledenGeteld()],
         ['Connecties gelegd', tel(Object.keys(d().connections || {}))],
@@ -135,7 +135,7 @@ module.exports = (ctx) => {
         ['Grootboekregels (14d)', recent(d().payBoekingen, 'at', 14)]
       ],
       lijsten: () => [] },
-    klantenservice: { naam: 'Klantenservice', emoji: '🎧', missie: 'Elke gast en elk gezin snel en warm geholpen.', naamInzage: true,
+    klantenservice: { naam: 'Klantenservice', icoon: 'help', missie: 'Elke gast en elk gezin snel en warm geholpen.', naamInzage: true,
       kpis: () => [
         ['Gastgesprekken', tel(Object.keys(d().guestChats || {}))],
         ['Ledengesprekken', tel(Object.keys(d().memberChats || {}))],

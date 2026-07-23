@@ -498,7 +498,7 @@
       '<div class="card" id="kaMeld">'+
         '<div class="k">'+T('pd.ka.naam','Jouw naam')+'</div>'+
         '<input class="hin" id="kaNaam" maxlength="30" style="margin-top:0.4rem;" value="'+esc(naam)+'">'+
-        '<div class="row"><select class="hin" id="kaKamer">'+k.kamers.map(x => '<option value="'+x.id+'">'+x.emoji+' '+esc(x.naam)+'</option>').join('')+'</select>'+
+        '<div class="row"><select class="hin" id="kaKamer">'+k.kamers.map(x => '<option value="'+x.id+'">'+esc(x.naam)+'</option>').join('')+'</select>'+
         '<select class="hin" id="kaWaar" style="max-width:9.5rem;"><option value="thuis">'+T('pd.ka.thuis','Thuis')+'</option><option value="kantoor">'+T('pd.ka.hier','Kantoor')+'</option></select></div>'+
         '<button class="abtn" id="kaMeldGo" style="margin-top:0.7rem;width:100%;padding:0.8rem;">'+T('pd.ka.meld','Meld je aan voor je dienst')+'</button>'+
         '<div id="kaMFout" style="margin-top:0.4rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>'+

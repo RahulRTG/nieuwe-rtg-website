@@ -41,7 +41,7 @@ module.exports = (ctx) => {
     const a = AFDELINGEN[id];
     if (!a) return { status: 404, error: 'Deze kamer bestaat niet.' };
     return {
-      ok: true, id, naam: a.naam, emoji: a.emoji, missie: a.missie, naamInzage: !!a.naamInzage,
+      ok: true, id, naam: a.naam, icoon: a.icoon, missie: a.missie, naamInzage: !!a.naamInzage,
       kpis: a.kpis().map(([label, waarde]) => ({ label, waarde })),
       lijsten: a.lijsten(), taken: taken(id).slice(0, 30)
     };
@@ -50,7 +50,7 @@ module.exports = (ctx) => {
     return { ok: true, kamers: KAMER_IDS.map(id => {
       const a = AFDELINGEN[id];
       const open = taken(id).filter(t => !t.af).length;
-      return { id, naam: a.naam, emoji: a.emoji, missie: a.missie, kpi: a.kpis()[0], takenOpen: open };
+      return { id, naam: a.naam, icoon: a.icoon, missie: a.missie, kpi: a.kpis()[0], takenOpen: open };
     }) };
   }
 

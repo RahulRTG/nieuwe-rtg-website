@@ -613,18 +613,21 @@ async function binnen(){
   } catch (e) { zetKamerUrl(''); }
 }
 
+/* huisstijl-glyf voor een kamer (valt stil terug als de glyf ontbreekt) */
+function ico(naam){ return (window.RTGGlyf && RTGGlyf.heeft(naam)) ? RTGGlyf.svgHTML(naam, { klasse:'gl-inline' }) : ''; }
+
 /* ---------- het kamergrid ---------- */
 async function laadKamers(){
   zetKamerUrl('');
   const d = await api('kamers');
   toon('vKamers');
-  const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
-    '<button class="kaart kamer board" data-kamer="bank"><span class="ic">🏦</span><h2>RTG Bank</h2><p>De eigen bank op het Pay-grootboek. Eén knop van de kaart-rails naar de eigen bank.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
-    '<button class="kaart kamer board" data-kamer="stad"><span class="ic">🏙️</span><h2>RTG Stad</h2><p>De hele stad slimmer op eigen hardware en software: Stadsdozen meten, één knop zet de stand.</p><span class="kpi">De stadsinfrastructuur →</span></button>' +
-    '<button class="kaart kamer board" data-kamer="redactie"><span class="ic">📰</span><h2>RTG Redactie</h2><p>Krant, magazine en drukkerij in eigen huis; de nieuwstips komen uit het hele platform.</p><span class="kpi">Naar het perskantoor →</span></button>' +
-    '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
+  const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">'+ico('balans')+'</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="bank"><span class="ic">'+ico('bank')+'</span><h2>RTG Bank</h2><p>De eigen bank op het Pay-grootboek. Eén knop van de kaart-rails naar de eigen bank.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="stad"><span class="ic">'+ico('stad')+'</span><h2>RTG Stad</h2><p>De hele stad slimmer op eigen hardware en software: Stadsdozen meten, één knop zet de stand.</p><span class="kpi">De stadsinfrastructuur →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="redactie"><span class="ic">'+ico('nieuws')+'</span><h2>RTG Redactie</h2><p>Krant, magazine en drukkerij in eigen huis; de nieuwstips komen uit het hele platform.</p><span class="kpi">Naar het perskantoor →</span></button>' +
+    '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">'+ico('schild')+'</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
-    '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
+    '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+ico(k.icoon)+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
     b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
@@ -637,7 +640,7 @@ async function openKamer(id){
   KAMER = id;
   zetKamerUrl(id);
   toon('vKamer');
-  $('#kNaam').textContent = d.emoji + ' ' + d.naam;
+  $('#kNaam').innerHTML = ico(d.icoon) + ' ' + esc(d.naam);
   $('#kMissie').textContent = d.missie;
   $('#kTabWereld').hidden = (id !== 'intern'); // de wereld hoort bij Intern & IT (en board- en paniekkamer)
   kamerTab('overzicht');
@@ -1988,7 +1991,7 @@ async function openBoard(){
   laadAidata();
   laadZelfzorg($('#bZelfzorg'));
   $('#bKamers').innerHTML = d.kamers.map(k =>
-    '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+k.emoji+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');
+    '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+ico(k.icoon)+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');
   $('#bKamers').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => openKamer(b.dataset.kamer)));
   tekenVoorstellen(d.verbeterkamer);
   $('#bPaniek').innerHTML = d.paniek.length ? d.paniek.map(v => voorstelKaart(v, true)).join('') : '<div class="leeg">Geen open voorstellen.</div>';

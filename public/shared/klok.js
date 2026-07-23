@@ -7,10 +7,14 @@
    en wie minder beweging wil (prefers-reduced-motion) ziet de
    milliseconden niet.
 
-   De ring (data-rtg-klok="ring") is een echte, onbetaalbare wijzerplaat:
-   het GOUD staat vast (het huisgoud, altijd goud), de SFEER -- de fijne
-   sunray-plaat en de accent-flens -- ademt mee met de levende dagkleur van
-   het palet. Zo blijft het goud goud terwijl de rest met het huis meekleurt.
+   De ring (data-rtg-klok="ring") is een verfijnde, ingetogen wijzerplaat in
+   de taal van een klassiek chique horloge: slanke, gepolijste wijzers met
+   een lume-kanaal, een fijne lollipop-secondewijzer, toegepaste indexen met
+   lume-punten en een licht verdiepte plaat. Het GOUD staat vast (het
+   huisgoud, altijd goud); de SFEER -- de fijne sunray en de accent-flens --
+   ademt mee met de levende dagkleur van het palet. De weekdag (in de taal
+   van de gebruiker) en de datum staan in identieke gouden kastjes: een
+   kloppend geheel.
 
    Gebruik: geef een element het attribuut data-rtg-klok (de klok) of
    data-rtg-datum (de lange datum in de taal van de pagina); dit script
@@ -28,47 +32,36 @@
     '.rtg-klok .km{font-family:Inter,system-ui,sans-serif;font-weight:400;font-size:0.26em;letter-spacing:0.08em;' +
       'color:var(--klok-goud,var(--gold,#C9A24B));margin-left:0.22em;min-width:3.6ch;text-align:left;align-self:center;}' +
     '@media (prefers-reduced-motion: reduce){.rtg-klok .km{display:none;}}' +
-    // Het ring-gezicht. Twee sleutelkleuren:
-    //   --klok-goud  = het HUISGOUD, staat VAST (altijd goud, ongeacht het palet)
-    //   --klok-sfeer = de levende dagkleur van het palet; hierin ademt "de rest"
-    //                  (de sunray-plaat, de accent-flens) met het huis mee.
+    // Twee sleutelkleuren: --klok-goud = het HUISGOUD (staat VAST), --klok-sfeer
+    // = de levende dagkleur van het palet (hierin ademt de fijne sunray + flens).
     '.rtg-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16rem;height:16rem;max-width:74vw;max-height:74vw;' +
       '--klok-goud:var(--gold,#C9A24B);' +
       '--klok-sfeer:var(--dag-kleur,var(--s-accent-hel,var(--s-accent,#7F1634)));}' +
     '.rtg-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}' +
-    // de rand + rehaut: een gouden buitenring, een fijne witte lichtlijn, en
-    // een accent-flens die met het palet meekleurt
-    '.rtg-ring .rr-rand{fill:none;stroke:var(--klok-goud);stroke-opacity:0.55;stroke-width:0.9;}' +
-    '.rtg-ring .rr-rehaut{fill:none;stroke:#ffffff;stroke-opacity:0.06;stroke-width:0.7;}' +
-    '.rtg-ring .rr-flens{fill:none;stroke:var(--klok-sfeer);stroke-opacity:0.34;stroke-width:0.9;}' +
-    // de sunray-plaat: fijne stralen vanuit het midden, in de paletkleur
-    '.rtg-ring .rr-sun{stroke:var(--klok-sfeer);stroke-opacity:0.08;stroke-width:0.35;}' +
-    '.rtg-ring .rr-sun2{stroke:var(--klok-sfeer);stroke-opacity:0.03;stroke-width:0.35;}' +
-    // de minutenbaan: fijne lichtlijntjes, gouden accent op de vijf minuten
-    '.rtg-ring .rr-min{stroke:#ffffff;stroke-opacity:0.22;stroke-width:0.7;}' +
-    '.rtg-ring .rr-vijf{stroke:var(--klok-goud);stroke-opacity:0.9;stroke-width:1.25;}' +
-    // toegepaste facet-indexen (goud, met een lichte bovenfacet)
+    // fijne randen: een gouden haarlijn buiten, een witte lichtlijn, een
+    // paletkleurige accent-flens
+    '.rtg-ring .rr-rand{fill:none;stroke:var(--klok-goud);stroke-opacity:0.5;stroke-width:0.7;}' +
+    '.rtg-ring .rr-rehaut{fill:none;stroke:#ffffff;stroke-opacity:0.05;stroke-width:0.6;}' +
+    '.rtg-ring .rr-flens{fill:none;stroke:var(--klok-sfeer);stroke-opacity:0.3;stroke-width:0.7;}' +
+    // de sunray-plaat: heel fijne stralen in de paletkleur (ingetogen)
+    '.rtg-ring .rr-sun{stroke:var(--klok-sfeer);stroke-opacity:0.055;stroke-width:0.28;}' +
+    '.rtg-ring .rr-sun2{stroke:var(--klok-sfeer);stroke-opacity:0.02;stroke-width:0.28;}' +
+    // de minutenbaan: heel fijn, gouden accent op de vijf minuten
+    '.rtg-ring .rr-min{stroke:#ffffff;stroke-opacity:0.26;stroke-width:0.55;}' +
+    '.rtg-ring .rr-vijf{stroke:var(--klok-goud);stroke-opacity:0.85;stroke-width:1.0;}' +
+    // toegepaste indexen in het vaste goud, met een lume-punt net erbinnen
     '.rtg-ring .rr-index{fill:var(--klok-goud);}' +
-    '.rtg-ring .rr-indexlicht{fill:#fff8e0;fill-opacity:0.55;}' +
-    // de signatuur en de weekdag, in het vaste goud (Inter resp. Bodoni)
-    '.rtg-ring .rr-naam{fill:var(--klok-goud);font-family:Inter,system-ui,sans-serif;font-size:5.2px;font-weight:500;letter-spacing:0.06em;}' +
-    // de dag- en datumvensters: identieke "kastjes" -- diep zwart met een
-    // toegepaste gouden lijst -- zodat de weekdag en de datum een geheel zijn
+    '.rtg-ring .rr-lume{fill:#E7E2CC;}' +
+    // signatuur (fijn, ruim gespatieerd) en de kastjes voor dag en datum
+    '.rtg-ring .rr-naam{fill:var(--klok-goud);font-family:Inter,system-ui,sans-serif;font-size:4.6px;font-weight:500;letter-spacing:0.12em;}' +
     '.rtg-ring .rr-venster{fill:#050504;}' +
-    '.rtg-ring .rr-vensterlijst{fill:none;stroke:var(--klok-goud);stroke-opacity:0.85;stroke-width:1.1;}' +
-    ".rtg-ring .rr-datum{fill:#F1E9D4;font-family:'Bodoni Moda',serif;font-size:8.6px;font-variant-numeric:tabular-nums;}" +
-    ".rtg-ring .rr-dagtekst{fill:#F1E9D4;font-family:'Bodoni Moda',serif;font-size:7.2px;}" +
-    // de gouden secondewijzer als een fijn juweel over de plaat
-    '.rtg-ring .rr-sec{stroke:var(--klok-goud);stroke-width:0.7;stroke-linecap:round;}' +
+    '.rtg-ring .rr-vensterlijst{fill:none;stroke:var(--klok-goud);stroke-opacity:0.8;stroke-width:0.9;}' +
+    ".rtg-ring .rr-datum{fill:#EFE8D2;font-family:'Bodoni Moda',serif;font-size:8.2px;font-variant-numeric:tabular-nums;}" +
+    ".rtg-ring .rr-dagtekst{fill:#EFE8D2;font-family:'Bodoni Moda',serif;font-size:6.6px;letter-spacing:0.03em;}" +
+    // de fijne gouden secondewijzer met lollipop
+    '.rtg-ring .rr-sec{stroke:var(--klok-goud);stroke-width:0.5;stroke-linecap:round;}' +
     '.rtg-ring .rr-seccw{fill:var(--klok-goud);}' +
-    // de gangreserve-subwijzerplaat op negen uur
-    '.rtg-ring .rr-sub{fill:none;stroke:#ffffff;stroke-opacity:0.08;stroke-width:0.6;}' +
-    '.rtg-ring .rr-res{fill:none;stroke:var(--klok-goud);stroke-opacity:0.3;stroke-width:0.5;}' +
-    '.rtg-ring .rr-resvol{fill:none;stroke:var(--klok-goud);stroke-opacity:0.75;stroke-width:0.9;}' +
-    '.rtg-ring .rr-reswijzer{stroke:var(--klok-goud);stroke-opacity:0.9;stroke-width:0.8;stroke-linecap:round;}' +
-    '.rtg-ring .rr-as{fill:var(--klok-goud);}' +
-    // de polijst-ribbel over de wijzers (het lichtvangertje)
-    '.rtg-ring .rr-ribbel{stroke:#fff7dc;stroke-opacity:0.7;stroke-linecap:round;fill:none;}';
+    '.rtg-ring .rr-seclolring{fill:#050504;stroke:var(--klok-goud);stroke-width:0.7;}';
   document.head.appendChild(stijl);
 
   const twee = n => String(n).padStart(2, '0');
@@ -92,14 +85,13 @@
     };
   }
 
-  /* ---- de RTG-ring: het onbetaalbare signatuurgezicht van de klok ----
-     Een echte, rustige wijzerplaat op haute-horlogerie-niveau: onder twaalf
-     uur de signatuur RAHUL TRAVEL GROUP, daaronder de weekdag, een datum-
-     venster met een gouden lijst op zes uur en een verzonken gangreserve op
-     negen uur. In het midden gefacetteerde dauphine-wijzers met een
-     gepolijste ribbel die het licht vangt. Het goud staat vast; de fijne
-     sunray-plaat en de accent-flens ademen mee met het palet. Subtiel 3D:
-     een zachte glasbolling en een fijne slagschaduw onder de wijzers. */
+  /* ---- de RTG-ring: het verfijnde signatuurgezicht van de klok ----
+     Ingetogen luxe: een licht verdiepte plaat met een fijne sunray, slanke
+     applied indexen met lume-punten, en gepolijste, slanke wijzers met een
+     lume-kanaal plus een fijne lollipop-secondewijzer. De weekdag (in de taal
+     van de gebruiker) en de datum staan in identieke gouden kastjes -- dag
+     onder twaalf uur, datum op drie uur. Het goud staat vast; de sunray en de
+     accent-flens ademen mee met het palet. */
   function maakRing(el) {
     el.classList.add('rtg-ring');
     const NS = 'http://www.w3.org/2000/svg';
@@ -116,84 +108,80 @@
     const pt = (r, a) => (r * Math.sin(a)).toFixed(2) + ' ' + (-r * Math.cos(a)).toFixed(2);
     const klokNr = (maakRing.nr = (maakRing.nr || 0) + 1);
 
-    // defs: plaatdiepte, gepolijst goud (met heldere ribbel), een index-goud,
-    // een zacht glashoogsel en een fijne slagschaduw (subtiel 3D)
+    // defs: plaatdiepte, gepolijst (champagne)goud, een randvignet voor de
+    // verdieping, een zacht glashoogsel en een fijne slagschaduw
     const defs = document.createElementNS(NS, 'defs');
     defs.innerHTML =
-      '<radialGradient id="rr-plaat' + klokNr + '" cx="50%" cy="40%" r="68%">' +
-        '<stop offset="0%" stop-color="#201C1B"/><stop offset="70%" stop-color="#131110"/>' +
-        '<stop offset="100%" stop-color="#090908"/></radialGradient>' +
+      '<radialGradient id="rr-plaat' + klokNr + '" cx="50%" cy="38%" r="70%">' +
+        '<stop offset="0%" stop-color="#1E1B1A"/><stop offset="68%" stop-color="#131110"/>' +
+        '<stop offset="100%" stop-color="#080807"/></radialGradient>' +
       '<linearGradient id="rr-goud' + klokNr + '" x1="0" y1="0" x2="1" y2="0">' +
-        '<stop offset="0%" stop-color="#5E4614"/><stop offset="18%" stop-color="#B4913E"/>' +
-        '<stop offset="45%" stop-color="#F7E9B4"/><stop offset="50%" stop-color="#FFF8DD"/>' +
-        '<stop offset="55%" stop-color="#EAD693"/><stop offset="82%" stop-color="#9A7A2E"/>' +
-        '<stop offset="100%" stop-color="#57420F"/></linearGradient>' +
-      '<linearGradient id="rr-goudkop' + klokNr + '" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0%" stop-color="#FFF4CE"/><stop offset="45%" stop-color="#E7CE86"/>' +
-        '<stop offset="100%" stop-color="#8A6A22"/></linearGradient>' +
-      '<radialGradient id="rr-glans' + klokNr + '" cx="37%" cy="28%" r="62%">' +
-        '<stop offset="0%" stop-color="rgba(255,251,240,0.13)"/>' +
-        '<stop offset="52%" stop-color="rgba(255,251,240,0.02)"/>' +
+        '<stop offset="0%" stop-color="#6B5320"/><stop offset="20%" stop-color="#C0A45A"/>' +
+        '<stop offset="46%" stop-color="#F3E6BC"/><stop offset="50%" stop-color="#FBF4DA"/>' +
+        '<stop offset="55%" stop-color="#E7D6A0"/><stop offset="82%" stop-color="#9C7E36"/>' +
+        '<stop offset="100%" stop-color="#61491A"/></linearGradient>' +
+      '<radialGradient id="rr-vig' + klokNr + '" cx="50%" cy="50%" r="52%">' +
+        '<stop offset="0%" stop-color="rgba(0,0,0,0)"/><stop offset="76%" stop-color="rgba(0,0,0,0)"/>' +
+        '<stop offset="100%" stop-color="rgba(0,0,0,0.45)"/></radialGradient>' +
+      '<radialGradient id="rr-glans' + klokNr + '" cx="37%" cy="27%" r="60%">' +
+        '<stop offset="0%" stop-color="rgba(255,251,240,0.11)"/>' +
+        '<stop offset="52%" stop-color="rgba(255,251,240,0.015)"/>' +
         '<stop offset="100%" stop-color="rgba(255,251,240,0)"/></radialGradient>' +
       '<filter id="rr-schaduw' + klokNr + '" x="-25%" y="-25%" width="150%" height="150%">' +
-        '<feDropShadow dx="0" dy="0.7" stdDeviation="0.8" flood-color="#000" flood-opacity="0.5"/></filter>';
+        '<feDropShadow dx="0" dy="0.55" stdDeviation="0.6" flood-color="#000" flood-opacity="0.45"/></filter>';
     svg.appendChild(defs);
 
-    // de plaat
+    // de plaat + de fijne sunray + het randvignet (verdieping)
     maak('circle', { cx: 100, cy: 100, r: 97, fill: 'url(#rr-plaat' + klokNr + ')' });
-    // de sunray-plaat: fijne stralen vanuit het midden, in de paletkleur
-    // (afwisselend twee sterktes voor een zachte schittering) -- onder alles
-    for (let i = 0; i < 120; i++) {
-      const a = i / 120 * P2, b = pt(20, a).split(' '), e = pt(86, a).split(' ');
+    for (let i = 0; i < 180; i++) {
+      const a = i / 180 * P2, b = pt(22, a).split(' '), e = pt(84, a).split(' ');
       maak('line', { x1: b[0], y1: b[1], x2: e[0], y2: e[1], class: i % 2 ? 'rr-sun' : 'rr-sun2' });
     }
-    // de rand + rehaut + accent-flens
+    maak('circle', { cx: 100, cy: 100, r: 97, fill: 'url(#rr-vig' + klokNr + ')', 'pointer-events': 'none' });
+    // de randen
     maak('circle', { cx: 100, cy: 100, r: 97, class: 'rr-rand' });
     maak('circle', { cx: 100, cy: 100, r: 95, class: 'rr-rehaut' });
-    maak('circle', { cx: 100, cy: 100, r: 84.5, class: 'rr-flens' });
+    maak('circle', { cx: 100, cy: 100, r: 84, class: 'rr-flens' });
     // de minutenbaan
     for (let m = 0; m < 60; m++) {
       const rad = m * 6 * Math.PI / 180, vijf = m % 5 === 0;
-      const r1 = vijf ? 89.5 : 92.0, r2 = 94.5;
+      const r1 = vijf ? 90.5 : 92.5, r2 = 94.5;
       maak('line', {
         x1: (100 + Math.sin(rad) * r1).toFixed(2), y1: (100 - Math.cos(rad) * r1).toFixed(2),
         x2: (100 + Math.sin(rad) * r2).toFixed(2), y2: (100 - Math.cos(rad) * r2).toFixed(2),
         class: vijf ? 'rr-vijf' : 'rr-min'
       });
     }
-    // toegepaste facet-indexen op de twaalf uren (dubbel op twaalf), met een
-    // lichte bovenfacet zodat ze echt opgezet lijken
+    // slanke toegepaste indexen op de twaalf uren (dubbel op twaalf), elk met
+    // een fijne lume-punt net erbinnen
     for (let h = 0; h < 12; h++) {
-      const a = h * 30 * Math.PI / 180, rIn = 80.5, rUit = 87.5;
+      const a = h * 30 * Math.PI / 180, rIn = 81, rUit = 88;
       const dx = Math.sin(a), dy = -Math.cos(a), nx = -dy, ny = dx;
-      const halfB = h % 3 === 0 ? 1.9 : 1.4;
       const P = (r, o) => (100 + dx * r + nx * o).toFixed(2) + ' ' + (100 + dy * r + ny * o).toFixed(2);
-      const teken = (o0, o1) => {
-        maak('path', { class: 'rr-index', d: 'M' + P(rIn, o0) + 'L' + P(rUit, o0) + 'L' + P(rUit, o1) + 'L' + P(rIn, o1) + 'Z' });
-        // smalle lichte facet langs de ene flank
-        maak('path', { class: 'rr-indexlicht', d: 'M' + P(rIn, o0) + 'L' + P(rUit, o0) + 'L' + P(rUit, o0 + 0.5) + 'L' + P(rIn, o0 + 0.5) + 'Z' });
-      };
-      if (h === 0) { teken(-2.4, -0.6); teken(0.6, 2.4); }   // dubbele index op 12
-      else teken(-halfB, halfB);
+      const baton = (o0, o1) => maak('path', { class: 'rr-index',
+        d: 'M' + P(rIn, o0) + 'L' + P(rUit, o0) + 'L' + P(rUit, o1) + 'L' + P(rIn, o1) + 'Z' });
+      if (h === 0) { baton(-2.0, -0.5); baton(0.5, 2.0); }   // dubbele index op 12
+      else baton(-0.75, 0.75);
+      // de lume-punt
+      maak('circle', { cx: (100 + dx * 78).toFixed(2), cy: (100 + dy * 78).toFixed(2), r: 0.85, class: 'rr-lume' });
     }
 
     // de signatuur onder twaalf uur, op vaste breedte gecentreerd
-    const naam = maak('text', { x: 100, y: 40, class: 'rr-naam', 'text-anchor': 'middle',
-      textLength: 84, lengthAdjust: 'spacing' });
+    const naam = maak('text', { x: 100, y: 39, class: 'rr-naam', 'text-anchor': 'middle',
+      textLength: 78, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
 
-    /* Een gedeeld "kastje": een diep zwart venster met een toegepaste gouden
-       lijst en een kijkgat (clip) voor de rol-omslag. Weekdag en datum krijgen
-       EXACT hetzelfde kastje, zodat de plaat een kloppend geheel is: de weekdag
-       (in de taal van de gebruiker) onder twaalf uur, de datum op drie uur, en
-       daartegenover de gangreserve op negen uur. */
+    /* Een gedeeld "kastje": een diep zwart venster met een fijne gouden lijst
+       en een kijkgat (clip) voor de rol-omslag. Weekdag en datum krijgen EXACT
+       hetzelfde kastje, zodat het een kloppend geheel is: de weekdag (in de
+       taal van de gebruiker) onder twaalf uur, de datum op drie uur. */
     function kastje(cx, cy, w, h, id, tekstKlasse, tl) {
       const x = +(cx - w / 2).toFixed(2), y = +(cy - h / 2).toFixed(2);
-      maak('rect', { x: x, y: y, width: w, height: h, rx: 1.6, class: 'rr-venster' });
-      maak('rect', { x: x, y: y, width: w, height: h, rx: 1.6, class: 'rr-vensterlijst' });
+      maak('rect', { x: x, y: y, width: w, height: h, rx: 1.4, class: 'rr-venster' });
+      maak('rect', { x: x, y: y, width: w, height: h, rx: 1.4, class: 'rr-vensterlijst' });
       const clip = maak('clipPath', { id: id + klokNr });
       const cr = document.createElementNS(NS, 'rect');
-      for (const [k, v] of Object.entries({ x: x, y: y, width: w, height: h, rx: 1.6 })) cr.setAttribute(k, v);
+      for (const [k, v] of Object.entries({ x: x, y: y, width: w, height: h, rx: 1.4 })) cr.setAttribute(k, v);
       clip.appendChild(cr);
       const g = maak('g', { 'clip-path': 'url(#' + id + klokNr + ')' });
       const t = document.createElementNS(NS, 'text');
@@ -204,9 +192,9 @@
       return t;
     }
     // de weekdag onder twaalf uur (breed kastje, tekst past zich aan de taal aan)
-    const dag = kastje(100, 57, 58, 13, 'rr-kd', 'rr-dagtekst', 50);
-    // de datum op drie uur (tegenover de gangreserve op negen uur)
-    const datumTekst = kastje(147, 100, 17, 12, 'rr-kv', 'rr-datum');
+    const dag = kastje(100, 55, 52, 11.5, 'rr-kd', 'rr-dagtekst', 44);
+    // de datum op drie uur
+    const datumTekst = kastje(148, 100, 16, 11.5, 'rr-kv', 'rr-datum');
 
     function slaOm(tekstEl, nieuw, hoogte) {
       if (RUSTIG || !tekstEl.isConnected) { tekstEl.textContent = nieuw; return; }
@@ -224,94 +212,62 @@
       })(start);
     }
 
-    /* ---- de gangreserve: een verzonken subwijzerplaat op negen uur ----
-       De veer van het huis (shared/uurwerk.js) houdt over ALLE pagina's heen
-       bij hoe ver het werk is opgewonden. Het boogje beslaat 230 graden:
-       links leeg, rechts vol; de gevulde boog groeit mee met de wijzer. */
-    const RES_A = 115 * Math.PI / 180;
-    const resBoog = (a0, a1, r) => {
-      const groot = (a1 - a0) > Math.PI ? 1 : 0;
-      return 'M' + pt(r, a0) + 'A' + r + ' ' + r + ' 0 ' + groot + ' 1 ' + pt(r, a1);
-    };
-    const resG = maak('g', { transform: 'translate(53 100)' });
-    const resRing = document.createElementNS(NS, 'circle');
-    resRing.setAttribute('r', 11.5); resRing.setAttribute('class', 'rr-sub');
-    resG.appendChild(resRing);
-    const resDeel = (klasse, d) => {
-      const q = document.createElementNS(NS, 'path');
-      q.setAttribute('class', klasse); q.setAttribute('d', d);
-      resG.appendChild(q);
-      return q;
-    };
-    resDeel('rr-res', resBoog(-RES_A, RES_A, 9));
-    for (let i = 0; i <= 4; i++) {
-      const a = -RES_A + i / 4 * 2 * RES_A, l = document.createElementNS(NS, 'line');
-      const b1 = pt(7.7, a).split(' '), b2 = pt(9, a).split(' ');
-      l.setAttribute('x1', b1[0]); l.setAttribute('y1', b1[1]); l.setAttribute('x2', b2[0]); l.setAttribute('y2', b2[1]);
-      l.setAttribute('class', 'rr-res');
-      resG.appendChild(l);
-    }
-    const resVol = resDeel('rr-resvol', '');
-    const resWijzer = document.createElementNS(NS, 'line');
-    resWijzer.setAttribute('x1', 0); resWijzer.setAttribute('y1', 1.4);
-    resWijzer.setAttribute('x2', 0); resWijzer.setAttribute('y2', -6.6);
-    resWijzer.setAttribute('class', 'rr-reswijzer');
-    resG.appendChild(resWijzer);
-    const resAs = document.createElementNS(NS, 'circle');
-    resAs.setAttribute('r', 0.9); resAs.setAttribute('class', 'rr-as');
-    resG.appendChild(resAs);
-
     // subtiel 3D: een zacht glashoogsel over de plaat (licht van linksboven),
-    // net onder de wijzers -- geeft diepte zonder op te vallen
+    // net onder de wijzers
     maak('circle', { cx: 100, cy: 100, r: 87, fill: 'url(#rr-glans' + klokNr + ')', 'pointer-events': 'none' });
 
-    /* ---- de wijzers: gefacetteerde dauphine-wijzers op de exacte tijd ----
-       Een gepolijst gouden lichaam met een heldere ribbel in het midden die
-       het licht vangt, en een fijne slagschaduw eronder: zo lijken ze net
-       boven de plaat te zweven. */
+    /* ---- de wijzers: slank, gepolijst goud met een lume-kanaal ----
+       Een fijne baton met een pale lume-strook in het midden, en een fijne
+       slagschaduw eronder: ingetogen, precies, chic. De secondewijzer is dun
+       met een lollipop en een klein tegengewicht. */
     const goud = 'url(#rr-goud' + klokNr + ')';
-    // een dauphine: breed rond de basis, taps naar een punt aan de tip
-    function dauphine(len, tail, w) {
+    function baton(len, tail, w) {
       const b = w / 2;
-      return 'M100 ' + (100 - len).toFixed(2) +
-        ' L' + (100 + b) + ' ' + (100 - len * 0.34).toFixed(2) +
-        ' L' + (100 + b * 0.5) + ' ' + (100 + tail).toFixed(2) +
-        ' L' + (100 - b * 0.5) + ' ' + (100 + tail).toFixed(2) +
-        ' L' + (100 - b) + ' ' + (100 - len * 0.34).toFixed(2) + ' Z';
+      return 'M' + (100 - b) + ' ' + (100 - len * 0.1).toFixed(2) +
+        ' L' + (100 - b * 0.78) + ' ' + (100 - len) +
+        ' L' + (100 + b * 0.78) + ' ' + (100 - len) +
+        ' L' + (100 + b) + ' ' + (100 - len * 0.1).toFixed(2) +
+        ' L' + (100 + b * 0.85) + ' ' + (100 + tail) +
+        ' L' + (100 - b * 0.85) + ' ' + (100 + tail) + ' Z';
     }
     const wijzers = maak('g', { filter: 'url(#rr-schaduw' + klokNr + ')' });
     function wijzer(len, tail, w) {
       const g = document.createElementNS(NS, 'g');
       const body = document.createElementNS(NS, 'path');
-      body.setAttribute('d', dauphine(len, tail, w)); body.setAttribute('fill', goud);
-      body.setAttribute('stroke', '#3E2E0C'); body.setAttribute('stroke-width', '0.25');
-      const ribbel = document.createElementNS(NS, 'line');
-      ribbel.setAttribute('x1', 100); ribbel.setAttribute('y1', (100 - len + 1).toFixed(2));
-      ribbel.setAttribute('x2', 100); ribbel.setAttribute('y2', (100 + tail * 0.4).toFixed(2));
-      ribbel.setAttribute('class', 'rr-ribbel'); ribbel.setAttribute('stroke-width', (w * 0.14).toFixed(2));
-      g.append(body, ribbel);
+      body.setAttribute('d', baton(len, tail, w)); body.setAttribute('fill', goud);
+      body.setAttribute('stroke', '#3E2E0C'); body.setAttribute('stroke-width', '0.2');
+      const lume = document.createElementNS(NS, 'line');
+      lume.setAttribute('x1', 100); lume.setAttribute('y1', (100 - len + 3).toFixed(2));
+      lume.setAttribute('x2', 100); lume.setAttribute('y2', (100 - len * 0.06).toFixed(2));
+      lume.setAttribute('stroke', '#E7E2CC'); lume.setAttribute('stroke-width', (w * 0.4).toFixed(2));
+      lume.setAttribute('stroke-linecap', 'round');
+      g.append(body, lume);
       wijzers.appendChild(g);
       return g;
     }
-    const uurW = wijzer(46, 11, 5.4);
-    const minW = wijzer(72, 14, 3.9);
-    // de secondewijzer: dun, met een klein tegengewicht
+    const uurW = wijzer(45, 10, 3.6);
+    const minW = wijzer(71, 13, 2.7);
+    // de secondewijzer: dun, met lollipop en tegengewicht
     const secG = document.createElementNS(NS, 'g');
     const secL = document.createElementNS(NS, 'line');
-    secL.setAttribute('x1', 100); secL.setAttribute('y1', 118); secL.setAttribute('x2', 100); secL.setAttribute('y2', 9);
+    secL.setAttribute('x1', 100); secL.setAttribute('y1', 116); secL.setAttribute('x2', 100); secL.setAttribute('y2', 14);
     secL.setAttribute('class', 'rr-sec');
+    const secLol = document.createElementNS(NS, 'circle');
+    secLol.setAttribute('cx', 100); secLol.setAttribute('cy', 30); secLol.setAttribute('r', 2.3); secLol.setAttribute('class', 'rr-seclolring');
+    const secLolK = document.createElementNS(NS, 'circle');
+    secLolK.setAttribute('cx', 100); secLolK.setAttribute('cy', 30); secLolK.setAttribute('r', 1.05); secLolK.setAttribute('class', 'rr-lume');
     const secCw = document.createElementNS(NS, 'circle');
-    secCw.setAttribute('cx', 100); secCw.setAttribute('cy', 118); secCw.setAttribute('r', 2.2); secCw.setAttribute('class', 'rr-seccw');
-    secG.append(secL, secCw);
+    secCw.setAttribute('cx', 100); secCw.setAttribute('cy', 116); secCw.setAttribute('r', 1.9); secCw.setAttribute('class', 'rr-seccw');
+    secG.append(secL, secLol, secLolK, secCw);
     wijzers.appendChild(secG);
-    // de centrale kap (gepolijst goud met een donker hart)
-    maak('circle', { cx: 100, cy: 100, r: 3.2, fill: goud, stroke: '#3E2E0C', 'stroke-width': 0.25 });
-    maak('circle', { cx: 100, cy: 100, r: 1.05, fill: '#191309' });
+    // de centrale kap
+    maak('circle', { cx: 100, cy: 100, r: 2.9, fill: goud, stroke: '#3E2E0C', 'stroke-width': 0.2 });
+    maak('circle', { cx: 100, cy: 100, r: 0.95, fill: '#191309' });
 
     el.textContent = '';
     el.append(svg);
 
-    let vorigeDag = '', vorigeDatum = '', vorigeKalenderdag = '', vorigeResHoek = -999;
+    let vorigeDag = '', vorigeDatum = '', vorigeKalenderdag = '';
     return d => {
       // de wijzers exact op de tijd (uur uit minuten, minuut uit seconden)
       const ms = RUSTIG ? 0 : d.getMilliseconds();
@@ -329,8 +285,7 @@
         else slaOm(datumTekst, dagNr, 11);
         vorigeDatum = dagNr;
       }
-      // de weekdag in de taal van de gebruiker (paginataal, anders de
-      // apparaattaal), met een hoofdletter
+      // de weekdag in de taal van de gebruiker (paginataal, anders apparaattaal)
       const taal = document.documentElement.lang || navigator.language || 'nl';
       let wd; try { wd = d.toLocaleDateString(taal, { weekday: 'long' }); } catch (e) { wd = d.toLocaleDateString(undefined, { weekday: 'long' }); }
       const cap = wd ? wd.charAt(0).toUpperCase() + wd.slice(1) : '';
@@ -341,16 +296,6 @@
         vorigeDag = cap;
       }
       vorigeKalenderdag = kalenderdag;
-      // de gangreserve volgt de veer van het huis (RTGUurwerk); zonder die
-      // laag staat hij vol, zoals een horloge vers van de bank
-      const uw = window.RTGUurwerk;
-      const res = uw ? uw.reserve() : 1;
-      const resHoek = -115 + 230 * res;
-      if (Math.abs(resHoek - vorigeResHoek) > 0.4) {
-        resWijzer.setAttribute('transform', 'rotate(' + resHoek.toFixed(1) + ')');
-        resVol.setAttribute('d', res > 0.004 ? resBoog(-RES_A, resHoek * Math.PI / 180, 9) : '');
-        vorigeResHoek = resHoek;
-      }
     };
   }
 

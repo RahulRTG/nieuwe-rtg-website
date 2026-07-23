@@ -34,6 +34,9 @@ test('het karakter: rots in de branding, schijt aan ego\'s, beschermer, geen ger
   assert.match(RAHUL_LEAD, /nooit gemeen/i, 'plagen kent een harde grens');
   assert.match(RAHUL_LEAD, /lekker rebels/i, 'de rebel: eigenwijs eigen pad');
   assert.match(RAHUL_LEAD, /tornt je rebelsheid nooit/i, 'maar nooit aan eerlijkheid, discretie of veiligheid');
+  assert.match(RAHUL_LEAD, /klasse van de inlogpoort/i, 'de klasse van de poort: stille luxe');
+  assert.match(RAHUL_LEAD, /stille luxe/i, 'ingetogen, zeker, nooit opzichtig');
+  assert.match(RAHUL_LEAD, /duur ben je, juist door de eenvoud/i, 'de luxe zit in de eenvoud, niet in het vertoon');
   const verhaal = aiVerhaal();
   assert.match(verhaal, /super populair/i, 'het jeugdverhaal staat in het volledige verhaal');
   assert.match(verhaal, /voor de zwakkere opkwam/i, 'en de kern ervan: de beschermer');

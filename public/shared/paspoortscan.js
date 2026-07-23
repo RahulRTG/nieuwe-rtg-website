@@ -58,7 +58,7 @@
     document.body.appendChild(ov);
 
     var vid = ov.querySelector('#pscanVid');
-    var stream = null, dataURL = null;
+    var stream = null, dataURL = null, mrz = null;
 
     function sluit() {
       if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
@@ -92,9 +92,18 @@
 
     function maak() {
       var w = vid.videoWidth, h = vid.videoHeight; if (!w || !h) return;
-      var max = 1500, sc = Math.min(1, max / Math.max(w, h));
-      var cv = document.createElement('canvas'); cv.width = Math.round(w * sc); cv.height = Math.round(h * sc);
-      cv.getContext('2d').drawImage(vid, 0, 0, cv.width, cv.height);
+      // Het beeld staat met object-fit:cover in het podium (1.42:1). We snijden
+      // het naar diezelfde verhouding en dan naar het gouden kader (inset 7%/5%),
+      // zodat we alleen het paspoort overhouden en de MRZ onderaan vast zit.
+      var doelR = 1.42, srcR = w / h, cw, ch, cx, cy;
+      if (srcR > doelR) { ch = h; cw = h * doelR; } else { cw = w; ch = w / doelR; }
+      cx = (w - cw) / 2; cy = (h - ch) / 2;
+      // het kader binnen het podium (zelfde inset als .pscan-kader)
+      var kx = cx + cw * 0.05, ky = cy + ch * 0.07, kw = cw * 0.90, kh = ch * 0.86;
+      var max = 1500, sc = Math.min(1, max / Math.max(kw, kh));
+      var cv = document.createElement('canvas'); cv.width = Math.round(kw * sc); cv.height = Math.round(kh * sc);
+      cv.getContext('2d').drawImage(vid, kx, ky, kw, kh, 0, 0, cv.width, cv.height);
+      mrz = (root.RTGMRZ ? root.RTGMRZ.lees(cv) : null);
       dataURL = cv.toDataURL('image/jpeg', 0.82);
       // bevrore beeld tonen ter controle
       var pod = ov.querySelector('#pscanPodium');

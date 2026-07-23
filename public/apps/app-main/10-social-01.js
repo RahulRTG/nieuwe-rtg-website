@@ -171,27 +171,44 @@
     onbZeg(T('onb.q.paspoort','Tot slot je paspoort, zodat ik zeker weet dat jij het bent. Scan het met de RTG-scanner of kies een foto.'));
     onbActies([
       { txt: T('onb.scan','Scan je paspoort'), prim: true, doe: function(){
-          if (window.RTGPaspoortScan) RTGPaspoortScan.open({ onKlaar: onbPaspoortUpload });
+          if (window.RTGPaspoortScan) RTGPaspoortScan.open({ onKlaar: function(d, mrz){ onbPaspoortUpload(d, mrz); } });
           else onbEl('onbKycFile').click();
         } },
       { txt: T('onb.upload','Kies een foto'), doe: function(){ onbEl('onbKycFile').click(); } }
     ]);
   }
-  // de gekozen/gescande foto versleuteld naar de kluis en het gesprek vervolgen
-  async function onbPaspoortUpload(data){
+  // de gekozen/gescande foto versleuteld naar de kluis en het gesprek vervolgen.
+  // mrz = (optioneel) de op het toestel uitgelezen paspoortzone; kloppen de
+  // controlecijfers, dan vult Rahul naam/geboortedatum/nationaliteit vast in.
+  async function onbPaspoortUpload(data, mrz){
     if (!data) return;
     const fout = onbEl('onbFout'); if (fout) fout.textContent = '';
     onbBezig = true;
     try {
       await API.call('/verify/upload', { image: data });
       if (user) user.verified = 'pending';
+      const gelezen = await onbMrzOpslaan(mrz);
       try { onbSt = await API.call('/onboarding/status'); } catch(e){}
       onbBezig = false;
-      if (onbSt && onbSt.klaar) return onbKlaar();
+      if (gelezen) onbZeg(T('onb.mrz1','Ik heb je paspoort gelezen: ') + gelezen + T('onb.mrz2','. Klopt dat? Dan gaan we verder.'));
+      if (onbSt && onbSt.klaar) return setTimeout(onbKlaar, gelezen ? 900 : 0);
       onbRij = onbOpenVelden();
       onbStap = onbRij.length ? 'veld' : 'teken';
-      onbVolgende();
+      if (gelezen) setTimeout(onbVolgende, 900); else onbVolgende();
     } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.upmis','Uploaden lukte niet.'); }
+  }
+  // MRZ-velden opslaan in het onboarding-profiel; geeft een korte omschrijving
+  // terug van wat gelezen is (voor Rahul), of '' als er niets bruikbaars was.
+  async function onbMrzOpslaan(mrz){
+    if (!mrz) return '';
+    const heeft = {}; (onbSt && onbSt.velden || []).forEach(function(v){ heeft[v.id] = v; });
+    const velden = {}, stukjes = [];
+    if (mrz.geboortedatum && heeft.geboortedatum){ velden.geboortedatum = mrz.geboortedatum; stukjes.push(mrz.geboortedatum); }
+    if (mrz.nationaliteit && heeft.nationaliteit){ velden.nationaliteit = mrz.nationaliteit; stukjes.push(mrz.nationaliteit); }
+    if (mrz.naam && heeft.naam && !heeft.naam.ingevuld){ velden.naam = mrz.naam; stukjes.push(mrz.naam); }
+    if (!Object.keys(velden).length) return '';
+    try { onbSt = await API.call('/onboarding/opslaan', { velden }); } catch(e){ return ''; }
+    return stukjes.join(', ');
   }
   function onbTekenVraag(){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
@@ -255,15 +272,22 @@
     if (!file) return;
     if (file.size > 5*1024*1024){ if (fout) fout.textContent = T('onb.toobig','De foto is te groot (max 5 MB).'); return; }
     const data = await snapVerklein(file); if (!data) return;
-    onbBezig = true;
-    try {
-      await API.call('/verify/upload', { image: data });
-      if (user) user.verified = 'pending';
-      try { onbSt = await API.call('/onboarding/status'); } catch(e){}
-      onbBezig = false;
-      if (onbSt && onbSt.klaar) return onbKlaar();
-      onbRij = onbOpenVelden();
-      onbStap = onbRij.length ? 'veld' : 'teken';
-      onbVolgende();
-    } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.upmis','Uploaden lukte niet.'); }
+    const mrz = await onbMrzUitFoto(data);
+    return onbPaspoortUpload(data, mrz);
+  }
+  // een gekozen foto in een canvas laden en er de MRZ uit proberen te lezen
+  function onbMrzUitFoto(dataURL){
+    return new Promise(function(res){
+      if (!window.RTGMRZ){ res(null); return; }
+      const img = new Image();
+      img.onload = function(){
+        try {
+          const cv = document.createElement('canvas'); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+          cv.getContext('2d').drawImage(img, 0, 0);
+          res(RTGMRZ.lees(cv));
+        } catch(e){ res(null); }
+      };
+      img.onerror = function(){ res(null); };
+      img.src = dataURL;
+    });
   }

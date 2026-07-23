@@ -25,6 +25,18 @@
     { id: 'foundation', naam: 'RTFoundation', bron: 'homeFoundation' }
   ];
   function soort(id) { for (var i = 0; i < SOORTEN.length; i++) if (SOORTEN[i].id === id) return SOORTEN[i]; return null; }
+  // een ROS-app als widget: id 'app:<url>', ingeladen als klein, live kader
+  function isApp(w) { return w && typeof w.id === 'string' && w.id.indexOf('app:') === 0; }
+  function rosApps() {
+    if (window.RTGApps && window.RTGApps.length) return window.RTGApps;
+    return [
+      { naam: 'De Salon', url: '/apps/app.html#salon' },
+      { naam: 'RTG Mall', url: '/apps/mall.html' },
+      { naam: 'Food Court', url: '/apps/foodcourt.html' },
+      { naam: 'RTG OV', url: '/apps/ov.html' },
+      { naam: 'Spelen', url: '/apps/spelen.html' }
+    ];
+  }
 
   var laag = null, plusKnop = null, menu = null, actief = false;
   var staat = laadStaat();
@@ -72,14 +84,16 @@
         '-webkit-backdrop-filter:blur(18px);color:var(--gold,#857007);font-size:1.4rem;cursor:pointer;' +
         'box-shadow:0 12px 30px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;}' +
       '#bureauMenu{position:fixed;pointer-events:auto;z-index:3;display:none;flex-direction:column;gap:.15rem;' +
-        'padding:.4rem;border-radius:14px;border:1px solid var(--line,rgba(255,255,255,.12));' +
+        'padding:.4rem;border-radius:14px;border:1px solid var(--line,rgba(255,255,255,.12));max-height:min(62vh,460px);overflow-y:auto;' +
         'background:color-mix(in srgb, var(--card,#151312) 90%, transparent);backdrop-filter:blur(20px);' +
         '-webkit-backdrop-filter:blur(20px);box-shadow:0 20px 50px rgba(0,0,0,.6);}' +
       '#bureauMenu.open{display:flex;}' +
       '#bureauMenu button{background:none;border:none;text-align:left;color:var(--txt,#F4F1EC);font-family:inherit;' +
         'font-size:.8rem;padding:.5rem .8rem;border-radius:9px;cursor:pointer;white-space:nowrap;}' +
       '#bureauMenu button:hover{background:color-mix(in srgb, var(--gold,#857007) 22%, transparent);}' +
-      '#bureauMenu button[disabled]{opacity:.4;cursor:default;}';
+      '#bureauMenu button[disabled]{opacity:.4;cursor:default;}' +
+      '.bureauMenu-kop{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft,#8A8680);' +
+        'padding:.5rem .8rem .2rem;position:sticky;top:-.4rem;background:color-mix(in srgb, var(--card,#151312) 90%, transparent);}';
     document.head.appendChild(st);
   }
 
@@ -102,12 +116,22 @@
     if (anker && anker.parentNode) { anker.parentNode.insertBefore(bron, anker); anker.parentNode.removeChild(anker); }
   }
 
+  function bouwApp(body, w) {
+    body.style.padding = '0';
+    var f = document.createElement('iframe');
+    f.src = w.app || '/apps/index.html';
+    f.setAttribute('title', w.naam || 'RTG-app');
+    f.setAttribute('loading', 'lazy');
+    f.style.cssText = 'width:100%;height:100%;border:0;background:var(--bg,#0C0C0B);display:block;';
+    body.appendChild(f);
+  }
   function widgetEl(w) {
-    var s = soort(w.id); if (!s) return null;
+    var app = isApp(w), s = app ? null : soort(w.id);
+    if (!app && !s) return null;
     var el = document.createElement('section'); el.className = 'bw'; el.dataset.id = w.id;
     var kop = document.createElement('div'); kop.className = 'bw-kop';
-    kop.innerHTML = '<span class="bw-grip"><i></i><i></i><i></i></span><span class="bw-naam"></span><button class="bw-x" aria-label="Terug naar het beginscherm">&times;</button>';
-    kop.querySelector('.bw-naam').textContent = s.naam;
+    kop.innerHTML = '<span class="bw-grip"><i></i><i></i><i></i></span><span class="bw-naam"></span><button class="bw-x" aria-label="Widget sluiten">&times;</button>';
+    kop.querySelector('.bw-naam').textContent = app ? (w.naam || 'App') : s.naam;
     kop.querySelector('.bw-x').addEventListener('click', function () { verwijder(w.id); });
     var body = document.createElement('div'); body.className = 'bw-body';
     var grip = document.createElement('span'); grip.className = 'bw-resize'; grip.setAttribute('aria-hidden', 'true');
@@ -115,7 +139,7 @@
     el.style.left = beginX(w) + 'px'; el.style.top = (w.y == null ? 40 : w.y) + 'px';
     if (w.w) el.style.width = w.w + 'px';
     if (w.h) { el.style.height = w.h + 'px'; el.style.maxHeight = 'none'; }
-    leen(body, s);
+    if (app) bouwApp(body, w); else leen(body, s);
     sleepbaar(el, kop, w);
     formaatbaar(el, grip, w);
     return el;
@@ -213,13 +237,15 @@
     staat.widgets = staat.widgets.filter(function (w) { return w.id !== id; });
     bewaar(); teken();
   }
-  function voegToe(id) {
+  function voegToe(id, app, naam) {
     if (staat.widgets.some(function (w) { return w.id === id; })) return;
     // afwisselend links/rechts, op de kant met de minste widgets
     var links = staat.widgets.filter(function (w) { return w.kant === 'links'; }).length;
     var rechts = staat.widgets.length - links;
     var kant = links <= rechts ? 'links' : 'rechts';
-    staat.widgets.push({ id: id, kant: kant, x: null, y: 40 + Math.floor(staat.widgets.length / 2) * 60 });
+    var wd = { id: id, kant: kant, x: null, y: 40 + Math.floor(staat.widgets.length / 2) * 60 };
+    if (id.indexOf('app:') === 0) { wd.app = app; wd.naam = naam; wd.w = 320; wd.h = 440; }
+    staat.widgets.push(wd);
     bewaar(); teken();
     if (menu) menu.classList.remove('open');
   }
@@ -231,6 +257,16 @@
       var b = document.createElement('button'); b.textContent = s.naam;
       if (staat.widgets.some(function (w) { return w.id === s.id; })) b.disabled = true;
       else b.addEventListener('click', function () { voegToe(s.id); });
+      menu.appendChild(b);
+    });
+    // elke ROS-app als widget
+    var kop = document.createElement('div'); kop.className = 'bureauMenu-kop'; kop.textContent = 'Apps';
+    menu.appendChild(kop);
+    rosApps().forEach(function (a) {
+      var id = 'app:' + a.url;
+      var b = document.createElement('button'); b.textContent = a.naam;
+      if (staat.widgets.some(function (w) { return w.id === id; })) b.disabled = true;
+      else b.addEventListener('click', function () { voegToe(id, a.url, a.naam); });
       menu.appendChild(b);
     });
   }

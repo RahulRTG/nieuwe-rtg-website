@@ -3272,6 +3272,9 @@
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
   const ccZoek = $('#osCcZoek');
   if (ccZoek) ccZoek.addEventListener('click', openZoek);
+  // twee apps naast elkaar (split screen)
+  const ccSplit = $('#osCcSplit');
+  if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });
   // licht/donker: de (verborgen) gedeelde themaknop blijft de motor
   const ccLicht = $('#osCcLicht');
   if (ccLicht) ccLicht.addEventListener('click', () => { const b = $('#rtg-thema-knop'); if (b) b.click(); });

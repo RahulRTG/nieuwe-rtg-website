@@ -475,6 +475,13 @@
         'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
       '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
       '.ag-mond{display:block;margin:0.15rem auto 0.3rem;width:220px;height:100px;}' +
+      // Face ID / passkey: een ingetogen gouden regel onder het veld, alleen
+      // zichtbaar zodra Rahul weet met wie hij praat (een terugkerend lid)
+      '.ag-passkey{margin:0.95rem auto 0;background:none;border:none;color:var(--gold,#857007);' +
+        'font-family:inherit;font-size:0.78rem;letter-spacing:0.03em;cursor:pointer;opacity:0.9;' +
+        'display:flex;align-items:center;gap:0.4rem;}' +
+      '.ag-passkey[hidden]{display:none;}' +
+      '.ag-passkey svg{width:15px;height:15px;stroke:currentColor;fill:none;}' +
       // de sterrenhemel gaat achter alles; de poort-inhoud eroverheen
       '#gate > *:not(canvas){position:relative;z-index:1;}';
     document.head.appendChild(st);
@@ -493,7 +500,10 @@
       '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
       '<div class="ag-rij"><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
-      '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>';
+      '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
+      '<button type="button" class="ag-passkey" id="agPasskey" hidden>' +
+        '<svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5"/><path d="M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5"/><path d="M12 13c0 3-.6 5.6-1.6 7.7"/><path d="M5.5 8a7 7 0 0 1 12 3c0 1"/></svg>' +
+        '<span>' + T('ag.pk.knop','Face ID of passkey') + '</span></button>';
     gate.appendChild(doos);
     // een wachtwoord-herstel-link uit de e-mail (?reset=): Rahul regelt het herstel zelf
     const herstel = new URLSearchParams(location.search).get('reset');
@@ -569,14 +579,61 @@
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));
     }
+    const pkKnop = doos.querySelector('#agPasskey');
+    function toonPasskey(aan){
+      if (!pkKnop) return;
+      pkKnop.hidden = !aan;
+      // het label pas hier vertalen: bij het bouwen van de poort is de i18n
+      // soms nog niet geladen
+      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.knop','Face ID of passkey'); }
+    }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';
       inp.placeholder = placeholder || T('ag.ww','Je wachtwoord');
+      // wie herkend is (loginU) mag ook met Face ID / vingerafdruk / sleutel
+      toonPasskey(!!loginU);
     }
     function tekstVeld(){
       inp.type = 'text';
       inp.placeholder = T('ag.plho','Ik wil zeggen dat..');
+      toonPasskey(false);
     }
+
+    /* Face ID / passkey: dezelfde WebAuthn-dans als de aparte passkey-pagina,
+       maar binnen de poort. Rahul kent de gebruikersnaam al (loginU); het
+       toestel bewijst de identiteit, de server munt een echte sessie. */
+    async function passkeyInlog(){
+      if (!loginU || bezig) return;
+      if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)){
+        zeg('rahul', T('ag.pk.geen','Dit toestel kent nog geen Face ID of passkey. Typ je wachtwoord.')); return;
+      }
+      const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+      const u2b = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      bezig = true;
+      try {
+        zeg('rahul', T('ag.pk.vraag','Je toestel vraagt nu om je Face ID, vingerafdruk of sleutel.'));
+        const o = await API.call('/webauthn/opties', { login: loginU });
+        const pub = o.opties; pub.challenge = b2u(pub.challenge);
+        pub.allowCredentials = (pub.allowCredentials || []).map(c => Object.assign({}, c, { id: b2u(c.id) }));
+        const cred = await navigator.credentials.get({ publicKey: pub });
+        const antwoord = { id: cred.id, rawId: u2b(cred.rawId), type: cred.type,
+          clientExtensionResults: cred.getClientExtensionResults(),
+          response: { authenticatorData: u2b(cred.response.authenticatorData), clientDataJSON: u2b(cred.response.clientDataJSON),
+            signature: u2b(cred.response.signature), userHandle: cred.response.userHandle ? u2b(cred.response.userHandle) : null } };
+        const r = await API.call('/webauthn/login', { login: loginU, antwoord });
+        bezig = false;
+        if (r && r.token){
+          API.token = r.token; try { localStorage.setItem('rtg_member_token', r.token); } catch(e){}
+          zeg('rahul', T('ag.welkom','Daar ben je weer. Welkom terug.'));
+          if (typeof restoreSession === 'function') await restoreSession();
+        }
+      } catch(e){
+        bezig = false;
+        if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) return; // afgebroken door de gebruiker
+        zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.pk.mis','Dat lukte niet met de passkey. Typ anders je wachtwoord.'));
+      }
+    }
+    if (pkKnop) pkKnop.addEventListener('click', passkeyInlog);
 
     /* ---------- wachtwoord-herstel, geheel in het gesprek ----------
        Rahul vraagt de zescijferige code (tweede kanaal, per SMS) en daarna het

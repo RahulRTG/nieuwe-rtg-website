@@ -189,6 +189,9 @@
 
   /* ---------- Samen: meekijken en samen doen (alleen leden) ---------- */
   if (!memTok) return;
+  // Heeft de pagina al haar eigen Samen-knop (bv. de RTF-pagina's met samen.js),
+  // dan laten we die met rust en voegen we geen tweede toe. Rahul komt er wel bij.
+  if (document.querySelector('script[src="samen.js"], script[src$="/samen.js"]')) return;
   var CODEKEY = 'rtg_samen_code';
   var kamerCode = null; try { kamerCode = localStorage.getItem(CODEKEY); } catch (e) {}
   var api = function (p, b) {

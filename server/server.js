@@ -2434,6 +2434,13 @@ Object.assign(kern, require('./kern/flits').maakFlits({
 Object.assign(kern, require('./kern/ov').maakOv({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify
 }));
+/* RTG Navigatie (kern/navigatie.js): het huiseigen navigatiesysteem. Een eigen
+   wegennet met A*-route, bocht-voor-bocht en ETA per vervoerwijze; bestemmingen
+   uit onze leveranciers, het OV, de loketten en de POI-lagen (tank/laad), en RTG
+   Flits op de route. Niets naar derden. Na flits en ov gemount (koppelt eraan). */
+Object.assign(kern, require('./kern/navigatie').maakNavigatie({
+  db, save, crypto, haversine, flitsRond: kern.flitsRond, flitsMeld: kern.flitsMeld
+}));
 /* RTG Clips (kern/clips.js): korte verticale video's die alleen op het
    toestel van de maker staan (OPFS); RTG bewaart enkel titel, affiche en
    het signaal-doorgeefluik. De feed is een eindige dagselectie, bewust
@@ -2639,6 +2646,7 @@ require('./routes/flits')(kern);
 require('./routes/theater')(kern);
 require('./routes/wbw')(kern);
 require('./routes/ov')(kern);
+require('./routes/navigatie')(kern);
 require('./routes/clips')(kern);
 require('./routes/kantoorpakket')(kern);
 /* RTG iD (kern/rtgid.js): de DigiD-vervanger op de eigen identiteitskluis;

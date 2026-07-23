@@ -165,8 +165,9 @@
         // je ziet de kleur nooit "verspringen" -- hij glijdt onmerkbaar
         ':root{transition:' + levendTrans + ';}' +
         // de themawissel (wit <-> donker <-> standaard): een zachte kruisvervaging
-        // van de grote vlakken (achtergrond + tekst), veilig via gewone properties
-        'body,[data-levendegrond],[data-levend-thema]{transition:background-color .8s ease,color .8s ease,border-color .8s ease;}}';
+        // van de grote vlakken en de kaarten (achtergrond + tekst + randen), veilig
+        // via gewone properties -- geen @property, dus var(--token,#fallback) blijft heel
+        'body,[data-levendegrond],[data-levend-thema],.card,.os-tegel,.tkc{transition:background-color .8s ease,color .8s ease,border-color .8s ease;}}';
     (d.head || d.documentElement).appendChild(st);
   }
 

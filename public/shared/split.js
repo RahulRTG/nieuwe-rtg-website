@@ -9,8 +9,9 @@
   'use strict';
   if (w.RTGSplit) return;
   var SLEUTEL = 'rtg_split';
-  // een curatie van RTG-schermen die je naast elkaar kunt zetten
-  var APPS = [
+  // alle ROS-schermen die je naast elkaar kunt zetten: dezelfde gedeelde lijst
+  // als de flagship- en bureau-widgets (shared/rosapps.js), met een terugval
+  var APPS = (w.RTGApps && w.RTGApps.length) ? w.RTGApps : [
     { naam: 'Beginscherm', url: '/apps/index.html' },
     { naam: 'De Salon', url: '/apps/app.html#salon' },
     { naam: 'RTG Mall', url: '/apps/mall.html' },

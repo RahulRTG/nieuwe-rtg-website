@@ -1,7 +1,7 @@
 /* Bundelt de opgeknipte app-scripts weer samen.
 
    De grote app-scripts (leverancier.js, app-main.js, personeel.js,
-   backoffice.js, techniek.js) zijn te groot om prettig in een bestand te
+   backoffice.js, techniek.js, meldkamer.js) zijn te groot om prettig in een bestand te
    bewerken, maar delen intern een gesloten scope:
    je kunt ze niet zomaar in losse modules hakken zonder alles te herschrijven.
    Daarom bewaren we de bron opgeknipt per onderdeel in public/apps/<naam>/,
@@ -29,6 +29,7 @@ const bundels = {
   'apps/personeel.js': 'apps/personeel',
   'apps/backoffice.js': 'apps/backoffice',
   'apps/techniek.js': 'apps/techniek',
+  'apps/meldkamer.js': 'apps/meldkamer',
   'apps/foundation/gezin-rt.js': 'apps/foundation/gezin-rt',
   'apps/foundation/sessie.js': 'apps/foundation/sessie',
   'shared/i18n.js': 'shared/i18n',

@@ -3451,7 +3451,7 @@
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
-        if (d && d.online) { LINKS.bank = { naam: 'RTG Bank', icoon: '🏦', url: '/apps/bank.html' }; bouw(); }
+        if (d && d.online) { LINKS.bank = { naam: 'RTG Bank', url: '/apps/bank.html' }; bouw(); }
       }).catch(() => {});
   })();
 
@@ -3472,7 +3472,7 @@
   function installeer(item) { var a = geinst(); if (a.indexOf(item) < 0) { a.push(item); zetGeinst(a); } bouw(); }
   function verwijder(item) { zetGeinst(geinst().filter(function (x) { return x !== item; })); bouw(); }
 
-  var winkelScrim = $('#osWinkelScrim'), winkelLijst = $('#osWinkelLijst');
+  var winkelScrim = $('#osWinkelScrim'), winkelLijst = $('#osWinkelLijst'), winkelTitel = $('#osWinkelTitel');
   function winkelRij(item) {
     var rij = document.createElement('div'); rij.className = 'os-winkel-rij';
     var zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(tegelInhoud(item)); rij.appendChild(zi);
@@ -3487,24 +3487,98 @@
     verf(); rij.appendChild(knop);
     return rij;
   }
-  function openWinkel() {
-    if (!winkelScrim) return;
-    sluitScrims();
-    winkelLijst.textContent = '';
-    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
-    intro.textContent = T('os.board.uitleg', 'Uw boardroom: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
-    winkelLijst.appendChild(intro);
-    var n = 0;
+  // de groepen die deze pas mag zien, met alleen de echt-bestaande extra-apps
+  function winkelGroepen() {
+    var uit = [];
     for (var i = 0; i < WINKEL_GROEPEN.length; i++) {
       var groep = WINKEL_GROEPEN[i];
       if (groep.pas && groep.pas.indexOf(pas) < 0) continue;
       var items = groep.items.filter(function (it) { return !vasteAppsSet().has(it) && itemZichtbaar(it); });
-      if (!items.length) continue;
-      var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = groep.titel;
-      winkelLijst.appendChild(kop);
-      items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); n++; });
+      if (items.length) uit.push({ titel: groep.titel, items: items });
     }
+    return uit;
+  }
+  function openWinkel() {
+    if (!winkelScrim) return;
+    sluitScrims();
+    if (winkelTitel) winkelTitel.textContent = T('os.store.h', 'App Store');
+    winkelLijst.textContent = '';
+    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
+    intro.textContent = T('os.store.uitleg', 'Zet functies op uw beginscherm of haal ze eraf. De basis en het dock blijven altijd staan.');
+    winkelLijst.appendChild(intro);
+    var groepen = winkelGroepen(), n = 0;
+    groepen.forEach(function (g) {
+      var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = g.titel;
+      winkelLijst.appendChild(kop);
+      g.items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); n++; });
+    });
     if (!n) { var leeg = document.createElement('div'); leeg.className = 'os-bel-leeg'; leeg.textContent = T('os.store.leeg', 'Er is nu niets extra beschikbaar.'); winkelLijst.appendChild(leeg); }
+    winkelScrim.classList.add('open');
+  }
+
+  /* ---------- De Boardroom: uw eigen regiekamer ----------
+     Rijker dan de kale App Store: bovenaan een telling (hoeveel functies aan
+     staan van hoeveel u er mag), dan de vaste basis als vergrendelde rij (met
+     een slot-glyf, niet uit te zetten), en daaronder per groep de functies
+     waar u recht op heeft, met een aan/uit-schakelaar. Onder water dezelfde
+     install-laag als de App Store. */
+  var BASIS_REGELS = [
+    { glyf: 'bellen',  naam: 'Bellen, videobellen en snaps' },
+    { glyf: 'betalen', naam: 'RTG Pay' },
+    { glyf: null, mono: 'R', naam: 'Rahul, uw AI' },
+    { glyf: 'pas',     naam: 'Uw pas-app' },
+    { glyf: 'rtf',     naam: 'De RTFoundation' }
+  ];
+  function boardBasisRij(def) {
+    var rij = document.createElement('div'); rij.className = 'os-board-rij os-board-vast';
+    var zi = document.createElement('span'); zi.className = 'zi';
+    var g = def.glyf && window.RTGGlyf && RTGGlyf.svg(def.glyf);
+    if (g) zi.appendChild(g);
+    else { var mo = document.createElement('span'); mo.className = 'os-monogram'; mo.textContent = def.mono || '•'; zi.appendChild(mo); }
+    rij.appendChild(zi);
+    var naam = document.createElement('span'); naam.className = 'os-winkel-naam'; naam.textContent = def.naam; rij.appendChild(naam);
+    var slot = document.createElement('span'); slot.className = 'os-board-slot'; slot.setAttribute('aria-label', T('os.board.vast', 'Altijd aan'));
+    var sg = window.RTGGlyf && RTGGlyf.svg('slot'); if (sg) slot.appendChild(sg);
+    rij.appendChild(slot);
+    return rij;
+  }
+  function openBoardroom() {
+    if (!winkelScrim) return;
+    sluitScrims();
+    if (winkelTitel) winkelTitel.textContent = T('os.board.h', 'Boardroom');
+    winkelLijst.textContent = '';
+    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
+    intro.textContent = T('os.board.uitleg', 'Uw eigen regiekamer: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
+    winkelLijst.appendChild(intro);
+
+    // telling: hoeveel van de beschikbare extra-functies staan aan
+    var groepen = winkelGroepen();
+    var alle = []; groepen.forEach(function (g) { alle = alle.concat(g.items); });
+    var aan = alle.filter(isGeinst).length;
+    var sum = document.createElement('div'); sum.className = 'os-board-sum';
+    var cijfer = document.createElement('strong'); cijfer.textContent = aan + ' / ' + alle.length;
+    sum.appendChild(cijfer);
+    sum.appendChild(document.createTextNode(' ' + T('os.board.telling', 'functies staan aan')));
+    winkelLijst.appendChild(sum);
+
+    // de vaste basis, vergrendeld
+    var basisKop = document.createElement('div'); basisKop.className = 'os-winkel-groep';
+    basisKop.textContent = T('os.board.basis', 'Altijd aan · de basis');
+    winkelLijst.appendChild(basisKop);
+    BASIS_REGELS.forEach(function (d) { winkelLijst.appendChild(boardBasisRij(d)); });
+
+    // en de functies waar u recht op heeft, met een schakelaar
+    if (!alle.length) {
+      var leeg = document.createElement('div'); leeg.className = 'os-bel-leeg';
+      leeg.textContent = T('os.board.leeg', 'Buiten de basis heeft u nu geen extra functies om te schakelen.');
+      winkelLijst.appendChild(leeg);
+    } else {
+      groepen.forEach(function (g) {
+        var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = g.titel;
+        winkelLijst.appendChild(kop);
+        g.items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); });
+      });
+    }
     winkelScrim.classList.add('open');
   }
 
@@ -3538,7 +3612,7 @@
      systeem veilig en werkend blijft. Onder water is dit dezelfde install-laag
      als de App Store. */
   var ccBoard = $('#osCcBoardroom');
-  if (ccBoard) ccBoard.addEventListener('click', function () { openWinkel(); });
+  if (ccBoard) ccBoard.addEventListener('click', function () { openBoardroom(); });
 
   /* ---------- Now Playing: je muziek bedienen vanaf de ROS ----------
      De muziek-apps melden hun stand via de gedeelde speler-laag

@@ -1166,6 +1166,18 @@
     transition:border-color 0.13s ease, color 0.13s ease, background 0.13s ease;
   }
   .os-winkel-knop.geinst{background:transparent;color:var(--soft);border-color:var(--line);}
+  /* -------- Boardroom: telling + vergrendelde basisregels -------- */
+  .os-board-sum{display:flex;align-items:baseline;gap:0.4rem;color:var(--soft);font-size:0.74rem;
+    padding:0.55rem 0 0.15rem;letter-spacing:0.02em;}
+  .os-board-sum strong{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.2rem;color:var(--txt);letter-spacing:0.01em;}
+  .os-board-rij{display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-top:1px solid var(--line);}
+  .os-winkel-groep + .os-board-rij{border-top:none;}
+  .os-board-rij .zi{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--card2);}
+  .os-board-rij .zi svg{width:18px;height:18px;stroke:#fff;fill:none;}
+  .os-board-rij .zi .os-monogram{font-size:0.9rem;}
+  .os-board-vast{opacity:0.9;}
+  .os-board-slot{margin-left:auto;color:var(--gold,#857007);display:flex;align-items:center;opacity:0.75;}
+  .os-board-slot svg{width:16px;height:16px;stroke:currentColor;fill:none;}
 
   /* -------- achtergrond (wallpaper), gekozen in het bedieningspaneel -------- */
   #app.os-wall-nacht{background:#000;}
@@ -1603,7 +1615,7 @@
     <!-- RTG OS: App Store (apps installeren en verwijderen) -->
     <div class="os-scrim" id="osWinkelScrim">
       <div class="os-winkel-paneel" role="dialog" aria-modal="true" aria-labelledby="osWinkelTitel">
-        <h3 class="os-bel-titel" id="osWinkelTitel">🛍️ App Store</h3>
+        <h3 class="os-bel-titel" id="osWinkelTitel">App Store</h3>
         <div id="osWinkelLijst"></div>
       </div>
     </div>

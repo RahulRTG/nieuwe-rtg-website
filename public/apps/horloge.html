@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Het RTG-horloge</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#141012;--line:rgba(235,215,160,0.14);
+    --txt:#F4F1EC;--soft:rgba(244,241,236,0.60);--gold:#C9A24B;--goud-zacht:#EBD79A;--burg:#C23A5E;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{min-height:100%;}
+  body{background:
+      radial-gradient(120% 90% at 50% 8%, #1a1416 0%, #0C0C0B 60%),
+      var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;padding:0 0 4rem;}
+  a{color:inherit;}
+  .kop{display:flex;align-items:center;gap:0.8rem;padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.2rem 0.6rem;
+    max-width:1080px;margin:0 auto;}
+  .kop a.terug{text-decoration:none;font-size:1.3rem;line-height:1;color:var(--soft);}
+  .kop .merk{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.05rem;letter-spacing:0.02em;}
+  .kop .rek{flex:1;}
+  .kop .pill{font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--goud-zacht);
+    border:1px solid var(--line);border-radius:999px;padding:0.28rem 0.62rem;}
+  main{max-width:1080px;margin:0 auto;padding:1rem 1.2rem;}
+  .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:1.4rem 0 0.5rem;}
+  .eyebrow{font-size:0.66rem;letter-spacing:0.34em;text-transform:uppercase;color:var(--goud-zacht);margin-bottom:0.9rem;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:clamp(2.1rem,6vw,3.4rem);line-height:1.05;
+    letter-spacing:0.01em;text-wrap:balance;margin-bottom:0.7rem;}
+  h1 em{font-style:italic;color:var(--goud-zacht);}
+  .lead{max-width:44ch;color:var(--soft);font-size:1.02rem;line-height:1.6;margin-bottom:1.6rem;}
+  /* het horloge zelf */
+  .toonbank{width:min(560px,86vw);aspect-ratio:1;margin:0.4rem auto 1.4rem;position:relative;
+    filter:drop-shadow(0 40px 70px rgba(0,0,0,0.7));}
+  .toonbank [data-rtg-horloge]{width:100%;height:100%;}
+  .glans{position:absolute;inset:-6% -6% auto -6%;height:40%;pointer-events:none;
+    background:radial-gradient(60% 100% at 40% 0%, rgba(255,255,255,0.10), transparent 70%);}
+  .onder{font-size:0.8rem;color:var(--soft);letter-spacing:0.04em;margin-top:0.2rem;}
+  .onder b{color:var(--goud-zacht);font-weight:600;}
+  /* de drie scholen */
+  .scholen{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin:2.4rem 0 1.2rem;}
+  @media(max-width:640px){.scholen{grid-template-columns:1fr;}}
+  .school{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.15rem;}
+  .school h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.12rem;margin-bottom:0.3rem;}
+  .school .van{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--goud-zacht);margin-bottom:0.55rem;}
+  .school p{font-size:0.9rem;line-height:1.55;color:var(--soft);}
+  /* de wiskunde-strook */
+  .exact{margin:1.6rem 0 0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--card);}
+  .exact .titel{display:flex;align-items:center;gap:0.6rem;padding:1rem 1.2rem;border-bottom:1px solid var(--line);}
+  .exact .titel h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.16rem;}
+  .exact .titel .nul{margin-left:auto;font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;
+    color:#0C0C0B;background:var(--goud-zacht);border-radius:999px;padding:0.3rem 0.7rem;font-weight:700;}
+  .rijen{display:grid;grid-template-columns:repeat(2,1fr);}
+  @media(max-width:640px){.rijen{grid-template-columns:1fr;}}
+  .rij{display:flex;align-items:baseline;gap:0.7rem;padding:0.85rem 1.2rem;border-top:1px solid rgba(235,215,160,0.08);}
+  .rij b{font-family:'Bodoni Moda',serif;font-size:1.5rem;color:var(--goud-zacht);font-variant-numeric:tabular-nums;min-width:4.6rem;}
+  .rij span{font-size:0.86rem;color:var(--soft);line-height:1.45;}
+  .voet{margin-top:1.6rem;font-size:0.8rem;color:var(--soft);line-height:1.6;text-align:center;max-width:60ch;margin-left:auto;margin-right:auto;}
+  .voet a{color:var(--goud-zacht);}
+</style>
+</head>
+<body>
+<header class="kop">
+  <a class="terug" href="/apps/index.html" aria-label="Terug naar alle apps">&#8592;</a>
+  <span class="merk">Rahul Travel Group</span>
+  <span class="rek"></span>
+  <span class="pill">Signatuur</span>
+</header>
+
+<main>
+  <section class="hero">
+    <p class="eyebrow">Het tweede gezicht van RTG</p>
+    <h1>Het <em>RTG-horloge</em></h1>
+    <p class="lead">Een eigen, volledig opengewerkt skelethorloge &mdash; naast de lippen het symbool van het huis. Achthoekig cassement, een echte wijzerplaat, en een uurwerk dat tot op de milliseconde klopt.</p>
+
+    <div class="toonbank">
+      <div data-rtg-horloge role="img" aria-label="Het RTG-signatuurhorloge: een opengewerkt skelethorloge met achthoekig cassement, wijzerplaat en een levend 3D-uurwerk."></div>
+      <div class="glans"></div>
+    </div>
+    <p class="onder">Levend 3D-uurwerk &middot; <b>28.800</b> halveslagen/uur &middot; loopt op de klok van dit toestel</p>
+  </section>
+
+  <section class="scholen" aria-label="De drie ontwerpscholen">
+    <article class="school">
+      <p class="van">De vorm</p>
+      <h3>Audemars Piguet</h3>
+      <p>Het achthoekige cassement met acht schroeven, toegepaste baton-indexen en een uurwerk dat helemaal open ligt &mdash; je kijkt zo het gaande werk in.</p>
+    </article>
+    <article class="school">
+      <p class="van">De leesbaarheid</p>
+      <h3>Rolex</h3>
+      <p>Een heldere minutenbaan, forse gevulde wijzers en een datum op drie uur onder een cycloop-loep. Altijd in een oogopslag af te lezen.</p>
+    </article>
+    <article class="school">
+      <p class="van">De techniek</p>
+      <h3>Porsche</h3>
+      <p>Matte, donkere diepte en een strak instrument-ritme. Eén enkele bordeaux secondepunt als accent &mdash; verder niets dat afleidt.</p>
+    </article>
+  </section>
+
+  <section class="exact" aria-label="De wiskunde achter het horloge">
+    <div class="titel">
+      <h2>Wiskundig kloppend</h2>
+      <span class="nul">Foutmarge 0,0</span>
+    </div>
+    <div class="rijen">
+      <div class="rij"><b>4 Hz</b><span>De balans klopt op precies vier oscillaties per seconde &mdash; 28.800 halveslagen per uur.</span></div>
+      <div class="rij"><b>1&thinsp;/&thinsp;60</b><span>Het secondewiel maakt exact één omwenteling per minuut, gelijk met de secondewijzer.</span></div>
+      <div class="rij"><b>12&thinsp;:&thinsp;1</b><span>Het wijzerwerk zet de minuutwijzer via twee raderparen exact twaalf keer trager op de uurwijzer.</span></div>
+      <div class="rij"><b>0,0</b><span>De wijzerhoeken komen rechtstreeks uit de tijd van dit toestel &mdash; tot op de milliseconde, in Node getoetst.</span></div>
+    </div>
+  </section>
+
+  <p class="voet">De mechaniek staat los in <a href="/shared/horlogewerk.js">shared/horlogewerk.js</a> en wordt bewaakt met een eigen testreeks. Het beeld is eigen werk: geen stockfoto, geen extern merk &mdash; alles met SVG en WebGL in eigen huis getekend, in de huiskleuren.</p>
+</main>
+
+<script src="/shared/horlogewerk.js"></script>
+<script src="/shared/rtghorloge.js"></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

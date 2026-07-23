@@ -150,9 +150,14 @@
     // in de RTFoundation-app hangen we de grond vanzelf aan de schil, zodat de
     // pastelblauwe was op elke RTF-pagina meekleurt zonder dat elke pagina een
     // eigen markering nodig heeft
-    if (rtfWereld() && !d.querySelector('[data-levendegrond]')) {
-      var doel = d.getElementById('shell') || d.body;
-      if (doel) doel.setAttribute('data-levendegrond', '');
+    if (rtfWereld()) {
+      // markeer de RTF-wereld op <html> zodat ook de klok en andere onderdelen
+      // de pastelblauwe familie via CSS kunnen oppakken
+      if (!d.documentElement.getAttribute('data-levend')) d.documentElement.setAttribute('data-levend', 'pastel');
+      if (!d.querySelector('[data-levendegrond]')) {
+        var doel = d.getElementById('shell') || d.body;
+        if (doel) doel.setAttribute('data-levendegrond', '');
+      }
     }
     zorgStijl(); verf();
     if (!loopt && w.requestAnimationFrame) { loopt = true; w.requestAnimationFrame(lus); }

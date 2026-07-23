@@ -1,6 +1,6 @@
     const bi = document.createElement('span'); bi.textContent = '✦';
     zoekRij(bi, q ? 'Vraag Rahul: "' + zoekInput.value.trim() + '"' : 'Vraag Rahul', null,
-      () => vraagButler(zoekInput.value.trim()));
+      () => vraagRahul(zoekInput.value.trim()));
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
   const zoekPil = $('#osZoekPil');
@@ -117,7 +117,7 @@
   const naarHome = () => { const b = tabKnop('home'); if (b) b.click(); };
   const terug = $('#osTerug'), pill = $('#osPill');
   if (terug) terug.addEventListener('click', naarHome);
-  // de pill: een tik gaat naar het beginscherm, vasthouden roept de Butler
+  // de pill: een tik gaat naar het beginscherm, vasthouden roept Rahul
   // (het Siri-gebaar van dit OS), en omhoog vegen sluit de open app: de app
   // krimpt onder de vinger weg (of veert terug als de veeg te kort was)
   let pillLang = false, pillTimer = null, pillY = null, pillDy = 0, pillVeeg = false;
@@ -126,7 +126,7 @@
     pill.addEventListener('pointerdown', e => {
       pillLang = false; pillY = e.clientY; pillDy = 0; pillVeeg = false;
       try { pill.setPointerCapture(e.pointerId); } catch (x) {}
-      pillTimer = setTimeout(() => { pillLang = true; vraagButler(''); }, 550);
+      pillTimer = setTimeout(() => { pillLang = true; vraagRahul(''); }, 550);
     });
     pill.addEventListener('pointermove', e => {
       if (pillY == null || pillLang) return;

@@ -2439,51 +2439,53 @@
   if (!tabbar || !app || !grids[0] || !grids[1] || !dock || !pages) return;
 
   const pas = new URLSearchParams(location.search).get('pas') || 'rtg';
-  // De Butler in het midden van het dock, als grotere gouden orb: hij is het
+  // Rahul in het midden van het dock, als grotere gouden orb: hij is het
   // hart van het OS en doet alles wat je hem vraagt. Het dock houdt de drie
   // RTG-kern-tabs vast; de overige diensten komen uit de App Store.
   const DOCK = ['betalen', 'ai', 'salon'];
 
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
+  // Elke app kent zijn eigen huisstijl-glyf (shared/glyf.js) op naam van de
+  // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
-    ontdek:      { naam: 'Het Huis',     icoon: '📖', url: '/apps/rtg.html' },
-    spelen:      { naam: 'Spelen',       icoon: '🎲', url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
-    vrienden:    { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
-    juridisch:   { naam: 'Juridisch',    icoon: '📜', url: '/apps/juridisch.html' },
-    camera:      { naam: 'Camera',       icoon: '📸', url: '/apps/camera.html' },
-    muziek:      { naam: 'RTG Sound',    icoon: '🎧', url: '/apps/muziek.html' },
-    podium:      { naam: 'Podium',       icoon: '🎬', url: '/apps/podium.html' },
-    flits:       { naam: 'Flits',        icoon: '🛣️', url: '/apps/flits.html' },
-    navigatie:   { naam: 'Navigatie',    icoon: '🧭', url: '/apps/navigatie.html' },
-    theater:     { naam: 'Theater',      icoon: '🎞️', url: '/apps/theater.html' },
-    wbw:         { naam: 'Wie betaalt wat', icoon: '💶', url: '/apps/wbw.html' },
-    passkeys:    { naam: 'Passkeys',     icoon: '🔑', url: '/apps/passkeys.html' },
-    ov:          { naam: 'OV',           icoon: '🚌', url: '/apps/ov.html' },
-    stad:        { naam: 'Mijn Stad',    icoon: '🏙️', url: '/apps/stad.html' },
-    clips:       { naam: 'Clips',        icoon: '🎥', url: '/apps/clips.html' },
-    office:      { naam: 'RTG Office',   icoon: '📊', url: '/apps/office.html' },
-    vonk:        { naam: 'Vonk',         icoon: '💘', url: '/apps/vonk.html' },
-    balans:      { naam: 'Balans',       icoon: '🌿', url: '/apps/balans.html' },
-    rechterhand: { naam: 'De Rechterhand', icoon: '🎩', url: '/apps/lifestyle.html' },
-    reisboek:    { naam: 'Reisboek',      icoon: '🧳', url: '/apps/reisboek.html' },
-    cellier:     { naam: 'Cellier',       icoon: '🍷', url: '/apps/cellier.html' },
-    table:       { naam: 'Table',         icoon: '🍽️', url: '/apps/table.html' },
-    maison:      { naam: 'Maison',        icoon: '🏛️', url: '/apps/maison.html' },
-    garderobe:   { naam: 'Garde-robe',    icoon: '🧥', url: '/apps/garderobe.html' },
-    mecenaat:    { naam: 'Mecenaat',      icoon: '🤲', url: '/apps/mecenaat.html' },
-    nalatenschap:{ naam: 'Nalatenschap',  icoon: '🗝️', url: '/apps/nalatenschap.html' },
-    logboek:     { naam: 'Logboek',       icoon: '⚓', url: '/apps/logboek.html' },
-    cercle:      { naam: 'Cercle',        icoon: '🎟️', url: '/apps/cercle.html' },
-    pulse:       { naam: 'Pulse',         icoon: '⚡', url: '/apps/pulse.html' },
-    nieuws:      { naam: 'Nieuws',        icoon: '📰', url: '/apps/nieuws.html' },
-    vluchten:    { naam: 'Vluchten',      icoon: '✈️', url: '/apps/vluchten.html' },
-    sport:       { naam: 'Sport',         icoon: '⚽', url: '/apps/sport.html' },
-    berichten:   { naam: 'Berichten',     icoon: '✉️', url: '/apps/berichten.html' },
-    hangar:      { naam: 'Hangar',        icoon: '🛩️', url: '/apps/hangar.html' },
-    entourage:   { naam: 'Entourage',     icoon: '👥', url: '/apps/entourage.html' },
-    attenties:   { naam: 'Attenties',     icoon: '🎁', url: '/apps/attenties.html' },
-    rendezvous:  { naam: 'Rendez-vous',   icoon: '💞', url: '/apps/rendezvous.html' }
+    ontdek:      { naam: 'Het Huis',     url: '/apps/rtg.html' },
+    spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
+    vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
+    juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
+    camera:      { naam: 'Camera',       url: '/apps/camera.html' },
+    muziek:      { naam: 'RTG Sound',    url: '/apps/muziek.html' },
+    podium:      { naam: 'Podium',       url: '/apps/podium.html' },
+    flits:       { naam: 'Flits',        url: '/apps/flits.html' },
+    navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
+    theater:     { naam: 'Theater',      url: '/apps/theater.html' },
+    wbw:         { naam: 'Wie betaalt wat', url: '/apps/wbw.html' },
+    passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
+    ov:          { naam: 'OV',           url: '/apps/ov.html' },
+    stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
+    clips:       { naam: 'Clips',        url: '/apps/clips.html' },
+    office:      { naam: 'RTG Office',   url: '/apps/office.html' },
+    vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
+    balans:      { naam: 'Balans',       url: '/apps/balans.html' },
+    rechterhand: { naam: 'De Rechterhand', url: '/apps/lifestyle.html' },
+    reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
+    cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
+    table:       { naam: 'Table',         url: '/apps/table.html' },
+    maison:      { naam: 'Maison',        url: '/apps/maison.html' },
+    garderobe:   { naam: 'Garde-robe',    url: '/apps/garderobe.html' },
+    mecenaat:    { naam: 'Mecenaat',      url: '/apps/mecenaat.html' },
+    nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/nalatenschap.html' },
+    logboek:     { naam: 'Logboek',       url: '/apps/logboek.html' },
+    cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
+    pulse:       { naam: 'Pulse',         url: '/apps/pulse.html' },
+    nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
+    vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
+    sport:       { naam: 'Sport',         url: '/apps/sport.html' },
+    berichten:   { naam: 'Berichten',     url: '/apps/berichten.html' },
+    hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
+    entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
+    attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
+    rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -2491,18 +2493,18 @@
      RTFoundation is EEN app: een tik toont de leeftijdskeuze en opent dan
      de hub in de passende jas (?groep= zet de bril op). */
   const OSAPPS = {
-    bellen:      { naam: 'Bellen',       icoon: '📞' },
-    videobellen: { naam: 'Videobellen',  icoon: '🎥' },
-    snaps:       { naam: 'Snaps',        icoon: '📷' },
-    rtf:         { naam: 'RTFoundation', icoon: '🕊️' },
-    store:       { naam: 'App Store',    icoon: '🛍️' }
+    bellen:      { naam: 'Bellen' },
+    videobellen: { naam: 'Videobellen' },
+    snaps:       { naam: 'Snaps' },
+    rtf:         { naam: 'RTFoundation' },
+    store:       { naam: 'App Store' }
   };
   const RTF_GROEPEN = [
-    { g: 'mini',   naam: 'RTF Mini',      icoon: '🧸', sub: '0 t/m 4 jaar' },
-    { g: 'kind',   naam: 'RTF Kids',      icoon: '🎒', sub: '5 t/m 11 jaar' },
-    { g: 'tiener', naam: 'RTF Tiener',    icoon: '🛹', sub: '12 t/m 15 jaar' },
-    { g: 'jong',   naam: 'RTF Jong',      icoon: '🚀', sub: '16 t/m 21+' },
-    { g: 'volw',   naam: 'RTF Volwassen', icoon: '🧑', sub: 'ouders en verzorgers' }
+    { g: 'mini',   naam: 'RTF Mini',      sub: '0 t/m 4 jaar' },
+    { g: 'kind',   naam: 'RTF Kids',      sub: '5 t/m 11 jaar' },
+    { g: 'tiener', naam: 'RTF Tiener',    sub: '12 t/m 15 jaar' },
+    { g: 'jong',   naam: 'RTF Jong',      sub: '16 t/m 21+' },
+    { g: 'volw',   naam: 'RTF Volwassen', sub: 'ouders en verzorgers' }
   ];
   /* ---------- de ROS als telefoon: alleen de basis + de App Store ----------
      Standaard staan alleen de "telefoon-apps", de RTFoundation en de App Store
@@ -2535,7 +2537,7 @@
      /api/account/start de werksessie, dus alle regels (zoals het werkvenster
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
      OSAPPS/INDELING/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
-  OSAPPS.werk = { naam: 'Werk', icoon: '💼' };
+  OSAPPS.werk = { naam: 'Werk' };
   // Werk zit in de App Store (categorie "Het huis & diensten"); installeer je
   // het, dan verschijnt het op pagina 2 en opent het met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
@@ -2551,9 +2553,9 @@
       () => af(null), { enableHighAccuracy: true, timeout: 8000 });
   });
   const WERKDOEL = {
-    personeel: { icoon: '🧭', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
-    zaak:      { icoon: '🏛️', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
-    kantoor:   { icoon: '📊', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
+    personeel: { glyf: 'navigatie', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
+    zaak:      { glyf: 'maison', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
+    kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
   };
 
   /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
@@ -2561,7 +2563,7 @@
     if (Date.now() < pinOkTot) return af(null);
     API.call('/pin/status', {}).then(st => {
       const zetten = !st.gezet;
-      belTitel.textContent = zetten ? '🔒 ' + T('pin.zet', 'Kies uw algemene pin') : '🔒 ' + T('pin.vraag', 'Algemene pin');
+      belTitel.textContent = zetten ? T('pin.zet', 'Kies uw algemene pin') : T('pin.vraag', 'Algemene pin');
       belLijst.textContent = '';
       const uitleg = document.createElement('div');
       uitleg.className = 'os-bel-leeg';
@@ -2600,7 +2602,7 @@
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
-    belTitel.textContent = '💼 ' + T('werk.h', 'Werk');
+    belTitel.textContent = T('werk.h', 'Werk');
     belLijst.textContent = '';
     API.call('/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
@@ -2614,7 +2616,8 @@
       for (const r of rollen) {
         const doel = WERKDOEL[r.rol];
         const b = document.createElement('button');
-        const zi = document.createElement('span'); zi.className = 'zi'; zi.textContent = doel.icoon;
+        const zi = document.createElement('span'); zi.className = 'zi';
+        const zg = window.RTGGlyf && RTGGlyf.svg(doel.glyf); if (zg) zi.appendChild(zg);
         b.appendChild(zi);
         b.appendChild(document.createTextNode(doel.app));
         const m = document.createElement('span'); m.className = 'zm';
@@ -2633,7 +2636,7 @@
             }
             try { doel.bewaar(s.token, r); } catch (e2) {}
             location.href = doel.url;
-          } catch (e) { bannerToon('💼', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
+          } catch (e) { bannerToon('', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
         }));
         belLijst.appendChild(b);
       }
@@ -2705,15 +2708,27 @@
   function itemDef(item) { // os-app of link-app: de registry-invoer
     return item.startsWith('os:') ? OSAPPS[item.slice(3)] : LINKS[item.slice(5)];
   }
-  function tegelInhoud(item) { // svg (tab) of emoji (link/os-app) in de tegel
+  // een Bodoni-monogram als de app (nog) geen eigen glyf heeft: de eerste
+  // letters van de naam, netjes in de display-letter (huisstijl, geen emoji).
+  function monogram(naam) {
+    const woorden = String(naam || '').trim().split(/\s+/).filter(w => !/^(de|het|een|rtg|rtf|mijn)$/i.test(w));
+    let m = woorden.length >= 2 ? (woorden[0][0] + woorden[1][0])
+      : (woorden[0] || naam || '?').slice(0, 2);
+    const span = document.createElement('span');
+    span.className = 'os-monogram';
+    span.textContent = m.toUpperCase();
+    return span;
+  }
+  function glyfVoor(item) { // huisstijl-glyf op naam van de sleutel
+    const sleutel = item.slice(item.indexOf(':') + 1);
+    return window.RTGGlyf ? RTGGlyf.svg(sleutel) : null;
+  }
+  function tegelInhoud(item) { // svg (tab), glyf (link/os-app) of monogram in de tegel
     if (item.startsWith('tab:')) {
       const svg = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('svg');
       return svg ? svg.cloneNode(true) : document.createTextNode('•');
     }
-    const span = document.createElement('span');
-    span.style.fontSize = '1.5rem';
-    span.textContent = (itemDef(item) || {}).icoon || '•';
-    return span;
+    return glyfVoor(item) || monogram((itemDef(item) || {}).naam || item);
   }
   function itemNaam(item) {
     return item.startsWith('tab:') ? tabNaam(item.slice(4)) : (itemDef(item) || {}).naam || item;
@@ -2744,7 +2759,7 @@
     if (naam === 'store') { openWinkel(); return; }
     // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
     if (naam === 'werk') { openWerkKiezer(); return; }
-    belTitel.textContent = app.icoon + ' ' + app.naam;
+    belTitel.textContent = app.naam;
     belLijst.textContent = '';
     // RTFoundation: een leeftijdskeuze, daarna opent de juiste app (RTF-jas)
     if (naam === 'rtf') {
@@ -2752,7 +2767,9 @@
       try { onthouden = localStorage.getItem('rtf_app_groep'); } catch (e) {}
       for (const gr of RTF_GROEPEN) {
         const b = document.createElement('button');
-        const zi = document.createElement('span'); zi.className = 'zi'; zi.textContent = gr.icoon;
+        const zi = document.createElement('span'); zi.className = 'zi';
+        const gg = window.RTGGlyf && RTGGlyf.svg('rtf-' + gr.g);
+        if (gg) zi.appendChild(gg); else zi.textContent = (gr.naam.match(/[A-Z]/g) || ['R']).slice(0, 2).join('');
         b.appendChild(zi);
         b.appendChild(document.createTextNode(gr.naam));
         const m = document.createElement('span'); m.className = 'zm';
@@ -2772,7 +2789,8 @@
       d.textContent = 'Nog geen contacten. Voeg iemand toe in De Salon; daarna belt, videobelt en snapt u met een tik, zonder telefoonnummer.';
       belLijst.appendChild(d);
       const ga = document.createElement('button');
-      const gi = document.createElement('span'); gi.className = 'zi'; gi.textContent = '🫂';
+      const gi = document.createElement('span'); gi.className = 'zi';
+      const gis = window.RTGGlyf && RTGGlyf.svg('salon'); if (gis) gi.appendChild(gis);
       ga.appendChild(gi); ga.appendChild(document.createTextNode('Naar De Salon'));
       ga.addEventListener('click', () => { sluitScrims(); const b = tabKnop('salon'); if (b) b.click(); });
       belLijst.appendChild(ga);
@@ -2783,7 +2801,8 @@
       zi.textContent = String(c.codename || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
       b.appendChild(zi);
       b.appendChild(document.createTextNode(c.codename || ''));
-      const m = document.createElement('span'); m.className = 'zm'; m.textContent = app.icoon; b.appendChild(m);
+      const m = document.createElement('span'); m.className = 'zm';
+      const mg = window.RTGGlyf && RTGGlyf.svg(naam); if (mg) m.appendChild(mg); b.appendChild(m);
       b.addEventListener('click', () => {
         sluitScrims();
         if (!window.RTGSocial) return;
@@ -2881,7 +2900,7 @@
     mapScrim.classList.add('open');
   }
 
-  /* ---------- map hernoemen (wiebel-modus of Butler) ---------- */
+  /* ---------- map hernoemen (wiebel-modus of Rahul) ---------- */
   const hernoemScrim = $('#osHernoemScrim'), hernoemIn = $('#osHernoemIn');
   const hernoemOk = $('#osHernoemOk'), hernoemReset = $('#osHernoemReset');
   let hernoemDoel = null;
@@ -2915,24 +2934,24 @@
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
   function osActies() {
     const uit = [
-      { naam: 'Licht of donker', icoon: '🌗', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
-      { naam: 'Meldingen', icoon: '🔔', doe: () => { const b = $('#bell'); if (b) b.click(); } },
-      { naam: 'Bedieningspaneel', icoon: '🎛️', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
-      { naam: 'Taal kiezen', icoon: '🌐', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
-      { naam: 'Push aanzetten', icoon: '📳', doe: () => { if (window.RTGRealtime) RTGRealtime.enablePush(); } },
-      { naam: 'Uitloggen', icoon: '⏻', doe: () => { const b = $('#logoutBtn'); if (b) b.click(); } }
+      { naam: 'Licht of donker', glyf: 'thema', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
+      { naam: 'Meldingen', glyf: 'meldingen', doe: () => { const b = $('#bell'); if (b) b.click(); } },
+      { naam: 'Bedieningspaneel', glyf: 'paneel', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
+      { naam: 'Taal kiezen', glyf: 'taal', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
+      { naam: 'Push aanzetten', glyf: 'push', doe: () => { if (window.RTGRealtime) RTGRealtime.enablePush(); } },
+      { naam: 'Uitloggen', glyf: 'uitloggen', doe: () => { const b = $('#logoutBtn'); if (b) b.click(); } }
     ];
     if (window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
       for (const t of ['bordeaux', 'parelmoer', 'standaard']) {
-        uit.push({ naam: 'Thema ' + (t === 'standaard' ? 'klassiek' : t), icoon: '🎨', doe: () => RTGOSThema.zet(t) });
+        uit.push({ naam: 'Thema ' + (t === 'standaard' ? 'klassiek' : t), glyf: 'thema', doe: () => RTGOSThema.zet(t) });
       }
     }
     return uit;
   }
-  // De Butler vanuit het zoekscherm: open zijn app, vul de vraag in en verstuur
-  // via de bestaande chat-knoppen; de hele acties-registry van de Butler
+  // Rahul vanuit het zoekscherm: open zijn app, vul de vraag in en verstuur
+  // via de bestaande chat-knoppen; de hele acties-registry van Rahul
   // (bestellen, boeken, betalen, plannen, annuleren) doet dan gewoon zijn werk.
-  function vraagButler(q) {
+  function vraagRahul(q) {
     sluitScrims();
     const b = tabKnop('ai'); if (b) b.click();
     const inp = $('#askInput'), knop = $('#askBtn');
@@ -2974,15 +2993,15 @@
       if (acts.length) {
         zoekSectie('Acties');
         for (const a of acts) {
-          const ic = document.createElement('span'); ic.textContent = a.icoon;
+          const ic = (window.RTGGlyf && RTGGlyf.svg(a.glyf)) || document.createTextNode('');
           zoekRij(ic, a.naam, null, () => { sluitScrims(); a.doe(); });
         }
       }
     }
-    // altijd onderaan: geef de vraag aan de Butler, wat het ook is
+    // altijd onderaan: geef de vraag aan Rahul, wat het ook is
     const bi = document.createElement('span'); bi.textContent = '✦';
     zoekRij(bi, q ? 'Vraag Rahul: "' + zoekInput.value.trim() + '"' : 'Vraag Rahul', null,
-      () => vraagButler(zoekInput.value.trim()));
+      () => vraagRahul(zoekInput.value.trim()));
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
   const zoekPil = $('#osZoekPil');
@@ -3099,7 +3118,7 @@
   const naarHome = () => { const b = tabKnop('home'); if (b) b.click(); };
   const terug = $('#osTerug'), pill = $('#osPill');
   if (terug) terug.addEventListener('click', naarHome);
-  // de pill: een tik gaat naar het beginscherm, vasthouden roept de Butler
+  // de pill: een tik gaat naar het beginscherm, vasthouden roept Rahul
   // (het Siri-gebaar van dit OS), en omhoog vegen sluit de open app: de app
   // krimpt onder de vinger weg (of veert terug als de veeg te kort was)
   let pillLang = false, pillTimer = null, pillY = null, pillDy = 0, pillVeeg = false;
@@ -3108,7 +3127,7 @@
     pill.addEventListener('pointerdown', e => {
       pillLang = false; pillY = e.clientY; pillDy = 0; pillVeeg = false;
       try { pill.setPointerCapture(e.pointerId); } catch (x) {}
-      pillTimer = setTimeout(() => { pillLang = true; vraagButler(''); }, 550);
+      pillTimer = setTimeout(() => { pillLang = true; vraagRahul(''); }, 550);
     });
     pill.addEventListener('pointermove', e => {
       if (pillY == null || pillLang) return;

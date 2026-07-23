@@ -58,15 +58,27 @@
   function itemDef(item) { // os-app of link-app: de registry-invoer
     return item.startsWith('os:') ? OSAPPS[item.slice(3)] : LINKS[item.slice(5)];
   }
-  function tegelInhoud(item) { // svg (tab) of emoji (link/os-app) in de tegel
+  // een Bodoni-monogram als de app (nog) geen eigen glyf heeft: de eerste
+  // letters van de naam, netjes in de display-letter (huisstijl, geen emoji).
+  function monogram(naam) {
+    const woorden = String(naam || '').trim().split(/\s+/).filter(w => !/^(de|het|een|rtg|rtf|mijn)$/i.test(w));
+    let m = woorden.length >= 2 ? (woorden[0][0] + woorden[1][0])
+      : (woorden[0] || naam || '?').slice(0, 2);
+    const span = document.createElement('span');
+    span.className = 'os-monogram';
+    span.textContent = m.toUpperCase();
+    return span;
+  }
+  function glyfVoor(item) { // huisstijl-glyf op naam van de sleutel
+    const sleutel = item.slice(item.indexOf(':') + 1);
+    return window.RTGGlyf ? RTGGlyf.svg(sleutel) : null;
+  }
+  function tegelInhoud(item) { // svg (tab), glyf (link/os-app) of monogram in de tegel
     if (item.startsWith('tab:')) {
       const svg = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('svg');
       return svg ? svg.cloneNode(true) : document.createTextNode('•');
     }
-    const span = document.createElement('span');
-    span.style.fontSize = '1.5rem';
-    span.textContent = (itemDef(item) || {}).icoon || '•';
-    return span;
+    return glyfVoor(item) || monogram((itemDef(item) || {}).naam || item);
   }
   function itemNaam(item) {
     return item.startsWith('tab:') ? tabNaam(item.slice(4)) : (itemDef(item) || {}).naam || item;
@@ -97,7 +109,7 @@
     if (naam === 'store') { openWinkel(); return; }
     // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
     if (naam === 'werk') { openWerkKiezer(); return; }
-    belTitel.textContent = app.icoon + ' ' + app.naam;
+    belTitel.textContent = app.naam;
     belLijst.textContent = '';
     // RTFoundation: een leeftijdskeuze, daarna opent de juiste app (RTF-jas)
     if (naam === 'rtf') {
@@ -105,7 +117,9 @@
       try { onthouden = localStorage.getItem('rtf_app_groep'); } catch (e) {}
       for (const gr of RTF_GROEPEN) {
         const b = document.createElement('button');
-        const zi = document.createElement('span'); zi.className = 'zi'; zi.textContent = gr.icoon;
+        const zi = document.createElement('span'); zi.className = 'zi';
+        const gg = window.RTGGlyf && RTGGlyf.svg('rtf-' + gr.g);
+        if (gg) zi.appendChild(gg); else zi.textContent = (gr.naam.match(/[A-Z]/g) || ['R']).slice(0, 2).join('');
         b.appendChild(zi);
         b.appendChild(document.createTextNode(gr.naam));
         const m = document.createElement('span'); m.className = 'zm';

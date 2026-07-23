@@ -6,7 +6,7 @@
      /api/account/start de werksessie, dus alle regels (zoals het werkvenster
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
      OSAPPS/INDELING/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
-  OSAPPS.werk = { naam: 'Werk', icoon: '💼' };
+  OSAPPS.werk = { naam: 'Werk' };
   // Werk zit in de App Store (categorie "Het huis & diensten"); installeer je
   // het, dan verschijnt het op pagina 2 en opent het met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
@@ -22,9 +22,9 @@
       () => af(null), { enableHighAccuracy: true, timeout: 8000 });
   });
   const WERKDOEL = {
-    personeel: { icoon: '🧭', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
-    zaak:      { icoon: '🏛️', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
-    kantoor:   { icoon: '📊', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
+    personeel: { glyf: 'navigatie', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
+    zaak:      { glyf: 'maison', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
+    kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
   };
 
   /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
@@ -32,7 +32,7 @@
     if (Date.now() < pinOkTot) return af(null);
     API.call('/pin/status', {}).then(st => {
       const zetten = !st.gezet;
-      belTitel.textContent = zetten ? '🔒 ' + T('pin.zet', 'Kies uw algemene pin') : '🔒 ' + T('pin.vraag', 'Algemene pin');
+      belTitel.textContent = zetten ? T('pin.zet', 'Kies uw algemene pin') : T('pin.vraag', 'Algemene pin');
       belLijst.textContent = '';
       const uitleg = document.createElement('div');
       uitleg.className = 'os-bel-leeg';
@@ -71,7 +71,7 @@
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
-    belTitel.textContent = '💼 ' + T('werk.h', 'Werk');
+    belTitel.textContent = T('werk.h', 'Werk');
     belLijst.textContent = '';
     API.call('/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
@@ -85,7 +85,8 @@
       for (const r of rollen) {
         const doel = WERKDOEL[r.rol];
         const b = document.createElement('button');
-        const zi = document.createElement('span'); zi.className = 'zi'; zi.textContent = doel.icoon;
+        const zi = document.createElement('span'); zi.className = 'zi';
+        const zg = window.RTGGlyf && RTGGlyf.svg(doel.glyf); if (zg) zi.appendChild(zg);
         b.appendChild(zi);
         b.appendChild(document.createTextNode(doel.app));
         const m = document.createElement('span'); m.className = 'zm';
@@ -104,7 +105,7 @@
             }
             try { doel.bewaar(s.token, r); } catch (e2) {}
             location.href = doel.url;
-          } catch (e) { bannerToon('💼', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
+          } catch (e) { bannerToon('', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
         }));
         belLijst.appendChild(b);
       }

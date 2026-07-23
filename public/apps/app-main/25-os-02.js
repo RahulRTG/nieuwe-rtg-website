@@ -1,4 +1,5 @@
-      const gi = document.createElement('span'); gi.className = 'zi'; gi.textContent = '🫂';
+      const gi = document.createElement('span'); gi.className = 'zi';
+      const gis = window.RTGGlyf && RTGGlyf.svg('salon'); if (gis) gi.appendChild(gis);
       ga.appendChild(gi); ga.appendChild(document.createTextNode('Naar De Salon'));
       ga.addEventListener('click', () => { sluitScrims(); const b = tabKnop('salon'); if (b) b.click(); });
       belLijst.appendChild(ga);
@@ -9,7 +10,8 @@
       zi.textContent = String(c.codename || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
       b.appendChild(zi);
       b.appendChild(document.createTextNode(c.codename || ''));
-      const m = document.createElement('span'); m.className = 'zm'; m.textContent = app.icoon; b.appendChild(m);
+      const m = document.createElement('span'); m.className = 'zm';
+      const mg = window.RTGGlyf && RTGGlyf.svg(naam); if (mg) m.appendChild(mg); b.appendChild(m);
       b.addEventListener('click', () => {
         sluitScrims();
         if (!window.RTGSocial) return;
@@ -107,7 +109,7 @@
     mapScrim.classList.add('open');
   }
 
-  /* ---------- map hernoemen (wiebel-modus of Butler) ---------- */
+  /* ---------- map hernoemen (wiebel-modus of Rahul) ---------- */
   const hernoemScrim = $('#osHernoemScrim'), hernoemIn = $('#osHernoemIn');
   const hernoemOk = $('#osHernoemOk'), hernoemReset = $('#osHernoemReset');
   let hernoemDoel = null;
@@ -141,24 +143,24 @@
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
   function osActies() {
     const uit = [
-      { naam: 'Licht of donker', icoon: '🌗', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
-      { naam: 'Meldingen', icoon: '🔔', doe: () => { const b = $('#bell'); if (b) b.click(); } },
-      { naam: 'Bedieningspaneel', icoon: '🎛️', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
-      { naam: 'Taal kiezen', icoon: '🌐', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
-      { naam: 'Push aanzetten', icoon: '📳', doe: () => { if (window.RTGRealtime) RTGRealtime.enablePush(); } },
-      { naam: 'Uitloggen', icoon: '⏻', doe: () => { const b = $('#logoutBtn'); if (b) b.click(); } }
+      { naam: 'Licht of donker', glyf: 'thema', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
+      { naam: 'Meldingen', glyf: 'meldingen', doe: () => { const b = $('#bell'); if (b) b.click(); } },
+      { naam: 'Bedieningspaneel', glyf: 'paneel', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
+      { naam: 'Taal kiezen', glyf: 'taal', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
+      { naam: 'Push aanzetten', glyf: 'push', doe: () => { if (window.RTGRealtime) RTGRealtime.enablePush(); } },
+      { naam: 'Uitloggen', glyf: 'uitloggen', doe: () => { const b = $('#logoutBtn'); if (b) b.click(); } }
     ];
     if (window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
       for (const t of ['bordeaux', 'parelmoer', 'standaard']) {
-        uit.push({ naam: 'Thema ' + (t === 'standaard' ? 'klassiek' : t), icoon: '🎨', doe: () => RTGOSThema.zet(t) });
+        uit.push({ naam: 'Thema ' + (t === 'standaard' ? 'klassiek' : t), glyf: 'thema', doe: () => RTGOSThema.zet(t) });
       }
     }
     return uit;
   }
-  // De Butler vanuit het zoekscherm: open zijn app, vul de vraag in en verstuur
-  // via de bestaande chat-knoppen; de hele acties-registry van de Butler
+  // Rahul vanuit het zoekscherm: open zijn app, vul de vraag in en verstuur
+  // via de bestaande chat-knoppen; de hele acties-registry van Rahul
   // (bestellen, boeken, betalen, plannen, annuleren) doet dan gewoon zijn werk.
-  function vraagButler(q) {
+  function vraagRahul(q) {
     sluitScrims();
     const b = tabKnop('ai'); if (b) b.click();
     const inp = $('#askInput'), knop = $('#askBtn');
@@ -200,9 +202,9 @@
       if (acts.length) {
         zoekSectie('Acties');
         for (const a of acts) {
-          const ic = document.createElement('span'); ic.textContent = a.icoon;
+          const ic = (window.RTGGlyf && RTGGlyf.svg(a.glyf)) || document.createTextNode('');
           zoekRij(ic, a.naam, null, () => { sluitScrims(); a.doe(); });
         }
       }
     }
-    // altijd onderaan: geef de vraag aan de Butler, wat het ook is
+    // altijd onderaan: geef de vraag aan Rahul, wat het ook is

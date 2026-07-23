@@ -6,11 +6,11 @@
   function reviewUI(el, o){
     const acts = el.querySelector('.acts');
     acts.innerHTML = '<span style="font-size:0.72rem;color:var(--soft);align-self:center;">' + T('erv.hoewas','Hoe was het?') + '</span>' +
-      [1,2,3,4,5].map(n => '<button class="mo-code js-star" data-n="' + n + '" aria-label="' + n + ' ' + T('erv.sterren','sterren') + '">' + '⭐'.repeat(1) + n + '</button>').join('');
+      [1,2,3,4,5].map(n => '<button class="mo-code js-star" data-n="' + n + '" aria-label="' + n + ' ' + T('erv.sterren','sterren') + '">' + RTGGlyf.svgHTML('ster', { fill: true }) + n + '</button>').join('');
     acts.querySelectorAll('.js-star').forEach(b => b.addEventListener('click', async () => {
       try {
         await API.call('/review', { soort: 'order', ref: o.ref, score: Number(b.dataset.n) });
-        toast('⭐ ' + T('erv.bedanktreview','Dank voor uw beoordeling.'));
+        toast('' + T('erv.bedanktreview','Dank voor uw beoordeling.'));
         renderTerPlaatse();
       } catch(e){ toast(e.message); renderTerPlaatse(); }
     }));
@@ -25,13 +25,13 @@
     acts.innerHTML = '<div style="width:100%;">' +
       '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.35rem;">' + T('erv.splitsmet','Splits gelijk met:') + '</div>' +
       cons.slice(0,8).map(c => '<label style="display:inline-flex;align-items:center;gap:0.3rem;margin:0 0.6rem 0.4rem 0;font-size:0.78rem;"><input type="checkbox" class="js-splid" value="' + c.key + '"> ' + c.codename + '</label>').join('') +
-      '<button class="mo-pay js-splgo" style="width:100%;margin-top:0.2rem;">🤝 ' + T('erv.stuurverzoek','Stuur betaalverzoeken') + '</button></div>';
+      '<button class="mo-pay js-splgo" style="width:100%;margin-top:0.2rem;">' + T('erv.stuurverzoek','Stuur betaalverzoeken') + '</button></div>';
     acts.querySelector('.js-splgo').addEventListener('click', async () => {
       const metKeys = [...acts.querySelectorAll('.js-splid:checked')].map(x => x.value);
       if (!metKeys.length){ toast(T('erv.kiesvriend','Kies minstens een vriend.')); return; }
       try {
         const d = await API.call('/splits', { ref: o.ref, metKeys });
-        toast('🤝 ' + T('erv.verzoekweg','Betaalverzoeken verstuurd:') + ' ' + eur(d.splits.delen[0].bedrag) + ' ' + T('erv.pp','p.p.'));
+        toast('' + T('erv.verzoekweg','Betaalverzoeken verstuurd:') + ' ' + eur(d.splits.delen[0].bedrag) + ' ' + T('erv.pp','p.p.'));
         renderTerPlaatse();
       } catch(e){ toast(e.message); }
     });
@@ -49,7 +49,7 @@
       'aangevraagd': [T('boek.st.aan','aangevraagd'), 'var(--soft)'],
       'bevestigd': [T('boek.st.ok','bevestigd'), 'var(--green, #4C9A75)']
     };
-    wrap.innerHTML = actief.length ? '<div class="sec-label">🗓️ '+T('boek.mijn','Mijn afspraken')+'</div>' + actief.map(b => {
+    wrap.innerHTML = actief.length ? '<div class="sec-label">'+T('boek.mijn','Mijn afspraken')+'</div>' + actief.map(b => {
       const st = BST[b.status] || [b.status, 'var(--soft)'];
       return '<div class="myorder">' +
         '<div class="r1"><div><div class="nm">' + b.supplierName + '</div><div class="sub2">' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + '</div></div>' +
@@ -80,7 +80,7 @@
       (s.vak ? '<div style="font-size:0.72rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;">' + s.vak + ' · ' + s.city + '</div>' : '') +
       s.services.map(x =>
         '<div class="rowitem js-svc" data-svc="' + x.id + '" style="cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;margin-bottom:0.55rem;">' +
-        '<div class="t"><b>' + (x.soort === 'product' ? '📦 ' : '🗓️ ') + x.name + '</b><span>' + (x.desc || '') + (x.duurMin ? ' · ' + x.duurMin + ' min' : '') + '</span></div>' +
+        '<div class="t"><b>' + (x.soort === 'product' ? '' : '') + x.name + '</b><span>' + (x.desc || '') + (x.duurMin ? ' · ' + x.duurMin + ' min' : '') + '</span></div>' +
         '<span class="amount">' + eur(x.price) + '</span></div>').join('') +
       '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">' +
       '<input id="boekDatum" type="date" value="' + morgen + '" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;color-scheme:dark;">' +
@@ -133,7 +133,7 @@
           return d.boeking;
         }, { message: () => T('boek.betaald','Geboekt en betaald; u hoort het zodra het bevestigd is.'), after: () => renderTerPlaatse() });
       } else {
-        toast('🗓️ ' + T('boek.ok','Aanvraag verstuurd; betalen kan achteraf.'));
+        toast('' + T('boek.ok','Aanvraag verstuurd; betalen kan achteraf.'));
         renderTerPlaatse();
       }
     });

@@ -64,14 +64,14 @@
     const autos = d.autos || [];
     const deals = (mijn.deals || []).filter(x => !['gereden','afgeleverd','afgewezen','geannuleerd'].includes(x.status));
     if (!autos.length && !deals.length){ el.innerHTML = ''; return; }
-    let h = '<h3 style="margin:1.6rem 0 0.3rem;font-size:1rem;">🚗 ' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('vk.sub','Exclusieve occasions. Proefrit, bod of inruil.') + '</p>';
+    let h = '<h3 style="margin:1.6rem 0 0.3rem;font-size:1rem;">' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('vk.sub','Exclusieve occasions. Proefrit, bod of inruil.') + '</p>';
     for (const d2 of deals){
-      h += '<div style="border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">' + (d2.soort==='koop'?'🔑 '+T('vk.koop','Koop'):'🚗 '+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
+      h += '<div style="border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">' + (d2.soort==='koop'?''+T('vk.koop','Koop'):''+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
         '<div style="font-size:0.86rem;margin-top:0.2rem;">' + escT(d2.autoNaam) + (d2.prijs?' · € ' + d2.prijs.toLocaleString('nl-NL'):'') + (d2.moment?' · ' + escT(d2.moment):'') + '</div>' +
-        (d2.soort==='koop' && d2.status==='aanvaard' ? '<button class="js-vkteken" data-ref="' + d2.ref + '" style="margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem 0.9rem;font-weight:600;font-family:inherit;cursor:pointer;">✍️ ' + T('vk.teken','Koopcontract tekenen') + '</button>' : '') + '</div>';
+        (d2.soort==='koop' && d2.status==='aanvaard' ? '<button class="js-vkteken" data-ref="' + d2.ref + '" style="margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem 0.9rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('vk.teken','Koopcontract tekenen') + '</button>' : '') + '</div>';
     }
     h += autos.slice(0,20).map(a => '<div style="border:1px solid var(--line);border-radius:16px;padding:0.85rem;margin-bottom:0.7rem;" data-av="' + a.id + '">' +
-      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.95rem;">' + (a.vip?'★ ':'') + escT(a.naam) + '</b><span style="font-weight:600;">€ ' + a.prijs.toLocaleString('nl-NL') + '</span></div>' +
+      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.95rem;">' + (a.vip?'':'') + escT(a.naam) + '</b><span style="font-weight:600;">€ ' + a.prijs.toLocaleString('nl-NL') + '</span></div>' +
       '<div class="sub">' + a.km.toLocaleString('nl-NL') + ' km · ' + escT(a.brandstof) + ' · ' + escT(a.transmissie) + (a.vermogenPk?' · ' + a.vermogenPk + ' pk':'') + (a.garantieMnd?' · ' + a.garantieMnd + ' mnd garantie':'') + '</div>' +
       (a.opties && a.opties.length ? '<div class="sub" style="margin-top:0.2rem;">' + a.opties.slice(0,4).map(escT).join(' · ') + '</div>' : '') +
       '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;">' +
@@ -81,11 +81,11 @@
     el.innerHTML = h;
     el.querySelectorAll('.js-vkteken').forEach(b => b.addEventListener('click', async () => {
       const naam = prompt(T('vk.tekennaam','Typ uw naam om het koopcontract te tekenen:')); if (!naam) return;
-      try { await API.call('/verkoop/teken', { ref: b.dataset.ref, naam }); toast('✍️ ' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/verkoop/teken', { ref: b.dataset.ref, naam }); toast('' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vkproef').forEach(b => b.addEventListener('click', async () => {
       const wens = prompt(T('vk.wens','Wanneer wilt u proefrijden? (bv. zaterdagochtend)')) || '';
-      try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('🚗 ' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vkkoop').forEach(b => b.addEventListener('click', async () => {
       const bod = prompt(T('vk.bodvraag','Uw bod in € (leeg = vraagprijs):'), b.dataset.prijs);

@@ -90,7 +90,7 @@
     if (!mijn.length){ el.innerHTML = ''; return; }
     el.innerHTML = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:0 0 0.5rem;">'+T('care.mijn','Mijn afspraken')+'</div>'+
       mijn.map(b => '<div class="card" style="border-color:rgba(139,195,168,0.35);">'+
-        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green,#8bc3a8);">🌿 '+esc(b.aanbiederNaam)+'</div>'+
+        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green,#8bc3a8);">'+esc(b.aanbiederNaam)+'</div>'+
         '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(b.behandelingNaam)+'</b>'+(b.behandelaarNaam?' · '+esc(b.behandelaarNaam):'')+'</div>'+
         '<div class="soft-sm" style="margin-top:0.15rem;">'+b.datum+' · '+b.tijd+' · '+eur(b.prijs)+' · '+
           (b.paid ? '<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>' : '<span style="color:var(--gold);">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
@@ -112,7 +112,7 @@
     const list = (careOv && careOv.intakes) || [];
     if (!list.length){ el.innerHTML = ''; return; }
     el.innerHTML = '<div class="card" style="border-color:rgba(208,172,87,0.3);">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">🩺 '+T('care.intakes','Gedeelde medische context')+'</div>'+
+      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">'+T('care.intakes','Gedeelde medische context')+'</div>'+
       list.map(i => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.5rem;">'+
         '<div style="font-size:0.85rem;">'+esc(i.aanbiederNaam)+'<div class="soft-sm">'+T('care.tot','tot')+' '+i.vervaltOp+'</div></div>'+
         '<button class="bz-btn" data-care-intakestop="'+esc(i.id)+'">'+T('care.stopdelen','Stop delen')+'</button></div>').join('')+

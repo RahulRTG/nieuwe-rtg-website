@@ -88,7 +88,7 @@
     // kop met aan/uit
     const uit = !s.aan;
     h += '<div style="display:flex;align-items:flex-start;gap:0.7rem;">' +
-      '<span style="font-size:1.3rem;">🌟</span>' +
+      '<span style="font-size:1.3rem;"></span>' +
       '<div style="flex:1;"><b style="font-size:0.9rem;">' + T('ont.titel','Ontmoetingen') + '</b>' +
       '<span style="display:block;font-size:0.68rem;color:var(--muted);">' + T('ont.sub','Connecties die vlakbij zijn kunnen samen afspreken. Alleen jij bepaalt of dit aanstaat.') + '</span></div>' +
       (s.mag
@@ -96,7 +96,7 @@
         : '') +
       '</div>';
     if (!s.mag){
-      h += '<div style="margin-top:0.6rem;font-size:0.72rem;color:var(--soft);border-top:1px solid var(--line);padding-top:0.6rem;">🔒 ' + escT(s.reden || T('ont.magniet','Nog niet beschikbaar.')) + '</div>';
+      h += '<div style="margin-top:0.6rem;font-size:0.72rem;color:var(--soft);border-top:1px solid var(--line);padding-top:0.6rem;">' + escT(s.reden || T('ont.magniet','Nog niet beschikbaar.')) + '</div>';
       el.innerHTML = kaart(h);
       bindOntmoet();
       return;

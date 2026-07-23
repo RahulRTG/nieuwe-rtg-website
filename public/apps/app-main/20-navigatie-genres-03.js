@@ -1,14 +1,14 @@
     for (const a of aanb){
       const medisch = a.soort === 'kliniek' || (a.behandelingen || []).some(b => b.soort === 'medisch');
-      html += '<div class="card"><div style="display:flex;gap:0.5rem;align-items:baseline;"><span style="font-size:1.1rem;">'+esc(a.icon||'🌿')+'</span>'+
+      html += '<div class="card"><div style="display:flex;gap:0.5rem;align-items:baseline;"><span style="font-size:1.1rem;">'+esc(a.icon||'')+'</span>'+
         '<div style="flex:1;"><b>'+esc(a.naam)+'</b> <span class="soft-sm">· '+esc(careSoort[a.soort]||a.soort)+(a.waar?' · '+esc(a.waar):'')+'</span>'+
         (a.beschrijving?'<div class="soft-sm" style="margin-top:0.15rem;">'+esc(a.beschrijving)+'</div>':'')+
-        ((a.behandelaars||[]).length?'<div class="soft-sm" style="margin-top:0.2rem;">👤 '+a.behandelaars.map(b => esc(b.naam)+(b.functie?' ('+esc(b.functie)+')':'')).join(' · ')+'</div>':'')+'</div></div>';
+        ((a.behandelaars||[]).length?'<div class="soft-sm" style="margin-top:0.2rem;">'+a.behandelaars.map(b => esc(b.naam)+(b.functie?' ('+esc(b.functie)+')':'')).join(' · ')+'</div>':'')+'</div></div>';
       // intake-deling voor klinieken/medische zorg: uitdrukkelijk en per aanbieder
       if (medisch){
         const actief = !!a.intakeActief;
         html += '<div style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div class="soft-sm" style="margin-bottom:0.35rem;">🩺 '+(actief
+          '<div class="soft-sm" style="margin-bottom:0.35rem;">'+(actief
             ? T('care.intakeaan','U deelt medische context met deze kliniek. U kunt dit bij Mijn afspraken stoppen.')
             : T('care.intakeuit','Wilt u dat de behandelaar iets weet (medicijnen, allergie, aandoening)? Deel het apart en alleen met deze kliniek.'))+'</div>'+
           (actief ? '' :
@@ -72,7 +72,7 @@
     // mijn geboekte pakketten
     for (const b of carePakMijn){
       html += '<div class="card" style="border-color:rgba(194,58,94,0.3);">'+
-        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);">🌸 '+T('care.pakket','Pakket')+'</div>'+
+        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);">'+T('care.pakket','Pakket')+'</div>'+
         '<div style="margin-top:0.3rem;font-size:0.92rem;"><b>'+esc(b.naam)+'</b></div>'+
         '<div class="soft-sm">'+b.nachten+' '+T('care.nachten','nachten')+' · '+esc(b.hotelNaam)+' · '+b.datum+' '+b.tijd+' · '+eur(b.prijs)+
           ' · '+(b.paid?'<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>':'<span style="color:var(--gold);">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
@@ -85,6 +85,6 @@
       html += '<div class="card"><div style="display:flex;justify-content:space-between;gap:0.5rem;">'+
         '<div style="flex:1;"><b>'+esc(p.naam)+'</b>'+
         '<div class="soft-sm" style="margin-top:0.15rem;">'+esc(p.beschrijving)+'</div>'+
-        '<div class="soft-sm" style="margin-top:0.25rem;">🏨 '+esc(p.hotelNaam)+' · '+p.nachten+' '+T('care.nachten','nachten')+' + '+esc(p.behandelingNaam)+' ('+p.duurMin+' min)</div></div>'+
+        '<div class="soft-sm" style="margin-top:0.25rem;">'+esc(p.hotelNaam)+' · '+p.nachten+' '+T('care.nachten','nachten')+' + '+esc(p.behandelingNaam)+' ('+p.duurMin+' min)</div></div>'+
         '<div style="text-align:right;white-space:nowrap;"><div style="color:var(--gold);font-size:0.95rem;">'+eur(p.prijs)+'</div>'+
         (p.bespaar>0?'<div class="soft-sm" style="color:var(--green,#8bc3a8);">'+T('care.bespaar','bespaar')+' '+eur(p.bespaar)+'</div>':'')+'</div></div>';

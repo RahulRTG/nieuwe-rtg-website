@@ -82,7 +82,7 @@
         bubble(q, 'user');
         bubble(r.antwoord, 'ai');
         if (!user.account){ chatHistory.push({role:'user', content:q}); chatHistory.push({role:'assistant', content:r.antwoord}); }
-        if (r.gedaan) toast('🤵 ' + T('fl.gedaan','Rahul heeft het geregeld.'));
+        if (r.gedaan) toast('' + T('fl.gedaan','Rahul heeft het geregeld.'));
         voorstelChips(!!r.voorstel);
         if (typeof renderFluister === 'function') renderFluister();
         $('#content').scrollTop = $('#content').scrollHeight;

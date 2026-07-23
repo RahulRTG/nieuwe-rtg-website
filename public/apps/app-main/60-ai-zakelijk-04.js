@@ -1,7 +1,7 @@
         const laad = async () => {
           const d = await API.call('/zakelijk/kansen', { q: $('#kansZoek').value, soort: $('#kansSoortF').value || undefined });
           const kaart = (k) => '<div class="zak-kaart">' +
-            '<div style="display:flex;gap:0.5rem;align-items:baseline;"><span>' + (SOORT_ICO[k.soort] || k.icon || '✨') + '</span>' +
+            '<div style="display:flex;gap:0.5rem;align-items:baseline;"><span>' + (SOORT_ICO[k.soort] || k.icon || '') + '</span>' +
             '<div class="grow-min"><b style="font-size:0.84rem;">' + escT(k.titel) + '</b>' +
             (!k.open ? ' <span class="zak-chip">' + T('zak.k.dicht','vervuld') + '</span>' : '') +
             '<div style="font-size:0.66rem;color:var(--soft);">' +
@@ -37,8 +37,8 @@
           '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('zak.k.nieuw','Plaats een kans') + '</b>' +
           '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">' +
           '<select id="kansSoort" aria-label="' + T('zak.k.soort','Soort kans') + '" style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.5rem;color:var(--txt);font-family:inherit;font-size:0.74rem;">' +
-          opt('opdracht','🛠️ ' + T('zak.k.opdracht','Opdracht')) + opt('samenwerking','🤝 ' + T('zak.k.samen','Samenwerking')) +
-          opt('vacature','📋 ' + T('zak.k.vac','Vacature')) + opt('investering','💶 ' + T('zak.k.inv','Investering')) + opt('anders','✨ ' + T('zak.k.anders','Anders')) + '</select>' +
+          opt('opdracht','' + T('zak.k.opdracht','Opdracht')) + opt('samenwerking','' + T('zak.k.samen','Samenwerking')) +
+          opt('vacature','' + T('zak.k.vac','Vacature')) + opt('investering','' + T('zak.k.inv','Investering')) + opt('anders','' + T('zak.k.anders','Anders')) + '</select>' +
           '<input id="kansTitel" placeholder="' + T('zak.k.titelph','Titel, bijv. Fotograaf gezocht voor merkcampagne') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.6rem;color:var(--txt);font-family:inherit;font-size:0.74rem;"></div>' +
           '<textarea id="kansOms" placeholder="' + T('zak.k.omsph','Omschrijf kort wat u zoekt of biedt…') + '" style="width:100%;min-height:52px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);font-family:inherit;font-size:0.74rem;margin-top:0.4rem;"></textarea>' +
           '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;align-items:center;">' +

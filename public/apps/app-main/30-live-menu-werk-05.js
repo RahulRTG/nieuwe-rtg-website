@@ -28,11 +28,11 @@
     let head = '';
     // rating + favoriet-hart + tafel reserveren (de ervaring-laag)
     head += '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.2rem 0 0.6rem;">' +
-      (s.rating ? '<span style="font-size:0.8rem;">⭐ <b>' + s.rating.score + '</b> <span style="color:var(--soft);font-size:0.7rem;">(' + s.rating.aantal + ')</span></span>' : '<span style="font-size:0.72rem;color:var(--soft);">' + T('erv.nogGeenReviews','Nog geen reviews') + '</span>') +
-      '<button id="msFav" style="margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.85rem;" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '❤️ ' + T('fav.bewaard','Bewaard') : '🤍 ' + T('fav.bewaar','Bewaar')) + '</button></div>';
+      (s.rating ? '<span style="font-size:0.8rem;"><b>' + s.rating.score + '</b> <span style="color:var(--soft);font-size:0.7rem;">(' + s.rating.aantal + ')</span></span>' : '<span style="font-size:0.72rem;color:var(--soft);">' + T('erv.nogGeenReviews','Nog geen reviews') + '</span>') +
+      '<button id="msFav" style="margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.85rem;" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '' + T('fav.bewaard','Bewaard') : '' + T('fav.bewaar','Bewaar')) + '</button></div>';
     if ((s.tableNames || []).length && s.reservationsOpen !== false){
       const morgen = new Date(Date.now() + 86400000).toISOString().slice(0,10);
-      head += '<div class="ms-cat">🪑 ' + T('erv.reserveer.h','Tafel reserveren') + '</div>' +
+      head += '<div class="ms-cat">' + T('erv.reserveer.h','Tafel reserveren') + '</div>' +
         '<div style="display:flex;gap:0.4rem;align-items:center;padding:0.2rem 0 0.9rem;flex-wrap:wrap;">' +
         '<input type="date" id="rsvDatum" value="' + morgen + '" min="' + new Date().toISOString().slice(0,10) + '" style="flex:2;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);" aria-label="' + T('erv.datum','Datum') + '">' +
         '<input type="time" id="rsvTijd" value="20:00" style="flex:1;min-width:84px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);" aria-label="' + T('erv.tijd','Tijd') + '">' +
@@ -57,7 +57,7 @@
         '<div style="margin:0.5rem 0 0.6rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote2','Tegen nettoprijs; het huis bevestigt uw verblijf en de rekening loopt op de kamer.') + '</div>' +
         // keyless: tijdens een ingecheckt verblijf is de telefoon de sleutel
         '<div style="display:flex;gap:0.5rem;padding-bottom:0.8rem;">' +
-        '<button class="vbtn" id="vbDeurKamer" style="flex:1;">🗝️ ' + T('vb.deurkamer','Open mijn kamerdeur') + '</button>' +
+        '<button class="vbtn" id="vbDeurKamer" style="flex:1;">' + T('vb.deurkamer','Open mijn kamerdeur') + '</button>' +
         '<button class="vbtn" id="vbDeurEntree" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);">' + T('vb.deurentree','Open de entree') + '</button></div>';
     }
     const funcs = APPLY_FUNCS[s.type] || [];
@@ -77,7 +77,7 @@
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;gap:0.6rem;">' +
           '<span style="font-size:0.72rem;color:' + (e.spotsLeft > 0 ? 'var(--soft)' : 'var(--burgundy)') + ';">' + (e.spotsLeft > 0 ? e.spotsLeft + ' ' + T('ev.spots','plekken vrij') : T('ev.full','Vol')) + (e.price ? ' \u00b7 ' + eur(e.price) + ' p.p.' : ' \u00b7 ' + T('ev.free','gratis')) + '</span>' +
           (e.spotsLeft > 0 ? '<button class="vbtn" data-rsvp="' + e.id + '">' + T('ev.join','Zet mij op de lijst') + '</button>'
-            : '<button class="vbtn" data-wl="' + e.id + '">⏳ ' + T('erv.wachtlijst','Wachtlijst') + '</button>') +
+            : '<button class="vbtn" data-wl="' + e.id + '">' + T('erv.wachtlijst','Wachtlijst') + '</button>') +
           '</div></div>'
         ).join('')
       : '';

@@ -6,18 +6,18 @@
           '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">' +
           (d.ikTekende
             ? '<span style="flex:1;font-size:0.72rem;color:var(--gold);align-self:center;">✓ ' + T('ont.jijtekende','Jij tekende. ') + (d.anderTekende ? '' : T('ont.wachtander','Wachten op ') + metNaam) + '</span>'
-            : '<button class="js-oteken" data-d="' + d.id + '" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:999px;padding:0.55rem;font-weight:600;font-family:inherit;cursor:pointer;">✍️ ' + T('ont.teken','Contract tekenen') + '</button>') +
+            : '<button class="js-oteken" data-d="' + d.id + '" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:999px;padding:0.55rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('ont.teken','Contract tekenen') + '</button>') +
           '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.55rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">' + T('ont.annuleer','Annuleren') + '</button>' +
           '</div></div>';
       } else if (d.status === 'actief' || d.status === 'noodgeval'){
         const nood = d.status === 'noodgeval';
         blokken += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;' + (nood ? 'background:rgba(220,40,40,0.08);border-radius:10px;padding:0.7rem;' : '') + '">' +
           '<b style="font-size:0.82rem;">' + d.icon + ' ' + escT(d.activiteitLabel) + ' ' + T('ont.met','met') + ' ' + metNaam + '</b>' +
-          '<div style="font-size:0.64rem;color:var(--muted);margin:0.25rem 0 0.5rem;">🛰️ ' + T('ont.kijktmee','RTG-kantoor kijkt live mee voor jullie veiligheid, tot jullie afronden.') + '</div>' +
-          (nood ? '<div style="font-size:0.72rem;color:#ff8a8a;font-weight:600;margin-bottom:0.4rem;">🚨 ' + T('ont.noodloopt','Noodsignaal actief. Kantoor kijkt mee via je camera.') + '</div>' : '') +
+          '<div style="font-size:0.64rem;color:var(--muted);margin:0.25rem 0 0.5rem;">' + T('ont.kijktmee','RTG-kantoor kijkt live mee voor jullie veiligheid, tot jullie afronden.') + '</div>' +
+          (nood ? '<div style="font-size:0.72rem;color:#ff8a8a;font-weight:600;margin-bottom:0.4rem;">' + T('ont.noodloopt','Noodsignaal actief. Kantoor kijkt mee via je camera.') + '</div>' : '') +
           '<div style="display:flex;gap:0.5rem;">' +
-          '<button class="js-osos" data-d="' + d.id + '" style="flex:1;background:#c62828;color:#fff;border:none;border-radius:999px;padding:0.6rem;font-weight:700;font-family:inherit;cursor:pointer;">🚨 ' + T('ont.sos','SOS') + '</button>' +
-          '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.6rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">🏁 ' + T('ont.afronden','Afronden') + '</button>' +
+          '<button class="js-osos" data-d="' + d.id + '" style="flex:1;background:#c62828;color:#fff;border:none;border-radius:999px;padding:0.6rem;font-weight:700;font-family:inherit;cursor:pointer;">' + T('ont.sos','SOS') + '</button>' +
+          '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.6rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">' + T('ont.afronden','Afronden') + '</button>' +
           '</div></div>';
       }
     }
@@ -26,7 +26,7 @@
     for (const v of (s.voorstellen || [])){
       const metNaam = escT(v.met);
       voors += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;">' +
-        '<b style="font-size:0.82rem;">📍 ' + metNaam + ' ' + T('ont.indebuurt','is in de buurt') + '</b>';
+        '<b style="font-size:0.82rem;">' + metNaam + ' ' + T('ont.indebuurt','is in de buurt') + '</b>';
       if (v.mijnKeuze){
         voors += '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.35rem;">✓ ' + T('ont.jijkoos','Jij koos') + ' ' + escT((s.activiteiten.find(a => a.id === v.mijnKeuze) || {}).label || v.mijnKeuze) + '. ' + T('ont.wachtkeuze','Wachten op de keuze van ') + metNaam + '.</div>';
       } else {
@@ -56,14 +56,14 @@
   }
   async function ontmoetKies(voorstelId, keuze){
     try { const r = await API.call('/ontmoeten/kies', { voorstelId, keuze }); ontmoetState = r.state;
-      if (r.status === 'gematcht') toast('🎉 ' + T('ont.match','Match! Teken het contract om te starten.'));
+      if (r.status === 'gematcht') toast('' + T('ont.match','Match! Teken het contract om te starten.'));
       renderOntmoet();
     } catch(e){ toast(e.message); }
   }
   async function ontmoetTeken(dateId){
     if (!confirm(T('ont.tekenbevestig','Ik ben 18+ met een geverifieerd paspoort en ga akkoord met het veiligheidscontract: RTG-kantoor mag mijn live-locatie zien tot de afspraak klaar is, en bij SOS meekijken via de camera en 112 bellen.'))) return;
     try { const r = await API.call('/ontmoeten/teken', { dateId }); ontmoetState = r.state; renderOntmoet(); beheerOntmoetTimer();
-      if (r.status === 'actief') toast('✅ ' + T('ont.gestart','Afspraak gestart. RTG kijkt mee voor jullie veiligheid.'));
+      if (r.status === 'actief') toast('' + T('ont.gestart','Afspraak gestart. RTG kijkt mee voor jullie veiligheid.'));
     } catch(e){ toast(e.message); }
   }
   async function ontmoetStop(dateId){
@@ -74,7 +74,7 @@
     const pos = await ontmoetPositie();
     try {
       await API.call('/ontmoeten/sos', { dateId, bericht: T('ont.sosbericht','Ik voel me niet veilig'), lat: pos ? pos.lat : undefined, lng: pos ? pos.lng : undefined });
-      toast('🚨 ' + T('ont.sosverstuurd','SOS verstuurd. RTG-kantoor is gewaarschuwd en kijkt mee.'));
+      toast('' + T('ont.sosverstuurd','SOS verstuurd. RTG-kantoor is gewaarschuwd en kijkt mee.'));
       ontmoetSosLive(dateId);         // camera + microfoon naar kantoor
       try { window.location.href = 'tel:112'; } catch(e){}   // en direct de hulpdiensten
       await laadOntmoet();

@@ -36,7 +36,7 @@
         (items.length
           ? items.map(it =>
             '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.7rem;">' +
-            '<div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">' + (it.soort === 'folder' ? '📖 ' + T('sal.folder','Folder') : it.soort === 'deal' ? '🎁 ' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? '📊 Poll' : '📣 ' + T('sal.bericht','Bericht')) + '</div>' +
+            '<div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">' + (it.soort === 'folder' ? '' + T('sal.folder','Folder') : it.soort === 'deal' ? '' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? 'Poll' : '' + T('sal.bericht','Bericht')) + '</div>' +
             (it.folder ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.folder.titel) + '</div>' +
               ((it.folder.fotos && it.folder.fotos.length) ? '<div style="display:flex;gap:0.4rem;overflow-x:auto;margin-top:0.45rem;">' + it.folder.fotos.map(f => '<img src="' + f + '" alt="" style="height:90px;border-radius:8px;flex-shrink:0;">').join('') + '</div>' : '') +
               ((it.folder.items && it.folder.items.length) ? '<div style="margin-top:0.45rem;display:grid;gap:0.2rem;">' + it.folder.items.map(x => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(x.naam) + '</span>' + (x.prijs != null ? '<span style="color:var(--gold);">' + eur2(x.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '')
@@ -65,7 +65,7 @@
     if (user && (user.tier === 'business' || user.tier === 'lifestyle')){
       zakL.style.display = 'block';
       zakL.innerHTML = '<button id="zakOpenBtn" style="display:flex;align-items:center;gap:0.7rem;width:100%;text-align:left;background:none;border:1px solid var(--gold);border-radius:14px;padding:0.75rem 1rem;margin-bottom:0.8rem;color:var(--txt);font-family:inherit;cursor:pointer;">' +
-        '<span style="font-size:1.2rem;">💼</span><span style="flex:1;"><b style="font-size:0.85rem;">' + T('zak.h','RTG Zakelijk') + '</b>' +
+        '<span style="font-size:1.2rem;"></span><span style="flex:1;"><b style="font-size:0.85rem;">' + T('zak.h','RTG Zakelijk') + '</b>' +
         '<span style="display:block;font-size:0.68rem;color:var(--muted);">' + T('zak.launch','Uw professionele netwerk: profiel, gids, feed en aanbevelingen.') + '</span></span>' +
         '<span style="color:var(--gold);">›</span></button>';
       $('#zakOpenBtn').addEventListener('click', zakOpen);

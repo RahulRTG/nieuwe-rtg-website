@@ -1,5 +1,5 @@
       const adres = concierge ? (prompt(T('vk.adres','Afleveradres:')) || '') : '';
-      try { await API.call('/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres }); toast('🔑 ' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres }); toast('' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
   }
 
@@ -11,7 +11,7 @@
     try { markt = await API.call('/groothandel/markt'); mijn = await API.call('/groothandel/mijn'); } catch(e){ el.innerHTML = ''; return; }
     const winkels = markt.groothandels || [];
     if (!winkels.length && !(mijn.bestellingen||[]).length){ el.innerHTML = ''; return; }
-    let h = '<h3 style="margin:1.4rem 0 0.3rem;font-size:1rem;">🛒 ' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('bo.sub','Bestel en laat bezorgen.') + '</p>';
+    let h = '<h3 style="margin:1.4rem 0 0.3rem;font-size:1rem;">' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('bo.sub','Bestel en laat bezorgen.') + '</p>';
     for (const g of winkels){
       h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">' +
         '<b>' + escT(g.naam) + '</b><span class="sub"> · ' + escT(g.city||'') + '</span>' +
@@ -29,7 +29,7 @@
       const regels = [];
       el.querySelectorAll('.js-boq[data-code="' + b.dataset.code + '"]').forEach(inp => { const a = Number(inp.value)||0; if (a>0) regels.push({ productId: inp.dataset.pid, aantal: a }); });
       if (!regels.length) return toast(T('bo.kies','Vul minstens een aantal in.'));
-      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels }); toast('🛒 ' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
     }));
   }
   async function laadBzMijn(){

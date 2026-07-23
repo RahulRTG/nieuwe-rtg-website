@@ -29,7 +29,7 @@
     if (!socialOK || !user || (user.tier === 'guest' && !user.account)){ el.hidden = true; return; }
     el.hidden = false;
     el.innerHTML = '<div class="label">'+T('spel.label','Spelen')+'</div>'+
-      '<div class="big" style="font-size:1.02rem;">🎲 '+T('spel.kop','Een potje tussendoor?')+'</div>'+
+      '<div class="big" style="font-size:1.02rem;">'+T('spel.kop','Een potje tussendoor?')+'</div>'+
       '<div class="meta" style="margin:.2rem 0 .7rem;">'+T('spel.uitleg','Schaken, Woordduel, Magnaat, 30 Seconden, Proost (18+) en Vingerroulette. Tegen vrienden of een random tegenstander; samen spelen maakt je niet automatisch vrienden.')+'</div>'+
       '<button class="go" id="gaSpelen">'+T('spel.ga','Naar de spellen')+' →</button>';
     el.querySelector('#gaSpelen').addEventListener('click', () => { location.href = '/apps/spelen.html?pas=' + encodeURIComponent(vastePas || 'rtg'); });
@@ -63,9 +63,9 @@
         '<span class="sc-av" style="width:2.2rem;height:2.2rem;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+initCN(c.codename)+(c.unread?'<span class="sc-badge">'+c.unread+'</span>':'')+'</span>'+
         '<b style="flex:1;min-width:0;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+escT(c.codename)+'</b>'+
         '<button class="go" style="padding:.2rem .5rem;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">Bericht</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-snap="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'" title="Snap">📷</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">📞</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">🎥</button></div>'
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-snap="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'" title="Snap">'+RTGGlyf.svgHTML('camera')+'</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+RTGGlyf.svgHTML('bellen')+'</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'
       ).join('') + '<button class="go" style="margin-top:.7rem;background:transparent;color:var(--muted);" data-goto="salon">+ Iemand toevoegen</button>';
     }
     el.innerHTML = html;
@@ -89,8 +89,8 @@
     const foto = await snapVerklein(f); if(!foto){ toast(T('snap.leesfout','Kon de foto niet lezen.')); return; }
     const tekst = prompt(T('snap.tekst','Tekst erbij (mag leeg):'),'') || '';
     try {
-      if (snapStoryMode){ await API.call('/member/story/post', { foto, tekst }); toast('✨ '+T('snap.storyok','Je verhaal staat er 24 uur op.')); loadStories(); }
-      else { await API.call('/member/snap/send', { toKey: snapNaar, foto, tekst }); toast('📷 '+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
+      if (snapStoryMode){ await API.call('/member/story/post', { foto, tekst }); toast(''+T('snap.storyok','Je verhaal staat er 24 uur op.')); loadStories(); }
+      else { await API.call('/member/snap/send', { toKey: snapNaar, foto, tekst }); toast(''+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
     } catch(err){ toast(err.message); }
   }
   function snapVerklein(file){

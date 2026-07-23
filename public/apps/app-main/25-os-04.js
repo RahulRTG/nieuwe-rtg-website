@@ -6,7 +6,7 @@
       app.appendChild(bannerEl);
     }
     bannerEl.textContent = '';
-    const ic = document.createElement('span'); ic.className = 'ob-ic'; ic.textContent = icoon || '🔔';
+    const ic = document.createElement('span'); ic.className = 'ob-ic'; ic.textContent = icoon || '';
     const kol = document.createElement('span');
     const t = document.createElement('div'); t.className = 'ob-titel'; t.textContent = titel || 'RTG';
     kol.appendChild(t);
@@ -29,7 +29,7 @@
       const oud = opts.onChange;
       opts.onChange = n => {
         if (oud) oud(n);
-        if (n && n.title) bannerToon(n.icon || '🔔', n.title, n.body || '');
+        if (n && n.title) bannerToon(n.icon || '', n.title, n.body || '');
       };
       return echteStart(token, opts);
     };

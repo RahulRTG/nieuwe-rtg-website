@@ -1,10 +1,10 @@
       for (const b of p.boten){
         const open = chOpen === p.code + ':' + b.id;
         html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="font-size:0.88rem;">'+(b.icoon||'🛥️')+' '+esc(b.naam)+'</div>'+
+          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="font-size:0.88rem;">'+(b.icoon||'')+' '+esc(b.naam)+'</div>'+
           '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(b.dagprijs)+'/'+T('ch.dag','dag')+'</span></div>'+
-          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+esc(b.type||'')+' · '+(b.lengte||0)+'m · 👥'+(b.gasten||'-')+(b.hutten?' · 🛏️'+b.hutten:'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+
-          ' · '+(b.skipperVerplicht?'⚓ '+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs of schipper'):T('ch.vrij','vrij')))+'</div>';
+          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+esc(b.type||'')+' · '+(b.lengte||0)+'m · '+(b.gasten||'-')+(b.hutten?' · '+b.hutten:'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+
+          ' · '+(b.skipperVerplicht?''+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs of schipper'):T('ch.vrij','vrij')))+'</div>';
         if (open){
           const verplicht = b.skipperVerplicht;
           html += '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+
@@ -12,8 +12,8 @@
             '<div class="bz-veld" style="flex:1;margin-top:0;"><label>'+T('ch.tot','Tot')+'</label><input type="date" id="chTot" value="'+chKeuze.tot+'"></div>'+
             '<div class="bz-veld" style="width:76px;margin-top:0;"><label>'+T('ch.gastn','Gasten')+'</label><input type="number" id="chGasten" min="1" max="'+(b.gasten||12)+'" value="'+Math.min(2,b.gasten||2)+'"></div></div>'+
             (verplicht
-              ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;">⚓ '+T('ch.altijdskipper','Dit vaartuig vaart altijd met een schipper (+'+eur(b.skipperPrijsPerDag||0)+'/'+T('ch.dag','dag')+').')+'</div>'
-              : '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.55rem;"><input type="checkbox" id="chSkipper"> ⚓ '+T('ch.wilskipper','Met schipper (+'+eur(b.skipperPrijsPerDag||0)+'/'+T('ch.dag','dag')+')')+'</label>'+
+              ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;">'+T('ch.altijdskipper','Dit vaartuig vaart altijd met een schipper (+'+eur(b.skipperPrijsPerDag||0)+'/'+T('ch.dag','dag')+').')+'</div>'
+              : '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.55rem;"><input type="checkbox" id="chSkipper">  '+T('ch.wilskipper','Met schipper (+'+eur(b.skipperPrijsPerDag||0)+'/'+T('ch.dag','dag')+')')+'</label>'+
                 '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.35rem;"><input type="checkbox" id="chVaarbewijs"> '+T('ch.hebvaarbewijs','Ik vaar bareboat en heb een geldig vaarbewijs')+'</label>')+
             '<button class="bz-groot" id="chBoek" style="margin-top:0.7rem;" data-verplicht="'+(verplicht?'1':'0')+'">'+T('ch.boek','Boek en betaal, vaste prijs')+'</button>';
         } else {

@@ -1,6 +1,6 @@
       // Borden: dezelfde werkbord-module als de zaken gebruiken (shared/borden.js)
       '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;">' +
-      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">📋 ' + T('bd2.h','Borden · uw projecten') + '</div>' +
+      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">' + T('bd2.h','Borden · uw projecten') + '</div>' +
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('bd2.s','Hetzelfde werkbord als in de RTG-bedrijfsapps: lijsten en kaarten voor uw eigen projecten en administratie.') + '</div>' +
       '<div id="lidBordenWrap"></div></div>';
     if (window.BordenUI){
@@ -44,7 +44,7 @@
           rij(T('zzp.belastbaar','Belastbaar (na aftrek)'), eur(d.belastbaar)) +
           rij(T('zzp.teBetalen','Te betalen (indicatie)'), eur(d.belasting), true) +
           rij(T('zzp.netto','Netto over'), eur(d.netto), true) +
-          '<div style="margin-top:0.55rem;padding-top:0.55rem;border-top:1px solid var(--line);color:var(--gold);">💡 ' + T('zzp.reserveer','Zet ~') + d.reserveerPct + '% ' + T('zzp.opzij','opzij: ongeveer') + ' ' + eur(d.perMaand) + ' ' + T('zzp.pm','per maand') + '.</div>' +
+          '<div style="margin-top:0.55rem;padding-top:0.55rem;border-top:1px solid var(--line);color:var(--gold);">' + T('zzp.reserveer','Zet ~') + d.reserveerPct + '% ' + T('zzp.opzij','opzij: ongeveer') + ' ' + eur(d.perMaand) + ' ' + T('zzp.pm','per maand') + '.</div>' +
           '<div style="margin-top:0.5rem;">' + d.regels.map(r => '• ' + r).join('<br>') + '</div>' +
           '<div style="margin-top:0.5rem;font-size:0.64rem;color:var(--soft);">' + T('zzp.disc','Indicatie op jaarbasis; dit is voorlichting, geen bindend fiscaal advies.') + '</div>';
       } catch(e){ box.textContent = e.message; }

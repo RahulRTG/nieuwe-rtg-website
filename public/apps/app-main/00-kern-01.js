@@ -37,8 +37,8 @@
           note.innerHTML = '<button class="msg-toggle" type="button"></button>';
           const btn = note.querySelector('.msg-toggle');
           const setLabel = shown => btn.textContent = shown==='t'
-            ? '🌐 ' + T('msg.from','vertaald uit') + ' ' + langName(from) + ' · ' + T('msg.orig','toon origineel')
-            : '🌐 ' + T('msg.showtrans','toon vertaling');
+            ? '' + T('msg.from','vertaald uit') + ' ' + langName(from) + ' · ' + T('msg.orig','toon origineel')
+            : '' + T('msg.showtrans','toon vertaling');
           let shown = 't'; setLabel(shown);
           btn.addEventListener('click', () => {
             shown = shown==='t' ? 'o' : 't';

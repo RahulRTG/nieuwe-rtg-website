@@ -16,7 +16,7 @@
   }
   function rtfBerichtHtml(x){
     return '<div style="padding:.55rem .7rem;border:1px solid var(--line);border-radius:12px;margin:.4rem 0;'+(x.gelezen?'':'border-color:var(--burgundy,#C23A5E);')+(x.soort==='hulp'?'background:rgba(194,58,94,.08);':'')+'">'+
-      '<div style="font-size:.72rem;color:var(--muted);">'+(x.soort==='hulp'?'🆘 ':(x.soort==='reis'?'✈️ ':''))+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
+      '<div style="font-size:.72rem;color:var(--muted);">'+(x.soort==='hulp'?'':(x.soort==='reis'?'':''))+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
       '<div style="font-size:.92rem;line-height:1.4;margin-top:.15rem;white-space:pre-wrap;">'+esc(x.tekst)+'</div></div>';
   }
   function renderGezin(){
@@ -25,7 +25,7 @@
     $('#gezinSub').textContent = g.length ? 'De RTFoundation-gezinnen die je als oppas of familie volgt.' : 'Je volgt nog geen gezin.';
     fam.innerHTML = '<div class="label">Gevolgde gezinnen</div>'+
       (g.length ? g.map(x=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><b style="flex:1;">'+esc(x.gezinNaam)+'</b><span class="meta">als '+esc(x.profielNaam)+'</span><button class="go" style="background:transparent;color:var(--muted);padding:.2rem .4rem;" data-los="'+x.code+'|'+x.profielId+'">Ontkoppel</button></div>').join('') : '<div class="meta">Nog geen gezin gekoppeld.</div>')+
-      '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;"><button class="go" id="rtfKoppelBtn2">Koppel een gezin →</button><button class="go" id="rtfPushBtn" style="background:transparent;color:var(--muted);">🔔 Meldingen op mijn telefoon</button></div>';
+      '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;"><button class="go" id="rtfKoppelBtn2">Koppel een gezin →</button><button class="go" id="rtfPushBtn" style="background:transparent;color:var(--muted);">Meldingen op mijn telefoon</button></div>';
     feed.innerHTML = '<div class="label">Meldingen van het gezin</div>'+
       (m.length ? m.slice(0,30).map(rtfBerichtHtml).join('') : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier en op je telefoon.</div>')+
       (g.length ? '<div style="display:flex;gap:.5rem;margin-top:.8rem;"><input id="rtfReplyIn" placeholder="Antwoord het gezin..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;color:var(--txt);"><button class="go" id="rtfReplyBtn">Stuur</button></div>' : '');
@@ -47,9 +47,9 @@
     else if (window.GezinRT){ GezinRT.setLeden(kan.leden); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
     const byId={}; chats.forEach(c=> byId[c.id]=c);
-    box.innerHTML='<div class="label">💬 Chat en bellen</div>'+
+    box.innerHTML='<div class="label">Chat en bellen</div>'+
       '<div class="meta" style="margin-bottom:.4rem;">Bericht of (video)bel het gezin in de app.</div>'+
-      kan.leden.map(function(l){ var c=byId[l.id]||{}; return '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><span style="width:2rem;height:2rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+(l.avatar||'🙂')+'</span><div class="grow-min"><b>'+esc(l.naam)+'</b>'+(c.ongelezen?' <span style="color:var(--burgundy);">('+c.ongelezen+')</span>':'')+(c.laatste?'<div class="meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(c.laatste)+'</div>':'')+'</div><button class="go" style="padding:.2rem .5rem;" data-chat="'+l.id+'">Chat</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-bel="'+l.id+'">📞</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-video="'+l.id+'">🎥</button></div>'; }).join('')+
+      kan.leden.map(function(l){ var c=byId[l.id]||{}; return '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><span style="width:2rem;height:2rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;font-weight:700;color:#0C0C0B;">'+(l.avatar||esc((l.naam||'?').charAt(0).toUpperCase()))+'</span><div class="grow-min"><b>'+esc(l.naam)+'</b>'+(c.ongelezen?' <span style="color:var(--burgundy);">('+c.ongelezen+')</span>':'')+(c.laatste?'<div class="meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(c.laatste)+'</div>':'')+'</div><button class="go" style="padding:.2rem .5rem;" data-chat="'+l.id+'">Chat</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-bel="'+l.id+'">'+RTGGlyf.svgHTML('bellen')+'</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-video="'+l.id+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'; }).join('')+
       '<div id="grtThread" style="display:none;margin-top:.7rem;"></div>';
     box.querySelectorAll('[data-chat]').forEach(function(b){ b.onclick=function(){ openGrtThread(b.dataset.chat, kan.leden.find(function(x){return x.id===b.dataset.chat;})); }; });
     box.querySelectorAll('[data-bel]').forEach(function(b){ b.onclick=function(){ GezinRT.bel(b.dataset.bel,false); }; });

@@ -9,7 +9,7 @@
     if (!memberFacturen){ laadFacturenLid(); return; }
     const o = memberFacturen, items = o.facturen || [];
     const inp = 'style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.55rem;color:var(--txt);font-family:inherit;font-size:0.76rem;"';
-    let h = '<div class="zak-kaart"><b style="font-size:0.8rem;">🧾 ' + T('fact.mijn','Mijn facturen') + (o.telling?' <span style="color:var(--gold);">('+o.telling+')</span>':'') + '</b>';
+    let h = '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('fact.mijn','Mijn facturen') + (o.telling?' <span style="color:var(--gold);">('+o.telling+')</span>':'') + '</b>';
     h += items.length
       ? '<div style="font-size:0.72rem;color:var(--muted);margin:0.3rem 0 0.4rem;">'+T('fact.besteed','Samen besteed')+': '+eur(o.besteed||0)+'</div>' + items.slice(0,30).map(f => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.78rem;margin-top:0.4rem;"><span>'+esc(f.verkoper)+'<span style="color:var(--muted);"> · '+esc(f.datum)+' · '+esc(f.nummer)+'</span></span><span style="white-space:nowrap;"><b>'+eur(f.totaal)+'</b> <button class="fact-pdf" data-fpdf="'+f.id+'" data-nr="'+esc(f.nummer)+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.15rem 0.45rem;color:var(--txt);font-size:0.68rem;cursor:pointer;">PDF</button></span></div>').join('')
       : '<div class="fineprint" style="margin-top:0.4rem;">'+T('fact.geenlid','U heeft nog geen facturen. Bij een aankoop op uw codenaam verschijnt hier automatisch de factuur.')+'</div>';
@@ -30,7 +30,7 @@
     const items = await Toestelkluis.lijst();
     const kaart = document.createElement('div');
     kaart.className = 'zak-kaart';
-    kaart.innerHTML = '<b style="font-size:0.8rem;">📱 ' + T('kluis.h','Op dit toestel') + '</b>' +
+    kaart.innerHTML = '<b style="font-size:0.8rem;">' + T('kluis.h','Op dit toestel') + '</b>' +
       '<div class="fineprint" style="margin-top:0.25rem;">' + T('kluis.d','Uw eigen kopieen, opgeslagen in de beveiligde opslag van deze browser. Alleen u kunt erbij; er gaat niets over de lijn.') + '</div>' +
       (items.length ? items.slice(0, 10).map(x =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.76rem;margin-top:0.4rem;">' +
@@ -71,17 +71,17 @@
     const totaalBetaald = betaald.reduce((s, i) => s + (i.netto || 0) + (i.bijdrage || 0), 0);
     const fonds = betaald.reduce((s, i) => s + Math.round((i.bijdrage || 0) * 0.3), 0);
     const acties = [];
-    if (open.length) acties.push('💳 ' + open.length + ' ' + T('bo2.open','openstaande factuur/facturen; betaal in één tik via Betalen.'));
-    if (user.account && user.emailVerified === false) acties.push('✉️ ' + T('bo2.mailniet','Uw e-mailadres is nog niet bevestigd.'));
-    if (user.account && user.verified && user.verified !== 'verified') acties.push('🪪 ' + T('bo2.kyc','Verifieer uw identiteit om in één tik te boeken.'));
+    if (open.length) acties.push('' + open.length + ' ' + T('bo2.open','openstaande factuur/facturen; betaal in één tik via Betalen.'));
+    if (user.account && user.emailVerified === false) acties.push('' + T('bo2.mailniet','Uw e-mailadres is nog niet bevestigd.'));
+    if (user.account && user.verified && user.verified !== 'verified') acties.push('' + T('bo2.kyc','Verifieer uw identiteit om in één tik te boeken.'));
 
     let html = '';
-    if (acties.length) html += kaart('⚡ ' + T('bo2.acties','Nu aandacht nodig'),
+    if (acties.length) html += kaart('' + T('bo2.acties','Nu aandacht nodig'),
       acties.map(a => '<div class="fineprint">' + a + '</div>').join('') +
       (open.length ? knopje('boNaarBetalen', T('bo2.betaalnu','Naar Betalen')) : ''));
     else html += kaart('✓ ' + T('bo2.alsklaar','Alles op orde'), '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;">' + T('bo2.geen','Geen openstaande zaken op uw account.') + '</div>');
 
-    html += kaart('📊 ' + T('bo2.cijfers','Mijn cijfers'),
+    html += kaart('' + T('bo2.cijfers','Mijn cijfers'),
       rij(T('bo2.betaald','Betaald via RTG'), eur(totaalBetaald)) +
       rij(T('bo2.facturen','Facturen'), betaald.length + ' ' + T('bo2.voldaan','voldaan') + (open.length ? ' · ' + open.length + ' open' : '')) +
       rij('RTFoundation', eur(fonds) + ' ' + T('bo2.viamij','via mijn bijdragen')) +

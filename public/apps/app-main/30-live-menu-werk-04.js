@@ -21,7 +21,7 @@
       if (p.ride){
         line2 += ' · ' + T('live.ride','rit') + ' ' + tRide(p.ride.status);
         const extra = [];
-        if (p.ride.driver) extra.push('🚘 ' + p.ride.driver + (p.ride.vehicle ? ' · ' + p.ride.vehicle : ''));
+        if (p.ride.driver) extra.push('' + p.ride.driver + (p.ride.vehicle ? ' · ' + p.ride.vehicle : ''));
         if (p.ride.quote) extra.push(T('live.vast','vaste nettoprijs') + ' ' + eur(p.ride.quote));
         if (extra.length) line2 += '<br>' + extra.join(' · ');
         // betaling achteraf: de zaak liet de rit direct rijden; afrekenen kan nu
@@ -41,7 +41,7 @@
     const hasVeh = L.partners.some(p => p.type === 'taxi' || p.type === 'jet');
     const canDoor = L.arrived && dest && dest.hasDoors;
     const acts = '<div class="live-acts">' +
-      (canDoor ? '<button class="prim glowbtn" id="liveDoor">🔓 ' + T('live.door','Open de deur') + '</button>' : '') +
+      (canDoor ? '<button class="prim glowbtn" id="liveDoor">' + T('live.door','Open de deur') + '</button>' : '') +
       '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
       (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
       (canDoor ? '' : '<button class="prim" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>') +
@@ -70,7 +70,7 @@
     const tx = $('#liveTaxi'); if (tx) tx.addEventListener('click', requestTaxi);
     const pre = $('#livePre'); if (pre) pre.addEventListener('click', () => { if (dest) openMenu(dest.code); });
     const dr = $('#liveDoor'); if (dr) dr.addEventListener('click', async () => {
-      try { const d = await API.call('/live/door'); toast('🔓 ' + d.door.name + ' ' + T('live.dooropen','is open. Vergrendelt zichzelf na') + ' ' + d.door.relockSec + ' ' + T('live.sec','seconden.')); }
+      try { const d = await API.call('/live/door'); toast('' + d.door.name + ' ' + T('live.dooropen','is open. Vergrendelt zichzelf na') + ' ' + d.door.relockSec + ' ' + T('live.sec','seconden.')); }
       catch(e){ toast(e.message); }
     });
   }
@@ -113,7 +113,7 @@
           return d.ride;
         }, { message: () => T('live.ritbetaald','Rit betaald en definitief:') + ' ' + eur(d.ride.quote), after: () => renderLive() });
       } else {
-        toast('🚘 ' + T('live.taxireq2','Rit aangevraagd.') + (d.ride && d.ride.quote ? ' ' + T('live.vast','vaste nettoprijs') + ': ' + eur(d.ride.quote) : ''));
+        toast('' + T('live.taxireq2','Rit aangevraagd.') + (d.ride && d.ride.quote ? ' ' + T('live.vast','vaste nettoprijs') + ': ' + eur(d.ride.quote) : ''));
         await renderLive();
       }
     } catch (e){ toast(e.message); }

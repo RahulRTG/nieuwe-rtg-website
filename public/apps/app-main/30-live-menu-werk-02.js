@@ -11,8 +11,8 @@
             '<b>' + T('as.mijn','Mijn positie') + ':</b> ' + p.tickets + ' ' + T('as.tickets','tickets') + ' (' + p.access + ' Access · ' + p.asset + ' Asset)' + (p.tickets ? ' · ' +
             '<b style="color:var(--gold-bright,#C99A2E);">' + p.dagenTegoed + '</b> ' + T('as.dagen','x 24 uur over dit jaar') + ' · ' + T('as.geldig','geldig tot') + ' ' + p.vervaltOp : '') +
             (p.asset ? '<br>' + T('as.uitstapw','Uitstapwaarde vandaag') + ': <b>' + eur(p.uitstapWaarde) + '</b>' : '') +
-            ((p.terugkoopOnderweg||[]).length ? '<br>⏳ ' + T('as.tkw','Terugkoop onderweg') + ': ' + p.terugkoopOnderweg.map(v => eur(v.waarde) + ' ' + T('as.uiterlijk','uiterlijk') + ' ' + v.uiterlijk).join(', ') : '') +
-            (p.gepland.length ? '<br>📅 ' + T('as.gepland','Gepland') + ': ' + p.gepland.join(', ') : '') +
+            ((p.terugkoopOnderweg||[]).length ? '<br>' + T('as.tkw','Terugkoop onderweg') + ': ' + p.terugkoopOnderweg.map(v => eur(v.waarde) + ' ' + T('as.uiterlijk','uiterlijk') + ' ' + v.uiterlijk).join(', ') : '') +
+            (p.gepland.length ? '<br>' + T('as.gepland','Gepland') + ': ' + p.gepland.join(', ') : '') +
             '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;">' +
               (p.tickets ? '<input type="date" data-asdatum="' + a.id + '" min="' + new Date().toISOString().slice(0,10) + '" style="flex:1;min-width:130px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.6rem;font-size:0.78rem;color:var(--txt);" aria-label="' + T('as.dag','Kies uw dag') + '">' +
               '<button class="mo-code js-asboek" data-id="' + a.id + '">' + T('as.boek','Boek mijn 24 uur') + '</button>' : '') +
@@ -33,7 +33,7 @@
             '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="access" style="flex:1;margin-top:0;">Access</button>' +
             '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="asset" data-ent="' + esc(a.entiteit) + '" data-fee="' + a.serviceFee + '" style="flex:1;margin-top:0;background:var(--gold-bright,#C99A2E);">Asset</button>' +
           '</div>')+
-        '<button class="mo-code js-asdoc" data-id="' + a.id + '" style="margin-top:0.5rem;">📄 ' + T('as.doc','Essentiele informatie') + '</button>' +
+        '<button class="mo-code js-asdoc" data-id="' + a.id + '" style="margin-top:0.5rem;">' + T('as.doc','Essentiele informatie') + '</button>' +
         '<div data-asdocuit="' + a.id + '" style="display:none;margin-top:0.5rem;font-size:0.7rem;color:var(--soft);line-height:1.6;border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.75rem;"></div>' +
       '</div>';
     }).join('');
@@ -49,12 +49,12 @@
       }
       try {
         const r = await API.call('/asset/koop', body);
-        toast('🎟️ ' + r.tickets.length + ' ticket(s) · ' + eur(r.totaalPrijs) + '. ' + T('as.welkom','Welkom in de pool.'));
+        toast('' + r.tickets.length + ' ticket(s) · ' + eur(r.totaalPrijs) + '. ' + T('as.welkom','Welkom in de pool.'));
         renderAssets();
       } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-aswacht').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await API.call('/asset/wachtlijst', { assetId: b.dataset.id }); toast('📋 ' + T('as.wlok','U staat op de wachtlijst, positie') + ' ' + r.positie + '.'); renderAssets(); }
+      try { const r = await API.call('/asset/wachtlijst', { assetId: b.dataset.id }); toast('' + T('as.wlok','U staat op de wachtlijst, positie') + ' ' + r.positie + '.'); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asherroep').forEach(b => b.addEventListener('click', async () => {

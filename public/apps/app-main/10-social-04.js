@@ -134,14 +134,14 @@
   }
 
   function opSociaal(d){
-    if (d.kind === 'request'){ toast('🤝 ' + d.from + ' ' + T('sal.wilverbinden','wil verbinden')); loadSocial(); }
-    else if (d.kind === 'accepted'){ toast('🤝 ' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
+    if (d.kind === 'request'){ toast('' + d.from + ' ' + T('sal.wilverbinden','wil verbinden')); loadSocial(); }
+    else if (d.kind === 'accepted'){ toast('' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
     else if (d.kind === 'dm'){
       if (dmWith === d.from && $('#dm-sheet').classList.contains('open')){
         dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
         API.call('/member/dm', { withKey: d.from }).catch(()=>{}); // gelezen
       } else {
-        toast('💬 ' + d.codename + ': ' + (d.text || '↗').slice(0, 60));
+        toast('' + d.codename + ': ' + (d.text || '↗').slice(0, 60));
         loadSocial();
       }
     }

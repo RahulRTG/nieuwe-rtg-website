@@ -11,12 +11,12 @@
         return '<div class="ms-item' + (botst.length ? ' ms-allergie' : '') + '" data-id="' + x.id + '"' + (op86 ? ' style="opacity:0.5;"' : '') + '>' +
           '<div class="info"><div class="nm">' + x.name + '</div>' +
             (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
-            (botst.length ? '<div class="alg-waarschuwing">⚠️ ' + T('menu.jouwallergie','jouw allergie') + ': ' + botst.map(a => tAlg(a)).join(', ') + '</div>' : '') +
+            (botst.length ? '<div class="alg-waarschuwing">' + T('menu.jouwallergie','jouw allergie') + ': ' + botst.map(a => tAlg(a)).join(', ') + '</div>' : '') +
             (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + tAlg(a) + '</span>').join('') + '</div>' : '') +
           '</div>' +
           '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +
             (op86 ? '<div class="qty" style="opacity:0.7;font-size:0.64rem;justify-content:center;">' + T('menu.86','uitverkocht') + '</div>'
-              : slot ? '<div class="qty" style="opacity:0.55;font-size:0.64rem;justify-content:center;">🔞 ' + menuState.alcohol.grens + '+</div>'
+              : slot ? '<div class="qty" style="opacity:0.55;font-size:0.64rem;justify-content:center;">' + menuState.alcohol.grens + '+</div>'
               : '<div class="qty"><button class="js-minus">−</button><b>' + q + '</b><button class="js-plus">+</button></div>') +
           '</div></div>';
       }).join('')
@@ -34,7 +34,7 @@
     document.querySelectorAll('[data-wl]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/wachtlijst', { supplierCode: menuState.supplier.code, eventId: b.dataset.wl });
-        toast('⏳ ' + T('erv.wlok','U staat op de wachtlijst (nr. ') + d.positie + '). ' + T('erv.wlbericht','Bij een vrije plek hoort u het meteen.'));
+        toast('' + T('erv.wlok','U staat op de wachtlijst (nr. ') + d.positie + '). ' + T('erv.wlbericht','Bij een vrije plek hoort u het meteen.'));
       } catch(e){ toast(e.message); }
     }));
     // favoriet-hart + tafel reserveren
@@ -50,14 +50,14 @@
     if (rsvGo) rsvGo.addEventListener('click', async () => {
       try {
         const d = await API.call('/reserveer', { supplierCode: s.code, datum: $('#rsvDatum').value, tijd: $('#rsvTijd').value, personen: Number($('#rsvPers').value) });
-        toast('🪑 ' + T('erv.reserveerok','Reservering aangevraagd voor') + ' ' + d.reservering.datum + ' ' + d.reservering.tijd + '. ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
+        toast('' + T('erv.reserveerok','Reservering aangevraagd voor') + ' ' + d.reservering.datum + ' ' + d.reservering.tijd + '. ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
       } catch(e){ toast(e.message); }
     });
     // keyless: de deur van je kamer of de entree, met je telefoon als sleutel
     const deur = async welke => {
       try {
         const d = await API.call('/verblijf/deur', { supplierCode: s.code, welke });
-        toast('🔓 ' + d.door.name + ' ' + T('vb.deuropen','is open; hij vergrendelt zelf weer na') + ' ' + d.door.relockSec + 's.');
+        toast('' + d.door.name + ' ' + T('vb.deuropen','is open; hij vergrendelt zelf weer na') + ' ' + d.door.relockSec + 's.');
       } catch(e){ toast(e.message); }
     };
     const dk = $('#vbDeurKamer'); if (dk) dk.addEventListener('click', () => deur('kamer'));
@@ -70,7 +70,7 @@
           aankomst: $('#vbAankomst').value, vertrek: $('#vbVertrek').value,
           personen: Number($('#vbPers').value)
         });
-        toast('🛎️ ' + T('vb.ok','Verblijf aangevraagd:') + ' ' + d.verblijf.roomName + ', ' + d.verblijf.nachten + ' ' + T('vb.nachten','nacht(en)') + ' (' + eur(d.verblijf.totaal) + '). ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
+        toast('' + T('vb.ok','Verblijf aangevraagd:') + ' ' + d.verblijf.roomName + ', ' + d.verblijf.nachten + ' ' + T('vb.nachten','nacht(en)') + ' (' + eur(d.verblijf.totaal) + '). ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
       } catch(e){ toast(e.message); }
     }));
     if (menuState.retail) bindRetailMenu();
@@ -82,7 +82,7 @@
     });
     if (!m.length){ $('#msFoot').innerHTML = ''; return; }
     if (menuState.supplier.ordersOpen === false){
-      $('#msFoot').innerHTML = '<div style="padding:0.9rem 0;text-align:center;font-size:0.82rem;color:var(--soft);">⏸ ' + T('app.ms.closed','Bestellingen zijn tijdelijk gesloten. De kaart blijft ter inzage.') + '</div>';
+      $('#msFoot').innerHTML = '<div style="padding:0.9rem 0;text-align:center;font-size:0.82rem;color:var(--soft);">' + T('app.ms.closed','Bestellingen zijn tijdelijk gesloten. De kaart blijft ter inzage.') + '</div>';
       return;
     }
     const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
@@ -102,12 +102,12 @@
       '</select>' +
       '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">' + T('app.ms.los','U bestelt rechtstreeks bij deze zaak: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de zaak.') + '</div>' +
       ((menuState.supplier.hasMenu !== false && (menuState.menu || []).some(x => x.station === 'bar'))
-        ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">🔞 ' +
+        ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">' +
           (menuState.alcohol && menuState.alcohol.mag === false
             ? T('app.ms.geenalc','Alcohol staat voor u uit:') + ' ' + (menuState.alcohol.land || '') + ' ' + T('app.ms.vanaf','hanteert') + ' ' + menuState.alcohol.grens + '+ ' + T('app.ms.pasp','(leeftijd geverifieerd via uw paspoort).')
             : 'Alcohol: ' + ((menuState.alcohol && menuState.alcohol.grens) || 18) + '+; ' + T('app.ms.18b','de zaak kan om legitimatie vragen.')) + '</div>' : '') +
       '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? T('app.ms.order','Bestel') + ' ' + count + ' ' + T('app.items','item(s)') + ', ' + eur(total) : T('app.ms.choose','Kies gerechten')) + '</button>' +
-      (count ? '<button class="ms-order" id="msKassa" style="margin-top:0.4rem;background:none;border:1px solid var(--line);color:var(--txt);">🧾 ' + T('app.ms.naarkassa','Stuur naar de kassa, betaal aan de balie') + '</button>' : '');
+      (count ? '<button class="ms-order" id="msKassa" style="margin-top:0.4rem;background:none;border:1px solid var(--line);color:var(--txt);">' + T('app.ms.naarkassa','Stuur naar de kassa, betaal aan de balie') + '</button>' : '');
     const mt = $('#msTable');
     if (mt) mt.addEventListener('change', e => menuState.table = e.target.value);
     $('#msNote').addEventListener('input', e => menuState.note = e.target.value);
@@ -124,6 +124,6 @@
   function retailMenuBlock(){
     const r = menuState.retail;
     const mijn = menuState.retailMijn || { apart: [], styling: [] };
-    let html = '<div class="ms-cat">🛍 ' + T('rt.m.cat','Collectie') + '</div>';
+    let html = '<div class="ms-cat">' + T('rt.m.cat','Collectie') + '</div>';
     // eigen apart-artikelen en stylingvoorstellen bij dit merk
     const apart = (mijn.apart || []).filter(a => a.supplierName === r.supplier.name);

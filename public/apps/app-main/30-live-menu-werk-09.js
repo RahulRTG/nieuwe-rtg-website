@@ -3,7 +3,7 @@
     } else {
       h += '<div style="margin-top:0.7rem;display:flex;flex-direction:column;gap:0.6rem;">'+ rij.slice(0,20).map(({v,km})=>{
         const al = isApplied(v);
-        const meta = [ VACSOORT[v.soort]||v.soort, (VLAG[v.land]||'')+' '+(v.landNaam||''), v.plaats||v.stad, km!=null?('📍 '+Geo.tekst(km)):'' ].filter(x=>x&&x.trim()).join(' · ');
+        const meta = [ VACSOORT[v.soort]||v.soort, (VLAG[v.land]||'')+' '+(v.landNaam||''), v.plaats||v.stad, km!=null?(''+Geo.tekst(km)):'' ].filter(x=>x&&x.trim()).join(' · ');
         return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;">'+
           '<div style="display:flex;align-items:flex-start;gap:0.5rem;justify-content:space-between;">'+
           '<div style="min-width:0;"><b style="font-size:0.9rem;">'+esc(v.func)+'</b>'+

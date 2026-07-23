@@ -2814,6 +2814,24 @@ const stunServer = require('./stun').start({ log });
 server.keepAliveTimeout = 75000;
 server.headersTimeout = 90000;
 
+/* Native TLS + eigen ACME: als de app zelf TLS termineert (RTG_TLS=1) EN ACME aan
+   staat (RTG_ACME=1 + RTG_TLS_DOMAIN + RTG_TLS_EMAIL), haalt en vernieuwt ze zelf
+   een echt Let's Encrypt-certificaat en laadt dat live in -- geen certbot, geen
+   reverse proxy. Volledig gated; standaard uit, en het mag de app nooit laten
+   vallen (mislukt de uitgifte, dan blijven we op het self-signed cert draaien).
+   Zet RTG_ACME_STAGING=1 om eerst tegen de staging-CA te oefenen (geen rate-limit). */
+if (process.env.RTG_TLS === '1' && process.env.RTG_ACME === '1' && server && typeof server.herlaadCert === 'function') {
+  const domeinen = String(process.env.RTG_TLS_DOMAIN || '').split(',').map(s => s.trim()).filter(Boolean);
+  const email = String(process.env.RTG_TLS_EMAIL || '').trim();
+  if (domeinen.length && email) {
+    require('./lib/tls-acme').startAcme({ server, domains: domeinen, email, dataDir: DATA_DIR, staging: process.env.RTG_ACME_STAGING === '1', log: (m) => log.info(m) })
+      .then(() => log.info('[tls] ACME actief voor ' + domeinen.join(', ')))
+      .catch((e) => log.warn('[tls] ACME-start mislukt; app draait door op het self-signed cert: ' + e.message));
+  } else {
+    log.warn('[tls] RTG_ACME=1 maar RTG_TLS_DOMAIN/RTG_TLS_EMAIL ontbreekt; ACME overgeslagen.');
+  }
+}
+
 // Netjes afsluiten: data wegschrijven, verbindingen sluiten, dan pas stoppen.
 for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
   console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);

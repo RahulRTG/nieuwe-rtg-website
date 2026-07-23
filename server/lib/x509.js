@@ -99,6 +99,34 @@ function selfSigned(opties) {
   return { certPem: derNaarPem(certDer, 'CERTIFICATE'), keyPem: paar.keyPem, key: paar, certDer };
 }
 
+/* Een certificaat uitgeven voor een GEGEVEN publieke sleutel (SPKI-DER),
+   ondertekend door een uitgever-sleutelpaar. Dit is wat een CA doet: subject !=
+   issuer. selfSigned is hiervan het bijzondere geval subject == issuer. Handig
+   voor een interne mini-CA (en voor een trouwe ACME-test die een cert uitgeeft
+   voor de sleutel uit de CSR). */
+function certVoor(opties) {
+  const issuer = opties.issuerKey;                                              // { type, privateKey }
+  const namen = (opties.names && opties.names.length) ? opties.names : [opties.cn];
+  const nu = new Date();
+  const nietVoor = new Date(nu.getTime() - 5 * 60000);
+  const nietNa = new Date(nu.getTime() + (opties.days || 90) * 86400000);
+  const subj = { cn: opties.cn || namen[0], org: opties.org };
+  const iss = { cn: opties.issuerCn || subj.cn, org: opties.issuerOrg };
+  const tbs = a.seq(
+    a.context(0, a.integer(2)),
+    a.integer(serieel()),
+    algId(issuer.type),
+    naam(iss),                                                                  // issuer (de CA)
+    a.seq(a.tijd(nietVoor), a.tijd(nietNa)),
+    naam(subj),
+    a.ruw(opties.subjectSpkiDer),                                               // de publieke sleutel van de aanvrager
+    a.context(3, a.seq(...standaardExtensies(opties.subjectType || 'ec', namen)))
+  );
+  const sig = crypto.sign('sha256', tbs, issuer.privateKey);
+  const certDer = a.seq(tbs, algId(issuer.type), a.bitString(sig));
+  return { certPem: derNaarPem(certDer, 'CERTIFICATE'), certDer };
+}
+
 /* Een CSR (PKCS#10) voor ACME: subject + publieke sleutel + gevraagde SAN,
    ondertekend met de private sleutel. De CA (Let's Encrypt) geeft het echte cert. */
 function maakCSR(opties) {
@@ -131,4 +159,4 @@ function certInfo(pem) {
   return { validTo: new Date(c.validTo), validFrom: new Date(c.validFrom), subject: c.subject, san: c.subjectAltName || '' };
 }
 
-module.exports = { genKeyPair, selfSigned, maakCSR, derNaarPem, pemNaarDer, b64url, certInfo, OID };
+module.exports = { genKeyPair, selfSigned, certVoor, maakCSR, derNaarPem, pemNaarDer, b64url, certInfo, OID };

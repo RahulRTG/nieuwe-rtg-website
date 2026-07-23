@@ -58,11 +58,23 @@ aanvraag een nette 500 en raakt de rest van het proces nooit.
 | `DATABASE_URL` | PostgreSQL voor de gedeelde data (aanbevolen voor productie en meerdere instances). Leeg = lokaal bestand |
 | `APP_URL` | Correcte links in e-mails |
 | `REDIS_URL` | Nodig zodra je meer dan één instance draait (realtime over instances) |
+| `RTG_TLS=1` | De app termineert **zelf** TLS/HTTPS op Node's tls-stack (HTTP/2 + HTTP/1.1-terugval via ALPN, TLS 1.2 als vloer, harde ciphers) — een aparte reverse proxy voor TLS is dan niet meer nodig. Zonder cert maakt ze een self-signed voor local |
+| `RTG_ACME=1` + `RTG_TLS_DOMAIN` + `RTG_TLS_EMAIL` | Met `RTG_TLS=1`: de app haalt en vernieuwt **zelf** een echt Let's Encrypt-certificaat (eigen ACME-client, HTTP-01 op poort 80, live cert-herlaad zonder herstart). `RTG_ACME_STAGING=1` om eerst tegen de staging-CA te oefenen |
 
 Aanbevolen: `SENTRY_DSN` (fouttracking), SMTP (`SMTP_URL`), `STRIPE_SECRET_KEY`
 + `STRIPE_WEBHOOK_SECRET` (echte betalingen), `ANTHROPIC_API_KEY` (AI).
 
 Volledige lijst met uitleg: `.env.example`.
+
+### Native TLS + eigen ACME (reverse proxy optioneel)
+
+De app kan HTTPS zelf termineren, zonder nginx/Caddy ervoor:
+
+- **Snel, met een echt certificaat:** `RTG_TLS=1 RTG_ACME=1 RTG_TLS_DOMAIN=rahultravelgroup.example RTG_TLS_EMAIL=… npm start`. De app luistert HTTPS op `PORT`, start een kleine HTTP-responder op poort 80 (die de ACME-challenge serveert én al het overige verkeer naar HTTPS 301'ert), haalt bij Let's Encrypt een certificaat op via HTTP-01, laadt het live in en vernieuwt het automatisch ~30 dagen voor het verloopt. Dit vereist dat poort 80 én 443 vanaf internet bereikbaar zijn voor het domein. Oefen eerst met `RTG_ACME_STAGING=1` (geen rate-limits).
+- **Alleen TLS, cert regel je zelf:** `RTG_TLS=1` met `RTG_TLS_CERT`/`RTG_TLS_KEY` naar je eigen PEM-bestanden.
+- **Local/dev:** alleen `RTG_TLS=1` — de app genereert een self-signed cert (in `<datamap>/tls/`, gitignore) en spreekt meteen HTTPS.
+
+Het sleutelmateriaal (self-signed cert, ACME-accountsleutel, opgehaalde certificaten) staat onder `<datamap>/tls/` en wordt nooit gecommit. Een reverse proxy/CDN (Cloudflare) ervoor mag nog steeds — dan laat je `RTG_TLS` uit en blijft `trust proxy` de bron van waarheid voor `X-Forwarded-Proto`.
 
 ---
 
@@ -156,8 +168,8 @@ achter de poortwachter, met Postgres en Redis overal aan.**
    alleen de instance die de foto ontving hem — de config-check waarschuwt hiervoor.
 4. **Zet er meer instances achter een load balancer.** De app is stateless
    tussen requests (sessie zit in Postgres, niet in procesgeheugen), dus je kunt
-   naar believen instances bijzetten. TLS-termination en `trust proxy` vóór de
-   app (zie checklist). Sticky sessions zijn niet nodig; alleen voor de
+   naar believen instances bijzetten. TLS-termination vóór de app (reverse proxy
+   met `trust proxy`) **of** native in de app (`RTG_TLS=1`, zie §3). Sticky sessions zijn niet nodig; alleen voor de
    SSE-verbinding is een langlevende connectie handig, maar de Redis-bus levert
    events naar de juiste instance ongeacht waar de gebruiker hangt.
 5. **Kies de procesindeling die past.**
@@ -213,7 +225,7 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar (verplicht; het voorbeeldadres blokkeert de start)
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
-- [ ] TLS-termination (reverse proxy / load balancer) vóór de app; `trust proxy` staat aan
+- [ ] TLS geregeld: óf een reverse proxy/load balancer vóór de app met `trust proxy` aan, óf native in de app (`RTG_TLS=1`, evt. `RTG_ACME=1` voor een automatisch Let's Encrypt-certificaat) — poort 80 + 443 bereikbaar
 - [ ] Redis draait en `REDIS_URL` is gezet (bij >1 instance)
 - [ ] `SENTRY_DSN` gezet en er komt een testfout binnen
 - [ ] SMTP getest (herstel-link komt echt aan)

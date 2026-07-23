@@ -23,6 +23,7 @@
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
   const LINKS = {
+    ontdek:      { naam: 'Ontdek RTG',   icoon: '📖', url: '/apps/rtg.html' },
     spelen:      { naam: 'Spelen',       icoon: '🎲', url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    icoon: '📜', url: '/apps/juridisch.html' },
@@ -81,7 +82,8 @@
   const INDELING = [
     ['tab:reizen', 'tab:betalen', 'tab:bestellen', 'tab:ai', 'tab:salon', 'tab:terplaatse',
       { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
-    [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:berichten', 'link:pulse', 'link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
+    ['link:ontdek',
+      { sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:berichten', 'link:pulse', 'link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
       'link:nieuws',
       'link:bank',
       'link:navigatie',

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ontdek RTG</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B;--card:#151011;--card2:#1C1517;--line:rgba(235,215,160,0.14);
+    --txt:#F4F1EC;--soft:rgba(244,241,236,0.62);--meta:rgba(244,241,236,0.42);
+    --gold:#C9A24B;--goud-zacht:#EBD79A;--burg:#C23A5E;--burg-diep:#7F1634;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{min-height:100%;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5;padding-bottom:3rem;}
+  a{color:inherit;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 1.3rem;}
+  /* kopbalk */
+  .kop{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:0.8rem;
+    padding:calc(env(safe-area-inset-top,0px) + 0.8rem) 1.3rem 0.8rem;max-width:1080px;margin:0 auto;
+    background:linear-gradient(180deg, rgba(12,12,11,0.94), rgba(12,12,11,0.72) 70%, transparent);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+  .kop a.terug{text-decoration:none;font-size:1.3rem;line-height:1;color:var(--soft);}
+  .kop .merk{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.05rem;letter-spacing:0.02em;}
+  .kop .rek{flex:1;}
+  .kop .lid{font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--goud-zacht);
+    border:1px solid var(--line);border-radius:999px;padding:0.3rem 0.7rem;}
+  /* hero */
+  .hero{padding:3.4rem 0 2.2rem;text-align:center;position:relative;}
+  .hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:0.5;pointer-events:none;
+    -webkit-mask-image:radial-gradient(120% 90% at 50% 30%, #000 30%, transparent 78%);
+    mask-image:radial-gradient(120% 90% at 50% 30%, #000 30%, transparent 78%);}
+  .hero > *{position:relative;z-index:1;}
+  .hero .eyebrow{font-size:0.68rem;letter-spacing:0.36em;text-transform:uppercase;color:var(--goud-zacht);margin-bottom:1.1rem;}
+  .hero h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:clamp(2.6rem,8vw,4.6rem);line-height:1.0;
+    letter-spacing:0.005em;text-wrap:balance;}
+  .hero h1 em{font-style:italic;color:var(--goud-zacht);}
+  .hero .lead{max-width:46ch;margin:1.3rem auto 0;color:var(--soft);font-size:1.06rem;line-height:1.65;}
+  .hero .acties{display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap;margin-top:1.8rem;}
+  .knop{display:inline-flex;align-items:center;gap:0.4rem;text-decoration:none;font-size:0.86rem;font-weight:600;
+    padding:0.8rem 1.4rem;border-radius:999px;letter-spacing:0.01em;transition:transform .15s ease, background .15s ease;}
+  .knop.prim{background:var(--goud-zacht);color:#0C0C0B;}
+  .knop.prim:hover{transform:translateY(-1px);background:#F4E3B0;}
+  .knop.sec{border:1px solid var(--line);color:var(--txt);}
+  .knop.sec:hover{border-color:var(--goud-zacht);}
+  /* secties */
+  section{padding:2.6rem 0;border-top:1px solid var(--line);}
+  .sectiekop{display:flex;align-items:baseline;gap:0.9rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+  .sectiekop .nr{font-family:'Bodoni Moda',serif;font-size:0.9rem;color:var(--goud-zacht);font-variant-numeric:tabular-nums;}
+  .sectiekop h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:clamp(1.5rem,4vw,2.1rem);letter-spacing:0.01em;}
+  .sectiekop p{flex-basis:100%;color:var(--soft);font-size:0.98rem;line-height:1.6;max-width:60ch;}
+  /* de drie passen */
+  .passen{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+  @media(max-width:760px){.passen{grid-template-columns:1fr;}}
+  .pas{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.4rem 1.35rem;display:flex;flex-direction:column;gap:0.55rem;position:relative;overflow:hidden;}
+  .pas::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;}
+  .pas.rtg::before{background:linear-gradient(90deg,var(--burg-diep),var(--burg));}
+  .pas.life::before{background:linear-gradient(90deg,#6E5B10,var(--gold));}
+  .pas.biz::before{background:linear-gradient(90deg,#3A3630,#8A8680);}
+  .pas .tier{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--goud-zacht);}
+  .pas h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+  .pas .toon{font-size:0.82rem;color:var(--meta);font-style:italic;}
+  .pas p{font-size:0.9rem;color:var(--soft);line-height:1.55;}
+  .pas .toegang{margin-top:auto;padding-top:0.7rem;font-size:0.76rem;color:var(--meta);border-top:1px solid var(--line);}
+  /* ecosysteem-grid */
+  .eco{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.7rem;}
+  .eco .tak{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.95rem 1rem;}
+  .eco .tak .ic{font-size:1.2rem;}
+  .eco .tak b{display:block;font-size:0.9rem;font-weight:600;margin-top:0.35rem;}
+  .eco .tak span{font-size:0.76rem;color:var(--meta);line-height:1.45;}
+  /* signatuur-duo (3D) */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  @media(max-width:640px){.duo{grid-template-columns:1fr;}}
+  .sig{display:block;text-decoration:none;background:radial-gradient(120% 90% at 50% 0%, #1a1416, var(--card) 70%);
+    border:1px solid var(--line);border-radius:18px;padding:1.5rem 1.4rem;transition:border-color .15s ease, transform .15s ease;}
+  .sig:hover{border-color:var(--goud-zacht);transform:translateY(-2px);}
+  .sig .ic{font-size:1.5rem;}
+  .sig h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.25rem;margin:0.5rem 0 0.35rem;}
+  .sig p{font-size:0.86rem;color:var(--soft);line-height:1.55;}
+  .sig .ga{display:inline-block;margin-top:0.7rem;font-size:0.78rem;color:var(--goud-zacht);letter-spacing:0.04em;}
+  /* twee-koloms tekstblok */
+  .duotekst{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+  @media(max-width:700px){.duotekst{grid-template-columns:1fr;}}
+  .duotekst p{color:var(--soft);font-size:0.96rem;line-height:1.65;}
+  .duotekst b{color:var(--txt);}
+  /* foundation-strook */
+  .fond{background:linear-gradient(150deg, #17110f, #0C0C0B);border:1px solid var(--line);border-radius:20px;padding:1.8rem 1.5rem;text-align:center;}
+  .fond .groot{font-family:'Bodoni Moda',serif;font-size:clamp(2.6rem,8vw,3.6rem);color:var(--goud-zacht);line-height:1;}
+  .fond h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.4rem;margin:0.6rem 0 0.5rem;}
+  .fond p{color:var(--soft);font-size:0.96rem;line-height:1.6;max-width:52ch;margin:0 auto;}
+  /* voet */
+  .voet{padding:2.4rem 0 0;color:var(--meta);font-size:0.8rem;line-height:1.65;text-align:center;}
+  .voet a{color:var(--goud-zacht);}
+</style>
+</head>
+<body>
+<header class="kop">
+  <a class="terug" href="/apps/index.html" aria-label="Terug naar het bureaublad">&#8592;</a>
+  <span class="merk">Rahul Travel Group</span>
+  <span class="rek"></span>
+  <span class="lid">Het huis</span>
+</header>
+
+<main>
+  <section class="hero" style="border-top:none;">
+    <canvas id="heroSky" aria-hidden="true"></canvas>
+    <p class="eyebrow">Een reishuis op lidmaatschap</p>
+    <h1>Reizen is een <em>manier van leven</em></h1>
+    <p class="lead">Rahul Travel Group is geen boekingssite maar een huis. Eén lidmaatschap opent een wereld van reizen, zorg, cultuur en gezelschap &mdash; rustig geregeld, met een mens (en zijn AI) die u kent.</p>
+    <div class="acties">
+      <a class="knop prim" href="#passen">Bekijk de passen</a>
+      <a class="knop sec" href="/apps/uitzicht.html">Zie het uitzicht &#8594;</a>
+    </div>
+  </section>
+
+  <div class="wrap">
+
+    <section id="passen">
+      <div class="sectiekop"><span class="nr">01</span><h2>Drie passen, drie toonaarden</h2>
+        <p>Elke pas heeft zijn eigen stem, bewust zo. De RTG Pass staat voor iedereen open na de ballotage; de Lifestyle en Business Pass zijn er uitsluitend op uitnodiging of na een persoonlijke goedkeuring.</p>
+      </div>
+      <div class="passen">
+        <article class="pas rtg">
+          <span class="tier">RTG Pass</span>
+          <h3>De instap</h3>
+          <p class="toon">&ldquo;Old money&rdquo; &middot; je/jij</p>
+          <p>Ingetogen en zeker. Volledig AI-gedreven contact dat u leert kennen. De instap, maar nooit budget.</p>
+          <p class="toegang">Voor iedereen &mdash; na de AI-intake.</p>
+        </article>
+        <article class="pas life">
+          <span class="tier">Lifestyle Pass</span>
+          <h3>De rechterhand</h3>
+          <p class="toon">Voorkomend &middot; u-vorm</p>
+          <p>Een vertrouwde rechterhand die het regelen uit handen neemt: reizen, tafels, wardrobe, mecenaat.</p>
+          <p class="toegang">Op uitnodiging of na goedkeuring.</p>
+        </article>
+        <article class="pas biz">
+          <span class="tier">Business Pass</span>
+          <h3>De partner</h3>
+          <p class="toon">Zakelijk, scherp &middot; u-vorm</p>
+          <p>Een efficiënte strategische partner voor de ondernemer: van boekhouding tot belasting per land.</p>
+          <p class="toegang">Op uitnodiging of na goedkeuring.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="ecosysteem">
+      <div class="sectiekop"><span class="nr">02</span><h2>Eén huis, vele takken</h2>
+        <p>Onder één dak: reizen, verblijven, zorg, onderwijs, cultuur en zaken. Alles praat met elkaar, alles op codenaam &mdash; en een deel ervan bouwden we in eigen huis in 3D.</p>
+      </div>
+      <div class="eco">
+        <div class="tak"><span class="ic">✈️</span><b>Reizen &amp; verblijven</b><span>Van de dagreis tot de private aviation van partners.</span></div>
+        <div class="tak"><span class="ic">🤍</span><b>RTG Care</b><span>Spa, wellness en kliniek, met veilige intake-deling.</span></div>
+        <div class="tak"><span class="ic">🎓</span><b>Leren</b><span>Overhoren, projecten en een eigen leerlaag.</span></div>
+        <div class="tak"><span class="ic">🎬</span><b>Cultuur</b><span>Theater, Podium en Clips &mdash; op bioscoopniveau.</span></div>
+        <div class="tak"><span class="ic">🏛️</span><b>Zaken</b><span>Boekhouding, facturatie en belasting per land.</span></div>
+        <div class="tak"><span class="ic">🕊️</span><b>RTFoundation</b><span>De sociale, non-profit kant van het huis.</span></div>
+      </div>
+    </section>
+
+    <section id="signatuur">
+      <div class="sectiekop"><span class="nr">03</span><h2>Het tweede gezicht van het huis</h2>
+        <p>Naast de lippen dragen twee eigen werken de signatuur van RTG &mdash; volledig in eigen huis getekend met SVG en WebGL, geen stockbeeld, geen extern merk.</p>
+      </div>
+      <div class="duo">
+        <a class="sig" href="/apps/uitzicht.html">
+          <span class="ic">🌆</span>
+          <h3>Het uitzicht</h3>
+          <p>Een stille, langzaam draaiende 3D-skyline van het hele ecosysteem, onder een gouden rasterlicht.</p>
+          <span class="ga">Bekijk de stad &#8594;</span>
+        </a>
+        <a class="sig" href="/apps/horloge.html">
+          <span class="ic">⌚</span>
+          <h3>Het RTG-horloge</h3>
+          <p>Een opengewerkt skelethorloge met een levend 3D-uurwerk, tot op de milliseconde kloppend.</p>
+          <span class="ga">Bekijk het horloge &#8594;</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="salon">
+      <div class="sectiekop"><span class="nr">04</span><h2>De Salon</h2></div>
+      <div class="duotekst">
+        <p><b>Een besloten sociaal netwerk</b> voor leden onderling &mdash; geen publiek, geen algoritme dat u vasthoudt. Verbind op codenaam, deel een reis, bel of videobel binnen het huis.</p>
+        <p>De Salon levert ook het beeld van RTG. Elk campagnebeeld is een uitgelichte Salon-post, altijd met naamsvermelding. <b>Geen stockfoto's, geen modellen</b> &mdash; alleen wat leden zelf laten zien.</p>
+      </div>
+    </section>
+
+    <section id="foundation">
+      <div class="fond">
+        <div class="groot">30%</div>
+        <h2>De RTFoundation</h2>
+        <p>Van elke bijdrage gaat dertig procent naar liefdadigheid, via de RTFoundation &mdash; de sociale kant van het huis, met een eigen wereld voor elke leeftijd.</p>
+      </div>
+    </section>
+
+    <section id="partners">
+      <div class="sectiekop"><span class="nr">05</span><h2>Voor partners en gasten</h2>
+        <p>Zaken en makers werken met RTG samen via een eigen partnerkanaal, met een ledenprijsgarantie: een partner rekent leden nooit meer dan de eigen publieke prijs. Wie (nog) geen lid is, kan als gast een deel van het huis proeven.</p>
+      </div>
+      <div class="duotekst">
+        <p><b>Privacy by design.</b> Klantdata draait op codenamen; echte namen staan in een gescheiden kluis. Wat een partner ziet, is precies genoeg om u goed te helpen &mdash; niet meer.</p>
+        <p><b>Eerlijk en echt.</b> De AI belooft nooit zelf toegang tot een pas, en zegt eerlijk wanneer een boeking nog bevestigd moet worden. Geen loze beloftes.</p>
+      </div>
+    </section>
+
+    <p class="voet">Rahul Travel Group &mdash; een reishuis op lidmaatschap. Dit is de website van het huis, nu als app in uw eigen bureaublad. <a href="/apps/index.html">Terug naar het bureaublad</a>.</p>
+
+  </div>
+</main>
+
+<script src="/shared/drie.js"></script>
+<script src="/apps/rtg-hero.js"></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

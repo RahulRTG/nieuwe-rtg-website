@@ -2,7 +2,7 @@
       $('#todayWrap').insertAdjacentHTML('beforeend',
         '<div class="card"><div class="k">'+T('pd.ws.h','Andere afdeling')+'</div>'+
         '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.ws.sub','U bent hier ook geaccrediteerd; wisselen kan direct, uw inlog reist mee.')+'</div>'+
-        wisselOpties.map(o => '<div class="task"><span class="ic">'+(BEDRIJVEN[o.code]?BEDRIJVEN[o.code].icon:'🏢')+'</span><div class="t"><b>'+esc(o.naam)+'</b><span>'+T('pd.ws.acc','Geaccrediteerd via het personeelsnetwerk')+'</span></div>'+
+        wisselOpties.map(o => '<div class="task"><span class="ic">'+(BEDRIJVEN[o.code]?BEDRIJVEN[o.code].icon:'')+'</span><div class="t"><b>'+esc(o.naam)+'</b><span>'+T('pd.ws.acc','Geaccrediteerd via het personeelsnetwerk')+'</span></div>'+
           '<button class="abtn" data-wissel="'+esc(o.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
       document.querySelectorAll('[data-wissel]').forEach(b => b.addEventListener('click', async () => {
         b.disabled = true;
@@ -13,7 +13,7 @@
             localStorage.setItem('rtg_pda_code', d.supplier.code);
             localStorage.setItem('rtg_pda_bedrijf', d.supplier.code);
           } catch(e){}
-          toast('🔁 ' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
+          toast('' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
           setTimeout(() => location.reload(), 400);
         } catch(e){ toast(e.message); b.disabled = false; }
       }));
@@ -25,13 +25,13 @@
       $('#todayWrap').insertAdjacentHTML('beforeend',
         '<div class="card"><div class="k">'+T('pd.mw.h','Mijn werkplekken')+'</div>'+
         '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.mw.sub','U werkt bij meer bedrijven; wissel met één tik. U klokt daar zelf in.')+'</div>'+
-        andere.map(p => '<div class="task"><span class="ic">'+(BEDRIJVEN[p.code]?BEDRIJVEN[p.code].icon:'🏢')+'</span><div class="t"><b>'+esc(p.naam)+'</b><span>'+esc(p.func || (p.manager?'Manager':T('pd.staff','Medewerker')))+'</span></div>'+
+        andere.map(p => '<div class="task"><span class="ic">'+(BEDRIJVEN[p.code]?BEDRIJVEN[p.code].icon:'')+'</span><div class="t"><b>'+esc(p.naam)+'</b><span>'+esc(p.func || (p.manager?'Manager':T('pd.staff','Medewerker')))+'</span></div>'+
           '<button class="abtn" data-mijn="'+esc(p.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
       document.querySelectorAll('[data-mijn]').forEach(b => b.addEventListener('click', async () => {
         b.disabled = true;
         try {
           const d = await API.call('/supplier/mijn/wissel', { code: b.dataset.mijn });
-          toast('🔁 ' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
+          toast('' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
           await landMijn(d); openTab('vandaag');
         } catch(e){ toast(e.message); b.disabled = false; }
       }));
@@ -61,11 +61,11 @@
     // melden hoort bij iedereen: een klus doorgeven en gevonden voorwerpen registreren
     const kamers = (state && state.rooms || []).map(r => r.name);
     const kamerSel = id => '<select class="hin" id="'+id+'" style="flex:1;"><option value="">'+T('hk.geenk','geen kamer')+'</option>'+kamers.map(k=>'<option>'+esc(k)+'</option>').join('')+'</select>';
-    tw.innerHTML += '<div class="card"><div class="k">🔧 '+T('hk.klus.meld','Meld klus')+'</div>'+
+    tw.innerHTML += '<div class="card"><div class="k">'+T('hk.klus.meld','Meld klus')+'</div>'+
       '<div class="row"><input class="hin" id="klusTekst" placeholder="'+T('hk.klus.ph','Omschrijf de klus...')+'" style="flex:2;">'+kamerSel('klusKamer')+'</div>'+
       '<button class="abtn" id="klusMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.klus.meld','Meld klus')+'</button></div>';
     const lf = (state && state.lostfound || []).slice(0, 6);
-    tw.innerHTML += '<div class="card"><div class="k">🧳 '+T('hk.lf','Gevonden voorwerp')+'</div>'+
+    tw.innerHTML += '<div class="card"><div class="k">'+T('hk.lf','Gevonden voorwerp')+'</div>'+
       '<div class="row"><input class="hin" id="lfItem" placeholder="'+T('hk.lf.item','Wat heb je gevonden?')+'" style="flex:2;">'+kamerSel('lfKamer')+'</div>'+
       '<div class="row"><input class="hin" id="lfPlek" placeholder="'+T('hk.lf.plek','Bewaarplek')+'"></div>'+
       '<button class="abtn" id="lfMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.lf.meld','Registreer')+'</button>'+
@@ -79,11 +79,11 @@
     }));
     const km = $('#klusMeld'); if (km) km.addEventListener('click', async () => {
       const text = $('#klusTekst').value.trim(); if (!text) return;
-      try { await API.call('/supplier/ticket/add', { text, room: $('#klusKamer').value }); toast('🔧 '+T('hk.klusok','Klus gemeld.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/ticket/add', { text, room: $('#klusKamer').value }); toast(''+T('hk.klusok','Klus gemeld.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
     });
     const lm = $('#lfMeld'); if (lm) lm.addEventListener('click', async () => {
       const item = $('#lfItem').value.trim(); if (!item) return;
-      try { await API.call('/supplier/lost/add', { item, room: $('#lfKamer').value, storage: $('#lfPlek').value }); toast('🧳 '+T('hk.lfok','Geregistreerd.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/lost/add', { item, room: $('#lfKamer').value, storage: $('#lfPlek').value }); toast(''+T('hk.lfok','Geregistreerd.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
     });
   }
 

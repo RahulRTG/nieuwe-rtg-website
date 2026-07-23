@@ -6,7 +6,7 @@
       try {
         const d = await API.call('/staff/trust/send', { text, anon: document.getElementById('tpAnon').checked });
         if (zaken) zaken.trust = d.trust;
-        toast('🤝 '+T('pd.tp.sent','Vertrouwelijk verstuurd. Alleen RTG leest dit.'));
+        toast(''+T('pd.tp.sent','Vertrouwelijk verstuurd. Alleen RTG leest dit.'));
         renderHulp();
         openTab('hulp');
       } catch(e){ toast(e.message); }
@@ -17,7 +17,7 @@
       ziekArm = false;
       try {
         await API.call('/staff/leave/request', { soort: 'ziek' });
-        toast('🤒 '+T('pd.ad.ziekok','Ziekmelding doorgegeven. Beterschap!'));
+        toast(''+T('pd.ad.ziekok','Ziekmelding doorgegeven. Beterschap!'));
         await laadZaken(); renderHulp(); openTab('hulp');
       } catch(e){ toast(e.message); renderHulp(); }
     });
@@ -27,7 +27,7 @@
       if (!van || !tot){ toast(T('pd.ad.datum','Kies een begin- en einddatum.')); return; }
       try {
         await API.call('/staff/leave/request', { soort: 'verlof', van, tot, reden: document.getElementById('vlReden').value.trim() });
-        toast('🌴 '+T('pd.ad.gevraagd','Verlof aangevraagd; de manager beslist in het Kantoor.'));
+        toast(''+T('pd.ad.gevraagd','Verlof aangevraagd; de manager beslist in het Kantoor.'));
         await laadZaken(); renderHulp(); openTab('hulp');
       } catch(e){ toast(e.message); }
     });
@@ -64,17 +64,17 @@
       (mijn.length ? mijn.map(r => {
         const nxt = NEXT_RIDE[r.status];
         const st = RIT_ST[r.status];
-        return '<div class="task"><span class="ic">'+(jet?'✈️':'🚗')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' · 📝 '+esc(r.note):'')+(r.zorg?'<span style="display:block;color:#E2B93B;">⚠ '+esc(pkZorg(r.zorg))+'</span>':'')+'</span></div>'+
+        return '<div class="task"><span class="ic">'+(jet?'':'')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' ·  '+esc(r.note):'')+(r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(pkZorg(r.zorg))+'</span>':'')+'</span></div>'+
           (nxt ? '<button class="abtn" data-pdgo="'+r.ref+'" data-st="'+nxt+'">'+T(RIDE_LBL[nxt][0], RIDE_LBL[nxt][1])+'</button>' : '')+'</div>';
       }).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geen','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.r.openh','Open aanvragen')+' ('+open.length+')</div>'+
       (open.length ? open.map(r =>
-        '<div class="task"><span class="ic">🔔</span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc(regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>'
+        '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc(regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>'
       ).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geenopen','Geen open aanvragen. Nieuwe ritten verschijnen hier vanzelf.')+'</div>')+'</div>'+
       (gepland.length ? '<div class="card"><div class="k">'+T('pd.r.gepland','Gepland')+' ('+gepland.length+')</div>'+
-        gepland.map(r => '<div class="task"><span class="ic">📅</span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc((r.when || '') + ' · ' + regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>').join('')+'</div>' : '')+
+        gepland.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc((r.when || '') + ' · ' + regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>').join('')+'</div>' : '')+
       '<div class="card"><div class="k">'+T('pd.r.vandaag','Vandaag')+'</div>'+
-      '<div class="task"><span class="ic">💶</span><div class="t"><b>'+klaar.length+' '+T('pd.r.klaar','rit(ten) afgerond')+' · '+eur(omzet)+'</b><span>'+T('pd.r.netto','Volledig voor de zaak: RTG rekent 0% commissie.')+'</span></div></div></div>';
+      '<div class="task"><span class="ic"></span><div class="t"><b>'+klaar.length+' '+T('pd.r.klaar','rit(ten) afgerond')+' · '+eur(omzet)+'</b><span>'+T('pd.r.netto','Volledig voor de zaak: RTG rekent 0% commissie.')+'</span></div></div></div>';
     document.querySelectorAll('[data-pdgo]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/ride/status', { ref: b.dataset.pdgo, status: b.dataset.st }); await refresh(); openTab('ritten'); } catch(e){ toast(e.message); }
     }));

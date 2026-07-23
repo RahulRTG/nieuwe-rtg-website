@@ -1,8 +1,8 @@
     const afd = pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0];
     pkDorpKant = afd.key;
     pkLaadTools();
-    return '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">🏘 '+T('pd.dorp','Afdelingen')+
-      '<button class="abtn ghost" id="pkDorpChat" style="font-size:0.66rem;">💬 '+T('pd.dorp.chat','Teamchat')+'</button></div>'+
+    return '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.dorp','Afdelingen')+
+      '<button class="abtn ghost" id="pkDorpChat" style="font-size:0.66rem;">'+T('pd.dorp.chat','Teamchat')+'</button></div>'+
       '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.4rem;">'+pkDorp.afdelingen.map(a =>
         '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+a.icon+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
       '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+afd.icon+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
@@ -40,8 +40,8 @@
       '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;"><b style="font-size:0.98rem;">'+esc(b.service && b.service.name || 'Opdracht')+'</b>'+
       '<span class="hkchip'+(b.status==='bevestigd'?' amber':' rood')+'">'+(b.status==='bevestigd'?T('hk.o.bevestigd','Ingepland'):T('hk.o.nieuw','Nieuw'))+'</span></div>'+
       '<div style="font-size:0.78rem;color:var(--soft);margin-top:0.25rem;">'+esc(b.customerCodename||'')+(b.wanneer?' · '+esc(b.wanneer):'')+(b.price?' · '+eur(b.price):'')+'</div>'+
-      (b.note?'<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">📝 '+esc(b.note)+'</div>':'')+
-      (b.zorg?'<div style="font-size:0.76rem;color:#E2B93B;margin-top:0.3rem;">⚠ '+esc(pkZorg(b.zorg))+'</div>':'')+
+      (b.note?'<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">'+esc(b.note)+'</div>':'')+
+      (b.zorg?'<div style="font-size:0.76rem;color:#E2B93B;margin-top:0.3rem;">'+esc(pkZorg(b.zorg))+'</div>':'')+
       '<div class="row" style="flex-wrap:wrap;">'+acties+'</div></div>';
     let html = '<div class="card stat"><div><b style="color:#FF8589;">'+open.length+'</b><span>'+T('hk.o.nieuw','Nieuw')+'</span></div>'+
       '<div><b style="color:#E2B93B;">'+komend.length+'</b><span>'+T('hk.o.bevestigd','Ingepland')+'</span></div></div>';
@@ -86,8 +86,8 @@
         const ok = r.bevestiging && r.bevestiging.voldoetLeeftijd === true;
         if (navigator.vibrate) navigator.vibrate(ok ? 80 : [200, 80, 200]);
         uit.innerHTML = ok
-          ? '<b style="color:var(--green,#7ecb8f);font-size:1rem;">✅ '+esc(codenaam)+' '+T('pd.lft.ja','is')+' '+min+'+</b>'
-          : '<b style="color:#E36385;font-size:1rem;">⛔ '+esc(codenaam)+' '+T('pd.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
+          ? '<b style="color:var(--green,#7ecb8f);font-size:1rem;">'+esc(codenaam)+' '+T('pd.lft.ja','is')+' '+min+'+</b>'
+          : '<b style="color:#E36385;font-size:1rem;">'+esc(codenaam)+' '+T('pd.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
       } catch(e){ uit.innerHTML = '<b style="color:#E36385;">'+esc(e.message)+'</b>'; }
     }));
     wrap.querySelectorAll('[data-pkdmeter]').forEach(b => b.addEventListener('click', async () => {

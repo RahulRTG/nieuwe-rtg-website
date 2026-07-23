@@ -20,7 +20,7 @@
             const uit = (trainData.gelezen || []).includes(x.t);
             try { const d = await API.call('/supplier/training/gelezen', { titel: x.t, uit }); if (trainData) trainData.gelezen = d.gelezen; vulTrainingKaart(); }
             catch (e) { toast(e.message); }
-          } }, g ? '✅' : '⬜'),
+          } }, g ? '' : ''),
         E('div', { class: 't' }, E('b', {}, x.t), E('span', { style: { lineHeight: '1.5' } }, x.s)),
         (t.kanBeheren && eigen.some(e => e.t === x.t)) ? E('button', { class: 'abtn ghost', style: { flex: '0 0 auto', padding: '0.25rem 0.5rem', fontSize: '0.7rem' },
           onclick: async () => { try { await API.call('/supplier/training/remove', { titel: x.t }); await laadZaken(); vulTrainingKaart(); } catch (e) { toast(e.message); } } }, '✕') : null
@@ -34,7 +34,7 @@
       const addBtn = E('button', { onclick: async () => {
         const titel = (titelInp.value || '').trim(), tekst = (tekstInp.value || '').trim();
         if (!titel || !tekst) { toast(T('pd.tr.leeg', 'Geef een titel en een tekst.')); return; }
-        try { await API.call('/supplier/training/add', { titel, tekst }); toast('🎓 ' + T('pd.tr.added', 'Huistip toegevoegd voor het team.')); tipsOpen = true; await laadZaken(); vulTrainingKaart(); }
+        try { await API.call('/supplier/training/add', { titel, tekst }); toast('' + T('pd.tr.added', 'Huistip toegevoegd voor het team.')); tipsOpen = true; await laadZaken(); vulTrainingKaart(); }
         catch (e) { toast(e.message); }
       } }, T('pd.tr.add', 'Voeg toe'));
       beheer = E('div', { style: { marginTop: '0.7rem', paddingTop: '0.6rem', borderTop: '1px solid var(--line,rgba(255,255,255,0.08))' } },
@@ -44,7 +44,7 @@
     }
 
     return E('div', { class: 'card' },
-      E('div', { class: 'k' }, '🎓 ' + T('pd.tr.h', 'Training & tips'),
+      E('div', { class: 'k' }, '' + T('pd.tr.h', 'Training & tips'),
         t.func ? E('span', { style: { fontWeight: '500', color: 'var(--soft)', fontSize: '0.72rem' } }, ' ' + t.func) : null),
       tvd ? E('div', { style: { marginTop: '0.6rem', padding: '0.7rem 0.8rem', borderRadius: '12px', background: 'linear-gradient(135deg,rgba(197,160,89,0.16),rgba(197,160,89,0.05))', border: '1px solid rgba(197,160,89,0.3)' } },
         E('div', { style: Object.assign({}, label, { color: 'var(--gold)' }) }, T('pd.tr.tvd', 'Tip van de dag')),
@@ -55,9 +55,9 @@
           E('span', {}, T('pd.tr.prog', 'Voortgang')), E('span', {}, klaar + ' / ' + totaal + ' ' + T('pd.tr.read', 'gelezen'))),
         E('div', { style: { height: '7px', borderRadius: '99px', background: 'var(--line,rgba(255,255,255,0.1))', marginTop: '0.3rem', overflow: 'hidden' } },
           E('div', { style: { height: '100%', width: pct + '%', background: 'linear-gradient(90deg,var(--gold),#e6c874)', borderRadius: '99px', transition: 'width .35s' } })),
-        (klaar >= totaal) ? E('div', { style: { marginTop: '0.3rem', fontSize: '0.7rem', color: 'var(--green)' } }, '🎉 ' + T('pd.tr.allread', 'Alle tips gelezen. Topper!')) : null) : null,
+        (klaar >= totaal) ? E('div', { style: { marginTop: '0.3rem', fontSize: '0.7rem', color: 'var(--green)' } }, '' + T('pd.tr.allread', 'Alle tips gelezen. Topper!')) : null) : null,
       coachRef ? E('div', { style: { marginTop: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', color: 'var(--gold)' } },
-        '🎓 ' + T('pd.tr.ctx', 'Coaching voor') + ' ' + (coachRefTafel || coachRef) + ' ',
+        '' + T('pd.tr.ctx', 'Coaching voor') + ' ' + (coachRefTafel || coachRef) + ' ',
         E('button', { class: 'abtn ghost', style: { padding: '0.1rem 0.4rem', fontSize: '0.68rem', lineHeight: '1' },
           onclick: () => { coachRef = null; coachRefTafel = null; vulTrainingKaart(); } }, '✕')) : null,
       E('div', { class: 'compose', style: { padding: '0.55rem 0 0' } }, coachInp, coachBtn),

@@ -20,13 +20,13 @@
     // de receptie kijkt mee: vuile kamers met een aankomst vandaag gaan voor
     pkLaadReceptie();
     if (pkReceptie && (pkReceptie.hkEerst || []).length)
-      html += '<div class="card" style="border-left:4px solid #E5484D;"><div class="k">🧹 '+T('hk.eerst','Eerst deze')+'</div>'+
+      html += '<div class="card" style="border-left:4px solid #E5484D;"><div class="k">'+T('hk.eerst','Eerst deze')+'</div>'+
         '<div style="margin-top:0.35rem;font-size:0.85rem;"><b>'+pkReceptie.hkEerst.map(esc).join(', ')+'</b> · '+T('hk.eerst.s','daar komt vandaag alweer een gast aan.')+'</div></div>';
     // de AI kijkt vooruit: gasten onderweg (GPS) bepalen de prioriteit
     const onderweg = (state.guests || []).filter(g => g.heading && !g.arrived && Number.isFinite(g.etaMin));
     const vuil = rooms.filter(r => hkVan(r) === 'vuil').length;
     if (onderweg.length && vuil)
-      html += '<div class="card" style="border-left:4px solid var(--amber);"><div class="k">🧭 '+T('hk.prio','Prioriteit')+'</div>'+
+      html += '<div class="card" style="border-left:4px solid var(--amber);"><div class="k">'+T('hk.prio','Prioriteit')+'</div>'+
         '<div style="margin-top:0.35rem;font-size:0.86rem;">'+onderweg.length+' '+T('hk.gast','gast(en) onderweg, eerste over ~')+Math.min.apply(null, onderweg.map(g=>g.etaMin))+' min · '+vuil+' '+T('hk.vuilcnt','kamer(s) vuil')+'. '+T('hk.gast2','Zorg dat er een schone kamer klaarstaat.')+'</div></div>';
     // de teller van de vloer
     const n = s2 => rooms.filter(r => hkVan(r) === s2).length;
@@ -39,22 +39,22 @@
       const chip = s2==='schoon' ? '<span class="hkchip groen">'+T('hk.schoon','Schoon')+'</span>'
         : s2==='vuil' ? '<span class="hkchip rood">'+T('hk.vuil','Vuil')+'</span>'
         : s2==='bezig' ? '<span class="hkchip amber">'+T('hk.bezig','Bezig')+'</span>'
-        : s2==='defect' ? '<span class="hkchip rood">⚠ '+T('hk.defect','Defect')+'</span>'
+        : s2==='defect' ? '<span class="hkchip rood">'+T('hk.defect','Defect')+'</span>'
         : '<span class="hkchip">'+T('hk.bezet','Bezet')+'</span>';
       let acts = '';
       if (s2 === 'vuil') acts = '<button class="abtn" data-khk="'+r.id+'" data-st="bezig">▶ '+T('hk.start','Start')+'</button>';
       else if (s2 === 'bezig' || s2 === 'defect') acts = '<button class="abtn" data-khk="'+r.id+'" data-st="schoon">✓ '+T('hk.klaar','Schoon')+'</button>';
       else if (s2 === 'schoon') acts = r.vroegVrij
         ? '<button class="abtn ghost" data-vrij="'+r.id+'" data-op="uit">'+T('hk.vrijaf','Vrijgave intrekken')+'</button>'
-        : '<button class="abtn" data-vrij="'+r.id+'" data-op="aan">🛎 '+T('hk.geefvrij','Geef vrij voor vroege check-in')+'</button>';
+        : '<button class="abtn" data-vrij="'+r.id+'" data-op="aan">'+T('hk.geefvrij','Geef vrij voor vroege check-in')+'</button>';
       return '<div class="card kamer '+s2+'">'+
         '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;"><b style="font-size:0.98rem;">'+esc(r.name)+'</b>'+chip+'</div>'+
         (r.hk && r.hk.at ? '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+timeAgo(r.hk.at)+(r.hk.by?' · '+esc(r.hk.by):'')+(r.hk.note?' · '+esc(r.hk.note):'')+'</div>' : '')+
-        (r.vroegVrij ? '<div style="font-size:0.74rem;color:#7BC79B;margin-top:0.3rem;">🛎 '+T('hk.vrijchip','vrij voor vroege check-in')+'</div>' : '')+
+        (r.vroegVrij ? '<div style="font-size:0.74rem;color:#7BC79B;margin-top:0.3rem;">'+T('hk.vrijchip','vrij voor vroege check-in')+'</div>' : '')+
         '<div class="row" style="flex-wrap:wrap;">'+acts+
           (s2 !== 'vuil' && s2 !== 'defect' ? '<button class="abtn ghost" data-khk="'+r.id+'" data-st="vuil">'+T('hk.checkout','Check-out (vuil)')+'</button>' : '')+
-          (s2 !== 'defect' ? '<button class="abtn warn" data-defect="'+r.id+'">⚠ '+T('hk.defectmeld','Defect')+'</button>' : '')+
-          '<button class="abtn ghost" data-mb="'+r.id+'">🧃 '+T('hk.minibar','Minibar')+'</button></div>'+
+          (s2 !== 'defect' ? '<button class="abtn warn" data-defect="'+r.id+'">'+T('hk.defectmeld','Defect')+'</button>' : '')+
+          '<button class="abtn ghost" data-mb="'+r.id+'">'+T('hk.minibar','Minibar')+'</button></div>'+
         (mbOpen === r.id ? minibarBlok(r) : '')+
       '</div>';
     }).join('');

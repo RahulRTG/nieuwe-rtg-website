@@ -1,11 +1,11 @@
       const eigen = (zbData.afspraken || []).filter(a => a.behandelaarId === b.id);
       return '<div class="card"><div class="k">'+esc(b.naam)+' · '+esc(b.functie)+'</div>'+
         (eigen.length ? eigen.map(a =>
-          '<div class="task"><span class="ic">'+(a.soort==='medisch'?'🩺':'🧖')+'</span><div class="t">'+
+          '<div class="task"><span class="ic">'+(a.soort==='medisch'?'':'')+'</span><div class="t">'+
             '<b style="font-variant-numeric:tabular-nums;">'+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</b>'+
             '<span>'+T('pd.zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min · '+eur(a.prijs)+'</span>'+
-            (a.zorg ? '<span style="display:block;color:#E2B93B;">⚠ '+esc(pkZorg(a.zorg))+'</span>' : '')+
-            (a.intake ? '<span style="display:block;color:#E2B93B;">🩺 '+esc(a.intake)+'</span>' : '')+
+            (a.zorg ? '<span style="display:block;color:#E2B93B;">'+esc(pkZorg(a.zorg))+'</span>' : '')+
+            (a.intake ? '<span style="display:block;color:#E2B93B;">'+esc(a.intake)+'</span>' : '')+
           '</div>'+
           (a.status === 'afgerond' ? '<span class="pill g">'+T('pd.zb.klaar','Afgerond')+'</span>'
             : '<button class="abtn" data-zbklaar="'+esc(a.ref)+'">'+T('pd.zb.afronden','Afronden')+'</button>')+
@@ -17,7 +17,7 @@
       '<div class="row" style="flex-wrap:wrap;margin-top:0.5rem;">'+dagen.join('')+'</div></div>' + perBehandelaar;
     wrap.querySelectorAll('[data-zbdag]').forEach(b => b.addEventListener('click', () => { zbDatum = b.dataset.zbdag; laadZorgbalie(); }));
     wrap.querySelectorAll('[data-zbklaar]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/care/afronden', { ref: b.dataset.zbklaar }); toast(T('pd.zb.klaar','Afgerond') + ' ✅'); laadZorgbalie(); }
+      try { await API.call('/supplier/care/afronden', { ref: b.dataset.zbklaar }); toast(T('pd.zb.klaar','Afgerond') + ' '); laadZorgbalie(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -50,7 +50,7 @@
       const open = [...(mkHulp.bijstand || []), ...(mkHulp.meldingen || []).filter(m => m.status !== 'afgerond')];
       html += '<div class="card"><div class="k">'+esc(mkHulp.korps.naam)+' · '+(mkHulp.open || 0)+' '+T('pd.mk.open','open')+'</div>'+
         (open.length ? open.map(m =>
-          '<div class="task"><span class="ic">'+(m.prio === 1 ? '🔴' : m.prio === 2 ? '🟠' : '🟢')+'</span><div class="t"><b>'+esc(m.tekst)+'</b>'+
+          '<div class="task"><span class="ic">'+(m.prio === 1 ? '' : m.prio === 2 ? '' : '')+'</span><div class="t"><b>'+esc(m.tekst)+'</b>'+
           '<span>'+(m.plek ? esc(m.plek)+' · ' : '')+esc(m.status)+'</span></div>'+
           '<button class="abtn ghost" data-mkst="ter-plaatse" data-mkm="'+m.id+'">'+T('pd.mk.tp','Ter plaatse')+'</button>'+
           '<button class="abtn" data-mkst="afgerond" data-mkm="'+m.id+'">'+T('pd.mk.af','Rond af')+'</button></div>').join('')
@@ -60,14 +60,14 @@
     if (mkZorg && mkZorg.receptie){
       html += '<div class="card"><div class="k">'+T('pd.mk.receptie','Medische receptie')+'</div>'+
         (mkZorg.receptie.length ? mkZorg.receptie.map(p =>
-          '<div class="task"><span class="ic">🪪</span><div class="t"><b>'+esc(p.aanduiding)+'</b><span>'+esc(p.status)+(p.kamer ? ' ('+esc(p.kamer)+')' : '')+'</span></div>'+
+          '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(p.aanduiding)+'</b><span>'+esc(p.status)+(p.kamer ? ' ('+esc(p.kamer)+')' : '')+'</span></div>'+
           (p.status === 'wacht' ? '<button class="abtn" data-mkroep="'+p.id+'">'+T('pd.mk.roep','Roep op')+'</button>' : '')+
           '<button class="abtn ghost" data-mkpk="'+p.id+'">'+T('pd.mk.klaar','Klaar')+'</button></div>').join('')
         : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.mk.wkleeg','De wachtkamer is leeg.')+'</div>')+'</div>';
     }
     if (mkZorg && mkZorg.seh){
       html += '<div class="card"><div class="k">'+T('pd.mk.seh','Eerste hulp')+' · '+mkZorg.seh.length+' '+T('pd.mk.inrij','in de rij')+'</div>'+
-        mkZorg.seh.slice(0, 6).map(p => '<div class="task"><span class="ic">'+({rood:'🔴',oranje:'🟠',geel:'🟡',groen:'🟢',blauw:'🔵'}[p.triage]||'🟡')+'</span><div class="t"><b>'+esc(p.klacht)+'</b><span>'+esc(p.status)+' · via '+esc(p.via)+'</span></div></div>').join('')+'</div>';
+        mkZorg.seh.slice(0, 6).map(p => '<div class="task"><span class="ic">'+({rood:'',oranje:'',geel:'',groen:'',blauw:''}[p.triage]||'')+'</span><div class="t"><b>'+esc(p.klacht)+'</b><span>'+esc(p.status)+' · via '+esc(p.via)+'</span></div></div>').join('')+'</div>';
     }
     // de ketenchat: het gedeelde kanaal en de eigen besloten groepen
     if (mkKeten && (mkKeten.kanalen || []).length){
@@ -89,7 +89,7 @@
       try { await API.call('/supplier/keten/bericht', { kanaal: mkKanaal, tekst: t }); laadMeldkamerPda(); } catch(e){ toast(e.message); }
     });
     wrap.querySelectorAll('[data-mkm]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/hulp/melding/status', { melding: b.dataset.mkm, status: b.dataset.mkst }); toast('✅'); laadMeldkamerPda(); }
+      try { await API.call('/supplier/hulp/melding/status', { melding: b.dataset.mkm, status: b.dataset.mkst }); toast(''); laadMeldkamerPda(); }
       catch(e){ toast(e.message); }
     }));
     wrap.querySelectorAll('[data-mkroep]').forEach(b => b.addEventListener('click', async () => {

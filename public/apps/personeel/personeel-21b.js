@@ -31,7 +31,7 @@
         if (!pdaPasBel || !ikBinnen()) return;
         try {
           const d = JSON.parse(e.data || '{}');
-          toast('🛎️ ' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));
+          toast('' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));
           if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
         } catch(err){}
       });

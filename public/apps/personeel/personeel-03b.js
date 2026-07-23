@@ -9,7 +9,7 @@
         '<div class="k">'+T('pd.ka.naam','Jouw naam')+'</div>'+
         '<input class="hin" id="kaNaam" maxlength="30" style="margin-top:0.4rem;" value="'+esc(naam)+'">'+
         '<div class="row"><select class="hin" id="kaKamer">'+k.kamers.map(x => '<option value="'+x.id+'">'+x.emoji+' '+esc(x.naam)+'</option>').join('')+'</select>'+
-        '<select class="hin" id="kaWaar" style="max-width:9.5rem;"><option value="thuis">🏠 '+T('pd.ka.thuis','Thuis')+'</option><option value="kantoor">🏢 '+T('pd.ka.hier','Kantoor')+'</option></select></div>'+
+        '<select class="hin" id="kaWaar" style="max-width:9.5rem;"><option value="thuis">'+T('pd.ka.thuis','Thuis')+'</option><option value="kantoor">'+T('pd.ka.hier','Kantoor')+'</option></select></div>'+
         '<button class="abtn" id="kaMeldGo" style="margin-top:0.7rem;width:100%;padding:0.8rem;">'+T('pd.ka.meld','Meld je aan voor je dienst')+'</button>'+
         '<div id="kaMFout" style="margin-top:0.4rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>'+
       '<div class="card" id="kaDienstBlok" hidden><div id="kaDienstTekst" style="font-size:0.9rem;"></div>'+
@@ -24,13 +24,13 @@
     const toonDienst = () => {
       $('#kaMeld').hidden = !!kaDienst;
       $('#kaDienstBlok').hidden = !kaDienst;
-      if (kaDienst) $('#kaDienstTekst').textContent = '✅ ' + kaDienst.naam + ' ' + T('pd.ka.aangemeld','is aangemeld') + ' (' + kaDienst.waar + ', ' + kaDienst.kamer + ').';
+      if (kaDienst) $('#kaDienstTekst').textContent = '' + kaDienst.naam + ' ' + T('pd.ka.aangemeld','is aangemeld') + ' (' + kaDienst.waar + ', ' + kaDienst.kamer + ').';
     };
     const laadWie = async () => {
       try {
         const d = await kaApi('dienst');
         $('#kaWie').innerHTML = d.aangemeld.length ? d.aangemeld.map(x =>
-          '<div class="task"><span class="ic">'+(x.waar==='thuis'?'🏠':'🏢')+'</span><div class="t"><b>'+esc(x.naam)+'</b><span>'+esc(x.kamer)+'</span></div></div>').join('')
+          '<div class="task"><span class="ic">'+(x.waar==='thuis'?'':'')+'</span><div class="t"><b>'+esc(x.naam)+'</b><span>'+esc(x.kamer)+'</span></div></div>').join('')
           : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.niemand','Nog niemand aangemeld.')+'</div>';
       } catch(e){}
     };
@@ -40,7 +40,7 @@
         if (!kamer) return;
         const d = await kaApi('kachat', { kamer });
         $('#kaChat').innerHTML = d.berichten.length ? d.berichten.slice(-25).map(m =>
-          '<div style="padding:0.25rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' 📸':'')+'</div>').join('')
+          '<div style="padding:0.25rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' ':'')+'</div>').join('')
           : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.stil','Nog stil hier.')+'</div>';
         $('#kaChat').scrollTop = $('#kaChat').scrollHeight;
       } catch(e){}

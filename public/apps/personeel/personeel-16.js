@@ -2,7 +2,7 @@
         // tap to pay als het kan, met altijd de uitweg om de code te typen
         let code = null;
         if (window.TapPay && TapPay.kan() && window.confirm(T('pd.w.tapkeuze','Tap to pay: de klant tikt zijn toestel hiertegen. Liever de code typen (bijv. als NFC niet werkt)? Kies dan Annuleren.'))){
-          toast('📳 '+T('pd.w.tap','Tap to pay: laat de klant het toestel hiertegen houden...'));
+          toast(''+T('pd.w.tap','Tap to pay: laat de klant het toestel hiertegen houden...'));
           code = await TapPay.lees(12000);
           if (!code) toast(T('pd.w.tapmis','Geen tik ontvangen; typ de code van de klant.'));
         }
@@ -16,7 +16,7 @@
       if (winkelKlant) body.klantKey = winkelKlant.key;
       try {
         const r = await API.call('/supplier/retail/verkoop', body);
-        toast('✅ '+T('pd.w.verkocht','Verkocht')+' · '+eur(r.sale.total));
+        toast(''+T('pd.w.verkocht','Verkocht')+' · '+eur(r.sale.total));
         winkelCart = [];
         if (winkelKlant){ try { winkelKlant = (await API.call('/supplier/retail/klant', { key: winkelKlant.key })).klant; } catch(e){} }
         await laadWinkel();
@@ -28,7 +28,7 @@
       try {
         const r = await API.call('/supplier/retail/zoek', { q: wrap.querySelector('#wZoek').value });
         uit.innerHTML = r.resultaten.length ? r.resultaten.map(v =>
-          '<div class="task"><span class="ic">'+(v.voorraad>0?'👕':'🚫')+'</span><div class="t"><b>'+esc(v.artikel)+'</b><span>'+esc(v.kleur)+' · '+esc(v.maat)+' · '+eur(v.price)+' · '+T('pd.w.voorraad','voorraad')+' '+v.voorraad+'</span></div>'+
+          '<div class="task"><span class="ic">'+(v.voorraad>0?'':'')+'</span><div class="t"><b>'+esc(v.artikel)+'</b><span>'+esc(v.kleur)+' · '+esc(v.maat)+' · '+eur(v.price)+' · '+T('pd.w.voorraad','voorraad')+' '+v.voorraad+'</span></div>'+
           '<div style="display:flex;gap:0.3rem;">'+
           (v.voorraad>0?'<button class="abtn" data-wadd="'+esc(v.vsku)+'" data-wnaam="'+esc(v.artikel)+'" data-wkleur="'+esc(v.kleur)+'" data-wmaat="'+esc(v.maat)+'" data-wprice="'+v.price+'">+</button>':'')+
           (v.voorraad>0?'<button class="abtn ghost" data-wapart="'+esc(v.vsku)+'">'+T('pd.w.legapart','Apart')+'</button>':'')+
@@ -82,18 +82,18 @@
     let html = '';
     // Vandaag-briefing (leesbaar samengevat voor de knecht)
     const br = o.briefing || { punten:[] };
-    html += '<div class="card"><div class="k">🌱 '+T('pd.boer.vandaag','Vandaag op het land')+'</div>'+
-      (br.punten.length ? br.punten.map(p => '<div class="task"><span class="ic">'+(p.soort==='oogst'?'🌾':p.soort==='voer'?'🐄':p.soort==='water'?'💧':p.soort==='gezondheid'?'🩺':'📋')+'</span><div class="t"><b>'+esc(p.tekst)+'</b></div></div>').join('')
+    html += '<div class="card"><div class="k">'+T('pd.boer.vandaag','Vandaag op het land')+'</div>'+
+      (br.punten.length ? br.punten.map(p => '<div class="task"><span class="ic">'+(p.soort==='oogst'?'':p.soort==='voer'?'':p.soort==='water'?'':p.soort==='gezondheid'?'':'')+'</span><div class="t"><b>'+esc(p.tekst)+'</b></div></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.rustig','Niets dringends. Fijne dag.')+'</div>')+'</div>';
     // Taken van vandaag / open
     const open = (o.taken||[]).filter(t => !t.klaar);
     html += '<div class="card"><div class="k">'+T('pd.boer.taken','Taken')+' ('+open.length+')</div>'+
-      (open.length ? open.map(t => '<div class="task"><span class="ic">'+((t.voor&&t.voor<vandaag)?'⏰':'📋')+'</span><div class="t"><b>'+esc(t.wat)+'</b><span>'+(t.waar?'📍 '+esc(t.waar):'')+(t.voor?' · '+esc(t.voor):'')+'</span></div><button class="abtn" data-btaak="'+t.id+'">'+T('pd.boer.klaar','Klaar')+'</button></div>').join('')
+      (open.length ? open.map(t => '<div class="task"><span class="ic">'+((t.voor&&t.voor<vandaag)?'':'')+'</span><div class="t"><b>'+esc(t.wat)+'</b><span>'+(t.waar?''+esc(t.waar):'')+(t.voor?' · '+esc(t.voor):'')+'</span></div><button class="abtn" data-btaak="'+t.id+'">'+T('pd.boer.klaar','Klaar')+'</button></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.geentaak','Geen open taken.')+'</div>')+'</div>';
     // Percelen: oogsten en water geven
     const perc = (o.percelen||[]).filter(p => p.gewasLabel && p.fase !== 'geoogst');
     if (perc.length) html += '<div class="card"><div class="k">'+T('pd.boer.perc','Percelen')+'</div>'+
-      perc.map(p => '<div class="task"><span class="ic">'+(p.fase==='te-oogsten'?'🌾':'🌱')+'</span><div class="t"><b>'+esc(p.naam)+' · '+esc(p.gewasLabel)+'</b><span>'+(p.fase==='te-oogsten'?T('pd.boer.oogstklaar','oogstklaar'):(p.restDagen+' '+T('pd.boer.dgn','dagen tot oogst')))+'</span></div>'+
-        (p.fase==='te-oogsten' ? '<button class="abtn" data-boogst="'+p.id+'">'+T('pd.boer.oogsten','Oogst')+'</button>' : '<button class="abtn" data-bwater="'+p.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);">💧</button>')+'</div>').join('')+'</div>';
+      perc.map(p => '<div class="task"><span class="ic">'+(p.fase==='te-oogsten'?'':'')+'</span><div class="t"><b>'+esc(p.naam)+' · '+esc(p.gewasLabel)+'</b><span>'+(p.fase==='te-oogsten'?T('pd.boer.oogstklaar','oogstklaar'):(p.restDagen+' '+T('pd.boer.dgn','dagen tot oogst')))+'</span></div>'+
+        (p.fase==='te-oogsten' ? '<button class="abtn" data-boogst="'+p.id+'">'+T('pd.boer.oogsten','Oogst')+'</button>' : '<button class="abtn" data-bwater="'+p.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);"></button>')+'</div>').join('')+'</div>';
     // Dieren: voeren
     const dr = (o.dieren||[]);

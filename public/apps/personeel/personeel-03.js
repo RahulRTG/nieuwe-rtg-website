@@ -55,7 +55,7 @@
         if (!r.ok || !(d.rollen || []).some(x => x.rol === 'kantoor')) return;
         const b = document.createElement('button');
         b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
-        b.textContent = '👤 ' + T('pd.ka.een', 'Verder met uw RTG-account');
+        b.textContent = '' + T('pd.ka.een', 'Verder met uw RTG-account');
         b.addEventListener('click', async () => {
           const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: JSON.stringify({ rol: 'kantoor' }) });
           const sd = await s.json().catch(() => ({}));

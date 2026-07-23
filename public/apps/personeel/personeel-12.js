@@ -68,7 +68,7 @@
      gestart de volle tijd; de langzaamste kant bepaalt wanneer de rest start,
      zodat de hele tafel tegelijk warm uitgaat. Elke actie hier staat direct
      op het keukenscherm en andersom (SSE-sync). */
-  const PDA_KANTEN = { warm:['🔥','Warme kant'], koud:['❄️','Koude kant'], snack:['🍟','Snacks'], dessert:['🍰','Desserts'], bar:['🍸','Bar'], pas:['🍽️','De pas'] };
+  const PDA_KANTEN = { warm:['','Warme kant'], koud:['','Koude kant'], snack:['','Snacks'], dessert:['','Desserts'], bar:['','Bar'], pas:['','De pas'] };
   const PDA_KTIJD = { warm: 12, koud: 6, snack: 8, dessert: 5 };
   let pdaKant = (() => { try { return localStorage.getItem('rtg_pda_kant') || 'warm'; } catch(e){ return 'warm'; } })();
   const heeftKeuken = () => !!(state && (state.menu||[]).some(m => m.station !== 'bar'));

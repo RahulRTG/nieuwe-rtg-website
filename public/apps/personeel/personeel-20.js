@@ -1,5 +1,5 @@
-        if (v.inkomend) return '<div class="task"><span class="ic">📥</span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span style="font-size:0.7rem;color:var(--soft);">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';
-        return '<div class="task"><span class="ic">📤</span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.wait','wacht op akkoord')+'</span></div></div>';
+        if (v.inkomend) return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span style="font-size:0.7rem;color:var(--soft);">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';
+        return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.wait','wacht op akkoord')+'</span></div></div>';
       }).join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.none','Nog geen verbindingen.')+'</div>')+
       (me.role==='manager' ? '<div class="compose" style="margin-top:0.5rem;"><input id="netCode" placeholder="'+T('pd.net.code','Bedrijfscode')+'" style="text-transform:uppercase;"><button id="netAdd">'+T('pd.net.connect','Verbind')+'</button></div>' : '')+
       '<div id="netChat"></div></div>';
@@ -12,7 +12,7 @@
     $('#tmMsg').addEventListener('keydown', e => { if (e.key==='Enter') send(); });
     const tc = document.getElementById('teamCall'); if (tc) tc.addEventListener('click', () => window.TeamCall && TeamCall.groep());
     const ba = document.getElementById('buzzAll'); if (ba) ba.addEventListener('click', async () => {
-      try { const d = await API.call('/supplier/team/buzz', { all: true }); toast('📢 '+T('pd.allbuzzed','Hele team opgeroepen')+' ('+d.reached+').'); }
+      try { const d = await API.call('/supplier/team/buzz', { all: true }); toast(''+T('pd.allbuzzed','Hele team opgeroepen')+' ('+d.reached+').'); }
       catch(e){ toast(e.message); }
     });
     document.querySelectorAll('[data-belm]').forEach(b => b.addEventListener('click', () => window.TeamCall && TeamCall.bel(parseInt(b.dataset.belm, 10), b.dataset.naam)));
@@ -20,7 +20,7 @@
     if (window.CollegaChat) CollegaChat.badges();
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
-        toast(d.reached ? '📳 '+d.name+' '+T('pd.buzzed','wordt opgeroepen.') : d.name+' '+T('pd.buzzoff','heeft de app nu niet open.')); }
+        toast(d.reached ? ''+d.name+' '+T('pd.buzzed','wordt opgeroepen.') : d.name+' '+T('pd.buzzoff','heeft de app nu niet open.')); }
       catch(e){ toast(e.message); }
     }));
     // personeelsnetwerk: verbinden, goedkeuren en chatten in de aparte ruimte
@@ -66,7 +66,7 @@
       document.getElementById('shell').appendChild(el);
       el.addEventListener('click', () => el.classList.remove('on'));
     }
-    el.innerHTML = '<div class="bz"><div class="bz-ic">📳</div><b>'+esc(from)+'</b><span>'+T('pd.buzzcalls','roept u op')+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
+    el.innerHTML = '<div class="bz"><div class="bz-ic"></div><b>'+esc(from)+'</b><span>'+T('pd.buzzcalls','roept u op')+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
     setTimeout(() => el.classList.remove('on'), 8000);
   }
@@ -81,8 +81,8 @@
       el.addEventListener('click', () => el.classList.remove('on'));
     }
     const locTxt = d.loc ? (d.label ? d.label + ' · ' : '') + d.loc.lat.toFixed(4) + ', ' + d.loc.lng.toFixed(4) : T('pd.noloc','locatie onbekend');
-    el.innerHTML = '<div class="bz"><div class="bz-ic">🚨</div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('pd.needs','heeft direct assistentie nodig'))+'</span>'+
-      '<span style="margin-top:0.6rem;font-size:0.8rem;">📍 '+esc(locTxt)+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
+    el.innerHTML = '<div class="bz"><div class="bz-ic"></div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('pd.needs','heeft direct assistentie nodig'))+'</span>'+
+      '<span style="margin-top:0.6rem;font-size:0.8rem;">'+esc(locTxt)+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
   }
 
@@ -94,7 +94,7 @@
     const fire = async (lat, lng) => {
       if (klaar) return;
       klaar = true;
-      try { await API.call('/supplier/security', { lat, lng, note: note || '' }); toast(melding || ('🚨 '+T('pd.sossent','Noodoproep verstuurd. Het team en RTG zijn gealarmeerd.'))); }
+      try { await API.call('/supplier/security', { lat, lng, note: note || '' }); toast(melding || (''+T('pd.sossent','Noodoproep verstuurd. Het team en RTG zijn gealarmeerd.'))); }
       catch(e){ toast(e.message); }
     };
     if (navigator.geolocation){

@@ -122,7 +122,8 @@
     ticket: '<path d="M4 8h16v2.4a1.6 1.6 0 0 0 0 3.2V16H4v-2.4a1.6 1.6 0 0 0 0-3.2z"/><path d="M14 8v8" stroke-dasharray="1.5 2"/>',
     sleutel: '<circle cx="8" cy="8" r="3.6"/><path d="M10.6 10.6L19 19M15.5 15.5l2.2-2.2M13.4 13.4l1.8-1.8"/>',
     boot: '<path d="M4.5 15.5h15l-2.2 4H6.7zM12 4.2v10M12 4.2l6.4 4.5L12 10.2"/>',
-    parasol: '<path d="M12 3.2v2.4M4 12.5a8 8 0 0 1 16 0zM12 12.5v5.3a2 2 0 0 0 4 0"/>'
+    parasol: '<path d="M12 3.2v2.4M4 12.5a8 8 0 0 1 16 0zM12 12.5v5.3a2 2 0 0 0 4 0"/>',
+    bar: '<path d="M4.5 5h15l-7.5 8zM12 13v6M8 19h8M15.5 8l2.5-3"/>'
   };
 
   /* De <svg>-jas als string (voor code die HTML samenstelt i.p.v. DOM-nodes).

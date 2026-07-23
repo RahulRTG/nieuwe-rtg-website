@@ -1998,7 +1998,7 @@ async function openBoard(){
     .filter(f => (f.doelgroepen || []).some(dg => dg.id === 'leverancier' || dg.id === 'personeel'));
   const lrF = $('#lrFunctie').value, lrG = $('#lrGenre').value; // keuze overleeft het hertekenen
   $('#lrFunctie').innerHTML = werkFuncties.map(f => '<option value="'+esc(f.id)+'">'+esc(f.naam)+'</option>').join('');
-  $('#lrGenre').innerHTML = (d.genres || []).map(g => '<option value="'+esc(g.id)+'">'+esc((g.icon||'')+' '+(g.label||g.id))+'</option>').join('');
+  $('#lrGenre').innerHTML = (d.genres || []).map(g => '<option value="'+esc(g.id)+'">'+esc(g.label||g.id)+'</option>').join('');
   if (lrF) $('#lrFunctie').value = lrF;
   if (lrG) $('#lrGenre').value = lrG;
   const dichtRegels = (d.genreRegels || []).filter(r => r.soort !== 'uitzondering');
@@ -2069,7 +2069,7 @@ const eurC = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDi
 async function laadGeld(){
   try {
     const d = await api('geld');
-    const genres = d.genres.map(g => '<option value="'+esc(g.id)+'">'+esc((g.icon||'')+' '+(g.label||g.id))+'</option>').join('');
+    const genres = d.genres.map(g => '<option value="'+esc(g.id)+'">'+esc(g.label||g.id)+'</option>').join('');
     if (!$('#gComGenre').options.length) { $('#gComGenre').innerHTML = genres; $('#gKorGenre').innerHTML = genres; }
     const p = d.pasprijzen;
     $('#gPasNu').textContent = 'Nu: RTG ' + eurC(p.rtg.maandCenten) + ' · Lifestyle ' + eurC(p.lifestyle.maandCenten) + ' · gratis app € 0 · Business op maat · 30% naar RTFoundation';
@@ -2222,6 +2222,7 @@ function officeLive(){
 if (TOKEN) binnen().then(officeLive).catch(uitgelogd);
 else uitgelogd();
 </script>
+<script src="/shared/glyf.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/accounts-os.js" defer></script>

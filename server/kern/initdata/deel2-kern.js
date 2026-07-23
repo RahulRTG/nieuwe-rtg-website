@@ -20,7 +20,7 @@ module.exports = (ctx) => {
   // huurder kan vrijwillig zijn live locatie delen. Vaste dagprijs, geen
   // verrassingen aan de balie.
   if (!db.data.supplierTypes.verhuur)
-    db.data.supplierTypes.verhuur = { label: 'Autoverhuur', icon: '\u{1F697}', caps: ['huur', 'location', 'pricing'] };
+    db.data.supplierTypes.verhuur = { label: 'Autoverhuur', icon: 'sleutel', caps: ['huur', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'ISLAREN')) {
     db.data.suppliers.push({
       code: 'ISLAREN', name: 'Isla Rent Ibiza', type: 'verhuur', city: 'Ibiza',
@@ -60,7 +60,7 @@ module.exports = (ctx) => {
   // onderweg, gearriveerd) met slimme toewijzing van piloot en toestel; 18+ zoals
   // de privejet, en de piloot bevestigt weer en helipad voor het opstijgen.
   if (!db.data.supplierTypes.helikopter)
-    db.data.supplierTypes.helikopter = { label: 'Helikopter transfers', icon: '\u{1F681}', caps: ['rides', 'fleet', 'location', 'pricing'] };
+    db.data.supplierTypes.helikopter = { label: 'Helikopter transfers', icon: 'vluchten', caps: ['rides', 'fleet', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'IBIZAIR')) {
     db.data.suppliers.push({
       code: 'IBIZAIR', name: 'Ibiza Sky Charter', type: 'helikopter', city: 'Ibiza',
@@ -85,7 +85,7 @@ module.exports = (ctx) => {
   // en na, borg, SOS en live positie op het water), aangevuld met vaartuig-specifieke
   // zaken: motoruren, brandstof, ligplaats, en bemand (crewed) of bareboat varen.
   if (!db.data.supplierTypes.charter)
-    db.data.supplierTypes.charter = { label: 'Boten & jachten', icon: '\u{26F5}', caps: ['charter', 'location', 'pricing'] };
+    db.data.supplierTypes.charter = { label: 'Boten & jachten', icon: 'boot', caps: ['charter', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'AZUL')) {
     const vaartuig = (id, o) => Object.assign({ id, actief: true, type: 'Motorjacht', lengte: 12, bouwjaar: 2022,
       gasten: 8, hutten: 2, slaapplaatsen: 4, brandstof: 'diesel', snelheidKn: 25, ligplaats: 'Marina Botafoch',

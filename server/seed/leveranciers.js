@@ -8,14 +8,14 @@ module.exports = {
      heeft eigen mogelijkheden (caps) die de app-schermen bepalen. Leveranciers
      gebruiken de app gratis in ruil voor de beste dynamische prijs aan RTG. */
   supplierTypes: {
-    hotel:      { label: 'Hotel',        icon: '🏨', caps: ['bookings', 'location', 'pricing'] },
-    apartment:  { label: 'Appartement',  icon: '🏡', caps: ['bookings', 'doors', 'location', 'pricing'] },
-    taxi:       { label: 'Taxi',         icon: '🚘', caps: ['rides', 'location', 'pricing'] },
-    jet:        { label: 'Privéjet',     icon: '✈️', caps: ['rides', 'location', 'pricing'] },
-    restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
-    bar:        { label: 'Bar',          icon: '🍸', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
-    club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
-    zorg:       { label: 'Zorg & welzijn', icon: '🌿', caps: ['care', 'location', 'pricing'] }
+    hotel:      { label: 'Hotel',        icon: 'hotel', caps: ['bookings', 'location', 'pricing'] },
+    apartment:  { label: 'Appartement',  icon: 'maison', caps: ['bookings', 'doors', 'location', 'pricing'] },
+    taxi:       { label: 'Taxi',         icon: 'auto', caps: ['rides', 'location', 'pricing'] },
+    jet:        { label: 'Privéjet',     icon: 'vluchten', caps: ['rides', 'location', 'pricing'] },
+    restaurant: { label: 'Restaurant',   icon: 'horeca', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
+    bar:        { label: 'Bar',          icon: 'bar', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
+    club:       { label: 'Club',         icon: 'muziek', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
+    zorg:       { label: 'Zorg & welzijn', icon: 'zorg', caps: ['care', 'location', 'pricing'] }
   },
 
   /* Voorbeeldleveranciers (demo-inlogcodes). rate = de dynamische prijs die

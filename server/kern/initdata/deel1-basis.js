@@ -75,7 +75,7 @@ module.exports = (ctx) => {
   // het zzp-genre: zelfstandige professionals (mode, health, fotografie...)
   // bieden diensten en producten aan; leden boeken met datum en tijd
   if (!db.data.supplierTypes.zzp)
-    db.data.supplierTypes.zzp = { label: 'Zelfstandig professional', icon: '🧑‍🎨', caps: ['services', 'location', 'pricing'] };
+    db.data.supplierTypes.zzp = { label: 'Zelfstandig professional', icon: 'werk', caps: ['services', 'location', 'pricing'] };
   if (!db.data.boekingen) db.data.boekingen = [];
   if (!db.data.suppliers.find(s => s.code === 'AYAKA')) {
     db.data.suppliers.push({
@@ -105,7 +105,7 @@ module.exports = (ctx) => {
   // tijdsloten en capaciteit; personeel (gids/security/balie) checkt de
   // entreecode af aan de deur, op eigen naam
   if (!db.data.supplierTypes.activiteit)
-    db.data.supplierTypes.activiteit = { label: 'Activiteiten & musea', icon: '\u{1F39F}\uFE0F', caps: ['tickets', 'rides', 'location', 'pricing'] };
+    db.data.supplierTypes.activiteit = { label: 'Activiteiten & musea', icon: 'ticket', caps: ['tickets', 'rides', 'location', 'pricing'] };
   // eigen transferdienst: activiteitenzaken rijden ook (migratie voor bestaande kasten)
   if (db.data.supplierTypes.activiteit && !db.data.supplierTypes.activiteit.caps.includes('rides'))
     db.data.supplierTypes.activiteit.caps.push('rides');

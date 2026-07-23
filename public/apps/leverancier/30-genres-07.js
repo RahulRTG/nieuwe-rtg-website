@@ -15,7 +15,7 @@
     if (mk){
       // CREATOR: leveranciers vinden + open oproepen
       html += '<div class="card"><div class="tt-h">'+T('sw.vind','Vind een leverancier om mee samen te werken')+'</div>'+
-        ((swLijst&&swLijst.leveranciers)||[]).slice(0,40).map(l => '<div class="mitem"><div class="r1"><span class="nm">'+(l.icon||'')+' '+esc(l.name)+'</span><span class="pr" style="font-size:0.72rem;color:var(--soft);">'+esc(l.typeLabel||'')+'</span></div>'+
+        ((swLijst&&swLijst.leveranciers)||[]).slice(0,40).map(l => '<div class="mitem"><div class="r1"><span class="nm">'+(window.RTGGlyf?RTGGlyf.svgHTML(l.icon,{klasse:'gl-inline'}):'')+' '+esc(l.name)+'</span><span class="pr" style="font-size:0.72rem;color:var(--soft);">'+esc(l.typeLabel||'')+'</span></div>'+
           (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+l.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+l.code+'">'+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
       const oproepen = (sw.openOproepen||[]).filter(op => !op.ikReageerde);
       html += '<div class="card"><div class="tt-h">'+T('sw.oproepen','Open oproepen van leveranciers')+' ('+oproepen.length+')</div>'+

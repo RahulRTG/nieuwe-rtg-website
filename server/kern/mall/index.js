@@ -55,7 +55,7 @@ function maakMall({ db, save, crypto, isRetail }) {
   function seed() {
     if (!db.data.suppliers || !Array.isArray(db.data.suppliers)) return;
     if (!db.data.supplierTypes.retail)
-      db.data.supplierTypes.retail = { label: 'Mode & retail', icon: '🛍️', caps: ['retail', 'location', 'pricing'] };
+      db.data.supplierTypes.retail = { label: 'Mode & retail', icon: 'mode', caps: ['retail', 'location', 'pricing'] };
     // de bestaande modepartner op de mode-etage zetten
     const maison = db.data.suppliers.find(s => s.code === 'MAISON');
     if (maison && !maison.mall) maison.mall = { etage: 'mode', tagline: 'Stille luxe uit eigen atelier, gesneden op de Riviera.' };
@@ -97,7 +97,7 @@ function maakMall({ db, save, crypto, isRetail }) {
     for (const b of boutieks) if (!db.data.suppliers.find(s => s.code === b.code)) db.data.suppliers.push(b);
     // een demo-boerderij voor de etage "Van het land"
     if (!db.data.supplierTypes.boerderij)
-      db.data.supplierTypes.boerderij = { label: 'Boerderij & tuinderij', icon: '🌾', caps: ['boerderij', 'location', 'pricing'] };
+      db.data.supplierTypes.boerderij = { label: 'Boerderij & tuinderij', icon: 'oogst', caps: ['boerderij', 'location', 'pricing'] };
     if (!db.data.suppliers.find(s => s.code === 'HOEVE')) {
       db.data.suppliers.push({
         code: 'HOEVE', name: 'Hoeve del Sol', type: 'boerderij', city: 'Ibiza',

@@ -13,7 +13,7 @@ module.exports = (ctx) => {
   // leden (via de Salon of prive), met biedingen, bezichtigingen en keyless
   // toegang, en snelle contracten via het contractsysteem
   if (!db.data.supplierTypes.vastgoed)
-    db.data.supplierTypes.vastgoed = { label: 'Vastgoed & makelaar', icon: '\u{1F3E1}', caps: ['vastgoed', 'location', 'pricing'] };
+    db.data.supplierTypes.vastgoed = { label: 'Vastgoed & makelaar', icon: 'gebouw', caps: ['vastgoed', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'IBIZALIV')) {
     db.data.suppliers.push({
       code: 'IBIZALIV', name: 'Ibiza Living Estates', type: 'vastgoed', city: 'Ibiza',
@@ -37,7 +37,7 @@ module.exports = (ctx) => {
   }
   // --- retail/mode: modehuizen, merken en winkels ---
   if (!db.data.supplierTypes.retail)
-    db.data.supplierTypes.retail = { label: 'Mode & retail', icon: '🛍️', caps: ['retail', 'location', 'pricing'] };
+    db.data.supplierTypes.retail = { label: 'Mode & retail', icon: 'mode', caps: ['retail', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'MAISON')) {
     const c1 = crypto.randomBytes(4).toString('hex'), c2 = crypto.randomBytes(4).toString('hex');
     const va = (sku, kleuren, maten, v) => { const out = []; for (const k of kleuren) for (const m of maten) out.push({ vsku: sku + '-' + k.slice(0, 3).toUpperCase() + '-' + m, kleur: k, maat: m, voorraad: v }); return out; };
@@ -72,7 +72,7 @@ module.exports = (ctx) => {
   if (!Array.isArray(db.data.modeBezorg)) db.data.modeBezorg = [];   // veilige mode-bezorgingen
   // --- groothandel & markt: B2B naar horeca, boodschappen naar leden, doorverkoop ---
   if (!db.data.supplierTypes.groothandel)
-    db.data.supplierTypes.groothandel = { label: 'Groothandel & markt', icon: '📦', caps: ['groothandel', 'bezorgen', 'location', 'pricing'] };
+    db.data.supplierTypes.groothandel = { label: 'Groothandel & markt', icon: 'logistiek', caps: ['groothandel', 'bezorgen', 'location', 'pricing'] };
   if (!Array.isArray(db.data.groothandelOrders)) db.data.groothandelOrders = [];
   if (!db.data.suppliers.find(s => s.code === 'MERCABIZA')) {
     const gp = (naam, categorie, eenheid, inkoop, cons, voorraad, minB, herkomst) => ({
@@ -104,7 +104,7 @@ module.exports = (ctx) => {
   }
   // --- beveiliging: een commandocentrum + PDA voor topbeveiligingsteams ---
   if (!db.data.supplierTypes.beveiliging)
-    db.data.supplierTypes.beveiliging = { label: 'Beveiliging & security', icon: '🛡️', caps: ['beveiliging', 'location'] };
+    db.data.supplierTypes.beveiliging = { label: 'Beveiliging & security', icon: 'schild', caps: ['beveiliging', 'location'] };
   if (!Array.isArray(db.data.bevDiensten)) db.data.bevDiensten = [];
   if (!Array.isArray(db.data.bevAanvragen)) db.data.bevAanvragen = [];
   if (!Array.isArray(db.data.bevIncidenten)) db.data.bevIncidenten = [];

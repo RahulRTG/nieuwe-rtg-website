@@ -68,9 +68,9 @@
     let html = '';
     // type + kiezer
     html += '<div class="card"><div class="tt-h">'+T('boer.type','Soort boerderij')+'</div>'+
-      '<div style="margin-top:0.5rem;font-size:0.9rem;">'+(o.typeIcon||'')+' <b>'+esc(o.typeLabel||T('boer.geen','nog niet gekozen'))+'</b></div>'+
+      '<div style="margin-top:0.5rem;font-size:0.9rem;display:flex;align-items:center;gap:0.35rem;">'+(window.RTGGlyf?RTGGlyf.svgHTML(o.typeIcon,{klasse:'gl-inline'}):'')+' <b>'+esc(o.typeLabel||T('boer.geen','nog niet gekozen'))+'</b></div>'+
       (canEdit ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;">'+
-        o.types.map(t => '<button class="obtn'+(t.id===o.type?' primary':'')+'" data-btype="'+t.id+'">'+t.icon+' '+esc(t.label)+'</button>').join('')+'</div>' : '')+'</div>';
+        o.types.map(t => '<button class="obtn'+(t.id===o.type?' primary':'')+'" data-btype="'+t.id+'">'+(window.RTGGlyf?RTGGlyf.svgHTML(t.icon,{klasse:'gl-inline'}):'')+' '+esc(t.label)+'</button>').join('')+'</div>' : '')+'</div>';
     // Vandaag-briefing
     const br = o.briefing || { punten:[] };
     html += '<div class="card"><div class="tt-h">'+T('boer.vandaag','Vandaag')+' · '+esc(br.seizoenLabel||'')+'</div>'+

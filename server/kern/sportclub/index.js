@@ -42,7 +42,7 @@ function maakSportclub({ db, save, crypto, anthropic }) {
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
     if (!db.data.supplierTypes.sportclub)
-      db.data.supplierTypes.sportclub = { label: 'Sportclub', icon: '⚽', caps: ['sportclub'] };
+      db.data.supplierTypes.sportclub = { label: 'Sportclub', icon: 'sport', caps: ['sportclub'] };
     if (!db.data.suppliers.find(s => s.code === 'FCRTG')) {
       db.data.suppliers.push({
         code: 'FCRTG', name: 'FC RTG', type: 'sportclub', city: 'Ibiza',

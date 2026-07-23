@@ -43,7 +43,8 @@
   .genres{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;}
   .genre{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .95rem;display:flex;gap:.7rem;align-items:flex-start;text-decoration:none;color:var(--txt);transition:border-color .2s,transform .2s;}
   .genre:hover{border-color:var(--gold);transform:translateY(-2px);}
-  .genre .gi{font-size:1.3rem;line-height:1;}
+  .genre .gi{font-size:1.3rem;line-height:1;color:var(--gold);}
+  .genre .gi .rtg-glyf{width:1.35rem;height:1.35rem;display:block;}
   .genre b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;display:block;}
   .genre .gn{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
   .genre .gl{font-size:.8rem;color:var(--muted);line-height:1.45;display:block;margin-top:.25rem;}
@@ -380,7 +381,7 @@ function tekenGids(genres){
   $('#gidsWrap').innerHTML = '<div class="gids"><div class="etage-kop"><h2>Alle leveranciers</h2><span class="n">per genre · boek en reserveer</span></div>'+
     '<div class="genres">'+genres.map(g => {
       const namen = g.leveranciers.map(l => l.naam).slice(0,4).join(', ') + (g.aantal>4?' e.a.':'');
-      return '<a class="genre" href="'+esc(g.pagina)+'"><span class="gi">'+g.icon+'</span>'+
+      return '<a class="genre" href="'+esc(g.pagina)+'"><span class="gi">'+(window.RTGGlyf?RTGGlyf.svgHTML(g.icon):'')+'</span>'+
         '<div><b>'+esc(g.label)+'</b><span class="gn">'+g.aantal+' adres'+(g.aantal===1?'':'sen')+'</span>'+
         '<span class="gl">'+esc(namen)+'</span>'+
         (g.boekbaar?'<span class="ga">Openen →</span>':'')+

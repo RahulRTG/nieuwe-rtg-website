@@ -67,7 +67,7 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
     if (!db.data.supplierTypes.luchthaven)
-      db.data.supplierTypes.luchthaven = { label: 'Luchthaven', icon: '✈️', caps: ['luchthaven'] };
+      db.data.supplierTypes.luchthaven = { label: 'Luchthaven', icon: 'vluchten', caps: ['luchthaven'] };
     if (!db.data.suppliers.find(s => s.code === 'LUCHT')) {
       db.data.suppliers.push({
         code: 'LUCHT', name: 'RTG Airport', type: 'luchthaven', city: 'Ibiza',

@@ -2172,6 +2172,7 @@ Object.assign(kern, require('./kern/geloofbieb').maakGeloofBieb({ db, save }));
 Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto }));
 Object.assign(kern, require('./kern/rtfclubs')({ db, save, crypto }));
 Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropic }));
+Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));
 /* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
    vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
 Object.assign(kern, require('./kern/pestgrens')({ db, save }));
@@ -2588,6 +2589,7 @@ require('./routes/rtfbieb')(kern);
 require('./routes/geloofbieb')(kern);
 /* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
 require('./routes/rtfkantoor')(kern);
+require('./routes/labfonds')(kern);
 /* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
    school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
    (kern/samenrtf.js): kindveilig meekijken binnen gezin en vrienden. */

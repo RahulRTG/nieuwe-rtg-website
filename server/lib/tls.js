@@ -83,9 +83,14 @@ function maakServer(app, opties) {
   const ctx = contextOpties(ck);
   const alpn = ['h2', 'http/1.1'];
   const gebruikHttp2 = process.env.RTG_TLS_HTTP2 !== '0';
+  // mTLS (wederzijdse TLS): met opties.ca (het CA-bundel van onze interne CA)
+  // vraagt de server het clientcertificaat op en verifieert het tegen die CA --
+  // zo authenticeren interne componenten (zaakdoos, noodserver, instances) elkaar.
+  const mtls = {};
+  if (opties.ca) { mtls.ca = opties.ca; mtls.requestCert = opties.requestCert !== false; mtls.rejectUnauthorized = opties.rejectUnauthorized !== false; }
   const server = gebruikHttp2
-    ? http2.createSecureServer(Object.assign({ allowHTTP1: true, ALPNProtocols: alpn }, ctx), app)
-    : https.createServer(Object.assign({ ALPNProtocols: alpn }, ctx), app);
+    ? http2.createSecureServer(Object.assign({ allowHTTP1: true, ALPNProtocols: alpn }, ctx, mtls), app)
+    : https.createServer(Object.assign({ ALPNProtocols: alpn }, ctx, mtls), app);
 
   // Hot herlaad: wissel het certificaat live om (na een ACME-vernieuwing) zonder
   // de server te herstarten of ook maar één verbinding te verbreken.

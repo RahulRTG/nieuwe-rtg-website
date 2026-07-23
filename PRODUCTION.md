@@ -76,6 +76,27 @@ De app kan HTTPS zelf termineren, zonder nginx/Caddy ervoor:
 
 Het sleutelmateriaal (self-signed cert, ACME-accountsleutel, opgehaalde certificaten) staat onder `<datamap>/tls/` en wordt nooit gecommit. Een reverse proxy/CDN (Cloudflare) ervoor mag nog steeds — dan laat je `RTG_TLS` uit en blijft `trust proxy` de bron van waarheid voor `X-Forwarded-Proto`.
 
+### Eigen interne CA + mTLS (intern verkeer)
+
+Naast ACME (publieke domeinen) is er een **eigen interne certificaat-autoriteit**
+(`server/lib/ca.js`) voor het EIGEN verkeer: mTLS tussen de RTG-servers onderling,
+de zaakdoos, de noodserver en losse instances. Een intern component vertrouwt
+alleen ons CA-cert (de trust anchor) en accepteert dan elk certificaat dat wij
+ondertekenden — en niets anders.
+
+```js
+const { maakCA } = require('./server/lib/ca');
+const ca = maakCA({ dataDir });                       // root-CA (10 jr), gepersisteerd in <datamap>/tls/ca/
+const srv = ca.geefUitServer({ names: ['zaakdoos.intern'] });   // { certPem, keyPem, chainPem, serial }
+const cli = ca.geefUitClient({ cn: 'instance-2' });             // clientcert voor mTLS
+```
+
+De TLS-server zet mTLS aan met `maakServer(app, { cert, key, ca: ca.bundelPem(), requestCert: true })`:
+dan vraagt hij het clientcertificaat op en verifieert het tegen onze CA. Intrekken
+kan op serial (`ca.trekIn(serial)`); `ca.crlPem()` geeft de door de CA ondertekende
+CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onder
+`<datamap>/tls/ca/` en worden NOOIT gecommit.
+
 ---
 
 ## 4. Wat er in de code al productie-klaar is

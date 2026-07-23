@@ -18,8 +18,9 @@ const OID = {
   ecdsaSha256: '1.2.840.10045.4.3.2',
   rsaSha256: '1.2.840.113549.1.1.11',
   basicConstraints: '2.5.29.19', keyUsage: '2.5.29.15',
-  extKeyUsage: '2.5.29.37', serverAuth: '1.3.6.1.5.5.7.3.1',
-  subjectAltName: '2.5.29.17', extensionRequest: '1.2.840.113549.1.9.14'
+  extKeyUsage: '2.5.29.37', serverAuth: '1.3.6.1.5.5.7.3.1', clientAuth: '1.3.6.1.5.5.7.3.2',
+  subjectAltName: '2.5.29.17', extensionRequest: '1.2.840.113549.1.9.14',
+  ski: '2.5.29.14', aki: '2.5.29.35', crlNumber: '2.5.29.20'
 };
 
 function genKeyPair(opties) {
@@ -61,17 +62,69 @@ function extensie(oidStr, kritiek, derWaarde) {
   delen.push(a.octetString(derWaarde));
   return a.seq(...delen);
 }
-function standaardExtensies(type, namen) {
-  const ku = type === 'rsa' ? { byte: 0xa0, ongebruikt: 5 } : { byte: 0x80, ongebruikt: 7 };
-  return [
-    extensie(OID.basicConstraints, true, a.seq()),                              // cA = FALSE (default)
-    extensie(OID.keyUsage, true, a.bitString(Buffer.from([ku.byte]), ku.ongebruikt)),
-    extensie(OID.extKeyUsage, false, a.seq(a.oid(OID.serverAuth))),             // serverAuth
-    extensie(OID.subjectAltName, false, sanExtWaarde(namen))
-  ];
-}
 function serieel() {
   const b = crypto.randomBytes(16); b[0] &= 0x7f; if (b[0] === 0) b[0] = 1; return b; // positief, niet-nul
+}
+
+/* ---- extensie-bouwers ---- */
+function basicConstraintsExt(isCA, pathLen) {
+  const inner = [];
+  if (isCA) { inner.push(a.booleaans(true)); if (pathLen != null) inner.push(a.integer(pathLen)); }
+  return extensie(OID.basicConstraints, true, a.seq(...inner));                 // cA = FALSE als leeg (default)
+}
+// keyUsage-bits: digitalSignature=bit0(0x80), keyEncipherment=bit2(0x20),
+// keyCertSign=bit5(0x04), cRLSign=bit6(0x02).
+function keyUsageExt(isCA, type, isClient) {
+  let byte, ongebruikt;
+  if (isCA) { byte = 0x06; ongebruikt = 1; }                                    // keyCertSign + cRLSign
+  else if (type === 'rsa' && !isClient) { byte = 0xa0; ongebruikt = 5; }        // digitalSignature + keyEncipherment
+  else { byte = 0x80; ongebruikt = 7; }                                         // digitalSignature
+  return extensie(OID.keyUsage, true, a.bitString(Buffer.from([byte]), ongebruikt));
+}
+function ekuExt(isClient) { return extensie(OID.extKeyUsage, false, a.seq(a.oid(isClient ? OID.clientAuth : OID.serverAuth))); }
+function skiExt(keyId) { return extensie(OID.ski, false, a.octetString(keyId)); }
+function akiExt(keyId) { return extensie(OID.aki, false, a.seq(a.context(0, keyId, { constructed: false }))); } // [0] keyIdentifier
+
+// SubjectKeyIdentifier = SHA-1 van de publieke-sleutel-bits uit de SPKI-DER.
+function derVeld(buf, start) {
+  let i = start + 1, len = buf[i], hlen = 2;
+  if (len & 0x80) { const n = len & 0x7f; len = 0; for (let j = 0; j < n; j++) len = len * 256 + buf[i + 1 + j]; hlen = 2 + n; }
+  return { hlen, len, valStart: start + hlen, end: start + hlen + len };
+}
+function skiVan(spkiDer) {
+  const outer = derVeld(spkiDer, 0);
+  const alg = derVeld(spkiDer, outer.valStart);
+  const bit = derVeld(spkiDer, alg.end);                                        // subjectPublicKey BIT STRING
+  const inhoud = spkiDer.slice(bit.valStart + 1, bit.end);                      // sla de "ongebruikte bits"-byte over
+  return crypto.createHash('sha1').update(inhoud).digest();
+}
+
+/* De algemene certificaat-bouwer: alles expliciet. selfSigned en certVoor zijn
+   hier gevallen van; de interne CA (lib/ca.js) gebruikt hem voor CA-, server- en
+   client-certificaten. Voegt SKI toe (en AKI als de uitgever-SKI bekend is),
+   zodat ketenopbouw werkt zoals bij echte CA's. */
+function bouwCert(o) {
+  const nu = new Date();
+  const nietVoor = o.notBefore || new Date(nu.getTime() - 5 * 60000);
+  const nietNa = o.notAfter || new Date(nu.getTime() + (o.days || 825) * 86400000);
+  const exts = [basicConstraintsExt(!!o.isCA, o.pathLen), keyUsageExt(!!o.isCA, o.subjectType || 'ec', !!o.isClient)];
+  if (!o.isCA) exts.push(ekuExt(!!o.isClient));                                 // een CA-cert krijgt geen EKU
+  if (o.namen && o.namen.length && !o.isCA) exts.push(extensie(OID.subjectAltName, false, sanExtWaarde(o.namen)));
+  exts.push(skiExt(skiVan(o.subjectSpkiDer)));
+  if (o.issuerSkiDer) exts.push(akiExt(o.issuerSkiDer));
+  const tbs = a.seq(
+    a.context(0, a.integer(2)),                                                 // versie v3
+    a.integer(o.serial || serieel()),
+    algId(o.issuerKey.type),
+    naam(o.issuerNaam),
+    a.seq(a.tijd(nietVoor), a.tijd(nietNa)),
+    naam(o.subjectNaam),
+    a.ruw(o.subjectSpkiDer),
+    a.context(3, a.seq(...exts))
+  );
+  const sig = crypto.sign('sha256', tbs, o.issuerKey.privateKey);
+  const certDer = a.seq(tbs, algId(o.issuerKey.type), a.bitString(sig));
+  return { certDer, certPem: derNaarPem(certDer, 'CERTIFICATE'), ski: skiVan(o.subjectSpkiDer) };
 }
 
 /* Een self-signed certificaat: issuer == subject, met SAN zodat browsers het voor
@@ -80,51 +133,44 @@ function selfSigned(opties) {
   opties = opties || {};
   const namen = (opties.names && opties.names.length) ? opties.names : ['localhost', '127.0.0.1'];
   const paar = opties.key || genKeyPair(opties);
-  const nu = new Date();
-  const nietVoor = new Date(nu.getTime() - 5 * 60000);                          // 5 min terug (klok-skew)
-  const nietNa = new Date(nu.getTime() + (opties.days || 825) * 86400000);
   const subj = { cn: opties.cn || namen[0], org: opties.org || 'RTG local' };
-  const tbs = a.seq(
-    a.context(0, a.integer(2)),                                                 // versie v3
-    a.integer(serieel()),
-    algId(paar.type),
-    naam(subj),                                                                 // issuer
-    a.seq(a.tijd(nietVoor), a.tijd(nietNa)),
-    naam(subj),                                                                 // subject
-    a.ruw(paar.spkiDer),                                                        // SubjectPublicKeyInfo (van Node)
-    a.context(3, a.seq(...standaardExtensies(paar.type, namen)))
-  );
-  const sig = crypto.sign('sha256', tbs, paar.privateKey);                      // Node tekent (EC->DER, RSA->PKCS1v15)
-  const certDer = a.seq(tbs, algId(paar.type), a.bitString(sig));
-  return { certPem: derNaarPem(certDer, 'CERTIFICATE'), keyPem: paar.keyPem, key: paar, certDer };
+  const r = bouwCert({ subjectNaam: subj, subjectSpkiDer: paar.spkiDer, subjectType: paar.type,
+    issuerNaam: subj, issuerKey: paar, issuerSkiDer: skiVan(paar.spkiDer), namen, days: opties.days || 825, isClient: opties.isClient });
+  return { certPem: r.certPem, keyPem: paar.keyPem, key: paar, certDer: r.certDer };
 }
 
 /* Een certificaat uitgeven voor een GEGEVEN publieke sleutel (SPKI-DER),
    ondertekend door een uitgever-sleutelpaar. Dit is wat een CA doet: subject !=
-   issuer. selfSigned is hiervan het bijzondere geval subject == issuer. Handig
-   voor een interne mini-CA (en voor een trouwe ACME-test die een cert uitgeeft
-   voor de sleutel uit de CSR). */
+   issuer. selfSigned is hiervan het bijzondere geval subject == issuer. */
 function certVoor(opties) {
-  const issuer = opties.issuerKey;                                              // { type, privateKey }
   const namen = (opties.names && opties.names.length) ? opties.names : [opties.cn];
+  const r = bouwCert({
+    subjectNaam: { cn: opties.cn || namen[0], org: opties.org }, subjectSpkiDer: opties.subjectSpkiDer, subjectType: opties.subjectType || 'ec',
+    issuerNaam: { cn: opties.issuerCn || opties.cn || namen[0], org: opties.issuerOrg }, issuerKey: opties.issuerKey, issuerSkiDer: opties.issuerSkiDer,
+    namen, days: opties.days || 90, isClient: opties.isClient
+  });
+  return { certPem: r.certPem, certDer: r.certDer };
+}
+
+/* Een CRL (RFC 5280): de door de CA ondertekende lijst van ingetrokken serials.
+   Interne clients halen die op om een ingetrokken cert te weigeren. */
+function maakCRL(o) {
   const nu = new Date();
-  const nietVoor = new Date(nu.getTime() - 5 * 60000);
-  const nietNa = new Date(nu.getTime() + (opties.days || 90) * 86400000);
-  const subj = { cn: opties.cn || namen[0], org: opties.org };
-  const iss = { cn: opties.issuerCn || subj.cn, org: opties.issuerOrg };
-  const tbs = a.seq(
-    a.context(0, a.integer(2)),
-    a.integer(serieel()),
-    algId(issuer.type),
-    naam(iss),                                                                  // issuer (de CA)
-    a.seq(a.tijd(nietVoor), a.tijd(nietNa)),
-    naam(subj),
-    a.ruw(opties.subjectSpkiDer),                                               // de publieke sleutel van de aanvrager
-    a.context(3, a.seq(...standaardExtensies(opties.subjectType || 'ec', namen)))
-  );
-  const sig = crypto.sign('sha256', tbs, issuer.privateKey);
-  const certDer = a.seq(tbs, algId(issuer.type), a.bitString(sig));
-  return { certPem: derNaarPem(certDer, 'CERTIFICATE'), certDer };
+  const thisUpd = o.thisUpdate || nu;
+  const nextUpd = o.nextUpdate || new Date(nu.getTime() + (o.geldigDagen || 7) * 86400000);
+  const rev = (o.ingetrokken || []).map(r => a.seq(
+    a.integer(Buffer.isBuffer(r.serial) ? r.serial : Buffer.from(String(r.serial), 'hex')),
+    a.tijd(r.datum ? new Date(r.datum) : nu)));
+  const crlExts = [];
+  if (o.issuerSkiDer) crlExts.push(akiExt(o.issuerSkiDer));
+  if (o.nummer != null) crlExts.push(extensie(OID.crlNumber, false, a.integer(o.nummer)));
+  const delen = [a.integer(1), algId(o.issuerKey.type), naam(o.issuerNaam), a.tijd(thisUpd), a.tijd(nextUpd)];
+  if (rev.length) delen.push(a.seq(...rev));
+  if (crlExts.length) delen.push(a.context(0, a.seq(...crlExts)));
+  const tbs = a.seq(...delen);
+  const sig = crypto.sign('sha256', tbs, o.issuerKey.privateKey);
+  const crlDer = a.seq(tbs, algId(o.issuerKey.type), a.bitString(sig));
+  return { crlDer, crlPem: derNaarPem(crlDer, 'X509 CRL') };
 }
 
 /* Een CSR (PKCS#10) voor ACME: subject + publieke sleutel + gevraagde SAN,
@@ -159,4 +205,4 @@ function certInfo(pem) {
   return { validTo: new Date(c.validTo), validFrom: new Date(c.validFrom), subject: c.subject, san: c.subjectAltName || '' };
 }
 
-module.exports = { genKeyPair, selfSigned, certVoor, maakCSR, derNaarPem, pemNaarDer, b64url, certInfo, OID };
+module.exports = { genKeyPair, selfSigned, certVoor, bouwCert, maakCSR, maakCRL, skiVan, derNaarPem, pemNaarDer, b64url, certInfo, OID };

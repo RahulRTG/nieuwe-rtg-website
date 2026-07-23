@@ -12,6 +12,7 @@ server/data/
 **/tls/self.crt
 **/tls/acme-account.key
 **/tls/live/
+**/tls/ca/
 .env
 .env.*
 .vercel

@@ -23,7 +23,7 @@
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
   const LINKS = {
-    ontdek:      { naam: 'Ontdek RTG',   icoon: '📖', url: '/apps/rtg.html' },
+    ontdek:      { naam: 'Het Huis',     icoon: '📖', url: '/apps/rtg.html' },
     spelen:      { naam: 'Spelen',       icoon: '🎲', url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    icoon: '📜', url: '/apps/juridisch.html' },

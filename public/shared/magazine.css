@@ -1,0 +1,127 @@
+/* RTG - Het Huis: het magazine als EEN pagina die je zijwaarts doorbladert.
+   Geen losse internetpagina's: alle bladen staan naast elkaar in een horizontale
+   scroll-snap-baan; je swipet naar links om verder te bladeren (pijltjes en
+   toetsenbord kunnen ook). Donkere bodem, creme inkt, gedempt goud en bordeaux,
+   Bodoni voor de display en Inter voor de lopende tekst. Veel lucht, rustig.
+
+   Alleen huisstijl en lay-out; het bladeren zit in apps/rtg-magazine.js. */
+
+:root{
+  --mag-bg:#0C0C0B; --mag-paper:#131010;
+  --mag-ink:#F3EFE7; --mag-soft:rgba(243,239,231,0.62); --mag-meta:rgba(243,239,231,0.40);
+  --mag-gold:#C9A24B; --mag-gold-soft:#E7D39A; --mag-burg:#C23A5E; --mag-burg-deep:#7F1634;
+  --mag-line:rgba(231,211,154,0.16); --mag-line-soft:rgba(231,211,154,0.09);
+  --mag-meet:60ch;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--mag-bg);color:var(--mag-ink);
+  font-family:Inter,system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+
+/* ---------- masthead (vast bovenaan) ---------- */
+.mag-top{position:fixed;top:0;left:0;right:0;z-index:30;
+  display:flex;align-items:center;gap:1rem;
+  padding:calc(env(safe-area-inset-top,0px) + 0.8rem) 1.3rem 0.8rem;
+  background:linear-gradient(180deg, rgba(12,12,11,0.96), rgba(12,12,11,0.55) 78%, transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:none;}
+.mag-top > *{pointer-events:auto;}
+.mag-top a.terug{text-decoration:none;font-size:1.25rem;line-height:1;color:var(--mag-soft);}
+.mag-top .naam{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.02rem;letter-spacing:0.14em;text-transform:uppercase;}
+.mag-top .rek{flex:1;}
+.mag-top .uitgave{font-size:0.58rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--mag-gold-soft);
+  border:1px solid var(--mag-line);border-radius:999px;padding:0.3rem 0.7rem;white-space:nowrap;}
+
+/* ---------- de bladerbaan: horizontale scroll-snap ---------- */
+.mag-flip{position:fixed;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain;}
+.mag-flip::-webkit-scrollbar{display:none;}
+.mag-blad{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;
+  overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
+  padding:calc(env(safe-area-inset-top,0px) + 4.4rem) 1.4rem calc(env(safe-area-inset-bottom,0px) + 5rem);
+  display:flex;flex-direction:column;}
+.mag-blad::-webkit-scrollbar{display:none;}
+.mag-binnen{width:100%;max-width:760px;margin:auto;}
+
+/* ---------- omslag ---------- */
+.mag-omslag{text-align:center;position:relative;padding:1rem 0;}
+.mag-omslag canvas{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+  width:120%;height:80%;z-index:0;opacity:0.42;pointer-events:none;
+  -webkit-mask-image:radial-gradient(120% 92% at 50% 40%, #000 22%, transparent 74%);
+  mask-image:radial-gradient(120% 92% at 50% 40%, #000 22%, transparent 74%);}
+.mag-omslag > *{position:relative;z-index:1;}
+.mag-issue{display:flex;align-items:center;gap:0.8rem;justify-content:center;
+  font-size:0.62rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--mag-gold-soft);margin-bottom:1.4rem;}
+.mag-issue::before,.mag-issue::after{content:"";height:1px;width:min(15vw,84px);background:var(--mag-line);}
+.mag-titel{font-family:'Bodoni Moda',serif;font-weight:600;
+  font-size:clamp(2.7rem,8.5vw,4.8rem);line-height:0.98;letter-spacing:0.004em;text-wrap:balance;}
+.mag-titel em{font-style:italic;color:var(--mag-gold-soft);}
+.mag-standfirst{max-width:46ch;margin:1.3rem auto 0;color:var(--mag-soft);font-size:1.04rem;line-height:1.65;}
+.mag-swipe{margin-top:2rem;font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--mag-gold-soft);
+  display:inline-flex;align-items:center;gap:0.5rem;}
+.mag-swipe .pijl{animation:magWenk 2.6s ease-in-out infinite;}
+@keyframes magWenk{0%,100%{transform:translateX(0);opacity:0.7;}50%{transform:translateX(5px);opacity:1;}}
+@media (prefers-reduced-motion: reduce){.mag-swipe .pijl{animation:none;}}
+
+/* ---------- inhoud ---------- */
+.mag-inhoud h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.7rem;margin-bottom:1.3rem;letter-spacing:0.02em;}
+.mag-index{list-style:none;display:flex;flex-direction:column;}
+.mag-index li{display:grid;grid-template-columns:2.2rem 1fr;gap:0.9rem;align-items:baseline;
+  padding:0.85rem 0;border-top:1px solid var(--mag-line-soft);}
+.mag-index li:first-child{border-top:none;}
+.mag-index .nr{font-family:'Bodoni Moda',serif;font-size:0.9rem;color:var(--mag-gold-soft);font-variant-numeric:tabular-nums;}
+.mag-index .titel{font-family:'Bodoni Moda',serif;font-size:1.16rem;font-weight:600;line-height:1.15;}
+.mag-index .sub{display:block;font-family:Inter,sans-serif;font-size:0.8rem;color:var(--mag-soft);font-weight:400;margin-top:0.15rem;line-height:1.5;}
+
+/* ---------- artikel-blad ---------- */
+.mag-kicker{font-size:0.64rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--mag-gold-soft);margin-bottom:0.9rem;}
+.mag-kop{font-family:'Bodoni Moda',serif;font-weight:600;
+  font-size:clamp(2rem,5.6vw,3.2rem);line-height:1.03;letter-spacing:0.006em;text-wrap:balance;}
+.mag-kop em{font-style:italic;color:var(--mag-gold-soft);}
+.mag-deck{margin:1rem 0 0;color:var(--mag-soft);font-size:1.06rem;line-height:1.65;max-width:52ch;}
+.mag-byline{display:flex;align-items:center;gap:0.7rem;margin:1.3rem 0 0;
+  font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--mag-meta);}
+.mag-byline::after{content:"";height:1px;flex:1;max-width:120px;background:var(--mag-line);}
+.mag-lood{margin:1.6rem 0 0;max-width:var(--mag-meet);}
+.mag-lood p{font-size:1.02rem;line-height:1.75;color:rgba(243,239,231,0.82);margin-top:1rem;}
+.mag-lood p:first-of-type{margin-top:0;}
+.mag-lood.intro p:first-of-type::first-letter{
+  font-family:'Bodoni Moda',serif;float:left;font-size:3.3rem;line-height:0.82;
+  padding:0.1rem 0.55rem 0 0;color:var(--mag-gold-soft);}
+.mag-citaat{margin:1.8rem 0 0;max-width:var(--mag-meet);font-family:'Bodoni Moda',serif;font-style:italic;
+  font-size:clamp(1.3rem,3.2vw,1.7rem);line-height:1.35;color:var(--mag-gold-soft);}
+.mag-citaat .bron{display:block;font-family:Inter,sans-serif;font-style:normal;font-size:0.66rem;
+  letter-spacing:0.2em;text-transform:uppercase;color:var(--mag-meta);margin-top:0.8rem;}
+.mag-kader{margin:1.8rem 0 0;max-width:var(--mag-meet);background:var(--mag-paper);
+  border:1px solid var(--mag-line);border-radius:16px;padding:1.2rem 1.35rem;}
+.mag-kader h3{font-size:0.64rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--mag-gold-soft);margin-bottom:0.65rem;}
+.mag-kader ul{list-style:none;display:flex;flex-direction:column;gap:0.5rem;}
+.mag-kader li{position:relative;padding-left:1.1rem;font-size:0.92rem;color:var(--mag-soft);line-height:1.55;}
+.mag-kader li::before{content:"\2014";position:absolute;left:0;color:var(--mag-gold-soft);}
+.mag-blad .paginanr{margin-top:1.8rem;font-family:'Bodoni Moda',serif;font-size:0.8rem;color:var(--mag-meta);letter-spacing:0.06em;}
+
+/* ---------- colofon ---------- */
+.mag-colofon{text-align:center;}
+.mag-colofon h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.9rem;margin-bottom:0.9rem;}
+.mag-colofon p{color:var(--mag-soft);font-size:0.98rem;line-height:1.7;max-width:48ch;margin:0 auto 1.4rem;}
+.mag-colofon .acties{display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap;}
+.mag-knop{display:inline-flex;align-items:center;gap:0.4rem;text-decoration:none;
+  font-size:0.82rem;font-weight:600;letter-spacing:0.02em;padding:0.75rem 1.35rem;border-radius:999px;}
+.mag-knop.prim{background:var(--mag-gold-soft);color:#0C0C0B;}
+.mag-knop.sec{border:1px solid var(--mag-line);color:var(--mag-ink);}
+
+/* ---------- pager (vast onderaan): tellertje, stippen, pijlen ---------- */
+.mag-pager{position:fixed;left:0;right:0;bottom:0;z-index:30;
+  display:flex;align-items:center;justify-content:center;gap:1rem;
+  padding:0.7rem 1.2rem calc(env(safe-area-inset-bottom,0px) + 0.7rem);
+  background:linear-gradient(0deg, rgba(12,12,11,0.96), rgba(12,12,11,0.5) 70%, transparent);}
+.mag-pager button{background:transparent;border:1px solid var(--mag-line);border-radius:999px;
+  color:var(--mag-ink);width:2.1rem;height:2.1rem;font-size:1rem;line-height:1;cursor:pointer;flex-shrink:0;}
+.mag-pager button:disabled{opacity:0.3;cursor:default;}
+.mag-pager .stippen{display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center;max-width:60vw;}
+.mag-pager .stip{width:7px;height:7px;border-radius:50%;background:var(--mag-line);border:none;padding:0;cursor:pointer;
+  transition:background .25s ease, transform .25s ease;}
+.mag-pager .stip.nu{background:var(--mag-gold-soft);transform:scale(1.25);}
+.mag-pager .teller{font-family:'Bodoni Moda',serif;font-size:0.82rem;color:var(--mag-gold-soft);
+  font-variant-numeric:tabular-nums;letter-spacing:0.08em;min-width:3.4rem;text-align:center;}

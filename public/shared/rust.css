@@ -1,0 +1,33 @@
+/* De rustlaag: één gedeelde, ingetogen laag die over de hele RTG-UI dezelfde
+   kalmte legt. shared/basis.js laadt hem op elke pagina. Niets schreeuwt; wat je
+   aanraakt beweegt traag en zacht in plaats van te snappen.
+
+   Bewust conservatief: we raken alleen generieke, interactieve elementen aan
+   (links, knoppen, invoervelden) met een rustige bodem-overgang -- component-
+   klassen die pagina's zelf stylen (.card, .os-tegel ...) laten we met rust, zodat
+   we nooit een pagina-eigen animatie overschrijven. Het echte dempen van de
+   drukke, terugkerende animaties gebeurt bij de bron (het OS), niet met een grof
+   globaal filter. Alles staat stil bij prefers-reduced-motion. */
+
+:root{
+  --rust-traag: 0.3s;
+  --rust-ease: cubic-bezier(0.22, 0.61, 0.36, 1);  /* zacht uitlopend, geen ruk */
+}
+
+@media (prefers-reduced-motion: no-preference){
+  /* een rustige bodem-overgang op generieke interactieve elementen; alles wat een
+     pagina zelf al een transition geeft, houdt die (dit is enkel een kalme basis
+     voor kale links/knoppen/velden). */
+  a, button, summary, input, select, textarea{
+    transition-property: color, background-color, border-color, box-shadow, opacity;
+    transition-duration: var(--rust-traag);
+    transition-timing-function: var(--rust-ease);
+  }
+}
+
+/* een rustige, zachte gouden focusrand -- toetsenbord-navigatie blijft duidelijk,
+   maar zonder harde sprong. */
+:focus-visible{
+  outline: 2px solid color-mix(in srgb, var(--gold, #C9A24B) 70%, transparent);
+  outline-offset: 3px;
+}

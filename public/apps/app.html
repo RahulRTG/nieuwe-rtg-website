@@ -525,8 +525,8 @@
   .paycard .icon{width:52px;height:52px;margin:0 auto 0.8rem;}
   .paycard .icon svg{width:100%;height:100%;}
   .paycard .lbl{font-size:0.8rem;color:#4D4A45;}
-  @keyframes pulse{0%{transform:scale(1);opacity:0.8;}50%{transform:scale(1.08);opacity:1;}100%{transform:scale(1);opacity:0.8;}}
-  .paycard.scanning .icon{animation:pulse 0.9s ease-in-out infinite;}
+  @keyframes pulse{0%{transform:scale(1);opacity:0.85;}50%{transform:scale(1.035);opacity:1;}100%{transform:scale(1);opacity:0.85;}}
+  .paycard.scanning .icon{animation:pulse 1.7s ease-in-out infinite;}
   .paycard.done .lbl{color:#2E6B4F;font-weight:600;}
 
   /* ter plaatse: leveranciers, orders, menu-overlay */
@@ -579,8 +579,8 @@
   .live-panel{background:linear-gradient(150deg,#1c1414,#151312);border:1px solid rgba(194,58,94,0.35);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;overflow:hidden;}
   .live-top{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;}
   .live-badge{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);font-weight:700;}
-  .live-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--burgundy);animation:livepulse 1.4s infinite;}
-  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 7px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
+  .live-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--burgundy);animation:livepulse 2.4s ease-in-out infinite;}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.4);}70%{box-shadow:0 0 0 5px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
   .live-stop{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.68rem;font-family:inherit;}
   .live-headline{margin-top:0.7rem;font-family:'Bodoni Moda',serif;font-size:1.35rem;line-height:1.15;}
   .live-headline em{font-style:normal;color:var(--gold);}
@@ -604,8 +604,8 @@
   .live-acts button{flex:1;min-width:120px;border-radius:999px;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
   .live-acts .prim{background:var(--knop);color:var(--knop-txt);border-color:#fff;}
   .live-acts .sec{background:var(--card2,#1B1817);color:var(--txt);}
-  .live-acts .glowbtn{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border-color:#D9B96A;animation:doorglow 1.8s ease-in-out infinite;}
-  @keyframes doorglow{0%,100%{box-shadow:0 0 0 0 rgba(217,185,106,0.4);}50%{box-shadow:0 0 18px 2px rgba(217,185,106,0.55);}}
+  .live-acts .glowbtn{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border-color:#D9B96A;animation:doorglow 3s ease-in-out infinite;}
+  @keyframes doorglow{0%,100%{box-shadow:0 0 0 0 rgba(217,185,106,0.3);}50%{box-shadow:0 0 13px 1px rgba(217,185,106,0.4);}}
   .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
   .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
 
@@ -629,14 +629,14 @@
 
   /* ---- oplichtend ophaalcode-scherm ---- */
   #glowCode{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;cursor:pointer;
-    background:radial-gradient(circle at 50% 42%, #FFF8E7 0%, #F3E3B8 45%, #D9B96A 100%);animation:gcbreathe 2.4s ease-in-out infinite;}
+    background:radial-gradient(circle at 50% 42%, #FFF8E7 0%, #F3E3B8 45%, #D9B96A 100%);animation:gcbreathe 3.4s ease-in-out infinite;}
   #glowCode.open{display:flex;}
-  @keyframes gcbreathe{0%,100%{filter:brightness(1);}50%{filter:brightness(1.12);}}
+  @keyframes gcbreathe{0%,100%{filter:brightness(1);}50%{filter:brightness(1.06);}}
   .gc-inner{text-align:center;color:#1c1508;padding:1.5rem;max-width:100%;overflow:hidden;}
   .gc-sup{font-size:0.8rem;letter-spacing:0.22em;text-transform:uppercase;font-weight:600;opacity:0.75;}
   .gc-code{font-family:'Bodoni Moda',serif;font-size:min(4.4rem,16vw);letter-spacing:0.18em;margin:1.2rem 0 0.6rem;text-indent:0.18em;white-space:nowrap;
-    text-shadow:0 0 30px rgba(255,255,255,0.9);animation:gcpulse 1.6s ease-in-out infinite;}
-  @keyframes gcpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+    text-shadow:0 0 30px rgba(255,255,255,0.9);animation:gcpulse 2.6s ease-in-out infinite;}
+  @keyframes gcpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}
   .gc-hint{font-size:0.92rem;font-weight:500;}
   .gc-close{margin-top:2.2rem;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.55;}
   .mo-code{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:700;}
@@ -1119,9 +1119,9 @@
     background:var(--gold);color:#000;font-size:0.72rem;font-weight:600;
   }
   @media (prefers-reduced-motion: no-preference){
-    .os-wiebel .os-app{animation:osWiebel 0.28s ease-in-out infinite alternate;}
+    .os-wiebel .os-app{animation:osWiebel 0.5s ease-in-out infinite alternate;}
     .os-wiebel .os-app:nth-child(2n){animation-duration:0.24s;animation-direction:alternate-reverse;}
-    @keyframes osWiebel{from{transform:rotate(-1.6deg);}to{transform:rotate(1.6deg);}}
+    @keyframes osWiebel{from{transform:rotate(-1deg);}to{transform:rotate(1deg);}}
   }
   .os-wiebel .os-app{cursor:grab;}
   .os-app.os-sleep{opacity:0.45;}
@@ -1212,7 +1212,7 @@
   .os-wiebel-w .card{position:relative;}
   .os-wiebel-w .card.os-sleep{opacity:0.45;}
   @media (prefers-reduced-motion: no-preference){
-    .os-wiebel-w .card{animation:osWiebel 0.3s ease-in-out infinite alternate;}
+    .os-wiebel-w .card{animation:osWiebel 0.5s ease-in-out infinite alternate;}
   }
   .os-w-min{
     position:absolute;top:-8px;left:-8px;z-index:5;

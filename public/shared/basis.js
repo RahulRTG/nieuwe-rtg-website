@@ -46,6 +46,13 @@
   var st = document.createElement('style'); st.textContent = css;
   (document.head || document.documentElement).appendChild(st);
 
+  /* de gedeelde rustlaag: één ingetogen stijl die overal dezelfde kalmte legt
+     (zachte, trage overgangen + een rustige focusrand). Als apart bestand zodat
+     het cachet en pagina's het kunnen overschrijven. */
+  var rl = document.createElement('link');
+  rl.rel = 'stylesheet'; rl.href = '/shared/rust.css';
+  (document.head || document.documentElement).appendChild(rl);
+
   function toost(t) {
     var m = document.createElement('div'); m.className = 'bss-net'; m.setAttribute('role', 'status'); m.textContent = t;
     document.body.appendChild(m);

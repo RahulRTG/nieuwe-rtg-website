@@ -6,6 +6,12 @@ server/data/
 # RTG_DATA_DIR ergens anders wijst dan server/data
 **/geheugen.key
 **/geheugen/
+# native TLS: self-signed certs, ACME-accountsleutel en opgehaalde certificaten:
+# privaat sleutelmateriaal, nooit committen (ook niet bij een andere RTG_DATA_DIR)
+**/tls/self.key
+**/tls/self.crt
+**/tls/acme-account.key
+**/tls/live/
 .env
 .env.*
 .vercel

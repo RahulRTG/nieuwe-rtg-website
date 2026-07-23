@@ -59,10 +59,14 @@ function maakApp() {
 
   app.listen = function (...args) {
     // Standaard op node:http (kern, veilig). Opt-in motoren:
+    //   RTG_TLS=1         -> native TLS-terminatie in de app (lib/tls): HTTP/2
+    //                        over TLS + HTTP/1.1-terugval, harde ciphers, auto
+    //                        self-signed voor local, ACME voor echte certificaten.
     //   RTG_EIGEN_HTTP2=1 -> onze HTTP/2-listener (node:http2, multiplexing+HPACK)
     //   RTG_EIGEN_HTTP=1  -> onze eigen HTTP/1.1-motor op rauwe sockets
     let server;
-    if (process.env.RTG_EIGEN_HTTP2 === '1') server = require('../lib/http2').maakServer(app);
+    if (process.env.RTG_TLS === '1') server = require('../lib/tls').maakServer(app);
+    else if (process.env.RTG_EIGEN_HTTP2 === '1') server = require('../lib/http2').maakServer(app);
     else if (process.env.RTG_EIGEN_HTTP === '1') server = require('../lib/http1').maakServer(app);
     else server = http.createServer(app);
     return server.listen(...args);

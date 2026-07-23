@@ -114,6 +114,16 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
     return bekend(veld.id, sess);
   }
 
+  // Het paspoort (KYC-upload) is standaard bij de betaalde passen (Lifestyle,
+  // Business). Bij de gratis RTG Pass hoeft niemand een paspoort te laten zien
+  // -- behalve wie RTG Pay gebruikt: dan wordt het eenmalig gevraagd. Guests en
+  // RTFoundation laten nooit een paspoort zien via deze poort.
+  function paspoortVerplicht(tier, profiel) {
+    if (tier === 'lifestyle' || tier === 'business') return true;
+    if (tier === 'rtg') return !!(profiel && profiel.payGebruikt);
+    return false;
+  }
+
   // De volledige onboarding-status voor deze sessie binnen een scope.
   function status(scope, sess) {
     const sc = scopeVan(scope);
@@ -121,6 +131,7 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
     const profiel = profielVan(profielId(sess));
     const velden = sc.velden
       .filter(v => (v.voorWie || []).includes(tier))
+      .filter(v => v.id !== 'paspoort' || paspoortVerplicht(tier, profiel))
       .map(v => {
         const w = waardeVan(v, sess, profiel);
         return { id: v.id, label: v.label, type: v.type, ingevuld: !!(w && String(w).trim()),
@@ -139,6 +150,25 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
   }
   // Snelle ja/nee: is de onboarding van deze sessie (platform-scope) rond?
   function klaar(sess, scope) { return status(scope || 'rtg', sess).klaar; }
+
+  /* RTG Pay-gebruik door een gratis lid. Vanaf het eerste gebruik is het
+     paspoort eenmalig vereist; de betaalde passen hebben dat al bij de
+     onboarding gedaan. Geeft {ok:true} als het door mag; anders een nette
+     403 met kyc:true, zodat de app het lid naar de paspoort-stap stuurt.
+     (Demo-/gastsessies zonder echt account laten we door: die kunnen geen
+     identiteitsbewijs uploaden.) */
+  function payGate(sess) {
+    const tier = (sess && sess.tier) || 'guest';
+    if (tier === 'lifestyle' || tier === 'business') return { ok: true };
+    if (tier !== 'rtg') return { ok: true };
+    const profiel = profielVan(profielId(sess));
+    if (!profiel.payGebruikt) { profiel.payGebruikt = true; save(); }
+    const acc = sess && sess.account;
+    const geverifieerd = acc && ['pending', 'approved', 'geverifieerd', 'verified'].includes(acc.verified);
+    if (!acc || geverifieerd) return { ok: true };
+    return { ok: false, status: 403, kyc: true,
+      error: 'RTG Pay vraagt eenmalig je paspoort. Open de app; Rahul helpt je het te bevestigen.' };
+  }
 
   // De intake-velden opslaan (paspoort loopt via de KYC-upload, niet hier).
   function slaOp(scope, sess, velden) {
@@ -176,7 +206,7 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
     nu, standaardVelden, standaardScope, store, scopeVan, profielVan, profielId };
   const { publiekeConfig, config, normaliseerVelden, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars } = require('./onboarding/beheer')(ctx);
 
-  return { store, standaardScope, status, klaar, slaOp, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
+  return { store, standaardScope, status, klaar, payGate, slaOp, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
     ALLE_WIE, PAS_WIE, VELD_TYPES };
 }
 

@@ -43,8 +43,10 @@ test('1. een nieuw account moet standaardgegevens invullen en het contract teken
   // naam/e-mail/telefoon/geboortedatum/land zijn geprefilld uit het account
   const ingevuld = new Set(st.velden.filter(v => v.ingevuld).map(v => v.id));
   assert.ok(ingevuld.has('naam') && ingevuld.has('email') && ingevuld.has('telefoon'), 'accountgegevens zijn geprefilld');
-  // adres/postcode/woonplaats/nationaliteit/paspoort ontbreken nog
-  assert.ok(st.ontbrekend.includes('adres') && st.ontbrekend.includes('paspoort'), 'adres en paspoort ontbreken nog');
+  // adres/postcode/woonplaats/nationaliteit ontbreken nog; maar een GRATIS RTG
+  // Pass hoeft GEEN paspoort te tonen (dat komt pas als hij RTG Pay gebruikt)
+  assert.ok(st.ontbrekend.includes('adres'), 'adres ontbreekt nog');
+  assert.ok(!st.velden.some(v => v.id === 'paspoort'), 'de gratis RTG Pass vraagt geen paspoort');
   assert.equal(st.contract.ondertekend, false, 'contract nog niet getekend');
   assert.ok(st.contract.tekst.length > 50 && st.contract.versie >= 1, 'er is een contracttekst met een versie');
 });
@@ -118,4 +120,34 @@ test('5. elke leverancier heeft een eigen scope die los AI-aanpasbaar is', async
   // de platform-scope is daardoor NIET veranderd
   const plat = (await api(base, '/api/onboarding/status', {}, lid)).body;
   assert.ok(!plat.velden.some(v => v.id === 'bsn'), 'de eigen scope lekt niet naar het platform');
+});
+
+test('7. de gratis RTG Pass hoeft geen paspoort, tenzij hij RTG Pay gebruikt', async () => {
+  const vrij = await registreer('vrij' + Date.now().toString().slice(-7) + '@x.nl');
+  // alle ontbrekende (niet-KYC) velden invullen; de eigenaar kan er eerder een
+  // hebben toegevoegd (bijv. noodcontact), dus dynamisch. Geen paspoort nodig.
+  let st = (await api(base, '/api/onboarding/status', {}, vrij)).body;
+  assert.ok(!st.velden.some(v => v.id === 'paspoort'), 'de gratis RTG Pass vraagt geen paspoort');
+  const velden = {};
+  st.velden.forEach(v => { if (v.type !== 'kyc' && !v.ingevuld) velden[v.id] = v.id === 'email' ? 'vrij@x.nl' : v.id === 'land' ? 'NL' : 'Vrijwaarde'; });
+  await api(base, '/api/onboarding/opslaan', { velden }, vrij);
+  await api(base, '/api/onboarding/teken', { naam: 'Vrij Lid', akkoord: true }, vrij);
+  st = (await api(base, '/api/onboarding/status', {}, vrij)).body;
+  assert.equal(st.klaar, true, 'zonder paspoort is de gratis onboarding rond');
+
+  // maar zodra hij RTG Pay gebruikt, wordt het paspoort geeist (403 + kyc-sein)
+  const pay = await api(base, '/api/pay/stuur', { aan: 'IEMAND', centen: 500 }, vrij);
+  assert.equal(pay.status, 403, 'RTG Pay is geblokkeerd tot het paspoort er is');
+  assert.equal(pay.body.kyc, true, 'met een kyc-sein zodat de app naar de paspoort-stap gaat');
+
+  st = (await api(base, '/api/onboarding/status', {}, vrij)).body;
+  assert.ok(st.velden.some(v => v.id === 'paspoort'), 'nu vraagt de onboarding wel het paspoort');
+  assert.equal(st.klaar, false, 'en is de onboarding weer niet rond tot het paspoort er is');
+
+  // na de KYC-upload is het rond en blokkeert RTG Pay niet meer op kyc
+  await api(base, '/api/verify/upload', { image: PNG }, vrij);
+  st = (await api(base, '/api/onboarding/status', {}, vrij)).body;
+  assert.equal(st.klaar, true, 'met paspoort is het weer rond');
+  const pay2 = await api(base, '/api/pay/stuur', { aan: 'IEMAND', centen: 500 }, vrij);
+  assert.notEqual(pay2.body && pay2.body.kyc, true, 'geen kyc-blokkade meer (een andere fout mag)');
 });

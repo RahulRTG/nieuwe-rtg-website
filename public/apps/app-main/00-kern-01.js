@@ -132,6 +132,15 @@
 
   // API-client uit de gedeelde app-shell (public/shared/appshell.js).
   const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
+  // Een 403 met kyc:true (bijv. een gratis lid dat RTG Pay gebruikt zonder
+  // paspoort) laat Rahul meteen de paspoort-stap van de onboarding tonen.
+  const _apiCall = API.call.bind(API);
+  API.call = function (pad, body) {
+    return _apiCall(pad, body).catch(function (e) {
+      if (e && e.data && e.data.kyc && typeof checkOnboarding === 'function') { try { checkOnboarding(); } catch (x) {} }
+      throw e;
+    });
+  };
 
   function applyState(state){
     if (!state) return;

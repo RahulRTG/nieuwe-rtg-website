@@ -86,11 +86,25 @@
     delete st.dataset.keukenLicht;
   }
 
+  // handmatige stand: 'auto' volgt de dag, 'licht'/'donker' zetten hem vast
+  var SKEY = 'rtg_keuken_lichtstand';
+  function stand(){ try { var v = localStorage.getItem(SKEY); if (v === 'licht' || v === 'donker') return v; } catch(e){} return 'auto'; }
+  function zetStand(v){ try { localStorage.setItem(SKEY, v); } catch(e){} verf(); knopBij(); }
+  var VOLGORDE = ['auto', 'licht', 'donker'];
+  function volgende(){ var i = VOLGORDE.indexOf(stand()); return VOLGORDE[(i + 1) % VOLGORDE.length]; }
+  function engels(){ return (document.documentElement.lang || '').slice(0,2) === 'en'; }
+  function standTekst(v){
+    var nl = { auto:'Licht: automatisch', licht:'Licht: altijd licht', donker:'Licht: altijd donker' };
+    var en = { auto:'Light: automatic', licht:'Light: always light', donker:'Light: always dark' };
+    return (engels() ? en : nl)[v];
+  }
+
   function verf(){
     var st = document.querySelector(SEL);
     if (!st) return;
     if (!st.classList.contains('on')){ if (st.dataset.keukenLicht) wis(st); return; }
-    var L = daglicht(new Date());
+    var s = stand();
+    var L = s === 'licht' ? 1 : s === 'donker' ? 0 : daglicht(new Date());
     Object.keys(NACHT).forEach(function(k){ st.style.setProperty('--'+k, meng(NACHT[k], DAG[k], L)); });
     st.style.background = grond(L);
     st.style.color = 'var(--txt)';
@@ -99,11 +113,32 @@
     st.dataset.keukenLicht = L > 0.66 ? 'licht' : L > 0.33 ? 'schemer' : 'donker';
   }
 
+  // het knopje in de werkplek-kop: cyclus auto -> altijd licht -> altijd donker
+  function knopBij(){
+    var b = document.getElementById('keukenLichtKnop');
+    if (b) b.textContent = standTekst(stand());
+  }
+  function bouwKnop(){
+    var st = document.querySelector(SEL); if (!st) return;
+    var kop = st.querySelector('.st-head'); if (!kop || document.getElementById('keukenLichtKnop')) return;
+    var b = document.createElement('button');
+    b.id = 'keukenLichtKnop'; b.type = 'button';
+    b.style.cssText = 'background:none;border:1px solid var(--line);border-radius:999px;padding:.5rem 1rem;color:var(--muted);' +
+      'font-family:Inter,system-ui,sans-serif;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;cursor:pointer;';
+    b.textContent = standTekst(stand());
+    b.addEventListener('click', function(){ zetStand(volgende()); });
+    // vlak voor de sluitknop, of anders achteraan in de kop
+    var exit = document.getElementById('stExit');
+    if (exit && exit.parentNode) exit.parentNode.insertBefore(b, exit);
+    else kop.appendChild(b);
+  }
+
   function boot(){
     var st = document.querySelector(SEL);
     if (st){
-      // meteen omkleuren zodra de werkplek open of dicht gaat
-      try { new MutationObserver(verf).observe(st, { attributes:true, attributeFilter:['class'] }); } catch(e){}
+      bouwKnop();
+      // meteen omkleuren + knop verversen zodra de werkplek open of dicht gaat
+      try { new MutationObserver(function(){ bouwKnop(); verf(); knopBij(); }).observe(st, { attributes:true, attributeFilter:['class'] }); } catch(e){}
     }
     verf();
     setInterval(verf, 60000); // elke minuut mee met de dag
@@ -112,5 +147,5 @@
   if (document.readyState !== 'loading') boot();
   else document.addEventListener('DOMContentLoaded', boot);
 
-  window.RTGKeukenLicht = { verf:verf, daglicht:daglicht };
+  window.RTGKeukenLicht = { verf:verf, daglicht:daglicht, stand:stand, zetStand:zetStand };
 })();

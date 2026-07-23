@@ -23,8 +23,21 @@
   var SOORTEN = {
     klok: { naam: 'Klok', bouw: bouwKlok, w: 210, h: 150 },
     notitie: { naam: 'Notitie', bouw: bouwNotitie, w: 240, h: 190 },
-    rahul: { naam: 'Rahul', bouw: bouwRahul, w: 210, h: 120 }
+    rahul: { naam: 'Rahul', bouw: bouwRahul, w: 210, h: 120 },
+    // een levende ROS-app als widget: het scherm zelf, in een klein kader
+    app: { naam: 'App', bouw: bouwApp, w: 360, h: 440 }
   };
+  // de ROS-apps die je als widget kunt neerzetten (gedeelde lijst, met terugval)
+  function rosApps() {
+    if (w.RTGApps && w.RTGApps.length) return w.RTGApps;
+    return [
+      { naam: 'De Salon', url: '/apps/app.html#salon' },
+      { naam: 'RTG Mall', url: '/apps/mall.html' },
+      { naam: 'Food Court', url: '/apps/foodcourt.html' },
+      { naam: 'RTG OV', url: '/apps/ov.html' },
+      { naam: 'Spelen', url: '/apps/spelen.html' }
+    ];
+  }
   function laadW() {
     try { var s = JSON.parse(localStorage.getItem(wkey())); if (s && s.length) return s; } catch (e) {}
     return [{ id: 'klok', x: 24, y: 120, w: 210, h: 150 }, { id: 'notitie', x: 24, y: 300, w: 240, h: 190 }];
@@ -61,6 +74,16 @@
       if (m) m.click();
     });
     body.appendChild(b);
+  }
+  function bouwApp(body, wd) {
+    // het ROS-scherm zelf, ingeladen als klein kader; werkt en beweegt mee
+    body.style.padding = '0';
+    var f = d.createElement('iframe');
+    f.src = wd.app || '/apps/index.html';
+    f.setAttribute('title', wd.naam || 'RTG-app');
+    f.setAttribute('loading', 'lazy');
+    f.style.cssText = 'width:100%;height:100%;border:0;background:var(--bg,#0C0C0B);display:block;';
+    body.appendChild(f);
   }
 
   function stijl() {
@@ -99,11 +122,12 @@
         'background:color-mix(in srgb, var(--card,#151312) 78%, transparent);color:var(--gold,#A98F1C);font-size:1.35rem;' +
         'backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 12px 30px -12px rgba(0,0,0,.5);}' +
       '#flagMenu{position:fixed;pointer-events:auto;z-index:4;left:18px;bottom:70px;display:none;flex-direction:column;gap:.1rem;' +
-        'padding:.35rem;border-radius:12px;border:1px solid var(--line,rgba(255,255,255,.12));' +
+        'padding:.35rem;border-radius:12px;border:1px solid var(--line,rgba(255,255,255,.12));max-height:min(62vh,460px);overflow-y:auto;' +
         'background:color-mix(in srgb, var(--card,#151312) 92%, transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}' +
       '#flagMenu.open{display:flex;}' +
       '#flagMenu button{background:none;border:none;text-align:left;color:var(--txt,#F4F1EC);font-family:inherit;font-size:.8rem;padding:.45rem .8rem;border-radius:8px;cursor:pointer;white-space:nowrap;}' +
       '#flagMenu button:hover{background:color-mix(in srgb, var(--gold,#A98F1C) 22%, transparent);}' +
+      '.flagMenu-kop{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft,#8A8680);padding:.5rem .8rem .2rem;position:sticky;top:-.35rem;background:color-mix(in srgb, var(--card,#151312) 92%, transparent);}' +
       '}';
     d.head.appendChild(st);
   }
@@ -141,11 +165,11 @@
     el.style.width = (wd.w || S.w) + 'px'; el.style.height = (wd.h || S.h) + 'px';
     var kop = d.createElement('div'); kop.className = 'fw-kop';
     kop.innerHTML = '<span class="fw-naam"></span><button class="fw-x" type="button" aria-label="Widget sluiten">&times;</button>';
-    kop.querySelector('.fw-naam').textContent = S.naam;
+    kop.querySelector('.fw-naam').textContent = wd.naam || S.naam;
     var body = d.createElement('div'); body.className = 'fw-body';
     var grip = d.createElement('span'); grip.className = 'fw-grip';
     el.appendChild(kop); el.appendChild(body); el.appendChild(grip);
-    S.bouw(body);
+    S.bouw(body, wd);
     kop.querySelector('.fw-x').addEventListener('click', function () { verwijder(wd); });
     sleep(el, kop, wd); formaat(el, grip, wd);
     return el;
@@ -188,9 +212,11 @@
     widgets.forEach(function (wd) { var el = widgetEl(wd); if (el) laag.appendChild(el); });
   }
   function verwijder(wd) { widgets = widgets.filter(function (x) { return x !== wd; }); bewaarW(); teken(); }
-  function voegToe(id) {
+  function voegToe(id, app, naam) {
     var S = SOORTEN[id]; if (!S) return;
-    widgets.push({ id: id, x: 24, y: 120 + widgets.length * 30, w: S.w, h: S.h });
+    var wd = { id: id, x: 24, y: 120 + widgets.length * 30, w: S.w, h: S.h };
+    if (id === 'app') { wd.app = app; wd.naam = naam; }
+    widgets.push(wd);
     bewaarW(); teken();
     var mn = d.getElementById('flagMenu'); if (mn) mn.classList.remove('open');
   }
@@ -220,9 +246,17 @@
       var plus = d.createElement('button'); plus.id = 'flagPlus'; plus.type = 'button'; plus.textContent = '+';
       plus.setAttribute('aria-label', 'Widget toevoegen');
       var menu = d.createElement('div'); menu.id = 'flagMenu';
-      Object.keys(SOORTEN).forEach(function (id) {
+      // eerst de vaste widgets (klok, notitie, Rahul) -- 'app' is geen losse knop
+      ['klok', 'notitie', 'rahul'].forEach(function (id) {
         var b = d.createElement('button'); b.type = 'button'; b.textContent = SOORTEN[id].naam;
         b.addEventListener('click', function () { voegToe(id); }); menu.appendChild(b);
+      });
+      // dan: elke ROS-app als widget
+      var kop = d.createElement('div'); kop.className = 'flagMenu-kop'; kop.textContent = 'Apps';
+      menu.appendChild(kop);
+      rosApps().forEach(function (a) {
+        var b = d.createElement('button'); b.type = 'button'; b.textContent = a.naam;
+        b.addEventListener('click', function () { voegToe('app', a.url, a.naam); }); menu.appendChild(b);
       });
       d.body.appendChild(plus); d.body.appendChild(menu);
       plus.addEventListener('click', function () { menu.classList.toggle('open'); });

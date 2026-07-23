@@ -44,8 +44,8 @@
     '.rtg-ring .rr-rehaut{fill:none;stroke:#ffffff;stroke-opacity:0.05;stroke-width:0.6;}' +
     '.rtg-ring .rr-flens{fill:none;stroke:var(--klok-sfeer);stroke-opacity:0.3;stroke-width:0.7;}' +
     // de sunray-plaat: heel fijne stralen in de paletkleur (ingetogen)
-    '.rtg-ring .rr-sun{stroke:var(--klok-sfeer);stroke-opacity:0.055;stroke-width:0.28;}' +
-    '.rtg-ring .rr-sun2{stroke:var(--klok-sfeer);stroke-opacity:0.02;stroke-width:0.28;}' +
+    // de guilloché-golfplaat: fijne golflijntjes in de paletkleur (de sfeer)
+    '.rtg-ring .rr-golf{stroke:var(--klok-sfeer);stroke-opacity:0.07;stroke-width:0.4;}' +
     // de minutenbaan: heel fijn, gouden accent op de vijf minuten
     '.rtg-ring .rr-min{stroke:#ffffff;stroke-opacity:0.26;stroke-width:0.55;}' +
     '.rtg-ring .rr-vijf{stroke:var(--klok-goud);stroke-opacity:0.85;stroke-width:1.0;}' +
@@ -56,8 +56,8 @@
     '.rtg-ring .rr-naam{fill:var(--klok-goud);font-family:Inter,system-ui,sans-serif;font-size:4.6px;font-weight:500;letter-spacing:0.12em;}' +
     '.rtg-ring .rr-venster{fill:#050504;}' +
     '.rtg-ring .rr-vensterlijst{fill:none;stroke:var(--klok-goud);stroke-opacity:0.8;stroke-width:0.9;}' +
-    ".rtg-ring .rr-datum{fill:#EFE8D2;font-family:'Bodoni Moda',serif;font-size:8.2px;font-variant-numeric:tabular-nums;}" +
-    ".rtg-ring .rr-dagtekst{fill:#EFE8D2;font-family:'Bodoni Moda',serif;font-size:6.6px;letter-spacing:0.03em;}" +
+    ".rtg-ring .rr-datum{fill:#EFE8D2;font-family:'Bodoni Moda',serif;font-size:7.4px;font-variant-numeric:tabular-nums;}" +
+    ".rtg-ring .rr-dagtekst{fill:#EFE8D2;font-family:'Bodoni Moda',serif;font-size:6.4px;letter-spacing:0.03em;}" +
     // de fijne gouden secondewijzer met lollipop
     '.rtg-ring .rr-sec{stroke:var(--klok-goud);stroke-width:0.5;stroke-linecap:round;}' +
     '.rtg-ring .rr-seccw{fill:var(--klok-goud);}' +
@@ -131,11 +131,21 @@
         '<feDropShadow dx="0" dy="0.55" stdDeviation="0.6" flood-color="#000" flood-opacity="0.45"/></filter>';
     svg.appendChild(defs);
 
-    // de plaat + de fijne sunray + het randvignet (verdieping)
+    // de plaat + een fijne guilloché-golfstructuur (Seamaster-taal) + randvignet
     maak('circle', { cx: 100, cy: 100, r: 97, fill: 'url(#rr-plaat' + klokNr + ')' });
-    for (let i = 0; i < 180; i++) {
-      const a = i / 180 * P2, b = pt(22, a).split(' '), e = pt(84, a).split(' ');
-      maak('line', { x1: b[0], y1: b[1], x2: e[0], y2: e[1], class: i % 2 ? 'rr-sun' : 'rr-sun2' });
+    // de golfplaat: fijne horizontale golflijntjes, geklonken binnen de plaat,
+    // in de paletkleur zodat de sfeer meeademt (het goud blijft goud)
+    const golfClip = maak('clipPath', { id: 'rr-golf' + klokNr });
+    const gc = document.createElementNS(NS, 'circle');
+    for (const [k, v] of Object.entries({ cx: 100, cy: 100, r: 86 })) gc.setAttribute(k, v);
+    golfClip.appendChild(gc);
+    const golfG = maak('g', { 'clip-path': 'url(#rr-golf' + klokNr + ')' });
+    for (let y = 13; y <= 187; y += 3.2) {
+      let dd = 'M6 ' + y.toFixed(1);
+      for (let x = 8; x <= 194; x += 3) dd += ' L' + x + ' ' + (y + Math.sin(x / 15 * P2) * 1.15).toFixed(2);
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', dd); p.setAttribute('class', 'rr-golf'); p.setAttribute('fill', 'none');
+      golfG.appendChild(p);
     }
     maak('circle', { cx: 100, cy: 100, r: 97, fill: 'url(#rr-vig' + klokNr + ')', 'pointer-events': 'none' });
     // de randen
@@ -166,8 +176,9 @@
       maak('circle', { cx: (100 + dx * 78).toFixed(2), cy: (100 + dy * 78).toFixed(2), r: 0.85, class: 'rr-lume' });
     }
 
-    // de signatuur onder twaalf uur, op vaste breedte gecentreerd
-    const naam = maak('text', { x: 100, y: 39, class: 'rr-naam', 'text-anchor': 'middle',
+    // de signatuur onder twaalf uur, op vaste breedte gecentreerd; iets lager
+    // gezet zodat er meer lucht tussen de bovenrand en de naam staat
+    const naam = maak('text', { x: 100, y: 46, class: 'rr-naam', 'text-anchor': 'middle',
       textLength: 78, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
 
@@ -185,16 +196,17 @@
       clip.appendChild(cr);
       const g = maak('g', { 'clip-path': 'url(#' + id + klokNr + ')' });
       const t = document.createElementNS(NS, 'text');
-      const at = { x: cx, y: (cy + h * 0.33).toFixed(2), class: tekstKlasse, 'text-anchor': 'middle' };
+      // exact verticaal centreren met dominant-baseline (niet met de hand raden)
+      const at = { x: cx, y: cy, class: tekstKlasse, 'text-anchor': 'middle', 'dominant-baseline': 'central' };
       if (tl) { at.textLength = tl; at.lengthAdjust = 'spacingAndGlyphs'; }
       for (const [k, v] of Object.entries(at)) t.setAttribute(k, v);
       g.appendChild(t);
       return t;
     }
-    // de weekdag onder twaalf uur (breed kastje, tekst past zich aan de taal aan)
-    const dag = kastje(100, 55, 52, 11.5, 'rr-kd', 'rr-dagtekst', 44);
-    // de datum op drie uur
-    const datumTekst = kastje(148, 100, 16, 11.5, 'rr-kv', 'rr-datum');
+    // twee kastjes met dezelfde hoogte en verhouding: de weekdag onder twaalf
+    // uur (breed, tekst past zich aan de taal aan), de datum op drie uur
+    const dag = kastje(100, 61, 50, 10.5, 'rr-kd', 'rr-dagtekst', 42);
+    const datumTekst = kastje(148, 100, 15.5, 10.5, 'rr-kv', 'rr-datum');
 
     function slaOm(tekstEl, nieuw, hoogte) {
       if (RUSTIG || !tekstEl.isConnected) { tekstEl.textContent = nieuw; return; }
@@ -282,7 +294,7 @@
       const dagNr = String(d.getDate());
       if (dagNr !== vorigeDatum) {
         if (vorigeDatum === '') datumTekst.textContent = dagNr;
-        else slaOm(datumTekst, dagNr, 11);
+        else slaOm(datumTekst, dagNr, 10);
         vorigeDatum = dagNr;
       }
       // de weekdag in de taal van de gebruiker (paginataal, anders apparaattaal)
@@ -291,7 +303,7 @@
       const cap = wd ? wd.charAt(0).toUpperCase() + wd.slice(1) : '';
       const kalenderdag = d.toDateString();
       if (cap !== vorigeDag) {
-        if (vorigeDag && kalenderdag !== vorigeKalenderdag) slaOm(dag, cap, 11);
+        if (vorigeDag && kalenderdag !== vorigeKalenderdag) slaOm(dag, cap, 10);
         else dag.textContent = cap;
         vorigeDag = cap;
       }

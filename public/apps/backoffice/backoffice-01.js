@@ -129,6 +129,19 @@
       row.querySelector('[data-ok]').addEventListener('click', () => beslisAanm(id, 'geaccepteerd'));
       row.querySelector('[data-no]').addEventListener('click', () => beslisAanm(id, 'afgewezen'));
     });
+    // de lopende lidmaatschapsbetalingen: na een akkoord loopt de bijdrage 12
+    // maanden automatisch, met de 30%-foundationsplit (20% lokaal, 10% RTF).
+    try {
+      const b = await call('/aanmelding/betalingen', {});
+      const eur = n => '€ ' + (Math.round(Number(n))).toLocaleString('nl-NL');
+      if (b && b.aantalLeden) {
+        el.insertAdjacentHTML('beforeend',
+          '<div style="margin-top:.7rem;border-top:1px solid var(--line,#2a2a2a);padding-top:.6rem;font-size:0.8rem;color:var(--soft);line-height:1.7;">' +
+          '<b style="color:var(--txt);">'+b.aantalLeden+'</b> '+T('bo.aanmlopend','lopende lidmaatschap(pen), 12 maanden automatisch.')+'<br>' +
+          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b style="color:var(--gold);">'+eur(b.totaal.foundation)+'</b> ('+
+          T('bo.aanmlokaal','20% lokaal')+' '+eur(b.totaal.lokaal)+' &middot; '+T('bo.aanmrtf','10% RTF')+' '+eur(b.totaal.rtf)+')</div>');
+      }
+    } catch(e){}
   }
   async function beslisAanm(id, besluit){
     try { await call('/aanmelding/beslis', { id, besluit }); } catch(e){ alert(e.message); return; }

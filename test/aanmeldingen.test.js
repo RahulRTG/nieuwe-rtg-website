@@ -8,7 +8,8 @@ const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().
 
 function maak() {
   const db = { data: {} };
-  return require('../server/kern/aanmeldingen')({ db, save: () => {}, crypto, schoon }).aanmeldingen;
+  const geldPasprijzen = () => ({ passen: { rtg: { maandCenten: 6500 }, lifestyle: { maandCenten: 2000000 } } });
+  return require('../server/kern/aanmeldingen')({ db, save: () => {}, crypto, schoon, geldPasprijzen }).aanmeldingen;
 }
 
 test('een aanmelding krijgt automatisch de hele reis en wacht op de mens', () => {
@@ -46,6 +47,38 @@ test('alleen een mens (met naam) beslist; de AI kan Lifestyle/Business nooit toe
   assert.equal(ok.aanmelding.besluit.door, 'Rahul Imran Ismail');
   // en niet twee keer
   assert.equal(a.beslis(life.id, 'afgewezen', 'Iemand').status, 409);
+});
+
+test('na accepteren loopt de betaling 12 maanden automatisch met de 30%-split', () => {
+  const a = maak();
+  const life = a.aanvraag({ pas: 'lifestyle', naam: 'Gast' }).aanmelding;
+  const r = a.beslis(life.id, 'geaccepteerd', 'Rahul Imran Ismail');
+  assert.equal(r.betaalschema, true);
+  const bet = a.betalingen();
+  assert.equal(bet.aantalLeden, 1);
+  const lid = bet.lidmaatschappen[0];
+  assert.equal(lid.termijnen.length, 12, '12 maandtermijnen');
+  const t1 = lid.termijnen[0];
+  assert.equal(t1.bedrag, 20000);        // Lifestyle 20.000 ex btw p/m
+  assert.equal(t1.foundation, 6000);     // 30%
+  assert.equal(t1.lokaal, 4000);         // 20%
+  assert.equal(t1.rtf, 2000);            // 10%
+  // het jaartotaal naar de foundation = 12 x 6000 = 72000
+  assert.equal(bet.totaal.foundation, 72000);
+  assert.equal(bet.totaal.lokaal, 48000);
+  assert.equal(bet.totaal.rtf, 24000);
+});
+
+test('afwijzen start geen betaling; Business staat als op maat in het schema', () => {
+  const a = maak();
+  const afw = a.aanvraag({ pas: 'rtg', naam: 'Nee' }).aanmelding;
+  a.beslis(afw.id, 'afgewezen', 'Beoordelaar');
+  assert.equal(a.betalingen().aantalLeden, 0, 'een afwijzing maakt geen betaalschema');
+  const biz = a.aanvraag({ pas: 'business', naam: 'Zaak' }).aanmelding;
+  a.beslis(biz.id, 'geaccepteerd', 'Beoordelaar');
+  const t = a.betalingen().lidmaatschappen[0].termijnen[0];
+  assert.equal(t.opMaat, true);
+  assert.equal(t.bedrag, null, 'Business is prijs op maat: bedrag nog leeg');
 });
 
 test('de wachtrij telt de openstaande aanmeldingen', () => {

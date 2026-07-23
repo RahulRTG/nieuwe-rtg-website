@@ -2177,7 +2177,10 @@ Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }))
    geautomatiseerd (berichten, onboarding, rondleiding, RTF, veiligheid, privacy);
    alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
    Lifestyle/Business toe. */
-Object.assign(kern, require('./kern/aanmeldingen')({ db, save, crypto, schoon }));
+Object.assign(kern, require('./kern/aanmeldingen')({ db, save, crypto, schoon,
+  // laat gebonden: de geld-regie wordt verderop gemount; bij het accepteren
+  // (request-tijd) is kern.geldPasprijzen al beschikbaar voor het betaalschema.
+  geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null) }));
 /* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
    vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
 Object.assign(kern, require('./kern/pestgrens')({ db, save }));

@@ -18,4 +18,7 @@ module.exports = (kern) => {
   app.post('/api/aanmelding/een', officeAuth, (req, res) => veilig(res, () => aanmeldingen.een(String((req.body || {}).id || ''))));
   app.post('/api/aanmelding/beslis', officeAuth, (req, res) => veilig(res, () =>
     aanmeldingen.beslis(String((req.body || {}).id || ''), String((req.body || {}).besluit || ''), wie(req), (req.body || {}).notitie)));
+  // het betaalschema: na een akkoord loopt de bijdrage 12 maanden automatisch,
+  // met de 30%-foundationsplit. Alleen voor het personeel.
+  app.post('/api/aanmelding/betalingen', officeAuth, (req, res) => veilig(res, () => aanmeldingen.betalingen(req.body || {})));
 };

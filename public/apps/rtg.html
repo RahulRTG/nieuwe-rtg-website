@@ -25,7 +25,9 @@
 <main class="mag-flip" id="flip" aria-label="Het RTG-magazine; blader zijwaarts">
   <section class="mag-blad donker">
     <div class="mag-binnen mag-omslag">
-      <canvas id="heroSky" aria-hidden="true"></canvas>
+      <figure class="mag-plaat">
+        <img src="/campagne/huis-omslag.jpg" width="640" height="641" alt="Rahul Travel Group &mdash; Experience the elite class: een priv&eacute;jet en een auto in zwart-wit">
+      </figure>
       <p class="mag-issue">Een uitgave van het huis</p>
       <h1 class="mag-titel">Reizen is een <em>manier van leven</em></h1>
       <p class="mag-standfirst">Geen boekingssite maar een huis. Blader mee door de passen, de takken, De Salon en de foundation.</p>
@@ -156,6 +158,9 @@
 
   <section class="mag-blad donker">
     <div class="mag-binnen mag-colofon">
+      <figure class="mag-plaat mag-plaat--klein">
+        <img src="/campagne/huis-omslag.jpg" width="640" height="641" alt="Rahul Travel Group &mdash; Experience the elite class" loading="lazy">
+      </figure>
       <p class="mag-issue">Colofon</p>
       <h2>Het Huis</h2>
       <p>Een reishuis op lidmaatschap. Dit magazine is de website van RTG, nu als app op je bureaublad &mdash; &eacute;&eacute;n pagina, om zijwaarts doorheen te bladeren.</p>
@@ -174,8 +179,6 @@
   <button type="button" id="volgende" aria-label="Volgend blad">&#8594;</button>
 </nav>
 
-<script src="/shared/drie.js"></script>
-<script src="/apps/rtg-hero.js"></script>
 <script src="/apps/rtg-magazine.js"></script>
 <script src="/shared/basis.js" defer></script>
 </body>

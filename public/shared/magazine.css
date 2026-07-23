@@ -85,11 +85,13 @@ a{color:inherit;}
 
 /* ---------- omslag (donkere spread) ---------- */
 .mag-omslag{text-align:center;position:relative;padding:1rem 0;margin:auto;}
-.mag-omslag canvas{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
-  width:122%;height:82%;z-index:0;opacity:0.4;pointer-events:none;
-  -webkit-mask-image:radial-gradient(120% 92% at 50% 40%, #000 22%, transparent 74%);
-  mask-image:radial-gradient(120% 92% at 50% 40%, #000 22%, transparent 74%);}
-.mag-omslag > *{position:relative;z-index:1;}
+/* de merkplaat: het zwart-wit reisbeeld met het bordeaux logo-vlak, als header */
+.mag-plaat{margin:0 auto 1.8rem;max-width:420px;position:relative;
+  border:1px solid var(--mag-line);box-shadow:0 24px 60px -30px rgba(0,0,0,0.8);}
+.mag-plaat img{display:block;width:100%;height:auto;}
+/* een fijne gouden kaderlijn eromheen, als lijst */
+.mag-plaat::after{content:"";position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(231,211,154,0.22);}
 .mag-issue{display:flex;align-items:center;gap:0.8rem;justify-content:center;
   font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--mag-gold-soft);margin-bottom:1.5rem;}
 .mag-issue::before,.mag-issue::after{content:"";height:1px;width:min(15vw,84px);background:rgba(231,211,154,0.35);}
@@ -140,6 +142,7 @@ a{color:inherit;}
 
 /* ---------- colofon (donkere spread) ---------- */
 .mag-colofon{text-align:center;margin:auto;}
+.mag-plaat--klein{max-width:260px;margin-bottom:1.6rem;}
 .mag-colofon .mag-issue{margin-bottom:1.4rem;}
 .mag-colofon h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:clamp(2rem,6vw,2.8rem);margin-bottom:1rem;}
 .mag-colofon p{color:var(--soft);font-size:1rem;line-height:1.7;max-width:46ch;margin:0 auto 1.7rem;}

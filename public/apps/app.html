@@ -100,11 +100,9 @@
       padding:0;align-items:center;justify-content:center;min-height:100dvh;
     }
     #shell{
-      /* op de computer ligt het leden-OS als een toestel op een donker bureau,
-         nu op NORMAAL (telefoon-)formaat i.p.v. een breed iPad-kader: zo houdt
-         de app zijn vertrouwde maat en vult de vrijgekomen ruimte ernaast zich
-         met widgets (shared/bureau.js). */
-      max-width:460px;
+      /* een echte tablet: los venster met marge rondom, afgeronde hoeken en een
+         duidelijke rand + schaduw, zodat hij op het donkere bureau "ligt" */
+      max-width:820px;
       width:calc(100% - 3rem);
       height:90vh;
       max-height:1040px;
@@ -306,6 +304,25 @@
   }
 
   /* codenaam-kaart (de digitale pas in de app) */
+  /* De Members-kaart (codenaam-pas) + widget ernaast. Op de telefoon staat de
+     kaart gewoon vol; op een breed scherm (tablet-venster) houdt hij zijn echte
+     pas-formaat i.p.v. uitgerekt, en vult een widget de overgebleven ruimte. */
+  .os-paskrow{margin-top:1rem;}
+  .os-paskrow .codecard{margin-top:0;}
+  .os-pas-widget{display:none;}
+  @media (min-width:600px){
+    .os-paskrow{display:flex;gap:1rem;align-items:stretch;}
+    .os-paskrow .codecard{flex:0 0 clamp(320px,42%,400px);max-width:400px;}
+    .os-pas-widget{display:flex;flex:1;flex-direction:column;justify-content:center;gap:0.7rem;
+      border-radius:20px;border:1px solid var(--line);padding:1.4rem;min-width:0;
+      background:color-mix(in srgb, var(--card) 68%, transparent);}
+    .opw-eyebrow{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+    .opw-zin{font-family:'Bodoni Moda',serif;font-size:1.15rem;line-height:1.3;color:var(--txt);margin:0;}
+    .opw-knop{align-self:flex-start;border-radius:999px;border:1px solid var(--line);
+      background:var(--card2);color:var(--txt);font-family:inherit;font-weight:600;font-size:0.8rem;
+      padding:0.6rem 1.1rem;cursor:pointer;transition:border-color 0.13s ease;}
+    .opw-knop:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
+  }
   .codecard{
     margin-top:1rem;
     border-radius:20px;
@@ -1443,7 +1460,17 @@
             <input type="file" id="verifyFile" accept="image/*" style="display:none;">
             <input type="file" id="selfieFile" accept="image/*" capture="user" style="display:none;">
             <div id="paspoortInbox"></div>
-            <div class="codecard" id="codecard"></div>
+            <!-- De Members-kaart houdt op een breed scherm zijn echte pas-formaat;
+                 de ruimte ernaast vult een widget (op de telefoon staat de kaart
+                 gewoon vol, zonder widget ernaast). -->
+            <div class="os-paskrow">
+              <div class="codecard" id="codecard"></div>
+              <aside class="os-pas-widget" id="osPasWidget" aria-label="Rahul">
+                <span class="opw-eyebrow" data-i18n="app.pas.widget.eyebrow">Rahul</span>
+                <p class="opw-zin" data-i18n="app.pas.widget.zin">Vraag me om een reis te plannen, iets te boeken of te regelen.</p>
+                <button type="button" class="opw-knop" id="osPasWidgetBtn" data-i18n="app.pas.widget.knop">Vraag Rahul</button>
+              </aside>
+            </div>
             <nav class="os-grid" id="osGrid" aria-label="Apps"></nav>
           </section>
           <section class="os-pagina" aria-label="Hoofdscherm 2" id="osPagina2">
@@ -2164,6 +2191,7 @@ window.I18N = { en: {
   'app.ms.order':'Order', 'app.ms.choose':'Choose dishes', 'app.orderplaced':'Order placed with', 'app.paidto':'Paid to',
   'app.welcome':'Welcome,', 'app.membersince':'member since',
   'app.cc.label':'Your codename, your identity in our systems', 'app.cc.membernr':'Member no.', 'app.cc.pass':'Membership',
+  'app.pas.widget.eyebrow':'Rahul', 'app.pas.widget.zin':'Ask me to plan a trip, book something or arrange it.', 'app.pas.widget.knop':'Ask Rahul',
   'app.cc.why':'Why a codename?', 'app.cc.why.h':'Your real name is not in our travel data.',
   'app.cc.why.b':'Reservations, payments and Salon activity are held under your codename. Your real name sits in a separate, encrypted vault and is linked only once, at ticketing and check-in. Were travel data ever stolen, the attacker would never have the right name with your journeys.',
   'app.nexttrip':'Next journey', 'app.in':'in', 'app.days':'days', 'app.viewtrip':'View your journey',
@@ -2282,5 +2310,13 @@ window.I18N = { en: {
 <script src="/shared/rosapps.js" defer></script>
 <script src="/shared/split.js" defer></script>
 <script src="/shared/bureau.js" defer></script>
+<script>
+  // de widget naast de Members-kaart opent Rahul (het hart van het OS)
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('#osPasWidgetBtn')) return;
+    var ai = document.querySelector('.os-dock [data-tab="ai"], [data-tab="ai"]');
+    if (ai) ai.click();
+  });
+</script>
 </body>
 </html>

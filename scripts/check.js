@@ -160,5 +160,28 @@ console.log('\n10) de 9+-keuring op alle app-pagina\'s');
   if (!np) ok(paginas.length + ' app-pagina\'s voldoen aan de 9+-basis (taal, viewport, titel, favicon, landmark, basis-laag, eigen gids)');
 }
 
+/* 11) bedradings-contract: elke `accounts.<methode>(` die de server aanroept,
+   moet ook echt een export zijn. Zo glipt een crash-bij-opstart (aangeroepen
+   functie bestaat niet in module.exports) nooit meer langs de groene tests. */
+console.log('\n11) bedradings-contract: aangeroepen accounts.<methode> bestaat als export');
+{
+  let contractFout = 0;
+  try {
+    const accounts = require('../server/accounts');
+    const bekend = new Set(Object.keys(accounts));
+    const bestanden = [];
+    loop(path.join(ROOT, 'server'), /\.js$/, f => bestanden.push(f));
+    for (const f of bestanden) {
+      const bron = fs.readFileSync(f, 'utf8');
+      const re = /\baccounts\.([A-Za-z_$][\w$]*)\s*\(/g;
+      let m;
+      while ((m = re.exec(bron))) {
+        if (!bekend.has(m[1])) { contractFout++; fout('accounts.' + m[1] + '() aangeroepen in ' + path.relative(ROOT, f) + ', maar niet geëxporteerd'); }
+      }
+    }
+  } catch (e) { contractFout++; fout('kon het accounts-contract niet controleren: ' + e.message); }
+  if (!contractFout) ok('alle aangeroepen accounts-methoden bestaan als export');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

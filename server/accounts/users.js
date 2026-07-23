@@ -189,7 +189,7 @@ function deleteUser(id) {
 
 module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
-  realNameOf, emailOf, phoneOf,
+  renameUser, realNameOf, emailOf, phoneOf,
   issueToken, verifyToken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, deleteUser

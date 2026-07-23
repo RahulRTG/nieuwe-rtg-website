@@ -78,7 +78,7 @@
   var RUSTIG = false; try { RUSTIG = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
   function bWaarde() {
     try { var v = localStorage.getItem(BKEY); if (v != null && v !== '') return Math.max(0, Math.min(100, +v)); } catch (e) {}
-    return RUSTIG ? 12 : 60; // standaard: rustig als het toestel dat vraagt, anders normaal
+    return RUSTIG ? 12 : 35; // standaard rustig/ontspannen (niet te wild); op te draaien tot Levendig
   }
   function bFactor() { return bWaarde() / 60; } // 60 -> 1.0, bereik 0 .. 1.67
   function bNiveau() { var v = bWaarde(); return v < 8 ? 'stil' : v < 40 ? 'rustig' : v < 82 ? 'normaal' : 'levendig'; }

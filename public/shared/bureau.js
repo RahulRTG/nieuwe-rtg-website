@@ -147,6 +147,32 @@
     });
   }
 
+  /* Magnetisch: als een widget met een rand vlak bij die van een andere komt,
+     "klikt" hij er vanzelf tegenaan (randen en boven-/onderkanten lijnen uit).
+     Rustig gehouden: alleen binnen een kleine afstand (14px). */
+  var KLEEF = 14;
+  function magneet(el, x, y) {
+    if (!laag) return { x: x, y: y };
+    var ew = el.offsetWidth, eh = el.offsetHeight;
+    var bx = null, by = null, dx = KLEEF, dy = KLEEF;
+    var prob = function (a, kandidaat, isX) {
+      var v = Math.abs(a - kandidaat);
+      if (isX && v < dx) { dx = v; bx = kandidaat; }
+      if (!isX && v < dy) { dy = v; by = kandidaat; }
+    };
+    laag.querySelectorAll('.bw').forEach(function (o) {
+      if (o === el) return;
+      var L = o.offsetLeft, T = o.offsetTop, R = L + o.offsetWidth, B = T + o.offsetHeight;
+      prob(x, L, true); prob(x, R, true);            // linkerranden gelijk, of tegen de rechterrand
+      prob(x + ew, L, true); prob(x + ew, R, true);  // rechterrand tegen links, of rechterranden gelijk
+      prob(y, T, false); prob(y, B, false);
+      prob(y + eh, T, false); prob(y + eh, B, false);
+    });
+    if (bx !== null) { if (Math.abs(bx - x) > Math.abs(bx - (x + ew))) x = bx - ew; else x = bx; }
+    if (by !== null) { if (Math.abs(by - y) > Math.abs(by - (y + eh))) y = by - eh; else y = by; }
+    return { x: x, y: y };
+  }
+
   function sleepbaar(el, kop, w) {
     kop.addEventListener('pointerdown', function (e) {
       if (e.target.closest('.bw-x')) return;
@@ -157,6 +183,7 @@
       function beweeg(ev) {
         var nx = Math.max(4, Math.min(window.innerWidth - 60, beginL + (ev.clientX - startX)));
         var ny = Math.max(4, Math.min(window.innerHeight - 44, beginT + (ev.clientY - startY)));
+        var m = magneet(el, nx, ny); nx = m.x; ny = m.y;
         el.style.left = nx + 'px'; el.style.top = ny + 'px';
       }
       function los() {

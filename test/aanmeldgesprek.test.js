@@ -109,7 +109,12 @@ test('de poort is van Rahul: aanmelden en inloggen als gesprek', async () => {
     let l = (await zeg3('Ik wil inloggen.')).body;
     assert.match(l.tekst, /e-mailadres|gebruikersnaam/i, 'hij vraagt met wie hij praat');
     l = (await zeg3('gesprek@test.nl')).body;
-    assert.match(l.tekst, /sleutelwoord/i, 'de inlog gaat via je sleutelwoorden, niet een wachtwoord');
+    // standaard biedt Rahul het wachtwoord aan (dat heeft iedereen) en noemt
+    // sleutelwoorden als optie voor wie ze zelf heeft ingesteld
+    assert.match(l.tekst, /niet door dit gesprek/i, 'de inlog leidt met het wachtwoord');
+    assert.match(l.tekst, /sleutelwoord/i, 'en noemt sleutelwoorden als optie');
+    // wie sleutelwoorden heeft, kiest er alsnog voor
+    l = (await zeg3('doe het maar met mijn sleutelwoorden')).body;
     const p = posities(l.tekst);
     assert.equal(p.length, 2, 'hij vraagt de eerste twee van de drie posities');
     l = (await zeg3('Even denken hoor, ' + woorden[p[0]] + ' en ' + woorden[p[1]] + ' natuurlijk.')).body;
@@ -129,16 +134,17 @@ test('de poort is van Rahul: aanmelden en inloggen als gesprek', async () => {
     const zeg5 = async (tekst) => (await api(base, '/api/aanmeld/zeg', { id: id5, tekst })).body;
     await zeg5('inloggen graag');
     let pw = await zeg5('gesprek@test.nl');
-    assert.match(pw.tekst, /sleutelwoord/i);
-    pw = await zeg5('doe toch maar met mijn wachtwoord');
+    // standaard meteen het wachtwoordveld: de gebruikersnaam komt terug voor de
+    // ene inlogroute, het wachtwoord blijft buiten het gesprek
     assert.ok(pw.login && pw.login.u === 'gesprek@test.nl', 'de gebruikersnaam komt terug voor de ene inlogroute');
     assert.match(pw.tekst, /niet door dit gesprek/i, 'en het wachtwoord blijft buiten het gesprek');
 
     // een los e-mailadres als eerste zin = vrijwel zeker een terugkeerder,
-    // en die valt meteen in het beveiligde sleutelwoorden-pad
+    // en die valt meteen in het inlogpad (wachtwoord standaard, sleutelwoorden als optie)
     const s4 = await api(base, '/api/aanmeld/start', {});
     const kort = await api(base, '/api/aanmeld/zeg', { id: s4.body.id, tekst: 'gesprek@test.nl' });
-    assert.match(kort.body.tekst, /sleutelwoord/i, 'e-mail als opening = meteen het beveiligde inlogpad');
+    assert.match(kort.body.tekst, /niet door dit gesprek/i, 'e-mail als opening = meteen het inlogpad');
+    assert.ok(kort.body.login && kort.body.login.u === 'gesprek@test.nl', 'met de gebruikersnaam voor de ene inlogroute');
   } finally {
     await stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

@@ -104,6 +104,8 @@ module.exports = {
     'Ah, welcome back. Let me see: which email address or username do you use here?',
   'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.':
     'Welcome back. Type your password below; it goes straight into the vault, not through this conversation.',
+  'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek. (Heb je sleutelwoorden ingesteld? Zeg "sleutelwoorden".)':
+    'Welcome back. Type your password below; it goes straight into the vault, not through this conversation. (Set up keywords? Say "keywords".)',
   'Welk e-mailadres of welke gebruikersnaam gebruik je hier? Typ hem even voluit.':
     'Which email address or username do you use here? Type it out in full.',
   'Geen zorgen, dat regelen we zo. Welk e-mailadres gebruik je hier? Dan zorg ik voor een herstel-link.':

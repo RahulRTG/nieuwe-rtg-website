@@ -43,15 +43,21 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
      wachtwoord, zodat bestaande accounts nooit vastlopen. */
   function naarWoordInlog(g, u) {
     g.login = { u };
-    if (typeof swStart !== 'function') {
-      g.stap = 'login-af';
-      return { tekst: 'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.', login: g.login };
-    }
-    const r = swStart(u);
+    // Standaard het wachtwoord: dat heeft iedereen. Sleutelwoorden zijn een
+    // optionele, veiligere manier die je zelf instelt; wie ze heeft, vraagt er
+    // gewoon om. Zo geen verplicht sleutelwoord-scherm voor wie er geen heeft.
+    g.stap = 'login-af';
+    const swKan = typeof swStart === 'function';
+    return { tekst: 'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.' +
+      (swKan ? ' (Heb je sleutelwoorden ingesteld? Zeg "sleutelwoorden".)' : ''), login: g.login };
+  }
+  // wie liever met zijn eigen sleutelwoorden inlogt, start de uitdaging alsnog
+  function naarSleutelwoorden(g) {
+    const r = swStart((g.login || {}).u || '');
     if (r && r.error) { g.stap = 'login-naam'; return { tekst: r.error }; }
     g.sw = { id: r.id };
     g.stap = 'sw-open';
-    return { tekst: 'Fijn, welkom terug. We doen het veilig met je sleutelwoorden: verweef je ' + ord(r.posA) + ' en je ' + ord(r.posB) + ' sleutelwoord losjes in een zin. (Liever met je wachtwoord? Zeg "wachtwoord".)' };
+    return { tekst: 'Goed, we doen het met je sleutelwoorden: verweef je ' + ord(r.posA) + ' en je ' + ord(r.posB) + ' sleutelwoord losjes in een zin. (Toch het wachtwoord? Zeg "wachtwoord".)' };
   }
 
   function intakeStart() {
@@ -136,6 +142,8 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
           g.stap = 'doel'; g.login = null;
           return { tekst: 'Geen punt, we beginnen gewoon opnieuw. Kom je inloggen, of word je lid?' };
         }
+        // wie zelf sleutelwoorden heeft ingesteld, mag er alsnog voor kiezen
+        if (/\bsleutelwoord/i.test(tekst) && typeof swStart === 'function' && g.login) return naarSleutelwoorden(g);
         return { tekst: 'Typ je wachtwoord gewoon hieronder, dan ben je zo binnen. Kom je er niet uit: zeg "opnieuw" of "wachtwoord vergeten".', login: g.login || null };
       }
       case 'vergeten-mail': {

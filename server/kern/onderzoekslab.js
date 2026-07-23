@@ -33,19 +33,39 @@ module.exports = ({ db, save, crypto, anthropic }) => {
 
   const beeld = p => ({ id: p.id, titel: p.titel, veld: p.veld, veldNaam: (VELDEN[p.veld] || {}).naam,
     voorWie: p.voorWie, doel: p.doel, fase: p.fase, budget: p.budget, veiligheid: p.veiligheid,
+    team: p.team || [],
     logboek: (p.logboek || []).slice(0, 30), bevindingen: p.bevindingen || [], at: p.at });
 
-  function overzicht() {
-    const perVeld = Object.keys(VELDEN).map(v => ({ veld: v, naam: VELDEN[v].naam, emoji: VELDEN[v].emoji,
-      aantal: P().filter(p => p.veld === v).length }));
-    const perFase = {};
-    for (const f of FASEN) perFase[f] = P().filter(p => p.fase === f).length;
-    return { ok: true, velden: perVeld, fasen: FASEN.slice(0, 5), perFase,
-      toetsOpen: P().filter(p => (p.veiligheid || {}).status === 'open').length,
-      kennisbank: P().reduce((s, p) => s + (p.bevindingen || []).length, 0),
-      projecten: P().slice(0, 100).map(beeld) };
+  /* Bedrijfsgeheimen: het werk van personeel in het lab is besloten. Alleen wie
+     ERAAN werkt (op het team van het project) ziet het project; de RTG-boardroom
+     ziet ALLES (RTG- en RTF-werk). Een viewer is { key, boardroom }. */
+  function magZien(p, viewer) {
+    if (!viewer) return false;
+    if (viewer.boardroom) return true;
+    return !!viewer.key && (p.team || []).includes(viewer.key);
   }
-  function projectMaak(b) {
+  function overzicht(lijst) {
+    const L = lijst || P();
+    const perVeld = Object.keys(VELDEN).map(v => ({ veld: v, naam: VELDEN[v].naam, emoji: VELDEN[v].emoji,
+      aantal: L.filter(p => p.veld === v).length }));
+    const perFase = {};
+    for (const f of FASEN) perFase[f] = L.filter(p => p.fase === f).length;
+    return { ok: true, velden: perVeld, fasen: FASEN.slice(0, 5), perFase,
+      toetsOpen: L.filter(p => (p.veiligheid || {}).status === 'open').length,
+      kennisbank: L.reduce((s, p) => s + (p.bevindingen || []).length, 0),
+      projecten: L.slice(0, 100).map(beeld) };
+  }
+  // het overzicht zoals EEN kijker het mag zien (team + boardroom)
+  function overzichtVoor(viewer) { return overzicht(P().filter(p => magZien(p, viewer))); }
+  // het team van een project bijwerken (de mensen die eraan werken, op sleutel)
+  function teamZet(id, keys) {
+    const p = vind(id); if (!p) return { status: 404, error: 'Dit project bestaat niet.' };
+    p.team = (Array.isArray(keys) ? keys : []).map(k => schoon(k, 80)).filter(Boolean).slice(0, 50);
+    p.logboek.unshift({ id: rid(), tekst: 'Team bijgewerkt (' + p.team.length + ' personen).', wie: 'lab', at: nu() });
+    save();
+    return { ok: true, project: beeld(p) };
+  }
+  function projectMaak(b, makerKey) {
     b = b || {};
     const titel = schoon(b.titel, 100), doel = schoon(b.doel, 400);
     if (titel.length < 3) return { status: 400, error: 'Geef het project een duidelijke titel.' };
@@ -55,6 +75,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     const voorWie = ['rtg', 'rtf', 'samen'].includes(b.voorWie) ? b.voorWie : 'samen';
     const p = { id: rid(), titel, veld: b.veld, voorWie, doel, fase: 'idee',
       budget: Math.max(0, Math.min(10000000, Math.round(Number(b.budget) || 0))),
+      team: makerKey ? [String(makerKey)] : [],
       veiligheid: { status: 'open', door: null, om: null, notitie: '' },
       logboek: [{ id: rid(), tekst: 'Project gestart in het veld ' + VELDEN[b.veld].naam + '.', wie: 'lab', at: nu() }],
       bevindingen: [], at: nu() };
@@ -115,5 +136,5 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   }
 
   const labAI = require('./onderzoekslab-ai')({ anthropic, schoon, P, VELDEN });
-  return { lab: { overzicht, projectMaak, faseZet, veiligheidZet, logMaak, bevindingMaak, kennisbank, labAI, VELDEN, FASEN } };
+  return { lab: { overzicht, overzichtVoor, teamZet, projectMaak, faseZet, veiligheidZet, logMaak, bevindingMaak, kennisbank, labAI, VELDEN, FASEN } };
 };

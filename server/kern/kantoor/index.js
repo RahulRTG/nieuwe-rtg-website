@@ -130,7 +130,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     }));
   }
 
-  return { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, pendingVerifications };
+  return { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
 }
 
 module.exports = { maakKantoor };

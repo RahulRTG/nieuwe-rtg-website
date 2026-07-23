@@ -4,7 +4,10 @@
    het clubportaal: dat opent op de eigen clubcode en toont uitsluitend het
    eigen clubdossier. */
 module.exports = (kern) => {
-  const { app, officeAuth, rtfkantoor, rtfclubs, lab } = kern;
+  const { app, officeAuth, boardroomWie, magBoardroom, rtfkantoor, rtfclubs, lab } = kern;
+  // de kijker in het lab: bedrijfsgeheimen zijn besloten, dus wie het lab opent
+  // ziet alleen de projecten van zijn eigen team; de boardroom ziet alles.
+  const labKijker = req => { const key = boardroomWie(req); return { key, boardroom: magBoardroom(key) }; };
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const veilig = (res, werk) => { try { stuur(res, werk()); } catch (e) { console.error('[rtfkantoor]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
 
@@ -30,9 +33,12 @@ module.exports = (kern) => {
   app.post('/api/rtf/club/portaal', (req, res) => veilig(res, () => rtfclubs.portaal(req.body.code)));
   app.post('/api/rtf/club/bericht', (req, res) => veilig(res, () => rtfclubs.berichtClub(req.body.code, req.body.naam, req.body.tekst)));
 
-  // het Onderzoekslab: projecten, de fase-keten, de toets, kennis en de coach
-  app.post('/api/lab/overzicht', officeAuth, (req, res) => veilig(res, () => lab.overzicht()));
-  app.post('/api/lab/project/maak', officeAuth, (req, res) => veilig(res, () => lab.projectMaak(req.body || {})));
+  // het Onderzoekslab: projecten, de fase-keten, de toets, kennis en de coach.
+  // Het overzicht is besloten: iedereen ziet alleen zijn eigen teamprojecten,
+  // de boardroom ziet alles. Wie een project start, staat meteen op het team.
+  app.post('/api/lab/overzicht', officeAuth, (req, res) => veilig(res, () => lab.overzichtVoor(labKijker(req))));
+  app.post('/api/lab/project/maak', officeAuth, (req, res) => veilig(res, () => lab.projectMaak(req.body || {}, boardroomWie(req))));
+  app.post('/api/lab/project/team', officeAuth, (req, res) => veilig(res, () => lab.teamZet(String(req.body.id || ''), req.body.team)));
   app.post('/api/lab/project/fase', officeAuth, (req, res) => veilig(res, () => lab.faseZet(String(req.body.id || ''), String(req.body.fase || ''))));
   app.post('/api/lab/project/veiligheid', officeAuth, (req, res) => veilig(res, () => lab.veiligheidZet(String(req.body.id || ''), req.body || {})));
   app.post('/api/lab/project/log', officeAuth, (req, res) => veilig(res, () => lab.logMaak(String(req.body.id || ''), req.body.tekst, req.body.wie)));

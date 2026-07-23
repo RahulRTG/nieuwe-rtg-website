@@ -2003,7 +2003,7 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, conci
   maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, pendingVerifications } = maakKantoor({
+const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
   db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
@@ -2037,7 +2037,7 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij, creator, samenwerking, agenda, facturatie, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, openVacatures, optieAan,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sendPush,

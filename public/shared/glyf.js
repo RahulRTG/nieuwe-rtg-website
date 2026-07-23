@@ -82,7 +82,15 @@
     betalen: '<rect x="3" y="6" width="18" height="12" rx="2.4"/><path d="M3 10h18M6.5 14.5h4"/>',
     bank: '<path d="M4 9.5l8-5 8 5M5 9.5v8M9 9.5v8M15 9.5v8M19 9.5v8M3.5 20.5h17"/>',
     slot: '<rect x="5" y="10.5" width="14" height="9" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><circle cx="12" cy="15" r="1.2"/>',
-    pas: '<rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 9.5h18M6.5 14h5"/><circle cx="16.5" cy="14" r="1.6"/>'
+    pas: '<rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 9.5h18M6.5 14h5"/><circle cx="16.5" cy="14" r="1.6"/>',
+    gebouw: '<path d="M6 21V4.6A1.6 1.6 0 0 1 7.6 3h5.8A1.6 1.6 0 0 1 15 4.6V21M15 9.5h2.4A1.6 1.6 0 0 1 19 11.1V21M4 21h16M9 7h3M9 11h3M9 15h3"/>',
+    gps: '<path d="M12 21c-4.5-5-6.6-8-6.6-11.2a6.6 6.6 0 0 1 13.2 0C18.6 13 16.5 16 12 21z"/><circle cx="12" cy="9.8" r="2.4"/>',
+    wifi: '<path d="M2.6 9.1a15 15 0 0 1 18.8 0M5.6 12.6a10 10 0 0 1 12.8 0M8.6 16.1a5 5 0 0 1 6.8 0"/><circle cx="12" cy="19.2" r="1"/>',
+    bluetooth: '<path d="M9 8l6 8-3 2.4V5.6l3 2.4-6 8"/>',
+    netwerk: '<rect x="4" y="4.5" width="16" height="6" rx="1.5"/><rect x="4" y="13.5" width="16" height="6" rx="1.5"/><path d="M7.5 7.5h.01M7.5 16.5h.01"/>',
+    antenne: '<path d="M12 13.2V21M12 13.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6.6 15.6a8 8 0 0 1 0-11.2M17.4 4.4a8 8 0 0 1 0 11.2"/>',
+    gear: '<circle cx="12" cy="12" r="3.2"/><path d="M12 3.4v2.6M12 18v2.6M3.4 12H6M18 12h2.6M6 6l1.8 1.8M16.2 16.2 18 18M18 6l-1.8 1.8M7.8 16.2 6 18"/>',
+    help: '<circle cx="12" cy="12" r="8.5"/><path d="M9.4 9.1a2.6 2.6 0 0 1 5 .8c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="16.6" r=".7"/>'
   };
 
   function svg(naam) {

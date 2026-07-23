@@ -87,7 +87,7 @@ const TALEN = [
   { code: 'or', naam: 'ଓଡ଼ିଆ', en: 'Odia' },
   { code: 'as', naam: 'অসমীয়া', en: 'Assamese' },
   { code: 'dv', naam: 'ދިވެހި', en: 'Dhivehi' },
-  { code: 'bo', naam: 'བོད་སྐད', en: 'Tibetan' },
+  { code: 'bo', naam: 'བོད་སྐད་', en: 'Tibetan' },
   // Oost- & Zuidoost-Azië
   { code: 'zh', naam: '中文', en: 'Chinese' },
   { code: 'ja', naam: '日本語', en: 'Japanese' },

@@ -15,7 +15,8 @@
   if (!memTok && !supTok) return;
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
-  var css = '.mgz-knop{position:fixed;right:1rem;z-index:35;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+  var css = '.mgz-knop{position:fixed;right:1rem;z-index:35;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+    '.mgz-knop.mgz-sleept{cursor:grabbing;opacity:.9;box-shadow:0 12px 34px rgba(0,0,0,.55);}' +
     '.mgz-rahul{bottom:1rem;background:var(--gold,#857007);color:#000;}' +
     '.mgz-samen{bottom:3.6rem;background:#151312;color:#eee;border:1px solid var(--gold,#857007);}' +
     '.mgz-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
@@ -39,6 +40,45 @@
     '.mgz-seintje:hover{border-color:#C23A5E;}.mgz-seintje b{color:var(--gold,#857007);display:block;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.15rem;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; };
+
+  /* De lippen zijn overal neer te zetten: sleep de Rahul-knop waarheen je wilt.
+     De plek onthouden we per toestel (localStorage). Een korte tik opent Rahul
+     zoals altijd; pas voorbij een kleine drempel wordt het slepen. */
+  function maakSleepbaar(el, sleutel) {
+    var neer = null, sleept = false;
+    function klem(x, y) {
+      var b = el.getBoundingClientRect();
+      var mx = window.innerWidth - b.width - 6, my = window.innerHeight - b.height - 6;
+      return { x: Math.max(6, Math.min(x, mx)), y: Math.max(6, Math.min(y, my)) };
+    }
+    function zet(x, y) {
+      var p = klem(x, y);
+      el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
+      el.style.right = 'auto'; el.style.bottom = 'auto';
+    }
+    try { var s = JSON.parse(localStorage.getItem(sleutel) || 'null'); if (s) requestAnimationFrame(function () { zet(s.x, s.y); }); } catch (e) {}
+    el.addEventListener('pointerdown', function (e) {
+      var r = el.getBoundingClientRect();
+      neer = { x: e.clientX, y: e.clientY, bx: r.left, by: r.top }; sleept = false;
+      try { el.setPointerCapture(e.pointerId); } catch (er) {}
+    });
+    el.addEventListener('pointermove', function (e) {
+      if (!neer) return;
+      var dx = e.clientX - neer.x, dy = e.clientY - neer.y;
+      if (!sleept && Math.abs(dx) + Math.abs(dy) > 6) { sleept = true; el.classList.add('mgz-sleept'); }
+      if (sleept) { zet(neer.bx + dx, neer.by + dy); e.preventDefault(); }
+    });
+    el.addEventListener('pointerup', function () {
+      if (neer && sleept) {
+        var r = el.getBoundingClientRect();
+        try { localStorage.setItem(sleutel, JSON.stringify({ x: r.left, y: r.top })); } catch (er) {}
+        // de klik die direct na het loslaten komt niet als 'openen' laten tellen
+        el.addEventListener('click', function stop(ev) { ev.stopPropagation(); ev.preventDefault(); el.removeEventListener('click', stop, true); }, true);
+      }
+      neer = null; sleept = false; el.classList.remove('mgz-sleept');
+    });
+    window.addEventListener('resize', function () { var r = el.getBoundingClientRect(); zet(r.left, r.top); });
+  }
 
   /* ---------- Rahul: vraagt en doet, met de inlog die er is ---------- */
   // de grote apps (leden-OS, leverancier, PDA, backoffice) hebben Rahul al
@@ -65,6 +105,7 @@
       '<div class="mgz-uit" aria-live="polite"></div>' +
       '<form class="mgz-rij"><input placeholder="Vraag of opdracht" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
     document.body.appendChild(fab); document.body.appendChild(sheet);
+    maakSleepbaar(fab, 'rtg_rahul_pos'); // de lippen overal neer te zetten
     var uit = sheet.querySelector('.mgz-uit'), form = sheet.querySelector('form'), inp = form.querySelector('input');
     var seintjesVak = sheet.querySelector('[data-seintjes]');
     fab.addEventListener('click', function () { sheet.hidden = false; fab.hidden = true; inp.focus(); doofMelding();

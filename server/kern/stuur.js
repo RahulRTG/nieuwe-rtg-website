@@ -109,7 +109,7 @@ function maakStuur({ log, anthropic, app }) {
 
   async function stuurLus(req, opties) {
     if (!anthropic) return null;
-    const vraag = String((opties && opties.vraag) || '').trim().slice(0, 600);
+    const vraag = String((opties && opties.vraag) || '').trim().slice(0, 1200);
     if (!vraag) return null;
     const paden = () => stuurPaden(app, null).filter(opties.filter || (() => true));
     const tools = [
@@ -122,9 +122,12 @@ function maakStuur({ log, anthropic, app }) {
     const messages = [{ role: 'user', content: vraag }];
     const acties = [];
     try {
-      for (let stap = 0; stap < 6; stap++) {
+      // ruim genoeg stappen voor een echte klus (een hele dag plannen, een
+      // reis regelen, meerdere boekingen achter elkaar) zonder halverwege te
+      // stoppen; elke stap houdt zich aan dezelfde inlog en de geld-drempel.
+      for (let stap = 0; stap < 12; stap++) {
         const resp = await anthropic.messages.create({
-          model: 'claude-sonnet-5', max_tokens: 700,
+          model: 'claude-sonnet-5', max_tokens: 1400,
           system: (opties.systeem || '') + '\n' + LUS_REGELS, tools, messages
         });
         const wilTools = resp.content.filter(c => c.type === 'tool_use');

@@ -51,9 +51,14 @@ app.post('/api/fluister', auth, async (req, res) => {
   if (stuurLus && !r.pakte) {
     const lus = await stuurLus(req, {
       vraag: req.body.q,
-      filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/foundation', '/api/partner'].some(w => p.startsWith(w)),
+      // alles wat het lid zelf mag: de hele leden-app EN de RTFoundation
+      // (gezin/kinderen). Alleen de zakelijke werk-apps van andere rollen
+      // (leverancier/personeel/kantoor/partner) blijven buiten bereik; de
+      // API zelf bewaakt verder wie waar recht op heeft (bv. ouder-goedkeuring).
+      filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/partner'].some(w => p.startsWith(w)),
       systeem: require('../../kern/rahul').RAHUL_LEAD +
-        'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app.'
+        'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app. ' +
+        'Je regelt niet alleen reizen, bestellen, betalen en de Salon, maar ook de RTFoundation voor het gezin (bijvoorbeeld het babyboek, school, toetsen of het zakgeldpotje) als het lid daar recht op heeft.'
     });
     if (lus && lus.tekst) return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
   }

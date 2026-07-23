@@ -33,8 +33,8 @@
       gasten.map(([naam, som]) => '<div class="tt-gast"><span>' + naam + '</span><span class="n">' + eur(som) + '</span></div>').join('') +
       (t.bonnen || []).map(b => '<div class="tt-bon">• ' + b.ref + ' · ' + b.codename + ' · ' + eur(b.total) + '</div>').join('') +
       '<div class="tt-tot"><span>' + T('tt.totaal','Totaal') + '</span><span>' + eur(t.subtotaal) + '</span></div>' +
-      '<div class="tt-zegel">🔒 ' + T('tt.zegel','Gezegeld ticket') + ': ' + String(t.zegel || '').slice(0, 24) + '…</div>' +
-      '<button class="tt-btn" id="ttAfreken">🧾 ' + T('tt.afrekenen','Reken dit ticket in een keer af (contant)') + '</button>';
+      '<div class="tt-zegel">' + T('tt.zegel','Gezegeld ticket') + ': ' + String(t.zegel || '').slice(0, 24) + '…</div>' +
+      '<button class="tt-btn" id="ttAfreken">' + T('tt.afrekenen','Reken dit ticket in een keer af (contant)') + '</button>';
     const ab = document.getElementById('ttAfreken');
     if (ab) ab.addEventListener('click', ttAfrekenen);
   }
@@ -51,7 +51,7 @@
     if (!confirm(T('tt.bevestig','Alle bonnen aan ') + (ttHuidig.table || '') + T('tt.bevestig2',' in een keer afrekenen (contant)?'))) return;
     try {
       const d = await API.call('/supplier/tafelticket/afrekenen', { table: ttHuidig.table, zegel: ttHuidig.zegel, at: ttHuidig.at, method: 'contant' });
-      toast('🧾 ' + T('tt.klaar','Tafelticket afgerekend: ') + eur(d.subtotaal) + ' (' + d.aantalBonnen + ' ' + T('tt.bonnen','bon(nen)') + ')');
+      toast('' + T('tt.klaar','Tafelticket afgerekend: ') + eur(d.subtotaal) + ' (' + d.aantalBonnen + ' ' + T('tt.bonnen','bon(nen)') + ')');
       const ov = document.getElementById('ttOverlay'); if (ov) ov.remove();
     } catch(e){
       // beveiliging: gewijzigde of gemanipuleerde rekening -> vers ophalen
@@ -66,7 +66,7 @@
     const oud = document.getElementById('ttOverlay'); if (oud) oud.remove();
     const ov = document.createElement('div'); ov.className = 'tt-ov'; ov.id = 'ttOverlay';
     ov.innerHTML = '<div class="tt-card" role="dialog" aria-modal="true" aria-label="' + T('tt.titel','Tafel op een ticket') + '">' +
-      '<div class="tt-kop"><h3>🧾 ' + T('tt.titel','Tafel op een ticket') + '</h3><button class="tt-sluit" id="ttSluit" aria-label="Sluiten">✕</button></div>' +
+      '<div class="tt-kop"><h3>' + T('tt.titel','Tafel op een ticket') + '</h3><button class="tt-sluit" id="ttSluit" aria-label="Sluiten">✕</button></div>' +
       (tafels.length
         ? '<select class="tt-in" id="ttTafel" aria-label="' + T('tt.tafel','Tafel') + '"><option value="">' + T('tt.kies','Kies een tafel…') + '</option>' +
             tafels.map(t => '<option value="' + t.name + '">' + t.name + '</option>').join('') + '</select>'

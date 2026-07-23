@@ -6,7 +6,7 @@
     el.innerHTML = '<div class="card">'+
       (doors.length ? doors.map(d =>
         '<div class="door-row'+(d.locked?'':' open')+'">'+
-          '<span class="dl">'+(d.locked?'🔒':'🔓')+'</span>'+
+          '<span class="dl">'+(d.locked?'':'')+'</span>'+
           '<div class="dt"><b>'+d.name+'</b><span>'+(d.locked?T('door.locked','Vergrendeld'):T('door.open','OPEN, vergrendelt zichzelf'))+
             (d.lastBy?' · '+T('door.lastby','laatst:')+' '+d.lastBy+(d.lastAt?', '+timeAgo(d.lastAt):''):'')+'</span></div>'+
           '<button class="obtn'+(d.locked?' primary':' warn')+'" data-door="'+d.id+'">'+(d.locked?T('door.openbtn','Open 10 sec'):T('door.lockbtn','Vergrendel nu'))+'</button>'+

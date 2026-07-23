@@ -80,9 +80,9 @@
     const wrap = document.createElement('div');
     wrap.id = 'dishSheet';
     const alg = (m.allergens||[]).length
-      ? m.allergens.map(a => '<span class="ds-alg">⚠ '+a+'</span>').join('')
+      ? m.allergens.map(a => '<span class="ds-alg">'+a+'</span>').join('')
       : '<span class="ds-alg ok">'+T('ds.noalg','geen allergenen geregistreerd')+'</span>';
-    const icoon = KSECTIES[m.sectie||'warm'] && m.station !== 'bar' ? KSECTIES[m.sectie||'warm'][0]+' ' : (m.station==='bar'?'🍸 ':'');
+    const icoon = KSECTIES[m.sectie||'warm'] && m.station !== 'bar' ? KSECTIES[m.sectie||'warm'][0]+' ' : (m.station==='bar'?'':'');
     wrap.innerHTML = '<div class="ds-scrim"></div>'+
       '<div class="ds-card" role="dialog" aria-modal="true" aria-label="'+m.name+'">'+
         '<div class="ds-top"><div><b>'+icoon+m.name+'</b>'+
@@ -90,11 +90,11 @@
           '<div class="ds-algs">'+alg+'</div></div>'+
           '<button class="st-exit" data-dsluit>'+T('ds.sluit','Sluit')+'</button></div>'+
         '<div class="ds-acts">'+
-          '<button data-dsk="recept">📖 '+T('ds.recept','Recept')+'</button>'+
-          '<button data-dsk="bereiding">👨‍🍳 '+T('ds.bereiding','Bereidingswijze')+'</button>'+
-          '<button data-dsk="allergenen">⚠️ '+T('ds.allergenen','Allergenen en vervangers')+'</button>'+
-          '<button data-dsk="pairing">🍷 '+T('ds.pairing','Dranksuggestie')+'</button>'+
-          '<button data-ds86'+(m.uitverkocht?' class="aan"':'')+'>⛔ '+(m.uitverkocht?T('ds.86off','86 opheffen'):T('ds.86','86, uitverkocht'))+'</button>'+
+          '<button data-dsk="recept">'+T('ds.recept','Recept')+'</button>'+
+          '<button data-dsk="bereiding">'+T('ds.bereiding','Bereidingswijze')+'</button>'+
+          '<button data-dsk="allergenen">'+T('ds.allergenen','Allergenen en vervangers')+'</button>'+
+          '<button data-dsk="pairing">'+T('ds.pairing','Dranksuggestie')+'</button>'+
+          '<button data-ds86'+(m.uitverkocht?' class="aan"':'')+'>'+(m.uitverkocht?T('ds.86off','86 opheffen'):T('ds.86','86, uitverkocht'))+'</button>'+
         '</div>'+
         (m.uitverkocht?'<div class="ds-86">'+T('ds.86nu','Dit gerecht staat op 86: leden kunnen het nu niet bestellen.')+'</div>':'')+
         '<div class="ds-body" id="dsBody">'+T('ds.kies','Kies hierboven wat je wilt zien.')+'</div>'+
@@ -116,7 +116,7 @@
       try {
         const d = await API.call('/supplier/menu/86', { itemId, op: !m.uitverkocht });
         m.uitverkocht = d.uitverkocht;
-        toast(m.uitverkocht ? '⛔ 86: '+m.name : '✅ '+m.name+' '+T('ds.weerbeschikbaar','is weer beschikbaar'));
+        toast(m.uitverkocht ? '86: '+m.name : ''+m.name+' '+T('ds.weerbeschikbaar','is weer beschikbaar'));
         dishSheet(itemId);
       } catch(e){ toast(e.message); }
     });

@@ -2,14 +2,14 @@
     const knoppen = [];
     if (r.status === 'aangevraagd') knoppen.push('<button class="obtn primary js-resok">'+T('res.ok','Bevestig')+'</button>','<button class="obtn warn js-resnee">'+T('sup.reject','Weiger')+'</button>');
     if (r.status === 'bevestigd'){
-      knoppen.push('<button class="obtn js-restafel">🪑 '+(r.tafel?esc(r.tafel):T('res.tafel','Tafel'))+'</button>');
+      knoppen.push('<button class="obtn js-restafel">'+(r.tafel?esc(r.tafel):T('res.tafel','Tafel'))+'</button>');
       if (vandaag) knoppen.push('<button class="obtn primary js-reser">'+T('res.er','Gast is er')+'</button>','<button class="obtn warn js-resno">'+T('res.noshow','No-show')+'</button>');
     }
     if (r.status === 'aangekomen') knoppen.push('<button class="obtn js-resweg">'+T('res.weg','Vertrokken')+'</button>');
     return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-res="'+r.id+'">'+
       '<span><b>'+r.tijd+'</b> · <b class="cn">'+esc(r.customerCodename)+'</b> · '+r.personen+'p'+
-        (r.tafel?' · 🪑 '+esc(r.tafel):'')+(r.notitie?' · 📝 '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
-        (r.zorg?'<span style="display:block;color:#E2B93B;">⚠ '+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
+        (r.tafel?' ·  '+esc(r.tafel):'')+(r.notitie?' ·  '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
+        (r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
       (knoppen.length
         ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
         : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+
@@ -41,15 +41,15 @@
             '<button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span>'+
         '</div>').join('')
       : '';
-    wrap.innerHTML = '<div class="card"><div class="tt-h">🪑 '+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
+    wrap.innerHTML = '<div class="card"><div class="tt-h">'+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
       '<div class="pos-chips" style="margin-top:0.4rem;">'+
-        '<span>👥 '+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
-        (plan.openAanvragen?'<span>✋ '+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
-        (plan.zonderTafel?'<span>🪑 '+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
+        '<span>'+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
+        (plan.openAanvragen?'<span>'+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
+        (plan.zonderTafel?'<span>'+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
       '</div>'+chips+rekBlok+
       (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
       '</div>'+
-      (later.length ? '<div class="card"><div class="tt-h">🗓 '+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
+      (later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
     // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij
     wrap.querySelectorAll('[data-tafelrek]').forEach(el => {
       const rekenAf = async (extra) => {
@@ -79,7 +79,7 @@
     wrap.querySelectorAll('.js-walkin').forEach(b => b.addEventListener('click', async () => {
       const p = window.prompt(T('res.walkinp','Walk-in aan '+b.dataset.tafel+': met hoeveel personen?'), '2');
       if (!p) return;
-      try { await API.call('/supplier/walkin', { tafel: b.dataset.tafel, personen: Number(p) }); toast('🪑 '+T('res.walkintoast','Walk-in geplaatst.')); renderReserveringen(); }
+      try { await API.call('/supplier/walkin', { tafel: b.dataset.tafel, personen: Number(p) }); toast(''+T('res.walkintoast','Walk-in geplaatst.')); renderReserveringen(); }
       catch(e){ toast(e.message); }
     }));
     wrap.querySelectorAll('[data-res]').forEach(el => {
@@ -88,12 +88,12 @@
         catch(e){ toast(e.message); }
       };
       const id = el.dataset.res;
-      const ok = el.querySelector('.js-resok'); if (ok) ok.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'bevestig' }, '🪑 '+T('res.oktoast','Reservering bevestigd; de gast hoort het meteen.')));
+      const ok = el.querySelector('.js-resok'); if (ok) ok.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'bevestig' }, ''+T('res.oktoast','Reservering bevestigd; de gast hoort het meteen.')));
       const nee = el.querySelector('.js-resnee'); if (nee) nee.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'weiger' }, T('res.neetoast','Reservering geweigerd.')));
       const tf = el.querySelector('.js-restafel'); if (tf) tf.addEventListener('click', () => {
         const namen = plan.tafels.map(t => t.name);
         const keuze = window.prompt(T('res.tafelp','Welke tafel?')+' ('+namen.join(', ')+')');
-        if (keuze) doe('/supplier/reservering/tafel', { id, tafel: keuze.trim() }, '🪑 '+T('res.tafeltoast','Tafel toegewezen; de gast krijgt bericht.'));
+        if (keuze) doe('/supplier/reservering/tafel', { id, tafel: keuze.trim() }, ''+T('res.tafeltoast','Tafel toegewezen; de gast krijgt bericht.'));
       });
       const er = el.querySelector('.js-reser'); if (er) er.addEventListener('click', () => doe('/supplier/reservering/komst', { id, actie:'aangekomen' }, T('res.ertoast','Welkom; de tafel staat op bezet.')));
       const no = el.querySelector('.js-resno'); if (no) no.addEventListener('click', () => doe('/supplier/reservering/komst', { id, actie:'no-show' }, T('res.noshowtoast','Gemeld als no-show; de tafel is weer vrij.')));

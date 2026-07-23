@@ -14,94 +14,94 @@
   const tAlg = a => (lang() === 'en' ? (ALG[a] || a) : a);
 
   const DEMO = [
-    { code:'KIKUNOI', name:'Sal de Mar',      type:'Restaurant', icon:'🍽️', sub:'Restaurant · Ibiza' },
-    { code:'PONTO',   name:'Sunset Ibiza',    type:'Bar',        icon:'🍸', sub:'Bar · Ibiza' },
-    { code:'HOSHI',   name:'Aguamarina Ibiza', type:'Hotel',     icon:'🏨', sub:'Hotel · Ibiza' },
-    { code:'SAKURA',  name:'Villa Bahia Ibiza', type:'Appartement', icon:'🏡', sub:'Appartement · Ibiza' },
-    { code:'MKKX',    name:'Ibiza Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Ibiza' },
-    { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' },
-    { code:'IBIZAIR', name:'Ibiza Sky Charter', type:'Helikopter', icon:'🚁', sub:'Helikopter transfers · Ibiza' },
-    { code:'AYAKA',   name:'Atelier Marfil', type:'Zelfstandig', icon:'🧑‍🎨', sub:'Sieraden & goudsmid · Ibiza' },
-    { code:'KAITO',   name:'Studio Milan', type:'Zelfstandig', icon:'🏋️', sub:'Health & wellness · Ibiza' },
-    { code:'ESVEDRA', name:'Es Vedra Cruises', type:'Activiteit', icon:'⛵', sub:'Tours & cruises · Ibiza' },
-    { code:'MACE',    name:'MACE Museum Eivissa', type:'Activiteit', icon:'🏛️', sub:'Museum · Ibiza' },
-    { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'🚗', sub:'Autoverhuur · Ibiza' },
-    { code:'IBIZALIV', name:'Ibiza Living Estates', type:'Vastgoed', icon:'🏡', sub:'Makelaar · Ibiza' },
-    { code:'MAISON',  name:'Maison Solène', type:'Mode', icon:'🛍️', sub:'Modehuis · Ibiza' },
-    { code:'AZUL',    name:'Azul Yacht Charter', type:'Charter', icon:'⛵', sub:'Boten & jachten · Ibiza' },
-    { code:'MERCABIZA', name:'Mercabiza', type:'Groothandel', icon:'📦', sub:'Groothandel & versmarkt · Ibiza' },
-    { code:'AEGIS',   name:'Aegis Elite Security', type:'Beveiliging', icon:'🛡️', sub:'Beveiliging · Ibiza' },
-    { code:'CANFERRER', name:'Finca Can Ferrer', type:'Boerderij', icon:'🚜', sub:'Boerderij · Ibiza' },
-    { code:'LUMINA',  name:'Lumina Media', type:'Creator', icon:'🎬', sub:'Content creators · Ibiza' },
-    { code:'VORA',    name:'Vora Beach Club', type:'Beachclub', icon:'🏖️', sub:'Beachclub · Cala Nova' },
-    { code:'BRISA',   name:'Cafe Brisa', type:'Koffie', icon:'☕', sub:'Koffie & patisserie · Ibiza-stad' },
-    { code:'FUEGO',   name:'Chef Fuego', type:'Privéchef', icon:'👨‍🍳', sub:'Privéchef & catering · op locatie' },
-    { code:'LUNARA',  name:'Casa Lunara', type:'Villa\'s', icon:'🌴', sub:'Villa\'s & fincas · Es Cubells' },
-    { code:'MOTOISLA', name:'Moto Isla', type:'Tweewielers', icon:'🛵', sub:'Scooters, motoren & quads · Ibiza' },
-    { code:'FESTA',   name:'Festa Ibiza Events', type:'Events', icon:'🎪', sub:'Events & festivals · Cala Comte' },
-    { code:'SERENA',  name:'Serena Spa', type:'Wellness', icon:'🧖', sub:'Wellness & spa · Santa Eularia' },
-    { code:'ZENITH',  name:'Zenith Spa & Wellness', type:'Zorg', icon:'🧖', sub:'Dagspa & behandelingen · Talamanca' },
-    { code:'CLARA',   name:'Kliniek Clara Ibiza', type:'Zorg', icon:'🩺', sub:'Privékliniek & herstel · Vila' },
-    { code:'ORODOR',  name:'Casa d\'Oro', type:'Juwelier', icon:'💎', sub:'Juwelier & horloges · Dalt Vila' },
-    { code:'LIENZO',  name:'Galeria Lienzo', type:'Galerie', icon:'🖼️', sub:'Kunst & galerie · Dalt Vila' },
-    { code:'TERRAMAR', name:'TerraMar Cargo', type:'Vracht', icon:'🚢', sub:'Internationale vracht · Haven van Ibiza' },
-    { code:'MERIDIAAN', name:'Meridiaan Toren', type:'Kantoorgebouw', icon:'🏢', sub:'Kantoorgebouw · Amsterdam Zuidas' },
-    { code:'SAROCA',  name:'Club de Golf Sa Roca', type:'Golfclub', icon:'⛳', sub:'Golf & countryclub · Roca Llisa' },
-    { code:'FORTIA',  name:'Fortia Club', type:'Fitnessclub', icon:'🏋️', sub:'Sport & fitnessclub · Marina Botafoch' },
-    { code:'VELVET',  name:'Velvet & Blade', type:'Beauty-salon', icon:'✂️', sub:'Beauty-salon & barbier · Vara de Rey' },
-    { code:'AMICS',   name:'Amics Petcare', type:'Petcare', icon:'🐾', sub:'Pension, uitlaat & trim · Sant Jordi' },
-    { code:'NIDO',    name:'Nido Kinderopvang & Nanny', type:'Kinderopvang', icon:'🧸', sub:'Opvang & nanny-service · Santa Gertrudis' },
-    { code:'PORTELL', name:'Marina Portell', type:'Marina', icon:'⚓', sub:'Marina & jachthaven · Marina Botafoch' },
-    { code:'AURELIA', name:'Aurelia Weddings & Events', type:'Weddings', icon:'💐', sub:'Weddings & privé-events · Sant Antoni' },
-    { code:'LEXNOVA', name:'LexNova Advocaten & Notarissen', type:'Professioneel', icon:'⚖️', sub:'Advocaat, notaris, fiscalist · Vara de Rey' },
-    { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'🛡️', sub:'Verzekeringsadvies · Ibiza-stad' },
-    { code:'VALAURA', name:"Val d'Aurora Resort", type:'Wintersport', icon:'⛷️', sub:"Wintersport & seizoensresort · Val d'Aurora" }
+    { code:'KIKUNOI', name:'Sal de Mar',      type:'Restaurant', icon:'', sub:'Restaurant · Ibiza' },
+    { code:'PONTO',   name:'Sunset Ibiza',    type:'Bar',        icon:'', sub:'Bar · Ibiza' },
+    { code:'HOSHI',   name:'Aguamarina Ibiza', type:'Hotel',     icon:'', sub:'Hotel · Ibiza' },
+    { code:'SAKURA',  name:'Villa Bahia Ibiza', type:'Appartement', icon:'', sub:'Appartement · Ibiza' },
+    { code:'MKKX',    name:'Ibiza Executive Cars', type:'Taxi',  icon:'', sub:'Taxi · Ibiza' },
+    { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'', sub:'Privéjet · Amsterdam' },
+    { code:'IBIZAIR', name:'Ibiza Sky Charter', type:'Helikopter', icon:'', sub:'Helikopter transfers · Ibiza' },
+    { code:'AYAKA',   name:'Atelier Marfil', type:'Zelfstandig', icon:'', sub:'Sieraden & goudsmid · Ibiza' },
+    { code:'KAITO',   name:'Studio Milan', type:'Zelfstandig', icon:'', sub:'Health & wellness · Ibiza' },
+    { code:'ESVEDRA', name:'Es Vedra Cruises', type:'Activiteit', icon:'', sub:'Tours & cruises · Ibiza' },
+    { code:'MACE',    name:'MACE Museum Eivissa', type:'Activiteit', icon:'', sub:'Museum · Ibiza' },
+    { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'', sub:'Autoverhuur · Ibiza' },
+    { code:'IBIZALIV', name:'Ibiza Living Estates', type:'Vastgoed', icon:'', sub:'Makelaar · Ibiza' },
+    { code:'MAISON',  name:'Maison Solène', type:'Mode', icon:'', sub:'Modehuis · Ibiza' },
+    { code:'AZUL',    name:'Azul Yacht Charter', type:'Charter', icon:'', sub:'Boten & jachten · Ibiza' },
+    { code:'MERCABIZA', name:'Mercabiza', type:'Groothandel', icon:'', sub:'Groothandel & versmarkt · Ibiza' },
+    { code:'AEGIS',   name:'Aegis Elite Security', type:'Beveiliging', icon:'', sub:'Beveiliging · Ibiza' },
+    { code:'CANFERRER', name:'Finca Can Ferrer', type:'Boerderij', icon:'', sub:'Boerderij · Ibiza' },
+    { code:'LUMINA',  name:'Lumina Media', type:'Creator', icon:'', sub:'Content creators · Ibiza' },
+    { code:'VORA',    name:'Vora Beach Club', type:'Beachclub', icon:'', sub:'Beachclub · Cala Nova' },
+    { code:'BRISA',   name:'Cafe Brisa', type:'Koffie', icon:'', sub:'Koffie & patisserie · Ibiza-stad' },
+    { code:'FUEGO',   name:'Chef Fuego', type:'Privéchef', icon:'', sub:'Privéchef & catering · op locatie' },
+    { code:'LUNARA',  name:'Casa Lunara', type:'Villa\'s', icon:'', sub:'Villa\'s & fincas · Es Cubells' },
+    { code:'MOTOISLA', name:'Moto Isla', type:'Tweewielers', icon:'', sub:'Scooters, motoren & quads · Ibiza' },
+    { code:'FESTA',   name:'Festa Ibiza Events', type:'Events', icon:'', sub:'Events & festivals · Cala Comte' },
+    { code:'SERENA',  name:'Serena Spa', type:'Wellness', icon:'', sub:'Wellness & spa · Santa Eularia' },
+    { code:'ZENITH',  name:'Zenith Spa & Wellness', type:'Zorg', icon:'', sub:'Dagspa & behandelingen · Talamanca' },
+    { code:'CLARA',   name:'Kliniek Clara Ibiza', type:'Zorg', icon:'', sub:'Privékliniek & herstel · Vila' },
+    { code:'ORODOR',  name:'Casa d\'Oro', type:'Juwelier', icon:'', sub:'Juwelier & horloges · Dalt Vila' },
+    { code:'LIENZO',  name:'Galeria Lienzo', type:'Galerie', icon:'', sub:'Kunst & galerie · Dalt Vila' },
+    { code:'TERRAMAR', name:'TerraMar Cargo', type:'Vracht', icon:'', sub:'Internationale vracht · Haven van Ibiza' },
+    { code:'MERIDIAAN', name:'Meridiaan Toren', type:'Kantoorgebouw', icon:'', sub:'Kantoorgebouw · Amsterdam Zuidas' },
+    { code:'SAROCA',  name:'Club de Golf Sa Roca', type:'Golfclub', icon:'', sub:'Golf & countryclub · Roca Llisa' },
+    { code:'FORTIA',  name:'Fortia Club', type:'Fitnessclub', icon:'', sub:'Sport & fitnessclub · Marina Botafoch' },
+    { code:'VELVET',  name:'Velvet & Blade', type:'Beauty-salon', icon:'', sub:'Beauty-salon & barbier · Vara de Rey' },
+    { code:'AMICS',   name:'Amics Petcare', type:'Petcare', icon:'', sub:'Pension, uitlaat & trim · Sant Jordi' },
+    { code:'NIDO',    name:'Nido Kinderopvang & Nanny', type:'Kinderopvang', icon:'', sub:'Opvang & nanny-service · Santa Gertrudis' },
+    { code:'PORTELL', name:'Marina Portell', type:'Marina', icon:'', sub:'Marina & jachthaven · Marina Botafoch' },
+    { code:'AURELIA', name:'Aurelia Weddings & Events', type:'Weddings', icon:'', sub:'Weddings & privé-events · Sant Antoni' },
+    { code:'LEXNOVA', name:'LexNova Advocaten & Notarissen', type:'Professioneel', icon:'', sub:'Advocaat, notaris, fiscalist · Vara de Rey' },
+    { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'', sub:'Verzekeringsadvies · Ibiza-stad' },
+    { code:'VALAURA', name:"Val d'Aurora Resort", type:'Wintersport', icon:'', sub:"Wintersport & seizoensresort · Val d'Aurora" }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
   const SECTOR_DEF = {
-    restaurant:  { label:'RTG Restaurant',  labelEn:'RTG Restaurant', codes:['KIKUNOI'], icon:'🍽️' },
-    bar:         { label:'RTG Bar & Club',  labelEn:'RTG Bar & Club', codes:['PONTO'],   icon:'🍸' },
-    hotel:       { label:'RTG Hotel',       labelEn:'RTG Hotel',      codes:['HOSHI'],   icon:'🏨' },
-    appartement: { label:'RTG Appartement', labelEn:'RTG Apartment',  codes:['SAKURA'],  icon:'🏡' },
-    taxi:        { label:'RTG Taxi',        labelEn:'RTG Taxi',       codes:['MKKX'],    icon:'🚘' },
-    privejet:    { label:'RTG Privéjet',    labelEn:'RTG Private Jet', codes:['JETAG'],  icon:'✈️' },
-    helikopter:  { label:'RTG Helikopter',  labelEn:'RTG Helicopter',  codes:['IBIZAIR'], icon:'🚁' },
-    zzp:         { label:'RTG Zelfstandig', labelEn:'RTG Independent', codes:['AYAKA','KAITO'], icon:'🧑‍🎨' },
-    activiteiten:{ label:'RTG Activiteiten', labelEn:'RTG Experiences', codes:['ESVEDRA','MACE'], icon:'🎟️' },
-    autoverhuur: { label:'RTG Autoverhuur', labelEn:'RTG Car Rental', codes:['ISLAREN'], icon:'🚗' },
-    vastgoed:    { label:'RTG Vastgoed', labelEn:'RTG Real Estate', codes:['IBIZALIV'], icon:'🏡' },
-    boerderij:   { label:'RTG Boerderij', labelEn:'RTG Farm', codes:['CANFERRER'], icon:'🚜' },
-    creator:     { label:'RTG Creators', labelEn:'RTG Creators', codes:['LUMINA'], icon:'🎬' },
-    retail:      { label:'RTG Mode', labelEn:'RTG Fashion', codes:['MAISON'], icon:'🛍️' },
-    groothandel: { label:'RTG Groothandel', labelEn:'RTG Wholesale', codes:['MERCABIZA'], icon:'📦' },
-    charter:     { label:'RTG Charter', labelEn:'RTG Charter', codes:['AZUL'], icon:'⛵' },
-    beveiliging: { label:'RTG Beveiliging', labelEn:'RTG Security', codes:['AEGIS'], icon:'🛡️' },
-    beachclub:   { label:'RTG Beachclub', labelEn:'RTG Beach Club', codes:['VORA'], icon:'🏖️' },
-    koffie:      { label:'RTG Koffie & Patisserie', labelEn:'RTG Coffee & Patisserie', codes:['BRISA'], icon:'☕' },
-    chef:        { label:'RTG Privéchef & Catering', labelEn:'RTG Private Chef & Catering', codes:['FUEGO'], icon:'👨‍🍳' },
-    villa:       { label:"RTG Villa's & Fincas", labelEn:'RTG Villas & Fincas', codes:['LUNARA'], icon:'🌴' },
-    tweewielers: { label:'RTG Tweewielers & Quads', labelEn:'RTG Two-wheelers & Quads', codes:['MOTOISLA'], icon:'🛵' },
-    events:      { label:'RTG Events & Festivals', labelEn:'RTG Events & Festivals', codes:['FESTA'], icon:'🎪' },
-    wellness:    { label:'RTG Wellness & Spa', labelEn:'RTG Wellness & Spa', codes:['SERENA'], icon:'🧖' },
-    zorg:        { label:'RTG Zorg & Welzijn', labelEn:'RTG Care & Wellness', codes:['ZENITH','CLARA'], icon:'🌿' },
-    juwelier:    { label:'RTG Juwelier', labelEn:'RTG Jeweller', codes:['ORODOR'], icon:'💎' },
-    galerie:     { label:'RTG Kunst & Galerie', labelEn:'RTG Art & Gallery', codes:['LIENZO'], icon:'🖼️' },
-    vracht:      { label:'RTG Vracht', labelEn:'RTG Freight', codes:['TERRAMAR'], icon:'🚢' },
-    kantoorgebouw: { label:'RTG Zuidas', labelEn:'RTG Zuidas', codes:['MERIDIAAN'], icon:'🏢' },
-    golfclub:    { label:'RTG Golf & Countryclub', labelEn:'RTG Golf & Country Club', codes:['SAROCA'], icon:'⛳' },
-    fitnessclub: { label:'RTG Sport & Fitness', labelEn:'RTG Sports & Fitness', codes:['FORTIA'], icon:'🏋️' },
-    beautysalon: { label:'RTG Beauty & Barbier', labelEn:'RTG Beauty & Barber', codes:['VELVET'], icon:'✂️' },
-    petcare:     { label:'RTG Petcare', labelEn:'RTG Petcare', codes:['AMICS'], icon:'🐾' },
-    kinderopvang: { label:'RTG Kinderopvang & Nanny', labelEn:'RTG Childcare & Nanny', codes:['NIDO'], icon:'🧸' },
-    marina:      { label:'RTG Marina', labelEn:'RTG Marina', codes:['PORTELL'], icon:'⚓' },
-    weddingplanner: { label:'RTG Weddings & Events', labelEn:'RTG Weddings & Events', codes:['AURELIA'], icon:'💐' },
-    professioneel: { label:'RTG Professionele Diensten', labelEn:'RTG Professional Services', codes:['LEXNOVA'], icon:'⚖️' },
-    verzekeringen: { label:'RTG Verzekeringsadvies', labelEn:'RTG Insurance Advice', codes:['SEGUR'], icon:'🛡️' },
-    wintersport: { label:'RTG Alpine', labelEn:'RTG Alpine', codes:['VALAURA'], icon:'⛷️' },
-    horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
-    verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
-    vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }
+    restaurant:  { label:'RTG Restaurant',  labelEn:'RTG Restaurant', codes:['KIKUNOI'], icon:'' },
+    bar:         { label:'RTG Bar & Club',  labelEn:'RTG Bar & Club', codes:['PONTO'],   icon:'' },
+    hotel:       { label:'RTG Hotel',       labelEn:'RTG Hotel',      codes:['HOSHI'],   icon:'' },
+    appartement: { label:'RTG Appartement', labelEn:'RTG Apartment',  codes:['SAKURA'],  icon:'' },
+    taxi:        { label:'RTG Taxi',        labelEn:'RTG Taxi',       codes:['MKKX'],    icon:'' },
+    privejet:    { label:'RTG Privéjet',    labelEn:'RTG Private Jet', codes:['JETAG'],  icon:'' },
+    helikopter:  { label:'RTG Helikopter',  labelEn:'RTG Helicopter',  codes:['IBIZAIR'], icon:'' },
+    zzp:         { label:'RTG Zelfstandig', labelEn:'RTG Independent', codes:['AYAKA','KAITO'], icon:'' },
+    activiteiten:{ label:'RTG Activiteiten', labelEn:'RTG Experiences', codes:['ESVEDRA','MACE'], icon:'' },
+    autoverhuur: { label:'RTG Autoverhuur', labelEn:'RTG Car Rental', codes:['ISLAREN'], icon:'' },
+    vastgoed:    { label:'RTG Vastgoed', labelEn:'RTG Real Estate', codes:['IBIZALIV'], icon:'' },
+    boerderij:   { label:'RTG Boerderij', labelEn:'RTG Farm', codes:['CANFERRER'], icon:'' },
+    creator:     { label:'RTG Creators', labelEn:'RTG Creators', codes:['LUMINA'], icon:'' },
+    retail:      { label:'RTG Mode', labelEn:'RTG Fashion', codes:['MAISON'], icon:'' },
+    groothandel: { label:'RTG Groothandel', labelEn:'RTG Wholesale', codes:['MERCABIZA'], icon:'' },
+    charter:     { label:'RTG Charter', labelEn:'RTG Charter', codes:['AZUL'], icon:'' },
+    beveiliging: { label:'RTG Beveiliging', labelEn:'RTG Security', codes:['AEGIS'], icon:'' },
+    beachclub:   { label:'RTG Beachclub', labelEn:'RTG Beach Club', codes:['VORA'], icon:'' },
+    koffie:      { label:'RTG Koffie & Patisserie', labelEn:'RTG Coffee & Patisserie', codes:['BRISA'], icon:'' },
+    chef:        { label:'RTG Privéchef & Catering', labelEn:'RTG Private Chef & Catering', codes:['FUEGO'], icon:'' },
+    villa:       { label:"RTG Villa's & Fincas", labelEn:'RTG Villas & Fincas', codes:['LUNARA'], icon:'' },
+    tweewielers: { label:'RTG Tweewielers & Quads', labelEn:'RTG Two-wheelers & Quads', codes:['MOTOISLA'], icon:'' },
+    events:      { label:'RTG Events & Festivals', labelEn:'RTG Events & Festivals', codes:['FESTA'], icon:'' },
+    wellness:    { label:'RTG Wellness & Spa', labelEn:'RTG Wellness & Spa', codes:['SERENA'], icon:'' },
+    zorg:        { label:'RTG Zorg & Welzijn', labelEn:'RTG Care & Wellness', codes:['ZENITH','CLARA'], icon:'' },
+    juwelier:    { label:'RTG Juwelier', labelEn:'RTG Jeweller', codes:['ORODOR'], icon:'' },
+    galerie:     { label:'RTG Kunst & Galerie', labelEn:'RTG Art & Gallery', codes:['LIENZO'], icon:'' },
+    vracht:      { label:'RTG Vracht', labelEn:'RTG Freight', codes:['TERRAMAR'], icon:'' },
+    kantoorgebouw: { label:'RTG Zuidas', labelEn:'RTG Zuidas', codes:['MERIDIAAN'], icon:'' },
+    golfclub:    { label:'RTG Golf & Countryclub', labelEn:'RTG Golf & Country Club', codes:['SAROCA'], icon:'' },
+    fitnessclub: { label:'RTG Sport & Fitness', labelEn:'RTG Sports & Fitness', codes:['FORTIA'], icon:'' },
+    beautysalon: { label:'RTG Beauty & Barbier', labelEn:'RTG Beauty & Barber', codes:['VELVET'], icon:'' },
+    petcare:     { label:'RTG Petcare', labelEn:'RTG Petcare', codes:['AMICS'], icon:'' },
+    kinderopvang: { label:'RTG Kinderopvang & Nanny', labelEn:'RTG Childcare & Nanny', codes:['NIDO'], icon:'' },
+    marina:      { label:'RTG Marina', labelEn:'RTG Marina', codes:['PORTELL'], icon:'' },
+    weddingplanner: { label:'RTG Weddings & Events', labelEn:'RTG Weddings & Events', codes:['AURELIA'], icon:'' },
+    professioneel: { label:'RTG Professionele Diensten', labelEn:'RTG Professional Services', codes:['LEXNOVA'], icon:'' },
+    verzekeringen: { label:'RTG Verzekeringsadvies', labelEn:'RTG Insurance Advice', codes:['SEGUR'], icon:'' },
+    wintersport: { label:'RTG Alpine', labelEn:'RTG Alpine', codes:['VALAURA'], icon:'' },
+    horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'', legacy:true },
+    verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'', legacy:true },
+    vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'', legacy:true }
   };
   const SECTOR = (new URLSearchParams(location.search).get('sector') || '').toLowerCase();
   const SDEF = SECTOR_DEF[SECTOR] || null;
@@ -351,9 +351,9 @@
     spDeck().textContent = T('sp.roledeck','Kies uw rol; u logt in met uw eigen pincode.');
     $('#spBack2') && $('#spBack2').remove();
     $('#spList').innerHTML = [
-      ['personeel','👥',T('sp.r.staff','Personeel'),T('sp.r.staff.s','Bediening, keuken, receptie, chauffeurs...')],
-      ['management','⭐',T('sp.r.mgmt','Management'),T('sp.r.mgmt.s','Managers en chefs, volledige toegang met eigen pincode')],
-      ['sollicit','📝',T('sp.r.apply','Solliciteren'),T('sp.r.apply.s','Werken bij ' + gateRoster.supplier.name + '? Solliciteer direct.')]
+      ['personeel','',T('sp.r.staff','Personeel'),T('sp.r.staff.s','Bediening, keuken, receptie, chauffeurs...')],
+      ['management','',T('sp.r.mgmt','Management'),T('sp.r.mgmt.s','Managers en chefs, volledige toegang met eigen pincode')],
+      ['sollicit','',T('sp.r.apply','Solliciteren'),T('sp.r.apply.s','Werken bij ' + gateRoster.supplier.name + '? Solliciteer direct.')]
     ].map(r =>
       '<button class="sp-person" data-rol="'+r[0]+'"><span class="av">'+r[1]+'</span><span><b>'+r[2]+'</b><span>'+r[3]+'</span></span></button>'
     ).join('');
@@ -481,14 +481,14 @@
     $('#spPin').classList.add('open');
   }
   function buildPad(){
-    const keys = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
+    const keys = ['1','2','3','4','5','6','7','8','9','','0',''];
     $('#spPad').innerHTML = keys.map(k => k==='' ? '<span></span>' :
-      '<button class="sp-key'+(k==='⌫'?' wide':'')+'" data-k="'+k+'">'+k+'</button>').join('');
+      '<button class="sp-key'+(k===''?' wide':'')+'" data-k="'+k+'">'+k+'</button>').join('');
     document.querySelectorAll('#spPad [data-k]').forEach(b => b.addEventListener('click', () => pinKey(b.dataset.k)));
   }
   async function pinKey(k){
     $('#spDots').classList.remove('bad');
-    if (k==='⌫'){ pinBuf = pinBuf.slice(0,-1); renderDots(); return; }
+    if (k===''){ pinBuf = pinBuf.slice(0,-1); renderDots(); return; }
     if (pinBuf.length >= 4) return;
     pinBuf += k; renderDots();
     if (pinBuf.length === 4){
@@ -622,7 +622,7 @@
       doos.className = 'login-form';
       doos.setAttribute('aria-label', 'Verder met uw RTG-account');
       doos.innerHTML = rollen.map((x, i) =>
-        '<button type="button" data-acc-start="' + i + '">👤 ' + (x.naam || 'Beheer') + ' · ' + (x.zaakNaam || x.code) +
+        '<button type="button" data-acc-start="' + i + '">' + (x.naam || 'Beheer') + ' · ' + (x.zaakNaam || x.code) +
         ' <small>' + T('acc.een', 'met uw RTG-account') + '</small></button>').join('');
       gate.querySelector('.login-form').after(doos);
       doos.querySelectorAll('[data-acc-start]').forEach(b => b.addEventListener('click', async () => {
@@ -633,7 +633,7 @@
         try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
         applyState(s.j.state);
         // Rahul denkt mee (agenda, uren, zorgprofiel): advies, nooit een slot
-        API.call('/supplier/werkadvies', {}).then(a => { if (a && a.advies) toast('💭 ' + a.advies.tekst); }).catch(()=>{});
+        API.call('/supplier/werkadvies', {}).then(a => { if (a && a.advies) toast('' + a.advies.tekst); }).catch(()=>{});
         if (naarEigenSector(S)) return;
         enterApp();
       }));
@@ -654,7 +654,7 @@
         if (!doosTimer) doosTimer = setInterval(doosCheck, 10000);
         if (d.modus === 'lokaal' && window.RTGNet) {
           doosBanner = true;
-          RTGNet.toon('📦 ' + T('doos.lokaal', 'Zaakdoos: de lijn is weg; de zaak draait lokaal door en synchroniseert vanzelf.') + (d.journaal ? ' (' + d.journaal + ' actie(s) in het journaal)' : ''));
+          RTGNet.toon('' + T('doos.lokaal', 'Zaakdoos: de lijn is weg; de zaak draait lokaal door en synchroniseert vanzelf.') + (d.journaal ? ' (' + d.journaal + ' actie(s) in het journaal)' : ''));
         } else if (doosBanner && window.RTGNet) { doosBanner = false; RTGNet.verberg(); }
       } catch (e) {}
     }
@@ -735,20 +735,20 @@
   }
   // spoedbonnen bovenaan, daarna de oudste eerst; het spoedmerkje per gerecht
   const spoedEerst = (a,b) => ((b.spoed?1:0) - (a.spoed?1:0)) || opTijd(a,b);
-  const spoedMerk = (o, it) => (o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id)) ? '⚡ ' : '';
+  const spoedMerk = (o, it) => (o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id)) ? '' : '';
   // KDS-tijdbanden: groen tot 6 min, amber tot 12, rood daarna, knipperen vanaf 18
   function ageKlasse(a){ return a >= 18 ? ' late flash' : a >= 12 ? ' late' : a >= 6 ? ' warn' : ' ok'; }
   function vpChip(sec, p){
     if (!p) return '';
-    const kant = KSECTIES[sec] || (sec === 'bar' ? ['🍸','Bar'] : ['·', sec]);
+    const kant = KSECTIES[sec] || (sec === 'bar' ? ['','Bar'] : ['·', sec]);
     const lbl = { nu: T('vp.nu','start nu'), wacht: T('vp.wacht','wacht'), bezig: T('vp.bezig','bezig'), warm: T('vp.warm','houd warm'), pas: T('vp.pas','naar de pas') }[p.doe] || '';
     const min = (p.doe==='wacht'||p.doe==='bezig'||p.doe==='warm') && p.min ? ' ~'+p.min+'m' : '';
     return '<span class="vp '+p.doe+'">'+kant[0]+' '+T('ks.'+sec, kant[1])+' · '+lbl+min+'</span>';
   }
   // de deurhost-regel op de bon: waar is de gast (GPS uit de leden-app)
   function gastRegel(o){
-    if (o.guestArrived) return '<div class="tkc-who">✅ '+T('kds.gastin','De gast is binnen.')+'</div>';
-    if (Number.isFinite(o.guestEtaMin)) return '<div class="tkc-who">🧭 '+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
+    if (o.guestArrived) return '<div class="tkc-who">'+T('kds.gastin','De gast is binnen.')+'</div>';
+    if (Number.isFinite(o.guestEtaMin)) return '<div class="tkc-who">'+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
     return '';
   }
   // hoe lang staat het al op de pas: sneller rood dan de bontijd (eten wordt koud)
@@ -804,13 +804,13 @@
   function overschotChips(){
     const l = overschotLijst();
     if (!l.length) return '';
-    return '<div class="allday"><span class="ad-h">🥡 '+T('over.h','Op de pas over')+'</span>'+
+    return '<div class="allday"><span class="ad-h">'+T('over.h','Op de pas over')+'</span>'+
       l.map(x => '<span class="ad"><b>'+x.qty+'×</b>'+MTX(x.name)+'</span>').join('')+'</div>';
   }
   // de melder voor de pas-schermen: is over, gebruikt of afschrijven
   function overschotBlok(){
     const l = overschotLijst();
-    return '<div class="tkc" style="grid-column:1/-1;"><h3>🥡 '+T('over.h','Op de pas over')+'</h3>'+
+    return '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('over.h','Op de pas over')+'</h3>'+
       '<div class="tkc-who">'+T('over.deck','Te veel gemaakt? Meld het hier; elk scherm telt het van de maaklijst af en de coach zegt: gebruik eerst wat er ligt.')+'</div>'+
       '<div class="row-gap"><select class="st-in" id="ovGerecht" style="flex:2;">'+
         (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
@@ -1019,8 +1019,8 @@
       if (tables.length){
         html += '<div class="st-sec">'+T('st.tables','Tafels, tik om te wisselen')+'</div><div class="st-tblgrid">'+
           tables.map(t=>'<button class="tbl tbl-'+t.status+'" data-sttbl="'+t.id+'" data-cur="'+t.status+'"><b>'+t.name+'</b><span>'+t.seats+' '+T('tbl.pers','pers.')+'</span><i>'+tTbl(t.status)+'</i></button>').join('')+'</div>'+
-          '<button class="obtn" data-tblqr style="margin-top:0.5rem;">🧾 '+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>'+
-          '<button class="obtn" data-tafelticket style="margin-top:0.5rem;">🧾 '+T('st.tafelticket','Tafel op één ticket (samenvoegen + afrekenen)')+'</button>';
+          '<button class="obtn" data-tblqr style="margin-top:0.5rem;">'+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>'+
+          '<button class="obtn" data-tafelticket style="margin-top:0.5rem;">'+T('st.tafelticket','Tafel op één ticket (samenvoegen + afrekenen)')+'</button>';
       }
       html += '<div class="st-sec">'+T('st.more','Meer')+'</div>'+
         '<button class="obtn" data-aanwezig style="width:100%;margin-bottom:0.5rem;">\u{1F465} '+T('st.aanwezig','Aanwezigheid (binnen + man/vrouw)')+'</button>'+
@@ -1064,10 +1064,10 @@
         return '<div class="tkc" style="grid-column:1/-1;">'+
           '<div class="tkc-top"><span class="tkc-code" style="font-size:1.3rem;">'+r.customerCodename+'</span><span class="tkc-age">'+tStatus(r.status)+'</span></div>'+
           '<div class="tkc-who" style="font-size:0.95rem;">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+
-          '<div class="tkc-who">'+ritRegel(r)+(r.vehicle?' · 🚘 '+r.vehicle.name+' ('+(r.vehicle.plate||'')+')':'')+'</div>'+
-          (r.note?'<div class="tkc-alg">📝 '+r.note+'</div>':'')+
-          (r.pickupEtaMin!=null && r.status==='onderweg' ? '<div class="tkc-who">🧭 ~'+r.pickupEtaMin+' min '+T('ch.naargast','naar de gast')+'</div>':'')+
-          (r.dropEtaMin!=null && r.status==='aan-boord' ? '<div class="tkc-who">🏁 ~'+r.dropEtaMin+' min '+T('ch.naarbestemming','naar de bestemming')+'</div>':'')+
+          '<div class="tkc-who">'+ritRegel(r)+(r.vehicle?' ·  '+r.vehicle.name+' ('+(r.vehicle.plate||'')+')':'')+'</div>'+
+          (r.note?'<div class="tkc-alg">'+r.note+'</div>':'')+
+          (r.pickupEtaMin!=null && r.status==='onderweg' ? '<div class="tkc-who">~'+r.pickupEtaMin+' min '+T('ch.naargast','naar de gast')+'</div>':'')+
+          (r.dropEtaMin!=null && r.status==='aan-boord' ? '<div class="tkc-who">~'+r.dropEtaMin+' min '+T('ch.naarbestemming','naar de bestemming')+'</div>':'')+
           (nxt?'<div class="tkc-act"><button class="tkc-ready" data-chgo="'+r.ref+'" data-st="'+nxt+'">'+T(RIDE_NEXT_LABEL[nxt], RIDE_NEXT_NL[nxt])+'</button></div>':'')+
         '</div>';
       }).join('') : '<div class="st-empty">'+T('ch.geenrit','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>';
@@ -1084,7 +1084,7 @@
         html += '<div class="st-sec">'+T('ch.gepland','Gepland')+' ('+gepland.length+')</div>';
         html += gepland.map(r =>
           '<div class="tkc dim">'+
-            '<div class="tkc-top"><span class="tkc-code">'+r.customerCodename+'</span><span class="tkc-age">📅</span></div>'+
+            '<div class="tkc-top"><span class="tkc-code">'+r.customerCodename+'</span><span class="tkc-age"></span></div>'+
             '<div class="tkc-who">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+
             '<div class="tkc-who">'+ritRegel(r)+' · <b>'+r.when+'</b></div>'+
             '<div class="tkc-act"><button class="tkc-start" data-chneem="'+r.ref+'">'+T('ch.neem','Neem deze rit')+'</button></div>'+
@@ -1105,9 +1105,9 @@
       const omzetB = klaarB.reduce((x, b) => x + (b.price || 0), 0);
       const kaartB = (b, acties) => '<div class="tkc" style="grid-column:1/-1;">'+
         '<div class="tkc-top"><span class="tkc-code" style="font-size:1.2rem;">'+b.customerCodename+'</span><span class="tkc-age">'+(b.wanneer || timeAgo(b.at))+'</span></div>'+
-        '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'📦 ':'🗓️ ')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--gold);">'+eur(b.price)+'</b></div>'+
-        (b.note?'<div class="tkc-alg">📝 '+b.note+'</div>':'')+
-        (b.zorg?'<div class="tkc-alg" style="color:#E2B93B;">⚠ '+T('sup.zorgp','Zorgprofiel gast:')+' '+[((b.zorg.allergenen||[]).length?T('zorg.allergie','Allergie')+': '+b.zorg.allergenen.join(', '):''), b.zorg.dieet, b.zorg.medisch].filter(Boolean).join(' · ')+'</div>':'')+
+        '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'':'')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--gold);">'+eur(b.price)+'</b></div>'+
+        (b.note?'<div class="tkc-alg">'+b.note+'</div>':'')+
+        (b.zorg?'<div class="tkc-alg" style="color:#E2B93B;">'+T('sup.zorgp','Zorgprofiel gast:')+' '+[((b.zorg.allergenen||[]).length?T('zorg.allergie','Allergie')+': '+b.zorg.allergenen.join(', '):''), b.zorg.dieet, b.zorg.medisch].filter(Boolean).join(' · ')+'</div>':'')+
         (acties?'<div class="tkc-act">'+acties+'</div>':'')+
       '</div>';
       html += '<div class="st-sec">'+T('ag.open','Nieuwe aanvragen')+' ('+openB.length+')</div>';
@@ -1155,7 +1155,7 @@
           const koks = ((state.lijn||{})[sec]) || [];
           const ikSta = koks.some(k => k.id === actor().staffId);
           const perKok = koks.length ? Math.ceil(actief.length / koks.length) : actief.length;
-          html += '<div class="allday"><span class="ad-h">👥 '+T('lijn.h','Bezetting')+'</span>'+
+          html += '<div class="allday"><span class="ad-h">'+T('lijn.h','Bezetting')+'</span>'+
             (koks.length ? '<span class="ad">'+koks.map(k=>k.name.split(' ')[0]).join(', ')+' · <b>'+perKok+'</b> '+T('lijn.perkok','bon(nen) p.p.')+'</span>' : '<span class="ad">'+T('lijn.leeg','Niemand aangemeld')+'</span>')+
             '<button class="obtn'+(ikSta?' primary':'')+'" data-lijnaan="'+sec+'">'+(ikSta?'✔ '+T('lijn.af','Aangemeld, tik om af te melden'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
           // maak nu: wat deze kant NU in een keer maakt, gebundeld over de bonnen
@@ -1168,7 +1168,7 @@
           minOverschot(nuPer);
           const nuRows = Object.entries(nuPer).sort((a,b)=>b[1].n-a[1].n);
           if (nuRows.length)
-            html += '<div class="tkc" style="grid-column:1/-1;border-top:4px solid #2E7D5B;"><h3>🔥 '+T('lijn.maaknu','Maak nu, in een keer')+'</h3>'+
+            html += '<div class="tkc" style="grid-column:1/-1;border-top:4px solid #2E7D5B;"><h3>'+T('lijn.maaknu','Maak nu, in een keer')+'</h3>'+
               nuRows.map(([naam,r])=>'<div class="st-row"><span><b style="color:var(--gold);">'+r.n+'×</b> '+naam+'<span class="sub">'+T('lijn.bonnen','bonnen ')+[...new Set(r.bonnen)].join(', ')+'</span></span></div>').join('')+'</div>';
           // tussendoor: slim gebruik van de wachttijd (voorbereiden, MEP, de lijn)
           const straks = {};
@@ -1181,7 +1181,7 @@
           const dmsK = (state.dailyMeps||{})[new Date().toISOString().slice(0,10)];
           const mepOpen = dmsK ? (dmsK.tasks||[]).filter(x=>!x.done).slice(0,3) : [];
           if (straksRows.length || mepOpen.length || !actief.length)
-            html += '<div class="tkc" style="grid-column:1/-1;"><h3>⏳ '+T('lijn.tussendoor','Tussendoor')+'</h3>'+
+            html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('lijn.tussendoor','Tussendoor')+'</h3>'+
               straksRows.map(([naam,r])=>'<div class="st-row"><span>'+T('lijn.zetklaar','Zet vast klaar: ')+'<b>'+r.n+'×</b> '+naam+'<span class="sub">'+T('lijn.startover','start over ~')+r.min+' min</span></span></div>').join('')+
               mepOpen.map(x=>'<div class="st-row"><span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.5rem;">'+x.time+'</b>'+x.task+'<span class="sub">'+T('lijn.mep','mise en place van vandaag')+'</span></span></div>').join('')+
               (!straksRows.length && !mepOpen.length ? '<div class="tkc-who">'+T('lijn.hygiene','Rustig moment: werkbank afnemen, koeling en parstock checken, garnituur bijvullen.')+'</div>' : '')+
@@ -1314,9 +1314,9 @@
     const wrap = document.createElement('div');
     wrap.id = 'dishSheet';
     const alg = (m.allergens||[]).length
-      ? m.allergens.map(a => '<span class="ds-alg">⚠ '+a+'</span>').join('')
+      ? m.allergens.map(a => '<span class="ds-alg">'+a+'</span>').join('')
       : '<span class="ds-alg ok">'+T('ds.noalg','geen allergenen geregistreerd')+'</span>';
-    const icoon = KSECTIES[m.sectie||'warm'] && m.station !== 'bar' ? KSECTIES[m.sectie||'warm'][0]+' ' : (m.station==='bar'?'🍸 ':'');
+    const icoon = KSECTIES[m.sectie||'warm'] && m.station !== 'bar' ? KSECTIES[m.sectie||'warm'][0]+' ' : (m.station==='bar'?'':'');
     wrap.innerHTML = '<div class="ds-scrim"></div>'+
       '<div class="ds-card" role="dialog" aria-modal="true" aria-label="'+m.name+'">'+
         '<div class="ds-top"><div><b>'+icoon+m.name+'</b>'+
@@ -1324,11 +1324,11 @@
           '<div class="ds-algs">'+alg+'</div></div>'+
           '<button class="st-exit" data-dsluit>'+T('ds.sluit','Sluit')+'</button></div>'+
         '<div class="ds-acts">'+
-          '<button data-dsk="recept">📖 '+T('ds.recept','Recept')+'</button>'+
-          '<button data-dsk="bereiding">👨‍🍳 '+T('ds.bereiding','Bereidingswijze')+'</button>'+
-          '<button data-dsk="allergenen">⚠️ '+T('ds.allergenen','Allergenen en vervangers')+'</button>'+
-          '<button data-dsk="pairing">🍷 '+T('ds.pairing','Dranksuggestie')+'</button>'+
-          '<button data-ds86'+(m.uitverkocht?' class="aan"':'')+'>⛔ '+(m.uitverkocht?T('ds.86off','86 opheffen'):T('ds.86','86, uitverkocht'))+'</button>'+
+          '<button data-dsk="recept">'+T('ds.recept','Recept')+'</button>'+
+          '<button data-dsk="bereiding">'+T('ds.bereiding','Bereidingswijze')+'</button>'+
+          '<button data-dsk="allergenen">'+T('ds.allergenen','Allergenen en vervangers')+'</button>'+
+          '<button data-dsk="pairing">'+T('ds.pairing','Dranksuggestie')+'</button>'+
+          '<button data-ds86'+(m.uitverkocht?' class="aan"':'')+'>'+(m.uitverkocht?T('ds.86off','86 opheffen'):T('ds.86','86, uitverkocht'))+'</button>'+
         '</div>'+
         (m.uitverkocht?'<div class="ds-86">'+T('ds.86nu','Dit gerecht staat op 86: leden kunnen het nu niet bestellen.')+'</div>':'')+
         '<div class="ds-body" id="dsBody">'+T('ds.kies','Kies hierboven wat je wilt zien.')+'</div>'+
@@ -1350,7 +1350,7 @@
       try {
         const d = await API.call('/supplier/menu/86', { itemId, op: !m.uitverkocht });
         m.uitverkocht = d.uitverkocht;
-        toast(m.uitverkocht ? '⛔ 86: '+m.name : '✅ '+m.name+' '+T('ds.weerbeschikbaar','is weer beschikbaar'));
+        toast(m.uitverkocht ? '86: '+m.name : ''+m.name+' '+T('ds.weerbeschikbaar','is weer beschikbaar'));
         dishSheet(itemId);
       } catch(e){ toast(e.message); }
     });
@@ -1362,7 +1362,7 @@
     el.querySelectorAll('[data-st86adv]').forEach(b => b.addEventListener('click', async () => {
       try {
         await API.call('/supplier/menu/86', { itemId: b.dataset.st86adv, op: true });
-        toast('⛔ '+T('st.86gezet','86 gezet; leden kunnen het niet meer bestellen.'));
+        toast(''+T('st.86gezet','86 gezet; leden kunnen het niet meer bestellen.'));
         wvAt = 0; laadWerkvloer(); await refresh();
       } catch(e){ toast(e.message); }
     }));
@@ -1374,7 +1374,7 @@
       const reden = prompt(T('vr.derfreden','Reden?')) || '';
       try {
         await API.call('/supplier/keuken/verspilling', { artikelId: art.id, hoeveelheid: Number(String(hv).replace(',', '.')), reden });
-        toast('♻ '+T('st.derfok','Geboekt in het voorraadlogboek.'));
+        toast(''+T('st.derfok','Geboekt in het voorraadlogboek.'));
         wvAt = 0; laadWerkvloer();
       } catch(e){ toast(e.message); }
     });
@@ -1386,7 +1386,7 @@
     }));
     // het overschot: is over melden, gebruikt afboeken of afschrijven
     const ovBij = el.querySelector('#ovBij'); if (ovBij) ovBij.addEventListener('click', async () => {
-      try { await API.call('/supplier/overschot', { op: 'erbij', itemId: el.querySelector('#ovGerecht').value, qty: el.querySelector('#ovAantal').value }); toast('🥡 '+T('over.toast','Gemeld; elk scherm telt het nu van de maaklijst af.')); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/overschot', { op: 'erbij', itemId: el.querySelector('#ovGerecht').value, qty: el.querySelector('#ovAantal').value }); toast(''+T('over.toast','Gemeld; elk scherm telt het nu van de maaklijst af.')); await refresh(); } catch(e){ toast(e.message); }
     });
     el.querySelectorAll('[data-overgebruikt]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/overschot', { op: 'gebruikt', id: b.dataset.overgebruikt }); await refresh(); } catch(e){ toast(e.message); }
@@ -1398,7 +1398,7 @@
     const spGo = el.querySelector('#spGo'); if (spGo) spGo.addEventListener('click', async () => {
       try {
         await API.call('/supplier/order/spoed', { itemId: el.querySelector('#spGerecht').value, qty: el.querySelector('#spAantal').value, table: el.querySelector('#spTafel').value });
-        toast('⚡ '+T('spoed.toast','Spoedbon staat op de lijn, als gewone bon.'));
+        toast(''+T('spoed.toast','Spoedbon staat op de lijn, als gewone bon.'));
         await refresh();
       } catch(e){ toast(e.message); }
     });
@@ -1406,7 +1406,7 @@
       try { await API.call('/supplier/order/spoed', { ref: b.dataset.spoedaf, op: false }); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-lijnaan]').forEach(b => b.addEventListener('click', async () => {
-      try { const d = await API.call('/supplier/lijn', { sectie: b.dataset.lijnaan }); toast(d.aangemeld ? '👥 '+T('lijn.aant','Aangemeld op deze kant.') : T('lijn.aftoast','Afgemeld van deze kant.')); await refresh(); } catch(e){ toast(e.message); }
+      try { const d = await API.call('/supplier/lijn', { sectie: b.dataset.lijnaan }); toast(d.aangemeld ? ''+T('lijn.aant','Aangemeld op deze kant.') : T('lijn.aftoast','Afgemeld van deze kant.')); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-ksel]').forEach(b => b.addEventListener('click', () => {
       keukenSectie = b.dataset.ksel;
@@ -1458,7 +1458,7 @@
       try {
         const s2 = await API.call('/supplier/ride/suggest', { ref: b.dataset.chneem });
         await API.call('/supplier/ride/assign', { ref: b.dataset.chneem, self: true, vehicleId: s2.vehicleId });
-        toast(T('ch.genomen','Rit is van u.') + (s2.vehicleName ? ' 🚘 ' + s2.vehicleName : ''));
+        toast(T('ch.genomen','Rit is van u.') + (s2.vehicleName ? '  ' + s2.vehicleName : ''));
         await refresh();
       } catch(e){ toast(e.message); }
     }));
@@ -1611,9 +1611,9 @@
       // RTG-controlecentrum maar dan uitsluitend over dit bedrijf
       if (!boData){
         laadBackoffice();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📊 '+T('kt.bo','Backoffice')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.bo','Backoffice')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (boData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📊 '+T('kt.bo','Backoffice')+'</h3><div class="tkc-who">'+boData.error+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.bo','Backoffice')+'</h3><div class="tkc-who">'+boData.error+'</div></div>';
       } else {
         const b = boData;
         html += '<div class="tkc" style="grid-column:1/-1;">'+
@@ -1628,36 +1628,36 @@
             '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--gold);margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
           '<div class="tkc-who" style="margin-top:0.5rem;">'+T('bz.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div>'+
-          '<button class="obtn" id="boBrief" style="align-self:flex-start;">📋 '+T('bz.brief','Dagbriefing')+'</button>'+
+          '<button class="obtn" id="boBrief" style="align-self:flex-start;">'+T('bz.brief','Dagbriefing')+'</button>'+
           '<div id="boBriefTxt" style="display:none;border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;"></div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🎯 '+T('bz.actie','Actiecentrum van de zaak')+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('bz.actie','Actiecentrum van de zaak')+'</h3>'+
           (b.alerts.length ? b.alerts.map(a =>
-            '<div class="st-row"><span>'+(a.level==='rood'?'🔴':a.level==='amber'?'🟠':'🟢')+' '+a.text+'</span></div>').join('')
+            '<div class="st-row"><span>'+(a.level==='rood'?'':a.level==='amber'?'':'')+' '+a.text+'</span></div>').join('')
             : '<div class="tkc-who">✓ '+T('bz.niks','Alles loopt. Vastgelopen bestellingen, wachtende gasten en open personeelszaken verschijnen hier vanzelf.')+'</div>')+'</div>';
         // de voorspeller: eerlijk vooruitkijken op basis van het eigen ritme
         if (vwData && vwData.ok){
           const m = vwData.morgen;
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>🔮 '+T('vw.h','Verwachting voor morgen')+'</h3>'+
+          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vw.h','Verwachting voor morgen')+'</h3>'+
             (m
               ? '<div class="tkc-who">'+T('vw.d','Op basis van uw eigen ritme van de afgelopen weken')+' ('+vwData.weken+' '+T('vw.weken','weken geschiedenis')+'): '+
                   '<b>'+m.verwachtTransacties+'</b> '+T('vw.trans','transacties')+' · <b>'+eur(m.verwachtCenten)+'</b> '+T('vw.omzet','omzet')+' ('+m.dagNaam+').'+
                   (m.drukUren.length ? ' '+T('vw.druk','Drukste uren')+': '+m.drukUren.map(u => u.uur+':00').join(', ')+'.' : '')+
                   ((vwData.vasteGasten||[]).length ? ' '+T('vw.gast','Vaste gasten')+': '+vwData.vasteGasten.map(g => g.codenaam).join(', ')+'.' : '')+
-                  (m.advies ? '<br>🧭 '+m.advies : '')+
-                  (m.bevoorrading ? '<br>📦 '+m.bevoorrading : '')+'</div>'
+                  (m.advies ? '<br>'+m.advies : '')+
+                  (m.bevoorrading ? '<br>'+m.bevoorrading : '')+'</div>'
               : '<div class="tkc-who">'+(vwData.uitleg||'')+'</div>')+'</div>';
         }
         // synergie: samen met andere zaken deals en hele pakketten maken
         const mijnCode = (S && S.code) || '';
         const synDeals = (synData && synData.deals) || [];
         const kansen = (vwData && vwData.dealkansen) || [];
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤝 '+T('sy.h','Synergie: samen deals maken')+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('sy.h','Synergie: samen deals maken')+'</h3>'+
           '<div class="tkc-who">'+T('sy.d','Stel met een andere RTG-zaak een pakket samen met een prijs; elke deelnemer tekent voor zijn aandeel en pas dan staat het live voor leden. RTG Pay splitst elke aankoop exact volgens de afspraak.')+'</div>'+
           kansen.map((k,i) =>
-            '<div class="st-row"><span>🔮 '+esc(k.tekst)+
+            '<div class="st-row"><span>'+esc(k.tekst)+
               '<span class="sub">'+T('sy.kans','Voorstel van de dealvinder')+': <b>'+esc(k.voorstel.naam)+'</b> · '+eur(k.voorstel.prijsCenten)+
               ' ('+k.voorstel.aandelen.map(a => eur(a.centen)).join(' / ')+', 10% '+T('sy.voordeel','pakketvoordeel')+')</span></span>'+
-            '<button class="obtn" data-synkans="'+i+'">🤝 '+T('sy.stel','Stel voor')+'</button></div>').join('')+
+            '<button class="obtn" data-synkans="'+i+'">'+T('sy.stel','Stel voor')+'</button></div>').join('')+
           synDeals.slice(0,6).map(d => {
             const mij = d.aandelen.find(a => a.code === mijnCode) || {};
             return '<div class="st-row"><span><b>'+esc(d.naam)+'</b> · '+eur(d.prijsCenten)+
@@ -1674,7 +1674,7 @@
             '<input id="synPartner" placeholder="'+T('sy.partner','Partnercode (bijv. SAKURA)')+'" style="flex:1;min-width:7rem;">'+
             '<input id="synPrijs" inputmode="decimal" placeholder="'+T('sy.prijs','Totaal EUR')+'" style="width:6.5rem;">'+
             '<input id="synMijn" inputmode="decimal" placeholder="'+T('sy.mijn','Mijn deel EUR')+'" style="width:6.5rem;">'+
-            '<button class="obtn" id="synMaak">🤝 '+T('sy.maak','Stel voor')+'</button></div></div>';
+            '<button class="obtn" id="synMaak">'+T('sy.maak','Stel voor')+'</button></div></div>';
         // baas over uw zaak: elke functie aan of uit; alleen app-betalen heeft
         // bewust geen knop, wel kiest u het moment (vooraf of achteraf)
         const caps2 = (S && S.caps) || [];
@@ -1693,23 +1693,23 @@
         const swRows = rijen.map(r =>
           '<div class="st-row"><span>'+r[1]+'<span class="sub">'+r[2]+'</span></span>'+
           '<button class="obtn'+(r[3]?' primary':' warn')+'" data-kopt="'+r[0]+'" data-val="'+(r[3]?'0':'1')+'">'+(r[3]?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>').join('');
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🎛 '+T('sw.h','Baas over uw zaak')+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('sw.h','Baas over uw zaak')+'</h3>'+
           '<div class="tkc-who">'+T('sw.s','Zet elke functie aan of uit wanneer u dat wilt. Alleen betalen via de app staat altijd aan; het moment (vooraf of achteraf) bepaalt u zelf.')+'</div>'+
           funcBlok(T('sw.blok','Schakelaars'), rijen.map(r => ({ aan: r[3] })), swRows)+
           '<div class="st-row"><span>'+T('sw.apppay','Betalen via de app')+'<span class="sub">'+T('sw.apppay.s','Vast onderdeel van elk RTG-partnerschap')+'</span></span>'+
           '<span class="pill klaar">'+T('sw.altijd','Altijd aan')+'</span></div></div>';
         html += werkvensterBlokHtml(inst);
         const maxD = Math.max.apply(null, b.week.map(d => d.omzet).concat([1]));
-        html += '<div class="tkc"><h3>📈 '+T('bz.weekh','Omzet per dag')+'</h3>'+
+        html += '<div class="tkc"><h3>'+T('bz.weekh','Omzet per dag')+'</h3>'+
           '<div style="display:flex;align-items:flex-end;gap:0.45rem;height:120px;margin-top:0.4rem;">'+
           b.week.map((d, i) =>
             '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0.2rem;height:100%;min-width:0;">'+
             '<span style="font-size:0.54rem;color:var(--soft);white-space:nowrap;">'+(d.omzet?eur(d.omzet):'·')+'</span>'+
             '<i style="display:block;width:100%;max-width:32px;border-radius:5px 5px 2px 2px;min-height:2px;height:'+Math.max(2, Math.round(d.omzet/maxD*70))+'%;background:'+(i===6?'var(--burgundy)':'var(--gold)')+';"></i>'+
             '<span style="font-size:0.52rem;color:var(--soft);text-transform:uppercase;">'+d.label+'</span></div>').join('')+'</div></div>';
-        html += '<div class="tkc"><h3>🏆 '+T('bz.top','Toppers')+'</h3>'+
+        html += '<div class="tkc"><h3>'+T('bz.top','Toppers')+'</h3>'+
           (b.toppers.length ? b.toppers.map((t2, i) =>
-            '<div class="st-row"><span>'+(['🥇','🥈','🥉'][i]||'')+' '+t2.naam+'<span class="sub">'+t2.aantal+'x '+T('bz.verkocht','verkocht')+'</span></span><b style="color:var(--gold);">'+eur(t2.omzet)+'</b></div>').join('')
+            '<div class="st-row"><span>'+(['','',''][i]||'')+' '+t2.naam+'<span class="sub">'+t2.aantal+'x '+T('bz.verkocht','verkocht')+'</span></span><b style="color:var(--gold);">'+eur(t2.omzet)+'</b></div>').join('')
             : '<div class="tkc-who">'+T('bz.geentop','Nog geen verkopen. Zodra er via de app of de kassa verkocht wordt, staan de toppers hier.')+'</div>')+'</div>';
       }
     }
@@ -1718,9 +1718,9 @@
       // klokuren en een boekhoudkundig correcte cadeaukaartenadministratie
       if (!finData){
         laadFinance();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📚 '+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (finData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📚 '+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+finData.error+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+finData.error+'</div></div>';
       } else {
         const f = finData;
         if (finMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+finMsg+'</div>'; }
@@ -1729,7 +1729,7 @@
         const omzetMaand = (f.btw || []).reduce((s2, r) => s2 + (r.omzet || 0), 0);
         const loonTot = (f.personeel && f.personeel.totaal) || 0;
         const nettoOver = Math.round((omzetMaand - (f.btwTotaal || 0) - loonTot) * 100) / 100;
-        html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);"><h3>💶 '+T('fn.netto','Wat u overhoudt')+' ('+f.maand+')</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);"><h3>'+T('fn.netto','Wat u overhoudt')+' ('+f.maand+')</h3>'+
           '<div class="st-row"><span>'+T('fn.omzetmaand','Omzet deze maand')+'<span class="sub">'+T('fn.nulcom','RTG rekent 0% commissie')+'</span></span><b>'+eur(omzetMaand)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.minbtw','Af te dragen btw')+'</span><b style="color:var(--burgundy);">- '+eur(f.btwTotaal || 0)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.minloon','Loonkosten')+'</span><b style="color:var(--burgundy);">- '+eur(loonTot)+'</b></div>'+
@@ -1738,44 +1738,44 @@
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">'+
           '<button class="obtn" id="fnPdf">⤓ '+T('fn.exportpdf','Overzicht (PDF)')+'</button>'+
           '<button class="obtn" id="fnCsv">⤓ '+T('fn.exportcsv','Boekhouding (CSV)')+'</button></div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🌍 '+T('fn.land','Land & uurloon')+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.land','Land & uurloon')+'</h3>'+
           '<div class="tkc-who">'+T('fn.land.s','Het land bepaalt de btw-tarieven, werkgeverslasten en aangifteregels; het uurloon voedt de personeelskosten.')+'</div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">'+
           '<select class="st-in" id="fnLand" style="flex:2;min-width:130px;">'+f.landen.map(l=>'<option value="'+l.code+'"'+(l.code===f.land?' selected':'')+'>'+l.naam+'</option>').join('')+'</select>'+
           '<input class="st-in" id="fnUur" type="number" step="0.5" value="'+f.personeel.uurloon+'" style="flex:1;min-width:80px;" placeholder="€/uur">'+
           '<button class="obtn primary" id="fnSave">'+T('fn.save','Opslaan')+'</button></div></div>';
-        html += '<div class="tkc"><h3>🧾 '+T('fn.btw','Btw deze maand')+' ('+f.maand+')</h3>'+
+        html += '<div class="tkc"><h3>'+T('fn.btw','Btw deze maand')+' ('+f.maand+')</h3>'+
           (f.btw.length ? f.btw.map(r =>
             '<div class="st-row"><span>'+r.label+'<span class="sub">'+T('fn.omzet','omzet')+' '+eur(r.omzet)+' · '+T('fn.grondslag','grondslag')+' '+eur(r.grondslag)+' · '+r.tarief+'%</span></span>'+
             '<b style="color:var(--gold);">'+eur(r.btw)+'</b></div>').join('')
             : '<div class="tkc-who">'+T('fn.geenomzet','Nog geen omzet deze maand.')+'</div>')+
           '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.afdragen','Af te dragen btw')+'</b></span><b style="color:var(--gold);">'+eur(f.btwTotaal)+'</b></div></div>';
-        html += '<div class="tkc"><h3>👥 '+T('fn.personeel','Personeelskosten')+' ('+f.maand+')</h3>'+
+        html += '<div class="tkc"><h3>'+T('fn.personeel','Personeelskosten')+' ('+f.maand+')</h3>'+
           '<div class="st-row"><span>'+T('fn.uren','Geklokte uren')+' × € '+f.personeel.uurloon+'<span class="sub">'+f.personeel.uren+' '+T('fn.uur','uur')+'</span></span><b>'+eur(f.personeel.bruto)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.lasten','Werkgeverslasten')+'<span class="sub">~'+f.personeel.lastenPct+'% ('+f.landNaam+')</span></span><b>'+eur(f.personeel.lasten)+'</b></div>'+
           (f.personeel.vakantiegeld ? '<div class="st-row"><span>'+T('fn.vak','Vakantiegeldreserve')+'<span class="sub">'+f.personeel.vakantiegeldPct+'%</span></span><b>'+eur(f.personeel.vakantiegeld)+'</b></div>' : '')+
           '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.totaal','Totale loonkosten')+'</b></span><b style="color:var(--gold);">'+eur(f.personeel.totaal)+'</b></div>'+
           '<div class="tkc-who">'+T('fn.minuur','Indicatie minimumuurloon')+': € '+f.personeel.uurloonMin+'</div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🎁 '+T('fn.gc','Cadeaukaarten')+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.gc','Cadeaukaarten')+'</h3>'+
           '<div class="st-row"><span>'+T('fn.gcverkocht','Verkocht deze maand')+'<span class="sub">'+T('fn.gcv.s','nog geen omzet, geen btw')+'</span></span><b>'+eur(f.giftcards.verkocht)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcin','Ingewisseld deze maand')+'<span class="sub">'+T('fn.gci.s','omzet + btw-moment')+'</span></span><b>'+eur(f.giftcards.ingewisseld)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcopen','Openstaand saldo')+'<span class="sub">'+T('fn.gco.s','verplichting op de balans')+' · '+f.giftcards.aantal+' '+T('fn.kaarten','kaart(en)')+'</span></span><b style="color:var(--gold);">'+eur(f.giftcards.open)+'</b></div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.4rem;">'+
           '<input class="st-in" id="gcBedrag" type="number" placeholder="€ 50" style="flex:1;min-width:80px;">'+
-          '<button class="obtn primary" id="gcSell">🎁 '+T('fn.gcsell','Verkoop kaart')+'</button></div>'+
+          '<button class="obtn primary" id="gcSell">'+T('fn.gcsell','Verkoop kaart')+'</button></div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.3rem;">'+
           '<input class="st-in" id="gcCode" placeholder="RTG-GC-XXXXXX" style="flex:2;min-width:130px;">'+
           '<input class="st-in" id="gcInBedrag" type="number" placeholder="€" style="flex:1;min-width:70px;">'+
           '<button class="obtn" id="gcRedeem">'+T('fn.gcredeem','In te wisselen')+'</button></div></div>';
-        html += '<div class="tkc"><h3>📜 '+T('fn.regels','Regels in ')+f.landNaam+'</h3>'+
+        html += '<div class="tkc"><h3>'+T('fn.regels','Regels in ')+f.landNaam+'</h3>'+
           f.regels.map(r => '<div class="tkc-who" style="line-height:1.5;">• '+r+'</div>').join('')+'</div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤖 '+T('fn.ai','AI-boekhouder')+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.ai','AI-boekhouder')+'</h3>'+
           '<div class="tkc-who">'+T('fn.ai.s2','Kent uw branche, uw cijfers en de regels. Stel een vraag, of laat hem u proactief bijsturen met adviezen op uw eigen cijfers.')+'</div>'+
           '<div id="accVragen" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.5rem 0;"></div>'+
           '<div class="row-gap"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" style="flex:1;">'+
           '<button class="obtn primary" id="accGo">'+T('fn.vraag','Vraag')+'</button></div>'+
           '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
-          '<button class="obtn" id="accAdvies" style="margin-top:0.6rem;">✨ '+T('fn.adviezen','Stuur mij bij, geef adviezen')+'</button>'+
+          '<button class="obtn" id="accAdvies" style="margin-top:0.6rem;">'+T('fn.adviezen','Stuur mij bij, geef adviezen')+'</button>'+
           '<div id="accAdv"></div></div>';
       }
     }
@@ -1783,21 +1783,21 @@
       // het AI-weekrooster: voorstel op de verwachte drukte, de gemachtigde stelt vast
       if (!agentData) laadAgent();
       const rp = agentData && agentData.rooster;
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗓 '+T('ag2.rooster','AI-weekrooster')+'</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('ag2.rooster','AI-weekrooster')+'</h3>'+
         '<div class="tkc-who">'+T('ag2.rooster.deck','De AI plant de week op de verwachte drukte per dag: drukke dagen iedereen op de vloer, rustige dagen om de beurt vrij.')+'</div>'+
         (rp ? rp.days.map(d=>'<div class="st-row"><span><b>'+d.label+'</b> <span class="sub">'+d.date+'</span></span>'+
             '<span class="sub" style="text-align:right;">'+d.staff.map(m=>m.name.split(' ')[0]+': '+m.shift.split(' ')[0]).join(' · ')+'</span></div>').join('')+
           (rp.status==='voorstel'
             ? '<div class="tkc-act"><button class="tkc-ready" id="agRoosterOk">✔ '+T('ag2.rooster.ok','Stel vast')+'</button><button class="obtn warn" id="agRoosterNee" style="margin-left:0.5rem;">'+T('ag2.nee','Wijs af')+'</button></div>'
             : '<div class="tkc-who">✔ '+T('ag2.rooster.vast','Vastgesteld; het rooster in de PDA volgt dit plan.')+'</div>')
-        : '<div class="tkc-act"><button class="tkc-start" id="agRooster">✨ '+T('ag2.rooster.stel','Stel het weekrooster voor')+'</button></div>')+'</div>';
+        : '<div class="tkc-act"><button class="tkc-start" id="agRooster">'+T('ag2.rooster.stel','Stel het weekrooster voor')+'</button></div>')+'</div>';
       // urenregistratie: wie is binnen, wie werkte wanneer en hoelang
       if (!klokOverzicht) laadKlok();
       const tijd = iso => new Date(iso).toLocaleString(lang()==='en'?'en-GB':'nl-NL', { weekday:'short', hour:'2-digit', minute:'2-digit' });
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>⏱ '+T('kt.uren','Urenregistratie')+'</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.uren','Urenregistratie')+'</h3>'+
         '<div class="tkc-who">'+T('kt.uren.deck','Iedereen klokt via de PDA; hier staat precies wie wanneer en hoelang werkt.')+'</div>'+
         (klokOverzicht && klokOverzicht.length ? klokOverzicht.map(r =>
-          '<div class="st-row"><span>'+(r.binnen?'🟢 ':'⚪ ')+r.name+'<span class="sub">'+(r.func||(r.role==='manager'?'Manager':''))+
+          '<div class="st-row"><span>'+(r.binnen?'':'')+r.name+'<span class="sub">'+(r.func||(r.role==='manager'?'Manager':''))+
             (r.laatsteIn?' · '+T('kt.uren.in','in ')+tijd(r.laatsteIn)+(r.laatsteUit?' · '+T('kt.uren.uit','uit ')+tijd(r.laatsteUit):' · '+T('kt.uren.nu','nu binnen')):' · '+T('kt.uren.nooit','nog niet geklokt'))+'</span></span>'+
           '<span class="sub" style="text-align:right;font-variant-numeric:tabular-nums;">'+T('kt.uren.vandaag','vandaag ')+r.vandaagUren+'u<br>'+T('kt.uren.week','week ')+r.weekUren+'u</span></div>').join('')
         : '<div class="tkc-who">…</div>')+'</div>';
@@ -1965,13 +1965,13 @@
       const rooms = state.rooms || [];
       const verblijfGenre = type === 'apartment' || type === 'villa';
       const unit = verblijfGenre ? T('kt.unit','verblijf') : T('kt.kamer','kamer');
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(verblijfGenre?'🏡 '+T('kt.units','Verblijven'):'🛏 '+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(verblijfGenre?''+T('kt.units','Verblijven'):''+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
         (rooms.length ? rooms.map(r => {
           const hk = (r.hk && r.hk.status) || 'schoon';
           return '<div class="st-row"><span>'+r.name+(r.available?'':' · '+T('kt.offline','offline'))+
-            '<span class="sub">'+eur(r.price)+' '+T('sup.pernight','p.n.')+' · '+tHk(hk)+(hk==='defect'&&r.hk&&r.hk.note?' · ⚠ '+r.hk.note:'')+'</span></span>'+
+            '<span class="sub">'+eur(r.price)+' '+T('sup.pernight','p.n.')+' · '+tHk(hk)+(hk==='defect'&&r.hk&&r.hk.note?' ·  '+r.hk.note:'')+'</span></span>'+
             '<span class="acts"><button class="obtn'+(r.available?' primary':' warn')+'" data-kmrt="'+r.id+'">'+(r.available?T('kt.isopen','Open'):T('kt.isclosed','Dicht'))+'</button>'+
-            '<button class="obtn" data-kmhk="'+r.id+'" data-cur="'+hk+'">🧹 '+tHk(hk)+'</button>'+
+            '<button class="obtn" data-kmhk="'+r.id+'" data-cur="'+hk+'">'+tHk(hk)+'</button>'+
             '<button class="obtn warn" data-kmrd="'+r.id+'">✕</button></span></div>';
         }).join('') : '<div class="tkc-who">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>')+
         '<div class="st-form"><div class="row-gap"><input class="st-in" id="kRmN" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;"><input class="st-in" id="kRmP" type="number" inputmode="decimal" placeholder="€" style="flex:1;"></div>'+
@@ -1980,7 +1980,7 @@
     }
     if (kantoorSec === 'minibar'){
       const cat = (state.minibar && state.minibar.catalog) || [];
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🧊 '+T('kt.mbcat','Minibar-catalogus')+' ('+cat.length+')</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.mbcat','Minibar-catalogus')+' ('+cat.length+')</h3>'+
         (cat.length ? cat.map(m=>'<div class="st-row"><span>'+m.name+'<span class="sub">'+eur(m.price)+'</span></span>'+
           '<button class="obtn warn" data-kmbd="'+m.id+'">✕</button></div>').join('')
         : '<div class="tkc-who">'+T('kt.nomb','Nog geen artikelen in de minibar.')+'</div>')+
@@ -1990,8 +1990,8 @@
     }
     if (kantoorSec === 'deuren'){
       const doors = state.doors || [];
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🚪 '+T('kt.deuren','Deuren')+'</h3>'+
-        (doors.length ? doors.map(d=>'<div class="st-row"><span>'+(d.locked?'🔒':'🔓')+' '+d.name+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.deuren','Deuren')+'</h3>'+
+        (doors.length ? doors.map(d=>'<div class="st-row"><span>'+(d.locked?'':'')+' '+d.name+
           '<span class="sub">'+(d.locked?T('door.locked','Vergrendeld'):T('door.open','OPEN, vergrendelt zichzelf'))+(d.lastBy?' · '+T('door.lastby','laatst:')+' '+d.lastBy:'')+'</span></span>'+
           '<button class="obtn'+(d.locked?' primary':' warn')+'" data-kdoor="'+d.id+'">'+(d.locked?T('door.openbtn','Open 10 sec'):T('door.lockbtn','Vergrendel nu'))+'</button></div>').join('')
         : '<div class="tkc-who">'+T('door.none','Nog geen digitale deuren gekoppeld.')+'</div>')+
@@ -2007,23 +2007,23 @@
       const bezig = ritten.filter(r => !RIT_KLAAR(r.status) && (r.driver || r.status !== 'aangevraagd'));
       const chauffeurs = (state.staff||[]);
       const wagens = (state.fleet||[]).filter(v=>v.active);
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗺 '+T('kt.openritten','Open aanvragen')+' ('+open.length+')</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.openritten','Open aanvragen')+' ('+open.length+')</h3>'+
         (open.length ? open.map(r =>
           '<div class="st-row" style="flex-wrap:wrap;"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+r.when+'</span></span>'+
           '<span class="acts" style="flex-wrap:wrap;">'+
             '<select class="st-in" data-ktch="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
             '<select class="st-in" data-ktvg="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
             '<button class="obtn primary" data-ktwijs="'+r.ref+'">'+T('kt.wijs','Wijs toe')+'</button>'+
-            '<button class="obtn" data-ktslim="'+r.ref+'">✨ '+T('kt.slim','Slim')+'</button></span></div>'
+            '<button class="obtn" data-ktslim="'+r.ref+'">'+T('kt.slim','Slim')+'</button></span></div>'
         ).join('') : '<div class="tkc-who">'+T('kt.geenopen','Geen open aanvragen.')+'</div>')+'</div>';
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>📅 '+T('kt.gepland','Gepland')+' ('+geplandK.length+')</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.gepland','Gepland')+' ('+geplandK.length+')</h3>'+
         (geplandK.length ? geplandK.map(r =>
           '<div class="st-row" style="flex-wrap:wrap;"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · <b>'+r.when+'</b></span></span>'+
           '<span class="acts" style="flex-wrap:wrap;">'+
             '<select class="st-in" data-ktch="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
             '<select class="st-in" data-ktvg="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
             '<button class="obtn primary" data-ktwijs="'+r.ref+'">'+T('kt.wijs','Wijs toe')+'</button>'+
-            '<button class="obtn" data-ktslim="'+r.ref+'">✨ '+T('kt.slim','Slim')+'</button></span></div>'
+            '<button class="obtn" data-ktslim="'+r.ref+'">'+T('kt.slim','Slim')+'</button></span></div>'
         ).join('') : '<div class="tkc-who">'+T('kt.nietsgepland','Geen geplande ritten. Leden kunnen ritten dagen vooruit boeken.')+'</div>')+'</div>';
       html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.lopend','Lopend')+' ('+bezig.length+')</h3>'+
         (bezig.length ? bezig.map(r =>
@@ -2036,13 +2036,13 @@
       // scherm er hetzelfde uitziet met tien of tien miljoen afgeronde ritten
       if (!histData){
         laadHistorie();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📒 '+T('kt.historie','Historie')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.historie','Historie')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else {
         const h = histData;
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📒 '+T('kt.historie','Historie')+' ('+h.total+')</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.historie','Historie')+' ('+h.total+')</h3>'+
           '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b style="color:var(--gold);">'+eur(h.omzet)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
           '<div style="display:flex;gap:0.5rem;margin:0.5rem 0;"><input class="st-in" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'" style="flex:1;">'+
-          '<button class="obtn" id="ktHzGo">🔍 '+T('kt.zoek','Zoek')+'</button></div>'+
+          '<button class="obtn" id="ktHzGo">'+T('kt.zoek','Zoek')+'</button></div>'+
           (h.items.length ? h.items.map(r =>
             '<div class="st-row"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+String(r.finishedAt||r.at).slice(0,16).replace('T',' ')+(r.driver?' · '+r.driver.name:'')+'</span></span>'+
             '<b style="color:var(--gold);">'+(r.quote?eur(r.quote):'')+'</b></div>'
@@ -2051,12 +2051,12 @@
             '<button class="obtn" data-khist="-1"'+(h.page<=1?' disabled':'')+'>‹</button>'+
             '<span class="tkc-who" style="margin:0;">'+T('kt.pagina','Pagina')+' '+h.page+' / '+h.pages+'</span>'+
             '<button class="obtn" data-khist="1"'+(h.page>=h.pages?' disabled':'')+'>›</button></div>' : '')+
-          (h.total ? '<div class="st-form"><button class="bigbtn" id="ktCsv">⬇ '+T('kt.csv','Exporteer alles als CSV')+' ('+h.total+')</button></div>' : '')+'</div>';
+          (h.total ? '<div class="st-form"><button class="bigbtn" id="ktCsv">'+T('kt.csv','Exporteer alles als CSV')+' ('+h.total+')</button></div>' : '')+'</div>';
       }
     }
     if (kantoorSec === 'vloot'){
       const wagens = state.fleet || [];
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(type==='jet'?'✈️ '+T('kt.vloot','Vloot'):'🚘 '+T('kt.vloot','Vloot'))+' ('+wagens.length+')</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(type==='jet'?''+T('kt.vloot','Vloot'):''+T('kt.vloot','Vloot'))+' ('+wagens.length+')</h3>'+
         (wagens.length ? wagens.map(v =>
           '<div class="st-row"><span>'+v.name+(v.active?'':' · '+T('kt.offline','offline'))+'<span class="sub">'+(v.plate||'')+' · '+v.seats+' '+T('tbl.pers','pers.')+'</span></span>'+
           '<span class="acts"><button class="obtn'+(v.active?' primary':' warn')+'" data-ktvt="'+v.id+'">'+(v.active?T('kt.isopen','Open'):T('kt.isclosed','Dicht'))+'</button>'+
@@ -2068,7 +2068,7 @@
     }
     if (kantoorSec === 'tarief'){
       const t2 = (state.settings && state.settings.tarief) || {};
-      html += '<div class="tkc"><h3>🧮 '+T('kt.tarief','Tarief')+'</h3>'+
+      html += '<div class="tkc"><h3>'+T('kt.tarief','Tarief')+'</h3>'+
         '<div class="tkc-who">'+T('kt.tarief.s','Elke aanvraag krijgt hiermee direct een vaste nettoprijs voor het lid; u houdt 100%.')+'</div>'+
         '<div class="st-form">'+
         '<label class="soft-xs">'+T('kt.start','Starttarief (€)')+'</label><input class="st-in" id="ktTa" type="number" step="0.1" value="'+(t2.start||0)+'">'+
@@ -2080,16 +2080,16 @@
       // het slimme vandaag-bord van de dienstverlener (zzp, chef, wellness)
       if (!vakData){
         laadVakwerk();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (vakData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+vakData.error+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+vakData.error+'</div></div>';
       } else {
         const v = vakData, k = v.kpi;
-        const rij = (b, knop) => '<div class="st-row"><span>'+(b.soort==='product'?'📦':'🗓️')+' '+b.dienst+
+        const rij = (b, knop) => '<div class="st-row"><span>'+(b.soort==='product'?'':'')+' '+b.dienst+
           '<span class="sub">'+b.klant+(b.tijd?' · '+b.tijd:(b.datum?' · '+b.datum:' · '+T('kt.geendatum','nog geen datum')))+(b.duurMin?' · '+b.duurMin+' min':'')+'</span></span>'+
           '<span class="acts"><b style="color:var(--gold);margin-right:0.4rem;">'+eur(b.prijs)+'</b>'+(knop||'')+'</span></div>';
         // KPI-strip
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+' · '+v.label+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.vandaag','Vandaag')+' · '+v.label+'</h3>'+
           '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:0.55rem;">'+
           [[T('vk.omzetvd','Omzet vandaag'), eur(k.omzetVandaag)],
            [T('vk.omzetwk','Deze week'), eur(k.omzetWeek)],
@@ -2102,23 +2102,23 @@
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--gold);margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
           '<div class="tkc-who" style="margin-top:0.5rem;">'+T('vk.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div></div>';
         // aanvragen die op bevestiging wachten
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📥 '+T('vk.tebev','Wacht op bevestiging')+' ('+v.teBevestigen.length+')</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.tebev','Wacht op bevestiging')+' ('+v.teBevestigen.length+')</h3>'+
           (v.teBevestigen.length ? v.teBevestigen.map(b => rij(b, '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>')).join('')
             : '<div class="tkc-who">'+T('vk.geentebev','Geen openstaande aanvragen.')+'</div>')+'</div>';
         // het vandaag-bord
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗓️ '+T('vk.vandaaglijst','Vandaag')+' ('+v.vandaag.length+')</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.vandaaglijst','Vandaag')+' ('+v.vandaag.length+')</h3>'+
           (v.vandaag.length ? v.vandaag.map(b => rij(b, b.status==='bevestigd' ? '<button class="obtn" data-vakaf="'+b.ref+'">'+T('vk.afronden','Afronden')+'</button>' : '')).join('')
             : '<div class="tkc-who">'+T('vk.geenvandaag','Vandaag staat er niets in de agenda.')+'</div>')+'</div>';
         // de eerstvolgende afspraken
-        if (v.binnenkort.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>🔜 '+T('vk.binnenkort','Binnenkort')+' ('+v.binnenkort.length+')</h3>'+
+        if (v.binnenkort.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.binnenkort','Binnenkort')+' ('+v.binnenkort.length+')</h3>'+
           v.binnenkort.slice(0,12).map(b => rij(b, '')).join('')+'</div>';
         // boekingen zonder datum die nog gepland moeten worden
-        if (v.zonderDatum.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>📌 '+T('vk.zonderdatum','Nog te plannen')+' ('+v.zonderDatum.length+')</h3>'+
+        if (v.zonderDatum.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.zonderdatum','Nog te plannen')+' ('+v.zonderDatum.length+')</h3>'+
           v.zonderDatum.map(b => rij(b, b.status==='aangevraagd' ? '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>' : '')).join('')+'</div>';
         // de beschikbaarheid: werkdagen en openingstijden waarin leden boeken
         if (vakUren){
           const dagNamen = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗓️ '+T('vk.beschik','Beschikbaarheid')+'</h3>'+
+          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.beschik','Beschikbaarheid')+'</h3>'+
             '<div class="tkc-who" style="margin-top:0;">'+T('vk.beschik.s','Leden boeken alleen binnen deze werkdagen en tijden; de app biedt vrije tijdvakken aan op basis van de duur van de dienst.')+'</div>'+
             '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin:0.5rem 0;">'+
             dagNamen.map((d,i)=>'<button class="obtn'+(vakUren.dagen[i]?' primary':'')+'" data-vakdag="'+i+'">'+d+'</button>').join('')+'</div>'+
@@ -2127,7 +2127,7 @@
             '<button class="bigbtn" id="vakUrenSave" style="margin-top:0.4rem;">'+T('vk.urenopslaan','Beschikbaarheid opslaan')+'</button></div>';
         }
         // de genre-bewuste AI-assistent
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤖 '+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
           '<div class="st-form"><input class="st-in" id="vakQ" placeholder="'+T('vk.aiplace','Bijv. waar moet ik me vandaag op richten?')+'">'+
           '<button class="bigbtn" id="vakAi"'+(vakAiBusy?' disabled':'')+'>'+(vakAiBusy?T('vk.aidenkt','De assistent denkt na...'):T('vk.aivraag','Vraag advies'))+'</button></div>'+
           (vakAiMsg ? '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;">'+vakAiMsg+'</div>' : '')+'</div>';
@@ -2136,9 +2136,9 @@
     if (kantoorSec === 'diensten'){
       // het aanbod van de zelfstandige: diensten en producten, eigen beheer
       const sv = state.services || [];
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗂️ '+T('kt.aanbod','Uw diensten en producten')+' ('+sv.length+')</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.aanbod','Uw diensten en producten')+' ('+sv.length+')</h3>'+
         (sv.length ? sv.map(x =>
-          '<div class="st-row"><span>'+(x.soort==='product'?'📦':'🗓️')+' '+x.name+'<span class="sub">'+(x.desc||'')+(x.duurMin?' · '+x.duurMin+' min':'')+'</span></span>'+
+          '<div class="st-row"><span>'+(x.soort==='product'?'':'')+' '+x.name+'<span class="sub">'+(x.desc||'')+(x.duurMin?' · '+x.duurMin+' min':'')+'</span></span>'+
           '<span class="acts"><b style="color:var(--gold);margin-right:0.4rem;">'+eur(x.price)+'</b><button class="obtn warn" data-svdel="'+x.id+'">✕</button></span></div>').join('')
           : '<div class="tkc-who">'+T('kt.geenaanbod','Nog geen aanbod. Voeg hieronder uw eerste dienst of product toe.')+'</div>')+
         '<div class="st-form"><input class="st-in" id="svNaam" placeholder="'+T('kt.svnaam','Naam, bijv. Personal styling')+'">'+
@@ -2151,7 +2151,7 @@
     }
     if (kantoorSec === 'prijzen'){
       const h = state.prices || [];
-      html += '<div class="tkc"><h3>💶 '+T('kt.newprice','Prijs doorgeven aan RTG')+'</h3>'+
+      html += '<div class="tkc"><h3>'+T('kt.newprice','Prijs doorgeven aan RTG')+'</h3>'+
         '<div class="st-form"><input class="st-in" id="kPrS" placeholder="'+T('kt.service','Dienst, bijv. Luchthaven, centrum')+'">'+
         '<input class="st-in" id="kPrP" type="number" inputmode="decimal" placeholder="€">'+
         '<button class="bigbtn" id="kPrSend" style="margin-top:0.2rem;">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
@@ -2162,12 +2162,12 @@
     }
     if (kantoorSec === 'marketing'){
       const photos = state.photos || [];
-      html += '<div class="tkc"><h3>📷 '+T('sup.photos','Foto\'s op uw pagina')+' ('+photos.length+'/6)</h3>'+
+      html += '<div class="tkc"><h3>'+T('sup.photos','Foto\'s op uw pagina')+' ('+photos.length+'/6)</h3>'+
         '<div class="ph-grid" style="margin-top:0.5rem;">'+
         photos.map((p,i)=>'<div class="ph"><img src="'+p+'" alt=""><button data-kphd="'+i+'">✕</button></div>').join('')+
         (photos.length<6?'<label class="ph add">+<input type="file" id="kPhFile" accept="image/jpeg,image/png,image/webp" style="display:none;"></label>':'')+
         '</div><div class="tkc-who">'+T('sup.photonote','Gasten zien deze foto\'s in de RTG-app bij uw pagina, direct na plaatsen.')+'</div></div>';
-      html += '<div class="tkc"><h3>📣 '+T('sup.salonpub','Publiceer op De Salon')+'</h3>'+
+      html += '<div class="tkc"><h3>'+T('sup.salonpub','Publiceer op De Salon')+'</h3>'+
         '<div class="st-form"><textarea class="st-in" id="kSpText" placeholder="'+T('kt.salonph','Vertel RTG-leden over uw nieuwste aanbod, suite of avond...')+'" style="min-height:70px;resize:vertical;"></textarea>'+
         (photos.length?'<div class="ph-pick">'+photos.map((p,i)=>'<img src="'+p+'" data-kpick="'+i+'" alt="">').join('')+'</div>':'')+
         '<button class="bigbtn" id="kSpPost">'+T('sup.salonpost','Publiceer als RTG-partner')+'</button></div>'+
@@ -2190,7 +2190,7 @@
             '<div style="font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.1rem;">'+x[0]+'</div></div>').join('')+'</div>'+
           '<div class="st-form"><textarea class="st-in" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. aan zee sinds 1998, drie generaties.')+'" style="min-height:52px;resize:vertical;">'+(mk.bio||'')+'</textarea>'+
           '<button class="obtn primary" id="mkBioSave" style="align-self:flex-start;">'+T('mk.biosave','Bio opslaan')+'</button></div></div>';
-        html += '<div class="tkc"><h3>🎁 '+T('mk.deal','Exclusieve aanbieding')+'</h3>'+
+        html += '<div class="tkc"><h3>'+T('mk.deal','Exclusieve aanbieding')+'</h3>'+
           '<div class="tkc-who">'+T('mk.deal.s','Alleen voor leden; zij claimen met een persoonlijke code die u aan de kassa verzilvert. Pure klantbinding.')+'</div>'+
           '<div class="st-form"><input class="st-in" id="mkDt" placeholder="'+T('mk.dealtitel','Titel, bijv. Amuse van het huis')+'">'+
           '<input class="st-in" id="mkDx" placeholder="'+T('mk.dealtekst','Tekst, bijv. Bij elk diner deze maand')+'">'+
@@ -2200,7 +2200,7 @@
             '<div class="st-row"><span>'+d2.titel+'<span class="sub">'+(d2.geldigTot?'t/m '+d2.geldigTot+' · ':'')+d2.claims+' '+T('mk.claims','geclaimd')+' · '+d2.verzilverd+' '+T('mk.verzilverd','verzilverd')+'</span></span></div>').join('') : '')+
           '<div style="display:flex;gap:0.5rem;margin-top:0.4rem;"><input class="st-in" id="mkCode" placeholder="RTG-D-XXXXXX" style="flex:1;">'+
           '<button class="obtn" id="mkRedeem">'+T('mk.innen','Verzilver')+'</button></div></div>';
-        html += '<div class="tkc"><h3>📊 '+T('mk.poll','Vraag het uw leden (poll)')+'</h3>'+
+        html += '<div class="tkc"><h3>'+T('mk.poll','Vraag het uw leden (poll)')+'</h3>'+
           '<div class="tkc-who">'+T('mk.poll.s','Marketinginzicht: laat leden kiezen en zie live de uitslag.')+'</div>'+
           '<div class="st-form"><input class="st-in" id="mkPv" placeholder="'+T('mk.pollvraag','Vraag, bijv. welk menu in december?')+'">'+
           '<input class="st-in" id="mkP1" placeholder="'+T('mk.optie','Optie')+' 1"><input class="st-in" id="mkP2" placeholder="'+T('mk.optie','Optie')+' 2"><input class="st-in" id="mkP3" placeholder="'+T('mk.optie','Optie')+' 3 ('+T('mk.optioneel','optioneel')+')">'+
@@ -2217,12 +2217,12 @@
     el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
-      try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = '✅ '+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = ''+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }
     });
     const mkD = el.querySelector('#mkDealGo'); if (mkD) mkD.addEventListener('click', async () => {
       try {
         await API.call('/supplier/salon/deal', { titel: el.querySelector('#mkDt').value, text: el.querySelector('#mkDx').value, geldigTot: el.querySelector('#mkDg').value });
-        mktMsg = '🎁 '+T('mk.dealklaar','Aanbieding staat op De Salon; uw volgers hebben een melding gekregen.');
+        mktMsg = ''+T('mk.dealklaar','Aanbieding staat op De Salon; uw volgers hebben een melding gekregen.');
         mktData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -2230,7 +2230,7 @@
     const mkR = el.querySelector('#mkRedeem'); if (mkR) mkR.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/salon/deal/redeem', { code: el.querySelector('#mkCode').value });
-        mktMsg = '✅ '+T('mk.geind','Verzilverd:')+' <b>'+d.titel+'</b> · '+d.codename;
+        mktMsg = ''+T('mk.geind','Verzilverd:')+' <b>'+d.titel+'</b> · '+d.codename;
         mktData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -2239,7 +2239,7 @@
       try {
         await API.call('/supplier/salon/poll', { vraag: el.querySelector('#mkPv').value,
           opties: [el.querySelector('#mkP1').value, el.querySelector('#mkP2').value, el.querySelector('#mkP3').value].filter(x => x && x.trim()) });
-        mktMsg = '📊 '+T('mk.pollklaar','Poll staat op De Salon.');
+        mktMsg = ''+T('mk.pollklaar','Poll staat op De Salon.');
         mktData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -2257,7 +2257,7 @@
     const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
-        finMsg = '🎁 '+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--gold);">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
+        finMsg = ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--gold);">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
         finData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -2265,7 +2265,7 @@
     const gR = el.querySelector('#gcRedeem'); if (gR) gR.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/redeem', { code: el.querySelector('#gcCode').value, bedrag: Number(el.querySelector('#gcInBedrag').value) });
-        finMsg = '✅ '+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b style="color:var(--gold);">€ '+d.saldo+'</b>';
+        finMsg = ''+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b style="color:var(--gold);">€ '+d.saldo+'</b>';
         finData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -2325,12 +2325,12 @@
         await API.call('/supplier/synergie/maak', { naam: k.voorstel.naam,
           omschrijving: T('sy.kansoms','Voorgesteld door de dealvinder op basis van combinatiegedrag van gasten.'),
           prijsCenten: k.voorstel.prijsCenten, aandelen: k.voorstel.aandelen });
-        toast('🤝 '+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
+        toast(''+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
         await synVer();
       } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-synja]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synja, akkoord: true }); toast('🤝 '+T('sy.ok','Getekend.')); await synVer(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synja, akkoord: true }); toast(''+T('sy.ok','Getekend.')); await synVer(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-synnee]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synnee, akkoord: false }); await synVer(); } catch(e){ toast(e.message); }
@@ -2349,7 +2349,7 @@
             { code: (S && S.code) || '', centen: mijn },
             { code: String(w('#synPartner')).toUpperCase().trim(), centen: totaal - mijn }
           ] });
-        toast('🤝 '+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
+        toast(''+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
         await synVer();
       } catch(e){ toast(e.message); }
     });
@@ -2576,7 +2576,7 @@
           name: el.querySelector('#svNaam').value, desc: el.querySelector('#svDesc').value,
           price: Number(el.querySelector('#svPrijs').value), duurMin: Number(el.querySelector('#svDuur').value),
           soort: el.querySelector('#svSoort').value });
-        kantoorMsg = '✅ '+T('kt.svklaar','In de app gezet; leden kunnen direct boeken.');
+        kantoorMsg = ''+T('kt.svklaar','In de app gezet; leden kunnen direct boeken.');
         await refresh();
       } catch(e){ toast(e.message); }
     });
@@ -2585,10 +2585,10 @@
     }));
     // vakwerk: een aanvraag bevestigen of een afspraak afronden
     el.querySelectorAll('[data-vakbev]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakbev, status: 'bevestigd' }); vakData = null; kantoorMsg = '✅ '+T('vk.bevok','Bevestigd; het lid krijgt bericht.'); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakbev, status: 'bevestigd' }); vakData = null; kantoorMsg = ''+T('vk.bevok','Bevestigd; het lid krijgt bericht.'); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-vakaf]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = '✅ '+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = ''+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
     }));
     // vakwerk: werkdagen aan/uit tikken (lokaal, tot Opslaan)
     el.querySelectorAll('[data-vakdag]').forEach(b => b.addEventListener('click', () => {
@@ -2598,7 +2598,7 @@
       const dagen = [...el.querySelectorAll('[data-vakdag]')].sort((a,c)=>a.dataset.vakdag-c.dataset.vakdag).map(b => b.classList.contains('primary'));
       try {
         await API.call('/supplier/vak/uren-zet', { dagen, van: el.querySelector('#vakVan').value, tot: el.querySelector('#vakTot').value });
-        vakData = null; vakUren = null; kantoorMsg = '✅ '+T('vk.urenok','Beschikbaarheid opgeslagen; leden zien alleen vrije tijden.');
+        vakData = null; vakUren = null; kantoorMsg = ''+T('vk.urenok','Beschikbaarheid opgeslagen; leden zien alleen vrije tijden.');
         await refresh();
       } catch(e){ toast(e.message); }
     });
@@ -2612,7 +2612,7 @@
     });
     // verlofaanvragen beslissen
     el.querySelectorAll('[data-kvja]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/leave/decide', { id: b.dataset.kvja, action: 'goedkeuren' }); kantoorMsg = '✅ '+T('kt.vgedaan','Verlof goedgekeurd; het staflid ziet dit direct op de PDA.'); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/leave/decide', { id: b.dataset.kvja, action: 'goedkeuren' }); kantoorMsg = ''+T('kt.vgedaan','Verlof goedgekeurd; het staflid ziet dit direct op de PDA.'); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kvnee]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/leave/decide', { id: b.dataset.kvnee, action: 'afwijzen' }); await refresh(); } catch(e){ toast(e.message); }
@@ -2639,7 +2639,7 @@
       const ref = b.dataset.ktwijs;
       try {
         await API.call('/supplier/ride/assign', { ref, staffId: Number(el.querySelector('[data-ktch="'+ref+'"]').value), vehicleId: el.querySelector('[data-ktvg="'+ref+'"]') ? el.querySelector('[data-ktvg="'+ref+'"]').value : null });
-        kantoorMsg = '✅ '+T('kt.gewezen','Rit toegewezen; de gast en de chauffeur zijn op de hoogte.');
+        kantoorMsg = ''+T('kt.gewezen','Rit toegewezen; de gast en de chauffeur zijn op de hoogte.');
         await refresh();
       } catch(e){ toast(e.message); }
     }));
@@ -2650,7 +2650,7 @@
         const s2 = await API.call('/supplier/ride/suggest', { ref });
         if (!s2.staffId){ toast(T('kt.niemandvrij','Iedereen is bezet.')); b.disabled = false; return; }
         await API.call('/supplier/ride/assign', { ref, staffId: s2.staffId, vehicleId: s2.vehicleId });
-        kantoorMsg = '✨ '+T('kt.slimgewezen','Slim toegewezen:')+' <b>'+s2.staffName+'</b>'+(s2.vehicleName?' · '+s2.vehicleName:'');
+        kantoorMsg = ''+T('kt.slimgewezen','Slim toegewezen:')+' <b>'+s2.staffName+'</b>'+(s2.vehicleName?' · '+s2.vehicleName:'');
         await refresh();
       } catch(e){ toast(e.message); b.disabled = false; }
     }));
@@ -2670,7 +2670,7 @@
     const ktT2 = el.querySelector('#ktTSave'); if (ktT2) ktT2.addEventListener('click', async () => {
       try {
         await API.call('/supplier/settings', { tarief: { start: Number(el.querySelector('#ktTa').value), perKm: Number(el.querySelector('#ktTb').value), minimum: Number(el.querySelector('#ktTc').value) } });
-        kantoorMsg = '✅ '+T('kt.tklaar','Tarief opgeslagen; nieuwe aanvragen krijgen direct de nieuwe prijs.');
+        kantoorMsg = ''+T('kt.tklaar','Tarief opgeslagen; nieuwe aanvragen krijgen direct de nieuwe prijs.');
         await refresh();
       } catch(e){ toast(e.message); }
     });
@@ -2731,7 +2731,7 @@
     const plek = wv.plek || null;
     const veldStijl = 'background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;';
     const plekBlok = '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
-      '<b style="font-size:0.78rem;">📍 '+T('wv.plekh','Werkplek-zone')+'</b>'+
+      '<b style="font-size:0.78rem;">'+T('wv.plekh','Werkplek-zone')+'</b>'+
       '<div class="tkc-who">'+T('wv.pleks','Alleen op de werkplek inloggen: het toestel deelt bij het inloggen eenmalig zijn positie, de server vergelijkt die met deze zone en bewaart er niets van. Thuiswerk-toestemming per persoon heft de zone op.')+'</div>'+
       '<div class="st-row" style="gap:0.5rem;flex-wrap:wrap;">'+
       '<span style="flex:1;min-width:8rem;">'+(plek ? (plek.lat.toFixed(3))+', '+(plek.lng.toFixed(3))+' · '+plek.radiusM+' m' : T('wv.plekleeg','Nog geen zone ingesteld'))+'</span>'+
@@ -2751,13 +2751,13 @@
         Object.keys(stnd).map(k => '<option value="'+k+'"'+(stand===k?' selected':'')+'>'+stnd[k]+'</option>').join('')+'</select>'+
         '<input type="time" class="wvps-van" value="'+(p.van||'')+'" aria-label="'+T('wv.vanaf','Vanaf')+' '+esc(m.name)+'"'+(stand==='eigen'?'':' hidden')+' style="'+veldStijl+'">'+
         '<input type="time" class="wvps-tot" value="'+(p.tot||'')+'" aria-label="'+T('wv.tot','Tot')+' '+esc(m.name)+'"'+(stand==='eigen'?'':' hidden')+' style="'+veldStijl+'">'+
-        '<button class="obtn'+(p.thuiswerk?' primary':'')+'" data-wvthuis="'+(p.thuiswerk?'1':'0')+'">🏠 '+(p.thuiswerk?T('wv.thuisaan','Thuiswerk aan'):T('wv.thuisuit','Thuiswerk uit'))+'</button></div>';
+        '<button class="obtn'+(p.thuiswerk?' primary':'')+'" data-wvthuis="'+(p.thuiswerk?'1':'0')+'">'+(p.thuiswerk?T('wv.thuisaan','Thuiswerk aan'):T('wv.thuisuit','Thuiswerk uit'))+'</button></div>';
     }).join('');
     const psBlok = psRows ? '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
-      '<b style="font-size:0.78rem;">👥 '+T('wv.persh','Per persoon')+'</b>'+
+      '<b style="font-size:0.78rem;">'+T('wv.persh','Per persoon')+'</b>'+
       '<div class="tkc-who">'+T('wv.perss','Wanneer de PDA en de werkpagina voor wie beschikbaar zijn: volgens het venster van de zaak, altijd, nooit, of eigen tijden. Thuiswerk aan = deze persoon kan ook buiten de werkplek-zone aan het werk.')+'</div>'+
       psRows+'</div>' : '';
-    return '<div class="tkc"><h3>🕰 '+T('wv.h','Werkvenster')+'</h3>'+
+    return '<div class="tkc"><h3>'+T('wv.h','Werkvenster')+'</h3>'+
       '<div class="tkc-who">'+T('wv.s','U bepaalt wanneer uw personeel op de werkpagina en de PDA kan. Buiten het venster geeft de server geen werksessie; managers vallen er nooit onder. Rahul mag op basis van agenda en gezondheid iets anders adviseren, maar de toegang bepaalt u.')+'</div>'+
       '<div class="st-row"><span>'+T('wv.aanh','Venster actief')+'<span class="sub">'+T('wv.aans','Uit = iedereen kan altijd inloggen')+'</span></span>'+
       '<button class="obtn'+(wv.aan?' primary':' warn')+'" id="wvAan" data-val="'+(wv.aan?'0':'1')+'">'+(wv.aan?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>'+
@@ -2787,7 +2787,7 @@
         const radiusM = Number(el.querySelector('#wvPlekStraal').value) || 250;
         try {
           await API.call('/supplier/werkvenster', { plek: { lat: p.coords.latitude, lng: p.coords.longitude, radiusM, aan: true } });
-          toast('📍 '+T('wv.plekok','Werkplek-zone ingesteld.')); boData = null; await refresh();
+          toast(''+T('wv.plekok','Werkplek-zone ingesteld.')); boData = null; await refresh();
         } catch(e){ toast(e.message); }
       }, () => toast(T('wv.gpsmis','Locatie ophalen lukte niet; sta locatie toe in de browser.')), { enableHighAccuracy: true, timeout: 8000 });
     });
@@ -2812,7 +2812,7 @@
       const aan = b.dataset.wvthuis !== '1';
       b.dataset.wvthuis = aan ? '1' : '0';
       b.classList.toggle('primary', aan);
-      b.textContent = '🏠 ' + (aan ? T('wv.thuisaan','Thuiswerk aan') : T('wv.thuisuit','Thuiswerk uit'));
+      b.textContent = '' + (aan ? T('wv.thuisaan','Thuiswerk aan') : T('wv.thuisuit','Thuiswerk uit'));
     }));
     const opslaan = el.querySelector('#wvSave');
     if (opslaan) opslaan.addEventListener('click', async () => {
@@ -2832,7 +2832,7 @@
           thuiswerk: rij.querySelector('[data-wvthuis]').dataset.wvthuis === '1'
         };
       });
-      try { await API.call('/supplier/werkvenster', { dagen, perStaff }); toast('🕰 '+T('wv.bewaard','Werkvenster bewaard.')); boData = null; await refresh(); }
+      try { await API.call('/supplier/werkvenster', { dagen, perStaff }); toast(''+T('wv.bewaard','Werkvenster bewaard.')); boData = null; await refresh(); }
       catch(e){ toast(e.message); }
     });
   }
@@ -3093,12 +3093,12 @@
     let html = '';
     // type + kiezer
     html += '<div class="card"><div class="tt-h">'+T('boer.type','Soort boerderij')+'</div>'+
-      '<div style="margin-top:0.5rem;font-size:0.9rem;">'+(o.typeIcon||'🚜')+' <b>'+esc(o.typeLabel||T('boer.geen','nog niet gekozen'))+'</b></div>'+
+      '<div style="margin-top:0.5rem;font-size:0.9rem;">'+(o.typeIcon||'')+' <b>'+esc(o.typeLabel||T('boer.geen','nog niet gekozen'))+'</b></div>'+
       (canEdit ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;">'+
         o.types.map(t => '<button class="obtn'+(t.id===o.type?' primary':'')+'" data-btype="'+t.id+'">'+t.icon+' '+esc(t.label)+'</button>').join('')+'</div>' : '')+'</div>';
     // Vandaag-briefing
     const br = o.briefing || { punten:[] };
-    html += '<div class="card"><div class="tt-h">🌱 '+T('boer.vandaag','Vandaag')+' · '+esc(br.seizoenLabel||'')+'</div>'+
+    html += '<div class="card"><div class="tt-h">'+T('boer.vandaag','Vandaag')+' · '+esc(br.seizoenLabel||'')+'</div>'+
       (br.punten.length ? br.punten.map(p => '<div class="mitem" style="border-left:3px solid '+(URG_KL[p.urgentie]||'var(--soft)')+';"><div class="ds" style="color:var(--txt);">'+esc(p.tekst)+'</div></div>').join('')
         : '<div class="ds" style="margin-top:0.5rem;">'+T('boer.rustig','Niets dringends. Mooie dag om vooruit te werken.')+'</div>')+'</div>';
     // stats
@@ -3117,8 +3117,8 @@
           (p.gewasLabel && p.fase!=='geoogst' ? bar : '')+
           '<div style="margin-top:0.45rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+
             (canEdit ? '<select data-zaaisel="'+p.id+'" '+sel+'><option value="">'+T('boer.zaaikies','zaai...')+'</option>'+o.gewaskeuze.map(g=>'<option value="'+g.id+'">'+esc(g.label)+'</option>').join('')+'</select>' : '')+
-            (p.gewasLabel && p.fase==='te-oogsten' ? '<button class="obtn primary" data-oogst="'+p.id+'">🌾 '+T('boer.oogsten','Oogsten')+'</button>' : '')+
-            (p.gewasLabel && p.fase!=='geoogst' ? '<button class="obtn" data-water="'+p.id+'">💧 '+T('boer.water','Water')+'</button>' : '')+
+            (p.gewasLabel && p.fase==='te-oogsten' ? '<button class="obtn primary" data-oogst="'+p.id+'">'+T('boer.oogsten','Oogsten')+'</button>' : '')+
+            (p.gewasLabel && p.fase!=='geoogst' ? '<button class="obtn" data-water="'+p.id+'">'+T('boer.water','Water')+'</button>' : '')+
             (canEdit ? '<button class="rr-del" data-percdel="'+p.id+'">✕</button>' : '')+
           '</div></div>';
         }).join('')+
@@ -3130,7 +3130,7 @@
         (o.dieren||[]).map(d => '<div class="mitem"><div class="r1"><span class="nm">'+esc(d.soortLabel)+' × '+(d.aantal||0)+'</span><span class="pr">'+(d.dagopbrengst||0)+' '+(d.eenheid||'')+'/dag</span></div>'+
           '<div class="ds">'+(d.stal?esc(d.stal)+' · ':'')+T('boer.voernodig','voer')+' '+(d.voerKgPerDag||0)+' kg/dag · '+T('boer.gezond','gezondheid')+': <span style="color:'+(d.gezondheid==='goed'?'#7EE0A3':d.gezondheid==='ziek'?'#E0736A':'var(--gold)')+';">'+esc(d.gezondheid)+'</span>'+(d.laatsteVoer?' · '+T('boer.gevoerd','gevoerd')+' '+timeAgo(d.laatsteVoer):'')+'</div>'+
           '<div style="margin-top:0.45rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+
-            '<button class="obtn primary" data-voer="'+d.id+'">🌾 '+T('boer.voeren','Voeren')+'</button>'+
+            '<button class="obtn primary" data-voer="'+d.id+'">'+T('boer.voeren','Voeren')+'</button>'+
             '<input type="number" min="0" data-opbin="'+d.id+'" placeholder="'+(d.eenheid||'')+'/dag" style="width:6rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.4rem 0.5rem;color:var(--txt);"><button class="obtn" data-opbset="'+d.id+'">'+T('boer.opbregistr','Opbrengst')+'</button>'+
             (canEdit ? '<select data-gezond="'+d.id+'" '+sel+'><option value="goed"'+(d.gezondheid==='goed'?' selected':'')+'>'+T('boer.g.goed','goed')+'</option><option value="aandacht"'+(d.gezondheid==='aandacht'?' selected':'')+'>'+T('boer.g.aandacht','aandacht')+'</option><option value="ziek"'+(d.gezondheid==='ziek'?' selected':'')+'>'+T('boer.g.ziek','ziek')+'</option></select><button class="rr-del" data-dierdel="'+d.id+'">✕</button>' : '')+
           '</div></div>').join('')+
@@ -3139,24 +3139,24 @@
     // takenbord
     html += '<div class="card"><div class="tt-h">'+T('boer.takenbord','Takenbord')+'</div>'+
       (o.taken||[]).map(t => '<div class="mitem" style="opacity:'+(t.klaar?'0.55':'1')+';"><div class="r1"><span class="nm">'+(t.klaar?'✓ ':'')+esc(t.wat)+'</span>'+(t.voor?'<span class="pr" style="color:'+(!t.klaar&&t.voor<new Date().toISOString().slice(0,10)?'#E0736A':'var(--soft)')+';">'+esc(t.voor)+'</span>':'')+'</div>'+
-        (t.waar?'<div class="ds">📍 '+esc(t.waar)+(t.door?' · '+esc(t.door):'')+'</div>':'')+
+        (t.waar?'<div class="ds">'+esc(t.waar)+(t.door?' · '+esc(t.door):'')+'</div>':'')+
         (!t.klaar ? '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;"><button class="obtn primary" data-taakklaar="'+t.id+'">'+T('boer.afronden','Afronden')+'</button>'+(canEdit?'<button class="rr-del" data-taakdel="'+t.id+'">✕</button>':'')+'</div>' : '')+'</div>').join('')+
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><input id="boerTkWat" placeholder="'+T('boer.tkwat','Nieuwe taak')+'" style="flex:1;min-width:9rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><input id="boerTkVoor" type="date" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><button class="obtn primary" id="boerTkAdd">+</button></div>' : '')+'</div>';
     // Verkoop: producten (oogst vult de voorraad) en verkopen via de Salon
-    html += '<div class="card"><div class="tt-h">🛒 '+T('boer.verkoop','Verkoop via de Salon')+'</div>'+
+    html += '<div class="card"><div class="tt-h">'+T('boer.verkoop','Verkoop via de Salon')+'</div>'+
       '<p class="sub" style="margin-top:0.2rem;">'+T('boer.verkoop.sub','Uw oogst komt hier automatisch in de voorraad. Zet een prijs en plaats het in de Salon; leden claimen en halen op.')+'</p>'+
       ((o.producten||[]).length ? (o.producten||[]).map(pr => '<div class="mitem"><div class="r1"><span class="nm">'+esc(pr.naam)+'</span><span class="pr">'+pr.voorraad+' '+esc(pr.eenheid)+'</span></div>'+
         '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+
           '<span style="font-size:0.78rem;color:var(--soft);">€</span><input type="number" min="0" step="0.1" value="'+(pr.prijs||'')+'" data-prijsin="'+pr.id+'" style="width:5rem;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0.35rem 0.5rem;color:var(--txt);"><span style="font-size:0.78rem;color:var(--soft);">/'+esc(pr.eenheid)+'</span>'+
           (canEdit?'<button class="obtn" data-prijsset="'+pr.id+'">'+T('boer.prijsopslaan','Prijs')+'</button>':'')+
-          (canEdit?'<button class="obtn primary" data-naarsalon="'+pr.id+'">'+(pr.inSalon?'🔁 '+T('boer.opnieuwsalon','Opnieuw in Salon'):'✦ '+T('boer.insalon','In de Salon'))+'</button>':'')+
+          (canEdit?'<button class="obtn primary" data-naarsalon="'+pr.id+'">'+(pr.inSalon?''+T('boer.opnieuwsalon','Opnieuw in Salon'):'✦ '+T('boer.insalon','In de Salon'))+'</button>':'')+
           (canEdit?'<button class="rr-del" data-proddel="'+pr.id+'">✕</button>':'')+
         '</div></div>').join('')
         : '<div class="ds" style="margin-top:0.5rem;">'+T('boer.geenprod','Nog geen producten. Oogst een perceel of voeg er hieronder een toe.')+'</div>')+
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><input id="boerPrNaam" placeholder="'+T('boer.prnaam','Product')+'" style="flex:1;min-width:7rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><input id="boerPrEenh" placeholder="'+T('boer.preenh','kg')+'" style="width:4rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><input id="boerPrPrijs" type="number" min="0" step="0.1" placeholder="€" style="width:5rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><button class="obtn primary" id="boerPrAdd">+</button></div>' : '')+'</div>';
     // AI-adviseur
     if (canEdit){
-      html += '<div class="card"><div class="tt-h">✨ '+T('boer.ai','AI-adviseur')+'</div>'+
+      html += '<div class="card"><div class="tt-h">'+T('boer.ai','AI-adviseur')+'</div>'+
         '<p class="sub" style="margin-top:0.3rem;">'+T('boer.ai.sub','Vraag advies of geef een opdracht, bijv. "zaai tomaat op Kasblok 1" of "voeg 20 melkkoeien toe".')+'</p>'+
         '<div id="boerAiOut" style="margin-top:0.5rem;"></div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="boerAiIn" placeholder="'+T('boer.ai.ph','Uw vraag of opdracht...')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);"><button class="obtn primary" id="boerAiGo">'+T('boer.ai.go','Vraag')+'</button></div></div>';
@@ -3193,7 +3193,7 @@
   // ---- content creator: de carriere-backoffice ----
   let cr = null;
   const IDEE_KL = { 'idee':'var(--soft)', 'productie':'var(--gold)', 'gepost':'#7EE0A3' };
-  const PLAT_ICO = { instagram:'📸', tiktok:'🎵', youtube:'▶️', x:'𝕏', twitch:'🎮', podcast:'🎙️', blog:'✍️' };
+  const PLAT_ICO = { instagram:'', tiktok:'', youtube:'▶', x:'𝕏', twitch:'', podcast:'', blog:'' };
   async function laadCreator(){
     if (!has('creator') || !API.live) return;
     try { cr = await API.call('/supplier/creator/overzicht', {}); } catch(e){ cr = null; }
@@ -3209,7 +3209,7 @@
     const kort = n => n >= 1000 ? (Math.round(n/100)/10)+'K' : String(n);
     let html = '';
     // profiel
-    html += '<div class="card"><div class="tt-h">🎬 '+T('cr.profiel','Profiel')+'</div>'+
+    html += '<div class="card"><div class="tt-h">'+T('cr.profiel','Profiel')+'</div>'+
       (canEdit ? '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;"><input id="crNiche" placeholder="'+T('cr.niche','Niche (bijv. Reizen & lifestyle)')+'" value="'+escAttr(o.niche||'')+'" '+inp+'><textarea id="crBio" placeholder="'+T('cr.bio','Korte bio')+'" '+inp+' rows="2">'+esc(o.bio||'')+'</textarea><button class="obtn primary" id="crProfielOp" style="align-self:flex-start;">'+T('cr.opslaan','Opslaan')+'</button></div>'
         : '<div style="margin-top:0.4rem;"><b>'+esc(o.niche||'')+'</b><div class="ds">'+esc(o.bio||'')+'</div></div>')+'</div>';
     // stats
@@ -3218,7 +3218,7 @@
       tiles.map(c => '<div style="background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.6rem;text-align:center;"><div style="font-size:1.1rem;font-weight:700;color:var(--gold);">'+c[0]+'</div><div style="font-size:0.6rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.05em;">'+c[1]+'</div></div>').join('')+'</div></div>';
     // platforms
     html += '<div class="card"><div class="tt-h">'+T('cr.platf','Platforms & bereik')+'</div>'+
-      (o.platforms||[]).map(p => '<div class="mitem"><div class="r1"><span class="nm">'+(PLAT_ICO[p.platform]||'🔗')+' '+esc(p.handle||p.platform)+'</span><span class="pr">'+kort(p.volgers||0)+'</span></div>'+
+      (o.platforms||[]).map(p => '<div class="mitem"><div class="r1"><span class="nm">'+(PLAT_ICO[p.platform]||'')+' '+esc(p.handle||p.platform)+'</span><span class="pr">'+kort(p.volgers||0)+'</span></div>'+
         (canEdit?'<div style="margin-top:0.35rem;display:flex;gap:0.4rem;"><input type="number" min="0" data-pfvin="'+p.id+'" value="'+(p.volgers||0)+'" style="width:7rem;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0.3rem 0.5rem;color:var(--txt);"><button class="obtn" data-pfvset="'+p.id+'">'+T('cr.volgersop','Bereik')+'</button><button class="rr-del" data-pfdel="'+p.id+'">✕</button></div>':'')+'</div>').join('')+
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><select id="crPfPlat" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem;color:var(--txt);">'+o.platformkeuze.map(p=>'<option value="'+p+'">'+(PLAT_ICO[p]||'')+' '+p+'</option>').join('')+'</select><input id="crPfHandle" placeholder="@handle" '+inp+' style="flex:1;min-width:7rem;"><input id="crPfVolg" type="number" min="0" placeholder="'+T('cr.volgers','volgers')+'" style="width:6rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem;color:var(--txt);"><button class="obtn primary" id="crPfAdd">+</button></div>' : '')+'</div>';
     // tarieven
@@ -3226,19 +3226,19 @@
       (o.tarieven||[]).map(t => '<div class="mitem"><div class="r1"><span class="nm">'+esc(t.soort)+'</span><span class="pr">€ '+(t.prijs||0)+(canEdit?' <button class="rr-del" data-trdel="'+t.id+'">✕</button>':'')+'</span></div></div>').join('')+
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><select id="crTrSoort" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem;color:var(--txt);">'+o.soortkeuze.map(x=>'<option value="'+x+'">'+x+'</option>').join('')+'</select><input id="crTrPrijs" type="number" min="0" placeholder="€" style="width:6rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem;color:var(--txt);"><button class="obtn primary" id="crTrAdd">+</button></div>' : '')+'</div>';
     // content-kalender
-    html += '<div class="card"><div class="tt-h">📅 '+T('cr.kalender','Content-kalender')+'</div>'+
+    html += '<div class="card"><div class="tt-h">'+T('cr.kalender','Content-kalender')+'</div>'+
       (o.ideeen||[]).map(i => '<div class="mitem" style="border-left:3px solid '+(IDEE_KL[i.status]||'var(--soft)')+';"><div class="r1"><span class="nm">'+esc(i.tekst)+'</span>'+(i.voor?'<span class="pr" style="color:var(--soft);">'+esc(i.voor)+'</span>':'')+'</div>'+
-        '<div class="ds">'+T('cr.status.'+i.status, i.status)+(i.script?' · 📝 '+T('cr.heeftscript','script klaar'):'')+'</div>'+
+        '<div class="ds">'+T('cr.status.'+i.status, i.status)+(i.script?' ·  '+T('cr.heeftscript','script klaar'):'')+'</div>'+
         (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
           (i.status!=='productie'?'<button class="obtn" data-ideest="'+i.id+'" data-st="productie">▶ '+T('cr.naarprod','In productie')+'</button>':'')+
           (i.status!=='gepost'?'<button class="obtn primary" data-ideest="'+i.id+'" data-st="gepost">✓ '+T('cr.naargepost','Gepost')+'</button>':'')+
-          (i.script?'<button class="obtn" data-ideescript="'+i.id+'">📝 '+T('cr.bekijkscript','Script')+'</button>':'')+
+          (i.script?'<button class="obtn" data-ideescript="'+i.id+'">'+T('cr.bekijkscript','Script')+'</button>':'')+
           '<button class="rr-del" data-ideedel="'+i.id+'">✕</button></div>':'')+
         '<div class="crScript" data-scriptbox="'+i.id+'" style="display:none;white-space:pre-wrap;font-size:0.8rem;color:var(--soft);margin-top:0.4rem;border-top:1px solid var(--line);padding-top:0.4rem;">'+esc(i.script||'')+'</div></div>').join('')+
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><input id="crIdTekst" placeholder="'+T('cr.nieuwidee','Nieuw idee')+'" '+inp+' style="flex:1;min-width:9rem;"><input id="crIdVoor" type="date" '+inp+'><button class="obtn primary" id="crIdAdd">+</button></div>' : '')+'</div>';
     // AI content-helper
     if (canEdit){
-      html += '<div class="card"><div class="tt-h">✨ '+T('cr.ai','AI content-helper')+'</div>'+
+      html += '<div class="card"><div class="tt-h">'+T('cr.ai','AI content-helper')+'</div>'+
         '<p class="sub" style="margin-top:0.3rem;">'+T('cr.ai.sub','Vraag om ideeen of een kant-en-klaar script, bijv. "schrijf een script voor een reel over een strandclub" of "voeg idee ... toe aan de kalender".')+'</p>'+
         '<div id="crAiOut" style="margin-top:0.5rem;"></div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="crAiIn" placeholder="'+T('cr.ai.ph','Vraag of opdracht...')+'" '+inp+' style="flex:1;"><button class="obtn primary" id="crAiGo">'+T('cr.ai.go','Vraag')+'</button></div></div>';
@@ -3279,13 +3279,13 @@
     const canEdit = actor().manager, mk = sw.isCreator;
     const st = 'style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"';
     const kaartAnder = a => a.niche != null || a.bereik != null
-      ? '🎬 <b>'+esc(a.name)+'</b>'+(a.niche?' · '+esc(a.niche):'')+(a.bereik?' · '+kortN(a.bereik)+' '+T('sw.bereik','bereik'):'')
-      : (a.icon||'🏷️')+' <b>'+esc(a.name)+'</b>'+(a.typeLabel?' · '+esc(a.typeLabel):'');
+      ? '<b>'+esc(a.name)+'</b>'+(a.niche?' · '+esc(a.niche):'')+(a.bereik?' · '+kortN(a.bereik)+' '+T('sw.bereik','bereik'):'')
+      : (a.icon||'')+' <b>'+esc(a.name)+'</b>'+(a.typeLabel?' · '+esc(a.typeLabel):'');
     const statusKl = { 'voorgesteld':'var(--gold)', 'geaccepteerd':'#7EE0A3', 'afgewezen':'#E0736A' };
     let html = '';
     // lopende samenwerkingen (in + uit)
     const inl = (sw.voorstellen&&sw.voorstellen.in)||[], uitl = (sw.voorstellen&&sw.voorstellen.uit)||[];
-    html += '<div class="card"><div class="tt-h">🤝 '+T('sw.mijn','Mijn samenwerkingen')+'</div>'+
+    html += '<div class="card"><div class="tt-h">'+T('sw.mijn','Mijn samenwerkingen')+'</div>'+
       (inl.length||uitl.length ? [].concat(inl,uitl).map(x => '<div class="mitem" style="border-left:3px solid '+(statusKl[x.status]||'var(--soft)')+';"><div class="r1"><span class="nm">'+kaartAnder(x.ander)+'</span><span class="pr" style="color:'+(statusKl[x.status]||'var(--soft)')+';">'+T('sw.st.'+x.status, x.status)+'</span></div>'+
         (x.bericht?'<div class="ds">'+esc(x.bericht)+(x.budget?' · € '+x.budget:'')+(x.soort?' · '+esc(x.soort):'')+'</div>':'')+
         (x.richting==='in'&&x.status==='voorgesteld'&&canEdit ? '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;"><button class="obtn primary" data-swja="'+x.id+'">'+T('sw.accept','Accepteren')+'</button><button class="obtn" data-swnee="'+x.id+'">'+T('sw.afwijs','Afwijzen')+'</button></div>' : '')+
@@ -3295,32 +3295,32 @@
     if (mk){
       // CREATOR: leveranciers vinden + open oproepen
       html += '<div class="card"><div class="tt-h">'+T('sw.vind','Vind een leverancier om mee samen te werken')+'</div>'+
-        ((swLijst&&swLijst.leveranciers)||[]).slice(0,40).map(l => '<div class="mitem"><div class="r1"><span class="nm">'+(l.icon||'🏷️')+' '+esc(l.name)+'</span><span class="pr" style="font-size:0.72rem;color:var(--soft);">'+esc(l.typeLabel||'')+'</span></div>'+
-          (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+l.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+l.code+'">🤝 '+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
+        ((swLijst&&swLijst.leveranciers)||[]).slice(0,40).map(l => '<div class="mitem"><div class="r1"><span class="nm">'+(l.icon||'')+' '+esc(l.name)+'</span><span class="pr" style="font-size:0.72rem;color:var(--soft);">'+esc(l.typeLabel||'')+'</span></div>'+
+          (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+l.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+l.code+'">'+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
       const oproepen = (sw.openOproepen||[]).filter(op => !op.ikReageerde);
-      html += '<div class="card"><div class="tt-h">📣 '+T('sw.oproepen','Open oproepen van leveranciers')+' ('+oproepen.length+')</div>'+
+      html += '<div class="card"><div class="tt-h">'+T('sw.oproepen','Open oproepen van leveranciers')+' ('+oproepen.length+')</div>'+
         (oproepen.length ? oproepen.map(op => '<div class="mitem"><div class="r1"><span class="nm">'+esc(op.titel)+'</span><span class="pr">'+(op.budget?'€ '+op.budget:'')+'</span></div>'+
           '<div class="ds">'+(op.van?esc(op.van.name)+' · ':'')+esc(op.omschrijving||'')+(op.soort?' · '+esc(op.soort):'')+'</div>'+
           (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.reactie','Jouw reactie...')+'" data-swreactie="'+op.id+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swreageer="'+op.id+'">'+T('sw.reageer','Reageer')+'</button></div>':'')+'</div>').join('')
           : '<div class="ds" style="margin-top:0.5rem;">'+T('sw.geenoproep','Nu geen open oproepen.')+'</div>')+'</div>';
     } else {
       // LEVERANCIER: creators oproepen + reacties + creators direct benaderen
-      if (canEdit) html += '<div class="card"><div class="tt-h">📣 '+T('sw.roepop','Roep content creators op')+'</div>'+
+      if (canEdit) html += '<div class="card"><div class="tt-h">'+T('sw.roepop','Roep content creators op')+'</div>'+
         '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;"><input id="swOpTitel" placeholder="'+T('sw.optitel','Titel (bijv. Zomercampagne)')+'" '+st+'><input id="swOpOms" placeholder="'+T('sw.opoms','Wat zoek je?')+'" '+st+'><div style="display:flex;gap:0.4rem;"><select id="swOpSoort" '+st+'>'+['reel','post','video','campagne','review','story'].map(x=>'<option value="'+x+'">'+x+'</option>').join('')+'</select><input id="swOpBudget" type="number" min="0" placeholder="'+T('sw.budget','budget €')+'" style="width:7rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem;color:var(--txt);"><button class="obtn primary" id="swOpPlaats">'+T('sw.plaats','Plaats oproep')+'</button></div></div></div>';
       // mijn oproepen met reacties
       (sw.mijnOproepen||[]).forEach(op => {
         html += '<div class="card"><div class="tt-h">'+esc(op.titel)+' '+(op.open?'<span style="font-size:0.68rem;color:#7EE0A3;">'+T('sw.open','open')+'</span>':'<span style="font-size:0.68rem;color:var(--soft);">'+T('sw.dicht','gesloten')+'</span>')+'</div>'+
           '<div class="ds" style="margin-bottom:0.4rem;">'+esc(op.omschrijving||'')+(op.budget?' · € '+op.budget:'')+'</div>'+
-          ((op.reacties||[]).length ? (op.reacties||[]).map(r => '<div class="mitem"><div class="r1"><span class="nm">🎬 '+esc(r.creator.name)+(r.creator.bereik?' · '+kortN(r.creator.bereik):'')+'</span>'+(r.status==='gekozen'?'<span class="pr" style="color:#7EE0A3;">'+T('sw.gekozen','gekozen')+'</span>':'')+'</div>'+
+          ((op.reacties||[]).length ? (op.reacties||[]).map(r => '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.creator.name)+(r.creator.bereik?' · '+kortN(r.creator.bereik):'')+'</span>'+(r.status==='gekozen'?'<span class="pr" style="color:#7EE0A3;">'+T('sw.gekozen','gekozen')+'</span>':'')+'</div>'+
             (r.bericht?'<div class="ds">'+esc(r.bericht)+'</div>':'')+
             (canEdit&&r.status!=='gekozen'&&op.open?'<div style="margin-top:0.35rem;"><button class="obtn primary" data-swkies="'+op.id+'" data-creator="'+r.creatorCode+'">'+T('sw.kiesdeze','Kies deze creator')+'</button></div>':'')+'</div>').join('')
             : '<div class="ds">'+T('sw.geenreacties','Nog geen reacties.')+'</div>')+
           (canEdit&&op.open?'<button class="obtn" data-swsluit="'+op.id+'" style="margin-top:0.5rem;">'+T('sw.sluit','Oproep sluiten')+'</button>':'')+'</div>';
       });
       // creators direct benaderen
-      html += '<div class="card"><div class="tt-h">🎬 '+T('sw.vindcreator','Benader een creator direct')+'</div>'+
+      html += '<div class="card"><div class="tt-h">'+T('sw.vindcreator','Benader een creator direct')+'</div>'+
         ((swLijst&&swLijst.creators)||[]).slice(0,40).map(c => '<div class="mitem"><div class="r1"><span class="nm">'+esc(c.name)+(c.niche?' · '+esc(c.niche):'')+'</span><span class="pr">'+kortN(c.bereik||0)+'</span></div>'+
-          (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+c.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+c.code+'">🤝 '+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
+          (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+c.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+c.code+'">'+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
     }
     el.innerHTML = html;
     // wiring
@@ -3343,7 +3343,7 @@
   function factRij(f, kant){
     return '<div class="mitem"><div class="r1"><span class="nm">'+esc(f.nummer)+' · '+esc(kant==='in'?f.verkoper:f.koper)+'</span><span class="pr">'+geld(f.totaal)+'</span></div>'+
       '<div class="ds">'+esc(f.datum)+' · '+T('fact.soort.'+f.soort, f.soort)+' · '+T('fact.btw','btw')+' '+geld(f.btwBedrag)+(f.methode?' · '+esc(f.methode):'')+'</div>'+
-      '<div style="margin-top:0.35rem;"><button class="obtn" data-factpdf="'+f.id+'" data-nr="'+escAttr(f.nummer)+'">⬇ PDF</button></div></div>';
+      '<div style="margin-top:0.35rem;"><button class="obtn" data-factpdf="'+f.id+'" data-nr="'+escAttr(f.nummer)+'">PDF</button></div></div>';
   }
   function renderFacturen(){
     const el = $('#factWrap'); if (!el) return;
@@ -3354,7 +3354,7 @@
       [[st.verkocht||0, T('fact.verkocht','verkoopfacturen')],[geld(st.omzet||0), T('fact.omzet','omzet')],[geld(st.btwAfdracht||0), T('fact.btwaf','btw')]]
       .map(c => '<div style="background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.6rem;text-align:center;"><div style="font-size:1.05rem;font-weight:700;color:var(--gold);">'+c[0]+'</div><div style="font-size:0.6rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.05em;">'+c[1]+'</div></div>').join('')+'</div></div>';
     if (canEdit){
-      html += '<div class="card"><div class="tt-h">✨ '+T('fact.ai','AI-factuurtool')+'</div>'+
+      html += '<div class="card"><div class="tt-h">'+T('fact.ai','AI-factuurtool')+'</div>'+
         '<p class="sub" style="margin-top:0.3rem;">'+T('fact.ai.sub','Vraag iets, of maak een factuur in gewone taal: "maak een factuur voor [codenaam], 3 uur advies a 90 euro".')+'</p>'+
         '<div id="factAiOut" style="margin-top:0.5rem;"></div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="factAiIn" placeholder="'+T('fact.ai.ph','Vraag of opdracht...')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);"><button class="obtn primary" id="factAiGo">'+T('fact.ai.go','Vraag')+'</button></div></div>';
@@ -3395,7 +3395,7 @@
     const canEdit = actor().manager;
     let html = '';
     if (canEdit){
-      html += '<div class="card"><div class="tt-h">➕ '+T('mkt.plaats','Plaats een advertentie')+'</div>'+
+      html += '<div class="card"><div class="tt-h">'+T('mkt.plaats','Plaats een advertentie')+'</div>'+
         '<input id="mktTitel" placeholder="'+T('mkt.titel','Titel, bijv. Etalagepop tweedehands')+'" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);margin-top:0.5rem;">'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap;">'+
           '<select id="mktCat" style="flex:1;min-width:8rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);">'+rtfmCats.map(c=>'<option value="'+c+'">'+rtfmCatNaam(c)+'</option>').join('')+'</select>'+
@@ -3405,8 +3405,8 @@
         '<textarea id="mktOms" placeholder="'+T('mkt.oms','Omschrijving')+'" style="width:100%;min-height:4rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);margin-top:0.4rem;"></textarea>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap;">'+
           '<input id="mktPlaats" placeholder="'+T('mkt.plaatsnaam','Plaats')+'" style="flex:1;min-width:6rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);">'+
-          '<button class="obtn" id="mktAiOms">✨ '+T('mkt.aioms','AI-omschrijving')+'</button>'+
-          '<button class="obtn" id="mktAiPrijs">✨ '+T('mkt.aiprijs','AI-prijs')+'</button>'+
+          '<button class="obtn" id="mktAiOms">'+T('mkt.aioms','AI-omschrijving')+'</button>'+
+          '<button class="obtn" id="mktAiPrijs">'+T('mkt.aiprijs','AI-prijs')+'</button>'+
         '</div>'+
         '<div id="mktAiUit" class="sub" style="margin-top:0.35rem;color:var(--gold);"></div>'+
         '<label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.8rem;color:var(--soft);margin:0.6rem 0;"><input type="checkbox" id="mktAkkoord" style="margin-top:0.2rem;"><span>'+T('mkt.akkoord','Ik bied alleen toegestane waar aan en houd het netjes en respectvol.')+'</span></label>'+
@@ -3449,7 +3449,7 @@
   let retailSec = 'overzicht';   // overzicht | catalogus | voorraad | clienteling
   let retailKlant = null;        // geopend klantdossier (clienteling)
   let retailArtBewerk = null;    // id van het artikel dat bewerkt wordt (of 'nieuw')
-  const RSEC = [['overzicht','📈','Overzicht'],['catalogus','👗','Collecties'],['voorraad','📦','Voorraad'],['clienteling','💎','Klanten']];
+  const RSEC = [['overzicht','','Overzicht'],['catalogus','','Collecties'],['voorraad','','Voorraad'],['clienteling','','Klanten']];
   async function laadRetail(){
     if (!has('retail') || !API.live) return;
     try { retailData = (await API.call('/supplier/retail', {})).retail; } catch(e){ retailData = { collecties:[], artikelen:[], apart:[], paskamer:[], styling:[], klanten:[], stats:{}, maten:[], seizoenen:[] }; }
@@ -3534,7 +3534,7 @@
       (arts.length ? '<div style="margin-top:0.5rem;display:grid;gap:0.5rem;">'+arts.map(a => {
         const drop = a.drop && !a.drop.gereleased ? '<span class="pill" style="color:var(--gold);border-color:rgba(212,175,55,0.4);margin-left:0.3rem;">'+T('rt.drop','drop')+' '+esc(a.drop.datum)+'</span>' : '';
         return '<div class="mitem"><div style="display:flex;gap:0.7rem;">'+
-          (a.foto ? '<img src="'+esc(a.foto)+'" alt="'+esc(a.naam)+'" style="width:52px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0;">' : '<div style="width:52px;height:64px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">👗</div>')+
+          (a.foto ? '<img src="'+esc(a.foto)+'" alt="'+esc(a.naam)+'" style="width:52px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0;">' : '<div style="width:52px;height:64px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>')+
           '<div style="flex:1;min-width:0;"><div class="r1"><span class="nm">'+esc(a.naam)+drop+'</span><span class="pr">'+geld(a.price)+'</span></div>'+
           '<div class="ds">'+esc(collNaam(a.collectieId))+' · '+esc(a.categorie||'')+'</div>'+
           '<div class="ds">'+esc((a.varianten||[]).map(v=>v.kleur).filter((x,i,z)=>z.indexOf(x)===i).join(', '))+' · '+T('rt.totvoorraad','voorraad')+' '+(a.voorraad||0)+'</div>'+
@@ -3570,7 +3570,7 @@
         '<div class="field"><label>'+T('rt.f.startvoorraad','Startvoorraad p. maat')+'</label><input id="rArtVoorraad" type="number" value="'+(a?'':'8')+'" placeholder="'+T('rt.optioneel','optioneel')+'"></div>'+
         '<div class="field"><label>'+T('rt.f.drop','Drop-datum')+'</label><input id="rArtDrop" type="date" value="'+esc(a&&a.drop?a.drop.datum:'')+'"></div>'+
       '</div>'+
-      '<div class="field"><label>'+T('rt.f.foto','Foto')+'</label><label class="obtn" style="cursor:pointer;">📷 '+T('rt.f.kiesfoto','Kies foto')+'<input type="file" id="rArtFoto" accept="image/*" style="display:none;"></label> <span id="rArtFotoNaam" style="font-size:0.75rem;color:var(--muted);">'+(a&&a.foto?T('rt.fotoaanwezig','foto aanwezig'):'')+'</span></div>'+
+      '<div class="field"><label>'+T('rt.f.foto','Foto')+'</label><label class="obtn" style="cursor:pointer;">'+T('rt.f.kiesfoto','Kies foto')+'<input type="file" id="rArtFoto" accept="image/*" style="display:none;"></label> <span id="rArtFotoNaam" style="font-size:0.75rem;color:var(--muted);">'+(a&&a.foto?T('rt.fotoaanwezig','foto aanwezig'):'')+'</span></div>'+
       '<div style="margin-top:0.8rem;display:flex;gap:0.5rem;"><button class="obtn primary" id="rArtBewaar">'+T('rt.bewaar','Bewaar artikel')+'</button><button class="obtn" id="rArtAnnuleer">'+T('rt.annuleer','Annuleer')+'</button></div></div>';
   }
   function retailVoorraadView(){
@@ -3777,14 +3777,14 @@
   function paspoortInzageKaart(inh){
     let body = '';
     if (inh.niveau === 'bevestiging'){
-      body = '<div style="font-size:0.9rem;">'+(inh.geverifieerd?'✅ '+T('pn.geverifieerd','RTG-geverifieerd'):'⛔ '+T('pn.nietgeverifieerd','niet geverifieerd'))+
-        (inh.voldoetLeeftijd!=null?'<br>'+(inh.voldoetLeeftijd?'✅ '+T('pn.voldoet','voldoet aan de leeftijdseis'):'⛔ '+T('pn.voldoetniet','voldoet NIET aan de leeftijdseis')):'')+'</div>';
+      body = '<div style="font-size:0.9rem;">'+(inh.geverifieerd?''+T('pn.geverifieerd','RTG-geverifieerd'):''+T('pn.nietgeverifieerd','niet geverifieerd'))+
+        (inh.voldoetLeeftijd!=null?'<br>'+(inh.voldoetLeeftijd?''+T('pn.voldoet','voldoet aan de leeftijdseis'):''+T('pn.voldoetniet','voldoet NIET aan de leeftijdseis')):'')+'</div>';
     } else {
       body = '<div style="display:flex;gap:0.8rem;">'+
         (inh.foto?'<img src="'+esc(inh.foto)+'" alt="'+T('pn.pasfoto','Pasfoto')+'" style="width:80px;height:100px;object-fit:cover;border-radius:10px;flex-shrink:0;">':'')+
         '<div><div style="font-weight:700;font-size:0.95rem;">'+esc(inh.naam||'')+'</div>'+
         '<div class="ds">'+(inh.nationaliteit?esc(inh.nationaliteit)+' · ':'')+(inh.geboortedatum?esc(inh.geboortedatum):'')+(inh.leeftijd!=null?' ('+inh.leeftijd+')':'')+'</div>'+
-        '<div class="ds" style="margin-top:0.3rem;color:var(--green);">'+(inh.geverifieerd?'✅ '+T('pn.geverifieerd','RTG-geverifieerd'):'')+(inh.gezichtGecontroleerd?' · '+T('pn.gezicht','gezicht gecontroleerd'):'')+'</div></div></div>'+
+        '<div class="ds" style="margin-top:0.3rem;color:var(--green);">'+(inh.geverifieerd?''+T('pn.geverifieerd','RTG-geverifieerd'):'')+(inh.gezichtGecontroleerd?' · '+T('pn.gezicht','gezicht gecontroleerd'):'')+'</div></div></div>'+
         (inh.scan?'<div style="margin-top:0.6rem;"><div class="tt-h">'+T('pn.scan','Paspoortscan')+'</div><img src="'+esc(inh.scan)+'" alt="'+T('pn.scan','Paspoortscan')+'" style="width:100%;border-radius:10px;margin-top:0.4rem;"></div>':'');
     }
     return '<div class="card" style="border-color:var(--gold);"><div class="tt-h" style="color:var(--gold);">'+T('pn.inzage','Inzage')+' · '+T('pn.niveau.'+inh.niveau, inh.niveau)+'</div><div style="margin-top:0.5rem;">'+body+'</div>'+
@@ -3802,10 +3802,10 @@
         if (r.niveau === 'bevestiging'){
           const be = r.bevestiging;
           uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:12px;font-size:0.88rem;">'+
-            (be.geverifieerd?'✅ '+T('pn.geverifieerd','RTG-geverifieerd'):'⛔ '+T('pn.nietgeverifieerd','niet geverifieerd'))+
-            (be.voldoetLeeftijd!=null?' · '+(be.voldoetLeeftijd?'✅ '+be.minLeeftijd+'+':'⛔ '+T('pn.voldoetniet','voldoet niet')):'')+'</div>';
+            (be.geverifieerd?''+T('pn.geverifieerd','RTG-geverifieerd'):''+T('pn.nietgeverifieerd','niet geverifieerd'))+
+            (be.voldoetLeeftijd!=null?' · '+(be.voldoetLeeftijd?''+be.minLeeftijd+'+':''+T('pn.voldoetniet','voldoet niet')):'')+'</div>';
         } else {
-          uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:12px;font-size:0.85rem;color:var(--amber);">⏳ '+T('pn.verstuurd','Verzoek verstuurd. De gast krijgt een melding en kan het goedkeuren of weigeren.')+'</div>';
+          uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:12px;font-size:0.85rem;color:var(--amber);">'+T('pn.verstuurd','Verzoek verstuurd. De gast krijgt een melding en kan het goedkeuren of weigeren.')+'</div>';
           await laadPaspoort();
         }
       } catch(e){ toast(e.message); }
@@ -3903,7 +3903,7 @@
     for (const g of (markt.groothandels||[])){
       h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">'+
         '<div style="display:flex;gap:0.5rem;align-items:center;"><b style="flex:1;">'+esc(g.naam)+'</b>'+
-        '<button class="js-inkai" data-code="'+g.code+'" style="background:var(--card2);border:1px solid var(--gold);border-radius:8px;padding:0.3rem 0.6rem;color:var(--gold);font-size:0.72rem;font-weight:600;font-family:inherit;">✨ '+T('ink.ai','AI-bijbestellen')+'</button></div>'+
+        '<button class="js-inkai" data-code="'+g.code+'" style="background:var(--card2);border:1px solid var(--gold);border-radius:8px;padding:0.3rem 0.6rem;color:var(--gold);font-size:0.72rem;font-weight:600;font-family:inherit;">'+T('ink.ai','AI-bijbestellen')+'</button></div>'+
         '<div id="inkai-'+g.code+'"></div>'+
         g.producten.slice(0,60).map(p => '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-top:1px solid var(--line);">'+
           '<div style="flex:1;"><span style="font-size:0.83rem;">'+esc(p.naam)+'</span><span class="sub"> · '+eur(p.prijs)+'/'+esc(p.eenheid)+'</span></div>'+
@@ -3953,7 +3953,7 @@
     if (!has('retail')){ el.innerHTML = ''; return; }
     let d; try { d = await API.call('/supplier/mode/bezorg/overzicht'); } catch(e){ el.innerHTML=''; return; }
     const ins = d.instellingen || { aan:false };
-    let h = '<div class="st-sec" style="margin-top:1.4rem;">🛍️ '+T('mb.h','Veilige bezorgdienst')+'</div>';
+    let h = '<div class="st-sec" style="margin-top:1.4rem;">'+T('mb.h','Veilige bezorgdienst')+'</div>';
     h += '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;margin-bottom:0.8rem;">'+
       '<label style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;"><input type="checkbox" id="mbAan"'+(ins.aan?' checked':'')+'> '+T('mb.aan','Bezorgen aan (met bezorgcode, foto-bewijs en live volgen)')+'</label>'+
       '<div class="row-gap" style="margin-top:0.5rem;"><input id="mbKosten" class="st-in" type="number" step="0.5" placeholder="'+T('mb.kosten','Kosten €')+'" value="'+(ins.kosten!=null?ins.kosten:'')+'" style="flex:1;"><input id="mbGratis" class="st-in" type="number" placeholder="'+T('mb.gratis','Gratis vanaf €')+'" value="'+(ins.gratisVanaf!=null?ins.gratisVanaf:'')+'" style="flex:1;"><input id="mbId" class="st-in" type="number" placeholder="'+T('mb.idgrens','ID vanaf €')+'" value="'+(ins.waardegrensId!=null?ins.waardegrensId:'')+'" style="flex:1;"></div>'+
@@ -3970,14 +3970,14 @@
     el.querySelectorAll('[data-mbretour]').forEach(b => b.addEventListener('click', async () => { const r = prompt(T('mb.retourreden','Reden van retour?'),'Past niet'); if (r===null) return; try { await API.call('/supplier/mode/bezorg/retour', { ref:b.dataset.mbretour, reden:r }); renderModeBezorg(); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-mbaf]').forEach(b => b.addEventListener('click', async () => {
       const code = prompt(T('mb.vraagcode','Bezorgcode van de klant (uit de app):')); if (!code) return;
-      try { await API.call('/supplier/mode/bezorg/overhandig', { ref:b.dataset.mbaf, bezorgcode:code.trim(), idOk:true }); toast('✅ '+T('mb.afgeleverd','Veilig afgeleverd.')); renderModeBezorg(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/mode/bezorg/overhandig', { ref:b.dataset.mbaf, bezorgcode:code.trim(), idOk:true }); toast(''+T('mb.afgeleverd','Veilig afgeleverd.')); renderModeBezorg(); } catch(e){ toast(e.message); }
     }));
   }
   function mbKaart(b){
     const done = ['afgeleverd','retour','geannuleerd'].includes(b.status);
     return '<div style="border:1px solid '+(b.status==='onderweg'?'var(--gold)':'var(--line)')+';border-radius:12px;padding:0.7rem 0.85rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.85rem;">'+esc(b.codenaam)+' · '+eur(b.waarde)+(b.kosten?' + '+eur(b.kosten):'')+'</b>'+
-      '<span class="sub">'+esc(b.status)+(b.idVereist?' · 🪪':'')+'</span></div>'+
+      '<span class="sub">'+esc(b.status)+(b.idVereist?' · ':'')+'</span></div>'+
       '<div class="sub">'+b.items.map(i=>i.aantal+'× '+esc(i.naam)+(i.maat?' ('+esc(i.maat)+')':'')).join(', ')+' · '+esc(b.adres)+'</div>'+
       (b.koerier?'<div class="sub">'+T('mb.koerier','koerier')+': '+esc(b.koerier)+'</div>':'')+
       (!done ? '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">'+
@@ -3999,7 +3999,7 @@
     // showroom
     h += '<div class="st-sec" style="margin-top:1rem;">'+T('vk.showroom','Showroom')+' <button class="js-vknew" style="float:right;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;font-family:inherit;">+ '+T('vk.nieuw','Auto toevoegen')+'</button></div><div id="vkForm"></div>';
     h += (d.showroom||[]).map(a => '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-top:1px solid var(--line);">'+
-      '<div style="flex:1;"><b style="font-size:0.85rem;">'+(a.vip?'★ ':'')+esc(a.naam)+'</b><span class="sub"> · '+eur(a.prijs)+' · '+a.km.toLocaleString('nl-NL')+' km · '+esc(a.brandstof)+'</span>'+
+      '<div style="flex:1;"><b style="font-size:0.85rem;">'+(a.vip?'':'')+esc(a.naam)+'</b><span class="sub"> · '+eur(a.prijs)+' · '+a.km.toLocaleString('nl-NL')+' km · '+esc(a.brandstof)+'</span>'+
       '<div class="sub">'+esc(a.status)+(a.garantieMnd?' · '+a.garantieMnd+' mnd garantie':'')+'</div></div>'+
       '<button class="js-vkedit" data-id="'+a.id+'" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.3rem 0.6rem;color:var(--txt);font-size:0.72rem;font-family:inherit;">'+T('vk.bewerk','Bewerk')+'</button></div>').join('');
     el.innerHTML = h;
@@ -4026,7 +4026,7 @@
       else if (d.status==='ingepland') acties = '<button class="js-vkact" data-vkact="'+d.ref+'" data-act="gereden" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vk.gereden','Gereden')+'</button>';
     }
     return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;margin-top:0.5rem;">'+
-      '<div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.85rem;">'+(koop?'🔑 ':'🚗 ')+esc(d.autoNaam)+'</b><span class="sub">'+esc(d.codenaam)+' · '+esc(d.status)+'</span></div>'+
+      '<div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.85rem;">'+(koop?'':'')+esc(d.autoNaam)+'</b><span class="sub">'+esc(d.codenaam)+' · '+esc(d.status)+'</span></div>'+
       '<div class="sub">'+(koop? (T('vk.bod','bod')+' '+eur(d.bod||0)+(d.inruil?' · '+T('vk.inruil','inruil')+' '+esc([d.inruil.merk,d.inruil.model].filter(Boolean).join(' ')):'')+(d.concierge?' · '+T('vk.concierge','concierge')+' '+esc(d.adres||''):'')) : (d.wens?esc(d.wens):T('vk.proefrit','proefrit'))+(d.moment?' · '+esc(d.moment):''))+'</div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+acties+'<button class="js-vkact" data-vkact="'+d.ref+'" data-act="afwijs" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.75rem;">'+T('vk.afwijs','Afwijzen')+'</button></div></div>';
   }
@@ -4160,7 +4160,7 @@
     });
     el.querySelectorAll('[data-vret]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/etappe', { id:b.dataset.vret }); renderVracht(); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-vrdouane]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/douane', { id:b.dataset.vrdouane }); renderVracht(); } catch(e){ toast(e.message); } }));
-    el.querySelectorAll('[data-vraf]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/afleveren', { id:b.dataset.vraf }); toast('✅ '+T('vr.klaar','Afgeleverd en getekend.')); renderVracht(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-vraf]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/afleveren', { id:b.dataset.vraf }); toast(''+T('vr.klaar','Afgeleverd en getekend.')); renderVracht(); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-vrmeld]').forEach(b => b.addEventListener('click', async () => {
       const t = prompt(T('vr.meldvraag','Korte melding voor het logboek (de klant ziet dit op de volgcode):')); if (!t) return;
       try { await API.call('/supplier/vracht/melding', { id:b.dataset.vrmeld, tekst:t }); renderVracht(); } catch(e){ toast(e.message); }
@@ -4854,12 +4854,12 @@
     const dagLbl = d => { try { return new Date(d+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{weekday:'short',day:'numeric',month:'short'}); } catch(e){ return d; } };
     const inp = 'style="background:var(--card,var(--bg));border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"';
     const items = o.items||[];
-    return '<div class="card"><div class="tt-h">📅 '+T('ag.titel','Agenda')+(o.telling?' <span style="color:#E0736A;">('+o.telling+')</span>':'')+'</div>'+
+    return '<div class="card"><div class="tt-h">'+T('ag.titel','Agenda')+(o.telling?' <span style="color:#E0736A;">('+o.telling+')</span>':'')+'</div>'+
       (items.length ? items.map(i => '<div class="mitem" data-agitem="'+i.id+'" style="opacity:'+(i.gedaan?'0.55':'1')+';"><div class="r1"><span class="nm">'+(i.gedaan?'✓ ':'')+esc(i.titel)+'</span><span class="pr" style="color:var(--soft);">'+esc(dagLbl(i.datum))+(i.tijd?' · '+esc(i.tijd):'')+'</span></div>'+
         (canEdit?'<div style="margin-top:0.35rem;display:flex;gap:0.4rem;">'+(!i.gedaan?'<button class="obtn" data-'+prefix+'done="'+i.id+'">'+T('ag.gedaan','Gedaan')+'</button>':'')+'<button class="rr-del" data-'+prefix+'del="'+i.id+'">✕</button></div>':'')+'</div>').join('')
         : '<div class="ds" style="margin-top:0.5rem;">'+T('ag.leeg','Nog niets gepland. Typ hieronder of laat de AI het inplannen.')+'</div>')+
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><input id="'+prefix+'Titel" placeholder="'+T('ag.wat','Afspraak')+'" '+inp+' style="flex:1;min-width:8rem;"><input id="'+prefix+'Datum" type="date" '+inp+'><input id="'+prefix+'Tijd" type="time" '+inp+'><button class="obtn primary" id="'+prefix+'Add">+</button></div>'+
-        '<div style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;"><div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.3rem;">✨ '+T('ag.aihint','Of typ het in gewone taal:')+'</div><div id="'+prefix+'AiOut"></div><div style="display:flex;gap:0.4rem;margin-top:0.4rem;"><input id="'+prefix+'AiIn" placeholder="'+T('ag.aiph','bijv. vergadering morgen om 15u')+'" '+inp+' style="flex:1;"><button class="obtn primary" id="'+prefix+'AiGo">'+T('ag.plan','Plan')+'</button></div></div>' : '')+'</div>';
+        '<div style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;"><div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.3rem;">'+T('ag.aihint','Of typ het in gewone taal:')+'</div><div id="'+prefix+'AiOut"></div><div style="display:flex;gap:0.4rem;margin-top:0.4rem;"><input id="'+prefix+'AiIn" placeholder="'+T('ag.aiph','bijv. vergadering morgen om 15u')+'" '+inp+' style="flex:1;"><button class="obtn primary" id="'+prefix+'AiGo">'+T('ag.plan','Plan')+'</button></div></div>' : '')+'</div>';
   }
   function renderAgendaSup(){
     const el = $('#agendaSupCard'); if (!el) return;
@@ -4882,24 +4882,24 @@
     let h = funcBlok(T('zb.functies','Functies (aan/uit)'), d.functies||[], zbChips);
     // HR
     const hr = d.hr || {};
-    h += '<div class="st-sec">👥 '+T('zb.hr','HR')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.6rem;">'+
+    h += '<div class="st-sec">'+T('zb.hr','HR')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.6rem;">'+
       zbCel(hr.teamAantal||0, T('zb.team','Team'))+zbCel(hr.ingeklokt||0, T('zb.ingeklokt','Ingeklokt'))+
       zbCel(hr.openVerlof||0, T('zb.verlof','Verlof/ziek'), hr.openVerlof)+zbCel(hr.openSollicitaties||0, T('zb.soll','Sollicitaties'), hr.openSollicitaties)+
       zbCel(hr.openVacatures||0, T('zb.vac','Vacatures'))+'</div>'+
       '<button class="js-zbnaar" data-tab="team" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-size:0.75rem;font-family:inherit;margin-bottom:1rem;">'+T('zb.naarteam','Naar het team ›')+'</button>';
     // Marketing
     const mk = d.marketing || {};
-    h += '<div class="st-sec">📣 '+T('zb.marketing','Marketing (De Salon)')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
+    h += '<div class="st-sec">'+T('zb.marketing','Marketing (De Salon)')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
       zbCel(mk.volgers||0, T('zb.volgers','Volgers'))+zbCel(mk.posts||0, T('zb.posts','Posts'))+
       zbCel(mk.lopendeDeal?1:0, T('zb.deal','Actie'))+zbCel(mk.lopendePoll?1:0, T('zb.poll','Poll'))+'</div>'+
-      '<div class="sub" style="margin-bottom:0.4rem;">'+(mk.salonActief? (mk.bioIngevuld&&mk.fotoIngevuld ? '✓ '+T('zb.compleet','profiel compleet, zichtbaar voor leden') : '⚠️ '+T('zb.onvolledig','profiel onvolledig, nog niet zichtbaar')) : '○ '+T('zb.salonuit','Salon-marketing staat uit'))+'</div>'+
+      '<div class="sub" style="margin-bottom:0.4rem;">'+(mk.salonActief? (mk.bioIngevuld&&mk.fotoIngevuld ? '✓ '+T('zb.compleet','profiel compleet, zichtbaar voor leden') : ''+T('zb.onvolledig','profiel onvolledig, nog niet zichtbaar')) : '○ '+T('zb.salonuit','Salon-marketing staat uit'))+'</div>'+
       (mk.laatstePost? '<div class="sub">'+T('zb.laatste','Laatste post')+': '+esc(mk.laatstePost.text)+'</div>' : '')+
       '<button class="js-zbnaar" data-tab="page" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-size:0.75rem;font-family:inherit;margin-top:0.5rem;">'+T('zb.naarsalon','Naar De Salon ›')+'</button>';
     // Rechtstreekse ontvangsten: geld dat direct van klanten binnenkwam (Face ID)
     let ont = null; try { ont = await API.call('/supplier/ontvangsten'); } catch(e){}
     if (ont){
       const e2 = n => '€ '+((n||0)/100).toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2});
-      h += '<div class="st-sec">💸 '+T('zb.ontvangsten','Rechtstreekse ontvangsten')+'</div>'+
+      h += '<div class="st-sec">'+T('zb.ontvangsten','Rechtstreekse ontvangsten')+'</div>'+
         '<div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
         '<div class="b" style="flex:1;min-width:5rem;"><div class="v">'+e2(ont.som)+'</div><div class="l">'+T('zb.binnen','Binnengekomen')+'</div></div>'+
         '<div class="b" style="flex:1;min-width:4.5rem;"><div class="v">'+(ont.aantal||0)+'</div><div class="l">'+T('zb.betalingen','Betalingen')+'</div></div>'+
@@ -4917,7 +4917,7 @@
     if (has('boerderij')){
       let bo = boer; if (!bo){ try { bo = await API.call('/supplier/boerderij/overzicht', {}); boer = bo; } catch(e){} }
       if (bo){ const bst = bo.stats||{}; const bbr = bo.briefing||{ punten:[] };
-        h += '<div class="st-sec">🚜 '+T('zb.boer','Boerderij')+(bo.typeLabel?' · '+esc(bo.typeLabel):'')+'</div>'+
+        h += '<div class="st-sec">'+T('zb.boer','Boerderij')+(bo.typeLabel?' · '+esc(bo.typeLabel):'')+'</div>'+
           '<div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
           zbCel(bst.teOogsten||0, T('zb.oogstklaar','Oogstklaar'), bst.teOogsten)+
           zbCel((bst.hectare||0)+' ha', T('zb.areaal','Areaal'))+
@@ -4929,7 +4929,7 @@
       }
     }
     // de belastingtool van de zaak: dezelfde motor als de Business Pass
-    h += '<div class="st-sec">🧮 '+T('zb.bel','Belastingtool')+'</div>'+
+    h += '<div class="st-sec">'+T('zb.bel','Belastingtool')+'</div>'+
       '<div class="sub" style="margin-bottom:0.4rem;">'+T('zb.bel.s','Vul de verwachte jaarwinst in voor een indicatie van de belasting, de nettowinst en wat u maandelijks opzij zet. Het land van de zaak is het vertrekpunt.')+'</div>'+
       '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
       '<input id="zbBelWinst" type="number" min="1" placeholder="'+T('zb.bel.ph','jaarwinst €')+'" style="width:9rem;">'+
@@ -4948,7 +4948,7 @@
           d2.posten.map(p2 => rij(p2.label, (p2.bedrag<0?'- ':'')+eur(Math.abs(p2.bedrag)))).join('')+
           rij(T('zb.bel.betalen','Te betalen (indicatie)'), eur(d2.belasting), true)+
           rij(T('zb.bel.netto','Netto over'), eur(d2.netto), true)+
-          '<div style="margin-top:0.5rem;color:var(--gold);">💡 '+T('zb.bel.zet','Zet ~')+d2.reserveerPct+'% '+T('zb.bel.opzij','opzij: ongeveer')+' '+eur(d2.perMaand)+' '+T('zb.bel.pm','per maand')+'.</div>'+
+          '<div style="margin-top:0.5rem;color:var(--gold);">'+T('zb.bel.zet','Zet ~')+d2.reserveerPct+'% '+T('zb.bel.opzij','opzij: ongeveer')+' '+eur(d2.perMaand)+' '+T('zb.bel.pm','per maand')+'.</div>'+
           '<div style="margin-top:0.4rem;font-size:0.64rem;color:var(--soft);">'+T('zb.bel.disc','Indicatie; dit is voorlichting, geen bindend fiscaal advies.')+'</div>';
       } catch(e){ box.textContent = e.message; }
     });
@@ -4961,7 +4961,7 @@
     if (bvSend) bvSend.addEventListener('click', async () => {
       const bedrag = Number(($('#bvBedrag')||{}).value);
       if (!(bedrag >= 0.5)) { toast(T('zb.bedragmin','Kies een bedrag van minstens € 0,50.')); return; }
-      try { await API.call('/supplier/betaalverzoek', { codename: ($('#bvCode')||{}).value, bedrag, omschrijving: ($('#bvOms')||{}).value }); toast('💸 '+T('zb.verzoekgestuurd','Betaalverzoek verstuurd.')); renderZaakBoard(); }
+      try { await API.call('/supplier/betaalverzoek', { codename: ($('#bvCode')||{}).value, bedrag, omschrijving: ($('#bvOms')||{}).value }); toast(''+T('zb.verzoekgestuurd','Betaalverzoek verstuurd.')); renderZaakBoard(); }
       catch(e){ toast(e.message); }
     });
     el.querySelectorAll('[data-bvweg]').forEach(b => b.addEventListener('click', async () => {
@@ -5016,7 +5016,7 @@
       zbCel(cmd.openVandaag, T('bev.openvandaag','Open vandaag'), cmd.openVandaag)+
       zbCel(cmd.openAanvragen, T('bev.aanvragen','Aanvragen'), cmd.openAanvragen)+
       zbCel(cmd.incidentenOpen, T('bev.incidenten','Incidenten'), cmd.incidentenOpen)+'</div>';
-    if (cmd.sosActief) h += '<div class="card" style="border:1px solid var(--rood);background:#3a1420;color:#F4B8C6;margin-bottom:0.8rem;font-weight:600;">🆘 '+T('bev.sos','Actieve SOS! Een bewaker heeft de noodknop ingedrukt. Bekijk het incident en stuur bijstand.')+'</div>';
+    if (cmd.sosActief) h += '<div class="card" style="border:1px solid var(--rood);background:#3a1420;color:#F4B8C6;margin-bottom:0.8rem;font-weight:600;">'+T('bev.sos','Actieve SOS! Een bewaker heeft de noodknop ingedrukt. Bekijk het incident en stuur bijstand.')+'</div>';
     // 2) functies aan/uit
     const bevChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
       (cmd.functies||[]).map(f => '<button class="js-bevf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--rood)')+';background:'+(f.aan?'#12321f':'#3a1420')+';color:'+(f.aan?'#7EE0A3':'#F4B8C6')+';border-radius:999px;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.aan?'● ':'○ ')+esc(f.naam)+'</button>').join('')+'</div>';
@@ -5024,7 +5024,7 @@
     // 3) budget
     if (b.budgetUren){
       const kleur = b.overschrijding ? 'var(--rood)' : (b.pct>=85?'#E0A93A':'#7EE0A3');
-      h += '<div class="st-sec">💶 '+T('bev.budget','Budget & uren')+'</div>'+
+      h += '<div class="st-sec">'+T('bev.budget','Budget & uren')+'</div>'+
         '<div class="card" style="margin-bottom:1rem;">'+
         '<div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;"><span>'+b.urenGepland+' / '+b.budgetUren+' '+T('bev.uur','uur')+' ('+b.maand+')</span><b>€ '+b.bestedBedrag+' / € '+b.budgetBedrag+'</b></div>'+
         '<div style="height:8px;border-radius:99px;background:var(--card2);overflow:hidden;"><div style="height:100%;width:'+Math.min(100,b.pct)+'%;background:'+kleur+';"></div></div>'+
@@ -5036,10 +5036,10 @@
         '</div>';
     }
     // 4) rooster met AI-overname
-    h += '<div class="st-sec">📋 '+T('bev.rooster','Rooster')+'</div>'+
+    h += '<div class="st-sec">'+T('bev.rooster','Rooster')+'</div>'+
       '<div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;flex-wrap:wrap;">'+
       '<input id="bevDag" type="date" value="'+bevDatum+'" style="width:11rem;">'+
-      '<button class="abtn" id="bevAI">✨ '+T('bev.ai','AI neemt het over')+'</button></div>';
+      '<button class="abtn" id="bevAI">'+T('bev.ai','AI neemt het over')+'</button></div>';
     const dag = roo.dagen && roo.dagen[0];
     if (dag){
       h += '<div class="card" style="margin-bottom:1rem;">'+ (dag.posten.length? dag.posten.map(p =>
@@ -5053,7 +5053,7 @@
       ).join('') : '<div class="softline">'+T('bev.geenpost','Nog geen posten. Voeg hieronder objecten toe.')+'</div>')+'</div>';
     }
     // 5) inzetaanvragen
-    h += '<div class="st-sec">🛡️ '+T('bev.inzet','Inzetaanvragen')+'</div>';
+    h += '<div class="st-sec">'+T('bev.inzet','Inzetaanvragen')+'</div>';
     const open = (cmd.functies||[]).find(f=>f.id==='aanvragen' && f.aan);
     h += '<div class="card" style="margin-bottom:1rem;"><div id="bevAvLijst"></div>'+
       (open? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
@@ -5065,7 +5065,7 @@
       '</div>';
     // 6) posten beheren
     const posten = cmd.postenLijst || [];
-    h += '<div class="st-sec">📍 '+T('bev.postbeheer','Posten & objecten')+'</div>'+
+    h += '<div class="st-sec">'+T('bev.postbeheer','Posten & objecten')+'</div>'+
       '<div class="card" style="margin-bottom:1rem;">'+
       (posten.length? posten.map(p => '<div style="border-bottom:1px solid var(--line);padding:0.35rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
         '<span><b>'+esc(p.naam)+'</b>'+(p.klant?' · '+esc(p.klant):'')+' · '+(p.minMan||1)+' '+T('bev.man','man')+(p.orders?'<br><span class="sub">'+esc(p.orders)+'</span>':'')+'</span>'+
@@ -5077,9 +5077,9 @@
       '<button class="abtn" id="bevPostAdd">'+T('bev.postadd','Post toevoegen')+'</button></div></div>';
     // 7) incidenten
     if (cmd.incidenten && cmd.incidenten.length){
-      h += '<div class="st-sec">🚨 '+T('bev.incs','Incidenten')+'</div><div class="card" style="margin-bottom:0.5rem;">'+
+      h += '<div class="st-sec">'+T('bev.incs','Incidenten')+'</div><div class="card" style="margin-bottom:0.5rem;">'+
         cmd.incidenten.map(x => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
-          '<span><b'+(x.ernst==='kritiek'||x.ernst==='hoog'?' style="color:var(--rood);"':'')+'>'+(x.sos?'🆘 ':'')+esc(x.soort)+'</b> · '+esc(x.post)+' · '+esc(x.guardNaam||'')+'<br><span class="sub">'+esc(x.tekst)+'</span></span>'+
+          '<span><b'+(x.ernst==='kritiek'||x.ernst==='hoog'?' style="color:var(--rood);"':'')+'>'+(x.sos?'':'')+esc(x.soort)+'</b> · '+esc(x.post)+' · '+esc(x.guardNaam||'')+'<br><span class="sub">'+esc(x.tekst)+'</span></span>'+
           '<button class="bev-inc" data-id="'+x.id+'" style="align-self:flex-start;">'+(x.status==='open'?T('bev.afh','Afhandelen'):T('bev.heropen','Heropen'))+'</button></div>').join('')+'</div>';
     }
     el.innerHTML = h;
@@ -5188,7 +5188,7 @@
     const revenue = (state.orders||[]).filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
     $('#homeH').textContent = T('sup.hello','Goedendag,') + ' ' + S.name.split(' ')[0] + '.';
     const rating = state.reviews && state.reviews.rating;
-    $('#homeSub').textContent = tType(S.typeLabel) + (rating ? ' · ⭐ ' + rating.score + ' (' + rating.aantal + ' reviews)' : '') + ' · ' + T('sup.connected','verbonden met RTG');
+    $('#homeSub').textContent = tType(S.typeLabel) + (rating ? ' ·  ' + rating.score + ' (' + rating.aantal + ' reviews)' : '') + ' · ' + T('sup.connected','verbonden met RTG');
     let stat = '';
     if (has('orders')) stat += '<div class="b"><div class="l">'+T('sup.openorders','Open orders')+'</div><div class="v a">'+open.length+'</div></div>';
     if (has('rides')) stat += '<div class="b"><div class="l">'+T('tab.rides','Ritten')+'</div><div class="v a">'+(state.rides||[]).length+'</div></div>';
@@ -5200,28 +5200,28 @@
     // Vandaag nog doen: alles wat aandacht vraagt, met een sprong naar de juiste tab
     const todos = [];
     const unreadChats = (state.guestChats || []).reduce((n, c) => n + (c.unread || 0), 0);
-    if (unreadChats) todos.push({ icon:'💬', txt: unreadChats + ' ' + T('todo.chats','onbeantwoord(e) gastbericht(en)'), tab:'gchat' });
+    if (unreadChats) todos.push({ icon:'', txt: unreadChats + ' ' + T('todo.chats','onbeantwoord(e) gastbericht(en)'), tab:'gchat' });
     const newOrders = (state.orders || []).filter(o => o.status === 'nieuw').length;
-    if (newOrders) todos.push({ icon:'🛎️', txt: newOrders + ' ' + T('todo.orders','nieuwe bestelling(en)'), tab:'orders' });
+    if (newOrders) todos.push({ icon:'', txt: newOrders + ' ' + T('todo.orders','nieuwe bestelling(en)'), tab:'orders' });
     const newRides = (state.rides || []).filter(r => r.status === 'aangevraagd').length;
-    if (newRides) todos.push({ icon:'🚗', txt: newRides + ' ' + T('todo.rides','open ritaanvraag/-vragen'), tab:'rides' });
+    if (newRides) todos.push({ icon:'', txt: newRides + ' ' + T('todo.rides','open ritaanvraag/-vragen'), tab:'rides' });
     if (state.minibar){
       const roomsAll = (state.rooms || []).map(r => r.name);
       const notCounted = roomsAll.filter(r => !state.minibar.countedToday.includes(r));
-      if (notCounted.length) todos.push({ icon:'🧊', txt: notCounted.length + ' ' + T('todo.minibar','minibar(s) nog tellen'), tab:'minibar' });
+      if (notCounted.length) todos.push({ icon:'', txt: notCounted.length + ' ' + T('todo.minibar','minibar(s) nog tellen'), tab:'minibar' });
     }
     const openRooms = Object.keys((state.pos && state.pos.openRooms) || {}).length;
-    if (openRooms) todos.push({ icon:'🧾', txt: openRooms + ' ' + T('todo.folio','open kamerrekening(en)'), tab:'kassa' });
+    if (openRooms) todos.push({ icon:'', txt: openRooms + ' ' + T('todo.folio','open kamerrekening(en)'), tab:'kassa' });
     const dirty = (state.rooms || []).filter(r => r.hk && (r.hk.status === 'vuil')).length;
-    if (dirty) todos.push({ icon:'🧹', txt: dirty + ' ' + T('todo.dirty','kamer(s) schoon te maken'), tab:'rooms' });
+    if (dirty) todos.push({ icon:'', txt: dirty + ' ' + T('todo.dirty','kamer(s) schoon te maken'), tab:'rooms' });
     const defect = (state.rooms || []).filter(r => r.hk && r.hk.status === 'defect').length;
-    if (defect) todos.push({ icon:'⚠️', txt: defect + ' ' + T('todo.defect','kamer(s) defect'), tab:'rooms' });
+    if (defect) todos.push({ icon:'', txt: defect + ' ' + T('todo.defect','kamer(s) defect'), tab:'rooms' });
     const openTickets = (state.tickets || []).filter(t => t.status !== 'klaar').length;
-    if (openTickets) todos.push({ icon:'🔧', txt: openTickets + ' ' + T('todo.tickets','open klus(sen)'), tab:'klussen' });
+    if (openTickets) todos.push({ icon:'', txt: openTickets + ' ' + T('todo.tickets','open klus(sen)'), tab:'klussen' });
     const newApps = (state.applications || []).filter(x => x.status === 'nieuw').length;
-    if (newApps) todos.push({ icon:'📝', txt: newApps + ' ' + T('todo.apps','nieuwe sollicitatie(s)'), tab:'team' });
+    if (newApps) todos.push({ icon:'', txt: newApps + ' ' + T('todo.apps','nieuwe sollicitatie(s)'), tab:'team' });
     const openRes = (state.reserveringen || []).filter(r => r.status === 'aangevraagd').length;
-    if (openRes) todos.push({ icon:'🪑', txt: openRes + ' ' + T('todo.res','open reservering(en) om te bevestigen'), tab:'orders' });
+    if (openRes) todos.push({ icon:'', txt: openRes + ' ' + T('todo.res','open reservering(en) om te bevestigen'), tab:'orders' });
     extra += '<div class="card"><div class="tt-h">' + T('todo.h','Vandaag nog doen') + '</div>' +
       (todos.length ? todos.map(t =>
         '<button class="todo-row" data-goto="' + t.tab + '"><span>' + t.icon + '</span><b>' + t.txt + '</b><i>›</i></button>'
@@ -5231,9 +5231,9 @@
     // recente reviews van gasten (1-5 sterren, geplaatst na afronding)
     const recentRevs = (state.reviews && state.reviews.recent) || [];
     if (recentRevs.length){
-      extra += '<div class="card"><div class="tt-h">⭐ ' + T('rev.h','Recente reviews') + '</div>' +
+      extra += '<div class="card"><div class="tt-h">' + T('rev.h','Recente reviews') + '</div>' +
         recentRevs.slice(0,3).map(r =>
-          '<div style="margin-top:0.55rem;font-size:0.8rem;"><b>' + '★'.repeat(r.score) + '<span style="opacity:0.25;">' + '★'.repeat(5 - r.score) + '</span></b> <span class="cn">' + r.codename + '</span>' +
+          '<div style="margin-top:0.55rem;font-size:0.8rem;"><b>' + ''.repeat(r.score) + '<span style="opacity:0.25;">' + ''.repeat(5 - r.score) + '</span></b> <span class="cn">' + r.codename + '</span>' +
           (r.tekst ? '<div style="color:var(--soft);font-size:0.76rem;margin-top:0.15rem;">' + r.tekst + '</div>' : '') + '</div>'
         ).join('') + '</div>';
     }
@@ -5272,11 +5272,11 @@
           E('div', { class: 'amt' }, eur(o.total)),
           E('div', { style: { marginTop: '0.3rem' } }, E('span', { class: 'pill ' + pillClass(o.status) }, tStatus(o.status))))),
       E('ul', {}, o.items.map(i => E('li', {}, E('span', {}, i.qty + '× ' + i.name), E('span', {}, eur(i.price * i.qty))))),
-      o.guestArrived ? E('div', { class: 'enroute here' }, '🎉 ' + T('sup.guesthere', 'Gast is gearriveerd. Serveer nu.'))
-        : (o.guestEtaMin != null ? E('div', { class: 'enroute' }, '📍 ' + T('sup.guesteta', 'Gast onderweg, arriveert over ~') + o.guestEtaMin + ' ' + T('sup.min', 'min') + '. ' + T('sup.readyontime', 'Zet op tijd klaar.')) : null),
-      o.allergyNote ? E('div', { class: 'allergy' }, '⚠ ' + T('sup.allergy', 'Allergie:') + ' ' + o.allergyNote) : null,
+      o.guestArrived ? E('div', { class: 'enroute here' }, '' + T('sup.guesthere', 'Gast is gearriveerd. Serveer nu.'))
+        : (o.guestEtaMin != null ? E('div', { class: 'enroute' }, '' + T('sup.guesteta', 'Gast onderweg, arriveert over ~') + o.guestEtaMin + ' ' + T('sup.min', 'min') + '. ' + T('sup.readyontime', 'Zet op tijd klaar.')) : null),
+      o.allergyNote ? E('div', { class: 'allergy' }, '' + T('sup.allergy', 'Allergie:') + ' ' + o.allergyNote) : null,
       // het zorgprofiel van de gast reist automatisch mee (alleen met toestemming)
-      o.zorg ? E('div', { class: 'allergy' }, '⚠ ' + T('sup.zorgp', 'Zorgprofiel gast:') + ' ' + zorgTekst(o.zorg)) : null,
+      o.zorg ? E('div', { class: 'allergy' }, '' + T('sup.zorgp', 'Zorgprofiel gast:') + ' ' + zorgTekst(o.zorg)) : null,
       o.tagSalon ? E('div', { class: 'salon' }, '✦ ' + T('sup.wantssalon', 'Gast wil dit taggen voor De Salon')) : null,
       E('div', { class: 'acts' },
         E('span', { class: 'pill ' + (o.paid ? 'betaald' : 'onbetaald') },
@@ -5304,14 +5304,14 @@
     const knoppen = [];
     if (r.status === 'aangevraagd') knoppen.push('<button class="obtn primary js-resok">'+T('res.ok','Bevestig')+'</button>','<button class="obtn warn js-resnee">'+T('sup.reject','Weiger')+'</button>');
     if (r.status === 'bevestigd'){
-      knoppen.push('<button class="obtn js-restafel">🪑 '+(r.tafel?esc(r.tafel):T('res.tafel','Tafel'))+'</button>');
+      knoppen.push('<button class="obtn js-restafel">'+(r.tafel?esc(r.tafel):T('res.tafel','Tafel'))+'</button>');
       if (vandaag) knoppen.push('<button class="obtn primary js-reser">'+T('res.er','Gast is er')+'</button>','<button class="obtn warn js-resno">'+T('res.noshow','No-show')+'</button>');
     }
     if (r.status === 'aangekomen') knoppen.push('<button class="obtn js-resweg">'+T('res.weg','Vertrokken')+'</button>');
     return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-res="'+r.id+'">'+
       '<span><b>'+r.tijd+'</b> · <b class="cn">'+esc(r.customerCodename)+'</b> · '+r.personen+'p'+
-        (r.tafel?' · 🪑 '+esc(r.tafel):'')+(r.notitie?' · 📝 '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
-        (r.zorg?'<span style="display:block;color:#E2B93B;">⚠ '+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
+        (r.tafel?' ·  '+esc(r.tafel):'')+(r.notitie?' ·  '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
+        (r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
       (knoppen.length
         ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
         : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+
@@ -5343,15 +5343,15 @@
             '<button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span>'+
         '</div>').join('')
       : '';
-    wrap.innerHTML = '<div class="card"><div class="tt-h">🪑 '+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
+    wrap.innerHTML = '<div class="card"><div class="tt-h">'+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
       '<div class="pos-chips" style="margin-top:0.4rem;">'+
-        '<span>👥 '+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
-        (plan.openAanvragen?'<span>✋ '+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
-        (plan.zonderTafel?'<span>🪑 '+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
+        '<span>'+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
+        (plan.openAanvragen?'<span>'+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
+        (plan.zonderTafel?'<span>'+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
       '</div>'+chips+rekBlok+
       (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
       '</div>'+
-      (later.length ? '<div class="card"><div class="tt-h">🗓 '+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
+      (later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
     // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij
     wrap.querySelectorAll('[data-tafelrek]').forEach(el => {
       const rekenAf = async (extra) => {
@@ -5381,7 +5381,7 @@
     wrap.querySelectorAll('.js-walkin').forEach(b => b.addEventListener('click', async () => {
       const p = window.prompt(T('res.walkinp','Walk-in aan '+b.dataset.tafel+': met hoeveel personen?'), '2');
       if (!p) return;
-      try { await API.call('/supplier/walkin', { tafel: b.dataset.tafel, personen: Number(p) }); toast('🪑 '+T('res.walkintoast','Walk-in geplaatst.')); renderReserveringen(); }
+      try { await API.call('/supplier/walkin', { tafel: b.dataset.tafel, personen: Number(p) }); toast(''+T('res.walkintoast','Walk-in geplaatst.')); renderReserveringen(); }
       catch(e){ toast(e.message); }
     }));
     wrap.querySelectorAll('[data-res]').forEach(el => {
@@ -5390,12 +5390,12 @@
         catch(e){ toast(e.message); }
       };
       const id = el.dataset.res;
-      const ok = el.querySelector('.js-resok'); if (ok) ok.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'bevestig' }, '🪑 '+T('res.oktoast','Reservering bevestigd; de gast hoort het meteen.')));
+      const ok = el.querySelector('.js-resok'); if (ok) ok.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'bevestig' }, ''+T('res.oktoast','Reservering bevestigd; de gast hoort het meteen.')));
       const nee = el.querySelector('.js-resnee'); if (nee) nee.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'weiger' }, T('res.neetoast','Reservering geweigerd.')));
       const tf = el.querySelector('.js-restafel'); if (tf) tf.addEventListener('click', () => {
         const namen = plan.tafels.map(t => t.name);
         const keuze = window.prompt(T('res.tafelp','Welke tafel?')+' ('+namen.join(', ')+')');
-        if (keuze) doe('/supplier/reservering/tafel', { id, tafel: keuze.trim() }, '🪑 '+T('res.tafeltoast','Tafel toegewezen; de gast krijgt bericht.'));
+        if (keuze) doe('/supplier/reservering/tafel', { id, tafel: keuze.trim() }, ''+T('res.tafeltoast','Tafel toegewezen; de gast krijgt bericht.'));
       });
       const er = el.querySelector('.js-reser'); if (er) er.addEventListener('click', () => doe('/supplier/reservering/komst', { id, actie:'aangekomen' }, T('res.ertoast','Welkom; de tafel staat op bezet.')));
       const no = el.querySelector('.js-resno'); if (no) no.addEventListener('click', () => doe('/supplier/reservering/komst', { id, actie:'no-show' }, T('res.noshowtoast','Gemeld als no-show; de tafel is weer vrij.')));
@@ -5419,23 +5419,23 @@
   const RIT_KLAAR = st => st === 'gearriveerd' || st === 'afgerond' || st === 'geweigerd';
   function ridePill(st){ return st==='aangevraagd'?'nieuw':RIT_KLAAR(st)?'klaar':'bereiding'; }
   function ritRegel(r){
-    return (r.passengers?'👤 '+r.passengers+' ':'')+(r.luggage?'🧳 '+r.luggage+' ':'')+(r.km?'· '+r.km+' km ':'')+(r.quote?'· <b style="color:var(--gold);">'+eur(r.quote)+'</b>':'');
+    return (r.passengers?''+r.passengers+' ':'')+(r.luggage?''+r.luggage+' ':'')+(r.km?'· '+r.km+' km ':'')+(r.quote?'· <b style="color:var(--gold);">'+eur(r.quote)+'</b>':'');
   }
   function renderRides(){
     const list = (state.rides || []).filter(r => !RIT_KLAAR(r.status));
     $('#rideList').innerHTML = list.length ? list.map(r => {
       const nxt = NEXT_RIDE[r.status];
       const eta = (r.status === 'aangevraagd' || r.status === 'onderweg')
-        ? (r.pickupEtaMin != null ? '<div class="enroute">🚗 '+T('sup.pickupeta','Gast op ~')+r.pickupEtaMin+' '+T('sup.min','min')+' '+T('sup.rijden','rijden')+'.</div>' : '')
-        : (r.status === 'rijdt' && r.dropEtaMin != null ? '<div class="enroute">🏁 '+T('sup.dropeta','Aankomst bestemming over ~')+r.dropEtaMin+' '+T('sup.min','min')+'.</div>' : '');
+        ? (r.pickupEtaMin != null ? '<div class="enroute">'+T('sup.pickupeta','Gast op ~')+r.pickupEtaMin+' '+T('sup.min','min')+' '+T('sup.rijden','rijden')+'.</div>' : '')
+        : (r.status === 'rijdt' && r.dropEtaMin != null ? '<div class="enroute">'+T('sup.dropeta','Aankomst bestemming over ~')+r.dropEtaMin+' '+T('sup.min','min')+'.</div>' : '');
       return '<div class="order" data-rref="'+r.ref+'">'+
         '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+r.customerCodename+'</span></div>'+
           '<div class="ref">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+' · '+timeAgo(r.at)+'</div></div>'+
           '<span class="pill '+ridePill(r.status)+'">'+tStatus(r.status)+'</span></div>'+
         '<div class="ref" style="margin-top:0.25rem;">'+ritRegel(r)+
-          (r.driver?' · 🚘 '+r.driver.name+(r.vehicle?' ('+r.vehicle.name+')':''):' · <span style="color:var(--amber,#B8860B);">'+T('sup.ride.nodriver','nog geen chauffeur')+'</span>')+'</div>'+
-        (r.note?'<div class="ref">📝 '+r.note+'</div>':'')+
-        (r.zorg?'<div class="allergy">⚠ '+T('sup.zorgp','Zorgprofiel gast:')+' '+esc(zorgTekst(r.zorg))+'</div>':'')+
+          (r.driver?' ·  '+r.driver.name+(r.vehicle?' ('+r.vehicle.name+')':''):' · <span style="color:var(--amber,#B8860B);">'+T('sup.ride.nodriver','nog geen chauffeur')+'</span>')+'</div>'+
+        (r.note?'<div class="ref">'+r.note+'</div>':'')+
+        (r.zorg?'<div class="allergy">'+T('sup.zorgp','Zorgprofiel gast:')+' '+esc(zorgTekst(r.zorg))+'</div>':'')+
         eta +
         '<div class="acts">'+
           (nxt?'<button class="obtn primary js-rnext">'+T(RIDE_NEXT_LABEL[nxt], RIDE_NEXT_NL[nxt])+'</button>':'')+
@@ -5544,7 +5544,7 @@
   /* Luchtzijde: staat de zaak op de luchthaven, dan toont de kassa dubbele
      prijzen (normaal + luchthavenprijs met de toeslag van het beheer). De bon
      gaat met NORMALE prijzen naar de server; die rekent dezelfde toeslag en
-     de gast betaalt de luchthavenprijs. De vertaalknop (🌐) zet de kaartnamen
+     de gast betaalt de luchthavenprijs. De vertaalknop () zet de kaartnamen
      in elke actieve wereldtaal, voor de gast aan de balie. */
   const MENU_VERTAAL = { naar: null, map: {} };
   const mNaam = x => MENU_VERTAAL.map[x.id] || x.name;
@@ -5558,9 +5558,9 @@
     if (window.TapPay && TapPay.kan()){
       const tap = window.confirm(T('pos.tapkeuze','Tap to pay: de gast tikt zijn toestel hiertegen. Liever de code typen (bijv. als NFC niet werkt)? Kies dan Annuleren.'));
       if (tap){
-        toast('📳 '+T('pos.tap','Tap to pay: laat de gast het toestel hiertegen houden...'));
+        toast(''+T('pos.tap','Tap to pay: laat de gast het toestel hiertegen houden...'));
         const code = await TapPay.lees(12000);
-        if (code){ toast('📳 '+T('pos.tapok','Code ontvangen via tap to pay.')); return code; }
+        if (code){ toast(''+T('pos.tapok','Code ontvangen via tap to pay.')); return code; }
         toast(T('pos.tapmis','Geen tik ontvangen; typ de code van de gast.'));
       }
     }
@@ -5590,17 +5590,17 @@
     let r; try { r = await API.call('/supplier/shift', {}); } catch(e){ return; }
     const heeftGasten = r.gasten.reserveringen || r.gasten.walkIns || r.gasten.noShows;
     if (!r.bonnen && !heeftGasten) { el.innerHTML = ''; return; }
-    el.innerHTML = '<div class="card"><div class="tt-h">🌙 '+T('shift.h','Shift-samenvatting')+'</div>'+
+    el.innerHTML = '<div class="card"><div class="tt-h">'+T('shift.h','Shift-samenvatting')+'</div>'+
       (heeftGasten?'<div class="pos-chips" style="margin-top:0.4rem;">'+
-        '<span>👥 '+r.gasten.personen+' '+T('shift.gasten','gasten aan tafel')+'</span>'+
-        '<span>🪑 '+r.gasten.reserveringen+' '+T('shift.res','reservering(en)')+'</span>'+
-        (r.gasten.walkIns?'<span>🚶 '+r.gasten.walkIns+' walk-in(s)</span>':'')+
+        '<span>'+r.gasten.personen+' '+T('shift.gasten','gasten aan tafel')+'</span>'+
+        '<span>'+r.gasten.reserveringen+' '+T('shift.res','reservering(en)')+'</span>'+
+        (r.gasten.walkIns?'<span>'+r.gasten.walkIns+' walk-in(s)</span>':'')+
         (r.gasten.noShows?'<span style="color:var(--burgundy);">✗ '+r.gasten.noShows+' no-show(s)</span>':'')+
       '</div>':'')+
       (r.verblijf?'<div class="pos-chips" style="margin-top:0.4rem;">'+
-        '<span>🛏 '+r.verblijf.bezet+' / '+r.verblijf.totaal+' '+T('rc.bezet','bezet')+'</span>'+
-        (r.verblijf.aankomsten?'<span>🗝️ '+r.verblijf.aankomsten+' '+T('shift.aank','check-in(s)')+'</span>':'')+
-        (r.verblijf.vertrekken?'<span>👋 '+r.verblijf.vertrekken+' '+T('shift.vertr','check-out(s)')+'</span>':'')+
+        '<span>'+r.verblijf.bezet+' / '+r.verblijf.totaal+' '+T('rc.bezet','bezet')+'</span>'+
+        (r.verblijf.aankomsten?'<span>'+r.verblijf.aankomsten+' '+T('shift.aank','check-in(s)')+'</span>':'')+
+        (r.verblijf.vertrekken?'<span>'+r.verblijf.vertrekken+' '+T('shift.vertr','check-out(s)')+'</span>':'')+
         (r.verblijf.noShows?'<span style="color:var(--burgundy);">✗ '+r.verblijf.noShows+' no-show(s)</span>':'')+
         (r.verblijf.adr?'<span>ADR '+eur(r.verblijf.adr)+'</span>':'')+
       '</div>':'')+
@@ -5615,13 +5615,13 @@
   async function laadZ(){
     const el = $('#zWrap'); if (!el) return;
     let r; try { r = await API.call('/supplier/dagrapport', {}); } catch(e){ return; }
-    el.innerHTML = '<div class="card"><div class="tt-h">🧾 '+T('pos.z','Dagafsluiting (Z-rapport)')+'</div>'+
+    el.innerHTML = '<div class="card"><div class="tt-h">'+T('pos.z','Dagafsluiting (Z-rapport)')+'</div>'+
       '<div class="st-row"><span>'+T('pos.z.omzet','Omzet vandaag')+'</span><b>'+eur(r.omzet)+'</b></div>'+
       '<div class="st-row"><span>'+T('pos.z.bonnen','Bonnen')+'</span><b>'+r.bonnen+'</b></div>'+
       (r.fooien?'<div class="st-row"><span>'+T('pos.fooien','Fooien')+'</span><b>'+eur(r.fooien)+'</b></div>':'')+
       (r.btw||[]).map(b => '<div class="st-row"><span>'+esc(b.label)+' · '+b.tarief+'% btw</span><b>'+eur(b.omzet)+' <span class="sub">'+T('pos.z.waarvanbtw','waarvan btw')+' '+eur(b.btw)+'</span></b></div>').join('')+
       Object.entries(r.betaalwijzen||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.ontv','Ontvangsten')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
-      '<button class="bigbtn" id="zCsv" style="margin-top:0.5rem;">⬇ '+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
+      '<button class="bigbtn" id="zCsv" style="margin-top:0.5rem;">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
       '<div class="softline" style="margin-top:0.3rem;">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
     const k = el.querySelector('#zCsv');
     if (k) k.addEventListener('click', () => { window.open('/api/supplier/dagrapport.csv?token='+encodeURIComponent(API.token)+'&datum='+r.datum, '_blank'); });
@@ -5633,16 +5633,16 @@
     if (!m.length) return '<div class="card"><div style="font-size:0.84rem;color:var(--muted);">'+T('pos.nomenu','Zet eerst gerechten op de menukaart; die worden hier uw kassaknoppen.')+'</div></div>';
     const total = bonTotal();
     const pct = luchtPct();
-    const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+mNaam(x)+'</span><span>'+eur(x.price*bon[x.id])+(pct?' · ✈ '+eur(luchtPrijs(x.price)*bon[x.id]):'')+'</span></div>').join('');
+    const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+mNaam(x)+'</span><span>'+eur(x.price*bon[x.id])+(pct?' ·  '+eur(luchtPrijs(x.price)*bon[x.id]):'')+'</span></div>').join('');
     return '<div class="card"><div class="tt-h">'+T('pos.newbon','Nieuwe bon')+
-      (pct?' <span style="font-size:0.64rem;color:var(--gold);letter-spacing:0.08em;">✈ '+T('pos.luchtzijde','LUCHTZIJDE')+' +'+pct+'%</span>':'')+'</div>'+
+      (pct?' <span style="font-size:0.64rem;color:var(--gold);letter-spacing:0.08em;">'+T('pos.luchtzijde','LUCHTZIJDE')+' +'+pct+'%</span>':'')+'</div>'+
       '<div class="pos-pay" style="margin:0.4rem 0 0.2rem;">'+
-        '<button class="obtn" id="posVertaal">🌐 '+(MENU_VERTAAL.naar?MENU_VERTAAL.naar.toUpperCase():T('pos.vertaal','Vertaal de kaart'))+'</button>'+
-        (pct?'<button class="obtn" id="posPass">✈ '+T('pos.pass','Boarding pass')+'</button>':'')+
+        '<button class="obtn" id="posVertaal">'+(MENU_VERTAAL.naar?MENU_VERTAAL.naar.toUpperCase():T('pos.vertaal','Vertaal de kaart'))+'</button>'+
+        (pct?'<button class="obtn" id="posPass">'+T('pos.pass','Boarding pass')+'</button>':'')+
       '</div>'+
-      '<div class="pos-grid">'+m.map(x=>'<button class="pos-key" data-pos="'+x.id+'"><b>'+mNaam(x)+'</b><span>'+eur(x.price)+(pct?' · ✈ '+eur(luchtPrijs(x.price)):'')+(bon[x.id]?' · '+bon[x.id]+'×':'')+'</span></button>').join('')+'</div>'+
-      (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+(pct?' · ✈ '+eur(luchtPrijs(total)):'')+'</span></div>'+
-        (pct?'<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">'+T('pos.luchtsub','De gast betaalt de luchthavenprijs (✈); de bon draagt beide prijzen.')+'</div>':'')+'</div>':'')+
+      '<div class="pos-grid">'+m.map(x=>'<button class="pos-key" data-pos="'+x.id+'"><b>'+mNaam(x)+'</b><span>'+eur(x.price)+(pct?' ·  '+eur(luchtPrijs(x.price)):'')+(bon[x.id]?' · '+bon[x.id]+'×':'')+'</span></button>').join('')+'</div>'+
+      (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+(pct?' ·  '+eur(luchtPrijs(total)):'')+'</span></div>'+
+        (pct?'<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">'+T('pos.luchtsub','De gast betaalt de luchthavenprijs (); de bon draagt beide prijzen.')+'</div>':'')+'</div>':'')+
       '<div class="pos-pay">'+
         '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
         '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
@@ -5658,7 +5658,7 @@
       // gast toont het oplichtende scherm; sla de code aan om de bestelling uit te geven
       '<div class="card"><div class="tt-h">'+T('pos.redeemh','RTG-ophaalcode innen')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat het oplichtende scherm zien. Sla de code aan; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven.')+'</div>'+
-      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Bijv. TBS9')+'" maxlength="4" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:0.2em;font-weight:700;"><button id="posScan" title="'+T('pos.scan','Scan de code')+'" aria-label="'+T('pos.scan','Scan de code')+'">📷</button><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
+      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Bijv. TBS9')+'" maxlength="4" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:0.2em;font-weight:700;"><button id="posScan" title="'+T('pos.scan','Scan de code')+'" aria-label="'+T('pos.scan','Scan de code')+'"></button><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
       '<div id="posRedeemResult"></div></div>';
   }
 
@@ -5709,8 +5709,8 @@
     let html = '<div class="card"><div class="tt-h">'+T('pos.today','Vandaag')+'</div>'+
       '<div class="pos-day"><b>'+eur(p.total)+'</b><span>'+p.count+' '+T('pos.bons','bon(nen)')+'</span></div>';
     const methods = Object.keys(p.byMethod);
-    if (methods.length) html += '<div class="pos-chips">'+methods.map(m=>'<span>'+methodLabel(m)+' '+eur(p.byMethod[m])+'</span>').join('')+(p.fooien?'<span>💛 '+T('pos.fooien','Fooien')+' '+eur(p.fooien)+'</span>':'')+'</div>';
-    else if (p.fooien) html += '<div class="pos-chips"><span>💛 '+T('pos.fooien','Fooien')+' '+eur(p.fooien)+'</span></div>';
+    if (methods.length) html += '<div class="pos-chips">'+methods.map(m=>'<span>'+methodLabel(m)+' '+eur(p.byMethod[m])+'</span>').join('')+(p.fooien?'<span>'+T('pos.fooien','Fooien')+' '+eur(p.fooien)+'</span>':'')+'</div>';
+    else if (p.fooien) html += '<div class="pos-chips"><span>'+T('pos.fooien','Fooien')+' '+eur(p.fooien)+'</span></div>';
     const actors = Object.keys(p.byActor);
     if (actors.length>1 || (actors.length===1 && actors[0]!==actor().name))
       html += '<div class="pos-chips actors">'+actors.map(a=>'<span>'+a+' '+eur(p.byActor[a])+'</span>').join('')+'</div>';
@@ -5757,7 +5757,7 @@
       try {
         const r = await API.call('/supplier/lucht/pass', { code });
         toast(r.geldig
-          ? '✈ '+T('pos.passok','Geldig:')+' '+r.pass.naam+' · '+r.pass.vlucht+' '+r.pass.tijd+' · '+T('pos.stoel','stoel')+' '+r.pass.stoel+' · gate '+r.pass.gate
+          ? ''+T('pos.passok','Geldig:')+' '+r.pass.naam+' · '+r.pass.vlucht+' '+r.pass.tijd+' · '+T('pos.stoel','stoel')+' '+r.pass.stoel+' · gate '+r.pass.gate
           : '✗ '+(r.reden||T('pos.passnee','Niet geldig.')));
       } catch(e){ toast(e.message); }
     });
@@ -6069,20 +6069,20 @@
       (charters.length ? charters.map(c => {
         let knop = '';
         if (c.status === 'aangevraagd') knop =
-          '<button class="obtn" data-chfoto="'+c.ref+'" data-fase="voor">📷 '+T('ch.fotovoor','Voor-foto')+' ('+c.fotosVoor+')</button> '+
+          '<button class="obtn" data-chfoto="'+c.ref+'" data-fase="voor">'+T('ch.fotovoor','Voor-foto')+' ('+c.fotosVoor+')</button> '+
           '<button class="obtn primary" data-chst="'+c.ref+'" data-st="lopend">'+T('ch.uitvaren','Uitvaren')+'</button>';
         else if (c.status === 'lopend') knop =
-          '<button class="obtn" data-chfoto="'+c.ref+'" data-fase="na">📷 '+T('ch.fotona','Na-foto')+' ('+c.fotosNa+')</button> '+
+          '<button class="obtn" data-chfoto="'+c.ref+'" data-fase="na">'+T('ch.fotona','Na-foto')+' ('+c.fotosNa+')</button> '+
           '<button class="obtn primary" data-chst="'+c.ref+'" data-st="afgerond">'+T('ch.teruggeven','Teruggeven en afronden')+'</button>';
         return '<div class="mitem">'+
-          (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.8rem;">🚨 <b>SOS:</b> '+esc(c.sos[0].bericht)+
+          (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.8rem;"><b>SOS:</b> '+esc(c.sos[0].bericht)+
             (Number.isFinite(c.sos[0].lat) ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="geo:'+c.sos[0].lat+','+c.sos[0].lng+'?q='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('ch.kaart','kaart')+'</a>' : '')+
             ' <button class="obtn" data-chsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;font-size:0.7rem;">'+T('ch.sosok','Afgehandeld')+'</button></div>' : '')+
           '<div class="r1"><span class="nm">'+esc(c.codename)+' · '+esc(c.boot)+' ('+esc(c.type)+')</span><span class="pr">'+eur(c.prijs)+'</span></div>'+
-          '<div class="ds">'+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('ch.gasten','gasten')+' · ':'')+(c.metSkipper?'⚓ '+T('ch.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.bareboat','bareboat'))+' · '+T('ch.st.'+c.status, CHARTER_ST[c.status]||c.status)+
-          ' · 📷 '+c.fotosVoor+'/'+c.fotosNa+(c.borg?' · '+T('ch.borg','borg')+' '+eur(c.borg):'')+
+          '<div class="ds">'+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('ch.gasten','gasten')+' · ':'')+(c.metSkipper?''+T('ch.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.bareboat','bareboat'))+' · '+T('ch.st.'+c.status, CHARTER_ST[c.status]||c.status)+
+          ' ·  '+c.fotosVoor+'/'+c.fotosNa+(c.borg?' · '+T('ch.borg','borg')+' '+eur(c.borg):'')+
           (c.uitvaart ? ' · '+c.uitvaart.urenStart+' '+T('ch.uur','mu') : '')+
-          (c.locatie ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="geo:'+c.locatie.lat+','+c.locatie.lng+'?q='+c.locatie.lat+','+c.locatie.lng+'">📍 '+T('ch.live','live positie')+'</a>' : '')+'</div>'+
+          (c.locatie ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="geo:'+c.locatie.lat+','+c.locatie.lng+'?q='+c.locatie.lat+','+c.locatie.lng+'">'+T('ch.live','live positie')+'</a>' : '')+'</div>'+
           (c.teruggave ? '<div class="ds" style="color:'+(c.teruggave.meerkosten>0?'var(--gold)':'var(--green)')+';">'+
             (c.teruggave.meerkosten>0 ? T('ch.meer','Meerkosten')+': '+eur(c.teruggave.meerkosten)+' ('+c.teruggave.gevaren+' '+T('ch.uur','mu')+(c.teruggave.brandstofKosten>0?', '+T('ch.brandstof','brandstof')+' '+eur(c.teruggave.brandstofKosten):'')+')'
               : '✓ '+c.teruggave.gevaren+' '+T('ch.uur','mu')+', '+T('ch.geenmeer','geen meerkosten, borg vrij'))+'</div>' : '')+
@@ -6092,10 +6092,10 @@
     const boten = state.boten || [];
     html += '<div class="card"><div class="tt-h">'+T('ch.vloot','Vloot')+' ('+boten.filter(b=>b.actief!==false).length+')</div>'+
       boten.filter(b => b.actief !== false).map(b =>
-        '<div class="mitem"><div class="r1"><span class="nm">'+(b.icoon||'🛥️')+' '+esc(b.naam)+'</span><span class="row-mid-gap"><span class="pr">'+eur(b.dagprijs)+'/'+T('ch.dag','dag')+'</span>'+
+        '<div class="mitem"><div class="r1"><span class="nm">'+(b.icoon||'')+' '+esc(b.naam)+'</span><span class="row-mid-gap"><span class="pr">'+eur(b.dagprijs)+'/'+T('ch.dag','dag')+'</span>'+
         (canEdit?'<button class="rr-del" data-chdel="'+b.id+'">✕</button>':'')+'</span></div>'+
-        '<div class="ds">'+esc(b.type||'')+' · '+(b.lengte||0)+'m · 👥 '+(b.gasten||0)+(b.hutten?' · 🛏️ '+b.hutten+' '+T('ch.hutten','hutten'):'')+' · '+esc(b.brandstof||'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+
-        ' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+' · '+(b.skipperVerplicht?'⚓ '+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs vereist'):T('ch.vrij','vrij te huren')))+
+        '<div class="ds">'+esc(b.type||'')+' · '+(b.lengte||0)+'m ·  '+(b.gasten||0)+(b.hutten?' ·  '+b.hutten+' '+T('ch.hutten','hutten'):'')+' · '+esc(b.brandstof||'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+
+        ' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+' · '+(b.skipperVerplicht?''+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs vereist'):T('ch.vrij','vrij te huren')))+
         (b.skipperPrijsPerDag?' (+'+eur(b.skipperPrijsPerDag)+'/'+T('ch.dag','dag')+')':'')+'</div></div>').join('')+
       (canEdit ? '<details style="margin-top:1rem;"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('ch.f.nieuw','Vaartuig toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
         '<div class="row-gap"><div class="field" style="flex:2;"><label>'+T('ch.f.naam','Naam')+'</label><input id="chNaam" placeholder="Serenidad"></div>'+
@@ -6244,21 +6244,21 @@
     const leeg = !r.aanvragen.length && !r.aankomsten.length && !r.inHuis.length && !r.komend.length;
     const rij = (v, knoppen, sub) => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-vb="'+v.id+'">'+
       '<span><b class="cn">'+esc(v.codenaam)+'</b> · '+esc(v.roomName)+' · '+(sub||v.aankomst+' tot '+v.vertrek+' · '+v.personen+'p · '+eur(v.totaal))+
-      (v.notitie?' · 📝 '+esc(v.notitie):'')+
-      (v.zorg?'<span style="display:block;color:#E2B93B;">⚠ '+esc(zorgTekst(v.zorg))+'</span>':'')+'</span>'+
+      (v.notitie?' ·  '+esc(v.notitie):'')+
+      (v.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(v.zorg))+'</span>':'')+'</span>'+
       (knoppen?'<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+knoppen+'</span>':'')+
     '</div>';
-    el.innerHTML = '<div class="card"><div class="tt-h">🛎️ '+T('rc.h','Receptie vandaag')+'</div>'+
+    el.innerHTML = '<div class="card"><div class="tt-h">'+T('rc.h','Receptie vandaag')+'</div>'+
       '<div class="pos-chips" style="margin-top:0.4rem;">'+
-        '<span>🛏 '+r.bezetting.bezet+' / '+r.bezetting.totaal+' '+T('rc.bezet','bezet')+'</span>'+
-        (r.bezetting.vuil?'<span>🧹 '+r.bezetting.vuil+' '+T('rc.vuil','voor housekeeping')+'</span>':'')+
-        (r.aanvragen.length?'<span>✋ '+r.aanvragen.length+' '+T('rc.aanvragen','aanvraag(en)')+'</span>':'')+
+        '<span>'+r.bezetting.bezet+' / '+r.bezetting.totaal+' '+T('rc.bezet','bezet')+'</span>'+
+        (r.bezetting.vuil?'<span>'+r.bezetting.vuil+' '+T('rc.vuil','voor housekeeping')+'</span>':'')+
+        (r.aanvragen.length?'<span>'+r.aanvragen.length+' '+T('rc.aanvragen','aanvraag(en)')+'</span>':'')+
       '</div>'+
-      ((r.hkEerst||[]).length?'<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--burgundy);border:1px solid rgba(194,58,94,0.35);border-radius:10px;padding:0.45rem 0.6rem;">🧹 '+T('rc.hkeerst','Housekeeping eerst:')+' <b>'+r.hkEerst.map(esc).join(', ')+'</b> · '+T('rc.hkeerst2','daar komt vandaag alweer een gast aan.')+'</div>':'')+
+      ((r.hkEerst||[]).length?'<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--burgundy);border:1px solid rgba(194,58,94,0.35);border-radius:10px;padding:0.45rem 0.6rem;">'+T('rc.hkeerst','Housekeeping eerst:')+' <b>'+r.hkEerst.map(esc).join(', ')+'</b> · '+T('rc.hkeerst2','daar komt vandaag alweer een gast aan.')+'</div>':'')+
       (r.aanvragen.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.nieuw','Aanvragen')+'</div>'+r.aanvragen.map(v => rij(v,
         '<button class="obtn primary js-vbok">'+T('res.ok','Bevestig')+'</button><button class="obtn warn js-vbnee">'+T('sup.reject','Weiger')+'</button>')).join(''):'')+
       (r.aankomsten.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.aankomst','Aankomsten')+'</div>'+r.aankomsten.map(v => rij(v,
-        '<button class="obtn primary js-vbin">🗝️ '+T('rc.checkin','Check-in')+'</button><button class="obtn warn js-vbnoshow">'+T('res.noshow','No-show')+'</button>')).join(''):'')+
+        '<button class="obtn primary js-vbin">'+T('rc.checkin','Check-in')+'</button><button class="obtn warn js-vbnoshow">'+T('res.noshow','No-show')+'</button>')).join(''):'')+
       (r.inHuis.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.inhuis','In huis')+'</div>'+r.inHuis.map(v => rij(v,
         '<button class="obtn js-vbuit">'+T('rc.checkout','Check-out')+'</button>',
         T('rc.tot','tot')+' '+v.vertrek+(v.vertrek<=r.datum?' · <b style="color:var(--gold);">'+T('rc.vandaagweg','vertrekt vandaag')+'</b>':'')+(v.openLast?' · '+T('rc.open','rekening')+' <b>'+eur(v.openLast)+'</b>':''))).join(''):'')+
@@ -6271,9 +6271,9 @@
         try { await API.call(pad, Object.assign({ id }, body)); if (boodschap) toast(boodschap); await refresh(); laadReceptie(); }
         catch(e){ toast(e.message); }
       };
-      const ok = elv.querySelector('.js-vbok'); if (ok) ok.addEventListener('click', () => doe('/supplier/verblijf/beslis', { actie:'bevestig' }, '🛎️ '+T('rc.oktoast','Bevestigd; de gast hoort het meteen.')));
+      const ok = elv.querySelector('.js-vbok'); if (ok) ok.addEventListener('click', () => doe('/supplier/verblijf/beslis', { actie:'bevestig' }, ''+T('rc.oktoast','Bevestigd; de gast hoort het meteen.')));
       const nee = elv.querySelector('.js-vbnee'); if (nee) nee.addEventListener('click', () => doe('/supplier/verblijf/beslis', { actie:'weiger' }, T('rc.neetoast','Geweigerd.')));
-      const inb = elv.querySelector('.js-vbin'); if (inb) inb.addEventListener('click', () => doe('/supplier/verblijf/checkin', {}, '🗝️ '+T('rc.intoast','Ingecheckt; de logies staan op de kamerrekening.')));
+      const inb = elv.querySelector('.js-vbin'); if (inb) inb.addEventListener('click', () => doe('/supplier/verblijf/checkin', {}, ''+T('rc.intoast','Ingecheckt; de logies staan op de kamerrekening.')));
       const uit = elv.querySelector('.js-vbuit'); if (uit) uit.addEventListener('click', () => doe('/supplier/verblijf/checkout', {}, T('rc.uittoast','Uitgecheckt; de kamer staat klaar voor housekeeping.')));
       const ns = elv.querySelector('.js-vbnoshow'); if (ns) ns.addEventListener('click', () => doe('/supplier/verblijf/noshow', {}, T('rc.noshowtoast','Gemeld als no-show; de kamer blijft vrij.')));
     });
@@ -6288,11 +6288,11 @@
       const hk = (r.hk && r.hk.status) || 'schoon';
       return '<div class="room-row'+(r.available?'':' off')+'" style="flex-wrap:wrap;">'+
         '<div class="rr-t"><b>'+r.name+' <span class="hk-pill hk-'+hk+'">'+tHk(hk)+'</span>'+
-          (r.vroegVrij ? ' <span class="hk-pill hk-schoon">🛎 '+T('hk.vroegvrij','vroege check-in')+'</span>' : '')+'</b>'+
+          (r.vroegVrij ? ' <span class="hk-pill hk-schoon">'+T('hk.vroegvrij','vroege check-in')+'</span>' : '')+'</b>'+
           '<span>'+(r.desc||'')+' · '+eur(r.price)+' '+T('sup.pernight','p.n.')+
           (r.hk && r.hk.by ? ' · '+r.hk.by+(r.hk.at?', '+timeAgo(r.hk.at):'') : '')+
-          (r.vroegVrij ? ' · 🛎 '+T('hk.vroegvrij2','vrijgegeven door housekeeping')+' ('+r.vroegVrij.door+')' : '')+
-          (hk==='defect' && r.hk.note ? ' · ⚠ '+r.hk.note : '')+'</span></div>'+
+          (r.vroegVrij ? ' ·  '+T('hk.vroegvrij2','vrijgegeven door housekeeping')+' ('+r.vroegVrij.door+')' : '')+
+          (hk==='defect' && r.hk.note ? ' ·  '+r.hk.note : '')+'</span></div>'+
         '<button class="rr-toggle'+(r.available?' on':'')+'" data-rtoggle="'+r.id+'" aria-label="aan/uit"><span></span></button>'+
         '<button class="rr-del" data-rdel="'+r.id+'">✕</button>'+
         '<div class="hk-chips">'+['schoon','vuil','bezig','bezet','defect'].map(s =>
@@ -6341,7 +6341,7 @@
     let p; try { p = await API.call('/supplier/kamerplanning', {}); } catch(e){ el.innerHTML = ''; return; }
     if (!p.kamers.length){ el.innerHTML = ''; return; }
     const dagLabel = d => d.slice(8, 10);
-    el.innerHTML = '<div class="card"><div class="tt-h">🗓 '+T('rc.plan','Kamerkalender')+' <span class="sub">('+p.dagen.length+' '+T('vr.dagen','dagen')+')</span></div>'+
+    el.innerHTML = '<div class="card"><div class="tt-h">'+T('rc.plan','Kamerkalender')+' <span class="sub">('+p.dagen.length+' '+T('vr.dagen','dagen')+')</span></div>'+
       '<div style="display:flex;gap:2px;margin:0.5rem 0 0.15rem;padding-left:96px;overflow:hidden;">'+p.dagen.map(d => '<span style="width:16px;flex-shrink:0;font-size:0.55rem;color:var(--soft);text-align:center;">'+dagLabel(d)+'</span>').join('')+'</div>'+
       p.kamers.map(k => '<div style="display:flex;align-items:center;gap:0;margin-top:3px;">'+
         '<span style="width:96px;flex-shrink:0;font-size:0.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px;">'+esc(k.name)+'</span>'+
@@ -6463,8 +6463,8 @@
         const r = await API.call('/supplier/paspoort/vraag', { codenaam, niveau: 'bevestiging', minLeeftijd: min });
         const ok = r.bevestiging && r.bevestiging.voldoetLeeftijd === true;
         uit.innerHTML = ok
-          ? '<b style="color:var(--green,#7ecb8f);font-size:1rem;">✅ '+esc(codenaam)+' '+T('dorp.lft.ja','is')+' '+min+'+</b>'
-          : '<b style="color:var(--burgundy,#C23A5E);font-size:1rem;">⛔ '+esc(codenaam)+' '+T('dorp.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
+          ? '<b style="color:var(--green,#7ecb8f);font-size:1rem;">'+esc(codenaam)+' '+T('dorp.lft.ja','is')+' '+min+'+</b>'
+          : '<b style="color:var(--burgundy,#C23A5E);font-size:1rem;">'+esc(codenaam)+' '+T('dorp.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
       } catch(e){ uit.innerHTML = '<b style="color:var(--burgundy,#C23A5E);">'+esc(e.message)+'</b>'; }
     }));
     // het logmoment: een tik en het staat geklokt als afgeronde post
@@ -6613,19 +6613,19 @@
     el.innerHTML = '<div class="card">'+
       row('ordersOpen', T('bh.orders','Bestellingen'), on1(st.ordersOpen), st.ordersOpen) +
       row('reservationsOpen', T('bh.res','Reserveringen'), on1(st.reservationsOpen), st.reservationsOpen) +
-      row('luchtzijde', '✈ '+T('bh.lucht','Luchtzijde'),
+      row('luchtzijde', ''+T('bh.lucht','Luchtzijde'),
         st.luchtzijde ? T('bh.luchtaan','Aan: boarding pass aan de deur, dubbele prijzen op de kassa (+')+(st.luchtToeslagPct==null?15:st.luchtToeslagPct)+'%)'
           : T('bh.luchtuit','Uit: de zaak staat niet op een luchthaven'), !!st.luchtzijde) +
       (st.luchtzijde ? '<div class="tt-add"><input id="bhLuchtPct" type="number" min="0" max="100" inputmode="numeric" value="'+(st.luchtToeslagPct==null?15:st.luchtToeslagPct)+'" style="width:6rem;"><button id="bhLuchtPctZet">'+T('bh.pctzet','Toeslag % opslaan')+'</button></div>' : '')+
       '<div class="note-soft">'+T('bh.note','Dicht = leden kunnen direct niet meer bestellen of reserveren; de kaart blijft zichtbaar. Alles wordt gelogd.')+'</div></div>'+
       '<div class="card"><div class="tt-h">'+T('bh.more','Verder beheren')+'</div>'+
       '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);line-height:1.7;">'+T('bh.tips','Menukaart bewerken doet u onder Menu. Tafels onder Tafels. Kamers en prijzen onder Kamers. Personeel en pincodes onder Team.')+'</div></div>'+
-      '<div class="card"><div class="tt-h">🗄️ '+T('ug.h','Officiele documentatie overschrijven')+'</div>'+
+      '<div class="card"><div class="tt-h">'+T('ug.h','Officiele documentatie overschrijven')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);line-height:1.6;">'+T('ug.sub','Met een druk op de knop naar uw oude apparatuur of een harde schijf, altijd achter het vier- of zes-ogenprincipe: 4 ogen = twee collega\'s tekenen, 6 ogen = drie. De bundel komt een keer vrij; daarna start u een nieuwe uitgifte.')+'</div>'+
       '<div class="tt-add" style="flex-wrap:wrap;"><select id="ugBron" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"></select>'+
       '<select id="ugOgen" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="4">4 ogen (2 pers.)</option><option value="6">6 ogen (3 pers.)</option></select>'+
       '<input id="ugDoel" placeholder="'+T('ug.doel','Doel, bijv. harde schijf archief')+'" style="flex:1;min-width:110px;">'+
-      '<button id="ugStart">⬇ '+T('ug.start','Start uitgifte')+'</button></div>'+
+      '<button id="ugStart">'+T('ug.start','Start uitgifte')+'</button></div>'+
       '<div id="ugLijst"></div></div>';
     function on1(v){ return v ? T('bh.open','Open, gasten kunnen dit nu gebruiken') : T('bh.closed','Dicht, tijdelijk niet beschikbaar'); }
     el.querySelectorAll('[data-set]').forEach(b => b.addEventListener('click', async () => {
@@ -6650,8 +6650,8 @@
     if (bron && !bron.options.length) bron.innerHTML = r.bronnen.map(b => '<option value="'+b.id+'">'+b.label+'</option>').join('');
     el.innerHTML = (r.uitgiften||[]).slice(0,6).map(u =>
       '<div class="st-row"><span>'+u.code+' · '+esc(u.bronLabel)+' · '+u.ogen+' ogen<br><span class="sub">'+u.handtekeningen.map(h=>esc(h.door)).join(' + ')+' → '+esc(u.doel)+'</span></span>'+
-      (u.status==='wacht-op-ogen' ? '<button class="obtn" data-ugteken="'+u.id+'">✍ '+T('ug.teken','Teken mee')+' ('+u.nogNodig+')</button>'
-        : u.status==='vrijgegeven' ? '<button class="obtn primary" data-ugdl="'+u.id+'">⬇ '+T('ug.dl','Overschrijven')+'</button>'
+      (u.status==='wacht-op-ogen' ? '<button class="obtn" data-ugteken="'+u.id+'">'+T('ug.teken','Teken mee')+' ('+u.nogNodig+')</button>'
+        : u.status==='vrijgegeven' ? '<button class="obtn primary" data-ugdl="'+u.id+'">'+T('ug.dl','Overschrijven')+'</button>'
         : '<span class="sub">✓ '+T('ug.klaar','overgeschreven')+'</span>')+'</div>').join('') || '<div class="softline">'+T('ug.leeg','Nog geen uitgiften.')+'</div>';
     el.querySelectorAll('[data-ugteken]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/uitgifte/teken', { id: b.dataset.ugteken }); toast(T('ug.getekend','Getekend.')); laadUitgifte(); } catch(e){ toast(e.message); }
@@ -6731,7 +6731,7 @@
     el.innerHTML = '<div class="card">'+
       (doors.length ? doors.map(d =>
         '<div class="door-row'+(d.locked?'':' open')+'">'+
-          '<span class="dl">'+(d.locked?'🔒':'🔓')+'</span>'+
+          '<span class="dl">'+(d.locked?'':'')+'</span>'+
           '<div class="dt"><b>'+d.name+'</b><span>'+(d.locked?T('door.locked','Vergrendeld'):T('door.open','OPEN, vergrendelt zichzelf'))+
             (d.lastBy?' · '+T('door.lastby','laatst:')+' '+d.lastBy+(d.lastAt?', '+timeAgo(d.lastAt):''):'')+'</span></div>'+
           '<button class="obtn'+(d.locked?' primary':' warn')+'" data-door="'+d.id+'">'+(d.locked?T('door.openbtn','Open 10 sec'):T('door.lockbtn','Vergrendel nu'))+'</button>'+
@@ -6765,14 +6765,14 @@
   }
   function gastLocBlok(){
     const lijst = gastLoc || [];
-    return '<div class="card"><div class="tt-h">📍 '+T('gl.h','Live meekijken (met toestemming)')+'</div>'+
+    return '<div class="card"><div class="tt-h">'+T('gl.h','Live meekijken (met toestemming)')+'</div>'+
       '<div style="font-size:0.75rem;color:var(--soft);margin-bottom:0.5rem;">'+T('gl.sub','De gast deelt zelf de live gps-locatie met uw zaak. Zet het uit zodra u het niet meer nodig heeft; de gast krijgt daar direct bericht van.')+'</div>'+
       (lijst.length ? lijst.map(g =>
         '<div class="guest-row" style="flex-wrap:wrap;gap:0.4rem;"><span class="cn">'+esc(g.codenaam)+'</span>'+
         (g.wachtOpLocatie ? '<span class="ge">'+T('gl.wacht','toestemming, wacht op gps')+'</span>'
           : '<span class="ge"><b>'+(g.km!=null?g.km+' km':'')+'</b>'+(g.etaMin!=null?' · ~'+g.etaMin+' min':'')+'</span>')+
         '<button class="obtn" data-glstop="'+g.id+'" style="font-size:0.62rem;">'+T('gl.stop','Niet meer nodig')+'</button>'+
-        (g.zorg ? '<div style="flex-basis:100%;font-size:0.74rem;color:#E2B93B;">⚠ '+esc(zorgTekst(g.zorg))+'</div>' : '')+
+        (g.zorg ? '<div style="flex-basis:100%;font-size:0.74rem;color:#E2B93B;">'+esc(zorgTekst(g.zorg))+'</div>' : '')+
         '</div>').join('')
       : '<div class="softline">'+T('gl.leeg','Nog geen gasten die hun locatie met u delen.')+'</div>')+'</div>';
   }
@@ -6780,7 +6780,7 @@
     el.querySelectorAll('[data-glstop]').forEach(b => b.addEventListener('click', async () => {
       try {
         const r = await API.call('/supplier/gastlocatie/stop', { id: b.dataset.glstop });
-        toast('📍 '+T('gl.gestopt','Meekijken gestopt;')+' '+r.deel.codenaam+' '+T('gl.gestopt2','heeft bericht gekregen.'));
+        toast(''+T('gl.gestopt','Meekijken gestopt;')+' '+r.deel.codenaam+' '+T('gl.gestopt2','heeft bericht gekregen.'));
         gastLocAt = 0; laadGastLoc();
       } catch(e){ toast(e.message); }
     }));
@@ -6936,13 +6936,13 @@
       const st = salonStatus, canEdit = actor().manager;
       const kleur = st.compleet ? 'var(--green)' : 'var(--burgundy)';
       html += '<div class="card" style="border-color:'+kleur+';"><div class="tt-h" style="color:'+kleur+';">'+
-        (st.compleet ? '✅ '+T('sn.compleet','Salon-profiel compleet') : '⚠️ '+T('sn.verplicht','De Salon is verplicht'))+'</div>'+
+        (st.compleet ? ''+T('sn.compleet','Salon-profiel compleet') : ''+T('sn.verplicht','De Salon is verplicht'))+'</div>'+
         '<p class="ds" style="margin:0.4rem 0;">'+T('sn.uitleg','Al uw marketing, producten en folders lopen via De Salon. Zonder compleet profiel bent u niet zichtbaar voor leden en kunt u niets publiceren.')+'</p>'+
         '<div style="height:8px;background:var(--card2);border-radius:999px;overflow:hidden;margin:0.5rem 0;"><div style="height:100%;width:'+st.percentage+'%;background:'+kleur+';"></div></div>'+
-        '<div style="display:grid;gap:0.35rem;">'+st.stappen.map(s => '<div style="font-size:0.82rem;">'+(s.klaar?'✅':'⬜')+' '+T('sn.stap.'+s.id, s.tekst)+'</div>').join('')+'</div>'+
+        '<div style="display:grid;gap:0.35rem;">'+st.stappen.map(s => '<div style="font-size:0.82rem;">'+(s.klaar?'':'')+' '+T('sn.stap.'+s.id, s.tekst)+'</div>').join('')+'</div>'+
         (canEdit ? '<div class="field" style="margin-top:0.7rem;"><label>'+T('sn.bio','Bio (wie bent u?)')+'</label><textarea id="snBio" rows="2" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;font-family:inherit;">'+esc(st.bio||'')+'</textarea></div>'+
           '<div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;flex-wrap:wrap;">'+
-          '<label class="obtn" style="cursor:pointer;">📷 '+T('sn.foto','Profielfoto')+'<input type="file" id="snFoto" accept="image/*" style="display:none;"></label>'+
+          '<label class="obtn" style="cursor:pointer;">'+T('sn.foto','Profielfoto')+'<input type="file" id="snFoto" accept="image/*" style="display:none;"></label>'+
           (st.foto?'<img src="'+esc(st.foto)+'" alt="'+T('sn.foto','Profielfoto')+'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;">':'')+
           '<button class="obtn primary" id="snBioSave">'+T('sn.opslaan','Profiel opslaan')+'</button></div>' : '')+
         '</div>';
@@ -6966,7 +6966,7 @@
       '<div class="field"><label>'+T('sn.f.titel','Titel')+'</label><input id="snFdTitel" placeholder="'+T('sn.f.titelph','Bijv. Zomerkaart')+'"></div>'+
       '<div class="field"><label>'+T('sn.f.tekst','Korte intro (optioneel)')+'</label><input id="snFdTekst"></div>'+
       '<div class="field"><label>'+T('sn.f.fotos','Foto\'s')+'</label><div id="snFdFotos" style="display:flex;gap:0.4rem;flex-wrap:wrap;"></div>'+
-        '<label class="obtn" style="cursor:pointer;margin-top:0.4rem;display:inline-block;">📷 '+T('sn.f.fotoadd','Foto toevoegen')+'<input type="file" id="snFdFoto" accept="image/*" style="display:none;"></label></div>'+
+        '<label class="obtn" style="cursor:pointer;margin-top:0.4rem;display:inline-block;">'+T('sn.f.fotoadd','Foto toevoegen')+'<input type="file" id="snFdFoto" accept="image/*" style="display:none;"></label></div>'+
       '<div class="field"><label>'+T('sn.f.items','Producten')+'</label><div id="snFdItems"></div>'+
         '<button class="obtn" id="snFdItemAdd" style="margin-top:0.4rem;">+ '+T('sn.f.itemadd','Product toevoegen')+'</button></div>'+
       '<button class="obtn primary" id="snFdPlaats" style="margin-top:0.7rem;">'+T('sn.f.plaats','Folder plaatsen')+'</button></div>';
@@ -7088,7 +7088,7 @@
       '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
       '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('wv.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
       (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
-      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;margin-top:0.35rem;">💛 '+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
+      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;margin-top:0.35rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
       '</div>';
   }
   function renderWinkelvloer(){
@@ -7112,13 +7112,13 @@
       '<div id="wvZoekUit" style="margin-top:0.5rem;"></div></div>';
     const pk = wvRetail.paskamer || [];
     html += '<div class="card"><div class="tt-h">'+T('wv.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
-      (pk.length ? pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">🚪 '+esc(v.artikelNaam)+' · '+esc(v.maat)+'</span></div>'+
+      (pk.length ? pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikelNaam)+' · '+esc(v.maat)+'</span></div>'+
         '<div class="ds">'+esc(v.codenaam||'Gast')+' · '+esc(v.kleur)+(v.paskamer?' · '+esc(v.paskamer):'')+'</div>'+
         '<button class="obtn primary" data-wvbreng="'+v.id+'" style="margin-top:0.35rem;">'+T('wv.breng','Gebracht')+'</button></div>').join('')
         : '<div class="empty">'+T('wv.geenpk','Geen open verzoeken.')+'</div>')+'</div>';
     const ap = wvRetail.apart || [];
     if (ap.length) html += '<div class="card"><div class="tt-h">'+T('wv.apart','Apart gelegd')+' ('+ap.length+')</div>'+
-      ap.map(r => '<div class="mitem"><div class="r1"><span class="nm">🛍 '+esc(r.artikelNaam)+' · '+esc(r.maat)+'</span></div><div class="ds">'+esc(r.codenaam||r.key)+' · '+T('wv.tot','tot')+' '+esc(r.tot)+'</div></div>').join('')+'</div>';
+      ap.map(r => '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</span></div><div class="ds">'+esc(r.codenaam||r.key)+' · '+T('wv.tot','tot')+' '+esc(r.tot)+'</div></div>').join('')+'</div>';
     html += '<div class="card"><div class="tt-h">'+T('wv.klant','Klant erbij pakken')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+wvInput('wvKlantKey', T('wv.klantph','Codenaam of sleutel van het lid'))+'<button class="obtn primary" id="wvKlantBtn">'+T('wv.open','Open')+'</button></div>'+
       '<div id="wvKlantUit">'+(wvKlant?wvKlantKaart(wvKlant):'')+'</div></div>';
@@ -7139,7 +7139,7 @@
       if (wvKlant) body.klantKey = wvKlant.key;
       try {
         const r = await API.call('/supplier/retail/verkoop', body);
-        toast('✅ '+T('wv.verkocht','Verkocht')+' · '+eur(r.sale.total));
+        toast(''+T('wv.verkocht','Verkocht')+' · '+eur(r.sale.total));
         wvCart = [];
         if (wvKlant){ try { wvKlant = (await API.call('/supplier/retail/klant', { key: wvKlant.key })).klant; } catch(e){} }
         await laadWinkelvloer();
@@ -7150,7 +7150,7 @@
       try {
         const r = await API.call('/supplier/retail/zoek', { q: wrap.querySelector('#wvZoek').value });
         uit.innerHTML = r.resultaten.length ? r.resultaten.map(v =>
-          '<div class="mitem"><div class="r1"><span class="nm">'+(v.voorraad>0?'👕':'🚫')+' '+esc(v.artikel)+'</span><span class="pr">'+eur(v.price)+'</span></div>'+
+          '<div class="mitem"><div class="r1"><span class="nm">'+(v.voorraad>0?'':'')+' '+esc(v.artikel)+'</span><span class="pr">'+eur(v.price)+'</span></div>'+
           '<div class="ds">'+esc(v.kleur)+' · '+esc(v.maat)+' · '+T('wv.voorraad','voorraad')+' '+v.voorraad+'</div>'+
           (v.voorraad>0?'<div style="display:flex;gap:0.35rem;margin-top:0.35rem;"><button class="obtn primary" data-wvadd="'+esc(v.vsku)+'" data-nm="'+esc(v.artikel)+'" data-kl="'+esc(v.kleur)+'" data-mt="'+esc(v.maat)+'" data-pr="'+v.price+'">+ '+T('wv.opbon','Op de bon')+'</button>'+
           '<button class="obtn" data-wvapart="'+esc(v.vsku)+'">'+T('wv.legapart','Apart')+'</button></div>':'')+'</div>').join('')
@@ -7205,11 +7205,11 @@
       const eigen = (zbLev.afspraken || []).filter(a => a.behandelaarId === b.id);
       return '<div class="card"><div class="tt-h">'+esc(b.naam)+' · '+esc(b.functie)+'</div>'+
         (eigen.length ? eigen.map(a =>
-          '<div class="mitem"><div class="r1"><span class="nm" style="font-variant-numeric:tabular-nums;">'+(a.soort==='medisch'?'🩺':'🧖')+' '+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</span><span class="pr">'+eur(a.prijs)+'</span></div>'+
+          '<div class="mitem"><div class="r1"><span class="nm" style="font-variant-numeric:tabular-nums;">'+(a.soort==='medisch'?'':'')+' '+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</span><span class="pr">'+eur(a.prijs)+'</span></div>'+
           '<div class="ds">'+T('zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min</div>'+
-          (a.zorg ? '<div class="ds" style="color:#E2B93B;">⚠ '+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
-          (a.intake ? '<div class="ds" style="color:#E2B93B;">🩺 '+esc(a.intake)+'</div>' : '')+
-          (a.status === 'afgerond' ? '<div class="ds" style="color:var(--green,#4C9A75);">✅ '+T('zb.klaar','Afgerond')+'</div>'
+          (a.zorg ? '<div class="ds" style="color:#E2B93B;">'+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
+          (a.intake ? '<div class="ds" style="color:#E2B93B;">'+esc(a.intake)+'</div>' : '')+
+          (a.status === 'afgerond' ? '<div class="ds" style="color:var(--green,#4C9A75);">'+T('zb.klaar','Afgerond')+'</div>'
             : '<button class="obtn primary" data-zblevklaar="'+esc(a.ref)+'" style="margin-top:0.35rem;">'+T('zb.afronden','Afronden')+'</button>')+
           '</div>').join('')
         : '<div class="empty">'+T('zb.leeg','Geen afspraken op deze dag.')+'</div>')+
@@ -7219,7 +7219,7 @@
       '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.55rem;">'+dagen.join('')+'</div></div>' + perBehandelaar;
     wrap.querySelectorAll('[data-zblevdag]').forEach(b => b.addEventListener('click', () => { zbLevDatum = b.dataset.zblevdag; laadZorgbalieLev(); }));
     wrap.querySelectorAll('[data-zblevklaar]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/care/afronden', { ref: b.dataset.zblevklaar }); toast('✅ '+T('zb.klaar','Afgerond')); laadZorgbalieLev(); }
+      try { await API.call('/supplier/care/afronden', { ref: b.dataset.zblevklaar }); toast(''+T('zb.klaar','Afgerond')); laadZorgbalieLev(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -7308,7 +7308,7 @@
     ].join('');
     document.head.appendChild(st);
   }
-  const AW_GROEPEN = [ { id: 'man', label: 'Man', icoon: '♂' }, { id: 'vrouw', label: 'Vrouw', icoon: '♀' }, { id: 'onbekend', label: 'Onbekend / anders', icoon: '○' } ];
+  const AW_GROEPEN = [ { id: 'man', label: 'Man', icoon: '' }, { id: 'vrouw', label: 'Vrouw', icoon: '' }, { id: 'onbekend', label: 'Onbekend / anders', icoon: '○' } ];
   async function awPas(groep, delta){
     try { const d = await API.call('/supplier/aanwezig/pas', { groep, delta }); awToon(d.aanwezig); } catch(e){ toast(e.message); }
   }
@@ -7376,8 +7376,8 @@
       gasten.map(([naam, som]) => '<div class="tt-gast"><span>' + naam + '</span><span class="n">' + eur(som) + '</span></div>').join('') +
       (t.bonnen || []).map(b => '<div class="tt-bon">• ' + b.ref + ' · ' + b.codename + ' · ' + eur(b.total) + '</div>').join('') +
       '<div class="tt-tot"><span>' + T('tt.totaal','Totaal') + '</span><span>' + eur(t.subtotaal) + '</span></div>' +
-      '<div class="tt-zegel">🔒 ' + T('tt.zegel','Gezegeld ticket') + ': ' + String(t.zegel || '').slice(0, 24) + '…</div>' +
-      '<button class="tt-btn" id="ttAfreken">🧾 ' + T('tt.afrekenen','Reken dit ticket in een keer af (contant)') + '</button>';
+      '<div class="tt-zegel">' + T('tt.zegel','Gezegeld ticket') + ': ' + String(t.zegel || '').slice(0, 24) + '…</div>' +
+      '<button class="tt-btn" id="ttAfreken">' + T('tt.afrekenen','Reken dit ticket in een keer af (contant)') + '</button>';
     const ab = document.getElementById('ttAfreken');
     if (ab) ab.addEventListener('click', ttAfrekenen);
   }
@@ -7394,7 +7394,7 @@
     if (!confirm(T('tt.bevestig','Alle bonnen aan ') + (ttHuidig.table || '') + T('tt.bevestig2',' in een keer afrekenen (contant)?'))) return;
     try {
       const d = await API.call('/supplier/tafelticket/afrekenen', { table: ttHuidig.table, zegel: ttHuidig.zegel, at: ttHuidig.at, method: 'contant' });
-      toast('🧾 ' + T('tt.klaar','Tafelticket afgerekend: ') + eur(d.subtotaal) + ' (' + d.aantalBonnen + ' ' + T('tt.bonnen','bon(nen)') + ')');
+      toast('' + T('tt.klaar','Tafelticket afgerekend: ') + eur(d.subtotaal) + ' (' + d.aantalBonnen + ' ' + T('tt.bonnen','bon(nen)') + ')');
       const ov = document.getElementById('ttOverlay'); if (ov) ov.remove();
     } catch(e){
       // beveiliging: gewijzigde of gemanipuleerde rekening -> vers ophalen
@@ -7409,7 +7409,7 @@
     const oud = document.getElementById('ttOverlay'); if (oud) oud.remove();
     const ov = document.createElement('div'); ov.className = 'tt-ov'; ov.id = 'ttOverlay';
     ov.innerHTML = '<div class="tt-card" role="dialog" aria-modal="true" aria-label="' + T('tt.titel','Tafel op een ticket') + '">' +
-      '<div class="tt-kop"><h3>🧾 ' + T('tt.titel','Tafel op een ticket') + '</h3><button class="tt-sluit" id="ttSluit" aria-label="Sluiten">✕</button></div>' +
+      '<div class="tt-kop"><h3>' + T('tt.titel','Tafel op een ticket') + '</h3><button class="tt-sluit" id="ttSluit" aria-label="Sluiten">✕</button></div>' +
       (tafels.length
         ? '<select class="tt-in" id="ttTafel" aria-label="' + T('tt.tafel','Tafel') + '"><option value="">' + T('tt.kies','Kies een tafel…') + '</option>' +
             tafels.map(t => '<option value="' + t.name + '">' + t.name + '</option>').join('') + '</select>'
@@ -7476,14 +7476,14 @@
 
     // personeel
     html += '<div class="card"><div class="tt-h" style="display:flex;justify-content:space-between;align-items:center;">'+T('team.roster','Personeel')+'<span style="display:flex;gap:0.4rem;">'+
-      (a.staffId ? '<button class="obtn" id="teamCallSup" style="font-size:0.66rem;">📹 '+T('team.call','Teamcall')+'</button>' : '')+
-      '<button class="obtn" id="buzzAll" style="font-size:0.66rem;">📢 '+T('team.buzzall','Iedereen')+'</button></span></div>';
+      (a.staffId ? '<button class="obtn" id="teamCallSup" style="font-size:0.66rem;">'+T('team.call','Teamcall')+'</button>' : '')+
+      '<button class="obtn" id="buzzAll" style="font-size:0.66rem;">'+T('team.buzzall','Iedereen')+'</button></span></div>';
     html += staff.map(m => {
       const you = a.staffId && m.id === a.staffId;
       // iedereen bereikt iedereen: een interne (video)call of een direct bericht
-      const bel = (you || !a.staffId) ? '' : '<button class="tt-buzz" data-belm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.belhint','Interne call (video)')+'">📞</button>';
-      const dm = (you || !a.staffId) ? '' : '<button class="tt-buzz" data-dmm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.dmhint','Direct bericht')+'" style="position:relative;">💬<i data-dmbadge="'+m.id+'" style="display:none;position:absolute;top:-5px;right:-5px;background:#C23A5E;color:#fff;border-radius:999px;font-style:normal;font-size:0.58rem;min-width:1rem;height:1rem;line-height:1rem;text-align:center;"></i></button>';
-      const buzz = you ? '' : '<button class="tt-buzz" data-buzz="'+m.id+'" title="'+T('team.buzz','Oproepen (tril)')+'">📳</button>';
+      const bel = (you || !a.staffId) ? '' : '<button class="tt-buzz" data-belm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.belhint','Interne call (video)')+'"></button>';
+      const dm = (you || !a.staffId) ? '' : '<button class="tt-buzz" data-dmm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.dmhint','Direct bericht')+'" style="position:relative;"><i data-dmbadge="'+m.id+'" style="display:none;position:absolute;top:-5px;right:-5px;background:#C23A5E;color:#fff;border-radius:999px;font-style:normal;font-size:0.58rem;min-width:1rem;height:1rem;line-height:1rem;text-align:center;"></i></button>';
+      const buzz = you ? '' : '<button class="tt-buzz" data-buzz="'+m.id+'" title="'+T('team.buzz','Oproepen (tril)')+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>';
       const rm = (a.manager && !you) ? '<button class="tt-rm" data-rm="'+m.id+'">'+T('team.remove','Verwijder')+'</button>' : '';
       const tag = you ? '<span class="you">'+T('team.you','jij')+'</span>' : '';
       return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+(m.func? m.func+' · ':'')+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+bel+dm+buzz+rm+'</div>';
@@ -7528,7 +7528,7 @@
       if (c.skills && c.skills.length) parts.push(T('ap.skills','Vaardigheden')+': '+c.skills.join(', '));
       if (c.languages) parts.push(T('ap.langs','Talen')+': '+c.languages);
       if (!parts.length) return '';
-      return '<div style="flex-basis:100%;font-size:0.72rem;color:var(--muted);line-height:1.5;margin-top:0.35rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;">📄 '+parts.join('<br>')+'</div>';
+      return '<div style="flex-basis:100%;font-size:0.72rem;color:var(--muted);line-height:1.5;margin-top:0.35rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;">'+parts.join('<br>')+'</div>';
     };
     html += apps.length ? apps.map(x =>
       '<div class="tk-row" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+
@@ -7542,13 +7542,13 @@
       const kanChat = x.status === 'uitgenodigd' || x.status === 'aangenomen';
       const stLabel = x.status === 'uitgenodigd' ? T('ap.st.invited','uitgenodigd') : x.status === 'aangenomen' ? T('ap.st.hired','aangenomen') : T('ap.st.rejected','afgewezen');
       return '<div class="tk-row done" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+stLabel+'</span></div>'+
-        (kanChat && a.manager ? '<button class="obtn primary" data-apchat="'+x.id+'" data-apname="'+encodeURIComponent(x.name)+'">💬 '+T('ap.chat','Chat')+'</button>' : '')+'</div>';
+        (kanChat && a.manager ? '<button class="obtn primary" data-apchat="'+x.id+'" data-apname="'+encodeURIComponent(x.name)+'">'+T('ap.chat','Chat')+'</button>' : '')+'</div>';
     }).join('');
     html += '</div>';
 
     // de PDA van dit bedrijf: personeel opent met deze link (of QR) meteen
     // het eigen team, zonder sector- en bedrijfskeuze
-    html += '<a class="obtn" style="text-decoration:none;display:inline-block;margin:0.2rem 0 0.8rem;" href="/apps/personeel.html?bedrijf='+encodeURIComponent(S.code)+'">👤 '+T('team.pdalink','Personeels-app van dit bedrijf')+'</a>';
+    html += '<a class="obtn" style="text-decoration:none;display:inline-block;margin:0.2rem 0 0.8rem;" href="/apps/personeel.html?bedrijf='+encodeURIComponent(S.code)+'">'+T('team.pdalink','Personeels-app van dit bedrijf')+'</a>';
 
     // activiteit
     html += '<div class="card"><div class="tt-h">'+T('team.activity','Wie deed wat')+'</div>';
@@ -7574,12 +7574,12 @@
     const tcs = $('#teamCallSup'); if (tcs) tcs.addEventListener('click', () => window.TeamCall && TeamCall.groep());
     const ba = $('#buzzAll'); if (ba) ba.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { all: true });
-        toast('📢 '+T('team.allbuzzed','Hele team opgeroepen')+' ('+d.reached+' '+T('team.online','online')+').'); }
+        toast(''+T('team.allbuzzed','Hele team opgeroepen')+' ('+d.reached+' '+T('team.online','online')+').'); }
       catch(e){ toast(e.message); }
     });
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
-        toast(d.reached ? '📳 '+d.name+' '+T('team.buzzed','wordt opgeroepen.') : d.name+' '+T('team.buzzoff','heeft de app nu niet open.')); }
+        toast(d.reached ? ''+d.name+' '+T('team.buzzed','wordt opgeroepen.') : d.name+' '+T('team.buzzoff','heeft de app nu niet open.')); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-aphire]').forEach(b => b.addEventListener('click', async () => {
@@ -7595,7 +7595,7 @@
     }));
     document.querySelectorAll('[data-apinvite]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/apply/decide', { id: b.dataset.apinvite, action: 'uitnodigen' });
-        toast('💬 '+T('ap.invited','Uitgenodigd. Maak samen een afspraak in de chat.'));
+        toast(''+T('ap.invited','Uitgenodigd. Maak samen een afspraak in de chat.'));
         await refresh(); openTab('team'); openApChat(b.dataset.apinvite, d.chat && d.chat.metWie); } catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-apchat]').forEach(b => b.addEventListener('click', () => openApChat(b.dataset.apchat, decodeURIComponent(b.dataset.apname||''))));
@@ -7607,7 +7607,7 @@
           func, soort: $('#vacSoort').value, minLeeftijd: Number($('#vacLft').value),
           plaats: $('#vacPlaats').value.trim(), uren: $('#vacUren').value.trim(), omschrijving: $('#vacOms').value.trim()
         });
-        toast('✅ '+T('vac.geplaatst','Vacature geplaatst en zichtbaar in de RTFoundation.'));
+        toast(''+T('vac.geplaatst','Vacature geplaatst en zichtbaar in de RTFoundation.'));
         await refresh(); openTab('team');
       } catch(e){ toast(e.message); }
     });
@@ -7633,7 +7633,7 @@
       document.getElementById('shell').appendChild(el);
       el.addEventListener('click', () => el.classList.remove('on'));
     }
-    el.innerHTML = '<div class="bz"><div class="bz-ic">📳</div><b>'+esc(from)+'</b><span>'+T('buzz.calls','roept u op')+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
+    el.innerHTML = '<div class="bz"><div class="bz-ic"></div><b>'+esc(from)+'</b><span>'+T('buzz.calls','roept u op')+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
     setTimeout(() => el.classList.remove('on'), 8000);
   }
@@ -7649,8 +7649,8 @@
       el.addEventListener('click', () => el.classList.remove('on'));
     }
     const locTxt = d.loc ? (d.label ? d.label + ' · ' : '') + d.loc.lat.toFixed(4) + ', ' + d.loc.lng.toFixed(4) : T('alarm.noloc','locatie onbekend');
-    el.innerHTML = '<div class="bz"><div class="bz-ic">🚨</div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('alarm.needs','heeft direct assistentie nodig'))+'</span>'+
-      '<span style="margin-top:0.6rem;font-size:0.8rem;">📍 '+esc(locTxt)+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
+    el.innerHTML = '<div class="bz"><div class="bz-ic"></div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('alarm.needs','heeft direct assistentie nodig'))+'</span>'+
+      '<span style="margin-top:0.6rem;font-size:0.8rem;">'+esc(locTxt)+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
   }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -7700,18 +7700,18 @@
     const el = $('#reviewsWrap'); if (!el) return;
     const rating = state && state.reviews && state.reviews.rating;
     const revs = (state && state.reviews && state.reviews.recent) || [];
-    let h = '<div class="card"><div class="tt-h">⭐ '+T('rev2.score','Uw reputatie')+'</div>'+
+    let h = '<div class="card"><div class="tt-h">'+T('rev2.score','Uw reputatie')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:1.4rem;font-family:\'Bodoni Moda\',serif;">'+
       (rating ? rating.score+' <span style="font-size:0.8rem;color:var(--soft);">/ 5 · '+rating.aantal+' '+T('rev2.stuks','review(s)')+'</span>' : T('rev2.geen','Nog geen reviews'))+'</div>'+
       '<div class="softline" style="margin-top:0.3rem;">'+T('rev2.deck','Een snel, persoonlijk antwoord weegt zwaar: gasten lezen mee, en de schrijver krijgt uw reactie direct als melding.')+'</div></div>';
     h += revs.length ? revs.map(r =>
       '<div class="card">'+
-      '<div class="tt-top" style="display:flex;justify-content:space-between;gap:0.5rem;"><b>'+'⭐'.repeat(r.score)+'<span style="opacity:0.25;">'+'⭐'.repeat(5-r.score)+'</span> · '+esc(r.codename||'gast')+'</b><time style="color:var(--soft);font-size:0.7rem;">'+timeAgo(r.at)+'</time></div>'+
+      '<div class="tt-top" style="display:flex;justify-content:space-between;gap:0.5rem;"><b>'+''.repeat(r.score)+'<span style="opacity:0.25;">'+''.repeat(5-r.score)+'</span> · '+esc(r.codename||'gast')+'</b><time style="color:var(--soft);font-size:0.7rem;">'+timeAgo(r.at)+'</time></div>'+
       (r.tekst ? '<div style="margin-top:0.35rem;font-size:0.86rem;">'+esc(r.tekst)+'</div>' : '')+
       (r.reactie
         ? '<div style="margin-top:0.5rem;border-left:3px solid var(--gold);padding:0.4rem 0.7rem;font-size:0.82rem;"><b style="color:var(--gold);">'+T('rev2.uw','Uw reactie')+'</b> · '+timeAgo(r.reactie.at)+'<br>'+esc(r.reactie.tekst)+'</div>'
         : '<div class="tt-compose" style="margin-top:0.5rem;"><input id="rv-'+r.id+'" placeholder="'+T('rev2.ph','Schrijf een persoonlijke reactie...')+'">'+
-          '<button class="obtn ghost" data-rvai="'+r.id+'">✨</button><button data-rvsend="'+r.id+'">'+T('team.send','Stuur')+'</button></div>')+
+          '<button class="obtn ghost" data-rvai="'+r.id+'"></button><button data-rvsend="'+r.id+'">'+T('team.send','Stuur')+'</button></div>')+
       '</div>').join('')
       : '<div class="card softline">'+T('rev2.leeg','Nog geen reviews. Na elke afgeronde dienst kan de gast er een achterlaten.')+'</div>';
     el.innerHTML = h;
@@ -7719,12 +7719,12 @@
       b.textContent = '…';
       try { const d = await API.call('/supplier/review/concept', { id: b.dataset.rvai }); const inp = $('#rv-'+b.dataset.rvai); if (inp) inp.value = d.concept; }
       catch(e){ toast(e.message); }
-      b.textContent = '✨';
+      b.textContent = '';
     }));
     el.querySelectorAll('[data-rvsend]').forEach(b => b.addEventListener('click', async () => {
       const inp = $('#rv-'+b.dataset.rvsend);
       if (!inp || !inp.value.trim()) return;
-      try { await API.call('/supplier/review/reageer', { id: b.dataset.rvsend, tekst: inp.value.trim() }); toast('💬 '+T('rev2.ok','Reactie geplaatst; de gast krijgt een melding.')); await refresh(); }
+      try { await API.call('/supplier/review/reageer', { id: b.dataset.rvsend, tekst: inp.value.trim() }); toast(''+T('rev2.ok','Reactie geplaatst; de gast krijgt een melding.')); await refresh(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -7742,9 +7742,9 @@
     let h = '<div class="card"><div class="st-row"><span>'+T('vr.waarde','Voorraadwaarde')+'</span><b>'+geld(d.totaalWaarde)+'</b></div>'+
       '<div class="st-row"><span>'+T('vr.onder','Onder minimum')+'</span><b'+(d.onderMinimum?' style="color:#FF8589;"':'')+'>'+d.onderMinimum+'</b></div></div>';
     // het inkoopadvies: aanvullen tot twee keer het minimum
-    if ((d.advies||[]).length) h += '<div class="card" style="border-left:4px solid var(--gold,#A98F1C);"><div class="tt-h">🛒 '+T('vr.advies','Inkoopadvies')+'</div>'+
+    if ((d.advies||[]).length) h += '<div class="card" style="border-left:4px solid var(--gold,#A98F1C);"><div class="tt-h">'+T('vr.advies','Inkoopadvies')+'</div>'+
       d.advies.map(a => '<div class="st-row"><span>'+esc(a.naam)+' <span class="sub">'+a.aantal+' '+esc(a.eenheid)+', min '+a.min+'</span></span><b>+ '+a.advies+' '+esc(a.eenheid)+(a.kosten?' <span class="sub">'+geld(a.kosten)+'</span>':'')+'</b></div>').join('')+
-      (mgr?'<button class="bigbtn" id="vrBestel" style="margin-top:0.5rem;">🛒 '+T('vr.bestel','Bestel dit advies bij de groothandel')+'</button>':'')+
+      (mgr?'<button class="bigbtn" id="vrBestel" style="margin-top:0.5rem;">'+T('vr.bestel','Bestel dit advies bij de groothandel')+'</button>':'')+
       '<div class="softline" style="margin-top:0.3rem;">'+T('vr.advies.s','Geleverd = automatisch bijgeboekt, met de inkoopprijs als nieuwe kostprijs.')+'</div></div>';
     // de artikelen zelf, met kostprijs en de vloerhandelingen
     h += '<div class="card">'+(vs.length ? vs.map(v =>
@@ -7752,13 +7752,13 @@
         '<span class="sub">min '+v.min+(v.kostprijs?' · '+geld(v.kostprijs)+'/'+esc(v.eenheid):'')+(v.waarde?' · '+T('vr.wrd','waarde')+' '+geld(v.waarde):'')+'</span></span>'+
       '<span style="display:flex;gap:0.35rem;align-items:center;flex-shrink:0;">'+
         '<b style="min-width:3.6rem;text-align:center;">'+v.aantal+' '+esc(v.eenheid)+'</b>'+
-        '<button class="obtn ghost" data-vtel="'+v.id+'" title="'+T('vr.tel','Telling')+'">🧮</button>'+
-        '<button class="obtn ghost" data-vderf="'+v.id+'" title="'+T('vr.derf','Verspilling')+'">♻</button>'+
-        (mgr?'<button class="obtn ghost" data-vlev="'+v.id+'" title="'+T('vr.lev','Levering')+'">🚚</button><button class="obtn warn" data-vweg="'+v.id+'">🗑</button>':'')+'</span></div>').join('')
+        '<button class="obtn ghost" data-vtel="'+v.id+'" title="'+T('vr.tel','Telling')+'"></button>'+
+        '<button class="obtn ghost" data-vderf="'+v.id+'" title="'+T('vr.derf','Verspilling')+'"></button>'+
+        (mgr?'<button class="obtn ghost" data-vlev="'+v.id+'" title="'+T('vr.lev','Levering')+'"></button><button class="obtn warn" data-vweg="'+v.id+'"></button>':'')+'</span></div>').join('')
       : '<div class="softline">'+T('vr.leeg','Nog geen voorraaditems. Het management zet hieronder de lijst op.')+'</div>')+'</div>';
     // recepten en marge per gerecht: dit maakt de afboeking automatisch
     const rec = (d.recepten||[]);
-    if (rec.length) h += '<div class="card"><div class="tt-h">📖 '+T('vr.recepten','Recepten en marge')+'</div>'+
+    if (rec.length) h += '<div class="card"><div class="tt-h">'+T('vr.recepten','Recepten en marge')+'</div>'+
       rec.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;">'+
         '<div class="st-row"><span><b>'+esc(r.naam)+'</b> <span class="sub">'+geld(r.prijs)+(r.regels.length?' · '+T('vr.kost','kost')+' '+geld(r.kostprijs)+' · '+T('vr.marge','marge')+' '+geld(r.marge)+(r.margePct!=null?' ('+r.margePct+'%)':''):'')+'</span></span>'+
         (mgr?'<button class="obtn ghost" data-vrec="'+r.id+'">'+(r.regels.length?T('vr.rbew','Recept'):T('vr.rzet','+ Recept'))+'</button>':'')+'</div>'+
@@ -7767,16 +7767,16 @@
       '<div class="softline" style="margin-top:0.3rem;">'+T('vr.rec.s','Elke kassabon en betaalde bestelling boekt de ingredienten automatisch af via het recept.')+'</div></div>';
     // menu-engineering: volume maal marge, in de klassieke kwadranten
     if (ma && (ma.rijen||[]).some(r => r.verkocht > 0 || r.heeftRecept)){
-      const KLASSE = { ster: ['⭐', '#D8B940'], werkpaard: ['🐴', '#69B98B'], puzzel: ['🧩', '#7FA6D9'], hond: ['🐕', '#FF8589'], onbekend: ['·', 'var(--soft)'] };
-      h += '<div class="card"><div class="tt-h">📊 '+T('vr.me','Menu-engineering')+' <span class="sub">('+ma.dagen+' '+T('vr.dagen','dagen')+')</span></div>'+
+      const KLASSE = { ster: ['', '#D8B940'], werkpaard: ['', '#69B98B'], puzzel: ['', '#7FA6D9'], hond: ['', '#FF8589'], onbekend: ['·', 'var(--soft)'] };
+      h += '<div class="card"><div class="tt-h">'+T('vr.me','Menu-engineering')+' <span class="sub">('+ma.dagen+' '+T('vr.dagen','dagen')+')</span></div>'+
         ma.rijen.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
           '<div class="st-row"><span><b style="color:'+KLASSE[r.klasse][1]+';">'+KLASSE[r.klasse][0]+' '+esc(r.klasse)+'</b> '+esc(r.naam)+'</span>'+
           '<span class="sub">'+r.verkocht+'× · '+T('vr.marge','marge')+' '+geld(r.marge)+' · '+T('vr.winst','winst')+' '+geld(r.brutowinst)+'</span></div>'+
           '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+
-        (mgr?'<button class="bigbtn" id="vrPlan" style="margin-top:0.5rem;">🧠 '+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
+        (mgr?'<button class="bigbtn" id="vrPlan" style="margin-top:0.5rem;">'+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
     }
     // het logboek: elke beweging herleidbaar
-    if ((d.logboek||[]).length) h += '<div class="card"><div class="tt-h">🧾 '+T('vr.log','Laatste bewegingen')+'</div>'+
+    if ((d.logboek||[]).length) h += '<div class="card"><div class="tt-h">'+T('vr.log','Laatste bewegingen')+'</div>'+
       d.logboek.slice(0,8).map(l => '<div class="st-row"><span>'+esc(l.artikel)+' <span class="sub">'+esc(l.soort)+' · '+esc(l.oms||'')+' · '+esc(l.wie||'')+'</span></span><b'+(l.delta<0?' style="color:#FF8589;"':' style="color:#69B98B;"')+'>'+(l.delta>0?'+':'')+l.delta+'</b></div>').join('')+'</div>';
     if (mgr) h += '<div class="card"><div class="tt-h">'+T('vr.nieuw','Nieuw item')+'</div>'+
       '<div class="row-gap" style="margin-top:0.5rem;"><input class="st-in" id="vrNaam" placeholder="'+T('vr.naam','Naam, bijv. Cava brut')+'" style="flex:2;">'+
@@ -7800,7 +7800,7 @@
           code = keuze.trim().toUpperCase();
         }
         const r = await API.call('/supplier/keuken/bestel-advies', { groothandelCode: code });
-        toast('🛒 '+T('vr.besteld','Bestelling ')+r.order.ref+' '+T('vr.besteld2','geplaatst.')+(r.nietGevonden.length?' '+T('vr.nietgev','Niet in het assortiment: ')+r.nietGevonden.join(', '):''));
+        toast(''+T('vr.besteld','Bestelling ')+r.order.ref+' '+T('vr.besteld2','geplaatst.')+(r.nietGevonden.length?' '+T('vr.nietgev','Niet in het assortiment: ')+r.nietGevonden.join(', '):''));
         renderVoorraad();
       } catch(e){ toast(e.message); }
     });
@@ -7883,7 +7883,7 @@
     source.addEventListener('pas', e => {
       try {
         const d = JSON.parse(e.data || '{}');
-        toast('🛎️ ' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));
+        toast('' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));
       } catch(err){}
     });
     source.addEventListener('notify', e => {

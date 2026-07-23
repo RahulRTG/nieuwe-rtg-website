@@ -92,7 +92,7 @@
           name: el.querySelector('#svNaam').value, desc: el.querySelector('#svDesc').value,
           price: Number(el.querySelector('#svPrijs').value), duurMin: Number(el.querySelector('#svDuur').value),
           soort: el.querySelector('#svSoort').value });
-        kantoorMsg = '✅ '+T('kt.svklaar','In de app gezet; leden kunnen direct boeken.');
+        kantoorMsg = ''+T('kt.svklaar','In de app gezet; leden kunnen direct boeken.');
         await refresh();
       } catch(e){ toast(e.message); }
     });
@@ -101,10 +101,10 @@
     }));
     // vakwerk: een aanvraag bevestigen of een afspraak afronden
     el.querySelectorAll('[data-vakbev]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakbev, status: 'bevestigd' }); vakData = null; kantoorMsg = '✅ '+T('vk.bevok','Bevestigd; het lid krijgt bericht.'); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakbev, status: 'bevestigd' }); vakData = null; kantoorMsg = ''+T('vk.bevok','Bevestigd; het lid krijgt bericht.'); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-vakaf]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = '✅ '+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = ''+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
     }));
     // vakwerk: werkdagen aan/uit tikken (lokaal, tot Opslaan)
     el.querySelectorAll('[data-vakdag]').forEach(b => b.addEventListener('click', () => {
@@ -114,7 +114,7 @@
       const dagen = [...el.querySelectorAll('[data-vakdag]')].sort((a,c)=>a.dataset.vakdag-c.dataset.vakdag).map(b => b.classList.contains('primary'));
       try {
         await API.call('/supplier/vak/uren-zet', { dagen, van: el.querySelector('#vakVan').value, tot: el.querySelector('#vakTot').value });
-        vakData = null; vakUren = null; kantoorMsg = '✅ '+T('vk.urenok','Beschikbaarheid opgeslagen; leden zien alleen vrije tijden.');
+        vakData = null; vakUren = null; kantoorMsg = ''+T('vk.urenok','Beschikbaarheid opgeslagen; leden zien alleen vrije tijden.');
         await refresh();
       } catch(e){ toast(e.message); }
     });
@@ -128,7 +128,7 @@
     });
     // verlofaanvragen beslissen
     el.querySelectorAll('[data-kvja]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/leave/decide', { id: b.dataset.kvja, action: 'goedkeuren' }); kantoorMsg = '✅ '+T('kt.vgedaan','Verlof goedgekeurd; het staflid ziet dit direct op de PDA.'); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/leave/decide', { id: b.dataset.kvja, action: 'goedkeuren' }); kantoorMsg = ''+T('kt.vgedaan','Verlof goedgekeurd; het staflid ziet dit direct op de PDA.'); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kvnee]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/leave/decide', { id: b.dataset.kvnee, action: 'afwijzen' }); await refresh(); } catch(e){ toast(e.message); }

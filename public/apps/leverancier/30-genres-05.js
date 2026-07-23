@@ -29,7 +29,7 @@
   // ---- content creator: de carriere-backoffice ----
   let cr = null;
   const IDEE_KL = { 'idee':'var(--soft)', 'productie':'var(--gold)', 'gepost':'#7EE0A3' };
-  const PLAT_ICO = { instagram:'📸', tiktok:'🎵', youtube:'▶️', x:'𝕏', twitch:'🎮', podcast:'🎙️', blog:'✍️' };
+  const PLAT_ICO = { instagram:'', tiktok:'', youtube:'▶', x:'𝕏', twitch:'', podcast:'', blog:'' };
   async function laadCreator(){
     if (!has('creator') || !API.live) return;
     try { cr = await API.call('/supplier/creator/overzicht', {}); } catch(e){ cr = null; }
@@ -45,7 +45,7 @@
     const kort = n => n >= 1000 ? (Math.round(n/100)/10)+'K' : String(n);
     let html = '';
     // profiel
-    html += '<div class="card"><div class="tt-h">🎬 '+T('cr.profiel','Profiel')+'</div>'+
+    html += '<div class="card"><div class="tt-h">'+T('cr.profiel','Profiel')+'</div>'+
       (canEdit ? '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;"><input id="crNiche" placeholder="'+T('cr.niche','Niche (bijv. Reizen & lifestyle)')+'" value="'+escAttr(o.niche||'')+'" '+inp+'><textarea id="crBio" placeholder="'+T('cr.bio','Korte bio')+'" '+inp+' rows="2">'+esc(o.bio||'')+'</textarea><button class="obtn primary" id="crProfielOp" style="align-self:flex-start;">'+T('cr.opslaan','Opslaan')+'</button></div>'
         : '<div style="margin-top:0.4rem;"><b>'+esc(o.niche||'')+'</b><div class="ds">'+esc(o.bio||'')+'</div></div>')+'</div>';
     // stats

@@ -27,7 +27,7 @@
   let retailSec = 'overzicht';   // overzicht | catalogus | voorraad | clienteling
   let retailKlant = null;        // geopend klantdossier (clienteling)
   let retailArtBewerk = null;    // id van het artikel dat bewerkt wordt (of 'nieuw')
-  const RSEC = [['overzicht','📈','Overzicht'],['catalogus','👗','Collecties'],['voorraad','📦','Voorraad'],['clienteling','💎','Klanten']];
+  const RSEC = [['overzicht','','Overzicht'],['catalogus','','Collecties'],['voorraad','','Voorraad'],['clienteling','','Klanten']];
   async function laadRetail(){
     if (!has('retail') || !API.live) return;
     try { retailData = (await API.call('/supplier/retail', {})).retail; } catch(e){ retailData = { collecties:[], artikelen:[], apart:[], paskamer:[], styling:[], klanten:[], stats:{}, maten:[], seizoenen:[] }; }

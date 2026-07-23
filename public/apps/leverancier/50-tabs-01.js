@@ -4,7 +4,7 @@
     const revenue = (state.orders||[]).filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
     $('#homeH').textContent = T('sup.hello','Goedendag,') + ' ' + S.name.split(' ')[0] + '.';
     const rating = state.reviews && state.reviews.rating;
-    $('#homeSub').textContent = tType(S.typeLabel) + (rating ? ' · ⭐ ' + rating.score + ' (' + rating.aantal + ' reviews)' : '') + ' · ' + T('sup.connected','verbonden met RTG');
+    $('#homeSub').textContent = tType(S.typeLabel) + (rating ? ' ·  ' + rating.score + ' (' + rating.aantal + ' reviews)' : '') + ' · ' + T('sup.connected','verbonden met RTG');
     let stat = '';
     if (has('orders')) stat += '<div class="b"><div class="l">'+T('sup.openorders','Open orders')+'</div><div class="v a">'+open.length+'</div></div>';
     if (has('rides')) stat += '<div class="b"><div class="l">'+T('tab.rides','Ritten')+'</div><div class="v a">'+(state.rides||[]).length+'</div></div>';
@@ -16,28 +16,28 @@
     // Vandaag nog doen: alles wat aandacht vraagt, met een sprong naar de juiste tab
     const todos = [];
     const unreadChats = (state.guestChats || []).reduce((n, c) => n + (c.unread || 0), 0);
-    if (unreadChats) todos.push({ icon:'💬', txt: unreadChats + ' ' + T('todo.chats','onbeantwoord(e) gastbericht(en)'), tab:'gchat' });
+    if (unreadChats) todos.push({ icon:'', txt: unreadChats + ' ' + T('todo.chats','onbeantwoord(e) gastbericht(en)'), tab:'gchat' });
     const newOrders = (state.orders || []).filter(o => o.status === 'nieuw').length;
-    if (newOrders) todos.push({ icon:'🛎️', txt: newOrders + ' ' + T('todo.orders','nieuwe bestelling(en)'), tab:'orders' });
+    if (newOrders) todos.push({ icon:'', txt: newOrders + ' ' + T('todo.orders','nieuwe bestelling(en)'), tab:'orders' });
     const newRides = (state.rides || []).filter(r => r.status === 'aangevraagd').length;
-    if (newRides) todos.push({ icon:'🚗', txt: newRides + ' ' + T('todo.rides','open ritaanvraag/-vragen'), tab:'rides' });
+    if (newRides) todos.push({ icon:'', txt: newRides + ' ' + T('todo.rides','open ritaanvraag/-vragen'), tab:'rides' });
     if (state.minibar){
       const roomsAll = (state.rooms || []).map(r => r.name);
       const notCounted = roomsAll.filter(r => !state.minibar.countedToday.includes(r));
-      if (notCounted.length) todos.push({ icon:'🧊', txt: notCounted.length + ' ' + T('todo.minibar','minibar(s) nog tellen'), tab:'minibar' });
+      if (notCounted.length) todos.push({ icon:'', txt: notCounted.length + ' ' + T('todo.minibar','minibar(s) nog tellen'), tab:'minibar' });
     }
     const openRooms = Object.keys((state.pos && state.pos.openRooms) || {}).length;
-    if (openRooms) todos.push({ icon:'🧾', txt: openRooms + ' ' + T('todo.folio','open kamerrekening(en)'), tab:'kassa' });
+    if (openRooms) todos.push({ icon:'', txt: openRooms + ' ' + T('todo.folio','open kamerrekening(en)'), tab:'kassa' });
     const dirty = (state.rooms || []).filter(r => r.hk && (r.hk.status === 'vuil')).length;
-    if (dirty) todos.push({ icon:'🧹', txt: dirty + ' ' + T('todo.dirty','kamer(s) schoon te maken'), tab:'rooms' });
+    if (dirty) todos.push({ icon:'', txt: dirty + ' ' + T('todo.dirty','kamer(s) schoon te maken'), tab:'rooms' });
     const defect = (state.rooms || []).filter(r => r.hk && r.hk.status === 'defect').length;
-    if (defect) todos.push({ icon:'⚠️', txt: defect + ' ' + T('todo.defect','kamer(s) defect'), tab:'rooms' });
+    if (defect) todos.push({ icon:'', txt: defect + ' ' + T('todo.defect','kamer(s) defect'), tab:'rooms' });
     const openTickets = (state.tickets || []).filter(t => t.status !== 'klaar').length;
-    if (openTickets) todos.push({ icon:'🔧', txt: openTickets + ' ' + T('todo.tickets','open klus(sen)'), tab:'klussen' });
+    if (openTickets) todos.push({ icon:'', txt: openTickets + ' ' + T('todo.tickets','open klus(sen)'), tab:'klussen' });
     const newApps = (state.applications || []).filter(x => x.status === 'nieuw').length;
-    if (newApps) todos.push({ icon:'📝', txt: newApps + ' ' + T('todo.apps','nieuwe sollicitatie(s)'), tab:'team' });
+    if (newApps) todos.push({ icon:'', txt: newApps + ' ' + T('todo.apps','nieuwe sollicitatie(s)'), tab:'team' });
     const openRes = (state.reserveringen || []).filter(r => r.status === 'aangevraagd').length;
-    if (openRes) todos.push({ icon:'🪑', txt: openRes + ' ' + T('todo.res','open reservering(en) om te bevestigen'), tab:'orders' });
+    if (openRes) todos.push({ icon:'', txt: openRes + ' ' + T('todo.res','open reservering(en) om te bevestigen'), tab:'orders' });
     extra += '<div class="card"><div class="tt-h">' + T('todo.h','Vandaag nog doen') + '</div>' +
       (todos.length ? todos.map(t =>
         '<button class="todo-row" data-goto="' + t.tab + '"><span>' + t.icon + '</span><b>' + t.txt + '</b><i>›</i></button>'
@@ -47,9 +47,9 @@
     // recente reviews van gasten (1-5 sterren, geplaatst na afronding)
     const recentRevs = (state.reviews && state.reviews.recent) || [];
     if (recentRevs.length){
-      extra += '<div class="card"><div class="tt-h">⭐ ' + T('rev.h','Recente reviews') + '</div>' +
+      extra += '<div class="card"><div class="tt-h">' + T('rev.h','Recente reviews') + '</div>' +
         recentRevs.slice(0,3).map(r =>
-          '<div style="margin-top:0.55rem;font-size:0.8rem;"><b>' + '★'.repeat(r.score) + '<span style="opacity:0.25;">' + '★'.repeat(5 - r.score) + '</span></b> <span class="cn">' + r.codename + '</span>' +
+          '<div style="margin-top:0.55rem;font-size:0.8rem;"><b>' + ''.repeat(r.score) + '<span style="opacity:0.25;">' + ''.repeat(5 - r.score) + '</span></b> <span class="cn">' + r.codename + '</span>' +
           (r.tekst ? '<div style="color:var(--soft);font-size:0.76rem;margin-top:0.15rem;">' + r.tekst + '</div>' : '') + '</div>'
         ).join('') + '</div>';
     }

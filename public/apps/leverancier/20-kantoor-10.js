@@ -1,7 +1,7 @@
     const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
-        finMsg = '🎁 '+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--gold);">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
+        finMsg = ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--gold);">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
         finData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -9,7 +9,7 @@
     const gR = el.querySelector('#gcRedeem'); if (gR) gR.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/redeem', { code: el.querySelector('#gcCode').value, bedrag: Number(el.querySelector('#gcInBedrag').value) });
-        finMsg = '✅ '+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b style="color:var(--gold);">€ '+d.saldo+'</b>';
+        finMsg = ''+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b style="color:var(--gold);">€ '+d.saldo+'</b>';
         finData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -69,12 +69,12 @@
         await API.call('/supplier/synergie/maak', { naam: k.voorstel.naam,
           omschrijving: T('sy.kansoms','Voorgesteld door de dealvinder op basis van combinatiegedrag van gasten.'),
           prijsCenten: k.voorstel.prijsCenten, aandelen: k.voorstel.aandelen });
-        toast('🤝 '+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
+        toast(''+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
         await synVer();
       } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-synja]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synja, akkoord: true }); toast('🤝 '+T('sy.ok','Getekend.')); await synVer(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synja, akkoord: true }); toast(''+T('sy.ok','Getekend.')); await synVer(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-synnee]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synnee, akkoord: false }); await synVer(); } catch(e){ toast(e.message); }
@@ -93,7 +93,7 @@
             { code: (S && S.code) || '', centen: mijn },
             { code: String(w('#synPartner')).toUpperCase().trim(), centen: totaal - mijn }
           ] });
-        toast('🤝 '+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
+        toast(''+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
         await synVer();
       } catch(e){ toast(e.message); }
     });

@@ -43,8 +43,8 @@
       if (tables.length){
         html += '<div class="st-sec">'+T('st.tables','Tafels, tik om te wisselen')+'</div><div class="st-tblgrid">'+
           tables.map(t=>'<button class="tbl tbl-'+t.status+'" data-sttbl="'+t.id+'" data-cur="'+t.status+'"><b>'+t.name+'</b><span>'+t.seats+' '+T('tbl.pers','pers.')+'</span><i>'+tTbl(t.status)+'</i></button>').join('')+'</div>'+
-          '<button class="obtn" data-tblqr style="margin-top:0.5rem;">🧾 '+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>'+
-          '<button class="obtn" data-tafelticket style="margin-top:0.5rem;">🧾 '+T('st.tafelticket','Tafel op één ticket (samenvoegen + afrekenen)')+'</button>';
+          '<button class="obtn" data-tblqr style="margin-top:0.5rem;">'+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>'+
+          '<button class="obtn" data-tafelticket style="margin-top:0.5rem;">'+T('st.tafelticket','Tafel op één ticket (samenvoegen + afrekenen)')+'</button>';
       }
       html += '<div class="st-sec">'+T('st.more','Meer')+'</div>'+
         '<button class="obtn" data-aanwezig style="width:100%;margin-bottom:0.5rem;">\u{1F465} '+T('st.aanwezig','Aanwezigheid (binnen + man/vrouw)')+'</button>'+

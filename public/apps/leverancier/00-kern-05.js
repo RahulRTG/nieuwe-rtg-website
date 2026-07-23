@@ -15,14 +15,14 @@
     $('#spPin').classList.add('open');
   }
   function buildPad(){
-    const keys = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
+    const keys = ['1','2','3','4','5','6','7','8','9','','0',''];
     $('#spPad').innerHTML = keys.map(k => k==='' ? '<span></span>' :
-      '<button class="sp-key'+(k==='⌫'?' wide':'')+'" data-k="'+k+'">'+k+'</button>').join('');
+      '<button class="sp-key'+(k===''?' wide':'')+'" data-k="'+k+'">'+k+'</button>').join('');
     document.querySelectorAll('#spPad [data-k]').forEach(b => b.addEventListener('click', () => pinKey(b.dataset.k)));
   }
   async function pinKey(k){
     $('#spDots').classList.remove('bad');
-    if (k==='⌫'){ pinBuf = pinBuf.slice(0,-1); renderDots(); return; }
+    if (k===''){ pinBuf = pinBuf.slice(0,-1); renderDots(); return; }
     if (pinBuf.length >= 4) return;
     pinBuf += k; renderDots();
     if (pinBuf.length === 4){
@@ -156,7 +156,7 @@
       doos.className = 'login-form';
       doos.setAttribute('aria-label', 'Verder met uw RTG-account');
       doos.innerHTML = rollen.map((x, i) =>
-        '<button type="button" data-acc-start="' + i + '">👤 ' + (x.naam || 'Beheer') + ' · ' + (x.zaakNaam || x.code) +
+        '<button type="button" data-acc-start="' + i + '">' + (x.naam || 'Beheer') + ' · ' + (x.zaakNaam || x.code) +
         ' <small>' + T('acc.een', 'met uw RTG-account') + '</small></button>').join('');
       gate.querySelector('.login-form').after(doos);
       doos.querySelectorAll('[data-acc-start]').forEach(b => b.addEventListener('click', async () => {
@@ -167,7 +167,7 @@
         try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
         applyState(s.j.state);
         // Rahul denkt mee (agenda, uren, zorgprofiel): advies, nooit een slot
-        API.call('/supplier/werkadvies', {}).then(a => { if (a && a.advies) toast('💭 ' + a.advies.tekst); }).catch(()=>{});
+        API.call('/supplier/werkadvies', {}).then(a => { if (a && a.advies) toast('' + a.advies.tekst); }).catch(()=>{});
         if (naarEigenSector(S)) return;
         enterApp();
       }));
@@ -188,7 +188,7 @@
         if (!doosTimer) doosTimer = setInterval(doosCheck, 10000);
         if (d.modus === 'lokaal' && window.RTGNet) {
           doosBanner = true;
-          RTGNet.toon('📦 ' + T('doos.lokaal', 'Zaakdoos: de lijn is weg; de zaak draait lokaal door en synchroniseert vanzelf.') + (d.journaal ? ' (' + d.journaal + ' actie(s) in het journaal)' : ''));
+          RTGNet.toon('' + T('doos.lokaal', 'Zaakdoos: de lijn is weg; de zaak draait lokaal door en synchroniseert vanzelf.') + (d.journaal ? ' (' + d.journaal + ' actie(s) in het journaal)' : ''));
         } else if (doosBanner && window.RTGNet) { doosBanner = false; RTGNet.verberg(); }
       } catch (e) {}
     }

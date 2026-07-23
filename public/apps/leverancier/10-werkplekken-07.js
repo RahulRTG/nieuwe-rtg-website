@@ -3,7 +3,7 @@
     el.querySelectorAll('[data-st86adv]').forEach(b => b.addEventListener('click', async () => {
       try {
         await API.call('/supplier/menu/86', { itemId: b.dataset.st86adv, op: true });
-        toast('⛔ '+T('st.86gezet','86 gezet; leden kunnen het niet meer bestellen.'));
+        toast(''+T('st.86gezet','86 gezet; leden kunnen het niet meer bestellen.'));
         wvAt = 0; laadWerkvloer(); await refresh();
       } catch(e){ toast(e.message); }
     }));
@@ -15,7 +15,7 @@
       const reden = prompt(T('vr.derfreden','Reden?')) || '';
       try {
         await API.call('/supplier/keuken/verspilling', { artikelId: art.id, hoeveelheid: Number(String(hv).replace(',', '.')), reden });
-        toast('♻ '+T('st.derfok','Geboekt in het voorraadlogboek.'));
+        toast(''+T('st.derfok','Geboekt in het voorraadlogboek.'));
         wvAt = 0; laadWerkvloer();
       } catch(e){ toast(e.message); }
     });
@@ -27,7 +27,7 @@
     }));
     // het overschot: is over melden, gebruikt afboeken of afschrijven
     const ovBij = el.querySelector('#ovBij'); if (ovBij) ovBij.addEventListener('click', async () => {
-      try { await API.call('/supplier/overschot', { op: 'erbij', itemId: el.querySelector('#ovGerecht').value, qty: el.querySelector('#ovAantal').value }); toast('🥡 '+T('over.toast','Gemeld; elk scherm telt het nu van de maaklijst af.')); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/overschot', { op: 'erbij', itemId: el.querySelector('#ovGerecht').value, qty: el.querySelector('#ovAantal').value }); toast(''+T('over.toast','Gemeld; elk scherm telt het nu van de maaklijst af.')); await refresh(); } catch(e){ toast(e.message); }
     });
     el.querySelectorAll('[data-overgebruikt]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/overschot', { op: 'gebruikt', id: b.dataset.overgebruikt }); await refresh(); } catch(e){ toast(e.message); }
@@ -39,7 +39,7 @@
     const spGo = el.querySelector('#spGo'); if (spGo) spGo.addEventListener('click', async () => {
       try {
         await API.call('/supplier/order/spoed', { itemId: el.querySelector('#spGerecht').value, qty: el.querySelector('#spAantal').value, table: el.querySelector('#spTafel').value });
-        toast('⚡ '+T('spoed.toast','Spoedbon staat op de lijn, als gewone bon.'));
+        toast(''+T('spoed.toast','Spoedbon staat op de lijn, als gewone bon.'));
         await refresh();
       } catch(e){ toast(e.message); }
     });
@@ -47,7 +47,7 @@
       try { await API.call('/supplier/order/spoed', { ref: b.dataset.spoedaf, op: false }); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-lijnaan]').forEach(b => b.addEventListener('click', async () => {
-      try { const d = await API.call('/supplier/lijn', { sectie: b.dataset.lijnaan }); toast(d.aangemeld ? '👥 '+T('lijn.aant','Aangemeld op deze kant.') : T('lijn.aftoast','Afgemeld van deze kant.')); await refresh(); } catch(e){ toast(e.message); }
+      try { const d = await API.call('/supplier/lijn', { sectie: b.dataset.lijnaan }); toast(d.aangemeld ? ''+T('lijn.aant','Aangemeld op deze kant.') : T('lijn.aftoast','Afgemeld van deze kant.')); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-ksel]').forEach(b => b.addEventListener('click', () => {
       keukenSectie = b.dataset.ksel;
@@ -99,7 +99,7 @@
       try {
         const s2 = await API.call('/supplier/ride/suggest', { ref: b.dataset.chneem });
         await API.call('/supplier/ride/assign', { ref: b.dataset.chneem, self: true, vehicleId: s2.vehicleId });
-        toast(T('ch.genomen','Rit is van u.') + (s2.vehicleName ? ' 🚘 ' + s2.vehicleName : ''));
+        toast(T('ch.genomen','Rit is van u.') + (s2.vehicleName ? '  ' + s2.vehicleName : ''));
         await refresh();
       } catch(e){ toast(e.message); }
     }));

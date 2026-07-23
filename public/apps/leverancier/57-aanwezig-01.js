@@ -24,7 +24,7 @@
     ].join('');
     document.head.appendChild(st);
   }
-  const AW_GROEPEN = [ { id: 'man', label: 'Man', icoon: '♂' }, { id: 'vrouw', label: 'Vrouw', icoon: '♀' }, { id: 'onbekend', label: 'Onbekend / anders', icoon: '○' } ];
+  const AW_GROEPEN = [ { id: 'man', label: 'Man', icoon: '' }, { id: 'vrouw', label: 'Vrouw', icoon: '' }, { id: 'onbekend', label: 'Onbekend / anders', icoon: '○' } ];
   async function awPas(groep, delta){
     try { const d = await API.call('/supplier/aanwezig/pas', { groep, delta }); awToon(d.aanwezig); } catch(e){ toast(e.message); }
   }

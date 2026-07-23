@@ -73,20 +73,20 @@
   }
   // spoedbonnen bovenaan, daarna de oudste eerst; het spoedmerkje per gerecht
   const spoedEerst = (a,b) => ((b.spoed?1:0) - (a.spoed?1:0)) || opTijd(a,b);
-  const spoedMerk = (o, it) => (o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id)) ? '⚡ ' : '';
+  const spoedMerk = (o, it) => (o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id)) ? '' : '';
   // KDS-tijdbanden: groen tot 6 min, amber tot 12, rood daarna, knipperen vanaf 18
   function ageKlasse(a){ return a >= 18 ? ' late flash' : a >= 12 ? ' late' : a >= 6 ? ' warn' : ' ok'; }
   function vpChip(sec, p){
     if (!p) return '';
-    const kant = KSECTIES[sec] || (sec === 'bar' ? ['🍸','Bar'] : ['·', sec]);
+    const kant = KSECTIES[sec] || (sec === 'bar' ? ['','Bar'] : ['·', sec]);
     const lbl = { nu: T('vp.nu','start nu'), wacht: T('vp.wacht','wacht'), bezig: T('vp.bezig','bezig'), warm: T('vp.warm','houd warm'), pas: T('vp.pas','naar de pas') }[p.doe] || '';
     const min = (p.doe==='wacht'||p.doe==='bezig'||p.doe==='warm') && p.min ? ' ~'+p.min+'m' : '';
     return '<span class="vp '+p.doe+'">'+kant[0]+' '+T('ks.'+sec, kant[1])+' · '+lbl+min+'</span>';
   }
   // de deurhost-regel op de bon: waar is de gast (GPS uit de leden-app)
   function gastRegel(o){
-    if (o.guestArrived) return '<div class="tkc-who">✅ '+T('kds.gastin','De gast is binnen.')+'</div>';
-    if (Number.isFinite(o.guestEtaMin)) return '<div class="tkc-who">🧭 '+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
+    if (o.guestArrived) return '<div class="tkc-who">'+T('kds.gastin','De gast is binnen.')+'</div>';
+    if (Number.isFinite(o.guestEtaMin)) return '<div class="tkc-who">'+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
     return '';
   }
   // hoe lang staat het al op de pas: sneller rood dan de bontijd (eten wordt koud)
@@ -142,13 +142,13 @@
   function overschotChips(){
     const l = overschotLijst();
     if (!l.length) return '';
-    return '<div class="allday"><span class="ad-h">🥡 '+T('over.h','Op de pas over')+'</span>'+
+    return '<div class="allday"><span class="ad-h">'+T('over.h','Op de pas over')+'</span>'+
       l.map(x => '<span class="ad"><b>'+x.qty+'×</b>'+MTX(x.name)+'</span>').join('')+'</div>';
   }
   // de melder voor de pas-schermen: is over, gebruikt of afschrijven
   function overschotBlok(){
     const l = overschotLijst();
-    return '<div class="tkc" style="grid-column:1/-1;"><h3>🥡 '+T('over.h','Op de pas over')+'</h3>'+
+    return '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('over.h','Op de pas over')+'</h3>'+
       '<div class="tkc-who">'+T('over.deck','Te veel gemaakt? Meld het hier; elk scherm telt het van de maaklijst af en de coach zegt: gebruik eerst wat er ligt.')+'</div>'+
       '<div class="row-gap"><select class="st-in" id="ovGerecht" style="flex:2;">'+
         (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+

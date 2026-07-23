@@ -21,7 +21,7 @@
     source.addEventListener('pas', e => {
       try {
         const d = JSON.parse(e.data || '{}');
-        toast('🛎️ ' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));
+        toast('' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));
       } catch(err){}
     });
     source.addEventListener('notify', e => {

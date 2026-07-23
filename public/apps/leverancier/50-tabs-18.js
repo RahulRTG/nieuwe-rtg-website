@@ -7,14 +7,14 @@
   }
   function gastLocBlok(){
     const lijst = gastLoc || [];
-    return '<div class="card"><div class="tt-h">📍 '+T('gl.h','Live meekijken (met toestemming)')+'</div>'+
+    return '<div class="card"><div class="tt-h">'+T('gl.h','Live meekijken (met toestemming)')+'</div>'+
       '<div style="font-size:0.75rem;color:var(--soft);margin-bottom:0.5rem;">'+T('gl.sub','De gast deelt zelf de live gps-locatie met uw zaak. Zet het uit zodra u het niet meer nodig heeft; de gast krijgt daar direct bericht van.')+'</div>'+
       (lijst.length ? lijst.map(g =>
         '<div class="guest-row" style="flex-wrap:wrap;gap:0.4rem;"><span class="cn">'+esc(g.codenaam)+'</span>'+
         (g.wachtOpLocatie ? '<span class="ge">'+T('gl.wacht','toestemming, wacht op gps')+'</span>'
           : '<span class="ge"><b>'+(g.km!=null?g.km+' km':'')+'</b>'+(g.etaMin!=null?' · ~'+g.etaMin+' min':'')+'</span>')+
         '<button class="obtn" data-glstop="'+g.id+'" style="font-size:0.62rem;">'+T('gl.stop','Niet meer nodig')+'</button>'+
-        (g.zorg ? '<div style="flex-basis:100%;font-size:0.74rem;color:#E2B93B;">⚠ '+esc(zorgTekst(g.zorg))+'</div>' : '')+
+        (g.zorg ? '<div style="flex-basis:100%;font-size:0.74rem;color:#E2B93B;">'+esc(zorgTekst(g.zorg))+'</div>' : '')+
         '</div>').join('')
       : '<div class="softline">'+T('gl.leeg','Nog geen gasten die hun locatie met u delen.')+'</div>')+'</div>';
   }
@@ -22,7 +22,7 @@
     el.querySelectorAll('[data-glstop]').forEach(b => b.addEventListener('click', async () => {
       try {
         const r = await API.call('/supplier/gastlocatie/stop', { id: b.dataset.glstop });
-        toast('📍 '+T('gl.gestopt','Meekijken gestopt;')+' '+r.deel.codenaam+' '+T('gl.gestopt2','heeft bericht gekregen.'));
+        toast(''+T('gl.gestopt','Meekijken gestopt;')+' '+r.deel.codenaam+' '+T('gl.gestopt2','heeft bericht gekregen.'));
         gastLocAt = 0; laadGastLoc();
       } catch(e){ toast(e.message); }
     }));

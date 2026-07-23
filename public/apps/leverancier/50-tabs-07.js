@@ -33,7 +33,7 @@
       try {
         const r = await API.call('/supplier/lucht/pass', { code });
         toast(r.geldig
-          ? '✈ '+T('pos.passok','Geldig:')+' '+r.pass.naam+' · '+r.pass.vlucht+' '+r.pass.tijd+' · '+T('pos.stoel','stoel')+' '+r.pass.stoel+' · gate '+r.pass.gate
+          ? ''+T('pos.passok','Geldig:')+' '+r.pass.naam+' · '+r.pass.vlucht+' '+r.pass.tijd+' · '+T('pos.stoel','stoel')+' '+r.pass.stoel+' · gate '+r.pass.gate
           : '✗ '+(r.reden||T('pos.passnee','Niet geldig.')));
       } catch(e){ toast(e.message); }
     });

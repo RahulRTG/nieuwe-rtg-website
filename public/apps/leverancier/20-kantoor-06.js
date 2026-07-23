@@ -51,13 +51,13 @@
       const rooms = state.rooms || [];
       const verblijfGenre = type === 'apartment' || type === 'villa';
       const unit = verblijfGenre ? T('kt.unit','verblijf') : T('kt.kamer','kamer');
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(verblijfGenre?'🏡 '+T('kt.units','Verblijven'):'🛏 '+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(verblijfGenre?''+T('kt.units','Verblijven'):''+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
         (rooms.length ? rooms.map(r => {
           const hk = (r.hk && r.hk.status) || 'schoon';
           return '<div class="st-row"><span>'+r.name+(r.available?'':' · '+T('kt.offline','offline'))+
-            '<span class="sub">'+eur(r.price)+' '+T('sup.pernight','p.n.')+' · '+tHk(hk)+(hk==='defect'&&r.hk&&r.hk.note?' · ⚠ '+r.hk.note:'')+'</span></span>'+
+            '<span class="sub">'+eur(r.price)+' '+T('sup.pernight','p.n.')+' · '+tHk(hk)+(hk==='defect'&&r.hk&&r.hk.note?' ·  '+r.hk.note:'')+'</span></span>'+
             '<span class="acts"><button class="obtn'+(r.available?' primary':' warn')+'" data-kmrt="'+r.id+'">'+(r.available?T('kt.isopen','Open'):T('kt.isclosed','Dicht'))+'</button>'+
-            '<button class="obtn" data-kmhk="'+r.id+'" data-cur="'+hk+'">🧹 '+tHk(hk)+'</button>'+
+            '<button class="obtn" data-kmhk="'+r.id+'" data-cur="'+hk+'">'+tHk(hk)+'</button>'+
             '<button class="obtn warn" data-kmrd="'+r.id+'">✕</button></span></div>';
         }).join('') : '<div class="tkc-who">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>')+
         '<div class="st-form"><div class="row-gap"><input class="st-in" id="kRmN" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;"><input class="st-in" id="kRmP" type="number" inputmode="decimal" placeholder="€" style="flex:1;"></div>'+

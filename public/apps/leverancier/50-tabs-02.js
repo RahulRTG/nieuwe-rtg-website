@@ -11,11 +11,11 @@
           E('div', { class: 'amt' }, eur(o.total)),
           E('div', { style: { marginTop: '0.3rem' } }, E('span', { class: 'pill ' + pillClass(o.status) }, tStatus(o.status))))),
       E('ul', {}, o.items.map(i => E('li', {}, E('span', {}, i.qty + '× ' + i.name), E('span', {}, eur(i.price * i.qty))))),
-      o.guestArrived ? E('div', { class: 'enroute here' }, '🎉 ' + T('sup.guesthere', 'Gast is gearriveerd. Serveer nu.'))
-        : (o.guestEtaMin != null ? E('div', { class: 'enroute' }, '📍 ' + T('sup.guesteta', 'Gast onderweg, arriveert over ~') + o.guestEtaMin + ' ' + T('sup.min', 'min') + '. ' + T('sup.readyontime', 'Zet op tijd klaar.')) : null),
-      o.allergyNote ? E('div', { class: 'allergy' }, '⚠ ' + T('sup.allergy', 'Allergie:') + ' ' + o.allergyNote) : null,
+      o.guestArrived ? E('div', { class: 'enroute here' }, '' + T('sup.guesthere', 'Gast is gearriveerd. Serveer nu.'))
+        : (o.guestEtaMin != null ? E('div', { class: 'enroute' }, '' + T('sup.guesteta', 'Gast onderweg, arriveert over ~') + o.guestEtaMin + ' ' + T('sup.min', 'min') + '. ' + T('sup.readyontime', 'Zet op tijd klaar.')) : null),
+      o.allergyNote ? E('div', { class: 'allergy' }, '' + T('sup.allergy', 'Allergie:') + ' ' + o.allergyNote) : null,
       // het zorgprofiel van de gast reist automatisch mee (alleen met toestemming)
-      o.zorg ? E('div', { class: 'allergy' }, '⚠ ' + T('sup.zorgp', 'Zorgprofiel gast:') + ' ' + zorgTekst(o.zorg)) : null,
+      o.zorg ? E('div', { class: 'allergy' }, '' + T('sup.zorgp', 'Zorgprofiel gast:') + ' ' + zorgTekst(o.zorg)) : null,
       o.tagSalon ? E('div', { class: 'salon' }, '✦ ' + T('sup.wantssalon', 'Gast wil dit taggen voor De Salon')) : null,
       E('div', { class: 'acts' },
         E('span', { class: 'pill ' + (o.paid ? 'betaald' : 'onbetaald') },

@@ -814,8 +814,7 @@
   #onbGate{position:fixed;inset:0;z-index:130;background:radial-gradient(130% 100% at 50% -10%, #141013, #000 82%);overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 1.4rem) 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.6rem);}
   #onbGate[hidden]{display:none;}
   .onb-card{max-width:30rem;width:100%;margin:0 auto;text-align:center;}
-  .onb-lippen{width:132px;margin:0 auto .35rem;}
-  .onb-lippen svg,.onb-lip-svg{width:100%;height:auto;display:block;}
+  .onb-mond{display:block;margin:0 auto .3rem;width:170px;height:auto;}
   .onb-mini{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:.2rem;}
   .onb-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.22rem;line-height:1.5;color:var(--txt);min-height:3.6rem;text-wrap:balance;margin:.2rem 0 1.1rem;animation:agZin .5s ease;}
   .onb-rij{display:flex;align-items:center;border-bottom:1px solid var(--line);margin:0 .3rem;transition:border-color .2s;}
@@ -1358,7 +1357,7 @@
        en laat je tekenen door je naam te typen (10-social-01/02.js). -->
   <div id="onbGate" role="dialog" aria-modal="true" aria-labelledby="onbTitel" hidden>
     <div class="onb-card">
-      <div class="onb-lippen" id="onbLippen" aria-hidden="true"></div>
+      <canvas class="onb-mond" id="onbMond" width="440" height="200" aria-hidden="true"></canvas>
       <p class="onb-mini" id="onbMini">Rahul</p>
       <h1 id="onbTitel" class="onb-zin" role="status" aria-live="polite">Nog even dit, dan gaan we op reis.</h1>
       <div class="onb-rij" id="onbRij">
@@ -1857,6 +1856,8 @@
 <script src="/shared/toestelkluis.js" defer></script>
 <script src="/shared/schermrust.js" defer></script>
 <script src="/shared/inlogkleur.js" defer></script>
+<script src="/shared/mond.js" defer></script>
+<script src="/shared/typ.js" defer></script>
 <script src="/shared/focus.js" data-app="leden" data-kaart=".live-start" data-kop=".lh"></script>
 <script src="/shared/spraak.js"></script>
 <script src="/shared/seizoen.js" defer></script>

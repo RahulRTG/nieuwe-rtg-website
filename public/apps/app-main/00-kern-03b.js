@@ -128,6 +128,8 @@
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
+      // Rahul typt zijn zin letter voor letter en de mond beweegt mee
+      if (window.RTGTyp){ RTGTyp.schrijf(zin, tekst, { praat: praat }); return; }
       zin.style.animation = 'none';
       void zin.offsetWidth; // de fade opnieuw laten lopen
       zin.style.animation = '';

@@ -573,6 +573,8 @@
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
+      // Rahul typt zijn zin letter voor letter en de mond beweegt mee
+      if (window.RTGTyp){ RTGTyp.schrijf(zin, tekst, { praat: praat }); return; }
       zin.style.animation = 'none';
       void zin.offsetWidth; // de fade opnieuw laten lopen
       zin.style.animation = '';
@@ -858,11 +860,18 @@
      loopt over dezelfde routes als voorheen (/onboarding/status|opslaan|teken
      en /verify/upload). De invoerregel + knoppen worden in 10-social-02
      bedraad; de gespreksfuncties staan hier. */
-  let onbBezig = false, onbSt = null, onbRij = [], onbStap = null, onbHuidig = null, onbGeopend = false;
+  let onbBezig = false, onbSt = null, onbRij = [], onbStap = null, onbHuidig = null, onbGeopend = false, onbMond = null;
   function onbEl(id){ return document.getElementById(id); }
-  function onbZeg(t){ const z = onbEl('onbTitel'); if (!z) return; z.style.animation = 'none'; void z.offsetWidth; z.style.animation = ''; z.textContent = t; }
+  // Rahuls signatuurmond boven de onboarding, dezelfde als op de poort; en zijn
+  // woorden verschijnen letter voor letter (RTGTyp) terwijl de mond meebeweegt.
+  function onbMondMaak(){ const c = onbEl('onbMond'); if (c && !onbMond && window.RTGMond) onbMond = RTGMond.maak(c); }
+  function onbZeg(t){
+    const z = onbEl('onbTitel'); if (!z) return;
+    const praat = onbMond ? function(ms){ onbMond.praat(ms); } : null;
+    if (window.RTGTyp) RTGTyp.schrijf(z, t, { praat: praat });
+    else { z.textContent = t; if (praat) praat(400); }
+  }
   function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
-  function onbLippen(){ const l = onbEl('onbLippen'); if (l && !l.innerHTML && window.RTGGlyf && RTGGlyf.heeft('lips')) l.innerHTML = RTGGlyf.svgHTML('lips', { klasse: 'onb-lip-svg' }); }
   function onbOpenVelden(){ return ((onbSt && onbSt.velden) || []).filter(function(v){ return !v.ingevuld; }); }
 
   async function checkOnboarding(){
@@ -874,7 +883,7 @@
   function onbStartGesprek(st){
     const g = onbEl('onbGate'); if (!g) return;
     if (!g.hidden && onbStap) return; // al bezig, niet opnieuw beginnen
-    onbSt = st; onbLippen();
+    onbSt = st; onbMondMaak();
     onbRij = onbOpenVelden();
     onbStap = onbRij.length ? 'veld' : 'teken';
     const eerste = !onbGeopend; onbGeopend = true;

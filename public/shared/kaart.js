@@ -139,7 +139,7 @@
     kaart.setAttribute('aria-label', 'Locatie');
 
     var kop = doc.createElement('div'); kop.className = 'krt-kop';
-    var titel = doc.createElement('span'); titel.textContent = info.heeftCoord ? '📍 Coördinaten' : '📍 Adres';
+    var titel = doc.createElement('span'); titel.textContent = info.heeftCoord ? 'Coördinaten' : 'Adres';
     var x = doc.createElement('button'); x.type = 'button'; x.className = 'krt-x'; x.setAttribute('aria-label', 'Sluiten'); x.textContent = '✕';
     kop.appendChild(titel); kop.appendChild(x);
 

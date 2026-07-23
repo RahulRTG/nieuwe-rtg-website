@@ -133,7 +133,7 @@
           var ul = document.createElement('ul'); ul.className = 'bss-doe';
           (g.doe || []).forEach(function (x) { var li = document.createElement('li'); li.textContent = x; ul.appendChild(li); });
           sheet.appendChild(ul);
-          var tip = document.createElement('div'); tip.className = 'bss-tip'; tip.textContent = '💡 ' + g.tip;
+          var tip = document.createElement('div'); tip.className = 'bss-tip'; tip.textContent = '' + g.tip;
           sheet.appendChild(tip);
         })
         .catch(function () { if (sheet) sheet.querySelector('.bss-wat').textContent = 'De uitleg is er zo weer; probeer het straks opnieuw.'; });

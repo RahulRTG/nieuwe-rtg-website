@@ -15,8 +15,8 @@
 (function () {
   const STORE = 'rtg_lang';
   const LANGS = {
-    nl: { label: 'Nederlands', native: 'Nederlands', flag: '🇳🇱' },
-    en: { label: 'Engels', native: 'English', flag: '🇬🇧' }
+    nl: { label: 'Nederlands', native: 'Nederlands' },
+    en: { label: 'Engels', native: 'English' }
   };
   /* Wereldtalen: de Boardroom bepaalt welke talen aanstaan; de kiezer toont ze
      allemaal. UI-teksten vallen voor andere talen terug op Engels; chats en

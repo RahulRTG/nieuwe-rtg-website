@@ -45,7 +45,7 @@
       'de echte wereld is de mooiste Salon. Een wandeling, uw hobby, of gewoon niks.';
     tekst.style.cssText = 'margin:0.7rem 0 1rem;font-size:0.86rem;line-height:1.6;color:rgba(244,241,236,0.72);';
     const weg = document.createElement('button');
-    weg.textContent = '🌿 Ik leg hem weg';
+    weg.textContent = 'Ik leg hem weg';
     weg.style.cssText = 'display:block;width:100%;background:#C9A24B;border:none;border-radius:10px;padding:0.65rem;' +
       'color:#0C0C0B;font:inherit;font-weight:600;cursor:pointer;';
     const door = document.createElement('button');

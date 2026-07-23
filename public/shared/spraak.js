@@ -25,14 +25,14 @@
         rec.lang = (opties.taal && opties.taal()) || (document.documentElement.lang === 'en' ? 'en-US' : 'nl-NL');
         rec.interimResults = false;
         rec.maxAlternatives = 1;
-        knop.textContent = '🔴';
+        knop.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="6"/></svg>';
         rec.addEventListener('result', ev => {
           const zin = (((ev.results[0] || [])[0] || {}).transcript || '').trim();
           if (zin) opties.opTekst(zin);
         });
-        rec.addEventListener('end', () => { knop.textContent = '🎤'; });
+        rec.addEventListener('end', () => { knop.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg>'; });
         rec.addEventListener('error', () => {
-          knop.textContent = '🎤';
+          knop.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg>';
           if (opties.nietVerstaan) opties.nietVerstaan();
         });
         rec.start();

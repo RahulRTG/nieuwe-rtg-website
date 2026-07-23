@@ -1442,8 +1442,10 @@
   let gpsWatch = null, gpsLaatst = 0, gpsPos = null;
   const heeftBezorg = () => !!(state && state.bezorg && state.bezorg.bezorgen);
   function kaartLink(o){
-    if (o.geo && Number.isFinite(o.geo.lat)) return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + o.geo.lat + ',' + o.geo.lng;
-    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(o.adres || '');
+    // geen derde partij: een neutrale geo:-URI opent de EIGEN kaart-app van het
+    // toestel (Android/OSMand/Apple Maps naar keuze), wij sturen niets naar Google.
+    if (o.geo && Number.isFinite(o.geo.lat)) return 'geo:' + o.geo.lat + ',' + o.geo.lng + '?q=' + o.geo.lat + ',' + o.geo.lng;
+    return 'geo:0,0?q=' + encodeURIComponent(o.adres || '');
   }
   function afstandNaar(o){
     if (!gpsPos || !o.geo || !Number.isFinite(o.geo.lat)) return null;
@@ -2077,7 +2079,7 @@
         '<button class="abtn" data-cvst="'+c.ref+'" data-st="afgerond">'+T('pd.va.terug','Teruggeven')+'</button>';
       return '<div class="card">'+
         (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy,#C23A5E);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.82rem;">🚨 <b>SOS:</b> '+esc(c.sos[0].bericht)+
-          (Number.isFinite(c.sos[0].lat)?' · <a style="color:var(--gold,#C99A2E);" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('pd.va.kaart','kaart')+'</a>':'')+
+          (Number.isFinite(c.sos[0].lat)?' · <a style="color:var(--gold,#C99A2E);" target="_blank" rel="noopener" href="geo:'+c.sos[0].lat+','+c.sos[0].lng+'?q='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('pd.va.kaart','kaart')+'</a>':'')+
           ' <button class="abtn" data-cvsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;">'+T('pd.va.sosok','Afgehandeld')+'</button></div>':'')+
         '<div class="k">'+esc(c.boot)+' · '+esc(c.type)+'</div>'+
         '<div style="font-size:0.85rem;margin-top:0.3rem;">'+esc(c.codename)+' · '+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('pd.va.gasten','gasten')+' · ':'')+(c.metSkipper?'⚓ '+T('pd.va.metskipper','met schipper'):T('pd.va.bareboat','bareboat'))+' · '+T('pd.va.st.'+c.status, VAART_ST[c.status]||c.status)+'</div>'+

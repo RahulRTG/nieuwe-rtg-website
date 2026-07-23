@@ -92,8 +92,10 @@
   let gpsWatch = null, gpsLaatst = 0, gpsPos = null;
   const heeftBezorg = () => !!(state && state.bezorg && state.bezorg.bezorgen);
   function kaartLink(o){
-    if (o.geo && Number.isFinite(o.geo.lat)) return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + o.geo.lat + ',' + o.geo.lng;
-    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(o.adres || '');
+    // geen derde partij: een neutrale geo:-URI opent de EIGEN kaart-app van het
+    // toestel (Android/OSMand/Apple Maps naar keuze), wij sturen niets naar Google.
+    if (o.geo && Number.isFinite(o.geo.lat)) return 'geo:' + o.geo.lat + ',' + o.geo.lng + '?q=' + o.geo.lat + ',' + o.geo.lng;
+    return 'geo:0,0?q=' + encodeURIComponent(o.adres || '');
   }
   function afstandNaar(o){
     if (!gpsPos || !o.geo || !Number.isFinite(o.geo.lat)) return null;

@@ -144,7 +144,7 @@ async function laad(){
     const fam = $('#fam');
     if (!d.locaties || !d.locaties.length){ fam.innerHTML = '<div class="leeg">Nog niemand heeft iets gedeeld. Wees de eerste.</div>'; return; }
     fam.innerHTML = d.locaties.map(l=>{
-      const kaart = (l.lat!=null&&l.lon!=null) ? '<a class="kaartlink" href="https://www.google.com/maps?q='+l.lat+','+l.lon+'" target="_blank" rel="noopener">Op de kaart →</a>' : '';
+      const kaart = (l.lat!=null&&l.lon!=null) ? '<a class="kaartlink" href="geo:'+l.lat+','+l.lon+'?q='+l.lat+','+l.lon+'" target="_blank" rel="noopener">Op de kaart →</a>' : '';
       return '<div class="lid"><span class="av" style="background:'+(l.kleur||'#C9A24B')+'">'+(l.avatar||'🙂')+'</span>'+
         '<div><div class="nm">'+esc(l.naam)+(l.vanMij?' (jij)':'')+'</div><div class="st">'+esc(l.status)+' · '+geleden(l.at)+'</div></div>'+kaart+'</div>';
     }).join('');

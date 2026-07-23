@@ -5962,13 +5962,13 @@
           '<button class="obtn primary" data-vhst="'+h.ref+'" data-st="afgerond">'+T('vh.innemen','Innemen en afronden')+'</button>';
         return '<div class="mitem">'+
           (h.sos && h.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.8rem;">\uD83D\uDEA8 <b>SOS:</b> '+esc(h.sos[0].bericht)+
-            (Number.isFinite(h.sos[0].lat) ? ' \u00B7 <a style="color:var(--gold);" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+h.sos[0].lat+','+h.sos[0].lng+'">'+T('vh.kaart','kaart')+'</a>' : '')+
+            (Number.isFinite(h.sos[0].lat) ? ' \u00B7 <a style="color:var(--gold);" target="_blank" rel="noopener" href="geo:'+h.sos[0].lat+','+h.sos[0].lng+'?q='+h.sos[0].lat+','+h.sos[0].lng+'">'+T('vh.kaart','kaart')+'</a>' : '')+
             ' <button class="obtn" data-vhsosok="'+h.ref+'" style="padding:0.15rem 0.7rem;font-size:0.7rem;">'+T('vh.sosok','Afgehandeld')+'</button></div>' : '')+
           '<div class="r1"><span class="nm">'+esc(h.codename)+' \u00B7 '+esc(h.auto)+(h.kenteken?' ('+esc(h.kenteken)+')':'')+'</span><span class="pr">'+eur(h.prijs)+'</span></div>'+
           '<div class="ds">'+h.van+' \u2192 '+h.tot+' \u00B7 '+T('vh.st.'+h.status, HUUR_ST[h.status]||h.status)+
           ' \u00B7 \uD83D\uDCF7 '+h.fotosVoor+'/'+h.fotosNa+(h.borg?' \u00B7 '+T('vh.borg','borg')+' '+eur(h.borg):'')+
           (h.uitgifte ? ' \u00B7 '+h.uitgifte.kmStart+' km' : '')+
-          (h.locatie ? ' \u00B7 <a style="color:var(--gold);" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+h.locatie.lat+','+h.locatie.lng+'">\uD83D\uDCCD '+T('vh.live','live locatie')+'</a>' : '')+'</div>'+
+          (h.locatie ? ' \u00B7 <a style="color:var(--gold);" target="_blank" rel="noopener" href="geo:'+h.locatie.lat+','+h.locatie.lng+'?q='+h.locatie.lat+','+h.locatie.lng+'">\uD83D\uDCCD '+T('vh.live','live locatie')+'</a>' : '')+'</div>'+
           (h.inname ? '<div class="ds" style="color:'+(h.inname.meerkosten>0?'var(--gold)':'var(--green)')+';">'+
             (h.inname.meerkosten>0 ? T('vh.meer','Meerkosten')+': '+eur(h.inname.meerkosten)+' ('+h.inname.gereden+' km, '+h.inname.extraKm+' extra'+(h.inname.tankKosten>0?', tank '+eur(h.inname.tankKosten):'')+')'
               : '\u2713 '+h.inname.gereden+' km, '+T('vh.geenmeer','geen meerkosten \u2013 borg vrij'))+'</div>' : '')+
@@ -6076,13 +6076,13 @@
           '<button class="obtn primary" data-chst="'+c.ref+'" data-st="afgerond">'+T('ch.teruggeven','Teruggeven en afronden')+'</button>';
         return '<div class="mitem">'+
           (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.8rem;">🚨 <b>SOS:</b> '+esc(c.sos[0].bericht)+
-            (Number.isFinite(c.sos[0].lat) ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('ch.kaart','kaart')+'</a>' : '')+
+            (Number.isFinite(c.sos[0].lat) ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="geo:'+c.sos[0].lat+','+c.sos[0].lng+'?q='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('ch.kaart','kaart')+'</a>' : '')+
             ' <button class="obtn" data-chsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;font-size:0.7rem;">'+T('ch.sosok','Afgehandeld')+'</button></div>' : '')+
           '<div class="r1"><span class="nm">'+esc(c.codename)+' · '+esc(c.boot)+' ('+esc(c.type)+')</span><span class="pr">'+eur(c.prijs)+'</span></div>'+
           '<div class="ds">'+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('ch.gasten','gasten')+' · ':'')+(c.metSkipper?'⚓ '+T('ch.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.bareboat','bareboat'))+' · '+T('ch.st.'+c.status, CHARTER_ST[c.status]||c.status)+
           ' · 📷 '+c.fotosVoor+'/'+c.fotosNa+(c.borg?' · '+T('ch.borg','borg')+' '+eur(c.borg):'')+
           (c.uitvaart ? ' · '+c.uitvaart.urenStart+' '+T('ch.uur','mu') : '')+
-          (c.locatie ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+c.locatie.lat+','+c.locatie.lng+'">📍 '+T('ch.live','live positie')+'</a>' : '')+'</div>'+
+          (c.locatie ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="geo:'+c.locatie.lat+','+c.locatie.lng+'?q='+c.locatie.lat+','+c.locatie.lng+'">📍 '+T('ch.live','live positie')+'</a>' : '')+'</div>'+
           (c.teruggave ? '<div class="ds" style="color:'+(c.teruggave.meerkosten>0?'var(--gold)':'var(--green)')+';">'+
             (c.teruggave.meerkosten>0 ? T('ch.meer','Meerkosten')+': '+eur(c.teruggave.meerkosten)+' ('+c.teruggave.gevaren+' '+T('ch.uur','mu')+(c.teruggave.brandstofKosten>0?', '+T('ch.brandstof','brandstof')+' '+eur(c.teruggave.brandstofKosten):'')+')'
               : '✓ '+c.teruggave.gevaren+' '+T('ch.uur','mu')+', '+T('ch.geenmeer','geen meerkosten, borg vrij'))+'</div>' : '')+

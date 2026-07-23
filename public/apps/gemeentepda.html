@@ -155,7 +155,7 @@ async function laad(){
   let d; try { d = await api('/api/gemeente/meldingen', { ploeg }); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const l = d.meldingen || [];
   $('#lijst').innerHTML = l.length ? l.map(m => {
-    const maps = (m.lat && m.lng) ? '<a class="loc" href="https://www.openstreetmap.org/?mlat='+m.lat+'&mlon='+m.lng+'#map=18/'+m.lat+'/'+m.lng+'" target="_blank" rel="noopener">Kaart openen</a>' : (m.locatie ? '<span class="loc" style="border:none;color:var(--soft);">'+esc(m.locatie)+'</span>' : '');
+    const maps = (m.lat && m.lng) ? '<a class="loc" href="geo:'+m.lat+','+m.lng+'?q='+m.lat+','+m.lng+'" target="_blank" rel="noopener">Kaart openen</a>' : (m.locatie ? '<span class="loc" style="border:none;color:var(--soft);">'+esc(m.locatie)+'</span>' : '');
     return '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.categorieLabel)+'</h4>'+
       '<div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+' · melder '+esc(m.melder||'')+'</div>'+
       maps + '<div><span class="status">'+esc(m.status)+'</span></div>'+

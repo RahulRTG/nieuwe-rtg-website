@@ -27,7 +27,16 @@
     '.mgz-stil{background:transparent;color:#eee;border:1px solid #444;border-radius:10px;padding:.5rem .8rem;font:inherit;font-size:.83rem;cursor:pointer;}' +
     '.mgz-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:6.4rem;z-index:37;background:#0C0C0B;border:1px solid var(--gold,#857007);border-radius:12px;padding:.6rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.84rem;color:#eee;display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
     '.mgz-code{font-family:ui-monospace,monospace;letter-spacing:.2em;color:var(--gold,#857007);font-weight:700;}' +
-    '.mgz-chat{font-size:.82rem;color:#bbb;max-height:26vh;overflow-y:auto;line-height:1.5;}';
+    '.mgz-chat{font-size:.82rem;color:#bbb;max-height:26vh;overflow-y:auto;line-height:1.5;}' +
+    /* de melding-staat: de lippen verkleuren (gouden gloed die ademt) en er
+       komt een klein bordeaux teken met het aantal; tikken opent de melding */
+    '.mgz-rahul.mgz-meld{background:#0C0C0B;border:1px solid var(--gold,#857007);animation:mgzPuls 1.8s ease-in-out infinite;}' +
+    '@keyframes mgzPuls{0%,100%{box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 0 0 rgba(158,28,64,.55);}50%{box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 14px 5px rgba(158,28,64,.55);}}' +
+    '@media (prefers-reduced-motion: reduce){.mgz-rahul.mgz-meld{animation:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 12px 4px rgba(158,28,64,.5);}}' +
+    '.mgz-stip{position:absolute;top:-4px;right:-4px;min-width:1.05rem;height:1.05rem;padding:0 .25rem;border-radius:999px;background:#9E1C40;color:#fff;font-size:.66rem;font-weight:700;line-height:1.05rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.5);}' +
+    '.mgz-seintjes{display:flex;flex-direction:column;gap:.4rem;}' +
+    '.mgz-seintje{background:#0C0C0B;border:1px solid var(--gold,#857007);border-radius:12px;padding:.5rem .7rem;font-size:.82rem;color:#eee;line-height:1.45;cursor:pointer;text-align:left;width:100%;}' +
+    '.mgz-seintje:hover{border-color:#C23A5E;}.mgz-seintje b{color:var(--gold,#857007);display:block;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.15rem;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; };
 
@@ -49,15 +58,69 @@
       if (window.RTGMond) return zet();
       var s = document.createElement('script'); s.src = '/shared/mond.js'; s.onload = zet; document.head.appendChild(s);
     })();
+    fab.style.position = 'fixed'; // zodat de melding-stip erop past
     var sheet = maakEl('<section class="mgz-sheet" aria-label="Vraag Rahul" hidden>' +
       '<div class="mgz-kop"><span>Vraag het Rahul</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
+      '<div class="mgz-seintjes" data-seintjes></div>' +
       '<div class="mgz-uit" aria-live="polite"></div>' +
       '<form class="mgz-rij"><input placeholder="Vraag of opdracht" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
     document.body.appendChild(fab); document.body.appendChild(sheet);
     var uit = sheet.querySelector('.mgz-uit'), form = sheet.querySelector('form'), inp = form.querySelector('input');
-    fab.addEventListener('click', function () { sheet.hidden = false; fab.hidden = true; inp.focus();
+    var seintjesVak = sheet.querySelector('[data-seintjes]');
+    fab.addEventListener('click', function () { sheet.hidden = false; fab.hidden = true; inp.focus(); doofMelding();
       if (!uit.textContent) uit.textContent = memTok ? 'Zeg wat je wilt. Ik zoek, reserveer, boek en bestel, alles met jouw eigen inlog.' : 'Vraag me alles over je zaak: cijfers, rooster, voorraad, en ik voer uit waar dat kan.'; });
     sheet.querySelector('.mgz-x').addEventListener('click', function () { sheet.hidden = true; fab.hidden = false; });
+
+    /* ---------- Rahul heeft een melding: de lippen verkleuren en bewegen ----------
+       We halen zuinig de eigen seintjes op (kern/fluister). Zijn er nieuwe
+       (t.o.v. wat de gebruiker al zag), dan gloeit de knop, komt er een teken
+       met het aantal en bewegen de lippen af en toe. Tikt de gebruiker, dan
+       ziet ze de melding boven de vraagbalk en kan ze meteen reageren. */
+    var stip = null, laatsteSeintjes = [], meldTimer = null;
+    var ZIEN = 'rtg_rahul_gezien';
+    function gezienIds() { try { return JSON.parse(localStorage.getItem(ZIEN) || '[]'); } catch (e) { return []; } }
+    function bewaarGezien(ids) { try { localStorage.setItem(ZIEN, JSON.stringify(ids.slice(0, 60))); } catch (e) {} }
+    function idVan(s) { return (s && (s.id || s.tekst || (s.titel || '') + (s.bron || ''))) || ''; }
+    function nieuweSeintjes() { var g = gezienIds(); return laatsteSeintjes.filter(function (s) { return g.indexOf(idVan(s)) === -1; }); }
+    function toonMelding() {
+      var nieuw = nieuweSeintjes();
+      if (!nieuw.length) { doofMelding(); return; }
+      fab.classList.add('mgz-meld');
+      if (!stip) { stip = maakEl('<span class="mgz-stip"></span>'); fab.appendChild(stip); }
+      stip.textContent = nieuw.length > 9 ? '9+' : String(nieuw.length);
+      if (!meldTimer) meldTimer = setInterval(function () { if (!document.hidden && fab.classList.contains('mgz-meld')) mond.praat(700); }, 4200);
+    }
+    function doofMelding() {
+      fab.classList.remove('mgz-meld');
+      if (stip) { stip.remove(); stip = null; }
+      if (meldTimer) { clearInterval(meldTimer); meldTimer = null; }
+      if (laatsteSeintjes.length) bewaarGezien(laatsteSeintjes.map(idVan));
+      tekenSeintjes();
+    }
+    function tekenSeintjes() {
+      if (!seintjesVak) return;
+      if (!laatsteSeintjes.length) { seintjesVak.innerHTML = ''; return; }
+      seintjesVak.innerHTML = laatsteSeintjes.slice(0, 5).map(function (s) {
+        var t = typeof s === 'string' ? s : (s.tekst || s.titel || '');
+        var kop = (s && s.titel && s.tekst) ? '<b>' + esc(s.titel) + '</b>' : '';
+        return '<button class="mgz-seintje" type="button" data-vraag="' + esc(s && s.actie ? s.actie : t) + '">' + kop + esc(t) + '</button>';
+      }).join('');
+      [].forEach.call(seintjesVak.querySelectorAll('.mgz-seintje'), function (b) {
+        b.addEventListener('click', function () { inp.value = b.getAttribute('data-vraag') || ''; inp.focus(); });
+      });
+    }
+    function haalSeintjes() {
+      if (!memTok || document.hidden) return;
+      fetch('/api/fluister/profiel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + memTok }, body: '{}' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { if (!d) return; laatsteSeintjes = (d.seintjes || []).filter(Boolean); tekenSeintjes(); if (sheet.hidden) toonMelding(); })
+        .catch(function () {});
+    }
+    if (memTok) {
+      haalSeintjes();
+      setInterval(haalSeintjes, 60000);
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) haalSeintjes(); });
+    }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault(); var q = inp.value.trim(); if (!q) return; inp.value = '';
       uit.textContent = 'Rahul denkt na...';

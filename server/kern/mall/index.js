@@ -14,13 +14,13 @@
 const { alleProducten: winkelCatalogus } = require('../winkelcatalogus');
 
 const ETAGES = [
-  { id: 'eigen',    label: 'RTG eigen-merk',       icon: '🛒' },
-  { id: 'mode',     label: 'Mode',                 icon: '👗' },
-  { id: 'sieraden', label: 'Sieraden & horloges',  icon: '💎' },
-  { id: 'leer',     label: 'Leer & accessoires',   icon: '👜' },
-  { id: 'wonen',    label: 'Wonen & interieur',    icon: '🛋️' },
-  { id: 'beauty',   label: 'Parfum & beauty',      icon: '🧴' },
-  { id: 'land',     label: 'Van het land',         icon: '🌾' }
+  { id: 'eigen',    label: 'RTG eigen-merk',       icon: 'store' },
+  { id: 'mode',     label: 'Mode',                 icon: 'mode' },
+  { id: 'sieraden', label: 'Sieraden & horloges',  icon: 'juweel' },
+  { id: 'leer',     label: 'Leer & accessoires',   icon: 'tas' },
+  { id: 'wonen',    label: 'Wonen & interieur',    icon: 'wonen' },
+  { id: 'beauty',   label: 'Parfum & beauty',      icon: 'beauty' },
+  { id: 'land',     label: 'Van het land',         icon: 'oogst' }
 ];
 // de etages waar retail-boutieks op landen (eigen-merk en boerderij vullen we apart)
 const ETAGE_IDS = ETAGES.map(e => e.id).filter(id => id !== 'eigen' && id !== 'land');

@@ -34,6 +34,7 @@
   .boutiek h3{font-size:1.05rem;}
   .boutiek .stad{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
   .boutiek .stad .stad-glyf{width:.95em;height:.95em;vertical-align:-.12em;margin-right:.3em;}
+  .etage-kop h2 .kop-glyf{width:1em;height:1em;vertical-align:-.14em;margin-right:.4em;}
   .boutiek .tag{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:.15rem;}
   .boutiek .meta{font-size:.76rem;color:var(--soft);margin-top:.35rem;}
   .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
@@ -150,7 +151,7 @@ async function laadRtfbieb(){
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="rfCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
-        d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('')+'</select>'+
+        d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('')+'</select>'+
       '<input id="rfZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
       '<button class="knop stil" id="rfMijn" type="button">Mijn RTF-apps</button>'+
     '</div>'+
@@ -162,7 +163,7 @@ async function laadRtfbieb(){
 }
 function rtfKaart(a, geinstalleerd){
   return '<div class="boutiek" style="cursor:default;">'+
-    '<span class="stad">'+a.icon+' '+esc(a.categorieLabel||a.categorie||'')+'</span>'+
+    '<span class="stad">'+esc(a.categorieLabel||a.categorie||'')+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
     '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</span>'+
     '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
@@ -361,7 +362,7 @@ async function laad(){
   try { d = await api('/api/mall'); } catch(e){ $('#etages').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   if (!d.etages || !d.etages.length){ $('#etages').innerHTML = '<div class="leeg">De mall wordt ingericht. Kom snel terug.</div>'; return; }
   $('#etages').innerHTML = d.etages.map(e =>
-    '<div class="etage"><div class="etage-kop"><h2>'+e.icon+' '+esc(e.label)+'</h2><span class="n">'+e.boutieks.length+' '+(e.boutieks.length===1?'boutique':'boutieks')+'</span></div>'+
+    '<div class="etage"><div class="etage-kop"><h2>'+(window.RTGGlyf?RTGGlyf.svgHTML(e.icon,{klasse:'kop-glyf'}):'')+esc(e.label)+'</h2><span class="n">'+e.boutieks.length+' '+(e.boutieks.length===1?'boutique':'boutieks')+'</span></div>'+
     '<div class="boutieks">'+e.boutieks.map(b =>
       '<button class="boutiek" data-code="'+esc(b.code)+'" data-kind="'+esc(b.kind||'retail')+'" data-naam="'+esc(b.naam)+'" data-stad="'+esc(b.stad||'')+'">'+
         '<span class="stad">'+esc(b.stad||'RTG')+'</span>'+

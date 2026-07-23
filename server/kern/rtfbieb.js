@@ -12,26 +12,26 @@
    installeren is: beschermde profielen zien nooit iets boven hun groep. */
 
 const CATEGORIEEN = [
-  { id: 'voorlezen', label: 'Voorlezen & verhalen', icon: '📖', doel: ['mini', 'kind'], vak: ['Verhaaltjes', 'Prentenboek', 'Slaapverhaal', 'Vertelkaarten', 'Voorleesstem'] },
-  { id: 'rekenen', label: 'Rekenen', icon: '🔢', doel: ['kind', 'tiener'], vak: ['Tafeltrainer', 'Sommenfabriek', 'Breukenbakker', 'Hoofdrekenen', 'Rekenrace'] },
-  { id: 'taal', label: 'Taal & lezen', icon: '🔤', doel: ['kind', 'tiener'], vak: ['Letterdoos', 'Leesavontuur', 'Spellingheld', 'Woordenjacht', 'Verhalenschrijver'] },
-  { id: 'tekenen', label: 'Tekenen & knutselen', icon: '🎨', doel: ['mini', 'kind', 'gezin'], vak: ['Kleurplaat', 'Tekenles', 'Knutselplan', 'Stickerstudio', 'Kleikunst'] },
-  { id: 'muziek', label: 'Muziek maken', icon: '🎵', doel: ['kind', 'tiener'], vak: ['Liedjesmaker', 'Pianoles', 'Ritmedoos', 'Zangkamer', 'Orkestje'] },
-  { id: 'puzzels', label: 'Puzzels & denkspellen', icon: '🧩', doel: ['kind', 'tiener', 'gezin'], vak: ['Puzzelkist', 'Breinbreker', 'Doolhof', 'Geheugenspel', 'Logicaland'] },
-  { id: 'coderen', label: 'Coderen & techniek', icon: '🤖', doel: ['kind', 'tiener'], vak: ['Codeblokken', 'Robotles', 'Spelletjesmaker', 'Schakelkast Junior', 'Pixelwerkplaats'] },
-  { id: 'natuur', label: 'Natuur & buiten', icon: '🌳', doel: ['kind', 'gezin'], vak: ['Speurtocht', 'Bomengids', 'Vogelspotter', 'Moestuintje', 'Buitenbingo'] },
-  { id: 'sport', label: 'Sport & bewegen', icon: '⚽', doel: ['kind', 'tiener', 'gezin'], vak: ['Beweegspel', 'Danskamer', 'Voetbalschool', 'Zwemdiploma', 'Springparcours'] },
-  { id: 'proefjes', label: 'Wetenschap & proefjes', icon: '🔬', doel: ['kind', 'tiener'], vak: ['Proefjeslab', 'Uitvindershoek', 'Magneetles', 'Waterwerkplaats', 'Kristallenkweek'] },
-  { id: 'ruimte', label: 'Ruimte & sterren', icon: '🚀', doel: ['kind', 'tiener'], vak: ['Sterrenkijker', 'Planetenreis', 'Raketbouwer', 'Maanmissie', 'Melkwegkaart'] },
-  { id: 'dieren', label: 'Dieren', icon: '🐾', doel: ['mini', 'kind'], vak: ['Dierengeluiden', 'Boerderijvriendjes', 'Dierendokter', 'Oceaanontdekker', 'Safariboek'] },
-  { id: 'koken', label: 'Koken voor kids', icon: '🧁', doel: ['kind', 'gezin'], vak: ['Bakplezier', 'Kinderkeuken', 'Receptenschrift', 'Pannenkoekplan', 'Smaakschool'] },
-  { id: 'verkeer', label: 'Verkeer & veilig', icon: '🚦', doel: ['mini', 'kind'], vak: ['Verkeersles', 'Oversteekspel', 'Fietsdiploma', 'Bordenquiz', 'Veiligthuis'] },
-  { id: 'gevoelens', label: 'Gevoelens & rust', icon: '💛', doel: ['mini', 'kind', 'tiener'], vak: ['Gevoelensweer', 'Ademwolkje', 'Complimentenpot', 'Piekerhulpje', 'Moedmeter'] },
-  { id: 'slapen', label: 'Dromen & slapen', icon: '🌙', doel: ['mini', 'gezin'], vak: ['Slaapliedjes', 'Sterrenlampje', 'Bedtijdklok', 'Droomdagboek', 'Nachtrustgids'] },
-  { id: 'zakgeld', label: 'Zakgeld & sparen', icon: '🐷', doel: ['kind', 'tiener'], vak: ['Spaarpot', 'Zakgeldboekje', 'Klusjesplanner', 'Wenslijstje', 'Spaardoel'] },
-  { id: 'talen', label: 'Talen ontdekken', icon: '🌍', doel: ['kind', 'tiener', 'gezin'], vak: ['Woordjesreis', 'Taalvriendjes', 'Uitspraakcoach', 'Reiswoordenboek', 'Taalquiz'] },
-  { id: 'school', label: 'Huiswerk & school', icon: '🎒', doel: ['kind', 'tiener'], vak: ['Huiswerkplanner', 'Topografietrainer', 'Werkstukhulp', 'Toetstimer', 'Boekverslag'] },
-  { id: 'gezin', label: 'Samen in het gezin', icon: '🏡', doel: ['gezin'], vak: ['Gezinsavond', 'Fotoalbum', 'Taakverdeler', 'Uitjesplanner', 'Familiequiz'] }
+  { id: 'voorlezen', label: 'Voorlezen & verhalen', doel: ['mini', 'kind'], vak: ['Verhaaltjes', 'Prentenboek', 'Slaapverhaal', 'Vertelkaarten', 'Voorleesstem'] },
+  { id: 'rekenen', label: 'Rekenen', doel: ['kind', 'tiener'], vak: ['Tafeltrainer', 'Sommenfabriek', 'Breukenbakker', 'Hoofdrekenen', 'Rekenrace'] },
+  { id: 'taal', label: 'Taal & lezen', doel: ['kind', 'tiener'], vak: ['Letterdoos', 'Leesavontuur', 'Spellingheld', 'Woordenjacht', 'Verhalenschrijver'] },
+  { id: 'tekenen', label: 'Tekenen & knutselen', doel: ['mini', 'kind', 'gezin'], vak: ['Kleurplaat', 'Tekenles', 'Knutselplan', 'Stickerstudio', 'Kleikunst'] },
+  { id: 'muziek', label: 'Muziek maken', doel: ['kind', 'tiener'], vak: ['Liedjesmaker', 'Pianoles', 'Ritmedoos', 'Zangkamer', 'Orkestje'] },
+  { id: 'puzzels', label: 'Puzzels & denkspellen', doel: ['kind', 'tiener', 'gezin'], vak: ['Puzzelkist', 'Breinbreker', 'Doolhof', 'Geheugenspel', 'Logicaland'] },
+  { id: 'coderen', label: 'Coderen & techniek', doel: ['kind', 'tiener'], vak: ['Codeblokken', 'Robotles', 'Spelletjesmaker', 'Schakelkast Junior', 'Pixelwerkplaats'] },
+  { id: 'natuur', label: 'Natuur & buiten', doel: ['kind', 'gezin'], vak: ['Speurtocht', 'Bomengids', 'Vogelspotter', 'Moestuintje', 'Buitenbingo'] },
+  { id: 'sport', label: 'Sport & bewegen', doel: ['kind', 'tiener', 'gezin'], vak: ['Beweegspel', 'Danskamer', 'Voetbalschool', 'Zwemdiploma', 'Springparcours'] },
+  { id: 'proefjes', label: 'Wetenschap & proefjes', doel: ['kind', 'tiener'], vak: ['Proefjeslab', 'Uitvindershoek', 'Magneetles', 'Waterwerkplaats', 'Kristallenkweek'] },
+  { id: 'ruimte', label: 'Ruimte & sterren', doel: ['kind', 'tiener'], vak: ['Sterrenkijker', 'Planetenreis', 'Raketbouwer', 'Maanmissie', 'Melkwegkaart'] },
+  { id: 'dieren', label: 'Dieren', doel: ['mini', 'kind'], vak: ['Dierengeluiden', 'Boerderijvriendjes', 'Dierendokter', 'Oceaanontdekker', 'Safariboek'] },
+  { id: 'koken', label: 'Koken voor kids', doel: ['kind', 'gezin'], vak: ['Bakplezier', 'Kinderkeuken', 'Receptenschrift', 'Pannenkoekplan', 'Smaakschool'] },
+  { id: 'verkeer', label: 'Verkeer & veilig', doel: ['mini', 'kind'], vak: ['Verkeersles', 'Oversteekspel', 'Fietsdiploma', 'Bordenquiz', 'Veiligthuis'] },
+  { id: 'gevoelens', label: 'Gevoelens & rust', doel: ['mini', 'kind', 'tiener'], vak: ['Gevoelensweer', 'Ademwolkje', 'Complimentenpot', 'Piekerhulpje', 'Moedmeter'] },
+  { id: 'slapen', label: 'Dromen & slapen', doel: ['mini', 'gezin'], vak: ['Slaapliedjes', 'Sterrenlampje', 'Bedtijdklok', 'Droomdagboek', 'Nachtrustgids'] },
+  { id: 'zakgeld', label: 'Zakgeld & sparen', doel: ['kind', 'tiener'], vak: ['Spaarpot', 'Zakgeldboekje', 'Klusjesplanner', 'Wenslijstje', 'Spaardoel'] },
+  { id: 'talen', label: 'Talen ontdekken', doel: ['kind', 'tiener', 'gezin'], vak: ['Woordjesreis', 'Taalvriendjes', 'Uitspraakcoach', 'Reiswoordenboek', 'Taalquiz'] },
+  { id: 'school', label: 'Huiswerk & school', doel: ['kind', 'tiener'], vak: ['Huiswerkplanner', 'Topografietrainer', 'Werkstukhulp', 'Toetstimer', 'Boekverslag'] },
+  { id: 'gezin', label: 'Samen in het gezin', doel: ['gezin'], vak: ['Gezinsavond', 'Fotoalbum', 'Taakverdeler', 'Uitjesplanner', 'Familiequiz'] }
 ];
 const MERK = ['Vlinder', 'Dolfijn', 'Raket', 'Uiltje', 'Vosje', 'Sterretje', 'Ballon', 'Kikker', 'Panda', 'Egeltje',
   'Zonnetje', 'Regenboog', 'Draakje', 'Robotje', 'Walvis', 'Pinguin', 'Eekhoorn', 'Vuurtoren', 'Boomhut', 'Zwaluw',
@@ -66,7 +66,7 @@ function appVan(i) {
   const waarde = 399 + ((i * 7919) % 21) * 50;              // 3,99 .. 13,99
   return {
     id: 'rtf-' + i, nr: i, naam: merk + ' ' + vak + ' ' + editie,
-    categorie: cat.id, categorieLabel: cat.label, icon: cat.icon,
+    categorie: cat.id, categorieLabel: cat.label,
     doelgroep, doelgroepLabel: DOELGROEP_LABEL[doelgroep],
     winkelwaardeCenten: waarde, prijsCenten: 0,
     sterren: (40 + ((i * 31) % 10)) / 10, versie: (1 + (i % 6)) + '.' + ((i * 13) % 10), grootteMB: 15 + ((i * 97) % 220),
@@ -93,7 +93,7 @@ function maakRtfBieb({ db, save }) {
       totaal: TOTAAL, totaleWinkelwaardeCenten: SOM_WAARDE, gratis: true,
       categorieen: CATEGORIEEN
         .filter(c => c.doel.some(d => magZien(groep, d)))
-        .map(c => ({ id: c.id, label: c.label, icon: c.icon, aantal: PER_CAT }))
+        .map(c => ({ id: c.id, label: c.label, aantal: PER_CAT }))
     };
   }
 

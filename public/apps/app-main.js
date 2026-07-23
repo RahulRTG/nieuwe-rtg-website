@@ -480,8 +480,20 @@
       '.ag-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;' +
         'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
       '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
-      '.ag-mond{display:block;margin:0.15rem auto 0.3rem;width:220px;height:100px;}';
+      '.ag-mond{display:block;margin:0.15rem auto 0.3rem;width:220px;height:100px;}' +
+      // de sterrenhemel gaat achter alles; de poort-inhoud eroverheen
+      '#gate > *:not(canvas){position:relative;z-index:1;}';
     document.head.appendChild(st);
+
+    // een heel subtiele 3D-sterrenhemel over het hele inlogscherm, in RTG-stijl
+    (function sterrenhemel(){
+      var gate = document.getElementById('gate');
+      if (!gate) return;
+      var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { helderheid: 0.9 }); };
+      if (window.RTGSterren) return hang();
+      var s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
+      s.onload = hang; document.head.appendChild(s);
+    })();
 
     const doos = document.createElement('div');
     doos.className = 'ag-doos';

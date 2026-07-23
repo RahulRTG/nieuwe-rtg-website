@@ -44,11 +44,17 @@
     rw: 'RW', mg: 'MG', wo: 'SN', ln: 'CD', ny: 'MW', lg: 'UG', ht: 'HT', qu: 'PE', gn: 'PY', ay: 'BO',
     mi: 'NZ', sm: 'WS', to: 'TO', fj: 'FJ'
   };
+  // Geen vlag-emoji's: elke taal draagt haar eigen ISO-code in een ingetogen,
+  // goud-omlijnd plaatje - rustiger en volwassener dan een rij vlaggetjes.
   function vlag(code) {
-    const iso = LAND[code];
-    if (!iso) return '<span class="rtg-lang-code">' + code.toUpperCase() + '</span>';
-    return String.fromCodePoint(...[...iso].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+    return '<span class="rtg-lang-code">' + String(code || '').toUpperCase() + '</span>';
   }
+  // kleine, in huisstijl getekende tekens (geen emoji), currentColor volgend
+  const ICOON = {
+    mic: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v3.5"/></svg>',
+    spark: '<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M12 2c.5 4.6 2.4 6.5 7 7-4.6.5-6.5 2.4-7 7-.5-4.6-2.4-6.5-7-7 4.6-.5 6.5-2.4 7-7z"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>'
+  };
   // veelgebruikte land-/taalnamen die Rahul moet herkennen (genormaliseerd:
   // kleine letters, accenten eraf). De rest matcht op de eigen naam + Engelse naam.
   const ALIAS = {
@@ -225,11 +231,11 @@
           '<h2>Where in the world are you?</h2>' +
           '<p>Type or say your language &middot; Rahul switches for you</p>' +
           '<div class="rtg-lang-ai">' +
-            (kanSpreken ? '<button type="button" id="rtg-lang-mic" aria-label="Speak your language / Spreek je taal">&#127908;</button>' : '') +
+            (kanSpreken ? '<button type="button" id="rtg-lang-mic" aria-label="Speak your language / Spreek je taal">' + ICOON.mic + '</button>' : '') +
             '<input id="rtg-lang-zoek" autocomplete="off" enterkeyhint="go" ' +
               'aria-label="Type your country or language / Typ je land of taal" ' +
               'placeholder="Say or type where you&rsquo;re from&hellip;">' +
-            '<button type="button" id="rtg-lang-rahul" aria-label="Let Rahul choose / Laat Rahul kiezen">&#10024;</button>' +
+            '<button type="button" id="rtg-lang-rahul" aria-label="Let Rahul choose / Laat Rahul kiezen">' + ICOON.spark + '</button>' +
           '</div>' +
           '<button type="button" class="rtg-lang-hint" id="rtg-lang-hint" hidden></button>' +
         '</div>';
@@ -249,7 +255,7 @@
         const t = self._lijst.find(x => x.code === res.code) || {};
         hint.hidden = false;
         hint.setAttribute('data-lang', res.code);
-        hint.innerHTML = '<span class="rtg-lang-flag">' + vlag(res.code) + '</span>' +
+        hint.innerHTML = vlag(res.code) +
           '<span class="rtg-lang-sug"><b>' + String(t.naam || res.code).replace(/[<>]/g, '') + '</b>' +
           '<span class="rtg-lang-go">tap to continue &middot; tik om verder te gaan</span></span>';
       };
@@ -300,10 +306,23 @@
       const c = document.getElementById('rtg-lang-mond');
       if (!c || this._mond) return;
       const go = () => { if (window.RTGMond && !this._mond) this._mond = window.RTGMond.maak(c); };
-      if (window.RTGMond) return go();
-      if (this._mondLaadt) return;
-      this._mondLaadt = true;
-      const s = document.createElement('script'); s.src = '/shared/mond.js'; s.async = true;
+      if (window.RTGMond) go();
+      else if (!this._mondLaadt) {
+        this._mondLaadt = true;
+        const s = document.createElement('script'); s.src = '/shared/mond.js'; s.async = true;
+        s.onload = go; document.head.appendChild(s);
+      }
+      this._startSterren();
+    },
+    // een heel subtiele 3D-sterrenhemel achter de kaart, in RTG-stijl
+    _startSterren() {
+      const scrim = document.getElementById('rtg-lang-modal');
+      if (!scrim || this._sterren) return;
+      const go = () => { if (window.RTGSterren && !this._sterren) this._sterren = window.RTGSterren.hang(scrim, { helderheid: 0.85 }); };
+      if (window.RTGSterren) return go();
+      if (this._sterLaadt) return;
+      this._sterLaadt = true;
+      const s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
       s.onload = go; document.head.appendChild(s);
     },
     openModal() {
@@ -328,7 +347,7 @@
     },
     updateSwitch() {
       const btn = document.getElementById('rtg-lang-switch');
-      if (btn) btn.innerHTML = '<span class="rtg-sw-globe">🌐</span>' + this.lang.toUpperCase();
+      if (btn) btn.innerHTML = '<span class="rtg-sw-globe">' + ICOON.globe + '</span>' + this.lang.toUpperCase();
     },
 
     injectStyles() {

@@ -2173,6 +2173,11 @@ Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto }));
 Object.assign(kern, require('./kern/rtfclubs')({ db, save, crypto }));
 Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropic }));
 Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));
+/* Aanmeldingen (kern/aanmeldingen.js): de aanmelding per pas is geheel
+   geautomatiseerd (berichten, onboarding, rondleiding, RTF, veiligheid, privacy);
+   alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
+   Lifestyle/Business toe. */
+Object.assign(kern, require('./kern/aanmeldingen')({ db, save, crypto, schoon }));
 /* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
    vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
 Object.assign(kern, require('./kern/pestgrens')({ db, save }));
@@ -2590,6 +2595,7 @@ require('./routes/geloofbieb')(kern);
 /* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
 require('./routes/rtfkantoor')(kern);
 require('./routes/labfonds')(kern);
+require('./routes/aanmeldingen')(kern);
 /* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
    school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
    (kern/samenrtf.js): kindveilig meekijken binnen gezin en vrienden. */

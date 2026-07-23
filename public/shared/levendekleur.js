@@ -167,7 +167,7 @@
         // de themawissel (wit <-> donker <-> standaard): een zachte kruisvervaging
         // van de grote vlakken en de kaarten (achtergrond + tekst + randen), veilig
         // via gewone properties -- geen @property, dus var(--token,#fallback) blijft heel
-        'body,[data-levendegrond],[data-levend-thema],.card,.os-tegel,.tkc{transition:background-color .8s ease,color .8s ease,border-color .8s ease;}}';
+        'body,[data-levendegrond],[data-levend-thema],.card,.os-tegel,.tkc,.topbar,.tabbar,.os-dock{transition:background-color .8s ease,color .8s ease,border-color .8s ease;}}';
     (d.head || d.documentElement).appendChild(st);
   }
 

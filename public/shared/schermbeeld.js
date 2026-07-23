@@ -18,9 +18,13 @@
   var hoek = 0;
   try { hoek = (parseInt(localStorage.getItem(STORE), 10) || 0) % 360; } catch (e) {}
 
+  // De knoppen (beeld draaien + volledig scherm) stonden rechtsONDER, waar ook
+  // Rahul en de metgezel-knoppen leven; dat werd te druk in die hoek. Ze staan nu
+  // rechtsBOVEN, uit de weg van de AI-knoppen, met een kleine marge voor de
+  // statusbalk (safe-area-inset-top).
   var CSS =
   '.rtg-scherm{position:fixed;right:calc(env(safe-area-inset-right,0px) + 0.7rem);' +
-  'bottom:calc(env(safe-area-inset-bottom,0px) + 0.7rem);z-index:2147483000;display:flex;gap:0.35rem;' +
+  'top:calc(env(safe-area-inset-top,0px) + 0.7rem);z-index:2147483000;display:flex;gap:0.35rem;' +
   'padding:0.3rem;border-radius:999px;background:rgba(18,16,15,0.72);backdrop-filter:blur(12px);' +
   'border:1px solid rgba(255,255,255,0.12);box-shadow:0 8px 24px rgba(0,0,0,0.4);}' +
   '.rtg-scherm button{width:2.1rem;height:2.1rem;border-radius:50%;border:none;cursor:pointer;' +

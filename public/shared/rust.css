@@ -31,3 +31,29 @@
   outline: 2px solid color-mix(in srgb, var(--gold, #C9A24B) 70%, transparent);
   outline-offset: 3px;
 }
+
+/* ---- de adem-laag: nooit te druk, voor niemand niet, op elk scherm ----
+   Deze laag is er voor de belofte dat de UI voor miljarden mensen werkt: op de
+   kleinste telefoon, het grootste scherm, in elke taal (ook lange woorden). Het
+   is bewust een vangnet, geen herontwerp -- we raken alleen universele, veilige
+   dingen aan en laten pagina-eigen componenten met rust.
+
+   1. Beeld ademt mee: nooit breder dan zijn kolom, dus geen zijwaartse scroll of
+      afgesneden randen op een smal scherm. Foto's en video houden hun verhouding;
+      svg-iconen en canvas-widgets hebben vaste maten, dus die krijgen alleen de
+      breedte-plafond mee (geen height:auto die hun maat zou verstoren). */
+img, picture, video{
+  max-width: 100%;
+  height: auto;
+}
+svg, canvas{ max-width: 100%; }
+/* 2. Lange woorden en onafgebroken tekst (URL's, codes, samengestelde woorden in
+      andere talen) breken netjes af in plaats van de kolom uit te duwen. */
+p, li, dd, dt, figcaption, blockquote, h1, h2, h3, h4, h5, h6, th, td, label, summary{
+  overflow-wrap: break-word;
+}
+/* 3. Wie "minder data" vraagt (zuinig toestel, trage lijn) krijgt een nog
+      rustiger beeld: decoratieve overgangen vallen weg. */
+@media (prefers-reduced-data: reduce){
+  a, button, summary, input, select, textarea{ transition: none; }
+}

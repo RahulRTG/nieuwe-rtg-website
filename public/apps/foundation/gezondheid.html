@@ -49,7 +49,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🩺 Gezondheidsmaatje</h1>
+  <h1>Gezondheidsmaatje</h1>
   <div class="intro">Houd samen de gezondheid van het gezin bij: medicijnen (met een vinkje of het vandaag al gegeven is), afspraken bij tandarts of huisarts, de groeicurve, en de allergiekaart uit jullie zorgprofiel.</div>
 
   <div id="allergie"></div>
@@ -73,11 +73,11 @@ async function laad(){
     if (data.error) throw new Error(data.error);
     // allergiekaart
     $('#allergie').innerHTML = data.allergie
-      ? '<div class="allergie"><h2>⚠️ Allergie &amp; medisch</h2><div class="txt">'+esc(data.allergie)+'</div></div>'
+      ? '<div class="allergie"><h2>Allergie &amp; medisch</h2><div class="txt">'+esc(data.allergie)+'</div></div>'
       : '<div class="allergie geen"><h2>Allergie &amp; medisch</h2><div>Nog niets vastgelegd'+(data.magZorgprofiel?' - vul het in bij het zorgprofiel (oppasinfo).':'.')+'</div></div>';
     // persoonkeuze
     if (!gekozen || !data.personen.some(p=>p.pid===gekozen)) gekozen = (data.personen.find(p=>p.pid===data.mijnId)||data.personen[0]||{}).pid;
-    $('#kies').innerHTML = data.personen.map(p=>'<button data-pid="'+p.pid+'" class="'+(p.pid===gekozen?'aan':'')+'">'+esc(p.naam)+(p.teGeven?' · '+p.teGeven+'💊':'')+'</button>').join('');
+    $('#kies').innerHTML = data.personen.map(p=>'<button data-pid="'+p.pid+'" class="'+(p.pid===gekozen?'aan':'')+'">'+esc(p.naam)+(p.teGeven?' · '+p.teGeven+'':'')+'</button>').join('');
     $('#kies').querySelectorAll('button').forEach(b=> b.onclick = ()=>{ gekozen = b.dataset.pid; toon(); });
     toon();
   }catch(e){ $('#paneel').innerHTML = '<div class="kaart blok"><div class="leeg">Kon het gezondheidsmaatje niet laden.</div></div>'; }
@@ -89,7 +89,7 @@ function toon(){
   $('#kies').querySelectorAll('button').forEach(b=> b.className = b.dataset.pid===gekozen?'aan':'');
   let h = '';
   // medicijnen
-  h += '<div class="kaart blok"><h2>💊 Medicijnen</h2>';
+  h += '<div class="kaart blok"><h2>Medicijnen</h2>';
   h += p.medicijnen.length ? p.medicijnen.map(m=>
     '<div class="rij'+(m.gegevenVandaag?' gedaan':'')+'" data-med="'+m.id+'">'
     + '<input type="checkbox" class="vink"'+(m.gegevenVandaag?' checked':'')+' title="Vandaag gegeven">'
@@ -98,7 +98,7 @@ function toon(){
   ).join('') : '<div class="leeg">Nog geen medicijnen.</div>';
   h += '<div class="toevoeg"><input id="mNaam" placeholder="Medicijn" maxlength="80"><input id="mDosis" class="sm" placeholder="Dosis"><input id="mTijd" class="sm" placeholder="Wanneer"><button class="knop klein" id="mAdd">+</button></div><div class="fout" id="mFout"></div></div>';
   // afspraken
-  h += '<div class="kaart blok"><h2>📅 Afspraken</h2>';
+  h += '<div class="kaart blok"><h2>Afspraken</h2>';
   const komend = p.afspraken.filter(a=>!a.voorbij);
   h += komend.length ? komend.map(a=>
     '<div class="rij" data-afs="'+a.id+'"><div class="mid"><b>'+esc(a.wat)+'</b><span class="meta">'+esc(a.datum)+(a.tijd?' '+esc(a.tijd):'')+(a.waar?' · '+esc(a.waar):'')+'</span></div>'
@@ -107,7 +107,7 @@ function toon(){
   ).join('') : '<div class="leeg">Geen afspraken gepland.</div>';
   h += '<div class="toevoeg"><input id="aWat" placeholder="Bijv. tandarts" maxlength="80"><input id="aDatum" type="date"><input id="aTijd" type="time" class="sm"><input id="aWaar" placeholder="Waar (optioneel)" maxlength="80"><button class="knop klein" id="aAdd">+</button></div><div class="fout" id="aFout"></div></div>';
   // groeicurve
-  h += '<div class="kaart blok"><h2>📈 Groei</h2>';
+  h += '<div class="kaart blok"><h2>Groei</h2>';
   const lg = p.laatsteGewicht, ll = p.laatsteLengte;
   h += '<div class="laatste">'
     + '<div>Gewicht<br><b>'+(lg?lg.gewicht+' kg':'-')+'</b></div>'

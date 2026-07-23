@@ -114,7 +114,7 @@
   const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
     clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const ICOON = { bus: '🚌', trein: '🚆', metro: '🚇', veerboot: '⛴️', tram: '🚊' };
+  const ICOON = { bus: '', trein: '', metro: '', veerboot: '', tram: '' };
 
   let beheer = null;       // {soorten, lijnen, ijkpunten}
   let huidig = null;       // de lijn in de editor: {id?, haltes:[{naam,lat,lng}]}
@@ -204,7 +204,7 @@
     for (const l of beheer.lijnen) {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'lijnknop';
       const info = document.createElement('span'); info.className = 'rek';
-      info.textContent = (ICOON[l.soort] || '🚌') + ' ' + l.naam;
+      info.textContent = (ICOON[l.soort] || '') + ' ' + l.naam;
       const sub = document.createElement('small');
       sub.textContent = l.haltes.length + ' haltes · om de ' + l.frequentieMin + ' min · € ' + (l.tarief.basis / 100).toFixed(2) + ' + € ' + (l.tarief.perKm / 100).toFixed(2) + '/km';
       info.appendChild(sub); b.appendChild(info);

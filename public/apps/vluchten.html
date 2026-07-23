@@ -72,7 +72,7 @@ async function laad(){
 async function laadBord(){
   let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const sec=d.security.filter(f=>f.open).map(f=>esc(f.naam)+': '+f.wachtMinuten+' min').join(' · ');
-  let h='<div class="sec">🛂 Security nu · '+(sec||'geen filter open')+'</div>';
+  let h='<div class="sec">Security nu · '+(sec||'geen filter open')+'</div>';
   h+= d.vluchten.length ? d.vluchten.map(v=>{
     const st = v.geannuleerd?'<span class="status open">geannuleerd</span>'
       : v.status==='inchecken'?'<span class="status goud">inchecken open</span>'
@@ -82,7 +82,7 @@ async function laadBord(){
       : '<span class="status">'+esc(v.status)+'</span>';
     const ver=v.vertraging?' <span class="status open">+'+v.vertraging.minuten+' min</span>':'';
     const boek=(v.soort==='vertrek'&&['gepland','inchecken'].includes(v.status))?'<div class="rij"><button class="knop stil" data-boek="'+v.id+'">Boek deze vlucht</button></div>':'';
-    return '<div class="item"><h4>'+(v.icoon||'✈️')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4><div class="meta">'+esc(v.soort)+' · '+esc(v.tijd)+' · '+esc(v.gate)+' · '+st+ver+'</div>'+boek+'</div>';
+    return '<div class="item"><h4>'+(v.icoon||'')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4><div class="meta">'+esc(v.soort)+' · '+esc(v.tijd)+' · '+esc(v.gate)+' · '+st+ver+'</div>'+boek+'</div>';
   }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
   $('#inhoud').innerHTML=h;
   document.querySelectorAll('[data-boek]').forEach(b=>b.onclick=async()=>{
@@ -91,12 +91,12 @@ async function laadBord(){
 }
 async function laadMijn(){
   let d; try{ d=await api('/mijn'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  const charterBlok='<div class="item" style="border-color:rgba(169,143,7,.4);"><h4>🛩️ Charter aanvragen</h4>'+
+  const charterBlok='<div class="item" style="border-color:rgba(169,143,7,.4);"><h4>Charter aanvragen</h4>'+
     '<div class="meta">Een privejet of helikopter op uw moment. Operations bevestigt persoonlijk; daarna staat de vlucht in uw reizen.</div>'+
-    '<div class="rij"><select class="veld" id="chSoort"><option value="privejet">🛩️ Privejet</option><option value="helikopter">🚁 Helikopter</option></select>'+
+    '<div class="rij"><select class="veld" id="chSoort"><option value="privejet">Privejet</option><option value="helikopter">Helikopter</option></select>'+
     '<input class="veld" id="chBest" style="flex:1;min-width:8rem;" placeholder="Bestemming" maxlength="60"></div>'+
     '<div class="rij"><input class="veld" id="chDatum" type="date"><input class="veld" id="chTijd" type="time" value="12:00"><button class="knop" id="chVraag">Vraag aan</button></div>'+
-    ((d.charters||[]).length?'<div style="margin-top:.5rem;">'+d.charters.map(c=>'<div class="meta">'+(c.icoon||'🛩️')+' '+esc(c.code)+' · '+esc(c.bestemming)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</div>';
+    ((d.charters||[]).length?'<div style="margin-top:.5rem;">'+d.charters.map(c=>'<div class="meta">'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</div>';
   $('#inhoud').innerHTML= charterBlok + (d.boekingen.length ? d.boekingen.map(b=>{
     const v=b.vlucht;
     if(b.status==='ingecheckt'){

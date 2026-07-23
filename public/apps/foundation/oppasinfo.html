@@ -42,7 +42,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>📋 Belangrijke info</h1>
+  <h1>Belangrijke info</h1>
   <div class="intro" id="intro">Alles wat een oppas, opa/oma of familielid moet weten om goed voor de kinderen te zorgen.</div>
   <div class="bijgewerkt" id="bijgewerkt"></div>
 
@@ -51,20 +51,20 @@
     <div class="nood112"><b>Bij nood of gevaar: bel 112.</b> Twijfel je? Bel gerust een van de contacten hieronder.</div>
 
     <div class="kaart blok">
-      <h2>📞 Noodnummers</h2>
+      <h2>Noodnummers</h2>
       <div class="h" style="color:var(--zacht);font-size:.85rem;margin-bottom:.7rem;">Alleen voor noodgevallen: huisarts, 112, een buur. Het gezin zelf bereik je via <a href="contact.html" style="color:var(--goud)">Contact</a> in de app, geen telefoonnummer nodig.</div>
       <div id="contacten"><div class="leeg">Nog geen noodnummers ingevuld.</div></div>
     </div>
     <div class="kaart blok">
-      <h2>💊 Allergieën en medisch</h2>
+      <h2>Allergieën en medisch</h2>
       <div class="tekstblok" id="vAllergie"><span class="leeg">Nog niets ingevuld.</span></div>
     </div>
     <div class="kaart blok">
-      <h2>🍽️ Eten en bedtijden</h2>
+      <h2>Eten en bedtijden</h2>
       <div class="tekstblok" id="vEten"><span class="leeg">Nog niets ingevuld.</span></div>
     </div>
     <div class="kaart blok">
-      <h2>🏠 Huisregels en bijzonderheden</h2>
+      <h2>Huisregels en bijzonderheden</h2>
       <div class="tekstblok" id="vHuisregels"><span class="leeg">Nog niets ingevuld.</span></div>
     </div>
     <div class="knoprij"><button class="knop" id="naarBewerk" hidden>Info aanpassen</button></div>
@@ -73,20 +73,20 @@
   <!-- BEWERKEN (alleen ouder/beheerder) -->
   <div id="bewerk">
     <div class="kaart blok">
-      <h2>📞 Noodnummers</h2>
+      <h2>Noodnummers</h2>
       <div id="contactVelden"></div>
       <button class="knop grijs klein" id="contactPlus">+ Nummer toevoegen</button>
     </div>
     <div class="kaart blok">
-      <h2>💊 Allergieën en medisch</h2>
+      <h2>Allergieën en medisch</h2>
       <textarea class="veld" id="eAllergie" rows="3" placeholder="Bijv. Sanne is allergisch voor pinda's. Noodmedicatie ligt in de keukenla." maxlength="1500"></textarea>
     </div>
     <div class="kaart blok">
-      <h2>🍽️ Eten en bedtijden</h2>
+      <h2>Eten en bedtijden</h2>
       <textarea class="veld" id="eEten" rows="3" placeholder="Bijv. Avondeten om 18:00. Tim naar bed om 19:30 met een verhaaltje, Sanne om 20:30." maxlength="1500"></textarea>
     </div>
     <div class="kaart blok">
-      <h2>🏠 Huisregels en bijzonderheden</h2>
+      <h2>Huisregels en bijzonderheden</h2>
       <textarea class="veld" id="eHuisregels" rows="3" placeholder="Bijv. Schoenen uit in huis. Max half uur schermtijd. De hond mag niet naar buiten." maxlength="1500"></textarea>
     </div>
     <div class="ok" id="ok"></div>
@@ -117,7 +117,7 @@ function render(){
   const o = huidig;
   // contacten
   $('#contacten').innerHTML = (o.noodcontacten && o.noodcontacten.length)
-    ? o.noodcontacten.map(c=> '<a class="contact" href="'+telHref(c.telefoon)+'"><span class="ic">📞</span><span><span class="nm">'+esc(c.naam||'Contact')+'</span>'+(c.wie?'<span class="wie"> · '+esc(c.wie)+'</span>':'')+'</span><span class="tel">'+esc(c.telefoon)+'</span></a>').join('')
+    ? o.noodcontacten.map(c=> '<a class="contact" href="'+telHref(c.telefoon)+'"><span class="ic"></span><span><span class="nm">'+esc(c.naam||'Contact')+'</span>'+(c.wie?'<span class="wie"> · '+esc(c.wie)+'</span>':'')+'</span><span class="tel">'+esc(c.telefoon)+'</span></a>').join('')
     : '<div class="leeg">Nog geen nummers ingevuld.</div>';
   vul('#vAllergie', o.allergie); vul('#vEten', o.eten); vul('#vHuisregels', o.huisregels);
   $('#bijgewerkt').textContent = o.updatedAt ? ('Laatst bijgewerkt door '+esc(o.updatedBy||'het gezin')+' op '+new Date(o.updatedAt).toLocaleDateString('nl-NL')) : '';

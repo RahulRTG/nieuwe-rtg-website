@@ -34,16 +34,16 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>✍️ Schrijven</h1>
+  <h1>Schrijven</h1>
   <p class="intro">Elke dag een nieuwe schrijfopdracht op jouw niveau. Schrijf je verhaal en laat je buddy meelezen: die geeft een compliment en tips, maar schrijft nooit voor je.</p>
 
   <div class="kaart blok">
     <div class="opdracht" id="opdracht">…</div>
-    <button class="knop grijs klein" id="anders">🎲 Andere opdracht</button>
+    <button class="knop grijs klein" id="anders">Andere opdracht</button>
     <textarea class="veld" id="tekst" style="margin-top:.8rem;" placeholder="Begin maar; het hoeft niet in een keer goed."></textarea>
     <div class="teller" id="teller">0 woorden</div>
     <div class="knoprij">
-      <button class="knop" id="lees">💬 Buddy leest mee</button>
+      <button class="knop" id="lees">Buddy leest mee</button>
       <button class="knop grijs" id="bewaar">Bewaar</button>
     </div>
     <div class="fb" id="fb" hidden></div>
@@ -78,14 +78,14 @@ $('#tekst').addEventListener('input', () => {
   $('#teller').textContent = n + (n === 1 ? ' woord' : ' woorden');
 });
 $('#lees').addEventListener('click', async () => {
-  $('#fout').textContent = ''; $('#lees').disabled = true; $('#lees').textContent = '💬 Even lezen…';
+  $('#fout').textContent = ''; $('#lees').disabled = true; $('#lees').textContent = 'Even lezen…';
   try {
     const d = await api('schrijf-feedback', { tekst: $('#tekst').value, opdracht: $('#opdracht').textContent, groep, buddy });
     laatsteFeedback = d.feedback;
     $('#fb').hidden = false;
     $('#fb').innerHTML = '<small>' + (d.demo ? 'je buddy (demo)' : 'je buddy') + ' las mee</small>' + esc(d.feedback);
   } catch (e) { $('#fout').textContent = e.message; }
-  $('#lees').disabled = false; $('#lees').textContent = '💬 Buddy leest mee';
+  $('#lees').disabled = false; $('#lees').textContent = 'Buddy leest mee';
 });
 $('#bewaar').addEventListener('click', async () => {
   $('#fout').textContent = '';

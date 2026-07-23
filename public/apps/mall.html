@@ -114,14 +114,14 @@ if (!TOKEN) {
    het Reis-gedeelte en de RTF-bieb zijn ook voor de gratis gast open). */
 function tekenBiebKop(){
   $('#biebKop').innerHTML =
-    '<div class="etage"><div class="etage-kop"><h2>📖 De RTG Bibliotheek</h2>'+
+    '<div class="etage"><div class="etage-kop"><h2>De RTG Bibliotheek</h2>'+
     '<span class="n">drie afdelingen · bladeren voor iedereen · vraag de bibliothecaris</span></div>'+
     '<div class="boutiek" style="cursor:default;">'+
-      '<b>💬 De bibliothecaris</b>'+
+      '<b>De bibliothecaris</b>'+
       '<span class="tag">Vertel wat u zoekt of wilt leren; de bibliothecaris zoekt dwars door de App-, Reis- en RTF-afdeling en raadt echte titels aan.</span>'+
       '<div class="rij" style="margin-top:.5rem;">'+
         '<input class="veld" id="bibVraag" maxlength="300" placeholder="Bijv. ik wil leren fotograferen, of: we gaan naar Londen" style="flex:1;min-width:12rem;">'+
-        '<button class="knop" id="bibGo">✨ Vraag advies</button>'+
+        '<button class="knop" id="bibGo">Vraag advies</button>'+
       '</div>'+
       '<div id="bibUit" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>'+
     '</div></div>';
@@ -145,7 +145,7 @@ async function laadRtfbieb(){
   let d;
   try { d = await api('/api/mall/rtf'); } catch(e){ return; }
   $('#rtfbieb').innerHTML =
-    '<div class="etage"><div class="etage-kop"><h2>🧸 RTF-Bibliotheek</h2>'+
+    '<div class="etage"><div class="etage-kop"><h2>RTF-Bibliotheek</h2>'+
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="rfCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
@@ -163,7 +163,7 @@ function rtfKaart(a, geinstalleerd){
   return '<div class="boutiek" style="cursor:default;">'+
     '<span class="stad">'+a.icon+' '+esc(a.categorieLabel||a.categorie||'')+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</span>'+
+    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</span>'+
     '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
       '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
       '<b style="color:var(--gold);font-size:.8rem;">Gratis</b>'+
@@ -220,7 +220,7 @@ async function laadAppbieb(){
   try { d = await api('/api/mall/apps'); } catch(e){ return; }
   AB.cats = d.categorieen;
   $('#appbieb').innerHTML =
-    '<div class="etage"><div class="etage-kop"><h2>📱 App-Bibliotheek</h2>'+
+    '<div class="etage"><div class="etage-kop"><h2>App-Bibliotheek</h2>'+
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' apps · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · bladeren voor iedereen · installeren bij de pas</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="abCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
@@ -238,7 +238,7 @@ function appKaart(a, geinstalleerd){
   return '<div class="boutiek" style="cursor:default;">'+
     '<span class="stad">'+a.icon+' '+esc(a.categorieLabel)+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</span>'+
+    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</span>'+
     '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
       '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
       '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>'+
@@ -290,7 +290,7 @@ async function laadReisbieb(){
   let d;
   try { d = await api('/api/mall/reis'); } catch(e){ return; }
   $('#reisbieb').innerHTML =
-    '<div class="etage"><div class="etage-kop"><h2>🌍 Reis-Bibliotheek</h2>'+
+    '<div class="etage"><div class="etage-kop"><h2>Reis-Bibliotheek</h2>'+
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' reisgidsen · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · van Londen tot Gaza</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="rbBestemming" class="veld" style="max-width:13rem;" aria-label="Bestemming"><option value="">Alle bestemmingen</option>'+
@@ -309,9 +309,9 @@ async function laadReisbieb(){
 }
 function reisKaart(a, geinstalleerd){
   return '<div class="boutiek" style="cursor:default;">'+
-    '<span class="stad">🌍 '+esc(a.bestemming)+' · '+esc(a.soort)+'</span>'+
+    '<span class="stad">'+esc(a.bestemming)+' · '+esc(a.soort)+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</span>'+
+    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</span>'+
     '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
       '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
       '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>'+
@@ -480,19 +480,19 @@ function tekenArt(arts){
       ((a.kleuren&&a.kleuren.length)||(a.maten&&a.maten.length)?'<span class="opties">'+esc((a.kleuren||[]).join(', '))+(a.maten&&a.maten.length?' · maten '+esc(a.maten.join('/')):'')+'</span>':'')+
       (a.drop?'<span class="opties" style="color:var(--gold);">Drop op '+esc(a.drop.datum)+' om '+esc(a.drop.tijd||'')+'</span>':'')+
       '<div class="rij">'+
-        '<button class="knop stil wl'+(a.opWishlist?' aan':'')+'" data-id="'+esc(a.id)+'">'+(a.opWishlist?'♥ Op verlanglijst':'♡ Verlanglijst')+'</button>'+
+        '<button class="knop stil wl'+(a.opWishlist?' aan':'')+'" data-id="'+esc(a.id)+'">'+(a.opWishlist?'Op verlanglijst':'Verlanglijst')+'</button>'+
       '</div></div>';
   }).join('') : '<div class="leeg">Deze boutique vult haar collectie nog.</div>';
   $('#bladArt').querySelectorAll('.wl').forEach(b => b.addEventListener('click', async () => {
     try { const r = await api('/api/retail/wishlist', { supplierCode: HUIDIG, artikelId: b.dataset.id });
-      const aan = !!r.wishlist; b.classList.toggle('aan', aan); b.textContent = aan ? '♥ Op verlanglijst' : '♡ Verlanglijst';
+      const aan = !!r.wishlist; b.classList.toggle('aan', aan); b.textContent = aan ? 'Op verlanglijst' : 'Verlanglijst';
       meld(aan ? 'Op je verlanglijst gezet.' : 'Van je verlanglijst gehaald.');
     } catch(e){ meld(e.message); }
   }));
 }
 $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
 </script>
-<button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
+<button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
   <div class="rahuluit" id="rahulUit" aria-live="polite"></div>

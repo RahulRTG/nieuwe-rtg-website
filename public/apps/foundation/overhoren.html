@@ -44,7 +44,7 @@
 
   <!-- overzicht -->
   <section id="vLijsten">
-    <h1>📇 Overhoren</h1>
+    <h1>Overhoren</h1>
     <p class="intro">Maak je eigen overhoorlijsten (woordjes, topografie, tafels), oefen ze zelf, of daag iemand uit voor een overhoorduel.</p>
 
     <div class="kaart blok">
@@ -54,7 +54,7 @@
       <div style="text-align:center;margin:.5rem 0 .1rem;color:var(--zacht);font-size:.8rem;">of laat je buddy er een maken</div>
       <div style="display:flex;gap:.5rem;">
         <input class="veld" id="mOnderwerp" style="flex:1;" placeholder="Waarover? (bijv. hoofdsteden van Europa)" maxlength="80">
-        <button class="knop grijs" id="mAi">✨ Maak</button>
+        <button class="knop grijs" id="mAi">Maak</button>
       </div>
       <div class="fout" id="mFout"></div>
     </div>
@@ -85,7 +85,7 @@
 
   <!-- samen leren: uitdagen -->
   <section id="vSamen" hidden>
-    <h1>🤝 Overhoorduel</h1>
+    <h1>Overhoorduel</h1>
     <p class="intro" id="sIntro"></p>
     <div class="kaart blok">
       <div class="keuzerij" id="sVrienden"><span class="leeg">Vrienden laden…</span></div>
@@ -164,7 +164,7 @@ $('#mAi').addEventListener('click', async () => {
   $('#mAi').disabled = true; $('#mAi').textContent = '…';
   try { const d = await api('lijst-ai', { onderwerp: $('#mOnderwerp').value, groep }); $('#mOnderwerp').value=''; if (d.demo) $('#mFout').textContent = 'De buddy koos een kant-en-klaar setje (demo).'; laadLijsten(); }
   catch (e) { $('#mFout').textContent = e.message; }
-  $('#mAi').disabled = false; $('#mAi').textContent = '✨ Maak';
+  $('#mAi').disabled = false; $('#mAi').textContent = 'Maak';
 });
 
 /* ---------- solo overhoren (op het scherm; de score gaat naar de server) ---------- */
@@ -174,7 +174,7 @@ async function beginOverhoor(id){
   const d = await api('lijst-haal', { id });
   const volgorde = d.lijst.paren.map((_,i)=>i).sort(()=>Math.random()-0.5);
   O = { id, naam: d.lijst.naam, paren: d.lijst.paren, rij: volgorde, i: 0, goed: 0, fouten: [], herkansing: false };
-  $('#oTitel').textContent = '📇 ' + d.lijst.naam;
+  $('#oTitel').textContent = '' + d.lijst.naam;
   $('#oKlaar').hidden = true; $('#oCheck').disabled = false;
   toon('vOverhoor'); volgende();
 }
@@ -197,7 +197,7 @@ $('#oCheck').addEventListener('click', () => {
 });
 $('#oAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#oCheck').click(); });
 async function oEinde(){
-  $('#oScore').textContent = O.goed + ' van ' + O.rij.length + ' goed' + (O.goed === O.rij.length ? ' 🎉' : '');
+  $('#oScore').textContent = O.goed + ' van ' + O.rij.length + ' goed' + (O.goed === O.rij.length ? ' ' : '');
   $('#oFouten').hidden = !O.fouten.length;
   $('#oKlaar').hidden = false;
   if (!O.herkansing) try { await api('overhoor-klaar', { id: O.id, goed: O.goed, totaal: O.rij.length }); } catch (e) {}
@@ -248,12 +248,12 @@ async function openDuel(id){
 async function ververs(){
   let d; try { d = await api('sessie-staat', { id: D.id }); } catch (e) { return; }
   const x = d.sessie;
-  $('#dTitel').textContent = '🤝 ' + x.naam;
+  $('#dTitel').textContent = '' + x.naam;
   const balk = (naam, wie) => '<div class="balkje"><span class="naam">'+esc(naam)+'</span><div class="spoor"><div class="vul" style="width:'+Math.round(100*wie.idx/x.aantal)+'%"></div></div><span>'+wie.goed+' goed</span></div>';
   $('#dStanden').innerHTML = balk('jij', x.ik) + (x.ander ? balk(x.ander.codenaam, x.ander) : '<div class="leeg">Wacht tot de ander meedoet…</div>');
   if (x.status === 'klaar'){
     $('#dSpeel').hidden = true; $('#dKlaar').hidden = false;
-    $('#dWin').textContent = x.gelijk ? 'Gelijkspel! Sterk van allebei.' : '🏆 ' + x.winnaar + ' wint dit duel!';
+    $('#dWin').textContent = x.gelijk ? 'Gelijkspel! Sterk van allebei.' : '' + x.winnaar + ' wint dit duel!';
     clearInterval(dPoll);
     return;
   }

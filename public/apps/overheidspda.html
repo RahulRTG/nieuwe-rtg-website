@@ -163,7 +163,7 @@ async function rolScherm(){
 
 /* ---- receptie ---- */
 async function schermReceptie(){
-  $('#app').innerHTML = kopStuk('🛎️ Receptie')+
+  $('#app').innerHTML = kopStuk('Receptie')+
     '<div class="item" style="background:var(--card2);"><h4>Bezoeker aanmelden</h4>'+
     '<div class="rij"><input class="veld" id="bNaam" style="flex:1;min-width:8rem;" placeholder="Naam bezoeker" maxlength="60"><input class="veld" id="bVoor" style="flex:1;min-width:8rem;" placeholder="Voor (afspraak, zitting, loket)" maxlength="80"><button class="knop" id="bIn">Badge</button></div></div>'+
     '<div id="bLijst"></div>'+aiBlok('Bijv. wat doe ik met een bezoeker zonder afspraak?');
@@ -189,7 +189,7 @@ async function laadBezoekers(){
 
 /* ---- security ---- */
 async function schermSecurity(){
-  $('#app').innerHTML = kopStuk('🛡️ Security')+
+  $('#app').innerHTML = kopStuk('Security')+
     '<div class="item" style="background:var(--card2);"><h4>Ronde lopen</h4><div class="meta">Een ronde gaat langs alle ruimtes van dit gebouw. Iets gezien? Meld het als incident.</div>'+
     '<div class="rij"><button class="knop" id="ronde">Ronde gelopen ✓</button><span class="status" id="rondeInfo"></span></div></div>'+
     '<div class="item" style="background:var(--card2);"><h4>Incident melden</h4>'+
@@ -227,7 +227,7 @@ async function laadIncidenten(){
 
 /* ---- schoonmaak ---- */
 async function schermSchoonmaak(){
-  $('#app').innerHTML = kopStuk('🧹 Schoonmaak')+
+  $('#app').innerHTML = kopStuk('Schoonmaak')+
     '<div class="item" style="background:var(--card2);"><h4>Extra werk doorgeven</h4>'+
     '<div class="rij"><select class="veld" id="tRuimte"></select><input class="veld" id="tTekst" style="flex:1;min-width:9rem;" placeholder="Wat moet er gebeuren?" maxlength="200"><button class="knop stil" id="tExtra">Zet erbij</button></div></div>'+
     '<div id="tLijst"></div>'+aiBlok('Bijv. waar begin ik vandaag?');
@@ -254,7 +254,7 @@ async function laadTaken(){
 
 /* ---- bode (rechtbank) ---- */
 async function schermBode(){
-  $('#app').innerHTML = kopStuk('🔔 Bode')+
+  $('#app').innerHTML = kopStuk('Bode')+
     '<div class="item" style="background:var(--card2);"><h4>De zittingsrol</h4><div class="meta">Rechtstreeks uit het rechtbanksysteem: zet de zalen op volgorde van de rol klaar en meld ze gereed. Na elke zitting staat de zaal automatisch op de schoonmaaklijst.</div></div>'+
     '<div id="zLijst"></div>'+aiBlok('Bijv. wat hoort er allemaal bij een zaal klaarzetten?');
   koppelBasis();

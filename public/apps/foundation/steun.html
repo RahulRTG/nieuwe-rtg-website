@@ -35,18 +35,18 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>💚 Steun voor jou</h1>
+  <h1>Steun voor jou</h1>
   <div class="intro">Jij zorgt voor iedereen, maar jij telt ook. Neem hier even een moment voor jezelf: kijk hoe het met je gaat, praat je hart even leeg, en weet waar je terecht kunt.</div>
 
   <div class="kaart blok">
     <h2>Hoe gaat het echt met jou?</h2>
     <div class="h">Tik aan wat past. Dit blijft privé op je eigen toestel; niemand anders ziet het.</div>
     <div class="moods" id="moods">
-      <button data-m="4"><div>😄</div><span class="lb">goed</span></button>
-      <button data-m="3"><div>🙂</div><span class="lb">oké</span></button>
-      <button data-m="2"><div>😐</div><span class="lb">gaat wel</span></button>
-      <button data-m="1"><div>😔</div><span class="lb">zwaar</span></button>
-      <button data-m="0"><div>😢</div><span class="lb">moeilijk</span></button>
+      <button data-m="4"><div></div><span class="lb">goed</span></button>
+      <button data-m="3"><div></div><span class="lb">oké</span></button>
+      <button data-m="2"><div></div><span class="lb">gaat wel</span></button>
+      <button data-m="1"><div></div><span class="lb">zwaar</span></button>
+      <button data-m="0"><div></div><span class="lb">moeilijk</span></button>
     </div>
     <div class="reactie" id="reactie" hidden></div>
     <div class="verloop" id="verloop"></div>
@@ -61,7 +61,7 @@
       <textarea class="veld" id="vraag" rows="1" placeholder="Typ wat er in je omgaat..." maxlength="1000"></textarea>
       <button class="knop" id="stuur">Deel</button>
     </div>
-    <div class="knoprij" style="margin-top:.8rem;"><a class="knop grijs klein" href="rust.html">🌿 Even ademen</a></div>
+    <div class="knoprij" style="margin-top:.8rem;"><a class="knop grijs klein" href="rust.html">Even ademen</a></div>
   </div>
 
   <div class="kaart blok">
@@ -81,7 +81,7 @@ if (!window.Sessie || !Sessie.eisFamilie()) {}
 Sessie.balk($('#balk'), { terug:'index.html' });
 
 const MKEY = 'rtf_stemming_' + (Sessie.huidig().profiel.id || 'ik');
-const EMO = ['😢','😔','😐','🙂','😄'];
+const EMO = ['','','','',''];
 const REACTIES = {
   4:'Wat fijn dat het goed gaat. Geniet ervan, en gun jezelf dit moment.',
   3:'Mooi, oké is echt goed genoeg. Doe vandaag iets kleins dat jij fijn vindt.',

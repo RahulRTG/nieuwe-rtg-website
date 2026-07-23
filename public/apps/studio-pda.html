@@ -40,7 +40,7 @@
 <body>
 <header>
   <div class="ey">RTG Ontwerpstudio</div>
-  <h1>🏎️ Studio PDA</h1>
+  <h1>Studio PDA</h1>
 </header>
 <main id="main">
   <div class="kaart" id="briefKaart">
@@ -50,7 +50,7 @@
     </div>
     <input class="veld" id="pNaam" placeholder="Naam van het concept" maxlength="100" style="margin-bottom:.5rem;">
     <input class="veld" id="pBrief" placeholder="Brief: sfeer, gebruik, aandrijving" maxlength="600" style="margin-bottom:.5rem;">
-    <button class="knop" id="pMaak" style="width:100%;">✨ Concept + AI</button>
+    <button class="knop" id="pMaak" style="width:100%;">Concept + AI</button>
   </div>
   <div class="chips" id="pFilters"></div>
   <div id="pLijst"><div class="leeg">Laden...</div></div>
@@ -93,7 +93,7 @@ function render(){
         : '<div class="leeg">Nog geen concept.</div>')+
       (o.kritiek ? '<div style="margin-top:.45rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.8rem;line-height:1.5;">'+esc(o.kritiek)+'</div>' : '')+
       '<div class="rij" style="margin-top:.6rem;">'+
-        '<button class="knop stil" data-concept="'+o.id+'">'+(c?'Herteken':'✨ Teken')+'</button>'+
+        '<button class="knop stil" data-concept="'+o.id+'">'+(c?'Herteken':'Teken')+'</button>'+
         '<button class="knop stil" data-kritiek="'+o.id+'">Kritiek</button>'+
         (nx?'<button class="knop" data-next="'+o.id+'" data-s="'+nx+'" style="margin-left:auto;">→ '+nx+'</button>':'')+
       '</div></div>';

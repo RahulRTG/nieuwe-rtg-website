@@ -50,7 +50,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>💼 Werk en vacatures</h1>
+  <h1>Werk en vacatures</h1>
 
   <div id="teJong" class="jong" hidden></div>
 
@@ -59,8 +59,8 @@
       <label for="lft">Jouw leeftijd</label>
       <input class="veld" id="lft" type="number" inputmode="numeric" min="16" max="99" value="16">
       <label for="land">Land</label>
-      <select class="veld" id="land" style="max-width:11rem;"><option value="">🌍 Overal</option></select>
-      <button class="knop grijs klein" id="gpsBtn" type="button" style="padding:.4rem .7rem;">📍 Toon afstand</button>
+      <select class="veld" id="land" style="max-width:11rem;"><option value="">Overal</option></select>
+      <button class="knop grijs klein" id="gpsBtn" type="button" style="padding:.4rem .7rem;">Toon afstand</button>
       <span id="cvStatus" class="cvstatus"></span>
     </div>
     <div id="mijnBlok" hidden>
@@ -91,8 +91,8 @@ function rtfApi(pad, body){
 
 const GROEP_VANAF = { mini:0, kind:5, tiener:12, jong:16, volw:22 };
 const SOORT = { bijbaan:'Bijbaan', vakantiewerk:'Vakantiewerk', parttime:'Parttime', fulltime:'Fulltime', stage:'Stage', vrijwilliger:'Vrijwilliger' };
-const VLAG = { NL:'🇳🇱', BE:'🇧🇪', DE:'🇩🇪', FR:'🇫🇷', ES:'🇪🇸', JP:'🇯🇵' };
-function vlag(code){ return VLAG[code] || '🏳️'; }
+const VLAG = { NL:'', BE:'', DE:'', FR:'', ES:'', JP:'' };
+function vlag(code){ return VLAG[code] || ''; }
 const VERZ_KEY = 'rtf_sollicitaties'; // welke vacatures dit toestel al verstuurde
 
 function verzonden(){ try { return JSON.parse(localStorage.getItem(VERZ_KEY)||'[]'); } catch(e){ return []; } }
@@ -124,15 +124,15 @@ function cvKlaar(cv){ return !!(cv && cv.name && cv.contact && (cv.experience.le
 function toonCvStatus(){
   const cv = bouwCv();
   const el = $('#cvStatus');
-  if (cvKlaar(cv)){ el.className = 'cvstatus ok'; el.innerHTML = '✅ Je cv is klaar (' + esc(cv.name) + '). <a href="cv.html" style="color:inherit;text-decoration:underline;">Aanpassen</a>'; }
-  else { el.className = 'cvstatus mis'; el.innerHTML = '📄 Maak eerst je cv af om te kunnen solliciteren. <a href="cv.html" style="color:inherit;text-decoration:underline;font-weight:700;">Naar de cv-maker →</a>'; }
+  if (cvKlaar(cv)){ el.className = 'cvstatus ok'; el.innerHTML = 'Je cv is klaar (' + esc(cv.name) + '). <a href="cv.html" style="color:inherit;text-decoration:underline;">Aanpassen</a>'; }
+  else { el.className = 'cvstatus mis'; el.innerHTML = 'Maak eerst je cv af om te kunnen solliciteren. <a href="cv.html" style="color:inherit;text-decoration:underline;font-weight:700;">Naar de cv-maker →</a>'; }
 }
 
 let vacatures = [];
 let mijnPlek = Geo.laatste(); // {lat,lng} of null
 function vulLanden(landen){
   const sel = $('#land'); const huidig = sel.value;
-  sel.innerHTML = '<option value="">🌍 Overal</option>' +
+  sel.innerHTML = '<option value="">Overal</option>' +
     (landen||[]).map(l => '<option value="'+esc(l.code)+'">'+vlag(l.code)+' '+esc(l.naam)+'</option>').join('');
   if ([...sel.options].some(o=>o.value===huidig)) sel.value = huidig;
 }
@@ -147,7 +147,7 @@ async function laad(){
   } catch(e){ $('#lijst').innerHTML = '<div class="leeg">Kon de vacatures even niet laden. Probeer het zo nog eens.</div>'; }
 }
 
-const STATUS = { nieuw:['In behandeling','nieuw'], uitgenodigd:['Uitgenodigd 💬','aangenomen'], aangenomen:['Aangenomen 🎉','aangenomen'], afgewezen:['Helaas afgewezen','afgewezen'], onbekend:['Afgerond','onbekend'] };
+const STATUS = { nieuw:['In behandeling','nieuw'], uitgenodigd:['Uitgenodigd ','aangenomen'], aangenomen:['Aangenomen ','aangenomen'], afgewezen:['Helaas afgewezen','afgewezen'], onbekend:['Afgerond','onbekend'] };
 async function laadMijn(){
   try {
     const d = await api('/gezin/sollicitaties', { code: s.code, token: s.token });
@@ -158,7 +158,7 @@ async function laadMijn(){
       const st = STATUS[x.status] || STATUS.onbekend;
       const waar = [x.bedrijf, x.landNaam].filter(Boolean).join(' · ');
       return '<div class="msoll"><div class="mt"><b>'+esc(x.func)+'</b><span>'+esc(waar)+'</span></div>'+
-        (x.chatId ? '<button class="knop grijs klein" style="padding:.35rem .7rem;" data-chat="'+esc(x.chatId)+'" data-bedrijf="'+esc(x.bedrijf)+'">💬 Chat</button>' : '')+
+        (x.chatId ? '<button class="knop grijs klein" style="padding:.35rem .7rem;" data-chat="'+esc(x.chatId)+'" data-bedrijf="'+esc(x.bedrijf)+'">Chat</button>' : '')+
         '<span class="pil '+st[1]+'">'+esc(st[0])+'</span></div>';
     }).join('');
     $('#mijn').querySelectorAll('[data-chat]').forEach(b=> b.addEventListener('click', ()=> openChat(b.dataset.chat, b.dataset.bedrijf)));
@@ -218,14 +218,14 @@ function teken(){
   if (mijnPlek) rij.sort((a,b) => (a.km==null?1e9:a.km) - (b.km==null?1e9:b.km));
   $('#lijst').innerHTML = rij.map(({v, km})=>{
     const al = verz.includes(v.id);
-    const afst = km!=null ? '📍 '+Geo.tekst(km)+' van jou' : '';
+    const afst = km!=null ? ''+Geo.tekst(km)+' van jou' : '';
     const landChip = v.landNaam ? vlag(v.land)+' '+v.landNaam : '';
     const meta = [ SOORT[v.soort]||v.soort, 'vanaf '+v.minLeeftijd+' jaar', landChip, v.plaats||v.stad, v.uren, afst ].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('');
     return '<div class="kaart vac">'+
-      '<div class="kop"><span class="ic">'+esc(v.icon||'🏢')+'</span><div><h2>'+esc(v.func)+'</h2><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div><div class="meta">'+meta+'</div></div></div>'+
+      '<div class="kop"><span class="ic">'+esc(v.icon||'')+'</span><div><h2>'+esc(v.func)+'</h2><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div><div class="meta">'+meta+'</div></div></div>'+
       (v.omschrijving?'<div class="oms">'+esc(v.omschrijving)+'</div>':'<div class="oms" style="opacity:.7;">Solliciteer met je cv; het bedrijf neemt daarna contact met je op.</div>')+
       '<div class="acties">'+
-      (al ? '<span class="verstuurd">✅ Sollicitatie verstuurd</span>'
+      (al ? '<span class="verstuurd">Sollicitatie verstuurd</span>'
           : '<button class="knop" data-sol="'+esc(v.id)+'" data-code="'+esc(v.supplierCode)+'">Solliciteer met mijn cv</button>')+
       '</div></div>';
   }).join('');
@@ -276,11 +276,11 @@ Sessie.ophalen().then(d=>{
     const btn = $('#gpsBtn'); const oud = btn.textContent; btn.textContent = 'Locatie zoeken...'; btn.disabled = true;
     const p = await Geo.positie();
     btn.disabled = false;
-    if (p){ mijnPlek = p; btn.textContent = '📍 Dichtstbij eerst'; teken(); }
+    if (p){ mijnPlek = p; btn.textContent = 'Dichtstbij eerst'; teken(); }
     else { btn.textContent = oud; alert('We konden je locatie niet ophalen. Zet locatie aan in je browser om de afstand te zien.'); }
   }
   $('#gpsBtn').addEventListener('click', vraagGps);
-  if (Geo.heeft()){ Geo.positie().then(p=>{ if(p){ mijnPlek = p; $('#gpsBtn').textContent = '📍 Dichtstbij eerst'; teken(); } }); }
+  if (Geo.heeft()){ Geo.positie().then(p=>{ if(p){ mijnPlek = p; $('#gpsBtn').textContent = 'Dichtstbij eerst'; teken(); } }); }
   laad();
   laadMijn();
 });

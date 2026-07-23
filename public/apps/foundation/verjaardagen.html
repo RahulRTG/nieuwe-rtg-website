@@ -55,7 +55,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🎂 Verjaardagen &amp; wensen</h1>
+  <h1>Verjaardagen &amp; wensen</h1>
   <div class="intro">Nooit meer een verjaardag vergeten. Houd wensenlijstjes bij, reserveer stiekem een cadeau zodat je niet dubbel koopt (de jarige ziet dat niet), en leg samen in het cadeaupotje.</div>
 
   <div id="mensen"><div class="leeg">Laden…</div></div>
@@ -86,7 +86,7 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 const MAAND = ['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 function wanneer(p){
-  if (p.vandaag) return '🎉 vandaag jarig!';
+  if (p.vandaag) return 'vandaag jarig!';
   if (p.dagenTot === 1) return 'morgen';
   if (p.dagenTot <= 31) return 'over '+p.dagenTot+' dagen';
   return p.dag+' '+MAAND[p.maand];
@@ -112,7 +112,7 @@ function kaartHtml(p){
   let h = '<div class="kaart persoon'+(p.vandaag?' vandaag':'')+'" data-id="'+p.id+'">';
   h += '<div class="pkop"><span class="nm">'+esc(p.naam)+leeftijd+'</span>'
      + '<span class="dt">'+wanneer(p)+(p.kanWeg?' <button class="ikoon" data-pdel title="Uit het boek">×</button>':'')+'</span></div>';
-  if (p.dagenTot<=60 && !p.vandaag) h += '<span class="telt">🎁 '+p.dagenTot+' dagen te gaan</span>';
+  if (p.dagenTot<=60 && !p.vandaag) h += '<span class="telt">'+p.dagenTot+' dagen te gaan</span>';
   // wensen
   h += '<div class="sect"><h3>Wensenlijst'+(p.benIkDeJarige?' (van jou)':'')+'</h3>';
   if (!p.wensen.length) h += '<div class="leeg" style="font-size:.83rem;">Nog geen wensen.</div>';

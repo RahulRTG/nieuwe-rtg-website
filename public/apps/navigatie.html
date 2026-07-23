@@ -405,7 +405,7 @@
     // langs de route: laadpalen + flits
     const lg = $('#langs'); lg.innerHTML = '';
     const nl = (route.langs.laad || []).length, nf = (route.langs.flits || []).length;
-    if (nl) { const c = document.createElement('span'); c.className = 'chip laad'; c.textContent = '⚡ ' + nl + ' laadpaal' + (nl > 1 ? 'punten' : '') + ' langs de route'; lg.appendChild(c); }
+    if (nl) { const c = document.createElement('span'); c.className = 'chip laad'; c.textContent = '' + nl + ' laadpaal' + (nl > 1 ? 'punten' : '') + ' langs de route'; lg.appendChild(c); }
     if (nf) { const c = document.createElement('span'); c.className = 'chip flits'; c.textContent = '\u{1F6A8} ' + nf + ' melding' + (nf > 1 ? 'en' : '') + ' op de route'; lg.appendChild(c); }
     $('#bron').textContent = route.bron + '. Alles op codenaam, niets naar een kaartdienst.';
     $('#paneel').classList.add('zien');

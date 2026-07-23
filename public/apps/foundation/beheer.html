@@ -73,7 +73,7 @@
     <textarea class="veld" id="bTekst" rows="3" placeholder="Schrijf je bericht..." maxlength="800"></textarea>
     <div class="rijknop">
       <button class="knop" id="bStuur">Bericht sturen</button>
-      <button class="knop grijs" id="bReis">✈️ Oproep: we gaan op reis</button>
+      <button class="knop grijs" id="bReis">Oproep: we gaan op reis</button>
     </div>
     <div class="ok" id="bOk"></div>
     <div class="fout" id="bFout"></div>
@@ -134,9 +134,9 @@
 <script>
 const $ = s => document.querySelector(s);
 const api = Sessie.api;
-const AVATARS = ['🙂','😀','🦊','🐼','🐵','🦁','🐯','🐧','🦉','🐢','🌟','⚽','🎨','🎧','📚','🚀','🌈','🐬','🦄','👑'];
+const AVATARS = ['','','','','','','','','','','','','','','','','','','',''];
 const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
-let dAv='🙂', dKl=KLEUREN[0], bewerkId=null, naarWie='allen';
+let dAv='', dKl=KLEUREN[0], bewerkId=null, naarWie='allen';
 
 const s = Sessie.huidig();
 if (!s || !s.token){ location.href='index.html'; }
@@ -163,7 +163,7 @@ async function laad(){
   d.profielen.forEach(p=>{
     const row=document.createElement('div'); row.className='prow';
     row.innerHTML='<span class="av" style="background:'+p.kleur+'">'+p.avatar+'</span>'+
-      '<div><div class="nm">'+esc(p.naam)+(p.heeftPin?' 🔒':'')+'</div><div class="rl">'+rolTekst(p)+(p.groepNaam?' · '+esc(p.groepNaam):'')+'</div></div>'+
+      '<div><div class="nm">'+esc(p.naam)+(p.heeftPin?' ':'')+'</div><div class="rl">'+rolTekst(p)+(p.groepNaam?' · '+esc(p.groepNaam):'')+'</div></div>'+
       '<div class="sp"><button class="knop grijs klein" data-bew="'+p.id+'">Bewerken</button>'+
       (p.beheerder && d.profielen.filter(x=>x.beheerder).length<=1 ? '' : '<button class="knop rood klein" data-del="'+p.id+'">×</button>')+'</div>';
     pl.appendChild(row);
@@ -182,7 +182,7 @@ async function laad(){
   $('#koppelUitleg').innerHTML = !gasten.length
     ? 'Er is nog geen oppas- of familieprofiel. Voeg er hierboven een toe.'
     : (gekoppeld.length
-      ? '📲 Gekoppeld aan de RTG-app: ' + gekoppeld.map(p=>esc(p.naam)).join(', ') + '.'
+      ? 'Gekoppeld aan de RTG-app: ' + gekoppeld.map(p=>esc(p.naam)).join(', ') + '.'
       : 'Nog geen van de oppas/familie-profielen is gekoppeld. Zij doen dat zelf in hun RTG-app.');
   // openstaand verzoek om te verwijderen
   const adults = d.profielen.filter(p=> p.beheerder || p.rol==='ouder').length;
@@ -214,7 +214,7 @@ function bewerk(p){
 }
 $('#bNieuw').onclick=()=>{
   bewerkId=null; $('#dTitel').textContent='Profiel toevoegen';
-  $('#dNaam').value=''; dAv='🙂'; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dGroep').value=''; $('#groephint').hidden=true; $('#dPin').value=''; $('#dPin').placeholder='Pincode (leeg = geen)'; $('#rolhint').hidden=true;
+  $('#dNaam').value=''; dAv=''; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dGroep').value=''; $('#groephint').hidden=true; $('#dPin').value=''; $('#dPin').placeholder='Pincode (leeg = geen)'; $('#rolhint').hidden=true;
   [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
   [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
   $('#dFout').textContent=''; $('#dlg').showModal();

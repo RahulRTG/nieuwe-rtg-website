@@ -106,7 +106,7 @@
     const werk = passendWerk();
     if (modus !== 'spiegel' && !werk.some(([k]) => k === modus)) modus = werk[0] ? werk[0][0] : 'kassa';
     kies.innerHTML = werk.map(([k, w]) => '<button data-werk="'+k+'"'+(modus===k&&!spiegel?' class="aan"':'')+'>'+esc(w.naam)+'</button>').join('') +
-      '<button data-spiegel="1" class="spiegel'+(spiegel?' aan':'')+'">🔗 Spiegel hoofdscherm</button>';
+      '<button data-spiegel="1" class="spiegel'+(spiegel?' aan':'')+'">Spiegel hoofdscherm</button>';
     kies.querySelectorAll('[data-werk]').forEach(b => b.addEventListener('click', () => { spiegel = false; modus = b.dataset.werk; bouwKies(); teken(); }));
     kies.querySelector('[data-spiegel]').addEventListener('click', () => { spiegel = !spiegel; if (spiegel) zeg('Spiegel aan: dit scherm volgt de werkplek van de hoofd-app.'); bouwKies(); teken(); });
   }
@@ -120,7 +120,7 @@
     return '<div class="kaart '+kl+'"><div class="bon"><b>'+esc(o.pickup || o.ref || '')+'</b><span class="tijd">'+m+"'</span></div>"+
       '<ul>'+items.map(it => '<li><span class="q">'+it.qty+'×</span><span>'+esc(it.name)+'</span></li>').join('')+'</ul>'+
       (o.table ? '<div class="meta">Tafel '+esc(o.table)+'</div>' : '')+
-      (o.allergyNote ? '<div class="meta" style="color:var(--oranje);">⚠ '+esc(o.allergyNote)+'</div>' : '')+'</div>';
+      (o.allergyNote ? '<div class="meta" style="color:var(--oranje);">'+esc(o.allergyNote)+'</div>' : '')+'</div>';
   }
   function menuStation(id){ const m = (state.menu||[]).find(x => x.id === id); return m && m.station === 'bar' ? 'bar' : 'keuken'; }
   function lopende(){ return (state.orders||[]).filter(o => o.paid && !['klaar','geserveerd','geweigerd','terugbetaald','bezorgd','opgehaald'].includes(o.status)); }

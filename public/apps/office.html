@@ -97,9 +97,9 @@
   <!-- de mappenlijst -->
   <section id="lijst">
     <div class="rijk">
-      <button class="knop vol" id="nieuwTekst" type="button">📄 Document</button>
-      <button class="knop vol" id="nieuwBlad" type="button">📊 Rekenblad</button>
-      <button class="knop vol" id="nieuwPres" type="button">🖥️ Presentatie</button>
+      <button class="knop vol" id="nieuwTekst" type="button">Document</button>
+      <button class="knop vol" id="nieuwBlad" type="button">Rekenblad</button>
+      <button class="knop vol" id="nieuwPres" type="button">Presentatie</button>
       <select id="sjabloonKeuze" aria-label="Sjabloon kiezen"><option value="">Sjabloon…</option></select>
     </div>
     <h2 id="kopMijn">Mijn documenten</h2>
@@ -121,10 +121,10 @@
       </span>
       <span class="rek"></span>
       <button class="knop" id="presBtn" type="button" style="display:none;">▶ Presenteer</button>
-      <button class="knop" id="aiBtn" type="button">✨ AI-hulp</button>
-      <button class="knop" id="versiesBtn" type="button">🕘 Versies</button>
-      <button class="knop" id="deelBtn" type="button">🔗 Delen</button>
-      <button class="knop" id="exportBtn" type="button">⬇ Export</button>
+      <button class="knop" id="aiBtn" type="button">AI-hulp</button>
+      <button class="knop" id="versiesBtn" type="button">Versies</button>
+      <button class="knop" id="deelBtn" type="button">Delen</button>
+      <button class="knop" id="exportBtn" type="button">Export</button>
     </div>
     <div class="vlak">
       <div id="tekst" contenteditable="true" data-leeg="Begin te typen…" role="textbox" aria-multiline="true" aria-label="Documenttekst"></div>
@@ -236,7 +236,7 @@
   async function laadLijst(){
     const r = await api('mijn');
     if (r.status !== 200) { zeg(r.body.error || opzet.leeg); return; }
-    const ic = s => s === 'blad' ? '📊' : s === 'presentatie' ? '🖥️' : '📄';
+    const ic = s => s === 'blad' ? '' : s === 'presentatie' ? '' : '';
     const teken = (rij, eigen) => rij.length ? rij.map(d =>
       '<div class="doc"><span class="ic">'+ic(d.soort)+'</span>'+
       '<button class="rek" data-open="'+d.id+'" style="background:none;border:none;color:var(--txt);text-align:left;">'+

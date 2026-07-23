@@ -73,7 +73,7 @@
         <div class="tel"><b id="tRoer">0</b><span>roer-rondes</span></div>
       </div>
       <div class="rij" style="margin-top:1rem;">
-        <button class="knop" id="kRoer" disabled>☸️ Geef het roer</button>
+        <button class="knop" id="kRoer" disabled>Geef het roer</button>
         <button class="knop stil2" id="kTerug" hidden>Roer terug naar het kantoor</button>
         <button class="knop stil2" id="kTrain">Trainingsronde nu</button>
       </div>
@@ -133,7 +133,7 @@ async function ververs(){
   try { S = await api('rtgai'); } catch(e){ return; }
   const f = $('#fase');
   f.className = 'fase ' + (S.fase === 'aan-het-roer' ? 'roer' : S.fase === 'klaar-voor-roer' ? 'klaar' : 'meelezen');
-  f.textContent = S.fase === 'aan-het-roer' ? '☸️ Aan het roer' : S.fase === 'klaar-voor-roer' ? '✋ Klaar voor het roer' : '👁 Leest mee';
+  f.textContent = S.fase === 'aan-het-roer' ? 'Aan het roer' : S.fase === 'klaar-voor-roer' ? 'Klaar voor het roer' : 'Leest mee';
   $('#sinds').textContent = S.roerSinds ? 'aan het roer sinds ' + new Date(S.roerSinds).toLocaleTimeString('nl-NL') : 'traint sinds ' + new Date(S.gestart).toLocaleDateString('nl-NL');
   $('#pct').textContent = S.gereedheid.procent + '%';
   $('#meter').style.width = S.gereedheid.procent + '%';
@@ -155,7 +155,7 @@ async function verversO(){
   const klaar = O.fase === 'onderzoeksklaar';
   const f = $('#oFase');
   f.className = 'fase ' + (klaar ? 'klaar' : 'meelezen');
-  f.textContent = klaar ? '🔍 Onderzoeksklaar' : '🛠 In ontwikkeling';
+  f.textContent = klaar ? 'Onderzoeksklaar' : 'In ontwikkeling';
   $('#oBouw').disabled = klaar;
   $('#oBouwUit').textContent = klaar ? 'af: alle ' + O.bouwplan + ' bouwstappen gedaan' : 'bouwstap ' + O.bouwstappen + ' van ' + O.bouwplan;
   $('#oGo').disabled = !klaar;

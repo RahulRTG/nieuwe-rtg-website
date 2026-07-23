@@ -77,7 +77,7 @@ async function laad(){
     +'<div class="kpi"><b>'+(ps.gepubliceerd||0)+'</b><span>Gepubliceerd</span></div>'
     +'<div class="kpi"><b>'+D.edities.length+'</b><span>Edities</span></div>'
     +'<div class="kpi"><b>'+D.edities.filter(e=>e.status==='gedrukt').length+'</b><span>Gedrukt</span></div></div>';
-  h+='<div class="tabs">'+[['schrijf','✍️ Schrijftafel'],['druk','🖨️ Drukkerij'],['tips','💡 Nieuwstips']].map(([t,n])=>'<button class="tab'+(TAB===t?' aan':'')+'" data-t="'+t+'">'+n+'</button>').join('')+'</div>';
+  h+='<div class="tabs">'+[['schrijf','Schrijftafel'],['druk','Drukkerij'],['tips','Nieuwstips']].map(([t,n])=>'<button class="tab'+(TAB===t?' aan':'')+'" data-t="'+t+'">'+n+'</button>').join('')+'</div>';
   h+='<section class="paneel'+(TAB==='schrijf'?' aan':'')+'" id="p-schrijf"></section><section class="paneel'+(TAB==='druk'?' aan':'')+'" id="p-druk"></section><section class="paneel'+(TAB==='tips'?' aan':'')+'" id="p-tips"></section>';
   $('#main').innerHTML=h;
   document.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{ TAB=b.dataset.t; laad(); });
@@ -88,12 +88,12 @@ async function laad(){
 function schrijftafel(){
   const rub=D.rubrieken.map(r=>'<option>'+r+'</option>').join('');
   let h='<div class="item"><h3>Nieuw stuk</h3><div class="rij"><input class="veld" id="nOnd" style="flex:1;min-width:12rem;" placeholder="Onderwerp of kop"><select class="veld" id="nRub">'+rub+'</select></div>'
-    +'<div class="rij"><button class="knop" id="nAi">🤖 Laat de AI-hoofdredacteur een concept schrijven</button><button class="knop stil" id="nLeeg">Leeg stuk</button></div><div class="uit" id="nUit" hidden></div></div>';
+    +'<div class="rij"><button class="knop" id="nAi">Laat de AI-hoofdredacteur een concept schrijven</button><button class="knop stil" id="nLeeg">Leeg stuk</button></div><div class="uit" id="nUit" hidden></div></div>';
   h+= D.artikelen.length ? D.artikelen.map(a=>{
     const acties='<div class="rij">'
       +(a.status==='concept'?'<button class="knop stil" data-st="eindredactie" data-id="'+a.id+'">→ eindredactie</button>':'')
       +(a.status==='eindredactie'?'<button class="knop" data-st="gepubliceerd" data-id="'+a.id+'">Publiceren (uw besluit)</button><button class="knop stil" data-st="concept" data-id="'+a.id+'">← terug</button>':'')
-      +(a.status!=='gepubliceerd'?'<button class="knop stil" data-red="'+a.id+'">🧐 eindredacteur</button><button class="knop rood" data-weg="'+a.id+'">×</button>':'')
+      +(a.status!=='gepubliceerd'?'<button class="knop stil" data-red="'+a.id+'">eindredacteur</button><button class="knop rood" data-weg="'+a.id+'">×</button>':'')
       +'</div>';
     return '<div class="item"><h4>'+esc(a.kop)+' <span class="status '+esc(a.status)+'">'+esc(a.status)+'</span></h4><div class="meta">['+esc(a.rubriek)+'] door '+esc(a.auteur)+(a.intro?' · '+esc(a.intro):'')+'</div>'+acties+'<div class="uit" id="red-'+a.id+'" hidden></div></div>';
   }).join('') : '<div class="leeg">Nog geen artikelen.</div>';
@@ -120,8 +120,8 @@ function drukkerij(){
     const acties='<div class="rij">'
       +(e.status==='samenstellen'?'<button class="knop stil" data-est="ter-perse" data-id="'+e.id+'">→ ter perse</button>':'')
       +(e.status==='ter-perse'?'<button class="knop" data-est="gedrukt" data-id="'+e.id+'">Gedrukt ✓</button>':'')
-      +'<button class="knop stil" data-proef="'+e.id+'">📄 drukproef</button></div>';
-    return '<div class="item"><h4>'+(e.soort==='magazine'?'📖':'🗞️')+' '+esc(e.titel)+' <span class="status '+esc(e.status)+'">'+esc(e.status)+'</span></h4><div class="meta">'+esc(e.soort)+' · '+e.datum+' · '+e.artikelIds.length+' stukken · oplage '+e.oplage+'</div>'+acties+'<div class="uit" id="proef-'+e.id+'" hidden></div></div>';
+      +'<button class="knop stil" data-proef="'+e.id+'">drukproef</button></div>';
+    return '<div class="item"><h4>'+(e.soort==='magazine'?'':'')+' '+esc(e.titel)+' <span class="status '+esc(e.status)+'">'+esc(e.status)+'</span></h4><div class="meta">'+esc(e.soort)+' · '+e.datum+' · '+e.artikelIds.length+' stukken · oplage '+e.oplage+'</div>'+acties+'<div class="uit" id="proef-'+e.id+'" hidden></div></div>';
   }).join('') : '<div class="leeg">Nog geen edities.</div>';
   $('#p-druk').innerHTML=h;
   $('#eMaak').onclick=async()=>{ const titel=$('#eT').value.trim(); if(!titel) return meld('Titel?');

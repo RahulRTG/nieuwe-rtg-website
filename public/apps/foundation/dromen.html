@@ -42,7 +42,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>⭐ Onze dromen</h1>
+  <h1>Onze dromen</h1>
 
   <div class="kaart maak">
     <div class="rijveld">
@@ -54,7 +54,7 @@
 
   <div id="open"></div>
   <div id="behaaldSec" hidden>
-    <h2 class="sec">🏆 Gevierd en gehaald</h2>
+    <h2 class="sec">Gevierd en gehaald</h2>
     <div id="behaald"></div>
   </div>
 
@@ -77,12 +77,12 @@ function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;',
 
 function kaartHtml(d){
   return '<div class="kaart droom'+(d.behaald?' behaald':'')+'" style="border-left-color:'+(d.behaald?'':(d.kleur||'#C9A24B'))+'">'+
-    '<div class="wie"><span class="av" style="background:'+(d.kleur||'#C9A24B')+'">'+(d.vanAvatar||'🙂')+'</span>'+esc(d.vanNaam)+(d.vanMij?' (jij)':'')+'</div>'+
+    '<div class="wie"><span class="av" style="background:'+(d.kleur||'#C9A24B')+'">'+(d.vanAvatar||'')+'</span>'+esc(d.vanNaam)+(d.vanMij?' (jij)':'')+'</div>'+
     '<div class="tk">'+esc(d.tekst)+'</div>'+
     '<div class="acties">'+
-      '<button class="moedig'+(d.aangemoedigd?' aan':'')+'" data-moedig="'+d.id+'">👏 <span>'+d.aantal+'</span></button>'+
+      '<button class="moedig'+(d.aangemoedigd?' aan':'')+'" data-moedig="'+d.id+'"><span>'+d.aantal+'</span></button>'+
       ((d.vanMij||Sessie.isBeheerder()) && !d.behaald ? '<button class="mini" data-behaald="'+d.id+'">✓ Gehaald!</button>' : '')+
-      (d.behaald && (d.vanMij||Sessie.isBeheerder()) ? '<span class="vlag">Gehaald 🎉</span> <button class="mini" data-terug="'+d.id+'">Terugzetten</button>' : '')+
+      (d.behaald && (d.vanMij||Sessie.isBeheerder()) ? '<span class="vlag">Gehaald </span> <button class="mini" data-terug="'+d.id+'">Terugzetten</button>' : '')+
       ((d.vanMij||Sessie.isBeheerder()) ? '<button class="mini" data-del="'+d.id+'">Weg</button>' : '')+
     '</div></div>';
 }

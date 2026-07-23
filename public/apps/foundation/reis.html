@@ -95,7 +95,7 @@ $('#verstuur').addEventListener('click', async ()=>{
   try{
     const r=await fetch('/api/foundation/reis/aanvraag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.');
-    $('#wrap').innerHTML='<div class="klaar"><span class="em">✈️</span><h2>Verstuurd, dankjewel.</h2>'+
+    $('#wrap').innerHTML='<div class="klaar"><span class="em"></span><h2>Verstuurd, dankjewel.</h2>'+
       '<p>De RTFoundation heeft je bericht ontvangen en neemt persoonlijk en discreet contact met je op. Er zit geen haast of druk bij, we nemen de tijd. Sterkte, en tot snel.</p>'+
       '<p style="margin-top:1.4rem;"><a class="knop grijs" href="index.html">Terug naar alle hulp</a></p></div>';
   }catch(e){ $('#fout').textContent=e.message; $('#verstuur').disabled=false; $('#verstuur').textContent='Versturen naar de foundation'; }

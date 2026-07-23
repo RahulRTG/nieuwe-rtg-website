@@ -63,7 +63,7 @@
 </head>
 <body>
 <header>
-  <div><div class="ey">Sportclub op RTG</div><h1 id="kop">⚽ FC RTG · Clubkantoor</h1></div>
+  <div><div class="ey">Sportclub op RTG</div><h1 id="kop">FC RTG · Clubkantoor</h1></div>
   <a href="/apps/leverancier.html">Kantine-kassa →</a>
 </header>
 <main id="main">
@@ -138,13 +138,13 @@ async function kiesScherm(){
     (C.signalen.length ? C.signalen.map(s => '<div class="item sig"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
     '<h3 style="font-size:.95rem;margin:.4rem 0 .1rem;">Jouw afdeling</h3>'+
     '<div class="keuze">'+
-      '<button data-rol="wedstrijden"><span class="ic">🎫</span>Wedstrijden &amp; tickets<span class="sub">programma, uitslagen, de stand en de scan bij de poort</span></button>'+
-      '<button data-rol="plattegrond"><span class="ic">🗺️</span>Plattegrond<span class="sub">het eigen stadion: vakken, prijzen, horeca en wc’s</span></button>'+
-      '<button data-rol="teams"><span class="ic">👥</span>Teams &amp; jeugd<span class="sub">van O17 tot het eerste, selectie op codenaam</span></button>'+
-      '<button data-rol="velden"><span class="ic">🏟️</span>Veldbeheer<span class="sub">gras en kunstgras, onderhoud en keuringen</span></button>'+
-      '<button data-rol="zakelijk"><span class="ic">🤝</span>Sponsors &amp; kampen<span class="sub">pakketten, kandidaten en het trainingskamp via RTG</span></button>'+
-      '<button data-rol="momenten"><span class="ic">📣</span>Momenten<span class="sub">marketing en pr: beelden voor de socials en de Sport-app</span></button>'+
-      '<button data-rol="financien"><span class="ic">💶</span>Financiën<span class="sub">tickets, sponsors, kantine en de kampkosten op één bord</span></button>'+
+      '<button data-rol="wedstrijden"><span class="ic"></span>Wedstrijden &amp; tickets<span class="sub">programma, uitslagen, de stand en de scan bij de poort</span></button>'+
+      '<button data-rol="plattegrond"><span class="ic"></span>Plattegrond<span class="sub">het eigen stadion: vakken, prijzen, horeca en wc’s</span></button>'+
+      '<button data-rol="teams"><span class="ic"></span>Teams &amp; jeugd<span class="sub">van O17 tot het eerste, selectie op codenaam</span></button>'+
+      '<button data-rol="velden"><span class="ic"></span>Veldbeheer<span class="sub">gras en kunstgras, onderhoud en keuringen</span></button>'+
+      '<button data-rol="zakelijk"><span class="ic"></span>Sponsors &amp; kampen<span class="sub">pakketten, kandidaten en het trainingskamp via RTG</span></button>'+
+      '<button data-rol="momenten"><span class="ic"></span>Momenten<span class="sub">marketing en pr: beelden voor de socials en de Sport-app</span></button>'+
+      '<button data-rol="financien"><span class="ic"></span>Financiën<span class="sub">tickets, sponsors, kantine en de kampkosten op één bord</span></button>'+
     '</div>'+
     '<div class="item" style="background:var(--card2);"><div class="meta">De voetbalkantine rekent af op de gewone clubkassa (contant of RTG Pay) en het personeel staat op het rooster in de werk-app. Alles telt hier mee in de financiën.</div></div>';
   $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => {
@@ -170,7 +170,7 @@ async function schermWedstrijden(){
   let t, b;
   try { t = await api('/api/sport/teams'); b = await api('/api/sport/stand', {}); } catch(e){ meld(e.message); return; }
   const opties = t.teams.map(x => '<option value="'+x.id+'">'+esc(x.naam)+'</option>').join('');
-  $('#app').innerHTML = kopStuk('🎫 Wedstrijden & tickets')+
+  $('#app').innerHTML = kopStuk('Wedstrijden & tickets')+
     '<div class="item" style="background:var(--card2);"><h4>Scan bij de poort</h4>'+
     '<div class="rij"><input class="veld" id="scanCode" style="flex:1;min-width:9rem;" placeholder="Ticketcode (ST-XXXXXX)" maxlength="12"><button class="knop" id="scanGo">Scan</button></div>'+
     '<div class="meta" id="scanUit">Elke code is eenmalig; afrekenen gebeurt aan de kassa (contant of RTG Pay).</div></div>'+
@@ -220,7 +220,7 @@ async function laadProgramma(){
 /* ---- de plattegrond-editor ---- */
 async function schermPlattegrond(){
   let p; try { p = await api('/api/sport/plattegrond'); } catch(e){ meld(e.message); return; }
-  $('#app').innerHTML = kopStuk('🗺️ Plattegrond')+
+  $('#app').innerHTML = kopStuk('Plattegrond')+
     '<div class="item" style="background:var(--card2);"><div class="meta">De club tekent zijn eigen stadion: tribunevakken met capaciteit en prijs, en de voorzieningen (horeca, wc, entree, ehbo) per vak. Leden kopen hun ticket precies op deze kaart.</div></div>'+
     '<h3 style="font-size:.95rem;margin:.6rem 0 .3rem;">Tribunevakken</h3><div id="pgVakken"></div>'+
     '<div class="item"><h4>Vak erbij</h4><div class="rij"><input class="veld" id="nVak" placeholder="Naam (bijv. Tribune Oost)" maxlength="60" style="flex:1;min-width:8rem;"><input class="veld" id="nCap" type="number" min="1" placeholder="Plaatsen" style="width:6rem;"><input class="veld" id="nPrijs" type="number" min="0" step="0.5" placeholder="€" style="width:5rem;"><button class="knop" id="nVakGo">Voeg toe</button></div></div>'+
@@ -228,14 +228,14 @@ async function schermPlattegrond(){
     '<div class="item"><h4>Voorziening erbij</h4><div class="rij"><select class="veld" id="vzSoort">'+p.soorten.map(s=>'<option>'+esc(s)+'</option>').join('')+'</select><input class="veld" id="vzNaam" placeholder="Naam" maxlength="60" style="flex:1;min-width:7rem;"><select class="veld" id="vzBij">'+p.vakken.map(v=>'<option value="'+esc(v.id)+'">bij '+esc(v.naam)+'</option>').join('')+'</select><button class="knop" id="vzGo">Voeg toe</button></div></div>'+
     aiBlok('Bijv. klopt mijn prijsopbouw per vak?');
   koppelBasis();
-  const VZ_ICO = { horeca: '🍺', wc: '🚻', entree: '🎟️', ehbo: '⛑️' };
+  const VZ_ICO = { horeca: '', wc: '', entree: '', ehbo: '' };
   const toon = () => {
     $('#pgVakken').innerHTML = p.vakken.map(v =>
       '<div class="item"><h4>'+esc(v.naam)+' <span class="status goud">'+v.capaciteit+' plaatsen · '+eur(v.prijsCenten)+'</span></h4>'+
       '<div class="rij"><button class="knop rood" data-weg="'+esc(v.id)+'">Weg</button></div></div>').join('') || '<div class="leeg">Nog geen vakken.</div>';
     $('#pgVz').innerHTML = p.voorzieningen.map(v => {
       const vak = p.vakken.find(x => x.id === v.bij);
-      return '<div class="item"><h4>'+(VZ_ICO[v.soort]||'📍')+' '+esc(v.naam)+' <span class="status">'+esc(v.soort)+(vak?' · bij '+esc(vak.naam):'')+'</span></h4>'+
+      return '<div class="item"><h4>'+(VZ_ICO[v.soort]||'')+' '+esc(v.naam)+' <span class="status">'+esc(v.soort)+(vak?' · bij '+esc(vak.naam):'')+'</span></h4>'+
       '<div class="rij"><button class="knop rood" data-vzweg="'+esc(v.id)+'">Weg</button></div></div>'; }).join('') || '<div class="leeg">Nog geen voorzieningen.</div>';
     $('#pgVakken').querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', () => {
       p.vakken = p.vakken.filter(x => x.id !== b.dataset.weg); bewaar();
@@ -264,7 +264,7 @@ async function schermPlattegrond(){
 /* ---- teams & jeugd ---- */
 async function schermTeams(){
   let t; try { t = await api('/api/sport/teams'); } catch(e){ meld(e.message); return; }
-  $('#app').innerHTML = kopStuk('👥 Teams & jeugd')+
+  $('#app').innerHTML = kopStuk('Teams & jeugd')+
     '<div id="tmLijst">'+t.teams.map(x =>
       '<div class="item"><h4>'+esc(x.naam)+' <span class="status '+(x.categorie==='jeugd'?'goud':'')+'">'+esc(x.categorie)+'</span></h4>'+
       '<div class="meta">'+esc(x.competitie)+(x.trainer?' · trainer '+esc(x.trainer):'')+' · '+x.spelers+' speler(s) in de selectie</div>'+
@@ -289,7 +289,7 @@ async function schermTeams(){
 /* ---- veldbeheer ---- */
 async function schermVelden(){
   let v; try { v = await api('/api/sport/velden'); } catch(e){ meld(e.message); return; }
-  $('#app').innerHTML = kopStuk('🏟️ Veldbeheer')+
+  $('#app').innerHTML = kopStuk('Veldbeheer')+
     '<div class="item" style="background:var(--card2);"><div class="meta">Elke keuring en elk onderhoud legt de veldbeheerder hier vast. Een thuiswedstrijd op een afgekeurd veld geeft meteen een signaal in de cockpit.</div></div>'+
     v.velden.map(x =>
       '<div class="item'+(x.status==='afgekeurd'?' sig':'')+'"><h4>'+esc(x.naam)+' <span class="status '+(x.status==='goed'?'ok':x.status==='afgekeurd'?'open':'goud')+'">'+esc(x.status)+'</span></h4>'+
@@ -309,7 +309,7 @@ async function schermVelden(){
 async function schermZakelijk(){
   let sp, km, tms;
   try { sp = await api('/api/sport/sponsors'); km = await api('/api/sport/kampen'); tms = await api('/api/sport/teams'); } catch(e){ meld(e.message); return; }
-  $('#app').innerHTML = kopStuk('🤝 Sponsors & kampen')+
+  $('#app').innerHTML = kopStuk('Sponsors & kampen')+
     '<h3 style="font-size:.95rem;margin:.2rem 0 .3rem;">Sponsorpakketten</h3>'+
     sp.sponsors.map(s =>
       '<div class="item"><h4>'+esc(s.pakket)+' <span class="status '+(s.status==='open'?'goud':'ok')+'">'+esc(s.status)+(s.sponsor?' · '+esc(s.sponsor):'')+'</span></h4>'+
@@ -348,9 +348,9 @@ async function schermZakelijk(){
 /* ---- momenten (marketing & pr) ---- */
 async function schermMomenten(){
   let m; try { m = await api('/api/sport/momenten'); } catch(e){ meld(e.message); return; }
-  $('#app').innerHTML = kopStuk('📣 Momenten')+
+  $('#app').innerHTML = kopStuk('Momenten')+
     '<div class="item" style="background:var(--card2);"><h4>Nieuw moment</h4>'+
-    '<div class="rij"><input class="veld" id="moBeeld" placeholder="⚽" maxlength="8" style="width:4rem;"><input class="veld" id="moTekst" placeholder="Wat wil de club laten zien?" maxlength="300" style="flex:1;min-width:10rem;"><button class="knop" id="moGo">Plaats</button></div>'+
+    '<div class="rij"><input class="veld" id="moBeeld" placeholder="" maxlength="8" style="width:4rem;"><input class="veld" id="moTekst" placeholder="Wat wil de club laten zien?" maxlength="300" style="flex:1;min-width:10rem;"><button class="knop" id="moGo">Plaats</button></div>'+
     '<div class="meta">Momenten verschijnen in de Sport-app van de leden; RTG cureert wat er breder wordt uitgelicht.</div></div>'+
     (m.momenten.length ? m.momenten.map(x =>
       '<div class="item"><h4>'+esc(x.beeld)+' '+esc(x.tekst)+'</h4><div class="meta">'+esc(x.door)+' · '+new Date(x.at).toLocaleDateString('nl-NL')+'</div></div>').join('')
@@ -366,7 +366,7 @@ async function schermMomenten(){
 /* ---- financien ---- */
 async function schermFinancien(){
   let f; try { f = await api('/api/sport/financien'); } catch(e){ meld(e.message); return; }
-  $('#app').innerHTML = kopStuk('💶 Financiën')+
+  $('#app').innerHTML = kopStuk('Financiën')+
     '<div class="kpis">'+
       '<div class="kpi"><b>'+eur(f.ticketOmzetCenten)+'</b><span>Tickets ('+f.ticketsVerkocht+')</span></div>'+
       '<div class="kpi"><b>'+eur(f.sponsorsCenten)+'</b><span>Sponsors gesloten</span></div>'+

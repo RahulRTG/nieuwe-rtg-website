@@ -40,7 +40,7 @@
 <div class="wrap" role="main">
   <!-- meedoen -->
   <section class="stap aan" id="vCode">
-    <h1>🏫 De klas-PDA</h1>
+    <h1>De klas-PDA</h1>
     <p class="stil">Doe mee met de les van je juf of meester. Typ de klascode van het bord en je voornaam; meer heb je niet nodig.</p>
     <input class="veld" id="cCode" maxlength="6" autocomplete="off" placeholder="KLASCODE" aria-label="Klascode">
     <input class="veld" id="cNaam" maxlength="24" autocomplete="off" placeholder="Je voornaam" aria-label="Je voornaam" style="text-transform:none;letter-spacing:normal;text-align:left;font-family:inherit;">
@@ -69,7 +69,7 @@ $('#cGo').addEventListener('click', async () => {
     const d = await api('/api/les/mee', { code: $('#cCode').value.trim().toUpperCase(), naam: $('#cNaam').value });
     CODE = $('#cCode').value.trim().toUpperCase(); NAAM = d.naam; TOKEN = d.deelnemerToken; LES = d.les;
     $('#vCode').classList.remove('aan'); $('#vLes').classList.add('aan');
-    $('#sNaam').textContent = '👋 ' + NAAM;
+    $('#sNaam').textContent = '' + NAAM;
     teken(); setInterval(kijk, 2500);
   } catch(e){ $('#cFout').textContent = e.message; }
 });
@@ -82,20 +82,20 @@ function teken(){
   const inhoud = $('#kInhoud'), opties = $('#kOpties');
   if (LES.fase === 'lobby'){
     inhoud.innerHTML = '<h1 style="font-size:1.25rem;">'+esc(LES.titel)+'</h1><p class="stil" style="margin-top:.6rem;">'+esc(LES.uitleg||'')+'</p>'+
-      '<p class="stil" style="margin-top:.8rem;">⏳ De juf of meester start zo de eerste vraag. Lees de uitleg alvast rustig door.</p>';
+      '<p class="stil" style="margin-top:.8rem;">De juf of meester start zo de eerste vraag. Lees de uitleg alvast rustig door.</p>';
     opties.innerHTML = ''; laatsteVraag = -2; return;
   }
   if (LES.fase === 'klaar'){
     const stand = LES.stand || [];
-    inhoud.innerHTML = '<div class="groot">🏆</div><h1 style="font-size:1.25rem;text-align:center;">De les is klaar!</h1>'+
+    inhoud.innerHTML = '<div class="groot"></div><h1 style="font-size:1.25rem;text-align:center;">De les is klaar!</h1>'+
       '<p class="stil" style="text-align:center;margin-top:.4rem;">Jouw score: <b style="color:var(--goud);">'+LES.score+'</b> punten</p>'+
-      '<div class="stand">'+stand.map((x,i) => '<div class="'+(x.naam===NAAM?'ik':'')+'">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'.')+' '+esc(x.naam)+' · '+x.score+'</div>').join('')+'</div>';
+      '<div class="stand">'+stand.map((x,i) => '<div class="'+(x.naam===NAAM?'ik':'')+'">'+(i===0?'':i===1?'':i===2?'':(i+1)+'.')+' '+esc(x.naam)+' · '+x.score+'</div>').join('')+'</div>';
     opties.innerHTML = ''; return;
   }
   if (LES.fase === 'vraag' && LES.vraag){
     if (LES.vraagIx !== laatsteVraag){ gekozen = null; laatsteVraag = LES.vraagIx; }
     if (LES.beantwoord){
-      inhoud.innerHTML = '<div class="groot '+(LES.goedFout?'goed':'fout')+'">'+(LES.goedFout?'✔ Goed!':'✘ Helaas')+'</div>'+
+      inhoud.innerHTML = '<div class="groot '+(LES.goedFout?'goed':'fout')+'">'+(LES.goedFout?'✔ Goed!':'Helaas')+'</div>'+
         '<p class="stil" style="text-align:center;">Wacht op de volgende vraag…</p>';
       opties.innerHTML = ''; return;
     }
@@ -110,7 +110,7 @@ function teken(){
       try {
         const r = await api('/api/les/antwoord', { code: CODE, naam: NAAM, deelnemerToken: TOKEN, keuze: gekozen });
         $('#sScore').textContent = r.score;
-        $('#kInhoud').innerHTML = '<div class="groot '+(r.goed?'goed':'fout')+'">'+(r.goed?'✔ Goed! +'+r.punten:'✘ Helaas')+'</div>'+
+        $('#kInhoud').innerHTML = '<div class="groot '+(r.goed?'goed':'fout')+'">'+(r.goed?'✔ Goed! +'+r.punten:'Helaas')+'</div>'+
           '<p class="stil" style="text-align:center;">Wacht op de volgende vraag…</p>';
         opties.innerHTML = '';
       } catch(e){ gekozen = null; opties.querySelectorAll('.optie').forEach(x => x.disabled = false); }

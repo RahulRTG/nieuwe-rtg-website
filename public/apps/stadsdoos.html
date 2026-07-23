@@ -37,7 +37,7 @@
 <body>
 <header>
   <div class="ey">RTG Stad · voor buiten</div>
-  <h1>🧰 Stadsdoos veld-app</h1>
+  <h1>Stadsdoos veld-app</h1>
 </header>
 <main id="main">
   <div class="kaart">
@@ -96,7 +96,7 @@ try { $('#vNaam').value = localStorage.getItem('rtg_veld_naam') || ''; } catch (
 $('#vNaam').addEventListener('input', () => { try { localStorage.setItem('rtg_veld_naam', $('#vNaam').value); } catch (e) {} });
 const wie = () => $('#vNaam').value.trim();
 
-const KLUS_IC = { onderhoud: '🔧', lucht: '🌫️', afval: '🗑️', geluid: '🔊', energie: '⚡', water: '💧', licht: '💡', verkeer: '🚦', parkeer: '🅿️' };
+const KLUS_IC = { onderhoud: '', lucht: '', afval: '', geluid: '', energie: '', water: '', licht: '', verkeer: '', parkeer: '' };
 const tijd = ms => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : Math.round(m / 60) + ' u geleden'; };
 
 async function laad(){
@@ -105,7 +105,7 @@ async function laad(){
     // de werklijst die de stad zelf voorschrijft
     $('#wTel').textContent = w.klussen.length + ' open';
     $('#wLijst').innerHTML = w.klussen.length ? w.klussen.map(k =>
-      '<div class="klus"><span style="font-size:1.05rem;">' + (KLUS_IC[k.soort] || '📍') + '</span>' +
+      '<div class="klus"><span style="font-size:1.05rem;">' + (KLUS_IC[k.soort] || '') + '</span>' +
       '<span style="flex:1;font-size:.86rem;line-height:1.45;">' + esc(k.omschrijving) + (k.zone ? '<br><span style="color:var(--soft);font-size:.75rem;">' + esc(k.zone) + '</span>' : '') + '</span>' +
       '<button class="knop stil" data-klaar="' + esc(k.sleutel) + '" style="font-size:.78rem;">✓ Klaar</button></div>').join('')
       : '<div class="leeg">Niets open. De stad draait.</div>';
@@ -134,7 +134,7 @@ $('#aMeld').addEventListener('click', async () => {
   try {
     const r = await api('stad/node/aanmeld', { doosNaam: $('#aNaam').value, zone: $('#aZone').value,
       sensoren: $('#aSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: wie() });
-    $('#aUit').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;">🔑 <strong>' + esc(r.serial) + '</strong><br>sleutel: <code style="word-break:break-all;">' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+    $('#aUit').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;"><strong>' + esc(r.serial) + '</strong><br>sleutel: <code style="word-break:break-all;">' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
     $('#tSerial').value = r.serial; $('#tSleutel').value = r.sleutel; // klaar voor de verbindingstest
     $('#aNaam').value = ''; $('#aSens').value = '';
     laad();
@@ -148,7 +148,7 @@ $('#tDoe').addEventListener('click', async () => {
       body: JSON.stringify({ serial: $('#tSerial').value.trim(), sleutel: $('#tSleutel').value.trim() }) });
     const d2 = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d2.error || 'De poort weigert.');
-    meld('💓 De doos praat met de stad.');
+    meld('De doos praat met de stad.');
     laad();
   } catch (e) { meld(e.message); }
 });

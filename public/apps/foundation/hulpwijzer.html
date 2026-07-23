@@ -42,7 +42,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🧭 Hulpwijzer</h1>
+  <h1>Hulpwijzer</h1>
   <div class="intro">Je hoeft het niet alleen te doen. Hieronder staat waar je in Nederland gratis hulp kunt vinden. Alles kosteloos aanvragen; schamen hoeft nooit.</div>
 
   <div class="cats" id="cats"></div>
@@ -69,32 +69,32 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 
 const CATS = [
-  { ic:'🍲', titel:'Eten', items:[
+  { ic:'', titel:'Eten', items:[
     ['Voedselbank','Gratis voedselpakketten als je even niet rondkomt. Aanmelden kan via voedselbankennederland.nl of je gemeente; er wordt vertrouwelijk gekeken of je in aanmerking komt.'],
     ['Buurtmaaltijden','Veel buurthuizen en kerken koken goedkope of gratis maaltijden waar iedereen welkom is. Vraag bij je wijkcentrum.']
   ]},
-  { ic:'👕', titel:'Kleding en spullen', items:[
+  { ic:'', titel:'Kleding en spullen', items:[
     ['Kledingbank','Gratis kleding voor het hele gezin. Zoek op "kledingbank" met je plaatsnaam, of vraag je gemeente.'],
     ['Stichting Leergeld','Betaalt mee aan schoolspullen, een fiets, laptop, zwemles en meer voor kinderen. Kijk op leergeld.nl.'],
     ['Kringloop en weggeefgroepen','Voor goedkope meubels en spullen. In bijna elke plaats zijn er lokale weggeefgroepen en buurt-apps.']
   ]},
-  { ic:'💶', titel:'Geld, toeslagen en post', items:[
+  { ic:'', titel:'Geld, toeslagen en post', items:[
     ['Toeslagen','Check op toeslagen.nl of je recht hebt op zorgtoeslag, huurtoeslag of het kindgebonden budget. Aanvragen is gratis.'],
     ['Gemeente: bijzondere bijstand en energietoeslag','Je gemeente heeft potjes voor extra kosten en een energietoeslag. Bel of mail de gemeente en vraag ernaar.'],
     ['Kwijtschelding','Vaak hoef je gemeente- en waterschapsbelasting niet te betalen als je weinig inkomen hebt. Vraag om kwijtschelding.'],
     ['SchuldHulpMaatje','Gratis, vertrouwelijke hulp bij schulden en post die je niet meer overziet. Kijk op schuldhulpmaatje.nl.']
   ]},
-  { ic:'🧒', titel:'Voor de kinderen', items:[
+  { ic:'', titel:'Voor de kinderen', items:[
     ['Jeugdfonds Sport & Cultuur','Betaalt de contributie voor sport, muziek, dans of tekenen. Je vraagt het aan via een leerkracht of hulpverlener; jeugdfondssportencultuur.nl.'],
     ['Nationaal Fonds Kinderhulp','Helpt met dingen die niet lukken: een bed, een verjaardag, een dagje uit. Kijk op kinderhulp.nl.'],
     ['Stichting Jarige Job','Een gratis verjaardagsbox zodat elk kind zijn verjaardag kan vieren.']
   ]},
-  { ic:'💚', titel:'Steun en gezondheid', items:[
+  { ic:'', titel:'Steun en gezondheid', items:[
     ['Je huisarts','Ook voor stress, somberheid of zorgen. De huisarts helpt of verwijst je door, en kent de weg.'],
     ['MIND Korrelatie','Gratis, anonieme hulp bij psychische vragen, chat of bel via mindkorrelatie.nl.'],
     ['113 Zelfmoordpreventie','Als je het echt niet meer ziet zitten: bel gratis 0800-0113, dag en nacht.']
   ]},
-  { ic:'📚', titel:'Leren en werk', items:[
+  { ic:'', titel:'Leren en werk', items:[
     ['De Bibliotheek','Vaak gratis of heel goedkoop lidmaatschap, gratis internet, cursussen en hulp bij lezen, taal en de computer.'],
     ['Gemeente en UWV','Voor hulp bij het vinden van werk, een uitkering of een opleiding. Vraag naar een klantmanager.'],
     ['Deze app','De cv-maker en het lesbord in de RTFoundation-app helpen je verder met leren en werk zoeken.']

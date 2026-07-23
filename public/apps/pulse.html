@@ -64,20 +64,20 @@ const wauw=(pad,body)=>roep('/api/member/wauw/'+pad,body);
 const tijd=iso=>{ const d=new Date(iso), s=(Date.now()-d)/1000; if(s<60)return 'nu'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'u'; return d.getDate()+'/'+(d.getMonth()+1); };
 const mooi=t=>esc(t).replace(/#([a-z0-9_]{2,30})/gi,'<span class="tag">#$1</span>');
 // de wauw-laag naast de codenaam: de dag-stemming en de verjaardagsglans
-const glans=p=>(p.stemming?' '+esc(p.stemming):'')+(p.jarig?' 🎂':'');
+const glans=p=>(p.stemming?' '+esc(p.stemming):'')+(p.jarig?' ':'');
 let SOORT='volgend';
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Pulse is de ledenfeed van RTG, op codenaam.</p></div>'; return; }
   let d; try{ d=await api('feed',{soort:SOORT}); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  let h='<div class="schrijf"><textarea id="nw" maxlength="280" placeholder="Wat wil je delen? (op je codenaam, 9+)"></textarea><div class="voet"><button class="knop" id="plaats">Plaatsen</button><button class="knop stil" id="stemKnop" title="Je stemming van vandaag">🙂 stemming</button><button class="knop stil" id="terugKnop">✨ mijn week</button><span class="teller" id="teller">280</span></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden style="margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
+  let h='<div class="schrijf"><textarea id="nw" maxlength="280" placeholder="Wat wil je delen? (op je codenaam, 9+)"></textarea><div class="voet"><button class="knop" id="plaats">Plaatsen</button><button class="knop stil" id="stemKnop" title="Je stemming van vandaag">stemming</button><button class="knop stil" id="terugKnop">mijn week</button><span class="teller" id="teller">280</span></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden style="margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
   h+='<div class="tabs"><button class="tab'+(SOORT==='volgend'?' aan':'')+'" data-s="volgend">Volgend ('+d.volgend+')</button><button class="tab'+(SOORT==='ontdek'?' aan':'')+'" data-s="ontdek">Ontdek</button></div>';
   if(d.trending.length) h+='<div class="trend">'+d.trending.map(t=>'<span>#'+esc(t.tag)+' · '+t.n+'</span>').join('')+'</div>';
   // het Moment van de week: een enkel lichtpunt, geen ranglijst
-  if(SOORT==='ontdek'&&d.moment) h+='<div class="post" style="border-color:var(--gold);"><div class="kop"><span class="wie">🌟 Moment van de week · '+esc(d.moment.codenaam)+glans(d.moment)+'</span><span class="tijd">♥ '+d.moment.likes+'</span></div><div class="tekst">'+mooi(d.moment.tekst)+'</div></div>';
+  if(SOORT==='ontdek'&&d.moment) h+='<div class="post" style="border-color:var(--gold);"><div class="kop"><span class="wie">Moment van de week · '+esc(d.moment.codenaam)+glans(d.moment)+'</span><span class="tijd">'+d.moment.likes+'</span></div><div class="tekst">'+mooi(d.moment.tekst)+'</div></div>';
   h+= d.feed.length ? d.feed.map(p=>{
     const acts='<div class="acts">'+
-      '<button class="knop stil'+(p.mijnLike?' aan':'')+'" data-like="'+p.id+'">♥ '+p.likes+'</button>'+
-      '<button class="knop stil" data-open="'+p.id+'">💬 '+p.reacties.length+'</button>'+
+      '<button class="knop stil'+(p.mijnLike?' aan':'')+'" data-like="'+p.id+'">'+p.likes+'</button>'+
+      '<button class="knop stil" data-open="'+p.id+'">'+p.reacties.length+'</button>'+
       (p.eigen?'<button class="knop stil" data-weg="'+p.id+'">verwijderen</button>'
         :(SOORT==='ontdek'?'<button class="knop stil" data-volg="'+p.van+'">+ volgen</button>':'')+'<button class="knop stil" data-meld="'+p.id+'">melden</button>')+'</div>';
     const reacties='<div class="reacties" id="re-'+p.id+'" hidden>'+p.reacties.map(r=>'<div class="reactie"><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+
@@ -99,7 +99,7 @@ async function laad(){
   // De Terugblik: jouw sociale week, om te vieren -- geen ranglijst
   $('#terugKnop').onclick=async()=>{ const box=$('#terugBox');
     if(box.hidden){ try{ const t=await wauw('terugblik',{});
-      box.innerHTML='✨ '+esc(t.zin)+(t.week.vuurtjes?' 🔥 '+t.week.vuurtjes+' vuurtje(s) branden.':'')+(t.jarig?' En... 🎂 van harte gefeliciteerd!':'');
+      box.innerHTML=''+esc(t.zin)+(t.week.vuurtjes?'  '+t.week.vuurtjes+' vuurtje(s) branden.':'')+(t.jarig?' En...  van harte gefeliciteerd!':'');
     }catch(e){ box.textContent=e.message; } }
     box.hidden=!box.hidden; };
   document.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{ SOORT=b.dataset.s; laad(); });

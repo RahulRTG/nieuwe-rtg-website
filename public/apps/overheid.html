@@ -82,7 +82,7 @@
       <div class="lbl">Al ingehouden loonheffing (€, optioneel)</div>
       <input class="veld" id="ibIngehouden" inputmode="numeric" placeholder="Leeg = schatting">
       <div style="margin-top:.7rem;border-top:1px solid var(--line);padding-top:.6rem;">
-        <div class="lbl" style="color:var(--gold);">✨ Laat Rahul het invullen</div>
+        <div class="lbl" style="color:var(--gold);">Laat Rahul het invullen</div>
         <textarea class="veld" id="ibAi" maxlength="300" placeholder="Bijv. ik verdien 48.000 bruto en had 3.200 aan hypotheekrente"></textarea>
         <button class="knop stil" id="ibAiGo" style="margin-top:.5rem;width:auto;">Rahul vult de velden in</button>
       </div>
@@ -499,7 +499,7 @@ async function laadBekend(){
   $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Geen bekendmakingen.</div>';
 }
 </script>
-<button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
+<button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
   <div class="rahulsug" id="rahulSug"></div>

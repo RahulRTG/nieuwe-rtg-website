@@ -58,7 +58,7 @@
 </head>
 <body>
 <header>
-  <div><div class="ey">Koninklijke Marechaussee</div><h1 id="kop">🎖️ Brigade RTG Airport</h1></div>
+  <div><div class="ey">Koninklijke Marechaussee</div><h1 id="kop">Brigade RTG Airport</h1></div>
   <a href="/apps/luchthaven.html">Airport Ops →</a>
 </header>
 <main id="main">
@@ -133,9 +133,9 @@ async function kiesScherm(){
     (C.signalen.length ? C.signalen.map(s => '<div class="item sig"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
     '<h3 style="font-size:.95rem;margin:.4rem 0 .1rem;">Jouw post</h3>'+
     '<div class="keuze">'+
-      '<button data-rol="grens"><span class="ic">🛂</span>Grensbalie<span class="sub">de passagierslijst per vlucht, besluit per reiziger</span></button>'+
-      '<button data-rol="patrouille"><span class="ic">🚶</span>Patrouille<span class="sub">rondes door de zones, met bevindingen</span></button>'+
-      '<button data-rol="incidenten"><span class="ic">🚨</span>Incidenten<span class="sub">melden en netjes sluiten</span></button>'+
+      '<button data-rol="grens"><span class="ic"></span>Grensbalie<span class="sub">de passagierslijst per vlucht, besluit per reiziger</span></button>'+
+      '<button data-rol="patrouille"><span class="ic"></span>Patrouille<span class="sub">rondes door de zones, met bevindingen</span></button>'+
+      '<button data-rol="incidenten"><span class="ic"></span>Incidenten<span class="sub">melden en netjes sluiten</span></button>'+
     '</div>';
   $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => {
     if (b.dataset.rol === 'grens') schermGrens();
@@ -158,7 +158,7 @@ function koppelBasis(){
 
 /* ---- de grensbalie ---- */
 async function schermGrens(){
-  $('#app').innerHTML = kopStuk('🛂 Grensbalie')+
+  $('#app').innerHTML = kopStuk('Grensbalie')+
     '<div class="item" style="background:var(--card2);"><div class="meta">De passagierslijst op codenaam; de echte naam blijft in de kluis. Per reiziger een menselijk besluit: akkoord, nader onderzoek, of daarna vrijgeven.</div>'+
     '<div class="rij"><select class="veld" id="gVlucht">'+(C.vluchten.length?C.vluchten.map(v=>'<option value="'+esc(v.nummer)+'">'+esc(v.nummer)+' · '+esc(v.tijd)+' · '+esc(v.status)+'</option>').join(''):'<option value="">Geen vertrekkers</option>')+'</select><button class="knop stil" id="gLaad">Toon de lijst</button></div></div>'+
     '<div id="gLijst"></div>'+aiBlok('Bijv. welke vlucht controleer ik als eerste?');
@@ -184,7 +184,7 @@ async function laadGrens(){
 
 /* ---- de patrouille ---- */
 async function schermPatrouille(){
-  $('#app').innerHTML = kopStuk('🚶 Patrouille')+
+  $('#app').innerHTML = kopStuk('Patrouille')+
     '<div class="item" style="background:var(--card2);"><div class="meta">Loop de zones na; een bevinding leg je meteen vast. De stille zones staan bovenaan.</div></div>'+
     '<div id="pLijst">'+C.zones.map(z =>
       '<div class="item"><h4>'+esc(z)+' <span class="status">'+(C.laatstePatrouille[z]?'laatst '+tijd(C.laatstePatrouille[z]):'nog niet gelopen')+'</span></h4>'+
@@ -200,7 +200,7 @@ async function schermPatrouille(){
 
 /* ---- incidenten ---- */
 async function schermIncidenten(){
-  $('#app').innerHTML = kopStuk('🚨 Incidenten')+
+  $('#app').innerHTML = kopStuk('Incidenten')+
     '<div class="item" style="background:var(--card2);"><h4>Incident melden</h4>'+
     '<div class="rij"><select class="veld" id="iZone"></select><select class="veld" id="iSoort"></select></div>'+
     '<div class="rij"><input class="veld" id="iTekst" style="flex:1;min-width:10rem;" placeholder="Wat speelt er?" maxlength="300"><button class="knop rood" id="iMeld">Meld</button></div>'+

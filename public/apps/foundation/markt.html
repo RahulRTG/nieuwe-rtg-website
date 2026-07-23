@@ -82,10 +82,10 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🏷️ Koopje</h1>
+  <h1>Koopje</h1>
 
   <div class="veiligbalk">
-    <span style="font-size:1.1rem;">🛡️</span>
+    <span style="font-size:1.1rem;"></span>
     <div><b>Veilig en met respect.</b> Spreek af op een openbare plek, betaal nooit vooruit en houd het gesprek in de app. Verboden waar en kwetsende taal horen hier niet. Twijfel je? Meld of blokkeer.</div>
   </div>
 
@@ -99,7 +99,7 @@
   <!-- ONTDEKKEN -->
   <div id="vOntdek">
     <div class="filters">
-      <input class="veld" id="fq" placeholder="🔎 Waar zoek je naar?">
+      <input class="veld" id="fq" placeholder="Waar zoek je naar?">
       <select class="veld klein" id="fcat"><option value="">Alles</option></select>
       <input class="veld klein" id="fplaats" placeholder="Plaats">
       <input class="veld klein" id="fmax" type="number" inputmode="numeric" placeholder="€ max">
@@ -178,7 +178,7 @@
   function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
   function eur(n) { return Number(n) > 0 ? '€ ' + Number(n).toLocaleString('nl-NL') : 'Gratis / t.e.a.b.'; }
   function badge(v) {
-    if (v.badge === 'zaak') return '<span class="mini-badge zaak">🏢 Zaak</span>';
+    if (v.badge === 'zaak') return '<span class="mini-badge zaak">Zaak</span>';
     if (v.badge === 'gezin') return '<span class="mini-badge gezin">✓ Gezin</span>';
     return '';
   }
@@ -229,9 +229,9 @@
       if (!d.ads || !d.ads.length) { r.innerHTML = '<div class="leeg">Nog niets gevonden. Verruim je zoekopdracht, of plaats zelf iets moois.</div>'; return; }
       r.innerHTML = d.ads.map(a =>
         '<a class="ad" data-id="' + a.id + '" href="#">' +
-        '<div class="foto"' + (a.fotos[0] ? ' style="background-image:url(' + esc(a.fotos[0]) + ')"' : '') + '>' + (a.fotos[0] ? '' : '📦') + '</div>' +
+        '<div class="foto"' + (a.fotos[0] ? ' style="background-image:url(' + esc(a.fotos[0]) + ')"' : '') + '>' + (a.fotos[0] ? '' : '') + '</div>' +
         '<div class="body">' +
-        (a.gemarkeerd ? '<span class="mini-badge let">⚠ Let op</span>' : '') +
+        (a.gemarkeerd ? '<span class="mini-badge let">Let op</span>' : '') +
         '<span class="titel">' + esc(a.titel) + '</span>' +
         '<span class="prijs">' + eur(a.prijs) + '</span>' +
         '<span class="plaats">' + (a.plaats ? esc(a.plaats) + ' · ' : '') + '</span>' +
@@ -250,9 +250,9 @@
       const a = d.ad;
       const fotos = a.fotos && a.fotos.length
         ? '<div class="fotos">' + a.fotos.map(f => '<img src="' + esc(f) + '" alt="foto van ' + esc(a.titel) + '">').join('') + '</div>'
-        : '<div class="fotoleeg">📦</div>';
+        : '<div class="fotoleeg"></div>';
       const waarsch = (a.gemarkeerd && a.veiligheid && a.veiligheid.length)
-        ? '<div class="waarschuw">⚠ ' + a.veiligheid.map(esc).join('<br>') + '</div>' : '';
+        ? '<div class="waarschuw">' + a.veiligheid.map(esc).join('<br>') + '</div>' : '';
       const eigen = a.mijn;
       $('#vDetail').innerHTML =
         '<button type="button" class="terug" id="dTerug">← Terug naar het aanbod</button>' +
@@ -261,7 +261,7 @@
         '<h2>' + esc(a.titel) + '</h2>' +
         '<div class="prijsgroot">' + eur(a.prijs) + '</div>' +
         '<div class="meta"><span>' + catNaam(a.categorie) + '</span><span>' + ({ nieuw: 'Nieuw', zgan: 'Zo goed als nieuw', gebruikt: 'Gebruikt' }[a.staat] || a.staat) + '</span>' +
-        (a.plaats ? '<span>📍 ' + esc(a.plaats) + '</span>' : '') + '<span>' + (a.levering || []).map(l => l === 'verzenden' ? '📦 Verzenden' : '🤝 Ophalen').join(' · ') + '</span></div>' +
+        (a.plaats ? '<span>' + esc(a.plaats) + '</span>' : '') + '<span>' + (a.levering || []).map(l => l === 'verzenden' ? 'Verzenden' : 'Ophalen').join(' · ') + '</span></div>' +
         waarsch +
         '<div class="oms">' + esc(a.beschrijving) + '</div>' +
         '<div class="veiligtips"><b>Veilig afspreken</b><ul>' +
@@ -274,7 +274,7 @@
             ? '<div class="veiligtips">Vraag een volwassene in je gezin om te reageren op deze advertentie.</div>'
             : '<div class="acties">' +
               '<button type="button" class="knop" id="dReageer">Stuur een bericht</button>' +
-              '<button type="button" class="knop grijs" id="dMeld">⚑ Melden</button>' +
+              '<button type="button" class="knop grijs" id="dMeld">Melden</button>' +
               '<button type="button" class="knop grijs" id="dBlok">Blokkeer verkoper</button></div>' +
               '<div id="dReageerVak" hidden style="margin-top:.7rem;">' +
               '<textarea class="veld" id="dBericht" placeholder="Hoi, is dit nog beschikbaar?"></textarea>' +
@@ -388,7 +388,7 @@
       const el = $('#postvak');
       if (!d.postvak || !d.postvak.length) { el.innerHTML = '<div class="leeg">Nog geen berichten. Reageer op een advertentie om een gesprek te starten.</div>'; return; }
       el.innerHTML = d.postvak.map(c =>
-        '<button type="button" class="chatrow" data-chat="' + c.id + '"><span style="font-size:1.4rem;">💬</span>' +
+        '<button type="button" class="chatrow" data-chat="' + c.id + '"><span style="font-size:1.4rem;"></span>' +
         '<div class="ct"><b>' + esc(c.adTitel) + '</b><span>' + esc(c.metNaam) + ': ' + esc(c.laatste) + '</span></div>' +
         '<span class="mini-badge ' + (c.rol === 'verkoper' ? 'gezin' : 'zaak') + '">' + (c.rol === 'verkoper' ? 'Verkoop' : 'Koop') + '</span></button>'
       ).join('');
@@ -403,23 +403,23 @@
     const verkoper = c.rol === 'verkoper';
     if (!d) {
       // nog geen deal: prijs afspreken
-      return '<div class="paneel" style="border-color:var(--goud);"><b>🤝 Veilig samen betalen</b>' +
+      return '<div class="paneel" style="border-color:var(--goud);"><b>Veilig samen betalen</b>' +
         '<div class="zacht" style="font-size:.83rem;line-height:1.5;margin:.3rem 0 .5rem;">Spreek een prijs af. Betalen kan pas als jullie samen zijn (locaties bij elkaar). Dan komt de factuur en betaal je via je account met Apple Pay.</div>' +
         '<div class="rijveld"><input class="veld" id="dBedrag" type="number" inputmode="numeric" placeholder="€ prijs"><button type="button" class="knop" id="dAfspreek">Spreek prijs af</button></div></div>';
     }
-    let h = '<div class="paneel" style="border-color:var(--goud);"><b>🤝 Deal: € ' + d.bedrag + '</b>';
+    let h = '<div class="paneel" style="border-color:var(--goud);"><b>Deal: € ' + d.bedrag + '</b>';
     if (d.betaald) {
-      return '<div class="paneel" style="border-color:var(--groen);"><b>✅ Betaald: € ' + d.bedrag + '</b>' +
+      return '<div class="paneel" style="border-color:var(--groen);"><b>Betaald: € ' + d.bedrag + '</b>' +
         '<div class="zacht" style="font-size:.83rem;margin-top:.3rem;">Via ' + (d.methode === 'apple-pay' ? 'Apple Pay' : d.methode) + '. Factuur ' + esc(d.factuur ? d.factuur.nummer : '') + '.</div></div>';
     }
     // status voor het samenkomen
     h += '<div style="display:flex;gap:.6rem;margin:.5rem 0;font-size:.8rem;">' +
-      '<span class="' + (d.ikGedeeld ? '' : 'zacht') + '">' + (d.ikGedeeld ? '📍 jij bent er' : '○ jij: nog niet') + '</span>' +
-      '<span class="' + (d.anderGedeeld ? '' : 'zacht') + '">' + (d.anderGedeeld ? '📍 de ander is er' : '○ de ander: nog niet') + '</span></div>';
+      '<span class="' + (d.ikGedeeld ? '' : 'zacht') + '">' + (d.ikGedeeld ? 'jij bent er' : '○ jij: nog niet') + '</span>' +
+      '<span class="' + (d.anderGedeeld ? '' : 'zacht') + '">' + (d.anderGedeeld ? 'de ander is er' : '○ de ander: nog niet') + '</span></div>';
     if (!d.samen) {
       h += '<div class="zacht" style="font-size:.82rem;line-height:1.5;margin-bottom:.5rem;">Zijn jullie samen bij de overhandiging? Deel je locatie. Zodra beide locaties dichtbij zijn, komt de factuur vrij.' +
         (d.ikGedeeld && d.anderGedeeld && d.afstand != null ? ' (nu ~' + d.afstand + ' m uit elkaar)' : '') + '</div>' +
-        '<button type="button" class="knop" id="dHier" style="width:100%;">📍 Ik ben hier (deel locatie)</button>';
+        '<button type="button" class="knop" id="dHier" style="width:100%;">Ik ben hier (deel locatie)</button>';
       if (verkoper) h += '<div class="zacht" style="font-size:.78rem;margin-top:.4rem;">De koper betaalt zodra jullie samen zijn.</div>';
     } else {
       // samen: factuur + betalen
@@ -444,7 +444,7 @@
         '<div class="paneel"><h2 style="font-family:var(--serif);font-weight:500;font-size:1.2rem;margin:0 0 .1rem;">' + esc(c.adTitel || '') + '</h2>' +
         '<div style="color:var(--zacht);font-size:.85rem;margin-bottom:.6rem;">met ' + esc(c.metNaam || '') + '</div>' +
         '<div class="chat" id="cBerichten">' + (c.berichten || []).map(b =>
-          '<div class="b ' + (b.mijn ? 'ik' : 'ai') + '"' + (b.systeem ? ' style="align-self:center;background:var(--paneel2);border:1px solid var(--goud);color:var(--goud2);font-size:.82rem;"' : '') + '>' + esc(b.tekst) + (b.let ? '<br><span style="font-size:.72rem;opacity:.8;">⚠ let op: nooit vooruit betalen</span>' : '') + '</div>'
+          '<div class="b ' + (b.mijn ? 'ik' : 'ai') + '"' + (b.systeem ? ' style="align-self:center;background:var(--paneel2);border:1px solid var(--goud);color:var(--goud2);font-size:.82rem;"' : '') + '>' + esc(b.tekst) + (b.let ? '<br><span style="font-size:.72rem;opacity:.8;">let op: nooit vooruit betalen</span>' : '') + '</div>'
         ).join('') + '</div>' +
         '<div class="rijveld"><input class="veld" id="cInput" placeholder="Typ een bericht..."><button type="button" class="knop" id="cSend">Stuur</button></div>' +
         '<div id="cTip" class="melding fout"></div></div>' +
@@ -469,12 +469,12 @@
       });
       const hier = $('#dHier'); if (hier) hier.addEventListener('click', () => {
         hier.textContent = 'Locatie ophalen...';
-        if (!navigator.geolocation) { $('#cTip').textContent = 'Je toestel deelt geen locatie.'; hier.textContent = '📍 Ik ben hier (deel locatie)'; return; }
+        if (!navigator.geolocation) { $('#cTip').textContent = 'Je toestel deelt geen locatie.'; hier.textContent = 'Ik ben hier (deel locatie)'; return; }
         navigator.geolocation.getCurrentPosition(pos => {
           rapi('/deal/hier', { chatId, lat: pos.coords.latitude, lng: pos.coords.longitude })
             .then(r => { if (!r.samen && r.afstand != null) $('#cTip').textContent = 'Nog ~' + r.afstand + ' m uit elkaar; kom dichterbij.'; render(r.chat); })
             .catch(e => { $('#cTip').textContent = e.message; render(c); });
-        }, () => { $('#cTip').textContent = 'Kon je locatie niet ophalen. Sta locatie toe.'; hier.textContent = '📍 Ik ben hier (deel locatie)'; }, { enableHighAccuracy: true, timeout: 8000 });
+        }, () => { $('#cTip').textContent = 'Kon je locatie niet ophalen. Sta locatie toe.'; hier.textContent = 'Ik ben hier (deel locatie)'; }, { enableHighAccuracy: true, timeout: 8000 });
       });
       const pay = $('#dPay'); if (pay) pay.addEventListener('click', () => {
         pay.textContent = 'Bezig...';

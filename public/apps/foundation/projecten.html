@@ -43,7 +43,7 @@
 
   <!-- overzicht -->
   <section id="vLijst">
-    <h1>🤝 Samen aan een project</h1>
+    <h1>Samen aan een project</h1>
     <p class="intro">Een spreekbeurt, werkstuk of bouwplan: begin samen, verdeel de taken en houd bij wat af is. Nodig gezinsleden of vrienden uit; de buddy helpt met een plan.</p>
     <div class="kaart blok">
       <input class="veld" id="nTitel" placeholder="Waar gaan jullie aan werken? (bijv. Spreekbeurt over dolfijnen)" maxlength="80">
@@ -62,14 +62,14 @@
     <div class="intro" id="pWat"></div>
     <div class="ledenregel" id="pLeden"></div>
 
-    <h2 class="sec">Taken <small style="text-transform:none;letter-spacing:0;">(tik ✋ om een taak te pakken)</small></h2>
+    <h2 class="sec">Taken <small style="text-transform:none;letter-spacing:0;">(tik  om een taak te pakken)</small></h2>
     <div class="kaart blok">
       <div id="pTaken"></div>
       <div style="display:flex;gap:.5rem;margin-top:.6rem;">
         <input class="veld" id="tNieuw" style="flex:1;" placeholder="Nieuwe taak…" maxlength="140">
         <button class="knop klein" id="tMaak">+</button>
       </div>
-      <button class="knop grijs" id="pAi" style="width:100%;margin-top:.5rem;">✨ Laat de buddy een plan voorstellen</button>
+      <button class="knop grijs" id="pAi" style="width:100%;margin-top:.5rem;">Laat de buddy een plan voorstellen</button>
       <div class="fout" id="pFout"></div>
     </div>
 
@@ -150,7 +150,7 @@ async function openProject(id){
 async function ververs(){
   let d; try { d = await api('project-staat', { id: P.id }); } catch (e) { toon('vLijst'); laadOverzicht(); return; }
   const p = d.project; P.mijn = p.mijnCodenaam;
-  $('#pTitel').textContent = '🤝 ' + p.titel;
+  $('#pTitel').textContent = '' + p.titel;
   $('#pWat').textContent = p.wat || '';
   $('#pLeden').textContent = 'Samen met: ' + p.leden.join(', ') + (p.wachtOp ? ' · wacht op ' + p.wachtOp + ' uitnodiging(en)' : '');
   $('#pWeg').hidden = !p.ikMaakte;
@@ -158,11 +158,11 @@ async function ververs(){
     '<div class="taak'+(t.af?' af':'')+'"><input type="checkbox" data-af="'+t.id+'"'+(t.af?' checked':'')+'>'+
     '<span class="tk">'+esc(t.tekst)+'</span>'+
     (t.wie ? '<span class="wiebadge">'+esc(t.wie)+'</span>' : '')+
-    '<button class="mini" data-claim="'+t.id+'" title="Deze taak pakken of loslaten">'+(t.wie===P.mijn?'🤚':'✋')+'</button></div>').join('')
+    '<button class="mini" data-claim="'+t.id+'" title="Deze taak pakken of loslaten">'+(t.wie===P.mijn?'':'')+'</button></div>').join('')
     : '<div class="leeg">Nog geen taken. Voeg er een toe of vraag de buddy om een plan.</div>';
   $('#pTaken').querySelectorAll('[data-af]').forEach(c => c.addEventListener('change', async () => { await api('taak-zet',{id:P.id, taakId:c.dataset.af, af:c.checked}); ververs(); }));
   $('#pTaken').querySelectorAll('[data-claim]').forEach(b => b.addEventListener('click', async () => {
-    const nuVanMij = b.textContent === '🤚'; // claim wisselen: pakken of loslaten
+    const nuVanMij = b.textContent === ''; // claim wisselen: pakken of loslaten
     await api('taak-zet', { id: P.id, taakId: b.dataset.claim, claim: !nuVanMij });
     ververs();
   }));

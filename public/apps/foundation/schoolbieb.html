@@ -34,9 +34,9 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🏫 School-Bibliotheek</h1>
+  <h1>School-Bibliotheek</h1>
   <p class="intro" id="sbIntro">Tienduizend school-apps per leeftijdsgroep, van kleuter tot universiteit en van vmbo tot vwo. De beste uit de winkel, hier altijd gratis.</p>
-  <div class="wijs">🌱 <b>Gezond leren:</b> korte sessies, echte leerdoelen, geen reclame en geen verslavende trucjes. Slim worden gaat het best met pauzes, buiten spelen en genoeg slaap.</div>
+  <div class="wijs"><b>Gezond leren:</b> korte sessies, echte leerdoelen, geen reclame en geen verslavende trucjes. Slim worden gaat het best met pauzes, buiten spelen en genoeg slaap.</div>
 
   <div class="zoekrij">
     <select id="sbNiveau" class="veld" aria-label="Niveau"><option value="">Alle niveaus (voor jou)</option></select>
@@ -85,7 +85,7 @@ function kaart(a, vanMij){
   return '<div class="kaart app">'+
     '<span class="cat">'+a.icon+' '+esc(a.groepLabel)+' · '+esc(a.vak)+'</span>'+
     '<b>'+esc(a.naam)+'</b>'+
-    '<small>★ '+a.sterren.toFixed(1)+' · versie '+esc(a.versie)+'</small>'+
+    '<small>'+a.sterren.toFixed(1)+' · versie '+esc(a.versie)+'</small>'+
     '<div class="rij"><s>'+euro(a.winkelwaardeCenten)+'</s><span class="gratis">Gratis</span>'+
     (vanMij ? '<button class="knop stil sweg" data-id="'+esc(a.id)+'">Opruimen</button>'
             : '<button class="knop sin" data-id="'+esc(a.id)+'">Installeer</button>')+

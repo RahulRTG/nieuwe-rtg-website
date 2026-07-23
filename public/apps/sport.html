@@ -54,7 +54,7 @@
 </style>
 </head>
 <body>
-<header><div class="ey">Alle uitslagen, standen en tickets</div><h1>⚽ RTG Sport</h1></header>
+<header><div class="ey">Alle uitslagen, standen en tickets</div><h1>RTG Sport</h1></header>
 <main>
   <div class="tabs" id="tabs">
     <button class="tab aan" data-t="bord">Uitslagen</button>
@@ -112,8 +112,8 @@ async function laadTickets(voorWedstrijd){
   try{ b=await api('/bord'); p=await api('/plattegrond',{club:CLUB}); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const thuis=b.wedstrijden.filter(w=>w.clubCode===CLUB&&w.thuis&&!w.uitslag).reverse();
   if(!thuis.length){ $('#inhoud').innerHTML='<div class="leeg">Geen thuiswedstrijden in de verkoop.</div>'; return; }
-  const VZ_ICO={horeca:'🍺',wc:'🚻',entree:'🎟️',ehbo:'⛑️'};
-  const vzBij=id=>p.voorzieningen.filter(v=>v.bij===id).map(v=>(VZ_ICO[v.soort]||'📍')+' '+esc(v.naam)).join(' · ');
+  const VZ_ICO={horeca:'',wc:'',entree:'',ehbo:''};
+  const vzBij=id=>p.voorzieningen.filter(v=>v.bij===id).map(v=>(VZ_ICO[v.soort]||'')+' '+esc(v.naam)).join(' · ');
   if(!VAK) VAK=(p.vakken[0]||{}).id;
   $('#inhoud').innerHTML=
     '<div class="item" style="background:var(--card2);"><h4>Kies de wedstrijd</h4>'+
@@ -152,7 +152,7 @@ async function laadClub(){
   $('#inhoud').innerHTML=
     '<h3 style="font-size:1rem;margin:.2rem 0 .5rem;">Momenten van de club</h3>'+
     (m.momenten.length?m.momenten.map(x=>'<div class="item"><h4>'+esc(x.beeld)+' '+esc(x.tekst)+'</h4><div class="meta">'+esc(x.door)+' · '+new Date(x.at).toLocaleDateString('nl-NL')+'</div></div>').join(''):'<div class="leeg">Nog geen momenten.</div>')+
-    '<h3 style="font-size:1rem;margin:.7rem 0 .5rem;">🤝 Sponsor worden?</h3>'+
+    '<h3 style="font-size:1rem;margin:.7rem 0 .5rem;">Sponsor worden?</h3>'+
     (sp.sponsors.length?sp.sponsors.map(s=>
       '<div class="item"><h4>'+esc(s.pakket)+' <span class="status goud">'+eur(s.prijsCenten)+'</span></h4>'+
       (s.tekst?'<div class="meta">'+esc(s.tekst)+'</div>':'')+

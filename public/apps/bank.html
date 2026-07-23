@@ -55,7 +55,7 @@
 <body>
 <header>
   <button class="terug" id="terug">←</button>
-  <div><div class="ey">RTG · Eigen bank</div><h1>🏦 RTG Bank</h1></div>
+  <div><div class="ey">RTG · Eigen bank</div><h1>RTG Bank</h1></div>
 </header>
 <main id="app"><div class="leeg">Laden…</div></main>
 
@@ -94,7 +94,7 @@ function render(){
   }
   const reks = OV.rekeningen || [];
   $('#app').innerHTML =
-    '<div class="ai" id="ai"><h2>🤖 De AI-bankier</h2><div class="we" id="aiWe">Ik kijk mee met je rekeningen en geef eerlijk advies. Ik adviseer; beslissen doe jij.</div>' +
+    '<div class="ai" id="ai"><h2>De AI-bankier</h2><div class="we" id="aiWe">Ik kijk mee met je rekeningen en geef eerlijk advies. Ik adviseer; beslissen doe jij.</div>' +
       '<div class="snel">' +
         '<button data-q="Hoe kan ik het beste sparen?">Beter sparen?</button>' +
         '<button data-q="Sta ik ergens rood en wat kan ik doen?">Sta ik rood?</button>' +
@@ -128,7 +128,7 @@ function rekHtml(r){
       '<button class="knop stil mini" data-pas="' + r.iban + '">Pas</button>' +
       (r.soort === 'spaar' ? '<button class="knop stil mini" data-doel="' + r.iban + '">Spaardoel</button>' : '') +
       '<button class="knop stil mini" data-afschrift="' + r.iban + '">Afschrift</button>' +
-      '<button class="knop stil mini" data-csv="' + r.iban + '" title="Download het afschrift als CSV-bestand">⬇ CSV</button>' +
+      '<button class="knop stil mini" data-csv="' + r.iban + '" title="Download het afschrift als CSV-bestand">CSV</button>' +
     '</div><div class="afschrift" data-blad="' + r.iban + '" hidden style="flex-basis:100%;font-size:.78rem;color:var(--muted);line-height:1.7;"></div></div>';
 }
 function bindBank(reks){

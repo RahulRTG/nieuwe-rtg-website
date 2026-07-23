@@ -38,7 +38,7 @@
 <a class="skip" href="#inhoud" style="position:absolute;left:-999px;">Naar de inhoud</a>
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
-  <h1>🌿 RTG Balans</h1>
+  <h1>RTG Balans</h1>
   <div class="rek"></div>
   <span class="stil">rust hoort erbij</span>
 </header>
@@ -68,7 +68,7 @@
       <input id="receptNaam" maxlength="60" placeholder="Bijv. pasta van Rahul" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.55rem 0.8rem;margin-top:0.25rem;">
       <label class="stil" for="receptTekst" style="display:block;margin-top:0.6rem;">Recept</label>
       <textarea id="receptTekst" rows="4" maxlength="4000" placeholder="Plak hier het recept uit de Rahul-chat" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.55rem 0.8rem;margin-top:0.25rem;resize:vertical;"></textarea>
-      <button class="knop" id="receptBewaar">📱 Bewaar op dit toestel</button>
+      <button class="knop" id="receptBewaar">Bewaar op dit toestel</button>
       <div id="receptLijst" style="margin-top:0.6rem;"></div>
     </div>
   </section>
@@ -96,12 +96,12 @@
       '<p class="stil" style="margin-top:0.6rem;">' + b.vrijeDagen + ' lege dag(en) · ' + b.avonden + ' avondafspraken · groen is een dag zonder verplichtingen.</p>';
     $('#adviesKaart').innerHTML = d.adviezen.map(a =>
       '<div class="advies"><span aria-hidden="true">' + esc(a.icoon) + '</span><span>' + esc(a.tekst) + '</span></div>').join('') +
-      '<button class="knop" id="rustKnop">🤵 Vraag Rahul een rustmoment te plannen</button>';
+      '<button class="knop" id="rustKnop">Vraag Rahul een rustmoment te plannen</button>';
     $('#kookKaart').innerHTML =
       '<p class="stil">Uit eten: ongeveer ' + b.uitPerWeek + ' keer per week' + (b.laat ? ' · ' + b.laat + ' late nachten in twee weken' : '') + '.</p>' +
       '<p class="stil" style="margin-top:0.5rem;">' + esc(d.koken) + '</p>' +
-      '<button class="knop" id="kookKnop">🍳 Vraag Rahul een recept voor vanavond</button> ' +
-      '<button class="knop" id="beweegKnop">💆 Vraag Rahul naar sport en wellness</button>';
+      '<button class="knop" id="kookKnop">Vraag Rahul een recept voor vanavond</button> ' +
+      '<button class="knop" id="beweegKnop">Vraag Rahul naar sport en wellness</button>';
     const vraag = async (tekst) => {
       try { await navigator.clipboard.writeText(tekst); } catch (e) {}
       location.href = '/apps/app.html#ai';
@@ -118,7 +118,7 @@
     const items = (await Toestelkluis.lijst()).filter(x => x.naam.startsWith('recept_'));
     host.innerHTML = items.map(x =>
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.4rem;">' +
-        '<span>🍳 ' + esc(x.naam.slice(7).replace(/_/g, ' ').replace(/\.txt$/, '')) + '</span>' +
+        '<span>' + esc(x.naam.slice(7).replace(/_/g, ' ').replace(/\.txt$/, '')) + '</span>' +
         '<span style="white-space:nowrap;">' +
         '<button class="knop" style="margin-top:0;padding:0.25rem 0.6rem;font-size:0.72rem;" data-ropen="' + esc(x.naam) + '">Lees</button> ' +
         '<button class="knop" style="margin-top:0;padding:0.25rem 0.6rem;font-size:0.72rem;color:var(--soft);border-color:var(--line);" data-rwis="' + esc(x.naam) + '" aria-label="wis recept">✕</button></span></div>').join('') ||

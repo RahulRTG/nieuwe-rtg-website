@@ -58,7 +58,7 @@
     padding:0.7rem;margin-top:0.7rem;font-size:0.82rem;line-height:1.5;}
   .chat .r{margin:0.2rem 0;overflow-wrap:anywhere;}
   .chat .wie{color:var(--gold);font-weight:600;}
-  .chat .wie.abb::after{content:" ★";color:var(--rood);}
+  .chat .wie.abb::after{content:" ";color:var(--rood);}
   .chat .cad{color:var(--rood);}
   .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
   .rij input{flex:1;min-width:9rem;width:auto;}
@@ -243,7 +243,7 @@
   function chatRegel(regel) {
     const r = document.createElement('div'); r.className = 'r';
     const wie = document.createElement('span'); wie.className = 'wie' + (regel.abonnee ? ' abb' : '');
-    wie.textContent = (regel.maker ? '★ ' : '') + regel.codenaam;
+    wie.textContent = (regel.maker ? '' : '') + regel.codenaam;
     r.appendChild(wie);
     const rest = document.createElement('span');
     if (regel.cadeau) { rest.className = 'cad'; rest.textContent = ' stuurt ' + regel.cadeau.icoon + ' ' + regel.cadeau.naam + ' (' + eur(regel.cadeau.centen) + ')'; }
@@ -326,7 +326,7 @@
     $('#kijkTel').textContent = (open.kijkers || 1) + ' kijkers';
     $('#kijkWie').textContent = open.codenaam + ' · ' + (open.bio || open.genre);
     const abb = $('#abbKnop');
-    if (open.ikAbonnee) { abb.textContent = 'Abonnee ★'; abb.disabled = true; }
+    if (open.ikAbonnee) { abb.textContent = 'Abonnee '; abb.disabled = true; }
     else if (open.abbCenten) { abb.textContent = 'Abonneer · ' + eur(open.abbCenten) + ' p/m'; abb.disabled = false; }
     else abb.classList.add('weg');
     const rij = $('#cadeauRij'); rij.innerHTML = '';
@@ -440,7 +440,7 @@
     const r = await api('abonneer', { id: open.id, idem: idem() });
     if (r.body.error) return zeg(r.body.error);
     zeg('U bent abonnee tot ' + new Date(r.body.tot).toLocaleDateString('nl-NL') + '.');
-    $('#abbKnop').textContent = 'Abonnee ★'; $('#abbKnop').disabled = true;
+    $('#abbKnop').textContent = 'Abonnee '; $('#abbKnop').disabled = true;
   });
   $('#meldKnop').addEventListener('click', async () => {
     if (!open) return;

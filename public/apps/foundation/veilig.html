@@ -40,7 +40,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>📍 Veilig thuis</h1>
+  <h1>Veilig thuis</h1>
   <div class="intro">Laat je gezin weten waar je bent en dat het goed met je gaat. Jij bepaalt zelf of je je plek deelt, en je kunt altijd stoppen. Zo hoeft niemand zich zorgen te maken.</div>
 
   <div class="kaart blok">
@@ -48,7 +48,7 @@
     <div class="h">Tik een berichtje aan. Je gezin ziet het meteen.</div>
     <div class="statusknoppen" id="statuskn"></div>
     <div class="knoprij">
-      <button class="knop" id="deelLoc">📍 Deel ook mijn locatie</button>
+      <button class="knop" id="deelLoc">Deel ook mijn locatie</button>
       <button class="knop grijs" id="stopLoc" hidden>Stop met delen</button>
     </div>
     <div class="deelstatus" id="deelstatus" hidden></div>
@@ -66,12 +66,12 @@
   <div class="kaart blok">
     <h2>Ik voel me niet veilig</h2>
     <div class="h">Voel je je onveilig of wil je opgehaald worden? Laat het je gezin meteen weten.</div>
-    <button class="sos" id="sos">🆘 Stuur mijn gezin een hulpvraag</button>
+    <button class="sos" id="sos">Stuur mijn gezin een hulpvraag</button>
     <div class="ok" id="sosOk" hidden>Je gezin heeft je hulpvraag gekregen. Blijf op een veilige, drukke plek als dat kan. Bij direct gevaar: bel 112.</div>
   </div>
 
   <div class="kaart blok">
-    <h2>📡 Geen bereik? Noodbericht via satelliet</h2>
+    <h2>Geen bereik? Noodbericht via satelliet</h2>
     <div class="h">Nieuwere telefoons kunnen zonder bereik een sms via een satelliet sturen (buiten, met vrij zicht op de lucht). De app zet een zo kort mogelijk noodbericht voor je klaar, met de tijd en je locatie erin; je telefoon biedt de satellietweg zelf aan zodra er geen bereik is. Bij direct gevaar en gewoon bereik: bel altijd eerst 112.</div>
     <button class="knop" id="nsMaak" style="width:100%;">Maak mijn noodbericht</button>
     <div id="nsTekst" style="margin-top:.6rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;font-size:.95rem;line-height:1.5;word-break:break-word;" hidden></div>
@@ -145,7 +145,7 @@ async function laad(){
     if (!d.locaties || !d.locaties.length){ fam.innerHTML = '<div class="leeg">Nog niemand heeft iets gedeeld. Wees de eerste.</div>'; return; }
     fam.innerHTML = d.locaties.map(l=>{
       const kaart = (l.lat!=null&&l.lon!=null) ? '<a class="kaartlink" href="geo:'+l.lat+','+l.lon+'?q='+l.lat+','+l.lon+'" target="_blank" rel="noopener">Op de kaart →</a>' : '';
-      return '<div class="lid"><span class="av" style="background:'+(l.kleur||'#C9A24B')+'">'+(l.avatar||'🙂')+'</span>'+
+      return '<div class="lid"><span class="av" style="background:'+(l.kleur||'#C9A24B')+'">'+(l.avatar||'')+'</span>'+
         '<div><div class="nm">'+esc(l.naam)+(l.vanMij?' (jij)':'')+'</div><div class="st">'+esc(l.status)+' · '+geleden(l.at)+'</div></div>'+kaart+'</div>';
     }).join('');
   }catch(e){ $('#fam').innerHTML='<div class="leeg">Kon het overzicht niet laden.</div>'; }

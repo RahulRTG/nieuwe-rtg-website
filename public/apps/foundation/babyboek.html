@@ -52,7 +52,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>📖 Fotoboekje</h1>
+  <h1>Fotoboekje</h1>
   <p class="intro" id="intro">Elke dag een foto of een klein stukje over jullie kindje. Zo groeit er vanzelf een boekje vol eerste keertjes, voor later.</p>
 
   <!-- eerste keer: het kindje voorstellen -->
@@ -76,7 +76,7 @@
       <div style="color:var(--zacht);font-size:.82rem;margin-bottom:.4rem;" id="cVandaag"></div>
       <textarea class="veld" id="cTekst" placeholder="Wat deed jullie kindje vandaag?"></textarea>
       <div class="fotoknop">
-        <label class="knop grijs klein">📷 Kies een foto<input type="file" id="cFoto" accept="image/*"></label>
+        <label class="knop grijs klein">Kies een foto<input type="file" id="cFoto" accept="image/*"></label>
         <img class="preview" id="cPreview" alt="Gekozen foto" hidden>
         <button class="mini" id="cFotoWeg" hidden>✕ foto weg</button>
       </div>
@@ -95,7 +95,7 @@
         <input class="veld" id="gNaam" style="flex:1;" placeholder="Naam erbij (bijv. opa Ties)" maxlength="30">
         <button class="knop klein" id="gDoe">+</button>
       </div>
-      <button class="knop" id="mDoe" style="width:100%;margin-top:.6rem;">✨ Bedenk momenten voor ons gezin</button>
+      <button class="knop" id="mDoe" style="width:100%;margin-top:.6rem;">Bedenk momenten voor ons gezin</button>
       <div id="mLijst"></div>
       <div class="fout" id="mFout"></div>
     </div>
@@ -110,10 +110,10 @@
         <button class="knop klein" id="stuur">Stuur</button>
       </div>
       <div class="links">
-        <a href="rust.html">🌿 Even rust</a>
-        <a href="steun.html">💚 Steun voor jou</a>
-        <a href="opvoeden.html">🧸 Opvoedhulp</a>
-        <a href="hulpwijzer.html">🧭 Hulpwijzer</a>
+        <a href="rust.html">Even rust</a>
+        <a href="steun.html">Steun voor jou</a>
+        <a href="opvoeden.html">Opvoedhulp</a>
+        <a href="hulpwijzer.html">Hulpwijzer</a>
       </div>
     </div>
   </div>
@@ -140,7 +140,7 @@ const ADEM = [
   'Slechte nachten zeggen niets over jou als ouder. Ze horen erbij, en ze gaan voorbij.',
   'Jij bent voor jullie kindje niet een gewone dag; jij bent de hele wereld.'
 ];
-$('#adem').textContent = '💛 ' + ADEM[Math.floor(Date.now() / 86400000) % ADEM.length];
+$('#adem').textContent = '' + ADEM[Math.floor(Date.now() / 86400000) % ADEM.length];
 
 let B = null, mijnGezin = [];
 function toonBoek(d){
@@ -149,7 +149,7 @@ function toonBoek(d){
   $('#kInstel').hidden = ingesteld;
   $('#vBoek').hidden = !ingesteld;
   if (!ingesteld) return;
-  $('#bNaam').textContent = '🧸 ' + d.kindNaam;
+  $('#bNaam').textContent = '' + d.kindNaam;
   $('#bLeeftijd').textContent = d.leeftijd ? d.leeftijd + ' oud' : '';
   $('#cVandaag').textContent = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
   $('#cTekst').placeholder = 'Wat deed ' + d.kindNaam + ' vandaag?';
@@ -163,7 +163,7 @@ function toonBoek(d){
       '<div class="kaart moment">' +
       (e.foto ? '<img src="' + esc(e.foto) + '" alt="Foto van ' + esc(d.kindNaam) + '" loading="lazy">' : '') +
       (e.tekst ? '<div class="tk">' + esc(e.tekst) + '</div>' : '') +
-      '<div class="wie"><span>' + esc(e.avatar || '🙂') + '</span><span>' + esc(e.van) + '</span>' +
+      '<div class="wie"><span>' + esc(e.avatar || '') + '</span><span>' + esc(e.van) + '</span>' +
       (e.magWeg ? '<button class="mini weg" data-weg="' + e.id + '" title="Dit momentje weghalen">✕</button>' : '') +
       '</div></div>').join('') + '</div>').join('')
     : '<div class="leeg">Nog geen momentjes. Vandaag is een mooie dag om te beginnen.</div>';
@@ -232,10 +232,10 @@ $('#gDoe').addEventListener('click', async () => {
 });
 $('#gNaam').addEventListener('keydown', e => { if (e.key === 'Enter') $('#gDoe').click(); });
 $('#mDoe').addEventListener('click', async () => {
-  $('#mFout').textContent = ''; $('#mDoe').disabled = true; $('#mDoe').textContent = '✨ Even denken…';
+  $('#mFout').textContent = ''; $('#mDoe').disabled = true; $('#mDoe').textContent = 'Even denken…';
   try { const r = await api('moment-ai'); toonMomenten(r.momenten); }
   catch (e) { $('#mFout').textContent = e.message; }
-  $('#mDoe').disabled = false; $('#mDoe').textContent = '✨ Bedenk momenten voor ons gezin';
+  $('#mDoe').disabled = false; $('#mDoe').textContent = 'Bedenk momenten voor ons gezin';
 });
 
 /* de buddy als kraam- en babycoach, voor de ouder zelf */

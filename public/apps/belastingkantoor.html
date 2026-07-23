@@ -71,7 +71,7 @@
   <div id="app" hidden>
     <div class="kpis" id="kpis"></div>
     <div class="ai">
-      <h3>🎩 Chef-inspecteur (Rahul)</h3>
+      <h3>Chef-inspecteur (Rahul)</h3>
       <div class="rij" style="margin-top:0;">
         <input class="veld" id="aiV" style="flex:1;min-width:12rem;" placeholder="Bijv. wat pak ik vandaag als eerste op?">
         <button class="knop" id="aiK">Vraag</button>
@@ -79,12 +79,12 @@
       <div class="uit" id="aiA">Adviserend, nooit beslissend: elke herinnering, regeling of kwijtschelding blijft uw handtekening.</div>
     </div>
     <div class="ai" style="border-color:var(--line);background:none;">
-      <h3>🗄️ Documentenuitgifte</h3>
+      <h3>Documentenuitgifte</h3>
       <div class="rij" style="margin-top:0;">
         <select class="veld" id="ugBron"><option value="aanslagen">Alle belastingaanslagen</option><option value="bezwaren">Alle bezwaren</option></select>
         <select class="veld" id="ugOgen"><option value="4">4 ogen (2 pers.)</option><option value="6">6 ogen (3 pers.)</option></select>
         <input class="veld" id="ugDoel" placeholder="Doel, bijv. harde schijf archief" style="flex:1;min-width:9rem;">
-        <button class="knop" id="ugStart">⬇ Start</button>
+        <button class="knop" id="ugStart">Start</button>
       </div>
       <div class="uit" style="margin-top:.3rem;">Naar oude apparatuur of een harde schijf, altijd met het vier- of zes-ogenprincipe: een andere ambtenaar logt in en tekent mee. De bundel komt een keer vrij.</div>
       <div id="ugLijst"></div>
@@ -238,8 +238,8 @@ async function laadUitgifte(){
       '<div class="item" style="margin-top:.5rem;"><h4>'+esc(u.code)+' · '+esc(u.bronLabel)+' <small style="color:var(--soft);font-family:Inter;">'+u.ogen+' ogen · '+esc(u.doel)+'</small></h4>'+
       '<div class="meta">Getekend: '+u.handtekeningen.map(h=>esc(h.door)).join(' + ')+'</div>'+
       '<div class="rij">'+
-      (u.status==='wacht-op-ogen' ? '<button class="knop stil" data-ugt="'+u.id+'">✍ Teken mee (nog '+u.nogNodig+')</button>'
-        : u.status==='vrijgegeven' ? '<button class="knop" data-ugd="'+u.id+'">⬇ Overschrijven naar de schijf</button>'
+      (u.status==='wacht-op-ogen' ? '<button class="knop stil" data-ugt="'+u.id+'">Teken mee (nog '+u.nogNodig+')</button>'
+        : u.status==='vrijgegeven' ? '<button class="knop" data-ugd="'+u.id+'">Overschrijven naar de schijf</button>'
         : '<span class="status ok">overgeschreven</span>')+'</div></div>').join('') || '';
     $('#ugLijst').querySelectorAll('[data-ugt]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/overheid/uitgifte/teken', { id: b.dataset.ugt }); meld('Getekend.'); laadUitgifte(); } catch(e){ meld(e.message); } }));

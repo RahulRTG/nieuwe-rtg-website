@@ -108,7 +108,7 @@ async function vOverzicht(){
     + stat(euro(d.bezittingenWaarde), 'Registerwaarde')
     + '</div>'
     + '<div class="kaart"><h2>Attentiepunten</h2><div class="sub">Wat binnenkort uw aandacht vraagt in het bezittingenregister.</div>'
-    + (att.length ? att.map(a=>'<div class="att'+(a.verlopen?'':' ok')+'">'+(a.verlopen?'⚠ ':'• ')+esc(a.naam)+' - '+esc(a.soort)+' '+(a.verlopen?'verlopen op ':'op ')+datum(a.datum)+'</div>').join('') : '<div class="leeg">Niets dat op korte termijn uw aandacht vraagt.</div>')
+    + (att.length ? att.map(a=>'<div class="att'+(a.verlopen?'':' ok')+'">'+(a.verlopen?'':'• ')+esc(a.naam)+' - '+esc(a.soort)+' '+(a.verlopen?'verlopen op ':'op ')+datum(a.datum)+'</div>').join('') : '<div class="leeg">Niets dat op korte termijn uw aandacht vraagt.</div>')
     + '</div>'
     + '<div class="kaart"><h2>Vraag De Rechterhand</h2><div class="sub">Rahul kijkt met u mee, regelt en noteert - en bevestigt pas als iets echt rond is.</div>'
     + '<div class="rij"><div style="flex:1;"><input class="veld" id="aiV" placeholder="Waarmee kan ik u van dienst zijn?"></div><button class="knop" id="aiK">Vraag</button></div>'

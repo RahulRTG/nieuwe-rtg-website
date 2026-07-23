@@ -73,7 +73,7 @@
   <a href="/apps/app.html" aria-label="Terug naar de leden-app">←</a>
   <h1>Clips</h1>
   <span class="rek"></span>
-  <button class="knop" id="studioOpen" type="button">✚ Maak een clip</button>
+  <button class="knop" id="studioOpen" type="button">Maak een clip</button>
 </header>
 
 <main id="feed" aria-label="De dagselectie van vandaag"></main>
@@ -172,7 +172,7 @@
           c.volgIk = !c.volgIk; vb.textContent = c.volgIk ? '✓ Volgend' : '+ Volg';
         });
       }
-      maakKnop('💬 ' + c.reacties, '', () => openReacties(c));
+      maakKnop('' + c.reacties, '', () => openReacties(c));
       if (c.mijn) maakKnop('Weg', 'rood', async () => {
         const r2 = await api('weg', { id: c.id });
         if (r2.body.error) return zeg(r2.body.error);

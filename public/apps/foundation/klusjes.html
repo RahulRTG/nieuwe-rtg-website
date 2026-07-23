@@ -41,11 +41,11 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🧹 Klusjes en sterren</h1>
+  <h1>Klusjes en sterren</h1>
   <div class="intro" id="intro">Help mee in huis en verdien sterren. Samen zorgen we voor elkaar, en jij wordt er sterker en trotser van.</div>
 
   <div class="kaart blok" id="rangBlok">
-    <h2>⭐ Sterren van het gezin</h2>
+    <h2>Sterren van het gezin</h2>
     <div class="ranglijst" id="ranglijst"><div class="leeg">Nog geen sterren verdiend.</div></div>
   </div>
 
@@ -76,7 +76,7 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 let magBeheren=false, mijnId='';
 
-for (let i=1;i<=10;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i+' ⭐'; $('#kSterren').appendChild(o); }
+for (let i=1;i<=10;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i+' '; $('#kSterren').appendChild(o); }
 
 async function laad(){
   try{
@@ -86,7 +86,7 @@ async function laad(){
     if (!magBeheren) $('#intro').textContent = 'Help mee in huis en verdien sterren! Tik een klusje aan als je het gedaan hebt; een ouder keurt het goed en de sterren zijn van jou.';
     // ranglijst
     $('#ranglijst').innerHTML = (d.sterren && d.sterren.length)
-      ? d.sterren.map(x=> '<div class="ster"><span class="av" style="background:'+x.kleur+'">'+x.avatar+'</span><span class="nm">'+esc(x.naam)+'</span><span class="aantal">'+x.sterren+' ⭐</span></div>').join('')
+      ? d.sterren.map(x=> '<div class="ster"><span class="av" style="background:'+x.kleur+'">'+x.avatar+'</span><span class="nm">'+esc(x.naam)+'</span><span class="aantal">'+x.sterren+' </span></div>').join('')
       : '<div class="leeg">Nog geen sterren verdiend. Begin met een klusje!</div>';
     // klussen
     const box = $('#klussen');
@@ -100,7 +100,7 @@ async function laad(){
         if (magBeheren) acties = '<button class="knop groen klein" data-keur="'+k.id+'">Goedkeuren</button><button class="knop grijs klein" data-afkeur="'+k.id+'">Nog niet</button>';
       } else if (k.status==='goedgekeurd'){ acties = '<span class="wachtlabel">✓ '+esc(k.door||'')+'</span>'; }
       const del = magBeheren ? '<button class="knop grijs klein" data-del="'+k.id+'">×</button>' : '';
-      return '<div class="klus '+k.status+'"><span class="tk"><b>'+esc(k.titel)+'</b><span>voor '+esc(k.voorNaam)+'</span></span><span class="pts">'+k.sterren+' ⭐</span><span class="knoppen">'+acties+del+'</span></div>';
+      return '<div class="klus '+k.status+'"><span class="tk"><b>'+esc(k.titel)+'</b><span>voor '+esc(k.voorNaam)+'</span></span><span class="pts">'+k.sterren+' </span><span class="knoppen">'+acties+del+'</span></div>';
     }).join('');
     box.querySelectorAll('[data-gedaan]').forEach(b=> b.onclick=()=> doe('/gezin/klus/gedaan', { klusId:b.dataset.gedaan }));
     box.querySelectorAll('[data-keur]').forEach(b=> b.onclick=()=> doe('/gezin/klus/keur', { klusId:b.dataset.keur, goed:true }));

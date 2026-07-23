@@ -99,7 +99,7 @@ async function ontdek(){
       +(k.zoekt?'<div class="note">Zoekt: '+esc(k.zoekt)+'</div>':'')
       +'<div style="margin-top:.4rem;">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'
       +(k.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">U staat allebei open voor: '+k.gedeeldeLocaties.map(esc).join(', ')+'</div>':'')
-      +'<div class="acts">'+(isMatch?'':'<button class="knop stil" data-pas="'+k.id+'">Overslaan</button><button class="knop hart" data-like="'+k.id+'">♥ Leuk</button>')+(isMatch?'<button class="knop" data-ga="1">Ga naar Matches</button>':'')+'</div></div>';
+      +'<div class="acts">'+(isMatch?'':'<button class="knop stil" data-pas="'+k.id+'">Overslaan</button><button class="knop hart" data-like="'+k.id+'">Leuk</button>')+(isMatch?'<button class="knop" data-ga="1">Ga naar Matches</button>':'')+'</div></div>';
   }).join('');
   $('#main').innerHTML=h;
   document.querySelectorAll('[data-like]').forEach(b=> b.onclick=async()=>{ try{ const r=await api('like',{id:b.dataset.like}); meld(r.match?'Het is een match! Bekijk Matches.':'Uw like is verstuurd.'); laad(); }catch(e){ meld(e.message); } });
@@ -112,7 +112,7 @@ async function matches(){
   if(!d.matches.length){ $('#main').innerHTML='<div class="leeg">Nog geen matches. Like iemand bij Ontdek; is het wederzijds, dan verschijnt de match hier.</div>'; return; }
   let h=d.matches.map(m=>'<div class="kaart match"><div class="nm" style="font-family:Bodoni Moda,serif;font-size:1.15rem;">'+esc(m.codenaam)+'</div>'
     +(m.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">Gedeelde locaties: '+m.gedeeldeLocaties.map(esc).join(', ')+'</div>':'<div class="note">Nog geen gedeelde locatie. Vul locaties aan bij Profiel.</div>')
-    +'<div style="margin-top:.7rem;"><button class="knop hart" data-date="'+m.id+'">✨ Stel een jetset-date voor</button></div>'
+    +'<div style="margin-top:.7rem;"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button></div>'
     +'<div class="datebox" id="date-'+m.id+'" style="display:none;"></div></div>').join('');
   $('#main').innerHTML=h;
   document.querySelectorAll('[data-date]').forEach(b=> b.onclick=async()=>{ const box=$('#date-'+b.dataset.date); box.style.display='block'; box.textContent='Rahul denkt na…'; try{ const r=await api('date',{id:b.dataset.date}); box.textContent=r.antwoord; }catch(e){ box.textContent=e.message; } });

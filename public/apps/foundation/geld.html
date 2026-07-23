@@ -42,7 +42,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>💶 Geldmaatje</h1>
+  <h1>Geldmaatje</h1>
 
   <div class="kaart blok">
     <h2>Ons spaarpotje</h2>
@@ -93,7 +93,7 @@ async function laadDoelen(){
       return '<div class="doel'+(x.klaar?' klaar':'')+'">'+
         '<div class="kop"><span class="naam">'+esc(x.naam)+'</span><span class="bedrag">'+euro(x.nu)+' / '+euro(x.doel)+'</span></div>'+
         '<div class="balk"><i style="width:'+pct+'%"></i></div>'+
-        (x.klaar ? '<div class="klaarbadge">🎉 Gehaald! Wat een teamwork.</div>' :
+        (x.klaar ? '<div class="klaarbadge">Gehaald! Wat een teamwork.</div>' :
         '<div class="acties"><input class="veld klein" data-b="'+x.id+'" inputmode="decimal" placeholder="€ erbij"><button class="knop klein" data-add="'+x.id+'">Erbij</button>'+
         (Sessie.isBeheerder()?'<button class="knop grijs klein" data-del="'+x.id+'">Weg</button>':'')+'</div>')+
         '</div>';
@@ -115,7 +115,7 @@ $('#dMaak').onclick = async ()=>{
   try{ await api('/gezin/spaardoel/maak', { code:s.code, token:s.token, naam:$('#nDoel').value, doel }); $('#nDoel').value=''; $('#nBedrag').value=''; laadDoelen(); }
   catch(e){ $('#dFout').textContent = e.message; }
 };
-function vier(){ try{ if(navigator.vibrate) navigator.vibrate([60,40,60]); }catch(e){} alert('🎉 Jullie hebben het gehaald! Zet gerust een nieuw doel; jullie kunnen dit.'); }
+function vier(){ try{ if(navigator.vibrate) navigator.vibrate([60,40,60]); }catch(e){} alert('Jullie hebben het gehaald! Zet gerust een nieuw doel; jullie kunnen dit.'); }
 
 async function tip(){ try{ const d = await fetch('/api/foundation/bespaartip').then(r=>r.json()); $('#tip').textContent = d.tip; $('#nogTip')._nog = d.nog; }catch(e){} }
 $('#nogTip').onclick = ()=>{ if($('#nogTip')._nog){ $('#tip').textContent = $('#nogTip')._nog; } tip(); };

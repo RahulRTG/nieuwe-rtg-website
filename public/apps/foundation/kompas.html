@@ -30,7 +30,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🧭 Kompas</h1>
+  <h1>Kompas</h1>
   <p class="intro">Voor alles waar je mee rondloopt: school, vrienden, thuis, online, of gewoon jij. Praat met je buddy of pak een onderwerp; niks is te klein of te raar.</p>
 
   <div class="kaart blok">
@@ -39,12 +39,12 @@
 
   <div class="kaart blok">
     <div class="thema" id="thema">
-      <button data-t="Iedereen in mijn klas doet iets en ik eigenlijk niet, maar ik wil er wel bij horen.">👥 Groepsdruk</button>
-      <button data-t="Ik zit best veel op mijn telefoon en vergelijk mezelf met anderen online.">📱 Online en schermtijd</button>
-      <button data-t="Ik heb stress om school en toetsen en weet niet waar ik moet beginnen.">📚 Schoolstress</button>
-      <button data-t="Thuis is er vaak ruzie of gedoe en daar baal ik van.">🏠 Thuis</button>
-      <button data-t="Ik voel me best onzeker over mezelf de laatste tijd.">🌪️ Onzeker</button>
-      <button data-t="Er is iemand die ik heel leuk vind en ik weet niet wat ik moet doen.">💘 Verliefd</button>
+      <button data-t="Iedereen in mijn klas doet iets en ik eigenlijk niet, maar ik wil er wel bij horen.">Groepsdruk</button>
+      <button data-t="Ik zit best veel op mijn telefoon en vergelijk mezelf met anderen online.">Online en schermtijd</button>
+      <button data-t="Ik heb stress om school en toetsen en weet niet waar ik moet beginnen.">Schoolstress</button>
+      <button data-t="Thuis is er vaak ruzie of gedoe en daar baal ik van.">Thuis</button>
+      <button data-t="Ik voel me best onzeker over mezelf de laatste tijd.">Onzeker</button>
+      <button data-t="Er is iemand die ik heel leuk vind en ik weet niet wat ik moet doen.">Verliefd</button>
     </div>
     <div class="chat" id="chat"><div class="b ai">Hoi, goed dat je er bent. Vertel maar wat er speelt, of tik hierboven een onderwerp aan. Wat je typt wordt niet bewaard en niemand van je gezin leest mee.</div></div>
     <div class="rijveld">
@@ -80,7 +80,7 @@ const VRAGEN = [
   'Wat wil je deze week een keer durven?',
   'Van wie of wat krijg jij energie, en wanneer deed je dat voor het laatst?'
 ];
-$('#dagvraag').textContent = '💭 ' + VRAGEN[Math.floor(Date.now() / 86400000) % VRAGEN.length];
+$('#dagvraag').textContent = '' + VRAGEN[Math.floor(Date.now() / 86400000) % VRAGEN.length];
 
 /* de thema-knoppen zetten een eerlijke openingszin klaar; versturen doe je zelf */
 document.querySelectorAll('#thema button').forEach(b => b.addEventListener('click', () => {

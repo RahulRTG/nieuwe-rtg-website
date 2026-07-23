@@ -92,7 +92,7 @@
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
-  const IC = { pas: '🪪', ticket: '🎟️', sleutel: '🔑', munt: '🪙', klantenkaart: '💳' };
+  const IC = { pas: '', ticket: '', sleutel: '', munt: '', klantenkaart: '' };
 
   function toon(item){
     $('#toonTitel').textContent = item.titel;

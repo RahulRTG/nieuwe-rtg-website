@@ -59,7 +59,7 @@ const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',header
 const euro=c=>'€ '+Number(c||0).toLocaleString('nl-NL');
 const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; };
-const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag de vlootbeheerder</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+const AIBOX=app=>'<div class="kaart"><h2>Vraag de vlootbeheerder</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 let open=null;
 async function laad(){
@@ -67,7 +67,7 @@ async function laad(){
   let d; try{ d=await api('logboek'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Logboek is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het logboek niet laden.</div>'; return; }
   if(open){ const o=d.objecten.find(x=>x.id===open); if(o) return detail(d,o); open=null; }
   let h='';
-  if(d.attenties.length){ h+='<div class="attn"><h2>⏳ Vraagt aandacht</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.object)+'</b> · '+esc(a.wat)+' · '+(a.verlopen?'verlopen':'vóór')+' '+dt(a.volgende)+'</div>').join('')+'</div>'; }
+  if(d.attenties.length){ h+='<div class="attn"><h2>Vraagt aandacht</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.object)+'</b> · '+esc(a.wat)+' · '+(a.verlopen?'verlopen':'vóór')+' '+dt(a.volgende)+'</div>').join('')+'</div>'; }
   h+='<div class="kaart"><h2>Object toevoegen</h2><div class="rij"><input class="veld" id="oN" placeholder="naam"><select class="veld" id="oS">'+d.soorten.map(s=>'<option>'+s+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="oM" placeholder="merk"><input class="veld" id="oB" type="number" placeholder="bouwjaar"><input class="veld" id="oR" placeholder="registratie"></div><div style="margin-top:.6rem;"><button class="knop" id="oAdd">+ object</button></div></div>';
   h+= d.objecten.length ? d.objecten.map(o=>'<div class="kaart obj" data-id="'+o.id+'"><div class="nm">'+esc(o.naam)+'</div><div class="meta">'+[o.soort,o.merk,o.bouwjaar,o.regelAantal+' regels',euro(o.kosten)].filter(Boolean).join(' · ')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen objecten in het logboek.</div></div>';
   h+=AIBOX('Bijv. wat staat er dit kwartaal op de planning?');

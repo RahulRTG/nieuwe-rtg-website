@@ -50,7 +50,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>☀️ Ochtendritme</h1>
+  <h1>Ochtendritme</h1>
   <div class="intro">Een rustig ochtendlijstje dat elke dag weer op nul begint. Vink af wat je gedaan hebt; wie alles rondkrijgt houdt een reeks bij. Geen druk - gewoon een fijn begin van de dag.</div>
 
   <div class="kaart blok">
@@ -95,7 +95,7 @@ async function laad(){
     if (d.error) throw new Error(d.error);
     // mijn reeks
     $('#mijnReeks').innerHTML = d.mijn.reeks > 0
-      ? '🔥 <b>'+d.mijn.reeks+'</b> '+(d.mijn.reeks===1?'dag':'dagen')+(d.mijn.record>d.mijn.reeks?' · record '+d.mijn.record:'')
+      ? '<b>'+d.mijn.reeks+'</b> '+(d.mijn.reeks===1?'dag':'dagen')+(d.mijn.record>d.mijn.reeks?' · record '+d.mijn.record:'')
       : '';
     // mijn stappen
     if (!d.mijn.stappen.length){ $('#mijnStappen').innerHTML = '<div class="leeg">Nog geen stappen. Tik hieronder een voorbeeld aan of typ je eerste stap.</div>'; }
@@ -115,7 +115,7 @@ async function laad(){
       rij.querySelector('[data-del]').onclick = ()=> doe('/gezin/ochtend/stap/verwijder', { stapId:id }, true);
     });
     // klaar-vlag
-    $('#klaarVlag').innerHTML = d.mijn.klaar ? '<div class="klaar-vlag">✨ Helemaal klaar voor vandaag. Fijne dag!</div>' : '';
+    $('#klaarVlag').innerHTML = d.mijn.klaar ? '<div class="klaar-vlag">Helemaal klaar voor vandaag. Fijne dag!</div>' : '';
     // voorbeelden (alleen die nog niet in mijn ritme staan)
     const heb = new Set(d.mijn.stappen.map(x=>x.tekst.toLowerCase()));
     $('#voorbeelden').innerHTML = d.voorbeelden.filter(v=>!heb.has(v.toLowerCase()))
@@ -128,7 +128,7 @@ async function laad(){
       '<div class="bordrij">'
       + '<span class="naam">'+esc(b.naam)+(b.pid===d.mijnId?' <span class="meta">(jij)</span>':'')+'</span>'
       + '<span class="meta">'+ (b.heeftRitme ? (b.klaar ? '<span class="vinkje">✓ klaar</span>' : b.gedaan+'/'+b.totaal) : 'geen ritme') +'</span>'
-      + (b.reeks>0?'<span class="rk">🔥 '+b.reeks+'</span>':'')
+      + (b.reeks>0?'<span class="rk">'+b.reeks+'</span>':'')
       + '</div>'
     ).join('') || '<div class="leeg">Nog niemand met een ochtendritme.</div>';
     // kinderen (ouder/beheerder)

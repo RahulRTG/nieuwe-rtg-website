@@ -62,7 +62,7 @@
       <input class="veld" id="mAppZoek" maxlength="60" placeholder="Zoek in de School-, App- en Reis-Bibliotheek…">
       <div class="appkeus" id="mApps"></div>
       <div class="rij" style="margin-top:.9rem;">
-        <button class="knop" id="mGo">✨ Maak de les</button>
+        <button class="knop" id="mGo">Maak de les</button>
         <span class="stil2" id="mStatus"></span>
       </div>
     </div>
@@ -149,7 +149,7 @@ function teken(){
   } else { $('#lVraag').hidden = true; $('#lBalken').hidden = true; }
   const s = LES.stand || [];
   $('#lStand').innerHTML = s.length
-    ? (klaar ? '<h3 style="margin:.4rem 0;">🏆 Het podium</h3>' : '<div class="lbl">Tussenstand</div>')+
+    ? (klaar ? '<h3 style="margin:.4rem 0;">Het podium</h3>' : '<div class="lbl">Tussenstand</div>')+
       s.slice(0,10).map((x,i) => (i+1)+'. '+esc(x.naam)+' · <span>'+x.score+'</span> punten').join('<br>')
     : '<p class="leeg">Nog geen kinderen; deel de klascode.</p>';
 }

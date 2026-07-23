@@ -129,7 +129,7 @@
   <div class="wrap">
     <div class="brand"><span class="merkvlak">Rahul Travel Group</span><small>Backoffice · <a href="/apps/kantoren.html" style="color:var(--gold);text-decoration:none;">De kantoren →</a></small></div>
     <span style="display:flex;align-items:center;gap:0.8rem;">
-      <a href="/apps/techniek.html" title="Technische status (beveiligd)" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:0.28rem 0.7rem;">🔧 Techniek</a>
+      <a href="/apps/techniek.html" title="Technische status (beveiligd)" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:0.28rem 0.7rem;">Techniek</a>
       <span class="live" id="liveInd" style="display:none;"><span class="dot"></span>Live</span>
     </span>
   </div>
@@ -150,7 +150,7 @@
     <div class="stat" id="stat"></div>
     <div class="zoekbar"><input id="zoekInp" placeholder="Zoek op gast, partner, referentie of plaats…" data-i18n-ph="bo.zoekph" autocomplete="off"></div>
     <div class="panel" style="margin-bottom:1.5rem;">
-      <h2 class="ph"><span>🎯 <span data-i18n="panel.actie">Actiecentrum</span></span><button class="hbtn" id="briefBtn">📋 <span data-i18n="bo.brief">Dagbriefing</span></button></h2>
+      <h2 class="ph"><span><span data-i18n="panel.actie">Actiecentrum</span></span><button class="hbtn" id="briefBtn"><span data-i18n="bo.brief">Dagbriefing</span></button></h2>
       <div class="brief" id="briefBox"></div>
       <div class="rows" id="alertList"></div>
     </div>
@@ -174,7 +174,7 @@
         <div class="rows" id="prices"></div>
       </div>
       <div class="panel">
-        <h2 class="ph"><span><span data-i18n="panel.orders">Bestellingen &amp; ritten</span> <span id="tlTot" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--soft);"></span></span><button class="hbtn" id="csvBtn">⬇ <span data-i18n="bo.csv">CSV</span></button></h2>
+        <h2 class="ph"><span><span data-i18n="panel.orders">Bestellingen &amp; ritten</span> <span id="tlTot" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--soft);"></span></span><button class="hbtn" id="csvBtn"><span data-i18n="bo.csv">CSV</span></button></h2>
         <div class="rows" id="orders"></div>
         <div id="tlPager" style="display:none;align-items:center;justify-content:center;gap:0.9rem;padding:0.7rem;border-top:1px solid var(--line);">
           <button class="hbtn" id="tlPrev">‹</button>
@@ -206,18 +206,18 @@
       </div>
     </div>
     <div class="panel" style="margin-top:1.5rem;">
-      <h2>🌟 <span data-i18n="panel.ontmoet">Salon-ontmoetingen (veiligheid)</span></h2>
+      <h2><span data-i18n="panel.ontmoet">Salon-ontmoetingen (veiligheid)</span></h2>
       <p class="sub" data-i18n="panel.ontmoet.sub" style="margin:0 0 0.6rem;">Lopende afspraken met live-locatie. Bij een SOS kijkt u mee via de camera en belt u 112.</p>
       <div class="rows" id="ontmoetOffice"></div>
     </div>
     <div class="panel" style="margin-top:1.5rem;">
-      <h2>🤝 <span data-i18n="panel.trust">Vertrouwenslijn</span></h2>
+      <h2><span data-i18n="panel.trust">Vertrouwenslijn</span></h2>
       <div class="rows" id="trustList"></div>
     </div>
     <div id="ontLiveScrim" class="scrim" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;align-items:center;justify-content:center;">
       <div style="width:min(94vw,640px);background:#111;border:1px solid var(--gold);border-radius:16px;padding:1rem;">
         <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;">
-          <b style="flex:1;font-size:0.95rem;">🚨 <span id="ontLiveNaam">SOS</span></b>
+          <b style="flex:1;font-size:0.95rem;"><span id="ontLiveNaam">SOS</span></b>
           <a id="ontBel112" href="tel:112" style="background:#c62828;color:#fff;border-radius:999px;padding:0.4rem 0.9rem;font-weight:700;text-decoration:none;">Bel 112</a>
           <button id="ontLiveClose" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.8rem;color:var(--soft);cursor:pointer;">Sluiten</button>
         </div>

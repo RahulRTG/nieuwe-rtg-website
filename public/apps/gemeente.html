@@ -75,7 +75,7 @@
       <div class="lbl">Locatie (optioneel)</div>
       <input class="veld" id="meldLoc" maxlength="120" placeholder="Straat of plek">
       <div style="margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
-        <button class="knop stil" id="meldGps" type="button" style="width:auto;">📍 Gebruik mijn locatie</button>
+        <button class="knop stil" id="meldGps" type="button" style="width:auto;">Gebruik mijn locatie</button>
         <span id="meldGpsUit" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
       <button class="knop" id="meldGo" style="margin-top:.8rem;">Melding versturen</button>
@@ -194,7 +194,7 @@ $('#meldGps').addEventListener('click', () => {
   if (!navigator.geolocation){ meld('Locatie wordt niet ondersteund op dit toestel.'); return; }
   $('#meldGpsUit').textContent = 'Locatie zoeken…';
   navigator.geolocation.getCurrentPosition(
-    p => { meldPos = { lat: p.coords.latitude, lng: p.coords.longitude }; $('#meldGpsUit').textContent = '📍 Locatie vastgelegd (' + meldPos.lat.toFixed(4) + ', ' + meldPos.lng.toFixed(4) + ')'; },
+    p => { meldPos = { lat: p.coords.latitude, lng: p.coords.longitude }; $('#meldGpsUit').textContent = 'Locatie vastgelegd (' + meldPos.lat.toFixed(4) + ', ' + meldPos.lng.toFixed(4) + ')'; },
     () => { meldPos = null; $('#meldGpsUit').textContent = 'Kon locatie niet bepalen · vul hierboven een plek in.'; },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
   );
@@ -306,7 +306,7 @@ async function laadBekend(){
   $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Geen bekendmakingen.</div>';
 }
 </script>
-<button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
+<button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
   <div class="rahulsug" id="rahulSug"></div>

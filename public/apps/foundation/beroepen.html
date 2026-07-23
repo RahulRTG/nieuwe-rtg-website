@@ -38,13 +38,13 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🧰 Beroepen-Bibliotheek</h1>
+  <h1>Beroepen-Bibliotheek</h1>
   <p class="intro">Twee miljoen leer-apps over echte beroepen: een miljoen voor technische en agrarische vakken en een miljoen voor het bedrijfsleven. Van verkenner tot grootmeester, en hier altijd gratis.</p>
-  <div class="wijs">🌱 <b>Een vak leren is goud waard:</b> kies een beroep dat je leuk lijkt en begin gewoon bij het leerpad. Met je handen of met je hoofd; allebei is even knap.</div>
+  <div class="wijs"><b>Een vak leren is goud waard:</b> kies een beroep dat je leuk lijkt en begin gewoon bij het leerpad. Met je handen of met je hoofd; allebei is even knap.</div>
 
   <div class="werelden" role="group" aria-label="Kies een wereld">
-    <button class="wereld aan" data-w="techniek" type="button">🛠️ Technisch &amp; agrarisch<small>1.000.000 apps · 100 beroepen</small></button>
-    <button class="wereld" data-w="zaken" type="button">💼 Bedrijfsleven<small>1.000.000 apps · 100 beroepen</small></button>
+    <button class="wereld aan" data-w="techniek" type="button">Technisch &amp; agrarisch<small>1.000.000 apps · 100 beroepen</small></button>
+    <button class="wereld" data-w="zaken" type="button">Bedrijfsleven<small>1.000.000 apps · 100 beroepen</small></button>
   </div>
   <div class="zoekrij">
     <select id="bbBeroep" class="veld" aria-label="Beroep"><option value="">Alle beroepen</option></select>
@@ -97,7 +97,7 @@ $('#bbMijn').addEventListener('click', () => { ST.mijn = !ST.mijn; ST.pagina = 1
 function kaart(a, heeft){
   return '<div class="kaart app"><span class="cat">'+a.icon+' '+esc(a.beroep)+' · '+esc(a.niveau)+'</span>'+
     '<b>'+esc(a.naam)+'</b>'+
-    '<small>'+esc(a.soort)+' · v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</small>'+
+    '<small>'+esc(a.soort)+' · v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</small>'+
     '<div class="rij"><s>€ '+(a.winkelwaardeCenten/100).toFixed(2).replace('.',',')+'</s><span class="gratis">Gratis</span>'+
     (heeft ? '<button class="knop stil bweg" data-id="'+esc(a.id)+'">Weg</button>'
            : '<button class="knop bin" data-id="'+esc(a.id)+'">Installeer</button>')+'</div></div>';

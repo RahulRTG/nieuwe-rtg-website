@@ -1,26 +1,20 @@
-  /* De poort is van Rahul: inloggen EN aanmelden als een gesprek. Rahul
-     ontdekt zelf of je terugkomt of nieuw bent, vraagt subtiel wat hij nodig
-     heeft en legt op "waarom?" uit waarvoor iets dient. Beide paden eindigen
-     op de bestaande routes: aanmelden via login() -> /auth/register, inloggen
-     via login() -> /auth/login; het wachtwoord van een terugkerend lid gaat
-     NOOIT door het gesprek maar rechtstreeks naar de inlogroute. In beeld:
-     de klok, de RTG-signatuurmond van bewegende lichtpuntjes, Rahuls zin
-     en de ene regel van de gebruiker.
-     Er is geen klassieke keuze: Rahul is de poort; de formulieren bestaan
-     alleen nog als vangnet voor wachtwoord-herstel. Deelt de
-     IIFE-scope met 00-kern-03.js (toReg, toForgot, login, API, T). */
+  /* De poort is van Rahul: inloggen, aanmelden EN wachtwoord-herstel als een
+     gesprek. Er zijn geen ouderwetse formulieren meer; Rahul is de enige poort.
+     Hij ontdekt zelf of je terugkomt of nieuw bent, vraagt subtiel wat hij
+     nodig heeft en legt op "waarom?" uit waarvoor iets dient. Alle paden
+     eindigen op de bestaande routes: aanmelden via login() -> /auth/register,
+     inloggen via login() -> /auth/login, herstel via /auth/reset. Het
+     wachtwoord van een terugkerend lid gaat NOOIT door het gespreks-endpoint
+     maar rechtstreeks naar de inlogroute. In beeld: de klok, Rahuls
+     signatuurmond van bewegende lichtpuntjes, zijn zin en de ene regel van de
+     gebruiker. Deelt de IIFE-scope met 00-kern-03.js (login, restoreSession,
+     API, T). */
   (function aanmeldGesprek(){
-    const loginFormEl = document.getElementById('loginForm');
-    const regForm = document.getElementById('regForm');
-    if (!regForm || !loginFormEl || !API.enabled) return;
-    const ouder = loginFormEl.parentNode;
+    const gate = document.getElementById('gate');
+    if (!gate || !API.enabled) return;
     const st = document.createElement('style');
     st.textContent =
-      // Rahul neemt de poort volledig over: geen formulieren en geen knoppen;
-      // wachtwoord-herstel regelt Rahul in het gesprek zelf
-      '.ag-over #loginForm,.ag-over #regForm,.ag-over #forgotForm,.ag-over #resetForm,.ag-over #toReg,.ag-over #toForgot,.ag-over #toLogin{display:none !important;}' +
-      '.ag-doos{display:none;flex-direction:column;width:100%;}' +
-      '.ag-over .ag-doos{display:flex;}' +
+      '.ag-doos{display:flex;flex-direction:column;width:100%;}' +
       // geen chatbubbels: alleen Rahuls zin, groot en stil in Bodoni, en
       // daaronder de ene regel van de gebruiker; verder niets
       ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:var(--txt);" +
@@ -42,8 +36,6 @@
 
     // een heel subtiele 3D-sterrenhemel over het hele inlogscherm, in RTG-stijl
     (function sterrenhemel(){
-      var gate = document.getElementById('gate');
-      if (!gate) return;
       var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { helderheid: 0.9 }); };
       if (window.RTGSterren) return hang();
       var s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
@@ -57,10 +49,9 @@
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
       '<div class="ag-rij"><input id="agIn" autocomplete="off" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>';
-    ouder.insertBefore(doos, loginFormEl);
-    // een wachtwoord-herstel-link uit de e-mail heeft voorrang op het gesprek
+    gate.appendChild(doos);
+    // een wachtwoord-herstel-link uit de e-mail (?reset=): Rahul regelt het herstel zelf
     const herstel = new URLSearchParams(location.search).get('reset');
-    if (!herstel) ouder.classList.add('ag-over');
 
     const zin = doos.querySelector('#agZin');
     const inp = doos.querySelector('#agIn');
@@ -141,11 +132,50 @@
       inp.type = 'text';
       inp.placeholder = T('ag.plho','Ik wil zeggen dat..');
     }
+
+    /* ---------- wachtwoord-herstel, geheel in het gesprek ----------
+       Rahul vraagt de zescijferige code (tweede kanaal, per SMS) en daarna het
+       nieuwe wachtwoord, en zet het via de bestaande /auth/reset-route (die de
+       herstel-link uit de e-mail plus de code samen eist). Daarna gaat het
+       gewone inloggesprek verder. */
+    let resetStap = 0, resetCode = '';
+    function resetStart(){
+      resetStap = 1;
+      inp.type = 'text'; inp.inputMode = 'numeric';
+      inp.placeholder = T('ag.reset.codeph','De zes cijfers');
+      zeg('rahul', T('ag.reset.hoi','Je stelt een nieuw wachtwoord in. Uit veiligheid stuurde ik een code van zes cijfers naar je telefoon. Wat is die code?'));
+    }
+    async function resetStuur(tekst){
+      if (resetStap === 1){
+        resetCode = tekst.replace(/\D/g, '').slice(0, 6);
+        if (resetCode.length !== 6){ zeg('rahul', T('ag.reset.code6','Het zijn zes cijfers; kijk nog even in het bericht op je telefoon.')); return; }
+        resetStap = 2;
+        wachtwoordVeld(T('ag.wwnieuw','Kies een wachtwoord'));
+        zeg('rahul', T('ag.reset.ww','Dank je. En wat wordt je nieuwe wachtwoord? Minstens zes tekens.'));
+      } else if (resetStap === 2){
+        if (tekst.length < 6){ zeg('rahul', T('ag.reset.ww6','Minstens zes tekens graag.')); return; }
+        try {
+          await API.call('/auth/reset', { token: herstel, code: resetCode, password: tekst });
+          resetStap = 3; resetCode = ''; tekstVeld(); inp.inputMode = 'text';
+          zeg('rahul', T('ag.reset.klaar','Klaar, je nieuwe wachtwoord staat. Zeg "inloggen" en ik laat je binnen.'));
+        } catch(e){
+          resetStap = 1; resetCode = ''; inp.type = 'text';
+          zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.reset.mis','Zeg "opnieuw" en dan proberen we het nog eens.'));
+        }
+      } else {
+        // klaar: over naar het gewone inloggesprek, ?reset uit de URL halen
+        resetStap = 0;
+        const pas = new URLSearchParams(location.search).get('pas');
+        try { history.replaceState(null, '', location.pathname + (pas ? '?pas=' + pas : '')); } catch(e){}
+        gesprek = null; start();
+      }
+    }
+
     async function start(){
       if (gesprek || bezig) return;
       bezig = true;
       try { const d = await API.call('/aanmeld/start', { lang: document.documentElement.lang || 'nl' }); gesprek = d.id; zeg('rahul', d.tekst); }
-      catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; de formulieren werken altijd.')); klassiek(); }
+      catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; zeg iets, dan probeer ik het opnieuw.')); gesprek = null; }
       bezig = false;
     }
     async function stuur(){
@@ -153,6 +183,8 @@
       if (!tekst || bezig) return;
       inp.value = '';
       inp.closest('.ag-rij').classList.remove('vol');
+      // wachtwoord-herstel loopt via zijn eigen kleine gesprek
+      if (resetStap){ bezig = true; try { await resetStuur(tekst); } catch(e){ zeg('rahul', e.message || T('ag.mis2','Dat ging even mis; zeg het nog eens.')); } bezig = false; inp.focus(); return; }
       bezig = true;
       try {
         // "opnieuw" en "wachtwoord vergeten" zijn commando's voor het gesprek,
@@ -207,18 +239,14 @@
       bezig = false;
       inp.focus();
     }
-    // er is GEEN klassieke keuze meer: Rahul is de poort. De formulieren
-    // bestaan alleen nog als vangnet: voor wachtwoord-herstel (de knop
-    // hieronder en de e-maillink) en als het gesprek zelf niet kan starten.
-    function klassiek(){
-      ouder.classList.remove('ag-over');
-    }
     doos.querySelector('#agGo').addEventListener('click', stuur);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); stuur(); } });
     inp.addEventListener('input', () => inp.closest('.ag-rij').classList.toggle('vol', !!inp.value.trim()));
-    // het gesprek begint vanzelf zodra duidelijk is dat er geen sessie ligt
+    // herstel-link uit de e-mail: Rahul begint meteen het herstel-gesprek.
+    // Anders begint het gewone gesprek zodra duidelijk is dat er geen sessie ligt.
     let onthouden = null;
     try { onthouden = localStorage.getItem('rtg_member_token'); } catch(e){}
-    if (!herstel && !onthouden) setTimeout(start, 400);
-    inp.addEventListener('focus', start, { once: true });
+    if (herstel) setTimeout(resetStart, 400);
+    else if (!onthouden) setTimeout(start, 400);
+    inp.addEventListener('focus', () => { if (!herstel && !resetStap) start(); }, { once: true });
   })();

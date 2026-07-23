@@ -1299,39 +1299,14 @@
 
   <!-- login -->
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
-    <!-- inlogscherm: de naam van de app, de klok en de datum; daaronder alleen
-         inloggen, aanmelden en wachtwoord vergeten. Na het inloggen opent uw
-         account vanzelf de juiste pas-app. -->
+    <!-- De poort is een gesprek met Rahul: geen ouderwetse formulieren. Boven
+         de klok, daaronder Rahuls signatuurmond, zijn zin en de ene regel van
+         de gebruiker. Inloggen, aanmelden en wachtwoord-herstel lopen allemaal
+         door het gesprek (00-kern-03b.js). Na afloop opent uw account vanzelf
+         de juiste pas-app. -->
     <div class="os-lock">
       <div class="os-lock-klok" id="gateKlok" data-rtg-klok="ring">--:--</div>
     </div>
-    <form class="login-form" id="loginForm">
-      <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
-      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
-      <button type="submit" data-i18n="gate.signin">Inloggen</button>
-    </form>
-    <form class="login-form" id="regForm" style="display:none;">
-      <div id="regKop" style="font-size:0.82rem;color:var(--muted);line-height:1.5;margin-bottom:0.2rem;"></div>
-      <input id="rgName" placeholder="Je naam" data-i18n-ph="gate.name" autocapitalize="words">
-      <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
-      <input id="rgPhone" type="tel" placeholder="Mobiel nummer" data-i18n-ph="gate.phone" autocomplete="tel">
-      <label style="display:block;font-size:0.68rem;color:var(--soft);margin:0.15rem 0 0.25rem;" data-i18n="gate.geb">Geboortedatum (zoals in je paspoort; lidmaatschap vanaf 15 jaar)</label>
-      <input id="rgGeb" type="date" autocomplete="bday">
-      <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
-      <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
-    </form>
-    <form class="login-form" id="forgotForm" style="display:none;">
-      <input id="fgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
-      <button type="submit" data-i18n="gate.sendreset">Stuur herstel-link</button>
-    </form>
-    <form class="login-form" id="resetForm" style="display:none;">
-      <input id="rsCode" inputmode="numeric" maxlength="6" placeholder="Code van je telefoon (6 cijfers)" data-i18n-ph="gate.smscode" autocomplete="one-time-code">
-      <input id="rsPass" type="password" placeholder="Nieuw wachtwoord" data-i18n-ph="gate.newpass2" autocomplete="new-password">
-      <button type="submit" data-i18n="gate.doreset">Stel nieuw wachtwoord in</button>
-    </form>
-    <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Aanmelden</button>
-    <button class="gate-switch" id="toForgot" type="button" data-i18n="gate.forgot">Wachtwoord vergeten?</button>
-    <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
   </div>
 
   <!-- verplichte onboarding + contract (blokkeert de app tot alles rond is) -->

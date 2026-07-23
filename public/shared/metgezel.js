@@ -38,7 +38,7 @@
   if (!eigenRahul && !document.getElementById('rahulFab')) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;
-    var fab = maakEl('<button class="mgz-knop mgz-rahul" type="button" aria-label="Vraag Rahul">✨ Rahul</button>');
+    var fab = maakEl('<button class="mgz-knop mgz-rahul" type="button" aria-label="Vraag Rahul">Rahul</button>');
     /* De signatuurmond als HET gezicht van Rahul: dezelfde lippen als op de
        voorpagina, klein op de knop, altijd in de buurt. De mond-tekenlaag
        (shared/mond.js) laden we er zelf bij; lukt dat niet, dan blijft de
@@ -50,7 +50,7 @@
       var s = document.createElement('script'); s.src = '/shared/mond.js'; s.onload = zet; document.head.appendChild(s);
     })();
     var sheet = maakEl('<section class="mgz-sheet" aria-label="Vraag Rahul" hidden>' +
-      '<div class="mgz-kop"><span>✨ Vraag het Rahul</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
+      '<div class="mgz-kop"><span>Vraag het Rahul</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
       '<div class="mgz-uit" aria-live="polite"></div>' +
       '<form class="mgz-rij"><input placeholder="Vraag of opdracht" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
     document.body.appendChild(fab); document.body.appendChild(sheet);

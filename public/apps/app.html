@@ -1196,13 +1196,20 @@
 
   /* -------- De Butler: de gouden orb in het midden van het dock -------- */
   .os-dock .os-app[data-tab="ai"]{margin-top:-14px;}
+  /* Rahul is het hart van het OS: de AI-knop in het dock is zijn signatuurmond
+     van bewegende lichtpuntjes (shared/mond.js), glimmend op een donkere ronde
+     bol met een gouden rand. Zo kijkt Rahul je overal aan. */
   .os-dock .os-app[data-tab="ai"] .os-tegel{
-    width:64px;height:64px;border-radius:50%;
-    background:radial-gradient(circle at 30% 25%, #E8CB6F, var(--gold) 55%, #6B570F);
-    border:1px solid rgba(255,255,255,0.25);
-    box-shadow:0 10px 26px rgba(169,143,28,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+    width:64px;height:64px;border-radius:50%;overflow:hidden;
+    background:radial-gradient(circle at 50% 42%, #211C17, #0C0C0B 72%);
+    border:1px solid rgba(201,162,75,0.55);
+    box-shadow:0 10px 26px rgba(0,0,0,0.5), 0 0 22px rgba(158,28,64,0.28), inset 0 1px 0 rgba(255,255,255,0.14);
   }
-  .os-dock .os-app[data-tab="ai"] svg{width:30px;height:30px;stroke:#1C1608;}
+  /* de lippen zijn fijn getekend; in de kleine bol zoomen we op het hart van de
+     mond in (de bol snijdt de zachte randen af) en tillen we ze wat op, zodat
+     Rahul ook op telefoonformaat duidelijk leest */
+  .os-dock .os-app[data-tab="ai"] .os-ai-mond{width:150%;height:auto;display:block;filter:brightness(1.28) saturate(1.08);}
+  .os-dock .os-app[data-tab="ai"] svg{width:30px;height:30px;stroke:#C9A24B;}
   .os-dock .os-app[data-tab="ai"].actief::after{background:var(--txt);}
 
   /* -------- de super grote tablet: op ruime schermen groeit het OS mee --------

@@ -21,13 +21,35 @@
     belScrim.classList.add('open');
   }
 
+  /* Rahuls signatuurmond als de AI-knop in het dock. Eén gedeeld canvas dat we
+     bij elke herbouw opnieuw in de bol hangen (de mond-lus hervat vanzelf zodra
+     hij weer in beeld is); de tekenlaag (shared/mond.js) laden we er zelf bij. */
+  var aiMondCv = null, aiMondBezig = false;
+  function aiMond() {
+    if (!aiMondCv) {
+      aiMondCv = document.createElement('canvas');
+      aiMondCv.width = 440; aiMondCv.height = 200;
+      aiMondCv.className = 'os-ai-mond'; aiMondCv.setAttribute('aria-hidden', 'true');
+      var mount = function () { if (window.RTGMond) RTGMond.maak(aiMondCv); };
+      if (window.RTGMond) mount();
+      else if (!aiMondBezig) {
+        aiMondBezig = true;
+        var s = document.createElement('script'); s.src = '/shared/mond.js'; s.async = true;
+        s.onload = mount; document.head.appendChild(s);
+      }
+    }
+    return aiMondCv;
+  }
+
   function maakAppIcoon(item, inDock) {
     const el = document.createElement('button');
     el.className = 'os-app'; el.dataset.sleutel = item;
     if (item.startsWith('tab:')) el.dataset.tab = item.slice(4);
     el.setAttribute('aria-label', itemNaam(item));
     const tegel = document.createElement('span'); tegel.className = 'os-tegel';
-    tegel.appendChild(tegelInhoud(item));
+    // de AI-knop in het dock IS Rahul: zijn signatuurmond (bewegende lichtpuntjes)
+    if (item === 'tab:ai' && inDock) tegel.appendChild(aiMond());
+    else tegel.appendChild(tegelInhoud(item));
     if (item.startsWith('tab:')) {
       const dot = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('span[id$="Dot"]');
       if (dot && dot.style.display !== 'none') { const b = document.createElement('span'); b.className = 'os-badge'; tegel.appendChild(b); }

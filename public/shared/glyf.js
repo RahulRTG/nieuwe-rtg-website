@@ -92,7 +92,7 @@
     el.setAttribute('viewBox', '0 0 24 24');
     el.setAttribute('fill', 'none');
     el.setAttribute('stroke', 'currentColor');
-    el.setAttribute('stroke-width', '1.4');
+    el.setAttribute('stroke-width', '1.6');
     el.setAttribute('stroke-linecap', 'round');
     el.setAttribute('stroke-linejoin', 'round');
     el.setAttribute('aria-hidden', 'true');

@@ -7,7 +7,12 @@
    - geen browser-tikflitsen, nette font-rendering,
    - de ene RTG-beweging (--rtg-ease) voor wie hem gebruikt,
    - en rust voor wie minder beweging wil. */
-:root{ --rtg-ease:cubic-bezier(0.22, 0.61, 0.21, 1); }
+:root{ --rtg-ease:cubic-bezier(0.22, 0.61, 0.21, 1); --rtg-stroke:1.6; }
+
+/* Eén lijndikte voor de hele familie: de gedeelde huisstijl-glyfen (shared/glyf.js)
+   erven de RTG-lijndikte, zodat elke sub-app exact hetzelfde icoon-gewicht toont.
+   Puur op de gedeelde iconenset; bespoke afbeeldingen (klok, mond) blijven vrij. */
+.rtg-glyf{ stroke-width:var(--rtg-stroke); }
 
 html{ -webkit-tap-highlight-color:transparent; }
 body{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }

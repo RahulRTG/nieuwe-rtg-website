@@ -147,6 +147,7 @@
       <button class="knop vol" type="submit">Stuur</button>
     </form>
     <h2>Kijkers</h2>
+    <p class="stil" style="margin-top:-0.3rem;">Uw uitzending draagt onbeperkt veel kijkers: elke kijker geeft het beeld door aan een paar volgende, dus u zendt zelf maar naar een handvol.</p>
     <div id="kijkerLijst"><p class="stil">Nog geen kijkers.</p></div>
   </section>
 
@@ -255,8 +256,68 @@
     for (const sel of ['#chatKijk', '#chatStudio']) { const el = $(sel); if (!el.closest('section').classList.contains('weg')) { el.appendChild(chatRegel(regel)); el.scrollTop = el.scrollHeight; } }
   }
 
-  /* ---------- kijken (WebRTC-kijkerkant) ---------- */
-  let kijkPc = null;
+  /* ---------- de relay-boom (WebRTC) ----------
+     Onbeperkt kijkers zonder mediaserver: de bron zendt naar een handvol
+     kijkers, en elke kijker geeft de ontvangen stream weer door aan een paar
+     volgende kijkers. Zo hoeft niemand meer dan FANOUT verbindingen te dragen.
+     Iedere knoop heeft dus twee kanten: één verbinding omhoog naar de ouder
+     (waar de stream binnenkomt) en een handvol omlaag naar de kinderen. */
+  let bronStream = null;             // wat ik doorgeef: de camera (maker) of de ontvangen stream (kijker)
+  const kinderPcs = new Map();       // kindKey -> RTCPeerConnection (naar wie ik doorgeef)
+  const wachtKinderen = new Map();   // kindKey -> kanaalId, kinderen die wachten tot ik zelf stream heb
+  let ouderPc = null, ouderKey = null;
+
+  // een nieuw kind toegewezen gekregen: bied aan zodra ik zelf een stream heb
+  function nieuwKind(kanaalId, kindKey) {
+    if (bronStream) serveerKind(kanaalId, kindKey);
+    else wachtKinderen.set(kindKey, kanaalId);
+  }
+  async function serveerKind(kanaalId, kindKey) {
+    let pc = kinderPcs.get(kindKey);
+    if (pc) { try { pc.close(); } catch (e) {} }
+    pc = new RTCPeerConnection({ iceServers: await haalIce() });
+    kinderPcs.set(kindKey, pc);
+    if (bronStream) for (const t of bronStream.getTracks()) pc.addTrack(t, bronStream);
+    pc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: kanaalId, doelKey: kindKey, kind: 'ice', payload: ev.candidate }); };
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    api('signaal', { id: kanaalId, doelKey: kindKey, kind: 'offer', payload: offer });
+  }
+  // mijn stream is er (of veranderde bij een herkoppeling): laat 'm zien als ik
+  // kijker ben, geef de nieuwe tracks door aan mijn kinderen, en bedien wachtenden
+  function zetBron(stream) {
+    bronStream = stream;
+    if (open) $('#kijkVideo').srcObject = stream;
+    for (const pc of kinderPcs.values()) {
+      const senders = pc.getSenders();
+      for (const t of stream.getTracks()) {
+        const s = senders.find(x => x.track && x.track.kind === t.kind) || senders.find(x => !x.track);
+        if (s) { try { s.replaceTrack(t); } catch (e) {} } else { try { pc.addTrack(t, stream); } catch (e) {} }
+      }
+    }
+    for (const [kk, kanaalId] of [...wachtKinderen]) { wachtKinderen.delete(kk); serveerKind(kanaalId, kk); }
+  }
+  // een aanbod van mijn ouder (de maker of een kijker boven mij): sluit aan en ontvang
+  async function ouderOffer(d) {
+    if (!open || d.kanaalId !== open.id) return;
+    ouderKey = d.van;
+    if (ouderPc) { try { ouderPc.close(); } catch (e) {} }
+    ouderPc = new RTCPeerConnection({ iceServers: await haalIce() });
+    ouderPc.ontrack = ev => zetBron(ev.streams[0]);
+    ouderPc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: open.id, doelKey: ouderKey, kind: 'ice', payload: ev.candidate }); };
+    await ouderPc.setRemoteDescription(d.payload);
+    const antwoord = await ouderPc.createAnswer();
+    await ouderPc.setLocalDescription(antwoord);
+    api('signaal', { id: open.id, doelKey: ouderKey, kind: 'answer', payload: antwoord });
+  }
+  function relaisSluit() {
+    if (ouderPc) { try { ouderPc.close(); } catch (e) {} ouderPc = null; }
+    ouderKey = null;
+    for (const pc of kinderPcs.values()) { try { pc.close(); } catch (e) {} }
+    kinderPcs.clear(); wachtKinderen.clear(); bronStream = null;
+  }
+
+  /* ---------- kijken (kijkerkant) ---------- */
   async function kijkStart(k) {
     const r = await api('kijk', { id: k.id });
     if (r.body.error) return zeg(r.body.error);
@@ -286,7 +347,7 @@
   }
   async function kijkStop() {
     clearInterval(hartslag); hartslag = null;
-    if (kijkPc) { try { kijkPc.close(); } catch (e) {} kijkPc = null; }
+    relaisSluit();
     if (open) { api('weg', { id: open.id }); open = null; }
     $('#kijkVideo').srcObject = null;
     laadZaal();
@@ -295,24 +356,13 @@
   async function haalIce() { if (iceConfig) return iceConfig;
     try { iceConfig = (await (await fetch('/api/ice')).json()).iceServers; } catch (e) {}
     return iceConfig || (iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]); }
-  async function kijkOffer(d) {
-    if (!open || d.kanaalId !== open.id) return;
-    if (kijkPc) { try { kijkPc.close(); } catch (e) {} }
-    kijkPc = new RTCPeerConnection({ iceServers: await haalIce() });
-    kijkPc.ontrack = ev => { $('#kijkVideo').srcObject = ev.streams[0]; };
-    kijkPc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: open.id, kind: 'ice', payload: ev.candidate }); };
-    await kijkPc.setRemoteDescription(d.payload);
-    const antwoord = await kijkPc.createAnswer();
-    await kijkPc.setLocalDescription(antwoord);
-    api('signaal', { id: open.id, kind: 'answer', payload: antwoord });
-  }
 
-  /* ---------- de studio (WebRTC-makerkant: een verbinding per kijker) ---------- */
+  /* ---------- de studio (makerkant: de bron van de boom) ---------- */
   let stream = null, studioLive = false;
-  const pcs = new Map();  // kijkerKey -> RTCPeerConnection
   async function studioStart() {
     try { stream = stream || await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: true }); }
     catch (e) { return zeg('Camera en microfoon zijn nodig om uit te zenden.'); }
+    bronStream = stream;   // de maker is de wortel: zijn camera is de stream die de boom in gaat
     $('#studioVideo').srcObject = stream;
     const m = zaal && zaal.mijn;
     studioLive = !!(m && m.live);
@@ -334,21 +384,8 @@
     const r = await api('live', { aan: !studioLive, titel: $('#studioTitel').value, alleenAbonnees: abbAan });
     if (r.body.error) return zeg(r.body.error);
     studioLive = !studioLive; tekenStudio();
-    if (!studioLive) { for (const pc of pcs.values()) { try { pc.close(); } catch (e) {} } pcs.clear(); tekenKijkers([]); }
+    if (!studioLive) { relaisSluit(); tekenKijkers([]); }
     zeg(studioLive ? 'U bent live.' : 'Uitzending gestopt.');
-  }
-  async function makerKijker(d) {
-    // een nieuwe kijker: bouw een eigen verbinding en stuur de offer
-    if (!studioLive || !stream) return;
-    const pc = new RTCPeerConnection({ iceServers: await haalIce() });
-    pcs.set(d.van, pc);
-    for (const t of stream.getTracks()) pc.addTrack(t, stream);
-    pc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: d.kanaalId, doelKey: d.van, kind: 'ice', payload: ev.candidate }); };
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    api('signaal', { id: d.kanaalId, doelKey: d.van, kind: 'offer', payload: offer });
-    const eigen = await api('mijn');
-    tekenKijkers((eigen.body.kanaal || {}).kijkerLijst || []);
   }
   function tekenKijkers(lijst) {
     $('#studioTel').textContent = lijst.length + ' kijkers';
@@ -361,7 +398,7 @@
       b.addEventListener('click', async () => {
         const r = await api('blokkeer', { id: zaal.mijn.id, key: x.key });
         if (r.body.error) return zeg(r.body.error);
-        const pc = pcs.get(x.key); if (pc) { try { pc.close(); } catch (e) {} pcs.delete(x.key); }
+        const pc = kinderPcs.get(x.key); if (pc) { try { pc.close(); } catch (e) {} kinderPcs.delete(x.key); }
         zeg(x.codenaam + ' geblokkeerd.'); rij.remove();
       });
       rij.appendChild(naam); rij.appendChild(b); el.appendChild(rij);
@@ -375,11 +412,11 @@
     es.addEventListener('podium', async e => {
       const d = JSON.parse(e.data);
       if (d.kind === 'chat' || d.kind === 'cadeau') chatErbij(d.regel);
-      else if (d.kind === 'kijker') makerKijker(d);
-      else if (d.kind === 'weg') { const pc = pcs.get(d.van); if (pc) { try { pc.close(); } catch (e2) {} pcs.delete(d.van); } api('mijn').then(r => tekenKijkers((r.body.kanaal || {}).kijkerLijst || [])); }
-      else if (d.kind === 'offer') kijkOffer(d);
-      else if (d.kind === 'answer') { const pc = pcs.get(d.van); if (pc) try { await pc.setRemoteDescription(d.payload); } catch (e2) {} }
-      else if (d.kind === 'ice') { const pc = open ? kijkPc : pcs.get(d.van); if (pc) try { await pc.addIceCandidate(d.payload); } catch (e2) {} }
+      else if (d.kind === 'kijker') { nieuwKind(d.kanaalId, d.van); if (studioLive) api('mijn').then(r => tekenKijkers((r.body.kanaal || {}).kijkerLijst || [])); }
+      else if (d.kind === 'weg') { const pc = kinderPcs.get(d.van); if (pc) { try { pc.close(); } catch (e2) {} kinderPcs.delete(d.van); } if (studioLive) api('mijn').then(r => tekenKijkers((r.body.kanaal || {}).kijkerLijst || [])); }
+      else if (d.kind === 'offer') ouderOffer(d);
+      else if (d.kind === 'answer') { const pc = kinderPcs.get(d.van); if (pc) try { await pc.setRemoteDescription(d.payload); } catch (e2) {} }
+      else if (d.kind === 'ice') { const pc = (ouderKey && d.van === ouderKey) ? ouderPc : kinderPcs.get(d.van); if (pc) try { await pc.addIceCandidate(d.payload); } catch (e2) {} }
       else if (d.kind === 'einde') { if (open && d.kanaalId === open.id) { zeg('De uitzending is afgelopen.'); kijkStop(); } }
       else if (d.kind === 'abonnee') zeg(d.codenaam + ' is nu abonnee.');
     });

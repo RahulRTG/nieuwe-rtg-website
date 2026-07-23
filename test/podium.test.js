@@ -109,6 +109,44 @@ test('3. live: kijker komt binnen, chat komt aan en het WebRTC-doorgeefluik werk
   assert.equal(sig2.status, 200, 'maker -> kijker signaal is een doorgeefluik');
 });
 
+test('3b. de relay-boom: kijkers dragen elkaar door, zodat er onbeperkt kunnen kijken', async () => {
+  // de bron draagt maar een handvol (FANOUT) directe kijkers; daarna wordt een
+  // kijker de ouder van de volgende. 'kijker' (uit test 3) is al kind van de bron.
+  const extra = [];
+  for (let i = 0; i < 5; i++) extra.push(await nieuwLid('1994-04-04'));
+  const ouders = [];
+  for (const v of extra) {
+    const r = await api(base, '/api/podium/kijk', { id: kanaalId }, v.token);
+    assert.equal(r.status, 200);
+    ouders.push(r.body.ouder);
+  }
+  assert.ok(ouders.includes('bron'), 'de eerste kijkers hangen direct aan de bron');
+  const kindIdx = ouders.findIndex(o => o && o !== 'bron');
+  assert.notEqual(kindIdx, -1, 'zodra de bron vol is, wordt een kijker de ouder van de volgende - zo groeit de boom onbeperkt');
+  const kind = extra[kindIdx];
+  const allen = [kijker, ...extra];
+  const ouder = allen.find(a => a.key === ouders[kindIdx]);
+  assert.ok(ouder, 'de toegewezen ouder is een gewone kijker, geen vreemde');
+
+  // het doorgeefluik loopt nu langs de boom: de ouder biedt zijn kind aan, het kind antwoordt terug
+  const sigO = await api(base, '/api/podium/signaal', { id: kanaalId, doelKey: kind.key, kind: 'offer', payload: { sdp: 'relay' } }, ouder.token);
+  assert.equal(sigO.status, 200, 'een kijker mag de stream doorgeven aan zijn eigen kind');
+  const sigA = await api(base, '/api/podium/signaal', { id: kanaalId, kind: 'answer', payload: { sdp: 'ok' } }, kind.token);
+  assert.equal(sigA.status, 200, 'het kind antwoordt vanzelf zijn eigen ouder');
+  // maar naar een vreemde (niet je ouder, niet je kind) mag het niet
+  const vreemde = allen.find(a => a.key !== kind.key && a.key !== ouder.key);
+  const sigX = await api(base, '/api/podium/signaal', { id: kanaalId, doelKey: vreemde.key, kind: 'offer', payload: {} }, kind.token);
+  assert.equal(sigX.status, 403, 'signaleren naar een vreemde die niet je eigen kind is, kan niet');
+
+  // valt de ouder weg, dan wordt de wees automatisch opnieuw onder een nieuwe ouder gehangen
+  await api(base, '/api/podium/weg', { id: kanaalId }, ouder.token);
+  const her = await api(base, '/api/podium/kijk', { id: kanaalId }, kind.token);
+  assert.equal(her.status, 200);
+  assert.notEqual(her.body.ouder, ouders[kindIdx], 'de wees hangt na het vertrek van zijn ouder onder een nieuwe ouder');
+  // ruim de extra kijkers weer op zodat de latere tests hun eigen zaal houden
+  for (const v of extra) await api(base, '/api/podium/weg', { id: kanaalId }, v.token);
+});
+
 test('4. cadeautjes lopen echt via RTG Pay: vaste bedragen, saldo bij de maker', async () => {
   const fout = await api(base, '/api/podium/cadeau', { id: kanaalId, cadeau: 'jacht', idem: 'x1' }, kijker.token);
   assert.equal(fout.status, 400, 'alleen de vaste cadeaucatalogus, geen vrije bedragen');

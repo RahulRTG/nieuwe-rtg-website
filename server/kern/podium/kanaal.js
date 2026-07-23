@@ -6,7 +6,7 @@
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
     stuurRond, kijkBeeld, eigenBeeld, codenaamVan, sseToCustomer, sseToOffice, notify,
-    GENRES, CADEAUS, SIGNALEN } = ctx;
+    koppel, herstelBoom, ouderKeyVan, GENRES, CADEAUS, SIGNALEN } = ctx;
 
   /* ---- het kanaal: aanmelden, en pas open na een mens van kantoor ---- */
   function kanaalMaak(key, data) {
@@ -51,7 +51,7 @@ module.exports = (ctx) => {
       k.live = { sinds: nu(), titel: schoon(data && data.titel, 80) || k.naam, alleenAbonnees: !!(data && data.alleenAbonnees) };
     } else {
       if (k.live) stuurRond(k, { kind: 'einde', kanaalId: k.id });
-      k.live = null; k.kijkers = {};
+      k.live = null; k.kijkers = {}; k.boom = {};
     }
     save(); sseToOffice('sync', { scope: 'podium' });
     return { status: 200, ok: true, kanaal: eigenBeeld(k) };
@@ -64,22 +64,44 @@ module.exports = (ctx) => {
     if (!k.live) return { status: 409, error: 'Dit kanaal is nu niet live.' };
     if (k.live.alleenAbonnees && !isAbonnee(k, key)) return { status: 403, error: 'Deze uitzending is alleen voor abonnees.' };
     const nieuw = !(k.kijkers || {})[key];
-    k.kijkers[key] = nu(); save();
-    if (nieuw) sseToCustomer(k.key, 'podium', { kind: 'kijker', kanaalId: k.id, van: key, codenaam: codenaamVan(key) });
-    return { status: 200, ok: true, kanaal: kijkBeeld(k, key), chat: (db.data.podiumChat[k.id] || []).slice(-40) };
+    k.kijkers[key] = nu();
+    k.boom = k.boom || {};
+    herstelBoom(k);                                  // wezen van vertrokken kijkers eerst herstellen
+    if (nieuw || !k.boom[key]) koppel(k, key);       // hang deze kijker in de boom en laat zijn ouder aanbieden
+    save();
+    return { status: 200, ok: true, kanaal: kijkBeeld(k, key), chat: (db.data.podiumChat[k.id] || []).slice(-40), ouder: k.boom[key].ouder };
   }
   function weg(key, kid) {
     const k = kanaalMet(kid); if (!k) return { status: 200, ok: true };
-    if ((k.kijkers || {})[key]) { delete k.kijkers[key]; save(); sseToCustomer(k.key, 'podium', { kind: 'weg', kanaalId: k.id, van: key }); }
+    if ((k.kijkers || {})[key]) {
+      delete k.kijkers[key];
+      const ouder = ouderKeyVan(k, key);
+      if (k.boom) delete k.boom[key];
+      herstelBoom(k);                                // eventuele kinderen van de vertrokkene opnieuw koppelen
+      save();
+      sseToCustomer(ouder, 'podium', { kind: 'weg', kanaalId: k.id, van: key });   // de ouder ruimt zijn verbinding op
+    }
     return { status: 200, ok: true };
   }
-  // pure doorgeefluik voor WebRTC: maker <-> kijker, nooit iemand anders
+  /* Pure doorgeefluik voor WebRTC, nu langs de boom: een knoop mag alleen praten
+     met zijn eigen ouder of een van zijn kinderen - nooit met een vreemde. Zonder
+     doelKey gaat het naar de ouder (de kijker antwoordt zijn aanbieder). */
   function signaal(key, kid, doelKey, kind, payload) {
     const k = kanaalMet(kid); if (!k) return { status: 404, error: 'Kanaal niet gevonden.' };
     if (!SIGNALEN.includes(kind)) return { status: 400, error: 'Onbekend signaal.' };
-    const ikMaker = k.key === key;
-    const doel = ikMaker ? String(doelKey || '') : k.key;
-    if (ikMaker ? !(k.kijkers || {})[doel] : !(k.kijkers || {})[key]) return { status: 403, error: 'Geen kijker op dit kanaal.' };
+    k.boom = k.boom || {};
+    let doel;
+    if (k.key === key) {                             // de bron: alleen naar een direct kind
+      doel = String(doelKey || '');
+      if (!(k.boom[doel] && k.boom[doel].ouder === 'bron')) return { status: 403, error: 'Geen kijker op dit kanaal.' };
+    } else {
+      if (!k.boom[key] && !(k.kijkers || {})[key]) return { status: 403, error: 'Geen kijker op dit kanaal.' };
+      const mijnOuder = ouderKeyVan(k, key);
+      doel = doelKey ? String(doelKey) : mijnOuder;
+      const naarOuder = doel === mijnOuder;
+      const naarKind = k.boom[doel] && k.boom[doel].ouder === key;
+      if (!naarOuder && !naarKind) return { status: 403, error: 'Alleen naar je eigen ouder of kind.' };
+    }
     sseToCustomer(doel, 'podium', { kind, kanaalId: k.id, van: key, payload: payload || null });
     return { status: 200, ok: true };
   }

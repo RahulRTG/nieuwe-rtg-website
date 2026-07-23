@@ -31,6 +31,10 @@ const KIJKER_TTL_MS = 90 * 1000;   // wie zich 90s niet meldt is weg
 const CHAT_MAX = 200;
 const ABB_DAGEN = 30;
 const SIGNALEN = ['offer', 'answer', 'ice', 'stop'];
+// De relay-boom: elke kijker geeft de stream door aan een handjevol volgende
+// kijkers. Zo hoeft de bron (en elke kijker) maar aan FANOUT anderen te zenden,
+// en groeit de boom in de diepte mee - onbeperkt veel kijkers, zonder mediaserver.
+const FANOUT = 4;
 
 function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseToCustomer, sseToOffice, notify, pay, schoon }) {
   const id = () => 'pk' + crypto.randomBytes(4).toString('hex');
@@ -73,6 +77,49 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
     for (const key of verseKijkers(k)) sseToCustomer(key, 'podium', data);
   }
 
+  /* ---- de relay-boom: wie geeft de stream aan wie door ----
+     'bron' is de maker; elke andere knoop is een kijker die de stream van zijn
+     ouder ontvangt en aan hoogstens FANOUT kinderen doorgeeft. De ouder wordt in
+     de breedte gekozen (de plek dichtst bij de bron met nog ruimte), zodat de boom
+     ondiep blijft en de vertraging laag. Zo draagt een kanaal onbeperkt veel
+     kijkers zonder mediaserver: elke kijker helpt de volgende. */
+  const ouderKeyVan = (k, key) => {           // de key om signalen heen te sturen (bron -> de maker)
+    const o = (k.boom || {})[key];
+    return o ? (o.ouder === 'bron' ? k.key : o.ouder) : k.key;
+  };
+  function kiesOuder(k, key) {
+    const verse = new Set(verseKijkers(k));
+    const kinderenVan = (van) => Object.keys(k.boom || {}).filter(kk => kk !== key && verse.has(kk) && k.boom[kk].ouder === van);
+    const rij = ['bron'];
+    while (rij.length) {
+      const n = rij.shift();
+      const kids = kinderenVan(n);
+      if (kids.length < FANOUT) return n;
+      for (const c of kids) rij.push(c);
+    }
+    return 'bron';
+  }
+  // hang een (nieuwe of te herkoppelen) kijker onder een ouder en laat die ouder
+  // aanbieden. Bij de bron is de ouder de maker zelf.
+  function koppel(k, key) {
+    k.boom = k.boom || {};
+    const ouder = kiesOuder(k, key);
+    k.boom[key] = { ouder, at: nu() };
+    const doel = ouder === 'bron' ? k.key : ouder;
+    sseToCustomer(doel, 'podium', { kind: 'kijker', kanaalId: k.id, van: key, codenaam: codenaamVan(key) });
+    return ouder;
+  }
+  // ruim vertrokken kijkers uit de boom en herkoppel wezen (hun ouder is weg)
+  function herstelBoom(k) {
+    if (!k.boom) return;
+    const verse = new Set(verseKijkers(k));
+    for (const kk of Object.keys(k.boom)) if (!verse.has(kk)) delete k.boom[kk];
+    for (const kk of Object.keys(k.boom)) {
+      const o = k.boom[kk].ouder;
+      if (o !== 'bron' && !verse.has(o)) koppel(k, kk);
+    }
+  }
+
   /* RTG Pay is zelf al idempotent, maar de bijwerking hier (verdiend-teller,
      chatregel, abonnee-verlenging) mag bij een dubbeltik ook niet dubbel. */
   function metIdem(k, sleutel, doe) {
@@ -108,7 +155,8 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
   const ctx = {
     db, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
     stuurRond, kijkBeeld, eigenBeeld, metIdem, codenaamVan, sseToCustomer, sseToOffice, notify, pay,
-    GENRES, CADEAUS, CHAT_MAX, ABB_DAGEN, SIGNALEN
+    koppel, herstelBoom, ouderKeyVan, kiesOuder,
+    GENRES, CADEAUS, CHAT_MAX, ABB_DAGEN, SIGNALEN, FANOUT
   };
   return Object.assign({}, require('./kanaal')(ctx), require('./interactie')(ctx));
 }

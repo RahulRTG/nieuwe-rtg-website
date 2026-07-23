@@ -4,7 +4,7 @@
    uit, en melden bij RTG-kantoor). Krijgt de gedeelde ctx van kern/podium/index.js. */
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, mag, lijsten, kanaalMet, isAbonnee, stuurRond, metIdem,
-    codenaamVan, sseToCustomer, sseToOffice, pay, CADEAUS, CHAT_MAX, ABB_DAGEN } = ctx;
+    codenaamVan, sseToCustomer, sseToOffice, pay, herstelBoom, CADEAUS, CHAT_MAX, ABB_DAGEN } = ctx;
 
   function chat(key, kid, tekst) {
     const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
@@ -59,7 +59,7 @@ module.exports = (ctx) => {
     const k = kanaalMet(kid); if (!k || k.key !== key) return { status: 403, error: 'Alleen de maker beheert het kanaal.' };
     doelKey = String(doelKey || ''); if (!doelKey || doelKey === key) return { status: 400, error: 'Kies een kijker.' };
     k.geblokkeerd = (k.geblokkeerd || []).filter(x => x !== doelKey);
-    if (aan !== false) { k.geblokkeerd.push(doelKey); delete (k.kijkers || {})[doelKey]; sseToCustomer(doelKey, 'podium', { kind: 'einde', kanaalId: k.id }); }
+    if (aan !== false) { k.geblokkeerd.push(doelKey); delete (k.kijkers || {})[doelKey]; if (k.boom) delete k.boom[doelKey]; herstelBoom(k); sseToCustomer(doelKey, 'podium', { kind: 'einde', kanaalId: k.id }); }
     save(); return { status: 200, ok: true, geblokkeerd: k.geblokkeerd.length };
   }
   function meld(key, kid, reden) {

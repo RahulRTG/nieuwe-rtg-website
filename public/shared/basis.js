@@ -14,6 +14,9 @@
    6. kaart: laadt de kaart-uitwijk bij (shared/kaart.js), die geo:-links op
       desktop/iOS opvangt met een eigen paneeltje - coördinaten tonen en laten
       kopiëren, zonder ook maar iets naar een kaart-provider te sturen
+   7. horloge: laadt het 3D-skelethorloge bij (shared/klok3d.js), dat waar een
+      RTG-klok-ring staat een gouden cassement, saffierglas en een opengewerkt
+      3D-uurwerk overheen legt (progressief; met een harde 2D-terugval)
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */
 (function () {
   'use strict';
@@ -61,6 +64,13 @@
   var km = document.createElement('script');
   km.src = '/shared/kaart.js'; km.async = true;
   (document.head || document.documentElement).appendChild(km);
+
+  /* ---- 7. het 3D-skelethorloge: waar een RTG-klok-ring staat, legt deze laag
+     er een gouden cassement, saffierglas en een opengewerkt 3D-uurwerk overheen
+     (progressief; zonder WebGL/bij reduced-motion blijft het horloge zoals het is) ---- */
+  var k3 = document.createElement('script');
+  k3.src = '/shared/klok3d.js'; k3.async = true;
+  (document.head || document.documentElement).appendChild(k3);
 
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {

@@ -124,10 +124,25 @@
     form.addEventListener('submit', function (ev) {
       ev.preventDefault(); var q = inp.value.trim(); if (!q) return; inp.value = '';
       uit.textContent = 'Rahul denkt na...';
+      /* Voor een zware taak stroomt de server live de voortgang ("Stap 4/24:
+         taxi zoeken...") over de eigen SSE-verbinding. We openen die alleen
+         zolang de vraag loopt en sluiten hem als het antwoord er is. */
+      var vBron = null;
+      if (memTok && window.EventSource) {
+        try {
+          vBron = new EventSource('/api/stream?token=' + encodeURIComponent(memTok));
+          vBron.addEventListener('rahul-voortgang', function (e) {
+            var v = {}; try { v = JSON.parse(e.data); } catch (x) {}
+            if (v.klaar) return;
+            if (v.totaal) { uit.textContent = 'Stap ' + v.stap + '/' + v.totaal + (v.bericht ? ': ' + v.bericht : '') + '...'; mond.praat(600); }
+          });
+        } catch (e) {}
+      }
+      var sluitBron = function () { if (vBron) { try { vBron.close(); } catch (e) {} vBron = null; } };
       fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ q: q }) })
         .then(function (r) { return r.json(); })
-        .then(function (d) { uit.textContent = (d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400); })
-        .catch(function () { uit.textContent = 'Even geen verbinding; probeer het zo weer.'; });
+        .then(function (d) { sluitBron(); uit.textContent = (d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400); })
+        .catch(function () { sluitBron(); uit.textContent = 'Even geen verbinding; probeer het zo weer.'; });
     });
   }
 

@@ -3,7 +3,7 @@
    (kern/fluister.js) en de Shared Assets (kern/assets.js). Alleen routes;
    de logica woont in de kern-modules. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, verdienPunten, pestgrens,
+  const { app, auth, liveCodename, verdienPunten, pestgrens, bus,
     zorgVan, zorgZet, locDeel, locStopKlant, locMijn,
     fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, stuurLus,
     sparLijst, sparParkeer, sparStatus,
@@ -51,6 +51,12 @@ app.post('/api/fluister', auth, async (req, res) => {
   if (stuurLus && !r.pakte) {
     const lus = await stuurLus(req, {
       vraag: req.body.q,
+      // streamende voortgang voor een zware taak: elke stap wordt live
+      // "Stap X/24: taxi zoeken..." op de eigen SSE-verbinding (de UI toont het)
+      opStap: (v) => {
+        try { bus && bus.publish('sse', { doel: 'tier', match: [req.session.tier],
+          event: 'rahul-voortgang', data: { stap: v.stap, totaal: v.totaal, bericht: v.bericht, klaar: !!v.klaar } }); } catch (e) {}
+      },
       // alles wat het lid zelf mag: de hele leden-app EN de RTFoundation
       // (gezin/kinderen). Alleen de zakelijke werk-apps van andere rollen
       // (leverancier/personeel/kantoor/partner) blijven buiten bereik; de

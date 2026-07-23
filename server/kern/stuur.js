@@ -33,6 +33,42 @@ const VERBODEN = [
 // bulk/salaris, krediet, vaste betalingen, pasacties) horen daar nadrukkelijk bij.
 const GELD = /(betaal|\/pay(\/|$)|\/tik|giftcard|verreken|refund|terugbetaal|\/bank\/(storten|overboek|sepa|naar-wallet|van-wallet|bulk|salaris|krediet|terugkerend|pas\/))/i;
 
+/* ---- lichte vs. zware taak: bepaalt het stappen-budget ----
+   Een pure functie (los getoetst): "zet een timer" of "zoek een lid" is licht
+   (4 stappen); "plan een complete reis voor 4 personen" is zwaar (24). We tellen
+   een paar signalen: lengte, koppelwoorden (en/daarna/ook), plan-/reiswoorden en
+   een groepsgrootte. Vanaf een drempel is het zwaar. */
+function classificeer(vraag) {
+  const t = String(vraag || '').toLowerCase();
+  let score = 0;
+  if (t.length > 90) score++;
+  if (t.length > 180) score++;
+  const koppels = (t.match(/\b(en|daarna|vervolgens|ook|plus|met)\b/g) || []).length;
+  if (koppels >= 3) score++;
+  if (koppels >= 6) score++;
+  if (/\b(plan|regel alles|hele dag|dagplanning|weekend|reis|trip|meerdere|allemaal|compleet|complete|organiseer|verzorg)\b/.test(t)) score += 2;
+  if (/\bvoor \d+ (personen|persoon|mensen|man|gasten|pax)\b/.test(t)) score++;
+  // meerdere concrete boekacties in één zin = meer werk (een ketting van dingen)
+  const boekwoorden = (t.match(/\b(boek|reserveer|bestel|regel|taxi'?s?|hotels?|tafels?|tickets?|vluchten?|vlucht|bloem(?:en)?|cadeaus?|restaurants?|diners?|verhuur)\b/g) || []).length;
+  if (boekwoorden >= 3) score++;
+  if (boekwoorden >= 5) score++;
+  const zwaar = score >= 3;
+  return { zwaar, maxStappen: zwaar ? 24 : 4, score };
+}
+
+/* ---- de deeltaken van een zware taak uit de model-uitvoer halen ----
+   We vragen de hoofd-agent om maximaal 3 korte deeltaken als JSON-array; deze
+   pure parser is soepel (JSON of een genummerde/gestreepte lijst) en los getoetst. */
+function parseSubs(tekst) {
+  let arr = null;
+  const m = String(tekst || '').match(/\[[\s\S]*\]/);
+  if (m) { try { arr = JSON.parse(m[0]); } catch (e) {} }
+  if (!Array.isArray(arr)) {
+    arr = String(tekst || '').split('\n').map(s => s.replace(/^[\s\-*\d.)]+/, '').trim()).filter(Boolean);
+  }
+  return arr.filter(s => typeof s === 'string' && s.trim()).map(s => s.trim().slice(0, 140)).slice(0, 3);
+}
+
 function maakStuur({ log, anthropic, app }) {
 
   /* ---- de poortwachter: mag dit pad überhaupt via het stuur? ---- */
@@ -107,33 +143,37 @@ function maakStuur({ log, anthropic, app }) {
     'en wees liever te hard dan een liegbeest: is een actie mislukt of onzeker, dan is dat je eerste zin, zonder verzachting; ' +
     'zeg nooit "gelukt" op basis van een aanname en verzin geen uitkomsten die de tools niet teruggaven. Antwoord kort, in de taal van de vraag.';
 
+  const TOOLS = [
+    { name: 'kaart', description: 'De lijst API-paden (POST) die je met "doe" kunt aanroepen.',
+      input_schema: { type: 'object', properties: {} } },
+    { name: 'doe', description: 'Voer een actie uit op een RTG API-pad (POST), met de inlog van de gebruiker.',
+      input_schema: { type: 'object', properties: {
+        pad: { type: 'string' }, body: { type: 'object' }, bevestigd: { type: 'boolean' } }, required: ['pad'] } }
+  ];
+
   async function stuurLus(req, opties) {
     if (!anthropic) return null;
     const vraag = String((opties && opties.vraag) || '').trim().slice(0, 1200);
     if (!vraag) return null;
     const paden = () => stuurPaden(app, null).filter(opties.filter || (() => true));
-    const tools = [
-      { name: 'kaart', description: 'De lijst API-paden (POST) die je met "doe" kunt aanroepen.',
-        input_schema: { type: 'object', properties: {} } },
-      { name: 'doe', description: 'Voer een actie uit op een RTG API-pad (POST), met de inlog van de gebruiker.',
-        input_schema: { type: 'object', properties: {
-          pad: { type: 'string' }, body: { type: 'object' }, bevestigd: { type: 'boolean' } }, required: ['pad'] } }
-    ];
-    const messages = [{ role: 'user', content: vraag }];
+    // een streamende voortgangsmelding (optioneel): de route koppelt dit aan de
+    // SSE-bus, zodat de UI live "Stap 4/24: taxi zoeken..." kan tonen
+    const opStap = typeof (opties && opties.opStap) === 'function' ? opties.opStap : () => {};
+    const systeem = (opties.systeem || '') + '\n' + LUS_REGELS;
     const acties = [];
-    try {
-      // ruim genoeg stappen voor een echte klus (een hele dag plannen, een
-      // reis regelen, meerdere boekingen achter elkaar) zonder halverwege te
-      // stoppen; elke stap houdt zich aan dezelfde inlog en de geld-drempel.
-      for (let stap = 0; stap < 12; stap++) {
+
+    /* Eén tool-lus met een stappen-budget en een globale teller. Geeft de
+       eindtekst (als de agent klaar is) en de nieuwe tellerstand terug. `label`
+       is de menselijke kop die tijdens deze (deel)taak wordt gestreamd. */
+    async function loop(messages, budget, tel, totaal, label) {
+      for (let s = 0; s < budget; s++) {
         const resp = await anthropic.messages.create({
-          model: 'claude-sonnet-5', max_tokens: 1400,
-          system: (opties.systeem || '') + '\n' + LUS_REGELS, tools, messages
+          model: 'claude-sonnet-5', max_tokens: 1400, system: systeem, tools: TOOLS, messages
         });
         const wilTools = resp.content.filter(c => c.type === 'tool_use');
         if (!wilTools.length || resp.stop_reason !== 'tool_use') {
           const tekst = resp.content.filter(c => c.type === 'text').map(c => c.text).join('').trim();
-          return { tekst: tekst || 'Gedaan.', acties };
+          return { tekst, tel, klaar: true };
         }
         messages.push({ role: 'assistant', content: resp.content });
         const uitkomsten = [];
@@ -147,16 +187,69 @@ function maakStuur({ log, anthropic, app }) {
           }
           uitkomsten.push({ type: 'tool_result', tool_use_id: t.id, content: JSON.stringify(uit).slice(0, 6000) });
         }
+        tel++;
+        try { opStap({ stap: tel, totaal, bericht: label }); } catch (e) {}
         messages.push({ role: 'user', content: uitkomsten });
       }
+      return { tekst: '', tel, klaar: false };
+    }
+
+    const cls = classificeer(vraag);
+    try {
+      // ---- lichte taak: één korte lus van 4 stappen ----
+      if (!cls.zwaar) {
+        const r = await loop([{ role: 'user', content: vraag }], 4, 0, 4, 'Bezig...');
+        return { tekst: r.tekst || 'Gedaan.', acties, zwaar: false, stappen: r.tel };
+      }
+
+      // ---- zware taak: de hoofd-agent splitst in max 3 deeltaken, elk een
+      //      eigen kleine lus; samen binnen een budget van 24 stappen ----
+      const totaal = cls.maxStappen; // 24
+      let subs = [];
+      try {
+        const plan = await anthropic.messages.create({
+          model: 'claude-sonnet-5', max_tokens: 350,
+          system: 'Je bent een planner. Verdeel de opdracht in maximaal 3 concrete, uitvoerbare deeltaken. ' +
+            'Antwoord UITSLUITEND met een JSON-array van korte NL-strings, niets anders.',
+          messages: [{ role: 'user', content: vraag }]
+        });
+        subs = parseSubs(plan.content.filter(c => c.type === 'text').map(c => c.text).join(''));
+      } catch (e) { subs = []; }
+      if (!subs.length) subs = [vraag]; // geen nette splitsing? dan als één klus
+
+      let tel = 0; const deel = [];
+      const perSub = Math.max(4, Math.floor(totaal / subs.length));
+      for (let i = 0; i < subs.length && tel < totaal; i++) {
+        const label = subs[i];
+        try { opStap({ stap: tel, totaal, bericht: label }); } catch (e) {}
+        const seed = [{ role: 'user', content:
+          'Hoofddoel van de gebruiker: ' + vraag + '\nVoer NU alleen deze deeltaak volledig uit: ' + label +
+          '\nStop zodra deze deeltaak klaar is en meld kort het resultaat.' }];
+        const r = await loop(seed, Math.min(perSub, totaal - tel), tel, totaal, label);
+        tel = r.tel;
+        deel.push('- ' + label + ': ' + (r.tekst || 'gedaan'));
+      }
+
+      // ---- synthese: één kort antwoord voor de gebruiker ----
+      let eind = deel.join('\n');
+      try {
+        const synth = await anthropic.messages.create({
+          model: 'claude-sonnet-5', max_tokens: 500, system: systeem,
+          messages: [{ role: 'user', content: 'Vat voor de gebruiker kort en concreet samen wat er is gedaan ' +
+            '(en wat niet lukte, eerlijk). Deelresultaten:\n' + deel.join('\n') }]
+        });
+        const st = synth.content.filter(c => c.type === 'text').map(c => c.text).join('').trim();
+        if (st) eind = st;
+      } catch (e) {}
+      try { opStap({ stap: totaal, totaal, bericht: 'Klaar', klaar: true }); } catch (e) {}
+      return { tekst: eind || 'Gedaan.', acties, zwaar: true, stappen: tel, deeltaken: subs };
     } catch (e) {
       try { log && log.warn && log.warn('stuurlus', { fout: (e && e.message || '').slice(0, 120) }); } catch (e2) {}
       return null; // de vaste antwoorden vangen het op
     }
-    return { tekst: 'Daar kwam ik binnen de tijd niet helemaal uit; zeg het iets specifieker en ik doe het alsnog.', acties };
   }
 
-  return { stuurToets, stuurRoep, stuurPaden, stuurLus };
+  return { stuurToets, stuurRoep, stuurPaden, stuurLus, classificeer, parseSubs };
 }
 
-module.exports = { maakStuur };
+module.exports = { maakStuur, classificeer, parseSubs };

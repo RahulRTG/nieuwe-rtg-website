@@ -531,8 +531,8 @@ rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch 
    interne herschrijving, zodat de nonce-laag gewoon meedraait). Web en mobiel
    krijgen exact dezelfde pagina; de tegels schalen mee met het formaat. De
    oude bureau-URL blijft werken en serveert hetzelfde bureaublad. */
-app.get('/', (req, res, next) => { req.url = '/apps/index.html'; next(); });
-app.get('/apps/bureau.html', (req, res, next) => { req.url = '/apps/index.html'; next(); });
+app.get('/', (req, res, next) => { req.url = '/apps/app.html'; next(); });
+app.get('/apps/bureau.html', (req, res, next) => { req.url = '/apps/app.html'; next(); });
 
 /* Strengere CSP voor de app-pagina's: geen 'unsafe-inline' voor scripts, maar
    een per-antwoord nonce. We lezen het .html-bestand, geven elke <script> die

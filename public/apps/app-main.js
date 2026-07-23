@@ -492,7 +492,7 @@
     doos.innerHTML =
       '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
-      '<div class="ag-rij"><input id="agIn" autocomplete="off" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
+      '<div class="ag-rij"><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>';
     gate.appendChild(doos);
     // een wachtwoord-herstel-link uit de e-mail (?reset=): Rahul regelt het herstel zelf

@@ -59,7 +59,7 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
     const id = 'ag' + nu().toString(36) + Math.random().toString(36).slice(2, 8);
     const g = { stap: 'doel', velden: {}, warmte: 0, beurten: 0, at: nu(), werkgever: null };
     gesprekken.set(id, g);
-    return { id, tekst: 'Hi, ik ben Rahul.. wat kan ik voor je doen? Ik kan je aanmelden, inloggen, of eerst even uitleggen wat RTG is.' };
+    return { id, tekst: 'Hoi, ik ben Rahul. Wat kan ik voor je doen? Ik kan je aanmelden, inloggen, of eerst even uitleggen wat RTG is.' };
   }
 
   function intakeZeg(id, ruwTekst) {

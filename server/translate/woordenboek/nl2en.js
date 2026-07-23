@@ -93,5 +93,21 @@ module.exports = {
   'Santa Eularia, Ibiza': 'Santa Eularia, Ibiza', 'Marina Botafoch, Ibiza': 'Marina Botafoch, Ibiza',
   'Cala Jondal, Ibiza': 'Cala Jondal, Ibiza', 'Sant Antoni, Ibiza': 'Sant Antoni, Ibiza',
   'Aeroport dEivissa': 'Eivissa Airport', 'Dalt Vila, Ibiza': 'Dalt Vila, Ibiza', 'Ibiza-stad, haven': 'Ibiza town, harbour',
-  'Schiphol Business Aviation': 'Schiphol Business Aviation', 'Live positie': 'Live position'
+  'Schiphol Business Aviation': 'Schiphol Business Aviation', 'Live positie': 'Live position',
+  // Rahul aan de poort (aanmeldgesprek): vaste zinnen, netjes vertaald i.p.v. woord-voor-woord
+  'Hoi, ik ben Rahul. Wat kan ik voor je doen? Ik kan je aanmelden, inloggen, of eerst even uitleggen wat RTG is.':
+    "Hi, I'm Rahul. What can I do for you? I can sign you up, log you in, or first explain what RTG is.",
+  'Zeg maar gewoon wat je denkt; ik luister.': "Just say what's on your mind; I'm listening.",
+  'Allebei goed hoor. Zeg het maar: kom je inloggen, word je vandaag lid, of wil je eerst uitleg?':
+    'Either is fine. Just tell me: are you here to log in, becoming a member today, or would you like an explanation first?',
+  'Ha, welkom terug. Even kijken: welk e-mailadres of welke gebruikersnaam gebruik je hier?':
+    'Ah, welcome back. Let me see: which email address or username do you use here?',
+  'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.':
+    'Welcome back. Type your password below; it goes straight into the vault, not through this conversation.',
+  'Welk e-mailadres of welke gebruikersnaam gebruik je hier? Typ hem even voluit.':
+    'Which email address or username do you use here? Type it out in full.',
+  'Geen zorgen, dat regelen we zo. Welk e-mailadres gebruik je hier? Dan zorg ik voor een herstel-link.':
+    "No worries, we'll sort that out. Which email address do you use here? Then I'll arrange a recovery link.",
+  'Typ je e-mailadres even voluit (met @), dan zorg ik voor de herstel-link.':
+    "Type your email address out in full (with @), and I'll arrange the recovery link."
 };

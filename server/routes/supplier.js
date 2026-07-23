@@ -61,6 +61,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/menukaart')(kern);
   require('./supplier/orders')(kern);
   require('./supplier/reserveringen')(kern);
+  require('./supplier/poort')(kern);
   require('./supplier/agent')(kern);
   require('./supplier/tools')(kern);
   require('./supplier/keuken')(kern);

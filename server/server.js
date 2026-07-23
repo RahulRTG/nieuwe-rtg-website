@@ -812,7 +812,11 @@ function salonProfielCompleet(s) {
   const heeftFoto = !!(s.salon && s.salon.foto) || (Array.isArray(s.photos) && s.photos.length > 0);
   return bio.length >= 15 && heeftFoto;
 }
-function salonZichtbaar(s) { return salonProfielCompleet(s); }
+// De ondernemer-poort: de klaar-checklist en de online-schakelaar per zaak. Een
+// zaak is pas zichtbaar/boekbaar voor leden als de Salon-pagina compleet is EN
+// de zaak online staat (bestaande zaken zijn online tenzij expliciet uitgezet).
+const ondernemerpoort = require('./kern/ondernemerpoort')({ salonProfielCompleet });
+function salonZichtbaar(s) { return salonProfielCompleet(s) && s.online !== false; }
 // hoeveel Salon-items (posts/folders/deals/polls) deze partner al plaatste
 function salonItemsVan(code) { return db.data.posts.filter(p => p.partnerCode === code).length; }
 
@@ -2040,7 +2044,7 @@ const kern = {
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
-  runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sendPush,
+  runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,

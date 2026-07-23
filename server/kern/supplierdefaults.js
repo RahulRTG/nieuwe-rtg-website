@@ -81,6 +81,12 @@ function ensureSupplierDefaults(s) {
   // Salon, met volgers en marketinggereedschap (folders, aanbiedingen, polls)
   if (!s.salon) s.salon = { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
   if (!Array.isArray(s.salon.volgers)) s.salon.volgers = [];
+  // De ondernemer-poort: bestaande zaken zijn online (undefined telt als aan);
+  // alleen een nieuw goedgekeurde partner krijgt online === false meegegeven en
+  // moet eerst door de poort (Salon-pagina + rondleidingen). De rondleiding-
+  // stempels leven hier zodat de app ze kan aftikken.
+  if (s.online === undefined) s.online = true;
+  if (!s.rondleiding || typeof s.rondleiding !== 'object') s.rondleiding = {};
 }
   return ensureSupplierDefaults;
 };

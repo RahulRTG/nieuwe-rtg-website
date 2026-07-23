@@ -18,6 +18,10 @@
   // lees een gescande tekst; geeft altijd een object met .soort terug
   function lees(tekst) {
     var s = String(tekst == null ? '' : tekst).trim();
+    // de nieuwe, gesloten dynamische code: alleen de server kan hem duiden, dus
+    // hier geven we enkel terug dat het er een is; de app haalt hem langs
+    // /api/code/scan om te verifieren (verlopen/vreemd wordt daar geweigerd).
+    if (s.slice(0, 5) === 'RTG1.') return { soort: 'rtg1', token: s };
     if (s.slice(0, 10) === 'rtg:tafel:') {
       var r = s.slice(10), i = r.indexOf(':');
       if (i < 0) return { soort: 'tafel', code: r, tafel: '' };

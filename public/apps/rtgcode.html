@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG-code</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --paneel:#151312; --lijn:rgba(255,255,255,.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,.66);
+    --burgundy:#7F1634; --burgundy-bright:#9E1C40; --burgundy-on-dark:#C23A5E; --gold:#857007;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:0 0 4rem;line-height:1.55;}
+  h1,h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:600;letter-spacing:-.01em;}
+  header{padding:2.4rem 1.3rem 1rem;max-width:34rem;margin:0 auto;}
+  header .eyebrow{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy-on-dark);}
+  header h1{font-size:2rem;margin:.25rem 0 .5rem;}
+  header p{color:var(--muted);font-size:.95rem;}
+  main{max-width:34rem;margin:0 auto;padding:0 1.3rem;display:flex;flex-direction:column;gap:1.5rem;}
+  .kaart{background:var(--paneel);border:1px solid var(--lijn);border-radius:18px;padding:1.4rem;}
+  .kaart h2{font-size:1.15rem;margin-bottom:.2rem;}
+  .kaart .bij{color:var(--muted);font-size:.86rem;margin-bottom:1rem;}
+  #code{min-height:16rem;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:1rem;}
+  button{font:inherit;font-weight:600;font-size:.86rem;border-radius:999px;border:1px solid var(--lijn);
+    background:transparent;color:var(--txt);padding:.5rem .95rem;cursor:pointer;transition:background .13s,border-color .13s;}
+  button:hover{border-color:var(--burgundy-on-dark);}
+  button[aria-pressed="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  button.primair{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  button.primair:hover{background:var(--burgundy-bright);}
+  .melding{margin-top:.5rem;font-size:.88rem;color:var(--muted);}
+  .goed{color:#7CC389;} .fout{color:var(--burgundy-on-dark);}
+  video{width:100%;max-width:22rem;border-radius:14px;background:#000;margin-top:1rem;display:none;}
+  video.aan{display:block;}
+  input[type=text]{flex:1;min-width:8rem;background:#0C0C0B;border:1px solid var(--lijn);border-radius:10px;color:var(--txt);font:inherit;font-size:.85rem;padding:.55rem .7rem;}
+  ul{list-style:none;display:flex;flex-direction:column;gap:.55rem;margin-top:.4rem;}
+  li{display:flex;gap:.6rem;font-size:.88rem;color:var(--muted);}
+  li b{color:var(--txt);font-weight:600;}
+  .punt{flex:0 0 auto;width:.5rem;height:.5rem;border-radius:50%;background:var(--burgundy-on-dark);margin-top:.45rem;}
+  .inlog{background:rgba(194,58,94,.1);border:1px solid var(--burgundy-on-dark);border-radius:12px;padding:.8rem 1rem;color:var(--txt);font-size:.88rem;}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">RTG-code</div>
+  <h1>Een gesloten, levende code</h1>
+  <p>Onze code is geen gewone QR. Alleen de RTG-app kan hem maken en lezen, en hij vernieuwt zichzelf. Een foto is binnen een halve minuut waardeloos.</p>
+</header>
+<main>
+  <section class="kaart" aria-labelledby="k1">
+    <h2 id="k1">Jouw levende code</h2>
+    <p class="bij">Ververst automatisch. Laat hem scannen door een RTG-kassa of -entree.</p>
+    <div id="inlogNodig" class="inlog" hidden>Log eerst in als lid; dan verschijnt je persoonlijke code hier.</div>
+    <div id="code" role="status" aria-live="polite"></div>
+    <div class="rij" role="group" aria-label="Merkteken">
+      <span style="color:var(--muted);font-size:.84rem;">Merkteken:</span>
+      <button id="mLip" aria-pressed="true">De lippen</button>
+      <button id="mHor" aria-pressed="false">Het horloge</button>
+    </div>
+  </section>
+
+  <section class="kaart" aria-labelledby="k2">
+    <h2 id="k2">Scannen</h2>
+    <p class="bij">De app leest de code en verifieert hem bij RTG. Een verlopen of vreemde code wordt geweigerd.</p>
+    <div class="rij">
+      <button id="camAan" class="primair" type="button">Open de camera</button>
+      <button id="camUit" type="button" hidden>Stop</button>
+    </div>
+    <video id="cam" playsinline></video>
+    <div class="rij">
+      <input id="plak" type="text" placeholder="Of plak hier een RTG-code om te testen" aria-label="RTG-code plakken">
+      <button id="check" type="button">Verifieer</button>
+    </div>
+    <div id="uit" class="melding" aria-live="polite"></div>
+  </section>
+
+  <section class="kaart" aria-labelledby="k3">
+    <h2 id="k3">Waarom zo</h2>
+    <ul>
+      <li><span class="punt"></span><span><b>Alleen onze app.</b> De code is ondertekend met een sleutel die alleen op de RTG-server staat; een gewone QR-lezer ziet enkel "RTG1..." en kan er niets mee.</span></li>
+      <li><span class="punt"></span><span><b>Dynamisch.</b> Elke code vervalt na tientallen seconden en ververst vanzelf, dus een schermafdruk veroudert meteen.</span></li>
+      <li><span class="punt"></span><span><b>In stijl.</b> Bordeaux van het RTG-logo, met de lippen of het horloge in het hart.</span></li>
+    </ul>
+  </section>
+</main>
+
+<script src="/shared/qr.js"></script>
+<script src="/shared/qrteken.js"></script>
+<script src="/shared/dyncode.js"></script>
+<script src="/shared/qrscan.js"></script>
+<script src="/shared/scanner.js"></script>
+<script src="/shared/rtgcode.js"></script>
+<script src="/shared/app-rtgcode.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

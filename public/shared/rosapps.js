@@ -43,6 +43,7 @@
     { naam: 'Hangar',          url: '/apps/hangar.html' },
     { naam: 'Mecenaat',        url: '/apps/mecenaat.html' },
     { naam: 'Lab-fonds',       url: '/apps/labfonds.html' },
+    { naam: 'RTG-code',        url: '/apps/rtgcode.html' },
     { naam: 'Nalatenschap',    url: '/apps/nalatenschap.html' },
     { naam: 'Logboek',         url: '/apps/logboek.html' },
     { naam: 'De Rechterhand',  url: '/apps/lifestyle.html' },

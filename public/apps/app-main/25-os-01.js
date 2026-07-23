@@ -52,6 +52,7 @@
     garderobe:   { naam: 'Garde-robe',    url: '/apps/garderobe.html' },
     mecenaat:    { naam: 'Mecenaat',      url: '/apps/mecenaat.html' },
     labfonds:    { naam: 'Lab-fonds',     url: '/apps/labfonds.html' },
+    rtgcode:     { naam: 'RTG-code',      url: '/apps/rtgcode.html' },
     nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/nalatenschap.html' },
     logboek:     { naam: 'Logboek',       url: '/apps/logboek.html' },
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
@@ -100,7 +101,7 @@
      voor de premium-suite, op de pas. */
   const WINKEL_GROEPEN = [
     { titel: 'Reizen & onderweg', items: ['tab:reizen', 'link:ov', 'link:vluchten', 'link:flits', 'link:stad', 'tab:terplaatse'] },
-    { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:office'] },
+    { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:rtgcode', 'link:office'] },
     { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:sport'] },
     { titel: 'Het huis & diensten', items: ['link:ontdek', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:labfonds', 'link:juridisch', 'link:passkeys', 'os:werk'] },
     { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],

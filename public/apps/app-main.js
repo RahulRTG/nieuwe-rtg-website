@@ -933,8 +933,30 @@
   }
   function onbVraagPaspoort(){
     const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
-    onbZeg(T('onb.q.paspoort','Tot slot een foto van de voorkant van je paspoort, zodat ik zeker weet dat jij het bent.'));
-    onbActies([{ txt: T('onb.upload','Foto kiezen'), prim: true, doe: function(){ onbEl('onbKycFile').click(); } }]);
+    onbZeg(T('onb.q.paspoort','Tot slot je paspoort, zodat ik zeker weet dat jij het bent. Scan het met de RTG-scanner of kies een foto.'));
+    onbActies([
+      { txt: T('onb.scan','Scan je paspoort'), prim: true, doe: function(){
+          if (window.RTGPaspoortScan) RTGPaspoortScan.open({ onKlaar: onbPaspoortUpload });
+          else onbEl('onbKycFile').click();
+        } },
+      { txt: T('onb.upload','Kies een foto'), doe: function(){ onbEl('onbKycFile').click(); } }
+    ]);
+  }
+  // de gekozen/gescande foto versleuteld naar de kluis en het gesprek vervolgen
+  async function onbPaspoortUpload(data){
+    if (!data) return;
+    const fout = onbEl('onbFout'); if (fout) fout.textContent = '';
+    onbBezig = true;
+    try {
+      await API.call('/verify/upload', { image: data });
+      if (user) user.verified = 'pending';
+      try { onbSt = await API.call('/onboarding/status'); } catch(e){}
+      onbBezig = false;
+      if (onbSt && onbSt.klaar) return onbKlaar();
+      onbRij = onbOpenVelden();
+      onbStap = onbRij.length ? 'veld' : 'teken';
+      onbVolgende();
+    } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.upmis','Uploaden lukte niet.'); }
   }
   function onbTekenVraag(){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');

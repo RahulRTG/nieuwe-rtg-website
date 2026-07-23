@@ -90,8 +90,23 @@
     netwerk: '<rect x="4" y="4.5" width="16" height="6" rx="1.5"/><rect x="4" y="13.5" width="16" height="6" rx="1.5"/><path d="M7.5 7.5h.01M7.5 16.5h.01"/>',
     antenne: '<path d="M12 13.2V21M12 13.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6.6 15.6a8 8 0 0 1 0-11.2M17.4 4.4a8 8 0 0 1 0 11.2"/>',
     gear: '<circle cx="12" cy="12" r="3.2"/><path d="M12 3.4v2.6M12 18v2.6M3.4 12H6M18 12h2.6M6 6l1.8 1.8M16.2 16.2 18 18M18 6l-1.8 1.8M7.8 16.2 6 18"/>',
-    help: '<circle cx="12" cy="12" r="8.5"/><path d="M9.4 9.1a2.6 2.6 0 0 1 5 .8c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="16.6" r=".7"/>'
+    help: '<circle cx="12" cy="12" r="8.5"/><path d="M9.4 9.1a2.6 2.6 0 0 1 5 .8c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="16.6" r=".7"/>',
+    hart: '<path d="M12 20.3l-1.4-1.3C6 14.9 3.5 12.6 3.5 9.4A3.9 3.9 0 0 1 7.4 5.5c1.5 0 2.9.7 3.6 1.9.7-1.2 2.1-1.9 3.6-1.9a3.9 3.9 0 0 1 3.9 3.9c0 3.2-2.5 5.5-7.1 9.6z"/>',
+    ster: '<path d="M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/>',
+    rekening: '<path d="M6 3.5h12v17l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3-2 1.3z"/><path d="M9 8h6M9 11.5h6M9 15h4"/>'
   };
+
+  /* De <svg>-jas als string (voor code die HTML samenstelt i.p.v. DOM-nodes).
+     opties: { fill:true } vult het glyf (bv. een actief hartje) i.p.v. lijnen. */
+  function svgHTML(naam, opt) {
+    var d = P[naam];
+    if (!d) return '';
+    opt = opt || {};
+    return '<svg viewBox="0 0 24 24" ' +
+      (opt.fill ? 'fill="currentColor" stroke="currentColor"' : 'fill="none" stroke="currentColor"') +
+      ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="rtg-glyf' +
+      (opt.klasse ? ' ' + opt.klasse : '') + '">' + d + '</svg>';
+  }
 
   function svg(naam) {
     var d = P[naam];
@@ -109,5 +124,5 @@
     return el;
   }
 
-  window.RTGGlyf = { svg: svg, heeft: function (n) { return !!P[n]; } };
+  window.RTGGlyf = { svg: svg, svgHTML: svgHTML, heeft: function (n) { return !!P[n]; } };
 })();

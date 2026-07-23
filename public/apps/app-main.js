@@ -2183,11 +2183,11 @@
     });
     const rekLijst = Object.entries(rekBij);
     const rekHtml = rekLijst.length
-      ? '<div class="sec-label">🧾 ' + T('app.rek.k','De rekening') + '</div>' + rekLijst.map(([code, r]) =>
+      ? '<div class="sec-label">' + T('app.rek.k','De rekening') + '</div>' + rekLijst.map(([code, r]) =>
           '<div class="rek-card"><div class="rek-top"><div><b>' + r.naam + '</b>' + (r.tafel ? ' · ' + r.tafel : '') +
             '<div class="sub2">' + r.n + ' ' + T('app.rek.bonnen','bon(nen) lopen') + ' · ' + T('app.rek.napm','betaal na het eten') + '</div></div>' +
             '<div class="amt">' + eur(r.som) + '</div></div>' +
-          '<button class="rek-pay" data-rekpay="' + code + '">🧾 ' + T('app.rek.vraag','Vraag de rekening') + '</button></div>').join('')
+          '<button class="rek-pay" data-rekpay="' + code + '">' + T('app.rek.vraag','Vraag de rekening') + '</button></div>').join('')
       : '';
     $('#myOrders').innerHTML = rekHtml + (active.length
       ? '<div class="sec-label">'+T('app.tp.myorders','Mijn bestellingen')+'</div>' + active.map(o => {
@@ -2201,8 +2201,8 @@
               : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
               (o.pickup ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon ophaalcode') + '</button>' : '') +
               (['nieuw','wacht-op-betaling'].includes(o.status) ? '<button class="mo-code js-oann">✕ ' + T('erv.annuleer','Annuleer') + '</button>' : '') +
-              (o.paid && !o.splitst ? '<button class="mo-code js-osplit">🤝 ' + T('erv.splits','Splits') + '</button>' : '') +
-              (['geserveerd','bezorgd','opgehaald'].includes(o.status) ? '<button class="mo-code js-orev">⭐ ' + T('erv.review','Beoordeel') + '</button>' : '') +
+              (o.paid && !o.splitst ? '<button class="mo-code js-osplit">' + T('erv.splits','Splits') + '</button>' : '') +
+              (['geserveerd','bezorgd','opgehaald'].includes(o.status) ? '<button class="mo-code js-orev">' + T('erv.review','Beoordeel') + '</button>' : '') +
               (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ '+T('app.taggedsalon','getagd voor Salon')+'</span>' : '') +
             '</div></div>';
         }).join('')
@@ -2218,7 +2218,7 @@
       if (ab) ab.addEventListener('click', async () => {
         try {
           const d = await API.call('/annuleer', { soort: 'order', ref: o.ref });
-          toast(d.terugbetaald ? '↩️ ' + T('erv.retour','U ontvangt') + ' ' + eur(d.terugbetaald) + ' ' + T('erv.terug','retour.') : T('erv.geannuleerd','Geannuleerd.'));
+          toast(d.terugbetaald ? T('erv.retour','U ontvangt') + ' ' + eur(d.terugbetaald) + ' ' + T('erv.terug','retour.') : T('erv.geannuleerd','Geannuleerd.'));
           renderTerPlaatse();
         } catch(e){ toast(e.message); }
       });
@@ -2236,14 +2236,14 @@
       const rooms = (s.rooms || []).length, photos = (s.photos || []).length;
       const zzp = (s.services || []).length > 0;
       const viewable = s.hasMenu || rooms || photos;
-      const afst = km!=null ? ' · 📍 ' + Geo.tekst(km) : '';
-      const ster = s.rating ? ' · ⭐ ' + s.rating.score : '';
+      const afst = km!=null ? ' · ' + Geo.tekst(km) : '';
+      const ster = s.rating ? ' · ' + s.rating.score : '';
       const sub = (s.vak ? s.vak : tType(s.typeLabel)) + ster + ' · ' + s.city + (rooms ? ' · ' + rooms + ' ' + T('app.roomsfree','kamer(s) vrij') : '') + afst;
       return '<div class="sup-card">' +
-        '<span class="ic">' + (s.icon || '📍') + '</span>' +
+        '<span class="ic">' + (s.icon || RTGGlyf.svgHTML('gps')) + '</span>' +
         '<div class="t"><b>' + s.name + '</b><span>' + sub + '</span></div>' +
-        '<button class="chatb js-fav" data-fav="' + s.code + '" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '❤️' : '🤍') + '</button>' +
-        '<button class="chatb" data-chat="' + s.code + '" aria-label="Chat">💬</button>' +
+        '<button class="chatb js-fav" data-fav="' + s.code + '" aria-label="' + T('fav.aria','Favoriet') + '">' + RTGGlyf.svgHTML('hart', s.favoriet ? { fill: true } : {}) + '</button>' +
+        '<button class="chatb" data-chat="' + s.code + '" aria-label="Chat">' + RTGGlyf.svgHTML('berichten') + '</button>' +
         (zzp
           ? '<button class="go" data-boek="' + s.code + '">'+T('app.tp.boek','Boek')+'</button>'
           : viewable
@@ -2257,8 +2257,8 @@
     $('#supplierList').querySelectorAll('.js-fav').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/favoriet', { supplierCode: b.dataset.fav });
-        b.textContent = d.favoriet ? '❤️' : '🤍';
-        toast(d.favoriet ? '❤️ ' + T('fav.on','Bewaard bij mijn adressen.') : T('fav.off','Uit mijn adressen gehaald.'));
+        b.innerHTML = RTGGlyf.svgHTML('hart', d.favoriet ? { fill: true } : {});
+        toast(d.favoriet ? T('fav.on','Bewaard bij mijn adressen.') : T('fav.off','Uit mijn adressen gehaald.'));
       } catch(e){ toast(e.message); }
     }));
     // eenmalig de locatie ophalen zodat partners op afstand worden getoond en gesorteerd

@@ -1,20 +1,22 @@
 /* RTG Bureau: op een ruim scherm staat het leden-OS als een gecentreerd
-   tablet-venster; de lege ruimte rechts vult zich met widgets die je zelf
-   neerzet. Elke widget spiegelt een kaart uit de app (De Salon, Chat, Reis,
-   Betalen) en ververst mee; je sleept ze waarheen je wilt en hun plek wordt
-   onthouden. Met de plus-knop haal je er widgets bij of terug.
+   tablet-venster; de lege ruimte links en rechts vult zich met widgets die je
+   zelf neerzet. Elke widget LEENT een echte kaart uit de app (De Salon, Chat,
+   Reis, Betalen, RTFoundation): de kaart wordt met huid en haar naar de widget
+   verplaatst, dus hij werkt en ververst gewoon door -- klikken, sturen, openen,
+   alles doet het. Je sleept ze waarheen je wilt (links of rechts) en hun plek
+   wordt onthouden. Met de plus-knop haal je widgets bij of terug; met het
+   kruisje geef je een kaart weer terug aan het beginscherm.
 
-   Alleen op brede schermen (naast het 820px-venster is genoeg plek) en pas
-   nadat je binnen bent (de app is actief). Zuiver presentatie: de widgets
-   lezen de al-getekende kaarten, er gaat geen extra verkeer naar de server. */
+   Alleen op brede schermen en pas nadat je binnen bent (de app is actief).
+   Zodra het scherm te smal wordt, keren alle kaarten netjes terug naar hun
+   plek in de app. */
 (function () {
   if (window.RTGBureau) return;
-  var MIN = 1360;                 // vanaf hier is er rechts genoeg ruimte
-  var BREED = 300;
-  var SLEUTEL = 'rtg_bureau_v1';
+  var MIN = 1360;
+  var BREED = 288;
+  var SLEUTEL = 'rtg_bureau_v2';
   var RUSTIG = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // de beschikbare widgets: naam + de bronkaart die ze spiegelen
   var SOORTEN = [
     { id: 'salon', naam: 'De Salon', bron: 'homeSalon' },
     { id: 'chat', naam: 'Chat', bron: 'homeContacts' },
@@ -29,35 +31,37 @@
 
   function laadStaat() {
     try { var s = JSON.parse(localStorage.getItem(SLEUTEL)); if (s && s.widgets) return s; } catch (e) {}
-    // standaard: Salon en Chat, netjes onder elkaar in de rechtermarge
-    return { widgets: [{ id: 'salon', x: null, y: 40 }, { id: 'chat', x: null, y: 430 }] };
+    // standaard: Chat links, De Salon rechts -- beide marges gevuld
+    return { widgets: [{ id: 'chat', kant: 'links', x: null, y: 40 }, { id: 'salon', kant: 'rechts', x: null, y: 40 }] };
   }
   function bewaar() { try { localStorage.setItem(SLEUTEL, JSON.stringify(staat)); } catch (e) {} }
 
   function rechterMarge() { return Math.round((window.innerWidth + 820) / 2 + 26); }
+  function linkerMarge() { return Math.max(16, Math.round((window.innerWidth - 820) / 2 - BREED - 26)); }
+  function beginX(w) { return w.x != null ? w.x : (w.kant === 'links' ? linkerMarge() : rechterMarge()); }
 
   function stijl() {
     if (document.getElementById('bureauCss')) return;
     var st = document.createElement('style'); st.id = 'bureauCss';
     st.textContent =
       '#bureau{position:fixed;inset:0;z-index:1;pointer-events:none;}' +
-      '.bw{position:absolute;width:' + BREED + 'px;max-height:46vh;pointer-events:auto;' +
-        'background:color-mix(in srgb, var(--card,#151312) 78%, transparent);' +
+      '.bw{position:absolute;width:' + BREED + 'px;max-height:52vh;pointer-events:auto;' +
+        'background:color-mix(in srgb, var(--card,#151312) 80%, transparent);' +
         'backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);' +
         'border:1px solid var(--line,rgba(255,255,255,.1));border-radius:18px;overflow:hidden;' +
         'box-shadow:0 24px 60px rgba(0,0,0,.55);display:flex;flex-direction:column;' +
         (RUSTIG ? '' : 'transition:box-shadow .16s ease,transform .16s ease;') + '}' +
-      '.bw.pak{box-shadow:0 34px 80px rgba(0,0,0,.7);' + (RUSTIG ? '' : 'transform:scale(1.012);') + 'cursor:grabbing;}' +
-      '.bw-kop{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;cursor:grab;' +
-        'border-bottom:1px solid var(--line,rgba(255,255,255,.08));user-select:none;}' +
+      '.bw.pak{box-shadow:0 34px 80px rgba(0,0,0,.7);' + (RUSTIG ? '' : 'transform:scale(1.012);') + '}' +
+      '.bw-kop{display:flex;align-items:center;gap:.5rem;padding:.55rem .8rem;cursor:grab;' +
+        'border-bottom:1px solid var(--line,rgba(255,255,255,.08));user-select:none;flex:0 0 auto;}' +
+      '.bw.pak .bw-kop{cursor:grabbing;}' +
       '.bw-grip{display:flex;gap:2px;}.bw-grip i{width:3px;height:3px;border-radius:50%;background:var(--soft,#8A8680);display:block;}' +
       '.bw-naam{flex:1;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--txt,#F4F1EC);}' +
-      '.bw-x{background:none;border:none;color:var(--soft,#8A8680);cursor:pointer;font-size:1rem;line-height:1;padding:.1rem .2rem;}' +
+      '.bw-x{background:none;border:none;color:var(--soft,#8A8680);cursor:pointer;font-size:1rem;line-height:1;padding:.1rem .3rem;}' +
       '.bw-x:hover{color:var(--txt,#F4F1EC);}' +
-      '.bw-body{padding:.7rem .85rem 1rem;overflow-y:auto;font-size:.82rem;color:var(--muted,#B7B2A8);}' +
-      '.bw-body .label{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold,#857007);font-weight:700;margin-bottom:.3rem;}' +
-      '.bw-body .big{font-family:"Bodoni Moda",serif;font-size:1.05rem;color:var(--txt,#F4F1EC);}' +
-      '.bw-leeg{color:var(--soft,#8A8680);font-size:.78rem;}' +
+      '.bw-body{padding:.7rem .8rem 1rem;overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0;}' +
+      '.bw-body > .card,.bw-body > .os-social{margin:0!important;background:none!important;border:none!important;box-shadow:none!important;padding:0!important;}' +
+      '.bw-leeg{color:var(--soft,#8A8680);font-size:.8rem;}' +
       '#bureauPlus{position:fixed;pointer-events:auto;z-index:2;bottom:calc(env(safe-area-inset-bottom,0px) + 1.1rem);' +
         'width:44px;height:44px;border-radius:50%;border:1px solid var(--line,rgba(255,255,255,.14));' +
         'background:color-mix(in srgb, var(--card,#151312) 70%, transparent);backdrop-filter:blur(18px);' +
@@ -65,7 +69,7 @@
         'box-shadow:0 12px 30px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;}' +
       '#bureauMenu{position:fixed;pointer-events:auto;z-index:3;display:none;flex-direction:column;gap:.15rem;' +
         'padding:.4rem;border-radius:14px;border:1px solid var(--line,rgba(255,255,255,.12));' +
-        'background:color-mix(in srgb, var(--card,#151312) 88%, transparent);backdrop-filter:blur(20px);' +
+        'background:color-mix(in srgb, var(--card,#151312) 90%, transparent);backdrop-filter:blur(20px);' +
         '-webkit-backdrop-filter:blur(20px);box-shadow:0 20px 50px rgba(0,0,0,.6);}' +
       '#bureauMenu.open{display:flex;}' +
       '#bureauMenu button{background:none;border:none;text-align:left;color:var(--txt,#F4F1EC);font-family:inherit;' +
@@ -75,40 +79,59 @@
     document.head.appendChild(st);
   }
 
+  /* Een echte kaart lenen: laat een anker achter op de oorspronkelijke plek en
+     verplaats het echte element naar de widget. Zo blijven alle klik-handlers
+     en de live updates werken -- de widget is dus echt interactief. */
+  function leen(body, s) {
+    var bron = document.getElementById(s.bron);
+    if (!bron) { body.innerHTML = '<div class="bw-leeg">Even niet beschikbaar.</div>'; return; }
+    if (!document.querySelector('.bw-anker[data-voor="' + s.bron + '"]')) {
+      var anker = document.createElement('span'); anker.className = 'bw-anker'; anker.hidden = true; anker.dataset.voor = s.bron;
+      if (bron.parentNode) bron.parentNode.insertBefore(anker, bron);
+    }
+    bron.style.display = '';
+    body.appendChild(bron);
+  }
+  function terug(s) {
+    var bron = document.getElementById(s.bron); if (!bron) return;
+    var anker = document.querySelector('.bw-anker[data-voor="' + s.bron + '"]');
+    if (anker && anker.parentNode) { anker.parentNode.insertBefore(bron, anker); anker.parentNode.removeChild(anker); }
+  }
+
   function widgetEl(w) {
     var s = soort(w.id); if (!s) return null;
     var el = document.createElement('section'); el.className = 'bw'; el.dataset.id = w.id;
-    el.innerHTML =
-      '<div class="bw-kop"><span class="bw-grip"><i></i><i></i><i></i></span>' +
-      '<span class="bw-naam"></span><button class="bw-x" aria-label="Sluiten">&times;</button></div>' +
-      '<div class="bw-body"><div class="bw-leeg">…</div></div>';
-    el.querySelector('.bw-naam').textContent = s.naam;
-    var x = (w.x == null ? rechterMarge() : w.x);
-    var y = (w.y == null ? 40 : w.y);
-    el.style.left = x + 'px'; el.style.top = y + 'px';
-    el.querySelector('.bw-x').addEventListener('click', function () { verwijder(w.id); });
-    sleepbaar(el, w);
+    var kop = document.createElement('div'); kop.className = 'bw-kop';
+    kop.innerHTML = '<span class="bw-grip"><i></i><i></i><i></i></span><span class="bw-naam"></span><button class="bw-x" aria-label="Terug naar het beginscherm">&times;</button>';
+    kop.querySelector('.bw-naam').textContent = s.naam;
+    kop.querySelector('.bw-x').addEventListener('click', function () { verwijder(w.id); });
+    var body = document.createElement('div'); body.className = 'bw-body';
+    el.appendChild(kop); el.appendChild(body);
+    el.style.left = beginX(w) + 'px'; el.style.top = (w.y == null ? 40 : w.y) + 'px';
+    leen(body, s);
+    sleepbaar(el, kop, w);
     return el;
   }
 
-  function sleepbaar(el, w) {
-    var kop = el.querySelector('.bw-kop');
+  function sleepbaar(el, kop, w) {
     kop.addEventListener('pointerdown', function (e) {
       if (e.target.closest('.bw-x')) return;
       e.preventDefault();
       var startX = e.clientX, startY = e.clientY;
       var beginL = parseFloat(el.style.left) || 0, beginT = parseFloat(el.style.top) || 0;
-      el.classList.add('pak'); el.setPointerCapture && el.setPointerCapture(e.pointerId);
+      el.classList.add('pak'); try { el.setPointerCapture(e.pointerId); } catch (x) {}
       function beweeg(ev) {
         var nx = Math.max(4, Math.min(window.innerWidth - 60, beginL + (ev.clientX - startX)));
-        var ny = Math.max(4, Math.min(window.innerHeight - 40, beginT + (ev.clientY - startY)));
+        var ny = Math.max(4, Math.min(window.innerHeight - 44, beginT + (ev.clientY - startY)));
         el.style.left = nx + 'px'; el.style.top = ny + 'px';
       }
       function los() {
         el.classList.remove('pak');
         document.removeEventListener('pointermove', beweeg);
         document.removeEventListener('pointerup', los);
-        w.x = parseFloat(el.style.left); w.y = parseFloat(el.style.top); bewaar();
+        w.x = parseFloat(el.style.left); w.y = parseFloat(el.style.top);
+        w.kant = w.x < window.innerWidth / 2 ? 'links' : 'rechts';
+        bewaar();
       }
       document.addEventListener('pointermove', beweeg);
       document.addEventListener('pointerup', los);
@@ -117,38 +140,25 @@
 
   function teken() {
     if (!laag) return;
+    // eerst alle geleende kaarten teruggeven, dan pas de laag legen
+    laag.querySelectorAll('.bw').forEach(function (w) { var s = soort(w.dataset.id); if (s) terug(s); });
     laag.innerHTML = '';
     staat.widgets.forEach(function (w) { var el = widgetEl(w); if (el) laag.appendChild(el); });
-    sync();
     vulMenu();
   }
 
-  // de widget-lichamen spiegelen de al-getekende kaarten uit de app
-  function sync() {
-    if (!laag) return;
-    var kaarten = laag.querySelectorAll('.bw');
-    for (var i = 0; i < kaarten.length; i++) {
-      var el = kaarten[i], s = soort(el.dataset.id); if (!s) continue;
-      var bron = document.getElementById(s.bron);
-      var body = el.querySelector('.bw-body');
-      if (bron && bron.innerHTML.trim() && bron.style.display !== 'none') {
-        if (body.dataset.hash !== String(bron.innerHTML.length) + bron.innerHTML.slice(0, 24)) {
-          body.innerHTML = bron.innerHTML;
-          body.dataset.hash = String(bron.innerHTML.length) + bron.innerHTML.slice(0, 24);
-        }
-      } else if (!body.querySelector('.bw-leeg')) {
-        body.innerHTML = '<div class="bw-leeg">Niets om te tonen.</div>';
-      }
-    }
-  }
-
   function verwijder(id) {
+    var s = soort(id); if (s) terug(s);
     staat.widgets = staat.widgets.filter(function (w) { return w.id !== id; });
     bewaar(); teken();
   }
   function voegToe(id) {
     if (staat.widgets.some(function (w) { return w.id === id; })) return;
-    staat.widgets.push({ id: id, x: rechterMarge(), y: 40 + staat.widgets.length * 40 });
+    // afwisselend links/rechts, op de kant met de minste widgets
+    var links = staat.widgets.filter(function (w) { return w.kant === 'links'; }).length;
+    var rechts = staat.widgets.length - links;
+    var kant = links <= rechts ? 'links' : 'rechts';
+    staat.widgets.push({ id: id, kant: kant, x: null, y: 40 + Math.floor(staat.widgets.length / 2) * 60 });
     bewaar(); teken();
     if (menu) menu.classList.remove('open');
   }
@@ -180,11 +190,10 @@
     document.body.appendChild(plusKnop); document.body.appendChild(menu);
     plusKnop.addEventListener('click', function () { menu.classList.toggle('open'); });
     plaatsKnop(); teken();
-    // meelezen met de app: elke seconde de kaarten spiegelen (zuinig, alleen zichtbaar)
-    setInterval(function () { if (actief && !document.hidden) sync(); }, 1100);
   }
   function uit() {
     if (!actief) return; actief = false;
+    if (laag) { laag.querySelectorAll('.bw').forEach(function (w) { var s = soort(w.dataset.id); if (s) terug(s); }); }
     if (laag && laag.parentNode) laag.parentNode.removeChild(laag);
     if (plusKnop && plusKnop.parentNode) plusKnop.parentNode.removeChild(plusKnop);
     if (menu && menu.parentNode) menu.parentNode.removeChild(menu);
@@ -194,23 +203,20 @@
   function beoordeel() {
     var app = document.getElementById('app');
     var binnen = app && app.classList.contains('active');
-    var ruim = window.innerWidth >= MIN;
-    if (binnen && ruim) { aan(); plaatsKnop(); }
+    if (binnen && window.innerWidth >= MIN) { aan(); plaatsKnop(); }
     else uit();
   }
 
   function start() {
     var app = document.getElementById('app');
-    if (app) {
-      // reageer zodra de app actief wordt (na de inlog) of weer verdwijnt
-      new MutationObserver(beoordeel).observe(app, { attributes: true, attributeFilter: ['class'] });
-    }
-    window.addEventListener('resize', function () { if (actief) plaatsKnop(); beoordeel(); });
+    if (app) new MutationObserver(beoordeel).observe(app, { attributes: true, attributeFilter: ['class'] });
+    var t;
+    window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (actief) plaatsKnop(); beoordeel(); }, 120); });
     beoordeel();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 
-  window.RTGBureau = { sync: sync, beoordeel: beoordeel };
+  window.RTGBureau = { beoordeel: beoordeel };
 })();

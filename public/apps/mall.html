@@ -33,6 +33,7 @@
   .boutiek:hover{border-color:var(--gold);transform:translateY(-2px);}
   .boutiek h3{font-size:1.05rem;}
   .boutiek .stad{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
+  .boutiek .stad .stad-glyf{width:.95em;height:.95em;vertical-align:-.12em;margin-right:.3em;}
   .boutiek .tag{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:.15rem;}
   .boutiek .meta{font-size:.76rem;color:var(--soft);margin-top:.35rem;}
   .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
@@ -224,7 +225,7 @@ async function laadAppbieb(){
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' apps · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · bladeren voor iedereen · installeren bij de pas</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="abCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
-        d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+' ('+c.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
+        d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+' ('+c.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
       '<input id="abZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
       '<button class="knop stil" id="abMijn" type="button">Mijn apps</button>'+
     '</div>'+
@@ -236,7 +237,7 @@ async function laadAppbieb(){
 }
 function appKaart(a, geinstalleerd){
   return '<div class="boutiek" style="cursor:default;">'+
-    '<span class="stad">'+a.icon+' '+esc(a.categorieLabel)+'</span>'+
+    '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel)+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
     '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</span>'+
     '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
@@ -524,6 +525,7 @@ $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('ope
   });
 })();</script>
 
+<script src="/shared/glyf.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/cookie.js" defer></script>

@@ -809,29 +809,25 @@
   .soft-sm{font-size:0.72rem;color:var(--soft);}
   .soft-sm-grow{flex:1;font-size:0.72rem;color:var(--soft);}
   .grow-min{flex:1;min-width:0;}
-  /* Verplichte onboarding + contract: een blokkerende poort na het inloggen. */
-  #onbGate{position:fixed;inset:0;z-index:130;background:var(--bg,#0C0C0B);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 1.4rem) 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.6rem);}
+  /* Verplichte onboarding als gesprek met Rahul: dezelfde poort-taal als de
+     inlog (Bodoni-zin, één invoerregel), geen formulier. Blokkeert tot rond. */
+  #onbGate{position:fixed;inset:0;z-index:130;background:radial-gradient(130% 100% at 50% -10%, #141013, #000 82%);overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 1.4rem) 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.6rem);}
   #onbGate[hidden]{display:none;}
-  .onb-card{max-width:34rem;margin:0 auto;}
-  .onb-card h1{font-size:1.5rem;line-height:1.15;}
-  .onb-deck{margin:.5rem 0 1.2rem;font-size:.86rem;color:var(--muted);line-height:1.55;}
-  .onb-sec{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.3rem 0 .5rem;}
-  .onb-veld{display:block;margin-bottom:.7rem;}
-  .onb-veld span{display:block;font-size:.78rem;color:var(--soft);margin-bottom:.25rem;}
-  .onb-veld input{width:100%;background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,.09));border-radius:10px;padding:.6rem .7rem;color:var(--txt,#F4F1EC);font-family:inherit;font-size:.9rem;}
-  .onb-kyc{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,.09));border-radius:10px;padding:.6rem .8rem;margin-bottom:.7rem;}
-  .onb-kyc b{font-size:.82rem;} .onb-kyc .sub{display:block;font-size:.7rem;color:var(--soft);}
-  .onb-kyc .st{font-size:.72rem;font-weight:700;}
-  .onb-btn{background:var(--gold,#A98F1C);color:#0C0C0B;border:none;border-radius:10px;padding:.55rem .9rem;font-weight:700;font-family:inherit;font-size:.82rem;cursor:pointer;}
-  .onb-btn.ghost{background:none;border:1px solid var(--line);color:var(--txt);}
-  .onb-contract{border:1px solid var(--line,rgba(255,255,255,.09));border-radius:12px;background:var(--card,#151312);margin-top:.4rem;}
-  .onb-contract h2{font-size:.95rem;padding:.7rem .9rem 0;}
-  .onb-tekst{max-height:15rem;overflow-y:auto;padding:.5rem .9rem .9rem;font-size:.8rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;}
-  .onb-akkoord{display:flex;gap:.5rem;align-items:flex-start;margin:.9rem 0 .5rem;font-size:.82rem;color:var(--txt);}
-  .onb-akkoord input{margin-top:.15rem;width:1.1rem;height:1.1rem;flex-shrink:0;}
-  #onbNaam{width:100%;background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,.09));border-radius:10px;padding:.6rem .7rem;color:var(--txt,#F4F1EC);font-family:inherit;font-size:.9rem;margin-bottom:.6rem;}
-  #onbKlaar{width:100%;padding:.8rem;font-size:.9rem;}
-  .onb-fout{color:#F4B8C6;font-size:.78rem;min-height:1rem;margin:.4rem 0;}
+  .onb-card{max-width:30rem;width:100%;margin:0 auto;text-align:center;}
+  .onb-lippen{width:132px;margin:0 auto .35rem;}
+  .onb-lippen svg,.onb-lip-svg{width:100%;height:auto;display:block;}
+  .onb-mini{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:.2rem;}
+  .onb-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.22rem;line-height:1.5;color:var(--txt);min-height:3.6rem;text-wrap:balance;margin:.2rem 0 1.1rem;animation:agZin .5s ease;}
+  .onb-rij{display:flex;align-items:center;border-bottom:1px solid var(--line);margin:0 .3rem;transition:border-color .2s;}
+  .onb-rij:focus-within{border-color:var(--burgundy);}
+  .onb-rij input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt);font-family:'Inter',sans-serif;font-size:.95rem;text-align:center;padding:.75rem .4rem;}
+  .onb-rij input::placeholder{color:var(--soft);}
+  .onb-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;padding:.4rem .2rem;font-family:inherit;}
+  .onb-acties{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1rem;}
+  .onb-acties button{background:none;border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.72rem;color:var(--txt);font-family:inherit;cursor:pointer;letter-spacing:.02em;}
+  .onb-acties button.prim{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);font-weight:700;}
+  .onb-lees{max-height:14rem;overflow-y:auto;margin-top:1rem;padding:.8rem 1rem;border:1px solid var(--line);border-radius:12px;background:var(--card,#151312);font-size:.8rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;text-align:left;}
+  .onb-fout{color:#F4B8C6;font-size:.78rem;min-height:1rem;margin:.6rem 0 0;}
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
   /* ============================== RTG OS ==============================
      De leden-app als telefoon-besturingssysteem: statusbalk met klok, het
@@ -1357,19 +1353,21 @@
     </div>
   </div>
 
-  <!-- verplichte onboarding + contract (blokkeert de app tot alles rond is) -->
+  <!-- verplichte onboarding: geen formulier, maar een gesprek met Rahul. Hij
+       vraagt de ontbrekende gegevens één voor één, laat de overeenkomst lezen
+       en laat je tekenen door je naam te typen (10-social-01/02.js). -->
   <div id="onbGate" role="dialog" aria-modal="true" aria-labelledby="onbTitel" hidden>
     <div class="onb-card">
-      <h1 id="onbTitel">Nog even dit, dan gaan we op reis</h1>
-      <p class="onb-deck">Je pas is bedoeld om te reizen. Vul je gegevens aan en teken de overeenkomst; daarna staat de hele wereld voor je open.</p>
-      <div id="onbVelden"></div>
-      <div class="onb-sec">De overeenkomst</div>
-      <div class="onb-contract"><h2 id="onbCTitel"></h2><div class="onb-tekst" id="onbCTekst"></div></div>
-      <label class="onb-akkoord"><input type="checkbox" id="onbAkkoord"><span id="onbAkkoordTxt">Ik heb de overeenkomst gelezen en ga akkoord.</span></label>
-      <label class="onb-veld"><span id="onbNaamLbl">Typ je volledige naam om digitaal te ondertekenen</span>
-        <input id="onbNaam" autocomplete="name"></label>
+      <div class="onb-lippen" id="onbLippen" aria-hidden="true"></div>
+      <p class="onb-mini" id="onbMini">Rahul</p>
+      <h1 id="onbTitel" class="onb-zin" role="status" aria-live="polite">Nog even dit, dan gaan we op reis.</h1>
+      <div class="onb-rij" id="onbRij">
+        <input id="onbIn" autocomplete="off" aria-label="Je antwoord aan Rahul" placeholder="Typ je antwoord">
+        <button type="button" id="onbGo" aria-label="Stuur">&#8594;</button>
+      </div>
+      <div class="onb-acties" id="onbActies"></div>
+      <div class="onb-lees" id="onbLees" hidden></div>
       <div class="onb-fout" id="onbFout" role="alert"></div>
-      <button class="onb-btn" id="onbKlaar" type="button">Onderteken en ga verder</button>
       <input type="file" id="onbKycFile" accept="image/*" hidden>
     </div>
   </div>
@@ -1960,6 +1958,19 @@ window.I18N = { en: {
   'sal.share.h':'Share with a connection', 'sal.deel':'Share with a connection', 'sal.gedeeld':'Shared.',
   'ag.plho':'I\'d like to say…', 'ag.in':'Your reply to Rahul', 'ag.ww':'Your password',
   'ag.stuur':'Send', 'ag.log':'Rahul',
+  'onb.intro':'Good to have you. Just a few things and you are ready to travel.',
+  'onb.typ':'Type your answer', 'onb.naamph':'Type your full name',
+  'onb.q.adres':'What is your street and house number?', 'onb.q.postcode':'And your postcode?',
+  'onb.q.woonplaats':'Which town do you live in?', 'onb.q.land':'And in which country?',
+  'onb.q.geboortedatum':'What is your date of birth?', 'onb.q.nationaliteit':'What is your nationality?',
+  'onb.q.naam':'What is your full name?', 'onb.q.email':'What is your email address?',
+  'onb.q.telefoon':'And your phone number?', 'onb.q.veld':'What is your ',
+  'onb.q.paspoort':'Lastly, a photo of the front of your passport, so I know for sure it is you.',
+  'onb.upload':'Choose a photo', 'onb.overeenkomst':'agreement',
+  'onb.teken':'Last step: the ', 'onb.teken2':'. Type your full name to sign; that is your agreement. Want to read it first?',
+  'onb.lees':'Read the agreement', 'onb.naamkort':'Type your full name to sign.',
+  'onb.mis':'That did not work, please try again.', 'onb.upmis':'Upload failed.',
+  'onb.toobig':'The photo is too large (max 5 MB).', 'onb.welkom':'Welcome aboard! Have a wonderful trip.',
   'sal.add':'Add', 'sal.zoek':'Search', 'sal.zoekph':'Search by codename, e.g. Golden Ibis',
   'sal.zoekkort':'Type at least two letters.', 'sal.niksgevonden':'No members found with this codename.',
   'sal.verzoek':'Send request', 'sal.verzonden':'Request sent.', 'sal.isverbonden':'connected',

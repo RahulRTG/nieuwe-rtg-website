@@ -1,56 +1,11 @@
-    const huidig = {}; vBox.querySelectorAll('input[data-veld]').forEach(function(i){ if (i.value) huidig[i.dataset.veld] = i.value; });
-    vBox.textContent='';
-    (st.velden||[]).forEach(function(v){
-      if (v.type === 'kyc'){
-        const d = document.createElement('div'); d.className='onb-kyc';
-        const l = document.createElement('div');
-        const b = document.createElement('b'); b.textContent = v.label; l.appendChild(b);
-        const s = document.createElement('span'); s.className='sub';
-        s.textContent = v.ingevuld ? T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.') : T('onb.kyc.upl','Upload een foto van de voorkant van uw paspoort.');
-        l.appendChild(s); d.appendChild(l);
-        if (v.ingevuld){ const st2 = document.createElement('span'); st2.className='st'; st2.style.color='#7EE0A3'; st2.textContent='✓'; d.appendChild(st2); }
-        else { const btn = document.createElement('button'); btn.type='button'; btn.className='onb-btn ghost'; btn.textContent=T('onb.kyc.knop','Uploaden');
-          btn.addEventListener('click', ()=> document.getElementById('onbKycFile').click()); d.appendChild(btn); }
-        vBox.appendChild(d); return;
-      }
-      const wrap = document.createElement('label'); wrap.className='onb-veld';
-      const sp = document.createElement('span'); sp.textContent = v.label + (v.ingevuld ? ' ✓' : '');
-      wrap.appendChild(sp);
-      const inp = document.createElement('input'); inp.type = onbInputType(v.type); inp.dataset.veld = v.id;
-      inp.value = huidig[v.id] != null ? huidig[v.id] : (v.waarde || ''); inp.autocomplete = ({naam:'name',email:'email',telefoon:'tel',adres:'street-address',postcode:'postal-code',woonplaats:'address-level2',land:'country-name'})[v.id] || 'off';
-      wrap.appendChild(inp); vBox.appendChild(wrap);
-    });
-    document.getElementById('onbCTitel').textContent = st.contract.titel || '';
-    document.getElementById('onbCTekst').textContent = st.contract.tekst || '';
-    const ak = document.getElementById('onbAkkoord'); ak.checked = ak.checked || !!st.contract.ondertekend;
-    document.getElementById('onbFout').textContent = '';
-  }
-  (function initOnb(){
+  // Het onboarding-gesprek bedraden: de invoerregel, de stuur-knop en de
+  // paspoort-upload. De gespreksfuncties zelf staan in 10-social-01.
+  (function initOnbGesprek(){
+    const go = document.getElementById('onbGo'), inp = document.getElementById('onbIn');
+    if (go && inp) go.addEventListener('click', function(){ onbInvoer(inp.value); });
+    if (inp) inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); onbInvoer(inp.value); } });
     const kf = document.getElementById('onbKycFile');
-    if (kf) kf.addEventListener('change', async () => {
-      const file = kf.files[0]; kf.value=''; if (!file) return;
-      if (file.size > 5*1024*1024){ document.getElementById('onbFout').textContent = T('onb.toobig','De foto is te groot (max 5 MB).'); return; }
-      const data = await snapVerklein(file); if (!data) return;
-      try { await API.call('/verify/upload', { image: data }); if (user) user.verified='pending'; toast(T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.')); checkOnboarding(); }
-      catch(e){ document.getElementById('onbFout').textContent = e.message || 'Upload mislukt.'; }
-    });
-    const kn = document.getElementById('onbKlaar');
-    if (kn) kn.addEventListener('click', async () => {
-      const fout = document.getElementById('onbFout'); fout.textContent='';
-      onbBezig = true;
-      try {
-        const velden = {};
-        document.querySelectorAll('#onbVelden input[data-veld]').forEach(function(i){ if (i.value.trim()) velden[i.dataset.veld] = i.value.trim(); });
-        if (Object.keys(velden).length) { try { await API.call('/onboarding/opslaan', { velden }); } catch(e){} }
-        const naam = (document.getElementById('onbNaam').value || '').trim();
-        const akkoord = document.getElementById('onbAkkoord').checked;
-        const r = await API.call('/onboarding/teken', { naam, akkoord });
-        if (r.klaar){ document.getElementById('onbGate').hidden = true; toast(T('onb.welkom','Welkom aan boord! Fijne reis.')); onbBezig=false; return; }
-        tekenOnbGate(r);
-        fout.textContent = T('onb.rest','Nog niet compleet: vul de resterende velden in (ook uw paspoort).');
-      } catch(e){ fout.textContent = e.message || 'Er ging iets mis.'; }
-      onbBezig = false;
-    });
+    if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();
 
   function snapOverlay(){

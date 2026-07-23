@@ -795,73 +795,154 @@
       rd.onload=()=>{ img.onload=()=>{ const max=1000; let w=img.width,h=img.height; if(w>max||h>max){ const r=Math.min(max/w,max/h); w=Math.round(w*r); h=Math.round(h*r);} const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h); res(cv.toDataURL('image/jpeg',0.7)); }; img.onerror=()=>res(null); img.src=rd.result; };
       rd.onerror=()=>res(null); rd.readAsDataURL(file); });
   }
-  /* ---------- verplichte onboarding + contract (blokkeert de app) ---------- */
-  let onbBezig = false;
+  /* ---------- verplichte onboarding als gesprek met Rahul ----------
+     Geen formulier meer: Rahul vraagt de ontbrekende gegevens één voor één,
+     laat de overeenkomst lezen en laat je tekenen door je naam te typen. Alles
+     loopt over dezelfde routes als voorheen (/onboarding/status|opslaan|teken
+     en /verify/upload). De invoerregel + knoppen worden in 10-social-02
+     bedraad; de gespreksfuncties staan hier. */
+  let onbBezig = false, onbSt = null, onbRij = [], onbStap = null, onbHuidig = null, onbGeopend = false;
+  function onbEl(id){ return document.getElementById(id); }
+  function onbZeg(t){ const z = onbEl('onbTitel'); if (!z) return; z.style.animation = 'none'; void z.offsetWidth; z.style.animation = ''; z.textContent = t; }
+  function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
+  function onbLippen(){ const l = onbEl('onbLippen'); if (l && !l.innerHTML && window.RTGGlyf && RTGGlyf.heeft('lips')) l.innerHTML = RTGGlyf.svgHTML('lips', { klasse: 'onb-lip-svg' }); }
+  function onbOpenVelden(){ return ((onbSt && onbSt.velden) || []).filter(function(v){ return !v.ingevuld; }); }
+
   async function checkOnboarding(){
     if (!API.live || !API.token || onbBezig) return;
     let st; try { st = await API.call('/onboarding/status'); } catch(e){ return; }
-    if (!st || st.klaar){ var g0 = document.getElementById('onbGate'); if (g0) g0.hidden = true; return; }
-    tekenOnbGate(st);
+    if (!st || st.klaar){ const g0 = onbEl('onbGate'); if (g0) g0.hidden = true; return; }
+    onbStartGesprek(st);
   }
-  function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
-  function tekenOnbGate(st){
-    const g = document.getElementById('onbGate'); if (!g) return;
+  function onbStartGesprek(st){
+    const g = onbEl('onbGate'); if (!g) return;
+    if (!g.hidden && onbStap) return; // al bezig, niet opnieuw beginnen
+    onbSt = st; onbLippen();
+    onbRij = onbOpenVelden();
+    onbStap = onbRij.length ? 'veld' : 'teken';
+    const eerste = !onbGeopend; onbGeopend = true;
     g.hidden = false;
-    const vBox = document.getElementById('onbVelden');
-    // bewaar wat de gebruiker al typte (een KYC-upload herbouwt dit paneel)
-    const huidig = {}; vBox.querySelectorAll('input[data-veld]').forEach(function(i){ if (i.value) huidig[i.dataset.veld] = i.value; });
-    vBox.textContent='';
-    (st.velden||[]).forEach(function(v){
-      if (v.type === 'kyc'){
-        const d = document.createElement('div'); d.className='onb-kyc';
-        const l = document.createElement('div');
-        const b = document.createElement('b'); b.textContent = v.label; l.appendChild(b);
-        const s = document.createElement('span'); s.className='sub';
-        s.textContent = v.ingevuld ? T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.') : T('onb.kyc.upl','Upload een foto van de voorkant van uw paspoort.');
-        l.appendChild(s); d.appendChild(l);
-        if (v.ingevuld){ const st2 = document.createElement('span'); st2.className='st'; st2.style.color='#7EE0A3'; st2.textContent='✓'; d.appendChild(st2); }
-        else { const btn = document.createElement('button'); btn.type='button'; btn.className='onb-btn ghost'; btn.textContent=T('onb.kyc.knop','Uploaden');
-          btn.addEventListener('click', ()=> document.getElementById('onbKycFile').click()); d.appendChild(btn); }
-        vBox.appendChild(d); return;
-      }
-      const wrap = document.createElement('label'); wrap.className='onb-veld';
-      const sp = document.createElement('span'); sp.textContent = v.label + (v.ingevuld ? ' ✓' : '');
-      wrap.appendChild(sp);
-      const inp = document.createElement('input'); inp.type = onbInputType(v.type); inp.dataset.veld = v.id;
-      inp.value = huidig[v.id] != null ? huidig[v.id] : (v.waarde || ''); inp.autocomplete = ({naam:'name',email:'email',telefoon:'tel',adres:'street-address',postcode:'postal-code',woonplaats:'address-level2',land:'country-name'})[v.id] || 'off';
-      wrap.appendChild(inp); vBox.appendChild(wrap);
-    });
-    document.getElementById('onbCTitel').textContent = st.contract.titel || '';
-    document.getElementById('onbCTekst').textContent = st.contract.tekst || '';
-    const ak = document.getElementById('onbAkkoord'); ak.checked = ak.checked || !!st.contract.ondertekend;
-    document.getElementById('onbFout').textContent = '';
+    if (eerste) onbZeg(T('onb.intro','Fijn dat je er bent. Nog een paar dingen en je kunt op reis.'));
+    setTimeout(onbVolgende, eerste ? 750 : 0);
   }
-  (function initOnb(){
-    const kf = document.getElementById('onbKycFile');
-    if (kf) kf.addEventListener('change', async () => {
-      const file = kf.files[0]; kf.value=''; if (!file) return;
-      if (file.size > 5*1024*1024){ document.getElementById('onbFout').textContent = T('onb.toobig','De foto is te groot (max 5 MB).'); return; }
-      const data = await snapVerklein(file); if (!data) return;
-      try { await API.call('/verify/upload', { image: data }); if (user) user.verified='pending'; toast(T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.')); checkOnboarding(); }
-      catch(e){ document.getElementById('onbFout').textContent = e.message || 'Upload mislukt.'; }
+  function onbVolgende(){
+    if (onbStap === 'veld' && onbRij.length){
+      onbHuidig = onbRij[0];
+      if (onbHuidig.type === 'kyc') return onbVraagPaspoort();
+      return onbVraagVeld(onbHuidig);
+    }
+    onbStap = 'teken';
+    onbTekenVraag();
+  }
+  function onbVraagTekst(v){
+    const M = {
+      adres: T('onb.q.adres','Wat is je straat en huisnummer?'),
+      postcode: T('onb.q.postcode','En je postcode?'),
+      woonplaats: T('onb.q.woonplaats','In welke plaats woon je?'),
+      land: T('onb.q.land','En in welk land?'),
+      geboortedatum: T('onb.q.geboortedatum','Wat is je geboortedatum?'),
+      nationaliteit: T('onb.q.nationaliteit','Wat is je nationaliteit?'),
+      naam: T('onb.q.naam','Hoe heet je voluit?'),
+      email: T('onb.q.email','Wat is je e-mailadres?'),
+      telefoon: T('onb.q.telefoon','En je telefoonnummer?')
+    };
+    return M[v.id] || (T('onb.q.veld','Wat is je ') + String(v.label || '').toLowerCase() + '?');
+  }
+  function onbVraagVeld(v){
+    const inp = onbEl('onbIn'), rij = onbEl('onbRij');
+    if (rij) rij.style.display = '';
+    if (inp){ inp.type = onbInputType(v.type); inp.value = ''; inp.placeholder = T('onb.typ','Typ je antwoord'); }
+    onbActies([]);
+    onbZeg(onbVraagTekst(v));
+    if (inp) inp.focus();
+  }
+  function onbVraagPaspoort(){
+    const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
+    onbZeg(T('onb.q.paspoort','Tot slot een foto van de voorkant van je paspoort, zodat ik zeker weet dat jij het bent.'));
+    onbActies([{ txt: T('onb.upload','Foto kiezen'), prim: true, doe: function(){ onbEl('onbKycFile').click(); } }]);
+  }
+  function onbTekenVraag(){
+    const inp = onbEl('onbIn'), rij = onbEl('onbRij');
+    if (rij) rij.style.display = '';
+    if (inp){ inp.type = 'text'; inp.value = ''; inp.placeholder = T('onb.naamph','Typ je volledige naam'); }
+    const c = (onbSt && onbSt.contract) || {};
+    onbZeg(T('onb.teken','Laatste stap: de ') + (c.titel || T('onb.overeenkomst','overeenkomst')) + T('onb.teken2','. Typ je volledige naam om te tekenen; daarmee ga je akkoord. Wil je hem eerst lezen?'));
+    onbActies([{ txt: T('onb.lees','Lees de overeenkomst'), doe: onbToonLees }]);
+    if (inp) inp.focus();
+  }
+  function onbToonLees(){
+    const l = onbEl('onbLees'); if (!l) return;
+    if (l.hidden){ l.textContent = ((onbSt && onbSt.contract) || {}).tekst || ''; l.hidden = false; }
+    else l.hidden = true;
+  }
+  function onbActies(lijst){
+    const box = onbEl('onbActies'); if (!box) return;
+    box.textContent = '';
+    (lijst || []).forEach(function(a){
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = a.txt;
+      if (a.prim) b.className = 'prim'; b.addEventListener('click', a.doe); box.appendChild(b);
     });
-    const kn = document.getElementById('onbKlaar');
-    if (kn) kn.addEventListener('click', async () => {
-      const fout = document.getElementById('onbFout'); fout.textContent='';
+  }
+  function onbKlaar(){
+    const g = onbEl('onbGate'); if (g) g.hidden = true;
+    onbStap = null; onbGeopend = false; onbSt = null; onbRij = [];
+    onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
+    toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
+  }
+  async function onbInvoer(tekst){
+    if (onbBezig || !onbStap) return;
+    tekst = String(tekst == null ? '' : tekst).trim();
+    const inp = onbEl('onbIn'); if (inp) inp.value = '';
+    const fout = onbEl('onbFout'); if (fout) fout.textContent = '';
+    if (onbStap === 'veld'){
+      if (!tekst || !onbHuidig) return;
       onbBezig = true;
       try {
-        const velden = {};
-        document.querySelectorAll('#onbVelden input[data-veld]').forEach(function(i){ if (i.value.trim()) velden[i.dataset.veld] = i.value.trim(); });
-        if (Object.keys(velden).length) { try { await API.call('/onboarding/opslaan', { velden }); } catch(e){} }
-        const naam = (document.getElementById('onbNaam').value || '').trim();
-        const akkoord = document.getElementById('onbAkkoord').checked;
-        const r = await API.call('/onboarding/teken', { naam, akkoord });
-        if (r.klaar){ document.getElementById('onbGate').hidden = true; toast(T('onb.welkom','Welkom aan boord! Fijne reis.')); onbBezig=false; return; }
-        tekenOnbGate(r);
-        fout.textContent = T('onb.rest','Nog niet compleet: vul de resterende velden in (ook uw paspoort).');
-      } catch(e){ fout.textContent = e.message || 'Er ging iets mis.'; }
+        const velden = {}; velden[onbHuidig.id] = tekst;
+        onbSt = await API.call('/onboarding/opslaan', { velden });
+        onbBezig = false;
+        onbRij = onbOpenVelden();
+        onbStap = onbRij.length ? 'veld' : 'teken';
+        onbVolgende();
+      } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
+    } else if (onbStap === 'teken'){
+      if (tekst.length < 2){ if (fout) fout.textContent = T('onb.naamkort','Typ je volledige naam om te tekenen.'); return; }
+      onbBezig = true;
+      try {
+        const r = await API.call('/onboarding/teken', { naam: tekst, akkoord: true });
+        onbBezig = false; onbSt = r;
+        if (r && r.klaar) return onbKlaar();
+        onbRij = onbOpenVelden();
+        onbStap = onbRij.length ? 'veld' : 'teken';
+        onbVolgende();
+      } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
+    }
+  }
+  async function onbPaspoortGekozen(file){
+    const fout = onbEl('onbFout'); if (fout) fout.textContent = '';
+    if (!file) return;
+    if (file.size > 5*1024*1024){ if (fout) fout.textContent = T('onb.toobig','De foto is te groot (max 5 MB).'); return; }
+    const data = await snapVerklein(file); if (!data) return;
+    onbBezig = true;
+    try {
+      await API.call('/verify/upload', { image: data });
+      if (user) user.verified = 'pending';
+      try { onbSt = await API.call('/onboarding/status'); } catch(e){}
       onbBezig = false;
-    });
+      if (onbSt && onbSt.klaar) return onbKlaar();
+      onbRij = onbOpenVelden();
+      onbStap = onbRij.length ? 'veld' : 'teken';
+      onbVolgende();
+    } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.upmis','Uploaden lukte niet.'); }
+  }
+  // Het onboarding-gesprek bedraden: de invoerregel, de stuur-knop en de
+  // paspoort-upload. De gespreksfuncties zelf staan in 10-social-01.
+  (function initOnbGesprek(){
+    const go = document.getElementById('onbGo'), inp = document.getElementById('onbIn');
+    if (go && inp) go.addEventListener('click', function(){ onbInvoer(inp.value); });
+    if (inp) inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); onbInvoer(inp.value); } });
+    const kf = document.getElementById('onbKycFile');
+    if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();
 
   function snapOverlay(){

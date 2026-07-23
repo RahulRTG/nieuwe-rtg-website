@@ -14,9 +14,9 @@
    6. kaart: laadt de kaart-uitwijk bij (shared/kaart.js), die geo:-links op
       desktop/iOS opvangt met een eigen paneeltje - coördinaten tonen en laten
       kopiëren, zonder ook maar iets naar een kaart-provider te sturen
-   7. horloge: laadt het 3D-skelethorloge bij (shared/klok3d.js), dat waar een
-      RTG-klok-ring staat een gouden cassement, saffierglas en een opengewerkt
-      3D-uurwerk overheen legt (progressief; met een harde 2D-terugval)
+   7. (vervallen) de OS-klok is nu zelf een rustige analoge wijzerplaat in
+      shared/klok.js; het uitbundige 3D-skelet (klok3d.js) wordt niet meer
+      standaard over elke ring gelegd, maar leeft als concept op /apps/horloge.html
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */
 (function () {
   'use strict';
@@ -65,12 +65,11 @@
   km.src = '/shared/kaart.js'; km.async = true;
   (document.head || document.documentElement).appendChild(km);
 
-  /* ---- 7. het 3D-skelethorloge: waar een RTG-klok-ring staat, legt deze laag
-     er een gouden cassement, saffierglas en een opengewerkt 3D-uurwerk overheen
-     (progressief; zonder WebGL/bij reduced-motion blijft het horloge zoals het is) ---- */
-  var k3 = document.createElement('script');
-  k3.src = '/shared/klok3d.js'; k3.async = true;
-  (document.head || document.documentElement).appendChild(k3);
+  /* ---- 7. de OS-klok is nu zelf een rustige analoge wijzerplaat (shared/klok.js):
+     gevulde uur-/minuut-/secondewijzers met een subtiel gouden bevel en een
+     zachte diepte -- strak en netjes. Het uitbundige opengewerkte 3D-skelet
+     (shared/klok3d.js) is daarom niet meer standaard over elke ring gelegd; dat
+     leeft nog als eigen concept op /apps/horloge.html. ---- */
 
   /* ---- 8. de 3D-tegellaag voor de werk-apps: KPI-tegels ([data-tegel3d] of
      .kpi-tegel) krijgen diepte + muiskantel, en <canvas data-vonk3d> tekent een

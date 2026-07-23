@@ -1,7 +1,7 @@
 /* Lidacties: de transactiefuncties van het lid als kern-module met
    EXPLICIETE afhankelijkheden. Bestellen, tickets en ritten, elk als
    (session, body) -> { ok, ... } | { status, error }. Dit zijn exact de
-   functies achter de app-knoppen EN achter De Butler (via de
+   functies achter de app-knoppen EN achter Rahul (via de
    acties-registry in server.js), dus er is een codepad en geen drift.
    De regels reizen mee: ledenprijsgarantie, 86 van de keuken, de
    leeftijds/alcohol-grens per land, het zorgprofiel en het betaalmoment
@@ -53,7 +53,7 @@ function koopTicketVoor(session, body) {
   };
   boekingenVoegToe(ticket);
   save();
-  return { ok: true, ticket }; // afrekenen via /api/booking/pay of de Butler
+  return { ok: true, ticket }; // afrekenen via /api/booking/pay of Rahul
 }
 
 function betaalBoekingVoor(session, body) {

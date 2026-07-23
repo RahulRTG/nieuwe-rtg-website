@@ -2650,7 +2650,7 @@
   }
   /* ---------- mappen: eigen namen ----------
      De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus
-     (tik op de map) of via de Butler; de keuze staat per pas in localStorage. */
+     (tik op de map) of via Rahul; de keuze staat per pas in localStorage. */
   function mapNamen() { try { return JSON.parse(localStorage.getItem('rtg_os_mapnamen_' + pas) || '{}'); } catch (e) { return {}; } }
   function mapNaam(map) { return (mapNamen()[map.sleutel] || '').trim() || map.naam; }
   function zetMapNaam(map, naam) {
@@ -3232,10 +3232,10 @@
     };
   }
 
-  /* ---------- de Butler bestuurt het OS ----------
+  /* ---------- Rahul bestuurt het OS ----------
      Zinnen die het OS zelf kan uitvoeren (open <app>, thema, licht/donker,
      zoek, home) onderscheppen we in de capture-fase, vóór de chat-handlers;
-     al het andere gaat gewoon door naar de Butler-chat, die met zijn
+     al het andere gaat gewoon door naar Rahul-chat, die met zijn
      acties-registry op de server bestelt, boekt, betaalt en annuleert. */
   function alleDoelen() {
     const uit = [];
@@ -3248,7 +3248,7 @@
     const q = schoon.toLowerCase();
     if (!q) return false;
     if (/^(home|thuis|beginscherm)$/.test(q)) { sluitScrims(); naarHome(); bannerToon('✦', 'Rahul', 'Naar het beginscherm.'); return true; }
-    // elke functie een eigen app: bellen en videobellen direct via de Butler
+    // elke functie een eigen app: bellen en videobellen direct via Rahul
     if (/^(bel|bellen|iemand bellen)$/.test(q)) { sluitScrims(); openItem('os:bellen'); return true; }
     if (/^(videobel|videobellen|video bellen)$/.test(q)) { sluitScrims(); openItem('os:videobellen'); return true; }
     // RTF met leeftijd erbij slaat de keuze over: "open rtf kids"
@@ -3464,7 +3464,7 @@
     sluitScrims();
     winkelLijst.textContent = '';
     var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
-    intro.textContent = T('os.board.uitleg', 'Uw boardroom: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, de Butler, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
+    intro.textContent = T('os.board.uitleg', 'Uw boardroom: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
     winkelLijst.appendChild(intro);
     var n = 0;
     for (var i = 0; i < WINKEL_GROEPEN.length; i++) {
@@ -3505,7 +3505,7 @@
 
   /* ---------- De Boardroom: functies aan en uit vanuit Instellingen ----------
      Uw eigen boardroom: alle functies waar u recht op heeft, aan of uit te zetten.
-     De basis van het toestel (bellen, betalen, de Butler, uw pas-app en de
+     De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de
      RTFoundation) blijft altijd staan - die valt niet uit te zetten, zodat het
      systeem veilig en werkend blijft. Onder water is dit dezelfde install-laag
      als de App Store. */
@@ -3714,14 +3714,14 @@
     }));
   }
 
-  /* ---------- het brein van De Butler: geheugen en seintjes ----------
-     Het gesprek zelf loopt via de gewone Butler-chat op de AI-tab; deze
+  /* ---------- het brein van Rahul: geheugen en seintjes ----------
+     Het gesprek zelf loopt via de gewone Rahul-chat op de AI-tab; deze
      kaart toont rustig wat hij weet (wisbaar) en wat hij zelf ziet. */
   let fluisterSyncAt = 0;
   async function renderFluister(){
     const el = $('#fluisterWrap'); if (!el) return;
     if (!API.live){ el.innerHTML = ''; return; }
-    // de inklap-laag deelt (alleen) de gebruikstellers, zodat de Butler leert
+    // de inklap-laag deelt (alleen) de gebruikstellers, zodat Rahul leert
     if (window.FocusUI && Date.now() - fluisterSyncAt > 60000){
       fluisterSyncAt = Date.now();
       API.call('/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
@@ -5620,7 +5620,7 @@
 
   const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
-  // een voorstel van de Butler ("even checken...") krijgt echte knoppen
+  // een voorstel van Rahul ("even checken...") krijgt echte knoppen
   function voorstelChips(aan){
     const box = $('#chips'); if (!box) return;
     if (aan){
@@ -5642,7 +5642,7 @@
   async function ask(qIn){
     const q = String(qIn || '').trim();
     if (!q) return;
-    // eerst de Butler-motor: geheugen, seintjes, zoeken en echt regelen
+    // eerst Rahul-motor: geheugen, seintjes, zoeken en echt regelen
     // (reserveren, het 24-uursblok, een Tik, betaalverzoeken); pakt hij de
     // vraag niet, dan neemt de gewone gesprekslaag het over
     if (API.live){
@@ -5700,7 +5700,7 @@
     const deck = document.querySelector('.view[data-view="ai"] .sub');
     if (deck) deck.textContent = concierge
       ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
-      : T('chat.butler.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
+      : T('chat.rahul.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
     // Vaste snelactie: alles regelen én afrekenen kan hier. Face ID, direct naar de partner.
     if (user.tier !== 'guest'){
       $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
@@ -5754,7 +5754,7 @@
   }
   $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
   $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
-  // spreek uw vraag in: de gedeelde spraakmotor luistert, De Butler doet de rest
+  // spreek uw vraag in: de gedeelde spraakmotor luistert, Rahul doet de rest
   if (window.Spraak) Spraak.koppel($('#askMic'), {
     opTekst: zin => { $('#askInput').value = zin; ask(zin); $('#askInput').value = ''; },
     nietVerstaan: () => toast(T('fl.michoor','Ik kon u niet verstaan; probeer het nog eens of typ het gewoon.')),

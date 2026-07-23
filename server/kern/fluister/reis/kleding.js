@@ -1,4 +1,4 @@
-/* Butler-reislaag, deel "kleding" (kern/fluister/reis): Rahul koopt kleding
+/* Rahul-reislaag, deel "kleding" (kern/fluister/reis): Rahul koopt kleding
    (een stuk in uw maat apart leggen bij de modezaak, een voorraadclaim dus
    eerst uw "ja") en voorspelt wat er nog nodig is rond wat al geboekt staat.
    Verbatim afgesplitst uit reis.js; de gedeelde helpers komen via ctx binnen. */
@@ -32,7 +32,7 @@ module.exports = (ctx) => {
   function voerKledingUit(key, codenaam, w) {
     const s = zaken().find(x => x.code === w.supplierCode);
     if (!s || !retailLegApart) return { tekst: 'De modezaak is even niet bereikbaar; probeer het zo weer.' };
-    const r = retailLegApart(s, key, w.vsku, 'butler');
+    const r = retailLegApart(s, key, w.vsku, 'Rahul');
     if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
     return { tekst: 'Geregeld: ' + w.artikel + ' (' + w.kleur + ', maat ' + w.maat + ') hangt voor u apart bij ' + w.zaakNaam +
       ' voor ' + eur(w.centen) + '. Past hij, dan rekent u af aan de kassa of in de paskamer; past hij niet, dan gaat hij gewoon terug in de verkoop.', gedaan: true };

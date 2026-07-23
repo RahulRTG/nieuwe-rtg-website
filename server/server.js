@@ -2010,7 +2010,7 @@ const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, p
 
 /* ================= DOORLOPEND GESPREK IN DE APP =================
    Elk lid heeft één doorlopend gesprek, volledig binnen de beveiligde RTG-app.
-   RTG Pass wordt beantwoord door de Butler (AI); Lifestyle en Business gaan naar
+   RTG Pass wordt beantwoord door Rahul (AI); Lifestyle en Business gaan naar
    een menselijke concierge, die in de backoffice antwoordt. Er zijn geen externe
    berichtenkoppelingen (WhatsApp/Meta) meer: alle communicatie loopt via de app
    en de push-/e-maillaag van RTG zelf. */
@@ -2355,7 +2355,7 @@ kern.stad.stadKoppelVerkeer(() => ({
 Object.assign(kern, require('./kern/aidata').maakAidata({ db, accounts }));
 /* Lidacties (kern/lidacties.js): de transactiefuncties van het lid, als
    kern-module met expliciete afhankelijkheden. Ze bedienen de app-routes
-   EN vullen de acties-registry van de Butler, volgens het contract
+   EN vullen de acties-registry van Rahul, volgens het contract
    (session, body) -> { ok, ... } | { status, error }. */
 Object.assign(kern, require('./kern/lidacties')({
   db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
@@ -2365,7 +2365,7 @@ Object.assign(kern, require('./kern/lidacties')({
   zorgVoor: kern.zorgVoor, zorgContact, keuken: kern.keuken,
   ledenvoordeelVoor: kern.ledenvoordeelVoor
 }));
-kern.butlerActies = {
+kern.rahulActies = {
   plaatsOrder: kern.plaatsOrderVoor, betaalOrder: kern.betaalOrderVoor,
   // de rekening in een keer afrekenen (betalen na het eten)
   betaalRekening: kern.betaalRekeningVoor,
@@ -2379,8 +2379,8 @@ kern.butlerActies = {
 Object.assign(kern, require('./kern/fluister')({
   db, save, schoon, anthropic, notify,
   reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,
-  acties: kern.butlerActies,
-  // de reislaag van De Butler: een hele reis op een vraag, kleding apart
+  acties: kern.rahulActies,
+  // de reislaag van Rahul: een hele reis op een vraag, kleding apart
   // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen
   verblijfBoek: (session, body) => kern.verblijfBoek(session, liveCodename(session), body),
   retailLegApart: legApart, retailKlantProfiel: klantProfiel

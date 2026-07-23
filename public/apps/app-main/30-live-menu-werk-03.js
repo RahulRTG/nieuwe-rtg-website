@@ -9,14 +9,14 @@
     }));
   }
 
-  /* ---------- het brein van De Butler: geheugen en seintjes ----------
-     Het gesprek zelf loopt via de gewone Butler-chat op de AI-tab; deze
+  /* ---------- het brein van Rahul: geheugen en seintjes ----------
+     Het gesprek zelf loopt via de gewone Rahul-chat op de AI-tab; deze
      kaart toont rustig wat hij weet (wisbaar) en wat hij zelf ziet. */
   let fluisterSyncAt = 0;
   async function renderFluister(){
     const el = $('#fluisterWrap'); if (!el) return;
     if (!API.live){ el.innerHTML = ''; return; }
-    // de inklap-laag deelt (alleen) de gebruikstellers, zodat de Butler leert
+    // de inklap-laag deelt (alleen) de gebruikstellers, zodat Rahul leert
     if (window.FocusUI && Date.now() - fluisterSyncAt > 60000){
       fluisterSyncAt = Date.now();
       API.call('/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});

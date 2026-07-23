@@ -1,6 +1,6 @@
 /* Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een
    behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en
-   veilige intake-deling per aanbieder, en De Butler die het in gewone taal
+   veilige intake-deling per aanbieder, en Rahul die het in gewone taal
    regelt. Draai los: node --experimental-sqlite --test test/care.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -148,7 +148,7 @@ test('herstel- & verblijfpakket: overzicht met voordeel, boeken, betalen en mijn
   assert.equal((await api('care/pakket/boek', { pakketId: p.id, datum: morgen(), tijd: p.tijden[0] }, gast.token)).status, 403);
 });
 
-test('De Butler boekt een behandeling in gewone taal: voorstel, "ja", referentie', async () => {
+test('Rahul boekt een behandeling in gewone taal: voorstel, "ja", referentie', async () => {
   const r = await api('fluister', { q: 'boek een hot stone massage bij Zenith morgen om 11:00' }, lid2);
   assert.ok(r.body.voorstel, 'een behandeling is geld: eerst een voorstel');
   assert.ok(/Hot stone/i.test(r.body.antwoord) && /135,00/.test(r.body.antwoord), 'behandeling en prijs staan er eerlijk bij');

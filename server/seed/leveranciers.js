@@ -29,7 +29,7 @@ module.exports = {
       rooms: [
         { id: 'r1', name: 'Sea-view suite', desc: '55 m², zeezicht, eigen terras', price: 780, available: true },
         { id: 'r2', name: 'Garden kamer', desc: '40 m², tuinzicht, loungehoek', price: 520, available: true },
-        { id: 'r3', name: 'Cliff suite', desc: '70 m², twee terrassen, butler-service', price: 940, available: false }
+        { id: 'r3', name: 'Cliff suite', desc: '70 m², twee terrassen, persoonlijke suiteservice', price: 940, available: false }
       ],
       minibar: [
         { id: 'mb1', name: 'Mineraalwater', price: 6 },

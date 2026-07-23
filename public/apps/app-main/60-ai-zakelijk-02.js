@@ -38,7 +38,7 @@
   }
   $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
   $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
-  // spreek uw vraag in: de gedeelde spraakmotor luistert, De Butler doet de rest
+  // spreek uw vraag in: de gedeelde spraakmotor luistert, Rahul doet de rest
   if (window.Spraak) Spraak.koppel($('#askMic'), {
     opTekst: zin => { $('#askInput').value = zin; ask(zin); $('#askInput').value = ''; },
     nietVerstaan: () => toast(T('fl.michoor','Ik kon u niet verstaan; probeer het nog eens of typ het gewoon.')),

@@ -35,10 +35,10 @@
     };
   }
 
-  /* ---------- de Butler bestuurt het OS ----------
+  /* ---------- Rahul bestuurt het OS ----------
      Zinnen die het OS zelf kan uitvoeren (open <app>, thema, licht/donker,
      zoek, home) onderscheppen we in de capture-fase, vóór de chat-handlers;
-     al het andere gaat gewoon door naar de Butler-chat, die met zijn
+     al het andere gaat gewoon door naar Rahul-chat, die met zijn
      acties-registry op de server bestelt, boekt, betaalt en annuleert. */
   function alleDoelen() {
     const uit = [];
@@ -51,7 +51,7 @@
     const q = schoon.toLowerCase();
     if (!q) return false;
     if (/^(home|thuis|beginscherm)$/.test(q)) { sluitScrims(); naarHome(); bannerToon('✦', 'Rahul', 'Naar het beginscherm.'); return true; }
-    // elke functie een eigen app: bellen en videobellen direct via de Butler
+    // elke functie een eigen app: bellen en videobellen direct via Rahul
     if (/^(bel|bellen|iemand bellen)$/.test(q)) { sluitScrims(); openItem('os:bellen'); return true; }
     if (/^(videobel|videobellen|video bellen)$/.test(q)) { sluitScrims(); openItem('os:videobellen'); return true; }
     // RTF met leeftijd erbij slaat de keuze over: "open rtf kids"

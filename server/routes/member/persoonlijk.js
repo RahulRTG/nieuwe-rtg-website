@@ -1,5 +1,5 @@
 /* Domein "member", deelmodule persoonlijk: alles wat van het lid zelf is.
-   Het zorgprofiel en locatie-delen (kern/gastzorg.js), De Butler
+   Het zorgprofiel en locatie-delen (kern/gastzorg.js), Rahul
    (kern/fluister.js) en de Shared Assets (kern/assets.js). Alleen routes;
    de logica woont in de kern-modules. */
 module.exports = (kern) => {

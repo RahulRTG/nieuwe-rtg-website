@@ -1,6 +1,6 @@
   /* ---------- mappen: eigen namen ----------
      De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus
-     (tik op de map) of via de Butler; de keuze staat per pas in localStorage. */
+     (tik op de map) of via Rahul; de keuze staat per pas in localStorage. */
   function mapNamen() { try { return JSON.parse(localStorage.getItem('rtg_os_mapnamen_' + pas) || '{}'); } catch (e) { return {}; } }
   function mapNaam(map) { return (mapNamen()[map.sleutel] || '').trim() || map.naam; }
   function zetMapNaam(map, naam) {

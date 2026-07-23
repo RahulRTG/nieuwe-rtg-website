@@ -134,16 +134,16 @@ test('geld gaat nooit zonder bevestiging de deur uit, en "nee" blaast af', async
   await api('fluister', { q: 'vergeet alles' }, lid);
 });
 
-test('de Butler zoekt door het hele aanbod van alle partners', async () => {
+test('Rahul zoekt door het hele aanbod van alle partners', async () => {
   const r = await api('fluister', { q: 'zoek lamsrack' }, lid);
   assert.equal(r.status, 200);
-  assert.ok(r.body.pakte, 'zoeken is werk voor de Butler zelf');
+  assert.ok(r.body.pakte, 'zoeken is werk voor Rahul zelf');
   assert.ok(/lamsrack/i.test(r.body.antwoord) && /Sal de Mar/.test(r.body.antwoord), 'hij vindt het gerecht en zegt bij welke zaak');
   const niks = await api('fluister', { q: 'zoek iets-dat-niet-bestaat-xyz' }, lid);
   assert.ok(/vond niets/i.test(niks.body.antwoord), 'geen hit blijft eerlijk geen hit');
 });
 
-test('betaalverzoeken: de Butler maakt ze, toont ze en betaalt ze pas na "ja"', async () => {
+test('betaalverzoeken: Rahul maakt ze, toont ze en betaalt ze pas na "ja"', async () => {
   // het rtg-lid (Amberen Vos) vraagt 10 euro aan het business-lid
   const r = await api('fluister', { q: 'vraag 10 euro aan Noordelijke Ster' }, lid);
   assert.ok(r.body.gedaan, 'een verzoek maken mag direct: er verlaat geen geld de rekening');
@@ -159,7 +159,7 @@ test('betaalverzoeken: de Butler maakt ze, toont ze en betaalt ze pas na "ja"', 
   assert.ok(/geen betaalverzoeken/i.test(leeg.body.antwoord));
 });
 
-test('de Butler bestelt en rekent af: voorstel, "ja", ophaalcode en een echte order', async () => {
+test('Rahul bestelt en rekent af: voorstel, "ja", ophaalcode en een echte order', async () => {
   const r = await api('fluister', { q: 'bestel 2 sangria en 1 bravas bij Sunset Ibiza' }, lid);
   assert.equal(r.status, 200);
   assert.ok(r.body.voorstel && !r.body.gedaan, 'bestellen is geld: eerst een voorstel');
@@ -217,7 +217,7 @@ test('saldo opvragen en een reservering annuleren, gewoon in het gesprek', async
   assert.ok(/geen lopende reservering/i.test(nogEen.body.antwoord), 'weg is echt weg');
 });
 
-test('"wat kun je": de Butler somt eerlijk zijn hele kunnen op', async () => {
+test('"wat kun je": Rahul somt eerlijk zijn hele kunnen op', async () => {
   const r = await api('fluister', { q: 'wat kun je allemaal?' }, lid);
   assert.ok(r.body.pakte);
   for (const stuk of ['zoeken', 'reserveren', 'bestel', '24-uursblok', 'Tik', 'betaalverzoek'])
@@ -235,7 +235,7 @@ test('de zaak-AI heeft hetzelfde geheugen gekregen: onthouden, opvragen, wissen'
   assert.ok(!/fustwissel/.test(naWis.body.reply), 'wissen is echt wissen');
 });
 
-test('pakt de Butler een gesprek niet, dan zegt hij dat eerlijk (pakte=false)', async () => {
+test('pakt Rahul een gesprek niet, dan zegt hij dat eerlijk (pakte=false)', async () => {
   // een vers lid zonder stand, weetjes of seintjes: een gewone vraag is
   // dan voor de gesprekslaag van de app, niet voor de motor
   const lid3 = (await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json()).token;

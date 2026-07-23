@@ -1,4 +1,4 @@
-/* De Butler-reislaag (kern/fluister/reis): Rahul regelt met EEN vraag een hele
+/* Rahul-reislaag (kern/fluister/reis): Rahul regelt met EEN vraag een hele
    reis: verblijf, transfer, diner en een activiteit, als een voorstel met een
    totaalprijs dat op een enkel "ja" in zijn geheel wordt geboekt en afgerekend,
    via exact dezelfde actie-functies als de app-knoppen. Ook hier: koopt hij
@@ -7,7 +7,7 @@
    de vaste drempel (eerst "ja").
 
    Dit is de orkestrator: de servicedag (dagplan voor zaak/personeel) en de haak
-   butlerExtra wonen hier; het reisplan en de kleding/voorspelling komen uit twee
+   rahulExtra wonen hier; het reisplan en de kleding/voorspelling komen uit twee
    deelbestanden op dezelfde ctx (./reisplan en ./kleding). De gedeelde helpers
    (zaken/open/caps/datumPlus) bouwt de orkestrator en geeft hij mee. */
 module.exports = (ctx) => {
@@ -49,7 +49,7 @@ module.exports = (ctx) => {
 
   /* ---- de haak in fluisterZeg: herkent de vragen en zet zelf het
      voorstel klaar; geeft null terug als de vraag niet van deze laag is. ---- */
-  async function butlerExtra(q, p, sess, klaar, key) {
+  async function rahulExtra(q, p, sess, klaar, key) {
     // fototips: Rahul als fotocoach voor iedereen (lezen, geen geld: direct)
     if (/fototip|foto ?tip|mooiere foto('s)?|perfecte foto|hoe fotografeer/i.test(q)) {
       const food = /food|eten|gerecht|bord/i.test(q);
@@ -95,5 +95,5 @@ module.exports = (ctx) => {
     return null;
   }
 
-  return { butlerExtra, voerReisUit, voerKledingUit };
+  return { rahulExtra, voerReisUit, voerKledingUit };
 };

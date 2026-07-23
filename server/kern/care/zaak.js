@@ -1,5 +1,5 @@
 /* Care (deelmodule): de aanbiederkant (dagagenda, afronden met verdiensten)
-   en de herstel-/verblijfpakketten met de Butler-boekactie. careBoek en
+   en de herstel-/verblijfpakketten met Rahul-boekactie. careBoek en
    careBetaal komen via de context binnen nadat kern/care.js de ledenlaag
    heeft gemount. */
 module.exports = (ctx) => {
@@ -135,7 +135,7 @@ module.exports = (ctx) => {
     };
   }
 
-  /* De Butler-actie: exact dezelfde functies achter een gewone zin.
+  /* Rahul-actie: exact dezelfde functies achter een gewone zin.
      "boek een massage bij Zenith morgen om 15:00" -> voorstel -> ja. */
   function boekBehandelingActie(session, body, verdien) {
     const r = careBoek(session, body.codenaam || '', body);

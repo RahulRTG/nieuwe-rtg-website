@@ -1,8 +1,8 @@
-/* De Butler-reislaag: Rahul regelt met een vraag een hele reis (verblijf,
+/* De Rahul-reislaag: Rahul regelt met een vraag een hele reis (verblijf,
    transfer, diner, activiteit) die op een enkel "ja" in zijn geheel wordt
    geboekt; koopt kleding (apart leggen in de juiste maat bij de modezaak);
    en voorspelt wat er nog nodig is. Draai los:
-   node --experimental-sqlite --test test/butler-reis.test.js */
+   node --experimental-sqlite --test test/rahul-reis.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -11,7 +11,7 @@ const path = require('path');
 const { startServer, stop } = require('./helper');
 
 let srv, base, lid;
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-butlerreis-'));
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rahulreis-'));
 
 const api = (pad, body) => fetch(base + '/api/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lid },

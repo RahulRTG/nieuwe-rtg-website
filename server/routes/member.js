@@ -67,9 +67,9 @@ module.exports = (kern) => {
   require('./member/nieuws')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
-  // De persoonlijke AI en de Butler/concierge-chat.
+  // De persoonlijke AI en Rahul/concierge-chat.
   require('./member/assistent')(kern);
-  // De persoonlijke laag (zorgprofiel, locatie-delen, De Butler, Shared Assets).
+  // De persoonlijke laag (zorgprofiel, locatie-delen, Rahul, Shared Assets).
   require('./member/persoonlijk')(kern);
   // Rechtstreeks betalen, de bezorgdienst, tickets en transfers.
   require('./member/kopen')(kern);

@@ -10,7 +10,7 @@
      techniekbord, de zaakdoos en het stuur zelf, tegen rondzingen);
    - de geld-drempel: paden die over geld gaan komen eerst terug als een
      voorstel dat de gebruiker met een bevestiging moet goedkeuren
-     (dezelfde afspraak als bij De Butler).
+     (dezelfde afspraak als bij Rahul).
 
    maakStuur(state) volgt het vaste kern-patroon. */
 

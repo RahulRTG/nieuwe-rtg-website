@@ -50,7 +50,7 @@
 
   const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
-  // een voorstel van de Butler ("even checken...") krijgt echte knoppen
+  // een voorstel van Rahul ("even checken...") krijgt echte knoppen
   function voorstelChips(aan){
     const box = $('#chips'); if (!box) return;
     if (aan){
@@ -72,7 +72,7 @@
   async function ask(qIn){
     const q = String(qIn || '').trim();
     if (!q) return;
-    // eerst de Butler-motor: geheugen, seintjes, zoeken en echt regelen
+    // eerst Rahul-motor: geheugen, seintjes, zoeken en echt regelen
     // (reserveren, het 24-uursblok, een Tik, betaalverzoeken); pakt hij de
     // vraag niet, dan neemt de gewone gesprekslaag het over
     if (API.live){
@@ -130,7 +130,7 @@
     const deck = document.querySelector('.view[data-view="ai"] .sub');
     if (deck) deck.textContent = concierge
       ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
-      : T('chat.butler.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
+      : T('chat.rahul.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
     // Vaste snelactie: alles regelen én afrekenen kan hier. Face ID, direct naar de partner.
     if (user.tier !== 'guest'){
       $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';

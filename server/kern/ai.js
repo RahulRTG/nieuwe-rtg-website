@@ -5,7 +5,7 @@
 
    AI_TONE is pure data; de rest draagt state (db, accounts, de Claude-client en
    de realtime-helpers) en komt uit maakAi(state). De interne kanaalsleutel van
-   Rahul's berichten blijft 'butler' (dataplumbing, niet zichtbaar voor het lid). */
+   Rahul's berichten is 'rahul' (dataplumbing, niet zichtbaar voor het lid). */
 
 // Het register verschilt per pas; het karakter van Rahul (zie aiSystemPrompt)
 // blijft altijd hetzelfde.
@@ -31,7 +31,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
   async function generateAiReply(tier, convo, lang, key) {
     lang = lang || 'nl';
     const history = convo
-      .filter(m => m.from === 'member' || m.from === 'butler')
+      .filter(m => m.from === 'member' || m.from === 'rahul')
       .map(m => ({ role: m.from === 'member' ? 'user' : 'assistant', content: String(m.text).slice(0, 2000) }))
       .slice(-12);
     while (history.length && history[0].role !== 'user') history.shift();
@@ -41,7 +41,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 1024, system: aiSystemPrompt(tier, lang, key), messages: history });
         const reply = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
         if (reply) return { text: reply, lang };
-      } catch (e) { console.error('Claude-fout (butler):', e.message); }
+      } catch (e) { console.error('Claude-fout (rahul):', e.message); }
     }
     const canned = cannedAnswer(last);
     if (lang !== 'nl' && i18n) {
@@ -62,7 +62,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     if (user.tier === 'rtg') {
       // Rahul (AI) antwoordt meteen, in de taal van het lid.
       const reply = await generateAiReply(user.tier, md.conversation, lang, 'user-' + user.id);
-      md.conversation.push({ from: 'butler', text: reply.text, lang: reply.lang, at: new Date().toISOString(), channel: 'butler' });
+      md.conversation.push({ from: 'rahul', text: reply.text, lang: reply.lang, at: new Date().toISOString(), channel: 'rahul' });
       md.needsConcierge = false;
     } else {
       // Lifestyle/Business: een mens (concierge) reageert via de backoffice.

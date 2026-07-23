@@ -8,7 +8,7 @@
 const WINKEL = {
   zaakdoos:           { naam: 'RTG Zaakdoos',              eenmalig: 100, perMaand: 150, eenheid: 'per doos' },
   'slimme-deur':      { naam: 'RTG Slimme Deur',           eenmalig: 120, perMaand: 5,   eenheid: 'per deur' },
-  'kamer-butler':     { naam: 'RTG Kamer-butler',          eenmalig: 180, perMaand: 5,   eenheid: 'per kamer' },
+  'kamerservice':     { naam: 'RTG Kamerservice',          eenmalig: 180, perMaand: 5,   eenheid: 'per kamer' },
   toegangspoort:      { naam: 'RTG Toegangspoort',         eenmalig: 450, perMaand: 5,   eenheid: 'per zuil' },
   paniekknop:         { naam: 'RTG Paniekknop',            eenmalig: 60,  perMaand: 5,   eenheid: 'per knop' },
   'gast-piepers':     { naam: 'RTG Gast-piepers',          eenmalig: 250, perMaand: 5,   eenheid: 'per set van 10' },

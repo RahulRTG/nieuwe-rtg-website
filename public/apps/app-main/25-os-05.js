@@ -92,7 +92,7 @@
     sluitScrims();
     winkelLijst.textContent = '';
     var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
-    intro.textContent = T('os.board.uitleg', 'Uw boardroom: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, de Butler, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
+    intro.textContent = T('os.board.uitleg', 'Uw boardroom: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
     winkelLijst.appendChild(intro);
     var n = 0;
     for (var i = 0; i < WINKEL_GROEPEN.length; i++) {
@@ -133,7 +133,7 @@
 
   /* ---------- De Boardroom: functies aan en uit vanuit Instellingen ----------
      Uw eigen boardroom: alle functies waar u recht op heeft, aan of uit te zetten.
-     De basis van het toestel (bellen, betalen, de Butler, uw pas-app en de
+     De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de
      RTFoundation) blijft altijd staan - die valt niet uit te zetten, zodat het
      systeem veilig en werkend blijft. Onder water is dit dezelfde install-laag
      als de App Store. */

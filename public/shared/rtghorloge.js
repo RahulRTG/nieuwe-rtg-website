@@ -79,13 +79,14 @@
     // ---- verlopen ----
     var defs = E('defs');
     defs.innerHTML =
-      // geborsteld goud voor het cassement
-      '<radialGradient id="rtghGoud" cx="42%" cy="34%" r="78%">' +
-      '<stop offset="0%" stop-color="#F6E6B4"/><stop offset="34%" stop-color="#D9B75E"/>' +
-      '<stop offset="66%" stop-color="#A9852F"/><stop offset="100%" stop-color="#6E5216"/></radialGradient>' +
+      // gelaagd goud voor het cassement (champagne-hoogsel, rosé-midden, brons-schaduw)
+      '<radialGradient id="rtghGoud" cx="40%" cy="30%" r="82%">' +
+      '<stop offset="0%" stop-color="#FBEFC6"/><stop offset="28%" stop-color="#E7CB84"/>' +
+      '<stop offset="58%" stop-color="#BE9646"/><stop offset="82%" stop-color="#856427"/>' +
+      '<stop offset="100%" stop-color="#4E3A13"/></radialGradient>' +
       // gepolijste binnenrand van het cassement
       '<linearGradient id="rtghGoudRand" x1="0" y1="0" x2="0" y2="1">' +
-      '<stop offset="0%" stop-color="#8A6A22"/><stop offset="50%" stop-color="#E7CE86"/><stop offset="100%" stop-color="#5E4614"/></linearGradient>' +
+      '<stop offset="0%" stop-color="#7E5F1E"/><stop offset="46%" stop-color="#F2DC97"/><stop offset="54%" stop-color="#EAD08A"/><stop offset="100%" stop-color="#54400F"/></linearGradient>' +
       // schroefkop (witgoud/staal)
       '<radialGradient id="rtghSchroef" cx="38%" cy="34%" r="72%">' +
       '<stop offset="0%" stop-color="#FBF7EC"/><stop offset="45%" stop-color="#CFC9B8"/>' +
@@ -175,13 +176,14 @@
     // leesbaarheid over het opengewerkte werk) ----
     var merk = E('g', { 'paint-order': 'stroke', stroke: 'rgba(18,12,8,0.85)', 'stroke-width': '4', 'stroke-linejoin': 'round' });
     var t1 = E('text', { x: C, y: 258, 'text-anchor': 'middle', 'font-family': "'Bodoni Moda',Georgia,serif", 'font-weight': '600', 'font-size': '52', fill: '#EFDDA2', 'letter-spacing': '5' }); t1.textContent = 'RTG';
-    var t2 = E('text', { x: C, y: 288, 'text-anchor': 'middle', 'font-family': 'Inter,system-ui,sans-serif', 'font-weight': '600', 'font-size': '15', fill: '#E6D6A0', 'stroke-width': '3', 'letter-spacing': '8' }); t2.textContent = 'SQUELETTE';
+    var t2 = E('text', { x: C, y: 286, 'text-anchor': 'middle', 'font-family': 'Inter,system-ui,sans-serif', 'font-weight': '600', 'font-size': '15', fill: '#E6D6A0', 'stroke-width': '3', 'letter-spacing': '3.5' }); t2.textContent = 'RAHUL TRAVEL GROUP';
     merk.appendChild(t1); merk.appendChild(t2);
     svg.appendChild(merk);
 
     // ---- robijnen (jewels) op de spil-punten van het gaande werk ----
     // (NDC-posities van de raderen; hieronder in het WebGL-deel gelijkgehouden)
-    var jewels = [[0.0, 0.0], [0.30, -0.13], [0.40, -0.40], [0.20, -0.55], [-0.36, 0.34], [0.0, -0.46]];
+    // de spil-punten (gelijk aan de raderposities in het WebGL-gaande werk)
+    var jewels = [[0.0, 0.0], [0.205, -0.119], [0.365, -0.253], [0.345, -0.425], [-0.243, 0.243], [0.0, -0.46]];
     var jg = E('g');
     jewels.forEach(function (n) {
       var vx = C + n[0] * C, vy = C - n[1] * C;
@@ -355,19 +357,24 @@
     function gpu(mesh) { return { p: buffer(gl, mesh.pos), n: buffer(gl, mesh.nor), c: mesh.n }; }
     var quadBuf = buffer(gl, new Float32Array([-1, -1, 1, -1, -1, 1, 1, -1, 1, 1, -1, 1]));
 
-    // het gaande werk: posities in NDC-eenheden (gelijk aan de jewels in de SVG),
-    // aangedreven door de exacte radhoeken; buren draaien tegengesteld => grijpen.
+    // het gaande werk: de middelpunten liggen op EXACT meshende afstand -- voor
+    // elk grijpend paar geldt afstand = steekstraal_a + steekstraal_b (steekstraal
+    // ~ 0,82 x de tip-straal r). Zo raken de tandkransen elkaar echt. Buren draaien
+    // bovendien tegengesteld (omk), zodat het als een echt treintje ineengrijpt.
+    // Keten: veer(barrel) -> midden -> derde -> vierde(seconde) -> anker -> balans.
     var trein = [
-      { g: G.barrel, r: 0.25, x: -0.36, y: 0.34, kleur: HUISGOUD, bron: 'uur' },
-      { g: G.midden, r: 0.17, x: 0.00, y: 0.00, kleur: STAAL, bron: 'midden' },
-      { g: G.derde, r: 0.12, x: 0.30, y: -0.13, kleur: HUISGOUD, bron: 'derde' },
-      { g: G.vierde, r: 0.135, x: 0.40, y: -0.40, kleur: STAAL, bron: 'vierde' },
-      { g: G.escape, r: 0.075, x: 0.20, y: -0.55, kleur: HUISGOUD, bron: 'anker' }
+      { g: G.barrel, r: 0.25, x: -0.243, y: 0.243, kleur: HUISGOUD, bron: 'uur', omk: -1 },
+      { g: G.midden, r: 0.17, x: 0.000, y: 0.000, kleur: STAAL, bron: 'midden', omk: 1 },
+      { g: G.derde, r: 0.12, x: 0.205, y: -0.119, kleur: HUISGOUD, bron: 'derde', omk: 1 },
+      { g: G.vierde, r: 0.135, x: 0.365, y: -0.253, kleur: STAAL, bron: 'vierde', omk: 1 },
+      { g: G.escape, r: 0.075, x: 0.345, y: -0.425, kleur: HUISGOUD, bron: 'anker', omk: 1 }
     ];
     var balans = { r: 0.24, x: 0.0, y: -0.46 };
+    // skelet-bruggen liggen langs de as tussen twee spillen (houden het werk vast)
     var bruggen = [
-      { x: 0.16, y: -0.28, rot: -0.7, len: 0.62 },
-      { x: -0.14, y: 0.14, rot: 0.5, len: 0.5 }
+      { x: -0.12, y: 0.122, rot: -0.785, len: 0.42 },
+      { x: 0.183, y: -0.126, rot: -0.606, len: 0.50 },
+      { x: 0.190, y: -0.424, rot: -0.25, len: 0.34 }
     ];
 
     var uMVP = gl.getUniformLocation(pM, 'uMVP'), uModel = gl.getUniformLocation(pM, 'uModel'), uLicht = gl.getUniformLocation(pM, 'uLicht'), uKleur = gl.getUniformLocation(pM, 'uKleur');
@@ -406,7 +413,7 @@
       for (var bi = 0; bi < bruggen.length; bi++) { var br = bruggen[bi]; tekenMesh(G.brug, mul(mul(mul(T(br.x, br.y, -0.06), Rz(br.rot)), S(br.len)), S(1)), [0.55, 0.43, 0.18], licht); }
       // het gaande werk op de exacte hoeken
       for (var i = 0; i < trein.length; i++) {
-        var g = trein[i], deg = rad[g.bron] || 0;
+        var g = trein[i], deg = (rad[g.bron] || 0) * (g.omk || 1);
         tekenMesh(g.g, mul(mul(T(g.x, g.y, 0.02 + i * 0.012), Rz(deg * Math.PI / 180)), S(g.r)), g.kleur, licht);
       }
       // de balans: exact 4 Hz (onrust), met de haarveer

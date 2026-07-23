@@ -151,3 +151,27 @@ test('7. de gratis RTG Pass hoeft geen paspoort, tenzij hij RTG Pay gebruikt', a
   const pay2 = await api(base, '/api/pay/stuur', { aan: 'IEMAND', centen: 500 }, vrij);
   assert.notEqual(pay2.body && pay2.body.kyc, true, 'geen kyc-blokkade meer (een andere fout mag)');
 });
+
+test('8. de MRZ-vervaldatum levert een paspoort-seintje binnen een half jaar', async () => {
+  const lid2 = await registreer('verval' + Date.now().toString().slice(-7) + '@x.nl');
+  // een datum ~5 maanden vooruit (binnen het half jaar) en eentje ruim erbuiten
+  const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const binnen = overDagen(150), ver = overDagen(400);
+
+  // ruim buiten een half jaar: nog geen seintje
+  await api(base, '/api/onboarding/paspoort', { vervaldatum: ver, nummer: 'NX1234567' }, lid2);
+  let prof = (await api(base, '/api/fluister/profiel', {}, lid2)).body;
+  assert.ok(!(prof.seintjes || []).some(s => s.soort === 'paspoort'), 'ruim op tijd: nog geen paspoort-seintje');
+
+  // binnen een half jaar: nu wel, met de datum in de tekst
+  await api(base, '/api/onboarding/paspoort', { vervaldatum: binnen }, lid2);
+  prof = (await api(base, '/api/fluister/profiel', {}, lid2)).body;
+  const sein = (prof.seintjes || []).find(s => s.soort === 'paspoort');
+  assert.ok(sein, 'binnen een half jaar komt er een paspoort-seintje');
+  assert.ok(sein.tekst.includes(binnen), 'het seintje noemt de vervaldatum');
+
+  // een ongeldige datum verandert niets (geen crash, blijft de geldige staan)
+  await api(base, '/api/onboarding/paspoort', { vervaldatum: 'geen-datum' }, lid2);
+  prof = (await api(base, '/api/fluister/profiel', {}, lid2)).body;
+  assert.ok((prof.seintjes || []).some(s => s.soort === 'paspoort' && s.tekst.includes(binnen)), 'ongeldige datum wordt genegeerd');
+});

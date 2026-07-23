@@ -60,6 +60,10 @@
       '.bw-x{background:none;border:none;color:var(--soft,#8A8680);cursor:pointer;font-size:1rem;line-height:1;padding:.1rem .3rem;}' +
       '.bw-x:hover{color:var(--txt,#F4F1EC);}' +
       '.bw-body{padding:.7rem .8rem 1rem;overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0;}' +
+      '.bw-resize{position:absolute;right:0;bottom:0;width:20px;height:20px;cursor:nwse-resize;pointer-events:auto;z-index:2;touch-action:none;}' +
+      '.bw-resize::after{content:"";position:absolute;right:4px;bottom:4px;width:8px;height:8px;' +
+        'border-right:2px solid var(--soft,#8A8680);border-bottom:2px solid var(--soft,#8A8680);opacity:.65;}' +
+      '.bw-resize:hover::after{opacity:1;border-color:var(--gold,#857007);}' +
       '.bw-body > .card,.bw-body > .os-social{margin:0!important;background:none!important;border:none!important;box-shadow:none!important;padding:0!important;}' +
       '.bw-leeg{color:var(--soft,#8A8680);font-size:.8rem;}' +
       '#bureauPlus{position:fixed;pointer-events:auto;z-index:2;bottom:calc(env(safe-area-inset-bottom,0px) + 1.1rem);' +
@@ -106,11 +110,41 @@
     kop.querySelector('.bw-naam').textContent = s.naam;
     kop.querySelector('.bw-x').addEventListener('click', function () { verwijder(w.id); });
     var body = document.createElement('div'); body.className = 'bw-body';
-    el.appendChild(kop); el.appendChild(body);
+    var grip = document.createElement('span'); grip.className = 'bw-resize'; grip.setAttribute('aria-hidden', 'true');
+    el.appendChild(kop); el.appendChild(body); el.appendChild(grip);
     el.style.left = beginX(w) + 'px'; el.style.top = (w.y == null ? 40 : w.y) + 'px';
+    if (w.w) el.style.width = w.w + 'px';
+    if (w.h) { el.style.height = w.h + 'px'; el.style.maxHeight = 'none'; }
     leen(body, s);
     sleepbaar(el, kop, w);
+    formaatbaar(el, grip, w);
     return el;
+  }
+
+  /* Van formaat veranderen: sleep aan de hoek rechtsonder. Breder/smaller
+     (kleiner/groter) en langer/korter tegelijk, met nette grenzen. De maat
+     wordt onthouden, net als de plek. */
+  function formaatbaar(el, grip, w) {
+    grip.addEventListener('pointerdown', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      var startX = e.clientX, startY = e.clientY;
+      var beginW = el.offsetWidth, beginH = el.offsetHeight;
+      el.classList.add('pak'); try { grip.setPointerCapture(e.pointerId); } catch (x) {}
+      function beweeg(ev) {
+        var nw = Math.max(200, Math.min(560, beginW + (ev.clientX - startX)));
+        var nh = Math.max(150, Math.min(Math.round(window.innerHeight * 0.9), beginH + (ev.clientY - startY)));
+        el.style.width = nw + 'px'; el.style.height = nh + 'px'; el.style.maxHeight = 'none';
+      }
+      function los() {
+        el.classList.remove('pak');
+        document.removeEventListener('pointermove', beweeg);
+        document.removeEventListener('pointerup', los);
+        w.w = el.offsetWidth; w.h = el.offsetHeight;
+        bewaar();
+      }
+      document.addEventListener('pointermove', beweeg);
+      document.addEventListener('pointerup', los);
+    });
   }
 
   function sleepbaar(el, kop, w) {

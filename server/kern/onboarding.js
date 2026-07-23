@@ -183,6 +183,20 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
     return status(scope, sess);
   }
 
+  /* Paspoort-meta (vervaldatum, nummer) uit de MRZ-scan bewaren op het profiel.
+     Rahul gebruikt de vervaldatum om een half jaar vooraf te seinen dat het
+     paspoort verloopt (zie kern/fluister). Alleen een geldige ISO-datum telt. */
+  function bewaarPaspoort(sess, info) {
+    info = info || {};
+    const p = profielVan(profielId(sess));
+    if (!p.paspoort) p.paspoort = {};
+    if (info.vervaldatum && /^\d{4}-\d{2}-\d{2}$/.test(String(info.vervaldatum))) p.paspoort.vervaldatum = String(info.vervaldatum);
+    if (info.nummer) p.paspoort.nummer = schoon(String(info.nummer), 40);
+    p.paspoort.at = nu();
+    save();
+    return { ok: true, paspoort: { vervaldatum: p.paspoort.vervaldatum || null } };
+  }
+
   // Het contract ondertekenen: getypte naam + akkoord -> bewijs met vingerafdruk.
   function teken(scope, sess, naam, akkoord) {
     if (!akkoord) return { status: 400, error: 'Zet een vinkje dat u akkoord bent met de overeenkomst.' };
@@ -206,7 +220,7 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
     nu, standaardVelden, standaardScope, store, scopeVan, profielVan, profielId };
   const { publiekeConfig, config, normaliseerVelden, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars } = require('./onboarding/beheer')(ctx);
 
-  return { store, standaardScope, status, klaar, payGate, slaOp, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
+  return { store, standaardScope, status, klaar, payGate, slaOp, bewaarPaspoort, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
     ALLE_WIE, PAS_WIE, VELD_TYPES };
 }
 

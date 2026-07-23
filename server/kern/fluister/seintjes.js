@@ -82,6 +82,10 @@ module.exports = (ctx) => {
     }
     for (const v of bron.terugkoop.filter(v => v.status === 'aangevraagd'))
       s.push({ soort: 'terugkoop', tekst: 'Terugkoop ' + v.assetNaam + ': uiterlijk ' + v.uiterlijk + ' staat het bedrag in uw tegoed' });
+    // 7. het paspoort verloopt: een half jaar vooraf een seintje, met een
+    // herinnering bij ~3 maanden, deze maand en als het verlopen is
+    const pp = paspoortSein(key);
+    if (pp) s.unshift(pp);
     // 6. een vriendelijke duw: het jaar loopt en uw 24 uur staat nog nergens
     if (vandaag().slice(5, 7) >= '07') {
       const jaar = vandaag().slice(0, 4);
@@ -91,6 +95,21 @@ module.exports = (ctx) => {
       if (stil) s.push({ soort: 'tip', tekst: 'Uw 24 uur van dit jaar bij ' + (((db.data.sharedAssets || []).find(a => a.id === stil.assetId) || {}).naam || 'uw object') + ' staat nog niet gepland' });
     }
     return s.slice(0, 5);
+  }
+
+  /* Het paspoort van dit lid: de vervaldatum staat op het onboarding-profiel
+     (uit de MRZ-scan). Vanaf een half jaar vooraf een seintje; de tekst schuift
+     mee met de mijlpaal (6 mnd -> 3 mnd -> deze maand -> verlopen), zodat elke
+     mijlpaal precies een keer een melding geeft (het piep-geheugen werkt op tekst). */
+  function paspoortSein(key) {
+    const prof = ((db.data.onboarding || {}).profielen || {})[key];
+    const vv = prof && prof.paspoort && prof.paspoort.vervaldatum;
+    if (!vv) return null;
+    const dgn = dagenTot(vv);
+    if (dgn > 183) return null; // pas vanaf een half jaar van tevoren
+    if (dgn <= 0) return { soort: 'paspoort', tekst: 'Je paspoort is verlopen (' + vv + '). Vraag een nieuw paspoort aan voordat je weer reist.' };
+    const mijlpaal = dgn <= 30 ? 'deze maand' : dgn <= 92 ? 'over ~3 maanden' : 'over ~6 maanden';
+    return { soort: 'paspoort', tekst: 'Je paspoort verloopt ' + mijlpaal + ' (' + vv + '). Vraag op tijd een nieuw paspoort aan.' };
   }
 
   /* Een nieuw seintje wordt vanzelf een melding op het toestel (de bel plus
@@ -113,11 +132,21 @@ module.exports = (ctx) => {
     return { ok: true, gepusht: n };
   }
 
-  // de halfuurlijkse ronde over alle gebruikers: een index, een datapass
+  // de halfuurlijkse ronde over alle gebruikers: een index, een datapass. Naast
+  // ieder die Rahul al gebruikt, nemen we leden mee van wie het paspoort binnen
+  // een half jaar verloopt -- zodat die het seintje ook krijgen zonder Rahul
+  // eerst geopend te hebben (alleen die, om geen profielen aan te maken die niets
+  // te melden hebben).
   function fluisterPushAlle() {
     const idx = maakSeintjesIndex();
+    const keys = new Set(Object.keys(db.data.fluister || {}));
+    const profs = ((db.data.onboarding || {}).profielen) || {};
+    for (const k in profs) {
+      const vv = profs[k] && profs[k].paspoort && profs[k].paspoort.vervaldatum;
+      if (vv && dagenTot(vv) <= 183) keys.add(k);
+    }
     let n = 0;
-    for (const k of Object.keys(db.data.fluister || {})) n += fluisterPush(k, idx).gepusht;
+    for (const k of keys) n += fluisterPush(k, idx).gepusht;
     return { ok: true, gepusht: n };
   }
 

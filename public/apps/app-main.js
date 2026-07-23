@@ -966,6 +966,9 @@
   // terug van wat gelezen is (voor Rahul), of '' als er niets bruikbaars was.
   async function onbMrzOpslaan(mrz){
     if (!mrz) return '';
+    // de vervaldatum los bewaren (geen onboarding-veld): Rahul seint er een half
+    // jaar vooraf mee dat het paspoort verloopt
+    if (mrz.vervaldatum){ try { await API.call('/onboarding/paspoort', { vervaldatum: mrz.vervaldatum, nummer: mrz.nummer }); } catch(e){} }
     const heeft = {}; (onbSt && onbSt.velden || []).forEach(function(v){ heeft[v.id] = v; });
     const velden = {}, stukjes = [];
     if (mrz.geboortedatum && heeft.geboortedatum){ velden.geboortedatum = mrz.geboortedatum; stukjes.push(mrz.geboortedatum); }

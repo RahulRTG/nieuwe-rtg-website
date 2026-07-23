@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Bedrijfspakketten</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:5rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:920px;margin:0 auto;}
+  .intro{color:var(--muted);font-size:.92rem;line-height:1.6;max-width:60ch;}
+  .geheim{margin-top:.6rem;font-size:.76rem;color:var(--soft);border-left:2px solid var(--gold);padding:.3rem 0 .3rem .7rem;}
+  .kop{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:1.6rem 0 .6rem;}
+  .typen{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.7rem;}
+  .type{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;cursor:pointer;text-align:left;transition:border-color .2s,transform .2s;font:inherit;color:var(--txt);}
+  .type:hover,.type:focus-visible{border-color:var(--gold);transform:translateY(-2px);}
+  .type.aan{border-color:var(--gold);background:linear-gradient(180deg,rgba(169,143,28,.14),var(--card));}
+  .type b{display:block;font-size:1.02rem;font-family:'Bodoni Moda',serif;font-weight:500;}
+  .type span{display:block;font-size:.78rem;color:var(--soft);margin-top:.2rem;line-height:1.45;}
+  #pakket{margin-top:1.4rem;display:none;}
+  #pakket.aan{display:block;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-top:.9rem;}
+  .kaart h3{font-size:1.1rem;margin-bottom:.5rem;}
+  .rij{display:flex;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);align-items:baseline;}
+  .rij:last-child{border-bottom:0;}
+  .rij b{flex-shrink:0;min-width:9.5rem;font-weight:600;font-size:.9rem;}
+  .rij span{color:var(--muted);font-size:.85rem;line-height:1.5;}
+  .apps{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .app{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--muted);}
+  /* de technieken met een QR-code erbij */
+  .tech{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;}
+  .tk{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:.8rem;display:flex;gap:.7rem;align-items:flex-start;}
+  .tk img{width:58px;height:58px;flex-shrink:0;border-radius:8px;background:#fff;padding:3px;image-rendering:pixelated;}
+  .tk b{display:block;font-size:.88rem;}
+  .tk span{display:block;font-size:.76rem;color:var(--soft);margin-top:.2rem;line-height:1.45;}
+  /* de 3D-plattegrond: een isometrisch raster met kamers */
+  .plek{perspective:1100px;margin-top:.4rem;overflow:hidden;padding:1.2rem 0 .4rem;}
+  .vloer{position:relative;width:min(420px,86vw);height:min(300px,62vw);margin:0 auto;
+    transform:rotateX(56deg) rotateZ(-42deg);transform-style:preserve-3d;
+    background:repeating-linear-gradient(0deg,transparent,transparent calc(25% - 1px),rgba(255,255,255,.06) 25%),repeating-linear-gradient(90deg,transparent,transparent calc(25% - 1px),rgba(255,255,255,.06) 25%);
+    border:1px solid rgba(255,255,255,.10);border-radius:6px;}
+  .kamer{position:absolute;border-radius:5px;color:#0C0C0B;font-weight:700;font-size:.6rem;
+    display:flex;align-items:center;justify-content:center;text-align:center;padding:.2rem;
+    box-shadow:0 10px 0 -2px rgba(0,0,0,.45);transform:translateZ(14px);letter-spacing:.02em;}
+  .huur{background:linear-gradient(180deg,rgba(169,143,28,.12),var(--card));border-color:rgba(169,143,28,.4);}
+  .maatrij{display:flex;gap:.5rem;margin-top:.6rem;}
+  .maatrij input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;color:var(--txt);font:inherit;font-size:.86rem;}
+  .maatrij button{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
+  .opmaat{margin-top:.7rem;background:#0C0C0B;border:1px solid rgba(169,143,28,.4);border-radius:12px;padding:.7rem .8rem;font-size:.86rem;color:var(--txt);line-height:1.55;white-space:pre-wrap;}
+  .opmaat[hidden]{display:none;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
+</style>
+</head>
+<body data-oswereld="lid">
+<a class="skip" href="#hoofd" style="position:absolute;left:-999px;">Naar de inhoud</a>
+<header>
+  <button class="terug" id="terug" type="button">Terug</button>
+  <div><div class="ey">Voor ondernemers</div><h1>Bedrijfspakketten</h1></div>
+</header>
+<main id="hoofd">
+  <p class="intro">Onderneem je (of denk je erover)? Kies je bedrijfstype en Rahul zet de juiste indeling voor je zaak klaar: welke werkplekken, welke RTG-werk-apps en welke technieken je nodig hebt, met een 3D-plattegrond, QR-codes en een passend kantoor om te huren.</p>
+  <p class="geheim">Dit gaat over jouw zaak. Hoe de RTG-kantoren zelf werken, is en blijft bedrijfsgeheim.</p>
+
+  <div class="kop">Kies je bedrijfstype</div>
+  <div class="typen" id="typen"><p class="leeg">Bezig met laden...</p></div>
+
+  <section id="pakket" aria-live="polite"></section>
+</main>
+
+<script src="/shared/qr.js" defer></script>
+<script src="/shared/qrteken.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  var tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
+  var terug = document.getElementById('terug');
+  if (terug) terug.addEventListener('click', function () { history.length > 1 ? history.back() : (location.href = '/apps/app.html'); });
+  var typenEl = document.getElementById('typen'), pakEl = document.getElementById('pakket');
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
+  function api(pad, body){
+    return fetch(pad, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+tok }, body: JSON.stringify(body||{}) })
+      .then(function(r){ return r.json().then(function(d){ if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }); });
+  }
+  if (!tok) { typenEl.innerHTML = '<p class="leeg">Meld je eerst aan bij Rahul; dan zet ik de pakketten voor je klaar.</p>'; return; }
+
+  var gekozen = null;
+  api('/api/pakket/typen', {}).then(function(d){
+    typenEl.innerHTML = (d.typen||[]).map(function(t){
+      return '<button class="type" type="button" data-id="'+esc(t.id)+'"><b>'+esc(t.naam)+'</b><span>'+esc(t.kort)+'</span></button>';
+    }).join('');
+    [].forEach.call(typenEl.querySelectorAll('.type'), function(b){
+      b.addEventListener('click', function(){
+        [].forEach.call(typenEl.querySelectorAll('.type'), function(x){ x.classList.remove('aan'); });
+        b.classList.add('aan'); gekozen = b.getAttribute('data-id'); laadPakket(gekozen);
+      });
+    });
+  }).catch(function(e){ typenEl.innerHTML = '<p class="leeg">'+esc(e.message)+'</p>'; });
+
+  // QR-tekening: encodeert een label per techniek als demonstratie van de QR-laag
+  function qr(tekst){
+    try { if (window.RTGQRteken) return RTGQRteken.dataURL(tekst, { schaal: 3, quiet: 2 }); } catch (e) {}
+    return '';
+  }
+  function techBlok(technieken){
+    return '<div class="tech">' + technieken.map(function(t){
+      var src = qr('RTG-techniek:' + t.id);
+      return '<div class="tk">' + (src ? '<img alt="QR voor '+esc(t.naam)+'" src="'+src+'">' : '') +
+        '<div><b>'+esc(t.naam)+'</b><span>'+esc(t.wat)+'</span></div></div>';
+    }).join('') + '</div>';
+  }
+  function plattegrond(indeling){
+    // r,k = rij/kolom; w,h = vakken. Het raster is 4 breed; hoogte schaalt mee.
+    var maxRij = 1; indeling.forEach(function(k){ maxRij = Math.max(maxRij, k.r + k.h); });
+    var cw = 100/4, ch = 100/Math.max(3, maxRij);
+    var kamers = indeling.map(function(k){
+      return '<div class="kamer" style="left:'+(k.k*cw)+'%;top:'+(k.r*ch)+'%;width:'+(k.w*cw)+'%;height:'+(k.h*ch)+'%;background:'+k.kleur+';">'+esc(k.naam)+'</div>';
+    }).join('');
+    return '<div class="plek"><div class="vloer">'+kamers+'</div></div>';
+  }
+  function render(a){
+    pakEl.innerHTML =
+      '<div class="kop">Jouw pakket</div>' +
+      '<div class="kaart"><h3>'+esc(a.naam)+'</h3><p class="intro">'+esc(a.kort)+'</p>' +
+        '<div class="kop" style="margin-top:1rem;">De 3D-plattegrond</div>' + plattegrond(a.indeling) +
+      '</div>' +
+      '<div class="kaart"><h3>Werkplekken</h3>' + a.werkplekken.map(function(w){
+        return '<div class="rij"><b>'+esc(w.naam)+'</b><span>'+esc(w.wat)+'</span></div>'; }).join('') + '</div>' +
+      '<div class="kaart"><h3>Werk-apps</h3><div class="apps">' + a.apps.map(function(p){
+        return '<span class="app">'+esc(p.naam)+'</span>'; }).join('') + '</div></div>' +
+      '<div class="kaart"><h3>Technieken (scan om te openen)</h3>' + techBlok(a.technieken) + '</div>' +
+      '<div class="kaart huur"><h3>Kantoor huren</h3><div class="rij"><b>'+esc(a.huur.kantoor)+'</b><span>'+esc(a.huur.wat)+'</span></div></div>' +
+      '<div class="kaart"><h3>Op maat van jouw zaak</h3>' +
+        '<p class="intro">Vertel je situatie (bijv. "40 couverts, 2 bars, veel events") en Rahul kleurt het pakket bij.</p>' +
+        '<div class="maatrij"><input id="situatie" placeholder="Beschrijf je zaak" maxlength="300" aria-label="Beschrijf je zaak"><button id="maatGo" type="button">Vraag Rahul</button></div>' +
+        '<div class="opmaat" id="opmaat" hidden></div>' +
+      '</div>';
+    pakEl.classList.add('aan');
+    var inp = document.getElementById('situatie'), go = document.getElementById('maatGo'), uit = document.getElementById('opmaat');
+    go.addEventListener('click', function(){
+      var s = inp.value.trim(); if (!s) return;
+      uit.hidden = false; uit.textContent = 'Rahul denkt na...';
+      api('/api/pakket/advies', { type: gekozen, situatie: s }).then(function(d){
+        uit.textContent = (d.advies && d.advies.opmaat) || 'Ik hou het bij het pakket hierboven; dat past goed bij wat je beschrijft.';
+      }).catch(function(e){ uit.textContent = e.message; });
+    });
+    pakEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function laadPakket(id){
+    pakEl.classList.remove('aan');
+    api('/api/pakket/advies', { type: id }).then(function(d){ render(d.advies); })
+      .catch(function(e){ pakEl.innerHTML = '<p class="leeg">'+esc(e.message)+'</p>'; pakEl.classList.add('aan'); });
+  }
+})();
+</script>
+</body>
+</html>

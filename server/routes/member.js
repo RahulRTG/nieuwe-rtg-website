@@ -87,4 +87,6 @@ module.exports = (kern) => {
   require('./member/salon')(kern);
   // Werk & sollicitaties: cv, vacatures, solliciteren en de sollicitatie-chat.
   require('./member/werk')(kern);
+  // Bedrijfspakketten: bedrijfstype -> juiste indeling voor de eigen zaak.
+  require('./member/pakket')(kern);
 };

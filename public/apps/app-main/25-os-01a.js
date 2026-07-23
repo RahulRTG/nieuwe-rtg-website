@@ -7,7 +7,8 @@
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
      OSAPPS/INDELING/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
   OSAPPS.werk = { naam: 'Werk', icoon: '💼' };
-  INDELING[1].push('os:werk');
+  // Werk zit in de App Store (categorie "Het huis & diensten"); installeer je
+  // het, dan verschijnt het op pagina 2 en opent het met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
   for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
 

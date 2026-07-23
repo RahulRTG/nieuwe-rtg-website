@@ -17,8 +17,9 @@
 
   const pas = new URLSearchParams(location.search).get('pas') || 'rtg';
   // De Butler in het midden van het dock, als grotere gouden orb: hij is het
-  // hart van het OS en doet alles wat je hem vraagt.
-  const DOCK = ['betalen', 'bestellen', 'ai', 'salon', 'terplaatse'];
+  // hart van het OS en doet alles wat je hem vraagt. Het dock houdt de drie
+  // RTG-kern-tabs vast; de overige diensten komen uit de App Store.
+  const DOCK = ['betalen', 'ai', 'salon'];
 
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
@@ -70,7 +71,8 @@
     bellen:      { naam: 'Bellen',       icoon: '📞' },
     videobellen: { naam: 'Videobellen',  icoon: '🎥' },
     snaps:       { naam: 'Snaps',        icoon: '📷' },
-    rtf:         { naam: 'RTFoundation', icoon: '🕊️' }
+    rtf:         { naam: 'RTFoundation', icoon: '🕊️' },
+    store:       { naam: 'App Store',    icoon: '🛍️' }
   };
   const RTF_GROEPEN = [
     { g: 'mini',   naam: 'RTF Mini',      icoon: '🧸', sub: '0 t/m 4 jaar' },
@@ -79,33 +81,26 @@
     { g: 'jong',   naam: 'RTF Jong',      icoon: '🚀', sub: '16 t/m 21+' },
     { g: 'volw',   naam: 'RTF Volwassen', icoon: '🧑', sub: 'ouders en verzorgers' }
   ];
-  const INDELING = [
-    ['tab:reizen', 'tab:betalen', 'tab:bestellen', 'tab:ai', 'tab:salon', 'tab:terplaatse',
-      { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
-    ['link:ontdek',
-      { sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:berichten', 'link:pulse', 'link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
-      'link:nieuws',
-      'link:bank',
-      'link:navigatie',
-      'link:ov',
-      'link:vluchten',
-      'link:sport',
-      'link:stad',
-      'os:rtf',
-      'link:camera',
-      'link:muziek',
-      'link:podium',
-      'link:clips',
-      'link:vonk',
-      'link:balans',
-      'link:flits',
-      'link:theater',
-      'link:wbw',
-      'link:office',
-      'link:passkeys',
-      'link:juridisch']
+  /* ---------- de ROS als telefoon: alleen de basis + de App Store ----------
+     Standaard staan alleen de "telefoon-apps", de RTFoundation en de App Store
+     op het beginscherm; de drie RTG-kern-tabs (Betalen, Rahul, De Salon) zitten
+     in het dock. Al het andere leeft in de App Store en verschijnt op pagina 2
+     zodra je het installeert (keuze per pas in localStorage). */
+  const STANDAARD = ['os:bellen', 'os:videobellen', 'os:snaps', 'link:berichten',
+    'link:camera', 'link:navigatie', 'link:muziek', 'os:rtf', 'os:store'];
+  // pagina 1 = de vaste basis; pagina 2 = geïnstalleerde apps (begint leeg,
+  // wordt door bouw() gevuld uit de installatiekeuze).
+  const INDELING = [STANDAARD.slice(), []];
+
+  /* De App Store-catalogus: alle diensten die je erbij kunt zetten, netjes
+     gegroepeerd. De Store filtert zelf op wat echt bestaat (itemZichtbaar) en,
+     voor de premium-suite, op de pas. */
+  const WINKEL_GROEPEN = [
+    { titel: 'Reizen & onderweg', items: ['tab:reizen', 'link:ov', 'link:vluchten', 'link:flits', 'link:stad', 'tab:terplaatse'] },
+    { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:office'] },
+    { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:sport'] },
+    { titel: 'Het huis & diensten', items: ['link:ontdek', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:juridisch', 'link:passkeys', 'os:werk'] },
+    { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],
+      items: ['link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous'] }
   ];
-  // De Rechterhand is de premium suite van de Lifestyle Pass (Business erft mee);
-  // hij verschijnt alleen op het springboard van die passen, vooraan op pagina twee.
-  if (['lifestyle', 'business'].includes(pas)) INDELING[1].splice(1, 0, 'link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous');
 

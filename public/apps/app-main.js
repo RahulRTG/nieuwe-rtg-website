@@ -2428,8 +2428,9 @@
 
   const pas = new URLSearchParams(location.search).get('pas') || 'rtg';
   // De Butler in het midden van het dock, als grotere gouden orb: hij is het
-  // hart van het OS en doet alles wat je hem vraagt.
-  const DOCK = ['betalen', 'bestellen', 'ai', 'salon', 'terplaatse'];
+  // hart van het OS en doet alles wat je hem vraagt. Het dock houdt de drie
+  // RTG-kern-tabs vast; de overige diensten komen uit de App Store.
+  const DOCK = ['betalen', 'ai', 'salon'];
 
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
@@ -2481,7 +2482,8 @@
     bellen:      { naam: 'Bellen',       icoon: '📞' },
     videobellen: { naam: 'Videobellen',  icoon: '🎥' },
     snaps:       { naam: 'Snaps',        icoon: '📷' },
-    rtf:         { naam: 'RTFoundation', icoon: '🕊️' }
+    rtf:         { naam: 'RTFoundation', icoon: '🕊️' },
+    store:       { naam: 'App Store',    icoon: '🛍️' }
   };
   const RTF_GROEPEN = [
     { g: 'mini',   naam: 'RTF Mini',      icoon: '🧸', sub: '0 t/m 4 jaar' },
@@ -2490,35 +2492,28 @@
     { g: 'jong',   naam: 'RTF Jong',      icoon: '🚀', sub: '16 t/m 21+' },
     { g: 'volw',   naam: 'RTF Volwassen', icoon: '🧑', sub: 'ouders en verzorgers' }
   ];
-  const INDELING = [
-    ['tab:reizen', 'tab:betalen', 'tab:bestellen', 'tab:ai', 'tab:salon', 'tab:terplaatse',
-      { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
-    ['link:ontdek',
-      { sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:berichten', 'link:pulse', 'link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
-      'link:nieuws',
-      'link:bank',
-      'link:navigatie',
-      'link:ov',
-      'link:vluchten',
-      'link:sport',
-      'link:stad',
-      'os:rtf',
-      'link:camera',
-      'link:muziek',
-      'link:podium',
-      'link:clips',
-      'link:vonk',
-      'link:balans',
-      'link:flits',
-      'link:theater',
-      'link:wbw',
-      'link:office',
-      'link:passkeys',
-      'link:juridisch']
+  /* ---------- de ROS als telefoon: alleen de basis + de App Store ----------
+     Standaard staan alleen de "telefoon-apps", de RTFoundation en de App Store
+     op het beginscherm; de drie RTG-kern-tabs (Betalen, Rahul, De Salon) zitten
+     in het dock. Al het andere leeft in de App Store en verschijnt op pagina 2
+     zodra je het installeert (keuze per pas in localStorage). */
+  const STANDAARD = ['os:bellen', 'os:videobellen', 'os:snaps', 'link:berichten',
+    'link:camera', 'link:navigatie', 'link:muziek', 'os:rtf', 'os:store'];
+  // pagina 1 = de vaste basis; pagina 2 = geïnstalleerde apps (begint leeg,
+  // wordt door bouw() gevuld uit de installatiekeuze).
+  const INDELING = [STANDAARD.slice(), []];
+
+  /* De App Store-catalogus: alle diensten die je erbij kunt zetten, netjes
+     gegroepeerd. De Store filtert zelf op wat echt bestaat (itemZichtbaar) en,
+     voor de premium-suite, op de pas. */
+  const WINKEL_GROEPEN = [
+    { titel: 'Reizen & onderweg', items: ['tab:reizen', 'link:ov', 'link:vluchten', 'link:flits', 'link:stad', 'tab:terplaatse'] },
+    { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:office'] },
+    { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:sport'] },
+    { titel: 'Het huis & diensten', items: ['link:ontdek', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:juridisch', 'link:passkeys', 'os:werk'] },
+    { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],
+      items: ['link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous'] }
   ];
-  // De Rechterhand is de premium suite van de Lifestyle Pass (Business erft mee);
-  // hij verschijnt alleen op het springboard van die passen, vooraan op pagina twee.
-  if (['lifestyle', 'business'].includes(pas)) INDELING[1].splice(1, 0, 'link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous');
 
   /* ---------- Werk op het OS + de algemene pin ----------
      De werk-apps zijn gewone apps op het RTG-OS: een tik op "Werk" toont de
@@ -2529,7 +2524,8 @@
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
      OSAPPS/INDELING/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
   OSAPPS.werk = { naam: 'Werk', icoon: '💼' };
-  INDELING[1].push('os:werk');
+  // Werk zit in de App Store (categorie "Het huis & diensten"); installeer je
+  // het, dan verschijnt het op pagina 2 en opent het met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
   for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
 
@@ -2732,6 +2728,8 @@
   function openOsApp(naam) {
     const app = OSAPPS[naam]; if (!app || !belScrim) return;
     sluitScrims();
+    // App Store: de eigen winkel-overlay (25-os-04b.js)
+    if (naam === 'store') { openWinkel(); return; }
     // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
     if (naam === 'werk') { openWerkKiezer(); return; }
     belTitel.textContent = app.icoon + ' ' + app.naam;
@@ -2821,6 +2819,8 @@
   }
 
   function bouw() {
+    // pagina 2 toont wat je in de App Store hebt geïnstalleerd (25-os-04b.js)
+    INDELING[1] = geinstalleerdeItems();
     grids.forEach((grid, p) => {
       grid.textContent = '';
       for (const it of gesorteerd(p)) {
@@ -2863,7 +2863,7 @@
   if (hernoemIn) hernoemIn.addEventListener('keydown', e => { if (e.key === 'Enter' && hernoemOk) hernoemOk.click(); });
 
   /* ---------- overlays: gedeeld sluiten ---------- */
-  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim'].map(s => $(s)).filter(Boolean);
+  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim'].map(s => $(s)).filter(Boolean);
   function sluitScrims() { scrims.forEach(s => s.classList.remove('open')); }
   scrims.forEach(s => s.addEventListener('click', e => { if (e.target === s) sluitScrims(); }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { sluitScrims(); zetWiebel(false); } });
@@ -3373,6 +3373,82 @@
         if (d && d.online) { LINKS.bank = { naam: 'RTG Bank', icoon: '🏦', url: '/apps/bank.html' }; bouw(); }
       }).catch(() => {});
   })();
+
+  /* ============================== App Store ==============================
+     De ROS is standaard een schone telefoon: alleen de basis-apps, de
+     RTFoundation en de App Store staan er (25-os-01.js). Alles daarbuiten leeft
+     in de Store en verschijnt op pagina 2 zodra je het installeert. De keuze
+     staat per pas in localStorage; verwijderen haalt het er weer af (de basis
+     en het dock kun je niet verwijderen). Dit blok staat bewust op het top-
+     niveau van de OS-IIFE (functie-declaraties worden gehoist, dus bouw()
+     hierboven kan geinstalleerdeItems() al gebruiken). */
+  function vasteAppsSet() { return new Set(STANDAARD.concat(DOCK.map(function (t) { return 'tab:' + t; }))); }
+  function geinst() { try { return JSON.parse(localStorage.getItem('rtg_os_apps_' + pas) || '[]') || []; } catch (e) { return []; } }
+  function zetGeinst(a) { try { localStorage.setItem('rtg_os_apps_' + pas, JSON.stringify(a)); } catch (e) {} }
+  function isGeinst(item) { return geinst().indexOf(item) >= 0; }
+  // pagina 2 = de geïnstalleerde apps die echt bestaan (bouw() leest dit)
+  function geinstalleerdeItems() { var v = vasteAppsSet(); return geinst().filter(function (it) { return !v.has(it) && itemZichtbaar(it); }); }
+  function installeer(item) { var a = geinst(); if (a.indexOf(item) < 0) { a.push(item); zetGeinst(a); } bouw(); }
+  function verwijder(item) { zetGeinst(geinst().filter(function (x) { return x !== item; })); bouw(); }
+
+  var winkelScrim = $('#osWinkelScrim'), winkelLijst = $('#osWinkelLijst');
+  function winkelRij(item) {
+    var rij = document.createElement('div'); rij.className = 'os-winkel-rij';
+    var zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(tegelInhoud(item)); rij.appendChild(zi);
+    var naam = document.createElement('span'); naam.className = 'os-winkel-naam'; naam.textContent = itemNaam(item); rij.appendChild(naam);
+    var knop = document.createElement('button'); knop.type = 'button'; knop.className = 'os-winkel-knop';
+    var verf = function () {
+      var g = isGeinst(item);
+      knop.textContent = g ? T('os.store.uit', 'Verwijderen') : T('os.store.in', 'Installeren');
+      knop.classList.toggle('geinst', g);
+    };
+    knop.addEventListener('click', function () { if (isGeinst(item)) verwijder(item); else installeer(item); verf(); });
+    verf(); rij.appendChild(knop);
+    return rij;
+  }
+  function openWinkel() {
+    if (!winkelScrim) return;
+    sluitScrims();
+    winkelLijst.textContent = '';
+    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
+    intro.textContent = T('os.store.uitleg', 'Kies wat je op je beginscherm wilt. Geïnstalleerde apps staan op pagina 2; je basis, het dock en de RTFoundation blijven altijd staan.');
+    winkelLijst.appendChild(intro);
+    var n = 0;
+    for (var i = 0; i < WINKEL_GROEPEN.length; i++) {
+      var groep = WINKEL_GROEPEN[i];
+      if (groep.pas && groep.pas.indexOf(pas) < 0) continue;
+      var items = groep.items.filter(function (it) { return !vasteAppsSet().has(it) && itemZichtbaar(it); });
+      if (!items.length) continue;
+      var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = groep.titel;
+      winkelLijst.appendChild(kop);
+      items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); n++; });
+    }
+    if (!n) { var leeg = document.createElement('div'); leeg.className = 'os-bel-leeg'; leeg.textContent = T('os.store.leeg', 'Er is nu niets extra beschikbaar.'); winkelLijst.appendChild(leeg); }
+    winkelScrim.classList.add('open');
+  }
+
+  /* ---------- Achtergrond (wallpaper) in het bedieningspaneel ---------- */
+  var WALLEN = ['standaard', 'nacht', 'bordeaux', 'beeld'];
+  function zetWall(naam) {
+    if (WALLEN.indexOf(naam) < 0) naam = 'standaard';
+    WALLEN.forEach(function (w) { app.classList.toggle('os-wall-' + w, w === naam); });
+    try { localStorage.setItem('rtg_os_wall', naam); } catch (e) {}
+    document.querySelectorAll('#osCcWp button').forEach(function (b) { b.classList.toggle('actief', b.dataset.wall === naam); });
+  }
+  document.querySelectorAll('#osCcWp button').forEach(function (b) { b.addEventListener('click', function () { zetWall(b.dataset.wall); }); });
+  var wallStart = 'standaard'; try { wallStart = localStorage.getItem('rtg_os_wall') || 'standaard'; } catch (e) {}
+  zetWall(wallStart);
+
+  /* ---------- Samen: verhuisd naar het bedieningspaneel ----------
+     De metgezel-laag (shared/metgezel.js) houdt op dit OS zijn zwevende
+     Samen-knop weg en biedt window.RTGMetgezel.samen() aan; hier openen we die
+     vanuit Instellingen. Rahul blijft gewoon in de buurt. */
+  var ccSamen = $('#osCcSamen');
+  if (ccSamen) ccSamen.addEventListener('click', function () {
+    sluitScrims();
+    if (window.RTGMetgezel && RTGMetgezel.samen) RTGMetgezel.samen();
+    else bannerToon('👥', T('os.samen', 'Samen'), T('os.samen.straks', 'Samen is zo beschikbaar.'));
+  });
 })();
   /* ---------- Onderweg (live reis) ---------- */
   let liveData = null;

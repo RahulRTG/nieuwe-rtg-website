@@ -57,6 +57,8 @@
   }
 
   function bouw() {
+    // pagina 2 toont wat je in de App Store hebt geïnstalleerd (25-os-04b.js)
+    INDELING[1] = geinstalleerdeItems();
     grids.forEach((grid, p) => {
       grid.textContent = '';
       for (const it of gesorteerd(p)) {
@@ -99,7 +101,7 @@
   if (hernoemIn) hernoemIn.addEventListener('keydown', e => { if (e.key === 'Enter' && hernoemOk) hernoemOk.click(); });
 
   /* ---------- overlays: gedeeld sluiten ---------- */
-  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim'].map(s => $(s)).filter(Boolean);
+  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim'].map(s => $(s)).filter(Boolean);
   function sluitScrims() { scrims.forEach(s => s.classList.remove('open')); }
   scrims.forEach(s => s.addEventListener('click', e => { if (e.target === s) sluitScrims(); }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { sluitScrims(); zetWiebel(false); } });

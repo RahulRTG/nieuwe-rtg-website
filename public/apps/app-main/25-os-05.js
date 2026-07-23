@@ -54,4 +54,80 @@
         if (d && d.online) { LINKS.bank = { naam: 'RTG Bank', icoon: '🏦', url: '/apps/bank.html' }; bouw(); }
       }).catch(() => {});
   })();
+
+  /* ============================== App Store ==============================
+     De ROS is standaard een schone telefoon: alleen de basis-apps, de
+     RTFoundation en de App Store staan er (25-os-01.js). Alles daarbuiten leeft
+     in de Store en verschijnt op pagina 2 zodra je het installeert. De keuze
+     staat per pas in localStorage; verwijderen haalt het er weer af (de basis
+     en het dock kun je niet verwijderen). Dit blok staat bewust op het top-
+     niveau van de OS-IIFE (functie-declaraties worden gehoist, dus bouw()
+     hierboven kan geinstalleerdeItems() al gebruiken). */
+  function vasteAppsSet() { return new Set(STANDAARD.concat(DOCK.map(function (t) { return 'tab:' + t; }))); }
+  function geinst() { try { return JSON.parse(localStorage.getItem('rtg_os_apps_' + pas) || '[]') || []; } catch (e) { return []; } }
+  function zetGeinst(a) { try { localStorage.setItem('rtg_os_apps_' + pas, JSON.stringify(a)); } catch (e) {} }
+  function isGeinst(item) { return geinst().indexOf(item) >= 0; }
+  // pagina 2 = de geïnstalleerde apps die echt bestaan (bouw() leest dit)
+  function geinstalleerdeItems() { var v = vasteAppsSet(); return geinst().filter(function (it) { return !v.has(it) && itemZichtbaar(it); }); }
+  function installeer(item) { var a = geinst(); if (a.indexOf(item) < 0) { a.push(item); zetGeinst(a); } bouw(); }
+  function verwijder(item) { zetGeinst(geinst().filter(function (x) { return x !== item; })); bouw(); }
+
+  var winkelScrim = $('#osWinkelScrim'), winkelLijst = $('#osWinkelLijst');
+  function winkelRij(item) {
+    var rij = document.createElement('div'); rij.className = 'os-winkel-rij';
+    var zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(tegelInhoud(item)); rij.appendChild(zi);
+    var naam = document.createElement('span'); naam.className = 'os-winkel-naam'; naam.textContent = itemNaam(item); rij.appendChild(naam);
+    var knop = document.createElement('button'); knop.type = 'button'; knop.className = 'os-winkel-knop';
+    var verf = function () {
+      var g = isGeinst(item);
+      knop.textContent = g ? T('os.store.uit', 'Verwijderen') : T('os.store.in', 'Installeren');
+      knop.classList.toggle('geinst', g);
+    };
+    knop.addEventListener('click', function () { if (isGeinst(item)) verwijder(item); else installeer(item); verf(); });
+    verf(); rij.appendChild(knop);
+    return rij;
+  }
+  function openWinkel() {
+    if (!winkelScrim) return;
+    sluitScrims();
+    winkelLijst.textContent = '';
+    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
+    intro.textContent = T('os.store.uitleg', 'Kies wat je op je beginscherm wilt. Geïnstalleerde apps staan op pagina 2; je basis, het dock en de RTFoundation blijven altijd staan.');
+    winkelLijst.appendChild(intro);
+    var n = 0;
+    for (var i = 0; i < WINKEL_GROEPEN.length; i++) {
+      var groep = WINKEL_GROEPEN[i];
+      if (groep.pas && groep.pas.indexOf(pas) < 0) continue;
+      var items = groep.items.filter(function (it) { return !vasteAppsSet().has(it) && itemZichtbaar(it); });
+      if (!items.length) continue;
+      var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = groep.titel;
+      winkelLijst.appendChild(kop);
+      items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); n++; });
+    }
+    if (!n) { var leeg = document.createElement('div'); leeg.className = 'os-bel-leeg'; leeg.textContent = T('os.store.leeg', 'Er is nu niets extra beschikbaar.'); winkelLijst.appendChild(leeg); }
+    winkelScrim.classList.add('open');
+  }
+
+  /* ---------- Achtergrond (wallpaper) in het bedieningspaneel ---------- */
+  var WALLEN = ['standaard', 'nacht', 'bordeaux', 'beeld'];
+  function zetWall(naam) {
+    if (WALLEN.indexOf(naam) < 0) naam = 'standaard';
+    WALLEN.forEach(function (w) { app.classList.toggle('os-wall-' + w, w === naam); });
+    try { localStorage.setItem('rtg_os_wall', naam); } catch (e) {}
+    document.querySelectorAll('#osCcWp button').forEach(function (b) { b.classList.toggle('actief', b.dataset.wall === naam); });
+  }
+  document.querySelectorAll('#osCcWp button').forEach(function (b) { b.addEventListener('click', function () { zetWall(b.dataset.wall); }); });
+  var wallStart = 'standaard'; try { wallStart = localStorage.getItem('rtg_os_wall') || 'standaard'; } catch (e) {}
+  zetWall(wallStart);
+
+  /* ---------- Samen: verhuisd naar het bedieningspaneel ----------
+     De metgezel-laag (shared/metgezel.js) houdt op dit OS zijn zwevende
+     Samen-knop weg en biedt window.RTGMetgezel.samen() aan; hier openen we die
+     vanuit Instellingen. Rahul blijft gewoon in de buurt. */
+  var ccSamen = $('#osCcSamen');
+  if (ccSamen) ccSamen.addEventListener('click', function () {
+    sluitScrims();
+    if (window.RTGMetgezel && RTGMetgezel.samen) RTGMetgezel.samen();
+    else bannerToon('👥', T('os.samen', 'Samen'), T('os.samen.straks', 'Samen is zo beschikbaar.'));
+  });
 })();

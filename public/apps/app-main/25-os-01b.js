@@ -93,6 +93,8 @@
   function openOsApp(naam) {
     const app = OSAPPS[naam]; if (!app || !belScrim) return;
     sluitScrims();
+    // App Store: de eigen winkel-overlay (25-os-04b.js)
+    if (naam === 'store') { openWinkel(); return; }
     // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
     if (naam === 'werk') { openWerkKiezer(); return; }
     belTitel.textContent = app.icoon + ' ' + app.naam;

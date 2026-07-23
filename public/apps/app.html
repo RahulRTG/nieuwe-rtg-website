@@ -1113,6 +1113,42 @@
   .os-cc-tegels button b{font-size:1.05rem;font-weight:400;}
   .os-cc-tegels button.aan{border-color:var(--green);color:var(--green);}
 
+  /* -------- App Store: apps installeren en verwijderen -------- */
+  .os-winkel-paneel{
+    margin-top:calc(env(safe-area-inset-top, 0px) + 3.4rem);
+    width:min(400px, 92%);max-height:80vh;overflow-y:auto;
+    background:color-mix(in srgb, var(--card) 84%, transparent);
+    border:1px solid var(--line);border-radius:18px;padding:1rem 1rem 1.3rem;
+    box-shadow:0 24px 60px rgba(0,0,0,0.5);
+  }
+  .os-winkel-intro{color:var(--soft);font-size:0.74rem;line-height:1.5;margin:0.6rem 0 0.2rem;}
+  .os-winkel-groep{
+    font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);
+    margin:1.1rem 0 0.4rem;
+  }
+  .os-winkel-rij{
+    display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;
+    border-top:1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  }
+  .os-winkel-groep + .os-winkel-rij{border-top:none;}
+  .os-winkel-rij .zi{
+    width:34px;height:34px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;background:var(--card2);font-size:1.1rem;
+  }
+  .os-winkel-rij .zi svg{width:18px;height:18px;stroke:#fff;}
+  .os-winkel-naam{flex:1;font-size:0.82rem;color:var(--txt);}
+  .os-winkel-knop{
+    flex-shrink:0;border:1px solid var(--gold);background:var(--gold);color:#0C0C0B;
+    border-radius:999px;padding:0.4rem 0.95rem;font-size:0.72rem;font-weight:600;cursor:pointer;
+    transition:border-color 0.13s ease, color 0.13s ease, background 0.13s ease;
+  }
+  .os-winkel-knop.geinst{background:transparent;color:var(--soft);border-color:var(--line);}
+
+  /* -------- achtergrond (wallpaper), gekozen in het bedieningspaneel -------- */
+  #app.os-wall-nacht{background:#000;}
+  #app.os-wall-bordeaux{background:radial-gradient(130% 100% at 50% 0%, #2b0b16 0%, #0C0C0B 62%);}
+  #app.os-wall-beeld{background:linear-gradient(rgba(12,12,11,0.76), rgba(12,12,11,0.95)), url('/campagne/hero.jpg') center/cover no-repeat fixed;}
+
   /* -------- wiebel-modus: iconen herschikken met een lange druk -------- */
   .os-klaar{
     border:none;border-radius:999px;padding:0.35rem 0.85rem;
@@ -1527,13 +1563,31 @@
           <span class="os-cc-label" data-i18n="os.cc.helder">Helderheid</span>
           <input type="range" id="osCcHelder" min="60" max="110" value="100" aria-label="Helderheid">
         </div>
+        <div class="os-cc-rij" id="osCcWpRij">
+          <span class="os-cc-label" data-i18n="os.cc.wall">Achtergrond</span>
+          <div class="os-cc-knoppen" id="osCcWp">
+            <button type="button" data-wall="standaard" data-i18n="os.cc.wall.std">Standaard</button>
+            <button type="button" data-wall="nacht" data-i18n="os.cc.wall.nacht">Nacht</button>
+            <button type="button" data-wall="bordeaux">Bordeaux</button>
+            <button type="button" data-wall="beeld" data-i18n="os.cc.wall.beeld">Beeld</button>
+          </div>
+        </div>
         <div class="os-cc-tegels">
           <button id="osCcTaal"><b>🌐</b><span data-i18n="os.cc.taal">Taal</span></button>
           <button id="osCcLicht"><b>🌗</b><span data-i18n="os.cc.licht">Weergave</span></button>
           <button id="osCcPush"><b>🔔</b><span data-i18n="os.cc.push">Push</span></button>
+          <button id="osCcSamen"><b>👥</b><span data-i18n="os.cc.samen">Samen</span></button>
           <button id="osCcZoek"><b>🔍</b><span data-i18n="os.zoek">Zoeken</span></button>
           <button id="osCcUit"><b>⏻</b><span data-i18n="app.logout">Uitloggen</span></button>
         </div>
+      </div>
+    </div>
+
+    <!-- RTG OS: App Store (apps installeren en verwijderen) -->
+    <div class="os-scrim" id="osWinkelScrim">
+      <div class="os-winkel-paneel" role="dialog" aria-modal="true" aria-labelledby="osWinkelTitel">
+        <h3 class="os-bel-titel" id="osWinkelTitel">🛍️ App Store</h3>
+        <div id="osWinkelLijst"></div>
       </div>
     </div>
   </div>

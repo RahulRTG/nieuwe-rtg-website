@@ -80,10 +80,16 @@
   var sSheet = maakEl('<section class="mgz-sheet" aria-label="Samen" hidden style="bottom:3.6rem;">' +
     '<div class="mgz-kop"><span>👥 Samen</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="mgz-vak"></div></section>');
-  document.body.appendChild(sKnop); document.body.appendChild(sSheet);
+  // Op het leden-OS (app.html) hoort Samen in het bedieningspaneel, niet als
+  // zwevende knop; daar opent Instellingen het via window.RTGMetgezel.samen().
+  var samenInPaneel = /\/apps\/app\.html$/.test(location.pathname);
+  if (!samenInPaneel) document.body.appendChild(sKnop);
+  document.body.appendChild(sSheet);
   var vak = sSheet.querySelector('.mgz-vak');
-  sKnop.addEventListener('click', function () { sSheet.hidden = false; sKnop.hidden = true; teken(); });
+  function toonSamen() { sSheet.hidden = false; sKnop.hidden = true; teken(); }
+  sKnop.addEventListener('click', toonSamen);
   sSheet.querySelector('.mgz-x').addEventListener('click', function () { sSheet.hidden = true; sKnop.hidden = false; });
+  window.RTGMetgezel = window.RTGMetgezel || {}; window.RTGMetgezel.samen = toonSamen;
 
   function zetKamer(code) { kamerCode = code; try { code ? localStorage.setItem(CODEKEY, code) : localStorage.removeItem(CODEKEY); } catch (e) {} }
   function meldHier() {

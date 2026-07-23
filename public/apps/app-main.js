@@ -3285,6 +3285,12 @@
     helder.value = h; zetHelder(h);
     helder.addEventListener('input', () => zetHelder(Number(helder.value)));
   }
+  // beweging: snelheid/intensiteit van de levende grond (via de gedeelde motor)
+  const beweeg = $('#osCcBeweging');
+  if (beweeg) {
+    if (window.RTGBeweging) beweeg.value = RTGBeweging.waarde();
+    beweeg.addEventListener('input', () => { if (window.RTGBeweging) RTGBeweging.zet(Number(beweeg.value)); });
+  }
 
   /* ---------- wiebel-modus: herschikken met een lange druk ---------- */
   let wiebel = false, drukTimer = null, sleepEl = null, wiebelStart = 0;

@@ -70,7 +70,31 @@
     pastel:    { anker: 210,  licht: false, basisL: 0.075, basisS: 0.34, topL: 0.60, onderL: 0.44, was: 0.80 }
   };
 
-  function palet(familie, nu) {
+  /* ---- beweging: snelheid + intensiteit van de levende grond, met een knopje ----
+     Een voorkeur (0..100) die de grond rustiger of levendiger maakt: hoe hoger,
+     hoe sterker de gloed en hoe sneller de zachte 'ademhaling'. 0 = stil. Wordt
+     per toestel onthouden en gedeeld door al je RTG-schermen. */
+  var BKEY = 'rtg_beweging';
+  var RUSTIG = false; try { RUSTIG = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  function bWaarde() {
+    try { var v = localStorage.getItem(BKEY); if (v != null && v !== '') return Math.max(0, Math.min(100, +v)); } catch (e) {}
+    return RUSTIG ? 12 : 60; // standaard: rustig als het toestel dat vraagt, anders normaal
+  }
+  function bFactor() { return bWaarde() / 60; } // 60 -> 1.0, bereik 0 .. 1.67
+  function bNiveau() { var v = bWaarde(); return v < 8 ? 'stil' : v < 40 ? 'rustig' : v < 82 ? 'normaal' : 'levendig'; }
+  function bPas() {
+    d.documentElement.style.setProperty('--beweging', bFactor().toFixed(3));
+    d.documentElement.setAttribute('data-beweging', bNiveau());
+  }
+  function bZet(v) {
+    try { localStorage.setItem(BKEY, String(Math.max(0, Math.min(100, +v)))); } catch (e) {}
+    bPas(); vorige = ''; bMerk();
+    try { w.dispatchEvent(new Event('rtg-beweging')); } catch (e) {}
+  }
+
+  function palet(familie, nu, beweeg, sh) {
+    if (beweeg == null) beweeg = 1;
+    if (sh == null) sh = 0;
     var F = FAMILIES[familie] || FAMILIES.donker;
     nu = nu || new Date();
     var q = null; try { q = new URLSearchParams(w.location.search); } catch (e) {}
@@ -86,8 +110,14 @@
     mh = (mh + Math.sin(dag * 2.399963) * 9 + 360) % 360;
     // naar het familie-anker trekken zodat de grond herkenbaar op-merk blijft
     var hue = F.anker == null ? mh : mengHue(mh, F.anker, 0.62);
+    // de zachte ademhaling: een fijne slinger op tint en gloed, sterker en sneller
+    // naarmate de beweging hoger staat (0 = helemaal stil)
+    hue = (hue + sh * 4 * beweeg + 360) % 360;
     var sat = Math.max(0.20, Math.min(0.72, s.sat * (0.7 + b.licht * 0.55)));
-    var g = b.gloed * F.was;
+    // de grond blijft altijd zichtbaar (stil = geen beweging, niet uit); alleen de
+    // ademhaling schaalt mee, met een fijne extra rijkdom naar 'levendig' toe
+    var glowBasis = 0.88 + Math.min(1.2, beweeg) * 0.2;
+    var g = Math.max(0, b.gloed * F.was * glowBasis * (1 + sh * 0.14 * beweeg));
 
     var top, onder, basis;
     if (F.licht) {
@@ -128,11 +158,17 @@
     return 'donker';
   }
 
-  var vorige = '';
+  var vorige = '', fase = 0, laatstT = 0;
+  function nowMs() { try { return w.performance && w.performance.now ? w.performance.now() : Date.now(); } catch (e) { return Date.now(); } }
   function verf() {
     if (!d.querySelector('[data-levendegrond]')) return;
     zorgStijl();
-    var p = palet(familieNu());
+    // de ademhaling: de fase loopt sneller door naarmate de beweging hoger staat
+    var beweeg = bFactor();
+    var t = nowMs(); var dt = laatstT ? Math.min(0.2, (t - laatstT) / 1000) : 0; laatstT = t;
+    fase += dt * (0.10 + beweeg * 0.35) * 2 * Math.PI; // ~8-20s per cyclus
+    var sh = beweeg > 0 ? Math.sin(fase) : 0;
+    var p = palet(familieNu(), null, beweeg, sh);
     var sleutel = p.top + '|' + p.onder + '|' + p.basis;
     if (sleutel === vorige) return; // niets veranderd: geen schrijf naar het scherm
     vorige = sleutel;
@@ -140,6 +176,49 @@
     r.setProperty('--levend-top', p.top);
     r.setProperty('--levend-onder', p.onder);
     r.setProperty('--levend-basis', p.basis);
+  }
+
+  /* ---- het knopje: een pil die door vier standen loopt (stil / rustig /
+     normaal / levendig). Linksonder, boven de themakiezer als die er is. ---- */
+  var STANDEN = [{ w: 0, n: 'Stil' }, { w: 30, n: 'Rustig' }, { w: 62, n: 'Normaal' }, { w: 100, n: 'Levendig' }];
+  function bMerk() {
+    var el = d.getElementById('bewegingKnop'); if (!el) return;
+    var lab = el.querySelector('.bw-label'); if (lab) lab.textContent = bNiveau().charAt(0).toUpperCase() + bNiveau().slice(1);
+  }
+  function bStijl() {
+    if (d.getElementById('bewegingCss')) return;
+    var st = d.createElement('style'); st.id = 'bewegingCss';
+    st.textContent =
+      '#bewegingKnop{position:fixed;left:max(14px,env(safe-area-inset-left,0px));z-index:9990;' +
+        'bottom:calc(64px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:.45rem;' +
+        'padding:.4rem .7rem .4rem .55rem;border-radius:999px;cursor:pointer;font-family:Inter,system-ui,sans-serif;' +
+        'font-size:.7rem;font-weight:600;letter-spacing:.02em;color:var(--txt,#F4F1EC);' +
+        'background:color-mix(in srgb, var(--card,#151312) 82%, transparent);' +
+        'border:1px solid var(--line,rgba(255,255,255,.14));box-shadow:0 10px 30px rgba(0,0,0,.4);' +
+        'backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}' +
+      '#bewegingKnop svg{flex:0 0 auto;color:var(--gold,#A98F1C);}' +
+      '#bewegingKnop:focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}' +
+      '@media print{#bewegingKnop{display:none;}}';
+    (d.head || d.documentElement).appendChild(st);
+  }
+  function bouwKnop() {
+    if (d.getElementById('bewegingKnop') || !d.body) return;
+    // op het leden-OS zit de beweging in het bedieningspaneel (een schuif), dus
+    // daar geen zwevend knopje dat de tabbalk zou overlappen
+    if (d.getElementById('osCcScrim')) return;
+    bStijl();
+    var b = d.createElement('button'); b.id = 'bewegingKnop'; b.type = 'button';
+    b.setAttribute('aria-label', 'Snelheid en intensiteit van de beweging');
+    b.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">' +
+      '<path d="M4 12a8 8 0 0 1 8-8"/><path d="M7.5 12a4.5 4.5 0 0 1 4.5-4.5"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>' +
+      '<span class="bw-label"></span>';
+    b.addEventListener('click', function () {
+      var v = bWaarde(), i = 0;
+      for (var k = 0; k < STANDEN.length; k++) if (Math.abs(STANDEN[k].w - v) <= 8) { i = k; break; }
+      bZet(STANDEN[(i + 1) % STANDEN.length].w);
+    });
+    d.body.appendChild(b);
+    bMerk();
   }
 
   // continu, maar zuinig: rAF pauzeert vanzelf als het tabblad weg is, en we
@@ -159,6 +238,7 @@
         if (doel) doel.setAttribute('data-levendegrond', '');
       }
     }
+    bPas(); bouwKnop();
     zorgStijl(); verf();
     if (!loopt && w.requestAnimationFrame) { loopt = true; w.requestAnimationFrame(lus); }
   }
@@ -170,4 +250,7 @@
   else start();
 
   w.RTGLevend = { palet: palet, verf: verf, familie: familie };
+  // de beweging (snelheid/intensiteit) is ook los te bedienen, bv. vanuit een
+  // eigen schuif in het bedieningspaneel
+  w.RTGBeweging = { waarde: bWaarde, factor: bFactor, niveau: bNiveau, zet: bZet };
 })(window, document);

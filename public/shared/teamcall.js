@@ -71,6 +71,8 @@
         '<button id="tcWeg" aria-label="ophangen">📵</button>' +
       '</div>';
     document.body.appendChild(el);
+    // een gesprek gaat vóór: RTG Sound wijkt zolang de call loopt
+    if (w.RTGGeluid) try { w.RTGGeluid.focus('teamcall', { exclusief: true }); } catch (e) {}
     el.querySelector('#tcWeg').addEventListener('click', einde);
     el.querySelector('#tcMic').addEventListener('click', ev => {
       const t = stream && stream.getAudioTracks()[0];
@@ -149,6 +151,7 @@
     if (stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
     const o = document.getElementById('tcOverlay'); if (o) o.remove();
     const r = document.getElementById('tcRing'); if (r) r.remove();
+    if (w.RTGGeluid) try { w.RTGGeluid.losFocus('teamcall'); } catch (e) {}  // muziek mag weer terug
   }
 
   /* ---------- rinkelen (1-op-1) ---------- */

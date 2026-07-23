@@ -3475,8 +3475,21 @@
       location.href = q;
     }
     function bedien(cmd) {
-      if (RTGSpeler.live()) { RTGSpeler.stuur(cmd); if (cmd === 'toggle' && nu) { nu.speelt = !nu.speelt; toon(nu); } }
-      else { openSound(cmd !== 'pause'); } // geen live speler: open RTG Sound en speel daar verder
+      var G = window.RTGGeluid, s = G && G.stand();
+      if (s) {                          // de motor draait hier in de ROS zelf: stuur hem rechtstreeks
+        if (cmd === 'next') G.volgende();
+        else if (cmd === 'prev') G.opnieuw();
+        else if (cmd === 'pause') G.pauze();
+        else if (cmd === 'play') G.hervat();
+        else s.speelt ? G.pauze() : G.hervat();
+        return;
+      }
+      if (RTGSpeler.live()) { RTGSpeler.stuur(cmd); if (cmd === 'toggle' && nu) { nu.speelt = !nu.speelt; toon(nu); } return; }
+      if (G && nu && nu.stationId && cmd !== 'pause') {  // niets live: pak de laatste stand hier weer op
+        var off = nu.start ? Math.max(0, (Date.now() - nu.start) / 1000) : 0;
+        G.speel(nu.stationId, nu.seed, off); return;
+      }
+      openSound(cmd !== 'pause');        // geen motor beschikbaar: open RTG Sound en speel daar verder
     }
     var vorige = $('#osNuVorige'), volgende = $('#osNuVolgende'), open = $('#osNuOpen');
     if (speelKnop) speelKnop.addEventListener('click', function () { bedien('toggle'); });
@@ -3484,6 +3497,8 @@
     if (volgende) volgende.addEventListener('click', function () { bedien('next'); });
     if (open) open.addEventListener('click', function () { openSound(true); });
     toon(RTGSpeler.opStand(toon));
+    // de muziek loopt met je mee: stond ze aan, dan pakt ze op je eerste tik weer op
+    if (window.RTGGeluid) RTGGeluid.hervatBijGebaar();
   })();
 })();
   /* ---------- Onderweg (live reis) ---------- */

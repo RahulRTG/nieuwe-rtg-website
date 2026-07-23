@@ -80,27 +80,32 @@
     position:relative;
     overflow:hidden; /* off-screen panelen (meldingen) mogen de mobiele viewport niet oprekken */
   }
-  /* op desktop: schermvullende desktop-app. Het kader vult het hele scherm
-     (geen smal telefoonvenster meer); de app-chrome (koptekst, tabbalk) loopt
-     over de volle breedte en de leesinhoud centreert in een royale kolom via
-     een padding-truc, zodat een-koloms schermen prettig lezen en de bestaande
-     rasters (keuken, hubs, dashboards) uitwaaieren over de breedte. */
+  /* op desktop: geen uitgerekte mobiele lay-out en geen kaal schermvullend
+     scherm, maar één net, gecentreerd tablet-venster. De app staat als een
+     grote tablet midden op het scherm (ruimer dan een telefoon, ~820px), met
+     een rustige donkere achtergrond eromheen en een subtiel kader. Zo ziet de
+     computerversie er hetzelfde uit als de app, alleen ruimer. */
   @media (min-width:520px){
-    body{background:var(--bg);padding:0;align-items:stretch;min-height:100dvh;}
+    body{
+      /* het "bureaublad" eromheen is duidelijk donkerder dan de tablet, zodat
+         het venster als een los paneel op het scherm ligt */
+      background:radial-gradient(130% 100% at 50% -10%, #141013, #000 78%);
+      padding:0;align-items:center;justify-content:center;min-height:100dvh;
+    }
     #shell{
-      max-width:none;
-      width:100%;
-      height:100dvh;
+      /* een echte tablet: los venster met marge rondom, afgeronde hoeken en een
+         duidelijke rand + schaduw, zodat hij op het donkere bureau "ligt" */
+      max-width:820px;
+      width:calc(100% - 3rem);
+      height:90vh;
+      max-height:1040px;
       min-height:0;
-      border-radius:0;
-      border:none;
-      box-shadow:none;
+      border:1px solid rgba(255,255,255,0.13);
+      border-radius:26px;
+      overflow:hidden;
+      box-shadow:0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.5);
     }
-    .content,.topbar,.tabbar{
-      padding-left:max(1.5rem, calc((100% - 1100px) / 2));
-      padding-right:max(1.5rem, calc((100% - 1100px) / 2));
-    }
-    /* meldingenpaneel blijft binnen het scherm */
+    /* meldingenpaneel blijft binnen het venster */
     .notif-panel{position:absolute;height:100%;}
     .notif-scrim{position:absolute;}
   }
@@ -930,7 +935,10 @@
      toestel; dock, zoekpil en stippen staan dan echt onderin beeld. De gate
      blijft vrij scrollen (lange inlogformulieren op kleine schermen). */
   body.os-vast{overflow:hidden;}
-  body.os-vast #shell{height:100dvh;min-height:0;}
+  /* op de telefoon vult de actieve app exact de viewport; op de computer laten
+     we het gecentreerde tablet-venster (media-query hierboven) staan i.p.v.
+     schermvullend, zodat de desktop eruitziet als de app in een tablet-kader. */
+  @media (max-width:519px){ body.os-vast #shell{height:100dvh;min-height:0;} }
 
   /* dock: zwevend glas met de vier kernapps */
   .os-dock{

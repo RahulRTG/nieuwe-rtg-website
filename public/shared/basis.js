@@ -72,6 +72,13 @@
   k3.src = '/shared/klok3d.js'; k3.async = true;
   (document.head || document.documentElement).appendChild(k3);
 
+  /* ---- 8. de 3D-tegellaag voor de werk-apps: KPI-tegels ([data-tegel3d] of
+     .kpi-tegel) krijgen diepte + muiskantel, en <canvas data-vonk3d> tekent een
+     klein isometrisch grafiekje. Rustig en zuinig; niets op touch/reduced-motion ---- */
+  var t3 = document.createElement('script');
+  t3.src = '/shared/tegel3d.js'; t3.async = true;
+  (document.head || document.documentElement).appendChild(t3);
+
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {
     var t = (v.type || 'text').toLowerCase();

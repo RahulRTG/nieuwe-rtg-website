@@ -14,7 +14,8 @@ module.exports = ({ db, save, crypto, sseToCustomer, schoon }) => {
     return db.data.samenKamers;
   };
   const pub = (k) => ({ code: k.code, gastheer: k.gastheer, leden: k.leden.map(l => l.codenaam),
-    pad: k.pad, titel: k.titel, chat: k.chat.slice(-30), at: k.at });
+    pad: k.pad, titel: k.titel, chat: k.chat.slice(-30), at: k.at,
+    muziek: k.muziek || null, now: Date.now() });
   // een seintje naar iedereen in de kamer, behalve (meestal) de afzender zelf
   const sein = (k, kind, data, behalveKey) => {
     for (const l of k.leden) if (l.key !== behalveKey) {
@@ -36,7 +37,7 @@ module.exports = ({ db, save, crypto, sseToCustomer, schoon }) => {
     if (Object.keys(K()).length >= 5000) return { status: 503, error: 'Alle samen-kamers zijn even bezet; probeer het zo weer.' };
     let code;
     do { code = crypto.randomBytes(4).toString('hex').slice(0, 6).toUpperCase(); } while (K()[code]);
-    K()[code] = { code, gastheer: codenaam, leden: [{ key, codenaam }], pad: null, titel: null, chat: [], at: Date.now() };
+    K()[code] = { code, gastheer: codenaam, gastheerKey: key, leden: [{ key, codenaam }], pad: null, titel: null, chat: [], muziek: null, at: Date.now() };
     save();
     return { status: 200, ok: true, kamer: pub(K()[code]) };
   }
@@ -83,6 +84,28 @@ module.exports = ({ db, save, crypto, sseToCustomer, schoon }) => {
     return { status: 200, ok: true, regel };
   }
 
+  /* "Samen luisteren": de gastheer deelt wat er speelt (station + seed + hoelang
+     de track al loopt). Omdat RTG Sound elke track uit die seed genereert, hoort
+     iedereen exact hetzelfde, tegelijk - van afstand of in dezelfde kamer als
+     luidsprekers. De server rekent de starttijd om naar zijn eigen klok, zodat
+     de leden hun positie los van hun eigen klok kunnen bepalen. */
+  function muziek(key, code, media) {
+    const k = vind(code);
+    if (!k) return { status: 404, error: 'Deze samen-code bestaat niet (meer).' };
+    const lid = lidVan(k, key);
+    if (!lid) return { status: 403, error: 'Je zit niet (meer) in deze kamer.' };
+    if (k.gastheerKey && k.gastheerKey !== key) return { status: 403, error: 'De gastheer bepaalt de muziek.' };
+    media = media || {};
+    const sid = String(media.stationId || '').slice(0, 40);
+    if (!sid) { k.muziek = null; k.at = Date.now(); save(); sein(k, 'muziek', { muziek: null, door: lid.codenaam }, key); return { status: 200, ok: true, kamer: pub(k) }; }
+    const seed = Math.max(0, Math.min(Math.floor(Number(media.seed) || 0), Number.MAX_SAFE_INTEGER));
+    const offset = Math.max(0, Math.min(Number(media.startOffsetMs) || 0, 24 * UUR));
+    const m = { stationId: sid, seed, start: Date.now() - offset, speelt: media.speelt !== false, door: lid.codenaam };
+    k.muziek = m; k.at = Date.now(); save();
+    sein(k, 'muziek', { muziek: m }, key);
+    return { status: 200, ok: true, kamer: pub(k) };
+  }
+
   function weg(key, code) {
     const k = vind(code);
     if (!k) return { status: 200, ok: true };
@@ -103,5 +126,5 @@ module.exports = ({ db, save, crypto, sseToCustomer, schoon }) => {
     return { status: 200, ok: true, kamer: pub(k) };
   }
 
-  return { samen: { maak, doeMee, zet, chat, weg, staat, ruimOp } };
+  return { samen: { maak, doeMee, zet, chat, muziek, weg, staat, ruimOp } };
 };

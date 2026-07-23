@@ -26,6 +26,10 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, samen.chat(req.session.key, req.body.code, req.body.tekst));
   });
+  app.post('/api/samen/muziek', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, samen.muziek(req.session.key, req.body.code, req.body.media));
+  });
   app.post('/api/samen/weg', auth, (req, res) => stuur(res, samen.weg(req.session.key, req.body.code)));
   app.post('/api/samen/staat', auth, (req, res) => {
     if (geenGast(req, res)) return;

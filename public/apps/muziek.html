@@ -68,6 +68,19 @@
   canvas.golf{position:fixed;left:0;right:0;width:100%;height:54px;z-index:4;pointer-events:none;
     bottom:calc(env(safe-area-inset-bottom,0px) + 4.6rem);opacity:0.5;}
   .vis-verborgen{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  .samen{background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:14px;padding:0.8rem 0.9rem;margin-bottom:1.1rem;}
+  .samen-kop{display:flex;flex-direction:column;gap:0.15rem;margin-bottom:0.65rem;}
+  .samen-kop b{font-size:0.9rem;}
+  .samen-uit{font-size:0.7rem;color:var(--soft);line-height:1.45;}
+  .samen-start{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;}
+  .samen-start form{display:flex;gap:0.4rem;flex:1;min-width:180px;}
+  .samen-start input{flex:1;min-width:0;background:var(--bg,#0C0C0B);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.82rem;padding:0.5rem 0.7rem;letter-spacing:0.12em;}
+  .samen button{background:var(--gold,#857007);color:#0C0C0B;border:none;border-radius:10px;padding:0.55rem 0.9rem;font-weight:700;font-size:0.8rem;cursor:pointer;}
+  .samen-start form button{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:600;}
+  .samen-in{display:flex;align-items:center;justify-content:space-between;gap:0.7rem;}
+  #samenStatus{font-size:0.82rem;color:var(--txt);line-height:1.4;}
+  #samenStatus b{color:var(--gold,#C9A24B);letter-spacing:0.14em;}
+  #samenWeg{background:transparent;color:var(--soft);border:1px solid var(--line);font-weight:600;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -80,6 +93,18 @@
 <div class="zoek"><input id="zoek" type="search" placeholder="Zoek een station of sfeer…" aria-label="Zoeken"></div>
 
 <main>
+  <section class="samen" id="samen" aria-label="Samen luisteren">
+    <div class="samen-kop"><b>👥 Samen luisteren</b>
+      <span class="samen-uit">Van afstand of samen in de kamer: iedereen hoort exact hetzelfde, tegelijk.</span></div>
+    <div class="samen-start" id="samenStart">
+      <button type="button" id="samenMaak">Start een sessie</button>
+      <form id="samenMeeForm"><input id="samenCode" maxlength="6" autocomplete="off" placeholder="Code van een vriend" aria-label="Samen-code" style="text-transform:uppercase;"><button type="submit">Doe mee</button></form>
+    </div>
+    <div class="samen-in" id="samenIn" hidden>
+      <span id="samenStatus"></span>
+      <button type="button" id="samenWeg">Stoppen</button>
+    </div>
+  </section>
   <h2>Stations</h2>
   <div class="stations" id="stations" role="group" aria-label="Stations"><span class="stil">De stations laden…</span></div>
   <h2>Straks in de wachtrij</h2>
@@ -212,12 +237,15 @@
   function stopStemmen() { for (const v of stemmen) { try { v.stop(); } catch (e) {} } stemmen = []; }
 
   /* ---- afspeellogica: tracks zijn seeds, de wachtrij is vooraf bekend ---- */
-  function speelTrack(st, zaad) {
+  function speelTrack(st, zaad, offsetSec) {
     zorgCtx(); if (ctx.state === 'suspended') ctx.resume();
     stopStemmen(); if (klok) clearInterval(klok);
     station = st; seed = zaad; rng = rngVan(zaad);
     duur = 150 + Math.floor(rngVan(zaad + 1)() * 60);
-    startTijd = ctx.currentTime + 0.08; tel = 0; speelt = true;
+    // offsetSec: samen luisteren start midden in de track, in de maat mee
+    offsetSec = Math.max(0, Math.min(Number(offsetSec) || 0, duur - 1));
+    startTijd = ctx.currentTime + 0.08 - offsetSec; speelt = true;
+    tel = offsetSec > 0 ? Math.ceil(offsetSec / stapDuur()) : 0;
     klok = setInterval(tik, 40); tik();
     $('#spTitel').textContent = trackNaam(zaad);
     $('#spSub').textContent = st.naam + ' · eigen studio · ' + Math.round(ctx.sampleRate / 1000) + ' kHz';
@@ -253,10 +281,11 @@
      bediening vanaf het beginscherm (shared/speler.js). Zo bedien je je muziek
      ook vanuit een andere app of een tweede scherm. ---- */
   function publiceerStand() {
-    if (!window.RTGSpeler || !station) return;
-    RTGSpeler.zet({ app: 'RTG Sound', titel: trackNaam(seed), artiest: 'RTG Sound',
+    if (!station) return;
+    if (window.RTGSpeler) RTGSpeler.zet({ app: 'RTG Sound', titel: trackNaam(seed), artiest: 'RTG Sound',
       station: station.naam, stationId: station.id, glyph: station.icoon || '🎵',
       speelt: !!(speelt && ctx && ctx.state === 'running'), seed: seed });
+    samenPubliceer();
   }
   if (window.RTGSpeler) {
     RTGSpeler.opCommando(cmd => {
@@ -346,6 +375,83 @@
   }
   if (window.Spraak) Spraak.koppel($('#micKnop'), { opTekst: vraagRahul,
     nietVerstaan: () => zeg('Dat verstond ik net niet. Zeg bijvoorbeeld "iets voor bij het diner".') });
+
+  /* ---- Samen luisteren: dezelfde muziek, tegelijk, waar je ook bent ----
+     De gastheer deelt station + seed + hoelang de track al loopt; elke luisteraar
+     genereert diezelfde track lokaal en hoort exact hetzelfde. Loopt over de
+     samen-kamers, dus van afstand of samen in de kamer werkt gelijk. Iedere paar
+     seconden een lichte poll; de maat houdt zichzelf, want de start is gedeeld. */
+  var sesCode = null, sesGastheer = false, sesTimer = null, sesSkew = 0, sesLaatst = '';
+  var elSamenStart = $('#samenStart'), elSamenIn = $('#samenIn'), elSamenStatus = $('#samenStatus');
+  function sesApi(pad, body) {
+    var h = { 'Content-Type': 'application/json' };
+    if (token) h.Authorization = 'Bearer ' + token;
+    return fetch('/api/samen/' + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Er ging iets mis.'); return j; }); });
+  }
+  function samenPubliceer() {
+    if (!sesGastheer || !sesCode || !station || !ctx) return;
+    var offset = Math.max(0, (ctx.currentTime - startTijd) * 1000);
+    sesApi('muziek', { code: sesCode, media: { stationId: station.id, seed: seed, startOffsetMs: offset, speelt: !!(speelt && ctx.state === 'running') } }).catch(function () {});
+  }
+  function samenBasis() { return sesGastheer ? 'Je bent de host. Deel de code: <b>' + sesCode + '</b>' : 'Je luistert mee in sessie <b>' + sesCode + '</b>'; }
+  function samenToon() {
+    if (elSamenStart) elSamenStart.hidden = !!sesCode;
+    if (elSamenIn) elSamenIn.hidden = !sesCode;
+    if (sesCode && elSamenStatus) elSamenStatus.innerHTML = samenBasis();
+  }
+  function samenSync(m, serverNow) {
+    if (!m || !m.stationId) return;
+    sesSkew = (serverNow || Date.now()) - Date.now();
+    var st = STATIONS.find(function (x) { return x.id === m.stationId; });
+    if (!st) return;
+    var sig = m.stationId + '|' + m.seed + '|' + (m.speelt ? 1 : 0);
+    if (sig === sesLaatst) return;
+    sesLaatst = sig;
+    var elapsed = (Date.now() + sesSkew - m.start) / 1000;
+    speelTrack(st, m.seed, elapsed);
+    if (!m.speelt) pauze();
+  }
+  function samenStop(stuurWeg) {
+    if (sesTimer) { clearInterval(sesTimer); sesTimer = null; }
+    if (stuurWeg && sesCode) sesApi('weg', { code: sesCode }).catch(function () {});
+    sesCode = null; sesGastheer = false; sesLaatst = ''; samenToon();
+  }
+  function samenPoll() {
+    if (!sesCode) return;
+    sesApi('staat', { code: sesCode }).then(function (j) {
+      var k = j.kamer; if (!k) return;
+      if (elSamenStatus) {
+        var n = k.leden ? k.leden.length : 1;
+        elSamenStatus.innerHTML = samenBasis() + ' · ' + n + ' luisteraar' + (n === 1 ? '' : 's');
+      }
+      if (!sesGastheer) samenSync(k.muziek, k.now);
+    }).catch(function (e) { if (/bestaat niet|zit je niet/.test(e.message)) samenStop(false); });
+  }
+  var elMaak = $('#samenMaak'), elMeeForm = $('#samenMeeForm'), elWeg = $('#samenWeg');
+  if (!token) { document.querySelectorAll('#samen button, #samen input').forEach(function (b) { b.disabled = true; }); }
+  if (elMaak) elMaak.addEventListener('click', function () {
+    sesApi('maak').then(function (j) {
+      sesCode = j.kamer.code; sesGastheer = true; sesLaatst = ''; samenToon();
+      sesTimer = setInterval(samenPoll, 4000); samenPubliceer();
+      zeg('Samen luisteren staat aan. Deel de code ' + sesCode + '.');
+    }).catch(function (e) { zeg(e.message); });
+  });
+  if (elMeeForm) elMeeForm.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var c = ($('#samenCode').value || '').trim().toUpperCase(); if (!c) return;
+    sesApi('mee', { code: c }).then(function (j) {
+      sesCode = j.kamer.code; sesGastheer = false; sesLaatst = ''; samenToon();
+      samenSync(j.kamer.muziek, j.kamer.now);
+      sesTimer = setInterval(samenPoll, 4000);
+      zeg('Je luistert nu mee.');
+    }).catch(function (e) { zeg(e.message); });
+  });
+  if (elWeg) elWeg.addEventListener('click', function () { samenStop(true); zeg('Je luistert weer voor jezelf.'); });
+  // een volger die zelf een knop of station kiest, stapt uit de sessie
+  function stapUitAlsVolger() { if (sesCode && !sesGastheer) samenStop(true); }
+  ['knopSpeel', 'knopVolgende', 'knopVorige'].forEach(function (id) { var b = $('#' + id); if (b) b.addEventListener('click', stapUitAlsVolger); });
+  var elStations = $('#stations'); if (elStations) elStations.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.station')) stapUitAlsVolger(); }, true);
 
   // voor de tests: een kleine, alleen-lezen blik in de motor
   window.RTGSound = { staat: () => ({ speelt, station: station && station.id, titel: $('#spTitel').textContent, ctx: ctx && ctx.state, sampleRate: ctx && ctx.sampleRate }), kiesOpZin };

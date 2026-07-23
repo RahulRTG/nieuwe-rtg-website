@@ -86,6 +86,18 @@ test('4. de kamer-chat werkt en is begrensd; buitenstaanders komen er niet in', 
   assert.equal((await api(base, '/api/samen/zet', { code, pad: '/apps/sport.html' }, C)).status, 403);
 });
 
+test('4b. samen luisteren: de gastheer deelt de muziek, de leden zien het en volgen; alleen de gastheer bepaalt', async () => {
+  const zet = await api(base, '/api/samen/muziek', { code, media: { stationId: 'sunset', seed: 4242, startOffsetMs: 12000, speelt: true } }, A);
+  assert.equal(zet.status, 200);
+  assert.ok(zet.body.kamer.muziek && zet.body.kamer.muziek.stationId === 'sunset', 'de kamer draagt nu de muziek');
+  // B ziet de muziek in de staat, met een serverklok om op te synchroniseren
+  const staat = await api(base, '/api/samen/staat', { code }, B);
+  assert.equal(staat.body.kamer.muziek.seed, 4242);
+  assert.ok(staat.body.kamer.muziek.start > 0 && staat.body.kamer.now >= staat.body.kamer.muziek.start, 'starttijd en serverklok kloppen');
+  // een lid dat niet de gastheer is, mag de muziek niet sturen
+  assert.equal((await api(base, '/api/samen/muziek', { code, media: { stationId: 'nacht', seed: 1 } }, B)).status, 403);
+});
+
 test('5. verlaten: de laatste doet het licht uit en de code vervalt', async () => {
   assert.equal((await api(base, '/api/samen/weg', { code }, B)).status, 200);
   assert.equal((await api(base, '/api/samen/weg', { code }, A)).status, 200);

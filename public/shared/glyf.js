@@ -114,7 +114,15 @@
     juweel: '<path d="M7 4.5h10l3 4.6-8 10.4L4 9.1z"/><path d="M4 9.1h16M9.4 4.5L8 9.1l4 10.4 4-10.4-1.4-4.6"/>',
     tas: '<path d="M5.5 8.5h13l-1 10.5a1 1 0 0 1-1 .9H7.5a1 1 0 0 1-1-.9zM9 8.5V6.8a3 3 0 0 1 6 0v1.7"/>',
     wonen: '<path d="M4.5 10.5V8.6A2.6 2.6 0 0 1 7.1 6h9.8a2.6 2.6 0 0 1 2.6 2.6v1.9M3.4 11.6a1.6 1.6 0 0 1 3.2 0V15h10.8v-3.4a1.6 1.6 0 0 1 3.2 0V18h-1.8v-1.4H5.2V18H3.4z"/>',
-    beauty: '<path d="M10 3.5h4v2.2l1.5 2.4a3 3 0 0 1 .5 1.6V18a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9.7a3 3 0 0 1 .5-1.6L10 5.7zM8.2 12h7.6"/>'
+    beauty: '<path d="M10 3.5h4v2.2l1.5 2.4a3 3 0 0 1 .5 1.6V18a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9.7a3 3 0 0 1 .5-1.6L10 5.7zM8.2 12h7.6"/>',
+
+    /* --- sectoren / branches --- */
+    hotel: '<path d="M3.5 10v9M3.5 14.5h17v4.5M20.5 19v-3.5a2.5 2.5 0 0 0-2.5-2.5H9.5v2.5"/><circle cx="6.7" cy="11.7" r="1.5"/>',
+    auto: '<path d="M4 16v-2.6l2-5.4h12l2 5.4V16M4 13.4h16M6.5 16v1.6M17.5 16v1.6"/><circle cx="7.6" cy="15" r="1.2"/><circle cx="16.4" cy="15" r="1.2"/>',
+    ticket: '<path d="M4 8h16v2.4a1.6 1.6 0 0 0 0 3.2V16H4v-2.4a1.6 1.6 0 0 0 0-3.2z"/><path d="M14 8v8" stroke-dasharray="1.5 2"/>',
+    sleutel: '<circle cx="8" cy="8" r="3.6"/><path d="M10.6 10.6L19 19M15.5 15.5l2.2-2.2M13.4 13.4l1.8-1.8"/>',
+    boot: '<path d="M4.5 15.5h15l-2.2 4H6.7zM12 4.2v10M12 4.2l6.4 4.5L12 10.2"/>',
+    parasol: '<path d="M12 3.2v2.4M4 12.5a8 8 0 0 1 16 0zM12 12.5v5.3a2 2 0 0 0 4 0"/>'
   };
 
   /* De <svg>-jas als string (voor code die HTML samenstelt i.p.v. DOM-nodes).

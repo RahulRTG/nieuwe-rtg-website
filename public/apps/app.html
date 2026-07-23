@@ -1252,6 +1252,9 @@
     font-size:4.2rem;font-weight:200;letter-spacing:0.01em;line-height:1;
     font-variant-numeric:tabular-nums;color:var(--txt);justify-content:center;
   }
+  /* het horloge bovenaan het beginscherm: gecentreerd, ingetogen formaat */
+  .os-home-klok-wrap{display:flex;justify-content:center;margin:0.3rem 0 1.1rem;}
+  .os-home-klok.rtg-ring{width:12.5rem;height:12.5rem;max-width:66vw;max-height:66vw;}
   .os-merk-logo{width:18px;height:18px;border-radius:4px;vertical-align:middle;}
 
   /* -------- Rahul: de gouden orb in het midden van het dock -------- */
@@ -1377,7 +1380,6 @@
   <div id="app">
     <div class="topbar" role="banner">
       <div class="os-links">
-        <span class="os-klok" id="osKlok" data-rtg-klok>--:--</span>
         <button class="os-terug" id="osTerug" hidden aria-label="Terug naar het beginscherm">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
           <span id="osAppTitel"></span>
@@ -1430,6 +1432,9 @@
         <!-- RTG OS: twee veegbare hoofdschermen (scroll-snap) met pagina-stippen -->
         <div class="os-pages" id="osPages">
           <section class="os-pagina" aria-label="Hoofdscherm 1">
+            <!-- De RTG-klok is de enige tijd in de ROS: het horloge bovenaan het
+                 beginscherm (het vergrendelscherm toont dezelfde wijzerplaat). -->
+            <div class="os-home-klok-wrap"><div class="os-home-klok" id="homeKlok" data-rtg-klok="ring" aria-label="RTG-horloge"></div></div>
             <div class="os-datum" id="osDatum" data-rtg-datum></div>
             <h2 id="homeGreeting">Welkom.</h2>
             <p class="sub" id="homeSub"></p>

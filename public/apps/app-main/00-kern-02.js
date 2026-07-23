@@ -81,12 +81,16 @@
      RTG krijgt het bordeauxrode thema, Lifestyle het parelmoeren thema,
      Business blijft klassiek donker. RTG en Lifestyle mogen terug naar
      klassiek; die keuze onthouden we per pas in localStorage. */
+  // Het ROS-thema (Champagne=parelmoer, Donker=standaard, Bordeaux) is een keuze
+  // voor IEDEREEN, per apparaat onthouden. Zonder eigen keuze krijgt elke pas een
+  // passende standaard. De levende grond (kleur die met het moment meebeweegt)
+  // volgt de gekozen familie.
   const THEMA_STANDAARD = { rtg: 'bordeaux', lifestyle: 'parelmoer', business: 'standaard' };
-  function pasThemaKey(){ return 'rtg_pas_thema_' + (vastePas || 'rtg'); }
+  function pasThemaKey(){ return 'rtg_ros_thema'; }
   function pasThemaHuidig(){
-    if (!vastePas || vastePas === 'business') return 'standaard'; // Business: geen keuze
     let t = null; try { t = localStorage.getItem(pasThemaKey()); } catch(e){}
-    return t || THEMA_STANDAARD[vastePas] || 'standaard';
+    if (t === 'standaard' || t === 'bordeaux' || t === 'parelmoer') return t;
+    return THEMA_STANDAARD[vastePas] || 'standaard';
   }
   function pasThemaToepassen(){
     const t = pasThemaHuidig();
@@ -96,6 +100,8 @@
     // de systeem-themakleur (statusbalk) meelaten kleuren
     const kleur = { bordeaux: '#1E0912', parelmoer: '#ECE6DD' }[t] || '#0C0C0B';
     const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', kleur);
+    // de levende grond de nieuwe familie laten oppakken (donker/champagne/bordeaux)
+    if (window.RTGLevend) RTGLevend.familie();
   }
   function pasThemaZet(t){
     try { localStorage.setItem(pasThemaKey(), t); } catch(e){}
@@ -104,8 +110,8 @@
   // meteen toepassen, ook op het beginscherm
   pasThemaToepassen();
   // seam voor de OS-schil (bedieningspaneel): thema lezen/zetten zonder de
-  // logica hierboven te dupliceren
-  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => !!vastePas && vastePas !== 'business' };
+  // logica hierboven te dupliceren. Iedereen mag kiezen.
+  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => true };
 
   /* ---------- de stem van de pas (tone of voice) ----------
      Dezelfde vriend als op de website, maar in de taal van de pas:

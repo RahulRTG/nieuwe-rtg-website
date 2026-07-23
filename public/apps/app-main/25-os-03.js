@@ -14,7 +14,8 @@
   function ccSync() {
     const T = window.RTGOSThema;
     const rij = $('#osCcThema');
-    if (rij) rij.style.display = T && T.keuzeMogelijk() ? '' : 'none';
+    // het thema (Champagne / Donker / Bordeaux) is een ROS-brede keuze voor iedereen
+    if (rij) rij.style.display = '';
     if (T) document.querySelectorAll('#osCcThema button').forEach(b => b.classList.toggle('actief', b.dataset.thema === T.huidig()));
     const push = $('#osCcPush');
     if (push && window.RTGRealtime) push.classList.toggle('aan', RTGRealtime.pushOn && RTGRealtime.pushOn());

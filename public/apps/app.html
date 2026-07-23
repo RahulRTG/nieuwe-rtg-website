@@ -1161,6 +1161,10 @@
     transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), color 0.13s cubic-bezier(0.22,0.7,0.3,1);
   }
   .os-cc-knoppen button.actief{border-color:var(--gold);color:var(--gold);}
+  .os-cc-thema button{display:flex;align-items:center;justify-content:center;gap:0.4rem;}
+  .os-thema-stip{width:0.85rem;height:0.85rem;border-radius:50%;flex:0 0 auto;
+    box-shadow:0 0 0 1px var(--line) inset;}
+  .os-cc-thema button.actief .os-thema-stip{box-shadow:0 0 0 1.5px var(--gold) inset;}
   #osCcHelder{width:100%;accent-color:var(--gold);}
   .os-cc-tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;}
   .os-cc-tegels button{
@@ -1337,7 +1341,7 @@
 </head>
 <body>
 <a class="skip" href="#content">Naar de inhoud</a>
-<div id="shell">
+<div id="shell" data-levendegrond>
 
   <!-- login -->
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
@@ -1612,10 +1616,10 @@
         </div>
         <div class="os-cc-rij" id="osCcThema">
           <span class="os-cc-label" data-i18n="os.cc.thema">Thema</span>
-          <div class="os-cc-knoppen">
-            <button data-thema="standaard" data-i18n="os.cc.klassiek">Klassiek</button>
-            <button data-thema="bordeaux">Bordeaux</button>
-            <button data-thema="parelmoer">Parelmoer</button>
+          <div class="os-cc-knoppen os-cc-thema">
+            <button data-thema="parelmoer"><span class="os-thema-stip" style="background:linear-gradient(135deg,#F3EBDA,#E4CF9E)"></span><span data-i18n="os.cc.champagne">Champagne</span></button>
+            <button data-thema="standaard"><span class="os-thema-stip" style="background:linear-gradient(135deg,#2A2724,#0C0C0B)"></span><span data-i18n="os.cc.donker">Donker</span></button>
+            <button data-thema="bordeaux"><span class="os-thema-stip" style="background:linear-gradient(135deg,#9E1C40,#4A0C1E)"></span><span data-i18n="os.cc.bordeaux">Bordeaux</span></button>
           </div>
         </div>
         <div class="os-cc-rij">
@@ -2007,6 +2011,7 @@ window.I18N = { en: {
   'gate.smscode':'Code from your phone (6 digits)',
   'bo2.weergave':'Appearance', 'bo2.weergave.s':'Choose the colour theme of this app.',
   'bo2.thema.bordeaux':'Bordeaux (RTG)', 'bo2.thema.parel':'Mother-of-pearl (Lifestyle)', 'bo2.thema.klassiek':'Classic (dark)',
+  'os.cc.champagne':'Champagne', 'os.cc.donker':'Dark', 'os.cc.bordeaux':'Bordeaux',
   'bo2.h':'My back office', 'bo2.acties':'Needs your attention', 'bo2.alsklaar':'All in order',
   'bo2.geen':'Nothing outstanding on your account.', 'bo2.open':'outstanding invoice(s); pay in one tap via Payments.',
   'bo2.mailniet':'Your email address has not been confirmed yet.', 'bo2.kyc':'Verify your identity to book in one tap.',
@@ -2261,6 +2266,7 @@ window.I18N = { en: {
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/bureau.js" defer></script>
 </body>
 </html>

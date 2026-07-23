@@ -3449,6 +3449,42 @@
     if (window.RTGMetgezel && RTGMetgezel.samen) RTGMetgezel.samen();
     else bannerToon('👥', T('os.samen', 'Samen'), T('os.samen.straks', 'Samen is zo beschikbaar.'));
   });
+
+  /* ---------- Now Playing: je muziek bedienen vanaf de ROS ----------
+     De muziek-apps melden hun stand via de gedeelde speler-laag
+     (shared/speler.js). Dit paneel toont die stand en stuurt bediening terug;
+     speelt er live een app (in een tab of tweede scherm), dan gaat het direct,
+     anders openen we RTG Sound om daar verder te spelen. */
+  (function () {
+    if (!window.RTGSpeler) return;
+    var kaart = $('#osNu'), hoes = $('#osNuHoes'), titel = $('#osNuTitel'), sub = $('#osNuSub'), speelKnop = $('#osNuSpeel');
+    if (!kaart) return;
+    var nu = null;
+    function toon(state) {
+      nu = state;
+      if (!state || !state.titel) { kaart.hidden = true; return; }
+      kaart.hidden = false;
+      hoes.textContent = state.glyph || '🎵';
+      titel.textContent = state.titel;
+      sub.textContent = (state.artiest || 'RTG Sound') + (state.station ? ' · ' + state.station : '');
+      if (speelKnop) speelKnop.textContent = state.speelt ? '⏸' : '▶';
+    }
+    function openSound(speel) {
+      var q = '/apps/muziek.html';
+      if (nu && nu.stationId) q += '?station=' + encodeURIComponent(nu.stationId) + '&seed=' + (nu.seed || 0) + '&speel=' + (speel === false ? '0' : '1');
+      location.href = q;
+    }
+    function bedien(cmd) {
+      if (RTGSpeler.live()) { RTGSpeler.stuur(cmd); if (cmd === 'toggle' && nu) { nu.speelt = !nu.speelt; toon(nu); } }
+      else { openSound(cmd !== 'pause'); } // geen live speler: open RTG Sound en speel daar verder
+    }
+    var vorige = $('#osNuVorige'), volgende = $('#osNuVolgende'), open = $('#osNuOpen');
+    if (speelKnop) speelKnop.addEventListener('click', function () { bedien('toggle'); });
+    if (vorige) vorige.addEventListener('click', function () { bedien('prev'); });
+    if (volgende) volgende.addEventListener('click', function () { bedien('next'); });
+    if (open) open.addEventListener('click', function () { openSound(true); });
+    toon(RTGSpeler.opStand(toon));
+  })();
 })();
   /* ---------- Onderweg (live reis) ---------- */
   let liveData = null;

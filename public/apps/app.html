@@ -1093,6 +1093,20 @@
     padding:1rem;box-shadow:0 24px 60px rgba(0,0,0,0.5);
     display:flex;flex-direction:column;gap:0.85rem;
   }
+  /* -------- Now Playing: je muziek bedienen vanaf de ROS -------- */
+  .os-nu{display:flex;align-items:center;gap:0.6rem;
+    background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:0.55rem 0.65rem;}
+  .os-nu-open{display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0;background:none;border:none;text-align:left;cursor:pointer;padding:0;color:var(--txt);}
+  .os-nu-hoes{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg, color-mix(in srgb, var(--gold) 30%, var(--card)), var(--card));font-size:1.25rem;}
+  .os-nu-tekst{display:flex;flex-direction:column;min-width:0;}
+  .os-nu-tekst b{font-size:0.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .os-nu-tekst small{font-size:0.66rem;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .os-nu-knoppen{display:flex;align-items:center;gap:0.15rem;flex-shrink:0;}
+  .os-nu-knoppen button{background:none;border:none;color:var(--txt);font-size:1.05rem;line-height:1;padding:0.35rem 0.3rem;cursor:pointer;border-radius:8px;}
+  .os-nu-knoppen button:hover{color:var(--gold);}
+  #osNuSpeel{font-size:1.3rem;}
+
   .os-cc-rij{display:flex;flex-direction:column;gap:0.45rem;}
   .os-cc-label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
   .os-cc-knoppen{display:flex;gap:0.4rem;}
@@ -1551,6 +1565,17 @@
     <!-- RTG OS: bedieningspaneel -->
     <div class="os-scrim" id="osCcScrim">
       <div class="os-cc" role="dialog" aria-modal="true" aria-label="Bedieningspaneel">
+        <div class="os-nu" id="osNu" hidden>
+          <button class="os-nu-open" id="osNuOpen" aria-label="Open RTG Sound">
+            <span class="os-nu-hoes" id="osNuHoes">🎵</span>
+            <span class="os-nu-tekst"><b id="osNuTitel"></b><small id="osNuSub"></small></span>
+          </button>
+          <div class="os-nu-knoppen">
+            <button id="osNuVorige" aria-label="Vorige track">⏮</button>
+            <button id="osNuSpeel" aria-label="Afspelen of pauzeren">⏯</button>
+            <button id="osNuVolgende" aria-label="Volgende track">⏭</button>
+          </div>
+        </div>
         <div class="os-cc-rij" id="osCcThema">
           <span class="os-cc-label" data-i18n="os.cc.thema">Thema</span>
           <div class="os-cc-knoppen">
@@ -1808,6 +1833,7 @@
 <script src="/shared/scanner.js"></script>
 <script src="/shared/scanknop.js"></script>
 <script src="/shared/rtgcode.js"></script>
+<script src="/shared/speler.js"></script>
 <script src="/apps/app-main.js"></script>
 <script>
 window.I18N = { en: {

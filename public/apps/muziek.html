@@ -106,6 +106,7 @@
 </footer>
 
 <script src="/shared/spraak.js" defer></script>
+<script src="/shared/speler.js"></script>
 <script>
 /* ============================== RTG Sound ==============================
    Muziek uit eigen huis: elk station is een kleine studio die live
@@ -228,7 +229,9 @@
       navigator.mediaSession.setActionHandler('play', hervat);
       navigator.mediaSession.setActionHandler('pause', pauze);
       navigator.mediaSession.setActionHandler('nexttrack', volgende);
+      navigator.mediaSession.setActionHandler('previoustrack', () => speelTrack(station, seed));
     }
+    publiceerStand();
   }
   function wachtrij() {
     const ul = $('#wachtrij'); ul.textContent = '';
@@ -240,11 +243,43 @@
     }
   }
   function volgende() { if (station) speelTrack(station, seed + 1); }
-  function pauze() { speelt = false; if (ctx) ctx.suspend(); $('#knopSpeel').textContent = '▶'; }
-  function hervat() { if (!station) return; speelt = true; ctx.resume(); $('#knopSpeel').textContent = '⏸'; }
+  function pauze() { speelt = false; if (ctx) ctx.suspend(); $('#knopSpeel').textContent = '▶'; publiceerStand(); }
+  function hervat() { if (!station) return; speelt = true; ctx.resume(); $('#knopSpeel').textContent = '⏸'; publiceerStand(); }
   $('#knopSpeel').addEventListener('click', () => { if (!station) { zeg('Kies eerst een station, of zeg wat u wilt horen.'); return; } (speelt && ctx.state === 'running') ? pauze() : hervat(); });
   $('#knopVolgende').addEventListener('click', volgende);
   $('#knopVorige').addEventListener('click', () => { if (station) speelTrack(station, seed); });
+
+  /* ---- RTG Speler: deze studio meldt zich aan de ROS en luistert naar de
+     bediening vanaf het beginscherm (shared/speler.js). Zo bedien je je muziek
+     ook vanuit een andere app of een tweede scherm. ---- */
+  function publiceerStand() {
+    if (!window.RTGSpeler || !station) return;
+    RTGSpeler.zet({ app: 'RTG Sound', titel: trackNaam(seed), artiest: 'RTG Sound',
+      station: station.naam, stationId: station.id, glyph: station.icoon || '🎵',
+      speelt: !!(speelt && ctx && ctx.state === 'running'), seed: seed });
+  }
+  if (window.RTGSpeler) {
+    RTGSpeler.opCommando(cmd => {
+      if (!station && (cmd === 'next' || cmd === 'prev' || cmd === 'toggle' || cmd === 'play')) { speelTrack(STATIONS[0], Date.now() % 100000); return; }
+      if (cmd === 'next') volgende();
+      else if (cmd === 'prev') speelTrack(station, seed);
+      else if (cmd === 'pause') pauze();
+      else if (cmd === 'play') hervat();
+      else if (cmd === 'toggle') (speelt && ctx && ctx.state === 'running') ? pauze() : hervat();
+    });
+    // een hartslag zodat de ROS ziet dat deze speler nog leeft
+    setInterval(() => { if (station) publiceerStand(); }, 2500);
+    window.addEventListener('pagehide', () => { if (window.RTGSpeler && station) RTGSpeler.zet({ app: 'RTG Sound', titel: trackNaam(seed), artiest: 'RTG Sound', station: station.naam, stationId: station.id, glyph: station.icoon || '🎵', speelt: false, seed: seed }); });
+    // resume vanaf de ROS: ?station=<id>&seed=<n>&speel=1
+    (function () {
+      const p = new URLSearchParams(location.search);
+      const sid = p.get('station'); if (!sid) return;
+      const st = STATIONS.find(x => x.id === sid); if (!st) return;
+      const zaad = parseInt(p.get('seed') || '', 10);
+      speelTrack(st, Number.isFinite(zaad) ? zaad : (Date.now() % 100000));
+      if (p.get('speel') === '0') pauze();
+    })();
+  }
 
   /* ---- de stations op het scherm ---- */
   const houder = $('#stations');

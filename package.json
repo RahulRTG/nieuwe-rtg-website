@@ -26,6 +26,6 @@
     "icons": "node scripts/icons.js"
   },
   "optionalDependencies": {
-    "stripe": "^17.0.0"
+    "stripe": "^22.3.2"
   }
 }

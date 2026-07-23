@@ -11,6 +11,9 @@
       hier, een leerzame tip) via /api/gids/app
    5. sfeer: laadt het lopende werk bij (shared/uurwerk.js), de gangreserve
       van het huis die als een stil verhaal over alle pagina's doorloopt
+   6. kaart: laadt de kaart-uitwijk bij (shared/kaart.js), die geo:-links op
+      desktop/iOS opvangt met een eigen paneeltje - coördinaten tonen en laten
+      kopiëren, zonder ook maar iets naar een kaart-provider te sturen
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */
 (function () {
   'use strict';
@@ -52,6 +55,12 @@
   var uw = document.createElement('script');
   uw.src = '/shared/uurwerk.js'; uw.async = true;
   (document.head || document.documentElement).appendChild(uw);
+
+  /* ---- 6. de kaart-uitwijk: geo:-links op desktop/iOS opvangen met een eigen
+     paneeltje (coördinaten tonen + kopiëren), zonder iets naar derden ---- */
+  var km = document.createElement('script');
+  km.src = '/shared/kaart.js'; km.async = true;
+  (document.head || document.documentElement).appendChild(km);
 
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {

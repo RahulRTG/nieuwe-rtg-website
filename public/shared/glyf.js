@@ -49,6 +49,7 @@
     office: '<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.6 14.5v3M12 11v6.5M15.4 8.5v9"/>',
     sitemaker: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9h17M7 13h6.5M7 16h9"/>',
     browser: '<circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.4 2.3 2.4 14.5 0 16.8M12 3.6c-2.4 2.3-2.4 14.5 0 16.8"/>',
+    krant: '<rect x="3.5" y="5" width="17" height="14" rx="1.6"/><path d="M7 9h6M7 12h6M7 15h4"/><rect x="15" y="9" width="2.5" height="4" rx=".4"/>',
     wbw: '<path d="M7 4h10l-1 16H8z"/><path d="M9.4 8h5.2M9.4 11h5.2M9.4 14h3.4"/>',
     passkeys: '<circle cx="8" cy="12" r="4"/><path d="M11.7 12H20l-1.8 1.8M15.5 12v2"/>',
     nalatenschap: '<circle cx="8" cy="12" r="4"/><path d="M11.7 12H20l-1.8 1.8M15.5 12v2"/>',

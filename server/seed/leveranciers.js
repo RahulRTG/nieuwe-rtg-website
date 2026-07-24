@@ -15,7 +15,8 @@ module.exports = {
     restaurant: { label: 'Restaurant',   icon: 'horeca', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
     bar:        { label: 'Bar',          icon: 'bar', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
     club:       { label: 'Club',         icon: 'muziek', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
-    zorg:       { label: 'Zorg & welzijn', icon: 'zorg', caps: ['care', 'location', 'pricing'] }
+    zorg:       { label: 'Zorg & welzijn', icon: 'zorg', caps: ['care', 'location', 'pricing'] },
+    journalistiek: { label: 'Journalistiek', icon: 'nieuws', caps: ['redactie', 'location', 'pricing'] }
   },
 
   /* Voorbeeldleveranciers (demo-inlogcodes). rate = de dynamische prijs die
@@ -99,6 +100,11 @@ module.exports = {
     {
       code: 'CLARA', name: 'Kliniek Clara Ibiza', type: 'zorg', city: 'Ibiza',
       loc: { lat: 38.907, lng: 1.432, label: 'Vila, Ibiza' }, rate: 0.12,
+      menu: []
+    },
+    {
+      code: 'BODE', name: 'De Ibiza Bode', type: 'journalistiek', city: 'Ibiza',
+      loc: { lat: 38.909, lng: 1.433, label: 'Vila, Ibiza' }, rate: 0.10,
       menu: []
     }
   ],

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Redactie PDA · RTG</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Redactie PDA">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;max-width:520px;margin:0 auto;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + .7rem) 1rem .7rem;display:flex;align-items:center;gap:.6rem;}
+  header .ey{font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.35rem .6rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;}
+  .sp{flex:1;}
+  main{padding:1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:1rem;}
+  label.lab{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);display:block;margin:.5rem 0 .25rem;}
+  input,textarea,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:1rem;padding:.65rem .7rem;}
+  textarea{resize:vertical;line-height:1.6;}
+  .knop{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.95rem;font-weight:600;border-radius:12px;padding:.8rem;cursor:pointer;margin-top:.6rem;}
+  .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;font-weight:700;}
+  .knop.stil{background:transparent;}
+  .art{display:flex;align-items:center;gap:.6rem;border-bottom:1px solid var(--line);padding:.6rem 0;}
+  .art:last-child{border-bottom:0;} .art .t{flex:1;min-width:0;} .art .t b{display:block;font-size:.9rem;} .art .t small{color:var(--soft);}
+  .badge{font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.12rem .45rem;border-radius:999px;border:1px solid var(--line);}
+  .badge.live{color:var(--green);border-color:var(--green);} .badge.concept{color:var(--gold);border-color:var(--gold);}
+  .mini{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:.3rem .55rem;font:inherit;font-size:.75rem;cursor:pointer;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
+  .inlog{margin:4rem auto;text-align:center;padding:0 1.2rem;} .inlog a{color:var(--gold);}
+  .hint{color:var(--soft);font-size:.8rem;line-height:1.5;}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/redactie.html">← Redactie</a>
+  <div><div class="ey">RTG Journalistiek</div><h1>Verslaggever</h1></div>
+</header>
+<main id="hoofd"></main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_sup_token'); }catch(e){}
+const api=(pad,body)=>fetch('/api/supplier/redactie/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
+function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',2600);}
+let RUBRIEKEN=[];
+async function laad(){ try{ const s=await api('staat'); RUBRIEKEN=s.rubrieken||[]; render(s); }catch(e){ meld(e.message); } }
+function render(s){
+  const opts=RUBRIEKEN.map(r=>'<option>'+esc(r)+'</option>').join('');
+  $('#hoofd').innerHTML='<div class="kaart"><h2 style="font-size:1.1rem;">Snel vanaf locatie</h2><p class="hint">Schrijf kort, publiceer meteen. Bijschaven kan later op de redactie.</p>'+
+    '<label class="lab">Kop</label><input id="titel" maxlength="160" placeholder="Wat gebeurt er?">'+
+    '<label class="lab">Rubriek</label><select id="rubriek">'+opts+'</select>'+
+    '<label class="lab">Tekst</label><textarea id="tekst" rows="6" maxlength="20000" placeholder="Korte verslaggeving…"></textarea>'+
+    '<button class="knop prim" id="pub">Publiceer nu</button>'+
+    '<button class="knop stil" id="concept">Bewaar als concept</button></div>'+
+    '<div class="kaart"><h2 style="font-size:1rem;">Recent</h2><div id="recent" style="margin-top:.4rem;"></div></div>';
+  $('#pub').addEventListener('click',()=>verstuur(true));
+  $('#concept').addEventListener('click',()=>verstuur(false));
+  const r=$('#recent'); const lijst=(s.recent||[]).slice(0,10);
+  if(!lijst.length){ r.innerHTML='<div class="hint">Nog niets geplaatst.</div>'; return; }
+  r.innerHTML=''; lijst.forEach(a=>{
+    const el=document.createElement('div'); el.className='art';
+    el.innerHTML='<div class="t"><b>'+esc(a.titel)+'</b><small>'+esc(a.rubriek)+' · '+(a.gelezen||0)+' gelezen</small></div><span class="badge '+(a.status==='live'?'live">Live':'concept">Concept')+'</span>';
+    const b=document.createElement('button'); b.className='mini'; b.textContent=a.status==='live'?'Concept':'Publiceer';
+    b.addEventListener('click',async()=>{ try{ await api(a.status==='live'?'artikel/concept':'artikel/publiceer',{id:a.id}); laad(); }catch(e){meld(e.message);} });
+    el.appendChild(b); r.appendChild(el);
+  });
+}
+async function verstuur(publiceren){
+  const titel=$('#titel').value.trim(); if(!titel){ meld('Geef een kop.'); return; }
+  const body={titel,rubriek:$('#rubriek').value,inhoud:$('#tekst').value};
+  try{ if(publiceren) await api('snel',body); else await api('artikel/bewaar',body); meld(publiceren?'Gepubliceerd.':'Concept bewaard.'); laad(); }
+  catch(e){ meld(e.message); }
+}
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p class="hint" style="margin-top:.6rem;">De verslaggevers-PDA hoort bij je nieuwsbedrijf.</p><p style="margin-top:1rem;"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; }
+else laad();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

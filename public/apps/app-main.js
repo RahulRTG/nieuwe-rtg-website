@@ -2729,6 +2729,7 @@
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
     pulse:       { naam: 'Pulse',         url: '/apps/pulse.html' },
     nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
+    krant:       { naam: 'RTG Krant',     url: '/apps/krant.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/berichten.html' },
@@ -2773,7 +2774,7 @@
   const WINKEL_GROEPEN = [
     { titel: 'Reizen & onderweg', items: ['tab:reizen', 'link:ov', 'link:vluchten', 'link:flits', 'link:stad', 'tab:terplaatse'] },
     { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:rtgcode', 'link:office'] },
-    { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:sport'] },
+    { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:krant', 'link:sport'] },
     { titel: 'Het huis & diensten', items: ['link:ontdek', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:labfonds', 'link:juridisch', 'link:passkeys', 'os:werk'] },
     { titel: 'Onderneem: eigen website & het RTG-web', items: ['link:sitemaker', 'link:browser'] },
     { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],

@@ -108,4 +108,13 @@ module.exports = {
   '/apps/browser.html': G('De RTG-browser: blader door het besloten web van het huis en bezoek de sites die leden hebben gebouwd.',
     ['Typ een adres in de balk (bijv. jouwzaak.rtg) of kies een site op RTG Start', 'Ga terug en vooruit zoals in een echte browser', 'Elke site buigt mee met je vensterbreedte: telefoon, tablet of desktop'],
     'Een eigen web binnen RTG: geen extern internet, alles op codenaam en tussen leden.'),
+  '/apps/redactie.html': G('De RTG Redactie: de luxe, efficiente nieuwsredactie voor nieuwsbedrijven (het Journalistiek-genre).',
+    ['Plaats met een knop snel nieuws, of schrijf artikelen als concept en publiceer later', 'Beheer rubrieken en volg wat het best gelezen wordt', 'Bouw de eigen krantsite volledig in je eigen huisstijl met blokken'],
+    'Een compleet redactiekantoor achter de zaak-inlog; de gepubliceerde krant leest iedereen in RTG Krant.'),
+  '/apps/redactie-pda.html': G('De verslaggevers-PDA: snel nieuws plaatsen vanaf locatie, zo van de straat de krant in.',
+    ['Typ een kop, kies een rubriek en publiceer meteen', 'Of bewaar als concept voor de eindredactie', 'Zie je recente stukken en zet ze live of terug naar concept'],
+    'De redactie op zak: kort schrijven, direct publiceren, later bijschaven op kantoor.'),
+  '/apps/krant.html': G('RTG Krant: lees de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.',
+    ['Kies een krant in de gids of open er een op adres', 'Blader per rubriek en lees het volledige artikel', 'De voorpagina staat in de eigen huisstijl van de krant'],
+    'Onafhankelijk nieuws binnen het huis: elke titel met een eigen gezicht, gemaakt in de RTG Redactie.'),
 };

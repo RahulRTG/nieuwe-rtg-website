@@ -1243,6 +1243,8 @@ const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypt
 // De slimme boerderij-laag (kern/boerderij.js): boerderijtypes, percelen+gewassen,
 // dieren, takenbord, seizoensbriefing en een AI-adviseur die ook dingen doet.
 const boerderij = require('./kern/boerderij').maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon });
+// Het Journalistiek-genre (kern/journalistiek.js): redactie + eigen krantsite.
+const journalistiek = require('./kern/journalistiek')({ db, save, crypto, schoon, findSupplier });
 // De content-creator-laag (kern/creator.js): carriere-profiel, platforms, tarieven,
 // portfolio, content-kalender en een AI content/script-helper.
 const creator = require('./kern/creator').maakCreator({ db, save, crypto, anthropic, schoon });
@@ -2126,7 +2128,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij, creator, samenwerking, agenda, facturatie, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, facturatie, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
@@ -2709,6 +2711,7 @@ require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/atelierweb')(kern);
 require('./routes/webmaker')(kern);
+require('./routes/journalistiek')(kern);
 require('./routes/markt')(kern);
 require('./routes/borden')(kern);
 require('./routes/spellen')(kern);

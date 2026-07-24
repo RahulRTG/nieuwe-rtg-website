@@ -156,12 +156,13 @@ module.exports = (kern) => {
 
   /* De overige domeinen draaien als submodules op dezelfde gedeelde context
      (een keer bij het opstarten gemount, geen kosten per verzoek). */
-  const tctx = { app, accounts, anthropic, archief, beveilig, crypto, db, mail, save, sendPushToUser,
+  const tctx = { app, accounts, anthropic, archief, beveilig, wacht: kern.wacht, crypto, db, mail, save, sendPushToUser,
     LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
     geldPasprijsZet, geldKortingZet, geldCommissieZet };
   require('./techniek/functie')(tctx);
   require('./techniek/boardroom')(tctx);
   require('./techniek/beheer')(tctx);
+  require('./techniek/wacht')(tctx);
 
   // Hulp voor de kern: mag een door een zekering bewaakt subsysteem draaien?
   kern.zekeringMag = (id) => { const z = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen[id]; return !z || z.aan !== false; };

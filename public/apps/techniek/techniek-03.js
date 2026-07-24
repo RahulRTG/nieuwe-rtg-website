@@ -84,6 +84,9 @@
         return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'DICHT'), el('div',{class:'mid'}, el('div',{class:'muted'}, g))); }));
       $('#toegangBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#toegangLijst'), (d.toegang&&d.toegang.length)? d.toegang.map(toegangRij) : el('div',{class:'muted'},'Nog niemand extra toegelaten.'));
+      // De Wacht-tab: zichtbaar voor iedereen met toegang (lezen); de acties
+      // (afsnijden, beslissen, opruimen) zijn in de UI en op de server owner-only.
+      $('#tabBtnWacht').hidden = false;
       // functies-tab: iedereen met toegang kan aanvragen; alleen de eigenaar besluit
       $('#tabBtnFuncties').hidden = false;
       var verzoeken = d.verzoeken || [];

@@ -250,9 +250,14 @@ app.use((req, res, next) => {
 /* Het schild voor de voordeur (kern/schild.js): applicatie-WAF + DDoS-rem.
    Altijd aan; localhost (health-checks, tests, poortwachter) slaat hij over.
    Treffers en bans landen als melding op het beveiligingsbord (techniek). */
+/* De Wacht (kern/wacht.js) wordt verderop gebouwd (na db + beveilig), maar het
+   schild raadpleegt hem nu al voor de quarantaine - laat-gebonden via deze
+   verwijzing zodat een afgesneden indringer er ook echt niet meer in komt. */
+let wacht = null;
 const schild = require('./kern/schild').maakSchild({
   meld: (type, ernst, tekst, meta) => { if (beveilig) beveilig.meld(type, ernst, tekst, meta); },
-  logboek: log
+  logboek: log,
+  quarantaine: (ip) => !!(wacht && wacht.inQuarantaine(ip))
 });
 app.use(schild.middleware);
 
@@ -896,6 +901,17 @@ const beveilig = require('./beveiliging')({
       '\n\nOpen de technische pagina (Beveiliging) om te zien wat er speelt.\n\nRahul Travel Group'); } catch (e) {}
   }
 });
+
+/* De Wacht (kern/wacht.js): het immuunsysteem + de raadkamer. Leest zijn meters
+   uit het schild (verzoeken, bans, actieve IP's, aanvalstreffers) en uit de
+   beveiligingsmeldingen; de quarantaine wordt door het schild afgedwongen. Elke
+   ~10 s een momentopname voor de grafiek. `wacht` is hierboven al gedeclareerd
+   (het schild raadpleegt hem voor de quarantaine). */
+wacht = require('./kern/wacht')({ db, save, beveilig, lees: schild.signalen });
+{
+  const t = setInterval(() => { try { wacht.meet(); } catch (e) {} }, 10000);
+  if (t.unref) t.unref();
+}
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
@@ -2031,7 +2047,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, eigenaar, zaakdoos,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, eigenaar, zaakdoos,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,

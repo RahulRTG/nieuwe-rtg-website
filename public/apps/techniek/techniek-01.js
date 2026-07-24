@@ -118,13 +118,104 @@
 
   /* ---------- tabbladen ---------- */
   function toonTab(naam){
-    var status = naam !== 'functies';
-    $('#tabStatus').hidden = !status; $('#tabFuncties').hidden = status;
-    $('#tabBtnStatus').setAttribute('aria-selected', status?'true':'false');
-    $('#tabBtnFuncties').setAttribute('aria-selected', status?'false':'true');
+    var panelen = { status:'#tabStatus', wacht:'#tabWacht', functies:'#tabFuncties' };
+    var knoppen = { status:'#tabBtnStatus', wacht:'#tabBtnWacht', functies:'#tabBtnFuncties' };
+    if (!panelen[naam]) naam = 'status';
+    for (var k in panelen){ $(panelen[k]).hidden = (k !== naam); $(knoppen[k]).setAttribute('aria-selected', k===naam?'true':'false'); }
+    if (naam === 'wacht') laadWacht();
   }
   $('#tabBtnStatus').addEventListener('click', function(){ toonTab('status'); });
+  $('#tabBtnWacht').addEventListener('click', function(){ toonTab('wacht'); });
   $('#tabBtnFuncties').addEventListener('click', function(){ toonTab('functies'); });
+
+  /* ---------- De Wacht: immuunsysteem + meters/grafiek + raadkamer ---------- */
+  function wachtActie(pad, body, melding){
+    api('/api/techniek/wacht/' + pad, { method:'POST', body:body||{} })
+      .then(function(d){ if (melding) toast(melding); if (d && d.bord) tekenWacht(d.bord); })
+      .catch(function(e){ toast(e.message); });
+  }
+  $('#bWachtAnalyseer').addEventListener('click', function(){ wachtActie('analyseer', {}, 'AI heeft de signalen uitgekauwd.'); });
+  $('#bWachtOpruimen').addEventListener('click', function(){ wachtActie('opruimen', {}, 'Opgeruimd.'); });
+  $('#bWachtIsoleer').addEventListener('click', function(){
+    var b = $('#wachtBron').value.trim(); if(!b){ toast('Vul een bron (IP) in.'); return; }
+    wachtActie('quarantaine', { bron:b, actie:'isoleer' }, 'In quarantaine gezet.'); $('#wachtBron').value='';
+  });
+
+  function meterKaart(n, label){ return el('div',{class:'tel'}, el('div',{class:'n'}, String(n)), el('div',{class:'l'}, label)); }
+
+  // Een simpele multi-lijn grafiek op canvas (geen externe library).
+  function tekenGrafiek(reeks){
+    var c = $('#wachtGrafiek'); if (!c || !c.getContext) return;
+    var dpr = window.devicePixelRatio || 1;
+    var w = c.clientWidth || 600, h = 120;
+    c.width = w * dpr; c.height = h * dpr;
+    var x = c.getContext('2d'); x.scale(dpr, dpr); x.clearRect(0,0,w,h);
+    if (!reeks || reeks.length < 2){ x.fillStyle = '#8A8680'; x.font = '12px Inter, sans-serif'; x.fillText('Nog te weinig metingen voor een grafiek.', 8, 20); return; }
+    var series = [ { k:'verzoeken', kleur:'#FFFFFF' }, { k:'alarm', kleur:'#C23A5E' }, { k:'quarantaine', kleur:'#C9A227' } ];
+    series.forEach(function(s){
+      var max = 1; for (var i=0;i<reeks.length;i++) if ((reeks[i][s.k]||0) > max) max = reeks[i][s.k];
+      x.beginPath(); x.lineWidth = 1.5; x.strokeStyle = s.kleur;
+      for (var j=0;j<reeks.length;j++){
+        var px = (j/(reeks.length-1)) * (w-6) + 3;
+        var py = h - 6 - ((reeks[j][s.k]||0)/max) * (h-16);
+        if (j===0) x.moveTo(px, py); else x.lineTo(px, py);
+      }
+      x.stroke();
+    });
+  }
+
+  function quarantaineRij(q){
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, q.bron)),
+      el('div',{class:'muted', style:{fontSize:'.74rem'}}, (q.reden||'') + ' · nog ' + Math.round((q.resterend||0)/60) + ' min'));
+    var knop = eigenaar ? el('button',{class:'knop grijs klein', onclick:function(){ wachtActie('quarantaine', { bron:q.bron, actie:'vrij' }, 'Vrijgegeven.'); }}, 'Vrijgeven') : null;
+    return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'AFGESNEDEN'), mid, knop);
+  }
+
+  var VERDICT_LABEL = { open:'OPEN', inconclaaf:'INCONCLAAF', geaccepteerd:'GEACCEPTEERD', afgewezen:'AFGEWEZEN' };
+  function raadRij(v){
+    var badgeKlas = (v.status==='geaccepteerd') ? 'aan' : 'uit';
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, v.titel), el('span',{class:'code'}, (v.soort||'').toUpperCase())),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, v.uitleg || ''),
+      v.resultaat ? el('div',{class:'muted', style:{fontSize:'.72rem',color:'#9ED3A6'}}, 'Uitgevoerd: '+v.resultaat) : null);
+    var acties = el('div',null);
+    if (eigenaar && (v.status==='open' || v.status==='inconclaaf')){
+      acties.appendChild(el('button',{class:'knop klein', onclick:function(){ wachtActie('beslis', { id:v.id, verdict:'accepteren' }, 'Geaccepteerd.'); }}, 'Accepteren'));
+      acties.appendChild(el('button',{class:'knop grijs klein', onclick:function(){
+        var n = prompt('Napraten met de AI (inconclaaf) - noteer je vraag of twijfel:', ''); if (n===null) return;
+        wachtActie('beslis', { id:v.id, verdict:'inconclaaf', notitie:n }, 'Inconclaaf: geparkeerd om na te praten.');
+      }}, 'Inconclaaf'));
+      acties.appendChild(el('button',{class:'knop rood klein', onclick:function(){ wachtActie('beslis', { id:v.id, verdict:'afwijzen' }, 'Afgewezen.'); }}, 'Afwijzen'));
+    } else {
+      acties.appendChild(el('span',{class:'badge '+badgeKlas}, VERDICT_LABEL[v.status] || v.status));
+    }
+    return el('div',{class:'zeker'}, mid, acties);
+  }
+
+  function tekenWacht(bord){
+    var m = bord.meters || {};
+    vervang($('#wachtMeters'), [
+      meterKaart(m.verzoeken||0, 'verzoeken/10s'),
+      meterKaart(m.bans||0, 'op de banlijst'),
+      meterKaart(m.quarantaine||0, 'in quarantaine'),
+      meterKaart(m.alarm||0, 'open alarmen'),
+      meterKaart(m.kritiek||0, 'kritiek'),
+      meterKaart(m.openVoorstellen||0, 'open voorstellen'),
+      meterKaart((m.geheugen||0)+' MB', 'geheugen')
+    ]);
+    tekenGrafiek(bord.grafiek || []);
+    $('#wachtIsoleer').hidden = !eigenaar;
+    $('#bWachtAnalyseer').hidden = !eigenaar;
+    var q = bord.quarantaine || [];
+    vervang($('#wachtQuarantaine'), q.length ? q.map(quarantaineRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Niemand in quarantaine. De afweer is rustig.'));
+    var r = bord.raad || [];
+    vervang($('#wachtRaad'), r.length ? r.map(raadRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Geen voorstellen. Laat de AI de signalen uitkauwen met "AI kauwt uit".'));
+  }
+
+  function laadWacht(){
+    api('/api/techniek/wacht/bord', {}).then(tekenWacht).catch(function(e){ toast(e.message); });
+  }
 
   /* ---------- controlekamer: functies per doelgroep, alles via een aanvraag ---------- */
   var wachtend = {};         // sleutel id|doelgroep -> open aanvraag

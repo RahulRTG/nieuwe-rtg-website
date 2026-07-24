@@ -38,7 +38,7 @@ const M = 300;
 (async () => {
   const eng = maakJsEngine();
   for (let i = 0; i < M; i++) eng.registreer('K' + i);
-  console.log('SCHADUW-SOAK gestart — ' + DUUR_S + 's, ' + M + ' leden, drift-check elke 10s');
+  console.log('SCHADUW-SOAK gestart - ' + DUUR_S + 's, ' + M + ' leden, drift-check elke 10s');
   const eind = Date.now() + DUUR_S * 1000;
   let ops = 0, checks = 0, drift = 0, laatsteLog = 0;
   while (Date.now() < eind) {
@@ -63,6 +63,6 @@ const M = 300;
     }
   }
   console.log('\nSOAK KLAAR: ' + ops + ' operaties, ' + checks + ' drift-checks, ' + drift + ' afwijking(en)');
-  console.log(drift === 0 ? 'RESULTAAT: VOLGEHOUDEN LOCKSTEP — de motor bleef de hele periode exact gelijk.' : 'RESULTAAT: DRIFT GEZIEN — niet cutover-gereed.');
+  console.log(drift === 0 ? 'RESULTAAT: VOLGEHOUDEN LOCKSTEP - de motor bleef de hele periode exact gelijk.' : 'RESULTAAT: DRIFT GEZIEN - niet cutover-gereed.');
   process.exit(drift === 0 ? 0 : 1);
 })();

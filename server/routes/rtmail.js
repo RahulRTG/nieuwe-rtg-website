@@ -6,7 +6,7 @@
    Alles achter de leverancier-inlog; het adres komt uit de sessie, nooit uit
    de body -- zo kan niemand in het postvak van een ander kijken. */
 module.exports = (kern) => {
-  const { app, supplierAuth, auth, rtmail, codenaamVan } = kern;
+  const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering } = kern;
   const adresVan = req => (req.supplier.code || '').toLowerCase() + '@rtmail';
   // het lid-adres: de codenaam van het account (privacy by design)
   const lidCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
@@ -35,6 +35,24 @@ module.exports = (kern) => {
     const b = req.body || {};
     const r = rtmail.stuur({ van: adresVan(req), naar: b.naar, onderwerp: b.onderwerp, tekst: b.tekst, soort: 'zaak' });
     if (r.error) return res.status(400).json({ error: r.error });
+    res.json({ ok: true, bericht: r });
+  });
+
+  /* ---- de draaiboeken die de zaak zelf (of Rahul namens de zaak) aftrapt ----
+     Elk bereidt voor en bericht over RTMAIL; het bestellen en indienen blijft
+     de zaak zelf. */
+  app.post('/api/supplier/rtmail/inkoop', supplierAuth, (req, res) => {
+    if (!automatisering) return res.status(503).json({ error: 'De automatiseringen draaien niet.' });
+    const b = req.body || {};
+    const r = automatisering.inkoopVoorstel({ zaakCode: req.supplier.code, groothandelCode: b.groothandel, regels: b.regels });
+    if (!r) return res.status(400).json({ error: 'Geef een groothandel-code op.' });
+    res.json({ ok: true, bezorgd: r.length });
+  });
+  app.post('/api/supplier/rtmail/btw-herinner', supplierAuth, (req, res) => {
+    if (!automatisering) return res.status(503).json({ error: 'De automatiseringen draaien niet.' });
+    const b = req.body || {};
+    const r = automatisering.btwHerinnering({ zaakCode: req.supplier.code, periode: b.periode, bedrag: b.bedrag, deadline: b.deadline });
+    if (!r) return res.status(400).json({ error: 'Kon de herinnering niet klaarzetten.' });
     res.json({ ok: true, bericht: r });
   });
 

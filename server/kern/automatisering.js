@@ -54,5 +54,37 @@ module.exports = ({ rtmail }) => {
     return uit.filter(Boolean);
   }
 
-  return { welkomLid, sollicitatieBinnen, factuurGeboekt };
+  // Inkoop-draaiboek: Rahul (of de zaak) stelt een CONCEPT-inkooporder op en
+  // bezorgt hem via RTMAIL bij de groothandel, met een kopie in het eigen
+  // postvak. De bestelling zelf (het geld) wacht op het akkoord van de zaak --
+  // het draaiboek bestelt nooit uit zichzelf.
+  function inkoopVoorstel({ zaakCode, groothandelCode, regels } = {}) {
+    const naar = rtmail.normAdres(groothandelCode);
+    const eigen = rtmail.normAdres(zaakCode);
+    if (!naar || !eigen) return null;
+    const lijst = (Array.isArray(regels) ? regels : []).slice(0, 40)
+      .map(r => '- ' + (r.aantal ? (Number(r.aantal) + 'x ') : '') + String(r.wat || r.omschrijving || 'artikel').slice(0, 80)).join('\n');
+    const body = 'Concept-inkooporder van ' + eigen + ':\n' + (lijst || '(geen regels opgegeven)') +
+      '\n\nDit is een concept; de zaak bevestigt de bestelling zelf. Reageer gerust met een prijsopgave.';
+    const naarGroot = rtmail.systeemStuur(naar, 'Concept-inkooporder', body, 'inkoop');
+    const kopie = rtmail.systeemStuur(eigen, 'Inkoopvoorstel klaargezet',
+      'Rahul heeft een concept-inkooporder naar ' + naar + ' klaargezet. Bekijk en bevestig de bestelling zelf; er is nog niets besteld of betaald.', 'inkoop');
+    return [naarGroot, kopie].filter(Boolean);
+  }
+
+  // Overheid-draaiboek: een btw-herinnering in het RTMAIL-postvak van de zaak,
+  // met de voorbereide cijfers. Indienen blijft een mens: het draaiboek zet
+  // het klaar en herinnert, het dient nooit zelf in.
+  function btwHerinnering({ zaakCode, periode, bedrag, deadline } = {}) {
+    const adres = rtmail.normAdres(zaakCode);
+    if (!adres) return null;
+    const p = periode ? (' over ' + String(periode).slice(0, 30)) : '';
+    const b = (bedrag != null && isFinite(bedrag)) ? (' Het voorbereide bedrag is EUR ' + Number(bedrag).toFixed(2) + '.') : '';
+    const d = deadline ? (' Deadline: ' + String(deadline).slice(0, 20) + '.') : '';
+    const body = 'Je btw-aangifte' + p + ' komt eraan.' + d + b +
+      ' De cijfers staan klaar in de belastingtool. Controleren en indienen doe je zelf; Rahul dient nooit voor je in.';
+    return rtmail.systeemStuur(adres, 'Btw-aangifte komt eraan', body, 'overheid');
+  }
+
+  return { welkomLid, sollicitatieBinnen, factuurGeboekt, inkoopVoorstel, btwHerinnering };
 };

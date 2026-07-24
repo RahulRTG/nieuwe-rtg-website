@@ -80,3 +80,26 @@ test('facturen-draaiboek: koper kan ook een andere zaak zijn', () => {
   automatisering.factuurGeboekt({ verkoperCode: 'GROOT', koperZaakCode: 'BLOEM', nummer: '9' });
   assert.equal(rtmail.postvak('bloem').length, 1);
 });
+
+test('inkoop-draaiboek: concept naar de groothandel + kopie bij de zaak, niets besteld', () => {
+  const { rtmail, automatisering } = maak();
+  const uit = automatisering.inkoopVoorstel({ zaakCode: 'SAKURA', groothandelCode: 'GROOT', regels: [{ aantal: 10, wat: 'handdoeken' }, { wat: 'zeep' }] });
+  assert.equal(uit.length, 2);
+  const bijGroot = rtmail.postvak('groot');
+  assert.equal(bijGroot.length, 1);
+  assert.match(bijGroot[0].tekst, /handdoeken/);
+  assert.match(bijGroot[0].tekst, /concept/i);
+  assert.equal(rtmail.postvak('sakura').length, 1); // de kopie
+  assert.equal(automatisering.inkoopVoorstel({ zaakCode: 'SAKURA', groothandelCode: '' }), null);
+});
+
+test('overheid-draaiboek: btw-herinnering met de voorbereide cijfers; indienen blijft een mens', () => {
+  const { rtmail, automatisering } = maak();
+  const m = automatisering.btwHerinnering({ zaakCode: 'SAKURA', periode: 'Q1 2026', bedrag: 842.5, deadline: '2026-04-30' });
+  assert.ok(m);
+  assert.equal(m.naar, 'sakura@rtmail');
+  assert.match(m.tekst, /842\.50/);
+  assert.match(m.tekst, /2026-04-30/);
+  assert.match(m.tekst, /indienen doe je zelf/i);
+  assert.equal(automatisering.btwHerinnering({ zaakCode: '' }), null);
+});

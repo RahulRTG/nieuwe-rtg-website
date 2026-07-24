@@ -83,6 +83,46 @@ test('scanDataUrl decodeert en scant een base64 data-URL', () => {
   assert.equal(r.verdict, 'besmet');
 });
 
+test('uitgebreide handtekeningen: webshell, powershell, svg-xss, archief, ransomware', () => {
+  const a = av();
+  const b = (s, mime) => a.scan(Buffer.from(s), { naam: 'x', mime: mime || 'application/octet-stream' });
+  assert.equal(b('<?php proc_open("id"); ?>').verdict, 'besmet', 'proc_open webshell');
+  assert.equal(b('powershell -enc SQBFAFgA').verdict, 'besmet', 'powershell -enc');
+  assert.equal(b('<svg onerror=alert(1)>').verdict, 'besmet', 'svg onerror xss');
+  assert.equal(b('eval(atob("..."))').verdict, 'besmet', 'js eval(atob');
+  // ZIP-magie in een niet-beeld upload = verdacht
+  assert.equal(a.scan(Buffer.from([0x50,0x4b,0x03,0x04,1,2,3,4]), { naam:'a.zip', mime:'application/zip' }).verdict, 'verdacht');
+  // ransomware-notitie
+  assert.equal(b('!!! YOUR FILES HAVE BEEN ENCRYPTED !!!').verdict, 'verdacht');
+});
+
+test('scanBody vindt een besmette data-URL diep in de body', () => {
+  const a = av();
+  const eicarUrl = 'data:image/png;base64,' + Buffer.from(EICAR).toString('base64');
+  const raak = a.scanBody({ post: { tekst: 'hoi', media: [ { foto: eicarUrl } ] } }, { bron: 't' });
+  assert.ok(raak && raak.verdict === 'besmet');
+});
+
+test('scanBody laat een schone body met een echte foto met rust', () => {
+  const a = av();
+  const pngUrl = 'data:image/png;base64,' + PNG.toString('base64');
+  assert.equal(a.scanBody({ foto: pngUrl, tekst: 'mooie dag' }, {}), null);
+});
+
+test('scanBody negeert gewone tekstvelden (geen data-URL) volledig', () => {
+  const a = av();
+  // een chatbericht dat toevallig "os.system(" bevat is gewone tekst, geen upload
+  assert.equal(a.scanBody({ bericht: 'gebruik os.system() in python voor shell_exec(' }, {}), null);
+});
+
+test('veiligeFoto weigert besmet en laat schoon door', () => {
+  const a = av();
+  const eicarUrl = 'data:image/png;base64,' + Buffer.from(EICAR).toString('base64');
+  const pngUrl = 'data:image/png;base64,' + PNG.toString('base64');
+  assert.equal(a.veiligeFoto(eicarUrl, {}).ok, false);
+  assert.equal(a.veiligeFoto(pngUrl, {}).ok, true);
+});
+
 test('een nieuwe handtekening toevoegen werkt (updatebare definities)', () => {
   const a = av();
   const voor = a.stand().definities;

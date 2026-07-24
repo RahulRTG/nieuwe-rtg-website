@@ -919,6 +919,25 @@ wacht = require('./kern/wacht')({ db, save, beveilig, lees: schild.signalen });
    Wacht ter afsnijding voorgesteld. */
 const antivirus = require('./kern/antivirus')({ db, save, beveilig, wacht });
 
+/* Universeel scan-net: elke schrijf-aanvraag wordt door De Ontsmetter gehaald.
+   Zit er een BESMETTE beeld-/PDF-data-URL in de body (waar dan ook, hoe diep
+   ook), dan weigeren we hem hier -- zo zijn ALLE upload-plekken (snaps, De Salon,
+   markt, clips, en alles wat later bijkomt) in één klap gedekt zonder elke route
+   apart aan te raken. Verdacht mag door (staat wel op het bord). /api/verify/*
+   scant al expliciet; /api/techniek/* en health blijven ongemoeid. */
+app.use((req, res, next) => {
+  const m = req.method;
+  if (m !== 'POST' && m !== 'PUT' && m !== 'PATCH') return next();
+  const p = req.path || '';
+  if (p.startsWith('/api/techniek') || p.startsWith('/api/verify') || p === '/api/health' || p === '/api/ready') return next();
+  if (!req.body || (typeof req.body !== 'object' && typeof req.body !== 'string')) return next();
+  try {
+    const raak = antivirus.scanBody(req.body, { bron: req.ip, naam: p });
+    if (raak) return res.status(422).json({ error: 'Dit bestand is geweigerd door de beveiliging (mogelijke malware).' });
+  } catch (e) { /* een scanfout mag nooit een verzoek breken */ }
+  next();
+});
+
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
 function resolveSession(token) {

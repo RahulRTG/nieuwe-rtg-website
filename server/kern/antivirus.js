@@ -36,23 +36,62 @@ const BEELD_MAGIE = {
 // type: 'bytes' (hex) of 'tekst' (ascii, overal in het bestand gezocht).
 function standaardDefinities() {
   return [
-    { id: 'eicar', naam: 'EICAR-testbestand', ernst: 'besmet', type: 'tekst',
-      patroon: 'EICAR-STANDARD-ANTIVIRUS-TEST-FILE' },
+    // --- testhandtekening ---
+    { id: 'eicar', naam: 'EICAR-testbestand', ernst: 'besmet', type: 'tekst', patroon: 'EICAR-STANDARD-ANTIVIRUS-TEST-FILE' },
+    // --- uitvoerbare bestanden (magie aan het begin) ---
     { id: 'pe', naam: 'Windows-uitvoerbaar (PE/MZ)', ernst: 'besmet', type: 'bytes', waar: 'start', patroon: '4d5a' },
     { id: 'elf', naam: 'Linux-uitvoerbaar (ELF)', ernst: 'besmet', type: 'bytes', waar: 'start', patroon: '7f454c46' },
     { id: 'macho', naam: 'macOS-uitvoerbaar (Mach-O)', ernst: 'besmet', type: 'bytes', waar: 'start', patroon: 'feedface' },
     { id: 'macho64', naam: 'macOS-uitvoerbaar (Mach-O 64)', ernst: 'besmet', type: 'bytes', waar: 'start', patroon: 'feedfacf' },
     { id: 'javaclass', naam: 'Java/uitvoerbaar (CAFEBABE)', ernst: 'besmet', type: 'bytes', waar: 'start', patroon: 'cafebabe' },
+    { id: 'dex', naam: 'Android-uitvoerbaar (DEX)', ernst: 'besmet', type: 'bytes', waar: 'start', patroon: '6465780a' },
     { id: 'shebang', naam: 'Shell-script (#!)', ernst: 'verdacht', type: 'bytes', waar: 'start', patroon: '2321' },
+    // --- archieven / containers (verdacht als upload; type-mismatch pakt beeld) ---
+    { id: 'zip', naam: 'ZIP/JAR/Office-container', ernst: 'verdacht', type: 'bytes', waar: 'start', patroon: '504b0304' },
+    { id: 'rar', naam: 'RAR-archief', ernst: 'verdacht', type: 'bytes', waar: 'start', patroon: '526172211a07' },
+    { id: '7z', naam: '7-Zip-archief', ernst: 'verdacht', type: 'bytes', waar: 'start', patroon: '377abcaf271c' },
+    { id: 'gzip', naam: 'GZIP-archief', ernst: 'verdacht', type: 'bytes', waar: 'start', patroon: '1f8b08' },
+    { id: 'ole', naam: 'OLE/Legacy-Office (kan macro dragen)', ernst: 'verdacht', type: 'bytes', waar: 'start', patroon: 'd0cf11e0' },
+    // --- scripts verstopt in een bestand (polyglot) ---
     { id: 'php', naam: 'PHP-code in bestand', ernst: 'besmet', type: 'tekst', patroon: '<?php' },
     { id: 'scripttag', naam: 'Script-tag in bestand (polyglot)', ernst: 'besmet', type: 'tekst', patroon: '<script' },
+    { id: 'svg-onload', naam: 'SVG/HTML met event-handler (XSS)', ernst: 'besmet', type: 'tekst', patroon: 'onerror=' },
+    { id: 'svg-onload2', naam: 'SVG/HTML met onload (XSS)', ernst: 'besmet', type: 'tekst', patroon: 'onload=' },
+    { id: 'js-uri', naam: 'javascript:-URI', ernst: 'verdacht', type: 'tekst', patroon: 'javascript:' },
+    { id: 'iframe', naam: 'Verborgen iframe', ernst: 'verdacht', type: 'tekst', patroon: '<iframe' },
+    // --- PHP-webshells ---
     { id: 'shell-eval', naam: 'Webshell (eval base64)', ernst: 'besmet', type: 'tekst', patroon: 'eval(base64_decode' },
     { id: 'shell-exec', naam: 'Webshell (shell_exec)', ernst: 'besmet', type: 'tekst', patroon: 'shell_exec(' },
     { id: 'shell-system', naam: 'Webshell (system $_)', ernst: 'besmet', type: 'tekst', patroon: 'system($_' },
     { id: 'shell-passthru', naam: 'Webshell (passthru)', ernst: 'besmet', type: 'tekst', patroon: 'passthru(' },
+    { id: 'shell-proc', naam: 'Webshell (proc_open)', ernst: 'besmet', type: 'tekst', patroon: 'proc_open(' },
+    { id: 'shell-popen', naam: 'Webshell (popen)', ernst: 'besmet', type: 'tekst', patroon: 'popen(' },
+    { id: 'shell-assertreq', naam: 'Webshell (assert $_REQUEST)', ernst: 'besmet', type: 'tekst', patroon: 'assert($_REQUEST' },
+    { id: 'shell-createfn', naam: 'Webshell (create_function)', ernst: 'besmet', type: 'tekst', patroon: 'create_function(' },
+    { id: 'shell-preg-e', naam: 'Webshell (preg_replace /e)', ernst: 'besmet', type: 'tekst', patroon: "preg_replace('/.*/e'" },
+    // --- Windows/PowerShell/JS uitvoering ---
+    { id: 'ps-enc', naam: 'PowerShell -EncodedCommand', ernst: 'besmet', type: 'tekst', patroon: 'powershell -enc' },
+    { id: 'ps-iex', naam: 'PowerShell Invoke-Expression', ernst: 'besmet', type: 'tekst', patroon: 'IEX(' },
+    { id: 'ps-frombase64', naam: 'PowerShell FromBase64String', ernst: 'verdacht', type: 'tekst', patroon: 'FromBase64String(' },
+    { id: 'wscript', naam: 'WScript.Shell', ernst: 'besmet', type: 'tekst', patroon: 'WScript.Shell' },
+    { id: 'cmd-c', naam: 'cmd.exe /c', ernst: 'verdacht', type: 'tekst', patroon: 'cmd.exe /c' },
+    { id: 'js-eval-atob', naam: 'JS eval(atob(', ernst: 'besmet', type: 'tekst', patroon: 'eval(atob(' },
+    { id: 'js-eval-unescape', naam: 'JS eval(unescape(', ernst: 'besmet', type: 'tekst', patroon: 'eval(unescape(' },
+    { id: 'jndi', naam: 'Log4Shell (jndi)', ernst: 'verdacht', type: 'tekst', patroon: '${jndi:' },
+    // --- Office-macro's / auto-uitvoering ---
+    { id: 'office-vba', naam: 'Office-macro (vbaProject)', ernst: 'verdacht', type: 'tekst', patroon: 'vbaProject.bin' },
+    { id: 'macro-autoopen', naam: 'Macro Auto_Open', ernst: 'verdacht', type: 'tekst', patroon: 'Auto_Open' },
+    { id: 'macro-docopen', naam: 'Macro Document_Open', ernst: 'verdacht', type: 'tekst', patroon: 'Document_Open' },
+    { id: 'macro-wbopen', naam: 'Macro Workbook_Open', ernst: 'verdacht', type: 'tekst', patroon: 'Workbook_Open' },
+    // --- PDF-gevaar ---
     { id: 'pdf-js', naam: 'PDF met JavaScript', ernst: 'verdacht', type: 'tekst', patroon: '/JavaScript', mimes: ['application/pdf'] },
+    { id: 'pdf-openaction', naam: 'PDF met /OpenAction', ernst: 'verdacht', type: 'tekst', patroon: '/OpenAction', mimes: ['application/pdf'] },
     { id: 'pdf-launch', naam: 'PDF met /Launch-actie', ernst: 'besmet', type: 'tekst', patroon: '/Launch', mimes: ['application/pdf'] },
-    { id: 'office-macro', naam: 'Office-macro (vbaProject)', ernst: 'verdacht', type: 'tekst', patroon: 'vbaProject.bin' }
+    { id: 'pdf-embed', naam: 'PDF met ingesloten bestand', ernst: 'verdacht', type: 'tekst', patroon: '/EmbeddedFile', mimes: ['application/pdf'] },
+    // --- ransomware-losgeldbriefjes (tekstsignalen) ---
+    { id: 'ransom-1', naam: 'Ransomware-notitie (files encrypted)', ernst: 'verdacht', type: 'tekst', patroon: 'YOUR FILES HAVE BEEN ENCRYPTED' },
+    { id: 'ransom-2', naam: 'Ransomware-notitie (recover files)', ernst: 'verdacht', type: 'tekst', patroon: 'RECOVER YOUR FILES' },
+    { id: 'ransom-3', naam: 'Ransomware-notitie (decrypt readme)', ernst: 'verdacht', type: 'tekst', patroon: 'README_FOR_DECRYPT' }
   ];
 }
 
@@ -131,8 +170,11 @@ module.exports = (ctx) => {
       if (raak) { redenen.push('handtekening: ' + d.naam); hef(d.ernst); }
     }
 
-    // 2. heuristiek: magie vs opgegeven type
-    if (!magieKlopt(buf, meta.mime)) { redenen.push('type-vervalsing: de inhoud komt niet overeen met het opgegeven ' + meta.mime); hef('besmet'); }
+    // 2. heuristiek: magie vs opgegeven type. Alleen 'verdacht' (niet hard
+    // blokkeren): een echt uitvoerbaar bestand of webshell wordt al door zijn
+    // eigen handtekening als 'besmet' gepakt; een enkele type-mismatch mag geen
+    // legitieme-maar-ongewone upload tegenhouden.
+    if (!magieKlopt(buf, meta.mime)) { redenen.push('type-vervalsing: de inhoud komt niet overeen met het opgegeven ' + meta.mime); hef('verdacht'); }
 
     // 3. heuristiek: gevaarlijke of dubbele extensie in de bestandsnaam
     const naam = String(meta.naam || '').toLowerCase();
@@ -195,6 +237,39 @@ module.exports = (ctx) => {
     return verwerk(buf, Object.assign({ mime: m[1] }, meta || {}));
   }
 
+  // Praktische poort voor de intake-plekken: geef {ok:false, error} terug bij een
+  // BESMET bestand (verdacht mag door, maar staat wel op het bord).
+  function veiligeFoto(dataUrl, meta) {
+    const r = scanDataUrl(dataUrl, meta);
+    if (r.verdict === 'besmet') return { ok: false, error: 'Dit bestand is geweigerd door de beveiliging (mogelijke malware).', verdict: r.verdict };
+    return { ok: true, verdict: r.verdict };
+  }
+
+  /* Loop door een verzoek-body (string/array/object, begrensde diepte) en scan
+     elke ingesloten beeld-/PDF-data-URL. Geeft de EERSTE besmette treffer terug
+     of null. Zo dekt één middleware alle upload-plekken (snaps, Salon, markt,
+     clips, ...) zonder elke route apart te hoeven aanraken. */
+  const DATA_URL_RE = /^data:(image\/[a-z0-9.+-]+|application\/pdf);base64,[A-Za-z0-9+/=]+$/i;
+  function scanBody(body, meta, diepte) {
+    diepte = diepte || 0;
+    if (diepte > 6 || body == null) return null;
+    if (typeof body === 'string') {
+      if (body.length > 64 && DATA_URL_RE.test(body)) {
+        const r = scanDataUrl(body, meta);
+        if (r.verdict === 'besmet') return r;
+      }
+      return null;
+    }
+    if (Array.isArray(body)) {
+      for (let i = 0; i < body.length && i < 200; i++) { const t = scanBody(body[i], meta, diepte + 1); if (t) return t; }
+      return null;
+    }
+    if (typeof body === 'object') {
+      for (const k of Object.keys(body)) { const t = scanBody(body[k], meta, diepte + 1); if (t) return t; }
+    }
+    return null;
+  }
+
   function voegSignatuurToe(sig) {
     if (!sig || !sig.id || !sig.patroon) return false;
     if (definities.some(d => d.id === sig.id)) return false;
@@ -211,6 +286,6 @@ module.exports = (ctx) => {
       definities: definities.length, versie: s.versie, laatste: s.laatste.slice(0, 20) };
   }
 
-  return { scan, verwerk, scanDataUrl, voegSignatuurToe, stand,
+  return { scan, verwerk, scanDataUrl, veiligeFoto, scanBody, voegSignatuurToe, stand,
     definities: () => definities.map(d => ({ id: d.id, naam: d.naam, ernst: d.ernst })) };
 };

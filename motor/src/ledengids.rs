@@ -125,9 +125,11 @@ mod kaart {
     extern "C" {
         fn mmap(addr: *mut c_void, length: usize, prot: i32, flags: i32, fd: i32, offset: i64) -> *mut c_void;
         fn munmap(addr: *mut c_void, length: usize) -> i32;
+        fn madvise(addr: *mut c_void, length: usize, advice: i32) -> i32;
     }
     const PROT_READ: i32 = 1; // gelijk op Linux/macOS/BSD
     const MAP_PRIVATE: i32 = 2;
+    const MADV_RANDOM: i32 = 1; // idem, gelijk op Linux/macOS/BSD
 
     pub struct Kaart {
         ptr: *mut c_void,
@@ -153,6 +155,10 @@ mod kaart {
             if ptr == mislukt || ptr.is_null() {
                 return Ok(None);
             }
+            // Binair zoeken springt willekeurig door het bestand. Vertel de kernel
+            // dat, zodat hij geen readahead verspilt aan pagina's die we toch niet
+            // op volgorde lezen (MADV_RANDOM). Best-effort: het advies mag falen.
+            unsafe { madvise(ptr, len, MADV_RANDOM); }
             Ok(Some(Kaart { ptr, len }))
         }
         #[inline]
@@ -179,12 +185,23 @@ pub struct Gids {
 
 impl Gids {
     pub fn open(pad: &Path) -> io::Result<Gids> {
+        Gids::open_met(pad, true)
+    }
+
+    /* Als `gebruik_mmap` false is, of mmap niet lukt, of op niet-Unix: de gids
+       leest via seek+read. Vooral handig om de terugval-weg te toetsen en om
+       mmap desgewenst uit te zetten. */
+    pub fn open_met(pad: &Path, gebruik_mmap: bool) -> io::Result<Gids> {
         let len = std::fs::metadata(pad)?.len();
         #[cfg(unix)]
-        let kaart = {
+        let kaart = if gebruik_mmap {
             let f = File::open(pad)?;
             kaart::Kaart::open(&f, len)? // f mag hierna droppen; de mapping blijft
+        } else {
+            None
         };
+        #[cfg(not(unix))]
+        let _ = gebruik_mmap;
         Ok(Gids {
             pad: pad.to_path_buf(),
             aantal: len / REC,
@@ -359,6 +376,28 @@ mod tests {
         assert!(g.exact("lid05000").unwrap().is_none());
         let p = g.prefix("lid0499", 20).unwrap();
         assert_eq!(p.len(), 10); // lid04990..lid04999
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn fallback_seek_read_geeft_zelfde_antwoorden() {
+        // De seek+read-terugval (mmap uit) moet exact hetzelfde teruggeven als de
+        // mmap-weg. Zo is de fallback getoetst op het platform waar we draaien.
+        let dir = std::env::temp_dir().join(format!("gids-fallback-{}", std::process::id()));
+        let pad = dir.join("g.bin");
+        std::fs::create_dir_all(&dir).unwrap();
+        let rijen: Vec<Rij> = (0..5000).map(|i| r(&format!("lid{:05}", i), if i % 2 == 0 { "rtg" } else { "business" })).collect();
+        bouw(&pad, rijen).unwrap();
+        let m = Gids::open_met(&pad, true).unwrap();
+        let s = Gids::open_met(&pad, false).unwrap();
+        assert!(m.via_kaart(), "mmap-weg");
+        assert!(!s.via_kaart(), "seek+read-weg");
+        for naam in ["lid00000", "lid02500", "lid04999", "LID02500", "spook", ""] {
+            assert_eq!(m.exact(naam).unwrap(), s.exact(naam).unwrap(), "exact({})", naam);
+        }
+        assert_eq!(m.prefix("lid024", 50).unwrap(), s.prefix("lid024", 50).unwrap());
+        assert_eq!(m.prefix("lid", 7).unwrap(), s.prefix("lid", 7).unwrap());
         std::fs::remove_dir_all(&dir).ok();
     }
 

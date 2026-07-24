@@ -94,6 +94,8 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   het aantal. Standaard leest de gids via **mmap(2)** (read-only, rauwe POSIX-FFI,
   geen crate — zero-dep blijft): de kernel cachet de hete pagina's in RAM en we
   lezen op RAM-snelheid, zonder per zoekopdracht een `File::open` of seek/read.
+  Binair zoeken is willekeurige toegang, dus `madvise(MADV_RANDOM)` zet de
+  readahead uit (geen verspilde I/O aan pagina's die we niet op volgorde lezen).
   Lukt mmap niet (of op niet-Unix), dan valt de gids terug op **seek+read** op
   schijf — zelfde antwoorden. `bouw()` schrijft naar een temp-bestand en hernoemt
   atomair, zodat een actieve mmap veilig op het oude inode blijft tijdens herbouw

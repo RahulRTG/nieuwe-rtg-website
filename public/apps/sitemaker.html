@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Website-maker · RTG</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Website-maker">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/webblok.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:calc(env(safe-area-inset-top) + .7rem) 1rem .7rem;}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.05rem;}
+  header .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.35rem .6rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;}
+  .titelin{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.85rem;border-radius:10px;padding:.4rem .6rem;min-width:11rem;}
+  .sp{flex:1 1 auto;}
+  .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.8rem;font-weight:600;border-radius:10px;padding:.45rem .8rem;cursor:pointer;white-space:nowrap;}
+  .knop:hover{border-color:var(--gold);}
+  .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .knop.online{background:var(--green);border-color:var(--green);color:#fff;}
+  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .swatches{display:flex;gap:.35rem;align-items:center;}
+  .swatch{width:1.35rem;height:1.35rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
+  .swatch.actief{border-color:#fff;}
+  .apparaten{display:flex;gap:.15rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.15rem;}
+  .apparaten button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:.72rem;font-weight:600;padding:.3rem .55rem;border-radius:7px;cursor:pointer;white-space:nowrap;}
+  .apparaten button.aan{background:var(--bg);color:var(--gold);}
+  main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;}
+  .doek{border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);}
+  .doek.mobielkader{border-radius:30px;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
+  /* bewerk-affordances */
+  .bewerk .blok{outline:1px dashed transparent;transition:outline-color .15s;}
+  .bewerk .blok:hover{outline-color:color-mix(in srgb,var(--gold) 55%,transparent);}
+  .bew{outline:none;border-radius:4px;cursor:text;}
+  .bewerk .bew:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent);}
+  .bewerk .b-beeld img,.bewerk .b-gal img{cursor:pointer;}
+  .bwbalk{position:absolute;top:6px;right:6px;display:none;gap:.25rem;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--line);border-radius:10px;padding:.2rem;}
+  .bewerk .blok:hover>.bwbalk{display:flex;}
+  .bwbalk button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center;}
+  .bwbalk button:hover{border-color:var(--gold);}
+  .bwbalk button.aan{border-color:var(--gold);color:var(--gold);}
+  .bwbalk button svg{display:block;}
+  .bwbalk .weg:hover{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .blok.sleep{opacity:.5;}
+  .bewerk .blok.dim{opacity:.4;}
+  .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--gold);font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
+  .leegdoek{padding:4rem 1.4rem;text-align:center;color:var(--dmut);}
+  /* onderweg-status-lint */
+  .lint{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:.5rem 1rem;background:var(--card);border-bottom:1px solid var(--line);font-size:.82rem;color:var(--muted);}
+  .lint .adres{color:var(--gold);font-weight:600;}
+  .lint .stip{width:.55rem;height:.55rem;border-radius:50%;background:var(--soft);display:inline-block;}
+  .lint .stip.aan{background:var(--green);}
+  .lint a{color:var(--gold);}
+  /* sheets */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:40;padding:1.2rem;}
+  .sheet.open{display:grid;}
+  .sheet .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem;max-width:520px;width:100%;max-height:82vh;overflow:auto;}
+  .sheet h2{font-size:1.15rem;margin-bottom:.2rem;}
+  .sheet .sub{font-size:.8rem;color:var(--soft);margin-bottom:.9rem;}
+  .blokkies{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem;}
+  .blokkies button{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:.7rem .5rem;font:inherit;font-size:.82rem;cursor:pointer;text-align:left;}
+  .blokkies button:hover{border-color:var(--gold);}
+  .blokkies .k{display:block;font-size:.66rem;color:var(--soft);margin-top:.2rem;}
+  .beeldgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem;}
+  .beeldgrid button{padding:0;border:2px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;background:none;}
+  .beeldgrid button:hover{border-color:var(--gold);}
+  .beeldgrid img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+  .adresin{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:.6rem .7rem;}
+  .adresrij{display:flex;align-items:center;gap:.3rem;margin:.5rem 0;}
+  .adresrij .suf{color:var(--gold);font-weight:600;}
+  .lijstrij{display:flex;align-items:center;gap:.6rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.55rem .7rem;margin-bottom:.4rem;}
+  .lijstrij .nm{flex:1;font-size:.9rem;font-weight:600;}
+  .lijstrij .mt{font-size:.72rem;color:var(--soft);}
+  .lijstrij button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:.3rem .55rem;font:inherit;font-size:.75rem;cursor:pointer;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
+  .inlog{max-width:460px;margin:5rem auto;text-align:center;padding:0 1.2rem;}
+  .inlog a{color:var(--gold);}
+  .tip{max-width:640px;margin:0 auto 0;padding:.8rem 1rem;color:var(--muted);font-size:.86rem;line-height:1.6;border:1px solid var(--line);border-radius:12px;background:var(--card);}
+  .tip b{color:var(--gold);font-weight:600;}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/app.html">← Apps</a>
+  <div><div class="ey">RTG · voor ondernemers</div><h1>Website-maker</h1></div>
+  <input class="titelin" id="titel" maxlength="80" placeholder="Naam van je bedrijf" aria-label="Naam van je website">
+  <div class="swatches" id="swatches" aria-label="Accentkleur"></div>
+  <button class="knop" id="themaKnop" title="Licht of donker">Donker</button>
+  <div class="apparaten" id="apparaten" role="group" aria-label="Versie per toestel">
+    <button type="button" data-a="telefoon">Telefoon</button>
+    <button type="button" data-a="tablet">Tablet</button>
+    <button type="button" data-a="desktop">Desktop</button>
+  </div>
+  <span class="sp"></span>
+  <button class="knop" id="blokKnop">+ Blok</button>
+  <button class="knop" id="bewerkKnop">Voorbeeld</button>
+  <button class="knop" id="openKnop">Mijn sites</button>
+  <button class="knop" id="bewaarKnop">Bewaren</button>
+  <button class="knop prim" id="onlineKnop">Ga online</button>
+</header>
+<div class="lint" id="lint" hidden>
+  <span class="stip" id="lintStip"></span>
+  <span id="lintTekst">Nog niet online. Klik op "Ga online" om je site een RTG-adres te geven.</span>
+</div>
+<main id="hoofd">
+  <div style="width:100%;max-width:1080px;">
+    <div class="tip" id="tip" style="margin-bottom:1rem;"><b>Begin hier.</b> Bouw je bedrijfssite met blokken: klik in de tekst om te typen, kies een accentkleur en beeld. Klaar? Klik op <b>Ga online</b> - dan krijgt je site een RTG-adres (bijv. jouwzaak.rtg) en staat hij in de RTG-browser, voor alle leden te bezoeken.</div>
+    <div class="doek" id="doek" data-thema="donker"></div>
+  </div>
+</main>
+
+<div class="sheet" id="blokSheet"><div class="box">
+  <h2>Nieuw blok</h2><div class="sub">Kies een blok; je kunt het daarna verplaatsen en de tekst aanpassen.</div>
+  <div class="blokkies" id="blokkies"></div>
+</div></div>
+<div class="sheet" id="beeldSheet"><div class="box">
+  <h2>Kies beeld</h2><div class="sub">Eigen RTG-campagnebeeld (quiet luxury). Geen stockfoto's.</div>
+  <div class="beeldgrid" id="beeldgrid"></div>
+</div></div>
+<div class="sheet" id="openSheet"><div class="box">
+  <h2>Mijn websites</h2><div class="sub">Open een eerder gemaakte site om verder te werken.</div>
+  <div id="openlijst"></div>
+</div></div>
+<div class="sheet" id="onlineSheet"><div class="box">
+  <h2>Ga online</h2><div class="sub">Kies het RTG-adres waarop bezoekers je site vinden. Alleen letters, cijfers en koppeltekens.</div>
+  <div class="adresrij"><input class="adresin" id="adresIn" maxlength="30" placeholder="jouwzaak" aria-label="Adres"><span class="suf">.rtg</span></div>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;">
+    <button class="knop online" id="publiceerKnop">Zet online</button>
+    <button class="knop" id="offlineKnop" hidden>Uit de lucht halen</button>
+  </div>
+  <div id="onlineNoot" style="font-size:.8rem;color:var(--soft);margin-top:.7rem;"></div>
+</div></div>
+
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+const api=(pad,body)=>fetch('/api/site/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
+function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',2600);}
+
+const BEELDEN=['bamboe','hero','huis-omslag','jet','kaiseki','kyoto-suite','onsen','palacio','riad'].map(n=>'/campagne/'+n+'.jpg');
+const ACCENTEN=['#7F1634','#9E1C40','#C23A5E','#857007','#A98F1C','#0C0C0B','#2E5D48'];
+const BLOKTYPES=[
+  {t:'hero',n:'Hero',k:'grote kop + knop'},{t:'kop',n:'Kop',k:'sectiekop'},{t:'tekst',n:'Tekst',k:'alinea'},
+  {t:'knop',n:'Knop',k:'oproep'},{t:'beeld',n:'Beeld',k:'één afbeelding'},{t:'kolommen',n:'Twee kolommen',k:'naast elkaar'},
+  {t:'galerij',n:'Galerij',k:'meerdere beelden'},{t:'citaat',n:'Citaat',k:'uitspraak'},{t:'ruimte',n:'Ruimte',k:'witruimte'},{t:'voettekst',n:'Voettekst',k:'onderaan'}
+];
+function nieuwBlok(t){
+  const id='b'+Math.random().toString(36).slice(2,8);
+  if(t==='hero')return{id,type:t,kop:'Welkom bij mijn bedrijf',sub:'Vertel in één zin wat je doet en voor wie.',knop:'Neem contact op'};
+  if(t==='kop')return{id,type:t,tekst:'Een sectiekop'};
+  if(t==='tekst')return{id,type:t,tekst:'Schrijf hier over je bedrijf, je aanbod of je verhaal. Klik en typ; het past zich vanzelf aan.'};
+  if(t==='knop')return{id,type:t,tekst:'Klik hier',href:''};
+  if(t==='beeld')return{id,type:t,src:BEELDEN[1],bijschrift:''};
+  if(t==='kolommen')return{id,type:t,lk:'Wat wij doen',lt:'Beschrijf je dienst of product.',rk:'Voor wie',rt:'Beschrijf je klanten.'};
+  if(t==='galerij')return{id,type:t,beelden:[BEELDEN[0],BEELDEN[3],BEELDEN[6]]};
+  if(t==='citaat')return{id,type:t,tekst:'Een tevreden klant zegt iets moois.',bron:'Naam'};
+  if(t==='ruimte')return{id,type:t,hoogte:48};
+  if(t==='voettekst')return{id,type:t,tekst:'© Mijn bedrijf · via RTG'};
+  return{id,type:'tekst',tekst:''};
+}
+
+let DESIGN={id:null,titel:'',thema:'donker',accent:'#7F1634',adres:'',online:false,blokken:[nieuwBlok('hero'),nieuwBlok('tekst')]};
+let BEWERK=true;
+let beeldDoel=null;
+const APPARATEN=[{k:'telefoon',n:'telefoon',w:390},{k:'tablet',n:'tablet',w:768},{k:'desktop',n:'desktop',w:1080}];
+let APPARAAT='desktop';
+function devNaam(k){const d=APPARATEN.find(x=>x.k===k);return d?d.n:k;}
+const OOG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const OOG_UIT='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.1 3.9M6.1 6.1A17 17 0 0 0 2 12s3.5 7 10 7a10.9 10.9 0 0 0 3.9-.7"/></svg>';
+function toggleZicht(i){const b=DESIGN.blokken[i];const set=new Set(b.verberg||[]);if(set.has(APPARAAT))set.delete(APPARAAT);else set.add(APPARAAT);b.verberg=[...set];render();}
+
+function veld(waarde,zetter,meer){
+  const el=document.createElement(meer?'div':'span');
+  el.textContent=waarde||'';
+  if(BEWERK){ el.contentEditable='true'; el.className='bew'; el.spellcheck=false;
+    el.addEventListener('blur',()=>zetter(el.textContent));
+    el.addEventListener('keydown',e=>{ if(!meer&&e.key==='Enter'){e.preventDefault();el.blur();} });
+  }
+  return el;
+}
+function balk(i){
+  const b=document.createElement('div'); b.className='bwbalk';
+  const mk=(txt,cls,fn,titel)=>{const x=document.createElement('button');x.type='button';x.textContent=txt;if(cls)x.className=cls;x.title=titel||'';x.addEventListener('click',ev=>{ev.stopPropagation();fn();});return x;};
+  b.appendChild(mk('↑','',()=>verplaats(i,-1),'Omhoog'));
+  b.appendChild(mk('↓','',()=>verplaats(i,1),'Omlaag'));
+  b.appendChild(mk('⧉','',()=>dupliceer(i),'Dupliceren'));
+  const verborgen=(DESIGN.blokken[i].verberg||[]).includes(APPARAAT);
+  const z=document.createElement('button'); z.type='button'; z.innerHTML=verborgen?OOG_UIT:OOG;
+  if(verborgen)z.className='aan'; z.title=(verborgen?'Weer tonen op ':'Verbergen op ')+devNaam(APPARAAT);
+  z.addEventListener('click',ev=>{ev.stopPropagation();toggleZicht(i);}); b.appendChild(z);
+  b.appendChild(mk('×','weg',()=>verwijder(i),'Verwijderen'));
+  return b;
+}
+function renderBlok(blok,i){
+  const s=document.createElement('section'); s.className='blok'; s.dataset.i=i;
+  if(BEWERK){ s.draggable=true;
+    s.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',i);s.classList.add('sleep');});
+    s.addEventListener('dragend',()=>s.classList.remove('sleep'));
+    s.addEventListener('dragover',e=>e.preventDefault());
+    s.addEventListener('drop',e=>{e.preventDefault();const van=+e.dataTransfer.getData('text/plain');if(!isNaN(van))herorden(van,i);});
+  }
+  const t=blok.type;
+  if(t==='hero'){ s.classList.add('b-hero');
+    const h=document.createElement('h1'); h.appendChild(veld(blok.kop,v=>blok.kop=v)); s.appendChild(h);
+    const p=document.createElement('div'); p.className='sub'; p.appendChild(veld(blok.sub,v=>blok.sub=v,true)); s.appendChild(p);
+    const a=document.createElement('span'); a.className='b-knop'; a.appendChild(veld(blok.knop,v=>blok.knop=v)); s.appendChild(a);
+  } else if(t==='kop'){ s.classList.add('b-kop'); const h=document.createElement('h2'); h.appendChild(veld(blok.tekst,v=>blok.tekst=v)); s.appendChild(h);
+  } else if(t==='tekst'){ s.classList.add('b-tekst'); s.appendChild(veld(blok.tekst,v=>blok.tekst=v,true));
+  } else if(t==='knop'){ s.classList.add('b-knoprij'); const a=document.createElement('span'); a.className='b-knop'; a.appendChild(veld(blok.tekst,v=>blok.tekst=v)); s.appendChild(a);
+  } else if(t==='beeld'){ s.classList.add('b-beeld');
+    const img=document.createElement('img'); img.src=blok.src; img.alt=blok.bijschrift||'Beeld';
+    if(BEWERK) img.addEventListener('click',()=>kiesBeeld({blok,veld:'src'}));
+    s.appendChild(img); const bij=document.createElement('div'); bij.className='bij'; bij.appendChild(veld(blok.bijschrift,v=>blok.bijschrift=v)); s.appendChild(bij);
+  } else if(t==='kolommen'){ s.classList.add('b-kol');
+    [['lk','lt'],['rk','rt']].forEach(([kk,kt])=>{const c=document.createElement('div');const h=document.createElement('h3');h.appendChild(veld(blok[kk],v=>blok[kk]=v));const p=document.createElement('div');p.className='kt';p.appendChild(veld(blok[kt],v=>blok[kt]=v,true));c.appendChild(h);c.appendChild(p);s.appendChild(c);});
+  } else if(t==='galerij'){ s.classList.add('b-gal');
+    (blok.beelden||[]).forEach((src,gi)=>{const img=document.createElement('img');img.src=src;img.alt='';if(BEWERK)img.addEventListener('click',()=>kiesBeeld({blok,index:gi}));s.appendChild(img);});
+  } else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div'); q.className='q'; q.appendChild(veld(blok.tekst,v=>blok.tekst=v,true)); const br=document.createElement('div'); br.className='bron'; br.appendChild(veld(blok.bron,v=>blok.bron=v)); s.appendChild(q); s.appendChild(br);
+  } else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px';
+  } else if(t==='voettekst'){ s.classList.add('b-voet'); s.appendChild(veld(blok.tekst,v=>blok.tekst=v));
+  }
+  (blok.verberg||[]).forEach(d=>s.classList.add('v-weg-'+d));
+  if(BEWERK && (blok.verberg||[]).includes(APPARAAT)){ s.classList.add('dim'); const lb=document.createElement('div'); lb.className='vlabel'; lb.textContent='Verborgen op '+devNaam(APPARAAT); s.appendChild(lb); }
+  if(BEWERK) s.appendChild(balk(i));
+  return s;
+}
+function render(){
+  const doek=$('#doek'); doek.dataset.thema=DESIGN.thema; doek.style.setProperty('--acc',DESIGN.accent);
+  const dev=APPARATEN.find(d=>d.k===APPARAAT)||APPARATEN[2]; doek.style.maxWidth=dev.w+'px';
+  doek.className='doek'+(BEWERK?' bewerk':'')+(APPARAAT!=='desktop'?' mobielkader':''); doek.textContent='';
+  if(!DESIGN.blokken.length){ const l=document.createElement('div'); l.className='leegdoek'; l.textContent='Leeg doek. Klik op "+ Blok" om te beginnen.'; doek.appendChild(l); return; }
+  DESIGN.blokken.forEach((b,i)=>doek.appendChild(renderBlok(b,i)));
+}
+function zetApparaat(k){ APPARAAT=k; document.querySelectorAll('#apparaten button').forEach(b=>b.classList.toggle('aan',b.dataset.a===k)); render(); }
+function verplaats(i,d){const j=i+d;if(j<0||j>=DESIGN.blokken.length)return;const a=DESIGN.blokken;[a[i],a[j]]=[a[j],a[i]];render();}
+function herorden(van,naar){const a=DESIGN.blokken;const [x]=a.splice(van,1);a.splice(naar,0,x);render();}
+function dupliceer(i){const kopie=JSON.parse(JSON.stringify(DESIGN.blokken[i]));kopie.id='b'+Math.random().toString(36).slice(2,8);DESIGN.blokken.splice(i+1,0,kopie);render();}
+function verwijder(i){DESIGN.blokken.splice(i,1);render();}
+
+function kiesBeeld(doel){beeldDoel=doel;$('#beeldSheet').classList.add('open');}
+function bouwBeeldgrid(){const g=$('#beeldgrid');g.textContent='';BEELDEN.forEach(src=>{const b=document.createElement('button');b.type='button';const im=document.createElement('img');im.src=src;im.alt='';b.appendChild(im);b.addEventListener('click',()=>{if(!beeldDoel)return;if(beeldDoel.veld)beeldDoel.blok[beeldDoel.veld]=src;else if(beeldDoel.index!=null)beeldDoel.blok.beelden[beeldDoel.index]=src;$('#beeldSheet').classList.remove('open');render();});g.appendChild(b);});}
+function bouwBlokkies(){const g=$('#blokkies');g.textContent='';BLOKTYPES.forEach(bt=>{const b=document.createElement('button');b.type='button';b.innerHTML=esc(bt.n)+'<span class="k">'+esc(bt.k)+'</span>';b.addEventListener('click',()=>{DESIGN.blokken.push(nieuwBlok(bt.t));$('#blokSheet').classList.remove('open');render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),40);});g.appendChild(b);});}
+function bouwSwatches(){const g=$('#swatches');g.textContent='';ACCENTEN.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='swatch'+(c===DESIGN.accent?' actief':'');b.style.background=c;b.title=c;b.addEventListener('click',()=>{DESIGN.accent=c;bouwSwatches();render();});g.appendChild(b);});}
+function zetBewerk(aan){BEWERK=aan;$('#bewerkKnop').textContent=aan?'Voorbeeld':'Bewerken';$('#bewerkKnop').classList.toggle('aan',!aan);render();}
+
+function lintBij(){
+  const l=$('#lint'); l.hidden=false;
+  const stip=$('#lintStip'); stip.classList.toggle('aan',!!DESIGN.online);
+  if(DESIGN.online && DESIGN.adres){
+    $('#lintTekst').innerHTML='Online op <span class="adres">'+esc(DESIGN.adres)+'.rtg</span> · <a href="/apps/browser.html?adres='+encodeURIComponent(DESIGN.adres)+'" target="_blank" rel="noopener">bekijk in de RTG-browser →</a>';
+  } else {
+    $('#lintTekst').textContent='Nog niet online. Klik op "Ga online" om je site een RTG-adres te geven.';
+  }
+  $('#onlineKnop').classList.toggle('online',!!DESIGN.online);
+  $('#onlineKnop').textContent=DESIGN.online?'Online-beheer':'Ga online';
+}
+
+async function bewaar(stil){
+  DESIGN.titel=$('#titel').value.trim()||'Mijn website';
+  try{ const d=await api('bewaar',{design:DESIGN}); DESIGN.id=d.design.id; DESIGN.adres=d.design.adres||''; DESIGN.online=!!d.design.online; if(!stil)meld('Bewaard.'); lintBij(); return true; }
+  catch(e){ meld(e.message); return false; }
+}
+async function openen(){
+  try{ const d=await api('mijn'); const l=$('#openlijst'); l.textContent='';
+    if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
+    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];$('#titel').value=DESIGN.titel;bouwSwatches();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
+    $('#openSheet').classList.add('open');
+  }catch(e){ meld(e.message); }
+}
+
+function onlineSheet(){
+  if(!DESIGN.id){ meld('Bewaar je site eerst.'); bewaar(true).then(()=>{ if(DESIGN.id) onlineSheet(); }); return; }
+  $('#adresIn').value=DESIGN.adres||'';
+  $('#offlineKnop').hidden=!DESIGN.online;
+  $('#onlineNoot').textContent=DESIGN.online?('Je site is online op '+DESIGN.adres+'.rtg'):'';
+  $('#onlineSheet').classList.add('open');
+}
+async function publiceer(){
+  const adres=$('#adresIn').value.trim();
+  try{ const r=await api('publiceer',{id:DESIGN.id,adres}); DESIGN.adres=r.adres; DESIGN.online=true; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je staat online op '+r.adres+'.rtg'); }
+  catch(e){ meld(e.message); }
+}
+async function offline(){
+  try{ await api('offline',{id:DESIGN.id}); DESIGN.online=false; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je site is uit de lucht gehaald.'); }
+  catch(e){ meld(e.message); }
+}
+
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-maker hoort bij je RTG-lidmaatschap. Open de leden-app en log in; kom dan hierheen terug.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; $('#lint').hidden=true; }
+else {
+  bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
+  $('#blokKnop').addEventListener('click',()=>$('#blokSheet').classList.add('open'));
+  $('#bewaarKnop').addEventListener('click',()=>bewaar());
+  $('#openKnop').addEventListener('click',openen);
+  $('#bewerkKnop').addEventListener('click',()=>zetBewerk(!BEWERK));
+  $('#onlineKnop').addEventListener('click',onlineSheet);
+  $('#publiceerKnop').addEventListener('click',publiceer);
+  $('#offlineKnop').addEventListener('click',offline);
+  $('#themaKnop').addEventListener('click',()=>{DESIGN.thema=DESIGN.thema==='donker'?'licht':'donker';$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';render();});
+  document.querySelectorAll('#apparaten button').forEach(b=>b.addEventListener('click',()=>zetApparaat(b.dataset.a)));
+  document.querySelectorAll('.sheet').forEach(sh=>sh.addEventListener('click',e=>{if(e.target===sh)sh.classList.remove('open');}));
+  zetApparaat('desktop'); lintBij();
+}
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

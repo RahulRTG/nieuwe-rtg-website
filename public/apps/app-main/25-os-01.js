@@ -42,6 +42,8 @@
     stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Clips',        url: '/apps/clips.html' },
     office:      { naam: 'RTG Office',   url: '/apps/office.html' },
+    sitemaker:   { naam: 'Website-maker', url: '/apps/sitemaker.html' },
+    browser:     { naam: 'RTG Browser',  url: '/apps/browser.html' },
     vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
     balans:      { naam: 'Balans',       url: '/apps/balans.html' },
     rechterhand: { naam: 'De Rechterhand', url: '/apps/lifestyle.html' },
@@ -104,6 +106,7 @@
     { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:rtgcode', 'link:office'] },
     { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:sport'] },
     { titel: 'Het huis & diensten', items: ['link:ontdek', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:labfonds', 'link:juridisch', 'link:passkeys', 'os:werk'] },
+    { titel: 'Onderneem: eigen website & het RTG-web', items: ['link:sitemaker', 'link:browser'] },
     { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],
       items: ['link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous'] }
   ];

@@ -47,6 +47,8 @@
     vrienden: '<path d="M4 6.6A2 2 0 0 1 6 4.6h9.5a2 2 0 0 1 2 2v4.6a2 2 0 0 1-2 2H8.6L4 16.8z"/>',
     entourage: '<circle cx="9" cy="8.8" r="3"/><path d="M3.6 18.6a5.4 5.4 0 0 1 10.8 0M16 6.4a3 3 0 0 1 0 5.8M15.6 18.6a5.4 5.4 0 0 0-.9-3"/>',
     office: '<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.6 14.5v3M12 11v6.5M15.4 8.5v9"/>',
+    sitemaker: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9h17M7 13h6.5M7 16h9"/>',
+    browser: '<circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.4 2.3 2.4 14.5 0 16.8M12 3.6c-2.4 2.3-2.4 14.5 0 16.8"/>',
     wbw: '<path d="M7 4h10l-1 16H8z"/><path d="M9.4 8h5.2M9.4 11h5.2M9.4 14h3.4"/>',
     passkeys: '<circle cx="8" cy="12" r="4"/><path d="M11.7 12H20l-1.8 1.8M15.5 12v2"/>',
     nalatenschap: '<circle cx="8" cy="12" r="4"/><path d="M11.7 12H20l-1.8 1.8M15.5 12v2"/>',

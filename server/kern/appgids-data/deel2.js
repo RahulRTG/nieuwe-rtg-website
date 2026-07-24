@@ -102,4 +102,10 @@ module.exports = {
   '/apps/websitestudio.html': G('De Website-studio van het Atelier: bouw met de muis een eigen RTG-sjabloon uit blokken, alsof het een sjabloon is.',
     ['Sleep blokken op hun plek: hero, koppen, tekst, beeld, kolommen, galerij', 'Klik in de tekst om te typen; kies een accentkleur en licht of donker', 'Bewaar het sjabloon, bekijk het als voorbeeld of exporteer het als losse pagina'],
     'Het is een eigen ontwerp in het Atelier, los van de echte site: hier kun je vrij spelen zonder iets aan de website te veranderen.'),
+  '/apps/sitemaker.html': G('De Website-maker: begin een eigen bedrijf en bouw met de muis je eigen website, klaar om online te gaan.',
+    ['Bouw je site uit blokken: klik en typ, kies beeld, accentkleur en licht of donker', 'Stel de telefoon-, tablet- en desktopversie apart in', 'Klik op Ga online: je site krijgt een RTG-adres (naam.rtg) en staat in de RTG-browser'],
+    'Voor beginnende ondernemers: van leeg doek tot online bedrijf, alles binnen het huis en op codenaam.'),
+  '/apps/browser.html': G('De RTG-browser: blader door het besloten web van het huis en bezoek de sites die leden hebben gebouwd.',
+    ['Typ een adres in de balk (bijv. jouwzaak.rtg) of kies een site op RTG Start', 'Ga terug en vooruit zoals in een echte browser', 'Elke site buigt mee met je vensterbreedte: telefoon, tablet of desktop'],
+    'Een eigen web binnen RTG: geen extern internet, alles op codenaam en tussen leden.'),
 };

@@ -158,6 +158,19 @@ test('de verbeterkamer loopt op verzoek een verse ronde', async () => {
   assert.ok(v.body.verbeterkamer.voorstellen.every(p => p.kamer && p.tekst), 'elk voorstel wijst een kamer aan');
 });
 
+test('Techniek-controlekamer: de motorkap-momentopname (grootboek, motor, De Wacht)', async () => {
+  const dicht = await fetch(base + '/api/office/techniek', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(dicht.status, 401, 'zonder inlog blijft de controlekamer dicht');
+  const t = await api('techniek');
+  assert.equal(t.status, 200);
+  assert.ok(t.body.grootboek && t.body.grootboek.pay, 'het pay-grootboek zit in het bord');
+  assert.equal(t.body.grootboek.pay.klopt, true, 'RTG Pay sluit op de cent');
+  assert.ok(t.body.motor, 'de motor-stand zit erin');
+  assert.equal(t.body.motor.aan, false, 'in schaduw draait de motor niet mee');
+  assert.ok(t.body.wacht && t.body.wacht.meters, 'het De Wacht-immuunbord zit erin');
+  assert.ok('lastafworp' in t.body.wacht, 'de lastafworp-stand (voor de gezondheidsband) is aanwezig');
+});
+
 test('Rahul denkt mee in een kamer: adviserend, uit de echte cijfers (zonder AI-sleutel)', async () => {
   const dicht = await fetch(base + '/api/office/kamer/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'hr' }) });
   assert.equal(dicht.status, 401, 'zonder inlog blijft de kamer-AI dicht');

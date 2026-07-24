@@ -43,6 +43,19 @@
     radial-gradient(85% 32% at 50% -4%, rgba(169,143,28,0.08), transparent 62%),
     radial-gradient(110% 45% at 50% 108%, rgba(194,58,94,0.05), transparent 60%),
     var(--bg);}
+  /* de gezondheidsband: alles-gecontroleerd op één oogopslag, boven de kamers.
+     Rustig -- een haarlijn met stille pillen; klikken opent de Techniek-kamer. */
+  .gezondband{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:1.2rem;
+    padding:.7rem 1rem;border:1px solid var(--line);border-radius:12px;
+    background:linear-gradient(155deg,#1B1815 0%,var(--card) 60%);cursor:pointer;
+    transition:border-color .13s, transform .13s;}
+  .gezondband:hover{border-color:color-mix(in srgb, var(--gold) 45%, transparent);transform:translateY(-1px);}
+  .gezondband .gb-titel{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;}
+  .gezondband .gb-pil{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .gezondband .gb-stip{width:.6rem;height:.6rem;border-radius:50%;flex-shrink:0;background:var(--soft);}
+  .gezondband .gb-stip.groen{background:var(--green);box-shadow:0 0 6px var(--green);}
+  .gezondband .gb-stip.oranje{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+  .gezondband .gb-meer{margin-left:auto;font-size:.72rem;color:var(--gold);font-weight:650;white-space:nowrap;}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-top:1.4rem;}
   .kamer{
     padding:1.1rem 1.2rem;cursor:pointer;border-radius:14px;
@@ -137,6 +150,7 @@
   <section id="vKamers" hidden>
     <h1>De kantoren</h1>
     <p class="deck">Elke afdeling een eigen kamer met de cijfers en werklijsten die er toe doen, plus het RTG Atelier: het ontwerpbureau van het kantoor. De boardroom ziet alles en kan alles schakelen. <a href="/apps/personeel.html?kantoor=1" style="color:var(--gold);">📟 Aanmelden voor je dienst (ook thuiswerken) via de personeels-app →</a></p>
+    <div id="gezondBand" hidden></div>
     <div class="grid" id="grid"></div>
   </section>
 
@@ -684,6 +698,33 @@ async function laadKamers(){
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
     b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'techniek' ? openTechniek() : b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
+  gezondBand();
+}
+
+/* De gezondheidsband boven de kamers: alles-gecontroleerd op een oogopslag,
+   getrokken uit dezelfde Techniek-momentopname (boardroom-territorium, dus
+   alleen voor de eigenaar; een office-inlog zonder boardroom krijgt 403 en
+   dan blijft de band gewoon weg). Klikken opent de Techniek-kamer. */
+async function gezondBand(){
+  const el = $('#gezondBand');
+  el.hidden = true;
+  let t; try { t = await api('techniek'); } catch (e) { return; }
+  const paySluit = t.grootboek && t.grootboek.pay && t.grootboek.pay.klopt;
+  const bankSluit = t.grootboek && t.grootboek.bank ? t.grootboek.bank.klopt : true;
+  const grootboekOk = paySluit && bankSluit;
+  const wacht = t.wacht || {};
+  const afwerpen = !!(wacht.lastafworp && wacht.lastafworp.actief);
+  const inQuarantaine = (wacht.quarantaine && wacht.quarantaine.length) || 0;
+  const wachtOk = !afwerpen && !inQuarantaine;
+  const motorAan = t.motor && t.motor.aan;
+  const pil = (ok, tekst) => '<span class="gb-pil"><span class="gb-stip '+(ok?'groen':'oranje')+'"></span>'+esc(tekst)+'</span>';
+  el.innerHTML = '<span class="gb-titel">De motorkap</span>' +
+    pil(grootboekOk, grootboekOk ? 'Grootboek sluit op de cent' : 'Grootboek: afwijking, kijk na') +
+    pil(wachtOk, afwerpen ? 'De Wacht: lastafworp actief' : (inQuarantaine ? 'De Wacht: '+inQuarantaine+' in quarantaine' : 'De Wacht: rustig')) +
+    pil(true, 'Motor: '+(motorAan ? 'cutover' : 'schaduw')) +
+    '<span class="gb-meer">Naar de controlekamer →</span>';
+  el.hidden = false;
+  el.onclick = () => openTechniek();
 }
 
 /* ---------- een kamer ---------- */

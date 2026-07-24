@@ -11,7 +11,7 @@ const G = (wat, doe, tip) => ({ wat, doe, tip });
 const GIDS = Object.assign({},
   require('./appgids-data/deel1'), require('./appgids-data/deel2'),
   require('./appgids-data/deel3'), require('./appgids-data/deel4'),
-  require('./appgids-data/deel5'));
+  require('./appgids-data/deel5'), require('./appgids-data/deel6'));
 
 
 // de terugvaluitleg: ook een onbekende of nieuwe pagina krijgt nette hulp

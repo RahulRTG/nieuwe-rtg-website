@@ -15,9 +15,26 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const PER_LID = 12;         // hoeveel sites een lid mag hebben
   const TOTAAL = 20000;       // harde bovengrens op de opslag
 
+  const FOTO_MAX = 24;        // hoeveel eigen foto's een lid in zijn bibliotheek houdt
   function store() {
     if (!db.data.ledenSites || !Array.isArray(db.data.ledenSites.lijst)) db.data.ledenSites = { lijst: [] };
+    if (!db.data.ledenSites.fotos || typeof db.data.ledenSites.fotos !== 'object') db.data.ledenSites.fotos = {};
     return db.data.ledenSites;
+  }
+  // De eigen fotobibliotheek van een lid: alleen veilige /media-verwijzingen (het
+  // scannen en opslaan gebeurt in de route, hier bewaren we alleen de url).
+  function fotos(key) { const s = store(); return Array.isArray(s.fotos[key]) ? s.fotos[key].slice() : []; }
+  function fotoBewaar(key, url) {
+    if (!/^\/media\/[A-Za-z0-9._-]+$/.test(String(url || ''))) return { error: 'Ongeldige foto.', status: 400 };
+    const s = store(); const lijst = Array.isArray(s.fotos[key]) ? s.fotos[key] : (s.fotos[key] = []);
+    if (!lijst.includes(url)) lijst.unshift(url);
+    if (lijst.length > FOTO_MAX) lijst.length = FOTO_MAX;
+    save();
+    return { ok: true, url, fotos: lijst.slice() };
+  }
+  function fotoWeg(key, url) {
+    const s = store(); if (Array.isArray(s.fotos[key])) s.fotos[key] = s.fotos[key].filter(u => u !== url); save();
+    return { ok: true, fotos: fotos(key) };
   }
   function slug(v) {
     return String(v == null ? '' : v).toLowerCase().trim()
@@ -159,5 +176,5 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return { ok: true, site: publiek(d) };
   }
 
-  return { mijn, haal, bewaar, verwijder, publiceer, offline, gids, open, TYPES };
+  return { mijn, haal, bewaar, verwijder, publiceer, offline, gids, open, fotos, fotoBewaar, fotoWeg, TYPES };
 };

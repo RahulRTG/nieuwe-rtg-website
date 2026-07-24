@@ -138,7 +138,12 @@
   <div class="blokkies" id="blokkies"></div>
 </div></div>
 <div class="sheet" id="beeldSheet"><div class="box">
-  <h2>Kies beeld</h2><div class="sub">Eigen RTG-campagnebeeld (quiet luxury). Geen stockfoto's.</div>
+  <h2>Kies beeld</h2><div class="sub">Kies een eigen RTG-campagnebeeld of upload je eigen foto (na een virusscan).</div>
+  <div class="rij" style="gap:.5rem;margin:.2rem 0 .8rem;align-items:center;">
+    <button class="knop prim" id="uploadKnop" type="button">Upload eigen foto</button>
+    <input type="file" id="fotoIn" accept="image/*" hidden>
+    <span class="sub" id="uploadStatus" style="margin:0;"></span>
+  </div>
   <div class="beeldgrid" id="beeldgrid"></div>
 </div></div>
 <div class="sheet" id="openSheet"><div class="box">
@@ -324,7 +329,15 @@ function verwijder(blok){
 }
 
 function kiesBeeld(doel){beeldDoel=doel;$('#beeldSheet').classList.add('open');}
-function bouwBeeldgrid(){const g=$('#beeldgrid');g.textContent='';BEELDEN.forEach(src=>{const b=document.createElement('button');b.type='button';const im=document.createElement('img');im.src=src;im.alt='';b.appendChild(im);b.addEventListener('click',()=>{if(!beeldDoel)return;if(beeldDoel.veld)beeldDoel.blok[beeldDoel.veld]=src;else if(beeldDoel.index!=null)beeldDoel.blok.beelden[beeldDoel.index]=src;$('#beeldSheet').classList.remove('open');render();});g.appendChild(b);});}
+let MIJNFOTOS=[];
+function kiesSrc(src){ if(!beeldDoel)return; if(beeldDoel.veld)beeldDoel.blok[beeldDoel.veld]=src; else if(beeldDoel.index!=null)beeldDoel.blok.beelden[beeldDoel.index]=src; $('#beeldSheet').classList.remove('open'); render(); }
+function bouwBeeldgrid(){
+  const g=$('#beeldgrid');g.textContent='';
+  // eigen geüploade foto's eerst, daarna het RTG-campagnebeeld
+  MIJNFOTOS.concat(BEELDEN).forEach(src=>{const b=document.createElement('button');b.type='button';const im=document.createElement('img');im.src=src;im.alt='';b.appendChild(im);b.addEventListener('click',()=>kiesSrc(src));g.appendChild(b);});
+}
+async function laadMijnFotos(){ try{ const r=await api('fotos',{}); MIJNFOTOS=(r.fotos||[]); }catch(e){} }
+function leesBestand(file){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>rej(new Error('lezen mislukt')); fr.readAsDataURL(file); }); }
 function bouwBlokkies(){const g=$('#blokkies');g.textContent='';BLOKTYPES.forEach(bt=>{const b=document.createElement('button');b.type='button';b.innerHTML=esc(bt.n)+'<span class="k">'+esc(bt.k)+'</span>';b.addEventListener('click',()=>{const nb=nieuwBlok(bt.t);DESIGN.blokken.push(nb);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>DESIGN.volgorde[k].push(nb.id));$('#blokSheet').classList.remove('open');render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),40);});g.appendChild(b);});}
 function bouwSwatches(){const g=$('#swatches');g.textContent='';ACCENTEN.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='swatch'+(c===DESIGN.accent?' actief':'');b.style.background=c;b.title=c;b.addEventListener('click',()=>{DESIGN.accent=c;bouwSwatches();render();});g.appendChild(b);});}
 function zetBewerk(aan){BEWERK=aan;$('#bewerkKnop').textContent=aan?'Voorbeeld':'Bewerken';$('#bewerkKnop').classList.toggle('aan',!aan);render();}
@@ -374,6 +387,15 @@ async function offline(){
 if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-maker hoort bij je RTG-lidmaatschap. Open de leden-app en log in; kom dan hierheen terug.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; $('#lint').hidden=true; }
 else {
   bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
+  laadMijnFotos().then(bouwBeeldgrid);
+  $('#uploadKnop').addEventListener('click',()=>$('#fotoIn').click());
+  $('#fotoIn').addEventListener('change',async e=>{
+    const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f)return;
+    if(f.size>2.2*1024*1024){ $('#uploadStatus').textContent='Te groot (max ~2 MB).'; return; }
+    $('#uploadStatus').textContent='Scannen en opslaan…';
+    try{ const dataUrl=await leesBestand(f); const r=await api('foto',{dataUrl}); MIJNFOTOS=r.fotos||MIJNFOTOS; bouwBeeldgrid(); $('#uploadStatus').textContent='Toegevoegd. Klik de foto om hem te plaatsen.'; }
+    catch(err){ $('#uploadStatus').textContent=err.message||'Uploaden mislukt.'; }
+  });
   $('#blokKnop').addEventListener('click',()=>$('#blokSheet').classList.add('open'));
   $('#bewaarKnop').addEventListener('click',()=>bewaar());
   $('#openKnop').addEventListener('click',openen);

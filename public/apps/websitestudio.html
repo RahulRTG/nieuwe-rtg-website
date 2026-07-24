@@ -31,36 +31,47 @@
   .swatches{display:flex;gap:.35rem;align-items:center;}
   .swatch{width:1.35rem;height:1.35rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
   .swatch.actief{border-color:#fff;}
-  /* het doek (de website die je bouwt) */
+  /* toestelkiezer: telefoon / tablet / desktop -- schaalt het doek naar die versie */
+  .apparaten{display:flex;gap:.15rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.15rem;}
+  .apparaten button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:.72rem;font-weight:600;padding:.3rem .55rem;border-radius:7px;cursor:pointer;white-space:nowrap;}
+  .apparaten button.aan{background:var(--bg);color:var(--gold);}
+  /* het doek (de website die je bouwt) -- een container, zodat de blokken
+     meebuigen met de DOEK-breedte (de gekozen versie), niet met het venster */
   main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;}
-  .doek{width:100%;max-width:1080px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);}
+  .doek{width:100%;max-width:1080px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);container-type:inline-size;transition:max-width .28s ease;}
+  .doek.mobielkader{border-radius:30px;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
   /* thema-tokens op het doek zelf */
   .doek[data-thema="donker"]{ --dbg:#0C0C0B; --dtxt:#F4F1EC; --dmut:rgba(244,241,236,.66); --dline:rgba(255,255,255,.12); --dcard:#151312; }
   .doek[data-thema="licht"]{ --dbg:#F5F1EA; --dtxt:#20160F; --dmut:rgba(32,22,15,.66); --dline:rgba(32,22,15,.14); --dcard:#FBF8F2; }
   .doek{background:var(--dbg);color:var(--dtxt);font-family:'Inter',system-ui,sans-serif;}
   .blok{position:relative;}
   .blok h1,.blok h2,.blok h3{font-family:'Bodoni Moda',serif;font-weight:500;color:var(--dtxt);line-height:1.1;}
-  .b-hero{padding:clamp(2.4rem,7vw,5rem) clamp(1.4rem,5vw,3.4rem);text-align:center;background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 22%,var(--dbg)),var(--dbg));}
-  .b-hero h1{font-size:clamp(1.9rem,5vw,3.4rem);}
-  .b-hero .sub{color:var(--dmut);font-size:clamp(1rem,2vw,1.2rem);margin:.9rem auto 0;max-width:44ch;line-height:1.6;}
+  .b-hero{padding:clamp(2.4rem,7cqw,5rem) clamp(1.4rem,5cqw,3.4rem);text-align:center;background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 22%,var(--dbg)),var(--dbg));}
+  .b-hero h1{font-size:clamp(1.9rem,5cqw,3.4rem);}
+  .b-hero .sub{color:var(--dmut);font-size:clamp(1rem,2cqw,1.2rem);margin:.9rem auto 0;max-width:44ch;line-height:1.6;}
   .b-knop{display:inline-block;margin-top:1.4rem;background:var(--acc);color:#fff;border-radius:999px;padding:.7rem 1.5rem;font-weight:600;font-size:.95rem;text-decoration:none;border:0;cursor:inherit;}
-  .b-kop{padding:1.6rem clamp(1.4rem,5vw,3.4rem) .3rem;}
-  .b-kop h2{font-size:clamp(1.4rem,3vw,2rem);}
-  .b-tekst{padding:.6rem clamp(1.4rem,5vw,3.4rem);color:var(--dmut);font-size:1rem;line-height:1.7;max-width:62ch;}
-  .b-knoprij{padding:1rem clamp(1.4rem,5vw,3.4rem);}
-  .b-beeld{padding:1rem clamp(1.4rem,5vw,3.4rem);}
+  .b-kop{padding:1.6rem clamp(1.4rem,5cqw,3.4rem) .3rem;}
+  .b-kop h2{font-size:clamp(1.4rem,3cqw,2rem);}
+  .b-tekst{padding:.6rem clamp(1.4rem,5cqw,3.4rem);color:var(--dmut);font-size:1rem;line-height:1.7;max-width:62ch;}
+  .b-knoprij{padding:1rem clamp(1.4rem,5cqw,3.4rem);}
+  .b-beeld{padding:1rem clamp(1.4rem,5cqw,3.4rem);}
   .b-beeld img{width:100%;border-radius:12px;display:block;}
   .b-beeld .bij{font-size:.78rem;color:var(--dmut);margin-top:.4rem;text-align:center;}
-  .b-kol{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;padding:1.2rem clamp(1.4rem,5vw,3.4rem);}
+  .b-kol{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;padding:1.2rem clamp(1.4rem,5cqw,3.4rem);}
   .b-kol h3{font-size:1.15rem;margin-bottom:.4rem;}
   .b-kol .kt{color:var(--dmut);line-height:1.6;font-size:.95rem;}
-  .b-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem;padding:1.2rem clamp(1.4rem,5vw,3.4rem);}
+  .b-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem;padding:1.2rem clamp(1.4rem,5cqw,3.4rem);}
   .b-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block;}
-  .b-citaat{padding:2rem clamp(1.4rem,5vw,3.4rem);text-align:center;}
-  .b-citaat .q{font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,3vw,1.9rem);line-height:1.35;color:var(--dtxt);}
+  .b-citaat{padding:2rem clamp(1.4rem,5cqw,3.4rem);text-align:center;}
+  .b-citaat .q{font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,3cqw,1.9rem);line-height:1.35;color:var(--dtxt);}
   .b-citaat .bron{color:var(--acc);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.8rem;}
-  .b-voet{padding:1.6rem clamp(1.4rem,5vw,3.4rem);border-top:1px solid var(--dline);color:var(--dmut);font-size:.82rem;text-align:center;}
-  @media(max-width:640px){ .b-kol{grid-template-columns:1fr;} }
+  .b-voet{padding:1.6rem clamp(1.4rem,5cqw,3.4rem);border-top:1px solid var(--dline);color:var(--dmut);font-size:.82rem;text-align:center;}
+  /* de versies buigen mee met de doek-breedte (container), niet met het venster */
+  @container (max-width:640px){ .b-kol{grid-template-columns:1fr;} .b-gal{grid-template-columns:repeat(auto-fill,minmax(46%,1fr));} }
+  /* per versie verbergen: geldt in het voorbeeld en in de export, niet tijdens bewerken */
+  @container (max-width:640px){ .doek:not(.bewerk) .v-weg-telefoon{display:none!important;} }
+  @container (min-width:641px) and (max-width:1000px){ .doek:not(.bewerk) .v-weg-tablet{display:none!important;} }
+  @container (min-width:1001px){ .doek:not(.bewerk) .v-weg-desktop{display:none!important;} }
   /* bewerk-affordances (alleen in bewerk-modus) */
   .bewerk .blok{outline:1px dashed transparent;transition:outline-color .15s;}
   .bewerk .blok:hover{outline-color:color-mix(in srgb,var(--gold) 55%,transparent);}
@@ -71,9 +82,14 @@
   .bewerk .blok:hover>.bwbalk{display:flex;}
   .bwbalk button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center;}
   .bwbalk button:hover{border-color:var(--gold);}
+  .bwbalk button.aan{border-color:var(--gold);color:var(--gold);}
+  .bwbalk button svg{display:block;}
   .bwbalk .weg:hover{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .grip{cursor:grab;}
   .blok.sleep{opacity:.5;}
+  /* blok dat op de HUIDIGE versie verborgen is: tijdens bewerken vaag met een label */
+  .bewerk .blok.dim{opacity:.4;}
+  .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--gold);font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
   .leegdoek{padding:4rem 1.4rem;text-align:center;color:var(--dmut);}
   /* sheets */
   .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:40;padding:1.2rem;}
@@ -105,6 +121,11 @@
   <input class="titelin" id="titel" maxlength="80" placeholder="Naam van je sjabloon" aria-label="Naam van het sjabloon">
   <div class="swatches" id="swatches" aria-label="Accentkleur"></div>
   <button class="knop" id="themaKnop" title="Licht of donker">Donker</button>
+  <div class="apparaten" id="apparaten" role="group" aria-label="Versie per toestel">
+    <button type="button" data-a="telefoon">Telefoon</button>
+    <button type="button" data-a="tablet">Tablet</button>
+    <button type="button" data-a="desktop">Desktop</button>
+  </div>
   <span class="sp"></span>
   <button class="knop" id="blokKnop">+ Blok</button>
   <button class="knop" id="bewerkKnop">Voorbeeld</button>
@@ -165,6 +186,15 @@ let DESIGN={id:null,titel:'',thema:'donker',accent:'#7F1634',blokken:[nieuwBlok(
 let BEWERK=true;
 let beeldDoel=null; // {blok, veld} of {blok, index} bij galerij
 
+// de versies: welke doek-breedte hoort bij welk toestel
+const APPARATEN=[{k:'telefoon',n:'telefoon',w:390},{k:'tablet',n:'tablet',w:768},{k:'desktop',n:'desktop',w:1080}];
+let APPARAAT='desktop';
+function devNaam(k){const d=APPARATEN.find(x=>x.k===k);return d?d.n:k;}
+// de oog-glyfen (SVG, geen emoji): tonen / verbergen op de gekozen versie
+const OOG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const OOG_UIT='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.1 3.9M6.1 6.1A17 17 0 0 0 2 12s3.5 7 10 7a10.9 10.9 0 0 0 3.9-.7"/></svg>';
+function toggleZicht(i){const b=DESIGN.blokken[i];const set=new Set(b.verberg||[]);if(set.has(APPARAAT))set.delete(APPARAAT);else set.add(APPARAAT);b.verberg=[...set];render();}
+
 function veld(waarde,zetter,meer){
   const el=document.createElement(meer?'div':'span');
   el.textContent=waarde||'';
@@ -180,6 +210,11 @@ function balk(i){
   b.appendChild(mk('↑','',()=>verplaats(i,-1),'Omhoog'));
   b.appendChild(mk('↓','',()=>verplaats(i,1),'Omlaag'));
   b.appendChild(mk('⧉','',()=>dupliceer(i),'Dupliceren'));
+  // tonen/verbergen op de huidige versie (telefoon/tablet/desktop)
+  const verborgen=(DESIGN.blokken[i].verberg||[]).includes(APPARAAT);
+  const z=document.createElement('button'); z.type='button'; z.innerHTML=verborgen?OOG_UIT:OOG;
+  if(verborgen)z.className='aan'; z.title=(verborgen?'Weer tonen op ':'Verbergen op ')+devNaam(APPARAAT);
+  z.addEventListener('click',ev=>{ev.stopPropagation();toggleZicht(i);}); b.appendChild(z);
   b.appendChild(mk('×','weg',()=>verwijder(i),'Verwijderen'));
   return b;
 }
@@ -211,15 +246,21 @@ function renderBlok(blok,i){
   } else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px';
   } else if(t==='voettekst'){ s.classList.add('b-voet'); s.appendChild(veld(blok.tekst,v=>blok.tekst=v));
   }
+  // per versie verbergen: klassen die het voorbeeld/de export laten reageren
+  (blok.verberg||[]).forEach(d=>s.classList.add('v-weg-'+d));
+  // tijdens bewerken: op de huidige versie verborgen blokken vaag met een label
+  if(BEWERK && (blok.verberg||[]).includes(APPARAAT)){ s.classList.add('dim'); const lb=document.createElement('div'); lb.className='vlabel'; lb.textContent='Verborgen op '+devNaam(APPARAAT); s.appendChild(lb); }
   if(BEWERK) s.appendChild(balk(i));
   return s;
 }
 function render(){
   const doek=$('#doek'); doek.dataset.thema=DESIGN.thema; doek.style.setProperty('--acc',DESIGN.accent);
-  doek.className='doek'+(BEWERK?' bewerk':''); doek.textContent='';
+  const dev=APPARATEN.find(d=>d.k===APPARAAT)||APPARATEN[2]; doek.style.maxWidth=dev.w+'px';
+  doek.className='doek'+(BEWERK?' bewerk':'')+(APPARAAT!=='desktop'?' mobielkader':''); doek.textContent='';
   if(!DESIGN.blokken.length){ const l=document.createElement('div'); l.className='leegdoek'; l.textContent='Leeg doek. Klik op "+ Blok" om te beginnen.'; doek.appendChild(l); return; }
   DESIGN.blokken.forEach((b,i)=>doek.appendChild(renderBlok(b,i)));
 }
+function zetApparaat(k){ APPARAAT=k; document.querySelectorAll('#apparaten button').forEach(b=>b.classList.toggle('aan',b.dataset.a===k)); render(); }
 function verplaats(i,d){const j=i+d;if(j<0||j>=DESIGN.blokken.length)return;const a=DESIGN.blokken;[a[i],a[j]]=[a[j],a[i]];render();}
 function herorden(van,naar){const a=DESIGN.blokken;const [x]=a.splice(van,1);a.splice(naar,0,x);render();}
 function dupliceer(i){const kopie=JSON.parse(JSON.stringify(DESIGN.blokken[i]));kopie.id='b'+Math.random().toString(36).slice(2,8);DESIGN.blokken.splice(i+1,0,kopie);render();}
@@ -266,8 +307,11 @@ else {
   $('#exportKnop').addEventListener('click',exporteer);
   $('#bewerkKnop').addEventListener('click',()=>zetBewerk(!BEWERK));
   $('#themaKnop').addEventListener('click',()=>{DESIGN.thema=DESIGN.thema==='donker'?'licht':'donker';$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';render();});
+  document.querySelectorAll('#apparaten button').forEach(b=>b.addEventListener('click',()=>zetApparaat(b.dataset.a)));
   document.querySelectorAll('.sheet').forEach(sh=>sh.addEventListener('click',e=>{if(e.target===sh)sh.classList.remove('open');}));
-  render();
+  // eventueel meteen in een gekozen versie openen (?versie=telefoon/tablet/desktop)
+  const wens=new URLSearchParams(location.search).get('versie');
+  zetApparaat(APPARATEN.some(d=>d.k===wens)?wens:'desktop');
 }
 </script>
 <script src="/shared/basis.js" defer></script>

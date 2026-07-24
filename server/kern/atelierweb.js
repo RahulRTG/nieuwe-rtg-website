@@ -12,6 +12,7 @@
 module.exports = ({ db, save, crypto, schoon }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst'];
+  const VERSIES = ['telefoon', 'tablet', 'desktop']; // op welke versies een blok verborgen mag zijn
 
   function store() {
     if (!db.data.atelierSites || !Array.isArray(db.data.atelierSites.lijst)) db.data.atelierSites = { lijst: [] };
@@ -33,6 +34,11 @@ module.exports = ({ db, save, crypto, schoon }) => {
     else if (t === 'citaat') { o.tekst = T(b.tekst, 600); o.bron = T(b.bron, 80); }
     else if (t === 'ruimte') { o.hoogte = Math.max(8, Math.min(240, Number(b.hoogte) || 40)); }
     else if (t === 'voettekst') { o.tekst = T(b.tekst, 400); }
+    // op welke versies (telefoon/tablet/desktop) dit blok verborgen is
+    if (Array.isArray(b.verberg)) {
+      const v = b.verberg.filter(x => VERSIES.includes(x));
+      if (v.length) o.verberg = [...new Set(v)];
+    }
     return o;
   }
 

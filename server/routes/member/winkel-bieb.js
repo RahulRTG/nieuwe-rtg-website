@@ -47,8 +47,9 @@ module.exports = (kern) => {
     res.json(r);
   });
 
-  /* ---- de App-Bibliotheek: 20.000 professionele apps. Bladeren is voor
-     iedereen zichtbaar; installeren is het pas-voordeel van betalende leden. ---- */
+  /* ---- de App-Bibliotheek: de echte RTG-apps van het ecosysteem. Bladeren is
+     voor iedereen zichtbaar; op je startscherm zetten is het pas-voordeel van
+     betalende leden. ---- */
   app.post('/api/mall/apps', auth, (req, res) => res.json(appbieb.overzicht()));
   // bladeren en zoeken (gepagineerd; de catalogus wordt ter plekke samengesteld)
   app.post('/api/mall/apps/catalogus', auth, (req, res) => res.json(appbieb.catalogus(req.body || {})));

@@ -52,8 +52,9 @@ test('1. een uitgewerkte App Store-opdracht wordt live gezet en is bij leden zic
   assert.equal(na.body.items[0].naam, 'RTG Reisdagboek Live');
   assert.equal(na.body.items[0].ledenprijsCenten, 0, 'voor leden inbegrepen');
   // en het telt mee in het overzicht als eigen categorie
+  const { APPS } = require('../server/kern/appbieb');
   const ov = await api(base, '/api/mall/apps', {}, lid);
-  assert.equal(ov.body.totaal, 20001);
+  assert.equal(ov.body.totaal, APPS.length + 1, 'de echte catalogus plus de gepubliceerde app');
   assert.ok(ov.body.categorieen.find(c => c.id === 'werkplaats'), 'de Werkplaats-plank staat in het overzicht');
 });
 

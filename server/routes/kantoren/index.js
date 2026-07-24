@@ -14,6 +14,11 @@ module.exports = (kern) => {
   app.post('/api/office/kamer', officeAuth, (req, res) => veilig(res, () => afdelingen.kamer(String(req.body.id || ''))));
   app.post('/api/office/kamer/taak', officeAuth, (req, res) => veilig(res, () => afdelingen.taakMaak(String(req.body.id || ''), req.body.tekst)));
   app.post('/api/office/kamer/taak-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.taakZet(String(req.body.id || ''), String(req.body.taakId || ''), req.body.af)));
+  // Rahul denkt mee in deze kamer: adviserend, uit de echte cijfers van de kamer
+  app.post('/api/office/kamer/ai', officeAuth, async (req, res) => {
+    try { const r = await afdelingen.kamerAdvies(String(req.body.id || ''), req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Rahul kon nu even niet meedenken.' }); }
+  });
 
   /* De identiteitskluis-inzage: kamers met naamInzage (en de boardroom)
      vragen de echte naam bij een codenaam op; elke opvraging komt in het

@@ -165,6 +165,15 @@
         <button class="knop stil" id="kMaak">+</button>
       </div>
     </div>
+    <div class="kaart" id="kRahul">
+      <h4 style="margin:0 0 .4rem;">Rahul denkt mee</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Rahul kijkt naar de echte cijfers van deze kamer -- de KPI's, de werklijsten, de open taken en de signalen uit de dagronde -- en zegt waar hij als eerste naar zou kijken. Hij adviseert; u beslist. Stel gerust een eigen vraag.</p>
+      <div class="taakrij">
+        <input class="veld" id="kRahulVraag" style="flex:1;" placeholder="Bijv. waar liggen vandaag de risico's in deze kamer?" maxlength="300">
+        <button class="knop" id="kRahulVraagKnop" type="button">Vraag Rahul</button>
+      </div>
+      <div class="stil" id="kRahulUit" style="font-size:.84rem;line-height:1.65;margin-top:.7rem;" aria-live="polite"></div>
+    </div>
     <div class="kaart" id="kKluis" hidden>
       <h4 style="margin:0 0 .4rem;">🔐 De identiteitskluis</h4>
       <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Deze kamer mag de echte naam bij een codenaam opvragen, omdat het werk erom vraagt. Elke opvraging komt in het auditlog van de boardroom, ook zonder treffer.</p>
@@ -692,6 +701,9 @@ async function openKamer(id){
   $('#kLijsten').innerHTML = d.lijsten.map(l =>
     '<div class="kaart lijst"><h4>'+esc(l.titel)+'</h4>'+(l.items.length ? '<ul>'+l.items.map(i => '<li>'+esc(i)+'</li>').join('')+'</ul>' : '<div class="leeg">Niets openstaand.</div>')+'</div>').join('');
   tekenTaken(d.taken);
+  // Rahul denkt mee in deze kamer -- schoon starten bij elke kamer
+  $('#kRahulUit').textContent = '';
+  $('#kRahulVraag').value = '';
   // de identiteitskluis alleen voor kamers die klanten bij naam moeten kennen
   $('#kKluis').hidden = !d.naamInzage;
   $('#kKluisUit').textContent = '';
@@ -783,6 +795,21 @@ $('#kMaak').addEventListener('click', async () => {
   try { await api('kamer/taak', { id: KAMER, tekst: $('#kNieuw').value }); $('#kNieuw').value = ''; openKamer(KAMER); } catch (e) { meld(e.message); }
 });
 $('#kNieuw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#kMaak').click(); });
+/* Rahul denkt mee in deze kamer: hij leest de echte cijfers en adviseert. */
+async function vraagRahulKamer(){
+  if (!KAMER) return;
+  const uit = $('#kRahulUit'), knop = $('#kRahulVraagKnop');
+  knop.disabled = true; uit.textContent = 'Rahul kijkt naar de kamer...';
+  try {
+    const r = await api('kamer/ai', { id: KAMER, q: $('#kRahulVraag').value });
+    let html = '<div style="white-space:pre-wrap;">'+esc(r.antwoord)+'</div>';
+    if (r.punten && r.punten.length) html += '<div style="margin-top:.6rem;color:var(--soft);font-size:.78rem;line-height:1.6;"><b>Uit de cijfers:</b><br>'+r.punten.map(esc).join('<br>')+'</div>';
+    uit.innerHTML = html;
+  } catch (e) { uit.textContent = e.message; }
+  knop.disabled = false;
+}
+$('#kRahulVraagKnop').addEventListener('click', vraagRahulKamer);
+$('#kRahulVraag').addEventListener('keydown', e => { if (e.key === 'Enter') vraagRahulKamer(); });
 $('#kTerug').addEventListener('click', laadKamers);
 $('#bTerug').addEventListener('click', laadKamers);
 $('#pTerug').addEventListener('click', laadKamers);

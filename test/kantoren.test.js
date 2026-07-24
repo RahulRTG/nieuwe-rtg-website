@@ -157,3 +157,14 @@ test('de verbeterkamer loopt op verzoek een verse ronde', async () => {
   assert.ok(v.body.verbeterkamer.voorstellen.length >= 1);
   assert.ok(v.body.verbeterkamer.voorstellen.every(p => p.kamer && p.tekst), 'elk voorstel wijst een kamer aan');
 });
+
+test('Rahul denkt mee in een kamer: adviserend, uit de echte cijfers (zonder AI-sleutel)', async () => {
+  const dicht = await fetch(base + '/api/office/kamer/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'hr' }) });
+  assert.equal(dicht.status, 401, 'zonder inlog blijft de kamer-AI dicht');
+  const r = await api('kamer/ai', { id: 'hr', q: 'Waar liggen de risico\'s?' });
+  assert.equal(r.status, 200);
+  assert.match(r.body.kamer, /HR|Human|Mensen|Personeel/i);
+  assert.ok(typeof r.body.antwoord === 'string' && r.body.antwoord.length > 0, 'er komt een advies terug');
+  assert.ok(Array.isArray(r.body.punten) && r.body.punten.length >= 1, 'de punten uit de cijfers zitten erbij');
+  assert.equal((await api('kamer/ai', { id: 'kelder' })).status, 404, 'een niet-bestaande kamer geeft 404');
+});

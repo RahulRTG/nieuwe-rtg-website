@@ -21,8 +21,10 @@ router.post('/gezin/maak', async (req, res) => {
   const pid = rid(4);
   const profiel = { id: pid, naam: beheerder, rol: 'beheerder', avatar: schoonAvatar(req.body.avatar) || '👑',
     kleur: schoonKleur(req.body.kleur), pin: await hashPin(req.body.pin), groep: schoonGroep(req.body.groep) || 'volw', token: rid(24), at: nu() };
+  ensureCodenaam(profiel); // de beheerder krijgt meteen een codenaam (o.a. voor RTMAIL)
   const g = { id: rid(4), code, naam, at: nu(), profielen: { [pid]: profiel }, berichten: [] };
   G()[code] = g; save();
+  try { gctx.welkomRtf(profiel.codenaam); } catch (e) {} // welkom-draaiboek: RTMAIL
   res.json({ code, token: profiel.token, profiel: pubProfiel(profiel), gezin: pubGezin(g) });
 });
 
@@ -67,7 +69,9 @@ router.post('/gezin/profiel/maak', async (req, res) => {
   const p = { id: rid(4), naam, rol, avatar: schoonAvatar(req.body.avatar), kleur: schoonKleur(req.body.kleur), token: rid(24), at: nu() };
   const g0 = schoonGroep(req.body.groep); if (g0) p.groep = g0;
   if (req.body.pin) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers, of laat hem leeg.' }); p.pin = await hashPin(req.body.pin); }
+  ensureCodenaam(p); // codenaam voor het nieuwe profiel (o.a. voor RTMAIL)
   g.profielen[p.id] = p; save();
+  try { gctx.welkomRtf(p.codenaam); } catch (e) {} // welkom-draaiboek: RTMAIL
   res.json({ profiel: pubProfiel(p) });
 });
 

@@ -940,6 +940,8 @@ wacht = require('./kern/wacht')({ db, save, beveilig, lees: schild.signalen });
 const rtmail = require('./kern/rtmail')({ db, save, crypto });
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
 const automatisering = require('./kern/automatisering')({ rtmail });
+// het welkom-draaiboek ook voor nieuwe RTF-profielen (foundation, eigen router)
+try { rtf.setAutomatisering(automatisering); } catch (e) {}
 {
   const t = setInterval(() => { try { wacht.meet(); } catch (e) {} }, 10000);
   if (t.unref) t.unref();

@@ -60,6 +60,13 @@ const { gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht,
   kanaalInfo, setPushHook, bezorgAanGasten, berichtVanGast } = require('./foundation/gasten')(ctx);
 require('./foundation/berichten')(ctx);
 gctx.bezorgAanGasten = bezorgAanGasten; // late binding voor de gezinsberichten
+gctx.welkomRtf = () => {}; // late binding: het welkom-draaiboek (RTMAIL) komt via setAutomatisering
+/* De server bindt hier het welkom-draaiboek in: elk nieuw RTF-profiel krijgt
+   een welkom in zijn eigen RTMAIL-postvak (op codenaam). Los te laten (blijft
+   de lege functie hierboven) als de automatisering niet meedraait. */
+function setAutomatisering(a) {
+  gctx.welkomRtf = (codenaam) => { try { if (a && codenaam) a.welkomLid({ codename: codenaam, wereld: 'RTF' }); } catch (e) {} };
+}
 /* ---------- sollicitaties + marktplaats: eigen modules op de context ----------
    De gezins-helpers gaan op de context; de submodules registreren hun routes
    op dezelfde router en geven hun publieke functies terug. */
@@ -72,4 +79,4 @@ router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F()
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
 require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto });
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr };

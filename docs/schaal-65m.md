@@ -61,6 +61,17 @@ extensie niet (geen rechten), dan valt alleen het deelzoeken terug op een scan
 en werkt de rest gewoon door. De trigram-index kost extra opslag (~15 byte/lid),
 vandaar de bandbreedte 165–180 byte/lid hierboven.
 
+**Bewust overslaan op een krappe schijf (`MEGA_TRGM=0`).** De trigram-gin is
+de duurste index qua opslag én bouwtijd. Op een schaal-run met beperkte schijf
+(bijv. de 100M-beproeving in een sandbox met ~24 GB vrij) kun je hem overslaan
+met `MEGA_TRGM=0`: de btree op `codename_lower` blijft dan de
+exacte-opzoek/buiten-RAM-belofte op 100M bewijzen (de betaal-/Tik-weg is
+razendsnel), alleen het fuzzy deelzoeken valt terug op een scan. Dit is een
+bewuste, verdedigbare afweging voor de meting; **in productie hoort de
+trigram-index er wél te zijn** zodra fuzzy zoeken op die schaal een echte eis
+is. De grens ligt bij ongeveer 100M rijen + btree ≈ 12–16 GB (past); met
+trigram erbij ≈ 22–25 GB (paste niet binnen de sandbox-schijf).
+
 ## Waarom "Leden in de gids" nu de O(1)-teller gebruikt
 
 De kantoor- en afdelingen-KPI's telden het ledental met

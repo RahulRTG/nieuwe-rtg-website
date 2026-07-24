@@ -109,6 +109,9 @@ module.exports = (ctx) => {
     try { const r = await kern.werkplaats.aiKritiek(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
     catch (e) { console.error('[werkplaats]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+  // rechtstreeks uitgeven: de opdracht als echt onderdeel in de winkel zetten of intrekken
+  app.post('/api/office/werkplaats/publiceer', officeAuth, (req, res) => veilig(res, () => kern.werkplaats.publiceer(String(req.body.id || ''))));
+  app.post('/api/office/werkplaats/introk', officeAuth, (req, res) => veilig(res, () => kern.werkplaats.introk(String(req.body.id || ''))));
 
   // het persbureau (RTG Redactie) staat apart, in ./redactie.js
   require('./redactie')(ctx);

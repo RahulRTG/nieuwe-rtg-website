@@ -39,7 +39,8 @@ function maakWerkplaats({ db, save, crypto, anthropic, schoon }) {
       id: o.id, soort: o.soort, soortLabel: SOORTEN[o.soort] || o.soort,
       doelSoort: o.doelSoort || null, doelSoortLabel: o.doelSoort ? DOELSOORT[o.doelSoort] : null,
       doel: o.doel || null, naam: o.naam, brief: o.brief, status: o.status,
-      plan: o.plan || null, kritiek: o.kritiek || null, at: o.at, updatedAt: o.updatedAt || o.at, door: o.door || null
+      plan: o.plan || null, kritiek: o.kritiek || null, uitgifte: o.uitgifte || null,
+      at: o.at, updatedAt: o.updatedAt || o.at, door: o.door || null
     };
   }
 
@@ -134,6 +135,50 @@ function maakWerkplaats({ db, save, crypto, anthropic, schoon }) {
     return { ok: true, item: publiek(o) };
   }
 
+  /* ---- rechtstreeks uitgeven: de opdracht wordt een echt onderdeel ----
+     De Werkplaats blijft adviseren, maar kan het resultaat nu ook DIRECT in de
+     winkel zetten. De overlay leeft in db.data.appbiebExtra; de App-Bibliotheek
+     (kern/appbieb.js) leest en toont die overal in de Mall. Alles omkeerbaar:
+     "intrekken" haalt het onderdeel er weer uit. De plank ('winkel' = App Store,
+     'bieb' = Bibliotheek) volgt uit het doel van de opdracht. */
+  function biebStore() {
+    if (!Array.isArray(d().appbiebExtra)) d().appbiebExtra = [];
+    return d().appbiebExtra;
+  }
+  function _uitgifteItem(o, ref) {
+    const plank = o.doelSoort === 'bieb' ? 'bieb' : 'winkel';
+    const uitleg = (o.soort === 'nieuw'
+      ? (o.plan && o.plan.doel) || o.brief
+      : (o.plan && o.plan.analyse) || o.brief) || o.naam;
+    return {
+      id: ref, naam: scho(o.naam, 120) || 'RTG Werkplaats-app',
+      plank, uitleg: scho(uitleg, 260),
+      icon: 'ster', sterren: 4.6, versie: '1.0', grootteMB: 60,
+      winkelwaardeCenten: 0, bron: 'werkplaats', werkplaatsId: o.id, at: nu()
+    };
+  }
+  function publiceer(i) {
+    const o = vind(i); if (!o) return { status: 404, error: 'Opdracht niet gevonden.' };
+    if (!o.plan) return { status: 400, error: 'Werk de opdracht eerst uit voordat je hem publiceert.' };
+    const store = biebStore();
+    const ref = (o.uitgifte && o.uitgifte.ref) || ('wx-' + crypto.randomBytes(5).toString('hex'));
+    const item = _uitgifteItem(o, ref);
+    const ix = store.findIndex(x => x && x.id === ref);
+    if (ix >= 0) store[ix] = item; else { store.unshift(item); if (store.length > 2000) store.length = 2000; }
+    o.uitgifte = { ref, plank: item.plank, plankLabel: item.plank === 'bieb' ? 'Bibliotheek' : 'App Store', at: nu() };
+    o.status = 'klaar'; o.updatedAt = nu(); save();
+    return { ok: true, item: publiek(o) };
+  }
+  function introk(i) {
+    const o = vind(i); if (!o) return { status: 404, error: 'Opdracht niet gevonden.' };
+    if (o.uitgifte && o.uitgifte.ref) {
+      const store = biebStore(); const ix = store.findIndex(x => x && x.id === o.uitgifte.ref);
+      if (ix >= 0) store.splice(ix, 1);
+    }
+    o.uitgifte = null; if (o.status === 'klaar') o.status = 'uitgewerkt'; o.updatedAt = nu(); save();
+    return { ok: true, item: publiek(o) };
+  }
+
   async function aiKritiek(i) {
     const o = vind(i); if (!o) return { status: 404, error: 'Opdracht niet gevonden.' };
     if (!o.plan) return { status: 400, error: 'Werk het idee eerst uit.' };
@@ -153,7 +198,7 @@ function maakWerkplaats({ db, save, crypto, anthropic, schoon }) {
     return { ok: true, item: publiek(o) };
   }
 
-  return { werkplaats: { STATUS, SOORTEN, DOELSOORT, overzicht, maak, zet, verwijder, aiUitwerken, aiKritiek } };
+  return { werkplaats: { STATUS, SOORTEN, DOELSOORT, overzicht, maak, zet, verwijder, aiUitwerken, aiKritiek, publiceer, introk } };
 }
 
 module.exports = { maakWerkplaats };

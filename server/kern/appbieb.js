@@ -66,6 +66,11 @@ const NAMEN = []; let SOM_WAARDE = 0;
 for (let i = 0; i < TOTAAL; i++) { const a = appVan(i); NAMEN.push(a.naam.toLowerCase()); SOM_WAARDE += a.winkelwaardeCenten; }
 const PER_CAT = MERK.length * EDITIE.length;
 
+// De pseudo-categorie waaronder de door de RTG Werkplaats gepubliceerde apps en
+// bibliotheek-materialen in de winkel verschijnen. De Werkplaats schrijft ze
+// (rechtstreeks) naar db.data.appbiebExtra; hier lezen en mengen we ze alleen.
+const WERKPLAATS_CAT = { id: 'werkplaats', label: 'Uit de Werkplaats', icon: 'ster' };
+
 function maakAppbieb({ db, save }) {
   const rij = (key) => {
     if (!db.data.appInstallaties) db.data.appInstallaties = {};
@@ -73,11 +78,43 @@ function maakAppbieb({ db, save }) {
     return db.data.appInstallaties[key];
   };
 
-  function overzicht() {
+  // ---- de bewerkbare overlay: apps/materiaal uit de RTG Werkplaats ----
+  function overlayRuw() { return Array.isArray(db.data.appbiebExtra) ? db.data.appbiebExtra : []; }
+  // maak van een opgeslagen overlay-record een nette winkel-app; defensief, want
+  // de records worden buiten deze module (door de Werkplaats) geschreven.
+  function overlayApp(o) {
+    if (!o || typeof o !== 'object' || !o.id) return null;
     return {
-      totaal: TOTAAL, totaleWinkelwaardeCenten: SOM_WAARDE,
-      categorieen: CATEGORIEEN.map(c => ({ id: c.id, label: c.label, icon: c.icon, aantal: PER_CAT }))
+      id: String(o.id), naam: String(o.naam || 'RTG Werkplaats-app').slice(0, 120),
+      categorie: WERKPLAATS_CAT.id, categorieLabel: WERKPLAATS_CAT.label, icon: String(o.icon || WERKPLAATS_CAT.icon),
+      plank: o.plank === 'bieb' ? 'bieb' : 'winkel', plankLabel: o.plank === 'bieb' ? 'Bibliotheek' : 'App Store',
+      winkelwaardeCenten: Math.max(0, Math.round(Number(o.winkelwaardeCenten) || 0)), ledenprijsCenten: 0,
+      sterren: Number(o.sterren) || 4.6, versie: String(o.versie || '1.0'), grootteMB: Number(o.grootteMB) || 60,
+      bron: 'werkplaats',
+      uitleg: String(o.uitleg || 'Gemaakt in de RTG Werkplaats; voor RTG-leden inbegrepen bij de pas.').slice(0, 260)
     };
+  }
+  const overlayLijst = () => overlayRuw().map(overlayApp).filter(Boolean);
+  const overlayVan = (id) => overlayLijst().find(a => a.id === id) || null;
+  const isOverlayId = (id) => /^wx-/.test(String(id || ''));
+
+  function overzicht() {
+    const ov = overlayLijst();
+    const cats = CATEGORIEEN.map(c => ({ id: c.id, label: c.label, icon: c.icon, aantal: PER_CAT }));
+    if (ov.length) cats.push({ id: WERKPLAATS_CAT.id, label: WERKPLAATS_CAT.label, icon: WERKPLAATS_CAT.icon, aantal: ov.length });
+    return {
+      totaal: TOTAAL + ov.length,
+      totaleWinkelwaardeCenten: SOM_WAARDE + ov.reduce((s, a) => s + a.winkelwaardeCenten, 0),
+      categorieen: cats
+    };
+  }
+
+  // de overlay-apps die bij dit filter horen (categorie/zoek)
+  function overlayFilter(categorie, q) {
+    let arr = overlayLijst();
+    if (categorie && categorie !== WERKPLAATS_CAT.id) arr = arr.filter(a => a.categorie === categorie);
+    if (q) arr = arr.filter(a => (a.naam + ' ' + a.uitleg).toLowerCase().includes(q));
+    return arr;
   }
 
   function catalogus({ categorie, zoek, pagina, per } = {}) {
@@ -85,46 +122,56 @@ function maakAppbieb({ db, save }) {
     const n = Math.max(1, Math.min(48, Number(per) || 24));
     const q = String(zoek || '').toLowerCase().trim().slice(0, 60);
     const ci = CATEGORIEEN.findIndex(c => c.id === categorie);
-    let nummers;
-    if (!q && ci >= 0) {
-      nummers = { aantal: PER_CAT, pak: (k) => ci * PER_CAT + k };
+    // de Werkplaats-apps staan vooraan; daarna de deterministische catalogus
+    const ex = overlayFilter(categorie, q);
+    let det;
+    if (categorie === WERKPLAATS_CAT.id) {
+      det = { aantal: 0, pak: () => -1 };                       // alleen overlay
+    } else if (!q && ci >= 0) {
+      det = { aantal: PER_CAT, pak: (k) => ci * PER_CAT + k };
     } else if (!q) {
-      nummers = { aantal: TOTAAL, pak: (k) => k };
+      det = { aantal: TOTAAL, pak: (k) => k };
     } else {
       const raak = [];
       const van = ci >= 0 ? ci * PER_CAT : 0, tot = ci >= 0 ? (ci + 1) * PER_CAT : TOTAAL;
       for (let i = van; i < tot && raak.length < 2000; i++) if (NAMEN[i].includes(q)) raak.push(i);
-      nummers = { aantal: raak.length, pak: (k) => raak[k] };
+      det = { aantal: raak.length, pak: (k) => raak[k] };
     }
+    const totaal = ex.length + det.aantal;
     const start = (p - 1) * n;
     const items = [];
-    for (let k = start; k < Math.min(start + n, nummers.aantal); k++) items.push(appVan(nummers.pak(k)));
-    return { items, totaal: nummers.aantal, pagina: p, paginas: Math.max(1, Math.ceil(nummers.aantal / n)) };
+    for (let k = start; k < Math.min(start + n, totaal); k++) {
+      items.push(k < ex.length ? ex[k] : appVan(det.pak(k - ex.length)));
+    }
+    return { items: items.filter(Boolean), totaal, pagina: p, paginas: Math.max(1, Math.ceil(totaal / n)) };
   }
 
   function installeer(key, id) {
-    const nr = Number(String(id || '').replace(/^app-/, ''));
-    const app = appVan(nr);
+    let app, sleutel;
+    if (isOverlayId(id)) { app = overlayVan(String(id)); sleutel = app ? app.id : null; }
+    else { const nr = Number(String(id || '').replace(/^app-/, '')); app = appVan(nr); sleutel = app ? nr : null; }
     if (!app) return { status: 404, error: 'Deze app bestaat niet in de bibliotheek.' };
     const mijn = rij(key);
-    if (mijn.includes(nr)) return { status: 200, ok: true, app, alGeinstalleerd: true, aantal: mijn.length };
+    if (mijn.includes(sleutel)) return { status: 200, ok: true, app, alGeinstalleerd: true, aantal: mijn.length };
     if (mijn.length >= 500) return { status: 400, error: 'Het maximum van 500 geïnstalleerde apps is bereikt; verwijder er eerst een.' };
-    mijn.push(nr); save();
+    mijn.push(sleutel); save();
     return { status: 200, ok: true, app, aantal: mijn.length };
   }
 
   function verwijder(key, id) {
-    const nr = Number(String(id || '').replace(/^app-/, ''));
+    const sleutel = isOverlayId(id) ? String(id) : Number(String(id || '').replace(/^app-/, ''));
     const mijn = rij(key);
-    const ix = mijn.indexOf(nr);
+    const ix = mijn.indexOf(sleutel);
     if (ix < 0) return { status: 404, error: 'Deze app staat niet bij uw installaties.' };
     mijn.splice(ix, 1); save();
     return { status: 200, ok: true, aantal: mijn.length };
   }
 
-  const mijnApps = (key) => rij(key).map(appVan).filter(Boolean);
+  // een geïnstalleerde sleutel kan een nummer (vaste catalogus) of een
+  // Werkplaats-id (overlay) zijn; ingetrokken overlay-apps vallen vanzelf weg.
+  const mijnApps = (key) => rij(key).map(x => (typeof x === 'string' && isOverlayId(x)) ? overlayVan(x) : appVan(x)).filter(Boolean);
 
-  return { appbieb: { overzicht, catalogus, installeer, verwijder, mijnApps, appVan, TOTAAL } };
+  return { appbieb: { overzicht, catalogus, installeer, verwijder, mijnApps, appVan, overlayLijst, TOTAAL } };
 }
 
 module.exports = { maakAppbieb, CATEGORIEEN, TOTAAL };

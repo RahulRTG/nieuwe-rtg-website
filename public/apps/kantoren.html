@@ -1027,9 +1027,13 @@ function renderWerkplaats(){
     (o.brief?'<p class="stil" style="font-size:.82rem;color:var(--soft);margin:.3rem 0 0;">'+esc(o.brief)+'</p>':'')+
     wpPlan(o.plan)+
     (o.kritiek?'<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.83rem;font-style:italic;">'+esc(o.kritiek)+'</div>':'')+
+    (o.uitgifte?'<div class="rij" style="gap:.4rem;margin-top:.5rem;align-items:center;font-size:.78rem;color:var(--gold);"><span class="ic" style="width:1rem;height:1rem;">'+ico('sitemaker')+'</span>Live in de '+esc(o.uitgifte.plankLabel||'winkel')+' · zichtbaar in de Mall</div>':'')+
     '<div class="rij" style="gap:.4rem;margin-top:.6rem;flex-wrap:wrap;align-items:center;">'+
       '<button class="knop stil" data-wp-uit="'+o.id+'" style="font-size:.78rem;">'+(o.plan?'Opnieuw uitwerken':'AI werkt het uit')+'</button>'+
       (o.plan?'<button class="knop stil" data-wp-kri="'+o.id+'" style="font-size:.78rem;">Scherpe blik</button>':'')+
+      (o.plan?(o.uitgifte
+        ?'<button class="knop stil" data-wp-introk="'+o.id+'" style="font-size:.78rem;color:var(--burgundy);">Uit de winkel halen</button>'
+        :'<button class="knop" data-wp-pub="'+o.id+'" style="font-size:.78rem;">'+(o.doelSoort==='bieb'?'In de Bibliotheek zetten':'In de App Store zetten')+'</button>'):'')+
       '<select class="veld" data-wp-status="'+o.id+'" style="max-width:9rem;font-size:.78rem;">'+opts(o)+'</select>'+
       '<span style="flex:1;"></span>'+
       '<button class="knop stil" data-wp-del="'+o.id+'" style="font-size:.78rem;color:var(--burgundy);">Verwijder</button>'+
@@ -1038,6 +1042,8 @@ function renderWerkplaats(){
   $('#wpLijst').querySelectorAll('[data-wp-kri]').forEach(b=>b.addEventListener('click',async()=>{ b.disabled=true; try{ const r=await api('werkplaats/kritiek',{id:b.dataset.wpKri}); vervangWp(r.item); }catch(e){ meld(e.message); b.disabled=false; } }));
   $('#wpLijst').querySelectorAll('[data-wp-status]').forEach(s=>s.addEventListener('change',async()=>{ try{ const r=await api('werkplaats/zet',{id:s.dataset.wpStatus,status:s.value}); vervangWp(r.item); }catch(e){ meld(e.message); } }));
   $('#wpLijst').querySelectorAll('[data-wp-del]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api('werkplaats/verwijder',{id:b.dataset.wpDel}); WP.items=WP.items.filter(x=>x.id!==b.dataset.wpDel); renderWerkplaats(); }catch(e){ meld(e.message); } }));
+  $('#wpLijst').querySelectorAll('[data-wp-pub]').forEach(b=>b.addEventListener('click',async()=>{ b.disabled=true; b.textContent='Bezig...'; try{ const r=await api('werkplaats/publiceer',{id:b.dataset.wpPub}); vervangWp(r.item); meld('Live gezet in de '+((r.item.uitgifte&&r.item.uitgifte.plankLabel)||'winkel')+'; leden zien het in de Mall.'); }catch(e){ meld(e.message); b.disabled=false; } }));
+  $('#wpLijst').querySelectorAll('[data-wp-introk]').forEach(b=>b.addEventListener('click',async()=>{ b.disabled=true; try{ const r=await api('werkplaats/introk',{id:b.dataset.wpIntrok}); vervangWp(r.item); meld('Uit de winkel gehaald.'); }catch(e){ meld(e.message); b.disabled=false; } }));
 }
 function vervangWp(o){ if(!o||!WP) return; const i=WP.items.findIndex(x=>x.id===o.id); if(i>=0) WP.items[i]=o; else WP.items.unshift(o); renderWerkplaats(); }
 $('#wpTerug').addEventListener('click', laadKamers);

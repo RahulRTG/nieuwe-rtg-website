@@ -30,6 +30,10 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   const nu = () => Date.now();
   const d = () => db.data;
 
+  // Schaduw-modus: spiegelt elke boeking naar de Rust-motor (RTG_MOTOR_SHADOW).
+  // Uit = een no-op; JS blijft altijd de baas.
+  const schaduw = require('./schaduw')();
+
   const MIN_CENTEN = 1;              // vanaf 1 cent (een rondje delen mag klein zijn)
   const MAX_CENTEN = 500000;         // tot 5000 euro per boeking
   const OPLAAD_MIN = 100;            // opladen vanaf 1 euro
@@ -82,6 +86,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     grootboek().unshift(rij);
     if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
     save();
+    schaduw.spiegel(rij); // schaduw-modus: naar de Rust-motor (no-op als uit)
     return { ok: true, boeking: rij };
   }
   // de sluitcontrole: som van alle saldi is nul, en niemand staat rood

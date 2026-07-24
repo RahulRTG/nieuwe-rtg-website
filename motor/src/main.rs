@@ -142,10 +142,30 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
         _ => {}
     }
 
+    // schaduw-boekbatch: efficiënt veel spiegelingen tegelijk toepassen
+    if req.path == "/api/pay/boekbatch" {
+        let mut s = state.write().unwrap();
+        let mut n = 0i64;
+        if let Some(Json::Arr(rijen)) = body.get("boekingen") {
+            for r in rijen {
+                let van = r.str_at("van").unwrap_or("");
+                let naar = r.str_at("naar").unwrap_or("");
+                let centen = r.i64_at("centen").unwrap_or(0);
+                if s.spiegel_boek(van, naar, centen, r.str_at("soort").unwrap_or("boeking"), r.str_at("oms").unwrap_or(""), r.str_at("ref").map(|x| x.to_string())).status < 300 {
+                    n += 1;
+                }
+            }
+        }
+        let mut b = Json::obj();
+        b.set("ok", Json::Bool(true)).set("toegepast", Json::Num(n as f64));
+        return Response { status: 200, body: b.dump() };
+    }
+
     // schrijf-paden: write-lock
     let mut s = state.write().unwrap();
     match req.path.as_str() {
         "/api/pay/registreer" => json_resp(s.registreer_lid(codenaam)),
+        "/api/pay/boek" => json_resp(s.spiegel_boek(body.str_at("van").unwrap_or(""), body.str_at("naar").unwrap_or(""), body.i64_at("centen").unwrap_or(0), body.str_at("soort").unwrap_or("boeking"), body.str_at("oms").unwrap_or(""), body.str_at("ref").map(|x| x.to_string()))),
         "/api/pay/oplaad" => json_resp(s.laad_op(codenaam, body.i64_at("centen"), idem)),
         "/api/pay/stuur" => json_resp(s.stuur(codenaam, body.str_at("aan").unwrap_or(""), body.i64_at("centen"), body.str_at("oms"), idem, "p2p")),
         "/api/pay/tikcode" => json_resp(s.tik_code(codenaam)),

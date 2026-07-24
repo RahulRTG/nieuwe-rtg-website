@@ -381,6 +381,16 @@ impl State {
         o
     }
 
+    // ---------- schaduw-modus: rauwe boeking van de autoritaire JS-engine ----------
+    pub fn spiegel_boek(&mut self, van: &str, naar: &str, centen: i64, soort: &str, oms: &str, ref_: Option<String>) -> Resp {
+        if centen <= 0 || van.is_empty() || naar.is_empty() || van == naar {
+            return err(400, "Ongeldige boeking.");
+        }
+        self.grb.apply_raw(BoekArgs { van, naar, centen, soort, oms, ref_ });
+        self.markeer();
+        ok(Json::obj())
+    }
+
     // ---------- snapshot voor durability (write-behind naar schijf) ----------
     /* De geld-kritische waarheid: saldi, leden, idempotentie en de boekingen.
        Genoeg om na een herstart exact verder te gaan (som blijft nul, dubbele

@@ -73,7 +73,14 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
 - [x] **Concurrency bewezen** — `scripts/motor-storm.js`: 60k parallelle
   operaties (64 schrijvers), 0 serverfouten, som saldi = 0, conservatie exact
   (positieve saldi === -extern). Geen cent zoek onder volle last.
-- [ ] **De echte naad — beslissing nodig.** Het grootboek wordt niet alleen via
+- [x] **Schaduw-modus** (gekozen richting) — `RTG_MOTOR_SHADOW=<url>` spiegelt
+  ELKE boeking van de autoritaire JS-engine naar de motor, op het ene
+  `boek()`-primitief (dus alle 26 interne callers automatisch mee, zonder ze aan
+  te raken). Fire-and-forget batches (nul latentie op het geld-pad); JS blijft
+  de baas. `scripts/motor-schaduw.js` bewijst LOCKSTEP: de motor-saldi zijn
+  identiek aan de JS-waarheid. Volgende: drift-detector op het statusbord, dan
+  canary -> cutover.
+- [ ] **De echte naad (na schaduw) — beslissing later.** Het grootboek wordt niet alleen via
   `/api/pay/*` bereikt: **26 interne JS-modules** (RTG Bank, OV, Assets, Vonk,
   Podium, Fluister, WBW, kassa, synergie) roepen `pay.boek/stuur/...`
   RECHTSTREEKS aan. Alleen de HTTP-routes omleiden zou een split-brain-grootboek

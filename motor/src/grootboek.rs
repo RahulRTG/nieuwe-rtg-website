@@ -95,6 +95,30 @@ impl Ledger {
         Ok(rij)
     }
 
+    /* Rauw toepassen (schaduw-modus): herspeelt een boeking van de autoritaire
+       JS-engine ZONDER saldo-guard — het herspeelt een al-genomen beslissing,
+       het neemt hem niet opnieuw. Zo blijft de mirror in lockstep, ook als
+       spiegelingen door de storm net anders geordend binnenkomen. */
+    pub fn apply_raw(&mut self, a: BoekArgs) -> Boeking {
+        *self.saldi.entry(a.van.to_string()).or_insert(0) -= a.centen;
+        *self.saldi.entry(a.naar.to_string()).or_insert(0) += a.centen;
+        let rij = Boeking {
+            id: rng::id("PB"),
+            van: a.van.to_string(),
+            naar: a.naar.to_string(),
+            centen: a.centen,
+            soort: a.soort.to_string(),
+            oms: schoon(a.oms, 120),
+            ref_: a.ref_,
+            at: rng::nu_ms(),
+        };
+        self.boekingen.push_front(rij.clone());
+        if self.boekingen.len() > WEERGAVE_CAP {
+            self.boekingen.pop_back();
+        }
+        rij
+    }
+
     /* De sluitcontrole: som van alle saldi is nul, en niemand staat rood. Dit
        is de waarheid waar /api/pay/gezond op afgaat. */
     pub fn sluitcontrole(&self) -> (bool, i64, Vec<String>) {

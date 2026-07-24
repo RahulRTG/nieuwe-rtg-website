@@ -11,6 +11,7 @@
    het grootboek. Codenaam/supplier komen als velden mee in de body. */
 use rtg_motor::http::{self, Request, Response};
 use rtg_motor::json::{self, Json};
+use rtg_motor::ledengids::{self, Gids};
 use rtg_motor::pay::{Resp, State};
 use std::fs;
 use std::path::PathBuf;
@@ -24,6 +25,10 @@ fn env(key: &str, standaard: &str) -> String {
 
 fn data_pad() -> PathBuf {
     PathBuf::from(env("RTG_MOTOR_DATA", "motor-data/state.json"))
+}
+
+fn gids_pad() -> PathBuf {
+    PathBuf::from(env("RTG_MOTOR_GIDS", "motor-data/gids.bin"))
 }
 
 fn laad_snapshot(state: &RwLock<State>) {
@@ -83,15 +88,103 @@ fn main() {
     laad_snapshot(&state);
     start_flusher(Arc::clone(&state));
 
+    // ledengids: open een bestaande gids als die er is (out-of-RAM, O(1) geheugen)
+    let gids: Arc<RwLock<Option<Gids>>> = Arc::new(RwLock::new(None));
+    {
+        let pad = gids_pad();
+        if pad.exists() {
+            if let Ok(g) = Gids::open(&pad) {
+                eprintln!("[motor] ledengids geopend: {} leden ({:.1} MB op schijf)", g.aantal(), g.bestandsbytes() as f64 / 1e6);
+                *gids.write().unwrap() = Some(g);
+            }
+        }
+    }
+
     eprintln!("[motor] RTG money-engine (Rust, zero-dep) luistert op {} (max {} verbindingen)", addr, maxconn);
 
     let router_state = Arc::clone(&state);
+    let router_gids = Arc::clone(&gids);
     let resultaat = http::serve(&addr, maxconn, move |req: &Request| {
+        if req.path.starts_with("/api/gids/") {
+            return gids_route(&router_gids, req);
+        }
         route(&router_state, req)
     });
     if let Err(e) = resultaat {
         eprintln!("[motor] kon niet starten: {}", e);
         std::process::exit(1);
+    }
+}
+
+/* De ledengids-routes: bouwen (demo-seed op schaal), zoeken (exact + prefix) en
+   status. Out-of-RAM: het zoeken gebeurt met binair zoeken op schijf. */
+fn gids_route(gids: &RwLock<Option<Gids>>, req: &Request) -> Response {
+    if req.path == "/api/gids/status" {
+        let g = gids.read().unwrap();
+        let mut b = Json::obj();
+        match &*g {
+            Some(g) => {
+                b.set("ok", Json::Bool(true))
+                    .set("leden", Json::Num(g.aantal() as f64))
+                    .set("bestandBytes", Json::Num(g.bestandsbytes() as f64))
+                    .set("ramModel", Json::Str("O(1) — binair zoeken op schijf".into()));
+            }
+            None => {
+                b.set("ok", Json::Bool(true)).set("leden", Json::Num(0.0)).set("detail", Json::Str("nog niet gebouwd".into()));
+            }
+        }
+        return Response { status: 200, body: b.dump() };
+    }
+
+    if req.method != "POST" {
+        return fout(404, "Onbekende route.");
+    }
+    let body = match json::parse(if req.body.is_empty() { "{}" } else { &req.body }) {
+        Ok(v) => v,
+        Err(_) => return fout(400, "Kapotte JSON."),
+    };
+
+    match req.path.as_str() {
+        "/api/gids/bouw" => {
+            let n = body.i64_at("aantal").unwrap_or(0);
+            if n <= 0 || n > 50_000_000 {
+                return fout(400, "aantal moet 1..50000000 zijn.");
+            }
+            let pad = gids_pad();
+            if let Some(dir) = pad.parent() {
+                let _ = fs::create_dir_all(dir);
+            }
+            let rijen = ledengids::demo(n as usize);
+            match ledengids::bouw(&pad, rijen) {
+                Ok(m) => match Gids::open(&pad) {
+                    Ok(g) => {
+                        let bytes = g.bestandsbytes();
+                        *gids.write().unwrap() = Some(g);
+                        let mut b = Json::obj();
+                        b.set("ok", Json::Bool(true)).set("leden", Json::Num(m as f64)).set("bestandBytes", Json::Num(bytes as f64));
+                        Response { status: 200, body: b.dump() }
+                    }
+                    Err(e) => fout(500, &e.to_string()),
+                },
+                Err(e) => fout(500, &e.to_string()),
+            }
+        }
+        "/api/gids/zoek" => {
+            let naam = body.str_at("naam").unwrap_or("");
+            let g = gids.read().unwrap();
+            let g = match &*g {
+                Some(g) => g,
+                None => return fout(404, "De gids is nog niet gebouwd."),
+            };
+            let exact = g.exact(naam).unwrap_or(None);
+            let pref = g.prefix(naam, 10).unwrap_or_default();
+            let mut b = Json::obj();
+            b.set("ok", Json::Bool(true));
+            b.set("exact", exact.map(|r| r.to_json()).unwrap_or(Json::Null));
+            b.set("suggesties", Json::Arr(pref.iter().map(|r| r.to_json()).collect()));
+            Response { status: 200, body: b.dump() }
+        }
+        _ => fout(404, "Onbekende route."),
     }
 }
 

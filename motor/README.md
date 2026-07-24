@@ -89,5 +89,12 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   door één ledger gaan. Dat is een echte refactor van de geldkern (veel callers
   zijn synchroon `pay.boek(...)`; de motor is async HTTP) en architecturaal
   significant — daarom een bewuste keuze, geen sluipende omzetting.
-- [ ] **Ledengids** — 100M leden, out-of-RAM venster, zoek.
+- [x] **Ledengids** (out-of-RAM) — leden in een gesorteerd bestand met vaste
+  recordgrootte; zoeken met binair zoeken op schijf, dus **RAM = O(1)** ongeacht
+  het aantal. Endpoints: `/api/gids/bouw`, `/api/gids/zoek` (exact + prefix),
+  `/api/gids/status`. Bewezen op 2M leden: gids openen = 2,5 MB RAM (184 MB op
+  schijf), 5000 zoekopdrachten ~3000/s, p50 0,31 ms / p99 0,70 ms, RAM vlak.
+  `scripts/motor-gids.js` reproduceert het. Projectie 100M: ~9 GB op schijf,
+  ~2,5 MB RAM. (Bouwen sorteert nu in RAM; voor >~10M hoort extern sorteren, maar
+  het serveren is al out-of-RAM — dat is de eigenschap die telt.)
 - [ ] **Kluis-crypto** — codenamen ↔ echte namen in de gescheiden kluis.

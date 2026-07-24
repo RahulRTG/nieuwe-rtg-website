@@ -593,6 +593,25 @@
     <div class="kaart lijst" id="stadNodes"><div class="leeg">Nog geen Stadsdozen.</div></div>
   </section>
 
+  <section id="vTechniek" hidden>
+    <div class="kop">
+      <button class="terug" id="techTerug">← alle kamers</button>
+      <h1 id="techH1">Techniek &amp; De Wacht</h1>
+    </div>
+    <p class="deck">De controlekamer onder de motorkap. Hier zie je in één oogopslag of het geld op de cent sluit, of de Rust-motor (het autoritatieve grootboek) meedraait en met de JS-spiegel in lockstep is, en hoe het immuunsysteem - De Wacht - het huis onder druk beschermt. Alles live; het volledige technische bord (zekeringen, health-checks, AI-fix) staat op <a href="/apps/techniek.html" style="color:var(--burgundy-on-dark);">de technische pagina</a>.</p>
+
+    <h3 class="sec">Het grootboek - sluit het op de cent?</h3>
+    <div class="kpis" id="techGrootboek"><div class="leeg">Laden…</div></div>
+
+    <h3 class="sec">De Rust-motor - draait hij mee, klopt de drift?</h3>
+    <div class="kaart" id="techMotor"><div class="leeg">Laden…</div></div>
+
+    <h3 class="sec">De Wacht - het immuunsysteem <span id="techWachtStand" class="kpi" style="margin-left:.4rem;"></span></h3>
+    <div class="kpis" id="techWachtMeters"></div>
+    <div class="kaart" id="techLastafworp" style="margin-top:.6rem;"></div>
+    <div class="kaart lijst" id="techRaad" style="margin-top:.6rem;"><div class="leeg">Geen open voorstellen.</div></div>
+  </section>
+
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -605,7 +624,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vAtelier','vStudio','vHardware','vArchitect','vIdeeen'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vAtelier','vStudio','vHardware','vArchitect','vIdeeen'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -649,12 +668,13 @@ async function laadKamers(){
     '<button class="kaart kamer board" data-kamer="bank"><span class="ic">'+ico('bank')+'</span><h2>RTG Bank</h2><p>De eigen bank op het Pay-grootboek. Eén knop van de kaart-rails naar de eigen bank.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
     '<button class="kaart kamer board" data-kamer="stad"><span class="ic">'+ico('stad')+'</span><h2>RTG Stad</h2><p>De hele stad slimmer op eigen hardware en software: Stadsdozen meten, één knop zet de stand.</p><span class="kpi">De stadsinfrastructuur →</span></button>' +
     '<button class="kaart kamer board" data-kamer="redactie"><span class="ic">'+ico('nieuws')+'</span><h2>RTG Redactie</h2><p>Krant, magazine en drukkerij in eigen huis; de nieuwstips komen uit het hele platform.</p><span class="kpi">Naar het perskantoor →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="techniek"><span class="ic">'+ico('schild')+'</span><h2>Techniek &amp; De Wacht</h2><p>De motor onder de motorkap: sluiten beide grootboeken op de cent, draait de Rust-motor mee, en werpt De Wacht netjes load af onder druk?</p><span class="kpi">De controlekamer →</span></button>' +
     '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">'+ico('schild')+'</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+ico(k.icoon)+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'techniek' ? openTechniek() : b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
 }
 
 /* ---------- een kamer ---------- */
@@ -1832,6 +1852,69 @@ function bankRenderRek(rij){
 /* ---------- RTG Stad ---------- */
 const stKleur = { rustig: 'var(--gold)', normaal: '#FFFFFF', druk: 'var(--burgundy-on-dark, #C23A5E)', stil: 'var(--soft)' };
 let stadGewired = false, stadWie = '', STAD = null;
+/* ---------- Techniek & De Wacht: de controlekamer ---------- */
+let techTimer = null;
+const eur = c => '€ ' + (Math.round(Number(c)||0)/100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function techPill(ok, ja, nee){ return '<span class="kpi" style="color:'+(ok?'#1e7d4f':'var(--burgundy-on-dark)')+';font-weight:700;">'+(ok?ja:nee)+'</span>'; }
+async function openTechniek(){
+  zetKamerUrl('techniek'); toon('vTechniek');
+  $('#techH1').innerHTML = ico('schild') + ' Techniek & De Wacht';
+  clearInterval(techTimer);
+  await techVervers();
+  techTimer = setInterval(() => { if ($('#vTechniek').hidden) { clearInterval(techTimer); return; } techVervers(); }, 4000);
+}
+async function techVervers(){
+  let d; try { d = await api('techniek'); } catch (e) { $('#techGrootboek').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  // --- grootboek ---
+  const gb = d.grootboek || {};
+  const kpi = (waarde, label) => '<div class="kaart kpi-tegel"><b>'+waarde+'</b><span>'+esc(label)+'</span></div>';
+  const payKlopt = gb.pay ? gb.pay.klopt : null, bankKlopt = gb.bank ? gb.bank.klopt : null;
+  $('#techGrootboek').innerHTML =
+    kpi(gb.pay ? techPill(payKlopt, 'Sluit ✓', 'DRIFT!') : '-', 'RTG Pay-grootboek' + (gb.pay ? ' · som '+gb.pay.som+'c' : '')) +
+    kpi(gb.bank ? techPill(bankKlopt, 'Sluit ✓', 'DRIFT!') : '-', 'RTG Bank-grootboek' + (gb.bank ? ' · som '+gb.bank.som+'c' : '')) +
+    (gb.bank ? kpi(eur(gb.bank.depositoCenten), 'Deposito in de bank') : '') +
+    (gb.bank ? kpi(eur(gb.bank.kredietCenten), 'Uitstaand krediet') : '');
+  // --- motor ---
+  const m = d.motor || {};
+  if (!m.aan){
+    $('#techMotor').innerHTML = '<p style="margin:0;">De Rust-motor draait nu <b>niet</b> mee (modus <code>'+esc(m.modus||'schaduw')+'</code>). Zet <code>RTG_MOTOR_SHADOW</code> of <code>RTG_MOTOR_GELD=motor</code> om het autoritatieve grootboek + drift-detector te activeren.</p>';
+  } else {
+    const stand = (naam, s) => {
+      if (!s) return '<div style="flex:1;min-width:12rem;"><b>'+naam+'</b><br><span class="leeg" style="display:inline;">geen motor-antwoord</span></div>';
+      const gelijk = (s.gelijkAlle != null) ? s.gelijkAlle : s.gelijk;
+      return '<div style="flex:1;min-width:12rem;"><b>'+naam+'</b> '+techPill(gelijk, 'in lockstep ✓', 'DRIFT!')+
+        '<br><span class="leeg" style="display:inline;font-size:.72rem;">JS '+esc(String(s.jsVingerafdruk||'-'))+' · motor '+esc(String(s.motorVingerafdruk||'-'))+'</span></div>';
+    };
+    $('#techMotor').innerHTML = '<p style="margin:0 0 .5rem;">De motor is het autoritatieve grootboek; de JS-engine spiegelt en de drift-detector vergelijkt beide vingerafdrukken (modus <code>'+esc(m.modus)+'</code>).</p>'+
+      '<div style="display:flex;gap:1rem;flex-wrap:wrap;">'+stand('RTG Pay', m.pay)+stand('RTG Bank', m.bank)+'</div>';
+  }
+  // --- De Wacht ---
+  const w = d.wacht;
+  if (!w){ $('#techWachtStand').textContent = ''; $('#techWachtMeters').innerHTML = '<div class="leeg">De Wacht draait hier niet.</div>'; $('#techLastafworp').innerHTML=''; $('#techRaad').innerHTML=''; return; }
+  const la = w.lastafworp || { actief: false };
+  $('#techWachtStand').innerHTML = la.actief ? techPill(false, '', 'LASTAFWORP ACTIEF') : techPill(true, 'rustig', '');
+  const me = w.meters || {};
+  $('#techWachtMeters').innerHTML =
+    kpi(String(me.verzoeken||0), 'verzoeken / 10s') +
+    kpi(String(me.ips||0), 'unieke bronnen') +
+    kpi(String(me.quarantaine||0), 'in quarantaine') +
+    kpi((me.geheugen||0)+' MB', 'geheugen') +
+    kpi(String(me.openVoorstellen||0), 'open voorstellen');
+  $('#techLastafworp').innerHTML =
+    '<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;"><div style="flex:1;min-width:14rem;"><b>Automatische L7-lastafworp</b><br>'+
+    '<span class="leeg" style="display:inline;">Bij een flood zet De Wacht de deur automatisch op een kier (503 "kom zo terug") en beschermt zo het huis. Je kunt hem hier met de hand forceren of opheffen.</span></div>'+
+    '<button class="knop'+(la.actief?'':' stil')+'" id="techLaKnop" type="button">'+(la.actief ? 'Lastafworp opheffen' : 'Lastafworp forceren')+'</button></div>';
+  $('#techLaKnop').onclick = async () => {
+    try { await api('techniek/lastafworp', { aan: !la.actief }); meld(la.actief ? 'Lastafworp opgeheven.' : 'Lastafworp geforceerd.'); techVervers(); }
+    catch (e) { meld(e.message); }
+  };
+  const raad = (w.raad || []).filter(v => v.status === 'open' || v.status === 'inconclaaf');
+  $('#techRaad').innerHTML = '<h4>Open raadkamer-voorstellen</h4>' + (raad.length
+    ? '<ul>'+raad.slice(0, 8).map(v => '<li>'+esc(v.titel || v.uitleg || 'Voorstel')+'</li>').join('')+'</ul>'
+    : '<div class="leeg">Geen open voorstellen - De Wacht heeft niets te melden.</div>');
+}
+$('#techTerug') && $('#techTerug').addEventListener('click', () => { clearInterval(techTimer); laadKamers(); });
+
 async function openStad(){
   zetKamerUrl('stad'); toon('vStad');
   if (!stadGewired){ stadGewired = true; $('#stadTerug').addEventListener('click', laadKamers); }

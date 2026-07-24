@@ -63,5 +63,6 @@ module.exports = (kern) => {
   require('./regie')(ctx);
   require('./bank')(ctx);
   require('./stad')(ctx);
+  require('./techniek')(ctx);
   require('./zelfzorg')(ctx);
 };

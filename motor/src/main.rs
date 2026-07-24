@@ -452,6 +452,7 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
     match req.path.as_str() {
         "/api/pay/registreer" => json_resp(s.registreer_lid(codenaam)),
         "/api/pay/boek" => json_resp(s.spiegel_boek(body.str_at("van").unwrap_or(""), body.str_at("naar").unwrap_or(""), body.i64_at("centen").unwrap_or(0), body.str_at("soort").unwrap_or("boeking"), body.str_at("oms").unwrap_or(""), body.str_at("ref").map(|x| x.to_string()))),
+        "/api/pay/boekguard" => json_resp(s.boek_guard(body.str_at("van").unwrap_or(""), body.str_at("naar").unwrap_or(""), body.i64_at("centen").unwrap_or(0), body.str_at("soort").unwrap_or("boeking"), body.str_at("oms").unwrap_or(""), body.str_at("ref").map(|x| x.to_string()))),
         "/api/pay/oplaad" => json_resp(s.laad_op(codenaam, body.i64_at("centen"), idem)),
         "/api/pay/stuur" => json_resp(s.stuur(codenaam, body.str_at("aan").unwrap_or(""), body.i64_at("centen"), body.str_at("oms"), idem, "p2p")),
         "/api/pay/tikcode" => json_resp(s.tik_code(codenaam)),

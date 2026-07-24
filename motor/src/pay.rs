@@ -408,6 +408,25 @@ impl State {
         o
     }
 
+    /* ---------- motor-autoriteit (cutover): geguard boeken ----------
+       I.t.t. spiegel_boek (dat een AL-genomen JS-beslissing rauw herspeelt)
+       NEEMT dit de beslissing zelf, met de volle saldo-guard: onvoldoende saldo
+       -> 402, bedrag buiten bereik -> 400. Bij succes komt de VOLLEDIGE boeking
+       terug, zodat de JS-spiegel exact dezelfde regel toepast (lockstep). Dit is
+       het primitief waarmee de JS-engine in RTG_MOTOR_GELD=motor de motor het
+       enige autoritatieve grootboek maakt. */
+    pub fn boek_guard(&mut self, van: &str, naar: &str, centen: i64, soort: &str, oms: &str, ref_: Option<String>) -> Resp {
+        match self.grb.boek(BoekArgs { van, naar, centen, soort, oms, ref_ }) {
+            Ok(b) => {
+                self.markeer();
+                let mut out = Json::obj();
+                out.set("boeking", b.to_json());
+                ok(out)
+            }
+            Err((st, m)) => err(st, &m),
+        }
+    }
+
     // ---------- schaduw-modus: rauwe boeking van de autoritaire JS-engine ----------
     pub fn spiegel_boek(&mut self, van: &str, naar: &str, centen: i64, soort: &str, oms: &str, ref_: Option<String>) -> Resp {
         if centen <= 0 || van.is_empty() || naar.is_empty() || van == naar {
@@ -526,6 +545,33 @@ mod tests {
         s.stuur("SPOOK", "NEVEL", i(40000), Some("y"), Some("v3"), "p2p");
         assert_ne!(s.vingerafdruk(), a);
         assert!(s.gezond().0);
+    }
+
+    #[test]
+    fn boek_guard_weigert_en_accepteert_met_volledige_boeking() {
+        let mut s = State::new();
+        // extern:* mag onder nul, dus opladen kan altijd
+        let r = s.boek_guard("extern:oplaad", "lid:A", 5000, "oplaad", "test", None);
+        assert_eq!(r.status, 200);
+        assert_eq!(r.body.bool_at("ok"), true);
+        // de volledige boeking komt terug (voor de JS-spiegel)
+        let boeking = r.body.get("boeking").expect("boeking-object");
+        assert_eq!(boeking.i64_at("centen"), Some(5000));
+        assert_eq!(boeking.str_at("van"), Some("extern:oplaad"));
+        assert_eq!(boeking.str_at("naar"), Some("lid:A"));
+        assert!(boeking.str_at("id").unwrap_or("").starts_with("PB"));
+        assert_eq!(s.grb.saldo_van("lid:A"), 5000);
+        // onvoldoende saldo -> 402, en de saldi bewegen NIET
+        let w = s.boek_guard("lid:A", "lid:B", 9000, "p2p", "te veel", None);
+        assert_eq!(w.status, 402);
+        assert_eq!(s.grb.saldo_van("lid:A"), 5000);
+        assert_eq!(s.grb.saldo_van("lid:B"), 0);
+        // geldige boeking binnen saldo
+        let g = s.boek_guard("lid:A", "lid:B", 2000, "p2p", "ok", None);
+        assert_eq!(g.status, 200);
+        assert_eq!(s.grb.saldo_van("lid:A"), 3000);
+        assert_eq!(s.grb.saldo_van("lid:B"), 2000);
+        assert!(s.gezond().0, "grootboek sluit");
     }
 
     #[test]

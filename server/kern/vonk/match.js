@@ -58,9 +58,9 @@ module.exports = (ctx) => {
     if (m.betaald[key]) return { status: 200, ok: true, al: true, status2: m.status };
     const codenaam = codenaamVan(key);
     // EUR 5 naar RTG en EUR 5 als aanbetaling bij de zaak, in een keer uit de wallet
-    const r1 = pay.boek({ van: 'lid:' + codenaam, naar: 'extern:vonk-rtg', centen: RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, deel RTG', ref: m.id });
+    const r1 = await pay.boekAsync({ van: 'lid:' + codenaam, naar: 'extern:vonk-rtg', centen: RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, deel RTG', ref: m.id });
     if (r1 && r1.error) return { status: 402, error: r1.error };
-    const r2 = pay.boek({ van: 'lid:' + codenaam, naar: 'partner:' + m.tafel.supplierCode, centen: PRIJS_CENTEN - RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, aanbetaling zaak', ref: m.id });
+    const r2 = await pay.boekAsync({ van: 'lid:' + codenaam, naar: 'partner:' + m.tafel.supplierCode, centen: PRIJS_CENTEN - RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, aanbetaling zaak', ref: m.id });
     if (r2 && r2.error) return { status: 402, error: r2.error };
     m.betaald[key] = nu();
     const ander = m.a === key ? m.b : m.a;

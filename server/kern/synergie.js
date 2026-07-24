@@ -94,7 +94,7 @@ function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, 
   /* Betaling in EEN beweging: eerst het saldo tegen de hele prijs, daarna
      per aandeel een grootboekregel. De saldo-check vooraf maakt een halve
      betaling praktisch onmogelijk; elke regel draagt de deal als ref. */
-  function pakketKoop(codenaam, dealId, idem) {
+  async function pakketKoop(codenaam, dealId, idem) {
     const d = vind(dealId);
     if (!d || d.status !== 'actief' || (d.geldigTot && d.geldigTot < vandaag()))
       return { status: 404, error: 'Dit pakket is niet (meer) beschikbaar.' };
@@ -104,7 +104,7 @@ function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, 
     const rek = 'lid:' + codenaam;
     if (pay.saldoVan(rek) < d.prijsCenten) return { status: 402, error: 'Onvoldoende saldo voor dit pakket.' };
     for (const a of d.aandelen.filter(a => a.centen > 0)) {
-      const b = pay.boek({ van: rek, naar: 'partner:' + a.code, centen: a.centen,
+      const b = await pay.boekAsync({ van: rek, naar: 'partner:' + a.code, centen: a.centen,
         soort: 'pakket', oms: 'Pakket ' + d.naam, ref: d.id });
       if (b.error) return b;
     }

@@ -34,6 +34,13 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   // Uit = een no-op; JS blijft altijd de baas.
   const schaduw = require('./schaduw')();
 
+  // CUTOVER-modus (RTG_MOTOR_GELD=motor): de Rust-motor wordt het ENIGE
+  // autoritatieve grootboek. Standaard uit -> geldModus 'schaduw' = JS blijft de
+  // baas, exact als voorheen. In 'motor' loopt elke boeking eerst geguard langs
+  // de motor en past de JS-engine daarna dezelfde bevestigde regel toe (spiegel).
+  const motorklant = require('./motorklant')();
+  const geldModus = motorklant.aan ? 'motor' : 'schaduw';
+
   const MIN_CENTEN = 1;              // vanaf 1 cent (een rondje delen mag klein zijn)
   const MAX_CENTEN = 500000;         // tot 5000 euro per boeking
   const OPLAAD_MIN = 100;            // opladen vanaf 1 euro
@@ -74,19 +81,49 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     return r;
   }
 
-  /* ---------- het grootboek zelf ---------- */
+  /* ---------- het grootboek zelf ----------
+     `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek
+     (geen guard meer). Gedeeld door de JS-guard (boek, schaduw-modus) en door de
+     motor-spiegel (boekAsync, motor-modus past de door de motor bevestigde regel
+     toe). */
+  function pasToe(rij) {
+    saldi()[rij.van] = saldoVan(rij.van) - rij.centen;
+    saldi()[rij.naar] = saldoVan(rij.naar) + rij.centen;
+    grootboek().unshift(rij);
+    if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
+    save();
+  }
+  // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
+  // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
+  // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
   function boek({ van, naar, centen, soort, oms, ref }) {
+    if (geldModus === 'motor') {
+      const bron = (new Error().stack || '').split('\n')[2] || '';
+      throw new Error('pay.boek (synchroon) is niet toegestaan in RTG_MOTOR_GELD=motor; gebruik boekAsync.' + bron);
+    }
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     if (!van || !naar || van === naar) return { status: 400, error: 'Van en naar kloppen niet.' };
     if (!van.startsWith('extern:') && saldoVan(van) < c) return { status: 402, error: 'Onvoldoende saldo.' };
-    saldi()[van] = saldoVan(van) - c;
-    saldi()[naar] = saldoVan(naar) + c;
     const rij = { id: id('PB'), van, naar, centen: c, soort: soort || 'boeking', oms: schoon(oms, 120), ref: ref || null, at: nu() };
-    grootboek().unshift(rij);
-    if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
-    save();
+    pasToe(rij);
     schaduw.spiegel(rij); // schaduw-modus: naar de Rust-motor (no-op als uit)
+    return { ok: true, boeking: rij };
+  }
+  /* De async boeking: het EEN choke-point voor de cutover. In schaduw-modus is
+     dit exact de sync-guard (gewoon awaitbaar gemaakt) -- geen gedragsverandering.
+     In motor-modus gaat de boeking geguard naar de motor (de autoriteit); pas als
+     die hem bevestigt, spiegelt de JS-engine dezelfde regel. Weigert de motor
+     (onvoldoende saldo) of is hij onbereikbaar, dan verandert er NIETS aan de
+     JS-saldi -- de fout gaat netjes terug naar de caller. */
+  async function boekAsync({ van, naar, centen, soort, oms, ref }) {
+    if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref });
+    const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
+    if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
+    // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
+    const b = r.boeking;
+    const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
+    pasToe(rij);
     return { ok: true, boeking: rij };
   }
   // de sluitcontrole: som van alle saldi is nul, en niemand staat rood
@@ -127,7 +164,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
         // webhook crediteert daarna. In de demo is hij altijd meteen betaald.
         return { status: 402, error: 'De betaling wacht op bevestiging.', betaalStatus: betaling.status };
       }
-      const b = boek({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref: betaling.id });
+      const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref: betaling.id });
       if (b.error) return b;
       return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c };
     });
@@ -163,11 +200,11 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   const ctx = {
     db, save, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, kascodes, tikcodes,
-    rekLid, rekPartner, saldoVan, id, metIdem, boek, zorgSaldo, seintje, bestaatLid,
+    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0),
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, saldoVan, koppelBank };
+  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, saldoVan, koppelBank };
   // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
   // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
   // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk

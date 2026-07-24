@@ -74,7 +74,7 @@ module.exports = (ctx) => {
       const l = await pay.laadOp({ codenaam, centen: Math.max(tekort, 1000), idem: idem ? 'ovlaad:' + idem : undefined });
       if (l.error) return { status: l.status || 402, error: l.error };
     }
-    const b = pay.boek({ van: rek, naar: 'partner:' + rit.code, centen: prijs, soort: 'ov',
+    const b = await pay.boekAsync({ van: rek, naar: 'partner:' + rit.code, centen: prijs, soort: 'ov',
       oms: 'OV · ' + (lijn ? lijn.naam : rit.lijnId) + ' · ' + (Math.round(km * 10) / 10) + ' km' });
     if (b.error) return { status: b.status || 400, error: b.error };
     rit.status = 'uit'; rit.uit = { ...uitPunt, at: nu() }; rit.prijs = prijs; rit.km = Math.round(km * 10) / 10;

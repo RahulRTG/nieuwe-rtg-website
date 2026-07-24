@@ -87,15 +87,25 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   de som mist (rekening A te hoog, B even veel te laag -> som blijft 0). Bewezen
   lockstep: dezelfde stand geeft in beide dezelfde afdruk (`e1c42b2abf34f03f`),
   live geverifieerd tegen `/api/motor/status`. Volgende: canary -> cutover.
-- [ ] **De echte naad (na schaduw) — beslissing later.** Het grootboek wordt niet alleen via
-  `/api/pay/*` bereikt: **26 interne JS-modules** (RTG Bank, OV, Assets, Vonk,
-  Podium, Fluister, WBW, kassa, synergie) roepen `pay.boek/stuur/...`
-  RECHTSTREEKS aan. Alleen de HTTP-routes omleiden zou een split-brain-grootboek
-  geven (twee ledgers → geldconservatie kapot). De juiste seam is het JS
-  `pay`-object zelf een dunne client naar de motor maken, zodat ALLE callers
-  door één ledger gaan. Dat is een echte refactor van de geldkern (veel callers
-  zijn synchroon `pay.boek(...)`; de motor is async HTTP) en architecturaal
-  significant — daarom een bewuste keuze, geen sluipende omzetting.
+- [x] **Cutover-seam gebouwd (gated, standaard uit).** De echte naad is er nu:
+  `RTG_MOTOR_GELD=motor` maakt de motor het ENIGE autoritatieve grootboek. Het
+  choke-point is `pay.boekAsync` -- in schaduw-modus exact de sync-guard (geen
+  gedragsverandering; `pay.test.js` blijft byte-identiek groen), in motor-modus
+  gaat elke boeking geguard naar `/api/pay/boekguard` (de guard leeft dus in de
+  motor) en spiegelt de JS-engine pas de door de motor BEVESTIGDE regel. De
+  interne callers (stuur, oplaad, klompje, kassa, uitbetaal, vonk, ov, synergie)
+  lopen nu door dit ene punt. De synchrone `pay.boek` weigert in motor-modus luid
+  (fail-closed) -- nooit een stil tweede grootboek. **Bewezen** met
+  `node scripts/motor-cutover.js`: byte-voor-byte lockstep (JS-spiegel ==
+  motor-vingerafdruk na elke boeking), som blijft 0, de motor-guard weigert
+  onvoldoende saldo (402) zonder de spiegel aan te raken, en idempotentie boekt
+  niet dubbel.
+  - Nog open vóór de daadwerkelijke flip (bewuste keuze, geen sluipende omzetting):
+    (a) de **bank<->wallet-brug** (`kern/bank/overboeken`) roept nog synchroon
+    `pay.boek` -- die faalt nu luid in motor-modus; hij moet mee zodra ook het
+    BANK-grootboek in de motor zit. (b) de JS-spiegel moet bij **herstart** uit de
+    motor-snapshot herstellen (nu blijft hij in lockstep vanaf een gedeelde lege
+    start; het cutover-harnas dekt dat pad).
 - [x] **Ledengids** (out-of-heap) — leden in een gesorteerd bestand met vaste
   recordgrootte; zoeken met binair zoeken, dus **process-heap = O(1)** ongeacht
   het aantal. Standaard leest de gids via **mmap(2)** (read-only, rauwe POSIX-FFI,

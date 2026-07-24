@@ -95,6 +95,21 @@ module.exports = (ctx) => {
     catch (e) { console.error('[ideeen]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
+  /* RTG Werkplaats: het app-bureau. Nieuwe apps bedenken en bestaande apps, de
+     Bibliotheek en de App Store met AI verbeteren (advies; een mens beslist). */
+  app.post('/api/office/werkplaats', officeAuth, (req, res) => veilig(res, () => kern.werkplaats.overzicht()));
+  app.post('/api/office/werkplaats/maak', officeAuth, (req, res) => veilig(res, () => kern.werkplaats.maak(req.body || {})));
+  app.post('/api/office/werkplaats/zet', officeAuth, (req, res) => veilig(res, () => kern.werkplaats.zet(String(req.body.id || ''), req.body || {})));
+  app.post('/api/office/werkplaats/verwijder', officeAuth, (req, res) => veilig(res, () => kern.werkplaats.verwijder(String(req.body.id || ''))));
+  app.post('/api/office/werkplaats/uitwerken', officeAuth, async (req, res) => {
+    try { const r = await kern.werkplaats.aiUitwerken(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[werkplaats]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  app.post('/api/office/werkplaats/kritiek', officeAuth, async (req, res) => {
+    try { const r = await kern.werkplaats.aiKritiek(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[werkplaats]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   // het persbureau (RTG Redactie) staat apart, in ./redactie.js
   require('./redactie')(ctx);
 };

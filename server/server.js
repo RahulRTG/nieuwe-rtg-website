@@ -2243,6 +2243,10 @@ Object.assign(kern, require('./kern/hardwarelab').maakHardwarelab({ db, save, cr
    gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. AI tekent
    het concept uit, levert een bouwstaat en de blik van de chef-architect. */
 Object.assign(kern, require('./kern/architect').maakArchitect({ db, save, crypto, anthropic, schoon }));
+/* RTG Werkplaats (kern/werkplaats.js): het app-bureau van de kantoren. Bedenkt
+   nieuwe apps en verbetert bestaande apps, de Bibliotheek en de App Store met AI
+   (advies; een mens beslist en bouwt). */
+Object.assign(kern, require('./kern/werkplaats').maakWerkplaats({ db, save, crypto, anthropic, schoon }));
 /* De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app; een
    gecureerde etagelijst van de retail-partners, elk met een eigen catalogus. */
 Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail }));

@@ -463,6 +463,36 @@
     <div id="aLijst"><div class="leeg">Nog geen ontwerpen.</div></div>
   </section>
 
+  <!-- RTG Werkplaats: het app-bureau -->
+  <section id="vWerkplaats" hidden>
+    <div class="kop">
+      <button class="terug" id="wpTerug">← alle kamers</button>
+      <h1>RTG Werkplaats</h1>
+    </div>
+    <p class="deck">Het app-bureau van de kantoren. Bedenk een nieuwe app of verbeter een bestaande app, materiaal uit de Bibliotheek of een groep in de App Store. Geef een korte brief, de AI werkt het uit tot een plan met schermen, functies en eerste stappen, en geeft op verzoek de scherpe blik van de chef. Alles is advies: een mens beslist en bouwt, klein en omkeerbaar.</p>
+    <div class="kpis" id="wpKpi"></div>
+    <h3 class="sec">Nieuwe opdracht</h3>
+    <div class="kaart">
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+        <select class="veld" id="wpSoort" style="max-width:12rem;" aria-label="Soort opdracht">
+          <option value="nieuw">Nieuwe app bedenken</option>
+          <option value="verbeter">Bestaand onderdeel verbeteren</option>
+        </select>
+        <select class="veld" id="wpDoelSoort" style="max-width:12rem;" aria-label="Wat verbeteren" hidden>
+          <option value="app">Bestaande app</option>
+          <option value="bieb">Bibliotheek</option>
+          <option value="winkel">App Store</option>
+        </select>
+        <input class="veld" id="wpDoel" style="flex:1;min-width:11rem;" placeholder="Welk onderdeel? bijv. RTG Pay" maxlength="120" hidden>
+      </div>
+      <input class="veld" id="wpNaam" style="width:100%;margin-top:.5rem;" placeholder="Naam van de opdracht" maxlength="120">
+      <textarea id="wpBrief" rows="2" maxlength="900" placeholder="De brief: wat moet het worden of beter kunnen?" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <button class="knop" id="wpMaak" style="margin-top:.5rem;">Opdracht aanmaken + laten uitwerken</button>
+    </div>
+    <h3 class="sec">De werkbank <span id="wpFilters" style="margin-left:.4rem;"></span></h3>
+    <div id="wpLijst"><div class="leeg">Nog geen opdrachten.</div></div>
+  </section>
+
   <!-- RTG Ontwerpstudio: voertuigen en vaartuigen -->
   <section id="vStudio" hidden>
     <div class="kop">
@@ -657,7 +687,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vAtelier','vStudio','vHardware','vArchitect','vIdeeen'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vAtelier','vStudio','vHardware','vArchitect','vIdeeen','vWerkplaats'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -684,6 +714,7 @@ async function binnen(){
     else if (start === 'studio') await openStudio();
     else if (start === 'hardware') await openHardware();
     else if (start === 'architect') await openArchitect();
+    else if (start === 'werkplaats') await openWerkplaats();
     else if (start === 'ideeen') await openIdeeen();
     else await openKamer(start);
   } catch (e) { zetKamerUrl(''); }
@@ -702,12 +733,13 @@ async function laadKamers(){
     '<button class="kaart kamer board" data-kamer="stad"><span class="ic">'+ico('stad')+'</span><h2>RTG Stad</h2><p>De hele stad slimmer op eigen hardware en software: Stadsdozen meten, één knop zet de stand.</p><span class="kpi">De stadsinfrastructuur →</span></button>' +
     '<button class="kaart kamer board" data-kamer="redactie"><span class="ic">'+ico('nieuws')+'</span><h2>RTG Redactie</h2><p>Krant, magazine en drukkerij in eigen huis; de nieuwstips komen uit het hele platform.</p><span class="kpi">Naar het perskantoor →</span></button>' +
     '<button class="kaart kamer board" data-kamer="techniek"><span class="ic">'+ico('schild')+'</span><h2>Techniek &amp; De Wacht</h2><p>De motor onder de motorkap: sluiten beide grootboeken op de cent, draait de Rust-motor mee, en werpt De Wacht netjes load af onder druk?</p><span class="kpi">De controlekamer →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="werkplaats"><span class="ic">'+ico('sitemaker')+'</span><h2>RTG Werkplaats</h2><p>Het app-bureau: bedenk met AI nieuwe apps en verbeter bestaande apps, de Bibliotheek en de App Store.</p><span class="kpi">Bouwen &amp; verbeteren →</span></button>' +
     '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">'+ico('schild')+'</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+ico(k.icoon)+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'techniek' ? openTechniek() : b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'techniek' ? openTechniek() : b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : b.dataset.kamer === 'werkplaats' ? openWerkplaats() : openKamer(b.dataset.kamer)));
   gezondBand();
 }
 
@@ -956,6 +988,72 @@ $('#aMaak').addEventListener('click', async () => {
     try { const c = await api('atelier/concept', { id: r.ontwerp.id }); vervangOntwerp(c.ontwerp); } catch(e){ renderAtelier(); }
     meld('Ontwerp aangemaakt; de creatief directeur tekent het concept.');
   } catch(e){ meld(e.message); }
+});
+
+/* ---------- RTG Werkplaats: het app-bureau ---------- */
+let WP = null;
+async function openWerkplaats(){
+  try { WP = await api('werkplaats'); } catch(e){ meld(e.message); return; }
+  zetKamerUrl('werkplaats'); toon('vWerkplaats'); renderWerkplaats();
+}
+function wpLijstje(t, a){ return (a && a.length) ? '<div style="margin-top:.4rem;"><b style="color:var(--gold);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;">'+t+'</b><ul style="margin:.2rem 0 0 1rem;padding:0;font-size:.83rem;line-height:1.5;">'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>' : ''; }
+function wpPlan(p){
+  if(!p) return '';
+  let b = '<div class="kaart" style="margin-top:.5rem;background:var(--bg);">';
+  if(p.soort==='nieuw'){
+    if(p.doel) b += '<p style="margin:0;">'+esc(p.doel)+'</p>';
+    if(p.doelgroep) b += '<p class="stil" style="font-size:.78rem;color:var(--soft);margin:.3rem 0 0;">Voor: '+esc(p.doelgroep)+'</p>';
+    b += wpLijstje('Schermen',p.schermen)+wpLijstje('Functies',p.functies);
+    if(p.huisstijl) b += '<div style="margin-top:.4rem;"><b style="color:var(--gold);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;">Huisstijl</b><p style="margin:.15rem 0 0;font-size:.83rem;">'+esc(p.huisstijl)+'</p></div>';
+    b += wpLijstje('Eerste stappen',p.eersteStappen);
+  } else {
+    if(p.analyse) b += '<p style="margin:0;">'+esc(p.analyse)+'</p>';
+    b += wpLijstje('Verbeteringen',p.verbeteringen)+wpLijstje('Nieuwe functies',p.nieuweFuncties)+wpLijstje("Risico's",p.risicos)+wpLijstje('Eerste stappen',p.eersteStappen);
+  }
+  return b + '</div>';
+}
+function renderWerkplaats(){
+  if(!WP) return;
+  const k = WP.kpi || {};
+  $('#wpKpi').innerHTML = [['Opdrachten',k.totaal||0],['Nieuwe apps',k.nieuw||0],['Verbeteringen',k.verbeter||0],['Klaar',k.klaar||0]]
+    .map(x => '<div class="kaart kpi-tegel"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
+  const it = WP.items || [];
+  if(!it.length){ $('#wpLijst').innerHTML = '<div class="leeg">Nog geen opdrachten.</div>'; return; }
+  const opts = o => (WP.statussen||[]).map(s=>'<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+esc(s)+'</option>').join('');
+  $('#wpLijst').innerHTML = it.map(o => '<div class="kaart" style="margin-bottom:.6rem;">'+
+    '<div class="rij" style="justify-content:space-between;gap:.5rem;align-items:baseline;flex-wrap:wrap;">'+
+      '<h3 style="margin:0;font-size:1rem;">'+esc(o.naam)+'</h3>'+
+      '<span class="stil" style="font-size:.72rem;color:var(--gold);">'+esc(o.soortLabel)+(o.doelSoortLabel?' · '+esc(o.doelSoortLabel):'')+(o.doel?' · '+esc(o.doel):'')+'</span></div>'+
+    (o.brief?'<p class="stil" style="font-size:.82rem;color:var(--soft);margin:.3rem 0 0;">'+esc(o.brief)+'</p>':'')+
+    wpPlan(o.plan)+
+    (o.kritiek?'<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.83rem;font-style:italic;">'+esc(o.kritiek)+'</div>':'')+
+    '<div class="rij" style="gap:.4rem;margin-top:.6rem;flex-wrap:wrap;align-items:center;">'+
+      '<button class="knop stil" data-wp-uit="'+o.id+'" style="font-size:.78rem;">'+(o.plan?'Opnieuw uitwerken':'AI werkt het uit')+'</button>'+
+      (o.plan?'<button class="knop stil" data-wp-kri="'+o.id+'" style="font-size:.78rem;">Scherpe blik</button>':'')+
+      '<select class="veld" data-wp-status="'+o.id+'" style="max-width:9rem;font-size:.78rem;">'+opts(o)+'</select>'+
+      '<span style="flex:1;"></span>'+
+      '<button class="knop stil" data-wp-del="'+o.id+'" style="font-size:.78rem;color:var(--burgundy);">Verwijder</button>'+
+    '</div></div>').join('');
+  $('#wpLijst').querySelectorAll('[data-wp-uit]').forEach(b=>b.addEventListener('click',async()=>{ b.disabled=true; b.textContent='Bezig...'; try{ const r=await api('werkplaats/uitwerken',{id:b.dataset.wpUit}); vervangWp(r.item); meld('Uitgewerkt door de AI.'); }catch(e){ meld(e.message); b.disabled=false; } }));
+  $('#wpLijst').querySelectorAll('[data-wp-kri]').forEach(b=>b.addEventListener('click',async()=>{ b.disabled=true; try{ const r=await api('werkplaats/kritiek',{id:b.dataset.wpKri}); vervangWp(r.item); }catch(e){ meld(e.message); b.disabled=false; } }));
+  $('#wpLijst').querySelectorAll('[data-wp-status]').forEach(s=>s.addEventListener('change',async()=>{ try{ const r=await api('werkplaats/zet',{id:s.dataset.wpStatus,status:s.value}); vervangWp(r.item); }catch(e){ meld(e.message); } }));
+  $('#wpLijst').querySelectorAll('[data-wp-del]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api('werkplaats/verwijder',{id:b.dataset.wpDel}); WP.items=WP.items.filter(x=>x.id!==b.dataset.wpDel); renderWerkplaats(); }catch(e){ meld(e.message); } }));
+}
+function vervangWp(o){ if(!o||!WP) return; const i=WP.items.findIndex(x=>x.id===o.id); if(i>=0) WP.items[i]=o; else WP.items.unshift(o); renderWerkplaats(); }
+$('#wpTerug').addEventListener('click', laadKamers);
+$('#wpSoort').addEventListener('change', ()=>{ const v=$('#wpSoort').value==='verbeter'; $('#wpDoelSoort').hidden=!v; $('#wpDoel').hidden=!v; });
+$('#wpMaak').addEventListener('click', async ()=>{
+  const naam=$('#wpNaam').value.trim(); if(!naam){ meld('Geef de opdracht een naam.'); return; }
+  const soort=$('#wpSoort').value;
+  const body={ soort, naam, brief:$('#wpBrief').value.trim() };
+  if(soort==='verbeter'){ body.doelSoort=$('#wpDoelSoort').value; body.doel=$('#wpDoel').value.trim(); }
+  try{
+    const r=await api('werkplaats/maak', body);
+    $('#wpNaam').value=''; $('#wpBrief').value=''; $('#wpDoel').value='';
+    WP.items.unshift(r.item); WP.kpi.totaal=(WP.kpi.totaal||0)+1;
+    try{ const u=await api('werkplaats/uitwerken',{id:r.item.id}); vervangWp(u.item); }catch(e){ renderWerkplaats(); }
+    meld('Opdracht aangemaakt; de AI werkt het uit.');
+  }catch(e){ meld(e.message); }
 });
 
 /* ---------- RTG Ontwerpstudio: voertuigen en vaartuigen ---------- */

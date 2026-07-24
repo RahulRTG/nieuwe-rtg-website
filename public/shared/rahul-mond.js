@@ -59,6 +59,22 @@
     bar.appendChild(can); bar.appendChild(veld); bar.appendChild(go);
     document.body.appendChild(uit); document.body.appendChild(bar);
 
+    /* Pratende placeholder: de balk laat rustig wisselende voorbeelden zien van
+       wat je Rahul kunt laten doen. Alleen als het veld leeg is en je er niet in
+       typt (dus nooit storend), en niet bij prefers-reduced-motion. */
+    (function () {
+      var vb = ['Vraag Rahul, of laat iets doen...', 'bv. hoe loopt de dag?',
+        'bv. zet de zaak open', 'bv. plan het rooster voor morgen',
+        'bv. wat is de omzet vandaag?', 'bv. bestel voorraad bij'];
+      var stil = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (stil) return; // dan blijft de eerste, rustige placeholder staan
+      var i = 0;
+      setInterval(function () {
+        if (document.hidden || veld.value || document.activeElement === veld) return;
+        i = (i + 1) % vb.length; veld.placeholder = vb[i];
+      }, 4200);
+    })();
+
     // de lippen laden (shared/mond.js); lukt dat niet, dan een rustige stip
     var s = document.createElement('script'); s.src = '/shared/mond.js';
     s.onload = function () { try { if (window.RTGMond) mond = RTGMond.maak(can); } catch (e) {} };

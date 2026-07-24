@@ -103,7 +103,7 @@
       '<div class="mgz-kop"><span>Vraag het Rahul</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
       '<div class="mgz-seintjes" data-seintjes></div>' +
       '<div class="mgz-uit" aria-live="polite"></div>' +
-      '<form class="mgz-rij"><input placeholder="Vraag of opdracht" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
+      '<form class="mgz-rij"><input placeholder="bv. boek een taxi naar huis" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht aan Rahul"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
     document.body.appendChild(fab); document.body.appendChild(sheet);
     maakSleepbaar(fab, 'rtg_rahul_pos'); // de lippen overal neer te zetten
     var uit = sheet.querySelector('.mgz-uit'), form = sheet.querySelector('form'), inp = form.querySelector('input');

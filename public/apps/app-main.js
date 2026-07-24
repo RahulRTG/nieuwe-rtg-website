@@ -3218,6 +3218,14 @@
   function zoek() {
     const q = (zoekInput.value || '').trim().toLowerCase();
     zoekLijst.textContent = '';
+    // zodra je iets typt: Rahul bovenaan. Zoeken gaat zo naadloos over in laten-
+    // doen -- wat je ook typt (een app-naam, een klus, een vraag), Rahul pakt het
+    // op met je eigen inlog. De letterlijke tekst gaat mee (niet de lowercase).
+    if (q) {
+      const bt = document.createElement('span'); bt.textContent = '✦';
+      zoekRij(bt, 'Laat Rahul dit doen: "' + zoekInput.value.trim() + '"', null,
+        () => vraagRahul(zoekInput.value.trim()));
+    }
     // leeg veld: eerst "Voor u", de apps die u hier het vaakst opent
     if (!q) {
       const top = topGebruik(4);
@@ -3243,9 +3251,12 @@
       }
     }
     // altijd onderaan: geef de vraag aan Rahul, wat het ook is
-    const bi = document.createElement('span'); bi.textContent = '✦';
-    zoekRij(bi, q ? 'Vraag Rahul: "' + zoekInput.value.trim() + '"' : 'Vraag Rahul', null,
-      () => vraagRahul(zoekInput.value.trim()));
+    // bij een lege zoekbalk staat Rahul onderaan als vaste ingang; zodra je typt
+    // staat hij al bovenaan (zie zoek()), dus dan slaan we de dubbele rij over.
+    if (!q) {
+      const bi = document.createElement('span'); bi.textContent = '✦';
+      zoekRij(bi, 'Vraag Rahul', null, () => vraagRahul(''));
+    }
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
   const zoekPil = $('#osZoekPil');

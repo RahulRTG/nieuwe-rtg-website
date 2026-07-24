@@ -113,6 +113,7 @@
      blijven van de app; wij beheren alleen onze eigen klasse. */
   const pagina2 = $('#osPagina2'), wChips = $('#osWChips');
   const W_NAMEN = {
+    homeKlok2: 'Klok',
     homeTrip: 'Reis', homePay: 'Betalen', homeSalon: 'De Salon', homeContacts: 'Contacten',
     homeSpelen: 'Spelen', homeCv: 'CV', homeVacatures: 'Vacatures', homeFoundation: 'Foundation'
   };

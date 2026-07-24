@@ -107,8 +107,11 @@
       '<div class="mgz-seintjes" data-seintjes></div>' +
       '<div class="mgz-uit" aria-live="polite"></div>' +
       '<form class="mgz-rij"><input placeholder="bv. boek een taxi naar huis" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht aan Rahul"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
-    document.body.appendChild(fab); document.body.appendChild(sheet);
-    maakSleepbaar(fab, 'rtg_rahul_pos'); // de lippen overal neer te zetten
+    // De zwevende Rahul-knop rechtsonder is overal weggehaald: te druk in beeld.
+    // Rahul blijft bereikbaar -- in het leden-OS via het dock en de zoekbalk, en
+    // op elke pagina via de lege-toestand-nudges (window.RTGRahul.vraag). We
+    // houden het vraagvenster (sheet) in de DOM, alleen de knop tonen we niet.
+    document.body.appendChild(sheet);
     var uit = sheet.querySelector('.mgz-uit'), form = sheet.querySelector('form'), inp = form.querySelector('input');
     var seintjesVak = sheet.querySelector('[data-seintjes]');
     fab.addEventListener('click', function () { sheet.hidden = false; fab.hidden = true; inp.focus(); doofMelding();
@@ -224,10 +227,10 @@
   var sSheet = maakEl('<section class="mgz-sheet" aria-label="Samen" hidden style="bottom:3.6rem;">' +
     '<div class="mgz-kop"><span>Samen</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="mgz-vak"></div></section>');
-  // Op het leden-OS (app.html) hoort Samen in het bedieningspaneel, niet als
-  // zwevende knop; daar opent Instellingen het via window.RTGMetgezel.samen().
-  var samenInPaneel = /\/apps\/app\.html$/.test(location.pathname);
-  if (!samenInPaneel) document.body.appendChild(sKnop);
+  // De zwevende Samen-knop is overal weggehaald en verhuisd naar het
+  // bedieningspaneel van het leden-OS; daar opent Instellingen hem via
+  // window.RTGMetgezel.samen(). We houden alleen het Samen-venster (sSheet) in
+  // de DOM; de knop zelf tonen we niet meer.
   document.body.appendChild(sSheet);
   var vak = sSheet.querySelector('.mgz-vak');
   function toonSamen() { sSheet.hidden = false; sKnop.hidden = true; teken(); }

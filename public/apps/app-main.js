@@ -3591,6 +3591,7 @@
      blijven van de app; wij beheren alleen onze eigen klasse. */
   const pagina2 = $('#osPagina2'), wChips = $('#osWChips');
   const W_NAMEN = {
+    homeKlok2: 'Klok',
     homeTrip: 'Reis', homePay: 'Betalen', homeSalon: 'De Salon', homeContacts: 'Contacten',
     homeSpelen: 'Spelen', homeCv: 'CV', homeVacatures: 'Vacatures', homeFoundation: 'Foundation'
   };
@@ -3857,6 +3858,16 @@
     if (window.RTGMetgezel && RTGMetgezel.samen) RTGMetgezel.samen();
     else bannerToon('', T('os.samen', 'Samen'), T('os.samen.straks', 'Samen is zo beschikbaar.'));
   });
+
+  /* ---------- Scherm draaien en volledig scherm: verhuisd naar het paneel ----------
+     De schermbeeld-laag (shared/schermbeeld.js) houdt op dit OS zijn zwevende
+     pil weg en biedt window.RTGscherm aan; hier bedienen we die vanuit het
+     bedieningspaneel. Volledig scherm vraagt om een gebruikersgebaar -- de tik
+     op deze knop is dat gebaar, dus we roepen het meteen aan. */
+  var ccDraai = $('#osCcDraai');
+  if (ccDraai) ccDraai.addEventListener('click', function () { sluitScrims(); if (window.RTGscherm) RTGscherm.draai(); });
+  var ccVol = $('#osCcVol');
+  if (ccVol) ccVol.addEventListener('click', function () { if (window.RTGscherm) RTGscherm.volledig(); sluitScrims(); });
 
   /* ---------- De Boardroom: functies aan en uit vanuit Instellingen ----------
      Uw eigen boardroom: alle functies waar u recht op heeft, aan of uit te zetten.

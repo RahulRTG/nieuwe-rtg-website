@@ -156,7 +156,8 @@
 </div></div>
 <!-- beeld-kiezer -->
 <div class="sheet" id="beeldSheet"><div class="box">
-  <h2>Kies beeld</h2><div class="sub">Eigen RTG-campagnebeeld (quiet luxury). Geen stockfoto's.</div>
+  <h2>Kies beeld</h2><div class="sub">Eigen foto's, "Uit De Salon" en het RTG-campagnebeeld (quiet luxury). Geen stockfoto's.</div>
+  <div style="margin:.2rem 0 .7rem;"><button type="button" id="uploadKnop" class="knop stil" style="font-size:.82rem;">Upload eigen foto</button><input type="file" id="fotoIn" accept="image/*" hidden><span id="uploadStatus" class="sub" style="margin-left:.6rem;"></span></div>
   <div class="beeldgrid" id="beeldgrid"></div>
 </div></div>
 <!-- opgeslagen sjablonen -->
@@ -341,7 +342,19 @@ function verwijder(blok){
 }
 
 function kiesBeeld(doel){beeldDoel=doel;$('#beeldSheet').classList.add('open');}
-function bouwBeeldgrid(){const g=$('#beeldgrid');g.textContent='';BEELDEN.forEach(src=>{const b=document.createElement('button');b.type='button';const im=document.createElement('img');im.src=src;im.alt='';b.appendChild(im);b.addEventListener('click',()=>{if(!beeldDoel)return;if(beeldDoel.veld)beeldDoel.blok[beeldDoel.veld]=src;else if(beeldDoel.index!=null)beeldDoel.blok.beelden[beeldDoel.index]=src;$('#beeldSheet').classList.remove('open');render();});g.appendChild(b);});}
+let MIJNFOTOS=[], SALONFOTOS=[];
+function kiesSrc(src){if(!beeldDoel)return;if(beeldDoel.veld)beeldDoel.blok[beeldDoel.veld]=src;else if(beeldDoel.index!=null)beeldDoel.blok.beelden[beeldDoel.index]=src;$('#beeldSheet').classList.remove('open');render();}
+function beeldTegel(g,src,titel){const b=document.createElement('button');b.type='button';if(titel)b.title=titel;const im=document.createElement('img');im.src=src;im.alt=titel||'';b.appendChild(im);b.addEventListener('click',()=>kiesSrc(src));g.appendChild(b);}
+function bouwBeeldgrid(){
+  const g=$('#beeldgrid');g.textContent='';
+  // eigen geüploade foto's eerst, daarna "Uit De Salon" (uitgelicht + campagne)
+  const salon=SALONFOTOS.length?SALONFOTOS:BEELDEN.map(s=>({src:s,naam:'RTG-campagne'}));
+  MIJNFOTOS.forEach(src=>beeldTegel(g,src,'Eigen foto'));
+  salon.forEach(f=>beeldTegel(g,f.src,f.naam?('Uit De Salon · '+f.naam):'Uit De Salon'));
+}
+function leesBestand(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>rej(new Error('lezen mislukt'));fr.readAsDataURL(file);});}
+async function laadMijnFotos(){try{const r=await api('fotos');MIJNFOTOS=(r.fotos||[]);}catch(e){}}
+async function laadSalon(){try{const r=await api('salon');SALONFOTOS=(r.fotos||[]);}catch(e){}}
 function bouwBlokkies(){const g=$('#blokkies');g.textContent='';BLOKTYPES.forEach(bt=>{const b=document.createElement('button');b.type='button';b.innerHTML=esc(bt.n)+'<span class="k">'+esc(bt.k)+'</span>';b.addEventListener('click',()=>{const nb=nieuwBlok(bt.t);DESIGN.blokken.push(nb);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>DESIGN.volgorde[k].push(nb.id));$('#blokSheet').classList.remove('open');render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),40);});g.appendChild(b);});}
 function bouwSwatches(){const g=$('#swatches');g.textContent='';ACCENTEN.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='swatch'+(c===DESIGN.accent?' actief':'');b.style.background=c;b.title=c;b.addEventListener('click',()=>{DESIGN.accent=c;bouwSwatches();render();});g.appendChild(b);});}
 
@@ -399,6 +412,15 @@ function exporteer(){
 if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in via de Kantoren</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-studio hoort bij het RTG Atelier. Open de Kantoren en log in met je kantoor-account.</p><p style="margin-top:1rem;"><a href="/apps/kantoren.html">Naar de Kantoren →</a></p></div>'; }
 else {
   bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
+  laadMijnFotos().then(bouwBeeldgrid);
+  laadSalon().then(bouwBeeldgrid);
+  $('#uploadKnop').addEventListener('click',()=>$('#fotoIn').click());
+  $('#fotoIn').addEventListener('change',async e=>{
+    const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f)return;
+    $('#uploadStatus').textContent='Scannen…';
+    try{ const dataUrl=await leesBestand(f); const r=await api('foto',{dataUrl}); MIJNFOTOS=r.fotos||MIJNFOTOS; bouwBeeldgrid(); $('#uploadStatus').textContent='Toegevoegd. Klik de foto om hem te plaatsen.'; }
+    catch(err){ $('#uploadStatus').textContent=err.message||'Upload mislukt.'; }
+  });
   $('#blokKnop').addEventListener('click',()=>$('#blokSheet').classList.add('open'));
   $('#bewaarKnop').addEventListener('click',bewaar);
   $('#openKnop').addEventListener('click',openen);

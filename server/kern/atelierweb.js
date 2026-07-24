@@ -14,10 +14,24 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst'];
   const VERSIES = ['telefoon', 'tablet', 'desktop']; // op welke versies een blok verborgen mag zijn
 
+  const FOTO_MAX = 40;        // hoeveel eigen foto's het Atelier in zijn beeldbank houdt
   function store() {
     if (!db.data.atelierSites || !Array.isArray(db.data.atelierSites.lijst)) db.data.atelierSites = { lijst: [] };
+    if (!Array.isArray(db.data.atelierSites.fotos)) db.data.atelierSites.fotos = [];
     return db.data.atelierSites;
   }
+  // De gedeelde beeldbank van het Atelier: alleen veilige /media-verwijzingen (het
+  // scannen en opslaan gebeurt in de route, hier bewaren we alleen de url).
+  function fotos() { return store().fotos.slice(); }
+  function fotoBewaar(url) {
+    if (!/^\/media\/[A-Za-z0-9._-]+$/.test(String(url || ''))) return { error: 'Ongeldige foto.', status: 400 };
+    const s = store();
+    if (!s.fotos.includes(url)) s.fotos.unshift(url);
+    if (s.fotos.length > FOTO_MAX) s.fotos.length = FOTO_MAX;
+    save();
+    return { ok: true, url, fotos: s.fotos.slice() };
+  }
+  function fotoWeg(url) { const s = store(); s.fotos = s.fotos.filter(u => u !== url); save(); return { ok: true, fotos: s.fotos.slice() }; }
 
   function schoonBlok(b) {
     b = b || {};
@@ -105,5 +119,5 @@ module.exports = ({ db, save, crypto, schoon }) => {
   function haal(id) { return store().lijst.find(x => x.id === scho(id, 20)) || null; }
   function verwijder(id) { const s = store(); s.lijst = s.lijst.filter(x => x.id !== scho(id, 20)); save(); return { ok: true }; }
 
-  return { bewaar, lijst, haal, verwijder, TYPES };
+  return { bewaar, lijst, haal, verwijder, fotos, fotoBewaar, fotoWeg, TYPES };
 };

@@ -329,14 +329,19 @@ function verwijder(blok){
 }
 
 function kiesBeeld(doel){beeldDoel=doel;$('#beeldSheet').classList.add('open');}
-let MIJNFOTOS=[];
+let MIJNFOTOS=[], SALONFOTOS=[];
 function kiesSrc(src){ if(!beeldDoel)return; if(beeldDoel.veld)beeldDoel.blok[beeldDoel.veld]=src; else if(beeldDoel.index!=null)beeldDoel.blok.beelden[beeldDoel.index]=src; $('#beeldSheet').classList.remove('open'); render(); }
+function beeldTegel(g,src,titel){const b=document.createElement('button');b.type='button';if(titel)b.title=titel;const im=document.createElement('img');im.src=src;im.alt=titel||'';b.appendChild(im);b.addEventListener('click',()=>kiesSrc(src));g.appendChild(b);}
 function bouwBeeldgrid(){
   const g=$('#beeldgrid');g.textContent='';
-  // eigen geüploade foto's eerst, daarna het RTG-campagnebeeld
-  MIJNFOTOS.concat(BEELDEN).forEach(src=>{const b=document.createElement('button');b.type='button';const im=document.createElement('img');im.src=src;im.alt='';b.appendChild(im);b.addEventListener('click',()=>kiesSrc(src));g.appendChild(b);});
+  // eigen geüploade foto's eerst, daarna "Uit De Salon" (uitgelicht + campagne).
+  // De Salon levert het beeld; valt terug op het vaste campagnebeeld.
+  const salon = SALONFOTOS.length ? SALONFOTOS : BEELDEN.map(s=>({src:s,naam:'RTG-campagne'}));
+  MIJNFOTOS.forEach(src=>beeldTegel(g,src,'Eigen foto'));
+  salon.forEach(f=>beeldTegel(g,f.src,f.naam?('Uit De Salon · '+f.naam):'Uit De Salon'));
 }
 async function laadMijnFotos(){ try{ const r=await api('fotos',{}); MIJNFOTOS=(r.fotos||[]); }catch(e){} }
+async function laadSalon(){ try{ const r=await fetch('/api/salon/promo',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:'{}'}); const d=await r.json().catch(()=>({})); if(r.ok)SALONFOTOS=(d.fotos||[]); }catch(e){} }
 function leesBestand(file){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>rej(new Error('lezen mislukt')); fr.readAsDataURL(file); }); }
 function bouwBlokkies(){const g=$('#blokkies');g.textContent='';BLOKTYPES.forEach(bt=>{const b=document.createElement('button');b.type='button';b.innerHTML=esc(bt.n)+'<span class="k">'+esc(bt.k)+'</span>';b.addEventListener('click',()=>{const nb=nieuwBlok(bt.t);DESIGN.blokken.push(nb);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>DESIGN.volgorde[k].push(nb.id));$('#blokSheet').classList.remove('open');render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),40);});g.appendChild(b);});}
 function bouwSwatches(){const g=$('#swatches');g.textContent='';ACCENTEN.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='swatch'+(c===DESIGN.accent?' actief':'');b.style.background=c;b.title=c;b.addEventListener('click',()=>{DESIGN.accent=c;bouwSwatches();render();});g.appendChild(b);});}
@@ -388,6 +393,7 @@ if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'B
 else {
   bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
   laadMijnFotos().then(bouwBeeldgrid);
+  laadSalon().then(bouwBeeldgrid);
   $('#uploadKnop').addEventListener('click',()=>$('#fotoIn').click());
   $('#fotoIn').addEventListener('change',async e=>{
     const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f)return;

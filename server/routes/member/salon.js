@@ -95,6 +95,12 @@ module.exports = (kern) => {
     res.json({ ok: true });
   });
 
+  /* Beeld "Uit De Salon" voor de Website-maker: uitgelichte en partner-posts met
+     een echte foto, plus het eigen RTG-campagnebeeld. De Salon levert het beeld. */
+  app.post('/api/salon/promo', auth, (req, res) => {
+    res.json({ fotos: require('../../kern/salonpromo').salonPromoFotos(db) });
+  });
+
   app.post('/api/salon/volg', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const s = findSupplier(req.body.code);

@@ -24,17 +24,30 @@ function isBelangrijk(p) {
   return BELANG.test(String(p.text || '') + ' ' + String(p.place || ''));
 }
 
-// komt deze post in De Salon?
-function toonInSalon(p) {
+/* Komt deze post in De Salon van deze kijker?
+
+   De algemene regel is de kwaliteitsdrempel: alleen wat viraal gaat of
+   maatschappelijk belangrijk is, zien vreemden. Maar het blijft ook een sociaal
+   netwerk: van iemand met wie je bevriend bent of die je volgt, zie je een
+   bericht altijd -- ook als het (nog) niet viraal is. En ga je zelf viraal, dan
+   ziet iedereen je. De kijker-afhankelijke uitzonderingen komen via een optionele
+   `kijker` met twee voorspellers: volgt(p) en bevriend(p). Zonder kijker gedraagt
+   de gate zich als het openbare feed (alleen viraal/belangrijk/curatie). */
+function toonInSalon(p, kijker) {
   if (!p) return false;
   if (p.partner) return true;   // de zakelijke etalage staat los van de drempel
   if (p.featured) return true;  // RTG cureert: altijd zichtbaar
-  return isViraal(p) || isBelangrijk(p);
+  if (isViraal(p) || isBelangrijk(p)) return true;              // viraal: iedereen ziet je
+  if (kijker && (kijker.bevriend(p) || kijker.volgt(p))) return true; // vriend/volger: sowieso
+  return false;
 }
 
-// reden voor een klein label in de UI ("Trending" / "Belangrijk"); null = geen
-function reden(p) {
+// reden voor een klein label in de UI; null = geen. Persoonlijke banden gaan
+// voor op de drempel-labels: een vriend/volger zie je omdat je hem kent.
+function reden(p, kijker) {
   if (!p || p.partner || p.featured) return null;
+  if (kijker && kijker.bevriend(p)) return 'vriend';
+  if (kijker && kijker.volgt(p)) return 'volgend';
   if (isBelangrijk(p)) return 'belangrijk';
   if (isViraal(p)) return 'viraal';
   return null;

@@ -1027,8 +1027,12 @@ function auth(req, res, next) {
    uit; iedereen chat in de eigen taal en de ander leest alles in de zijne. Vroeg
    opgezet zodat de leden-laag (en alles daarna) taalVan kan gebruiken. */
 const talen = maakTalen({ db, save });
+// De leden-kern wordt vóór de sociale laag gebouwd; deps.zijnVrienden wordt
+// hieronder laat-gebonden gevuld zodra de vriendenlaag bestaat (voor de
+// Salon-zichtbaarheid: van een vriend zie je een bericht altijd).
+const lidDeps = { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan };
 const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications } =
-  maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan });
+  maakLid(lidDeps);
 
 /* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
    -facturen. Hoisted en dus ook bruikbaar door de demo-seed hierboven (die vóór
@@ -1265,6 +1269,9 @@ rtf.setMarkt(markt);
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
 } = sociaal;
+// laat-gebonden: de leden-kern (De Salon) mag nu de vriendschap tussen kijker en
+// auteur nakijken, zodat je een bericht van een vriend altijd ziet
+lidDeps.zijnVrienden = zijnVrienden;
 function geenGast(req, res) {
   // vrienden toevoegen, chatten en bellen kan met elk echt account, ook de
   // gratis laag (met paspoort). Alleen een anonieme demo-gast zonder account niet.

@@ -9,7 +9,12 @@
 
 const salonviraal = require('./salonviraal');
 
-function maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan }) {
+function maakLid(deps) {
+  const { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan } = deps;
+  // Laat-gebonden vriendencheck: de sociale laag wordt ná de leden-kern
+  // opgebouwd, dus server.js vult deps.zijnVrienden later in. Zonder die functie
+  // (bijv. losse module-test) telt niemand als vriend.
+  const zijnVriendenVan = (a, b) => { try { return typeof deps.zijnVrienden === 'function' ? !!deps.zijnVrienden(a, b) : false; } catch (e) { return false; } };
   function hasContact(higherFull, rtgFull) {
     return db.data.contacts.some(c => c.higher === higherFull && c.rtg === rtgFull);
   }
@@ -59,16 +64,26 @@ function maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeft
     // Systeeminhoud (facturen, reis, menu) wordt gelokaliseerd. Berichten van
     // leden (posts, reacties) houden hun originele tekst + de taal van de auteur,
     // zodat de ontvanger ze in zijn eigen taal vertaald kan lezen.
-    // De Salon toont alleen wat viraal gaat of maatschappelijk belangrijk is; de
-    // zakelijke partner-etalage en de door RTG uitgelichte posts staan daar los
-    // van en blijven altijd zichtbaar (zie kern/salonviraal.js).
-    const posts = db.data.posts.filter(salonviraal.toonInSalon).map(p => {
+    // De Salon toont aan vreemden alleen wat viraal gaat of maatschappelijk
+    // belangrijk is; de zakelijke partner-etalage en de door RTG uitgelichte
+    // posts staan daar los van en blijven altijd zichtbaar. Maar van een vriend
+    // of iemand die je volgt zie je een bericht altijd (zie kern/salonviraal.js).
+    const volgtAuteur = (p) => {
+      if (p.partnerCode) { const s = findSupplier(p.partnerCode); return !!(s && s.salon && Array.isArray(s.salon.volgers) && s.salon.volgers.includes(sess.key)); }
+      return false;
+    };
+    const bevriendMet = (p) => {
+      if (!p.authorKey || sess.tier === 'guest' || !sess.key) return false;
+      return zijnVriendenVan(sess.key, p.authorKey);
+    };
+    const kijker = { volgt: volgtAuteur, bevriend: bevriendMet };
+    const posts = db.data.posts.filter(p => salonviraal.toonInSalon(p, kijker)).map(p => {
       const sup = p.partnerCode ? findSupplier(p.partnerCode) : null;
       const claim = p.deal ? (p.deal.claims || []).find(c => c.key === sess.key) : null;
       return {
         id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual, at: p.at || null,
         photo: p.photo || null, partner: !!p.partner,
-        reden: salonviraal.reden(p),
+        reden: salonviraal.reden(p, kijker),
         text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
         likes: p.baseLikes + Object.keys(p.likedBy).length,
         liked: !!p.likedBy[sess.key],

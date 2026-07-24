@@ -74,13 +74,18 @@
       const engage = canEngage(p);
       // gratis gebruikers (zonder pas) liken/reageren niet bij particulieren
       const mayLike = !(isGuest && !p.partner);
-      // waarom staat dit bericht in De Salon? De Salon toont alleen wat viraal
-      // gaat of maatschappelijk belangrijk is; een klein, ingetogen chipje maakt
-      // dat zichtbaar (partner-etalage en uitgelichte posts dragen geen chip).
-      const redenChip = p.reden
-        ? '<span class="salon-reden salon-reden-' + p.reden + '">' +
-            (p.reden === 'belangrijk' ? T('sal.reden.belangrijk', 'Belangrijk') : T('sal.reden.viraal', 'Trending')) +
-          '</span>'
+      // waarom staat dit bericht in De Salon? Vreemden zien alleen wat viraal
+      // gaat of maatschappelijk belangrijk is; van een vriend of iemand die je
+      // volgt zie je het sowieso. Een klein, ingetogen chipje maakt de reden
+      // zichtbaar (partner-etalage en uitgelichte posts dragen geen chip).
+      const REDEN_LABEL = {
+        vriend: T('sal.reden.vriend', 'Vriend'),
+        volgend: T('sal.reden.volgend', 'Je volgt'),
+        belangrijk: T('sal.reden.belangrijk', 'Belangrijk'),
+        viraal: T('sal.reden.viraal', 'Trending')
+      };
+      const redenChip = (p.reden && REDEN_LABEL[p.reden])
+        ? '<span class="salon-reden salon-reden-' + p.reden + '">' + REDEN_LABEL[p.reden] + '</span>'
         : '';
       const visual = p.photo
         ? '<div class="visual"><img src="' + p.photo + '" alt="">' + redenChip + '<span class="place">' + escT(p.place) + '</span></div>'

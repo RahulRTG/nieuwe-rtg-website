@@ -292,6 +292,15 @@ function stopNet(ms) {
 /* ---------- Postgres: 100M + activiteit zaaien (alleen mega-modus) ---------- */
 async function zaaiPostgres() {
   const { Pool } = require('../server/pgwire');
+  /* Controle-vlak schoonvegen (test-hygiene). Een HERGEBRUIKTE Postgres-DB kan
+     uit een vorige run een GETRIPTE zekering dragen -- de chaos-storm fuzzt de
+     schakelkast/techniek en kan bijv. de registratie-zekering uitzetten. Die
+     staat blijft dan in kv staan en de volgende run start met "registreren
+     uitgeschakeld" (503), waardoor Fase B/D omvallen op een spookoorzaak. We
+     wissen daarom de vluchtige controle-vlak-sleutels; ze herstellen bij het
+     opstarten naar de standaard (alles aan). De ledengids en de accounts raken
+     we niet aan. (In CI draait dit tegen een wegwerp-DB en is het een no-op.) */
+  try { psql("DELETE FROM kv WHERE key IN ('techniek','appregie','ledenregie','geldregie','leveranciersregie')"); } catch (e) {}
   psql('DROP INDEX IF EXISTS member_dir_codename_lower'); psql('DROP INDEX IF EXISTS member_dir_codename_trgm'); psql('TRUNCATE member_dir');
   for (let s = 1; s <= LEDEN; s += CHUNK) {
     const e = Math.min(s + CHUNK - 1, LEDEN); const tc = Date.now();

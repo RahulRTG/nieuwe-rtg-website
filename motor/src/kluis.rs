@@ -17,7 +17,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-const NONCE_LEN: usize = 12;
+const NONCE_LEN: usize = 24; // XChaCha20: 24-byte nonce -> geen collision-zorg
 const SLEUTEL_LEN: usize = 32;
 
 pub struct Kluis {
@@ -125,8 +125,9 @@ impl Kluis {
         }
         let mut nonce = [0u8; NONCE_LEN];
         aead::os_random(&mut nonce).map_err(|e| e.to_string())?;
-        // eigen ChaCha20-Poly1305 (RFC 8439), geverifieerd tegen de RFC-vectoren
-        let ct = aead::seal(&self.sleutel, &nonce, &[], klaartekst.as_bytes());
+        // eigen XChaCha20-Poly1305 (24-byte nonce -> nonce-hergebruik praktisch
+        // onmogelijk bij willekeurige nonces)
+        let ct = aead::xseal(&self.sleutel, &nonce, &[], klaartekst.as_bytes());
         let mut blob = nonce.to_vec();
         blob.extend_from_slice(&ct);
         self.store.insert(key.to_string(), blob);
@@ -145,7 +146,7 @@ impl Kluis {
         let (nonce, ct) = blob.split_at(NONCE_LEN);
         let mut n = [0u8; NONCE_LEN];
         n.copy_from_slice(nonce);
-        let pt = aead::open(&self.sleutel, &n, &[], ct)?;
+        let pt = aead::xopen(&self.sleutel, &n, &[], ct)?;
         String::from_utf8(pt).ok()
     }
 
@@ -176,6 +177,19 @@ impl Kluis {
     }
     pub fn pad(&self) -> &Path {
         &self.pad
+    }
+}
+
+impl Drop for Kluis {
+    /* Wis de sleutel uit het geheugen bij afsluiten, zodat hij niet in een
+       core-dump of vrijgegeven geheugen blijft staan. black_box zorgt dat de
+       compiler het wissen niet wegoptimaliseert (de bytes worden immers daarna
+       niet meer gelezen). */
+    fn drop(&mut self) {
+        for b in self.sleutel.iter_mut() {
+            *b = 0;
+        }
+        std::hint::black_box(&self.sleutel);
     }
 }
 

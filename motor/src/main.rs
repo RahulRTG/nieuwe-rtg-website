@@ -69,7 +69,7 @@ fn kluis_route(kluis: &std::sync::Mutex<rtg_motor::kluis::Kluis>, req: &Request)
         let mut b = Json::obj();
         b.set("ok", Json::Bool(true))
             .set("records", Json::Num(k.aantal() as f64))
-            .set("crypto", Json::Str("ChaCha20-Poly1305 (AEAD), versleuteld op schijf".into()))
+            .set("crypto", Json::Str("XChaCha20-Poly1305 (24-byte nonce), versleuteld op schijf".into()))
             .set("sleutelVingerafdruk", Json::Str(k.vingerafdruk().to_string()));
         return Response { status: 200, body: b.dump() };
     }
@@ -189,7 +189,7 @@ fn main() {
     // kluis: identiteitskluis met onze eigen ChaCha20-Poly1305 (zero-dep)
     let router_kluis = {
         let k = Arc::new(std::sync::Mutex::new(open_kluis()));
-        eprintln!("[motor] kluis actief: ChaCha20-Poly1305, sleutel-vingerafdruk {}", k.lock().unwrap().vingerafdruk());
+        eprintln!("[motor] kluis actief: XChaCha20-Poly1305, sleutel-vingerafdruk {}", k.lock().unwrap().vingerafdruk());
         start_kluis_flusher(Arc::clone(&k));
         k
     };

@@ -203,6 +203,45 @@ pub fn open(sleutel: &[u8; 32], nonce: &[u8; 12], aad: &[u8], ct_en_tag: &[u8]) 
     Some(pt)
 }
 
+// ---------- XChaCha20-Poly1305 (24-byte nonce, draft-irtf-cfrg-xchacha) ----------
+/* HChaCha20: leidt uit sleutel + 16-byte nonce een subsleutel af. Zelfde ronden
+   als ChaCha20, maar ZONDER de eind-optelling; uitvoer = woorden 0..4 en 12..16. */
+fn hchacha20(sleutel: &[u8; 32], nonce16: &[u8; 16]) -> [u8; 32] {
+    let mut w = [0u32; 16];
+    w[0] = 0x6170_7865; w[1] = 0x3320_646e; w[2] = 0x7962_2d32; w[3] = 0x6b20_6574;
+    for i in 0..8 { w[4 + i] = le32(&sleutel[4 * i..]); }
+    for i in 0..4 { w[12 + i] = le32(&nonce16[4 * i..]); }
+    for _ in 0..10 {
+        kwart(&mut w, 0, 4, 8, 12); kwart(&mut w, 1, 5, 9, 13); kwart(&mut w, 2, 6, 10, 14); kwart(&mut w, 3, 7, 11, 15);
+        kwart(&mut w, 0, 5, 10, 15); kwart(&mut w, 1, 6, 11, 12); kwart(&mut w, 2, 7, 8, 13); kwart(&mut w, 3, 4, 9, 14);
+    }
+    let mut out = [0u8; 32];
+    for i in 0..4 { out[4 * i..4 * i + 4].copy_from_slice(&w[i].to_le_bytes()); }
+    for i in 0..4 { out[16 + 4 * i..16 + 4 * i + 4].copy_from_slice(&w[12 + i].to_le_bytes()); }
+    out
+}
+
+fn x_naar_sub(sleutel: &[u8; 32], nonce24: &[u8; 24]) -> ([u8; 32], [u8; 12]) {
+    let mut n16 = [0u8; 16];
+    n16.copy_from_slice(&nonce24[0..16]);
+    let subsleutel = hchacha20(sleutel, &n16);
+    let mut cn = [0u8; 12]; // 4 nul-bytes + de laatste 8 nonce-bytes
+    cn[4..].copy_from_slice(&nonce24[16..24]);
+    (subsleutel, cn)
+}
+
+/// XChaCha20-Poly1305 seal: 24-byte nonce (willekeurig veilig, geen collision-zorg).
+pub fn xseal(sleutel: &[u8; 32], nonce24: &[u8; 24], aad: &[u8], klaartekst: &[u8]) -> Vec<u8> {
+    let (sub, cn) = x_naar_sub(sleutel, nonce24);
+    seal(&sub, &cn, aad, klaartekst)
+}
+
+/// XChaCha20-Poly1305 open.
+pub fn xopen(sleutel: &[u8; 32], nonce24: &[u8; 24], aad: &[u8], ct_en_tag: &[u8]) -> Option<Vec<u8>> {
+    let (sub, cn) = x_naar_sub(sleutel, nonce24);
+    open(&sub, &cn, aad, ct_en_tag)
+}
+
 /// Willekeurige bytes uit de OS-CSPRNG (/dev/urandom). Zero-dependency.
 pub fn os_random(uit: &mut [u8]) -> std::io::Result<()> {
     let mut f = std::fs::File::open("/dev/urandom")?;
@@ -313,5 +352,114 @@ mod tests {
         let l = kapot.len() - 1;
         kapot[l] ^= 0x01;
         assert!(open(&key, &n, &aad, &kapot).is_none());
+    }
+
+    // draft-irtf-cfrg-xchacha sec. 2.2.1: HChaCha20-subsleutel
+    #[test]
+    fn xchacha_hchacha20_kat() {
+        let mut key = [0u8; 32];
+        for i in 0..32 { key[i] = i as u8; }
+        let nonce = hex("000000090000004a0000000031415927");
+        let mut n = [0u8; 16]; n.copy_from_slice(&nonce);
+        let sk = hchacha20(&key, &n);
+        assert_eq!(&sk[..], &hex("82413b4227b27bfed30e42508a877d73
+                                  a0f9e4d58a74a853c12ec41326d3ecdc")[..]);
+    }
+
+    #[test]
+    fn xchacha_rondrit_en_tamper() {
+        let mut key = [0u8; 32]; os_random(&mut key).unwrap();
+        let mut nonce = [0u8; 24]; os_random(&mut nonce).unwrap();
+        let pt = b"echte naam: Jan Jansen, BSN 123456789";
+        let ct = xseal(&key, &nonce, b"aad", pt);
+        assert_eq!(xopen(&key, &nonce, b"aad", &ct).unwrap(), pt);
+        // verkeerde aad faalt
+        assert!(xopen(&key, &nonce, b"anders", &ct).is_none());
+        // elke omgeknipte bit faalt de authenticatie
+        for i in 0..ct.len() {
+            let mut kapot = ct.clone();
+            kapot[i] ^= 0x01;
+            assert!(xopen(&key, &nonce, b"aad", &kapot).is_none(), "bit-flip op {} mag niet openen", i);
+        }
+    }
+
+    // RFC 8439 A.3 #1: r=0 -> tag is de s-helft (hier nul)
+    #[test]
+    fn poly1305_nul_kat() {
+        let key = [0u8; 32];
+        let tag = poly1305(&key, &[0u8; 64]);
+        assert_eq!(tag, [0u8; 16]);
+    }
+
+    // Property: seal->open klopt voor honderden willekeurige groottes/aad's, en
+    // een willekeurige bit-flip faalt altijd de authenticatie.
+    #[test]
+    fn property_rondrit_en_integriteit() {
+        fn stap(r: &mut u64) -> u64 { *r ^= *r << 13; *r ^= *r >> 7; *r ^= *r << 17; *r }
+        fn vul(r: &mut u64, n: usize) -> Vec<u8> {
+            let mut v = vec![0u8; n];
+            for b in v.iter_mut() { *b = stap(r) as u8; }
+            v
+        }
+        let mut zaad = [0u8; 8]; os_random(&mut zaad).unwrap();
+        let mut rng = u64::from_le_bytes(zaad) | 1;
+        for ronde in 0..300 {
+            let mut key = [0u8; 32]; key.copy_from_slice(&vul(&mut rng, 32));
+            let mut nonce = [0u8; 24]; nonce.copy_from_slice(&vul(&mut rng, 24));
+            let ptlen = (stap(&mut rng) as usize) % 2049; // 0..2048
+            let aadlen = (stap(&mut rng) as usize) % 33;
+            let pt = vul(&mut rng, ptlen);
+            let aad = vul(&mut rng, aadlen);
+            let ct = xseal(&key, &nonce, &aad, &pt);
+            assert_eq!(xopen(&key, &nonce, &aad, &ct).as_deref(), Some(&pt[..]), "ronde {}", ronde);
+            if !ct.is_empty() {
+                let pos = (stap(&mut rng) as usize) % ct.len();
+                let mut kapot = ct.clone();
+                kapot[pos] ^= 0x80;
+                assert!(xopen(&key, &nonce, &aad, &kapot).is_none(), "tamper ronde {}", ronde);
+            }
+        }
+    }
+
+    // Doorvoer-benchmark (draai: cargo test --release -- --ignored --nocapture bench_doorvoer)
+    #[test]
+    #[ignore]
+    fn bench_doorvoer() {
+        let key = [1u8; 32];
+        let nonce = [2u8; 24];
+        let data = vec![7u8; 4096];
+        let iters = 100_000usize;
+        let mb = (iters as f64 * data.len() as f64) / 1e6;
+
+        let t = std::time::Instant::now();
+        let mut som = 0usize;
+        for _ in 0..iters { som = som.wrapping_add(xseal(&key, &nonce, b"", &data).len()); }
+        let s1 = t.elapsed().as_secs_f64();
+        println!("\n  xseal (versleutel+MAC): {:.0} MB/s   ({} x 4096B in {:.2}s)", mb / s1, iters, s1);
+
+        let ct = xseal(&key, &nonce, b"", &data);
+        let t2 = std::time::Instant::now();
+        for _ in 0..iters { let _ = std::hint::black_box(xopen(&key, &nonce, b"", &ct)); }
+        let s2 = t2.elapsed().as_secs_f64();
+        println!("  xopen (verifieer+ontsleutel): {:.0} MB/s   (som {})", mb / s2, som);
+    }
+
+    // Fuzz: open() mag NOOIT crashen en NOOIT vals-accepteren op willekeurige rommel.
+    #[test]
+    fn open_faalt_veilig_op_rommel() {
+        let mut zaad = [0u8; 8]; os_random(&mut zaad).unwrap();
+        let mut rng = u64::from_le_bytes(zaad) | 3;
+        let key = [7u8; 32];
+        let n12 = [9u8; 12];
+        let n24 = [9u8; 24];
+        for _ in 0..2000 {
+            rng ^= rng << 13; rng ^= rng >> 7; rng ^= rng << 17;
+            let len = (rng as usize) % 200;
+            let mut blob = vec![0u8; len];
+            for b in blob.iter_mut() { rng ^= rng << 13; rng ^= rng >> 7; rng ^= rng << 17; *b = rng as u8; }
+            // geen paniek, en (vrijwel zeker) geen geldige tag op willekeurige bytes
+            assert!(open(&key, &n12, &[], &blob).is_none());
+            assert!(xopen(&key, &n24, &[], &blob).is_none());
+        }
     }
 }

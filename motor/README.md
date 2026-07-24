@@ -98,20 +98,27 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   ~2,5 MB RAM. (Bouwen sorteert nu in RAM; voor >~10M hoort extern sorteren, maar
   het serveren is al out-of-RAM — dat is de eigenschap die telt.)
 - [x] **Kluis-crypto** — identiteitskluis met ECHTE authenticated encryption:
-  onze **eigen ChaCha20-Poly1305 (RFC 8439)** in `src/aead.rs`, byte-voor-byte
-  geverifieerd tegen de officiele RFC-testvectoren (quarter-round los + op de
-  state, Poly1305, Poly1305-sleutelgen uit blok 0, ChaCha-blok, volledige AEAD).
-  Geen zelfverzonnen algoritme, en **geen externe crate** — de hele motor blijft
-  zero-dependency. Timing-hardening met `std::hint::black_box` op het constant-
-  time tag-vergelijk en de Poly1305-reductie (zelfde mechanisme als de
-  `subtle`-crate). Verse willekeurige nonce per record (/dev/urandom), sleutel
-  gescheiden van de data (`secret.key`, rechten 600). Endpoints:
-  `/api/kluis/bewaar`, `/api/kluis/onthul`, `/api/kluis/wis`, `/api/kluis/status`
-  (toont alleen een niet-omkeerbare sleutel-vingerafdruk). Bewezen: klaartekst
-  raakt de schijf nooit; een andere sleutel of een gewijzigd blob levert niets op.
+  onze **eigen XChaCha20-Poly1305** in `src/aead.rs` (ChaCha20-Poly1305 uit
+  RFC 8439 + HChaCha20 uit de XChaCha-draft), byte-voor-byte geverifieerd tegen
+  de officiele testvectoren — óók de tussenstappen: quarter-round los + op de
+  volle state, Poly1305, Poly1305-sleutelgen uit blok 0, ChaCha-blok, HChaCha20,
+  volledige AEAD. Geen zelfverzonnen algoritme, en **geen externe crate** — de
+  hele motor is zero-dependency (`cargo tree` toont enkel rtg-motor).
+  - **24-byte nonce (XChaCha20)** → nonce-hergebruik bij willekeurige nonces
+    praktisch onmogelijk (birthday-veilig).
+  - **Timing-hardening** met `std::hint::black_box` op het constant-time
+    tag-vergelijk en de Poly1305-maskerkeuze (zelfde mechanisme als de
+    `subtle`-crate). ChaCha20-Poly1305 is ARX (geen S-box-cache-timing zoals AES).
+  - **Sleutel wissen bij afsluiten** (zeroize-on-drop, black_box-beschermd).
+  - Verse willekeurige nonce per record (/dev/urandom), sleutel gescheiden van de
+    data (`secret.key`, rechten 600). Status toont alleen een niet-omkeerbare
+    sleutel-vingerafdruk.
+  - **Bewezen betrouwbaar:** property-test (300 willekeurige seal→open + tamper),
+    fuzz (2000 willekeurige/gemuteerde blobs → nooit crash, nooit vals-accept),
+    elke-bit-flip-faalt. **Doorvoer:** ~332 MB/s seal én open (4 KB-blokken).
+  Endpoints: `/api/kluis/bewaar`, `/api/kluis/onthul`, `/api/kluis/wis`,
+  `/api/kluis/status`.
 
-  > Eerlijke restnoot (timing): ChaCha20-Poly1305 vermijdt door zijn ARX-ontwerp
-  > de S-box-cache-timing die AES treft, en de code is branchloos met
-  > black_box-barrieres — dezelfde klasse mitigatie als de pure-Rust vetted
-  > crates. Het enige dat een gevestigde crate extra biedt, is jarenlange review
-  > en fuzzing; de timing-techniek voor dit algoritme is dezelfde.
+  > Eerlijke restnoot (timing): de timing-techniek voor dit algoritme is dezelfde
+  > als de pure-Rust vetted crates (ARX + branchloos + black_box). Het enige dat
+  > een gevestigde crate extra biedt is jarenlange externe review en fuzzing.

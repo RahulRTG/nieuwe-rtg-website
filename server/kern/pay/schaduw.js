@@ -56,13 +56,17 @@ module.exports = function maakSchaduw() {
         rij.push({ van: b.van, naar: b.naar, centen: b.centen, soort: b.soort, oms: b.oms, ref: b.ref || null });
       } catch (e) { /* schaduw mag het echte pad nooit raken */ }
     },
-    // vergelijk de stand: JS-som vs motor-som (drift-detector)
+    // vergelijk de stand: JS-som vs motor-som (drift-detector). Met een korte
+    // time-out zodat het statusbord nooit hangt op een trage/dode motor.
     async stand(jsSom) {
+      const af = new AbortController();
+      const t = setTimeout(() => af.abort(), 2000);
       try {
-        const r = await fetch(URL.replace(/\/$/, '') + '/api/motor/status', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+        const r = await fetch(URL.replace(/\/$/, '') + '/api/motor/status', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', signal: af.signal });
         const j = await r.json();
         return { motorSom: j.som, motorKlopt: j.klopt, jsSom, gelijk: Number(j.som) === Number(jsSom) };
-      } catch (e) { return { fout: e.message }; }
+      } catch (e) { return { fout: e.name === 'AbortError' ? 'time-out (2s)' : e.message }; }
+      finally { clearTimeout(t); }
     },
   };
 };

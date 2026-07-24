@@ -65,6 +65,37 @@ test('techniek: postgres onbereikbaar geeft een fout', async () => {
   assert.equal(res.find(c => c.id === 'postgres').status, 'fout');
 });
 
+test('techniek: motor-schaduw uit geeft een waarschuwing', async () => {
+  const res = await techniek.draaiChecks(maakCtx({ pay: { schaduw: { aan: false } } }));
+  const m = res.find(c => c.id === 'motorschaduw');
+  assert.equal(m.status, 'waarschuwing');
+  assert.match(m.detail, /RTG_MOTOR_SHADOW/);
+});
+
+test('techniek: motor-schaduw in lockstep is ok', async () => {
+  const pay = { schaduw: { aan: true, stand: async () => ({ motorSom: 0, motorKlopt: true, jsSom: 0, gelijk: true }) } };
+  const res = await techniek.draaiChecks(maakCtx({ pay }));
+  const m = res.find(c => c.id === 'motorschaduw');
+  assert.equal(m.status, 'ok');
+  assert.match(m.detail, /Lockstep/i);
+});
+
+test('techniek: motor-schaduw met drift geeft een fout', async () => {
+  const pay = { schaduw: { aan: true, stand: async () => ({ motorSom: 500, motorKlopt: true, jsSom: 0, gelijk: false }) } };
+  const res = await techniek.draaiChecks(maakCtx({ pay }));
+  const m = res.find(c => c.id === 'motorschaduw');
+  assert.equal(m.status, 'fout');
+  assert.match(m.detail, /DRIFT/);
+});
+
+test('techniek: motor-schaduw onbereikbaar geeft een fout', async () => {
+  const pay = { schaduw: { aan: true, stand: async () => ({ fout: 'connect ECONNREFUSED' }) } };
+  const res = await techniek.draaiChecks(maakCtx({ pay }));
+  const m = res.find(c => c.id === 'motorschaduw');
+  assert.equal(m.status, 'fout');
+  assert.match(m.detail, /bereiken/);
+});
+
 test('techniek: standaard-zekeringen staan aan en poorten gedrag', () => {
   const z = techniek.standaardZekeringen();
   for (const id of ['onderhoud', 'registratie', 'betalingen', 'ai']) {

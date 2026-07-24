@@ -168,6 +168,9 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
   const api = { MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, saldoVan, koppelBank };
+  // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-som met
+  // de Rust-motor. `aan` is false als RTG_MOTOR_SHADOW niet is gezet.
+  api.schaduw = { aan: schaduw.aan, stand: () => schaduw.stand(sluitcontrole().som) };
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
   return { pay: api };

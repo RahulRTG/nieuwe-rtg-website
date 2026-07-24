@@ -70,6 +70,18 @@ const CHECKS = [
     }
   },
   {
+    id: 'motorschaduw', naam: 'Rust-motor (schaduw)', code: 'MOTOR-01', categorie: 'Integraties',
+    run: async (c) => {
+      if (!c.pay || !c.pay.schaduw || !c.pay.schaduw.aan) return { status: 'waarschuwing', detail: 'Schaduw-modus uit. Zet RTG_MOTOR_SHADOW om de Rust-motor als parallel-grootboek mee te laten lopen.' };
+      let s;
+      try { s = await c.pay.schaduw.stand(); } catch (e) { return { status: 'fout', detail: 'Kan de motor niet bereiken: ' + (e.message || e) }; }
+      if (!s || s.fout) return { status: 'fout', detail: 'Kan de motor niet bereiken: ' + ((s && s.fout) || 'onbekend') };
+      if (!s.motorKlopt) return { status: 'fout', detail: 'De Rust-motor sluit niet (motor-som ' + s.motorSom + ', hoort exact 0 te zijn).' };
+      if (!s.gelijk) return { status: 'fout', detail: 'DRIFT: JS-som ' + s.jsSom + ' vs motor-som ' + s.motorSom + ' -- de schaduw loopt uit de pas.' };
+      return { status: 'ok', detail: 'Lockstep: JS en de Rust-motor sluiten allebei op ' + s.jsSom + '.' };
+    }
+  },
+  {
     id: 'bank', naam: 'RTG Bank', code: 'BANK-01', categorie: 'Integraties',
     run: (c) => {
       if (!c.bank) return { status: 'waarschuwing', detail: 'Bankmodule niet gekoppeld aan de bewaking.' };

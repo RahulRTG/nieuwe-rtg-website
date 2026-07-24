@@ -51,6 +51,19 @@
         tellerKaart(d.samenvatting.fout,'Storing')];
       if (bev.open) tellers.push(tellerKaart(bev.open, bev.kritiek?'Beveiliging!':'Beveiliging'));
       vervang($('#tellers'), tellers);
+      // de motorkap-band: grootboek/motor/bank op een oogopslag, uit de checks
+      var kap = { wallet:'Grootboek', motorschaduw:'Motor', bank:'Bank' };
+      var kapChecks = (d.checks||[]).filter(function(c){ return kap[c.id]; });
+      $('#motorkapBand').hidden = !kapChecks.length;
+      if (kapChecks.length){
+        var pillen = [el('span',{class:'mk-titel'},'De motorkap')];
+        kapChecks.forEach(function(c){
+          pillen.push(el('span',{class:'mk-pil', title:c.detail||''},
+            el('span',{class:'mk-stip '+c.status}), kap[c.id]));
+        });
+        var band = el('div',{class:'motorkap'}, pillen);
+        vervang($('#motorkapBand'), band);
+      }
       // beveiligingsmeldingen: tonen bij meldingen, en altijd voor de eigenaar
       // (die ziet er ook de noodrem-schakelaar)
       $('#beveiligBlok').hidden = !(d.eigenaar || (bev.recent && bev.recent.length));

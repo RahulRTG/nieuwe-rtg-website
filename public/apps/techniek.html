@@ -33,6 +33,14 @@
   .login h1{font-size:1.3rem;margin-bottom:.3rem;}
   .login p{color:var(--soft);font-size:.85rem;margin-bottom:1.1rem;}
   .fout{color:var(--rood);font-size:.82rem;min-height:1.1rem;margin-top:.2rem;}
+  /* de motorkap-band: grootboek/motor/bank op een oogopslag, boven de tellers */
+  .motorkap{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1rem;padding:.7rem 1rem;border:1px solid var(--line);border-radius:12px;background:var(--card);}
+  .motorkap .mk-titel{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;}
+  .motorkap .mk-pil{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--muted);}
+  .motorkap .mk-stip{width:.6rem;height:.6rem;border-radius:50%;flex-shrink:0;background:var(--soft);}
+  .motorkap .mk-stip.ok{background:var(--groen);box-shadow:0 0 6px var(--groen);}
+  .motorkap .mk-stip.waarschuwing{background:var(--oranje);box-shadow:0 0 6px var(--oranje);}
+  .motorkap .mk-stip.fout{background:var(--rood);box-shadow:0 0 6px var(--rood);}
   .telrij{display:flex;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap;}
   .tel{flex:1;min-width:7rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
   .tel .n{font-size:1.5rem;font-weight:700;}
@@ -124,6 +132,7 @@
     </div>
 
     <div id="tabStatus" role="tabpanel" aria-labelledby="tabBtnStatus">
+      <div id="motorkapBand" hidden></div>
       <div class="telrij" id="tellers"></div>
       <div id="beveiligBlok" hidden>
         <div class="sec" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">

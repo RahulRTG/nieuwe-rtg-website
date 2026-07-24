@@ -1,0 +1,22 @@
+# RTG Motor — de hete, security-kritische kern in Rust.
+# Bewust ZERO dependencies: alleen de standaardbibliotheek, net als de
+# Node-server. Sneller te bouwen, volledig te auditen, geen supply-chain-risico.
+[package]
+name = "rtg-motor"
+version = "0.1.0"
+edition = "2021"
+description = "RTG Pay money-engine + ledengids + kluis in Rust (zero-dependency)"
+
+[[bin]]
+name = "rtg-motor"
+path = "src/main.rs"
+
+[lib]
+name = "rtg_motor"
+path = "src/lib.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

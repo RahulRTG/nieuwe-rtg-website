@@ -1,11 +1,22 @@
 # RTG Motor — de hete, security-kritische kern in Rust.
-# Bewust ZERO dependencies: alleen de standaardbibliotheek, net als de
-# Node-server. Sneller te bouwen, volledig te auditen, geen supply-chain-risico.
+# De standaardbuild (money-engine + ledengids) is bewust ZERO dependencies:
+# alleen de standaardbibliotheek. De kluis heeft ECHTE authenticated encryption
+# nodig; die zit achter de optionele feature `kluis` en gebruikt geaudite
+# RustCrypto-crates (nooit zelfgebouwde crypto). Zo blijft `cargo build`
+# zero-dep en bouwt alleen de bewuste vault-build de crypto mee.
 [package]
 name = "rtg-motor"
 version = "0.1.0"
 edition = "2021"
-description = "RTG Pay money-engine + ledengids + kluis in Rust (zero-dependency)"
+description = "RTG Pay money-engine + ledengids + kluis in Rust"
+
+[features]
+# uit = zero-dependency; aan = kluis met geaudite AEAD-crypto
+kluis = ["dep:chacha20poly1305", "dep:getrandom"]
+
+[dependencies]
+chacha20poly1305 = { version = "0.10", optional = true }
+getrandom = { version = "0.2", optional = true }
 
 [[bin]]
 name = "rtg-motor"

@@ -31,6 +31,95 @@ fn gids_pad() -> PathBuf {
     PathBuf::from(env("RTG_MOTOR_GIDS", "motor-data/gids.bin"))
 }
 
+#[cfg(feature = "kluis")]
+fn open_kluis() -> rtg_motor::kluis::Kluis {
+    let sleutel = PathBuf::from(env("RTG_KLUIS_KEY_FILE", "motor-data/secret.key"));
+    let data = PathBuf::from(env("RTG_KLUIS_DATA", "motor-data/kluis.json"));
+    if let Some(dir) = data.parent() {
+        let _ = fs::create_dir_all(dir);
+    }
+    rtg_motor::kluis::Kluis::open(&sleutel, &data).unwrap_or_else(|e| {
+        eprintln!("[motor] kluis kon niet openen: {}", e);
+        std::process::exit(1);
+    })
+}
+
+/* Write-behind voor de kluis: elke ~500 ms een versleutelde snapshot als er iets
+   veranderde. De klaartekst raakt de schijf nooit. */
+#[cfg(feature = "kluis")]
+fn start_kluis_flusher(kluis: Arc<std::sync::Mutex<rtg_motor::kluis::Kluis>>) {
+    thread::spawn(move || loop {
+        thread::sleep(Duration::from_millis(500));
+        let (pad, tekst) = {
+            let mut k = kluis.lock().unwrap();
+            if !k.vuil {
+                continue;
+            }
+            k.vuil = false;
+            (k.pad().to_path_buf(), k.snapshot().dump())
+        };
+        let tmp = pad.with_extension("tmp");
+        if fs::write(&tmp, tekst.as_bytes()).is_ok() {
+            let _ = fs::rename(&tmp, &pad);
+        }
+    });
+}
+
+#[cfg(feature = "kluis")]
+fn kluis_route(kluis: &std::sync::Mutex<rtg_motor::kluis::Kluis>, req: &Request) -> Response {
+    if req.path == "/api/kluis/status" {
+        let k = kluis.lock().unwrap();
+        let mut b = Json::obj();
+        b.set("ok", Json::Bool(true))
+            .set("records", Json::Num(k.aantal() as f64))
+            .set("crypto", Json::Str("ChaCha20-Poly1305 (AEAD), versleuteld op schijf".into()))
+            .set("sleutelVingerafdruk", Json::Str(k.vingerafdruk().to_string()));
+        return Response { status: 200, body: b.dump() };
+    }
+    if req.method != "POST" {
+        return fout(404, "Onbekende route.");
+    }
+    let body = match json::parse(if req.body.is_empty() { "{}" } else { &req.body }) {
+        Ok(v) => v,
+        Err(_) => return fout(400, "Kapotte JSON."),
+    };
+    let key = body.str_at("key").unwrap_or("");
+    match req.path.as_str() {
+        // bewaar de echte gegevens (versleuteld). `data` mag JSON-tekst zijn.
+        "/api/kluis/bewaar" => {
+            let data = body.str_at("data").unwrap_or("");
+            let mut k = kluis.lock().unwrap();
+            match k.bewaar(key, data) {
+                Ok(()) => {
+                    let mut b = Json::obj();
+                    b.set("ok", Json::Bool(true));
+                    Response { status: 200, body: b.dump() }
+                }
+                Err(e) => fout(400, &e),
+            }
+        }
+        // onthul (de gevoelige handeling; in productie zit hier de eigenaar-poort voor)
+        "/api/kluis/onthul" => {
+            let k = kluis.lock().unwrap();
+            match k.onthul(key) {
+                Some(d) => {
+                    let mut b = Json::obj();
+                    b.set("ok", Json::Bool(true)).set("data", Json::Str(d));
+                    Response { status: 200, body: b.dump() }
+                }
+                None => fout(404, "Niets gevonden of niet te ontsleutelen."),
+            }
+        }
+        "/api/kluis/wis" => {
+            let mut k = kluis.lock().unwrap();
+            let mut b = Json::obj();
+            b.set("ok", Json::Bool(true)).set("gewist", Json::Bool(k.wis(key)));
+            Response { status: 200, body: b.dump() }
+        }
+        _ => fout(404, "Onbekende route."),
+    }
+}
+
 fn laad_snapshot(state: &RwLock<State>) {
     let pad = data_pad();
     if let Ok(tekst) = fs::read_to_string(&pad) {
@@ -100,13 +189,26 @@ fn main() {
         }
     }
 
-    eprintln!("[motor] RTG money-engine (Rust, zero-dep) luistert op {} (max {} verbindingen)", addr, maxconn);
+    // kluis: alleen in de vault-build (--features kluis)
+    #[cfg(feature = "kluis")]
+    let router_kluis = {
+        let k = Arc::new(std::sync::Mutex::new(open_kluis()));
+        eprintln!("[motor] kluis actief: ChaCha20-Poly1305, sleutel-vingerafdruk {}", k.lock().unwrap().vingerafdruk());
+        start_kluis_flusher(Arc::clone(&k));
+        k
+    };
+
+    eprintln!("[motor] RTG-motor luistert op {} (max {} verbindingen)", addr, maxconn);
 
     let router_state = Arc::clone(&state);
     let router_gids = Arc::clone(&gids);
     let resultaat = http::serve(&addr, maxconn, move |req: &Request| {
         if req.path.starts_with("/api/gids/") {
             return gids_route(&router_gids, req);
+        }
+        #[cfg(feature = "kluis")]
+        if req.path.starts_with("/api/kluis/") {
+            return kluis_route(&router_kluis, req);
         }
         route(&router_state, req)
     });

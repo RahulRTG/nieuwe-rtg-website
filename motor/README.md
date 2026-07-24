@@ -97,4 +97,12 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   `scripts/motor-gids.js` reproduceert het. Projectie 100M: ~9 GB op schijf,
   ~2,5 MB RAM. (Bouwen sorteert nu in RAM; voor >~10M hoort extern sorteren, maar
   het serveren is al out-of-RAM — dat is de eigenschap die telt.)
-- [ ] **Kluis-crypto** — codenamen ↔ echte namen in de gescheiden kluis.
+- [x] **Kluis-crypto** (achter `--features kluis`) — identiteitskluis met ECHTE
+  authenticated encryption (**ChaCha20-Poly1305** uit de geaudite RustCrypto-crate;
+  geen zelfgebouwde crypto). Verse willekeurige nonce per record (OS-CSPRNG),
+  sleutel gescheiden van de data (`secret.key`, rechten 600). Endpoints:
+  `/api/kluis/bewaar`, `/api/kluis/onthul`, `/api/kluis/wis`, `/api/kluis/status`
+  (toont alleen een niet-omkeerbare sleutel-vingerafdruk, nooit de sleutel).
+  Bewezen: klaartekst raakt de schijf nooit, een andere sleutel of een gewijzigd
+  blob levert niets op. **De standaardbuild blijft zero-dependency**; alleen deze
+  vault-build trekt de crypto binnen (`cargo build --features kluis`).

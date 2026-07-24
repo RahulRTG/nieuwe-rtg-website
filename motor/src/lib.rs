@@ -7,3 +7,5 @@ pub mod pay;
 pub mod rng;
 pub mod http;
 pub mod ledengids;
+#[cfg(feature = "kluis")]
+pub mod kluis;

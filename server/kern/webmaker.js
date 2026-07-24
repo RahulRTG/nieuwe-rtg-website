@@ -77,7 +77,18 @@ module.exports = ({ db, save, crypto, schoon }) => {
   }
 
   const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length });
-  const publiek = d => ({ titel: d.titel, thema: d.thema, accent: d.accent, blokken: d.blokken || [], volgorde: d.volgorde || null, adres: d.adres, eigenaar: d.eigenaar });
+  // vrije kleuren: alleen echte hex-waarden (#rgb of #rrggbb) worden bewaard;
+  // de sleutels die we kennen zijn bg (achtergrond), txt (tekst) en card (kaart).
+  // Het accent blijft zijn eigen veld. Ontbreekt een kleur, dan valt de site
+  // terug op het thema (licht/donker) -- niets forceren.
+  function schoonKleuren(k) {
+    if (!k || typeof k !== 'object') return null;
+    const hex = v => /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(String(v || '')) ? String(v) : null;
+    const uit = {};
+    ['bg', 'txt', 'card'].forEach(n => { const c = hex(k[n]); if (c) uit[n] = c; });
+    return Object.keys(uit).length ? uit : null;
+  }
+  const publiek = d => ({ titel: d.titel, thema: d.thema, accent: d.accent, kleuren: d.kleuren || null, blokken: d.blokken || [], volgorde: d.volgorde || null, adres: d.adres, eigenaar: d.eigenaar });
 
   function mijn(key) { return store().lijst.filter(d => d.eigenaar === key).map(kort); }
   function haal(key, id) { const d = store().lijst.find(x => x.id === scho(id, 20) && x.eigenaar === key); return d || null; }
@@ -96,6 +107,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
       titel: scho(d.titel, 80) || 'Mijn website',
       thema: ['licht', 'donker'].includes(d.thema) ? d.thema : 'donker',
       accent: /^#[0-9a-fA-F]{6}$/.test(String(d.accent || '')) ? d.accent : '#7F1634',
+      kleuren: schoonKleuren(d.kleuren),
       blokken: (Array.isArray(d.blokken) ? d.blokken : []).slice(0, 60).map(schoonBlok),
       adres: bestaand ? (bestaand.adres || '') : '',
       online: bestaand ? !!bestaand.online : false,

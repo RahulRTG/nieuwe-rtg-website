@@ -32,6 +32,10 @@
   .swatches{display:flex;gap:.35rem;align-items:center;}
   .swatch{width:1.35rem;height:1.35rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
   .swatch.actief{border-color:#fff;}
+  .kleurbalk{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .kleurbalk label{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.52rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);cursor:pointer;}
+  .kleurbalk input[type=color]{width:1.7rem;height:1.4rem;border:1px solid var(--line);border-radius:6px;background:none;padding:0;cursor:pointer;}
+  .kleurbalk .knop{padding:.3rem .55rem;font-size:.7rem;}
   .apparaten{display:flex;gap:.15rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.15rem;}
   .apparaten button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:.72rem;font-weight:600;padding:.3rem .55rem;border-radius:7px;cursor:pointer;white-space:nowrap;}
   .apparaten button.aan{background:var(--bg);color:var(--gold);}
@@ -98,6 +102,13 @@
   <input class="titelin" id="titel" maxlength="80" placeholder="Naam van je bedrijf" aria-label="Naam van je website">
   <div class="swatches" id="swatches" aria-label="Accentkleur"></div>
   <button class="knop" id="themaKnop" title="Licht of donker">Donker</button>
+  <div class="kleurbalk" role="group" aria-label="Kleuren zelf kiezen">
+    <label title="Accentkleur (knoppen, accenten)"><span>Accent</span><input type="color" id="kAcc" aria-label="Accentkleur"></label>
+    <label title="Achtergrondkleur"><span>Achter</span><input type="color" id="kBg" aria-label="Achtergrondkleur"></label>
+    <label title="Tekstkleur"><span>Tekst</span><input type="color" id="kTxt" aria-label="Tekstkleur"></label>
+    <label title="Kaartkleur (blokken met een vlak)"><span>Kaart</span><input type="color" id="kCard" aria-label="Kaartkleur"></label>
+    <button class="knop" id="kReset" title="Kleuren terug naar het thema">Reset</button>
+  </div>
   <div class="apparaten" id="apparaten" role="group" aria-label="Versie per toestel">
     <button type="button" data-a="telefoon">Telefoon</button>
     <button type="button" data-a="tablet">Tablet</button>
@@ -175,7 +186,24 @@ function nieuwBlok(t){
   return{id,type:'tekst',tekst:''};
 }
 
-let DESIGN={id:null,titel:'',thema:'donker',accent:'#7F1634',adres:'',online:false,blokken:[nieuwBlok('hero'),nieuwBlok('tekst')]};
+let DESIGN={id:null,titel:'',thema:'donker',accent:'#7F1634',kleuren:{},adres:'',online:false,blokken:[nieuwBlok('hero'),nieuwBlok('tekst')]};
+// de themakleuren zijn het vertrekpunt van de vrije kleurkiezers; wie niets
+// aanraakt houdt het thema, wie wel kiest overschrijft alleen die ene kleur
+const THEMA_KLEUR={donker:{bg:'#0C0C0B',txt:'#F4F1EC',card:'#151312'},licht:{bg:'#F5F1EA',txt:'#20160F',card:'#FBF8F2'}};
+function pasDoekKleur(doek,d){
+  doek.dataset.thema=d.thema||'donker';
+  doek.style.setProperty('--acc',d.accent||'#7F1634');
+  const k=d.kleuren||{};
+  if(k.bg) doek.style.setProperty('--dbg',k.bg); else doek.style.removeProperty('--dbg');
+  if(k.card) doek.style.setProperty('--dcard',k.card); else doek.style.removeProperty('--dcard');
+  if(k.txt){ doek.style.setProperty('--dtxt',k.txt); doek.style.setProperty('--dmut','color-mix(in srgb,'+k.txt+' 66%,transparent)'); doek.style.setProperty('--dline','color-mix(in srgb,'+k.txt+' 16%,transparent)'); }
+  else { doek.style.removeProperty('--dtxt'); doek.style.removeProperty('--dmut'); doek.style.removeProperty('--dline'); }
+}
+function syncKleurInputs(){
+  const kb=THEMA_KLEUR[DESIGN.thema]||THEMA_KLEUR.donker, k=DESIGN.kleuren||{};
+  const set=(id,v)=>{const el=$('#'+id); if(el)el.value=v;};
+  set('kAcc',DESIGN.accent||'#7F1634'); set('kBg',k.bg||kb.bg); set('kTxt',k.txt||kb.txt); set('kCard',k.card||kb.card);
+}
 let BEWERK=true;
 let beeldDoel=null;
 const APPARATEN=[{k:'telefoon',n:'telefoon',w:390},{k:'tablet',n:'tablet',w:768},{k:'desktop',n:'desktop',w:1080}];
@@ -262,7 +290,7 @@ function renderBlok(blok,p){
   return s;
 }
 function render(){
-  const doek=$('#doek'); doek.dataset.thema=DESIGN.thema; doek.style.setProperty('--acc',DESIGN.accent);
+  const doek=$('#doek'); pasDoekKleur(doek,DESIGN);
   const dev=APPARATEN.find(d=>d.k===APPARAAT)||APPARATEN[2]; doek.style.maxWidth=dev.w+'px';
   doek.className='doek'+(BEWERK?' bewerk':'')+(APPARAAT!=='desktop'?' mobielkader':''); doek.textContent='';
   const lijst=ordening();
@@ -321,7 +349,7 @@ async function bewaar(stil){
 async function openen(){
   try{ const d=await api('mijn'); const l=$('#openlijst'); l.textContent='';
     if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
-    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];$('#titel').value=DESIGN.titel;bouwSwatches();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
+    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
   }catch(e){ meld(e.message); }
 }
@@ -353,7 +381,13 @@ else {
   $('#onlineKnop').addEventListener('click',onlineSheet);
   $('#publiceerKnop').addEventListener('click',publiceer);
   $('#offlineKnop').addEventListener('click',offline);
-  $('#themaKnop').addEventListener('click',()=>{DESIGN.thema=DESIGN.thema==='donker'?'licht':'donker';$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';render();});
+  $('#themaKnop').addEventListener('click',()=>{DESIGN.thema=DESIGN.thema==='donker'?'licht':'donker';$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';syncKleurInputs();render();});
+  $('#kAcc').addEventListener('input',e=>{DESIGN.accent=e.target.value;bouwSwatches();render();});
+  $('#kBg').addEventListener('input',e=>{DESIGN.kleuren=DESIGN.kleuren||{};DESIGN.kleuren.bg=e.target.value;render();});
+  $('#kTxt').addEventListener('input',e=>{DESIGN.kleuren=DESIGN.kleuren||{};DESIGN.kleuren.txt=e.target.value;render();});
+  $('#kCard').addEventListener('input',e=>{DESIGN.kleuren=DESIGN.kleuren||{};DESIGN.kleuren.card=e.target.value;render();});
+  $('#kReset').addEventListener('click',()=>{DESIGN.kleuren={};syncKleurInputs();render();});
+  syncKleurInputs();
   document.querySelectorAll('#apparaten button').forEach(b=>b.addEventListener('click',()=>zetApparaat(b.dataset.a)));
   document.querySelectorAll('.sheet').forEach(sh=>sh.addEventListener('click',e=>{if(e.target===sh)sh.classList.remove('open');}));
   zetApparaat('desktop'); lintBij(); versieNoot();

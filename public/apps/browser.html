@@ -164,6 +164,12 @@ async function toonSite(adres){
     document.title=site.titel+' · RTG Browser';
     const wrap=document.createElement('div'); wrap.className='sitewrap';
     const doek=document.createElement('div'); doek.className='doek'; doek.dataset.thema=site.thema||'donker'; doek.dataset.ver=''; doek.style.setProperty('--acc',site.accent||'#7F1634');
+    // vrije kleuren van de maker toepassen (achtergrond, tekst, kaart); ontbreekt
+    // er een, dan houdt het thema die kleur
+    const kk=site.kleuren||{};
+    if(kk.bg) doek.style.setProperty('--dbg',kk.bg);
+    if(kk.card) doek.style.setProperty('--dcard',kk.card);
+    if(kk.txt){ doek.style.setProperty('--dtxt',kk.txt); doek.style.setProperty('--dmut','color-mix(in srgb,'+kk.txt+' 66%,transparent)'); doek.style.setProperty('--dline','color-mix(in srgb,'+kk.txt+' 16%,transparent)'); }
     wrap.appendChild(doek); h.textContent=''; h.appendChild(wrap);
     schilder(); window.scrollTo(0,0);
   }catch(e){

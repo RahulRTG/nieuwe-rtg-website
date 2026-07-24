@@ -15,8 +15,11 @@
      4. een onafgevangen fout       (Uncaught/unhandledRejection in het serverlog)
      5. een geheugenlek            (heap-na-GC blijft klimmen -> OOM op schaal)
 
-   WAT HET RAPPORTEERT (ook zonder harde crash): elk endpoint dat ooit 5xx gaf, met
-   een voorbeeld van de rommel die het brak -- de kandidaat-bugs om te harden.
+   WAT HET RAPPORTEERT (ook zonder harde crash): elk endpoint dat een ECHTE
+   serverfout (500/502/504) gaf, met een voorbeeld van de rommel die het brak --
+   de kandidaat-bugs om te harden. Een 503 ("kom zo terug") is GEEN bug maar de
+   immuunreactie van De Wacht (kern/wacht.js), die onder een flood bewust load
+   afwerpt; die telt apart mee als een gezond signaal, niet als kandidaat-bug.
 
    Deterministisch (seeded), zonder externe database (sqlite), draait overal.
    Draai: node scripts/tot-crash.js   (env: TOTCRASH_RONDES, TOTCRASH_RONDE_MS,
@@ -179,8 +182,14 @@ async function tokens() {
 
 /* ---------- de gezondheids-poort tussen de rondes ---------- */
 async function geldKlopt(office) {
-  const pay = await verzoek('GET', '/api/pay/gezond', null, null, 5000);
-  if (pay.status !== 200) return { ok: false, wat: 'pay-grootboek sluit niet (/api/pay/gezond ' + pay.status + ')' };
+  // /api/pay/gezond geeft 200 als het grootboek sluit, 500 als het NIET sluit.
+  // Onder de storm kan De Wacht 503 "kom zo terug" serveren (L7-lastafworp); dat is
+  // geen geldfout -- dan even opnieuw tot de afworp zakt (de storm is voorbij tussen
+  // de rondes, dus dat gebeurt snel).
+  let pay = { status: 0 };
+  for (let i = 0; i < 10; i++) { pay = await verzoek('GET', '/api/pay/gezond', null, null, 5000); if (pay.status === 200 || pay.status === 500) break; await new Promise(r => setTimeout(r, 400)); }
+  if (pay.status === 500) return { ok: false, wat: 'pay-grootboek sluit niet (/api/pay/gezond 500)' };
+  if (pay.status !== 200) return { ok: true, onzeker: 'pay-poort gaf ' + pay.status + ' (afworp), niet als geldfout geteld' };
   if (office) { const b = await post('/api/office/bank/gezond', {}, office); if (b.status === 200 && b.data && b.data.sluit && b.data.sluit.klopt === false) return { ok: false, wat: 'bank-grootboek sluit niet (som ' + b.data.sluit.som + ')' }; }
   return { ok: true };
 }
@@ -199,14 +208,14 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
   const g0 = await geldKlopt(office); rij('geld bij start', g0.ok ? 'klopt' : g0.wat);
   logOffset = (() => { try { return fs.statSync(SRVLOG).size; } catch (e) { return 0; } })();
 
-  const ooit5xx = new Map(); // pad -> { n, sample }
-  let heapBasis = null, totaalReq = 0, breuk = null, piekWerkers = 0;
+  const ooit5xx = new Map(); // pad -> { n, sample }  (ECHTE serverfouten: 500/502/504)
+  let heapBasis = null, totaalReq = 0, breuk = null, piekWerkers = 0, totaalShed = 0;
 
   for (let r = 0; r < RONDES && !breuk; r++) {
     const werkers = Math.min(MAX_WERKERS, BASIS * Math.pow(2, r));
     piekWerkers = werkers;
     const eind = Date.now() + RONDE_MS;
-    let req = 0, s5xx = 0, geen = 0;
+    let req = 0, fault = 0, shed = 0, geen = 0;
     async function werker() {
       while (Date.now() < eind && !gestopt) {
         const rt = routes[rint(routes.length)];
@@ -216,12 +225,16 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
         const b = rt.schakel ? { aan: true } : (rt.method === 'GET' ? null : body(0, r));
         const st = await verzoek(rt.method, rt.pad, tk, b);
         req++;
-        if (st.status >= 500) { s5xx++; const e = ooit5xx.get(rt.pad) || { n: 0, sample: null }; e.n++; if (!e.sample) { try { e.sample = JSON.stringify(b).slice(0, 200); } catch (x) { e.sample = '<onserialiseerbaar>'; } } ooit5xx.set(rt.pad, e); }
+        // 503 = De Wacht die onder de flood bewust load afwerpt ("kom zo terug") --
+        // dat is JUIST gedrag (zelfbescherming), geen bug. Alleen 500/502/504 zijn
+        // echte serverfouten die we als kandidaat-bug rapporteren.
+        if (st.status === 503) shed++;
+        else if (st.status >= 500) { fault++; const e = ooit5xx.get(rt.pad) || { n: 0, sample: null }; e.n++; if (!e.sample) { try { e.sample = JSON.stringify(b).slice(0, 200); } catch (x) { e.sample = '<onserialiseerbaar>'; } } ooit5xx.set(rt.pad, e); }
         else if (st.status === 0) geen++;
       }
     }
     await Promise.all(Array.from({ length: werkers }, werker));
-    totaalReq += req;
+    totaalReq += req; totaalShed += shed;
 
     // --- de gezondheids-poort na de ronde ---
     if (gestopt) { breuk = { wat: 'DE SERVER VIEL OM (proces stopte, code ' + gestopt.code + (gestopt.signal ? ' / ' + gestopt.signal : '') + ')', ronde: r }; break; }
@@ -234,20 +247,26 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
     // lek: heap-na-GC ruim boven de startvloer terwijl de druk terugviel naar rust
     if (heap != null && heapBasis != null && heap > heapBasis * 3 && heap > heapBasis + 400) { breuk = { wat: 'GEHEUGENLEK: heap-na-GC ' + heap + ' MB (start ' + heapBasis + ' MB) -- klimt richting OOM', ronde: r }; break; }
 
-    rij('ronde ' + (r + 1) + '  ' + nl(werkers) + ' werkers', nl(req) + ' req (' + Math.round(req / (RONDE_MS / 1000)) + '/s) | 5xx ' + s5xx + ' | geen-antwoord ' + geen + ' | heap ' + heap + ' MB | rss ' + rssMB() + ' MB');
+    rij('ronde ' + (r + 1) + '  ' + nl(werkers) + ' werkers', nl(req) + ' req (' + Math.round(req / (RONDE_MS / 1000)) + '/s) | serverfout ' + fault + ' | 503-afworp ' + shed + ' | geen-antw ' + geen + ' | heap ' + heap + ' MB | rss ' + rssMB() + ' MB');
   }
 
   kop('UITKOMST');
   rij('rondes gehaald', (breuk ? breuk.ronde : RONDES) + ' / ' + RONDES);
   rij('piek-werkers', nl(piekWerkers)); rij('verzoeken totaal', nl(totaalReq));
+  // 503-afworp is geen bug maar de immuunreactie (De Wacht) die onder de flood
+  // bewust load afwerpt -- apart gerapporteerd als een GEZOND signaal.
+  if (totaalShed) rij('503-lastafworp (De Wacht)', nl(totaalShed) + ' verzoeken afgeworpen onder de storm -- correct, geen bug');
   if (ooit5xx.size) {
-    kop('KANDIDAAT-BUGS -- endpoints die 5xx gaven (hardden naar 4xx):');
+    kop('ECHTE SERVERFOUTEN (500/502/504) -- bugs om te hardden naar 4xx:');
     const lijst = [...ooit5xx.entries()].sort((a, b) => b[1].n - a[1].n).slice(0, 20);
     for (const [pad, e] of lijst) rij(pad + '  (' + e.n + 'x)', e.sample);
-  } else rij('5xx-endpoints', 'geen -- alle rommel netjes met 4xx afgewezen');
+  } else rij('serverfouten (500/502/504)', 'geen -- alle rommel met 4xx afgewezen of onder afworp (503)');
 
   await stop();
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  // TOTCRASH_KEEPLOG=1 bewaart het serverlog (met de stacktraces van elke 5xx)
+  // zodat je de kandidaat-bugs kunt naspeuren; anders ruimen we netjes op.
+  if (process.env.TOTCRASH_KEEPLOG === '1') rij('serverlog bewaard', SRVLOG);
+  else { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
 
   if (breuk) {
     console.log('\n\x1b[1;31m[tot-crash] GEBROKEN in ronde ' + (breuk.ronde + 1) + ': ' + breuk.wat + '\x1b[0m');

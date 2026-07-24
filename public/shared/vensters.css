@@ -72,5 +72,13 @@
   border-radius: 10px; padding: .35rem .7rem;
 }
 .rtg-dockknop.voor { color: var(--txt, #F4F1EC); border-color: var(--gold, #A98F1C); }
+/* de Bureaublad-knop: vouwt alles weg zodat de "mobiel" (het OS) vrijkomt */
+.rtg-dockknop.rtg-home {
+  color: var(--gold, #A98F1C);
+  background: color-mix(in srgb, var(--gold, #A98F1C) 12%, var(--card2, #1B1817));
+  border-color: color-mix(in srgb, var(--gold, #A98F1C) 40%, var(--line, rgba(255,255,255,0.12)));
+  margin-right: .15rem;
+}
+.rtg-dockknop.rtg-home:hover { color: var(--txt, #F4F1EC); }
 
 @media (max-width: 999px) { #rtg-vensters, .rtg-dock { display: none !important; } }

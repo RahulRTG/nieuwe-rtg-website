@@ -66,6 +66,15 @@ body {
     border: 1px solid var(--line, rgba(255,255,255,0.14)); border-radius: 999px; cursor: pointer;
   }
   .rtg-greep .herstel:hover { color: var(--txt, #F4F1EC); border-color: var(--gold, #A98F1C); }
+  /* het groene volledig-scherm-bolletje links op de greep (geen sluiten/rood:
+     dit is de pagina zelf) */
+  .rtg-greep .rtg-vollamp {
+    position: absolute; left: 8px; top: 5px; width: 12px; height: 12px;
+    border-radius: 50%; padding: 0; cursor: pointer; line-height: 0;
+    border: 1px solid rgba(0, 0, 0, 0.25); background: var(--green, #4C9A75);
+    transition: filter .12s ease, transform .12s ease;
+  }
+  .rtg-greep .rtg-vollamp:hover { filter: brightness(1.15); transform: scale(1.12); }
   main.rtg-venster { padding-top: calc(clamp(1.5rem, 2.4vw, 2.6rem) + 22px); }
 }
 @media (prefers-reduced-motion: reduce) { main { scroll-behavior: auto; } }

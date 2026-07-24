@@ -52,6 +52,20 @@
     window.open(w.url, '_blank', 'noopener,width=' + b + ',height=' + h);
     sluit(w);
   }
+  function minimaliseer(w) { w.el.hidden = true; dockSync(); }
+  function maximaliseer(w) {
+    var el = w.el;
+    if (el.classList.contains('vol')) {
+      el.classList.remove('vol');
+      if (w.prev) { el.style.left = w.prev.x + 'px'; el.style.top = w.prev.y + 'px'; el.style.width = w.prev.w + 'px'; el.style.height = w.prev.h + 'px'; }
+    } else {
+      w.prev = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight };
+      el.classList.add('vol');
+      el.style.left = '0px'; el.style.top = '0px';
+      el.style.width = window.innerWidth + 'px'; el.style.height = window.innerHeight + 'px';
+    }
+    focus(w);
+  }
   function sleepbaar(el, greep) {
     greep.addEventListener('pointerdown', function (e) {
       if (e.target.closest('button')) return;
@@ -85,7 +99,11 @@
       '<header class="rtg-titel"><span class="rtg-grip"></span><span class="rtg-naam"></span>' +
       '<span class="rtg-sp"></span>' +
       '<button class="rtg-uit" type="button" title="Als los venster (andere monitor)" aria-label="Open in een los venster">↗</button>' +
-      '<button class="rtg-dicht" type="button" title="Sluiten" aria-label="Venster sluiten">×</button></header>' +
+      '<span class="rtg-lampen">' +
+      '<button class="rtg-lamp rood" type="button" title="Sluiten" aria-label="Venster sluiten"></button>' +
+      '<button class="rtg-lamp geel" type="button" title="Kleiner (naar het dock)" aria-label="Minimaliseren"></button>' +
+      '<button class="rtg-lamp groen" type="button" title="Volledig scherm" aria-label="Volledig scherm"></button>' +
+      '</span></header>' +
       '<div class="rtg-body"><iframe title="" loading="lazy"></iframe></div>';
     el.querySelector('.rtg-naam').textContent = titel || 'App';
     var ifr = el.querySelector('iframe');
@@ -97,7 +115,9 @@
     wins.push(w);
     el.addEventListener('pointerdown', function () { focus(w); }, true);
     sleepbaar(el, el.querySelector('.rtg-titel'));
-    el.querySelector('.rtg-dicht').addEventListener('click', function (e) { e.stopPropagation(); sluit(w); });
+    el.querySelector('.rtg-lamp.rood').addEventListener('click', function (e) { e.stopPropagation(); sluit(w); });
+    el.querySelector('.rtg-lamp.geel').addEventListener('click', function (e) { e.stopPropagation(); minimaliseer(w); });
+    el.querySelector('.rtg-lamp.groen').addEventListener('click', function (e) { e.stopPropagation(); maximaliseer(w); });
     el.querySelector('.rtg-uit').addEventListener('click', function (e) { e.stopPropagation(); popout(w); });
     focus(w);
     return w;

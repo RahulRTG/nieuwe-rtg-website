@@ -31,14 +31,26 @@
 .rtg-titel .rtg-grip { width: 30px; height: 4px; border-radius: 999px; background: var(--line, rgba(255,255,255,0.2)); flex: 0 0 auto; }
 .rtg-titel .rtg-naam { font-family: 'Inter', system-ui, sans-serif; font-size: .82rem; font-weight: 600; color: var(--txt, #F4F1EC); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rtg-titel .rtg-sp { flex: 1 1 auto; }
-.rtg-titel button {
-  flex: 0 0 auto; width: 26px; height: 26px; border-radius: 8px; cursor: pointer;
+/* het losse-venster-knopje (naar een andere monitor) */
+.rtg-titel .rtg-uit {
+  flex: 0 0 auto; width: 24px; height: 24px; border-radius: 8px; cursor: pointer;
   border: 1px solid var(--line, rgba(255,255,255,0.12)); background: transparent;
-  color: var(--muted, rgba(244,241,236,0.7)); font-size: 1rem; line-height: 1;
-  display: grid; place-items: center;
+  color: var(--muted, rgba(244,241,236,0.7)); font-size: .95rem; line-height: 1;
+  display: grid; place-items: center; margin-right: .1rem;
 }
-.rtg-titel button:hover { color: var(--txt, #F4F1EC); border-color: var(--gold, #A98F1C); }
-.rtg-titel .rtg-dicht:hover { color: #fff; background: var(--burgundy, #C23A5E); border-color: var(--burgundy, #C23A5E); }
+.rtg-titel .rtg-uit:hover { color: var(--txt, #F4F1EC); border-color: var(--gold, #A98F1C); }
+/* de drie stoplicht-knopjes in de huisstijl: sluiten / kleiner / volledig scherm */
+.rtg-lampen { display: flex; align-items: center; gap: .42rem; margin-left: .25rem; }
+.rtg-lamp {
+  flex: 0 0 auto; width: 13px; height: 13px; border-radius: 50%; padding: 0; cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.25); position: relative; line-height: 0;
+  transition: filter .12s ease, transform .12s ease;
+}
+.rtg-lamp:hover { transform: scale(1.12); filter: brightness(1.15); }
+.rtg-lamp:focus-visible { outline: 2px solid var(--gold, #A98F1C); outline-offset: 2px; }
+.rtg-lamp.rood { background: var(--burgundy, #C23A5E); }
+.rtg-lamp.geel { background: var(--gold, #A98F1C); }
+.rtg-lamp.groen { background: var(--green, #4C9A75); }
 
 .rtg-body { flex: 1 1 auto; min-height: 0; background: var(--bg, #0C0C0B); }
 .rtg-body iframe { width: 100%; height: 100%; border: 0; display: block; }

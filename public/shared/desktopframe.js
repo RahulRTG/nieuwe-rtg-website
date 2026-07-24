@@ -39,12 +39,26 @@
     // ontkoppel na de huidige frame, zodat de ResizeObserver onze eigen zet negeert
     requestAnimationFrame(function () { zetten = false; });
   }
+  function vol() {
+    // volledig scherm aan/uit voor het midden-console (geen sluiten -- dit is de
+    // pagina zelf; alleen groter of terug)
+    if (main.classList.contains('rtg-vol')) { main.classList.remove('rtg-vol'); pas(); bewaar(); }
+    else {
+      main.classList.add('rtg-vol');
+      zetten = true;
+      main.style.left = '0px'; main.style.top = '0px';
+      main.style.width = window.innerWidth + 'px'; main.style.height = window.innerHeight + 'px';
+      requestAnimationFrame(function () { zetten = false; });
+    }
+  }
   function bouwGreep() {
     greep = document.createElement('div');
     greep.className = 'rtg-greep';
-    greep.innerHTML = '<span class="streep"></span><button type="button" class="herstel" aria-label="Venster terug naar het midden">Herstel</button>';
+    greep.innerHTML = '<button type="button" class="rtg-vollamp" title="Volledig scherm" aria-label="Volledig scherm"></button>' +
+      '<span class="streep"></span><button type="button" class="herstel" aria-label="Venster terug naar het midden">Herstel</button>';
     main.appendChild(greep);
-    greep.querySelector('.herstel').addEventListener('click', function (e) { e.stopPropagation(); st = standaard(); pas(); bewaar(); });
+    greep.querySelector('.rtg-vollamp').addEventListener('click', function (e) { e.stopPropagation(); vol(); });
+    greep.querySelector('.herstel').addEventListener('click', function (e) { e.stopPropagation(); main.classList.remove('rtg-vol'); st = standaard(); pas(); bewaar(); });
     greep.addEventListener('pointerdown', sleepStart);
   }
   function sleepStart(e) {

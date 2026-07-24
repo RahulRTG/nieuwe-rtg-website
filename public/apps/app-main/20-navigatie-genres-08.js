@@ -62,7 +62,8 @@
     const el = $('#bzInhoud'); if (!el) return;
     if (bzZaak) return renderBzZaak();
     if (!bzPartners.length){
-      el.innerHTML = '<div class="card"><div style="font-size:0.85rem;color:var(--muted);">'+T('bz.geen','Nog geen partners met een bezorgdienst op uw bestemming. Zodra een zaak de dienst opent, staat hij hier.')+'</div></div>';
+      el.innerHTML = '<div class="card"><div style="font-size:0.85rem;color:var(--muted);">'+T('bz.geen','Nog geen partners met een bezorgdienst op uw bestemming. Zodra een zaak de dienst opent, staat hij hier.')+'</div>'+
+        '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek waar ik hier iets kan bestellen en laten bezorgen, en regel het" style="margin-top:0.6rem;">'+T('bz.geendoe','Laat Rahul iets bestellen')+'</button></div>';
       return;
     }
     el.innerHTML = bzPartners.map(p =>

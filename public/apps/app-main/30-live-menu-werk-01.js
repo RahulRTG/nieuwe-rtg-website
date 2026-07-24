@@ -23,6 +23,7 @@
         '<div class="live-dest-row"><select id="liveDest">' + opts + '</select></div>' +
         '<div class="live-mode">' + modes.map(m => '<button data-mode="' + m[0] + '"' + (m[0]===liveMode?' class="on"':'') + '>' + T('live.mode.'+m[0], m[1]) + '</button>').join('') + '</div>' +
         '<button class="live-go" id="liveGo">' + T('live.go','Start onderweg') + '</button>' +
+        '<button class="rahul-leeg-knop" data-rahul-leeg="Boek een rit voor me: vraag waar ik heen wil en regel het vervoer" style="margin-top:0.45rem;">' + T('live.rahulrit','Laat Rahul een rit boeken') + '</button>' +
         '<button class="live-go" id="liveDeel" style="margin-top:0.45rem;background:none;border:1px solid var(--line);color:var(--txt);">' + T('live.deel','Deel mijn live locatie met deze zaak') + '</button>' +
         '<div style="margin-top:0.4rem;font-size:0.62rem;color:var(--soft);line-height:1.5;">' + T('live.deel.s','Alleen deze zaak ziet dan waar u bent, tot de zaak het niet meer nodig heeft of u het zelf stopt.') + '</div>' +
       '</div>';

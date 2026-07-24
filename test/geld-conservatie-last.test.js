@@ -13,6 +13,9 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 
+// een geldige 1x1 PNG voor de KYC-upload (opent de payGate eenmalig)
+const KYC_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
 const api = (base, pad, body, token) => fetch(base + '/api/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
@@ -32,6 +35,9 @@ test('gelijktijdige echte tikken bewaren geld op de cent en zakken nooit onder n
       const reg = await api(base, 'auth/register', { name: 'Conserv ' + i, email: 'c' + uniek + '@x.test',
         phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
       assert.ok(reg.body.token, 'lid ' + i + ' geregistreerd');
+      // eenmalige KYC (paspoort tonen) voor het eerste RTG Pay-moment: opent de
+      // payGate zodat opladen mag -- een gratis lid moet dit een keer doen.
+      await api(base, 'verify/upload', { image: KYC_PNG }, reg.body.token);
       const ov = await api(base, 'pay/overzicht', {}, reg.body.token);
       leden.push({ token: reg.body.token, codenaam: ov.body.codenaam });
     }

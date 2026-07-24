@@ -11,6 +11,7 @@
     "sleutels": "node scripts/sleutels.js",
     "golive": "node scripts/golive.js",
     "beproeving": "node --experimental-sqlite scripts/beproeving.js",
+    "beproeving:streng": "STRENG=1 node --experimental-sqlite scripts/beproeving.js",
     "beproeving:mega": "node --max-old-space-size=8192 scripts/beproeving.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",

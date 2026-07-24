@@ -7,6 +7,8 @@
    (Lifestyle/Business) mogen elk RTG-lid aanspreken; een RTG-lid reageert alleen
    met andere RTG-leden, tenzij een hoger lid het contact eerst legde. */
 
+const salonviraal = require('./salonviraal');
+
 function maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan }) {
   function hasContact(higherFull, rtgFull) {
     return db.data.contacts.some(c => c.higher === higherFull && c.rtg === rtgFull);
@@ -57,12 +59,16 @@ function maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeft
     // Systeeminhoud (facturen, reis, menu) wordt gelokaliseerd. Berichten van
     // leden (posts, reacties) houden hun originele tekst + de taal van de auteur,
     // zodat de ontvanger ze in zijn eigen taal vertaald kan lezen.
-    const posts = db.data.posts.map(p => {
+    // De Salon toont alleen wat viraal gaat of maatschappelijk belangrijk is; de
+    // zakelijke partner-etalage en de door RTG uitgelichte posts staan daar los
+    // van en blijven altijd zichtbaar (zie kern/salonviraal.js).
+    const posts = db.data.posts.filter(salonviraal.toonInSalon).map(p => {
       const sup = p.partnerCode ? findSupplier(p.partnerCode) : null;
       const claim = p.deal ? (p.deal.claims || []).find(c => c.key === sess.key) : null;
       return {
         id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual, at: p.at || null,
         photo: p.photo || null, partner: !!p.partner,
+        reden: salonviraal.reden(p),
         text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
         likes: p.baseLikes + Object.keys(p.likedBy).length,
         liked: !!p.likedBy[sess.key],

@@ -6714,9 +6714,17 @@
       const engage = canEngage(p);
       // gratis gebruikers (zonder pas) liken/reageren niet bij particulieren
       const mayLike = !(isGuest && !p.partner);
+      // waarom staat dit bericht in De Salon? De Salon toont alleen wat viraal
+      // gaat of maatschappelijk belangrijk is; een klein, ingetogen chipje maakt
+      // dat zichtbaar (partner-etalage en uitgelichte posts dragen geen chip).
+      const redenChip = p.reden
+        ? '<span class="salon-reden salon-reden-' + p.reden + '">' +
+            (p.reden === 'belangrijk' ? T('sal.reden.belangrijk', 'Belangrijk') : T('sal.reden.viraal', 'Trending')) +
+          '</span>'
+        : '';
       const visual = p.photo
-        ? '<div class="visual"><img src="' + p.photo + '" alt=""><span class="place">' + escT(p.place) + '</span></div>'
-        : '<div class="visual ' + (p.visual || 'v-partner') + '"><span class="place">' + escT(p.place) + '</span></div>';
+        ? '<div class="visual"><img src="' + p.photo + '" alt="">' + redenChip + '<span class="place">' + escT(p.place) + '</span></div>'
+        : '<div class="visual ' + (p.visual || 'v-partner') + '">' + redenChip + '<span class="place">' + escT(p.place) + '</span></div>';
       // partners posten zonder wachttijd: hun bericht staat er direct, met
       // tijdstempel; de 7-dagen-privacyregel geldt alleen voor ledenposts
       const meta = p.partner

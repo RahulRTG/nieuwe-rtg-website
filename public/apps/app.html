@@ -500,12 +500,27 @@
   .post .head b{display:block;font-size:0.84rem;}
   .post .head span{font-size:0.68rem;color:var(--soft);}
   .post .visual{
+    position:relative;
     aspect-ratio:16/10;
     display:flex;align-items:flex-end;padding:1rem 1.15rem;
   }
   .post .visual .place{
     font-family:'Bodoni Moda',serif;font-style:italic;font-size:1.4rem;color:#fff;
     text-shadow:0 2px 16px rgba(0,0,0,0.4);
+  }
+  /* waarom staat dit bericht in De Salon: viraal ('Trending') of maatschappelijk
+     belangrijk ('Belangrijk'). Ingetogen chip, geen kunstmatige urgentie. */
+  .post .visual .salon-reden{
+    position:absolute;top:0.85rem;left:1.15rem;
+    font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;
+    padding:0.16rem 0.55rem;border-radius:999px;
+    background:rgba(12,12,11,0.55);color:#fff;
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,0.28);
+  }
+  .post .visual .salon-reden-belangrijk{
+    color:#fff;border-color:rgba(194,58,94,0.7);
+    background:linear-gradient(180deg,rgba(126,22,52,0.85),rgba(126,22,52,0.7));
   }
   .v-ibiza{background:linear-gradient(160deg,#0B2A3A 0%,#1E7A8C 55%,#F2A65A 100%);}
   .v-gstaad{background:linear-gradient(160deg,#1A2230 0%,#3E5A7A 55%,#C9D6E4 100%);}

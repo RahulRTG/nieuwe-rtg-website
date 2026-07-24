@@ -77,8 +77,12 @@ const CHECKS = [
       try { s = await c.pay.schaduw.stand(); } catch (e) { return { status: 'fout', detail: 'Kan de motor niet bereiken: ' + (e.message || e) }; }
       if (!s || s.fout) return { status: 'fout', detail: 'Kan de motor niet bereiken: ' + ((s && s.fout) || 'onbekend') };
       if (!s.motorKlopt) return { status: 'fout', detail: 'De Rust-motor sluit niet (motor-som ' + s.motorSom + ', hoort exact 0 te zijn).' };
-      if (!s.gelijk) return { status: 'fout', detail: 'DRIFT: JS-som ' + s.jsSom + ' vs motor-som ' + s.motorSom + ' -- de schaduw loopt uit de pas.' };
-      return { status: 'ok', detail: 'Lockstep: JS en de Rust-motor sluiten allebei op ' + s.jsSom + '.' };
+      if (!s.gelijk) return { status: 'fout', detail: 'DRIFT (som): JS-som ' + s.jsSom + ' vs motor-som ' + s.motorSom + ' -- de schaduw loopt uit de pas.' };
+      // Som klopt, maar valt er per-rekening iets weg? De vingerafdruk over alle
+      // saldi vangt drift die de som mist (A te hoog, B even veel te laag).
+      if (s.gelijkAlle === false) return { status: 'fout', detail: 'DRIFT (per rekening): de som klopt (' + s.jsSom + ') maar de saldi-vingerafdruk verschilt (JS ' + s.jsVingerafdruk + ' vs motor ' + s.motorVingerafdruk + ') -- ergens vallen twee rekeningen tegen elkaar weg.' };
+      if (s.gelijkAlle === true) return { status: 'ok', detail: 'Lockstep: JS en de Rust-motor sluiten allebei op ' + s.jsSom + ' en de saldi-vingerafdruk klopt rekening-voor-rekening (' + s.jsVingerafdruk + ').' };
+      return { status: 'ok', detail: 'Lockstep op de som (' + s.jsSom + '). Motor levert nog geen saldi-vingerafdruk; alleen de som is vergeleken.' };
     }
   },
   {

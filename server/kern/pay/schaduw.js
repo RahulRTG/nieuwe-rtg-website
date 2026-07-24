@@ -56,15 +56,25 @@ module.exports = function maakSchaduw() {
         rij.push({ van: b.van, naar: b.naar, centen: b.centen, soort: b.soort, oms: b.oms, ref: b.ref || null });
       } catch (e) { /* schaduw mag het echte pad nooit raken */ }
     },
-    // vergelijk de stand: JS-som vs motor-som (drift-detector). Met een korte
-    // time-out zodat het statusbord nooit hangt op een trage/dode motor.
-    async stand(jsSom) {
+    // vergelijk de stand: JS vs motor (drift-detector). Twee lagen:
+    //   - `gelijk`  : de totaalsom klopt (grove check, mist wegvallende drift);
+    //   - `gelijkAlle`: de vingerafdruk over ALLE saldi klopt (per-rekening).
+    // De afdruk kan ontbreken (oudere motor); dan blijft `gelijkAlle` null en
+    // valt het statusbord terug op de som. Korte time-out zodat het bord nooit
+    // hangt op een trage/dode motor.
+    async stand(jsSom, jsVingerafdruk) {
       const af = new AbortController();
       const t = setTimeout(() => af.abort(), 2000);
       try {
         const r = await fetch(URL.replace(/\/$/, '') + '/api/motor/status', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', signal: af.signal });
         const j = await r.json();
-        return { motorSom: j.som, motorKlopt: j.klopt, jsSom, gelijk: Number(j.som) === Number(jsSom) };
+        const motorAfdruk = j.vingerafdruk || null;
+        return {
+          motorSom: j.som, motorKlopt: j.klopt, jsSom,
+          gelijk: Number(j.som) === Number(jsSom),
+          jsVingerafdruk: jsVingerafdruk || null, motorVingerafdruk: motorAfdruk,
+          gelijkAlle: (jsVingerafdruk && motorAfdruk) ? (jsVingerafdruk === motorAfdruk) : null,
+        };
       } catch (e) { return { fout: e.name === 'AbortError' ? 'time-out (2s)' : e.message }; }
       finally { clearTimeout(t); }
     },

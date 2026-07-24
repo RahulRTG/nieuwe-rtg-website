@@ -369,6 +369,33 @@ impl State {
         (klopt, som)
     }
 
+    /* Vingerafdruk over ALLE saldi (niet alleen de som). Twee grootboeken kunnen
+       dezelfde som hebben terwijl losse rekeningen tegen elkaar wegvallen; deze
+       afdruk vangt zulke per-rekening-drift die de som mist. FNV-1a (64-bit) over
+       een canonieke bytestroom: rekeningen met saldo != 0, gesorteerd op de rauwe
+       bytes van de sleutel, elk als `sleutel 0x1f <decimaal saldo> 0x0a`. De
+       JS-kant (server/kern/pay/vingerafdruk.js) berekent dit BYTE-VOOR-BYTE
+       hetzelfde, zodat de schaduw-drift-detector ze kan vergelijken. */
+    pub fn vingerafdruk(&self) -> String {
+        let mut paren: Vec<(&String, i64)> =
+            self.grb.saldi.iter().filter(|(_, &v)| v != 0).map(|(k, &v)| (k, v)).collect();
+        paren.sort_by(|a, b| a.0.as_bytes().cmp(b.0.as_bytes()));
+        let mut h: u64 = 0xcbf29ce484222325; // FNV-offset-basis
+        let mut eet = |bytes: &[u8]| {
+            for &byte in bytes {
+                h ^= byte as u64;
+                h = h.wrapping_mul(0x100000001b3); // FNV-prime
+            }
+        };
+        for (k, v) in paren {
+            eet(k.as_bytes());
+            eet(&[0x1f]);
+            eet(v.to_string().as_bytes());
+            eet(&[0x0a]);
+        }
+        format!("{:016x}", h)
+    }
+
     // Volledige saldi-dump — alleen voor het pariteitsharnas (achter een vlag);
     // in productie nooit blootstellen (het is de hele geldstand).
     pub fn saldi_json(&self) -> Json {
@@ -480,6 +507,25 @@ mod tests {
         assert_eq!(r.body.i64_at("bijgeladen"), Some(25000));
         let (klopt, som) = s.gezond();
         assert!(klopt && som == 0, "grootboek sluit op de cent");
+    }
+
+    #[test]
+    fn vingerafdruk_stabiel_en_vaste_vector() {
+        // Bekende vector: dezelfde saldi geven altijd dezelfde afdruk, ongeacht
+        // invoegvolgorde, en nul-saldi tellen niet mee. De JS-kant
+        // (test/motor-vingerafdruk.test.js) checkt EXACT dezelfde string.
+        let mut s = State::new();
+        s.registreer_lid("NEVEL");
+        s.registreer_lid("SPOOK");
+        s.laad_op("NEVEL", i(100000), Some("v1"));
+        s.stuur("NEVEL", "SPOOK", i(40000), Some("x"), Some("v2"), "p2p");
+        // saldi nu: lid:NEVEL=60000, lid:SPOOK=40000, extern:oplaad=-100000
+        let a = s.vingerafdruk();
+        assert_eq!(a, "e1c42b2abf34f03f", "vaste vector (moet gelijk zijn aan JS)");
+        // een rekening naar nul: telt niet meer mee, afdruk verandert
+        s.stuur("SPOOK", "NEVEL", i(40000), Some("y"), Some("v3"), "p2p");
+        assert_ne!(s.vingerafdruk(), a);
+        assert!(s.gezond().0);
     }
 
     #[test]

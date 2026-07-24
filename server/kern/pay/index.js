@@ -168,9 +168,13 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
   const api = { MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, saldoVan, koppelBank };
-  // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-som met
-  // de Rust-motor. `aan` is false als RTG_MOTOR_SHADOW niet is gezet.
-  api.schaduw = { aan: schaduw.aan, stand: () => schaduw.stand(sluitcontrole().som) };
+  // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
+  // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
+  // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk
+  // wordt alleen hier berekend (statusbord-poll), niet in het warme geld-pad.
+  // `aan` is false als RTG_MOTOR_SHADOW niet is gezet.
+  const { vingerafdruk } = require('./vingerafdruk');
+  api.schaduw = { aan: schaduw.aan, stand: () => schaduw.stand(sluitcontrole().som, vingerafdruk(saldi())) };
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
   return { pay: api };

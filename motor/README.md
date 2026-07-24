@@ -78,8 +78,15 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   `boek()`-primitief (dus alle 26 interne callers automatisch mee, zonder ze aan
   te raken). Fire-and-forget batches (nul latentie op het geld-pad); JS blijft
   de baas. `scripts/motor-schaduw.js` bewijst LOCKSTEP: de motor-saldi zijn
-  identiek aan de JS-waarheid. Volgende: drift-detector op het statusbord, dan
-  canary -> cutover.
+  identiek aan de JS-waarheid.
+- [x] **Drift-detector op het statusbord** (twee lagen). Het techniek-bord
+  (MOTOR-01) vergelijkt de schaduw-motor met de JS-waarheid op ELKE poll:
+  eerst de totaalsom, en daarnaast een **vingerafdruk over ALLE saldi**
+  (FNV-1a, byte-voor-byte gelijk in `src/pay.rs::vingerafdruk` en
+  `server/kern/pay/vingerafdruk.js`). Zo komt ook per-rekening-drift eruit die
+  de som mist (rekening A te hoog, B even veel te laag -> som blijft 0). Bewezen
+  lockstep: dezelfde stand geeft in beide dezelfde afdruk (`e1c42b2abf34f03f`),
+  live geverifieerd tegen `/api/motor/status`. Volgende: canary -> cutover.
 - [ ] **De echte naad (na schaduw) — beslissing later.** Het grootboek wordt niet alleen via
   `/api/pay/*` bereikt: **26 interne JS-modules** (RTG Bank, OV, Assets, Vonk,
   Podium, Fluister, WBW, kassa, synergie) roepen `pay.boek/stuur/...`

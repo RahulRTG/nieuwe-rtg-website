@@ -403,6 +403,7 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
         b.set("ok", Json::Bool(true))
             .set("klopt", Json::Bool(klopt))
             .set("som", Json::Num(som as f64))
+            .set("vingerafdruk", Json::Str(s.vingerafdruk()))
             .set("leden", Json::Num(s.ledental() as f64));
         return Response { status: 200, body: b.dump() };
     }

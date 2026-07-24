@@ -22,7 +22,7 @@
             '</div>';
           const alle = (d.kansen || []).concat(d.partnerVacatures || []);
           $('#kansLijst').innerHTML = alle.length ? alle.map(kaart).join('')
-            : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.k.leeg','Nog geen kansen. Plaats de eerste: een opdracht, samenwerking of investeringsvraag.') + '</div>';
+            : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.k.leeg','Nog geen kansen. Plaats de eerste: een opdracht, samenwerking of investeringsvraag.') + '<br><button class="rahul-leeg-knop" data-rahul-leeg="Stel een kans op (een opdracht, samenwerking of investeringsvraag) en plaats hem voor me" style="margin-top:0.6rem;">' + T('zak.k.leegdoe','Laat Rahul een kans opstellen') + '</button></div>';
           $('#kansLijst').querySelectorAll('.js-kre').forEach(b => b.addEventListener('click', async () => {
             const inp = $('#kansLijst').querySelector('.js-kretxt[data-id="' + b.dataset.id + '"]');
             try { await API.call('/zakelijk/kans/reageer', { id: b.dataset.id, tekst: inp.value }); toast(T('zak.k.gereageerd','Reactie geplaatst; de plaatser ziet hem direct.')); laad(); }

@@ -1,5 +1,6 @@
     if (!rij.length){
-      h += '<div style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);">'+T('vac.leeg','Nu geen open vacatures die bij u passen. Kijk gerust later nog eens.')+'</div>';
+      h += '<div style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);">'+T('vac.leeg','Nu geen open vacatures die bij u passen. Kijk gerust later nog eens.')+'</div>'+
+        '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek werk dat bij mijn profiel past en help me solliciteren" style="margin-top:0.5rem;">'+T('vac.leegdoe','Laat Rahul werk zoeken dat past')+'</button>';
     } else {
       h += '<div style="margin-top:0.7rem;display:flex;flex-direction:column;gap:0.6rem;">'+ rij.slice(0,20).map(({v,km})=>{
         const al = isApplied(v);

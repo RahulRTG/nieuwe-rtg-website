@@ -327,16 +327,39 @@ async function openen(){
     $('#openSheet').classList.add('open');
   }catch(e){ meld(e.message); }
 }
+// De export is een op zichzelf staande pagina met een kleine runtime: hij kiest
+// live de versie (telefoon/tablet/desktop) op de vensterbreedte en past per
+// versie de tekst, volgorde en zichtbaarheid toe -- net als de RTG-browser.
+const EXPORT_RUNTIME=
+"(function(){var D=window.__RTG__;"+
+"function ver(){var w=Math.min(innerWidth,1080);return w<=640?'telefoon':(w<=1000?'tablet':'desktop');}"+
+"function toon(b,v){if(v==='desktop')return b;var o=b.varianten&&b.varianten[v];return o?Object.assign({},b,o):b;}"+
+"function orden(v){var vs=D.volgorde&&D.volgorde[v];if(v!=='desktop'&&vs&&vs.length){var m={};D.blokken.forEach(function(b){m[b.id]=b;});var u=[];vs.forEach(function(id){if(m[id]){u.push(m[id]);delete m[id];}});D.blokken.forEach(function(b){if(m[b.id])u.push(b);});return u;}return (D.blokken||[]).slice();}"+
+"function tk(el,v){el.textContent=v||'';return el;}"+
+"function tb(b,v){var T=toon(b,v),s=document.createElement('section');s.className='blok';var t=b.type;"+
+"if(t==='hero'){s.className+=' b-hero';s.appendChild(tk(document.createElement('h1'),T.kop));var p=document.createElement('div');p.className='sub';tk(p,T.sub);s.appendChild(p);if(T.knop){var a=document.createElement('span');a.className='b-knop';tk(a,T.knop);s.appendChild(a);}}"+
+"else if(t==='kop'){s.className+=' b-kop';s.appendChild(tk(document.createElement('h2'),T.tekst));}"+
+"else if(t==='tekst'){s.className+=' b-tekst';var d=document.createElement('div');tk(d,T.tekst);s.appendChild(d);}"+
+"else if(t==='knop'){s.className+=' b-knoprij';var a=document.createElement('span');a.className='b-knop';tk(a,T.tekst);s.appendChild(a);}"+
+"else if(t==='beeld'){s.className+=' b-beeld';var im=document.createElement('img');im.src=b.src;im.alt=T.bijschrift||'';s.appendChild(im);if(T.bijschrift){var bb=document.createElement('div');bb.className='bij';tk(bb,T.bijschrift);s.appendChild(bb);}}"+
+"else if(t==='kolommen'){s.className+=' b-kol';[['lk','lt'],['rk','rt']].forEach(function(p){var c=document.createElement('div');c.appendChild(tk(document.createElement('h3'),T[p[0]]));var q=document.createElement('div');q.className='kt';tk(q,T[p[1]]);c.appendChild(q);s.appendChild(c);});}"+
+"else if(t==='galerij'){s.className+=' b-gal';(b.beelden||[]).forEach(function(src){var im=document.createElement('img');im.src=src;im.alt='';s.appendChild(im);});}"+
+"else if(t==='citaat'){s.className+=' b-citaat';var q=document.createElement('div');q.className='q';tk(q,T.tekst);s.appendChild(q);var br=document.createElement('div');br.className='bron';tk(br,T.bron);s.appendChild(br);}"+
+"else if(t==='ruimte'){s.style.height=(b.hoogte||40)+'px';}"+
+"else if(t==='voettekst'){s.className+=' b-voet';tk(s,T.tekst);}"+
+"return s;}"+
+"function verf(){var v=ver();var d=document.querySelector('.doek');if(!d||d.dataset.ver===v)return;d.dataset.ver=v;d.textContent='';orden(v).forEach(function(b){if((b.verberg||[]).indexOf(v)>=0)return;d.appendChild(tb(b,v));});}"+
+"addEventListener('resize',function(){clearTimeout(window._t);window._t=setTimeout(verf,120);});verf();})();";
 function exporteer(){
-  const was=BEWERK; BEWERK=false; render();
-  const inner=$('#doek').innerHTML; BEWERK=was; render();
   const css=document.querySelector('style').textContent.replace(/\/\* bewerk[\s\S]*?\}\n/,'');
+  const data=JSON.stringify({titel:DESIGN.titel,thema:DESIGN.thema,accent:DESIGN.accent,blokken:DESIGN.blokken,volgorde:DESIGN.volgorde||null}).replace(/</g,'\\u003c');
   const html='<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(DESIGN.titel||'RTG sjabloon')+'</title>'+
     '<link href="/fonts/fonts.css" rel="stylesheet"><style>body{margin:0;background:'+(DESIGN.thema==='licht'?'#F5F1EA':'#0C0C0B')+';}'+css+'</style></head>'+
-    '<body><div class="doek" data-thema="'+DESIGN.thema+'" style="--acc:'+DESIGN.accent+';max-width:1080px;margin:0 auto;">'+inner+'</div></body></html>';
+    '<body><div class="doek" data-thema="'+DESIGN.thema+'" data-ver="" style="--acc:'+DESIGN.accent+';max-width:1080px;margin:0 auto;"></div>'+
+    '<script>window.__RTG__='+data+';<\/script><script>'+EXPORT_RUNTIME+'<\/script></body></html>';
   const blob=new Blob([html],{type:'text/html'}); const a=document.createElement('a');
   a.href=URL.createObjectURL(blob); a.download=(DESIGN.titel||'rtg-sjabloon').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.html';
-  document.body.appendChild(a); a.click(); a.remove(); meld('Sjabloon geëxporteerd als webpagina.');
+  document.body.appendChild(a); a.click(); a.remove(); meld('Sjabloon geëxporteerd: past zich per toestel aan.');
 }
 
 // bediening

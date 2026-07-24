@@ -31,7 +31,6 @@ fn gids_pad() -> PathBuf {
     PathBuf::from(env("RTG_MOTOR_GIDS", "motor-data/gids.bin"))
 }
 
-#[cfg(feature = "kluis")]
 fn open_kluis() -> rtg_motor::kluis::Kluis {
     let sleutel = PathBuf::from(env("RTG_KLUIS_KEY_FILE", "motor-data/secret.key"));
     let data = PathBuf::from(env("RTG_KLUIS_DATA", "motor-data/kluis.json"));
@@ -46,7 +45,6 @@ fn open_kluis() -> rtg_motor::kluis::Kluis {
 
 /* Write-behind voor de kluis: elke ~500 ms een versleutelde snapshot als er iets
    veranderde. De klaartekst raakt de schijf nooit. */
-#[cfg(feature = "kluis")]
 fn start_kluis_flusher(kluis: Arc<std::sync::Mutex<rtg_motor::kluis::Kluis>>) {
     thread::spawn(move || loop {
         thread::sleep(Duration::from_millis(500));
@@ -65,7 +63,6 @@ fn start_kluis_flusher(kluis: Arc<std::sync::Mutex<rtg_motor::kluis::Kluis>>) {
     });
 }
 
-#[cfg(feature = "kluis")]
 fn kluis_route(kluis: &std::sync::Mutex<rtg_motor::kluis::Kluis>, req: &Request) -> Response {
     if req.path == "/api/kluis/status" {
         let k = kluis.lock().unwrap();
@@ -189,8 +186,7 @@ fn main() {
         }
     }
 
-    // kluis: alleen in de vault-build (--features kluis)
-    #[cfg(feature = "kluis")]
+    // kluis: identiteitskluis met onze eigen ChaCha20-Poly1305 (zero-dep)
     let router_kluis = {
         let k = Arc::new(std::sync::Mutex::new(open_kluis()));
         eprintln!("[motor] kluis actief: ChaCha20-Poly1305, sleutel-vingerafdruk {}", k.lock().unwrap().vingerafdruk());
@@ -206,7 +202,6 @@ fn main() {
         if req.path.starts_with("/api/gids/") {
             return gids_route(&router_gids, req);
         }
-        #[cfg(feature = "kluis")]
         if req.path.starts_with("/api/kluis/") {
             return kluis_route(&router_kluis, req);
         }

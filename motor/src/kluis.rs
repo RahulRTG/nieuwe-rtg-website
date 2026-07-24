@@ -10,9 +10,8 @@
    alleen een niet-omkeerbare vingerafdruk.
 
    Alleen gecompileerd met `--features kluis`. */
+use crate::aead;
 use crate::json::Json;
-use chacha20poly1305::aead::{Aead, KeyInit};
-use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
 use std::collections::HashMap;
 use std::fs;
 use std::io;
@@ -22,7 +21,7 @@ const NONCE_LEN: usize = 12;
 const SLEUTEL_LEN: usize = 32;
 
 pub struct Kluis {
-    cipher: ChaCha20Poly1305,
+    sleutel: [u8; SLEUTEL_LEN],
     vingerafdruk: String,
     store: HashMap<String, Vec<u8>>, // key -> nonce || ciphertext+tag
     pad: PathBuf,
@@ -86,7 +85,7 @@ fn laad_of_maak_sleutel(pad: &Path) -> io::Result<[u8; SLEUTEL_LEN]> {
         }
     }
     let mut k = [0u8; SLEUTEL_LEN];
-    getrandom::getrandom(&mut k).map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
+    aead::os_random(&mut k)?;
     if let Some(dir) = pad.parent() {
         let _ = fs::create_dir_all(dir);
     }
@@ -102,7 +101,6 @@ fn laad_of_maak_sleutel(pad: &Path) -> io::Result<[u8; SLEUTEL_LEN]> {
 impl Kluis {
     pub fn open(sleutel_pad: &Path, data_pad: &Path) -> io::Result<Kluis> {
         let key = laad_of_maak_sleutel(sleutel_pad)?;
-        let cipher = ChaCha20Poly1305::new(Key::from_slice(&key));
         let vaf = vingerafdruk(&key);
         let mut store = HashMap::new();
         if let Ok(tekst) = fs::read_to_string(data_pad) {
@@ -116,7 +114,7 @@ impl Kluis {
                 }
             }
         }
-        Ok(Kluis { cipher, vingerafdruk: vaf, store, pad: data_pad.to_path_buf(), vuil: false })
+        Ok(Kluis { sleutel: key, vingerafdruk: vaf, store, pad: data_pad.to_path_buf(), vuil: false })
     }
 
     /* Bewaar (of overschrijf) de echte gegevens voor een sleutel/codenaam,
@@ -126,11 +124,9 @@ impl Kluis {
             return Err("Geen sleutel.".into());
         }
         let mut nonce = [0u8; NONCE_LEN];
-        getrandom::getrandom(&mut nonce).map_err(|e| e.to_string())?;
-        let ct = self
-            .cipher
-            .encrypt(Nonce::from_slice(&nonce), klaartekst.as_bytes())
-            .map_err(|_| "Versleutelen mislukte.".to_string())?;
+        aead::os_random(&mut nonce).map_err(|e| e.to_string())?;
+        // eigen ChaCha20-Poly1305 (RFC 8439), geverifieerd tegen de RFC-vectoren
+        let ct = aead::seal(&self.sleutel, &nonce, &[], klaartekst.as_bytes());
         let mut blob = nonce.to_vec();
         blob.extend_from_slice(&ct);
         self.store.insert(key.to_string(), blob);
@@ -147,7 +143,9 @@ impl Kluis {
             return None;
         }
         let (nonce, ct) = blob.split_at(NONCE_LEN);
-        let pt = self.cipher.decrypt(Nonce::from_slice(nonce), ct).ok()?;
+        let mut n = [0u8; NONCE_LEN];
+        n.copy_from_slice(nonce);
+        let pt = aead::open(&self.sleutel, &n, &[], ct)?;
         String::from_utf8(pt).ok()
     }
 
@@ -192,7 +190,7 @@ mod tests {
     }
     fn rand_byte() -> u8 {
         let mut b = [0u8; 1];
-        getrandom::getrandom(&mut b).unwrap();
+        super::aead::os_random(&mut b).unwrap();
         b[0]
     }
 

@@ -97,12 +97,21 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   `scripts/motor-gids.js` reproduceert het. Projectie 100M: ~9 GB op schijf,
   ~2,5 MB RAM. (Bouwen sorteert nu in RAM; voor >~10M hoort extern sorteren, maar
   het serveren is al out-of-RAM — dat is de eigenschap die telt.)
-- [x] **Kluis-crypto** (achter `--features kluis`) — identiteitskluis met ECHTE
-  authenticated encryption (**ChaCha20-Poly1305** uit de geaudite RustCrypto-crate;
-  geen zelfgebouwde crypto). Verse willekeurige nonce per record (OS-CSPRNG),
-  sleutel gescheiden van de data (`secret.key`, rechten 600). Endpoints:
+- [x] **Kluis-crypto** — identiteitskluis met ECHTE authenticated encryption:
+  onze **eigen ChaCha20-Poly1305 (RFC 8439)** in `src/aead.rs`, byte-voor-byte
+  geverifieerd tegen de officiele RFC-testvectoren (quarter-round los + op de
+  state, Poly1305, Poly1305-sleutelgen uit blok 0, ChaCha-blok, volledige AEAD).
+  Geen zelfverzonnen algoritme, en **geen externe crate** — de hele motor blijft
+  zero-dependency. Timing-hardening met `std::hint::black_box` op het constant-
+  time tag-vergelijk en de Poly1305-reductie (zelfde mechanisme als de
+  `subtle`-crate). Verse willekeurige nonce per record (/dev/urandom), sleutel
+  gescheiden van de data (`secret.key`, rechten 600). Endpoints:
   `/api/kluis/bewaar`, `/api/kluis/onthul`, `/api/kluis/wis`, `/api/kluis/status`
-  (toont alleen een niet-omkeerbare sleutel-vingerafdruk, nooit de sleutel).
-  Bewezen: klaartekst raakt de schijf nooit, een andere sleutel of een gewijzigd
-  blob levert niets op. **De standaardbuild blijft zero-dependency**; alleen deze
-  vault-build trekt de crypto binnen (`cargo build --features kluis`).
+  (toont alleen een niet-omkeerbare sleutel-vingerafdruk). Bewezen: klaartekst
+  raakt de schijf nooit; een andere sleutel of een gewijzigd blob levert niets op.
+
+  > Eerlijke restnoot (timing): ChaCha20-Poly1305 vermijdt door zijn ARX-ontwerp
+  > de S-box-cache-timing die AES treft, en de code is branchloos met
+  > black_box-barrieres — dezelfde klasse mitigatie als de pure-Rust vetted
+  > crates. Het enige dat een gevestigde crate extra biedt, is jarenlange review
+  > en fuzzing; de timing-techniek voor dit algoritme is dezelfde.

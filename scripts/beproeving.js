@@ -292,7 +292,12 @@ async function zaaiPostgres() {
     process.stdout.write('  ' + ('member_dir +' + nl(e - s + 1)).padEnd(46) + ' \x1b[36m' + (Date.now() - tc) + ' ms\x1b[0m\n');
   }
   psql('CREATE INDEX member_dir_codename_lower ON member_dir(codename_lower)');
-  try { psql('CREATE EXTENSION IF NOT EXISTS pg_trgm'); psql('CREATE INDEX member_dir_codename_trgm ON member_dir USING gin(codename_lower gin_trgm_ops)'); } catch (e) {}
+  // De trgm-gin (fuzzy zoeken) is de duurste index qua schijf en bouwtijd. Op de
+  // echte 100M-schaal met een krappe schijf kun je hem overslaan (MEGA_TRGM=0);
+  // de btree op codename_lower blijft de exacte-zoek/buiten-RAM-belofte bewijzen.
+  if (process.env.MEGA_TRGM !== '0') {
+    try { psql('CREATE EXTENSION IF NOT EXISTS pg_trgm'); psql('CREATE INDEX member_dir_codename_trgm ON member_dir USING gin(codename_lower gin_trgm_ops)'); } catch (e) {}
+  }
   const pool = new Pool({ connectionString: DB, max: 4 });
   const NU = Date.now();
   const SUPS = ['KIKUNOI', 'PONTO', 'HOSHI', 'SAKURA', 'MKKX'];

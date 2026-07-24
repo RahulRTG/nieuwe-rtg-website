@@ -70,8 +70,17 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   door de Node-JS-engine en de motor; de saldi zijn IDENTIEK, beide sluiten. De
   motor is een geverifieerde 1-op-1 vervanger van het grootboek.
 - [x] **Gehard** — DoS-body-cap + constant-time betaalcodes.
-- [ ] Achter de Node-poort schuiven (`/api/pay/*` → motor). Let op: een
-  HTTP-hop kost seriële latentie; de winst is veiligheid + gedrag onder
-  gelijktijdige last, niet de enkele-call-latentie. Afweging, geen no-brainer.
+- [x] **Concurrency bewezen** — `scripts/motor-storm.js`: 60k parallelle
+  operaties (64 schrijvers), 0 serverfouten, som saldi = 0, conservatie exact
+  (positieve saldi === -extern). Geen cent zoek onder volle last.
+- [ ] **De echte naad — beslissing nodig.** Het grootboek wordt niet alleen via
+  `/api/pay/*` bereikt: **26 interne JS-modules** (RTG Bank, OV, Assets, Vonk,
+  Podium, Fluister, WBW, kassa, synergie) roepen `pay.boek/stuur/...`
+  RECHTSTREEKS aan. Alleen de HTTP-routes omleiden zou een split-brain-grootboek
+  geven (twee ledgers → geldconservatie kapot). De juiste seam is het JS
+  `pay`-object zelf een dunne client naar de motor maken, zodat ALLE callers
+  door één ledger gaan. Dat is een echte refactor van de geldkern (veel callers
+  zijn synchroon `pay.boek(...)`; de motor is async HTTP) en architecturaal
+  significant — daarom een bewuste keuze, geen sluipende omzetting.
 - [ ] **Ledengids** — 100M leden, out-of-RAM venster, zoek.
 - [ ] **Kluis-crypto** — codenamen ↔ echte namen in de gescheiden kluis.

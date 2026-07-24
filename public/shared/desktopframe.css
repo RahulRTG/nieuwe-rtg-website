@@ -1,0 +1,42 @@
+/* Gedeelde desktop-omkadering voor de losse app-pagina's.
+
+   Op een telefoon is een app-pagina een smalle kolom -- precies goed. Op een
+   breed scherm werd dat een dun streepje midden op het zwart. Dit blad geeft de
+   pagina op desktop dezelfde warme, levende RTG-grond en een breed, omkaderd
+   vlak als het leden-OS: veel lucht, de gradient van de dag eronder, de inhoud
+   in een rustige kaart. Onder de 900px verandert er niets (de omkadering begint
+   pas daar), dus de telefoon-beleving blijft intact.
+
+   Hergebruikt de bestaande tokens (--bg/--card/--line/--gold/--burgundy) en de
+   dagkleur (--dag-kleur uit shared/dagkleur.css, gezet door shared/seizoen.js).
+   Geen nieuwe kleuren; alles buigt mee met zon en seizoen zoals het OS. */
+
+/* De levende grond: twee zachte warme wolken uit de dagkleur, subtiel, overal.
+   Op telefoon geeft dit alleen wat meer diepte; het breekt geen enkele layout. */
+body {
+  background:
+    radial-gradient(1200px 720px at 78% -10%, color-mix(in srgb, var(--dag-kleur, var(--burgundy, #C23A5E)) 12%, transparent), transparent 60%),
+    radial-gradient(950px 640px at 6% 112%, color-mix(in srgb, var(--dag-kleur, var(--gold, #A98F1C)) 9%, transparent), transparent 60%),
+    var(--bg, #0C0C0B);
+  background-attachment: fixed;
+}
+
+@media (min-width: 900px) {
+  /* De inhoud als een breed, warm omkaderd vlak -- gecentreerd, met lucht.
+     De <main>-landmark bestaat op elke app-pagina (9+-keuring), dus dit grijpt
+     overal aan zonder de opmaak binnenin te raken. */
+  main {
+    max-width: 1080px;
+    margin: 1.6rem auto 3rem;
+    padding: clamp(1.5rem, 2.4vw, 2.6rem) clamp(1.5rem, 3vw, 3rem);
+    background:
+      linear-gradient(158deg,
+        color-mix(in srgb, var(--card, #151312) 90%, var(--dag-kleur, transparent) 10%),
+        color-mix(in srgb, var(--card, #151312) 97%, transparent));
+    border: 1px solid var(--line, rgba(255, 255, 255, 0.10));
+    border-radius: 22px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+  }
+  /* De vaste kopbalk mag over de volle breedte blijven, als de OS-topbalk. */
+  body > header { border-radius: 0; }
+}

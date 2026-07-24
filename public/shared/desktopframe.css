@@ -36,7 +36,36 @@ body {
     border: 1px solid var(--line, rgba(255, 255, 255, 0.10));
     border-radius: 22px;
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+    /* De kaart is een venster: sleep de rechteronderhoek om te vergroten of te
+       verkleinen. Werkt ook zonder JS; de JS-laag voegt verplaatsen + onthouden
+       toe. */
+    overflow: auto;
+    resize: both;
+    min-width: 340px;
+    min-height: 280px;
+    max-height: calc(100dvh - 120px);
   }
   /* De vaste kopbalk mag over de volle breedte blijven, als de OS-topbalk. */
   body > header { border-radius: 0; }
+
+  /* ---- de vensterlaag (desktopframe.js maakt de kaart verplaatsbaar) ---- */
+  main.rtg-venster { margin: 0; max-width: none; z-index: 6; }
+  /* de sleepgreep bovenaan het venster: een rustige balk om te verplaatsen */
+  .rtg-greep {
+    position: absolute; top: 0; left: 0; right: 0; height: 26px;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    cursor: grab; user-select: none; border-radius: 22px 22px 0 0;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--dag-kleur, var(--gold, #A98F1C)) 10%, transparent), transparent);
+  }
+  .rtg-greep:active { cursor: grabbing; }
+  .rtg-greep .streep { width: 42px; height: 4px; border-radius: 999px; background: var(--line, rgba(255,255,255,0.18)); }
+  .rtg-greep .herstel {
+    position: absolute; right: 8px; top: 4px; height: 18px; padding: 0 .5rem;
+    font: inherit; font-size: .64rem; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--soft, rgba(244,241,236,.5)); background: transparent;
+    border: 1px solid var(--line, rgba(255,255,255,0.14)); border-radius: 999px; cursor: pointer;
+  }
+  .rtg-greep .herstel:hover { color: var(--txt, #F4F1EC); border-color: var(--gold, #A98F1C); }
+  main.rtg-venster { padding-top: calc(clamp(1.5rem, 2.4vw, 2.6rem) + 22px); }
 }
+@media (prefers-reduced-motion: reduce) { main { scroll-behavior: auto; } }

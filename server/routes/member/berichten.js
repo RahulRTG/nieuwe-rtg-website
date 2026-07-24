@@ -5,7 +5,9 @@
    lezen/beantwoorden gebeurt in de bron-app (die houdt zelf de leesstanden bij).
    Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan } = kern;
+  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan, rtmail } = kern;
+  // het RTMAIL-adres van dit lid: zijn codenaam (privacy by design)
+  const mijnCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
 
   app.post('/api/member/berichten', auth, (req, res) => {
     const mij = req.session.key;
@@ -65,6 +67,17 @@ module.exports = (kern) => {
       for (const p of posts) for (const r of p.reacties) if (r.key !== mij) { n += 1; if (!laatste || r.at > laatste.at) laatste = r; }
       if (laatste) kanalen.push({ soort: 'pulse', titel: 'Pulse-reacties', icoon: '⚡',
         laatste: laatste.codenaam + ': ' + String(laatste.tekst).slice(0, 100), at: laatste.at, ongelezen: 0, link: '/apps/pulse.html' });
+    } catch (e) {}
+
+    // 6. RTMAIL: het interne postvak (welkom + de automatiserings-seintjes)
+    try {
+      const codenaam = mijnCodenaam(req);
+      if (rtmail && codenaam) {
+        const vak = rtmail.postvak(codenaam, { limit: 1 });
+        const l = vak[0];
+        if (l) kanalen.push({ soort: 'rtmail', titel: 'RTMAIL', icoon: '✉️',
+          laatste: l.onderwerp, at: l.at, ongelezen: rtmail.ongelezen(codenaam), link: '/apps/rtmail.html' });
+      }
     } catch (e) {}
 
     kanalen.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));

@@ -11,6 +11,9 @@
 (function () {
   var main = document.querySelector('main');
   if (!main) return;
+  // Binnen een OS-venster (iframe) vult de app het hele venster -- dan geen
+  // eigen omkadering/venster; de vensterbeheerder levert de rand al.
+  if (window.self !== window.top) { try { document.documentElement.classList.add('rtg-in-frame'); } catch (e) {} return; }
   var mq = window.matchMedia('(min-width: 1000px)');
   var KEY = 'rtg_venster_' + location.pathname.replace(/[^a-z0-9]/gi, '_');
   var st = null; try { st = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}

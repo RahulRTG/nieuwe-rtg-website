@@ -92,9 +92,15 @@
     else {
       const l = LINKS[item.slice(5)];
       if (!l) return;
+      // op een breed scherm opent een app als venster op het bureaublad
+      // (meerdere naast elkaar); op de telefoon gewoon schermvullend.
+      const openen = () => {
+        if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(l.url, l.app || l.naam || 'App');
+        else location.href = l.url;
+      };
       // prive-apps openen pas na de algemene pin (25-os-01a.js)
-      if (l.prive) return metAlgPin(() => { location.href = l.url; });
-      location.href = l.url;
+      if (l.prive) return metAlgPin(openen);
+      openen();
     }
   }
 

@@ -183,6 +183,67 @@ fn fout(status: u16, msg: &str) -> Response {
     Response { status, body: b.dump() }
 }
 
+/* De Ontsmetter-routes (malware-scanner). /api/av/scan haalt een payload
+   (base64 in `data`, of rauwe `tekst`) door de scanner en telt het verdict mee;
+   /api/av/status geeft de tellingen + het aantal definities. Zelfde verdicten
+   als de Node-scanner (pariteit). */
+#[derive(Default)]
+struct AvStand {
+    totaal: u64,
+    besmet: u64,
+    verdacht: u64,
+    schoon: u64,
+}
+
+fn av_route(stand: &std::sync::Mutex<AvStand>, req: &Request) -> Response {
+    if req.path == "/api/av/status" {
+        let s = stand.lock().unwrap();
+        let mut b = Json::obj();
+        b.set("ok", Json::Bool(true))
+            .set("definities", Json::Num(rtg_motor::ontsmetter::aantal_definities() as f64))
+            .set("totaal", Json::Num(s.totaal as f64))
+            .set("besmet", Json::Num(s.besmet as f64))
+            .set("verdacht", Json::Num(s.verdacht as f64))
+            .set("schoon", Json::Num(s.schoon as f64))
+            .set("scanner", Json::Str("De Ontsmetter (Rust): handtekeningen + heuristiek + entropie".into()));
+        return Response { status: 200, body: b.dump() };
+    }
+    if req.method != "POST" || req.path != "/api/av/scan" {
+        return fout(404, "Onbekende route.");
+    }
+    let body = match json::parse(if req.body.is_empty() { "{}" } else { &req.body }) {
+        Ok(v) => v,
+        Err(_) => return fout(400, "Kapotte JSON."),
+    };
+    let mime = body.str_at("mime").unwrap_or("application/octet-stream").to_string();
+    let naam = body.str_at("naam").unwrap_or("(upload)").to_string();
+    let buf: Vec<u8> = if let Some(d) = body.str_at("data") {
+        rtg_motor::ontsmetter::base64_decode(d)
+    } else if let Some(t) = body.str_at("tekst") {
+        t.as_bytes().to_vec()
+    } else {
+        return fout(400, "Geef 'data' (base64) of 'tekst'.");
+    };
+    let v = rtg_motor::ontsmetter::scan(&buf, &naam, &mime);
+    {
+        let mut s = stand.lock().unwrap();
+        s.totaal += 1;
+        match v.verdict {
+            "besmet" => s.besmet += 1,
+            "verdacht" => s.verdacht += 1,
+            _ => s.schoon += 1,
+        }
+    }
+    let redenen = Json::Arr(v.redenen.iter().map(|r| Json::Str(r.clone())).collect());
+    let mut b = Json::obj();
+    b.set("ok", Json::Bool(true))
+        .set("verdict", Json::Str(v.verdict.into()))
+        .set("bytes", Json::Num(v.bytes as f64))
+        .set("entropie", Json::Num(v.entropie))
+        .set("redenen", redenen);
+    Response { status: 200, body: b.dump() }
+}
+
 fn main() {
     let addr = env("RTG_MOTOR_ADDR", "127.0.0.1:3100");
     let maxconn: usize = env("RTG_MOTOR_MAXCONN", "1024").parse().unwrap_or(1024);
@@ -211,6 +272,10 @@ fn main() {
         k
     };
 
+    // De Ontsmetter: malware-scanner (zero-dep, byte-scan in een enkele pass)
+    let router_av = Arc::new(std::sync::Mutex::new(AvStand::default()));
+    eprintln!("[motor] Ontsmetter actief: {} handtekeningen (Rust)", rtg_motor::ontsmetter::aantal_definities());
+
     eprintln!("[motor] RTG-motor luistert op {} (max {} verbindingen)", addr, maxconn);
 
     let router_state = Arc::clone(&state);
@@ -221,6 +286,9 @@ fn main() {
         }
         if req.path.starts_with("/api/kluis/") {
             return kluis_route(&router_kluis, req);
+        }
+        if req.path.starts_with("/api/av/") {
+            return av_route(&router_av, req);
         }
         route(&router_state, req)
     });

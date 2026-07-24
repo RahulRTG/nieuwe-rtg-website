@@ -139,3 +139,21 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   > Eerlijke restnoot (timing): de timing-techniek voor dit algoritme is dezelfde
   > als de pure-Rust vetted crates (ARX + branchloos + black_box). Het enige dat
   > een gevestigde crate extra biedt is jarenlange externe review en fuzzing.
+- [x] **De Ontsmetter** (`src/ontsmetter.rs`) — de platform-malware-scanner als
+  hete kern in Rust, met dezelfde verdicten als de Node-scanner
+  (`kern/antivirus.js`), dus **pariteit**. Eerlijke scope: dit scant geen
+  computer van een bezoeker, maar elk BESTAND dat RTG binnenkomt.
+  - **46 handtekeningen** (byte-magie én tekst): EICAR, uitvoerbare bestanden
+    (PE/MZ, ELF, Mach-O, CAFEBABE, DEX), scripts-in-beeld (`<?php`, `<script`,
+    SVG/HTML-XSS), PHP-webshells, PowerShell/JS-uitvoering, Log4Shell, Office-
+    macro's, archieven (ZIP/RAR/7z/GZIP/OLE), PDF-gevaar en ransomware-notities.
+  - **Heuristiek + entropie**: magie-vs-opgegeven-type (verdacht), gevaarlijke/
+    dubbele extensie (besmet), Shannon-entropie voor verpakte payloads.
+  - **Snel**: één pass over de bytes via eerste-byte-emmers voor alle tekst-
+    handtekeningen (i.p.v. een pass per patroon). **Doorvoer: ~1260 MB/s** (8 MB-
+    blok) — 37× sneller dan de naïeve variant. Zero-dependency, incl. een eigen
+    kleine base64-decoder.
+  - **Bewezen**: EICAR-KAT, PE/ELF, php-in-afbeelding, type-vervalsing, dubbele
+    extensie, entropie, uitgebreide-handtekeningen en base64-rondrit — 10 tests.
+  Endpoints: `/api/av/scan` (base64 in `data` of rauwe `tekst`, + `mime`/`naam`),
+  `/api/av/status` (tellingen + aantal definities).

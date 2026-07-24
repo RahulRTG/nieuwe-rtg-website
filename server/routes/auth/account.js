@@ -3,7 +3,7 @@
    de gedeelde context een keer bij het opstarten vanuit routes/auth.js. */
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN } = actx;
+    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering } = actx;
 app.post('/api/auth/register', async (req, res) => {
   // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
   // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
@@ -49,6 +49,8 @@ app.post('/api/auth/register', async (req, res) => {
     const ln = String(req.body.land || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
     if (ln.length === 2) mdNieuw.land = ln;
     accounts.saveMemberState(user.id, mdNieuw);
+    // welkom-draaiboek: een automatisch bericht in het eigen RTMAIL-postvak
+    try { if (automatisering) automatisering.welkomLid({ codename: user.codename, wereld: 'RTG' }); } catch (e) {}
     // bevestigingsmail met een echte, werkende link
     const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
     const verifyUrl = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(user.tier) + '&verify=' + vtok;

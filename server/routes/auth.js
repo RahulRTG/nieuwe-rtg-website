@@ -1,7 +1,7 @@
 /* Domein "auth" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog } = kern;
+  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog, automatisering } = kern;
   // Demo-inlog (snelle pas-login zonder wachtwoord, en het demo-account) alleen
   // buiten productie of met RTG_DEMO=1. Echte leden loggen in via /api/auth/login.
   const DEMO = !PRODUCTION || process.env.RTG_DEMO === '1';
@@ -84,7 +84,7 @@ app.post('/api/auth/me', auth, (req, res) => {
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, antivirus: kern.antivirus,
     webauthnRegOpties: kern.webauthnRegOpties, webauthnRegMaak: kern.webauthnRegMaak,
     webauthnLoginOpties: kern.webauthnLoginOpties, webauthnLoginMaak: kern.webauthnLoginMaak,
-    webauthnLijst: kern.webauthnLijst, webauthnWeg: kern.webauthnWeg };
+    webauthnLijst: kern.webauthnLijst, webauthnWeg: kern.webauthnWeg, automatisering };
   require('./auth/account')(actx);
   require('./auth/herstel')(actx);
   require('./auth/verificatie')(actx);

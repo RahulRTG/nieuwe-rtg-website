@@ -58,3 +58,45 @@ test('zaak naar zaak: verzonden-lijst en ontvang-lijst kloppen', () => {
   assert.equal(rtmail.postvak('bloem').length, 1);
   assert.equal(rtmail.postvak('bloem')[0].van, 'sakura@rtmail');
 });
+
+/* ---- de veiligste-mail-laag: vertrouwen, link-scan, bijlage-nul ---- */
+
+test('vertrouwen wordt gestempeld: systeem/lid/zaak = vertrouwd, de rest niet', () => {
+  const { rtmail } = maak();
+  // de systeem-afzender is altijd vertrouwd
+  assert.equal(rtmail.systeemStuur('lid1', 'x', 'y').vertrouwd, true);
+  assert.equal(rtmail.systeemStuur('lid1', 'x', 'y').bron, 'systeem');
+  // een geverifieerde zaak of lid geeft een expliciete bron mee
+  assert.equal(rtmail.stuur({ van: 'sakura', naar: 'bloem', tekst: 'hoi', bron: 'zaak' }).vertrouwd, true);
+  assert.equal(rtmail.stuur({ van: 'orchidee', naar: 'lelie', tekst: 'hoi', bron: 'lid' }).vertrouwd, true);
+  // standaard, of een verzonnen bron, is NIET vertrouwd -> valt terug op 'extern'
+  const zonder = rtmail.stuur({ van: 'iemand', naar: 'lelie', tekst: 'klik hier' });
+  assert.equal(zonder.vertrouwd, false);
+  assert.equal(zonder.bron, 'extern');
+  assert.equal(rtmail.stuur({ van: 'iemand', naar: 'lelie', tekst: 'x', bron: 'hacker' }).bron, 'extern');
+});
+
+test('link-scan: externe links worden herkend en geteld, gevaarlijke schema\'s gemarkeerd', () => {
+  const { rtmail } = maak();
+  const s = rtmail.scanLinks('kijk op https://kwaad.example/pad en www.ook.dit maar niet /apps/veilig');
+  assert.equal(s.aantal, 2);
+  assert.ok(s.externeLinks.some(u => u.includes('kwaad.example')));
+  assert.equal(s.gevaarlijk, false);
+  assert.equal(rtmail.scanLinks('javascript:alert(1)').gevaarlijk, true);
+  // dubbele links tellen als een
+  assert.equal(rtmail.scanLinks('https://a.example https://a.example').aantal, 1);
+});
+
+test('een bezorgd bericht draagt zijn link-analyse mee', () => {
+  const { rtmail } = maak();
+  const m = rtmail.stuur({ van: 'iemand', naar: 'lelie', tekst: 'phishing op http://boos.example nu' });
+  assert.equal(m.links.aantal, 1);
+  assert.equal(rtmail.postvak('lelie')[0].links.aantal, 1);
+});
+
+test('bijlagen bestaan niet: wat er ook binnenkomt, er wordt niets te openen bewaard', () => {
+  const { rtmail } = maak();
+  const m = rtmail.stuur({ van: 'iemand', naar: 'lelie', tekst: 'zie bijlage', bijlagen: [{ naam: 'virus.exe', data: 'x' }] });
+  assert.deepEqual(m.bijlagen, []);
+  assert.deepEqual(rtmail.postvak('lelie')[0].bijlagen, []);
+});

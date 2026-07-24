@@ -282,6 +282,16 @@
     <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.6rem;">Loop nu een ronde</button></h3>
     <div class="kaart lijst" id="bVoorstellen"></div>
 
+    <div class="kaart" id="bRahulHuis" style="margin-top:.8rem;">
+      <h4 style="margin:0 0 .4rem;">Rahul kijkt over het huis</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Rahul leest de verbeterkamer-signalen en de drukte per kamer, en zegt waar de boardroom vandaag de aandacht zou leggen. Hij adviseert; u beslist.</p>
+      <div class="taakrij">
+        <input class="veld" id="bRahulVraag" style="flex:1;" placeholder="Bijv. welke kamer voelt vandaag de meeste druk?" maxlength="300">
+        <button class="knop" id="bRahulKnop" type="button">Vraag Rahul</button>
+      </div>
+      <div class="stil" id="bRahulUit" style="font-size:.84rem;line-height:1.65;margin-top:.7rem;" aria-live="polite"></div>
+    </div>
+
     <h3 class="sec">De zelfzorg: de code ruimt op, beschermt, repareert en upgradet zichzelf</h3>
     <div class="kaart" id="bZelfzorg"><div class="leeg">Laden...</div></div>
 
@@ -2244,6 +2254,20 @@ function tekenVoorstellen(v){
 $('#bVernieuw').addEventListener('click', async () => {
   try { const d = await api('boardroom/verbeter'); tekenVoorstellen(d.verbeterkamer); meld('Verse ronde gelopen.'); } catch (e) { meld(e.message); }
 });
+/* Rahul kijkt over het hele huis: overkoepelend advies uit de dagronde-signalen. */
+async function vraagRahulHuis(){
+  const uit = $('#bRahulUit'), knop = $('#bRahulKnop');
+  knop.disabled = true; uit.textContent = 'Rahul kijkt over de kamers...';
+  try {
+    const r = await api('boardroom/ai', { q: $('#bRahulVraag').value });
+    let html = '<div style="white-space:pre-wrap;">'+esc(r.antwoord)+'</div>';
+    if (r.punten && r.punten.length) html += '<div style="margin-top:.6rem;color:var(--soft);font-size:.78rem;line-height:1.6;"><b>Uit de dagronde:</b><br>'+r.punten.map(esc).join('<br>')+'</div>';
+    uit.innerHTML = html;
+  } catch (e) { uit.textContent = e.message; }
+  knop.disabled = false;
+}
+$('#bRahulKnop').addEventListener('click', vraagRahulHuis);
+$('#bRahulVraag').addEventListener('keydown', e => { if (e.key === 'Enter') vraagRahulHuis(); });
 /* de geld-regie: pasprijzen, partnervergoeding en ledenvoordeel */
 const eurC = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 });
 async function laadGeld(){

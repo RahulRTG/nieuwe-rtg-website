@@ -48,6 +48,11 @@ module.exports = (ctx) => {
     return r;
   }));
   app.post('/api/office/boardroom/verbeter', boardroomAuth, (req, res) => veilig(res, () => ({ ok: true, verbeterkamer: afdelingen.voorstellen(true) })));
+  // Rahul kijkt over het hele huis: adviserend, uit de verbeterkamer-signalen en de drukte per kamer
+  app.post('/api/office/boardroom/ai', boardroomAuth, async (req, res) => {
+    try { const r = await afdelingen.boardroomAdvies(req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[boardroom]', e); res.status(500).json({ error: 'Rahul kon nu even niet meedenken.' }); }
+  });
   // de leveranciers-regie: een functie per genre zaken open of dicht
   app.post('/api/office/boardroom/genre', boardroomAuth, (req, res) => veilig(res, () => {
     const r = afdelingen.schakelGenre(String(req.body.functie || ''), String(req.body.genre || ''),

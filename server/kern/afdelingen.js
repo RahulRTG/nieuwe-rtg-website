@@ -50,7 +50,7 @@ module.exports = ({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCo
   const { chatRij, chatLijst, chatStuur, HUISREGELS, ONBOARDING_EXTRA, onboarding, dienstRij, dienstIn, dienstUit, dienstNu, kantineMenu, kantineMenuZet } = deelKantoor;
   const { paniekRij, paniekStel, paniekBesluit, paniekBericht, paniekLijst, auditRij, audit, laatstePerDoos, opdrachtRij, wereld, wereldActie, opdrachtVoorDoos, doosUpdateZet, doosNetwerkZet, doosRegie } = deelBewaking;
   const { naamInzage } = deelInzage;
-  const { kamerAdvies } = deelKamerAdvies;
+  const { kamerAdvies, boardroomAdvies } = deelKamerAdvies;
 
-  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, kamerAdvies, schakel, schakelAlles, schakelGenre, schakelFase, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, kantineMenu, kantineMenuZet, naamInzage, wereld, wereldActie, opdrachtVoorDoos, doosUpdateZet, doosNetwerkZet, doosRegie, audit, KAMER_IDS } };
+  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, kamerAdvies, boardroomAdvies, schakel, schakelAlles, schakelGenre, schakelFase, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, kantineMenu, kantineMenuZet, naamInzage, wereld, wereldActie, opdrachtVoorDoos, doosUpdateZet, doosNetwerkZet, doosRegie, audit, KAMER_IDS } };
 };

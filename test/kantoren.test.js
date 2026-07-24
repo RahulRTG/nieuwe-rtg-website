@@ -181,3 +181,12 @@ test('Rahul denkt mee in een kamer: adviserend, uit de echte cijfers (zonder AI-
   assert.ok(Array.isArray(r.body.punten) && r.body.punten.length >= 1, 'de punten uit de cijfers zitten erbij');
   assert.equal((await api('kamer/ai', { id: 'kelder' })).status, 404, 'een niet-bestaande kamer geeft 404');
 });
+
+test('Rahul kijkt over het hele huis: overkoepelend boardroom-advies (zonder AI-sleutel)', async () => {
+  const dicht = await fetch(base + '/api/office/boardroom/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(dicht.status, 401, 'zonder inlog blijft de boardroom-AI dicht');
+  const r = await api('boardroom/ai', { q: 'Welke kamer voelt de meeste druk?' });
+  assert.equal(r.status, 200);
+  assert.ok(typeof r.body.antwoord === 'string' && r.body.antwoord.length > 0, 'er komt een overkoepelend advies terug');
+  assert.ok(Array.isArray(r.body.punten) && r.body.punten.length >= 1, 'de punten uit de dagronde zitten erbij');
+});

@@ -65,5 +65,39 @@ module.exports = (ctx) => {
     return { ok: true, kamer: k.naam, antwoord: 'Waar ik naar zou kijken (u beslist zelf): ' + regels.join(' '), punten: regels };
   }
 
-  return { kamerAdvies };
+  /* Rahul over het hele huis: dezelfde stem, maar nu overkoepelend voor de
+     boardroom. Hij leest de verbeterkamer-signalen (per kamer) en de open
+     taken per kamer, en zegt waar de boardroom vandaag de aandacht zou leggen
+     en welke kamer de meeste druk voelt. Adviserend; de boardroom beslist. */
+  async function boardroomAdvies(vraag) {
+    const sig = ((voorstellen(false) || {}).voorstellen || []).map(x => (x.kamer ? x.kamer + ': ' : '') + x.tekst);
+    // per kamer het aantal open taken, om de drukste kamers te benoemen
+    const druk = Object.keys(AFDELINGEN).map(id => ({ id, naam: AFDELINGEN[id].naam, open: taken(id).filter(t => !t.af).length }))
+      .filter(x => x.open > 0).sort((a, b) => b.open - a.open);
+    const regels = [];
+    for (const s of sig.slice(0, 6)) regels.push(s);
+    if (druk.length) regels.push('Meeste open taken: ' + druk.slice(0, 3).map(x => x.naam + ' (' + x.open + ')').join(', ') + '.');
+    if (!regels.length) regels.push('Over de hele linie geen knelpunten in de dagronde; een rustig huis.');
+    const v = String(vraag || '').replace(/[<>]/g, '').trim().slice(0, 300);
+
+    if (anthropic) {
+      try {
+        const beeld = 'Aantal kamers: ' + Object.keys(AFDELINGEN).length +
+          '. Signalen uit de dagronde (per kamer): ' + (sig.length ? sig.join(' | ') : 'geen') +
+          '. Drukte per kamer (open taken): ' + (druk.length ? druk.map(x => x.naam + ' ' + x.open).join(', ') : 'overal leeg') +
+          '. Voorlopige punten: ' + regels.join(' | ');
+        const r = await anthropic.messages.create({
+          model: 'claude-sonnet-5', max_tokens: 420,
+          system: rahul.RAHUL_LEAD + 'je denkt mee met de RTG-boardroom over het hele kantoor. Je geeft KORT en concreet je blik op waar de boardroom vandaag de aandacht zou leggen en welke kamer de meeste druk voelt, in hooguit drie punten, in gewone taal. ' +
+            'Je BESLIST NOOIT en schakelt niets: je adviseert, de boardroom beslist zelf. Verzin geen kamers, getallen of gebeurtenissen die niet in het beeld staan; is het rustig, zeg dat. Situatie: ' + beeld,
+          messages: [{ role: 'user', content: v || 'Waar zou de boardroom vandaag als eerste naar kijken?' }]
+        });
+        const t = (r && r.content && r.content[0] && r.content[0].text || '').trim();
+        if (t) return { ok: true, antwoord: t, punten: regels };
+      } catch (e) { /* de regelterugval hieronder */ }
+    }
+    return { ok: true, antwoord: 'Waar de boardroom naar zou kijken (u beslist zelf): ' + regels.join(' '), punten: regels };
+  }
+
+  return { kamerAdvies, boardroomAdvies };
 };

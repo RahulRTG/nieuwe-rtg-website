@@ -20,7 +20,8 @@
     '.mgz-rahul{bottom:1rem;background:var(--gold,#857007);color:#000;}' +
     '.mgz-samen{bottom:3.6rem;background:#151312;color:#eee;border:1px solid var(--gold,#857007);}' +
     '.mgz-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
-    '.mgz-sheet[hidden]{display:none;}.mgz-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;}' +
+    '.mgz-sheet[hidden]{display:none;}.mgz-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;cursor:move;touch-action:none;user-select:none;-webkit-user-select:none;}' +
+    '.mgz-sheet.mgz-sleept{opacity:.96;box-shadow:0 16px 44px rgba(0,0,0,.6);}' +
     '.mgz-x{background:transparent;border:1px solid #333;border-radius:8px;color:#eee;padding:.15rem .5rem;cursor:pointer;}' +
     '.mgz-uit{font-size:.84rem;color:#bbb;line-height:1.55;max-height:40vh;overflow-y:auto;white-space:pre-wrap;}' +
     '.mgz-rij{display:flex;gap:.4rem;}.mgz-rij input{flex:1;background:#0C0C0B;border:1px solid #333;border-radius:10px;color:#eee;font:inherit;font-size:.85rem;padding:.5rem .7rem;}' +
@@ -44,10 +45,14 @@
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; };
 
-  /* De lippen zijn overal neer te zetten: sleep de Rahul-knop waarheen je wilt.
-     De plek onthouden we per toestel (localStorage). Een korte tik opent Rahul
-     zoals altijd; pas voorbij een kleine drempel wordt het slepen. */
-  function maakSleepbaar(el, sleutel) {
+  /* Alles wat uitspringt is te verslepen: geef het element (el) een greep
+     (greep, bv. de kopbalk; standaard het element zelf). Sleep de greep en het
+     hele blok verhuist mee; de plek onthouden we per toestel (localStorage).
+     Knoppen en velden binnen de greep blijven gewoon werken (die starten geen
+     sleep). Een korte tik telt niet als sleep -- pas voorbij een kleine drempel
+     beweegt het. */
+  function maakSleepbaar(el, sleutel, greep) {
+    greep = greep || el;
     var neer = null, sleept = false;
     function klem(x, y) {
       var b = el.getBoundingClientRect();
@@ -60,27 +65,29 @@
       el.style.right = 'auto'; el.style.bottom = 'auto';
     }
     try { var s = JSON.parse(localStorage.getItem(sleutel) || 'null'); if (s) requestAnimationFrame(function () { zet(s.x, s.y); }); } catch (e) {}
-    el.addEventListener('pointerdown', function (e) {
+    greep.addEventListener('pointerdown', function (e) {
+      // knoppen, links en invoervelden in de greep gewoon laten werken
+      if (e.target.closest && e.target.closest('button, a, input, textarea, select')) return;
       var r = el.getBoundingClientRect();
       neer = { x: e.clientX, y: e.clientY, bx: r.left, by: r.top }; sleept = false;
-      try { el.setPointerCapture(e.pointerId); } catch (er) {}
+      try { greep.setPointerCapture(e.pointerId); } catch (er) {}
     });
-    el.addEventListener('pointermove', function (e) {
+    greep.addEventListener('pointermove', function (e) {
       if (!neer) return;
       var dx = e.clientX - neer.x, dy = e.clientY - neer.y;
       if (!sleept && Math.abs(dx) + Math.abs(dy) > 6) { sleept = true; el.classList.add('mgz-sleept'); }
       if (sleept) { zet(neer.bx + dx, neer.by + dy); e.preventDefault(); }
     });
-    el.addEventListener('pointerup', function () {
+    greep.addEventListener('pointerup', function () {
       if (neer && sleept) {
         var r = el.getBoundingClientRect();
         try { localStorage.setItem(sleutel, JSON.stringify({ x: r.left, y: r.top })); } catch (er) {}
-        // de klik die direct na het loslaten komt niet als 'openen' laten tellen
-        el.addEventListener('click', function stop(ev) { ev.stopPropagation(); ev.preventDefault(); el.removeEventListener('click', stop, true); }, true);
       }
       neer = null; sleept = false; el.classList.remove('mgz-sleept');
     });
-    window.addEventListener('resize', function () { var r = el.getBoundingClientRect(); zet(r.left, r.top); });
+    // bij het verkleinen van het scherm: alleen bijsturen als het blok al een
+    // eigen (versleepte) plek heeft, anders blijft de nette CSS-hoek staan
+    window.addEventListener('resize', function () { if (el.style.left) { var r = el.getBoundingClientRect(); zet(r.left, r.top); } });
   }
 
   /* ---------- Rahul: vraagt en doet, met de inlog die er is ---------- */
@@ -112,6 +119,8 @@
     // op elke pagina via de lege-toestand-nudges (window.RTGRahul.vraag). We
     // houden het vraagvenster (sheet) in de DOM, alleen de knop tonen we niet.
     document.body.appendChild(sheet);
+    // het vraagvenster is te verslepen aan zijn kopbalk; de plek blijft bewaard
+    maakSleepbaar(sheet, 'rtg_rahul_sheet_pos', sheet.querySelector('.mgz-kop'));
     var uit = sheet.querySelector('.mgz-uit'), form = sheet.querySelector('form'), inp = form.querySelector('input');
     var seintjesVak = sheet.querySelector('[data-seintjes]');
     fab.addEventListener('click', function () { sheet.hidden = false; fab.hidden = true; inp.focus(); doofMelding();
@@ -232,6 +241,7 @@
   // window.RTGMetgezel.samen(). We houden alleen het Samen-venster (sSheet) in
   // de DOM; de knop zelf tonen we niet meer.
   document.body.appendChild(sSheet);
+  maakSleepbaar(sSheet, 'rtg_samen_sheet_pos', sSheet.querySelector('.mgz-kop'));
   var vak = sSheet.querySelector('.mgz-vak');
   function toonSamen() { sSheet.hidden = false; sKnop.hidden = true; teken(); }
   sKnop.addEventListener('click', toonSamen);

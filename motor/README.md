@@ -109,15 +109,32 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   - **Timing-hardening** met `std::hint::black_box` op het constant-time
     tag-vergelijk en de Poly1305-maskerkeuze (zelfde mechanisme als de
     `subtle`-crate). ChaCha20-Poly1305 is ARX (geen S-box-cache-timing zoals AES).
-  - **Sleutel wissen bij afsluiten** (zeroize-on-drop, black_box-beschermd).
+  - **Context-binding (AAD):** elk record wordt verzegeld met zijn eigen
+    codenaam als additional authenticated data. Een blob dat onder NEVEL staat
+    kan daardoor NIET naar het slot van SPOOK worden verplaatst — de
+    AEAD-authenticatie faalt zodra de codenaam niet meer klopt. Record-
+    verwisseling binnen de kluis is onmogelijk, ook voor wie het versleutelde
+    bestand op schijf kan bewerken.
+  - **Crash-veilige sleutelrotatie (keyring):** de sleutel is een geordende
+    keyring; elk blob draagt in zijn eerste byte de versie waarmee het is
+    verzegeld. `/api/kluis/roteer` genereert een verse sleutel en hersleutelt
+    alle records ernaartoe. De nieuwe keyring gaat EERST duurzaam naar schijf
+    (temp + `fsync` + rename, rechten 600) vóór er ook maar één record wordt
+    aangeraakt — crasht de motor halverwege, dan wijst elk blob nog steeds naar
+    een sleutel die op schijf staat en raakt niets onleesbaar. Onleesbare
+    records worden bij rotatie met rust gelaten (rotatie vernietigt nooit data).
+  - **Sleutel wissen bij afsluiten** (zeroize-on-drop over de hele keyring,
+    black_box-beschermd).
   - Verse willekeurige nonce per record (/dev/urandom), sleutel gescheiden van de
     data (`secret.key`, rechten 600). Status toont alleen een niet-omkeerbare
-    sleutel-vingerafdruk.
+    sleutel-vingerafdruk plus het aantal sleutelversies.
   - **Bewezen betrouwbaar:** property-test (300 willekeurige seal→open + tamper),
     fuzz (2000 willekeurige/gemuteerde blobs → nooit crash, nooit vals-accept),
-    elke-bit-flip-faalt. **Doorvoer:** ~332 MB/s seal én open (4 KB-blokken).
+    elke-bit-flip-faalt, AAD-verplaatsing-faalt, rotatie-behoudt-data en
+    oude-versie-blijft-leesbaar-na-rotatie. **Doorvoer:** ~332 MB/s seal én open
+    (4 KB-blokken).
   Endpoints: `/api/kluis/bewaar`, `/api/kluis/onthul`, `/api/kluis/wis`,
-  `/api/kluis/status`.
+  `/api/kluis/roteer`, `/api/kluis/status`.
 
   > Eerlijke restnoot (timing): de timing-techniek voor dit algoritme is dezelfde
   > als de pure-Rust vetted crates (ARX + branchloos + black_box). Het enige dat

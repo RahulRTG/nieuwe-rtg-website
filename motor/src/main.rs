@@ -69,7 +69,8 @@ fn kluis_route(kluis: &std::sync::Mutex<rtg_motor::kluis::Kluis>, req: &Request)
         let mut b = Json::obj();
         b.set("ok", Json::Bool(true))
             .set("records", Json::Num(k.aantal() as f64))
-            .set("crypto", Json::Str("XChaCha20-Poly1305 (24-byte nonce), versleuteld op schijf".into()))
+            .set("crypto", Json::Str("XChaCha20-Poly1305 (24-byte nonce), codenaam-gebonden (AAD), versleuteld op schijf".into()))
+            .set("sleutelversies", Json::Num(k.sleutelversies() as f64))
             .set("sleutelVingerafdruk", Json::Str(k.vingerafdruk().to_string()));
         return Response { status: 200, body: b.dump() };
     }
@@ -112,6 +113,22 @@ fn kluis_route(kluis: &std::sync::Mutex<rtg_motor::kluis::Kluis>, req: &Request)
             let mut b = Json::obj();
             b.set("ok", Json::Bool(true)).set("gewist", Json::Bool(k.wis(key)));
             Response { status: 200, body: b.dump() }
+        }
+        // roteer de kluissleutel: verse sleutel, alle records hersleuteld.
+        // Crash-veilig via de keyring (nieuwe sleutel eerst duurzaam op schijf).
+        "/api/kluis/roteer" => {
+            let mut k = kluis.lock().unwrap();
+            match k.roteer_sleutel() {
+                Ok(n) => {
+                    let mut b = Json::obj();
+                    b.set("ok", Json::Bool(true))
+                        .set("hersleuteld", Json::Num(n as f64))
+                        .set("sleutelversies", Json::Num(k.sleutelversies() as f64))
+                        .set("sleutelVingerafdruk", Json::Str(k.vingerafdruk().to_string()));
+                    Response { status: 200, body: b.dump() }
+                }
+                Err(e) => fout(400, &e),
+            }
         }
         _ => fout(404, "Onbekende route."),
     }

@@ -156,7 +156,7 @@ module.exports = (kern) => {
 
   /* De overige domeinen draaien als submodules op dezelfde gedeelde context
      (een keer bij het opstarten gemount, geen kosten per verzoek). */
-  const tctx = { app, accounts, anthropic, archief, beveilig, wacht: kern.wacht, crypto, db, mail, save, sendPushToUser,
+  const tctx = { app, accounts, anthropic, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser,
     LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
     geldPasprijsZet, geldKortingZet, geldCommissieZet };
   require('./techniek/functie')(tctx);

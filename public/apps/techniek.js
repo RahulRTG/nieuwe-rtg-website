@@ -140,6 +140,20 @@
     var b = $('#wachtBron').value.trim(); if(!b){ toast('Vul een bron (IP) in.'); return; }
     wachtActie('quarantaine', { bron:b, actie:'isoleer' }, 'In quarantaine gezet.'); $('#wachtBron').value='';
   });
+  $('#bAvTest').addEventListener('click', function(){
+    var eicar = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
+    api('/api/techniek/wacht/av-test', { method:'POST', body:{ inhoud:eicar, naam:'eicar.com', mime:'application/octet-stream' } })
+      .then(function(d){ toast('Scanner: ' + d.resultaat.verdict + ' (' + (d.resultaat.redenen[0]||'') + ')'); laadWacht(); })
+      .catch(function(e){ toast(e.message); });
+  });
+
+  function avRij(x){
+    var badge = el('span',{class:'badge '+(x.verdict==='besmet'?'uit':'aan')}, (x.verdict||'').toUpperCase());
+    return el('div',{class:'zeker'}, badge,
+      el('div',{class:'mid'},
+        el('div',null, el('span',{class:'naam'}, x.naam||'(upload)'), el('span',{class:'code'}, (x.sha256||'').slice(0,10))),
+        el('div',{class:'muted', style:{fontSize:'.74rem'}}, (x.redenen||[]).join('; ') + (x.bron?(' · ' + x.bron):''))));
+  }
 
   function meterKaart(n, label){ return el('div',{class:'tel'}, el('div',{class:'n'}, String(n)), el('div',{class:'l'}, label)); }
 
@@ -211,6 +225,20 @@
     vervang($('#wachtQuarantaine'), q.length ? q.map(quarantaineRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Niemand in quarantaine. De afweer is rustig.'));
     var r = bord.raad || [];
     vervang($('#wachtRaad'), r.length ? r.map(raadRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Geen voorstellen. Laat de AI de signalen uitkauwen met "AI kauwt uit".'));
+    // De Ontsmetter (malware-scanner)
+    var a = bord.av;
+    if (a){
+      vervang($('#avMeters'), [
+        meterKaart(a.totaal||0, 'gescand'),
+        meterKaart(a.besmet||0, 'besmet geweigerd'),
+        meterKaart(a.verdacht||0, 'verdacht'),
+        meterKaart(a.definities||0, 'handtekeningen'),
+        meterKaart('v'+(a.versie||1), 'definitie-versie')
+      ]);
+      var det = a.laatste || [];
+      vervang($('#avLaatste'), det.length ? det.map(avRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Nog geen verdachte of besmette uploads. Alles schoon.'));
+      $('#bAvTest').hidden = !eigenaar;
+    }
   }
 
   function laadWacht(){

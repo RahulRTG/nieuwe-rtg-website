@@ -235,6 +235,14 @@
         <canvas id="wachtGrafiek" height="120" style="width:100%;height:120px;display:block;"></canvas>
       </div>
 
+      <div class="blok-kop" style="margin-top:1rem;">
+        <h2>De Ontsmetter (malware-scanner)</h2>
+        <button class="knop grijs klein" id="bAvTest" hidden>EICAR-test</button>
+      </div>
+      <div class="muted" style="font-size:.76rem;margin-bottom:.5rem;">Elke geuploade foto/document wordt gescand op malware (handtekeningen, heuristiek, entropie). Besmet wordt geweigerd.</div>
+      <div class="telrij" id="avMeters"></div>
+      <div class="kaart" id="avLaatste"></div>
+
       <div class="blok-kop" style="margin-top:1rem;"><h2>Afweer &amp; quarantaine</h2></div>
       <div class="kaart">
         <div id="wachtIsoleer" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem;" hidden>

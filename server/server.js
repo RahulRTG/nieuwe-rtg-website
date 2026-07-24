@@ -913,6 +913,12 @@ wacht = require('./kern/wacht')({ db, save, beveilig, lees: schild.signalen });
   if (t.unref) t.unref();
 }
 
+/* De Ontsmetter (kern/antivirus.js): de platform-malware-scanner. Elk bestand
+   dat RTG binnenkomt wordt gescand (handtekeningen + heuristiek + entropie);
+   besmette inhoud wordt geweigerd, gemeld op het bord, en de bron wordt via De
+   Wacht ter afsnijding voorgesteld. */
+const antivirus = require('./kern/antivirus')({ db, save, beveilig, wacht });
+
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
 function resolveSession(token) {
@@ -2047,7 +2053,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, eigenaar, zaakdoos,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, antivirus, eigenaar, zaakdoos,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,

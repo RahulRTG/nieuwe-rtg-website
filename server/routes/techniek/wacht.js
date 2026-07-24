@@ -10,11 +10,22 @@
 module.exports = (tctx) => {
   const { app, techAuth, eigenaarAlleen, accounts } = tctx;
   const wacht = tctx.wacht;
+  const av = tctx.av; // De Ontsmetter (malware-scanner)
   if (!wacht) return; // niet gebouwd (bijv. losse test-context): niets te mounten
 
-  // Het bord: meters + grafiek + quarantaine + open voorstellen + hygiëne-stand.
+  // Het bord: meters + grafiek + quarantaine + open voorstellen + hygiëne-stand +
+  // de stand van De Ontsmetter (gescande/geweigerde uploads, definitie-versie).
   app.get('/api/techniek/wacht/bord', techAuth, (req, res) => {
-    res.json(wacht.bord());
+    res.json(Object.assign(wacht.bord(), { av: av ? av.stand() : null }));
+  });
+
+  // Een testbestand door De Ontsmetter halen (bijv. de EICAR-teststring), zodat
+  // de eigenaar de scanner live kan verifiëren zonder echte malware.
+  app.post('/api/techniek/wacht/av-test', techAuth, eigenaarAlleen, (req, res) => {
+    if (!av) return res.status(404).json({ error: 'Scanner niet actief.' });
+    const inhoud = String((req.body && req.body.inhoud) || '');
+    const r = av.scan(Buffer.from(inhoud, 'latin1'), { naam: String((req.body && req.body.naam) || 'test.txt'), mime: String((req.body && req.body.mime) || 'text/plain') });
+    res.json({ ok: true, resultaat: r });
   });
 
   // De AI kauwt de live-signalen uit tot concrete voorstellen (geen uitvoering).

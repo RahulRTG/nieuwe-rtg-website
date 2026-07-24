@@ -42,16 +42,10 @@
   merk.appendChild(el('span', 'os-app', appNaam));
   bar.appendChild(merk);
 
-  var klokLink = el('a', 'os-klok');
-  klokLink.href = BUREAU;
-  klokLink.style.textDecoration = 'none';
-  klokLink.style.color = 'inherit';
-  var tijd = el('time', null, '--:--');
-  tijd.setAttribute('aria-label', 'Huidige tijd, naar het bureaublad');
-  var datum = el('span', 'os-datum');
-  klokLink.appendChild(tijd);
-  klokLink.appendChild(datum);
-  bar.appendChild(klokLink);
+  // Geen tijd in de bovenbalk: de RTG Horloge (de ring op het OS-beginscherm)
+  // is de enige klok van het systeem. Wel houden we een lege ruimte in het
+  // midden aan, zodat het woordmerk links en het account rechts blijven staan.
+  bar.appendChild(el('span', 'os-klok'));
 
   var accountWrap = el('div', 'os-account');
   accountWrap.setAttribute('aria-live', 'polite');
@@ -76,19 +70,6 @@
   bar.appendChild(accountWrap);
 
   body.insertBefore(bar, body.firstChild);
-
-  // ---- de levende klok ----
-  var DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
-  var MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-  function tweeCijfers(n) { return (n < 10 ? '0' : '') + n; }
-  function tik() {
-    var nu = new Date();
-    tijd.textContent = tweeCijfers(nu.getHours()) + ':' + tweeCijfers(nu.getMinutes());
-    datum.textContent = DAGEN[nu.getDay()] + ' ' + nu.getDate() + ' ' + MND[nu.getMonth()];
-  }
-  tik();
-  var klokTimer = setInterval(tik, 15000);
-  if (klokTimer && klokTimer.unref) klokTimer.unref();
 
   // ---- het actieve account tonen (best effort; faalt stil) ----
   try {
@@ -167,5 +148,5 @@
     });
   }
 
-  w.RTGosbar = { tik: tik };
+  w.RTGosbar = {};
 })(window, document);

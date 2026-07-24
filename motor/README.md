@@ -123,6 +123,19 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
     aangeraakt — crasht de motor halverwege, dan wijst elk blob nog steeds naar
     een sleutel die op schijf staat en raakt niets onleesbaar. Onleesbare
     records worden bij rotatie met rust gelaten (rotatie vernietigt nooit data).
+  - **Lengte-verhulling (padding):** elke klaartekst wordt vóór het verzegelen
+    naar een emmer (veelvoud van 64 byte) gepad met een lengteprefix. De
+    ciphertext-lengte verraadt zo alleen de emmer, niet of een slot een leeg
+    profiel of een vol dossier bevat.
+  - **Tamper-evident manifest (anti-wissen + anti-terugrol):** naast de
+    per-record-authenticatie draagt de kluis een gezegeld manifest (generatie +
+    de complete recordset). Bij `open` valt op als iemand met schijftoegang een
+    record WIST, een record TOEVOEGT, of de datafile TERUGROLT naar een oudere
+    snapshot (de generatie leeft ook in het sleutelbestand als hoogste waarmerk;
+    datafile-eerst-dan-keyring voorkomt een valse melding na een crash). Het
+    statusbord toont `geknoeid`. Restrisico: wie óók het sleutelbestand
+    terugrolt naar exact dezelfde oude generatie krijgt een oude-maar-consistente
+    stand; forgen of records mengen lukt daarmee nog steeds niet.
   - **Sleutel wissen bij afsluiten** (zeroize-on-drop over de hele keyring,
     black_box-beschermd).
   - Verse willekeurige nonce per record (/dev/urandom), sleutel gescheiden van de

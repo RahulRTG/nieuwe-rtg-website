@@ -54,11 +54,15 @@ fn start_kluis_flusher(kluis: Arc<std::sync::Mutex<rtg_motor::kluis::Kluis>>) {
                 continue;
             }
             k.vuil = false;
-            (k.pad().to_path_buf(), k.snapshot().dump())
+            // momentopname bumpt de generatie en zegelt een vers manifest mee
+            (k.pad().to_path_buf(), k.momentopname().dump())
         };
         let tmp = pad.with_extension("tmp");
-        if fs::write(&tmp, tekst.as_bytes()).is_ok() {
-            let _ = fs::rename(&tmp, &pad);
+        if fs::write(&tmp, tekst.as_bytes()).is_ok() && fs::rename(&tmp, &pad).is_ok() {
+            // datafile staat -> anker nu de generatie in de keyring (hoogste
+            // waarmerk). Volgorde datafile-eerst voorkomt een valse terugrol-
+            // melding na een crash tussen beide schrijfacties.
+            let _ = kluis.lock().unwrap().anker();
         }
     });
 }
@@ -69,8 +73,10 @@ fn kluis_route(kluis: &std::sync::Mutex<rtg_motor::kluis::Kluis>, req: &Request)
         let mut b = Json::obj();
         b.set("ok", Json::Bool(true))
             .set("records", Json::Num(k.aantal() as f64))
-            .set("crypto", Json::Str("XChaCha20-Poly1305 (24-byte nonce), codenaam-gebonden (AAD), versleuteld op schijf".into()))
+            .set("crypto", Json::Str("XChaCha20-Poly1305 (24-byte nonce), codenaam-gebonden (AAD), lengte-verhuld, versleuteld op schijf".into()))
             .set("sleutelversies", Json::Num(k.sleutelversies() as f64))
+            .set("integriteit", Json::Str(if k.geknoeid { "GEKNOEID: manifest klopt niet (record gewist of teruggerold)".into() } else { "ok: manifest sluit (anti-wis + anti-terugrol)".to_string() }))
+            .set("geknoeid", Json::Bool(k.geknoeid))
             .set("sleutelVingerafdruk", Json::Str(k.vingerafdruk().to_string()));
         return Response { status: 200, body: b.dump() };
     }

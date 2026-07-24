@@ -37,6 +37,9 @@ use std::path::{Path, PathBuf};
 const NONCE_LEN: usize = 24; // XChaCha20: 24-byte nonce -> geen collision-zorg
 const SLEUTEL_LEN: usize = 32;
 const MAX_SLEUTELS: usize = 255; // versie past in 1 byte (0..=254)
+const PAD_BUCKET: usize = 64; // klaartekst wordt naar een veelvoud hiervan gepad
+const MANIFEST_KEY: &str = "__manifest__"; // gereserveerde sleutel: geen record
+const MANIFEST_AAD: &[u8] = b"rtg-kluis-manifest-v1";
 
 pub struct Kluis {
     sleutels: Vec<[u8; SLEUTEL_LEN]>, // keyring; actief = laatste
@@ -44,6 +47,8 @@ pub struct Kluis {
     vingerafdruk: String,
     store: HashMap<String, Vec<u8>>, // key -> [versie:1] || nonce:24 || ciphertext+tag
     pad: PathBuf,
+    generatie: u64,      // monotone teller; leeft ook in het sleutelbestand
+    pub geknoeid: bool,  // true = manifest klopt niet (record gewist of teruggerold)
     pub vuil: bool,
 }
 
@@ -79,6 +84,30 @@ fn van_hex(s: &str) -> Option<Vec<u8>> {
     Some(uit)
 }
 
+/* Lengte-verhulling: pad de klaartekst tot een veelvoud van PAD_BUCKET met een
+   4-byte lengteprefix, zodat de ciphertext-lengte alleen de emmer verraadt en
+   niet de exacte recordgrootte (een BSN, een naam en een heel dossier zien er op
+   schijf even groot uit binnen dezelfde emmer). */
+fn pad_klaar(data: &[u8]) -> Vec<u8> {
+    let netto = 4 + data.len();
+    let vol = ((netto + PAD_BUCKET - 1) / PAD_BUCKET) * PAD_BUCKET;
+    let mut uit = Vec::with_capacity(vol);
+    uit.extend_from_slice(&(data.len() as u32).to_le_bytes());
+    uit.extend_from_slice(data);
+    uit.resize(vol, 0);
+    uit
+}
+fn unpad_klaar(padded: &[u8]) -> Option<Vec<u8>> {
+    if padded.len() < 4 {
+        return None;
+    }
+    let len = u32::from_le_bytes([padded[0], padded[1], padded[2], padded[3]]) as usize;
+    if 4 + len > padded.len() {
+        return None;
+    }
+    Some(padded[4..4 + len].to_vec())
+}
+
 /* Niet-omkeerbare vingerafdruk van de ACTIEVE sleutel voor de status (nooit de
    sleutel zelf). Een simpele, niet-cryptografische mix -- genoeg om "dezelfde
    sleutel?" te zien zonder iets te lekken. */
@@ -96,15 +125,18 @@ fn vingerafdruk(sleutel: &[u8]) -> String {
    schijf staat. Rechten 600 (alleen de eigenaar). Dit MOET slagen vóór we
    records hersleutelen, anders zou een crash een blob naar een sleutel laten
    wijzen die de schijf niet kent. */
-fn schrijf_keyring(pad: &Path, sleutels: &[[u8; SLEUTEL_LEN]]) -> io::Result<()> {
+fn schrijf_keyring(pad: &Path, sleutels: &[[u8; SLEUTEL_LEN]], generatie: u64) -> io::Result<()> {
     if let Some(dir) = pad.parent() {
         let _ = fs::create_dir_all(dir);
     }
-    let mut tekst = String::with_capacity(sleutels.len() * (SLEUTEL_LEN * 2 + 1));
+    let mut tekst = String::with_capacity(sleutels.len() * (SLEUTEL_LEN * 2 + 1) + 16);
     for k in sleutels {
         tekst.push_str(&naar_hex(k));
         tekst.push('\n');
     }
+    // de generatie is het anti-terugrol-anker: hij leeft NAAST de datafile, zodat
+    // een teruggerolde datafile (met een oudere manifest-generatie) opvalt.
+    tekst.push_str(&format!("gen {}\n", generatie));
     let tmp = pad.with_extension("tmp");
     {
         use std::io::Write;
@@ -131,12 +163,17 @@ fn schrijf_keyring(pad: &Path, sleutels: &[[u8; SLEUTEL_LEN]]) -> io::Result<()>
    bestand met één sleutel (geen newline) leest gewoon als keyring met lengte 1.
    Onherkenbare regels worden overgeslagen; als er geen enkele geldige sleutel is
    maken we een verse keyring. */
-fn laad_of_maak_keyring(pad: &Path) -> io::Result<Vec<[u8; SLEUTEL_LEN]>> {
+fn laad_of_maak_keyring(pad: &Path) -> io::Result<(Vec<[u8; SLEUTEL_LEN]>, u64)> {
     if let Ok(tekst) = fs::read_to_string(pad) {
         let mut ring = Vec::new();
+        let mut generatie: u64 = 0;
         for regel in tekst.lines() {
             let regel = regel.trim();
             if regel.is_empty() {
+                continue;
+            }
+            if let Some(g) = regel.strip_prefix("gen ") {
+                generatie = g.trim().parse().unwrap_or(0);
                 continue;
             }
             if let Some(b) = van_hex(regel) {
@@ -148,44 +185,123 @@ fn laad_of_maak_keyring(pad: &Path) -> io::Result<Vec<[u8; SLEUTEL_LEN]>> {
             }
         }
         if !ring.is_empty() {
-            return Ok(ring);
+            return Ok((ring, generatie));
         }
     }
     let mut k = [0u8; SLEUTEL_LEN];
     aead::os_random(&mut k)?;
     let ring = vec![k];
-    schrijf_keyring(pad, &ring)?;
-    Ok(ring)
+    schrijf_keyring(pad, &ring, 0)?;
+    Ok((ring, 0))
 }
 
 impl Kluis {
     pub fn open(sleutel_pad: &Path, data_pad: &Path) -> io::Result<Kluis> {
-        let sleutels = laad_of_maak_keyring(sleutel_pad)?;
+        let (sleutels, keyring_gen) = laad_of_maak_keyring(sleutel_pad)?;
         let vaf = vingerafdruk(&sleutels[sleutels.len() - 1]);
         let mut store = HashMap::new();
+        let mut manifest_blob: Option<Vec<u8>> = None;
         if let Ok(tekst) = fs::read_to_string(data_pad) {
             if let Ok(Json::Obj(m)) = crate::json::parse(&tekst) {
                 for (k, v) in m {
                     if let Some(h) = v.as_str() {
                         if let Some(b) = van_hex(h) {
-                            store.insert(k, b);
+                            if k == MANIFEST_KEY {
+                                manifest_blob = Some(b);
+                            } else {
+                                store.insert(k, b);
+                            }
                         }
                     }
                 }
             }
         }
-        Ok(Kluis {
+        let mut k = Kluis {
             sleutels,
             sleutel_pad: sleutel_pad.to_path_buf(),
             vingerafdruk: vaf,
             store,
             pad: data_pad.to_path_buf(),
+            generatie: keyring_gen,
+            geknoeid: false,
             vuil: false,
-        })
+        };
+        // Integriteit van de HELE kluis (niet alleen per record): controleer het
+        // gezegelde manifest. Zo valt op als iemand met schijftoegang een record
+        // WIST, een record TOEVOEGT, of de datafile TERUGROLT naar een oudere
+        // snapshot. Geen manifest (verse/oude kluis) = niets te controleren.
+        if let Some(blob) = manifest_blob {
+            match k.verifieer_manifest(&blob, keyring_gen) {
+                Some(gen) => { k.geknoeid = false; k.generatie = gen.max(keyring_gen); }
+                None => { k.geknoeid = true; }
+            }
+        }
+        Ok(k)
     }
 
     fn actieve_versie(&self) -> usize {
         self.sleutels.len() - 1
+    }
+
+    // Canonieke manifest-bytes: generatie (8 LE) || gesorteerde recordsleutels
+    // met \n ertussen. Dit is wat we verzegelen en bij open weer natellen.
+    fn manifest_bytes(&self, generatie: u64) -> Vec<u8> {
+        let mut keys: Vec<&String> = self.store.keys().collect();
+        keys.sort();
+        let mut uit = Vec::new();
+        uit.extend_from_slice(&generatie.to_le_bytes());
+        for (i, key) in keys.iter().enumerate() {
+            if i > 0 {
+                uit.push(b'\n');
+            }
+            uit.extend_from_slice(key.as_bytes());
+        }
+        uit
+    }
+
+    // Verzegel het manifest met de actieve sleutel (AAD = vaste domeinscheider).
+    fn verzegel_manifest(&self, generatie: u64) -> Vec<u8> {
+        let versie = self.actieve_versie();
+        let mut nonce = [0u8; NONCE_LEN];
+        let _ = aead::os_random(&mut nonce);
+        let ct = aead::xseal(&self.sleutels[versie], &nonce, MANIFEST_AAD, &self.manifest_bytes(generatie));
+        let mut blob = Vec::with_capacity(1 + NONCE_LEN + ct.len());
+        blob.push(versie as u8);
+        blob.extend_from_slice(&nonce);
+        blob.extend_from_slice(&ct);
+        blob
+    }
+
+    /* Verifieer het manifest tegen de huidige recordset en de keyring-generatie.
+       Geeft de manifest-generatie terug als alles klopt, anders None (geknoeid).
+
+       Anti-terugrol: `manifest.gen >= keyring.gen`. De keyring bewaart de hoogste
+       generatie die ooit duurzaam bedoeld was; we schrijven eerst de datafile en
+       daarna pas de keyring, dus na een crash kan de datafile één generatie VOOR
+       lopen (dat is OK), maar nooit ACHTER (dat = terugrol). Een oudere datafile
+       terugzetten valt zo op. (Restrisico: wie ook de keyring-sidecar terugrolt
+       naar exact dezelfde oude generatie krijgt een oude-maar-consistente stand;
+       forgen of records mengen lukt daarmee nog steeds niet.) */
+    fn verifieer_manifest(&self, blob: &[u8], keyring_gen: u64) -> Option<u64> {
+        if blob.len() < 1 + NONCE_LEN {
+            return None;
+        }
+        let versie = blob[0] as usize;
+        let sleutel = self.sleutels.get(versie)?;
+        let mut n = [0u8; NONCE_LEN];
+        n.copy_from_slice(&blob[1..1 + NONCE_LEN]);
+        let klaar = aead::xopen(sleutel, &n, MANIFEST_AAD, &blob[1 + NONCE_LEN..])?; // vervalst -> None
+        if klaar.len() < 8 {
+            return None;
+        }
+        let gen = u64::from_le_bytes([klaar[0], klaar[1], klaar[2], klaar[3], klaar[4], klaar[5], klaar[6], klaar[7]]);
+        if gen < keyring_gen {
+            return None; // terugrol
+        }
+        if klaar != self.manifest_bytes(gen) {
+            return None; // record gewist/toegevoegd/verwisseld
+        }
+        Some(gen)
     }
 
     /* Bewaar (of overschrijf) de echte gegevens voor een sleutel/codenaam,
@@ -195,24 +311,37 @@ impl Kluis {
         if key.is_empty() {
             return Err("Geen sleutel.".into());
         }
+        if key == MANIFEST_KEY {
+            return Err("Gereserveerde sleutel.".into());
+        }
         let versie = self.actieve_versie();
-        let mut nonce = [0u8; NONCE_LEN];
-        aead::os_random(&mut nonce).map_err(|e| e.to_string())?;
-        // eigen XChaCha20-Poly1305 (24-byte nonce -> nonce-hergebruik praktisch
-        // onmogelijk bij willekeurige nonces). De codenaam gaat als AAD mee, zodat
-        // het blob niet naar een ander slot te verplaatsen is.
-        let ct = aead::xseal(&self.sleutels[versie], &nonce, key.as_bytes(), klaartekst.as_bytes());
-        let mut blob = Vec::with_capacity(1 + NONCE_LEN + ct.len());
-        blob.push(versie as u8);
-        blob.extend_from_slice(&nonce);
-        blob.extend_from_slice(&ct);
+        let blob = self.verzegel_record(versie, key, klaartekst.as_bytes())?;
         self.store.insert(key.to_string(), blob);
         self.vuil = true;
         Ok(())
     }
 
-    /* Ontsleutel één blob met de keyring en de codenaam als AAD. Los gehouden van
-       `onthul` zodat de rotatie hem kan hergebruiken zonder de String-omweg. */
+    /* Verzegel één record: pad de klaartekst (lengte-verhulling), versleutel met
+       de opgegeven sleutelversie en bind hem aan de codenaam (AAD). Gedeeld door
+       `bewaar` en de rotatie, zodat de padding overal consistent is. */
+    fn verzegel_record(&self, versie: usize, key: &str, data: &[u8]) -> Result<Vec<u8>, String> {
+        let mut nonce = [0u8; NONCE_LEN];
+        aead::os_random(&mut nonce).map_err(|e| e.to_string())?;
+        // eigen XChaCha20-Poly1305 (24-byte nonce -> nonce-hergebruik praktisch
+        // onmogelijk bij willekeurige nonces). De codenaam gaat als AAD mee, zodat
+        // het blob niet naar een ander slot te verplaatsen is. De klaartekst is
+        // eerst gepad naar een emmer zodat de lengte niets verraadt.
+        let ct = aead::xseal(&self.sleutels[versie], &nonce, key.as_bytes(), &pad_klaar(data));
+        let mut blob = Vec::with_capacity(1 + NONCE_LEN + ct.len());
+        blob.push(versie as u8);
+        blob.extend_from_slice(&nonce);
+        blob.extend_from_slice(&ct);
+        Ok(blob)
+    }
+
+    /* Ontsleutel één blob met de keyring en de codenaam als AAD, en haal de
+       padding eraf. Los gehouden van `onthul` zodat de rotatie hem kan hergebruiken
+       zonder de String-omweg. */
     fn ontcijfer(&self, key: &str, blob: &[u8]) -> Option<Vec<u8>> {
         if blob.len() < 1 + NONCE_LEN {
             return None;
@@ -223,7 +352,8 @@ impl Kluis {
         let ct = &blob[1 + NONCE_LEN..];
         let mut n = [0u8; NONCE_LEN];
         n.copy_from_slice(nonce);
-        aead::xopen(sleutel, &n, key.as_bytes(), ct)
+        let gepad = aead::xopen(sleutel, &n, key.as_bytes(), ct)?;
+        unpad_klaar(&gepad)
     }
 
     /* Onthul de echte gegevens (de gevoelige handeling; in productie zit hier de
@@ -257,8 +387,9 @@ impl Kluis {
         self.sleutels.push(nieuw);
         let versie = self.actieve_versie();
 
-        // 1) keyring EERST duurzaam op schijf -- vóór enig record hersleuteld is.
-        schrijf_keyring(&self.sleutel_pad, &self.sleutels).map_err(|e| e.to_string())?;
+        // 1) keyring EERST duurzaam op schijf (met de huidige generatie) -- vóór
+        //    enig record hersleuteld is.
+        schrijf_keyring(&self.sleutel_pad, &self.sleutels, self.generatie).map_err(|e| e.to_string())?;
 
         // 2) hersleutel elk record naar de nieuwe versie, gebonden aan zijn codenaam.
         let keys: Vec<String> = self.store.keys().cloned().collect();
@@ -272,13 +403,7 @@ impl Kluis {
                 Some(pt) => pt,
                 None => continue, // onleesbaar record: niet aanraken (nooit data verliezen)
             };
-            let mut nonce = [0u8; NONCE_LEN];
-            aead::os_random(&mut nonce).map_err(|e| e.to_string())?;
-            let ct = aead::xseal(&self.sleutels[versie], &nonce, key.as_bytes(), &klaar);
-            let mut blob = Vec::with_capacity(1 + NONCE_LEN + ct.len());
-            blob.push(versie as u8);
-            blob.extend_from_slice(&nonce);
-            blob.extend_from_slice(&ct);
+            let blob = self.verzegel_record(versie, &key, &klaar)?;
             self.store.insert(key, blob);
             hersleuteld += 1;
         }
@@ -307,7 +432,7 @@ impl Kluis {
         self.sleutels.len()
     }
 
-    // versleutelde snapshot naar schijf (blobs als hex; nooit klaartekst)
+    // Rauwe records-dump zonder manifest (voor tests/inspectie). Nooit klaartekst.
     pub fn snapshot(&self) -> Json {
         let mut o = Json::obj();
         if let Json::Obj(m) = &mut o {
@@ -316,6 +441,29 @@ impl Kluis {
             }
         }
         o
+    }
+
+    /* De durabele momentopname: bump de generatie en zegel een vers manifest mee.
+       Schrijft de keyring NIET (dat doet `anker`, ná de datafile) -- zo loopt de
+       datafile na een crash hooguit vóór op de keyring, nooit achter (geen valse
+       terugrol-melding). Geeft de JSON die de flusher naar schijf schrijft. */
+    pub fn momentopname(&mut self) -> Json {
+        self.generatie += 1;
+        let manifest = self.verzegel_manifest(self.generatie);
+        let mut o = Json::obj();
+        if let Json::Obj(m) = &mut o {
+            for (k, blob) in &self.store {
+                m.insert(k.clone(), Json::Str(naar_hex(blob)));
+            }
+            m.insert(MANIFEST_KEY.to_string(), Json::Str(naar_hex(&manifest)));
+        }
+        o
+    }
+
+    /* Anker de generatie: schrijf de keyring met de huidige generatie als hoogste
+       waarmerk. Roep dit ná het wegschrijven van de datafile aan. */
+    pub fn anker(&self) -> io::Result<()> {
+        schrijf_keyring(&self.sleutel_pad, &self.sleutels, self.generatie)
     }
     pub fn pad(&self) -> &Path {
         &self.pad
@@ -473,13 +621,108 @@ mod tests {
         let mut nieuw = [0u8; SLEUTEL_LEN];
         aead::os_random(&mut nieuw).unwrap();
         k.sleutels.push(nieuw);
-        super::schrijf_keyring(&kp, &k.sleutels).unwrap();
+        super::schrijf_keyring(&kp, &k.sleutels, 0).unwrap();
         std::fs::write(&dp, k.snapshot().dump()).unwrap();
         drop(k);
         // heropen: v0-blob wijst nog naar keyring[0], dus leesbaar.
         let k2 = Kluis::open(&kp, &dp).unwrap();
         assert_eq!(k2.sleutelversies(), 2);
         assert_eq!(k2.onthul("NEVEL").unwrap(), "onder versie nul", "een oud blob moet leesbaar blijven zolang de sleutel in de keyring staat");
+        std::fs::remove_dir_all(&d).ok();
+    }
+
+    /* Lengte-verhulling: een kort en een lang record binnen dezelfde emmer zijn
+       op schijf even groot. Zo verraadt de blob-lengte niet hoe groot het dossier
+       is (een leeg profiel vs een vol dossier). */
+    #[test]
+    fn padding_verhult_lengte() {
+        let d = tmp();
+        let mut k = Kluis::open(&d.join("secret.key"), &d.join("kluis.json")).unwrap();
+        k.bewaar("A", "x").unwrap();               // 1 byte
+        k.bewaar("B", "xxxxxxxxxxxxxxxxxxxx").unwrap(); // 20 bytes, zelfde emmer (<64)
+        assert_eq!(k.store.get("A").unwrap().len(), k.store.get("B").unwrap().len(),
+            "records in dezelfde emmer moeten even groot zijn op schijf");
+        assert_eq!(k.onthul("A").unwrap(), "x");
+        assert_eq!(k.onthul("B").unwrap(), "xxxxxxxxxxxxxxxxxxxx");
+        std::fs::remove_dir_all(&d).ok();
+    }
+
+    /* Manifest: na een momentopname met manifest detecteert open() dat een record
+       op schijf is GEWIST (record-set klopt niet meer). */
+    #[test]
+    fn manifest_betrapt_gewist_record() {
+        let d = tmp();
+        let kp = d.join("secret.key");
+        let dp = d.join("kluis.json");
+        {
+            let mut k = Kluis::open(&kp, &dp).unwrap();
+            k.bewaar("NEVEL", "een").unwrap();
+            k.bewaar("SPOOK", "twee").unwrap();
+            let json = k.momentopname().dump();
+            std::fs::write(&dp, json).unwrap();
+            k.anker().unwrap();
+        }
+        // schone heropen: niet geknoeid
+        assert_eq!(Kluis::open(&kp, &dp).unwrap().geknoeid, false);
+        // wis met de hand een record uit de datafile (attacker met schijftoegang)
+        let tekst = std::fs::read_to_string(&dp).unwrap();
+        if let Ok(Json::Obj(mut m)) = crate::json::parse(&tekst) {
+            m.remove("SPOOK");
+            let mut o = Json::obj();
+            if let Json::Obj(nw) = &mut o { *nw = m; }
+            std::fs::write(&dp, o.dump()).unwrap();
+        }
+        let k2 = Kluis::open(&kp, &dp).unwrap();
+        assert!(k2.geknoeid, "een gewist record moet als geknoeid opvallen");
+        std::fs::remove_dir_all(&d).ok();
+    }
+
+    /* Manifest: een TERUGGEROLDE datafile (oude generatie, keyring is verder)
+       valt op als geknoeid. */
+    #[test]
+    fn manifest_betrapt_terugrol() {
+        let d = tmp();
+        let kp = d.join("secret.key");
+        let dp = d.join("kluis.json");
+        let oud_bestand;
+        {
+            let mut k = Kluis::open(&kp, &dp).unwrap();
+            k.bewaar("NEVEL", "versie een").unwrap();
+            std::fs::write(&dp, k.momentopname().dump()).unwrap();
+            k.anker().unwrap();
+            oud_bestand = std::fs::read_to_string(&dp).unwrap(); // generatie 1
+            // nog een momentopname -> generatie 2, keyring ankert op 2
+            k.bewaar("NEVEL", "versie twee").unwrap();
+            std::fs::write(&dp, k.momentopname().dump()).unwrap();
+            k.anker().unwrap();
+        }
+        // normaal heropenen: niet geknoeid
+        assert_eq!(Kluis::open(&kp, &dp).unwrap().geknoeid, false);
+        // rol de datafile terug naar generatie 1 (keyring staat nog op 2)
+        std::fs::write(&dp, oud_bestand).unwrap();
+        let k2 = Kluis::open(&kp, &dp).unwrap();
+        assert!(k2.geknoeid, "een teruggerolde datafile moet als geknoeid opvallen");
+        std::fs::remove_dir_all(&d).ok();
+    }
+
+    /* Manifest overleeft een crash TUSSEN datafile en keyring-anker: de datafile
+       loopt dan één generatie voor -> dat is geen terugrol en mag niet als
+       geknoeid gelden. */
+    #[test]
+    fn manifest_geen_valse_melding_bij_crash_voor_anker() {
+        let d = tmp();
+        let kp = d.join("secret.key");
+        let dp = d.join("kluis.json");
+        {
+            let mut k = Kluis::open(&kp, &dp).unwrap();
+            k.bewaar("NEVEL", "een").unwrap();
+            // schrijf WEL de datafile (generatie 1) maar anker de keyring NIET
+            std::fs::write(&dp, k.momentopname().dump()).unwrap();
+            // (geen k.anker() -> simuleert crash voor het anker)
+        }
+        let k2 = Kluis::open(&kp, &dp).unwrap();
+        assert_eq!(k2.geknoeid, false, "datafile één generatie voor is normaal na een crash, geen terugrol");
+        assert_eq!(k2.onthul("NEVEL").unwrap(), "een");
         std::fs::remove_dir_all(&d).ok();
     }
 }

@@ -23,6 +23,7 @@ enum Lees {
     Klaar(Request),
     Dicht,
     TeGroot,
+    Slecht, // dubbelzinnig/gevaarlijk verzoek (request smuggling) -> 400 + sluiten
 }
 
 pub struct Response {
@@ -109,6 +110,18 @@ where
                 let _ = writer.write_all(tekst.as_bytes());
                 break;
             }
+            Ok(Lees::Slecht) => {
+                // dubbelzinnig verzoek (Transfer-Encoding of botsende Content-Length):
+                // 400 en de verbinding HARD sluiten -- nooit doorgaan met een body
+                // die een tussenproxy anders zou knippen dan wij (request smuggling).
+                let body = "{\"error\":\"Dubbelzinnig verzoek geweigerd.\"}";
+                let tekst = format!(
+                    "HTTP/1.1 400 Bad Request\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                    body.len(), body
+                );
+                let _ = writer.write_all(tekst.as_bytes());
+                break;
+            }
             Err(_) => break, // timeout of leesfout: sluit af, thread vrij
         };
         let resp = handler(&req);
@@ -162,7 +175,8 @@ fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Lees> {
         return Ok(Lees::Dicht);
     }
 
-    let mut content_length = 0usize;
+    let mut content_length: Option<usize> = None;
+    let mut heeft_transfer_encoding = false;
     let mut header_teller = 0usize;
     loop {
         let lijn = match lees_lijn_begrensd(reader, MAX_LIJN)? {
@@ -178,11 +192,36 @@ fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Lees> {
             return Ok(Lees::TeGroot);
         }
         if let Some(v) = lijn.split_once(':') {
-            if v.0.eq_ignore_ascii_case("content-length") {
-                content_length = v.1.trim().parse().unwrap_or(0);
+            let naam = v.0.trim();
+            if naam.eq_ignore_ascii_case("transfer-encoding") {
+                // De motor spreekt geen chunked. Een Transfer-Encoding-header is
+                // dé klassieke smuggling-vector (TE.CL / CL.TE desync): weiger hem
+                // categorisch i.p.v. de body verkeerd te knippen.
+                heeft_transfer_encoding = true;
+            } else if naam.eq_ignore_ascii_case("content-length") {
+                let rauw = v.1.trim();
+                // strikt: alleen cijfers (geen "+10", "0x10", "10 ", dubbele waarden
+                // "10, 20"); anders is de lengte dubbelzinnig -> weigeren.
+                if rauw.is_empty() || !rauw.bytes().all(|b| b.is_ascii_digit()) {
+                    return Ok(Lees::Slecht);
+                }
+                let waarde: usize = match rauw.parse() { Ok(n) => n, Err(_) => return Ok(Lees::Slecht) };
+                // botsende dubbele Content-Length -> smuggling -> weigeren.
+                if let Some(eerder) = content_length {
+                    if eerder != waarde {
+                        return Ok(Lees::Slecht);
+                    }
+                }
+                content_length = Some(waarde);
             }
         }
     }
+
+    // Transfer-Encoding + (evt.) Content-Length: altijd weigeren.
+    if heeft_transfer_encoding {
+        return Ok(Lees::Slecht);
+    }
+    let content_length = content_length.unwrap_or(0);
 
     // body-cap VOOR de allocatie: nooit alloceren op wat de client beweert
     if content_length > MAX_BODY {
@@ -197,4 +236,46 @@ fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Lees> {
     }
 
     Ok(Lees::Klaar(Request { method, path, body }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    fn lees(req: &[u8]) -> Lees {
+        let mut c = Cursor::new(req.to_vec());
+        lees_verzoek(&mut c).unwrap()
+    }
+
+    #[test]
+    fn normaal_verzoek_met_content_length() {
+        match lees(b"POST /api/pay/x HTTP/1.1\r\nContent-Length: 2\r\n\r\n{}") {
+            Lees::Klaar(req) => { assert_eq!(req.method, "POST"); assert_eq!(req.body, "{}"); }
+            _ => panic!("verwacht Klaar"),
+        }
+    }
+
+    #[test]
+    fn transfer_encoding_geweigerd() {
+        // TE.CL / CL.TE desync-vector: chunked wordt categorisch geweigerd.
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\n"), Lees::Slecht));
+    }
+
+    #[test]
+    fn botsende_content_length_geweigerd() {
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nContent-Length: 5\r\nContent-Length: 6\r\n\r\nhello"), Lees::Slecht));
+    }
+
+    #[test]
+    fn dubbele_gelijke_content_length_ok() {
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nContent-Length: 2\r\nContent-Length: 2\r\n\r\nhi"), Lees::Klaar(_)));
+    }
+
+    #[test]
+    fn rommel_content_length_geweigerd() {
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nContent-Length: 0x10\r\n\r\nhi"), Lees::Slecht));
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nContent-Length: +5\r\n\r\nhello"), Lees::Slecht));
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nContent-Length: 5, 5\r\n\r\nhello"), Lees::Slecht));
+    }
 }

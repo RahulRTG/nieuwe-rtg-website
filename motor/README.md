@@ -89,14 +89,22 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   door één ledger gaan. Dat is een echte refactor van de geldkern (veel callers
   zijn synchroon `pay.boek(...)`; de motor is async HTTP) en architecturaal
   significant — daarom een bewuste keuze, geen sluipende omzetting.
-- [x] **Ledengids** (out-of-RAM) — leden in een gesorteerd bestand met vaste
-  recordgrootte; zoeken met binair zoeken op schijf, dus **RAM = O(1)** ongeacht
-  het aantal. Endpoints: `/api/gids/bouw`, `/api/gids/zoek` (exact + prefix),
-  `/api/gids/status`. Bewezen op 2M leden: gids openen = 2,5 MB RAM (184 MB op
-  schijf), 5000 zoekopdrachten ~3000/s, p50 0,31 ms / p99 0,70 ms, RAM vlak.
-  `scripts/motor-gids.js` reproduceert het. Projectie 100M: ~9 GB op schijf,
-  ~2,5 MB RAM. (Bouwen sorteert nu in RAM; voor >~10M hoort extern sorteren, maar
-  het serveren is al out-of-RAM — dat is de eigenschap die telt.)
+- [x] **Ledengids** (out-of-heap) — leden in een gesorteerd bestand met vaste
+  recordgrootte; zoeken met binair zoeken, dus **process-heap = O(1)** ongeacht
+  het aantal. Standaard leest de gids via **mmap(2)** (read-only, rauwe POSIX-FFI,
+  geen crate — zero-dep blijft): de kernel cachet de hete pagina's in RAM en we
+  lezen op RAM-snelheid, zonder per zoekopdracht een `File::open` of seek/read.
+  Lukt mmap niet (of op niet-Unix), dan valt de gids terug op **seek+read** op
+  schijf — zelfde antwoorden. `bouw()` schrijft naar een temp-bestand en hernoemt
+  atomair, zodat een actieve mmap veilig op het oude inode blijft tijdens herbouw
+  (geen SIGBUS). Micro-bench (1M leden, mmap): `exact()` p50 ~4 µs / p99 ~9 µs,
+  ~233k lookups/s single-thread — de leespad is nu RAM-snelheid i.p.v. de ~0,31 ms
+  schijf-p50. Endpoints: `/api/gids/bouw`, `/api/gids/zoek` (exact + prefix),
+  `/api/gids/status` (met `mmap`-vlag). Bewezen op 2M leden: gids openen = enkele
+  MB heap (184 MB op schijf, in de paginacache), RAM vlak.
+  `scripts/motor-gids.js` reproduceert het. (Bouwen sorteert in RAM; voor >~10M
+  hoort extern sorteren, maar het serveren is out-of-heap — dat is de eigenschap
+  die telt.)
 - [x] **Kluis-crypto** — identiteitskluis met ECHTE authenticated encryption:
   onze **eigen XChaCha20-Poly1305** in `src/aead.rs` (ChaCha20-Poly1305 uit
   RFC 8439 + HChaCha20 uit de XChaCha-draft), byte-voor-byte geverifieerd tegen

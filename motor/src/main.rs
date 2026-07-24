@@ -264,7 +264,8 @@ fn main() {
         let pad = gids_pad();
         if pad.exists() {
             if let Ok(g) = Gids::open(&pad) {
-                eprintln!("[motor] ledengids geopend: {} leden ({:.1} MB op schijf)", g.aantal(), g.bestandsbytes() as f64 / 1e6);
+                eprintln!("[motor] ledengids geopend: {} leden ({:.1} MB op schijf), lezen via {}",
+                    g.aantal(), g.bestandsbytes() as f64 / 1e6, if g.via_kaart() { "mmap (RAM-snelheid)" } else { "seek+read" });
                 *gids.write().unwrap() = Some(g);
             }
         }
@@ -315,7 +316,10 @@ fn gids_route(gids: &RwLock<Option<Gids>>, req: &Request) -> Response {
                 b.set("ok", Json::Bool(true))
                     .set("leden", Json::Num(g.aantal() as f64))
                     .set("bestandBytes", Json::Num(g.bestandsbytes() as f64))
-                    .set("ramModel", Json::Str("O(1) — binair zoeken op schijf".into()));
+                    .set("mmap", Json::Bool(g.via_kaart()))
+                    .set("ramModel", Json::Str(
+                        if g.via_kaart() { "O(1) heap - mmap, binair zoeken in de paginacache".into() }
+                        else { "O(1) heap - binair zoeken met seek+read op schijf".into() }));
             }
             None => {
                 b.set("ok", Json::Bool(true)).set("leden", Json::Num(0.0)).set("detail", Json::Str("nog niet gebouwd".into()));

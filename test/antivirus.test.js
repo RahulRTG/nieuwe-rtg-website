@@ -131,3 +131,53 @@ test('een nieuwe handtekening toevoegen werkt (updatebare definities)', () => {
   const r = a.scan(Buffer.from('hallo RTG_KWAADAARDIG daar'), { naam: 'x.txt', mime: 'text/plain' });
   assert.equal(r.verdict, 'besmet');
 });
+
+// --- Multi-laag / obfuscatie: gzip, deflate en geneste base64 afpellen ---
+
+const zlib = require('zlib');
+
+test('EICAR verstopt in gzip wordt door de laag heen betrapt', () => {
+  const gz = zlib.gzipSync(Buffer.from(EICAR));
+  const r = av().scan(gz, { naam: 'onschuldig.txt', mime: 'application/octet-stream' });
+  assert.equal(r.verdict, 'besmet', r.redenen.join(','));
+  assert.ok(r.redenen.some(x => /laag 1/.test(x) && /EICAR/.test(x)), r.redenen.join(','));
+});
+
+test('webshell verstopt in zlib/deflate wordt betrapt', () => {
+  const def = zlib.deflateSync(Buffer.from('<?php eval(base64_decode($_POST[0])); ?>'));
+  const r = av().scan(def, { naam: 'blob.bin', mime: 'application/octet-stream' });
+  assert.equal(r.verdict, 'besmet', r.redenen.join(','));
+  assert.ok(r.redenen.some(x => /laag 1/.test(x)));
+});
+
+test('EICAR in dubbele base64 (geneste lagen) wordt betrapt', () => {
+  const laag1 = Buffer.from(EICAR).toString('base64');
+  const laag2 = Buffer.from(laag1).toString('base64');
+  const r = av().scan(Buffer.from(laag2), { naam: 'data.txt', mime: 'text/plain' });
+  assert.equal(r.verdict, 'besmet', r.redenen.join(','));
+});
+
+test('PE/MZ in gzip-in-base64 (compressie onder een encoding-laag) wordt betrapt', () => {
+  const gz = zlib.gzipSync(Buffer.from([0x4d, 0x5a, 0x90, 0x00, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]));
+  const b64 = Buffer.from(gz).toString('base64');
+  const r = av().scan(Buffer.from(b64), { naam: 'payload.txt', mime: 'text/plain' });
+  assert.equal(r.verdict, 'besmet', r.redenen.join(','));
+});
+
+test('schone inhoud in base64 blijft schoon (base64-peel geeft geen vals alarm)', () => {
+  // gewone, onschuldige inhoud als base64: de peel-laag decodeert het en vindt
+  // niets kwaadaardigs -> schoon (base64-tekst raakt zelf geen container-magie)
+  const b64 = Buffer.from('Beste gast, welkom bij Rahul Travel Group. Fijne reis naar Ibiza!').toString('base64');
+  const r = av().scan(Buffer.from(b64), { naam: 'brief.txt', mime: 'text/plain' });
+  assert.equal(r.verdict, 'schoon', r.redenen.join(','));
+});
+
+test('een gzip-bom (klein in, enorm uit) laat ons niet ontploffen', () => {
+  // 8 MB nullen comprimeert tot enkele KB's; de MAX_UITPAK-grens moet dit
+  // veilig afkappen zonder de scanner te laten crashen of hangen.
+  const groot = Buffer.alloc(64 * 1024 * 1024, 0);
+  const gz = zlib.gzipSync(groot);
+  const r = av().scan(gz, { naam: 'bom.gz', mime: 'application/octet-stream' });
+  // niet besmet (nullen raken geen handtekening) en vooral: geen exception
+  assert.ok(r.verdict === 'schoon' || r.verdict === 'verdacht');
+});

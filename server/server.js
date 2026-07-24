@@ -253,6 +253,7 @@ app.use((req, res, next) => {
 /* De Wacht (kern/wacht.js) wordt verderop gebouwd (na db + beveilig), maar het
    schild raadpleegt hem nu al voor de quarantaine - laat-gebonden via deze
    verwijzing zodat een afgesneden indringer er ook echt niet meer in komt. */
+const ssrf = require('./kern/ssrf'); // SSRF-afweer voor client-bepaalde uitgaande doelen
 let wacht = null;
 const schild = require('./kern/schild').maakSchild({
   meld: (type, ernst, tekst, meta) => { if (beveilig) beveilig.meld(type, ernst, tekst, meta); },
@@ -1245,6 +1246,15 @@ app.post('/api/push/subscribe', auth, (req, res) => {
   if (!webpush) return res.status(501).json({ error: 'Push niet beschikbaar.' });
   const sub = req.body.subscription;
   if (!sub || !sub.endpoint) return res.status(400).json({ error: 'Ongeldige subscription.' });
+  // SSRF-afweer: het endpoint komt van de client en de server POST daar later
+  // naartoe. Alleen https naar bekende push-diensten; anders weigeren en melden
+  // (een intern/metadata-adres hier is een SSRF-poging).
+  if (!ssrf.pushEndpointOk(sub.endpoint)) {
+    if (beveilig) beveilig.meld('ssrf-push', 'kritiek',
+      'Push-subscription met een niet-vertrouwd endpoint geweigerd (mogelijke SSRF): ' + String(sub.endpoint).slice(0, 120),
+      { bron: 'user:' + (req.session.account ? req.session.account.id : req.ip) });
+    return res.status(400).json({ error: 'Ongeldig push-endpoint.' });
+  }
   const list = db.data.pushSubs[req.session.tier] = (db.data.pushSubs[req.session.tier] || []);
   if (!list.some(s => s.endpoint === sub.endpoint)) list.push(sub);
   // echte accounts krijgen ook een persoonlijke push-lijst (voor o.a. RTFoundation-meldingen)

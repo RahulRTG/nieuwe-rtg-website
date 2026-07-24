@@ -6,6 +6,8 @@
      RTG_MOTOR_ADDR     luisteradres (standaard 127.0.0.1:3100)
      RTG_MOTOR_MAXCONN  plafond gelijktijdige verbindingen (standaard 1024)
      RTG_MOTOR_DATA     snapshot-bestand (standaard ./motor-data/state.json)
+     RTG_MOTOR_SALDI    =1 opent /api/motor/saldi zodat de gepaarde server zijn
+                        spiegel uit de motor-snapshot kan reconcilen (cutover)
 
    Let op: authenticatie/rol-scheiding zit in de Node-poort ervoor; de motor is
    het grootboek. Codenaam/supplier komen als velden mee in de body. */
@@ -389,8 +391,13 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
         return Response { status: if klopt { 200 } else { 500 }, body: b.dump() };
     }
     if req.path == "/api/motor/saldi" {
-        // alleen achter de debug-vlag: het is de hele geldstand
-        if std::env::var("RTG_MOTOR_DEBUG").as_deref() != Ok("1") {
+        // De hele geldstand: alleen achter een expliciete vlag. RTG_MOTOR_DEBUG
+        // voor het pariteitsharnas; RTG_MOTOR_SALDI zodat de gepaarde JS-server
+        // zijn spiegel bij een herstart uit de motor-snapshot kan reconcilen
+        // (cutover). Zonder een van beide: onvindbaar (404).
+        let toe = std::env::var("RTG_MOTOR_DEBUG").as_deref() == Ok("1")
+            || std::env::var("RTG_MOTOR_SALDI").as_deref() == Ok("1");
+        if !toe {
             return fout(404, "Onbekende route.");
         }
         let s = state.read().unwrap();

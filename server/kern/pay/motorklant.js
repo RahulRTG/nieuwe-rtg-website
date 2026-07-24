@@ -53,5 +53,22 @@ module.exports = function maakMotorklant() {
         return { error: e.name === 'AbortError' ? 'Motor-time-out.' : ('Motor onbereikbaar: ' + e.message), status: 502 };
       }
     },
+
+    // De volledige saldi-stand van de motor (autoriteit), voor de herstart-
+    // reconcile van de JS-spiegel. Vereist RTG_MOTOR_SALDI=1 (of _DEBUG=1) op de
+    // motor. Retourneert { ok, saldi } of { error }.
+    async saldiSnapshot() {
+      const af = new AbortController();
+      const t = setTimeout(() => af.abort(), TIMEOUT_MS);
+      try {
+        const r = await fetch(URL + '/api/motor/saldi', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', signal: af.signal });
+        if (r.status >= 300) return { error: 'Motor gaf ' + r.status + ' op /api/motor/saldi (staat RTG_MOTOR_SALDI=1 aan?).', status: r.status };
+        const j = await r.json().catch(() => null);
+        if (!j || typeof j !== 'object') return { error: 'Motor gaf geen saldi terug.', status: 502 };
+        return { ok: true, saldi: j };
+      } catch (e) {
+        return { error: e.name === 'AbortError' ? 'Motor-time-out.' : ('Motor onbereikbaar: ' + e.message), status: 502 };
+      } finally { clearTimeout(t); }
+    },
   };
 };

@@ -29,8 +29,8 @@ module.exports = (kern) => {
 
   app.post('/api/bank/storten', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankStorten({ iban: String(req.body.iban || ''), centen: req.body.centen, route: req.body.route, codenaam: cn(req), idem: req.body.idem, oms: req.body.oms })); });
   app.post('/api/bank/overboek', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankOverboek({ vanIban: String(req.body.vanIban || ''), naarIban: String(req.body.naarIban || ''), centen: req.body.centen, oms: req.body.oms, codenaam: cn(req) })); });
-  app.post('/api/bank/naar-wallet', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankBankNaarWallet({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen })); });
-  app.post('/api/bank/van-wallet', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankWalletNaarBank({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen })); });
+  app.post('/api/bank/naar-wallet', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankBankNaarWallet({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen })); });
+  app.post('/api/bank/van-wallet', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankWalletNaarBank({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen })); });
   app.post('/api/bank/sepa', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankSepaUit({ iban: String(req.body.iban || ''), codenaam: cn(req), centen: req.body.centen, naarIban: req.body.naarIban, begunstigde: req.body.begunstigde, oms: req.body.oms, idem: req.body.idem })); });
   app.post('/api/bank/spaardoel', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankSpaardoelZet({ iban: String(req.body.iban || ''), euro: req.body.euro, codenaam: cn(req) })); });
   app.post('/api/bank/rente-voorbeeld', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.bankRenteVoorbeeld(req.body.euro)); });

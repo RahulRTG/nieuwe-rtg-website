@@ -2419,6 +2419,18 @@ Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, p
 kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
   ? kern.bank.bankDekWallet({ codenaam, centen })
   : { status: 403, error: 'De leden-bank is niet live.' });
+/* Cutover-reconcile: draait de wallet in motor-modus (RTG_MOTOR_GELD=motor), dan
+   is de Rust-motor de autoriteit -- neem bij het opstarten de saldi-spiegel over
+   uit de motor-snapshot, zodat we altijd in lockstep starten (ook na een crash of
+   nadat de motor los is bijgewerkt). No-op in de standaard schaduw-modus. */
+if (kern.pay.geldModus === 'motor') {
+  Promise.resolve(kern.pay.reconcileVanMotor())
+    .then(r => {
+      if (r && r.ok && !r.overgeslagen) log.info('motor-reconcile', { rekeningen: r.rekeningen, som: r.som });
+      else if (r && r.error) log.warn('motor-reconcile mislukt', { fout: r.error });
+    })
+    .catch(e => log.warn('motor-reconcile uitzondering', { fout: e.message }));
+}
 /* De RTFoundation-afdracht over de eigen rails: staat de knop effectief op
    "eigen" (en niet in nood), dan boekt de 30% als grootboekboeking van de
    reserve naar de foundation-tegenrekening. Anders geeft de naad null terug

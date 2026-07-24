@@ -29,7 +29,7 @@ async function motorStatus() {
 (async () => {
   // 1. Start de motor (verse, lege staat).
   const datadir = path.join(require('os').tmpdir(), 'motor-cutover-' + Date.now());
-  const motor = cp.spawn(BIN, [], { env: Object.assign({}, process.env, { RTG_MOTOR_ADDR: ADDR, RTG_MOTOR_DATA: path.join(datadir, 'state.json') }), stdio: 'ignore' });
+  const motor = cp.spawn(BIN, [], { env: Object.assign({}, process.env, { RTG_MOTOR_ADDR: ADDR, RTG_MOTOR_DATA: path.join(datadir, 'state.json'), RTG_MOTOR_SALDI: '1' }), stdio: 'ignore' });
   let op = false;
   for (let i = 0; i < 40; i++) { try { await motorStatus(); op = true; break; } catch (e) { await wacht(200); } }
   if (!op) { console.error('[cutover] motor start niet'); motor.kill(); process.exit(1); }
@@ -86,6 +86,31 @@ async function motorStatus() {
   // 5. Herhaalde idempotente oplaad boekt niet dubbel.
   await pay.laadOp({ codenaam: 'NEVEL', centen: 100000, idem: 'l1' });
   await checkLockstep('oplaad NEVEL herhaald (idem)');
+
+  // 6. De bank<->wallet-brug: de pay-KANT loopt via de motor (de bank-kant is
+  //    een apart JS-grootboek). We spiegelen precies de bridge-boekingen:
+  //    wallet -> extern:bank (naar de bank) en extern:bank -> wallet (terug).
+  await pay.boekAsync({ van: 'lid:NEVEL', naar: 'extern:bank', centen: 10000, soort: 'naar-bank', oms: 'brug' });
+  await checkLockstep('brug: wallet -> bank 100');
+  await pay.boekAsync({ van: 'extern:bank', naar: 'lid:NEVEL', centen: 4000, soort: 'van-bank', oms: 'brug terug' });
+  await checkLockstep('brug: bank -> wallet 40');
+
+  // 7. HERSTART-RECONCILE: bouw een VERSE engine (lege db) in motor-modus, laat
+  //    hem zijn spiegel uit de motor-snapshot herstellen, en eis dat de verse
+  //    spiegel byte-voor-byte gelijk is aan de motor (zoals na een herstart).
+  const db2 = { data: {} };
+  const { pay: pay2 } = require('../server/kern/pay')({
+    db: db2, save() {}, crypto, betaal: demoBetaal,
+    keyVanCodenaam: () => null, sseToCustomer() {},
+    schoon: (s, n) => String(s == null ? '' : s).slice(0, n || 120),
+    betaaldienstKosten: () => 0,
+  });
+  const rec = await pay2.reconcileVanMotor();
+  const mNu = await motorStatus();
+  const ja2 = vingerafdruk(db2.data.paySaldi || {});
+  if (!rec || !rec.ok) { fouten++; console.error('[cutover] FOUT: reconcile mislukte: ' + JSON.stringify(rec)); }
+  else if (ja2 !== mNu.vingerafdruk) { fouten++; console.error('[cutover] FOUT: verse spiegel na reconcile wijkt af (js ' + ja2 + ' vs motor ' + mNu.vingerafdruk + ')'); }
+  else console.log('[cutover] OK  herstart-reconcile: verse spiegel == motor (' + ja2 + ', ' + rec.rekeningen + ' rekeningen)');
 
   // Borging tegen een vals-positieve lockstep: als er NIETS geboekt was, zouden
   // beide kanten de lege afdruk hebben en "matchen". Eis dus echte activiteit.

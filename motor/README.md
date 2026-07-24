@@ -93,19 +93,26 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
   gedragsverandering; `pay.test.js` blijft byte-identiek groen), in motor-modus
   gaat elke boeking geguard naar `/api/pay/boekguard` (de guard leeft dus in de
   motor) en spiegelt de JS-engine pas de door de motor BEVESTIGDE regel. De
-  interne callers (stuur, oplaad, klompje, kassa, uitbetaal, vonk, ov, synergie)
-  lopen nu door dit ene punt. De synchrone `pay.boek` weigert in motor-modus luid
-  (fail-closed) -- nooit een stil tweede grootboek. **Bewezen** met
-  `node scripts/motor-cutover.js`: byte-voor-byte lockstep (JS-spiegel ==
-  motor-vingerafdruk na elke boeking), som blijft 0, de motor-guard weigert
-  onvoldoende saldo (402) zonder de spiegel aan te raken, en idempotentie boekt
-  niet dubbel.
-  - Nog open vóór de daadwerkelijke flip (bewuste keuze, geen sluipende omzetting):
-    (a) de **bank<->wallet-brug** (`kern/bank/overboeken`) roept nog synchroon
-    `pay.boek` -- die faalt nu luid in motor-modus; hij moet mee zodra ook het
-    BANK-grootboek in de motor zit. (b) de JS-spiegel moet bij **herstart** uit de
-    motor-snapshot herstellen (nu blijft hij in lockstep vanaf een gedeelde lege
-    start; het cutover-harnas dekt dat pad).
+  interne callers (stuur, oplaad, klompje, kassa, uitbetaal, vonk, ov, synergie
+  EN de bank<->wallet-brug) lopen nu door dit ene punt. De synchrone `pay.boek`
+  weigert in motor-modus luid (fail-closed) -- nooit een stil tweede grootboek.
+  **Bewezen** met `node scripts/motor-cutover.js`: byte-voor-byte lockstep
+  (JS-spiegel == motor-vingerafdruk na elke boeking), som blijft 0, de motor-guard
+  weigert onvoldoende saldo (402) zonder de spiegel aan te raken, idempotentie
+  boekt niet dubbel, de bank<->wallet-brug-pay-kant loopt in lockstep door de
+  motor, en de herstart-reconcile herstelt een verse spiegel byte-voor-byte uit de
+  motor-snapshot.
+  - **Bank<->wallet-brug (klaar):** de brug (`kern/bank/overboeken`) stuurt zijn
+    PAY-kant nu via `boekAsync` (in motor-modus dus geguard langs de motor); de
+    bank-kant blijft het eigen JS-bank-grootboek. Elk grootboek sluit apart -- de
+    bank hoeft NIET in de motor te zitten voor de brug.
+  - **Herstart-reconcile (klaar):** in motor-modus haalt de server bij het
+    opstarten de saldi-spiegel uit de motor-snapshot (`reconcileVanMotor`, via
+    `/api/motor/saldi` achter `RTG_MOTOR_SALDI=1`), zodat de spiegel altijd in
+    lockstep start -- ook na een crash of nadat de motor los is bijgewerkt.
+  - **Flip-klaar:** zet `RTG_MOTOR_GELD=motor` + `RTG_MOTOR_GELD_URL` en (op de
+    motor) `RTG_MOTOR_SALDI=1`. Aparte, latere stap blijft: het BANK-grootboek
+    zelf naar de motor brengen (nu nog een eigen JS-grootboek).
 - [x] **Ledengids** (out-of-heap) — leden in een gesorteerd bestand met vaste
   recordgrootte; zoeken met binair zoeken, dus **process-heap = O(1)** ongeacht
   het aantal. Standaard leest de gids via **mmap(2)** (read-only, rauwe POSIX-FFI,

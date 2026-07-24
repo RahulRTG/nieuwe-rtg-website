@@ -66,20 +66,22 @@ module.exports = (ctx) => {
   /* De brug met RTG Pay: geld tussen de wallet (lid:<codenaam>) en de eigen
      betaalrekening. Beide grootboeken blijven sluiten (elk een eigen extern-
      tegenrekening). Begrensd door de wallet-cap van Pay per overboeking. */
-  function walletNaarBank({ iban, codenaam, centen }) {
+  async function walletNaarBank({ iban, codenaam, centen }) {
     const c = String(codenaam || '').trim();
     const m = rekMeta(iban);
     if (!m || m.codenaam !== c) return { status: 404, error: 'De rekening bestaat niet.' };
     const bedrag = Math.round(Number(centen));
     if (!Number.isFinite(bedrag) || bedrag < 1 || bedrag > pay.MAX_CENTEN) return { status: 400, error: 'Kies een bedrag tot ' + (pay.MAX_CENTEN / 100) + ' euro per keer.' };
-    const uit = pay.boek({ van: 'lid:' + c, naar: 'extern:bank', centen: bedrag, soort: 'naar-bank', oms: 'Naar RTG Bank' });
+    // De wallet-kant loopt via het pay-grootboek (in motor-modus dus geguard langs
+    // de motor); de bank-kant is het eigen bank-grootboek. Elk sluit apart.
+    const uit = await pay.boekAsync({ van: 'lid:' + c, naar: 'extern:bank', centen: bedrag, soort: 'naar-bank', oms: 'Naar RTG Bank' });
     if (uit.error) return uit;
     const in_ = boek({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'van-wallet', oms: 'Van RTG Pay' });
-    if (in_.error) { pay.boek({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
+    if (in_.error) { await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
     seintje(c);
     return { ok: true, saldoCenten: saldoVan(iban) };
   }
-  function bankNaarWallet({ iban, codenaam, centen }) {
+  async function bankNaarWallet({ iban, codenaam, centen }) {
     const c = String(codenaam || '').trim();
     const m = rekMeta(iban);
     if (!m || m.codenaam !== c) return { status: 404, error: 'De rekening bestaat niet.' };
@@ -87,7 +89,7 @@ module.exports = (ctx) => {
     if (!Number.isFinite(bedrag) || bedrag < 1 || bedrag > pay.MAX_CENTEN) return { status: 400, error: 'Kies een bedrag tot ' + (pay.MAX_CENTEN / 100) + ' euro per keer.' };
     const uit = boek({ van: iban, naar: 'extern:pay', centen: bedrag, soort: 'naar-wallet', oms: 'Naar RTG Pay' });
     if (uit.error) return uit;
-    const in_ = pay.boek({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'van-bank', oms: 'Van RTG Bank' });
+    const in_ = await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'van-bank', oms: 'Van RTG Bank' });
     if (in_.error) { boek({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
     seintje(c);
     return { ok: true, saldoCenten: saldoVan(iban) };
@@ -98,7 +100,7 @@ module.exports = (ctx) => {
      (binnen zijn bodem, dus incl. rood-staan-ruimte) kan dragen en verhuizen
      precies het tekort naar de wallet. Zo draait Pay op de eigen bank zodra
      die er is, en pas daarna op de kaart-naad. */
-  function dekWallet({ codenaam, centen }) {
+  async function dekWallet({ codenaam, centen }) {
     const c = String(codenaam || '').trim();
     const bedrag = Math.round(Number(centen));
     if (!Number.isFinite(bedrag) || bedrag < 1) return { status: 400, error: 'Dat bedrag kan niet.' };

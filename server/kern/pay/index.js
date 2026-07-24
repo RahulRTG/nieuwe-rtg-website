@@ -176,6 +176,28 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   let bankDekking = null;
   function koppelBank(dekking) { bankDekking = typeof dekking === 'function' ? dekking : null; }
 
+  /* Herstart-reconcile (cutover): bij het opstarten in motor-modus is de motor de
+     autoriteit, dus de JS-spiegel moet zijn saldi uit de motor-snapshot overnemen
+     i.p.v. uit zijn eigen (mogelijk verouderde) snapshot. We halen de volledige
+     saldi-stand op en vervangen db.data.paySaldi ermee. Zo start de spiegel altijd
+     in lockstep met de motor, ook na een crash of nadat de motor los is bijgewerkt.
+     No-op buiten motor-modus. */
+  async function reconcileVanMotor() {
+    if (geldModus !== 'motor') return { ok: true, overgeslagen: true };
+    const r = await motorklant.saldiSnapshot();
+    if (!r || r.error) return { ok: false, error: (r && r.error) || 'Geen saldi van de motor.' };
+    const nieuw = {};
+    for (const k in r.saldi) {
+      if (!Object.prototype.hasOwnProperty.call(r.saldi, k)) continue;
+      const v = Math.round(Number(r.saldi[k]) || 0);
+      if (v !== 0) nieuw[k] = v; // nul-saldi laten we weg (schone spiegel)
+    }
+    d().paySaldi = nieuw;
+    save();
+    let som = 0; for (const k in nieuw) som += nieuw[k];
+    return { ok: true, rekeningen: Object.keys(nieuw).length, som };
+  }
+
   /* Het hart van "EEN knop": is er te weinig saldo, dan laadt de wallet zelf
      bij en betaalt door. Eerst via de eigen bank (exact het tekort), anders
      via de kaart-naad (afgerond op tientjes). Het lid merkt er niets van
@@ -184,7 +206,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     const tekort = Math.round(centen) - saldoVan(rekLid(codenaam));
     if (tekort <= 0) return { ok: true, bijgeladen: 0 };
     if (bankDekking) {
-      try { const b = bankDekking({ codenaam, centen: tekort }); if (b && b.ok) return { ok: true, bijgeladen: tekort, via: 'bank' }; }
+      try { const b = await bankDekking({ codenaam, centen: tekort }); if (b && b.ok) return { ok: true, bijgeladen: tekort, via: 'bank' }; }
       catch (e) { /* de bank kon niet dekken: gewoon door naar de kaart */ }
     }
     const stap = Math.ceil(tekort / AUTOLAAD_STAP) * AUTOLAAD_STAP;
@@ -204,7 +226,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     betaaldienstKosten: betaaldienstKosten || (() => 0),
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, saldoVan, koppelBank };
+  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, saldoVan, koppelBank, reconcileVanMotor };
   // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
   // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
   // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk

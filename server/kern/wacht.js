@@ -32,10 +32,14 @@ const QUARANTAINE_MS = 60 * 60000;      // een indringer een uur afgesneden
 const RAAD_MAX = 100;                   // audit-staart van voorstellen
 const OUD_BESLUIT_MS = 24 * 60 * 60000; // afgehandeld voorstel ouder dan een dag -> opruimbaar
 const AANVAL_DREMPEL = 3;               // vanaf zoveel treffers stelt de AI afsnijden voor
+const LASTAFWORP_MS = 2 * 60000;        // een getripte zekering blijft 2 min dicht en dooft dan vanzelf
+const L7_DREMPEL = 3000;                // verzoeken/10s (aggregaat) waarboven de deur op een kier gaat
+const TOP_AFSNIJDEN = 5;                // zoveel felste bronnen gaan bij een piek meteen in quarantaine
+const RAND_VERS_MS = 5 * 60000;         // randverkeer jonger dan dit telt als "de eerste linie staat"
 
 // De enige acties die "accepteren" mag uitvoeren. Alles daarbuiten wordt
 // geweigerd: de AI kan dus niets draaien wat hier niet expliciet in staat.
-const TOEGESTAAN = new Set(['quarantaine', 'vrij', 'hygiene', 'zekering', 'drempel']);
+const TOEGESTAAN = new Set(['quarantaine', 'vrij', 'hygiene', 'zekering', 'drempel', 'lastafworp']);
 
 module.exports = (ctx) => {
   const { db, save } = ctx;
@@ -49,6 +53,10 @@ module.exports = (ctx) => {
     geheugenMB: () => Math.round((process.memoryUsage().rss || 0) / 1e6)
   }, ctx.lees || {});
   let vorigeVerzoeken = null;
+  // Rand-status (Cloudflare/edge) leeft in het geheugen, niet in de db: het is
+  // een live gezondheidssignaal (kwam er net randverkeer binnen?), geen staat om
+  // te bewaren. Elk verzoek dat via de rand komt draagt CF-Ray / CF-Connecting-IP.
+  let randLaatst = { at: 0, ray: null, provider: null };
 
   function W() {
     if (!db.data.wacht) db.data.wacht = {};
@@ -58,6 +66,7 @@ module.exports = (ctx) => {
     if (!Array.isArray(w.raad)) w.raad = [];      // voorstellen
     if (!w.hygiene) w.hygiene = { laatst: null, totaalOpgeruimd: 0 };
     if (!w.drempels) w.drempels = {};
+    if (!w.lastafworp) w.lastafworp = { actief: false }; // automatische L7-zekering
     return w;
   }
 
@@ -78,10 +87,104 @@ module.exports = (ctx) => {
       quarantaine: Object.keys(w.quarantaine).length,
       geheugen: lees.geheugenMB()
     };
+    const la = beoordeelFlood(delta);
+    sample.lastafworp = la && la.actief ? 1 : 0;
     w.grafiek.push(sample);
     if (w.grafiek.length > RING) w.grafiek.splice(0, w.grafiek.length - RING);
     return sample;
   }
+
+  /* ---------------- Automatische lastafworp (L7-flood) ----------------
+     Een reflex, geen bestuur: herkent een L7-piek (te veel verzoeken in het
+     10s-venster) en zet dan zelf de deur op een kier. Het schild + de meters
+     zien het aankomen; hier reageren we automatisch en TIJDGEBONDEN:
+       - de zekering trip zichzelf (het middleware serveert 503 "kom zo terug"),
+       - de felste bronnen gaan meteen in quarantaine,
+       - het gaat kritiek op het bord, en
+       - er komt een raadkamer-voorstel zodat een mens het eerder kan opheffen.
+     De zekering dooft vanzelf na LASTAFWORP_MS; de mens blijft dus de baas en
+     kan hem ook handmatig opheffen (voerUit soort 'lastafworp'). */
+  function beoordeelFlood(delta) {
+    const w = W(); const nu = Date.now();
+    const la = w.lastafworp;
+    // Verlopen? Vanzelf doven.
+    if (la.actief && la.tot && la.tot <= nu) { la.actief = false; la.tot = null; save(); }
+    const drempel = Number(w.drempels['l7-flood']) > 0 ? Number(w.drempels['l7-flood']) : L7_DREMPEL;
+    if (la.actief) { if (delta > (la.piek || 0)) { la.piek = delta; } return la; }
+    if (delta <= drempel) return la;
+    // Trip: tijdgebonden lastafworp aanzetten.
+    la.actief = true; la.sinds = nu; la.tot = nu + LASTAFWORP_MS; la.piek = delta;
+    la.drempel = drempel;
+    la.reden = 'L7-piek: ' + delta + ' verzoeken/10s (drempel ' + drempel + ')';
+    // De felste bronnen meteen afsnijden (isoleer() slaat zelf op + meldt).
+    const bronnen = (lees.verdachteBronnen() || []).slice()
+      .sort((a, b) => (b.treffers || 0) - (a.treffers || 0)).slice(0, TOP_AFSNIJDEN);
+    la.bronnen = bronnen.map(s => s.bron);
+    for (const s of bronnen) if (s && s.bron) isoleer(s.bron, 'automatische lastafworp (L7-piek)');
+    if (beveilig) beveilig.meld('lastafworp', 'kritiek',
+      'Automatische lastafworp: ' + la.reden + '. De server serveert tijdelijk 503 ("kom zo terug") en sneed ' +
+      bronnen.length + ' bron(nen) af. Dooft vanzelf over ' + Math.round(LASTAFWORP_MS / 60000) + ' min.',
+      { bron: 'lastafworp' });
+    if (!w.raad.some(v => v.status === 'open' && v.actie && v.actie.soort === 'lastafworp')) {
+      voorstel({
+        soort: 'afweer', titel: 'Lastafworp actief (L7-piek)',
+        uitleg: 'De Wacht zette bij ' + delta + ' verzoeken/10s automatisch de deur op een kier (503). ' +
+          'Hij dooft vanzelf; accepteer dit voorstel om hem nu al op te heffen, of pas de drempel aan.',
+        actie: { soort: 'lastafworp', aan: false }
+      });
+    }
+    save();
+    return la;
+  }
+
+  // Het middleware raadpleegt dit per verzoek; goedkoop, geen schijf-schrijf in
+  // het hete pad -- de meet-lus (elke 10s) verzorgt het opslaan.
+  function lastAfworpActief() {
+    const w = W(); const la = w.lastafworp;
+    if (!la || !la.actief) return false;
+    if (la.tot && la.tot <= Date.now()) { la.actief = false; return false; }
+    return true;
+  }
+
+  /* ---------------- Rand-status (Cloudflare/edge) ----------------
+     Eerlijk: we hebben geen bevoorrechte inkijk in Cloudflare zelf. Wat we WEL
+     eerlijk kunnen zien is of het verkeer daadwerkelijk via de rand binnenkomt
+     (elk edge-verzoek draagt CF-Ray / CF-Connecting-IP). Dat is het waarneembare
+     analoog van "staat de eerste linie?": zien we vers randverkeer, dan staat de
+     rand; blijft het uit terwijl we hem verwachten, dan is er iets mis. */
+  function randGezien(info) {
+    info = info || {};
+    randLaatst.at = Date.now();
+    if (info.ray) randLaatst.ray = String(info.ray).slice(0, 60);
+    if (info.provider) randLaatst.provider = String(info.provider).slice(0, 40);
+  }
+  function randStatus() {
+    const nu = Date.now();
+    const verwacht = !!(process.env.RTG_EDGE || process.env.RTG_ACHTER_RAND);
+    const geziens = randLaatst.at > 0;
+    const versGezien = geziens && (nu - randLaatst.at) < RAND_VERS_MS;
+    let status, uitleg;
+    if (versGezien) {
+      status = 'actief';
+      uitleg = 'Verkeer komt binnen via de rand (' + (randLaatst.provider || 'edge') + '); de eerste linie staat.';
+    } else if (verwacht && geziens) {
+      status = 'stil';
+      uitleg = 'Rand verwacht, maar geen recent randverkeer gezien -- controleer de edge-laag.';
+    } else if (verwacht) {
+      status = 'wachtend';
+      uitleg = 'Rand verwacht, nog geen randverkeer waargenomen.';
+    } else {
+      status = 'onbekend';
+      uitleg = 'Geen rand/edge geconfigureerd; verkeer komt rechtstreeks binnen.';
+    }
+    return {
+      status, verwacht, provider: randLaatst.provider, ray: randLaatst.ray,
+      laatstGezien: randLaatst.at || null,
+      ouderdomSec: geziens ? Math.round((nu - randLaatst.at) / 1000) : null, uitleg
+    };
+  }
+  // Directe schakelaar voor de boardroom (naast de raadkamer-weg).
+  function zetLastafworp(aan) { return voerUit({ soort: 'lastafworp', aan: !!aan }); }
   function meters() {
     const w = W();
     const laatste = w.grafiek[w.grafiek.length - 1] || { verzoeken: 0, bans: 0, ips: 0, alarm: 0, kritiek: 0, geheugen: lees.geheugenMB() };
@@ -157,6 +260,14 @@ module.exports = (ctx) => {
     if (actie.soort === 'drempel') {
       const w = W(); w.drempels[String(actie.sleutel || '').slice(0, 40)] = Number(actie.waarde) || 0; save();
       return { ok: true, uitleg: 'Drempel ' + actie.sleutel + ' = ' + (Number(actie.waarde) || 0) + '.' };
+    }
+    if (actie.soort === 'lastafworp') {
+      const w = W(); const la = w.lastafworp;
+      la.actief = !!actie.aan;
+      if (!la.actief) { la.tot = null; la.reden = 'handmatig opgeheven'; }
+      else { la.sinds = Date.now(); la.tot = Date.now() + LASTAFWORP_MS; la.reden = la.reden || 'handmatig aangezet'; }
+      save();
+      return { ok: true, uitleg: la.actief ? 'Lastafworp weer actief (503 kom-zo-terug).' : 'Lastafworp opgeheven; verkeer weer toegelaten.' };
     }
     return { ok: false, uitleg: 'Niets uitgevoerd.' };
   }
@@ -244,11 +355,14 @@ module.exports = (ctx) => {
       quarantaine: quarantaineLijst(),
       hygiene: w.hygiene,
       drempels: w.drempels,
+      lastafworp: w.lastafworp || { actief: false },
+      rand: randStatus(),
       raad: w.raad.slice(0, 40),
       openVoorstellen: w.raad.filter(v => v.status === 'open' || v.status === 'inconclaaf').length
     };
   }
 
   return { meet, meters, grafiek, isoleer, vrij, inQuarantaine, quarantaineLijst,
-    opruimen, voorstel, beslis, analyseer, bord, TOEGESTAAN };
+    opruimen, voorstel, beslis, analyseer, bord, TOEGESTAAN,
+    beoordeelFlood, lastAfworpActief, zetLastafworp, randGezien, randStatus };
 };

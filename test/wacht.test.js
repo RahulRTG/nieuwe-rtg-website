@@ -106,3 +106,53 @@ test('analyseer: kauwt verdachte bronnen uit tot afsnij-voorstellen (geen duplic
   const tweede = w.analyseer();
   assert.equal(tweede.length, 0, 'geen dubbel open voorstel voor dezelfde bron');
 });
+
+test('lastafworp: een L7-piek tript de zekering, snijdt bronnen af en dooft vanzelf', () => {
+  let teller = 0;
+  const db = maakDb(); const bev = maakBeveilig();
+  const bronnen = [{ bron: '3.3.3.3', treffers: 9 }, { bron: '4.4.4.4', treffers: 4 }];
+  const w = maakWacht({ db, save() {}, beveilig: bev, lees: { verzoeken: () => teller, verdachteBronnen: () => bronnen } });
+  // een rustige meting: geen lastafworp
+  teller = 100; w.meet();
+  assert.equal(w.lastAfworpActief(), false, 'rustig verkeer trip niets');
+  // drempel omlaag zodat een bescheiden piek al telt, dan een piek
+  db.data.wacht.drempels['l7-flood'] = 200;
+  teller = 100 + 5000; const s = w.meet();
+  assert.equal(s.lastafworp, 1, 'de sample markeert de lastafworp');
+  assert.equal(w.lastAfworpActief(), true, 'de zekering staat dicht na de piek');
+  assert.equal(w.inQuarantaine('3.3.3.3'), true, 'de felste bron is afgesneden');
+  assert.ok(bev.meldingen.some(m => m.type === 'lastafworp' && m.ernst === 'kritiek'), 'kritieke melding op het bord');
+  assert.ok(w.bord().openVoorstellen >= 1, 'er staat een raadkamer-voorstel klaar om eerder op te heffen');
+  // laten verlopen -> dooft vanzelf
+  db.data.wacht.lastafworp.tot = Date.now() - 1;
+  assert.equal(w.lastAfworpActief(), false, 'de lastafworp dooft vanzelf na de afkoeltijd');
+});
+
+test('lastafworp: handmatig opheffen via de veilige actie-lijst', () => {
+  const db = maakDb();
+  const w = maakWacht({ db, save() {} });
+  w.zetLastafworp(true);
+  assert.equal(w.lastAfworpActief(), true);
+  w.zetLastafworp(false);
+  assert.equal(w.lastAfworpActief(), false, 'handmatig opheffen laat verkeer weer toe');
+  // via de raadkamer (accepteren van een lastafworp-voorstel) moet ook werken
+  w.zetLastafworp(true);
+  const v = w.voorstel({ soort: 'afweer', titel: 'Hef op', uitleg: 't', actie: { soort: 'lastafworp', aan: false } });
+  w.beslis(v.id, 'accepteren', '', 'eigenaar');
+  assert.equal(w.lastAfworpActief(), false, 'de raadkamer kan de lastafworp opheffen');
+});
+
+test('rand-status: weerspiegelt of verkeer via de rand binnenkomt', () => {
+  const db = maakDb();
+  const w = maakWacht({ db, save() {} });
+  // niets gezien, geen edge verwacht
+  let r = w.bord().rand;
+  assert.equal(r.status, 'onbekend');
+  // randverkeer waargenomen -> actief
+  w.randGezien({ ray: 'abc-123', provider: 'cloudflare' });
+  r = w.randStatus();
+  assert.equal(r.status, 'actief');
+  assert.equal(r.provider, 'cloudflare');
+  assert.equal(r.ray, 'abc-123');
+  assert.ok(r.ouderdomSec != null);
+});

@@ -207,8 +207,29 @@
     return el('div',{class:'zeker'}, mid, acties);
   }
 
+  // De rand-status (Cloudflare/edge): staat de eerste linie?
+  function randChip(r){
+    if (!r) return el('div',{class:'muted', style:{fontSize:'.78rem'}}, 'Rand-status onbekend.');
+    var kleur = r.status==='actief' ? '#9ED3A6' : (r.status==='stil' ? '#C23A5E' : '#C9A227');
+    var label = r.status==='actief' ? 'RAND ACTIEF' : (r.status==='stil' ? 'RAND STIL' : (r.status==='wachtend' ? 'RAND WACHT' : 'GEEN RAND'));
+    return el('div',{style:{display:'flex',alignItems:'center',gap:'.6rem',flexWrap:'wrap'}},
+      el('span',{class:'badge', style:{background:'transparent',border:'1px solid '+kleur,color:kleur}}, label),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, r.uitleg || ''),
+      r.ouderdomSec!=null ? el('span',{class:'code'}, 'laatst ' + r.ouderdomSec + 's geleden') : null);
+  }
+  // De automatische lastafworp (L7-zekering): 503 "kom zo terug".
+  function lastafworpBanner(la){
+    if (!la || !la.actief) return el('div');
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, 'Automatische lastafworp actief')),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, (la.reden||'') + ' - de server serveert tijdelijk 503 en dooft vanzelf.'));
+    var knop = eigenaar ? el('button',{class:'knop grijs klein', onclick:function(){ wachtActie('lastafworp', { aan:false }, 'Lastafworp opgeheven.'); }}, 'Nu opheffen') : null;
+    return el('div',{class:'zeker', style:{borderColor:'#C23A5E'}}, el('span',{class:'badge uit'}, '503'), mid, knop);
+  }
+
   function tekenWacht(bord){
     var m = bord.meters || {};
+    var la = bord.lastafworp || {};
     vervang($('#wachtMeters'), [
       meterKaart(m.verzoeken||0, 'verzoeken/10s'),
       meterKaart(m.bans||0, 'op de banlijst'),
@@ -216,8 +237,11 @@
       meterKaart(m.alarm||0, 'open alarmen'),
       meterKaart(m.kritiek||0, 'kritiek'),
       meterKaart(m.openVoorstellen||0, 'open voorstellen'),
+      meterKaart(la.actief ? 'AAN' : 'rustig', 'lastafworp'),
       meterKaart((m.geheugen||0)+' MB', 'geheugen')
     ]);
+    vervang($('#wachtLastafworp'), lastafworpBanner(la));
+    vervang($('#wachtRand'), randChip(bord.rand));
     tekenGrafiek(bord.grafiek || []);
     $('#wachtIsoleer').hidden = !eigenaar;
     $('#bWachtAnalyseer').hidden = !eigenaar;

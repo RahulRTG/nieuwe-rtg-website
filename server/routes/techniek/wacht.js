@@ -58,4 +58,13 @@ module.exports = (tctx) => {
     const r = wacht.opruimen();
     res.json({ ok: true, resultaat: r, bord: wacht.bord() });
   });
+
+  // De automatische lastafworp (L7-zekering) handmatig opheffen of aanzetten.
+  // De zekering trip zichzelf bij een piek en dooft vanzelf; hiermee kan de
+  // boardroom hem eerder opheffen (of, zeldzaam, bewust dichtzetten).
+  app.post('/api/techniek/wacht/lastafworp', techAuth, eigenaarAlleen, (req, res) => {
+    const aan = !!(req.body && req.body.aan);
+    const r = wacht.zetLastafworp(aan);
+    res.json(Object.assign({ ok: true }, r, { bord: wacht.bord() }));
+  });
 };

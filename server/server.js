@@ -1253,7 +1253,7 @@ const agenda = require('./kern/agenda').maakAgenda({ db, save, crypto, anthropic
 // De centrale facturatielaag (kern/facturatie.js): bij elke verkoop/dienst/verhuur
 // automatisch EGn tweezijdige factuur die beide partijen in de app zien, plus een
 // AI-factuurtool. Alle apps haken hierop in.
-const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon });
+const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering });
 // De marktplaats (kern/markt.js): één gedeelde motor voor de RTFoundation-app
 // (gezinnen kopen/verkopen) en voor leveranciers die er ook op willen verkopen.
 const markt = require('./kern/markt').maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal });

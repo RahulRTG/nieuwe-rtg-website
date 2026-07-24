@@ -36,5 +36,23 @@ module.exports = ({ rtmail }) => {
     return rtmail.systeemStuur(adres, 'Nieuwe sollicitatie', tekst, 'personeel');
   }
 
-  return { welkomLid, sollicitatieBinnen };
+  // Facturen-draaiboek: een geboekte factuur zet een seintje in het RTMAIL-
+  // postvak van beide kanten -- de verkoper (zaak) en de koper (lid op codenaam,
+  // of een andere zaak). De factuur zelf staat al in de facturen-app; RTMAIL is
+  // het seintje. Bedragen worden in hele euro's afgerond in het onderwerp.
+  function factuurGeboekt({ verkoperCode, verkoperNaam, koperCodenaam, koperZaakCode, nummer, totaal } = {}) {
+    const nr = nummer ? ('#' + String(nummer).slice(0, 40)) : 'een factuur';
+    const bedrag = (totaal != null && isFinite(totaal)) ? ' (EUR ' + Number(totaal).toFixed(2) + ')' : '';
+    const uit = [];
+    if (verkoperCode) uit.push(rtmail.systeemStuur(rtmail.normAdres(verkoperCode),
+      'Factuur geboekt ' + nr, 'Je factuur ' + nr + bedrag + ' is geboekt. Je vindt hem terug in de facturen-app.', 'factuur'));
+    // de koper: een lid (codenaam) of een andere zaak (zaakcode)
+    const koper = koperCodenaam || koperZaakCode;
+    if (koper) uit.push(rtmail.systeemStuur(rtmail.normAdres(koper),
+      'Nieuwe factuur ' + nr, 'Er is een nieuwe factuur ' + nr + bedrag + ' van ' + (verkoperNaam ? String(verkoperNaam).slice(0, 60) : 'een RTG-partner') +
+      '. Je vindt hem in de facturen-app. Betalen doe je zelf, wanneer het jou uitkomt.', 'factuur'));
+    return uit.filter(Boolean);
+  }
+
+  return { welkomLid, sollicitatieBinnen, factuurGeboekt };
 };

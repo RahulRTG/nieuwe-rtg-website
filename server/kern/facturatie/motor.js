@@ -73,6 +73,11 @@ module.exports = (ctx) => {
       if (sseToCustomer) sseToCustomer(f.koper.key, 'sync', { scope: 'facturen' });
       if (notify) notify(f.koper.key, { icon: '🧾', title: 'Nieuwe factuur', body: f.verkoper.naam + ': € ' + f.totaal.toFixed(2), scope: 'facturen' });
     }
+    // facturen-draaiboek: een RTMAIL-seintje naar beide kanten (over de rail)
+    try {
+      if (ctx.automatisering) ctx.automatisering.factuurGeboekt({ verkoperCode: f.verkoper.code, verkoperNaam: f.verkoper.naam,
+        koperCodenaam: f.koper.codenaam, koperZaakCode: f.koper.supplierCode, nummer: f.nummer, totaal: f.totaal });
+    } catch (e) {}
     return { ok: true, factuur: publiek(f) };
   }
 

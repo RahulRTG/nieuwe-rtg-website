@@ -62,3 +62,21 @@ test('personeel-draaiboek: zonder zaakcode gebeurt er niets', () => {
   const { automatisering } = maak();
   assert.equal(automatisering.sollicitatieBinnen({ zaakCode: '', functie: 'x' }), null);
 });
+
+test('facturen-draaiboek: seintje naar verkoper en koper (lid op codenaam)', () => {
+  const { rtmail, automatisering } = maak();
+  const uit = automatisering.factuurGeboekt({ verkoperCode: 'SAKURA', verkoperNaam: 'Sakura Spa', koperCodenaam: 'orchidee', nummer: '2026-0007', totaal: 121 });
+  assert.equal(uit.length, 2);
+  assert.equal(rtmail.postvak('sakura').length, 1);
+  assert.match(rtmail.postvak('sakura')[0].onderwerp, /2026-0007/);
+  const koper = rtmail.postvak('orchidee');
+  assert.equal(koper.length, 1);
+  assert.match(koper[0].tekst, /Sakura Spa/);
+  assert.match(koper[0].tekst, /121\.00/);
+});
+
+test('facturen-draaiboek: koper kan ook een andere zaak zijn', () => {
+  const { rtmail, automatisering } = maak();
+  automatisering.factuurGeboekt({ verkoperCode: 'GROOT', koperZaakCode: 'BLOEM', nummer: '9' });
+  assert.equal(rtmail.postvak('bloem').length, 1);
+});

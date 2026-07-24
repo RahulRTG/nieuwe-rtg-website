@@ -99,4 +99,7 @@ module.exports = {
   '/apps/architect-pda.html': G('De architect-PDA: het architectenbureau op zak.',
     ['Bekijk projecten en hun fase', 'Leg bevindingen op locatie vast', 'Deel met het bureau'],
     'Foto\'s op locatie zeggen meer dan een pagina notities.'),
+  '/apps/websitestudio.html': G('De Website-studio van het Atelier: bouw met de muis een eigen RTG-sjabloon uit blokken, alsof het een sjabloon is.',
+    ['Sleep blokken op hun plek: hero, koppen, tekst, beeld, kolommen, galerij', 'Klik in de tekst om te typen; kies een accentkleur en licht of donker', 'Bewaar het sjabloon, bekijk het als voorbeeld of exporteer het als losse pagina'],
+    'Het is een eigen ontwerp in het Atelier, los van de echte site: hier kun je vrij spelen zonder iets aan de website te veranderen.'),
 };

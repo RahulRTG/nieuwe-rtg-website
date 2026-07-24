@@ -16,11 +16,13 @@
 
    maakAanmeldgesprek(state) volgt het vaste kern-patroon en werkt zonder
    API-sleutel. De vaste teksten en pure herkenners staan in
-   ./aanmeldgesprek-hulp.js, het aanmeld-pad in ./aanmeldgesprek-aanmeld.js;
-   hier staan de gespreksstaat, het doel-onderscheid en het inlog-pad. */
+   ./aanmeldgesprek-hulp.js, het aanmeld-pad in ./aanmeldgesprek-aanmeld.js en
+   het inlog-pad in ./aanmeldgesprek-inlog.js; hier staan de gespreksstaat en
+   het doel-onderscheid. */
 
 const maakHulp = require('./aanmeldgesprek-hulp');
 const aanmeldStap = require('./aanmeldgesprek-aanmeld');
+const maakInlog = require('./aanmeldgesprek-inlog');
 
 const MAX_GESPREKKEN = 500;
 const MAX_BEURTEN = 60;
@@ -30,34 +32,13 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
   const { ord, UITLEG, warmteVan, toon, pikWoonplaats, pikWerkgever, pikPasInteresse, WAAROM, isWaarom } = maakHulp({ db, schoon });
   const gesprekken = new Map(); // id -> { stap, velden, warmte, beurten, at, werkgever }
   const nu = () => Date.now();
+  // het inlog-pad (login, sleutelwoorden, wachtwoord vergeten) als submodule
+  const { naarWoordInlog, inlogStap } = maakInlog({ swStart, swZeg, ord, schoon, gesprekken });
 
   function opruimen() {
     if (gesprekken.size < MAX_GESPREKKEN) return;
     for (const [id, g] of gesprekken) { if (nu() - g.at > TTL_MS) gesprekken.delete(id); }
     while (gesprekken.size >= MAX_GESPREKKEN) { gesprekken.delete(gesprekken.keys().next().value); }
-  }
-
-  /* het inlog-pad opent standaard de sleutelwoorden-uitdaging (veiliger, en
-     "inloggen is een gesprek met de AI"); wie liever het wachtwoord tikt, kan
-     dat altijd zeggen. Zonder sleutelwoorden-motor valt alles terug op het
-     wachtwoord, zodat bestaande accounts nooit vastlopen. */
-  function naarWoordInlog(g, u) {
-    g.login = { u };
-    // Standaard het wachtwoord: dat heeft iedereen. Sleutelwoorden zijn een
-    // optionele, veiligere manier die je zelf instelt; wie ze heeft, vraagt er
-    // gewoon om. Zo geen verplicht sleutelwoord-scherm voor wie er geen heeft.
-    g.stap = 'login-af';
-    const swKan = typeof swStart === 'function';
-    return { tekst: 'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.' +
-      (swKan ? ' (Heb je sleutelwoorden ingesteld? Zeg "sleutelwoorden".)' : ''), login: g.login };
-  }
-  // wie liever met zijn eigen sleutelwoorden inlogt, start de uitdaging alsnog
-  function naarSleutelwoorden(g) {
-    const r = swStart((g.login || {}).u || '');
-    if (r && r.error) { g.stap = 'login-naam'; return { tekst: r.error }; }
-    g.sw = { id: r.id };
-    g.stap = 'sw-open';
-    return { tekst: 'Goed, we doen het met je sleutelwoorden: verweef je ' + ord(r.posA) + ' en je ' + ord(r.posB) + ' sleutelwoord losjes in een zin. (Toch het wachtwoord? Zeg "wachtwoord".)' };
   }
 
   function intakeStart() {
@@ -102,59 +83,13 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
         if (mail) return naarWoordInlog(g, mail[0].toLowerCase());
         return { tekst: 'Allebei goed hoor. Zeg het maar: kom je inloggen, word je vandaag lid, of wil je eerst uitleg?' };
       }
-      case 'login-naam': {
-        if (/\bvergeten\b/i.test(tekst)) {
-          g.stap = 'vergeten-mail';
-          return { tekst: 'Geen zorgen, dat regelen we zo. Welk e-mailadres gebruik je hier? Dan zorg ik voor een herstel-link.' };
-        }
-        const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
-        const u = mail ? mail[0].toLowerCase() : schoon(tekst.replace(/^(met\s+|mijn\s+(e-?mail(adres)?|gebruikersnaam|naam)\s+is\s+|het\s+is\s+)/i, ''), 80);
-        if (!u || u.length < 2) return { tekst: 'Welk e-mailadres of welke gebruikersnaam gebruik je hier? Typ hem even voluit.' };
-        return naarWoordInlog(g, u);
-      }
-      case 'sw-open': {
-        if (/\bwachtwoord\b/i.test(tekst)) { g.stap = 'login-af'; g.sw = null; return { tekst: 'Ook goed. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.', login: g.login || null }; }
-        if (/\bopnieuw\b/i.test(tekst)) { g.stap = 'doel'; g.login = null; g.sw = null; return { tekst: 'Prima, we beginnen opnieuw. Inloggen, aanmelden, of wil je uitleg?' }; }
-        const r = swZeg((g.sw || {}).id || '', tekst);
-        if (r.error) { g.stap = 'login-naam'; g.sw = null; return { tekst: r.error + ' Met welk e-mailadres of welke gebruikersnaam ken ik je? (Of zeg "wachtwoord".)' }; }
-        g.stap = 'sw-sluit';
-        const echo = r.echo ? ' Ik hoor je "' + r.echo + '" terug.' : '';
-        return { tekst: 'Dank je.' + echo + ' Sluit nu af met je ' + ord(r.posSluit) + ' sleutelwoord.' };
-      }
-      case 'sw-sluit': {
-        if (/\bwachtwoord\b/i.test(tekst)) { g.stap = 'login-af'; g.sw = null; return { tekst: 'Ook goed. Typ je wachtwoord hieronder.', login: g.login || null }; }
-        const r = swZeg((g.sw || {}).id || '', tekst);
-        g.sw = null;
-        if (r.ok) { gesprekken.delete(id); return { inlog: { userId: r.userId }, tekst: 'Daar ben je weer. Welkom terug.' }; }
-        g.stap = 'login-naam';
-        return { tekst: (r.error || 'Dat klopte net niet helemaal.') + ' Zullen we het opnieuw proberen? Met welk e-mailadres of welke gebruikersnaam ken ik je? (Of zeg "wachtwoord".)' };
-      }
-      case 'login-af': {
-        // wachtwoord kwijt: Rahul regelt de herstel-link zelf (de app vraagt
-        // hem stil aan; of het adres bestaat, verklapt niemand)
-        if (/\bvergeten\b/i.test(tekst)) {
-          const u = g.login && /@/.test(g.login.u) ? g.login.u : null;
-          if (u) return { tekst: 'Geen zorgen. Als ik ' + u + ' ken, ligt er zo een herstel-link in je mail; volg die even en kom terug, dan ben ik hier.', vergeten: { u } };
-          g.stap = 'vergeten-mail';
-          return { tekst: 'Geen zorgen, dat regelen we zo. Welk e-mailadres gebruik je hier? Dan zorg ik voor een herstel-link.' };
-        }
-        if (/\b(opnieuw|ander (adres|account)|verkeerde?|toch (aanmelden|lid|nieuw))\b/i.test(tekst)) {
-          g.stap = 'doel'; g.login = null;
-          return { tekst: 'Geen punt, we beginnen gewoon opnieuw. Kom je inloggen, of word je lid?' };
-        }
-        // wie zelf sleutelwoorden heeft ingesteld, mag er alsnog voor kiezen
-        if (/\bsleutelwoord/i.test(tekst) && typeof swStart === 'function' && g.login) return naarSleutelwoorden(g);
-        return { tekst: 'Typ je wachtwoord gewoon hieronder, dan ben je zo binnen. Kom je er niet uit: zeg "opnieuw" of "wachtwoord vergeten".', login: g.login || null };
-      }
-      case 'vergeten-mail': {
-        const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
-        if (!mail) return { tekst: 'Typ je e-mailadres even voluit (met @), dan zorg ik voor de herstel-link.' };
-        g.stap = 'doel'; g.login = null;
-        return { tekst: 'Als ik ' + mail[0].toLowerCase() + ' ken, ligt de herstel-link nu in je mail. Volg hem even; daarna log ik je hier zo weer in.', vergeten: { u: mail[0].toLowerCase() } };
-      }
-      default:
-        // alle overige stappen zijn het aanmeld-pad (hallo t/m wachtwoord)
+      default: {
+        // de login-/sw-/vergeten-stappen lopen via het inlog-pad; geeft dat
+        // null terug, dan is het een aanmeld-stap (hallo t/m wachtwoord)
+        const inlog = inlogStap(g, tekst, id);
+        if (inlog) return inlog;
         return aanmeldStap(g, tekst, ruwTekst, id, { schoon, leeftijdVan, toon, gesprekken });
+      }
     }
   }
 

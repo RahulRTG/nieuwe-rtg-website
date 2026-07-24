@@ -156,8 +156,9 @@
         </div>
       </div>
       <div id="kasAan" hidden>
+        <img id="kQr" class="tik-qr" alt="Scan deze betaalcode aan de kassa" hidden>
         <div class="kascode" id="kCode" aria-live="polite"></div>
-        <p class="leeg" style="text-align:center;">geldig tot <span id="kTot"></span>, max <span id="kMaxToon"></span></p>
+        <p class="leeg" style="text-align:center;">Laat de kassa deze QR scannen; geldig tot <span id="kTot"></span>, max <span id="kMaxToon"></span></p>
         <p class="leeg" id="kTap" style="text-align:center;" hidden>Tap to pay staat aan: houd uw telefoon tegen de kassa.</p>
       </div>
     </div>
@@ -361,6 +362,9 @@ $('#kMaak').addEventListener('click', async () => {
     $('#kasUit').hidden = true;
     $('#kasAan').hidden = false;
     $('#kCode').textContent = r.code;
+    const kqi = $('#kQr');
+    try { if (window.RTGQRteken && kqi) { kqi.src = RTGQRteken.dataURL(r.code, { schaal: 5, quiet: 3 }); kqi.hidden = false; } else if (kqi) kqi.hidden = true; }
+    catch (e) { if (kqi) kqi.hidden = true; }
     $('#kMaxToon').textContent = euro(r.maxCenten) + ' eur';
     $('#kTot').textContent = new Date(r.geldigTot).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
     // tap to pay: het toestel staat klaar om de code contactloos af te geven

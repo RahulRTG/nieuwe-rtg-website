@@ -5560,13 +5560,27 @@
      niet of tikt er niemand, dan komt het typvenster vanzelf. */
   async function vraagPayCode(){
     if (window.TapPay && TapPay.kan()){
-      const tap = window.confirm(T('pos.tapkeuze','Tap to pay: de gast tikt zijn toestel hiertegen. Liever de code typen (bijv. als NFC niet werkt)? Kies dan Annuleren.'));
+      const tap = window.confirm(T('pos.tapkeuze','Tap to pay: de gast tikt zijn toestel hiertegen. Liever de code scannen of typen? Kies dan Annuleren.'));
       if (tap){
         toast(''+T('pos.tap','Tap to pay: laat de gast het toestel hiertegen houden...'));
         const code = await TapPay.lees(12000);
         if (code){ toast(''+T('pos.tapok','Code ontvangen via tap to pay.')); return code; }
-        toast(T('pos.tapmis','Geen tik ontvangen; typ de code van de gast.'));
+        toast(T('pos.tapmis','Geen tik ontvangen; scan of typ de code van de gast.'));
       }
+    }
+    // scan de betaal-QR op het scherm van de gast; het scanscherm biedt zelf een
+    // typveld aan als er geen camera is of de code niet leesbaar is
+    if (window.RTGScanknop){
+      return await new Promise((resolve) => {
+        let klaar = false;
+        RTGScanknop.open({
+          titel: T('pos.scanbetaal','Scan de betaalcode'),
+          hint: T('pos.scanbetaalhint','Scan de QR op het scherm van de gast.'),
+          handTekst: T('pos.oftyp','Of typ de betaalcode'),
+          onCode: (c) => { klaar = true; resolve(((c.tekst||'').trim().toUpperCase()) || null); },
+          onSluit: () => { if (!klaar) resolve(null); }
+        });
+      });
     }
     const c = window.prompt(T('pos.paycode','Betaalcode van de gast (uit de app):'));
     return c ? c.trim().toUpperCase() : null;

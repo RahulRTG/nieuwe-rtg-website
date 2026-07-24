@@ -97,6 +97,7 @@ $('#balk').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#a
 
 // ---- de RTG-startpagina ----
 async function toonStart(){
+  HUIDIGE=null;
   const h=$('#hoofd');
   h.innerHTML='<div class="start"><div class="merk">RTG · het web van het huis</div><h1>RTG Start</h1>'+
     '<p class="lead">Het besloten web van Rahul Travel Group. Bezoek de sites die leden hier hebben gebouwd, of typ een adres in de balk.</p>'+
@@ -116,35 +117,57 @@ async function toonStart(){
   }catch(e){ $('#rooster').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
-// ---- een site tonen (alleen-lezen, met dezelfde bloktaal) ----
-function tekenBlok(blok){
-  const s=document.createElement('section'); s.className='blok'; const t=blok.type;
+// ---- een site tonen (alleen-lezen). De browser kiest live de versie
+//      (telefoon/tablet/desktop) op basis van de vensterbreedte, en past
+//      per versie de eigen tekst, volgorde en zichtbaarheid toe. ----
+let HUIDIGE=null;
+function versieNu(){ const w=Math.min(window.innerWidth,1080); return w<=640?'telefoon':(w<=1000?'tablet':'desktop'); }
+function toonBlok(blok,ver){ if(ver==='desktop')return blok; const ov=blok.varianten&&blok.varianten[ver]; return ov?Object.assign({},blok,ov):blok; }
+function ordenSite(site,ver){
+  const vs=site.volgorde&&site.volgorde[ver];
+  if(ver!=='desktop'&&Array.isArray(vs)&&vs.length){
+    const byId={}; (site.blokken||[]).forEach(b=>byId[b.id]=b);
+    const uit=[]; vs.forEach(id=>{ if(byId[id]){uit.push(byId[id]);delete byId[id];} });
+    (site.blokken||[]).forEach(b=>{ if(byId[b.id])uit.push(b); });
+    return uit;
+  }
+  return (site.blokken||[]).slice();
+}
+function tekenBlok(blok,ver){
+  const T=toonBlok(blok,ver); const s=document.createElement('section'); s.className='blok'; const t=blok.type;
   const tekst=(el,v)=>{el.textContent=v||'';return el;};
-  if(t==='hero'){ s.classList.add('b-hero'); s.appendChild(tekst(document.createElement('h1'),blok.kop)); const p=document.createElement('div');p.className='sub';tekst(p,blok.sub);s.appendChild(p); if(blok.knop){const a=document.createElement('span');a.className='b-knop';tekst(a,blok.knop);s.appendChild(a);} }
-  else if(t==='kop'){ s.classList.add('b-kop'); s.appendChild(tekst(document.createElement('h2'),blok.tekst)); }
-  else if(t==='tekst'){ s.classList.add('b-tekst'); const d=document.createElement('div');tekst(d,blok.tekst);s.appendChild(d); }
-  else if(t==='knop'){ s.classList.add('b-knoprij'); const a=document.createElement('span');a.className='b-knop';tekst(a,blok.tekst);s.appendChild(a); }
-  else if(t==='beeld'){ s.classList.add('b-beeld'); const img=document.createElement('img');img.src=blok.src;img.alt=blok.bijschrift||'';s.appendChild(img); if(blok.bijschrift){const b=document.createElement('div');b.className='bij';tekst(b,blok.bijschrift);s.appendChild(b);} }
-  else if(t==='kolommen'){ s.classList.add('b-kol'); [['lk','lt'],['rk','rt']].forEach(([kk,kt])=>{const c=document.createElement('div');c.appendChild(tekst(document.createElement('h3'),blok[kk]));const p=document.createElement('div');p.className='kt';tekst(p,blok[kt]);c.appendChild(p);s.appendChild(c);}); }
+  if(t==='hero'){ s.classList.add('b-hero'); s.appendChild(tekst(document.createElement('h1'),T.kop)); const p=document.createElement('div');p.className='sub';tekst(p,T.sub);s.appendChild(p); if(T.knop){const a=document.createElement('span');a.className='b-knop';tekst(a,T.knop);s.appendChild(a);} }
+  else if(t==='kop'){ s.classList.add('b-kop'); s.appendChild(tekst(document.createElement('h2'),T.tekst)); }
+  else if(t==='tekst'){ s.classList.add('b-tekst'); const d=document.createElement('div');tekst(d,T.tekst);s.appendChild(d); }
+  else if(t==='knop'){ s.classList.add('b-knoprij'); const a=document.createElement('span');a.className='b-knop';tekst(a,T.tekst);s.appendChild(a); }
+  else if(t==='beeld'){ s.classList.add('b-beeld'); const img=document.createElement('img');img.src=blok.src;img.alt=T.bijschrift||'';s.appendChild(img); if(T.bijschrift){const b=document.createElement('div');b.className='bij';tekst(b,T.bijschrift);s.appendChild(b);} }
+  else if(t==='kolommen'){ s.classList.add('b-kol'); [['lk','lt'],['rk','rt']].forEach(([kk,kt])=>{const c=document.createElement('div');c.appendChild(tekst(document.createElement('h3'),T[kk]));const p=document.createElement('div');p.className='kt';tekst(p,T[kt]);c.appendChild(p);s.appendChild(c);}); }
   else if(t==='galerij'){ s.classList.add('b-gal'); (blok.beelden||[]).forEach(src=>{const img=document.createElement('img');img.src=src;img.alt='';s.appendChild(img);}); }
-  else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div');q.className='q';tekst(q,blok.tekst);s.appendChild(q); const br=document.createElement('div');br.className='bron';tekst(br,blok.bron);s.appendChild(br); }
+  else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div');q.className='q';tekst(q,T.tekst);s.appendChild(q); const br=document.createElement('div');br.className='bron';tekst(br,T.bron);s.appendChild(br); }
   else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px'; }
-  else if(t==='voettekst'){ s.classList.add('b-voet'); tekst(s,blok.tekst); }
-  (blok.verberg||[]).forEach(d=>s.classList.add('v-weg-'+d));
+  else if(t==='voettekst'){ s.classList.add('b-voet'); tekst(s,T.tekst); }
   return s;
 }
+function schilder(){
+  if(!HUIDIGE)return; const ver=versieNu(); const site=HUIDIGE.site;
+  const doek=document.querySelector('#hoofd .doek'); if(!doek)return;
+  if(doek.dataset.ver===ver)return;
+  doek.dataset.ver=ver; doek.textContent='';
+  ordenSite(site,ver).forEach(b=>{ if((b.verberg||[]).includes(ver))return; doek.appendChild(tekenBlok(b,ver)); });
+}
+window.addEventListener('resize',()=>{ clearTimeout(window._rt); window._rt=setTimeout(schilder,120); });
 async function toonSite(adres){
   const h=$('#hoofd'); h.innerHTML='<div class="leeg" style="padding:4rem;">Laden…</div>';
   try{
     const d=await api('open',{adres});
-    const site=d.site;
+    const site=d.site; HUIDIGE={site};
     document.title=site.titel+' · RTG Browser';
     const wrap=document.createElement('div'); wrap.className='sitewrap';
-    const doek=document.createElement('div'); doek.className='doek'; doek.dataset.thema=site.thema||'donker'; doek.style.setProperty('--acc',site.accent||'#7F1634');
-    (site.blokken||[]).forEach(b=>doek.appendChild(tekenBlok(b)));
+    const doek=document.createElement('div'); doek.className='doek'; doek.dataset.thema=site.thema||'donker'; doek.dataset.ver=''; doek.style.setProperty('--acc',site.accent||'#7F1634');
     wrap.appendChild(doek); h.textContent=''; h.appendChild(wrap);
-    window.scrollTo(0,0);
+    schilder(); window.scrollTo(0,0);
   }catch(e){
+    HUIDIGE=null;
     h.innerHTML='<div class="foutpagina"><h2>Deze RTG-site bestaat niet</h2><p>Er staat niets op <b>'+esc(adres)+'.rtg</b>. Controleer het adres of ga terug naar <a id="naarStart">RTG Start</a>.</p></div>';
     const b=$('#naarStart'); if(b) b.addEventListener('click',()=>ga('start'));
   }

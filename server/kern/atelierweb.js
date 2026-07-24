@@ -39,7 +39,37 @@ module.exports = ({ db, save, crypto, schoon }) => {
       const v = b.verberg.filter(x => VERSIES.includes(x));
       if (v.length) o.verberg = [...new Set(v)];
     }
+    // per-versie eigen tekst (telefoon/tablet): alleen de tekstvelden die dit blok kent
+    if (b.varianten && typeof b.varianten === 'object') {
+      const V = {};
+      ['telefoon', 'tablet'].forEach(ver => {
+        const src = b.varianten[ver];
+        if (src && typeof src === 'object') {
+          const ov = {};
+          Object.keys(o).forEach(k => {
+            if (['id', 'type', 'verberg', 'varianten'].includes(k)) return;
+            if (typeof o[k] === 'string' && typeof src[k] === 'string') ov[k] = T(src[k], 4000);
+          });
+          if (Object.keys(ov).length) V[ver] = ov;
+        }
+      });
+      if (Object.keys(V).length) o.varianten = V;
+    }
     return o;
+  }
+
+  function schoonVolgorde(d, blokken) {
+    if (!d.volgorde || typeof d.volgorde !== 'object') return undefined;
+    const ids = new Set(blokken.map(b => b.id));
+    const V = {};
+    ['telefoon', 'tablet'].forEach(ver => {
+      const arr = d.volgorde[ver];
+      if (!Array.isArray(arr)) return;
+      const seen = new Set(); const uit = [];
+      arr.forEach(x => { const s = scho(x, 20); if (ids.has(s) && !seen.has(s)) { seen.add(s); uit.push(s); } });
+      if (uit.length) V[ver] = uit;
+    });
+    return Object.keys(V).length ? V : undefined;
   }
 
   function bewaar(d) {
@@ -54,6 +84,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
       blokken: (Array.isArray(d.blokken) ? d.blokken : []).slice(0, 60).map(schoonBlok),
       bij: new Date().toISOString()
     };
+    const vg = schoonVolgorde(d, design.blokken); if (vg) design.volgorde = vg;
     const i = s.lijst.findIndex(x => x.id === id);
     if (i >= 0) design.gemaakt = s.lijst[i].gemaakt || design.bij, s.lijst[i] = design;
     else { design.gemaakt = design.bij; s.lijst.unshift(design); }

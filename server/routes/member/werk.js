@@ -6,7 +6,7 @@ const { eigenVeld } = require('../../kern/util'); // veilige objecttoegang (geen
 module.exports = (kern) => {
   const { app, auth, db, save, crypto, talen, trChat, chatStuur, applyChatVertaald, meldWerkgever,
     rtf, LANDEN, openVacatures, tooManyTries, noteFailedTry, findSupplier, cvReady,
-    leeftijdVan, geborenVan, notifySupplier, sseToSupplier, sseToOffice, PERSONAS } = kern;
+    leeftijdVan, geborenVan, notifySupplier, sseToSupplier, sseToOffice, PERSONAS, automatisering } = kern;
   app.post('/api/member/apply/chats', auth, (req, res) => {
     // ook gratis gebruikers chatten met de werkgever over hun sollicitatie
     const uit = Object.values(db.data.applyChats)
@@ -102,6 +102,8 @@ module.exports = (kern) => {
     db.data.applications[s.code] = list.slice(0, 100);
     save();
     notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTG', body: cv.name + ' (RTG-lid) solliciteert als ' + func + ', met cv.' });
+    // personeel-draaiboek: een seintje in het RTMAIL-postvak van de zaak (op codenaam)
+    try { if (automatisering) automatisering.sollicitatieBinnen({ zaakCode: s.code, functie: func, codename }); } catch (e) {}
     sseToSupplier(s.code, 'sync', { scope: 'team' });
     sseToOffice('sync', { scope: 'team' });
     res.json({ ok: true });

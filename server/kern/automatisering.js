@@ -22,5 +22,19 @@ module.exports = ({ rtmail }) => {
     return rtmail.systeemStuur(adres, 'Welkom bij ' + merk, tekst, 'welkom');
   }
 
-  return { welkomLid };
+  // Personeel-draaiboek: een nieuwe sollicitatie zet een seintje in het RTMAIL-
+  // postvak van de zaak. Codenaam-privacy: geen echte naam, alleen de codenaam
+  // en de functie; de kandidaat en het cv staan in de sollicitatie-lijst. Het
+  // aannemen (een baan geven) blijft de zaak zelf, langs de bestaande poort.
+  function sollicitatieBinnen({ zaakCode, functie, codename } = {}) {
+    const adres = rtmail.normAdres(zaakCode);
+    if (!adres) return null;
+    const f = functie ? (' als ' + String(functie).slice(0, 60)) : '';
+    const wie = codename ? ' (codenaam ' + String(codename).slice(0, 40) + ')' : '';
+    const tekst = 'Er is een nieuwe sollicitatie binnen' + f + wie + '. Bekijk de kandidaat en het cv ' +
+      'bij Team / sollicitaties. Aannemen of afwijzen beslist u zelf.';
+    return rtmail.systeemStuur(adres, 'Nieuwe sollicitatie', tekst, 'personeel');
+  }
+
+  return { welkomLid, sollicitatieBinnen };
 };

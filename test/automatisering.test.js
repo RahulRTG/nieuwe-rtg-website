@@ -45,3 +45,20 @@ test('zonder bruikbaar adres gebeurt er niets (geen crash)', () => {
   assert.equal(automatisering.welkomLid({ codename: '', wereld: 'RTG' }), null);
   assert.equal(automatisering.welkomLid({}), null);
 });
+
+test('personeel-draaiboek: sollicitatie zet een seintje in het postvak van de zaak', () => {
+  const { rtmail, automatisering } = maak();
+  const m = automatisering.sollicitatieBinnen({ zaakCode: 'SAKURA', functie: 'gastvrouw', codename: 'orchidee' });
+  assert.ok(m);
+  assert.equal(m.naar, 'sakura@rtmail');
+  assert.equal(m.van, 'rtg@rtmail');
+  assert.match(m.onderwerp, /sollicitatie/i);
+  assert.match(m.tekst, /gastvrouw/);
+  assert.match(m.tekst, /orchidee/); // codenaam mag, echte naam niet
+  assert.equal(rtmail.postvak('sakura').length, 1);
+});
+
+test('personeel-draaiboek: zonder zaakcode gebeurt er niets', () => {
+  const { automatisering } = maak();
+  assert.equal(automatisering.sollicitatieBinnen({ zaakCode: '', functie: 'x' }), null);
+});

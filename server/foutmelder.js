@@ -15,10 +15,24 @@
 const https = require('https');
 const http = require('http');
 const { URL } = require('url');
+const ssrf = require('./kern/ssrf');
 
 function maakFoutmelder(opts) {
   opts = opts || {};
-  const url = opts.url || process.env.ERR_WEBHOOK_URL || '';
+  // SSRF-afweer op de uitgaande webhook: het doel komt uit config, maar een
+  // fout-webhook mag nooit een intern/metadata-adres port-scannen. Standaard
+  // streng (privé + metadata geweigerd); ERR_WEBHOOK_INTERN=1 staat een bewuste
+  // interne collector toe en blokkeert dan alleen het metadata/link-local-adres.
+  const intern = opts.intern === true || String(process.env.ERR_WEBHOOK_INTERN || '') === '1';
+  const logger = opts.log && typeof opts.log.warn === 'function' ? opts.log.warn.bind(opts.log) : console.warn;
+  let url = opts.url || process.env.ERR_WEBHOOK_URL || '';
+  if (url) {
+    const keur = ssrf.veiligeWebhookUrl(url, { intern });
+    if (!keur.ok) {
+      logger('[foutmelder] ERR_WEBHOOK_URL geweigerd (' + keur.reden + '); externe bezorging uit.');
+      url = '';
+    }
+  }
   const app = opts.app || process.env.RTG_APP_NAAM || 'rtg';
   const timeout = opts.timeout || 5000;
   const venster = opts.vensterMs || 60000;        // per vingerafdruk max 1x per minuut

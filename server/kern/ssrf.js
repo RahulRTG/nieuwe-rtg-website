@@ -93,4 +93,34 @@ function veiligeExternalUrl(url) {
   return { ok: true };
 }
 
-module.exports = { pushEndpointOk, veiligeExternalUrl, onveiligIpLiteral };
+/* Het cloud-metadata-endpoint en link-local: NOOIT een legitiem uitgaand doel,
+   ook niet voor operator-ingestelde targets (webhook, SMTP-smarthost). Andere
+   interne adressen (127.*, 10.*, ...) laten we hier BEWUST met rust -- een
+   lokale collector- of mailrelay-sidecar (MailHog op localhost:1025, een intern
+   log-endpoint) is een gangbaar en legitiem doel. Dit is het harde minimum dat
+   overal geldt; de strengere veiligeExternalUrl blokkeert ook de privé-ranges. */
+function metadataDoel(host) {
+  const h = String(host || '').replace(/^\[|\]$/g, '').toLowerCase();
+  const v4 = isIpv4(h);
+  if (v4) return v4[0] === 169 && v4[1] === 254;   // 169.254.0.0/16 (IMDS + link-local)
+  if (h.startsWith('fe80:')) return true;          // IPv6 link-local
+  if (h === 'fd00:ec2::254') return true;          // AWS IPv6 IMDS
+  return false;
+}
+
+/* Mag de server naar dit operator-ingestelde webhook-doel POSTen? Standaard
+   dezelfde strenge poort als veiligeExternalUrl (privé + metadata weigeren, zo
+   kan een fout-webhook nooit een intern adres port-scannen). Zet intern=true
+   (bewuste collector-sidecar) om alleen het metadata/link-local-adres te
+   blokkeren en de rest toe te staan. */
+function veiligeWebhookUrl(url, opts) {
+  opts = opts || {};
+  if (!opts.intern) return veiligeExternalUrl(url);
+  let u;
+  try { u = new URL(String(url || '')); } catch (e) { return { ok: false, reden: 'geen geldige URL' }; }
+  if (u.protocol !== 'https:' && u.protocol !== 'http:') return { ok: false, reden: 'alleen http(s)' };
+  if (metadataDoel(u.hostname)) return { ok: false, reden: 'cloud-metadata/link-local-adres' };
+  return { ok: true };
+}
+
+module.exports = { pushEndpointOk, veiligeExternalUrl, veiligeWebhookUrl, metadataDoel, onveiligIpLiteral };

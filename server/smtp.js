@@ -21,11 +21,17 @@ const net = require('net');
 const tls = require('tls');
 const os = require('os');
 const crypto = require('crypto');
+const ssrf = require('./kern/ssrf');
 
 const CRLF = '\r\n';
 
 function createTransport(url, opts) {
   const cfg = ontleedUrl(url, opts || {});
+  // Een smarthost is operator-config, dus localhost/interne relays (MailHog,
+  // een intern mailgateway) zijn hier legitiem -- die laten we met rust. Maar
+  // het cloud-metadata/link-local-adres is nooit een echte mailserver: dat
+  // weigeren we hard (defense-in-depth tegen een verkeerd/gekaapt SMTP_URL).
+  if (ssrf.metadataDoel(cfg.host)) throw new Error('SMTP: smarthost-adres geweigerd (cloud-metadata/link-local)');
   return { sendMail(bericht) { return verstuur(cfg, bericht); } };
 }
 

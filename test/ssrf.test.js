@@ -67,3 +67,27 @@ test('veiligeExternalUrl laat een gewone publieke https-URL door', () => {
   assert.equal(ssrf.veiligeExternalUrl('https://example.com/pad').ok, true);
   assert.equal(ssrf.veiligeExternalUrl('https://api.stripe.com/v1/charges').ok, true);
 });
+
+test('metadataDoel herkent alleen cloud-metadata/link-local, niet gewoon lokaal', () => {
+  assert.equal(ssrf.metadataDoel('169.254.169.254'), true, 'IMDS');
+  assert.equal(ssrf.metadataDoel('169.254.1.1'), true, 'link-local');
+  assert.equal(ssrf.metadataDoel('fe80::1'), true, 'IPv6 link-local');
+  assert.equal(ssrf.metadataDoel('fd00:ec2::254'), true, 'AWS IPv6 IMDS');
+  // gewoon lokaal is GEEN metadata-doel (localhost-collector mag)
+  assert.equal(ssrf.metadataDoel('127.0.0.1'), false);
+  assert.equal(ssrf.metadataDoel('10.0.0.1'), false);
+  assert.equal(ssrf.metadataDoel('localhost'), false);
+  assert.equal(ssrf.metadataDoel('8.8.8.8'), false);
+});
+
+test('veiligeWebhookUrl is standaard streng maar met intern:true alleen metadata-blok', () => {
+  // standaard: net als veiligeExternalUrl (privé + metadata weg)
+  assert.equal(ssrf.veiligeWebhookUrl('http://10.0.0.5/hook').ok, false);
+  assert.equal(ssrf.veiligeWebhookUrl('http://169.254.169.254/x').ok, false);
+  assert.equal(ssrf.veiligeWebhookUrl('https://hooks.slack.com/services/x').ok, true);
+  // intern:true (bewuste collector-sidecar): lokaal mag, metadata NOOIT
+  assert.equal(ssrf.veiligeWebhookUrl('http://127.0.0.1:9000/collect', { intern: true }).ok, true);
+  assert.equal(ssrf.veiligeWebhookUrl('http://10.0.0.5/hook', { intern: true }).ok, true);
+  assert.equal(ssrf.veiligeWebhookUrl('http://169.254.169.254/x', { intern: true }).ok, false, 'metadata blijft geblokkeerd');
+  assert.equal(ssrf.veiligeWebhookUrl('ftp://x/y', { intern: true }).ok, false, 'alleen http(s)');
+});

@@ -103,6 +103,14 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
         b.set("klopt", Json::Bool(klopt));
         return Response { status: if klopt { 200 } else { 500 }, body: b.dump() };
     }
+    if req.path == "/api/motor/saldi" {
+        // alleen achter de debug-vlag: het is de hele geldstand
+        if std::env::var("RTG_MOTOR_DEBUG").as_deref() != Ok("1") {
+            return fout(404, "Onbekende route.");
+        }
+        let s = state.read().unwrap();
+        return Response { status: 200, body: s.saldi_json().dump() };
+    }
     if req.path == "/api/ready" || req.path == "/api/motor/status" {
         let s = state.read().unwrap();
         let (klopt, som) = s.gezond();

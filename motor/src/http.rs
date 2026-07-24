@@ -13,6 +13,18 @@ pub struct Request {
     pub body: String,
 }
 
+// Harde grenzen tegen geheugen-DoS: een kwaadwillende client mag ons niet laten
+// alloceren op basis van wat hij zegt te sturen.
+const MAX_BODY: usize = 256 * 1024;   // 256 KB body is ruim voor elke pay-call
+const MAX_LIJN: usize = 8 * 1024;      // start-lijn / header-lijn
+const MAX_HEADERS: usize = 100;
+
+enum Lees {
+    Klaar(Request),
+    Dicht,
+    TeGroot,
+}
+
 pub struct Response {
     pub status: u16,
     pub body: String,
@@ -85,9 +97,19 @@ where
 
     loop {
         let req = match lees_verzoek(&mut reader) {
-            Ok(Some(r)) => r,
-            Ok(None) => break,  // verbinding netjes dicht
-            Err(_) => break,    // timeout of leesfout: sluit af, thread vrij
+            Ok(Lees::Klaar(r)) => r,
+            Ok(Lees::Dicht) => break, // verbinding netjes dicht
+            Ok(Lees::TeGroot) => {
+                // te grote body/regel: 413 en verbinding sluiten
+                let body = "{\"error\":\"Verzoek te groot.\"}";
+                let tekst = format!(
+                    "HTTP/1.1 413 Payload Too Large\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                    body.len(), body
+                );
+                let _ = writer.write_all(tekst.as_bytes());
+                break;
+            }
+            Err(_) => break, // timeout of leesfout: sluit af, thread vrij
         };
         let resp = handler(&req);
         let tekst = format!(
@@ -103,35 +125,68 @@ where
     Ok(())
 }
 
-fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Option<Request>> {
-    let mut startlijn = String::new();
-    let n = reader.read_line(&mut startlijn)?;
-    if n == 0 {
-        return Ok(None); // EOF
+/* Lees een enkele regel met een harde bovengrens; een oneindige regel mag ons
+   niet laten groeien. Geeft None bij EOF, TeGroot bij overschrijding. */
+fn lees_lijn_begrensd<R: BufRead>(reader: &mut R, max: usize) -> std::io::Result<Option<Result<String, ()>>> {
+    let mut buf = Vec::new();
+    loop {
+        let mut byte = [0u8; 1];
+        let n = reader.read(&mut byte)?;
+        if n == 0 {
+            if buf.is_empty() { return Ok(None); } // EOF
+            break;
+        }
+        if byte[0] == b'\n' {
+            break;
+        }
+        if byte[0] != b'\r' {
+            buf.push(byte[0]);
+        }
+        if buf.len() > max {
+            return Ok(Some(Err(())));
+        }
     }
+    Ok(Some(Ok(String::from_utf8_lossy(&buf).into_owned())))
+}
+
+fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Lees> {
+    let startlijn = match lees_lijn_begrensd(reader, MAX_LIJN)? {
+        None => return Ok(Lees::Dicht),
+        Some(Err(())) => return Ok(Lees::TeGroot),
+        Some(Ok(s)) => s,
+    };
     let mut delen = startlijn.split_whitespace();
     let method = delen.next().unwrap_or("").to_string();
     let path = delen.next().unwrap_or("/").to_string();
     if method.is_empty() {
-        return Ok(None);
+        return Ok(Lees::Dicht);
     }
 
     let mut content_length = 0usize;
+    let mut header_teller = 0usize;
     loop {
-        let mut lijn = String::new();
-        let m = reader.read_line(&mut lijn)?;
-        if m == 0 {
-            break;
-        }
-        let trimmed = lijn.trim_end();
-        if trimmed.is_empty() {
+        let lijn = match lees_lijn_begrensd(reader, MAX_LIJN)? {
+            None => break,
+            Some(Err(())) => return Ok(Lees::TeGroot),
+            Some(Ok(s)) => s,
+        };
+        if lijn.is_empty() {
             break; // einde headers
         }
-        if let Some(v) = trimmed.split_once(':') {
+        header_teller += 1;
+        if header_teller > MAX_HEADERS {
+            return Ok(Lees::TeGroot);
+        }
+        if let Some(v) = lijn.split_once(':') {
             if v.0.eq_ignore_ascii_case("content-length") {
                 content_length = v.1.trim().parse().unwrap_or(0);
             }
         }
+    }
+
+    // body-cap VOOR de allocatie: nooit alloceren op wat de client beweert
+    if content_length > MAX_BODY {
+        return Ok(Lees::TeGroot);
     }
 
     let mut body = String::new();
@@ -141,5 +196,5 @@ fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Option<Request>> 
         body = String::from_utf8_lossy(&buf).into_owned();
     }
 
-    Ok(Some(Request { method, path, body }))
+    Ok(Lees::Klaar(Request { method, path, body }))
 }

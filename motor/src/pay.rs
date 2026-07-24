@@ -31,6 +31,20 @@ fn err(status: u16, msg: &str) -> Resp {
 struct Kascode { code: String, codenaam: String, max_centen: i64, geldig_tot: u64, gebruikt: bool }
 struct Tikcode { code: String, codenaam: String, geldig_tot: u64 }
 
+/* Constant-time vergelijk voor betaalcodes: geen vroeg-stoppen per teken, zodat
+   de tijd niet verraadt hoeveel tekens al klopten (timing-lek op geldcodes). */
+fn ct_eq(a: &str, b: &str) -> bool {
+    let (a, b) = (a.as_bytes(), b.as_bytes());
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut diff = 0u8;
+    for i in 0..a.len() {
+        diff |= a[i] ^ b[i];
+    }
+    diff == 0
+}
+
 pub struct State {
     pub grb: Ledger,
     leden: HashSet<String>,
@@ -195,7 +209,7 @@ impl State {
     pub fn tik_betaal(&mut self, van: &str, code: &str, centen: Option<i64>, oms: Option<&str>, idem: Option<&str>) -> Resp {
         let nu = rng::nu_ms();
         let code = code.to_uppercase();
-        let doel = self.tikcodes.iter().find(|k| k.code == code && k.geldig_tot >= nu).map(|k| k.codenaam.clone());
+        let doel = self.tikcodes.iter().find(|k| ct_eq(&k.code, &code) && k.geldig_tot >= nu).map(|k| k.codenaam.clone());
         let doel = match doel {
             Some(d) => d,
             None => return err(404, "Deze tik is niet (meer) geldig; laat je vriend opnieuw op ontvangen zetten."),
@@ -233,7 +247,7 @@ impl State {
     pub fn kas_int(&mut self, supplier: &str, code: &str, centen: Option<i64>, oms: Option<&str>, idem: Option<&str>) -> Resp {
         let nu = rng::nu_ms();
         let code = code.to_uppercase();
-        let vondst = self.kascodes.iter().position(|k| k.code == code);
+        let vondst = self.kascodes.iter().position(|k| ct_eq(&k.code, &code));
         let pos = match vondst {
             Some(p) if !self.kascodes[p].gebruikt && self.kascodes[p].geldig_tot >= nu => p,
             _ => return err(404, "Deze betaalcode is niet (meer) geldig."),
@@ -353,6 +367,18 @@ impl State {
     pub fn gezond(&self) -> (bool, i64) {
         let (klopt, som, _rood) = self.grb.sluitcontrole();
         (klopt, som)
+    }
+
+    // Volledige saldi-dump — alleen voor het pariteitsharnas (achter een vlag);
+    // in productie nooit blootstellen (het is de hele geldstand).
+    pub fn saldi_json(&self) -> Json {
+        let mut o = Json::obj();
+        if let Json::Obj(m) = &mut o {
+            for (k, v) in &self.grb.saldi {
+                m.insert(k.clone(), Json::Num(*v as f64));
+            }
+        }
+        o
     }
 
     // ---------- snapshot voor durability (write-behind naar schijf) ----------
@@ -490,6 +516,15 @@ mod tests {
         let r2 = s.kas_int("PART1", &code_str, i(12000), Some("Diner"), Some("k2"));
         assert_eq!(r2.status, 404);
         assert!(s.gezond().0);
+    }
+
+    #[test]
+    fn constant_time_vergelijk() {
+        assert!(ct_eq("A1B2C3", "A1B2C3"));
+        assert!(!ct_eq("A1B2C3", "A1B2C4"));
+        assert!(!ct_eq("A1B2C3", "A1B2C"));  // verschillende lengte
+        assert!(!ct_eq("", "x"));
+        assert!(ct_eq("", ""));
     }
 
     #[test]

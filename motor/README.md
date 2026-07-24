@@ -28,6 +28,11 @@ smaak maar een eis.
   Idempotentie en saldi overleven zo een herstart.
 - **Thread-per-verbinding** met een verbindingsplafond — verwerkt keep-alive
   zonder pool-verhongering; boven het plafond volgt nette backpressure (503).
+- **Gehard tegen DoS**: body-cap (256 KB) VOOR de allocatie, begrensde
+  regel/header-lengte — een liegende `Content-Length` van 10 GB krijgt 413 en
+  laat de motor niet groeien (blijft ~2,5 MB).
+- **Constant-time vergelijk** op betaalcodes (kascode/tikcode): geen timing-lek
+  dat verraadt hoeveel tekens al klopten.
 
 ## Bouwen, testen, draaien
 
@@ -60,8 +65,13 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
 ## Status & vervolg (strangler)
 
 - [x] **Money-engine** — grootboek, idempotentie (herstart-vast), autolaad,
-  tik, kassacode, partnerkant. 11 tests groen; live idempotent bewezen.
-- [ ] Achter de Node-poort schuiven (proxy `/api/pay/*` → motor) en De
-  Beproeving eroverheen draaien voor pariteit + snelheidswinst zwart-op-wit.
+  tik, kassacode, partnerkant. 12 tests groen; live idempotent bewezen.
+- [x] **Pariteit bewezen** — `scripts/motor-pariteit.js` jaagt dezelfde reeks
+  door de Node-JS-engine en de motor; de saldi zijn IDENTIEK, beide sluiten. De
+  motor is een geverifieerde 1-op-1 vervanger van het grootboek.
+- [x] **Gehard** — DoS-body-cap + constant-time betaalcodes.
+- [ ] Achter de Node-poort schuiven (`/api/pay/*` → motor). Let op: een
+  HTTP-hop kost seriële latentie; de winst is veiligheid + gedrag onder
+  gelijktijdige last, niet de enkele-call-latentie. Afweging, geen no-brainer.
 - [ ] **Ledengids** — 100M leden, out-of-RAM venster, zoek.
 - [ ] **Kluis-crypto** — codenamen ↔ echte namen in de gescheiden kluis.

@@ -81,6 +81,12 @@ module.exports = ({ db, save, crypto, schoon }) => {
       titel: scho(d.titel, 80) || 'Naamloos sjabloon',
       thema: ['licht', 'donker'].includes(d.thema) ? d.thema : 'donker',
       accent: /^#[0-9a-fA-F]{6}$/.test(String(d.accent || '')) ? d.accent : '#7F1634',
+      kleuren: (() => {
+        const k = d.kleuren; if (!k || typeof k !== 'object') return null;
+        const hex = v => /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(String(v || '')) ? String(v) : null;
+        const uit = {}; ['bg', 'txt', 'card'].forEach(n => { const c = hex(k[n]); if (c) uit[n] = c; });
+        return Object.keys(uit).length ? uit : null;
+      })(),
       blokken: (Array.isArray(d.blokken) ? d.blokken : []).slice(0, 60).map(schoonBlok),
       bij: new Date().toISOString()
     };

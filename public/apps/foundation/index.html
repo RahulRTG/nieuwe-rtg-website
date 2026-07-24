@@ -115,6 +115,7 @@
   #rtfOnbFout{color:var(--rood,#E06A80);font-size:.8rem;min-height:1rem;margin:.3rem 0;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/vensters.css" rel="stylesheet">
 </head>
 <body>
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -673,7 +674,21 @@ function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;',
 window.addEventListener('hashchange', start);
 start();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+/* Op de desktop openen de tegels als vensters (net als in het RTG-OS): meerdere
+   apps naast elkaar, verplaatsbaar en schaalbaar. Op de telefoon navigeert een
+   tegel gewoon zoals altijd. */
+document.addEventListener('click', function(e){
+  if(!window.RTGVensters || !RTGVensters.actief()) return;
+  var a = e.target.closest ? e.target.closest('a.tile') : null;
+  if(!a) return;
+  var href = a.getAttribute('href'); if(!href || href.charAt(0) === '#') return;
+  e.preventDefault();
+  var h2 = a.querySelector('h2'); var titel = (h2 ? h2.textContent : a.textContent || 'App').trim();
+  RTGVensters.open(href, titel);
+}, false);
 </script>
+<script src="/shared/vensters.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

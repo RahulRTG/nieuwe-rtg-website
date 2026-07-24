@@ -414,6 +414,29 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
             .set("leden", Json::Num(s.ledental() as f64));
         return Response { status: 200, body: b.dump() };
     }
+    // Bank-grootboek (cutover stap 3): eigen som + vingerafdruk voor de drift-detector.
+    if req.path == "/api/bank/status" {
+        let s = state.read().unwrap();
+        let (klopt, som) = s.bank_gezond();
+        let mut b = Json::obj();
+        b.set("ok", Json::Bool(true))
+            .set("klopt", Json::Bool(klopt))
+            .set("som", Json::Num(som as f64))
+            .set("vingerafdruk", Json::Str(s.bank_vingerafdruk()));
+        return Response { status: 200, body: b.dump() };
+    }
+    // Volledige bank-saldi voor de herstart-reconcile (achter dezelfde vlag als /api/motor/saldi).
+    if req.path == "/api/bank/saldi" {
+        let toe = std::env::var("RTG_MOTOR_DEBUG").as_deref() == Ok("1")
+            || std::env::var("RTG_MOTOR_SALDI").as_deref() == Ok("1");
+        if !toe { return fout(404, "Onbekende route."); }
+        let s = state.read().unwrap();
+        let mut o = Json::obj();
+        if let Json::Obj(m) = &mut o {
+            for (k, v) in &s.bank.saldi { m.insert(k.clone(), Json::Num(*v as f64)); }
+        }
+        return Response { status: 200, body: o.dump() };
+    }
 
     if req.method != "POST" {
         return fout(404, "Onbekende route.");
@@ -467,6 +490,8 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
         "/api/pay/kascode" => json_resp(s.kas_code(codenaam, body.i64_at("maxCenten"))),
         "/api/supplier/pay/in" => json_resp(s.kas_int(supplier, body.str_at("code").unwrap_or(""), body.i64_at("centen"), body.str_at("oms"), idem)),
         "/api/supplier/pay/uitbetaal" => json_resp(s.partner_uitbetaal(supplier, idem)),
+        // Bank-grootboek (cutover stap 3): rauwe boeking — de rijke bodem/bevroren-guard blijft in JS.
+        "/api/bank/boek" => json_resp(s.bank_boek(body.str_at("van").unwrap_or(""), body.str_at("naar").unwrap_or(""), body.i64_at("centen").unwrap_or(0), body.str_at("soort").unwrap_or("boeking"), body.str_at("oms").unwrap_or(""), body.str_at("ref").map(|x| x.to_string()))),
         _ => fout(404, "Onbekende route."),
     }
 }

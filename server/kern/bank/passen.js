@@ -5,7 +5,7 @@
    pasnummer en de CVC bewaren we NOOIT -- alleen een gemaskeerd nummer en de laatste
    vier cijfers. Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, d, boek, rekMeta, saldoVan, seintje } = ctx;
+  const { db, save, crypto, nu, d, boekAsync, rekMeta, saldoVan, seintje } = ctx;
 
   const DAG_MS = 86400000;
   const SOORTEN = { debit: 'Betaalpas', credit: 'Creditcard' };
@@ -71,7 +71,7 @@ module.exports = (ctx) => {
   /* Betalen met de pas: bevroren kan niet, de daglimiet wordt bewaakt, en de
      boeking gaat van de gekoppelde rekening naar extern:kaartbetaling (de bodem
      van de rekening -- inclusief rood staan -- geldt gewoon). */
-  function betaal({ id, centen, oms, codenaam }) {
+  async function betaal({ id, centen, oms, codenaam }) {
     const p = passen()[id];
     if (!eigen(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
     if (p.bevroren) return { status: 423, error: 'Deze pas is bevroren.' };
@@ -80,7 +80,7 @@ module.exports = (ctx) => {
     const vandaag = Math.floor(nu() / DAG_MS);
     if (p.besteedDag !== vandaag) { p.besteedDag = vandaag; p.besteed = 0; }
     if (p.dagLimietCenten > 0 && p.besteed + c > p.dagLimietCenten) return { status: 429, error: 'De daglimiet van deze pas is bereikt.' };
-    const b = boek({ van: p.iban, naar: 'extern:kaartbetaling', centen: c, soort: 'pasbetaling', oms: oms || ('Pasbetaling ' + p.laatste4) });
+    const b = await boekAsync({ van: p.iban, naar: 'extern:kaartbetaling', centen: c, soort: 'pasbetaling', oms: oms || ('Pasbetaling ' + p.laatste4) });
     if (b.error) return b;
     p.besteed += c;
     save();

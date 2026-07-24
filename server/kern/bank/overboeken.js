@@ -5,7 +5,7 @@
    betaal-naad. Idempotent op de clearende paden: dubbeltikken kan nooit dubbel
    afschrijven of dubbel storten. Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, d, boek, rekMeta, saldoVan, betaal, pay, bankregie, seintje } = ctx;
+  const { db, save, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje } = ctx;
 
   const eigenaar = (iban, codenaam) => { const m = rekMeta(iban); return m && (!codenaam || m.codenaam === String(codenaam).trim()); };
 
@@ -44,7 +44,7 @@ module.exports = (ctx) => {
         ref = betaling.id;
       }
       const van = via === 'eigen' ? 'extern:emissie' : 'extern:kaart';
-      const b = boek({ van, naar: iban, centen: c, soort: 'storting', oms: oms || 'Storting', ref });
+      const b = await boekAsync({ van, naar: iban, centen: c, soort: 'storting', oms: oms || 'Storting', ref });
       if (b.error) { if (via === 'eigen') bankregie.bankClearingMislukt('emissie-boek'); return b; }
       if (via === 'eigen') bankregie.bankClearingGelukt(); // een geslaagde eigen-clearing wist de mislukt-teller
       seintje(rekMeta(iban).codenaam);
@@ -53,10 +53,10 @@ module.exports = (ctx) => {
   }
 
   // interne overboeking tussen twee rekeningen (direct, geen kosten)
-  function overboek({ vanIban, naarIban, centen, oms, codenaam }) {
+  async function overboek({ vanIban, naarIban, centen, oms, codenaam }) {
     if (!eigenaar(vanIban, codenaam)) return { status: 404, error: 'De bronrekening bestaat niet.' };
     if (!rekMeta(naarIban)) return { status: 404, error: 'De tegenrekening bestaat niet.' };
-    const b = boek({ van: vanIban, naar: naarIban, centen: Math.round(Number(centen)), soort: 'overboeking', oms: oms || 'Overboeking' });
+    const b = await boekAsync({ van: vanIban, naar: naarIban, centen: Math.round(Number(centen)), soort: 'overboeking', oms: oms || 'Overboeking' });
     if (b.error) return b;
     seintje(rekMeta(vanIban).codenaam);
     seintje(rekMeta(naarIban).codenaam);
@@ -76,7 +76,7 @@ module.exports = (ctx) => {
     // de motor); de bank-kant is het eigen bank-grootboek. Elk sluit apart.
     const uit = await pay.boekAsync({ van: 'lid:' + c, naar: 'extern:bank', centen: bedrag, soort: 'naar-bank', oms: 'Naar RTG Bank' });
     if (uit.error) return uit;
-    const in_ = boek({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'van-wallet', oms: 'Van RTG Pay' });
+    const in_ = await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'van-wallet', oms: 'Van RTG Pay' });
     if (in_.error) { await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
     seintje(c);
     return { ok: true, saldoCenten: saldoVan(iban) };
@@ -87,10 +87,10 @@ module.exports = (ctx) => {
     if (!m || m.codenaam !== c) return { status: 404, error: 'De rekening bestaat niet.' };
     const bedrag = Math.round(Number(centen));
     if (!Number.isFinite(bedrag) || bedrag < 1 || bedrag > pay.MAX_CENTEN) return { status: 400, error: 'Kies een bedrag tot ' + (pay.MAX_CENTEN / 100) + ' euro per keer.' };
-    const uit = boek({ van: iban, naar: 'extern:pay', centen: bedrag, soort: 'naar-wallet', oms: 'Naar RTG Pay' });
+    const uit = await boekAsync({ van: iban, naar: 'extern:pay', centen: bedrag, soort: 'naar-wallet', oms: 'Naar RTG Pay' });
     if (uit.error) return uit;
     const in_ = await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'van-bank', oms: 'Van RTG Bank' });
-    if (in_.error) { boek({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
+    if (in_.error) { await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
     seintje(c);
     return { ok: true, saldoCenten: saldoVan(iban) };
   }
@@ -121,9 +121,9 @@ module.exports = (ctx) => {
     if (!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(dest)) return { status: 400, error: 'Vul een geldig IBAN in.' };
     const fooi = bankregie.bankTarief('sepaUitCenten');
     return metIdem(idem ? 'sepa:' + iban + ':' + idem : null, async () => {
-      const b = boek({ van: iban, naar: 'extern:sepa', centen: c, soort: 'sepa-uit', oms: oms || ('SEPA naar ' + dest), ref: dest });
+      const b = await boekAsync({ van: iban, naar: 'extern:sepa', centen: c, soort: 'sepa-uit', oms: oms || ('SEPA naar ' + dest), ref: dest });
       if (b.error) return b;
-      if (fooi > 0) boek({ van: iban, naar: 'rtg:reserve', centen: fooi, soort: 'tarief', oms: 'SEPA-tarief' });
+      if (fooi > 0) await boekAsync({ van: iban, naar: 'rtg:reserve', centen: fooi, soort: 'tarief', oms: 'SEPA-tarief' });
       try { await betaal.maakUitbetaling({ bedrag: c, iban: dest, begunstigde: begunstigde || '', referentie: b.boeking.id, idempotentieSleutel: idem ? 'bank-sepa:' + iban + ':' + idem : undefined, omschrijving: oms || 'RTG Bank SEPA' }); }
       catch (e) { /* eventueel-consistent: de payout kan later opnieuw; de boeking staat al */ }
       seintje(rekMeta(iban).codenaam);

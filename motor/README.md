@@ -111,8 +111,34 @@ de demo-naad (altijd meteen betaald), net als de Node-standaard zonder sleutel.
     `/api/motor/saldi` achter `RTG_MOTOR_SALDI=1`), zodat de spiegel altijd in
     lockstep start -- ook na een crash of nadat de motor los is bijgewerkt.
   - **Flip-klaar:** zet `RTG_MOTOR_GELD=motor` + `RTG_MOTOR_GELD_URL` en (op de
-    motor) `RTG_MOTOR_SALDI=1`. Aparte, latere stap blijft: het BANK-grootboek
-    zelf naar de motor brengen (nu nog een eigen JS-grootboek).
+    motor) `RTG_MOTOR_SALDI=1`.
+- [x] **Bank-grootboek in de motor (cutover stap 3, gated, standaard uit).** De
+  motor houdt nu een TWEEDE, aparte `Ledger` voor de RTG Bank (`bank`), naast het
+  pay-grootboek; ze delen de boekhoud-tucht (som=0, dezelfde FNV-1a-vingerafdruk-
+  code) maar sluiten onafhankelijk. Dezelfde vlag `RTG_MOTOR_GELD=motor` stuurt
+  beide. Ontwerp-verschil met pay: de bank-guard is **metadata-afhankelijk**
+  (rekening bestaat, bevroren, rood-staan-bodem per rekening-soort), en die
+  metadata woont in JS. Daarom:
+  - De motor doet voor de bank een **RAUWE apply** (`/api/bank/boek`) -- hij is de
+    autoritatieve saldi-store, maar neemt de accept/reject-beslissing niet.
+  - De **JS-guard** draait vóór de motor-call (in `kern/bank/index.js::boekAsync`),
+    plus een **serialisatie-slot** (belofte-keten) om alle bank-schrijfacties heen:
+    dat sluit een TOCTOU-race waarin twee gelijktijdige overboekingen dezelfde
+    verouderde bodem-check passeren en samen door de bodem zakken.
+  - `bank.boek` (synchroon) weigert in motor-modus luid (fail-closed); alle 14
+    interne boek-callers (storten, overboeken, brug, SEPA, passen, krediet, sparen,
+    incasso, zakelijke bulk/salaris) lopen door `boekAsync`. De motor-`bank_gezond`
+    bewaakt enkel de conservatie (som=0), niet wie rood staat -- want in de bank MAG
+    een betaalrekening rood tot haar limiet (die policy blijft in JS).
+  - **Herstart-reconcile** voor de bank net als voor pay (`/api/bank/saldi` achter
+    `RTG_MOTOR_SALDI=1`).
+  - **Bewezen** door `node scripts/motor-cutover.js` (bank-scenario): lockstep +
+    conservatie op het bank-grootboek, JS-guard weigert onder de bodem zonder de
+    spiegel te raken, een betaalrekening mag rood binnen haar limiet, het
+    serialisatie-slot laat van twee gelijktijdige boekingen er precies één slagen
+    (geen bodem-doorbraak), en de bank-herstart-reconcile herstelt een verse spiegel
+    byte-voor-byte. De 19 bank-tests blijven in de standaard schaduw-modus groen
+    (byte-identiek gedrag).
 - [x] **Ledengids** (out-of-heap) — leden in een gesorteerd bestand met vaste
   recordgrootte; zoeken met binair zoeken, dus **process-heap = O(1)** ongeacht
   het aantal. Standaard leest de gids via **mmap(2)** (read-only, rauwe POSIX-FFI,

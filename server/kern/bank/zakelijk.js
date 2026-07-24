@@ -10,11 +10,11 @@
 const { LANDEN } = require('../fiscaal');
 
 module.exports = (ctx) => {
-  const { schoon, d, boek, rekMeta, saldoVan, bodem, rekeningen, accounts } = ctx;
+  const { schoon, d, boekAsync, rekMeta, saldoVan, bodem, rekeningen, accounts } = ctx;
 
   const MAX_POSTEN = 5000;
 
-  function batch({ vanIban, posten, codenaam, oms, soort }) {
+  async function batch({ vanIban, posten, codenaam, oms, soort }) {
     const m = rekMeta(vanIban);
     if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De bronrekening bestaat niet.' };
     if (m.bevroren) return { status: 423, error: 'Deze rekening is bevroren.' };
@@ -36,7 +36,7 @@ module.exports = (ctx) => {
     // en dan pas boeken (de voorcontrole maakt dat dit niet half blijft steken)
     let geboekt = 0;
     for (const p of schoonPosten) {
-      const b = boek({ van: vanIban, naar: p.naar, centen: p.centen, soort: soort || 'bulk', oms: p.oms });
+      const b = await boekAsync({ van: vanIban, naar: p.naar, centen: p.centen, soort: soort || 'bulk', oms: p.oms });
       if (b.ok) geboekt++;
     }
     return { ok: true, geboekt, aantal: schoonPosten.length, totaalCenten: totaal, saldoCenten: saldoVan(vanIban) };

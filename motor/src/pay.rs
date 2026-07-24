@@ -28,6 +28,30 @@ fn err(status: u16, msg: &str) -> Resp {
     Resp { status, body: b }
 }
 
+/* Vingerafdruk over een saldi-map: FNV-1a (64-bit) over de niet-nul rekeningen,
+   gesorteerd op de rauwe bytes van de sleutel. BYTE-VOOR-BYTE gelijk aan
+   server/kern/pay/vingerafdruk.js -- gedeeld door zowel het pay- als het
+   bank-grootboek, zodat de drift-detector beide kan vergelijken. */
+fn vingerafdruk_van(saldi: &HashMap<String, i64>) -> String {
+    let mut paren: Vec<(&String, i64)> =
+        saldi.iter().filter(|(_, &v)| v != 0).map(|(k, &v)| (k, v)).collect();
+    paren.sort_by(|a, b| a.0.as_bytes().cmp(b.0.as_bytes()));
+    let mut h: u64 = 0xcbf29ce484222325; // FNV-offset-basis
+    let mut eet = |bytes: &[u8]| {
+        for &byte in bytes {
+            h ^= byte as u64;
+            h = h.wrapping_mul(0x100000001b3); // FNV-prime
+        }
+    };
+    for (k, v) in paren {
+        eet(k.as_bytes());
+        eet(&[0x1f]);
+        eet(v.to_string().as_bytes());
+        eet(&[0x0a]);
+    }
+    format!("{:016x}", h)
+}
+
 struct Kascode { code: String, codenaam: String, max_centen: i64, geldig_tot: u64, gebruikt: bool }
 struct Tikcode { code: String, codenaam: String, geldig_tot: u64 }
 
@@ -47,6 +71,7 @@ fn ct_eq(a: &str, b: &str) -> bool {
 
 pub struct State {
     pub grb: Ledger,
+    pub bank: Ledger, // tweede grootboek (RTG Bank), cutover stap 3
     leden: HashSet<String>,
     idem: HashMap<String, Json>,
     idem_volgorde: Vec<String>,
@@ -60,6 +85,7 @@ impl State {
     pub fn new() -> State {
         State {
             grb: Ledger::new(),
+            bank: Ledger::new(),
             leden: HashSet::new(),
             idem: HashMap::new(),
             idem_volgorde: Vec::new(),
@@ -376,25 +402,32 @@ impl State {
        bytes van de sleutel, elk als `sleutel 0x1f <decimaal saldo> 0x0a`. De
        JS-kant (server/kern/pay/vingerafdruk.js) berekent dit BYTE-VOOR-BYTE
        hetzelfde, zodat de schaduw-drift-detector ze kan vergelijken. */
-    pub fn vingerafdruk(&self) -> String {
-        let mut paren: Vec<(&String, i64)> =
-            self.grb.saldi.iter().filter(|(_, &v)| v != 0).map(|(k, &v)| (k, v)).collect();
-        paren.sort_by(|a, b| a.0.as_bytes().cmp(b.0.as_bytes()));
-        let mut h: u64 = 0xcbf29ce484222325; // FNV-offset-basis
-        let mut eet = |bytes: &[u8]| {
-            for &byte in bytes {
-                h ^= byte as u64;
-                h = h.wrapping_mul(0x100000001b3); // FNV-prime
-            }
-        };
-        for (k, v) in paren {
-            eet(k.as_bytes());
-            eet(&[0x1f]);
-            eet(v.to_string().as_bytes());
-            eet(&[0x0a]);
+    pub fn vingerafdruk(&self) -> String { vingerafdruk_van(&self.grb.saldi) }
+
+    // ---------- bank-grootboek (cutover stap 3): tweede, aparte Ledger ----------
+    /* Raw toepassen op het BANK-grootboek (motor-autoriteit voor de saldi). De
+       rijke bank-guard (rekening bestaat, bevroren, rood-staan-bodem) leeft in de
+       JS-engine waar de rekening-metadata staat; hier houden we de saldi als enige
+       bron van waarheid, net als spiegel_boek voor pay. */
+    pub fn bank_boek(&mut self, van: &str, naar: &str, centen: i64, soort: &str, oms: &str, ref_: Option<String>) -> Resp {
+        if centen <= 0 || van.is_empty() || naar.is_empty() || van == naar {
+            return err(400, "Ongeldige bankboeking.");
         }
-        format!("{:016x}", h)
+        let b = self.bank.apply_raw(BoekArgs { van, naar, centen, soort, oms, ref_ });
+        self.markeer();
+        let mut out = Json::obj();
+        out.set("boeking", b.to_json());
+        ok(out)
     }
+    /* Bank-gezondheid = alleen de conservatie (som == 0). Anders dan pay MAG een
+       betaalrekening in de bank rood staan (tot de bodem); die bodem-policy leeft
+       in de JS-engine. De motor bewaakt hier dus enkel dat er geen geld ontstaat
+       of verdwijnt, niet wie er rood staat. */
+    pub fn bank_gezond(&self) -> (bool, i64) {
+        let (_, som, _) = self.bank.sluitcontrole();
+        (som == 0, som)
+    }
+    pub fn bank_vingerafdruk(&self) -> String { vingerafdruk_van(&self.bank.saldi) }
 
     // Volledige saldi-dump — alleen voor het pariteitsharnas (achter een vlag);
     // in productie nooit blootstellen (het is de hele geldstand).
@@ -457,12 +490,20 @@ impl State {
             }
         }
         let idem_volgorde: Vec<Json> = self.idem_volgorde.iter().cloned().map(Json::Str).collect();
+        // Het bank-grootboek (cutover stap 3): eigen saldi + boekingen.
+        let mut bank_saldi = Json::obj();
+        if let Json::Obj(m) = &mut bank_saldi {
+            for (k, v) in &self.bank.saldi { m.insert(k.clone(), Json::Num(*v as f64)); }
+        }
+        let bank_boekingen: Vec<Json> = self.bank.boekingen.iter().map(|b| b.to_json()).collect();
         let mut o = Json::obj();
         o.set("saldi", saldi)
             .set("boekingen", Json::Arr(boekingen))
             .set("leden", Json::Arr(leden))
             .set("idem", idem)
-            .set("idemVolgorde", Json::Arr(idem_volgorde));
+            .set("idemVolgorde", Json::Arr(idem_volgorde))
+            .set("bankSaldi", bank_saldi)
+            .set("bankBoekingen", Json::Arr(bank_boekingen));
         o
     }
 
@@ -502,6 +543,29 @@ impl State {
         if let Some(Json::Arr(a)) = snap.get("idemVolgorde") {
             for n in a {
                 if let Some(s) = n.as_str() { self.idem_volgorde.push(s.to_string()); }
+            }
+        }
+        // Het bank-grootboek terugladen (cutover stap 3).
+        if let Some(Json::Obj(m)) = snap.get("bankSaldi") {
+            for (k, v) in m {
+                if let Some(c) = v.as_i64() { self.bank.saldi.insert(k.clone(), c); }
+            }
+        }
+        if let Some(Json::Arr(a)) = snap.get("bankBoekingen") {
+            for b in a.iter().rev() {
+                let van = b.str_at("van").unwrap_or("").to_string();
+                let naar = b.str_at("naar").unwrap_or("").to_string();
+                if van.is_empty() || naar.is_empty() { continue; }
+                self.bank.boekingen.push_front(crate::grootboek::Boeking {
+                    id: b.str_at("id").unwrap_or("").to_string(),
+                    van,
+                    naar,
+                    centen: b.i64_at("centen").unwrap_or(0),
+                    soort: b.str_at("soort").unwrap_or("boeking").to_string(),
+                    oms: b.str_at("oms").unwrap_or("").to_string(),
+                    ref_: b.str_at("ref").map(|s| s.to_string()),
+                    at: b.i64_at("at").unwrap_or(0) as u64,
+                });
             }
         }
     }
@@ -636,5 +700,68 @@ mod tests {
         s.laad_op("A", i(50000), Some("op"));
         let r = s.stuur("A", "SPOOK", i(1000), None, Some("k"), "p2p");
         assert_eq!(r.status, 404);
+    }
+
+    #[test]
+    fn bank_grootboek_apart_en_sluit() {
+        // Cutover stap 3: het bank-grootboek is een TWEEDE, aparte Ledger.
+        // Boeken op de bank raakt het pay-grootboek nooit, beide sluiten op 0.
+        let mut s = State::new();
+        // Storting van buiten (extern:bank mag onder nul) naar een betaalrekening.
+        let r = s.bank_boek("extern:bank", "rek:BETAAL", 80000, "storting", "test", None);
+        assert_eq!(r.status, 200);
+        let boeking = r.body.get("boeking").expect("boeking-object");
+        assert_eq!(boeking.i64_at("centen"), Some(80000));
+        assert_eq!(s.bank.saldo_van("rek:BETAAL"), 80000);
+        assert_eq!(s.bank.saldo_van("extern:bank"), -80000);
+        // Het pay-grootboek is ONGEMOEID.
+        assert_eq!(s.grb.saldo_van("rek:BETAAL"), 0);
+        assert_eq!(s.vingerafdruk(), State::new().vingerafdruk(), "pay-afdruk onveranderd");
+        // Overboeking binnen de bank.
+        let o = s.bank_boek("rek:BETAAL", "rek:SPAAR", 30000, "overboeking", "sparen", None);
+        assert_eq!(o.status, 200);
+        assert_eq!(s.bank.saldo_van("rek:BETAAL"), 50000);
+        assert_eq!(s.bank.saldo_van("rek:SPAAR"), 30000);
+        // Beide grootboeken sluiten onafhankelijk op de cent.
+        let (bank_klopt, bank_som) = s.bank_gezond();
+        assert!(bank_klopt && bank_som == 0, "bank sluit op 0");
+        assert!(s.gezond().0, "pay sluit op 0");
+        // Rauwe apply: geen bodem-guard in de motor (die leeft in JS) — negatief mag.
+        let n = s.bank_boek("rek:BETAAL", "rek:SPAAR", 999999, "overboeking", "rood", None);
+        assert_eq!(n.status, 200, "motor doet rauwe apply, geen bodem");
+        assert!(s.bank.saldo_van("rek:BETAAL") < 0);
+        assert!(s.bank_gezond().0, "sluit nog steeds");
+        // Ongeldige boeking geweigerd (zelfde rekening / nul centen).
+        assert_eq!(s.bank_boek("rek:X", "rek:X", 100, "x", "", None).status, 400);
+        assert_eq!(s.bank_boek("rek:A", "rek:B", 0, "x", "", None).status, 400);
+    }
+
+    #[test]
+    fn bank_vingerafdruk_apart_van_pay() {
+        // De afdruk-helper wordt gedeeld, maar werkt over aparte saldi-maps.
+        let mut s = State::new();
+        s.laad_op_helper_pay();
+        let pay_afdruk = s.vingerafdruk();
+        s.bank_boek("extern:bank", "rek:BETAAL", 12345, "storting", "", None);
+        // De bank-afdruk verschilt van de pay-afdruk (andere rekeningen/saldi).
+        assert_ne!(s.bank_vingerafdruk(), pay_afdruk);
+        // De pay-afdruk is niet meebewogen door de bank-boeking.
+        assert_eq!(s.vingerafdruk(), pay_afdruk);
+        // Snapshot -> laad herstelt beide grootboeken byte-voor-byte.
+        let snap = s.snapshot();
+        let mut s2 = State::new();
+        s2.laad(&snap);
+        assert_eq!(s2.vingerafdruk(), s.vingerafdruk(), "pay hersteld");
+        assert_eq!(s2.bank_vingerafdruk(), s.bank_vingerafdruk(), "bank hersteld");
+        assert!(s2.bank_gezond().0 && s2.gezond().0);
+    }
+}
+
+#[cfg(test)]
+impl State {
+    // Testhulp: zet een bekende pay-stand neer zodat de afdruk niet-leeg is.
+    fn laad_op_helper_pay(&mut self) {
+        self.registreer_lid("NEVEL");
+        self.laad_op("NEVEL", Some(50000), Some("h"));
     }
 }

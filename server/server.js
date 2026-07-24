@@ -2431,15 +2431,24 @@ if (kern.pay.geldModus === 'motor') {
     })
     .catch(e => log.warn('motor-reconcile uitzondering', { fout: e.message }));
 }
+// Zelfde herstart-reconcile voor het BANK-grootboek (tweede motor-ledger).
+if (kern.bank.geldModus === 'motor') {
+  Promise.resolve(kern.bank.reconcileVanMotor())
+    .then(r => {
+      if (r && r.ok && !r.overgeslagen) log.info('motor-reconcile bank', { rekeningen: r.rekeningen, som: r.som });
+      else if (r && r.error) log.warn('motor-reconcile bank mislukt', { fout: r.error });
+    })
+    .catch(e => log.warn('motor-reconcile bank uitzondering', { fout: e.message }));
+}
 /* De RTFoundation-afdracht over de eigen rails: staat de knop effectief op
    "eigen" (en niet in nood), dan boekt de 30% als grootboekboeking van de
    reserve naar de foundation-tegenrekening. Anders geeft de naad null terug
    en volgt fonds.js gewoon de bestaande betaal-naad. Late binding, want het
    fonds is eerder gemount dan de bank. */
-fonds.koppelBank(({ centen, referentie, oms }) => {
+fonds.koppelBank(async ({ centen, referentie, oms }) => {
   const c = bankregie.bankClearing();
   if (c.modus !== 'eigen') return null;
-  return kern.bank.boek({ van: 'rtg:reserve', naar: 'extern:foundation', centen, soort: 'afdracht', oms, ref: referentie });
+  return kern.bank.boekAsync({ van: 'rtg:reserve', naar: 'extern:foundation', centen, soort: 'afdracht', oms, ref: referentie });
 });
 /* RTG Stad (kern/stad): het slimme-stad-platform op EIGEN hardware (de
    Stadsdoos-vloot, dezelfde familie als de Zaakdoos) en eigen software --

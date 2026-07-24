@@ -104,5 +104,31 @@
       .then(function () { bezig = false; });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bouw); else bouw();
+  /* Lege-toestand-nudge (ook op zaak-pagina's): data-rahul-leeg="opdracht" opent
+     de balk met die opdracht al ingevuld. Geen auto-verstuur; de gebruiker leest
+     mee en stuurt zelf. Zelfde afspraak als bij de leden-metgezel. */
+  function bindLeeg() {
+    window.RTGRahul = window.RTGRahul || {};
+    window.RTGRahul.vraag = function (tekst) {
+      if (bar && bar.classList.contains('rm-dicht')) { bar.classList.remove('rm-dicht'); open = true; try { localStorage.setItem('rtg_mond_open', '1'); } catch (e) {} }
+      if (veld) { veld.value = String(tekst || '').slice(0, 300); veld.focus(); }
+    };
+    if (!window.__rahulLeegBound) {
+      window.__rahulLeegBound = true;
+      document.addEventListener('click', function (ev) {
+        var el = ev.target && ev.target.closest ? ev.target.closest('[data-rahul-leeg]') : null;
+        if (!el || !window.RTGRahul || !window.RTGRahul.vraag) return;
+        ev.preventDefault(); window.RTGRahul.vraag(el.getAttribute('data-rahul-leeg'));
+      });
+    }
+    // de knop-stijl, voor het geval de leden-metgezel niet meedraait op deze pagina
+    if (!document.getElementById('rahul-leeg-stijl')) {
+      var s2 = document.createElement('style'); s2.id = 'rahul-leeg-stijl';
+      s2.textContent = '.rahul-leeg-knop{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--gold,#857007);color:var(--gold,#857007);border-radius:999px;padding:.5rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;}.rahul-leeg-knop:hover{background:var(--gold,#857007);color:#0C0C0B;}';
+      (document.head || document.documentElement).appendChild(s2);
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { bouw(); bindLeeg(); });
+  else { bouw(); bindLeeg(); }
 })();

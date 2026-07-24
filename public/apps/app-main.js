@@ -827,7 +827,10 @@
     if (!conns.length && !reqs.length){
       html += '<div class="big" style="font-size:1.02rem;">Nog geen contacten</div>'+
         '<div class="meta" style="margin:.2rem 0 .7rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
-        '<button class="go" data-goto="salon">Iemand toevoegen →</button>';
+        '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">'+
+        '<button class="go" data-goto="salon">Iemand toevoegen →</button>'+
+        '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek in De Salon iemand die bij me past en help me die toe te voegen als connectie">Laat Rahul iemand voorstellen</button>'+
+        '</div>';
     } else {
       html += conns.map(c =>
         '<div class="hc-rij" style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+

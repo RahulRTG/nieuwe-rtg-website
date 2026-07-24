@@ -30,6 +30,12 @@ test.before(async () => {
     password: 'geheim123', geboortedatum: '1987-07-07', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
   assert.ok(kikunoi && sakura && lid, 'twee zaken en een lid ingelogd');
+  // Een gratis RTG-lid toont eenmalig zijn paspoort voor het RTG Pay gebruikt
+  // (de payGate op opladen/kopen). Echte precondititie; de minimale schone PNG
+  // passeert de malware-scanner.
+  const PNG = 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]).toString('base64');
+  await api('/api/verify/upload', { image: PNG }, lid);
+  await api('/api/verify/selfie', { image: PNG }, lid);
 });
 test.after(() => {
   stop(srv && srv.child);

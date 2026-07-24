@@ -37,7 +37,10 @@
     '.mgz-stip{position:absolute;top:-4px;right:-4px;min-width:1.05rem;height:1.05rem;padding:0 .25rem;border-radius:999px;background:#9E1C40;color:#fff;font-size:.66rem;font-weight:700;line-height:1.05rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.5);}' +
     '.mgz-seintjes{display:flex;flex-direction:column;gap:.4rem;}' +
     '.mgz-seintje{background:#0C0C0B;border:1px solid var(--gold,#857007);border-radius:12px;padding:.5rem .7rem;font-size:.82rem;color:#eee;line-height:1.45;cursor:pointer;text-align:left;width:100%;}' +
-    '.mgz-seintje:hover{border-color:#C23A5E;}.mgz-seintje b{color:var(--gold,#857007);display:block;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.15rem;}';
+    '.mgz-seintje:hover{border-color:#C23A5E;}.mgz-seintje b{color:var(--gold,#857007);display:block;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.15rem;}' +
+    /* de lege-toestand-knop: overal waar nog niets staat, kan Rahul het regelen */
+    '.rahul-leeg-knop{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--gold,#857007);color:var(--gold,#857007);border-radius:999px;padding:.5rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;}' +
+    '.rahul-leeg-knop:hover{background:var(--gold,#857007);color:#0C0C0B;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; };
 
@@ -185,6 +188,25 @@
         .then(function (d) { sluitBron(); uit.textContent = (d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400); })
         .catch(function () { sluitBron(); uit.textContent = 'Even geen verbinding; probeer het zo weer.'; });
     });
+
+    /* Lege-toestand-nudge: elke plek met data-rahul-leeg="opdracht" opent Rahul
+       met die opdracht al ingevuld. Geen auto-verstuur -- de gebruiker leest mee
+       en stuurt zelf, zodat de rust en de geld-drempel bij de gebruiker blijven.
+       Via event-delegatie, dus het werkt ook op later bijgeladen schermen. */
+    window.RTGRahul = window.RTGRahul || {};
+    window.RTGRahul.vraag = function (tekst) {
+      sheet.hidden = false; fab.hidden = true; doofMelding();
+      inp.value = String(tekst || '').slice(0, 300); inp.focus();
+      try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
+    };
+    if (!window.__rahulLeegBound) {
+      window.__rahulLeegBound = true;
+      document.addEventListener('click', function (ev) {
+        var el = ev.target && ev.target.closest ? ev.target.closest('[data-rahul-leeg]') : null;
+        if (!el || !window.RTGRahul || !window.RTGRahul.vraag) return;
+        ev.preventDefault(); window.RTGRahul.vraag(el.getAttribute('data-rahul-leeg'));
+      });
+    }
   }
 
   /* ---------- Samen: meekijken en samen doen (alleen leden) ---------- */

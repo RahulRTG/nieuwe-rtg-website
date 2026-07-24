@@ -13,6 +13,10 @@ const lees = p => fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
 // het volledige verhaal van de leden-AI staat in de ai-promptlaag: de assemblage
 // in prompt.js plus het vaste karakterportret in het sibling-bestand karakter.js
 const aiVerhaal = () => lees('server/kern/ai/prompt.js') + '\n' + lees('server/kern/ai/karakter.js');
+// de tool-lus van het stuur is afgesplitst: de dispatcher staat in stuur.js, de
+// eigenlijke Claude-lus (met het doctrine-prompt) in de submodule stuur/lus.js.
+// We lezen beide, zodat de bewaking klopt waar de doctrine ook precies leeft.
+const stuurLus = () => lees('server/kern/stuur.js') + '\n' + lees('server/kern/stuur/lus.js');
 
 test('het gedeelde karakter draagt de doctrine, met de concrete gedragsregels', () => {
   const { RAHUL_LEAD } = require('../server/kern/rahul');
@@ -73,7 +77,7 @@ test('de werkvloer-regel: in een werkomgeving nooit persoonlijke zaken, behalve 
 
 test('de leden-AI (volledig verhaal) en het AI-stuur dragen de doctrine ook', () => {
   assert.match(aiVerhaal(), /liever te hard dan een liegbeest/i, 'leden-AI');
-  assert.match(lees('server/kern/stuur.js'), /liever te hard dan een liegbeest/i, 'tool-lus van het stuur');
+  assert.match(stuurLus(), /liever te hard dan een liegbeest/i, 'tool-lus van het stuur');
 });
 
 test('de vertrouwelijkheid: de AI maakt nooit bedrijfsgeheimen openbaar, in elke promptlaag', () => {
@@ -85,7 +89,7 @@ test('de vertrouwelijkheid: de AI maakt nooit bedrijfsgeheimen openbaar, in elke
   assert.match(RAHUL_LEAD, /vertrouwelijkheid/i, 'vertrouwelijkheid staat bij de hardste regels');
   // de leden-AI (volledig portret) en de tool-lus van het stuur dragen hem ook
   assert.match(aiVerhaal(), /bedrijfsgeheimen/i, 'leden-AI draagt de vertrouwelijkheid');
-  assert.match(lees('server/kern/stuur.js'), /bedrijfsgeheimen/i, 'de tool-lus van het stuur draagt de vertrouwelijkheid');
+  assert.match(stuurLus(), /bedrijfsgeheimen/i, 'de tool-lus van het stuur draagt de vertrouwelijkheid');
 });
 
 test('elke gespreks-assistent begint met het gedeelde karakter (RAHUL_LEAD)', () => {

@@ -5,7 +5,7 @@
    Het kamerregister zelf staat in ./rtfkantoor-data.js; de clubs-samenwerking
    in ./rtfclubs.js en het lab in ./onderzoekslab.js vullen twee eigen kamers.
    Opslag: db.data.rtfKantoorTaken (taken per kamer). */
-module.exports = ({ db, save, crypto }) => {
+module.exports = ({ db, save, crypto, anthropic }) => {
   const nu = () => Date.now();
   const d = () => db.data;
   const lijst = x => Array.isArray(x) ? x : (x && typeof x === 'object' ? Object.values(x) : []);
@@ -69,5 +69,11 @@ module.exports = ({ db, save, crypto }) => {
       lab: { projecten: lab.length, inProef: lab.filter(p => p.fase === 'proef' || p.fase === 'uitrol').length, toetsOpen: lab.filter(p => (p.veiligheid || {}).status === 'open').length } };
   }
 
-  return { rtfkantoor: { kamers, kamer, taakMaak, taakZet, overzicht, KAMER_IDS } };
+  /* Rahul denkt mee, per kamer en over het hele huis (./rtfkantoor-advies.js).
+     Krijgt dezelfde bronnen als het kantoor zelf, zodat advies en scherm nooit
+     uit elkaar lopen. */
+  const advies = require('./rtfkantoor-advies')({ anthropic, AFDELINGEN, kamer, taken, KAMER_IDS });
+
+  return { rtfkantoor: { kamers, kamer, taakMaak, taakZet, overzicht, KAMER_IDS,
+    kamerAdvies: advies.kamerAdvies, huisAdvies: advies.huisAdvies } };
 };

@@ -129,7 +129,32 @@ test('7. elk huis heeft een eigen kantoordrive met alle drie de soorten', async 
   assert.equal((await drive('/mijn', { bedrijf: 'bestaatniet' })).status, 404);
 });
 
-test('8. het RTF-kantoor draagt huisstijl-glyfen, geen emoji', () => {
+test('8. Rahul denkt ook in het RTF-kantoor mee, per kamer en over het huis', () => {
+  // zonder sleutel valt de laag terug op de regels; dat is het feitelijke deel
+  // en moet altijd werken. Direct op de kern, los van de HTTP-deur.
+  const db = { data: {} };
+  const kern = require('../server/kern/rtfkantoor')({ db, save: () => {}, crypto: require('crypto'), anthropic: null });
+  const k = kern.rtfkantoor;
+  assert.ok(k.KAMER_IDS.length >= 16, 'het huis heeft zijn kamers');
+  assert.equal(typeof k.kamerAdvies, 'function', 'er is advies per kamer, net als bij RTG');
+  assert.equal(typeof k.huisAdvies, 'function', 'en advies over het hele huis');
+
+  return Promise.all([
+    k.kamerAdvies(k.KAMER_IDS[0]).then(a => {
+      assert.equal(a.ok, true);
+      assert.ok(a.antwoord && a.antwoord.length > 20, 'er komt een leesbaar advies uit');
+      assert.ok(Array.isArray(a.punten) && a.punten.length, 'met de punten waarop het rust');
+      assert.match(a.antwoord, /u beslist zelf/, 'het advies zegt er zelf bij dat de mens beslist');
+    }),
+    k.huisAdvies().then(h => {
+      assert.equal(h.ok, true);
+      assert.ok(h.antwoord && h.antwoord.length > 20);
+    }),
+    k.kamerAdvies('bestaatniet').then(n => assert.equal(n.status, 404))
+  ]);
+});
+
+test('9. het RTF-kantoor draagt huisstijl-glyfen, geen emoji', () => {
   const data = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'rtfkantoor-data.js'), 'utf8');
   assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(data), 'geen emoji meer in de RTF-kamerdata');
   const glyfen = (data.match(/icoon: '[^']+'/g) || []).map(s => s.slice(8, -1));

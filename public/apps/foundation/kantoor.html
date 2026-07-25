@@ -53,6 +53,14 @@
     </div>
     <div class="kaart" style="margin-top:.7rem;"><div class="sec">Werklijsten</div><div id="kLijsten"></div></div>
     <div class="kaart" style="margin-top:.7rem;">
+      <div class="sec">Rahul denkt mee in deze kamer</div>
+      <div class="rij" style="margin-bottom:.5rem;">
+        <input class="veld" id="aVraag" placeholder="Stel een vraag, of laat leeg" maxlength="300" aria-label="Vraag aan Rahul">
+        <button class="knop" id="aVraag2">Vraag</button>
+      </div>
+      <div id="kAdvies" class="leeg">Rahul kijkt naar de cijfers van deze kamer en zegt wat opvalt. Hij adviseert; u beslist.</div>
+    </div>
+    <div class="kaart" style="margin-top:.7rem;">
       <div class="sec">Taken van deze kamer</div>
       <div class="rij" style="margin-bottom:.5rem;"><input class="veld" id="tTekst" placeholder="Nieuwe taak" maxlength="200"><button class="knop" id="tMaak">+</button></div>
       <div id="kTaken"></div>
@@ -107,6 +115,15 @@ function toonTaken(taken){
     await api('kamer/taak-zet', { id: KAMER, taakId: c.dataset.id, af: c.checked }); open(KAMER);
   }));
 }
+$('#aVraag2').addEventListener('click', async () => {
+  const doel = $('#kAdvies');
+  doel.textContent = 'Rahul kijkt...';
+  try {
+    const r = await api('kamer/advies', { id: KAMER, vraag: $('#aVraag').value.trim() });
+    doel.innerHTML = '<div>' + esc(r.antwoord) + '</div>' +
+      (r.punten && r.punten.length ? '<ul style="margin-top:.5rem;">' + r.punten.map(p => '<li>· ' + esc(p) + '</li>').join('') + '</ul>' : '');
+  } catch (e) { doel.textContent = e.message; }
+});
 $('#terug').addEventListener('click', () => { $('#kamer').hidden = true; $('#grid').hidden = false; laad(); });
 $('#tMaak').addEventListener('click', async () => {
   const t = $('#tTekst').value.trim(); if (!t) return;

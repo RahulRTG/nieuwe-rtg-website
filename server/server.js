@@ -2291,7 +2291,7 @@ Object.assign(kern, require('./kern/geloofbieb').maakGeloofBieb({ db, save }));
    (kern/rtfclubs.js: samenwerking met grote (sport)clubs per stad) en het
    RTG Onderzoekslab (kern/onderzoekslab.js: hardware, software, dorpshulp,
    landbouw en onderzoek naar onderzoek, met een menselijke veiligheidstoets). */
-Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto }));
+Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto, anthropic }));
 Object.assign(kern, require('./kern/rtfclubs')({ db, save, crypto }));
 Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropic }));
 Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));

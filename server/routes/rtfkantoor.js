@@ -17,6 +17,15 @@ module.exports = (kern) => {
   app.post('/api/rtfkantoor/kamer/taak', officeAuth, (req, res) => veilig(res, () => rtfkantoor.taakMaak(String(req.body.id || ''), req.body.tekst)));
   app.post('/api/rtfkantoor/kamer/taak-zet', officeAuth, (req, res) => veilig(res, () => rtfkantoor.taakZet(String(req.body.id || ''), String(req.body.taakId || ''), req.body.af)));
   app.post('/api/rtfkantoor/overzicht', officeAuth, (req, res) => veilig(res, () => rtfkantoor.overzicht()));
+  // Rahul denkt mee: per kamer en over het hele huis. Adviserend, nooit beslissend.
+  app.post('/api/rtfkantoor/kamer/advies', officeAuth, async (req, res) => {
+    try { const r = await rtfkantoor.kamerAdvies(String(req.body.id || ''), req.body.vraag); stuur(res, r); }
+    catch (e) { console.error('[rtfkantoor]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  app.post('/api/rtfkantoor/advies', officeAuth, async (req, res) => {
+    try { const r = await rtfkantoor.huisAdvies(req.body.vraag); stuur(res, r); }
+    catch (e) { console.error('[rtfkantoor]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
 
   // Clubs & steden: het register, de programma's, het team en de afspraken
   app.post('/api/rtfkantoor/clubs', officeAuth, (req, res) => veilig(res, () => rtfclubs.overzicht()));

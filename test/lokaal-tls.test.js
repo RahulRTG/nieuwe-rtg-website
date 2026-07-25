@@ -139,6 +139,26 @@ test('6. de QR in het venster is een echte, leesbare code', () => {
   const adres = 'https://192.168.178.218:3000/lokaal';
   const kunst = lokaal.qrInTerminal(adres);
   assert.ok(kunst && kunst.split('\n').length > 10, 'er komt een blok tekens uit');
+
+  /* De twee dingen die een camera laten afhaken en die je met het blote oog
+     niet ziet. Ze hebben ons hier allebei een ronde gekost.
+
+     Polariteit: zonder eigen kleuren tekent een Terminal met witte
+     achtergrond de code omgekeerd, en dan is hij onleesbaar. */
+  assert.match(kunst, /\x1b\[97;40m/, 'wit op zwart wordt zelf gezet, niet aan het venster overgelaten');
+  assert.match(kunst, /\x1b\[0m/, 'en netjes weer losgelaten');
+  assert.ok(!/\x1b/.test(lokaal.qrInTerminal(adres, { kleur: false })), 'kaal blijft kaal, voor logbestanden');
+
+  // Rustzone: de norm eist vier lege blokjes rondom, anders vindt een camera
+  // de hoeken niet terug. Vier beeldrijen zijn twee tekstregels.
+  const kaal = lokaal.qrInTerminal(adres, { kleur: false }).split('\n').map(r => r.slice(2));
+  const leeg = r => /^█+$/.test(r);
+  assert.ok(leeg(kaal[0]) && leeg(kaal[1]), 'boven zit een rustzone van vier blokjes');
+  assert.ok(leeg(kaal[kaal.length - 1]) && leeg(kaal[kaal.length - 2]), 'onder ook');
+  for (const r of kaal) {
+    assert.match(r, /^████/, 'en links van elke regel');
+    assert.match(r, /████$/, 'en rechts');
+  }
   // en het is geen plaatje-dat-erop-lijkt: onze eigen decoder leest hem terug
   const qr = require('../public/shared/qr');
   const uit = qr.decode(qr.encode(adres, { ecc: 'M' }));

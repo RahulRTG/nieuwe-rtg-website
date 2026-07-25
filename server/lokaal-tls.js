@@ -159,27 +159,43 @@ function loketAntwoord(req, res, cert, poort) {
    worden: camera erop, tikken op de melding, klaar.
 
    Twee beeldrijen per tekstregel via de halve blokjes, anders wordt de code
-   twee keer zo hoog als een terminalvenster. De rustzone eromheen hoort erbij;
-   zonder die witrand leest een camera de code niet. */
-function qrInTerminal(tekst) {
+   twee keer zo hoog als een terminalvenster.
+
+   Twee dingen die een camera anders laten afhaken, en die allebei niet te zien
+   zijn als je alleen naar de code kijkt:
+
+   De rustzone. Een QR heeft rondom vier lege blokjes nodig; met minder vindt
+   een camera de hoeken niet terug. Dat is geen marge maar onderdeel van de
+   code.
+
+   De polariteit. De blokjes worden getekend in de kleuren van het venster, en
+   een Terminal met een witte achtergrond keert de code daarmee om: donker
+   wordt licht. Voor een mens ziet dat er nog steeds uit als een QR, voor een
+   camera is het onleesbaar. We zetten de kleuren daarom zelf: wit op zwart,
+   ongeacht het profiel van de gebruiker. Zonder kleur (kleur:false) blijft de
+   oude tekening over, voor logbestanden en tests. */
+function qrInTerminal(tekst, opties) {
+  opties = opties || {};
+  const kleur = opties.kleur !== false;
   let matrix;
   try { matrix = require('../public/shared/qr').encode(tekst, { ecc: 'M' }).matrix; }
   catch (e) { return ''; }
-  const rand = 2;
+  const rand = 4;
   const n = matrix.length + rand * 2;
   const aan = (r, k) => {
     const y = r - rand, x = k - rand;
     return y >= 0 && x >= 0 && y < matrix.length && x < matrix.length && matrix[y][x];
   };
+  // wit is aan: een QR is donker-op-licht, dus een donker blokje laten we leeg
+  const AAN = '\x1b[97;40m', UIT = '\x1b[0m';
   const regels = [];
   for (let r = 0; r < n; r += 2) {
-    let regel = '  ';
+    let regel = '';
     for (let k = 0; k < n; k++) {
       const boven = aan(r, k), onder = (r + 1 < n) ? aan(r + 1, k) : false;
-      // wit is aan: een QR is donker-op-licht, en een terminal is meestal donker
       regel += boven && onder ? ' ' : boven ? '▄' : onder ? '▀' : '█';
     }
-    regels.push(regel);
+    regels.push('  ' + (kleur ? AAN + regel + UIT : regel));
   }
   return regels.join('\n');
 }

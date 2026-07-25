@@ -5,6 +5,7 @@
   "description": "Rahul Travel Group, website, ledenportaal en backend",
   "scripts": {
     "start": "node server/trio.js",
+    "telefoon": "RTG_LOKAAL_TLS=1 node server/trio.js",
     "single": "node --experimental-sqlite server/server.js",
     "gateway": "node server/poort.js",
     "vloot": "node server/vloot.js",

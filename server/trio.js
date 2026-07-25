@@ -16,9 +16,16 @@
    Alleen de actieve server schrijft naar de database; standby-servers lezen
    alleen mee. Zo kunnen er nooit twee servers tegelijk in de data schrijven. */
 const http = require('http');
+const https = require('https');
 const { spawn } = require('child_process');
 const path = require('path');
 const crypto = require('crypto');
+
+/* Lokale https (RTG_LOKAAL_TLS=1): de poortwachter neemt dan de beveiligde
+   verbinding voor zijn rekening; de drie servers erachter blijven gewoon
+   gewoon http op de eigen machine praten. Zo hoeft er aan de servers zelf
+   niets te veranderen. */
+const LOKAAL_TLS = process.env.RTG_LOKAAL_TLS === '1';
 
 const PORT = Number(process.env.PORT || 3000);
 const AANTAL = 3;
@@ -148,7 +155,7 @@ function stuurDoor(req, res, body, idx, magOpnieuw) {
   const s = servers[idx];
   const headers = { ...req.headers };
   headers['x-forwarded-for'] = (req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'] + ', ' : '') + (req.socket.remoteAddress || '');
-  if (!headers['x-forwarded-proto']) headers['x-forwarded-proto'] = 'http';
+  if (!headers['x-forwarded-proto']) headers['x-forwarded-proto'] = LOKAAL_TLS ? 'https' : 'http';
   const proxy = http.request({ host: '127.0.0.1', port: s.port, path: req.url, method: req.method, headers }, pres => {
     res.writeHead(pres.statusCode, pres.headers);
     pres.pipe(res); // streamt ook SSE gewoon door
@@ -167,7 +174,16 @@ function uitleg503(res) {
   res.end(JSON.stringify({ error: 'Alle servers zijn tijdelijk onbereikbaar; ze worden automatisch herstart. Probeer het over een paar seconden opnieuw.' }));
 }
 
-const poort = http.createServer((req, res) => {
+/* Het certificaat wordt bij elke start opnieuw uitgegeven voor de adressen die
+   deze computer nu heeft; de CA eronder blijft dezelfde, dus wat u eenmaal op
+   uw telefoon vertrouwt blijft goed. */
+let tlsCert = null;
+if (LOKAAL_TLS) {
+  try { tlsCert = require('./lokaal-tls').certVoorDezeMachine(); }
+  catch (e) { console.error('[poortwachter] lokale https lukte niet: ' + e.message); process.exit(1); }
+}
+
+const afhandelen = (req, res) => {
   // Het verzoek eerst binnenhalen (verzoeken zijn klein: JSON en foto's tot
   // ruwweg een megabyte); dan kan het bij een uitval veilig opnieuw naar de
   // volgende server, ook halverwege een POST.
@@ -180,7 +196,28 @@ const poort = http.createServer((req, res) => {
     if (idx < 0) return uitleg503(res);
     stuurDoor(req, res, Buffer.concat(delen), idx, true);
   });
-});
+};
+const poort = LOKAAL_TLS ? https.createServer({ key: tlsCert.key, cert: tlsCert.cert }, afhandelen)
+  : http.createServer(afhandelen);
+
+/* Een klein http-loketje ernaast, alleen om het CA-bestand op te halen. Uw
+   telefoon vertrouwt onze certificaten nog niet, dus dat bestand moet langs een
+   gewone verbinding binnenkomen; alle andere adressen sturen we door naar de
+   beveiligde site. Verder staat er niets op dit loket. */
+let caLoket = null;
+if (LOKAAL_TLS) {
+  caLoket = http.createServer((req, res) => {
+    if ((req.url || '').split('?')[0] === '/rtg-ca.crt') {
+      res.writeHead(200, { 'Content-Type': 'application/x-x509-ca-cert',
+        'Content-Disposition': 'attachment; filename="RTG-CA.crt"' });
+      return res.end(tlsCert.caPem);
+    }
+    const gastheer = String(req.headers.host || '').split(':')[0] || 'localhost';
+    res.writeHead(302, { Location: 'https://' + gastheer + ':' + PORT + (req.url || '/') });
+    res.end();
+  });
+  caLoket.on('error', e => console.error('[poortwachter] CA-loket: ' + e.message));
+}
 poort.on('error', e => {
   if (e.code === 'EADDRINUSE') { console.error('Poort ' + PORT + ' is al in gebruik. Draait de site al?'); process.exit(1); }
   console.error('[poortwachter]', e.message);
@@ -189,7 +226,8 @@ poort.on('error', e => {
 /* ---------- netjes starten en stoppen ---------- */
 
 (async () => {
-  poort.listen(PORT, () => log('luistert op http://localhost:' + PORT));
+  poort.listen(PORT, () => log('luistert op ' + (LOKAAL_TLS ? 'https' : 'http') + '://localhost:' + PORT));
+  if (caLoket) caLoket.listen(PORT + 10, () => log('CA-loket op http://localhost:' + (PORT + 10) + '/rtg-ca.crt'));
   // Server 1 eerst, zodat een verse database maar door een server wordt
   // aangemaakt; daarna de twee standby-servers.
   startServer(0);
@@ -201,9 +239,10 @@ poort.on('error', e => {
   setTimeout(() => {
     console.log('');
     console.log('  Drie servers draaien: 1 actief (poort ' + servers[0].port + '), 2 en 3 standby (' + servers[1].port + ', ' + servers[2].port + ').');
-    console.log('  De site staat op http://localhost:' + PORT + '. Valt een server uit, dan neemt de volgende het direct over');
+    console.log('  De site staat op ' + (LOKAAL_TLS ? 'https' : 'http') + '://localhost:' + PORT + '. Valt een server uit, dan neemt de volgende het direct over');
     console.log('  en wordt de gevallen server automatisch herstart.');
-    console.log('');
+    if (LOKAAL_TLS) console.log(require('./lokaal-tls').startUitleg(tlsCert, PORT));
+    else console.log('');
   }, 2500);
 })();
 
@@ -213,5 +252,6 @@ for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
   log(sig + ' ontvangen, alle servers worden netjes gestopt');
   for (const s of servers) if (s.child) try { s.child.kill('SIGTERM'); } catch (e) {}
   poort.close();
+  if (caLoket) try { caLoket.close(); } catch (e) {}
   setTimeout(() => process.exit(0), 3000);
 });

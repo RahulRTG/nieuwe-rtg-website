@@ -165,10 +165,16 @@ function publicUser(u) {
 function getMemberState(userId) {
   const row = S.db.prepare('SELECT member_state FROM users WHERE id = ?').get(userId);
   if (!row || !row.member_state) return null;
-  try { return JSON.parse(row.member_state); } catch (e) { return null; }
+  try { return JSON.parse(kluis.decVeld(row.member_state)); } catch (e) { return null; }
 }
+/* Het ledendossier gaat versleuteld de kolom in. Dat is geen luxe: hier staan
+   de gesprekken met Rahul, de boekingen, de facturen en de geboortedatum, en
+   ze staan in DEZELFDE rij als de identiteit. Bleef dit platte tekst, dan zou
+   wie de accountdatabase in handen krijgt het hele dossier kunnen lezen, terwijl
+   de naam ernaast wel versleuteld is. Dat maakt het codenaam-ontwerp waardeloos.
+   De Postgres-spiegel kopieert de kolom ongewijzigd en erft de bescherming. */
 function saveMemberState(userId, obj) {
-  S.db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(JSON.stringify(obj), userId);
+  S.db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(kluis.encVeld(JSON.stringify(obj)), userId);
   mirror.markUser(userId);
 }
 
@@ -187,7 +193,7 @@ function listByVerification(status) {
 function conversations() {
   const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users WHERE member_state IS NOT NULL').all();
   return rows.map(r => {
-    let md = {}; try { md = JSON.parse(r.member_state) || {}; } catch (e) {}
+    let md = {}; try { md = JSON.parse(kluis.decVeld(r.member_state)) || {}; } catch (e) {}
     return { id: r.id, tier: r.tier, codename: r.codename, conversation: md.conversation || [], needsConcierge: !!md.needsConcierge };
   }).filter(x => x.conversation.length);
 }
@@ -200,7 +206,7 @@ function ledenRegisterRijen(limit) {
   const n = Math.max(1, Math.min(Number(limit) || 5000, 20000));
   const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users ORDER BY codename ASC LIMIT ?').all(n);
   return rows.map(r => {
-    let md = {}; try { md = r.member_state ? (JSON.parse(r.member_state) || {}) : {}; } catch (e) {}
+    let md = {}; try { md = r.member_state ? (JSON.parse(kluis.decVeld(r.member_state)) || {}) : {}; } catch (e) {}
     const gs = String(md.geslacht || '').toLowerCase();
     return { id: r.id, key: 'user-' + r.id, tier: r.tier || 'rtg', codename: r.codename || null,
       geslacht: (gs === 'v' || gs === 'm' || gs === 'x') ? gs : null, land: md.land || null };

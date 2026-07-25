@@ -30,6 +30,24 @@ function dec(blob) {
     return Buffer.concat([d.update(buf.subarray(28)), d.final()]).toString('utf8');
   } catch (e) { return null; }
 }
+/* Een heel veld versleuteld opslaan, met een markering ervoor. De markering is
+   het verschil met enc()/dec() hierboven: die gaan over velden die ALTIJD
+   versleuteld zijn (enc_name, enc_email). Dit is voor velden die vroeger platte
+   tekst waren en dat in bestaande databases nog zijn: leest de markering niet,
+   dan is het oude platte tekst en geven we hem ongewijzigd terug. Zo migreert
+   een draaiende installatie vanzelf mee, bij de eerstvolgende schrijfactie. */
+const MERK = 'RTGV1:';
+function encVeld(tekst) {
+  if (tekst == null) return null;
+  return MERK + enc(String(tekst));
+}
+function decVeld(waarde) {
+  if (waarde == null) return null;
+  const s = String(waarde);
+  if (!s.startsWith(MERK)) return s;           // nog niet gemigreerd: platte tekst
+  return dec(s.slice(MERK.length));            // null bij een verkeerde sleutel
+}
+
 function emailHash(email) {
   return crypto.createHmac('sha256', S.VAULT).update(String(email || '').trim().toLowerCase()).digest('hex');
 }
@@ -84,6 +102,6 @@ function makeCodename() {
 function sign(body) { return crypto.createHmac('sha256', S.SECRET).update(body).digest('hex').slice(0, 32); }
 
 module.exports = {
-  CODENAMES, enc, dec, emailHash, normalizePhone, phoneHash,
+  CODENAMES, enc, dec, encVeld, decVeld, emailHash, normalizePhone, phoneHash,
   scryptAsync, hashPasswordSync, hashPassword, verifyPassword, makeCodename, sign
 };

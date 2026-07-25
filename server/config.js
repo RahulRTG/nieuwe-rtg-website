@@ -58,6 +58,14 @@ function valideer(env) {
     // zijn, anders kan de ene instance de gegevens van de andere niet lezen.
     if (env.DATABASE_URL && !env.RTG_VAULT_KEY) waarschuwingen.push('RTG_VAULT_KEY niet gezet: bij meerdere instances kunnen ze elkaars versleutelde naam/e-mail niet ontsleutelen en klopt de e-mail-login-hash niet. Zet een gedeelde sleutel.');
     if (env.DATABASE_URL && !env.RTG_SECRET_KEY) waarschuwingen.push('RTG_SECRET_KEY niet gezet: sessietokens van de ene instance gelden dan niet op de andere.');
+    /* Losstaand van het instance-verhaal hierboven: staat de kluissleutel niet in
+       de omgeving, dan maakt de server hem als BESTAND in de datamap. Dat is prima
+       lokaal, maar op productie ligt de sleutel dan naast de versleutelde data, en
+       opent een gestolen schijf zichzelf. Dat holt de hele versleuteling-in-rust
+       uit, dus dat hoort de keuring te zeggen. */
+    for (const [naam, wat] of [['RTG_VAULT_KEY', 'de identiteitskluis (naam, e-mail, ledendossier)'], ['RTG_SECRET_KEY', 'de ondertekening van sessietokens']])
+      if (!env[naam]) waarschuwingen.push(naam + ' niet gezet: de sleutel voor ' + wat +
+        ' wordt als bestand in de datamap gezet, dus naast de data die hij beschermt. Zet hem als omgevingsvariabele.');
     if (!env.REDIS_URL) waarschuwingen.push('REDIS_URL niet gezet: realtime werkt alleen binnen één proces (niet over meerdere instances).');
     // Media (Salon-foto's, snaps) op lokale schijf worden niet gedeeld tussen
     // instances; bij meerdere instances is S3-compatibele opslag (of een gedeeld

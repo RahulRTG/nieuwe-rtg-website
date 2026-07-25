@@ -245,6 +245,9 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] `npm run golive` geeft exitcode 0 op de productiemachine
 - [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). Overdragen kan later op de technische pagina onder "Eigenaarschap"
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
+- [ ] Versleuteling in rust bewezen op de echte machine: `node --experimental-sqlite --test test/rust.test.js` is groen. Die test zet gegevens via de gewone endpoints in een server en zoekt daarna de hele datamap byte voor byte af; hij vertrouwt niet op de belofte
+- [ ] De sleutels (`RTG_ENC_KEY`, `RTG_VAULT_KEY`, `RTG_SECRET_KEY`) staan als omgevingsvariabele, **niet** in de datamap. Zonder deze regel schrijft de server ze als bestand naast de data, en dan opent een gestolen schijf zichzelf
+- [ ] Weet dat de outbox met een sleutel versleuteld is: mislukte verzendingen teruglezen gaat met `npm run outbox` (met dezelfde `RTG_ENC_KEY`)
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
 - [ ] TLS geregeld: óf een reverse proxy/load balancer vóór de app met `trust proxy` aan, óf native in de app (`RTG_TLS=1`, evt. `RTG_ACME=1` voor een automatisch Let's Encrypt-certificaat) — poort 80 + 443 bereikbaar
 - [ ] Redis draait en `REDIS_URL` is gezet (bij >1 instance)

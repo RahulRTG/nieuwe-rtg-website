@@ -76,9 +76,21 @@ ook zonder key en de boardroom kan de functie `stuur` per doelgroep sluiten.
 
 ### Muisvrij: alles met de mond of met typen
 
-Op elke app-pagina staat onderaan één balk (`public/shared/handenvrij.js` +
-`-balk.js` + `-mond.js`, aangehaakt via `shared/metgezel.js`). Daarin typ je of
-praat je, en er gebeurt iets. Drie dingen maken het muisvrij:
+Op elke app-pagina staat onderaan één balk met daarboven het gesprek
+(`public/shared/handenvrij.js` + `-balk.js` + `-chat.js` + `-mond.js`,
+aangehaakt via `shared/metgezel.js`). Daarin typ je of praat je, en er gebeurt
+iets. Het leest als een chat met Rahul: jouw beurt rechts in bordeaux, zijn
+beurt links met de signatuurmond ernaast, drie puntjes terwijl hij bezig is.
+
+Het gesprek begint ook niet leeg. Bij het openen komt de doorlopende conversatie
+mee (`/api/chat/history`) — dezelfde die in de chat van de leden-app staat, want
+de server legt de beurten van de assistent daar nu ook in vast
+(`kern/ai.js: noteerBeurt`). **Behalve bij Lifestyle en Business:** daar is die
+chat de lijn naar een mens (de concierge). De AI schrijft daar niets in het
+draadje, anders leest die concierge straks antwoorden die zij niet gaf.
+`test/gesprekdraad.test.js` houdt die grens vast.
+
+Drie dingen maken het muisvrij:
 
 - **Navigeren zonder tik.** "Open de Salon", "ga naar Bestellen", "terug",
   "omlaag", "sluit". Dat wordt *lokaal* afgehandeld, zonder ronde langs de

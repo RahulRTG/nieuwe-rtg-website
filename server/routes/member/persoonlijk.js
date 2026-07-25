@@ -3,7 +3,7 @@
    (kern/fluister.js) en de Shared Assets (kern/assets.js). Alleen routes;
    de logica woont in de kern-modules. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, verdienPunten, pestgrens, bus,
+  const { app, auth, liveCodename, verdienPunten, pestgrens, bus, noteerBeurt,
     zorgVan, zorgZet, locDeel, locStopKlant, locMijn,
     fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, stuurLus,
     sparLijst, sparParkeer, sparStatus,
@@ -66,10 +66,24 @@ app.post('/api/fluister', auth, async (req, res) => {
         'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app. ' +
         'Je regelt niet alleen reizen, bestellen, betalen en de Salon, maar ook de RTFoundation voor het gezin (bijvoorbeeld het babyboek, school, toetsen of het zakgeldpotje) als het lid daar recht op heeft.'
     });
-    if (lus && lus.tekst) return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
+    if (lus && lus.tekst) {
+      onthoudGesprek(req, lus.tekst);
+      return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
+    }
   }
+  onthoudGesprek(req, r && r.antwoord);
   res.json(r);
 });
+/* De uitwisseling in het doorlopende gesprek zetten, zodat de chat in de app en
+   de balk in het OS EEN draadje zijn en je geschiedenis niet half is. Alleen
+   vastleggen wat er al gebeurd is; kern/ai.js weigert dit voor Lifestyle en
+   Business, waar de chat de lijn naar een mens is. */
+function onthoudGesprek(req, antwoord) {
+  try {
+    if (!req.session.account || !antwoord) return;
+    noteerBeurt(req.session.account, req.body.q, antwoord, req.body.lang);
+  } catch (e) { /* het gesprek loggen mag het antwoord nooit in de weg zitten */ }
+}
 app.post('/api/fluister/profiel', auth, (req, res) => {
   // nieuwe seintjes worden meteen ook een melding op het toestel (met dedupe)
   fluisterPush(req.session.key);

@@ -74,6 +74,34 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     if (user.tier !== 'rtg') sseToOffice('sync', { scope: 'concierge' });
   }
 
+  /* Een uitwisseling die AL heeft plaatsgevonden vastleggen in het gesprek.
+     Nodig omdat de assistent (/api/fluister) buiten deze chat om antwoordt: zonder
+     dit zou de balk in het OS een ander gesprek tonen dan de chat in de app, en
+     zou je geschiedenis half zijn.
+
+     Twee dingen die dit met opzet NIET doet:
+     - geen tweede antwoord genereren (memberSays doet dat; hier is het antwoord
+       er al, en nog een beurt erbij zou een dubbel gesprek opleveren);
+     - niets aanraken van needsConcierge, en alleen voor de RTG Pass schrijven.
+       Bij Lifestyle en Business is de chat de lijn naar een MENS. Zou de AI daar
+       beurten in het draadje zetten, dan leest de concierge straks antwoorden
+       die zij niet gaf, en lijkt het alsof de AI in haar naam heeft gesproken.
+       Dat is precies de grens die niet mag verschuiven. */
+  function noteerBeurt(user, vraag, antwoord, lang) {
+    if (!user || user.tier !== 'rtg') return false;
+    const v = String(vraag || '').trim(), a = String(antwoord || '').trim();
+    if (!v || !a) return false;
+    const md = accounts.getMemberState(user.id) || {};
+    md.conversation = md.conversation || [];
+    const nu = new Date().toISOString();
+    md.conversation.push({ from: 'member', text: v.slice(0, 1000), lang: lang || 'nl', at: nu, channel: 'assistent' });
+    md.conversation.push({ from: 'rahul', text: a.slice(0, 4000), lang: lang || 'nl', at: nu, channel: 'assistent' });
+    md.conversation = md.conversation.slice(-120);
+    accounts.saveMemberState(user.id, md);
+    broadcastSync([user.tier], 'chat');
+    return true;
+  }
+
   /* Backoffice: concierge-inbox voor Lifestyle/Business-leden. */
   function conciergeInbox() {
     return accounts.conversations()
@@ -86,6 +114,6 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
       .sort((a, b) => (b.needsConcierge - a.needsConcierge) || (new Date(b.lastAt) - new Date(a.lastAt)));
   }
 
-  return { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, conciergeInbox };
+  return { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox };
 }
 module.exports = { AI_TONE, maakAi };

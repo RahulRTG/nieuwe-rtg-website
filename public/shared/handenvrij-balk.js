@@ -1,9 +1,10 @@
 /* Muisvrij bedienen, deel 2: de balk.
 
-   Een vaste strook onderaan met een veld, en daaronder het antwoord. Dit is de
+   Een vaste strook onderaan met een veld, en daarboven het gesprek. Dit is de
    ENE ingang: typen of praten, en er gebeurt iets. De zinsontleding zit in
-   shared/handenvrij.js; het luisteren en terugpraten in handenvrij-mond.js, dat
-   dit bestand erbij haalt en een handvat meekrijgt (doe/zeg/stem).
+   shared/handenvrij.js, het gesprek in handenvrij-chat.js en het luisteren en
+   terugpraten in handenvrij-mond.js. Die twee haalt dit bestand erbij; ze krijgen
+   een gedeelde kamer mee (doe/zeg/vak) en vullen er hun eigen kant in.
 
    Twee dingen die hier bewust zo staan:
    - de plekken op de pagina worden bij ELKE opdracht opnieuw opgehaald, niet een
@@ -44,10 +45,7 @@
     '.hv-go{font-size:1rem;line-height:1;padding:.4rem .6rem;}' +
     '.hv-k[aria-pressed="true"]{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);font-weight:700;}' +
     '.hv-k.hv-hoort{background:#9E1C40;color:#fff;border-color:#9E1C40;}' +
-    '.hv-uit{position:fixed;left:0;right:0;bottom:3.4rem;z-index:37;padding:.6rem .8rem;background:rgba(12,12,11,.96);' +
-    'border-top:1px solid #2a2a28;color:#ddd;font-family:Inter,system-ui,sans-serif;font-size:.85rem;line-height:1.55;' +
-    'max-height:38vh;overflow-y:auto;white-space:pre-wrap;}' +
-    '.hv-uit[hidden]{display:none;}body.hv-ruimte{padding-bottom:3.6rem;}' +
+    'body.hv-ruimte{padding-bottom:3.6rem;}' +
     '@media (prefers-reduced-motion: reduce){.hv-balk{backdrop-filter:none;}}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -58,25 +56,33 @@
     '<button class="hv-k hv-go" type="submit" aria-label="Versturen">→</button></form>' +
     '<button class="hv-k" type="button" data-mond aria-pressed="false" hidden>Mond</button>' +
     '<button class="hv-k" type="button" data-stem aria-pressed="true">Stem</button>';
-  var uit = document.createElement('div');
-  uit.className = 'hv-uit'; uit.hidden = true;
-  uit.setAttribute('role', 'status'); uit.setAttribute('aria-live', 'polite');
+  var chat = document.createElement('div');
+  chat.className = 'hv-chat'; chat.hidden = true;
+  chat.setAttribute('role', 'log'); chat.setAttribute('aria-live', 'polite');
+  chat.setAttribute('aria-label', 'Gesprek met Rahul');
 
   var form = balk.querySelector('form'), inp = balk.querySelector('input');
   var knMond = balk.querySelector('[data-mond]'), knStem = balk.querySelector('[data-stem]');
 
+  /* Let op: als de pagina al geladen is, draait klaar() HIER, tijdens het inlezen
+     van dit bestand. Alles wat verderop met var/function wordt neergezet bestaat
+     dan nog niet. Een aanroep naar de gedeelde kamer hoort hier dus niet: die
+     wierp een TypeError, waarna de rest van de module (inclusief de toets-luister)
+     nooit meer werd opgezet. Het gesprek laadt zichzelf, in handenvrij-chat.js. */
   function klaar() {
     if (balk.parentNode || !document.body) return;
-    document.body.appendChild(uit); document.body.appendChild(balk);
+    document.body.appendChild(chat); document.body.appendChild(balk);
     document.body.classList.add('hv-ruimte');
     knStem.setAttribute('aria-pressed', String(stemAan));
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', klaar);
   else klaar();
 
-  /* ---------- antwoorden ---------- */
+  /* ---------- antwoorden ----------
+     Een antwoord is een beurt in het gesprek, geen regel die de vorige wist.
+     Het tekenen zit in handenvrij-chat.js; hier alleen de bedoeling. */
   function zeg(tekst, hardop) {
-    uit.hidden = false; uit.textContent = tekst;
+    if (kamer.beurt) kamer.beurt('rahul', tekst);
     if (hardop && stemAan && kamer.spreek) kamer.spreek(tekst);
   }
 
@@ -108,7 +114,7 @@
       case 'ga': zeg(b.plek.naam, hardop); try { b.plek.doen(); } catch (e) { zeg('Dat lukte niet.', hardop); } return;
       case 'terug': history.back(); return;
       case 'vooruit': history.forward(); return;
-      case 'sluit': uit.hidden = true; inp.value = ''; inp.blur(); return;
+      case 'sluit': chat.hidden = true; inp.value = ''; inp.blur(); return;
       case 'omhoog': root.scrollBy({ top: -Math.round(innerHeight * 0.8), behavior: 'smooth' }); return;
       case 'omlaag': root.scrollBy({ top: Math.round(innerHeight * 0.8), behavior: 'smooth' }); return;
       case 'begin': root.scrollTo({ top: 0, behavior: 'smooth' }); return;
@@ -135,18 +141,30 @@
      de eigen inlog. Daar zitten de geld-drempel en de bevestiging, en die willen
      we niet dubbel (en dus niet half) in de browser nabouwen. */
   function vraagRahul(vraag, hardop) {
-    zeg('Rahul denkt na...', false);
-    fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ q: vraag }) })
+    if (kamer.tikt) kamer.tikt(true);              // drie puntjes: hij is bezig
+    fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ q: vraag, lang: taal() }) })
       .then(function (r) { return r.json(); })
-      .then(function (d) { zeg((d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.', hardop); })
-      .catch(function () { zeg('Even geen verbinding; probeer het zo weer.', hardop); });
+      .then(function (d) {
+        if (kamer.tikt) kamer.tikt(false);
+        zeg((d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.', hardop);
+      })
+      .catch(function () {
+        if (kamer.tikt) kamer.tikt(false);
+        zeg('Even geen verbinding; probeer het zo weer.', hardop);
+      });
   }
+  function taal() { try { return localStorage.getItem('rtg_lang') || document.documentElement.lang || 'nl'; } catch (e) { return 'nl'; } }
 
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     var q = inp.value.trim(); if (!q) return;
-    inp.value = ''; doe(q, false);
+    inp.value = ''; mijnBeurt(q); doe(q, false);
   });
+
+  /* Wat JIJ zegt hoort meteen in het gesprek te staan, ook als het navigatie
+     blijkt. Anders zie je je eigen woorden pas terug als er een antwoord komt,
+     en dat voelt niet als chatten maar als een formulier. */
+  function mijnBeurt(tekst) { if (kamer.beurt) kamer.beurt('member', tekst); }
   knStem.addEventListener('click', function () { stelStem(!stemAan); });
 
   /* ---------- beginnen met typen, waar je ook bent ----------
@@ -156,7 +174,7 @@
   document.addEventListener('keydown', function (ev) {
     if (ev.defaultPrevented || ev.ctrlKey || ev.metaKey || ev.altKey) return;
     var t = ev.target;
-    if (t === inp) { if (ev.key === 'Escape') { inp.value = ''; inp.blur(); uit.hidden = true; } return; }
+    if (t === inp) { if (ev.key === 'Escape') { inp.value = ''; inp.blur(); chat.hidden = true; } return; }
     var tag = (t && t.tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
     if (ev.key === '/' || (ev.key && ev.key.length === 1 && /[\wÀ-ɏ]/.test(ev.key))) {
@@ -169,13 +187,17 @@
      Een gedeelde, muteerbare kamer: handenvrij-mond.js vult spreek/zwijg in en
      leest doe/zeg/knop. Zo kennen de twee delen elkaar zonder laadvolgorde-gedoe;
      hetzelfde late-binding-patroon als in de kern op de server. */
-  var kamer = { doe: doe, zeg: zeg, knop: knMond, spreek: null, zwijg: null };
+  var kamer = {
+    doe: doe, zeg: zeg, knop: knMond, vak: chat, tok: tok, taal: taal,
+    spreek: null, zwijg: null,          // vult handenvrij-mond.js in
+    beurt: null, tikt: null, laadGesprek: null   // vult handenvrij-chat.js in
+  };
   root.__handenvrijKamer = kamer;
-  (function () {
-    var s = document.createElement('script');
-    s.src = '/shared/handenvrij-mond.js'; s.defer = true;
-    document.head.appendChild(s);
-  })();
+  ['/shared/handenvrij-chat.js', '/shared/handenvrij-mond.js'].forEach(function (src) {
+    var el = document.createElement('script');
+    el.src = src; el.defer = true;
+    document.head.appendChild(el);
+  });
 
   // wat een pagina zelf aanmeldt, gaat voor op wat we uit de DOM oprapen
   api.plek = function (naam, doen) { if (naam && typeof doen === 'function') eigen.push({ naam: String(naam), doen: doen }); };

@@ -111,7 +111,27 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     });
     assert.ok(gescrold > 50, 'omlaag hoort echt te scrollen, kreeg ' + gescrold);
 
-    // 7. en dit alles zonder onopgevangen JS-fouten
+    /* 7. het voelt als een gesprek: jouw zin staat er meteen als eigen bubbel,
+       daarna komt Rahul met een bubbel aan zijn kant. Niet een regel die de
+       vorige wist, maar beurten die blijven staan. */
+    await page.evaluate(() => { document.querySelector('.hv-balk input').value = 'hoe staat mijn saldo ervoor'; });
+    await page.click('.hv-balk button[type="submit"]');
+    await page.waitForSelector('.hv-chat .hv-beurt.ik .hv-bel', { state: 'visible', timeout: 5000 });
+    const mijn = await page.evaluate(() => document.querySelector('.hv-chat .hv-beurt.ik .hv-bel').textContent);
+    assert.match(mijn, /saldo/, 'jouw eigen zin hoort meteen in het gesprek te staan');
+    await page.waitForSelector('.hv-chat .hv-beurt.hij .hv-bel', { state: 'visible', timeout: 20000 });
+    const beurten = await page.evaluate(() => ({
+      ik: document.querySelectorAll('.hv-chat .hv-beurt.ik').length,
+      hij: document.querySelectorAll('.hv-chat .hv-beurt.hij').length,
+      tikt: document.querySelectorAll('.hv-tikt').length,
+      koppen: document.querySelectorAll('.hv-beurt.hij .hv-kop').length
+    }));
+    assert.ok(beurten.ik >= 1, 'minstens een eigen beurt');
+    assert.ok(beurten.hij >= 1, 'minstens een beurt van Rahul');
+    assert.equal(beurten.tikt, 0, 'de drie puntjes horen weg te zijn als het antwoord er is');
+    assert.ok(beurten.koppen >= 1, 'Rahul hoort zijn gezicht bij zijn beurt te hebben');
+
+    // 8. en dit alles zonder onopgevangen JS-fouten
     assert.deepEqual(fouten, [], 'geen paginafouten');
   } finally {
     if (browser) { try { await browser.close(); } catch (e) {} }

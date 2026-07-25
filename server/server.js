@@ -117,6 +117,18 @@ function appUrl(req) {
 require('./config').pasToe(process.env, log);
 
 load();
+
+/* Is het eigenaarschap ooit overgedragen vanuit de boardroom, dan staat de
+   opvolger in de database. Dat zetten we hier meteen terug in de eigenaar-
+   module, VOOR de routers geladen worden. Anders zou het platform na een
+   herstart terugvallen op het startadres en zou de vorige eigenaar er weer
+   doorheen komen, terwijl de nieuwe buiten staat. */
+try {
+  const bewaard = db.data && db.data.techniek && db.data.techniek.eigenaarEmail;
+  if (bewaard && eigenaar.zetEigenaarEmail(bewaard)) {
+    console.log('[eigenaar] overgedragen eigenaarschap hersteld: ' + eigenaar.eigenaarEmail());
+  }
+} catch (e) {}
 accounts.init();
 // Demo-modus: alleen buiten productie, of expliciet met RTG_DEMO=1. Zo staan de
 // demo-inlog en het demo-account (Rahul/Imran) nooit per ongeluk open op productie.
@@ -714,7 +726,7 @@ function eigenaarAccount() {
   // Hetzelfde adres als de boardroom- en kantoorpoort gebruiken (kern/eigenaar.js).
   // Stond hier eerder een eigen voorbeeldadres, waardoor de meldingen bij een
   // ander account uitkwamen dan de poort als eigenaar herkende.
-  try { return accounts.findByLogin(eigenaar.OWNER_EMAIL); } catch (e) { return null; }
+  try { return accounts.findByLogin(eigenaar.eigenaarEmail()); } catch (e) { return null; }
 }
 /* De archiefkast: houdt de levende kast klein door afgeronde tickets ouder
    dan een afgesloten kwartaal naar append-only maandbestanden te verhuizen. */

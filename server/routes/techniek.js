@@ -128,6 +128,15 @@ module.exports = (kern) => {
       uit.toegang = t.toegang.map(id => { const u = accounts.getUserById(id); return { id, naam: u ? accounts.realNameOf(u) : '?', email: u ? accounts.emailOf(u) : null }; });
       // de juridische grenzen: waar zelfs de eigenaar bewust GEEN inzage heeft
       uit.grenzen = eigenaar.GRENZEN;
+      /* Wie is op dit moment eigenaar, en waar komt dat vandaan? Dat laatste
+         is de nuttige helft: een adres uit de code is iets anders dan een
+         adres dat op de server is gezet of bewust is overgedragen. */
+      uit.eigenaarschap = {
+        email: eigenaar.eigenaarEmail(),
+        herkomst: t.eigenaarEmail ? 'overgedragen in de boardroom'
+          : (process.env.RTG_OWNER_EMAIL ? 'ingesteld op de server (RTG_OWNER_EMAIL)' : 'ingebouwde standaard'),
+        overdrachten: (t.eigenaarLog || []).slice(0, 5)
+      };
       // de archiefkast: instelbare live-vensterbreedte en de huidige verdeling
       uit.archief = archief ? { dagen: archief.dagen(), levend: (db.data.orders || []).length, gearchiveerd: archief.stat().aantal } : null;
       // de moderniseringsverzoeken die de eigenaar zelf via de AI heeft gevraagd

@@ -86,6 +86,41 @@
     }}, 'Intrekken');
     return el('div',{class:'zeker'}, el('div',{class:'mid'}, el('div',{class:'naam'}, t.naam||'?'), el('div',{class:'muted'}, t.email||('#'+t.id))), knop);
   }
+  /* ---------- eigenaarschap overdragen ----------
+     Bewust stroef: een bevestiging waarin het adres letterlijk staat, en het
+     eigen wachtwoord erbij. Wie dit per ongeluk aanklikt raakt anders in één
+     tik de zeggenschap over het hele platform kwijt. */
+  $('#bEigenaar').addEventListener('click', function(){
+    $('#eigFout').textContent='';
+    var email = $('#eigEmail').value.trim();
+    var ww = $('#eigWw').value;
+    if (!email) { $('#eigFout').textContent = 'Vul het e-mailadres van de nieuwe eigenaar in.'; return; }
+    if (!ww) { $('#eigFout').textContent = 'Vul uw eigen wachtwoord in ter bevestiging.'; return; }
+    if (!confirm('Het eigenaarschap van het hele platform overdragen aan ' + email + '?\n\n' +
+      'Daarna bepaalt dat account de zekeringen, de functieschakelaars en wie er toegang heeft. ' +
+      'U verliest die zeggenschap, tenzij de nieuwe eigenaar hem teruggeeft.')) return;
+    api('/api/techniek/eigenaar', { method:'POST', body:{ email:email, wachtwoord:ww } })
+      .then(function(r){
+        $('#eigEmail').value=''; $('#eigWw').value='';
+        toast('Eigenaarschap overgedragen aan ' + (r.naam || r.eigenaar) + '.');
+        laad();
+      })
+      .catch(function(e){ $('#eigWw').value=''; $('#eigFout').textContent = e.message; });
+  });
+  function eigLogRij(o){
+    return el('div',{class:'zeker'}, el('div',{class:'mid'},
+      el('div',{class:'naam'}, (o.van||'?') + ' → ' + (o.naar||'?')),
+      el('div',{class:'muted'}, 'door ' + (o.doorNaam||'?') + ' op ' + new Date(o.at).toLocaleString('nl-NL'))));
+  }
+  window.RTGTechEigenaar = function(e){
+    $('#eigNu').textContent = e && e.email ? e.email : '-';
+    $('#eigHerkomst').textContent = e && e.herkomst ? '(' + e.herkomst + ')' : '';
+    var log = (e && e.overdrachten) || [];
+    vervang($('#eigLog'), log.length
+      ? [el('div',{class:'muted',style:'margin-bottom:.3rem;'},'Eerdere overdrachten')].concat(log.map(eigLogRij))
+      : el('div',{class:'muted'},'Nog nooit overgedragen.'));
+  };
+
   $('#bGrant').addEventListener('click', function(){
     $('#grantFout').textContent='';
     api('/api/techniek/toegang', { method:'POST', body:{ email:$('#grantEmail').value.trim(), actie:'verleen' } })

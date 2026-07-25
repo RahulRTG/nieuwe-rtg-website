@@ -243,7 +243,7 @@ dev-lekken, registratie/eigenaar/backoffice werken.
    `.env.productie` als omgeving en start met `NODE_ENV=production`.
 
 - [ ] `npm run golive` geeft exitcode 0 op de productiemachine
-- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar (verplicht; het voorbeeldadres blokkeert de start)
+- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). Overdragen kan later op de technische pagina onder "Eigenaarschap"
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
 - [ ] TLS geregeld: óf een reverse proxy/load balancer vóór de app met `trust proxy` aan, óf native in de app (`RTG_TLS=1`, evt. `RTG_ACME=1` voor een automatisch Let's Encrypt-certificaat) — poort 80 + 443 bereikbaar

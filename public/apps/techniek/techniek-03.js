@@ -96,6 +96,9 @@
       if (d.eigenaar && d.grenzen) vervang($('#grenzen'), d.grenzen.map(function(g){
         return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'DICHT'), el('div',{class:'mid'}, el('div',{class:'muted'}, g))); }));
       $('#toegangBlok').hidden = !d.eigenaar;
+      // het eigenaarschap: alleen de eigenaar ziet wie het is en kan overdragen
+      $('#eigenaarBlok').hidden = !d.eigenaar;
+      if (d.eigenaar && window.RTGTechEigenaar) RTGTechEigenaar(d.eigenaarschap);
       if (d.eigenaar) vervang($('#toegangLijst'), (d.toegang&&d.toegang.length)? d.toegang.map(toegangRij) : el('div',{class:'muted'},'Nog niemand extra toegelaten.'));
       // De Wacht-tab: zichtbaar voor iedereen met toegang (lezen); de acties
       // (afsnijden, beslissen, opruimen) zijn in de UI en op de server owner-only.

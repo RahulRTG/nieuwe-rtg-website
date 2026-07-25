@@ -178,6 +178,15 @@ eigenaar, of voor wie hij op codenaam toegang heeft gegeven
 heeft geen identiteit en komt er dus nooit in; de rest van het kantoor blijft
 gewoon op de office-inlog werken.
 
+Wie de eigenaar is, staat op één plek: `server/eigenaar.js` (startadres uit
+`RTG_OWNER_EMAIL`, anders de ingebouwde standaard). Het eigenaarschap is over
+te dragen op de technische pagina onder **Eigenaarschap**
+(`POST /api/techniek/eigenaar`), met drie sloten: het wachtwoord van de
+huidige eigenaar op dat moment, een nieuw adres waar al een RTG-account bij
+hoort (anders zou de pagina voor iedereen dichtzitten) en een spoor in het
+logboek plus een kritieke beveiligingsmelding. De keuze staat in de database
+en wordt bij het opstarten teruggezet, dus een herstart draait hem niet terug.
+
 ## Privacy & security
 
 - **Pseudonimisering by design:** klanten staan in alle operationele systemen op hun codenaam; echte namen liggen in een gescheiden kluis en worden pas bij ticketing/check-in gekoppeld.

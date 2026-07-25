@@ -189,6 +189,28 @@
           <div id="modHist" style="margin-top:.7rem;"></div>
         </div>
       </div>
+      <div id="eigenaarBlok" hidden>
+        <div class="sec">Eigenaarschap</div>
+        <div class="kaart">
+          <p style="margin:0 0 .6rem;">Eigenaar van dit platform:
+            <b id="eigNu">-</b> <span class="muted" id="eigHerkomst"></span></p>
+          <p class="muted" style="margin:0 0 .8rem;font-size:.9rem;">
+            De eigenaar is de enige die zekeringen omzet, functies uitschakelt en anderen
+            toegang geeft. Overdragen kan alleen naar een adres waar al een RTG-account
+            bij hoort, anders zou deze pagina voor iedereen dichtzitten.</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <input class="veld" id="eigEmail" type="email" autocomplete="off"
+              aria-label="E-mailadres van de nieuwe eigenaar"
+              placeholder="E-mailadres van de nieuwe eigenaar" style="flex:1;margin-bottom:0;min-width:14rem;">
+            <input class="veld" id="eigWw" type="password" autocomplete="current-password"
+              aria-label="Uw eigen wachtwoord ter bevestiging"
+              placeholder="Uw eigen wachtwoord" style="flex:1;margin-bottom:0;min-width:12rem;">
+            <button class="knop klein" id="bEigenaar">Eigenaarschap overdragen</button>
+          </div>
+          <div class="fout" id="eigFout"></div>
+          <div id="eigLog" style="margin-top:.7rem;"></div>
+        </div>
+      </div>
       <div id="toegangBlok" hidden>
         <div class="sec">Toegang beheren</div>
         <div class="kaart">

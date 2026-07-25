@@ -2,6 +2,8 @@
    archiefkast, toegangsbeheer en de AI-diagnose per check. Gemount vanuit
    routes/techniek.js op de gedeelde context. */
 const techniek = require('../../techniek');
+const eigenaar = require('../../eigenaar');
+const { log } = require('../../log');
 module.exports = (tctx) => {
   const { app, accounts, anthropic, archief, beveilig, crypto, db, mail, save, sendPushToUser, LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx } = tctx;
   /* De eigenaar vraagt ZELF om een update/modernisering, in gewone taal. De AI
@@ -77,6 +79,73 @@ module.exports = (tctx) => {
     else if (!t.toegang.includes(doel.id)) t.toegang.push(doel.id);
     save();
     res.json({ ok: true, toegang: t.toegang.length });
+  });
+
+  /* Het eigenaarschap overdragen. Dit is de zwaarste handeling die het systeem
+     kent: de eigenaar is de enige die zekeringen mag omzetten, functies mag
+     uitschakelen en anderen toegang mag geven. Daarom drie sloten:
+
+     1. Het wachtwoord opnieuw. Een geleend of gestolen token is niet genoeg;
+        wie overdraagt moet op dat moment bewijzen dat hij het is.
+     2. Het nieuwe adres MOET een bestaand account zijn. Draag je over aan een
+        adres dat niemand heeft, dan is de technische pagina voor iedereen
+        dicht en kan degene die dat adres later registreert hem overnemen.
+        Precies het gat waar de go-live-controle voor waarschuwt.
+     3. Er blijft een spoor. Elke overdracht komt in het logboek en gaat als
+        kritieke melding het beveiligingsbord op. Een stille machtsoverdracht
+        hoort niet te kunnen. */
+  app.post('/api/techniek/eigenaar', techAuth, eigenaarAlleen, async (req, res) => {
+    const t = staat();
+    const nieuw = String(req.body.email || '').trim().toLowerCase();
+    if (!nieuw) return res.status(400).json({ error: 'Vul het e-mailadres van de nieuwe eigenaar in.' });
+
+    // slot 1: het wachtwoord van de HUIDIGE eigenaar, hier en nu
+    const wachtwoord = String(req.body.wachtwoord || '');
+    if (!wachtwoord || !await accounts.verifyPassword(wachtwoord, req.techUser.password_hash)) {
+      if (beveilig) beveilig.meld('eigenaar-overdracht-mislukt', 'kritiek',
+        'Poging tot overdracht van het eigenaarschap met een onjuist wachtwoord.',
+        { bron: 'user:' + req.techUser.id });
+      return res.status(401).json({ error: 'Onjuist wachtwoord; er is niets gewijzigd.' });
+    }
+
+    // slot 2: er moet een account achter zitten, anders sluit je jezelf buiten
+    const doel = accounts.findByLogin(nieuw);
+    if (!doel) {
+      return res.status(404).json({
+        error: 'Er is nog geen RTG-account met dat e-mailadres. Maak dat account eerst aan; ' +
+          'anders zou de technische pagina voor iedereen dicht zitten.'
+      });
+    }
+    const doelEmail = (accounts.emailOf(doel) || '').trim().toLowerCase();
+    if (!doelEmail) return res.status(400).json({ error: 'Dat account heeft geen e-mailadres in de kluis.' });
+    if (doelEmail === eigenaar.eigenaarEmail()) {
+      return res.status(400).json({ error: 'Dat is al de eigenaar; er is niets gewijzigd.' });
+    }
+
+    const vorige = eigenaar.eigenaarEmail();
+    if (!eigenaar.zetEigenaarEmail(doelEmail)) {
+      return res.status(400).json({ error: 'Dat is geen geldig e-mailadres.' });
+    }
+    t.eigenaarEmail = doelEmail;
+    t.eigenaarId = doel.id;
+
+    // slot 3: het spoor
+    if (!Array.isArray(t.eigenaarLog)) t.eigenaarLog = [];
+    t.eigenaarLog.unshift({
+      van: vorige, naar: doelEmail,
+      doorId: req.techUser.id, doorNaam: accounts.realNameOf(req.techUser),
+      at: new Date().toISOString()
+    });
+    if (t.eigenaarLog.length > 50) t.eigenaarLog.length = 50;
+    save();
+
+    log.info('eigenaar-overgedragen', { van: vorige, naar: doelEmail, door: req.techUser.id });
+    if (beveilig) beveilig.meld('eigenaar-overgedragen', 'kritiek',
+      'Het eigenaarschap van het platform is overgedragen van ' + vorige + ' naar ' + doelEmail +
+      ' door ' + accounts.realNameOf(req.techUser) + '.',
+      { bron: 'user:' + req.techUser.id });
+
+    res.json({ ok: true, eigenaar: doelEmail, naam: accounts.realNameOf(doel), vorige });
   });
 
   // AI-hulp: geef een diagnose en herstelstappen voor een (falende) check.

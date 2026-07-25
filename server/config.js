@@ -36,11 +36,18 @@ function valideer(env) {
       fouten.push('DEMO_PASS staat nog op de standaardwaarde.');
     if (env.RTG_CLUSTER_KEY && env.RTG_CLUSTER_KEY.length < 16)
       fouten.push('RTG_CLUSTER_KEY is te kort om de failover-endpoints te beschermen.');
-    // De eigenaar van de technische pagina wordt op e-mailadres herkend. Met het
-    // voorbeeldadres zou IEDEREEN die dat adres registreert eigenaar worden
-    // (zekeringen, functieschakelaars, beveiligingsmeldingen). Hard blokkeren.
-    if (!env.RTG_OWNER_EMAIL || env.RTG_OWNER_EMAIL === 'rahul@rtg.example')
-      fouten.push('RTG_OWNER_EMAIL ontbreekt of staat op het voorbeeldadres: wie dat adres registreert zou eigenaar van de technische pagina worden. Zet het echte e-mailadres van de eigenaar.');
+    /* De eigenaar van de technische pagina wordt op e-mailadres herkend. In
+       productie moet dat adres HIER staan, expliciet. server/eigenaar.js heeft
+       wel een ingebouwde standaard, maar die is voor ontwikkelen: op een verse
+       productiebak hoort bij dat adres nog geen account, dus wie het als eerste
+       registreert zou eigenaar worden (zekeringen, functieschakelaars,
+       beveiligingsmeldingen). Vandaar twee aparte, eerlijke meldingen: leeg is
+       iets anders dan het voorbeeldadres, maar allebei blokkeren ze de start. */
+    const eigenaarEnv = String(env.RTG_OWNER_EMAIL || '').trim().toLowerCase();
+    if (eigenaarEnv === 'rahul@rtg.example')
+      fouten.push('RTG_OWNER_EMAIL staat op het voorbeeldadres: wie dat adres registreert zou eigenaar van de technische pagina worden. Zet het echte e-mailadres van de eigenaar.');
+    else if (!eigenaarEnv)
+      fouten.push('RTG_OWNER_EMAIL ontbreekt. In productie geldt de ingebouwde standaard uit server/eigenaar.js niet: zet het echte e-mailadres van de eigenaar, en zorg dat daar al een RTG-account bij hoort.');
     if (env.OFFICE_CODE && env.OFFICE_CODE.length < 8)
       fouten.push('OFFICE_CODE is te kort; gebruik minstens 8 tekens (of laat hem weg voor een willekeurige code).');
 

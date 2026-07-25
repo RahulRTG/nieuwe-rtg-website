@@ -184,6 +184,9 @@ if (LOKAAL_TLS) {
 }
 
 const afhandelen = (req, res) => {
+  // Het certificaat en de uitlegpagina hangen ook aan de beveiligde kant, zodat
+  // een telefoon die alleen https accepteert er nog steeds bij kan.
+  if (LOKAAL_TLS && require('./lokaal-tls').loketAntwoord(req, res, tlsCert, PORT)) return;
   // Het verzoek eerst binnenhalen (verzoeken zijn klein: JSON en foto's tot
   // ruwweg een megabyte); dan kan het bij een uitval veilig opnieuw naar de
   // volgende server, ook halverwege een POST.
@@ -207,11 +210,7 @@ const poort = LOKAAL_TLS ? https.createServer({ key: tlsCert.key, cert: tlsCert.
 let caLoket = null;
 if (LOKAAL_TLS) {
   caLoket = http.createServer((req, res) => {
-    if ((req.url || '').split('?')[0] === '/rtg-ca.crt') {
-      res.writeHead(200, { 'Content-Type': 'application/x-x509-ca-cert',
-        'Content-Disposition': 'attachment; filename="RTG-CA.crt"' });
-      return res.end(tlsCert.caPem);
-    }
+    if (require('./lokaal-tls').loketAntwoord(req, res, tlsCert, PORT)) return;
     const gastheer = String(req.headers.host || '').split(':')[0] || 'localhost';
     // de voorpagina vertelt een mens of hij binnen is en wat er nog moet gebeuren
     if ((req.url || '/').split('?')[0] === '/') {

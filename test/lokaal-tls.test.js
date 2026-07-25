@@ -102,10 +102,7 @@ test('5. het loketje geeft de CA en stuurt de rest naar de beveiligde site', asy
   const c = lokaal.certVoorDezeMachine({ dataDir: TMP });
   const http = require('http');
   const loket = http.createServer((req, res) => {
-    if ((req.url || '').split('?')[0] === '/rtg-ca.crt') {
-      res.writeHead(200, { 'Content-Type': 'application/x-x509-ca-cert' });
-      return res.end(c.caPem);
-    }
+    if (lokaal.loketAntwoord(req, res, c, 3000)) return;
     const gastheer = String(req.headers.host || '').split(':')[0] || 'localhost';
     if ((req.url || '/').split('?')[0] === '/') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -139,7 +136,7 @@ test('5. het loketje geeft de CA en stuurt de rest naar de beveiligde site', asy
 });
 
 test('6. de QR in het venster is een echte, leesbare code', () => {
-  const adres = 'http://192.168.178.218:3010';
+  const adres = 'https://192.168.178.218:3000/lokaal';
   const kunst = lokaal.qrInTerminal(adres);
   assert.ok(kunst && kunst.split('\n').length > 10, 'er komt een blok tekens uit');
   // en het is geen plaatje-dat-erop-lijkt: onze eigen decoder leest hem terug
@@ -153,10 +150,48 @@ test('7. de opstartregels wijzen naar het loket, niet naar het losse bestand', (
   const uitleg = lokaal.startUitleg(c, 3000);
   assert.match(uitleg, /https:\/\/localhost:3000/, 'het adres op deze computer staat er');
   if (c.netwerk.length) {
-    assert.match(uitleg, new RegExp('http://' + c.netwerk[0].replace(/\./g, '\\.') + ':3010'),
-      'en het loket-adres voor de telefoon');
+    assert.match(uitleg, new RegExp('https://' + c.netwerk[0].replace(/\./g, '\\.') + ':3000/lokaal'),
+      'en het loket-adres voor de telefoon, over https');
     assert.match(uitleg, /camera/, 'met de uitleg dat de camera volstaat');
+    assert.match(uitleg, /Bezoek deze website/, 'en wat te doen bij de eenmalige waarschuwing');
   }
+});
+
+/* De aanleiding voor deze test: een iPhone met "Alleen HTTPS" aan weigerde het
+   http-loket op poort 3010 al voordat er iets verstuurd werd. Het certificaat
+   was daardoor onbereikbaar zonder eerst een beveiliging uit te zetten. Sinds
+   die dag hangt het loket aan beide kanten. */
+test('8. het loket hangt ook aan de beveiligde kant, voor telefoons die http weigeren', async () => {
+  const c = lokaal.certVoorDezeMachine({ dataDir: TMP });
+  const server = https.createServer({ key: c.key, cert: c.cert }, (req, res) => {
+    if (lokaal.loketAntwoord(req, res, c, 3000)) return;
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('de site zelf');
+  });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  const poort = server.address().port;
+
+  const haal = pad => new Promise((klaar, stuk) => {
+    https.get({ host: '127.0.0.1', port: poort, path: pad, servername: 'localhost', ca: c.caPem }, r => {
+      const d = []; r.on('data', x => d.push(x));
+      r.on('end', () => klaar({ status: r.statusCode, body: Buffer.concat(d).toString() }));
+    }).on('error', stuk);
+  });
+
+  const ca = await haal('/rtg-ca.crt');
+  assert.equal(ca.status, 200);
+  assert.ok(ca.body.includes('BEGIN CERTIFICATE'), 'het CA-bestand komt ook over https binnen');
+  const pagina = await haal('/lokaal');
+  assert.match(pagina.body, /bereikbaar/, 'de uitlegpagina staat er ook');
+  assert.match(pagina.body, /Certificaatvertrouwensinstellingen/, 'met de stap die het vaakst vergeten wordt');
+  const rest = await haal('/apps/app.html');
+  assert.equal(rest.body, 'de site zelf', 'de rest gaat gewoon naar de site door');
+
+  await new Promise(r => server.close(r));
+
+  // en de poortwachter rijgt het er echt aan, niet alleen deze test
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'trio.js'), 'utf8');
+  assert.match(bron, /loketAntwoord\(req, res, tlsCert, PORT\)/, 'trio.js hangt het loket aan de https-kant');
 });
 
 test.after(() => { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });

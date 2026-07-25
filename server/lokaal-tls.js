@@ -121,6 +121,36 @@ function loketPagina(poort, naamVanDeMachine) {
     '</body></html>';
 }
 
+/* Het loket beantwoordt twee adressen: het CA-bestand zelf en de uitlegpagina.
+   Ze hangen bewust aan twee kanten: aan het kale http-loketje, en aan de
+   beveiligde site zelf.
+
+   Dat tweede is nodig omdat Safari en Chrome een stand kennen waarin ze elk
+   http-adres botweg weigeren ("Alleen HTTPS" / "Altijd beveiligde
+   verbindingen"). Staat die aan, dan komt het http-loket niet eens van de
+   grond, en zou de gebruiker eerst een beveiliging op zijn telefoon moeten
+   uitzetten om er een bij te kunnen zetten. Via https werkt het met die stand
+   gewoon aan; de browser waarschuwt dan eenmalig over het certificaat, en dat
+   is precies het certificaat dat hier wordt opgehaald.
+
+   Geeft true terug als het verzoek hier is afgehandeld. */
+function loketAntwoord(req, res, cert, poort) {
+  const pad = String(req.url || '/').split('?')[0];
+  if (pad === '/rtg-ca.crt') {
+    res.writeHead(200, { 'Content-Type': 'application/x-x509-ca-cert',
+      'Content-Disposition': 'attachment; filename="RTG-CA.crt"' });
+    res.end(cert.caPem);
+    return true;
+  }
+  if (pad === '/lokaal') {
+    const gastheer = String(req.headers.host || '').split(':')[0] || 'localhost';
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(loketPagina(poort, gastheer));
+    return true;
+  }
+  return false;
+}
+
 /* Een QR-code in het Terminal-venster, met onze eigen codec (public/shared/qr.js).
 
    Het adres van deze computer overtypen op een telefoon gaat vaak mis: één
@@ -168,16 +198,22 @@ function startUitleg(cert, poort) {
   }
   regels.push('');
   if (cert.netwerk.length) {
-    const loket = 'http://' + cert.netwerk[0] + ':' + (poort + 10);
+    const loket = 'https://' + cert.netwerk[0] + ':' + poort + '/lokaal';
     regels.push('  Richt de camera van uw telefoon op deze code, en tik op de melding:');
     regels.push('');
     const qr = qrInTerminal(loket);
     if (qr) { regels.push(qr); regels.push(''); }
-    regels.push('  (of typ het over: ' + loket + '  -- let op: http, en poort ' + (poort + 10) + ')');
+    regels.push('  Uw browser waarschuwt eenmalig dat de verbinding niet veilig is. Dat klopt:');
+    regels.push('  het certificaat staat nog niet op uw telefoon, en dat is precies wat u daar');
+    regels.push('  gaat ophalen. Tik op "Toon details" en daarna op "Bezoek deze website".');
+    regels.push('');
+    regels.push('  (of typ het over: ' + loket + ')');
+    regels.push('  (zonder die waarschuwing, maar alleen als "Alleen HTTPS" uit staat:');
+    regels.push('   http://' + cert.netwerk[0] + ':' + (poort + 10) + ')');
   }
   regels.push('  Het certificaat staat ook los op schijf: ' + cert.caPad);
   regels.push('');
   return regels.join('\n');
 }
 
-module.exports = { certVoorDezeMachine, adressenVanDezeMachine, netwerkAdressen, startUitleg, loketPagina, qrInTerminal };
+module.exports = { certVoorDezeMachine, adressenVanDezeMachine, netwerkAdressen, startUitleg, loketPagina, loketAntwoord, qrInTerminal };

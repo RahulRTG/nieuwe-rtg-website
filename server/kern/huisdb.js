@@ -55,7 +55,11 @@ const RTF_OMLEIDING = {
   hardware: 'hardwareRtf',
   architect: 'architectRtf',
   redactie: 'redactieRtf',
-  ideeen: 'ideeenRtf'
+  ideeen: 'ideeenRtf',
+  // de plank waar een afgerond concept in de verkoop gaat. Voor RTG is dat de
+  // echte RTG-winkel; de stichting krijgt haar eigen plank, zodat haar werk
+  // niet ongemerkt in de winkel van RTG belandt.
+  winkelProducten: 'winkelProductenRtf'
 };
 
 /* De bureaus geven zichzelf terug onder hun eigen naam ({ atelier: api }).

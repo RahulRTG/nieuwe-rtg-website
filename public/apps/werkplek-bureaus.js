@@ -28,7 +28,7 @@
       knop: 'Nieuw ontwerp', blad: ['specsheet', 'Specsheet'] },
     hardware: { naam: 'Hardwarelab', glyf: 'gear', wat: 'De eigen apparaten en schermen',
       lijst: 'ontwerpen', titel: 'naam', tekst: 'brief', maak: '/maak',
-      knop: 'Nieuw apparaat', blad: ['stuklijst', 'Stuklijst'] },
+      knop: 'Nieuw apparaat', blad: ['stuklijst', 'Stuklijst'], plank: true },
     architect: { naam: 'Architectenbureau', glyf: 'bouw', wat: 'Het gebouwde: huizen en paviljoens',
       lijst: 'ontwerpen', titel: 'naam', tekst: 'brief', maak: '/maak',
       knop: 'Nieuw project', blad: ['bouwstaat', 'Bouwstaat'] },
@@ -96,8 +96,10 @@
           '<input class="veld" id="bBrief" placeholder="Waar gaat het over?" maxlength="400" aria-label="Omschrijving">' +
           '<button class="knop" type="button" id="bMaak">' + esc(c.knop) + '</button>' +
         '</div>' +
-        '<div id="bLijst"></div><div id="bUit" class="leeg"></div>';
+        '<div id="bLijst"></div><div id="bUit" class="leeg"></div>' +
+        (c.plank ? '<div class="sec2">Op de plank van dit huis</div><div id="bPlank" class="leeg">Laden...</div>' : '');
       lijst(paneel, code, id, items);
+      if (c.plank) plank(paneel, code);
       paneel.querySelector('#bDicht').addEventListener('click', function () { paneel.innerHTML = ''; });
       paneel.querySelector('#bMaak').addEventListener('click', function () {
         var t = paneel.querySelector('#bTitel').value.trim();
@@ -124,8 +126,18 @@
           '<button class="knop klein" type="button" data-doe="/kritiek" data-id="' + esc(o.id) + '">Kritiek</button>';
       }
       if (c.ai) acties += '<button class="knop klein" type="button" data-doe="' + esc(c.ai[0]) + '" data-id="' + esc(o.id) + '">' + esc(c.ai[1]) + '</button>';
+      // het Hardwarelab kan een afgerond concept op de plank van dit huis zetten:
+      // bij RTG is dat de echte winkel, bij de stichting haar eigen plank.
+      if (c.plank) {
+        acties += o.winkel
+          ? '<button class="knop klein" type="button" data-af="' + esc(o.id) + '">Van de plank</button>'
+          : '<input class="veld prijsveld" type="number" min="1" step="1" data-prijs="' + esc(o.id) + '" ' +
+            'placeholder="euro ex btw" aria-label="Prijs voor ' + esc(o.naam || '') + '">' +
+            '<button class="knop klein" type="button" data-op="' + esc(o.id) + '">Op de plank</button>';
+      }
       return '<div class="bItem"><div><b>' + esc(o[c.titel] || o.naam || o.kop || o.titel) + '</b>' +
-        (o.status ? ' <span class="pil">' + esc(o.status) + '</span>' : '') + '</div>' +
+        (o.status ? ' <span class="pil">' + esc(o.status) + '</span>' : '') +
+        (o.winkel ? ' <span class="pil">op de plank</span>' : '') + '</div>' +
         '<div class="acties">' + acties + '</div></div>';
     }).join('');
     Array.prototype.forEach.call(doel.querySelectorAll('[data-doe]'), function (b) {
@@ -136,6 +148,51 @@
         }).catch(function (e) { melding(paneel, e.message); });
       });
     });
+    Array.prototype.forEach.call(doel.querySelectorAll('[data-op]'), function (b) {
+      b.addEventListener('click', function () {
+        var veld = doel.querySelector('[data-prijs="' + b.dataset.op + '"]');
+        var eenmalig = Math.round(Number(veld && veld.value) || 0);
+        if (!eenmalig) { melding(paneel, 'Geef eerst een prijs in euro, ex btw.'); return; }
+        api('/' + id + '/plank', { bedrijf: code, id: b.dataset.op, prijs: { eenmalig: eenmalig } })
+          .then(function () { open(paneel, code, id); })
+          .catch(function (e) { melding(paneel, e.message); });
+      });
+    });
+    Array.prototype.forEach.call(doel.querySelectorAll('[data-af]'), function (b) {
+      b.addEventListener('click', function () {
+        api('/' + id + '/plank-af', { bedrijf: code, id: b.dataset.af })
+          .then(function () { open(paneel, code, id); })
+          .catch(function (e) { melding(paneel, e.message); });
+      });
+    });
+  }
+
+  /* De plank van dit huis: wat er nu echt in de verkoop staat. */
+  function plank(paneel, code) {
+    var doel = paneel.querySelector('#bPlank');
+    fetch('/api/werkplek/plank', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (function () {
+        try { return localStorage.getItem('rtg_token') || localStorage.getItem('rtg_office_token') || ''; } catch (e) { return ''; }
+      })() },
+      body: JSON.stringify({ bedrijf: code })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      var p = d.producten || [];
+      if (!p.length) {
+        doel.innerHTML = d.eigenWinkel
+          ? 'De RTG-winkel heeft nog geen concept uit dit lab staan.'
+          : 'De plank van de stichting is nog leeg. Wat hier komt te staan, komt niet in de winkel van RTG.';
+        return;
+      }
+      doel.innerHTML = '<div class="uitleg">' + (d.eigenWinkel
+        ? 'Dit staat in de RTG-winkel.'
+        : 'De eigen plank van de stichting, los van de winkel van RTG.') + '</div>' +
+        p.map(function (x) {
+          return '<div class="bItem"><div><b>' + esc(x.naam) + '</b> <span class="pil">' + esc(x.disciplineLabel || '') + '</span>' +
+            '<div class="uitleg">' + esc(x.beschrijving || '') + '</div></div>' +
+            '<div class="acties"><b>&euro; ' + esc(x.eenmalig) + '</b> <span class="uitleg">' + esc(x.eenheid || '') + ', ex btw</span></div></div>';
+        }).join('');
+    }).catch(function (e) { doel.textContent = e.message; });
   }
 
   /* Wat er terugkomt verschilt per actie; toon het stuk dat een mens leest en

@@ -10,11 +10,12 @@
    De deur komt van ./werkplek.js mee: dezelfde sleutel per bedrijf, dus een
    medewerker van RTF kan hier niet in de ontwerpen van RTG kijken.
 
-   Niet meegenomen: het spoor waar een concept van het Hardwarelab in de
-   RTG-winkel belandt (/winkel). Dat is geen ontwerp- maar een verkoophandeling
-   van RTG zelf, en hoort niet vanuit de stichting te lopen. */
+   Elk huis heeft ook een eigen plank: het spoor waar een afgerond concept van
+   het Hardwarelab in de verkoop gaat. Voor RTG is dat de echte RTG-winkel, voor
+   de stichting haar eigen plank -- hetzelfde gebaar, maar het werk van de
+   stichting belandt nooit ongemerkt tussen dat van RTG. */
 module.exports = (kern, huisAuth) => {
-  const { app } = kern;
+  const { app, db } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
   /* Welke instantie hoort bij dit huis: RTG heeft de oorspronkelijke, de
@@ -32,6 +33,7 @@ module.exports = (kern, huisAuth) => {
     idStatus: b => [String(b.id || ''), String(b.status || '')],
     idBureau: b => [String(b.id || ''), String(b.bureau || '')],
     naam: b => [b.naam],
+    prijs: b => [String(b.id || ''), b.prijs || b],
     schrijf: b => [String(b.onderwerp || ''), String(b.rubriek || '')]
   };
 
@@ -57,6 +59,7 @@ module.exports = (kern, huisAuth) => {
       ['/zet', 'ontwerpZet', 'idBody'], ['/verwijder', 'ontwerpVerwijder', 'id'],
       ['/serie', 'collectieMaak', 'body'], ['/productblad', 'productblad', 'naam'],
       ['/stuklijst', 'aiStuklijst', 'id'],
+      ['/plank', 'naarWinkel', 'prijs'], ['/plank-af', 'uitWinkel', 'id'],
       ['/concept', 'aiConcept', 'id', true], ['/kritiek', 'aiKritiek', 'idVraag', true]
     ],
     architect: [
@@ -99,6 +102,22 @@ module.exports = (kern, huisAuth) => {
       });
     }
   }
+
+  /* De plank van dit huis: wat er uit het Hardwarelab in de verkoop staat.
+     RTG leest de echte winkel, de stichting haar eigen plank. Prijzen zijn in
+     euro, ex btw -- precies zoals ze bij naarWinkel zijn ingevoerd. */
+  const PLANK = { rtg: 'winkelProducten', rtf: 'winkelProductenRtf' };
+  app.post('/api/werkplek/plank', huisAuth, (req, res) => {
+    try {
+      const bak = db.data[PLANK[req.werkplekCode]] || {};
+      const items = Object.keys(bak).map(slug => Object.assign({ slug }, bak[slug]))
+        .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
+      res.json({ ok: true, bedrijf: req.werkplekCode, eigenWinkel: req.werkplekCode === 'rtg', producten: items });
+    } catch (e) {
+      console.error('[werkplek-bureaus] plank', e);
+      res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
+    }
+  });
 
   /* De etalage van de ontwerptak: hoeveel staat er in elk bureau van dit huis?
      Voedt het overzichtsscherm zonder zes losse verzoeken. */

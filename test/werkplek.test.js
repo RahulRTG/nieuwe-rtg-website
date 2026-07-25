@@ -240,3 +240,38 @@ test('12. de ideeenkamer van de stichting werkt haar eigen bureaus bij', async (
   assert.equal((await post('/api/werkplek/bureau/atelier', { bedrijf: 'rtf' })).status, 403);
   assert.equal((await bu('/atelier', { bedrijf: 'bestaatniet' })).status, 404);
 });
+
+test('13. elk huis verkoopt van zijn eigen plank', async () => {
+  const bu = (pad, body) => post('/api/werkplek/bureau' + pad, body, eigenaar);
+  const plank = code => post('/api/werkplek/plank', { bedrijf: code }, eigenaar);
+
+  const leeg = await plank('rtf');
+  assert.equal(leeg.status, 200);
+  assert.equal(leeg.body.eigenWinkel, false, 'de stichting verkoopt niet uit de RTG-winkel');
+  assert.equal(leeg.body.producten.length, 0, 'haar plank begint leeg');
+  const rtgVoor = (await plank('rtg')).body.producten.length;
+
+  // een apparaat van de stichting op haar eigen plank zetten
+  const m = await bu('/hardware/maak', { bedrijf: 'rtf', naam: 'Clubhuis-paneel',
+    brief: 'Een eenvoudig paneel voor bij de deur van een clubhuis.' });
+  assert.equal(m.status, 200);
+  const oid = m.body.ontwerp.id;
+  assert.equal((await bu('/hardware/plank', { bedrijf: 'rtf', id: oid })).status, 400,
+    'zonder prijs gaat er niets in de verkoop');
+
+  const op = await bu('/hardware/plank', { bedrijf: 'rtf', id: oid, prijs: { eenmalig: 240, eenheid: 'per stuk' } });
+  assert.equal(op.status, 200);
+  const na = await plank('rtf');
+  assert.equal(na.body.producten.length, 1, 'het staat op de plank van de stichting');
+  assert.equal(na.body.producten[0].eenmalig, 240);
+  assert.equal((await plank('rtg')).body.producten.length, rtgVoor,
+    'en niet in de winkel van RTG');
+
+  // eraf halen kan ook
+  assert.equal((await bu('/hardware/plank-af', { bedrijf: 'rtf', id: oid })).status, 200);
+  assert.equal((await plank('rtf')).body.producten.length, 0, 'de plank is weer leeg');
+
+  // en de deur geldt ook hier
+  assert.equal((await post('/api/werkplek/plank', { bedrijf: 'rtf' }, medewerker)).status, 403);
+  assert.equal((await post('/api/werkplek/plank', { bedrijf: 'bestaatniet' }, eigenaar)).status, 404);
+});

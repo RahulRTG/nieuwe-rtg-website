@@ -127,12 +127,24 @@ const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '
 // Sync-varianten: de seed draait voor 'listen', dus blokkeren kan geen kwaad
 // en zodra de poort opengaat bestaan de accounts gegarandeerd (geen race in tests).
 if (DEMO) {
-  let u = accounts.findByLogin(require('./eigenaar').OWNER_EMAIL);
-  if (!u && accounts.count() === 0) {
-    u = accounts.createUserSync({ username: 'Rahul', email: require('./eigenaar').OWNER_EMAIL, password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
-    accounts.saveMemberState(u.id, memberTemplate());
-    accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
-  } else if (u && accounts.realNameOf(u) !== 'Rahul Imran Ismail') {
+  const DEMO_WACHTWOORD = process.env.DEMO_PASS || 'Imran';
+  let u = accounts.findByLogin(eigenaar.OWNER_EMAIL);
+  if (!u) {
+    /* Nog geen account op het eigenaarsadres. Op een verse database maken we er
+       een; op een database die al demoleden bevat draagt de seed-persona de
+       naam Rahul al, en verhuizen we die naar het eigenaarsadres. Anders zou
+       de inlognaam botsen en bleef de eigenaar buiten de boardroom staan. */
+    const bestaand = accounts.findByLogin('Rahul');
+    if (bestaand) {
+      u = accounts.renameUser(bestaand.id, { username: 'Rahul', realName: 'Rahul Imran Ismail', email: eigenaar.OWNER_EMAIL });
+      accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
+      accounts.setVerification(u.id, 'verified');
+    } else {
+      u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
+      accounts.saveMemberState(u.id, memberTemplate());
+      accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
+    }
+  } else if (accounts.realNameOf(u) !== 'Rahul Imran Ismail') {
     u = accounts.renameUser(u.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
   }
   /* De sleutelbos van de eigenaar: alles zien en alles doen met het ene
@@ -912,7 +924,10 @@ function sendPush(tier, note) {
 /* Beveiligingsmeldingen (inbraakdetectie) voor het technische bord. Een kritieke
    melding gaat meteen naar de eigenaar: web-push op zijn telefoon en een e-mail. */
 function eigenaarAccount() {
-  try { return accounts.findByLogin(process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example'); } catch (e) { return null; }
+  // Hetzelfde adres als de boardroom- en kantoorpoort gebruiken (kern/eigenaar.js).
+  // Stond hier eerder een eigen voorbeeldadres, waardoor de meldingen bij een
+  // ander account uitkwamen dan de poort als eigenaar herkende.
+  try { return accounts.findByLogin(eigenaar.OWNER_EMAIL); } catch (e) { return null; }
 }
 /* De archiefkast: houdt de levende kast klein door afgeronde tickets ouder
    dan een afgesloten kwartaal naar append-only maandbestanden te verhuizen. */

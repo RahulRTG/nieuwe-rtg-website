@@ -58,12 +58,28 @@ function findByLogin(login) {
 function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().c; }
 
 /* Naamswijziging door het huis zelf (opstart-seed van het eigenaarsaccount):
-   inlognaam en echte naam in een keer, de kluis blijft de bron. */
-function renameUser(id, { username, realName }) {
-  S.db.prepare('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
-    .run(username, kluis.enc(realName), id);
+   inlognaam en echte naam in een keer, de kluis blijft de bron. Geef je ook een
+   e-mailadres mee, dan verhuist het account daarheen: de zoekhash en de
+   versleutelde waarde gaan samen mee, anders zou het account onvindbaar worden. */
+function renameUser(id, { username, realName, email }) {
+  if (email === undefined) {
+    S.db.prepare('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
+      .run(username, kluis.enc(realName), id);
+  } else {
+    S.db.prepare('UPDATE users SET username = ?, enc_name = ?, email_hash = ?, enc_email = ? WHERE id = ?')
+      .run(username, kluis.enc(realName), kluis.emailHash(email), kluis.enc(email), id);
+  }
   mirror.markUser(id);
   return getUserById(id);
+}
+
+/* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
+   setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
+function setPasswordSync(userId, password) {
+  S.db.prepare('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
+    .run(kluis.hashPasswordSync(password), userId);
+  mirror.markUser(userId);
+  return getUserById(userId);
 }
 
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
@@ -206,6 +222,6 @@ module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
   renameUser, realNameOf, emailOf, phoneOf,
   issueToken, verifyToken, issueActionToken, verifyActionToken,
-  setEmailVerified, createReset, findByReset, setPassword,
+  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

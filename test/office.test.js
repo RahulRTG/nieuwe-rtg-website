@@ -101,3 +101,82 @@ test('4. privacy en eigendom: alleen de eigenaar beheert; een gast mag niet in O
   const eigen = await api('/api/kantoorpakket/weg', { id: m.body.id }, lidA);
   assert.equal(eigen.status, 200, 'de eigenaar verwijdert wel');
 });
+
+test('5. de drive vertelt wat er in een stuk zit, en markeren zet het bovenaan', async () => {
+  const t = await api('/api/kantoorpakket/maak', { soort: 'tekst', titel: 'Kort memo' }, lidA);
+  await api('/api/kantoorpakket/bewaar', { id: t.body.id, inhoud: { tekst: '<p>een twee drie vier</p>' } }, lidA);
+  const b = await api('/api/kantoorpakket/maak', { soort: 'blad', titel: 'Cijfers' }, lidA);
+  await api('/api/kantoorpakket/bewaar', { id: b.body.id, inhoud: { cellen: { A1: '1', A2: '2' }, rijen: 5, kolommen: 3 } }, lidA);
+
+  const mijn = await api('/api/kantoorpakket/mijn', {}, lidA);
+  const memo = mijn.body.docs.find(d => d.id === t.body.id);
+  const cijfers = mijn.body.docs.find(d => d.id === b.body.id);
+  assert.equal(memo.omvang, '4 woorden', 'een tekst telt in woorden');
+  assert.equal(cijfers.omvang, '2 cellen', 'een blad telt in cellen');
+  assert.equal(memo.vanMij, true, 'de drive weet dat dit uw eigen stuk is');
+  assert.equal(memo.ster, false);
+
+  const ster = await api('/api/kantoorpakket/ster', { id: t.body.id, aan: true }, lidA);
+  assert.equal(ster.status, 200);
+  assert.equal((await api('/api/kantoorpakket/mijn', {}, lidA)).body.docs
+    .find(d => d.id === t.body.id).ster, true, 'de markering blijft staan');
+  assert.equal((await api('/api/kantoorpakket/ster', { id: t.body.id, aan: true }, lidB)).status, 403,
+    'een ander markeert niets in uw map');
+});
+
+test('6. de sjablonen zijn kantoorwerk, met groep en werkende formules', async () => {
+  const mijn = await api('/api/kantoorpakket/mijn', {}, lidA);
+  const sj = mijn.body.sjablonen;
+  assert.ok(sj.length >= 10, 'er staat een echte sjabloonkast klaar (nu ' + sj.length + ')');
+  assert.ok(sj.every(s => s.groep), 'elk sjabloon hoort bij een groep');
+  const groepen = [...new Set(sj.map(s => s.groep))];
+  for (const g of ['Bestuur', 'Financieel', 'Commercieel', 'Juridisch']) {
+    assert.ok(groepen.includes(g), 'de groep ' + g + ' bestaat');
+  }
+  // een begroting komt met formules en celopmaak uit de kast
+  const m = await api('/api/kantoorpakket/maak', { sjabloon: 'begroting' }, lidA);
+  assert.equal(m.status, 200);
+  const o = await api('/api/kantoorpakket/open', { id: m.body.id }, lidA);
+  assert.equal(o.body.soort, 'blad');
+  assert.equal(o.body.inhoud.cellen.F2, '=SOM(B2:E2)', 'de formule staat er echt in');
+  assert.equal(o.body.inhoud.opmaak.F2, 'geld', 'en de cel weet dat het geld is');
+  assert.equal(o.body.inhoud.opmaak.A1, 'kop');
+  // een deck komt met indelingen en sprekersnotities
+  const p = await api('/api/kantoorpakket/maak', { sjabloon: 'boardpack' }, lidA);
+  const po = await api('/api/kantoorpakket/open', { id: p.body.id }, lidA);
+  assert.equal(po.body.inhoud.dias[0].indeling, 'titel');
+  assert.ok(po.body.inhoud.dias.some(d => d.notitie), 'er staat een sprekersnotitie bij');
+});
+
+test('7. vreemde celopmaak en dia-indelingen komen de opslag niet in', async () => {
+  const b = await api('/api/kantoorpakket/maak', { soort: 'blad' }, lidA);
+  await api('/api/kantoorpakket/bewaar', { id: b.body.id, inhoud: { cellen: { A1: '1' },
+    opmaak: { A1: 'geld', A2: 'onzin', 'niet-een-cel': 'kop' }, rijen: 5, kolommen: 3 } }, lidA);
+  const o = await api('/api/kantoorpakket/open', { id: b.body.id }, lidA);
+  assert.equal(o.body.inhoud.opmaak.A1, 'geld');
+  assert.equal(o.body.inhoud.opmaak.A2, undefined, 'een onbekende opmaak wordt geweigerd');
+  assert.equal(o.body.inhoud.opmaak['niet-een-cel'], undefined, 'en een niet-cel ook');
+
+  const p = await api('/api/kantoorpakket/maak', { soort: 'presentatie' }, lidA);
+  await api('/api/kantoorpakket/bewaar', { id: p.body.id, inhoud: { dias: [
+    { indeling: 'cijfer', titel: 'Een', tekst: '1', notitie: 'zeg het cijfer' },
+    { indeling: 'hakketak', titel: 'Twee', tekst: '2' }
+  ] } }, lidA);
+  const po = await api('/api/kantoorpakket/open', { id: p.body.id }, lidA);
+  assert.equal(po.body.inhoud.dias[0].indeling, 'cijfer');
+  assert.equal(po.body.inhoud.dias[0].notitie, 'zeg het cijfer');
+  assert.equal(po.body.inhoud.dias[1].indeling, 'punten', 'een onbekende indeling valt terug op punten');
+});
+
+test('8. Rahul leest mee met meer dan drie opdrachten, en weigert wat hij niet kent', async () => {
+  const t = await api('/api/kantoorpakket/maak', { soort: 'tekst', titel: 'Notitie' }, lidA);
+  await api('/api/kantoorpakket/bewaar', { id: t.body.id,
+    inhoud: { tekst: '<p>Jan levert het rapport voor vrijdag. De cijfers moeten nog onderbouwd.</p>' } }, lidA);
+  for (const opdracht of ['samenvatten', 'herschrijven', 'inkorten', 'actiepunten', 'kritisch', 'engels']) {
+    const r = await api('/api/kantoorpakket/ai', { id: t.body.id, opdracht }, lidA);
+    assert.equal(r.status, 200, opdracht + ' bestaat');
+    assert.ok(r.body.voorstel && r.body.voorstel.length > 10, opdracht + ' levert een leesbaar voorstel');
+  }
+  const raar = await api('/api/kantoorpakket/ai', { id: t.body.id, opdracht: 'verzin-maar-wat' }, lidA);
+  assert.equal(raar.status, 400, 'een onbekende opdracht wordt geweigerd');
+});

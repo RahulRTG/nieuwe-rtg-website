@@ -10,27 +10,13 @@ const MAX_BYTES = 500000;        // per document (ruime kantoortekst, blad of de
 const MAX_TITEL = 120;
 const MAX_VERSIES = 15;
 const MAX_DIAS = 60;
+/* De celopmaak van een rekenblad en de indelingen van een dia: een korte,
+   vaste lijst, zodat het scherm het kan tekenen en er nooit vreemde waarden
+   in de opslag belanden. */
+const OPMAAK = ['kop', 'geld', 'procent', 'getal', 'datum'];
+const INDELINGEN = ['titel', 'punten', 'twee', 'citaat', 'cijfer'];
 
-/* Sjablonen: een vliegende start per soort; pure inhoud, geen logica. */
-const SJABLONEN = {
-  brief: { soort: 'tekst', titel: 'Zakelijke brief', inhoud: { tekst: '<p>[Uw naam of zaak]<br>[Adres]</p><p>Betreft: </p><p>Geachte ,</p><p><br></p><p>Met vriendelijke groet,</p>' } },
-  notulen: { soort: 'tekst', titel: 'Notulen', inhoud: { tekst: '<p><b>Notulen</b> · [datum]</p><p>Aanwezig: </p><ul><li>Opening</li><li>Besluiten</li><li>Actiepunten (wie, wat, wanneer)</li><li>Rondvraag</li></ul>' } },
-  factuurblad: { soort: 'blad', titel: 'Factuurregels', inhoud: { cellen: {
-    A1: 'Omschrijving', B1: 'Aantal', C1: 'Prijs', D1: 'Regel',
-    D2: '=B2*C2', D3: '=B3*C3', D4: '=B4*C4',
-    C6: 'Totaal', D6: '=SOM(D2:D4)'
-  }, rijen: 20, kolommen: 6 } },
-  weekplan: { soort: 'blad', titel: 'Weekplanning', inhoud: { cellen: {
-    A1: 'Dag', B1: 'Ochtend', C1: 'Middag', D1: 'Avond',
-    A2: 'Maandag', A3: 'Dinsdag', A4: 'Woensdag', A5: 'Donderdag', A6: 'Vrijdag', A7: 'Zaterdag', A8: 'Zondag'
-  }, rijen: 12, kolommen: 5 } },
-  pitch: { soort: 'presentatie', titel: 'Pitch', inhoud: { dias: [
-    { titel: 'De titel van uw verhaal', tekst: 'Wie u bent, in een zin.' },
-    { titel: 'Het probleem', tekst: 'Wat lost u op, en voor wie?' },
-    { titel: 'De oplossing', tekst: 'Hoe u het oplost; een zin per punt.' },
-    { titel: 'De vraag', tekst: 'Wat heeft u nodig van de zaal?' }
-  ] } }
-};
+const { SJABLONEN } = require('./sjablonen');
 
 function maakBasis({ db, crypto, codenaamVan }) {
   const id = () => 'doc' + crypto.randomBytes(6).toString('hex');
@@ -68,17 +54,27 @@ function maakBasis({ db, crypto, codenaamVan }) {
         if (!/^[A-Z]{1,2}[0-9]{1,3}$/.test(ref) || n++ > 4000) continue;
         cellen[ref] = String(waarde == null ? '' : waarde).slice(0, 400);
       }
+      // de opmaak per cel: alleen de vaste soorten, en alleen voor echte cellen
+      const opmaak = {};
+      const opBron = (inhoud.opmaak && typeof inhoud.opmaak === 'object') ? inhoud.opmaak : {};
+      let m = 0;
+      for (const [ref, soortje] of Object.entries(opBron)) {
+        if (!/^[A-Z]{1,2}[0-9]{1,3}$/.test(ref) || m++ > 4000) continue;
+        if (OPMAAK.includes(soortje)) opmaak[ref] = soortje;
+      }
       const rijen = Math.min(200, Math.max(1, parseInt(inhoud.rijen, 10) || 20));
       const kolommen = Math.min(26, Math.max(1, parseInt(inhoud.kolommen, 10) || 8));
-      return { cellen, rijen, kolommen };
+      return { cellen, opmaak, rijen, kolommen };
     }
     if (soort === 'presentatie') {
       const bron = Array.isArray(inhoud.dias) ? inhoud.dias : [];
       const dias = bron.slice(0, MAX_DIAS).map(x => ({
+        indeling: INDELINGEN.includes(x && x.indeling) ? x.indeling : 'punten',
         titel: String((x && x.titel) || '').slice(0, MAX_TITEL),
-        tekst: String((x && x.tekst) || '').slice(0, 4000)
+        tekst: String((x && x.tekst) || '').slice(0, 4000),
+        notitie: String((x && x.notitie) || '').slice(0, 2000)
       }));
-      return { dias: dias.length ? dias : [{ titel: 'Titelblad', tekst: '' }] };
+      return { dias: dias.length ? dias : [{ indeling: 'titel', titel: 'Titelblad', tekst: '', notitie: '' }] };
     }
     return { tekst: String(inhoud.tekst || '').slice(0, MAX_BYTES) };
   }
@@ -86,4 +82,5 @@ function maakBasis({ db, crypto, codenaamVan }) {
   return { id, nu, lijsten, docMet, grootteVan, naamVan, inKring, magSchrijven, magLezen, schoonInhoud };
 }
 
-module.exports = { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, MAX_DIAS, SJABLONEN, maakBasis };
+module.exports = { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, MAX_DIAS,
+  OPMAAK, INDELINGEN, SJABLONEN, maakBasis };

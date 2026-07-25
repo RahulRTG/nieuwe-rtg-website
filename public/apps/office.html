@@ -4,115 +4,236 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Office</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#0E0E0D">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rosthema.css" rel="stylesheet">
-<script src="/shared/levendekleur.js" defer></script>
-<script src="/shared/rosthema.js" defer></script>
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
-    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  /* RTG Office draagt de huisstijl, maar niet de dagkleur-was: een kantoor
+     hoort een rustige, neutrale ondergrond te hebben waarop cijfers en tekst
+     het werk doen. Bordeaux blijft accent, goud alleen op de hoofdknop. */
+  :root{--bg:#0E0E0D;--paneel:#151413;--rail:#121110;--veld:#1C1A19;
+    --line:rgba(255,255,255,0.09);--line2:rgba(255,255,255,0.16);
+    --txt:#F2EFEA;--soft:rgba(242,239,234,0.58);--zacht:rgba(242,239,234,0.38);
+    --acc:#C23A5E;--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
-  button{font:inherit;cursor:pointer;}
-  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.8rem) 1.1rem 0.6rem;border-bottom:1px solid var(--line);}
-  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
-  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
-  .kop .werk{font-size:0.72rem;color:var(--gold);border:1px solid rgba(201,162,75,0.5);border-radius:999px;padding:0.15rem 0.55rem;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;
+    height:100dvh;display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased;}
+  button{font:inherit;cursor:pointer;color:inherit;}
+  /* ---- de kop ---- */
+  .kop{display:flex;align-items:center;gap:.7rem;background:var(--rail);
+    padding:calc(env(safe-area-inset-top,0px) + .7rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  .kop a.terug{color:var(--soft);text-decoration:none;font-size:1.05rem;line-height:1;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.18rem;letter-spacing:.01em;}
+  .kop .werk{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line2);border-radius:999px;padding:.2rem .6rem;}
   .kop .rek{flex:1;}
-  .kop .staat{font-size:0.75rem;color:var(--soft);}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:0.82rem;padding:0.5rem 0.85rem;}
+  .kop .staat{font-size:.74rem;color:var(--soft);font-variant-numeric:tabular-nums;}
+  .knop{background:var(--veld);border:1px solid var(--line);border-radius:9px;font-size:.8rem;padding:.45rem .8rem;}
+  .knop:hover{border-color:var(--line2);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
-  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
-  .knop:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[contenteditable]:focus-visible,td:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
-  main{flex:1;min-height:0;overflow-y:auto;}
-  /* de mappenlijst */
-  #lijst{padding:1.1rem;max-width:820px;margin:0 auto;}
-  .rijk{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
-  .rijk select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.82rem;padding:0.5rem 0.6rem;}
-  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1rem 0 0.5rem;}
-  .doc{display:flex;align-items:center;gap:0.8rem;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;color:var(--txt);padding:0.85rem 1rem;margin-bottom:0.5rem;}
-  .doc .ic{font-size:1.4rem;}
-  .doc .rek{flex:1;min-width:0;}
-  .doc b{display:block;font-size:0.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .doc small{color:var(--soft);font-size:0.75rem;}
-  .doc .weg{background:none;border:1px solid var(--line);border-radius:8px;color:var(--rood);font-size:0.72rem;padding:0.3rem 0.6rem;}
-  .stil{color:var(--soft);font-size:0.85rem;}
-  /* de editor */
-  #editor{display:none;flex-direction:column;height:100%;}
+  .knop.rood{border-color:rgba(222,110,146,.5);color:var(--rood);}
+  .knop.aan{border-color:var(--acc);color:var(--txt);box-shadow:inset 0 0 0 1px var(--acc);}
+  .knop:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,
+  [contenteditable]:focus-visible,td:focus-visible{outline:2px solid var(--acc);outline-offset:1px;}
+  main{flex:1;min-height:0;display:flex;flex-direction:column;}
+
+  /* ---- de drive: een rail met wat u kunt maken, en de lijst zelf ---- */
+  #lijst{flex:1;min-height:0;display:grid;grid-template-columns:15.5rem 1fr;}
+  #rail{background:var(--rail);border-right:1px solid var(--line);padding:1rem .9rem;overflow-y:auto;}
+  #rail .sec{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);margin:1.2rem 0 .5rem;}
+  #rail .sec:first-child{margin-top:0;}
+  .nieuwe{display:flex;align-items:center;gap:.6rem;width:100%;text-align:left;background:var(--veld);
+    border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;margin-bottom:.4rem;font-size:.85rem;}
+  .nieuwe:hover{border-color:var(--acc);}
+  .nieuwe .rtg-glyf{width:1.05rem;height:1.05rem;color:var(--acc);flex:none;}
+  .nieuwe small{display:block;color:var(--zacht);font-size:.7rem;}
+  .sjab{display:block;width:100%;text-align:left;background:none;border:none;color:var(--soft);
+    font-size:.8rem;padding:.3rem 0;border-bottom:1px solid transparent;}
+  .sjab:hover{color:var(--txt);border-bottom-color:var(--line);}
+  #vak{min-height:0;overflow-y:auto;padding:1.1rem 1.3rem 2.5rem;}
+  .zoekrij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.9rem;}
+  .zoekrij input,.zoekrij select{background:var(--veld);border:1px solid var(--line);border-radius:9px;
+    color:var(--txt);font:inherit;font-size:.82rem;padding:.45rem .7rem;}
+  .zoekrij input{flex:1;min-width:12rem;}
+  h2{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);margin:1.3rem 0 .4rem;}
+  h2:first-of-type{margin-top:0;}
+  /* de lijst als tabel: naam, wat erin zit, wanneer, van wie */
+  .tabelkop,.doc{display:grid;grid-template-columns:1.6rem 1fr 8rem 7.5rem 6rem;gap:.8rem;align-items:center;}
+  .tabelkop{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--zacht);
+    padding:0 .7rem .4rem;border-bottom:1px solid var(--line);}
+  .doc{background:none;border:none;border-bottom:1px solid var(--line);width:100%;text-align:left;
+    padding:.62rem .7rem;font-size:.88rem;}
+  .doc:hover{background:var(--paneel);}
+  .doc .ic{color:var(--acc);display:flex;}
+  .doc .ic .rtg-glyf{width:1.05rem;height:1.05rem;}
+  .doc .naam{min-width:0;}
+  .doc .naam b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .doc .naam small{color:var(--zacht);font-size:.72rem;}
+  .doc .kol{color:var(--soft);font-size:.78rem;font-variant-numeric:tabular-nums;}
+  .doc .acties{display:flex;gap:.3rem;justify-content:flex-end;}
+  .mini{background:none;border:1px solid var(--line);border-radius:7px;color:var(--soft);font-size:.7rem;padding:.2rem .45rem;}
+  .mini:hover{border-color:var(--line2);color:var(--txt);}
+  .mini.ster.aan{color:var(--gold);border-color:rgba(201,162,75,.5);}
+  .mini.weg:hover{color:var(--rood);border-color:rgba(222,110,146,.5);}
+  .stil{color:var(--soft);font-size:.84rem;padding:.7rem 0;}
+
+  /* ---- de editor ---- */
+  #editor{display:none;flex-direction:column;height:100%;min-height:0;}
   #editor.aan{display:flex;}
-  .balk{display:flex;align-items:center;gap:0.4rem;padding:0.55rem 1rem;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--card2);}
-  .balk input.titel{flex:1;min-width:9rem;background:none;border:none;color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.1rem;outline:none;}
-  .balk .tb{background:var(--card);border:1px solid var(--line);border-radius:8px;color:var(--txt);width:2.1rem;height:2.1rem;font-weight:700;}
-  .balk .tb.ital{font-style:italic;} .balk .tb.und{text-decoration:underline;}
-  .vlak{flex:1;min-height:0;overflow:auto;padding:1.4rem;}
-  /* tekstdocument */
-  #tekst{max-width:820px;margin:0 auto;min-height:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;
-    padding:2.2rem 2.4rem;font-size:1rem;line-height:1.7;outline:none;}
-  #tekst:empty::before{content:attr(data-leeg);color:var(--soft);}
-  /* rekenblad */
-  #blad{border-collapse:collapse;font-variant-numeric:tabular-nums;}
-  #blad th,#blad td{border:1px solid var(--line);min-width:96px;height:32px;padding:0 0.5rem;font-size:0.88rem;}
-  #blad th{background:var(--card2);color:var(--soft);font-weight:600;text-align:center;position:sticky;top:0;}
+  .balk{display:flex;align-items:center;gap:.3rem;padding:.45rem .9rem;border-bottom:1px solid var(--line);
+    flex-wrap:wrap;background:var(--rail);}
+  .balk .knop{padding:.35rem .6rem;font-size:.75rem;white-space:nowrap;}
+  .balk input.titel{flex:1;min-width:6rem;background:none;border:none;color:var(--txt);
+    font-family:'Bodoni Moda',serif;font-size:1.02rem;outline:none;}
+  .groep{display:flex;gap:.1rem;padding:0 .3rem;border-left:1px solid var(--line);}
+  .groep:first-child{border-left:none;padding-left:0;}
+  .tb{background:none;border:1px solid transparent;border-radius:6px;height:1.75rem;min-width:1.75rem;
+    padding:0 .35rem;font-size:.75rem;color:var(--soft);white-space:nowrap;}
+  .tb:hover{background:var(--veld);color:var(--txt);}
+  .tb.aan{background:var(--veld);border-color:var(--acc);color:var(--txt);}
+  .tb b{font-weight:800;} .tb.ital{font-style:italic;} .tb.und{text-decoration:underline;}
+  .vlak{flex:1;min-height:0;overflow:auto;padding:1.5rem;}
+  .voetbalk{display:flex;align-items:center;gap:1rem;padding:.4rem 1rem;border-top:1px solid var(--line);
+    background:var(--rail);font-size:.73rem;color:var(--zacht);font-variant-numeric:tabular-nums;}
+
+  /* tekstdocument: een echt vel papier, met kantoortypografie */
+  #tekst{max-width:46rem;margin:0 auto;min-height:100%;background:var(--paneel);border:1px solid var(--line);
+    border-radius:4px;padding:3rem 3.4rem;font-size:1rem;line-height:1.75;outline:none;}
+  #tekst:empty::before{content:attr(data-leeg);color:var(--zacht);}
+  #tekst h1{font-family:'Bodoni Moda',serif;font-size:1.75rem;font-weight:600;margin:.2rem 0 .9rem;line-height:1.25;}
+  #tekst h2{font-family:'Bodoni Moda',serif;font-size:1.25rem;font-weight:600;margin:1.5rem 0 .5rem;
+    letter-spacing:0;text-transform:none;color:var(--txt);}
+  #tekst h3{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.2rem 0 .4rem;}
+  #tekst p{margin:0 0 .85rem;}
+  #tekst ul,#tekst ol{margin:0 0 .9rem 1.4rem;} #tekst li{margin-bottom:.25rem;}
+  #tekst blockquote{border-left:2px solid var(--acc);margin:1rem 0;padding:.2rem 0 .2rem 1rem;color:var(--soft);font-style:italic;}
+  #tekst a{color:var(--acc);}
+  #tekst table{border-collapse:collapse;margin:1rem 0;width:100%;}
+  #tekst td,#tekst th{border:1px solid var(--line2);padding:.4rem .6rem;font-size:.92rem;}
+
+  /* rekenblad: formulebalk, koppen die blijven staan, opmaak per cel */
+  .formbalk{display:flex;align-items:center;gap:.5rem;padding:.4rem 1rem;border-bottom:1px solid var(--line);background:var(--bg);}
+  .formbalk .ref{min-width:3.6rem;font-size:.78rem;color:var(--soft);font-variant-numeric:tabular-nums;
+    border:1px solid var(--line);border-radius:7px;padding:.28rem .5rem;text-align:center;}
+  .formbalk input{flex:1;background:var(--veld);border:1px solid var(--line);border-radius:7px;color:var(--txt);
+    font:inherit;font-size:.84rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:.3rem .6rem;}
+  #bladWrap{overflow:auto;height:100%;}
+  #blad{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums;}
+  #blad th,#blad td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    min-width:104px;height:30px;padding:0 .5rem;font-size:.85rem;white-space:nowrap;}
+  #blad th{background:var(--rail);color:var(--zacht);font-weight:600;font-size:.7rem;letter-spacing:.1em;
+    text-align:center;position:sticky;top:0;z-index:2;}
+  #blad td.rijkop{background:var(--rail);color:var(--zacht);text-align:center;font-weight:600;font-size:.7rem;
+    position:sticky;left:0;z-index:1;min-width:44px;}
+  #blad th:first-child{left:0;z-index:3;min-width:44px;}
   #blad td[data-berekend]{color:var(--gold);}
-  #blad td:focus{background:rgba(201,162,75,0.12);}
-  #blad td.rijkop{background:var(--card2);color:var(--soft);text-align:center;font-weight:600;position:sticky;left:0;}
-  /* presentatie: de dia-lijst en de presenteermodus */
-  #presWrap{max-width:820px;margin:0 auto;}
-  .dia{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.2rem;margin-bottom:0.7rem;}
-  .dia .nr{font-size:0.72rem;color:var(--soft);letter-spacing:0.12em;text-transform:uppercase;display:flex;align-items:center;gap:0.5rem;}
-  .dia .nr .rek{flex:1;}
-  .dia input{width:100%;background:none;border:none;color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.25rem;outline:none;margin:0.35rem 0;}
-  .dia textarea{width:100%;min-height:4.5rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.92rem;line-height:1.6;padding:0.6rem 0.8rem;resize:vertical;}
-  #toonDia{position:fixed;inset:0;z-index:40;background:#0C0C0B;display:none;flex-direction:column;justify-content:center;padding:6vw;}
+  #blad td.getal,#blad td.geld,#blad td.procent{text-align:right;}
+  #blad td.kopcel{background:rgba(255,255,255,.04);font-weight:600;color:var(--txt);}
+  #blad td.actief{box-shadow:inset 0 0 0 2px var(--acc);}
+  #blad td.fout{color:var(--rood);}
+
+  /* presentatie: een strook met dia's ernaast, zoals het hoort */
+  #presWrap{display:grid;grid-template-columns:11rem 1fr;gap:1.2rem;height:100%;min-height:0;}
+  #diaRail{overflow-y:auto;padding-right:.3rem;}
+  .mini-dia{width:100%;text-align:left;background:var(--paneel);border:1px solid var(--line);border-radius:6px;
+    padding:.5rem .6rem;margin-bottom:.45rem;font-size:.72rem;color:var(--soft);min-height:4.2rem;}
+  .mini-dia.aan{border-color:var(--acc);color:var(--txt);}
+  .mini-dia i{font-style:normal;color:var(--zacht);font-size:.64rem;display:block;margin-bottom:.2rem;}
+  .mini-dia b{display:block;font-weight:500;font-size:.76rem;color:var(--txt);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #diaVlak{min-width:0;overflow-y:auto;}
+  .diakaart{background:var(--paneel);border:1px solid var(--line);border-radius:8px;padding:1.3rem 1.5rem;}
+  .diakaart .rij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;}
+  .diakaart select{background:var(--veld);border:1px solid var(--line);border-radius:8px;color:var(--txt);
+    font:inherit;font-size:.78rem;padding:.35rem .5rem;}
+  .diakaart input.dt{width:100%;background:none;border:none;border-bottom:1px solid var(--line);color:var(--txt);
+    font-family:'Bodoni Moda',serif;font-size:1.4rem;outline:none;padding:.2rem 0 .5rem;margin-bottom:.8rem;}
+  .diakaart textarea{width:100%;background:var(--veld);border:1px solid var(--line);border-radius:8px;color:var(--txt);
+    font:inherit;font-size:.92rem;line-height:1.6;padding:.7rem .85rem;resize:vertical;}
+  .diakaart .lab{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--zacht);margin:.9rem 0 .3rem;}
+  /* presenteermodus, met sprekersnotitie op het eigen scherm */
+  #toonDia{position:fixed;inset:0;z-index:40;background:#0A0A09;display:none;flex-direction:column;justify-content:center;padding:6vw;}
   #toonDia.aan{display:flex;}
-  #toonDia h3{font-family:'Bodoni Moda',serif;font-size:clamp(2rem,6vw,4rem);margin-bottom:1.2rem;}
-  #toonDia p{font-size:clamp(1.05rem,2.6vw,1.6rem);line-height:1.6;color:var(--soft);white-space:pre-wrap;}
-  #toonDia .voet{position:fixed;left:0;right:0;bottom:1.2rem;display:flex;justify-content:center;gap:0.6rem;align-items:center;color:var(--soft);font-size:0.8rem;}
+  #toonDia h3{font-family:'Bodoni Moda',serif;font-size:clamp(2rem,5.5vw,3.8rem);margin-bottom:1.2rem;line-height:1.15;}
+  #toonDia p{font-size:clamp(1.05rem,2.4vw,1.5rem);line-height:1.65;color:var(--soft);white-space:pre-wrap;max-width:52rem;}
+  #toonDia.i-cijfer h3{font-size:clamp(3rem,11vw,8rem);}
+  #toonDia.i-citaat p{font-style:italic;font-size:clamp(1.3rem,3.2vw,2.2rem);color:var(--txt);border-left:3px solid var(--acc);padding-left:1.2rem;}
+  #tdNotitie{position:fixed;left:0;right:0;bottom:3.6rem;padding:0 6vw;color:var(--zacht);font-size:.85rem;
+    white-space:pre-wrap;max-width:60rem;}
+  #toonDia .voet{position:fixed;left:0;right:0;bottom:1rem;display:flex;justify-content:center;gap:.5rem;
+    align-items:center;color:var(--zacht);font-size:.76rem;}
+
   /* modals */
-  .scrim{position:fixed;inset:0;z-index:20;background:rgba(12,12,11,0.85);display:none;align-items:center;justify-content:center;padding:1rem;}
+  .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;align-items:center;justify-content:center;padding:1rem;}
   .scrim.open{display:flex;}
-  .paneel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;width:min(480px,100%);max-height:85dvh;overflow:auto;}
-  .paneel h3{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin-bottom:0.6rem;}
-  .paneel input,.paneel select,.paneel textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:0.6rem 0.8rem;margin:0.5rem 0;}
-  .paneel .lijst{font-size:0.85rem;color:var(--soft);margin:0.5rem 0;}
-  .paneel .vitem{display:flex;align-items:center;gap:0.6rem;border-bottom:1px solid var(--line);padding:0.45rem 0;font-size:0.85rem;}
+  .paneel{background:var(--paneel);border:1px solid var(--line);border-radius:12px;padding:1.3rem;
+    width:min(520px,100%);max-height:85dvh;overflow:auto;}
+  .paneel h3{font-family:'Bodoni Moda',serif;font-size:1.1rem;margin-bottom:.5rem;}
+  .paneel input,.paneel select,.paneel textarea{width:100%;background:var(--veld);border:1px solid var(--line);
+    border-radius:9px;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .75rem;margin:.45rem 0;}
+  .paneel .lijst{font-size:.83rem;color:var(--soft);margin:.5rem 0;}
+  .paneel .vitem{display:flex;align-items:center;gap:.6rem;border-bottom:1px solid var(--line);padding:.45rem 0;font-size:.83rem;}
   .paneel .vitem .rek{flex:1;}
-  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:50;
-    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;opacity:0;transition:opacity .25s;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    z-index:50;background:var(--veld);border:1px solid var(--line2);border-radius:999px;padding:.5rem 1rem;
+    font-size:.79rem;opacity:0;transition:opacity .25s;pointer-events:none;}
   .melding.zien{opacity:1;}
+  @media (max-width:820px){
+    #lijst{grid-template-columns:1fr;}
+    #rail{border-right:none;border-bottom:1px solid var(--line);max-height:13rem;}
+    .tabelkop,.doc{grid-template-columns:1.6rem 1fr 5.5rem;}
+    .tabelkop span:nth-child(4),.tabelkop span:nth-child(5),.doc .kol.van,.doc .acties{display:none;}
+    #presWrap{grid-template-columns:1fr;}
+    #diaRail{display:flex;gap:.4rem;overflow-x:auto;max-height:6rem;}
+    .mini-dia{min-width:8rem;}
+    #tekst{padding:1.6rem 1.3rem;}
+  }
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
-<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/glyf.js"></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header class="kop">
-  <a href="/apps/app.html" id="terug" aria-label="Terug">←</a>
+  <a href="/apps/app.html" class="terug" id="terug" aria-label="Terug">←</a>
   <h1>RTG Office</h1>
   <span class="werk" id="werkChip" style="display:none;"></span>
   <span class="rek"></span>
   <span class="staat" id="staat"></span>
 </header>
 <main>
-  <!-- de mappenlijst -->
+  <!-- de drive -->
   <section id="lijst">
-    <div class="rijk">
-      <button class="knop vol" id="nieuwTekst" type="button">Document</button>
-      <button class="knop vol" id="nieuwBlad" type="button">Rekenblad</button>
-      <button class="knop vol" id="nieuwPres" type="button">Presentatie</button>
-      <select id="sjabloonKeuze" aria-label="Sjabloon kiezen"><option value="">Sjabloon…</option></select>
+    <aside id="rail">
+      <div class="sec">Nieuw</div>
+      <button class="nieuwe" id="nieuwTekst" type="button"><span data-glyf="logboek"></span><span>Document<small>Brief, memo, notitie</small></span></button>
+      <button class="nieuwe" id="nieuwBlad" type="button"><span data-glyf="grafiek"></span><span>Rekenblad<small>Cijfers met formules</small></span></button>
+      <button class="nieuwe" id="nieuwPres" type="button"><span data-glyf="podium"></span><span>Presentatie<small>Deck met notities</small></span></button>
+      <div class="sec">Sjablonen</div>
+      <div id="sjablonen"></div>
+    </aside>
+    <div id="vak">
+      <div class="zoekrij">
+        <input id="zoek" type="search" placeholder="Zoek op titel" aria-label="Zoek in documenten">
+        <select id="filterSoort" aria-label="Filter op soort">
+          <option value="">Alle soorten</option><option value="tekst">Documenten</option>
+          <option value="blad">Rekenbladen</option><option value="presentatie">Presentaties</option>
+        </select>
+        <select id="sorteer" aria-label="Sorteren">
+          <option value="gewijzigd">Laatst gewijzigd</option><option value="titel">Titel</option>
+          <option value="soort">Soort</option><option value="gemaakt">Aangemaakt</option>
+        </select>
+      </div>
+      <h2 id="kopMijn">Mijn documenten</h2>
+      <div class="tabelkop"><span></span><span>Naam</span><span>Inhoud</span><span>Gewijzigd</span><span></span></div>
+      <div id="mijnDocs"></div>
+      <h2>Met mij gedeeld</h2>
+      <div class="tabelkop"><span></span><span>Naam</span><span>Inhoud</span><span>Van</span><span></span></div>
+      <div id="gedeeldDocs"></div>
     </div>
-    <h2 id="kopMijn">Mijn documenten</h2>
-    <div id="mijnDocs"></div>
-    <h2>Met mij gedeeld</h2>
-    <div id="gedeeldDocs"></div>
   </section>
 
   <!-- de editor -->
@@ -120,27 +241,28 @@
     <div class="balk">
       <button class="knop" id="editTerug" type="button">← Documenten</button>
       <input class="titel" id="titel" maxlength="120" aria-label="Titel van het document">
-      <span id="tekstTools" style="display:flex;gap:0.4rem;">
-        <button class="tb" data-cmd="bold" title="Vet" type="button">B</button>
-        <button class="tb ital" data-cmd="italic" title="Cursief" type="button">I</button>
-        <button class="tb und" data-cmd="underline" title="Onderstreept" type="button">U</button>
-        <button class="tb" data-cmd="insertUnorderedList" title="Opsomming" type="button">•</button>
-      </span>
+      <span id="tekstTools" style="display:none;"></span>
+      <span id="bladTools" style="display:none;"></span>
       <span class="rek"></span>
-      <button class="knop" id="presBtn" type="button" style="display:none;">▶ Presenteer</button>
-      <button class="knop" id="aiBtn" type="button">AI-hulp</button>
+      <button class="knop" id="presBtn" type="button" style="display:none;">Presenteer</button>
+      <button class="knop" id="aiBtn" type="button">Rahul</button>
       <button class="knop" id="versiesBtn" type="button">Versies</button>
       <button class="knop" id="deelBtn" type="button">Delen</button>
       <button class="knop" id="exportBtn" type="button">Export</button>
     </div>
-    <div class="vlak">
+    <div class="formbalk" id="formBalk" style="display:none;">
+      <span class="ref" id="celRef">A1</span>
+      <input id="celInvoer" aria-label="Inhoud of formule van de cel" placeholder="Waarde of formule, bijvoorbeeld =SOM(B2:B9)">
+    </div>
+    <div class="vlak" id="vlak">
       <div id="tekst" contenteditable="true" data-leeg="Begin te typen…" role="textbox" aria-multiline="true" aria-label="Documenttekst"></div>
-      <div id="bladWrap" style="display:none;overflow:auto;"><table id="blad"></table></div>
+      <div id="bladWrap" style="display:none;"><table id="blad"></table></div>
       <div id="presWrap" style="display:none;">
-        <div id="diaLijst"></div>
-        <button class="knop" id="diaErbij" type="button">+ Dia erbij</button>
+        <div id="diaRail"></div>
+        <div id="diaVlak"></div>
       </div>
     </div>
+    <div class="voetbalk" id="voetbalk"></div>
   </section>
 </main>
 
@@ -148,7 +270,8 @@
 <div id="toonDia" role="dialog" aria-label="Presentatie">
   <h3 id="tdTitel"></h3>
   <p id="tdTekst"></p>
-  <div class="voet"><button class="knop" id="tdVorige" type="button">← vorige</button><span id="tdTeller"></span><button class="knop" id="tdVolgende" type="button">volgende →</button><button class="knop" id="tdDicht" type="button">sluit</button></div>
+  <div id="tdNotitie"></div>
+  <div class="voet"><button class="knop" id="tdVorige" type="button">← vorige</button><span id="tdTeller"></span><button class="knop" id="tdVolgende" type="button">volgende →</button><button class="knop" id="tdNotitieBtn" type="button">Notitie</button><button class="knop" id="tdDicht" type="button">sluit</button></div>
 </div>
 
 <!-- delen -->
@@ -170,7 +293,7 @@
       <button class="knop vol" id="gezinZet" type="button">Bewaar keuze</button>
     </div>
     <div class="lijst" id="deelLijst"></div>
-    <button class="knop" id="deelDicht" type="button" style="margin-top:0.5rem;">Sluit</button>
+    <button class="knop" id="deelDicht" type="button" style="margin-top:.5rem;">Sluit</button>
   </div>
 </div>
 
@@ -180,386 +303,39 @@
     <h3>Versiegeschiedenis</h3>
     <p class="stil">Elke wijziging bewaart de vorige stand; de eigenaar kan terugzetten.</p>
     <div id="versieLijst"></div>
-    <button class="knop" id="versieDicht" type="button" style="margin-top:0.5rem;">Sluit</button>
+    <button class="knop" id="versieDicht" type="button" style="margin-top:.5rem;">Sluit</button>
   </div>
 </div>
 
-<!-- de AI-schrijfhulp: stelt voor, u beslist -->
-<div class="scrim" id="aiScrim" role="dialog" aria-label="AI-hulp">
+<!-- Rahul leest mee: stelt voor, u beslist -->
+<div class="scrim" id="aiScrim" role="dialog" aria-label="Rahul leest mee">
   <div class="paneel">
-    <h3>AI-hulp</h3>
-    <p class="stil">De AI stelt alleen voor; u kiest zelf of het in het document komt.</p>
+    <h3>Rahul leest mee</h3>
+    <p class="stil">Rahul stelt alleen voor; u kiest zelf of het in het document komt.</p>
     <select id="aiOpdracht" aria-label="Opdracht">
-      <option value="samenvatten">Samenvatten</option>
-      <option value="herschrijven">Zakelijk herschrijven</option>
-      <option value="doorschrijven">Doorschrijven</option>
+      <option value="samenvatten">Vat samen</option>
+      <option value="herschrijven">Herschrijf zakelijk</option>
+      <option value="inkorten">Kort in tot de helft</option>
+      <option value="actiepunten">Haal de actiepunten eruit</option>
+      <option value="kritisch">Lees kritisch mee</option>
+      <option value="engels">Vertaal naar het Engels</option>
+      <option value="doorschrijven">Schrijf door</option>
+      <option value="formule">Stel een formule voor</option>
     </select>
     <input id="aiVraag" maxlength="300" placeholder="Extra wens (mag leeg)" aria-label="Wens">
     <button class="knop vol" id="aiVraagBtn" type="button">Vraag voorstel</button>
-    <textarea id="aiUit" rows="6" readonly aria-label="Voorstel"></textarea>
-    <div style="display:flex;gap:0.5rem;">
+    <textarea id="aiUit" rows="7" readonly aria-label="Voorstel"></textarea>
+    <div style="display:flex;gap:.5rem;">
       <button class="knop vol" id="aiToepas" type="button" style="display:none;">Voeg toe aan het document</button>
       <button class="knop" id="aiDicht" type="button">Sluit</button>
     </div>
   </div>
 </div>
 <div class="melding" id="melding" role="status"></div>
-<script>
-(() => {
-  const $ = s => document.querySelector(s);
-  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-  /* Vijf ingangen op hetzelfde pakket: het lid (eigen account), de zaak
-     (?werk=zaak, de team-drive van de hele zaak), de RTG-kantoren
-     (?werk=kantoor, de gedeelde kantoor-drive), RTF-leden (?werk=rtf,
-     per gezinsprofiel, met delen binnen het eigen gezin) en de werkplek
-     (?werk=werkplek&bedrijf=rtg|rtf, de kantoordrive van dat huis). */
-  const PAR = new URLSearchParams(location.search);
-  const WERK = PAR.get('werk') || '';
-  const BEDRIJF = (PAR.get('bedrijf') || '').toLowerCase();
-  const opzet = WERK === 'werkplek'
-    ? { basis: '/api/werkplek/kantoorpakket/', tokenKey: 'rtg_token',
-        chip: BEDRIJF === 'rtf' ? 'RTFoundation-kantoor' : 'RTG-kantoor',
-        terug: '/apps/werkplek.html', mijnKop: 'Documenten van dit huis',
-        leeg: 'Log eerst in en kies een werkplek.' }
-    : WERK === 'zaak'
-    ? { basis: '/api/supplier/kantoorpakket/', tokenKey: 'rtg_sup_token', chip: 'Team-drive van de zaak', terug: '/apps/leverancier.html', mijnKop: 'Documenten van de zaak', leeg: 'Log eerst in op de zaak-app.' }
-    : WERK === 'kantoor'
-    ? { basis: '/api/office/kantoorpakket/', tokenKey: 'rtg_office_token', chip: 'RTG Kantoor-drive', terug: '/apps/kantoren.html', mijnKop: 'Documenten van het kantoor', leeg: 'Log eerst in op de backoffice.' }
-    : WERK === 'rtf'
-    ? { basis: '/api/rtf/kantoorpakket/', tokenKey: 'rtf_sessie', chip: 'RTFoundation', terug: '/apps/foundation/index.html', mijnKop: 'Mijn documenten', leeg: 'Log eerst in bij je gezin.' }
-    : { basis: '/api/kantoorpakket/', tokenKey: 'rtg_member_token', chip: '', terug: '/apps/app.html', mijnKop: 'Mijn documenten', leeg: 'Log eerst in op de leden-app.' };
-  // RTF stuurt de gezinscode en het profieltoken in de body, zoals alle
-  // RTF-routes; de andere ingangen dragen een Bearer-token.
-  const rtfSess = (() => { if (WERK !== 'rtf') return null;
-    try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); } catch (e) { return null; } })();
-  const token = WERK === 'rtf' ? (rtfSess && rtfSess.token)
-    : (() => { try { return localStorage.getItem(opzet.tokenKey); } catch (e) { return null; } })();
-  $('#terug').href = opzet.terug;
-  $('#kopMijn').textContent = opzet.mijnKop;
-  if (opzet.chip) { $('#werkChip').textContent = opzet.chip; $('#werkChip').style.display = ''; }
-
-  const api = (pad, body) => fetch(opzet.basis + pad, { method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, WERK === 'rtf' ? {} : { Authorization: 'Bearer ' + token }),
-    body: JSON.stringify(Object.assign(
-      WERK === 'rtf' ? { code: rtfSess && rtfSess.code, token: rtfSess && rtfSess.token } : {},
-      WERK === 'werkplek' ? { bedrijf: BEDRIJF } : {},
-      body || {}))
-  }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-  let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
-
-  let open = null, magBewerken = false, bewaarT = null, vuil = false, leesT = null;
-
-  /* ---------- de mappenlijst ---------- */
-  async function laadLijst(){
-    const r = await api('mijn');
-    if (r.status !== 200) { zeg(r.body.error || opzet.leeg); return; }
-    const ic = s => s === 'blad' ? '' : s === 'presentatie' ? '' : '';
-    const teken = (rij, eigen) => rij.length ? rij.map(d =>
-      '<div class="doc"><span class="ic">'+ic(d.soort)+'</span>'+
-      '<button class="rek" data-open="'+d.id+'" style="background:none;border:none;color:var(--txt);text-align:left;">'+
-        '<b>'+esc(d.titel)+'</b><small>'+esc(d.door)+' · '+new Date(d.gewijzigd).toLocaleDateString('nl-NL')+(d.gedeeld?' · gedeeld met '+d.gedeeld:'')+'</small></button>'+
-      (eigen?'<button class="weg" data-weg="'+d.id+'">weg</button>':'')+'</div>').join('') : '<p class="stil">Nog niets hier.</p>';
-    $('#mijnDocs').innerHTML = teken(r.body.docs, true);
-    $('#gedeeldDocs').innerHTML = teken(r.body.gedeeld, false);
-    const sj = $('#sjabloonKeuze');
-    sj.innerHTML = '<option value="">Sjabloon…</option>' + (r.body.sjablonen || []).map(s =>
-      '<option value="'+s.id+'">'+esc(s.titel)+' ('+(s.soort==='blad'?'rekenblad':s.soort)+')</option>').join('');
-    document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openen(b.dataset.open)));
-    document.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
-      if (!confirm('Dit document verwijderen?')) return;
-      const w = await api('weg', { id: b.dataset.weg }); if (w.body.error) return zeg(w.body.error);
-      zeg('Verwijderd.'); laadLijst();
-    }));
-  }
-  async function nieuw(soort, sjabloon){
-    const r = await api('maak', sjabloon ? { sjabloon } : { soort });
-    if (r.body.error) return zeg(r.body.error);
-    openen(r.body.id);
-  }
-  $('#nieuwTekst').addEventListener('click', () => nieuw('tekst'));
-  $('#nieuwBlad').addEventListener('click', () => nieuw('blad'));
-  $('#nieuwPres').addEventListener('click', () => nieuw('presentatie'));
-  $('#sjabloonKeuze').addEventListener('change', () => { const v = $('#sjabloonKeuze').value; if (v){ $('#sjabloonKeuze').value=''; nieuw(null, v); } });
-
-  /* ---------- een document openen ---------- */
-  async function openen(id){
-    const r = await api('open', { id });
-    if (r.status !== 200) return zeg(r.body.error || 'Kon niet openen.');
-    open = r.body; magBewerken = !!r.body.magBewerken; vuil = false;
-    $('#titel').value = r.body.titel; $('#titel').disabled = !r.body.eigenaar;
-    $('#staat').textContent = magBewerken ? (r.body.eigenaar ? '' : 'meeschrijven · van ' + r.body.door) : 'alleen lezen · van ' + r.body.door;
-    $('#deelBtn').style.display = r.body.eigenaar ? '' : 'none';
-    $('#aiBtn').style.display = (magBewerken && r.body.soort !== 'blad') ? '' : 'none';
-    $('#presBtn').style.display = r.body.soort === 'presentatie' ? '' : 'none';
-    if (r.body.soort === 'blad') toonBlad(r.body.inhoud);
-    else if (r.body.soort === 'presentatie') toonPres(r.body.inhoud);
-    else toonTekst(r.body.inhoud);
-    $('#lijst').style.display = 'none'; $('#editor').classList.add('aan');
-    // live meelezen: wie niet zelf aan het typen is, ziet wijzigingen van
-    // de eigenaar of meeschrijvers vanzelf verschijnen
-    clearInterval(leesT);
-    leesT = setInterval(async () => {
-      if (!open || vuil) return;
-      const v = await api('open', { id: open.id });
-      if (v.status === 200 && v.body.gewijzigd !== open.gewijzigd){
-        open.gewijzigd = v.body.gewijzigd; open.inhoud = v.body.inhoud;
-        if (document.activeElement && ['tekst'].includes(document.activeElement.id)) return;
-        if (open.soort === 'blad') toonBlad(v.body.inhoud);
-        else if (open.soort === 'presentatie') toonPres(v.body.inhoud);
-        else toonTekst(v.body.inhoud);
-        zeg('Bijgewerkt door ' + (v.body.door || 'een ander'));
-      }
-    }, 5000);
-  }
-  function sluitEditor(){ clearInterval(leesT); $('#editor').classList.remove('aan'); $('#lijst').style.display = ''; open = null; laadLijst(); }
-  $('#editTerug').addEventListener('click', () => { if (vuil) bewaarNu(); sluitEditor(); });
-
-  /* ---------- tekstdocument ---------- */
-  function toonTekst(inhoud){
-    $('#tekstTools').style.display = magBewerken ? 'flex' : 'none';
-    $('#tekst').style.display = ''; $('#bladWrap').style.display = 'none'; $('#presWrap').style.display = 'none';
-    $('#tekst').innerHTML = inhoud && inhoud.tekst || '';
-    $('#tekst').contentEditable = magBewerken ? 'true' : 'false';
-  }
-  $('#tekst').addEventListener('input', () => markeer());
-  document.querySelectorAll('[data-cmd]').forEach(b => b.addEventListener('mousedown', e => {
-    e.preventDefault(); document.execCommand(b.dataset.cmd, false, null); $('#tekst').focus(); markeer();
-  }));
-
-  /* ---------- rekenblad met formules ---------- */
-  let bladData = null;
-  function kolLetter(i){ return String.fromCharCode(65 + i); }
-  function toonBlad(inhoud){
-    bladData = { cellen: Object.assign({}, (inhoud && inhoud.cellen) || {}),
-      rijen: (inhoud && inhoud.rijen) || 20, kolommen: (inhoud && inhoud.kolommen) || 8 };
-    $('#tekstTools').style.display = 'none';
-    $('#tekst').style.display = 'none'; $('#presWrap').style.display = 'none'; $('#bladWrap').style.display = '';
-    tekenBlad();
-  }
-  function tekenBlad(){
-    const t = $('#blad'); let h = '<thead><tr><th></th>';
-    for (let c = 0; c < bladData.kolommen; c++) h += '<th>' + kolLetter(c) + '</th>';
-    h += '</tr></thead><tbody>';
-    for (let r = 1; r <= bladData.rijen; r++){
-      h += '<tr><td class="rijkop">' + r + '</td>';
-      for (let c = 0; c < bladData.kolommen; c++){
-        const ref = kolLetter(c) + r;
-        const rauw = bladData.cellen[ref] || '';
-        const isForm = String(rauw).startsWith('=');
-        const toon = isForm ? bereken(rauw) : rauw;
-        h += '<td tabindex="0" data-ref="'+ref+'"'+(isForm?' data-berekend="1"':'')+(magBewerken?' contenteditable="true"':'')+'>'+esc(toon)+'</td>';
-      }
-      h += '</tr>';
-    }
-    t.innerHTML = h + '</tbody>';
-    if (magBewerken) t.querySelectorAll('td[data-ref]').forEach(td => {
-      td.addEventListener('focus', () => { const ref = td.dataset.ref; td.textContent = bladData.cellen[ref] || ''; });
-      td.addEventListener('blur', () => {
-        const ref = td.dataset.ref, val = td.textContent.trim();
-        if (val) bladData.cellen[ref] = val; else delete bladData.cellen[ref];
-        markeer(); tekenBlad();
-      });
-      td.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); td.blur(); } });
-    });
-  }
-  function celGetal(ref, diepte){
-    const rauw = bladData.cellen[ref];
-    if (rauw == null || rauw === '') return 0;
-    if (String(rauw).startsWith('=')) { const v = bereken(rauw, diepte + 1); return parseFloat(v) || 0; }
-    return parseFloat(String(rauw).replace(',', '.')) || 0;
-  }
-  function reeks(a, b, diepte){
-    const m1 = /^([A-Z]+)([0-9]+)$/.exec(a), m2 = /^([A-Z]+)([0-9]+)$/.exec(b);
-    if (!m1 || !m2) return [];
-    const c1 = m1[1].charCodeAt(0), c2 = m2[1].charCodeAt(0), r1 = +m1[2], r2 = +m2[2];
-    const uit = [];
-    for (let c = Math.min(c1,c2); c <= Math.max(c1,c2); c++)
-      for (let r = Math.min(r1,r2); r <= Math.max(r1,r2); r++) uit.push(celGetal(String.fromCharCode(c) + r, diepte));
-    return uit;
-  }
-  function bereken(formule, diepte){
-    diepte = diepte || 0;
-    if (diepte > 30) return '#LUS';
-    try {
-      let f = String(formule).slice(1).toUpperCase().replace(/\s+/g, '');
-      // functies: SOM/SUM, GEM/AVERAGE, MIN, MAX, AANTAL/COUNT over een bereik
-      f = f.replace(/(SOM|SUM|GEM|AVERAGE|MIN|MAX|AANTAL|COUNT)\(([A-Z]+[0-9]+):([A-Z]+[0-9]+)\)/g, (_, fn, a, b) => {
-        const r = reeks(a, b, diepte);
-        if (fn === 'SOM' || fn === 'SUM') return r.reduce((n, x) => n + x, 0);
-        if (fn === 'GEM' || fn === 'AVERAGE') return r.length ? r.reduce((n, x) => n + x, 0) / r.length : 0;
-        if (fn === 'MIN') return r.length ? Math.min.apply(null, r) : 0;
-        if (fn === 'MAX') return r.length ? Math.max.apply(null, r) : 0;
-        return r.length; // AANTAL/COUNT
-      });
-      // losse celverwijzingen
-      f = f.replace(/[A-Z]+[0-9]+/g, ref => celGetal(ref, diepte));
-      if (!/^[-+*/().0-9,\s]*$/.test(f)) return '#FOUT';
-      const uit = Function('"use strict";return (' + f.replace(/,/g, '.') + ')')();
-      return (Math.round(uit * 10000) / 10000).toString();
-    } catch (e) { return '#FOUT'; }
-  }
-
-  /* ---------- presentatie: dia's bewerken en presenteren ---------- */
-  let presData = null, diaNr = 0;
-  function toonPres(inhoud){
-    presData = { dias: ((inhoud && inhoud.dias) || [{ titel: 'Titelblad', tekst: '' }]).map(d => ({ titel: d.titel || '', tekst: d.tekst || '' })) };
-    $('#tekstTools').style.display = 'none';
-    $('#tekst').style.display = 'none'; $('#bladWrap').style.display = 'none'; $('#presWrap').style.display = '';
-    $('#diaErbij').style.display = magBewerken ? '' : 'none';
-    tekenPres();
-  }
-  function tekenPres(){
-    $('#diaLijst').innerHTML = presData.dias.map((d, i) =>
-      '<div class="dia"><div class="nr">Dia '+(i+1)+'<span class="rek"></span>'+
-      (magBewerken && presData.dias.length > 1 ? '<button class="weg" data-diaweg="'+i+'">weg</button>' : '')+'</div>'+
-      '<input data-diat="'+i+'" value="'+esc(d.titel)+'" maxlength="120" placeholder="Titel van de dia"'+(magBewerken?'':' disabled')+'>'+
-      '<textarea data-diax="'+i+'" maxlength="4000" placeholder="De tekst; een regel per punt."'+(magBewerken?'':' disabled')+'>'+esc(d.tekst)+'</textarea></div>').join('');
-    const w = $('#diaLijst');
-    w.querySelectorAll('[data-diat]').forEach(el => el.addEventListener('input', () => { presData.dias[+el.dataset.diat].titel = el.value; markeer(); }));
-    w.querySelectorAll('[data-diax]').forEach(el => el.addEventListener('input', () => { presData.dias[+el.dataset.diax].tekst = el.value; markeer(); }));
-    w.querySelectorAll('[data-diaweg]').forEach(el => el.addEventListener('click', () => { presData.dias.splice(+el.dataset.diaweg, 1); markeer(); tekenPres(); }));
-  }
-  $('#diaErbij').addEventListener('click', () => { if (presData.dias.length >= 60) return zeg('Maximaal 60 dia\'s.'); presData.dias.push({ titel: '', tekst: '' }); markeer(); tekenPres(); });
-  function toonDia(){
-    const d = presData.dias[diaNr] || { titel: '', tekst: '' };
-    $('#tdTitel').textContent = d.titel || '(zonder titel)';
-    $('#tdTekst').textContent = d.tekst;
-    $('#tdTeller').textContent = (diaNr + 1) + ' van ' + presData.dias.length;
-  }
-  $('#presBtn').addEventListener('click', () => { diaNr = 0; toonDia(); $('#toonDia').classList.add('aan');
-    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); });
-  const diaStap = n => { diaNr = Math.min(presData.dias.length - 1, Math.max(0, diaNr + n)); toonDia(); };
-  $('#tdVorige').addEventListener('click', () => diaStap(-1));
-  $('#tdVolgende').addEventListener('click', () => diaStap(1));
-  $('#tdDicht').addEventListener('click', () => { $('#toonDia').classList.remove('aan'); if (document.exitFullscreen) document.exitFullscreen().catch(() => {}); });
-  document.addEventListener('keydown', e => {
-    if (!$('#toonDia').classList.contains('aan')) return;
-    if (e.key === 'ArrowRight' || e.key === ' ') diaStap(1);
-    else if (e.key === 'ArrowLeft') diaStap(-1);
-    else if (e.key === 'Escape') $('#tdDicht').click();
-  });
-
-  /* ---------- autosave ---------- */
-  function markeer(){ vuil = true; $('#staat').textContent = 'Opslaan…'; clearTimeout(bewaarT); bewaarT = setTimeout(bewaarNu, 900); }
-  async function bewaarNu(){
-    if (!open || !magBewerken || !vuil) return;
-    const inhoud = open.soort === 'blad' ? { cellen: bladData.cellen, rijen: bladData.rijen, kolommen: bladData.kolommen }
-      : open.soort === 'presentatie' ? { dias: presData.dias }
-      : { tekst: $('#tekst').innerHTML.slice(0, 500000) };
-    const r = await api('bewaar', { id: open.id, titel: $('#titel').value, inhoud });
-    if (r.body.error) { $('#staat').textContent = ''; return zeg(r.body.error); }
-    vuil = false; open.gewijzigd = r.body.gewijzigd; open.inhoud = inhoud;
-    $('#staat').textContent = 'Bewaard ' + new Date().toLocaleTimeString('nl-NL').slice(0,5);
-  }
-  $('#titel').addEventListener('input', markeer);
-  setInterval(() => { if (vuil) bewaarNu(); }, 8000);
-  window.addEventListener('beforeunload', () => { if (vuil) navigator.sendBeacon && bewaarNu(); });
-
-  /* ---------- delen: op codenaam, of (RTF) binnen het eigen gezin ---------- */
-  $('#deelBtn').addEventListener('click', async () => { if (!open) return; await toonDeel(); $('#deelScrim').classList.add('open'); });
-  $('#deelDicht').addEventListener('click', () => $('#deelScrim').classList.remove('open'));
-  if (WERK === 'rtf'){
-    $('#deelForm').style.display = 'none'; $('#gezinBlok').style.display = '';
-    $('#deelKop').textContent = 'Delen met je gezin';
-    $('#deelUitleg').textContent = 'Een document blijft van jou; je kunt je gezin laten meelezen of er samen in schrijven. Buiten het gezin deelt RTF niets.';
-  }
-  async function toonDeel(){
-    const r = await api('open', { id: open.id });
-    if (WERK === 'rtf'){
-      const stand = (r.body && r.body.kringDeel) || 'uit';
-      $('#gezinRechten').value = stand === null ? 'uit' : (stand || 'uit');
-      $('#deelLijst').textContent = stand === 'bewerken' ? 'Jullie schrijven hier samen in.'
-        : stand === 'lezen' ? 'Je gezin leest mee.' : 'Alleen jij ziet dit document.';
-      return;
-    }
-    const lees = (r.body && r.body.gedeeldMet) || [];
-    const schrijf = (r.body && r.body.bewerkers) || [];
-    $('#deelLijst').innerHTML = (lees.length || schrijf.length)
-      ? (schrijf.length ? 'Meeschrijvers: ' + schrijf.map(esc).join(', ') + '<br>' : '') +
-        (lees.length ? 'Meelezers: ' + lees.map(esc).join(', ') : '')
-      : 'Nog met niemand gedeeld.';
-  }
-  $('#gezinZet').addEventListener('click', async () => {
-    const r = await api('gezin', { id: open.id, rechten: $('#gezinRechten').value });
-    if (r.body.error) return zeg(r.body.error);
-    zeg('Bewaard.'); toonDeel();
-  });
-  $('#deelForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const r = await api('deel', { id: open.id, codenaam: $('#deelCode').value, aan: true, rechten: $('#deelRechten').value });
-    if (r.body.error) return zeg(r.body.error);
-    $('#deelCode').value = ''; zeg('Gedeeld.'); toonDeel();
-  });
-
-  /* ---------- versiegeschiedenis ---------- */
-  $('#versiesBtn').addEventListener('click', async () => {
-    if (!open) return;
-    const r = await api('versies', { id: open.id });
-    if (r.body.error) return zeg(r.body.error);
-    $('#versieLijst').innerHTML = (r.body.versies || []).length ? r.body.versies.map(v =>
-      '<div class="vitem"><span class="rek">'+new Date(v.om).toLocaleString('nl-NL')+' · '+esc(v.door||'')+'</span>'+
-      (open.eigenaar ? '<button class="knop" data-terug="'+v.nr+'">Zet terug</button>' : '')+'</div>').join('')
-      : '<p class="stil">Nog geen eerdere versies.</p>';
-    $('#versieScrim').classList.add('open');
-    $('#versieLijst').querySelectorAll('[data-terug]').forEach(b => b.addEventListener('click', async () => {
-      const t = await api('terug', { id: open.id, nr: b.dataset.terug });
-      if (t.body.error) return zeg(t.body.error);
-      open.gewijzigd = t.body.gewijzigd; open.inhoud = t.body.inhoud; vuil = false;
-      if (open.soort === 'blad') toonBlad(t.body.inhoud);
-      else if (open.soort === 'presentatie') toonPres(t.body.inhoud);
-      else toonTekst(t.body.inhoud);
-      $('#versieScrim').classList.remove('open'); zeg('Versie teruggezet.');
-    }));
-  });
-  $('#versieDicht').addEventListener('click', () => $('#versieScrim').classList.remove('open'));
-
-  /* ---------- de AI-schrijfhulp ---------- */
-  $('#aiBtn').addEventListener('click', () => { if (!open) return; $('#aiUit').value = ''; $('#aiToepas').style.display = 'none'; $('#aiScrim').classList.add('open'); });
-  $('#aiDicht').addEventListener('click', () => $('#aiScrim').classList.remove('open'));
-  $('#aiVraagBtn').addEventListener('click', async () => {
-    if (vuil) await bewaarNu();
-    $('#aiUit').value = 'Even denken…';
-    const r = await api('ai', { id: open.id, opdracht: $('#aiOpdracht').value, vraag: $('#aiVraag').value });
-    if (r.body.error) { $('#aiUit').value = ''; return zeg(r.body.error); }
-    $('#aiUit').value = r.body.voorstel + (r.body.demo ? '\n\n(demostand: zet een AI-sleutel voor echte voorstellen)' : '');
-    $('#aiToepas').style.display = '';
-  });
-  $('#aiToepas').addEventListener('click', () => {
-    const stuk = $('#aiUit').value.split('\n\n(demostand')[0];
-    if (open.soort === 'presentatie'){ presData.dias.push({ titel: 'AI-voorstel', tekst: stuk }); tekenPres(); }
-    else { $('#tekst').innerHTML += '<p>' + esc(stuk) + '</p>'; }
-    markeer(); $('#aiScrim').classList.remove('open'); zeg('Toegevoegd; u kunt het gewoon bewerken.');
-  });
-
-  /* ---------- export ---------- */
-  $('#exportBtn').addEventListener('click', () => {
-    if (!open) return;
-    let data, naam, type;
-    if (open.soort === 'blad'){
-      const rijen = [];
-      for (let r = 1; r <= bladData.rijen; r++){
-        const cel = [];
-        for (let c = 0; c < bladData.kolommen; c++){ const ref = kolLetter(c) + r; const v = bladData.cellen[ref] || '';
-          cel.push('"' + String(String(v).startsWith('=') ? bereken(v) : v).replace(/"/g,'""') + '"'); }
-        rijen.push(cel.join(','));
-      }
-      data = rijen.join('\n'); naam = ($('#titel').value || 'rekenblad') + '.csv'; type = 'text/csv';
-    } else if (open.soort === 'presentatie'){
-      data = presData.dias.map((d, i) => 'Dia ' + (i+1) + ': ' + d.titel + '\n' + d.tekst).join('\n\n');
-      naam = ($('#titel').value || 'presentatie') + '.txt'; type = 'text/plain';
-    } else {
-      data = '<!doctype html><meta charset="utf-8"><title>' + esc($('#titel').value) + '</title><body style="font-family:Georgia,serif;max-width:42em;margin:3em auto;line-height:1.7;">' + $('#tekst').innerHTML;
-      naam = ($('#titel').value || 'document') + '.html'; type = 'text/html';
-    }
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: type + ';charset=utf-8' }));
-    a.download = naam; a.click(); URL.revokeObjectURL(a.href);
-    zeg('Geëxporteerd: ' + naam);
-  });
-
-  if (!token) zeg(opzet.leeg); else laadLijst();
-})();
-</script>
+<script src="/apps/office/tekst.js" defer></script>
+<script src="/apps/office/blad.js" defer></script>
+<script src="/apps/office/pres.js" defer></script>
+<script src="/apps/office/app.js" defer></script>
 <script src="/shared/rahul-mond.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

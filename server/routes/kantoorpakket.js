@@ -11,7 +11,7 @@
 module.exports = (kern) => {
   const { app, auth, supplierAuth, officeAuth, express, rtf,
     werkplek, boardroomWie, boardroomBaas,
-    officeMijn, officeMaak, officeOpen, officeBewaar, officeDeel, officeWeg,
+    officeMijn, officeMaak, officeOpen, officeBewaar, officeDeel, officeWeg, officeSter,
     officeVersies, officeTerug, officeAI, officeKring } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const ruim = express.json({ limit: '600kb' });
@@ -27,6 +27,7 @@ module.exports = (kern) => {
     route('/bewaar', (key, b) => officeBewaar(key, b.id, b), ruim);
     route('/deel', (key, b) => officeDeel(key, b.id, b.codenaam, b.aan !== false, b.rechten));
     route('/weg', (key, b) => officeWeg(key, b.id));
+    route('/ster', (key, b) => officeSter(key, b.id, b.aan));
     route('/versies', (key, b) => officeVersies(key, b.id));
     route('/terug', (key, b) => officeTerug(key, b.id, b.nr));
     route('/ai', (key, b) => officeAI(key, b.id, b.opdracht, b.vraag));
@@ -48,6 +49,7 @@ module.exports = (kern) => {
     route('/bewaar', (key, b) => officeBewaar(key, b.id, b), ruim);
     route('/deel', (key, b) => officeDeel(key, b.id, b.codenaam, b.aan !== false, b.rechten));
     route('/weg', (key, b) => officeWeg(key, b.id));
+    route('/ster', (key, b) => officeSter(key, b.id, b.aan));
     route('/versies', (key, b) => officeVersies(key, b.id));
     route('/terug', (key, b) => officeTerug(key, b.id, b.nr));
     route('/ai', (key, b) => officeAI(key, b.id, b.opdracht, b.vraag));
@@ -78,6 +80,7 @@ module.exports = (kern) => {
   rtfRoute('/open', (s, b) => officeOpen(s.key, b.id, s.kring));
   rtfRoute('/bewaar', (s, b) => officeBewaar(s.key, b.id, b, s.kring), { schrijf: true, ruim: true });
   rtfRoute('/weg', (s, b) => officeWeg(s.key, b.id), { schrijf: true });
+  rtfRoute('/ster', (s, b) => officeSter(s.key, b.id, b.aan), { schrijf: true });
   rtfRoute('/versies', (s, b) => officeVersies(s.key, b.id, s.kring));
   rtfRoute('/terug', (s, b) => officeTerug(s.key, b.id, b.nr), { schrijf: true });
   rtfRoute('/ai', (s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring), { schrijf: true });
@@ -111,6 +114,7 @@ module.exports = (kern) => {
   huisRoute('/open', (s, b) => officeOpen(s.key, b.id, s.kring));
   huisRoute('/bewaar', (s, b) => officeBewaar(s.key, b.id, b, s.kring), { ruim: true });
   huisRoute('/weg', (s, b) => officeWeg(s.key, b.id));
+  huisRoute('/ster', (s, b) => officeSter(s.key, b.id, b.aan));
   huisRoute('/versies', (s, b) => officeVersies(s.key, b.id, s.kring));
   huisRoute('/terug', (s, b) => officeTerug(s.key, b.id, b.nr));
   huisRoute('/ai', (s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring));

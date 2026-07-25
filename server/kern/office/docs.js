@@ -14,10 +14,45 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
       .sort((a, b) => String(b.gewijzigd).localeCompare(String(a.gewijzigd)));
     const gedeeld = Object.values(alle).filter(d => d.key !== key && magLezen(d, key, kring))
       .sort((a, b) => String(b.gewijzigd).localeCompare(String(a.gewijzigd)));
-    const kop = d => ({ id: d.id, soort: d.soort, titel: d.titel, gewijzigd: d.gewijzigd,
-      door: naamVan(d.key), gedeeld: (d.gedeeldMet || []).length + (d.bewerkers || []).length });
-    return { status: 200, docs: eigen.map(kop), gedeeld: gedeeld.map(kop), max: MAX_DOCS,
-      sjablonen: Object.entries(SJABLONEN).map(([k, s]) => ({ id: k, soort: s.soort, titel: s.titel })) };
+    // per document net genoeg om de drive te kunnen tekenen zonder de inhoud
+    // mee te sturen: soort, wanneer, van wie, hoe groot en of het uw eigen is
+    const kop = (d, vanMij) => ({ id: d.id, soort: d.soort, titel: d.titel, gewijzigd: d.gewijzigd,
+      gemaakt: d.gemaakt || d.gewijzigd, door: naamVan(d.key), vanMij: !!vanMij,
+      ster: !!d.ster, grootte: grootteVan(d.inhoud), versies: (d.versies || []).length,
+      gedeeld: (d.gedeeldMet || []).length + (d.bewerkers || []).length,
+      omvang: omvangVan(d) });
+    return { status: 200, docs: eigen.map(d => kop(d, true)), gedeeld: gedeeld.map(d => kop(d, false)),
+      max: MAX_DOCS,
+      sjablonen: Object.entries(SJABLONEN).map(([k, s]) => ({ id: k, soort: s.soort, titel: s.titel, groep: s.groep || 'Algemeen' })) };
+  }
+
+  /* Hoe groot is dit stuk werk, in de eenheid van zijn eigen soort: woorden
+     voor een tekst, gevulde cellen voor een blad, dia's voor een presentatie.
+     Dat leest een mens sneller dan een aantal bytes. */
+  function omvangVan(d) {
+    try {
+      if (d.soort === 'blad') {
+        const n = Object.keys((d.inhoud && d.inhoud.cellen) || {}).length;
+        return n + (n === 1 ? ' cel' : ' cellen');
+      }
+      if (d.soort === 'presentatie') {
+        const n = ((d.inhoud && d.inhoud.dias) || []).length;
+        return n + (n === 1 ? ' dia' : ' dia\'s');
+      }
+      const kaal = String((d.inhoud && d.inhoud.tekst) || '').replace(/<[^>]+>/g, ' ').trim();
+      const n = kaal ? kaal.split(/\s+/).length : 0;
+      return n + (n === 1 ? ' woord' : ' woorden');
+    } catch (e) { return ''; }
+  }
+
+  /* ---- een document markeren: het staat dan bovenaan in de drive ---- */
+  function ster(key, did, aan) {
+    const d = docMet(did);
+    if (!d) return { status: 404, error: 'Document niet gevonden.' };
+    if (d.key !== key) return { status: 403, error: 'Alleen de eigenaar markeert een document.' };
+    d.ster = aan !== false;
+    save();
+    return { status: 200, ok: true, ster: d.ster };
   }
 
   /* ---- een nieuw document (leeg of vanuit een sjabloon) ---- */
@@ -90,5 +125,6 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     return { status: 200, ok: true };
   }
 
-  return { officeMijn: mijn, officeMaak: maak, officeOpen: open, officeBewaar: bewaar, officeWeg: weg };
+  return { officeMijn: mijn, officeMaak: maak, officeOpen: open, officeBewaar: bewaar,
+    officeWeg: weg, officeSter: ster };
 };

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Werkplek</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/shared/os.css">
+<link rel="stylesheet" href="/shared/osmenu.css">
+<script src="/apps/foundation/palet.js"></script>
+<script src="/shared/verbinding.js"></script>
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;
+    --muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.60);--acc:var(--dag-kleur,#C23A5E);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .wrap{max-width:920px;margin:0 auto;padding:1.4rem 1.1rem 4rem;}
+  .terug{display:inline-block;margin-bottom:1rem;color:var(--acc);text-decoration:none;font-size:.85rem;}
+  .intro{margin:0 0 1.6rem;}
+  .intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
+  .intro p{color:var(--soft);font-size:.9rem;margin-top:.35rem;max-width:56ch;}
+  /* de keuze tussen de huizen */
+  .huizen{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));}
+  .huis{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:1.3rem 1.3rem 1.15rem;color:inherit;font:inherit;cursor:pointer;transition:border-color .15s,transform .15s;}
+  .huis:hover{border-color:var(--acc);transform:translateY(-2px);}
+  .huis:focus-visible{outline:2px solid var(--acc);outline-offset:3px;}
+  .huis .kop{display:flex;align-items:center;gap:.6rem;}
+  .huis .kop .rtg-glyf{width:1.5rem;height:1.5rem;color:var(--acc);flex:none;}
+  .huis h2{font-family:'Bodoni Moda',Georgia,serif;font-size:1.2rem;font-weight:600;}
+  .huis .aard{color:var(--soft);font-size:.85rem;margin:.5rem 0 .9rem;}
+  .huis .voet{display:flex;gap:1.2rem;font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:.7rem;}
+  .huis .voet b{color:var(--txt);font-weight:600;}
+  /* het huis van binnen */
+  .balk{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+  .balk .wie{display:flex;align-items:center;gap:.6rem;}
+  .balk .wie .rtg-glyf{width:1.6rem;height:1.6rem;color:var(--acc);}
+  .balk h2{font-family:'Bodoni Moda',Georgia,serif;font-size:1.45rem;font-weight:600;}
+  .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:999px;
+    padding:.45rem 1rem;font:inherit;font-size:.82rem;cursor:pointer;}
+  .knop:hover{border-color:var(--acc);}
+  .knop:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+  .vak{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.1rem 1.2rem;margin-bottom:1rem;}
+  .vak > h3{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin-bottom:.9rem;}
+  .cijfers{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));}
+  .stat b{display:block;font-size:1.5rem;font-family:'Bodoni Moda',Georgia,serif;font-weight:600;}
+  .stat i{font-style:normal;font-size:.78rem;color:var(--soft);}
+  .loopt{display:grid;gap:.55rem;}
+  .loopt .r{display:flex;justify-content:space-between;gap:1rem;font-size:.88rem;border-top:1px solid var(--line);padding-top:.55rem;}
+  .loopt .r:first-child{border-top:none;padding-top:0;}
+  .loopt .r b{font-weight:600;}
+  .mensen{display:grid;gap:.5rem;}
+  .mens{display:flex;align-items:center;justify-content:space-between;gap:1rem;font-size:.88rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .mens:first-child{border-top:none;padding-top:0;}
+  .mens .fn{color:var(--soft);font-size:.8rem;}
+  .taak{display:flex;align-items:flex-start;gap:.6rem;font-size:.9rem;padding:.4rem 0;}
+  .taak.af span{color:var(--soft);text-decoration:line-through;}
+  .rij{display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;}
+  .veld{flex:1;min-width:11rem;background:var(--card2);border:1px solid var(--line);color:var(--txt);
+    border-radius:10px;padding:.55rem .75rem;font:inherit;font-size:.88rem;}
+  .veld:focus-visible{outline:2px solid var(--acc);outline-offset:1px;}
+  .leeg{color:var(--soft);font-size:.86rem;}
+  .melding{color:var(--soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rosthema.css" rel="stylesheet">
+<script src="/shared/glyf.js"></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/rosthema.js" defer></script>
+</head>
+<body data-osbar="Werkplek" data-oswereld="lid" data-osterug="apps/app.html">
+<main class="wrap" id="hoofd">
+  <a class="terug" href="/apps/app.html">← naar de app</a>
+  <div class="intro">
+    <h1>Waar werk je vandaag?</h1>
+    <p>RTG en de RTFoundation zijn twee huizen. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun takenlijst. Kies een huis; je ziet daarna alleen dat huis.</p>
+  </div>
+  <div id="kiezer"><p class="melding" id="melding">Werkplekken laden&hellip;</p></div>
+  <div id="huis" hidden></div>
+</main>
+<script src="/apps/werkplek.js" defer></script>
+<script src="/shared/osbar.js" defer></script>
+<script src="/shared/osmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

@@ -28,6 +28,10 @@ module.exports = {
     ['Kies je type (tech, horeca, retail, hotel, zorg, creatief)', 'Zie de werkplekken, werk-apps en technieken die je nodig hebt, met een 3D-plattegrond en QR-codes', 'Vertel je situatie en laat Rahul het pakket op maat bijkleuren'],
     'Dit gaat over jouw zaak; hoe de RTG-kantoren zelf werken blijft bedrijfsgeheim.'),
 
+  '/apps/werkplek.html': G('De werkplek: RTG en de RTFoundation zijn twee huizen; u kiest er een en werkt daarbinnen.',
+    ['Kies het huis waar u vandaag werkt; u ziet alleen dat huis', 'Bekijk de cijfers en wat er op dit moment loopt', 'Houd de bezetting en de takenlijst van dat huis bij'],
+    'De bezetting draait op codenamen: de echte naam blijft in de kluis, ook op uw eigen werkplek.'),
+
   /* ---- de kleinsten (0 t/m 5), samen met papa of mama ---- */
   '/apps/foundation/tellen.html': G('Tellen tot tien: dingen aantikken en samen hardop meetellen.',
     ['Tik de plaatjes een voor een aan; bij elke tik komt er een cijfer bij', 'Kies daarna hoeveel het er waren', 'Ga door zolang uw kind wil, of stop gewoon'],

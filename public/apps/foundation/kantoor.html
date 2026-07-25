@@ -59,9 +59,16 @@
     </div>
   </div>
 </main>
+<script src="/shared/glyf.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Het kamericoon als huisstijl-glyf; ontbreekt de glyf, dan valt de kop stil
+// terug op alleen de naam (nooit een leeg vierkantje of een emoji).
+const glyf = naam => {
+  const s = (window.RTGGlyf && RTGGlyf.svgHTML) ? RTGGlyf.svgHTML(String(naam || ''), { klasse: 'kic' }) : '';
+  return s ? s + ' ' : '';
+};
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
 function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
 if (!TOKEN) uitgelogd();
@@ -78,7 +85,7 @@ async function laad(){
     '<div class="stat"><b>' + o.lab.projecten + '</b><i>lab-projecten</i></div>' +
     '<div class="stat"><b>' + o.takenOpen + '</b><i>taken open</i></div>';
   $('#grid').innerHTML = k.kamers.map(x => '<div class="kaart kamer" data-id="' + x.id + '">' +
-    '<div class="rij" style="justify-content:space-between;"><h2>' + x.emoji + ' ' + esc(x.naam) + '</h2>' + (x.takenOpen ? '<span class="pil">' + x.takenOpen + ' taken</span>' : '') + '</div>' +
+    '<div class="rij" style="justify-content:space-between;"><h2>' + glyf(x.icoon) + esc(x.naam) + '</h2>' + (x.takenOpen ? '<span class="pil">' + x.takenOpen + ' taken</span>' : '') + '</div>' +
     '<div class="mi">' + esc(x.missie) + '</div>' +
     (x.kpi ? '<div class="kpi">' + esc(x.kpi[0]) + ': <b>' + esc(x.kpi[1]) + '</b></div>' : '') + '</div>').join('');
   document.querySelectorAll('.kamer').forEach(el => el.addEventListener('click', () => open(el.dataset.id)));
@@ -87,7 +94,7 @@ async function open(id){
   KAMER = id;
   const d = await api('kamer', { id });
   $('#grid').hidden = true; $('#kamer').hidden = false;
-  $('#kNaam').textContent = d.emoji + ' ' + d.naam;
+  $('#kNaam').innerHTML = glyf(d.icoon) + esc(d.naam);
   $('#kMissie').textContent = d.missie;
   $('#kKpis').innerHTML = d.kpis.map(k => '<div class="stat"><b>' + esc(k.waarde) + '</b><i>' + esc(k.label) + '</i></div>').join('');
   $('#kLijsten').innerHTML = d.lijsten.map(l => '<div class="sec" style="margin-top:.5rem;">' + esc(l.titel) + '</div>' +

@@ -2295,6 +2295,10 @@ Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto }));
 Object.assign(kern, require('./kern/rtfclubs')({ db, save, crypto }));
 Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropic }));
 Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));
+/* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
+   werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun
+   takenlijst; wie binnenkomt kiest eerst een huis. */
+Object.assign(kern, require('./kern/werkplek')({ db, save, crypto }));
 /* Aanmeldingen (kern/aanmeldingen.js): de aanmelding per pas is geheel
    geautomatiseerd (berichten, onboarding, rondleiding, RTF, veiligheid, privacy);
    alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
@@ -2749,6 +2753,8 @@ require('./routes/rtfbieb')(kern);
 require('./routes/geloofbieb')(kern);
 /* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
 require('./routes/rtfkantoor')(kern);
+/* De twee werkplekken RTG en RTF (kern staat al hierboven). */
+require('./routes/werkplek')(kern);
 require('./routes/labfonds')(kern);
 require('./routes/aanmeldingen')(kern);
 require('./routes/ledenregister')(kern);

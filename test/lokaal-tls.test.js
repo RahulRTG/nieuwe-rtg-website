@@ -107,6 +107,10 @@ test('5. het loketje geeft de CA en stuurt de rest naar de beveiligde site', asy
       return res.end(c.caPem);
     }
     const gastheer = String(req.headers.host || '').split(':')[0] || 'localhost';
+    if ((req.url || '/').split('?')[0] === '/') {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      return res.end(lokaal.loketPagina(3000, gastheer));
+    }
     res.writeHead(302, { Location: 'https://' + gastheer + ':3000' + (req.url || '/') });
     res.end();
   });
@@ -122,6 +126,11 @@ test('5. het loketje geeft de CA en stuurt de rest naar de beveiligde site', asy
   const ca = await haal('/rtg-ca.crt');
   assert.equal(ca.status, 200);
   assert.ok(ca.body.includes('BEGIN CERTIFICATE'), 'het CA-bestand komt eruit');
+  const voor = await haal('/');
+  assert.equal(voor.status, 200, 'de voorpagina zegt of u binnen bent');
+  assert.match(voor.body, /bereikbaar/, 'en zegt dat in gewone taal');
+  assert.match(voor.body, /rtg-ca\.crt/, 'met de knop om het certificaat te halen');
+  assert.match(voor.body, /Certificaatvertrouwensinstellingen/, 'en de stap die het vaakst vergeten wordt');
   const rest = await haal('/apps/app.html');
   assert.equal(rest.status, 302, 'al het andere gaat naar de beveiligde site');
   assert.match(rest.kop.location, /^https:\/\//);

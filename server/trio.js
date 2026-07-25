@@ -213,6 +213,11 @@ if (LOKAAL_TLS) {
       return res.end(tlsCert.caPem);
     }
     const gastheer = String(req.headers.host || '').split(':')[0] || 'localhost';
+    // de voorpagina vertelt een mens of hij binnen is en wat er nog moet gebeuren
+    if ((req.url || '/').split('?')[0] === '/') {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      return res.end(require('./lokaal-tls').loketPagina(PORT, gastheer));
+    }
     res.writeHead(302, { Location: 'https://' + gastheer + ':' + PORT + (req.url || '/') });
     res.end();
   });

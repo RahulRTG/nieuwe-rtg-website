@@ -79,6 +79,48 @@ function certVoorDezeMachine(opties) {
   };
 }
 
+/* De pagina van het http-loketje. Dit is het eerste wat een telefoon van deze
+   computer te zien krijgt, en het moet twee vragen beantwoorden: kom ik hier
+   binnen, en wat moet ik nu doen. Vandaar een echte pagina in plaats van een
+   kaal bestand -- een leeg scherm of een foutmelding van de browser vertelt een
+   mens niet of het aan het netwerk lag of aan het adres.
+
+   Bewust zonder opsmuk: dit draait op een onbeveiligde verbinding en hoort
+   niets anders te doen dan het certificaat aanreiken. */
+function loketPagina(poort, naamVanDeMachine) {
+  return '<!doctype html><html lang="nl"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>RTG: deze computer is bereikbaar</title><style>' +
+    ':root{color-scheme:dark}' +
+    'body{margin:0;background:#0E0E0D;color:#F2EFEA;font:16px/1.6 -apple-system,system-ui,sans-serif;' +
+    'padding:2.2rem 1.3rem;max-width:34rem;margin:0 auto;}' +
+    'h1{font-size:1.35rem;font-weight:600;margin:0 0 .3rem;}' +
+    'p{color:rgba(242,239,234,.66);margin:0 0 1rem;}' +
+    '.goed{color:#69B891;font-weight:600;}' +
+    'a.knop{display:block;text-align:center;background:#C9A24B;color:#0C0C0B;font-weight:600;' +
+    'text-decoration:none;border-radius:12px;padding:.9rem 1rem;margin:1.4rem 0;}' +
+    'ol{padding-left:1.2rem;margin:0 0 1.4rem;} li{margin-bottom:.5rem;}' +
+    'code{background:#1C1A19;border-radius:6px;padding:.1rem .35rem;font-size:.9em;}' +
+    '.stil{font-size:.85rem;color:rgba(242,239,234,.42);border-top:1px solid rgba(255,255,255,.09);padding-top:1rem;}' +
+    '</style></head><body>' +
+    '<h1><span class="goed">Gelukt.</span> Deze computer is bereikbaar.</h1>' +
+    '<p>U kijkt naar ' + naamVanDeMachine + '. Uw telefoon zit op hetzelfde netwerk; ' +
+    'dat deel werkt dus. Nog twee dingen en de site kan alles.</p>' +
+    '<a class="knop" href="/rtg-ca.crt">1 · Haal het certificaat op</a>' +
+    '<p>Tik hierboven, en daarna op <b>Sta toe</b>. Ga dan naar ' +
+    '<b>Instellingen</b>: bovenin staat nu <b>Profiel gedownload</b>: en tik op ' +
+    '<b>Installeer</b>.</p>' +
+    '<h1 style="margin-top:1.8rem;">2 · Zet het vertrouwen aan</h1>' +
+    '<p>Deze stap wordt het vaakst vergeten, en zonder deze stap werkt het niet:</p>' +
+    '<ol><li><b>Instellingen</b> → <b>Algemeen</b> → <b>Info</b></li>' +
+    '<li>Helemaal naar beneden: <b>Certificaatvertrouwensinstellingen</b></li>' +
+    '<li>Zet de schakelaar bij <b>RTG lokaal</b> aan</li></ol>' +
+    '<a class="knop" href="https://' + naamVanDeMachine + ':' + poort + '/">3 · Open de site</a>' +
+    '<p class="stil">Dit loketje draait op een onbeveiligde verbinding en doet niets anders dan ' +
+    'het certificaat aanreiken. De site zelf staat op <code>https://' + naamVanDeMachine + ':' + poort + '</code>.</p>' +
+    '</body></html>';
+}
+
 /* Het lijstje dat we bij het opstarten tonen: waar u de site vandaan haalt en,
    als de CA net gemaakt is, hoe u hem op uw telefoon vertrouwt. */
 function startUitleg(cert, poort) {
@@ -92,11 +134,12 @@ function startUitleg(cert, poort) {
     regels.push('  Zit hij op wifi?');
   }
   regels.push('');
-  regels.push('  Eenmalig op de telefoon: het bestand RTG-CA.crt vertrouwen.');
-  regels.push('  Het staat hier: ' + cert.caPad);
-  regels.push('  Of haal het op met de telefoon via http://<adres hierboven>:' + (poort + 10) + '/rtg-ca.crt');
+  regels.push('  Eenmalig op de telefoon: open eerst dit adres, daar staat wat u moet doen:');
+  for (const ip of cert.netwerk) regels.push('    http://' + ip + ':' + (poort + 10));
+  regels.push('  (let op: http, en poort ' + (poort + 10) + ')');
+  regels.push('  Het certificaat staat ook los op schijf: ' + cert.caPad);
   regels.push('');
   return regels.join('\n');
 }
 
-module.exports = { certVoorDezeMachine, adressenVanDezeMachine, netwerkAdressen, startUitleg };
+module.exports = { certVoorDezeMachine, adressenVanDezeMachine, netwerkAdressen, startUitleg, loketPagina };

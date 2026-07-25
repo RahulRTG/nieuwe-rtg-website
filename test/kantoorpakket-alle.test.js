@@ -135,7 +135,11 @@ test('6. sjablonen: een vliegende start met een factuurblad en een pitch', async
   const p = await api('/api/kantoorpakket/maak', { sjabloon: 'pitch' }, lidA);
   const opP = await api('/api/kantoorpakket/open', { id: p.body.id }, lidA);
   assert.equal(opP.body.soort, 'presentatie');
-  assert.equal(opP.body.inhoud.dias.length, 4);
+  // een echt deck: meerdere dia's, elk met een titel en een indeling. Het
+  // aantal dia's staat hier bewust niet vast; de sjabloonkast mag groeien.
+  assert.ok(opP.body.inhoud.dias.length >= 4, 'de pitch is een heel deck');
+  assert.ok(opP.body.inhoud.dias.every(d => d.titel && d.indeling),
+    'elke dia heeft een titel en een indeling');
 });
 
 test('7. de AI-schrijfhulp: stelt voor (demostand), en alleen voor wie mag schrijven', async () => {

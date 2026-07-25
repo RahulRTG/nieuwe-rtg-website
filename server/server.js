@@ -2260,11 +2260,12 @@ Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail
 /* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,
    elk rond de duizend euro winkelwaarde, voor leden inbegrepen bij de pas. */
 Object.assign(kern, require('./kern/appbieb').maakAppbieb({ db, save }));
-/* De Reis-Bibliotheek (kern/reisbieb): een miljoen reisgidsen van over de
-   hele wereld, van Londen tot Gaza; alleen voor betalende leden. */
+/* De Reis-Bibliotheek (kern/reisbieb): echte, leesbare bestemmingsgidsen van
+   eigen redactie; open voor iedereen die is aangemeld. */
 Object.assign(kern, require('./kern/reisbieb').maakReisBieb({ db, save }));
-/* De RTF App-Bibliotheek (kern/rtfbieb.js): 20.000 kind- en gezinsapps; de
-   kern staat hier al zodat de Mall (routes/member) hem ook kan tonen. */
+/* De RTF App-Bibliotheek (kern/rtfbieb.js): de echte, gratis kind- en
+   gezinsapps van de stichting; de kern staat hier al zodat de Mall
+   (routes/member) hem ook kan tonen. */
 Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
 /* De Geloof & Wijsheid-Bibliotheek (kern/geloofbieb.js): een miljoen boeken en
    apps over alle religies en levensbeschouwingen, als gelijken naast elkaar,

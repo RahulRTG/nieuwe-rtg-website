@@ -1,6 +1,7 @@
-/* De Reis-Bibliotheek: een miljoen reisgidsen van over de hele wereld, van
-   Londen tot Gaza, voor betalende leden inbegrepen; en de betaalmuur op
-   beide bibliotheken: de gratis gast-app blijft er volledig buiten.
+/* De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen van eigen redactie.
+   Geen miljoen lege titels meer; wat hier staat kun je openen en lezen. En het
+   toegangsmodel op beide bibliotheken: bladeren is voor iedereen, installeren
+   uit de App-Bibliotheek blijft een voordeel van betalende leden.
    Draai los: node --experimental-sqlite --test test/reisbieb.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -8,6 +9,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const { GIDSEN, TOTAAL, REGIOS } = require('../server/kern/reisbieb');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -31,52 +33,55 @@ test.before(async () => {
 });
 test.after(() => stop(srv && srv.child));
 
-test('1. de bibliotheek telt exact een miljoen reis-apps over 250 bestemmingen', async () => {
+test('1. de bibliotheek toont precies de echte gidsen, gratis en leesbaar', async () => {
   const r = await api(base, '/api/mall/reis', {}, lid);
   assert.equal(r.status, 200);
-  assert.equal(r.body.totaal, 1000000);
-  assert.equal(r.body.bestemmingen.length, 250);
-  assert.equal(r.body.bestemmingen.length * r.body.perBestemming, 1000000);
-  assert.ok(r.body.bestemmingen.includes('Londen') && r.body.bestemmingen.includes('Gaza'), 'van Londen tot Gaza');
+  assert.equal(r.body.totaal, TOTAAL);
+  assert.equal(r.body.totaal, GIDSEN.length);
+  assert.equal(r.body.gratis, true);
+  assert.equal(r.body.leesbaar, true, 'elke gids is echt te lezen');
+  assert.equal(r.body.regios.length, REGIOS.length);
+  assert.equal(r.body.regios.reduce((s, x) => s + x.aantal, 0), TOTAAL, 'elke gids hoort bij een regio');
+  assert.ok(r.body.bestemmingen.includes('Londen'), 'Londen staat in de bibliotheek');
 });
 
-test('2. van Londen tot Gaza: zoeken en filteren vindt elke bestemming', async () => {
-  const gaza = await api(base, '/api/mall/reis/catalogus', { zoek: 'gaza' }, lid);
-  assert.equal(gaza.body.totaal, 4000, 'elke bestemming heeft 4.000 gidsen');
-  for (const a of gaza.body.items) assert.equal(a.bestemming, 'Gaza');
-  const londen = await api(base, '/api/mall/reis/catalogus', { bestemming: 'Londen' }, lid);
-  assert.equal(londen.body.totaal, 4000);
-  for (const a of londen.body.items) assert.equal(a.bestemming, 'Londen');
-  // een gidssoort als zoekterm werkt ook, en combineert met een bestemming
-  const metro = await api(base, '/api/mall/reis/catalogus', { zoek: 'metrokaart', bestemming: 'Tokio' }, lid);
-  assert.equal(metro.body.totaal, 100, 'een soort x bestemming = 100 edities/jaargangen');
-  for (const a of metro.body.items) { assert.equal(a.soort, 'Metrokaart'); assert.equal(a.bestemming, 'Tokio'); }
-  const niks = await api(base, '/api/mall/reis/catalogus', { zoek: 'qqqxyz' }, lid);
-  assert.equal(niks.body.totaal, 0);
-  assert.ok(niks.body.hint, 'een misser legt uit hoe je wel zoekt');
-});
-
-test('3. dure, exclusieve en educatieve gidsen; voor leden altijd inbegrepen (0)', async () => {
-  const p1 = await api(base, '/api/mall/reis/catalogus', { pagina: 1 }, lid);
-  const ver = await api(base, '/api/mall/reis/catalogus', { pagina: 41666 }, lid);
-  for (const a of [...p1.body.items, ...ver.body.items]) {
-    assert.ok(a.winkelwaardeCenten >= 999 && a.winkelwaardeCenten <= 14899, a.naam + ': winkelwaarde 9,99..148,99 (nu ' + a.winkelwaardeCenten + ')');
-    assert.equal(a.ledenprijsCenten, 0, 'inbegrepen bij de pas');
-    assert.match(a.uitleg, /exclusief en educatief/);
+test('2. elke gids is inbegrepen en heeft een echte aankondiging', async () => {
+  const cat = await api(base, '/api/mall/reis/catalogus', { per: 48 }, lid);
+  assert.equal(cat.body.items.length, Math.min(48, TOTAAL));
+  for (const a of cat.body.items) {
+    assert.equal(a.prijsCenten, 0, a.naam + ' is inbegrepen');
+    assert.equal(a.ledenprijsCenten, 0);
+    assert.ok(a.uitleg && a.uitleg.length > 40, a.naam + ' heeft een aankondiging');
+    assert.ok(a.woorden > 80, a.naam + ' is een echte tekst (' + a.woorden + ' woorden)');
+    assert.ok(a.bestemming && a.regio, a.naam + ' heeft een bestemming en een regio');
   }
-  const o = await api(base, '/api/mall/reis', {}, lid);
-  assert.ok(o.body.totaleWinkelwaardeCenten > 1000000 * 999, 'de totale winkelwaarde loopt in de tientallen miljoenen');
 });
 
-test('4. de catalogus is deterministisch: dezelfde pagina geeft dezelfde gidsen', async () => {
-  const a = await api(base, '/api/mall/reis/catalogus', { bestemming: 'Gaza', soort: 'Stadsgids', pagina: 2 }, lid);
-  const b = await api(base, '/api/mall/reis/catalogus', { bestemming: 'Gaza', soort: 'Stadsgids', pagina: 2 }, lid);
-  assert.deepEqual(a.body.items.map(x => x.id), b.body.items.map(x => x.id));
-  assert.ok(a.body.items.length > 0);
+test('3. lezen geeft de volledige tekst; een onbekende gids bestaat niet', async () => {
+  const eerste = (await api(base, '/api/mall/reis/catalogus', {}, lid)).body.items[0];
+  const r = await api(base, '/api/mall/reis/lees', { id: eerste.id }, lid);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.gids.id, eerste.id);
+  assert.ok(r.body.gids.tekst.length > 200, 'de gids is echt geschreven, geen lege huls');
+  assert.ok(r.body.gids.tekst.includes('\n'), 'de tekst heeft meerdere alineas');
+  assert.equal((await api(base, '/api/mall/reis/lees', { id: 'reis-nergens' }, lid)).status, 404);
+});
+
+test('4. filteren op regio en bestemming, en zoeken in de tekst', async () => {
+  const regio = REGIOS[0];
+  const r = await api(base, '/api/mall/reis/catalogus', { regio, per: 48 }, lid);
+  assert.ok(r.body.totaal > 0);
+  for (const a of r.body.items) assert.equal(a.regio, regio);
+  const londen = await api(base, '/api/mall/reis/catalogus', { bestemming: 'Londen' }, lid);
+  assert.equal(londen.body.totaal, 1);
+  assert.equal(londen.body.items[0].bestemming, 'Londen');
+  const zoek = await api(base, '/api/mall/reis/catalogus', { zoek: 'londen' }, lid);
+  assert.ok(zoek.body.totaal >= 1, 'zoeken vindt Londen');
+  assert.equal((await api(base, '/api/mall/reis/catalogus', { zoek: 'qqqxyz' }, lid)).body.totaal, 0);
 });
 
 test('5. installeren en verwijderen: idempotent, bewaard per lid, buiten de bieb bestaat niets', async () => {
-  const eerste = (await api(base, '/api/mall/reis/catalogus', { bestemming: 'Gaza' }, lid)).body.items[0];
+  const eerste = (await api(base, '/api/mall/reis/catalogus', { bestemming: 'Londen' }, lid)).body.items[0];
   const r1 = await api(base, '/api/mall/reis/installeer', { id: eerste.id }, lid);
   assert.equal(r1.status, 200);
   assert.equal(r1.body.aantal, 1);
@@ -87,7 +92,7 @@ test('5. installeren en verwijderen: idempotent, bewaard per lid, buiten de bieb
   assert.equal(mijn.body.apps[0].id, eerste.id);
   const weg = await api(base, '/api/mall/reis/weg', { id: eerste.id }, lid);
   assert.equal(weg.body.aantal, 0);
-  assert.equal((await api(base, '/api/mall/reis/installeer', { id: 'reis-1000000' }, lid)).status, 404);
+  assert.equal((await api(base, '/api/mall/reis/installeer', { id: 'reis-atlantis' }, lid)).status, 404);
 });
 
 test('6. het toegangsmodel: bladeren voor iedereen; de gast installeert reis wel, apps niet', async () => {
@@ -99,11 +104,13 @@ test('6. het toegangsmodel: bladeren voor iedereen; de gast installeert reis wel
   const dicht = await api(base, '/api/mall/apps/installeer', { id: 'app-1' }, gast);
   assert.equal(dicht.status, 403);
   assert.match(dicht.body.error, /betalende leden/);
-  // het Reis-gedeelte is voor de aangemelde gast volledig open, ook installeren
-  const reis = await api(base, '/api/mall/reis/installeer', { id: 'reis-7' }, gast);
+  // het Reis-gedeelte is voor de aangemelde gast volledig open: bladeren, lezen en installeren
+  const gids = (await api(base, '/api/mall/reis/catalogus', {}, gast)).body.items[0];
+  assert.ok((await api(base, '/api/mall/reis/lees', { id: gids.id }, gast)).body.gids.tekst.length > 200);
+  const reis = await api(base, '/api/mall/reis/installeer', { id: gids.id }, gast);
   assert.equal(reis.status, 200);
   assert.equal((await api(base, '/api/mall/reis/mijn', {}, gast)).body.apps.length, 1);
-  assert.equal((await api(base, '/api/mall/reis/weg', { id: 'reis-7' }, gast)).status, 200);
+  assert.equal((await api(base, '/api/mall/reis/weg', { id: gids.id }, gast)).status, 200);
   // zonder aanmelding uberhaupt geen toegang; het betalende lid kan overal in
   assert.equal((await api(base, '/api/mall/reis')).status, 401);
   assert.equal((await api(base, '/api/mall/apps', {}, lid)).status, 200);

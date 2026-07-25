@@ -37,7 +37,7 @@
 <div id="balk"></div>
 <div class="wrap" role="main">
   <h1>App-Bibliotheek</h1>
-  <p class="intro" id="biebIntro">Duizenden apps om te leren, spelen en ontdekken; allemaal gratis, een cadeau van de RTFoundation. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.</p>
+  <p class="intro" id="biebIntro">Alle apps van de RTFoundation om te leren, spelen en ontdekken; allemaal gratis, een cadeau van de stichting. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.</p>
 
   <div class="kaart" style="padding:.8rem .9rem;margin-bottom:.9rem;">
     <b style="font-size:.92rem;">De bibliothecaris</b>
@@ -82,23 +82,25 @@ const api = (pad, body) => fetch('/api/rtf/bieb' + pad, {
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 const ST = { categorie: '', zoek: '', pagina: 1, mijn: false };
-const euro = c => 'EUR ' + (c / 100).toFixed(2).replace('.', ',');
 
 async function start(){
   try {
     const d = await api('');
-    $('#biebIntro').textContent = d.totaal.toLocaleString('nl-NL') + ' apps om te leren, spelen en ontdekken; allemaal gratis, een cadeau van de RTFoundation. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.';
+    $('#biebIntro').textContent = d.totaal.toLocaleString('nl-NL') + ' echte apps om te leren, spelen en ontdekken; elke tegel opent een werkende app. Allemaal gratis, een cadeau van de RTFoundation. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.';
     $('#bCat').innerHTML = '<option value="">Alle categorieën</option>' +
-      d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+      d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+' ('+c.aantal+')</option>').join('');
   } catch (e) { $('#bGrid').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   teken();
 }
 function kaart(a, vanMij){
+  // een echte app: de tegel opent de bestaande pagina
+  const open = a.url ? '<a class="knop stil" href="'+esc(a.url)+'" style="text-decoration:none;">Openen</a>' : '';
   return '<div class="kaart app">'+
-    '<span class="cat">'+a.icon+' '+esc(a.categorieLabel)+'</span>'+
+    '<span class="cat">'+esc(a.categorieLabel)+'</span>'+
     '<b>'+esc(a.naam)+'</b>'+
-    '<small>voor '+esc(a.doelgroepLabel)+' ·  '+a.sterren.toFixed(1)+' · '+a.grootteMB+' MB</small>'+
-    '<div class="rij"><s>'+euro(a.winkelwaardeCenten)+'</s><span class="gratis">Gratis</span>'+
+    (a.uitleg ? '<small style="line-height:1.5;">'+esc(a.uitleg)+'</small>' : '')+
+    '<small>voor '+esc(a.doelgroepLabel)+'</small>'+
+    '<div class="rij"><span class="gratis">Gratis</span>'+ open +
     (vanMij ? '<button class="knop stil bweg" data-id="'+esc(a.id)+'">Opruimen</button>'
             : '<button class="knop bin" data-id="'+esc(a.id)+'">Installeer</button>')+
     '</div></div>';

@@ -97,6 +97,14 @@
   <div class="art" id="bladArt"></div>
 </section>
 
+<section class="blad" id="lezer" aria-label="Reisgids lezen">
+  <div class="blad-kop">
+    <button class="terug" id="lezerTerug">← Bibliotheek</button>
+    <div><div class="ey" id="lezerMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);"></div><h1 id="lezerTitel" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+  </div>
+  <div id="lezerTekst" style="max-width:38rem;margin:0 auto;padding:1.6rem 1.2rem 4rem;font-size:.95rem;line-height:1.8;color:var(--muted);"></div>
+</section>
+
 <div class="melding" id="melding" role="status"></div>
 <script>
 const $ = s => document.querySelector(s);
@@ -145,15 +153,15 @@ function tekenBiebKop(){
   });
 }
 
-/* ---------- De RTF-afdeling: 20.000 gratis kind- en gezinsapps, open voor
-   iedereen die is aangemeld (ook de gast) ---------- */
+/* ---------- De RTF-afdeling: de echte, gratis kind- en gezinsapps van de
+   stichting, open voor iedereen die is aangemeld (ook de gast) ---------- */
 const RF = { categorie: '', zoek: '', pagina: 1, mijn: false };
 async function laadRtfbieb(){
   let d;
   try { d = await api('/api/mall/rtf'); } catch(e){ return; }
   $('#rtfbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>RTF-Bibliotheek</h2>'+
-    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
+    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' echte kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="rfCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
         d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('')+'</select>'+
@@ -167,16 +175,19 @@ async function laadRtfbieb(){
   tekenRtf();
 }
 function rtfKaart(a, geinstalleerd){
+  // een echte foundation-app: elke tegel opent een bestaande, werkende pagina
+  const open = a.url ? '<a class="knop stil" href="'+esc(a.url)+'" style="text-decoration:none;">Openen</a>' : '';
   return '<div class="boutiek" style="cursor:default;">'+
-    '<span class="stad">'+esc(a.categorieLabel||a.categorie||'')+'</span>'+
+    '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel||a.categorie||'')+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</span>'+
-    '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
-      '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
+    (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
+    (a.doelgroepLabel?'<span style="font-size:.72rem;color:var(--soft);display:block;">voor '+esc(a.doelgroepLabel)+'</span>':'')+
+    '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
       '<b style="color:var(--gold);font-size:.8rem;">Gratis</b>'+
+      '<span style="flex:1;"></span>'+ open +
       (geinstalleerd
-        ? '<button class="knop stil rfweg" data-id="'+esc(a.id)+'" style="margin-left:auto;">Verwijder</button>'
-        : '<button class="knop rfin" data-id="'+esc(a.id)+'" style="margin-left:auto;">Installeer</button>')+
+        ? '<button class="knop stil rfweg" data-id="'+esc(a.id)+'">Verwijder</button>'
+        : '<button class="knop rfin" data-id="'+esc(a.id)+'">Installeer</button>')+
     '</div></div>';
 }
 let rfTekenNr = 0;
@@ -294,43 +305,57 @@ async function tekenApps(){
   } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
-/* ---------- De Reis-Bibliotheek: een miljoen reisgidsen, van Londen tot Gaza ----------
-   Kies een bestemming en/of gidssoort, of zoek erop; de gidsen zijn nuttig,
-   exclusief en educatief, en voor betalende leden altijd inbegrepen. */
-const RB = { bestemming: '', soort: '', zoek: '', pagina: 1, mijn: false };
+/* ---------- De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen ----------
+   Geen lege titels: elke gids opent en is te lezen. Kies een bestemming of een
+   werelddeel, of zoek erop; alles is open voor iedereen die is aangemeld. */
+const RB = { bestemming: '', regio: '', zoek: '', pagina: 1, mijn: false };
 async function laadReisbieb(){
   let d;
   try { d = await api('/api/mall/reis'); } catch(e){ return; }
   $('#reisbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>Reis-Bibliotheek</h2>'+
-    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' reisgidsen · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · van Londen tot Gaza</span></div>'+
+    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' gidsen van eigen redactie · echt te lezen · voor iedereen open</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="rbBestemming" class="veld" style="max-width:13rem;" aria-label="Bestemming"><option value="">Alle bestemmingen</option>'+
         d.bestemmingen.map(b => '<option value="'+esc(b)+'">'+esc(b)+'</option>').join('')+'</select>'+
-      '<select id="rbSoort" class="veld" style="max-width:13rem;" aria-label="Gidssoort"><option value="">Alle gidssoorten</option>'+
-        d.soorten.map(s => '<option value="'+esc(s)+'">'+esc(s)+'</option>').join('')+'</select>'+
-      '<input id="rbZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek een bestemming of gidssoort" maxlength="60" aria-label="Zoeken">'+
-      '<button class="knop stil" id="rbMijn" type="button">Mijn reis-apps</button>'+
+      '<select id="rbRegio" class="veld" style="max-width:13rem;" aria-label="Werelddeel"><option value="">Alle werelddelen</option>'+
+        d.regios.map(r => '<option value="'+esc(r.id)+'">'+esc(r.label)+' ('+r.aantal+')</option>').join('')+'</select>'+
+      '<input id="rbZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek een bestemming of een woord uit de gids" maxlength="60" aria-label="Zoeken">'+
+      '<button class="knop stil" id="rbMijn" type="button">Mijn reisgidsen</button>'+
     '</div>'+
     '<div id="rbGrid"></div><div class="rij" id="rbBlader" style="justify-content:center;"></div></div>';
   $('#rbBestemming').addEventListener('change', () => { RB.bestemming = $('#rbBestemming').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
-  $('#rbSoort').addEventListener('change', () => { RB.soort = $('#rbSoort').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
+  $('#rbRegio').addEventListener('change', () => { RB.regio = $('#rbRegio').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
   let zt; $('#rbZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { RB.zoek = $('#rbZoek').value; RB.pagina = 1; RB.mijn = false; tekenReis(); }, 300); });
   $('#rbMijn').addEventListener('click', () => { RB.mijn = !RB.mijn; RB.pagina = 1; tekenReis(); });
   tekenReis();
 }
 function reisKaart(a, geinstalleerd){
   return '<div class="boutiek" style="cursor:default;">'+
-    '<span class="stad">'+esc(a.bestemming)+' · '+esc(a.soort)+'</span>'+
+    '<span class="stad">'+esc(a.bestemming)+' · '+esc(a.regio)+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</span>'+
-    '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
-      '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
+    (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
+    '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
       '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>'+
+      '<span style="flex:1;"></span>'+
+      '<button class="knop stil rblees" data-id="'+esc(a.id)+'">Lezen</button>'+
       (geinstalleerd
-        ? '<button class="knop stil rbweg" data-id="'+esc(a.id)+'" style="margin-left:auto;">Verwijder</button>'
-        : '<button class="knop rbin" data-id="'+esc(a.id)+'" style="margin-left:auto;">Installeer</button>')+
+        ? '<button class="knop stil rbweg" data-id="'+esc(a.id)+'">Verwijder</button>'
+        : '<button class="knop rbin" data-id="'+esc(a.id)+'">In mijn kast</button>')+
     '</div></div>';
+}
+// de leeszaal: de volledige tekst van een gids, in hetzelfde blad-formaat
+async function leesGids(id){
+  try {
+    const d = await api('/api/mall/reis/lees', { id });
+    const g = d.gids;
+    $('#lezerTitel').textContent = g.naam;
+    $('#lezerMeta').textContent = g.bestemming + ' · ' + g.regio;
+    $('#lezerTekst').innerHTML = String(g.tekst || '').split('\n').filter(Boolean)
+      .map(p => '<p style="margin-bottom:1rem;">'+esc(p)+'</p>').join('');
+    $('#lezer').classList.add('open');
+    window.scrollTo(0, 0);
+  } catch(e){ meld(e.message); }
 }
 async function tekenReis(){
   const grid = $('#rbGrid'), blader = $('#rbBlader');
@@ -341,12 +366,12 @@ async function tekenReis(){
     if (RB.mijn) {
       const mijn = (await api('/api/mall/reis/mijn')).apps;
       grid.innerHTML = mijn.length ? '<div class="boutieks">'+mijn.map(a => reisKaart(a, true)).join('')+'</div>'
-        : '<div class="leeg">Nog geen reis-apps geïnstalleerd. Kies een bestemming en druk op Installeer.</div>';
+        : '<div class="leeg">Nog geen gidsen in je kast. Kies een bestemming en druk op In mijn kast.</div>';
       blader.innerHTML = '';
     } else {
-      const d = await api('/api/mall/reis/catalogus', { bestemming: RB.bestemming, soort: RB.soort, zoek: RB.zoek, pagina: RB.pagina });
+      const d = await api('/api/mall/reis/catalogus', { bestemming: RB.bestemming, regio: RB.regio, zoek: RB.zoek, pagina: RB.pagina });
       grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => reisKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
-        : '<div class="leeg">'+esc(d.hint || 'Niets gevonden. Probeer een andere zoekterm.')+'</div>';
+        : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
         ? '<button class="knop stil" id="rbVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
           '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' gidsen</span>'+
@@ -356,8 +381,9 @@ async function tekenReis(){
       if (vorig) vorig.addEventListener('click', () => { RB.pagina--; tekenReis(); });
       if (volgend) volgend.addEventListener('click', () => { RB.pagina++; tekenReis(); });
     }
+    grid.querySelectorAll('.rblees').forEach(b => b.addEventListener('click', () => leesGids(b.dataset.id)));
     grid.querySelectorAll('.rbin').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await api('/api/mall/reis/installeer', { id: b.dataset.id }); meld('Geïnstalleerd: '+r.app.naam+' ('+r.aantal+' reis-apps)'); tekenReis(); }
+      try { const r = await api('/api/mall/reis/installeer', { id: b.dataset.id }); meld('In je kast: '+r.app.naam+' ('+r.aantal+' gidsen)'); tekenReis(); }
       catch(e){ meld(e.message); }
     }));
     grid.querySelectorAll('.rbweg').forEach(b => b.addEventListener('click', async () => {
@@ -503,6 +529,7 @@ function tekenArt(arts){
   }));
 }
 $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
+$('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('open'));
 </script>
 <button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>

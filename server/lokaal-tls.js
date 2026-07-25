@@ -121,6 +121,39 @@ function loketPagina(poort, naamVanDeMachine) {
     '</body></html>';
 }
 
+/* Een QR-code in het Terminal-venster, met onze eigen codec (public/shared/qr.js).
+
+   Het adres van deze computer overtypen op een telefoon gaat vaak mis: één
+   spatie of een autocorrectie en de browser maakt er een zoekopdracht van, en
+   dan komt u ergens heel anders uit. Met een QR hoeft er niets getypt te
+   worden: camera erop, tikken op de melding, klaar.
+
+   Twee beeldrijen per tekstregel via de halve blokjes, anders wordt de code
+   twee keer zo hoog als een terminalvenster. De rustzone eromheen hoort erbij;
+   zonder die witrand leest een camera de code niet. */
+function qrInTerminal(tekst) {
+  let matrix;
+  try { matrix = require('../public/shared/qr').encode(tekst, { ecc: 'M' }).matrix; }
+  catch (e) { return ''; }
+  const rand = 2;
+  const n = matrix.length + rand * 2;
+  const aan = (r, k) => {
+    const y = r - rand, x = k - rand;
+    return y >= 0 && x >= 0 && y < matrix.length && x < matrix.length && matrix[y][x];
+  };
+  const regels = [];
+  for (let r = 0; r < n; r += 2) {
+    let regel = '  ';
+    for (let k = 0; k < n; k++) {
+      const boven = aan(r, k), onder = (r + 1 < n) ? aan(r + 1, k) : false;
+      // wit is aan: een QR is donker-op-licht, en een terminal is meestal donker
+      regel += boven && onder ? ' ' : boven ? '▄' : onder ? '▀' : '█';
+    }
+    regels.push(regel);
+  }
+  return regels.join('\n');
+}
+
 /* Het lijstje dat we bij het opstarten tonen: waar u de site vandaan haalt en,
    als de CA net gemaakt is, hoe u hem op uw telefoon vertrouwt. */
 function startUitleg(cert, poort) {
@@ -134,12 +167,17 @@ function startUitleg(cert, poort) {
     regels.push('  Zit hij op wifi?');
   }
   regels.push('');
-  regels.push('  Eenmalig op de telefoon: open eerst dit adres, daar staat wat u moet doen:');
-  for (const ip of cert.netwerk) regels.push('    http://' + ip + ':' + (poort + 10));
-  regels.push('  (let op: http, en poort ' + (poort + 10) + ')');
+  if (cert.netwerk.length) {
+    const loket = 'http://' + cert.netwerk[0] + ':' + (poort + 10);
+    regels.push('  Richt de camera van uw telefoon op deze code, en tik op de melding:');
+    regels.push('');
+    const qr = qrInTerminal(loket);
+    if (qr) { regels.push(qr); regels.push(''); }
+    regels.push('  (of typ het over: ' + loket + '  -- let op: http, en poort ' + (poort + 10) + ')');
+  }
   regels.push('  Het certificaat staat ook los op schijf: ' + cert.caPad);
   regels.push('');
   return regels.join('\n');
 }
 
-module.exports = { certVoorDezeMachine, adressenVanDezeMachine, netwerkAdressen, startUitleg, loketPagina };
+module.exports = { certVoorDezeMachine, adressenVanDezeMachine, netwerkAdressen, startUitleg, loketPagina, qrInTerminal };

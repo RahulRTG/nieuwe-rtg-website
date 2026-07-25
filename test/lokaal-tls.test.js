@@ -138,4 +138,25 @@ test('5. het loketje geeft de CA en stuurt de rest naar de beveiligde site', asy
   await new Promise(r => loket.close(r));
 });
 
+test('6. de QR in het venster is een echte, leesbare code', () => {
+  const adres = 'http://192.168.178.218:3010';
+  const kunst = lokaal.qrInTerminal(adres);
+  assert.ok(kunst && kunst.split('\n').length > 10, 'er komt een blok tekens uit');
+  // en het is geen plaatje-dat-erop-lijkt: onze eigen decoder leest hem terug
+  const qr = require('../public/shared/qr');
+  const uit = qr.decode(qr.encode(adres, { ecc: 'M' }));
+  assert.equal(uit.tekst, adres, 'de code bevat precies het adres van het loket');
+});
+
+test('7. de opstartregels wijzen naar het loket, niet naar het losse bestand', () => {
+  const c = lokaal.certVoorDezeMachine({ dataDir: TMP });
+  const uitleg = lokaal.startUitleg(c, 3000);
+  assert.match(uitleg, /https:\/\/localhost:3000/, 'het adres op deze computer staat er');
+  if (c.netwerk.length) {
+    assert.match(uitleg, new RegExp('http://' + c.netwerk[0].replace(/\./g, '\\.') + ':3010'),
+      'en het loket-adres voor de telefoon');
+    assert.match(uitleg, /camera/, 'met de uitleg dat de camera volstaat');
+  }
+});
+
 test.after(() => { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });

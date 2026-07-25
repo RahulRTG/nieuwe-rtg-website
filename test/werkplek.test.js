@@ -103,7 +103,33 @@ test('6. sleutels uitdelen en intrekken doet alleen de eigenaar', async () => {
   assert.equal((await post('/api/werkplek/mijn', {}, medewerker)).body.bedrijven.length, 0);
 });
 
-test('7. het RTF-kantoor draagt huisstijl-glyfen, geen emoji', () => {
+test('7. elk huis heeft een eigen kantoordrive met alle drie de soorten', async () => {
+  // de eigenaar heeft nog steeds beide sleutels na test 6 (die trok alleen de
+  // sleutel van de medewerker in)
+  const drive = (pad, body) => post('/api/werkplek/kantoorpakket' + pad, body, eigenaar);
+  const leeg = await drive('/mijn', { bedrijf: 'rtf' });
+  assert.equal(leeg.status, 200);
+  assert.equal(leeg.body.docs.length, 0, 'de RTF-drive begint leeg');
+  assert.ok(leeg.body.sjablonen.length > 0, 'er staan sjablonen klaar');
+
+  for (const soort of ['tekst', 'blad', 'presentatie']) {
+    const r = await drive('/maak', { bedrijf: 'rtf', soort, titel: 'Stichting ' + soort });
+    assert.equal(r.status, 200, soort + ' kan aangemaakt worden');
+    assert.equal(r.body.soort, soort);
+  }
+  const vol = await drive('/mijn', { bedrijf: 'rtf' });
+  assert.equal(vol.body.docs.length, 3, 'alle drie de soorten staan in de RTF-drive');
+
+  // de twee drives zijn gescheiden
+  assert.equal((await drive('/mijn', { bedrijf: 'rtg' })).body.docs.length, 0, 'RTG ziet de RTF-documenten niet');
+
+  // en de deur geldt ook hier: zonder sleutel geen documenten
+  assert.equal((await post('/api/werkplek/kantoorpakket/mijn', { bedrijf: 'rtf' }, medewerker)).status, 403);
+  assert.equal((await post('/api/werkplek/kantoorpakket/mijn', { bedrijf: 'rtf' })).status, 403);
+  assert.equal((await drive('/mijn', { bedrijf: 'bestaatniet' })).status, 404);
+});
+
+test('8. het RTF-kantoor draagt huisstijl-glyfen, geen emoji', () => {
   const data = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'rtfkantoor-data.js'), 'utf8');
   assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(data), 'geen emoji meer in de RTF-kamerdata');
   const glyfen = (data.match(/icoon: '[^']+'/g) || []).map(s => s.slice(8, -1));

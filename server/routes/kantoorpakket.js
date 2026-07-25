@@ -10,6 +10,7 @@
    (/api/office) zelf. */
 module.exports = (kern) => {
   const { app, auth, supplierAuth, officeAuth, express, rtf,
+    werkplek, boardroomWie, boardroomBaas,
     officeMijn, officeMaak, officeOpen, officeBewaar, officeDeel, officeWeg,
     officeVersies, officeTerug, officeAI, officeKring } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
@@ -81,4 +82,36 @@ module.exports = (kern) => {
   rtfRoute('/terug', (s, b) => officeTerug(s.key, b.id, b.nr), { schrijf: true });
   rtfRoute('/ai', (s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring), { schrijf: true });
   rtfRoute('/gezin', (s, b) => officeKring(s.key, b.id, b.rechten), { schrijf: true });
+
+  /* De werkplekken: elk huis zijn eigen kantoordrive, op dezelfde kern als de
+     rest van RTG Office. RTG werkte al op 'rtg:kantoor'; de RTFoundation kreeg
+     die drive nooit, en had dus geen eigen documenten. Nu heeft elk huis er
+     een, met dezelfde drie soorten (tekst, blad, presentatie), dezelfde
+     versies, dezelfde export en dezelfde AI-hulp.
+
+     De deur is die van de werkplek zelf: de eigenaar mag in beide huizen, een
+     medewerker alleen in het zijne. Wie geen sleutel heeft ziet de map niet,
+     laat staan de inhoud. */
+  const huisDrive = req => {
+    const key = boardroomWie(req);
+    const baas = boardroomBaas(key);
+    const code = String((req.body || {}).bedrijf || '').toLowerCase();
+    if (!werkplek.kent(code)) return { fout: { status: 404, error: 'Dit bedrijf kennen we niet.' } };
+    if (!werkplek.magIn(code, key, baas)) return { fout: { status: 403, error: 'Deze werkplek is niet van u. Vraag de eigenaar om toegang tot dit bedrijf.' } };
+    // de kring is het huis zelf: collega's van hetzelfde bedrijf delen de map
+    return { key: code + ':kantoor', kring: 'werkplek:' + code };
+  };
+  const huisRoute = (pad, fn, opties) => app.post('/api/werkplek/kantoorpakket' + pad, ...((opties && opties.ruim) ? [ruim] : []), async (req, res) => {
+    const s = huisDrive(req);
+    if (s.fout) return res.status(s.fout.status).json({ error: s.fout.error });
+    stuur(res, await fn(s, req.body || {}));
+  });
+  huisRoute('/mijn', (s) => officeMijn(s.key, s.kring));
+  huisRoute('/maak', (s, b) => officeMaak(s.key, b, s.kring));
+  huisRoute('/open', (s, b) => officeOpen(s.key, b.id, s.kring));
+  huisRoute('/bewaar', (s, b) => officeBewaar(s.key, b.id, b, s.kring), { ruim: true });
+  huisRoute('/weg', (s, b) => officeWeg(s.key, b.id));
+  huisRoute('/versies', (s, b) => officeVersies(s.key, b.id, s.kring));
+  huisRoute('/terug', (s, b) => officeTerug(s.key, b.id, b.nr));
+  huisRoute('/ai', (s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring));
 };

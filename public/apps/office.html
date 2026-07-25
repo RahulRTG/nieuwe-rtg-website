@@ -209,12 +209,20 @@
   const $ = s => document.querySelector(s);
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  /* Vier ingangen op hetzelfde pakket: het lid (eigen account), de zaak
+  /* Vijf ingangen op hetzelfde pakket: het lid (eigen account), de zaak
      (?werk=zaak, de team-drive van de hele zaak), de RTG-kantoren
-     (?werk=kantoor, de gedeelde kantoor-drive) en RTF-leden (?werk=rtf,
-     per gezinsprofiel, met delen binnen het eigen gezin). */
-  const WERK = new URLSearchParams(location.search).get('werk') || '';
-  const opzet = WERK === 'zaak'
+     (?werk=kantoor, de gedeelde kantoor-drive), RTF-leden (?werk=rtf,
+     per gezinsprofiel, met delen binnen het eigen gezin) en de werkplek
+     (?werk=werkplek&bedrijf=rtg|rtf, de kantoordrive van dat huis). */
+  const PAR = new URLSearchParams(location.search);
+  const WERK = PAR.get('werk') || '';
+  const BEDRIJF = (PAR.get('bedrijf') || '').toLowerCase();
+  const opzet = WERK === 'werkplek'
+    ? { basis: '/api/werkplek/kantoorpakket/', tokenKey: 'rtg_token',
+        chip: BEDRIJF === 'rtf' ? 'RTFoundation-kantoor' : 'RTG-kantoor',
+        terug: '/apps/werkplek.html', mijnKop: 'Documenten van dit huis',
+        leeg: 'Log eerst in en kies een werkplek.' }
+    : WERK === 'zaak'
     ? { basis: '/api/supplier/kantoorpakket/', tokenKey: 'rtg_sup_token', chip: 'Team-drive van de zaak', terug: '/apps/leverancier.html', mijnKop: 'Documenten van de zaak', leeg: 'Log eerst in op de zaak-app.' }
     : WERK === 'kantoor'
     ? { basis: '/api/office/kantoorpakket/', tokenKey: 'rtg_office_token', chip: 'RTG Kantoor-drive', terug: '/apps/kantoren.html', mijnKop: 'Documenten van het kantoor', leeg: 'Log eerst in op de backoffice.' }
@@ -233,7 +241,10 @@
 
   const api = (pad, body) => fetch(opzet.basis + pad, { method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, WERK === 'rtf' ? {} : { Authorization: 'Bearer ' + token }),
-    body: JSON.stringify(Object.assign(WERK === 'rtf' ? { code: rtfSess && rtfSess.code, token: rtfSess && rtfSess.token } : {}, body || {}))
+    body: JSON.stringify(Object.assign(
+      WERK === 'rtf' ? { code: rtfSess && rtfSess.code, token: rtfSess && rtfSess.token } : {},
+      WERK === 'werkplek' ? { bedrijf: BEDRIJF } : {},
+      body || {}))
   }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
 

@@ -70,7 +70,8 @@
         '<div class="balk">' +
           '<div class="wie">' + glyf(d.icoon) + '<h2>' + esc(d.naam) + '</h2></div>' +
           '<div><button class="knop" type="button" id="anderHuis">Ander huis</button> ' +
-          '<a class="knop" href="' + esc(d.kantoor) + '">Naar het kantoor</a></div>' +
+          '<a class="knop" href="' + esc(d.kantoor) + '">Naar het kantoor</a> ' +
+          '<a class="knop" href="/apps/office.html?werk=werkplek&amp;bedrijf=' + esc(d.code) + '">Documenten</a></div>' +
         '</div>' +
         '<div class="vak"><h3>Cijfers</h3><div class="cijfers">' +
           d.cijfers.map(function (c) {

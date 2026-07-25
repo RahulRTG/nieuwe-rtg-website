@@ -26,5 +26,39 @@ module.exports = {
     'Geen gewone QR: alleen de RTG-app kan de code duiden, en een foto veroudert vanzelf.'),
   '/apps/pakketten.html': G('RTG Bedrijfspakketten: kies je bedrijfstype en krijg de juiste indeling voor je eigen zaak.',
     ['Kies je type (tech, horeca, retail, hotel, zorg, creatief)', 'Zie de werkplekken, werk-apps en technieken die je nodig hebt, met een 3D-plattegrond en QR-codes', 'Vertel je situatie en laat Rahul het pakket op maat bijkleuren'],
-    'Dit gaat over jouw zaak; hoe de RTG-kantoren zelf werken blijft bedrijfsgeheim.')
+    'Dit gaat over jouw zaak; hoe de RTG-kantoren zelf werken blijft bedrijfsgeheim.'),
+
+  /* ---- de kleinsten (0 t/m 5), samen met papa of mama ---- */
+  '/apps/foundation/tellen.html': G('Tellen tot tien: dingen aantikken en samen hardop meetellen.',
+    ['Tik de plaatjes een voor een aan; bij elke tik komt er een cijfer bij', 'Kies daarna hoeveel het er waren', 'Ga door zolang uw kind wil, of stop gewoon'],
+    'Geen klok en geen puntentelling: het hardop meetellen van een volwassene doet het werk.'),
+  '/apps/foundation/kleuren.html': G('Kleuren en vormen: zoeken op kleur, op vorm, of op allebei tegelijk.',
+    ['Kies de moeilijkheid: alleen kleur, alleen vorm, of beide', 'Lees de opdracht voor en laat uw kind aanwijzen', 'Bij een misser blijft het spel gewoon staan, zonder straf'],
+    'Begin bij alleen kleur; beide tegelijk is voor veel kleuters nog een stap te ver.'),
+  '/apps/foundation/memorie.html': G('Memorie: kaartjes omdraaien en paren zoeken.',
+    ['Kies drie, zes of acht paren', 'Draai twee kaartjes om; passen ze niet, dan gaan ze weer dicht', 'Speel mee en benoem hardop wat u ziet'],
+    'Drie paren is voor een peuter al een hele klus; groter maken kan altijd nog.'),
+  '/apps/foundation/verhaaltje.html': G('Voorleesverhaaltjes: zes korte verhalen om samen te lezen, bladzijde voor bladzijde.',
+    ['Kies een verhaaltje uit de lijst', 'Blader met Vorige en Volgende; niets gaat vanzelf verder', 'Lees hardop voor en kijk samen naar de plaat'],
+    'De verhalen zijn voor deze app geschreven, lopen goed af en bevatten niets engs.'),
+  '/apps/foundation/liedjes.html': G('Liedjes en versjes: oude Nederlandse liedjes met de tekst groot in beeld.',
+    ['Filter op zingen, handjes of slapen', 'Kies een liedje; de hele tekst komt in beeld', 'Zing zelf: er wordt met opzet geen geluid afgespeeld'],
+    'De mooiste versie is die van uw eigen stem; herhaling werkt bij kleintjes beter dan afwisseling.'),
+  '/apps/foundation/gevoel.html': G('Hoe voel je je: het gezichtje aantikken dat past, en samen kijken wat helpt.',
+    ['Tik het gevoel aan dat het beste past', 'Lees samen het zinnetje en de drie dingen die kunnen helpen', 'Adem mee met de bol als het te druk wordt van binnen'],
+    'Er wordt niets opgeslagen of verstuurd: gevoelens van een kind horen niet in een dossier.'),
+
+  /* ---- tieners ---- */
+  '/apps/foundation/presenteren.html': G('Spreekbeurt en presentatie: je verhaal opbouwen in vaste stukken, met tijdverdeling en een oefenklok.',
+    ['Vul de acht onderdelen in, van opening tot vragen', 'Zet je spreektijd en zie hoeveel tijd elk stuk krijgt', 'Oefen hardop met de klok en print je briefje met steekwoorden'],
+    'Twee keer hardop en staand oefenen scheelt meer dan tien keer in je hoofd doorlezen.'),
+  '/apps/foundation/budget.html': G('Maandbegroting: wat komt binnen, wat gaat eruit, wat houd je over.',
+    ['Zet je inkomsten erin, met de suggesties als startpunt', 'Vul je uitgaven aan en zie de balk meteen meebewegen', 'Zet een spaardoel en lees hoeveel maanden dat kost'],
+    'Alles blijft in je eigen scherm; dit is algemene uitleg, geen financieel advies.'),
+  '/apps/foundation/rechten.html': G('Wat mag ik op welke leeftijd: werken, geld, school en zorg per leeftijd.',
+    ['Kies je leeftijd en zie wat nu al geldt en wat nog komt', 'Filter op werk, school, zelf beslissen, zorg of online', 'Bekijk de werktijdentabel die bij jouw leeftijd hoort'],
+    'Algemene informatie over de Nederlandse regels, geen juridisch advies; je cao of school kan strenger zijn.'),
+  '/apps/foundation/mediawijs.html': G('Online wijs: echte situaties van je telefoon, met eerlijke uitleg over wat je keuze oplevert.',
+    ['Lees de situatie en kies wat je zou doen', 'Zie meteen waarom die keuze verstandig, matig of riskant is', 'Onthoud de regel die eronder staat en ga door naar de volgende'],
+    'Er is geen goed cijfer te halen; de bedoeling is dat je de valkuil herkent voordat hij echt langskomt.')
 };

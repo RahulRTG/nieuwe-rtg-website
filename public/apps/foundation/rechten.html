@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Wat mag ik op welke leeftijd</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:42rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.6rem;}
+  .leeftijdrij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.4rem;}
+  .leeftijdrij button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
+    padding:.42rem .95rem;font-size:.9rem;cursor:pointer;font-variant-numeric:tabular-nums;}
+  .leeftijdrij button.aan{border-color:var(--goud);color:var(--goud2);}
+  .toon{display:flex;gap:.5rem;flex-wrap:wrap;margin:.9rem 0 1rem;}
+  .toon button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
+    padding:.35rem .85rem;font-size:.82rem;cursor:pointer;}
+  .toon button.aan{border-color:var(--goud);color:var(--goud2);}
+  .regel{border-left:2px solid var(--lijn);padding:.15rem 0 .15rem .9rem;margin-bottom:1rem;}
+  .regel.mag{border-left-color:var(--groen);}
+  .regel.nog{border-left-color:var(--rood);}
+  .regel .kop{display:flex;gap:.6rem;align-items:baseline;justify-content:space-between;flex-wrap:wrap;}
+  .regel .kop b{font-family:var(--serif);font-weight:500;font-size:1.05rem;}
+  .regel .status{font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
+  .regel.mag .status{color:var(--groen);}
+  .regel.nog .status{color:var(--rood);}
+  .regel p{color:var(--zacht);line-height:1.6;margin:.3rem 0 0;}
+  .uren{margin-top:.6rem;border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;}
+  .uren th,.uren td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid var(--lijn);font-size:.9rem;}
+  .uren th{color:var(--zacht);font-weight:500;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;}
+  .tabelwrap{overflow-x:auto;}
+  .klein{font-size:.84rem;color:var(--zacht);line-height:1.6;}
+  .klein b{color:var(--txt);}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Wat mag ik op welke leeftijd</h1>
+  <div class="intro">Kies je leeftijd en zie wat er in Nederland voor je geldt: werken, geld, school, zorg en je eigen beslissingen. Er wordt niets opgeslagen; je leeftijd blijft op dit scherm.</div>
+
+  <div class="kaart blok">
+    <h2>Ik ben</h2>
+    <div class="leeftijdrij" id="leeftijden"></div>
+    <div class="klein" id="samenvatting"></div>
+  </div>
+
+  <div class="kaart blok">
+    <div class="toon" id="onderwerpen" role="group" aria-label="Onderwerp"></div>
+    <div id="regels"></div>
+  </div>
+
+  <div class="kaart blok" id="urenblok">
+    <h2>Hoeveel je mag werken</h2>
+    <div class="klein" id="urenuitleg"></div>
+    <div class="tabelwrap">
+      <table class="uren">
+        <thead><tr><th>Wanneer</th><th>Per dag</th><th>Per week</th></tr></thead>
+        <tbody id="urenlijf"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Lees dit erbij</h2>
+    <p class="klein">Dit is <b>algemene informatie over de Nederlandse regels, geen juridisch advies</b>, en regels veranderen. Bedragen zoals het minimumjeugdloon worden elk halfjaar aangepast; kijk voor het actuele bedrag op rijksoverheid.nl. Voor je eigen situatie geldt daarnaast wat er in je contract, je cao of je schoolreglement staat, en dat kan strenger zijn. Twijfel je of iets klopt wat een werkgever of iemand anders je vertelt, vraag het dan na bij een ouder, je mentor, of het Juridisch Loket. Ben je in een ander land dan Nederland, dan gelden daar andere leeftijdsgrenzen.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+const ONDERWERPEN = [
+  { id: 'alles', label: 'Alles' },
+  { id: 'werk', label: 'Werk en geld' },
+  { id: 'school', label: 'School' },
+  { id: 'zelf', label: 'Zelf beslissen' },
+  { id: 'zorg', label: 'Zorg' },
+  { id: 'online', label: 'Online' }
+];
+
+const REGELS = [
+  { v: 12, o: 'zelf', t: 'Meebeslissen over jezelf', u: 'Vanaf 12 jaar tellen jouw mening en toestemming officieel mee bij beslissingen over jou, bijvoorbeeld bij een medische behandeling of bij een rechter die over je woonsituatie beslist. Je ouders beslissen niet meer alleen.' },
+  { v: 12, o: 'zorg', t: 'Toestemming bij de dokter', u: 'Tussen 12 en 16 jaar hebben zowel jij als je ouders toestemming nodig voor een behandeling. Je mag zelf met de arts praten en zelf vragen stellen; de arts moet jou uitleg geven, niet alleen je ouders.' },
+  { v: 13, o: 'werk', t: 'Licht werk naast school', u: 'Vanaf 13 mag je klusjes doen: vakken vullen, folders bezorgen, oppassen, helpen op een boerderij. Niet in een fabriek, niet met machines, niet met gevaarlijke stoffen, en nooit tijdens schooltijd.' },
+  { v: 13, o: 'online', t: 'Eigen account op sociale media', u: 'De meeste platforms hanteren 13 jaar als ondergrens in hun voorwaarden. Onder de 16 heb je in Nederland formeel toestemming van je ouders nodig voordat een bedrijf jouw gegevens mag verwerken.' },
+  { v: 14, o: 'school', t: 'Stage en snuffelstage', u: 'Vanaf 14 mag je in het kader van school een stage of maatschappelijke stage lopen. Dat valt onder je opleiding, dus er gelden andere regels dan voor een bijbaan.' },
+  { v: 15, o: 'werk', t: 'Meer soorten werk', u: 'Vanaf 15 mag je bijvoorbeeld in een winkel of horeca werken en zelfstandig een krantenwijk doen. Je mag nog steeds niet werken tijdens schooluren en niet in de nacht.' },
+  { v: 15, o: 'werk', t: 'Recht op minimumjeugdloon', u: 'Vanaf 15 jaar heb je recht op het wettelijk minimumjeugdloon: een vast bedrag per uur dat per leeftijd oploopt. Een werkgever mag je niet minder betalen. Kijk het actuele bedrag op rijksoverheid.nl, want het wordt elk halfjaar bijgesteld.' },
+  { v: 16, o: 'school', t: 'Einde volledige leerplicht', u: 'De volledige leerplicht loopt tot het einde van het schooljaar waarin je 16 wordt. Daarna geldt de kwalificatieplicht: tot je 18e moet je naar school totdat je een startkwalificatie hebt (havo, vwo of mbo niveau 2).' },
+  { v: 16, o: 'zorg', t: 'Zelf beslissen over je behandeling', u: 'Vanaf 16 beslis je zelf over medische behandelingen. Je hebt geen toestemming van je ouders meer nodig, en de arts heeft beroepsgeheim ook tegenover hen.' },
+  { v: 16, o: 'zelf', t: 'Eigen bankzaken', u: 'Vanaf 16 kun je bij veel banken zelfstandig een rekening beheren, en bepaalde kleine overeenkomsten mag je zelf aangaan. Grote contracten (abonnementen, leningen) kunnen door je ouders worden teruggedraaid tot je 18 bent.' },
+  { v: 16, o: 'online', t: 'Zelf toestemming geven voor je gegevens', u: 'Vanaf 16 mag je in Nederland zelf toestemming geven voor het verwerken van je persoonsgegevens door een dienst. Daaronder deden je ouders dat voor je.' },
+  { v: 16, o: 'werk', t: 'Bijna alle soorten werk', u: 'Vanaf 16 mag je vrijwel al het werk doen, maar nog niet alles: niet met gevaarlijke stoffen, niet met zwaar materieel, en tot je 18e mag je niet in de nacht werken. Je moet ook echt rust en pauze krijgen.' },
+  { v: 16, o: 'zelf', t: 'Bromfiets of scooter', u: 'Vanaf 16 mag je het bromfietsrijbewijs (AM) halen. Vanaf 16 mag je ook beginnen met autorijlessen en theorie-examen doen in het 2toDrive-traject.' },
+  { v: 18, o: 'zelf', t: 'Meerderjarig', u: 'Vanaf 18 ben je volwassen voor de wet: je mag zelf contracten tekenen, stemmen, en niemand kan je handtekening nog terugdraaien. Alles wat je tekent is vanaf nu echt van jou, inclusief de schulden.' },
+  { v: 18, o: 'werk', t: 'Volwassen minimumloon en alle werksoorten', u: 'Vanaf 21 heb je recht op het volledige wettelijk minimumloon; tussen 18 en 21 geldt een oplopend jeugdloon. Vanaf 18 vervallen de meeste beperkingen op werktijden en soorten werk.' },
+  { v: 18, o: 'zorg', t: 'Eigen zorgverzekering', u: 'Vanaf 18 ben je zelf verzekeringsplichtig en betaal je zelf premie en eigen risico. Regel dit op tijd, want te laat verzekeren levert een boete op. Mogelijk heb je recht op zorgtoeslag.' },
+  { v: 18, o: 'school', t: 'Studiefinanciering en toeslagen', u: 'Vanaf 18 kun je studiefinanciering aanvragen voor mbo, hbo of universiteit, en mogelijk huur- en zorgtoeslag. Kinderbijslag voor jou stopt aan het einde van het kwartaal waarin je 18 wordt.' },
+  { v: 18, o: 'zelf', t: 'Alcohol, tabak en gokken', u: 'Verkoop van alcohol, tabak en deelname aan kansspelen is vanaf 18. Onder de 18 is het ook strafbaar om alcohol bij je te hebben op straat of in een cafe.' }
+];
+
+const URENREGELS = {
+  13: { uitleg: 'Op je 13e en 14e mag je alleen licht, niet-industrieel werk doen, en nooit tijdens schooltijd.',
+    rijen: [['Schoolweek, naast school', '2 uur', '12 uur'], ['Zaterdag', '6 uur', 'binnen de 12 uur'], ['Zondag', 'in principe vrij', 'binnen de 12 uur'], ['Vakantieweek', '7 uur', '35 uur, maximaal 4 weken per jaar'], ['Niet werken', 'voor 07:00 en na 19:00', '']] },
+  15: { uitleg: 'Op je 15e mag je meer soorten werk doen en gelden ruimere uren, maar schooltijd blijft voorgaan.',
+    rijen: [['Schoolweek, naast school', '2 uur', '12 uur'], ['Zaterdag', '8 uur', 'binnen de 12 uur'], ['Vakantieweek', '8 uur', '40 uur, maximaal 6 weken per jaar'], ['Niet werken', 'voor 07:00 en na 19:00', '']] },
+  16: { uitleg: 'Op je 16e en 17e mag je bijna al het werk doen, maar niet in de nacht, en school- plus werkuren samen zijn begrensd.',
+    rijen: [['Werkdag', '9 uur', '45 uur'], ['School en werk samen', '9 uur', '45 uur'], ['Nachtrust', 'minimaal 12 uur aaneengesloten', ''], ['Niet werken', 'tussen 23:00 en 06:00', ''], ['Vrije dagen', '', 'minimaal 2 vrije dagen per week']] },
+  18: { uitleg: 'Vanaf 18 gelden de gewone regels van de Arbeidstijdenwet voor volwassenen.',
+    rijen: [['Werkdag', 'maximaal 12 uur', 'gemiddeld 48 uur over 16 weken'], ['Per week', '', 'maximaal 60 uur in een enkele week'], ['Pauze', 'vanaf 5,5 uur werken: 30 minuten', ''], ['Nachtdienst', 'toegestaan, met extra rustregels', '']] }
+};
+
+let leeftijd = 15, onderwerp = 'alles';
+
+function urenSleutel(l) {
+  if (l >= 18) return 18;
+  if (l >= 16) return 16;
+  if (l >= 15) return 15;
+  return 13;
+}
+
+function tekenLeeftijden() {
+  const doos = $('#leeftijden');
+  doos.innerHTML = '';
+  for (let l = 12; l <= 21; l++) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = l;
+    b.setAttribute('aria-label', l + ' jaar');
+    b.className = l === leeftijd ? 'aan' : '';
+    b.addEventListener('click', () => { leeftijd = l; tekenLeeftijden(); teken(); });
+    doos.appendChild(b);
+  }
+}
+
+function tekenOnderwerpen() {
+  const doos = $('#onderwerpen');
+  doos.innerHTML = '';
+  for (const o of ONDERWERPEN) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = o.label;
+    b.className = o.id === onderwerp ? 'aan' : '';
+    b.addEventListener('click', () => { onderwerp = o.id; tekenOnderwerpen(); teken(); });
+    doos.appendChild(b);
+  }
+}
+
+function teken() {
+  const zicht = REGELS.filter(r => onderwerp === 'alles' || r.o === onderwerp)
+    .sort((a, b) => a.v - b.v);
+  const doos = $('#regels');
+  doos.innerHTML = '';
+  for (const r of zicht) {
+    const mag = leeftijd >= r.v;
+    const d = document.createElement('div');
+    d.className = 'regel ' + (mag ? 'mag' : 'nog');
+    d.innerHTML = '<div class="kop"><b></b><span class="status"></span></div><p></p>';
+    d.querySelector('b').textContent = r.t;
+    d.querySelector('.status').textContent = mag ? 'geldt voor jou' : 'vanaf ' + r.v + ' jaar';
+    d.querySelector('p').textContent = r.u;
+    doos.appendChild(d);
+  }
+
+  const nu = REGELS.filter(r => r.v === leeftijd).length;
+  const straks = REGELS.filter(r => r.v > leeftijd).map(r => r.v).sort((a, b) => a - b)[0];
+  let s = 'Je bent ' + leeftijd + '. ' + (nu ? 'Er ' + (nu === 1 ? 'is een regel' : 'zijn ' + nu + ' regels') + ' die precies dit jaar ingaat. ' : '');
+  s += straks ? 'De volgende verandering komt op je ' + straks + 'e.' : 'Vanaf hier gelden alle regels voor volwassenen.';
+  $('#samenvatting').textContent = s;
+
+  const u = URENREGELS[urenSleutel(leeftijd)];
+  $('#urenuitleg').textContent = u.uitleg;
+  const lijf = $('#urenlijf');
+  lijf.innerHTML = '';
+  for (const rij of u.rijen) {
+    const tr = document.createElement('tr');
+    for (const cel of rij) {
+      const td = document.createElement('td');
+      td.textContent = cel;
+      tr.appendChild(td);
+    }
+    lijf.appendChild(tr);
+  }
+}
+
+tekenLeeftijden();
+tekenOnderwerpen();
+teken();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Liedjes en versjes</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:40rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .toon{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;}
+  .toon button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
+    padding:.4rem .9rem;font-size:.85rem;cursor:pointer;}
+  .toon button.aan{border-color:var(--goud);color:var(--goud2);}
+  .lijst{display:grid;gap:.6rem;}
+  .titelknop{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.8rem 1rem;
+    cursor:pointer;text-align:left;color:var(--txt);}
+  .titelknop:hover{border-color:var(--goud);}
+  .titelknop b{display:block;font-family:var(--serif);font-weight:500;font-size:1.05rem;}
+  .titelknop span{color:var(--zacht);font-size:.82rem;}
+  .liedtitel{font-family:var(--serif);font-weight:500;font-size:1.4rem;margin-bottom:.2rem;}
+  .liedmeta{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;}
+  .regels{font-family:var(--serif);font-size:1.25rem;line-height:2;white-space:pre-line;}
+  .regels .coupletpauze{display:block;height:.9rem;}
+  .doen{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.9rem 1rem;margin-top:1.1rem;
+    color:var(--zacht);font-size:.88rem;line-height:1.55;}
+  .doen b{color:var(--txt);font-weight:600;}
+  .onderrij{display:flex;gap:.6rem;justify-content:center;margin-top:1rem;flex-wrap:wrap;}
+  .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Liedjes en versjes</h1>
+  <div class="intro">Oude Nederlandse kinderliedjes en versjes, met de tekst groot in beeld zodat je ze samen kunt zingen. Bij elk liedje staat wat je erbij kunt doen met je handen.</div>
+
+  <div class="kaart blok" id="kiesblok">
+    <div class="toon" id="soort" role="group" aria-label="Soort">
+      <button type="button" data-s="alles" class="aan">Alles</button>
+      <button type="button" data-s="zing">Zingen</button>
+      <button type="button" data-s="hand">Handjes</button>
+      <button type="button" data-s="slaap">Voor het slapen</button>
+    </div>
+    <div class="lijst" id="lijst"></div>
+  </div>
+
+  <div class="kaart blok" id="leesblok" hidden>
+    <div class="liedtitel" id="liedtitel"></div>
+    <div class="liedmeta" id="liedmeta"></div>
+    <div class="regels" id="regels"></div>
+    <div class="doen" id="doen"></div>
+    <div class="onderrij">
+      <button class="knop grijs" id="terug" type="button">Ander liedje</button>
+    </div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de meezinger</h2>
+    <p class="ouder">Dit zijn oude liedjes die al generaties worden doorgegeven; er staat geen muziek onder en er wordt niets afgespeeld, want de mooiste versie is die van uw eigen stem. Zing gerust vals en verzin gerust andere woorden. Voor kleine kinderen werkt herhaling beter dan afwisseling: hetzelfde liedje tien avonden achter elkaar is precies goed.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+const LIEDJES = [
+  { id: 'schaapjes', titel: 'Schaapje, schaapje', soort: 'slaap', meta: 'oud wiegeliedje',
+    tekst: 'Schaapje, schaapje,\nheb je witte wol?\nJa baas, ja baas,\ndrie zakken vol.\n\nEen voor de meester,\neen voor de vrouw,\neen voor het kindje\ndat slapen gaat nu.',
+    doen: 'Aai zachtjes over het hoofdje bij elke regel. Tel de drie zakken op de vingers: een, twee, drie.' },
+  { id: 'slaapkindje', titel: 'Slaap kindje slaap', soort: 'slaap', meta: 'het bekendste slaapliedje',
+    tekst: 'Slaap kindje slaap,\ndaar buiten loopt een schaap.\nEen schaap met witte voetjes,\ndie drinkt zijn melk zo zoetjes.\nSlaap kindje slaap,\ndaar buiten loopt een schaap.',
+    doen: 'Zing heel langzaam en laat de laatste regel bijna fluisteren. Wieg mee op de maat.' },
+  { id: 'maantje', titel: 'Er staat een maantje aan de hemel', soort: 'slaap', meta: 'avondversje',
+    tekst: 'Er staat een maantje aan de hemel,\nhet schijnt zo mooi en zacht.\nDe sterren komen een voor een,\nen zeggen: goedenacht.',
+    doen: 'Kijk samen uit het raam en zoek de maan. Zwaai naar de maan voor het gordijn dichtgaat.' },
+  { id: 'poesje', titel: 'Poesje mauw', soort: 'zing', meta: 'over een ondeugende poes',
+    tekst: 'Poesje mauw, kom eens gauw,\nik heb lekkere melk voor jou.\nEn voor mij rijstebrij,\no wat heerlijk smullen wij.',
+    doen: 'Doe de poot van een poesje na met je hand en likkebaard bij de laatste regel.' },
+  { id: 'berenjacht', titel: 'Op de grote stille heide', soort: 'zing', meta: 'over een herder',
+    tekst: 'Op de grote stille heide\ndwaalt de herder eenzaam rond.\nWel hem, die de rust kan vinden,\nop de grote stille grond.',
+    doen: 'Loop op de plaats mee in een rustig tempo, alsof je zelf over de heide wandelt.' },
+  { id: 'berenboot', titel: 'Twee emmertjes water halen', soort: 'zing', meta: 'liedje om bij te draaien',
+    tekst: 'Twee emmertjes water halen,\ntwee emmertjes pompen.\nDe meisjes op de klompen,\nde jongens op de fiets.\nZonder, zonder,\nzonder iets.',
+    doen: 'Pak elkaars handen kruislings vast en draai rond. Bij de laatste regel laat je los.' },
+  { id: 'hansje', titel: 'In Holland staat een huis', soort: 'zing', meta: 'wordt steeds langer',
+    tekst: 'In Holland staat een huis,\nin Holland staat een huis,\nin Holland staat een huis, ja huis,\nin Holland staat een huis.\n\nEn in dat huis daar woont een heer,\nen in dat huis daar woont een heer.',
+    doen: 'Verzin bij elk couplet iets wat er nog bij komt in het huis; het kind mag kiezen wat.' },
+  { id: 'klapklap', titel: 'Klap eens in je handjes', soort: 'hand', meta: 'handjesversje',
+    tekst: 'Klap eens in je handjes,\nblij, blij, blij.\nOp je bolle bolletje,\nallebei.\n\nHandjes in de hoogte,\nhandjes op je hoofd,\nhandjes op je buikje,\nen dan stil.',
+    doen: 'Doe alles precies mee: klappen, op het hoofd, in de lucht, op de buik.' },
+  { id: 'draaidraai', titel: 'Draai het wieltje nog eens om', soort: 'hand', meta: 'handjesversje',
+    tekst: 'Draai, draai, draai het wieltje\nnog eens om.\nEn nog eens om,\nen nog eens om,\nen dan zijn we weer terug.',
+    doen: 'Draai je handen om elkaar heen, steeds sneller, en stop opeens bij de laatste regel.' },
+  { id: 'kriebel', titel: 'Er kwam een muisje aangelopen', soort: 'hand', meta: 'kriebelversje',
+    tekst: 'Er kwam een muisje aangelopen,\nhij liep de trap op,\nhij liep de trap af,\nen daar ging hij zijn holletje in.',
+    doen: 'Loop met twee vingers over de arm omhoog en weer omlaag, en kriebel bij de laatste regel in de nek.' },
+  { id: 'vingertjes', titel: 'Dit is de duim', soort: 'hand', meta: 'vingerversje',
+    tekst: 'Dit is de duim,\ndit is de wijzer,\ndit is de lange,\ndit is de ringvinger,\nen dit kleintje\nheet de pink.',
+    doen: 'Wijs bij elke regel de goede vinger aan, eerst bij uzelf, dan bij het kind.' },
+  { id: 'regen', titel: 'Regen, regen', soort: 'zing', meta: 'weerversje',
+    tekst: 'Regen, regen, druppel, druppel,\ntik, tik, tik op het raam.\nMorgen komt de zon weer terug,\nen dan gaan wij naar buiten, samen.',
+    doen: 'Tik met je vingertoppen op tafel als regen, hard en dan steeds zachter.' }
+];
+
+const SOORTLABEL = { zing: 'om te zingen', hand: 'met de handjes', slaap: 'voor het slapen' };
+let filter = 'alles';
+
+function tekenLijst() {
+  const doos = $('#lijst');
+  doos.innerHTML = '';
+  const zicht = LIEDJES.filter(l => filter === 'alles' || l.soort === filter);
+  for (const l of zicht) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'titelknop';
+    b.innerHTML = '<b></b><span></span>';
+    b.querySelector('b').textContent = l.titel;
+    b.querySelector('span').textContent = l.meta + ' - ' + SOORTLABEL[l.soort];
+    b.addEventListener('click', () => open(l));
+    doos.appendChild(b);
+  }
+}
+
+function open(l) {
+  $('#liedtitel').textContent = l.titel;
+  $('#liedmeta').textContent = l.meta + ' - ' + SOORTLABEL[l.soort];
+  $('#regels').textContent = l.tekst;
+  $('#doen').innerHTML = '<b>Erbij doen: </b><span></span>';
+  $('#doen').querySelector('span').textContent = l.doen;
+  $('#kiesblok').hidden = true;
+  $('#leesblok').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+$('#terug').addEventListener('click', () => {
+  $('#leesblok').hidden = true;
+  $('#kiesblok').hidden = false;
+});
+$('#soort').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  filter = b.dataset.s;
+  $('#soort').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
+  tekenLijst();
+}));
+
+tekenLijst();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

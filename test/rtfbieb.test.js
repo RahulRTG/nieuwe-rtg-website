@@ -109,3 +109,26 @@ test('7. zonder geldig gezin blijft de bibliotheek dicht', async () => {
   const r = await bieb('', {}, { code: 'NEPPERT', token: 'nep' });
   assert.equal(r.status, 403);
 });
+
+test('8. elke leeftijd heeft echte apps, ook de allerkleinsten', async () => {
+  // geen enkele groep mag een lege of bijna lege plank hebben
+  for (const groep of ['mini', 'kind', 'tiener', 'gezin']) {
+    const eigen = APPS.filter(a => a.doelgroep === groep);
+    assert.ok(eigen.length >= 4, groep + ' heeft een echte set apps (nu ' + eigen.length + ')');
+  }
+  // en wat een kleuter door de leeftijdspoort ziet, is ook echt iets
+  const t = Date.now().toString().slice(-6);
+  const mp = (await fnd('/gezin/profiel/maak', { code: ouder.code, token: ouder.token, naam: 'Klein ' + t, rol: 'kind', groep: 'mini' })).body;
+  const kies = (await fnd('/gezin/profiel/kies', { code: ouder.code, profielId: mp.profiel.id })).body;
+  const mini = { code: ouder.code, token: kies.token };
+  const cat = await bieb('/catalogus', { per: 48 }, mini);
+  assert.equal(cat.status, 200);
+  assert.ok(cat.body.totaal >= 15, 'een mini-profiel ziet een gevulde plank (nu ' + cat.body.totaal + ')');
+  const eigenMini = cat.body.items.filter(a => a.doelgroep === 'mini');
+  assert.ok(eigenMini.length >= 4, 'waarvan een echte set speciaal voor de kleinsten (nu ' + eigenMini.length + ')');
+  for (const a of cat.body.items) assert.ok(['mini', 'gezin'].includes(a.doelgroep), a.naam + ' past bij een kleuter (' + a.doelgroep + ')');
+  // en zo'n app installeert ook echt
+  const r = await bieb('/installeer', { id: eigenMini[0].id }, mini);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.aantal, 1);
+});

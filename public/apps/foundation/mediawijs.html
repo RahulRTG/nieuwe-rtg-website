@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Online wijs</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:42rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .situatie{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1rem;}
+  .situatie .waar{color:var(--goud2);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem;}
+  .situatie p{line-height:1.6;margin:0;}
+  .opties{display:grid;gap:.6rem;}
+  .optie{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.8rem 1rem;text-align:left;
+    color:var(--txt);cursor:pointer;line-height:1.5;}
+  .optie:hover{border-color:var(--goud);}
+  .optie.goed{border-color:var(--groen);}
+  .optie.matig{border-color:var(--goud);}
+  .optie.mis{border-color:var(--rood);}
+  .optie[disabled]{cursor:default;}
+  .uitleg{margin-top:1rem;border-left:2px solid var(--goud);padding-left:.9rem;line-height:1.6;color:var(--zacht);}
+  .uitleg b{color:var(--txt);}
+  .regel{margin-top:.9rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.8rem 1rem;
+    font-size:.9rem;line-height:1.55;color:var(--zacht);}
+  .regel b{color:var(--goud2);}
+  .onderrij{display:flex;gap:.6rem;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:1rem;}
+  .stand{color:var(--zacht);font-size:.85rem;}
+  .hulp{font-size:.86rem;color:var(--zacht);line-height:1.6;}
+  .hulp b{color:var(--txt);}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Online wijs</h1>
+  <div class="intro">Echte situaties die je op je telefoon tegenkomt. Kies wat jij zou doen; daarna lees je wat die keuze in het echt oplevert. Er wordt niets bijgehouden en niemand ziet je antwoorden.</div>
+
+  <div class="kaart blok">
+    <div class="situatie" id="situatie"></div>
+    <div class="opties" id="opties"></div>
+    <div class="uitleg" id="uitleg" hidden></div>
+    <div class="regel" id="regel" hidden></div>
+    <div class="onderrij">
+      <div class="stand" id="stand"></div>
+      <button class="knop" id="verder" type="button" hidden>Volgende situatie</button>
+    </div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Als het echt misgaat</h2>
+    <p class="hulp">Ben je afgeperst, bestolen of staat er iets van jou online dat er niet hoort te staan: <b>zeg het tegen een volwassene die je vertrouwt</b>, ook als je je schaamt en ook als je zelf iets stoms hebt gedaan. Bewaar de berichten en maak schermafbeeldingen voordat je iets blokkeert; dat is later je bewijs. Betaal nooit, want betalen stopt het bijna nooit. In Nederland kun je terecht bij de politie (aangifte kan ook online), bij de Kindertelefoon voor een gesprek, en bij Helpwanted voor hulp bij beeld dat verspreid wordt. Deze app geeft algemene uitleg, geen juridisch advies.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+// score: 2 = verstandig, 1 = kan beter, 0 = risicovol
+const SITUATIES = [
+  {
+    waar: 'Direct message',
+    tekst: 'Iemand die je niet kent stuurt je een bericht: "Hey, jij zit toch op die school? Ik ken je van vroeger." De foto op het profiel ziet er normaal uit, het account bestaat sinds vorige week.',
+    opties: [
+      { t: 'Terugvragen wie het is en wachten op antwoord', s: 1, u: 'Begrijpelijk, maar een nepaccount heeft altijd een verhaal klaar. Zolang je antwoordt weet de ander dat je account actief is.' },
+      { t: 'Niet reageren, profiel bekijken en het account rapporteren', s: 2, u: 'Dit is de verstandige route. Een account van een week oud dat doet alsof het je kent is het klassieke begin van een nepprofiel. Rapporteren kost niets en niemand krijgt te horen dat jij het deed.' },
+      { t: 'Vragen om een foto zodat je kunt zien wie het is', s: 0, u: 'Een foto bewijst niets: die is in twee seconden van internet geplukt. En je hebt nu wel een gesprek geopend.' }
+    ],
+    regel: 'Een profiel is geen persoon. Leeftijd van het account, aantal berichten en gedeelde vrienden zeggen meer dan de foto.'
+  },
+  {
+    waar: 'Groepschat van je klas',
+    tekst: 'In de klassenapp wordt een foto van een klasgenoot doorgestuurd waar diegene duidelijk niet blij mee is. Vier mensen hebben al gelachen. Jij hebt de foto ook binnengekregen.',
+    opties: [
+      { t: 'Niets doen; je hebt hem zelf niet gestuurd', s: 1, u: 'Je doet niets fouts, maar voor degene op de foto voelt stilte hetzelfde als meedoen. Meestal is een enkele reactie genoeg om de sfeer te laten kantelen.' },
+      { t: 'De foto niet doorsturen, hem verwijderen, en die klasgenoot los een bericht sturen', s: 2, u: 'Dit is het meest waardevolle wat je kunt doen. Doorsturen maakt je juridisch en sociaal medeverantwoordelijk. Een prive-bericht ("ik vond het niet oke, gaat het?") betekent voor de ander vaak meer dan de hele groep bij elkaar.' },
+      { t: 'In de groep terugsturen dat ze zich moeten schamen', s: 1, u: 'Je hart zit goed, maar in de groep escaleert het vaak; de aandacht gaat dan naar de ruzie in plaats van naar de foto. Melden bij een mentor werkt beter, en die kan de foto laten verwijderen.' }
+    ],
+    regel: 'Beeld van iemand anders verspreiden mag niet zonder toestemming. Bij naaktbeeld van een minderjarige is doorsturen strafbaar, ook als je zelf minderjarig bent.'
+  },
+  {
+    waar: 'Mail',
+    tekst: 'Je krijgt een mail: je pakketje kon niet bezorgd worden, betaal 1,95 euro verzendkosten binnen 24 uur. De link lijkt op de site van de vervoerder, maar het adres eindigt op iets anders.',
+    opties: [
+      { t: 'Betalen, het is maar twee euro', s: 0, u: 'Het gaat niet om die twee euro. Op zo n pagina vul je je bankgegevens in, en die zijn het echte doel. Ook de haast in de mail ("binnen 24 uur") is een signaal.' },
+      { t: 'De mail weggooien en zelf in de app van de vervoerder kijken', s: 2, u: 'Precies goed. Ga altijd zelf naar de bron in plaats van via een link in een bericht. Verwacht je echt een pakket, dan staat het in de officiele app of op de site die je zelf intypt.' },
+      { t: 'De link openen om te kijken of hij echt is', s: 0, u: 'Alleen al de pagina openen is niet zonder risico, en iets wat er echt uitziet is nooit een bewijs. De domeinnaam voor de eerste schuine streep is het enige wat telt.' }
+    ],
+    regel: 'Haast, een kleine bedrag en een link: dat is de standaardvorm van phishing. Een echte organisatie vraagt nooit via een mail om je pincode of je volledige bankgegevens.'
+  },
+  {
+    waar: 'Nieuwe app',
+    tekst: 'Een app die je wilt installeren vraagt bij het openen om toegang tot je contacten, je locatie (altijd) en je fotos. Het is een spelletje.',
+    opties: [
+      { t: 'Alles toestaan, anders werkt hij misschien niet', s: 0, u: 'Bijna nooit waar. Een spelletje heeft je contactenlijst niet nodig; die wordt verkocht of gebruikt om je vrienden te benaderen. Toestemming intrekken kan altijd nog, maar wat al is opgehaald blijft weg.' },
+      { t: 'Alles weigeren en kijken of hij het toch doet', s: 2, u: 'De verstandigste volgorde: weigeren, en pas toestaan als iets echt niet werkt. Locatie zet je op "tijdens gebruik", nooit op "altijd".' },
+      { t: 'Alleen locatie toestaan, de rest niet', s: 1, u: 'Beter dan alles toestaan, maar locatie is juist het gevoeligste: daarmee is te zien waar je woont, naar school gaat en wanneer je thuis bent. Bij een spelletje is er geen reden voor.' }
+    ],
+    regel: 'Vraag je bij elke toestemming af: heeft deze app dit nodig om te doen wat hij belooft? Zo niet, dan is het antwoord nee.'
+  },
+  {
+    waar: 'Chat met iemand die je leuk vindt',
+    tekst: 'Iemand met wie je al weken chat vraagt om een foto waar je minder aan hebt. Diegene stuurt eerst zelf iets en zegt dat het tussen jullie blijft.',
+    opties: [
+      { t: 'Sturen, maar zonder je gezicht erop', s: 0, u: 'Ook zonder gezicht ben je herkenbaar aan je kamer, je sieraden, een tatoeage of gewoon aan het feit dat jij het stuurde. En zodra het beeld weg is, heb je er geen enkele controle meer over.' },
+      { t: 'Niet sturen en zeggen dat je dit niet doet', s: 2, u: 'Sterk. Iemand die je respecteert accepteert een nee zonder er nog eens over te beginnen. Blijft de druk komen, dan zegt dat alles over de ander en niets over jou.' },
+      { t: 'Uitstellen en hopen dat het overwaait', s: 1, u: 'Kan werken, maar meestal komt de vraag terug en wordt de druk groter. Een duidelijke nee is voor jezelf makkelijker vol te houden dan een vage misschien.' }
+    ],
+    regel: 'Wat je stuurt kun je niet terughalen. Word je toch afgeperst met beeld: niet betalen, niets meer sturen, alles bewaren en het meteen aan een volwassene vertellen.'
+  },
+  {
+    waar: 'Tijdlijn',
+    tekst: 'Een video met miljoenen weergaven beweert dat een bekend merk iets gevaarlijks in zijn producten doet. In de reacties is iedereen woedend. Je wilt het delen.',
+    opties: [
+      { t: 'Delen, want dit moeten mensen weten', s: 0, u: 'Verontwaardiging is precies wat een video ver laat komen; dat maakt hem nog niet waar. Deel je het en klopt het niet, dan sta jij ervoor.' },
+      { t: 'Eerst zoeken of een nieuwsorganisatie hier iets over schrijft', s: 2, u: 'De juiste reflex. Klopt zoiets, dan is er meer dan een enkele video. Kijk ook wie de video maakte en of er een datum en een bron in zit.' },
+      { t: 'De reacties lezen om te zien of het klopt', s: 1, u: 'Reacties zijn geen controle: mensen onder een video zijn er meestal al van overtuigd. Bewijs zoek je buiten het platform, niet eronder.' }
+    ],
+    regel: 'Hoe bozer een bericht je maakt, hoe belangrijker het is om het te checken. Boosheid is de motor waarop algoritmes draaien.'
+  },
+  {
+    waar: 'Wachtwoord',
+    tekst: 'Je maakt een account aan voor een nieuwe dienst. Je gebruikt normaal overal hetzelfde wachtwoord, want dan onthoud je het.',
+    opties: [
+      { t: 'Hetzelfde wachtwoord gebruiken, het is maar een klein sitetje', s: 0, u: 'Juist kleine sites worden gehackt. De gelekte combinatie van mail en wachtwoord wordt daarna automatisch op je mail, je socials en je bank geprobeerd.' },
+      { t: 'Een uniek wachtwoord kiezen en tweestapsverificatie aanzetten', s: 2, u: 'Dit is de enige echte bescherming. Gebruik een wachtwoordmanager of drie willekeurige woorden achter elkaar; lengte is belangrijker dan rare tekens. Tweestapsverificatie houdt een gelekt wachtwoord alsnog tegen.' },
+      { t: 'Hetzelfde wachtwoord met een cijfer erachter', s: 1, u: 'Dat patroon is het eerste wat een aanvaller probeert. Een variatie is geen nieuw wachtwoord.' }
+    ],
+    regel: 'Je mailadres is de sleutel tot al je andere accounts. Beveilig dat account het zwaarst.'
+  },
+  {
+    waar: 'Game',
+    tekst: 'In een game biedt iemand je een zeldzaam item aan. Je hoeft alleen even in te loggen op een site die hij stuurt, of hem je inloggegevens te geven zodat hij het voor je regelt.',
+    opties: [
+      { t: 'Inloggen op zijn site, je account is toch niets waard', s: 0, u: 'Accounts met speeluren erin worden verkocht, en de site is er alleen om je wachtwoord af te vangen. Gebruik je dat wachtwoord ook elders, dan ben je daar ook binnen een dag kwijt.' },
+      { t: 'Weigeren en de ruil alleen in de game zelf doen', s: 2, u: 'Goed. Een ruil die buiten het spel om moet, is geen ruil maar een truc. Niemand heeft ooit je wachtwoord nodig om jou iets te geven.' },
+      { t: 'Je wachtwoord geven maar het daarna veranderen', s: 0, u: 'Te laat: in de tussentijd kan het account worden overgenomen, inclusief het gekoppelde mailadres, en dan kun je zelf niets meer veranderen.' }
+    ],
+    regel: 'Niemand heeft ooit je wachtwoord nodig. Geen vriend, geen beheerder, geen helpdesk.'
+  }
+];
+
+let volgorde = [], index = 0, gedaan = 0, punten = 0, beantwoord = false;
+
+function start() {
+  volgorde = SITUATIES.map((s, i) => i).sort(() => Math.random() - 0.5);
+  index = 0;
+  toon();
+}
+
+function toon() {
+  const s = SITUATIES[volgorde[index]];
+  beantwoord = false;
+  const doos = $('#situatie');
+  doos.innerHTML = '<div class="waar"></div><p></p>';
+  doos.querySelector('.waar').textContent = s.waar;
+  doos.querySelector('p').textContent = s.tekst;
+  const op = $('#opties');
+  op.innerHTML = '';
+  s.opties.map(o => o).sort(() => Math.random() - 0.5).forEach(o => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'optie';
+    b.textContent = o.t;
+    b.addEventListener('click', () => kies(s, o, b));
+    op.appendChild(b);
+  });
+  $('#uitleg').hidden = true;
+  $('#regel').hidden = true;
+  $('#verder').hidden = true;
+  tekenStand();
+}
+
+function kies(s, o, knop) {
+  if (beantwoord) return;
+  beantwoord = true;
+  gedaan++; punten += o.s;
+  $('#opties').querySelectorAll('.optie').forEach(b => { b.disabled = true; });
+  knop.classList.add(o.s === 2 ? 'goed' : (o.s === 1 ? 'matig' : 'mis'));
+  const kop = o.s === 2 ? 'Verstandige keuze. ' : (o.s === 1 ? 'Kan beter. ' : 'Dit levert problemen op. ');
+  const u = $('#uitleg');
+  u.innerHTML = '<b></b><span></span>';
+  u.querySelector('b').textContent = kop;
+  u.querySelector('span').textContent = o.u;
+  u.hidden = false;
+  const r = $('#regel');
+  r.innerHTML = '<b>Onthoud: </b><span></span>';
+  r.querySelector('span').textContent = s.regel;
+  r.hidden = false;
+  $('#verder').hidden = false;
+  tekenStand();
+}
+
+function tekenStand() {
+  $('#stand').textContent = gedaan ? gedaan + ' van de ' + SITUATIES.length + ' gedaan, ' + punten + ' van de ' + (gedaan * 2) + ' punten' : '';
+}
+
+$('#verder').addEventListener('click', () => {
+  index++;
+  if (index >= volgorde.length) { volgorde.sort(() => Math.random() - 0.5); index = 0; }
+  toon();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+start();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

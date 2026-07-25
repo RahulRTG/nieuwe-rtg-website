@@ -414,150 +414,29 @@ if (zaakdoos.actief) {
   });
 }
 
-/* ---------- rem op de deur (rate-limiter) ----------
-   In productie (of met RTG_RATELIMIT=1) mag een IP maximaal 300 API-verzoeken
-   per minuut; daarboven 429. Ruim genoeg voor elk normaal gebruik, en het
-   haalt de scherpte van scripts en scrapers. De live-streams (SSE) tellen
-   niet mee: dat zijn langlopende verbindingen, geen verzoeken. */
-if (PRODUCTION || process.env.RTG_RATELIMIT === '1') {
-  const rem = require('./rem');
-  app.use(rem({
-    windowMs: 60000,
-    limit: 300,
-    skip: req => !req.path.startsWith('/api/') || req.path.endsWith('/stream'),
-    handler: (req, res) => res.status(429).json({ error: 'Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.' })
-  }));
-}
+/* ---------- de poortwachters voor de routers (server/middleware/) ----------
+   Drie remmen, de functieschakelaars, de compressie en de voordeur. Ze staan
+   in deze volgorde omdat elke laag werk bespaart voor de laag erna: eerst
+   weigeren wat we sowieso weigeren, dan pas comprimeren en serveren. */
+const { remOpDeDeur, opslagPoort, hoofdzekering } = require('./middleware/remmen');
+const { schakelaars } = require('./middleware/functieschakelaars');
+const { jsonGzip, statischGzip } = require('./middleware/compressie');
+const { bureaublad, cspNonce } = require('./middleware/voordeur');
 
-/* Hoofdzekering: staat de onderhouds-zekering uit (gesprongen), dan is de app in
-   onderhoud. Alle API's geven dan 503, behalve de technische pagina en de
-   health/ready-checks, en behalve verzoeken van de eigenaar (met geldig token).
-   Zo kan de eigenaar de app bewust "spanningsloos" maken en er zelf bij blijven
-   om de zekering er weer in te doen. */
-/* De opslag-poortwachter: een instance die zijn duurzame staat nog niet
-   volledig geladen heeft (Postgres-herstart: de gedeelde data en het
-   RAM-venster zijn nog onderweg) mag GEEN API-verkeer beantwoorden. Anders
-   serveert hij de verouderde lokale snapshot-cache, en kan een schrijfactie
-   in dat venster (geld!) de echte Postgres-staat daarna overschrijven --
-   precies wat fase D van de beproeving op 65M-schaal ving: saldi die een
-   herstart niet 'overleefden'. Health/ready/techniek blijven bereikbaar,
-   zodat de load balancer en de eigenaar de instance gewoon kunnen zien. */
-app.use((req, res, next) => {
-  const p = req.path || '';
-  if (!p.startsWith('/api/')) return next();
-  if (p === '/api/health' || p === '/api/ready' || p.startsWith('/api/techniek') || p.startsWith('/api/cluster')) return next();
-  let klaar = true;
-  try { klaar = opslagKlaar(); } catch (e) { klaar = false; }
-  if (klaar) return next();
-  res.set('Retry-After', '2');
-  res.status(503).json({ error: 'De server laadt zijn gegevens nog; een ogenblik.' });
-});
-app.use((req, res, next) => {
-  const z = db.data && db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.onderhoud;
-  if (!z || z.aan !== false) return next(); // normaal: stroom staat erop
-  const p = req.path;
-  if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
-  try {
-    const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || req.query.token;
-    const u = tok ? accounts.verifyToken(tok) : null;
-    if (eigenaar.isEigenaar(accounts, u)) return next(); // de eigenaar mag er wel bij
-  } catch (e) {}
-  if (p.startsWith('/api/')) return res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' });
-  next();
-});
-
-/* Functieschakelaars: per functionaliteit een bewuste aan/uit-knop (beheerd op
-   de technische pagina). Staat een functie uit, dan geeft zijn API 503. De
-   technische pagina zelf en de health/ready-checks blijven altijd bereikbaar,
-   zodat de eigenaar alles weer aan kan zetten. */
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
 const functies = require('./functies');
-/* Landcode van een lid voor de "per land"-regels van de Boardroom: het bij
-   registratie gekozen land wint, anders leiden we het af uit de nationaliteit
-   op het geverifieerde paspoort (bijv. "Duitse" -> DE). */
-function natieNaarLand(nat) {
-  const s = String(nat || '').toLowerCase();
-  if (!s) return null;
-  if (/nederland|dutch|holland/.test(s)) return 'NL';
-  if (/belg/.test(s)) return 'BE';
-  if (/duits|german|deutsch/.test(s)) return 'DE';
-  if (/frans|french|franc/.test(s)) return 'FR';
-  if (/spaan|spanish|espa/.test(s)) return 'ES';
-  if (/japan/.test(s)) return 'JP';
-  return null;
-}
-app.use((req, res, next) => {
-  const p = req.path;
-  if (!p.startsWith('/api/')) return next();
-  if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
-  const staat = db.data && db.data.techniek && db.data.techniek.functies;
-  if (!staat) return next(); // niets uitgezet: alles staat aan
-  // De doelgroep van dit verzoek: uit het pad (leverancier/personeel/intern/
-  // foundation) of uit de pas van het ingelogde lid (RTG/Lifestyle/Business).
-  let user = null, sessieTier = null, zaakGenre = null;
-  const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
-  try {
-    if (tok) user = accounts.verifyToken(tok);
-  } catch (e) {}
-  // geen accounttoken? dan kan het een sessietoken zijn: een gast (de gratis
-  // app) of een demo-pas; zo kan de boardroom ook de gratis app besturen
-  if (tok && !user) {
-    try { const s = sessionFor(tok); if (s && s.tier) sessieTier = s.tier; } catch (e) {}
-  }
-  const doelgroep = functies.doelgroepVanVerzoek(p, user) ||
-    (sessieTier ? functies.tierNaarDoelgroep(sessieTier) : null);
-  // de leveranciers-regie: alleen als er genre-regels staan (bewaard of als
-  // standaard-matrix in de catalogus) zoeken we de zaak achter een
-  // leveranciers-/personeelsverzoek op (scheelt werk per verzoek)
-  if ((p.startsWith('/api/supplier') || p.startsWith('/api/staff')) &&
-      (functies.HEEFT_GENRE_STANDAARD || functies.heeftGenreRegels(staat))) {
-    try {
-      const s = tok && sessionFor(tok);
-      if (s && s.role === 'supplier') { const z = findSupplier(s.code); zaakGenre = z ? z.type : null; }
-    } catch (e) {}
-  }
-  // land van het lid (alleen opzoeken als er ergens land-regels staan) en de
-  // persoonssleutel (voor per-persoon uitschakelen): 'user-<id>'.
-  let land = null, persoon = null;
-  if (user) {
-    persoon = 'user-' + user.id;
-    if (functies.heeftLandRegels(staat)) {
-      try { const md = accounts.getMemberState(user.id) || {}; land = md.land || natieNaarLand(md.nationaliteit) || null; } catch (e) {}
-    }
-  }
-  const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, persoon, genre: zaakGenre });
-  if (dicht) {
-    const zin = { globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
-      pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
-      land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
-      persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.',
-      genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.' };
-    return res.status(503).json({
-      error: zin[dicht.reden] || zin.globaal,
-      functie: dicht.id, naam: dicht.naam, reden: dicht.reden, doelgroep: doelgroep || undefined
-    });
-  }
-  next();
-});
 
-/* Satellietvriendelijk: ook alle API-antwoorden gaan gecomprimeerd over de
-   lijn (de statische laag deed dat al). Op een smalle, trage verbinding
-   (satelliet, buitengebied, traag mobiel) scheelt dat 70 tot 90 procent per
-   antwoord. Kleine antwoorden laten we met rust: daar kost gzip meer dan het
-   oplevert. Moet voor de routers staan, anders missen die de wikkel. */
-app.use((req, res, next) => {
-  if (!/\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) return next();
-  const gewoonJson = res.json.bind(res);
-  res.json = (data) => {
-    let s;
-    try { s = JSON.stringify(data); } catch (e) { return gewoonJson(data); }
-    if (typeof s !== 'string' || s.length < 1024 || res.headersSent) return gewoonJson(data);
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Content-Encoding', 'gzip');
-    res.setHeader('Vary', 'Accept-Encoding');
-    return res.send(zlib.gzipSync(Buffer.from(s), { level: 6 }));
-  };
-  next();
-});
+remOpDeDeur(app, PRODUCTION || process.env.RTG_RATELIMIT === '1');
+app.use(opslagPoort(opslagKlaar));
+app.use(hoofdzekering({ db, accounts, eigenaar }));
+// sessionFor en findSupplier staan verderop in dit bestand; ze worden pas bij
+// een echt verzoek geraadpleegd, dus geven we ze lui door in plaats van hier
+// hun waarde te lezen (die er op dit punt nog niet is).
+app.use(schakelaars({ db, accounts, functies,
+  sessionFor: t => sessionFor(t),
+  findSupplier: c => findSupplier(c) }));
+app.use(jsonGzip());
 
 // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
 // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
@@ -567,102 +446,10 @@ app.use('/api/foundation', rtf.router);
 // een gezinsmelding voor een gekoppelde oppas/familie ook als telefoonmelding (web-push)
 rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch (e) {} });
 
-/* De voordeur is het RTG-OS-bureaublad (ROS): wie naar / gaat, krijgt meteen
-   het besturingssysteem met alle apps als tegels. GEEN omleiding meer: we
-   serveren het bureaublad rechtstreeks (interne rewrite), zodat de nonce-/CSP-
-   laag hieronder er gewoon overheen gaat en er geen 302-sprong in de weg zit.
-   De losse apps regelen hun eigen inlog zodra je er een opent. */
-/* De voordeur: de site-root IS het RTG OS-bureaublad, zonder omleiding (een
-   interne herschrijving, zodat de nonce-laag gewoon meedraait). Web en mobiel
-   krijgen exact dezelfde pagina; de tegels schalen mee met het formaat. De
-   oude bureau-URL blijft werken en serveert hetzelfde bureaublad. */
-app.get('/', (req, res, next) => { req.url = '/apps/app.html'; next(); });
-app.get('/apps/bureau.html', (req, res, next) => { req.url = '/apps/app.html'; next(); });
-
-/* Strengere CSP voor de app-pagina's: geen 'unsafe-inline' voor scripts, maar
-   een per-antwoord nonce. We lezen het .html-bestand, geven elke <script> die
-   nonce mee en zetten de CSP navenant. De apps gebruiken addEventListener (geen
-   inline on-handlers), dus dit werkt zonder ze om te bouwen en sluit de deur
-   voor ingespoten scripts. Uit te zetten met RTG_CSP_NONCE=0. Losse statische
-   pagina's (bijv. 404) vallen terug op de gewone CSP hierboven. */
-const PUBLIC_DIR = path.join(__dirname, '..', 'public');
-const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
-app.use((req, res, next) => {
-  if (!CSP_NONCE || req.method !== 'GET') return next();
-  let rel = req.path;
-  if (rel.endsWith('/')) rel += 'index.html';
-  if (!rel.endsWith('.html')) return next();
-  const bestand = path.join(PUBLIC_DIR, rel);
-  if (!bestand.startsWith(PUBLIC_DIR + path.sep)) return next(); // geen path traversal
-  fs.readFile(bestand, 'utf8', (err, html) => {
-    if (err) return next(); // bestaat niet: laat de statische laag/404 het doen
-    const nonce = crypto.randomBytes(16).toString('base64');
-    html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
-    res.set('Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline'; " +
-      "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
-      "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
-    res.type('html');
-    // ook de pagina's zelf gecomprimeerd over de lijn (satelliet en traag mobiel)
-    if (html.length > 2048 && /\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) {
-      res.setHeader('Content-Encoding', 'gzip');
-      res.setHeader('Vary', 'Accept-Encoding');
-      return res.send(zlib.gzipSync(Buffer.from(html), { level: 6 }));
-    }
-    res.send(html);
-  });
-});
-
-/* Lichte gzip voor statische tekstassets (js/css/svg/json/webmanifest), met een
-   in-memory cache op pad + mtime. De grote app-scripts (leverancier.js ~5000
-   regels, app-main.js ~4400) gaan zo ~75% kleiner over de lijn, zonder extra
-   dependency (ingebouwde zlib) en zonder per-verzoek opnieuw te comprimeren.
-   Valt netjes terug op express.static bij range-verzoeken of onbekende paden. */
-const PUBLIC_DIR_STATIC = path.join(__dirname, '..', 'public');
-const GZIP_TYPE = { '.js': 'application/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json' };
-const MIN_DIR_STATIC = path.join(PUBLIC_DIR_STATIC, 'dist', 'min');
-const gzipCache = new Map(); // absoluut pad -> { mtimeMs, minMtimeMs, gz }
-app.get(/\.(?:js|css|svg|json|webmanifest)$/, (req, res, next) => {
-  if (req.headers.range) return next(); // range-verzoeken: laat express.static het doen
-  if (!/\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) return next();
-  let rel; try { rel = decodeURIComponent(req.path); } catch (e) { return next(); }
-  if (rel.indexOf('..') !== -1) return next();
-  const bestand = path.join(PUBLIC_DIR_STATIC, rel);
-  if (!bestand.startsWith(PUBLIC_DIR_STATIC)) return next();
-  const type = GZIP_TYPE[path.extname(bestand)]; if (!type) return next();
-  let st; try { st = fs.statSync(bestand); } catch (e) { return next(); }
-  if (!st.isFile()) return next();
-  // Is er een verse geminificeerde versie (npm run build)? Dan die serveren,
-  // anders de bron. Vers = gebouwd na de laatste bronwijziging (mtime-controle),
-  // zodat een lokaal bewerkt bronbestand nooit een oude minify uitserveert.
-  let minPad = null, minMtimeMs = 0;
-  if (type.indexOf('javascript') !== -1) {
-    const kandidaat = path.join(MIN_DIR_STATIC, rel);
-    if (kandidaat.startsWith(MIN_DIR_STATIC)) {
-      try {
-        const mst = fs.statSync(kandidaat);
-        if (mst.isFile() && mst.mtimeMs >= st.mtimeMs) { minPad = kandidaat; minMtimeMs = mst.mtimeMs; }
-      } catch (e) { /* geen minify aanwezig: bron gebruiken */ }
-    }
-  }
-  let hit = gzipCache.get(bestand);
-  if (!hit || hit.mtimeMs !== st.mtimeMs || hit.minMtimeMs !== minMtimeMs) {
-    try {
-      const bron = fs.readFileSync(minPad || bestand);
-      hit = { mtimeMs: st.mtimeMs, minMtimeMs, gz: zlib.gzipSync(bron, { level: 6 }) };
-    }
-    catch (e) { return next(); }
-    if (gzipCache.size > 300) gzipCache.clear();
-    gzipCache.set(bestand, hit);
-  }
-  res.setHeader('Content-Type', type);
-  res.setHeader('Content-Encoding', 'gzip');
-  res.setHeader('Vary', 'Accept-Encoding');
-  res.setHeader('Cache-Control', 'public, max-age=3600');
-  res.end(hit.gz);
-});
-
-app.use(express.static(path.join(__dirname, '..', 'public')));
+bureaublad(app);
+app.use(cspNonce(PUBLIC_DIR, CSP_NONCE));
+app.get(/\.(?:js|css|svg|json|webmanifest)$/, statischGzip(PUBLIC_DIR));
+app.use(express.static(PUBLIC_DIR));
 
 /* ---------- Claude API (optioneel) ---------- */
 

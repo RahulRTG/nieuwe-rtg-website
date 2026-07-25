@@ -2374,6 +2374,22 @@ Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));
 Object.assign(kern, require('./kern/redactie').maakRedactie({ db, save, crypto, anthropic, schoon }));
 Object.assign(kern, require('./kern/ideeen').maakIdeeen({ db, save, crypto, anthropic, schoon,
   bureaus: { atelier: kern.atelier, studio: kern.studio, hardware: kern.hardware, architect: kern.architect, redactie: kern.redactie } }));
+/* Dezelfde zes bureaus nog een keer, nu voor de RTFoundation. De modules
+   blijven onaangeraakt; ze krijgen via kern/huisdb.js alleen een andere bril op
+   waardoor hun opslagsleutel naar een eigen la wijst (atelier -> atelierRtf).
+   Zo ontwerpt de stichting in haar eigen atelier, studio, hardwarelab,
+   architectenbureau, redactie en ideeenkamer, zonder dat het werk van RTG en
+   dat van de stichting op een hoop belandt. */
+const { huisDb, RTF_OMLEIDING, huisNaam } = require('./kern/huisdb');
+const rtfBureauCtx = { db: huisDb(db, RTF_OMLEIDING), save, crypto, anthropic, schoon };
+Object.assign(kern, huisNaam(require('./kern/atelier').maakAtelier(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/studio').maakStudio(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/hardwarelab').maakHardwarelab(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/architect').maakArchitect(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/redactie').maakRedactie(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/ideeen').maakIdeeen(Object.assign({}, rtfBureauCtx, {
+  bureaus: { atelier: kern.atelierRtf, studio: kern.studioRtf, hardware: kern.hardwareRtf,
+    architect: kern.architectRtf, redactie: kern.redactieRtf } })), 'Rtf'));
 /* De hulpdiensten (kern/hulpdienst.js): zes korpsen met een meldkamer,
    eenheden over land, water en door de lucht, bijstand tussen korpsen en
    de zorgketen ambulance -> ziekenhuis -> huisarts. */

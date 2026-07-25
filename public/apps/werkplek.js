@@ -94,7 +94,12 @@
             '<input class="veld" id="tTekst" placeholder="Wat moet er gebeuren?" maxlength="200" aria-label="Nieuwe taak">' +
             '<button class="knop" type="button" id="tMaak">Toevoegen</button>' +
           '</div>' +
+        '</div>' +
+        '<div class="vak"><h3>De ontwerptak</h3>' +
+          '<p class="leeg" style="margin-bottom:.9rem;">Zes bureaus, elk met het werk van dit huis. Wat hier gemaakt wordt, staat niet in het andere huis.</p>' +
+          '<div id="bureaus"></div>' +
         '</div>';
+      if (window.RTGWerkplekBureaus) RTGWerkplekBureaus.tegels($('#bureaus'), code);
       toonMensen(d.mensen);
       toonTaken(d.taken);
       $('#anderHuis').addEventListener('click', toonKiezer);

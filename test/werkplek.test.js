@@ -165,3 +165,78 @@ test('9. het RTF-kantoor draagt huisstijl-glyfen, geen emoji', () => {
     assert.match(bekend, new RegExp("(^|[\\s{,])'?" + g + "'?\\s*:", 'm'), 'de glyf ' + g + ' bestaat echt');
   }
 });
+
+test('10. de stichting heeft dezelfde ontwerptak als RTG', async () => {
+  const r = await post('/api/werkplek/bureaus', { bedrijf: 'rtf' }, eigenaar);
+  assert.equal(r.status, 200);
+  const namen = r.body.bureaus.map(b => b.bureau).sort();
+  assert.deepEqual(namen, ['architect', 'atelier', 'hardware', 'ideeen', 'redactie', 'studio'],
+    'alle zes de bureaus staan er bij de stichting');
+  assert.ok(r.body.bureaus.every(b => b.aanwezig), 'en ze zijn allemaal echt aanwezig');
+  // en RTG heeft ze langs hetzelfde pad ook
+  const g = await post('/api/werkplek/bureaus', { bedrijf: 'rtg' }, eigenaar);
+  assert.deepEqual(g.body.bureaus.map(b => b.bureau).sort(), namen);
+});
+
+test('11. de ontwerpen van de stichting staan niet tussen die van RTG', async () => {
+  const bu = (pad, body) => post('/api/werkplek/bureau' + pad, body, eigenaar);
+  const voor = (await bu('/atelier', { bedrijf: 'rtg' })).body.ontwerpen.length;
+
+  const maak = await bu('/atelier/maak', { bedrijf: 'rtf', naam: 'Stille Toga',
+    categorie: 'jurken', brief: 'Een ingetogen toga voor de vrijwilligers van de stichting.' });
+  assert.equal(maak.status, 200, 'de stichting kan in haar eigen atelier ontwerpen');
+  const oid = maak.body.ontwerp.id;
+
+  const rtf = (await bu('/atelier', { bedrijf: 'rtf' })).body;
+  const rtg = (await bu('/atelier', { bedrijf: 'rtg' })).body;
+  assert.ok(rtf.ontwerpen.some(o => o.id === oid), 'het ontwerp staat in het atelier van de stichting');
+  assert.ok(!rtg.ontwerpen.some(o => o.id === oid), 'en niet in dat van RTG');
+  assert.equal(rtg.ontwerpen.length, voor, 'het atelier van RTG is niets veranderd');
+
+  // het technische blad hoort er ook bij (werkt zonder API-sleutel, uit de bank)
+  const tp = await bu('/atelier/techpack', { bedrijf: 'rtf', id: oid });
+  assert.equal(tp.status, 200, 'het tech pack rolt eruit');
+
+  // de andere drie bureaus doen hetzelfde in hun eigen taal
+  for (const [bureau, blad] of [['studio', 'specsheet'], ['hardware', 'stuklijst'], ['architect', 'bouwstaat']]) {
+    const m = await bu('/' + bureau + '/maak', { bedrijf: 'rtf', naam: 'Stichting ' + bureau,
+      brief: 'Een eerste verkenning voor de stichting.' });
+    assert.equal(m.status, 200, bureau + ' ontwerpt voor de stichting');
+    const b = await bu('/' + bureau + '/' + blad, { bedrijf: 'rtf', id: m.body.ontwerp.id });
+    assert.equal(b.status, 200, bureau + ' levert een ' + blad);
+  }
+
+  // de redactie van de stichting schrijft haar eigen krant
+  const art = await bu('/redactie/artikel/maak', { bedrijf: 'rtf', kop: 'De stichting opent haar clubhuis',
+    rubriek: 'nieuws', intro: 'Het eerste clubhuis gaat open.', tekst: 'Vrijwilligers openen het eerste clubhuis.' });
+  assert.equal(art.status, 200);
+  const rtfPers = (await bu('/redactie', { bedrijf: 'rtf' })).body;
+  const rtgPers = (await bu('/redactie', { bedrijf: 'rtg' })).body;
+  assert.ok(rtfPers.artikelen.some(a => a.kop === 'De stichting opent haar clubhuis'));
+  assert.ok(!rtgPers.artikelen.some(a => a.kop === 'De stichting opent haar clubhuis'),
+    'de krant van RTG blijft die van RTG');
+});
+
+test('12. de ideeenkamer van de stichting werkt haar eigen bureaus bij', async () => {
+  const bu = (pad, body) => post('/api/werkplek/bureau' + pad, body, eigenaar);
+  const idee = await bu('/ideeen/maak', { bedrijf: 'rtf', titel: 'Een clubhuis dat meegroeit',
+    brief: 'Een gebouw dat met de club mee kan groeien.', bureaus: ['architect'] });
+  assert.equal(idee.status, 200);
+  const spin = await bu('/ideeen/spinoff', { bedrijf: 'rtf', id: idee.body.idee.id, bureau: 'architect' });
+  assert.equal(spin.status, 200, 'het idee gaat als concept naar het eigen architectenbureau');
+
+  const rtfArch = (await bu('/architect', { bedrijf: 'rtf' })).body;
+  const rtgArch = (await bu('/architect', { bedrijf: 'rtg' })).body;
+  assert.ok(rtfArch.ontwerpen.some(o => o.naam === 'Een clubhuis dat meegroeit'));
+  assert.ok(!rtgArch.ontwerpen.some(o => o.naam === 'Een clubhuis dat meegroeit'),
+    'de spin-off blijft binnen de stichting');
+
+  // de ideeen zelf zijn ook gescheiden
+  const rtgIdee = (await bu('/ideeen', { bedrijf: 'rtg' })).body;
+  assert.ok(!rtgIdee.ideeen.some(i => i.titel === 'Een clubhuis dat meegroeit'));
+
+  // en de deur geldt ook voor de bureaus
+  assert.equal((await post('/api/werkplek/bureau/atelier', { bedrijf: 'rtf' }, medewerker)).status, 403);
+  assert.equal((await post('/api/werkplek/bureau/atelier', { bedrijf: 'rtf' })).status, 403);
+  assert.equal((await bu('/atelier', { bedrijf: 'bestaatniet' })).status, 404);
+});

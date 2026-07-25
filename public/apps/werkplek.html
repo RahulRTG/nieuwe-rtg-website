@@ -63,6 +63,27 @@
   .veld:focus-visible{outline:2px solid var(--acc);outline-offset:1px;}
   .leeg{color:var(--soft);font-size:.86rem;}
   .melding{color:var(--soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
+  /* de ontwerptak: zes bureaus, en het bureau dat u opent */
+  .bureaus{display:grid;gap:.7rem;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));}
+  .bureau{display:block;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);
+    border-radius:14px;padding:.85rem .9rem;color:inherit;font:inherit;cursor:pointer;transition:border-color .15s;}
+  .bureau:hover{border-color:var(--acc);}
+  .bureau:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+  .bureau .kop{display:flex;align-items:center;gap:.5rem;min-width:0;}
+  .bureau .kop b{min-width:0;font-size:.95rem;overflow-wrap:anywhere;}
+  .bureau .kop .rtg-glyf{width:1.15rem;height:1.15rem;color:var(--acc);flex:none;}
+  .bureau .wat{color:var(--soft);font-size:.78rem;margin:.35rem 0 .5rem;}
+  .bureau .tel{font-size:.75rem;color:var(--muted);}
+  .bureauKop{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:1.2rem 0 .2rem;}
+  .bureauKop h4{font-family:'Bodoni Moda',Georgia,serif;font-size:1.05rem;font-weight:600;display:flex;align-items:center;gap:.45rem;}
+  .bureauKop .rtg-glyf{width:1.2rem;height:1.2rem;color:var(--acc);}
+  .bItem{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+    font-size:.88rem;border-top:1px solid var(--line);padding:.55rem 0;}
+  .bItem .acties{display:flex;gap:.35rem;flex-wrap:wrap;}
+  .knop.klein{padding:.3rem .7rem;font-size:.75rem;}
+  .pil{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);
+    border-radius:999px;padding:.1rem .5rem;color:var(--soft);}
+  #bUit{white-space:pre-wrap;margin-top:.7rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
@@ -80,6 +101,7 @@
   <div id="kiezer"><p class="melding" id="melding">Werkplekken laden&hellip;</p></div>
   <div id="huis" hidden></div>
 </main>
+<script src="/apps/werkplek-bureaus.js" defer></script>
 <script src="/apps/werkplek.js" defer></script>
 <script src="/shared/osbar.js" defer></script>
 <script src="/shared/osmenu.js" defer></script>

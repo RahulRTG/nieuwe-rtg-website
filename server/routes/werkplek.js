@@ -55,4 +55,8 @@ module.exports = (kern) => {
   app.post('/api/werkplek/toegang', baasAuth, (req, res) => veilig(res, () => werkplek.toegangLijst(String(req.body.bedrijf || ''))));
   app.post('/api/werkplek/toegang-geef', baasAuth, (req, res) => veilig(res, () => werkplek.toegangGeef(String(req.body.bedrijf || ''), req.body.key, req.body.naam)));
   app.post('/api/werkplek/toegang-weg', baasAuth, (req, res) => veilig(res, () => werkplek.toegangWeg(String(req.body.bedrijf || ''), req.body.key)));
+
+  /* De ontwerpbureaus van het huis staan in ./werkplek-bureaus, achter dezelfde
+     deur. Die krijgt hij hier mee zodat er maar een slot bestaat. */
+  require('./werkplek-bureaus')(kern, huisAuth);
 };

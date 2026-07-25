@@ -1,0 +1,185 @@
+/* Muisvrij bedienen, deel 2: de balk.
+
+   Een vaste strook onderaan met een veld, en daaronder het antwoord. Dit is de
+   ENE ingang: typen of praten, en er gebeurt iets. De zinsontleding zit in
+   shared/handenvrij.js; het luisteren en terugpraten in handenvrij-mond.js, dat
+   dit bestand erbij haalt en een handvat meekrijgt (doe/zeg/stem).
+
+   Twee dingen die hier bewust zo staan:
+   - de plekken op de pagina worden bij ELKE opdracht opnieuw opgehaald, niet een
+     keer bij het laden. In dit OS wisselen schermen en tabs voortdurend; een
+     lijst van een minuut oud wijst naar knoppen die er niet meer zijn.
+   - een letter tikken waar dan ook belandt in de balk. Zonder dat blijf je toch
+     eerst met de muis naar het veld gaan, en dan is de hele opzet zinloos. */
+(function (root) {
+  'use strict';
+  if (root.__handenvrijBalk) return; root.__handenvrijBalk = true;
+  var api = root.Handenvrij;
+  if (!api || !api.versta) return;                 // deel 1 hoort er te zijn
+
+  var memTok = null, supTok = null;
+  try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
+  try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
+  if (!memTok && !supTok) return;
+  var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
+  var tok = memTok || supTok;
+
+  var STEM = 'rtg_handenvrij_stem';
+  var lezen = function (k, standaard) { try { var v = localStorage.getItem(k); return v == null ? standaard : v === '1'; } catch (e) { return standaard; } };
+  var zetten = function (k, v) { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
+  var stemAan = lezen(STEM, true);
+
+  var css = '.hv-balk{position:fixed;left:0;right:0;bottom:0;z-index:38;display:flex;gap:.5rem;align-items:center;' +
+    'padding:.55rem .7rem calc(.55rem + env(safe-area-inset-bottom,0px));background:rgba(12,12,11,.94);' +
+    'border-top:1px solid var(--gold,#857007);font-family:Inter,system-ui,sans-serif;backdrop-filter:blur(6px);}' +
+    '.hv-balk form{display:flex;gap:.5rem;flex:1;align-items:center;margin:0;}' +
+    '.hv-balk input{flex:1;min-width:0;background:#0C0C0B;border:1px solid #333;border-radius:10px;color:#eee;' +
+    'font:inherit;font-size:.88rem;padding:.5rem .7rem;}' +
+    '.hv-balk input:focus-visible,.hv-k:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:2px;}' +
+    /* De knoppen moeten op een telefoon van 390px naast het veld passen; met
+       drie woorden erin liep de rij het beeld uit. Vandaar een pijl voor sturen
+       (zoals in de metgezel) en korte woorden voor de twee schakelaars. */
+    '.hv-k{background:transparent;border:1px solid #444;border-radius:10px;color:#eee;font:inherit;font-size:.78rem;' +
+    'padding:.45rem .5rem;cursor:pointer;white-space:nowrap;flex:0 0 auto;}' +
+    '.hv-go{font-size:1rem;line-height:1;padding:.4rem .6rem;}' +
+    '.hv-k[aria-pressed="true"]{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);font-weight:700;}' +
+    '.hv-k.hv-hoort{background:#9E1C40;color:#fff;border-color:#9E1C40;}' +
+    '.hv-uit{position:fixed;left:0;right:0;bottom:3.4rem;z-index:37;padding:.6rem .8rem;background:rgba(12,12,11,.96);' +
+    'border-top:1px solid #2a2a28;color:#ddd;font-family:Inter,system-ui,sans-serif;font-size:.85rem;line-height:1.55;' +
+    'max-height:38vh;overflow-y:auto;white-space:pre-wrap;}' +
+    '.hv-uit[hidden]{display:none;}body.hv-ruimte{padding-bottom:3.6rem;}' +
+    '@media (prefers-reduced-motion: reduce){.hv-balk{backdrop-filter:none;}}';
+  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+
+  var balk = document.createElement('div');
+  balk.className = 'hv-balk';
+  balk.innerHTML = '<form><input type="text" maxlength="300" autocomplete="off" spellcheck="false"' +
+    ' aria-label="Zeg of typ wat er moet gebeuren" placeholder="Zeg of typ het">' +
+    '<button class="hv-k hv-go" type="submit" aria-label="Versturen">→</button></form>' +
+    '<button class="hv-k" type="button" data-mond aria-pressed="false" hidden>Mond</button>' +
+    '<button class="hv-k" type="button" data-stem aria-pressed="true">Stem</button>';
+  var uit = document.createElement('div');
+  uit.className = 'hv-uit'; uit.hidden = true;
+  uit.setAttribute('role', 'status'); uit.setAttribute('aria-live', 'polite');
+
+  var form = balk.querySelector('form'), inp = balk.querySelector('input');
+  var knMond = balk.querySelector('[data-mond]'), knStem = balk.querySelector('[data-stem]');
+
+  function klaar() {
+    if (balk.parentNode || !document.body) return;
+    document.body.appendChild(uit); document.body.appendChild(balk);
+    document.body.classList.add('hv-ruimte');
+    knStem.setAttribute('aria-pressed', String(stemAan));
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', klaar);
+  else klaar();
+
+  /* ---------- antwoorden ---------- */
+  function zeg(tekst, hardop) {
+    uit.hidden = false; uit.textContent = tekst;
+    if (hardop && stemAan && kamer.spreek) kamer.spreek(tekst);
+  }
+
+  /* ---------- de plekken op deze pagina ----------
+     Wat een pagina zelf aanmeldt met Handenvrij.plek() gaat voor. Daarnaast rapen
+     we op wat er toch al staat: alles met data-plek, de tabs en de navigatielinks.
+     Zo werkt spraaknavigatie ook op de 150+ pagina's die hier niets van weten. */
+  var eigen = [];
+  function plekken() {
+    var lijst = eigen.slice(), gezien = {};
+    eigen.forEach(function (p) { gezien[api.kaal(p.naam)] = 1; });
+    var kies = '[data-plek],[role="tab"],.tab,.tabbtn,nav a[href],[data-tab]';
+    [].forEach.call(document.querySelectorAll(kies), function (el) {
+      if (el.hidden || el.getAttribute('aria-hidden') === 'true') return;
+      var naam = el.getAttribute('data-plek') || (el.textContent || '').trim();
+      var k = api.kaal(naam);
+      if (!k || k.length > 40 || gezien[k]) return;
+      gezien[k] = 1;
+      lijst.push({ naam: naam, doen: function () { el.click(); el.scrollIntoView({ block: 'nearest' }); } });
+    });
+    return lijst;
+  }
+
+  /* ---------- een bedoeling uitvoeren ---------- */
+  function doe(zin, hardop) {
+    var b = api.versta(zin, plekken());
+    switch (b.soort) {
+      case 'niets': return;
+      case 'ga': zeg(b.plek.naam, hardop); try { b.plek.doen(); } catch (e) { zeg('Dat lukte niet.', hardop); } return;
+      case 'terug': history.back(); return;
+      case 'vooruit': history.forward(); return;
+      case 'sluit': uit.hidden = true; inp.value = ''; inp.blur(); return;
+      case 'omhoog': root.scrollBy({ top: -Math.round(innerHeight * 0.8), behavior: 'smooth' }); return;
+      case 'omlaag': root.scrollBy({ top: Math.round(innerHeight * 0.8), behavior: 'smooth' }); return;
+      case 'begin': root.scrollTo({ top: 0, behavior: 'smooth' }); return;
+      case 'eind': root.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); return;
+      case 'stil': stelStem(false); zeg('Goed, ik hou het bij tekst.', false); return;
+      case 'luid': stelStem(true); zeg('Ik praat weer mee.', true); return;
+      case 'lijst': zeg(lijstTekst(), hardop); return;
+      default: vraagRahul(b.zin, hardop);
+    }
+  }
+  function lijstTekst() {
+    var namen = plekken().slice(0, 14).map(function (p) { return p.naam; });
+    return namen.length
+      ? 'Hier kun je naartoe: ' + namen.join(', ') + '. En verder: terug, omhoog, omlaag, sluit, stil. Al het andere doe ik zelf.'
+      : 'Op deze pagina vind ik geen vaste plekken. Zeg gewoon wat er moet gebeuren.';
+  }
+  function stelStem(aan) {
+    stemAan = !!aan; zetten(STEM, stemAan);
+    knStem.setAttribute('aria-pressed', String(stemAan));
+    if (!stemAan && kamer.zwijg) kamer.zwijg();
+  }
+
+  /* Alles wat geen navigatie is, gaat hiernaartoe: onveranderd naar Rahul, met
+     de eigen inlog. Daar zitten de geld-drempel en de bevestiging, en die willen
+     we niet dubbel (en dus niet half) in de browser nabouwen. */
+  function vraagRahul(vraag, hardop) {
+    zeg('Rahul denkt na...', false);
+    fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ q: vraag }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { zeg((d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.', hardop); })
+      .catch(function () { zeg('Even geen verbinding; probeer het zo weer.', hardop); });
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var q = inp.value.trim(); if (!q) return;
+    inp.value = ''; doe(q, false);
+  });
+  knStem.addEventListener('click', function () { stelStem(!stemAan); });
+
+  /* ---------- beginnen met typen, waar je ook bent ----------
+     Een losse letter hoort in de balk te belanden, niet in het niets. We blijven
+     van echte velden en van sneltoetsen (ctrl/cmd/alt) af, en van Escape binnen
+     de balk maken we "laat maar". */
+  document.addEventListener('keydown', function (ev) {
+    if (ev.defaultPrevented || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+    var t = ev.target;
+    if (t === inp) { if (ev.key === 'Escape') { inp.value = ''; inp.blur(); uit.hidden = true; } return; }
+    var tag = (t && t.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+    if (ev.key === '/' || (ev.key && ev.key.length === 1 && /[\wÀ-ɏ]/.test(ev.key))) {
+      ev.preventDefault(); inp.focus();
+      if (ev.key !== '/') inp.value += ev.key;
+    }
+  });
+
+  /* ---------- de mond erbij ----------
+     Een gedeelde, muteerbare kamer: handenvrij-mond.js vult spreek/zwijg in en
+     leest doe/zeg/knop. Zo kennen de twee delen elkaar zonder laadvolgorde-gedoe;
+     hetzelfde late-binding-patroon als in de kern op de server. */
+  var kamer = { doe: doe, zeg: zeg, knop: knMond, spreek: null, zwijg: null };
+  root.__handenvrijKamer = kamer;
+  (function () {
+    var s = document.createElement('script');
+    s.src = '/shared/handenvrij-mond.js'; s.defer = true;
+    document.head.appendChild(s);
+  })();
+
+  // wat een pagina zelf aanmeldt, gaat voor op wat we uit de DOM oprapen
+  api.plek = function (naam, doen) { if (naam && typeof doen === 'function') eigen.push({ naam: String(naam), doen: doen }); };
+  api.zeg = function (t) { doe(String(t || ''), false); };
+  api.balk = function () { inp.focus(); };
+  api.plekken = plekken;
+})(typeof self !== 'undefined' ? self : this);

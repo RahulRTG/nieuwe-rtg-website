@@ -13,6 +13,19 @@
   try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
   if (!memTok && !supTok) return;
+
+  /* De muisvrije laag erbij (shared/handenvrij.js): de stuurbalk waar je in typt
+     of tegen praat, met navigatie zonder tik. Hij hangt hier omdat de metgezel
+     al op elke app-pagina staat en al weet dat er iemand is ingelogd; zo is het
+     een script erbij in plaats van 150+ pagina's aanpassen. Lukt het laden niet,
+     dan verandert er niets: alle knoppen blijven gewoon staan. */
+  (function () {
+    if (window.__handenvrij) return;
+    var s = document.createElement('script');
+    s.src = '/shared/handenvrij.js'; s.defer = true;
+    document.head.appendChild(s);
+  })();
+
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
   var css = '.mgz-knop{position:fixed;right:1rem;z-index:35;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +

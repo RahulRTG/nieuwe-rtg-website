@@ -74,6 +74,40 @@ geld-actie vraagt eerst een expliciete bevestiging. De losse endpoints
 (`/api/member/doe`, `/api/supplier/doe`, `/api/staff/doe` + `/kaart`) werken
 ook zonder key en de boardroom kan de functie `stuur` per doelgroep sluiten.
 
+### Muisvrij: alles met de mond of met typen
+
+Op elke app-pagina staat onderaan één balk (`public/shared/handenvrij.js` +
+`-balk.js` + `-mond.js`, aangehaakt via `shared/metgezel.js`). Daarin typ je of
+praat je, en er gebeurt iets. Drie dingen maken het muisvrij:
+
+- **Navigeren zonder tik.** "Open de Salon", "ga naar Bestellen", "terug",
+  "omlaag", "sluit". Dat wordt *lokaal* afgehandeld, zonder ronde langs de
+  server: springen hoort onmiddellijk te zijn en ook te werken als het netwerk
+  hapert. De plekken komen uit de pagina zelf (tabs, `data-tab`,
+  navigatielinks), en worden bij elke opdracht opnieuw opgehaald, want in dit OS
+  wisselen de schermen voortdurend. Een pagina kan er zelf bij zetten met
+  `Handenvrij.plek(naam, doen)`. Zeg "wat kan ik zeggen" voor de lijst.
+- **Luisteren zonder klik.** De knop *Mond* zet continu luisteren aan, met een
+  wekwoord ("Rahul, ..."); daarna blijft hij twaalf seconden wakker zodat een
+  vervolgzin zonder wekwoord mag. Hij staat **uit** tot je hem zelf aanzet: een
+  meeluisterende microfoon is geen standaardinstelling. *Stem* zet het
+  terugpraten aan of uit ("stil" werkt ook).
+- **Beginnen met typen.** Een losse letter, waar je ook bent op de pagina,
+  belandt in de balk. Zonder dat pak je toch eerst de muis om bij het veld te
+  komen, en dan is de hele opzet zinloos.
+
+De grens: de balk herkent **navigatie** en anders niets. Elke zin die niet
+zeker een sprong is, gaat onveranderd naar Rahul, met de geld-drempel en de
+bevestiging die daar zitten. Zou de balk zelf gaan gokken wat een half-verstane
+zin betekent, dan wordt een spraakfoutje een echte handeling. Verkeerd
+navigeren is hinderlijk, verkeerd handelen niet. `test/handenvrij.test.js`
+toetst precies dat: "boek een taxi naar huis" en "open de deur van kamer 12"
+mogen nooit als navigatie gelezen worden. `test/handenvrij.e2e.js` doet het
+daarna nog eens in een echte browser.
+
+De bestaande knoppen blijven allemaal staan; dit is een tweede weg, geen
+vervanging.
+
 ## Tests
 
 ```bash

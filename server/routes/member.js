@@ -61,6 +61,8 @@ module.exports = (kern) => {
   // en de handelingen erbij: zoeken, vlaggen en de drie AI-taken
   require('./member/berichten')(kern);
   require('./member/berichtenapp')(kern);
+  // De Salon als app: plaatsen, feed met paginering, profielen, reacties, AI
+  require('./member/salonapp')(kern);
   // De wauw-laag: stemming, verjaardagsglans en De Terugblik
   require('./member/wauw')(kern);
   // De moedertaal van het account: iedereen praat en leest in de eigen taal

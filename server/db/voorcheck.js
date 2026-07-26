@@ -36,8 +36,14 @@ const GROOT_MS = Number(process.env.RTG_SQLITE_GROOT_MS || 2000);
 const ALTIJD_EXACT = new Set(['paySaldi', 'saldi', 'payTikken', 'muntOntvangsten', 'directBetalingen',
   'giftcards', 'orders', 'boekingen', 'posSales', 'invoices', 'facturen', 'bank', 'bankBoekingen',
   'winkelBestellingen', 'assets', 'assetTickets', 'fonds']);
-// Vangnet op de naam: alles wat naar centen ruikt, wordt altijd exact nagekeken.
-const GELD_NAAM = /sald|cent|bedrag|betaal|betaling|\bpay|munt|factu|invoice|order|boeking|bank|kas\b|gift|tegoed|uitbetaal|payout|grootboek|ledger|fonds|asset|winkel|\bpos|abonnement|tik(ken)?$/i;
+/* Vangnet op de naam: alles wat naar centen ruikt, wordt altijd exact nagekeken.
+
+   Let op de valkuil van zo'n regel: hij mag niet BREDER zijn dan geld. `\bpos`
+   stond hier voor de kassa (posSales), maar dat ving ook `posts` -- De Salon,
+   waar geen cent in staat. Die collectie werd daardoor bij elke save volledig
+   geserialiseerd, precies het werk dat de voorcheck wil vermijden. posSales
+   staat gewoon op de lijst hierboven, dus de regel kan weg. */
+const GELD_NAAM = /sald|cent|bedrag|betaal|betaling|\bpay|munt|factu|invoice|order|boeking|bank|kas\b|gift|tegoed|uitbetaal|payout|grootboek|ledger|fonds|asset|winkel|abonnement|tik(ken)?$/i;
 const exactNodig = k => ALTIJD_EXACT.has(k) || GELD_NAAM.test(k);
 
 const laatsteGrootte = new Map(); // collectie -> bytes van de laatst gemeten JSON

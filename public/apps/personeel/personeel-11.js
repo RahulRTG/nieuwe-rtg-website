@@ -69,7 +69,11 @@
             const uit = (trainData.gelezen || []).includes(x.t);
             try { const d = await API.call('/supplier/training/gelezen', { titel: x.t, uit }); if (trainData) trainData.gelezen = d.gelezen; vulTrainingKaart(); }
             catch (e) { toast(e.message); }
-          } }, g ? '' : ''),
+          /* Deze knop was leeg (twee lege strings) sinds de emoji-ronde: geen
+             vinkje, geen rondje, dus niets om aan te tikken. De aria-label was
+             er nog wel, dus alleen wie ziet had er last van. Een vinkje en een
+             open rondje, in dezelfde tekentaal als de kruisknop hiernaast. */
+          } }, g ? '✓' : '○'),
         E('div', { class: 't' }, E('b', {}, x.t), E('span', { style: { lineHeight: '1.5' } }, x.s)),
         (t.kanBeheren && eigen.some(e => e.t === x.t)) ? E('button', { class: 'abtn ghost', style: { flex: '0 0 auto', padding: '0.25rem 0.5rem', fontSize: '0.7rem' },
           onclick: async () => { try { await API.call('/supplier/training/remove', { titel: x.t }); await laadZaken(); vulTrainingKaart(); } catch (e) { toast(e.message); } } }, '✕') : null

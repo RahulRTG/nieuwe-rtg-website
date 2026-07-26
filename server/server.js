@@ -2310,6 +2310,18 @@ Object.assign(kern, require('./kern/wauw')({ db, save, accounts, socialConnectie
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)
 Object.assign(kern, require('./kern/pulse')({ db, save, crypto, liveCodename, notify,
   stemmingVan: kern.stemmingVan, jarigVan: kern.jarigVan }));
+/* De Salon als volwaardige app: leden die zelf plaatsen (karrousel, onderwerpen),
+   een feed met echte paginering in plaats van het oude plafond van 60, profielen
+   op codenaam met volgen tussen leden, reacties met antwoorden en vermeldingen,
+   bewaren, de veiligheidsknoppen, en drie AI-taken die voorstellen maar nooit
+   plaatsen. De zichtbaarheidspoort blijft kern/salonviraal.js. */
+kern.salon = require('./kern/salon')({ db, save, media, liveCodename, codenaamVan: kern.codenaamVan,
+  crypto, broadcastSync });
+kern.salonProfiel = require('./kern/salon/profiel')({ db, save, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam: kern.keyVanCodenaam, liveCodename, salon: kern.salon });
+kern.salonReacties = require('./kern/salon/reacties')({ db, save, liveCodename, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam: kern.keyVanCodenaam, zijnVrienden: kern.zijnVrienden, salon: kern.salon, notify });
+kern.salonAI = require('./kern/salon/ai')({ anthropic, salon: kern.salon });
 /* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
    archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */

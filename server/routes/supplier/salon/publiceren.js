@@ -10,7 +10,7 @@ module.exports = (kern, eisSalonProfiel) => {
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
-    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
+    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak , salon} = kern;
 app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAuth, async (req, res) => {
   if (!eisSalonProfiel(req, res)) return;
   const text = String(req.body.text || '').trim().slice(0, 600);
@@ -30,7 +30,7 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
     baseLikes: 0, likedBy: {}, comments: []
   };
   db.data.posts.unshift(post);
-  db.data.posts = db.data.posts.slice(0, 60);
+  salon.kap();   // het venster: een grens, op een plek (kern/salon)
   save();
   logActivity(req.supplier.code, req.actor, 'publiceerde op De Salon');
   salonNaarVolgers(req.supplier, text);
@@ -54,7 +54,7 @@ app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
     deal: { titel, geldigTot, claims: [] }
   };
   db.data.posts.unshift(post);
-  db.data.posts = db.data.posts.slice(0, 60);
+  salon.kap();   // het venster: een grens, op een plek (kern/salon)
   save();
   logActivity(req.supplier.code, req.actor, 'zette een aanbieding op De Salon: "' + titel + '"');
   salonNaarVolgers(req.supplier, '🎁 ' + titel);
@@ -93,7 +93,7 @@ app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
     poll: { vraag, opties: opties.map(t2 => ({ tekst: t2, stemmen: [] })) }
   };
   db.data.posts.unshift(post);
-  db.data.posts = db.data.posts.slice(0, 60);
+  salon.kap();   // het venster: een grens, op een plek (kern/salon)
   save();
   logActivity(req.supplier.code, req.actor, 'zette een poll op De Salon');
   salonNaarVolgers(req.supplier, '📊 ' + vraag);

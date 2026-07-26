@@ -45,8 +45,12 @@ body {
     min-height: 280px;
     max-height: calc(100dvh - 120px);
   }
-  /* De vaste kopbalk mag over de volle breedte blijven, als de OS-topbalk. */
-  body > header { border-radius: 0; }
+  /* De vaste kopbalk mag over de volle breedte blijven, als de OS-topbalk.
+     En hij hoort BOVEN de vensterlaag: de apps zetten hun eigen kopbalk op
+     z-index 5, de kaart hieronder op 6. Zonder deze regel schuift het venster
+     over de topbalk heen zodra je scrollt, en zijn de tabs er niet meer
+     aan te klikken. Een topbalk die je niet kunt raken is geen topbalk. */
+  body > header { border-radius: 0; z-index: 7; }
 
   /* ---- de vensterlaag (desktopframe.js maakt de kaart verplaatsbaar) ---- */
   main.rtg-venster { margin: 0; max-width: none; z-index: 6; }

@@ -319,3 +319,50 @@ Twee dingen die ik niet zelf besluit en waar ik je woord voor nodig heb:
 1. **De vuurtjes (streaks) in RTF Vrienden.** Dat is precies het patroon dat de
    huisregels verbieden. Laten staan, of eruit?
 2. **Nieuws en Krant** doen nu hetzelfde. Samenvoegen, of scherp scheiden?
+
+## Ronde 2 is af: De Salon
+
+De Salon was een etalage: alleen partners konden er iets in zetten, en elke
+publicatie deed `posts.slice(0, 60)` -- post 61 duwde post 1 er stilletjes uit,
+voorgoed. Nu is het een sociaal netwerk waar de leden zelf wonen.
+
+| Functie | Waar |
+|---|---|
+| **Een lid plaatst zelf**, met tot zes foto's in een karrousel, elk met een eigen alt-tekst | `kern/salon/index.js` -> `/api/salon/plaats` |
+| Onderwerpen (`#hashtags`) uit je eigen tekst; wat je typt is wat je krijgt | `kern/salon/index.js` -> `onderwerpenUit` |
+| **De muur van 60 is weg**: een ruim venster (`SALON_MAX`, standaard 2000) met echte paginering op `na` | `/api/salon/feed` |
+| Ledenprofiel op codenaam: bio, plaats, raster, volgers, volgend | `kern/salon/profiel.js` -> `/api/salon/lid` |
+| Leden volgen elkaar (de poort kende alleen partners) | `/api/salon/volg-lid` |
+| Bewaren op je eigen, **prive** plank; de maker merkt er niets van | `/api/salon/bewaar` |
+| Reacties met antwoorden en `@codenaam`-vermeldingen | `kern/salon/reacties.js` -> `/api/salon/reageer` |
+| **De maker bepaalt wie mag reageren**: iedereen, vrienden of niemand | `/api/salon/reacties-van` |
+| Verbergen (prive, alleen voor jou) naast melden (drie melders -> uit de feed) | `/api/salon/verberg`, `/api/salon/meld` |
+| Rahul **schrijft een bijschrift** bij je steekwoorden; jij drukt op plaatsen | `/api/salon/ai/bijschrift` |
+| Rahul **vat de reacties onder je eigen post samen** | `/api/salon/ai/reacties` |
+| Waar het vandaag over gaat: de telling is echt, de AI zet er een zin omheen | `/api/salon/ai/waarover` |
+| De AI-balk onderaan: typ wat er moet gebeuren | `/api/chat/send` |
+
+De drie ontwerpregels van ronde 1 gelden onverkort. Wat deze ronde eraan toevoegt:
+
+4. **Geen motor die rangschikt op wat jou vasthoudt.** De ontdek-kant kijkt naar
+   wat er gedeeld wordt, niet naar wat jou het langst bezighoudt, en onderaan de
+   feed staat een knop met "Je bent bij." in plaats van een scroll die zichzelf
+   aanvult.
+5. **Een grens hoort op EEN plek.** De kap van 60 stond op vijf plaatsen los in
+   de partner-routes; er is nu een `salon.kap()`, dus er is nog maar een getal om
+   te verzetten.
+
+Bewezen: `test/salon-app.test.js` (12 toetsen) en in een echte browser
+`test/salon-app.e2e.js`.
+
+Drie dingen die onderweg stuk bleken en gerepareerd zijn:
+
+- `keyVanCodenaam` is **async** en geeft een object terug, geen sleutel. Volgen
+  en vermelden gebruikten hem synchroon: de knop zei "je volgt hem nu", maar er
+  werd niets opgeslagen dat de poort herkende.
+- In de bureaubladweergave stond de kopbalk (`z-index: 5`) ONDER de vensterlaag
+  (`z-index: 6`): zodra je scrolde schoof het venster eroverheen en waren de tabs
+  niet meer aan te klikken. Opgelost in `shared/desktopframe.css`.
+- De knop "markeer als gelezen" in de PDA-trainingskaart was sinds de
+  emoji-ronde helemaal leeg (`g ? '' : ''`): een knop zonder inhoud, dus niets om
+  aan te tikken. Nu een vinkje en een open rondje.

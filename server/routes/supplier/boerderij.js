@@ -3,7 +3,7 @@
    dieren, takenbord en een AI-adviseur die ook echt dingen doet. De logica zit
    in kern/boerderij.js; hier alleen de endpoints + rechten + realtime. */
 module.exports = (kern) => {
-  const { app, boerderij, broadcastSync, db, logActivity, managerOnly, save, salonNaarVolgers, sseToOffice, sseToSupplier, supplierAuth } = kern;
+  const { app, boerderij, broadcastSync, db, logActivity, managerOnly, save, salonNaarVolgers, sseToOffice, sseToSupplier, supplierAuth , salon} = kern;
 
   function isBoer(s, res) {
     if (!boerderij.isBoer(s)) { res.status(409).json({ error: 'Dit is geen boerderij.' }); return false; }
@@ -135,7 +135,7 @@ module.exports = (kern) => {
     };
     if (!Array.isArray(db.data.posts)) db.data.posts = [];
     db.data.posts.unshift(post);
-    db.data.posts = db.data.posts.slice(0, 60);
+    salon.kap();   // het venster: een grens, op een plek (kern/salon)
     boerderij.markeerInSalon(s, p.id);
     save();
     logActivity(s.code, req.actor, 'zette "' + p.naam + '" te koop in de Salon');

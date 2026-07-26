@@ -2581,9 +2581,14 @@ require('./kern/rahul').zetGeslachtBron((key) => {
     lft = nu2.getFullYear() - g.getFullYear();
     if (nu2 < new Date(nu2.getFullYear(), g.getMonth(), g.getDate())) lft -= 1;
   }
-  if (lft != null && lft < 18) return { soort: 'kind' };
+  /* De levensfase (kern/rahul-fases.js) bepaalt in welke ROL Rahul staat:
+     kind, scholier, student, volwassen of senior. De leeftijd geeft de
+     standaard, het lid mag hem bijstellen, en faseVoor() bewaakt dat een
+     minderjarige alleen tussen kind en scholier kan kiezen. */
+  const fase = require('./kern/rahul-fases').faseVoor(lft, md.fase);
   return {
-    soort: 'volwassen',
+    fase,
+    soort: (fase === 'kind' || fase === 'scholier') ? 'kind' : 'volwassen',
     omgang: md.omgang || 'maatje',
     voornaamwoord: md.voornaamwoord || '',
     aanhef: md.aanhef || '',

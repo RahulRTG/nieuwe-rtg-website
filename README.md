@@ -330,7 +330,7 @@ is slechter af dan wie het weet.
 
 ## Rahul als mens: geen AI-taal, een echte bui, iedereen welkom
 
-Drie lagen die samen bepalen hoe Rahul klinkt.
+Vijf lagen die samen bepalen hoe Rahul klinkt.
 
 **Geen AI-taal** (`server/kern/rahul/taal.js`). Regels in de prompt, PLUS een
 schrobber over elk antwoord dat de deur uitgaat, inclusief de vaste
@@ -360,6 +360,42 @@ naast. Nu kiest het lid zelf in `/apps/ik.html`: **maatje** (standaard),
 kiest en alleen vanaf 18), **zakelijk** of **rustig**. Voornaamwoorden en
 aanspreekvorm zijn vrije velden, want geen enkele keuzelijst dekt iedereen.
 De welkomstregel staat in elke stand, ook in het kind-hart.
+
+**Vijf levensfases** (`server/kern/rahul-fases.js`). Dezelfde persoon, een
+andere rol. Bij een **kind** is Rahul een grote broer: lief, geduldig,
+beschermend, en bereid om over koetjes en kalfjes te praten. Bij een
+**scholier** is hij los en beschermend tegelijk -- je moet experimenteren om te
+ontdekken wat je wilt, naar jezelf luisteren is altijd het juiste antwoord
+(meestal met je hart, soms met je hoofd), en omdat deze leeftijd wankel kan
+zijn duwt hij op een chille manier de goede kant op en helpt hij met school,
+bijbaan, sport en geld. Bij een **student** gaat het over de studie, rondkomen,
+balans, volwassen worden en dingen meemaken -- en over er in een volle week een
+moment alleen tussen zetten. Bij een **volwassene** over werk, boodschappen,
+verjaardagen, kinderen, sparen, koken en af en toe quality time. Bij een
+**opa of oma** is hij vooral behulpzaam, lief en een luisterend oor, met alle
+tijd en gewone woorden.
+
+De leeftijd uit het paspoort geeft de standaard, het lid stelt hem zelf bij in
+`/apps/ik.html` (een student van 34 bestaat). **De grens: een minderjarige kan
+alleen kind of scholier kiezen** -- anders zou iemand van veertien zichzelf tot
+volwassene kunnen verklaren en daarmee verschuiven wat Rahul bespreekbaar
+vindt. De plagerige stand staat bij een minderjarige niet in de lijst en wordt
+ook niet opgeslagen, zodat hij niet vanzelf aangaat op de dag dat iemand
+achttien wordt.
+
+**Bij twijfel doet hij niets** (`server/kern/rahul/twijfel.js`). Twijfelt Rahul
+over wat er gevraagd wordt, over een tijd, een bedrag, een plek of over voor
+wie iets is, dan voert hij niets uit maar stelt hij een vraag, en nog een, tot
+hij het honderd procent begrijpt. Haast is geen uitzondering; dan vraagt hij
+korter, maar hij vraagt.
+
+Dat staat er twee keer, want een regel in een prompt is een verzoek: juist bij
+twijfel "helpt" een model liever dan dat het iets vraagt. Naast de regels in de
+system prompt heeft de tool `doe` in de AI-lus (`server/kern/stuur/lus.js`) twee
+**verplichte** velden -- `zeker: true` en `begrepen`, een zin over wat er
+precies gaat gebeuren en voor wie. Zonder allebei wordt de actie niet
+uitgevoerd en krijgt het model terug dat het eerst moet vragen. Kun je niet
+opschrijven wat je gaat doen, dan weet je het niet zeker genoeg.
 
 ### Geloof: zelf uitgerekend, nooit geraden
 

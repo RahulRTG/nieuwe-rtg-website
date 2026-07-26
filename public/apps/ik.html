@@ -48,6 +48,11 @@
     paspoort. Wat u hier zet, blijft in huis en gaat nergens heen.
   </div>
 
+  <section aria-label="Waar staat u in het leven">
+    <h2>Waar staat u in het leven</h2>
+    <div class="kaart" id="fase"><p class="stil">Laden...</p></div>
+  </section>
+
   <section aria-label="Hoe Rahul tegen u doet">
     <h2>Hoe Rahul tegen u doet</h2>
     <div class="kaart" id="omgang"><p class="stil">Laden...</p></div>
@@ -88,6 +93,24 @@
     gewoon: 'Gewoon zichzelf', blij: 'Uitgelaten', chagrijnig: 'Chagrijnig', moe: 'Moe',
     wervelend: 'Stuiterend', kort: 'Geirriteerd', ondeugend: 'Ondeugend', dromerig: 'Dromerig'
   };
+
+  /* De levensfase bepaalt in welke ROL Rahul staat. De leeftijd geeft de
+     standaard; wie zich ergens anders thuis voelt, past hem aan. Onder de
+     achttien staan alleen de jeugdfases in de lijst (de server bewaakt dat
+     ook, dus dit is de nette weergave en niet de grens zelf). */
+  function tekenFase(d) {
+    $('#fase').innerHTML =
+      '<p class="stil">Hier kiest u de rol waarin Rahul staat. Uw leeftijd geeft de standaard; ' +
+      'voelt een andere fase beter, dan zet u hem gewoon om.' +
+      (d.leeftijdBekend ? '' : ' Uw geboortedatum staat nog niet in uw paspoort. Zolang die ontbreekt ' +
+        'houden we het bij de voorzichtige kant; vult u hem aan, dan staan de andere fases er ook.') + '</p>' +
+      d.faseKeuzes.map(k => '<button class="keus" data-fase="' + k.id + '" aria-pressed="' + (k.id === d.fase) + '">' +
+        '<b>' + Veilig.esc(k.naam) + '</b><span>' + Veilig.esc(k.uitleg) + '</span></button>').join('');
+    $('#fase').querySelectorAll('[data-fase]').forEach(b => b.addEventListener('click', async () => {
+      try { teken(await Veilig.api('/api/ik/zet', { fase: b.dataset.fase })); Veilig.melding('Genoteerd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
 
   function tekenOmgang(d) {
     $('#omgang').innerHTML = d.keuzes.omgang.map(k =>
@@ -186,7 +209,7 @@
     } catch (e) { host.innerHTML = '<p class="stil">' + Veilig.esc(e.message) + '</p>'; }
   }
 
-  function teken(d) { tekenOmgang(d); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
+  function teken(d) { tekenFase(d); tekenOmgang(d); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
 
   async function laad() {
     try { teken(await Veilig.api('/api/ik')); vandaag(); }

@@ -81,13 +81,16 @@ function rahulExtra() {
   return delen.length ? delen.join(' ') + ' ' : '';
 }
 
-/* De omgangsvormen (vrouw-/man-vorm, het kind-hart of neutraal) staan apart, in
-   ./rahul-omgang.js -- pure tekst, alleen in de persoonlijke ledenomgeving. */
+/* De omgangsvormen (de welkomstregel, de levensfase en de toon die het lid zelf
+   koos) staan apart, in ./rahul-omgang.js -- pure tekst, alleen in de
+   persoonlijke ledenomgeving. */
 const rahulOmgang = require('./rahul-omgang');
 
-/* Het geslacht per sessiesleutel komt uit de accountlaag; server.js registreert
-   de bron (net als de boardroom-bron hierboven). Zonder bron of bij een
-   onbekend/RTF-/persona-lid geeft de bron null en blijft Rahul neutraal. */
+/* Het profiel per sessiesleutel komt uit de accountlaag; server.js registreert
+   de bron (net als de boardroom-bron hierboven). De bron heet nog "geslacht"
+   omdat dit vroeger op geslacht liep; hij geeft nu { fase, omgang, volwassen,
+   voornaamwoord, aanhef }. Zonder bron, bij een RTF-/persona-lid of bij een
+   kapotte bron komt er null en blijft het bij de welkomstregel. */
 let geslachtBron = null;
 const zetGeslachtBron = (fn) => { geslachtBron = fn; };
 function rahulOmgangVoor(key) {

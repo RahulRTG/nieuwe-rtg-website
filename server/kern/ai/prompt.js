@@ -5,6 +5,7 @@
    ./karakter; hier wordt het aangevuld met het register en de dagcontext. */
 const RAHUL_KARAKTER = require('./karakter');
 const { TAALREGELS } = require('../rahul/taal');
+const { TWIJFELREGELS } = require('../rahul/twijfel');
 module.exports = (ctx) => {
   const { db, PERSONAS, AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel } = ctx;
   function aiSystemPrompt(tier, lang, key) {
@@ -33,6 +34,9 @@ module.exports = (ctx) => {
       // Geen AI-taal (kern/rahul/taal.js): de regels hier, en een schrobber
       // over de uitvoer, want een prompt is een verzoek en geen garantie.
       ...TAALREGELS,
+      // Bij twijfel doet hij niets en vraagt hij door (kern/rahul/twijfel.js).
+      // Staat ook als harde poort in de doe-lus; hier voor het gewone gesprek.
+      ...TWIJFELREGELS,
       // De bui van vandaag. Raakt alleen de toon; valt weg bij een kind, op de
       // werkvloer en zodra het ergens over gaat (kern/rahul/stemming.js).
       ...(stemmingVoor ? [stemmingVoor({ kind: false, werk: false })].filter(Boolean) : []),

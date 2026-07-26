@@ -11,7 +11,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const taal = require('../server/kern/rahul/taal');
+const twijfel = require('../server/kern/rahul/twijfel');
+const lus = require('../server/kern/stuur/lus');
 const rahulOmgang = require('../server/kern/rahul-omgang');
+const fases = require('../server/kern/rahul-fases');
 const tijden = require('../server/kern/geloof/tijden');
 const feesten = require('../server/kern/geloof/feesten');
 const K = require('../server/kern/geloof/kalenders');
@@ -131,6 +134,160 @@ test('omgang: iedereen welkom, niemand ingedeeld', async (t) => {
     assert.match(t2, /die\/diens/);
     assert.match(t2, /Sam/);
   });
+});
+
+/* ---------------- de vijf levensfases ---------------- */
+test('levensfases: dezelfde Rahul, een andere rol', async (t) => {
+  await t.test('elke fase levert zijn eigen tekst op, en die is te herkennen', () => {
+    const uit = {};
+    for (const fase of Object.keys(fases.FASES)) {
+      uit[fase] = rahulOmgang({ fase, volwassen: true });
+      assert.match(uit[fase], /ga je nergens vanuit/i, 'welkomstregel ontbreekt bij ' + fase);
+    }
+    assert.match(uit.kind, /grote broer/i);
+    assert.match(uit.kind, /koetjes en kalfjes/i);
+    assert.match(uit.scholier, /experimenteren/i);
+    assert.match(uit.scholier, /naar jezelf luisteren/i);
+    assert.match(uit.student, /balans/i);
+    assert.match(uit.student, /rondkomen/i);
+    assert.match(uit.volwassen, /quality time/i);
+    assert.match(uit.volwassen, /sparen/i);
+    assert.match(uit.senior, /luisterend oor/i);
+    // en geen twee fases zijn hetzelfde
+    const teksten = Object.values(uit);
+    assert.equal(new Set(teksten).size, teksten.length, 'twee fases leveren dezelfde tekst');
+  });
+
+  await t.test('de leeftijd bepaalt de standaardfase, onbekend blijft onbekend', () => {
+    assert.equal(fases.faseUitLeeftijd(7), 'kind');
+    assert.equal(fases.faseUitLeeftijd(11), 'kind');
+    assert.equal(fases.faseUitLeeftijd(12), 'scholier');
+    assert.equal(fases.faseUitLeeftijd(17), 'scholier');
+    assert.equal(fases.faseUitLeeftijd(18), 'student');
+    assert.equal(fases.faseUitLeeftijd(25), 'student');
+    assert.equal(fases.faseUitLeeftijd(26), 'volwassen');
+    assert.equal(fases.faseUitLeeftijd(66), 'volwassen');
+    assert.equal(fases.faseUitLeeftijd(67), 'senior');
+    assert.equal(fases.faseUitLeeftijd(null), null, 'geen leeftijd is geen aanname');
+  });
+
+  await t.test('het lid mag bijstellen: een student van 34 bestaat', () => {
+    assert.equal(fases.faseVoor(34, 'student'), 'student');
+    assert.equal(fases.faseVoor(70, 'volwassen'), 'volwassen', 'zeventig en nog midden in het leven');
+    assert.equal(fases.faseVoor(30, null), 'volwassen', 'geen keuze: gewoon de leeftijd');
+    assert.equal(fases.faseVoor(30, 'bestaatniet'), 'volwassen', 'onzin valt terug op de leeftijd');
+  });
+
+  await t.test('DE GRENS: een minderjarige kan zichzelf niet volwassen verklaren', () => {
+    for (const keuze of ['student', 'volwassen', 'senior']) {
+      assert.equal(fases.faseVoor(14, keuze), 'scholier', 'veertien koos ' + keuze);
+      assert.equal(fases.faseVoor(8, keuze), 'kind', 'acht koos ' + keuze);
+      // leeftijd onbekend is net zo goed geen toestemming
+      assert.equal(fases.faseVoor(null, keuze), null, 'onbekende leeftijd koos ' + keuze);
+    }
+    // binnen de jeugd mag het wel: een kind van elf dat zich scholier voelt
+    assert.equal(fases.faseVoor(11, 'scholier'), 'scholier');
+    assert.equal(fases.faseVoor(13, 'kind'), 'kind');
+  });
+
+  await t.test('DE GRENS: de jeugdfases krijgen NOOIT de plagerige toon', () => {
+    for (const fase of ['kind', 'scholier']) {
+      const tekst = rahulOmgang({ fase, omgang: 'plagerig', volwassen: true });
+      assert.doesNotMatch(tekst, /stille crush/i, fase + ' kreeg de plagerige tekst');
+      assert.match(tekst, /volledig uitgesloten/i, fase + ' mist de uitsluiting');
+      // ook de andere volwassen stijlen horen er niet bij te komen
+      assert.doesNotMatch(rahulOmgang({ fase, omgang: 'zakelijk' }), /geen gezelligheid vooraf/i);
+    }
+  });
+});
+
+/* ---------------- bij twijfel niets ---------------- */
+test('bij twijfel doet Rahul niets', async (t) => {
+  await t.test('de regel staat in de prompt, niet alleen in de code', () => {
+    const alles = twijfel.TWIJFELREGELS.join(' ');
+    assert.match(alles, /BIJ TWIJFEL DOE JE NIETS/);
+    assert.match(alles, /honderd procent/i);
+    assert.match(alles, /haast/i, 'haast is uitdrukkelijk geen uitzondering');
+  });
+
+  await t.test('zonder zeker=true wordt er niets uitgevoerd', () => {
+    for (const invoer of [undefined, {}, { zeker: false }, { zeker: 'ja' }, { begrepen: 'taxi om 19:00 voor Sam' }]) {
+      const r = twijfel.magDoen(invoer);
+      assert.equal(r.ok, false, 'kwam door de poort: ' + JSON.stringify(invoer));
+      assert.equal(r.gedaan, false);
+      assert.equal(r.vraagEerst, true);
+      assert.match(r.uitleg, /Niet uitgevoerd/);
+    }
+  });
+
+  await t.test('zeker=true alleen is niet genoeg; het moet op te schrijven zijn', () => {
+    assert.equal(twijfel.magDoen({ zeker: true }).ok, false);
+    assert.equal(twijfel.magDoen({ zeker: true, begrepen: '   ' }).ok, false);
+    assert.equal(twijfel.magDoen({ zeker: true, begrepen: 'ok' }).ok, false, 'te kort telt niet als begrepen');
+    assert.equal(twijfel.magDoen({ zeker: true, begrepen: 'ok' }).vraagEerst, true);
+  });
+
+  await t.test('met zeker EN een zin over wat je gaat doen, mag het wel', () => {
+    const r = twijfel.magDoen({ zeker: true, begrepen: 'taxi om 19:00 voor Sam naar Schiphol' });
+    assert.equal(r.ok, true);
+    assert.equal(r.vraagEerst, undefined);
+  });
+
+  await t.test('de doe-tool eist de poortvelden ook echt op', () => {
+    // anders is de poort een suggestie in plaats van een voorwaarde
+    const doe = lus.TOOLS.find(x => x.name === 'doe');
+    assert.ok(doe, 'de tool "doe" bestaat niet meer');
+    for (const veld of ['pad', 'zeker', 'begrepen']) {
+      assert.ok(doe.input_schema.required.includes(veld), 'niet verplicht: ' + veld);
+      assert.ok(doe.input_schema.properties[veld], 'niet beschreven: ' + veld);
+    }
+  });
+});
+
+/* ---------------- de fase door de hele keten ---------------- */
+/* De enige toets hier met een echte server: de grens moet ook overeind blijven
+   als hij via HTTP wordt geprobeerd, en niet alleen in de functie. */
+test('/api/ik houdt de grens vast', async (t) => {
+  const { startServer, stop } = require('./helper.js');
+  const srv = await startServer();
+  const api = async (pad, body, token) => {
+    const r = await fetch(srv.base + pad, { method: 'POST',
+      headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Bearer ' + token } : {}) },
+      body: JSON.stringify(body || {}) });
+    return { status: r.status, body: await r.json().catch(() => ({})) };
+  };
+  const maakLid = async (naam, geboren) => {
+    const u = Date.now() + Math.floor(Math.random() * 1e6);
+    const reg = await api('/api/auth/register', { name: naam, email: 'fase' + u + '@x.nl',
+      phone: '06' + String(u).slice(-8), password: 'geheim123', geboortedatum: geboren, tier: 'rtg', pasApp: 'rtg' });
+    assert.ok(reg.body.token, 'registratie mislukt: ' + JSON.stringify(reg.body).slice(0, 200));
+    return reg.body.token;
+  };
+
+  try {
+    await t.test('een volwassene krijgt de vier volwassen fases en mag plagerig', async () => {
+      const t1 = await maakLid('Fase Volwassen', '1988-05-05');
+      const d = (await api('/api/ik', {}, t1)).body;
+      assert.equal(d.fase, 'volwassen');
+      assert.deepEqual(d.faseKeuzes.map(k => k.id), ['student', 'volwassen', 'senior', 'scholier']);
+      assert.ok(d.keuzes.omgang.some(k => k.id === 'plagerig'));
+      const na = (await api('/api/ik/zet', { fase: 'senior', omgang: 'plagerig' }, t1)).body;
+      assert.equal(na.fase, 'senior');
+      assert.equal(na.omgang, 'plagerig');
+    });
+
+    await t.test('DE GRENS: een scholier komt er via de API niet doorheen', async () => {
+      const t2 = await maakLid('Fase Scholier', '2011-03-03');
+      const d = (await api('/api/ik', {}, t2)).body;
+      assert.equal(d.fase, 'scholier');
+      assert.deepEqual(d.faseKeuzes.map(k => k.id), ['kind', 'scholier']);
+      assert.ok(!d.keuzes.omgang.some(k => k.id === 'plagerig'), 'plagerig hoort hier niet in de lijst');
+      // en zetten lukt ook niet, ook niet als je de knop overslaat
+      const na = (await api('/api/ik/zet', { fase: 'volwassen', omgang: 'plagerig' }, t2)).body;
+      assert.equal(na.fase, 'scholier', 'een minderjarige verklaarde zichzelf volwassen');
+      assert.equal(na.omgang, 'maatje', 'de plagerige stand werd toch bewaard');
+    });
+  } finally { stop(srv && srv.child); }
 });
 
 /* ---------------- geloof: rekenwerk ---------------- */

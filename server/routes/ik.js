@@ -14,18 +14,47 @@ module.exports = (kern) => {
   const uid = (req) => (req.session && req.session.account) ? req.session.account.id : null;
   const uit = (res, r) => res.status(r.status || 200).json(r.error ? { error: r.error } : r);
   const OMGANG = ['maatje', 'plagerig', 'zakelijk', 'rustig'];
+  const fases = require('../kern/rahul-fases');
+  // de leeftijd uit het profiel; bepaalt welke fases gekozen mogen worden
+  function leeftijdVan(md) {
+    if (!md || !md.geboren) return null;
+    const g = new Date(md.geboren), nu = new Date();
+    let l = nu.getFullYear() - g.getFullYear();
+    if (nu < new Date(nu.getFullYear(), g.getMonth(), g.getDate())) l -= 1;
+    return l;
+  }
+  const FASE_NAMEN = {
+    kind: ['Kind', 'Rahul is je grote broer: lief, geduldig en beschermend.'],
+    scholier: ['Middelbare school', 'Los en beschermend; ruimte om te experimenteren, plus rust en planning.'],
+    student: ['Student of net begonnen', 'Studie, rondkomen, balans, en ruimte om dingen mee te maken.'],
+    volwassen: ['Midden in het leven', 'Werk, huishouden, gezin, sparen, en af en toe quality time.'],
+    senior: ['Opa of oma', 'Alle tijd, gewone woorden, en een luisterend oor.']
+  };
 
   function beeld(id) {
     const md = (id != null && accounts.getMemberState(id)) || {};
+    const lft = leeftijdVan(md);
+    const jong = lft == null || lft < 18;
+    const mag = jong ? fases.JEUGD_FASES : fases.VOLWASSEN_FASES;
+    const fase = fases.faseVoor(lft, md.fase);
     return {
+      fase,
+      faseKeuzes: mag.map(f => ({ id: f, naam: FASE_NAMEN[f][0], uitleg: FASE_NAMEN[f][1] })),
+      // staat de geboortedatum niet in het paspoort, dan zeggen we waarom de
+      // lijst kort is; anders lijkt het een fout in plaats van een grens
+      leeftijdBekend: lft != null,
       omgang: OMGANG.includes(md.omgang) ? md.omgang : 'maatje',
       voornaamwoord: md.voornaamwoord || '',
       aanhef: md.aanhef || '',
       geloof: geloof.profielVan(id),
       keuzes: {
+        /* De plagerige stand staat er alleen als hij ook echt kan. Bij een
+           jeugdfase negeert kern/rahul-omgang.js hem toch, en een knop die
+           niets doet is erger dan geen knop. */
         omgang: [
           { id: 'maatje', naam: 'Maatje', uitleg: 'Warm, loyaal, recht voor zijn raap. De standaard.' },
-          { id: 'plagerig', naam: 'Plagerig', uitleg: 'Brutaal, gevat, licht rebels. Alleen als u dat zelf wilt, en alleen vanaf 18 jaar.' },
+          ...(fases.isJeugd(fase) || jong ? [] : [
+            { id: 'plagerig', naam: 'Plagerig', uitleg: 'Brutaal, gevat, licht rebels. Alleen als u dat zelf wilt, en alleen vanaf 18 jaar.' }]),
           { id: 'zakelijk', naam: 'Zakelijk', uitleg: 'Antwoord, klaar. Geen gezelligheid vooraf.' },
           { id: 'rustig', naam: 'Rustig', uitleg: 'Kalm tempo, weinig prikkels, geen aandrang.' }
         ],
@@ -45,7 +74,24 @@ module.exports = (kern) => {
     const id = uid(req);
     if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
     const md = accounts.getMemberState(id) || {};
-    if ('omgang' in req.body) md.omgang = OMGANG.includes(req.body.omgang) ? req.body.omgang : 'maatje';
+    /* De fase mag het lid zelf zetten, maar faseVoor() bewaakt de grens: een
+       minderjarige kan alleen kind of scholier kiezen. Anders zou iemand van
+       veertien zichzelf tot volwassene kunnen verklaren, en daarmee ook
+       verschuiven wat Rahul bespreekbaar vindt. */
+    if ('fase' in req.body) {
+      const gekozen = fases.faseVoor(leeftijdVan(md), req.body.fase);
+      if (gekozen) md.fase = gekozen;
+    }
+    /* De plagerige stand wordt bij een minderjarige niet eens OPGESLAGEN.
+       Hij zou toch genegeerd worden (kern/rahul-omgang.js kijkt naar de
+       leeftijd), maar dan staat hij er wel, en op de dag dat iemand achttien
+       wordt zou de toon vanzelf omslaan zonder dat die persoon daar als
+       volwassene voor koos. Dus: hier al weigeren. */
+    if ('omgang' in req.body) {
+      const gevraagd = OMGANG.includes(req.body.omgang) ? req.body.omgang : 'maatje';
+      const lft = leeftijdVan(md);
+      md.omgang = (gevraagd === 'plagerig' && (lft == null || lft < 18)) ? 'maatje' : gevraagd;
+    }
     // Vrij tekstveld, met opzet: er bestaat geen lijst met alle juiste
     // voornaamwoorden, en een keuzelijst sluit altijd iemand uit.
     if ('voornaamwoord' in req.body) md.voornaamwoord = schoon(req.body.voornaamwoord, 40);

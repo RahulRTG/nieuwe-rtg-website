@@ -17,8 +17,11 @@
        als gok, nooit bij kinderen, nooit als eerste zet;
      - `zakelijk` en `rustig`, want niet iedereen zoekt een maatje.
 
-   Leeftijd bepaalt nog wel iets (het kind-hart); geslacht niet meer.
-   Pure tekst, geen context. Bewaakt door test/omgang.test.js. */
+   Leeftijd bepaalt nog wel iets (de levensfase in ./rahul-fases.js); geslacht
+   niet meer. Pure tekst, geen context. Bewaakt door test/rahul-omgang.test.js
+   (de bedrading) en test/rahul-mens.test.js (de inhoud en de grenzen). */
+
+const { FASES, isJeugd } = require('./rahul-fases');
 
 // Geldt voor IEDEREEN, ongeacht keuze. Dit is de kern van "iedereen is
 // welkom", en daarom staat het bovenaan en niet als uitzondering onderaan.
@@ -34,17 +37,6 @@ const IEDEREEN =
   'vanzelfsprekend welkom, en niemand hoeft zich hier te verantwoorden. Grappen ten koste van wie ' +
   'iemand is maak je nooit, en maakt een ander die in jouw bijzijn, dan laat je dat niet passeren: ' +
   'rustig, kort, zonder preek. ';
-
-const KIND =
-  'Degene met wie je praat is een kind of tiener. Voor een kind ben jij vooral een ENORM luisterend oor: ' +
-  'je luistert eerst echt, vraagt zacht door en neemt elk gevoel serieus, hoe klein het ook lijkt. ' +
-  'Je bent behulpzaam en je helpt het kind zich verder te ontwikkelen: je laat het zelf ontdekken en zelf de laatste stap zetten, ' +
-  'en lukt iets niet meteen, dan help je doorzetten ("nog een keer, ik weet dat je het kunt") in plaats van het over te nemen. ' +
-  'Bij verdriet, een gemiste kans of ruzie troost je eerst warm, en pas daarna kijk je samen wat helpt. ' +
-  'En je zorgt dat het kind gezond leeft met heel veel plezier: buiten spelen, bewegen, gezond eten, goed slapen en lekker lachen -- ' +
-  'altijd luchtig en aanmoedigend, nooit streng of belerend. Flirten en volwassen onderwerpen zijn hier vanzelfsprekend volledig uitgesloten. ' +
-  'Vertelt een kind iets over zichzelf, over verliefdheid of over twijfel over wie het is, dan doe je daar nooit moeilijk over ' +
-  'en ook nooit lacherig: je luistert, je zegt dat het goed is zoals het is, en zo nodig wijs je naar een grote die kan helpen. ';
 
 const STIJLEN = {
   maatje:
@@ -66,15 +58,24 @@ const STIJLEN = {
     'vragen, geen aandrang. Je laat stiltes bestaan en je duwt nergens toe. '
 };
 
-/* profiel: { soort:'kind'|'volwassen', omgang, voornaamwoord, aanhef, volwassen }
+/* profiel: { fase, soort, omgang, voornaamwoord, aanhef, volwassen }
+   `fase` is een van de vijf levensfases (kern/rahul-fases.js): kind, scholier,
+   student, volwassen, senior. Die bepaalt in welke ROL Rahul staat; `omgang`
+   bepaalt daarnaast de toon, maar alleen bij volwassenen.
+
    Een losse string blijft werken (oude aanroepen met alleen het geslacht):
-   'kind' geeft het kind-hart, al het andere de neutrale maatje-toon. Dat het
+   'kind' geeft de kindfase, al het andere de neutrale maatje-toon. Dat het
    geslacht daar geen verschil meer maakt, is precies de bedoeling. */
 module.exports = function rahulOmgang(profiel) {
   const p = (typeof profiel === 'string' || profiel == null)
     ? { soort: String(profiel || '').toLowerCase() === 'kind' ? 'kind' : 'volwassen' }
     : profiel;
-  if (p.soort === 'kind') return IEDEREEN + KIND;
+  const fase = FASES[p.fase] ? p.fase : (p.soort === 'kind' ? 'kind' : null);
+
+  /* Bij de jeugd stopt het hier: de rol van die fase, en verder geen
+     omgangskeuze. Een kind of scholier kiest geen "plagerige" Rahul, en de
+     stijlen hieronder zijn geschreven voor volwassen verhoudingen. */
+  if (isJeugd(fase)) return IEDEREEN + FASES[fase];
 
   /* De plagerige stand alleen voor volwassenen. Staat de leeftijd niet vast,
      dan is het antwoord nee: bij twijfel de veilige kant.
@@ -86,7 +87,8 @@ module.exports = function rahulOmgang(profiel) {
   const mag = p.omgang === 'plagerig' && p.volwassen === true;
   const stijl = mag ? STIJLEN.plagerig
     : (p.omgang && p.omgang !== 'plagerig' && STIJLEN[p.omgang]) || STIJLEN.maatje;
-  let uit = IEDEREEN + stijl;
+  // eerst de rol (welke levensfase), dan de toon (hoe het lid Rahul wil)
+  let uit = IEDEREEN + (fase && FASES[fase] ? FASES[fase] : '') + stijl;
 
   if (p.voornaamwoord) uit += 'Deze persoon gebruikt de voornaamwoorden ' + String(p.voornaamwoord).slice(0, 40) +
     '. Gebruik die consequent, ook als je over deze persoon praat. ';
@@ -96,3 +98,4 @@ module.exports = function rahulOmgang(profiel) {
 
 module.exports.IEDEREEN = IEDEREEN;
 module.exports.STIJLEN = Object.keys(STIJLEN);
+module.exports.FASES = Object.keys(FASES);

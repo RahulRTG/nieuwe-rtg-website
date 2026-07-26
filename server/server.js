@@ -1097,6 +1097,11 @@ lidDeps.zijnVrienden = zijnVrienden;
    codenaamVan uit de sociale kern nodig heeft. */
 Object.assign(agenda, require('./kern/agenda-pro').maakAgendaPro({
   db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
+/* Notities & Taken (kern/notities.js): het bord met notities en lijstjes.
+   Krijgt de agenda mee, want een notitie met datum en tijd wordt een
+   gekoppelde afspraak -- een wekkerlaag, niet drie. */
+const notities = require('./kern/notities').maakNotities({
+  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda);
 function geenGast(req, res) {
   // vrienden toevoegen, chatten en bellen kan met elk echt account, ook de
   // gratis laag (met paspoort). Alleen een anonieme demo-gast zonder account niet.
@@ -1969,7 +1974,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, facturatie, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, facturatie, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
@@ -2727,6 +2732,7 @@ require('./routes/aanmeldgesprek')(kern);
 require('./routes/algpin')(kern);
 require('./routes/sleutelwoorden')(kern);
 require('./routes/agenda')(kern);
+require('./routes/notities')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);

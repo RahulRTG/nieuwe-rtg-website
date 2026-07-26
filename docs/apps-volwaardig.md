@@ -1200,3 +1200,33 @@ Server: kern/agenda-pro.js + agenda-ics.js als laag óver kern/agenda.js
 (Object.assign in server.js; de bestaande /verwijder-route krijgt daarmee
 vanzelf de kopie-opruiming). Client: apps/agenda/ (kalender, paneel,
 app). Tests: agenda-pro.test.js (5) en agenda.e2e.js door het echte scherm.
+
+## RTG Notities & Taken: het bord dat elke dag opengaat
+
+De kleinste app van de reeks, en juist daarom de strengste oefening in
+weglaten: een bord met notities en lijstjes, en verder niets dat afleidt.
+
+**Het bord.** Notities en lijsten door elkaar, vastgepind bovenaan, zoeken
+over alles heen. Vinkjes werken op de kaart zelf -- afvinken hoort geen
+editor nodig te hebben. Een lijst bouw je met Enter, punt voor punt.
+
+**Het archief is de la, niet de prullenbak.** Archiveren haalt niets weg;
+de inhoud blijft compleet en komt met één knop terug op het bord. Niets
+verdwijnt stiekem -- dat is huisbeleid, en de test controleert het.
+
+**Delen op codenaam is samen werken.** Wie een lijst gedeeld krijgt, vinkt
+af en vult aan; beide kanten zien hetzelfde exemplaar. Maar het bord
+blijft van de eigenaar: vastpinnen, archiveren en verder delen kan alleen
+die. Een gedeelde die eruit stapt haalt alleen zichzelf eraf; de lijst
+blijft gewoon bestaan. Echte namen komen nergens in het verkeer voor.
+
+**Eén wekkerlaag, niet drie.** Een notitie met datum en tijd wordt een
+GEKOPPELDE afspraak in RTG Agenda (herinner: 0 -- het seintje komt van de
+agenda-laag, niet van een tweede timer hier). Verzetten is verzetten, geen
+verdubbelen: dezelfde afspraak schuift mee. De notitie weggooien neemt de
+afspraak mee; er blijft geen wees-afspraak achter.
+
+Server: kern/notities.js (maakNotities, met de agenda als tweede argument
+voor de koppeling) + routes/notities.js. Client: apps/notities.html +
+apps/notities/app.js. Tests: notities.test.js (3) en notities.e2e.js met
+twee leden door het echte scherm.

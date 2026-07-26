@@ -47,6 +47,7 @@ const PAGINAS = [
   '/apps/berichten.html',
   '/apps/salon.html',
   '/apps/metier.html',
+  '/apps/genootschap.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

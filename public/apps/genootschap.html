@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Genootschap · RTG</title>
+<link rel="icon" href="/icons/pas-rtg.svg">
+<link rel="manifest" href="/manifests/genootschap.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Genootschap">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:6rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  input,textarea,select,button{font:inherit;}
+  input,textarea,select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:.85rem;padding:.5rem .7rem;width:100%;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.45rem .9rem;border-radius:0 0 10px 10px;text-decoration:none;font-size:.8rem;}
+  .skip:focus{top:0;}
+  label{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin:.7rem 0 .25rem;}
+  .tabs{display:flex;gap:.4rem;margin-top:.7rem;overflow-x:auto;}
+  .tabs button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .85rem;font-size:.78rem;white-space:nowrap;cursor:pointer;}
+  .tabs button[aria-pressed="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  main{padding:1.1rem;max-width:660px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin-bottom:.8rem;}
+  .kaart h2{font-size:1rem;margin-bottom:.4rem;}
+  .knoppen{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem;}
+  .knop{background:var(--burgundy);border:1px solid var(--burgundy);color:#fff;border-radius:999px;padding:.4rem 1rem;font-size:.8rem;cursor:pointer;}
+  .knop.stil{background:none;border-color:var(--line);color:var(--muted);}
+  .mini{background:none;border:none;color:var(--gold);font-size:.75rem;cursor:pointer;padding:0;text-decoration:underline;}
+  .rij{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 0;border-bottom:1px solid var(--line);}
+  .rij:last-child{border-bottom:0;}
+  .rij .tx{flex:1;min-width:0;}
+  .rij b{font-weight:600;font-size:.9rem;}
+  .rij small{display:block;color:var(--soft);font-size:.75rem;margin-top:.1rem;line-height:1.45;}
+  .merk{display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);color:var(--soft);border-radius:999px;padding:.05rem .45rem;margin-left:.35rem;}
+  .merk.op{border-color:var(--gold);color:var(--gold);}
+  .staaf{height:6px;border-radius:999px;background:var(--card2);overflow:hidden;margin-top:.25rem;}
+  .staaf i{display:block;height:100%;background:var(--burgundy);}
+  .leeg{color:var(--soft);font-size:.85rem;padding:.6rem 0;}
+  .uit{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;font-size:.85rem;line-height:1.5;white-space:pre-wrap;}
+  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,rgba(12,12,11,.7));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
+  .aibalk form{display:flex;gap:.5rem;max-width:660px;margin:0 auto;}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Naar de inhoud</a>
+<header>
+  <div class="ey">Van RTG</div>
+  <h1>Genootschap</h1>
+  <div class="tabs" id="tabs" role="group" aria-label="Onderdelen"></div>
+</header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="aibalk" id="aibalk" hidden>
+  <div class="uit" id="aiuit" hidden aria-live="polite"></div>
+  <form id="aiform">
+    <input id="aiin" placeholder="Zeg wat er moet gebeuren" aria-label="Zeg Rahul wat er moet gebeuren" autocomplete="off">
+    <button class="knop" type="submit">Vraag</button>
+  </form>
+</div>
+<script src="/shared/basis.js"></script>
+<script>
+(function(){
+  var TOKEN = localStorage.getItem('rtg_member_token') || '';
+  var TAB = 'mijn', OPEN = null;
+  var TABS = [['mijn','Mijn genootschappen'],['agenda','Mijn agenda'],['zoek','Zoeken'],['nieuw','Oprichten']];
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  function $(s){ return document.querySelector(s); }
+  function api(pad, body){
+    return fetch('/api'+pad, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+TOKEN },
+      body: JSON.stringify(body||{}) }).then(function(r){ return r.json().then(function(d){ d.__status=r.status; return d; }); });
+  }
+  function toon(html){ $('#main').innerHTML = html; }
+  function melding(t){ var u=$('#aiuit'); u.hidden=false; u.textContent=t; }
+  function tekenTabs(){
+    $('#tabs').innerHTML = TABS.map(function(t){
+      return '<button type="button" data-t="'+t[0]+'" aria-pressed="'+(TAB===t[0]?'true':'false')+'">'+esc(t[1])+'</button>';
+    }).join('');
+  }
+  var SOORT = { openbaar:'Openbaar', besloten:'Besloten', geheim:'Geheim' };
+
+  function groepRij(g, knop){
+    return '<div class="rij"><div class="tx"><b>'+esc(g.naam)+'</b>'+
+      '<span class="merk'+(g.soort==='geheim'?' op':'')+'">'+esc(SOORT[g.soort]||g.soort)+'</span>'+
+      (g.mijnRol==='beheerder'?'<span class="merk op">Beheerder</span>':'')+
+      '<small>'+esc(g.over||'geen omschrijving')+' · '+g.leden+' leden</small></div>'+
+      (knop||'')+'</div>';
+  }
+
+  function tekenMijn(d){
+    var html = '';
+    if ((d.uitnodigingen||[]).length) {
+      html += '<div class="kaart"><h2>Uitnodigingen</h2>'+
+        d.uitnodigingen.map(function(g){ return groepRij(g, '<button class="mini" data-binnen="'+g.id+'">binnentreden</button>'); }).join('')+
+        '<p style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Een uitnodiging is nog geen lidmaatschap: je zegt zelf ja.</p></div>';
+    }
+    html += '<div class="kaart"><h2>Mijn genootschappen</h2>'+
+      ((d.groepen||[]).length ? d.groepen.map(function(g){ return groepRij(g, '<button class="mini" data-open="'+g.id+'">openen</button>'); }).join('')
+        : '<div class="leeg">Je zit nog nergens in. Richt er een op, of zoek een openbaar genootschap.</div>')+'</div>';
+    toon(html);
+  }
+
+  function tekenGroep(d, agenda){
+    var g = d.groep, b = d.berichten||[];
+    var html = '<div class="kaart"><h2>'+esc(g.naam)+'</h2>'+
+      '<small style="color:var(--soft);">'+esc(SOORT[g.soort]||g.soort)+' · '+g.leden+' leden'+(g.mijnRol?' · jij bent '+esc(g.mijnRol):'')+'</small>'+
+      (g.over?'<p style="margin-top:.5rem;font-size:.88rem;line-height:1.55;color:var(--muted);">'+esc(g.over)+'</p>':'')+
+      (g.regels?'<p style="margin-top:.5rem;font-size:.82rem;line-height:1.5;color:var(--soft);"><b>Huisregels:</b> '+esc(g.regels)+'</p>':'')+
+      '<div class="knoppen"><button class="knop stil" id="bterug" type="button">Terug</button>'+
+      '<button class="knop stil" id="bleden" type="button">Leden</button>'+
+      '<button class="knop stil" id="bvertrek" type="button">Vertrekken</button></div></div>';
+
+    html += '<div class="kaart"><h2>Bijeenkomsten</h2>'+
+      ((agenda.komt||[]).length ? agenda.komt.map(function(x){
+        return '<div class="rij"><div class="tx"><b>'+esc(x.wat)+'</b>'+(x.vol?'<span class="merk">Vol</span>':'')+
+          '<small>'+esc(x.datum)+(x.tijd?' om '+esc(x.tijd):'')+(x.waar?' · '+esc(x.waar):'')+
+          ' · gastheer '+esc(x.gastheer)+'<br>ja '+x.ja+' · misschien '+x.misschien+' · nee '+x.nee+
+          (x.plaatsen?' · '+x.plaatsen+' plaatsen':'')+'</small>'+
+          '<div class="knoppen">'+['ja','misschien','nee'].map(function(w){
+            return '<button class="knop'+(x.mijnAntwoord===w?'':' stil')+'" data-antw="'+x.id+'" data-w="'+w+'">'+w+'</button>';
+          }).join('')+
+          (x.vanMij?'<button class="mini" data-afgelast="'+x.id+'" style="margin-left:.4rem;">afgelasten</button>':'')+
+          '</div></div></div>';
+      }).join('') : '<div class="leeg">Nog niets gepland.</div>')+
+      '<label for="bwat">Roep een bijeenkomst uit</label><input id="bwat" maxlength="90" placeholder="Waarvoor komen jullie samen?">'+
+      '<div style="display:flex;gap:.4rem;margin-top:.4rem;"><input id="bdatum" type="date" aria-label="Datum"><input id="btijd" type="time" aria-label="Tijd"></div>'+
+      '<input id="bwaar" maxlength="120" placeholder="Waar?" style="margin-top:.4rem;">'+
+      '<input id="bplaatsen" inputmode="numeric" placeholder="Aantal plaatsen (mag leeg)" aria-label="Aantal plaatsen" style="margin-top:.4rem;">'+
+      '<div class="knoppen"><button class="knop" id="broep" type="button">Uitnodigen</button>'+
+      '<button class="knop stil" id="bdatumai" type="button">Welke dag past de meesten?</button></div>'+
+      '<div class="uit" id="udatum" hidden></div></div>';
+
+    html += '<div class="kaart"><h2>Prikbord</h2>'+
+      '<label for="ptekst">Wat wil je melden?</label><textarea id="ptekst" rows="3" maxlength="800"></textarea>'+
+      '<label for="pkeuzes">Peiling (keuzes met komma\'s, mag leeg)</label><input id="pkeuzes" placeholder="Vrijdag, Zaterdag">'+
+      '<div class="knoppen"><button class="knop" id="bprik" type="button">Op het prikbord</button>'+
+      '<button class="knop stil" id="baankondig" type="button">Rahul schrijft het</button>'+
+      '<button class="knop stil" id="bsamen" type="button">Vat het prikbord samen</button></div>'+
+      '<div class="uit" id="uprik" hidden></div>'+
+      (b.length ? b.map(function(x){
+        return '<div class="rij"><div class="tx"><b>'+esc(x.van)+'</b><small>'+esc(x.tekst)+'</small>'+
+          (x.peiling ? '<div style="margin-top:.4rem;">'+x.peiling.keuzes.map(function(k,i){
+            var pct = x.peiling.totaal ? Math.round(k.aantal/x.peiling.totaal*100) : 0;
+            return '<button class="mini" data-stem="'+x.id+'" data-k="'+i+'" style="display:block;text-align:left;">'+
+              esc(k.naam)+' · '+k.aantal+(x.peiling.mijnStem===i?' (jouw stem)':'')+'</button>'+
+              '<div class="staaf"><i style="width:'+pct+'%;"></i></div>';
+          }).join('')+'<small style="margin-top:.3rem;">'+x.peiling.totaal+' stemmen</small></div>' : '')+
+          (x.reacties.length ? '<div style="margin-top:.4rem;">'+x.reacties.map(function(r){
+            return '<small><b>'+esc(r.van)+':</b> '+esc(r.tekst)+'</small>'; }).join('')+'</div>' : '')+
+          '<div class="knoppen"><input data-reactie="'+x.id+'" placeholder="Reageren" aria-label="Reageren op dit bericht" style="max-width:60%;">'+
+          '<button class="mini" data-reageer="'+x.id+'">plaatsen</button>'+
+          (x.vanMij||g.mijnRol==='beheerder'?'<button class="mini" data-prikweg="'+x.id+'">weg</button>':'')+'</div></div></div>';
+      }).join('') : '<div class="leeg">Het prikbord is nog leeg.</div>')+
+      (d.meer ? '<button class="knop stil" id="bmeer" type="button">Meer laden</button>' : (b.length?'<div class="leeg">Je bent bij.</div>':''))+
+      '</div>';
+    toon(html);
+  }
+
+  function openGroep(id, na){
+    OPEN = id;
+    Promise.all([api('/genootschap/prikbord', { groep:id, na:na||null }), api('/genootschap/agenda', { groep:id })])
+      .then(function(r){
+        if (r[0].error) return melding(r[0].error);
+        tekenGroep(r[0], r[1] || {});
+      });
+  }
+
+  function laad(){
+    tekenTabs();
+    if (TAB === 'mijn') { api('/genootschap/mijn').then(function(d){ if(d.error) return toon('<div class="leeg">'+esc(d.error)+'</div>'); tekenMijn(d); }); return; }
+    if (TAB === 'agenda') {
+      api('/genootschap/mijn-agenda').then(function(d){
+        toon('<div class="kaart"><h2>Wat er aankomt</h2>'+
+          ((d.komt||[]).length ? d.komt.map(function(x){
+            return '<div class="rij"><div class="tx"><b>'+esc(x.wat)+'</b><span class="merk">'+esc(x.groep)+'</span>'+
+              '<small>'+esc(x.datum)+(x.tijd?' om '+esc(x.tijd):'')+(x.waar?' · '+esc(x.waar):'')+
+              ' · jouw antwoord: '+esc(x.mijnAntwoord||'nog niets')+'</small></div>'+
+              '<button class="mini" data-open="'+x.groepId+'">openen</button></div>';
+          }).join('') : '<div class="leeg">Er staat niets in je agenda.</div>')+'</div>');
+      });
+      return;
+    }
+    if (TAB === 'zoek') {
+      toon('<div class="kaart"><label for="zveld">Zoek een genootschap</label>'+
+        '<input id="zveld" type="search" placeholder="Op naam of onderwerp">'+
+        '<div class="knoppen"><button class="knop" id="bzoek" type="button">Zoeken</button></div>'+
+        '<p style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Geheime genootschappen staan hier niet in. Die vind je alleen met een uitnodiging.</p></div>'+
+        '<div class="kaart" id="zuit"><div class="leeg">Zoek op een naam of een onderwerp.</div></div>');
+      return;
+    }
+    toon('<div class="kaart"><h2>Een genootschap oprichten</h2>'+
+      '<label for="nnaam">Naam</label><input id="nnaam" maxlength="70" placeholder="Het Zeilgezelschap">'+
+      '<label for="nsoort">Wie mag erbij</label><select id="nsoort">'+
+      '<option value="besloten">Besloten · te vinden, op uitnodiging</option>'+
+      '<option value="openbaar">Openbaar · iedereen kan binnenlopen</option>'+
+      '<option value="geheim">Geheim · staat in geen enkele lijst</option></select>'+
+      '<label for="nover">Waar gaat het over</label><textarea id="nover" rows="3" maxlength="600"></textarea>'+
+      '<label for="nregels">Huisregels (mag leeg)</label><textarea id="nregels" rows="2" maxlength="800"></textarea>'+
+      '<div class="knoppen"><button class="knop" id="bnieuw" type="button">Oprichten</button></div></div>');
+  }
+
+  document.addEventListener('click', function(ev){
+    var t = ev.target.closest('[data-t]');
+    if (t) { TAB = t.getAttribute('data-t'); OPEN = null; laad(); return; }
+    var id = ev.target.id;
+
+    if (id === 'bnieuw') return api('/genootschap/richt-op', { naam:$('#nnaam').value, soort:$('#nsoort').value,
+      over:$('#nover').value, regels:$('#nregels').value }).then(function(d){
+        melding(d.error||'Opgericht. Jij bent de beheerder.'); if(!d.error){ TAB='mijn'; laad(); } });
+    if (id === 'bzoek') return api('/genootschap/zoek', { zoek:$('#zveld').value }).then(function(d){
+      $('#zuit').innerHTML = (d.groepen||[]).length ? d.groepen.map(function(g){
+        return groepRij(g, g.ikBenLid ? '<button class="mini" data-open="'+g.id+'">openen</button>'
+          : (g.soort==='openbaar'||g.uitgenodigd ? '<button class="mini" data-binnen="'+g.id+'">binnentreden</button>'
+            : '<small style="color:var(--soft);">op uitnodiging</small>'));
+      }).join('') : '<div class="leeg">Niets gevonden.</div>'; });
+    if (id === 'bterug') { TAB='mijn'; OPEN=null; return laad(); }
+    if (id === 'bvertrek') return api('/genootschap/vertrek', { groep:OPEN }).then(function(d){
+      melding(d.error||'Je bent vertrokken.'); if(!d.error){ TAB='mijn'; OPEN=null; laad(); } });
+    if (id === 'bleden') return api('/genootschap/mijn').then(function(d){
+      var g = (d.groepen||[]).filter(function(x){ return String(x.id)===String(OPEN); })[0];
+      if (!g) return melding('Kon de ledenlijst niet laden.');
+      melding('Leden: ' + (g.ledenlijst||[]).map(function(l){ return l.codenaam+' ('+l.rol+')'; }).join(', '));
+    });
+    if (id === 'bprik') {
+      var keuzes = $('#pkeuzes').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+      return api('/genootschap/prik', { groep:OPEN, tekst:$('#ptekst').value, keuzes:keuzes })
+        .then(function(d){ melding(d.error||'Op het prikbord.'); if(!d.error) openGroep(OPEN); });
+    }
+    if (id === 'baankondig') return api('/genootschap/ai/aankondiging', { groep:OPEN, steekwoorden:$('#ptekst').value })
+      .then(function(d){ var u=$('#uprik'); u.hidden=false; u.textContent = d.aankondiging || d.reden || 'Geen antwoord.';
+        if (d.aankondiging) $('#ptekst').value = d.aankondiging; });
+    if (id === 'bsamen') return api('/genootschap/ai/prikbord', { groep:OPEN })
+      .then(function(d){ var u=$('#uprik'); u.hidden=false; u.textContent = d.samenvatting || d.reden || 'Geen antwoord.'; });
+    if (id === 'bdatumai') return api('/genootschap/ai/datum', { groep:OPEN }).then(function(d){
+      var u=$('#udatum'); u.hidden=false;
+      u.textContent = d.tekst || (d.meting && d.meting.length ? 'De meeste ja-antwoorden staan op ' + d.beste + '.' : (d.reden||'Geen antwoord.')); });
+    if (id === 'broep') return api('/genootschap/roep-bijeen', { groep:OPEN, wat:$('#bwat').value, datum:$('#bdatum').value,
+      tijd:$('#btijd').value, waar:$('#bwaar').value, plaatsen:$('#bplaatsen').value })
+      .then(function(d){ melding(d.error||'De leden hebben bericht.'); if(!d.error) openGroep(OPEN); });
+    if (id === 'bmeer') return openGroep(OPEN, ev.target.getAttribute('data-na'));
+
+    var o = ev.target.closest('[data-open]');
+    if (o) { return openGroep(o.getAttribute('data-open')); }
+    var bi = ev.target.closest('[data-binnen]');
+    if (bi) return api('/genootschap/binnen', { groep:bi.getAttribute('data-binnen') })
+      .then(function(d){ melding(d.error||'Welkom.'); if(!d.error){ TAB='mijn'; laad(); } });
+    var aw = ev.target.closest('[data-antw]');
+    if (aw) return api('/genootschap/antwoord', { groep:OPEN, id:aw.getAttribute('data-antw'), antwoord:aw.getAttribute('data-w') })
+      .then(function(d){ if(d.error) return melding(d.error); openGroep(OPEN); });
+    var af = ev.target.closest('[data-afgelast]');
+    if (af) return api('/genootschap/afgelast', { groep:OPEN, id:af.getAttribute('data-afgelast') })
+      .then(function(d){ melding(d.error||'Afgelast. De aanwezigen hebben bericht.'); openGroep(OPEN); });
+    var st = ev.target.closest('[data-stem]');
+    if (st) return api('/genootschap/stem', { groep:OPEN, id:st.getAttribute('data-stem'), keuze:Number(st.getAttribute('data-k')) })
+      .then(function(d){ if(d.error) return melding(d.error); openGroep(OPEN); });
+    var re = ev.target.closest('[data-reageer]');
+    if (re) {
+      var veld = document.querySelector('[data-reactie="'+re.getAttribute('data-reageer')+'"]');
+      return api('/genootschap/reageer', { groep:OPEN, id:re.getAttribute('data-reageer'), tekst: veld ? veld.value : '' })
+        .then(function(d){ if(d.error) return melding(d.error); openGroep(OPEN); });
+    }
+    var pw = ev.target.closest('[data-prikweg]');
+    if (pw) return api('/genootschap/prik-weg', { groep:OPEN, id:pw.getAttribute('data-prikweg') })
+      .then(function(d){ if(d.error) return melding(d.error); openGroep(OPEN); });
+  });
+
+  $('#aiform').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var t = $('#aiin').value.trim();
+    if (!t) return;
+    $('#aiin').value = '';
+    melding('Rahul denkt mee…');
+    api('/chat/send', { text: t }).then(function(d){ melding(d.reply || d.error || 'Geen antwoord.'); laad(); })
+      .catch(function(){ melding('Rahul is nu niet bereikbaar.'); });
+  });
+
+  if (!TOKEN) { toon('<div class="kaart"><h2>Meld je eerst aan</h2><p style="color:var(--muted);font-size:.88rem;">Genootschappen horen bij je RTG-account. Open het OS en meld je aan.</p></div>'); tekenTabs(); }
+  else { $('#aibalk').hidden = false; laad(); }
+})();
+</script>
+</body>
+</html>

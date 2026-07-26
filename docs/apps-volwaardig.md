@@ -416,3 +416,41 @@ Twee dingen die onderweg misgingen en waar ik van geleerd heb:
 - Mijn eigen e2e wachtte op een waarde die ik zelf net had getypt, dus die
   voorwaarde was meteen waar en het herladen wiste daarna de velden. Wachten op
   de MELDING in plaats van op de invoer.
+
+## Ronde 4: Genootschap -- en waarom het plan hierboven niet klopte
+
+Het plan voor deze ronde stond hierboven als "Cercle wordt de groepen-app" en
+"evenementen naar Rendez-vous". Dat plan was op de NAMEN geschreven, niet op de
+code. Wat er in werkelijkheid staat:
+
+- **Cercle** is het register van je besloten societeiten: per club je lidnummer,
+  sinds wanneer je lid bent, de dresscode, met welke clubs er reciprociteit is en
+  hoeveel gastpassen je nog hebt. Een eigen, doordacht jetset-idee.
+- **Rendez-vous** is de besloten datingdienst van de Lifestyle Pass: wensen,
+  locaties, wederzijdse likes en een date-voorstel van Rahul.
+
+Beide verbouwen zou twee werkende concepten slopen om een derde te maken. De
+groepen-laag ontbrak echt (er was geen `db.data.groepen`; het bestaande
+`/api/event/rsvp` is de gastenlijst van een PARTNER, niet van een lid), dus die
+staat nu in een eigen huis: **Genootschap**.
+
+| Functie | Waar |
+|---|---|
+| Groepen met drie soorten zichtbaarheid: openbaar, besloten, **geheim** | `kern/genootschap/index.js` |
+| Geheim betekent echt geheim: staat in geen enkele lijst, alleen op uitnodiging | `/api/genootschap/zoek` |
+| Een uitnodiging is geen lidmaatschap: de ander zegt zelf ja | `/api/genootschap/binnen` |
+| Beheerders, en de laatste beheerder kan niet weglopen | `kern/genootschap/beheer.js` |
+| Prikbord met berichten, reacties en **peilingen** (een stem per lid, verzetbaar) | `kern/genootschap/prikbord.js` |
+| Bijeenkomsten met ja/misschien/nee, plaatsen, en afgelasten | `kern/genootschap/bijeenkomst.js` |
+| Mijn agenda: alles wat eraan komt, over al je genootschappen heen | `/api/genootschap/mijn-agenda` |
+| Rahul schrijft de aankondiging, vat het prikbord samen, en **telt zelf** welke dag de meesten past | `kern/genootschap/ai.js` |
+
+Bewust niet: herinneringen die blijven trekken, "X en 12 anderen komen" als
+sociale druk, een wachtlijst die iedereen hoop geeft, en elke vorm van
+"leden die je misschien kent". De AI rekent hier zelf (een model dat moet tellen
+maakt fouten) en zet er alleen een zin omheen; zonder AI blijft het cijfer staan.
+
+Bewezen: `test/genootschap.test.js` (11 toetsen) en `test/genootschap.e2e.js`.
+
+De les van deze ronde staat in de kop van `kern/genootschap/index.js`: een plan
+dat op namen is geschreven, moet je tegen de code houden voordat je het uitvoert.

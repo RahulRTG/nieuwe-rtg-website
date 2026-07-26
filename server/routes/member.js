@@ -66,6 +66,8 @@ module.exports = (kern) => {
   // Métier: het beroepsprofiel op codenaam, met de naam als sleutel die je per
   // werkgever afgeeft en weer intrekt
   require('./member/metier')(kern);
+  // Genootschap: besloten groepen met een prikbord en bijeenkomsten
+  require('./member/genootschap')(kern);
   // De wauw-laag: stemming, verjaardagsglans en De Terugblik
   require('./member/wauw')(kern);
   // De moedertaal van het account: iedereen praat en leest in de eigen taal

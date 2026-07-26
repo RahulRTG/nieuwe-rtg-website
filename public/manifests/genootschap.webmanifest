@@ -1,0 +1,32 @@
+{
+  "name": "Genootschap, je besloten groepen binnen RTG",
+  "short_name": "Genootschap",
+  "id": "/apps/genootschap",
+  "description": "Besloten groepen met een prikbord en bijeenkomsten. Geheim is hier echt geheim.",
+  "lang": "nl",
+  "start_url": "/apps/genootschap.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/pas-rtg-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pas-rtg-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pas-rtg-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

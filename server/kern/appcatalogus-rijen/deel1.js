@@ -49,6 +49,7 @@ module.exports = [
   ['bestanden', 'Bestanden', 'media', '/apps/bestanden.html', 'De versleutelde kluis: mappen, versies, delen op codenaam en een prullenbak die 30 dagen bewaart. Je Office-werk staat er vanzelf bij.'],
   ['meet', 'Meet', 'sociaal', '/apps/meet.html', 'Vergaderen op codenaam: kamers met een korte code, scherm delen, en een Vergaderruimte-knop op elke agenda-afspraak. Beeld en geluid lopen peer-to-peer.'],
   ['galerij', 'Galerij', 'media', '/apps/galerij.html', 'Al je beelden op een plek: tijdlijn per maand, albums en favorieten. Leest De Salon en Bestanden; niets dubbel, geen gezichtsherkenning.'],
+  ['gereedschap', 'Gereedschap', 'media', '/apps/gereedschap.html', 'Rekenmachine (met btw en rekening delen), wekkers en timers die op de server aftellen, stopwatch en wereldklok. Rahul zet ze ook voor je.'],
   ['krant', 'RTG Krant', 'media', '/apps/krant.html', 'De kiosk: de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.'],
   ['nieuws', 'Nieuws', 'media', '/apps/nieuws.html', 'RTG Nieuws per rubriek, met wat je later wilt lezen bewaard.'],
   ['garderobe', 'Garde-robe', 'media', '/apps/garderobe.html', 'Je kledingkast en looks bij elkaar.'],

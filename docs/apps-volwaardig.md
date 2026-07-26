@@ -1339,3 +1339,35 @@ Rahul te bedienen via het stuur). Client: apps/galerij.html +
 apps/galerij/ (app = tijdlijn en albums, kijker = lightbox). Tests:
 galerij.test.js (3, incl. de Salon-integratie en "B ziet de beelden van
 A niet") en galerij.e2e.js door het echte scherm.
+
+## RTG Gereedschap: de dagelijkse basics, op huisniveau
+
+De zevende app van de reeks: rekenmachine, wekker, timer, stopwatch en
+wereldklok. Klein werk, groot effect -- een OS zonder rekenmachine voelt
+onaf, en met deze ronde is dat gevoel weg.
+
+**De rekenmachine** draait op een eigen motor (shared/rekenkern.js:
+tokenizer plus shunting-yard, dus GEEN eval). Volgorde en haakjes
+kloppen, procent werkt zoals op een zakrekenmachine ("200+10%" is 220),
+komma en punt zijn allebei goed, en 0,1+0,2 is gewoon 0,3 -- geen
+zwevendekomma-ruis naar de gebruiker. Fouten zijn eerlijk: delen door
+nul is een nette melding, geen NaN. Ernaast: btw twee kanten op (21/9)
+en een rekening delen met fooi.
+
+**Wekkers en timers tellen op de SERVER** (kern/klok.js), zoals de
+Thuiswacht: valt je telefoon uit of zit de app dicht, dan gaat het alarm
+juist wel af -- SSE naar het open scherm, webpush naar de zak. Een losse
+wekker gaat precies een keer af; een vaste wekker (doordeweeks, weekend,
+elke dag) blijft staan en gaat per dag hooguit een keer. En omdat het
+gewone routes zijn kan Rahul ze zetten: "maak me morgen om 7 uur wakker"
+is een aanroep, geen kunstje. Het alarmscherm heeft een eigen opgewekte
+twee-toon (WebAudio, geen geluidsbestand van een ander).
+
+**Stopwatch en wereldklok** blijven bewust lokaal: milliseconden zijn
+van het toestel, en de wereldklok rekent met de tijdzones die de browser
+zelf kent (Intl) -- zomertijd klopt vanzelf, zonder externe bron.
+
+Server: kern/klok.js + routes/klok.js. Client: apps/gereedschap.html +
+apps/gereedschap/ (reken, klok, tijd) + shared/rekenkern.js. Tests:
+gereedschap.test.js (2, puur: motor en klok-kern zonder wachten) en
+gereedschap.e2e.js met de volledige alarmketen door het scherm.

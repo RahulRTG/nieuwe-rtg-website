@@ -1,0 +1,59 @@
+/* Vertaallaag NL->EN, deel 1 van de seed-inhoud. Zie ../nl2en.js voor waar dit
+   voor is; dit bestand is alleen woordenboek. */
+module.exports = {
+
+  // facturen
+  'Ibiza, Aguamarina, 3 nachten': 'Ibiza, Aguamarina, 3 nights',
+  'Villa Bahia Ibiza, Cala Jondal, 4 nachten': 'Villa Bahia Ibiza, Cala Jondal, 4 nights',
+  'Privejet Schiphol - Ibiza (retour, gedeeld)': 'Private jet Schiphol - Ibiza (return, shared)',
+  'Jaarbijdrage lidmaatschap 2026': 'Annual membership contribution 2026',
+  'Vervalt 28 juli 2026': 'Due 28 July 2026',
+  'Vervalt 15 augustus 2026': 'Due 15 August 2026',
+  'Betaald op 2 mei 2026': 'Paid on 2 May 2026',
+  'Betaald op 4 januari 2026': 'Paid on 4 January 2026',
+  'Zojuist betaald': 'Just paid',
+  // reis
+  '18 - 25 juli 2026': '18 - 25 July 2026',
+  '18 jul': '18 Jul', '18-21 jul': '18-21 Jul', '19 jul': '19 Jul', '20 jul': '20 Jul', '21-25 jul': '21-25 Jul',
+  'KLM KL1263, Amsterdam Schiphol → Ibiza': 'KLM KL1263, Amsterdam Schiphol → Ibiza',
+  'Economy comfort, 2 personen · de rest van de groep vloog privé': 'Economy comfort, 2 people · the rest of the group flew private',
+  'Economy comfort, 2 personen': 'Economy comfort, 2 people',
+  'Privétransfer luchthaven → Aguamarina': 'Private transfer airport → Aguamarina',
+  'Chauffeur wacht bij aankomsthal, naambord RTG': 'Driver waits in the arrivals hall, RTG name board',
+  'Chauffeur bij aankomsthal': 'Driver in the arrivals hall',
+  'Aguamarina Ibiza, Sea-view suite': 'Aguamarina Ibiza, Sea-view suite',
+  '3 nachten, ontbijt, late check-out': '3 nights, breakfast, late check-out',
+  '3 nachten, late check-out': '3 nights, late check-out',
+  'Diner, Sal de Mar': 'Dinner, Sal de Mar',
+  'Chef-menu · tafel 21:00 uur': 'Chef menu · table 21:00',
+  'Chef-menu · 21:00 uur': 'Chef menu · 21:00',
+  'Privéboot naar Formentera': 'Private boat to Formentera',
+  'Met de hele groep · 10:00 uur': 'With the whole group · 10:00',
+  'Met de groep · 10:00 uur': 'With the group · 10:00',
+  'Villa Bahia Ibiza, Cala Jondal': 'Villa Bahia Ibiza, Cala Jondal',
+  '4 nachten, eigen zwembad': '4 nights, private pool',
+  // post-teksten (seed)
+  'Met de hele vriendengroep neergestreken: de helft in het hotel aan zee, wij met z\'n vieren in de villa boven Cala Jondal. Rahul kwam met de privéjet vanaf Schiphol, wij pakten gewoon de ochtendvlucht, en toch checken we samen in. Dit is reizen zonder gedoe.':
+    'The whole group of friends has landed: half in the seaside hotel, the four of us in the villa above Cala Jondal. Rahul came by private jet from Schiphol, we just took the morning flight, and still we check in together. This is travel without hassle.',
+  'Ochtend: twee calls vanaf het terras. Middag: boot naar Formentera met de groep. De Business Pass plant mijn dag strakker dan welke assistent ook, en de jet stond klaar op Schiphol Business Aviation.':
+    'Morning: two calls from the terrace. Afternoon: boat to Formentera with the group. The Business Pass plans my day tighter than any assistant, and the jet was ready at Schiphol Business Aviation.',
+  'Wij oude rotten trekken de bergen in terwijl de jeugd op Ibiza ligt. Chalet in Gstaad, open haard, en morgen een privélift de piste op. Op je 69e mag dat.':
+    'We old hands head into the mountains while the youngsters lie on Ibiza. A chalet in Gstaad, an open fire, and tomorrow a private lift up the slopes. At 69 you are allowed.',
+  'Na mijn voetbaljaren dacht ik alles gezien te hebben in Monaco, maar aankomen op codenaam en toch als vanouds ontvangen worden, dat is nieuw. Eerst de jachthaven, dan het casino.':
+    'After my football years I thought I had seen everything in Monaco, but arriving on a codename and still being received as ever, that is new. First the marina, then the casino.',
+  'Een week Dubai met vrienden: de een in de wolkenkrabber-suite, de ander in een strandappartement aan de Palm. Ik werk voor de Nederlandse staat, maar deze dagen tel ik even niet mee.':
+    'A week in Dubai with friends: one in the skyscraper suite, the other in a beach apartment on the Palm. I work for the Dutch state, but these days I am simply off the clock.',
+  'Een ring gesmeed voor de tweeling van Ashley, hier op het terras afgemaakt. Goudsmid zijn op vakantie, omdat het niet als werk voelt tussen deze mensen. 30% van mijn bijdrage ging bovendien naar de RTFoundation.':
+    'Forged a ring for Ashley\'s twins, finished right here on the terrace. Being a goldsmith on holiday, because it does not feel like work among these people. And 30% of my contribution went to the RTFoundation.',
+  // reacties (seed)
+  'Tussen twee tentamens door even bijkomen, precies wat ik nodig had.': 'Recovering between two exams, exactly what I needed.',
+  '22, tussen twee tentamens door even bijkomen, precies wat ik nodig had.': '22, recovering between two exams, exactly what I needed.',
+  'Snackbar dicht, telefoon uit, ik ben even niemands baas.': 'Snack bar closed, phone off, for once I am nobody\'s boss.',
+  'De strandtent hier kan nog wat leren van ons, maar de zonsondergang niet.': 'The beach bar here could learn a thing from us, but the sunset could not.',
+  'En vanavond koken we samen in de villa, jij snijdt.': 'And tonight we cook together in the villa, you chop.',
+  'Als schooldirectrice tel ik de dagen af tot de vakantie; deze is het waard.': 'As a head teacher I count down the days to the holiday; this one is worth it.',
+  'Vanuit Monaco groeten wij Gstaad. De boekhouding klopt, de rosé ook.': 'From Monaco we greet Gstaad. The books add up, and so does the rosé.',
+  'Wij zitten in Dubai, andere warmte, dezelfde club. Tot in september.': 'We are in Dubai, different heat, same club. See you in September.',
+  'Als arts weet ik: rust is ook zorg. Deze zonsondergang is op doktersvoorschrift.': 'As a doctor I know: rest is care too. This sunset is on doctor\'s orders.',
+  'En als jullie advocaat zeg ik: de contracten kunnen wachten tot maandag.': 'And as your lawyer I say: the contracts can wait until Monday.'
+};

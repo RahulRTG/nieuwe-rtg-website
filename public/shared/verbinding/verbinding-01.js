@@ -179,3 +179,17 @@
       .then(function (r) {
         wBezig = false;
         // gelukt, of definitief geweigerd (4xx): allebei uit de wachtrij
+        if (r.ok || (r.status >= 400 && r.status < 500)) {
+          q = wachtrij(); q.shift(); wachtrijZet(q);
+          if (q.length) setTimeout(verstuurWachtrij, 800);
+          else {
+            fout(T('net.rijLeeg', 'Alles uit de wachtrij is alsnog verstuurd.'));
+            try { document.dispatchEvent(new CustomEvent('rtg-wachtrij-leeg')); } catch (e) {}
+          }
+        }
+      }, function () { wBezig = false; });
+  }
+  w.addEventListener('online', function () { setTimeout(verstuurWachtrij, 1500); });
+  setInterval(verstuurWachtrij, 30000);
+  setTimeout(verstuurWachtrij, 3000);
+

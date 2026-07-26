@@ -223,5 +223,3 @@
     uitleg.style.color = 'var(--osm-grijs-zacht)'; uitleg.style.fontSize = '0.78rem'; uitleg.style.margin = '0.2rem 0.2rem 0.6rem';
     lijf.appendChild(sectie('paneel', 'Bedieningspaneel', [uitleg].concat(appToggles), false));
 
-    // ---- verbinding: GPS werkt echt; wifi/Bluetooth kan een website niet
-    //      schakelen (alleen het toestel zelf), dus die staan vast met uitleg ----

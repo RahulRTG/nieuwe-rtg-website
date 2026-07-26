@@ -1,17 +1,3 @@
-        if (r.ok || (r.status >= 400 && r.status < 500)) {
-          q = wachtrij(); q.shift(); wachtrijZet(q);
-          if (q.length) setTimeout(verstuurWachtrij, 800);
-          else {
-            fout(T('net.rijLeeg', 'Alles uit de wachtrij is alsnog verstuurd.'));
-            try { document.dispatchEvent(new CustomEvent('rtg-wachtrij-leeg')); } catch (e) {}
-          }
-        }
-      }, function () { wBezig = false; });
-  }
-  w.addEventListener('online', function () { setTimeout(verstuurWachtrij, 1500); });
-  setInterval(verstuurWachtrij, 30000);
-  setTimeout(verstuurWachtrij, 3000);
-
   /* ---------- het satelliet-noodbericht ----------
      Nieuwere telefoons versturen zonder bereik een sms via een satelliet. De
      app maakt daarvoor een zo kort mogelijk bericht klaar met tijd en locatie;

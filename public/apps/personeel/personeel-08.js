@@ -1,94 +1,122 @@
-      if (!pkDorp) return;
-      const naar = prompt(T('pd.dorp.stuurwaar','Naar welke afdeling?')+' ('+pkDorp.afdelingen.map(a=>a.key).join(', ')+')');
-      if (!naar) return;
-      try {
-        await API.call('/supplier/dorp/stuurdoor', { id: b.dataset.pkdstuur, naar: naar.trim().toLowerCase() });
-        toast('↪ '+T('pd.dorp.gestuurd','Doorgestuurd.'));
-        pkDorpAt = 0; pkToolsKant = null; pkLaadDorp();
-      } catch(e){ toast(e.message); }
-    }));
-    // de buurt: een tik zet de naam alvast in de wens
-    if (pkDorpKant === 'concierge') pkLaadBuurt();
-    wrap.querySelectorAll('[data-pkdbuurt]').forEach(b => b.addEventListener('click', async () => {
-      const afd = pkDorp && pkDorp.afdelingen.find(a => a.key === 'concierge');
-      const waar = prompt(afd ? afd.waarHint : 'Kamer') || '';
-      const tekst = prompt(T('pd.dorp.regelwat','Wat regelen we bij')+' '+b.dataset.pkdbuurt+' ('+b.dataset.soort+', '+b.dataset.km+' km)?');
-      if (!tekst) return;
-      try {
-        await API.call('/supplier/dorp/post', { afdeling: 'concierge', waar, tekst: b.dataset.pkdbuurt+': '+tekst });
-        toast(''+T('pd.dorp.gezet','Staat op de lijst.'));
-        pkDorpAt = 0; pkToolsKant = null; pkLaadDorp();
-      } catch(e){ toast(e.message); }
-    }));
-    const dn = wrap.querySelector('[data-pkdnieuw]'); if (dn) dn.addEventListener('click', async () => {
-      const afd = pkDorp && (pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0]);
-      if (!afd) return;
-      const waar = prompt(afd.waarHint) || '';
-      const tekst = prompt(afd.watHint);
-      if (!tekst) return;
-      try { await API.call('/supplier/dorp/post', { afdeling: afd.key, waar, tekst }); toast(afd.icon+' '+T('pd.dorp.gezet','Staat op de lijst.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
-      catch(e){ toast(e.message); }
+    const lm = $('#lfMeld'); if (lm) lm.addEventListener('click', async () => {
+      const item = $('#lfItem').value.trim(); if (!item) return;
+      try { await API.call('/supplier/lost/add', { item, room: $('#lfKamer').value, storage: $('#lfPlek').value }); toast(''+T('hk.lfok','Geregistreerd.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
     });
-    wrap.querySelectorAll('[data-khk]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/room/hk', { id: b.dataset.khk, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
-    }));
-    wrap.querySelectorAll('[data-vrij]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/room/vrij', { id: b.dataset.vrij, op: b.dataset.op === 'aan' }); toast(b.dataset.op==='aan' ? ''+T('hk.vrijtoast','Vrijgegeven; de receptie ziet het direct.') : T('hk.vrijaf','Vrijgave intrekken')); await refresh(); } catch(e){ toast(e.message); }
-    }));
-    wrap.querySelectorAll('[data-defect]').forEach(b => b.addEventListener('click', async () => {
-      const note = prompt(T('hk.defectq','Wat is er kapot?'), '');
-      if (note === null) return;
-      try { await API.call('/supplier/room/hk', { id: b.dataset.defect, status: 'defect', note }); await refresh(); } catch(e){ toast(e.message); }
-    }));
-    wrap.querySelectorAll('[data-mb]').forEach(b => b.addEventListener('click', () => {
-      mbOpen = mbOpen === b.dataset.mb ? null : b.dataset.mb;
-      mbTel = {};
-      renderKamers();
-    }));
-    wrap.querySelectorAll('[data-mbplus]').forEach(b => b.addEventListener('click', () => { mbTel[b.dataset.mbplus] = (mbTel[b.dataset.mbplus]||0)+1; renderKamers(); }));
-    wrap.querySelectorAll('[data-mbmin]').forEach(b => b.addEventListener('click', () => { mbTel[b.dataset.mbmin] = Math.max(0,(mbTel[b.dataset.mbmin]||0)-1); renderKamers(); }));
-    wrap.querySelectorAll('[data-mbboek]').forEach(b => b.addEventListener('click', async () => {
-      const items = Object.entries(mbTel).filter(([,q]) => q > 0).map(([id, qty]) => ({ id, qty }));
-      if (!items.length) return;
-      try { await API.call('/supplier/minibar/count', { room: b.dataset.mbboek, items }); mbOpen = null; mbTel = {}; toast(''+T('hk.geboekt','Geboekt op de kamer.')); await refresh(); } catch(e){ toast(e.message); }
-    }));
   }
 
-  /* Hulp & zaken: EHBO-kennis direct bij de hand, de vertrouwenspersoon van
-     RTG (volledig buiten de werkgever om) en de eigen administratie. */
-  let hulpOpen = null, ziekArm = false;
-  const EHBO_GIDS = () => lang() === 'en' ? [
-    { t: 'Resuscitation (CPR)', i: '', s: ['Check consciousness and breathing; shout for help.', 'Call 112 (or have someone call) and ask for an AED.', '30 chest compressions: centre of the chest, 5-6 cm deep, 100-120 per minute.', '2 rescue breaths, then keep alternating 30 to 2.', 'Use the AED as soon as it arrives and follow its instructions.', 'Continue until professional help takes over.'] },
-    { t: 'Choking', i: '', s: ['Encourage coughing first.', 'Not working? Give up to 5 firm blows between the shoulder blades.', 'Still stuck? Up to 5 abdominal thrusts (Heimlich manoeuvre).', 'Keep alternating 5 blows and 5 thrusts; call 112 if it does not clear.'] },
-    { t: 'Burns', i: '', s: ['Cool 10 to 20 minutes with lukewarm, gently running water.', 'No ice, no butter, no ointments.', 'Never pull off clothing that sticks to the skin.', 'Cover loosely with a sterile dressing; blisters or a large area: see a doctor.'] },
-    { t: 'Severe bleeding', i: '', s: ['Press firmly on the wound with a clean cloth.', 'Keep pressing; do not lift it to look.', 'Raise the arm or leg if possible.', 'Call 112 for severe or spurting bleeding.'] },
-    { t: 'Allergic reaction', i: '', s: ['Known allergy with an adrenaline pen? Use it on the outside of the thigh.', 'Call 112 for swelling of face or throat, or trouble breathing.', 'Loosen tight clothing; let the person sit or lie comfortably.', 'Stay with them; a second dose can be needed after 5 to 15 minutes.'] },
-    { t: 'Unconscious but breathing', i: '', s: ['Place the person on their side (recovery position), head tilted back.', 'Call 112.', 'Keep checking the breathing until help arrives.'] },
-    { t: 'Heart attack or stroke', i: '', s: ['Heart attack: pressure on the chest, pain to arm or jaw, sweating. Call 112 and let the person rest half-sitting.', 'Stroke, think FAST: Face (drooping mouth), Arm (weakness), Speech (confused), Time: call 112 at once.', 'Note the time the symptoms started; the hospital needs it.'] }
-  ] : [
-    { t: 'Reanimatie', i: '', s: ['Controleer bewustzijn en ademhaling; roep om hulp.', 'Bel 112 (of laat bellen) en vraag om een AED.', '30 borstcompressies: midden op de borst, 5-6 cm diep, 100-120 per minuut.', '2 beademingen, en blijf wisselen: 30 om 2.', 'Gebruik de AED zodra die er is en volg de gesproken instructies.', 'Ga door tot professionele hulp het overneemt.'] },
-    { t: 'Verslikking', i: '', s: ['Laat eerst flink hoesten.', 'Helpt dat niet? Geef maximaal 5 stevige klappen tussen de schouderbladen.', 'Zit het nog vast? Maximaal 5 buikstoten (Heimlich-greep).', 'Blijf wisselen: 5 klappen, 5 stoten. Bel 112 als het niet loskomt.'] },
-    { t: 'Brandwond', i: '', s: ['Koel 10 tot 20 minuten met lauw, zacht stromend water.', 'Geen ijs, geen boter, geen zalf.', 'Trek kleding die aan de huid plakt nooit los.', 'Dek losjes af met steriel verband; blaren of een groot oppervlak: naar een arts.'] },
-    { t: 'Ernstige bloeding', i: '', s: ['Druk stevig op de wond met een schone doek.', 'Blijf drukken; til de doek niet op om te kijken.', 'Houd de arm of het been omhoog als dat kan.', 'Bel 112 bij een ernstige of spuitende bloeding.'] },
-    { t: 'Allergische reactie', i: '', s: ['Bekende allergie met een adrenalinepen? Zet die op de buitenkant van het bovenbeen.', 'Bel 112 bij een opgezwollen gezicht of keel, of moeite met ademen.', 'Maak knellende kleding los; laat rustig zitten of liggen.', 'Blijf erbij; na 5 tot 15 minuten kan een tweede dosis nodig zijn.'] },
-    { t: 'Bewusteloos, maar ademt', i: '', s: ['Leg de persoon op de zij (stabiele zijligging), hoofd iets achterover.', 'Bel 112.', 'Blijf de ademhaling controleren tot er hulp is.'] },
-    { t: 'Hartaanval of beroerte', i: '', s: ['Hartaanval: drukkende pijn op de borst, uitstraling naar arm of kaak, zweten. Bel 112 en laat halfzittend rusten.', 'Beroerte, denk aan FAST: Face (scheve mond), Arm (uitvalt), Speech (verwarde spraak), Time: bel direct 112.', 'Noteer hoe laat de klachten begonnen; het ziekenhuis heeft dat nodig.'] }
-  ];
-  // Training & tips: micro-learning in de PDA. Rol-bewuste tips, een tip van de
-  // dag, een AI-coach en (voor de manager) eigen huistips van de zaak.
-  // De trainingskaart is met het componentframework (Util.el) gebouwd: tekst
-  // wordt structureel als tekstknoop gezet (dus altijd veilig ge-escaped) en de
-  // knoppen dragen hun eigen handler. renderHulp laat er een plek voor open
-  // (#trainKaart); vulTrainingKaart() tekent hem daarin, ook na een klik.
-  function trainingKaart(){ return trainData ? '<div id="trainKaart"></div>' : ''; }
-  function vulTrainingKaart(){
-    const c = document.getElementById('trainKaart');
-    if (!c || !window.Util) return;
-    const node = bouwTrainingKaart();
-    Util.vervang(c, node || document.createTextNode(''));
+  /* ---------- Kamers: het volledige housekeeping-bord in de PDA ----------
+     Alle PDA's leven in deze ene app. Voor zaken met kamers (hotel,
+     appartementen) is dit het kamerbord met een tik per stap, vroege
+     check-in vrijgeven en de minibar. Voor zaken zonder kamers
+     (schoonmaakbedrijven, zzp'ers) werkt dezelfde tab op opdrachten. */
+  const HK_ORDE = { defect: 0, vuil: 1, bezig: 2, schoon: 3, bezet: 4 };
+  const hkVan = r => (r.hk && r.hk.status) || (r.available ? 'schoon' : 'bezet');
+  const heeftKamers = () => !!(state && (state.rooms || []).length);
+  const heeftOpdrachten = () => !!(state && !(state.rooms || []).length && (state.boekingen || []).length);
+  // het eigen dorp op zak: bars, clubs, beachclubs en restaurants krijgen het afdelingenbord
+  const heeftClubdorp = () => !!(state && !(state.rooms || []).length && state.supplier && ['bar', 'club', 'beachclub', 'restaurant'].includes(state.supplier.type));
+  // het zorgprofiel van de gast, kort op een regel (reist mee met toestemming)
+  const pkZorg = z => [((z.allergenen || []).length ? T('zorg.allergie', 'Allergie') + ': ' + z.allergenen.join(', ') : ''), z.dieet, z.medisch].filter(Boolean).join(' · ');
+  let mbOpen = null;          // kamer waarvan de minibar-teller openstaat
+  let mbTel = {};             // minibar-aantallen van die kamer
+  // het receptiebord op zak: alleen de housekeeping-prioriteit is hier nodig
+  let pkReceptie = null, pkReceptieAt = 0, pkReceptieBezig = false;
+  function pkLaadReceptie(){
+    if (pkReceptieBezig || Date.now() - pkReceptieAt < 30000) return;
+    pkReceptieBezig = true;
+    API.call('/supplier/receptie').then(d => { pkReceptie = d; pkReceptieAt = Date.now(); pkReceptieBezig = false; renderKamers(); })
+      .catch(() => { pkReceptieBezig = false; pkReceptieAt = Date.now(); });
   }
-  function bouwTrainingKaart(){
-    if (!trainData) return null;
-    const E = Util.el, t = trainData, tvd = t.tipVanDeDag;
-    const alle = t.tips || [], eigen = t.eigen || [], gelezen = t.gelezen || [];
-    const totaal = alle.length, klaar = gelezen.filter(g => alle.some(x => x.t === g)).length;
+
+  function renderKamers(){
+    const tabBtn = $('#tabKamers');
+    const aan = heeftKamers() || heeftOpdrachten() || heeftClubdorp();
+    const tabNaam = heeftKamers() ? T('pd.t.kamers','Kamers') : heeftClubdorp() ? T('pd.t.dorp','Afdelingen') : T('pd.t.opdr','Opdrachten');
+    if (tabBtn){
+      tabBtn.style.display = aan ? '' : 'none';
+      const lbl = tabBtn.querySelector('span');
+      if (lbl) lbl.textContent = tabNaam;
+    }
+    const kop = document.querySelector('.view[data-view="kamers"] h2');
+    if (kop) kop.textContent = tabNaam;
+    const wrap = $('#kamersWrap'); if (!wrap || !state) return;
+    if (!aan){ wrap.innerHTML = ''; return; }
+    // de nachtzaak: het hele afdelingenbord (entree, garderobe, bar, vip...)
+    if (!heeftKamers() && heeftClubdorp()){
+      wrap.innerHTML = pkDorpKaart();
+      bindKamers(wrap);
+      return;
+    }
+    // zonder kamers (schoonmaakbedrijf, zzp) werkt de tab op opdrachten
+    if (!heeftKamers()) return renderOpdrachten(wrap);
+    const rooms = (state.rooms || []).slice().sort((a,b) => (HK_ORDE[hkVan(a)] ?? 9) - (HK_ORDE[hkVan(b)] ?? 9));
+    let html = '';
+    // de receptie kijkt mee: vuile kamers met een aankomst vandaag gaan voor
+    pkLaadReceptie();
+    if (pkReceptie && (pkReceptie.hkEerst || []).length)
+      html += '<div class="card" style="border-left:4px solid #E5484D;"><div class="k">'+T('hk.eerst','Eerst deze')+'</div>'+
+        '<div style="margin-top:0.35rem;font-size:0.85rem;"><b>'+pkReceptie.hkEerst.map(esc).join(', ')+'</b> · '+T('hk.eerst.s','daar komt vandaag alweer een gast aan.')+'</div></div>';
+    // de AI kijkt vooruit: gasten onderweg (GPS) bepalen de prioriteit
+    const onderweg = (state.guests || []).filter(g => g.heading && !g.arrived && Number.isFinite(g.etaMin));
+    const vuil = rooms.filter(r => hkVan(r) === 'vuil').length;
+    if (onderweg.length && vuil)
+      html += '<div class="card" style="border-left:4px solid var(--amber);"><div class="k">'+T('hk.prio','Prioriteit')+'</div>'+
+        '<div style="margin-top:0.35rem;font-size:0.86rem;">'+onderweg.length+' '+T('hk.gast','gast(en) onderweg, eerste over ~')+Math.min.apply(null, onderweg.map(g=>g.etaMin))+' min · '+vuil+' '+T('hk.vuilcnt','kamer(s) vuil')+'. '+T('hk.gast2','Zorg dat er een schone kamer klaarstaat.')+'</div></div>';
+    // de teller van de vloer
+    const n = s2 => rooms.filter(r => hkVan(r) === s2).length;
+    html += '<div class="card stat"><div><b style="color:#FF8589;">'+n('vuil')+'</b><span>'+T('hk.vuil','Vuil')+'</span></div>'+
+      '<div><b style="color:#E2B93B;">'+n('bezig')+'</b><span>'+T('hk.bezig','Bezig')+'</span></div>'+
+      '<div><b style="color:#7BC79B;">'+n('schoon')+'</b><span>'+T('hk.schoon','Schoon')+'</span></div>'+
+      '<div><b>'+rooms.filter(r=>r.vroegVrij).length+'</b><span>'+T('hk.vrij','Vrijgegeven')+'</span></div></div>';
+    html += rooms.map(r => {
+      const s2 = hkVan(r);
+      const chip = s2==='schoon' ? '<span class="hkchip groen">'+T('hk.schoon','Schoon')+'</span>'
+        : s2==='vuil' ? '<span class="hkchip rood">'+T('hk.vuil','Vuil')+'</span>'
+        : s2==='bezig' ? '<span class="hkchip amber">'+T('hk.bezig','Bezig')+'</span>'
+        : s2==='defect' ? '<span class="hkchip rood">'+T('hk.defect','Defect')+'</span>'
+        : '<span class="hkchip">'+T('hk.bezet','Bezet')+'</span>';
+      let acts = '';
+      if (s2 === 'vuil') acts = '<button class="abtn" data-khk="'+r.id+'" data-st="bezig">▶ '+T('hk.start','Start')+'</button>';
+      else if (s2 === 'bezig' || s2 === 'defect') acts = '<button class="abtn" data-khk="'+r.id+'" data-st="schoon">✓ '+T('hk.klaar','Schoon')+'</button>';
+      else if (s2 === 'schoon') acts = r.vroegVrij
+        ? '<button class="abtn ghost" data-vrij="'+r.id+'" data-op="uit">'+T('hk.vrijaf','Vrijgave intrekken')+'</button>'
+        : '<button class="abtn" data-vrij="'+r.id+'" data-op="aan">'+T('hk.geefvrij','Geef vrij voor vroege check-in')+'</button>';
+      return '<div class="card kamer '+s2+'">'+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;"><b style="font-size:0.98rem;">'+esc(r.name)+'</b>'+chip+'</div>'+
+        (r.hk && r.hk.at ? '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+timeAgo(r.hk.at)+(r.hk.by?' · '+esc(r.hk.by):'')+(r.hk.note?' · '+esc(r.hk.note):'')+'</div>' : '')+
+        (r.vroegVrij ? '<div style="font-size:0.74rem;color:#7BC79B;margin-top:0.3rem;">'+T('hk.vrijchip','vrij voor vroege check-in')+'</div>' : '')+
+        '<div class="row" style="flex-wrap:wrap;">'+acts+
+          (s2 !== 'vuil' && s2 !== 'defect' ? '<button class="abtn ghost" data-khk="'+r.id+'" data-st="vuil">'+T('hk.checkout','Check-out (vuil)')+'</button>' : '')+
+          (s2 !== 'defect' ? '<button class="abtn warn" data-defect="'+r.id+'">'+T('hk.defectmeld','Defect')+'</button>' : '')+
+          '<button class="abtn ghost" data-mb="'+r.id+'">'+T('hk.minibar','Minibar')+'</button></div>'+
+        (mbOpen === r.id ? minibarBlok(r) : '')+
+      '</div>';
+    }).join('');
+    html += pkDorpKaart();
+    wrap.innerHTML = html;
+    bindKamers(wrap);
+  }
+  /* Het hoteldorp op zak: dezelfde afdelingslijsten als in de zaak-app.
+     Kies je kant (concierge, parking, security, spa, klusjesman, IT...),
+     zet posten erbij en tik ze een stap verder. */
+  let pkDorp = null, pkDorpAt = 0, pkDorpBezig = false;
+  let pkDorpKant = (() => { try { return localStorage.getItem('rtg_pda_dorp') || 'klussen'; } catch(e){ return 'klussen'; } })();
+  function pkLaadDorp(){
+    if (pkDorpBezig || Date.now() - pkDorpAt < 20000) return;
+    pkDorpBezig = true;
+    API.call('/supplier/dorp').then(d => { pkDorp = d; pkDorpAt = Date.now(); pkDorpBezig = false; renderKamers(); })
+      .catch(() => { pkDorpBezig = false; pkDorpAt = Date.now(); });
+  }
+  // het specialistische gereedschap van de gekozen kant, compact op zak
+  let pkTools = null, pkToolsKant = null, pkToolsBezig = false;
+  function pkLaadTools(){
+    if (pkToolsBezig || pkToolsKant === pkDorpKant) return;
+    pkToolsBezig = true;
+    const kant = pkDorpKant;
+    API.call('/supplier/dorp/tools', { afdeling: kant }).then(d => { pkTools = d; pkToolsKant = kant; pkToolsBezig = false; renderKamers(); })
+      .catch(() => { pkTools = null; pkToolsKant = kant; pkToolsBezig = false; });
+  }
+  function pkToolsHtml(){
+    const t = pkTools;
+    if (!t || pkToolsKant !== pkDorpKant || !Array.isArray(t.tools)) return '';
+    const kop = titel => '<div style="margin-top:0.5rem;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;">'+esc(titel)+'</div>';

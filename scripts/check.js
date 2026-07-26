@@ -203,6 +203,7 @@ console.log('\n11) bedradings-contract: aangeroepen accounts.<methode> bestaat a
    en dit is stuk in de browser. We knippen het blok op precies de manier waarop
    een HTML-lezer dat doet (tot het EERSTE sluitende scripttag-teken) en laten
    de JS-lezer erover. new Function() ontleedt zonder uit te voeren. */
+const { parse: ontleed } = require('./ast/parser');
 console.log('\n12) inline scripts op pagina\'s zijn geldige JS');
 {
   let stuk = 0;
@@ -219,12 +220,95 @@ console.log('\n12) inline scripts op pagina\'s zijn geldige JS');
       const eind = laag.indexOf('</scr' + 'ipt>', start);
       const regel = t.slice(0, start).split('\n').length;
       if (eind < 0) { stuk++; fout(path.relative(ROOT, f) + ' regel ' + regel + ': inline script wordt nooit gesloten'); break; }
-      try { new Function(t.slice(start, eind)); }
-      catch (e) { stuk++; fout(path.relative(ROOT, f) + ' regel ' + regel + ': inline script is geen geldige JS -- ' + e.message.slice(0, 80)); }
+      /* Ontleden met de EIGEN parser (scripts/ast/parser.js), niet met
+         new Function(). Dat laatste stond er eerst, en de AST-scanner keurde het
+         terecht af: new Function() bouwt code uit een string. Voor een
+         keuringsscript is dat extra ongelukkig -- het is precies de regel die
+         wij zelf handhaven. De eigen parser doet hetzelfde werk zonder ook maar
+         iets uit te voeren. */
+      try { ontleed(t.slice(start, eind)); }
+      catch (e) { stuk++; fout(path.relative(ROOT, f) + ' regel ' + regel + ': inline script is geen geldige JS -- ' + String(e.message).slice(0, 80)); }
       OPEN.lastIndex = eind;
     }
   }
   if (!stuk) ok(paginas2.length + ' pagina\'s: elk inline script ontleedt zonder fout');
+}
+
+/* 13) modulegrootte: productcode blijft onder de 10 KB per bestand.
+
+   De norm bestond al, maar niets hield hem vast -- en dus was hij weggezakt:
+   63 bestanden stonden erboven, tot 162 KB. Met deze regel kan dat niet meer
+   sluipen. De grens is een dakpan, geen wet: een bestand dat er net boven komt
+   is een teken dat er een tweede onderwerp in zit.
+
+   Wat NIET meetelt:
+   - bundels (apps/leverancier.js en broers): dat is bouwuitvoer, de bron staat
+     opgeknipt in de delen-map en regel 6 bewaakt dat ze gelijk zijn;
+   - tests: een toetsbestand is een samenhangend scenario. In stukken hakken
+     maakt de suite slechter leesbaar, niet beter;
+   - public/dist: geminificeerde uitvoer.
+
+   De uitzonderingen hieronder staan MET naam en reden. Dat is bewust: zo zie je
+   ze en kan de lijst krimpen. Hij hoort niet te groeien. */
+console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
+{
+  const MAX = 10 * 1024;
+  const { bundels } = require('./bundel');
+  const bundelPaden = new Set(Object.keys(bundels).map(k => 'public/' + k));
+  /* Uitzonderingen, met reden. Dit zijn allemaal EEN ondeelbaar stuk: een
+     tabeldefinitie of een enkele lange opbouwfunctie. Er zit geen sectiegrens
+     in, en er middenin knippen levert twee onleesbare helften op. */
+  const MAG = new Map([
+    ['public/apps/leverancier/leverancier-01.js', 'tabeldefinitie van de tabs (TABDEF), een tabel'],
+    ['public/apps/leverancier/leverancier-03.js', 'een opbouwfunctie zonder binnengrens'],
+    ['public/apps/leverancier/leverancier-10.js', 'de stationsweergave: een keten if/else per werkplek'],
+    ['public/apps/leverancier/leverancier-14.js', 'een opbouwfunctie zonder binnengrens'],
+    ['public/apps/app-main/app-main-52.js', 'een HTML-opbouw in een string, in een keer'],
+    ['public/apps/personeel/personeel-17.js', 'een opbouwfunctie zonder binnengrens'],
+    ['public/apps/backoffice/backoffice-03.js', 'een opbouwfunctie zonder binnengrens'],
+    ['public/shared/glyf/glyf-02.js', 'de glyfentabel: elk icoon een pad, hoort bij elkaar'],
+    ['public/shared/flagship/flagship-02.js', 'een opbouwfunctie zonder binnengrens'],
+    ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
+    ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
+    ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
+    ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
+    ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund']
+  ]);
+  /* NOG TE DOEN. Deze staan net boven de grens en moeten opgeknipt worden, maar
+     dat is bij een servermodule geen byte-knip: het vraagt echte bedrading
+     (require/export), en dat doe je een voor een met de toetsen ernaast. Ze
+     WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
+     voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
+  const NOG = new Set([
+    'server/accounts/users.js',
+    'server/kern/journalistiek.js',
+    'server/kern/pay/index.js',
+    'server/kern/werkplaats.js',
+    'server/lokaal-tls.js',
+    'server/routes/kantoren/bureaus.js',
+    'server/routes/kantoren/regie.js',
+    'server/routes/techniek/beheer.js',
+    'server/techniek.js',
+    'server/trio.js'
+  ]);
+  let teGroot = 0, uitz = 0, nog = [];
+  for (const map of ['server', 'public']) {
+    loop(path.join(ROOT, map), /\.js$/, f => {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+      if (rel.startsWith('public/dist/') || rel.includes('/data/')) return;
+      if (bundelPaden.has(rel)) return;
+      const kb = fs.statSync(f).size;
+      if (kb <= MAX) return;
+      if (MAG.has(rel)) { uitz++; return; }
+      if (NOG.has(rel)) { nog.push(rel + ' (' + (kb / 1024).toFixed(1) + ' KB)'); return; }
+      teGroot++;
+      fout('te groot (' + (kb / 1024).toFixed(1) + ' KB): ' + rel + ' -- knip hem op, of zet hem met reden in de lijst');
+    });
+  }
+  if (nog.length) {
+    console.log('  ! nog op te knippen (' + nog.length + '): ' + nog.join(', '));
+  }
+  if (!teGroot) ok('geen onverwacht groot productbestand (' + uitz + ' benoemde uitzonderingen, ' + nog.length + ' op de lijst)');
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

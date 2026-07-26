@@ -1,107 +1,95 @@
-    const afd = pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0];
-    pkDorpKant = afd.key;
-    pkLaadTools();
-    return '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.dorp','Afdelingen')+
-      '<button class="abtn ghost" id="pkDorpChat" style="font-size:0.66rem;">'+T('pd.dorp.chat','Teamchat')+'</button></div>'+
-      '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.4rem;">'+pkDorp.afdelingen.map(a =>
-        '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+a.icon+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
-      '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+afd.icon+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
-      pkToolsHtml()+
-      (afd.open.length ? afd.open.map(p => {
-        const i = afd.keten.indexOf(p.status);
-        const volgende = i >= 0 && i < afd.keten.length - 1 ? afd.keten[i + 1] : null;
-        return '<div class="task"><div class="t"><b>'+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</b><span>'+esc(p.status)+' · '+esc(p.door)+' · '+timeAgo(p.updatedAt||p.at)+
-          ((p.via||[]).length?' · '+T('pd.dorp.via','via')+' '+p.via.map(esc).join(', '):'')+'</span></div>'+
-          '<div style="display:flex;gap:0.3rem;">'+(volgende?'<button class="abtn" data-pkdverder="'+p.id+'">'+esc(volgende)+'</button>':'')+
-          '<button class="abtn ghost" data-pkdstuur="'+p.id+'" aria-label="doorsturen">↪</button></div></div>';
-      }).join('') : '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--soft);">'+T('pd.dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
-      (pkDorpKant === 'concierge' && pkBuurt && pkBuurt.length
-        ? '<div style="margin-top:0.5rem;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('pd.dorp.buurt','In de buurt')+'</div>'+
-          '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+pkBuurt.map(b =>
-            '<button class="abtn ghost" data-pkdbuurt="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'">'+b.icon+' '+esc(b.naam)+' · '+b.km+' km</button>').join('')+'</div>'
-        : '')+
-      '<button class="abtn ghost" data-pkdnieuw style="width:100%;margin-top:0.5rem;">+ '+T('pd.dorp.nieuw','Zet iets op de lijst')+'</button></div>';
-  }
-  // de buurt voor de concierge-kant op zak
-  let pkBuurt = null, pkBuurtBezig = false;
-  function pkLaadBuurt(){
-    if (pkBuurt || pkBuurtBezig) return;
-    pkBuurtBezig = true;
-    API.call('/supplier/dorp/buurt').then(d => { pkBuurt = d.buurt || []; pkBuurtBezig = false; renderKamers(); })
-      .catch(() => { pkBuurt = []; pkBuurtBezig = false; });
-  }
-  /* opdrachten: de flow voor schoonmaakbedrijven en zzp'ers. Geen kamerbord
-     maar de eigen boekingen: bevestigen, op locatie werken en afronden. */
-  function renderOpdrachten(wrap){
-    const bs = state.boekingen || [];
-    const open = bs.filter(b => b.status === 'aangevraagd');
-    const komend = bs.filter(b => b.status === 'bevestigd');
-    const kaart = (b, acties) => '<div class="card kamer '+(b.status==='bevestigd'?'bezig':'vuil')+'">'+
-      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;"><b style="font-size:0.98rem;">'+esc(b.service && b.service.name || 'Opdracht')+'</b>'+
-      '<span class="hkchip'+(b.status==='bevestigd'?' amber':' rood')+'">'+(b.status==='bevestigd'?T('hk.o.bevestigd','Ingepland'):T('hk.o.nieuw','Nieuw'))+'</span></div>'+
-      '<div style="font-size:0.78rem;color:var(--soft);margin-top:0.25rem;">'+esc(b.customerCodename||'')+(b.wanneer?' · '+esc(b.wanneer):'')+(b.price?' · '+eur(b.price):'')+'</div>'+
-      (b.note?'<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">'+esc(b.note)+'</div>':'')+
-      (b.zorg?'<div style="font-size:0.76rem;color:#E2B93B;margin-top:0.3rem;">'+esc(pkZorg(b.zorg))+'</div>':'')+
-      '<div class="row" style="flex-wrap:wrap;">'+acties+'</div></div>';
-    let html = '<div class="card stat"><div><b style="color:#FF8589;">'+open.length+'</b><span>'+T('hk.o.nieuw','Nieuw')+'</span></div>'+
-      '<div><b style="color:#E2B93B;">'+komend.length+'</b><span>'+T('hk.o.bevestigd','Ingepland')+'</span></div></div>';
-    html += open.map(b => kaart(b, '<button class="abtn" data-bk="'+b.ref+'" data-st="bevestigd">✓ '+T('hk.o.bevestig','Bevestig')+'</button><button class="abtn warn" data-bk="'+b.ref+'" data-st="geweigerd">'+T('hk.o.weiger','Weiger')+'</button>')).join('');
-    html += komend.map(b => kaart(b, '<button class="abtn" data-bk="'+b.ref+'" data-st="afgerond">✓ '+T('hk.o.klaar','Rond af')+'</button>')).join('');
-    if (!open.length && !komend.length) html += '<div class="card">'+T('hk.o.leeg','Geen open opdrachten. Nieuwe boekingen verschijnen hier vanzelf.')+'</div>';
-    wrap.innerHTML = html;
-    wrap.querySelectorAll('[data-bk]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/booking/status', { ref: b.dataset.bk, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
-    }));
-  }
-  function minibarBlok(r){
-    const mb = (state.minibar && state.minibar.catalog) || [];
-    return '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.5rem;">'+
-      mb.map(x => '<div class="mbrow"><span style="font-size:0.86rem;">'+esc(x.name)+' <span style="color:var(--soft);font-size:0.74rem;">'+eur(x.price)+'</span></span>'+
-        '<span class="q"><button data-mbmin="'+x.id+'" aria-label="minder">−</button><b>'+(mbTel[x.id]||0)+'</b><button data-mbplus="'+x.id+'" aria-label="meer">+</button></span></div>').join('')+
-      '<button class="abtn" data-mbboek="'+esc(r.name)+'" style="width:100%;margin-top:0.4rem;">'+T('hk.boek','Boek op de kamer')+'</button></div>';
-  }
-  function bindKamers(wrap){
-    // het hoteldorp: kant kiezen, posten doorzetten, en er iets bij zetten
-    wrap.querySelectorAll('[data-pkdkant]').forEach(b => b.addEventListener('click', () => {
-      pkDorpKant = b.dataset.pkdkant;
-      try { localStorage.setItem('rtg_pda_dorp', pkDorpKant); } catch(e){}
-      renderKamers();
-    }));
-    // het specialistische gereedschap: logmoment, meter en snelposten
-    wrap.querySelectorAll('[data-pkdactie]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/dorp/post', { afdeling: pkDorpKant, waar: '', tekst: b.dataset.pkdactie, directKlaar: true }); toast(T('dorp.geklokt','Geklokt.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
-      catch(e){ toast(e.message); }
-    }));
-    // elke afdeling in een tik bij de teamchat, de collegachat en de teamcall
-    const pdc = wrap.querySelector('#pkDorpChat');
-    if (pdc) pdc.addEventListener('click', () => openTab('team'));
-    // de leeftijdscheck: de paspoort-bevestiging geeft ja/nee, nooit gegevens
-    wrap.querySelectorAll('[data-pklft]').forEach(b => b.addEventListener('click', async () => {
-      const inp = wrap.querySelector('#pkLftIn'), uit = wrap.querySelector('#pkLftUit');
-      const codenaam = (inp && inp.value || '').trim();
-      if (!codenaam){ toast(T('pd.lft.leeg','Vul de codenaam van de gast in.')); return; }
-      const min = Number(b.dataset.pklft);
+    const kb = document.getElementById('klokBtn');
+    if (kb) kb.addEventListener('click', async () => {
+      kb.disabled = true;
       try {
-        const r = await API.call('/supplier/paspoort/vraag', { codenaam, niveau: 'bevestiging', minLeeftijd: min });
-        const ok = r.bevestiging && r.bevestiging.voldoetLeeftijd === true;
-        if (navigator.vibrate) navigator.vibrate(ok ? 80 : [200, 80, 200]);
-        uit.innerHTML = ok
-          ? '<b style="color:var(--green,#7ecb8f);font-size:1rem;">'+esc(codenaam)+' '+T('pd.lft.ja','is')+' '+min+'+</b>'
-          : '<b style="color:#E36385;font-size:1rem;">'+esc(codenaam)+' '+T('pd.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
-      } catch(e){ uit.innerHTML = '<b style="color:#E36385;">'+esc(e.message)+'</b>'; }
+        const d = await API.call('/staff/clock', {});
+        if (zaken) zaken.klok = d.klok;
+        toast(d.actie === 'in' ? '▶ ' + T('pd.k.ingeklokt','Ingeklokt. Werk ze!') : '' + T('pd.k.uitgeklokt','Uitgeklokt. Tot de volgende dienst.'));
+        renderToday();
+      } catch(e){ toast(e.message); kb.disabled = false; }
+    });
+    // geaccrediteerd wisselen: wie ook bij een verbonden zaak op het rooster
+    // staat, stapt met een tik over, zonder opnieuw een PIN in te voeren
+    if (wisselOpties.length){
+      $('#todayWrap').insertAdjacentHTML('beforeend',
+        '<div class="card"><div class="k">'+T('pd.ws.h','Andere afdeling')+'</div>'+
+        '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.ws.sub','U bent hier ook geaccrediteerd; wisselen kan direct, uw inlog reist mee.')+'</div>'+
+        wisselOpties.map(o => '<div class="task"><span class="ic">'+(BEDRIJVEN[o.code]?BEDRIJVEN[o.code].icon:'')+'</span><div class="t"><b>'+esc(o.naam)+'</b><span>'+T('pd.ws.acc','Geaccrediteerd via het personeelsnetwerk')+'</span></div>'+
+          '<button class="abtn" data-wissel="'+esc(o.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
+      document.querySelectorAll('[data-wissel]').forEach(b => b.addEventListener('click', async () => {
+        b.disabled = true;
+        try {
+          const d = await API.call('/supplier/wissel', { code: b.dataset.wissel });
+          try {
+            localStorage.setItem('rtg_pda_token', d.token);
+            localStorage.setItem('rtg_pda_code', d.supplier.code);
+            localStorage.setItem('rtg_pda_bedrijf', d.supplier.code);
+          } catch(e){}
+          toast('' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
+          setTimeout(() => location.reload(), 400);
+        } catch(e){ toast(e.message); b.disabled = false; }
+      }));
+    }
+    // 1x aanmelden: wie met het eigen RTG-account is ingelogd en bij meer bedrijven
+    // werkt, wisselt hier direct van werkplek. Inklokken doet u daar zelf, apart.
+    const andere = (mijnPosities || []).filter(p => p.code !== code);
+    if (andere.length){
+      $('#todayWrap').insertAdjacentHTML('beforeend',
+        '<div class="card"><div class="k">'+T('pd.mw.h','Mijn werkplekken')+'</div>'+
+        '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.mw.sub','U werkt bij meer bedrijven; wissel met één tik. U klokt daar zelf in.')+'</div>'+
+        andere.map(p => '<div class="task"><span class="ic">'+(BEDRIJVEN[p.code]?BEDRIJVEN[p.code].icon:'')+'</span><div class="t"><b>'+esc(p.naam)+'</b><span>'+esc(p.func || (p.manager?'Manager':T('pd.staff','Medewerker')))+'</span></div>'+
+          '<button class="abtn" data-mijn="'+esc(p.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
+      document.querySelectorAll('[data-mijn]').forEach(b => b.addEventListener('click', async () => {
+        b.disabled = true;
+        try {
+          const d = await API.call('/supplier/mijn/wissel', { code: b.dataset.mijn });
+          toast('' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
+          await landMijn(d); openTab('vandaag');
+        } catch(e){ toast(e.message); b.disabled = false; }
+      }));
+    }
+  }
+
+  function renderRooster(){
+    if (!week){ $('#roosterWrap').innerHTML = ''; return; }
+    $('#roosterWrap').innerHTML = week.days.map((d,i) =>
+      '<div class="rooster-day"><div class="dh">'+d.label+' · '+d.date.slice(8,10)+'-'+d.date.slice(5,7)+'</div>'+
+      d.staff.map(m => '<div class="rrow'+(m.id===me.staffId?' me':'')+'"><b>'+esc(m.name)+(m.id===me.staffId?' ('+T('pd.you','u')+')':'')+'</b><span>'+m.shift+'</span></div>').join('')+
+      '</div>'
+    ).join('');
+  }
+
+  function renderTaken(){
+    const tasks = taskList();
+    $('#takenWrap').innerHTML = '<div class="card">'+(tasks.length ? tasks.map(t => {
+      let act = '';
+      if (t.kind==='ticket') act = t.status==='open'
+        ? '<button class="abtn" data-tk="'+t.id+'" data-st="bezig">'+T('pd.pickup','Oppakken')+'</button>'
+        : '<button class="abtn" data-tk="'+t.id+'" data-st="klaar">'+T('pd.done','Klaar')+'</button>';
+      if (t.kind==='hk') act = '<button class="abtn" data-hk="'+t.id+'">'+T('pd.clean','Schoon')+'</button>';
+      return '<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div>'+act+'</div>';
+    }).join('') : '<div style="font-size:0.84rem;color:var(--green);padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
+    const tw = $('#takenWrap');
+    // melden hoort bij iedereen: een klus doorgeven en gevonden voorwerpen registreren
+    const kamers = (state && state.rooms || []).map(r => r.name);
+    const kamerSel = id => '<select class="hin" id="'+id+'" style="flex:1;"><option value="">'+T('hk.geenk','geen kamer')+'</option>'+kamers.map(k=>'<option>'+esc(k)+'</option>').join('')+'</select>';
+    tw.innerHTML += '<div class="card"><div class="k">'+T('hk.klus.meld','Meld klus')+'</div>'+
+      '<div class="row"><input class="hin" id="klusTekst" placeholder="'+T('hk.klus.ph','Omschrijf de klus...')+'" style="flex:2;">'+kamerSel('klusKamer')+'</div>'+
+      '<button class="abtn" id="klusMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.klus.meld','Meld klus')+'</button></div>';
+    const lf = (state && state.lostfound || []).slice(0, 6);
+    tw.innerHTML += '<div class="card"><div class="k">'+T('hk.lf','Gevonden voorwerp')+'</div>'+
+      '<div class="row"><input class="hin" id="lfItem" placeholder="'+T('hk.lf.item','Wat heb je gevonden?')+'" style="flex:2;">'+kamerSel('lfKamer')+'</div>'+
+      '<div class="row"><input class="hin" id="lfPlek" placeholder="'+T('hk.lf.plek','Bewaarplek')+'"></div>'+
+      '<button class="abtn" id="lfMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.lf.meld','Registreer')+'</button>'+
+      (lf.length ? '<div class="k" style="margin-top:0.8rem;">'+T('hk.lf.recent','Laatst geregistreerd')+'</div>'+
+        lf.map(x => '<div class="task"><div class="t"><b>'+esc(x.item)+'</b><span>'+(x.room?esc(x.room)+' · ':'')+(x.storage?esc(x.storage)+' · ':'')+timeAgo(x.at)+'</span></div></div>').join('') : '')+'</div>';
+    tw.querySelectorAll('[data-tk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/ticket/status', { id:b.dataset.tk, status:b.dataset.st }); toast(b.dataset.st==='klaar'?T('pd.tickdone','Klus afgerond.'):T('pd.tickbusy','Opgepakt.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
     }));
-    wrap.querySelectorAll('[data-pkdmeter]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/dorp/drukte', { afdeling: pkDorpKant, stand: b.dataset.pkdmeter }); pkToolsKant = null; pkLaadTools(); } catch(e){ toast(e.message); }
+    tw.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/room/hk', { id:b.dataset.hk, status:'schoon' }); toast(T('pd.cleaned','Kamer staat op schoon.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
     }));
-    wrap.querySelectorAll('[data-pkdsnelknop]').forEach(b => b.addEventListener('click', async () => {
-      const afd = pkDorp && (pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0]);
-      if (!afd) return;
-      const waar = prompt(afd.waarHint) || '';
-      try { await API.call('/supplier/dorp/post', { afdeling: afd.key, waar, tekst: b.dataset.pkdsnelknop }); toast(afd.icon+' '+T('pd.dorp.gezet','Staat op de lijst.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
-      catch(e){ toast(e.message); }
-    }));
-    wrap.querySelectorAll('[data-pkdverder]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/dorp/verder', { id: b.dataset.pkdverder }); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); } catch(e){ toast(e.message); }
-    }));
-    // doorsturen: de post reist naar een andere afdeling, met het spoor erbij
-    wrap.querySelectorAll('[data-pkdstuur]').forEach(b => b.addEventListener('click', async () => {
+    const km = $('#klusMeld'); if (km) km.addEventListener('click', async () => {
+      const text = $('#klusTekst').value.trim(); if (!text) return;
+      try { await API.call('/supplier/ticket/add', { text, room: $('#klusKamer').value }); toast(''+T('hk.klusok','Klus gemeld.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    });

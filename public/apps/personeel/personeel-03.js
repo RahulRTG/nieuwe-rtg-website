@@ -1,70 +1,128 @@
-  let kaToken = null, kaDienst = null, kaTimer = null;
-  try { kaToken = localStorage.getItem('rtg_office_token'); } catch(e){}
-  try { kaDienst = JSON.parse(localStorage.getItem('rtg_kantoor_dienst') || 'null'); } catch(e){}
-  const kaApi = (pad, body) => fetch('/api/office/' + pad, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kaToken },
-    body: JSON.stringify(body || {})
-  }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || T('pd.mis','Er ging iets mis.')); return d; });
-  function kantoorStop(){ if (kaTimer){ clearInterval(kaTimer); kaTimer = null; } }
-  // het terug-adres van een kantoren-deeplink (?kamer=...): alleen eigen paden
-  function kaTerugPad(){
-    const t = new URLSearchParams(location.search).get('terug') || '';
-    return (t.startsWith('/') && !t.startsWith('//')) ? t : null;
+    // de pas-controle
+    html += '<div class="card"><div class="k">'+T('pd.pol.pas','Pas-controle')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="ppPas" placeholder="ZP-XXXX" maxlength="12" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.45rem 0.6rem;text-transform:uppercase;">'+
+      '<button class="abtn" id="ppGo">'+T('pd.pol.check','Controleer')+'</button></div>'+
+      '<div id="ppUit" style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);"></div></div>';
+    wrap.innerHTML = html;
+    const doe2 = (sel, fn) => wrap.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', () => fn(b.dataset)));
+    doe2('data-ppak', async ds => {
+      try { await API.call('/supplier/polis/zet', { id: ds.ppak, status: 'advies-klaar', advies: (wrap.querySelector('[data-ppat="'+ds.ppak+'"]')||{}).value }); laadPolisPda(); } catch(e){ toast(e.message); }
+    });
+    doe2('data-ppdg', async ds => {
+      try { await API.call('/supplier/zorgpolis/declaratie/beslis', { id: ds.ppdg, besluit: 'goedgekeurd', door: (me && me.name) || '' }); laadPolisPda(); } catch(e){ toast(e.message); }
+    });
+    doe2('data-ppda', async ds => {
+      try { await API.call('/supplier/zorgpolis/declaratie/beslis', { id: ds.ppda, besluit: 'afgewezen', reden: (wrap.querySelector('[data-ppdr="'+ds.ppda+'"]')||{}).value, door: (me && me.name) || '' }); laadPolisPda(); } catch(e){ toast(e.message); }
+    });
+    const go = wrap.querySelector('#ppGo');
+    if (go) go.addEventListener('click', async () => {
+      try { const r = await API.call('/supplier/zorgpolis/pas', { pas: (wrap.querySelector('#ppPas')||{}).value });
+        wrap.querySelector('#ppUit').textContent = (r.actief ? T('pd.pol.actief','Actief') : T('pd.pol.niet','Niet actief')) + ' · ' + r.pakket + ' · ' + r.codenaam;
+      } catch(e){ const u = wrap.querySelector('#ppUit'); if (u) u.textContent = e.message; }
+    });
   }
-  function stepKantoor(){
+
+
+  /* ---------- stappen-gate: sector -> bedrijf -> wie -> pincode ----------
+     De PDA staat vast op een bedrijf: na de eerste keuze onthoudt het apparaat
+     het bedrijf en opent hij direct op het eigen team. Inloggen kan alleen wie
+     door de werkgever is uitgenodigd en zich heeft aangemeld (dan sta je in het
+     team), met de eigen pincode. */
+  function pdaBedrijf(){
+    try { const c = localStorage.getItem('rtg_pda_bedrijf'); return (c && BEDRIJVEN[c]) ? c : null; } catch(e){ return null; }
+  }
+  function stepStart(){
+    // 1x aanmelden is de gewone ingang: log één keer in met uw eigen RTG-account
+    // en u landt meteen op de juiste bedrijfspagina. Een vast apparaat in de zaak
+    // (QR / ?bedrijf=CODE, of een onthouden bedrijf) houdt de naam-en-pincode-ingang.
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('kantoor') != null){ stepKantoor(); return; }
+    const qb = String(qs.get('bedrijf') || '').toUpperCase();
+    if (qb && BEDRIJVEN[qb]){ stepWie(null, qb); return; }
+    const vast = pdaBedrijf();
+    if (vast) stepWie(null, vast);
+    else stepLogin();
+  }
+  // de klok en de datum op het inlogscherm (de naam van de app staat in de badge)
+  function gateTik(){ if (window.RTGKlok) RTGKlok.alles(); }
+  // De hoofd-ingang: inloggen met het eigen RTG-account (e-mail/gebruikersnaam +
+  // wachtwoord). Daaronder alleen aanmelden en wachtwoord vergeten; een vast
+  // apparaat kan nog op naam met pincode.
+  function stepLogin(){
     kantoorStop();
-    if (kaToken){ enterKantoor().catch(() => toonKantoorLogin()); return; }
-    toonKantoorLogin();
+    $('#gateStep').innerHTML =
+      '<form class="lform" id="loginForm" autocomplete="on">'+
+        '<input id="liUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
+        '<input id="liPass" type="password" autocomplete="current-password" placeholder="'+T('pd.li.pass','Wachtwoord')+'" aria-label="'+T('pd.li.pass','Wachtwoord')+'">'+
+        '<div class="err" id="liErr" role="alert"></div>'+
+        '<button class="prim" type="submit">'+T('pd.login','Inloggen')+'</button>'+
+      '</form>'+
+      '<div class="llinks">'+
+        '<button class="llink" id="toJoin" type="button">'+T('pd.aanmelden','Aanmelden bij een bedrijf')+'</button>'+
+        '<button class="llink" id="toForgot" type="button">'+T('pd.forgot','Wachtwoord vergeten?')+'</button>'+
+        '<button class="llink" id="toDevice" type="button">'+T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode')+'</button>'+
+      '</div>';
+    $('#loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('#liErr').textContent = '';
+      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
+      catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
+    });
+    $('#toJoin').addEventListener('click', stepAanmelden);
+    $('#toForgot').addEventListener('click', stepForgot);
+    $('#toDevice').addEventListener('click', stepSector);
+    $('#liUser').focus();
   }
-  function toonKantoorLogin(){
-    $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.back','Terug')+'</button>'+
-      '<div class="card"><div class="k">'+T('pd.ka.code','Kantoorcode')+'</div>'+
-      '<div class="pinrow" style="margin-top:0.6rem;"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
-      '<button id="kaGo">'+T('pd.ka.binnen','Binnen')+'</button></div>'+
-      '<div class="k" style="margin-top:0.7rem;">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
-      '<input class="hin" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" style="margin-top:0.4rem;">'+
-      '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
-    $('#kaTerug').addEventListener('click', stepSector);
-    const go = async () => {
-      $('#kaFout').textContent = '';
+  // Aanmelden bij een bedrijf: bedrijfsnaam + kassacode (van de werkgever) +
+  // het eigen RTG-account + een zelfgekozen pincode. Daarna landt u meteen.
+  function stepAanmelden(){
+    $('#gateStep').innerHTML =
+      '<button class="gback" id="jaBack">← '+T('pd.back','Terug')+'</button>'+
+      '<form class="lform" id="joinForm" autocomplete="on">'+
+        '<input id="jaBedrijf" type="text" placeholder="'+T('pd.ja.bedrijf','Bedrijfsnaam')+'" aria-label="'+T('pd.ja.bedrijf','Bedrijfsnaam')+'">'+
+        '<input id="jaCode" type="text" autocapitalize="characters" placeholder="'+T('pd.ja.code','Kassacode van uw werkgever')+'" aria-label="'+T('pd.ja.code','Kassacode van uw werkgever')+'">'+
+        '<input id="jaUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
+        '<input id="jaPass" type="password" autocomplete="current-password" placeholder="'+T('pd.ja.rtgpass','Wachtwoord van uw RTG-account')+'" aria-label="'+T('pd.ja.rtgpass','Wachtwoord van uw RTG-account')+'">'+
+        '<input id="jaPin" type="password" inputmode="numeric" maxlength="4" placeholder="'+T('pd.ja.pin','Kies een pincode (4 cijfers)')+'" aria-label="'+T('pd.ja.pin','Kies een pincode van 4 cijfers')+'">'+
+        '<div class="err" id="jaErr" role="alert"></div>'+
+        '<button class="prim" type="submit">'+T('pd.aanmelden.go','Aanmelden')+'</button>'+
+      '</form>'+
+      '<div class="lhint">'+T('pd.ja.hint','Nog geen RTG-account? Maak er gratis een aan in de leden-app; daarna meldt u zich hier aan met de kassacode van uw werkgever.')+'</div>';
+    $('#jaBack').addEventListener('click', stepLogin);
+    $('#joinForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('#jaErr').textContent = '';
+      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
       try {
-        const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#kaCode').value.trim(), totp: $('#kaTotp').value.trim() }) });
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(d.error || T('pd.ka.fout','Die code klopt niet.'));
-        kaToken = d.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-        // een account voor alles: net bewezen code stil aan het RTG-account koppelen
-        try {
-          const lt = localStorage.getItem('rtg_member_token');
-          if (lt) fetch('/api/account/koppel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
-            body: JSON.stringify({ soort: 'kantoor', code: $('#kaCode').value.trim(), totp: $('#kaTotp').value.trim() }) });
-        } catch(e){}
-        enterKantoor();
-      } catch(e){ $('#kaFout').textContent = e.message; }
-    };
-    $('#kaGo').addEventListener('click', go);
-    $('#kaCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
-    $('#kaCode').focus();
-    // is de kantoor-rol al aan het RTG-account op dit toestel gekoppeld,
-    // dan is een tik genoeg (het ene account start dezelfde kantoor-sessie)
-    (async () => {
-      let lt = null; try { lt = localStorage.getItem('rtg_member_token'); } catch(e){}
-      if (!lt) return;
-      try {
-        const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok || !(d.rollen || []).some(x => x.rol === 'kantoor')) return;
-        const b = document.createElement('button');
-        b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
-        b.textContent = '' + T('pd.ka.een', 'Verder met uw RTG-account');
-        b.addEventListener('click', async () => {
-          const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: JSON.stringify({ rol: 'kantoor' }) });
-          const sd = await s.json().catch(() => ({}));
-          if (!s.ok) { $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.'); return; }
-          kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-          enterKantoor();
-        });
-        const kaart = $('#gateStep').querySelector('.card');
-        if (kaart) kaart.appendChild(b);
-      } catch(e){}
-    })();
+        await API.call('/supplier/staff/join', { bedrijf: $('#jaBedrijf').value.trim(), kassacode: $('#jaCode').value.trim(),
+          login: $('#jaUser').value.trim(), password: $('#jaPass').value, pin: $('#jaPin').value.trim() });
+        // aangemeld: log meteen in met hetzelfde account en land op het bedrijf
+        await mijnLogin($('#jaUser').value.trim(), $('#jaPass').value);
+      } catch(err){ $('#jaErr').textContent = err.message || T('pd.mis','Er ging iets mis.'); btn.disabled = false; }
+    });
+    $('#jaBedrijf').focus();
   }
+  // Wachtwoord vergeten: stuurt de herstelmail; verder gaat het via de leden-app.
+  function stepForgot(){
+    $('#gateStep').innerHTML =
+      '<button class="gback" id="fgBack">← '+T('pd.back','Terug')+'</button>'+
+      '<form class="lform" id="forgotForm" autocomplete="on">'+
+        '<input id="fgEmail" type="email" autocomplete="email" placeholder="'+T('pd.fg.email','Uw e-mailadres')+'" aria-label="'+T('pd.fg.email','Uw e-mailadres')+'">'+
+        '<div class="err" id="fgErr" role="alert"></div>'+
+        '<button class="prim" type="submit">'+T('pd.fg.go','Stuur herstel-link')+'</button>'+
+      '</form>'+
+      '<div class="lhint">'+T('pd.fg.hint','We sturen een link en een code om uw wachtwoord opnieuw in te stellen. Dat rondt u af in de leden-app.')+'</div>';
+    $('#fgBack').addEventListener('click', stepLogin);
+    $('#forgotForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      try { await API.call('/auth/forgot', { email: $('#fgEmail').value.trim() });
+        toast(T('pd.fg.ok','Als dit adres bij ons bekend is, is de herstel-link onderweg.'));
+        stepLogin();
+      } catch(err){ $('#fgErr').textContent = err.message || T('pd.mis','Er ging iets mis.'); btn.disabled = false; }
+    });
+    $('#fgEmail').focus();
+  }
+  // Inloggen met het RTG-account en landen op de juiste bedrijfspagina.
+  async function mijnLogin(login, password, bedrijf){

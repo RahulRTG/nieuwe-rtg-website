@@ -1,128 +1,79 @@
-    const ts = document.getElementById('tpSend');
-    if (ts) ts.addEventListener('click', async () => {
-      const inp = document.getElementById('tpText');
-      const text = (inp.value || '').trim();
-      if (!text) return;
-      try {
-        const d = await API.call('/staff/trust/send', { text, anon: document.getElementById('tpAnon').checked });
-        if (zaken) zaken.trust = d.trust;
-        toast(''+T('pd.tp.sent','Vertrouwelijk verstuurd. Alleen RTG leest dit.'));
-        renderHulp();
-        openTab('hulp');
-      } catch(e){ toast(e.message); }
-    });
-    const zb = document.getElementById('ziekBtn');
-    if (zb) zb.addEventListener('click', async () => {
-      if (!ziekArm){ ziekArm = true; renderHulp(); openTab('hulp'); return; }
-      ziekArm = false;
-      try {
-        await API.call('/staff/leave/request', { soort: 'ziek' });
-        toast(''+T('pd.ad.ziekok','Ziekmelding doorgegeven. Beterschap!'));
-        await laadZaken(); renderHulp(); openTab('hulp');
-      } catch(e){ toast(e.message); renderHulp(); }
-    });
-    const vg = document.getElementById('vlGo');
-    if (vg) vg.addEventListener('click', async () => {
-      const van = document.getElementById('vlVan').value, tot = document.getElementById('vlTot').value;
-      if (!van || !tot){ toast(T('pd.ad.datum','Kies een begin- en einddatum.')); return; }
-      try {
-        await API.call('/staff/leave/request', { soort: 'verlof', van, tot, reden: document.getElementById('vlReden').value.trim() });
-        toast(''+T('pd.ad.gevraagd','Verlof aangevraagd; de manager beslist in het Kantoor.'));
-        await laadZaken(); renderHulp(); openTab('hulp');
-      } catch(e){ toast(e.message); }
-    });
-    // De trainingskaart tekent zichzelf met Util.el (eigen handlers); vullen volstaat.
-    vulTrainingKaart();
-  }
-
-  // Ritten: chauffeurs en crew van vervoerspartners (taxi en jet) werken hun
-  // ritten volledig vanuit de zak af: nemen, stap voor stap rijden, verdiensten.
-  const NEXT_RIDE = { 'aangevraagd':'geaccepteerd', 'geaccepteerd':'onderweg', 'onderweg':'aangekomen', 'aangekomen':'aan-boord', 'aan-boord':'afgerond', 'rijdt':'afgerond', 'gearriveerd':null };
-  const RIDE_LBL = { 'geaccepteerd':['pd.r.accept','Accepteer'], 'onderweg':['pd.r.go','Ik rijd'], 'aangekomen':['pd.r.atpickup','Ik sta voor'], 'aan-boord':['pd.r.board','Aan boord'], 'afgerond':['pd.r.done','Afronden'] };
-  const RIT_ST = { 'aangevraagd':['pd.rs.new','nieuw'], 'geaccepteerd':['pd.rs.acc','geaccepteerd'], 'onderweg':['pd.rs.go','onderweg'], 'aangekomen':['pd.rs.at','staat voor'], 'aan-boord':['pd.rs.board','gast aan boord'], 'rijdt':['pd.rs.board','gast aan boord'] };
-  const RIT_KLAAR = st => st === 'gearriveerd' || st === 'afgerond' || st === 'geweigerd';
-  const heeftRitten = () => !!(state && state.supplier && (state.supplier.caps || []).includes('rides'));
-  function renderRitten(){
-    const aan = heeftRitten();
-    const tabBtn = document.getElementById('tabRitten');
-    if (tabBtn) tabBtn.style.display = aan ? '' : 'none';
-    const wrap = $('#rittenWrap');
-    if (!aan){ if (wrap) wrap.innerHTML = ''; return; }
-    const jet = state.supplier && state.supplier.type === 'jet';
-    const ritten = state.rides || [];
-    const mijn = ritten.filter(r => !RIT_KLAAR(r.status) && r.driver && r.driver.staffId === me.staffId);
-    const straks = r => r.plannedFor && (new Date(r.plannedFor) - Date.now()) > 45 * 60000;
-    const alleOpen = ritten.filter(r => r.status === 'aangevraagd' && !r.driver);
-    const open = alleOpen.filter(r => !straks(r));
-    const gepland = alleOpen.filter(straks);
-    const vandaag = new Date().toISOString().slice(0, 10);
-    const klaar = ritten.filter(r => (r.status === 'afgerond' || r.status === 'gearriveerd') && r.driver && r.driver.staffId === me.staffId && String(r.finishedAt || r.at).slice(0, 10) === vandaag);
-    const omzet = klaar.reduce((s, r) => s + (r.quote || 0), 0);
-    const regel = r => (r.from || '') + ' → ' + (r.to || T('pd.r.opendest','open bestemming')) + (r.passengers ? ' · ' + r.passengers + 'p' : '') + (r.quote ? ' · ' + eur(r.quote) : '');
-    wrap.innerHTML =
-      '<div class="card"><div class="k">'+T('pd.r.mijn','Uw rit')+' ('+mijn.length+')</div>'+
-      (mijn.length ? mijn.map(r => {
-        const nxt = NEXT_RIDE[r.status];
-        const st = RIT_ST[r.status];
-        return '<div class="task"><span class="ic">'+(jet?'':'')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' ·  '+esc(r.note):'')+(r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(pkZorg(r.zorg))+'</span>':'')+'</span></div>'+
-          (nxt ? '<button class="abtn" data-pdgo="'+r.ref+'" data-st="'+nxt+'">'+T(RIDE_LBL[nxt][0], RIDE_LBL[nxt][1])+'</button>' : '')+'</div>';
-      }).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geen','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>')+'</div>'+
-      '<div class="card"><div class="k">'+T('pd.r.openh','Open aanvragen')+' ('+open.length+')</div>'+
-      (open.length ? open.map(r =>
-        '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc(regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>'
-      ).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geenopen','Geen open aanvragen. Nieuwe ritten verschijnen hier vanzelf.')+'</div>')+'</div>'+
-      (gepland.length ? '<div class="card"><div class="k">'+T('pd.r.gepland','Gepland')+' ('+gepland.length+')</div>'+
-        gepland.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc((r.when || '') + ' · ' + regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>').join('')+'</div>' : '')+
-      '<div class="card"><div class="k">'+T('pd.r.vandaag','Vandaag')+'</div>'+
-      '<div class="task"><span class="ic"></span><div class="t"><b>'+klaar.length+' '+T('pd.r.klaar','rit(ten) afgerond')+' · '+eur(omzet)+'</b><span>'+T('pd.r.netto','Volledig voor de zaak: RTG rekent 0% commissie.')+'</span></div></div></div>';
-    document.querySelectorAll('[data-pdgo]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/ride/status', { ref: b.dataset.pdgo, status: b.dataset.st }); await refresh(); openTab('ritten'); } catch(e){ toast(e.message); }
-    }));
-    document.querySelectorAll('[data-pdneem]').forEach(b => b.addEventListener('click', async () => {
-      try {
-        const s = await API.call('/supplier/ride/suggest', { ref: b.dataset.pdneem });
-        await API.call('/supplier/ride/assign', { ref: b.dataset.pdneem, self: true, vehicleId: s.vehicleId });
-        toast(T('pd.r.genomen','De rit is van u.') + (s.vehicleName ? ' · ' + s.vehicleName : ''));
-        await refresh(); openTab('ritten');
-      } catch(e){ toast(e.message); }
+    wrap.querySelectorAll('[data-mbboek]').forEach(b => b.addEventListener('click', async () => {
+      const items = Object.entries(mbTel).filter(([,q]) => q > 0).map(([id, qty]) => ({ id, qty }));
+      if (!items.length) return;
+      try { await API.call('/supplier/minibar/count', { room: b.dataset.mbboek, items }); mbOpen = null; mbTel = {}; toast(''+T('hk.geboekt','Geboekt op de kamer.')); await refresh(); } catch(e){ toast(e.message); }
     }));
   }
 
-  /* ---- bezorgen: ritten op naam, GPS, navigatie en AI-hulp ---- */
-  let gpsWatch = null, gpsLaatst = 0, gpsPos = null;
-  const heeftBezorg = () => !!(state && state.bezorg && state.bezorg.bezorgen);
-  function kaartLink(o){
-    // geen derde partij: een neutrale geo:-URI opent de EIGEN kaart-app van het
-    // toestel (Android/OSMand/Apple Maps naar keuze), wij sturen niets naar Google.
-    if (o.geo && Number.isFinite(o.geo.lat)) return 'geo:' + o.geo.lat + ',' + o.geo.lng + '?q=' + o.geo.lat + ',' + o.geo.lng;
-    return 'geo:0,0?q=' + encodeURIComponent(o.adres || '');
+  /* Hulp & zaken: EHBO-kennis direct bij de hand, de vertrouwenspersoon van
+     RTG (volledig buiten de werkgever om) en de eigen administratie. */
+  let hulpOpen = null, ziekArm = false;
+  const EHBO_GIDS = () => lang() === 'en' ? [
+    { t: 'Resuscitation (CPR)', i: '', s: ['Check consciousness and breathing; shout for help.', 'Call 112 (or have someone call) and ask for an AED.', '30 chest compressions: centre of the chest, 5-6 cm deep, 100-120 per minute.', '2 rescue breaths, then keep alternating 30 to 2.', 'Use the AED as soon as it arrives and follow its instructions.', 'Continue until professional help takes over.'] },
+    { t: 'Choking', i: '', s: ['Encourage coughing first.', 'Not working? Give up to 5 firm blows between the shoulder blades.', 'Still stuck? Up to 5 abdominal thrusts (Heimlich manoeuvre).', 'Keep alternating 5 blows and 5 thrusts; call 112 if it does not clear.'] },
+    { t: 'Burns', i: '', s: ['Cool 10 to 20 minutes with lukewarm, gently running water.', 'No ice, no butter, no ointments.', 'Never pull off clothing that sticks to the skin.', 'Cover loosely with a sterile dressing; blisters or a large area: see a doctor.'] },
+    { t: 'Severe bleeding', i: '', s: ['Press firmly on the wound with a clean cloth.', 'Keep pressing; do not lift it to look.', 'Raise the arm or leg if possible.', 'Call 112 for severe or spurting bleeding.'] },
+    { t: 'Allergic reaction', i: '', s: ['Known allergy with an adrenaline pen? Use it on the outside of the thigh.', 'Call 112 for swelling of face or throat, or trouble breathing.', 'Loosen tight clothing; let the person sit or lie comfortably.', 'Stay with them; a second dose can be needed after 5 to 15 minutes.'] },
+    { t: 'Unconscious but breathing', i: '', s: ['Place the person on their side (recovery position), head tilted back.', 'Call 112.', 'Keep checking the breathing until help arrives.'] },
+    { t: 'Heart attack or stroke', i: '', s: ['Heart attack: pressure on the chest, pain to arm or jaw, sweating. Call 112 and let the person rest half-sitting.', 'Stroke, think FAST: Face (drooping mouth), Arm (weakness), Speech (confused), Time: call 112 at once.', 'Note the time the symptoms started; the hospital needs it.'] }
+  ] : [
+    { t: 'Reanimatie', i: '', s: ['Controleer bewustzijn en ademhaling; roep om hulp.', 'Bel 112 (of laat bellen) en vraag om een AED.', '30 borstcompressies: midden op de borst, 5-6 cm diep, 100-120 per minuut.', '2 beademingen, en blijf wisselen: 30 om 2.', 'Gebruik de AED zodra die er is en volg de gesproken instructies.', 'Ga door tot professionele hulp het overneemt.'] },
+    { t: 'Verslikking', i: '', s: ['Laat eerst flink hoesten.', 'Helpt dat niet? Geef maximaal 5 stevige klappen tussen de schouderbladen.', 'Zit het nog vast? Maximaal 5 buikstoten (Heimlich-greep).', 'Blijf wisselen: 5 klappen, 5 stoten. Bel 112 als het niet loskomt.'] },
+    { t: 'Brandwond', i: '', s: ['Koel 10 tot 20 minuten met lauw, zacht stromend water.', 'Geen ijs, geen boter, geen zalf.', 'Trek kleding die aan de huid plakt nooit los.', 'Dek losjes af met steriel verband; blaren of een groot oppervlak: naar een arts.'] },
+    { t: 'Ernstige bloeding', i: '', s: ['Druk stevig op de wond met een schone doek.', 'Blijf drukken; til de doek niet op om te kijken.', 'Houd de arm of het been omhoog als dat kan.', 'Bel 112 bij een ernstige of spuitende bloeding.'] },
+    { t: 'Allergische reactie', i: '', s: ['Bekende allergie met een adrenalinepen? Zet die op de buitenkant van het bovenbeen.', 'Bel 112 bij een opgezwollen gezicht of keel, of moeite met ademen.', 'Maak knellende kleding los; laat rustig zitten of liggen.', 'Blijf erbij; na 5 tot 15 minuten kan een tweede dosis nodig zijn.'] },
+    { t: 'Bewusteloos, maar ademt', i: '', s: ['Leg de persoon op de zij (stabiele zijligging), hoofd iets achterover.', 'Bel 112.', 'Blijf de ademhaling controleren tot er hulp is.'] },
+    { t: 'Hartaanval of beroerte', i: '', s: ['Hartaanval: drukkende pijn op de borst, uitstraling naar arm of kaak, zweten. Bel 112 en laat halfzittend rusten.', 'Beroerte, denk aan FAST: Face (scheve mond), Arm (uitvalt), Speech (verwarde spraak), Time: bel direct 112.', 'Noteer hoe laat de klachten begonnen; het ziekenhuis heeft dat nodig.'] }
+  ];
+  // Training & tips: micro-learning in de PDA. Rol-bewuste tips, een tip van de
+  // dag, een AI-coach en (voor de manager) eigen huistips van de zaak.
+  // De trainingskaart is met het componentframework (Util.el) gebouwd: tekst
+  // wordt structureel als tekstknoop gezet (dus altijd veilig ge-escaped) en de
+  // knoppen dragen hun eigen handler. renderHulp laat er een plek voor open
+  // (#trainKaart); vulTrainingKaart() tekent hem daarin, ook na een klik.
+  function trainingKaart(){ return trainData ? '<div id="trainKaart"></div>' : ''; }
+  function vulTrainingKaart(){
+    const c = document.getElementById('trainKaart');
+    if (!c || !window.Util) return;
+    const node = bouwTrainingKaart();
+    Util.vervang(c, node || document.createTextNode(''));
   }
-  function afstandNaar(o){
-    if (!gpsPos || !o.geo || !Number.isFinite(o.geo.lat)) return null;
-    const R = 6371000, rad = d => d * Math.PI / 180;
-    const dLat = rad(o.geo.lat - gpsPos.lat), dLng = rad(o.geo.lng - gpsPos.lng);
-    const a = Math.sin(dLat/2)**2 + Math.cos(rad(gpsPos.lat)) * Math.cos(rad(o.geo.lat)) * Math.sin(dLng/2)**2;
-    return Math.round(2 * R * Math.asin(Math.sqrt(a)));
-  }
-  async function gpsStuur(lat, lng){
-    if (Date.now() - gpsLaatst < 8000) return; // hooguit elke 8 s naar de server
-    gpsLaatst = Date.now();
-    try { await API.call('/supplier/bezorg/gps', { lat, lng }); } catch(e){}
-  }
-  function gpsAanUit(){
-    if (gpsWatch != null){ navigator.geolocation.clearWatch(gpsWatch); gpsWatch = null; renderBezorgen(); return; }
-    if (!navigator.geolocation){ toast(T('pd.bz.geengps','Dit apparaat deelt geen GPS.')); return; }
-    gpsWatch = navigator.geolocation.watchPosition(p => {
-      gpsPos = { lat: p.coords.latitude, lng: p.coords.longitude };
-      gpsStuur(gpsPos.lat, gpsPos.lng);
-    }, () => toast(T('pd.bz.gpsfout','GPS staat uit of is geweigerd.')), { enableHighAccuracy: true, maximumAge: 5000 });
-    renderBezorgen();
-  }
-  function renderBezorgen(){
-    const tabBtn = document.getElementById('tabBezorgen');
-    if (tabBtn) tabBtn.style.display = heeftBezorg() ? '' : 'none';
-    const wrap = $('#bezorgenWrap');
-    if (!wrap) return;
-    if (!heeftBezorg()){ wrap.innerHTML = ''; return; }
-    const alle = (state.bezorg && state.bezorg.lopend) || [];
-    const mijn = alle.filter(o => o.levering === 'bezorgen' && o.bezorger && o.bezorger.staffId === me.staffId && !['bezorgd','opgehaald'].includes(o.status));
+  function bouwTrainingKaart(){
+    if (!trainData) return null;
+    const E = Util.el, t = trainData, tvd = t.tipVanDeDag;
+    const alle = t.tips || [], eigen = t.eigen || [], gelezen = t.gelezen || [];
+    const totaal = alle.length, klaar = gelezen.filter(g => alle.some(x => x.t === g)).length;
+    const pct = totaal ? Math.round(klaar / totaal * 100) : 0;
+    const label = { fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--soft)' };
+
+    /* De id hoort hier te staan. Wie op een trage tafel tikt, komt via
+       personeel-04.js in dit tabblad en dat zoekt #coachVraag op om de cursor
+       er meteen in te zetten. Dat veld had geen id, dus die sprong deed niets
+       -- en niets viel op: het tabblad ging wel open. */
+    const coachInp = E('input', { id: 'coachVraag', placeholder: coachRef ? T('pd.tr.askctx', 'Vraag over deze tafel... bijv. waar let ik op?') : T('pd.tr.ask', 'Vraag de coach... bijv. hoe stel ik een wijn voor?') });
+    const coachBtn = E('button', { onclick: async () => {
+      const vraag = (coachInp.value || '').trim();
+      if (!vraag) return;
+      coachBtn.disabled = true; coachBtn.textContent = '...';
+      try { coachAntwoord = await API.call('/supplier/coach', coachRef ? { vraag, ref: coachRef } : { vraag }); }
+      catch (e) { toast(e.message); }
+      vulTrainingKaart();
+    } }, T('pd.tr.coach', 'Vraag'));
+
+    function tipRij(x){
+      const g = gelezen.includes(x.t);
+      return E('div', { class: 'task', style: g ? { alignItems: 'flex-start', opacity: '0.7' } : { alignItems: 'flex-start' } },
+        E('button', { class: 'ic', 'aria-label': g ? T('pd.tr.unread', 'Markeer als ongelezen') : T('pd.tr.mark', 'Markeer als gelezen'),
+          style: { cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.1rem' },
+          onclick: async () => {
+            const uit = (trainData.gelezen || []).includes(x.t);
+            try { const d = await API.call('/supplier/training/gelezen', { titel: x.t, uit }); if (trainData) trainData.gelezen = d.gelezen; vulTrainingKaart(); }
+            catch (e) { toast(e.message); }
+          } }, g ? '' : ''),
+        E('div', { class: 't' }, E('b', {}, x.t), E('span', { style: { lineHeight: '1.5' } }, x.s)),
+        (t.kanBeheren && eigen.some(e => e.t === x.t)) ? E('button', { class: 'abtn ghost', style: { flex: '0 0 auto', padding: '0.25rem 0.5rem', fontSize: '0.7rem' },
+          onclick: async () => { try { await API.call('/supplier/training/remove', { titel: x.t }); await laadZaken(); vulTrainingKaart(); } catch (e) { toast(e.message); } } }, '✕') : null
+      );
+    }
+
+    let beheer = null;

@@ -124,6 +124,6 @@ function lenteEquinox(jaar) {
 }
 
 module.exports = {
-  hijriDatum, hijriVan, joodsDatum, joodsSchrikkel, joodsRoshHashana, JOODSE_MAANDEN,
-  pasen, lenteEquinox, utc, naarDatum, dagVerschil, DAG
+  hijriDatum, joodsDatum, joodsSchrikkel, joodsRoshHashana, JOODSE_MAANDEN,
+  pasen, lenteEquinox, utc, dagVerschil, DAG
 };

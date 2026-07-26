@@ -1,135 +1,120 @@
-    if (pdBordenUI) { pdBordenUI.refresh(); return; }
-    pdBordenUI = BordenUI.mount(wrap, {
-      laad: () => API.call('/supplier/borden'),
-      doe: b => API.call('/supplier/bord', b),
-      teamleden: () => (state && state.staff || []).map(m => ({ id: m.id, name: m.name })),
-      kanBeheren: () => !!(me && me.role === 'manager'),
-      T, toast
+    const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
+    await landMijn(d);
+  }
+  // Land (of wissel) naar een van de eigen werkplekken: sessie zetten en de app openen.
+  async function landMijn(d){
+    API.token = d.token; state = d.state; code = d.supplier.code;
+    me = { name: d.actor.name, role: d.actor.role, staffId: d.actor.staffId };
+    mijnPosities = d.posities || [];
+    try { localStorage.setItem('rtg_pda_token', API.token); localStorage.setItem('rtg_pda_code', code); } catch(e){}
+    week = await API.call('/supplier/schedule', {}).catch(()=>null);
+    enter();
+  }
+  function stepSector(){
+    kantoorStop();
+    $('#gateStep').innerHTML = '<div class="glist">' + SECTORS.map(s =>
+      '<button class="gbtn" data-sec="'+s.id+'"><span class="ic">'+(window.RTGGlyf?RTGGlyf.svgHTML(s.icon):'')+'</span><span><b>'+(lang()==='en'?s.en:s.nl)+'</b><span>'+s.sub+'</span></span></button>'
+    ).join('') +
+      '<button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button>'
+    + '</div>';
+    document.querySelectorAll('[data-sec]').forEach(b => b.addEventListener('click', () => stepBedrijf(b.dataset.sec)));
+    $('#gKantoor').addEventListener('click', stepKantoor);
+  }
+  function stepBedrijf(secId){
+    const sec = SECTORS.find(s => s.id === secId);
+    $('#gateStep').innerHTML = '<button class="gback" id="gb1">← '+T('pd.back','Terug')+'</button><div class="glist">' + sec.codes.map(c =>
+      '<button class="gbtn" data-bedrijf="'+c+'"><span class="ic">'+(window.RTGGlyf?RTGGlyf.svgHTML(sec.icon):'')+'</span><span><b>'+BEDRIJVEN[c].name+'</b><span>'+T('pd.choose','Kies uw bedrijf')+'</span></span></button>'
+    ).join('') + '</div>';
+    $('#gb1').addEventListener('click', stepSector);
+    document.querySelectorAll('[data-bedrijf]').forEach(b => b.addEventListener('click', () => stepWie(secId, b.dataset.bedrijf)));
+  }
+  async function stepWie(secId, c){
+    let roster = { staff: [] };
+    try { roster = await API.call('/supplier/roster', { code: c }); }
+    catch(e){ toast(T('pd.needserver','Start de server om in te loggen.')); return; }
+    // dit apparaat staat nu vast op dit bedrijf
+    try { localStorage.setItem('rtg_pda_bedrijf', c); } catch(e){}
+    $('#gateStep').innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-bottom:0.3rem;">'+
+        '<div style="font-size:0.9rem;"><b>'+BEDRIJVEN[c].icon+' '+esc(BEDRIJVEN[c].name)+'</b><div style="font-size:0.68rem;color:var(--soft);">'+T('pd.vast','Deze PDA staat op dit bedrijf')+'</div></div>'+
+        '<button class="gback" id="gbSwitch" style="margin:0;">'+T('pd.switch','Ander bedrijf')+'</button>'+
+      '</div><div class="glist">' + (roster.staff||[]).map(m =>
+      '<button class="gbtn" data-wie="'+m.id+'" data-nm="'+esc(m.name)+'"><span class="ic">'+(m.role==='manager'?'':'')+'</span><span><b>'+m.name+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+'</span></span></button>'
+    ).join('') + '</div>'+
+      '<div style="margin-top:0.8rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.nieuw','Nieuw? Vraag uw werkgever om een kassacode en meld u eenmalig aan in de leverancier-app.')+'</div>';
+    $('#gbSwitch').addEventListener('click', () => {
+      try { localStorage.removeItem('rtg_pda_bedrijf'); } catch(e){}
+      stepSector();
     });
+    document.querySelectorAll('[data-wie]').forEach(b => b.addEventListener('click', () => stepPin(secId, c, Number(b.dataset.wie), b.dataset.nm)));
   }
-  async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
-
-  // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
-  let zaken = null;
-  let pdContracten = [];
-  let aandacht = null;   // gasten die aandacht vragen + te lang stille tafels
-  let netwerk = [];      // verbindingen met andere zaken (personeelsnetwerk)
-  let trainData = null;  // training & tips: tip van de dag, rol-tips, eigen tips
-  let coachAntwoord = null; // laatste antwoord van de AI-coach
-  let tipsOpen = false;     // toon de volledige tip-lijst
-  let coachRef = null;      // coaching voor een concrete tafel/bestelling
-  let coachRefTafel = null; // leesbare naam van die tafel
-  let wisselOpties = []; // verbonden zaken waar dit personeelslid ook op het rooster staat
-  let mijnPosities = []; // eigen werkplekken (RTG-account) om tussen te wisselen na 1x aanmelden
-  async function laadZaken(){
-    try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
-    try { wisselOpties = (await API.call('/supplier/wissel/opties', {})).opties || []; } catch(e){ wisselOpties = []; }
-    try { mijnPosities = (await API.call('/supplier/mijn/opties', {})).posities || []; } catch(e){ mijnPosities = []; }
-    try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }
-    try { aandacht = await API.call('/supplier/aandacht', {}); } catch(e){ aandacht = null; }
-    try { netwerk = (await API.call('/supplier/net/lijst', {})).verbindingen || []; } catch(e){ netwerk = []; }
-    try { trainData = await API.call('/supplier/training', {}); } catch(e){ trainData = null; }
-  }
-
-  // Blijf ingelogd: met een bewaard token direct naar Vandaag, zonder PIN.
-  async function restoreSession(){
-    let t = null, c = null;
-    try { t = localStorage.getItem('rtg_pda_token'); c = localStorage.getItem('rtg_pda_code'); } catch(e){}
-    if (!t || !c || !BEDRIJVEN[c]) return;
-    // de PDA staat vast op een bedrijf: een sessie van een ander bedrijf herstellen we niet
-    const vast = pdaBedrijf();
-    if (vast && vast !== c){ try { localStorage.removeItem('rtg_pda_token'); localStorage.removeItem('rtg_pda_code'); } catch(e){} return; }
-    API.token = t;
-    try {
-      const st = (await API.call('/supplier/state')).state;
-      if (!st.actor || !st.actor.staffId){ API.token = null; return; } // alleen persoonlijke logins herstellen
-      state = st; code = c;
-      me = { name: st.actor.name, role: st.actor.role, staffId: st.actor.staffId };
-      week = await API.call('/supplier/schedule', {}).catch(()=>null);
-      enter();
-    } catch(e){
-      API.token = null;
-      try { localStorage.removeItem('rtg_pda_token'); localStorage.removeItem('rtg_pda_code'); } catch(e2){}
-    }
-  }
-
-  function myShift(dayIndex){
-    if (!week) return null;
-    const d = week.days[dayIndex]; if (!d) return null;
-    const m = d.staff.find(x => x.id === me.staffId);
-    return m ? m.shift : null;
-  }
-  function taskList(){
-    const t = [];
-    (state.tickets||[]).filter(x=>x.status!=='klaar').forEach(x => t.push({ icon:'', b:x.text, s:(x.room?x.room+' · ':'')+(x.status==='bezig'?T('pd.busy','wordt opgepakt'):T('pd.open','open')), kind:'ticket', id:x.id, status:x.status }));
-    (state.rooms||[]).filter(r=>r.hk&&r.hk.status==='vuil').forEach(r => t.push({ icon:'', b:r.name, s:T('pd.toclean','schoonmaken'), kind:'hk', id:r.id }));
-    if (state.minibar){
-      (state.rooms||[]).map(r=>r.name).filter(n=>!state.minibar.countedToday.includes(n)).forEach(n => t.push({ icon:'', b:T('pd.minibar','Minibar tellen')+': '+n, s:T('pd.inapp','via de bedrijfsapp'), kind:'info' }));
-    }
-    (state.orders||[]).filter(o=>o.status==='nieuw').forEach(o => t.push({ icon:'', b:T('pd.order','Nieuwe bestelling')+' '+o.customerCodename, s:eur(o.total)+' · code '+o.pickup, kind:'info' }));
-    (state.rides||[]).filter(r=>r.status==='aangevraagd').forEach(r => t.push({ icon:'', b:T('pd.ride','Ritaanvraag')+' '+r.customerCodename, s:(r.from||'')+' → '+(r.to||''), kind:'info' }));
-    (state.guestChats||[]).filter(c=>c.unread).forEach(c => t.push({ icon:'', b:c.codename+' ('+c.dept+')', s:c.last, kind:'info' }));
-    return t;
-  }
-
-  // de voorspeller op de PDA: het team ziet de piek van morgen aankomen
-  let vwPda = null, vwPdaBezig = false;
-  function laadVwPda(){
-    if (vwPdaBezig || vwPda) return;
-    vwPdaBezig = true;
-    API.call('/staff/voorspel', {}).then(d => { vwPda = d; renderToday(); })
-      .catch(() => {}).finally(() => { vwPdaBezig = false; });
-  }
-  function renderToday(){
-    const shift = myShift(0);
-    const tasks = taskList();
-    $('#todaySub').textContent = new Date().toLocaleDateString(lang()==='en'?'en-GB':'nl-NL', { weekday:'long', day:'numeric', month:'long' });
-    const klok = zaken && zaken.klok;
-    $('#todayWrap').innerHTML =
-      '<div class="card"><div class="k">'+T('pd.myshift','Uw dienst vandaag')+'</div><div class="shift-big">'+(shift||T('pd.noshift','Geen dienst'))+'</div>'+
-      (klok ? '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.7rem;padding-top:0.7rem;border-top:1px solid var(--line);">'+
-        '<span style="font-size:0.76rem;color:var(--soft);">'+T('pd.k.vandaag','Vandaag')+' <b style="color:var(--txt);">'+klok.vandaagUren+' u</b> · '+T('pd.k.week','deze week')+' <b style="color:var(--txt);">'+klok.weekUren+' u</b></span>'+
-        '<button class="abtn'+(klok.open?'':' ghost')+'" id="klokBtn">'+(klok.open?''+T('pd.k.uit','Klok uit'):'▶ '+T('pd.k.in','Klok in'))+'</button></div>' : '')+
-      '</div>'+
-      '<div class="card"><div class="k">'+T('pd.tasksnow','Nu aandacht nodig')+' ('+tasks.length+')</div>'+
-      (tasks.length ? tasks.slice(0,6).map(t=>'<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div></div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--green);">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+
-      (tasks.length>6?'<div style="margin-top:0.5rem;font-size:0.74rem;color:var(--soft);">+'+(tasks.length-6)+' '+T('pd.more','meer onder Taken')+'</div>':'')+'</div>'+
-      (vwPda && vwPda.ok && vwPda.morgen
-        ? '<div class="card"><div class="k">'+T('pd.vw','Morgen verwacht')+'</div>'+
-          '<div style="margin-top:0.4rem;font-size:0.8rem;line-height:1.55;color:var(--soft);">'+
-          '~<b style="color:var(--txt);">'+vwPda.morgen.verwachtTransacties+'</b> '+T('pd.vw.trans','transacties')+' ('+vwPda.morgen.dagNaam+')'+
-          (vwPda.morgen.drukUren.length ? ' · '+T('pd.vw.piek','piek rond')+' '+vwPda.morgen.drukUren.map(u=>u.uur+':00').join(', ') : '')+
-          '<br>'+esc(vwPda.morgen.advies||'')+'</div></div>'
-        : '');
-    laadVwPda();
-    // Service op sterrenniveau: gasten die aandacht vragen en te lang stille
-    // tafels staan bovenaan, zodat niemand ooit wordt vergeten.
-    const A = (aandacht && aandacht.aandacht) || [], TT = (aandacht && aandacht.traagTafels) || [];
-    if (A.length || TT.length){
-      let h = '<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">'+T('pd.attn','Aandacht gevraagd')+' ('+(A.length+TT.length)+')</div>';
-      h += A.map(a => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(a.reden)+(a.tafel?' · '+esc(a.tafel):'')+'</b><span>'+esc(a.codename)+' · '+timeAgo(a.at)+'</span></div><button class="abtn" data-aankl="'+a.id+'">'+T('pd.help','Help')+'</button></div>').join('');
-      h += TT.map(t => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(t.tafel||t.ref)+'</b><span>'+esc(t.codename)+' · '+t.minuten+' min '+T('pd.waiting','zonder aandacht')+'</span></div><button class="abtn ghost" data-coachref="'+esc(t.ref)+'" data-coachtafel="'+esc(t.tafel||t.ref)+'" title="'+T('pd.tr.coachtable','Vraag de coach over deze tafel')+'"></button></div>').join('');
-      h += '</div>';
-      $('#todayWrap').insertAdjacentHTML('afterbegin', h);
-      document.querySelectorAll('[data-aankl]').forEach(b => b.addEventListener('click', async () => {
-        try { await API.call('/supplier/aandacht/klaar', { id:b.dataset.aankl }); toast(T('pd.helped','Gast geholpen.')); await refresh(); openTab('vandaag'); } catch(e){ toast(e.message); }
-      }));
-      document.querySelectorAll('[data-coachref]').forEach(b => b.addEventListener('click', () => {
-        coachRef = b.dataset.coachref; coachRefTafel = b.dataset.coachtafel; coachAntwoord = null;
-        renderHulp(); openTab('hulp');
-        const inp = document.getElementById('coachVraag'); if (inp) inp.focus();
-      }));
-    }
-    const kb = document.getElementById('klokBtn');
-    if (kb) kb.addEventListener('click', async () => {
-      kb.disabled = true;
+  function stepPin(secId, c, staffId, nm){
+    $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+T('pd.back','Terug')+'</button>'+
+      '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
+      '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
+      '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>';
+    $('#gb3').addEventListener('click', () => stepWie(secId, c));
+    // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
+    // opnieuw proberen; de server vergelijkt en bewaart er niets van
+    const vraagPositie = () => new Promise(af => {
+      if (!navigator.geolocation) return af(null);
+      navigator.geolocation.getCurrentPosition(
+        p => af({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        () => af(null), { enableHighAccuracy: true, timeout: 8000 });
+    });
+    const go = async () => {
       try {
-        const d = await API.call('/staff/clock', {});
-        if (zaken) zaken.klok = d.klok;
-        toast(d.actie === 'in' ? '▶ ' + T('pd.k.ingeklokt','Ingeklokt. Werk ze!') : '' + T('pd.k.uitgeklokt','Uitgeklokt. Tot de volgende dienst.'));
-        renderToday();
-      } catch(e){ toast(e.message); kb.disabled = false; }
-    });
-    // geaccrediteerd wisselen: wie ook bij een verbonden zaak op het rooster
-    // staat, stapt met een tik over, zonder opnieuw een PIN in te voeren
+        const body = { code: c, staffId, pin: $('#pinInp').value };
+        let d;
+        try { d = await API.call('/supplier/login', body); }
+        catch(e1){
+          if (!(e1.data && e1.data.locatieNodig)) throw e1;
+          const pos = await vraagPositie();
+          if (!pos) throw e1;
+          d = await API.call('/supplier/login', Object.assign({ positie: pos }, body));
+        }
+        API.token = d.token; state = d.state; code = c;
+        me = { name: d.state.actor.name, role: d.state.actor.role, staffId: d.state.actor.staffId };
+        try { localStorage.setItem('rtg_pda_token', API.token); localStorage.setItem('rtg_pda_code', code); } catch(e2){}
+        week = await API.call('/supplier/schedule', {}).catch(()=>null);
+        enter();
+        // Rahul denkt mee (agenda, uren, zorgprofiel): een advies, nooit een slot
+        API.call('/supplier/werkadvies', {}).then(a => { if (a && a.advies) toast('' + a.advies.tekst); }).catch(()=>{});
+      } catch(e){ toast(e.message || T('pd.badpin','Onjuiste pincode.')); }
+    };
+    $('#pinGo').addEventListener('click', go);
+    $('#pinInp').addEventListener('keydown', e => { if (e.key==='Enter') go(); });
+    $('#pinInp').focus();
+  }
+
+  /* ---------- de kantoor-modus: de oude kantoor-PDA, nu een ingang hier ----------
+     Kantoormensen zijn geen zaak-personeel: zij melden zich met de kantoorcode,
+     kiezen hun kamer en werkplek (thuis of kantoor) en houden de kamerchat bij.
+     Het volledige kantoor (taken, statistieken, boardroom) blijft kantoren.html. */
+  let kaToken = null, kaDienst = null, kaTimer = null;
+  try { kaToken = localStorage.getItem('rtg_office_token'); } catch(e){}
+  try { kaDienst = JSON.parse(localStorage.getItem('rtg_kantoor_dienst') || 'null'); } catch(e){}
+  const kaApi = (pad, body) => fetch('/api/office/' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kaToken },
+    body: JSON.stringify(body || {})
+  }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || T('pd.mis','Er ging iets mis.')); return d; });
+  function kantoorStop(){ if (kaTimer){ clearInterval(kaTimer); kaTimer = null; } }
+  // het terug-adres van een kantoren-deeplink (?kamer=...): alleen eigen paden
+  function kaTerugPad(){
+    const t = new URLSearchParams(location.search).get('terug') || '';
+    return (t.startsWith('/') && !t.startsWith('//')) ? t : null;
+  }
+  function stepKantoor(){
+    kantoorStop();
+    if (kaToken){ enterKantoor().catch(() => toonKantoorLogin()); return; }
+    toonKantoorLogin();
+  }
+  function toonKantoorLogin(){
+    $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.back','Terug')+'</button>'+
+      '<div class="card"><div class="k">'+T('pd.ka.code','Kantoorcode')+'</div>'+
+      '<div class="pinrow" style="margin-top:0.6rem;"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
+      '<button id="kaGo">'+T('pd.ka.binnen','Binnen')+'</button></div>'+
+      '<div class="k" style="margin-top:0.7rem;">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
+      '<input class="hin" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" style="margin-top:0.4rem;">'+
+      '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
+    $('#kaTerug').addEventListener('click', stepSector);

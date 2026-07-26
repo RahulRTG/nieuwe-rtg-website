@@ -1,102 +1,115 @@
-      const eigen = (zbData.afspraken || []).filter(a => a.behandelaarId === b.id);
-      return '<div class="card"><div class="k">'+esc(b.naam)+' · '+esc(b.functie)+'</div>'+
-        (eigen.length ? eigen.map(a =>
-          '<div class="task"><span class="ic">'+(a.soort==='medisch'?'':'')+'</span><div class="t">'+
-            '<b style="font-variant-numeric:tabular-nums;">'+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</b>'+
-            '<span>'+T('pd.zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min · '+eur(a.prijs)+'</span>'+
-            (a.zorg ? '<span style="display:block;color:#E2B93B;">'+esc(pkZorg(a.zorg))+'</span>' : '')+
-            (a.intake ? '<span style="display:block;color:#E2B93B;">'+esc(a.intake)+'</span>' : '')+
-          '</div>'+
-          (a.status === 'afgerond' ? '<span class="pill g">'+T('pd.zb.klaar','Afgerond')+'</span>'
-            : '<button class="abtn" data-zbklaar="'+esc(a.ref)+'">'+T('pd.zb.afronden','Afronden')+'</button>')+
-          '</div>').join('')
-        : '<div style="margin-top:0.5rem;color:var(--soft);font-size:0.8rem;">'+T('pd.zb.leeg','Geen afspraken op deze dag.')+'</div>')+
-      '</div>';
-    }).join('');
-    wrap.innerHTML = '<div class="card"><div class="k">'+esc(zbData.aanbieder || '')+'</div>'+
-      '<div class="row" style="flex-wrap:wrap;margin-top:0.5rem;">'+dagen.join('')+'</div></div>' + perBehandelaar;
-    wrap.querySelectorAll('[data-zbdag]').forEach(b => b.addEventListener('click', () => { zbDatum = b.dataset.zbdag; laadZorgbalie(); }));
-    wrap.querySelectorAll('[data-zbklaar]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/care/afronden', { ref: b.dataset.zbklaar }); toast(T('pd.zb.klaar','Afgerond') + ' '); laadZorgbalie(); }
-      catch(e){ toast(e.message); }
+    wrap.querySelectorAll('[data-pdvk]').forEach(b => b.addEventListener('click', async () => {
+      const uit = document.getElementById('pdVkUit');
+      const slot = slots[parseInt(($('#pdVkSlot')||{}).value, 10) || 0];
+      if (!slot) return;
+      const body = {
+        activiteitId: slot.activiteitId, tijd: slot.tijd,
+        personen: parseInt(($('#pdVkPers')||{}).value, 10) || 1,
+        vip: ($('#pdVkSoort')||{}).value === 'vip',
+        method: b.dataset.pdvk
+      };
+      if (body.method === 'rtgpay'){
+        // tap to pay als het kan, met altijd de uitweg om de code te typen
+        let code = null;
+        if (window.TapPay && TapPay.kan() && window.confirm(T('pd.w.tapkeuze','Tap to pay: de klant tikt zijn toestel hiertegen. Liever de code typen (bijv. als NFC niet werkt)? Kies dan Annuleren.'))){
+          toast('\uD83D\uDCF3 '+T('pd.w.tap','Tap to pay: laat de klant het toestel hiertegen houden...'));
+          code = await TapPay.lees(12000);
+          if (!code) toast(T('pd.w.tapmis','Geen tik ontvangen; typ de code van de klant.'));
+        }
+        if (!code){
+          const c = window.prompt(T('pd.w.paycode','Betaalcode van de klant (uit de app):'));
+          if (!c) return;
+          code = c.trim().toUpperCase();
+        }
+        body.payCode = code;
+        body.idem = 'deur-' + Date.now();
+      }
+      try {
+        const r = await API.call('/supplier/ticket/deurverkoop', body);
+        // de code blijft staan als het programma zich ververst
+        pdVkLaatst = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+' \u00B7 \u20AC '+r.ticket.total+'</b>'+
+          '<div style="margin-top:0.35rem;font-size:1.3rem;letter-spacing:0.22em;font-weight:700;color:var(--gold);">'+esc(r.ticket.code)+'</div>'+
+          '<div style="font-size:0.72rem;color:var(--soft);">'+T('pd.e.geefcode','Geef deze entreecode aan de gast.')+'</div>';
+        uit.innerHTML = pdVkLaatst;
+        laadEntree();
+      } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }
     }));
   }
 
-  /* ---------- de meldkamer op de PDA: het korps in de binnenzak ----------
-     Voor de hulpdiensten (politie, brandweer, ambulance, special forces) de
-     open meldingen met de veld-knoppen (ter plaatse, afronden); voor de
-     zorg-zaken de medische receptie en de eerste hulp. De tab verschijnt
-     alleen als de zaak een korps of zorg-zaak is. */
-  let mkHulp = null, mkZorg = null, mkKeten = null, mkKanaal = 'keten', mkGesprek = null;
-  async function laadMeldkamerPda(){
-    if (!API.token) return;
-    try { mkHulp = await API.call('/supplier/hulp/overzicht'); } catch(e){ mkHulp = null; }
-    try { mkZorg = await API.call('/supplier/zorg/overzicht'); } catch(e){ mkZorg = null; }
-    try { mkKeten = await API.call('/supplier/keten/status'); } catch(e){ mkKeten = null; }
-    if (mkKeten && (mkKeten.kanalen || []).length){
-      if (!mkKeten.kanalen.some(k => k.id === mkKanaal)) mkKanaal = mkKeten.kanalen[0].id;
-      try { mkGesprek = await API.call('/supplier/keten/gesprek', { kanaal: mkKanaal }); } catch(e){ mkGesprek = null; }
-    } else mkGesprek = null;
-    renderMeldkamerPda();
+  // ---- vaart (charter): de schipper handelt de charters van vandaag af ----
+  let pdCharters = null;
+  const heeftCharter = () => !!(state && state.supplier && (state.supplier.caps || []).includes('charter'));
+  const VAART_ST = { 'aangevraagd':'klaar om uit te varen', 'lopend':'op zee', 'afgerond':'afgerond' };
+  async function laadVaart(){
+    if (!heeftCharter()) return;
+    try { pdCharters = (await API.call('/supplier/charter/overzicht', {})).charters; } catch(e){ pdCharters = []; }
+    renderVaart();
   }
-  function renderMeldkamerPda(){
-    const tabBtn = document.getElementById('tabMeldkamer');
-    if (tabBtn) tabBtn.style.display = (mkHulp || mkZorg) ? '' : 'none';
-    const wrap = $('#meldkamerWrap');
+  function renderVaart(){
+    const tabBtn = document.getElementById('tabVaart');
+    if (tabBtn) tabBtn.style.display = heeftCharter() ? '' : 'none';
+    const wrap = $('#vaartWrap');
     if (!wrap) return;
-    if (!mkHulp && !mkZorg){ wrap.innerHTML = ''; return; }
-    let html = '';
-    if (mkHulp){
-      const open = [...(mkHulp.bijstand || []), ...(mkHulp.meldingen || []).filter(m => m.status !== 'afgerond')];
-      html += '<div class="card"><div class="k">'+esc(mkHulp.korps.naam)+' · '+(mkHulp.open || 0)+' '+T('pd.mk.open','open')+'</div>'+
-        (open.length ? open.map(m =>
-          '<div class="task"><span class="ic">'+(m.prio === 1 ? '' : m.prio === 2 ? '' : '')+'</span><div class="t"><b>'+esc(m.tekst)+'</b>'+
-          '<span>'+(m.plek ? esc(m.plek)+' · ' : '')+esc(m.status)+'</span></div>'+
-          '<button class="abtn ghost" data-mkst="ter-plaatse" data-mkm="'+m.id+'">'+T('pd.mk.tp','Ter plaatse')+'</button>'+
-          '<button class="abtn" data-mkst="afgerond" data-mkm="'+m.id+'">'+T('pd.mk.af','Rond af')+'</button></div>').join('')
-        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.mk.rustig','Geen open meldingen; rustig op het bord.')+'</div>')+
-        '<div style="margin-top:0.5rem;font-size:0.75rem;color:var(--soft);">'+(mkHulp.eenheden || []).map(e => e.naam+' ('+e.status+')').join(' · ')+'</div></div>';
-    }
-    if (mkZorg && mkZorg.receptie){
-      html += '<div class="card"><div class="k">'+T('pd.mk.receptie','Medische receptie')+'</div>'+
-        (mkZorg.receptie.length ? mkZorg.receptie.map(p =>
-          '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(p.aanduiding)+'</b><span>'+esc(p.status)+(p.kamer ? ' ('+esc(p.kamer)+')' : '')+'</span></div>'+
-          (p.status === 'wacht' ? '<button class="abtn" data-mkroep="'+p.id+'">'+T('pd.mk.roep','Roep op')+'</button>' : '')+
-          '<button class="abtn ghost" data-mkpk="'+p.id+'">'+T('pd.mk.klaar','Klaar')+'</button></div>').join('')
-        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.mk.wkleeg','De wachtkamer is leeg.')+'</div>')+'</div>';
-    }
-    if (mkZorg && mkZorg.seh){
-      html += '<div class="card"><div class="k">'+T('pd.mk.seh','Eerste hulp')+' · '+mkZorg.seh.length+' '+T('pd.mk.inrij','in de rij')+'</div>'+
-        mkZorg.seh.slice(0, 6).map(p => '<div class="task"><span class="ic">'+({rood:'',oranje:'',geel:'',groen:'',blauw:''}[p.triage]||'')+'</span><div class="t"><b>'+esc(p.klacht)+'</b><span>'+esc(p.status)+' · via '+esc(p.via)+'</span></div></div>').join('')+'</div>';
-    }
-    // de ketenchat: het gedeelde kanaal en de eigen besloten groepen
-    if (mkKeten && (mkKeten.kanalen || []).length){
-      html += '<div class="card"><div class="k">'+T('pd.mk.keten','Ketenchat')+'</div>'+
-        '<div class="row" style="flex-wrap:wrap;margin-top:0.4rem;">'+mkKeten.kanalen.map(k =>
-          '<button class="abtn '+(k.id===mkKanaal?'':'ghost')+'" data-mkkan="'+k.id+'"'+(k.id===mkKanaal?' aria-current="true"':'')+'>'+esc(k.naam)+'</button>').join('')+'</div>'+
-        '<div class="chat" style="margin-top:0.4rem;">'+((mkGesprek && mkGesprek.berichten) || []).slice(-15).map(m =>
-          '<div class="msg other"><span class="who">'+esc(m.van)+' · '+esc(m.korpsNaam || m.korps)+'</span>'+esc(m.tekst)+'</div>').join('')+'</div>'+
-        (mkGesprek && mkGesprek.magSchrijven === false
-          ? '<div style="font-size:0.75rem;color:var(--soft);margin-top:0.3rem;">'+T('pd.mk.meekijk','U kijkt mee als meldkamer; alleen de leden schrijven.')+'</div>'
-          : '<div class="compose" style="margin-top:0.4rem;"><input id="mkMsg" placeholder="'+T('pd.mk.msg','Bericht aan de keten')+'" maxlength="500"><button id="mkSend">'+T('pd.send','Stuur')+'</button></div>')+
+    if (!heeftCharter()){ wrap.innerHTML = ''; return; }
+    if (!pdCharters){ wrap.innerHTML = '<div class="card">…</div>'; laadVaart(); return; }
+    wrap.innerHTML = pdCharters.length ? pdCharters.map(c => {
+      let knop = '';
+      if (c.status === 'aangevraagd') knop =
+        '<button class="abtn ghost" data-cvfoto="'+c.ref+'" data-fase="voor">'+T('pd.va.voor','Voor-foto')+' ('+c.fotosVoor+')</button> '+
+        '<button class="abtn" data-cvst="'+c.ref+'" data-st="lopend">'+T('pd.va.uitvaren','Uitvaren')+'</button>';
+      else if (c.status === 'lopend') knop =
+        '<button class="abtn ghost" data-cvfoto="'+c.ref+'" data-fase="na">'+T('pd.va.na','Na-foto')+' ('+c.fotosNa+')</button> '+
+        '<button class="abtn" data-cvst="'+c.ref+'" data-st="afgerond">'+T('pd.va.terug','Teruggeven')+'</button>';
+      return '<div class="card">'+
+        (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy,#C23A5E);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.82rem;"><b>SOS:</b> '+esc(c.sos[0].bericht)+
+          (Number.isFinite(c.sos[0].lat)?' · <a style="color:var(--gold,#C99A2E);" target="_blank" rel="noopener" href="geo:'+c.sos[0].lat+','+c.sos[0].lng+'?q='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('pd.va.kaart','kaart')+'</a>':'')+
+          ' <button class="abtn" data-cvsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;">'+T('pd.va.sosok','Afgehandeld')+'</button></div>':'')+
+        '<div class="k">'+esc(c.boot)+' · '+esc(c.type)+'</div>'+
+        '<div style="font-size:0.85rem;margin-top:0.3rem;">'+esc(c.codename)+' · '+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('pd.va.gasten','gasten')+' · ':'')+(c.metSkipper?''+T('pd.va.metskipper','met schipper'):T('pd.va.bareboat','bareboat'))+' · '+T('pd.va.st.'+c.status, VAART_ST[c.status]||c.status)+'</div>'+
+        (c.teruggave ? '<div style="font-size:0.8rem;margin-top:0.2rem;color:'+(c.teruggave.meerkosten>0?'var(--amber,#C99A2E)':'var(--green,#4C9A75)')+';">'+(c.teruggave.meerkosten>0?T('pd.va.meer','Meerkosten')+' '+eur(c.teruggave.meerkosten):'✓ '+T('pd.va.geenmeer','geen meerkosten'))+'</div>':'')+
+        (knop?'<div style="margin-top:0.6rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+knop+'</div>':'')+
         '</div>';
-    }
-    wrap.innerHTML = html;
-    wrap.querySelectorAll('[data-mkkan]').forEach(b => b.addEventListener('click', () => { mkKanaal = b.dataset.mkkan; laadMeldkamerPda(); }));
-    const mkSend = wrap.querySelector('#mkSend');
-    if (mkSend) mkSend.addEventListener('click', async () => {
-      const i = wrap.querySelector('#mkMsg'); const t = (i.value || '').trim(); if (!t) return; i.value = '';
-      try { await API.call('/supplier/keten/bericht', { kanaal: mkKanaal, tekst: t }); laadMeldkamerPda(); } catch(e){ toast(e.message); }
-    });
-    wrap.querySelectorAll('[data-mkm]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/hulp/melding/status', { melding: b.dataset.mkm, status: b.dataset.mkst }); toast(''); laadMeldkamerPda(); }
-      catch(e){ toast(e.message); }
+    }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:0.85rem;">'+T('pd.va.geen','Geen charters vandaag.')+'</div>';
+    wrap.querySelectorAll('[data-cvst]').forEach(b => b.addEventListener('click', async () => {
+      const body = { ref: b.dataset.cvst, status: b.dataset.st };
+      if (b.dataset.st === 'lopend'){
+        const uren = prompt(T('pd.va.qurenstart','Motorurenstand bij uitvaren?')); if (uren == null) return;
+        body.urenStart = Number(uren); body.brandstofStart = Number(prompt(T('pd.va.qbrandstart','Brandstof bij uitvaren in achtsten (8 = vol)?'), '8'));
+      } else if (b.dataset.st === 'afgerond'){
+        const uren = prompt(T('pd.va.qureneind','Motorurenstand bij teruggave?')); if (uren == null) return;
+        body.urenEind = Number(uren); body.brandstofEind = Number(prompt(T('pd.va.qbrandeind','Brandstof bij teruggave in achtsten (8 = vol)?'), '8'));
+      }
+      try { await API.call('/supplier/charter/status', body); toast(T('pd.va.ok','Bijgewerkt.')); await laadVaart(); } catch(e){ toast(e.message); }
     }));
-    wrap.querySelectorAll('[data-mkroep]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/zorg/receptie/roep', { id: b.dataset.mkroep }); laadMeldkamerPda(); } catch(e){ toast(e.message); }
+    wrap.querySelectorAll('[data-cvsosok]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/charter/sos-ok', { ref: b.dataset.cvsosok }); toast(T('pd.va.sosafg','SOS afgehandeld.')); await laadVaart(); } catch(e){ toast(e.message); }
     }));
-    wrap.querySelectorAll('[data-mkpk]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/zorg/receptie/klaar', { id: b.dataset.mkpk }); laadMeldkamerPda(); } catch(e){ toast(e.message); }
+    wrap.querySelectorAll('[data-cvfoto]').forEach(b => b.addEventListener('click', () => {
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
+      inp.onchange = () => { const file = inp.files[0]; if (!file) return; const r = new FileReader();
+        r.onload = () => { const img = new Image(); img.onload = async () => {
+          const cv = document.createElement('canvas'); const sc = Math.min(1, 1000 / Math.max(img.width, img.height));
+          cv.width = img.width * sc; cv.height = img.height * sc; cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          try { await API.call('/supplier/charter/foto', { ref: b.dataset.cvfoto, fase: b.dataset.fase, foto: cv.toDataURL('image/jpeg', 0.7) });
+            toast(T('pd.va.fotook','De staat is vastgelegd.')); await laadVaart(); } catch(e){ toast(e.message); } };
+          img.src = r.result; };
+        r.readAsDataURL(file); };
+      inp.click();
     }));
   }
 
+  // ---- autoverkoop op de PDA: proefritten inplannen/rijden en auto's afleveren ----
+  let pdVerkoop = null;
+  const heeftVerkoop = () => !!(state && state.supplier && state.supplier.type === 'verhuur');
+  async function laadVerkoop(){
+    if (!heeftVerkoop()) return;
+    try { pdVerkoop = await API.call('/supplier/verkoop/overzicht', {}); } catch(e){ pdVerkoop = { pda: [] }; }
+    renderVerkoop();
+  }
+  function renderVerkoop(){
+    const tabBtn = document.getElementById('tabVerkoop');
+    if (tabBtn) tabBtn.style.display = (heeftVerkoop() && pdVerkoop && pdVerkoop.aan) ? '' : 'none';
+    const wrap = $('#verkoopWrap'); if (!wrap) return;
+    if (!heeftVerkoop()){ wrap.innerHTML = ''; return; }
+    if (!pdVerkoop){ wrap.innerHTML = '<div class="card">…</div>'; laadVerkoop(); return; }
+    const lijst = pdVerkoop.pda || [];

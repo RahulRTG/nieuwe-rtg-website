@@ -1,3 +1,165 @@
+    api('/api/techniek/wacht/av-test', { method:'POST', body:{ inhoud:eicar, naam:'eicar.com', mime:'application/octet-stream' } })
+      .then(function(d){ toast('Scanner: ' + d.resultaat.verdict + ' (' + (d.resultaat.redenen[0]||'') + ')'); laadWacht(); })
+      .catch(function(e){ toast(e.message); });
+  });
+
+  function avRij(x){
+    var badge = el('span',{class:'badge '+(x.verdict==='besmet'?'uit':'aan')}, (x.verdict||'').toUpperCase());
+    return el('div',{class:'zeker'}, badge,
+      el('div',{class:'mid'},
+        el('div',null, el('span',{class:'naam'}, x.naam||'(upload)'), el('span',{class:'code'}, (x.sha256||'').slice(0,10))),
+        el('div',{class:'muted', style:{fontSize:'.74rem'}}, (x.redenen||[]).join('; ') + (x.bron?(' · ' + x.bron):''))));
+  }
+
+  function meterKaart(n, label){ return el('div',{class:'tel'}, el('div',{class:'n'}, String(n)), el('div',{class:'l'}, label)); }
+
+  // Een simpele multi-lijn grafiek op canvas (geen externe library).
+  function tekenGrafiek(reeks){
+    var c = $('#wachtGrafiek'); if (!c || !c.getContext) return;
+    var dpr = window.devicePixelRatio || 1;
+    var w = c.clientWidth || 600, h = 120;
+    c.width = w * dpr; c.height = h * dpr;
+    var x = c.getContext('2d'); x.scale(dpr, dpr); x.clearRect(0,0,w,h);
+    if (!reeks || reeks.length < 2){ x.fillStyle = '#8A8680'; x.font = '12px Inter, sans-serif'; x.fillText('Nog te weinig metingen voor een grafiek.', 8, 20); return; }
+    var series = [ { k:'verzoeken', kleur:'#FFFFFF' }, { k:'alarm', kleur:'#C23A5E' }, { k:'quarantaine', kleur:'#C9A227' } ];
+    series.forEach(function(s){
+      var max = 1; for (var i=0;i<reeks.length;i++) if ((reeks[i][s.k]||0) > max) max = reeks[i][s.k];
+      x.beginPath(); x.lineWidth = 1.5; x.strokeStyle = s.kleur;
+      for (var j=0;j<reeks.length;j++){
+        var px = (j/(reeks.length-1)) * (w-6) + 3;
+        var py = h - 6 - ((reeks[j][s.k]||0)/max) * (h-16);
+        if (j===0) x.moveTo(px, py); else x.lineTo(px, py);
+      }
+      x.stroke();
+    });
+  }
+
+  function quarantaineRij(q){
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, q.bron)),
+      el('div',{class:'muted', style:{fontSize:'.74rem'}}, (q.reden||'') + ' · nog ' + Math.round((q.resterend||0)/60) + ' min'));
+    var knop = eigenaar ? el('button',{class:'knop grijs klein', onclick:function(){ wachtActie('quarantaine', { bron:q.bron, actie:'vrij' }, 'Vrijgegeven.'); }}, 'Vrijgeven') : null;
+    return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'AFGESNEDEN'), mid, knop);
+  }
+
+  var VERDICT_LABEL = { open:'OPEN', inconclaaf:'INCONCLAAF', geaccepteerd:'GEACCEPTEERD', afgewezen:'AFGEWEZEN' };
+  function raadRij(v){
+    var badgeKlas = (v.status==='geaccepteerd') ? 'aan' : 'uit';
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, v.titel), el('span',{class:'code'}, (v.soort||'').toUpperCase())),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, v.uitleg || ''),
+      v.resultaat ? el('div',{class:'muted', style:{fontSize:'.72rem',color:'#9ED3A6'}}, 'Uitgevoerd: '+v.resultaat) : null);
+    var acties = el('div',null);
+    if (eigenaar && (v.status==='open' || v.status==='inconclaaf')){
+      acties.appendChild(el('button',{class:'knop klein', onclick:function(){ wachtActie('beslis', { id:v.id, verdict:'accepteren' }, 'Geaccepteerd.'); }}, 'Accepteren'));
+      acties.appendChild(el('button',{class:'knop grijs klein', onclick:function(){
+        var n = prompt('Napraten met de AI (inconclaaf) - noteer je vraag of twijfel:', ''); if (n===null) return;
+        wachtActie('beslis', { id:v.id, verdict:'inconclaaf', notitie:n }, 'Inconclaaf: geparkeerd om na te praten.');
+      }}, 'Inconclaaf'));
+      acties.appendChild(el('button',{class:'knop rood klein', onclick:function(){ wachtActie('beslis', { id:v.id, verdict:'afwijzen' }, 'Afgewezen.'); }}, 'Afwijzen'));
+    } else {
+      acties.appendChild(el('span',{class:'badge '+badgeKlas}, VERDICT_LABEL[v.status] || v.status));
+    }
+    return el('div',{class:'zeker'}, mid, acties);
+  }
+
+  // De rand-status (Cloudflare/edge): staat de eerste linie?
+  function randChip(r){
+    if (!r) return el('div',{class:'muted', style:{fontSize:'.78rem'}}, 'Rand-status onbekend.');
+    var kleur = r.status==='actief' ? '#9ED3A6' : (r.status==='stil' ? '#C23A5E' : '#C9A227');
+    var label = r.status==='actief' ? 'RAND ACTIEF' : (r.status==='stil' ? 'RAND STIL' : (r.status==='wachtend' ? 'RAND WACHT' : 'GEEN RAND'));
+    return el('div',{style:{display:'flex',alignItems:'center',gap:'.6rem',flexWrap:'wrap'}},
+      el('span',{class:'badge', style:{background:'transparent',border:'1px solid '+kleur,color:kleur}}, label),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, r.uitleg || ''),
+      r.ouderdomSec!=null ? el('span',{class:'code'}, 'laatst ' + r.ouderdomSec + 's geleden') : null);
+  }
+  // De automatische lastafworp (L7-zekering): 503 "kom zo terug".
+  function lastafworpBanner(la){
+    if (!la || !la.actief) return el('div');
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, 'Automatische lastafworp actief')),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, (la.reden||'') + ' - de server serveert tijdelijk 503 en dooft vanzelf.'));
+    var knop = eigenaar ? el('button',{class:'knop grijs klein', onclick:function(){ wachtActie('lastafworp', { aan:false }, 'Lastafworp opgeheven.'); }}, 'Nu opheffen') : null;
+    return el('div',{class:'zeker', style:{borderColor:'#C23A5E'}}, el('span',{class:'badge uit'}, '503'), mid, knop);
+  }
+
+  function tekenWacht(bord){
+    var m = bord.meters || {};
+    var la = bord.lastafworp || {};
+    vervang($('#wachtMeters'), [
+      meterKaart(m.verzoeken||0, 'verzoeken/10s'),
+      meterKaart(m.bans||0, 'op de banlijst'),
+      meterKaart(m.quarantaine||0, 'in quarantaine'),
+      meterKaart(m.alarm||0, 'open alarmen'),
+      meterKaart(m.kritiek||0, 'kritiek'),
+      meterKaart(m.openVoorstellen||0, 'open voorstellen'),
+      meterKaart(la.actief ? 'AAN' : 'rustig', 'lastafworp'),
+      meterKaart((m.geheugen||0)+' MB', 'geheugen')
+    ]);
+    vervang($('#wachtLastafworp'), lastafworpBanner(la));
+    vervang($('#wachtRand'), randChip(bord.rand));
+    tekenGrafiek(bord.grafiek || []);
+    $('#wachtIsoleer').hidden = !eigenaar;
+    $('#bWachtAnalyseer').hidden = !eigenaar;
+    var q = bord.quarantaine || [];
+    vervang($('#wachtQuarantaine'), q.length ? q.map(quarantaineRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Niemand in quarantaine. De afweer is rustig.'));
+    var r = bord.raad || [];
+    vervang($('#wachtRaad'), r.length ? r.map(raadRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Geen voorstellen. Laat de AI de signalen uitkauwen met "AI kauwt uit".'));
+    // De Ontsmetter (malware-scanner)
+    var a = bord.av;
+    if (a){
+      vervang($('#avMeters'), [
+        meterKaart(a.totaal||0, 'gescand'),
+        meterKaart(a.besmet||0, 'besmet geweigerd'),
+        meterKaart(a.verdacht||0, 'verdacht'),
+        meterKaart(a.definities||0, 'handtekeningen'),
+        meterKaart('v'+(a.versie||1), 'definitie-versie')
+      ]);
+      var det = a.laatste || [];
+      vervang($('#avLaatste'), det.length ? det.map(avRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Nog geen verdachte of besmette uploads. Alles schoon.'));
+      $('#bAvTest').hidden = !eigenaar;
+    }
+  }
+
+  function laadWacht(){
+    api('/api/techniek/wacht/bord', {}).then(tekenWacht).catch(function(e){ toast(e.message); });
+  }
+
+  /* ---------- controlekamer: functies per doelgroep, alles via een aanvraag ---------- */
+  var wachtend = {};         // sleutel id|doelgroep -> open aanvraag
+  var catData = [];          // laatste catalogus
+  var doelgroepenMeta = [];  // doelgroep-meta (chips/pillen)
+  var actieveDg = null;      // null = overzicht; anders een doelgroep-id
+  var zoekterm = '';
+
+  function sleutel(id, dg){ return id + '|' + (dg||''); }
+  function isWacht(id, dg){ return !!wachtend[sleutel(id, dg)]; }
+  function dgMeta(id){ for (var i=0;i<doelgroepenMeta.length;i++) if (doelgroepenMeta[i].id===id) return doelgroepenMeta[i]; return { id:id, naam:id, emoji:'•', kleur:'#888' }; }
+
+  function zetFunctie(body){
+    api('/api/techniek/functie', { method:'POST', body:body })
+      .then(function(d){
+        if (d.status === 'ongewijzigd') toast('Niets te wijzigen: dit staat al zo.');
+        else toast('Aanvraag aangemaakt. De eigenaar moet dit eerst accepteren.');
+        laad();
+      })
+      .catch(function(e){ toast(e.message); });
+  }
+
+  // een pil voor een doelgroep binnen een functie (overzicht-weergave)
+  function pil(f, d){
+    var geblokkeerd = isWacht(f.id, d.id) || !f.aan;
+    var m = dgMeta(d.id);
+    return el('button',{class:'pill '+(d.aan?'aan':'uit'), disabled: geblokkeerd||null,
+      'aria-label':(d.aan?'Uitzetten voor ':'Aanzetten voor ')+m.naam+': '+f.naam,
+      onclick:function(){ zetFunctie({ id:f.id, doelgroep:d.id, aan:!d.aan }); }},
+      el('span',{class:'dot', style:{background:m.kleur}}), m.naam);
+  }
+
+  function functieRij(f){
+    if (actieveDg){
+      var dEntry = null;
+      for (var i=0;i<f.doelgroepen.length;i++) if (f.doelgroepen[i].id===actieveDg) dEntry=f.doelgroepen[i];
       if (!dEntry) return null; // deze functie bedient deze doelgroep niet
       var aan1 = dEntry.aan, wacht1 = isWacht(f.id, actieveDg);
       var schakel1 = el('button',{class:'schakel '+(aan1?'aan':'uit'), disabled: wacht1||null,
@@ -13,147 +175,3 @@
     }
     // overzicht: globale schakel + doelgroep-pillen (alleen als >1 doelgroep)
     var wachtG = isWacht(f.id, null);
-    var schakel = el('button',{class:'schakel '+(f.aan?'aan':'uit'), disabled: wachtG||null,
-      'aria-label':(f.aan?'Globaal uitzetten: ':'Globaal aanzetten: ')+f.naam,
-      onclick:function(){ zetFunctie({ id:f.id, aan:!f.aan }); }}, f.aan?'AAN':'UIT');
-    return el('div',{class:'fn'},
-      el('div',{class:'mid'},
-        el('div',{class:'naam'}, f.naam, wachtG ? el('span',{class:'code'}, 'aanvraag wacht') : null),
-        el('div',{class:'muted'}, f.uitleg||''),
-        (f.doelgroepen && f.doelgroepen.length>1) ? el('div',{class:'pills'}, f.doelgroepen.map(function(d){ return pil(f,d); })) : null),
-      schakel);
-  }
-  function verzoekRij(v){
-    var wanneer = new Date(v.at).toLocaleString('nl-NL');
-    var mid = el('div',{class:'mid'},
-      el('div',{class:'naam'}, v.label, el('span',{class:'code'}, v.wijzigingen.length+' functie(s)')),
-      el('div',{class:'muted'}, 'aangevraagd door '+v.doorNaam+' op '+wanneer));
-    if (v.status !== 'wacht'){
-      return el('div',{class:'zeker'},
-        el('span',{class:'badge '+(v.status==='akkoord'?'aan':'uit')}, v.status==='akkoord'?'GEACCEPTEERD':'GEWEIGERD'), mid);
-    }
-    var acties;
-    if (eigenaar){
-      acties = el('div',{style:{display:'flex',gap:'.4rem',flexShrink:0}},
-        el('button',{class:'knop klein', onclick:function(){ besluit(v.vid, true); }}, 'Accepteren'),
-        el('button',{class:'knop rood klein', onclick:function(){ besluit(v.vid, false); }}, 'Weigeren'));
-    } else {
-      acties = el('span',{class:'badge uit'}, 'WACHT OP EIGENAAR');
-    }
-    return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'WACHT'), mid, acties);
-  }
-  function besluit(vid, akkoord){
-    api('/api/techniek/functie/besluit', { method:'POST', body:{ verzoekId:vid, akkoord:akkoord } })
-      .then(function(d){ toast(d.status==='akkoord'?'Geaccepteerd en doorgevoerd.':'Geweigerd; er is niets veranderd.'); laad(); })
-      .catch(function(e){ toast(e.message); });
-  }
-  function functieAan(f){
-    if (actieveDg){ for (var i=0;i<(f.doelgroepen||[]).length;i++) if (f.doelgroepen[i].id===actieveDg) return f.doelgroepen[i].aan; return true; }
-    return f.aan;
-  }
-  function categorieBlok(g){
-    var rijen = g.functies.map(functieRij).filter(Boolean);
-    if (!rijen.length) return null;
-    var totaal = g.functies.length;
-    var aan = g.functies.filter(functieAan).length;
-    var storing = g.functies.filter(function(f){ return isWacht(f.id, actieveDg||null); }).length;
-    // Alleen categorieën met iets uit of een wachtende aanvraag klappen vanzelf
-    // open; de rest blijft rustig samengevat.
-    var afwijkt = aan < totaal || storing > 0;
-    var bulk = function(aan2){ return function(){ var b={ categorie:g.categorie, aan:aan2 }; if(actieveDg) b.doelgroep=actieveDg; zetFunctie(b); }; };
-    var kaart = el('div',{class:'kaart', hidden: afwijkt ? null : true}, rijen);
-    var chev = el('span',{class:'catchev'}, afwijkt ? '▾' : '▸');
-    var tel = el('span',{class:'cattel'+(afwijkt?' let':'')}, aan+'/'+totaal+' aan'+(storing?' · '+storing+' aanvraag':''));
-    var kop = el('button',{class:'catklap', type:'button', 'aria-expanded': afwijkt?'true':'false'},
-      chev, el('h2', null, g.categorie), tel);
-    kop.addEventListener('click', function(){
-      var dicht = kaart.hidden;
-      kaart.hidden = !dicht;
-      chev.textContent = dicht ? '▾' : '▸';
-      kop.setAttribute('aria-expanded', dicht ? 'true' : 'false');
-    });
-    return el('div', null,
-      el('div',{class:'catkop'},
-        kop,
-        el('div',{style:{display:'flex',gap:'.4rem'}},
-          el('button',{class:'knop grijs klein', onclick:bulk(true)}, 'Alles aan'),
-          el('button',{class:'knop grijs klein', onclick:bulk(false)}, 'Alles uit'))),
-      kaart);
-  }
-
-  /* ---------- doelgroep-filter (chips) + zoeken ---------- */
-  function chip(id, label, kleur){
-    var actief = actieveDg===id;
-    var kids = [];
-    if (kleur) kids.push(el('span',{class:'dot', style:{background:kleur}}));
-    kids.push(label);
-    return el('button',{class:'chip', 'aria-pressed':actief?'true':'false',
-      onclick:function(){ actieveDg=id; tekenChips(); updBulk(); tekenFuncties(); }}, kids);
-  }
-  function tekenChips(){
-    var chips = [ chip(null, 'Overzicht', null) ];
-    doelgroepenMeta.forEach(function(d){ chips.push(chip(d.id, d.emoji+' '+d.naam, d.kleur)); });
-    vervang($('#dgChips'), chips);
-  }
-  function past(f){
-    if (actieveDg && !(f.doelgroepen||[]).some(function(d){ return d.id===actieveDg; })) return false;
-    if (zoekterm){ var s=(f.naam+' '+(f.uitleg||'')).toLowerCase(); if (s.indexOf(zoekterm)<0) return false; }
-    return true;
-  }
-  function tekenFuncties(){
-    var groepen = catData.map(function(g){ return { categorie:g.categorie, functies:g.functies.filter(past) }; })
-                         .filter(function(g){ return g.functies.length; });
-    var blokken = groepen.map(categorieBlok).filter(Boolean);
-    vervang($('#functies'), blokken.length ? blokken : el('div',{class:'muted', style:{padding:'.6rem 0'}}, 'Geen functies gevonden voor deze filter.'));
-    if (actieveDg){ var m=dgMeta(actieveDg); Util.tekst($('#ctxUitleg'), m.naam+' · '+(m.uitleg||'')+' Wijzigingen hier gelden alleen voor deze doelgroep.'); }
-    else Util.tekst($('#ctxUitleg'), 'Overzicht: de grote knop zet een functie globaal aan of uit; de gekleurde pillen sturen per doelgroep bij (bijv. wel voor RTG-leden, niet voor Lifestyle).');
-  }
-  function updBulk(){
-    var suffix = actieveDg ? (' voor '+dgMeta(actieveDg).naam) : '';
-    Util.tekst($('#bAllesAan'), 'Alles aan'+suffix);
-    Util.tekst($('#bAllesUit'), 'Alles uit'+suffix);
-  }
-  $('#fnZoek').addEventListener('input', function(){ zoekterm=this.value.trim().toLowerCase(); tekenFuncties(); });
-  $('#bAllesAan').addEventListener('click', function(){ var b={ alles:true, aan:true }; if(actieveDg) b.doelgroep=actieveDg; zetFunctie(b); });
-  $('#bAllesUit').addEventListener('click', function(){
-    var wat = actieveDg ? ('alles voor '+dgMeta(actieveDg).naam) : 'ALLE functionaliteiten';
-    if (!confirm('Weet je het zeker? Dit maakt een aanvraag om '+wat+' uit te zetten. Er verandert pas iets nadat de eigenaar de aanvraag accepteert.')) return;
-    var b={ alles:true, aan:false }; if(actieveDg) b.doelgroep=actieveDg; zetFunctie(b);
-  });
-
-  /* ---------- AI-hulp voor de controlekamer ---------- */
-  var aiVoorstelData = [];
-  function voorstelRij(w){
-    var m = w.doelgroep ? dgMeta(w.doelgroep) : null;
-    return el('div',{class:'voorstelrij'},
-      el('span',{class:'tag', style:{color:w.aan?'#7EE0A3':'#F4B8C6'}}, w.aan?'AAN':'UIT'),
-      el('span',{style:{flex:'1',minWidth:'0'}}, w.naam||w.id),
-      el('span',{class:'muted'}, m ? (m.emoji+' '+m.naam) : 'globaal'));
-  }
-  $('#bAiVraag').addEventListener('click', function(){
-    var v=$('#aiVraag').value.trim(); if(!v){ toast('Typ eerst een vraag of instructie.'); return; }
-    var b=$('#bAiVraag'); b.disabled=true; Util.tekst(b,'AI denkt na…');
-    api('/api/techniek/functie/ai', { method:'POST', body:{ vraag:v } })
-      .then(function(d){
-        b.disabled=false; Util.tekst(b,'Vraag de AI');
-        $('#aiAntwoord').hidden=false; Util.tekst($('#aiAntwoord'), d.antwoord||'');
-        Util.tekst($('#aiBron'), d.bron==='ai' ? 'AI-antwoord' : 'ingebouwde taal-hulp');
-        aiVoorstelData = d.voorstel||[];
-        if (aiVoorstelData.length){ $('#aiVoorstelBlok').hidden=false; vervang($('#aiVoorstel'), aiVoorstelData.map(voorstelRij)); }
-        else $('#aiVoorstelBlok').hidden=true;
-      })
-      .catch(function(e){ b.disabled=false; Util.tekst(b,'Vraag de AI'); toast(e.message); });
-  });
-  $('#bAiVoorstel').addEventListener('click', function(){
-    if(!aiVoorstelData.length) return;
-    var lijst = aiVoorstelData.slice();
-    (function volgende(i){
-      if (i>=lijst.length){ toast(lijst.length+' aanvraag(-vragen) ingediend. De eigenaar accepteert ze nog.'); laad(); return; }
-      api('/api/techniek/functie', { method:'POST', body:{ id:lijst[i].id, doelgroep:lijst[i].doelgroep||undefined, aan:lijst[i].aan } })
-        .then(function(){ volgende(i+1); }).catch(function(){ volgende(i+1); });
-    })(0);
-    $('#aiVoorstelBlok').hidden=true; aiVoorstelData=[];
-  });
-
-  /* ---------- beveiliging (inbraakdetectie) ---------- */
-  var ernstKleur = { kritiek:'fout', waarschuwing:'waarschuwing', info:'ok' };

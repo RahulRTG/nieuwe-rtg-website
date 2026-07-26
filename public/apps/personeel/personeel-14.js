@@ -1,87 +1,129 @@
-        const items = (o.items||[]).filter(pkBarItem);
-        return '<div class="card" style="border-left:4px solid '+(a>=8?'#E5484D':a>=4?'#C99A2E':'#2E7D5B')+';">'+
-          '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=8?'#FF8589':a>=4?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
-          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
-          (fase==='bezig'?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+T('vp.bezig','bezig')+'</div>':'')+
-          '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost" data-pkbar="'+o.ref+'" data-phase="bezig" style="flex:1;">'+T('st.start','Start')+'</button>':'')+
-          '<button class="abtn" data-pkbar="'+o.ref+'" data-phase="klaar" style="flex:1;">'+T('st.ready','Klaar')+'</button></div></div>';
-      }).join('') : '<div class="card" style="color:var(--soft);font-size:0.85rem;">'+T('pd.b.leeg','Geen open drankbonnen. Nieuwe bestellingen verschijnen hier vanzelf, live met het barscherm.')+'</div>';
-    } else {
-      const sec = pdaKant;
-      const mijn = live.filter(o => pkSecties(o).includes(sec) && (o.secties||{})[sec] !== 'klaar').sort((a,b) => ((b.spoed?1:0)-(a.spoed?1:0)) || (new Date(a.at)-new Date(b.at)));
-      const laat = mijn.filter(o => pkAge(o.at) >= 12).length;
-      // all day voor deze kant, net als op het grote scherm
-      const per = {};
-      mijn.forEach(o => (o.items||[]).forEach(it => { if (pkSectieOf(it) === sec) per[it.name] = (per[it.name]||0) + it.qty; }));
-      pkMinOver(per);
-      const allday = Object.entries(per).sort((a,b) => b[1]-a[1]).slice(0, 8);
-      html += '<div class="card" style="display:flex;gap:1.2rem;align-items:center;"><div><b style="font-size:1.3rem;">'+mijn.length+'</b><span style="display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('kds.open','Open bonnen')+'</span></div>'+
-        '<div><b style="font-size:1.3rem;color:'+(laat?'#FF8589':'#7BC79B')+';">'+laat+'</b><span style="display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('kds.laat','Te laat')+'</span></div>'+
-        (allday.length?'<div style="flex:1;font-size:0.72rem;color:var(--soft);">'+T('kds.allday','All day')+': '+allday.map(r => r[1]+'× '+esc(r[0])).join(', ')+'</div>':'')+'</div>';
-      // de bezetting van deze kant: aanmelden = het scherm rekent met jou mee
-      const koks = ((state.lijn||{})[sec]) || [];
-      const ikSta = me && koks.some(k => k.id === me.staffId);
-      const perKok = koks.length ? Math.ceil(mijn.length / koks.length) : mijn.length;
-      html += '<div class="card" style="display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;"><span style="font-size:0.8rem;">'+
-        (koks.length ? esc(koks.map(k=>k.name.split(' ')[0]).join(', '))+' · <b>'+perKok+'</b> '+T('lijn.perkok','bon(nen) p.p.') : T('lijn.leeg','Niemand aangemeld'))+'</span>'+
-        '<button class="abtn'+(ikSta?'':' ghost')+'" data-pklijn style="margin-left:auto;">'+(ikSta?'✔ '+T('lijn.af2','Aangemeld'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
-      // maak nu: in een keer maken, gebundeld over de bonnen
-      const nuPer = {};
-      mijn.forEach(o => {
-        const p2 = pkPlan(o).plan[sec];
-        if (!p2 || (p2.doe !== 'nu' && p2.doe !== 'bezig')) return;
-        (o.items||[]).forEach(it => { if (pkSectieOf(it) === sec){ nuPer[it.name] = (nuPer[it.name]||0) + it.qty; } });
-      });
-      pkMinOver(nuPer);
-      const nuRows = Object.entries(nuPer).sort((a,b)=>b[1]-a[1]).slice(0,6);
-      if (nuRows.length) html += '<div class="card" style="border-left:4px solid #2E7D5B;"><div class="k">'+T('lijn.maaknu','Maak nu, in een keer')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.9rem;">'+nuRows.map(r=>'<b style="color:var(--gold);">'+r[1]+'×</b> '+esc(r[0])).join(' · ')+'</div></div>';
-      if (pkOverLijst().length) html += '<div class="card"><div class="k">'+T('over.h','Op de pas over')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.85rem;">'+pkOverLijst().map(x=>'<b style="color:var(--gold);">'+x.qty+'×</b> '+esc(x.name)).join(' · ')+' · <span style="color:var(--soft);">'+T('over.eerst','gebruik eerst wat er ligt')+'</span></div></div>';
-      html += mijn.length ? mijn.map(o => {
-        const a = pkAge(o.at);
-        const p = pkPlan(o).plan[sec];
-        const adv = p ? ({ nu: '▶ '+T('vp.nu','start nu'), wacht: ''+T('vp.wacht','wacht')+' ~'+p.min+'m', bezig: ''+T('vp.bezig','bezig'), warm: ''+T('vp.warm','houd warm'), pas: '✓ '+T('vp.pas','naar de pas') })[p.doe] : '';
-        const fase = (o.secties||{})[sec];
-        const items = (o.items||[]).filter(it => pkSectieOf(it) === sec);
-        return '<div class="card" style="border-left:4px solid '+(a>=12?'#E5484D':a>=6?'#C99A2E':'#2E7D5B')+';">'+
-          '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
-          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
-          (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+esc(o.allergyNote)+'</div>':'')+
-          (o.zorg?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+T('pd.zorgp','Zorgprofiel gast')+': '+esc(pkZorg(o.zorg))+'</div>':'')+
-          pkGast(o)+
-          (adv?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+adv+'</div>':'')+
-          '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost" data-pkgo="'+o.ref+'" data-phase="bezig" style="flex:1;">'+T('st.start','Start')+'</button>':'')+
-          '<button class="abtn" data-pkgo="'+o.ref+'" data-phase="klaar" style="flex:1;">'+T('st.ready','Klaar')+'</button></div></div>';
-      }).join('') : '<div class="card" style="color:var(--soft);font-size:0.85rem;">'+T('pd.k.leeg','Niets voor deze kant. Nieuwe bonnen verschijnen hier vanzelf, live met het keukenscherm.')+'</div>';
-    }
-    wrap.innerHTML = html;
-    wrap.querySelectorAll('[data-pkkant]').forEach(b => b.addEventListener('click', () => {
-      pdaKant = b.dataset.pkkant;
-      try { localStorage.setItem('rtg_pda_kant', pdaKant); } catch(e){}
-      renderKeuken();
+    if (pkfs) pkfs.addEventListener('click', () => {
+      const inp = document.getElementById('pkFlIn');
+      const q = (inp.value || '').trim();
+      inp.value = '';
+      pkFlVraag(q);
+    });
+    // spreek de vraag in via de gedeelde spraakmotor: handig met een
+    // dienblad in de ene hand
+    if (window.Spraak) Spraak.koppel(document.getElementById('pkFlMic'), {
+      opTekst: zin => {
+        const inp = document.getElementById('pkFlIn');
+        if (inp) inp.value = zin;
+        pkFlVraag(zin);
+      },
+      kanNiet: () => toast(T('pd.fl.micniet','Spraak werkt niet op dit toestel; typen kan altijd.'))
+    });
+    document.querySelectorAll('[data-eh]').forEach(el => el.addEventListener('click', () => {
+      const i = Number(el.dataset.eh);
+      hulpOpen = hulpOpen === i ? null : i;
+      renderHulp();
     }));
-    // de voorraadbalk: 86 op advies en derving melden, recht vanaf de vloer
-    wrap.querySelectorAll('[data-pk86]').forEach(b => b.addEventListener('click', async () => {
-      try {
-        await API.call('/supplier/menu/86', { itemId: b.dataset.pk86, op: true });
-        toast(''+T('st.86gezet','86 gezet; leden kunnen het niet meer bestellen.'));
-        pkWvAt = 0; pkLaadWerkvloer(); await refresh();
-      } catch(e){ toast(e.message); }
+    document.querySelectorAll('[data-ctteken]').forEach(b => b.addEventListener('click', async () => {
+      const naam = prompt(T('pd.ct.tekenvraag','Typ uw naam om digitaal te ondertekenen:'));
+      if (!naam) return;
+      try { await API.call('/supplier/contract/teken', { ref: b.dataset.ctteken, naam, akkoord: true }); toast(T('pd.ct.tekenok','Ondertekend.')); await laadZaken(); renderHulp(); }
+      catch(e){ toast(e.message); }
     }));
-    const pkDerf = wrap.querySelector('[data-pkderf]'); if (pkDerf) pkDerf.addEventListener('click', async () => {
-      const naam = prompt(T('st.derfwat','Welk artikel is er weg (naam van de voorraadlijst)?')); if (!naam) return;
-      const art = ((pkWv && pkWv.artikelen) || []).find(a => a.naam.toLowerCase() === naam.trim().toLowerCase());
-      if (!art){ toast(T('st.derfgeen','Dat artikel staat niet op de voorraadlijst.')); return; }
-      const hv = prompt(T('vr.derfvraag','Hoeveel is er weg (breuk, derving)?')); if (!hv) return;
-      const reden = prompt(T('vr.derfreden','Reden?')) || '';
+    const ea = document.getElementById('ehboAlarm');
+    if (ea) ea.addEventListener('click', () => sendSOS('EHBO nodig', ''+T('pd.eh.gestuurd','EHBO-alarm verstuurd. Het team is gealarmeerd.')));
+    const ts = document.getElementById('tpSend');
+    if (ts) ts.addEventListener('click', async () => {
+      const inp = document.getElementById('tpText');
+      const text = (inp.value || '').trim();
+      if (!text) return;
       try {
-        await API.call('/supplier/keuken/verspilling', { artikelId: art.id, hoeveelheid: Number(String(hv).replace(',', '.')), reden });
-        toast(''+T('st.derfok','Geboekt in het voorraadlogboek.'));
-        pkWvAt = 0; pkLaadWerkvloer();
+        const d = await API.call('/staff/trust/send', { text, anon: document.getElementById('tpAnon').checked });
+        if (zaken) zaken.trust = d.trust;
+        toast(''+T('pd.tp.sent','Vertrouwelijk verstuurd. Alleen RTG leest dit.'));
+        renderHulp();
+        openTab('hulp');
       } catch(e){ toast(e.message); }
     });
-    wrap.querySelectorAll('[data-pkover]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/overschot', { op: 'gebruikt', id: b.dataset.pkover }); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
+    const zb = document.getElementById('ziekBtn');
+    if (zb) zb.addEventListener('click', async () => {
+      if (!ziekArm){ ziekArm = true; renderHulp(); openTab('hulp'); return; }
+      ziekArm = false;
+      try {
+        await API.call('/staff/leave/request', { soort: 'ziek' });
+        toast(''+T('pd.ad.ziekok','Ziekmelding doorgegeven. Beterschap!'));
+        await laadZaken(); renderHulp(); openTab('hulp');
+      } catch(e){ toast(e.message); renderHulp(); }
+    });
+    const vg = document.getElementById('vlGo');
+    if (vg) vg.addEventListener('click', async () => {
+      const van = document.getElementById('vlVan').value, tot = document.getElementById('vlTot').value;
+      if (!van || !tot){ toast(T('pd.ad.datum','Kies een begin- en einddatum.')); return; }
+      try {
+        await API.call('/staff/leave/request', { soort: 'verlof', van, tot, reden: document.getElementById('vlReden').value.trim() });
+        toast(''+T('pd.ad.gevraagd','Verlof aangevraagd; de manager beslist in het Kantoor.'));
+        await laadZaken(); renderHulp(); openTab('hulp');
+      } catch(e){ toast(e.message); }
+    });
+    // De trainingskaart tekent zichzelf met Util.el (eigen handlers); vullen volstaat.
+    vulTrainingKaart();
+  }
+
+  // Ritten: chauffeurs en crew van vervoerspartners (taxi en jet) werken hun
+  // ritten volledig vanuit de zak af: nemen, stap voor stap rijden, verdiensten.
+  const NEXT_RIDE = { 'aangevraagd':'geaccepteerd', 'geaccepteerd':'onderweg', 'onderweg':'aangekomen', 'aangekomen':'aan-boord', 'aan-boord':'afgerond', 'rijdt':'afgerond', 'gearriveerd':null };
+  const RIDE_LBL = { 'geaccepteerd':['pd.r.accept','Accepteer'], 'onderweg':['pd.r.go','Ik rijd'], 'aangekomen':['pd.r.atpickup','Ik sta voor'], 'aan-boord':['pd.r.board','Aan boord'], 'afgerond':['pd.r.done','Afronden'] };
+  const RIT_ST = { 'aangevraagd':['pd.rs.new','nieuw'], 'geaccepteerd':['pd.rs.acc','geaccepteerd'], 'onderweg':['pd.rs.go','onderweg'], 'aangekomen':['pd.rs.at','staat voor'], 'aan-boord':['pd.rs.board','gast aan boord'], 'rijdt':['pd.rs.board','gast aan boord'] };
+  const RIT_KLAAR = st => st === 'gearriveerd' || st === 'afgerond' || st === 'geweigerd';
+  const heeftRitten = () => !!(state && state.supplier && (state.supplier.caps || []).includes('rides'));
+  function renderRitten(){
+    const aan = heeftRitten();
+    const tabBtn = document.getElementById('tabRitten');
+    if (tabBtn) tabBtn.style.display = aan ? '' : 'none';
+    const wrap = $('#rittenWrap');
+    if (!aan){ if (wrap) wrap.innerHTML = ''; return; }
+    const jet = state.supplier && state.supplier.type === 'jet';
+    const ritten = state.rides || [];
+    const mijn = ritten.filter(r => !RIT_KLAAR(r.status) && r.driver && r.driver.staffId === me.staffId);
+    const straks = r => r.plannedFor && (new Date(r.plannedFor) - Date.now()) > 45 * 60000;
+    const alleOpen = ritten.filter(r => r.status === 'aangevraagd' && !r.driver);
+    const open = alleOpen.filter(r => !straks(r));
+    const gepland = alleOpen.filter(straks);
+    const vandaag = new Date().toISOString().slice(0, 10);
+    const klaar = ritten.filter(r => (r.status === 'afgerond' || r.status === 'gearriveerd') && r.driver && r.driver.staffId === me.staffId && String(r.finishedAt || r.at).slice(0, 10) === vandaag);
+    const omzet = klaar.reduce((s, r) => s + (r.quote || 0), 0);
+    const regel = r => (r.from || '') + ' → ' + (r.to || T('pd.r.opendest','open bestemming')) + (r.passengers ? ' · ' + r.passengers + 'p' : '') + (r.quote ? ' · ' + eur(r.quote) : '');
+    wrap.innerHTML =
+      '<div class="card"><div class="k">'+T('pd.r.mijn','Uw rit')+' ('+mijn.length+')</div>'+
+      (mijn.length ? mijn.map(r => {
+        const nxt = NEXT_RIDE[r.status];
+        const st = RIT_ST[r.status];
+        return '<div class="task"><span class="ic">'+(jet?'':'')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' ·  '+esc(r.note):'')+(r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(pkZorg(r.zorg))+'</span>':'')+'</span></div>'+
+          (nxt ? '<button class="abtn" data-pdgo="'+r.ref+'" data-st="'+nxt+'">'+T(RIDE_LBL[nxt][0], RIDE_LBL[nxt][1])+'</button>' : '')+'</div>';
+      }).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geen','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>')+'</div>'+
+      '<div class="card"><div class="k">'+T('pd.r.openh','Open aanvragen')+' ('+open.length+')</div>'+
+      (open.length ? open.map(r =>
+        '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc(regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>'
+      ).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geenopen','Geen open aanvragen. Nieuwe ritten verschijnen hier vanzelf.')+'</div>')+'</div>'+
+      (gepland.length ? '<div class="card"><div class="k">'+T('pd.r.gepland','Gepland')+' ('+gepland.length+')</div>'+
+        gepland.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc((r.when || '') + ' · ' + regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>').join('')+'</div>' : '')+
+      '<div class="card"><div class="k">'+T('pd.r.vandaag','Vandaag')+'</div>'+
+      '<div class="task"><span class="ic"></span><div class="t"><b>'+klaar.length+' '+T('pd.r.klaar','rit(ten) afgerond')+' · '+eur(omzet)+'</b><span>'+T('pd.r.netto','Volledig voor de zaak: RTG rekent 0% commissie.')+'</span></div></div></div>';
+    document.querySelectorAll('[data-pdgo]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/ride/status', { ref: b.dataset.pdgo, status: b.dataset.st }); await refresh(); openTab('ritten'); } catch(e){ toast(e.message); }
     }));
-    // aanmelden op deze kant: het scherm en de coach rekenen met de bezetting
+    document.querySelectorAll('[data-pdneem]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const s = await API.call('/supplier/ride/suggest', { ref: b.dataset.pdneem });
+        await API.call('/supplier/ride/assign', { ref: b.dataset.pdneem, self: true, vehicleId: s.vehicleId });
+        toast(T('pd.r.genomen','De rit is van u.') + (s.vehicleName ? ' · ' + s.vehicleName : ''));
+        await refresh(); openTab('ritten');
+      } catch(e){ toast(e.message); }
+    }));
+  }
+
+  /* ---- bezorgen: ritten op naam, GPS, navigatie en AI-hulp ---- */
+  let gpsWatch = null, gpsLaatst = 0, gpsPos = null;
+  const heeftBezorg = () => !!(state && state.bezorg && state.bezorg.bezorgen);
+  function kaartLink(o){
+    // geen derde partij: een neutrale geo:-URI opent de EIGEN kaart-app van het
+    // toestel (Android/OSMand/Apple Maps naar keuze), wij sturen niets naar Google.
+    if (o.geo && Number.isFinite(o.geo.lat)) return 'geo:' + o.geo.lat + ',' + o.geo.lng + '?q=' + o.geo.lat + ',' + o.geo.lng;
+    return 'geo:0,0?q=' + encodeURIComponent(o.adres || '');
+  }
+  function afstandNaar(o){

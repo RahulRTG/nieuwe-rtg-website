@@ -163,3 +163,17 @@
   $('#tabBtnWacht').addEventListener('click', function(){ toonTab('wacht'); });
   $('#tabBtnFuncties').addEventListener('click', function(){ toonTab('functies'); });
 
+  /* ---------- De Wacht: immuunsysteem + meters/grafiek + raadkamer ---------- */
+  function wachtActie(pad, body, melding){
+    api('/api/techniek/wacht/' + pad, { method:'POST', body:body||{} })
+      .then(function(d){ if (melding) toast(melding); if (d && d.bord) tekenWacht(d.bord); })
+      .catch(function(e){ toast(e.message); });
+  }
+  $('#bWachtAnalyseer').addEventListener('click', function(){ wachtActie('analyseer', {}, 'AI heeft de signalen uitgekauwd.'); });
+  $('#bWachtOpruimen').addEventListener('click', function(){ wachtActie('opruimen', {}, 'Opgeruimd.'); });
+  $('#bWachtIsoleer').addEventListener('click', function(){
+    var b = $('#wachtBron').value.trim(); if(!b){ toast('Vul een bron (IP) in.'); return; }
+    wachtActie('quarantaine', { bron:b, actie:'isoleer' }, 'In quarantaine gezet.'); $('#wachtBron').value='';
+  });
+  $('#bAvTest').addEventListener('click', function(){
+    var eicar = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';

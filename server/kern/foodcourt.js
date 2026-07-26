@@ -93,4 +93,4 @@ function maakFoodcourt({ db, save, crypto }) {
   return { foodcourt: { KEUKENS, overzicht, tijden, seed, isEetgelegenheid } };
 }
 
-module.exports = { maakFoodcourt, FOODCOURT_KEUKENS: KEUKENS };
+module.exports = { maakFoodcourt };

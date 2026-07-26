@@ -1,76 +1,119 @@
-      const r = pdBev.ronde;
-      h += '<div class="card"><div class="k">'+T('pd.bev.ronde','Patrouilleronde')+' · '+esc(r.post)+'</div>'+
-        '<div style="font-size:0.82rem;margin:0.3rem 0;">'+(r.checkpoints.length? r.checkpoints.map(c=>'✓ '+esc(c.naam)).join(' · ') : T('pd.bev.nogcp','Nog geen checkpoints.'))+'</div>'+
-        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><input id="bevCpNaam" placeholder="'+T('pd.bev.cpnaam','checkpoint')+'" style="flex:1;min-width:7rem;">'+
-        '<button class="abtn" id="bevCpAdd">'+T('pd.bev.cpadd','Checkpoint')+'</button>'+
-        '<button class="abtn ghost" id="bevRondeKlaar">'+T('pd.bev.rondeklaar','Ronde klaar')+'</button></div></div>';
-    }
-    // 3) mijn diensten
-    h += '<div class="card"><div class="k">'+T('pd.bev.diensten','Mijn diensten')+'</div>';
-    h += ds.length ? ds.map(d => {
-      const ingeklokt = d.status === 'ingeklokt';
-      return '<div class="task"><span class="ic">'+(ingeklokt?'':'')+'</span><div class="t"><b>'+esc(d.post)+'</b><span>'+esc(d.datum)+' · '+esc(d.shift)+(d.klant?' · '+esc(d.klant):'')+'</span></div>'+
-        (d.status==='afgerond' ? '<span style="font-size:0.72rem;color:var(--soft);">'+T('pd.bev.klaar','afgerond')+'</span>'
-          : ingeklokt ? '<button class="abtn ghost" data-bevuit="'+d.id+'">'+T('pd.bev.uit','Uitklokken')+'</button>'
-          : '<button class="abtn" data-bevin="'+d.id+'">'+T('pd.bev.in','Inklokken')+'</button>')+'</div>'+
-        (ingeklokt && !pdBev.ronde ? '<div style="text-align:right;margin-top:-0.3rem;"><button class="abtn ghost" data-bevronde="'+d.postId+'" style="font-size:0.7rem;">'+T('pd.bev.startronde','Start ronde')+'</button></div>' : '');
-    }).join('') : '<div style="font-size:0.85rem;color:var(--soft);">'+T('pd.bev.geendienst','Geen diensten ingepland.')+'</div>';
-    h += '</div>';
-    // 4) incident melden
-    h += '<div class="card"><div class="k">'+T('pd.bev.incident','Incident melden')+'</div>'+
-      '<input id="bevIncSoort" placeholder="'+T('pd.bev.incsoort','soort (bijv. inbraakpoging)')+'" style="width:100%;margin-bottom:0.4rem;">'+
-      '<select id="bevIncErnst" style="width:100%;margin-bottom:0.4rem;"><option value="laag">'+T('pd.bev.laag','laag')+'</option><option value="midden" selected>'+T('pd.bev.midden','midden')+'</option><option value="hoog">'+T('pd.bev.hoog','hoog')+'</option><option value="kritiek">'+T('pd.bev.kritiek','kritiek')+'</option></select>'+
-      '<textarea id="bevIncTekst" placeholder="'+T('pd.bev.inctekst','wat is er gebeurd?')+'" style="width:100%;min-height:3rem;margin-bottom:0.4rem;"></textarea>'+
-      '<button class="abtn" id="bevIncSend" style="width:100%;">'+T('pd.bev.incsend','Melden')+'</button></div>';
-    wrap.innerHTML = h;
-    // bindingen
-    const bind = (id, fn) => { const e2 = document.getElementById(id); if (e2) e2.addEventListener('click', fn); };
-    bind('bevSosBtn', () => { if (!confirm(T('pd.bev.sosbev','SOS versturen? Het team en RTG-kantoor worden direct gealarmeerd.'))) return;
-      bevPos(async (lat, lng) => { try { await API.call('/supplier/beveiliging/pda/sos', { lat, lng }); toast(''+T('pd.bev.sosok','SOS verstuurd. Bijstand onderweg.')); } catch(e){ toast(e.message); } }); });
-    wrap.querySelectorAll('[data-bevin]').forEach(b => b.addEventListener('click', () => {
-      bevPos(async (lat, lng) => { try { await API.call('/supplier/beveiliging/pda/inklok', { id:b.dataset.bevin, lat, lng }); toast(''+T('pd.bev.inok','Ingeklokt op post.')); await laadBevPda(); } catch(e){ toast(e.message); } });
+    if (ap.length) html += '<div class="card"><div class="k">'+T('pd.w.apart','Apart gelegd')+' ('+ap.length+')</div>'+
+      ap.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</b><span>'+esc(r.codenaam||r.key)+' · '+T('pd.w.tot','tot')+' '+esc(r.tot)+'</span></div></div>').join('')+'</div>';
+    // klant erbij pakken
+    html += '<div class="card"><div class="k">'+T('pd.w.klant','Klant erbij pakken')+'</div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wKlantKey', T('pd.w.klantph','Codenaam of sleutel van het lid'))+'<button class="abtn" id="wKlantBtn">'+T('pd.w.open','Open')+'</button></div>'+
+      '<div id="wKlantUit" style="margin-top:0.5rem;">'+(winkelKlant?winkelKlantKaart(winkelKlant):'')+'</div></div>';
+    wrap.innerHTML = html;
+    winkelBind(wrap);
+  }
+  function winkelKlantKaart(k){
+    const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
+    return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;">'+
+      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
+      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('pd.w.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
+      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
+      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;color:var(--txt);margin-top:0.35rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
+      '</div>';
+  }
+  function winkelBind(wrap){
+    // kassa
+    wrap.querySelectorAll('[data-wcartdel]').forEach(b => b.addEventListener('click', () => { winkelCart.splice(Number(b.dataset.wcartdel), 1); renderWinkel(); }));
+    const leeg = wrap.querySelector('#wCartLeeg'); if (leeg) leeg.addEventListener('click', () => { winkelCart = []; renderWinkel(); });
+    wrap.querySelectorAll('[data-wbetaal]').forEach(b => b.addEventListener('click', async () => {
+      if (!winkelCart.length) return;
+      const body = { method: b.dataset.wbetaal, regels: winkelCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
+      if (body.method === 'rtgpay'){
+        // tap to pay als het kan, met altijd de uitweg om de code te typen
+        let code = null;
+        if (window.TapPay && TapPay.kan() && window.confirm(T('pd.w.tapkeuze','Tap to pay: de klant tikt zijn toestel hiertegen. Liever de code typen (bijv. als NFC niet werkt)? Kies dan Annuleren.'))){
+          toast(''+T('pd.w.tap','Tap to pay: laat de klant het toestel hiertegen houden...'));
+          code = await TapPay.lees(12000);
+          if (!code) toast(T('pd.w.tapmis','Geen tik ontvangen; typ de code van de klant.'));
+        }
+        if (!code){
+          const c = window.prompt(T('pd.w.paycode','Betaalcode van de klant (uit de app):'));
+          if (!c) return;
+          code = c.trim().toUpperCase();
+        }
+        body.payCode = code;
+      }
+      if (winkelKlant) body.klantKey = winkelKlant.key;
+      try {
+        const r = await API.call('/supplier/retail/verkoop', body);
+        toast(''+T('pd.w.verkocht','Verkocht')+' · '+eur(r.sale.total));
+        winkelCart = [];
+        if (winkelKlant){ try { winkelKlant = (await API.call('/supplier/retail/klant', { key: winkelKlant.key })).klant; } catch(e){} }
+        await laadWinkel();
+      } catch(e){ toast(e.message); }
     }));
-    wrap.querySelectorAll('[data-bevuit]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/beveiliging/pda/uitklok', { id:b.dataset.bevuit }); toast(T('pd.bev.uitok','Uitgeklokt.')); await laadBevPda(); } catch(e){ toast(e.message); }
+    // zoeken
+    const doeZoek = async () => {
+      const uit = wrap.querySelector('#wZoekUit');
+      try {
+        const r = await API.call('/supplier/retail/zoek', { q: wrap.querySelector('#wZoek').value });
+        uit.innerHTML = r.resultaten.length ? r.resultaten.map(v =>
+          '<div class="task"><span class="ic">'+(v.voorraad>0?'':'')+'</span><div class="t"><b>'+esc(v.artikel)+'</b><span>'+esc(v.kleur)+' · '+esc(v.maat)+' · '+eur(v.price)+' · '+T('pd.w.voorraad','voorraad')+' '+v.voorraad+'</span></div>'+
+          '<div style="display:flex;gap:0.3rem;">'+
+          (v.voorraad>0?'<button class="abtn" data-wadd="'+esc(v.vsku)+'" data-wnaam="'+esc(v.artikel)+'" data-wkleur="'+esc(v.kleur)+'" data-wmaat="'+esc(v.maat)+'" data-wprice="'+v.price+'">+</button>':'')+
+          (v.voorraad>0?'<button class="abtn ghost" data-wapart="'+esc(v.vsku)+'">'+T('pd.w.legapart','Apart')+'</button>':'')+
+          '</div></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.w.niets','Niets gevonden.')+'</div>';
+        // knoppen in de resultaten binden
+        uit.querySelectorAll('[data-wadd]').forEach(b => b.addEventListener('click', () => {
+          const bestaand = winkelCart.find(r => r.vsku === b.dataset.wadd);
+          if (bestaand) bestaand.aantal++;
+          else winkelCart.push({ vsku: b.dataset.wadd, naam: b.dataset.wnaam, kleur: b.dataset.wkleur, maat: b.dataset.wmaat, price: Number(b.dataset.wprice), aantal: 1 });
+          renderWinkel();
+        }));
+        uit.querySelectorAll('[data-wapart]').forEach(b => b.addEventListener('click', async () => {
+          if (!winkelKlant) return toast(T('pd.w.eerstklant','Pak eerst een klant erbij.'));
+          try { await API.call('/supplier/retail/apart', { key: winkelKlant.key, vsku: b.dataset.wapart }); toast(T('pd.w.apartok','Apart gelegd voor de klant.')); await laadWinkel(); } catch(e){ toast(e.message); }
+        }));
+      } catch(e){ toast(e.message); }
+    };
+    const zb = wrap.querySelector('#wZoekBtn'); if (zb) zb.addEventListener('click', doeZoek);
+    const zi = wrap.querySelector('#wZoek'); if (zi) zi.addEventListener('keydown', e => { if (e.key === 'Enter') doeZoek(); });
+    // paskamer gebracht
+    wrap.querySelectorAll('[data-wbreng]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/retail/paskamer/breng', { id: b.dataset.wbreng }); toast(T('pd.w.gebracht','Gebracht.')); await laadWinkel(); } catch(e){ toast(e.message); }
     }));
-    wrap.querySelectorAll('[data-bevronde]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/beveiliging/pda/ronde/start', { postId:b.dataset.bevronde }); await laadBevPda(); } catch(e){ toast(e.message); }
-    }));
-    bind('bevCpAdd', () => { const naam = ($('#bevCpNaam')||{}).value || '';
-      bevPos(async (lat, lng) => { try { await API.call('/supplier/beveiliging/pda/ronde/checkpoint', { id: pdBev.ronde.id, naam, lat, lng }); await laadBevPda(); } catch(e){ toast(e.message); } }); });
-    bind('bevRondeKlaar', async () => { try { await API.call('/supplier/beveiliging/pda/ronde/klaar', { id: pdBev.ronde.id }); toast(T('pd.bev.rondeok','Ronde afgerond.')); await laadBevPda(); } catch(e){ toast(e.message); } });
-    bind('bevIncSend', () => {
-      const tekst = ($('#bevIncTekst')||{}).value || '';
-      if (!tekst.trim()) { toast(T('pd.bev.incleeg','Beschrijf het incident.')); return; }
-      const soort = ($('#bevIncSoort')||{}).value || '';
-      const ernst = ($('#bevIncErnst')||{}).value || 'midden';
-      const post = ds[0] ? ds[0].post : '';
-      const postId = ds.find(d => d.status==='ingeklokt') ? ds.find(d => d.status==='ingeklokt').postId : (ds[0]||{}).postId;
-      bevPos(async (lat, lng) => { try { await API.call('/supplier/beveiliging/pda/incident', { soort, ernst, tekst, post, postId, lat, lng }); toast(''+T('pd.bev.incok','Incident gemeld.')); await laadBevPda(); } catch(e){ toast(e.message); } });
-    });
+    // klant openen
+    const kb = wrap.querySelector('#wKlantBtn');
+    const openKlant = async () => {
+      const key = wrap.querySelector('#wKlantKey').value.trim(); if (!key) return;
+      try { winkelKlant = (await API.call('/supplier/retail/klant', { key })).klant; renderWinkel(); }
+      catch(e){ toast(e.message); }
+    };
+    if (kb) kb.addEventListener('click', openKlant);
+    const ki = wrap.querySelector('#wKlantKey'); if (ki) ki.addEventListener('keydown', e => { if (e.key === 'Enter') openKlant(); });
   }
 
-  function renderTeam(){
-    const team = state.team || [];
-    const act = (state.activity || []).slice(0, 10);
-    const staff = (state.staff || []).filter(m => m.id !== me.staffId);
-    $('#teamWrap').innerHTML =
-      (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<span style="display:flex;gap:0.4rem;"><button class="abtn" id="teamCall" style="font-size:0.66rem;">'+T('pd.teamcall','Teamcall')+'</button><button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">'+T('pd.buzzall','Iedereen')+'</button></span></div>'+
-        staff.map(m=>{
-          const in2 = !!(state.klok && (state.klok.binnen||[]).includes(m.name));
-          return '<div class="task"><span class="ic">'+(m.role==='manager'?'':'')+'</span><div class="t"><b>'+esc(m.name)+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+(in2?' ·  '+T('pd.ingeklokt','ingeklokt'):'')+'</span></div>'+
-            (in2?'<button class="abtn" data-belm="'+m.id+'" data-naam="'+esc(m.name)+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5c-1 0-1.8.8-1.8 1.8 0 7.2 5.8 13 13 13 1 0 1.8-.8 1.8-1.8v-2.2c0-.8-.6-1.5-1.4-1.7l-2-.4c-.7-.2-1.4.1-1.8.7l-.4.8c-2-1-3.6-2.6-4.6-4.6l.8-.4c.6-.4.9-1.1.7-1.8l-.4-2C9.3 4.1 8.6 3.5 7.8 3.5z"/></svg></button>':'')+
-            '<button class="abtn ghost" data-dmm="'+m.id+'" data-naam="'+esc(m.name)+'" style="position:relative;"><i data-dmbadge="'+m.id+'" style="display:none;position:absolute;top:-6px;right:-6px;background:#C23A5E;color:#fff;border-radius:999px;font-style:normal;font-size:0.6rem;min-width:1.1rem;height:1.1rem;line-height:1.1rem;text-align:center;"></i></button>'+
-            '<button class="abtn ghost" data-buzz="'+m.id+'">'+T('pd.buzz','Tril')+'</button></div>';
-        }).join('')+'</div>' : '')+
-      '<div class="card"><div class="k">'+T('pd.chat','Teamchat')+'</div><div class="chat">'+
-      (team.length ? team.map(m=>'<div class="msg '+(m.who===me.name?'me':'other')+'"><span class="who">'+esc(m.who)+'</span>'+
-        (m.audio?'<audio controls src="'+m.audio+'" style="width:190px;max-width:100%;height:34px;"></audio>':esc(m.text))+'</div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.nochat','Nog geen berichten.')+'</div>')+
-      '</div><div class="compose"><input id="tmMsg" placeholder="'+T('pd.msgph','Bericht aan het team')+'"><button id="tmSend">'+T('pd.send','Stuur')+'</button></div></div>'+
-      '<div class="card"><div class="k">'+T('pd.activity','Wie deed wat')+'</div>'+
-      (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);padding:0.4rem 0;">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>'+
-      // Aparte ruimte: het personeelsnetwerk met andere zaken (met toestemming).
-      '<div class="card"><div class="k">'+T('pd.net','Netwerk met andere zaken')+'</div>'+
-      '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.4rem;">'+T('pd.net.sub','Aparte ruimte. Alleen zaken die uw manager heeft verbonden.')+'</div>'+
-      (netwerk.length ? netwerk.map(v => {
-        if (v.status==='akkoord') return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.open','tik om te chatten')+'</span></div><button class="abtn ghost" data-netopen="'+v.code+'"></button></div>';
+  // ---- op het land (boerderij): de knecht doet de taken van vandaag ----
+  let pdBoer = null;
+  const heeftBoer = () => !!(state && state.supplier && (state.supplier.caps || []).includes('boerderij'));
+  async function laadBoer(){
+    if (!heeftBoer()) return;
+    try { pdBoer = (await API.call('/supplier/boerderij/overzicht', {})); } catch(e){ pdBoer = null; }
+    renderBoer();
+  }
+  function boerPdaToe(r){ if (r && r.overzicht) pdBoer = r.overzicht; renderBoer(); }
+  function renderBoer(){
+    const tabBtn = document.getElementById('tabBoer');
+    if (tabBtn) tabBtn.style.display = heeftBoer() ? '' : 'none';
+    const wrap = $('#boerPdaWrap'); if (!wrap) return;
+    if (!heeftBoer()){ wrap.innerHTML = ''; return; }
+    if (!pdBoer){ wrap.innerHTML = '<div class="card">…</div>'; laadBoer(); return; }
+    const o = pdBoer, vandaag = new Date().toISOString().slice(0,10);
+    let html = '';
+    // Vandaag-briefing (leesbaar samengevat voor de knecht)
+    const br = o.briefing || { punten:[] };
+    html += '<div class="card"><div class="k">'+T('pd.boer.vandaag','Vandaag op het land')+'</div>'+
+      (br.punten.length ? br.punten.map(p => '<div class="task"><span class="ic">'+(p.soort==='oogst'?'':p.soort==='voer'?'':p.soort==='water'?'':p.soort==='gezondheid'?'':'')+'</span><div class="t"><b>'+esc(p.tekst)+'</b></div></div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.rustig','Niets dringends. Fijne dag.')+'</div>')+'</div>';
+    // Taken van vandaag / open
+    const open = (o.taken||[]).filter(t => !t.klaar);
+    html += '<div class="card"><div class="k">'+T('pd.boer.taken','Taken')+' ('+open.length+')</div>'+
+      (open.length ? open.map(t => '<div class="task"><span class="ic">'+((t.voor&&t.voor<vandaag)?'':'')+'</span><div class="t"><b>'+esc(t.wat)+'</b><span>'+(t.waar?''+esc(t.waar):'')+(t.voor?' · '+esc(t.voor):'')+'</span></div><button class="abtn" data-btaak="'+t.id+'">'+T('pd.boer.klaar','Klaar')+'</button></div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.geentaak','Geen open taken.')+'</div>')+'</div>';
+    // Percelen: oogsten en water geven
+    const perc = (o.percelen||[]).filter(p => p.gewasLabel && p.fase !== 'geoogst');

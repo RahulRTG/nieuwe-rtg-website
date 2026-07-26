@@ -158,4 +158,4 @@ function maakIdeeen({ db, save, crypto, anthropic, schoon, bureaus }) {
   return { ideeen: { BUREAUS, STATUS, overzicht, ideeMaak, ideeZet, ideeVerwijder, reactie, aiUitwerken, spinOff } };
 }
 
-module.exports = { maakIdeeen, IDEE_BUREAUS: BUREAUS, IDEE_STATUS: STATUS };
+module.exports = { maakIdeeen, IDEE_STATUS: STATUS };

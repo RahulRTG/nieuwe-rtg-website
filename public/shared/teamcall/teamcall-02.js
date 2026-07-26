@@ -1,3 +1,7 @@
+  /* ---------- de publieke knoppen ---------- */
+  async function bel(staffId, naam){
+    if (stream || kamer){ toast(T('tc.bezig', 'Er loopt al een gesprek.')); return; }
+    await haalIce();
     if (!(await pakMedia())) return;
     try { await API.call('/staff/call', { kind: 'ring', staffId, video: true }); }
     catch (e) { toast(e.message); einde(); return; }

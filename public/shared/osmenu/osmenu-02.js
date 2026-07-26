@@ -1,3 +1,5 @@
+    // ---- verbinding: GPS werkt echt; wifi/Bluetooth kan een website niet
+    //      schakelen (alleen het toestel zelf), dus die staan vast met uitleg ----
     function gpsAan() { try { return localStorage.getItem('rtg_os_gps') === '1'; } catch (e) { return false; } }
     var gpsRij = el('div', 'osmenu-toggle');
     gpsRij.appendChild(icoNode('gps'));

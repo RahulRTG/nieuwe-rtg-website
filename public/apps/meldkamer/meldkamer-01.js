@@ -138,3 +138,8 @@
           '<button class="knop klein" data-rz="uitgereikt" data-r="' + r.id + '" type="button">Reik uit</button></div>' : '') +
         '</div>').join('') : '<p class="stil">Geen recepten in de rij.</p>';
     }
+    if (z.apotheken) {
+      $('#kVoorschrijf').hidden = false;
+      $('#rApotheek').innerHTML = z.apotheken.map(a => '<option value="' + a.code + '">' + esc(a.naam) + '</option>').join('');
+      $('#eigenRecepten').innerHTML = (z.eigenRecepten || []).slice(0, 5).map(r => esc(r.middel) + ' (' + esc(r.status) + ')').join('<br>');
+    }

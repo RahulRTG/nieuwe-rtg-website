@@ -102,6 +102,15 @@
 
   function naarBeneden() { try { vak.scrollTop = vak.scrollHeight; } catch (e) {} }
 
+  /* Wie het paneel omhoog of omlaag zet, is handenvrij-scherm.js: dat kent de
+     standen en de regel "hij praat -> omhoog, jij antwoordt -> omlaag". Is die
+     laag er niet (of nog niet geladen), dan doen we het oude, simpele: gewoon
+     zichtbaar maken. Hier zelf .hidden zetten zou de standen omzeilen. */
+  function inBeeld(van) {
+    if (kamer.naStand) kamer.naStand(van);
+    else vak.hidden = false;
+  }
+
   /* Een beurt toevoegen. van: 'member' (jij), 'rahul' (de assistent) of iets
      anders (een mens: concierge, backoffice). */
   function beurt(van, tekst, at) {
@@ -118,8 +127,8 @@
     bel.innerHTML = (mens ? '<div class="hv-wie">RTG Concierge</div>' : '') +
       esc(t) + '<div class="hv-tijd">' + esc(klok(at || Date.now())) + '</div>';
     rij.appendChild(bel);
-    vak.hidden = false;
     vak.appendChild(rij);
+    inBeeld(van);
     naarBeneden();
     if (!ik) praat(Math.min(4000, 500 + t.length * 22));  // even bewegen, naar lengte
     return rij;
@@ -138,8 +147,8 @@
     bel.className = 'hv-bel';
     bel.innerHTML = '<span class="hv-tikt" role="status" aria-label="Rahul is bezig"><i></i><i></i><i></i></span>';
     puntjes.appendChild(bel);
-    vak.hidden = false;
     vak.appendChild(puntjes);
+    inBeeld('rahul');
     naarBeneden();
     praat(1500);
   }
@@ -164,8 +173,9 @@
         var m = (d && d.messages) || [];
         if (!m.length) return;
         m.slice(-10).forEach(function (b) { beurt(b.from, b.text, b.at); });
-        // het opgehaalde gesprek staat er, maar hoeft niet in beeld te springen
-        vak.hidden = true;
+        /* Het opgehaalde gesprek staat er, maar hoeft niet in beeld te
+           springen: je begint waar je was, niet met een openklappend paneel. */
+        if (root.RTGChatScherm) root.RTGChatScherm.zet('min'); else vak.hidden = true;
       })
       .catch(function () {});
   }

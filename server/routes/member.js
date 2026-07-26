@@ -69,6 +69,8 @@ module.exports = (kern) => {
   require('./member/privacy')(kern);
   // De persoonlijke AI en Rahul/concierge-chat.
   require('./member/assistent')(kern);
+  // Rahul kijkt mee met een foto (kern/kijken.js) en zegt waar die foto heen kan
+  require('./member/kijk')(kern);
   // De persoonlijke laag (zorgprofiel, locatie-delen, Rahul, Shared Assets).
   require('./member/persoonlijk')(kern);
   // Rechtstreeks betalen, de bezorgdienst, tickets en transfers.

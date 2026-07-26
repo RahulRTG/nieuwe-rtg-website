@@ -1861,6 +1861,7 @@
         <button id="dmBel" title="Bellen">📞</button>
         <button id="dmVideo" title="Videobellen">🎥</button>
         <button id="dmBlok" title="Blokkeren of melden">🚫</button>
+        <button id="dmKlets" title="Laat de Rahuls kletsen">RR</button>
         <button class="ms-close" id="dmClose" aria-label="Sluiten">✕</button>
       </div>
     </div>
@@ -1869,6 +1870,16 @@
       <input id="dmInput" placeholder="Typ een bericht" data-i18n-ph="app.pc.ph" autocomplete="off">
       <button id="dmSend" data-i18n="app.pc.send">Stuur</button>
     </div>
+  </div>
+
+  <!-- het salongesprek: jouw Rahul en die van je vriend, over hoe de dag was -->
+  <div id="klets-scrim" class="menu-scrim"></div>
+  <div id="klets-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b>Rahul &amp; Rahul</b><span>Een gesprek over jullie dag &middot; <span id="kletsNaam"></span></span></div>
+      <button class="ms-close" id="kletsClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body" id="kletsBody" style="padding:1rem 1.1rem;"></div>
   </div>
 
   <!-- salon-post delen met een connectie -->

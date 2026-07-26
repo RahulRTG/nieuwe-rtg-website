@@ -149,6 +149,88 @@ een gesproken boeking hoort er nul te veroorzaken.
 De bestaande knoppen blijven allemaal staan; dit is een tweede weg, geen
 vervanging.
 
+### Het scherm van Rahul: vier standen die zichzelf zetten
+
+`public/shared/handenvrij-scherm.js`. De chatbox is het **enige** dat permanent
+in beeld staat; wat er eerder omheen zweefde (de losse Rahul-knop van de
+metgezel, de pil met "draaien" en "volledig scherm") is erin opgegaan.
+
+Vier standen: **min** (alleen de balk), **half**, **vol** en **scherm**
+(volledig scherm). Hij beweegt uit zichzelf tussen de eerste drie: zegt Rahul
+iets, dan komt hij omhoog; antwoord jij, dan zakt hij terug zodat je ziet waar
+je mee bezig was. Zet je zelf een stand, dan blijft die staan -- een scherm dat
+terugveert nadat je het met de hand hebt gezet, voelt kapot. Slepen aan de greep
+werkt ook.
+
+Drie regels die daar strak omheen zitten:
+
+- **Je kunt altijd scrollen.** Deze laag zet nooit `overflow:hidden` op de body,
+  en in de stand `vol` blijft er met opzet een strook pagina zichtbaar. Die
+  strook is geen decoratie maar de uitweg: hij is te scrollen, en tikken laat
+  het paneel zakken.
+- **Staat iets anders op volledig scherm** (een video, een foto), dan verdwijnt
+  de balk vanzelf en komt hij daarna terug in de stand waarin hij stond. Ons
+  eigen volledige scherm telt daarbij niet mee, anders poetst hij zichzelf weg.
+- **Op een bureaublad wordt de balk een paneel** rechtsonder
+  (`handenvrij-bureau.js`), in plaats van een strook van een halve meter over
+  een 27-inch monitor. Ctrl/Cmd+K zet de aandacht in het veld.
+
+Op de **werkpagina's** (zaak, personeel, kantoor, backoffice, meldkamer) staat
+er een smalle rij van hooguit vijf knoppen boven de balk. Liever gaat alles via
+Rahul, maar iemand die aan het werk is mag daar nooit door vertraagd worden. Die
+knoppen komen uit dezelfde plekkenlijst die Rahul gebruikt, dus er is maar één
+waarheid over wat een pagina kan. Vijf en niet meer: een rij van vijftien is
+weer gewoon een werkbalk.
+
+`test/rahulscherm.e2e.js` toetst de vier beloften in een echte browser.
+
+### De camera in de balk
+
+Twee knoppen, en het verschil is niet cosmetisch (`handenvrij-oog.js`,
+`server/kern/kijken.js`):
+
+- **Kijk** -- je richt op iets en Rahul zegt wat het is. Die ene foto gaat naar
+  het model, want anders is er geen antwoord, en dat staat er ook bij. Hij wordt
+  **nergens** opgeslagen: niet in de database, niet op schijf, niet in een log.
+  Zonder AI-sleutel zegt hij dat hij niet kan kijken in plaats van te raden.
+  Staan er mensen op, dan beschrijft hij die niet en probeert hij niemand te
+  herkennen; over iets medisch stelt hij geen diagnose.
+- **Deel** -- een foto ergens neerzetten (De Salon). *Jij* kiest de bestemming;
+  Rahul plaatst nooit iets uit zichzelf. Waar het heen kan vraagt de app aan de
+  server, want dat hangt af van de pas en van wie je kent.
+
+Let op het verschil met **RTG Eye** (`kern/oog.js`): daar draait de visielaag
+volledig op het toestel en verlaat er geen beeld het apparaat. Dat is de
+werkvloer, waar een camera de hele dag aan staat; zwijgend meekijken zou daar
+een surveillancesysteem zijn. Hier richt het lid zelf, tikt zelf en vraagt zelf.
+
+### Het salongesprek: Rahul kletst met de Rahul van je vriend
+
+Een gimmick, en we noemen het ook zo (`server/kern/kletspraat/`). Twee AI's die
+over de dag van hun mens ouwehoeren alsof het twee mensen zijn. Te openen vanuit
+de ledenchat.
+
+Het gaat wel over waar iemand was, dus er zitten **drie sloten** op, en alle
+drie moeten open:
+
+1. **Alleen tussen vrienden** -- een actieve connectie in de vriendenlaag,
+   opnieuw gecontroleerd op het moment zelf.
+2. **Alleen als beiden het aan hebben staan.** Standaard staat het uit. Zet
+   iemand het uit, dan kan er niets meer gemaakt worden, ook niet door de ander.
+3. **Alleen met verzonnen namen.** Elke echte zaaknaam gaat door
+   `kletspraat/namen.js`: binnen een gesprek altijd dezelfde (anders klopt het
+   verhaal niet), tussen gesprekken altijd anders (anders leg je ze naast elkaar
+   en reken je alsnog uit waar iemand komt), en nooit per ongeluk een bestaand
+   merk. Wat er bewaard wordt bevat dus geen enkele echte naam.
+
+Het dagbeeld komt uit wat er tóch al staat -- de bestellingen en boekingen van
+vandaag -- en er komt geen nieuwe verzameling persoonsgegevens bij. Er staan
+**geen bedragen** in, ook niet bij benadering: hooguit "iets kleins" of
+"uitgebreid". Geen berichten, geen locaties, geen agenda, geen andere mensen.
+En hooguit één gesprek per paar per dag; dit hoort een verrassing te zijn, geen
+knop waar je op blijft drukken. `test/klets.test.js` bewaakt alle drie de
+sloten, inclusief de controle dat er geen echte naam in de opslag belandt.
+
 ## Tests
 
 ```bash

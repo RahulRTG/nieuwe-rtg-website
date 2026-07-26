@@ -2078,6 +2078,21 @@ Object.assign(kern, require('./kern/veiligheid')({
   appUrl: () => process.env.APP_URL || ''
 }));
 kern.meldAan = meldAan;
+
+/* Rahul kijkt mee (kern/kijken.js): een foto van iets, en hij zegt wat het is.
+   De foto wordt nergens bewaard; zie de kop van die module. */
+Object.assign(kern, require('./kern/kijken').maakKijken({ anthropic }));
+
+/* Het salongesprek (kern/kletspraat/): de Rahul van het ene lid kletst met de
+   Rahul van een vriend over hoe hun dag was. Een gimmick met drie sloten:
+   alleen tussen vrienden, alleen als beiden het aan hebben staan, en altijd
+   met verzonnen plaatsnamen. Zie de kop van die module. */
+Object.assign(kern, require('./kern/kletspraat')({
+  db, save, crypto,
+  sociaal: { codenaamVan: kern.codenaamVan, zijnVrienden: kern.zijnVrienden },
+  ordersVanKlant, boekingenVanKlant, anthropic,
+  dagContext: require('./kern/context').dagContext, sseToCustomer
+}));
 /* De sweep: elke halve minuut kijken of er een wacht is afgelopen. Dit is de
    klok die doortikt terwijl de telefoon van het lid uit staat. De overgangen
    zijn idempotent (elke stap kijkt eerst naar de huidige status), dus een

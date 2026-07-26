@@ -118,7 +118,7 @@
       case 'ga': zeg(b.plek.naam, hardop); try { b.plek.doen(); } catch (e) { zeg('Dat lukte niet.', hardop); } return;
       case 'terug': history.back(); return;
       case 'vooruit': history.forward(); return;
-      case 'sluit': chat.hidden = true; inp.value = ''; inp.blur(); return;
+      case 'sluit': dicht(); inp.value = ''; inp.blur(); return;
       case 'omhoog': root.scrollBy({ top: -Math.round(innerHeight * 0.8), behavior: 'smooth' }); return;
       case 'omlaag': root.scrollBy({ top: Math.round(innerHeight * 0.8), behavior: 'smooth' }); return;
       case 'begin': root.scrollTo({ top: 0, behavior: 'smooth' }); return;
@@ -182,6 +182,9 @@
      blijkt. Anders zie je je eigen woorden pas terug als er een antwoord komt,
      en dat voelt niet als chatten maar als een formulier. */
   function mijnBeurt(tekst) { if (kamer.beurt) kamer.beurt('member', tekst); }
+  /* Dichtdoen loopt via de standen-laag (handenvrij-scherm.js) als die er is;
+     die haalt dan ook de pin eraf, zodat hij daarna weer vanzelf meebeweegt. */
+  function dicht() { if (root.RTGChatScherm) root.RTGChatScherm.zet('min'); else chat.hidden = true; }
   knStem.addEventListener('click', function () { stelStem(!stemAan); });
 
   /* ---------- beginnen met typen, waar je ook bent ----------
@@ -191,7 +194,7 @@
   document.addEventListener('keydown', function (ev) {
     if (ev.defaultPrevented || ev.ctrlKey || ev.metaKey || ev.altKey) return;
     var t = ev.target;
-    if (t === inp) { if (ev.key === 'Escape') { inp.value = ''; inp.blur(); chat.hidden = true; } return; }
+    if (t === inp) { if (ev.key === 'Escape') { inp.value = ''; inp.blur(); dicht(); } return; }
     var tag = (t && t.tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
     if (ev.key === '/' || (ev.key && ev.key.length === 1 && /[\wÀ-ɏ]/.test(ev.key))) {
@@ -210,10 +213,13 @@
     geldDoorgaan: function (z) { stuurRahul(z, true); },
     spreek: null, zwijg: null,          // vult handenvrij-mond.js in
     beurt: null, tikt: null, laadGesprek: null,  // vult handenvrij-chat.js in
-    geldPoort: null, geldAntwoord: null, geldAan: null  // vult handenvrij-geld.js in
+    geldPoort: null, geldAntwoord: null, geldAan: null, // vult handenvrij-geld.js in
+    naStand: null, camera: null         // vult handenvrij-scherm.js / -oog.js in
   };
   root.__handenvrijKamer = kamer;
-  ['/shared/handenvrij-chat.js', '/shared/handenvrij-geld.js', '/shared/handenvrij-mond.js'].forEach(function (src) {
+  ['/shared/handenvrij-chat.js', '/shared/handenvrij-geld.js', '/shared/handenvrij-mond.js',
+    '/shared/handenvrij-scherm.js', '/shared/handenvrij-oog.js',
+    '/shared/handenvrij-bureau.js'].forEach(function (src) {
     var el = document.createElement('script');
     el.src = src; el.defer = true;
     document.head.appendChild(el);

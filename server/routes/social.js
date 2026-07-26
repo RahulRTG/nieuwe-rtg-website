@@ -27,6 +27,7 @@ function rtfSociaal(req, res) {
   const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal };
   require('./social/leden')(sctx);
   require('./social/gezinnen')(sctx);
+  require('./social/klets')(sctx);
 
 
 // web-push: publieke sleutel + subscription opslaan

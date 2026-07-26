@@ -170,4 +170,5 @@ module.exports = (kern) => {
     if (r.error) return res.status(404).json({ error: r.error });
     res.json({ ok: true, bericht: r });
   });
+
 };

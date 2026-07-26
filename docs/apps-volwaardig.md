@@ -656,3 +656,50 @@ Verder gereserveerd: `rtg`, `rtmail`, `postmaster`, `systeem`, `admin` en
 met dat van de systeem-afzender.
 
 Bewezen: `test/rtmail.test.js` (11) en `test/rtmail-lid.test.js` (5).
+
+### RTMAIL: teams, een adres dat je samen leest
+
+Een receptie, een keuken, een boekhouding zijn geen personen maar **functies**.
+Post daaraan hoort niet in het postvak van wie er toevallig als eerste was. Een
+team is dus een eigen adres (`receptie@partner.rtg`) dat meerdere mensen samen
+lezen. Elders is dit de betaalde helft: een gedeelde inbox met toewijzing zit
+achter een zakelijk abonnement of een licentie per stoel. Hier hoort het erbij.
+
+**De regel die dit huis eraan toevoegt: het adres is gedeeld, de hand niet.**
+Wie vanuit het teamadres schrijft, staat er altijd bij -- niet als sierlijkheid,
+maar omdat een gedeeld adres anders een masker wordt. "De receptie zegt dat het
+geregeld is" is geen antwoord; "Gouden Panter, namens De Receptie" wel. Er is
+geen schakelaar om dat uit te zetten, en de toets bewijst dat: ook met
+`anoniem: true` in de body komt de codenaam eronder.
+
+Wat een gedeeld postvak pas bruikbaar maakt, en er dus in zit:
+
+- **Toewijzen.** Een bericht is van niemand tot iemand het oppakt. Je ziet wie
+  het doet (op codenaam), een ander kan het niet stilletjes overnemen, en
+  loslaten kan altijd.
+- **Afhandelen.** Het team ziet wat nog open staat, niet een eindeloze lijst.
+  Wat af is verdwijnt uit de open lijst, maar niet uit de historie.
+- **Zelf weglopen.** De eigenaar zet je erin, maar niemand anders dan jij bepaalt
+  of je erin blijft -- een gedeeld postvak lezen is werk, geen cadeau. De
+  eigenaar zelf kan niet weglopen: een team zonder eigenaar is een postvak dat
+  niemand meer kan opruimen.
+
+Wat er **niet** in komt: een teller wie het meest afhandelt. Dat is dezelfde
+ranglijst die Genootschap en De Salon al weigerden; het maakt van samenwerken
+een wedstrijd. De toets controleert dat structureel, niet op woorden.
+
+**Een team mag nooit een bestaand postvak kapen.** Omdat het postvak aan het
+linkerdeel hangt (belofte 2 hierboven), zou een team dat "gouden-panter" of
+"sakura" heet de post van een lid of een zaak meelezen. Dat is de enige echt
+gevaarlijke fout die een gedeeld adres kan maken, dus staat de toets apart in
+`kern/rtmail-vrij.js`, met drie sloten: de **vorm** van een codenaam (altijd een
+woord uit een vaste lijst plus vier hex-tekens, dus exact te toetsen -- een
+teamnaam als `kantoor-2026` blijft gewoon toegestaan), de **zaakcodes** uit het
+register, en tot slot: waar al post ligt, woont al iemand.
+
+Het domein van een team volgt de oprichter, net als bij een persoon: een zaak
+maakt een team op `partner.rtg`, personeel op `rahultravelgroup.rtg`. Een domein
+meesturen in de body doet niets.
+
+Bewezen: `test/rtmail-team.test.js` (9) en `test/rtmail-team.e2e.js` (scherm:
+oprichten, iemand erbij op codenaam, oppakken, afhandelen).

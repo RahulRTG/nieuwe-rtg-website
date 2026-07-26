@@ -62,6 +62,20 @@
   .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2.5rem 1rem;line-height:1.6;}
   .inlog{text-align:center;padding:3rem 1rem;}
   .noot{font-size:.72rem;color:var(--soft);text-align:center;margin-top:1rem;line-height:1.5;}
+  /* Teams: een adres dat je samen leest. Het label van wie iets oppakte staat
+     bij het bericht zelf - niet als score, maar zodat niemand dubbel werkt. */
+  .kop{font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
+  .adr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.76rem;color:var(--gold);word-break:break-all;}
+  .vld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.86rem;padding:.55rem .65rem;margin-bottom:.5rem;}
+  .vld:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .knp{border:1px solid var(--line);background:var(--card2);color:var(--txt);font:inherit;font-size:.78rem;font-weight:600;border-radius:9px;padding:.42rem .7rem;cursor:pointer;}
+  .knp:hover{border-color:var(--gold);}
+  .knp.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .knp[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .knprij{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem;}
+  .tag{display:inline-block;font-size:.66rem;letter-spacing:.04em;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.1rem .5rem;margin-right:.35rem;}
+  .tag.af{color:#8FD6A6;}
+  .fout{font-size:.78rem;color:#E78AA0;margin-top:.5rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
@@ -76,7 +90,7 @@
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
-let LIJST=[];
+let LIJST=[], TEAM=null, TEAMPOST=[];
 const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(), dag=86400000;
   if(nu-d<dag && d.getDate()===nu.getDate()) return d.toTimeString().slice(0,5);
   if(nu-d<7*dag) return ['zo','ma','di','wo','do','vr','za'][d.getDay()];
@@ -141,6 +155,128 @@ async function laadInbox(){
   ) : '<div class="leeg">Je postvak is leeg.<br>Zodra RTG je iets stuurt, verschijnt het hier.</div>');
   const vs=$('#vatSamen'); if(vs) vs.addEventListener('click',vatSamenNu);
   $('#main').querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>openBericht(LIJST[+b.dataset.i])));
+  teamsErbij();
+}
+
+/* ---- teams: een adres dat je samen leest ----
+   Een receptie, een keuken, een boekhouding. Onder je eigen postvak, want het
+   is je tweede postvak en niet je eerste. */
+async function teamsErbij(){
+  let d; try{ d=await api('team/mijn'); }catch(e){ return; }
+  const wrap=document.createElement('div');
+  wrap.innerHTML='<div class="kop">Teams · een adres dat je samen leest</div>'+
+    ((d.teams||[]).map(t=>
+      '<button class="rij" data-team="'+esc(t.id)+'"><span class="ic">'+esc((t.naam||'?').slice(0,1).toUpperCase())+'</span>'+
+      '<span class="b"><span class="nm">'+esc(t.naam)+'</span><span class="lt adr">'+esc(t.adres)+'</span></span>'+
+      '<span class="tijd">'+t.aantalLeden+(t.aantalLeden===1?' persoon':' mensen')+'</span></button>').join('')
+      || '<div class="noot" style="margin:0 0 .6rem;text-align:left;">Nog geen team. Een team is handig zodra post niet aan jou is maar aan een functie - de receptie, de boekhouding.</div>')+
+    '<button class="ai-knop" id="tNieuw" style="margin-bottom:0;">Team oprichten</button>';
+  $('#main').appendChild(wrap);
+  wrap.querySelectorAll('[data-team]').forEach(b=>b.addEventListener('click',()=>openTeam(b.dataset.team)));
+  $('#tNieuw').addEventListener('click',nieuwTeamForm);
+}
+function nieuwTeamForm(){
+  const k=$('#tNieuw');
+  k.outerHTML='<div class="kaart" id="tForm"><h2>Team oprichten</h2>'+
+    '<div class="meta">Het domein volgt je lidmaatschap; dat kies je niet zelf.</div>'+
+    '<label class="meta" for="tNaam">Naam van het team</label>'+
+    '<input class="vld" id="tNaam" placeholder="De Receptie" maxlength="60">'+
+    '<label class="meta" for="tAdres">Linkerdeel van het adres</label>'+
+    '<input class="vld" id="tAdres" placeholder="receptie" maxlength="40">'+
+    '<div class="knprij"><button class="knp prim" id="tMaak">Oprichten</button><button class="knp" id="tAf">Annuleren</button></div>'+
+    '<div class="fout" id="tFout" hidden></div></div>';
+  $('#tAf').addEventListener('click',laadInbox);
+  $('#tMaak').addEventListener('click',async()=>{
+    const naam=$('#tNaam').value.trim(), adres=$('#tAdres').value.trim();
+    try{ const d=await api('team/maak',{naam,adres:adres||naam}); await openTeam(d.team.id); }
+    catch(e){ const f=$('#tFout'); f.textContent=e.message; f.hidden=false; }
+  });
+}
+
+/* Het gedeelde postvak. Bij elk bericht staat wie het oppakte -- dat is het
+   hele punt: zonder dat antwoorden twee mensen hetzelfde, of niemand. */
+async function openTeam(id, alles){
+  let d; try{ d=await api('team/postvak',{id,alles:!!alles}); }catch(e){ alert(e.message); return laadInbox(); }
+  const t=d.team;
+  $('#main').innerHTML=
+    '<button class="terug" id="terug">← je eigen postvak</button>'+
+    '<div class="kaart"><h2>'+esc(t.naam)+'</h2><div class="meta adr">'+esc(t.adres)+'</div>'+
+    '<div class="body" style="font-size:.84rem;">'+t.leden.map(l=>'<span class="tag">'+esc(l.codenaam||'lid')+(l.ikZelf?' · jij':'')+'</span>').join('')+'</div>'+
+    '<div class="knprij">'+
+      '<button class="knp" id="tSchrijf">Schrijven namens het team</button>'+
+      '<button class="knp" id="tAlles" aria-pressed="'+(alles?'true':'false')+'">'+(alles?'Alleen wat open staat':'Ook wat af is')+'</button>'+
+      (t.ikBenEigenaar?'<button class="knp" id="tErbij">Iemand erbij</button><button class="knp" id="tHef">Team opheffen</button>'
+                      :'<button class="knp" id="tWeg">Team verlaten</button>')+
+    '</div><div class="fout" id="tFout" hidden></div></div>'+
+    '<div class="kop">'+(alles?'Alle post':d.open+(d.open===1?' bericht open':' berichten open'))+'</div>'+
+    (d.berichten.length ? d.berichten.map((m,i)=>
+      '<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-tb="'+i+'"><span class="ic">'+esc((m.van||'@').split('@')[0].slice(0,3).toUpperCase())+'</span>'+
+      '<span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+
+        (m.af?'<span class="tag af">afgehandeld</span>':m.opgepakt?'<span class="tag">'+esc(m.opgepakt)+(m.doorMij?' · jij':'')+'</span>':'')+
+        esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>').join('')
+      : '<div class="leeg">Niets meer open. Dat is het hele idee.</div>');
+  TEAM=t; TEAMPOST=d.berichten;
+  $('#terug').addEventListener('click',laadInbox);
+  $('#tAlles').addEventListener('click',()=>openTeam(id,!alles));
+  $('#tSchrijf').addEventListener('click',()=>schrijfNamens(t));
+  const kn=(sel,fn)=>{ const b=$(sel); if(b) b.addEventListener('click',fn); };
+  kn('#tErbij',()=>lidErbij(t));
+  kn('#tHef',async()=>{ if(!confirm('Het team en zijn adres verdwijnen. Doorgaan?')) return;
+    try{ await api('team/hef',{id}); }catch(e){ return toonFout(e); } laadInbox(); });
+  kn('#tWeg',async()=>{ if(!confirm('Je leest de post van dit team dan niet meer. Doorgaan?')) return;
+    try{ await api('team/verlaat',{id}); }catch(e){ return toonFout(e); } laadInbox(); });
+  $('#main').querySelectorAll('[data-tb]').forEach(b=>b.addEventListener('click',()=>openTeamBericht(t,TEAMPOST[+b.dataset.tb],alles)));
+}
+function toonFout(e){ const f=$('#tFout'); if(f){ f.textContent=e.message; f.hidden=false; } }
+function lidErbij(t){
+  const box=$('#tFout');
+  box.hidden=false;
+  box.innerHTML='<label class="meta" for="tWie">Codenaam van wie je erbij wilt</label>'+
+    '<input class="vld" id="tWie" placeholder="Gouden Panter 2679" maxlength="60">'+
+    '<div class="knprij"><button class="knp prim" id="tWieOk">Toevoegen</button></div><div id="tWieFout"></div>';
+  $('#tWieOk').addEventListener('click',async()=>{
+    try{ await api('team/lid',{id:t.id,codenaam:$('#tWie').value.trim()}); openTeam(t.id); }
+    catch(e){ $('#tWieFout').textContent=e.message; }
+  });
+}
+/* Schrijven vanuit het teamadres. Onder de tekst komt altijd je codenaam te
+   staan -- het adres is gedeeld, de hand niet. Daar is geen schakelaar voor,
+   dus staat het er ook gewoon bij op het scherm. */
+function schrijfNamens(t){
+  $('#main').innerHTML='<button class="terug" id="terug">← '+esc(t.naam)+'</button>'+
+    '<div class="kaart"><h2>Namens '+esc(t.naam)+'</h2><div class="meta adr">van '+esc(t.adres)+'</div>'+
+    '<input class="vld" id="sNaar" placeholder="Aan (codenaam of adres)" maxlength="80">'+
+    '<input class="vld" id="sOnd" placeholder="Onderwerp" maxlength="160">'+
+    '<textarea class="vld" id="sTekst" rows="6" placeholder="Je bericht"></textarea>'+
+    '<div class="bijlaag-noot">Je codenaam komt onder het bericht te staan. Een gedeeld adres mag geen masker worden: "de receptie zegt dat het geregeld is" is geen antwoord.</div>'+
+    '<div class="knprij"><button class="knp prim" id="sStuur">Versturen</button></div>'+
+    '<div class="fout" id="tFout" hidden></div></div>';
+  $('#terug').addEventListener('click',()=>openTeam(t.id));
+  $('#sStuur').addEventListener('click',async()=>{
+    try{ await api('team/stuur',{id:t.id,naar:$('#sNaar').value.trim(),onderwerp:$('#sOnd').value.trim(),tekst:$('#sTekst').value});
+      openTeam(t.id); }catch(e){ toonFout(e); }
+  });
+}
+async function openTeamBericht(t,m,alles){
+  const band=bandVan(m);
+  $('#main').innerHTML='<button class="terug" id="terug">← '+esc(t.naam)+'</button>'+
+    '<div class="kaart"><div class="band '+band.cls+'">'+(band.cls==='no'?SLOT:SCHILD)+'<span>'+esc(band.t)+'</span></div>'+
+    '<h2>'+esc(m.onderwerp)+'</h2>'+
+    '<div class="meta">Van '+esc(m.van)+' · '+esc(langTijd(m.at))+
+      (m.opgepakt?' · opgepakt door '+esc(m.opgepakt):'')+'</div>'+
+    '<div class="body" id="body">'+veiligBody(m.tekst,!!m.vertrouwd)+'</div>'+
+    '<div class="knprij">'+
+      '<button class="knp" id="bPak" aria-pressed="'+(m.doorMij?'true':'false')+'">'+(m.doorMij?'Toch niet, laat los':'Ik pak dit op')+'</button>'+
+      '<button class="knp" id="bAf" aria-pressed="'+(m.af?'true':'false')+'">'+(m.af?'Toch nog open':'Afgehandeld')+'</button>'+
+    '</div><div class="fout" id="tFout" hidden></div></div>';
+  bindLinks($('#body'));
+  $('#terug').addEventListener('click',()=>openTeam(t.id,alles));
+  $('#bPak').addEventListener('click',async()=>{
+    try{ await api('team/pak',{id:t.id,bericht:m.id,aan:!m.doorMij}); openTeam(t.id,alles); }catch(e){ toonFout(e); }
+  });
+  $('#bAf').addEventListener('click',async()=>{
+    try{ await api('team/af',{id:t.id,bericht:m.id,aan:!m.af}); openTeam(t.id,alles); }catch(e){ toonFout(e); }
+  });
 }
 async function vatSamenNu(){
   const b=$('#vatSamen'); if(!b) return; b.disabled=true; b.textContent='Rahul leest je postvak…';

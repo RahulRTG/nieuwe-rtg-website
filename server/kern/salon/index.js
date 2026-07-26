@@ -28,6 +28,23 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
   const TEKST_MAX = 600;
   const nu = () => new Date().toISOString();
 
+  /* Een id dat echt uniek is. Eerst stond hier `Date.now() + random(1000)`, en
+     dat leek genoeg tot de paginerings-toets 65 posts achter elkaar plaatste:
+     dan zitten er betrouwbaar een of twee dubbele ids tussen. Twee posts met
+     hetzelfde id betekent dat verwijderen, bewaren of melden de VERKEERDE post
+     raakt -- een stille vergissing met iemands bericht.
+
+     Nu strikt oplopend, en met een blik op wat er al ligt: de poortwachter
+     (server/trio.js) start drie serverkinderen op dezelfde opslag, en die delen
+     deze teller niet. */
+  let laatsteId = 0;
+  function nieuwId() {
+    const t = Date.now();
+    laatsteId = t > laatsteId ? t : laatsteId + 1;
+    while (db.data.posts.some(p => p.id === laatsteId)) laatsteId++;
+    return laatsteId;
+  }
+
   function S() {
     if (!Array.isArray(db.data.posts)) db.data.posts = [];
     if (!db.data.salon || typeof db.data.salon !== 'object') db.data.salon = {};

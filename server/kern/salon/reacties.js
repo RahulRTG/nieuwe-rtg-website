@@ -38,6 +38,12 @@ module.exports = ({ db, save, liveCodename, codenaamVan, keyVanCodenaam, zijnVri
     return uit;
   }
 
+  function reactieId(p) {
+    let id = Date.now();
+    while ((p.comments || []).some(c => c.id === id)) id++;
+    return id;
+  }
+
   function magReageren(sess, p) {
     const stand = p.reactiesVan || 'iedereen';
     if (p.authorKey === sess.key) return true;      // op je eigen post altijd
@@ -62,7 +68,10 @@ module.exports = ({ db, save, liveCodename, codenaamVan, keyVanCodenaam, zijnVri
     // niemand meer ziet wie waarop reageert
     const op = opId != null ? p.comments.find(c => String(c.id) === String(opId)) : null;
     const reactie = {
-      id: Date.now() + Math.floor(Math.random() * 1000),
+      // uniek BINNEN deze post: daar wordt hij ook alleen opgezocht (weghalen,
+      // en `op` bij een antwoord). Zie kern/salon/index.js voor waarom een
+      // willekeurig getal bij de tijd hier niet genoeg was.
+      id: reactieId(p),
       who: liveCodename(sess) || 'Een lid', key: sess.key, tier: sess.tier,
       text: t, lang: 'nl', at: nu(), op: op ? op.id : null, noemt: await genoemd(t)
     };

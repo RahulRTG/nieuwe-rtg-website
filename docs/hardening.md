@@ -20,6 +20,24 @@ schrijven en elkaars data zien. Alleen een JSON-bestand herschrijven is niet
 meer nodig. (Binnen EEN collectie serialiseert SQLite; geef een collectie aan
 een domein. Row-niveau-concurrency binnen een collectie zou de volgende stap zijn.)
 
+Een profiel onder gemengde last wees uit dat 42% van alle server-CPU naar het
+OPSPOREN van wijzigingen ging: om te zien of een collectie veranderd was, werd
+hij geserialiseerd -- alle 164, bij elke save, terwijl `sessions` alleen al
+780 KB van de 1027 KB is. `server/db/voorcheck.js` slaat die serialisatie nu
+over voor grote collecties waarvan het aantal items gelijk is, en hooguit
+`RTG_SQLITE_GROOT_MS` (2 s). De grenzen zijn met opzet streng: toevoegen en
+verwijderen veranderen het aantal en landen dus altijd meteen (in- en uitloggen
+staan direct op schijf), geld wordt altijd exact nagekeken -- op naam én op een
+namenlijst -- en netjes afsluiten kijkt alles na en vouwt de WAL dicht. Gemeten
+op een sessie-zware last: 5,9 -> 1,2 ms per save. Vastgelegd in
+`test/opslag-voorcheck.test.js`.
+
+Wat hierna nog O(alles) is in de SQLite-stand: een collectie die alleen maar
+GROEIT (`orders`) wordt bij elke nieuwe order in zijn geheel herschreven. Dat is
+de blob-grens waarvoor het tx-grootboek bestaat -- dat werkt alleen met Postgres
+(`server/db/tx/ledger.js`: "zonder Postgres is dit inert"). Voor die omvang is
+Postgres dus de opslag, precies zoals de README zegt.
+
 ## 3. Misbruik/spam  (aangepakt)
 Snelheidslimieten: vriendschapsverzoeken (30/uur), berichten (60/min), snaps
 (40/5min). Blokkeren en melden zoals bij zwakheid 1.

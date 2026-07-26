@@ -9,11 +9,15 @@ const kluis = require('../kluis');
 const state = require('./state');
 const { merge3 } = require('./merge');
 const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
+// De goedkope veranderingsdetectie op GROTE collecties; daar staat ook waarom
+// hij veilig is en waarom geld er nooit door gaat.
+const voorcheck = require('./voorcheck');
 const db = state.db;
 
 let kvdb = null;
 const toegepast = new Map();   // collectie -> versienummer dat dit proces al toegepast heeft
 const laatsteJson = new Map(); // collectie -> laatst weggeschreven JSON (om ongewijzigde over te slaan)
+
 // De opgeslagen waarde is (met RTG_ENC_KEY) versleuteld; in het geheugen en in
 // laatsteJson houden we altijd de leesbare JSON aan, alleen op schijf staat cijfer.
 const uitStore = v => kluis.ontsleutel(v);       // ruwe kolomwaarde -> leesbare JSON
@@ -25,10 +29,15 @@ function sqliteInit() {
   beslotenMap(DATA_DIR);
   const bestand = path.join(DATA_DIR, 'store.db');
   kvdb = new DatabaseSync(bestand);
+  stmt = null; // verse verbinding: de voorbereide statements horen bij de oude
   besloten(bestand);
   kvdb.exec('PRAGMA journal_mode=WAL');
   kvdb.exec('PRAGMA synchronous=NORMAL');
   kvdb.exec('PRAGMA busy_timeout=5000'); // wacht kort als een ander proces net schrijft
+  // Houd het WAL-bestand begrensd: na een checkpoint wordt het teruggezet naar
+  // deze grens in plaats van op zijn hoogste stand te blijven staan. Zonder dit
+  // groeide store.db-wal tot een paar MB en werd elke start onnodig traag.
+  kvdb.exec('PRAGMA journal_size_limit=' + Number(process.env.RTG_SQLITE_WAL_MAX || 8 * 1024 * 1024));
   kvdb.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT, ver INTEGER NOT NULL DEFAULT 0)');
   kvdb.exec('CREATE INDEX IF NOT EXISTS idx_kv_ver ON kv(ver)');
   kvdb.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER)');
@@ -42,18 +51,33 @@ function loadSqlite() {
   for (const r of rows) { const j = uitStore(r.val); data[r.key] = JSON.parse(j); laatsteJson.set(r.key, j); toegepast.set(r.key, r.ver); }
   return data;
 }
-function saveSqlite() {
+// De vier statements zijn per verbinding altijd dezelfde: één keer voorbereiden
+// in plaats van bij elke save opnieuw (SQLite hoeft dan niet te hercompileren).
+let stmt = null;
+function statements() {
+  if (stmt) return stmt;
+  stmt = {
+    bump: kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'"),
+    huidig: kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'"),
+    lees: kvdb.prepare('SELECT val, ver FROM kv WHERE key = ?'),
+    up: kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver')
+  };
+  return stmt;
+}
+function saveSqlite(force) {
   sqliteInit();
   const gewijzigd = [];
+  const nu = Date.now();
+  let uitgesteld = false;
   for (const k of Object.keys(db.data)) {
+    if (voorcheck.magOverslaan(k, db.data[k], force, nu)) { uitgesteld = true; continue; }
     const j = JSON.stringify(db.data[k]);
+    voorcheck.onthoud(k, j.length, db.data[k], nu);
     if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
   }
+  if (uitgesteld) voorcheck.planNaronde(saveSqlite);
   if (!gewijzigd.length) return;
-  const bump = kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'");
-  const huidig = kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'");
-  const lees = kvdb.prepare('SELECT val, ver FROM kv WHERE key = ?');
-  const up = kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver');
+  const { bump, huidig, lees, up } = statements();
   kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat de versie en de merge kloppen
   try {
     for (const [k, jOns] of gewijzigd) {
@@ -66,6 +90,9 @@ function saveSqlite() {
         const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)));
         db.data[k] = samen;
         j = JSON.stringify(samen);
+        // na een merge is de collectie een ANDER object: de maten van de
+        // voorcheck horen bij deze nieuwe inhoud, niet bij die van voor de merge
+        voorcheck.onthoud(k, j.length, samen);
       }
       bump.run();
       const v = huidig.get().v;
@@ -104,6 +131,9 @@ function pollSqlite() {
         laatsteJson.set(r.key, hunJson);
       }
       toegepast.set(r.key, r.ver);
+      // De inhoud komt van BUITEN: wat de voorcheck van deze collectie meende te
+      // weten, geldt niet meer. Vergeten, zodat de volgende save hem exact nakijkt.
+      voorcheck.vergeet(r.key);
       if (r.key === 'sessions') sessieGewijzigd = true;
     }
     if (sessieGewijzigd) { const ext = state.getExternCb(); if (ext) ext(); }
@@ -118,4 +148,16 @@ function startSqliteSync() {
   if (pollTimer.unref) pollTimer.unref();
 }
 
-module.exports = { loadSqlite, saveSqlite, startSqliteSync };
+/* Netjes afronden: alles nog een keer volledig nakijken (de voorcheck mag niets
+   achterlaten) en daarna de WAL in het hoofdbestand vouwen. Zonder die
+   checkpoint blijft store.db-wal staan waar hij stond -- gemeten 4,9 MB naast
+   een database van 1,9 MB -- en moet de volgende start dat eerst inlezen.
+   TRUNCATE lukt alleen als geen ander proces meer leest; mislukt hij, dan is dat
+   geen probleem (de data staat al gecommit in de WAL), dus alleen loggen. */
+function afrondSqlite() {
+  if (!kvdb) return;
+  try { saveSqlite(true); } catch (e) { console.warn('[db] laatste sqlite-save mislukt:', e.message); }
+  try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (e) { /* ander proces leest nog */ }
+}
+
+module.exports = { loadSqlite, saveSqlite, startSqliteSync, afrondSqlite };

@@ -162,6 +162,11 @@ function onExternalChange(cb) { state.setExternCb(cb); }
 async function flushBijAfsluiten() {
   if (db.writable && saveVuil) { try { schrijfSnapshotNu(); } catch (e) {} }
   geheugen.flushGeheugen();   // no-op buiten de geheugen-modus
+  // SQLite commit elke save al synchroon, maar de goedkope voorcheck kan een
+  // GROTE collectie met een gelijk aantal items even hebben overgeslagen. Bij
+  // het afsluiten kijkt afrondSqlite() daarom alles na en vouwt daarna de WAL
+  // dicht, zodat een nette stop nooit een wijziging-op-zijn-plaats achterlaat.
+  if (db.writable && STORE === 'sqlite') { try { sqlite.afrondSqlite(); } catch (e) {} }
   await postgres.flushBijAfsluiten();
 }
 

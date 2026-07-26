@@ -114,7 +114,48 @@
     return wakker ? s : null;
   }
 
-  var api = { versta: versta, kaal: kaal, zoekPlek: zoekPlek, gericht: gericht };
+  /* ---------- gaat deze zin over geld of een verplichting? ----------
+
+     Hier leunt de herkenning bewust de ANDERE kant op dan versta() hierboven.
+     Bij navigatie is niets-herkennen het veilige antwoord; hier is dat juist
+     te-veel-herkennen. Een valse treffer betekent dat de gebruiker het moet
+     typen: hinderlijk. Een misser betekent dat er op een half verstaan woord
+     geld weggaat, of dat er een taxi staat die niemand vroeg. Dus: ruim
+     opgezet, en bij twijfel telt het als geld.
+
+     Wat er NIET onder valt zijn vragen. "wat kost een taxi naar huis" en
+     "hoeveel heb ik nog op mijn pas" verplichten je tot niets; die mogen met de
+     mond. Verplichten kan alleen een opdracht. */
+  var GELD_WOORDEN = new RegExp('\\b(' + [
+    // rechtstreeks geld
+    'betaal', 'betalen', 'afrekenen', 'rekening', 'overmaak', 'overmaken',
+    'overboek', 'overboeken', 'stort', 'storten', 'tik', 'tikken', 'pay', 'sepa',
+    'terugbetaal', 'verreken', 'salaris', 'incasso',
+    // vastleggen wat geld kost
+    'boek', 'boeken', 'reserveer', 'reserveren', 'bestel', 'bestellen', 'koop', 'kopen',
+    'huur', 'huren', 'verleng', 'verlengen', 'upgrade', 'abonneer', 'aanbetaling',
+    'borg', 'doneer', 'doneren', 'cadeaukaart', 'giftcard', 'inschrijven', 'afsluiten',
+    'bevestig', 'afnemen'
+  ].join('|') + ')\\b');
+  // een bedrag in de zin: 20 euro, EUR 20, 20,-, tekens
+  var GELD_BEDRAG = /(\beuro\b|\beur\b|\bcent\b|[$£€]|\b\d+[.,]?\d*\s*(euro|eur)\b|\b\d+\s*,-)/;
+  /* Nederlandse scheidbare werkwoorden: "reken de tafel AF", "maak 20 euro OVER".
+     Het werkwoord staat vooraan, het deeltje achteraan, en met alleen een
+     woordenlijst glipt dat er dus tussendoor. */
+  var GELD_SPLIT = /\b(reken)\b[\s\S]{0,40}\baf\b|\b(maak|schrijf|zet)\b[\s\S]{0,40}\bover\b|\b(boek)\b[\s\S]{0,40}\bin\b/;
+  var VRAAG = /^(wat|hoeveel|hoe|waar|wanneer|wie|welke|kan ik|mag ik|klopt|is er|heb ik|staat er|zie ik)\b/;
+
+  function geldZin(zin) {
+    var ruw = String(zin == null ? '' : zin).trim();
+    if (!ruw) return false;
+    var k = kaal(ruw);
+    if (!k) return false;
+    // een vraag verplicht tot niets, ook niet als er "kosten" in staat
+    if (VRAAG.test(k) || /\?\s*$/.test(ruw)) return false;
+    return GELD_WOORDEN.test(k) || GELD_BEDRAG.test(k) || GELD_SPLIT.test(k);
+  }
+
+  var api = { versta: versta, kaal: kaal, zoekPlek: zoekPlek, gericht: gericht, geldZin: geldZin };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.Handenvrij = api;
 

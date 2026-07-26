@@ -117,6 +117,35 @@ toetst precies dat: "boek een taxi naar huis" en "open de deur van kamer 12"
 mogen nooit als navigatie gelezen worden. `test/handenvrij.e2e.js` doet het
 daarna nog eens in een echte browser.
 
+### Geld en boekingen typ je
+
+Wat geld kost of ergens toe verplicht -- "boek een taxi", "stuur 20 euro",
+"betaal dit", "reserveer een tafel" -- gaat **standaard niet met de mond**.
+Rahul zet de zin klaar in het veld en je stuurt hem zelf. De reden is simpel:
+spraak wordt niet altijd goed verstaan en een open microfoon hoort de kamer mee.
+Een verkeerd verstane routebeschrijving is hinderlijk; een verkeerd verstane
+betaling is geld dat weg is.
+
+Wie het toch met de mond wil, zet het zelf aan in het gespreksvenster. Dan:
+
+1. verschijnt er een **disclaimer, elke keer dat je hem aanzet** -- niet een keer
+   weggeklikt en daarna nooit meer. De stand geldt per sessie
+   (`sessionStorage`), zodat je hem niet een half jaar geleden hebt goedgekeurd.
+   De tekst zegt onomwonden dat het eigen risico en eigen verantwoordelijkheid
+   is en dat RTG niets vergoedt dat zo in gang wordt gezet;
+2. vraagt hij het **per opdracht nog een keer**, vóórdat de vraag de deur uit
+   gaat ("U zei: ... Zal ik dit doorzetten?");
+3. en doet de server daarna nog zijn eigen geld-drempel. Met de mond zitten er
+   dus twee poorten meer voor dan met getypte tekst.
+
+De herkenning (`Handenvrij.geldZin`) leunt hier bewust de **andere** kant op dan
+de navigatie: bij navigatie is niets-herkennen veilig, hier is te-veel-herkennen
+veilig. Een valse treffer betekent typen; een misser betekent geld. Vragen
+tellen niet mee: "wat kost een taxi" mag gewoon met de mond, want dat verplicht
+je tot niets. `test/handenvrij.test.js` toetst beide kanten, en
+`test/handenvrij.e2e.js` telt in een echte browser de verzoeken naar Rahul --
+een gesproken boeking hoort er nul te veroorzaken.
+
 De bestaande knoppen blijven allemaal staan; dit is een tweede weg, geen
 vervanging.
 

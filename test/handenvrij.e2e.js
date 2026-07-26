@@ -131,7 +131,46 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     assert.equal(beurten.tikt, 0, 'de drie puntjes horen weg te zijn als het antwoord er is');
     assert.ok(beurten.koppen >= 1, 'Rahul hoort zijn gezicht bij zijn beurt te hebben');
 
-    // 8. en dit alles zonder onopgevangen JS-fouten
+    /* 8. de geldgrens, in de browser. We tellen de verzoeken naar Rahul: een
+       gesproken betaalopdracht mag er GEEN veroorzaken zolang geld-met-de-mond
+       uitstaat. Dit is de enige toets die echt bewijst dat er niets de deur
+       uitgaat; de rest kijkt naar tekst op het scherm. */
+    let naarRahul = 0;
+    await page.route('**/api/fluister', async r => {
+      naarRahul++;
+      await r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ antwoord: 'geregeld' }) });
+    });
+
+    // gesproken (hardop=true) betaalopdracht, met de standaardinstelling
+    await page.evaluate(() => { window.__handenvrijKamer.doe('boek een taxi naar huis', true); });
+    await new Promise(r => setTimeout(r, 900));
+    assert.equal(naarRahul, 0, 'een gesproken boeking mag Rahul niet eens bereiken');
+    const klaarGezet = await page.evaluate(() => document.querySelector('.hv-balk input').value);
+    assert.match(klaarGezet, /taxi/, 'de zin hoort klaargezet te staan om zelf te versturen');
+
+    // getypt mag wel: dat is juist de weg die we willen
+    await page.evaluate(() => { window.__handenvrijKamer.doe('boek een taxi naar huis', false); });
+    await page.waitForFunction(() => document.querySelectorAll('.hv-beurt.hij').length > 0, { timeout: 5000 });
+    assert.equal(naarRahul, 1, 'getypt gaat gewoon door');
+
+    // met de mond aan: eerst een bevestiging, en pas daarna gaat het uit
+    await page.evaluate(() => { sessionStorage.setItem('rtg_handenvrij_geldmond', '1'); });
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForSelector('.hv-balk input', { state: 'visible', timeout: 15000 });
+    let naarRahul2 = 0;
+    await page.route('**/api/fluister', async r => {
+      naarRahul2++;
+      await r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ antwoord: 'geregeld' }) });
+    });
+    await page.evaluate(() => { window.__handenvrijKamer.doe('betaal de rekening', true); });
+    await page.waitForSelector('.hv-kaart', { state: 'visible', timeout: 5000 });
+    assert.equal(naarRahul2, 0, 'ook met de mond aan gaat er eerst niets uit');
+    await page.click('.hv-kaart button.ja');
+    await page.waitForFunction(() => window.__hvTeller === undefined || true, { timeout: 1000 }).catch(() => {});
+    await new Promise(r => setTimeout(r, 800));
+    assert.equal(naarRahul2, 1, 'pas na de extra bevestiging gaat het door');
+
+    // 9. en dit alles zonder onopgevangen JS-fouten
     assert.deepEqual(fouten, [], 'geen paginafouten');
   } finally {
     if (browser) { try { await browser.close(); } catch (e) {} }

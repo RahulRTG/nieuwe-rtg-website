@@ -120,3 +120,77 @@ test('10. een naam die op Rahul lijkt is niet Rahul', () => {
   assert.equal(H.gericht('Rahulstraat 12 is het adres', false), null);
   assert.equal(H.gericht('over Rahul gesproken, hij belde net', false), null);
 });
+
+/* ---------- de geldgrens ----------
+   Vanaf hier gaat het niet meer over gemak maar over geld. geldZin() bepaalt of
+   een zin standaard getypt moet worden. De weegschaal hangt hier bewust andersom
+   dan bij navigatie: te veel herkennen is hinderlijk, te weinig herkennen kost
+   geld. Toets 12 is daarom de belangrijkste van dit bestand. */
+
+test('11. een vraag over geld is geen opdracht en mag gewoon met de mond', () => {
+  // Anders zou je niet eens meer mogen VRAGEN wat iets kost zonder te typen.
+  for (const zin of [
+    'wat kost een taxi naar huis',
+    'hoeveel heb ik nog op mijn pas',
+    'hoe boek ik een taxi?',
+    'is er nog plek vanavond?',
+    'kan ik dit ergens goedkoper krijgen',
+    'wanneer wordt mijn abonnement afgeschreven'
+  ]) assert.equal(H.geldZin(zin), false, 'werd onterecht als geld gelezen: ' + zin);
+});
+
+test('12. alles wat geld kost of vastlegt wordt herkend', () => {
+  /* Deze lijst is de kern. Glipt hier iets doorheen, dan kan een half verstaan
+     woord een betaling of een boeking worden. Bij twijfel hoort het hier te
+     staan, ook als dat betekent dat iemand vaker moet typen. */
+  for (const zin of [
+    'boek een taxi naar huis',
+    'stuur 20 euro naar Imran',
+    'betaal dit',
+    'betaal de rekening van tafel 6',
+    'reken de tafel af',
+    'maak 50 euro over naar mijn spaarrekening',
+    'bestel het gebruikelijke',
+    'tik Imran een tientje',
+    'reserveer een tafel voor vier vanavond',
+    'huur die auto voor het weekend',
+    'koop twee kaartjes voor zaterdag',
+    'verleng mijn abonnement',
+    'doneer 100 euro aan de foundation',
+    'schrijf 30 euro over',
+    'bevestig de boeking'
+  ]) assert.equal(H.geldZin(zin), true, 'niet als geld herkend: ' + zin);
+});
+
+test('13. gewone opdrachten zonder geld blijven vrij', () => {
+  // De poort mag niet zo ruim worden dat alles getypt moet.
+  for (const zin of [
+    'zet de verwarming lager',
+    'open de deur van kamer 12',
+    'stuur Imran een bericht dat ik later ben',
+    'zet mijn locatie aan',
+    'herinner me hier vanavond aan',
+    'open de Salon',
+    'terug'
+  ]) assert.equal(H.geldZin(zin), false, 'onterecht tegengehouden: ' + zin);
+});
+
+test('14. leeg of onzin is geen geld', () => {
+  assert.equal(H.geldZin(''), false);
+  assert.equal(H.geldZin('   '), false);
+  assert.equal(H.geldZin(null), false);
+  assert.equal(H.geldZin('!!!'), false);
+});
+
+test('15. de geldgrens staat los van de navigatie-ontleding', () => {
+  /* Een sprong is nooit geld en geld is nooit een sprong: dat zijn twee aparte
+     vragen aan dezelfde zin. "open de Salon" is navigatie en geen geld;
+     "boek een taxi" is geen navigatie en wel geld. */
+  const plekken = plekkenVan(['De Salon', 'Betalen']);
+  assert.equal(H.versta('open de Salon', plekken).soort, 'ga');
+  assert.equal(H.geldZin('open de Salon'), false);
+  assert.equal(H.versta('boek een taxi naar huis', plekken).soort, 'vraag');
+  assert.equal(H.geldZin('boek een taxi naar huis'), true);
+  // ook als een PLEK "Betalen" heet blijft navigeren gewoon navigeren
+  assert.equal(H.versta('ga naar Betalen', plekken).soort, 'ga');
+});

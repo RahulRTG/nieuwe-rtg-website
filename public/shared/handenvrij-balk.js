@@ -106,8 +106,12 @@
     return lijst;
   }
 
-  /* ---------- een bedoeling uitvoeren ---------- */
+  /* ---------- een bedoeling uitvoeren ----------
+     hardop=true betekent: dit kwam van de MOND. Dat is niet alleen "praat het
+     antwoord terug", het bepaalt ook of de geldpoort ingrijpt. */
   function doe(zin, hardop) {
+    // staat er een geld-bevestiging open, dan is "ja"/"nee" daar het antwoord op
+    if (hardop && kamer.geldAntwoord && kamer.geldAntwoord(zin)) return;
     var b = api.versta(zin, plekken());
     switch (b.soort) {
       case 'niets': return;
@@ -128,8 +132,13 @@
   function lijstTekst() {
     var namen = plekken().slice(0, 14).map(function (p) { return p.naam; });
     return namen.length
-      ? 'Hier kun je naartoe: ' + namen.join(', ') + '. En verder: terug, omhoog, omlaag, sluit, stil. Al het andere doe ik zelf.'
-      : 'Op deze pagina vind ik geen vaste plekken. Zeg gewoon wat er moet gebeuren.';
+      ? 'Hier kun je naartoe: ' + namen.join(', ') + '. En verder: terug, omhoog, omlaag, sluit, stil. Al het andere doe ik zelf. ' + geldRegel()
+      : 'Op deze pagina vind ik geen vaste plekken. Zeg gewoon wat er moet gebeuren. ' + geldRegel();
+  }
+  function geldRegel() {
+    return (kamer.geldAan && kamer.geldAan())
+      ? 'Geld en boekingen mogen met de mond, met een bevestiging per opdracht.'
+      : 'Geld en boekingen typ je; dat doe ik niet op je woord alleen.';
   }
   function stelStem(aan) {
     stemAan = !!aan; zetten(STEM, stemAan);
@@ -141,6 +150,14 @@
      de eigen inlog. Daar zitten de geld-drempel en de bevestiging, en die willen
      we niet dubbel (en dus niet half) in de browser nabouwen. */
   function vraagRahul(vraag, hardop) {
+    /* De geldpoort staat VOOR het versturen. Kwam dit van de mond en gaat het
+       over geld of een boeking, dan houdt hij het tegen (typen) of zet hij er
+       eerst een bevestiging voor. Getypte tekst gaat gewoon door: dat is de
+       weg die we juist willen. */
+    if (kamer.geldPoort && kamer.geldPoort(vraag, !!hardop, function (z) { stuurRahul(z, hardop); })) return;
+    stuurRahul(vraag, hardop);
+  }
+  function stuurRahul(vraag, hardop) {
     if (kamer.tikt) kamer.tikt(true);              // drie puntjes: hij is bezig
     fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ q: vraag, lang: taal() }) })
       .then(function (r) { return r.json(); })
@@ -189,11 +206,14 @@
      hetzelfde late-binding-patroon als in de kern op de server. */
   var kamer = {
     doe: doe, zeg: zeg, knop: knMond, vak: chat, tok: tok, taal: taal,
+    zetVeld: function (t) { inp.value = String(t || '').slice(0, 300); try { inp.focus(); } catch (e) {} },
+    geldDoorgaan: function (z) { stuurRahul(z, true); },
     spreek: null, zwijg: null,          // vult handenvrij-mond.js in
-    beurt: null, tikt: null, laadGesprek: null   // vult handenvrij-chat.js in
+    beurt: null, tikt: null, laadGesprek: null,  // vult handenvrij-chat.js in
+    geldPoort: null, geldAntwoord: null, geldAan: null  // vult handenvrij-geld.js in
   };
   root.__handenvrijKamer = kamer;
-  ['/shared/handenvrij-chat.js', '/shared/handenvrij-mond.js'].forEach(function (src) {
+  ['/shared/handenvrij-chat.js', '/shared/handenvrij-geld.js', '/shared/handenvrij-mond.js'].forEach(function (src) {
     var el = document.createElement('script');
     el.src = src; el.defer = true;
     document.head.appendChild(el);

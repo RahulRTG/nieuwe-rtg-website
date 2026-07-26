@@ -20,6 +20,23 @@
 
 const HERHAAL = ['geen', 'dag', 'week', 'maand', 'jaar'];
 
+/* ---- herhalingen uitrollen ----
+   De n-de keer wordt ALTIJD vanaf de basisdatum gerekend, nooit vanaf de
+   vorige keer: een maandafspraak op de 31e klemt in september op de 30e,
+   maar hoort in oktober gewoon weer op de 31e te staan. Wie doorstapt
+   vanaf de geklemde datum blijft voorgoed op de 30e hangen. Deze regel is
+   van het hele huis (ook de RTF-gezinsagenda), daarom staat hij hier los
+   en wordt hij mee geexporteerd. */
+function keerN(basis, soort, n) {
+  const [j, m, dg] = basis.split('-').map(Number);
+  if (soort === 'dag' || soort === 'week') {
+    return new Date(Date.UTC(j, m - 1, dg + n * (soort === 'dag' ? 1 : 7))).toISOString().slice(0, 10);
+  }
+  const nm = soort === 'maand' ? m - 1 + n : m - 1, nj = soort === 'maand' ? j : j + n;
+  const laatste = new Date(Date.UTC(nj, nm + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(nj, nm, Math.min(dg, laatste))).toISOString().slice(0, 10);
+}
+
 function maakAgendaPro({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }) {
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
@@ -29,21 +46,6 @@ function maakAgendaPro({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
   const naam = ownerKey => { const k = lidVan(ownerKey); return k ? (codenaamVan(k) || 'een lid') : 'de zaak'; };
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
   const isTijd = t => /^\d{2}:\d{2}$/.test(String(t || ''));
-
-  /* ---- herhalingen uitrollen ----
-     De n-de keer wordt ALTIJD vanaf de basisdatum gerekend, nooit vanaf de
-     vorige keer: een maandafspraak op de 31e klemt in september op de 30e,
-     maar hoort in oktober gewoon weer op de 31e te staan. Wie doorstapt
-     vanaf de geklemde datum blijft voorgoed op de 30e hangen. */
-  function keerN(basis, soort, n) {
-    const [j, m, dg] = basis.split('-').map(Number);
-    if (soort === 'dag' || soort === 'week') {
-      return new Date(Date.UTC(j, m - 1, dg + n * (soort === 'dag' ? 1 : 7))).toISOString().slice(0, 10);
-    }
-    const nm = soort === 'maand' ? m - 1 + n : m - 1, nj = soort === 'maand' ? j : j + n;
-    const laatste = new Date(Date.UTC(nj, nm + 1, 0)).getUTCDate();
-    return new Date(Date.UTC(nj, nm, Math.min(dg, laatste))).toISOString().slice(0, 10);
-  }
 
   function publiek(i) {
     return { id: i.id, titel: i.titel, tijd: i.tijd || null, eind: i.eind || null, plek: i.plek || null,
@@ -170,4 +172,4 @@ function maakAgendaPro({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
   return { bereik, bewaarAfspraak, nodigUit, antwoordUitnodiging, verwijder, ecosysteem, ics };
 }
 
-module.exports = { maakAgendaPro };
+module.exports = { maakAgendaPro, keerN, HERHAAL };

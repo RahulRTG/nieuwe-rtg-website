@@ -24,7 +24,9 @@
   function chip(x, klik) {
     var klas = 'chip' + (x.bron === 'boeking' ? ' eco' : '') +
       (x.status === 'uitgenodigd' ? ' uit' : '') + (x.status === 'nee' ? ' nee' : '');
-    return '<span class="' + klas + '" data-klik="' + esc(klik) + '" title="' + esc(x.titel) + '">' +
+    // een optionele kleur (bijv. het gezinslid in de RTF-agenda) kleurt de rand
+    var stijl = /^#[0-9A-Fa-f]{3,8}$/.test(x.kleur || '') ? ' style="border-color:' + x.kleur + '"' : '';
+    return '<span class="' + klas + '"' + stijl + ' data-klik="' + esc(klik) + '" title="' + esc(x.titel) + '">' +
       (x.tijd ? '<b>' + x.tijd + '</b> ' : '') + esc(x.titel) + '</span>';
   }
 

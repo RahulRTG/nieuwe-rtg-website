@@ -1371,3 +1371,33 @@ Server: kern/klok.js + routes/klok.js. Client: apps/gereedschap.html +
 apps/gereedschap/ (reken, klok, tijd) + shared/rekenkern.js. Tests:
 gereedschap.test.js (2, puur: motor en klok-kern zonder wachten) en
 gereedschap.e2e.js met de volledige alarmketen door het scherm.
+
+## RTF-golf 1: de gezinsagenda op RTG-niveau
+
+De eerste ronde van de RTF-golf: de gezinsagenda van een platte lijst
+naar het niveau van de ledenagenda -- met dezelfde spelregels, letterlijk.
+
+**Een herhaalregel voor het hele huis.** keerN (de uitrol die de 31e in
+een korte maand klemt en daarna netjes laat terugkeren) is uit de
+RTG-agendakern getild en wordt nu door BEIDE agenda's gebruikt: geen
+tweede implementatie, geen drift. De RTF-test legt dezelfde klem vast
+als de RTG-test.
+
+**Herhaling, verjaardagen en het bereik.** Agendapunten kennen nu
+herhaal (dag/week/maand/jaar) met een einddatum; een verjaardag is
+gewoon een jaarpunt dat je EEN keer neerzet. De bereik-route rolt de
+reeksen uit en geeft per punt de naam en de kleur van het gezinslid mee.
+Bewerken rekent met de STARTdatum van een reeks, niet met de toevallig
+aangeklikte keer -- anders verzet een klik op 30 september de hele
+reeks. De oppas (gast) mag lezen; schrijven blijft van het gezin.
+
+**Het scherm.** Maand, week en lijst -- met hergebruik van het
+tekenwerk van de ledenagenda (RTGAgendaKal), dat daarvoor een optionele
+kleurrand per chip kreeg. Ieder gezinslid zijn eigen kleur in het
+raster, een verjaardag-snelknop in het paneel, en een nette waarschuwing
+bij het weghalen van een reeks.
+
+Server: foundation/gasten/gezinsleven.js (wijzig + bereik erbij) op de
+gedeelde keerN uit kern/agenda-pro.js. Client: apps/foundation/
+agenda.html herbouwd op RTGAgendaKal. Tests: rtfagenda.test.js (3, incl.
+de klemregel) en rtfagenda.e2e.js door het echte gezinsscherm.

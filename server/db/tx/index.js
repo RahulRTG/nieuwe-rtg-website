@@ -84,7 +84,8 @@ const boekingenVanZaak = code => txVanZaak('boekingen', code);
 const boekingenVoegToe = b => txVoegToe('boekingen', b, { cap: 50000 });
 
 module.exports = {
-  wire, initLedger: ledger.initLedger, vensterTopUp: ledger.vensterTopUp,
+  wire, initLedger: ledger.initLedger, initLedgerSqlite: ledger.initLedgerSqlite,
+  afrondLedger: ledger.afrondLedger, vensterTopUp: ledger.vensterTopUp,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   txStaartNa, txVerwijder,

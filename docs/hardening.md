@@ -32,11 +32,21 @@ namenlijst -- en netjes afsluiten kijkt alles na en vouwt de WAL dicht. Gemeten
 op een sessie-zware last: 5,9 -> 1,2 ms per save. Vastgelegd in
 `test/opslag-voorcheck.test.js`.
 
-Wat hierna nog O(alles) is in de SQLite-stand: een collectie die alleen maar
-GROEIT (`orders`) wordt bij elke nieuwe order in zijn geheel herschreven. Dat is
-de blob-grens waarvoor het tx-grootboek bestaat -- dat werkt alleen met Postgres
-(`server/db/tx/ledger.js`: "zonder Postgres is dit inert"). Voor die omvang is
-Postgres dus de opslag, precies zoals de README zegt.
+Daarna bleef er nog een tweede O(alles) staan: een collectie die alleen maar
+GROEIT (`orders`) werd bij elke nieuwe order in zijn geheel herschreven -- gemeten
+460 KB na 1050 orders, lineair groeiend. Het tx-grootboek bestond daar al voor,
+maar werkte alleen met Postgres ("zonder Postgres is dit inert"), dus juist de
+standaardopslag hield die serialisatie in stand. Het grootboek is nu
+opslag-onafhankelijk: `server/db/tx/ledger.js` kent alleen nog een ACHTERKANT
+(`pgachter.js` of `sqliteachter.js`), en dezelfde veeg- en vensterlogica draait op
+beide. In de SQLite-stand houdt het RAM een venster van de recentste items en
+staat de rest als geindexeerde rij in een eigen `grootboek.db` -- eigen bestand,
+zodat de kv-schrijvers en het grootboek niet op dezelfde schrijflock wachten.
+Gemeten op een order-zware last: `saveSqlite` van 35,2% naar 26,1% van de CPU en
+1119 -> 1380 rondes in dezelfde 25 s. Uit te zetten met `TX_LEDGER_SQLITE=0`.
+Vastgelegd in `test/txledger-sqlite.test.js`, dat hetzelfde contract afdwingt als
+de Postgres-variant: venster, verlies-vrij vegen, historie voorbij het venster,
+doorstromende statuswissels, en dat de kv-blob niet meer meegroeit.
 
 ## 3. Misbruik/spam  (aangepakt)
 Snelheidslimieten: vriendschapsverzoeken (30/uur), berichten (60/min), snaps

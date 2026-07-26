@@ -1,14 +1,20 @@
-/* Transactie-grootboek (tx_ledger), alleen met Postgres actief. Orders en
-   boekingen staan als GEINDEXEERDE RIJEN in Postgres (soort+ref als sleutel,
-   klant/zaak/at geindexeerd), buiten het procesgeheugen. Het werkgeheugen houdt
-   alleen een VENSTER van de recentste items (TX_RAM_*); alles daarbuiten leeft in
-   het grootboek en is via de gepagineerde lezers bereikbaar. Zo blijft de kv-blob
-   klein (goedkope flush) en verdwijnt de laatste O(alles)-serialisatie.
+/* Transactie-grootboek (tx_ledger). Orders en boekingen staan als GEINDEXEERDE
+   RIJEN buiten het procesgeheugen (soort+ref als sleutel, klant/zaak/at
+   geindexeerd). Het werkgeheugen houdt alleen een VENSTER van de recentste items
+   (TX_RAM_*); alles daarbuiten leeft in het grootboek en is via de gepagineerde
+   lezers bereikbaar. Zo blijft de kv-blob klein (goedkope flush) en verdwijnt de
+   laatste O(alles)-serialisatie.
+
+   Deze module kent de opslag niet: hij bouwt rijen en vraagt bladzijden op bij een
+   ACHTERKANT (./pgachter of ./sqliteachter). Daardoor werkt dezelfde veeg- en
+   vensterlogica in de Postgres-stand en in de SQLite-stand -- die laatste is de
+   standaardopslag, en daar hield een groeiende `orders` tot nu toe de laatste
+   O(alles)-serialisatie in stand.
 
    Verlies-vrij per constructie: de veegronde schrijft de staart EERST (upsert,
    idempotent) naar het grootboek en haalt hem pas daarna uit het RAM. Nieuwe
    items gaan bij aanmaak direct (best-effort) mee; statuswissels van recente
-   items neemt de veegronde mee via de hete kop. Zonder Postgres is dit inert.
+   items neemt de veegronde mee via de hete kop. Zonder achterkant is dit inert.
    Afgesplitst uit tx/index.js; het RAM-venster (txStaartNa/txVerwijder) en save()
    komen via wire() binnen. */
 const kluis = require('../../kluis');
@@ -22,7 +28,7 @@ const txKlantVan = t => t.customerKey || t.customerTier;
 let venster = { txStaartNa: () => [], txVerwijder: () => {}, save: () => {} };
 function wire(v) { venster = Object.assign(venster, v); }
 
-let txPool = null;
+let achter = null;
 const TX_RAM_MAX = { orders: Number(process.env.TX_RAM_ORDERS || 30000), boekingen: Number(process.env.TX_RAM_BOEKINGEN || 50000) };
 const TX_SOORT = { orders: 'order', boekingen: 'boeking' };
 const TX_VEEG_MS = Number(process.env.TX_VEEG_MS || 30000);
@@ -30,72 +36,53 @@ const TX_KAP = Number(process.env.TX_KAP || 20000);      // max staart-items per
 const TX_KOP = Number(process.env.TX_KOP || 500);        // hete kop die elke ronde opnieuw meegaat (statuswissels)
 const txBekend = { orders: new Set(), boekingen: new Set() }; // refs waarvan we weten dat ze in het grootboek staan
 let txVeegTimer = null, txVeegBezig = false;
-function txLedgerActief() { return !!txPool; }
+function txLedgerActief() { return !!achter; }
 const txDedup = items => { const gezien = new Set(); const uit = []; for (const t of items) { if (!t || t.ref == null || gezien.has(t.ref)) continue; gezien.add(t.ref); uit.push(t); } return uit; };
+// Een ticket naar een grootboekrij. Hier gebeurt het versleutelen, precies een keer.
+const rijVan = (naam, t) => ({
+  soort: TX_SOORT[naam], ref: String(t.ref), klant: txKlantVan(t) || null, zaak: t.supplierCode || null,
+  paid: !!t.paid, status: t.status || null, totaal: Number(t.total != null ? t.total : t.price) || 0,
+  at: t.at || new Date().toISOString(), data: kluis.versleutel(JSON.stringify(t))
+});
+const lees = rijen => rijen.map(d => JSON.parse(kluis.ontsleutel(d)));
+
 async function txLedgerZet(naam, t) {
-  if (!txPool || !t || t.ref == null) return;
+  if (!achter || !t || t.ref == null) return;
   try {
-    await txPool.query(
-      `INSERT INTO tx_ledger(soort, ref, klant, zaak, paid, status, totaal, at, data) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
-       ON CONFLICT(soort, ref) DO UPDATE SET klant=$3, zaak=$4, paid=$5, status=$6, totaal=$7, at=$8, data=$9`,
-      [TX_SOORT[naam], String(t.ref), txKlantVan(t) || null, t.supplierCode || null, !!t.paid, t.status || null,
-        Number(t.total != null ? t.total : t.price) || 0, t.at || new Date().toISOString(), kluis.versleutel(JSON.stringify(t))]);
+    await achter.upsert([rijVan(naam, t)]);
     txBekend[naam].add(t.ref);
   } catch (e) { /* eventueel-consistent: de veegronde (backfill/kop) probeert het opnieuw */ }
 }
 async function txLedgerBulk(naam, items) {
-  if (!txPool) return false;
+  if (!achter) return false;
   const schoonItems = txDedup(items);
-  const soort = TX_SOORT[naam];
-  for (let i = 0; i < schoonItems.length; i += 1000) {
-    const brok = schoonItems.slice(i, i + 1000);
-    const vals = [], params = [];
-    brok.forEach((t, j) => {
-      const b = j * 9;
-      vals.push('($' + (b + 1) + ',$' + (b + 2) + ',$' + (b + 3) + ',$' + (b + 4) + ',$' + (b + 5) + ',$' + (b + 6) + ',$' + (b + 7) + ',$' + (b + 8) + ',$' + (b + 9) + ')');
-      params.push(soort, String(t.ref), txKlantVan(t) || null, t.supplierCode || null, !!t.paid, t.status || null,
-        Number(t.total != null ? t.total : t.price) || 0, t.at || new Date().toISOString(), kluis.versleutel(JSON.stringify(t)));
-    });
-    await txPool.query(
-      'INSERT INTO tx_ledger(soort,ref,klant,zaak,paid,status,totaal,at,data) VALUES ' + vals.join(',') +
-      ' ON CONFLICT(soort,ref) DO UPDATE SET klant=EXCLUDED.klant, zaak=EXCLUDED.zaak, paid=EXCLUDED.paid, status=EXCLUDED.status, totaal=EXCLUDED.totaal, at=EXCLUDED.at, data=EXCLUDED.data',
-      params);
-    for (const t of brok) txBekend[naam].add(t.ref);
-  }
+  if (!schoonItems.length) return true;
+  await achter.upsert(schoonItems.map(t => rijVan(naam, t)));
+  for (const t of schoonItems) txBekend[naam].add(t.ref);
   return true;
 }
 // Gepagineerde lezers: geindexeerd op (soort, klant/zaak, at), nooit een scan.
 async function txLedgerVanKlant(naam, klant, limit, offset) {
-  if (!txPool) return [];
-  try {
-    const r = await txPool.query('SELECT data FROM tx_ledger WHERE soort=$1 AND klant=$2 ORDER BY at DESC LIMIT $3 OFFSET $4',
-      [TX_SOORT[naam], String(klant || ''), Math.min(200, limit || 25), Math.max(0, offset || 0)]);
-    return r.rows.map(x => JSON.parse(kluis.ontsleutel(x.data)));
-  } catch (e) { return []; }
+  if (!achter) return [];
+  try { return lees(await achter.vanSleutel(TX_SOORT[naam], 'klant', klant, Math.min(200, limit || 25), Math.max(0, offset || 0))); }
+  catch (e) { return []; }
 }
 async function txLedgerVanZaak(naam, zaak, limit, offset) {
-  if (!txPool) return [];
-  try {
-    const r = await txPool.query('SELECT data FROM tx_ledger WHERE soort=$1 AND zaak=$2 ORDER BY at DESC LIMIT $3 OFFSET $4',
-      [TX_SOORT[naam], String(zaak || ''), Math.min(200, limit || 25), Math.max(0, offset || 0)]);
-    return r.rows.map(x => JSON.parse(kluis.ontsleutel(x.data)));
-  } catch (e) { return []; }
+  if (!achter) return [];
+  try { return lees(await achter.vanSleutel(TX_SOORT[naam], 'zaak', zaak, Math.min(200, limit || 25), Math.max(0, offset || 0))); }
+  catch (e) { return []; }
 }
 async function txLedgerTel(naam, klant) {
-  if (!txPool) return 0;
-  try {
-    const r = klant != null
-      ? await txPool.query('SELECT count(*)::bigint AS c FROM tx_ledger WHERE soort=$1 AND klant=$2', [TX_SOORT[naam], String(klant)])
-      : await txPool.query('SELECT count(*)::bigint AS c FROM tx_ledger WHERE soort=$1', [TX_SOORT[naam]]);
-    return Number(r.rows[0].c);
-  } catch (e) { return 0; }
+  if (!achter) return 0;
+  try { return await achter.tel(TX_SOORT[naam], klant != null ? klant : null); }
+  catch (e) { return 0; }
 }
 // Synchrone, gecachete totalen (zelfde patroon als ledenGidsAantal): de
 // KPI-lezers blijven synchroon en krijgen een teller die hooguit ~10 s achterloopt.
 const txN = { orders: 0, boekingen: 0 };
 let txNAt = 0;
 function txLedgerAantal(naam) {
-  if (txPool && Date.now() - txNAt > 10000) {
+  if (achter && Date.now() - txNAt > 10000) {
     txNAt = Date.now();
     (async () => { try { txN.orders = await txLedgerTel('orders'); txN.boekingen = await txLedgerTel('boekingen'); } catch (e) {} })();
   }
@@ -107,7 +94,7 @@ function txLedgerAantal(naam) {
    Gepaced (TX_KAP per ronde) zodat een grote achterstand nooit de event-loop
    blokkeert maar in rustige stappen wegloopt. */
 async function txVeegNu() {
-  if (!txPool || txVeegBezig || !db.writable) return;
+  if (!achter || txVeegBezig || !db.writable) return;
   txVeegBezig = true;
   try {
     for (const naam of ['orders', 'boekingen']) {
@@ -129,36 +116,38 @@ async function txVeegNu() {
   finally { txVeegBezig = false; }
 }
 
-/* Installeer het grootboek: tabellen/indexen klaarzetten, de pool bewaren en de
-   veegronde starten (aangeroepen door de Postgres-start). */
-async function initLedger(pool, log) {
+/* Installeer een achterkant: schema klaarzetten, hem bewaren en de veegronde
+   starten. Mislukt het schema, dan blijft het grootboek inert en werkt alles als
+   voorheen -- de kv-blob is dan de waarheid. */
+async function start(nieuw, log) {
   const warn = m => { if (log && log.warn) log.warn(m); };
   try {
-    await pool.query(`CREATE TABLE IF NOT EXISTS tx_ledger(
-      soort text NOT NULL, ref text NOT NULL, klant text, zaak text,
-      paid boolean, status text, totaal numeric, at timestamptz, data text NOT NULL,
-      PRIMARY KEY(soort, ref))`);
-    await pool.query('CREATE INDEX IF NOT EXISTS tx_ledger_klant ON tx_ledger(soort, klant, at DESC)');
-    await pool.query('CREATE INDEX IF NOT EXISTS tx_ledger_zaak ON tx_ledger(soort, zaak, at DESC)');
-    txPool = pool;
+    await nieuw.schema();
+    achter = nieuw;
     txVeegTimer = setInterval(() => { txVeegNu().catch(() => {}); }, TX_VEEG_MS);
     if (txVeegTimer.unref) txVeegTimer.unref();
     const eersteVeeg = setTimeout(() => { txVeegNu().catch(() => {}); }, 3000);
     if (eersteVeeg.unref) eersteVeeg.unref();
-  } catch (e) { txPool = null; warn('[db] tx-grootboek init mislukt: ' + e.message); }
+  } catch (e) { achter = null; warn('[db] tx-grootboek (' + nieuw.naam + ') init mislukt: ' + e.message); }
 }
+// Aangeroepen door de Postgres-start (met de pool) en door de SQLite-start.
+const initLedger = (pool, log) => start(require('./pgachter')(pool), log);
+const initLedgerSqlite = (opslag, log) => start(require('./sqliteachter')(opslag), log);
+// Netjes afronden bij het afsluiten (alleen de SQLite-achterkant heeft werk).
+function afrondLedger() { if (achter && achter.afronden) achter.afronden(); }
+
 // Venster-top-up uit het grootboek: items die al als rij in het grootboek staan
 // maar nog niet in de blob, komen hier terug in het venster.
 async function vensterTopUp(log) {
   const warn = m => { if (log && log.warn) log.warn(m); };
-  if (!txPool || !db.data) return;
+  if (!achter || !db.data) return;
   for (const naam of ['orders', 'boekingen']) {
     try {
-      const r = await txPool.query('SELECT data FROM tx_ledger WHERE soort=$1 ORDER BY at DESC LIMIT 500', [TX_SOORT[naam]]);
+      const rijen = await achter.recent(TX_SOORT[naam], 500);
       const arr = Array.isArray(db.data[naam]) ? db.data[naam] : (db.data[naam] = []);
       const bekend = new Set(arr.map(t => t && t.ref).filter(x => x != null));
       const missend = [];
-      for (const row of r.rows) { const t = JSON.parse(kluis.ontsleutel(row.data)); if (!bekend.has(t.ref)) missend.push(t); }
+      for (const t of lees(rijen)) if (!bekend.has(t.ref)) missend.push(t);
       if (missend.length) {
         missend.sort((a, b) => String(b.at || '').localeCompare(String(a.at || ''))); // nieuwste eerst, zoals unshift
         db.data[naam] = missend.concat(arr);
@@ -171,5 +160,5 @@ async function vensterTopUp(log) {
 module.exports = {
   wire, actief: txLedgerActief, zet: txLedgerZet,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, txVeegNu,
-  initLedger, vensterTopUp
+  initLedger, initLedgerSqlite, afrondLedger, vensterTopUp
 };

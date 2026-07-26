@@ -65,6 +65,9 @@
       for (var c = 0; c < data.kolommen; c++) h += '<th>' + kolLetter(c) + '</th>';
       h += '</tr></thead><tbody>';
       for (var r = 1; r <= data.rijen; r++) {
+        // Een filter verbergt rijen; hij hoort NIET bij het document (hij wordt
+        // niet bewaard), want een filter is hoe u nu kijkt, niet wat er staat.
+        if (data.verborgen && data.verborgen[r]) continue;
         h += '<tr><td class="rijkop">' + r + '</td>';
         for (var k = 0; k < data.kolommen; k++) {
           var ref = kolLetter(k) + r;

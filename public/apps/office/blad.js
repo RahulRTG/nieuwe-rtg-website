@@ -65,6 +65,9 @@
       for (var c = 0; c < data.kolommen; c++) h += '<th>' + kolLetter(c) + '</th>';
       h += '</tr></thead><tbody>';
       for (var r = 1; r <= data.rijen; r++) {
+        // Een filter verbergt rijen; hij hoort NIET bij het document (hij wordt
+        // niet bewaard), want een filter is hoe u nu kijkt, niet wat er staat.
+        if (data.verborgen && data.verborgen[r]) continue;
         h += '<tr><td class="rijkop">' + r + '</td>';
         for (var k = 0; k < data.kolommen; k++) {
           var ref = kolLetter(k) + r;
@@ -160,6 +163,11 @@
           onWijzig(); teken();
         });
       });
+      /* De pro-laag hangt zichzelf hierachter: functie-zoeker, sorteren,
+         filteren en een grafiek (apps/office/bladpro.js). Die staat apart
+         omdat het ander werk is -- dit bestand gaat over het raster zelf.
+         Is hij er niet, dan werkt het blad gewoon zonder. */
+      if (window.RTGOfficeBladPro) window.RTGOfficeBladPro.balk(host, zelf);
     }
 
     invoer.addEventListener('keydown', function (e) {
@@ -170,7 +178,7 @@
       if ((data.cellen[actief] || '') !== invoer.value.trim()) zetCel(actief, invoer.value.trim());
     });
 
-    return {
+    var zelf = {
       laad: function (inhoud, mag) {
         magBewerken = !!mag;
         data = { cellen: Object.assign({}, (inhoud && inhoud.cellen) || {}),
@@ -179,6 +187,17 @@
         actief = 'A1'; invoer.disabled = !mag;
         teken(); kies('A1');
       },
+      /* Wat de pro-laag mag: kijken, en langs de gewone weg wijzigen. Geen
+         eigen tekenwerk, geen eigen opslag -- één blad, één waarheid. */
+      data: function () { return data; },
+      actief: function () { return actief; },
+      mag: function () { return magBewerken; },
+      motor: function () { return motor; },
+      toon: function (ref) { return toonWaarde(ref); },
+      uitkomst: function (ref) { return ruweUitkomst(ref); },
+      zetCel: zetCel,
+      vernieuw: function () { onWijzig(); teken(); kies(actief); },
+      hertekenen: teken,
       bouwBalk: bouwBalk,
       inhoud: function () { return { cellen: data.cellen, opmaak: data.opmaak, rijen: data.rijen, kolommen: data.kolommen }; },
       naarCsv: function () {
@@ -192,6 +211,7 @@
       },
       zetFormule: function (f) { zetCel(actief, f); }
     };
+    return zelf;
   }
 
   window.RTGOfficeBlad = { maak: maak };

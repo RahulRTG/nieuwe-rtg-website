@@ -952,3 +952,79 @@ op het scherm de hele keten afloopt: een lied met een eigen zin laten neerzetten
 een tweede maker erbij op codenaam, uitgeven met de RTG-naam als aanvraag,
 nagaan dat er in de zaal dan de codenaam staat -- en pas na het besluit van het
 kantoor de naam Rahul Travel Group.
+
+---
+
+## RTG Office: het rekenblad krijgt een echte motor
+
+Het rekenblad kende vijf functies (SOM, GEM, MIN, MAX, AANTAL, plus AFRONDEN en
+ALS), kolommen A tot en met Z, en bereiken die alleen werkten als je ze
+letterlijk als `A1:B9` typte. Dat is een demonstratie van een rekenblad, geen
+rekenblad. Deze ronde gaat over het fundament.
+
+### Wat erbij komt
+
+| | Was | Is |
+|---|---|---|
+| functies | 7 | **129 namen**, Nederlands en Engels naast elkaar |
+| kolommen | A tot Z | doorlopend na Z (AA, AB, ...), tot 60 |
+| rijen | 200 | 500 |
+| bereiken | alleen letterlijk `A1:B9` | overal waar een functie een bereik aankan |
+| andere bladen | nee | `Blad2!A1` |
+| ontleding | een regexp die "toch alleen cijfers" doorliet | een echte ontleder |
+
+De functies staan er per soort: rekenen en tellen, voorwaarden (`SOM.ALS`,
+`AANTAL.ALS`, `SOMPRODUCT`), logica, tekst, zoeken (`VERT.ZOEKEN`, `INDEX`,
+`VERGELIJKEN`), datums, en geld (`BET`, `TW`, `HW`, en `BTW` — die laatste is
+geen standaardfunctie maar wel wat hier het vaakst met de hand wordt uitgerekend,
+en dan met het verkeerde percentage).
+
+### Drie regels die vastliggen
+
+1. **Een formule draait nooit als code.** Geen `eval`, geen `Function`, geen
+   omweg. Een document wordt gedeeld, dus een formule van een ander is altijd
+   invoer van een vreemde; daarom staat er een echte ontleder en bestaat wat
+   niet in de grammatica staat gewoon niet. `=alert(1)` levert `#NAAM?` op:
+   een naam die er niet is, en die dus ook niet wordt uitgevoerd.
+2. **Een fout blijft zichtbaar.** `#DEEL/0!` wordt geen nul, `#NAAM?` geen lege
+   cel, en een kringverwijzing geen stille 0. Ook een fout **midden in een
+   bereik** reist omhoog — die vond de test, en het is de gevaarlijkste van de
+   twee: `=SOM(A1:A9)` over een kolom met één kapotte cel zou anders een keurig
+   getal geven dat niet klopt. Een uitkomst die je gelooft.
+3. **ALS raakt alleen de tak aan die hij nodig heeft.** `=ALS(A1=0; 0; 1/A1)` is
+   precies de formule die mensen schrijven om delen door nul te voorkómen; die
+   moet dus niet alsnog door nul delen. Daarom krijgen functies luie argumenten.
+   En een lege cel telt als nul zodra de andere kant een getal is — anders klopt
+   diezelfde formule nog steeds niet.
+
+### De vier dingen waarvoor men elders betaalt
+
+- **Functies zoeken.** Ruim honderd functies zijn niets waard als niemand ze kan
+  vinden. Een zoekvak zet de naam in uw cel; wie SOM typt vindt ook SUM.
+- **Sorteren** op de kolom waar u staat, over de rijen die u opgeeft. De rijen
+  verhuizen écht, met alle kolommen mee — dat staat er met zoveel woorden bij,
+  want het is ingrijpend.
+- **Filteren.** Rijen die niet aan uw eis voldoen (`>100`, `<=0`, een woord)
+  verdwijnen uit **beeld**, niet uit het document. Een filter wordt niet bewaard:
+  hij zegt hoe u nu kijkt, niet wat er staat.
+- **Grafiek**, met SVG uit uw eigen cellen. Staven of een lijn. Geen taartdiagram:
+  daar leest niemand een verhouding beter uit af dan uit staven naast elkaar, en
+  het staat elders vooral omdat het er altijd al stond.
+
+**Datums zijn hier gewone tekst** (`2026-07-26`). De grote rekenbladen bewaren een
+datum als volgnummer sinds 1900, met een schrikkeljaar erin verwerkt dat nooit
+bestaan heeft. Die halve eeuw sleepgewicht hoeven wij niet over te nemen: wie
+"2026-07-26" in een cel ziet weet wat het is, en `DAGEN()` rekent het verschil net
+zo goed uit. De prijs is dat een datum niet zomaar optelbaar is met +1; daarvoor
+is er `DATUM.PLUS()`. Een eerlijke ruil, en hij staat opgeschreven.
+
+Opgeknipt op de naad: lezen (`shared/rekenlezer.js`) apart van rekenen
+(`shared/rekenmotor.js`), functies per soort, en de bediening apart van het
+beeld (`bladpro.js` / `bladgrafiek.js`).
+
+Bewezen: `test/rekenmotor.test.js` (12), `test/office-blad.test.js` (6) en
+`test/office-blad.e2e.js`, die in een echte browser een formule intypt, de
+functielijst doorzoekt, sorteert, filtert en een grafiek laat tekenen. Die
+laatste is geen luxe: de motor draait in de browser, waar de beveiligingsregels
+van de app tekst-als-code blokkeren — precies de fout die deze app eerder had,
+toen in Node alles groen stond en op het scherm elke formule een melding gaf.

@@ -125,12 +125,20 @@ async function laadInbox(){
   let d; try{ d=await api('inbox'); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   LIJST=d.berichten||[];
   if(d.ongelezen){ $('#tel').textContent=d.ongelezen; $('#tel').hidden=false; } else $('#tel').hidden=true;
-  $('#main').innerHTML = LIJST.length ? (
+  /* Je eigen adres bovenaan: het draagt sinds deze ronde welk huis je hoort
+     (rtgpass.rtg, lifestyle.rtg, business.rtg, rahultravelgroup.rtg,
+     rahultravelfoundation.rtg, partner.rtg of gouvernement.rtg). Het linkerdeel
+     is je codenaam -- je echte naam blijft in de kluis. */
+  const kaart = d.adres
+    ? '<div class="noot" style="margin:0 0 .8rem;"><b style="color:var(--txt);font-size:.95rem;">' + esc(d.adres) + '</b><br>' +
+      'Dit is je RTMAIL-adres. Het volgt je lidmaatschap: verandert je pas, dan verandert het domein mee, en post aan je vorige adres komt gewoon aan.</div>'
+    : '';
+  $('#main').innerHTML = kaart + (LIJST.length ? (
     '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
     LIJST.map((m,i)=>
       '<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+(m.van==='rtg@rtmail'?'RTG':esc((m.van||'@').replace('@rtmail','').slice(0,3).toUpperCase()))+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>'
     ).join('')+'<div class="noot">RTMAIL bezorgt en bewaart je post op je codenaam, binnen RTG. Links en bijlagen van niet-geverifieerde afzenders zijn geblokkeerd; je vindt dit ook als kanaal in de Berichten-app.</div>'
-  ) : '<div class="leeg">Je postvak is leeg.<br>Zodra RTG je iets stuurt, verschijnt het hier.</div>';
+  ) : '<div class="leeg">Je postvak is leeg.<br>Zodra RTG je iets stuurt, verschijnt het hier.</div>');
   const vs=$('#vatSamen'); if(vs) vs.addEventListener('click',vatSamenNu);
   $('#main').querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>openBericht(LIJST[+b.dataset.i])));
 }

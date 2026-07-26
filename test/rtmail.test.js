@@ -100,3 +100,43 @@ test('bijlagen bestaan niet: wat er ook binnenkomt, er wordt niets te openen bew
   assert.deepEqual(m.bijlagen, []);
   assert.deepEqual(rtmail.postvak('lelie')[0].bijlagen, []);
 });
+
+/* ---- het adres per lidmaatschap (kern/rtmail-adres.js) ---- */
+
+test('elk huis zijn eigen domein, en het domein wordt afgeleid -- nooit gekozen', () => {
+  const a = require('../server/kern/rtmail-adres');
+  assert.equal(a.adresVoor('rtg', 'Gouden Panter'), 'gouden-panter@rtgpass.rtg');
+  assert.equal(a.adresVoor('lifestyle', 'Gouden Panter'), 'gouden-panter@lifestyle.rtg');
+  assert.equal(a.adresVoor('business', 'Gouden Panter'), 'gouden-panter@business.rtg');
+  assert.equal(a.adresVoor('rtf', 'Blauwe Vos'), 'blauwe-vos@rahultravelfoundation.rtg');
+  assert.equal(a.adresVoor('personeel', 'Rahul'), 'rahul@rahultravelgroup.rtg');
+  assert.equal(a.adresVoor('kantoor', 'Rahul'), 'rahul@rahultravelgroup.rtg');
+  assert.equal(a.adresVoor('zaak', 'KIKUNOI'), 'kikunoi@partner.rtg');
+  assert.equal(a.adresVoor('overheid', 'Overheid'), 'overheid@gouvernement.rtg');
+
+  // een BEWEZEN rol weegt zwaarder dan een pas: je werkadres is waar je op
+  // aanspreekbaar bent
+  assert.equal(a.soortVoor({ tier: 'rtg', rollen: [{ rol: 'personeel' }] }), 'personeel');
+  assert.equal(a.soortVoor({ tier: 'lifestyle', rollen: [{ rol: 'zaak' }] }), 'zaak');
+  assert.equal(a.soortVoor({ tier: 'business', rollen: [] }), 'business');
+  assert.equal(a.soortVoor({ tier: 'rtg', handle: 'rtf:123' }), 'rtf');
+  assert.equal(a.soortVoor({ tier: 'onzin' }), 'rtg', 'onbekend valt terug op de RTG Pass');
+
+  // het huis houdt zijn eigen namen: niemand wordt rtg@...
+  assert.equal(a.adresVoor('personeel', 'RTG'), 'rtg-personeel@rahultravelgroup.rtg');
+});
+
+test('je oude adres blijft werken als je pas verandert', () => {
+  const a = require('../server/kern/rtmail-adres');
+  assert.equal(a.zelfdeBus('gouden-panter@rtgpass.rtg', 'gouden-panter@lifestyle.rtg'), true);
+  assert.equal(a.zelfdeBus('gouden-panter@rtmail', 'gouden-panter@business.rtg'), true,
+    'ook het domein van voor deze ronde blijft geldig; daar ligt post op');
+  assert.equal(a.zelfdeBus('gouden-panter@rtgpass.rtg', 'blauwe-vos@rtgpass.rtg'), false);
+  assert.equal(a.zelfdeBus('gouden-panter@elders.example', 'gouden-panter@rtgpass.rtg'), false,
+    'van buiten het huis komt niemand in een postvak');
+  const o = a.ontleed('KIKUNOI@partner.rtg');
+  assert.equal(o.lokaal, 'kikunoi');
+  assert.equal(o.soort, 'zaak');
+  assert.equal(o.binnenshuis, true);
+  assert.equal(a.ontleed('iemand@elders.example').binnenshuis, false);
+});

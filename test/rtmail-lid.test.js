@@ -33,7 +33,8 @@ test.after(() => {
 
 test('een nieuw lid heeft direct een welkom in zijn RTMAIL-postvak', async () => {
   const d = await json(await api('/api/member/rtmail/inbox', {}, token));
-  assert.ok(d.adres && d.adres.endsWith('@rtmail'), 'er is een postvak-adres op codenaam');
+  // sinds de domeinen per lidmaatschap bestaan draagt het adres welk huis je hoort
+  assert.ok(d.adres && d.adres.endsWith('@rtgpass.rtg'), 'een RTG Pass-lid zit op rtgpass.rtg: ' + d.adres);
   assert.ok(Array.isArray(d.berichten) && d.berichten.length >= 1, 'er staat een bericht');
   assert.match(d.berichten[0].onderwerp, /Welkom/);
   assert.equal(d.berichten[0].van, 'rtg@rtmail');
@@ -62,4 +63,39 @@ test('een bericht lezen zet de teller op nul', async () => {
 test('zonder inlog blijft het postvak dicht', async () => {
   const r = await fetch(BASE + '/api/member/rtmail/inbox', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(r.status, 401);
+});
+
+test('elk lid krijgt een adres op het domein van zijn pas, en oude post komt aan', async () => {
+  const t = Date.now();
+  const maak = async (tier) => (await json(await api('/api/auth/register', { name: 'Lid ' + tier + t,
+    email: 'a' + tier + t + '@v.test', phone: '06' + String(t).slice(-7) + (tier === 'rtg' ? '1' : tier === 'business' ? '2' : '3'),
+    password: 'geheim123', geboortedatum: '1990-01-01', tier }))).token;
+
+  for (const [tier, domein] of [['rtg', 'rtgpass.rtg'], ['business', 'business.rtg'], ['lifestyle', 'lifestyle.rtg']]) {
+    const tok = await maak(tier);
+    const d = await json(await api('/api/member/rtmail/adres', {}, tok));
+    assert.ok(d.adres, 'een lid heeft een adres');
+    assert.equal(d.adres.split('@')[1], domein, tier + ' hoort op ' + domein);
+    assert.equal(d.soort, tier);
+    assert.ok(d.domeinen && d.domeinen.zaak === 'partner.rtg' && d.domeinen.overheid === 'gouvernement.rtg',
+      'de hele lijst komt mee, zodat het scherm hem kan tonen');
+
+    // het linkerdeel is de CODENAAM, nooit de echte naam of het e-mailadres
+    const lokaal = d.adres.split('@')[0];
+    assert.equal(/lid|@|v\.test/.test(lokaal), false, 'geen echte naam in het adres: ' + d.adres);
+
+    // en het postvak van de inbox draagt hetzelfde adres
+    const inbox = await json(await api('/api/member/rtmail/inbox', {}, tok));
+    assert.equal(inbox.adres, d.adres);
+    assert.ok(inbox.berichten.length >= 1, 'het welkom staat er nog gewoon in');
+    // het welkom is bezorgd onder de normalisatie van VOOR deze ronde (die
+    // spaties wiste); dat het toch in dit postvak ligt, is de belofte
+    const adresLaag = require('../server/kern/rtmail-adres');
+    assert.ok(inbox.berichten.every(m => adresLaag.zelfdeBus(m.naar, d.adres)),
+      'post aan het adres van voor deze ronde komt in hetzelfde postvak aan: ' +
+      inbox.berichten.map(m => m.naar).join(', ') + ' vs ' + d.adres);
+  }
+
+  const uitgelogd = await api('/api/member/rtmail/adres', {});
+  assert.equal(uitgelogd.status, 401);
 });

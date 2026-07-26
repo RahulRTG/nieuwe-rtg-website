@@ -23,6 +23,8 @@
    Bewust adviserend/onthoudend: RTMAIL bezorgt en bewaart, maar besluit niets
    en raakt geen geld -- een geld- of toegangs-actie loopt altijd langs de
    bestaande poorten waar een mens beslist. */
+const adresLaag = require('./rtmail-adres');
+
 module.exports = ({ db, save, crypto }) => {
   const SYSTEEM = 'rtg@rtmail';
   const MAX = 20000; // ruwe bovengrens op het totaal, zodat het geheugen begrensd blijft
@@ -39,6 +41,19 @@ module.exports = ({ db, save, crypto }) => {
     if (!s.includes('@')) s = s + '@rtmail';
     return s.slice(0, 80);
   }
+
+  /* HET POSTVAK HANGT AAN HET LINKERDEEL, NIET AAN HET DOMEIN.
+     Sinds de domeinen per lidmaatschap bestaan (kern/rtmail-adres.js) heeft
+     iemand met de RTG Pass "x@rtgpass.rtg" en na een overstap "x@lifestyle.rtg".
+     Post aan het oude adres moet gewoon aankomen -- een lidmaatschap dat
+     verandert mag geen post laten verdwijnen. Daarom vergelijken we binnen ons
+     eigen huis op het linkerdeel; buiten het huis geldt het hele adres.
+
+     Bekende eigenschap, van vóór deze ronde: codenamen en zaakcodes delen die
+     ene naamruimte. Twee identiteiten met hetzelfde linkerdeel zouden dus
+     hetzelfde postvak zien. Dat was met "@rtmail" al zo; het scheiden ervan zou
+     bestaande post onbereikbaar maken, en dat is de ergere fout. */
+  const zelfdeBus = adresLaag.zelfdeBus;
 
   /* ---- de veiligheidsscan op de tekst ----
      RTMAIL rendert platte tekst; hier merken we vooruit welke stukken een link
@@ -120,25 +135,28 @@ module.exports = ({ db, save, crypto }) => {
   // Het postvak IN van een adres (nieuwste eerst).
   function postvak(adres, { limit = 60 } = {}) {
     const a = normAdres(adres);
-    return store().berichten.filter(m => m.naar === a).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
+    return store().berichten.filter(m => zelfdeBus(m.naar, a)).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
   }
   // Wat een adres zelf verstuurd heeft.
   function verzonden(adres, { limit = 60 } = {}) {
     const a = normAdres(adres);
-    return store().berichten.filter(m => m.van === a).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
+    return store().berichten.filter(m => zelfdeBus(m.van, a)).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
   }
   function ongelezen(adres) {
     const a = normAdres(adres);
-    return store().berichten.reduce((n, m) => n + (m.naar === a && !m.gelezen ? 1 : 0), 0);
+    return store().berichten.reduce((n, m) => n + (zelfdeBus(m.naar, a) && !m.gelezen ? 1 : 0), 0);
   }
   // Een bericht als gelezen markeren -- alleen als het echt aan dit adres is.
   function lees(adres, id) {
     const a = normAdres(adres);
-    const m = store().berichten.find(x => x.id === id && x.naar === a);
+    const m = store().berichten.find(x => x.id === id && zelfdeBus(x.naar, a));
     if (!m) return { error: 'Dit bericht staat niet in dit postvak.' };
     if (!m.gelezen) { m.gelezen = true; save(); }
     return pub(m);
   }
 
-  return { SYSTEEM, VERTROUWDE_BRONNEN, normAdres, scanLinks, stuur, systeemStuur, postvak, verzonden, ongelezen, lees };
+  return { SYSTEEM, VERTROUWDE_BRONNEN, normAdres, scanLinks, stuur, systeemStuur, postvak, verzonden, ongelezen, lees,
+    // de adreslaag doorgeven, zodat routes en tests er maar een bron voor hebben
+    DOMEINEN: adresLaag.DOMEINEN, adresVoor: adresLaag.adresVoor, ontleed: adresLaag.ontleed,
+    soortVoor: adresLaag.soortVoor, zelfdeBus };
 };

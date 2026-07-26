@@ -6,8 +6,11 @@
    Alles achter de leverancier-inlog; het adres komt uit de sessie, nooit uit
    de body -- zo kan niemand in het postvak van een ander kijken. */
 module.exports = (kern) => {
-  const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, anthropic } = kern;
-  const adresVan = req => (req.supplier.code || '').toLowerCase() + '@rtmail';
+  const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, anthropic, db } = kern;
+  /* Het adres draagt nu welk huis je hoort (kern/rtmail-adres.js). Een zaak
+     handelt onder haar eigen code op partner.rtg. Post aan het oude "@rtmail"
+     komt nog steeds aan: het postvak hangt aan het linkerdeel. */
+  const adresVan = req => rtmail.adresVoor('zaak', req.supplier.code || '');
   // het lid-adres: de codenaam van het account (privacy by design)
   const lidCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
 
@@ -131,10 +134,34 @@ module.exports = (kern) => {
   /* ---- de lid-kant: het RTMAIL-postvak in de verenigde Berichten-app ----
      Het adres is de codenaam van het lid; leden lezen alleen (RTMAIL bezorgt,
      het lid antwoordt niet naar de systeem-afzender). */
+  /* Het adres van een lid: de codenaam op het domein van zijn lidmaatschap.
+     De soort wordt AFGELEID uit de pas en de bewezen rollen -- niemand kiest
+     zijn eigen domein, want dan was het adres een bewering in plaats van een
+     feit. Het linkerdeel blijft de codenaam: een adres reist, en de echte naam
+     hoort in de kluis te blijven (server/accounts.js). */
+  function lidSoort(req) {
+    const rollen = ((db && db.data && db.data.accountRollen) || {})[req.session.key] || [];
+    return rtmail.soortVoor({ tier: req.session.tier, rollen });
+  }
+  const lidAdres = (req) => {
+    const c = lidCodenaam(req);
+    return c ? rtmail.adresVoor(lidSoort(req), c) : null;
+  };
+
+  app.post('/api/member/rtmail/adres', auth, (req, res) => {
+    const adres = lidAdres(req);
+    if (!adres) return res.json({ adres: null });
+    const soort = lidSoort(req);
+    res.json({ ok: true, adres, soort, domein: rtmail.DOMEINEN[soort],
+      domeinen: rtmail.DOMEINEN,
+      uitleg: 'Je adres volgt je lidmaatschap. Verandert je pas, dan verandert het domein mee -- en post aan je vorige adres komt gewoon aan.' });
+  });
+
   app.post('/api/member/rtmail/inbox', auth, (req, res) => {
     const codenaam = lidCodenaam(req);
     if (!codenaam) return res.json({ adres: null, ongelezen: 0, berichten: [] });
-    res.json({ adres: codenaam.toLowerCase() + '@rtmail', ongelezen: rtmail.ongelezen(codenaam), berichten: rtmail.postvak(codenaam) });
+    res.json({ adres: lidAdres(req), soort: lidSoort(req),
+      ongelezen: rtmail.ongelezen(codenaam), berichten: rtmail.postvak(codenaam) });
   });
   app.post('/api/member/rtmail/lees', auth, (req, res) => {
     const codenaam = lidCodenaam(req);

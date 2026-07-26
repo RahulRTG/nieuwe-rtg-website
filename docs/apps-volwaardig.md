@@ -605,3 +605,54 @@ en is daarom een map geworden, net als salon, metier en genootschap:
 `require('./kern/pulse')` vindt vanzelf de index.
 
 Bewezen: `test/pulse.test.js` (7 toetsen) en `test/rechterhand.test.js` (18).
+
+## RTMAIL: een adres per lidmaatschap
+
+RTMAIL had één vlak domein voor iedereen: `<code>@rtmail`. Dat werkte, maar het
+zei niets. Nu draagt het adres zelf welk huis je hoort:
+
+| Domein | Voor wie |
+|---|---|
+| `rahultravelgroup.rtg` | RTG-personeel en het kantoor |
+| `rahultravelfoundation.rtg` | RTFoundation, leden en personeel |
+| `rtgpass.rtg` | leden met de RTG Pass |
+| `business.rtg` | leden met de Business Pass |
+| `lifestyle.rtg` | leden met de Lifestyle Pass |
+| `partner.rtg` | partners en leveranciers |
+| `gouvernement.rtg` | overheid |
+
+De laag staat in `kern/rtmail-adres.js` -- één lijst, en wie er een domein bij
+wil doet het daar en nergens anders.
+
+**Drie regels die hier niet onderhandelbaar zijn.**
+
+1. **Het linkerdeel van een ledenadres is de codenaam, nooit de echte naam.**
+   Een adres reist: het belandt in andermans postvak en blijft daar staan. Stond
+   er een echte naam in, dan was het codenaam-ontwerp (de gescheiden kluis in
+   `server/accounts.js`) omzeild voor iedereen die ooit post kreeg. Voor
+   PERSONEEL, ZAKEN en OVERHEID ligt dat anders: dat zijn functionele
+   identiteiten die naar buiten al openbaar zijn -- een zaak handelt onder haar
+   naam, een ambtenaar in een functie. Daar is het linkerdeel de werknaam of de
+   zaakcode, precies zoals op een visitekaartje.
+2. **Je oude adres blijft werken.** Wie van de RTG Pass naar de Lifestyle Pass
+   gaat, krijgt een nieuw adres, maar post aan het oude komt gewoon aan. Dat
+   geldt ook voor het `@rtmail` van vóór deze ronde: daar ligt post op.
+   Technisch: het postvak hangt aan het linkerdeel, het domein zegt welk huis.
+3. **Het domein wordt afgeleid, nooit gekozen.** Je kunt jezelf geen
+   `@rahultravelgroup.rtg` geven door het in te typen; het volgt uit je pas en je
+   bewezen rollen (`kern/eenaccount.js`). Een bewezen rol weegt daarbij zwaarder
+   dan een pas: wie bij RTG werkt én een RTG Pass heeft, krijgt het werkadres --
+   dat is het adres waarop hij aanspreekbaar is.
+
+**Wat een toets ving.** De normalisatie van vóór deze ronde WISTE spaties
+("Saffieren Ooievaar" werd `saffierenooievaar`), de nieuwe maakt er streepjes van
+(`saffieren-ooievaar`) omdat dat leesbaar is. Zonder correctie zou post die onder
+het oude schema bezorgd is in een ánder postvak liggen dan het nieuwe adres --
+precies belofte 2, gebroken. De vergelijking kijkt nu door streepjes en punten
+heen (`sleutel()` in `kern/rtmail-adres.js`).
+
+Verder gereserveerd: `rtg`, `rtmail`, `postmaster`, `systeem`, `admin` en
+`noreply` worden nooit aan iemand uitgedeeld -- anders viel zijn postvak samen
+met dat van de systeem-afzender.
+
+Bewezen: `test/rtmail.test.js` (11) en `test/rtmail-lid.test.js` (5).

@@ -231,6 +231,30 @@ En hooguit één gesprek per paar per dag; dit hoort een verrassing te zijn, gee
 knop waar je op blijft drukken. `test/klets.test.js` bewaakt alle drie de
 sloten, inclusief de controle dat er geen echte naam in de opslag belandt.
 
+### Het werkblad: je scherm zelf indelen
+
+Op een kantoorwerkplek (>=1100px) liggen meerdere dingen tegelijk open. Daarom
+kan elke werkpagina zichzelf opdelen in vlakken: 1, 2 naast elkaar, 2 boven
+elkaar, 3 of 4 (`public/shared/werkblad.js` + `.css`). De verhouding zet je door
+de scheiding te verslepen, en die keuze blijft staan per pagina en per toestel.
+De knoppenrij staat in de kopbalk van de pagina, niet in de console van Rahul --
+een knop die verdwijnt zodra je de console dichtklapt, is geen knop.
+
+Twee dingen zijn met opzet zo:
+
+- **Tegels, geen zwevende vensters.** Die bestaan al (`shared/vensters.js`) en
+  zijn goed om even iets bij te pakken. Ze overlappen, en dat is precies wat je
+  niet wilt als twee schermen de hele dag naast elkaar moeten staan.
+- **Het eerste vlak is de pagina zelf**, verhuisd en niet gekopieerd. Anders zet
+  je twee versies van hetzelfde scherm naast elkaar die elkaars gegevens niet
+  zien. De kopbalk van de pagina blijft de bovenrand van het werkblad, zodat wat
+  de pagina met `position:fixed` neerzet binnen zijn eigen vlak blijft.
+
+De console van Rahul is op het bureaublad te **verplaatsen en van maat te
+veranderen** (`handenvrij-bureau.js`); ook dat blijft onthouden. Slepen naar
+links en rechts verzet hem, omhoog en omlaag blijft van de standen.
+`test/werkblad.e2e.js` toetst het in een echte browser.
+
 ## Tests
 
 ```bash
@@ -249,6 +273,44 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
 
 De tests draaien in een tijdelijke datamap (`RTG_DATA_DIR`) en raken de echte
 data nooit aan.
+
+### De blinde vlek (`test/blindevlek.test.js`)
+
+Alle andere toetsen draaien op de **server**. Ze bewijzen dat de endpoints
+kloppen, en dat is precies wat ze bewijzen -- niet dat de pagina die ze gebruikt
+ook maar een regel JS uitvoert. Daar zijn er twee fouten maandenlang doorheen
+gelopen terwijl alles groen stond: op RTG Kantoren sloot een ingeplakte
+scriptregel het inline script af (halve pagina als platte tekst in beeld), en op
+de hangar stond een ternair zonder dubbele punt (het script draaide nooit).
+
+Dit bestand jaagt daarom op **klassen** van stille fout, niet op gevallen:
+
+1. elk inline script op een pagina is geldige JS;
+2. elk eigen script-, stijl- en beeldpad bestaat echt;
+3. elk `.html`-adres dat in JS staat (een schermenlijst, een knop die iets opent)
+   bestaat als bestand of als route -- `/apps/bureau.html` is bijvoorbeeld geen
+   bestand maar een omschrijving in de voordeur;
+4. geen dubbele `id` op een pagina (de tweede doet stil niets);
+5. elk `/api`-pad dat de app aanroept bestaat op de server. De lijst komt niet
+   uit de broncode maar uit de **echte** router: `scripts/routekaart.js` start de
+   app en leest `app._routes()` (`server/web/routing.js`). Uit de broncode kan het
+   niet, want een deel van de routes hangt aan een voorvoegsel-hulpje;
+6. elke gelezen opslagsleutel wordt ook ergens gezet (naamdrift: een pagina die
+   altijd uitgelogd lijkt);
+7. geen handler in een HTML-attribuut -- de nonce-CSP weigert die, dus zo'n knop
+   ziet er goed uit en doet niets. Ook in JS die HTML opbouwt, en ook in een
+   venster uit `window.open('')`: dat erft de CSP van de pagina;
+8. er wordt niet gezocht naar een element dat nergens bestaat.
+
+Bij het schrijven vonden 3, 6, 7 en 8 elk een echte fout: RTG Kantoren had een
+scherm in de lijst dat niet bestaat, de werkplek las een token-sleutel die
+niemand zet (wie geen kantoorsessie had kwam er nooit in), de printknop op het
+tafel-QR-blad zat op een geweigerde handler, en de coach-vraagbalk op de PDA had
+geen `id` waardoor de cursor er nooit in belandde.
+
+Regel voor dit bestand: vind je een nieuw soort stille fout, dan komt er een
+scanner bij. En een scanner die roept bij dingen die kloppen is erger dan geen
+scanner -- dus liever iets milder dan valse alarmen.
 
 ## Datamap instelbaar (RTG_DATA_DIR)
 

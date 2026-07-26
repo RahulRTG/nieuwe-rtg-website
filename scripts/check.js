@@ -29,6 +29,10 @@ loop(path.join(ROOT, 'server'), /\.js$/, f => {
 });
 if (!fouten) ok('alle server-bestanden compileren');
 
+/* Deze regel kijkt alleen in de .html-bestanden, want dat is de snelle
+   keuring. De volledige variant staat in test/blindevlek.test.js (toets 6): die
+   kijkt ook in de JS die HTML opbouwt, en juist daar zat het geval dat hier
+   jarenlang doorheen glipte. */
 console.log('2) geen inline on-handlers in de HTML (nonce-CSP)');
 let inline = 0;
 loop(path.join(ROOT, 'public'), /\.html$/, f => {
@@ -181,6 +185,46 @@ console.log('\n11) bedradings-contract: aangeroepen accounts.<methode> bestaat a
     }
   } catch (e) { contractFout++; fout('kon het accounts-contract niet controleren: ' + e.message); }
   if (!contractFout) ok('alle aangeroepen accounts-methoden bestaan als export');
+}
+
+/* 12) elk inline script op een pagina is geldige JS.
+
+   Deze regel bestaat door twee echte fouten die maandenlang meeliepen zonder
+   dat iets ze zag:
+
+   - kantoren.html: een eerdere ronde plakte de link- en scriptregel van het
+     desktopframe MIDDEN IN een JS-string. Het sluitende scripttag-teken in die
+     regel beëindigde het inline script van de pagina, waarna de rest van het
+     bestand als platte tekst in beeld kwam.
+   - hangar.html: een ternair zonder dubbele punt. Het hele script draaide
+     nooit; de pagina bleef eeuwig op "Laden...".
+
+   Beide gevallen kwamen door geen enkele toets: de suite draait op de server,
+   en dit is stuk in de browser. We knippen het blok op precies de manier waarop
+   een HTML-lezer dat doet (tot het EERSTE sluitende scripttag-teken) en laten
+   de JS-lezer erover. new Function() ontleedt zonder uit te voeren. */
+console.log('\n12) inline scripts op pagina\'s zijn geldige JS');
+{
+  let stuk = 0;
+  const paginas2 = [];
+  loop(path.join(ROOT, 'public'), /\.html$/, f => paginas2.push(f));
+  const OPEN = /<script(?![^>]*\bsrc=)[^>]*>/gi;
+  for (const f of paginas2) {
+    const t = fs.readFileSync(f, 'utf8');
+    const laag = t.toLowerCase();
+    OPEN.lastIndex = 0;
+    let m;
+    while ((m = OPEN.exec(t))) {
+      const start = m.index + m[0].length;
+      const eind = laag.indexOf('</scr' + 'ipt>', start);
+      const regel = t.slice(0, start).split('\n').length;
+      if (eind < 0) { stuk++; fout(path.relative(ROOT, f) + ' regel ' + regel + ': inline script wordt nooit gesloten'); break; }
+      try { new Function(t.slice(start, eind)); }
+      catch (e) { stuk++; fout(path.relative(ROOT, f) + ' regel ' + regel + ': inline script is geen geldige JS -- ' + e.message.slice(0, 80)); }
+      OPEN.lastIndex = eind;
+    }
+  }
+  if (!stuk) ok(paginas2.length + ' pagina\'s: elk inline script ontleedt zonder fout');
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

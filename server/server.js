@@ -2930,3 +2930,9 @@ for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
   // landt, ook als dit vangnet toch nog vuurt.
   setTimeout(() => process.exit(0), Number(process.env.RTG_STOP_GRACE_MS || 20000)).unref();
 });
+
+/* Naar buiten toe is dit een startscript, geen module: niets require't
+   server.js. Toch geven we de app mee, zodat een gereedschap (scripts/
+   routekaart.js) de ECHT geregistreerde routes kan uitlezen in plaats van ze
+   uit de broncode te raden. Alleen lezen; de app draait al. */
+module.exports = { app, server };

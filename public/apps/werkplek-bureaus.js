@@ -41,9 +41,17 @@
   };
   var VOLGORDE = ['atelier', 'studio', 'hardware', 'architect', 'redactie', 'ideeen'];
 
+  /* De sleutel van dit huis, op EEN plek. De server (routes/werkplek.js) laat
+     je binnen op een kantoorsessie of op je eigen RTG-account; dat laatste is er
+     juist voor wie geen kantoorsessie heeft. Hier stond 'rtg_token', een naam
+     die niemand in het systeem zet -- drie keer overgeschreven, en daarom drie
+     keer niet opgevallen. */
+  function sleutel() {
+    try { return localStorage.getItem('rtg_office_token') || localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; }
+  }
+
   function api(pad, body) {
-    var token = null;
-    try { token = localStorage.getItem('rtg_token') || localStorage.getItem('rtg_office_token'); } catch (e) {}
+    var token = sleutel();
     return fetch('/api/werkplek/bureau' + pad, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token || '') },
@@ -61,9 +69,7 @@
     vak.innerHTML = '<div class="leeg">Laden...</div>';
     fetch('/api/werkplek/bureaus', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (function () {
-        try { return localStorage.getItem('rtg_token') || localStorage.getItem('rtg_office_token') || ''; } catch (e) { return ''; }
-      })() },
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sleutel() },
       body: JSON.stringify({ bedrijf: code })
     }).then(function (r) { return r.json(); }).then(function (d) {
       var per = {};
@@ -172,9 +178,7 @@
     var doel = paneel.querySelector('#bPlank');
     fetch('/api/werkplek/plank', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (function () {
-        try { return localStorage.getItem('rtg_token') || localStorage.getItem('rtg_office_token') || ''; } catch (e) { return ''; }
-      })() },
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sleutel() },
       body: JSON.stringify({ bedrijf: code })
     }).then(function (r) { return r.json(); }).then(function (d) {
       var p = d.producten || [];

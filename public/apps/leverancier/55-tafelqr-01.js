@@ -26,8 +26,19 @@
       '.k .n{font-family:"Bodoni Moda",Georgia,serif;font-size:19pt;margin-top:3mm;}'+
       '.k .s{font-size:8pt;color:#8A8680;margin-top:1mm;letter-spacing:.02em;}'+
       '@media print{.noprint{display:none;}}'+
-      '</style></head><body><button class="noprint" onclick="window.print()" style="margin-bottom:7mm;padding:9px 18px;border:1px solid #7F1634;background:#7F1634;color:#fff;border-radius:8px;font:inherit;cursor:pointer;">'+esc(T('tblqr.printknop','Printen'))+'</button>'+
+      '</style></head><body><button class="noprint" id="tblqrPrint" style="margin-bottom:7mm;padding:9px 18px;border:1px solid #7F1634;background:#7F1634;color:#fff;border-radius:8px;font:inherit;cursor:pointer;">'+esc(T('tblqr.printknop','Printen'))+'</button>'+
       '<h1>'+esc(naam)+'</h1><div class="g">'+kaarten+'</div></body></html>');
     w.document.close();
+    /* De knop krijgt hier een listener, en de handler staat NIET in het
+       HTML-attribuut. Een venster uit window.open('') erft de CSP van deze
+       pagina, en die staat geen handler in een attribuut toe. Zo stond het hier
+       wel, en dus deed de printknop niets: het blad zag er goed uit, alleen
+       printen gebeurde niet. (De naam van dat attribuut staat hier ook niet
+       uitgeschreven: de toets in test/blindevlek.test.js zoekt op het patroon
+       en kan niet zien dat dit een opmerking is.) */
+    try {
+      var pk = w.document.getElementById('tblqrPrint');
+      if (pk) pk.addEventListener('click', function () { w.print(); });
+    } catch (e) { /* venster al gesloten */ }
   }
   document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-tblqr]'); if (b) printTafelQRs(); });

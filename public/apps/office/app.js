@@ -27,7 +27,12 @@
   var WERK = PAR.get('werk') || '';
   var BEDRIJF = (PAR.get('bedrijf') || '').toLowerCase();
   var opzet = WERK === 'werkplek'
-    ? { basis: '/api/werkplek/kantoorpakket/', tokenKey: 'rtg_token',
+    /* Twee sleutels, in deze volgorde: de werkplek gaat open op een
+       kantoorsessie OF op het eigen RTG-account (zo komt een RTF-medewerker
+       zonder kantoorsessie ook binnen; zie routes/werkplek.js). Hier stond een
+       sleutel die nergens gezet wordt, en dan bleef de drive van dit huis leeg
+       zonder dat er iets misging in beeld. */
+    ? { basis: '/api/werkplek/kantoorpakket/', tokenKey: ['rtg_office_token', 'rtg_member_token'],
         chip: BEDRIJF === 'rtf' ? 'RTFoundation-kantoor' : 'RTG-kantoor',
         terug: '/apps/werkplek.html', mijnKop: 'Documenten van dit huis',
         leeg: 'Log eerst in en kies een werkplek.' }
@@ -46,7 +51,13 @@
   var rtfSess = (function () { if (WERK !== 'rtf') return null;
     try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); } catch (e) { return null; } })();
   var token = WERK === 'rtf' ? (rtfSess && rtfSess.token)
-    : (function () { try { return localStorage.getItem(opzet.tokenKey); } catch (e) { return null; } })();
+    : (function () {
+        var namen = [].concat(opzet.tokenKey);
+        for (var i = 0; i < namen.length; i++) {
+          try { var t = localStorage.getItem(namen[i]); if (t) return t; } catch (e) { return null; }
+        }
+        return null;
+      })();
 
   $('#terug').href = opzet.terug;
   $('#kopMijn').textContent = opzet.mijnKop;

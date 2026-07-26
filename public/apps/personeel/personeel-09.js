@@ -1,7 +1,11 @@
     const pct = totaal ? Math.round(klaar / totaal * 100) : 0;
     const label = { fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--soft)' };
 
-    const coachInp = E('input', { placeholder: coachRef ? T('pd.tr.askctx', 'Vraag over deze tafel... bijv. waar let ik op?') : T('pd.tr.ask', 'Vraag de coach... bijv. hoe stel ik een wijn voor?') });
+    /* De id hoort hier te staan. Wie op een trage tafel tikt, komt via
+       personeel-04.js in dit tabblad en dat zoekt #coachVraag op om de cursor
+       er meteen in te zetten. Dat veld had geen id, dus die sprong deed niets
+       -- en niets viel op: het tabblad ging wel open. */
+    const coachInp = E('input', { id: 'coachVraag', placeholder: coachRef ? T('pd.tr.askctx', 'Vraag over deze tafel... bijv. waar let ik op?') : T('pd.tr.ask', 'Vraag de coach... bijv. hoe stel ik een wijn voor?') });
     const coachBtn = E('button', { onclick: async () => {
       const vraag = (coachInp.value || '').trim();
       if (!vraag) return;

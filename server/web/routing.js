@@ -28,6 +28,31 @@ function mountMatch(prefix, pn) {
   return null;
 }
 
+/* ---------- de volledige routekaart ----------
+   app._router.stack (zie web/index.js) geeft alleen de BOVENSTE laag, in de
+   express-vorm die kern/stuur.js verwacht. Dat is een half beeld: alles wat via
+   app.use('/api/foundation', router) of via een voorvoegsel-hulpje hangt staat
+   er niet in. Wie op dat halve beeld toetst, meldt kloppende paden als kapot.
+
+   Deze functie loopt de mounts wel na en geeft elk ECHT pad terug met zijn
+   methode. Ze leest alleen; er verandert niets aan het routeren zelf. */
+function leesLagen(lagen, voorvoegsel) {
+  const uit = [];
+  for (const l of lagen) {
+    if (l.mount) {
+      const kind = l.fn && l.fn._stack;
+      if (!Array.isArray(kind)) continue;                 // gewone middleware
+      const p = l.prefix === '/' ? '' : String(l.prefix || '');
+      for (const r of leesLagen(kind, voorvoegsel + p)) uit.push(r);
+      continue;
+    }
+    if (typeof l.pad !== 'string') continue;              // RegExp-pad: niet te noemen
+    const pad = (voorvoegsel + l.pad).replace(/\/+$/, '') || '/';
+    uit.push({ pad, methode: l.method || 'ALL' });
+  }
+  return uit;
+}
+
 /* ---------- een router (ook de app is er een) ---------- */
 function maakRouter() {
   const lagen = [];
@@ -80,6 +105,7 @@ function maakRouter() {
   const router = function (req, res, next) { handle(req, res, next || (() => {})); };
   router._stack = lagen;
   router._handle = handle;
+  router._routes = function (voorvoegsel) { return leesLagen(lagen, voorvoegsel || ''); };
 
   router.use = function (arg0, ...rest) {
     if (typeof arg0 === 'string') {
@@ -102,4 +128,4 @@ function maakRouter() {
 }
 
 
-module.exports = { maakRouter, padNaar };
+module.exports = { maakRouter, padNaar, leesLagen };

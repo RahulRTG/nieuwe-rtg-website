@@ -14,8 +14,13 @@
     return (window.RTGGlyf && RTGGlyf.svgHTML) ? RTGGlyf.svgHTML(String(naam || ''), {}) : '';
   };
 
+  /* Welke sleutel hier hoort: de server (routes/werkplek.js) laat je binnen op
+     een KANTOORsessie of op je eigen RTG-account -- juist omdat een medewerker
+     van RTF vaak geen kantoorsessie heeft. Hier stond 'rtg_token', en die naam
+     zet niemand in het hele systeem; dat viel niet op omdat er een tweede
+     poging achter stond. Wie geen kantoorsessie had, kwam er dus nooit in. */
   var token = null;
-  try { token = localStorage.getItem('rtg_token') || localStorage.getItem('rtg_office_token'); } catch (e) {}
+  try { token = localStorage.getItem('rtg_office_token') || localStorage.getItem('rtg_member_token'); } catch (e) {}
 
   function api(pad, body) {
     return fetch('/api/werkplek/' + pad, {

@@ -46,10 +46,18 @@
 
   var css =
     /* het paneel rechtsonder; de rest van het scherm blijft van het werk */
-    'body.hv-bureau .hv-balk{left:auto;right:1rem;bottom:1rem;width:min(30rem,42vw);border:1px solid var(--gold,#857007);' +
-    'border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.5);}' +
-    'body.hv-bureau .hv-chat{left:auto;right:1rem;bottom:4.6rem;width:min(30rem,42vw);border:1px solid #2a2a28;' +
-    'border-radius:14px;}' +
+    'body.hv-bureau .hv-balk{left:auto;right:1rem;bottom:1rem;width:var(--hv-breed,min(30rem,42vw));' +
+    'border:1px solid var(--gold,#857007);border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.5);}' +
+    'body.hv-bureau .hv-chat{left:auto;right:1rem;bottom:4.6rem;width:var(--hv-breed,min(30rem,42vw));' +
+    'border:1px solid #2a2a28;border-radius:14px;}' +
+    /* verplaatst: dan telt de eigen plek en niet meer de hoek rechtsonder */
+    'body.hv-bureau.hv-verzet .hv-balk{right:auto;bottom:auto;left:var(--hv-x);top:calc(var(--hv-y) + var(--hv-hoog));}' +
+    'body.hv-bureau.hv-verzet .hv-chat{right:auto;bottom:auto;left:var(--hv-x);top:var(--hv-y);' +
+    'max-height:var(--hv-hoog) !important;height:var(--hv-hoog);}' +
+    /* de greep om groter en kleiner te slepen, rechtsonder in het gesprek */
+    '.hv-maat{position:absolute;right:0;bottom:0;width:1.1rem;height:1.1rem;cursor:nwse-resize;' +
+    'background:linear-gradient(135deg,transparent 45%,#4a4744 45%,#4a4744 55%,transparent 55%);z-index:3;}' +
+    'body:not(.hv-bureau) .hv-maat{display:none;}' +
     'body.hv-bureau .hv-chat[data-stand="scherm"]{right:0;width:100%;border-radius:0;}' +
     /* op een bureaublad hoeft er onder de pagina geen strook vrij te blijven:
        het paneel zweeft in de hoek en dekt geen inhoud af die je nodig hebt */
@@ -77,6 +85,103 @@
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   if (bureau) document.body.classList.add('hv-bureau');
+
+  /* ---------- de middenconsole: verplaatsen en van maat veranderen ----------
+
+     Op een telefoon hoort de balk onderaan te zitten, punt. Op een bureaublad
+     is hij een console: iemand met twee monitoren en een planning open wil hem
+     links, iemand anders rechtsonder. Plek en maat blijven staan, per toestel.
+
+     De console beweegt als GEHEEL: het gesprek en de balk eronder horen bij
+     elkaar. Daarom zet dit de linkerbovenhoek en de hoogte van het gesprek, en
+     hangt de balk daar met CSS onder. */
+  var PLEK = 'rtg_hv_console';
+  var plek = null;
+  try { plek = JSON.parse(localStorage.getItem(PLEK) || 'null'); } catch (e) { plek = null; }
+
+  function pasPlekToe() {
+    if (!bureau || !plek) return;
+    var st2 = document.documentElement.style;
+    st2.setProperty('--hv-x', plek.x + 'px');
+    st2.setProperty('--hv-y', plek.y + 'px');
+    st2.setProperty('--hv-breed', plek.b + 'px');
+    st2.setProperty('--hv-hoog', plek.h + 'px');
+    document.body.classList.add('hv-verzet');
+  }
+  function zetPlek(x, y, b, h) {
+    var maxB = Math.min(root.innerWidth - 40, 900), maxH = Math.min(root.innerHeight - 120, 900);
+    plek = {
+      b: Math.max(280, Math.min(b, maxB)),
+      h: Math.max(140, Math.min(h, maxH)),
+      x: 0, y: 0
+    };
+    plek.x = Math.max(6, Math.min(x, root.innerWidth - plek.b - 6));
+    plek.y = Math.max(6, Math.min(y, root.innerHeight - plek.h - 70));
+    pasPlekToe();
+    try { localStorage.setItem(PLEK, JSON.stringify(plek)); } catch (e) {}
+  }
+  function huidig() {
+    var c = kamer.vak.getBoundingClientRect();
+    return plek || { x: c.left, y: c.top, b: c.width, h: Math.max(140, c.height) };
+  }
+
+  /* Slepen aan de greep van het gesprek verplaatst de console. De greep zelf
+     regelt ook de standen (half/vol); daar zit een drempel van 18 px op voor
+     verticaal slepen, dus we nemen hier alleen het HORIZONTALE gebaar over als
+     dat duidelijk het grootste is. Anders zouden de twee elkaar bijten. */
+  function haakSleep() {
+    var greep = root.RTGChatScherm && root.RTGChatScherm.greep;
+    if (!greep || greep.__hvSleep) return false;
+    greep.__hvSleep = true;
+    var neer = null;
+    greep.addEventListener('pointerdown', function (e) {
+      if (!bureau || (e.target.closest && e.target.closest('button'))) return;
+      var h = huidig();
+      neer = { x: e.clientX, y: e.clientY, bx: h.x, by: h.y, b: h.b, h: h.h, uit: false };
+    });
+    greep.addEventListener('pointermove', function (e) {
+      if (!neer || !bureau) return;
+      var dx = e.clientX - neer.x, dy = e.clientY - neer.y;
+      if (!neer.uit) {
+        if (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy)) return;  // verticaal: dat zijn de standen
+        neer.uit = true;
+      }
+      zetPlek(neer.bx + dx, neer.by + dy, neer.b, neer.h);
+      e.preventDefault();
+    });
+    var los = function () { neer = null; };
+    greep.addEventListener('pointerup', los);
+    greep.addEventListener('pointercancel', los);
+
+    // de maat-greep rechtsonder in het gesprek
+    var maat = document.createElement('div');
+    maat.className = 'hv-maat';
+    maat.setAttribute('aria-hidden', 'true');
+    maat.title = 'Groter of kleiner slepen';
+    kamer.vak.appendChild(maat);
+    var mneer = null;
+    maat.addEventListener('pointerdown', function (e) {
+      if (!bureau) return;
+      var h = huidig();
+      mneer = { x: e.clientX, y: e.clientY, b: h.b, h: h.h, bx: h.x, by: h.y };
+      try { maat.setPointerCapture(e.pointerId); } catch (er) {}
+      e.stopPropagation();
+    });
+    maat.addEventListener('pointermove', function (e) {
+      if (!mneer) return;
+      zetPlek(mneer.bx, mneer.by, mneer.b + (e.clientX - mneer.x), mneer.h + (e.clientY - mneer.y));
+      e.preventDefault();
+    });
+    maat.addEventListener('pointerup', function () { mneer = null; });
+    return true;
+  }
+  pasPlekToe();
+  if (!haakSleep()) {
+    var hp = 0;
+    var ht = setInterval(function () { if (haakSleep() || ++hp > 20) clearInterval(ht); }, 100);
+  }
+  // het venster kleiner maken mag de console niet buiten beeld duwen
+  root.addEventListener('resize', function () { if (plek) zetPlek(plek.x, plek.y, plek.b, plek.h); });
 
   /* ---------- de sneltoets ----------
      Ctrl/Cmd+K is de toets die iedereen al kent van zoeken. handenvrij-balk.js

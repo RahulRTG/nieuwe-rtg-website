@@ -1230,3 +1230,45 @@ Server: kern/notities.js (maakNotities, met de agenda als tweede argument
 voor de koppeling) + routes/notities.js. Client: apps/notities.html +
 apps/notities/app.js. Tests: notities.test.js (3) en notities.e2e.js met
 twee leden door het echte scherm.
+
+## RTG Bestanden: de versleutelde kluis
+
+De vierde app van de reeks, en de eerste die echt bytes bewaart. De regel
+uit server/media.js is hier wet geworden: bytes staan ALTIJD versleuteld
+op schijf (kluis.versleutelBuf), in de database staat alleen een korte
+verwijzing. Zonder de sleutel is de opslagmap onleesbaar.
+
+**De kluis.** Mappen die nesten (en bij weghalen hun inhoud netjes een
+niveau omhoog laten vallen -- er verdwijnt niets stiekem), een eerlijk
+quotum van 200 MB per lid met een dunne meter die de prullenbak
+meetelt, zoeken over alles heen, sorteren, sterren bovenaan. Slepen naar
+het scherm is uploaden.
+
+**Grote bestanden gaan in stukken.** De globale JSON-grens is 8 MB; alles
+daarboven gaat als reeks base64-stukken (upstart/updeel/upklaar) en loopt
+aan het eind door DEZELFDE upload-poort: zelfde grenzen, zelfde quotum.
+Een upload die tien minuten stilvalt wordt opgeruimd.
+
+**Versies.** Elke nieuwe upload op hetzelfde bestand schuift de oude opzij
+(max 10, de oudste valt er met bytes en al af). Terugzetten gooit niets
+weg: de huidige versie wordt zelf een versie. Wie de versie plaatste
+staat erbij -- op codenaam.
+
+**Delen op codenaam.** De ander kijkt, downloadt en plaatst nieuwe
+versies; mappen, prullenbak, ster en verder delen blijven van de
+eigenaar. Het quotum blijft ook bij een gedeelde versie dat van de
+eigenaar. Echte namen komen nergens in het verkeer voor (getest).
+
+**De prullenbak is een la met een klok.** Weg is eerst prullenbak
+(herstellen kan 30 dagen, lui geveegd bij elke lijst-aanroep); pas de
+tweede keer weg -- of leegmaken -- ruimt de bytes van alle versies echt op.
+
+**De Office-spiegel.** Documenten uit RTG Office staan als alleen-lezen
+rij in de kluis, met een link naar de Office-app: kijken kan hier,
+werken doet u daar. Niets wordt dubbel opgeslagen.
+
+Server: kern/bestanden.js (basis: opslag, mappen, upload, quotum) +
+kern/bestanden-delen.js (delen, versies, prullenbak) +
+kern/bestanden-stukken.js (grote bestanden) + routes/bestanden.js.
+Client: apps/bestanden.html + apps/bestanden/ (app, paneel). Tests:
+bestanden.test.js (5) en bestanden.e2e.js met twee leden door het scherm.

@@ -18,7 +18,7 @@ const DAGSELECTIE = 25;              // de eindige dagselectie
 const CLIPS_PER_MAKER = 100;
 const REACTIES_MAX = 200;
 
-function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseToOffice }) {
+function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseToOffice, eigenTrack }) {
   const id = () => 'c' + crypto.randomBytes(5).toString('hex');
   const nu = () => new Date().toISOString();
   const aanwezigheid = new Map();     // clipId -> ts van de laatste hartslag
@@ -32,7 +32,7 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
   const clipMet = cid => db.data.clips.find(c => c.id === String(cid || '')) || null;
   const online = c => Date.now() - (aanwezigheid.get(c.id) || 0) < AANWEZIG_TTL_MS;
   // de studio: knippen, geluid en ondertitels (kern/clips-studio.js)
-  const studio = require('./clips-studio')({ db, save, schoon, clipMet });
+  const studio = require('./clips-studio')({ db, save, schoon, clipMet, eigenTrack });
 
   /* ---- maken en weghalen: alleen metadata, het beeld blijft thuis ---- */
   function maak(key, data) {

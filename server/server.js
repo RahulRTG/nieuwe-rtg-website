@@ -2553,8 +2553,15 @@ Object.assign(kern, require('./kern/navigatie').maakNavigatie({
    toestel van de maker staan (OPFS); RTG bewaart enkel titel, affiche en
    het signaal-doorgeefluik. De feed is een eindige dagselectie, bewust
    zonder oneindige scroll. Na sociaal gemount (codenamen). */
+/* RTG Studio: zelf muziek maken. Alles wordt opgewekt, niets gesampled -- zie
+   kern/muziek-instrumenten.js. Daardoor zit er geen licentie van een ander in
+   wat een lid maakt, en mag zijn eigen stuk wel onder zijn eigen clip. */
+Object.assign(kern, require('./kern/muziek')({ db, save, crypto, schoon }));
+kern.muziekRahul = require('./kern/muziek-rahul')({ schoonTrack: kern.muziekSchoonTrack });
 Object.assign(kern, require('./kern/clips').maakClips({
-  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, sseToCustomer, sseToOffice
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, sseToCustomer, sseToOffice,
+  // eigen muziek mag onder een eigen clip; de muziekmodule toetst het eigendom
+  eigenTrack: kern.muziekEigenTrack
 }));
 /* RTG Office (kern/office.js): het eigen kantoorpakket. Documenten
    (tekstdocument of rekenblad) op het account, alleen-lezen te delen op
@@ -2707,6 +2714,7 @@ require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);
 require('./routes/huis')(kern);
+require('./routes/muziek')(kern);
 require('./routes/atelierweb')(kern);
 require('./routes/webmaker')(kern);
 require('./routes/journalistiek')(kern);

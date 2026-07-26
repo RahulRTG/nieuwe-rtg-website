@@ -25,14 +25,21 @@
    de kijker die hem aanzet, niet wij.
 
    Wat hier NIET komt: een muziekbibliotheek. We hebben geen rechten op muziek en
-   doen dus niet alsof. "stil" en "stem" zijn eerlijk; een lijstje nepdeuntjes
-   zou dat niet zijn. */
+   doen dus niet alsof.
+
+   WEL: JE EIGEN MUZIEK. Sinds RTG Studio (kern/muziek.js) kan een lid zelf een
+   stuk maken waarin geen enkele licentie van een ander zit -- elke klank wordt
+   door de app opgewekt. Op zoiets hebben we de rechten wél, want ze zijn van de
+   maker. Daarom is er een vierde antwoord bijgekomen: "muziek", en die geldt
+   ALLEEN met een stuk dat van jou is en dat je zelf klaar noemde. De toets
+   daarvoor staat in de muziekmodule, niet hier: wie eigenaar is, weet de
+   eigenaar-module. */
 
 const CUES_MAX = 200;        // ondertitelregels per clip
 const CUE_TEKST = 120;       // tekens per regel; langer leest niemand in beeld
-const GELUID = ['eigen', 'stil', 'stem'];
+const GELUID = ['eigen', 'stil', 'stem', 'muziek'];
 
-module.exports = ({ db, save, schoon, clipMet }) => {
+module.exports = ({ db, save, schoon, clipMet, eigenTrack }) => {
   const getal = (v) => { const n = Number(v); return Number.isFinite(n) ? n : null; };
   const mijn = (key, cid) => {
     const c = clipMet(cid);
@@ -77,18 +84,30 @@ module.exports = ({ db, save, schoon, clipMet }) => {
     return { status: 200, ok: true, regels: uit.length, ondertitels: uit };
   }
 
-  /* Wat de kijker gaat horen. Drie eerlijke antwoorden en geen vierde:
-       eigen -- het geluid van de opname zelf
-       stil  -- deze clip is gemaakt om zonder geluid te bekijken
-       stem  -- er ligt een gesproken toelichting overheen (die reist net als het
-                beeld rechtstreeks van het toestel van de maker naar de kijker) */
-  function geluid(key, cid, soort) {
+  /* Wat de kijker gaat horen. Vier eerlijke antwoorden:
+       eigen  -- het geluid van de opname zelf
+       stil   -- deze clip is gemaakt om zonder geluid te bekijken
+       stem   -- er ligt een gesproken toelichting overheen (die reist net als het
+                 beeld rechtstreeks van het toestel van de maker naar de kijker)
+       muziek -- een stuk dat u ZELF in RTG Studio maakte
+
+     Dat laatste is streng: het stuk moet van u zijn en door u klaar genoemd.
+     Kan de muziekmodule dat niet bevestigen, dan weigeren we -- liever een
+     nette weigering dan een clip met muziek waarvan niemand weet van wie ze is. */
+  function geluid(key, cid, soort, muziekId) {
     const { c, fout } = mijn(key, cid); if (fout) return fout;
     const s = String(soort || '').toLowerCase();
-    if (!GELUID.includes(s)) return { status: 400, error: 'Kies: eigen, stil of stem.' };
+    if (!GELUID.includes(s)) return { status: 400, error: 'Kies: eigen, stil, stem of muziek.' };
+    if (s === 'muziek') {
+      const t = eigenTrack ? eigenTrack(key, muziekId) : null;
+      if (!t) return { status: 400, error: 'Kies een eigen stuk uit RTG Studio dat u klaar hebt gemeld.' };
+      c.muziek = { id: t.id, naam: t.naam, bpm: t.bpm };
+    } else {
+      delete c.muziek;
+    }
     c.geluid = s;
     save();
-    return { status: 200, ok: true, geluid: s };
+    return { status: 200, ok: true, geluid: s, muziek: c.muziek || null };
   }
 
   /* Wat de feed per clip meekrijgt. `ondertiteld` staat er los van de regels
@@ -96,7 +115,7 @@ module.exports = ({ db, save, schoon, clipMet }) => {
      op te halen. */
   function studioBeeld(c) {
     const on = Array.isArray(c.ondertitels) ? c.ondertitels : [];
-    return { knip: c.knip || null, geluid: c.geluid || 'eigen',
+    return { knip: c.knip || null, geluid: c.geluid || 'eigen', muziek: c.muziek || null,
       ondertiteld: on.length > 0, ondertitels: on,
       speelduurS: c.knip ? Math.round((c.knip.tot - c.knip.van) * 10) / 10 : c.duurS };
   }

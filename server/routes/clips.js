@@ -63,7 +63,7 @@ module.exports = (kern) => {
   });
   app.post('/api/clips/geluid', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, clipsGeluid(req.session.key, req.body.id, req.body.soort));
+    stuur(res, clipsGeluid(req.session.key, req.body.id, req.body.soort, req.body.muziek));
   });
 
   // kantoor: meldingen zien en een kaart weghalen (het beeld stond nooit bij RTG)

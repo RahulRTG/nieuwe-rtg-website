@@ -785,3 +785,58 @@ doen dus niet alsof; `stil` en `stem` zijn eerlijk, een lijstje nepdeuntjes niet
 Bewezen: `test/clips.test.js` (9, waarvan 4 nieuw) en
 `test/clips-studio.e2e.js` (scherm: knippen, geluid, ondertitels, het filter
 gezien door een kijker).
+
+### RTG Klankwerk: zelf muziek maken
+
+Vorige ronde weigerde Clips een muziekbibliotheek: we hebben geen rechten op
+muziek en gaan niet doen alsof. Dat liet een gat achter, en Klankwerk vult het
+van de andere kant: **muziek die een lid zelf maakt, is van dat lid** -- en mag
+dus wél onder zijn clip.
+
+**De vertaling van FL Studio.** Wat die programma's groot maakt zijn
+samplepakketten en plug-ins, en die kunnen we geen van beide meeleveren: geen
+rechten, en de CSP laat niets van een vreemde server binnen. Dus wordt élke
+klank door de app zelf opgewekt, uit oscillatoren en ruis, in dezelfde klanktaal
+als RTG Sound. Dat is geen uitgeklede versie -- het is precies wat maakt dat er
+geen licentie van iemand anders in je werk zit.
+
+| FL Studio | Klankwerk |
+|---|---|
+| Channel Rack | het raster: kanalen x 16 stappen per maat |
+| Piano roll | de notenrol, twee octaven rond het instrument |
+| Mixer | volume, links-rechts en stil per kanaal |
+| Samplepakketten en plug-ins | tien vaste instrumenten, alle opgewekt |
+| Export | eigen WAV-schrijver, offline uitgerekend |
+| -- | Rahul, die een voorstel neerzet dat je zelf plaatst |
+
+**Drie regels die hier niet onderhandelbaar zijn.**
+
+1. **Alles wordt opgewekt, niets wordt geleend.** Zie hierboven. Het maakt de
+   koppeling met Clips mogelijk: `geluid: 'muziek'` geldt alleen met een stuk dat
+   van jou is én dat je zelf klaar noemde. De eigendomstoets staat in de
+   muziekmodule, niet in Clips -- wie eigenaar is, weet de eigenaar-module.
+2. **De AI zet neer, jij bent de maker.** Rahul levert noten en stappen in
+   hetzelfde formaat als je eigen werk: je ziet ze, je haalt de helft weg, je
+   schuift de rest op. Nooit een kant-en-klaar bestand. Daarom zit de
+   muziekkennis (toonladders, akkoordreeksen, drumfiguren) in de módule en niet
+   in de prompt: de studio doet het net zo goed zonder AI-sleutel, en met Claude
+   erbij mag hij alleen kiezen en variëren binnen wat er staat. Zijn antwoord
+   gaat langs dezelfde keuring als handwerk.
+3. **Het stuk is een handvol getallen.** Welke stap, welke toon, hoe lang. Klein,
+   leesbaar, mee te nemen. Wat er klinkt rekent je eigen toestel uit.
+
+**Eén planner, twee gebruiken.** Afspelen en exporteren lopen door dezelfde
+functie; de context is live of offline. Daardoor *kan* het bestand niet anders
+klinken dan wat je hoorde. Twee aparte paden zouden vroeg of laat uit elkaar
+lopen, en dan levert "opnemen" iets anders op dan "afspelen".
+
+**Wat er niet in zit.** Geen teller wie de meeste stukken maakt, geen uitgelichte
+lijst, geen aanmoediging om vandaag nog iets te maken: een instrument hoort te
+wachten tot je het pakt. En een onbekend instrument levert géén kanaal op -- er
+stilletjes een kick van maken zou betekenen dat je iets anders hoort dan je
+vroeg, en dan is een fout van Rahul onhoorbaar én verkeerd.
+
+Bewezen: `test/muziek.test.js` (9) en `test/klankwerk.e2e.js` (scherm: raster,
+notenrol, Rahul, en een offline gerenderde WAV waarin nagemeten wordt dat er
+werkelijk signaal zit -- een studio die er goed uitziet maar stil blijft is geen
+studio).

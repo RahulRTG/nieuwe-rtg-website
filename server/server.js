@@ -1091,6 +1091,12 @@ const {
 // laat-gebonden: de leden-kern (De Salon) mag nu de vriendschap tussen kijker en
 // auteur nakijken, zodat je een bericht van een vriend altijd ziet
 lidDeps.zijnVrienden = zijnVrienden;
+/* De pro-laag over de agenda (kern/agenda-pro.js): kalenderbereik met
+   herhalingen, uitnodigen op codenaam, herinneringen, ICS-export en de
+   alleen-lezen laag met eigen RTG-boekingen. Ligt hier omdat hij
+   codenaamVan uit de sociale kern nodig heeft. */
+Object.assign(agenda, require('./kern/agenda-pro').maakAgendaPro({
+  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
 function geenGast(req, res) {
   // vrienden toevoegen, chatten en bellen kan met elk echt account, ook de
   // gratis laag (met paspoort). Alleen een anonieme demo-gast zonder account niet.

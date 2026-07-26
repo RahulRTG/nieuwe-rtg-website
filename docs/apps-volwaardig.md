@@ -1158,3 +1158,45 @@ office.test.js test 12 (verplicht + sluiten, server-kant), en de twee
 e2e's doen het door de echte schermen -- kopiëren/plakken/Ctrl+Z en
 doorvoeren in het blad; de verplichte vraag, de balkjes, de grepen,
 dupliceren en Ctrl+Z in formulier en schets.
+
+## RTG Agenda: van lijstje naar een kalender van wereldklasse
+
+De boardroom had al een lijst-agenda met AI-invoer; dit is de ronde waarin
+hij een eigen app werd (/apps/agenda.html) die zich met de grote agenda's
+kan meten -- op de RTG-manier.
+
+**De kalender.** Maand (echt raster, maandag eerst, vandaag in goud), week
+en lijst. Afspraken hebben eindtijd, plek, notitie en HERHALING
+(dag/week/maand/jaar, tot een einddatum). De uitrol rekent elke keer vanaf
+de basisdatum: een maandafspraak op de 31e klemt in september op de 30e --
+zoals elke grote agenda -- maar staat in oktober gewoon weer op de 31e.
+Wie doorstapt vanaf de geklemde datum blijft voorgoed op de 30e hangen;
+die fout is hier gemaakt, door de test gevangen (agenda-pro test 1) en
+zit nu vastgeschroefd.
+
+**Uitnodigen op codenaam.** De genodigde krijgt een gekoppelde kopie in de
+eigen agenda en zegt ja of nee; de organisator ziet de stand per
+deelnemer. Wijzigt de organisator de tijd, dan schuiven de kopieën mee;
+verwijdert hij de afspraak, dan vervalt hij ook bij de genodigden (met
+een seintje). Een genodigde BEWERKT de afspraak niet -- die zegt ja of
+nee, meer zeggenschap hoort een uitnodiging niet te geven. Echte namen
+komen in het hele verkeer niet voor.
+
+**Herinneringen.** Zoveel minuten vooraf een seintje (SSE), via een
+veegtimer die elke halve minuut kijkt; bij herhalende afspraken per
+voorkomen ('herinnerdOp' onthoudt per datum). De timer is unref'd: hij
+houdt geen test wakker.
+
+**ICS-export.** De agenda ligt niet op een eiland: één knop en er ligt een
+.ics die in elke agenda ter wereld opent, met RRULE voor herhalingen en
+VALARM voor herinneringen. Tijden reizen bewust als lokale tijd.
+
+**De ecosysteem-laag.** Eigen RTG-boekingen (boekingenVanKlant) verschijnen
+goudgemarkeerd en alleen-lezen, met bronlabel "uit RTG": de agenda leest
+het ecosysteem, hij herschrijft het niet. En Rahul plant in gewone taal
+("proeverij morgen om 15:00") via de bestaande AI-route.
+
+Server: kern/agenda-pro.js + agenda-ics.js als laag óver kern/agenda.js
+(Object.assign in server.js; de bestaande /verwijder-route krijgt daarmee
+vanzelf de kopie-opruiming). Client: apps/agenda/ (kalender, paneel,
+app). Tests: agenda-pro.test.js (5) en agenda.e2e.js door het echte scherm.

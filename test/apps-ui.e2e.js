@@ -208,8 +208,15 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 
-    // naar het AI/concierge-scherm en een bericht met een XSS-payload sturen
-    await page.click('[data-tab="ai"]');
+    /* Naar het AI/concierge-scherm en een bericht met een XSS-payload sturen.
+
+       Let op de selector. '[data-tab="ai"]' raakt TWEE elementen: de knop in de
+       oude tabbalk (die in de OS-weergave verborgen is) en de tegel in het dock.
+       Playwright pakt de eerste, en die is onzichtbaar -- dan wacht de klik 30
+       seconden en valt de toets om op een timeout, terwijl er niets mis is met
+       de app. Zo stond het hier, en daarom faalde deze toets al langer. Dus:
+       expliciet de tegel in het dock. */
+    await page.click('.os-dock [data-tab="ai"]');
     const payload = '<img src=x onerror="window.__xss=1">';
     await page.fill('#askInput', payload);
     await page.click('#askBtn');

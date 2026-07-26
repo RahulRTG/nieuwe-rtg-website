@@ -49,8 +49,7 @@
   .invoer{display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--lijn);}
   .invoer .veld{flex:1;}
   .snapfull{max-width:100%;max-height:70vh;border-radius:10px;}
-  /* vuurtje (snap-streak) en dag-opdracht */
-  .vuurchip{background:#241f16;color:var(--goud2);border-radius:999px;padding:.05rem .45rem;font-size:.72rem;font-weight:700;margin-left:.35rem;white-space:nowrap;}
+  /* de dag-opdracht */
   .opkaart{display:flex;align-items:center;gap:.7rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:14px;padding:.7rem .9rem;margin:.4rem 0 .8rem;}
   .opkaart .em{font-size:1.6rem;}
   .opkaart .tx{flex:1;font-size:.9rem;line-height:1.35;}
@@ -258,7 +257,6 @@ async function laad(){
     belModus ? {class:'rij', style:{cursor:'pointer'}, onclick:()=>belModusDoe(c)} : {class:'rij'},
     E('span',{class:'av'}, initcn(c.codename)),
     E('div',{class:'nm'}, c.codename, c.unread ? E('span',{class:'badge'}, c.unread) : null,
-      c.vuurtje ? E('span',{class:'vuurchip', title:'Jullie vuurtje: '+c.vuurtje+' dagen op rij gesnapt'}, seizoenVuur()+' '+c.vuurtje) : null,
       E('small', null, (c.tier==='rtf'?'RTFoundation':'RTG') + (c.last?' · '+c.last:''))),
     E('button',{class:'knop mini', onclick:ev=>{ ev.stopPropagation(); openChat(c.key,c.codename); }}, 'Chat'),
     E('button',{class:'knop grijs mini', title:'Bellen', onclick:ev=>{ ev.stopPropagation(); belStart(c.key,c.codename,false); }}, '📞'),
@@ -443,7 +441,6 @@ const ST_FILTERS = [['geen','Geen'],['dag','Dagkleur'],['warm','Warm'],['zw','Zw
 const ST_KLEUREN = ['#F2E7C9','#E05B5B','#5FA56A','#5B8FE0','#111111'];
 const ST_EMOJIS = ['😄','😍','🔥','⭐','🎉','💛','🦊','👑'];
 function dagkleur(){ return (getComputedStyle(document.documentElement).getPropertyValue('--dag-kleur')||'').trim() || '#C9A24B'; }
-function seizoenVuur(){ return ({lente:'🌸',zomer:'🔥',herfst:'🍂',winter:'❄️'})[document.documentElement.getAttribute('data-seizoen')] || '🔥'; }
 function stTeken(){
   const cv=$('#stCv'), ctx=cv.getContext('2d'); if(!ST.img) return;
   ctx.save();
@@ -503,7 +500,7 @@ $('#stStuur').addEventListener('click', async ()=>{
     } else {
       const d=await soc('/snap/send', { toKey: snapNaar, foto, tekst });
       $('#studioOv').classList.remove('open');
-      meld(d.vuurtje>0 ? 'Snap verstuurd · jullie vuurtje: '+seizoenVuur()+' '+d.vuurtje : 'Snap verstuurd. Hij verdwijnt na het bekijken.');
+      meld('Snap verstuurd. Hij verdwijnt na het bekijken.');
       laad();
     }
   }catch(err){ alert(err.message); }

@@ -117,7 +117,7 @@ app.post('/api/member/snap/send', express.json({ limit: '1.5mb' }), auth, async 
   if (geenGast(req, res)) return;
   const r = await snapSturen(req.session.key, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true, vuurtje: r.vuurtje || 0 });
+  res.json({ ok: true });
 });
 app.post('/api/member/snaps', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ snaps: snapsVoor(req.session.key) }); });
 app.post('/api/member/snap/view', auth, async (req, res) => {

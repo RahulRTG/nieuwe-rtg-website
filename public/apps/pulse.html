@@ -103,7 +103,7 @@ async function laad(){
   // De Terugblik: jouw sociale week, om te vieren -- geen ranglijst
   $('#terugKnop').onclick=async()=>{ const box=$('#terugBox');
     if(box.hidden){ try{ const t=await wauw('terugblik',{});
-      box.innerHTML=''+esc(t.zin)+(t.week.vuurtjes?'  '+t.week.vuurtjes+' vuurtje(s) branden.':'')+(t.jarig?' En...  van harte gefeliciteerd!':'');
+      box.innerHTML=''+esc(t.zin)+(t.jarig?' En...  van harte gefeliciteerd!':'');
     }catch(e){ box.textContent=e.message; } }
     box.hidden=!box.hidden; };
   document.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{ SOORT=b.dataset.s; laad(); });

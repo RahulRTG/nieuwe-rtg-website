@@ -514,12 +514,18 @@ test('cross-app vrienden: RTF en RTG vinden elkaar op codenaam, chatten, snappen
   const stories = await json(await raw('/member/stories', {}, rtgTok));
   assert.ok(stories.stories.some(s => s.van === ouderCn), 'de RTG-vriend ziet het verhaal van de RTF-vriend');
 
-  // VUURTJE: RTG snapte al vandaag; snapt de ouder terug, dan telt de dag
+  /* GEEN VUURTJES: hier stond een snap-streak, en die is er bewust uit. Deze
+     toets houdt hem eruit. Een teller die dooft als je een dag niet komt maakt
+     van contact een verplichting, en dat is precies wat de huisregels van dit
+     project verbieden -- in de kinder-app nog een graad erger. */
   assert.equal((await raw('/rtf/social/snap/send', { code: g.code, token: g.token, toKey: verzoek.key, foto, tekst: 'terug' })).status, 200);
   const oc2 = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
-  assert.equal((oc2.connections.find(c => c.key === verzoek.key) || {}).vuurtje, 1, 'beide kanten snapten vandaag: het vuurtje staat op 1');
   const rc2 = await json(await raw('/member/connections', {}, rtgTok));
-  assert.equal((rc2.connections.find(c => c.key === ouderKey) || {}).vuurtje, 1, 'de RTG-kant ziet hetzelfde vuurtje');
+  for (const [naam, d] of [['RTF', oc2], ['RTG', rc2]]) {
+    for (const c of d.connections || []) {
+      assert.equal('vuurtje' in c, false, naam + ': een connectie draagt geen streak-teller');
+    }
+  }
 
   // DAG-OPDRACHT: er is elke dag een opdracht, en een inzending draagt de badge
   const op = await json(await raw('/rtf/social/opdracht', { code: g.code, token: g.token }));

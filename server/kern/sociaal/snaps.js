@@ -1,5 +1,5 @@
 /* Sociaal (deelmodule): snaps (een keer bekijken), 24-uurs verhalen,
-   vuurtjes (streaks) en de dag-opdracht. zijnVrienden komt via de context
+   en de dag-opdracht. zijnVrienden komt via de context
    binnen nadat kern/sociaal.js de vriendenlaag heeft gemount. */
 module.exports = (ctx) => {
 const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
@@ -29,29 +29,19 @@ function opschonenSnaps() {
   db.data.stories = db.data.stories.filter(s => (nu - new Date(s.at).getTime()) < STORY_TTL);
   if (voor !== db.data.snaps.length + db.data.stories.length) save();
 }
-/* ---------- vuurtjes: de snap-streak per vriendenpaar ----------
-   Snappen jullie allebei op dezelfde dag, dan telt die dag; elke
-   aaneengesloten dag groeit het vuurtje. Een dag missen dooft het. */
-function streaks() { if (!db.data.streaks) db.data.streaks = {}; return db.data.streaks; }
-const streakSleutel = (a, b) => [a, b].sort().join('|');
+/* ---------- de vuurtjes zijn eruit, en dat is een besluit ----------
+   Hier stond een snap-streak per vriendenpaar: snapten jullie allebei op
+   dezelfde dag, dan groeide het vuurtje, en een dag missen doofde het. Precies
+   het patroon dat de huisregels van dit huis verbieden -- een teller die alleen
+   omhoog gaat als je elke dag komt, maakt van contact een verplichting. Dat het
+   in de RTFoundation-app stond, bij kinderen, maakte het niet beter.
+
+   Wat blijft is de dag-opdracht hieronder: een uitnodiging ("iets geels"). Die
+   kost je niets als je hem overslaat, en dat is het verschil.
+
+   Oude installaties houden nog een dode db.data.streaks; er wordt niets meer
+   in geschreven en niets meer uit gelezen. */
 const dagVan = (t) => new Date(t || Date.now()).toISOString().slice(0, 10);
-function streakBijwerken(van, naar) {
-  const st = streaks();
-  const s = st[streakSleutel(van, naar)] || (st[streakSleutel(van, naar)] = { count: 0, laatste: null, dag: null, kanten: [] });
-  const vandaag = dagVan();
-  if (s.dag !== vandaag) { s.dag = vandaag; s.kanten = []; }
-  if (!s.kanten.includes(van)) s.kanten.push(van);
-  if (s.kanten.length === 2 && s.laatste !== vandaag) {
-    s.count = (s.laatste === dagVan(Date.now() - 86400000)) ? s.count + 1 : 1;
-    s.laatste = vandaag;
-  }
-}
-function streakVan(a, b) {
-  const s = streaks()[streakSleutel(a, b)];
-  if (!s || !s.laatste) return 0;
-  // na een gemiste dag is het vuurtje gedoofd
-  return (s.laatste === dagVan() || s.laatste === dagVan(Date.now() - 86400000)) ? s.count : 0;
-}
 
 /* ---------- de dag-opdracht: elke dag een snap-uitdaging voor iedereen ---------- */
 const OPDRACHTEN = [
@@ -88,10 +78,9 @@ async function snapSturen(van, naar, foto, tekst) {
   db.data.snaps.push(snap);
   // over de bovengrens? de oudste (weggeknipte) snaps ook van schijf halen
   if (db.data.snaps.length > 2000) { db.data.snaps.slice(0, db.data.snaps.length - 2000).forEach(wisFoto); db.data.snaps = db.data.snaps.slice(-2000); }
-  streakBijwerken(van, naar); // het vuurtje groeit als jullie allebei vandaag snappen
   save();
   sseToCustomer(naar, 'social', { kind: 'snap', from: codenaamVan(van) });
-  return { status: 200, ok: true, vuurtje: streakVan(van, naar) };
+  return { status: 200, ok: true };
 }
 // binnengekomen snaps voor 'mij' (alleen dat er een is, nog niet de foto)
 function snapsVoor(mij) {
@@ -138,5 +127,5 @@ async function verhaalBekijken(mij, id) {
   return { status: 200, foto: await media.leesDataUrl(s.foto), tekst: s.tekst, van: codenaamVan(s.van), at: s.at, opdracht: s.opdracht || null };
 }
 
-return { geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, streakVan };
+return { geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht };
 };

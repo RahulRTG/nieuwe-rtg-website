@@ -67,9 +67,9 @@ const ctx = { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, 
 const deelVrienden = require('./sociaal/vrienden')(ctx);
 Object.assign(ctx, deelVrienden);
 const deelSnaps = require('./sociaal/snaps')(ctx);
-Object.assign(ctx, deelSnaps); // o.a. streakVan, dat de vriendenlaag laat-gebonden gebruikt
+Object.assign(ctx, deelSnaps);
 const { kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur } = deelVrienden;
-const { geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, streakVan } = deelSnaps;
+const { geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht } = deelSnaps;
 
-  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, streakVan };
+  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht };
 };

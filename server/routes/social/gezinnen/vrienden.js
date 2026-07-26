@@ -80,7 +80,7 @@ app.post('/api/rtf/social/snap/send', express.json({ limit: '1.5mb' }), async (r
   const s = rtfSociaal(req, res); if (!s) return;
   const r = await snapSturen(s.handle, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true, vuurtje: r.vuurtje || 0 });
+  res.json({ ok: true });
 });
 app.post('/api/rtf/social/snaps', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ snaps: snapsVoor(s.handle) }); });
 app.post('/api/rtf/social/snap/view', async (req, res) => {

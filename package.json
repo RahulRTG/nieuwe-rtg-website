@@ -26,6 +26,7 @@
     "audit": "npm audit --audit-level=high",
     "secrets": "node scripts/geheimen.js",
     "e2e": "node --experimental-sqlite --test test/*.e2e.js",
+    "test:pg": "node --experimental-sqlite --test --test-concurrency=1 test/pg.test.js test/pgaccounts.test.js test/chaos.pg.test.js test/leden-gids-pg.test.js test/txledger.pg.test.js test/grand-integratie.pg.test.js test/sloophamer.pg.test.js",
     "icons": "node scripts/icons.js"
   },
   "optionalDependencies": {

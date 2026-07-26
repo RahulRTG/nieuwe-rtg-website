@@ -42,58 +42,20 @@
   // meteen: de poort spreekt de taal van de gekozen ingang (?pas=...)
   stemKoppen();
 
-  const loginForm = document.getElementById('loginForm');
-  if (loginForm) loginForm.addEventListener('submit', e => {
-    e.preventDefault();
-    login(null, { u: $('#liUser').value, p: $('#liPass').value });
-  });
-  const regForm = document.getElementById('regForm');
-  if (regForm) regForm.addEventListener('submit', e => {
-    e.preventDefault();
-    login(null, { register: true, tier: regTier, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, geboortedatum: $('#rgGeb').value, p: $('#rgPass').value });
-  });
-  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
-  function showGateForm(which){
-    ['#loginForm','#regForm','#forgotForm','#resetForm'].forEach(sel => { const f=$(sel); if(f) f.style.display='none'; });
-    const map = { login:'#loginForm', register:'#regForm', forgot:'#forgotForm', reset:'#resetForm' };
-    const f = $(map[which]); if (f) f.style.display = 'flex';
-    if (toReg) toReg.style.display = which==='login' ? '' : 'none';
-    if (toForgot) toForgot.style.display = which==='login' ? '' : 'none';
-    if (toLogin) toLogin.style.display = which==='login' ? 'none' : '';
-  }
-  if (toReg) toReg.addEventListener('click', () => { regTier = 'rtg'; showGateForm('register'); updateRegKop(); });
-  if (toForgot) toForgot.addEventListener('click', () => showGateForm('forgot'));
-  if (toLogin) toLogin.addEventListener('click', () => showGateForm('login'));
-  const forgotForm = document.getElementById('forgotForm');
-  if (forgotForm) forgotForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    try { await API.call('/auth/forgot', { email: $('#fgEmail').value }); }
-    catch (e2){ /* stil, geen bestaan lekken */ }
-    toast(T('gate.forgotsent','Als dit e-mailadres bekend is, sturen we een herstel-link.'));
-    showGateForm('login');
-  });
-  // wachtwoord-herstel: de link uit de e-mail komt hier binnen (?reset=)
-  let resetToken = null;
-  const resetForm = document.getElementById('resetForm');
-  if (resetForm) resetForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    try {
-      await API.call('/auth/reset', { token: resetToken, code: $('#rsCode').value, password: $('#rsPass').value });
-      toast(T('gate.resetok','Wachtwoord aangepast. Log in met uw nieuwe wachtwoord.'));
-      showGateForm('login');
-    } catch (e2){ toast(e2.message || 'Herstel mislukt.'); }
-  });
-  // bevestigings- en herstel-links uit de e-mail afhandelen (voorheen het
-  // aparte ledenportaal; het grote scherm zit nu gewoon in de pas-apps zelf)
-  (function handleAuthLinks(){
-    const q = new URLSearchParams(location.search);
-    if (q.get('verify')){
-      API.call('/auth/verify-email', { token: q.get('verify') })
-        .then(() => toast(T('gate.verified','Uw e-mailadres is bevestigd.')))
-        .catch(() => toast(T('gate.verifyfail','Bevestigingslink ongeldig of verlopen.')))
-        .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
-    }
-    if (q.get('reset')){ resetToken = q.get('reset'); showGateForm('reset'); }
+  /* De poort is een gesprek met Rahul (zie app-main-06): inloggen, aanmelden en
+     wachtwoord-herstel gaan alle drie via dat gesprek. De oude formulieren
+     (loginForm/regForm/forgotForm/resetForm met hun wisselknoppen) staan niet
+     meer in app.html; hun afhandeling hoort hier dus ook niet meer te staan. Wat
+     blijft, zijn de LINKS uit de e-mail: die komen los van de poort binnen. */
+  (function bevestigEmailLink(){
+    const token = new URLSearchParams(location.search).get('verify');
+    if (!token) return;
+    API.call('/auth/verify-email', { token })
+      .then(() => toast(T('gate.verified','Uw e-mailadres is bevestigd.')))
+      .catch(() => toast(T('gate.verifyfail','Bevestigingslink ongeldig of verlopen.')))
+      // alleen ?verify= uit het adres halen; ?reset= NIET aanraken, want de poort
+      // van Rahul (app-main-04/05) leest die parameter hierna zelf nog
+      .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
   })();
 
   async function login(tier, cred){

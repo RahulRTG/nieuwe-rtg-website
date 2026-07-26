@@ -300,6 +300,31 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
 De tests draaien in een tijdelijke datamap (`RTG_DATA_DIR`) en raken de echte
 data nooit aan.
 
+### De Postgres-toetsen (`npm run test:pg`)
+
+Zeven toetsen bewijzen de meerdere-instances-kant: de gedeelde store, de
+accountsspiegel, gelijktijdige schrijvers, de Postgres-ledengids, het
+transactie-grootboek, en twee zware integratietoetsen (GRAND en SLOOPHAMER) met
+twee servers op één Postgres plus één Redis-bus. Zonder `DATABASE_URL` slaan ze
+netjes over; met een database erbij:
+
+```bash
+DATABASE_URL=postgres://postgres@127.0.0.1:5433/rtgtest \
+REDIS_URL=redis://127.0.0.1:6380 npm run test:pg
+```
+
+Twee dingen die hier eerder misgingen, en waarom het script bestaat:
+
+- **De poort stond te lang dicht.** `test/pg.test.js` en `test/pgaccounts.test.js`
+  wachtten ook op het NPM-pakket `pg`, terwijl de code al lang op onze eigen
+  pgwire-client draait. Die toetsen sloegen dus ALTIJD over, ook met een echte
+  database ernaast -- acht toetsen die niets bewaakten. De wachtstand is eruit.
+- **Ze willen de database voor zichzelf.** Meerdere PG-toetsen droppen en maken
+  dezelfde tabellen, en `node --test` draait bestanden parallel. Dan trekt de een
+  de tabel onder de ander weg en krijg je spookfouten die niets met de code te
+  maken hebben. Vandaar `--test-concurrency=1` in het script (of geef elke toets
+  een eigen database).
+
 ### De blinde vlek (`test/blindevlek.test.js`)
 
 Alle andere toetsen draaien op de **server**. Ze bewijzen dat de endpoints
@@ -326,7 +351,11 @@ Dit bestand jaagt daarom op **klassen** van stille fout, niet op gevallen:
 7. geen handler in een HTML-attribuut -- de nonce-CSP weigert die, dus zo'n knop
    ziet er goed uit en doet niets. Ook in JS die HTML opbouwt, en ook in een
    venster uit `window.open('')`: dat erft de CSP van de pagina;
-8. er wordt niet gezocht naar een element dat nergens bestaat.
+8. er wordt niet gezocht naar een element dat nergens bestaat. Deze lijst met
+   uitzonderingen is nu **leeg**: de vier resten van de oude inlogformulieren van
+   de leden-app (regForm, toReg, toLogin, resetForm) zijn opgeruimd nu de poort
+   een gesprek met Rahul is. Wat hier bij zou moeten, is in principe code die weg
+   mag.
 
 Bij het schrijven vonden 3, 6, 7 en 8 elk een echte fout: RTG Kantoren had een
 scherm in de lijst dat niet bestaat, de werkplek las een token-sleutel die

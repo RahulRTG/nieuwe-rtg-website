@@ -1,7 +1,6 @@
-/* Integratietest voor de PostgreSQL-opslag (server/pg.js).
-   Draait alleen als DATABASE_URL is gezet en het pakket 'pg' beschikbaar is;
-   anders wordt de hele suite netjes overgeslagen (zoals op een CI zonder
-   database). Lokaal draaien tegen een test-database:
+/* Integratietest voor de PostgreSQL-opslag (server/pg/). Draait alleen als
+   DATABASE_URL is gezet; anders wordt de hele suite netjes overgeslagen (zoals
+   op een CI zonder database). Lokaal draaien tegen een test-database:
      DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtgtest \
        node --test test/pg.test.js
 
@@ -9,15 +8,23 @@
    app-processen voor. We controleren: gedeelde lees/schrijf, de 3-weg-merge bij
    gelijktijdige schrijvers naar dezelfde collectie (geen overschrijven),
    duurzaamheid over een verse verbinding, en versleuteling-at-rest op schijf. */
+/* LET OP -- deze toets vraagt de database VOOR ZICHZELF. Verschillende
+   PG-toetsen maken en droppen dezelfde tabellen (kv, tx_ledger, users), en
+   `node --test` draait bestanden standaard PARALLEL: dan trekt de een de tabel
+   onder de ander weg en zie je "spookfouten" die niets met de code te maken
+   hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
+   eigen database). */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+/* Alleen DATABASE_URL is nodig. De oude poort stond ook op het NPM-pakket 'pg'
+   te wachten, maar server/pg draait al lang op onze eigen pgwire-client (zero
+   dependencies) -- die wachtstand liet deze integratietest dus altijd
+   overslaan, ook met een echte database ernaast. */
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
-let heeftPg = false;
-try { require.resolve('pg'); heeftPg = true; } catch (e) {}
 
-if (!URL || !heeftPg) {
-  test('postgres-opslag (overgeslagen: geen DATABASE_URL of pg-pakket)', { skip: true }, () => {});
+if (!URL) {
+  test('postgres-opslag (overgeslagen: geen DATABASE_URL)', { skip: true }, () => {});
 } else {
   const { merge3 } = require('../server/db');
   const { maakPg } = require('../server/pg');

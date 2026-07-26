@@ -173,25 +173,12 @@
     return true;
   }
 
-  /* ---------- login & tabs ---------- */
-
-  // De gratis (bestel/betaal) laag is alleen te gebruiken na registratie met een
-  // paspoort. De gratis-knop opent daarom het registratieformulier, niet een
-  // anonieme sessie. De betaalde passen (demo) loggen wel direct in.
-  let regTier = 'rtg';
-  function updateRegKop(){
-    const el = $('#regKop'); if (!el) return;
-    el.textContent = regTier === 'guest'
-      ? T('gate.reg.free','Gratis account met paspoort: bestel en betaal bij partners, bekijk De Salon en solliciteer. Geen betaalde pas.')
-      : T('gate.reg.paid','Maak uw RTG-account aan. Aanmelden gebeurt met uw paspoort (geboortedatum).');
-    const btn = $('#regForm button[type="submit"]');
-    if (btn) btn.textContent = regTier === 'guest' ? T('gate.reg.freebtn','Gratis account aanmaken') : T('gate.createacc','Account aanmaken');
-  }
-  document.querySelectorAll('[data-login]').forEach(b =>
-    b.addEventListener('click', () => {
-      if (b.dataset.login === 'guest'){ regTier = 'guest'; showGateForm('register'); updateRegKop(); }
-      else login(b.dataset.login);
-    }));
+  /* ---------- login & tabs ----------
+     De poort zelf is een gesprek met Rahul (app-main-06); die roept login()
+     aan met de gegevens uit het gesprek. De oude keuzeknoppen per pas
+     ([data-login]) en de kop boven het registratieformulier bestaan niet meer,
+     dus staat er hier ook geen bediening meer voor. De gratis laag blijft wat
+     hij was: alleen na aanmelden met een paspoort, nooit een anonieme sessie. */
 
   /* ---------- eigen app per pas, geen brede app ----------
      Elke betaalde pas heeft zijn eigen ingang (pas-rtg/lifestyle/business.html)
@@ -213,10 +200,6 @@
     const tl = document.getElementById('touchLink');
     if (tl) tl.href = '/icons/pas-' + vastePas + '-192.png';
     document.title = { rtg:'RTG Pass', lifestyle:'RTG Lifestyle Pass', business:'RTG Business Pass' }[vastePas];
-    // in de RTG-app mag ook de gratis ingang (minder functies); elders alleen de eigen pas
-    const mag = vastePas === 'rtg' ? ['rtg','guest'] : [vastePas];
-    document.querySelectorAll('[data-login]').forEach(b => { if (!mag.includes(b.dataset.login)) b.style.display = 'none'; });
-    regTier = vastePas;
   } else {
 
     // de ene poort: het scherm blijft kaal (alleen inloggen, aanmelden en
@@ -225,7 +208,6 @@
     document.title = 'RTG, log in';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
-    regTier = 'rtg';
   }
 
   /* ---------- pas-thema (kleuren van de website) ----------
@@ -321,58 +303,20 @@
   // meteen: de poort spreekt de taal van de gekozen ingang (?pas=...)
   stemKoppen();
 
-  const loginForm = document.getElementById('loginForm');
-  if (loginForm) loginForm.addEventListener('submit', e => {
-    e.preventDefault();
-    login(null, { u: $('#liUser').value, p: $('#liPass').value });
-  });
-  const regForm = document.getElementById('regForm');
-  if (regForm) regForm.addEventListener('submit', e => {
-    e.preventDefault();
-    login(null, { register: true, tier: regTier, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, geboortedatum: $('#rgGeb').value, p: $('#rgPass').value });
-  });
-  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
-  function showGateForm(which){
-    ['#loginForm','#regForm','#forgotForm','#resetForm'].forEach(sel => { const f=$(sel); if(f) f.style.display='none'; });
-    const map = { login:'#loginForm', register:'#regForm', forgot:'#forgotForm', reset:'#resetForm' };
-    const f = $(map[which]); if (f) f.style.display = 'flex';
-    if (toReg) toReg.style.display = which==='login' ? '' : 'none';
-    if (toForgot) toForgot.style.display = which==='login' ? '' : 'none';
-    if (toLogin) toLogin.style.display = which==='login' ? 'none' : '';
-  }
-  if (toReg) toReg.addEventListener('click', () => { regTier = 'rtg'; showGateForm('register'); updateRegKop(); });
-  if (toForgot) toForgot.addEventListener('click', () => showGateForm('forgot'));
-  if (toLogin) toLogin.addEventListener('click', () => showGateForm('login'));
-  const forgotForm = document.getElementById('forgotForm');
-  if (forgotForm) forgotForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    try { await API.call('/auth/forgot', { email: $('#fgEmail').value }); }
-    catch (e2){ /* stil, geen bestaan lekken */ }
-    toast(T('gate.forgotsent','Als dit e-mailadres bekend is, sturen we een herstel-link.'));
-    showGateForm('login');
-  });
-  // wachtwoord-herstel: de link uit de e-mail komt hier binnen (?reset=)
-  let resetToken = null;
-  const resetForm = document.getElementById('resetForm');
-  if (resetForm) resetForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    try {
-      await API.call('/auth/reset', { token: resetToken, code: $('#rsCode').value, password: $('#rsPass').value });
-      toast(T('gate.resetok','Wachtwoord aangepast. Log in met uw nieuwe wachtwoord.'));
-      showGateForm('login');
-    } catch (e2){ toast(e2.message || 'Herstel mislukt.'); }
-  });
-  // bevestigings- en herstel-links uit de e-mail afhandelen (voorheen het
-  // aparte ledenportaal; het grote scherm zit nu gewoon in de pas-apps zelf)
-  (function handleAuthLinks(){
-    const q = new URLSearchParams(location.search);
-    if (q.get('verify')){
-      API.call('/auth/verify-email', { token: q.get('verify') })
-        .then(() => toast(T('gate.verified','Uw e-mailadres is bevestigd.')))
-        .catch(() => toast(T('gate.verifyfail','Bevestigingslink ongeldig of verlopen.')))
-        .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
-    }
-    if (q.get('reset')){ resetToken = q.get('reset'); showGateForm('reset'); }
+  /* De poort is een gesprek met Rahul (zie app-main-06): inloggen, aanmelden en
+     wachtwoord-herstel gaan alle drie via dat gesprek. De oude formulieren
+     (loginForm/regForm/forgotForm/resetForm met hun wisselknoppen) staan niet
+     meer in app.html; hun afhandeling hoort hier dus ook niet meer te staan. Wat
+     blijft, zijn de LINKS uit de e-mail: die komen los van de poort binnen. */
+  (function bevestigEmailLink(){
+    const token = new URLSearchParams(location.search).get('verify');
+    if (!token) return;
+    API.call('/auth/verify-email', { token })
+      .then(() => toast(T('gate.verified','Uw e-mailadres is bevestigd.')))
+      .catch(() => toast(T('gate.verifyfail','Bevestigingslink ongeldig of verlopen.')))
+      // alleen ?verify= uit het adres halen; ?reset= NIET aanraken, want de poort
+      // van Rahul (app-main-04/05) leest die parameter hierna zelf nog
+      .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
   })();
 
   async function login(tier, cred){

@@ -343,13 +343,12 @@ test('BLINDE VLEK: geen handler in een HTML-attribuut (die weigert de CSP)', () 
    opzet: negen meldingen, waarvan vijf onzin). Wat overblijft is precies de
    drift: een naam die NERGENS anders staat dan bij het opzoeken zelf. */
 test('BLINDE VLEK: er wordt niet gezocht naar een element dat nergens bestaat', () => {
-  /* Bekende uitzonderingen, met reden. Dit zijn de resten van de oude
-     inlogformulieren van de leden-app; die poort is vervangen door het gesprek
-     met Rahul, en app.html heeft die velden niet meer. De aanroepen zijn alle
-     vier afgeschermd, dus er gaat niets stuk -- het is dode code die bij de
-     volgende opruimronde weg mag. Ze staan hier MET naam zodat de toets nieuwe
-     drift blijft zien; de lijst hoort te krimpen, niet te groeien. */
-  const BEKEND = new Set(['regForm', 'toReg', 'toLogin', 'resetForm']);
+  /* Geen uitzonderingen meer. Hier stonden vier resten van de oude
+     inlogformulieren van de leden-app (regForm, toReg, toLogin, resetForm); die
+     poort is vervangen door het gesprek met Rahul en die dode afhandeling is
+     opgeruimd. Laat deze verzameling leeg: elke naam die hier bij zou moeten,
+     is in principe code die weg mag. */
+  const BEKEND = new Set();
 
   const bestanden = loop(PUB, /\.(js|html)$/).filter(f => !rel(f).startsWith('public/dist'));
   const OPZOEK = /(?:getElementById\(\s*['"]([A-Za-z][\w-]*)['"]\s*\)|querySelector(?:All)?\(\s*['"]#([A-Za-z][\w-]*)['"]\s*\))/g;

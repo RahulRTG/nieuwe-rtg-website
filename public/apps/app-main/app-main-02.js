@@ -55,25 +55,12 @@
     return true;
   }
 
-  /* ---------- login & tabs ---------- */
-
-  // De gratis (bestel/betaal) laag is alleen te gebruiken na registratie met een
-  // paspoort. De gratis-knop opent daarom het registratieformulier, niet een
-  // anonieme sessie. De betaalde passen (demo) loggen wel direct in.
-  let regTier = 'rtg';
-  function updateRegKop(){
-    const el = $('#regKop'); if (!el) return;
-    el.textContent = regTier === 'guest'
-      ? T('gate.reg.free','Gratis account met paspoort: bestel en betaal bij partners, bekijk De Salon en solliciteer. Geen betaalde pas.')
-      : T('gate.reg.paid','Maak uw RTG-account aan. Aanmelden gebeurt met uw paspoort (geboortedatum).');
-    const btn = $('#regForm button[type="submit"]');
-    if (btn) btn.textContent = regTier === 'guest' ? T('gate.reg.freebtn','Gratis account aanmaken') : T('gate.createacc','Account aanmaken');
-  }
-  document.querySelectorAll('[data-login]').forEach(b =>
-    b.addEventListener('click', () => {
-      if (b.dataset.login === 'guest'){ regTier = 'guest'; showGateForm('register'); updateRegKop(); }
-      else login(b.dataset.login);
-    }));
+  /* ---------- login & tabs ----------
+     De poort zelf is een gesprek met Rahul (app-main-06); die roept login()
+     aan met de gegevens uit het gesprek. De oude keuzeknoppen per pas
+     ([data-login]) en de kop boven het registratieformulier bestaan niet meer,
+     dus staat er hier ook geen bediening meer voor. De gratis laag blijft wat
+     hij was: alleen na aanmelden met een paspoort, nooit een anonieme sessie. */
 
   /* ---------- eigen app per pas, geen brede app ----------
      Elke betaalde pas heeft zijn eigen ingang (pas-rtg/lifestyle/business.html)
@@ -95,10 +82,6 @@
     const tl = document.getElementById('touchLink');
     if (tl) tl.href = '/icons/pas-' + vastePas + '-192.png';
     document.title = { rtg:'RTG Pass', lifestyle:'RTG Lifestyle Pass', business:'RTG Business Pass' }[vastePas];
-    // in de RTG-app mag ook de gratis ingang (minder functies); elders alleen de eigen pas
-    const mag = vastePas === 'rtg' ? ['rtg','guest'] : [vastePas];
-    document.querySelectorAll('[data-login]').forEach(b => { if (!mag.includes(b.dataset.login)) b.style.display = 'none'; });
-    regTier = vastePas;
   } else {
 
     // de ene poort: het scherm blijft kaal (alleen inloggen, aanmelden en
@@ -107,7 +90,6 @@
     document.title = 'RTG, log in';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
-    regTier = 'rtg';
   }
 
   /* ---------- pas-thema (kleuren van de website) ----------

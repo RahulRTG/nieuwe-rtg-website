@@ -1110,6 +1110,9 @@ const bestanden = require('./kern/bestanden').maakBestanden({
    alleen WebRTC-seinen door, beeld en geluid lopen peer-to-peer. */
 const meet = require('./kern/meet').maakMeet({
   db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer });
+/* RTG Galerij (kern/galerij.js): leest De Salon en RTG Bestanden; albums
+   en favorieten zijn verwijzingen, nooit kopieen van de bytes. */
+const galerij = require('./kern/galerij').maakGalerij({ db, save, crypto, schoon });
 function geenGast(req, res) {
   // vrienden toevoegen, chatten en bellen kan met elk echt account, ook de
   // gratis laag (met paspoort). Alleen een anonieme demo-gast zonder account niet.
@@ -1982,7 +1985,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, facturatie, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, facturatie, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
@@ -2743,6 +2746,7 @@ require('./routes/agenda')(kern);
 require('./routes/notities')(kern);
 require('./routes/bestanden')(kern);
 require('./routes/meet')(kern);
+require('./routes/galerij')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);

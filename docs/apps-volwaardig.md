@@ -1307,3 +1307,35 @@ met nepcamera's en bewijst de hele keten.
 Server: kern/meet.js + routes/meet.js. Client: apps/meet.html +
 apps/meet/ (app = lobby en SSE, kamer = mesh en scherm delen), plus de
 knop in apps/agenda/paneel.js. Tests: meet.test.js (3) en meet.e2e.js.
+
+## RTG Galerij: de tijdlijn is de kalender
+
+De zesde app van de reeks, en de lichtste: de galerij BEWAART niets. Hij
+leest twee bronnen die er al zijn -- de eigen Salon-posts met beeld en de
+afbeeldingen in RTG Bestanden -- en legt daar een dunne laag overheen.
+Snaps en verhalen horen er bewust niet in: die zijn vluchtig (24 uur, een
+keer kijken) en dat blijven ze.
+
+**De tijdlijn.** Per maand gegroepeerd, nieuwste eerst, sterren bovenaan
+in de kijker-lijst. Geen gezichtsherkenning, geen "slimme" volgorde: de
+galerij kijkt niet naar je foto's, hij toont ze alleen. Beelden uit de
+kluis laden lui (IntersectionObserver), pas als ze in beeld komen.
+
+**Albums en favorieten zijn verwijzingen** ({bron, id}), nooit kopieen
+van bytes. Een album weghalen laat elk beeld gewoon staan: een album is
+een verzameling, geen map. Twee keer hetzelfde beeld erin zetten blijft
+een verwijzing.
+
+**De terugblik.** Dezelfde maand in eerdere jaren, als rustige rij
+bovenaan -- een terugblik, geen pop-up en geen notificatie. Wie er niet
+naar kijkt, wordt er niet aan herinnerd.
+
+**De kijker.** Groot beeld, bladeren met pijlen (ook toetsenbord),
+favoriet, in een album zetten, en een diavoorstelling op rustig tempo
+die stopt bij elke eigen handeling: de kijker is de baas, niet de klok.
+
+Server: kern/galerij.js + routes/galerij.js (en dus automatisch door
+Rahul te bedienen via het stuur). Client: apps/galerij.html +
+apps/galerij/ (app = tijdlijn en albums, kijker = lightbox). Tests:
+galerij.test.js (3, incl. de Salon-integratie en "B ziet de beelden van
+A niet") en galerij.e2e.js door het echte scherm.

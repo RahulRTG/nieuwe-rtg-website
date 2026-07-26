@@ -264,3 +264,120 @@ test('zonder aanmelding geen genootschappen', async () => {
     assert.equal(r.status, 401, pad + ' hoort dicht te zitten');
   }
 });
+
+/* ---- ronde 5: inzicht zonder ranglijst, bijgepraat met een bodem, meenemen ---- */
+
+test('groepsinzicht is voor de beheerder, en telt de groep, niet de leden', async () => {
+  const a = await lid(), b = await lid();
+  const g = await json(await raw('/genootschap/richt-op', { naam: 'De Leeskring', soort: 'besloten' }, a.token));
+  const groep = g.groep.id;
+  await raw('/genootschap/nodig-uit', { groep, wie: b.codenaam }, a.token);
+  await raw('/genootschap/binnen', { groep }, b.token);
+
+  const p1 = await json(await raw('/genootschap/prik', { groep, tekst: 'Wie leest er mee?' }, a.token));
+  await raw('/genootschap/reageer', { groep, id: p1.bericht.id, tekst: 'Ik.' }, b.token);
+  await raw('/genootschap/prik', { groep, tekst: 'En deze blijft stil.' }, a.token);
+  await raw('/genootschap/prik', { groep, tekst: 'Welke avond?', keuzes: ['Vrijdag', 'Zaterdag'] }, a.token);
+  await raw('/genootschap/roep-bijeen', { groep, wat: 'Eerste avond', datum: morgen() }, a.token);
+  await raw('/genootschap/antwoord', { groep, id: (await json(await raw('/genootschap/agenda', { groep }, a.token))).komt[0].id, antwoord: 'ja' }, b.token);
+
+  const h = await json(await raw('/genootschap/gezondheid', { groep }, a.token));
+  assert.ok(h.ok, h.error);
+  assert.equal(h.groep.leden, 2);
+  assert.equal(h.prikbord.totaal, 3);
+  assert.equal(h.prikbord.reacties, 1);
+  assert.equal(h.prikbord.zonderReactie, 1, 'een bericht bleef stil, en dat is te zien');
+  assert.equal(h.actief.leden, 2, 'beide leden deden deze maand iets');
+  assert.equal(h.bijeenkomsten.komend, 1);
+
+  // geen ranglijst, geen namen, geen sleutels
+  const tekst = JSON.stringify(h);
+  assert.equal(tekst.includes(a.codenaam), false, 'geen codenaam bij de cijfers');
+  assert.equal(tekst.includes(b.codenaam), false);
+  // geen ranglijst: "actief" is een AANTAL, geen lijst van leden met scores
+  assert.equal(typeof h.actief.leden, 'number');
+  const lijsten = Object.values(h).filter(Array.isArray);
+  assert.deepEqual(lijsten, [], 'het inzicht bevat geen enkele lijst, dus ook geen top bijdragers');
+
+  // en een gewoon lid komt er niet in
+  const vreemd = await json(await raw('/genootschap/gezondheid', { groep }, b.token));
+  assert.ok(vreemd.error, 'alleen een beheerder ziet het inzicht');
+});
+
+test('bijgepraat heeft een bodem: als er niets is, zegt de app dat', async () => {
+  const a = await lid(), b = await lid();
+  const g = await json(await raw('/genootschap/richt-op', { naam: 'De Wandelclub', soort: 'besloten' }, a.token));
+  const groep = g.groep.id;
+  await raw('/genootschap/nodig-uit', { groep, wie: b.codenaam }, a.token);
+  await raw('/genootschap/binnen', { groep }, b.token);
+
+  await raw('/genootschap/prik', { groep, tekst: 'Zondag om tien uur.' }, a.token);
+  await raw('/genootschap/prik', { groep, tekst: 'Welke route?', keuzes: ['Duinen', 'Bos'] }, a.token);
+  await raw('/genootschap/roep-bijeen', { groep, wat: 'De zondagwandeling', datum: morgen() }, a.token);
+
+  const bij1 = await json(await raw('/genootschap/bijgepraat', { groep }, b.token));
+  assert.ok(bij1.ok, bij1.error);
+  assert.equal(bij1.nieuw, 2, 'twee berichten die B nog niet zag');
+  assert.equal(bij1.peilingen.length, 1, 'een peiling wacht nog op zijn stem');
+  assert.equal(bij1.bijeenkomsten.length, 1, 'en een bijeenkomst op zijn antwoord');
+  assert.equal(bij1.bij, false);
+
+  // alles afhandelen en het bezoek afsluiten
+  await raw('/genootschap/stem', { groep, id: bij1.peilingen[0].id, keuze: 0 }, b.token);
+  await raw('/genootschap/antwoord', { groep, id: bij1.bijeenkomsten[0].id, antwoord: 'ja' }, b.token);
+  const m = await json(await raw('/genootschap/gezien', { groep }, b.token));
+  assert.ok(m.ok && m.gezien);
+
+  const bij2 = await json(await raw('/genootschap/bijgepraat', { groep }, b.token));
+  assert.equal(bij2.bij, true, 'daarna is hij bij, en de app verzint er niets bij');
+  assert.equal(bij2.nieuw, 0);
+  assert.ok(/Je bent bij/.test(bij2.tekst));
+
+  // je eigen bericht telt niet als "gemist"
+  await raw('/genootschap/prik', { groep, tekst: 'Ik neem koffie mee.' }, b.token);
+  const bij3 = await json(await raw('/genootschap/bijgepraat', { groep }, b.token));
+  assert.equal(bij3.nieuw, 0, 'wat je zelf schreef heb je niet gemist');
+});
+
+test('je neemt je genootschap mee: alles voor de beheerder, je eigen inbreng voor elk lid', async () => {
+  const a = await lid(), b = await lid();
+  const g = await json(await raw('/genootschap/richt-op', { naam: 'De Kookclub', soort: 'geheim',
+    over: 'Wij koken.', regels: 'Niemand praat erover.' }, a.token));
+  const groep = g.groep.id;
+  await raw('/genootschap/nodig-uit', { groep, wie: b.codenaam }, a.token);
+  await raw('/genootschap/binnen', { groep }, b.token);
+  const p = await json(await raw('/genootschap/prik', { groep, tekst: 'Wat maken we?', keuzes: ['Vis', 'Vlees'] }, a.token));
+  await raw('/genootschap/reageer', { groep, id: p.bericht.id, tekst: 'Vis, graag.' }, b.token);
+  await raw('/genootschap/stem', { groep, id: p.bericht.id, keuze: 0 }, b.token);
+  await raw('/genootschap/roep-bijeen', { groep, wat: 'De proefavond', datum: morgen(), waar: 'Bij mij' }, a.token);
+
+  const alles = await json(await raw('/genootschap/uitvoer', { groep }, a.token));
+  assert.ok(alles.ok, alles.error);
+  assert.equal(alles.genootschap.naam, 'De Kookclub');
+  assert.equal(alles.leden.length, 2);
+  assert.equal(alles.prikbord.length, 1);
+  assert.equal(alles.prikbord[0].reacties.length, 1);
+  assert.equal(alles.prikbord[0].peiling.totaal, 1);
+  assert.equal(alles.agenda.length, 1);
+  assert.equal(/"key"|"vanKey"|"authorKey"/.test(JSON.stringify(alles)), false, 'geen sleutels in een uitvoer');
+  assert.equal(/@|Lid \d/.test(JSON.stringify(alles)), false, 'en geen echte namen of e-mailadressen');
+
+  // een gewoon lid krijgt het hele genootschap niet mee, zijn eigen inbreng wel
+  const geweigerd = await json(await raw('/genootschap/uitvoer', { groep }, b.token));
+  assert.ok(geweigerd.error, 'alleen een beheerder neemt het geheel mee');
+
+  const mijn = await json(await raw('/genootschap/mijn-uitvoer', { groep }, b.token));
+  assert.ok(mijn.ok, mijn.error);
+  assert.equal(mijn.berichten.length, 0, 'B schreef zelf geen bericht');
+  assert.equal(mijn.reacties.length, 1);
+  assert.equal(mijn.stemmen.length, 1);
+  assert.equal(mijn.stemmen[0].mijnKeuze, 'Vis');
+  assert.equal(mijn.ik.codenaam, b.codenaam);
+  assert.equal(JSON.stringify(mijn).includes('Wat maken we?') && JSON.stringify(mijn).includes(a.codenaam), false,
+    'van andere leden staat er niets in');
+
+  // en wie er niet in zit, komt er sowieso niet bij
+  const c = await lid();
+  const buiten = await json(await raw('/genootschap/mijn-uitvoer', { groep }, c.token));
+  assert.ok(buiten.error);
+});

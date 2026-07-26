@@ -2352,6 +2352,10 @@ kern.bijeenkomst = require('./kern/genootschap/bijeenkomst')({ db, save, codenaa
   notify, genootschap: kern.genootschap });
 kern.genootschapAI = require('./kern/genootschap/ai')({ anthropic, genootschap: kern.genootschap,
   prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
+kern.genootschapInzicht = require('./kern/genootschap/inzicht')({ db, save, genootschap: kern.genootschap,
+  prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
+kern.genootschapUitvoer = require('./kern/genootschap/uitvoer')({ genootschap: kern.genootschap,
+  codenaamVan: kern.codenaamVan });
 /* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
    archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */

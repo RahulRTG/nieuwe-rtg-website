@@ -96,7 +96,23 @@ test('Genootschap: oprichten, een bijeenkomst uitroepen en een peiling houden',
     const agenda = await page.evaluate(() => document.querySelector('#main').textContent);
     assert.ok(/Zeilgezelschap/.test(agenda), 'de groepsnaam staat bij de bijeenkomst');
 
-    // 8. de AI-balk staat er en we zijn nergens heen genavigeerd
+    // 8. bijgepraat heeft een bodem, en inzicht telt de groep zonder ranglijst
+    await page.click('[data-open]');
+    await page.waitForSelector('#bgezond', { timeout: 10000 });
+    await page.waitForFunction(() => {
+      const u = document.querySelector('#ubij');
+      return u && !/Kijken/.test(u.textContent);
+    }, null, { timeout: 10000 });
+    const bij = await page.evaluate(() => document.querySelector('#ubij').textContent);
+    assert.ok(/Je bent bij/.test(bij), 'alles is van jezelf, dus je bent bij: ' + bij);
+
+    await page.click('#bgezond');
+    await page.waitForFunction(() => /actief/.test(document.querySelector('#ugezond').textContent), null, { timeout: 10000 });
+    const gz = await page.evaluate(() => document.querySelector('#ugezond').textContent);
+    assert.ok(/zonder reactie/.test(gz), 'de enige score gaat over de groep: ' + gz.slice(0, 120));
+    assert.ok(/geen lijst van wie het meest/.test(gz), 'en het scherm zegt zelf waarom er geen ranglijst is');
+
+    // 9. de AI-balk staat er en we zijn nergens heen genavigeerd
     const balk = await page.evaluate(() => !!document.querySelector('#aiform'));
     assert.equal(balk, true);
     assert.equal(await page.evaluate(() => location.pathname), '/apps/genootschap.html');

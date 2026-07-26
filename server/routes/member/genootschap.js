@@ -6,7 +6,8 @@
    AI-taken in kern/genootschap/ai.js raken ze niet aan; die schrijven alleen
    tekst. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, geenGast, genootschap, genootschapBeheer, prikbord, bijeenkomst, genootschapAI } = kern;
+  const { app, auth, geenGast, genootschap, genootschapBeheer, prikbord, bijeenkomst, genootschapAI,
+    genootschapInzicht, genootschapUitvoer } = kern;
   const fout = (res, e) => res.status(400).json({ error: (e && e.message) || 'Er ging iets mis.' });
   const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
   const id = (req) => req.body.groep;
@@ -113,6 +114,35 @@ module.exports = (kern) => {
   app.post('/api/genootschap/afgelast', auth, (req, res) => {
     if (geenGast(req, res)) return;
     try { uit(res, bijeenkomst.afgelast(req.session, id(req), req.body.id, req.body.reden)); } catch (e) { fout(res, e); }
+  });
+
+  /* ---- inzicht, bijgepraat en meenemen: elders premium of moeilijk gemaakt ----
+     De grenzen zitten in de modules, niet hier: gezondheid is voor beheerders,
+     de volledige uitvoer ook, en je eigen inbreng is voor elk lid. Zo staat elke
+     grens op een plek. */
+  app.post('/api/genootschap/gezondheid', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, genootschapInzicht.gezondheid(req.session, id(req))); } catch (e) { fout(res, e); }
+  });
+
+  app.post('/api/genootschap/bijgepraat', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, genootschapInzicht.bijgepraat(req.session, id(req))); } catch (e) { fout(res, e); }
+  });
+
+  app.post('/api/genootschap/gezien', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, genootschapInzicht.markeer(req.session, id(req))); } catch (e) { fout(res, e); }
+  });
+
+  app.post('/api/genootschap/uitvoer', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, genootschapUitvoer.alles(req.session, id(req))); } catch (e) { fout(res, e); }
+  });
+
+  app.post('/api/genootschap/mijn-uitvoer', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, genootschapUitvoer.mijn(req.session, id(req))); } catch (e) { fout(res, e); }
   });
 
   // ---- Rahul: schrijft en telt, plaatst nooit ----

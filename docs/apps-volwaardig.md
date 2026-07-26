@@ -510,3 +510,41 @@ vakgenoten". Een spiegel mag informeren, niet porren.
 
 Bewezen: `test/salon-app.test.js` (14 toetsen) en `test/metier.test.js` (13),
 plus beide schermtoetsen.
+
+### Genootschap: de Facebook-kant
+
+Facebook is zelf gratis, dus "pro-functies" zijn hier iets anders: het gaat om
+wat er achter een abonnement zit (Meta Verified), wat je kunt kópen (bereik),
+wat alleen beheerders krijgen (Group Insights) en wat formeel gratis is maar met
+opzet moeilijk gemaakt (je gegevens downloaden). Wij geven de bruikbare helft weg
+en laten de trekkerige helft staan.
+
+| Functie | Waar |
+|---|---|
+| Groepsinzicht voor de beheerder: actieve leden, prikbord-ritme, bijeenkomsten | `kern/genootschap/inzicht.js` |
+| Hoeveel berichten **zonder reactie** bleven -- de enige score die over de groep gaat | `/api/genootschap/gezondheid` |
+| Bijgepraat: wat je miste, met een bodem ("Je bent bij") | `/api/genootschap/bijgepraat` |
+| Neem je genootschap mee: de hele groep, voor de beheerder | `kern/genootschap/uitvoer.js` |
+| Neem je eigen inbreng mee: voor elk lid, ook zonder beheerder te zijn | `/api/genootschap/mijn-uitvoer` |
+
+**Wat we bewust NIET overnemen, ook niet gratis:**
+
+- **De top-bijdragerslijst** die elders in datzelfde inzicht-scherm staat. Een
+  ranglijst maakt van meedoen een wedstrijd en van stilvallen een zichtbare
+  afgang. Je ziet dus HOEVEEL leden actief waren, nooit WIE het meest deed --
+  en de toets bewijst dat: het inzicht bevat geen enkele lijst.
+- **Bereik dat je kunt kopen.** Wie iets plaatst wordt door de leden gezien
+  omdat ze in het genootschap zitten, niet omdat er is bijbetaald.
+- **Een vinkje dat je kunt kopen.** Bevestiging komt bij ons uit een
+  gebeurtenis (`kern/eenaccount.js`: een personeels-PIN of een bedrijfsinlog),
+  niet uit een abonnement.
+- **Een feed die nooit ophoudt.** "Wat heb je gemist" is hier een korte lijst
+  met een einde. Een tijdlijn die zegt dat je bij bent, is een tijdlijn die je
+  laat gaan -- en dat is precies de bedoeling.
+
+Over de uitvoer: er gaan nooit echte namen en nooit sleutels in mee, ook niet in
+de beheerdersversie. Alles loopt op codenaam, en wat erin staat zag elk lid al.
+Zo is vertrekken goedkoop; een groep die alleen blijft omdat weggaan te duur is,
+is geen groep maar een slot.
+
+Bewezen: `test/genootschap.test.js` (14 toetsen) en `test/genootschap.e2e.js`.

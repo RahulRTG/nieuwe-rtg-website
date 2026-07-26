@@ -116,7 +116,16 @@
       (g.regels?'<p style="margin-top:.5rem;font-size:.82rem;line-height:1.5;color:var(--soft);"><b>Huisregels:</b> '+esc(g.regels)+'</p>':'')+
       '<div class="knoppen"><button class="knop stil" id="bterug" type="button">Terug</button>'+
       '<button class="knop stil" id="bleden" type="button">Leden</button>'+
-      '<button class="knop stil" id="bvertrek" type="button">Vertrekken</button></div></div>';
+      '<button class="knop stil" id="bmee" type="button">Neem mijn inbreng mee</button>'+
+      (g.mijnRol==='beheerder'?'<button class="knop stil" id="bgezond" type="button">Hoe staat het ervoor</button>'+
+        '<button class="knop stil" id="balles" type="button">Neem alles mee</button>':'')+
+      '<button class="knop stil" id="bvertrek" type="button">Vertrekken</button></div>'+
+      '<div class="uit" id="ugezond" hidden></div></div>';
+
+    /* Wat heb je gemist? Met een bodem: staat er niets, dan zegt de app dat, in
+       plaats van iets te verzinnen om je bezig te houden. */
+    html += '<div class="kaart" id="kbij"><h2>Sinds je laatste bezoek</h2>'+
+      '<div class="leeg" id="ubij">Kijken…</div></div>';
 
     html += '<div class="kaart"><h2>Bijeenkomsten</h2>'+
       ((agenda.komt||[]).length ? agenda.komt.map(function(x){
@@ -162,6 +171,34 @@
       (d.meer ? '<button class="knop stil" id="bmeer" type="button">Meer laden</button>' : (b.length?'<div class="leeg">Je bent bij.</div>':''))+
       '</div>';
     toon(html);
+    tekenBijgepraat(g.id);
+  }
+
+  /* Bijgepraat: een korte lijst met een einde. Geen teller die oploopt en geen
+     melding die je terughaalt -- je ziet het als je er zelf bent. */
+  function tekenBijgepraat(groep){
+    api('/genootschap/bijgepraat', { groep:groep }).then(function(d){
+      var u = $('#ubij'); if (!u) return;
+      if (d.error) { u.textContent = d.error; return; }
+      if (d.bij) { u.textContent = d.tekst; return; }
+      u.className = '';
+      u.innerHTML =
+        ((d.nieuw||d.nieuweReacties) ? '<p style="font-size:.88rem;line-height:1.55;">'+
+          (d.nieuw?d.nieuw+' nieuwe berichten':'')+(d.nieuw&&d.nieuweReacties?' · ':'')+
+          (d.nieuweReacties?d.nieuweReacties+' nieuwe reacties':'')+'</p>' : '')+
+        ((d.peilingen||[]).length ? '<p style="font-size:.84rem;color:var(--muted);margin-top:.4rem;">Nog niet gestemd: '+
+          d.peilingen.map(function(p){ return esc(p.tekst); }).join(' · ')+'</p>' : '')+
+        ((d.bijeenkomsten||[]).length ? '<p style="font-size:.84rem;color:var(--muted);margin-top:.4rem;">Nog niet beantwoord: '+
+          d.bijeenkomsten.map(function(b){ return esc(b.wat)+' ('+esc(b.datum)+')'; }).join(' · ')+'</p>' : '')+
+        '<div class="knoppen"><button class="knop stil" id="bgezien" type="button">Gezien</button></div>';
+    });
+  }
+
+  // Een uitvoer op de schijf zetten. Zelfde patroon als elders in het huis.
+  function bewaarUitvoer(d, naam){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' }));
+    a.download = naam; a.click(); URL.revokeObjectURL(a.href);
   }
 
   function openGroep(id, na){
@@ -229,6 +266,36 @@
       if (!g) return melding('Kon de ledenlijst niet laden.');
       melding('Leden: ' + (g.ledenlijst||[]).map(function(l){ return l.codenaam+' ('+l.rol+')'; }).join(', '));
     });
+    if (id === 'bgezien') return api('/genootschap/gezien', { groep:OPEN })
+      .then(function(d){ if(d.error) return melding(d.error); tekenBijgepraat(OPEN); });
+
+    if (id === 'bgezond') return api('/genootschap/gezondheid', { groep:OPEN }).then(function(d){
+      var u = $('#ugezond'); if (!u) return;
+      if (d.error) { u.hidden=false; u.textContent = d.error; return; }
+      u.hidden = false;
+      u.innerHTML = '<b>'+d.actief.leden+' van de '+d.actief.vanTotaal+' leden waren actief in '+esc(d.actief.periode)+'</b><br>'+
+        'Prikbord: '+d.prikbord.totaal+' berichten ('+d.prikbord.dezeMaand+' deze maand, '+d.prikbord.vorigeMaand+' de maand ervoor) · '+
+        d.prikbord.reacties+' reacties · '+d.prikbord.peilingen+' peilingen met '+d.prikbord.stemmen+' stemmen<br>'+
+        '<b>'+d.prikbord.zonderReactie+'</b> berichten bleven zonder reactie.<br>'+
+        'Bijeenkomsten: '+d.bijeenkomsten.komend+' komend'+
+        (d.bijeenkomsten.eerstvolgende ? ' · '+esc(d.bijeenkomsten.eerstvolgende.wat)+': '+
+          d.bijeenkomsten.eerstvolgende.geantwoord+' van de '+d.bijeenkomsten.eerstvolgende.vanTotaal+' antwoordden' : '')+
+        (d.ritme ? '<br>De meeste berichten komen op '+esc(d.ritme.drukste)+'.' : '')+
+        '<br><small style="color:var(--soft);">'+esc(d.uitleg)+'</small>';
+    });
+
+    if (id === 'balles') return api('/genootschap/uitvoer', { groep:OPEN }).then(function(d){
+      if (d.error) return melding(d.error);
+      bewaarUitvoer(d, 'genootschap-' + String(d.genootschap.naam).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.json');
+      melding('Meegegeven: het hele genootschap op codenaam, zonder echte namen en zonder sleutels.');
+    });
+
+    if (id === 'bmee') return api('/genootschap/mijn-uitvoer', { groep:OPEN }).then(function(d){
+      if (d.error) return melding(d.error);
+      bewaarUitvoer(d, 'mijn-inbreng-' + String(d.genootschap.naam).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.json');
+      melding('Meegegeven: alleen wat jij zelf schreef, stemde of antwoordde.');
+    });
+
     if (id === 'bprik') {
       var keuzes = $('#pkeuzes').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
       return api('/genootschap/prik', { groep:OPEN, tekst:$('#ptekst').value, keuzes:keuzes })

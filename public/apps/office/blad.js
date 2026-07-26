@@ -89,6 +89,26 @@
         td.addEventListener('keydown', function (e) {
           if (e.key === 'Enter' || e.key === 'F2') { e.preventDefault(); invoer.focus(); invoer.select(); return; }
           if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); zetCel(td.dataset.ref, ''); return; }
+          /* Het klembord van het blad: kopiëren, knippen en plakken met
+             verwijzingen die MEESCHUIVEN (=B2*C2 een rij lager geplakt is
+             =B3*C3; een dollarteken zet vast). Ctrl+Z draait terug. */
+          if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+            var kk = e.key.toLowerCase();
+            if (kk === 'c' || kk === 'x') {
+              e.preventDefault();
+              klem = { ref: td.dataset.ref, w: data.cellen[td.dataset.ref] || '' };
+              if (kk === 'x') zetCel(td.dataset.ref, '');
+              return;
+            }
+            if (kk === 'v' && klem && magBewerken) {
+              e.preventDefault();
+              var hier = /^([A-Z]+)([0-9]+)$/.exec(td.dataset.ref), daar = /^([A-Z]+)([0-9]+)$/.exec(klem.ref);
+              zetCel(td.dataset.ref, window.RTGRekenschuif.verschuif(klem.w,
+                (+hier[2]) - (+daar[2]), MOTOR.kolIndex(hier[1]) - MOTOR.kolIndex(daar[1])));
+              return;
+            }
+            if (kk === 'z') { e.preventDefault(); terugdraai(); return; }
+          }
           var m = /^([A-Z]+)([0-9]+)$/.exec(td.dataset.ref);
           if (!m) return;
           var k = MOTOR.kolIndex(m[1]), r = +m[2], stap = null;
@@ -115,8 +135,28 @@
     }
     function zetCel(ref, waarde) {
       if (!magBewerken) return;
-      if (waarde) data.cellen[ref] = String(waarde).slice(0, 400); else delete data.cellen[ref];
+      var nieuw = waarde ? String(waarde).slice(0, 400) : '';
+      if ((data.cellen[ref] || '') === nieuw) return;
+      onthoud([{ ref: ref, oud: data.cellen[ref] }]);
+      if (nieuw) data.cellen[ref] = nieuw; else delete data.cellen[ref];
       onWijzig(); teken(); kies(ref);
+    }
+
+    /* Ongedaan maken: elke wijziging onthoudt wat er stond -- ook een
+       sortering of een doorvoer-reeks, als ÉÉN stap. Veertig stappen diep;
+       ouder werk staat in de versiegeschiedenis van het document. */
+    var klem = null, verleden = [];
+    function onthoud(groep) {
+      verleden.push(groep);
+      if (verleden.length > 40) verleden.shift();
+    }
+    function terugdraai() {
+      if (!magBewerken || !verleden.length) return;
+      verleden.pop().forEach(function (x) {
+        if (x.oud == null) delete data.cellen[x.ref]; else data.cellen[x.ref] = x.oud;
+        if (x.opm !== undefined) { if (x.opm) data.opmaak[x.ref] = x.opm; else delete data.opmaak[x.ref]; }
+      });
+      onWijzig(); teken(); kies(actief);
     }
 
     /* De voet: wat staat er in deze kolom onder de actieve cel? Som, gemiddelde
@@ -185,6 +225,8 @@
           opmaak: Object.assign({}, (inhoud && inhoud.opmaak) || {}),
           rijen: (inhoud && inhoud.rijen) || 20, kolommen: (inhoud && inhoud.kolommen) || 8 };
         actief = 'A1'; invoer.disabled = !mag;
+        // een ander document is een ander verleden: hier niets terugdraaien
+        verleden = []; klem = null;
         teken(); kies('A1');
       },
       /* Wat de pro-laag mag: kijken, en langs de gewone weg wijzigen. Geen
@@ -196,6 +238,7 @@
       toon: function (ref) { return toonWaarde(ref); },
       uitkomst: function (ref) { return ruweUitkomst(ref); },
       zetCel: zetCel,
+      onthoud: onthoud,
       vernieuw: function () { onWijzig(); teken(); kies(actief); },
       hertekenen: teken,
       bouwBalk: bouwBalk,

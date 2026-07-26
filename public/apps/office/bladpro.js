@@ -103,6 +103,13 @@
           }
           blok.push({ sleutel: blad.uitkomst(hier.kol + r), rij: rij });
         }
+        // eerst onthouden wat er stond: een sortering is met Ctrl+Z een stap terug
+        var groep = [];
+        for (var r2 = a; r2 <= b; r2++) for (var k2 = 0; k2 < d.kolommen; k2++) {
+          var ref2 = M.kolNaam(k2) + r2;
+          groep.push({ ref: ref2, oud: d.cellen[ref2], opm: d.opmaak[ref2] || null });
+        }
+        blad.onthoud(groep);
         blok.sort(function (x, y) {
           var beide = M.isGetallig(x.sleutel) && M.isGetallig(y.sleutel);
           var p1 = beide ? M.getalVan(x.sleutel) : M.tekstVan(x.sleutel).toLowerCase();
@@ -173,6 +180,10 @@
     balk: function (host, blad) {
       var groep = el('span', 'groep');
       groep.appendChild(knop('Functies', function () { functies(blad); }, 'Zoek in alle functies'));
+      if (window.RTGOfficeBladReeks) {
+        groep.appendChild(knop('Doorvoeren', function () { window.RTGOfficeBladReeks.open(blad); },
+          'Rol deze cel uit over een reeks; verwijzingen schuiven mee'));
+      }
       groep.appendChild(knop('Sorteren', function () { sorteren(blad); }, 'Sorteer op deze kolom'));
       groep.appendChild(knop('Filter', function () { filteren(blad); }, 'Toon alleen rijen die voldoen'));
       if (window.RTGOfficeGrafiek) {

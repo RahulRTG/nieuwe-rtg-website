@@ -76,6 +76,8 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
       el.querySelector('.fv-soort').value = 'schaal';
       el.querySelector('.fv-soort').dispatchEvent(new Event('change', { bubbles: true }));
     });
+    // de eerste vraag wordt verplicht: zonder antwoord geen inzending
+    await page.evaluate(() => { document.querySelector('.fvraag .fv-plicht').click(); });
     await page.waitForFunction(() => /Bewaard/.test(document.querySelector('#staat').textContent),
       null, { timeout: 10000 });
 
@@ -95,6 +97,10 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
     await page.waitForSelector('#fStuur', { timeout: 10000 });
     const uitleg = await page.evaluate(() => document.querySelector('#formWrap .fstil').textContent);
     assert.ok(/codenaam/.test(uitleg), 'het scherm zegt eerlijk op welke wijze wordt ingevuld: ' + uitleg);
+    // leeg insturen strandt vriendelijk op de verplichte vraag
+    await page.click('#fStuur');
+    await page.waitForFunction(() => /verplicht/.test(document.querySelector('#melding').textContent),
+      null, { timeout: 5000 });
     await page.fill('.fv-antwoord', 'Prachtig verzorgd');
     await page.evaluate(() => { document.querySelector('input[name="fv1"][value="5"]').click(); });
     await page.click('#fStuur');
@@ -113,6 +119,8 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
     assert.ok(/Prachtig verzorgd/.test(uitslag), 'het open antwoord staat in de uitslag');
     assert.ok(uitslag.indexOf(codeB) >= 0, 'de codenaam van B staat erbij (wijze: codenaam)');
     assert.ok(!/Invuller Echt/.test(uitslag), 'de echte naam van B staat er NOOIT bij');
+    assert.ok(await page.evaluate(() => document.querySelectorAll('#formWrap .fstaaf').length >= 5),
+      'de telling staat er ook als balkje, niet alleen als getal');
 
     /* ---- de schets: slepen, dubbelklikken, herladen ---- */
     await page.click('#editTerug');
@@ -130,7 +138,7 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
         clientX: r.left + x, clientY: r.top + y }));
       ev('pointerdown', 40, 30); ev('pointermove', 160, 90); ev('pointerup', 160, 90);
     });
-    await page.waitForFunction(() => document.querySelectorAll('#schetsWrap svg rect').length === 1,
+    await page.waitForFunction(() => document.querySelectorAll("#schetsWrap svg .sv rect").length === 1,
       null, { timeout: 5000 });
     await page.evaluate(() => {
       window.prompt = () => 'Directie';
@@ -148,13 +156,46 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
         .find(d => /Schets e2e/.test(d.textContent));
       doc.click();
     });
-    await page.waitForSelector('#schetsWrap svg rect', { timeout: 10000 });
+    await page.waitForSelector('#schetsWrap svg .sv rect', { timeout: 10000 });
     const na = await page.evaluate(() => ({
       tekst: document.querySelector('#schetsWrap svg text') ? document.querySelector('#schetsWrap svg text').textContent : null,
       voet: document.querySelector('#voetbalk').textContent
     }));
     assert.equal(na.tekst, 'Directie', 'de tekst van de vorm is bewaard');
     assert.equal(na.voet, '1 vorm', 'de voetbalk telt in vormen');
+
+    /* De grepen: een vorm aanklikken geeft vier hoekgrepen, en aan de
+       zuidoost-greep trekken maakt hem echt groter. Daarna dupliceren, en
+       Ctrl+Z haalt de kopie weer weg. */
+    const breedteVoor = await page.evaluate(() => +document.querySelector("#schetsWrap svg .sv rect").getAttribute('width'));
+    await page.evaluate(() => {
+      const svg = document.querySelector('#schetsWrap svg');
+      const g = svg.querySelector('[data-i]');
+      const r = g.getBoundingClientRect();
+      const ev = (t, x, y, el) => (el || svg).dispatchEvent(new PointerEvent(t, { bubbles: true, pointerId: 1, clientX: x, clientY: y }));
+      ev('pointerdown', r.left + 4, r.top + 4, g); ev('pointerup', r.left + 4, r.top + 4);
+    });
+    await page.waitForFunction(() => document.querySelectorAll('#schetsWrap .sgreep').length === 4,
+      null, { timeout: 5000 });
+    await page.evaluate(() => {
+      const svg = document.querySelector('#schetsWrap svg');
+      const greep = svg.querySelector('.sgreep[data-h="zo"]');
+      const r = greep.getBoundingClientRect();
+      const ev = (t, x, y, el) => (el || svg).dispatchEvent(new PointerEvent(t, { bubbles: true, pointerId: 1, clientX: x, clientY: y }));
+      ev('pointerdown', r.left + 6, r.top + 6, greep);
+      ev('pointermove', r.left + 106, r.top + 66);
+      ev('pointerup', r.left + 106, r.top + 66);
+    });
+    const breedteNa = await page.evaluate(() => +document.querySelector("#schetsWrap svg .sv rect").getAttribute('width'));
+    assert.ok(breedteNa > breedteVoor, 'de greep maakt de vorm echt groter: ' + breedteVoor + ' -> ' + breedteNa);
+    await page.click('#sDup');
+    await page.waitForFunction(() => document.querySelector('#voetbalk').textContent === '2 vormen',
+      null, { timeout: 5000 });
+    await page.evaluate(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true }));
+    });
+    await page.waitForFunction(() => document.querySelector('#voetbalk').textContent === '1 vorm',
+      null, { timeout: 5000 });
 
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {

@@ -20,20 +20,26 @@
     api('uitslag', { id: docId }).then(function (r) {
       if (r.body.error) return meld(r.body.error);
       var u = r.body;
+      // het balkje: de verhouding in beeld, het getal ernaast -- geen van
+      // beide vervangt de ander
+      var staaf = function (n) {
+        return '<span class="fstaaf"><i style="width:' + (u.aantal ? Math.round(n * 100 / u.aantal) : 0) + '%"></i></span>';
+      };
       wrap.innerHTML = '<div class="fkop"><b>' + u.aantal + (u.aantal === 1 ? ' inzending' : ' inzendingen') + '</b>' +
         '<span class="fstil">' + (u.wijze === 'anoniem'
-          ? 'Anoniem: u ziet geen namen bij de antwoorden.' : 'Op codenaam.') + '</span>' +
+          ? 'Anoniem: u ziet geen namen bij de antwoorden.' : 'Op codenaam.') +
+          (u.dicht ? ' Gesloten: er komen geen antwoorden meer bij.' : '') + '</span>' +
         '<button class="knop" id="fTerugBouw" type="button">Terug naar de vragen</button></div>' +
         u.vragen.map(function (v, i) {
           var lijf = v.soort === 'keuze'
             ? v.telling.map(function (t) {
-                return '<p class="fbalkje"><span>' + esc(t.optie) + '</span><b>' + t.aantal + '</b></p>';
+                return '<p class="fbalkje"><span>' + esc(t.optie) + '</span>' + staaf(t.aantal) + '<b>' + t.aantal + '</b></p>';
               }).join('')
             : v.soort === 'schaal'
             ? '<p class="fbalkje"><span>Gemiddeld</span><b>' + (v.gemiddelde == null ? '-' :
                 String(v.gemiddelde).replace('.', ',')) + '</b></p>' +
               v.telling.map(function (n, j) {
-                return '<p class="fbalkje"><span>' + (j + 1) + '</span><b>' + n + '</b></p>';
+                return '<p class="fbalkje"><span>' + (j + 1) + '</span>' + staaf(n) + '<b>' + n + '</b></p>';
               }).join('')
             : (v.teksten.length ? v.teksten.map(function (t) {
                 return '<p class="fopen">' + (t.van ? '<b>' + esc(t.van) + '</b> · ' : '') + esc(t.tekst) + '</p>';

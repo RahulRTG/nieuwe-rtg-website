@@ -59,7 +59,12 @@
       b.addEventListener('mousedown', function (e) {
         e.preventDefault();
         if (b.dataset.doe === 'link') return zetLink(vel, onWijzig);
-        if (b.dataset.doe === 'tabel') return zetTabel(vel, onWijzig);
+        // de pro-tabellaag (teksttabel.js) kan meer: rijen en kolommen
+        // beheren op de plek waar u staat; zonder die laag blijft de vraag
+        if (b.dataset.doe === 'tabel') {
+          if (window.RTGOfficeTekstTabel) return window.RTGOfficeTekstTabel.open(vel, onWijzig);
+          return zetTabel(vel, onWijzig);
+        }
         document.execCommand(b.dataset.cmd, false, b.dataset.waarde || null);
         vel.focus(); onWijzig(); standBij(host);
       });

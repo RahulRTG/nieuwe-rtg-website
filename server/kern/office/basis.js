@@ -96,14 +96,17 @@ function maakBasis({ db, crypto, codenaamVan }) {
       const vragen = bron.slice(0, MAX_VRAGEN).map(v => ({
         tekst: String((v && v.tekst) || '').slice(0, 200),
         soort: VRAAGSOORTEN.includes(v && v.soort) ? v.soort : 'open',
+        verplicht: !!(v && v.verplicht),
         opties: (Array.isArray(v && v.opties) ? v.opties : []).slice(0, 8)
           .map(o => String(o == null ? '' : o).slice(0, 80))
       }));
-      return { vragen: vragen.length ? vragen : [{ tekst: '', soort: 'open', opties: [] }],
+      return { vragen: vragen.length ? vragen : [{ tekst: '', soort: 'open', verplicht: false, opties: [] }],
         // codenaam is de standaard: wie invult staat er met codenaam bij;
         // 'anoniem' verbergt de invuller voor de eigenaar (niet voor RTG:
         // een inzending per persoon vraagt dat de server weet wie het was)
-        wijze: inhoud.wijze === 'anoniem' ? 'anoniem' : 'codenaam' };
+        wijze: inhoud.wijze === 'anoniem' ? 'anoniem' : 'codenaam',
+        // dicht: de eigenaar sluit de inzendingen; de uitslag blijft
+        dicht: !!inhoud.dicht };
     }
     if (soort === 'schets') {
       const bron = Array.isArray(inhoud.vormen) ? inhoud.vormen : [];

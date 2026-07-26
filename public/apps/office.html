@@ -180,9 +180,13 @@
     color:var(--txt);font:inherit;font-size:.85rem;line-height:1.55;padding:.5rem .7rem;resize:vertical;}
   .fkeus{display:inline-flex;align-items:center;gap:.4rem;font-size:.86rem;color:var(--soft);margin-right:.9rem;}
   .fschaal{display:flex;gap:.6rem;flex-wrap:wrap;}
-  .fbalkje{display:flex;justify-content:space-between;gap:.6rem;font-size:.85rem;color:var(--soft);
+  .fbalkje{display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-size:.85rem;color:var(--soft);
     border-bottom:1px solid var(--line);padding:.25rem 0;margin:0;}
   .fbalkje b{color:var(--txt);font-variant-numeric:tabular-nums;}
+  .fbalkje span:first-child{min-width:9rem;}
+  .fstaaf{flex:1;height:.55rem;background:var(--veld);border:1px solid var(--line);overflow:hidden;}
+  .fstaaf i{display:block;height:100%;background:var(--acc);}
+  .fplicht{color:var(--acc);font-weight:600;}
   .fopen{font-size:.86rem;color:var(--soft);border-bottom:1px solid var(--line);padding:.3rem 0;margin:0;}
 
   /* schets: een wit vel met zwarte lijnen, ook op het scherm -- een schema
@@ -192,6 +196,7 @@
   #schetsWrap svg{flex:1;min-height:0;width:100%;background:#FFFFFF;border:1px solid var(--line);
     border-radius:4px;touch-action:none;cursor:crosshair;}
   #schetsWrap svg .sv{cursor:move;}
+  #schetsWrap svg .sgreep{cursor:nwse-resize;}
 
   /* afdrukken: alleen het document, zwart op wit; de hand-out bestaat alleen
      op papier */
@@ -218,6 +223,8 @@
     body.afdruk-aan #formWrap.afdrukdoel input,body.afdruk-aan #formWrap.afdrukdoel textarea,
     body.afdruk-aan #formWrap.afdrukdoel select{background:#fff;color:#111;border-color:#999;}
     body.afdruk-aan #formWrap.afdrukdoel .knop,body.afdruk-aan #formWrap.afdrukdoel .mini{display:none;}
+    body.afdruk-aan #formWrap.afdrukdoel .fstaaf{background:#fff;border-color:#999;}
+    body.afdruk-aan #formWrap.afdrukdoel .fstaaf i{background:#7F1634;}
     body.afdruk-aan #schetsWrap.afdrukdoel .sbalk{display:none;}
     body.afdruk-aan #schetsWrap.afdrukdoel svg{border:none;}
     body.afdruk-aan #handout.afdrukdoel{display:block;}
@@ -446,15 +453,20 @@
 <script src="/shared/rekenfuncties2.js" defer></script>
 <script src="/shared/rekenfuncties3.js" defer></script>
 <script src="/shared/rekenmotor.js" defer></script>
+<script src="/shared/rekenschuif.js" defer></script>
 <script src="/apps/office/bladpro.js" defer></script>
+<script src="/apps/office/bladreeks.js" defer></script>
 <script src="/apps/office/bladgrafiek.js" defer></script>
 <script src="/apps/office/tekstpro.js" defer></script>
+<script src="/apps/office/teksttabel.js" defer></script>
 <script src="/apps/office/tekst.js" defer></script>
 <script src="/apps/office/blad.js" defer></script>
 <script src="/apps/office/pres.js" defer></script>
 <script src="/apps/office/presenteren.js" defer></script>
 <script src="/apps/office/formulieruitslag.js" defer></script>
 <script src="/apps/office/formulier.js" defer></script>
+<script src="/apps/office/schetsvorm.js" defer></script>
+<script src="/apps/office/schetsbalk.js" defer></script>
 <script src="/apps/office/schets.js" defer></script>
 <script src="/apps/office/afdruk.js" defer></script>
 <script src="/apps/office/app.js" defer></script>

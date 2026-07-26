@@ -294,3 +294,38 @@ test('11. de schets: vormen blijven staan, en wat geen vorm is valt weg', async 
   const fo = await api('/api/kantoorpakket/open', { id: van.body.id }, lidA);
   assert.ok(fo.body.inhoud.vragen.length >= 2, 'het sjabloon draagt echte vragen');
 });
+
+test('12. formulier-professioneel: verplichte vragen en het sluiten van de inzendingen', async () => {
+  const m = await api('/api/kantoorpakket/maak', { soort: 'formulier', titel: 'Aanmelding diner' }, lidA);
+  const id = m.body.id;
+  const vragen = [
+    { tekst: 'Naam van uw gezelschap', soort: 'open', opties: [], verplicht: true },
+    { tekst: 'Dieetwensen (mag leeg)', soort: 'open', opties: [] }
+  ];
+  await api('/api/kantoorpakket/bewaar', { id, inhoud: { wijze: 'codenaam', vragen } }, lidA);
+  await api('/api/kantoorpakket/deel', { id, codenaam: codeB, aan: true, rechten: 'lezen' }, lidA);
+
+  // verplicht is verplicht, en de fout zegt WELKE vraag er nog openstaat
+  const zonder = await api('/api/kantoorpakket/vul', { id, antwoorden: ['', 'geen noten'] }, lidB);
+  assert.equal(zonder.status, 400);
+  assert.ok(/Vraag 1 is verplicht/.test(zonder.body.error), zonder.body.error);
+  assert.equal((await api('/api/kantoorpakket/vul', { id, antwoorden: ['De Vries', ''] }, lidB)).status, 200);
+
+  // sluiten: geen nieuwe of vervangende antwoorden; de kijk-stand zegt het eerlijk
+  await api('/api/kantoorpakket/bewaar', { id, inhoud: { wijze: 'codenaam', dicht: true, vragen } }, lidA);
+  const naSluit = await api('/api/kantoorpakket/vul', { id, antwoorden: ['Toch anders', ''] }, lidB);
+  assert.equal(naSluit.status, 409);
+  const kijk = await api('/api/kantoorpakket/vul', { id, kijk: true }, lidB);
+  assert.equal(kijk.body.ingevuld, true);
+  assert.equal(kijk.body.dicht, true, 'de kijk-stand vertelt dat het gesloten is');
+
+  // de uitslag blijft, met het antwoord van voor de sluiting
+  const u = await api('/api/kantoorpakket/uitslag', { id }, lidA);
+  assert.equal(u.body.aantal, 1);
+  assert.equal(u.body.dicht, true);
+  assert.equal(u.body.vragen[0].teksten[0].tekst, 'De Vries');
+
+  // weer openen kan ook: de eigenaar houdt de regie
+  await api('/api/kantoorpakket/bewaar', { id, inhoud: { wijze: 'codenaam', dicht: false, vragen } }, lidA);
+  assert.equal((await api('/api/kantoorpakket/vul', { id, antwoorden: ['Toch anders', ''] }, lidB)).status, 200);
+});

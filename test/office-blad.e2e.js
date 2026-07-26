@@ -146,6 +146,42 @@ test('Rekenblad: formules, functies zoeken, sorteren, filteren en een grafiek',
     await page.waitForSelector('.bladpaneel .bpdoek svg', { timeout: 8000 });
     const staven = await page.evaluate(() => document.querySelectorAll('.bpdoek .staaf').length);
     assert.ok(staven >= 1, 'er staan staven in de grafiek: ' + staven);
+    await page.evaluate(() => {
+      Array.from(document.querySelectorAll('.bladpaneel .tb')).find(b => b.textContent === 'Sluiten').click();
+    });
+
+    /* Kopiëren en plakken met verwijzingen die MEESCHUIVEN: =E1*2 een rij
+       lager geplakt is =E2*2. Dat is de afspraak van elk rekenblad; zonder
+       dit is plakken een leugen. En Ctrl+Z haalt de plak weer weg. */
+    await zet('E1', '10');
+    await zet('E2', '5');
+    await zet('F1', '=E1*2');
+    assert.equal(await cel('F1'), '20');
+    await page.press('#blad td[data-ref="F1"]', 'Control+c');
+    await page.click('#blad td[data-ref="F2"]');
+    await page.press('#blad td[data-ref="F2"]', 'Control+v');
+    await page.waitForFunction(() => document.querySelector('#blad td[data-ref="F2"]').textContent === '10',
+      null, { timeout: 5000 });
+    assert.equal(await page.evaluate(() => document.querySelector('#celInvoer').value), '=E2*2',
+      'de formule is meegeschoven, niet letterlijk gekopieerd');
+    await page.press('#blad td[data-ref="F2"]', 'Control+z');
+    await page.waitForFunction(() => document.querySelector('#blad td[data-ref="F2"]').textContent === '',
+      null, { timeout: 5000 });
+
+    /* Doorvoeren: de cel uitrollen over een reeks, met een verwijzing die
+       per rij een stap meeschuift. */
+    await zet('G1', '=E1+1');
+    await page.click('#blad td[data-ref="G1"]');
+    await page.evaluate(() => {
+      Array.from(document.querySelectorAll('#bladTools .tb')).find(b => b.textContent === 'Doorvoeren').click();
+    });
+    await page.waitForSelector('.bladpaneel .bprij .tb', { timeout: 8000 });
+    await page.evaluate(() => {
+      document.querySelector('.bladpaneel input[type="number"]').value = '2';
+      Array.from(document.querySelectorAll('.bladpaneel .tb')).find(b => b.textContent === 'Omlaag doorvoeren').click();
+    });
+    await page.waitForFunction(() => document.querySelector('#blad td[data-ref="G2"]').textContent === '6',
+      null, { timeout: 5000 });
 
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {

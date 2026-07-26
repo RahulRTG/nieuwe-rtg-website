@@ -35,8 +35,11 @@ module.exports = ({ db, save }, basis) => {
     if (fout) return fout;
     if (!magLezen(d, key, kring)) return { status: 403, error: 'Dit formulier is niet met u gedeeld.' };
     const mijn = bak()[d.id] && bak()[d.id][key];
-    // kijk: alleen de eigen stand opvragen (al ingevuld?), zonder in te sturen
-    if (data.kijk) return { status: 200, ingevuld: !!mijn, om: mijn ? mijn.om : null };
+    const dicht = !!(d.inhoud && d.inhoud.dicht);
+    // kijk: alleen de eigen stand opvragen (al ingevuld? gesloten?), zonder in te sturen
+    if (data.kijk) return { status: 200, ingevuld: !!mijn, om: mijn ? mijn.om : null, dicht };
+    // gesloten is gesloten: ook een eerder antwoord wordt niet meer vervangen
+    if (dicht) return { status: 409, error: 'Dit formulier is gesloten; er kunnen geen antwoorden meer bij.' };
     const vragen = (d.inhoud && d.inhoud.vragen) || [];
     const bron = Array.isArray(data.antwoorden) ? data.antwoorden : [];
     // per vraag het antwoord in de vorm van die vraag; wat niet past wordt
@@ -58,6 +61,12 @@ module.exports = ({ db, save }, basis) => {
     });
     const iets = antwoorden.some((a, i) => vragen[i].soort === 'open' ? String(a).trim() : a != null);
     if (!iets) return { status: 400, error: 'Vul eerst een antwoord in.' };
+    // verplicht is verplicht -- en de fout zegt WELKE vraag er nog openstaat
+    for (let i = 0; i < vragen.length; i++) {
+      const leeg2 = vragen[i].soort === 'open' ? !String(antwoorden[i]).trim() : antwoorden[i] == null;
+      if (vragen[i].verplicht && leeg2)
+        return { status: 400, error: 'Vraag ' + (i + 1) + ' is verplicht: ' + (vragen[i].tekst || '(zonder tekst)') };
+    }
     const alle = bak();
     if (!alle[d.id]) alle[d.id] = {};
     if (!mijn && Object.keys(alle[d.id]).length >= MAX_INZENDINGEN)
@@ -94,7 +103,7 @@ module.exports = ({ db, save }, basis) => {
           .map(x => anoniem ? { tekst: x.a } : { van: naamVan(x.wie), tekst: x.a }) };
     });
     return { status: 200, wijze: anoniem ? 'anoniem' : 'codenaam', aantal: inzendingen.length,
-      vragen: per,
+      dicht: !!(d.inhoud && d.inhoud.dicht), vragen: per,
       // bij codenaam ziet de beheerder wie er invulde; bij anoniem bewust niet
       wie: anoniem ? undefined : inzendingen.map(([k, z]) => ({ van: naamVan(k), om: z.om })) };
   }

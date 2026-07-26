@@ -1,88 +1,84 @@
 /* RTG Office, de schets: diagrammen zoals een kantoor ze tekent -- kaders,
    ovalen, ruiten, pijlen en losse tekst op een wit vel. Kies een vorm en
-   sleep om te tekenen; klik om te kiezen, sleep om te verplaatsen,
-   dubbelklik om de tekst te zetten, Delete haalt weg.
+   sleep om te tekenen; klik om te kiezen, sleep om te verplaatsen, pak een
+   GREEP om de maat te veranderen (bij een pijl: zijn uiteinden), dubbelklik
+   voor de tekst, Delete haalt weg en Ctrl+Z draait terug.
 
-   Het vel is SVG (1200 bij 800): het schaalt scherp op elk scherm, drukt
-   strak af en exporteert als een echt .svg-bestand. Wit met zwarte lijnen,
-   bewust: een schema is om te lezen, niet om te stylen.
+   Alles ligt op een raster van 10: vormen die vanzelf uitlijnen zijn het
+   verschil tussen een schema en een gekras. Het vel is SVG (1200 bij 800):
+   scherp op elk scherm, strak op papier, en export als echt .svg-bestand.
+   Hoe een vorm eruitziet staat in schetsvorm.js; dit bestand is de hand.
 
    Levert window.RTGOfficeSchets. */
 (function () {
   'use strict';
-  var NS = 'http://www.w3.org/2000/svg';
-  var GEREEDSCHAP = [['kader', 'Kader'], ['ovaal', 'Ovaal'], ['ruit', 'Ruit'], ['pijl', 'Pijl'], ['tekst', 'Tekst']];
+  var V = window.RTGOfficeSchetsVorm;
+  var RASTER = 10;
+  var snap = function (n) { return Math.round(n / RASTER) * RASTER; };
 
   function maak(opties) {
-    var wrap = opties.wrap, onWijzig = opties.onWijzig, meld = opties.meld;
-    var vormen = [], mag = false, keuze = null, sel = -1, svg = null, voet = opties.voet;
-    var bezig = null; // { nieuw:bool, i, vanX, vanY, basis } tijdens het slepen
+    var wrap = opties.wrap, onWijzig = opties.onWijzig, meld = opties.meld, voet = opties.voet;
+    var vormen = [], mag = false, keuze = null, sel = -1, svg = null;
+    var bezig = null;     // tijdens het slepen: { nieuw, greep, i, vanX, vanY, basis, voor }
+    var verleden = [];    // Ctrl+Z: snapshots, alleen bij een echte wijziging
 
-    function el(naam, at) {
-      var e = document.createElementNS(NS, naam);
-      for (var k in at) e.setAttribute(k, at[k]);
-      return e;
-    }
     function punt(e) {
       var r = svg.getBoundingClientRect();
-      return { x: Math.max(0, Math.min(1200, Math.round((e.clientX - r.left) * 1200 / r.width))),
-        y: Math.max(0, Math.min(800, Math.round((e.clientY - r.top) * 800 / r.height))) };
+      return { x: snap(Math.max(0, Math.min(1200, (e.clientX - r.left) * 1200 / r.width))),
+        y: snap(Math.max(0, Math.min(800, (e.clientY - r.top) * 800 / r.height))) };
+    }
+    function duw(voor) {
+      verleden.push(voor);
+      if (verleden.length > 30) verleden.shift();
+    }
+    function terug() {
+      if (!mag || !verleden.length) return;
+      vormen = JSON.parse(verleden.pop());
+      sel = -1; onWijzig(); teken();
     }
 
-    function teken() {
+    /* Eén keer bouwen, daarna alleen de vormen hertekenen: wie het hele vel
+       bij elke muisbeweging vervangt, raakt de pointer-greep kwijt en laat
+       het scherm knipperen. */
+    function bouw() {
       wrap.innerHTML = '';
-      if (mag) {
-        var balk = document.createElement('div');
-        balk.className = 'sbalk';
-        balk.innerHTML = GEREEDSCHAP.map(function (g) {
-          return '<button class="tb' + (keuze === g[0] ? ' aan' : '') + '" data-vorm="' + g[0] + '" type="button">' + g[1] + '</button>';
-        }).join('') + '<button class="tb weg" id="sWeg" type="button" title="Gekozen vorm weghalen">Weg</button>' +
-          '<span class="fstil">Sleep om te tekenen · dubbelklik voor tekst</span>';
-        wrap.appendChild(balk);
-        Array.prototype.forEach.call(balk.querySelectorAll('[data-vorm]'), function (b) {
-          b.addEventListener('click', function () {
-            keuze = keuze === b.dataset.vorm ? null : b.dataset.vorm; sel = -1; teken();
-          });
-        });
-        balk.querySelector('#sWeg').addEventListener('click', wegSel);
-      }
-      svg = el('svg', { viewBox: '0 0 1200 800', role: 'img', 'aria-label': 'Schets' });
-      var pijlpunt = el('marker', { id: 'sPijlpunt', viewBox: '0 0 10 10', refX: 9, refY: 5,
-        markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' });
-      pijlpunt.appendChild(el('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: '#0C0C0B' }));
-      var defs = el('defs', {}); defs.appendChild(pijlpunt); svg.appendChild(defs);
-      vormen.forEach(function (v, i) { svg.appendChild(tekenVorm(v, i)); });
-      wrap.appendChild(svg);
+      if (mag) wrap.appendChild(balk());
+      svg = V.el('svg', { viewBox: '0 0 1200 800', role: 'img', 'aria-label': 'Schets' });
       if (mag) {
         svg.addEventListener('pointerdown', neer);
         svg.addEventListener('pointermove', beweeg);
         svg.addEventListener('pointerup', los);
         svg.addEventListener('dblclick', dubbel);
       }
+      wrap.appendChild(svg);
+      teken();
+    }
+    function teken() {
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      svg.appendChild(V.maakDefs());
+      vormen.forEach(function (v, i) { svg.appendChild(V.tekenVorm(v, i, i === sel)); });
+      if (mag && sel >= 0 && vormen[sel]) V.grepenVan(vormen[sel]).forEach(function (gr) {
+        svg.appendChild(V.tekenGreep(gr));
+      });
+      var kn = wrap.querySelectorAll('[data-vorm]');
+      Array.prototype.forEach.call(kn, function (k) { k.classList.toggle('aan', k.dataset.vorm === keuze); });
       if (voet) voet.textContent = vormen.length + (vormen.length === 1 ? ' vorm' : ' vormen');
     }
-    function tekenVorm(v, i) {
-      var g = el('g', { 'data-i': i, 'class': i === sel ? 'sv aan' : 'sv' });
-      var lijn = { fill: '#FFFFFF', stroke: i === sel ? '#7F1634' : '#0C0C0B', 'stroke-width': i === sel ? 3 : 2 };
-      var mx = v.x + (v.b || 0) / 2, my = v.y + (v.h || 0) / 2;
-      if (v.soort === 'kader') g.appendChild(el('rect', Object.assign({ x: v.x, y: v.y, width: v.b, height: v.h }, lijn)));
-      else if (v.soort === 'ovaal') g.appendChild(el('ellipse', Object.assign({ cx: mx, cy: my, rx: v.b / 2, ry: v.h / 2 }, lijn)));
-      else if (v.soort === 'ruit') g.appendChild(el('polygon', Object.assign({ points:
-        mx + ',' + v.y + ' ' + (v.x + v.b) + ',' + my + ' ' + mx + ',' + (v.y + v.h) + ' ' + v.x + ',' + my }, lijn)));
-      else if (v.soort === 'pijl') {
-        g.appendChild(el('line', { x1: v.x, y1: v.y, x2: v.x2, y2: v.y2, stroke: lijn.stroke,
-          'stroke-width': lijn['stroke-width'], 'marker-end': 'url(#sPijlpunt)' }));
-        mx = (v.x + v.x2) / 2; my = (v.y + v.y2) / 2 - 8;
-      } else { mx = v.x; my = v.y; }
-      if (v.tekst || v.soort === 'tekst') {
-        var t = el('text', { x: mx, y: my + (v.soort === 'pijl' || v.soort === 'tekst' ? 0 : 5),
-          'text-anchor': v.soort === 'tekst' ? 'start' : 'middle', fill: '#0C0C0B',
-          'font-size': 20, 'font-family': 'Inter, sans-serif' });
-        t.textContent = v.tekst || '(dubbelklik voor tekst)';
-        g.appendChild(t);
-      }
-      return g;
-    }
+    /* De werkbalk woont in schetsbalk.js; dit is de smalle brug die hij
+       daarvoor krijgt -- kijken en langs de gewone weg wijzigen. */
+    var brug = {
+      keuze: function () { return keuze; },
+      zetKeuze: function (g) { keuze = keuze === g ? null : g; sel = -1; teken(); },
+      sel: function () { return sel; },
+      zetSel: function (i) { sel = i; },
+      vormen: function () { return vormen; },
+      duw: function () { duw(JSON.stringify(vormen)); },
+      wegSel: function () { wegSel(); },
+      onWijzig: function () { onWijzig(); },
+      teken: function () { teken(); },
+      meld: function (t) { meld(t); }
+    };
+    function balk() { return window.RTGOfficeSchetsBalk.bouw(brug); }
 
     /* ---- muis en vinger ---- */
     function vormBij(e) {
@@ -90,87 +86,108 @@
       return g ? +g.getAttribute('data-i') : -1;
     }
     function neer(e) {
-      var p = punt(e);
+      var p = punt(e), voor = JSON.stringify(vormen);
+      var greep = e.target.getAttribute && e.target.getAttribute('data-h');
+      if (greep && sel >= 0) {
+        bezig = { greep: greep, i: sel, voor: voor, basis: JSON.parse(JSON.stringify(vormen[sel])) };
+        svg.setPointerCapture && svg.setPointerCapture(e.pointerId);
+        return;
+      }
       if (keuze) {
         if (vormen.length >= 300) return meld('Maximaal 300 vormen.');
         var v = keuze === 'pijl' ? { soort: 'pijl', x: p.x, y: p.y, x2: p.x, y2: p.y, tekst: '' }
           : keuze === 'tekst' ? { soort: 'tekst', x: p.x, y: p.y, tekst: '' }
           : { soort: keuze, x: p.x, y: p.y, b: 10, h: 10, tekst: '' };
         vormen.push(v); sel = vormen.length - 1;
-        bezig = { nieuw: true, i: sel, vanX: p.x, vanY: p.y };
+        bezig = { nieuw: true, i: sel, vanX: p.x, vanY: p.y, voor: voor };
         svg.setPointerCapture && svg.setPointerCapture(e.pointerId);
         return;
       }
       var i = vormBij(e);
       sel = i;
       if (i >= 0) {
-        bezig = { nieuw: false, i: i, vanX: p.x, vanY: p.y, basis: JSON.parse(JSON.stringify(vormen[i])) };
+        bezig = { i: i, vanX: p.x, vanY: p.y, voor: voor, basis: JSON.parse(JSON.stringify(vormen[i])) };
         svg.setPointerCapture && svg.setPointerCapture(e.pointerId);
       }
       teken();
     }
     function beweeg(e) {
       if (!bezig) return;
-      var p = punt(e), v = vormen[bezig.i];
-      if (bezig.nieuw) {
+      var p = punt(e), v = vormen[bezig.i], b = bezig.basis;
+      if (bezig.greep) {
+        if (v.soort === 'pijl') {
+          if (bezig.greep === 'a') { v.x = p.x; v.y = p.y; } else { v.x2 = p.x; v.y2 = p.y; }
+        } else {
+          var x1 = b.x, y1 = b.y, x2 = b.x + b.b, y2 = b.y + b.h;
+          if (bezig.greep.indexOf('w') >= 0) x1 = p.x; else if (bezig.greep.indexOf('o') >= 0) x2 = p.x;
+          if (bezig.greep.indexOf('n') >= 0) y1 = p.y; else y2 = p.y;
+          v.x = Math.min(x1, x2); v.y = Math.min(y1, y2);
+          v.b = Math.max(10, Math.abs(x2 - x1)); v.h = Math.max(10, Math.abs(y2 - y1));
+        }
+      } else if (bezig.nieuw) {
         if (v.soort === 'pijl') { v.x2 = p.x; v.y2 = p.y; }
         else if (v.soort !== 'tekst') {
           v.x = Math.min(bezig.vanX, p.x); v.y = Math.min(bezig.vanY, p.y);
           v.b = Math.max(10, Math.abs(p.x - bezig.vanX)); v.h = Math.max(10, Math.abs(p.y - bezig.vanY));
         }
       } else {
-        var dx = p.x - bezig.vanX, dy = p.y - bezig.vanY, b = bezig.basis;
-        v.x = b.x + dx; v.y = b.y + dy;
-        if (v.soort === 'pijl') { v.x2 = b.x2 + dx; v.y2 = b.y2 + dy; }
+        var dx = p.x - bezig.vanX, dy = p.y - bezig.vanY;
+        v.x = snap(b.x + dx); v.y = snap(b.y + dy);
+        if (v.soort === 'pijl') { v.x2 = snap(b.x2 + dx); v.y2 = snap(b.y2 + dy); }
       }
       teken();
     }
     function los() {
       if (!bezig) return;
-      var v = vormen[bezig.i];
+      var v = vormen[bezig.i], voor = bezig.voor;
       // een klik zonder sleep levert geen minivormpje op: tekst vraagt meteen
       // om zijn tekst, een pijl of kader van niks verdwijnt weer
-      if (bezig.nieuw && v.soort === 'tekst') zetTekst(bezig.i);
-      else if (bezig.nieuw && v.soort === 'pijl' && Math.abs(v.x2 - v.x) + Math.abs(v.y2 - v.y) < 12) { vormen.pop(); sel = -1; }
-      else if (bezig.nieuw && v.soort !== 'pijl' && v.soort !== 'tekst' && (v.b < 12 || v.h < 12)) { vormen.pop(); sel = -1; }
-      bezig = null; keuze = null; onWijzig(); teken();
+      if (bezig.nieuw && v.soort === 'tekst') { bezig = null; keuze = null; zetTekst(vormen.length - 1, voor); return; }
+      if (bezig.nieuw && v.soort === 'pijl' && Math.abs(v.x2 - v.x) + Math.abs(v.y2 - v.y) < 12) { vormen.pop(); sel = -1; }
+      else if (bezig.nieuw && v.soort !== 'pijl' && (v.b < 12 || v.h < 12)) { vormen.pop(); sel = -1; }
+      bezig = null; keuze = null;
+      // alleen een echte wijziging is een stap terug waard
+      if (JSON.stringify(vormen) !== voor) { duw(voor); onWijzig(); }
+      teken();
     }
     function dubbel(e) {
       var i = vormBij(e);
-      if (i >= 0) zetTekst(i);
+      if (i >= 0) zetTekst(i, JSON.stringify(vormen));
     }
-    function zetTekst(i) {
+    function zetTekst(i, voor) {
       var t = prompt('De tekst van deze vorm (leeg = geen tekst):', vormen[i].tekst || '');
       if (t === null) { if (vormen[i].soort === 'tekst' && !vormen[i].tekst) { vormen.splice(i, 1); sel = -1; } }
       else {
         vormen[i].tekst = t.slice(0, 120);
         if (vormen[i].soort === 'tekst' && !vormen[i].tekst) { vormen.splice(i, 1); sel = -1; }
       }
-      onWijzig(); teken();
+      if (JSON.stringify(vormen) !== voor) { duw(voor); onWijzig(); }
+      teken();
     }
     function wegSel() {
       if (sel < 0) return meld('Klik eerst een vorm aan.');
+      duw(JSON.stringify(vormen));
       vormen.splice(sel, 1); sel = -1; onWijzig(); teken();
     }
     document.addEventListener('keydown', function (e) {
-      if (!mag || sel < 0 || (e.key !== 'Delete' && e.key !== 'Backspace')) return;
+      if (!mag || !wrap.offsetParent) return;      // de schets is niet in beeld
       var a = document.activeElement;
       if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable)) return;
-      if (!wrap.offsetParent) return; // de schets is niet in beeld
-      e.preventDefault(); wegSel();
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); terug(); return; }
+      if (sel >= 0 && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); wegSel(); }
     });
 
     return {
       laad: function (inhoud, magNu) {
-        mag = !!magNu; sel = -1; keuze = null; bezig = null;
+        mag = !!magNu; sel = -1; keuze = null; bezig = null; verleden = [];
         vormen = JSON.parse(JSON.stringify((inhoud && inhoud.vormen) || []));
-        teken();
+        bouw();
       },
       inhoud: function () { return { vormen: vormen }; },
       naarSvg: function () {
         var kopie = svg.cloneNode(true);
-        kopie.setAttribute('xmlns', NS);
-        kopie.querySelectorAll('.sv').forEach(function (g) { g.setAttribute('class', 'sv'); });
+        kopie.setAttribute('xmlns', V.NS);
+        Array.prototype.forEach.call(kopie.querySelectorAll('.sgreep'), function (g) { g.parentNode.removeChild(g); });
         return '<?xml version="1.0" encoding="UTF-8"?>\n' +
           kopie.outerHTML.replace(/stroke="#7F1634"/g, 'stroke="#0C0C0B"').replace(/stroke-width="3"/g, 'stroke-width="2"');
       }

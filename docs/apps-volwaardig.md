@@ -1070,3 +1070,91 @@ Bewezen: `test/office.test.js` (9, met de thema/grenzen-rondreis) en
 `test/office-suite.e2e.js` (zoeken/vervangen met opmaak die blijft staan,
 inhoudsopgave die ververst, dupliceren, thema, timer, en de hand-out zonder
 notities — via de echte afdrukknop).
+
+## RTG Office: Formulieren en Schetsen (vijf soorten in een pakket)
+
+Een kantoorpakket is meer dan tekst, blad en presentatie. De twee soorten die
+er echt nog misten:
+
+**Formulier** (de Forms-kant) -- het ene officedocument dat door ANDEREN
+wordt gebruikt. De eigenaar bouwt vragen (open, meerkeuze of schaal 1-5),
+kiest de wijze, en deelt op codenaam; wie mag lezen krijgt geen document
+maar een invulscherm. Een inzending per persoon; opnieuw insturen vervangt.
+De antwoorden staan bewust NIET in het document zelf (`officeAntwoorden`
+per formulier, in `server/kern/office/formulier.js`): anders zou elke
+autosave van de eigenaar over andermans antwoorden heen schrijven. De
+uitslag (telling per optie, gemiddelde per schaal, teksten per open vraag)
+is voor wie mag schrijven; export als CSV.
+
+De anoniem-stand is eerlijk, aan beide kanten van het scherm: bij 'anoniem'
+ziet de eigenaar nooit wie wat antwoordde, maar RTG weet het wel -- zonder
+te weten wie inzond kan "een inzending per persoon" niet bestaan. Die zin
+staat bij de bouwer EN bij de invuller in beeld, niet in kleine lettertjes.
+En een overgeslagen vraag is geen antwoord: `Number(null)` is 0, en zonder
+die ene regel telde "niets gekozen" stilletjes als de eerste optie -- exact
+de soort geloofwaardige fout die dit pakket weigert (test 10 legt het vast).
+
+**Schets** (de Visio-kant) -- diagrammen op een wit vel: kader, ovaal, ruit,
+pijl en losse tekst. Slepen tekent, klikken kiest, slepen verplaatst,
+dubbelklik zet de tekst, Delete haalt weg. Het vel is SVG (1200x800): het
+schaalt scherp, drukt strak af en exporteert als echt `.svg`-bestand. Wit
+met zwarte lijnen, bewust -- een schema is om te lezen, niet om te stylen.
+De server klemt elke vorm op het vel en laat onbekende vormen weggevallen
+in plaats van ze als raadsel te bewaren.
+
+Beide soorten draaien op exact dezelfde kern als de andere drie: dezelfde
+vijf ingangen (lid, zaak, RTG-kantoor, RTF-gezin, werkplek), hetzelfde
+delen, dezelfde versies, hetzelfde afdrukken. In het RTF-gezin mag ook een
+oppas of familielid (gast) een formulier invullen -- antwoorden is lezen,
+geen bewerken; de uitslag blijft bij wie schrijft. Sjablonen erbij
+(rondvraag, stemming, organigram, stroomschema) in `sjablonen2.js`, want
+deel 1 zat tegen de 10 KB.
+
+## RTG Office professioneel: het verschil tussen "het kan" en "het werkt als vanzelf"
+
+De ronde waarin de vijf officeproducten zich als volwassen software gaan
+gedragen. Rode draad: de handgrepen die mensen uit de grote pakketten
+kennen, precies zoals ze die verwachten -- en elk met de eerlijkheid die
+dit pakket overal hanteert.
+
+**Rekenblad.** Ctrl+C/X/V op cellen, met verwijzingen die MEESCHUIVEN:
+=B2*C2 een rij lager geplakt is =B3*C3, en een dollarteken zet een deel
+vast ($B$2 blijft $B$2). Dat schuiven doet `shared/rekenschuif.js`, een
+eigen kleine laag naast de lezer: tekst tussen aanhalingstekens en
+functienamen als LOG10 blijven met rust, en een verwijzing die van het
+blad af zou schuiven maakt de cel zichtbaar kapot (#VERW!) in plaats van
+stilletjes op een andere cel te klemmen -- een geloofwaardig fout getal is
+erger dan een fout die je ziet. Doorvoeren (bladreeks.js) rolt een cel
+over een reeks uit, omlaag of naar rechts. En Ctrl+Z: veertig stappen
+ongedaan maken, waarbij een sortering of een doorvoer-reeks als EEN stap
+terugkomt. Het verleden hoort bij het document: een ander document openen
+begint met een schone lei.
+
+**Schets.** Formaatgrepen op de gekozen vorm (vier hoeken; een pijl heeft
+grepen op zijn uiteinden), dupliceren, voorgrond/achtergrond, en alles
+ligt op een raster van 10 -- vormen die vanzelf uitlijnen zijn het
+verschil tussen een schema en een gekras. Ctrl+Z met snapshots die alleen
+bij een ECHTE wijziging worden gezet (een klik zonder sleep is geen stap).
+Technisch is de schets nu drie lagen: schetsvorm.js (hoe een vorm
+eruitziet), schetsbalk.js (de knoppen, via een smalle brug) en schets.js
+(de hand). En het vel wordt niet meer bij elke muisbeweging herbouwd --
+alleen de vormen hertekenen scheelt geknipper en behoudt de pointer-greep.
+
+**Formulier.** Verplichte vragen (de fout zegt WELKE vraag er nog
+openstaat, aan beide kanten: vriendelijk op het scherm, afgedwongen op de
+server) en het sluiten van de inzendingen: dicht is dicht, ook voor wie
+zijn eerdere antwoord wilde vervangen, en de eigenaar kan weer openen. De
+uitslag toont de telling nu ook als balkje naast het getal -- geen van
+beide vervangt de ander.
+
+**Tekstverwerker.** De tabelknop is volwassen geworden (teksttabel.js):
+buiten een tabel voegt hij er een in met kop-rij en gekozen maat; staat de
+cursor IN een tabel, dan beheert hij rijen en kolommen op die plek. De
+tabel is gewone HTML in het document en gaat mee in bewaren, exporteren
+en afdrukken.
+
+Alles zit in de tests: rekenschuif.test.js (schuiven, vastzetten, #VERW!),
+office.test.js test 12 (verplicht + sluiten, server-kant), en de twee
+e2e's doen het door de echte schermen -- kopiëren/plakken/Ctrl+Z en
+doorvoeren in het blad; de verplichte vraag, de balkjes, de grepen,
+dupliceren en Ctrl+Z in formulier en schets.

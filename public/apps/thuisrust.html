@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thuisrust</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifests/thuisrust.webmanifest">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<style>
+  .stand{display:block;width:100%;text-align:left;margin:.5rem 0;padding:.9rem 1rem;
+    background:transparent;border:1px solid var(--line);border-radius:12px;color:var(--txt);font:inherit;cursor:pointer;}
+  .stand:focus-visible{outline:2px solid var(--goldlicht);outline-offset:2px;}
+  .stand[aria-pressed="true"]{border-color:var(--goldlicht);background:rgba(201,162,75,.09);}
+  .stand b{display:block;font-size:.98rem;margin-bottom:.2rem;}
+  .stand span{display:block;color:var(--soft);font-size:.82rem;line-height:1.5;}
+  .baan{border:1px solid var(--groen);border-radius:12px;padding:.8rem .9rem;margin:1rem 0;
+    font-size:.84rem;line-height:1.55;color:var(--soft);background:rgba(105,184,145,.07);}
+  .baan strong{color:var(--txt);}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#inhoud" style="position:absolute;left:-999px;">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Thuisrust</h1>
+  <div class="rek"></div>
+  <span class="stil">stil, maar bereikbaar</span>
+</header>
+<main id="inhoud">
+  <p class="stil">De wereld gaat stil. De mensen die ertoe doen komen er altijd doorheen.</p>
+
+  <div class="baan" role="note">
+    <strong>De veiligheidsbaan.</strong> Wat u ook kiest: uw kring komt er altijd doorheen, en elk
+    veiligheidsbericht ook. Dat is precies waarom u dit durft aan te zetten. Gewone
+    niet-storen-standen zetten alles dicht, en daarom laat iedereen ze uit: stel dat er iets is met
+    een kind, of met uw moeder. Hier hoeft u niet te kiezen tussen rust en bereikbaar zijn.
+  </div>
+
+  <section aria-label="De stand">
+    <h2>Nu</h2>
+    <div class="kaart" id="rust"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Uw kring">
+    <h2>Wie er altijd doorkomt</h2>
+    <div class="kaart" id="kring"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Uitleg">
+    <h2>Hoe het eindigt</h2>
+    <div class="kaart">
+      <p class="stil">Elke stand heeft een einde. "Tot ik thuis ben" gaat vanzelf uit zodra u
+      incheckt in de Thuiswacht, en anders na de tijd die u kiest. Zo blijft er nooit per ongeluk
+      een stand dagenlang aan staan, en gaat u niets missen zonder het te weten.</p>
+    </div>
+  </section>
+
+  <div id="grens"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const DUUR = [
+    { min: 60, naam: '1 uur' }, { min: 120, naam: '2 uur' },
+    { min: 240, naam: '4 uur' }, { min: 480, naam: '8 uur' }, { min: 720, naam: '12 uur' }
+  ];
+
+  function teken(r) {
+    if (r.aan) {
+      $('#rust').innerHTML =
+        '<p><strong>' + Veilig.esc(r.naam) + '</strong> staat aan.</p>' +
+        '<p class="stil" style="margin-top:.3rem;">' + Veilig.esc(r.uitleg) + '</p>' +
+        '<p class="stil" style="margin-top:.5rem;">Vanzelf voorbij om ' + Veilig.tijd(r.tot) +
+          (r.hangtAanWacht ? ', of zodra u incheckt in de Thuiswacht.' : '.') + '</p>' +
+        (r.notitie ? '<p class="stil" style="margin-top:.5rem;">' + Veilig.esc(r.notitie) + '</p>' : '') +
+        '<button class="knop groot" id="uit" style="margin-top:1rem;">Zet uit</button>';
+      $('#uit').addEventListener('click', async () => {
+        try { await Veilig.api('/api/veiligheid/rust/uit'); Veilig.melding('Uit.'); laad(); }
+        catch (e) { Veilig.melding(e.message); }
+      });
+      return;
+    }
+    let gekozen = (r.standen[0] || {}).id;
+    let duur = 240;
+    $('#rust').innerHTML =
+      r.standen.map(s => '<button class="stand" data-id="' + s.id + '" aria-pressed="' + (s.id === gekozen) + '">' +
+        '<b>' + Veilig.esc(s.naam) + '</b><span>' + Veilig.esc(s.uitleg) + '</span></button>').join('') +
+      '<label class="stil lbl" for="duur">Hoe lang hooguit?</label>' +
+      '<div class="keuzes" role="group" aria-label="Duur">' +
+        DUUR.map(d => '<button class="knop" data-duur="' + d.min + '" aria-pressed="' + (d.min === duur) + '">' + d.naam + '</button>').join('') +
+      '</div>' +
+      '<label class="stil lbl" for="notitie">Wilt u er iets bij zetten? (alleen voor uzelf)</label>' +
+      '<input id="notitie" maxlength="120" placeholder="Bijv. eten met de kinderen">' +
+      '<button class="knop hoofd groot" id="aan" style="margin-top:.9rem;">Zet aan</button>';
+
+    $('#rust').querySelectorAll('[data-id]').forEach(b => b.addEventListener('click', () => {
+      gekozen = b.dataset.id;
+      $('#rust').querySelectorAll('[data-id]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    }));
+    $('#rust').querySelectorAll('[data-duur]').forEach(b => b.addEventListener('click', () => {
+      duur = Number(b.dataset.duur);
+      $('#rust').querySelectorAll('[data-duur]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    }));
+    $('#aan').addEventListener('click', async () => {
+      try {
+        await Veilig.api('/api/veiligheid/rust/aan', { stand: gekozen, minuten: duur, notitie: $('#notitie').value.trim() });
+        Veilig.melding('Rust aan. Uw kring komt er altijd doorheen.');
+        laad();
+      } catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
+  async function laad() {
+    try { teken((await Veilig.api('/api/veiligheid/rust')).rust); }
+    catch (e) { $('#rust').innerHTML = '<p class="stil">' + Veilig.esc(e.message) + ' Log eerst in via de leden-app.</p>'; }
+  }
+
+  function start() {
+    $('#grens').innerHTML = Veilig.grens();
+    Veilig.kringKaart($('#kring'));
+    laad();
+  }
+  if (window.Veilig) start();
+  else window.addEventListener('load', start);
+})();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

@@ -38,6 +38,11 @@
     theater:     { naam: 'Theater',      url: '/apps/theater.html' },
     wbw:         { naam: 'Wie betaalt wat', url: '/apps/wbw.html' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
+    // veiligheid en verbinding: vier apps op een gedeelde kern
+    thuiswacht:  { naam: 'Thuiswacht',   url: '/apps/thuiswacht.html' },
+    codewoord:   { naam: 'Codewoord',    url: '/apps/codewoord.html' },
+    vitaal:      { naam: 'Vitaal',       url: '/apps/vitaal.html' },
+    thuisrust:   { naam: 'Thuisrust',    url: '/apps/thuisrust.html' },
     ov:          { naam: 'OV',           url: '/apps/ov.html' },
     stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Clips',        url: '/apps/clips.html' },

@@ -1,0 +1,57 @@
+/* Gedeelde stijl voor de vier veiligheidsapps. Zelfde huisstijl als de rest
+   van het leden-OS: zwart, dunne lijnen, veel lucht. Rustig, want dit zijn
+   schermen die je soms onder spanning gebruikt. */
+:root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+  --soft:rgba(244,241,236,0.62);--gold:#857007;--goldlicht:#C9A24B;
+  --bordeaux:#C23A5E;--groen:#69B891;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+.kop{display:flex;align-items:center;gap:.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem .6rem;}
+.kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+.kop .rek{flex:1;}
+.kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:720px;margin:0 auto;}
+h2{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 .6rem;}
+p{line-height:1.6;}
+.stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
+.lbl{display:block;margin:.7rem 0 .25rem;}
+.kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:.6rem 0;}
+.knop{background:transparent;border:1px solid var(--goldlicht);border-radius:10px;color:var(--goldlicht);
+  font:inherit;font-size:.85rem;padding:.6rem .95rem;cursor:pointer;}
+.knop:focus-visible{outline:2px solid var(--goldlicht);outline-offset:2px;}
+.knop.groot{width:100%;padding:1rem;font-size:1rem;font-weight:600;}
+.knop.hoofd{background:var(--goldlicht);border-color:var(--goldlicht);color:#0C0C0B;font-weight:700;}
+.knop.mini{padding:.3rem .6rem;font-size:.72rem;}
+.knop.weg{color:var(--soft);border-color:var(--line);}
+.knop.stop{color:var(--bordeaux);border-color:var(--bordeaux);}
+.knop[disabled]{opacity:.45;cursor:default;}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  font:inherit;font-size:.9rem;padding:.6rem .8rem;width:100%;}
+input:focus-visible,select:focus-visible{outline:2px solid var(--goldlicht);outline-offset:1px;}
+.rij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.4rem 0;}
+.rij .cn{flex:1;min-width:8rem;font-size:.9rem;}
+.rij input{flex:1;min-width:9rem;width:auto;}
+.mini{font-size:.72rem;color:var(--soft);display:flex;align-items:center;gap:.3rem;white-space:nowrap;}
+.mini input{width:auto;}
+/* de eerlijke grens: gouden lijn, altijd zichtbaar, nooit weg te klikken */
+.grens{border:1px solid var(--gold);border-radius:12px;padding:.8rem .9rem;margin:1rem 0;
+  font-size:.8rem;line-height:1.55;color:var(--soft);background:rgba(133,112,7,.07);}
+.grens strong{color:var(--txt);}
+/* de teller: het enige grote element op het scherm als er iets loopt */
+.teller{font-family:'Bodoni Moda',serif;font-size:3.2rem;line-height:1;letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;text-align:center;margin:.3rem 0 .2rem;}
+.teller.warm{color:var(--goldlicht);}
+.teller.alarm{color:var(--bordeaux);}
+.tellerbij{text-align:center;color:var(--soft);font-size:.8rem;margin-bottom:.9rem;}
+/* De duurknoppen als raster, niet als flex-rij. Met flex-wrap kreeg de laatste
+   knop de hele tweede regel voor zich (vijf keuzes op een telefoon), en dat
+   leest als een aparte, belangrijkere knop. Een raster houdt ze gelijkwaardig. */
+.keuzes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;margin:.6rem 0;}
+.keuzes button{padding:.6rem .2rem;font-size:.8rem;}
+@media (max-width:360px){.keuzes{grid-template-columns:repeat(3,minmax(0,1fr));}}
+.keuzes button[aria-pressed="true"]{background:var(--goldlicht);color:#0C0C0B;font-weight:700;}
+.vmelding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%) translateY(1rem);
+  background:#151312;border:1px solid var(--goldlicht);border-radius:12px;padding:.7rem 1rem;
+  font-size:.85rem;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;}
+.vmelding.aan{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (prefers-reduced-motion:reduce){.vmelding{transition:none;}}

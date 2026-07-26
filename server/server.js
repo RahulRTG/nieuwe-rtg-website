@@ -2033,6 +2033,46 @@ Object.assign(kern, require('./kern/spellen')({
     return lft != null && lft >= 18;
   }
 }));
+/* RTG Veilig (kern/veilig/): de ruggengraat onder vier apps -- Thuiswacht
+   ("ik ben over X minuten thuis"), het stille Codewoord, de Vitale check-in
+   en Thuisrust ("niet storen tot thuis").
+
+   De dodemansknop telt op de klok van DEZE server, niet in de app. Dat is de
+   hele reden dat het werkt als de telefoon uitvalt: geen levensteken is zelf
+   het signaal. Zie kern/veilig/wacht.js. */
+function meldAan(handle, note) {
+  if (!handle) return null;
+  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
+  /* De veiligheidsbaan: een rust-stand ("niet storen") mag een
+     veiligheidsmelding NOOIT tegenhouden. Daarom vraagt deze poort het
+     expliciet, in plaats van de gewone meldingsvoorkeuren te volgen. */
+  if (kern.rustMagDoor && !kern.rustMagDoor(handle, n)) return n;
+  db.data.notifications[handle] = (db.data.notifications[handle] || []);
+  db.data.notifications[handle].unshift(n);
+  db.data.notifications[handle] = db.data.notifications[handle].slice(0, 40);
+  save();
+  sseToCustomer(handle, 'notify', n);
+  sseToCustomer(handle, 'veilig', n);          // de vier apps luisteren hierop
+  try { sendPush(handle, n); } catch (e) { /* push mag een alarm nooit tegenhouden */ }
+  const m = /^user-(.+)$/.exec(String(handle));
+  if (m) { try { sendPushToUser(m[1], n); } catch (e) {} }
+  return n;
+}
+Object.assign(kern, require('./kern/veiligheid')({
+  db, save, crypto, schoon, mail,
+  kluis: require('./accounts/kluis'),
+  sociaal: { codenaamVan: kern.codenaamVan, zijnVrienden: kern.zijnVrienden },
+  meldAan,
+  appUrl: () => process.env.APP_URL || ''
+}));
+kern.meldAan = meldAan;
+/* De sweep: elke halve minuut kijken of er een wacht is afgelopen. Dit is de
+   klok die doortikt terwijl de telefoon van het lid uit staat. De overgangen
+   zijn idempotent (elke stap kijkt eerst naar de huidige status), dus een
+   dubbele sweep levert hooguit een dubbele melding op, nooit een dubbele
+   toestand. */
+setInterval(() => { try { kern.veiligSweep(); } catch (e) { console.error('[veilig] sweep:', e.message); } }, 30 * 1000).unref();
+
 /* De leerlaag (kern/leren.js): overhoorlijsten, het overhoorduel, samen aan
    projecten en schrijven met buddy-feedback; RTF- en RTG-leden doen samen mee. */
 Object.assign(kern, require('./kern/leren')({
@@ -2696,6 +2736,8 @@ require('./routes/lesmaker')(kern);
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);
 require('./routes/code')(kern);
+// RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
+require('./routes/veiligheid')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

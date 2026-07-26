@@ -75,6 +75,13 @@ const R = [
   ['sport', 'Sport', 'spelen', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
 
   // ---- veiligheid & identiteit ----
+  // De vier veiligheidsapps draaien op een gedeelde kern (kern/veiligheid/):
+  // een kring van codenamen, je laatst bekende plek, en een dodemansknop die
+  // op de SERVER tikt, zodat hij ook afgaat als je telefoon uitvalt.
+  ['thuiswacht', 'Thuiswacht', 'veiligheid', '/apps/thuiswacht.html', 'Zeg hoe lang je onderweg bent; meld je je niet, dan krijgt je kring bericht met je laatst bekende plek.'],
+  ['codewoord', 'Codewoord', 'veiligheid', '/apps/codewoord.html', 'Een gewone zin die je kring stil waarschuwt met je plek; op je scherm gebeurt er niets zichtbaars.'],
+  ['vitaal', 'Vitaal', 'veiligheid', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
+  ['thuisrust', 'Thuisrust', 'veiligheid', '/apps/thuisrust.html', 'Niet storen tot je thuis bent; je eigen kring komt er altijd doorheen.'],
   ['passkeys', 'Passkeys', 'veiligheid', '/apps/passkeys.html', 'Inloggen met vingerafdruk, gezicht of een fysieke sleutel.'],
   ['juridisch', 'Juridisch', 'veiligheid', '/apps/juridisch.html', 'Voorwaarden, contracten en je eigen akkoorden.'],
 

@@ -39,6 +39,13 @@ app.post('/api/fluister', auth, async (req, res) => {
      vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de
      deur weer (kern/pestgrens.js). Neemt de poort het gesprek over, dan
      komt er geen gewone AI-beurt en ook geen stuur-lus. */
+  /* Het stille codewoord (kern/veilig/codewoord.js). Staat hier, in de gewone
+     Rahul-route, omdat de zin juist in een DOODGEWOON gesprek moet kunnen
+     vallen: je hoeft geen app te openen, en degene die meekijkt ziet je niets
+     bijzonders doen. Wat er ook gebeurt, hierna gaat het gesprek precies
+     verder zoals altijd: geen ander antwoord, geen extra veld, geen vinkje.
+     Elk zichtbaar verschil zou de functie kapotmaken. */
+  if (kern.codewoordCheck) { try { kern.codewoordCheck(req.session.key, req.body.q, 'rahul'); } catch (e) {} }
   const grens = pestgrens.poort(req.session.key, req.body.q);
   if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
   // de sessie reist mee zodat Fluister ook kan doen (reserveren, 24 uur plannen)

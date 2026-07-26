@@ -295,6 +295,39 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 
 **Codenaam (privacy by design):** elke klant krijgt een codenaam (bijv. *Zilveren Valk*). Reserveringen, betalingen en reisdata staan in de systemen op de codenaam; de echte naam ligt in een gescheiden kluis en wordt pas bij ticketing/check-in gekoppeld. Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam.
 
+## Veiligheid & verbinding: vier apps op één ruggengraat
+
+Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen
+(`server/kern/veiligheid/`, routes onder `/api/veiligheid/*`):
+
+| App | Wat het doet |
+|---|---|
+| **Thuiswacht** (`/apps/thuiswacht.html`) | "Ik ben over X minuten thuis." Meld je je niet, dan krijgt je kring bericht met je laatst bekende plek |
+| **Codewoord** (`/apps/codewoord.html`) | Een gewone zin tegen Rahul waarschuwt je kring stil; op je scherm gebeurt er zichtbaar niets |
+| **Vitaal** (`/apps/vitaal.html`) | Dagelijkse check-in voor medicijnen of voor wie alleen woont |
+| **Thuisrust** (`/apps/thuisrust.html`) | Niet storen tot je thuis bent, met een veiligheidsbaan die je kring altijd doorlaat |
+
+Drie ontwerpkeuzes die de rest verklaren:
+
+1. **De dodemansknop tikt op de server, niet in de app.** Daarom werkt hij ook
+   als de telefoon uitvalt: het toestel moet zich MELDEN om het alarm tegen te
+   houden, dus stilte is zelf het signaal. De laatst bekende positie staat al op
+   de server en gaat mee in het alarm. Bewezen in `test/veiligheid.test.js`
+   (toets 4): daar doet het toestel na de start niets meer, en het contact krijgt
+   toch het alarm met de plek.
+2. **De kring bestaat uit codenamen**, en alleen uit mensen met wie je al een
+   actieve connectie hebt. Echte namen blijven in de kluis. Per contact stel je in
+   of hij je plek mag zien.
+3. **Het codewoord staat nooit als tekst opgeslagen** (HMAC met de serversleutel
+   plus een eigen zout), het scherm toont hem na het instellen nooit meer, en de
+   controle-route geeft altijd exact hetzelfde antwoord: raak of mis is van
+   buitenaf niet te zien.
+
+En hardop op elk scherm: **dit is geen alarmcentrale.** Er wordt niemand gebeld,
+er kijkt geen mens mee, en zonder internet of met een server die plat ligt gaat er
+niets af. Die zin staat er met opzet; wie denkt beschermd te zijn en het niet is,
+is slechter af dan wie het weet.
+
 ## Partnerkanaal
 
 Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)

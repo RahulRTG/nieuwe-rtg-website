@@ -82,4 +82,27 @@ async function jaNee(ai, system, tekst) {
   } catch (e) { return null; }
 }
 
-module.exports = { maakAI, bouwKetting, jaNee, MODEL_KORT };
+/* Een kort STUK TEKST, via dezelfde uitwijkketen. Zelfde reden als jaNee: zodra
+   een app zijn eigen messages.create schrijft, staat de modelnaam in die app en
+   mist hij de uitwijk. Apps die de AI iets laten samenvatten, opstellen of
+   uitpluizen roepen dit aan.
+
+   Geeft null bij geen sleutel of als geen enkele aanbieder het haalde -- nooit
+   een verzonnen antwoord, zodat de aanroeper eerlijk "de AI is even niet
+   bereikbaar" kan tonen in plaats van iets te doen alsof. */
+async function tekst(ai, system, prompt, opties) {
+  if (!ai || !ai.messages) return null;
+  const o = opties || {};
+  try {
+    const r = await ai.messages.create({
+      model: o.model || MODEL_KORT,
+      max_tokens: Math.min(2000, Number(o.max) || 400),
+      system: String(system || ''),
+      messages: [{ role: 'user', content: String(prompt || '').slice(0, o.invoerMax || 12000) }]
+    });
+    const t = ((r && r.content) || []).map(b => (b && b.text) || '').join('').trim();
+    return t || null;
+  } catch (e) { return null; }
+}
+
+module.exports = { maakAI, bouwKetting, jaNee, tekst, MODEL_KORT };

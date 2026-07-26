@@ -2310,6 +2310,11 @@ Object.assign(kern, require('./kern/wauw')({ db, save, accounts, socialConnectie
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)
 Object.assign(kern, require('./kern/pulse')({ db, save, crypto, liveCodename, notify,
   stemmingVan: kern.stemmingVan, jarigVan: kern.jarigVan }));
+/* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
+   archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
+   afspraken eruit halen). De AI stelt op, de mens verstuurt. */
+kern.berichten = require('./kern/berichten')({ db, save, socialConnecties: kern.socialConnecties,
+  dmSleutel: kern.dmSleutel, codenaamVan: kern.codenaamVan, rtmail, overheid: kern.overheid, anthropic });
 // Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
 // dat meereist en een aparte, veilige intake-deling per aanbieder.
 Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));

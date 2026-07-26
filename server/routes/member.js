@@ -57,8 +57,10 @@ module.exports = (kern) => {
   require('./member/rendezvous')(kern);
   // RTG Pulse: het eigen 9+-microblog op codenaam
   require('./member/pulse')(kern);
-  // De Berichten-app: alle gesprekken van het platform op een plek
+  // De Berichten-app: alle gesprekken van het platform op een plek (de lijst),
+  // en de handelingen erbij: zoeken, vlaggen en de drie AI-taken
   require('./member/berichten')(kern);
+  require('./member/berichtenapp')(kern);
   // De wauw-laag: stemming, verjaardagsglans en De Terugblik
   require('./member/wauw')(kern);
   // De moedertaal van het account: iedereen praat en leest in de eigen taal

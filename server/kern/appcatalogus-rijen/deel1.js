@@ -4,7 +4,7 @@
 module.exports = [
 
   // ---- sociaal & contact ----
-  ['berichten', 'Berichten', 'sociaal', '/apps/berichten.html', 'Chatten, bellen en videobellen op codenaam; berichten worden automatisch voor je vertaald.'],
+  ['berichten', 'Berichten', 'sociaal', '/apps/berichten.html', 'Al je gesprekken op een plek, met zoeken over alles heen. Rahul vat een lang gesprek samen, stelt een antwoord op en haalt de afspraken eruit.'],
   ['pulse', 'Pulse', 'sociaal', '/apps/pulse.html', 'De hoogtepunten van vandaag in jouw RTG-wereld, rustig gebundeld, geen eindeloze feed.'],
   ['cercle', 'Cercle', 'sociaal', '/apps/cercle.html', 'Je besloten kring: de mensen die dichtbij staan, op één plek.'],
   ['entourage', 'Entourage', 'sociaal', '/apps/entourage.html', 'Je vaste mensen en hun rol om je heen, overzichtelijk bij elkaar.'],

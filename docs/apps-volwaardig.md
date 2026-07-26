@@ -277,13 +277,42 @@ opslagronde ook deden.
 
 | Ronde | Wat | Waarom eerst |
 |---|---|---|
-| 1 | **Berichten** volwaardig | de motor is er al helemaal; grootste winst per uur werk |
+| 1 | ~~**Berichten** volwaardig~~ **GEDAAN** | zie hieronder |
 | 2 | **De Salon**: ledenprofiel, karrousel, paginering voorbij de 60 | de 60-grens is een echte muur, en de Salon levert het beeld voor de hele site |
 | 3 | **Métier** (de professionele app) van nul, met het pseudonieme profiel | ontbreekt volledig, en het pseudonieme ontwerp is een echt merkvoordeel |
 | 4 | **Cercle + Rendez-vous**: groepen en evenementen | maakt de Facebook-kant in één keer echt |
 | 5 | **Snaps en verhalen naar de RTG-wereld** | bestaat al in RTF; overzetten in plaats van bouwen |
 | 6 | **Het Huis** | de hoofdingang van het reisbureau mag geen landingsscherm zijn |
 | 7 | De schillen per categorie afwerken | in de volgorde hierboven |
+
+## Ronde 1 is af: Berichten
+
+Wat de app nu kan, en waar het zit:
+
+| Functie | Waar |
+|---|---|
+| Alle kanalen op een plek (Rahul, prive, werk, Berichtenbox, Pulse, RTMAIL) | `routes/member/berichten.js` |
+| **Zoeken over ALLE kanalen tegelijk**, met het stukje tekst dat laat zien waarom iets een treffer is | `kern/berichten.js` -> `/api/member/berichten/zoek` |
+| Vastzetten (bovenaan), stilzetten (niet in de teller), archiveren (uit de lijst, niets weg) | `/api/member/berichten/vlag` |
+| Een prive-gesprek **lezen en beantwoorden IN de app**, live bijgewerkt | `berichten.html` + de bestaande DM-laag |
+| Rahul **vat een lang gesprek samen** | `/api/member/berichten/samenvatting` |
+| Rahul **stelt een antwoord op** en zet het in je invoerveld | `/api/member/berichten/concept` |
+| Rahul **haalt de afspraken eruit**, met een knop om ze in je agenda te zetten | `/api/member/berichten/afspraken` |
+| De AI-balk onderaan: typ wat er moet gebeuren | `/api/chat/send` |
+
+Drie ontwerpregels die hier zijn vastgelegd en die voor elke volgende app gelden:
+
+1. **De AI stelt op, de mens verstuurt.** Een concept komt terug als tekst in je
+   invoerveld. `test/berichten.test.js` bewijst dat er na een concept geen enkel
+   bericht extra in het gesprek staat.
+2. **Geen AI? Dan een eerlijke melding, geen verzonnen antwoord.** Zonder sleutel
+   geeft elke AI-taak 503 met een leesbare reden.
+3. **Een goede route IS de AI-koppeling.** Het stuur (`kern/stuur.js`) roept elk
+   toegestaan API-pad aan met de inlog van de gebruiker zelf. Elke handeling die
+   ik als route bouw, kan Rahul daarmee meteen zelf doen -- er is geen aparte
+   AI-laag per app nodig, en de AI kan nooit meer dan de persoon die het vraagt.
+
+Bewezen in een echte browser: `test/berichten.e2e.js`.
 
 Twee dingen die ik niet zelf besluit en waar ik je woord voor nodig heb:
 

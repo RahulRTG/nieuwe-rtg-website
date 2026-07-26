@@ -58,7 +58,11 @@ app.post('/api/member/dm', auth, async (req, res) => {
       } catch (e) { return m; }
     }));
   }
-  res.json({ messages: uit, codename: codenaamVan(ander), taal: mijnTaal || null });
+  /* mij: is dit bericht van mij? De client kent zijn eigen sessiesleutel niet
+     (en hoort die niet te kennen), maar moet wel weten welke kant de bel op
+     staat. Een extra veld, dus bestaande lezers merken er niets van. */
+  res.json({ messages: uit.map(m => ({ ...m, mij: m.from === req.session.key })),
+    codename: codenaamVan(ander), taal: mijnTaal || null });
 });
 
 // bericht sturen; optioneel met een gedeelde Salon-post erbij

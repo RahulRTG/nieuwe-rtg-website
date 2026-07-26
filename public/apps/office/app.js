@@ -20,8 +20,8 @@
   var glyf = function (naam) {
     return (window.RTGGlyf && RTGGlyf.svgHTML) ? RTGGlyf.svgHTML(String(naam || ''), {}) : '';
   };
-  var GLYF_SOORT = { tekst: 'logboek', blad: 'grafiek', presentatie: 'podium' };
-  var NAAM_SOORT = { tekst: 'Document', blad: 'Rekenblad', presentatie: 'Presentatie' };
+  var GLYF_SOORT = { tekst: 'logboek', blad: 'grafiek', presentatie: 'podium', formulier: 'opties', schets: 'ontwerp' };
+  var NAAM_SOORT = { tekst: 'Document', blad: 'Rekenblad', presentatie: 'Presentatie', formulier: 'Formulier', schets: 'Schets' };
 
   var PAR = new URLSearchParams(location.search);
   var WERK = PAR.get('werk') || '';
@@ -84,7 +84,7 @@
   };
 
   var open = null, magBewerken = false, bewaarT = null, vuil = false, leesT = null, stand = null;
-  var blad = null, pres = null, presLoop = null;
+  var blad = null, pres = null, presLoop = null, formulier = null, schets = null;
 
   /* ---------- de drive ---------- */
   function laadLijst() {
@@ -186,6 +186,8 @@
   $('#nieuwTekst').addEventListener('click', function () { nieuw('tekst'); });
   $('#nieuwBlad').addEventListener('click', function () { nieuw('blad'); });
   $('#nieuwPres').addEventListener('click', function () { nieuw('presentatie'); });
+  $('#nieuwFormulier').addEventListener('click', function () { nieuw('formulier'); });
+  $('#nieuwSchets').addEventListener('click', function () { nieuw('schets'); });
 
   /* ---------- openen ---------- */
   function openen(id) {
@@ -196,13 +198,17 @@
       $('#staat').textContent = magBewerken ? (r.body.eigenaar ? '' : 'meeschrijven · van ' + r.body.door)
         : 'alleen lezen · van ' + r.body.door;
       $('#deelBtn').style.display = r.body.eigenaar ? '' : 'none';
-      $('#aiBtn').style.display = magBewerken ? '' : 'none';
+      // Rahul leest tekst en dia's; op een formulier of schets heeft hij niets te zoeken
+      $('#aiBtn').style.display = magBewerken && r.body.soort !== 'formulier' && r.body.soort !== 'schets' ? '' : 'none';
       $('#presBtn').style.display = r.body.soort === 'presentatie' ? '' : 'none';
       $('#formBalk').style.display = r.body.soort === 'blad' ? '' : 'none';
       $('#tekstTools').style.display = 'none'; $('#bladTools').style.display = 'none';
       $('#tekst').style.display = 'none'; $('#bladWrap').style.display = 'none'; $('#presWrap').style.display = 'none';
+      $('#formWrap').style.display = 'none'; $('#schetsWrap').style.display = 'none';
       if (r.body.soort === 'blad') toonBlad(r.body.inhoud);
       else if (r.body.soort === 'presentatie') toonPres(r.body.inhoud);
+      else if (r.body.soort === 'formulier') toonFormulier(r.body.inhoud);
+      else if (r.body.soort === 'schets') toonSchets(r.body.inhoud);
       else toonTekst(r.body.inhoud);
       $('#lijst').style.display = 'none'; $('#editor').classList.add('aan');
       volgMee();
@@ -214,10 +220,16 @@
       if (!open || vuil) return;
       api('open', { id: open.id }).then(function (v) {
         if (v.status !== 200 || v.body.gewijzigd === open.gewijzigd) return;
+        // wie een formulier aan het invullen is raakt zijn half getypte
+        // antwoorden niet kwijt aan een verversing; nieuwe vragen komen
+        // vanzelf bij de volgende keer openen
+        if (open.soort === 'formulier' && !magBewerken) return;
         open.gewijzigd = v.body.gewijzigd; open.inhoud = v.body.inhoud;
         if (document.activeElement && document.activeElement.id === 'tekst') return;
         if (open.soort === 'blad') blad.laad(v.body.inhoud, magBewerken);
         else if (open.soort === 'presentatie') pres.laad(v.body.inhoud, magBewerken);
+        else if (open.soort === 'formulier') formulier.laad(v.body.inhoud, magBewerken, open.id);
+        else if (open.soort === 'schets') schets.laad(v.body.inhoud, magBewerken);
         else $('#tekst').innerHTML = (v.body.inhoud && v.body.inhoud.tekst) || '';
         zeg('Bijgewerkt door ' + (v.body.door || 'een ander'));
       });
@@ -253,6 +265,20 @@
       voet: $('#voetbalk'), onWijzig: markeer });
     blad.laad(inhoud, magBewerken);
     if (magBewerken) { $('#bladTools').style.display = 'flex'; blad.bouwBalk($('#bladTools')); }
+  }
+
+  /* ---------- formulier en schets ---------- */
+  function toonFormulier(inhoud) {
+    $('#formWrap').style.display = '';
+    if (!formulier) formulier = RTGOfficeFormulier.maak({ wrap: $('#formWrap'), api: api, onWijzig: markeer, meld: zeg });
+    formulier.laad(inhoud, magBewerken, open.id);
+    var n = ((inhoud && inhoud.vragen) || []).length;
+    $('#voetbalk').textContent = n + (n === 1 ? ' vraag' : ' vragen');
+  }
+  function toonSchets(inhoud) {
+    $('#schetsWrap').style.display = '';
+    if (!schets) schets = RTGOfficeSchets.maak({ wrap: $('#schetsWrap'), onWijzig: markeer, meld: zeg, voet: $('#voetbalk') });
+    schets.laad(inhoud, magBewerken);
   }
 
   /* ---------- presentatie ---------- */
@@ -291,6 +317,8 @@
   function inhoudNu() {
     return open.soort === 'blad' ? blad.inhoud()
       : open.soort === 'presentatie' ? pres.inhoud()
+      : open.soort === 'formulier' ? formulier.inhoud()
+      : open.soort === 'schets' ? schets.inhoud()
       : { tekst: $('#tekst').innerHTML.slice(0, 500000) };
   }
   function bewaarNu() {
@@ -368,6 +396,8 @@
             open.gewijzigd = t.body.gewijzigd; open.inhoud = t.body.inhoud; vuil = false;
             if (open.soort === 'blad') blad.laad(t.body.inhoud, magBewerken);
             else if (open.soort === 'presentatie') pres.laad(t.body.inhoud, magBewerken);
+            else if (open.soort === 'formulier') formulier.laad(t.body.inhoud, magBewerken, open.id);
+            else if (open.soort === 'schets') schets.laad(t.body.inhoud, magBewerken);
             else { $('#tekst').innerHTML = (t.body.inhoud && t.body.inhoud.tekst) || ''; telBij(); }
             $('#versieScrim').classList.remove('open'); zeg('Versie teruggezet.');
           });
@@ -406,21 +436,33 @@
   });
 
   /* ---------- export ---------- */
+  function laadNeer(data, naam, type) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([data], { type: type + ';charset=utf-8' }));
+    a.download = naam; a.click(); URL.revokeObjectURL(a.href);
+    zeg('Geëxporteerd: ' + naam);
+  }
   $('#exportBtn').addEventListener('click', function () {
     if (!open) return;
     var data, naam, type, titel = $('#titel').value || 'document';
     if (open.soort === 'blad') { data = blad.naarCsv(); naam = titel + '.csv'; type = 'text/csv'; }
     else if (open.soort === 'presentatie') { data = pres.naarTekst(); naam = titel + '.txt'; type = 'text/plain'; }
+    else if (open.soort === 'schets') { data = schets.naarSvg(); naam = titel + '.svg'; type = 'image/svg+xml'; }
+    else if (open.soort === 'formulier') {
+      // de beheerder krijgt de uitslag als CSV; wie alleen invult niets
+      if (!magBewerken) return zeg('De uitslag is voor wie het formulier beheert.');
+      return formulier.uitslagCsv().then(function (csv) {
+        if (csv == null) return zeg('Kon de uitslag niet ophalen.');
+        laadNeer(csv, titel + '.csv', 'text/csv');
+      });
+    }
     else {
       data = '<!doctype html><meta charset="utf-8"><title>' + esc(titel) + '</title>' +
         '<body style="font-family:Georgia,serif;max-width:42em;margin:3em auto;line-height:1.7;color:#1a1a19;">' +
         $('#tekst').innerHTML;
       naam = titel + '.html'; type = 'text/html';
     }
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([data], { type: type + ';charset=utf-8' }));
-    a.download = naam; a.click(); URL.revokeObjectURL(a.href);
-    zeg('Geëxporteerd: ' + naam);
+    laadNeer(data, naam, type);
   });
 
   if (!token) zeg(opzet.leeg); else laadLijst();

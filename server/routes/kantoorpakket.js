@@ -12,7 +12,7 @@ module.exports = (kern) => {
   const { app, auth, supplierAuth, officeAuth, express, rtf,
     werkplek, boardroomWie, boardroomBaas,
     officeMijn, officeMaak, officeOpen, officeBewaar, officeDeel, officeWeg, officeSter,
-    officeVersies, officeTerug, officeAI, officeKring } = kern;
+    officeVersies, officeTerug, officeAI, officeKring, officeVul, officeUitslag } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const ruim = express.json({ limit: '600kb' });
 
@@ -31,6 +31,8 @@ module.exports = (kern) => {
     route('/versies', (key, b) => officeVersies(key, b.id));
     route('/terug', (key, b) => officeTerug(key, b.id, b.nr));
     route('/ai', (key, b) => officeAI(key, b.id, b.opdracht, b.vraag));
+    route('/vul', (key, b) => officeVul(key, b.id, b));
+    route('/uitslag', (key, b) => officeUitslag(key, b.id));
   }
 
   // leden: op het eigen account; de gratis gast-app heeft geen Office
@@ -53,6 +55,8 @@ module.exports = (kern) => {
     route('/versies', (key, b) => officeVersies(key, b.id));
     route('/terug', (key, b) => officeTerug(key, b.id, b.nr));
     route('/ai', (key, b) => officeAI(key, b.id, b.opdracht, b.vraag));
+    route('/vul', (key, b) => officeVul(key, b.id, b));
+    route('/uitslag', (key, b) => officeUitslag(key, b.id));
   }
 
   // elke leverancier en partner: de team-drive van de zaak
@@ -85,6 +89,9 @@ module.exports = (kern) => {
   rtfRoute('/terug', (s, b) => officeTerug(s.key, b.id, b.nr), { schrijf: true });
   rtfRoute('/ai', (s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring), { schrijf: true });
   rtfRoute('/gezin', (s, b) => officeKring(s.key, b.id, b.rechten), { schrijf: true });
+  // invullen mag ook een oppas of familielid (gast): antwoorden is geen bewerken
+  rtfRoute('/vul', (s, b) => officeVul(s.key, b.id, b, s.kring));
+  rtfRoute('/uitslag', (s, b) => officeUitslag(s.key, b.id, s.kring), { schrijf: true });
 
   /* De werkplekken: elk huis zijn eigen kantoordrive, op dezelfde kern als de
      rest van RTG Office. RTG werkte al op 'rtg:kantoor'; de RTFoundation kreeg
@@ -118,4 +125,6 @@ module.exports = (kern) => {
   huisRoute('/versies', (s, b) => officeVersies(s.key, b.id, s.kring));
   huisRoute('/terug', (s, b) => officeTerug(s.key, b.id, b.nr));
   huisRoute('/ai', (s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring));
+  huisRoute('/vul', (s, b) => officeVul(s.key, b.id, b, s.kring));
+  huisRoute('/uitslag', (s, b) => officeUitslag(s.key, b.id, s.kring));
 };

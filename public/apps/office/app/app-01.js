@@ -20,8 +20,8 @@
   var glyf = function (naam) {
     return (window.RTGGlyf && RTGGlyf.svgHTML) ? RTGGlyf.svgHTML(String(naam || ''), {}) : '';
   };
-  var GLYF_SOORT = { tekst: 'logboek', blad: 'grafiek', presentatie: 'podium' };
-  var NAAM_SOORT = { tekst: 'Document', blad: 'Rekenblad', presentatie: 'Presentatie' };
+  var GLYF_SOORT = { tekst: 'logboek', blad: 'grafiek', presentatie: 'podium', formulier: 'opties', schets: 'ontwerp' };
+  var NAAM_SOORT = { tekst: 'Document', blad: 'Rekenblad', presentatie: 'Presentatie', formulier: 'Formulier', schets: 'Schets' };
 
   var PAR = new URLSearchParams(location.search);
   var WERK = PAR.get('werk') || '';
@@ -84,7 +84,7 @@
   };
 
   var open = null, magBewerken = false, bewaarT = null, vuil = false, leesT = null, stand = null;
-  var blad = null, pres = null, presLoop = null;
+  var blad = null, pres = null, presLoop = null, formulier = null, schets = null;
 
   /* ---------- de drive ---------- */
   function laadLijst() {
@@ -186,4 +186,6 @@
   $('#nieuwTekst').addEventListener('click', function () { nieuw('tekst'); });
   $('#nieuwBlad').addEventListener('click', function () { nieuw('blad'); });
   $('#nieuwPres').addEventListener('click', function () { nieuw('presentatie'); });
+  $('#nieuwFormulier').addEventListener('click', function () { nieuw('formulier'); });
+  $('#nieuwSchets').addEventListener('click', function () { nieuw('schets'); });
 

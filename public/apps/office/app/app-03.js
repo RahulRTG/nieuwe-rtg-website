@@ -27,21 +27,33 @@
   });
 
   /* ---------- export ---------- */
+  function laadNeer(data, naam, type) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([data], { type: type + ';charset=utf-8' }));
+    a.download = naam; a.click(); URL.revokeObjectURL(a.href);
+    zeg('Geëxporteerd: ' + naam);
+  }
   $('#exportBtn').addEventListener('click', function () {
     if (!open) return;
     var data, naam, type, titel = $('#titel').value || 'document';
     if (open.soort === 'blad') { data = blad.naarCsv(); naam = titel + '.csv'; type = 'text/csv'; }
     else if (open.soort === 'presentatie') { data = pres.naarTekst(); naam = titel + '.txt'; type = 'text/plain'; }
+    else if (open.soort === 'schets') { data = schets.naarSvg(); naam = titel + '.svg'; type = 'image/svg+xml'; }
+    else if (open.soort === 'formulier') {
+      // de beheerder krijgt de uitslag als CSV; wie alleen invult niets
+      if (!magBewerken) return zeg('De uitslag is voor wie het formulier beheert.');
+      return formulier.uitslagCsv().then(function (csv) {
+        if (csv == null) return zeg('Kon de uitslag niet ophalen.');
+        laadNeer(csv, titel + '.csv', 'text/csv');
+      });
+    }
     else {
       data = '<!doctype html><meta charset="utf-8"><title>' + esc(titel) + '</title>' +
         '<body style="font-family:Georgia,serif;max-width:42em;margin:3em auto;line-height:1.7;color:#1a1a19;">' +
         $('#tekst').innerHTML;
       naam = titel + '.html'; type = 'text/html';
     }
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([data], { type: type + ';charset=utf-8' }));
-    a.download = naam; a.click(); URL.revokeObjectURL(a.href);
-    zeg('Geëxporteerd: ' + naam);
+    laadNeer(data, naam, type);
   });
 
   if (!token) zeg(opzet.leeg); else laadLijst();

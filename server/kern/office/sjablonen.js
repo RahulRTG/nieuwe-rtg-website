@@ -1,8 +1,10 @@
 /* RTG Office, de sjablonen: een vliegende start voor het werk dat op een
    kantoorvloer echt gedaan wordt. Pure inhoud, geen logica.
 
-   Elk sjabloon draagt een groep, zodat de kiezer op het scherm ze ordent in
-   plaats van er een lange lijst van te maken. De cijfersjablonen staan met
+   De sjablonen voor presenteren, vragen en schetsen staan in sjablonen2.js
+   (dit bestand voegt ze hieronder samen). Elk sjabloon draagt een groep,
+   zodat de kiezer op het scherm ze ordent in plaats van er een lange lijst
+   van te maken. De cijfersjablonen staan met
    formules erin (=SOM, =GEM); de opmaak zegt per cel of het een kop, een
    geldbedrag, een percentage of een gewoon getal is, zodat een blad er
    meteen uitziet als een blad en niet als los tekstwerk. */
@@ -116,31 +118,9 @@ const SJABLONEN = {
   weekplan: { soort: 'blad', groep: 'Algemeen', titel: 'Weekplanning', inhoud: { cellen: {
     A1: 'Dag', B1: 'Ochtend', C1: 'Middag', D1: 'Avond',
     A2: 'Maandag', A3: 'Dinsdag', A4: 'Woensdag', A5: 'Donderdag', A6: 'Vrijdag', A7: 'Zaterdag', A8: 'Zondag'
-  }, opmaak: { A1: 'kop', B1: 'kop', C1: 'kop', D1: 'kop' }, rijen: 12, kolommen: 5 } },
-
-  /* ---- presenteren ---- */
-  boardpack: { soort: 'presentatie', groep: 'Bestuur', titel: 'Bestuursvergadering', inhoud: { dias: [
-    { indeling: 'titel', titel: 'Bestuursvergadering', tekst: '[Datum] · [Plaats]', notitie: 'Welkom, vaststellen agenda.' },
-    { indeling: 'punten', titel: 'Agenda', tekst: 'Cijfers\nOperatie\nBesluiten\nRondvraag', notitie: '' },
-    { indeling: 'cijfer', titel: 'De maand in een cijfer', tekst: 'Zet hier het cijfer dat de maand samenvat.', notitie: 'Noem eerst het cijfer, dan de duiding.' },
-    { indeling: 'twee', titel: 'Wat ging goed / wat niet', tekst: 'Goed:\n\nNiet:', notitie: '' },
-    { indeling: 'punten', titel: 'Gevraagde besluiten', tekst: 'Besluit 1\nBesluit 2', notitie: 'Per besluit: wie, wat, wanneer.' }
-  ] } },
-  investering: { soort: 'presentatie', groep: 'Commercieel', titel: 'Investeringsvoorstel', inhoud: { dias: [
-    { indeling: 'titel', titel: 'Investeringsvoorstel', tekst: '[Onderwerp] · [Bedrag]', notitie: '' },
-    { indeling: 'punten', titel: 'De vraag', tekst: 'Wat vragen we\nWaarvoor\nWanneer', notitie: '' },
-    { indeling: 'twee', titel: 'Business case', tekst: 'Kosten:\n\nOpbrengsten:', notitie: 'Terugverdientijd expliciet noemen.' },
-    { indeling: 'cijfer', titel: 'Terugverdientijd', tekst: '[maanden]', notitie: '' },
-    { indeling: 'punten', titel: 'Risico\'s', tekst: 'Risico en beheersing per punt', notitie: '' },
-    { indeling: 'citaat', titel: 'Het besluit', tekst: 'Wat vragen we de vergadering nu te besluiten?', notitie: '' }
-  ] } },
-  pitch: { soort: 'presentatie', groep: 'Commercieel', titel: 'Pitch', inhoud: { dias: [
-    { indeling: 'titel', titel: 'De titel van uw verhaal', tekst: 'Wie u bent, in een zin.', notitie: '' },
-    { indeling: 'punten', titel: 'Het probleem', tekst: 'Wat lost u op, en voor wie?', notitie: '' },
-    { indeling: 'punten', titel: 'De oplossing', tekst: 'Hoe u het oplost; een zin per punt.', notitie: '' },
-    { indeling: 'cijfer', titel: 'De markt', tekst: '[bedrag of aantal]', notitie: '' },
-    { indeling: 'citaat', titel: 'De vraag', tekst: 'Wat heeft u nodig van de zaal?', notitie: '' }
-  ] } }
+  }, opmaak: { A1: 'kop', B1: 'kop', C1: 'kop', D1: 'kop' }, rijen: 12, kolommen: 5 } }
 };
+
+Object.assign(SJABLONEN, require('./sjablonen2'));
 
 module.exports = { SJABLONEN };

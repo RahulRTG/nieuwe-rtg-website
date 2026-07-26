@@ -4,7 +4,7 @@
    leden op eigen account, teams als 'sup:CODE', de RTG-kantoren als
    'rtg:kantoor' en RTF-gezinsprofielen als 'rtf:CODE:handle'. */
 
-const SOORTEN = ['tekst', 'blad', 'presentatie'];
+const SOORTEN = ['tekst', 'blad', 'presentatie', 'formulier', 'schets'];
 const MAX_DOCS = 200;            // per eigenaar (lid, zaak of kantoor)
 const MAX_BYTES = 500000;        // per document (ruime kantoortekst, blad of deck)
 const MAX_TITEL = 120;
@@ -17,6 +17,14 @@ const OPMAAK = ['kop', 'geld', 'procent', 'getal', 'datum'];
 const INDELINGEN = ['titel', 'punten', 'twee', 'citaat', 'cijfer'];
 // de thema's van een deck; dezelfde vier als in apps/office/pres.js
 const THEMAS = ['nacht', 'papier', 'bordeaux', 'goud'];
+/* Het formulier en de schets: dezelfde aanpak als opmaak en indelingen --
+   een korte vaste lijst per soort, en grenzen die het scherm ook hanteert. */
+const VRAAGSOORTEN = ['open', 'keuze', 'schaal'];
+const MAX_VRAGEN = 30;
+const MAX_INZENDINGEN = 500;     // per formulier; een enquete, geen volkstelling
+const VORMEN = ['kader', 'ovaal', 'ruit', 'pijl', 'tekst'];
+const MAX_VORMEN = 300;
+const VLAK_B = 1200, VLAK_H = 800; // het tekenvlak van een schets (viewBox)
 
 const { SJABLONEN } = require('./sjablonen');
 
@@ -83,6 +91,39 @@ function maakBasis({ db, crypto, codenaamVan }) {
         // blijft bruikbaar, alleen de kleur valt terug
         thema: THEMAS.includes(inhoud.thema) ? inhoud.thema : 'nacht' };
     }
+    if (soort === 'formulier') {
+      const bron = Array.isArray(inhoud.vragen) ? inhoud.vragen : [];
+      const vragen = bron.slice(0, MAX_VRAGEN).map(v => ({
+        tekst: String((v && v.tekst) || '').slice(0, 200),
+        soort: VRAAGSOORTEN.includes(v && v.soort) ? v.soort : 'open',
+        opties: (Array.isArray(v && v.opties) ? v.opties : []).slice(0, 8)
+          .map(o => String(o == null ? '' : o).slice(0, 80))
+      }));
+      return { vragen: vragen.length ? vragen : [{ tekst: '', soort: 'open', opties: [] }],
+        // codenaam is de standaard: wie invult staat er met codenaam bij;
+        // 'anoniem' verbergt de invuller voor de eigenaar (niet voor RTG:
+        // een inzending per persoon vraagt dat de server weet wie het was)
+        wijze: inhoud.wijze === 'anoniem' ? 'anoniem' : 'codenaam' };
+    }
+    if (soort === 'schets') {
+      const bron = Array.isArray(inhoud.vormen) ? inhoud.vormen : [];
+      const klem = (x, min, max, sv) => {
+        const n = Math.round(Number(x));
+        return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : sv;
+      };
+      const vormen = [];
+      for (const v of bron) {
+        if (vormen.length >= MAX_VORMEN) break;
+        // een onbekende vorm valt weg in plaats van als raadsel opgeslagen
+        if (!v || !VORMEN.includes(v.soort)) continue;
+        const s = { soort: v.soort, x: klem(v.x, 0, VLAK_B, 0), y: klem(v.y, 0, VLAK_H, 0),
+          tekst: String(v.tekst == null ? '' : v.tekst).slice(0, 120) };
+        if (v.soort === 'pijl') { s.x2 = klem(v.x2, 0, VLAK_B, s.x); s.y2 = klem(v.y2, 0, VLAK_H, s.y); }
+        else if (v.soort !== 'tekst') { s.b = klem(v.b, 10, VLAK_B, 120); s.h = klem(v.h, 10, VLAK_H, 60); }
+        vormen.push(s);
+      }
+      return { vormen };
+    }
     return { tekst: String(inhoud.tekst || '').slice(0, MAX_BYTES) };
   }
 
@@ -90,4 +131,5 @@ function maakBasis({ db, crypto, codenaamVan }) {
 }
 
 module.exports = { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, MAX_DIAS,
-  OPMAAK, INDELINGEN, THEMAS, SJABLONEN, maakBasis };
+  OPMAAK, INDELINGEN, THEMAS, VRAAGSOORTEN, MAX_VRAGEN, MAX_INZENDINGEN,
+  VORMEN, MAX_VORMEN, VLAK_B, VLAK_H, SJABLONEN, maakBasis };

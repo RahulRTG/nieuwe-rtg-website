@@ -205,3 +205,92 @@ test('9. het deck-thema en de bladgrenzen overleven het bewaren', async () => {
   assert.equal(bo.body.inhoud.kolommen, 30, 'de kolommen ook');
   assert.equal(bo.body.inhoud.cellen.AA400, '=SOM(A1:A9)', 'een cel voorbij kolom Z is gewoon een cel');
 });
+
+test('10. het formulier: bouwen, delen, invullen, en de uitslag -- met de anoniem-stand eerlijk', async () => {
+  /* A bouwt drie vragen (open, keuze, schaal) en deelt met B als meelezer.
+     Invullen hoort bij LEZEN, niet bij schrijven: wie het formulier krijgt,
+     mag antwoorden; de uitslag is voor wie het formulier beheert. */
+  const m = await api('/api/kantoorpakket/maak', { soort: 'formulier', titel: 'Rondvraag' }, lidA);
+  const id = m.body.id;
+  await api('/api/kantoorpakket/bewaar', { id, inhoud: { wijze: 'anoniem', vragen: [
+    { tekst: 'Wat vond u ervan?', soort: 'open', opties: [] },
+    { tekst: 'Komt u terug?', soort: 'keuze', opties: ['Ja', 'Nee'] },
+    { tekst: 'Cijfer', soort: 'schaal', opties: [] }
+  ] } }, lidA);
+  await api('/api/kantoorpakket/deel', { id, codenaam: codeB, aan: true, rechten: 'lezen' }, lidA);
+
+  // B ziet vooraf dat hij nog niet heeft ingevuld (de kijk-stand schrijft niets)
+  const kijk = await api('/api/kantoorpakket/vul', { id, kijk: true }, lidB);
+  assert.equal(kijk.body.ingevuld, false);
+
+  const vul = await api('/api/kantoorpakket/vul', { id, antwoorden: ['Prachtig', 0, 4] }, lidB);
+  assert.equal(vul.status, 200);
+  assert.equal(vul.body.vervangen, false);
+  assert.equal(vul.body.aantal, 1);
+
+  // opnieuw insturen vervangt; het aantal blijft een (een inzending per persoon)
+  const vul2 = await api('/api/kantoorpakket/vul', { id, antwoorden: ['Toch matig', 1, 2] }, lidB);
+  assert.equal(vul2.body.vervangen, true);
+  assert.equal(vul2.body.aantal, 1, 'opnieuw insturen telt niet dubbel');
+
+  // B (meelezer) krijgt de uitslag niet; A wel
+  const dicht = await api('/api/kantoorpakket/uitslag', { id }, lidB);
+  assert.equal(dicht.status, 403);
+  const u = await api('/api/kantoorpakket/uitslag', { id }, lidA);
+  assert.equal(u.status, 200);
+  assert.equal(u.body.aantal, 1);
+  assert.equal(u.body.wijze, 'anoniem');
+  assert.equal(u.body.wie, undefined, 'anoniem: de eigenaar ziet NIET wie invulde');
+  assert.equal(u.body.vragen[0].teksten[0].tekst, 'Toch matig', 'de vervangen tekst telt');
+  assert.equal(u.body.vragen[0].teksten[0].van, undefined, 'geen naam bij een anoniem antwoord');
+  assert.equal(u.body.vragen[1].telling[1].aantal, 1, 'de keuze is geteld');
+  assert.equal(u.body.vragen[2].gemiddelde, 2, 'de schaal is gemiddeld');
+
+  // op codenaam staat de naam er WEL bij -- dat is de andere kant van dezelfde eerlijkheid
+  await api('/api/kantoorpakket/bewaar', { id, inhoud: { wijze: 'codenaam', vragen: [
+    { tekst: 'Wat vond u ervan?', soort: 'open', opties: [] },
+    { tekst: 'Komt u terug?', soort: 'keuze', opties: ['Ja', 'Nee'] },
+    { tekst: 'Cijfer', soort: 'schaal', opties: [] }
+  ] } }, lidA);
+  const u2 = await api('/api/kantoorpakket/uitslag', { id }, lidA);
+  assert.equal(u2.body.wie.length, 1);
+  assert.equal(u2.body.wie[0].van, codeB, 'de codenaam, nooit de echte naam');
+
+  // een lid zonder deling komt er niet in, en lege antwoorden zijn geen inzending
+  const c = await lid();
+  assert.equal((await api('/api/kantoorpakket/vul', { id, antwoorden: ['Hoi', 0, 3] }, c.token)).status, 403);
+  assert.equal((await api('/api/kantoorpakket/vul', { id, antwoorden: ['', null, null] }, lidB)).status, 400);
+
+  // verwijderen neemt de inzendingen mee: een nieuw formulier op hetzelfde id bestaat niet meer
+  await api('/api/kantoorpakket/weg', { id }, lidA);
+  assert.equal((await api('/api/kantoorpakket/uitslag', { id }, lidA)).status, 404);
+});
+
+test('11. de schets: vormen blijven staan, en wat geen vorm is valt weg', async () => {
+  const m = await api('/api/kantoorpakket/maak', { soort: 'schets', titel: 'Organigram' }, lidA);
+  const id = m.body.id;
+  await api('/api/kantoorpakket/bewaar', { id, inhoud: { vormen: [
+    { soort: 'kader', x: 100, y: 50, b: 200, h: 60, tekst: 'Directie' },
+    { soort: 'pijl', x: 200, y: 110, x2: 200, y2: 200 },
+    { soort: 'wolkje', x: 1, y: 1, b: 5, h: 5, tekst: 'bestaat niet' },
+    { soort: 'ovaal', x: 99999, y: -50, b: 3, h: 4000, tekst: 'x' }
+  ] } }, lidA);
+  const o = await api('/api/kantoorpakket/open', { id }, lidA);
+  const v = o.body.inhoud.vormen;
+  assert.equal(v.length, 3, 'de onbekende vorm is weggevallen, niet als raadsel bewaard');
+  assert.deepEqual(v[0], { soort: 'kader', x: 100, y: 50, b: 200, h: 60, tekst: 'Directie' });
+  assert.equal(v[1].x2, 200, 'de pijl houdt zijn eindpunt');
+  // de wilde ovaal is geklemd op het vel en op een leesbare maat
+  assert.ok(v[2].x <= 1200 && v[2].y >= 0 && v[2].b >= 10 && v[2].h <= 800,
+    'coordinaten geklemd: ' + JSON.stringify(v[2]));
+
+  // de drive telt in vormen, en de sjablonen leveren een werkende schets en een formulier
+  const mijn = await api('/api/kantoorpakket/mijn', {}, lidA);
+  assert.ok(mijn.body.docs.some(d => d.id === id && d.omvang === '3 vormen'), 'de drive telt vormen');
+  assert.ok(mijn.body.sjablonen.some(s => s.soort === 'schets'), 'er is een schets-sjabloon');
+  const f = mijn.body.sjablonen.find(s => s.soort === 'formulier');
+  assert.ok(f, 'er is een formulier-sjabloon');
+  const van = await api('/api/kantoorpakket/maak', { sjabloon: f.id }, lidA);
+  const fo = await api('/api/kantoorpakket/open', { id: van.body.id }, lidA);
+  assert.ok(fo.body.inhoud.vragen.length >= 2, 'het sjabloon draagt echte vragen');
+});

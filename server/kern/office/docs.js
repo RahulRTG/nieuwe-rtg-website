@@ -4,7 +4,7 @@
 
 const { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, SJABLONEN } = require('./basis');
 
-module.exports = ({ save, schoon, sseToCustomer }, basis) => {
+module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
   const { id, nu, lijsten, docMet, grootteVan, naamVan, magSchrijven, magLezen, schoonInhoud } = basis;
 
   /* ---- de mappenlijst: eigen documenten + wat met mij is gedeeld ---- */
@@ -39,6 +39,14 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
         const n = ((d.inhoud && d.inhoud.dias) || []).length;
         return n + (n === 1 ? ' dia' : ' dia\'s');
       }
+      if (d.soort === 'formulier') {
+        const n = ((d.inhoud && d.inhoud.vragen) || []).length;
+        return n + (n === 1 ? ' vraag' : ' vragen');
+      }
+      if (d.soort === 'schets') {
+        const n = ((d.inhoud && d.inhoud.vormen) || []).length;
+        return n + (n === 1 ? ' vorm' : ' vormen');
+      }
       const kaal = String((d.inhoud && d.inhoud.tekst) || '').replace(/<[^>]+>/g, ' ').trim();
       const n = kaal ? kaal.split(/\s+/).length : 0;
       return n + (n === 1 ? ' woord' : ' woorden');
@@ -63,9 +71,12 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     if (Object.values(alle).filter(d => d.key === key).length >= MAX_DOCS)
       return { status: 409, error: 'U heeft het maximum van ' + MAX_DOCS + ' documenten; verwijder er eerst een.' };
     const titel = schoon(data.titel, MAX_TITEL) || (sjab ? sjab.titel
-      : soort === 'blad' ? 'Nieuw rekenblad' : soort === 'presentatie' ? 'Nieuwe presentatie' : 'Nieuw document');
+      : soort === 'blad' ? 'Nieuw rekenblad' : soort === 'presentatie' ? 'Nieuwe presentatie'
+      : soort === 'formulier' ? 'Nieuw formulier' : soort === 'schets' ? 'Nieuwe schets' : 'Nieuw document');
     const leeg = soort === 'blad' ? { cellen: {}, rijen: 20, kolommen: 8 }
       : soort === 'presentatie' ? { dias: [{ titel: 'Titelblad', tekst: '' }] }
+      : soort === 'formulier' ? { vragen: [{ tekst: '', soort: 'open', opties: [] }], wijze: 'codenaam' }
+      : soort === 'schets' ? { vormen: [] }
       : { tekst: '' };
     const inhoud = sjab ? schoonInhoud(soort, JSON.parse(JSON.stringify(sjab.inhoud))) : leeg;
     const d = { id: id(), key, soort, titel, inhoud, gedeeldMet: [], bewerkers: [], versies: [], gemaakt: nu(), gewijzigd: nu() };
@@ -121,6 +132,8 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
     if (d.key !== key) return { status: 403, error: 'Alleen de eigenaar kan verwijderen.' };
     delete lijsten()[d.id];
+    // een formulier neemt zijn inzendingen mee het graf in
+    if (db.data.officeAntwoorden) delete db.data.officeAntwoorden[d.id];
     save();
     return { status: 200, ok: true };
   }

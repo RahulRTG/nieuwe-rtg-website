@@ -162,6 +162,37 @@
   #tekst .rtg-toc p{margin:.15rem 0;font-size:.86rem;color:var(--soft);}
   #tekst .rtg-toc .toc-h2{padding-left:1.1rem;}
   #tekst .rtg-toc .toc-h3{padding-left:2.2rem;}
+  /* formulier: vragen bouwen, invullen en de uitslag */
+  #formWrap{max-width:46rem;margin:0 auto;display:grid;gap:.7rem;align-content:start;}
+  .fkop{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+  .fkop select,#formWrap .fv-soort{background:var(--veld);border:1px solid var(--line);border-radius:8px;
+    color:var(--txt);font:inherit;font-size:.8rem;padding:.35rem .5rem;}
+  .fstil{color:var(--soft);font-size:.78rem;line-height:1.5;}
+  .fkop .fstil{flex:1;min-width:12rem;}
+  .fvraag{background:var(--paneel);border:1px solid var(--line);border-radius:8px;padding:.8rem .9rem;
+    display:grid;gap:.5rem;}
+  .frij{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+  .fnr{font-size:.68rem;color:var(--zacht);min-width:1.2rem;font-variant-numeric:tabular-nums;}
+  .fv-tekst{flex:1;min-width:10rem;background:none;border:none;border-bottom:1px solid var(--line);
+    color:var(--txt);font:inherit;font-size:.95rem;outline:none;padding:.2rem 0;}
+  .fv-lab{flex:1;font-size:.95rem;}
+  .fv-opties,.fv-antwoord{width:100%;background:var(--veld);border:1px solid var(--line);border-radius:8px;
+    color:var(--txt);font:inherit;font-size:.85rem;line-height:1.55;padding:.5rem .7rem;resize:vertical;}
+  .fkeus{display:inline-flex;align-items:center;gap:.4rem;font-size:.86rem;color:var(--soft);margin-right:.9rem;}
+  .fschaal{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .fbalkje{display:flex;justify-content:space-between;gap:.6rem;font-size:.85rem;color:var(--soft);
+    border-bottom:1px solid var(--line);padding:.25rem 0;margin:0;}
+  .fbalkje b{color:var(--txt);font-variant-numeric:tabular-nums;}
+  .fopen{font-size:.86rem;color:var(--soft);border-bottom:1px solid var(--line);padding:.3rem 0;margin:0;}
+
+  /* schets: een wit vel met zwarte lijnen, ook op het scherm -- een schema
+     is om te lezen, en zo drukt het ook af */
+  #schetsWrap{height:100%;display:flex;flex-direction:column;gap:.6rem;min-height:0;}
+  .sbalk{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;}
+  #schetsWrap svg{flex:1;min-height:0;width:100%;background:#FFFFFF;border:1px solid var(--line);
+    border-radius:4px;touch-action:none;cursor:crosshair;}
+  #schetsWrap svg .sv{cursor:move;}
+
   /* afdrukken: alleen het document, zwart op wit; de hand-out bestaat alleen
      op papier */
   #handout{display:none;}
@@ -179,6 +210,16 @@
     body.afdruk-aan #bladWrap.afdrukdoel table{font-family:inherit;}
     body.afdruk-aan #bladWrap.afdrukdoel th,body.afdruk-aan #bladWrap.afdrukdoel td{
       background:#fff;color:#111;border-color:#999;position:static;}
+    body.afdruk-aan #formWrap.afdrukdoel .fvraag{border-color:#bbb;background:#fff;}
+    body.afdruk-aan #formWrap.afdrukdoel .fstil,body.afdruk-aan #formWrap.afdrukdoel .fv-lab,
+    body.afdruk-aan #formWrap.afdrukdoel .fopen,body.afdruk-aan #formWrap.afdrukdoel .fbalkje,
+    body.afdruk-aan #formWrap.afdrukdoel .fkeus,body.afdruk-aan #formWrap.afdrukdoel .fnr{color:#222;}
+    body.afdruk-aan #formWrap.afdrukdoel .fbalkje b{color:#111;}
+    body.afdruk-aan #formWrap.afdrukdoel input,body.afdruk-aan #formWrap.afdrukdoel textarea,
+    body.afdruk-aan #formWrap.afdrukdoel select{background:#fff;color:#111;border-color:#999;}
+    body.afdruk-aan #formWrap.afdrukdoel .knop,body.afdruk-aan #formWrap.afdrukdoel .mini{display:none;}
+    body.afdruk-aan #schetsWrap.afdrukdoel .sbalk{display:none;}
+    body.afdruk-aan #schetsWrap.afdrukdoel svg{border:none;}
     body.afdruk-aan #handout.afdrukdoel{display:block;}
     #handout .hdia{break-inside:avoid;border-bottom:1px solid #ccc;padding:1rem 0;}
     #handout .hnr{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:#555;margin:0 0 .2rem;}
@@ -274,6 +315,8 @@
       <button class="nieuwe" id="nieuwTekst" type="button"><span data-glyf="logboek"></span><span>Document<small>Brief, memo, notitie</small></span></button>
       <button class="nieuwe" id="nieuwBlad" type="button"><span data-glyf="grafiek"></span><span>Rekenblad<small>Cijfers met formules</small></span></button>
       <button class="nieuwe" id="nieuwPres" type="button"><span data-glyf="podium"></span><span>Presentatie<small>Deck met notities</small></span></button>
+      <button class="nieuwe" id="nieuwFormulier" type="button"><span data-glyf="opties"></span><span>Formulier<small>Vragen en antwoorden</small></span></button>
+      <button class="nieuwe" id="nieuwSchets" type="button"><span data-glyf="ontwerp"></span><span>Schets<small>Diagram met kaders en pijlen</small></span></button>
       <div class="sec">Sjablonen</div>
       <div id="sjablonen"></div>
     </aside>
@@ -283,6 +326,7 @@
         <select id="filterSoort" aria-label="Filter op soort">
           <option value="">Alle soorten</option><option value="tekst">Documenten</option>
           <option value="blad">Rekenbladen</option><option value="presentatie">Presentaties</option>
+          <option value="formulier">Formulieren</option><option value="schets">Schetsen</option>
         </select>
         <select id="sorteer" aria-label="Sorteren">
           <option value="gewijzigd">Laatst gewijzigd</option><option value="titel">Titel</option>
@@ -324,6 +368,8 @@
         <div id="diaRail"></div>
         <div id="diaVlak"></div>
       </div>
+      <div id="formWrap" style="display:none;"></div>
+      <div id="schetsWrap" style="display:none;"></div>
     </div>
     <div class="voetbalk" id="voetbalk"></div>
   </section>
@@ -407,6 +453,9 @@
 <script src="/apps/office/blad.js" defer></script>
 <script src="/apps/office/pres.js" defer></script>
 <script src="/apps/office/presenteren.js" defer></script>
+<script src="/apps/office/formulieruitslag.js" defer></script>
+<script src="/apps/office/formulier.js" defer></script>
+<script src="/apps/office/schets.js" defer></script>
 <script src="/apps/office/afdruk.js" defer></script>
 <script src="/apps/office/app.js" defer></script>
 <script src="/shared/rahul-mond.js" defer></script>

@@ -28,6 +28,8 @@
   function soortNu() {
     if (zichtbaar('#bladWrap')) return 'blad';
     if (zichtbaar('#presWrap')) return 'pres';
+    if (zichtbaar('#formWrap')) return 'formulier';
+    if (zichtbaar('#schetsWrap')) return 'schets';
     return 'tekst';
   }
 
@@ -59,8 +61,11 @@
     var editor = document.getElementById('editor');
     if (!editor || !editor.classList.contains('aan')) return;
     var soort = soortNu();
+    // een formulier of schets drukt af zoals hij in beeld staat: de vragen,
+    // de uitslag of het tekenvlak -- wat u ziet is wat de printer krijgt
     var doel = soort === 'pres' ? bouwHandout()
-      : q(soort === 'blad' ? '#bladWrap' : '#tekst');
+      : q(soort === 'blad' ? '#bladWrap' : soort === 'formulier' ? '#formWrap'
+        : soort === 'schets' ? '#schetsWrap' : '#tekst');
     if (!doel) return;
 
     var oudeTitel = document.title;

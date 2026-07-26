@@ -2,8 +2,9 @@
    Alles achter de office-inlog (dezelfde als de backoffice); het schakelen
    van functies raakt het hele platform en hoort dus bij het kantoor. De
    ontwerpbureaus staan in ./bureaus, de boardroom-/geld-/paniek-/wereldregie in
-   ./regie; hier de kamers zelf, de kluis-inzage, de kantine, het rampbeeld, het
-   reisbureau, de doos-regie, de diensten en de interne chat. */
+   ./regie, de Salon-curatie in ./salon; hier de kamers zelf, de kluis-inzage, de
+   kantine, het rampbeeld, het reisbureau, de doos-regie, de diensten en de
+   interne chat. */
 module.exports = (kern) => {
   const { app, officeAuth, afdelingen, sseToOffice, db, save,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = kern;
@@ -66,6 +67,7 @@ module.exports = (kern) => {
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet };
   require('./bureaus')(ctx);
   require('./regie')(ctx);
+  require('./salon')(ctx);
   require('./bank')(ctx);
   require('./stad')(ctx);
   require('./techniek')(ctx);

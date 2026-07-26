@@ -53,27 +53,42 @@ function reden(p, kijker) {
   return null;
 }
 
-/* Optioneel AI-oordeel over maatschappelijk belang. Roep dit periodiek of vanuit
-   de boardroom aan; het zet p.belangrijk op de posts. Zonder anthropic doet het
-   niets (de heuristiek blijft dan gelden). Bewust buiten het feed-pad gehouden:
-   de feed mag nooit op een AI-aanroep wachten. */
-async function beoordeelBelang(anthropic, posts, scho) {
-  if (!anthropic || !Array.isArray(posts)) return 0;
-  const kandidaten = posts.filter(p => p && !p.partner && !p.featured && typeof p.belangrijk !== 'boolean').slice(0, 40);
-  let gezet = 0;
-  for (const p of kandidaten) {
-    try {
-      const r = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 8,
-        system: 'Bepaal of een korte Salon-post maatschappelijk belangrijk is (raakt de gemeenschap, gezondheid, veiligheid, natuur/klimaat, liefdadigheid, onderwijs of mensenrechten) of gewoon persoonlijk. Antwoord met exact "ja" of "nee".',
-        messages: [{ role: 'user', content: String((p.text || '') + ' - ' + (p.place || '')).slice(0, 500) }]
-      });
-      const t = ((r && r.content && r.content[0] && r.content[0].text) || '').toLowerCase();
-      p.belangrijk = /\bja\b/.test(t);
-      gezet++;
-    } catch (e) { /* laat de heuristiek het doen */ }
-  }
-  return gezet;
+/* Het AI-oordeel over maatschappelijk belang: zet p.belangrijk op de posts die
+   nog geen oordeel hebben. Bewust buiten het feed-pad gehouden -- een lezer mag
+   nooit op een AI-aanroep wachten -- en bewust niet op een timer: dit draait op
+   een knop in de boardroom, zodat een mens de opdracht geeft en de kosten
+   zichtbaar blijven. RTG cureert.
+
+   De aanroep zelf loopt via de centrale AI-laag (../ai jaNee): daar staat het
+   model en daar zit de uitwijkketen. Deze module houdt alleen het vakinhoudelijke
+   deel vast: welke posts kandidaat zijn en wat we precies vragen. Geeft de AI geen
+   oordeel (geen sleutel, storing, onleesbaar antwoord), dan blijft p.belangrijk
+   ongezet en doet de heuristiek hierboven het werk. */
+const { jaNee } = require('../ai');
+const BELANG_MAX = 40;   // hoogstens zoveel posts per ronde, tegen een AI-rekening die wegloopt
+const BELANG_VRAAG = 'Bepaal of een korte Salon-post maatschappelijk belangrijk is (raakt de gemeenschap, gezondheid, veiligheid, natuur/klimaat, liefdadigheid, onderwijs of mensenrechten) of gewoon persoonlijk. Antwoord met exact "ja" of "nee".';
+
+function belangKandidaten(posts) {
+  if (!Array.isArray(posts)) return [];
+  return posts.filter(p => p && !p.partner && !p.featured && typeof p.belangrijk !== 'boolean');
 }
 
-module.exports = { VIRAAL_DREMPEL, likesVan, reactiesVan, viraalScore, isViraal, isBelangrijk, toonInSalon, reden, beoordeelBelang };
+async function beoordeelBelang(ai, posts) {
+  const uit = { bekeken: 0, gezet: 0, belangrijk: 0, wachtend: 0 };
+  const kandidaten = belangKandidaten(posts);
+  uit.wachtend = kandidaten.length;
+  if (!ai) return uit;
+  for (const p of kandidaten.slice(0, BELANG_MAX)) {
+    uit.bekeken++;
+    const oordeel = await jaNee(ai, BELANG_VRAAG, String(p.text || '') + ' - ' + String(p.place || ''));
+    if (oordeel === null) continue;          // geen oordeel: de heuristiek doet het
+    p.belangrijk = oordeel;
+    uit.gezet++;
+    if (oordeel) uit.belangrijk++;
+  }
+  uit.wachtend -= uit.gezet;
+  return uit;
+}
+
+module.exports = { VIRAAL_DREMPEL, BELANG_MAX, likesVan, reactiesVan, viraalScore, isViraal, isBelangrijk,
+  toonInSalon, reden, belangKandidaten, beoordeelBelang };

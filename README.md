@@ -74,6 +74,32 @@ geld-actie vraagt eerst een expliciete bevestiging. De losse endpoints
 (`/api/member/doe`, `/api/supplier/doe`, `/api/staff/doe` + `/kaart`) werken
 ook zonder key en de boardroom kan de functie `stuur` per doelgroep sluiten.
 
+Elke AI-aanroep loopt via **`server/ai.js`**: één `messages.create` met een
+uitwijkketen erachter (Claude, dan OpenAI, dan Gemini; alleen aanbieders met
+een sleutel doen mee, volgorde met `AI_VOLGORDE`). Voor korte classificaties
+staat daar ook `jaNee(ai, vraag, tekst)` — één plek met het lichte model
+(`AI_MODEL_KORT`) en het lezen van het antwoord, dat `true`, `false` of `null`
+geeft. `null` betekent "geen oordeel" (geen sleutel, alle aanbieders plat, of
+een onleesbaar antwoord) en dan valt de aanroeper terug op zijn eigen
+heuristiek: een AI-storing mag nooit een besluit forceren. Modules die een
+oordeel nodig hebben bouwen dus geen eigen aanroep met een eigen modelnaam —
+dat zou ze stil aan één aanbieder vastzetten.
+
+### De Salon-curatie: viraal rekent zichzelf uit, belang niet
+
+De Salon-feed laat alleen door wat viraal gaat of maatschappelijk belangrijk is
+(`server/kern/salonviraal.js`; partner-etalage en door RTG uitgelichte posts
+staan daar los van en zijn altijd zichtbaar). Viraliteit is een som van likes,
+reacties en de RTG-waardering. Belang is een AI-oordeel, en dat staat met opzet
+**niet** in het leespad: een lezer mag nooit op een AI-aanroep wachten, en er
+staat ook geen timer op. Het draait op een knop in de boardroom
+(`POST /api/office/salon/belang{,/beoordeel}`, achter de boardroom-poort), per
+ronde maximaal `BELANG_MAX` (40) posts, met de uitkomst en een audit-regel
+erna. Zonder oordeel geldt de vaste woordencheck in dezelfde module, dus zonder
+AI-sleutel werkt de feed precies zoals hij is. Getest in
+`test/salon-curatie.test.js`, inclusief een ronde tegen een nagemaakte
+provider.
+
 ### Muisvrij: alles met de mond of met typen
 
 Op elke app-pagina staat onderaan één balk met daarboven het gesprek

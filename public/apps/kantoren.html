@@ -294,6 +294,15 @@
       <div class="stil" id="bRahulUit" style="font-size:.84rem;line-height:1.65;margin-top:.7rem;" aria-live="polite"></div>
     </div>
 
+    <h3 class="sec">De Salon-curatie: wat is maatschappelijk belangrijk?</h3>
+    <div class="kaart" id="bSalonBelang">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);line-height:1.6;margin:0;">De Salon laat alleen door wat viraal gaat of maatschappelijk belangrijk is. Viraliteit rekent zichzelf uit; belang niet. Rahul leest de posts die nog geen oordeel hebben en zet er ja of nee bij. Dit gebeurt nooit automatisch en nooit tijdens het lezen van de feed: u geeft de opdracht, per ronde, en ziet wat het opleverde. Zonder oordeel blijft de vaste woordencheck gelden.</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;">
+        <button class="knop" id="bSalonKnop" type="button">Beoordeel deze ronde</button>
+        <span class="stil" id="bSalonStand" style="font-size:.78rem;color:var(--soft);">Laden…</span>
+      </div>
+    </div>
+
     <h3 class="sec">De zelfzorg: de code ruimt op, beschermt, repareert en upgradet zichzelf</h3>
     <div class="kaart" id="bZelfzorg"><div class="leeg">Laden...</div></div>
 
@@ -2236,6 +2245,36 @@ async function laadAidata(){
   });
 }
 
+/* ---------- de Salon-curatie (boardroom) ----------
+   Een knop, geen timer: de ronde loopt alleen als de boardroom hem geeft. De
+   knop gaat op slot zolang de ronde loopt (een tweede klik zou dezelfde posts
+   opnieuw langs de AI sturen) en de stand komt daarna uit het antwoord zelf. */
+let salonBelangGewired = false, salonBelangBezig = false;
+function salonBelangTekst(s){
+  if (!s.ai) return 'Geen AI-sleutel actief; de vaste woordencheck doet het werk.';
+  return s.posts + ' eigen posts · ' + s.beoordeeld + ' beoordeeld (' + s.belangrijk + ' belangrijk) · ' +
+    s.wachtend + ' wachten nog' + (s.opHeuristiek ? ', waarvan ' + s.opHeuristiek + ' nu op de woordencheck' : '') +
+    (s.ronde ? ' · deze ronde: ' + s.ronde + ' van maximaal ' + s.max : '');
+}
+async function laadSalonBelang(){
+  try { $('#bSalonStand').textContent = salonBelangTekst(await api('salon/belang')); }
+  catch (e) { $('#bSalonStand').textContent = e.message; }
+  if (salonBelangGewired) return;
+  salonBelangGewired = true;
+  $('#bSalonKnop').addEventListener('click', async () => {
+    if (salonBelangBezig) return;
+    salonBelangBezig = true;
+    $('#bSalonKnop').disabled = true;
+    $('#bSalonStand').textContent = 'Rahul leest mee…';
+    try {
+      const r = await api('salon/belang/beoordeel');
+      meld(r.gezet ? r.gezet + ' post(en) beoordeeld, ' + r.belangrijk + ' als belangrijk.' : 'Niets te beoordelen.');
+      $('#bSalonStand').textContent = salonBelangTekst(r.stand);
+    } catch (e) { meld(e.message); $('#bSalonStand').textContent = e.message; }
+    finally { salonBelangBezig = false; $('#bSalonKnop').disabled = false; }
+  });
+}
+
 /* ---------- de boardroom ---------- */
 /* De deur: de boardroom is de kamer van de eigenaar. Komt er een 403 terug,
    dan tonen we de gesloten deur en verder niets; de rest van het kantoor
@@ -2292,6 +2331,7 @@ async function openBoard(){
     : '<div class="leeg">Nog geen handelingen gelogd.</div>';
   chatWidget($('#bChat'), 'boardroom');
   laadAidata();
+  laadSalonBelang();
   laadZelfzorg($('#bZelfzorg'));
   $('#bKamers').innerHTML = d.kamers.map(k =>
     '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+ico(k.icoon)+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');

@@ -96,7 +96,27 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     const pad = await page.evaluate(() => location.pathname);
     assert.equal(pad, '/apps/salon.html', 'we zijn nergens heen genavigeerd');
 
-    // 6. de AI-balk staat er: in deze app typ je tegen Rahul wat er moet gebeuren
+    // 6. inzicht: je eigen cijfers, met de reactie die we net plaatsten erin
+    await page.click('[data-t="inzicht"]');
+    await page.waitForFunction(() => /Wat jouw posts deden/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    const cijfers = await page.evaluate(() => document.querySelector('#main').textContent);
+    assert.ok(/1 reacties/.test(cijfers), 'de reactie is geteld in je eigen spiegel: ' + cijfers.slice(0, 120));
+    assert.ok(/#kade/.test(cijfers), 'en je onderwerp staat erbij');
+
+    // 7. archiveren vanuit het inzicht: de post verlaat je raster maar blijft bestaan
+    await page.click('[data-arch]');
+    await page.waitForFunction(() => /terugzetten/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    await page.click('[data-t="ik"]');
+    await page.waitForSelector('[data-open]', { timeout: 10000 });
+    await page.waitForFunction(() => !/kade/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    await page.click('[data-t="inzicht"]');
+    await page.waitForFunction(() => /archief/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    await page.click('#archknop');
+    await page.waitForFunction(() => /Je archief/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    const kast = await page.evaluate(() => document.querySelector('#main').textContent);
+    assert.ok(/kade/.test(kast), 'in het archief staat hij er nog gewoon');
+
+    // 8. de AI-balk staat er: in deze app typ je tegen Rahul wat er moet gebeuren
     const balk = await page.evaluate(() => !!document.querySelector('#aiform') && !!document.querySelector('#aiin'));
     assert.equal(balk, true, 'de AI-balk staat op de app');
 

@@ -454,3 +454,59 @@ Bewezen: `test/genootschap.test.js` (11 toetsen) en `test/genootschap.e2e.js`.
 
 De les van deze ronde staat in de kop van `kern/genootschap/index.js`: een plan
 dat op namen is geschreven, moet je tegen de code houden voordat je het uitvoert.
+
+## Ronde 5: wat elders geld kost, zit hier in de pas
+
+De opdracht voor deze ronde was: *in elke app alle pro-functies van het
+origineel, bij ons gratis*. Dat is geen prijslijst maar een ontwerpregel, en hij
+snijdt twee kanten op. Wat er achter een betaalmuur zit is namelijk niet altijd
+de moeite waard; soms is de betaalmuur juist het product ("betaal om te zien wie
+naar je keek"). Dus de regel zoals wij hem toepassen:
+
+> Wat elders betaald is en de gebruiker echt iets geeft, geven wij weg. Wat
+> elders betaald is omdat het aan je trekt, bouwen we niet -- ook niet gratis.
+
+### De Salon: inzicht en archief (Instagram/LinkedIn creator-functies)
+
+| Functie | Waar |
+|---|---|
+| Je eigen cijfers per post: mooi, reacties, hoe vaak bewaard | `kern/salon/inzicht.js` |
+| Welk **onderwerp** aansloeg, over je eigen posts geteld | `/api/salon/inzicht` |
+| Archiveren: uit de etalage, niet uit je leven -- en terugzetten kan | `/api/salon/archiveer` |
+| Het archief als eigen weergave van de feed | `/api/salon/feed` met `{archief:true}` |
+
+Drie regels staan in de kop van de module en worden door de toetsen bewaakt:
+het is **jouw spiegel, geen scorebord** (geen ranglijst, geen vergelijking met
+andere leden), er staan **geen namen bij de cijfers** (je ziet DAT tien mensen
+iets bewaarden, nooit wie), en er is **geen aansporing om vaker te plaatsen**.
+
+Onderweg gerepareerd: `plaats()` deelde nog altijd id's uit met
+`Date.now() + random(1000)` terwijl de oplopende `nieuwId()` er al stond maar
+nergens werd aangeroepen -- precies de dubbele-id-bug die commit `d065665`
+had moeten verhelpen.
+
+### Métier: de loonspiegel (LinkedIn Salary)
+
+| Functie | Waar |
+|---|---|
+| Wat een vak echt betaalt: mediaan en middenband per vak en per land | `kern/metier/loon.js` |
+| Het **wettelijk minimumuurloon** ernaast, uit `kern/fiscaal/landen.js` | `/api/metier/loon` |
+| Een concreet bod tegen de wet en tegen de markt houden | `/api/metier/loon-toets` |
+
+De cijfers komen uit de loonrun van de zaken zelf (`settings.uurloon`, zie
+`kern/bank/zakelijk.js`), niet uit een enquête. Drie harde regels:
+
+1. **Onder de vijf zaken tonen we niets.** Een gemiddelde over drie werkgevers
+   is een omweg naar het loon van een herkenbare zaak.
+2. **Mediaan en p25-p75, nooit de uiteinden.** De hoogste en de laagste wijzen
+   altijd naar één aanwijsbare werkgever.
+3. **De wet staat er altijd naast**, ook als er nog geen markt te tonen is --
+   het wettelijk minimum hangt van geen enkele zaak af. Daarom werkt de toets
+   ("mag dit bod eigenlijk wel?") ook in een lege regio.
+
+Bewust niet: "wie bekeek je profiel" (dat weigert Métier al sinds ronde 3, zie
+de kop van `kern/metier/index.js`) en "jij verdient minder dan 68% van je
+vakgenoten". Een spiegel mag informeren, niet porren.
+
+Bewezen: `test/salon-app.test.js` (14 toetsen) en `test/metier.test.js` (13),
+plus beide schermtoetsen.

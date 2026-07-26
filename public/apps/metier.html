@@ -76,7 +76,7 @@
 (function(){
   var TOKEN = localStorage.getItem('rtg_member_token') || '';
   var TAB = 'ik', IK = null, BEKEKEN = null;
-  var TABS = [['ik','Mijn profiel'],['naam','Mijn naam'],['register','Beroepsregister'],['coach','Rahul coacht']];
+  var TABS = [['ik','Mijn profiel'],['naam','Mijn naam'],['register','Beroepsregister'],['loon','Loonspiegel'],['coach','Rahul coacht']];
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
   function $(s){ return document.querySelector(s); }
   function api(pad, body){
@@ -208,6 +208,37 @@
       '<div class="knoppen"><button class="knop" id="baanbeveel" type="button">Plaatsen</button></div></div>');
   }
 
+  /* ---- de loonspiegel: elders een betaalde dienst, hier gewoon in de pas ----
+     Echte uurlonen uit de loonrun van RTG-zaken, met het wettelijk minimum
+     ernaast. Vakken met te weinig zaken staan er bewust niet bij: de server
+     houdt die drempel aan, dit scherm toont alleen wat hij teruggeeft. */
+  var LOONLAND = 'NL';
+  function loonRij(r){
+    return '<div class="rij"><div class="tx"><b>'+esc(r.vakNaam)+'</b>'+
+      '<small>€ '+r.uur.midden+' per uur (midden) · band € '+r.uur.laag+'-'+r.uur.hoog+
+      ' · ± € '+r.maand.midden+' bruto per maand · '+r.zaken+' zaken</small></div></div>';
+  }
+  function tekenLoon(d){
+    toon('<div class="kaart"><h2>Wat betaalt dit vak?</h2>'+
+      '<p style="color:var(--soft);font-size:.82rem;line-height:1.5;">'+esc(d.uitleg||'')+
+      (d.wet?' Wettelijk minimumuurloon in '+esc(d.wet.land)+': € '+d.wet.minimum+'.':'')+'</p>'+
+      '<label for="lland">Land</label>'+
+      '<select id="lland"><option value="NL">Nederland</option><option value="BE">Belgie</option>'+
+      '<option value="DE">Duitsland</option><option value="ES">Spanje</option></select>'+
+      '<p style="color:var(--soft);font-size:.78rem;margin-top:.6rem;line-height:1.5;">Onder de '+d.drempel+' zaken tonen we niets: een gemiddelde over een handvol werkgevers is een omweg naar het loon van een herkenbare zaak.</p></div>'+
+      '<div class="kaart"><h2>Per vak</h2>'+
+      ((d.vakken||[]).length ? d.vakken.map(loonRij).join('')
+        : '<div class="leeg">Nog te weinig zaken per vak om cijfers te tonen zonder een werkgever aan te wijzen. De toets hieronder werkt wel: die legt je bod naast de wet.</div>')+'</div>'+
+      '<div class="kaart"><h2>Houd een bod ertegen</h2>'+
+      '<label for="tvak">Vak</label><select id="tvak">'+
+        (d.alleVakken||[]).map(function(r){ return '<option value="'+esc(r.vak)+'">'+esc(r.vakNaam)+'</option>'; }).join('')+'</select>'+
+      '<label for="tuur">Geboden uurloon</label><input id="tuur" type="number" min="0" step="0.5" placeholder="16">'+
+      '<div class="knoppen"><button class="knop" id="btoets" type="button">Vergelijk</button></div>'+
+      '<div class="uit" id="utoets" hidden></div>'+
+      '<p style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Dit is informatie, geen onderhandelingstruc. Er gaat niets naar de werkgever en er wordt niets van bewaard.</p></div>');
+    var s=$('#lland'); if(s) s.value = LOONLAND;
+  }
+
   /* ---- Rahul coacht ---- */
   function tekenCoach(){
     toon('<div class="kaart"><h2>Je profiel door de ogen van een werkgever</h2>'+
@@ -235,6 +266,7 @@
     if (TAB === 'ik') { api('/metier/ik').then(function(d){ if(d.error) return toon('<div class="leeg">'+esc(d.error)+'</div>'); IK=d; tekenIk(d); }); return; }
     if (TAB === 'naam') { api('/metier/naam-log').then(function(d){ if(d.error) return toon('<div class="leeg">'+esc(d.error)+'</div>'); tekenNaam(d); }); return; }
     if (TAB === 'register') { tekenRegister(null); return; }
+    if (TAB === 'loon') { api('/metier/loon', { land: LOONLAND }).then(function(d){ if(d.error) return toon('<div class="leeg">'+esc(d.error)+'</div>'); tekenLoon(d); }); return; }
     tekenCoach();
   }
 
@@ -297,6 +329,19 @@
     var at = ev.target.closest('[data-atrek]');
     if (at) return api('/metier/aanbeveling-intrekken', { wie:BEKEKEN.codenaam, id:at.getAttribute('data-atrek') })
       .then(function(d){ melding(d.error||'Ingetrokken.'); opendLid(BEKEKEN.codenaam); });
+
+    if (id === 'btoets') return api('/metier/loon-toets', { vak:($('#tvak')||{}).value, land:LOONLAND, uurloon:($('#tuur')||{}).value })
+      .then(function(d){
+        var u = $('#utoets'); if (!u) return;
+        if (d.error) { u.hidden=false; u.textContent = d.error; return; }
+        u.hidden = false;
+        u.innerHTML = '<b>€ '+d.uurloon+' per uur'+(d.perMaand?' · ± € '+d.perMaand+' bruto per maand':'')+'</b><br>'+
+          d.punten.map(function(p){ return esc(p); }).join('<br>');
+      });
+  });
+
+  document.addEventListener('change', function(ev){
+    if (ev.target.id === 'lland') { LOONLAND = ev.target.value; laad(); }
   });
 
   function opendLid(codenaam){

@@ -17,7 +17,7 @@ const salonviraal = require('../../kern/salonviraal');
 
 module.exports = (kern) => {
   const { app, express, auth, geenGast, db, findSupplier, zijnVrienden,
-    salon, salonProfiel, salonReacties, salonAI } = kern;
+    salon, salonProfiel, salonReacties, salonAI, salonInzicht } = kern;
   const fout = (res, e) => res.status(400).json({ error: (e && e.message) || 'Er ging iets mis.' });
   const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
 
@@ -120,6 +120,18 @@ module.exports = (kern) => {
   app.post('/api/salon/meld', auth, (req, res) => {
     if (geenGast(req, res)) return;
     try { uit(res, salonReacties.meld(req.session, req.body.id, req.body.reden)); } catch (e) { fout(res, e); }
+  });
+
+  /* ---- inzicht en archief: elders premium, hier in de pas ----
+     Je eigen spiegel, zonder namen bij de cijfers en zonder ranglijst. */
+  app.post('/api/salon/inzicht', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { res.json(salonInzicht.overzicht(req.session.key)); } catch (e) { fout(res, e); }
+  });
+
+  app.post('/api/salon/archiveer', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, salonInzicht.archiveer(req.session.key, req.body.id, req.body.aan !== false)); } catch (e) { fout(res, e); }
   });
 
   // ---- de AI: stelt voor, plaatst nooit ----

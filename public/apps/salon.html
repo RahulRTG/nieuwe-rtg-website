@@ -102,9 +102,9 @@
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
-let TAB='feed', ONDERWERP='', ZOEK='', NA=null, POSTS=[], NIEUW={media:[]};
+let TAB='feed', ONDERWERP='', ZOEK='', NA=null, POSTS=[], NIEUW={media:[]}, ARCHIEF=false;
 
-const TABS=[['feed','Feed'],['ontdek','Ontdekken'],['plaats','Plaatsen'],['bewaard','Bewaard'],['ik','Mijn profiel']];
+const TABS=[['feed','Feed'],['ontdek','Ontdekken'],['plaats','Plaatsen'],['bewaard','Bewaard'],['inzicht','Inzicht'],['ik','Mijn profiel']];
 const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(); const dag=86400000;
   if(nu-d<dag) return d.toTimeString().slice(0,5);
   if(nu-d<7*dag) return ['zo','ma','di','wo','do','vr','za'][d.getDay()];
@@ -121,7 +121,7 @@ function meld(t){ const u=$('#aiuit'); u.hidden=false; u.textContent=t; }
 
 function tekenTabs(){
   $('#tabs').innerHTML=TABS.map(([id,l])=>'<button type="button" data-t="'+id+'" aria-pressed="'+(TAB===id?'true':'false')+'">'+esc(l)+'</button>').join('');
-  $('#tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; ONDERWERP=''; NA=null; teken(); });
+  $('#tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; ONDERWERP=''; NA=null; ARCHIEF=false; teken(); });
 }
 
 /* ---------- de post zelf ---------- */
@@ -141,7 +141,8 @@ function postHtml(p){
       '<button type="button" data-like="'+p.id+'" aria-pressed="'+(p.liked?'true':'false')+'">Mooi ('+p.likes+')</button>'+
       '<button type="button" data-reacties="'+p.id+'">Reacties ('+p.reacties+')</button>'+
       '<button type="button" data-bewaar="'+p.id+'" aria-pressed="'+(p.bewaard?'true':'false')+'">Bewaar</button>'+
-      (p.vanMij?'<button type="button" data-weg="'+p.id+'">Verwijder</button>'
+      (p.vanMij?'<button type="button" data-arch="'+p.id+'" data-aan="'+(p.gearchiveerd?'0':'1')+'">'+(p.gearchiveerd?'Terugzetten':'Archiveer')+'</button>'+
+                '<button type="button" data-weg="'+p.id+'">Verwijder</button>'
               :'<button type="button" data-verberg="'+p.id+'">Verberg</button>'+
                '<button type="button" data-meld="'+p.id+'">Meld</button>')+
       '<span class="tijd">'+tijd(p.at)+'</span></div>'+
@@ -160,6 +161,12 @@ function knopen(){
   m.querySelectorAll('[data-meld]').forEach(b=>b.onclick=async()=>{
     const reden=prompt('Wat klopt er niet aan deze post?'); if(reden===null) return;
     try{ const r=await api('/api/salon/meld',{id:Number(b.dataset.meld),reden}); meld(r.verborgen?'Gemeld. De post is verborgen tot het kantoor ernaar kijkt.':'Gemeld. Dank je.'); }catch(e){ meld(e.message); } });
+  m.querySelectorAll('[data-arch]').forEach(b=>b.onclick=async()=>{
+    const aan=b.dataset.aan==='1';
+    try{ await api('/api/salon/archiveer',{id:Number(b.dataset.arch),aan});
+      meld(aan?'In je archief. Hij is uit de etalage, maar hij is nog van jou.':'Terug in je raster.');
+      herlaad();
+    }catch(e){ meld(e.message); } });
   m.querySelectorAll('[data-weg]').forEach(b=>b.onclick=async()=>{
     if(!confirm('Deze post verwijderen?')) return;
     try{ await api('/api/salon/weg',{id:Number(b.dataset.weg)}); herlaad(); }catch(e){ meld(e.message); } });
@@ -170,12 +177,13 @@ const herlaad=()=>{ NA=null; teken(); };
 /* ---------- de feed ---------- */
 async function tekenFeed(){
   let d;
-  try{ d=await api('/api/salon/feed',{na:NA,onderwerp:ONDERWERP,zoek:ZOEK,bewaard:TAB==='bewaard'}); }
+  try{ d=await api('/api/salon/feed',{na:NA,onderwerp:ONDERWERP,zoek:ZOEK,bewaard:TAB==='bewaard',archief:ARCHIEF}); }
   catch(e){ toon('<div class="leeg">'+esc(e.message)+'</div>'); return; }
   POSTS = NA ? POSTS.concat(d.posts) : d.posts;
-  const kop = TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Wat je bewaarde</h2>'
+  const kop = ARCHIEF ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Je archief</h2>'
+    : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Wat je bewaarde</h2>'
     : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--gold);cursor:pointer;">wissen</button></div>' : '';
-  toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : '<div class="leeg">'+(TAB==='bewaard'?'Je hebt nog niets bewaard.':'Nog niets te zien. Plaats zelf iets, of volg iemand.')+'</div>')
+  toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : '<div class="leeg">'+(ARCHIEF?'Je archief is leeg.':TAB==='bewaard'?'Je hebt nog niets bewaard.':'Nog niets te zien. Plaats zelf iets, of volg iemand.')+'</div>')
     + (d.meer ? '<button class="meer" id="meer">Meer laden</button>'
               : (POSTS.length?'<div class="leeg" style="padding:1.2rem;">Je bent bij.</div>':'')));
   knopen();
@@ -240,6 +248,36 @@ function tekenPlaats(){
     }catch(e){ meld(e.message); }
     finally{ knop.classList.remove('wacht'); }
   };
+}
+
+/* ---------- inzicht: elders premium, hier gewoon in de pas ----------
+   Je eigen spiegel. Geen ranglijst, geen vergelijking met andere leden, en
+   geen namen bij de cijfers -- wie iets bewaart doet dat voor zichzelf. */
+async function tekenInzicht(){
+  let d;
+  try{ d=await api('/api/salon/inzicht',{}); }
+  catch(e){ toon('<div class="leeg">'+esc(e.message)+'</div>'); return; }
+  const t=d.totaal||{posts:0,mooi:0,reacties:0,bewaard:0};
+  const cijfer=(n,l)=>'<span><b style="display:block;font-size:1.15rem;color:var(--txt);font-family:\'Bodoni Moda\',serif;">'+n+'</b>'+l+'</span>';
+  toon('<div class="kaart"><h2>Wat jouw posts deden</h2>'+
+    '<div class="cijfers" style="display:flex;gap:1.3rem;font-size:.74rem;color:var(--muted);margin:.6rem 0 .2rem;">'+
+      cijfer(t.posts,'posts')+cijfer(t.mooi,'mooi')+cijfer(t.reacties,'reacties')+cijfer(t.bewaard,'bewaard')+'</div>'+
+    '<p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:.6rem;">Alleen van jou, en alleen voor jou. Je ziet dat iets bewaard is, nooit door wie.</p>'+
+    '<div class="knoppen"><button class="knop stil" id="archknop" type="button">Toon je archief</button></div></div>'+
+    ((d.onderwerpen||[]).length?'<div class="kaart"><h2>Wat aansloeg</h2><div class="onderw" style="padding:.4rem 0 0;">'+
+      d.onderwerpen.map(o=>'<button type="button" data-onderwerp="'+esc(o.onderwerp)+'">#'+esc(o.onderwerp)+' · '+(o.mooi+o.reacties+o.bewaard)+'</button>').join('')+
+      '</div><p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:.6rem;">Je onderwerpen, op wat ze losmaakten. Over de inhoud, niet over hoe vaak je plaatst.</p></div>':'')+
+    '<div class="kaart"><h2>Per post</h2>'+
+      ((d.posts||[]).length? d.posts.map(p=>
+        '<div class="reactie"><span class="wie">'+esc(p.tekst||'(zonder tekst)')+'</span>'+
+        (p.gearchiveerd?' <span style="font-size:.6rem;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.02rem .4rem;">archief</span>':'')+
+        '<div style="color:var(--soft);font-size:.74rem;margin-top:.2rem;">'+
+          p.mooi+' mooi · '+p.reacties+' reacties · '+p.bewaard+' bewaard'+
+          '<button class="mini" data-arch="'+p.id+'" data-aan="'+(p.gearchiveerd?'0':'1')+'">'+(p.gearchiveerd?'terugzetten':'archiveren')+'</button>'+
+          '<button class="mini" data-reacties="'+p.id+'">openen</button></div></div>').join('')
+        : '<p style="color:var(--soft);font-size:.85rem;">Je hebt nog niets geplaatst.</p>')+'</div>');
+  knopen();
+  $('#archknop').onclick=()=>{ TAB='feed'; ARCHIEF=true; NA=null; ONDERWERP=''; tekenTabs(); tekenFeed(); };
 }
 
 /* ---------- profiel ---------- */
@@ -325,6 +363,7 @@ function teken(){
   tekenTabs();
   if(TAB==='plaats') return tekenPlaats();
   if(TAB==='ontdek') return tekenOntdek();
+  if(TAB==='inzicht') return tekenInzicht();
   if(TAB==='ik') return toonProfiel('ik');
   tekenFeed();
 }

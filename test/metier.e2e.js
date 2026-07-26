@@ -105,7 +105,16 @@ test('Métier: je kaart, het beroepsregister en de naam die je zelf vrijgeeft',
     await page.click('[data-intrek]');
     await page.waitForFunction(() => /Ingetrokken/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
 
-    // 8. de AI-balk staat er
+    // 8. de loonspiegel: een te laag bod wordt naast de wet gelegd
+    await page.click('[data-t="loon"]');
+    await page.waitForSelector('#tuur', { timeout: 10000 });
+    await page.evaluate(() => { document.querySelector('#tuur').value = '9'; });
+    await page.click('#btoets');
+    await page.waitForFunction(() => /minimum/i.test(document.querySelector('#utoets').textContent), null, { timeout: 10000 });
+    const oordeel = await page.evaluate(() => document.querySelector('#utoets').textContent);
+    assert.ok(/onder het wettelijk minimum/i.test(oordeel), 'het scherm zegt dat dit bod niet mag: ' + oordeel);
+
+    // 9. de AI-balk staat er
     const balk = await page.evaluate(() => !!document.querySelector('#aiform') && !!document.querySelector('#aiin'));
     assert.equal(balk, true, 'de AI-balk staat op de app');
     const pad = await page.evaluate(() => location.pathname);

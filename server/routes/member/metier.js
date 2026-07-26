@@ -9,7 +9,7 @@
    - /zaak/naam is de werkgeverskant en loopt op de leveranciers-auth.
    Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, geenGast, metier, metierBewijs, metierNetwerk, metierAI } = kern;
+  const { app, auth, supplierAuth, geenGast, metier, metierBewijs, metierNetwerk, metierAI, metierLoon } = kern;
   const fout = (res, e) => res.status(400).json({ error: (e && e.message) || 'Er ging iets mis.' });
   const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
 
@@ -117,6 +117,20 @@ module.exports = (kern) => {
       const r = await metierBewijs.naamVoorZaak(req.supplier.code, req.body.codenaam);
       res.status(r.status || 200).json(r);
     } catch (e) { fout(res, e); }
+  });
+
+  /* ---- de loonspiegel: elders premium, hier in de pas ----
+     Open voor elk lid, want juist wie nog niets heeft, heeft dit nodig. De
+     drempel van vijf zaken zit in de module, niet hier: een grens hoort op een
+     plek te staan, anders verschilt hij per route. */
+  app.post('/api/metier/loon', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { res.json(metierLoon.spiegel(req.body.land, req.body.vak)); } catch (e) { fout(res, e); }
+  });
+
+  app.post('/api/metier/loon-toets', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, metierLoon.toets(req.body.vak, req.body.land, req.body.uurloon)); } catch (e) { fout(res, e); }
   });
 
   // ---- Rahul als loopbaancoach: stelt voor, verstuurt nooit ----

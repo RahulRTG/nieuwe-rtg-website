@@ -229,3 +229,63 @@ test('zonder aanmelding geen beroepsprofiel', async () => {
   const vrij = await raw('/metier/naam-vrij', { code: 'KIKUNOI' });
   assert.equal(vrij.status, 401);
 });
+
+/* ---- de loonspiegel ----
+   De module rekenen we los na, met een verzonnen zaakregister: alleen zo is de
+   drempel van vijf zaken echt te toetsen (het demo-register heeft er per vak
+   minder). De route erna bewijst dat hij op de gewone leden-auth zit. */
+const maakLoon = (zaken) => require('../server/kern/metier/loon')({ db: { data: { suppliers: zaken } } });
+
+test('loonspiegel: onder de drempel geen cijfer, erboven een middenband zonder namen', () => {
+  const zaak = (code, type, uurloon) => ({ code, name: 'Zaak ' + code, type, country: 'NL', settings: { uurloon } });
+
+  // vier zaken: te weinig, dus geen getal
+  const weinig = maakLoon([1, 2, 3, 4].map(i => zaak('A' + i, 'restaurant', 15 + i)));
+  const r4 = weinig.vak('restaurant', 'NL');
+  assert.equal(r4.genoeg, false, 'vier zaken is te weinig voor een cijfer');
+  assert.equal(r4.uur, undefined, 'en dan staat er ook geen band');
+  assert.ok(r4.wet && r4.wet.minimum > 0, 'het wettelijk minimum staat er wel, dat hangt van geen zaak af');
+
+  // zes zaken: wel een band, maar nooit de uiteinden
+  const genoeg = maakLoon([12, 14, 16, 18, 20, 40].map((u, i) => zaak('B' + i, 'restaurant', u)));
+  const r6 = genoeg.vak('restaurant', 'NL');
+  assert.equal(r6.genoeg, true);
+  assert.equal(r6.zaken, 6);
+  assert.ok(r6.uur.laag > 12 && r6.uur.hoog < 40, 'de laagste en hoogste zaak zijn niet af te lezen: ' + JSON.stringify(r6.uur));
+  assert.ok(r6.maand.midden > 0);
+  const tekst = JSON.stringify(r6);
+  assert.equal(/Zaak B|"code"|"name"/.test(tekst), false, 'geen zaaknaam en geen code bij de cijfers');
+
+  // en het land filtert: dezelfde zaken in een ander land halen de drempel niet
+  assert.equal(genoeg.vak('restaurant', 'BE').genoeg, false);
+});
+
+test('loonspiegel: een bod tegen de wet, ook als de markt nog leeg is', () => {
+  const leeg = maakLoon([]);
+  const onder = leeg.toets('restaurant', 'NL', 9);
+  assert.ok(onder.ok);
+  assert.ok(onder.punten.some(p => /onder het wettelijk minimum/i.test(p)), 'een te laag bod wordt benoemd: ' + JSON.stringify(onder.punten));
+  assert.ok(onder.perMaand > 0, 'het maandbedrag staat er ook zonder markt');
+
+  const boven = leeg.toets('restaurant', 'NL', 22);
+  assert.ok(boven.punten.some(p => /Boven het wettelijk minimum/.test(p)));
+  assert.ok(boven.punten.some(p => /te weinig zaken/.test(p)), 'en het is eerlijk over wat het niet weet');
+
+  assert.ok(leeg.toets('restaurant', 'NL', 0).error, 'zonder bedrag geen oordeel');
+});
+
+test('de loonspiegel is voor elk lid, niet voor de uitgelogde', async () => {
+  const a = await lid();
+  const d = await json(await raw('/metier/loon', { land: 'NL' }, a.token));
+  assert.equal(d.ok, true);
+  assert.equal(d.drempel, 5);
+  assert.ok(d.wet && d.wet.minimum > 0, 'het wettelijk minimum komt mee');
+  assert.ok(Array.isArray(d.alleVakken) && d.alleVakken.length > 5, 'alle vakken zijn kiesbaar voor de toets');
+  assert.ok(Array.isArray(d.vakken), 'en de vakken met genoeg zaken staan apart');
+
+  const t = await json(await raw('/metier/loon-toets', { vak: 'restaurant', land: 'NL', uurloon: 11 }, a.token));
+  assert.ok(t.ok && t.punten.length, 'de toets geeft een oordeel terug');
+
+  const uitgelogd = await raw('/metier/loon', { land: 'NL' });
+  assert.equal(uitgelogd.status, 401);
+});

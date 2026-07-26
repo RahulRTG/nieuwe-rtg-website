@@ -232,6 +232,67 @@ test('je eigen post mag weg, die van een ander niet; en een gast plaatst niet', 
   assert.equal(uitgelogd.status, 401);
 });
 
+test('inzicht is je eigen spiegel: cijfers wel, namen niet', async () => {
+  const a = await lid(), b = await lid(), c = await lid();
+  const post = await json(await raw('/salon/plaats', { tekst: 'Een avond die bleef hangen. #avond' }, a.token));
+  const id = post.post.id;
+  for (const wie of [b, c]) await raw('/salon/volg-lid', { wie: a.codenaam, aan: true }, wie.token);
+  await raw('/salon/reageer', { id, tekst: 'Wat mooi.' }, b.token);
+  await raw('/salon/bewaar', { id, aan: true }, b.token);
+  await raw('/salon/bewaar', { id, aan: true }, c.token);
+
+  const i = await json(await raw('/salon/inzicht', {}, a.token));
+  assert.ok(i.ok, i.error);
+  const rij = i.posts.find(r => r.id === id);
+  assert.ok(rij, 'je eigen post staat in je overzicht');
+  assert.equal(rij.reacties, 1);
+  assert.equal(rij.bewaard, 2, 'twee leden bewaarden hem, en dat is te tellen');
+  assert.ok(i.onderwerpen.some(o => o.onderwerp === 'avond'), 'de onderwerpen zijn die van jouw eigen posts');
+
+  // geen namen bij de cijfers, en geen sleutels
+  const tekst = JSON.stringify(i);
+  assert.equal(tekst.includes(b.codenaam), false, 'wie iets bewaart blijft prive, ook nu er een cijfer bij staat');
+  assert.equal(tekst.includes(c.codenaam), false);
+  assert.equal(/"(authorKey|key|likedBy)"/.test(tekst), false, 'geen sleutels in het antwoord');
+
+  // en het is echt JOUW spiegel: B ziet de post van A niet in zijn overzicht
+  const iB = await json(await raw('/salon/inzicht', {}, b.token));
+  assert.equal(iB.posts.some(r => r.id === id), false, 'er is geen ranglijst en geen inkijk in andermans cijfers');
+});
+
+test('archiveren haalt een post uit de etalage zonder hem weg te gooien', async () => {
+  const a = await lid(), b = await lid();
+  const post = await json(await raw('/salon/plaats', { tekst: 'Deze zet ik straks in het archief. #kast' }, a.token));
+  const id = post.post.id;
+  await raw('/salon/volg-lid', { wie: a.codenaam, aan: true }, b.token);
+  const voor = await json(await raw('/salon/feed', { onderwerp: 'kast' }, b.token));
+  assert.equal(voor.posts.some(p => p.id === id), true, 'eerst staat hij er gewoon');
+
+  // een ander kan jouw post niet archiveren
+  const inbraak = await json(await raw('/salon/archiveer', { id, aan: true }, b.token));
+  assert.ok(inbraak.error, 'archiveren kan alleen de maker');
+
+  const arch = await json(await raw('/salon/archiveer', { id, aan: true }, a.token));
+  assert.equal(arch.gearchiveerd, true);
+
+  const naB = await json(await raw('/salon/feed', { onderwerp: 'kast' }, b.token));
+  assert.equal(naB.posts.some(p => p.id === id), false, 'uit de feed van anderen');
+  const naA = await json(await raw('/salon/lid', { wie: 'ik' }, a.token));
+  assert.equal(naA.raster.posts.some(p => p.id === id), false, 'en ook uit je eigen raster');
+
+  // maar hij bestaat nog: in het archief, en in je inzicht met een merkteken
+  const kast = await json(await raw('/salon/feed', { archief: true }, a.token));
+  assert.equal(kast.posts.some(p => p.id === id), true, 'in het archief staat hij er wel');
+  const i = await json(await raw('/salon/inzicht', {}, a.token));
+  assert.equal(i.posts.find(r => r.id === id).gearchiveerd, true);
+
+  // en terugzetten kan
+  const terug = await json(await raw('/salon/archiveer', { id, aan: false }, a.token));
+  assert.equal(terug.gearchiveerd, false);
+  const weerA = await json(await raw('/salon/lid', { wie: 'ik' }, a.token));
+  assert.equal(weerA.raster.posts.some(p => p.id === id), true, 'terug in je raster');
+});
+
 test('de bio is van jou, en de keuring geldt er net zo goed', async () => {
   const a = await lid();
   const g = await json(await raw('/salon/bio', { bio: 'Reist met een boek en een camera.', plaats: 'Ibiza' }, a.token));

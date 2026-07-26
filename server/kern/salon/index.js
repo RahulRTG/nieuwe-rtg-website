@@ -88,7 +88,7 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
 
     S();
     const post = {
-      id: Date.now() + Math.floor(Math.random() * 1000),
+      id: nieuwId(),
       author: liveCodename(sess) || 'Een lid', authorKey: sess.key, tier: sess.tier,
       partner: false, place: String((invoer && invoer.plaats) || '').slice(0, 60) || null,
       visual: null, photo: beeld.length ? beeld[0].src : null,   // photo: wat oudere schermen lezen
@@ -132,6 +132,7 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
       reacties: (p.comments || []).length,
       bewaard: !!(mij && (s.bewaard[mij] || []).includes(p.id)),
       vanMij: !!(mij && p.authorKey === mij),
+      gearchiveerd: !!p.archief,
       reactiesVan: p.reactiesVan || 'iedereen'
     };
   }
@@ -150,6 +151,9 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     let lijst = db.data.posts.filter(p => {
       if (verborgen.includes(p.id)) return false;
       if (p.weg) return false;
+      // gearchiveerd: uit de etalage van iedereen, ook uit je eigen raster
+      if (p.archief && !o.archief) return false;
+      if (o.archief && !p.archief) return false;
       if (poort && !poort(p)) return false;
       if (onderwerp && !(p.onderwerpen || []).includes(onderwerp)) return false;
       if (zoek && !String(p.text || '').toLowerCase().includes(zoek)

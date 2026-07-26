@@ -2708,6 +2708,7 @@
     wbw:         { naam: 'Wie betaalt wat', url: '/apps/wbw.html' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
     // veiligheid en verbinding: vier apps op een gedeelde kern
+    ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
     thuiswacht:  { naam: 'Thuiswacht',   url: '/apps/thuiswacht.html' },
     codewoord:   { naam: 'Codewoord',    url: '/apps/codewoord.html' },
     vitaal:      { naam: 'Vitaal',       url: '/apps/vitaal.html' },

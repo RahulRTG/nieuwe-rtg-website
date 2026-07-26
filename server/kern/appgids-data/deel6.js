@@ -70,4 +70,7 @@ module.exports = {
   '/apps/thuisrust.html': G('Thuisrust: niet storen tot je thuis bent, zonder dat je onbereikbaar wordt.',
     ['Kies een stand en hoe lang hij hooguit duurt', 'De wereld gaat stil; je kring komt er altijd doorheen', 'De stand eindigt vanzelf, of zodra je incheckt in de Thuiswacht'],
     'De veiligheidsbaan is de hele truc: je hoeft niet te kiezen tussen rust en bereikbaar zijn voor wie ertoe doet.'),
+  '/apps/ik.html': G('Wie ben ik: wat Rahul over jou mag weten, en hoe hij tegen je doet.',
+    ['Kies of Rahul een maatje, plagerig, zakelijk of rustig is', 'Zet je voornaamwoorden en hoe je genoemd wilt worden', 'Geef zelf aan of je iets gelooft; dan feliciteert hij je en houdt hij er rekening mee'],
+    'Alles is optioneel en alles is weer weg te halen. Rahul raadt nooit: niet je geloof uit je naam, niet je aanspreekvorm uit je paspoort.'),
 };

@@ -328,6 +328,65 @@ er kijkt geen mens mee, en zonder internet of met een server die plat ligt gaat 
 niets af. Die zin staat er met opzet; wie denkt beschermd te zijn en het niet is,
 is slechter af dan wie het weet.
 
+## Rahul als mens: geen AI-taal, een echte bui, iedereen welkom
+
+Drie lagen die samen bepalen hoe Rahul klinkt.
+
+**Geen AI-taal** (`server/kern/rahul/taal.js`). Regels in de prompt, PLUS een
+schrobber over elk antwoord dat de deur uitgaat, inclusief de vaste
+demo-antwoorden zonder API-sleutel (die komen niet langs een model, dus een
+prompt helpt daar niet). Weg: "Natuurlijk!", "Als AI-assistent kan ik...",
+"Ik hoop dat dit helpt", "Laat het me weten als je nog vragen hebt". De
+schrobber is bewust voorzichtig: liever een cliche gemist dan een zin
+verminkt die iets betekende.
+
+**Een stemming** (`server/kern/rahul/stemming.js`). Rahul is soms chagrijnig,
+soms een hele poos uitgelaten, soms moe, soms stuitert hij (ADHD wagenwijd
+open). Een stand houdt uren tot een dag aan, en geldt voor iedereen tegelijk:
+hij is een persoon, geen apparaat dat per gesprek een masker kiest.
+
+De grens telt zwaarder dan het mechaniek: **stemming raakt alleen de toon.**
+Een chagrijnige Rahul helpt even goed en even snel, is nooit kortaf tegen de
+persoon voor hem, en zegt nooit iets over de vraag die net gesteld is. Bij een
+kind, op de werkvloer en zodra het ergens over gaat (verdriet, geld,
+veiligheid, gezondheid) valt de bui volledig weg.
+
+**Iedereen welkom** (`server/kern/rahul-omgang.js`). Dit liep op GESLACHT: een
+man kreeg de beste-vriend-toon, een vrouw de crush-toon. Dat is omgedraaid.
+Wie iemand is zegt niets over hoe die persoon benaderd wil worden, en een
+systeem dat op geslacht gokt zit er per definitie bij een deel van de mensen
+naast. Nu kiest het lid zelf in `/apps/ik.html`: **maatje** (standaard),
+**plagerig** (de ondeugende, licht rebelse Rahul; alleen als je daar zelf voor
+kiest en alleen vanaf 18), **zakelijk** of **rustig**. Voornaamwoorden en
+aanspreekvorm zijn vrije velden, want geen enkele keuzelijst dekt iedereen.
+De welkomstregel staat in elke stand, ook in het kind-hart.
+
+### Geloof: zelf uitgerekend, nooit geraden
+
+`server/kern/geloof/` rekent gebedstijden, de richting van Mekka en de
+feestdagen van alle tradities zelf uit. Niet uit principe-drift maar omdat een
+verzoek om gebedstijden drie dingen tegelijk verraadt: waar je bent, hoe laat
+het daar is, en wat je gelooft. Dat geef je niet aan een derde.
+
+- **Gebedstijden** uit de zonnestand, met keuze uit zes methodes (MWL, ISNA,
+  Egypte, Umm al-Qura, Karachi, Teheran) en asr standaard of hanafi. De
+  methode staat er altijd bij, want er is geen enkele juiste.
+- **Qibla** als grootcirkelkoers. Gecontroleerd tegen de referentiewaarde voor
+  Londen (119,0 graden).
+- **Feestdagen**: joodse kalender en Pasen exact berekend, islamitische data
+  uit de tabelkalender **met het voorbehoud dat de plaatselijke maansikkel
+  beslist**, en lunisolaire feesten (Diwali, Holi, Vesak, Guru Nanak) uit een
+  tabel. Buiten die jaren zegt hij dat hij het niet weet in plaats van te
+  gokken. Joodse en islamitische dagen beginnen bij zonsondergang de avond
+  ervoor; dat staat erbij, zodat een felicitatie niet een avond te laat komt.
+- Op hoge breedtegraden bestaan fajr en isha in de zomer astronomisch niet.
+  Dan komt er geen verzonnen tijd maar een uitleg met de gebruikelijke
+  benadering.
+
+**Rahul raadt nooit iemands geloof** uit een naam, een land of een taal. Er
+staat een keuze in het profiel of er staat er geen. Wie niets invult merkt er
+niets van, en dat is geen tweederangs ervaring.
+
 ## Partnerkanaal
 
 Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)

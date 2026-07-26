@@ -1912,8 +1912,17 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (PRODUCTION ? crypto.randomBytes(
    doorlopende conversatie) staat in server/kern/ai.js. AI_TONE komt daar
    rechtstreeks vandaan; de functies dragen db, PERSONAS, de Claude-client,
    accounts en de realtime-helpers. broadcastSync en sseToOffice zijn hoisted. */
+/* De stemming van Rahul (kern/rahul/stemming.js) en de geloofslaag
+   (kern/geloof/). Allebei nodig voordat de promptlaag wordt opgebouwd, want
+   die draagt ze mee in elke system prompt. */
+const stemming = require('./kern/rahul/stemming')({ db, save, crypto });
+const geloof = require('./kern/geloof')({ accounts });
 const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox } =
-  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n });
+  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n,
+    stemmingVoor: (c) => stemming.stemmingVoor(c), geloofRegel: (key) => {
+      const m = /^user-(\d+)$/.exec(String(key || ''));
+      return m ? geloof.promptRegel(Number(m[1]), null) : null;
+    } });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
 const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
@@ -1958,6 +1967,9 @@ const kern = {
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   zorgContact, klantSalon,
+  // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
+  geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
+  stemmingVoor: stemming.stemmingVoor,
   webpush, weekdagFactor, werkgeverSollicitatie,
   // de ervaring-laag (kern/ervaring.js)
   MELDING_SCOPES, reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
@@ -2553,18 +2565,31 @@ require('./kern/rahul').zetRahulBron(() => db.data.rahulProfiel || null);
    het lid komt uit het eigen profiel (v/m/x). Volwassen leden krijgen de
    vrouw-/man-vorm; minderjarige leden (15-17) krijgen het kind-hart (het grote
    luisterende oor); onbekend geeft null en dan blijft Rahul neutraal. */
+/* Hoe Rahul zich verhoudt tot dit lid. Dit liep op GESLACHT en loopt nu op
+   wat het lid ZELF heeft gekozen (kern/rahul-omgang.js legt uit waarom).
+   Leeftijd telt nog wel: onder de 18 het kind-hart, en de plagerige stand
+   bestaat alleen voor volwassenen. */
 require('./kern/rahul').zetGeslachtBron((key) => {
   const m = /^user-(\d+)$/.exec(String(key || ''));
   if (!m) return null;
   let md = null;
   try { md = accounts.getMemberState(Number(m[1])); } catch (e) { return null; }
-  if (!md || !md.geboren) return null;
-  const g = new Date(md.geboren), nu2 = new Date();
-  let lft = nu2.getFullYear() - g.getFullYear();
-  if (nu2 < new Date(nu2.getFullYear(), g.getMonth(), g.getDate())) lft -= 1;
-  if (!(lft >= 18)) return 'kind';
-  const gs = String(md.geslacht || '').toLowerCase();
-  return (gs === 'v' || gs === 'm') ? gs : null;
+  if (!md) return null;
+  let lft = null;
+  if (md.geboren) {
+    const g = new Date(md.geboren), nu2 = new Date();
+    lft = nu2.getFullYear() - g.getFullYear();
+    if (nu2 < new Date(nu2.getFullYear(), g.getMonth(), g.getDate())) lft -= 1;
+  }
+  if (lft != null && lft < 18) return { soort: 'kind' };
+  return {
+    soort: 'volwassen',
+    omgang: md.omgang || 'maatje',
+    voornaamwoord: md.voornaamwoord || '',
+    aanhef: md.aanhef || '',
+    // Bij een onbekende leeftijd is het antwoord nee: geen plagerige stand.
+    volwassen: lft != null && lft >= 18
+  };
 });
 
 /* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
@@ -2738,6 +2763,8 @@ require('./routes/doos')(kern);
 require('./routes/code')(kern);
 // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
 require('./routes/veiligheid')(kern);
+// Wie ben ik voor Rahul: omgang, voornaamwoorden en de eigen geloofskeuze.
+require('./routes/ik')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

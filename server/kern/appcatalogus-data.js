@@ -82,6 +82,7 @@ const R = [
   ['codewoord', 'Codewoord', 'veiligheid', '/apps/codewoord.html', 'Een gewone zin die je kring stil waarschuwt met je plek; op je scherm gebeurt er niets zichtbaars.'],
   ['vitaal', 'Vitaal', 'veiligheid', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
   ['thuisrust', 'Thuisrust', 'veiligheid', '/apps/thuisrust.html', 'Niet storen tot je thuis bent; je eigen kring komt er altijd doorheen.'],
+  ['ik', 'Wie ben ik', 'veiligheid', '/apps/ik.html', 'Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze. Alles optioneel.'],
   ['passkeys', 'Passkeys', 'veiligheid', '/apps/passkeys.html', 'Inloggen met vingerafdruk, gezicht of een fysieke sleutel.'],
   ['juridisch', 'Juridisch', 'veiligheid', '/apps/juridisch.html', 'Voorwaarden, contracten en je eigen akkoorden.'],
 

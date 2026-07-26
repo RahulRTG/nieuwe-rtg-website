@@ -47,6 +47,7 @@ module.exports = [
   ['agenda', 'Agenda', 'media', '/apps/agenda.html', 'Maand, week en lijst; uitnodigen op codenaam, herinneringen, en je RTG-boekingen staan er vanzelf in.'],
   ['notities', 'Notities & Taken', 'media', '/apps/notities.html', 'Notities en lijstjes met vinkjes; delen op codenaam is samen werken, en een datum wordt vanzelf een agenda-afspraak.'],
   ['bestanden', 'Bestanden', 'media', '/apps/bestanden.html', 'De versleutelde kluis: mappen, versies, delen op codenaam en een prullenbak die 30 dagen bewaart. Je Office-werk staat er vanzelf bij.'],
+  ['meet', 'Meet', 'sociaal', '/apps/meet.html', 'Vergaderen op codenaam: kamers met een korte code, scherm delen, en een Vergaderruimte-knop op elke agenda-afspraak. Beeld en geluid lopen peer-to-peer.'],
   ['krant', 'RTG Krant', 'media', '/apps/krant.html', 'De kiosk: de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.'],
   ['nieuws', 'Nieuws', 'media', '/apps/nieuws.html', 'RTG Nieuws per rubriek, met wat je later wilt lezen bewaard.'],
   ['garderobe', 'Garde-robe', 'media', '/apps/garderobe.html', 'Je kledingkast en looks bij elkaar.'],

@@ -1272,3 +1272,38 @@ kern/bestanden-delen.js (delen, versies, prullenbak) +
 kern/bestanden-stukken.js (grote bestanden) + routes/bestanden.js.
 Client: apps/bestanden.html + apps/bestanden/ (app, paneel). Tests:
 bestanden.test.js (5) en bestanden.e2e.js met twee leden door het scherm.
+
+## RTG Meet: vergaderen op codenaam
+
+De vijfde app van de reeks, en de eerste die twee leden LIVE met elkaar
+verbindt. De regel van de teamcall geldt hier voor leden: beeld en geluid
+lopen peer-to-peer (WebRTC-mesh, tot 12 deelnemers), de server geeft
+alleen seinen door via de bestaande SSE-lijn -- hij ziet het gesprek
+zelf nooit.
+
+**Kamers.** Een kamer heeft een zes-tekens code zonder verwarbare
+tekens; wie de code heeft mag erin (open kamer), of de kamer is
+besloten met een lijst codenamen. Kamers die een week stil zijn worden
+lui opgeruimd. Alles op codenaam, nergens een echte naam (getest).
+
+**De uitnodiging is de sleutel.** Een kamer vanuit RTG Agenda is
+idempotent (dezelfde afspraak geeft altijd dezelfde kamer) en besloten:
+de organisator en iedereen die op de afspraak staat komt binnen, de
+rest niet -- OOK NIET met de code in de hand. De Vergaderruimte-knop
+staat op het afspraak-paneel, voor beide kanten van de uitnodiging.
+
+**In de kamer.** Microfoon en camera aan/uit, SCHERM DELEN via
+getDisplayMedia met replaceTrack (de verbindingen blijven gewoon
+staan; stopt het delen, dan komt de camera vanzelf terug), de hand
+opsteken, en de gastheer kan de kamer sluiten.
+
+**De les van de bouw** (met een echte browser-test gevonden): laat de
+NIEUWKOMER bellen zodra zijn media klaar is, niet de zittende
+deelnemers zodra ze het kom-sein zien. Anders ontstaat een race waarin
+het eerste offer een camera treft die nog opkomt, en er een verbinding
+zonder sporen staat. De e2e-test verbindt twee echte Chromium-contexten
+met nepcamera's en bewijst de hele keten.
+
+Server: kern/meet.js + routes/meet.js. Client: apps/meet.html +
+apps/meet/ (app = lobby en SSE, kamer = mesh en scherm delen), plus de
+knop in apps/agenda/paneel.js. Tests: meet.test.js (3) en meet.e2e.js.

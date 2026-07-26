@@ -43,6 +43,8 @@
         (open.status === 'ja' ? ' · u zei: ik kom.' : open.status === 'nee' ? ' · u zei: ik kom niet.' : ' · nog niet beantwoord.');
       zetVelden(!eco && !uitnodiging);
       $('#deelBlok').style.display = open.id && !eco && !uitnodiging ? '' : 'none';
+      // de Vergaderruimte (RTG Meet): voor de organisator en de genodigden
+      $('#afMeet').style.display = open.id && !eco ? '' : 'none';
       tekenDeelnemers();
       $('#afScrim').classList.add('open');
       if (!eco && !uitnodiging) $('#afTitel').focus();
@@ -97,6 +99,20 @@
     };
     $('#afJa').addEventListener('click', antwoord(true));
     $('#afNee').addEventListener('click', antwoord(false));
+    $('#afMeet').addEventListener('click', function () {
+      if (!open || !open.id) return;
+      // dezelfde afspraak geeft altijd dezelfde kamer; de uitnodiging is de sleutel
+      var agendaId = open.bronId || open.id;
+      fetch('/api/meet/maak', { method: 'POST',
+        headers: { 'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + (localStorage.getItem('rtg_member_token') || '') },
+        body: JSON.stringify({ agendaId: agendaId }) })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.error) return meld(d.error);
+          location.href = '/apps/meet.html#kamer=' + d.code;
+        }).catch(function () { meld('De vergaderruimte is nu even niet te openen.'); });
+    });
 
     return { toon: toon, dicht: dicht };
   }

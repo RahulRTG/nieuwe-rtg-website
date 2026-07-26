@@ -9,6 +9,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const I = require('../server/kern/muziek-instrumenten');
 
 let BASE, child, maker, ander, trackId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-muziek-'));
@@ -65,26 +66,29 @@ test('de woordenschat is gedeeld: de lijst instrumenten komt van de server', asy
 });
 
 test('wat niet kan spelen, wordt eruit gehaald in plaats van het stuk te weigeren', async () => {
+  // De grenzen komen uit de module zelf. Een test die ze overschrijft, toetst
+  // niet de regel maar zijn eigen kopie -- en gaat stuk zodra de regel verandert.
+  const laatste = I.stappenVoor(I.MAX_MATEN) - 1;
   const r = await api('/api/muziek/bewaar', { id: trackId, bpm: 999, maten: 99, kanalen: [
     { instrument: 'trompet', stappen: [0, 4] },
-    { instrument: 'kick', stappen: [0, 4, 8, 12, -3, 9999] },
+    { instrument: 'kick', stappen: [0, 4, 8, 12, -3, 99999] },
     { instrument: 'bas', noten: [
       { stap: 0, toon: 40, lengte: 4 },
       { stap: 3, toon: 200, lengte: 2 },
-      { stap: 500, toon: 40, lengte: 2 }
+      { stap: 99999, toon: 40, lengte: 2 }
     ] }
   ] }, maker);
   assert.equal(r.status, 200, 'het stuk blijft bestaan: ' + JSON.stringify(r.body).slice(0, 150));
   const t = r.body.track;
-  assert.equal(t.bpm, 200, 'het tempo is naar de bovengrens gebracht, niet geweigerd');
-  assert.equal(t.maten, 8, 'en het aantal maten ook');
+  assert.equal(t.bpm, I.BPM_MAX, 'het tempo is naar de bovengrens gebracht, niet geweigerd');
+  assert.equal(t.maten, I.MAX_MATEN, 'en het aantal maten ook');
   /* Een onbekend instrument levert GEEN kanaal op. Er iets anders van maken zou
      betekenen dat de maker iets anders hoort dan hij vroeg zonder dat iemand
      het zegt; dan wordt een fout onhoorbaar en verkeerd tegelijk. */
   assert.deepEqual(t.kanalen.map(k => k.instrument), ['kick', 'bas'],
     'de trompet is er niet, en er is ook geen kick van gemaakt');
   const kick = t.kanalen.find(k => k.instrument === 'kick');
-  assert.deepEqual(kick.stappen, [0, 4, 8, 12, 127],
+  assert.deepEqual(kick.stappen, [0, 4, 8, 12, laatste],
     'een stap buiten het raster wordt naar de rand gebracht, niet stil weggegooid');
   /* Eén regel voor het hele stuk: wat buiten de grenzen valt gaat NAAR DE RAND,
      het verdwijnt niet stil. Zo blijft het zichtbaar in de notenrol en kan de
@@ -92,9 +96,9 @@ test('wat niet kan spelen, wordt eruit gehaald in plaats van het stuk te weigere
      terugvinden en niet herstellen. */
   const bas = t.kanalen.find(k => k.instrument === 'bas');
   assert.equal(bas.noten.length, 3, 'alle drie de noten staan er nog');
-  assert.equal(bas.noten.some(n => n.toon === 96), true, 'toon 200 ligt nu op de bovenste toon');
-  assert.equal(bas.noten.some(n => n.stap === 127), true, 'stap 500 ligt nu op de laatste stap');
-  assert.equal(bas.noten.every(n => n.toon >= 24 && n.toon <= 96 && n.stap < 128), true);
+  assert.equal(bas.noten.some(n => n.toon === I.TOON_MAX), true, 'toon 200 ligt nu op de bovenste toon');
+  assert.equal(bas.noten.some(n => n.stap === laatste), true, 'de stap ver voorbij het eind ligt nu op de laatste stap');
+  assert.equal(bas.noten.every(n => n.toon >= I.TOON_MIN && n.toon <= I.TOON_MAX && n.stap <= laatste), true);
 });
 
 test('een stuk is van jou: een ander komt er niet in', async () => {

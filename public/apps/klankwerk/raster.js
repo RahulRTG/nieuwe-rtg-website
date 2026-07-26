@@ -1,8 +1,8 @@
-/* RTG Studio: het raster en de notenrol.
+/* RTG Studio: het raster.
 
-   Het raster is de kern van een sequencer: kanalen naast elkaar, stappen onder
+   Het raster is de kern van een sequencer: kanalen onder elkaar, stappen naast
    elkaar, en één blik waarin je ziet wat er gebeurt. Slagwerk zet je aan en uit
-   per stap; wat een toonhoogte heeft krijgt een notenrol.
+   per stap; wat een toonhoogte heeft krijgt een notenrol (rol.js).
 
    DE ZWAARSTE ONTWERPKEUZE HIER IS WAT ER NIET IS. Een muziekprogramma kan
    eindeloos knoppen krijgen -- automatisering, effecten per kanaal, tempo dat
@@ -17,10 +17,6 @@
   'use strict';
   if (window.RTGStudioRaster) return;
 
-  var TOON_NAMEN = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-  function nootNaam(n) { return TOON_NAMEN[((n % 12) + 12) % 12] + (Math.floor(n / 12) - 1); }
-  function isKruis(n) { return TOON_NAMEN[((n % 12) + 12) % 12].length > 1; }
-
   function maak(opties) {
     var o = opties || {};
     var rackEl = o.rack, rolEl = o.rol;
@@ -29,6 +25,19 @@
 
     var stappenVan = function () { return track.stappen || (16 * track.maten); };
     var soortVan = function (inst) { return (instrumenten[inst] || {}).soort || 'slag'; };
+    var speeltNoten = function (inst) { var so = soortVan(inst); return so === 'toon' || so === 'stem'; };
+
+    // De smalle brug naar de notenrol: wat hij mag weten, en niets daarbuiten.
+    var rol = window.RTGStudioRol.maak(rolEl, {
+      kanaal: function () { return (track.kanalen || [])[gekozen]; },
+      instrument: function (naam) { return instrumenten[naam]; },
+      stappen: stappenVan,
+      speeltNoten: speeltNoten,
+      soortVan: soortVan,
+      lengte: function () { return Number(o.lengte && o.lengte()) || 2; },
+      opWijziging: function () { opWijziging(); },
+      teken: function () { teken(); }
+    });
 
     /* ---- het rek: één regel per kanaal ---- */
     function tekenRack() {
@@ -64,7 +73,7 @@
 
         var baan = document.createElement('div'); baan.className = 'baan';
         baan.style.gridTemplateColumns = 'repeat(' + stappen + ', 1fr)';
-        if (soortVan(k.instrument) === 'slag') {
+        if (!speeltNoten(k.instrument)) {
           for (var s = 0; s < stappen; s++) tekenStap(baan, k, s);
         } else {
           // een melodisch kanaal toont zijn noten als blokjes; bewerken gaat in de rol
@@ -100,55 +109,6 @@
       baan.appendChild(b);
     }
 
-    /* ---- de notenrol: alleen voor het gekozen melodische kanaal ---- */
-    function tekenRol() {
-      rolEl.textContent = '';
-      var k = (track.kanalen || [])[gekozen];
-      if (!k || soortVan(k.instrument) === 'slag') {
-        var p = document.createElement('p'); p.className = 'stil';
-        p.textContent = k ? 'Slagwerk zet u aan en uit in het raster hierboven.'
-          : 'Kies een kanaal om de noten te zien.';
-        rolEl.appendChild(p);
-        return;
-      }
-      var basis = (instrumenten[k.instrument] || {}).basToon || 60;
-      var laag = basis - 12, hoog = basis + 12;          // twee octaven rond het instrument
-      var stappen = stappenVan();
-      var tabel = document.createElement('div'); tabel.className = 'rol';
-      for (var toon = hoog; toon >= laag; toon--) {
-        var rij = document.createElement('div'); rij.className = 'rrij';
-        var label = document.createElement('span');
-        label.className = 'rlabel' + (isKruis(toon) ? ' kruis' : '');
-        label.textContent = nootNaam(toon);
-        rij.appendChild(label);
-        var baan = document.createElement('div'); baan.className = 'rbaan';
-        baan.style.gridTemplateColumns = 'repeat(' + stappen + ', 1fr)';
-        for (var s = 0; s < stappen; s++) baan.appendChild(rolCel(k, toon, s));
-        rij.appendChild(baan);
-        tabel.appendChild(rij);
-      }
-      rolEl.appendChild(tabel);
-    }
-    function rolCel(k, toon, s) {
-      var noot = (k.noten || []).find(function (n) { return n.toon === toon && n.stap === s; });
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'cel' + (noot ? ' aan' : '') + (isKruis(toon) ? ' zwart' : '') +
-        (s % 16 === 0 ? ' maat' : '') + (s % 4 === 0 ? ' tel' : '');
-      b.dataset.stap = s;
-      b.setAttribute('aria-pressed', noot ? 'true' : 'false');
-      b.setAttribute('aria-label', nootNaam(toon) + ', stap ' + (s + 1));
-      b.addEventListener('click', function () {
-        k.noten = k.noten || [];
-        var i = k.noten.findIndex(function (n) { return n.toon === toon && n.stap === s; });
-        if (i >= 0) k.noten.splice(i, 1);
-        else k.noten.push({ stap: s, toon: toon, lengte: Number(o.lengte && o.lengte()) || 2 });
-        k.noten.sort(function (a, b2) { return a.stap - b2.stap || a.toon - b2.toon; });
-        opWijziging(); teken();
-      });
-      return b;
-    }
-
     /* De loper: welke stap er nu klinkt. Dit raakt alleen een class, geen
        herbouw -- anders zou het scherm 16 keer per maat opnieuw getekend
        worden en dat merkt een telefoon meteen. */
@@ -160,12 +120,12 @@
       for (var j = 0; j < nu.length; j++) nu[j].classList.add('nu');
     }
 
-    function teken() { tekenRack(); tekenRol(); }
+    function teken() { tekenRack(); rol.teken(); }
 
     return {
       zet: function (t, inst) { track = t; instrumenten = inst || instrumenten;
         if (gekozen == null || gekozen >= (t.kanalen || []).length) {
-          gekozen = (t.kanalen || []).findIndex(function (k) { return soortVan(k.instrument) !== 'slag'; });
+          gekozen = (t.kanalen || []).findIndex(function (k) { return speeltNoten(k.instrument); });
           if (gekozen < 0) gekozen = (t.kanalen || []).length ? 0 : null;
         }
         teken(); },
@@ -176,5 +136,5 @@
     };
   }
 
-  window.RTGStudioRaster = { maak: maak, nootNaam: nootNaam };
+  window.RTGStudioRaster = { maak: maak, nootNaam: window.RTGStudioRol.nootNaam };
 })();

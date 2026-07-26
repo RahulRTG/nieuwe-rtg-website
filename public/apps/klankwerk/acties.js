@@ -41,14 +41,24 @@
     B.raster().zet(track, B.instrumenten());
   });
 
-  /* ---- Rahul: een voorstel dat u zelf plaatst ---- */
-  $('#rVraagKnop').addEventListener('click', function () {
+  /* ---- Rahul: een voorstel dat u zelf plaatst ----
+
+     Twee knoppen, want het zijn twee verschillende dingen. Een FIGUUR is een
+     lus om mee te beginnen en laat uw eigen maten staan. Een LIED brengt zijn
+     eigen lengte en vorm mee -- die kan het huidige stuk dus overnemen, en dat
+     hoort de maker te zien voordat hij op "zet het in mijn raster" drukt. */
+  $('#rVraagKnop').addEventListener('click', function () { vraagRahul(false); });
+  $('#rLiedKnop').addEventListener('click', function () { vraagRahul(true); });
+
+  function vraagRahul(lied) {
     var track = B.track();
     if (!track) return;
-    var k = $('#rVraagKnop');
+    var k = lied ? $('#rLiedKnop') : $('#rVraagKnop');
+    var woord = k.textContent;
     k.disabled = true; k.textContent = 'Rahul denkt na…';
-    B.api('rahul', { vraag: $('#rVraag').value, maten: track.maten, zaad: Date.now() }).then(function (d) {
-      k.disabled = false; k.textContent = 'Vraag het Rahul';
+    B.api('rahul', { vraag: $('#rVraag').value, maten: lied ? undefined : track.maten,
+      lied: lied, tekst: lied ? $('#rTekst').value : '', zaad: Date.now() }).then(function (d) {
+      k.disabled = false; k.textContent = woord;
       if (d.error) return B.zeg(d.error);
       voorstel = d.voorstel;
       var namen = voorstel.kanalen.map(function (c) {
@@ -69,18 +79,22 @@
         track.bpm = voorstel.bpm; track.maten = voorstel.maten;
         track.stappen = 16 * voorstel.maten;
         track.kanalen = voorstel.kanalen;
-        $('#tBpm').value = track.bpm; $('#tMaten').value = track.maten;
+        // De vorm hoort bij het voorstel. Hem laten staan zou betekenen dat de
+        // delen naar maten wijzen die er niet meer zijn.
+        if (voorstel.secties && voorstel.secties.length) track.secties = voorstel.secties;
+        B.velden();
         B.gewijzigd();
         B.raster().zet(track, B.instrumenten());
+        if (window.RTGKlankwerkVorm) window.RTGKlankwerkVorm.teken();
         $('#rUit').innerHTML = '<p class="stil">Het staat in uw raster. Haal eruit wat u niet wilt; ' +
           'het is nu gewoon uw werk.</p>';
       });
       $('#rWeg').addEventListener('click', function () { voorstel = null; $('#rUit').textContent = ''; });
     }).catch(function () {
-      k.disabled = false; k.textContent = 'Vraag het Rahul';
+      k.disabled = false; k.textContent = woord;
       B.zeg('Rahul is nu niet bereikbaar.');
     });
-  });
+  }
 
   /* ---- meenemen ---- */
   $('#exportWav').addEventListener('click', function () {

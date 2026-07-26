@@ -840,3 +840,115 @@ Bewezen: `test/muziek.test.js` (9) en `test/klankwerk.e2e.js` (scherm: raster,
 notenrol, Rahul, en een offline gerenderde WAV waarin nagemeten wordt dat er
 werkelijk signaal zit -- een studio die er goed uitziet maar stil blijft is geen
 studio).
+
+---
+
+## Van een lus naar een lied: zang, samen produceren en de zaal
+
+De studio kon een figuur maken. Wat er nu bij komt is alles wat daarna nodig is
+om er iets van te maken dat je aan iemand laat horen: een STEM, een VORM, een
+tweede MAKER, en een PLEK waar het klinkt.
+
+### De stem
+
+Drie instrumenten met `soort: 'stem'` (zang, koor, fluister). Een noot van zo'n
+kanaal draagt naast toonhoogte en lengte ook een **lettergreep**, en die wordt op
+het toestel van de luisteraar opgewekt met formantsynthese: een klinker is niets
+anders dan een paar resonanties, en die zijn met bandfilters na te bouwen
+(`public/apps/klankwerk/zang.js`, tabel van 15 klinkers, vibrato, ademruis, drie
+formanten). Het koor is dezelfde stem, drie keer, ±7 cent uit elkaar.
+
+Wat dit **niet** is: een neuraal model dat een zanger nadoet. Dat kan hier niet
+draaien, en doen alsof zou oneerlijk zijn. Daarom staat het ook op het scherm,
+boven de tekstregel: *"Deze stem wordt opgewekt, het is geen opname van een
+zanger."* Liever een eerlijke grens dan een belofte die de eerste luisteraar al
+doorprikt.
+
+### De vorm, en waarom Rahul hem meelevert
+
+`MAX_MATEN` ging van 8 naar 32, en een stuk kreeg `secties`: namen op stukken van
+het raster. Ze veranderen niets aan de klank -- dat lijkt een reden om ze weg te
+laten, maar het is juist het punt. Vorm is wat een lus tot een lied maakt, en wie
+een refrein benoemt gaat er anders naar luisteren.
+
+Rahul heeft er een tweede knop bij: *"maak er een heel lied van"*. Wat er dan
+uitkomt is een vorm van acht delen, een zanglijn erover, een koor op het refrein,
+en een intro waarin het slagwerk stilstaat. De muzikale kennis daarvoor staat in
+`kern/muziek-lied.js` als gewone tabellen -- net als de begeleiding in
+`kern/muziek-stijlen.js`. Vier regels die een beginner nooit zelf bedenkt:
+
+1. een zin begint op de tel;
+2. hij loopt in stapjes door de ladder (een stem die octaven springt is een synth);
+3. hij eindigt op de grondtoon, anders blijft hij openstaan;
+4. hij ademt: aan het eind van elke twee maten valt er een lettergreep weg.
+
+Plus het enige echte "hit-trucje" hier, en het is eeuwenoud: het refrein ligt een
+terts hoger dan het couplet en herhaalt zijn eerste maat.
+
+**Bij een lied doet Claude niet mee.** Vorm, zang en begeleiding moeten over 26
+maten bij elkaar horen; een voorstel dat daar de helft van overdoet levert een
+slechter lied op dan de tabellen. Bij een figuur ligt dat andersom -- daar is
+variatie juist de winst.
+
+**En Rahul schrijft uw woorden niet.** Typt u een zin, dan legt hij die
+lettergreep voor lettergreep op de melodie (een vuistregel op klinkergroepen,
+geen woordenboek -- daarom staat elke lettergreep in een eigen veldje dat u
+overtypt). Typt u niets, dan zingt de stem open klinkers: hoorbaar een lege plek.
+Een AI die uw refrein schrijft zou van u een luisteraar maken van uw eigen lied.
+
+### Samen produceren
+
+`kern/muziek-samen.js`. De regel die dit huis eraan toevoegt: **het stuk is
+gedeeld, de credits niet.** Een medemaker bewerkt volledig mee (anders is het
+geen samenwerking maar een postbus), de eigenaar nodigt uit op **codenaam**, en
+wie meewerkte staat bij de uitgave -- ook als hij er daarna uitgezet wordt. Een
+medemaker die stil uit de aftiteling valt is precies hoe het in de echte
+muziekwereld misgaat.
+
+Wat er bewust **niet** is: gelijktijdig in hetzelfde raster tekenen. Dat vraagt
+een conflictmodel dat we nu niet eerlijk kunnen bouwen; wie tegelijk bewaart,
+overschrijft. Daarom zegt het scherm wie er als laatste bewaarde en wanneer --
+zodat je het ziet in plaats van raadt. Een eerlijke waarschuwing boven een valse
+belofte van magie.
+
+### Uitgeven: onder wiens naam
+
+`kern/muziek-uitgave.js`. Twee wegen, en het verschil is wezenlijk:
+
+| | Onder je codenaam | Onder de RTG-naam |
+|---|---|---|
+| wie beslist | u, meteen | een **mens** bij het kantoor |
+| wat het is | een knop | een **aanvraag** |
+| bij nee | -- | de uitgave blijft staan onder uw codenaam |
+
+RTG die zijn naam ergens onder zet, staat ergens voor in. Dat kan Rahul niet, de
+app niet en de maker niet -- dezelfde regel als bij de Lifestyle- en Business
+Pass, waar de AI ook nooit zelf toegang belooft. De enige plek waar het wél kan
+is `/apps/klankwerk-kantoor.html`, achter de kantoorinlog.
+
+Een uitgave **bevriest** het stuk (diepe kopie van kanalen en secties). Wie
+daarna in de studio verder sleutelt, verandert niet met terugwerkende kracht wat
+er is uitgegeven; dat is het hele idee van uitgeven.
+
+### De zaal
+
+`/apps/zaal.html`. Luisteren, "mooi" zeggen, er iets bij schrijven. Wat er niet
+komt is de vierde keer dezelfde weigering in dit project: **geen hitlijst, geen
+"meest beluisterd van de week", geen aanbevolen volgorde.** De zaal is
+chronologisch, eindig, en heeft een bodem -- en zegt er zelf bij: *"wie bovenaan
+staat, staat daar omdat hij de laatste was."*
+
+Wat er wél hardop staat: onder wiens naam iets uitkwam, en wie eraan meewerkten
+met hun rol. Codenamen, nooit echte namen: een uitgave reist, en wat reist draagt
+geen echte naam.
+
+Er komt bij het luisteren geen audiobestand over de lijn. Een stuk is een handvol
+getallen; het toestel van de luisteraar rekent het uit met dezelfde motor waarmee
+de maker het hoorde.
+
+Bewezen: `test/muziek-lied.test.js` (6), `test/muziek-uitgave.test.js` (9, met
+als kop *"de RTG-naam komt er nooit vanzelf onder"*) en `test/zaal.e2e.js`, die
+op het scherm de hele keten afloopt: een lied met een eigen zin laten neerzetten,
+een tweede maker erbij op codenaam, uitgeven met de RTG-naam als aanvraag,
+nagaan dat er in de zaal dan de codenaam staat -- en pas na het besluit van het
+kantoor de naam Rahul Travel Group.

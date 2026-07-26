@@ -45,8 +45,20 @@ module.exports = (kern) => {
     if (!muziekRahul) return res.status(503).json({ error: 'De studio-assistent draait niet.' });
     const b = req.body || {};
     const vraag = String(b.vraag || '').slice(0, 300);
-    const basis = muziekRahul.voorstel(vraag, { maten: b.maten, zaad: b.zaad });
-    if (!anthropic) return res.json({ status: 200, ok: true, voorstel: basis, ai: false });
+    /* Twee smaken, en het verschil is groot genoeg om expliciet te zijn: een
+       FIGUUR (een lus om mee te beginnen) of een LIED (vorm, coupletten,
+       refreinen en een zanglijn). De tekst die iemand meestuurt wordt op de
+       melodie gelegd -- niet geschreven. Rahul verzint uw woorden niet. */
+    const lied = b.lied === true;
+    const tekst = String(b.tekst || '').slice(0, 600);
+    const basis = muziekRahul.voorstel(vraag, { maten: b.maten, zaad: b.zaad, lied, tekst });
+    /* Bij een LIED doet Claude niet mee, en dat is geen zuinigheid. Vorm, zang
+       en begeleiding moeten over 26 maten bij elkaar horen: het refrein ligt
+       hoger dan het couplet, de trap valt weg in de intro, de lettergrepen
+       staan op de tel. Een voorstel dat daar de helft van overdoet levert een
+       slechter lied op dan de tabellen. Voor een figuur ligt dat anders --
+       daar is variatie juist de winst. */
+    if (!anthropic || lied) return res.json({ status: 200, ok: true, voorstel: basis, ai: false });
     try {
       const namen = Object.keys(require('../kern/muziek-instrumenten').INSTRUMENTEN);
       const r = await anthropic.messages.create({

@@ -27,7 +27,7 @@
    hoort te wachten tot je het pakt. */
 const I = require('./muziek-instrumenten');
 
-module.exports = ({ db, save, crypto, schoon }) => {
+module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
   const nu = () => new Date().toISOString();
   const rid = () => 'm' + crypto.randomBytes(5).toString('hex');
   const getal = (v, min, max, terug) => {
@@ -57,17 +57,24 @@ module.exports = ({ db, save, crypto, schoon }) => {
       volume: Math.max(0, Math.min(1, Number(k && k.volume != null ? k.volume : 0.8))) || 0,
       pan: Math.max(-1, Math.min(1, Number((k && k.pan) || 0))) || 0,
       stil: !!(k && k.stil) };
-    if (I.soortVan(inst) === 'slag') {
+    if (!I.speeltNoten(inst)) {
       const rij = Array.isArray(k && k.stappen) ? k.stappen : [];
       uit.stappen = Array.from(new Set(rij.map(s => getal(s, 0, stappen - 1, -1)).filter(s => s >= 0)))
         .sort((a, b) => a - b).slice(0, stappen);
     } else {
+      // Een stemkanaal draagt per noot een LETTERGREEP. Bij een gewoon
+      // instrument laten we die weg: tekst die nooit klinkt is dode last.
+      const stem = I.soortVan(inst) === 'stem';
       const rij = Array.isArray(k && k.noten) ? k.noten : [];
-      uit.noten = rij.map(n => ({
-        stap: getal(n && n.stap, 0, stappen - 1, -1),
-        toon: getal(n && n.toon, I.TOON_MIN, I.TOON_MAX, -1),
-        lengte: getal(n && n.lengte, 1, stappen, 1)
-      })).filter(n => n.stap >= 0 && n.toon >= 0).slice(0, I.MAX_NOTEN)
+      uit.noten = rij.map(n => {
+        const no = {
+          stap: getal(n && n.stap, 0, stappen - 1, -1),
+          toon: getal(n && n.toon, I.TOON_MIN, I.TOON_MAX, -1),
+          lengte: getal(n && n.lengte, 1, stappen, 1)
+        };
+        if (stem) no.tekst = schoon((n && n.tekst) || '', I.TEKST_MAX);
+        return no;
+      }).filter(n => n.stap >= 0 && n.toon >= 0).slice(0, I.MAX_NOTEN)
         .sort((a, b) => a.stap - b.stap || a.toon - b.toon);
     }
     return uit;
@@ -81,10 +88,20 @@ module.exports = ({ db, save, crypto, schoon }) => {
     const stappen = I.stappenVoor(maten);
     const kanalen = (Array.isArray(v.kanalen) ? v.kanalen : basis.kanalen || [])
       .slice(0, I.MAX_KANALEN).map(k => schoonKanaal(k, stappen)).filter(Boolean);
+    /* De secties: namen op stukken van het raster (intro, couplet, refrein).
+       Ze veranderen niets aan de klank -- ze maken zichtbaar wat de VORM is,
+       en dat is precies wat een lus tot een lied maakt. Een sectie die buiten
+       het raster valt wordt bijgetrokken, niet geweigerd. */
+    const secties = (Array.isArray(v.secties) ? v.secties : basis.secties || [])
+      .slice(0, I.MAX_SECTIES).map(x => ({
+        naam: schoon((x && x.naam) || '', 24) || 'Deel',
+        van: getal(x && x.van, 0, maten - 1, 0),
+        tot: getal(x && x.tot, 1, maten, maten)
+      })).filter(x => x.tot > x.van).sort((a, b) => a.van - b.van);
     return Object.assign({}, basis, {
       naam: schoon(v.naam != null ? v.naam : basis.naam, 60) || 'Naamloos',
       bpm: getal(v.bpm, I.BPM_MIN, I.BPM_MAX, basis.bpm || 100),
-      maten, kanalen,
+      maten, kanalen, secties,
       // "klaar" betekent: dit stuk is af genoeg om ergens anders te gebruiken.
       // Het is een keuze van de maker, geen oordeel van ons.
       klaar: v.klaar != null ? !!v.klaar : !!basis.klaar,
@@ -93,18 +110,20 @@ module.exports = ({ db, save, crypto, schoon }) => {
   }
 
   const publiek = (t) => ({ id: t.id, naam: t.naam, bpm: t.bpm, maten: t.maten,
-    stappen: I.stappenVoor(t.maten), kanalen: t.kanalen, klaar: !!t.klaar,
-    at: t.at, bewerkt: t.bewerkt });
+    stappen: I.stappenVoor(t.maten), kanalen: t.kanalen, secties: t.secties || [],
+    klaar: !!t.klaar, at: t.at, bewerkt: t.bewerkt });
   // Voor een lijst hoeven de noten niet mee; die zijn het grootste stuk.
-  const kort = (t) => ({ id: t.id, naam: t.naam, bpm: t.bpm, maten: t.maten,
-    kanalen: (t.kanalen || []).length, klaar: !!t.klaar, at: t.at, bewerkt: t.bewerkt });
+  const kort = (t, key) => ({ id: t.id, naam: t.naam, bpm: t.bpm, maten: t.maten,
+    kanalen: (t.kanalen || []).length, klaar: !!t.klaar, at: t.at, bewerkt: t.bewerkt,
+    vanMij: t.key === key, laatste: t.laatsteMaker || null });
 
   function maak(key, invoer) {
     const lijst = T();
     if (lijst.filter(t => t.key === key).length >= I.MAX_TRACKS) {
       return { status: 409, error: 'U heeft ' + I.MAX_TRACKS + ' stukken; haal er eerst een weg.' };
     }
-    const leeg = { id: rid(), key, naam: 'Naamloos', bpm: 100, maten: 1, kanalen: [], klaar: false, at: nu() };
+    const leeg = { id: rid(), key, naam: 'Naamloos', bpm: 100, maten: 1, kanalen: [],
+      secties: [], klaar: false, at: nu() };
     const start = (invoer && invoer.leeg)
       ? leeg
       : Object.assign({}, leeg, { kanalen: I.beginKanalen() });
@@ -114,22 +133,32 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return { status: 200, ok: true, track: publiek(t) };
   }
 
-  const mijne = (key) => T().filter(t => t.key === key);
-  const mijn = (key) => ({ status: 200, tracks: mijne(key).map(kort),
+  // Je eigen stukken EN die waar je aan meewerkt; anders zijn ze onvindbaar.
+  const mijne = (key) => T().filter(t => bijMij(key, t));
+  const mijn = (key) => ({ status: 200, tracks: mijne(key).map(t => kort(t, key)),
     instrumenten: I.INSTRUMENTEN, stappenPerMaat: I.STAPPEN_PER_MAAT,
     maxMaten: I.MAX_MATEN, maxKanalen: I.MAX_KANALEN, bpmMin: I.BPM_MIN, bpmMax: I.BPM_MAX,
-    toonMin: I.TOON_MIN, toonMax: I.TOON_MAX });
+    toonMin: I.TOON_MIN, toonMax: I.TOON_MAX, tekstMax: I.TEKST_MAX });
+
+  /* Wie erbij mag. Naast de eigenaar ook zijn MEDEMAKERS (kern/muziek-samen.js):
+     samen produceren is niets waard als de ander alleen mag kijken. Wie er
+     helemaal niet bij hoort, krijgt 404 en niet 403 -- dan verraadt het antwoord
+     ook niet dat dit stuk bestaat. */
+  const bijMij = (key, t) => !!t && (t.key === key || (magBij ? magBij(t, key) : false));
 
   function open(key, id) {
     const t = trackMet(id);
-    if (!t || t.key !== key) return { status: 404, error: 'Dit stuk bestaat niet.' };
+    if (!bijMij(key, t)) return { status: 404, error: 'Dit stuk bestaat niet.' };
     return { status: 200, track: publiek(t) };
   }
 
   function bewaar(key, id, invoer) {
     const t = trackMet(id);
-    if (!t || t.key !== key) return { status: 404, error: 'Dit stuk bestaat niet.' };
+    if (!bijMij(key, t)) return { status: 404, error: 'Dit stuk bestaat niet.' };
     Object.assign(t, schoonTrack(t, invoer));
+    // wie er als laatste aan werkte: de eerlijke vervanging van gelijktijdig
+    // bewerken, dat we niet bouwen (zie kern/muziek-samen.js)
+    if (stempel) stempel(t, key);
     save();
     return { status: 200, ok: true, track: publiek(t) };
   }

@@ -31,7 +31,10 @@
     URL.revokeObjectURL(a.href);
   }
 
-  var track = null, instrumenten = {}, raster = null, vuil = false;
+  /* De grenzen komen van de server mee (kern/muziek-instrumenten.js). Ze hier
+     nog eens opschrijven zou betekenen dat er twee waarheden zijn over hoe lang
+     een stuk mag worden -- en die lopen vroeg of laat uit elkaar. */
+  var track = null, instrumenten = {}, raster = null, vuil = false, grens = { maten: 8 };
 
   if (!TOKEN) {
     $('#lijstVlak').innerHTML = '<div class="kaart"><h2>Log eerst in</h2>' +
@@ -45,6 +48,7 @@
     $('#werkVlak').hidden = true;
     api('mijn').then(function (d) {
       instrumenten = d.instrumenten || instrumenten;
+      if (d.maxMaten) { grens.maten = d.maxMaten; $('#tMaten').max = String(d.maxMaten); }
       vulInstrumenten();
       var v = $('#lijstVlak'); v.hidden = false;
       var rijen = (d.tracks || []).map(function (t) {
@@ -90,6 +94,10 @@
   }
 
   /* ---- het werkvlak ---- */
+  // Wie er nog meer wakker moet worden als er een stuk opengaat: de vorm, de
+  // makers, de uitgave. Ze melden zich zelf aan; dit bestand hoeft ze niet te
+  // kennen.
+  var luisteraars = [];
   function zet(t) {
     track = t; vuil = false;
     $('#lijstVlak').hidden = true;
@@ -108,12 +116,14 @@
       });
     }
     raster.zet(track, instrumenten);
+    meld();
   }
+  function meld() { luisteraars.forEach(function (f) { try { f(track); } catch (e) {} }); }
 
   function leesVelden() {
     track.naam = $('#tNaam').value.trim() || 'Naamloos';
     track.bpm = Math.max(40, Math.min(200, Number($('#tBpm').value) || track.bpm));
-    var maten = Math.max(1, Math.min(8, Number($('#tMaten').value) || track.maten));
+    var maten = Math.max(1, Math.min(grens.maten, Number($('#tMaten').value) || track.maten));
     if (maten !== track.maten) { track.maten = maten; track.stappen = 16 * maten; }
     track.klaar = $('#tKlaar').checked;
   }
@@ -128,10 +138,14 @@
     if (!track) return Promise.resolve();
     leesVelden();
     return api('bewaar', { id: track.id, naam: track.naam, bpm: track.bpm, maten: track.maten,
-      kanalen: track.kanalen, klaar: track.klaar }).then(function (d) {
+      kanalen: track.kanalen, secties: track.secties || [], klaar: track.klaar }).then(function (d) {
       if (d.error) { fout(d.error); return; }
       track = d.track; vuil = false;
       raster.zet(track, instrumenten);
+      // ook na het bewaren, want de server stuurt een NIEUW track-object terug:
+      // wie het oude vasthoudt (de vorm, de uitgave) kijkt anders naar iets dat
+      // niet meer bestaat. En "klaar" aanvinken opent pas hier de uitgave.
+      meld();
       if (!stil) zeg('Bewaard.');
     });
   }
@@ -171,6 +185,9 @@
     raster: function () { return raster; },
     leesVelden: function () { if (track) leesVelden(); },
     gewijzigd: function () { vuil = true; },
+    bewaar: function () { return bewaarNu(true); },
+    bijOpenen: function (f) { luisteraars.push(f); if (track) f(track); },
+    velden: function () { $('#tBpm').value = track.bpm; $('#tMaten').value = track.maten; },
     naarLijst: function () { track = null; toonLijst(); }
   };
 

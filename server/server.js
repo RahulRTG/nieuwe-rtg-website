@@ -2556,7 +2556,18 @@ Object.assign(kern, require('./kern/navigatie').maakNavigatie({
 /* RTG Studio: zelf muziek maken. Alles wordt opgewekt, niets gesampled -- zie
    kern/muziek-instrumenten.js. Daardoor zit er geen licentie van een ander in
    wat een lid maakt, en mag zijn eigen stuk wel onder zijn eigen clip. */
-Object.assign(kern, require('./kern/muziek')({ db, save, crypto, schoon }));
+/* De studio is in drie lagen bedraad, en de volgorde is nodig: samen levert de
+   makers-lijst waar muziek zijn toegang op baseert, en uitgave heeft beide. */
+kern.muziekSamen = null;
+Object.assign(kern, require('./kern/muziek')({ db, save, crypto, schoon,
+  magBij: (t, key) => (kern.muziekSamen ? kern.muziekSamen.muziekMagBij(t, key) : t.key === key),
+  stempel: (t, key) => { if (kern.muziekSamen) kern.muziekSamen.muziekStempel(t, key); } }));
+kern.muziekSamen = require('./kern/muziek-samen')({ save,
+  trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan });
+Object.assign(kern, kern.muziekSamen);
+Object.assign(kern, require('./kern/muziek-uitgave')({ db, save, crypto, schoon,
+  trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan,
+  makersVan: kern.muziekMakersVan, notify }));
 kern.muziekRahul = require('./kern/muziek-rahul')({ schoonTrack: kern.muziekSchoonTrack });
 Object.assign(kern, require('./kern/clips').maakClips({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, sseToCustomer, sseToOffice,
@@ -2715,6 +2726,7 @@ require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);
 require('./routes/huis')(kern);
 require('./routes/muziek')(kern);
+require('./routes/muziek-samen')(kern);
 require('./routes/atelierweb')(kern);
 require('./routes/webmaker')(kern);
 require('./routes/journalistiek')(kern);

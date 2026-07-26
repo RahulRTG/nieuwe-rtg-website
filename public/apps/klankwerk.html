@@ -76,6 +76,24 @@
   .stuk .rechts{margin-left:auto;font-size:.68rem;color:var(--soft);text-align:right;}
   .merk{display:inline-block;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
     border:1px solid var(--line);border-radius:999px;padding:.05rem .45rem;color:var(--gold);margin-left:.4rem;}
+  /* de tekstregel onder een stemkanaal */
+  .tekstrij{margin-top:.7rem;border-top:1px solid var(--line);padding-top:.6rem;}
+  .lettergrepen{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+  .lg{display:grid;gap:.15rem;}
+  .lgtijd{font-size:.55rem;color:var(--soft);font-variant-numeric:tabular-nums;}
+  .lg input{background:var(--card2);border:1px solid var(--line);border-radius:7px;color:var(--txt);
+    font:inherit;font-size:.78rem;padding:.2rem .35rem;width:4.2rem;}
+  /* de vorm, de makers en de uitgave */
+  .deel{display:flex;gap:.6rem;align-items:center;border-top:1px solid var(--line);padding:.4rem 0;}
+  .deel:first-child{border-top:none;}
+  .deel .dn{font-weight:600;font-size:.85rem;}
+  .deel .dm{font-size:.72rem;color:var(--soft);}
+  .deel .rechts{margin-left:auto;}
+  .maker{display:flex;gap:.5rem;align-items:center;border-top:1px solid var(--line);padding:.4rem 0;
+    font-size:.85rem;}
+  .maker:first-child{border-top:none;}
+  .maker .rol{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);}
+  .maker .rechts{margin-left:auto;}
   .fout{font-size:.8rem;color:#E78AA0;margin-top:.5rem;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
     border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
@@ -92,6 +110,7 @@
   <a class="terug" href="/apps/index.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG</span><h1>Klankwerk</h1></span>
   <span class="rij" style="margin-left:auto;">
+    <a class="knop" href="/apps/zaal.html">De zaal</a>
     <button class="knop vol" id="speel" type="button">Speel</button>
     <button class="knop" id="stopKnop" type="button">Stop</button>
     <button class="knop" id="bewaar" type="button">Bewaren</button>
@@ -109,7 +128,7 @@
         <label for="tBpm" class="stil">Tempo</label>
         <input class="veld" id="tBpm" type="number" min="40" max="200" style="width:5rem;">
         <label for="tMaten" class="stil">Maten</label>
-        <input class="veld" id="tMaten" type="number" min="1" max="8" style="width:4rem;">
+        <input class="veld" id="tMaten" type="number" min="1" max="32" style="width:4rem;">
         <label for="tLengte" class="stil">Nootlengte</label>
         <select class="veld" id="tLengte">
           <option value="1">1</option><option value="2" selected>2</option>
@@ -135,6 +154,26 @@
     <div class="kop">De notenrol</div>
     <div class="kaart"><div id="rol"></div></div>
 
+    <div class="kop">De vorm</div>
+    <div class="kaart">
+      <p class="stil">Een lus van vier maten is een figuur; een lied heeft delen. Wat u hier benoemt
+        verandert niets aan de klank &ndash; het maakt zichtbaar wat de vorm is, en dat is precies wat een
+        lus tot een lied maakt.</p>
+      <div id="secties" style="margin-top:.6rem;"></div>
+      <div class="rij" style="margin-top:.6rem;">
+        <label class="stil" for="sNaam">Deel</label>
+        <select class="veld" id="sNaam">
+          <option>Intro</option><option>Couplet</option><option selected>Refrein</option>
+          <option>Brug</option><option>Slot</option>
+        </select>
+        <label class="stil" for="sVan">van maat</label>
+        <input class="veld" id="sVan" type="number" min="1" max="32" value="1" style="width:4rem;">
+        <label class="stil" for="sTot">t/m</label>
+        <input class="veld" id="sTot" type="number" min="1" max="32" value="4" style="width:4rem;">
+        <button class="knop" id="sBij" type="button">Deel erbij</button>
+      </div>
+    </div>
+
     <div class="kop">Rahul zet iets neer</div>
     <div class="kaart">
       <p class="stil">Wat hij maakt is een voorstel: het landt pas in uw raster als u dat zegt, en het is
@@ -143,9 +182,46 @@
         <label class="stil" for="rVraag" style="position:absolute;left:-999px;">Wat wilt u horen?</label>
         <input class="veld" id="rVraag" style="flex:1;min-width:10rem;" maxlength="300"
           placeholder="Bijv. een rustige lounge rond 90 bpm">
-        <button class="knop" id="rVraagKnop" type="button">Vraag het Rahul</button>
+        <button class="knop" id="rVraagKnop" type="button">Een figuur om mee te beginnen</button>
       </div>
+      <div class="rij" style="margin-top:.6rem;">
+        <label class="stil" for="rTekst" style="position:absolute;left:-999px;">Uw zin om te zingen</label>
+        <input class="veld" id="rTekst" style="flex:1;min-width:10rem;" maxlength="600"
+          placeholder="Uw eigen zin, bijv. de zon komt op boven de haven">
+        <button class="knop vol" id="rLiedKnop" type="button">Maak er een heel lied van</button>
+      </div>
+      <p class="stil" style="margin-top:.5rem;">Bij een heel lied komt er een vorm uit (intro, couplet,
+        refrein) met een zanglijn erop. Uw zin wordt lettergreep voor lettergreep onder de noten gelegd;
+        Rahul schrijft uw woorden niet. Typt u niets, dan zingt de stem open klinkers, zodat u hoort waar
+        uw tekst nog moet komen. De stem wordt opgewekt &ndash; het is geen opname van een zanger.</p>
       <div id="rUit" style="margin-top:.7rem;"></div>
+    </div>
+
+    <div class="kop">Samen produceren</div>
+    <div class="kaart">
+      <p class="stil">Muziek maken is zelden een eenmanszaak. Wie u erbij haalt, bewerkt het stuk volledig
+        mee en staat straks in de aftiteling. Het stuk is gedeeld, de credits niet.</p>
+      <div id="makers" style="margin-top:.6rem;"></div>
+      <div class="rij" id="nodigRij" style="margin-top:.6rem;">
+        <label class="stil" for="mCode">Codenaam</label>
+        <input class="veld" id="mCode" style="flex:1;min-width:9rem;" maxlength="40"
+          placeholder="Bijv. Zilveren Lynx 2679">
+        <label class="stil" for="mRol">Rol</label>
+        <select class="veld" id="mRol"></select>
+        <button class="knop" id="mNodig" type="button">Erbij vragen</button>
+      </div>
+      <p class="stil" style="margin-top:.5rem;">U werkt niet tegelijk in hetzelfde raster: wie als laatste
+        bewaart, wint. Daarom staat hierboven wie er als laatste iets deed. Liever een eerlijke
+        waarschuwing dan een valse belofte.</p>
+    </div>
+
+    <div class="kop">Uitgeven</div>
+    <div class="kaart">
+      <div id="uitgaveVlak"></div>
+      <p class="stil" style="margin-top:.5rem;">Onder uw codenaam geeft u zelf uit, meteen: het is uw werk.
+        De RTG-naam eronder is een aanvraag, geen knop &ndash; RTG die zijn naam ergens onder zet, staat
+        ergens voor in, en dat besluit een mens bij het kantoor. Wordt het nee, dan blijft uw uitgave
+        gewoon staan onder uw codenaam.</p>
     </div>
 
     <div class="kop">Meenemen</div>
@@ -166,11 +242,16 @@
 
 <div class="melding" id="melding" role="status"></div>
 
+<script src="/apps/klankwerk/klanken.js"></script>
+<script src="/apps/klankwerk/zang.js"></script>
 <script src="/apps/klankwerk/motor.js"></script>
+<script src="/apps/klankwerk/rol.js"></script>
 <script src="/apps/klankwerk/raster.js"></script>
 <script src="/apps/klankwerk/wav.js"></script>
 <script src="/apps/klankwerk/scherm.js"></script>
 <script src="/apps/klankwerk/acties.js"></script>
+<script src="/apps/klankwerk/vorm.js"></script>
+<script src="/apps/klankwerk/samen.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

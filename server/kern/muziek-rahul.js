@@ -1,4 +1,4 @@
-/* RTG Studio (deelmodule): Rahul zet iets neer.
+/* RTG Klankwerk (deelmodule): Rahul zet iets neer.
 
    DE AI ZET NEER, JIJ BENT DE MAKER. Wat hier uitkomt is een VOORSTEL: gewone
    stappen en noten, in hetzelfde formaat als wat je zelf tekent. Je ziet het in
@@ -6,138 +6,66 @@
    van jou. Er komt nooit een kant-en-klaar audiobestand uit, want dan zou je
    niets meer kunnen veranderen en zou de maker de machine zijn.
 
-   DAAROM ZIT DE MUZIEKKENNIS IN DEZE MODULE EN NIET IN DE PROMPT. Toonladders,
-   akkoordreeksen en drumfiguren staan hier als gewone tabellen. Gevolg: de
-   studio doet het net zo goed zonder AI-sleutel, en als Claude er wél is, mag
-   hij alleen KIEZEN en VARIEREN binnen wat hier staat -- zijn antwoord gaat
-   langs dezelfde keuring als een mens. Een AI die zelf noten mag verzinnen die
-   het instrument niet kan spelen, levert stilte op en een raadsel erbij.
+   De muzikale kennis waarmee hij dat doet staat NIET hier en niet in een
+   prompt, maar in muziek-stijlen.js (ladders, stijlen, figuren) en
+   muziek-lied.js (vorm en zang). Dit bestand doet één ding: van een vraag een
+   voorstel maken, en wat Claude terugstuurt langs dezelfde keuring halen als
+   handwerk.
 
    Wat hier NIET komt: "maak het populairder", "dit scoort beter". Er is geen
    publiek om voor te optimaliseren en we gaan er ook geen verzinnen. */
 const I = require('./muziek-instrumenten');
-
-// Toonladders als halve tonen vanaf de grondtoon.
-const LADDERS = {
-  mineur:  [0, 2, 3, 5, 7, 8, 10],
-  majeur:  [0, 2, 4, 5, 7, 9, 11],
-  dorisch: [0, 2, 3, 5, 7, 9, 10]
-};
-
-/* De stijlen. Elke stijl is een handvol beslissingen die samen een gevoel
-   maken: hoe snel, welke ladder, waar de trap valt, en hoe druk het is. */
-const STIJLEN = {
-  house:   { naam: 'house', bpm: 122, ladder: 'mineur', grond: 45, trap: [0, 4, 8, 12],
-    klap: [4, 12], hoed: [2, 6, 10, 14], reeks: [0, 5, 3, 4], basOctaaf: -12, pad: 'snaar', top: 'pluk' },
-  lounge:  { naam: 'lounge', bpm: 84, ladder: 'dorisch', grond: 50, trap: [0, 8],
-    klap: [], hoed: [4, 12], reeks: [0, 3, 5, 4], basOctaaf: -12, pad: 'toets', top: 'pluk' },
-  hiphop:  { naam: 'hiphop', bpm: 88, ladder: 'mineur', grond: 43, trap: [0, 6, 10],
-    klap: [4, 12], hoed: [0, 2, 4, 6, 8, 10, 12, 14], reeks: [0, 5, 0, 3], basOctaaf: -12, pad: 'toets', top: null },
-  ambient: { naam: 'ambient', bpm: 62, ladder: 'majeur', grond: 48, trap: [],
-    klap: [], hoed: [], reeks: [0, 4, 5, 3], basOctaaf: -12, pad: 'snaar', top: 'lead' },
-  club:    { naam: 'club', bpm: 128, ladder: 'mineur', grond: 45, trap: [0, 4, 8, 12],
-    klap: [4, 12], hoed: [2, 6, 10, 14], reeks: [0, 6, 5, 4], basOctaaf: -12, pad: 'snaar', top: 'lead' }
-};
-const STIJLNAMEN = Object.keys(STIJLEN);
-
-// Uit de vraag halen wat erin staat: een stijl en eventueel een tempo.
-const WOORDEN = {
-  house: ['house', 'deep', 'garage'],
-  lounge: ['lounge', 'chill', 'rustig', 'zacht', 'warm', 'diner', 'zonsondergang'],
-  hiphop: ['hiphop', 'hip hop', 'beat', 'boom bap', 'rap', 'trap'],
-  ambient: ['ambient', 'sfeer', 'traag', 'langzaam', 'slapen', 'focus', 'studeren'],
-  club: ['club', 'techno', 'hard', 'snel', 'dansen', 'nacht']
-};
-function leesVraag(vraag) {
-  const v = String(vraag || '').toLowerCase();
-  let stijl = 'house';
-  for (const s of STIJLNAMEN) if ((WOORDEN[s] || []).some(w => v.includes(w))) { stijl = s; break; }
-  /* Het tempo alleen lezen als het er ook echt als tempo staat: met een eenheid
-     erbij, of anders een los getal dat een tempo KAN zijn. Zonder die tweede
-     eis kaapt "4 maten" of een jaartal het tempo. */
-  const metEenheid = (v.match(/\b(\d{2,3})\s*(?:bpm|slagen|tempo)/) || [])[1];
-  const los = (v.match(/\b(\d{2,3})\b/g) || []).map(Number).find(n => n >= I.BPM_MIN && n <= I.BPM_MAX);
-  const bpm = metEenheid ? Number(metEenheid) : (los != null ? los : null);
-  const mineur = /mineur|mineurs|droevig|donker|melancholi/.test(v);
-  const majeur = /majeur|vrolijk|blij|licht|zonnig/.test(v);
-  return { stijl, bpm: bpm ? Number(bpm) : null, ladder: mineur ? 'mineur' : majeur ? 'majeur' : null };
-}
-
-/* Het voorstel bouwen. Geen willekeur waar het ertoe doet: de trap staat waar
-   hij hoort, de bas volgt de akkoordreeks. Wel wat variatie in de bovenstem,
-   want een reeks die precies herhaalt klinkt als een oefening. */
-function bouw(stijl, maten, ladderNaam, zaad) {
-  const s = STIJLEN[stijl] || STIJLEN.house;
-  const ladder = LADDERS[ladderNaam || s.ladder] || LADDERS.mineur;
-  const stappen = I.stappenVoor(maten);
-  const rnd = zaadRnd(zaad);
-  const kanalen = [];
-  const perMaat = I.STAPPEN_PER_MAAT;
-
-  const herhaal = (basis) => {
-    const uit = [];
-    for (let m = 0; m < maten; m++) for (const p of basis) uit.push(m * perMaat + p);
-    return uit.filter(p => p < stappen);
-  };
-  if (s.trap.length) kanalen.push({ instrument: 'kick', stappen: herhaal(s.trap) });
-  if (s.klap.length) kanalen.push({ instrument: 'snare', stappen: herhaal(s.klap) });
-  if (s.hoed.length) kanalen.push({ instrument: 'hihat', stappen: herhaal(s.hoed) });
-
-  // De akkoordreeks: één akkoord per maat, en de bas pakt de grondtoon.
-  const bas = [], pad = [], top = [];
-  for (let m = 0; m < maten; m++) {
-    const graad = s.reeks[m % s.reeks.length];
-    const grond = s.grond + ladder[graad % ladder.length] + (graad >= ladder.length ? 12 : 0);
-    const start = m * perMaat;
-    bas.push({ stap: start, toon: grond + s.basOctaaf, lengte: 6 });
-    bas.push({ stap: start + 8, toon: grond + s.basOctaaf, lengte: 6 });
-    // een drieklank uit de ladder: grondtoon, terts, kwint
-    for (const trede of [0, 2, 4]) {
-      pad.push({ stap: start, toon: grond + ladder[(graad + trede) % ladder.length] +
-        (graad + trede >= ladder.length ? 12 : 0), lengte: perMaat });
-    }
-    if (s.top) {
-      for (let i = 0; i < 4; i++) {
-        if (rnd() < 0.55) continue;
-        const trede = Math.floor(rnd() * ladder.length);
-        top.push({ stap: start + i * 4 + (rnd() < 0.4 ? 2 : 0), toon: grond + 12 + ladder[trede], lengte: 2 });
-      }
-    }
-  }
-  kanalen.push({ instrument: 'bas', noten: bas });
-  kanalen.push({ instrument: s.pad, noten: pad, volume: 0.5 });
-  if (s.top && top.length) kanalen.push({ instrument: s.top, noten: top, volume: 0.45 });
-  return kanalen;
-}
-function zaadRnd(zaad) {
-  let t = (zaad >>> 0) || 1;
-  return function () {
-    t += 0x6D2B79F5;
-    let r = Math.imul(t ^ t >>> 15, 1 | t);
-    r ^= r + Math.imul(r ^ r >>> 7, 61 | r);
-    return ((r ^ r >>> 14) >>> 0) / 4294967296;
-  };
-}
+const LIED = require('./muziek-lied');
+const { LADDERS, STIJLEN, STIJLNAMEN, leesVraag, bouw, zaadRnd, stiltes } = require('./muziek-stijlen');
 
 module.exports = ({ schoonTrack }) => {
   /* Een voorstel op basis van wat iemand vroeg. Werkt zonder AI-sleutel; dat is
-     de bedoeling, niet de terugval. */
+     de bedoeling, niet de terugval.
+
+     Twee smaken. Zonder `lied` komt er een FIGUUR: een lus van een paar maten
+     om mee te beginnen. Met `lied` komt er een LIED: een vorm met coupletten en
+     refreinen, een zanglijn erop, en een koor op het refrein. Dat tweede is de
+     "zonder al te moeilijk doen"-weg -- maar het blijft een voorstel dat u zelf
+     plaatst, en elke noot is daarna gewoon te verschuiven. */
   function voorstel(vraag, opties) {
     const o = opties || {};
     const gelezen = leesVraag(vraag);
     const stijl = STIJLEN[gelezen.stijl];
-    const maten = Math.max(1, Math.min(I.MAX_MATEN, Number(o.maten) || 2));
+    const lied = !!o.lied;
+    const maten = Math.max(1, Math.min(I.MAX_MATEN, Number(o.maten) || (lied ? 26 : 2)));
     const bpm = Math.max(I.BPM_MIN, Math.min(I.BPM_MAX, gelezen.bpm || stijl.bpm));
-    const kanalen = bouw(gelezen.stijl, maten, gelezen.ladder, Number(o.zaad) || Date.now());
+    const zaad = Number(o.zaad) || Date.now();
+    const kanalen = bouw(gelezen.stijl, maten, gelezen.ladder, zaad);
+    let secties = [];
+    if (lied) {
+      secties = LIED.vorm(maten);
+      const ladder = LADDERS[gelezen.ladder || stijl.ladder] || LADDERS.mineur;
+      // een eigen toevalsdraad voor de stem: anders volgt de melodie exact de
+      // grillen van de bovenstem en zingt hij zichzelf achterna
+      const rnd = zaadRnd((zaad ^ 0x5EED) >>> 0);
+      const zangNoten = LIED.zang({ secties, ladder, grond: stijl.grond, rnd, tekst: o.tekst });
+      const koorNoten = LIED.koor({ secties, ladder, grond: stijl.grond });
+      stiltes(kanalen, secties);
+      if (zangNoten) kanalen.push({ instrument: 'zang', noten: zangNoten, volume: 0.9 });
+      if (koorNoten) kanalen.push({ instrument: 'koor', noten: koorNoten, volume: 0.32 });
+    }
     // Langs dezelfde poort als handwerk: wat niet kan, valt weg.
-    const net = schoonTrack({ maten, bpm, kanalen: [] }, { maten, bpm, kanalen });
+    const net = schoonTrack({ maten, bpm, kanalen: [], secties: [] }, { maten, bpm, kanalen, secties });
     return { stijl: gelezen.stijl, bpm: net.bpm, maten: net.maten, kanalen: net.kanalen,
-      uitleg: zin(gelezen.stijl, net.bpm, net.maten) };
+      secties: net.secties, lied,
+      uitleg: lied ? liedZin(gelezen.stijl, net.bpm, net.secties, o.tekst) : zin(gelezen.stijl, net.bpm, net.maten) };
   }
 
   const zin = (stijl, bpm, maten) =>
     'Een ' + stijl + '-figuur van ' + maten + ' ' + (maten === 1 ? 'maat' : 'maten') + ' op ' + bpm + ' slagen. ' +
     'Zet hem in uw raster en haal eruit wat u niet wilt; het is een begin, geen stuk.';
+
+  const liedZin = (stijl, bpm, secties, tekst) =>
+    'Een ' + stijl + '-lied op ' + bpm + ' slagen, in ' + secties.length + ' delen: ' +
+    secties.map(s => s.naam.toLowerCase()).join(', ') + '. ' +
+    (String(tekst || '').trim()
+      ? 'Uw zin staat lettergreep voor lettergreep onder de zangnoten; klopt een afbreking niet, dan typt u die zelf over.'
+      : 'Er staat nog geen tekst onder: de stem zingt open klinkers, zodat u hoort waar uw woorden moeten komen.');
 
   /* Wat Claude terugstuurt gaat langs dezelfde keuring. Een AI die een
      instrument noemt dat niet bestaat of een noot buiten het bereik zet, krijgt

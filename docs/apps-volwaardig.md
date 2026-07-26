@@ -703,3 +703,85 @@ meesturen in de body doet niets.
 
 Bewezen: `test/rtmail-team.test.js` (9) en `test/rtmail-team.e2e.js` (scherm:
 oprichten, iemand erbij op codenaam, oppakken, afhandelen).
+
+### Het Huis: het reisdossier achter de hoofdingang
+
+Het Huis was een magazine: elf mooie bladen en nul gegevens. Dat is vreemd voor
+de voordeur van een reisbureau, want wat een reisbureau *doet* is precies dit --
+alles van je reis bij elkaar houden en eerlijk zeggen wat nog niet rond is.
+Blad 02 is nu het **reisdossier**, en het is het enige blad met echte gegevens
+erin: de rest van het magazine gaat over het huis, dit gaat over jou.
+
+Elders is dit de betaalde laag: al je boekingen in één tijdlijn, een seintje als
+een document verloopt, en een dossier dat je kunt meenemen. Dat is waar het
+jaarabonnement van de bekende reisapps voor bestaat. Hier zit het in de pas.
+
+**De regel die dit huis eraan toevoegt: wat niet bevestigd is, staat er ook zo
+bij.** Een dossier dat alles even zeker laat lijken is erger dan geen dossier --
+dan sta je aan de balie met een papier dat niets waard blijkt. Elk onderdeel
+draagt zijn eigen stand (Bevestigd / Wacht op betaling / In aanvraag bij de
+partner), en die stand staat als **woord** op het scherm, niet alleen als kleur.
+
+Daaruit volgt de tweede scheiding, en die is streng: **wat aan jou ligt** staat
+apart van **wat je alleen kunt afwachten**. Een openstaande betaling is een taak
+en wijst naar waar je hem oplost; iets dat bij een partner ligt is dat niet en
+krijgt dus ook geen knop. Iets afwachten is geen taak, en een lijst die dat door
+elkaar gooit maakt onrust waar niets te doen valt.
+
+Verder:
+
+- **De papieren van het gezelschap** komen uit Entourage, dat die grens al
+  berekent. Die rekenen we hier niet nog eens: een limiet hoort op één plek.
+- **De datum wordt gelezen, niet verzonnen.** Lukt het niet om uit de reisregel
+  een vertrekdatum te halen, dan zegt het scherm dat de datum als tekst bekend
+  is. Een verzonnen datum in een reisdossier is gevaarlijker dan een ontbrekende.
+- **Het aftellen jaagt niet op.** Het zegt hoeveel dagen er nog zijn, en verder
+  niets: geen "nog maar", geen rode cijfers.
+- **De reismap** is het dossier als platte tekst, om te bewaren, te printen of
+  aan iemand mee te geven -- het mapje dat een reisbureau je meegeeft. Platte
+  tekst met opzet: dat opent overal, ook zonder ons.
+- **Rahul verwoordt, de module telt.** Zonder AI-sleutel is het antwoord exact de
+  telling van de module. De AI mag nooit een onderdeel of een bevestiging
+  verzinnen -- juist hier niet.
+
+Wat er bewust **niet** in staat: inreisvereisten per land. Die wisselen per week
+en per nationaliteit; iets beweren wat we niet kunnen naslaan is erger dan
+zwijgen. Entourage weigert dat al om dezelfde reden.
+
+Bewezen: `test/huis.test.js` (7) en `test/huis.e2e.js` (scherm: de reis, elke
+stand als woord, de twee gescheiden lijsten, de map en Rahul).
+
+### Clips: knippen, geluid en ondertitels
+
+Clips had opnemen en delen, maar niets ertussenin -- en dat is nu juist het stuk
+waar de bekende knip-apps geld voor vragen: ondertitels bewerken, een clip
+inkorten, het geluid regelen. Achter Pro, of met een watermerk.
+
+**Het ontwerp volgt de architectuur, niet andersom.** Het beeld van een clip
+staat alleen op het toestel van de maker; RTG heeft het nooit. Daarom kan hier
+niets "gerenderd" worden, en dat hoeft ook niet:
+
+- **Knippen is een begin en een eind, geen nieuwe video.** De speler van de
+  kijker springt naar `van` en stopt bij `tot`. Het origineel blijft heel, dus je
+  kunt een knip altijd terugdraaien -- er is niets weggegooid. Dat is beter dan
+  wat een knip-app doet, niet minder.
+- **Ondertitels zijn tekst, en tekst is klein.** Die staan dus wél bij RTG, want
+  de kijker moet ze kunnen lezen ook al komt het beeld rechtstreeks van het
+  toestel van de maker.
+- **Geluid is een mededeling van de maker** over wat de kijker gaat horen:
+  `eigen`, `stil` (gemaakt om zonder geluid te bekijken) of `stem`.
+
+**De regel die dit huis eraan toevoegt: een clip zonder ondertitel is een clip
+die een deel van de mensen niet kan volgen.** Daarom draagt elke clip in de feed
+of hij ondertiteld is, en kan een kijker de dagselectie beperken tot wat hij kán
+volgen. Dat is geen smaakfilter maar een toegangsfilter -- en de kijker zet hem
+zelf aan; hij staat uit tenzij iemand dat doet. Je eigen werk verdwijnt er nooit
+door uit je eigen lijst: het filter gaat over wat je kijkt, niet over wat je
+maakte.
+
+Wat er **niet** komt: een muziekbibliotheek. We hebben geen rechten op muziek en
+doen dus niet alsof; `stil` en `stem` zijn eerlijk, een lijstje nepdeuntjes niet.
+
+Bewezen: `test/clips.test.js` (9, waarvan 4 nieuw) en
+`test/clips-studio.e2e.js` (scherm: knippen, geluid, ondertitels, het filter
+gezien door een kijker).

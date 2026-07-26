@@ -87,3 +87,86 @@ test('5. reacties en melden; kantoor ziet de melding en kan de kaart weghalen', 
   const na = await api('/api/clips/feed', {}, kijker);
   assert.ok(!na.body.clips.some(x => x.id === clipId), 'de kaart is weg; het beeld stond toch al alleen bij de maker');
 });
+
+/* ---- de studio: knippen, geluid en ondertitels (kern/clips-studio.js) ----
+   Het beeld staat alleen bij de maker, dus een knip is een begin en een eind
+   en geen nieuwe video; ondertitels zijn tekst en staan daarom wel bij RTG,
+   want de kijker moet ze kunnen lezen. */
+let studioId;
+test('6. knippen: een begin en een eind, en altijd terug te draaien', async () => {
+  const r = await api('/api/clips/maak', { titel: 'Kade bij avond', duurS: 30, poster: POSTER, mbGeschat: 6 }, maker);
+  assert.equal(r.status, 200);
+  studioId = r.body.id;
+
+  // een knip buiten de opname of korter dan een seconde bestaat niet
+  assert.equal((await api('/api/clips/knip', { id: studioId, van: 5, tot: 44 }, maker)).status, 400);
+  assert.equal((await api('/api/clips/knip', { id: studioId, van: 5, tot: 5.4 }, maker)).status, 400);
+  // en een ander knipt niet in andermans clip
+  assert.equal((await api('/api/clips/knip', { id: studioId, van: 2, tot: 8 }, kijker)).status, 403);
+
+  const k = await api('/api/clips/knip', { id: studioId, van: 4, tot: 19 }, maker);
+  assert.equal(k.status, 200);
+  assert.equal(k.body.duurNa, 15, 'de speelduur volgt uit de knip');
+
+  const feed = await api('/api/clips/feed', {}, maker);
+  const mijn = feed.body.mijn.find(c => c.id === studioId);
+  assert.deepEqual(mijn.knip, { van: 4, tot: 19 });
+  assert.equal(mijn.speelduurS, 15);
+  assert.equal(mijn.duurS, 30, 'de opname zelf is niet ingekort -- er is niets weggegooid');
+
+  // terugdraaien kan altijd, juist omdat er niets weg is
+  assert.equal((await api('/api/clips/knip', { id: studioId, weg: true }, maker)).body.knip, null);
+  const na = (await api('/api/clips/feed', {}, maker)).body.mijn.find(c => c.id === studioId);
+  assert.equal(na.speelduurS, 30);
+});
+
+test('7. ondertitels: tekst hoort bij RTG, want de kijker moet ze lezen', async () => {
+  const r = await api('/api/clips/ondertitels', { id: studioId, regels: [
+    { van: 6, tot: 9, tekst: 'De boten liggen stil.' },
+    { van: 1, tot: 4, tekst: 'Het is bijna donker.' },
+    { van: 12, tot: 40, tekst: 'valt buiten de opname' },
+    { van: 15, tot: 14, tekst: 'eindigt voor het begint' },
+    { van: 20, tot: 22, tekst: '' }
+  ] }, maker);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.regels, 2, 'alleen wat klopt wordt bewaard');
+  assert.deepEqual(r.body.ondertitels.map(c => c.van), [1, 6], 'op tijd gesorteerd');
+
+  const kf = await api('/api/clips/feed', {}, kijker);
+  const bij = kf.body.clips.find(c => c.id === studioId);
+  assert.equal(bij.ondertiteld, true, 'de kijker ziet dat hij deze kan volgen');
+  assert.equal(bij.ondertitels.length, 2, 'en krijgt de regels erbij');
+
+  // een ander schrijft geen ondertitels onder andermans clip
+  assert.equal((await api('/api/clips/ondertitels', { id: studioId, regels: [] }, kijker)).status, 403);
+});
+
+test('8. geluid: drie eerlijke antwoorden, en geen muziekbibliotheek', async () => {
+  assert.equal((await api('/api/clips/geluid', { id: studioId, soort: 'muziek' }, maker)).status, 400,
+    'we hebben geen rechten op muziek en doen dus niet alsof');
+  for (const s of ['eigen', 'stil', 'stem']) {
+    assert.equal((await api('/api/clips/geluid', { id: studioId, soort: s }, maker)).body.geluid, s);
+  }
+  const bij = (await api('/api/clips/feed', {}, kijker)).body.clips.find(c => c.id === studioId);
+  assert.equal(bij.geluid, 'stem');
+});
+
+test('9. de kijker mag de selectie beperken tot wat hij kan volgen', async () => {
+  const kaal = await api('/api/clips/maak', { titel: 'Zonder ondertitel', duurS: 8, poster: POSTER }, maker);
+  assert.equal(kaal.status, 200);
+
+  const alles = await api('/api/clips/feed', {}, kijker);
+  assert.equal(alles.body.alleenOndertiteld, false, 'het filter staat uit tenzij de kijker hem aanzet');
+  assert.ok(alles.body.clips.some(c => c.id === kaal.body.id));
+
+  const alleen = await api('/api/clips/feed', { alleenOndertiteld: true }, kijker);
+  assert.equal(alleen.body.alleenOndertiteld, true);
+  assert.equal(alleen.body.clips.some(c => c.id === kaal.body.id), false, 'zonder ondertitel valt hij af');
+  assert.ok(alleen.body.clips.some(c => c.id === studioId), 'met ondertitel blijft hij staan');
+  // je eigen clips blijven zichtbaar: het filter gaat over wat je KIJKT.
+  // Dus gevraagd als de MAKER -- die ziet zijn eigen werk onder "mijn".
+  const bijMaker = await api('/api/clips/feed', { alleenOndertiteld: true }, maker);
+  assert.ok(bijMaker.body.mijn.some(c => c.id === kaal.body.id),
+    'je eigen werk verdwijnt niet uit je eigen lijst, ook niet met het filter aan');
+  assert.equal(alleen.body.einde, 'Dat was het voor nu.', 'de selectie houdt zijn expliciete einde');
+});

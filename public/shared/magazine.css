@@ -179,3 +179,27 @@ a{color:inherit;}
 .mag-pager .stip.nu{background:var(--mag-gold-soft);transform:scale(1.3);}
 .mag-pager .teller{font-family:'Bodoni Moda',serif;font-size:0.82rem;color:var(--mag-gold-soft);
   font-variant-numeric:tabular-nums;letter-spacing:0.08em;min-width:3.4rem;text-align:center;}
+
+/* ---------- het reisdossier (blad 02) ----------
+   Geen sierlijke uitzondering maar dezelfde magazinetaal: een lijst met een
+   dunne lijn per regel, en een stand die je aan de tekst leest en niet alleen
+   aan een kleur. Een stand die alleen kleur is, leest een deel van de mensen
+   niet -- daarom staat het woord er altijd bij. */
+.mag-dossier{margin:1.6rem 0 0;max-width:var(--mag-meet);}
+.mag-dossier .regel{display:grid;grid-template-columns:4.6rem 1fr;gap:0.9rem;align-items:baseline;
+  padding:0.85rem 0;border-top:1px solid var(--line-soft);}
+.mag-dossier .regel:first-child{border-top:none;}
+.mag-dossier .wanneer{font-family:'Bodoni Moda',serif;font-size:0.9rem;color:var(--accent);
+  font-variant-numeric:tabular-nums;}
+.mag-dossier .titel{font-size:1rem;font-weight:600;line-height:1.3;}
+.mag-dossier .sub{display:block;font-size:0.84rem;color:var(--soft);margin-top:0.2rem;line-height:1.5;}
+.mag-dossier .stand{display:inline-block;margin-top:0.4rem;font-size:0.66rem;letter-spacing:0.14em;
+  text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:0.16rem 0.6rem;color:var(--meta);}
+.mag-dossier .stand.ja{color:var(--accent);border-color:var(--accent);}
+.mag-telling{margin:1.3rem 0 0;font-size:0.95rem;line-height:1.6;color:var(--ink);max-width:var(--mag-meet);}
+.mag-lijstje{list-style:none;display:flex;flex-direction:column;gap:0.5rem;margin-top:0.6rem;}
+.mag-lijstje li{position:relative;padding-left:1.1rem;font-size:0.9rem;color:var(--soft);line-height:1.55;}
+.mag-lijstje li::before{content:"\2014";position:absolute;left:0;color:var(--accent);}
+.mag-lijstje a{color:var(--accent);}
+.mag-acties{display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:1.5rem;}
+.mag-acties button{font:inherit;cursor:pointer;}

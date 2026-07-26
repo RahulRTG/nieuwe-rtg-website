@@ -31,6 +31,8 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
   }
   const clipMet = cid => db.data.clips.find(c => c.id === String(cid || '')) || null;
   const online = c => Date.now() - (aanwezigheid.get(c.id) || 0) < AANWEZIG_TTL_MS;
+  // de studio: knippen, geluid en ondertitels (kern/clips-studio.js)
+  const studio = require('./clips-studio')({ db, save, schoon, clipMet });
 
   /* ---- maken en weghalen: alleen metadata, het beeld blijft thuis ---- */
   function maak(key, data) {
@@ -85,20 +87,29 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
 
   /* ---- de feed: een eindige dagselectie met een expliciet einde ---- */
   function beeld(c, key) {
-    return { id: c.id, titel: c.titel, duurS: c.duurS, poster: c.poster, mb: c.mbGeschat,
+    return Object.assign({ id: c.id, titel: c.titel, duurS: c.duurS, poster: c.poster, mb: c.mbGeschat,
       codenaam: codenaamVan(c.key), online: online(c), mijn: c.key === key,
       volgIk: (db.data.clipsVolg[key] || []).includes(c.key),
-      reacties: (db.data.clipsReacties[c.id] || []).length, at: c.at };
+      reacties: (db.data.clipsReacties[c.id] || []).length, at: c.at },
+      studio.clipsStudioBeeld(c));
   }
-  function feed(key) {
+  /* De dagselectie blijft eindig en chronologisch. `alleenOndertiteld` is de
+     enige beperking die de kijker zelf kan zetten: geen smaakfilter maar een
+     toegangsfilter, voor wie geluid niet kan of niet wil gebruiken. Hij staat
+     uit tenzij de kijker hem aanzet -- wij kiezen dat niet voor hem. */
+  function feed(key, opties) {
     lijsten();
+    const o = opties || {};
     const volgSet = new Set(db.data.clipsVolg[key] || []);
-    const rijen = [...db.data.clips].sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    let rijen = [...db.data.clips].sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    const mijne = rijen.filter(c => c.key === key);
+    if (o.alleenOndertiteld) rijen = rijen.filter(c => (c.ondertitels || []).length > 0);
     const eerst = rijen.filter(c => volgSet.has(c.key) && c.key !== key);
     const rest = rijen.filter(c => !volgSet.has(c.key) && c.key !== key);
     const selectie = [...eerst, ...rest].slice(0, DAGSELECTIE);
     return { status: 200, clips: selectie.map(c => beeld(c, key)),
-      mijn: rijen.filter(c => c.key === key).map(c => beeld(c, key)),
+      mijn: mijne.map(c => beeld(c, key)),
+      alleenOndertiteld: !!o.alleenOndertiteld,
       einde: 'Dat was het voor nu.', maxS: CLIP_MAX_S };
   }
   function volg(key, cid, aan) {
@@ -150,9 +161,9 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     return { status: 200, ok: true };
   }
 
-  return { clipsMaak: maak, clipsWeg: weg, clipsAanwezig: aanwezig, clipsSignaal: signaal,
+  return Object.assign(studio, { clipsMaak: maak, clipsWeg: weg, clipsAanwezig: aanwezig, clipsSignaal: signaal,
     clipsFeed: feed, clipsVolg: volg, clipsReactie: reactie, clipsReacties: reacties,
-    clipsMeld: meld, clipsOfficeLijst: officeLijst, clipsOfficeVerwijder: officeVerwijder };
+    clipsMeld: meld, clipsOfficeLijst: officeLijst, clipsOfficeVerwijder: officeVerwijder });
 }
 
 module.exports = { maakClips };

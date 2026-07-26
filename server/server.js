@@ -2308,6 +2308,15 @@ Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify,
 Object.assign(kern, require('./kern/lifestyle')({ db, save, crypto, anthropic, liveCodename, notify }));
 // De extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison
 Object.assign(kern, require('./kern/rechterhand')({ db, save, crypto, liveCodename, anthropic, DATA_DIR }));
+/* Het Huis: het reisdossier achter de hoofdingang. Leest alleen wat er al is --
+   de eigen reis van het lid, en de papieren die Entourage al bewaakt. Die grens
+   wordt daar berekend en hier niet nog een keer: een limiet hoort op één plek. */
+kern.huis = require('./kern/huis')({
+  reisVan: (sess) => (sess && sess.account
+    ? (accounts.getMemberState(sess.account.id) || {}).trip
+    : (sess && sess.tier !== 'guest' ? db.data.trip : null)) || null,
+  entourageVan: (sess) => { try { return kern.entourage(sess.key); } catch (e) { return null; } }
+});
 // Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass (match -> jetset-date)
 Object.assign(kern, require('./kern/rendezvous')({ db, save, crypto, liveCodename, anthropic, notify }));
 // De wauw-laag: stemming, verjaardagsglans en De Terugblik over alle socials
@@ -2697,6 +2706,7 @@ require('./routes/agenda')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);
+require('./routes/huis')(kern);
 require('./routes/atelierweb')(kern);
 require('./routes/webmaker')(kern);
 require('./routes/journalistiek')(kern);

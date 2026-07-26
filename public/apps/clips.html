@@ -50,6 +50,15 @@
     align-items:center;justify-content:center;text-align:center;padding:2rem;}
   .einde h2{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
   /* de studio en de reacties: eenvoudige sheets */
+  /* De ondertitelband. Staat boven de knoppenlaag, met een eigen donkere plaat
+     eronder: witte tekst op willekeurig beeld leest anders soms niet. */
+  .ondert{position:absolute;left:0;right:0;bottom:8.5rem;text-align:center;padding:0 1.2rem;pointer-events:none;}
+  .ondert span{display:inline-block;background:rgba(12,12,11,0.78);color:#F4F1EC;font-size:0.95rem;
+    line-height:1.45;border-radius:8px;padding:0.3rem 0.7rem;max-width:34ch;}
+  .merk{display:inline-block;font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:999px;padding:0.1rem 0.5rem;margin-left:0.4rem;color:var(--soft);}
+  .cue{display:grid;grid-template-columns:4rem 4rem 1fr auto;gap:0.4rem;margin-bottom:0.4rem;align-items:center;}
+  .cue input{width:100%;}
   .sheet{position:fixed;inset:0;z-index:10;background:rgba(12,12,11,0.92);display:none;
     align-items:flex-end;justify-content:center;}
   .sheet.open{display:flex;}
@@ -73,6 +82,7 @@
   <a href="/apps/app.html" aria-label="Terug naar de leden-app">←</a>
   <h1>Clips</h1>
   <span class="rek"></span>
+  <button class="knop" id="volgbaar" type="button" aria-pressed="false">Alleen met ondertitel</button>
   <button class="knop" id="studioOpen" type="button">Maak een clip</button>
 </header>
 
@@ -95,6 +105,44 @@
       <button class="knop" id="studioDicht" type="button">Sluit</button>
     </div>
     <p class="stil" id="studioStatus" style="margin-top:0.6rem;"></p>
+  </div>
+</div>
+
+<!-- de knipstudio: knippen, geluid en ondertitels op een eigen clip.
+     Het beeld blijft op het toestel; een knip is een begin en een eind. -->
+<div class="sheet" id="knipSheet" role="dialog" aria-label="Clip bewerken">
+  <div class="vlak">
+    <h2 id="knipTitel">Bewerken</h2>
+    <p class="stil">Er wordt niets weggegooid: een knip is een begin en een eind, dus u kunt hem
+      altijd terugdraaien. Ondertitels staan wel bij RTG, want de kijker moet ze kunnen lezen.</p>
+
+    <h3 style="margin-top:1rem;font-size:0.8rem;">Knippen</h3>
+    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+      <label for="knipVan">Van (s)</label><input id="knipVan" type="number" min="0" step="0.1" style="width:5.5rem;">
+      <label for="knipTot">Tot (s)</label><input id="knipTot" type="number" min="0" step="0.1" style="width:5.5rem;">
+      <button class="knop vol" id="knipZet" type="button">Zet de knip</button>
+      <button class="knop" id="knipWeg" type="button">Terugdraaien</button>
+    </div>
+
+    <h3 style="margin-top:1rem;font-size:0.8rem;">Geluid</h3>
+    <p class="stil">We hebben geen rechten op muziek en doen dus niet alsof. Dit zegt de kijker
+      wat hij gaat horen.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <button class="knop" data-geluid="eigen" type="button">Eigen geluid</button>
+      <button class="knop" data-geluid="stil" type="button">Zonder geluid te bekijken</button>
+      <button class="knop" data-geluid="stem" type="button">Met gesproken toelichting</button>
+    </div>
+
+    <h3 style="margin-top:1rem;font-size:0.8rem;">Ondertitels</h3>
+    <p class="stil">Een clip zonder ondertitel is een clip die een deel van de mensen niet kan volgen.</p>
+    <div id="cueLijst" style="margin-top:0.5rem;"></div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="knop" id="cueBij" type="button">Regel erbij</button>
+      <button class="knop vol" id="cueBewaar" type="button">Bewaar de ondertitels</button>
+    </div>
+
+    <p class="stil" id="knipStatus" style="margin-top:0.6rem;"></p>
+    <div style="margin-top:0.6rem;"><button class="knop" id="knipDicht" type="button">Sluit</button></div>
   </div>
 </div>
 
@@ -138,8 +186,9 @@
 
   /* ---------- de feed: eindige dagselectie, geen oneindige scroll ---------- */
   let feedData = null, mijnIds = [];
+  let alleenOndertiteld = false;
   async function laadFeed() {
-    const r = await api('feed');
+    const r = await api('feed', { alleenOndertiteld });
     if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
     feedData = r.body;
     mijnIds = (feedData.mijn || []).map(c => c.id);
@@ -158,8 +207,11 @@
       status.textContent = c.mijn ? 'Uit uw eigen archief' : (c.online ? 'Rechtstreeks van ' + c.codenaam : 'Maker offline: de clip staat alleen op diens toestel');
       sec.appendChild(status);
       const laag = document.createElement('div'); laag.className = 'laag';
-      laag.innerHTML = '<div class="t">' + esc(c.titel) + '</div>' +
-        '<div class="m">' + esc(c.codenaam) + ' · ' + c.duurS + 's · ±' + c.mb + ' MB · het beeld passeert RTG nooit</div>';
+      const GELUID = { eigen: 'eigen geluid', stil: 'zonder geluid te bekijken', stem: 'met gesproken toelichting' };
+      laag.innerHTML = '<div class="t">' + esc(c.titel) +
+        (c.ondertiteld ? '<span class="merk">ondertiteld</span>' : '') + '</div>' +
+        '<div class="m">' + esc(c.codenaam) + ' · ' + (c.speelduurS || c.duurS) + 's · ±' + c.mb +
+        ' MB · ' + esc(GELUID[c.geluid] || GELUID.eigen) + ' · het beeld passeert RTG nooit</div>';
       const rij = document.createElement('div'); rij.className = 'rij';
       const maakKnop = (tekst, cls, doe) => { const b = document.createElement('button');
         b.className = 'knop ' + (cls || ''); b.type = 'button'; b.textContent = tekst;
@@ -173,6 +225,7 @@
         });
       }
       maakKnop('' + c.reacties, '', () => openReacties(c));
+      if (c.mijn) maakKnop('Bewerken', '', () => openKnip(c));
       if (c.mijn) maakKnop('Weg', 'rood', async () => {
         const r2 = await api('weg', { id: c.id });
         if (r2.body.error) return zeg(r2.body.error);
@@ -204,21 +257,45 @@
     const vid = sec.querySelector('video');
     if (vid.src) { vid.muted = false; vid.play().catch(() => {}); return; }
     const eigen = await lees((c.mijn ? 'clip-' : 'clipcache-') + c.id + '.webm');
-    if (eigen) { toonVideo(sec, eigen); return; }
+    if (eigen) { toonVideo(sec, eigen, c); return; }
     if (c.mijn) { zeg('Deze clip staat niet (meer) op dit toestel.'); return; }
     if (!c.online) { zeg('De maker is nu niet online; deze clip staat alleen op diens eigen toestel.'); return; }
     sec.querySelector('.status').textContent = 'Rechtstreeks ophalen bij ' + c.codenaam + '…';
-    ontvangst = { clipId: c.id, sec, brokken: [], bytes: 0, totaal: 0 };
+    ontvangst = { clipId: c.id, clip: c, sec, brokken: [], bytes: 0, totaal: 0 };
     const r = await api('signaal', { id: c.id, kind: 'vraag' });
     if (r.body.error) { zeg(r.body.error); ontvangst = null; }
   }
-  function toonVideo(sec, blob) {
+  /* Afspelen met de knip en de ondertitels van de maker.
+     DE KNIP IS GEEN NIEUWE VIDEO. Het origineel staat bij de maker en blijft
+     heel; wij springen naar het begin en stoppen bij het eind. Daarom kan een
+     knip ook altijd terug: er is nooit iets weggegooid.
+     De ondertitels komen wel van RTG (tekst is klein), zodat de kijker ze heeft
+     ook al reist het beeld rechtstreeks van toestel naar toestel. */
+  function toonVideo(sec, blob, c) {
     const vid = sec.querySelector('video');
     vid.src = URL.createObjectURL(blob);
-    vid.muted = false;
+    // "stil" is de mededeling van de maker dat deze clip zonder geluid werkt
+    vid.muted = !!(c && c.geluid === 'stil');
+    const knip = c && c.knip;
+    if (knip) {
+      const start = () => { if (vid.currentTime < knip.van) vid.currentTime = knip.van; };
+      vid.addEventListener('loadedmetadata', start);
+      if (vid.readyState >= 1) start();
+      vid.addEventListener('timeupdate', () => { if (vid.currentTime >= knip.tot) vid.pause(); });
+    }
+    if (c && c.ondertitels && c.ondertitels.length) toonOndertitels(sec, vid, c.ondertitels);
     vid.play().catch(() => { vid.muted = true; vid.play().catch(() => {}); });
     const p = sec.querySelector('img.poster'); if (p) p.remove();
     sec.querySelector('.status').textContent = 'Speelt: rechtstreeks ontvangen, niets bij RTG bewaard';
+  }
+  function toonOndertitels(sec, vid, regels) {
+    let band = sec.querySelector('.ondert');
+    if (!band) { band = document.createElement('div'); band.className = 'ondert'; sec.appendChild(band); }
+    vid.addEventListener('timeupdate', () => {
+      const t = vid.currentTime;
+      const nu = regels.find(r => t >= r.van && t <= r.tot);
+      band.innerHTML = nu ? '<span>' + esc(nu.tekst) + '</span>' : '';
+    });
   }
   async function kijkOntvang(d) {
     if (!ontvangst || d.clipId !== ontvangst.clipId) return;
@@ -235,7 +312,7 @@
             if (b.soort === 'klaar') {
               const blob = new Blob(ontvangst.brokken, { type: 'video/webm' });
               try { await schrijf('clipcache-' + ontvangst.clipId + '.webm', blob); } catch (e) {}
-              toonVideo(ontvangst.sec, blob);
+              toonVideo(ontvangst.sec, blob, ontvangst.clip);
             }
             return;
           }
@@ -341,6 +418,89 @@
     $('#studioDicht').click();
     laadFeed();
   });
+  /* ---------- de knipstudio op een eigen clip ---------- */
+  let knipClip = null;
+  function openKnip(c) {
+    knipClip = c;
+    $('#knipTitel').textContent = 'Bewerken: ' + c.titel;
+    $('#knipVan').value = c.knip ? c.knip.van : 0;
+    $('#knipTot').value = c.knip ? c.knip.tot : c.duurS;
+    $('#knipVan').max = c.duurS; $('#knipTot').max = c.duurS;
+    $('#knipStatus').textContent = 'Opname: ' + c.duurS + ' seconden. Speelduur nu: ' + (c.speelduurS || c.duurS) + ' seconden.';
+    document.querySelectorAll('[data-geluid]').forEach(b => {
+      b.setAttribute('aria-pressed', b.dataset.geluid === (c.geluid || 'eigen') ? 'true' : 'false');
+      b.classList.toggle('vol', b.dataset.geluid === (c.geluid || 'eigen'));
+    });
+    teken(c.ondertitels || []);
+    $('#knipSheet').classList.add('open');
+  }
+  function teken(regels) {
+    const lijst = $('#cueLijst'); lijst.textContent = '';
+    if (!regels.length) cueRij({ van: 0, tot: 3, tekst: '' });
+    else regels.forEach(cueRij);
+  }
+  function cueRij(r) {
+    const d = document.createElement('div'); d.className = 'cue';
+    const v = document.createElement('input'); v.type = 'number'; v.step = '0.1'; v.min = '0';
+    v.value = r.van; v.setAttribute('aria-label', 'Van, in seconden');
+    const t = document.createElement('input'); t.type = 'number'; t.step = '0.1'; t.min = '0';
+    t.value = r.tot; t.setAttribute('aria-label', 'Tot, in seconden');
+    const x = document.createElement('input'); x.type = 'text'; x.maxLength = 120;
+    x.value = r.tekst || ''; x.placeholder = 'Wat er gezegd wordt'; x.setAttribute('aria-label', 'De tekst');
+    const w = document.createElement('button'); w.className = 'knop'; w.type = 'button'; w.textContent = 'Weg';
+    w.addEventListener('click', () => d.remove());
+    d.append(v, t, x, w);
+    $('#cueLijst').appendChild(d);
+  }
+  $('#cueBij').addEventListener('click', () => cueRij({ van: 0, tot: 3, tekst: '' }));
+  $('#knipDicht').addEventListener('click', () => { $('#knipSheet').classList.remove('open'); knipClip = null; });
+  $('#knipZet').addEventListener('click', async () => {
+    if (!knipClip) return;
+    const r = await api('knip', { id: knipClip.id, van: Number($('#knipVan').value), tot: Number($('#knipTot').value) });
+    if (r.body.error) return ($('#knipStatus').textContent = r.body.error);
+    $('#knipStatus').textContent = 'De knip staat: ' + r.body.duurNa + ' seconden. Het origineel is heel gebleven.';
+    laadFeed();
+  });
+  $('#knipWeg').addEventListener('click', async () => {
+    if (!knipClip) return;
+    const r = await api('knip', { id: knipClip.id, weg: true });
+    if (r.body.error) return ($('#knipStatus').textContent = r.body.error);
+    $('#knipStatus').textContent = 'De knip is teruggedraaid; de hele opname speelt weer.';
+    laadFeed();
+  });
+  document.querySelectorAll('[data-geluid]').forEach(b => b.addEventListener('click', async () => {
+    if (!knipClip) return;
+    const r = await api('geluid', { id: knipClip.id, soort: b.dataset.geluid });
+    if (r.body.error) return ($('#knipStatus').textContent = r.body.error);
+    knipClip.geluid = r.body.geluid;
+    document.querySelectorAll('[data-geluid]').forEach(o => {
+      o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+      o.classList.toggle('vol', o === b);
+    });
+    laadFeed();
+  }));
+  $('#cueBewaar').addEventListener('click', async () => {
+    if (!knipClip) return;
+    const regels = [...document.querySelectorAll('#cueLijst .cue')].map(d => {
+      const i = d.querySelectorAll('input');
+      return { van: Number(i[0].value), tot: Number(i[1].value), tekst: i[2].value.trim() };
+    }).filter(r => r.tekst);
+    const r = await api('ondertitels', { id: knipClip.id, regels });
+    if (r.body.error) return ($('#knipStatus').textContent = r.body.error);
+    knipClip.ondertitels = r.body.ondertitels;
+    $('#knipStatus').textContent = r.body.regels + ' regel' + (r.body.regels === 1 ? '' : 's') + ' bewaard.';
+    laadFeed();
+  });
+
+  /* De kijker beperkt zelf tot wat hij kan volgen. Geen smaakfilter maar een
+     toegangsfilter, en hij staat uit tot iemand hem aanzet. */
+  $('#volgbaar').addEventListener('click', () => {
+    alleenOndertiteld = !alleenOndertiteld;
+    $('#volgbaar').setAttribute('aria-pressed', alleenOndertiteld ? 'true' : 'false');
+    $('#volgbaar').classList.toggle('vol', alleenOndertiteld);
+    laadFeed();
+  });
+
   function posterVan(blob) {
     return new Promise(res => {
       const url = URL.createObjectURL(blob);

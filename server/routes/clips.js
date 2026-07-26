@@ -4,6 +4,7 @@
 module.exports = (kern) => {
   const { app, auth, officeAuth, clipsMaak, clipsWeg, clipsAanwezig, clipsSignaal,
     clipsFeed, clipsVolg, clipsReactie, clipsReacties, clipsMeld,
+    clipsKnip, clipsOndertitels, clipsGeluid,
     clipsOfficeLijst, clipsOfficeVerwijder } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -13,7 +14,7 @@ module.exports = (kern) => {
 
   app.post('/api/clips/feed', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, clipsFeed(req.session.key));
+    stuur(res, clipsFeed(req.session.key, { alleenOndertiteld: !!(req.body && req.body.alleenOndertiteld) }));
   });
   app.post('/api/clips/maak', auth, (req, res) => {
     if (geenGast(req, res)) return;
@@ -46,6 +47,23 @@ module.exports = (kern) => {
   app.post('/api/clips/meld', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, clipsMeld(req.session.key, req.body.id, req.body.reden));
+  });
+
+  /* ---- de studio: knippen, geluid en ondertitels ----
+     Alleen op de eigen clip; de kern toetst dat nog eens op de sleutel uit de
+     sessie, zodat een id uit de body niets kan forceren. Het beeld zelf raakt
+     RTG nooit aan: een knip is een begin en een eind, geen nieuwe video. */
+  app.post('/api/clips/knip', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, clipsKnip(req.session.key, req.body.id, req.body));
+  });
+  app.post('/api/clips/ondertitels', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, clipsOndertitels(req.session.key, req.body.id, req.body.regels));
+  });
+  app.post('/api/clips/geluid', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, clipsGeluid(req.session.key, req.body.id, req.body.soort));
   });
 
   // kantoor: meldingen zien en een kaart weghalen (het beeld stond nooit bij RTG)

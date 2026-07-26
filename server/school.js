@@ -108,4 +108,5 @@ module.exports = (ctx) => {
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));
   require('./school/gezin')(sctx);
+  require('./school/planner')(sctx);
 };

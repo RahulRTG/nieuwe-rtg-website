@@ -1401,3 +1401,40 @@ Server: foundation/gasten/gezinsleven.js (wijzig + bereik erbij) op de
 gedeelde keerN uit kern/agenda-pro.js. Client: apps/foundation/
 agenda.html herbouwd op RTGAgendaKal. Tests: rtfagenda.test.js (3, incl.
 de klemregel) en rtfagenda.e2e.js door het echte gezinsscherm.
+
+## RTF-golf 2: school en de toetsplanner in samenhang
+
+De tweede ronde verbindt drie dingen die er al waren -- het schoolkanaal
+(huiswerk, klassen), de toetsplanner van de tiener en de gezinsagenda --
+zonder een van de drie te herschrijven.
+
+**De agenda leest school, hij herschrijft school niet.** Dezelfde regel
+als de RTG-ecosysteemlaag: de bereik-route van de gezinsagenda mengt
+alleen-lezen punten met bron 'school' bij -- open huiswerk op de
+inleverdag en de toetsen van de tieners op de toetsdag, met naam en
+kleur van het kind. Afgevinkt huiswerk verdwijnt vanzelf. Het paneel
+opent zo'n punt alleen-lezen en verwijst naar School; het lijstlabel
+zegt eerlijk "van school". Niet voor de oppas: schoolzaken zijn van het
+gezin (isGast filtert, en de leerplanner geeft een gast 403).
+
+**De leerplanner (school/planner.js).** Een dagplanning per kind voor
+veertien dagen die drie bronnen ordent zonder er een te bezitten:
+huiswerk op de inleverdag (te laat schuift naar vandaag), de
+leerstappen uit de toetsplanner op hun eigen dag, en de toets zelf.
+Afvinken loopt via de bestaande wegen: huiswerk via /school/huiswerk/af
+(kind of ouder), een leerstap uitsluitend door de tiener zelf
+(vanMij stuurt de knop) -- het leren is van hem of haar, de ouder
+kijkt mee. schoolPunten() uit dezelfde module is de leesbril voor de
+agenda, dus er bestaat maar een definitie van "wat telt als schoolpunt".
+
+**Het scherm.** school.html kreeg het blok "Vandaag leren" boven de
+klaskaarten: per dag de toets, het huiswerk en de leerstap, met direct
+afvinken. De gezinsagenda toont schoolpunten gestippeld in de eco-stijl
+van de ledenagenda (kalender.js kent 'school' nu naast 'boeking').
+
+Server: server/school/planner.js (nieuw, /school/planner +
+schoolPunten) + bijmenging in foundation/gasten/gezinsleven.js.
+Client: school.html (Vandaag leren) + foundation/agenda.html
+(alleen-lezen paneel) + apps/agenda/kalender.js (bronlabel).
+Tests: rtfschool2.test.js (3: bijmenging en afvinken, plannerordening
+met vanMij, de oppasgrens) en rtfschool2.e2e.js door beide schermen.

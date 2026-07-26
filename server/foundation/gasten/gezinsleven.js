@@ -4,9 +4,10 @@
    De herhaalregel (keerN) komt uit de RTG-agendakern: EEN regel voor het
    hele huis, dus een verjaardag op de 31e klemt en keert netjes terug. */
 const { keerN, HERHAAL } = require('../../kern/agenda-pro');
+const { schoolPunten } = require('../../school/planner');
 
 module.exports = (ctx) => {
-  const { router, G, eigenVeld, nu, save, rid, schoon, encS, decS,
+  const { router, F, G, eigenVeld, nu, save, rid, schoon, encS, decS,
     familieVan, sessieVan, isGast, locatiePubliek, oppasinfoPubliek } = ctx;
   // de herhaal- en notitievelden van een agendapunt, netjes geschoond
   function agendaVelden(body) {
@@ -73,6 +74,10 @@ module.exports = (ctx) => {
         if (d >= van) uit.push(Object.assign({ datum: d, vandaag: d === vandaag }, basis));
       }
     }
+    /* school kijkt mee, alleen-lezen: open huiswerk en de toetsen van de
+       tieners op hun dag (dezelfde regel als de RTG-ecosysteemlaag: de
+       agenda leest school, hij herschrijft school niet). Niet voor de oppas. */
+    if (!isGast(s.p)) for (const x of schoolPunten(F(), s.g, van, totD)) uit.push(x);
     uit.sort((x, y) => (x.datum + (x.tijd || '99:99')).localeCompare(y.datum + (y.tijd || '99:99')));
     res.json({ items: uit, magBewerken: !isGast(s.p),
       profielen: Object.values(s.g.profielen).filter(p => !isGast(p))

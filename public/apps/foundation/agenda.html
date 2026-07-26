@@ -104,6 +104,9 @@
     <label for="afNotitie">Notitie (mag leeg)</label>
     <input class="veld" id="afNotitie" maxlength="120" style="width:100%;">
     <div class="fout" id="afFout"></div>
+    <div id="afSchool" style="display:none;color:var(--goud);font-size:.85rem;">
+      Dit punt komt van school en leest de agenda alleen mee.
+      Afvinken en plannen doe je in <a href="school.html" style="color:var(--goud2);">School</a>.</div>
     <div class="rijknoppen">
       <button class="knop" id="afBewaar" type="button">Bewaar</button>
       <button class="knop" id="afVerjaardag" type="button">Dit is een verjaardag</button>
@@ -144,7 +147,7 @@ async function laad() {
     profielen = d.profielen || [];
     $('#nieuwKnop').style.display = magBewerken ? '' : 'none';
     items = (d.items || []).map(i => ({ datum: i.datum, tijd: i.tijd || null, kleur: i.wieKleur || '',
-      titel: i.titel + (i.wieNaam ? ' · ' + i.wieNaam : ''), _r: i }));
+      bron: i.bron || '', titel: i.titel + (i.wieNaam ? ' · ' + i.wieNaam : ''), _r: i }));
     teken();
   } catch (e) { $('#bord').innerHTML = '<div class="stil">Kon de agenda niet laden.</div>'; }
 }
@@ -170,21 +173,25 @@ document.querySelectorAll('[data-zicht]').forEach(k => k.onclick = () => { zicht
 /* ---- het paneel ---- */
 function toon(item, datum) {
   if (!magBewerken && !item) return;
-  open = item || null;
-  $('#afKop').textContent = item ? 'Agendapunt' : 'Nieuw agendapunt';
+  // een schoolpunt is alleen-lezen: de agenda leest school, hij herschrijft school niet
+  const school = !!(item && item.bron === 'school');
+  open = school ? null : (item || null);
+  $('#afKop').textContent = school ? 'Van school' : item ? 'Agendapunt' : 'Nieuw agendapunt';
   $('#afTitel').value = item ? item.titel : '';
   // bij een reeks bewerken we de STARTdatum, niet de toevallig aangeklikte keer
   $('#afDatum').value = item ? (item.basis || item.datum) : (datum || vandaag());
   $('#afTijd').value = item ? (item.tijd || '') : '';
   $('#afWie').innerHTML = '<option value="">Het hele gezin</option>' + profielen.map(p =>
     '<option value="' + p.id + '"' + (item && item.wie === p.id ? ' selected' : '') + '>' + p.naam.replace(/</g, '&lt;') + '</option>').join('');
-  $('#afHerhaal').value = item ? item.herhaal : 'geen';
+  $('#afHerhaal').value = item ? (item.herhaal || 'geen') : 'geen';
   $('#afHerhaalTot').value = item ? (item.herhaalTot || '') : '';
   $('#afNotitie').value = item ? (item.notitie || '') : '';
-  $('#afWeg').style.display = item ? '' : 'none';
+  $('#afWeg').style.display = item && !school ? '' : 'none';
   $('#afFout').textContent = '';
-  ['afTitel', 'afDatum', 'afTijd', 'afWie', 'afHerhaal', 'afHerhaalTot', 'afNotitie'].forEach(id => { $('#' + id).disabled = !magBewerken; });
-  $('#afBewaar').style.display = magBewerken ? '' : 'none';
+  $('#afSchool').style.display = school ? '' : 'none';
+  ['afTitel', 'afDatum', 'afTijd', 'afWie', 'afHerhaal', 'afHerhaalTot', 'afNotitie'].forEach(id => { $('#' + id).disabled = !magBewerken || school; });
+  $('#afBewaar').style.display = magBewerken && !school ? '' : 'none';
+  $('#afVerjaardag').style.display = school ? 'none' : '';
   $('#afScrim').classList.add('open');
 }
 function dicht() { $('#afScrim').classList.remove('open'); open = null; }

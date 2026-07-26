@@ -58,6 +58,7 @@
   <!-- gezinsweergave -->
   <section id="vGezin" hidden>
     <div id="uitnodigingen"></div>
+    <div id="vandaagLeren"></div>
     <div id="schoolLijst"></div>
     <div id="koppelBlok" hidden>
       <div class="sec" id="kopTitel">Kind uitnodigen voor een klas</div>
@@ -161,6 +162,7 @@ async function laadGezin(){
   $('#kopKind').hidden = !ouder;
   if (ouder) vulKindKeuze();
   toonUitnodigingen(d.uitnodigingen || []);
+  laadPlanner();
   const lijst = d.school || [];
   if (!lijst.length){
     vervang($('#schoolLijst'), E('div',{class:'kaart blok'},
@@ -189,6 +191,51 @@ function toonUitnodigingen(lijst){
 async function antwoordUitnodiging(u, akkoord){
   try{ await gezinApi('/school/uitnodiging/antwoord', { klasCode: u.klas.code, akkoord }); laadGezin(); }
   catch(e){ alert(e.message); }
+}
+/* ---------- Vandaag leren: school en de toetsplanner op een rij ----------
+   De planner ordent alleen (huiswerk op de inleverdag, leerstappen op hun
+   dag, de toets op de toetsdag); afvinken loopt via de bestaande wegen. */
+async function laadPlanner(){
+  const host = $('#vandaagLeren');
+  let d;
+  try { d = await gezinApi('/school/planner'); } catch(e){ vervang(host); return; }
+  const dagen = (d.dagen||[]).filter(x => x.items.length);
+  if (!dagen.length){ vervang(host); return; }
+  const NL = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+  vervang(host, E('div',{class:'kaart blok', style:{borderColor:'var(--goud)'}},
+    E('b', null, 'Vandaag leren'),
+    E('div',{class:'mini', style:{margin:'.2rem 0 .4rem'}},
+      'Huiswerk, leerstappen uit de toetsplanner en toetsen, per dag op een rij.'),
+    dagen.map(dag => [
+      E('div',{class:'sec', style:{margin:'0.6rem 0 0.2rem'}},
+        dag.vandaag ? 'Vandaag' : NL[new Date(dag.datum + 'T12:00:00').getDay()] + ' ' + (+dag.datum.slice(8)) + '-' + dag.datum.slice(5, 7)),
+      dag.items.map(plannerRij)
+    ])));
+}
+function plannerRij(it){
+  if (it.soort === 'toets') return E('div',{class:'rij'},
+    E('div',{class:'mid'}, 'Toets ' + it.vak + (it.wat ? ' · ' + it.wat : ''), E('small', null, it.kind)));
+  if (it.soort === 'huiswerk'){
+    const knop = E('button',{class:'knop grijs mini', 'aria-label':'Huiswerk afvinken', onclick:async()=>{
+      try{ await gezinApi('/school/huiswerk/af', { klasCode: it.klasCode, profielId: it.profielId, huiswerkId: it.id, af: true }); laadGezin(); }
+      catch(e){ alert(e.message); }
+    }}, '✓');
+    return E('div',{class:'rij'}, knop, E('div',{class:'mid'},
+      (it.vak ? it.vak + ': ' : '') + it.titel,
+      E('small', null, it.kind + (it.laat ? ' · was voor ' + it.deadline : ''))));
+  }
+  // een leerstap vinkt alleen de tiener zelf af: het leren is van hem/haar
+  const knop = it.vanMij ? E('button',{class:'knop grijs mini', 'aria-label':'Leerstap afvinken', onclick:async()=>{
+    try{
+      const r = await fetch('/api/rtf/tiener/toets-stap', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ code: s.code, token: s.token, id: it.toetsId, dag: it.dag, af: true }) });
+      const b = await r.json().catch(()=>({}));
+      if (!r.ok) throw new Error(b.error || 'Er ging iets mis.');
+      laadGezin();
+    }catch(e){ alert(e.message); }
+  }}, '✓') : null;
+  return E('div',{class:'rij'}, knop, E('div',{class:'mid'},
+    'Leren voor ' + it.vak + ': ' + it.taak, E('small', null, it.kind + (it.laat ? ' · liep achter' : ''))));
 }
 function kaartVoor(x){
   const open = (x.huiswerk||[]).filter(h => !h.af);

@@ -22,7 +22,7 @@
   var maandagVan = function (s) { var d = vanIso(s); var w = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - w); return iso(d); };
 
   function chip(x, klik) {
-    var klas = 'chip' + (x.bron === 'boeking' ? ' eco' : '') +
+    var klas = 'chip' + (x.bron === 'boeking' || x.bron === 'school' ? ' eco' : '') +
       (x.status === 'uitgenodigd' ? ' uit' : '') + (x.status === 'nee' ? ' nee' : '');
     // een optionele kleur (bijv. het gezinslid in de RTF-agenda) kleurt de rand
     var stijl = /^#[0-9A-Fa-f]{3,8}$/.test(x.kleur || '') ? ' style="border-color:' + x.kleur + '"' : '';
@@ -90,14 +90,15 @@
         ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'][(d.getUTCDay() + 6) % 7] +
         ' ' + d.getUTCDate() + ' ' + MAANDEN[d.getUTCMonth()];
       return '<div class="ldag"><h3>' + kop + '</h3>' + kaart[dag].map(function (x) {
-        return '<div class="litem' + (x.bron === 'boeking' ? ' eco' : '') + '" data-klik="' + x._i + '" role="button" tabindex="0">' +
+        return '<div class="litem' + (x.bron === 'boeking' || x.bron === 'school' ? ' eco' : '') + '" data-klik="' + x._i + '" role="button" tabindex="0">' +
           '<span class="tijd">' + (x.tijd ? x.tijd + (x.eind ? '&ndash;' + x.eind : '') : 'hele dag') + '</span>' +
           '<span class="wat"><b>' + esc(x.titel) + '</b><small>' +
           (x.plek ? esc(x.plek) + ' · ' : '') +
           (x.van ? 'uitnodiging van ' + esc(x.van) + ' · ' : '') +
           (x.status && x.bron !== 'boeking' ? 'u zei: ' + esc(x.status === 'uitgenodigd' ? 'nog niets' : x.status) : '') +
           '</small></span>' +
-          (x.bron === 'boeking' ? '<span class="bron">uit RTG</span>' : '') + '</div>';
+          (x.bron === 'boeking' ? '<span class="bron">uit RTG</span>' :
+            x.bron === 'school' ? '<span class="bron">van school</span>' : '') + '</div>';
       }).join('') + '</div>';
     }).join('');
     host.innerHTML = h || '<p class="stil">Niets gepland in deze periode. Dat is ook een agenda-stand.</p>';

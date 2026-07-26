@@ -63,14 +63,30 @@ async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
   let d; try{ d=await api('entourage'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Entourage is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het gezelschap niet laden.</div>'; return; }
   let h='';
-  if(d.attenties.length){ h+='<div class="attn"><h2>Paspoorten die aandacht vragen</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.naam)+'</b> · paspoort '+(a.verlopen?'verlopen':'geldig tot')+' '+dt(a.paspoortTot)+'</div>').join('')+'</div>'; }
+  if(d.attenties.length){ h+='<div class="attn"><h2>Documenten die aandacht vragen</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.naam)+'</b> · '+esc(a.soort)+' '+(a.verlopen?'verlopen':'geldig tot')+' '+dt(a.tot)+'</div>').join('')+'<small style="display:block;margin-top:.4rem;opacity:.75;">'+esc(d.bron)+'</small></div>'; }
   h+='<div class="kaart"><h2>Iemand toevoegen</h2><div class="rij"><input class="veld" id="pN" placeholder="naam"><select class="veld" id="pB">'+d.banden.map(b=>'<option>'+b+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="pT" placeholder="telefoon"><input class="veld" id="pDi" placeholder="dieet"></div><div class="rij"><input class="veld" id="pP" type="date" title="paspoort geldig tot"><input class="veld" id="pV" placeholder="voorkeuren"></div><div style="margin-top:.6rem;"><button class="knop" id="pAdd">+ toevoegen</button></div><div style="font-size:.72rem;color:var(--soft);margin-top:.35rem;">De datum is de geldigheid van het paspoort.</div></div>';
-  h+='<div class="kaart"><h2>Uw gezelschap <small style="font-size:.75rem;color:var(--soft);">('+d.aantal+')</small></h2>'+(d.gezelschap.length?d.gezelschap.map(p=>'<div class="item"><div class="b"><b>'+esc(p.naam)+'</b> <span class="band">'+esc(p.band)+'</span><small>'+[p.telefoon,p.dieet?'dieet: '+esc(p.dieet):'',p.paspoortTot?'paspoort tot '+dt(p.paspoortTot):'',esc(p.voorkeuren)].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-p="'+p.id+'">×</button></div>').join(''):'<div class="leeg">Nog niemand in het gezelschap.</div>')+'</div>';
+  h+='<div class="kaart"><h2>Uw gezelschap <small style="font-size:.75rem;color:var(--soft);">('+d.aantal+')</small></h2>'+(d.gezelschap.length?d.gezelschap.map(p=>'<div class="item"><div class="b"><b>'+esc(p.naam)+'</b> <span class="band">'+esc(p.band)+'</span><small>'+[p.telefoon,p.dieet?'dieet: '+esc(p.dieet):'',esc(p.voorkeuren)].filter(Boolean).join(' · ')+'</small>'+((p.documenten||[]).length?'<small>'+(p.documenten||[]).map(x=>esc(x.soort)+' tot '+dt(x.tot)).join(' · ')+'</small>':'<small style="opacity:.7;">nog geen documenten</small>')+'</div><input type="checkbox" data-mee="'+p.id+'" aria-label="meenemen" style="margin-right:.5rem;"><button class="knop" data-doc="'+p.id+'" style="margin-right:.4rem;">+ document</button><button class="weg" data-p="'+p.id+'">×</button></div>').join(''):'<div class="leeg">Nog niemand in het gezelschap.</div>')+'</div>';
+  /* Het gezelschap samenstellen met een gereedheidscheck: elders de betaalde
+     kant van een reisapp, hier de lijst die u anders met de hand maakt. */
+  h+='<div class="kaart"><h2>Gezelschap samenstellen</h2><p style="color:var(--soft);font-size:.8rem;">Vink hierboven aan wie er meegaat.</p><div style="margin-top:.6rem;"><button class="knop" id="gZ">controleer</button></div><div id="gU" style="margin-top:.6rem;"></div></div>';
   h+=AIBOX('Bijv. wie kan er mee naar Ibiza dit weekend?');
   $('#main').innerHTML=h;
   bindAi('entourage');
   $('#pAdd').onclick=async()=>{ const naam=$('#pN').value.trim(); if(!naam) return meld('Naam?'); try{ await api('entourage/persoon',{naam,band:$('#pB').value,telefoon:$('#pT').value,dieet:$('#pDi').value,paspoortTot:$('#pP').value,voorkeuren:$('#pV').value}); laad(); }catch(e){ meld(e.message); } };
   document.querySelectorAll('[data-p]').forEach(b=> b.onclick=async()=>{ try{ await api('entourage/persoon/weg',{id:b.dataset.p}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-doc]').forEach(b=> b.onclick=async()=>{
+    const soort=prompt('Welk document? (' + d.soorten.join(', ') + ')','paspoort'); if(soort===null) return;
+    const tot=prompt('Geldig tot? (2029-04-01)'); if(!tot) return;
+    try{ await api('entourage/doc',{id:b.dataset.doc,soort,tot}); laad(); }catch(e){ meld(e.message); } });
+  $('#gZ').onclick=async()=>{
+    const ids=[...document.querySelectorAll('[data-mee]:checked')].map(x=>x.dataset.mee);
+    try{
+      const g=await api('entourage/gezelschap',{ids});
+      $('#gU').innerHTML='<b>'+esc(g.tekst)+'</b>'+
+        (g.punten.length?'<div style="margin-top:.5rem;">'+g.punten.map(x=>'<div class="r">'+esc(x.naam)+': '+esc(x.wat)+'</div>').join('')+'</div>':'')+
+        (g.dieten.length?'<div style="margin-top:.5rem;color:var(--muted);font-size:.85rem;">Voor de tafel: '+g.dieten.map(x=>esc(x.naam)+' ('+esc(x.dieet)+')').join(', ')+'</div>':'');
+    }catch(e){ meld(e.message); }
+  };
 }
 laad();
 </script>

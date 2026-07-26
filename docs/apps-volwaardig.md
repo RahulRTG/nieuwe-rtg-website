@@ -548,3 +548,60 @@ Zo is vertrekken goedkoop; een groep die alleen blijft omdat weggaan te duur is,
 is geen groep maar een slot.
 
 Bewezen: `test/genootschap.test.js` (14 toetsen) en `test/genootschap.e2e.js`.
+
+### Cercle, Entourage en Pulse
+
+De drie kleinere sociale apps uit deel 2. Elk heeft een duidelijk origineel met
+een duidelijke betaalmuur, en in alle drie de gevallen ging het niet om iets
+groots erbij bouwen maar om een veld dat geen gegeven was.
+
+**Cercle** (`kern/rechterhand/cercle.js`) -- waar u elders een conciergedienst
+voor belt:
+
+| Functie | Waar |
+|---|---|
+| Reciprociteit als **lijst** in plaats van een regel vrije tekst | `cercle/club` |
+| "Waar kan ik in deze stad terecht, en op welk lidmaatschap?" | `cercle/waarheen` |
+| Gastpassen met een boekhouding: wie, waar, wanneer -- en het saldo loopt terug | `cercle/gast` |
+| Een vergissing terugdraaien | `cercle/gast/terug` |
+
+Oude records blijven werken: een tekstregel als "Soho House, Annabel's" wordt bij
+het lezen op komma's gesplitst. Een veld, een betekenis. Wat er NIET komt: een
+clubgids die wij zouden "kennen" -- het antwoord komt uit uw eigen gegevens, en
+dat zegt het scherm er ook bij.
+
+**Entourage** (`kern/rechterhand/entourage.js`) -- bij de bekende reisapps is de
+documentwaarschuwing precies waarvoor het jaarabonnement bestaat:
+
+| Functie | Waar |
+|---|---|
+| Elk document een eigen vervaldatum: paspoort, visum, rijbewijs, verzekering, vaccinatie | `entourage/doc` |
+| Eén waarschuwlijst over alles heen, verlopen bovenaan | `entourage` |
+| Het gezelschap samenstellen met een gereedheidscheck + de dieetlijst voor de tafel | `entourage/gezelschap` |
+
+Het oude losse veld `paspoortTot` wordt gelezen als een document van de soort
+paspoort -- een gegeven, een plek. Wat er NIET komt: inreisvereisten per land.
+Die wisselen per week en per nationaliteit; iets beweren wat wij niet kunnen
+naslaan is erger dan niets zeggen, en dat staat ook op het scherm.
+
+**Pulse** (`kern/pulse/vrij.js`) -- de twee functies achter het abonnement van
+een microblog:
+
+| Functie | Waar |
+|---|---|
+| Je bericht **bewerken**, met elke vorige versie bewaard | `pulse/bewerk` |
+| De geschiedenis staat open voor **iedereen** die het bericht mag zien | `pulse/versies` |
+| Bewaren **met mappen** (elders zijn losse bladwijzers gratis en is ordenen betaald) | `pulse/bewaar` |
+
+Waarom die open geschiedenis geen bijzaak is: onder een bericht staan reacties en
+likes van anderen. Wie de tekst ongemerkt kan vervangen, kan mensen achteraf iets
+laten onderschrijven wat ze nooit gelezen hebben. Een correctie mag; stiekem
+herschrijven niet. En wat je bewaart blijft prive -- de schrijver merkt er niets
+van, want "X bewaarde jouw bericht" is een seintje dat niets toevoegt.
+
+`kern/pulse.js` ging door deze uitbreiding over de tien kilobyte (check-regel 13)
+en is daarom een map geworden, net als salon, metier en genootschap:
+`kern/pulse/index.js` + `kern/pulse/vrij.js`. De bedrading veranderde niet mee --
+`require('./kern/pulse')` vindt vanzelf de index.
+
+Bewezen: `test/pulse.test.js` (7 toetsen) en `test/rechterhand.test.js` (18).

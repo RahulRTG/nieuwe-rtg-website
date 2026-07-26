@@ -74,7 +74,7 @@ async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Pulse is de ledenfeed van RTG, op codenaam.</p></div>'; return; }
   let d; try{ d=await api('feed',{soort:SOORT}); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   let h='<div class="schrijf"><textarea id="nw" maxlength="280" placeholder="Wat wil je delen? (op je codenaam, 9+)"></textarea><div class="voet"><button class="knop" id="plaats">Plaatsen</button><button class="knop stil" id="stemKnop" title="Je stemming van vandaag">stemming</button><button class="knop stil" id="terugKnop">mijn week</button><span class="teller" id="teller">280</span></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden style="margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
-  h+='<div class="tabs"><button class="tab'+(SOORT==='volgend'?' aan':'')+'" data-s="volgend">Volgend ('+d.volgend+')</button><button class="tab'+(SOORT==='ontdek'?' aan':'')+'" data-s="ontdek">Ontdek</button></div>';
+  h+='<div class="tabs"><button class="tab'+(SOORT==='volgend'?' aan':'')+'" data-s="volgend">Volgend ('+d.volgend+')</button><button class="tab'+(SOORT==='ontdek'?' aan':'')+'" data-s="ontdek">Ontdek</button><button class="tab" id="plankKnop">Mijn plank</button></div>';
   if(d.trending.length) h+='<div class="trend">'+d.trending.map(t=>'<span>#'+esc(t.tag)+' · '+t.n+'</span>').join('')+'</div>';
   // het Moment van de week: een enkel lichtpunt, geen ranglijst
   if(SOORT==='ontdek'&&d.moment) h+='<div class="post" style="border-color:var(--gold);"><div class="kop"><span class="wie">Moment van de week · '+esc(d.moment.codenaam)+glans(d.moment)+'</span><span class="tijd">'+d.moment.likes+'</span></div><div class="tekst">'+mooi(d.moment.tekst)+'</div></div>';
@@ -82,11 +82,11 @@ async function laad(){
     const acts='<div class="acts">'+
       '<button class="knop stil'+(p.mijnLike?' aan':'')+'" data-like="'+p.id+'">'+p.likes+'</button>'+
       '<button class="knop stil" data-open="'+p.id+'">'+p.reacties.length+'</button>'+
-      (p.eigen?'<button class="knop stil" data-weg="'+p.id+'">verwijderen</button>'
+      '<button class="knop stil" data-bewaar="'+p.id+'">'+(p.bewaard?'bewaard':'bewaar')+'</button>'+(p.versies?'<button class="knop stil" data-hist="'+p.id+'">geschiedenis ('+p.versies+')</button>':'')+(p.eigen?'<button class="knop stil" data-bew="'+p.id+'">bewerken</button><button class="knop stil" data-weg="'+p.id+'">verwijderen</button>'
         :(SOORT==='ontdek'?'<button class="knop stil" data-volg="'+p.van+'">+ volgen</button>':'')+'<button class="knop stil" data-meld="'+p.id+'">melden</button>')+'</div>';
     const reacties='<div class="reacties" id="re-'+p.id+'" hidden>'+p.reacties.map(r=>'<div class="reactie"><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+
       '<div class="rrij"><input id="ri-'+p.id+'" maxlength="280" placeholder="Reageer (9+)"><button class="knop" data-re="'+p.id+'">→</button></div></div>';
-    return '<div class="post"><div class="kop"><span class="wie">'+esc(p.codenaam)+glans(p)+'</span><span class="tijd">'+tijd(p.at)+'</span></div><div class="tekst">'+mooi(p.tekst)+'</div>'+acts+reacties+'</div>';
+    return '<div class="post"><div class="kop"><span class="wie">'+esc(p.codenaam)+glans(p)+'</span><span class="tijd">'+tijd(p.at)+(p.bewerkt?' · bewerkt':'')+'</span></div><div class="tekst">'+mooi(p.tekst)+'</div>'+acts+reacties+'</div>';
   }).join('')+'<div class="klaar">Je bent bij. Meer is er niet - en dat is precies de bedoeling.</div>'
   : '<div class="leeg">'+(SOORT==='volgend'?'Je volgt nog niemand.<br>Kijk bij Ontdek en volg een paar codenamen.':'Nog geen berichten. Wees de eerste!')+'</div>';
   $('#main').innerHTML=h;
@@ -113,6 +113,32 @@ async function laad(){
   document.querySelectorAll('[data-weg]').forEach(b=> b.onclick=async()=>{ if(!confirm('Dit bericht verwijderen?'))return; try{ await api('weg',{id:b.dataset.weg}); laad(); }catch(e){ meld(e.message); } });
   document.querySelectorAll('[data-volg]').forEach(b=> b.onclick=async()=>{ try{ const r=await api('volg',{key:b.dataset.volg}); meld(r.volgIk?'Je volgt deze codenaam nu.':'Ontvolgd.'); laad(); }catch(e){ meld(e.message); } });
   document.querySelectorAll('[data-meld]').forEach(b=> b.onclick=async()=>{ const reden=prompt('Waarom meld je dit bericht?',''); if(reden==null)return; try{ await api('meld',{id:b.dataset.meld,reden}); meld('Gemeld. Dank je; zo blijft Pulse 9+.'); }catch(e){ meld(e.message); } });
+  /* Bewerken en bewaren: elders de betaalde functies van een microblog.
+     Een bewerking is nooit onzichtbaar -- de vorige versie blijft leesbaar
+     voor iedereen die het bericht mag zien. */
+  document.querySelectorAll('[data-bew]').forEach(b=> b.onclick=async()=>{
+    const post=d.feed.find(x=>x.id===b.dataset.bew); if(!post) return;
+    const t=prompt('Pas je bericht aan. De vorige versie blijft leesbaar voor iedereen.',post.tekst);
+    if(t==null) return;
+    try{ await api('bewerk',{id:b.dataset.bew,tekst:t}); meld('Aangepast. Er staat nu "bewerkt" bij, en de vorige versie blijft te lezen.'); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-hist]').forEach(b=> b.onclick=async()=>{
+    try{ const h=await api('versies',{id:b.dataset.hist});
+      meld(h.versies.map((v,i)=>'Versie '+(i+1)+': '+v.tekst).join('  |  ')+'  |  Nu: '+h.nu);
+    }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-bewaar]').forEach(b=> b.onclick=async()=>{
+    const aan=b.textContent==='bewaar';
+    const map=aan?(prompt('In welke map? (leeg = Bewaard)','Bewaard')||'Bewaard'):null;
+    try{ const r=await api('bewaar',{id:b.dataset.bewaar,map}); meld(r.bewaard?'Op je plank, in "'+r.map+'".':'Van je plank af.'); laad(); }catch(e){ meld(e.message); } });
+  $('#plankKnop').onclick=async()=>{
+    try{ const pl=await api('bewaard',{});
+      $('#main').innerHTML='<div class="post" style="padding:1rem;"><h2>Mijn plank</h2>'+
+        (pl.mappen.length?'<div class="trend">'+pl.mappen.map(m=>'<span>'+esc(m.naam)+' · '+m.aantal+'</span>').join('')+'</div>':'')+
+        (pl.bewaard.length?pl.bewaard.map(x=>'<div class="post"><div class="kop"><span class="wie">'+esc(x.codenaam)+'</span><span class="tijd">'+esc(x.map)+'</span></div><div class="tekst">'+mooi(x.tekst)+'</div></div>').join('')
+          :'<div class="leeg">Je plank is nog leeg.</div>')+
+        '<div style="margin-top:.8rem;"><button class="knop" id="plankTerug">Terug naar de feed</button></div>'+
+        '<p style="color:var(--muted);font-size:.8rem;margin-top:.6rem;">Wat je bewaart is prive: de schrijver merkt er niets van.</p></div>';
+      $('#plankTerug').onclick=()=>laad();
+    }catch(e){ meld(e.message); } };
 }
 laad();
 </script>

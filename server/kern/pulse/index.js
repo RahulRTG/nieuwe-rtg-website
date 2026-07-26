@@ -8,7 +8,7 @@
    een bericht automatisch na drie unieke melders, waarna het kantoor het
    laatste woord heeft. Gedeelde context vanuit server.js. */
 module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVan }) => {
-  const { keur } = require('./veilig');
+  const { keur } = require('../veilig');
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(5).toString('hex');
 
@@ -18,6 +18,7 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
     if (!Array.isArray(p.posts)) p.posts = [];
     if (!p.volgt || typeof p.volgt !== 'object') p.volgt = {};
     if (!p.laatstePost || typeof p.laatstePost !== 'object') p.laatstePost = {};
+    if (!p.bewaard || typeof p.bewaard !== 'object') p.bewaard = {};
     return p;
   }
   const codenaam = sessieOfKey => typeof sessieOfKey === 'string'
@@ -96,6 +97,9 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
       likes: Object.keys(x.likes).length, mijnLike: !!x.likes[mij],
       reacties: x.reacties.slice(-30).map(r => ({ codenaam: r.codenaam, tekst: r.tekst, at: r.at, eigen: r.key === mij })),
       eigen: x.key === mij,
+      // een bewerking is nooit onzichtbaar: het staat erbij, met hoeveel versies
+      bewerkt: x.bewerkt || null, versies: (x.versies || []).length,
+      bewaard: !!((P().bewaard[mij] || {})[x.id]),
       // de wauw-laag: de dag-stemming en de verjaardagsglans naast de codenaam
       stemming: stemmingVan ? stemmingVan(x.key) : null,
       jarig: jarigVan ? !!jarigVan(x.key) : false };
@@ -132,5 +136,10 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
       volgIk: !!(p.volgt[key] && p.volgt[key][wie]), zelf: wie === key };
   }
 
-  return { pulsePost, pulseWeg, pulseLike, pulseReactie, pulseVolg, pulseMeld, pulseFeed, pulseProfiel };
+  /* Bewerken en bewaren staan in ./vrij.js -- elders de betaalde functies van een
+     microblog, hier in de pas. Ze krijgen de binnenkant van de feed mee. */
+  const vrij = require('./vrij')({ save, nu, keur, P, publiek, zichtbaar, tags });
+
+  return Object.assign({ pulsePost, pulseWeg, pulseLike, pulseReactie, pulseVolg, pulseMeld,
+    pulseFeed, pulseProfiel }, vrij);
 };

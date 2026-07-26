@@ -106,11 +106,17 @@
   }
   function bewaarNu() {
     if (!open || !magBewerken || !vuil) return Promise.resolve();
-    var inhoud = inhoudNu();
-    return api('bewaar', { id: open.id, titel: $('#titel').value, inhoud: inhoud }).then(function (r) {
+    // Het document vastpakken vóór de rondreis: wie tijdens het bewaren
+    // teruggaat naar de lijst (open wordt dan null) of een ander document
+    // opent, mag niet door het late antwoord worden ingehaald.
+    var doc = open, inhoud = inhoudNu();
+    return api('bewaar', { id: doc.id, titel: $('#titel').value, inhoud: inhoud }).then(function (r) {
       if (r.body.error) { $('#staat').textContent = ''; return zeg(r.body.error); }
-      vuil = false; open.gewijzigd = r.body.gewijzigd; open.inhoud = inhoud;
-      $('#staat').textContent = 'Bewaard ' + new Date().toLocaleTimeString('nl-NL').slice(0, 5);
+      doc.gewijzigd = r.body.gewijzigd; doc.inhoud = inhoud;
+      if (open === doc) {
+        vuil = false;
+        $('#staat').textContent = 'Bewaard ' + new Date().toLocaleTimeString('nl-NL').slice(0, 5);
+      }
     });
   }
   $('#titel').addEventListener('input', markeer);

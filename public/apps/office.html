@@ -154,6 +154,37 @@
   .bpdoek .staaf{fill:var(--acc);}
   .bpdoek .lijn{fill:none;stroke:var(--acc);stroke-width:2;stroke-linejoin:round;}
   .bpdoek .bijschrift{fill:var(--zacht);font-size:9px;text-anchor:middle;}
+  /* de tekstverwerker: doorhalen, markeren en de inhoudsopgave */
+  .tb.door{text-decoration:line-through;}
+  .tb.mark{background:linear-gradient(transparent 52%, rgba(201,162,75,.45) 52%);}
+  #tekst .rtg-toc{border:1px solid var(--line);border-radius:8px;padding:.8rem 1rem;margin:0 0 1.2rem;}
+  #tekst .rtg-toc .toc-kop{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--zacht);margin:0 0 .4rem;}
+  #tekst .rtg-toc p{margin:.15rem 0;font-size:.86rem;color:var(--soft);}
+  #tekst .rtg-toc .toc-h2{padding-left:1.1rem;}
+  #tekst .rtg-toc .toc-h3{padding-left:2.2rem;}
+  /* afdrukken: alleen het document, zwart op wit; de hand-out bestaat alleen
+     op papier */
+  #handout{display:none;}
+  @media print{
+    body.afdruk-aan{background:#fff;}
+    body.afdruk-aan *{visibility:hidden;}
+    body.afdruk-aan .afdrukdoel, body.afdruk-aan .afdrukdoel *{visibility:visible;}
+    body.afdruk-aan .afdrukdoel{position:absolute;left:0;top:0;width:100%;height:auto;max-height:none;
+      overflow:visible;background:#fff;color:#111;font-family:Georgia,'Times New Roman',serif;
+      padding:0;margin:0;}
+    body.afdruk-aan .afdrukdoel a{color:#111;}
+    body.afdruk-aan .afdrukdoel h1,body.afdruk-aan .afdrukdoel h2,body.afdruk-aan .afdrukdoel h3{color:#111;}
+    body.afdruk-aan .afdrukdoel .rtg-toc{border-color:#bbb;}
+    body.afdruk-aan .afdrukdoel .rtg-toc p,body.afdruk-aan .afdrukdoel .rtg-toc .toc-kop{color:#333;}
+    body.afdruk-aan #bladWrap.afdrukdoel table{font-family:inherit;}
+    body.afdruk-aan #bladWrap.afdrukdoel th,body.afdruk-aan #bladWrap.afdrukdoel td{
+      background:#fff;color:#111;border-color:#999;position:static;}
+    body.afdruk-aan #handout.afdrukdoel{display:block;}
+    #handout .hdia{break-inside:avoid;border-bottom:1px solid #ccc;padding:1rem 0;}
+    #handout .hnr{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:#555;margin:0 0 .2rem;}
+    #handout h3{margin:0 0 .4rem;color:#111;}
+    #handout p{white-space:pre-wrap;color:#222;margin:0;}
+  }
 
   /* presentatie: een strook met dia's ernaast, zoals het hoort */
   #presWrap{display:grid;grid-template-columns:11rem 1fr;gap:1.2rem;height:100%;min-height:0;}
@@ -181,6 +212,16 @@
   #toonDia p{font-size:clamp(1.05rem,2.4vw,1.5rem);line-height:1.65;color:var(--soft);white-space:pre-wrap;max-width:52rem;}
   #toonDia.i-cijfer h3{font-size:clamp(3rem,11vw,8rem);}
   #toonDia.i-citaat p{font-style:italic;font-size:clamp(1.3rem,3.2vw,2.2rem);color:var(--txt);border-left:3px solid var(--acc);padding-left:1.2rem;}
+  /* de thema's van het deck, alle vier uit het eigen palet */
+  #toonDia.t-papier{background:#FFFFFF;}
+  #toonDia.t-papier h3{color:#0C0C0B;}
+  #toonDia.t-papier p{color:#4D4A45;}
+  #toonDia.t-papier.i-citaat p{color:#0C0C0B;border-left-color:#7F1634;}
+  #toonDia.t-bordeaux{background:#7F1634;}
+  #toonDia.t-bordeaux h3{color:#FFFFFF;}
+  #toonDia.t-bordeaux p{color:rgba(255,255,255,.85);}
+  #toonDia.t-bordeaux.i-citaat p{color:#FFFFFF;border-left-color:rgba(255,255,255,.6);}
+  #toonDia.t-goud h3{color:var(--gold);}
   #tdNotitie{position:fixed;left:0;right:0;bottom:3.6rem;padding:0 6vw;color:var(--zacht);font-size:.85rem;
     white-space:pre-wrap;max-width:60rem;}
   #toonDia .voet{position:fixed;left:0;right:0;bottom:1rem;display:flex;justify-content:center;gap:.5rem;
@@ -269,6 +310,7 @@
       <button class="knop" id="aiBtn" type="button">Rahul</button>
       <button class="knop" id="versiesBtn" type="button">Versies</button>
       <button class="knop" id="deelBtn" type="button">Delen</button>
+      <button class="knop" id="printBtn" type="button" title="Afdrukken of opslaan als PDF">Afdruk</button>
       <button class="knop" id="exportBtn" type="button">Export</button>
     </div>
     <div class="formbalk" id="formBalk" style="display:none;">
@@ -358,11 +400,14 @@
 <script src="/shared/rekenfuncties2.js" defer></script>
 <script src="/shared/rekenfuncties3.js" defer></script>
 <script src="/shared/rekenmotor.js" defer></script>
-<script src="/apps/office/tekst.js" defer></script>
 <script src="/apps/office/bladpro.js" defer></script>
 <script src="/apps/office/bladgrafiek.js" defer></script>
+<script src="/apps/office/tekstpro.js" defer></script>
+<script src="/apps/office/tekst.js" defer></script>
 <script src="/apps/office/blad.js" defer></script>
 <script src="/apps/office/pres.js" defer></script>
+<script src="/apps/office/presenteren.js" defer></script>
+<script src="/apps/office/afdruk.js" defer></script>
 <script src="/apps/office/app.js" defer></script>
 <script src="/shared/rahul-mond.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

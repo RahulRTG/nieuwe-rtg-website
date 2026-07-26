@@ -15,6 +15,8 @@ const MAX_DIAS = 60;
    in de opslag belanden. */
 const OPMAAK = ['kop', 'geld', 'procent', 'getal', 'datum'];
 const INDELINGEN = ['titel', 'punten', 'twee', 'citaat', 'cijfer'];
+// de thema's van een deck; dezelfde vier als in apps/office/pres.js
+const THEMAS = ['nacht', 'papier', 'bordeaux', 'goud'];
 
 const { SJABLONEN } = require('./sjablonen');
 
@@ -62,8 +64,10 @@ function maakBasis({ db, crypto, codenaamVan }) {
         if (!/^[A-Z]{1,2}[0-9]{1,3}$/.test(ref) || m++ > 4000) continue;
         if (OPMAAK.includes(soortje)) opmaak[ref] = soortje;
       }
-      const rijen = Math.min(200, Math.max(1, parseInt(inhoud.rijen, 10) || 20));
-      const kolommen = Math.min(26, Math.max(1, parseInt(inhoud.kolommen, 10) || 8));
+      // dezelfde grenzen als het scherm (apps/office/blad): wie hier strakker
+      // klemt, knipt bij het bewaren stilletjes rijen uit andermans blad
+      const rijen = Math.min(500, Math.max(1, parseInt(inhoud.rijen, 10) || 20));
+      const kolommen = Math.min(60, Math.max(1, parseInt(inhoud.kolommen, 10) || 8));
       return { cellen, opmaak, rijen, kolommen };
     }
     if (soort === 'presentatie') {
@@ -74,7 +78,10 @@ function maakBasis({ db, crypto, codenaamVan }) {
         tekst: String((x && x.tekst) || '').slice(0, 4000),
         notitie: String((x && x.notitie) || '').slice(0, 2000)
       }));
-      return { dias: dias.length ? dias : [{ indeling: 'titel', titel: 'Titelblad', tekst: '', notitie: '' }] };
+      return { dias: dias.length ? dias : [{ indeling: 'titel', titel: 'Titelblad', tekst: '', notitie: '' }],
+        // een verzonnen thema wordt geen fout maar de standaard: het deck
+        // blijft bruikbaar, alleen de kleur valt terug
+        thema: THEMAS.includes(inhoud.thema) ? inhoud.thema : 'nacht' };
     }
     return { tekst: String(inhoud.tekst || '').slice(0, MAX_BYTES) };
   }
@@ -83,4 +90,4 @@ function maakBasis({ db, crypto, codenaamVan }) {
 }
 
 module.exports = { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, MAX_DIAS,
-  OPMAAK, INDELINGEN, SJABLONEN, maakBasis };
+  OPMAAK, INDELINGEN, THEMAS, SJABLONEN, maakBasis };

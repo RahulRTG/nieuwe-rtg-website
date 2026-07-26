@@ -180,3 +180,28 @@ test('8. Rahul leest mee met meer dan drie opdrachten, en weigert wat hij niet k
   const raar = await api('/api/kantoorpakket/ai', { id: t.body.id, opdracht: 'verzin-maar-wat' }, lidA);
   assert.equal(raar.status, 400, 'een onbekende opdracht wordt geweigerd');
 });
+
+test('9. het deck-thema en de bladgrenzen overleven het bewaren', async () => {
+  /* Het thema is deel van het document: wie zijn deck op bordeaux zet en het
+     morgen opent, hoort geen nacht terug te krijgen. En een verzonnen thema
+     wordt geen fout maar de standaard -- het deck blijft bruikbaar. */
+  const p = await api('/api/kantoorpakket/maak', { soort: 'presentatie', titel: 'Kwartaal' }, lidA);
+  await api('/api/kantoorpakket/bewaar', { id: p.body.id,
+    inhoud: { thema: 'bordeaux', dias: [{ indeling: 'titel', titel: 'Q3', tekst: '' }] } }, lidA);
+  const po = await api('/api/kantoorpakket/open', { id: p.body.id }, lidA);
+  assert.equal(po.body.inhoud.thema, 'bordeaux', 'het thema is bewaard');
+  await api('/api/kantoorpakket/bewaar', { id: p.body.id,
+    inhoud: { thema: 'paars-met-glitters', dias: po.body.inhoud.dias } }, lidA);
+  const po2 = await api('/api/kantoorpakket/open', { id: p.body.id }, lidA);
+  assert.equal(po2.body.inhoud.thema, 'nacht', 'een verzonnen thema valt terug op nacht');
+
+  /* En het blad: het scherm kan tot 500 rijen en 60 kolommen; de server mag
+     daar bij het bewaren niet stilletjes rijen afknippen. */
+  const b = await api('/api/kantoorpakket/maak', { soort: 'blad', titel: 'Groot blad' }, lidA);
+  await api('/api/kantoorpakket/bewaar', { id: b.body.id,
+    inhoud: { cellen: { A1: '1', AA400: '=SOM(A1:A9)' }, opmaak: {}, rijen: 400, kolommen: 30 } }, lidA);
+  const bo = await api('/api/kantoorpakket/open', { id: b.body.id }, lidA);
+  assert.equal(bo.body.inhoud.rijen, 400, 'de rijen blijven staan');
+  assert.equal(bo.body.inhoud.kolommen, 30, 'de kolommen ook');
+  assert.equal(bo.body.inhoud.cellen.AA400, '=SOM(A1:A9)', 'een cel voorbij kolom Z is gewoon een cel');
+});

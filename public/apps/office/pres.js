@@ -1,4 +1,4 @@
-/* RTG Office, de presentatie: de dia-strook, de indelingen en het presenteren.
+/* RTG Office, de presentatie: de dia-strook, de indelingen en de thema's.
 
    Een deck bouw je niet in een lijst van tekstvakken onder elkaar. Links staat
    een strook met alle dia's, zodat u ziet hoe het verhaal loopt en er sleept
@@ -6,8 +6,8 @@
    titelblad, punten, twee kolommen, citaat of een groot cijfer -- en een
    sprekersnotitie die alleen u ziet.
 
-   Bij het presenteren staat de dia schermvullend; de notitie kunt u eronder
-   aanzetten voor uzelf. Pijltjes en spatie lopen door het deck.
+   Het presenteren zelf staat in apps/office/presenteren.js: daar wordt het
+   deck gehouden, hier wordt het gebouwd.
 
    Levert window.RTGOfficePres. */
 (function () {
@@ -25,10 +25,14 @@
     ['citaat', 'Citaat', 'Een uitspraak of de vraag aan de zaal.'],
     ['cijfer', 'Groot cijfer', 'Een getal dat het verhaal draagt.']
   ];
+  /* De thema's, alle vier uit het eigen palet: nacht (zoals het altijd was),
+     papier voor een lichte zaal, bordeaux en goud als de huiskleuren. Meer
+     smaken zou een kleurenkiezer worden, en dan maakt iedereen paars. */
+  var THEMAS = [['nacht', 'Nacht'], ['papier', 'Papier'], ['bordeaux', 'Bordeaux'], ['goud', 'Goud']];
 
   function maak(opties) {
     var rail = opties.rail, vlak = opties.vlak, onWijzig = opties.onWijzig, meld = opties.meld;
-    var dias = [], huidig = 0, magBewerken = false;
+    var dias = [], huidig = 0, magBewerken = false, thema = 'nacht';
 
     function schoon(d) {
       return { indeling: d && d.indeling ? d.indeling : 'punten',
@@ -42,7 +46,13 @@
           '<b>' + esc(d.titel || '(zonder titel)') + '</b>' +
           '<span>' + esc(String(d.tekst || '').split('\n')[0].slice(0, 42)) + '</span></button>';
       }).join('') + (magBewerken
-        ? '<button class="knop" id="diaErbij" type="button" style="width:100%;margin-top:.4rem;">+ Dia</button>' : '');
+        ? '<button class="knop" id="diaErbij" type="button" style="width:100%;margin-top:.4rem;">+ Dia</button>' +
+          /* het thema staat in de dia-kolom omdat het over het HELE deck gaat;
+             naast de indeling van één dia zou het lezen als iets per dia */
+          '<select id="deckThema" aria-label="Thema van het hele deck" title="Thema van het hele deck"' +
+          ' style="width:100%;margin-top:.4rem;">' + THEMAS.map(function (t) {
+            return '<option value="' + t[0] + '"' + (t[0] === thema ? ' selected' : '') + '>Thema: ' + t[1] + '</option>';
+          }).join('') + '</select>' : '');
       Array.prototype.forEach.call(rail.querySelectorAll('[data-dia]'), function (b) {
         b.addEventListener('click', function () { huidig = +b.dataset.dia; tekenRail(); tekenVlak(); });
       });
@@ -51,6 +61,10 @@
         if (dias.length >= 60) return meld('Maximaal 60 dia\'s.');
         dias.splice(huidig + 1, 0, schoon({ indeling: 'punten' }));
         huidig++; onWijzig(); tekenRail(); tekenVlak();
+      });
+      var themaSel = rail.querySelector('#deckThema');
+      if (themaSel) themaSel.addEventListener('change', function () {
+        thema = this.value; onWijzig();
       });
     }
     function labelVan(id) {
@@ -72,6 +86,7 @@
           '<span style="flex:1"></span>' +
           (magBewerken ? '<button class="mini" id="diaOp" type="button" title="Naar voren">↑</button>' +
             '<button class="mini" id="diaNeer" type="button" title="Naar achteren">↓</button>' +
+            '<button class="mini" id="diaDup" type="button" title="Deze dia dupliceren">Dupliceer</button>' +
             (dias.length > 1 ? '<button class="mini weg" id="diaWeg" type="button">Verwijder</button>' : '') : '') +
         '</div>' +
         '<input class="dt" id="diaTitel" maxlength="120" placeholder="Titel van de dia" value="' + esc(d.titel) + '"' + (magBewerken ? '' : ' disabled') + '>' +
@@ -87,6 +102,11 @@
         q('#diaNotitie').addEventListener('input', function () { dias[huidig].notitie = this.value; onWijzig(); });
         q('#diaOp').addEventListener('click', function () { verplaats(-1); });
         q('#diaNeer').addEventListener('click', function () { verplaats(1); });
+        q('#diaDup').addEventListener('click', function () {
+          if (dias.length >= 60) return meld('Maximaal 60 dia\'s.');
+          dias.splice(huidig + 1, 0, schoon(JSON.parse(JSON.stringify(dias[huidig]))));
+          huidig++; onWijzig(); tekenRail(); tekenVlak();
+        });
         var w = q('#diaWeg');
         if (w) w.addEventListener('click', function () {
           dias.splice(huidig, 1); huidig = Math.max(0, huidig - 1); onWijzig(); tekenRail(); tekenVlak();
@@ -101,15 +121,18 @@
       huidig = doel; onWijzig(); tekenRail(); tekenVlak();
     }
 
-    return {
+    var api = {
       laad: function (inhoud, mag) {
         magBewerken = !!mag;
         var bron = (inhoud && inhoud.dias) || [];
+        thema = 'nacht';
+        for (var i = 0; i < THEMAS.length; i++) if (inhoud && inhoud.thema === THEMAS[i][0]) thema = inhoud.thema;
         dias = (bron.length ? bron : [{ indeling: 'titel', titel: 'Titelblad', tekst: '' }]).map(schoon);
         huidig = 0; tekenRail(); tekenVlak();
       },
-      inhoud: function () { return { dias: dias }; },
+      inhoud: function () { return { dias: dias, thema: thema }; },
       dias: function () { return dias; },
+      thema: function () { return thema; },
       erbij: function (d) { dias.push(schoon(d)); huidig = dias.length - 1; tekenRail(); tekenVlak(); },
       naarTekst: function () {
         return dias.map(function (d, i) {
@@ -118,28 +141,11 @@
         }).join('\n\n');
       }
     };
+    /* De afdruklaag (hand-out) en het presenteren hebben het geopende deck
+       nodig; dit is de ene plek waar het te vinden is. */
+    window.RTGOfficePres.huidige = api;
+    return api;
   }
 
-  /* De presenteermodus: dezelfde dia's, schermvullend, met de indeling die de
-     dia zelf draagt en de notitie die alleen de spreker aanzet. */
-  function presenteer(opties) {
-    var doos = opties.doos, titelEl = opties.titel, tekstEl = opties.tekst, notitieEl = opties.notitie,
-        tellerEl = opties.teller, dias = opties.dias;
-    var nr = 0, notitieAan = false;
-    function toon() {
-      var d = dias[nr] || { titel: '', tekst: '', indeling: 'punten', notitie: '' };
-      doos.className = 'aan i-' + (d.indeling || 'punten');
-      titelEl.textContent = d.titel || '(zonder titel)';
-      tekstEl.textContent = d.tekst || '';
-      notitieEl.textContent = notitieAan ? (d.notitie || 'Geen notitie bij deze dia.') : '';
-      tellerEl.textContent = (nr + 1) + ' van ' + dias.length;
-    }
-    toon();
-    return {
-      stap: function (n) { nr = Math.min(dias.length - 1, Math.max(0, nr + n)); toon(); },
-      notitie: function () { notitieAan = !notitieAan; toon(); }
-    };
-  }
-
-  window.RTGOfficePres = { maak: maak, presenteer: presenteer, INDELINGEN: INDELINGEN };
+  window.RTGOfficePres = { maak: maak, INDELINGEN: INDELINGEN, THEMAS: THEMAS };
 })();

@@ -22,6 +22,10 @@
     [ { cmd: 'bold', lab: 'B', titel: 'Vet', klasse: 'vet' },
       { cmd: 'italic', lab: 'I', titel: 'Cursief', klasse: 'ital' },
       { cmd: 'underline', lab: 'U', titel: 'Onderstreept', klasse: 'und' },
+      { cmd: 'strikeThrough', lab: 'S', titel: 'Doorhalen', klasse: 'door' },
+      // de markeerstift: goud uit het eigen palet, doorzichtig zodat de tekst
+      // leesbaar blijft; weghalen gaat met de ✕ ernaast
+      { cmd: 'hiliteColor', waarde: 'rgba(201,162,75,0.35)', lab: 'M', titel: 'Markeren (weghalen met ✕)', klasse: 'mark' },
       { cmd: 'removeFormat', lab: '✕', titel: 'Opmaak weghalen' } ],
     [ { cmd: 'insertUnorderedList', lab: '•', titel: 'Opsomming' },
       { cmd: 'insertOrderedList', lab: '1.', titel: 'Genummerd' },
@@ -61,6 +65,10 @@
       });
     });
     document.addEventListener('selectionchange', function () { standBij(host); });
+    /* De pro-laag hangt zichzelf hierachter: zoeken en vervangen, en de
+       inhoudsopgave (apps/office/tekstpro.js). Is hij er niet, dan werkt de
+       tekstverwerker gewoon zonder. */
+    if (window.RTGOfficeTekstPro) window.RTGOfficeTekstPro.balk(host, vel, onWijzig);
     return host;
   }
 
@@ -71,7 +79,7 @@
     Array.prototype.forEach.call(host.querySelectorAll('.tb'), function (b) {
       var cmd = b.dataset.cmd, waarde = b.dataset.waarde;
       var aan = false;
-      if (waarde) aan = ('<' + blok + '>') === waarde;
+      if (cmd === 'formatBlock' && waarde) aan = ('<' + blok + '>') === waarde;
       else if (STAND[cmd]) { try { aan = document.queryCommandState(cmd); } catch (e) {} }
       b.classList.toggle('aan', !!aan);
     });

@@ -1028,3 +1028,45 @@ functielijst doorzoekt, sorteert, filtert en een grafiek laat tekenen. Die
 laatste is geen luxe: de motor draait in de browser, waar de beveiligingsregels
 van de app tekst-als-code blokkeren — precies de fout die deze app eerder had,
 toen in Node alles groen stond en op het scherm elke formule een melding gaf.
+
+### En de andere twee: de tekstverwerker en de presentatie
+
+**De tekstverwerker.** Naast de bestaande balk (koppen, lijsten, uitlijning,
+citaat, verwijzing, tabel) komen doorhalen en een markeerstift (goud uit het
+eigen palet, doorzichtig), en twee dingen waarvoor men elders betaalt:
+
+- **Zoeken en vervangen** — loopt uitsluitend door de *tekstknopen* van het
+  document. Dat is de veiligheidsregel van de functie: wie door de HTML zelf
+  zou zoeken, kan met een vervanging een tag doormidden knippen en daarmee de
+  opmaak van een gedeeld document slopen. Na "haven" naar "kade" is de kop nog
+  steeds een kop; de e2e-test bewijst het.
+- **Inhoudsopgave** uit de koppen, bovenaan het document. Een momentopname:
+  opnieuw klikken ververst hem. Een inhoudsopgave die zichzelf live bijhoudt
+  klinkt beter, maar betekent dat het document iets doet wat u niet ziet.
+
+**De presentatie.** Dia dupliceren, en **thema's voor het hele deck** — vier,
+alle uit het eigen palet: nacht, papier, bordeaux en goud. Meer smaken zou een
+kleurenkiezer worden, en dan maakt iedereen paars. Bij het presenteren loopt de
+**spreektimer** mee naast de teller: gewoon optellen, geen aftellen en geen
+rood knipperen — u bent aan het woord, geen examen aan het doen.
+
+**Afdrukken, voor alle drie.** Geen eigen PDF-schrijver — de browser heeft een
+uitstekende (de afdrukdialoog met "opslaan als PDF"). Wat wij toevoegen is dat
+er iets fatsoenlijks uitkomt: zwart op wit, serif voor tekst, geen appbalken.
+Een tekstdocument drukt af als het stuk dat het is; een rekenblad als de tabel
+met de uitkomsten van het scherm; een presentatie als **hand-out** — elke dia
+een blok, en de sprekersnotities gaan NIET mee. Een hand-out is voor de zaal,
+en een notitie die per ongeluk meeprint is het soort ongeluk dat je maar één
+keer overkomt. Ook dat staat in de e2e-test.
+
+De ronde ving onderweg twee echte fouten: de server-schoonmaak gooide het
+thema bij het bewaren weg (een bordeaux deck zou morgen weer nacht zijn) en
+klemde het blad op 200 rijen en 26 kolommen terwijl het scherm er 500 en 60
+aankan — bewaren zou stilletjes rijen afknippen. En een race die er al langer
+zat: teruggaan naar de lijst terwijl de autosave onderweg was, liet het late
+antwoord op een gesloten document schrijven.
+
+Bewezen: `test/office.test.js` (9, met de thema/grenzen-rondreis) en
+`test/office-suite.e2e.js` (zoeken/vervangen met opmaak die blijft staan,
+inhoudsopgave die ververst, dupliceren, thema, timer, en de hand-out zonder
+notities — via de echte afdrukknop).

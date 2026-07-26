@@ -47,6 +47,26 @@ verplicht (anders heeft elk proces zijn eigen data-snapshot). Daarnaast is
 elke route-handler omhuld: een (async) bug in een route geeft die ene
 aanvraag een nette 500 en raakt de rest van het proces nooit.
 
+### Op een Mac (Mac mini als thuisserver)
+
+```bash
+mv ~/Desktop/nieuwe-rtg-website ~/rtg        # niet in een map die macOS afschermt
+cd ~/rtg
+sudo scripts/mac/installeer.sh --eigenaar=jij@voorbeeld.nl --slaap-uit
+```
+
+Dit zet RTG als **launchd-daemon** neer: hij start bij het aanzetten van de
+machine (zonder dat er iemand inlogt), komt terug na een crash en na een
+stroomstoring. Het installatiescript maakt de geheimen met `npm run sleutels`,
+zet ze in `/usr/local/etc/rtg/rtg.env` met rechten 600, keurt de configuratie
+vóórdat het de dienst laadt, en overschrijft een bestaand geheimenbestand
+**nooit** (daar zit `RTG_VAULT_KEY` in). In het plist staan geen sleutels:
+alles in `/Library/LaunchDaemons` is voor iedereen leesbaar.
+
+Details, achtergrond en het dagelijks gebruik (`launchctl print`, `kickstart`,
+logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
+`sudo scripts/mac/verwijder.sh`.
+
 ---
 
 ## 3. Verplichte configuratie in productie

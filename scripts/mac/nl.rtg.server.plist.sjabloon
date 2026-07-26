@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Sjabloon voor de RTG-launchd-service. scripts/mac/installeer.sh vult de
+  plaatshouders in en schrijft het resultaat naar
+  /Library/LaunchDaemons/nl.rtg.server.plist.
+
+  Het is een LaunchDAEMON en geen LaunchAgent: een daemon start bij het
+  aanzetten van de machine, zonder dat er iemand inlogt. Dat is precies wat je
+  van een server wilt na een stroomstoring. Omdat een daemon standaard als root
+  draait, staat UserName erin: de server zelf hoeft geen root te zijn.
+
+  Er staan hier bewust GEEN geheimen. Dit bestand is voor iedereen op de
+  machine leesbaar; de sleutels staan in het bestand achter RTG_ENV_BESTAND
+  (rechten 600) en worden door scripts/mac/rtg-start.sh ingelezen.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>@@LABEL@@</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>@@START@@</string>
+  </array>
+
+  <!-- niet als root draaien: de server heeft geen rootrechten nodig -->
+  <key>UserName</key>
+  <string>@@GEBRUIKER@@</string>
+  <key>GroupName</key>
+  <string>@@GROEP@@</string>
+
+  <key>WorkingDirectory</key>
+  <string>@@REPO@@</string>
+
+  <!-- starten bij het opstarten van de machine, en weer starten na een crash.
+       SuccessfulExit=false betekent: alleen herstarten als het proces met een
+       fout of een signaal eindigde, niet na een nette exit 0. -->
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+  <!-- minstens 10 seconden tussen twee starts: bij een configuratiefout weigert
+       de server te starten (server/config.js), en dan is een rustige lus met
+       nette regels in het logboek beter dan een tolhek dat op hol slaat -->
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+
+  <!-- Interactive: geen CPU- en I/O-knijper van macOS. Een webserver moet ook
+       reageren als er niemand achter het scherm zit. -->
+  <key>ProcessType</key>
+  <string>Interactive</string>
+
+  <key>SoftResourceLimits</key>
+  <dict>
+    <key>NumberOfFiles</key>
+    <integer>8192</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>@@LOGMAP@@/rtg.log</string>
+  <key>StandardErrorPath</key>
+  <string>@@LOGMAP@@/rtg-fout.log</string>
+
+  <!-- alleen niet-geheime zaken: waar node staat, waar het geheimenbestand
+       staat, en een PATH waar Homebrew in zit -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>RTG_NODE</key>
+    <string>@@NODE@@</string>
+    <key>RTG_ENV_BESTAND</key>
+    <string>@@ENVBESTAND@@</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+</dict>
+</plist>

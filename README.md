@@ -305,3 +305,4 @@ Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk 
 - **docs/architectuur.md** — gedeelde kern + aparte domeinmodules, gateway en losse processen.
 - **docs/hardening.md** — beveiligings- en betrouwbaarheidskeuzes.
 - **PRODUCTION.md** / **LAUNCH.md** — runbook en livegang-checklist.
+- **scripts/mac/LEESMIJ.md** — RTG als launchd-dienst op een Mac (Mac mini als thuisserver): `sudo scripts/mac/installeer.sh`.

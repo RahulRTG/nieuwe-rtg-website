@@ -1,8 +1,9 @@
 /* Betaal-abstractie: één naad waarachter de echte provider zit.
 
-   - Staat STRIPE_SECRET_KEY (en het pakket 'stripe') klaar, dan draaien
-     betalingen echt via Stripe: een PaymentIntent met idempotentiesleutel, en
-     webhooks die met de Stripe-handtekening worden geverifieerd.
+   - Staat STRIPE_SECRET_KEY klaar, dan draaien betalingen echt via Stripe: een
+     PaymentIntent met idempotentiesleutel, en webhooks die met de
+     Stripe-handtekening worden geverifieerd. Dat loopt over onze EIGEN dunne
+     client (./stripe), niet over het npm-pakket: geen dependency.
    - Anders draait de demo-provider: dezelfde interface, maar hij "bevestigt"
      direct zonder echt geld. Zo werkt lokaal en in demo alles zonder keys.
 

@@ -13,6 +13,13 @@ let fouten = 0;
 const fout = m => { console.error('  ✗ ' + m); fouten++; };
 const ok = m => console.log('  ✓ ' + m);
 
+/* Commentaar eruit halen (regel- en blokcommentaar), zodat een uitleg als
+   "// require('x') -> 'x'" niet als echte require wordt gelezen. Strings blijven
+   staan; voor deze keuringen is dat genoeg. */
+function zonderCommentaar(bron) {
+  return String(bron).replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+}
+
 function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
     const vol = path.join(dir, naam);
@@ -285,9 +292,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/kern/pay/index.js',
     'server/kern/werkplaats.js',
     'server/lokaal-tls.js',
-    'server/routes/kantoren/bureaus.js',
-    'server/routes/kantoren/regie.js',
-    'server/routes/techniek/beheer.js',
     'server/techniek.js',
     'server/trio.js'
   ]);
@@ -309,6 +313,65 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     console.log('  ! nog op te knippen (' + nog.length + '): ' + nog.join(', '));
   }
   if (!teGroot) ok('geen onverwacht groot productbestand (' + uitz + ' benoemde uitzonderingen, ' + nog.length + ' op de lijst)');
+}
+
+
+/* 14) zero dependencies: geen enkele externe module, en de belofte in
+   package.json moet daarmee kloppen. De AST-scan heeft al een verbodslijst van
+   pakketten die we zelf gebouwd hebben, maar dat is een NAAMLIJST: require van
+   iets nieuws (lodash, dayjs, wat dan ook) glipt daar zo langs. Deze regel doet
+   het omgekeerd: alles wat geen ingebouwde Node-module en geen eigen pad is, is
+   fout tenzij het bij naam als uitzondering staat.
+
+   De twee uitzonderingen zijn dev-hulp, nooit productie: 'playwright' (met onze
+   eigen browser-driver als terugval) en 'redis' (een kruiscontrole van onze
+   eigen client tegen de npm-client, die zichzelf overslaat als hij er niet is).
+   Beide staan in een try/catch en zijn dus nooit nodig om te draaien. */
+console.log('\n14) zero dependencies: geen externe modules, package.json klopt');
+{
+  const INGEBOUWD = new Set(require('module').builtinModules.concat(['sqlite', 'test', 'test/reporters']));
+  const MAG_DEV = new Set(['playwright', 'redis']);
+  /* Dit bestand VOEDT de AST-scan met verboden pakketnamen ("keurt require van
+     web-push af?"). Die namen staan daar in een string, niet in een echte
+     require -- maar een tekstscan ziet het verschil niet. */
+  const MAG_BESTAND = new Set(['test/ast-scan.test.js']);
+  const RE = /require\(\s*['"]([^'"]+)['"]\s*\)/g;
+  const vondsten = [];
+  for (const map of ['server', 'scripts', 'test', 'public']) {
+    loop(path.join(ROOT, map), /\.(js|mjs|cjs)$/, f => {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+      if (rel.startsWith('public/dist/') || rel.includes('/data/')) return;
+      const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+      let m;
+      while ((m = RE.exec(bron))) {
+        const naam = m[1];
+        if (naam.startsWith('.') || naam.startsWith('/')) continue;
+        const kaal = naam.replace(/^node:/, '');
+        if (INGEBOUWD.has(kaal) || INGEBOUWD.has(kaal.split('/')[0])) continue;
+        if (MAG_DEV.has(naam) && (rel.startsWith('test/') || rel.startsWith('scripts/'))) continue;
+        if (MAG_BESTAND.has(rel)) continue;
+        vondsten.push(rel + ':' + bron.slice(0, m.index).split('\n').length + ' -> ' + naam);
+      }
+    });
+  }
+  for (const v of vondsten) fout('externe module: ' + v + ' -- bouw het zelf of zet het met reden in de lijst');
+  if (!vondsten.length) ok('geen externe module in server/, scripts/, test/ en public/');
+
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  const beloofd = [];
+  for (const veld of ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']) {
+    const namen = Object.keys(pkg[veld] || {});
+    if (namen.length) beloofd.push(veld + ': ' + namen.join(', '));
+  }
+  if (beloofd.length) fout('package.json noemt toch pakketten (' + beloofd.join(' | ') + ')');
+  else ok('package.json noemt geen enkel pakket');
+
+  const lock = path.join(ROOT, 'package-lock.json');
+  if (fs.existsSync(lock)) {
+    const pakketten = Object.keys(JSON.parse(fs.readFileSync(lock, 'utf8')).packages || {}).filter(k => k);
+    if (pakketten.length) fout('package-lock.json bevat ' + pakketten.length + ' pakket(ten): ' + pakketten.slice(0, 5).join(', '));
+    else ok('package-lock.json is leeg (alleen het project zelf)');
+  }
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

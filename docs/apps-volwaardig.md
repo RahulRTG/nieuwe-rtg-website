@@ -366,3 +366,53 @@ Drie dingen die onderweg stuk bleken en gerepareerd zijn:
 - De knop "markeer als gelezen" in de PDA-trainingskaart was sinds de
   emoji-ronde helemaal leeg (`g ? '' : ''`): een knop zonder inhoud, dus niets om
   aan te tikken. Nu een vinkje en een open rondje.
+
+## Ronde 3 is af: Métier
+
+De grootste bevinding van de inventarisatie was dat er GEEN werk- of
+carriere-app bestond: alleen een vacaturebank met chat, weggestopt als tab. Nu
+staat er een eigen app, en het ontwerp ervan is het merkvoordeel zelf.
+
+**Het idee in een zin:** je profiel draait op je codenaam, RTG bevestigt wat het
+echt kan bevestigen, en je naam geef je per werkgever vrij uit de kluis.
+
+| Functie | Waar |
+|---|---|
+| Beroepsprofiel op codenaam: kop, over, plaats, open voor werk | `kern/metier/index.js` -> `/api/metier/kaart` |
+| **Bewezen rollen** uit de sleutelbos: wie een personeelsrol koppelde, gaf daarvoor de zaak-code en zijn eigen PIN | `kern/metier/index.js` -> `bewezenRollen` |
+| Zelf opgegeven werk mag erbij, en staat er zichtbaar bij als onbevestigd | `/api/metier/rol` |
+| Vaardigheden en talen zonder niveaus van 1 tot 5 | `/api/metier/lijst` |
+| **De naam vrijgeven aan een zaak**, met een reden voor jezelf | `kern/metier/bewijs.js` -> `/api/metier/naam-vrij` |
+| **Intrekken, en dan is er niets meer te lezen** -- er lag nergens een kopie | `/api/metier/naam-intrekken` |
+| **Je eigen inzagelog**: wie keek, wanneer, en of hij toen mocht | `/api/metier/naam-log` |
+| De werkgeverskant: naam achter een codenaam, alleen met toestemming | `/api/supplier/metier/naam` |
+| Aanbevelingen die je zelf schrijft (geen duimpje, geen ruilknop) | `kern/metier/netwerk.js` -> `/api/metier/beveel-aan` |
+| Onderschrijven, alleen op een vaardigheid die er al staat en alleen door een connectie | `/api/metier/onderschrijf` |
+| Beroepsregister: zoeken op vak, plaats, vaardigheid, "open voor werk" | `kern/metier/zoek.js` -> `/api/metier/zoek` |
+| Rahul kijkt naar je profiel als een werkgever, schrijft een brief, oefent het gesprek | `kern/metier/ai.js` -> `/api/metier/ai/{profiel,brief,oefen}` |
+
+De vier regels van ronde 1 en 2 gelden, en hier komt de vijfde bij:
+
+6. **Een bevestiging mag niet uit het verzoek komen.** `bevestigd: true`
+   meesturen doet niets: die vlag komt uit `db.data.accountRollen`, waar alleen
+   in staat wat iemand met een PIN of bedrijfsinlog heeft aangetoond. Métier
+   leest daar mee en schrijft er nooit. Een profiel kan dus niet mooier zijn dan
+   de werkelijkheid, en `test/metier.test.js` bewijst dat.
+
+Bewust NIET overgenomen van LinkedIn: "wie bekeek je profiel" als lokkertje, een
+feed met motivatiepraat, en "je bent 1 van de 30 sollicitanten". Wie je NAAM
+bekeek is een ander verhaal -- dat is een echte gebeurtenis met gevolgen, en die
+staat wel in je eigen log.
+
+Bewezen: `test/metier.test.js` (10 toetsen) en in een echte browser
+`test/metier.e2e.js`.
+
+Twee dingen die onderweg misgingen en waar ik van geleerd heb:
+
+- Ik gaf de app een sla-over-link met een klasse (`rtg-skip`) die in dit project
+  niet bestaat. Gevolg: een losse blauwe browserlink bovenaan de app, en precies
+  het contrast-advies dat de a11y-keuring gaf. Het huispatroon is `class="skip"`,
+  uit beeld tot hij focus krijgt, en check-regel 5 bewaakt dat ook.
+- Mijn eigen e2e wachtte op een waarde die ik zelf net had getypt, dus die
+  voorwaarde was meteen waar en het herladen wiste daarna de velden. Wachten op
+  de MELDING in plaats van op de invoer.

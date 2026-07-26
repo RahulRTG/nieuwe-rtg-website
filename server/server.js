@@ -2322,6 +2322,19 @@ kern.salonProfiel = require('./kern/salon/profiel')({ db, save, codenaamVan: ker
 kern.salonReacties = require('./kern/salon/reacties')({ db, save, liveCodename, codenaamVan: kern.codenaamVan,
   keyVanCodenaam: kern.keyVanCodenaam, zijnVrienden: kern.zijnVrienden, salon: kern.salon, notify });
 kern.salonAI = require('./kern/salon/ai')({ anthropic, salon: kern.salon });
+
+/* Métier (kern/metier/): de beroepskant. Het profiel draait op de codenaam, RTG
+   bevestigt alleen wat het echt zag (de bewezen rollen komen uit de sleutelbos
+   van kern/eenaccount.js) en de echte naam geeft het lid per werkgever vrij uit
+   de kluis -- intrekbaar, met een eigen inzagelog. Zie kern/metier/bewijs.js. */
+kern.metier = require('./kern/metier')({ db, save, liveCodename, codenaamVan: kern.codenaamVan, findSupplier });
+kern.metierZoek = require('./kern/metier/zoek')({ codenaamVan: kern.codenaamVan, metier: kern.metier, PAGINA: kern.metier.PAGINA });
+kern.metier.zoek = kern.metierZoek.zoek;
+kern.metierBewijs = require('./kern/metier/bewijs')({ db, save, accounts, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam, findSupplier, notifySupplier, notify });
+kern.metierNetwerk = require('./kern/metier/netwerk')({ db, save, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam, zijnVrienden: kern.zijnVrienden, liveCodename, notify, metier: kern.metier });
+kern.metierAI = require('./kern/metier/ai')({ anthropic, metier: kern.metier, netwerk: kern.metierNetwerk });
 /* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
    archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */

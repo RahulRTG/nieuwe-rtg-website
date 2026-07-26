@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Métier · RTG</title>
+<link rel="icon" href="/icons/werk.svg">
+<link rel="manifest" href="/manifests/metier.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Métier">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:6rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  input,textarea,select,button{font:inherit;}
+  input,textarea,select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:.85rem;padding:.5rem .7rem;width:100%;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  /* de sla-over-link: uit beeld tot hij focus krijgt, dan linksboven in zicht.
+     Zonder deze regels stond hij als losse blauwe browserlink bovenaan de app,
+     en dat was ook precies het contrast-advies van de keuring. */
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.45rem .9rem;border-radius:0 0 10px 10px;text-decoration:none;font-size:.8rem;}
+  .skip:focus{top:0;}
+  label{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin:.7rem 0 .25rem;}
+  .tabs{display:flex;gap:.4rem;margin-top:.7rem;overflow-x:auto;}
+  .tabs button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .85rem;font-size:.78rem;white-space:nowrap;cursor:pointer;}
+  .tabs button[aria-pressed="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  main{padding:1.1rem;max-width:660px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin-bottom:.8rem;}
+  .kaart h2{font-size:1rem;margin-bottom:.4rem;}
+  .knoppen{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem;}
+  .knop{background:var(--burgundy);border:1px solid var(--burgundy);color:#fff;border-radius:999px;padding:.4rem 1rem;font-size:.8rem;cursor:pointer;}
+  .knop.stil{background:none;border-color:var(--line);color:var(--muted);}
+  .mini{background:none;border:none;color:var(--gold);font-size:.75rem;cursor:pointer;padding:0;text-decoration:underline;}
+  .rij{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 0;border-bottom:1px solid var(--line);}
+  .rij:last-child{border-bottom:0;}
+  .rij .tx{flex:1;min-width:0;}
+  .rij b{font-weight:600;font-size:.9rem;}
+  .rij small{display:block;color:var(--soft);font-size:.75rem;margin-top:.1rem;}
+  .zegel{display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:.05rem .45rem;margin-left:.35rem;white-space:nowrap;}
+  .zegel.los{border-color:var(--line);color:var(--soft);}
+  .chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+  .chips button{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:.2rem .7rem;font-size:.78rem;cursor:pointer;}
+  .chips button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .leeg{color:var(--soft);font-size:.85rem;padding:.6rem 0;}
+  .naamkaart{background:linear-gradient(150deg,#1d1417,var(--card));border:1px solid rgba(194,58,94,.32);}
+  .uit{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;font-size:.85rem;line-height:1.5;white-space:pre-wrap;}
+  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,rgba(12,12,11,.7));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
+  .aibalk form{display:flex;gap:.5rem;max-width:660px;margin:0 auto;}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Naar de inhoud</a>
+<header>
+  <div class="ey">Van RTG</div>
+  <h1>Métier</h1>
+  <div class="tabs" id="tabs" role="group" aria-label="Onderdelen"></div>
+</header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="aibalk" id="aibalk" hidden>
+  <div class="uit" id="aiuit" hidden aria-live="polite"></div>
+  <form id="aiform">
+    <input id="aiin" placeholder="Zeg wat er moet gebeuren" aria-label="Zeg Rahul wat er moet gebeuren" autocomplete="off">
+    <button class="knop" type="submit">Vraag</button>
+  </form>
+</div>
+<script src="/shared/basis.js"></script>
+<script>
+(function(){
+  var TOKEN = localStorage.getItem('rtg_member_token') || '';
+  var TAB = 'ik', IK = null, BEKEKEN = null;
+  var TABS = [['ik','Mijn profiel'],['naam','Mijn naam'],['register','Beroepsregister'],['coach','Rahul coacht']];
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  function $(s){ return document.querySelector(s); }
+  function api(pad, body){
+    return fetch('/api'+pad, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+TOKEN },
+      body: JSON.stringify(body||{}) }).then(function(r){ return r.json().then(function(d){ d.__status=r.status; return d; }); });
+  }
+  function toon(html){ $('#main').innerHTML = html; }
+  function melding(t){ var u=$('#aiuit'); u.hidden=false; u.textContent=t; }
+
+  function tekenTabs(){
+    $('#tabs').innerHTML = TABS.map(function(t){
+      return '<button type="button" data-t="'+t[0]+'" aria-pressed="'+(TAB===t[0]?'true':'false')+'">'+esc(t[1])+'</button>';
+    }).join('');
+  }
+
+  /* ---- mijn profiel ---- */
+  function rolRij(r){
+    return '<div class="rij"><div class="tx"><b>'+esc(r.wat)+'</b>'+
+      (r.bevestigd ? '<span class="zegel" title="'+esc(r.hoe||'')+'">Bevestigd door RTG</span>'
+                   : '<span class="zegel los">Zelf opgegeven</span>')+
+      '<small>'+esc(r.waar)+(r.sinds?' · sinds '+esc(String(r.sinds).slice(0,10)):'')+
+      (r.van?' · '+esc(r.van)+(r.tot?'-'+esc(r.tot):'-nu'):'')+'</small></div>'+
+      (r.bevestigd?'':'<button class="mini" data-rolweg="'+esc(r.id)+'">weg</button>')+'</div>';
+  }
+  function tekenIk(d){
+    var p = d.profiel, alle = (p.bewezen||[]).concat(p.rollen||[]);
+    var html = '<div class="kaart"><h2>Je kaart</h2>'+
+      '<label for="fkop">Beroepskop</label><input id="fkop" maxlength="80" value="'+esc(p.kop)+'" placeholder="Sommelier, tien jaar aan tafel">'+
+      '<label for="fover">Over je werk</label><textarea id="fover" rows="3" maxlength="600" placeholder="Wat doe je, en waar ben je goed in?">'+esc(p.over)+'</textarea>'+
+      '<label for="fplaats">Plaats</label><input id="fplaats" maxlength="60" value="'+esc(p.plaats)+'">'+
+      '<div class="knoppen"><button class="knop" id="bkaart" type="button">Bewaren</button>'+
+      '<button class="knop stil" id="bopen" type="button" aria-pressed="'+(p.open?'true':'false')+'">'+(p.open?'Je staat open voor werk':'Zet "open voor werk" aan')+'</button></div></div>'+
+
+      '<div class="kaart"><h2>Je werk</h2>'+
+      '<p style="color:var(--soft);font-size:.8rem;">Rollen die je binnen RTG hebt gewerkt staan hier met de bevestiging van RTG erbij: daarvoor heb je een keer de zaak-code en je eigen PIN gegeven. Werk van buiten RTG mag erbij, en staat er eerlijk bij als zelf opgegeven.</p>'+
+      (alle.length ? alle.map(rolRij).join('') : '<div class="leeg">Nog geen werk op je profiel.</div>')+
+      '<label for="rwat">Rol toevoegen</label><input id="rwat" maxlength="80" placeholder="Wat deed je?">'+
+      '<input id="rwaar" maxlength="80" placeholder="Waar?" style="margin-top:.4rem;">'+
+      '<div style="display:flex;gap:.4rem;margin-top:.4rem;"><input id="rvan" inputmode="numeric" placeholder="van (jaar)" aria-label="Van welk jaar"><input id="rtot" inputmode="numeric" placeholder="tot (jaar)" aria-label="Tot welk jaar"></div>'+
+      '<div class="knoppen"><button class="knop stil" id="brol" type="button">Toevoegen</button></div></div>'+
+
+      '<div class="kaart"><h2>Vaardigheden</h2>'+
+      '<p style="color:var(--soft);font-size:.8rem;">Geen niveaus van 1 tot 5; die zegt iedereen 5. Wat telt is wie ze onderschrijft.</p>'+
+      (p.vaardigheden.length ? '<div class="chips">'+p.vaardigheden.map(function(v){
+        var o = (p.onderschreven||{})[v]||{aantal:0};
+        return '<button type="button" disabled>'+esc(v)+(o.aantal?' · '+o.aantal:'')+'</button>';
+      }).join('')+'</div>' : '<div class="leeg">Nog geen vaardigheden.</div>')+
+      '<label for="fvaardig">Vaardigheden (met komma\'s)</label><input id="fvaardig" value="'+esc(p.vaardigheden.join(', '))+'">'+
+      '<label for="ftalen">Talen (met komma\'s)</label><input id="ftalen" value="'+esc(p.talen.join(', '))+'">'+
+      '<div class="knoppen"><button class="knop stil" id="blijst" type="button">Bewaren</button></div></div>'+
+
+      '<div class="kaart"><h2>Aanbevelingen</h2>'+
+      ((p.aanbevelingen||[]).length ? p.aanbevelingen.map(function(a){
+        return '<div class="rij"><div class="tx"><b>'+esc(a.van)+'</b>'+(a.verborgen?'<span class="zegel los">Verborgen</span>':'')+
+          '<small>'+esc(a.tekst)+'</small></div>'+
+          '<button class="mini" data-verberg="'+esc(a.id)+'">'+(a.verborgen?'tonen':'verbergen')+'</button></div>';
+      }).join('') : '<div class="leeg">Nog geen aanbevelingen. Iemand met wie je verbonden bent kan er een schrijven.</div>')+
+      '</div>';
+    toon(html);
+  }
+
+  /* ---- mijn naam: het signatuurstuk ---- */
+  function tekenNaam(d){
+    var t = d.toestemmingen||[], log = d.inzage||[];
+    toon('<div class="kaart naamkaart"><h2>Je naam is een sleutel, geen veld</h2>'+
+      '<p style="color:var(--muted);font-size:.85rem;line-height:1.55;">Op je profiel staat je codenaam. Je echte naam staat in de kluis en gaat pas mee als jij hem aan één werkgever vrijgeeft, voor één sollicitatie. Je kunt hem altijd intrekken, en je ziet hieronder precies wie hem heeft bekeken.</p>'+
+      '<label for="nzaak">Zaak-code</label><input id="nzaak" maxlength="24" placeholder="Bijvoorbeeld KIKUNOI">'+
+      '<label for="nwaarvoor">Waarvoor (voor jezelf)</label><input id="nwaarvoor" maxlength="120" placeholder="Sollicitatie sommelier">'+
+      '<div class="knoppen"><button class="knop" id="bvrij" type="button">Naam vrijgeven</button></div></div>'+
+
+      '<div class="kaart"><h2>Wie mag je naam zien</h2>'+
+      (t.length ? t.map(function(x){
+        return '<div class="rij"><div class="tx"><b>'+esc(x.zaak)+'</b>'+
+          (x.actief?'<span class="zegel">Actief</span>':'<span class="zegel los">Ingetrokken</span>')+
+          '<small>'+esc(x.waarvoor||'geen reden opgegeven')+' · gegeven op '+esc(String(x.at).slice(0,10))+
+          (x.ingetrokken?' · ingetrokken op '+esc(String(x.ingetrokken).slice(0,10)):'')+'</small></div>'+
+          (x.actief?'<button class="mini" data-intrek="'+esc(x.code)+'">intrekken</button>':'')+'</div>';
+      }).join('') : '<div class="leeg">Je hebt je naam aan niemand gegeven.</div>')+'</div>'+
+
+      '<div class="kaart"><h2>Wie keek</h2>'+
+      '<p style="color:var(--soft);font-size:.8rem;">Ook de pogingen zonder toestemming staan erbij. Inzage is een gebeurtenis, geen stille zoekopdracht.</p>'+
+      (log.length ? log.map(function(l){
+        return '<div class="rij"><div class="tx"><b>'+esc(l.zaak)+'</b>'+
+          (l.gelukt?'<span class="zegel">Naam gezien</span>':'<span class="zegel los">Geweigerd</span>')+
+          '<small>'+esc(String(l.at).replace('T',' ').slice(0,16))+'</small></div></div>';
+      }).join('') : '<div class="leeg">Nog niemand heeft gekeken.</div>')+'</div>');
+  }
+
+  /* ---- het beroepsregister ---- */
+  function tekenRegister(d){
+    var l = (d && d.leden) || [];
+    toon('<div class="kaart"><label for="zveld">Zoek in het beroepsregister</label>'+
+      '<input id="zveld" type="search" placeholder="Vak, vaardigheid of taal">'+
+      '<label for="zplaats">Plaats</label><input id="zplaats" placeholder="Alle plaatsen">'+
+      '<div class="knoppen"><button class="knop" id="bzoek" type="button">Zoeken</button>'+
+      '<button class="knop stil" id="bopenwerk" type="button">Alleen wie openstaat voor werk</button></div></div>'+
+      '<div class="kaart"><h2>'+(d?('Gevonden: '+l.length+' van '+d.totaal):'Leden')+'</h2>'+
+      (l.length ? l.map(function(m){
+        return '<div class="rij"><div class="tx"><b>'+esc(m.codenaam)+'</b>'+
+          (m.open?'<span class="zegel">Open voor werk</span>':'')+
+          (m.bewezen?'<span class="zegel">'+m.bewezen+' bevestigd</span>':'')+
+          '<small>'+esc(m.kop||'geen beroepskop')+(m.plaats?' · '+esc(m.plaats):'')+
+          ((m.vaardigheden||[]).length?' · '+esc(m.vaardigheden.join(', ')):'')+'</small></div>'+
+          '<button class="mini" data-lid="'+esc(m.codenaam)+'">bekijk</button></div>';
+      }).join('') : '<div class="leeg">Zoek op een vak, een vaardigheid of een plaats.</div>')+'</div>');
+  }
+
+  function tekenLid(p){
+    BEKEKEN = p;
+    var alle = (p.bewezen||[]).concat(p.rollen||[]);
+    toon('<div class="kaart"><h2>'+esc(p.codenaam)+'</h2>'+
+      '<small style="color:var(--soft);">'+esc(p.kop||'geen beroepskop')+(p.plaats?' · '+esc(p.plaats):'')+'</small>'+
+      (p.open?'<div style="margin-top:.4rem;"><span class="zegel">Open voor werk</span></div>':'')+
+      (p.over?'<p style="margin-top:.6rem;font-size:.88rem;line-height:1.55;color:var(--muted);">'+esc(p.over)+'</p>':'')+
+      '<div class="knoppen"><button class="knop stil" id="bterug" type="button">Terug naar het register</button></div></div>'+
+      '<div class="kaart"><h2>Werk</h2>'+(alle.length?alle.map(rolRij).join(''):'<div class="leeg">Niets opgegeven.</div>')+'</div>'+
+      '<div class="kaart"><h2>Vaardigheden</h2>'+
+      ((p.vaardigheden||[]).length?'<div class="chips">'+p.vaardigheden.map(function(v){
+        var o=(p.onderschreven||{})[v]||{aantal:0,ikDeed:false};
+        return '<button type="button" data-onder="'+esc(v)+'" aria-pressed="'+(o.ikDeed?'true':'false')+'">'+esc(v)+(o.aantal?' · '+o.aantal:'')+'</button>';
+      }).join('')+'</div>':'<div class="leeg">Niets opgegeven.</div>')+
+      '<p style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Onderschrijven kan alleen bij iemand met wie je verbonden bent, en alleen op een vaardigheid die er al staat.</p></div>'+
+      '<div class="kaart"><h2>Aanbevelingen</h2>'+
+      ((p.aanbevelingen||[]).length?p.aanbevelingen.map(function(a){
+        return '<div class="rij"><div class="tx"><b>'+esc(a.van)+'</b><small>'+esc(a.tekst)+'</small></div>'+
+          (a.vanMij?'<button class="mini" data-atrek="'+esc(a.id)+'">intrekken</button>':'')+'</div>';
+      }).join(''):'<div class="leeg">Nog geen aanbevelingen.</div>')+
+      '<label for="atekst">Schrijf een aanbeveling</label><textarea id="atekst" rows="3" maxlength="500" placeholder="Een paar zinnen over hoe het is om met deze persoon te werken."></textarea>'+
+      '<div class="knoppen"><button class="knop" id="baanbeveel" type="button">Plaatsen</button></div></div>');
+  }
+
+  /* ---- Rahul coacht ---- */
+  function tekenCoach(){
+    toon('<div class="kaart"><h2>Je profiel door de ogen van een werkgever</h2>'+
+      '<p style="color:var(--soft);font-size:.82rem;">Rahul zegt wat er ontbreekt. Hij vult niets voor je in.</p>'+
+      '<div class="knoppen"><button class="knop" id="bkritiek" type="button">Kijk mee</button></div>'+
+      '<div class="uit" id="ukritiek" hidden></div></div>'+
+      '<div class="kaart"><h2>Een brief bij een vacature</h2>'+
+      '<label for="cvac">De vacature</label><textarea id="cvac" rows="4" maxlength="800" placeholder="Plak de vacaturetekst of beschrijf hem kort."></textarea>'+
+      '<div class="knoppen"><button class="knop" id="bbrief" type="button">Schrijf een concept</button></div>'+
+      '<p style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Het concept komt hier te staan. Jij verstuurt hem zelf, en jij ondertekent.</p>'+
+      '<div class="uit" id="ubrief" hidden></div></div>'+
+      '<div class="kaart"><h2>Oefen het gesprek</h2>'+
+      '<label for="crol">Voor welke functie?</label><input id="crol" maxlength="120" placeholder="Restaurantmanager">'+
+      '<div class="knoppen"><button class="knop" id="boefen" type="button">Begin</button></div>'+
+      '<div class="uit" id="uoefen" hidden></div>'+
+      '<div id="oefenveld" hidden><label for="cantw">Je antwoord</label><textarea id="cantw" rows="3" maxlength="1200"></textarea>'+
+      '<div class="knoppen"><button class="knop stil" id="bantw" type="button">Antwoord geven</button></div></div>'+
+      '<p style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Er wordt niets van bewaard en niets van gedeeld. Dit is een oefenruimte.</p></div>');
+  }
+
+  var OEFEN = { rol:'', vraag:'' };
+
+  function laad(){
+    tekenTabs();
+    if (TAB === 'ik') { api('/metier/ik').then(function(d){ if(d.error) return toon('<div class="leeg">'+esc(d.error)+'</div>'); IK=d; tekenIk(d); }); return; }
+    if (TAB === 'naam') { api('/metier/naam-log').then(function(d){ if(d.error) return toon('<div class="leeg">'+esc(d.error)+'</div>'); tekenNaam(d); }); return; }
+    if (TAB === 'register') { tekenRegister(null); return; }
+    tekenCoach();
+  }
+
+  function zoekNu(alleenOpen){
+    api('/metier/zoek', { zoek: ($('#zveld')||{}).value||'', plaats: ($('#zplaats')||{}).value||'', open: !!alleenOpen })
+      .then(function(d){ if(d.error) return melding(d.error); tekenRegister(d); });
+  }
+
+  document.addEventListener('click', function(ev){
+    var el = ev.target.closest('[data-t]');
+    if (el) { TAB = el.getAttribute('data-t'); laad(); return; }
+    var id = ev.target.id;
+
+    if (id === 'bkaart') return api('/metier/kaart', { kop:$('#fkop').value, over:$('#fover').value, plaats:$('#fplaats').value })
+      .then(function(d){ melding(d.error||'Je kaart is bewaard.'); if(!d.error) laad(); });
+    if (id === 'bopen') { var aan = ev.target.getAttribute('aria-pressed') !== 'true';
+      return api('/metier/kaart', { open: aan }).then(function(d){ melding(d.error||(aan?'Je staat open voor werk.':'Staat weer uit.')); if(!d.error) laad(); }); }
+    if (id === 'brol') return api('/metier/rol', { wat:$('#rwat').value, waar:$('#rwaar').value, van:$('#rvan').value, tot:$('#rtot').value })
+      .then(function(d){ melding(d.error||'Rol toegevoegd, als zelf opgegeven.'); if(!d.error) laad(); });
+    if (id === 'blijst') {
+      var v = $('#fvaardig').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+      var t = $('#ftalen').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+      return api('/metier/lijst', { veld:'vaardigheden', waarden:v }).then(function(){
+        return api('/metier/lijst', { veld:'talen', waarden:t }); }).then(function(d){ melding(d.error||'Bewaard.'); laad(); });
+    }
+    if (id === 'bvrij') return api('/metier/naam-vrij', { code:$('#nzaak').value, waarvoor:$('#nwaarvoor').value })
+      .then(function(d){ melding(d.error||'Deze zaak kan je naam nu zien. Je kunt dat altijd intrekken.'); if(!d.error) laad(); });
+    if (id === 'bzoek') return zoekNu(false);
+    if (id === 'bopenwerk') return zoekNu(true);
+    if (id === 'bterug') { TAB='register'; return laad(); }
+    if (id === 'baanbeveel') return api('/metier/beveel-aan', { wie:BEKEKEN.codenaam, tekst:$('#atekst').value })
+      .then(function(d){ melding(d.error||'Je aanbeveling staat op zijn profiel.'); if(!d.error) opendLid(BEKEKEN.codenaam); });
+    if (id === 'bkritiek') return api('/metier/ai/profiel').then(function(d){
+      var u=$('#ukritiek'); u.hidden=false; u.textContent = d.kritiek || d.reden || 'Geen antwoord.'; });
+    if (id === 'bbrief') return api('/metier/ai/brief', { vacature:$('#cvac').value }).then(function(d){
+      var u=$('#ubrief'); u.hidden=false; u.textContent = d.brief || d.reden || 'Geen antwoord.'; });
+    if (id === 'boefen') { OEFEN.rol = $('#crol').value;
+      return api('/metier/ai/oefen', { rol:OEFEN.rol }).then(function(d){
+        var u=$('#uoefen'); u.hidden=false; u.textContent = d.vraag || d.reden || 'Geen antwoord.';
+        if (d.vraag) { OEFEN.vraag = d.vraag; $('#oefenveld').hidden = false; } }); }
+    if (id === 'bantw') return api('/metier/ai/oefen', { rol:OEFEN.rol, vraag:OEFEN.vraag, antwoord:$('#cantw').value })
+      .then(function(d){ var u=$('#uoefen'); u.hidden=false;
+        u.textContent = (d.feedback||d.reden||'') + (d.vraag ? '\n\n' + d.vraag : '');
+        if (d.vraag) OEFEN.vraag = d.vraag; $('#cantw').value=''; });
+
+    var w = ev.target.closest('[data-rolweg]');
+    if (w) return api('/metier/rol-weg', { id:w.getAttribute('data-rolweg') }).then(function(d){ melding(d.error||'Weg.'); laad(); });
+    var vb = ev.target.closest('[data-verberg]');
+    if (vb) { var nu = vb.textContent === 'verbergen';
+      return api('/metier/aanbeveling-verberg', { id:vb.getAttribute('data-verberg'), aan:nu }).then(function(d){ melding(d.error||'Aangepast.'); laad(); }); }
+    var it = ev.target.closest('[data-intrek]');
+    if (it) return api('/metier/naam-intrekken', { code:it.getAttribute('data-intrek') })
+      .then(function(d){ melding(d.error||'Ingetrokken. Er lag nergens een kopie, dus er is niets meer te lezen.'); laad(); });
+    var lid = ev.target.closest('[data-lid]');
+    if (lid) return opendLid(lid.getAttribute('data-lid'));
+    var on = ev.target.closest('[data-onder]');
+    if (on) { var aanZ = on.getAttribute('aria-pressed') !== 'true';
+      return api('/metier/onderschrijf', { wie:BEKEKEN.codenaam, vaardigheid:on.getAttribute('data-onder'), aan:aanZ })
+        .then(function(d){ if(d.error) return melding(d.error); opendLid(BEKEKEN.codenaam); }); }
+    var at = ev.target.closest('[data-atrek]');
+    if (at) return api('/metier/aanbeveling-intrekken', { wie:BEKEKEN.codenaam, id:at.getAttribute('data-atrek') })
+      .then(function(d){ melding(d.error||'Ingetrokken.'); opendLid(BEKEKEN.codenaam); });
+  });
+
+  function opendLid(codenaam){
+    api('/metier/lid', { wie:codenaam }).then(function(d){ if(d.error) return melding(d.error); tekenLid(d.profiel); });
+  }
+
+  $('#aiform').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var t = $('#aiin').value.trim();
+    if (!t) return;
+    $('#aiin').value = '';
+    melding('Rahul denkt mee…');
+    api('/chat/send', { text: t }).then(function(d){
+      melding(d.reply || d.error || 'Geen antwoord.');
+      laad();
+    }).catch(function(){ melding('Rahul is nu niet bereikbaar.'); });
+  });
+
+  if (!TOKEN) { toon('<div class="kaart"><h2>Meld je eerst aan</h2><p style="color:var(--muted);font-size:.88rem;">Métier hoort bij je RTG-account. Open het OS en meld je aan; daarna staat je beroepsprofiel hier.</p></div>'); tekenTabs(); }
+  else { $('#aibalk').hidden = false; laad(); }
+})();
+</script>
+</body>
+</html>

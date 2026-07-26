@@ -46,6 +46,7 @@ const PAGINAS = [
   '/apps/vonk.html',
   '/apps/berichten.html',
   '/apps/salon.html',
+  '/apps/metier.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

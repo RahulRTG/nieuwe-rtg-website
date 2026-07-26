@@ -63,6 +63,9 @@ module.exports = (kern) => {
   require('./member/berichtenapp')(kern);
   // De Salon als app: plaatsen, feed met paginering, profielen, reacties, AI
   require('./member/salonapp')(kern);
+  // Métier: het beroepsprofiel op codenaam, met de naam als sleutel die je per
+  // werkgever afgeeft en weer intrekt
+  require('./member/metier')(kern);
   // De wauw-laag: stemming, verjaardagsglans en De Terugblik
   require('./member/wauw')(kern);
   // De moedertaal van het account: iedereen praat en leest in de eigen taal

@@ -13,11 +13,23 @@ const fs = require('fs');
 const path = require('path');
 
 const BRON = path.join(__dirname, '..', 'public', 'apps', 'office', 'blad.js');
+/* Het rekenen zelf staat sinds deze ronde in gedeelde modules; het blad vraagt
+   ze alleen wat er in een cel komt te staan. Die modules laden we hier in
+   dezelfde nep-window, precies zoals de pagina dat doet. */
+const DEEL = ['rekenlezer', 'rekenfuncties', 'rekenfuncties2', 'rekenfuncties3', 'rekenmotor']
+  .map(n => path.join(__dirname, '..', 'public', 'shared', n + '.js'));
 
 function maakBlad(inhoud) {
   const zaal = {};
   global.window = zaal;
+  global.self = zaal;
   global.document = { querySelector() { return null; }, addEventListener() {} };
+  for (const p of DEEL) { delete require.cache[require.resolve(p)]; }
+  const M = require(DEEL[4]);
+  const F = require(DEEL[1]);
+  zaal.RTGRekenlezer = require(DEEL[0]);
+  zaal.RTGRekenfuncties = F;
+  zaal.RTGRekenmotor = M;
   delete require.cache[require.resolve(BRON)];
   require(BRON);
   const stuk = () => ({ textContent: '', value: '', disabled: false,
@@ -48,7 +60,10 @@ test('2. rekenkunde, voorrang en haakjes', () => {
   const b = maakBlad({ cellen: {
     A1: '=2+3*4', A2: '=(2+3)*4', A3: '=10/4', A4: '=-3+1', A5: '=2*(3+(4-1))'
   }, opmaak: {}, rijen: 5, kolommen: 1 });
-  assert.deepEqual(kolomA(b), ['14', '20', '2.5', '-2', '12']);
+  // Een uitkomst wordt getoond zoals men hier schrijft: met een komma. Wat u
+  // zelf INTYPT blijft staan zoals u het typte; alleen wat de motor uitrekent
+  // krijgt de Nederlandse schrijfwijze.
+  assert.deepEqual(kolomA(b), ['14', '20', '2,5', '-2', '12']);
 });
 
 test('3. celverwijzingen en de bereikfuncties', () => {
@@ -66,7 +81,7 @@ test('4. AFRONDEN en ALS, met tekst die zijn hoofdletters houdt', () => {
     A1: '=AFRONDEN(10/3;2)', A2: '=ALS(5>3;"Boven";"Onder")', A3: '=ALS(5<3;"Boven";"Onder")',
     A4: '=ALS(2=2;10;20)'
   }, opmaak: {}, rijen: 4, kolommen: 1 });
-  assert.deepEqual(kolomA(b), ['3.33', 'Boven', 'Onder', '10']);
+  assert.deepEqual(kolomA(b), ['3,33', 'Boven', 'Onder', '10']);
 });
 
 test('5. de motor houdt zich staande bij onzin', () => {
@@ -74,15 +89,15 @@ test('5. de motor houdt zich staande bij onzin', () => {
     A1: '=1/0', A2: '=alert(1)', A3: '=)(', A4: '=A4', A5: '=SOM(B1:B2'
   }, opmaak: {}, rijen: 5, kolommen: 1 });
   const uit = kolomA(b);
-  assert.equal(uit[0], '#DEEL/0', 'delen door nul heeft een eigen melding');
-  assert.equal(uit[1], '#FOUT', 'een functieaanroep is gewoon fout, geen code');
-  assert.equal(uit[2], '#FOUT');
-  assert.equal(uit[3], '#LUS', 'een cel die naar zichzelf wijst loopt niet vast');
-  assert.equal(uit[4], '#FOUT', 'een half getypte formule is gewoon fout');
+  assert.equal(uit[0], '#DEEL/0!', 'delen door nul heeft een eigen melding');
+  assert.equal(uit[1], '#NAAM?', 'alert() is geen functie die bestaat -- en wordt dus ook niet uitgevoerd');
+  assert.equal(uit[2], '#WAARDE!');
+  assert.equal(uit[3], '#LUS!', 'een cel die naar zichzelf wijst loopt niet vast');
+  assert.equal(uit[4], '#WAARDE!', 'een half getypte formule is gewoon fout');
 
   // en een fout reist mee omhoog: een som over een kapotte cel liegt niet
   const c = maakBlad({ cellen: { A1: '=1/0', A2: '=SOM(A1:A1)' }, opmaak: {}, rijen: 2, kolommen: 1 });
-  assert.equal(kolomA(c)[1], '#DEEL/0', 'de melding komt uit de cel eronder mee');
+  assert.equal(kolomA(c)[1], '#DEEL/0!', 'de melding komt uit de cel eronder mee');
 });
 
 test('6. de opmaak maakt van een uitkomst een leesbaar bedrag', () => {

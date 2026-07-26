@@ -6,7 +6,7 @@
           if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); zetCel(td.dataset.ref, ''); return; }
           var m = /^([A-Z]+)([0-9]+)$/.exec(td.dataset.ref);
           if (!m) return;
-          var k = m[1].charCodeAt(0) - 65, r = +m[2], stap = null;
+          var k = MOTOR.kolIndex(m[1]), r = +m[2], stap = null;
           if (e.key === 'ArrowRight') stap = [k + 1, r]; else if (e.key === 'ArrowLeft') stap = [k - 1, r];
           else if (e.key === 'ArrowDown') stap = [k, r + 1]; else if (e.key === 'ArrowUp') stap = [k, r - 1];
           if (!stap) return;
@@ -41,10 +41,9 @@
       if (!m || !voet) return;
       var getallen = [];
       for (var r = 1; r <= data.rijen; r++) {
-        var ref = m[1] + r, rauw = data.cellen[ref];
-        if (rauw == null || rauw === '') continue;
-        var v = String(rauw).charAt(0) === '=' ? parseFloat(bereken(rauw)) : parseFloat(String(rauw).replace(/\./g, '').replace(',', '.'));
-        if (!isNaN(v)) getallen.push(v);
+        var uit = ruweUitkomst(m[1] + r);
+        if (uit === '' || MOTOR.isFout(uit) || !MOTOR.isGetallig(uit)) continue;
+        getallen.push(MOTOR.getalVan(uit));
       }
       var som = getallen.reduce(function (n, x) { return n + x; }, 0);
       var rond = function (x) { return (Math.round(x * 100) / 100).toString().replace('.', ','); };
@@ -72,8 +71,10 @@
       Array.prototype.forEach.call(host.querySelectorAll('[data-groei]'), function (b) {
         b.addEventListener('click', function () {
           if (!magBewerken) return;
-          if (b.dataset.groei === 'rij') data.rijen = Math.min(200, data.rijen + 5);
-          else data.kolommen = Math.min(26, data.kolommen + 1);
+          // De kolommen lopen door na Z (AA, AB, ...), dus die grens hoeft niet
+          // meer bij 26 te liggen.
+          if (b.dataset.groei === 'rij') data.rijen = Math.min(500, data.rijen + 5);
+          else data.kolommen = Math.min(60, data.kolommen + 1);
           onWijzig(); teken();
         });
       });

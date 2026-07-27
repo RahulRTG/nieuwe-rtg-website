@@ -1,10 +1,11 @@
 /* RTFoundation-gezin (deelmodule): het Ochtendritme -- een persoonlijk
    ochtend-lijstje (tanden poetsen, aankleden, ontbijt, tas inpakken...) dat elke
-   ochtend weer op nul staat. Wie alles afvinkt houdt een rustige reeks bij: geen
-   druk, geen tellertjes die je opjagen, gewoon een schouderklopje voor een goed
-   begonnen dag. Gedeeld per gezin (s.g), dicht voor gasten. Een kind beheert zijn
-   eigen ritme; een ouder mag het ritme van een kind mee klaarzetten.
-   Gemount vanuit foundation/gasten.js op de gedeelde context. */
+   ochtend weer op nul staat. Bewust GEEN reeks en geen record: een ketting die
+   je kunt breken is druk, en druk hoort niet bij een kinderochtend. We tellen
+   alleen zacht hoeveel ochtenden er deze week rond waren; een gemiste dag
+   maakt niets stuk. Gedeeld per gezin (s.g), dicht voor gasten. Een kind
+   beheert zijn eigen ritme; een ouder mag het ritme van een kind mee
+   klaarzetten. Gemount vanuit foundation/gasten.js op de gedeelde context. */
 module.exports = (ctx) => {
   const { router, nu, save, rid, schoon, familieVan } = ctx;
 
@@ -15,7 +16,6 @@ module.exports = (ctx) => {
     'Even bewegen', 'Agenda checken', 'Ochtendgroet aan het gezin'
   ];
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
-  const gisterenStr = () => new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
   function bak(g) {
     if (!g.ochtend || typeof g.ochtend !== 'object') g.ochtend = {};
@@ -24,11 +24,17 @@ module.exports = (ctx) => {
   // haal (of maak) het ritme-object voor een profiel, met de dag-reset ingebouwd
   function persoon(g, pid) {
     const o = bak(g);
-    if (!o[pid] || typeof o[pid] !== 'object') o[pid] = { stappen: [], dag: '', done: [], reeks: 0, laatste: '', record: 0 };
+    if (!o[pid] || typeof o[pid] !== 'object') o[pid] = { stappen: [], dag: '', done: [], rond: [] };
     const p = o[pid];
     if (!Array.isArray(p.stappen)) p.stappen = [];
+    if (!Array.isArray(p.rond)) p.rond = p.laatste ? [p.laatste] : [];   // oude reeks-data zacht meenemen
     if (p.dag !== vandaagStr()) { p.dag = vandaagStr(); p.done = []; }   // nieuwe ochtend: schoon lijstje
     return p;
+  }
+  // hoeveel ochtenden waren de laatste zeven dagen rond -- meer houden we niet bij
+  function week(p) {
+    const grens = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
+    return p.rond.filter(d => d >= grens).length;
   }
   const naamVan = (g, pid) => (pid && g.profielen[pid] ? g.profielen[pid].naam : '');
   const isGastPid = (g, pid) => !!(g.profielen[pid] && g.profielen[pid].rol === 'gast');
@@ -72,17 +78,16 @@ module.exports = (ctx) => {
     const had = p.done.includes(stap.id);
     if (aan && !had) p.done.push(stap.id);
     if (!aan && had) p.done = p.done.filter(id => id !== stap.id);
-    // reeks: net alles af vandaag, en nog niet eerder vandaag geteld -> reeks bij
+    // net alles af vandaag, en vandaag nog niet geteld -> vandaag telt mee ("af is af")
     const allesAf = p.stappen.length > 0 && p.stappen.every(x => p.done.includes(x.id));
     let netKlaar = false;
-    if (allesAf && p.laatste !== vandaagStr()) {
-      p.reeks = (p.laatste === gisterenStr()) ? (p.reeks || 0) + 1 : 1;
-      p.laatste = vandaagStr();
-      p.record = Math.max(p.record || 0, p.reeks);
+    if (allesAf && !p.rond.includes(vandaagStr())) {
+      p.rond.push(vandaagStr());
+      if (p.rond.length > 30) p.rond = p.rond.slice(-30);
       netKlaar = true;
     }
     save();
-    res.json({ ok: true, klaar: allesAf, netKlaar, reeks: p.reeks || 0 });
+    res.json({ ok: true, klaar: allesAf, netKlaar, week: week(p) });
   });
 
   /* ---------- het overzicht: mijn ritme van vandaag + het gezinsbord ---------- */
@@ -90,7 +95,8 @@ module.exports = (ctx) => {
     const s = familieVan(req, res); if (!s) return;
     const mij = persoon(s.g, s.p.id);
     const klaarVandaag = p => p.stappen.length > 0 && p.stappen.every(x => p.done.includes(x.id));
-    // het gezinsbord: elk niet-gast-lid, of het vandaag al rond is en de reeks
+    // het gezinsbord: elk niet-gast-lid en of het vandaag al rond is. Op naam
+    // gesorteerd -- het is een bord om elkaar te zien, geen ranglijst.
     const bord = Object.entries(s.g.profielen)
       .filter(([, pr]) => pr.rol !== 'gast')
       .map(([id, pr]) => {
@@ -98,13 +104,13 @@ module.exports = (ctx) => {
         return { pid: id, naam: pr.naam, avatar: pr.avatar, kleur: pr.kleur,
           heeftRitme: p.stappen.length > 0, klaar: klaarVandaag(p),
           gedaan: p.done.filter(d => p.stappen.some(x => x.id === d)).length,
-          totaal: p.stappen.length, reeks: p.reeks || 0 };
+          totaal: p.stappen.length, week: week(p) };
       })
-      .sort((a, b) => (b.reeks - a.reeks) || a.naam.localeCompare(b.naam));
+      .sort((a, b) => a.naam.localeCompare(b.naam));
     res.json({
       mijn: {
         stappen: mij.stappen.map(x => ({ id: x.id, tekst: x.tekst, af: mij.done.includes(x.id) })),
-        klaar: klaarVandaag(mij), reeks: mij.reeks || 0, record: mij.record || 0
+        klaar: klaarVandaag(mij), week: week(mij)
       },
       voorbeelden: VOORBEELDEN,
       bord,

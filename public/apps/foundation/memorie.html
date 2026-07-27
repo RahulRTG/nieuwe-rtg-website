@@ -37,7 +37,7 @@
 <div id="balk"></div>
 <div class="wrap" role="main">
   <h1>Memorie</h1>
-  <div class="intro">Draai twee kaartjes om. Zijn ze hetzelfde, dan blijven ze open liggen. Zoek alle paren. Er is geen klok en geen tegenstander: je speelt zo lang je wilt.</div>
+  <div class="intro">Draai twee kaartjes om. Zijn ze hetzelfde, dan blijven ze open liggen. Zoek alle paren. Er is geen klok: je speelt zo lang je wilt, alleen of samen om de beurt.</div>
 
   <div class="kaart blok">
     <div class="toon" id="maat" role="group" aria-label="Hoeveel paren">
@@ -45,6 +45,11 @@
       <button type="button" data-p="6">6 paren</button>
       <button type="button" data-p="8">8 paren</button>
     </div>
+    <div class="toon" id="samen" role="group" aria-label="Alleen of samen">
+      <button type="button" data-s="1" class="aan">Alleen</button>
+      <button type="button" data-s="2">Samen om de beurt</button>
+    </div>
+    <div class="melding" id="beurt" style="margin:0 0 .7rem;min-height:0;"></div>
     <div class="bord" id="bord"></div>
     <div class="melding" id="melding" aria-live="polite"></div>
     <div class="onderrij"><button class="knop grijs" id="opnieuw" type="button">Nieuw spel</button></div>
@@ -53,7 +58,7 @@
 
   <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-speler</h2>
-    <p class="ouder">Begin bij drie paren en ga pas omhoog als dat makkelijk gaat. Benoem hardop wat er op het kaartje staat ("een vis, en daar nog een vis") - zo oefent het kind woorden en geheugen tegelijk. Er wordt niets bijgehouden buiten dit ene spel; sluit je de app, dan is de stand weg.</p>
+    <p class="ouder">Begin bij drie paren en ga pas omhoog als dat makkelijk gaat. Benoem hardop wat er op het kaartje staat ("een vis, en daar nog een vis") - zo oefent het kind woorden en geheugen tegelijk. Bij Samen om de beurt speel je met z'n tweeen op een scherm; er wordt bewust niet geteld wie de meeste paren vond, want samen het bord leeg spelen is het feest. Er wordt niets bijgehouden buiten dit ene spel; sluit je de app, dan is de stand weg.</p>
   </div>
 </div>
 
@@ -75,17 +80,23 @@ const BEELD = [
 ];
 const RUG = '<svg viewBox="0 0 64 64" class="rug" aria-hidden="true"><circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="currentColor"/></svg>';
 
-let paren = 3, kaartjes = [], open = [], bezig = false, gevonden = 0, spellen = 0;
+let paren = 3, spelers = 1, beurt = 1, kaartjes = [], open = [], bezig = false, gevonden = 0, spellen = 0;
 
 function nieuwSpel() {
   const set = BEELD.slice(0, paren);
   kaartjes = set.concat(set).map((b, i) => ({ sleutel: b[0], svg: b[1], id: i, op: false, uit: false }))
     .sort(() => Math.random() - 0.5);
-  open = []; bezig = false; gevonden = 0;
+  open = []; bezig = false; gevonden = 0; beurt = 1;
   $('#melding').textContent = '';
   $('#bord').style.gridTemplateColumns = 'repeat(' + (paren <= 3 ? 3 : 4) + ',1fr)';
+  toonBeurt();
   teken();
   tekenStand();
+}
+
+// samen spelen: alleen laten zien wie er mag -- er wordt niets per speler geteld
+function toonBeurt() {
+  $('#beurt').textContent = spelers === 2 && gevonden < paren ? 'Nu mag speler ' + beurt : '';
 }
 
 function teken() {
@@ -119,12 +130,13 @@ function draai(k) {
     a.op = b.op = false;
     open = [];
     gevonden++;
-    $('#melding').textContent = 'Een paar gevonden.';
+    $('#melding').textContent = spelers === 2 ? 'Een paar gevonden. Je mag nog een keer.' : 'Een paar gevonden.';
     teken();
     try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) {}
     if (gevonden === paren) {
       spellen++;
-      $('#melding').textContent = 'Alle paren gevonden. Wat een geheugen.';
+      $('#melding').textContent = spelers === 2 ? 'Samen alle paren gevonden. Goed gedaan, allebei.' : 'Alle paren gevonden. Wat een geheugen.';
+      toonBeurt();
       tekenStand();
     }
     return;
@@ -134,6 +146,7 @@ function draai(k) {
   setTimeout(() => {
     a.op = b.op = false;
     open = []; bezig = false;
+    if (spelers === 2) { beurt = beurt === 1 ? 2 : 1; toonBeurt(); }
     $('#melding').textContent = '';
     teken();
   }, 1100);
@@ -144,6 +157,11 @@ function tekenStand() { $('#stand').textContent = spellen ? 'Je hebt vandaag ' +
 $('#maat').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
   paren = Number(b.dataset.p);
   $('#maat').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
+  nieuwSpel();
+}));
+$('#samen').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  spelers = Number(b.dataset.s);
+  $('#samen').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
   nieuwSpel();
 }));
 $('#opnieuw').addEventListener('click', nieuwSpel);

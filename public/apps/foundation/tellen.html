@@ -32,6 +32,12 @@
   .onderrij{display:flex;gap:.6rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:.9rem;}
   .stand{color:var(--zacht);font-size:.85rem;text-align:center;margin-top:.6rem;}
   .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+  .toon{display:flex;gap:.5rem;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap;}
+  .toon button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
+    padding:.4rem .9rem;font-size:.85rem;cursor:pointer;}
+  .toon button.aan{border-color:var(--goud);color:var(--goud2);}
+  .ding.gepakt{color:var(--goud2);}
+  .ding.gepakt svg{filter:drop-shadow(0 0 6px rgba(201,162,75,.55));}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
@@ -39,15 +45,20 @@
 <div id="balk"></div>
 <div class="wrap" role="main">
   <h1>Tellen tot tien</h1>
-  <div class="intro">Tik de dingen een voor een aan en tel hardop mee; bij elk ding komt een cijfer te staan. Weet je hoeveel het er zijn? Kies dan het goede getal.</div>
+  <div class="intro">Twee spelletjes in een: bij Tellen tik je de dingen aan en kies je het goede getal; bij Pakken krijg je een getal en pak je er precies zoveel. Samen zijn dat de twee kanten van tellen.</div>
 
   <div class="kaart blok">
+    <div class="toon" id="spelvorm" role="group" aria-label="Welk spel">
+      <button type="button" data-m="tel" class="aan">Tellen</button>
+      <button type="button" data-m="pak">Pakken</button>
+    </div>
     <div class="veld-groot" id="veld" aria-live="polite"></div>
     <div class="vraag" id="vraag">Hoeveel zie je er?</div>
     <div class="keuzes" id="keuzes"></div>
     <div class="melding" id="melding"></div>
     <div class="onderrij">
       <button class="knop grijs" id="opnieuw" type="button">Nog een keer</button>
+      <button class="knop" id="pakKlaar" type="button" hidden>Klaar met pakken</button>
       <button class="knop" id="volgend" type="button" hidden>Verder</button>
     </div>
     <div class="stand" id="stand"></div>
@@ -55,7 +66,7 @@
 
   <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-teller</h2>
-    <p class="ouder">Tel samen hardop en wijs elk ding aan; dat is precies wat een kleuter nodig heeft om getallen aan hoeveelheden te koppelen. Fout kiezen kan geen kwaad: het spel telt niets af en gaat gewoon rustig verder. Er zit geen tijd op, geen geluid en geen beloningssysteem in.</p>
+    <p class="ouder">Tel samen hardop en wijs elk ding aan; dat is precies wat een kleuter nodig heeft om getallen aan hoeveelheden te koppelen. Het Pakken-spel oefent de andere kant op: van het getal naar de hoeveelheid ("pak er drie"), en terugleggen is gewoon nog eens tikken -- niets is fout. Er zit geen tijd op, geen geluid en geen beloningssysteem in.</p>
   </div>
 </div>
 
@@ -77,41 +88,62 @@ const NAAM = { appel: 'appels', ster: 'sterren', hart: 'hartjes', bal: 'ballen',
 const SOORTEN = Object.keys(FIG);
 const WOORD = ['nul', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht', 'negen', 'tien'];
 
-let ronde = null, goed = 0, gedaan = 0;
+let spelvorm = 'tel', ronde = null, goed = 0, gedaan = 0;
 const dobbel = n => Math.floor(Math.random() * n);
 
 function nieuweRonde() {
   const soort = SOORTEN[dobbel(SOORTEN.length)];
-  const aantal = 1 + dobbel(10);
-  ronde = { soort, aantal, geteld: 0, klaar: false };
-  $('#vraag').textContent = 'Hoeveel ' + NAAM[soort] + ' zie je?';
+  if (spelvorm === 'pak') {
+    // andersom denken: het getal komt eerst, de hoeveelheid maak je zelf
+    const doel = 1 + dobbel(6);
+    const totaal = Math.min(10, doel + 2 + dobbel(3));
+    ronde = { soort, aantal: doel, totaal, geteld: 0, klaar: false };
+    $('#vraag').textContent = 'Pak er precies ' + WOORD[doel] + ' (' + doel + ')';
+  } else {
+    const aantal = 1 + dobbel(10);
+    ronde = { soort, aantal, totaal: aantal, geteld: 0, klaar: false };
+    $('#vraag').textContent = 'Hoeveel ' + NAAM[soort] + ' zie je?';
+  }
   $('#melding').textContent = '';
   $('#volgend').hidden = true;
+  $('#pakKlaar').hidden = spelvorm !== 'pak';
+  $('#keuzes').innerHTML = '';
   tekenVeld();
-  tekenKeuzes();
+  if (spelvorm === 'tel') tekenKeuzes();
   tekenStand();
 }
 
 function tekenVeld() {
   const veld = $('#veld');
   veld.innerHTML = '';
-  for (let i = 0; i < ronde.aantal; i++) {
+  for (let i = 0; i < ronde.totaal; i++) {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'ding';
     b.setAttribute('aria-label', NAAM[ronde.soort].replace(/s$/, '') + ' ' + (i + 1));
     b.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true">' + FIG[ronde.soort] + '</svg>';
-    b.addEventListener('click', () => {
-      if (b.classList.contains('geteld')) return;
-      b.classList.add('geteld');
-      ronde.geteld++;
-      const nr = document.createElement('span');
-      nr.className = 'nr';
-      nr.textContent = ronde.geteld;
-      b.appendChild(nr);
-    });
+    b.addEventListener('click', () => (spelvorm === 'pak' ? pak(b) : tel(b)));
     veld.appendChild(b);
   }
+}
+
+// tel-spel: elk ding krijgt bij het aantikken zijn eigen cijfer
+function tel(b) {
+  if (b.classList.contains('geteld')) return;
+  b.classList.add('geteld');
+  ronde.geteld++;
+  const nr = document.createElement('span');
+  nr.className = 'nr';
+  nr.textContent = ronde.geteld;
+  b.appendChild(nr);
+}
+
+// pak-spel: aantikken pakt, nog eens tikken legt terug -- niets is fout
+function pak(b) {
+  if (ronde.klaar) return;
+  b.classList.toggle('gepakt');
+  const n = $('#veld').querySelectorAll('.gepakt').length;
+  $('#melding').textContent = n === 0 ? '' : 'Je hebt er nu ' + WOORD[n] + '.';
 }
 
 function tekenKeuzes() {
@@ -150,6 +182,31 @@ function kies(n, knop) {
   tekenStand();
   try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) {}
 }
+
+// pak-spel nakijken: precies goed is feest, anders rustig verder proberen
+$('#pakKlaar').addEventListener('click', () => {
+  if (ronde.klaar || spelvorm !== 'pak') return;
+  const n = $('#veld').querySelectorAll('.gepakt').length;
+  if (n === ronde.aantal) {
+    ronde.klaar = true;
+    goed++; gedaan++;
+    $('#melding').textContent = 'Ja! Precies ' + WOORD[n] + '. Knap gepakt.';
+    $('#pakKlaar').hidden = true;
+    $('#volgend').hidden = false;
+    tekenStand();
+    try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) {}
+  } else if (n < ronde.aantal) {
+    $('#melding').textContent = 'Je hebt er nu ' + WOORD[n] + '. Pak er nog een paar bij.';
+  } else {
+    $('#melding').textContent = 'Je hebt er nu ' + WOORD[n] + '. Leg er een paar terug (tik ze nog eens aan).';
+  }
+});
+
+$('#spelvorm').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  spelvorm = b.dataset.m;
+  $('#spelvorm').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
+  nieuweRonde();
+}));
 
 function tekenStand() {
   $('#stand').textContent = gedaan ? 'Je hebt er vandaag ' + goed + ' goed geteld.' : '';

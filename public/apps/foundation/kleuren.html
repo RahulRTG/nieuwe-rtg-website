@@ -38,13 +38,14 @@
 <div id="balk"></div>
 <div class="wrap" role="main">
   <h1>Kleuren en vormen</h1>
-  <div class="intro">Er staat steeds iets gevraagd, bijvoorbeeld: zoek de rode cirkel. Tik het goede vak aan. Kies hieronder of je op kleur, op vorm of op allebei speelt.</div>
+  <div class="intro">Er staat steeds iets gevraagd, bijvoorbeeld: zoek de rode cirkel. Tik het goede vak aan. Kies hieronder of je op kleur, op vorm of op allebei speelt -- of speel Welke is anders?</div>
 
   <div class="kaart blok">
     <div class="toon" id="modus" role="group" aria-label="Waarop speel je">
       <button type="button" data-m="kleur">Kleur</button>
       <button type="button" data-m="vorm">Vorm</button>
       <button type="button" data-m="beide" class="aan">Allebei</button>
+      <button type="button" data-m="anders">Welke is anders?</button>
     </div>
     <div class="opdracht" id="opdracht" aria-live="polite"></div>
     <div class="rooster" id="rooster"></div>
@@ -58,7 +59,7 @@
 
   <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-kijker</h2>
-    <p class="ouder">Zeg de opdracht hardop mee en laat het kind eerst aanwijzen, dan pas tikken. Zit er een misser bij, dan blijft die keuze gewoon staan en mag het kind opnieuw kiezen; er wordt niets afgeteld. Speel eerst een tijdje alleen op kleur, daarna alleen op vorm, en pas als dat vlot gaat op allebei tegelijk.</p>
+    <p class="ouder">Zeg de opdracht hardop mee en laat het kind eerst aanwijzen, dan pas tikken. Zit er een misser bij, dan blijft die keuze gewoon staan en mag het kind opnieuw kiezen; er wordt niets afgeteld. Speel eerst een tijdje alleen op kleur, daarna alleen op vorm, en pas als dat vlot gaat op allebei tegelijk. Welke is anders? is de volgende stap: goed kijken en vergelijken, zonder dat er een woord aan te pas komt.</p>
   </div>
 </div>
 
@@ -90,6 +91,7 @@ const dobbel = n => Math.floor(Math.random() * n);
 const trek = lijst => lijst[dobbel(lijst.length)];
 
 function nieuweRonde() {
+  if (modus === 'anders') return nieuweAnders();
   const kleur = trek(KLEUREN), vorm = trek(VORMEN);
   const opties = [{ kleur, vorm }];
   // drie afleiders die op minstens een punt afwijken van het antwoord
@@ -112,12 +114,30 @@ function nieuweRonde() {
 }
 
 function omschrijving() {
+  if (modus === 'anders') return 'die ene die anders is';
   if (modus === 'kleur') return 'iets dat ' + ronde.kleur.basis + ' is';
   if (modus === 'vorm') return 'de ' + ronde.vorm.naam;
   return 'de ' + ronde.kleur.naam + ' ' + ronde.vorm.naam;
 }
 
+// Welke is anders: drie dezelfde en een die net afwijkt, in kleur of in vorm
+function nieuweAnders() {
+  const kleur = trek(KLEUREN), vorm = trek(VORMEN);
+  const opKleur = Math.random() < 0.5;
+  let ander;
+  do { ander = opKleur ? { kleur: trek(KLEUREN), vorm } : { kleur, vorm: trek(VORMEN) }; }
+  while (ander.kleur.id === kleur.id && ander.vorm.id === vorm.id);
+  const opties = [{ kleur, vorm }, { kleur, vorm }, { kleur, vorm }, Object.assign({ anders: true }, ander)];
+  ronde = { kleur: ander.kleur, vorm: ander.vorm, opties: opties.sort(() => Math.random() - 0.5), klaar: false };
+  $('#opdracht').textContent = 'Welke is anders dan de rest?';
+  $('#melding').textContent = '';
+  $('#volgend').hidden = true;
+  tekenRooster();
+  tekenStand();
+}
+
 function past(o) {
+  if (modus === 'anders') return !!o.anders;
   if (modus === 'kleur') return o.kleur.id === ronde.kleur.id;
   if (modus === 'vorm') return o.vorm.id === ronde.vorm.id;
   return o.kleur.id === ronde.kleur.id && o.vorm.id === ronde.vorm.id;

@@ -1594,3 +1594,45 @@ met lege handen laten staan.
 Test: rtfhulpwijzer.e2e.js door het scherm (privacyregel, Meike via de
 coach-laag met het demo-antwoord, en veilig.html met kruislinks maar
 zonder chat).
+
+## RTF-golf 7: de speelhoek voor de kleintjes
+
+Zes apps voor de jongste gezinsleden, verdiept zonder ooit aan de
+huisregel te tornen: geen klok, geen score-druk, geen beloningsmachine.
+
+**tellen.html: twee kanten van tellen.** Naast het bestaande tel-spel
+(hoeveelheid -> getal) is er nu Pakken: het getal komt eerst en het kind
+pakt er precies zoveel ("pak er drie"). Terugleggen is gewoon nog eens
+tikken -- niets is fout, de melding telt alleen zacht mee in woorden.
+
+**kleuren.html: Welke is anders?** De vierde speelvorm: drie dezelfde en
+een afwijker (in kleur of in vorm). Goed kijken en vergelijken, zonder
+dat er een woord aan te pas komt -- de volgende stap na kleur/vorm/beide.
+
+**memorie.html: samen om de beurt.** Twee spelers op een scherm, met
+alleen een beurtaanwijzer. Er wordt bewust niet geteld wie de meeste
+paren vond: samen het bord leeg spelen is het feest, en bij een paar mag
+je nog een keer (de klassieke regel, zonder de wedstrijd eromheen).
+
+**verhaaltje.html: de napraatvraag.** Elk verhaal eindigt op de laatste
+bladzijde met een vraag om samen door te praten ("Wat doe jij als je
+niet kunt slapen?"). Het boekje gaat dicht, het gesprek gaat open.
+
+**liedjes.html: vier klassiekers erbij.** Berend Botje, Schuitje varen,
+Altijd is Kortjakje ziek en Suja suja kindje -- allemaal traditioneel en
+vrij van rechten, met bij elk liedje iets om met de handen te doen.
+
+**ochtend.html: de reeks is weg, bewust.** Het ochtendritme hield een
+streak met record bij en sorteerde het gezinsbord erop -- precies het
+patroon dat de RTF-regels verbieden (een ketting die je kunt breken is
+druk). Vervangen door een zachte weektelling (hoeveel ochtenden waren de
+laatste zeven dagen rond, meer bewaren we niet), het bord staat nu op
+naam ("een bord om elkaar te zien, geen ranglijst") en de intro belooft
+het hardop: een gemiste dag maakt niets stuk. Server, pagina en tests
+(ochtend.test.js) zijn samen omgezet; oude reeks-data wordt zacht
+meegenomen.
+
+Tests: ochtend.test.js (4, herschreven op de weektelling; asserteert ook
+dat reeks en record echt weg zijn en het bord geen ranglijst is) en
+rtfspeelhoek.e2e.js door het scherm (pakken, de afwijker, samen memorie,
+de napraatvraag).

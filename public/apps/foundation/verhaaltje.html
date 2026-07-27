@@ -44,6 +44,7 @@
   <div class="kaart blok" id="leesblok" hidden>
     <div class="plaat" id="plaat"></div>
     <div class="tekst" id="tekst" aria-live="polite"></div>
+    <div class="doen" id="napraat" hidden style="background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.9rem 1rem;margin-bottom:1rem;color:var(--zacht);font-size:.88rem;line-height:1.55;"></div>
     <div class="onderrij">
       <button class="knop grijs klein" id="terug" type="button">Vorige</button>
       <div class="paginaatje" id="paginaatje"></div>
@@ -56,7 +57,7 @@
 
   <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de voorlezer</h2>
-    <p class="ouder">Lees rustig en laat stiltes vallen; een kleuter heeft tijd nodig om het plaatje te bekijken. Stel bij elke bladzijde een vraag: wat zie jij hier? wat zou er nu gebeuren? Alle verhaaltjes zijn voor deze app geschreven, lopen goed af en bevatten niets engs. Er is geen geluid en geen automatische pagina-omslag: het kind bepaalt het tempo.</p>
+    <p class="ouder">Lees rustig en laat stiltes vallen; een kleuter heeft tijd nodig om het plaatje te bekijken. Stel bij elke bladzijde een vraag: wat zie jij hier? wat zou er nu gebeuren? Op de laatste bladzijde staat een napraatvraag: het boekje gaat dicht, het gesprek gaat open. Alle verhaaltjes zijn voor deze app geschreven, lopen goed af en bevatten niets engs. Er is geen geluid en geen automatische pagina-omslag: het kind bepaalt het tempo.</p>
   </div>
 </div>
 
@@ -80,6 +81,7 @@ const P = {
 const VERHALEN = [
   {
     id: 'muis',
+    vraag: 'Wat doe jij als je niet kunt slapen? Zullen we het sterren-ademen van uil samen proberen?',
     titel: 'De muis die niet kon slapen',
     sub: 'zeven bladzijden, over rustig worden',
     plaat: 'maan',
@@ -95,6 +97,7 @@ const VERHALEN = [
   },
   {
     id: 'druppel',
+    vraag: 'Waar zou jij weleens naartoe willen stromen? En wie neem je mee?',
     titel: 'De druppel die de zee zocht',
     sub: 'zes bladzijden, over onderweg zijn',
     plaat: 'water',
@@ -109,6 +112,7 @@ const VERHALEN = [
   },
   {
     id: 'beer',
+    vraag: 'Wanneer heb jij weleens iets gedeeld? Hoe voelde dat vanbinnen?',
     titel: 'Beer deelt zijn appel',
     sub: 'zes bladzijden, over samen delen',
     plaat: 'boom',
@@ -123,6 +127,7 @@ const VERHALEN = [
   },
   {
     id: 'kat',
+    vraag: 'Wat zou jij bovenop de heuvel willen zien? En wat is fijn aan thuiskomen?',
     titel: 'Poes Miel gaat op reis',
     sub: 'zeven bladzijden, over durven en thuiskomen',
     plaat: 'kat',
@@ -138,6 +143,7 @@ const VERHALEN = [
   },
   {
     id: 'lantaarn',
+    vraag: 'Waar ben jij weleens een beetje bang voor? Wat zou de maan tegen jou zeggen?',
     titel: 'De lantaarn die bang was voor het donker',
     sub: 'zes bladzijden, over jezelf durven zijn',
     plaat: 'ster',
@@ -152,6 +158,7 @@ const VERHALEN = [
   },
   {
     id: 'zaadje',
+    vraag: 'Wat wil jij graag kunnen wat nu nog niet lukt? Welk klein stapje kan vandaag al?',
     titel: 'Het zaadje dat wachten leerde',
     sub: 'zes bladzijden, over geduld',
     plaat: 'boom',
@@ -191,11 +198,18 @@ function open(v) {
 
 function toon() {
   const bl = huidig.bladzijden[bladzij];
+  const laatste = bladzij === huidig.bladzijden.length - 1;
   $('#plaat').innerHTML = P[bl.p];
   $('#tekst').textContent = bl.t;
+  // op de laatste bladzijde: een vraag om samen na te praten -- het boekje dicht, het gesprek open
+  $('#napraat').hidden = !(laatste && huidig.vraag);
+  if (laatste && huidig.vraag) {
+    $('#napraat').innerHTML = '<b style="color:var(--txt);font-weight:600;">Om samen na te praten: </b><span></span>';
+    $('#napraat').querySelector('span').textContent = huidig.vraag;
+  }
   $('#paginaatje').textContent = 'bladzijde ' + (bladzij + 1) + ' van ' + huidig.bladzijden.length;
   $('#terug').disabled = bladzij === 0;
-  $('#verder').textContent = bladzij === huidig.bladzijden.length - 1 ? 'Uit' : 'Volgende';
+  $('#verder').textContent = laatste ? 'Uit' : 'Volgende';
 }
 
 $('#terug').addEventListener('click', () => { if (bladzij > 0) { bladzij--; toon(); } });

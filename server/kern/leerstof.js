@@ -10,7 +10,11 @@
    wedstrijd, en een fout is gewoon de volgende stap in de les. */
 const { REKENEN } = require('./leerstof-data/rekenen');
 const { TAAL } = require('./leerstof-data/taal');
+const { AARDRIJKSKUNDE, GESCHIEDENIS } = require('./leerstof-data/wereld');
+const { NATUUR, VERKEER, ENGELS_PO } = require('./leerstof-data/natuur');
 const { VO } = require('./leerstof-data/vo');
+const { VO2 } = require('./leerstof-data/vo2');
+const { VO3 } = require('./leerstof-data/vo3');
 const { VERVOLG } = require('./leerstof-data/vervolg');
 const { opgave } = require('./leerstof-gen');
 
@@ -22,7 +26,8 @@ const BEHAALD_BIJ = 4;
    bibliotheek putten zonder de stateful motor nodig te hebben */
 const DOELEN = {};
 const PER_GROEP = {};
-for (const [vak, lijn] of [['rekenen', REKENEN], ['taal', TAAL]]) {
+for (const [vak, lijn] of [['rekenen', REKENEN], ['taal', TAAL], ['aardrijkskunde', AARDRIJKSKUNDE],
+  ['geschiedenis', GESCHIEDENIS], ['natuur', NATUUR], ['verkeer', VERKEER], ['engels', ENGELS_PO]]) {
   for (const g of lijn) {
     PER_GROEP[g.groep] = PER_GROEP[g.groep] || [];
     for (const d of g.doelen) {
@@ -35,7 +40,7 @@ for (const [vak, lijn] of [['rekenen', REKENEN], ['taal', TAAL]]) {
    (vmbo t/m wo). Zelfde bibliotheek, dus toetsen en huiswerk kunnen er net
    zo uit putten als bij groep 1 t/m 8. */
 const PER_FASE = {};
-for (const blok of VO.concat(VERVOLG)) {
+for (const blok of VO.concat(VO2, VO3, VERVOLG)) {
   for (const fase of blok.fasen) {
     PER_FASE[fase] = PER_FASE[fase] || [];
     for (const d of blok.doelen) {

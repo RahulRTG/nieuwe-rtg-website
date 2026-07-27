@@ -5,29 +5,35 @@
    als gedeelde helper uit de catalogus. Krijgt de gedeelde ctx van kern/mall/index.js. */
 module.exports = (ctx) => {
   const { db, save, seed, isRetail, isBoer, verborgen, boutiek, eigenBoutiek, farmBoutieks,
-    ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA } = ctx;
+    dienstenplein, ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA } = ctx;
 
-  /* De gids van alle leveranciers, per genre. Elk genre wijst naar de pagina waar
-     je die partner boekt of reserveert; genres zonder eigen pagina landen op de
-     leden-app. Verborgen partners en partners zonder compleet type slaan we over. */
+  /* De gids van alle leveranciers, per genre. Eerst de vaste, gecureerde
+     volgorde (tafelen, verblijven, uitgaan, diensten), daarna ELK overig genre
+     dat partners heeft, op label gesorteerd: zo heeft elk leverancier-genre
+     een eigen plek in de Mall. Elk genre wijst naar de pagina waar je die
+     partner boekt of reserveert; genres zonder eigen pagina landen op de
+     leden-app. Verborgen partners slaan we over. */
   function gidsen() {
     const types = db.data.supplierTypes || {};
     const alle = (db.data.suppliers || []).filter(s => s && !verborgen(s));
-    const genres = [];
-    for (const g of GIDS_GENRES) {
-      const def = types[g];
-      if (!def) continue;
+    const rij = g => {
+      const def = types[g] || {};
       const leden = alle.filter(s => s.type === g).map(s => ({
         code: s.code, naam: s.name, stad: s.city || null,
         tagline: (s.mall && s.mall.tagline) || null
       }));
-      if (!leden.length) continue;
-      genres.push({
+      if (!leden.length) return null;
+      return {
         type: g, label: def.label || g, icon: def.icon || '•',
         pagina: GENRE_PAGINA[g] || '/apps/app.html',
         boekbaar: !!GENRE_PAGINA[g], leveranciers: leden, aantal: leden.length
-      });
-    }
+      };
+    };
+    const genres = GIDS_GENRES.map(rij).filter(Boolean);
+    const rest = [...new Set(alle.map(s => s.type).filter(t => t && !GIDS_GENRES.includes(t)))]
+      .map(rij).filter(Boolean)
+      .sort((a, b) => a.label.localeCompare(b.label));
+    genres.push(...rest);
     return { ok: true, genres, aantal: genres.reduce((n, x) => n + x.aantal, 0) };
   }
 
@@ -44,6 +50,7 @@ module.exports = (ctx) => {
     return {
       ok: true,
       etages,
+      diensten: dienstenplein().genres,
       gids: gidsen().genres,
       totaalBoutieks: winkels.length + farms.length + (eigenBoutiek() ? 1 : 0),
       valuta: 'EUR',

@@ -23,6 +23,7 @@
     { code:'IBIZAIR', name:'Ibiza Sky Charter', type:'Helikopter', icon:'', sub:'Helikopter transfers · Ibiza' },
     { code:'AYAKA',   name:'Atelier Marfil', type:'Zelfstandig', icon:'', sub:'Sieraden & goudsmid · Ibiza' },
     { code:'KAITO',   name:'Studio Milan', type:'Zelfstandig', icon:'', sub:'Health & wellness · Ibiza' },
+    { code:'CASTELL', name:'Castell Bouw & Ambacht', type:'Bouw', icon:'', sub:'Timmerman, loodgieter & elektricien · Ibiza' },
     { code:'ESVEDRA', name:'Es Vedra Cruises', type:'Activiteit', icon:'', sub:'Tours & cruises · Ibiza' },
     { code:'MACE',    name:'MACE Museum Eivissa', type:'Activiteit', icon:'', sub:'Museum · Ibiza' },
     { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'', sub:'Autoverhuur · Ibiza' },

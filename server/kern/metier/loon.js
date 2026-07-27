@@ -34,7 +34,8 @@ const UREN_MAAND = 165;       // ~38 uur per week, om een maandbedrag te duiden
 const VAKKEN = {
   hotel: 'Hotel', restaurant: 'Restaurant', bar: 'Bar en club', apartment: 'Verhuur en appartementen',
   taxi: 'Vervoer', jet: 'Luchtvaart', zorg: 'Zorg en wellness', retail: 'Winkel', boerderij: 'Land en teelt',
-  activiteit: 'Activiteiten', vastgoed: 'Vastgoed', zzp: 'Zelfstandigen', vakwerk: 'Vakwerk en techniek'
+  activiteit: 'Activiteiten', vastgoed: 'Vastgoed', zzp: 'Zelfstandigen', vakwerk: 'Vakwerk en techniek',
+  bouw: 'Bouw en installatie'
 };
 
 module.exports = ({ db }) => {

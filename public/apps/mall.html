@@ -38,6 +38,8 @@
   .boutiek .tag{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:.15rem;}
   .boutiek .meta{font-size:.76rem;color:var(--soft);margin-top:.35rem;}
   .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
+  .dp-sub{font-family:'Bodoni Moda',serif;font-size:1.02rem;margin:1rem 0 .55rem;}
+  .dp-sub .n{font-family:'Inter',system-ui,sans-serif;font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
   /* gids: alle leveranciers per genre, met een diepe link naar boeken/reserveren */
   .gids{margin-top:2.4rem;}
   .genres{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;}
@@ -86,6 +88,7 @@
   <div id="reisbieb"></div>
   <div id="rtfbieb"></div>
   <div id="etages"></div>
+  <div id="dienstenWrap"></div>
   <div id="gidsWrap"></div>
 </main>
 
@@ -408,7 +411,84 @@ async function laad(){
       '</button>').join('')+'</div></div>'
   ).join('');
   $('#etages').querySelectorAll('.boutiek').forEach(b => b.addEventListener('click', () => openBoutiek(b.dataset.code, b.dataset.naam, b.dataset.stad, b.dataset.kind)));
+  tekenDiensten(d.diensten || []);
   tekenGids(d.gids || []);
+}
+
+/* ---------- Het Dienstenplein: de dienstverlenende zaken (zelfstandigen,
+   privéchef, wellness, bouw & installatie) bieden hier hun aanbod aan.
+   Boeken loopt op je codenaam via de gewone boekroute; de zaak bevestigt. */
+let DZAKEN = {};
+function tekenDiensten(genres){
+  const w = $('#dienstenWrap');
+  if (!genres.length){ w.innerHTML = ''; return; }
+  DZAKEN = {};
+  w.innerHTML = '<div class="etage"><div class="etage-kop"><h2>Het Dienstenplein</h2>'+
+    '<span class="n">diensten aan huis, op de villa of aan boord · boek direct</span></div>'+
+    genres.map(g => {
+      g.zaken.forEach(z => DZAKEN[z.code] = z);
+      return '<div class="dp-sub">'+esc(g.label)+' <span class="n">· '+g.aantal+' '+(g.aantal===1?'zaak':'zaken')+'</span></div>'+
+      '<div class="boutieks">'+g.zaken.map(z =>
+        '<button class="boutiek dpz" data-code="'+esc(z.code)+'">'+
+          '<span class="stad">'+esc(z.stad||'RTG')+'</span>'+
+          '<h3>'+esc(z.naam)+'</h3>'+
+          (z.vak?'<span class="tag">'+esc(z.vak)+'</span>':(z.tagline?'<span class="tag">'+esc(z.tagline)+'</span>':''))+
+          '<span class="meta">'+z.diensten.length+' dienst'+(z.diensten.length===1?'':'en')+(z.vanaf!=null?' · vanaf '+euro(z.vanaf):'')+'</span>'+
+        '</button>').join('')+'</div>';
+    }).join('')+'</div>';
+  w.querySelectorAll('.dpz').forEach(b => b.addEventListener('click', () => openDienstZaak(b.dataset.code)));
+}
+function openDienstZaak(code){
+  const z = DZAKEN[code]; if (!z) return;
+  HUIDIG = code;
+  $('#bladNaam').textContent = z.naam;
+  $('#bladStad').textContent = (z.stad || 'RTG') + ' · ' + z.genreLabel;
+  $('#blad').classList.add('open');
+  $('#bladArt').innerHTML = z.diensten.length ? z.diensten.map(d =>
+    '<div class="kaart">'+
+      '<span class="cat">'+(d.soort==='product'?'Product':'Dienst')+'</span>'+
+      '<h3>'+esc(d.naam)+'</h3>'+
+      (d.uitleg?'<span class="oms">'+esc(d.uitleg)+'</span>':'')+
+      '<span class="prijs">'+euro(d.prijs)+(d.duurMin?' <span style="color:var(--soft);font-size:.8rem;">· '+d.duurMin+' min</span>':'')+'</span>'+
+      '<div class="rij"><button class="knop dboek" data-id="'+esc(d.id)+'">Boeken</button></div>'+
+    '</div>').join('') : '<div class="leeg">Deze zaak vult haar aanbod nog.</div>';
+  $('#bladArt').querySelectorAll('.dboek').forEach(b => b.addEventListener('click', () => boekDienst(code, b.dataset.id)));
+}
+function boekDienst(code, dienstId){
+  const z = DZAKEN[code]; const d = z && z.diensten.find(x => x.id === dienstId); if (!d) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'blad open'; wrap.style.zIndex = '40';
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="dbTerug">← Terug</button>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(d.naam)+'</h1></div></div>'+
+    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+      '<label class="opties" for="dbDatum">Datum</label><input class="veld" id="dbDatum" type="date" style="margin-bottom:.5rem;">'+
+      '<label class="opties" for="dbTijd">Tijd</label><select class="veld" id="dbTijd" style="margin-bottom:.5rem;"><option value="">Kies eerst een datum</option></select>'+
+      '<textarea class="veld" id="dbNote" rows="2" maxlength="140" placeholder="Opmerking voor de zaak (optioneel)" style="margin-bottom:.6rem;resize:vertical;"></textarea>'+
+      '<button class="knop" id="dbGa" style="width:100%;">Vraag aan · '+(d.prijs?euro(d.prijs):'op aanvraag')+'</button>'+
+      '<p class="opties" style="margin-top:.5rem;">Je boekt op je codenaam; de zaak bevestigt je aanvraag in de app.</p>'+
+    '</div></div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('#dbTerug').addEventListener('click', () => wrap.remove());
+  const datum = wrap.querySelector('#dbDatum'), tijd = wrap.querySelector('#dbTijd');
+  datum.min = new Date().toISOString().slice(0,10);
+  datum.addEventListener('change', async () => {
+    tijd.innerHTML = '<option value="">Laden...</option>';
+    try {
+      const r = await api('/api/booking/slots', { supplierCode: code, serviceId: d.id, date: datum.value });
+      tijd.innerHTML = (r.tijden && r.tijden.length)
+        ? '<option value="">Kies een tijd</option>'+r.tijden.map(t => '<option>'+esc(t)+'</option>').join('')
+        : '<option value="">Geen vrije tijden op deze dag</option>';
+    } catch(e){ tijd.innerHTML = '<option value="">'+esc(e.message)+'</option>'; }
+  });
+  wrap.querySelector('#dbGa').addEventListener('click', async () => {
+    try {
+      const r = await api('/api/booking/request', { supplierCode: code, serviceId: d.id, date: datum.value, time: tijd.value, note: wrap.querySelector('#dbNote').value });
+      wrap.remove();
+      meld(r.boeking.status === 'wacht-op-betaling'
+        ? 'Aanvraag '+r.boeking.ref+' staat klaar; rond de betaling af in de app.'
+        : 'Aangevraagd ('+r.boeking.ref+'); de zaak bevestigt je aanvraag.');
+    } catch(e){ meld(e.message); }
+  });
 }
 
 function tekenGids(genres){

@@ -187,6 +187,15 @@ if (DEMO) {
     if (!db.data.suppliers.some(x => x.code === s.code)) db.data.suppliers.push(JSON.parse(JSON.stringify(s)));
   }
   for (const [code, people] of Object.entries(STAFF_SEED)) {
+    /* heling: bij een allereerste start kunnen de drie werkers tegelijk
+       countStaff 0 zien en elk seeden; dubbele seed-rijen (zelfde naam+rol)
+       worden hier bij elke start weer opgeruimd */
+    const seedNamen = new Set(people.map(p => p[0] + '|' + p[1]));
+    const gezien = new Set();
+    for (const st of accounts.listStaff(code)) {
+      const k = st.name + '|' + st.role;
+      if (seedNamen.has(k) && gezien.has(k)) accounts.deactivateStaff(st.id); else gezien.add(k);
+    }
     if (accounts.countStaff(code) === 0) {
       people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }

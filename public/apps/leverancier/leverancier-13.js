@@ -5,9 +5,9 @@
       ['tarief','\uD83E\uDDEE',T('kt.tarief','Tarief')],
       ['prijzen','\uD83D\uDCB6',T('kt.prijzen','Prijzen')]
     );
-    // de dienstverlenende genres (zelfstandige, privechef, wellness) krijgen
-    // hun eigen vandaag-bord en aanbodbeheer
-    if (['zzp','chef','wellness'].includes(type)) secs.push(
+    // de dienstverlenende genres (zelfstandige, privechef, wellness, bouw)
+    // krijgen hun eigen vandaag-bord en aanbodbeheer
+    if (['zzp','chef','wellness','bouw'].includes(type)) secs.push(
       ['vandaag','\u2600\uFE0F',T('kt.vandaag','Vandaag')],
       ['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]
     );

@@ -12,6 +12,7 @@ module.exports = (ctx) => {
     jet: 'Privejets op maat, van transfer tot dagtrip, wereldwijd.',
     helikopter: 'Scenic vluchten en snelle transfers per helikopter.',
     zzp: 'Zelfstandig vakmanschap op afspraak, met oog voor detail.',
+    bouw: 'Timmerman, loodgieter en elektricien: vakwerk aan huis, ook met spoed.',
     activiteit: 'Tours, cruises en experiences om het eiland te beleven.',
     verhuur: 'Auto’s huren zonder verrassingen: vaste prijs en eerlijke staat.',
     charter: 'Boten en jachten charteren, met of zonder schipper, veilig op zee.',

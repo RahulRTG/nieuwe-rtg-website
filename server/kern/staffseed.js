@@ -1,7 +1,6 @@
 /* Het demopersoneel per leverancier (alleen in demostand gebruikt): per
    zaak een manager (PIN 1234) en vloerpersoneel (PIN 5678) voor de PDA.
    Pure data, geen logica. */
-// Demo-personeel per leverancier: een manager (PIN 1234) en een medewerker (PIN 5678).
 const STAFF_SEED = {
   SAKURA: [['Marc Bosch', 'manager', 'Beheer'], ['Rosa Torres', 'staff', 'Onderhoud']],
   // de hulpdiensten: per korps een meldkamer-chef (PIN 1234) en een collega
@@ -25,6 +24,7 @@ const STAFF_SEED = {
   // zelfstandigen: eenmanszaken, dus alleen een eigenaar met beheer-rechten
   AYAKA: [['Livia Bergkamp', 'manager', 'Goudsmid']],
   KAITO: [['Milan de Wit', 'manager', 'Personal trainer']],
+  CASTELL: [['Ferran Castell', 'manager', 'Aannemer'], ['Marc Soler', 'staff', 'Timmerman'], ['Pau Ricard', 'staff', 'Loodgieter']],
   // activiteiten: beheer plus de mensen aan de deur en op de boot
   ESVEDRA: [['Marta Salas', 'manager', 'Beheer'], ['Joel Ferrer', 'staff', 'Gids']],
   MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']],

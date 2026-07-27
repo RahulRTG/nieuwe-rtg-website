@@ -1,6 +1,7 @@
 /* Vakwerk: het slimme dashboard voor de dienstverlenende genres, de
-   zelfstandige professional (zzp), de privechef (chef) en wellness & spa
-   (wellness). Deze genres draaien op hetzelfde aanbod-/boekingsmodel
+   zelfstandige professional (zzp), de privechef (chef), wellness & spa
+   (wellness) en bouw & installatie (bouw: timmerman, loodgieter,
+   elektricien). Deze genres draaien op hetzelfde aanbod-/boekingsmodel
    (s.services + db.data.boekingen met de statusketen aangevraagd ->
    bevestigd -> afgerond). Deze module tilt ze naar hetzelfde niveau als de
    horeca- en hoteltorens: een vandaag-bord, de eerstvolgende afspraken, de
@@ -27,6 +28,11 @@ const VAK_GENRES = {
     label: 'Wellness & spa',
     werk: 'behandeling', werkMv: 'behandelingen',
     persona: 'je bent de spa-manager die meedenkt met een wellness- & spa-aanbieder op RTG. Je denkt mee over de behandelagenda, bezetting, het aanbod en rust in de planning, kort en concreet.'
+  },
+  bouw: {
+    label: 'Bouw & installatie',
+    werk: 'klus', werkMv: 'klussen',
+    persona: 'je bent de nuchtere werkvoorbereider van een bouw- en installatiebedrijf (timmerman, loodgieter, elektricien) op RTG. Je denkt mee over de klusplanning, materiaal, offertes en spoedklussen, kort en concreet.'
   }
 };
 

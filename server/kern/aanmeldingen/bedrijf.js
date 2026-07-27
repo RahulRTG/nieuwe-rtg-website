@@ -15,7 +15,7 @@
    verwerkt -- 'voldaan' is de administratieve bevestiging door een mens. */
 const GENRES = ['restaurant', 'hotel', 'bar', 'club', 'beachclub', 'retail', 'modehuis',
   'vervoer', 'charter', 'verhuur', 'vastgoed', 'care', 'boerderij', 'creator',
-  'activiteiten', 'zzp', 'vakwerk', 'kantoorgebouw', 'apartment', 'villa'];
+  'activiteiten', 'zzp', 'vakwerk', 'bouw', 'kantoorgebouw', 'apartment', 'villa'];
 
 module.exports = (ctx) => {
   const { db, save, kap, nu, accounts } = ctx;

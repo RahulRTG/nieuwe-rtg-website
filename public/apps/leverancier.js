@@ -23,6 +23,7 @@
     { code:'IBIZAIR', name:'Ibiza Sky Charter', type:'Helikopter', icon:'', sub:'Helikopter transfers · Ibiza' },
     { code:'AYAKA',   name:'Atelier Marfil', type:'Zelfstandig', icon:'', sub:'Sieraden & goudsmid · Ibiza' },
     { code:'KAITO',   name:'Studio Milan', type:'Zelfstandig', icon:'', sub:'Health & wellness · Ibiza' },
+    { code:'CASTELL', name:'Castell Bouw & Ambacht', type:'Bouw', icon:'', sub:'Timmerman, loodgieter & elektricien · Ibiza' },
     { code:'ESVEDRA', name:'Es Vedra Cruises', type:'Activiteit', icon:'', sub:'Tours & cruises · Ibiza' },
     { code:'MACE',    name:'MACE Museum Eivissa', type:'Activiteit', icon:'', sub:'Museum · Ibiza' },
     { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'', sub:'Autoverhuur · Ibiza' },
@@ -68,6 +69,7 @@
     privejet:    { label:'RTG Privéjet',    labelEn:'RTG Private Jet', codes:['JETAG'],  icon:'' },
     helikopter:  { label:'RTG Helikopter',  labelEn:'RTG Helicopter',  codes:['IBIZAIR'], icon:'' },
     zzp:         { label:'RTG Zelfstandig', labelEn:'RTG Independent', codes:['AYAKA','KAITO'], icon:'' },
+    bouw:        { label:'RTG Bouw & Installatie', labelEn:'RTG Construction & Trades', codes:['CASTELL'], icon:'' },
     activiteiten:{ label:'RTG Activiteiten', labelEn:'RTG Experiences', codes:['ESVEDRA','MACE'], icon:'' },
     autoverhuur: { label:'RTG Autoverhuur', labelEn:'RTG Car Rental', codes:['ISLAREN'], icon:'' },
     vastgoed:    { label:'RTG Vastgoed', labelEn:'RTG Real Estate', codes:['IBIZALIV'], icon:'' },
@@ -304,7 +306,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub', VELVET:'beautysalon', AMICS:'petcare', NIDO:'kinderopvang', PORTELL:'marina', AURELIA:'weddingplanner', LEXNOVA:'professioneel', SEGUR:'verzekeringen', VALAURA:'wintersport' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', CASTELL:'bouw', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub', VELVET:'beautysalon', AMICS:'petcare', NIDO:'kinderopvang', PORTELL:'marina', AURELIA:'weddingplanner', LEXNOVA:'professioneel', SEGUR:'verzekeringen', VALAURA:'wintersport' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -1594,9 +1596,9 @@
       ['tarief','\uD83E\uDDEE',T('kt.tarief','Tarief')],
       ['prijzen','\uD83D\uDCB6',T('kt.prijzen','Prijzen')]
     );
-    // de dienstverlenende genres (zelfstandige, privechef, wellness) krijgen
-    // hun eigen vandaag-bord en aanbodbeheer
-    if (['zzp','chef','wellness'].includes(type)) secs.push(
+    // de dienstverlenende genres (zelfstandige, privechef, wellness, bouw)
+    // krijgen hun eigen vandaag-bord en aanbodbeheer
+    if (['zzp','chef','wellness','bouw'].includes(type)) secs.push(
       ['vandaag','\u2600\uFE0F',T('kt.vandaag','Vandaag')],
       ['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]
     );

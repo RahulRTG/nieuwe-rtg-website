@@ -25,23 +25,26 @@ const ETAGES = [
 // de etages waar retail-boutieks op landen (eigen-merk en boerderij vullen we apart)
 const ETAGE_IDS = ETAGES.map(e => e.id).filter(id => id !== 'eigen' && id !== 'land');
 
-/* De gids "Alle leveranciers": naast de koop-etages toont de Mall elke partner,
+/* De gids "Alle leveranciers": naast de koop-etages toont de Mall ELKE partner,
    gegroepeerd per genre, met een diepe link naar de plek waar je daar boekt of
-   reserveert. Alleen de gastvrije/lifestyle-genres horen in de mall-gids; de
-   hulpdiensten, zorgketen en defensie horen hier niet thuis. De volgorde is
-   bewust: eerst tafelen en verblijven, dan uitgaan en beleven, dan de rest. */
+   reserveert. De volgorde is bewust: eerst tafelen en verblijven, dan uitgaan
+   en beleven, dan diensten en de rest; genres buiten deze vaste lijst (nieuwe
+   en niche-genres) komen er in de etalage automatisch achteraan, zodat elk
+   leverancier-genre een eigen plek in de Mall heeft. */
 const GIDS_GENRES = [
   'restaurant', 'hotel', 'apartment', 'villa', 'bar', 'club', 'beachclub',
-  'koffie', 'chef', 'wellness', 'juwelier', 'galerie', 'retail', 'boerderij',
-  'activiteit', 'events', 'taxi', 'jet', 'helikopter', 'verhuur', 'tweewielers',
-  'charter', 'vastgoed', 'zorg'
+  'koffie', 'chef', 'wellness', 'zzp', 'bouw', 'juwelier', 'galerie', 'retail',
+  'boerderij', 'activiteit', 'events', 'taxi', 'jet', 'helikopter', 'verhuur',
+  'tweewielers', 'charter', 'vastgoed', 'zorg'
 ];
-// waar je een genre boekt/reserveert in de app (de diepe link vanuit de gids)
+// waar je een genre boekt/reserveert in de app (de diepe link vanuit de gids);
+// de dienstverlenende genres landen op het Dienstenplein in de Mall zelf
 const GENRE_PAGINA = {
   restaurant: '/apps/foodcourt.html',
   hotel: '/apps/hotels.html', apartment: '/apps/hotels.html', villa: '/apps/hotels.html',
   bar: '/apps/uitgaan.html', club: '/apps/uitgaan.html', beachclub: '/apps/uitgaan.html',
-  retail: '/apps/mall.html', juwelier: '/apps/mall.html', boerderij: '/apps/mall.html'
+  retail: '/apps/mall.html', juwelier: '/apps/mall.html', boerderij: '/apps/mall.html',
+  zzp: '/apps/mall.html', chef: '/apps/mall.html', wellness: '/apps/mall.html', bouw: '/apps/mall.html'
 };
 
 function maakMall({ db, save, crypto, isRetail }) {
@@ -130,6 +133,7 @@ function maakMall({ db, save, crypto, isRetail }) {
   };
   const api = { ETAGES, seed };
   Object.assign(api, require('./catalogus')(ctx)); // vult ctx met de boutiekweergaven
+  Object.assign(api, require('./diensten')(ctx)); // vult ctx met het Dienstenplein
   Object.assign(api, require('./etalage')(ctx));
   return { mall: api };
 }

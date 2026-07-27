@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG School Partner</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --goed:#69B891; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));
+    backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
+    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.15rem;}
+  header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
+  main{padding:1rem 1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .5rem;}
+  .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}
+  .knop{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font:inherit;font-size:.8rem;font-weight:600;padding:.5rem .85rem;cursor:pointer;}
+  .knop.p{background:var(--burgundy);border-color:transparent;color:#fff;}
+  .knop:hover{border-color:var(--gold);}
+  .knop:focus-visible,.veld:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.55rem;margin-bottom:.8rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+  .kpi b{display:block;font-family:'Bodoni Moda',serif;font-size:1.5rem;font-weight:500;}
+  .kpi span{font-size:.68rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
+  .item{display:flex;gap:.6rem;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:.55rem 0;flex-wrap:wrap;}
+  .item:first-of-type{border-top:0;}
+  .tag{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;color:var(--muted);}
+  .tag.aan{color:var(--goed);border-color:var(--goed);}
+  .doelkies{display:flex;flex-wrap:wrap;gap:.35rem;margin:.5rem 0;}
+  .doelkies label{border:1px solid var(--line);border-radius:999px;padding:.28rem .6rem;font-size:.74rem;cursor:pointer;display:inline-flex;gap:.3rem;align-items:center;}
+  .doelkies input{accent-color:var(--burgundy);}
+  .doelkies label:has(:checked){border-color:var(--burgundy);color:#fff;}
+  .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
+    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw;}
+  .melding.zie{opacity:1;}
+  [hidden]{display:none !important;}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/index.html" aria-label="Terug naar het bureaublad">&#8592;</a>
+  <span><span class="ey">RTG Partner</span><h1>School Partner</h1></span>
+  <span style="flex:1;"></span>
+  <button class="knop" id="uitlog" type="button" hidden>Uitloggen</button>
+</header>
+<main>
+  <!-- de poort -->
+  <div id="vPoort">
+    <div class="kaart">
+      <div class="kop">Inloggen</div>
+      <p class="stil" style="margin-bottom:.6rem;">Voor directie (beheer-token) en leraren (personeel-token).</p>
+      <div class="rij">
+        <input class="veld" id="inCode" placeholder="Schoolcode" autocapitalize="characters" aria-label="Schoolcode">
+        <input class="veld" id="inToken" placeholder="Token" type="password" aria-label="Token">
+        <button class="knop p" id="inGa" type="button">Open de werkbank</button>
+      </div>
+    </div>
+    <div class="kaart">
+      <div class="kop">Nieuw hier?</div>
+      <p class="stil">Een school meldt zich eerst aan (RTG keurt goed), daarna meldt het personeel zich met de schoolcode, en de directie laat ze toe. Dat regel je in de school-app: <a href="/apps/foundation/school.html" style="color:var(--burgundy);">open de aanmeldstroom</a>.</p>
+    </div>
+  </div>
+
+  <!-- directie -->
+  <div id="vDirectie" hidden>
+    <div class="kpis" id="dKpis" aria-live="polite"></div>
+    <div class="kaart">
+      <div class="kop">Personeel</div>
+      <div id="dPersoneel"></div>
+    </div>
+    <div class="kaart">
+      <div class="kop">Klassen</div>
+      <div id="dKlassen"></div>
+    </div>
+  </div>
+
+  <!-- leraar-werkbank -->
+  <div id="vLeraar" hidden>
+    <div class="kaart" id="lKlassenKaart">
+      <div class="kop">Mijn klassen</div>
+      <div id="lKlassen"></div>
+    </div>
+    <div id="lWerk" hidden>
+      <div class="kpis" id="lKpis" aria-live="polite"></div>
+      <div class="kaart">
+        <div class="kop">Vandaag</div>
+        <div class="rij">
+          <button class="knop p" id="lesKnop" type="button">Online les starten</button>
+          <span class="tag" id="lesTag" hidden></span>
+          <span style="flex:1;"></span>
+          <button class="knop" id="teamKnop" type="button">Team en overname</button>
+        </div>
+        <div id="teamBlok" hidden style="margin-top:.6rem;">
+          <div id="teamLijst" class="stil"></div>
+          <div class="rij" style="margin-top:.4rem;">
+            <input class="veld" id="teamId" placeholder="Personeels-id van de collega" aria-label="Personeels-id">
+            <button class="knop" id="teamErbij" type="button">Vast op de klas (max 3)</button>
+            <button class="knop" id="overnameStop" type="button">Overname stoppen</button>
+          </div>
+        </div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Toets uit de leerlijn</div>
+        <p class="stil">Vink leerdoelen aan, kies de vorm, klaar. Elke leerling krijgt verse opgaven; de motor kijkt na en het cijfervoorstel blijft een advies.</p>
+        <div class="rij" style="margin:.5rem 0;">
+          <select class="veld" id="tSoort" aria-label="Toetsvorm" style="flex:0 1 12rem;">
+            <option value="so">SO</option><option value="proefwerk">Proefwerk</option>
+            <option value="examen">Examen</option><option value="mo">MO (mondeling)</option>
+          </select>
+          <select class="veld" id="tGroep" aria-label="Groep" style="flex:0 1 9rem;"></select>
+          <input class="veld" id="tNaam" placeholder="Naam (mag leeg)" aria-label="Naam van de toets">
+        </div>
+        <div class="doelkies" id="tDoelen" role="group" aria-label="Leerdoelen"></div>
+        <div class="rij">
+          <button class="knop p" id="tMaak" type="button">Zet de toets klaar</button>
+          <span class="stil">Ook als huiswerk: <button class="knop" id="hwMaak" type="button">geef 1 doel als oefen-huiswerk</button></span>
+        </div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Toetsen en uitslagen</div>
+        <div id="tLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Cijferboek</div>
+        <div id="cBoek" class="stil"></div>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/apps/schoolpartner/toetsen.js"></script>
+<script src="/apps/schoolpartner/app.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

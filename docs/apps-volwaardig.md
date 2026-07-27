@@ -1675,3 +1675,28 @@ herhaalbaar: elk Sessie.coach-gebruik hoort een privacyregel te hebben).
 verjaardagen.html en oppasinfo.html zijn doorgelicht en staan op niveau
 (volledige secties, server-bedrading, gast-scheiding); geen ingreep
 nodig.
+
+## RTF-golf 9: werk & toekomst voor tieners + de eindronde
+
+De werk-en-toekomst-laag stond al stevig: de cv-maker (lokaal, live
+voorbeeld, print/PDF), de beroepen-bieb, de vacature- en
+sollicitatieketen in werk.html, de spreekbeurt-app met tijdbalk en
+oefenklok, en de studiecoach. Golf 9 voegt gericht toe en maakt de hele
+RTF-laag consistent:
+
+**cv.html: hulpzinnen tegen het lege vak.** Zes aanzetten ("Ik werk hard
+en kom mijn afspraken na.") die je aantikt en dan van jezelf maakt --
+precies het duwtje dat een tiener nodig heeft die bevriest bij een leeg
+"Over jou"-veld. Alles blijft lokaal, zoals de hele cv-maker.
+
+**De eindronde: alle RTF-apps consistent.**
+- Appgids-dekking gecontroleerd in beide richtingen: elke
+  foundation-pagina heeft een appgids-entry en elke entry een pagina
+  (geautomatiseerde kruiscontrole, nul afwijkingen).
+- De privacyregel-sweep uit golf 8 bleef groen: elke coach-chat draagt
+  "Wat je hier typt wordt niet bewaard."
+- Emoji-eindsweep over alle foundation-pagina's: contact.html,
+  schrift.html en vrienden.html (UI-chrome: koppen, bel/video/snap-
+  knoppen, tabs, meldingen) zijn omgezet naar huisstijl-glyfen. Het
+  stickerpalet van de snap-studio blijft bewust staan: stickers zijn
+  beeldinhoud die het kind zelf kiest, geen interface-chrome.

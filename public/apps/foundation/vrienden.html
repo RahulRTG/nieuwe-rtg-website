@@ -89,7 +89,7 @@
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header id="balk"></header>
 <main class="wrap" id="hoofd" tabindex="-1">
-  <h1>👋 Contacten</h1>
+  <h1>Contacten</h1>
   <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam.</div>
   <div class="mijncn" id="mijncn"></div>
 
@@ -108,7 +108,7 @@
   <div id="beschermdBlok" hidden>
     <div class="sec">Vrienden</div>
     <div class="kaart" style="padding:.9rem 1.1rem;line-height:1.5;font-size:.9rem;">
-      🛡️ Je ouder of verzorger voegt vrienden voor je toe. Je kunt hier gewoon chatten,
+      Je ouder of verzorger voegt vrienden voor je toe. Je kunt hier gewoon chatten,
       bellen en snappen met je gezin en met de vrienden die zij hebben toegevoegd.
     </div>
   </div>
@@ -135,12 +135,12 @@
 <!-- chat -->
 <div class="ov" id="chatOv"><div class="ovkaart">
   <div class="ovkop"><b id="chatWie"></b>
-    <button class="belk-kop" id="chatBel" title="Bellen">📞</button>
-    <button class="belk-kop" id="chatVideo" title="Videobellen">🎥</button>
+    <button class="belk-kop" id="chatBel" title="Bellen">✆</button>
+    <button class="belk-kop" id="chatVideo" title="Videobellen">⌲</button>
     <button class="ovx" id="chatX">✕</button></div>
   <div class="msgs" id="chatMsgs"></div>
   <div class="invoer">
-    <button class="knop grijs" id="snapBtn" title="Stuur een snap">📷</button>
+    <button class="knop grijs" id="snapBtn" title="Stuur een snap">◨</button>
     <input class="veld" id="chatIn" placeholder="Bericht...">
     <button class="knop" id="chatSend">Stuur</button>
   </div>
@@ -163,19 +163,19 @@
   <div class="belwrap">
     <video id="belRemote" autoplay playsinline></video>
     <video id="belLocal" autoplay playsinline muted></video>
-    <div class="belaudio" id="belAudio"><div class="belav" id="belAv">🙂</div></div>
+    <div class="belaudio" id="belAudio"><div class="belav" id="belAv">•</div></div>
     <div class="belinfo"><b id="belNaam"></b><div class="beltijd" id="belTijd"></div></div>
     <div class="belknoppen">
-      <button class="belk" id="belMute" title="Microfoon">🎤</button>
-      <button class="belk" id="belCam" title="Camera">🎥</button>
-      <button class="belk op" id="belWeg" title="Ophangen">📴</button>
+      <button class="belk" id="belMute" title="Microfoon">⌾</button>
+      <button class="belk" id="belCam" title="Camera">⌲</button>
+      <button class="belk op" id="belWeg" title="Ophangen">✕</button>
     </div>
   </div>
 </div></div>
 
 <!-- inkomende oproep -->
 <div class="ov" id="inkOv"><div class="ovkaart" style="max-width:22rem;text-align:center;padding:1.4rem;">
-  <div class="belav" id="inkAv" style="margin:0 auto 1rem;">🙂</div>
+  <div class="belav" id="inkAv" style="margin:0 auto 1rem;">•</div>
   <b id="inkNaam"></b><div class="beltijd" id="inkSoort" style="margin:.3rem 0 1.2rem;"></div>
   <div style="display:flex;gap:1rem;justify-content:center;">
     <button class="knop" id="inkJa">Opnemen</button>
@@ -230,9 +230,9 @@ if (belModus){
     const h = document.createElement('div');
     h.className = 'kaart';
     h.style.cssText = 'padding:.7rem .9rem;margin:.4rem 0 .8rem;border-color:var(--goud);font-size:.9rem;';
-    h.textContent = belModus === 'bel' ? '📞 Tik op een vriend om te bellen.'
-      : belModus === 'video' ? '🎥 Tik op een vriend om te videobellen.'
-      : '📷 Tik op een vriend om een snap te sturen.';
+    h.textContent = belModus === 'bel' ? '✆ Tik op een vriend om te bellen.'
+      : belModus === 'video' ? '⌲ Tik op een vriend om te videobellen.'
+      : '◨ Tik op een vriend om een snap te sturen.';
     intro.after(h);
   }
 }
@@ -259,10 +259,10 @@ async function laad(){
     E('div',{class:'nm'}, c.codename, c.unread ? E('span',{class:'badge'}, c.unread) : null,
       E('small', null, (c.tier==='rtf'?'RTFoundation':'RTG') + (c.last?' · '+c.last:''))),
     E('button',{class:'knop mini', onclick:ev=>{ ev.stopPropagation(); openChat(c.key,c.codename); }}, 'Chat'),
-    E('button',{class:'knop grijs mini', title:'Bellen', onclick:ev=>{ ev.stopPropagation(); belStart(c.key,c.codename,false); }}, '📞'),
-    E('button',{class:'knop grijs mini', title:'Videobellen', onclick:ev=>{ ev.stopPropagation(); belStart(c.key,c.codename,true); }}, '🎥'),
-    E('button',{class:'knop grijs mini', title:'Stuur een snap', onclick:ev=>{ ev.stopPropagation(); kiesSnap(c.key,c.codename); }}, '📷'),
-    E('button',{class:'knop grijs mini', title:'Blokkeren of melden', onclick:ev=>{ ev.stopPropagation(); blokkeerMelden(c.key,c.codename); }}, '🚫')
+    E('button',{class:'knop grijs mini', title:'Bellen', onclick:ev=>{ ev.stopPropagation(); belStart(c.key,c.codename,false); }}, '✆'),
+    E('button',{class:'knop grijs mini', title:'Videobellen', onclick:ev=>{ ev.stopPropagation(); belStart(c.key,c.codename,true); }}, '⌲'),
+    E('button',{class:'knop grijs mini', title:'Stuur een snap', onclick:ev=>{ ev.stopPropagation(); kiesSnap(c.key,c.codename); }}, '◨'),
+    E('button',{class:'knop grijs mini', title:'Blokkeren of melden', onclick:ev=>{ ev.stopPropagation(); blokkeerMelden(c.key,c.codename); }}, '⊘')
   )) : E('div',{class:'leeg'}, mij.beschermd ? 'Nog geen vrienden. Je ouder of verzorger kan ze toevoegen.' : 'Nog geen vrienden. Zoek hierboven op codenaam.'));
   // verzoeken (niet voor kinderen)
   const reqs = d.requests||[];
@@ -313,7 +313,7 @@ function renderMeekijk(kinderen){
     '<div class="rij"><span class="av">'+initcn(k.codenaam)+'</span><div class="nm">'+esc(k.codenaam)+'<small>jij voegt vrienden toe en kijkt mee</small></div>'+
     '<button class="knop mini" data-voeg="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">➕ Vriend</button>'+
     '<button class="knop grijs mini" data-kijk="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Bekijk</button>'+
-    '<button class="knop grijs mini" data-board="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">🎛️ Boardroom</button></div>'
+    '<button class="knop grijs mini" data-board="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Boardroom</button></div>'
   ).join('');
   $('#meekijk').querySelectorAll('[data-kijk]').forEach(b=> b.addEventListener('click', ()=> kindContacten(b.dataset.kijk, b.dataset.cn)));
   $('#meekijk').querySelectorAll('[data-voeg]').forEach(b=> b.addEventListener('click', ()=> ouderVoegt(b.dataset.voeg, b.dataset.cn)));
@@ -467,7 +467,7 @@ function stOpen(dataUrl){
     ST.img=img; ST.ops=[]; ST.filter='dag'; ST.modus='pen';
     const cv=$('#stCv'); cv.width=img.width; cv.height=img.height;
     stChips(); stTeken();
-    $('#studioTitel').textContent = storyMode ? (opdrachtMode?'📸 Dag-opdracht':'Jouw verhaal (24 uur)') : 'Snap voor '+(snapCn||'je vriend');
+    $('#studioTitel').textContent = storyMode ? (opdrachtMode?'Dag-opdracht':'Jouw verhaal (24 uur)') : 'Snap voor '+(snapCn||'je vriend');
     $('#stTekst').value = (opdrachtMode && opdrachtVandaag) ? opdrachtVandaag.emoji+' '+opdrachtVandaag.tekst : '';
     $('#studioOv').classList.add('open');
   };
@@ -495,7 +495,7 @@ $('#stStuur').addEventListener('click', async ()=>{
     if (storyMode){
       await soc('/story/post', { foto, tekst, opdracht: opdrachtMode===true });
       $('#studioOv').classList.remove('open');
-      meld(opdrachtMode ? 'Je doet mee met de dag-opdracht! 🎉' : 'Je verhaal staat er 24 uur op.');
+      meld(opdrachtMode ? 'Je doet mee met de dag-opdracht!' : 'Je verhaal staat er 24 uur op.');
       laadStories();
     } else {
       const d=await soc('/snap/send', { toKey: snapNaar, foto, tekst });
@@ -517,7 +517,7 @@ async function laadOpdracht(){
     E('span',{class:'em'}, opdrachtVandaag.emoji),
     E('div',{class:'tx'}, E('b', null, 'Dag-opdracht: '), 'snap '+opdrachtVandaag.tekst,
       E('small', null, 'Elke dag een nieuwe, voor iedereen dezelfde. Jouw inzending staat 24 uur in je verhaal.')),
-    E('button',{class:'knop mini', onclick:()=>kiesStory(true)}, '📸 Doe mee'));
+    E('button',{class:'knop mini', onclick:()=>kiesStory(true)}, 'Doe mee'));
   el.appendChild(kaart);
 }
 // foto verkleinen naar ~kleine jpeg zodat hij klein blijft
@@ -538,7 +538,7 @@ async function laadSnaps(){
   if (!snaps.length) return;
   const el = document.createElement('div'); el.id='nieuweSnaps'; el.className='lijst'; el.style.marginBottom='.6rem';
   el.innerHTML = '<div class="sec" style="margin-top:0;">Nieuwe snaps</div>' + snaps.map(sn=>
-    '<div class="rij"><span class="av">📷</span><div class="nm">'+esc(sn.van)+'<small>stuurde je een snap</small></div><button class="knop mini" data-opensnap="'+esc(sn.id)+'">Bekijk</button></div>'
+    '<div class="rij"><span class="av">◨</span><div class="nm">'+esc(sn.van)+'<small>stuurde je een snap</small></div><button class="knop mini" data-opensnap="'+esc(sn.id)+'">Bekijk</button></div>'
   ).join('');
   $('#vrienden').parentNode.insertBefore(el, $('#vrienden').previousElementSibling);
   el.querySelectorAll('[data-opensnap]').forEach(b=> b.addEventListener('click', ()=> openSnap(b.dataset.opensnap)));
@@ -555,7 +555,7 @@ async function laadStories(){
   let d; try{ d = await soc('/stories'); }catch(e){ return; }
   const st = d.stories||[];
   let html = '<div class="story" id="storyPlus"><div class="ring">＋</div><div class="nm">Jouw verhaal</div></div>';
-  html += st.map(v=> '<div class="story'+(v.gezien?' gezien':'')+'" data-story="'+esc(v.id)+'"'+(v.opdracht?' title="'+esc(v.opdracht)+'"':'')+'><div class="ring">'+initcn(v.van)+'</div><div class="nm">'+(v.opdracht?'📸 ':'')+esc(v.vanMij?'Jij':v.van)+'</div></div>').join('');
+  html += st.map(v=> '<div class="story'+(v.gezien?' gezien':'')+'" data-story="'+esc(v.id)+'"'+(v.opdracht?' title="'+esc(v.opdracht)+'"':'')+'><div class="ring">'+initcn(v.van)+'</div><div class="nm">'+(v.opdracht?'✶ ':'')+esc(v.vanMij?'Jij':v.van)+'</div></div>').join('');
   $('#stories').innerHTML = html;
   $('#storyPlus').addEventListener('click', ()=>kiesStory(false));
   $('#stories').querySelectorAll('[data-story]').forEach(b=> b.addEventListener('click', ()=> openStory(b.dataset.story)));

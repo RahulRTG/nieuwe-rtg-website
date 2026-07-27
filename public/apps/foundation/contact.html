@@ -42,7 +42,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" id="lijstView" role="main">
-  <h1>💬 Contact</h1>
+  <h1>Contact</h1>
   <div id="lijst"><div class="leeg">Laden...</div></div>
 </div>
 
@@ -50,8 +50,8 @@
   <div class="tkop">
     <button class="terug" id="tTerug">←</button>
     <span class="av" id="tAv"></span><span class="nm" id="tNaam"></span>
-    <button class="bel" id="tBel" title="Bellen">📞</button>
-    <button class="bel" id="tVideo" title="Videobellen">🎥</button>
+    <button class="bel" id="tBel" title="Bellen">✆</button>
+    <button class="bel" id="tVideo" title="Videobellen">⌲</button>
   </div>
   <div class="berichten" id="berichten"></div>
   <div class="invoer"><input id="tIn" placeholder="Typ een bericht..." maxlength="1000"><button id="tStuur">Stuur</button></div>
@@ -96,7 +96,7 @@ async function laadLijst(){
   }catch(e){ $('#lijst').innerHTML='<div class="leeg">Kon de gesprekken niet laden.</div>'; }
 }
 async function openGesprek(id){
-  actief = id; const l = leden[id]||{naam:'Gezinslid',avatar:'🙂',kleur:'#C9A24B'};
+  actief = id; const l = leden[id]||{naam:'Gezinslid',avatar:'•',kleur:'#C9A24B'};
   $('#tAv').textContent=l.avatar; $('#tAv').style.background=l.kleur; $('#tNaam').textContent=l.naam;
   $('#lijstView').style.display='none'; $('#balk').style.display='none'; $('#threadView').classList.add('open');
   const d = await GezinRT.thread(id);

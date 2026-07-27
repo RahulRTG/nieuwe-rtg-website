@@ -88,6 +88,43 @@ const ZALEN = {
       ['dinertafel', 4, 4], ['fauteuil', 3, 4], ['fauteuil', 6, 5],
       ['vleugel', 9, 6], ['palm', 0, 8], ['lamp', 0, 5], ['lamp', 11, 5], ['palm', 0, 0]
     ]
+  },
+  balzaal: {
+    naam: 'De Balzaal', sub: 'het gemaskerde bal, elke avond',
+    b: 13, d: 10, spawn: [6, 9],
+    meubels: [
+      ['dansvloer', 4, 3], ['dansvloer', 6, 3], ['dansvloer', 4, 5], ['dansvloer', 6, 5],
+      ['kroonluchter', 5, 4], ['kroonluchter', 7, 4],
+      ['vleugel', 10, 0], ['bank', 0, 4], ['bank', 11, 5],
+      ['palm', 0, 0], ['palm', 12, 0], ['lamp', 0, 8], ['lamp', 12, 8], ['bar', 0, 9]
+    ]
+  },
+  biljart: {
+    naam: 'De Biljartkamer', sub: 'caramboles en een goed gesprek',
+    b: 11, d: 9, spawn: [5, 8],
+    meubels: [
+      ['biljarttafel', 4, 3], ['lamp', 5, 2],
+      ['bar', 7, 7], ['kruk', 7, 6], ['kruk', 8, 6],
+      ['bank', 0, 6], ['bijzet', 2, 6], ['boekenkast', 0, 0], ['palm', 10, 0], ['lamp', 0, 3]
+    ]
+  },
+  boog: {
+    naam: 'De Boogbaan', sub: 'boogschieten op de roos',
+    b: 12, d: 9, spawn: [6, 8],
+    meubels: [
+      ['doelwit', 2, 0], ['doelwit', 6, 0], ['doelwit', 10, 0],
+      ['golfmat', 2, 6], ['golfmat', 6, 6], ['golfmat', 10, 6],
+      ['bank', 0, 8], ['palm', 0, 0], ['palm', 11, 4], ['lamp', 0, 4], ['lamp', 11, 8]
+    ]
+  },
+  sterrenwacht: {
+    naam: 'De Sterrenwacht', sub: 'stil samen kijken, hoog boven het huis',
+    b: 11, d: 9, spawn: [5, 8],
+    meubels: [
+      ['telescoop', 5, 2], ['telescoop', 8, 3],
+      ['chaise', 2, 4], ['chaise', 7, 6], ['bank', 1, 7],
+      ['bijzet', 3, 7], ['lamp', 0, 0], ['palm', 10, 0], ['palm', 0, 8]
+    ]
   }
 };
 

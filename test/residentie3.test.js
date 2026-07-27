@@ -90,14 +90,14 @@ test('Rahul, de directeur: gewaagd alleen prive met het eigen paar in de suite',
   const v1 = await api(base, '/api/residentie/vraag', {}, a.token);
   assert.equal(v1.status, 200);
   assert.equal(v1.body.van, 'rahul', 'prive met het paar is de directeur de gastheer');
-  assert.ok(['eerlijk', 'gewaagd'].includes(v1.body.niveau));
+  assert.ok(['intiem', 'ongemakkelijk', 'traan', 'gewaagd'].includes(v1.body.niveau));
   assert.ok(v1.body.intro && v1.body.tekst.includes('?'));
   // in het restaurant zonder paar-privacy: de gewone vraag van het huis
   await api(base, '/api/residentie/betreed', { kamer: 'restaurant' }, c.token);
   const v2 = await api(base, '/api/residentie/vraag', {}, c.token);
   assert.equal(v2.status, 200);
   assert.equal(v2.body.van, 'huis', 'de eerste restaurantvraag is gewoon van het huis');
-  assert.ok(!v2.body.niveau);
+  assert.ok(v2.body.niveau && v2.body.niveau !== 'gewaagd', 'huis-vragen hebben een genre, nooit gewaagd');
 });
 
 test('losmaken en de schone staat erna', async () => {

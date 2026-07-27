@@ -9,7 +9,8 @@
     k.classList.toggle('rahul', rahul);
     k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:' +
       (rahul ? 'var(--burgundy)' : 'var(--gold)') + ';margin-bottom:.35rem;">' +
-      (rahul ? 'Rahul · directeur van het huis' + (v.niveau === 'gewaagd' ? ' · gewaagd' : '') : 'Vraag van het huis') + '</div>' +
+      (rahul ? 'Rahul · directeur van het huis' : 'Vraag van het huis') +
+      (v.niveau ? ' · ' + esc(v.niveau) : '') + '</div>' +
       (rahul && v.intro ? '<div style="font-size:.74rem;color:var(--soft);margin-bottom:.3rem;">' + esc(v.intro) + '</div>' : '') +
       '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(v.tekst) + '</div>';
     k.classList.add('open');

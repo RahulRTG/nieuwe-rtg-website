@@ -21,13 +21,14 @@
     hover: null
   };
   const KLEUR = {
-    goud: '#C9A94B', goudDiep: '#857007', bordeaux: '#7F1634', bordeauxLicht: '#C23A5E',
-    ivoor: '#EDE6D6', tegelA: '#17140F', tegelB: '#14110D', lijn: 'rgba(201,169,75,0.16)',
-    muur: '#121009', muurLicht: '#1A1710', marmer: '#E9E3D8'
+    goud: '#D8B858', goudDiep: '#857007', bordeaux: '#7F1634', bordeauxLicht: '#D24A6E',
+    ivoor: '#F2ECDC', tegelA: '#2B2519', tegelB: '#231E14', lijn: 'rgba(216,184,88,0.3)',
+    muur: '#1E1910', muurLicht: '#2A2416', marmer: '#EFE9DC'
   };
   // elke zaal een eigen ondertoon in het licht
-  const SFEER = { lobby: '#C9A94B', bar: '#C23A5E', bibliotheek: '#B08D3F', terras: '#4A6B8A',
-    golf: '#3E6B4A', kegel: '#8A5A2B', badhuis: '#3A7A8A', restaurant: '#7F1634' };
+  const SFEER = { lobby: '#D8B858', bar: '#D24A6E', bibliotheek: '#C09A48', terras: '#5C82A6',
+    golf: '#4E8A5E', kegel: '#A66E38', badhuis: '#4A96AA', restaurant: '#9E1C40',
+    balzaal: '#C9A050', biljart: '#3E7A50', boog: '#8A6E3A', sterrenwacht: '#3A4E7A' };
 
   /* ---------- canvas en isometrie ---------- */
   const canvas = $('#wereld'), ctx = canvas.getContext('2d');
@@ -67,22 +68,24 @@
     ctx.clearRect(0, 0, W, H);
     const b = S.kamer.b, d = S.kamer.d;
     const sfeer = S.kamer.soort === 'suite' ? KLEUR.goud : (SFEER[S.kamer.id] || KLEUR.goud);
-    // avondlicht van boven: een zachte gloed in de zaalkleur
+    // avondlicht van boven: een warme gloed in de zaalkleur, met meer contrast
     const g = ctx.createRadialGradient(W / 2, OY - MUUR, 40, W / 2, H / 2, Math.max(W, H) * 0.9);
-    g.addColorStop(0, sfeer + '22'); g.addColorStop(0.4, '#0C0C0B'); g.addColorStop(1, '#080807');
+    g.addColorStop(0, sfeer + '4A'); g.addColorStop(0.45, '#151310'); g.addColorStop(1, '#0A0908');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    // de achtermuren met gouden plint
+    // de achtermuren: een verloop van licht (boven) naar diep (bij de vloer)
     const hoekX = isoX(0, 0), hoekY = isoY(0, 0) - TH / 2;
-    ctx.fillStyle = KLEUR.muur;
+    const wg = ctx.createLinearGradient(0, hoekY - MUUR, 0, hoekY + TH);
+    wg.addColorStop(0, KLEUR.muurLicht); wg.addColorStop(1, KLEUR.muur);
+    ctx.fillStyle = wg;
     ctx.beginPath(); // linkerwand (langs y-as)
     ctx.moveTo(hoekX, hoekY - MUUR); ctx.lineTo(hoekX, hoekY);
     ctx.lineTo(isoX(0, d) - TW / 2, isoY(0, d) - TH / 2 + TH / 2);
     ctx.lineTo(isoX(0, d) - TW / 2, isoY(0, d) - MUUR); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = KLEUR.muurLicht;
-    ctx.beginPath(); // rechterwand (langs x-as)
+    ctx.beginPath(); // rechterwand (langs x-as), iets lichter aangezet
     ctx.moveTo(hoekX, hoekY - MUUR); ctx.lineTo(hoekX, hoekY);
     ctx.lineTo(isoX(b, 0) + TW / 2, isoY(b, 0) - TH / 2 + TH / 2);
     ctx.lineTo(isoX(b, 0) + TW / 2, isoY(b, 0) - MUUR); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = sfeer + '14'; ctx.fill();
     // plintlijn in goud
     ctx.strokeStyle = 'rgba(201,169,75,0.4)'; ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -184,20 +187,6 @@
       ctx.fillStyle = '#241E14';
       ruitje(cx2 - TW * 0.09, cy2 - TH * 0.09, TW * 0.16); ruitje(cx2 + TW * 0.09, cy2 + TH * 0.02, TW * 0.16);
     },
-    boekenkast: (x, y) => {
-      blokje(x, y, 3, 0.5, TH * 2.2, '#1A1712', '#242018');
-      ctx.strokeStyle = 'rgba(201,169,75,0.35)'; ctx.lineWidth = 0.8;
-      for (let i = 1; i <= 3; i++) { const h = TH * 2.2 * i / 4;
-        ctx.beginPath(); ctx.moveTo(isoX(x, y + 0.5), isoY(x, y + 0.5) - h); ctx.lineTo(isoX(x + 3, y + 0.5), isoY(x + 3, y + 0.5) - h); ctx.stroke(); }
-    },
-    tapijt: (x, y) => {
-      ctx.beginPath();
-      ctx.moveTo(isoX(x + 1.5, y), isoY(x + 1.5, y) - 1); ctx.lineTo(isoX(x + 3, y + 1), isoY(x + 3, y + 1) - 1);
-      ctx.lineTo(isoX(x + 1.5, y + 2), isoY(x + 1.5, y + 2) - 1); ctx.lineTo(isoX(x, y + 1), isoY(x, y + 1) - 1);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(127,22,52,0.55)'; ctx.fill();
-      ctx.strokeStyle = 'rgba(201,169,75,0.55)'; ctx.lineWidth = 1.4; ctx.stroke();
-    },
     fontein: (x, y) => {
       const [mx, my] = midden(x, y, 2, 2);
       ctx.beginPath(); ctx.ellipse(mx, my, TW * 0.7, TH * 0.7, 0, 0, Math.PI * 2);
@@ -236,8 +225,20 @@
     ctx.bezierCurveTo(px + TW * 0.1, py - hoog * 0.52, px + TW * 0.05, py - hoog * 0.38, px + TW * 0.16, py);
     ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.arc(px, py - hoog * 0.8, TW * 0.105, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = zelf ? 'rgba(201,169,75,0.8)' : 'rgba(255,255,255,0.25)'; ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.ellipse(px, py - hoog * 0.66, TW * 0.085, TH * 0.06, 0, 0, Math.PI * 2); ctx.stroke();
+    // het gemaskerde bal: een venetiaans masker met een veertje en een kraag
+    const hoofdY = py - hoog * 0.8, r = TW * 0.105;
+    ctx.fillStyle = zelf ? '#7F1634' : '#141210';
+    ctx.beginPath(); ctx.ellipse(px, hoofdY - r * 0.12, r * 1.06, r * 0.52, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = zelf ? 'rgba(240,214,140,0.9)' : 'rgba(201,169,75,0.8)'; ctx.lineWidth = 0.9;
+    ctx.stroke();
+    ctx.fillStyle = '#F2ECDC';
+    ctx.beginPath(); ctx.arc(px - r * 0.42, hoofdY - r * 0.12, r * 0.16, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px + r * 0.42, hoofdY - r * 0.12, r * 0.16, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = zelf ? '#E3C878' : '#C9A94B'; ctx.lineWidth = 1.1; // het veertje
+    ctx.beginPath(); ctx.moveTo(px + r * 0.9, hoofdY - r * 0.3);
+    ctx.quadraticCurveTo(px + r * 1.5, hoofdY - r * 1.6, px + r * 0.7, hoofdY - r * 2.1); ctx.stroke();
+    ctx.strokeStyle = zelf ? 'rgba(127,22,52,0.75)' : 'rgba(20,18,16,0.65)'; ctx.lineWidth = 1.6; // de kraag
+    ctx.beginPath(); ctx.ellipse(px, py - hoog * 0.64, TW * 0.1, TH * 0.075, 0, Math.PI * 1.05, Math.PI * 1.95, true); ctx.stroke();
     extraGast(l, px, py); // in het water of onder de douche: het effect erbij
     // het naamplaatje
     ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'center';
@@ -452,6 +453,106 @@
     }
   }
 
+  /* ---------- deel 2c: het bal, de biljartkamer en de sterrenwacht ----------
+     De tekeningen voor de nieuwe zalen: kroonluchters en een spiegelende
+     dansvloer, de biljarttafel, het boogdoel en de telescoop. Zelfde taal:
+     goudlijn op donker, licht uit de tekening zelf. */
+  VLAKKEN.add('dansvloer');
+  VLAKKEN.add('kroonluchter');
+
+  Object.assign(TEKEN, {
+    boekenkast: (x, y) => {
+      blokje(x, y, 3, 0.5, TH * 2.2, '#1A1712', '#242018');
+      ctx.strokeStyle = 'rgba(201,169,75,0.35)'; ctx.lineWidth = 0.8;
+      for (let i = 1; i <= 3; i++) { const h = TH * 2.2 * i / 4;
+        ctx.beginPath(); ctx.moveTo(isoX(x, y + 0.5), isoY(x, y + 0.5) - h); ctx.lineTo(isoX(x + 3, y + 0.5), isoY(x + 3, y + 0.5) - h); ctx.stroke(); }
+    },
+    tapijt: (x, y) => {
+      ctx.beginPath();
+      ctx.moveTo(isoX(x + 1.5, y), isoY(x + 1.5, y) - 1); ctx.lineTo(isoX(x + 3, y + 1), isoY(x + 3, y + 1) - 1);
+      ctx.lineTo(isoX(x + 1.5, y + 2), isoY(x + 1.5, y + 2) - 1); ctx.lineTo(isoX(x, y + 1), isoY(x, y + 1) - 1);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(127,22,52,0.55)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(201,169,75,0.55)'; ctx.lineWidth = 1.4; ctx.stroke();
+    },
+    kroonluchter: (x, y) => {
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5);
+      const top = py - TH * 4.6, fl = Math.sin(Date.now() / 300 + x) * 0.6;
+      ctx.strokeStyle = 'rgba(216,184,88,0.75)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(px, top - TH * 0.8); ctx.lineTo(px, top); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(px, top, TW * 0.34, TH * 0.16, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(px, top + TH * 0.28, TW * 0.2, TH * 0.1, 0, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 5; i++) {
+        const a = (Math.PI * 2 / 5) * i + 0.4;
+        const kx = px + Math.cos(a) * TW * 0.34, ky = top + Math.sin(a) * TH * 0.16;
+        const gl = ctx.createRadialGradient(kx, ky - 3, 0.5, kx, ky - 3, 5 + fl);
+        gl.addColorStop(0, 'rgba(246,220,140,0.95)'); gl.addColorStop(1, 'rgba(246,220,140,0)');
+        ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(kx, ky - 3, 5 + fl, 0, Math.PI * 2); ctx.fill();
+      }
+      const poel = ctx.createRadialGradient(px, py, 2, px, py, TW * 1.1);
+      poel.addColorStop(0, 'rgba(246,220,140,0.16)'); poel.addColorStop(1, 'rgba(246,220,140,0)');
+      ctx.fillStyle = poel;
+      ctx.beginPath(); ctx.ellipse(px, py, TW * 1.1, TH * 1.1, 0, 0, Math.PI * 2); ctx.fill();
+    },
+    dansvloer: (x, y) => {
+      vlakRuit(x, y, 2, 2, 'rgba(58,50,34,0.9)', 'rgba(216,184,88,0.55)');
+      ctx.strokeStyle = 'rgba(216,184,88,0.28)'; ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(isoX(x + 1, y), isoY(x + 1, y) - 1); ctx.lineTo(isoX(x + 1, y + 2), isoY(x + 1, y + 2) - 1);
+      ctx.moveTo(isoX(x, y + 1), isoY(x, y + 1) - 1); ctx.lineTo(isoX(x + 2, y + 1), isoY(x + 2, y + 1) - 1);
+      ctx.stroke();
+      const sh = ctx.createLinearGradient(isoX(x, y + 1) , isoY(x, y) - 1, isoX(x + 2, y + 1), isoY(x + 2, y + 2));
+      sh.addColorStop(0, 'rgba(246,236,220,0)'); sh.addColorStop(0.5, 'rgba(246,236,220,0.08)'); sh.addColorStop(1, 'rgba(246,236,220,0)');
+      vlakRuit(x, y, 2, 2, sh);
+    },
+    biljarttafel: (x, y) => {
+      blokje(x, y, 3, 2, TH * 0.72, '#241E14', '#2E6B44');
+      ctx.strokeStyle = 'rgba(216,184,88,0.6)'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(isoX(x + 0.2, y + 0.2), isoY(x + 0.2, y + 0.2) - TH * 0.72);
+      ctx.lineTo(isoX(x + 2.8, y + 0.2), isoY(x + 2.8, y + 0.2) - TH * 0.72);
+      ctx.lineTo(isoX(x + 2.8, y + 1.8), isoY(x + 2.8, y + 1.8) - TH * 0.72);
+      ctx.lineTo(isoX(x + 0.2, y + 1.8), isoY(x + 0.2, y + 1.8) - TH * 0.72);
+      ctx.closePath(); ctx.stroke();
+      const bal = (bx, by, kleur) => {
+        ctx.fillStyle = kleur;
+        ctx.beginPath(); ctx.ellipse(isoX(x + bx, y + by), isoY(x + bx, y + by) - TH * 0.72 - 2, 2.6, 2, 0, 0, Math.PI * 2); ctx.fill();
+      };
+      bal(1, 0.8, '#F2ECDC'); bal(1.8, 1.2, '#C23A5E'); bal(2.2, 0.6, '#D8B858');
+    },
+    doelwit: (x, y) => {
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5);
+      ctx.strokeStyle = 'rgba(216,184,88,0.7)'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(px - TW * 0.14, py); ctx.lineTo(px, py - TH * 1.1); ctx.moveTo(px + TW * 0.14, py); ctx.lineTo(px, py - TH * 1.1); ctx.stroke();
+      const r = TW * 0.26, cy2 = py - TH * 1.7;
+      for (const [rr, kleur] of [[1, '#F2ECDC'], [0.66, '#D24A6E'], [0.33, '#D8B858']]) {
+        ctx.fillStyle = kleur;
+        ctx.beginPath(); ctx.arc(px, cy2, r * rr, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.fillStyle = '#141210';
+      ctx.beginPath(); ctx.arc(px, cy2, r * 0.1, 0, Math.PI * 2); ctx.fill();
+    },
+    telescoop: (x, y) => {
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5);
+      ctx.strokeStyle = 'rgba(216,184,88,0.8)'; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(px - TW * 0.16, py); ctx.lineTo(px, py - TH * 1);
+      ctx.moveTo(px + TW * 0.16, py); ctx.lineTo(px, py - TH * 1);
+      ctx.stroke();
+      ctx.save();
+      ctx.translate(px, py - TH * 1); ctx.rotate(-0.6);
+      ctx.fillStyle = '#2A2416';
+      ctx.fillRect(-3, -TW * 0.42, 6, TW * 0.46);
+      ctx.strokeStyle = 'rgba(216,184,88,0.9)'; ctx.lineWidth = 1; ctx.strokeRect(-3, -TW * 0.42, 6, TW * 0.46);
+      ctx.restore();
+      const st = Date.now() / 900; // een handvol sterren boven de kijker
+      ctx.fillStyle = 'rgba(240,236,220,' + (0.5 + Math.sin(st + x) * 0.3).toFixed(2) + ')';
+      for (const [ox, oy] of [[-14, -TH * 2.6], [10, -TH * 3], [2, -TH * 2.2]]) {
+        ctx.beginPath(); ctx.arc(px + ox, py + oy, 1.1, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  });
+
   /* ---------- deel 3: de tekenlus, het netwerk en het gesprek ----------
      De lus loopt op requestAnimationFrame en sorteert alles op diepte; het
      netwerk rijdt op de gewone routes plus het bestaande /api/stream-kanaal
@@ -590,8 +691,10 @@
      De activiteitenzalen hebben een eigen spel per zaal; u daagt iemand in
      de zaal uit, de ander zegt ja, en om de beurt speelt u met de
      timing-meter. Geen ranglijsten -- de uitslag is van het moment. */
-  const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen' };
-  const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem' };
+  const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen',
+    balzaal: 'dansen', biljart: 'biljart', boog: 'boogschieten' };
+  const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem',
+    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet' };
   let P = null, meterAan = false, meterWaarde = 0;
 
   function kamerKnoppen() {
@@ -621,7 +724,7 @@
   });
 
   function startPotje(d) {
-    P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, beurten: d.beurten,
+    P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
     tekenSpel();
@@ -633,7 +736,7 @@
     const st = P.spelers.length === 4
       ? [0, 1].map(t => P.spelers.filter(s2 => s2.team === t).map(s2 => esc(s2.codenaam)).join(' & ') + ' ' +
           P.spelers.filter(s2 => s2.team === t).reduce((a, s2) => a + s2.punten.reduce((x, y) => x + y, 0), 0)).join(' tegen ')
-      : P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(' tegen ');
+      : P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(P.samen ? ' en ' : ' tegen ');
     $('#spelInfo').innerHTML = '<b>' + esc(P.naam) + '</b> · ' + st + ' ' + esc(P.eenheid) +
       '<span style="color:var(--gold);"> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
     $('#spelDoe').textContent = SPELWERK[P.spel] || 'Speel';
@@ -661,9 +764,12 @@
       const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);
       const w = d.uitslag.winnaar;
       $('#spelKeuze').innerHTML = '<h2>' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
-        '<div class="sub">' + esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1] + '</div>' +
+        '<div class="sub">' + (d.uitslag.samen
+          ? esc(namen[0]) + ' · samen ' + d.uitslag.stand[0] + ' ' + (P ? esc(P.eenheid) : '')
+          : esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1]) + '</div>' +
         '<p style="margin:.6rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
-        (w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
+        (d.uitslag.samen ? 'Wat een paar. De vloer was van u.'
+          : w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
         '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
       $('#spelLaag').classList.add('open');
       $('#spelUitslagWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
@@ -707,7 +813,8 @@
     k.classList.toggle('rahul', rahul);
     k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:' +
       (rahul ? 'var(--burgundy)' : 'var(--gold)') + ';margin-bottom:.35rem;">' +
-      (rahul ? 'Rahul · directeur van het huis' + (v.niveau === 'gewaagd' ? ' · gewaagd' : '') : 'Vraag van het huis') + '</div>' +
+      (rahul ? 'Rahul · directeur van het huis' : 'Vraag van het huis') +
+      (v.niveau ? ' · ' + esc(v.niveau) : '') + '</div>' +
       (rahul && v.intro ? '<div style="font-size:.74rem;color:var(--soft);margin-bottom:.3rem;">' + esc(v.intro) + '</div>' : '') +
       '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(v.tekst) + '</div>';
     k.classList.add('open');

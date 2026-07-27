@@ -3,8 +3,10 @@
      De activiteitenzalen hebben een eigen spel per zaal; u daagt iemand in
      de zaal uit, de ander zegt ja, en om de beurt speelt u met de
      timing-meter. Geen ranglijsten -- de uitslag is van het moment. */
-  const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen' };
-  const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem' };
+  const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen',
+    balzaal: 'dansen', biljart: 'biljart', boog: 'boogschieten' };
+  const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem',
+    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet' };
   let P = null, meterAan = false, meterWaarde = 0;
 
   function kamerKnoppen() {
@@ -34,7 +36,7 @@
   });
 
   function startPotje(d) {
-    P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, beurten: d.beurten,
+    P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
     tekenSpel();
@@ -46,7 +48,7 @@
     const st = P.spelers.length === 4
       ? [0, 1].map(t => P.spelers.filter(s2 => s2.team === t).map(s2 => esc(s2.codenaam)).join(' & ') + ' ' +
           P.spelers.filter(s2 => s2.team === t).reduce((a, s2) => a + s2.punten.reduce((x, y) => x + y, 0), 0)).join(' tegen ')
-      : P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(' tegen ');
+      : P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(P.samen ? ' en ' : ' tegen ');
     $('#spelInfo').innerHTML = '<b>' + esc(P.naam) + '</b> · ' + st + ' ' + esc(P.eenheid) +
       '<span style="color:var(--gold);"> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
     $('#spelDoe').textContent = SPELWERK[P.spel] || 'Speel';
@@ -74,9 +76,12 @@
       const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);
       const w = d.uitslag.winnaar;
       $('#spelKeuze').innerHTML = '<h2>' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
-        '<div class="sub">' + esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1] + '</div>' +
+        '<div class="sub">' + (d.uitslag.samen
+          ? esc(namen[0]) + ' · samen ' + d.uitslag.stand[0] + ' ' + (P ? esc(P.eenheid) : '')
+          : esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1]) + '</div>' +
         '<p style="margin:.6rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
-        (w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
+        (d.uitslag.samen ? 'Wat een paar. De vloer was van u.'
+          : w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
         '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
       $('#spelLaag').classList.add('open');
       $('#spelUitslagWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));

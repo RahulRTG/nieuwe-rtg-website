@@ -13,32 +13,18 @@ const SPELLEN = {
   kegelen: { zaal: 'kegel', naam: 'Kegelen', beurten: 5, laag: false, eenheid: 'kegels',
     punt: a => a >= 92 ? 10 : Math.floor(a / 10) },
   zwemmen: { zaal: 'badhuis', naam: 'Baantjes zwemmen', beurten: 4, laag: true, eenheid: 'seconden',
-    punt: a => Math.round((14 - a / 10) * 10) / 10 }
+    punt: a => Math.round((14 - a / 10) * 10) / 10 },
+  biljart: { zaal: 'biljart', naam: 'Biljart', beurten: 5, eenheid: 'caramboles',
+    punt: a => a >= 90 ? 3 : a >= 65 ? 2 : a >= 35 ? 1 : 0 },
+  boogschieten: { zaal: 'boog', naam: 'Boogschieten', beurten: 5, eenheid: 'punten',
+    punt: a => Math.min(10, Math.max(0, Math.round(a / 10))) },
+  // dansen is samen: geen winnaar, een gezamenlijke score voor de gratie
+  dansen: { zaal: 'balzaal', naam: 'Samen dansen', beurten: 4, samen: true, eenheid: 'gratie',
+    punt: a => Math.round(a / 2) }
 };
 
-/* de vragen van het huis: om elkaar te leren kennen, licht en zonder graven */
-const VRAGEN = [
-  'Wat is de mooiste reis die u ooit maakte, en waarom die?',
-  'Waar kunnen ze u midden in de nacht voor wakker maken?',
-  'Welk gerecht doet u aan thuis denken?',
-  'Wat zou u doen met een vrije maandagochtend?',
-  'Welke muziek staat er op als niemand meeluistert?',
-  'Bent u van de bergen of van de zee?',
-  'Wat is het beste advies dat u ooit kreeg?',
-  'Welke stad zou u zo weer bezoeken?',
-  'Wat kunt u verrassend goed?',
-  'Waar wordt u rustig van na een lange dag?',
-  'Welk boek of welke film raakt u telkens weer?',
-  'Wat staat er bovenaan uw lijstje voor dit jaar?',
-  'Koffie of thee, en hoe precies?',
-  'Wat was uw eerste baantje, en wat leerde het u?',
-  'Met wie uit de geschiedenis zou u een avond willen eten?',
-  'Wat is uw guilty pleasure op televisie?',
-  'Welke geur brengt u meteen ergens naartoe?',
-  'Wat zou u nog willen leren als tijd geen rol speelde?'
-];
-
 const rahul = require('./rahul');
+const vragen = require('./vragen');
 
 module.exports = (ctx) => {
   const { R, kamer, kamerVan, sein, sseToCustomer, save, partnerVan } = ctx;
@@ -89,7 +75,7 @@ module.exports = (ctx) => {
   }
 
   const staTe = (p, id) => ({ spel: p.spel, naam: SPELLEN[p.spel].naam, eenheid: SPELLEN[p.spel].eenheid,
-    laag: !!SPELLEN[p.spel].laag, beurten: SPELLEN[p.spel].beurten, kamerId: id,
+    laag: !!SPELLEN[p.spel].laag, samen: !!SPELLEN[p.spel].samen, beurten: SPELLEN[p.spel].beurten, kamerId: id,
     spelers: p.spelers.map(s => ({ codenaam: s.codenaam, punten: s.punten, team: s.team })),
     aanZet: p.status === 'bezig' ? p.spelers[p.beurt % p.spelers.length].codenaam : null });
   const teamNamen = p => [0, 1].map(t => p.spelers.filter(s => s.team === t).map(s => s.codenaam).join(' & '));
@@ -108,11 +94,16 @@ module.exports = (ctx) => {
     const klaar = p.spelers.every(s => s.punten.length >= S2.beurten);
     let uitslag = null;
     if (klaar) {
-      const som = t => Math.round(p.spelers.filter(s => s.team === t)
+      const som = t => Math.round(p.spelers.filter(s => t == null || s.team === t)
         .reduce((a, s) => a + s.punten.reduce((x, y) => x + y, 0), 0) * 10) / 10;
-      const a = som(0), b = som(1);
-      uitslag = { stand: [a, b], teams: teamNamen(p),
-        winnaar: a === b ? null : (S2.laag ? (a < b ? 0 : 1) : (a > b ? 0 : 1)) };
+      if (S2.samen) {
+        uitslag = { stand: [som(null)], samen: true, winnaar: null,
+          teams: [p.spelers.map(s => s.codenaam).join(' & ')] };
+      } else {
+        const a = som(0), b = som(1);
+        uitslag = { stand: [a, b], teams: teamNamen(p),
+          winnaar: a === b ? null : (S2.laag ? (a < b ? 0 : 1) : (a > b ? 0 : 1)) };
+      }
       delete potjes()[id];
     }
     save();
@@ -144,16 +135,24 @@ module.exports = (ctx) => {
     k.vraagTeller = (k.vraagTeller || 0) + 1;
     const maat = partnerVan && partnerVan(key);
     const prive = id.startsWith('suite:') && maat && k.leden[maat] && Object.keys(k.leden).length === 2;
+    const pak = a => a[Math.floor(Math.random() * a.length)];
     let uit;
     if (prive) {
-      const niveau = k.vraagTeller % 2 ? 'eerlijk' : 'gewaagd';
-      const r = rahul.kies(niveau);
-      uit = { tekst: r.tekst, intro: r.intro, van: 'rahul', niveau };
+      // de directeur als gastheer: gewaagd (eigen dek) afgewisseld met de
+      // diepere genres uit de motor
+      if (k.vraagTeller % 2 === 0) {
+        const r = rahul.kies('gewaagd');
+        uit = { tekst: r.tekst, intro: r.intro, van: 'rahul', niveau: 'gewaagd' };
+      } else {
+        const v = vragen.genereer(pak(['intiem', 'ongemakkelijk', 'traan']));
+        uit = { tekst: v.tekst, intro: rahul.kies('eerlijk').intro, van: 'rahul', niveau: v.genre };
+      }
     } else if (id === 'restaurant' && k.vraagTeller % 3 === 0) {
-      const r = rahul.kies('eerlijk');
-      uit = { tekst: r.tekst, intro: r.intro, van: 'rahul', niveau: 'eerlijk' };
+      const v = vragen.genereer(pak(['ongemakkelijk', 'traan', 'zakelijk']));
+      uit = { tekst: v.tekst, intro: rahul.kies('eerlijk').intro, van: 'rahul', niveau: v.genre };
     } else {
-      uit = { tekst: VRAGEN[Math.floor(Math.random() * VRAGEN.length)], van: 'huis' };
+      const v = vragen.genereer(pak(['luchtig', 'luchtig', 'lach', 'zakelijk', 'intiem']));
+      uit = { tekst: v.tekst, van: 'huis', niveau: v.genre };
     }
     sein(id, 'vraag', uit, key);
     return Object.assign({ status: 200, ok: true }, uit);

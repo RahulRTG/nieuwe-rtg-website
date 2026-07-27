@@ -38,6 +38,12 @@ const MEUBELS = {
   keuken: { naam: 'Keukeneiland', b: 3, d: 1 },
   koelkast: { naam: 'Koelkast', b: 1, d: 1 },
   dinertafel: { naam: 'Dinertafel voor twee', b: 2, d: 2 },
+  /* bal en salon */
+  kroonluchter: { naam: 'Kroonluchter', b: 1, d: 1, vlak: true },
+  dansvloer: { naam: 'Dansvloer', b: 2, d: 2, vlak: true },
+  biljarttafel: { naam: 'Biljarttafel', b: 3, d: 2 },
+  doelwit: { naam: 'Boogdoel', b: 1, d: 1 },
+  telescoop: { naam: 'Telescoop', b: 1, d: 1 },
   /* spel en buiten */
   water: { naam: 'Privebad (water)', b: 2, d: 2, vlak: true },
   green: { naam: 'Golfgreen', b: 2, d: 2, vlak: true },

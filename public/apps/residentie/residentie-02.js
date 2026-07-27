@@ -68,20 +68,6 @@
       ctx.fillStyle = '#241E14';
       ruitje(cx2 - TW * 0.09, cy2 - TH * 0.09, TW * 0.16); ruitje(cx2 + TW * 0.09, cy2 + TH * 0.02, TW * 0.16);
     },
-    boekenkast: (x, y) => {
-      blokje(x, y, 3, 0.5, TH * 2.2, '#1A1712', '#242018');
-      ctx.strokeStyle = 'rgba(201,169,75,0.35)'; ctx.lineWidth = 0.8;
-      for (let i = 1; i <= 3; i++) { const h = TH * 2.2 * i / 4;
-        ctx.beginPath(); ctx.moveTo(isoX(x, y + 0.5), isoY(x, y + 0.5) - h); ctx.lineTo(isoX(x + 3, y + 0.5), isoY(x + 3, y + 0.5) - h); ctx.stroke(); }
-    },
-    tapijt: (x, y) => {
-      ctx.beginPath();
-      ctx.moveTo(isoX(x + 1.5, y), isoY(x + 1.5, y) - 1); ctx.lineTo(isoX(x + 3, y + 1), isoY(x + 3, y + 1) - 1);
-      ctx.lineTo(isoX(x + 1.5, y + 2), isoY(x + 1.5, y + 2) - 1); ctx.lineTo(isoX(x, y + 1), isoY(x, y + 1) - 1);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(127,22,52,0.55)'; ctx.fill();
-      ctx.strokeStyle = 'rgba(201,169,75,0.55)'; ctx.lineWidth = 1.4; ctx.stroke();
-    },
     fontein: (x, y) => {
       const [mx, my] = midden(x, y, 2, 2);
       ctx.beginPath(); ctx.ellipse(mx, my, TW * 0.7, TH * 0.7, 0, 0, Math.PI * 2);
@@ -120,8 +106,20 @@
     ctx.bezierCurveTo(px + TW * 0.1, py - hoog * 0.52, px + TW * 0.05, py - hoog * 0.38, px + TW * 0.16, py);
     ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.arc(px, py - hoog * 0.8, TW * 0.105, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = zelf ? 'rgba(201,169,75,0.8)' : 'rgba(255,255,255,0.25)'; ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.ellipse(px, py - hoog * 0.66, TW * 0.085, TH * 0.06, 0, 0, Math.PI * 2); ctx.stroke();
+    // het gemaskerde bal: een venetiaans masker met een veertje en een kraag
+    const hoofdY = py - hoog * 0.8, r = TW * 0.105;
+    ctx.fillStyle = zelf ? '#7F1634' : '#141210';
+    ctx.beginPath(); ctx.ellipse(px, hoofdY - r * 0.12, r * 1.06, r * 0.52, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = zelf ? 'rgba(240,214,140,0.9)' : 'rgba(201,169,75,0.8)'; ctx.lineWidth = 0.9;
+    ctx.stroke();
+    ctx.fillStyle = '#F2ECDC';
+    ctx.beginPath(); ctx.arc(px - r * 0.42, hoofdY - r * 0.12, r * 0.16, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px + r * 0.42, hoofdY - r * 0.12, r * 0.16, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = zelf ? '#E3C878' : '#C9A94B'; ctx.lineWidth = 1.1; // het veertje
+    ctx.beginPath(); ctx.moveTo(px + r * 0.9, hoofdY - r * 0.3);
+    ctx.quadraticCurveTo(px + r * 1.5, hoofdY - r * 1.6, px + r * 0.7, hoofdY - r * 2.1); ctx.stroke();
+    ctx.strokeStyle = zelf ? 'rgba(127,22,52,0.75)' : 'rgba(20,18,16,0.65)'; ctx.lineWidth = 1.6; // de kraag
+    ctx.beginPath(); ctx.ellipse(px, py - hoog * 0.64, TW * 0.1, TH * 0.075, 0, Math.PI * 1.05, Math.PI * 1.95, true); ctx.stroke();
     extraGast(l, px, py); // in het water of onder de douche: het effect erbij
     // het naamplaatje
     ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'center';

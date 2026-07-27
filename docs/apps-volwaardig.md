@@ -1655,3 +1655,23 @@ tekstwissel.
 Test: gezinskeuken.test.js kreeg een vijfde test (aanmaken, dubbel
 negeren, tikken naar de lijst, vast weghalen zonder de lijst te raken,
 dicht voor gasten).
+
+## RTF-golf 8 (deel 2): cultuur op orde, consistentie afgemaakt
+
+De cultuurlaag bleek grotendeels al op niveau (de App-Bibliotheek met
+bibliothecaris, de Geloof & Wijsheid-Bibliotheek en het magazine); deel
+2 is daarom een gerichte consistentieronde:
+
+**bord.html emoji-vrij**: de werktuigknoppen (marker, gum, wissen) en de
+sectiekoppen gebruiken nu huisstijl-glyfen (✎, ◻, ✕) in plaats van
+OS-emoji, in lijn met de lopende emoji-ronde.
+
+**De privacyregel dekt nu echt elke coach-chat**: een sweep over alle
+foundation-pagina's vond nog twee chats zonder de regel "Wat je hier
+typt wordt niet bewaard." -- opvoeden.html en studie.html. Beide hebben
+hem nu, waarmee de belofte uit golf 6 overal geldt (de sweep is
+herhaalbaar: elk Sessie.coach-gebruik hoort een privacyregel te hebben).
+
+verjaardagen.html en oppasinfo.html zijn doorgelicht en staan op niveau
+(volledige secties, server-bedrading, gast-scheiding); geen ingreep
+nodig.

@@ -1488,3 +1488,26 @@ weekgeldCenten). Client: klusjes.html (geldschoolblok: ouder beheert,
 kind kijkt mee) + zakgeld.html (weekgeldregel onder het saldo).
 Tests: rtfgeld.test.js (3: nooit dubbel, eer blijft staan, uit is uit
 maar geboekt is geboekt) en rtfgeld.e2e.js door beide schermen.
+
+## RTF-golf 5: het gezinsalbum
+
+Het babyboekje groeide naar het niveau van de RTG Galerij, zonder zijn
+warmte te verliezen. Het boekje is nu een album met maandhoofdstukken,
+een kijker (foto groot, pijlen, toetsenbord), een gedeeld
+favorieten-hartje en de terugblik "Deze maand, eerder" -- dezelfde
+eerlijke regel als de Galerij: dezelfde maand, eerdere jaren.
+
+Drie eerlijke keuzes. Het hartje is van het gezin samen: iedereen kan
+er een geven, je ziet of JIJ hem mooi vond, en er is geen ranglijst --
+warmte, geen wedstrijd. Een oude foto mag op zijn echte dag het boekje
+in (optioneel dagveld), maar nooit op een dag die nog moet komen: de
+server klemt de toekomst op vandaag. En het album LEEST de
+verjaardagen-app alleen mee: de jarigenstrook ("Over 10 dagen: oma
+jarig, wordt 70") komt uit de bestaande leesroute, beheren doe je in de
+verjaardagen-app zelf -- geen tweede verjaardagslogica.
+
+Server: kern/baby.js (tijdlijn, favoriet, dagklem) op de bestaande
+mediastore. Client: babyboek.html (maandgroepen, filter, kijker,
+terugblik, jarigenstrook). Tests: rtfalbum.test.js (3: maandgroepen en
+terugblik met dagklem, het hartje per kijker, gast blijft buiten) en
+rtfalbum.e2e.js door het hele scherm.

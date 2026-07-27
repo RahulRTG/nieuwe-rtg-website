@@ -26,10 +26,27 @@
   .fotoknop input[type=file]{display:none;}
   .preview{max-width:9rem;border-radius:12px;display:block;}
   .preview[hidden],.mini[hidden]{display:none;}
-  /* het boekje zelf: per dag een bladzijde-gevoel */
+  /* het album: maandgroepen met een bladzijde-gevoel */
   .dag{margin-bottom:1.2rem;}
-  .dag .datum{font-family:var(--serif);font-size:1.05rem;color:var(--goud2);margin-bottom:.5rem;}
+  .dag .datum{font-family:var(--serif);font-size:1.15rem;color:var(--goud2);margin-bottom:.5rem;}
   .moment{padding:.9rem 1rem;margin-bottom:.6rem;}
+  .moment .dagje{color:var(--zacht);font-size:.75rem;margin-bottom:.3rem;}
+  .moment img{cursor:zoom-in;}
+  .hart{background:none;border:0;cursor:pointer;color:var(--zacht);font-size:.95rem;padding:0 .2rem;}
+  .hart.aan{color:var(--goud2);}
+  .filterrij{display:flex;gap:.4rem;margin:0 0 .8rem;}
+  .filterrij button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .9rem;font-size:.82rem;cursor:pointer;}
+  .filterrij button.aan{border-color:var(--goud);color:var(--goud2);}
+  .jarig{display:flex;align-items:center;gap:.6rem;background:var(--paneel2);border:1px solid var(--goud);border-radius:12px;padding:.6rem .9rem;margin-bottom:.5rem;font-size:.9rem;}
+  .jarig a{margin-left:auto;color:var(--goud2);font-size:.82rem;text-decoration:none;white-space:nowrap;}
+  /* de kijker: een foto groot, met pijlen en het hartje */
+  .kijker{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;z-index:60;flex-direction:column;align-items:center;justify-content:center;padding:1rem;}
+  .kijker.open{display:flex;}
+  .kijker img{max-width:100%;max-height:70vh;border-radius:12px;}
+  .kijker .onder{color:var(--txt);text-align:center;margin-top:.8rem;max-width:34rem;}
+  .kijker .onder small{display:block;color:var(--zacht);margin-top:.25rem;}
+  .kijker .knopjes{display:flex;gap:1rem;align-items:center;margin-top:.7rem;}
+  .kijker button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.5rem .9rem;cursor:pointer;font-size:1rem;}
   .moment img{width:100%;border-radius:12px;display:block;margin-bottom:.6rem;}
   .moment .tk{line-height:1.55;white-space:pre-wrap;}
   .moment .wie{display:flex;align-items:center;gap:.4rem;color:var(--zacht);font-size:.78rem;margin-top:.5rem;}
@@ -55,6 +72,9 @@
   <h1>Fotoboekje</h1>
   <p class="intro" id="intro">Elke dag een foto of een klein stukje over jullie kindje. Zo groeit er vanzelf een boekje vol eerste keertjes, voor later.</p>
 
+  <!-- het album leest de verjaardagen alleen mee; beheren doe je in de verjaardagen-app -->
+  <div id="jarigen"></div>
+
   <!-- eerste keer: het kindje voorstellen -->
   <div class="kaart blok" id="kInstel" hidden>
     <div style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.5rem;">Voor wie is dit boekje?</div>
@@ -79,13 +99,24 @@
         <label class="knop grijs klein">Kies een foto<input type="file" id="cFoto" accept="image/*"></label>
         <img class="preview" id="cPreview" alt="Gekozen foto" hidden>
         <button class="mini" id="cFotoWeg" hidden>✕ foto weg</button>
+        <label class="mini" style="display:inline-flex;gap:.3rem;align-items:center;">van een andere dag?
+          <input class="veld" id="cDag" type="date" style="padding:.3rem .5rem;font-size:.82rem;" aria-label="Op welke dag was dit moment? (mag leeg)"></label>
       </div>
       <button class="knop" id="cBewaar" style="width:100%;margin-top:.6rem;">In het boekje</button>
       <div class="fout" id="cFout"></div>
     </div>
 
     <h2 class="sec">Het boekje</h2>
+    <div class="filterrij" role="group" aria-label="Weergave">
+      <button id="fAlles" class="aan" type="button">Alles</button>
+      <button id="fFavs" type="button">Favorieten</button>
+    </div>
     <div id="boek"><div class="leeg">Nog geen momentjes. Vandaag is een mooie dag om te beginnen.</div></div>
+
+    <div id="terugblikSec" hidden>
+      <h2 class="sec">Deze maand, eerder</h2>
+      <div id="terugblik"></div>
+    </div>
 
     <h2 class="sec">Leuke momenten voor het hele gezin</h2>
     <div class="kaart blok">
@@ -119,6 +150,18 @@
   </div>
 </div>
 
+<!-- de kijker: een foto groot, met pijlen, toetsenbord en het hartje -->
+<div class="kijker" id="kijker" role="dialog" aria-label="Foto groot bekijken">
+  <img id="kFoto" alt="Foto uit het boekje">
+  <div class="onder"><span id="kTekst"></span><small id="kMeta"></small></div>
+  <div class="knopjes">
+    <button id="kVorige" aria-label="Vorige">&larr;</button>
+    <button id="kHart" class="hart" aria-label="Favoriet"></button>
+    <button id="kVolgende" aria-label="Volgende">&rarr;</button>
+    <button id="kDicht" aria-label="Sluiten">✕</button>
+  </div>
+</div>
+
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -142,9 +185,23 @@ const ADEM = [
 ];
 $('#adem').textContent = '' + ADEM[Math.floor(Date.now() / 86400000) % ADEM.length];
 
-let B = null, mijnGezin = [];
-function toonBoek(d){
-  B = d; mijnGezin = d.gezin || [];
+let B = null, mijnGezin = [], T = null, filterFavs = false, vlak = [];
+const MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+const maandKop = m => MAANDEN[Number(m.slice(5, 7)) - 1] + ' ' + m.slice(0, 4);
+
+function momentKaart(e, i){
+  return '<div class="kaart moment">' +
+    '<div class="dagje">' + new Date(e.dag + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' }) + '</div>' +
+    (e.foto ? '<img src="' + esc(e.foto) + '" alt="Foto van ' + esc(B ? B.kindNaam : '') + '" loading="lazy" data-kijk="' + i + '">' : '') +
+    (e.tekst ? '<div class="tk">' + esc(e.tekst) + '</div>' : '') +
+    '<div class="wie"><span>' + esc(e.avatar || '') + '</span><span>' + esc(e.van) + '</span>' +
+    '<button class="hart' + (e.mijnFav ? ' aan' : '') + '" data-fav="' + e.id + '" aria-label="Favoriet" title="Mooi moment">' +
+    (e.mijnFav ? '♥' : '♡') + (e.fav ? ' ' + e.fav : '') + '</button>' +
+    (e.magWeg ? '<button class="mini weg" data-weg="' + e.id + '" title="Dit momentje weghalen">✕</button>' : '') +
+    '</div></div>';
+}
+function toonBoek(d, t){
+  B = d; T = t; mijnGezin = d.gezin || [];
   const ingesteld = !!d.kindNaam;
   $('#kInstel').hidden = ingesteld;
   $('#vBoek').hidden = !ingesteld;
@@ -153,24 +210,26 @@ function toonBoek(d){
   $('#bLeeftijd').textContent = d.leeftijd ? d.leeftijd + ' oud' : '';
   $('#cVandaag').textContent = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
   $('#cTekst').placeholder = 'Wat deed ' + d.kindNaam + ' vandaag?';
-  // het boekje: per dag een bladzijde, nieuwste bovenaan
-  const perDag = {};
-  (d.entries || []).forEach(e => { (perDag[e.dag] = perDag[e.dag] || []).push(e); });
-  const dagen = Object.keys(perDag).sort().reverse();
-  $('#boek').innerHTML = dagen.length ? dagen.map(dag =>
-    '<div class="dag"><div class="datum">' + new Date(dag + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' +
-    perDag[dag].map(e =>
-      '<div class="kaart moment">' +
-      (e.foto ? '<img src="' + esc(e.foto) + '" alt="Foto van ' + esc(d.kindNaam) + '" loading="lazy">' : '') +
-      (e.tekst ? '<div class="tk">' + esc(e.tekst) + '</div>' : '') +
-      '<div class="wie"><span>' + esc(e.avatar || '') + '</span><span>' + esc(e.van) + '</span>' +
-      (e.magWeg ? '<button class="mini weg" data-weg="' + e.id + '" title="Dit momentje weghalen">✕</button>' : '') +
-      '</div></div>').join('') + '</div>').join('')
-    : '<div class="leeg">Nog geen momentjes. Vandaag is een mooie dag om te beginnen.</div>';
-  $('#boek').querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+  $('#cDag').max = new Date().toISOString().slice(0, 10);
+  /* het album: per maand een hoofdstuk; de favorietenfilter laat alleen de
+     hartjes zien. vlak[] is de platte rij voor de kijker (pijlen). */
+  vlak = [];
+  const maanden = (t.maanden || []).map(m => ({ maand: m.maand,
+    items: filterFavs ? m.items.filter(e => e.mijnFav || e.fav) : m.items })).filter(m => m.items.length);
+  $('#boek').innerHTML = maanden.length ? maanden.map(m =>
+    '<div class="dag"><div class="datum">' + maandKop(m.maand) + '</div>' +
+    m.items.map(e => momentKaart(e, vlak.push(e) - 1)).join('') + '</div>').join('')
+    : '<div class="leeg">' + (filterFavs ? 'Nog geen favorieten. Tik een hartje aan bij een mooi moment.' : 'Nog geen momentjes. Vandaag is een mooie dag om te beginnen.') + '</div>';
+  $('#terugblikSec').hidden = !(t.terugblik && t.terugblik.length) || filterFavs;
+  $('#terugblik').innerHTML = (t.terugblik || []).map(e => momentKaart(e, vlak.push(e) - 1)).join('');
+  document.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
     if (!confirm('Dit momentje uit het boekje halen?')) return;
     try { await api('entry-weg', { id: b.dataset.weg }); laad(); } catch (e) {}
   }));
+  document.querySelectorAll('[data-fav]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('favoriet', { id: b.dataset.fav }); laad(); } catch (e) {}
+  }));
+  document.querySelectorAll('[data-kijk]').forEach(el => el.addEventListener('click', () => kijk(+el.dataset.kijk)));
   // gezinsnamen
   $('#gChips').innerHTML = mijnGezin.map(n => '<span class="chip">' + esc(n) + '<button data-naam="' + esc(n) + '" title="' + esc(n) + ' weghalen">✕</button></span>').join('');
   $('#gChips').querySelectorAll('[data-naam]').forEach(b => b.addEventListener('click', async () => {
@@ -178,12 +237,65 @@ function toonBoek(d){
   }));
   toonMomenten(d.momenten);
 }
+$('#fAlles').addEventListener('click', () => { filterFavs = false; $('#fAlles').classList.add('aan'); $('#fFavs').classList.remove('aan'); laad(); });
+$('#fFavs').addEventListener('click', () => { filterFavs = true; $('#fFavs').classList.add('aan'); $('#fAlles').classList.remove('aan'); laad(); });
+
+/* ---------- de kijker: pijlen, toetsenbord en het hartje ---------- */
+let kI = -1;
+function kijk(i){
+  // alleen momenten met een foto doen mee aan het bladeren
+  if (!vlak[i] || !vlak[i].foto) return;
+  kI = i;
+  const e = vlak[i];
+  $('#kFoto').src = e.foto;
+  $('#kTekst').textContent = e.tekst || '';
+  $('#kMeta').textContent = new Date(e.dag + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) + ' · ' + e.van;
+  $('#kHart').textContent = (e.mijnFav ? '♥' : '♡') + (e.fav ? ' ' + e.fav : '');
+  $('#kHart').classList.toggle('aan', !!e.mijnFav);
+  $('#kijker').classList.add('open');
+}
+function kStap(r){
+  for (let i = kI + r; i >= 0 && i < vlak.length; i += r) if (vlak[i].foto) return kijk(i);
+}
+$('#kVorige').addEventListener('click', () => kStap(-1));
+$('#kVolgende').addEventListener('click', () => kStap(1));
+$('#kDicht').addEventListener('click', () => { $('#kijker').classList.remove('open'); kI = -1; });
+$('#kHart').addEventListener('click', async () => {
+  if (kI < 0) return;
+  const e = vlak[kI];
+  try {
+    const r = await api('favoriet', { id: e.id });
+    e.mijnFav = r.mijnFav; e.fav = r.fav;
+    $('#kHart').textContent = (e.mijnFav ? '♥' : '♡') + (e.fav ? ' ' + e.fav : '');
+    $('#kHart').classList.toggle('aan', !!e.mijnFav);
+  } catch (err) {}
+});
+document.addEventListener('keydown', ev => {
+  if (!$('#kijker').classList.contains('open')) return;
+  if (ev.key === 'Escape') $('#kDicht').click();
+  else if (ev.key === 'ArrowLeft') kStap(-1);
+  else if (ev.key === 'ArrowRight') kStap(1);
+});
 function toonMomenten(m){
   $('#mLijst').innerHTML = (m && m.items && m.items.length) ?
     '<div style="margin-top:.7rem;">' + m.items.map(x => '<div class="idee"><b>' + esc(x.titel) + '</b><div>' + esc(x.hoe) + '</div></div>').join('') +
     (m.demo ? '<div class="leeg" style="padding:0;">De buddy koos uit een vast setje (demo).</div>' : '') + '</div>' : '';
 }
-async function laad(){ try { toonBoek(await api('boek')); } catch (e) {} }
+async function laad(){
+  try { const [d, t] = await Promise.all([api('boek'), api('tijdlijn')]); toonBoek(d, t); } catch (e) {}
+}
+/* de jarigenstrook: het album leest de verjaardagen-app alleen mee */
+async function laadJarigen(){
+  try {
+    const d = await fetch('/api/foundation/gezin/' + encodeURIComponent(s.code) + '/verjaardagen?token=' + encodeURIComponent(s.token)).then(r => r.json());
+    const komend = (d.mensen || []).filter(m => m.dagenTot <= 30).slice(0, 3);
+    $('#jarigen').innerHTML = komend.map(m =>
+      '<div class="jarig"><span>' + (m.vandaag ? 'Vandaag jarig: <b>' + esc(m.naam) + '</b>'
+        : 'Over ' + m.dagenTot + (m.dagenTot === 1 ? ' dag' : ' dagen') + ': <b>' + esc(m.naam) + '</b> jarig') +
+      (m.wordt ? ' (wordt ' + m.wordt + ')' : '') + '</span>' +
+      '<a href="verjaardagen.html">naar de verjaardagen</a></div>').join('');
+  } catch (e) { /* zonder verjaardagenboek blijft de strook gewoon leeg */ }
+}
 
 /* kindje instellen of aanpassen */
 $('#iDoe').addEventListener('click', async () => {
@@ -219,8 +331,8 @@ $('#cFotoWeg').addEventListener('click', () => { fotoData = null; $('#cPreview')
 $('#cBewaar').addEventListener('click', async () => {
   $('#cFout').textContent = ''; $('#cBewaar').disabled = true;
   try {
-    await api('entry-maak', { tekst: $('#cTekst').value, foto: fotoData });
-    $('#cTekst').value = ''; $('#cFotoWeg').click(); laad();
+    await api('entry-maak', { tekst: $('#cTekst').value, foto: fotoData, dag: $('#cDag').value || undefined });
+    $('#cTekst').value = ''; $('#cDag').value = ''; $('#cFotoWeg').click(); laad();
   } catch (e) { $('#cFout').textContent = e.message; }
   $('#cBewaar').disabled = false;
 });
@@ -242,6 +354,7 @@ $('#mDoe').addEventListener('click', async () => {
 Sessie.coach({ kind: 'baby', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 
 laad();
+laadJarigen();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

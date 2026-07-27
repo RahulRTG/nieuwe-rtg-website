@@ -55,6 +55,7 @@
   <div class="kaart saldo">
     <div class="b" id="saldo">€ 0,00</div>
     <small>vrij in je potje</small>
+    <div class="mini" id="week" style="display:none;margin-top:.4rem;"></div>
   </div>
 
   <div class="kaart blok">
@@ -112,6 +113,9 @@ $('#tip').textContent = '' + TIPS[Math.floor(Date.now() / 86400000) % TIPS.lengt
 
 function toon(d){
   $('#saldo').textContent = euro(d.saldoCenten);
+  // weekgeld (de geldschool): komt er elke week vanzelf bij, zonder timer-fratsen
+  $('#week').style.display = d.weekgeldCenten ? '' : 'none';
+  if (d.weekgeldCenten) $('#week').textContent = 'Je krijgt ' + euro(d.weekgeldCenten) + ' per week; dat komt er elke week vanzelf bij.';
   $('#doelen').innerHTML = d.doelen.length ? d.doelen.map(x => {
     const pct = Math.min(100, Math.round(100 * x.gespaard / x.doelCenten));
     return '<div class="kaart doel' + (x.behaald ? ' klaar' : '') + '"><div class="kop"><span class="nm">' + (x.behaald ? '' : '') + esc(x.naam) + '</span>' +

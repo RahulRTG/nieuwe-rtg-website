@@ -1464,3 +1464,27 @@ Client: overhoren.html (blok "Vandaag herhalen" + herhaalscherm).
 Tests: rtfcurve.test.js (3: dagstapel en goed/fout, klimmen tot bakje 5
 met eerlijke stand, andermans lijst dicht) en rtfcurve.e2e.js door het
 scherm (fout komt vandaag terug, daarna eerlijk leeg).
+
+## RTF-golf 4: de geldschool
+
+Klusjes, weekgeld en het zakgeldpotje zijn nu een geheel, met drie
+eerlijke regels. De ouder beslist over geld: weekgeld instellen en
+sterren verzilveren kan alleen een ouder of de beheerder. De eer blijft
+staan: verzilveren haalt sterren van het beschikbare saldo, maar de
+ranglijst blijft tellen wat een kind ooit verdiende -- trots raak je
+niet kwijt aan geld. En er loopt geen echt geld: het potje is een
+leerboekje, de portemonnee van thuis betaalt.
+
+Weekgeld werkt zonder timer: de eerste week boekt meteen ("de week
+begint nu"), daarna boekt het potje zelf lui bij zodra iemand kijkt --
+nooit dubbel, hooguit 52 weken inhaal. Uitzetten pakt niets terug:
+geboekt is geboekt. Verzilveren is een keuze van de ouder, met een
+bedrag dat de ouder zelf kiest; de app noteert alleen eerlijk hoeveel
+sterren zijn verzilverd ("Sterren verzilverd (2)").
+
+Server: foundation/gasten/geldschool.js (nieuw: overzicht, weekgeld,
+verzilver) + lui weekgeld in kern/tiener.js (het potje meldt ook
+weekgeldCenten). Client: klusjes.html (geldschoolblok: ouder beheert,
+kind kijkt mee) + zakgeld.html (weekgeldregel onder het saldo).
+Tests: rtfgeld.test.js (3: nooit dubbel, eer blijft staan, uit is uit
+maar geboekt is geboekt) en rtfgeld.e2e.js door beide schermen.

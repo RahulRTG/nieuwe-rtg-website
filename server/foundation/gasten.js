@@ -11,6 +11,7 @@ module.exports = (ctx) => {
   Object.assign(ctx, deelKoppeling);
   const deelLeven = require('./gasten/gezinsleven')(ctx);
   Object.assign(ctx, deelLeven);
+  require('./gasten/geldschool')(ctx);
   require('./gasten/keuken')(ctx);
   require('./gasten/ochtend')(ctx);
   require('./gasten/verjaardagen')(ctx);

@@ -113,10 +113,29 @@ module.exports = ({ save, crypto }) => {
   const saldoCenten = b =>
     b.transacties.reduce((som, t) => som + t.centen, 0) - b.doelen.reduce((som, d) => som + d.gespaard, 0);
 
+  /* weekgeld (de geldschool): een ouder zet p.zakgeld, en het potje boekt
+     hier lui de verstreken weken bij zodra iemand kijkt -- geen timer, nooit
+     dubbel, hooguit een jaar inhaal. De eerste week boekt de geldschool-route
+     zelf ("de week begint nu"); dit vult alleen de vervolgweken aan. */
+  function weekgeldBij(p) {
+    const z = p.zakgeld, b = bak(p);
+    if (!z || !z.perWeek) return;
+    const WEEK = 7 * DAG;
+    let n = 0;
+    for (; z.laatst + WEEK <= Date.now() && n < 52; n++) {
+      z.laatst += WEEK;
+      b.transacties.unshift({ id: crypto.randomBytes(6).toString('hex'),
+        centen: z.perWeek, wat: 'Zakgeld (week)', at: z.laatst });
+    }
+    if (n) { b.transacties = b.transacties.slice(0, 500); save(); }
+  }
+
   function potje(s) {
+    weekgeldBij(s.p);
     const b = bak(s.p);
     return {
       ok: true, saldoCenten: saldoCenten(b),
+      weekgeldCenten: (s.p.zakgeld && s.p.zakgeld.perWeek) || 0,
       transacties: b.transacties.slice(0, 30),
       doelen: b.doelen.map(d => Object.assign({}, d, { behaald: d.gespaard >= d.doelCenten }))
     };

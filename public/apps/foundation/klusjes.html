@@ -49,6 +49,13 @@
     <div class="ranglijst" id="ranglijst"><div class="leeg">Nog geen sterren verdiend.</div></div>
   </div>
 
+  <div class="kaart blok" id="geldBlok" style="display:none;border-color:var(--goud);">
+    <h2>De geldschool</h2>
+    <div class="intro" id="geldUitleg" style="margin-bottom:.6rem;font-size:.88rem;"></div>
+    <div class="ranglijst" id="geldKinderen"></div>
+    <div class="fout" id="geldFout"></div>
+  </div>
+
   <div class="kaart blok" id="maakBlok" style="display:none;">
     <h2>Nieuw klusje klaarzetten</h2>
     <input class="veld" id="kTitel" placeholder="Welk klusje? (bijv. tafel dekken)" maxlength="80" style="margin-bottom:.5rem;">
@@ -109,7 +116,52 @@ async function laad(){
   }catch(e){ $('#klussen').innerHTML='<div class="leeg">Kon de klusjes niet laden.</div>'; }
 }
 function isGastRol(){ const h=Sessie.huidig(); return !!(h&&h.profiel&&h.profiel.gast); }
-async function doe(pad, extra){ try{ await api(pad, Object.assign({ code:s.code, token:s.token }, extra)); laad(); }catch(e){ alert(e.message); } }
+
+/* ---------- de geldschool: weekgeld en sterren verzilveren ----------
+   De ouder beslist over geld; het kind kijkt mee. De eer op de ranglijst
+   blijft staan -- verzilveren verlaagt alleen wat er nog open staat. */
+const euro = c => '€ ' + (c/100).toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2});
+const naarCenten = v => Math.round(parseFloat(String(v||'').replace(',','.'))*100);
+async function laadGeld(){
+  let d;
+  try { d = await api('/gezin/geldschool', { code:s.code, token:s.token }); }
+  catch(e){ return; } // een oppas heeft hier niets te zoeken; het blok blijft weg
+  $('#geldBlok').style.display = 'block';
+  $('#geldUitleg').textContent = d.magBeheren
+    ? 'Weekgeld komt elke week vanzelf in het potje van je kind. Sterren verzilver je voor een bedrag dat jij kiest; de eer op de ranglijst blijft gewoon staan.'
+    : 'Je sterren blijven van jou. Een ouder kan er zakgeld van maken; wat je verdient zie je terug in je Zakgeld-app.';
+  $('#geldKinderen').innerHTML = d.kinderen.map(k=>{
+    const week = k.weekgeldCenten ? euro(k.weekgeldCenten).replace('€ ','€ ')+' p/w' : 'geen weekgeld';
+    let beheer='';
+    if (d.magBeheren) beheer =
+      '<div class="rijveld" style="margin:.5rem 0 0;width:100%;">'+
+      '<input class="veld" data-wg="'+k.id+'" inputmode="decimal" placeholder="Weekgeld (bijv. 2,50)">'+
+      '<button class="knop grijs klein" data-wgzet="'+k.id+'">Zet</button>'+
+      (k.beschikbaar>0
+        ? '<input class="veld" data-vs="'+k.id+'" inputmode="numeric" placeholder="Sterren" style="max-width:6.5rem;">'+
+          '<input class="veld" data-vb="'+k.id+'" inputmode="decimal" placeholder="Euro" style="max-width:6.5rem;">'+
+          '<button class="knop klein" data-verz="'+k.id+'">Verzilver</button>'
+        : '')+
+      '</div>';
+    return '<div class="ster" style="flex-wrap:wrap;"><span class="nm">'+esc(k.naam)+'</span>'+
+      '<span style="font-size:.82rem;color:var(--zacht);margin-left:auto;">'+
+      k.beschikbaar+' van '+k.sterren+' sterren open · '+week+'</span>'+beheer+'</div>';
+  }).join('') || '<div class="leeg">Nog geen gezinsleden.</div>';
+  $('#geldKinderen').querySelectorAll('[data-wgzet]').forEach(b=> b.onclick = async ()=>{
+    $('#geldFout').textContent='';
+    const inp = $('#geldKinderen').querySelector('[data-wg="'+b.dataset.wgzet+'"]');
+    try{ await api('/gezin/geldschool/weekgeld', { code:s.code, token:s.token, pid:b.dataset.wgzet, centenPerWeek: naarCenten(inp.value)||0 }); laadGeld(); }
+    catch(e){ $('#geldFout').textContent = e.message; }
+  });
+  $('#geldKinderen').querySelectorAll('[data-verz]').forEach(b=> b.onclick = async ()=>{
+    $('#geldFout').textContent='';
+    const st = $('#geldKinderen').querySelector('[data-vs="'+b.dataset.verz+'"]');
+    const bd = $('#geldKinderen').querySelector('[data-vb="'+b.dataset.verz+'"]');
+    try{ await api('/gezin/geldschool/verzilver', { code:s.code, token:s.token, pid:b.dataset.verz, sterren:Number(st.value), centen: naarCenten(bd.value) }); laadGeld(); }
+    catch(e){ $('#geldFout').textContent = e.message; }
+  });
+}
+async function doe(pad, extra){ try{ await api(pad, Object.assign({ code:s.code, token:s.token }, extra)); laad(); laadGeld(); }catch(e){ alert(e.message); } }
 
 $('#kDoe').onclick = async ()=>{
   $('#kFout').textContent='';
@@ -123,6 +175,7 @@ $('#kDoe').onclick = async ()=>{
     (d.profielen||[]).filter(p=>!p.gast).forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.naam; $('#kVoor').appendChild(o); });
   }catch(e){}
   laad();
+  laadGeld();
 })();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>

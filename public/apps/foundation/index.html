@@ -189,27 +189,27 @@
 
   <h3 class="sec">Leren en groeien</h3>
   <div class="tiles">
-    <a class="kaart tile" href="leren.html">
+    <a class="kaart tile" href="leren.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Leren</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="/apps/office.html?werk=rtf">
+    <a class="kaart tile" href="/apps/office.html?werk=rtf" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>RTG Office</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="bieb.html">
+    <a class="kaart tile" href="bieb.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>App-Bibliotheek</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="geloofbieb.html">
+    <a class="kaart tile" href="geloofbieb.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Geloof &amp; Wijsheid</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="schoolbieb.html">
+    <a class="kaart tile" href="schoolbieb.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>School-apps</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="beroepen.html">
+    <a class="kaart tile" href="beroepen.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Beroepen</h2>
       <span class="cta">→</span>
     </a>
@@ -257,23 +257,23 @@
       <div class="ic"></div><h2>Fotoboekje</h2>
       <span class="cta">Elke dag een momentje →</span>
     </a>
-    <a class="kaart tile" href="agenda.html">
+    <a class="kaart tile" href="agenda.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Gezinsagenda</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="keuken.html">
+    <a class="kaart tile" href="keuken.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Gezinskeuken</h2>
       <span class="cta">Weekmenu &amp; boodschappen →</span>
     </a>
-    <a class="kaart tile" href="ochtend.html">
+    <a class="kaart tile" href="ochtend.html" data-grp="mini kind volw">
       <div class="ic"></div><h2>Ochtendritme</h2>
       <span class="cta">Fijn beginnen aan de dag →</span>
     </a>
-    <a class="kaart tile" href="verjaardagen.html">
+    <a class="kaart tile" href="verjaardagen.html" data-grp="mini kind tiener jong volw">
       <div class="ic"></div><h2>Verjaardagen</h2>
       <span class="cta">Wensen &amp; cadeaupotje →</span>
     </a>
-    <a class="kaart tile" href="gezondheid.html">
+    <a class="kaart tile" href="gezondheid.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Gezondheidsmaatje</h2>
       <span class="cta">Medicijnen, afspraken &amp; groei →</span>
     </a>
@@ -297,7 +297,7 @@
       <div class="ic"></div><h2>Wat mag ik al</h2>
       <span class="cta">Per leeftijd, met werktijden →</span>
     </a>
-    <a class="kaart tile" href="contact.html">
+    <a class="kaart tile" href="contact.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Contact</h2>
       <span class="cta">→</span>
     </a>
@@ -317,11 +317,11 @@
       <div class="ic"></div><h2>Kompas</h2>
       <span class="cta">Voor alles waar je mee zit →</span>
     </a>
-    <a class="kaart tile" href="rust.html">
+    <a class="kaart tile" href="rust.html" data-grp="mini kind tiener jong volw">
       <div class="ic"></div><h2>Even rust</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="veilig.html">
+    <a class="kaart tile" href="veilig.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Veilig thuis</h2>
       <span class="cta">→</span>
     </a>
@@ -379,15 +379,15 @@
   <div id="secKind" hidden>
     <h3 class="sec">Voor jou</h3>
     <div class="tiles">
-      <a class="kaart tile" href="pesten.html">
+      <a class="kaart tile" href="pesten.html" data-grp="kind tiener jong">
         <div class="ic"></div><h2>Sterker dan pesten</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="klusjes.html">
+      <a class="kaart tile" href="klusjes.html" data-grp="kind tiener">
         <div class="ic"></div><h2>Klusjes en sterren</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="cv.html">
+      <a class="kaart tile" href="cv.html" data-grp="tiener jong">
         <div class="ic"></div><h2>Je eerste cv</h2>
         <span class="cta">→</span>
       </a>
@@ -498,6 +498,14 @@ function toonRol(profiel){
   $('#tileBoekje').style.display = gast || (groep && !$('#tileBoekje').dataset.grp.split(' ').includes(groep)) ? 'none' : ''; // het fotoboekje is van het gezin zelf
   // werk en vacatures: vanaf 16 jaar (leeftijdsgroep jong/volw), niet voor gasten
   $('#tileWerk').hidden = gast || !profiel.magSolliciteren;
+  // een sectiekop zonder zichtbare tegels verdwijnt mee (de kleinsten zien alleen hun eigen rijtje)
+  document.querySelectorAll('h3.sec').forEach(h => {
+    const t = h.nextElementSibling;
+    if (!t || !t.classList.contains('tiles')) return;
+    const iets = Array.from(t.children).some(c => c.style.display !== 'none' && !c.hidden);
+    h.style.display = iets ? '' : 'none';
+    t.style.display = iets ? '' : 'none';
+  });
   if (profiel.groepNaam && !gast){
     $('#hWelkom').innerHTML = esc($('#hWelkom').textContent) + ' <span class="grpbadge">' + esc(profiel.groepNaam) + '</span>';
   }

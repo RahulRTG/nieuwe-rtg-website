@@ -32,6 +32,7 @@ module.exports = (ctx) => {
     if (!(x >= 0 && x + M.b <= SUITE.b && y >= 0 && y + M.d <= SUITE.d))
       return { status: 400, error: 'Dat past daar niet; kies een plek binnen de suite.' };
     s.meubels.push({ soort: body.soort, x, y });
+    s.leeg = false;
     save();
     sein('suite:' + s.codenaam, 'meubel', { meubels: s.meubels.map(m => [m.soort, m.x, m.y]) });
     return { status: 200, ok: true, meubels: s.meubels };
@@ -42,6 +43,7 @@ module.exports = (ctx) => {
     const i = Math.round(Number((body || {}).i));
     if (!(i >= 0 && i < s.meubels.length)) return { status: 404, error: 'Dit meubel staat er niet (meer).' };
     s.meubels.splice(i, 1);
+    if (!s.meubels.length) s.leeg = true; // bewust leeg: niet opnieuw vullen
     save();
     sein('suite:' + s.codenaam, 'meubel', { meubels: s.meubels.map(m => [m.soort, m.x, m.y]) });
     return { status: 200, ok: true, meubels: s.meubels };

@@ -24,6 +24,28 @@ module.exports = (kern) => {
   app.post('/api/residentie/weg', auth, (req, res) => stuur(res, res9().weg(req.session.key)));
   app.post('/api/residentie/pols', auth, (req, res) => stuur(res, res9().pols(req.session.key)));
 
+  /* samen spelen: uitdagen, antwoorden, een beurt doen, stoppen; plus de
+     vragen van het huis aan tafel en de huistelefoon in de suite */
+  app.post('/api/residentie/spel/daag', auth, (req, res) => {
+    if (!lid(req, res)) return;
+    stuur(res, res9().daag(req.session.key, req.body || {}));
+  });
+  app.post('/api/residentie/spel/antwoord', auth, (req, res) => {
+    if (!lid(req, res)) return;
+    stuur(res, res9().antwoord(req.session.key, req.body || {}));
+  });
+  app.post('/api/residentie/spel/zet', auth, (req, res) => stuur(res, res9().spelZet(req.session.key, req.body || {})));
+  app.post('/api/residentie/spel/stop', auth, (req, res) => stuur(res, res9().spelStop(req.session.key)));
+  app.post('/api/residentie/vraag', auth, (req, res) => stuur(res, res9().vraag(req.session.key)));
+  app.post('/api/residentie/huis', auth, (req, res) => {
+    if (!lid(req, res)) return;
+    stuur(res, res9().huis(req.session.key));
+  });
+  app.post('/api/residentie/bel', auth, (req, res) => {
+    if (!lid(req, res)) return;
+    stuur(res, res9().bel(req.session.key, req.body || {}, naamVan(req)));
+  });
+
   app.post('/api/residentie/suite', auth, (req, res) => {
     if (!lid(req, res)) return;
     stuur(res, res9().mijnSuite(req.session.key, naamVan(req)));

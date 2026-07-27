@@ -26,7 +26,8 @@
     muur: '#121009', muurLicht: '#1A1710', marmer: '#E9E3D8'
   };
   // elke zaal een eigen ondertoon in het licht
-  const SFEER = { lobby: '#C9A94B', bar: '#C23A5E', bibliotheek: '#B08D3F', terras: '#4A6B8A' };
+  const SFEER = { lobby: '#C9A94B', bar: '#C23A5E', bibliotheek: '#B08D3F', terras: '#4A6B8A',
+    golf: '#3E6B4A', kegel: '#8A5A2B', badhuis: '#3A7A8A', restaurant: '#7F1634' };
 
   /* ---------- canvas en isometrie ---------- */
   const canvas = $('#wereld'), ctx = canvas.getContext('2d');
@@ -237,6 +238,7 @@
     ctx.beginPath(); ctx.arc(px, py - hoog * 0.8, TW * 0.105, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = zelf ? 'rgba(201,169,75,0.8)' : 'rgba(255,255,255,0.25)'; ctx.lineWidth = 0.8;
     ctx.beginPath(); ctx.ellipse(px, py - hoog * 0.66, TW * 0.085, TH * 0.06, 0, 0, Math.PI * 2); ctx.stroke();
+    extraGast(l, px, py); // in het water of onder de douche: het effect erbij
     // het naamplaatje
     ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'center';
     const naam = l.codenaam, tb = ctx.measureText(naam).width;
@@ -267,6 +269,189 @@
     ctx.fillStyle = '#F4F1EC'; ctx.textAlign = 'center'; ctx.fillText(woorden, px, py - 8);
   }
 
+  /* ---------- deel 2b: RTG Maison deluxe en de activiteiten ----------
+     De tekeningen voor het penthouse (bed, badkamer, keuken, televisie,
+     telefoon) en voor de activiteitenzalen (green, water, kegelbaan,
+     dartbord). Zelfde taal als deel 2: goudlijn op donker, geen sprites. */
+  const VLAKKEN = new Set(['tapijt', 'water', 'green', 'golfhole', 'golfmat', 'kegelbaan', 'douche']);
+
+  function vlakRuit(x, y, b, d, vul, rand) {
+    ctx.beginPath();
+    ctx.moveTo(isoX(x + b / 2, y), isoY(x + b / 2, y) - 1);
+    ctx.lineTo(isoX(x + b, y + d / 2), isoY(x + b, y + d / 2) - 1);
+    ctx.lineTo(isoX(x + b / 2, y + d), isoY(x + b / 2, y + d) - 1);
+    ctx.lineTo(isoX(x, y + d / 2), isoY(x, y + d / 2) - 1);
+    ctx.closePath();
+    ctx.fillStyle = vul; ctx.fill();
+    if (rand) { ctx.strokeStyle = rand; ctx.lineWidth = 1.2; ctx.stroke(); }
+  }
+
+  Object.assign(TEKEN, {
+    bed: (x, y) => {
+      blokje(x, y, 2, 2, TH * 0.5, '#241E14', '#EDE6D6');
+      blokje(x, y, 2, 0.35, TH * 1.1, '#1A1712', '#2B2418'); // hoofdbord
+      const [mx, my] = midden(x, y, 2, 2);
+      ctx.fillStyle = '#F7F2E6';
+      ctx.beginPath(); ctx.ellipse(mx - TW * 0.2, my - TH * 0.62, TW * 0.16, TH * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(mx + TW * 0.05, my - TH * 0.5, TW * 0.16, TH * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(127,22,52,0.6)'; ctx.lineWidth = 2; // plaid
+      ctx.beginPath(); ctx.moveTo(isoX(x + 0.2, y + 1.3), isoY(x + 0.2, y + 1.3) - TH * 0.5);
+      ctx.lineTo(isoX(x + 1.8, y + 1.3), isoY(x + 1.8, y + 1.3) - TH * 0.5); ctx.stroke();
+    },
+    kast: (x, y) => {
+      blokje(x, y, 2, 1, TH * 2.1, '#1A1712', '#242018');
+      ctx.strokeStyle = 'rgba(201,169,75,0.4)'; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(isoX(x + 1, y + 1), isoY(x + 1, y + 1)); ctx.lineTo(isoX(x + 1, y + 1), isoY(x + 1, y + 1) - TH * 2.1); ctx.stroke();
+    },
+    spiegel: (x, y) => {
+      blokje(x + 0.3, y + 0.3, 0.4, 0.4, TH * 1.7, '#1A1712', '#C9A94B');
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5);
+      ctx.fillStyle = 'rgba(180,200,215,0.35)';
+      ctx.beginPath(); ctx.ellipse(px, py - TH * 1.1, TW * 0.14, TH * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(201,169,75,0.7)'; ctx.lineWidth = 1; ctx.stroke();
+    },
+    tv: (x, y) => {
+      blokje(x, y, 2, 0.35, TH * 1.5, '#0E0C0A', '#12100D');
+      const gl = Math.sin(Date.now() / 900) * 0.06 + 0.2;
+      ctx.fillStyle = 'rgba(120,160,200,' + gl.toFixed(2) + ')';
+      ctx.beginPath();
+      ctx.moveTo(isoX(x + 0.2, y + 0.18), isoY(x + 0.2, y + 0.18) - TH * 1.35);
+      ctx.lineTo(isoX(x + 1.8, y + 0.18), isoY(x + 1.8, y + 0.18) - TH * 1.35);
+      ctx.lineTo(isoX(x + 1.8, y + 0.18), isoY(x + 1.8, y + 0.18) - TH * 0.55);
+      ctx.lineTo(isoX(x + 0.2, y + 0.18), isoY(x + 0.2, y + 0.18) - TH * 0.55);
+      ctx.closePath(); ctx.fill();
+    },
+    bureau: (x, y) => { blokje(x, y, 2, 1, TH * 0.72, '#171310', '#3A2F1C'); ader(x, y, 2, 1, TH * 0.72); },
+    telefoon: (x, y) => {
+      blokje(x + 0.2, y + 0.2, 0.6, 0.6, TH * 0.7, '#171310', '#E9E3D8');
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5) - TH * 0.7;
+      ctx.strokeStyle = KLEUR.goud; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(px, py - 4, TW * 0.1, Math.PI * 0.15, Math.PI * 0.85, true); ctx.stroke();
+      ctx.fillStyle = KLEUR.goud;
+      ctx.beginPath(); ctx.arc(px - TW * 0.09, py - 3, 2.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px + TW * 0.09, py - 3, 2.4, 0, Math.PI * 2); ctx.fill();
+    },
+    bad: (x, y) => {
+      blokje(x, y, 2, 1, TH * 0.62, '#2A2A28', '#F0EBE0');
+      ctx.fillStyle = 'rgba(110,160,190,0.55)';
+      const [mx, my] = midden(x, y, 2, 1);
+      ctx.beginPath(); ctx.ellipse(mx, my - TH * 0.62, TW * 0.52, TH * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+    },
+    douche: (x, y) => {
+      vlakRuit(x, y, 1, 1, 'rgba(120,160,190,0.18)', 'rgba(201,169,75,0.45)');
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5);
+      ctx.strokeStyle = 'rgba(201,169,75,0.7)'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(px - TW * 0.28, py); ctx.lineTo(px - TW * 0.28, py - TH * 2); ctx.lineTo(px + TW * 0.1, py - TH * 2.2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(px + TW * 0.1, py - TH * 2.1, 3, 0, Math.PI * 2); ctx.fillStyle = KLEUR.goud; ctx.fill();
+    },
+    wastafel: (x, y) => {
+      blokje(x + 0.15, y + 0.15, 0.7, 0.7, TH * 0.75, '#171310', '#E9E3D8');
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5) - TH * 0.75;
+      ctx.fillStyle = 'rgba(110,160,190,0.4)';
+      ctx.beginPath(); ctx.ellipse(px, py, TW * 0.14, TH * 0.11, 0, 0, Math.PI * 2); ctx.fill();
+    },
+    toilet: (x, y) => {
+      blokje(x + 0.2, y + 0.2, 0.6, 0.6, TH * 0.55, '#2A2A28', '#F0EBE0');
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5) - TH * 0.55;
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.ellipse(px, py, TW * 0.13, TH * 0.1, 0, 0, Math.PI * 2); ctx.stroke();
+    },
+    keuken: (x, y) => {
+      blokje(x, y, 3, 1, TH * 0.8, '#1A1712', '#E9E3D8'); ader(x, y, 3, 1, TH * 0.8);
+      const px = isoX(x + 2.5, y + 0.5), py = isoY(x + 2.5, y + 0.5) - TH * 0.8;
+      ctx.strokeStyle = KLEUR.goud; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py - 9); ctx.lineTo(px + 6, py - 9); ctx.stroke();
+    },
+    koelkast: (x, y) => {
+      blokje(x + 0.1, y + 0.1, 0.8, 0.8, TH * 1.9, '#26262A', '#3A3A40');
+      ctx.strokeStyle = 'rgba(201,169,75,0.5)'; ctx.lineWidth = 1;
+      const px = isoX(x + 0.85, y + 0.5), py = isoY(x + 0.85, y + 0.5);
+      ctx.beginPath(); ctx.moveTo(px, py - TH * 1.5); ctx.lineTo(px, py - TH * 0.9); ctx.stroke();
+    },
+    dinertafel: (x, y) => {
+      blokje(x + 0.2, y + 0.2, 1.6, 1.6, TH * 0.72, '#2A2622', '#F4EFE2');
+      const [mx, my] = midden(x, y, 2, 2), top = my - TH * 0.72;
+      const fl = Math.sin(Date.now() / 130) * 1.2;
+      ctx.strokeStyle = KLEUR.goud; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(mx, top); ctx.lineTo(mx, top - 8); ctx.stroke();
+      const vg = ctx.createRadialGradient(mx, top - 11, 1, mx, top - 11, 7 + fl);
+      vg.addColorStop(0, 'rgba(240,200,110,0.95)'); vg.addColorStop(1, 'rgba(240,200,110,0)');
+      ctx.fillStyle = vg; ctx.beginPath(); ctx.arc(mx, top - 11, 7 + fl, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(201,169,75,0.8)';
+      ctx.beginPath(); ctx.ellipse(mx - TW * 0.22, top + TH * 0.1, 4, 2.4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(mx + TW * 0.22, top - TH * 0.1, 4, 2.4, 0, 0, Math.PI * 2); ctx.fill();
+    },
+    water: (x, y) => {
+      vlakRuit(x, y, 2, 2, 'rgba(38,86,110,0.85)', 'rgba(201,169,75,0.5)');
+      const t = Date.now() / 700;
+      ctx.strokeStyle = 'rgba(150,200,225,0.35)'; ctx.lineWidth = 1;
+      for (let i = 0; i < 2; i++) {
+        const f = ((t + i / 2) % 1);
+        ctx.globalAlpha = 1 - f;
+        ctx.beginPath();
+        ctx.ellipse(isoX(x + 1, y + 1), isoY(x + 1, y + 1), TW * 0.8 * f, TH * 0.8 * f, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    },
+    green: (x, y) => { vlakRuit(x, y, 2, 2, 'rgba(38,74,52,0.9)', 'rgba(201,169,75,0.4)'); },
+    golfhole: (x, y) => {
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5);
+      ctx.fillStyle = '#0A0A09';
+      ctx.beginPath(); ctx.ellipse(px, py, TW * 0.1, TH * 0.08, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = KLEUR.goud; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py - TH * 1.6); ctx.stroke();
+      ctx.fillStyle = KLEUR.bordeauxLicht;
+      ctx.beginPath(); ctx.moveTo(px, py - TH * 1.6); ctx.lineTo(px + TW * 0.2, py - TH * 1.45); ctx.lineTo(px, py - TH * 1.3); ctx.closePath(); ctx.fill();
+    },
+    golfmat: (x, y) => { vlakRuit(x + 0.15, y + 0.15, 0.7, 0.7, 'rgba(30,55,40,0.9)', 'rgba(201,169,75,0.5)'); },
+    dartbord: (x, y) => {
+      const px = isoX(x + 0.5, y + 0.5), py = isoY(x + 0.5, y + 0.5);
+      ctx.strokeStyle = 'rgba(201,169,75,0.7)'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py - TH * 1.7); ctx.stroke();
+      const r = TW * 0.2;
+      ctx.fillStyle = '#171310';
+      ctx.beginPath(); ctx.arc(px, py - TH * 1.9, r, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = KLEUR.bordeauxLicht;
+      ctx.beginPath(); ctx.arc(px, py - TH * 1.9, r * 0.62, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = KLEUR.goud;
+      ctx.beginPath(); ctx.arc(px, py - TH * 1.9, r * 0.26, 0, Math.PI * 2); ctx.stroke();
+    },
+    kegelbaan: (x, y) => {
+      vlakRuit(x, y, 1, 5, 'rgba(72,54,30,0.85)', 'rgba(201,169,75,0.45)');
+      const px = isoX(x + 0.5, y + 0.35), py = isoY(x + 0.5, y + 0.35);
+      ctx.fillStyle = '#EDE6D6';
+      for (const [ox, oy] of [[0, 0], [-4, 3], [4, 3], [-8, 6], [0, 6], [8, 6]]) {
+        ctx.beginPath(); ctx.ellipse(px + ox, py + oy - 6, 2.2, 4.2, 0, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  });
+
+  /* effecten om de gast heen: baantjes trekken in het water, de regendouche */
+  function extraGast(l, px, py) {
+    if (!S.kamer) return;
+    const hier = (S.kamer.meubels || []).find(([soort, mx, my]) => {
+      const specs = { water: [2, 2], douche: [1, 1] }[soort];
+      return specs && l.dx >= mx && l.dx < mx + specs[0] && l.dy >= my && l.dy < my + specs[1];
+    });
+    if (!hier) return;
+    if (hier[0] === 'water') {
+      const t = Date.now() / 600;
+      ctx.strokeStyle = 'rgba(170,215,235,0.6)'; ctx.lineWidth = 1.2;
+      for (let i = 0; i < 2; i++) { const f = ((t + i / 2) % 1);
+        ctx.globalAlpha = 1 - f;
+        ctx.beginPath(); ctx.ellipse(px, py, TW * 0.34 * f + 4, TH * 0.3 * f + 2, 0, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.strokeStyle = 'rgba(170,210,235,0.55)'; ctx.lineWidth = 1;
+      const t = Date.now() / 90;
+      for (let i = 0; i < 5; i++) {
+        const dy2 = ((t + i * 7) % 26);
+        ctx.beginPath(); ctx.moveTo(px - 8 + i * 4, py - TH * 2 + dy2); ctx.lineTo(px - 8 + i * 4, py - TH * 2 + dy2 + 5); ctx.stroke();
+      }
+    }
+  }
+
   /* ---------- deel 3: de tekenlus, het netwerk en het gesprek ----------
      De lus loopt op requestAnimationFrame en sorteert alles op diepte; het
      netwerk rijdt op de gewone routes plus het bestaande /api/stream-kanaal
@@ -289,8 +474,8 @@
     const items = [];
     for (const [soort, mx, my] of (S.kamer.meubels || [])) {
       if (!TEKEN[soort]) continue;
-      const vlak = soort === 'tapijt';
-      items.push({ z: vlak ? -1000 : (mx + my) * 10 + 5, doe: () => TEKEN[soort](mx, my) });
+      const vlak = VLAKKEN.has(soort);
+      items.push({ z: vlak ? -1000 + (mx + my) : (mx + my) * 10 + 5, doe: () => TEKEN[soort](mx, my) });
     }
     for (const l of S.leden.values()) items.push({ z: (l.rx + l.ry) * 10 + 6, doe: () => tekenGast(l, l.codenaam === S.ik) });
     items.sort((a, b) => a.z - b.z);
@@ -304,6 +489,7 @@
     $('#kamerNaam').textContent = d.kamer.naam;
     $('#kamerSub').textContent = (d.kamer.sub || '') + ' · ' + d.leden.length + ' aanwezig';
     $('#knopAtelier').hidden = !d.kamer.eigen;
+    kamerKnoppen();
     const oud = hou ? S.leden : new Map();
     S.leden = new Map();
     for (const l of d.leden) {
@@ -344,6 +530,9 @@
         if (d.kind === 'zeg') { const l = lid(d.codenaam); if (l) { l.zeg = d.tekst; l.zegTot = Date.now() + 5200; } }
         if (d.kind === 'emote') { const l = lid(d.codenaam); if (l) { l.emote = d.glyf; l.emoteTot = Date.now() + 1800; } }
         if (d.kind === 'meubel' && S.kamer.soort === 'suite') { S.kamer.meubels = d.meubels; }
+        if (d.kind && d.kind.slice(0, 4) === 'spel') spelSein(d);
+        if (d.kind === 'vraag') toonVraag(d.tekst);
+        if (d.kind === 'telefoon') toonBel(d);
       });
       bron.onerror = () => { bron.close(); setTimeout(luister, 4000); };
     } catch (e) {}
@@ -363,6 +552,7 @@
     const t2 = tegelVan(ev.clientX, ev.clientY);
     if (t2.x < 0 || t2.x >= S.kamer.b || t2.y < 0 || t2.y >= S.kamer.d) return;
     if (S.editor) return zetOfWeg(t2);
+    if (S.kamer.eigen && telefoonOp(t2)) return openBel(); // de huistelefoon
     try {
       const r = await api('/api/residentie/stap', { x: t2.x, y: t2.y });
       const ik = lid(S.ik);
@@ -391,6 +581,160 @@
   }
   $('#emoteSter').addEventListener('click', () => emote('✶'));
   $('#emoteHart').addEventListener('click', () => emote('♥'));
+
+  /* ---------- deel 3b: samen spelen ----------
+     De activiteitenzalen hebben een eigen spel per zaal; u daagt iemand in
+     de zaal uit, de ander zegt ja, en om de beurt speelt u met de
+     timing-meter. Geen ranglijsten -- de uitslag is van het moment. */
+  const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen' };
+  const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem' };
+  let P = null, meterAan = false, meterWaarde = 0;
+
+  function kamerKnoppen() {
+    const spel = S.kamer && SPELZAAL[S.kamer.id];
+    $('#knopSpel').hidden = !spel;
+    $('#knopVraag').hidden = !(S.kamer && (S.kamer.id === 'restaurant' || S.kamer.soort === 'suite'));
+    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; }
+  }
+
+  $('#knopSpel').addEventListener('click', () => {
+    if (P) return meld('Er loopt al een potje.');
+    const anderen = [...S.leden.values()].filter(l => l.codenaam !== S.ik);
+    if (!anderen.length) return meld('U bent hier nog alleen; nodig iemand uit via de gids of uw telefoon.');
+    $('#spelKeuze').innerHTML = '<h2>Wie daagt u uit?</h2><div class="sub">' +
+      esc((S.kamer && S.kamer.naam) || '') + ' · een potje om elkaar te leren kennen</div>' +
+      anderen.map(l => '<button class="rij-item" data-daag="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">daag uit</span></button>').join('') +
+      '<button class="knop2 stil2" id="spelKeuzeWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
+    $('#spelLaag').classList.add('open');
+    $('#spelKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+    $('#spelKeuze').querySelectorAll('[data-daag]').forEach(b => b.addEventListener('click', async () => {
+      $('#spelLaag').classList.remove('open');
+      try { await api('/api/residentie/spel/daag', { codenaam: b.dataset.daag, spel: SPELZAAL[S.kamer.id] });
+        meld('Uitnodiging verstuurd; even wachten op ' + b.dataset.daag + '.'); } catch (e) { meld(e.message); }
+    }));
+  });
+
+  function startPotje(d) {
+    P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, beurten: d.beurten,
+      kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
+    $('#spelBalk').hidden = false;
+    tekenSpel();
+    if (!meterAan) { meterAan = true; requestAnimationFrame(meterLus); }
+  }
+  function tekenSpel() {
+    if (!P) return;
+    const st = P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(' tegen ');
+    $('#spelInfo').innerHTML = '<b>' + esc(P.naam) + '</b> · ' + st + ' ' + esc(P.eenheid) +
+      '<span style="color:var(--gold);"> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
+    $('#spelDoe').textContent = SPELWERK[P.spel] || 'Speel';
+  }
+  function meterLus(t) {
+    if (!P) { meterAan = false; return; }
+    requestAnimationFrame(meterLus);
+    meterWaarde = Math.round((Math.sin(t / 260) * 0.5 + 0.5) * 100);
+    $('#spelPin').style.left = meterWaarde + '%';
+  }
+  $('#spelDoe').addEventListener('click', async () => {
+    if (!P) return;
+    if (P.aanZet !== S.ik) return meld('De ander is aan zet.');
+    try { verwerkZet(await api('/api/residentie/spel/zet', { kracht: meterWaarde }), S.ik); }
+    catch (e) { meld(e.message); }
+  });
+  $('#spelWeg').addEventListener('click', async () => {
+    try { await api('/api/residentie/spel/stop', {}); } catch (e) {}
+    P = null; $('#spelBalk').hidden = true;
+  });
+
+  function verwerkZet(d, wie) {
+    if (d.punt != null && wie) meld(wie === S.ik ? 'U: ' + d.punt + ' ' + (P ? P.eenheid : '') : wie + ': ' + d.punt + ' ' + (P ? P.eenheid : ''));
+    if (d.uitslag) {
+      const namen = P ? P.spelers.map(s2 => s2.codenaam) : ['', ''];
+      const w = d.uitslag.winnaar;
+      $('#spelKeuze').innerHTML = '<h2>' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
+        '<div class="sub">' + esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1] + '</div>' +
+        '<p style="margin:.6rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
+        (w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
+        '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
+      $('#spelLaag').classList.add('open');
+      $('#spelUitslagWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+      P = null; $('#spelBalk').hidden = true;
+      return;
+    }
+    if (d.potje) { P.spelers = d.potje.spelers; P.aanZet = d.potje.aanZet; tekenSpel(); }
+  }
+
+  function spelSein(d) {
+    if (d.kind === 'spel-uitnodiging') {
+      $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
+        '<div class="sub">' + esc(d.van) + ' vraagt u voor een potje ' + esc(d.naam) + '</div>' +
+        '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+        '<button class="knop2" id="spelJa" type="button" style="flex:1;">Graag</button>' +
+        '<button class="knop2 stil2" id="spelNee" type="button" style="flex:1;">Nu even niet</button></div>';
+      $('#spelLaag').classList.add('open');
+      $('#spelJa').addEventListener('click', async () => {
+        $('#spelLaag').classList.remove('open');
+        try { const r = await api('/api/residentie/spel/antwoord', { ja: true }); if (r.potje) startPotje(r.potje); }
+        catch (e) { meld(e.message); }
+      });
+      $('#spelNee').addEventListener('click', async () => {
+        $('#spelLaag').classList.remove('open');
+        try { await api('/api/residentie/spel/antwoord', { ja: false }); } catch (e) {}
+      });
+    }
+    if (d.kind === 'spel-start') startPotje(d);
+    if (d.kind === 'spel-zet' && d.codenaam !== S.ik) verwerkZet(d, d.codenaam);
+    if (d.kind === 'spel-afgewezen') meld(d.van + ' slaat het potje even over.');
+    if (d.kind === 'spel-gestopt') { P = null; $('#spelBalk').hidden = true; meld('Het potje is gestopt.'); }
+  }
+
+  /* ---------- deel 3c: de vragen van het huis en de huistelefoon ----------
+     Aan tafel (restaurant of suite) stelt het huis een vraag om het gesprek
+     op gang te helpen; iedereen aan tafel ziet dezelfde kaart. De telefoon
+     in de suite belt een lid dat nu in het huis is en nodigt uit. */
+  function toonVraag(tekst) {
+    const k = $('#vraagKaart');
+    k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem;">Vraag van het huis</div>' +
+      '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(tekst) + '</div>';
+    k.classList.add('open');
+    clearTimeout(k._t); k._t = setTimeout(() => k.classList.remove('open'), 12000);
+  }
+  $('#knopVraag').addEventListener('click', async () => {
+    try { const r = await api('/api/residentie/vraag', {}); toonVraag(r.tekst); }
+    catch (e) { meld(e.message); }
+  });
+
+  /* de telefoon in de suite: tik erop en nodig iemand uit */
+  function telefoonOp(t2) {
+    return (S.kamer.meubels || []).some(([soort, mx, my]) => soort === 'telefoon' && t2.x === mx && t2.y === my);
+  }
+  async function openBel() {
+    try {
+      const d = await api('/api/residentie/huis', {});
+      $('#belLijst').innerHTML = d.leden.length ? d.leden.map(l =>
+        '<button class="rij-item" data-bel="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b><span class="m">nu in ' + esc(l.kamer) + '</span></span>' +
+        '<span class="tel">nodig uit</span></button>').join('')
+        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Er is nu verder niemand in het huis.</div>';
+      $('#belLaag').classList.add('open');
+      $('#belLijst').querySelectorAll('[data-bel]').forEach(b => b.addEventListener('click', async () => {
+        $('#belLaag').classList.remove('open');
+        try { await api('/api/residentie/bel', { codenaam: b.dataset.bel });
+          meld('Uitnodiging verstuurd naar ' + b.dataset.bel + '.'); } catch (e) { meld(e.message); }
+      }));
+    } catch (e) { meld(e.message); }
+  }
+  $('#belDicht').addEventListener('click', () => $('#belLaag').classList.remove('open'));
+
+  /* er wordt gebeld: iemand nodigt u uit in zijn of haar suite */
+  function toonBel(d) {
+    $('#spelKeuze').innerHTML = '<h2>De telefoon gaat</h2>' +
+      '<div class="sub">' + esc(d.van) + ' nodigt u uit in de suite</div>' +
+      '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+      '<button class="knop2" id="belGa" type="button" style="flex:1;">Ga erheen</button>' +
+      '<button class="knop2 stil2" id="belNiet" type="button" style="flex:1;">Niet nu</button></div>';
+    $('#spelLaag').classList.add('open');
+    $('#belGa').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); betreed(d.adres); });
+    $('#belNiet').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+  }
 
   /* ---------- deel 4: de gids, het suite-atelier en de start ---------- */
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

@@ -21,8 +21,8 @@
     const items = [];
     for (const [soort, mx, my] of (S.kamer.meubels || [])) {
       if (!TEKEN[soort]) continue;
-      const vlak = soort === 'tapijt';
-      items.push({ z: vlak ? -1000 : (mx + my) * 10 + 5, doe: () => TEKEN[soort](mx, my) });
+      const vlak = VLAKKEN.has(soort);
+      items.push({ z: vlak ? -1000 + (mx + my) : (mx + my) * 10 + 5, doe: () => TEKEN[soort](mx, my) });
     }
     for (const l of S.leden.values()) items.push({ z: (l.rx + l.ry) * 10 + 6, doe: () => tekenGast(l, l.codenaam === S.ik) });
     items.sort((a, b) => a.z - b.z);
@@ -36,6 +36,7 @@
     $('#kamerNaam').textContent = d.kamer.naam;
     $('#kamerSub').textContent = (d.kamer.sub || '') + ' · ' + d.leden.length + ' aanwezig';
     $('#knopAtelier').hidden = !d.kamer.eigen;
+    kamerKnoppen();
     const oud = hou ? S.leden : new Map();
     S.leden = new Map();
     for (const l of d.leden) {
@@ -76,6 +77,9 @@
         if (d.kind === 'zeg') { const l = lid(d.codenaam); if (l) { l.zeg = d.tekst; l.zegTot = Date.now() + 5200; } }
         if (d.kind === 'emote') { const l = lid(d.codenaam); if (l) { l.emote = d.glyf; l.emoteTot = Date.now() + 1800; } }
         if (d.kind === 'meubel' && S.kamer.soort === 'suite') { S.kamer.meubels = d.meubels; }
+        if (d.kind && d.kind.slice(0, 4) === 'spel') spelSein(d);
+        if (d.kind === 'vraag') toonVraag(d.tekst);
+        if (d.kind === 'telefoon') toonBel(d);
       });
       bron.onerror = () => { bron.close(); setTimeout(luister, 4000); };
     } catch (e) {}
@@ -95,6 +99,7 @@
     const t2 = tegelVan(ev.clientX, ev.clientY);
     if (t2.x < 0 || t2.x >= S.kamer.b || t2.y < 0 || t2.y >= S.kamer.d) return;
     if (S.editor) return zetOfWeg(t2);
+    if (S.kamer.eigen && telefoonOp(t2)) return openBel(); // de huistelefoon
     try {
       const r = await api('/api/residentie/stap', { x: t2.x, y: t2.y });
       const ik = lid(S.ik);

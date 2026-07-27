@@ -51,9 +51,20 @@
   .veldje{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.84rem;padding:.5rem .7rem;width:100%;}
   .paneel .knop2{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;}
   .paneel .stil2{background:transparent;color:var(--txt);border:1px solid var(--line);}
-  .melding{position:fixed;left:50%;bottom:8.4rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .melding{position:fixed;left:50%;bottom:13rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:22vh auto 0;text-align:center;padding:0 1.2rem;position:relative;z-index:7;}
   .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  /* het spelpaneel: info, timing-meter en de speelknop */
+  .spelbalk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(8rem + env(safe-area-inset-bottom));z-index:6;width:min(560px,94vw);background:rgba(21,19,18,.92);border:1px solid var(--gold);border-radius:16px;padding:.65rem .8rem;backdrop-filter:blur(8px);}
+  .spelbalk .info{font-size:.78rem;margin-bottom:.45rem;}
+  .meter{position:relative;height:12px;border-radius:999px;background:linear-gradient(90deg,#3a2f1c 0%,#7F1634 42%,var(--gold) 50%,#7F1634 58%,#3a2f1c 100%);border:1px solid var(--line);}
+  .meter .pin{position:absolute;top:-4px;width:3px;height:20px;background:#fff;border-radius:2px;left:0;box-shadow:0 0 6px rgba(255,255,255,.8);}
+  .spelbalk .rijtje{display:flex;gap:.4rem;margin-top:.55rem;}
+  .spelbalk .knop2{flex:1;background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;}
+  .spelbalk .stil2{background:transparent;color:var(--txt);border:1px solid var(--line);}
+  /* de vraag van het huis */
+  .vraagkaart{position:fixed;left:50%;transform:translateX(-50%) translateY(8px);top:6.2rem;z-index:7;width:min(420px,92vw);background:rgba(21,19,18,.95);border:1px solid var(--gold);border-radius:16px;padding:.9rem 1rem;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;}
+  .vraagkaart.open{opacity:1;transform:translateX(-50%) translateY(0);}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -67,6 +78,8 @@
   <a class="terug" href="/apps/app.html">←</a>
   <div><div class="ey">De Résidence</div><h1 id="kamerNaam">…</h1><div class="sub" id="kamerSub"></div></div>
   <div class="rek"></div>
+  <button class="knopje" id="knopSpel" type="button" hidden>Samen spelen</button>
+  <button class="knopje" id="knopVraag" type="button" hidden>Vraag</button>
   <button class="knopje" id="knopGids" type="button">Gids</button>
   <button class="knopje" id="knopSuite" type="button">Mijn suite</button>
   <button class="knopje" id="knopAtelier" type="button" hidden>Inrichten</button>
@@ -106,6 +119,29 @@
     <button class="knop2 stil2" id="atelierDicht" type="button" style="margin-top:.9rem;width:100%;">Klaar met inrichten</button>
   </div>
 </section>
+
+<section class="laag" id="spelLaag" aria-label="Samen spelen">
+  <div class="paneel" id="spelKeuze"></div>
+</section>
+
+<section class="laag" id="belLaag" aria-label="Huistelefoon">
+  <div class="paneel">
+    <h2>De huistelefoon</h2>
+    <div class="sub">wie is er nu in het huis; nodig iemand uit in uw suite</div>
+    <div id="belLijst"></div>
+    <button class="knop2 stil2" id="belDicht" type="button" style="margin-top:.9rem;width:100%;">Ophangen</button>
+  </div>
+</section>
+
+<div class="spelbalk" id="spelBalk" hidden>
+  <div class="info" id="spelInfo"></div>
+  <div class="meter" aria-label="Timing"><div class="pin" id="spelPin"></div></div>
+  <div class="rijtje">
+    <button class="knop2" id="spelDoe" type="button">Speel</button>
+    <button class="knop2 stil2" id="spelWeg" type="button">Stop</button>
+  </div>
+</div>
+<div class="vraagkaart" id="vraagKaart" role="status"></div>
 
 <div class="melding" id="melding" role="status"></div>
 <div id="poort"></div>

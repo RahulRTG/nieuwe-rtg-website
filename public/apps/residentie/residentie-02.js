@@ -122,6 +122,7 @@
     ctx.beginPath(); ctx.arc(px, py - hoog * 0.8, TW * 0.105, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = zelf ? 'rgba(201,169,75,0.8)' : 'rgba(255,255,255,0.25)'; ctx.lineWidth = 0.8;
     ctx.beginPath(); ctx.ellipse(px, py - hoog * 0.66, TW * 0.085, TH * 0.06, 0, 0, Math.PI * 2); ctx.stroke();
+    extraGast(l, px, py); // in het water of onder de douche: het effect erbij
     // het naamplaatje
     ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'center';
     const naam = l.codenaam, tb = ctx.measureText(naam).width;

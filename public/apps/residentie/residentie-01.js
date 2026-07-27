@@ -26,7 +26,8 @@
     muur: '#121009', muurLicht: '#1A1710', marmer: '#E9E3D8'
   };
   // elke zaal een eigen ondertoon in het licht
-  const SFEER = { lobby: '#C9A94B', bar: '#C23A5E', bibliotheek: '#B08D3F', terras: '#4A6B8A' };
+  const SFEER = { lobby: '#C9A94B', bar: '#C23A5E', bibliotheek: '#B08D3F', terras: '#4A6B8A',
+    golf: '#3E6B4A', kegel: '#8A5A2B', badhuis: '#3A7A8A', restaurant: '#7F1634' };
 
   /* ---------- canvas en isometrie ---------- */
   const canvas = $('#wereld'), ctx = canvas.getContext('2d');

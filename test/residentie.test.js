@@ -67,9 +67,12 @@ test('de suite: inrichten met het atelier, open of dicht voor bezoek', async () 
   const su = await api(base, '/api/residentie/suite', {}, a.token);
   assert.equal(su.status, 200);
   assert.ok(su.body.suite.adres.startsWith('suite:') && su.body.catalogus.length >= 10);
+  // de suite is vanaf dag een een compleet penthouse: bed, douche en telefoon staan er al
+  const soorten = su.body.suite.meubels.map(m => m.soort);
+  for (const s2 of ['bed', 'douche', 'bad', 'toilet', 'keuken', 'telefoon', 'tv']) assert.ok(soorten.includes(s2), s2 + ' hoort in de deluxe-inrichting');
   assert.equal((await api(base, '/api/residentie/suite/zet', { naam: 'Salon Prive' }, a.token)).body.suite.naam, 'Salon Prive');
-  assert.equal((await api(base, '/api/residentie/meubel/zet', { soort: 'fauteuil', x: 1, y: 1 }, a.token)).status, 200);
-  assert.equal((await api(base, '/api/residentie/meubel/zet', { soort: 'bank', x: 9, y: 7 }, a.token)).status, 400, 'buiten het raster');
+  assert.equal((await api(base, '/api/residentie/meubel/zet', { soort: 'fauteuil', x: 6, y: 2 }, a.token)).status, 200);
+  assert.equal((await api(base, '/api/residentie/meubel/zet', { soort: 'bank', x: 11, y: 8 }, a.token)).status, 400, 'buiten het raster');
   assert.equal((await api(base, '/api/residentie/meubel/zet', { soort: 'troon', x: 1, y: 4 }, a.token)).status, 400, 'onbekend meubel');
   const eigen = await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, a.token);
   assert.equal(eigen.body.kamer.eigen, true);
@@ -81,13 +84,13 @@ test('de suite: inrichten met het atelier, open of dicht voor bezoek', async () 
   assert.equal((await api(base, '/api/residentie/meubel/weg', { i: 0 }, a.token)).status, 200);
 });
 
-test('de gids: vier zalen met wie er is, en open suites op codenaam', async () => {
+test('de gids: alle zalen met wie er is, en open suites op codenaam', async () => {
   await api(base, '/api/residentie/suite/zet', { open: true }, a.token);
   const ik = (await api(base, '/api/residentie/betreed', { kamer: 'lobby' }, a.token)).body.ik;
   await api(base, '/api/residentie/betreed', { kamer: 'bar' }, b.token);
   const g = await api(base, '/api/residentie/gids', {}, b.token);
   assert.equal(g.status, 200);
-  assert.equal(g.body.zalen.length, 4);
+  assert.equal(g.body.zalen.length, 8, 'vier klassieke zalen plus vier activiteitenzalen');
   assert.ok(g.body.zalen.find(z => z.id === 'bar').aanwezig >= 1);
   const mijn = g.body.suites.find(s => s.adres === 'suite:' + ik);
   assert.ok(mijn && mijn.naam === 'Salon Prive');

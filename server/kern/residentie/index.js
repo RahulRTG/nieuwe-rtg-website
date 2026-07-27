@@ -6,7 +6,7 @@
    toestand in db.data + save, seintjes naar de kamerleden. Rustig van aard:
    geen scores, geen streaks, geen koop-lussen -- de catalogus is inbegrepen.
    Volgt het vaste kern-patroon maakResidentie(state). */
-const { MEUBELS, ZALEN, SUITE } = require('./zalen');
+const { MEUBELS, ZALEN, SUITE, DELUXE } = require('./zalen');
 const TTL = 90000; // wie 90s niets laat horen, is de kamer uit
 
 function maakResidentie({ db, save, schoon, sseToCustomer }) {
@@ -21,6 +21,9 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     const s = R().suites[key] = R().suites[key] || { codenaam, naam: 'Suite ' + codenaam, open: true, meubels: [] };
     s.codenaam = codenaam || s.codenaam;
     if (s.codenaam) R().wie[s.codenaam] = key; // eigen index: suite-adres -> sleutel
+    // elke suite is vanaf dag een een compleet penthouse (deluxe-inrichting);
+    // wie alles weghaalt of verzet, houdt zijn eigen indeling
+    if (!s.meubels.length && !s.leeg) s.meubels = DELUXE.map(([soort, x, y]) => ({ soort, x, y }));
     return s;
   }
   // kamer-id -> de plattegrond (zaal of suite); suites heten 'suite:<codenaam>'
@@ -44,10 +47,16 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     return M && M.zit && x >= mx && x < mx + M.b && y >= my && y < my + M.d;
   });
 
+  // een potje sterft mee met zijn spelers: wie de kamer verlaat, stopt het
+  function potjeWeg(id, key) {
+    const p = R().potjes && R().potjes[id];
+    if (p && p.spelers.some(s => s.key === key)) { delete R().potjes[id]; sein(id, 'spel-gestopt', {}); }
+  }
   function ruimOp(id) {
     const k = kamer(id), nu = Date.now();
     for (const key of Object.keys(k.leden)) if (nu - (k.leden[key].at || 0) > TTL) {
       const weg = k.leden[key]; delete k.leden[key];
+      potjeWeg(id, key);
       sein(id, 'weg', { codenaam: weg.codenaam });
     }
   }
@@ -73,11 +82,18 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     if (p.soort === 'suite' && !p.open && p.eigenaarKey !== key)
       return { status: 403, error: 'Deze suite is op dit moment gesloten.' };
     const vorige = kamerVan(key);
-    if (vorige && vorige !== id) { const weg = kamer(vorige).leden[key]; delete kamer(vorige).leden[key]; if (weg) sein(vorige, 'weg', { codenaam: weg.codenaam }); }
+    if (vorige && vorige !== id) { const weg = kamer(vorige).leden[key]; delete kamer(vorige).leden[key]; potjeWeg(vorige, key); if (weg) sein(vorige, 'weg', { codenaam: weg.codenaam }); }
     ruimOp(id);
     const k = kamer(id);
     if (!k.leden[key] && Object.keys(k.leden).length >= 40) return { status: 409, error: 'Deze zaal is vol (40 gasten); probeer een andere.' };
-    k.leden[key] = k.leden[key] || { codenaam, x: p.spawn[0], y: p.spawn[1], dx: p.spawn[0], dy: p.spawn[1], zit: false, at: Date.now() };
+    // niet op elkaars tenen binnenkomen: pak de eerste vrije tegel rond de spawn
+    let [sx, sy] = p.spawn;
+    const bezet = (x2, y2) => Object.values(k.leden).some(l => l.dx === x2 && l.dy === y2);
+    for (const [ox, oy] of [[0, 0], [1, 0], [-1, 0], [0, -1], [1, -1], [-1, -1], [2, 0], [-2, 0]]) {
+      const nx = p.spawn[0] + ox, ny = p.spawn[1] + oy;
+      if (nx >= 0 && nx < p.b && ny >= 0 && ny < p.d && !geblokkeerd(p, nx, ny) && !bezet(nx, ny)) { sx = nx; sy = ny; break; }
+    }
+    k.leden[key] = k.leden[key] || { codenaam, x: sx, y: sy, dx: sx, dy: sy, zit: false, at: Date.now() };
     k.leden[key].codenaam = codenaam; k.leden[key].at = Date.now();
     save();
     sein(id, 'kom', pub(k.leden[key]), key);
@@ -128,7 +144,7 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
 
   function weg(key) {
     const id = kamerVan(key);
-    if (id) { const l = kamer(id).leden[key]; delete kamer(id).leden[key]; save(); if (l) sein(id, 'weg', { codenaam: l.codenaam }); }
+    if (id) { const l = kamer(id).leden[key]; delete kamer(id).leden[key]; potjeWeg(id, key); save(); if (l) sein(id, 'weg', { codenaam: l.codenaam }); }
     return { status: 200, ok: true };
   }
 
@@ -141,6 +157,7 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
 
   const api = { betreed, stap, zeg, emote, weg, pols };
   Object.assign(api, require('./suite')({ R, suiteVan, kamer, sein, save, schoon, MEUBELS, ZALEN, SUITE }));
+  Object.assign(api, require('./spel')({ R, kamer, kamerVan, sein, sseToCustomer, save }));
   return { residentie: api };
 }
 

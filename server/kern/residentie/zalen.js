@@ -1,29 +1,12 @@
 /* De Residence, deelbestand "zalen": de vaste zalen van het virtuele
-   RTG-grandhotel en de meubelcatalogus van RTG Maison. Pure data: het
-   raster (b x d tegels), de vaste inrichting per zaal en de plek waar een
-   lid binnenkomt. De client tekent alles zelf met canvas (huisstijl, geen
-   sprites of extern beeld); de server kent alleen de voetafdrukken zodat
-   niemand door een vleugelpiano kan lopen. */
-
-/* de meubelcatalogus: b/d = voetafdruk in tegels, zit = je kunt erop
-   plaatsnemen, vlak = beloopbaar (tapijten) */
-const MEUBELS = {
-  fauteuil: { naam: 'Fauteuil Marfil', b: 1, d: 1, zit: true },
-  bank: { naam: 'Canape Riviera', b: 2, d: 1, zit: true },
-  chaise: { naam: 'Chaise longue', b: 2, d: 1, zit: true },
-  kruk: { naam: 'Barkruk', b: 1, d: 1, zit: true },
-  tafel: { naam: 'Marmeren tafel', b: 2, d: 2 },
-  bijzet: { naam: 'Bijzettafel', b: 1, d: 1 },
-  vleugel: { naam: 'Vleugelpiano', b: 2, d: 2 },
-  haard: { naam: 'Open haard', b: 2, d: 1 },
-  bar: { naam: 'Gouden bar', b: 3, d: 1 },
-  palm: { naam: 'Palm in pot', b: 1, d: 1 },
-  lamp: { naam: 'Vloerlamp', b: 1, d: 1 },
-  schaak: { naam: 'Schaaktafel', b: 1, d: 1 },
-  boekenkast: { naam: 'Boekenwand', b: 3, d: 1 },
-  tapijt: { naam: 'Perzisch tapijt', b: 3, d: 2, vlak: true },
-  fontein: { naam: 'Fontein', b: 2, d: 2 }
-};
+   RTG-grandhotel. Pure data: het raster (b x d tegels), de vaste inrichting
+   per zaal en de plek waar een lid binnenkomt. De catalogus en de suite
+   staan in maison.js. De client tekent alles zelf met canvas (huisstijl,
+   geen sprites of extern beeld); de server kent alleen de voetafdrukken
+   zodat niemand door een vleugelpiano kan lopen. De activiteitenzalen zijn
+   er om elkaar te leren kennen: samen golfen, darten, kegelen, zwemmen of
+   uit eten -- een eerste kennismaking voor een echte date. */
+const { MEUBELS, SUITE, DELUXE } = require('./maison');
 
 /* de vaste zalen; meubels als [soort, x, y] */
 const ZALEN = {
@@ -38,13 +21,14 @@ const ZALEN = {
     ]
   },
   bar: {
-    naam: 'De Gouden Bar', sub: 'aperitieven en gesprekken',
+    naam: 'De Gouden Bar', sub: 'aperitieven, gesprekken en darts',
     b: 12, d: 9, spawn: [6, 7],
     meubels: [
       ['bar', 4, 1], ['kruk', 4, 3], ['kruk', 5, 3], ['kruk', 6, 3],
       ['tafel', 1, 5], ['fauteuil', 0, 5], ['fauteuil', 3, 6],
       ['tafel', 9, 5], ['fauteuil', 8, 5], ['fauteuil', 11, 6],
-      ['vleugel', 9, 0], ['palm', 0, 0], ['lamp', 11, 3], ['palm', 0, 8]
+      ['vleugel', 9, 0], ['palm', 0, 0], ['lamp', 11, 3], ['palm', 0, 8],
+      ['dartbord', 1, 1], ['dartbord', 2, 1]
     ]
   },
   bibliotheek: {
@@ -66,10 +50,45 @@ const ZALEN = {
       ['tafel', 8, 3], ['fauteuil', 7, 3], ['fauteuil', 10, 4],
       ['chaise', 2, 6], ['chaise', 9, 6], ['lamp', 5, 1], ['fontein', 5, 4]
     ]
+  },
+  golf: {
+    naam: 'De Golfbaan', sub: 'midgetgolf onder de sterren',
+    b: 13, d: 9, spawn: [6, 8],
+    meubels: [
+      ['green', 1, 1], ['golfhole', 2, 1], ['green', 9, 1], ['golfhole', 10, 2],
+      ['green', 5, 3], ['golfhole', 6, 4],
+      ['golfmat', 1, 7], ['golfmat', 6, 6], ['golfmat', 11, 7],
+      ['palm', 0, 0], ['palm', 12, 0], ['lamp', 0, 5], ['lamp', 12, 5], ['bank', 3, 8]
+    ]
+  },
+  kegel: {
+    naam: 'De Kegelzaal', sub: 'kegelen op het gladde hout',
+    b: 12, d: 9, spawn: [6, 8],
+    meubels: [
+      ['kegelbaan', 3, 1], ['kegelbaan', 5, 1], ['kegelbaan', 7, 1],
+      ['bar', 9, 7], ['kruk', 9, 6], ['kruk', 10, 6],
+      ['bank', 0, 7], ['bijzet', 2, 7], ['lamp', 0, 0], ['lamp', 11, 0], ['palm', 0, 4]
+    ]
+  },
+  badhuis: {
+    naam: 'Het Badhuis', sub: 'baantjes en ligstoelen',
+    b: 12, d: 9, spawn: [6, 8],
+    meubels: [
+      ['water', 3, 1], ['water', 5, 1], ['water', 3, 3], ['water', 5, 3],
+      ['chaise', 9, 1], ['chaise', 9, 3], ['douche', 11, 5], ['wastafel', 11, 6],
+      ['palm', 0, 0], ['palm', 11, 0], ['palm', 0, 6], ['lamp', 8, 6], ['bijzet', 9, 5]
+    ]
+  },
+  restaurant: {
+    naam: 'Het Restaurant', sub: 'diner bij kaarslicht, met vragen van het huis',
+    b: 12, d: 9, spawn: [6, 8],
+    meubels: [
+      ['dinertafel', 1, 1], ['fauteuil', 0, 1], ['fauteuil', 3, 2],
+      ['dinertafel', 8, 1], ['fauteuil', 7, 1], ['fauteuil', 10, 3],
+      ['dinertafel', 4, 4], ['fauteuil', 3, 4], ['fauteuil', 6, 5],
+      ['vleugel', 9, 6], ['palm', 0, 8], ['lamp', 0, 5], ['lamp', 11, 5], ['palm', 0, 0]
+    ]
   }
 };
 
-// de suite van een lid: leeg raster, zelf in te richten met de catalogus
-const SUITE = { b: 10, d: 8, spawn: [5, 6], maxMeubels: 40 };
-
-module.exports = { MEUBELS, ZALEN, SUITE };
+module.exports = { MEUBELS, ZALEN, SUITE, DELUXE };

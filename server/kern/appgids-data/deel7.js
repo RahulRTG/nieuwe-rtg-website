@@ -68,7 +68,7 @@ module.exports = {
   '/apps/ik.html': G('Wie ben ik: wat Rahul over jou mag weten, en hoe hij tegen je doet.',
     ['Kies of Rahul een maatje, plagerig, zakelijk of rustig is', 'Zet je voornaamwoorden en hoe je genoemd wilt worden', 'Geef zelf aan of je iets gelooft; dan feliciteert hij je en houdt hij er rekening mee'],
     'Alles is optioneel en alles is weer weg te halen. Rahul raadt nooit: niet je geloof uit je naam, niet je aanspreekvorm uit je paspoort.'),
-  '/apps/residentie.html': G('De Residence: het virtuele grandhotel van RTG, waar leden elkaar als pionnen op codenaam ontmoeten.',
-    ['Loop door de zalen: tik op een tegel en je wandelt erheen; op een fauteuil ga je zitten', 'Praat met de zaal via de balk onderin, of stuur een schittering of hartje', 'Richt je eigen suite in met RTG Maison-meubels en zet hem open voor bezoek'],
+  '/apps/residentie.html': G('De Residence: het virtuele grandhotel van RTG om elkaar te leren kennen -- voor je echt op date gaat.',
+    ['Speel samen: midgetgolf, darts, kegelen of baantjes zwemmen; in het restaurant stelt het huis vragen', 'Praat met de zaal via de balk onderin, of stuur een schittering of hartje', 'Je suite is een compleet penthouse (bed, douche, keuken, telefoon); nodig iemand uit via de huistelefoon'],
     'Alles is inbegrepen bij de pas en iedereen heet er bij zijn codenaam: gezellig zonder scores, streaks of winkeltjes.')
 };

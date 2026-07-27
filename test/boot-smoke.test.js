@@ -40,9 +40,10 @@ async function wachtTotOp(port, uitInfo, tot = 15000) {
   throw new Error('server werd niet bereikbaar binnen ' + tot + 'ms\n' + uitInfo.log.slice(-2000));
 }
 
-test('de server boot en serveert de ROS-poort op de root', async () => {
-  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-boot-'));
-  const port = 34000 + Math.floor(Math.random() * 2000);
+// boot een kindproces op een gokte poort; bij een poortbotsing (EADDRINUSE --
+// kan gebeuren naast de vele parallelle testservers van de suite) gooien we
+// een herkenbare fout zodat de test het met een verse poort opnieuw probeert
+function boot(port, dataDir) {
   const kind = cp.spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'], {
     cwd: ROOT,
     env: Object.assign({}, process.env, {
@@ -55,9 +56,26 @@ test('de server boot en serveert de ROS-poort op de root', async () => {
   const vang = d => { uitInfo.log += d; if (/uncaughtException|"fataal":true|is not a function/.test(String(d))) uitInfo.fataal = true; };
   kind.stdout.on('data', vang);
   kind.stderr.on('data', vang);
+  return { kind, uitInfo };
+}
 
+test('de server boot en serveert de ROS-poort op de root', async () => {
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-boot-'));
+  let kind, uitInfo, r;
   try {
-    const r = await wachtTotOp(port, uitInfo);
+    for (let poging = 0; ; poging++) {
+      const port = 34000 + Math.floor(Math.random() * 2000);
+      ({ kind, uitInfo } = boot(port, dataDir));
+      try {
+        r = await wachtTotOp(port, uitInfo);
+        break;
+      } catch (e) {
+        kind.kill('SIGKILL');
+        // alleen een poortbotsing is een reden om opnieuw te gokken
+        if (poging < 3 && /EADDRINUSE/.test(String(e.message))) continue;
+        throw e;
+      }
+    }
     // 1) de root reageert met een echte pagina
     assert.equal(r.status, 200, 'root gaf status ' + r.status + ' i.p.v. 200');
     // 2) het is het RTG OS-bureaublad (de ROS-poort), herkenbaar aan het slot + het gategrid

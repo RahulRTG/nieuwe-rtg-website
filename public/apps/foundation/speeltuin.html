@@ -12,7 +12,7 @@
 <script src="palet.js"></script>
 <style>
   /* de speeltuin mag kleurrijk: een eigen vrolijk palet voor de kleintjes */
-  :root{--s-geel:#F6C445;--s-koraal:#F0715C;--s-zee:#3FB8AF;--s-lila:#9C7BD8;--s-gras:#7DC95E;--s-nacht:#1C2440;}
+  :root{--s-geel:#F6C445;--s-koraal:#F0715C;--s-zee:#3FB8AF;--s-lila:#9C7BD8;--s-gras:#7DC95E;--s-blauw:#5AA7E8;--s-nacht:#1C2440;}
   html,body{height:100%;}
   body{overflow:hidden;background:var(--s-nacht);}
   #doek{position:fixed;inset:0;display:block;touch-action:none;cursor:pointer;}
@@ -22,7 +22,10 @@
     padding:.55rem 1.1rem;font:inherit;font-size:1rem;font-weight:700;cursor:pointer;}
   .opdracht{flex:1;text-align:center;color:#FFF;font-size:1.25rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.5);min-height:1.6rem;}
   .menu{position:fixed;inset:0;z-index:10;background:linear-gradient(180deg,#26305A,#1C2440);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:1.2rem;}
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:.8rem;
+    padding:1.2rem;overflow-y:auto;}
+  .menu::before{content:'';flex:1 0 .2rem;}
+  .menu::after{content:'';flex:1 0 .2rem;}
   .menu.weg{display:none;}
   .menu h1{font-family:var(--serif);font-weight:500;color:#FFF;font-size:2rem;margin:0 0 .2rem;}
   .menu .sub{color:#C9D2F0;margin-bottom:.8rem;text-align:center;}
@@ -34,6 +37,9 @@
   .k1{background:var(--s-geel);}
   .k2{background:var(--s-zee);color:#0E2A28;}
   .k3{background:var(--s-lila);color:#F5F0FF;}
+  .k4{background:var(--s-koraal);color:#3A0F08;}
+  .k5{background:var(--s-gras);color:#12300C;}
+  .k6{background:var(--s-blauw);color:#0C2440;}
   .menu .naarhuis{background:transparent;border:2px solid #C9D2F0;color:#C9D2F0;border-radius:999px;
     padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.6rem;}
   .kwastrij{position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));left:0;right:0;z-index:6;
@@ -68,6 +74,18 @@
   <button class="spelkaartje k3" data-spel="kwast" type="button">
     <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 38c6-2 8-4 10-10l8-16 6 4-10 15c-4 5-7 6-14 7z" fill="#F6C445"/><circle cx="36" cy="10" r="5" fill="#F0715C"/></svg>
     <span><b>De toverkwast</b><span>Teken met een regenboog</span></span>
+  </button>
+  <button class="spelkaartje k4" data-spel="vissen" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="26" cy="24" rx="14" ry="9" fill="#3FB8AF"/><path d="M12 24l-8-7v14z" fill="#2E8A83"/><circle cx="32" cy="21" r="2.4" fill="#FFF"/></svg>
+    <span><b>Visjes voeren</b><span>Tik in het water, de visjes komen happen</span></span>
+  </button>
+  <button class="spelkaartje k5" data-spel="muziek" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="22" width="7" height="20" rx="2" fill="#F0715C"/><rect x="15" y="16" width="7" height="26" rx="2" fill="#F6C445"/><rect x="24" y="10" width="7" height="32" rx="2" fill="#9C7BD8"/><rect x="33" y="6" width="7" height="36" rx="2" fill="#3FB8AF"/></svg>
+    <span><b>De klankentrap</b><span>Tik de balken, hoor de tonen</span></span>
+  </button>
+  <button class="spelkaartje k6" data-spel="kiekeboe" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="30" r="12" fill="#4CA65E"/><circle cx="13" cy="34" r="8" fill="#3E8E4E"/><circle cx="35" cy="34" r="8" fill="#3E8E4E"/><circle cx="24" cy="16" r="7" fill="#F0A05C"/><circle cx="21.5" cy="15" r="1.6" fill="#1C2440"/><circle cx="26.5" cy="15" r="1.6" fill="#1C2440"/></svg>
+    <span><b>Kiekeboe</b><span>Waar zit de poes? Tik de struiken</span></span>
   </button>
   <button class="naarhuis" id="naarhuis" type="button">Terug naar de app</button>
 </div>
@@ -250,12 +268,161 @@
     KWAST.vorige = [x, y];
   }
 
+  /* ---------- spel 4: visjes voeren ---------- */
+  const VIS = { lijst: [], voer: [], bubbels: [] };
+  function visStart() {
+    VIS.lijst = []; VIS.voer = []; VIS.bubbels = [];
+    for (let i = 0; i < 5; i++) VIS.lijst.push({
+      x: Math.random() * W, y: H * (0.25 + i * 0.13), r: 26 + Math.random() * 12,
+      k: KLEUREN[i % KLEUREN.length], v: 0.7 + Math.random() * 0.8,
+      d: Math.random() < 0.5 ? -1 : 1, w: Math.random() * 6 });
+  }
+  function tekenVis(f) {
+    const x = f.x, y = f.y + Math.sin(f.w) * 6;
+    ctx.fillStyle = f.k;
+    ctx.beginPath(); ctx.ellipse(x, y, f.r, f.r * 0.6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x - f.d * f.r, y);
+    ctx.lineTo(x - f.d * f.r * 1.7, y - f.r * 0.45 + Math.sin(f.w * 3) * 4);
+    ctx.lineTo(x - f.d * f.r * 1.7, y + f.r * 0.45);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#FFF'; ctx.beginPath(); ctx.arc(x + f.d * f.r * 0.45, y - f.r * 0.15, f.r * 0.18, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1C2440'; ctx.beginPath(); ctx.arc(x + f.d * f.r * 0.5, y - f.r * 0.15, f.r * 0.09, 0, Math.PI * 2); ctx.fill();
+  }
+  function visLus() {
+    lucht('#1E6FA8', '#0F3D66');
+    if (Math.random() < 0.1) VIS.bubbels.push({ x: Math.random() * W, y: H + 10, r: 2 + Math.random() * 5 });
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 1.4;
+    for (let i = VIS.bubbels.length - 1; i >= 0; i--) {
+      const b = VIS.bubbels[i]; b.y -= 1.2;
+      if (b.y < -10) { VIS.bubbels.splice(i, 1); continue; }
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.fillStyle = '#F6C445';
+    for (let i = VIS.voer.length - 1; i >= 0; i--) {
+      const v = VIS.voer[i]; v.y += 0.7;
+      if (v.y > H + 10) { VIS.voer.splice(i, 1); continue; }
+      ctx.beginPath(); ctx.arc(v.x, v.y, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    for (const f of VIS.lijst) {
+      f.w += 0.08;
+      let doel = null, afstand = 1e9;
+      for (const v of VIS.voer) { const a = Math.hypot(v.x - f.x, v.y - f.y); if (a < afstand) { afstand = a; doel = v; } }
+      if (doel) { // het dichtstbijzijnde visje zwemt naar het voer en hapt
+        f.d = doel.x > f.x ? 1 : -1;
+        f.x += Math.sign(doel.x - f.x) * Math.min(2.4, Math.abs(doel.x - f.x));
+        f.y += Math.sign(doel.y - f.y) * Math.min(1.6, Math.abs(doel.y - f.y));
+        if (afstand < f.r) { VIS.voer.splice(VIS.voer.indexOf(doel), 1); feest(f.x, f.y, 8); }
+      } else {
+        f.x += f.d * f.v;
+        if (f.x < -70) f.x = W + 70;
+        if (f.x > W + 70) f.x = -70;
+      }
+      tekenVis(f);
+    }
+    tekenFeest();
+  }
+
+  /* ---------- spel 5: de klankentrap ---------- */
+  const MUZ = { balken: [], audio: null };
+  const TONEN = [523.25, 587.33, 659.25, 783.99, 880, 1046.5]; // een vrolijke ladder
+  function muzStart() {
+    const kleuren = ['#F0715C', '#F6C445', '#7DC95E', '#3FB8AF', '#5AA7E8', '#9C7BD8'];
+    MUZ.balken = TONEN.map((f, i) => ({ f, k: kleuren[i], gl: 0 }));
+  }
+  function toon(f) {
+    try {
+      if (!MUZ.audio) MUZ.audio = new (window.AudioContext || window.webkitAudioContext)();
+      const a = MUZ.audio, o = a.createOscillator(), g = a.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.22, a.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.6);
+      o.connect(g); g.connect(a.destination);
+      o.start(); o.stop(a.currentTime + 0.65);
+    } catch (e) {}
+  }
+  function muzLus() {
+    lucht('#241C3E', '#141024');
+    const bw = W / 6;
+    MUZ.balken.forEach((b, i) => {
+      const hh = H * (0.34 + i * 0.07), groei = b.gl * 18;
+      ctx.fillStyle = b.k;
+      ctx.fillRect(i * bw + 6, H - hh - groei, bw - 12, hh + groei);
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.15 + b.gl * 0.4) + ')';
+      ctx.fillRect(i * bw + 6, H - hh - groei, bw - 12, 14);
+      if (b.gl > 0) b.gl -= 0.05;
+    });
+    tekenFeest();
+  }
+
+  /* ---------- spel 6: kiekeboe ---------- */
+  const DIEREN = [['poes', '#F0A05C'], ['hond', '#B08050'], ['konijn', '#C9CBD8'], ['kikker', '#7DC95E'], ['vogel', '#5AA7E8']];
+  const KIEK = { struiken: [], dier: DIEREN[0], waar: 0, blij: 0 };
+  function kiekStart() {
+    KIEK.blij = 0;
+    KIEK.dier = DIEREN[Math.floor(Math.random() * DIEREN.length)];
+    KIEK.waar = Math.floor(Math.random() * 4);
+    KIEK.struiken = [0, 1, 2, 3].map(i => ({
+      x: W * (0.28 + (i % 2) * 0.44), y: H * (0.4 + Math.floor(i / 2) * 0.26),
+      r: Math.min(W, H) * 0.13, wig: 0 }));
+    $('#opdracht').textContent = 'Waar zit de ' + KIEK.dier[0] + '?';
+  }
+  function tekenDier(x, y, s) {
+    const naam = KIEK.dier[0];
+    ctx.fillStyle = KIEK.dier[1];
+    if (naam === 'poes' || naam === 'hond') {
+      ctx.beginPath(); ctx.moveTo(x - s * 0.8, y - s * 0.4); ctx.lineTo(x - s * 0.45, y - s * 1.25); ctx.lineTo(x - s * 0.1, y - s * 0.75); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x + s * 0.8, y - s * 0.4); ctx.lineTo(x + s * 0.45, y - s * 1.25); ctx.lineTo(x + s * 0.1, y - s * 0.75); ctx.closePath(); ctx.fill();
+    }
+    if (naam === 'konijn') {
+      ctx.beginPath(); ctx.ellipse(x - s * 0.4, y - s * 1.15, s * 0.22, s * 0.7, -0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x + s * 0.4, y - s * 1.15, s * 0.22, s * 0.7, 0.15, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(x, y, s, 0, Math.PI * 2); ctx.fill();
+    if (naam === 'vogel') {
+      ctx.fillStyle = '#F6C445';
+      ctx.beginPath(); ctx.moveTo(x + s * 0.2, y + s * 0.05); ctx.lineTo(x + s * 0.85, y + s * 0.25); ctx.lineTo(x + s * 0.2, y + s * 0.45); ctx.closePath(); ctx.fill();
+    }
+    ctx.fillStyle = '#FFF';
+    ctx.beginPath(); ctx.arc(x - s * 0.32, y - s * 0.15, s * 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + s * 0.32, y - s * 0.15, s * 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1C2440';
+    ctx.beginPath(); ctx.arc(x - s * 0.32, y - s * 0.1, s * 0.1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + s * 0.32, y - s * 0.1, s * 0.1, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#1C2440'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y + s * 0.2, s * 0.3, 0.3, Math.PI - 0.3); ctx.stroke();
+  }
+  function kiekLus() {
+    lucht('#2E6B4F', '#153826');
+    KIEK.struiken.forEach((st, i) => {
+      const wig = st.wig > 0 ? Math.sin(st.wig * 30) * 6 : 0;
+      if (st.wig > 0) st.wig -= 0.04;
+      if (KIEK.blij > 0 && i === KIEK.waar)
+        tekenDier(st.x, st.y - st.r * (0.5 + Math.min(1, KIEK.blij) * 0.9), st.r * 0.55);
+      ctx.fillStyle = '#3E8E4E';
+      ctx.beginPath(); ctx.arc(st.x - st.r * 0.5 + wig, st.y + st.r * 0.15, st.r * 0.55, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(st.x + st.r * 0.5 + wig, st.y + st.r * 0.15, st.r * 0.55, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#4CA65E';
+      ctx.beginPath(); ctx.arc(st.x + wig, st.y - st.r * 0.15, st.r * 0.7, 0, Math.PI * 2); ctx.fill();
+    });
+    if (KIEK.blij > 0) {
+      KIEK.blij += 0.016;
+      ctx.fillStyle = '#FFF'; ctx.font = '700 42px ' + LET; ctx.textAlign = 'center';
+      ctx.fillText('De ' + KIEK.dier[0] + '!', W / 2, H * 0.22);
+      if (KIEK.blij > 2.2) kiekStart();
+    }
+    tekenFeest();
+  }
+
   /* ---------- de lus en de bediening ---------- */
   const LET = 'system-ui, sans-serif';
   function lus() {
     requestAnimationFrame(lus);
     if (SPEL === 'bellen') balLus();
     else if (SPEL === 'vormen') vormLus();
+    else if (SPEL === 'vissen') visLus();
+    else if (SPEL === 'muziek') muzLus();
+    else if (SPEL === 'kiekeboe') kiekLus();
     // de toverkwast tekent alleen bij aanraken: het vel blijft staan
   }
   requestAnimationFrame(lus);
@@ -268,6 +435,9 @@
     if (spel === 'bellen') { BAL.lijst = []; BAL.geknapt = 0; $('#opdracht').textContent = 'Tik de ballonnen'; }
     if (spel === 'vormen') vormRondje();
     if (spel === 'kwast') { KWAST.vorige = null; velOpnieuw(); $('#opdracht').textContent = 'Teken maar'; }
+    if (spel === 'vissen') { visStart(); $('#opdracht').textContent = 'Tik om de visjes te voeren'; }
+    if (spel === 'muziek') { muzStart(); $('#opdracht').textContent = 'Tik de balken'; }
+    if (spel === 'kiekeboe') kiekStart();
   }
   document.querySelectorAll('[data-spel]').forEach(b => b.addEventListener('click', () => start(b.dataset.spel)));
   $('#terugMenu').addEventListener('click', () => { SPEL = null; $('#menu').classList.remove('weg'); $('#bovenrij').hidden = true; $('#kwastrij').style.display = 'none'; });
@@ -278,6 +448,22 @@
     if (SPEL === 'bellen') balTik(ev.clientX, ev.clientY);
     if (SPEL === 'vormen') vormTik(ev.clientX, ev.clientY);
     if (SPEL === 'kwast') { KWAST.vorige = [ev.clientX, ev.clientY]; kwastStreek(ev.clientX, ev.clientY); }
+    if (SPEL === 'vissen' && VIS.voer.length < 8) VIS.voer.push({ x: ev.clientX, y: ev.clientY });
+    if (SPEL === 'muziek') {
+      const i = Math.max(0, Math.min(5, Math.floor(ev.clientX / (W / 6))));
+      MUZ.balken[i].gl = 1; toon(MUZ.balken[i].f);
+      feest(ev.clientX, Math.min(ev.clientY, H - 60), 10);
+    }
+    if (SPEL === 'kiekeboe' && KIEK.blij === 0) {
+      for (let i = 0; i < KIEK.struiken.length; i++) {
+        const st = KIEK.struiken[i];
+        if (Math.hypot(ev.clientX - st.x, ev.clientY - st.y) < st.r * 1.25) {
+          if (i === KIEK.waar) { KIEK.blij = 0.02; feest(st.x, st.y - st.r, 34); }
+          else st.wig = 1;
+          break;
+        }
+      }
+    }
   });
   doek.addEventListener('pointermove', ev => {
     if (SPEL === 'kwast' && ev.buttons) kwastStreek(ev.clientX, ev.clientY);

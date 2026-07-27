@@ -33,8 +33,8 @@ module.exports = {
     'De bezetting draait op codenamen: de echte naam blijft in de kluis, ook op uw eigen werkplek.'),
 
   /* ---- de kleinsten (0 t/m 5), samen met papa of mama ---- */
-  '/apps/foundation/speeltuin.html': G('De Speeltuin: drie grote schermvullende spelletjes voor de kleinsten.',
-    ['Kies een kaart: ballonnen knappen, zoek de vorm, of de toverkwast', 'Tik met grote gebaren; het hele scherm is speelveld', 'Klaar is klaar: een tik op de knop en u bent terug bij de kaarten'],
+  '/apps/foundation/speeltuin.html': G('De Speeltuin: zes grote schermvullende spelletjes voor de kleinsten.',
+    ['Kies een kaart: van ballonnen knappen en kiekeboe tot de toverkwast', 'Tik met grote gebaren; het hele scherm is speelveld', 'Klaar is klaar: een tik op de knop en u bent terug bij de kaarten'],
     'Zonder punten en zonder klok: knallen, zoeken en tekenen om het plezier zelf.'),
   '/apps/foundation/tellen.html': G('Tellen tot tien: dingen aantikken en samen hardop meetellen.',
     ['Tik de plaatjes een voor een aan; bij elke tik komt er een cijfer bij', 'Kies daarna hoeveel het er waren', 'Ga door zolang uw kind wil, of stop gewoon'],

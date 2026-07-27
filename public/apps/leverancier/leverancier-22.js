@@ -75,6 +75,7 @@
     if (window.RTGZaakHR) RTGZaakHR.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, staff: (state && state.staff) || [] });
     // pr-plus (los script): planner, nieuwsbrief, bereik + Persdossier
     if (window.RTGZaakPR) RTGZaakPR.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, S: S, lang: lang, mktData: mktData, fotos: (state && state.photos) || [] });
+    if (window.RTGZaakPuls) RTGZaakPuls.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, S: S });
     // de generieke kamer-laag: Kamerrapport (print) + Rahul-advies in elke kamer
     if (window.RTGZaakKamer) RTGZaakKamer.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, S: S, lang: lang, sectie: kantoorSec,
       label: ((el.querySelector('[data-ksec="' + kantoorSec + '"]') || {}).textContent || kantoorSec).trim() });

@@ -22,7 +22,7 @@ module.exports = (kern) => {
       for (const w of (g.wedstrijden || [])) if (w.datum >= d && w.datum <= overDagen(7)) s.push('Wedstrijd "' + w.naam + '" op ' + w.datum + '; loop de baan en de flights vooruit na.');
       return { meters: [['Starttijden vandaag', tees], ['Lessen geboekt', (g.lessen || []).filter(l => l.status !== 'gegeven').length], ['Baan', g.baanStatus || 'open']], signalen: s };
     },
-    fitclub(c) {
+    fitnessclub(c) {
       const f = bak('fitclub', c); if (!f) return null;
       const s = [];
       for (const l of (f.lessen || [])) {
@@ -31,7 +31,7 @@ module.exports = (kern) => {
       return { meters: [['Leden', (f.leden || []).length], ['Nu binnen', (f.leden || []).filter(x => x.binnen).length],
         ['Groepslessen', (f.lessen || []).length]], signalen: s };
     },
-    beauty(c) {
+    beautysalon(c) {
       const b = bak('beauty', c); if (!b) return null;
       const d = vandaag();
       const af = (b.afspraken || []).filter(a => a.datum === d && a.status !== 'weg');
@@ -47,7 +47,7 @@ module.exports = (kern) => {
       return { meters: [['Gasten in huis', (p.gasten || []).length], ['Rondes gepland', (p.rondes || []).filter(r => r.status !== 'klaar').length],
         ['Trim open', (p.trim || []).filter(t => t.status !== 'klaar').length]], signalen: s };
     },
-    opvang(c) {
+    kinderopvang(c) {
       const o = bak('opvang', c); if (!o) return null;
       const s = [];
       for (const g of (o.groepen || [])) if ((g.aanwezig || []).length > (g.capaciteit || 0)) s.push('Groep "' + g.naam + '" zit boven de capaciteit; dat mag niet -- regel direct een extra kracht of verdeel.');
@@ -55,7 +55,7 @@ module.exports = (kern) => {
       return { meters: [['Kinderen aanwezig', (o.groepen || []).reduce((n, g) => n + (g.aanwezig || []).length, 0)],
         ['Groepen', (o.groepen || []).length], ['Nannies gescreend', (o.nannies || []).filter(n => n.gescreend).length]], signalen: s };
     },
-    weddings(c) {
+    weddingplanner(c) {
       const w = bak('weddings', c); if (!w) return null;
       const d = vandaag();
       const s = [];
@@ -78,7 +78,7 @@ module.exports = (kern) => {
       return { meters: [['Ligplaatsen bezet', bezet.length + ' / ' + (m.ligplaatsen || []).length],
         ['Service open', serviceOpen], ['Vaste liggers', bezet.filter(p => p.vast).length]], signalen: s };
     },
-    alpine(c) {
+    wintersport(c) {
       const a = bak('alpine', c); if (!a) return null;
       const dicht = (a.pistes || []).filter(p => p.status !== 'open').length;
       const s = [];

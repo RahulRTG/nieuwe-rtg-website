@@ -14,6 +14,7 @@
     var oud = el.querySelector('#zaakPuls'); if (oud) oud.remove();
     api('/supplier/puls').then(function (r) {
       if (!r.puls) return;
+      var dubbel = el.querySelector('#zaakPuls'); if (dubbel) dubbel.remove();
       var w = document.createElement('div'); w.id = 'zaakPuls';
       el.appendChild(w);
       teken(w, r.puls, ctx);

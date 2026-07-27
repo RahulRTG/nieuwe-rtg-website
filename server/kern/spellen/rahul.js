@@ -31,7 +31,11 @@ module.exports = (ctx) => {
     waarheid: { uitleg: 'Doen of Waarheid: kies doen of waarheid en voer de opdracht uit; samen kom je tot het doel.',
       tips: ['Hou het leuk en veilig -- niemand hoeft iets te doen waar hij zich rot bij voelt.', 'Een goede waarheid is nieuwsgierig, niet gemeen.', 'Durf ook eens "doen" te kiezen; daar komen de beste verhalen uit.'] },
     proost: { uitleg: 'Proost (18+): een kaartspel voor aan tafel; volg de kaart die boven ligt.',
-      tips: ['18+ en met mate -- drink verstandig en zorg voor elkaar.', 'Water ertussendoor is nooit een verkeerde zet.', 'Niemand hoeft mee te doen die niet wil; dat is ook winnen.'] }
+      tips: ['18+ en met mate -- drink verstandig en zorg voor elkaar.', 'Water ertussendoor is nooit een verkeerde zet.', 'Niemand hoeft mee te doen die niet wil; dat is ook winnen.'] },
+    flits: { uitleg: 'Flitsduel: iedereen krijgt dezelfde tien sommen en rekent in eigen tempo; de meeste goed wint, bij gelijke stand wie het eerst klaar was.',
+      tips: ['Snel is mooi, maar goed is beter: een fout antwoord haal je niet meer in.', 'Deelsommen zijn omgekeerde tafels -- denk aan de keersom die erbij hoort.'] },
+    reactie: { uitleg: 'Reactieduel: vijf ronden stoplicht met dezelfde wachttijden voor iedereen; tik zodra het groen wordt, de laagste totaaltijd wint.',
+      tips: ['Te vroeg tikken is een valse start en kost 1500 ms -- geduld loont.', 'Kijk naar het vlak, niet naar je duim; je reageert sneller dan je denkt.'] }
   };
 
   function standVan(p, mij) {

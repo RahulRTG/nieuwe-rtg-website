@@ -48,7 +48,11 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     magnaat:  { naam: 'Magnaat',            max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'] },
     seconden: { naam: '30 Seconden',        max: 4, min: 4, wereld: 'rtg' },
     waarheid: { naam: 'Doen of Waarheid',   max: 6, wereld: 'rtf' },
-    proost:   { naam: 'Proost',             max: 6, wereld: 'rtg', volwassen: true }
+    proost:   { naam: 'Proost',             max: 6, wereld: 'rtg', volwassen: true },
+    // de Arena-duels (tieners): iedereen speelt dezelfde opgaven in eigen
+    // tempo, dus de zet mag buiten de beurt
+    flits:    { naam: 'Flitsduel',          max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
+    reactie:  { naam: 'Reactieduel',        max: 4, wereld: 'rtf', buitenBeurt: ['tik'] }
   };
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
   const TEAMS = [0, 1, 0, 1, 0, 1]; // om en om twee teams, tot zes spelers
@@ -107,6 +111,10 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { secondenInit, secondenZet } = require('./spellen/seconden')(spelCtx);
   const { waarheidInit, waarheidZet } = require('./spellen/waarheid')(spelCtx);
   const { proostInit, proostZet } = require('./spellen/proost')(spelCtx);
+  const { flitsInit, flitsZet, flitsView } = require('./spellen/flits')(spelCtx);
+  const { reactieInit, reactieZet, reactieView } = require('./spellen/reactie')(spelCtx);
+  // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
+  const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
 
 
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
@@ -115,7 +123,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
     mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
     pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
-    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet };
+    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
+    flitsInit, flitsZet, flitsView, reactieInit, reactieZet, reactieView, klasgenotenVan };
   const { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
   const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
@@ -148,7 +157,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet, W_PREMIE } };

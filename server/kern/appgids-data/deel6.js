@@ -1,6 +1,5 @@
-/* App-gids data, deel6 (vervolg van deel1: de leden-apps, tweede helft).
-   Zie ../appgids.js voor de uitleg; nieuwe pagina's krijgen hier (of in het
-   passende deel) een eigen entry. */
+/* App-gids data, deel6 (24 pagina's). Zie ../appgids.js voor de uitleg;
+   nieuwe pagina's krijgen hier (of in het passende deel) een eigen entry. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
@@ -91,26 +90,5 @@ module.exports = {
     'Plan je ritten om de voorspelde pieken heen; tien minuten schuiven scheelt vaak een half uur file.'),
   '/apps/vonk.html': G('RTG Vonk: kennismaken op wensen, met een reservering in het midden.',
     ['Vertel wat jij zoekt', 'Bij een wederzijdse like regelt de app een plek in het midden', 'De eerste ronde is geregeld; de rest is aan jullie'],
-    'Wees eerlijk in je wensen; de match wordt er alleen maar beter van.'),
-  '/apps/passkeys.html': G('Passkeys: inloggen met je vingerafdruk, gezicht of sleutel; geen wachtwoord meer.',
-    ['Maak een passkey aan op dit toestel', 'Log voortaan in zonder wachtwoord', 'Beheer of verwijder je sleutels'],
-    'Een passkey is niet te phishen: er valt niets over te typen of af te kijken.'),
-  '/apps/vluchten.html': G('RTG Vluchten: je vluchten en de private aviation van partners.',
-    ['Bekijk vluchten en beschikbaarheid', 'Vraag een boeking aan; de partner bevestigt', 'Volg je reis in de app'],
-    'Boekingen zijn pas definitief na bevestiging; de app zegt dat ook eerlijk.'),
-  '/apps/thuiswacht.html': G('De Thuiswacht: je zegt hoe lang je onderweg bent, en meld je je niet, dan krijgt je kring bericht met je laatst bekende plek.',
-    ['Kies hoe lang je onderweg bent en start de wacht', 'Druk op "Ik ben thuis" zodra je binnen bent', 'Stuur je kring een keer een proefalarm, zodat je weet dat het werkt'],
-    'De klok loopt op de server, niet in de app: valt je telefoon uit, dan gaat het alarm juist wel af. Stilte is hier het signaal.'),
-  '/apps/codewoord.html': G('Het Codewoord: een gewone zin die je kring stil waarschuwt met je plek, zonder dat er op je scherm iets gebeurt.',
-    ['Kies een zin van minstens drie woorden die niet opvalt', 'Laat hem vallen in een gewoon gesprek met Rahul', 'Oefen hem af en toe als je alleen bent'],
-    'Je zin wordt alleen als onleesbare afdruk bewaard; ook wij kunnen hem niet teruglezen, en het scherm toont hem nooit meer.'),
-  '/apps/vitaal.html': G('Vitaal: een dagelijkse check-in voor medicijnen, of gewoon om te laten weten dat het goed gaat.',
-    ['Stel in hoe vaak je je meldt', 'Druk op "Het gaat goed"', 'Kies wie er gaat kijken als je je niet meldt'],
-    'Je hoeft de app niet open te hebben: de server telt af, dus een vergeten check-in valt vanzelf op.'),
-  '/apps/thuisrust.html': G('Thuisrust: niet storen tot je thuis bent, zonder dat je onbereikbaar wordt.',
-    ['Kies een stand en hoe lang hij hooguit duurt', 'De wereld gaat stil; je kring komt er altijd doorheen', 'De stand eindigt vanzelf, of zodra je incheckt in de Thuiswacht'],
-    'De veiligheidsbaan is de hele truc: je hoeft niet te kiezen tussen rust en bereikbaar zijn voor wie ertoe doet.'),
-  '/apps/ik.html': G('Wie ben ik: wat Rahul over jou mag weten, en hoe hij tegen je doet.',
-    ['Kies of Rahul een maatje, plagerig, zakelijk of rustig is', 'Zet je voornaamwoorden en hoe je genoemd wilt worden', 'Geef zelf aan of je iets gelooft; dan feliciteert hij je en houdt hij er rekening mee'],
-    'Alles is optioneel en alles is weer weg te halen. Rahul raadt nooit: niet je geloof uit je naam, niet je aanspreekvorm uit je paspoort.'),
+    'Wees eerlijk in je wensen; de match wordt er alleen maar beter van.')
 };

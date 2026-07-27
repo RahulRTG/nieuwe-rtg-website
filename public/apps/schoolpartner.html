@@ -143,6 +143,37 @@
         <div id="tLijst"></div>
       </div>
       <div class="kaart">
+        <div class="kop">Excursies</div>
+        <p class="stil">Locaties bestaan alleen tijdens een actieve excursie (met toestemming van de ouders) en worden bij de stop gewist. Elke blik op de kaart wordt gelogd en is zichtbaar voor de gezinnen.</p>
+        <div class="rij" style="margin:.5rem 0;">
+          <input class="veld" id="exTitel" placeholder="Naam (bijv. Artis)" aria-label="Naam van de excursie">
+          <input class="veld" id="exBest" placeholder="Bestemming" aria-label="Bestemming">
+          <button class="knop p" id="exMaak" type="button">Zet de excursie klaar</button>
+        </div>
+        <div id="exLijst"></div>
+        <div id="exUit"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Ouderbijdrage</div>
+        <p class="stil">De ouderbijdrage is vrijwillig; een kind wordt nooit uitgesloten als er niet betaald is.</p>
+        <div class="rij" style="margin:.5rem 0;">
+          <input class="veld" id="bijTitel" placeholder="Waarvoor (bijv. Museumbezoek)" aria-label="Naam van de bijdrage">
+          <input class="veld" id="bijBedrag" type="number" min="0" step="0.5" placeholder="Bedrag" aria-label="Bedrag in euro" style="flex:0 1 8rem;">
+          <button class="knop p" id="bijMaak" type="button">Vraag de bijdrage</button>
+        </div>
+        <div id="bijLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Telefoonboom</div>
+        <p class="stil">De leraar belt twee gezinnen, elk gezin belt er weer twee. Iedereen ziet alleen de eigen takken.</p>
+        <div class="rij" style="margin:.5rem 0;">
+          <button class="knop" id="boomMaak" type="button">Boom (opnieuw) maken</button>
+          <input class="veld" id="boomBericht" placeholder="Bericht voor het alarm" aria-label="Alarmbericht">
+          <button class="knop p" id="boomStart" type="button">Start het alarm</button>
+        </div>
+        <div id="boomLijst"></div>
+      </div>
+      <div class="kaart">
         <div class="kop">Cijferboek</div>
         <div id="cBoek" class="stil"></div>
       </div>
@@ -151,6 +182,7 @@
 </main>
 <div class="melding" id="melding" role="status"></div>
 <script src="/apps/schoolpartner/toetsen.js"></script>
+<script src="/apps/schoolpartner/excursie.js"></script>
 <script src="/apps/schoolpartner/app.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

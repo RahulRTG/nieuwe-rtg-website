@@ -114,4 +114,6 @@ module.exports = (ctx) => {
   require('./school/planner')(sctx);
   require('./school/toets')(sctx); // toetsen (SO/MO/proefwerk/examen) op de leerstof-motor
   require('./school/verbonden')(sctx); // lerarenteam, overname, online les, oefen-huiswerk
+  require('./school/excursie')(sctx); // excursies: tijdelijke GPS met toestemming + kijklog
+  require('./school/bijdrage')(sctx); // vrijwillige ouderbijdrage + telefoonboom
 };

@@ -48,6 +48,7 @@
   <a href="/apps/kantoren.html">RTG-kantoren</a>
 </header>
 <main id="main">
+  <div class="labkpis" id="labKpi"></div>
   <div class="kaart">
     <div class="sec">Nieuw project</div>
     <div class="rij">
@@ -76,11 +77,18 @@
   </div>
   <div class="chips" id="filters"></div>
   <div id="lijst"><div class="leeg">Laden...</div></div>
-  <div class="kaart"><div class="sec">Kennisbank (<span id="kbTel">0</span> bevindingen, ook uit het archief)</div><div id="kb"></div></div>
+  <div class="kaart">
+    <div class="rij" style="justify-content:space-between;align-items:center;gap:.6rem;">
+      <div class="sec" style="margin:0;">Kennisbank (<span id="kbTel">0</span> bevindingen, ook uit het archief)</div>
+      <input class="veld" id="kbZoek" placeholder="Zoek in de kennisbank" style="max-width:14rem;font-size:.8rem;padding:.35rem .6rem;" aria-label="Zoek in de kennisbank">
+    </div>
+    <div id="kb"></div>
+  </div>
 </main>
 <script src="/shared/drie.js"></script>
 <script src="/apps/lab3d.js"></script>
 <script src="/apps/lab-dossier.js"></script>
+<script src="/apps/lab-pro.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -99,10 +107,15 @@ async function laad(){
     D.velden.map(v => '<button class="chip' + (filter === v.veld ? ' aan' : '') + '" data-f="' + v.veld + '">' + v.emoji + ' ' + esc(v.naam) + (v.aantal ? ' (' + v.aantal + ')' : '') + '</button>').join('');
   document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; render(); }));
   $('#kbTel').textContent = kb.totaal;
-  $('#kb').innerHTML = kb.bevindingen.slice(0, 12).map(b => '<div class="log"><b>' + esc(b.titel) + '</b> · ' + esc(b.project) + ' (' + esc(b.veld) + ')' + (b.tekst ? '<br>' + esc(b.tekst) : '') + '</div>').join('') || '<div class="leeg">De eerste bevinding moet nog geschreven worden.</div>';
+  kbRender(KB.slice(0, 12));
+  if (window.LabPro) { LabPro.kpi(D, kb.totaal); LabPro.zoekbind(() => KB, l => kbRender(l.slice(0, 12))); }
   if (window.Lab3D) Lab3D.toon(D.projecten, D.velden);
   render();
 }
+function kbRender(lijst){
+  $('#kb').innerHTML = lijst.map(b => '<div class="log"><b>' + esc(b.titel) + '</b> · ' + esc(b.project) + ' (' + esc(b.veld) + ')' + (b.tekst ? '<br>' + esc(b.tekst) : '') + '</div>').join('') || '<div class="leeg">Niets gevonden; de kennisbank vergeet nooit iets, maar dit staat er nog niet in.</div>';
+}
+const meld = t => window.LabPro ? LabPro.meld(t) : alert(t);
 function render(){
   const lijst = D.projecten.filter(p => !filter || p.veld === filter);
   $('#lijst').innerHTML = lijst.length ? lijst.map(p => {
@@ -112,6 +125,7 @@ function render(){
       '<div class="rij" style="justify-content:space-between;"><h2 style="font-size:1.02rem;">' + esc(p.titel) + '</h2>' +
       '<span class="pil">' + esc(p.fase) + '</span></div>' +
       '<div class="leeg">' + esc(p.veldNaam) + ' · voor ' + esc(p.voorWie) + (p.doel ? ' · ' + esc(p.doel) : '') + '</div>' +
+      (window.LabPro ? LabPro.strook(D.fasen, p.fase) : '') +
       '<div class="rij" style="margin:.35rem 0;">' +
         '<span class="pil ' + (v.status === 'akkoord' ? 'ok' : (v.status === 'open' ? 'wacht' : '')) + '">toets: ' + esc(v.status) + (v.door ? ' door ' + esc(v.door) : '') + '</span>' +
         (v.status !== 'akkoord' ? '<input class="veld" data-door placeholder="Uw naam (mens tekent)" style="max-width:11rem;"><button class="knop stil" data-toets>Toets akkoord</button>' : '') +
@@ -127,7 +141,7 @@ function render(){
 function bind(){
   document.querySelectorAll('[data-p]').forEach(k => {
     const id = k.dataset.p;
-    const doe = w => w.then(laad).catch(e => alert(e.message));
+    const doe = w => w.then(laad).catch(e => meld(e.message));
     const toets = k.querySelector('[data-toets]');
     if (toets) toets.addEventListener('click', () => doe(api('project/veiligheid', { id, status: 'akkoord', door: k.querySelector('[data-door]').value })));
     const fase = k.querySelector('[data-fase]');
@@ -142,8 +156,8 @@ function bind(){
 }
 $('#pMaak').addEventListener('click', async () => {
   try { await api('project/maak', { titel: $('#pTitel').value, veld: $('#pVeld').value, voorWie: $('#pWie').value, doel: $('#pDoel').value });
-    $('#pTitel').value = ''; $('#pDoel').value = ''; laad();
-  } catch (e) { alert(e.message); }
+    $('#pTitel').value = ''; $('#pDoel').value = ''; meld('Project gestart; de keten begint bij idee.'); laad();
+  } catch (e) { meld(e.message); }
 });
 $('#aiStuur').addEventListener('click', async () => {
   const q = $('#aiVraag').value.trim(); if (!q) return;

@@ -921,7 +921,7 @@ $('#bTerug').addEventListener('click', laadKamers);
 $('#pTerug').addEventListener('click', laadKamers);
 
 /* ---------- RTG Atelier: het ontwerpbureau ---------- */
-let ATELIER = null, aFilter = '';
+let ATELIER = null, aFilter = '', aStatus = '';
 async function openAtelier(){
   const d = await api('atelier');
   ATELIER = d;
@@ -942,9 +942,12 @@ function renderAtelier(){
     ['Maisons', d.kpi.huizen], ['Collecties', d.collecties.length]
   ].map(x => '<div class="kaart kpi-tegel"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
   $('#aFilters').innerHTML = '<button class="knop stil aFilterKnop'+(aFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
-    d.categorieen.filter(c => c.aantal).map(c => '<button class="knop stil aFilterKnop'+(aFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
+    d.categorieen.filter(c => c.aantal).map(c => '<button class="knop stil aFilterKnop'+(aFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ') +
+    ' <span style="color:var(--line);margin:0 .2rem;">|</span> ' +
+    ['', ...d.statussen].map(s => '<button class="knop stil aStatusKnop'+(aStatus===s?' aan':'')+'" data-s="'+s+'" style="padding:.15rem .6rem;font-size:.7rem;">'+(s || 'elke status')+'</button>').join(' ');
   $('#aFilters').querySelectorAll('.aFilterKnop').forEach(b => b.addEventListener('click', () => { aFilter = b.dataset.f; renderAtelier(); }));
-  const lijst = d.ontwerpen.filter(o => !aFilter || o.categorie === aFilter);
+  $('#aFilters').querySelectorAll('.aStatusKnop').forEach(b => b.addEventListener('click', () => { aStatus = b.dataset.s; renderAtelier(); }));
+  const lijst = d.ontwerpen.filter(o => (!aFilter || o.categorie === aFilter) && (!aStatus || o.status === aStatus));
   const opts = d.statussen.map(s => '<option value="'+s+'">'+s+'</option>').join('');
   $('#aLijst').innerHTML = lijst.length ? lijst.map(o => {
     const c = o.concept;
@@ -1006,10 +1009,10 @@ $('#aTerug').addEventListener('click', laadKamers);
 // premium: het Collectieboek -- de huidige selectie als drukklaar boek
 $('#aBoek').addEventListener('click', () => {
   if (!window.Collectieboek || !ATELIER) return;
-  const lijst = ATELIER.ontwerpen.filter(o => !aFilter || o.categorie === aFilter);
+  const lijst = ATELIER.ontwerpen.filter(o => (!aFilter || o.categorie === aFilter) && (!aStatus || o.status === aStatus));
   if (!lijst.length) { meld('Geen ontwerpen in deze selectie.'); return; }
   const cat = aFilter ? (ATELIER.categorieen.find(c => c.id === aFilter) || {}).label : '';
-  Collectieboek.open(lijst, cat || 'Het atelier');
+  Collectieboek.open(lijst, (cat || 'Het atelier') + (aStatus ? ' · ' + aStatus : ''));
   meld('Collectieboek geopend in een nieuw tabblad.');
 });
 $('#aMaak').addEventListener('click', async () => {

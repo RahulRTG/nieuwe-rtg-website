@@ -1511,3 +1511,28 @@ mediastore. Client: babyboek.html (maandgroepen, filter, kijker,
 terugblik, jarigenstrook). Tests: rtfalbum.test.js (3: maandgroepen en
 terugblik met dagklem, het hartje per kijker, gast blijft buiten) en
 rtfalbum.e2e.js door het hele scherm.
+
+## RTF-golf 6 (deel 1): het gevoelsdagboek
+
+De gevoelens-app beloofde altijd al: "deze app slaat niets op". Die
+belofte blijft staan -- en juist daarom is het nieuwe dagboek OPT-IN.
+Een kind tikt een gezichtje aan (dat blijft vluchtig, zoals beloofd)
+en kiest daarna ZELF of dit ene gevoel het dagboekje in gaat.
+
+Vier regels, vastgelegd in kern/welzijn.js en getest:
+1. Opt-in: zonder eigen keuze bewaart de server niets.
+2. Prive: het dagboek is van het profiel zelf. Geen ouder, geen
+   broertje, geen oppas kan erin -- er bestaat geen route naartoe.
+   De oudertekst op de pagina zegt dat nu ook eerlijk.
+3. Eerlijk: een dag heeft een gevoel (een woord, geen cijfer of
+   score), geen streaks, geen druk. Vandaag herzien mag ("een ochtend
+   en een avond voelen anders"); gisteren blijft staan zoals het was.
+4. Hulp dichtbij, geen alarm: waren drie van de laatste vijf bewaarde
+   dagen zwaar, dan toont het SCHERM warme wegen naar steun en de
+   hulpwijzer. De server meldt niets aan niemand: steun aanbieden is
+   niet hetzelfde als verklikken.
+
+Server: kern/welzijn.js + routes/welzijn.js (dagboek, stemming).
+Client: gevoel.html (bewaarknop, dagboekstrook met gezichtjes,
+hulpregel). Tests: rtfwelzijn.test.js (3) en rtfwelzijn.e2e.js.
+De overige welzijnsapps volgen in de volgende delen van deze golf.

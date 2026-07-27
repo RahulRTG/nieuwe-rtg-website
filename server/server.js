@@ -2140,6 +2140,9 @@ Object.assign(kern, require('./kern/leren')({
 /* Het babyboekje (kern/baby.js): het dagboek van de allerkleinsten, met
    gezinsnamen en AI-gezinsmomenten; foto's gaan naar de mediastore. */
 Object.assign(kern, require('./kern/baby')({ save, crypto, media, anthropic }));
+/* De welzijnslaag (kern/welzijn.js): het prive-gevoelsdagboek van een kind;
+   niemand leest mee, het scherm wijst zelf warm de weg naar hulp. */
+Object.assign(kern, require('./kern/welzijn')({ save }));
 /* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
    boardroom die alles ziet en het functieschakelbord bedient. */
 Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCodenaam }));
@@ -2796,6 +2799,7 @@ Object.assign(kern, require('./kern/samen')({ db, save, crypto, sseToCustomer, s
 require('./routes/samen')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
+require('./routes/welzijn')(kern);
 /* De zelfzorg (kern/zelfzorg): de code ruimt zichzelf op, beschermt zichzelf,
    repareert zichzelf en upgradet zichzelf. De knoppen staan in de boardroom en
    de kamers Intern & IT en Ingenieurs; de veilige delen draaien ook als stille

@@ -46,6 +46,21 @@
   <div class="kaart blok">
     <div class="koppen" id="koppen"></div>
     <div class="antwoord" id="antwoord" aria-live="polite"></div>
+    <div id="bewaarRij" hidden style="margin-top:.7rem;">
+      <button class="knop klein" id="bewaarKnop" type="button">Bewaar in mijn dagboekje</button>
+      <span style="color:var(--zacht);font-size:.8rem;margin-left:.4rem;">alleen jij kunt erin kijken</span>
+    </div>
+  </div>
+
+  <!-- het dagboekje: alleen wat het kind ZELF bewaarde, alleen voor het kind zelf -->
+  <div class="kaart blok" id="dagboekBlok" hidden>
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Mijn dagboekje</h2>
+    <p style="color:var(--zacht);font-size:.85rem;line-height:1.5;margin-bottom:.6rem;">Alleen jij ziet dit. Niet papa, niet mama, niemand.</p>
+    <div id="dagboekStrook" style="display:flex;gap:.35rem;flex-wrap:wrap;"></div>
+    <div id="hulpRegel" hidden style="margin-top:.8rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;">
+      Je had een paar zware dagen achter elkaar. Dat hoef je niet alleen te dragen:
+      <a href="steun.html" style="color:var(--goud2);">praat met iemand</a> of kijk in de
+      <a href="hulpwijzer.html" style="color:var(--goud2);">hulpwijzer</a>.</div>
   </div>
 
   <div class="kaart blok">
@@ -59,7 +74,7 @@
 
   <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-voeler</h2>
-    <p class="ouder">Deze app slaat niets op en stuurt niets door: wat het kind aantikt blijft op dit scherm en verdwijnt zodra u weggaat. Dat is met opzet, want gevoelens van een kind horen niet in een dossier. Benoem wat u ziet ("je kijkt boos") en wacht daarna even; kinderen hebben eerst erkenning nodig en pas daarna een oplossing. Blijft een kind langere tijd bang of verdrietig, dan is dit spel geen vervanging voor een gesprek met de huisarts of de school.</p>
+    <p class="ouder">Deze app stuurt niets door en legt uit zichzelf niets vast: wat het kind aantikt blijft op dit scherm. Alleen als het kind zelf op "bewaar in mijn dagboekje" tikt, wordt dat ene gevoel bewaard -- en dat dagboekje kan uitsluitend het kind zelf inzien, u niet. Dat is met opzet: een kind dat weet dat niemand meeleest, durft eerlijk te zijn. Benoem wat u ziet ("je kijkt boos") en wacht daarna even; kinderen hebben eerst erkenning nodig en pas daarna een oplossing. Blijft een kind langere tijd bang of verdrietig, dan is dit spel geen vervanging voor een gesprek met de huisarts of de school.</p>
   </div>
 </div>
 
@@ -133,7 +148,53 @@ function kies(g, knop) {
     li.textContent = t;
     ul.appendChild(li);
   }
+  gekozen = g;
+  $('#bewaarRij').hidden = false;
+  $('#bewaarKnop').textContent = 'Bewaar in mijn dagboekje';
+  $('#bewaarKnop').disabled = false;
 }
+
+/* ---------- het dagboekje: opt-in, prive, een woord per dag ----------
+   De app blijft bij zijn belofte: er wordt pas iets bewaard als het kind
+   ZELF op de knop tikt, en alleen het kind kan het teruglezen. */
+const s = Sessie.huidig();
+let gekozen = null;
+const ZWAAR = ['verdrietig', 'bang', 'boos'];
+const api = (actie, body) => fetch('/api/rtf/welzijn/' + actie, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: s && s.code, token: s && s.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+$('#bewaarKnop').addEventListener('click', async () => {
+  if (!gekozen) return;
+  try {
+    await api('stemming', { gevoel: gekozen.id });
+    laadDagboek(); // een bron van waarheid: het dagboek zet de knoptekst
+  } catch (e) { $('#bewaarKnop').textContent = e.message; }
+});
+
+async function laadDagboek() {
+  let d;
+  try { d = await api('dagboek'); } catch (e) { return; } // een oppas heeft hier geen dagboekje
+  $('#dagboekBlok').hidden = !d.stemmingen.length;
+  if (!d.stemmingen.length) return;
+  const naam = {};
+  GEVOELENS.forEach(g => { naam[g.id] = g; });
+  $('#dagboekStrook').innerHTML = d.stemmingen.map(x => {
+    const g = naam[x.gevoel];
+    return '<span class="kop" style="width:3.6rem;min-width:3.6rem;padding:.3rem;cursor:default;" title="' + x.dag + '">' +
+      (g ? g.svg : '') + '<b style="font-size:.62rem;">' + x.dag.slice(8) + '-' + x.dag.slice(5, 7) + '</b></span>';
+  }).join('');
+  // hulp dichtbij: waren 3 van de laatste 5 bewaarde dagen zwaar, wijs dan warm de weg
+  const laatste = d.stemmingen.slice(-5);
+  $('#hulpRegel').hidden = laatste.filter(x => ZWAAR.includes(x.gevoel)).length < 3;
+  if (d.dagVandaag) {
+    $('#bewaarRij').hidden = false;
+    $('#bewaarKnop').textContent = 'Vandaag bewaard: ' + d.dagVandaag.gevoel + ' (tik een gezichtje om te herzien)';
+    $('#bewaarKnop').disabled = true;
+  }
+}
+laadDagboek();
 
 let ademLoop = null, ademUit = false;
 $('#ademknop').addEventListener('click', () => {

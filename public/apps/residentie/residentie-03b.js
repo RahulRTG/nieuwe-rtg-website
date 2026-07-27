@@ -71,6 +71,7 @@
   });
 
   function verwerkZet(d, wie) {
+    if (d.punt != null && wie && P) voegEffect(P.spel, wie, d.punt, d.punt + ' ' + P.eenheid);
     if (d.punt != null && wie) meld(wie === S.ik ? 'U: ' + d.punt + ' ' + (P ? P.eenheid : '') : wie + ': ' + d.punt + ' ' + (P ? P.eenheid : ''));
     if (d.uitslag) {
       const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);

@@ -5,24 +5,7 @@
    een potje is een gesprek met een bal erbij. Het vragenspel aan tafel
    stelt de vragen die een eerste date makkelijker maken. */
 
-const SPELLEN = {
-  golf: { zaal: 'golf', naam: 'Midgetgolf', beurten: 3, laag: true, eenheid: 'slagen',
-    punt: a => a >= 90 ? 1 : a >= 72 ? 2 : a >= 45 ? 3 : 4 },
-  darts: { zaal: 'bar', naam: 'Darts', beurten: 6, laag: false, eenheid: 'punten',
-    punt: a => Math.round(a * 0.6) },
-  kegelen: { zaal: 'kegel', naam: 'Kegelen', beurten: 5, laag: false, eenheid: 'kegels',
-    punt: a => a >= 92 ? 10 : Math.floor(a / 10) },
-  zwemmen: { zaal: 'badhuis', naam: 'Baantjes zwemmen', beurten: 4, laag: true, eenheid: 'seconden',
-    punt: a => Math.round((14 - a / 10) * 10) / 10 },
-  biljart: { zaal: 'biljart', naam: 'Biljart', beurten: 5, eenheid: 'caramboles',
-    punt: a => a >= 90 ? 3 : a >= 65 ? 2 : a >= 35 ? 1 : 0 },
-  boogschieten: { zaal: 'boog', naam: 'Boogschieten', beurten: 5, eenheid: 'punten',
-    punt: a => Math.min(10, Math.max(0, Math.round(a / 10))) },
-  // dansen is samen: geen winnaar, een gezamenlijke score voor de gratie
-  dansen: { zaal: 'balzaal', naam: 'Samen dansen', beurten: 4, samen: true, eenheid: 'gratie',
-    punt: a => Math.round(a / 2) }
-};
-
+const { SPELLEN, plaats } = require('./spellen');
 const rahul = require('./rahul');
 const vragen = require('./vragen');
 
@@ -69,7 +52,9 @@ module.exports = (ctx) => {
       try { sseToCustomer(p.spelers[0].key, 'residentie', { kind: 'spel-afgewezen', kamer: id, van: p.spelers[1].codenaam }); } catch (e) {}
       return { status: 200, ok: true };
     }
-    p.status = 'bezig'; p.at = Date.now(); save();
+    p.status = 'bezig'; p.at = Date.now();
+    plaats(id, kamer(id).leden, p.spelers, sein); // iedereen treedt aan op de speelplek
+    save();
     sein(id, 'spel-start', staTe(p, id));
     return { status: 200, ok: true, potje: staTe(p, id) };
   }

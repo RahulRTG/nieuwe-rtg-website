@@ -50,6 +50,10 @@ test('een potje midgetgolf: om de beurt, eerlijke uitslag, geen ranglijst', asyn
   assert.equal(ja.status, 200);
   assert.equal(ja.body.potje.aanZet, a.codenaam);
   assert.ok(!JSON.stringify(ja.body).includes(ECHT), 'alleen codenamen in het potje');
+  // de wereld speelt mee: bij de start treedt iedereen aan op de speelplek
+  const st = await api(base, '/api/residentie/pols', {}, a.token);
+  const mij = st.body.leden.find(l => l.codenaam === a.codenaam);
+  assert.deepEqual([mij.dx, mij.dy], [1, 7], 'de speler staat op de afslagmat');
   assert.equal((await api(base, '/api/residentie/spel/zet', { kracht: 50 }, b.token)).status, 409, 'de ander is aan zet');
   let laatste = null;
   for (let ronde = 0; ronde < 3; ronde++) {

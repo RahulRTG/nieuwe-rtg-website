@@ -28,6 +28,7 @@
     items.sort((a, b) => a.z - b.z);
     for (const it of items) it.doe();
     tekenParen(); // de gouden draad tussen wie samen wandelt
+    tekenEffecten(); // beurt-animaties: ballen, pijlen, spetters, glans
   }
 
   /* ---------- staat bijwerken vanuit server-antwoorden ---------- */

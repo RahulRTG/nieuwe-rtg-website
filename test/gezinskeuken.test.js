@@ -124,3 +124,25 @@ test('de keuken is dicht voor gasten (oppas/familie) en voor een verkeerd token'
   // een verzonnen token komt er ook niet in
   assert.equal((await fetch(BASE + '/api/foundation/gezin/' + G.code + '/keuken?token=nep')).status, 403);
 });
+
+test('vaste boodschappen: aanmaken, dubbel negeren, op de lijst tikken en weer vast weghalen', async () => {
+  const G = await gezin();
+  // twee vaste boodschappen; een dubbele (ander hoofdlettergebruik) telt niet mee
+  assert.equal((await api('/gezin/keuken/vast', { code: G.code, token: G.token, wat: 'Melk' })).status, 200);
+  assert.equal((await api('/gezin/keuken/vast', { code: G.code, token: G.token, wat: 'Brood' })).status, 200);
+  await api('/gezin/keuken/vast', { code: G.code, token: G.token, wat: 'melk' });
+  assert.equal((await api('/gezin/keuken/vast', { code: G.code, token: G.token, wat: '  ' })).status, 400);
+  let d = await overzicht(G.code, G.token);
+  assert.deepEqual(d.vast, ['Melk', 'Brood'], 'twee vaste boodschappen, geen dubbele');
+  // vast tikken = gewoon de bestaande lijst-route; het kind mag dat ook
+  await api('/gezin/keuken/lijst', { code: G.code, token: G.kt, wat: 'Melk' });
+  d = await overzicht(G.code, G.token);
+  assert.ok(d.lijst.some(x => x.wat === 'Melk' && !x.af), 'de vaste boodschap staat op de lijst');
+  // uit het vaste rijtje halen raakt de lijst niet aan
+  await api('/gezin/keuken/vast/verwijder', { code: G.code, token: G.token, wat: 'Melk' });
+  d = await overzicht(G.code, G.token);
+  assert.deepEqual(d.vast, ['Brood']);
+  assert.ok(d.lijst.some(x => x.wat === 'Melk'), 'wat al op de lijst stond blijft gewoon staan');
+  // dicht voor gasten, net als de rest van de keuken
+  assert.equal((await api('/gezin/keuken/vast', { code: G.code, token: G.gt, wat: 'stiekem' })).status, 403);
+});

@@ -1636,3 +1636,22 @@ Tests: ochtend.test.js (4, herschreven op de weektelling; asserteert ook
 dat reeks en record echt weg zijn en het bord geen ranglijst is) en
 rtfspeelhoek.e2e.js door het scherm (pakken, de afwijker, samen memorie,
 de napraatvraag).
+
+## RTF-golf 8 (deel 1): de gezinskeuken op pro-niveau
+
+**Vaste boodschappen.** Wat elke week terugkomt (melk, brood) hoef je
+niet elke week opnieuw te typen: het gezin bouwt een vast rijtje op, en
+een tik zet het item op de gedeelde lijst (via de bestaande
+lijst-route -- geen tweede pad). Het rijtje laat met een vinkje zien wat
+er al op de lijst staat; iets uit het vaste rijtje halen raakt de lijst
+zelf niet aan. Maximaal veertig, dicht voor gasten net als de rest van
+de keuken.
+
+**Emoji-opschoning** (in lijn met de lopende emoji-ronde): de kopjes van
+de keuken en de "verras me"-knop gebruiken nu huisstijl-glyfen in plaats
+van OS-emoji. reis.html verloor een leeg sier-element en een loze
+tekstwissel.
+
+Test: gezinskeuken.test.js kreeg een vijfde test (aanmaken, dubbel
+negeren, tikken naar de lijst, vast weghalen zonder de lijst te raken,
+dicht voor gasten).

@@ -81,7 +81,6 @@ let soort='aanvraag';
 document.querySelectorAll('.kies button').forEach(b=> b.addEventListener('click', ()=>{
   document.querySelectorAll('.kies button').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); soort=b.dataset.soort;
   const vd = soort==='voordracht';
-  $('#labNaam').textContent = vd ? 'Jouw naam' : 'Jouw naam';
   $('#labGezin').textContent = vd ? 'Over het gezin dat je voordraagt' : 'Over jouw gezin (aantal personen, leeftijden kinderen)';
   $('#labWaarom').textContent = vd ? 'Waarom verdient dit gezin dit?' : 'Vertel kort waarom';
 }));
@@ -95,7 +94,7 @@ $('#verstuur').addEventListener('click', async ()=>{
   try{
     const r=await fetch('/api/foundation/reis/aanvraag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.');
-    $('#wrap').innerHTML='<div class="klaar"><span class="em"></span><h2>Verstuurd, dankjewel.</h2>'+
+    $('#wrap').innerHTML='<div class="klaar"><h2>Verstuurd, dankjewel.</h2>'+
       '<p>De RTFoundation heeft je bericht ontvangen en neemt persoonlijk en discreet contact met je op. Er zit geen haast of druk bij, we nemen de tijd. Sterkte, en tot snel.</p>'+
       '<p style="margin-top:1.4rem;"><a class="knop grijs" href="index.html">Terug naar alle hulp</a></p></div>';
   }catch(e){ $('#fout').textContent=e.message; $('#verstuur').disabled=false; $('#verstuur').textContent='Versturen naar de foundation'; }

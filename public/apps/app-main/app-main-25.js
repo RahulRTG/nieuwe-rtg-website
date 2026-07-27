@@ -72,6 +72,8 @@
               s = await API.call('/account/start', Object.assign({ positie: pos }, body));
             }
             try { doel.bewaar(s.token, r); } catch (e2) {}
+            // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren
+            if (s.welzijn) bannerToon('', 'Rahul', s.welzijn);
             // werk-app als venster op het bureaublad (breed scherm), anders schermvullend
             if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(doel.url, doel.app || 'Werk');
             else location.href = doel.url;

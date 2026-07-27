@@ -83,3 +83,13 @@ test('5. ontkoppelen sluit de deur weer, en de AI-stuur blijft van de sleutelbos
   const ai = await api('/api/member/doe', { pad: '/api/account/start', body: { rol: 'zaak' } }, lid);
   assert.equal(ai.status, 403, 'het AI-stuur mag de sleutelbos niet bedienen');
 });
+
+test('6. Rahuls welzijnszin: bij de zoveelste werkstart zegt hij iets, blokkeert hij niets', async () => {
+  let zin = null;
+  for (let i = 0; i < 6; i++) {
+    const s = await api('/api/account/start', { rol: 'zaak' }, lid);
+    assert.equal(s.status, 200, 'de start blijft gewoon werken');
+    if (s.body.welzijn) zin = s.body.welzijn;
+  }
+  assert.ok(zin && /pauze|rust/.test(zin), 'de welzijnszin is er (pauze overdag, rust in de nacht) en is alleen een zin');
+});

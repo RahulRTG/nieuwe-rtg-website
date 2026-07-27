@@ -419,6 +419,20 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/member/apply` `{supplierCode, func}` | Solliciteren bij een partner; kan pas met een afgerond cv |
 | `POST /api/supplier/apply` `{code, name, func, contact}` | Open sollicitatie via het startscherm van een partner-app |
 
+### RTG School (de onderwijs-toren)
+
+Een leven lang leren op een eigen motor, van kleuterklas tot universiteit en daarna. Gebouwd in zes golven; de kern:
+
+- **Het leerpaspoort** (`server/kern/onderwijs.js`): hangt aan de codenaam (nooit een echte naam), volgt de officiële Nederlandse ladder (groep 1-8, referentieniveaus, vmbo/havo/vwo, mbo 1-4, hbo, wo) en telt elk behaald leerdoel mee. Overgaan wordt geadviseerd door het systeem, besloten door een mens.
+- **De leerstof-motor** (`server/kern/leerstof.js` + `leerstof-data/`): 20 vakken en 70+ leerdoelen met een les in gewone taal en verse opgaven uit generatoren (`leerstof-gen.js`). Server-authoritatief: het juiste antwoord verlaat de server nooit. Vijf opgaven per sessie; bij vier goed wordt het doel bijgeschreven.
+- **Examentraining en niveau-advies** (`server/kern/leerstof-vervolg.js`): tien vragen zoals een echt examen (terugblik pas aan het eind), de cijferindicatie is een ADVIES; het niveau-advies telt behaalde doelen en zegt eerlijk waar je staat.
+- **Rahul Bijles** (`server/kern/bijles.js`): ieders eigen bijlesleraar, geduldig en positief, op het niveau uit het paspoort; werkt ook zonder AI-sleutel (vaste demo-uitleg) en tweetalig via de thuistaal.
+- **School × RTF** (`server/school/`): klassen, huiswerk, toetsen op dezelfde leerdoelbibliotheek, de tweetalige laag (NL blijft altijd staan), in-app bellen, excursies met tijdelijke GPS (toestemming, stop = wissen, kijklog), de vrijwillige ouderbijdrage, de telefoonboom en de hulplijn (de knop van het kind zelf; vertrouwelijk = alleen de mentor).
+- **De schermen**: `/apps/rtgschool.html` (leden: paspoort, lessen, oefenen, examentraining, advies, bijles), `/apps/foundation/school.html` (gezin: kind en ouder, incl. hulplijn en aankomende toetsen) en `/apps/schoolpartner.html` (school: directie, leraar, mentor).
+- **AI-bedienbaar**: alle onderwijs-routes lopen over het gewone stuur (`/api/member/doe`), dus Rahul kan inschrijven, overhoren en bijles regelen met de inlog van het lid zelf, binnen dezelfde remmen (bewaakt door `test/onderwijsstuur.test.js`).
+
+Vaste eerlijkheidsregels, in code en tests verankerd: RTG School is geen school of examenbureau (diploma's en examens lopen via de officiële instellingen); cijfervoorstellen zijn advies (een mens beslist); een toets verklikt niet halverwege; geen scores buiten de sessie, geen reeksen, geen ranglijsten -- leren is geen wedstrijd.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.

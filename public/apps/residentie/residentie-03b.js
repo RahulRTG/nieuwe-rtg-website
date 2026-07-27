@@ -15,7 +15,7 @@
     $('#knopVraag').hidden = !(S.kamer && (S.kamer.id === 'restaurant' || S.kamer.soort === 'suite'));
     $('#knopPaar').hidden = !S.kamer;
     zetKnopPaar();
-    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; }
+    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; sceneDicht(); }
   }
 
   $('#knopSpel').addEventListener('click', () => {
@@ -39,7 +39,7 @@
     P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
-    tekenSpel();
+    tekenSpel(); sceneOpen(P.spel);
     if (!meterAan) { meterAan = true; requestAnimationFrame(meterLus); }
   }
   function tekenSpel() {
@@ -67,11 +67,14 @@
   });
   $('#spelWeg').addEventListener('click', async () => {
     try { await api('/api/residentie/spel/stop', {}); } catch (e) {}
-    P = null; $('#spelBalk').hidden = true;
+    P = null; $('#spelBalk').hidden = true; sceneDicht();
   });
 
   function verwerkZet(d, wie) {
-    if (d.punt != null && wie && P) voegEffect(P.spel, wie, d.punt, d.punt + ' ' + P.eenheid);
+    if (d.punt != null && wie && P) {
+      voegEffect(P.spel, wie, d.punt, d.punt + ' ' + P.eenheid);
+      sceneZet(wie, d.punt, (RAAK[P.spel] || (() => true))(d.punt), meterWaarde);
+    }
     if (d.punt != null && wie) meld(wie === S.ik ? 'U: ' + d.punt + ' ' + (P ? P.eenheid : '') : wie + ': ' + d.punt + ' ' + (P ? P.eenheid : ''));
     if (d.uitslag) {
       const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);
@@ -85,7 +88,7 @@
           : w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
         '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
       $('#spelLaag').classList.add('open');
-      $('#spelUitslagWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+      $('#spelUitslagWeg').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); sceneDicht(); });
       P = null; $('#spelBalk').hidden = true;
       return;
     }
@@ -113,5 +116,5 @@
     if (d.kind === 'spel-start') startPotje(d);
     if (d.kind === 'spel-zet' && d.codenaam !== S.ik) verwerkZet(d, d.codenaam);
     if (d.kind === 'spel-afgewezen') meld(d.van + ' slaat het potje even over.');
-    if (d.kind === 'spel-gestopt') { P = null; $('#spelBalk').hidden = true; meld('Het potje is gestopt.'); }
+    if (d.kind === 'spel-gestopt') { P = null; $('#spelBalk').hidden = true; sceneDicht(); meld('Het potje is gestopt.'); }
   }

@@ -18,6 +18,11 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   #wereld{position:fixed;inset:0;display:block;cursor:pointer;}
+  /* het schermvullende speelveld van een potje, boven de zaal, onder de knoppen */
+  #speelveld{position:fixed;inset:0;display:block;z-index:3;cursor:pointer;}
+  /* tijdens een potje wijkt de kop: alle aandacht naar het speelveld */
+  .kop{transition:opacity .35s;}
+  body.scene-aan .kop{opacity:0;pointer-events:none;}
   /* de kop: kamernaam en de hoteldiensten */
   .kop{position:fixed;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:.7rem;padding:.85rem 1rem .7rem;background:linear-gradient(180deg,rgba(12,12,11,.92),rgba(12,12,11,0));pointer-events:none;}
   .kop>*{pointer-events:auto;}
@@ -78,6 +83,7 @@
 <body>
 <main style="display:contents">
 <canvas id="wereld" aria-label="De Residence: de zaal met aanwezige leden"></canvas>
+<canvas id="speelveld" hidden aria-label="Het speelveld van het lopende potje"></canvas>
 <header class="kop">
   <a class="terug" href="/apps/app.html">←</a>
   <div><div class="ey">De Résidence</div><h1 id="kamerNaam">…</h1><div class="sub" id="kamerSub"></div></div>

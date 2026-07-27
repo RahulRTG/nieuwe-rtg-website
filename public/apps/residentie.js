@@ -704,7 +704,7 @@
     $('#knopVraag').hidden = !(S.kamer && (S.kamer.id === 'restaurant' || S.kamer.soort === 'suite'));
     $('#knopPaar').hidden = !S.kamer;
     zetKnopPaar();
-    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; }
+    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; sceneDicht(); }
   }
 
   $('#knopSpel').addEventListener('click', () => {
@@ -728,7 +728,7 @@
     P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
-    tekenSpel();
+    tekenSpel(); sceneOpen(P.spel);
     if (!meterAan) { meterAan = true; requestAnimationFrame(meterLus); }
   }
   function tekenSpel() {
@@ -756,11 +756,14 @@
   });
   $('#spelWeg').addEventListener('click', async () => {
     try { await api('/api/residentie/spel/stop', {}); } catch (e) {}
-    P = null; $('#spelBalk').hidden = true;
+    P = null; $('#spelBalk').hidden = true; sceneDicht();
   });
 
   function verwerkZet(d, wie) {
-    if (d.punt != null && wie && P) voegEffect(P.spel, wie, d.punt, d.punt + ' ' + P.eenheid);
+    if (d.punt != null && wie && P) {
+      voegEffect(P.spel, wie, d.punt, d.punt + ' ' + P.eenheid);
+      sceneZet(wie, d.punt, (RAAK[P.spel] || (() => true))(d.punt), meterWaarde);
+    }
     if (d.punt != null && wie) meld(wie === S.ik ? 'U: ' + d.punt + ' ' + (P ? P.eenheid : '') : wie + ': ' + d.punt + ' ' + (P ? P.eenheid : ''));
     if (d.uitslag) {
       const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);
@@ -774,7 +777,7 @@
           : w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
         '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
       $('#spelLaag').classList.add('open');
-      $('#spelUitslagWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+      $('#spelUitslagWeg').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); sceneDicht(); });
       P = null; $('#spelBalk').hidden = true;
       return;
     }
@@ -802,7 +805,7 @@
     if (d.kind === 'spel-start') startPotje(d);
     if (d.kind === 'spel-zet' && d.codenaam !== S.ik) verwerkZet(d, d.codenaam);
     if (d.kind === 'spel-afgewezen') meld(d.van + ' slaat het potje even over.');
-    if (d.kind === 'spel-gestopt') { P = null; $('#spelBalk').hidden = true; meld('Het potje is gestopt.'); }
+    if (d.kind === 'spel-gestopt') { P = null; $('#spelBalk').hidden = true; sceneDicht(); meld('Het potje is gestopt.'); }
   }
 
   /* ---------- deel 3c: de vragen van het huis en de huistelefoon ----------
@@ -1055,6 +1058,420 @@
     }
     ctx.globalAlpha = 1;
   }
+
+  /* ---------- deel 3f: de speelschermen ----------
+     Zodra een potje begint, klapt een eigen speelscherm open over de zaal:
+     de golfbaan, het dartbord, de kegelbaan, het bad, het biljartlaken, het
+     boogdoel of de dansvloer, schermvullend. De meter onderin blijft de
+     besturing; richten gebeurt in de scene zelf, en tikken op het veld is
+     hetzelfde als de speelknop. De scenes registreren zich in SCENES. */
+  const SC = { aan: false, spel: null, anims: [] };
+  const SCENES = {};
+  const veld = $('#speelveld'), sctx = veld.getContext('2d');
+  let SW = 0, SH = 0, SDPR = 1;
+
+  function sceneMaat() {
+    if (!SC.aan) return;
+    SDPR = Math.min(2, window.devicePixelRatio || 1);
+    SW = window.innerWidth; SH = window.innerHeight;
+    veld.width = SW * SDPR; veld.height = SH * SDPR;
+    veld.style.width = SW + 'px'; veld.style.height = SH + 'px';
+    sctx.setTransform(SDPR, 0, 0, SDPR, 0, 0);
+  }
+  window.addEventListener('resize', sceneMaat);
+
+  function sceneOpen(spel) {
+    if (!SCENES[spel]) return;
+    SC.aan = true; SC.spel = spel; SC.anims = [];
+    veld.hidden = false; document.body.classList.add('scene-aan');
+    sceneMaat();
+    requestAnimationFrame(sceneLus);
+  }
+  function sceneDicht() { SC.aan = false; veld.hidden = true; document.body.classList.remove('scene-aan'); }
+
+  function sceneLus() {
+    if (!SC.aan) return;
+    requestAnimationFrame(sceneLus);
+    const sc = SCENES[SC.spel];
+    if (!sc) return;
+    const mijnBeurt = !!(P && P.aanZet === S.ik);
+    sc.teken(sctx, SW, SH, meterWaarde, mijnBeurt);
+    const nu = performance.now();
+    for (let i = SC.anims.length - 1; i >= 0; i--) {
+      const a = SC.anims[i], t = (nu - a.t0) / a.duur;
+      if (t >= 1) { SC.anims.splice(i, 1); continue; }
+      if (sc.anim) sc.anim(sctx, SW, SH, a, t);
+    }
+  }
+  function sceneZet(wie, punt, raak, kracht) {
+    if (!SC.aan) return;
+    SC.anims.push({ wie, punt, raak, eigen: wie === S.ik,
+      kracht: Math.max(0, Math.min(100, kracht == null ? 50 : kracht)),
+      t0: performance.now(), duur: SC.spel === 'dansen' ? 1600 : 1400 });
+  }
+  // tikken op het speelveld = de speelknop
+  veld.addEventListener('click', () => { const k = $('#spelDoe'); if (k && !$('#spelBalk').hidden) k.click(); });
+
+  /* gedeelde penselen voor de scenes */
+  function doek(boven, onder) {
+    const g = sctx.createLinearGradient(0, 0, 0, SH);
+    g.addColorStop(0, boven); g.addColorStop(1, onder);
+    sctx.fillStyle = g; sctx.fillRect(0, 0, SW, SH);
+  }
+  function kopScene(naam, sub) { // de titel van de scene, in de huisstijl
+    sctx.textAlign = 'center';
+    sctx.fillStyle = '#F2ECDC'; sctx.font = '500 26px "Bodoni Moda", serif';
+    sctx.fillText(naam, SW / 2, 96);
+    sctx.fillStyle = 'rgba(216,184,88,0.9)'; sctx.font = '600 10px Inter, sans-serif';
+    sctx.fillText(sub, SW / 2, 116);
+  }
+  function baanVak() { // de maten van de perspectief-baan, zonder te tekenen
+    const bw = Math.min(SW * 0.7, 420);
+    return { x0: SW / 2, yB: SH - 170, yT: 130, bw, tw: bw * 0.34 };
+  }
+  function baan(kleurA, kleurB, randKleur) { // een perspectief-baan van onder naar boven
+    const { x0, yB, yT, bw, tw } = baanVak();
+    sctx.beginPath();
+    sctx.moveTo(x0 - bw / 2, yB); sctx.lineTo(x0 - tw / 2, yT);
+    sctx.lineTo(x0 + tw / 2, yT); sctx.lineTo(x0 + bw / 2, yB); sctx.closePath();
+    const g = sctx.createLinearGradient(0, yT, 0, yB);
+    g.addColorStop(0, kleurA); g.addColorStop(1, kleurB);
+    sctx.fillStyle = g; sctx.fill();
+    sctx.strokeStyle = randKleur; sctx.lineWidth = 2; sctx.stroke();
+    return { x0, yB, yT, bw, tw };
+  }
+  // een punt op de baan: v = 0 (onder) .. 1 (boven), zij = -1..1
+  function opBaan(b, v, zij) {
+    const w = b.bw + (b.tw - b.bw) * v;
+    return [b.x0 + zij * w / 2 * 0.8, b.yB + (b.yT - b.yB) * v];
+  }
+  function richtlijn(b, zij, kleur) { // gebogen stippellijn vanaf de bal
+    sctx.setLineDash([6, 8]); sctx.strokeStyle = kleur; sctx.lineWidth = 2;
+    sctx.beginPath();
+    const [sx, sy] = opBaan(b, 0.04, 0), [ex, ey] = opBaan(b, 0.9, zij);
+    sctx.moveTo(sx, sy - 8);
+    sctx.quadraticCurveTo(sx + (ex - sx) * 0.5, sy + (ey - sy) * 0.55, ex, ey);
+    sctx.stroke(); sctx.setLineDash([]);
+  }
+  function schijf(x, y, r, ringen) { // een doel van ringen [kleur, kleur, ...]
+    for (let i = 0; i < ringen.length; i++) {
+      sctx.fillStyle = ringen[i];
+      sctx.beginPath(); sctx.arc(x, y, r * (1 - i / ringen.length), 0, Math.PI * 2); sctx.fill();
+    }
+    sctx.strokeStyle = 'rgba(216,184,88,0.7)'; sctx.lineWidth = 2;
+    sctx.beginPath(); sctx.arc(x, y, r, 0, Math.PI * 2); sctx.stroke();
+  }
+  function kruis(x, y, kleur) { // het zwevende richtkruis
+    sctx.strokeStyle = kleur; sctx.lineWidth = 1.6;
+    sctx.beginPath(); sctx.arc(x, y, 14, 0, Math.PI * 2); sctx.stroke();
+    sctx.beginPath();
+    sctx.moveTo(x - 22, y); sctx.lineTo(x - 8, y); sctx.moveTo(x + 8, y); sctx.lineTo(x + 22, y);
+    sctx.moveTo(x, y - 22); sctx.lineTo(x, y - 8); sctx.moveTo(x, y + 8); sctx.lineTo(x, y + 22);
+    sctx.stroke();
+  }
+  function sceneVonken(x, y, t, kleur) {
+    sctx.fillStyle = kleur;
+    for (let v = 0; v < 8; v++) {
+      const a = (Math.PI * 2 / 8) * v, r = 8 + t * 46;
+      sctx.globalAlpha = Math.max(0, 1 - t * 1.2);
+      sctx.beginPath(); sctx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r * 0.7, 2.2, 0, Math.PI * 2); sctx.fill();
+    }
+    sctx.globalAlpha = 1;
+  }
+  function puntZweef(x, y, a, t) { // het puntenaantal zweeft ook hier
+    if (a.punt == null) return;
+    sctx.globalAlpha = Math.max(0, 1 - t * 1.1);
+    sctx.font = '700 20px Inter, sans-serif'; sctx.textAlign = 'center';
+    sctx.fillStyle = a.raak ? '#E3C878' : 'rgba(244,241,236,0.9)';
+    sctx.fillText(String(a.punt), x, y - t * 60);
+    sctx.globalAlpha = 1;
+  }
+
+  /* ---------- deel 3g: de baanscenes ----------
+     Golf, kegelen en boogschieten als schermvullende speelvelden. De baan
+     ligt in perspectief, het richten volgt de meter onderin, en elke beurt
+     speelt zich in de scene af: de bal rolt, de pijl vliegt, kegels vallen. */
+  SCENES.golf = {
+    teken(c, W, H, m, beurt) {
+      doek('#141C0F', '#090D06');
+      const b = baan('#4C6B36', '#2C471F', 'rgba(216,184,88,0.5)');
+      const [hx, hy] = opBaan(b, 0.86, 0);
+      c.fillStyle = '#0A0A09';
+      c.beginPath(); c.ellipse(hx, hy, 13, 6, 0, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = '#D8B858'; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(hx, hy); c.lineTo(hx, hy - 54); c.stroke();
+      c.fillStyle = '#D24A6E';
+      c.beginPath(); c.moveTo(hx, hy - 54); c.lineTo(hx + 26, hy - 46); c.lineTo(hx, hy - 38); c.closePath(); c.fill();
+      const [bx, by] = opBaan(b, 0.04, 0);
+      if (beurt) richtlijn(b, (100 - m) / 100 * 0.85 * Math.sin(performance.now() / 320), 'rgba(242,236,220,0.7)');
+      c.fillStyle = '#F2ECDC';
+      c.beginPath(); c.arc(bx, by - 5, 6, 0, Math.PI * 2); c.fill();
+      kopScene('Midgetgolf', 'sla af op het topje van de meter');
+    },
+    anim(c, W, H, a, t) {
+      const b = baanVak(), tt = 1 - (1 - t) * (1 - t);
+      const eind = a.raak ? 0.86 : 0.3 + a.kracht / 100 * 0.45;
+      const zij = a.raak ? 0 : (a.kracht >= 50 ? 0.5 : -0.5);
+      const [x, y] = opBaan(b, 0.04 + (eind - 0.04) * tt, zij * tt);
+      c.fillStyle = '#F2ECDC';
+      c.beginPath(); c.arc(x, y - 4, 6 - tt * 2.5, 0, Math.PI * 2); c.fill();
+      if (a.raak && t > 0.72) { const [hx, hy] = opBaan(b, 0.86, 0); sceneVonken(hx, hy - 4, (t - 0.72) * 3.6, '#E3C878'); }
+      puntZweef(x, y - 28, a, t);
+    }
+  };
+
+  SCENES.kegelen = {
+    teken(c, W, H, m, beurt) {
+      doek('#1B130A', '#0C0805');
+      const b = baan('#7A552C', '#452C13', 'rgba(216,184,88,0.45)');
+      // de naden van de baanplanken lopen mee het perspectief in
+      c.strokeStyle = 'rgba(12,10,7,0.35)'; c.lineWidth = 1;
+      for (const z of [-0.5, 0, 0.5]) {
+        const [x1, y1] = opBaan(b, 0, z), [x2, y2] = opBaan(b, 1, z);
+        c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+      }
+      const kegel = (x, y, r) => {
+        c.fillStyle = '#EFE8D6';
+        c.beginPath(); c.ellipse(x, y - r * 1.6, r, r * 2, 0, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = '#B08D2F'; c.lineWidth = 1.5;
+        c.beginPath(); c.moveTo(x - r * 0.7, y - r * 2.4); c.lineTo(x + r * 0.7, y - r * 2.4); c.stroke();
+      };
+      const rijen = [[0], [-0.13, 0.13], [-0.26, 0, 0.26], [-0.39, -0.13, 0.13, 0.39]];
+      rijen.forEach((rij, i) => rij.forEach(z => { const [x, y] = opBaan(b, 0.8 + i * 0.05, z); kegel(x, y, 4.6 - i * 0.5); }));
+      const [bx, by] = opBaan(b, 0.05, 0);
+      if (beurt) richtlijn(b, (100 - m) / 100 * 0.6 * Math.sin(performance.now() / 300), 'rgba(242,236,220,0.65)');
+      c.fillStyle = '#7F1634'; c.beginPath(); c.arc(bx, by - 7, 9, 0, Math.PI * 2); c.fill();
+      c.fillStyle = 'rgba(242,236,220,0.5)'; c.beginPath(); c.arc(bx - 3, by - 10, 2.2, 0, Math.PI * 2); c.fill();
+      kopScene('Kegelen', 'rol vol door voor alle tien');
+    },
+    anim(c, W, H, a, t) {
+      const b = baanVak(), tt = 1 - (1 - t) * (1 - t);
+      const [x, y] = opBaan(b, 0.05 + 0.72 * tt, 0);
+      c.fillStyle = '#7F1634';
+      c.beginPath(); c.arc(x, y - 6, 9 - tt * 4, 0, Math.PI * 2); c.fill();
+      if (t > 0.55) { // de kegels stuiven uiteen, naar rato van de worp
+        const n = Math.max(1, Math.round(a.punt || 0)), f = (t - 0.55) / 0.45;
+        const [px, py] = opBaan(b, 0.85, 0);
+        c.strokeStyle = 'rgba(239,232,214,' + Math.max(0, 1 - f * 1.1) + ')'; c.lineWidth = 2.4;
+        for (let i = 0; i < n; i++) {
+          const hk = (i / n - 0.5) * 2.6, r = 10 + f * 52;
+          const kx = px + Math.cos(hk - Math.PI / 2) * r, ky = py + Math.sin(hk - Math.PI / 2) * r * 0.6;
+          c.beginPath(); c.moveTo(kx, ky); c.lineTo(kx + Math.cos(hk) * 8, ky + Math.sin(hk) * 8 - 4); c.stroke();
+        }
+        if (a.raak) sceneVonken(px, py - 6, f, '#E3C878');
+        puntZweef(px, py - 30, a, f);
+      }
+    }
+  };
+
+  SCENES.boogschieten = {
+    teken(c, W, H, m, beurt) {
+      doek('#151110', '#0A0807');
+      const cx = W / 2, cy = H * 0.34, r = Math.min(W * 0.33, 150);
+      c.strokeStyle = '#4A3A22'; c.lineWidth = 5; // de poten van de schietstand
+      c.beginPath(); c.moveTo(cx - r * 0.7, cy + r * 1.5); c.lineTo(cx, cy);
+      c.moveTo(cx + r * 0.7, cy + r * 1.5); c.lineTo(cx, cy); c.stroke();
+      schijf(cx, cy, r, ['#EFE8D6', '#1E1910', '#C23A5E', '#7F1634', '#D8B858']);
+      // de boog met de pijl op de pees, onderin
+      const by = H - 190;
+      c.strokeStyle = '#8A6238'; c.lineWidth = 4;
+      c.beginPath(); c.arc(cx, by + 60, 85, Math.PI * 1.22, Math.PI * 1.78); c.stroke();
+      c.strokeStyle = 'rgba(242,236,220,0.6)'; c.lineWidth = 1.4;
+      c.beginPath(); c.moveTo(cx - 71, by + 13); c.lineTo(cx, by + 4); c.lineTo(cx + 71, by + 13); c.stroke();
+      c.strokeStyle = '#D8B858'; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(cx, by + 4); c.lineTo(cx, by - 44); c.stroke();
+      if (beurt) {
+        const rr = r * (100 - m) / 100 * 0.9, hk = performance.now() / 620;
+        kruis(cx + Math.cos(hk) * rr, cy + Math.sin(hk) * rr * 0.9, 'rgba(242,236,220,0.85)');
+      }
+      kopScene('Boogschieten', 'hoe hoger de meter, hoe dichter bij de roos');
+    },
+    anim(c, W, H, a, t) {
+      const cx = W / 2, cy = H * 0.34, r = Math.min(W * 0.33, 150);
+      const rr = r * Math.max(0, 10 - (a.punt || 0)) / 10 * 0.9, ha = a.kracht / 100 * Math.PI * 2;
+      const lx = cx + Math.cos(ha) * rr, ly = cy + Math.sin(ha) * rr * 0.9;
+      const tt = Math.min(1, t * 2.2), sx = cx, sy = H - 234;
+      const x = sx + (lx - sx) * tt, y = sy + (ly - sy) * tt;
+      c.strokeStyle = '#D8B858'; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(x, y + 26 * (1 - tt * 0.6)); c.lineTo(x, y); c.stroke();
+      c.fillStyle = '#D24A6E';
+      c.beginPath(); c.moveTo(x, y); c.lineTo(x - 3.4, y + 8); c.lineTo(x + 3.4, y + 8); c.closePath(); c.fill();
+      if (tt >= 1) { if (a.raak) sceneVonken(lx, ly, (t - 0.45) * 2, '#E3C878'); puntZweef(lx, ly - 16, a, Math.max(0, t - 0.4)); }
+    }
+  };
+
+  /* ---------- deel 3h: de zaalscenes ----------
+     Darts, biljart, zwemmen en dansen: het bord aan de muur, het laken van
+     boven, de banen van het badhuis en de dansvloer in het spotlicht. */
+  SCENES.darts = {
+    teken(c, W, H, m, beurt) {
+      doek('#171310', '#0B0908');
+      const cx = W / 2, cy = H * 0.36, r = Math.min(W * 0.34, 150);
+      c.fillStyle = '#241E15';
+      c.beginPath(); c.arc(cx, cy, r + 12, 0, Math.PI * 2); c.fill();
+      for (let i = 0; i < 20; i++) {
+        c.fillStyle = i % 2 ? '#EFE8D6' : '#1E1910';
+        c.beginPath(); c.moveTo(cx, cy);
+        c.arc(cx, cy, r, i * Math.PI / 10, (i + 1) * Math.PI / 10); c.closePath(); c.fill();
+      }
+      c.strokeStyle = '#7F1634'; c.lineWidth = 5; // dubbel- en tripelring
+      c.beginPath(); c.arc(cx, cy, r * 0.95, 0, Math.PI * 2); c.stroke();
+      c.beginPath(); c.arc(cx, cy, r * 0.58, 0, Math.PI * 2); c.stroke();
+      c.fillStyle = '#D8B858'; c.beginPath(); c.arc(cx, cy, r * 0.11, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#7F1634'; c.beginPath(); c.arc(cx, cy, r * 0.05, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = 'rgba(216,184,88,0.8)'; c.lineWidth = 2;
+      c.beginPath(); c.arc(cx, cy, r + 12, 0, Math.PI * 2); c.stroke();
+      c.strokeStyle = 'rgba(216,184,88,0.5)'; // de werplijn (oche)
+      c.beginPath(); c.moveTo(W * 0.3, H - 180); c.lineTo(W * 0.7, H - 180); c.stroke();
+      if (beurt) {
+        const rr = r * (100 - m) / 100 * 0.92, hk = performance.now() / 560;
+        kruis(cx + Math.cos(hk) * rr, cy + Math.sin(hk) * rr, 'rgba(242,236,220,0.85)');
+      }
+      kopScene('Darts', 'gooi op het topje voor de roos');
+    },
+    anim(c, W, H, a, t) {
+      const cx = W / 2, cy = H * 0.36, r = Math.min(W * 0.34, 150);
+      const rr = r * Math.max(0, 60 - (a.punt || 0)) / 60 * 0.9, ha = a.kracht / 100 * Math.PI * 2;
+      const lx = cx + Math.cos(ha) * rr, ly = cy + Math.sin(ha) * rr;
+      const tt = Math.min(1, t * 2.4);
+      const x = lx + (1 - tt) * (a.eigen ? 90 : -90), y = ly + (1 - tt) * 300;
+      c.strokeStyle = '#D8B858'; c.lineWidth = 2.4;
+      c.beginPath(); c.moveTo(x, y + 20 * (1 - tt * 0.5)); c.lineTo(x, y); c.stroke();
+      c.fillStyle = '#D24A6E';
+      c.beginPath(); c.moveTo(x, y + 22 * (1 - tt * 0.5)); c.lineTo(x - 3.4, y + 29 * (1 - tt * 0.5) + 3); c.lineTo(x + 3.4, y + 29 * (1 - tt * 0.5) + 3); c.closePath(); c.fill();
+      if (tt >= 1) { if (a.raak) sceneVonken(lx, ly, (t - 0.42) * 2, '#E3C878'); puntZweef(lx, ly - 16, a, Math.max(0, t - 0.38)); }
+    }
+  };
+
+  SCENES.biljart = {
+    vak(W, H) { const tw = Math.min(W * 0.84, 560), th = tw * 0.52;
+      return { tx: (W - tw) / 2, ty: H * 0.24, tw, th }; },
+    teken(c, W, H, m, beurt) {
+      doek('#161310', '#0B0908');
+      const { tx, ty, tw, th } = this.vak(W, H);
+      c.fillStyle = '#4A2F16'; c.fillRect(tx - 16, ty - 16, tw + 32, th + 32);
+      c.fillStyle = '#2E5A3E'; c.fillRect(tx, ty, tw, th);
+      c.strokeStyle = 'rgba(12,10,7,0.5)'; c.lineWidth = 2; c.strokeRect(tx, ty, tw, th);
+      c.fillStyle = '#D8B858'; // de diamanten op de band
+      for (let i = 1; i < 4; i++) { c.beginPath(); c.arc(tx + tw * i / 4, ty - 8, 2.2, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.arc(tx + tw * i / 4, ty + th + 8, 2.2, 0, Math.PI * 2); c.fill(); }
+      const b = this.ballen(tx, ty, tw, th);
+      if (beurt) {
+        const hk = m / 100 * Math.PI * 2;
+        c.setLineDash([5, 7]); c.strokeStyle = 'rgba(242,236,220,0.75)'; c.lineWidth = 1.6;
+        c.beginPath(); c.moveTo(b.wx, b.wy); c.lineTo(b.wx + Math.cos(hk) * tw * 0.32, b.wy + Math.sin(hk) * tw * 0.32); c.stroke();
+        c.setLineDash([]);
+      }
+      const bal = (x, y, k) => { c.fillStyle = k; c.beginPath(); c.arc(x, y, 8, 0, Math.PI * 2); c.fill();
+        c.fillStyle = 'rgba(255,255,255,0.35)'; c.beginPath(); c.arc(x - 2.5, y - 2.5, 2.2, 0, Math.PI * 2); c.fill(); };
+      bal(b.wx, b.wy, '#F2ECDC'); bal(b.gx, b.gy, '#C9A94B'); bal(b.rx, b.ry, '#9E1C40');
+      kopScene('Biljart', 'stoot als de lijn de rode raakt');
+    },
+    ballen(tx, ty, tw, th) {
+      return { wx: tx + tw * 0.28, wy: ty + th * 0.62, gx: tx + tw * 0.24, gy: ty + th * 0.3,
+        rx: tx + tw * 0.72, ry: ty + th * 0.46 };
+    },
+    anim(c, W, H, a, t) {
+      const { tx, ty, tw, th } = this.vak(W, H), b = this.ballen(tx, ty, tw, th);
+      const tt = 1 - (1 - t) * (1 - t);
+      const doelx = a.raak ? b.rx : b.rx + tw * 0.12, doely = a.raak ? b.ry : ty + th * 0.9;
+      const f = Math.min(1, tt * 1.6);
+      const x = b.wx + (doelx - b.wx) * f, y = b.wy + (doely - b.wy) * f;
+      c.fillStyle = '#F2ECDC'; c.beginPath(); c.arc(x, y, 8, 0, Math.PI * 2); c.fill();
+      if (a.raak && f >= 1) { // de rode kaatst weg over het laken
+        const g = (tt - 0.62) / 0.38;
+        if (g > 0) { c.fillStyle = '#9E1C40';
+          c.beginPath(); c.arc(b.rx + g * tw * 0.16, b.ry - g * th * 0.3, 8, 0, Math.PI * 2); c.fill();
+          sceneVonken(b.rx, b.ry, g, '#E3C878'); }
+      }
+      puntZweef(x, y - 20, a, t);
+    }
+  };
+
+  SCENES.zwemmen = {
+    vak(W, H) { const pw = Math.min(W * 0.78, 480);
+      return { px: (W - pw) / 2, py: 170, pw, ph: H - 470 }; },
+    teken(c, W, H, m, beurt) {
+      doek('#0E1A1E', '#080F13');
+      const { px, py, pw, ph } = this.vak(W, H);
+      const g = c.createLinearGradient(0, py, 0, py + ph);
+      g.addColorStop(0, 'rgba(48,104,130,0.95)'); g.addColorStop(1, 'rgba(24,58,76,0.95)');
+      c.fillStyle = g; c.fillRect(px, py, pw, ph);
+      c.strokeStyle = 'rgba(216,184,88,0.7)'; c.lineWidth = 3; c.strokeRect(px, py, pw, ph);
+      const sp = (P && P.spelers) || [], n = Math.max(2, sp.length);
+      c.setLineDash([4, 10]); c.strokeStyle = 'rgba(242,236,220,0.4)'; c.lineWidth = 1.4;
+      for (let i = 1; i < n; i++) { c.beginPath(); c.moveTo(px + pw * i / n, py); c.lineTo(px + pw * i / n, py + ph); c.stroke(); }
+      c.setLineDash([]);
+      const t2 = Date.now() / 600;
+      sp.forEach((s2, i) => {
+        const lx = px + pw * (i + 0.5) / n;
+        const v = Math.min(1, s2.punten.length / ((P && P.beurten) || 4));
+        const y = py + ph - 26 - v * (ph - 56);
+        c.strokeStyle = 'rgba(242,236,220,0.5)'; c.lineWidth = 1.2;
+        c.beginPath(); c.ellipse(lx, y, 13 + Math.sin(t2 + i) * 2, 6, 0, 0, Math.PI * 2); c.stroke();
+        c.fillStyle = s2.codenaam === S.ik ? '#7F1634' : '#1E1910';
+        c.beginPath(); c.arc(lx, y, 7.5, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = '#D8B858'; c.lineWidth = 1.4; c.beginPath(); c.arc(lx, y, 7.5, 0, Math.PI * 2); c.stroke();
+        c.fillStyle = '#EFE8D6'; c.font = '600 10px Inter, sans-serif'; c.textAlign = 'center';
+        c.fillText(s2.codenaam, lx, py + ph + 18 + (i % 2) * 12);
+      });
+      if (beurt) { c.fillStyle = 'rgba(216,184,88,0.9)'; c.font = '600 11px Inter, sans-serif'; c.textAlign = 'center';
+        c.fillText('duik op het topje van de meter', W / 2, py - 12); }
+      kopScene('Baantjes trekken', 'vier banen, de snelste tijd wint');
+    },
+    anim(c, W, H, a, t) {
+      const { px, py, pw, ph } = this.vak(W, H);
+      const sp = (P && P.spelers) || [], n = Math.max(2, sp.length);
+      const i = Math.max(0, sp.findIndex(s2 => s2.codenaam === a.wie));
+      const lx = px + pw * (i + 0.5) / n, y = py + ph - 26 - t * (ph - 56);
+      c.strokeStyle = 'rgba(242,236,220,' + (0.7 - t * 0.4) + ')'; c.lineWidth = 1.6;
+      for (let k = 0; k < 3; k++) {
+        const f = (t * 2 + k / 3) % 1;
+        c.beginPath(); c.ellipse(lx, y + f * 34, 6 + f * 16, 3 + f * 7, 0, 0, Math.PI * 2); c.stroke();
+      }
+      puntZweef(lx, y - 14, a, t);
+    }
+  };
+
+  SCENES.dansen = {
+    teken(c, W, H, m, beurt) {
+      doek('#100C0A', '#070505');
+      const cx = W / 2, fy = H * 0.6, rx = Math.min(W * 0.38, 210);
+      c.fillStyle = 'rgba(240,200,110,0.09)'; // de lichtbundel van boven
+      c.beginPath(); c.moveTo(cx - 30, 70); c.lineTo(cx - rx, fy); c.lineTo(cx + rx, fy); c.lineTo(cx + 30, 70); c.closePath(); c.fill();
+      const g = c.createRadialGradient(cx, fy, 20, cx, fy, rx);
+      g.addColorStop(0, '#3A3226'); g.addColorStop(1, '#16120D');
+      c.fillStyle = g; c.beginPath(); c.ellipse(cx, fy, rx, rx * 0.42, 0, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = 'rgba(216,184,88,0.55)'; c.lineWidth = 2;
+      c.beginPath(); c.ellipse(cx, fy, rx, rx * 0.42, 0, 0, Math.PI * 2); c.stroke();
+      const t2 = Date.now() / 800, dans = (x, k) => {
+        const dy = Math.sin(t2 * 2 + x) * 6;
+        c.fillStyle = k; c.beginPath(); c.ellipse(cx + x, fy - 34 + dy, 12, 26, x > 0 ? -0.08 : 0.08, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#D8B858'; c.beginPath(); c.ellipse(cx + x, fy - 56 + dy, 7, 4.6, 0, 0, Math.PI * 2); c.fill();
+      };
+      dans(-34, '#7F1634'); dans(34, '#1E1910');
+      if (beurt) {
+        const r = 30 + m / 100 * (rx - 40);
+        c.strokeStyle = 'rgba(240,200,110,' + (0.25 + m / 100 * 0.6) + ')'; c.lineWidth = 2.4;
+        c.beginPath(); c.ellipse(cx, fy, r, r * 0.42, 0, 0, Math.PI * 2); c.stroke();
+      }
+      kopScene('Het gemaskerde bal', 'dans samen op de maat, op het topje');
+    },
+    anim(c, W, H, a, t) {
+      const cx = W / 2, fy = H * 0.6, rx = Math.min(W * 0.38, 210);
+      c.strokeStyle = 'rgba(240,200,110,' + Math.max(0, 0.8 - t) + ')'; c.lineWidth = 3;
+      c.beginPath(); c.ellipse(cx, fy, 30 + t * rx, (30 + t * rx) * 0.42, 0, 0, Math.PI * 2); c.stroke();
+      if (a.raak) {
+        c.fillStyle = 'rgba(240,200,110,' + Math.max(0, 1 - t * 1.1) + ')';
+        c.font = '400 ' + (16 + t * 10) + 'px serif'; c.textAlign = 'center';
+        for (let i = 0; i < 5; i++) {
+          const hk = t * 1.6 + i * Math.PI * 2 / 5, r = 40 + t * 90;
+          c.fillText('✶', cx + Math.cos(hk) * r, fy - 40 + Math.sin(hk) * r * 0.45);
+        }
+      }
+      puntZweef(cx, fy - 90, a, t);
+    }
+  };
 
   /* ---------- deel 4: de gids, het suite-atelier en de start ---------- */
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

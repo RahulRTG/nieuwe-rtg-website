@@ -11,4 +11,5 @@ module.exports = function initRealtime(ctx) {
   require('./deel6-diensten')(ctx);
   require('./deel7-salon')(ctx);
   require('./deel8-bouw')(ctx);
+  require('./deel9-vakken')(ctx);
 };

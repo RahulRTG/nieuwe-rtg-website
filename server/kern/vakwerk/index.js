@@ -13,28 +13,7 @@
    orkestrator: de genres, de gedeelde helpers en het bord wonen hier; de
    beschikbaarheid en tijdvakken in ./agenda, de AI-adviseur in ./advies. */
 
-const VAK_GENRES = {
-  zzp: {
-    label: 'Zelfstandig professional',
-    werk: 'afspraak', werkMv: 'afspraken',
-    persona: 'je bent de nuchtere bedrijfsadviseur van een zelfstandige professional op RTG. Je denkt mee over agenda, aanbod, tarieven en klantcontact, kort en concreet.'
-  },
-  chef: {
-    label: 'Privechef & catering',
-    werk: 'opdracht', werkMv: 'opdrachten',
-    persona: 'je bent de ervaren culinair bedrijfsadviseur van een privechef & cateraar op RTG. Je denkt mee over boekingen, menuvoorstellen, mise en place en marge, kort en concreet.'
-  },
-  wellness: {
-    label: 'Wellness & spa',
-    werk: 'behandeling', werkMv: 'behandelingen',
-    persona: 'je bent de spa-manager die meedenkt met een wellness- & spa-aanbieder op RTG. Je denkt mee over de behandelagenda, bezetting, het aanbod en rust in de planning, kort en concreet.'
-  },
-  bouw: {
-    label: 'Bouw & installatie',
-    werk: 'klus', werkMv: 'klussen',
-    persona: 'je bent de nuchtere werkvoorbereider van een bouw- en installatiebedrijf (timmerman, loodgieter, elektricien) op RTG. Je denkt mee over de klusplanning, materiaal, offertes en spoedklussen, kort en concreet.'
-  }
-};
+const { VAK_GENRES } = require('./genres');
 
 function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));

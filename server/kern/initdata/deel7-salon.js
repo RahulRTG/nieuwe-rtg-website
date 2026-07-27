@@ -13,6 +13,16 @@ module.exports = (ctx) => {
     helikopter: 'Scenic vluchten en snelle transfers per helikopter.',
     zzp: 'Zelfstandig vakmanschap op afspraak, met oog voor detail.',
     bouw: 'Timmerman, loodgieter en elektricien: vakwerk aan huis, ook met spoed.',
+    autogarage: 'Onderhoud, keuring en banden; halen en brengen doen wij.',
+    schoonmaak: 'Huis- en villaschoonmaak met een vast team en eigen middelen.',
+    hovenier: 'Tuinaanleg en -onderhoud, van snoeidag tot irrigatie.',
+    wasserij: 'Wassen, strijken en stomen; wij halen op en bezorgen terug.',
+    rijschool: 'Rijlessen met vaste instructeur, van proefles tot examen.',
+    dierenarts: 'Dierenartspraktijk: consulten, vaccinaties en spoed.',
+    tandarts: 'Tandarts en mondhygienist: controle, reiniging en spoed.',
+    fotograaf: 'Fotografie en film op locatie, van shoot tot reportage.',
+    verhuizer: 'Verhuizen zonder zorgen: vaste ploeg, verzekerd en op tijd.',
+    ithulp: 'IT-hulp aan huis: rustig uitgelegd en meteen geregeld.',
     activiteit: 'Tours, cruises en experiences om het eiland te beleven.',
     verhuur: 'Auto’s huren zonder verrassingen: vaste prijs en eerlijke staat.',
     charter: 'Boten en jachten charteren, met of zonder schipper, veilig op zee.',
@@ -64,7 +74,8 @@ module.exports = (ctx) => {
       'AZUL', 'AEGIS', 'CANFERRER', 'LUMINA',
       'VORA', 'BRISA', 'FUEGO', 'LUNARA', 'MOTOISLA', 'FESTA', 'SERENA', 'ORODOR', 'LIENZO',
       'GUARDIA', 'BOMBERS', 'URGENCIA', 'CANMISSES', 'CONSULTA', 'FALCO',
-      'FARMACIA', 'CARDIO', 'ESTETICA', 'GARNIZOEN'];
+      'FARMACIA', 'CARDIO', 'ESTETICA', 'GARNIZOEN', 'CASTELL',
+      'TALLER', 'BRILLA', 'VERDIA', 'LAVANDA', 'ESCOLA', 'FAUNA', 'DENTAL', 'LUZ', 'MUDANZA', 'DIGITAL'];
     const voor = db.data.suppliers.length;
     db.data.suppliers = db.data.suppliers.filter(s => !DEMO_ZAKEN.includes(s.code));
     // en de bijbehorende voorbeeldposts uit De Salon (de zes geseede verhalen)

@@ -35,7 +35,10 @@ const VAKKEN = {
   hotel: 'Hotel', restaurant: 'Restaurant', bar: 'Bar en club', apartment: 'Verhuur en appartementen',
   taxi: 'Vervoer', jet: 'Luchtvaart', zorg: 'Zorg en wellness', retail: 'Winkel', boerderij: 'Land en teelt',
   activiteit: 'Activiteiten', vastgoed: 'Vastgoed', zzp: 'Zelfstandigen', vakwerk: 'Vakwerk en techniek',
-  bouw: 'Bouw en installatie'
+  bouw: 'Bouw en installatie', autogarage: 'Garage en werkplaats', schoonmaak: 'Schoonmaak',
+  hovenier: 'Tuin en groen', wasserij: 'Wasserij en stomerij', rijschool: 'Rijschool',
+  dierenarts: 'Dierenzorg', tandarts: 'Mondzorg', fotograaf: 'Fotografie',
+  verhuizer: 'Verhuizen', ithulp: 'IT aan huis'
 };
 
 module.exports = ({ db }) => {

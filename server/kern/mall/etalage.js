@@ -23,10 +23,12 @@ module.exports = (ctx) => {
         tagline: (s.mall && s.mall.tagline) || null
       }));
       if (!leden.length) return null;
+      // elk genre met een dienstenaanbod boekt op het Dienstenplein in de Mall
+      const dienst = (def.caps || []).includes('services');
       return {
         type: g, label: def.label || g, icon: def.icon || '•',
-        pagina: GENRE_PAGINA[g] || '/apps/app.html',
-        boekbaar: !!GENRE_PAGINA[g], leveranciers: leden, aantal: leden.length
+        pagina: GENRE_PAGINA[g] || (dienst ? '/apps/mall.html' : '/apps/app.html'),
+        boekbaar: !!GENRE_PAGINA[g] || dienst, leveranciers: leden, aantal: leden.length
       };
     };
     const genres = GIDS_GENRES.map(rij).filter(Boolean);

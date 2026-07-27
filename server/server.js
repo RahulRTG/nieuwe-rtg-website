@@ -177,7 +177,7 @@ if (DEMO) {
 }
 
 /* Het demopersoneel per leverancier staat als pure data in een kern-module. */
-const { STAFF_SEED } = require('./kern/staffseed');
+const STAFF_SEED = Object.assign({}, require('./kern/staffseed').STAFF_SEED, require('./kern/staffseed2').STAFF_SEED);
 // demopersoneel bestaat alleen in demostand; in productie komt personeel
 // uitsluitend via de eigen zaak binnen (uitnodiging + eigen pincode)
 if (DEMO) {

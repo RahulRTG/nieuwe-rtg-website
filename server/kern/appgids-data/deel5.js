@@ -74,5 +74,10 @@ module.exports = {
     ['Druk op Neem op en spreek in; stoppen is bewaren (map Memo\'s in je kluis)',
      'Zet het meeluisteren aan voor een transcript; dat blijft op je toestel',
      'Druk op Samenvatting en Rahul vat het transcript samen -- de audio gaat nooit naar de AI'],
-    'Weggooien is naar de prullenbak van je kluis (30 dagen te herstellen) en je kluiskwota is dezelfde; geen tweede opslaglaag.')
+    'Weggooien is naar de prullenbak van je kluis (30 dagen te herstellen) en je kluiskwota is dezelfde; geen tweede opslaglaag.'),
+  '/apps/scanner.html': G('RTG Scanner: van papier naar je kluis, alles op het toestel.',
+    ['Open de camera en leg pagina voor pagina vast, of kies bestaande foto\'s',
+     'De documentmodus maakt papier vlak en leesbaar (zwart-wit, extra contrast)',
+     'Bewaar als een PDF of als losse foto\'s in de map Scans van je Bestanden-kluis'],
+    'De beeldbewerking en de PDF worden op je toestel gemaakt; er gaat geen beeld naar een andere server dan je eigen kluis.')
 };

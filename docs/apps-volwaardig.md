@@ -1752,3 +1752,25 @@ Bedrading: route naast vertaal gemount, catalogusrij en appgids-entry
 de eerlijke demo-samenvatting met echte woordtelling + dicht zonder
 token, en de nette fout zonder transcript) en memo.e2e.js door het
 scherm (lijst uit de kluis, samenvatting, weggooien).
+
+## RTG Scanner: van papier naar je kluis, alles op het toestel
+
+Documenten vastleggen zonder nieuwe serverlaag: de Scanner heeft geen
+eigen route nodig -- de Bestanden-kluis is de opslag (map Scans, zelfde
+kwota en prullenbak).
+
+**Vastleggen.** De camera pagina voor pagina (of foto's kiezen -- die
+weg werkt ook zonder camera), met een documentmodus die papier vlak en
+leesbaar maakt (zwart-wit, extra contrast, via canvasfilters op het
+toestel). Pagina's stapelen zich in een strook en zijn los weg te halen.
+
+**De eigen PDF-bouwer.** public/apps/scanner/pdfje.js zet de
+JPEG-pagina's in een geldige PDF (DCTDecode, een beeld per pagina,
+MediaBox op de pixelmaat, kloppende xref) -- zero dependencies, gebouwd
+op het toestel, en puur genoeg om hem los in Node te toetsen. Bewaar als
+PDF of als losse foto's; beide landen als gewone bestanden in de kluis.
+
+Tests: scannerpdf.test.js (3, puur: geldige structuur met twee beelden,
+de xref wijst byte-precies naar tabel en objecten, nette fout zonder
+pagina's) en scanner.e2e.js door het scherm (foto's kiezen, strook,
+pagina weghalen, PDF aantoonbaar als application/pdf in de map Scans).

@@ -22,6 +22,10 @@ module.exports = (kern) => {
     'lijst-weg': (mij, b) => leren.lijstWeg(mij, String(b.id || '')),
     'lijst-ai': (mij, b) => leren.lijstAi(mij, b.onderwerp, b.groep),
     'overhoor-klaar': (mij, b) => leren.overhoorKlaar(mij, String(b.id || ''), b.goed, b.totaal),
+    // de eerlijke vergeetcurve: de dagstapel, een antwoord en het bakjesoverzicht
+    herhaal: (mij) => leren.herhaalVandaag(mij),
+    'herhaal-antwoord': (mij, b) => leren.herhaalAntwoord(mij, { lijstId: b.lijstId, idx: b.idx, goed: b.goed === true }),
+    'herhaal-stand': (mij) => leren.herhaalStand(mij),
     // samen leren: het overhoorduel
     'sessie-start': (mij, b) => leren.sessieStart(mij, { lijstId: b.lijstId, vrienden: b.vrienden, codenamen: b.codenamen }),
     'sessie-antwoord': (mij, b) => leren.sessieAntwoord(mij, String(b.id || ''), b.akkoord === true),

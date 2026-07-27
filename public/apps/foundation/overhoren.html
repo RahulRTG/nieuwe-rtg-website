@@ -47,6 +47,11 @@
     <h1>Overhoren</h1>
     <p class="intro">Maak je eigen overhoorlijsten (woordjes, topografie, tafels), oefen ze zelf, of daag iemand uit voor een overhoorduel.</p>
 
+    <div class="kaart rij" id="hBlok" style="border-color:var(--goud);">
+      <div class="nm">Vandaag herhalen<small id="hUitleg">Even kijken wat er klaarstaat&hellip;</small></div>
+      <button class="knop klein" id="hStart" hidden>Start</button>
+    </div>
+
     <div class="kaart blok">
       <input class="veld" id="mNaam" placeholder="Naam van je lijst (bijv. Frans hoofdstuk 3)" maxlength="60">
       <textarea class="veld" id="mParen" style="margin-top:.4rem;" placeholder="Elke regel een paar, met = ertussen:&#10;de hond = le chien&#10;de kat = le chat"></textarea>
@@ -64,6 +69,24 @@
     <div id="lijsten"><div class="leeg">Nog geen lijsten. Maak er hierboven een.</div></div>
     <h2 class="sec">Jouw duels</h2>
     <div id="sessies"><div class="leeg">Nog geen duels gespeeld.</div></div>
+  </section>
+
+  <!-- vandaag herhalen: de eerlijke vergeetcurve -->
+  <section id="vHerhaal" hidden>
+    <h1>Vandaag herhalen</h1>
+    <div class="kaart kaartgroot" id="hSpeel">
+      <div style="color:var(--zacht);font-size:.82rem;" id="hTeller"></div>
+      <div class="vraag" id="hVraag"></div>
+      <div style="color:var(--zacht);font-size:.78rem;margin:.2rem 0;" id="hBron"></div>
+      <input class="veld" id="hAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
+      <button class="knop" id="hCheck" style="width:100%;margin-top:.6rem;">Controleer</button>
+      <div class="uitslag" id="hUitslag"></div>
+    </div>
+    <div class="kaart kaartgroot" id="hKlaar" hidden>
+      <div class="vraag" id="hScore"></div>
+      <p class="intro">Wat je goed wist komt later vanzelf terug; wat lastig was, staat morgen weer klaar. Meer hoeft niet.</p>
+      <button class="knop grijs" id="hTerug" style="width:100%;">Klaar voor vandaag</button>
+    </div>
   </section>
 
   <!-- solo overhoren -->
@@ -122,13 +145,13 @@ if (!window.Sessie || !Sessie.eisFamilie()) {}
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const groep = (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || 'kind';
+const groep = (s && s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || 'kind';
 const api = (actie, body) => fetch('/api/rtf/leren/' + actie, {
   method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
-function toon(v){ ['vLijsten','vOverhoor','vSamen','vDuel'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vLijsten','vHerhaal','vOverhoor','vSamen','vDuel'].forEach(x => $('#'+x).hidden = (x!==v)); }
 
 /* ---------- overzicht ---------- */
 async function laadLijsten(){
@@ -166,6 +189,54 @@ $('#mAi').addEventListener('click', async () => {
   catch (e) { $('#mFout').textContent = e.message; }
   $('#mAi').disabled = false; $('#mAi').textContent = 'Maak';
 });
+
+/* ---------- vandaag herhalen: de eerlijke vergeetcurve ----------
+   De server bepaalt de dagstapel en de bakjes; het scherm overhoort alleen.
+   Goed = een bakje omhoog en later terug, fout = achteraan vandaag opnieuw. */
+let H = null;
+async function laadHerhaal(){
+  try {
+    const d = await api('herhaal-stand');
+    $('#hUitleg').textContent = d.vandaag
+      ? d.vandaag + (d.vandaag === 1 ? ' vraag staat' : ' vragen staan') + ' vandaag klaar. Goed = later terug, fout = vandaag nog een keer.'
+      : 'Niets meer voor vandaag. Wat je oefent komt vanzelf terug op de goede dag.';
+    $('#hStart').hidden = !d.vandaag;
+  } catch(e){ /* het blok blijft dan stil */ }
+}
+$('#hStart').addEventListener('click', async () => {
+  const d = await api('herhaal');
+  if (!d.stapel.length) return laadHerhaal();
+  H = { rij: d.stapel, i: 0, goed: 0 };
+  $('#hKlaar').hidden = true;
+  toon('vHerhaal'); hVolgende();
+});
+function hVolgende(){
+  if (H.i >= H.rij.length) return hEinde();
+  const k = H.rij[H.i];
+  $('#hTeller').textContent = 'nog ' + (H.rij.length - H.i) + ' vandaag';
+  $('#hVraag').textContent = k.v;
+  $('#hBron').textContent = k.lijst + ' · bakje ' + k.bak;
+  $('#hAntwoord').value = ''; $('#hUitslag').textContent = ''; $('#hUitslag').className = 'uitslag';
+  $('#hAntwoord').focus();
+}
+$('#hCheck').addEventListener('click', async () => {
+  if (!H || H.i >= H.rij.length) return;
+  const k = H.rij[H.i];
+  const goed = norm($('#hAntwoord').value) === norm(k.a);
+  $('#hUitslag').textContent = goed ? '✓ Goed! Die komt later vanzelf terug.'
+    : '✗ Het was: ' + k.a + ' -- die komt vandaag nog een keer.';
+  $('#hUitslag').className = 'uitslag ' + (goed ? 'goed' : 'fout');
+  if (goed) H.goed++; else H.rij.push(k); // fout: achteraan vandaag opnieuw
+  try { await api('herhaal-antwoord', { lijstId: k.lijstId, idx: k.idx, goed }); } catch(e){}
+  H.i++;
+  setTimeout(hVolgende, goed ? 650 : 1600);
+});
+$('#hAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#hCheck').click(); });
+function hEinde(){
+  $('#hScore').textContent = 'Alles van vandaag gehad.';
+  $('#hKlaar').hidden = false;
+}
+$('#hTerug').addEventListener('click', () => { toon('vLijsten'); laadLijsten(); laadHerhaal(); });
 
 /* ---------- solo overhoren (op het scherm; de score gaat naar de server) ---------- */
 const norm = t => String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -281,6 +352,7 @@ $('#dAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#dC
 $('#dTerug').addEventListener('click', () => { toon('vLijsten'); laadLijsten(); });
 
 laadLijsten();
+laadHerhaal();
 const qs = new URLSearchParams(location.search);
 if (qs.get('duel')) openDuel(qs.get('duel'));
 </script>

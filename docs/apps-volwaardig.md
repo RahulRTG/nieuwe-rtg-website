@@ -1438,3 +1438,29 @@ Client: school.html (Vandaag leren) + foundation/agenda.html
 (alleen-lezen paneel) + apps/agenda/kalender.js (bronlabel).
 Tests: rtfschool2.test.js (3: bijmenging en afvinken, plannerordening
 met vanMij, de oppasgrens) en rtfschool2.e2e.js door beide schermen.
+
+## RTF-golf 3: de eerlijke vergeetcurve
+
+De overhoorlijsten kregen een geheugen: elke vraag zit in een Leitner-
+bakje (1 t/m 5). Goed beantwoord = een bakje omhoog en langer rust
+(1, 2, 4, 7, 14 dagen); fout = terug naar bakje 1 en vandaag nog een
+keer. De dagstapel verzamelt alles wat vandaag aan de beurt is, over
+alle lijsten heen, geschud.
+
+Eerlijk gebruikt: geen streaks, geen vuurtjes, geen druk. De teller
+zegt alleen wat er vandaag klaarstaat; als het op is, zegt het scherm
+dat ook ("Niets meer voor vandaag") in plaats van meer te verzinnen.
+En een vraag is nooit "voor altijd klaar" -- bakje 5 komt elke twee
+weken gewoon terug, want zo werkt een geheugen.
+
+De bakjes leven op de lijst zelf (lui aangemaakt, groeien mee met de
+paren) en de drie routes (herhaal, herhaal-antwoord, herhaal-stand)
+draaien op dezelfde dubbele ingang als de rest van de leerlaag:
+RTG-leden en RTF-gezinnen, gasten niet. Daarmee zijn ze ook direct
+door Rahul te bedienen.
+
+Server: kern/leren/overhoren/curve.js (nieuw) op de bestaande ctx.
+Client: overhoren.html (blok "Vandaag herhalen" + herhaalscherm).
+Tests: rtfcurve.test.js (3: dagstapel en goed/fout, klimmen tot bakje 5
+met eerlijke stand, andermans lijst dicht) en rtfcurve.e2e.js door het
+scherm (fout komt vandaag terug, daarna eerlijk leeg).

@@ -401,8 +401,9 @@ async function openPotje(id){
   // bij het openen reist het statische Magnaat-bord eenmalig mee; de polls
   // daarna dragen alleen de dynamische staat
   try{ const d = await api('staat', { id, velden: true }); huidig = d.potje; }catch(e){ meld(e.message); return; }
-  // de Arena-duels (Flitsduel, Reactieduel) hebben hun eigen speelscherm
+  // de Arena- en Societeit-duels hebben hun eigen speelscherm
   if (huidig.soort === 'flits' || huidig.soort === 'reactie'){ location.href = '/apps/foundation/arena.html?potje=' + encodeURIComponent(id); return; }
+  if (huidig.soort === 'quiz' || huidig.soort === 'schat'){ location.href = '/apps/foundation/societeit.html?potje=' + encodeURIComponent(id); return; }
   if (huidig.staat && huidig.staat.velden) mgVelden = huidig.staat.velden;
   toon('vSpel'); tekenPotje();
   clearInterval(pollT);

@@ -35,7 +35,11 @@ module.exports = (ctx) => {
     flits: { uitleg: 'Flitsduel: iedereen krijgt dezelfde tien sommen en rekent in eigen tempo; de meeste goed wint, bij gelijke stand wie het eerst klaar was.',
       tips: ['Snel is mooi, maar goed is beter: een fout antwoord haal je niet meer in.', 'Deelsommen zijn omgekeerde tafels -- denk aan de keersom die erbij hoort.'] },
     reactie: { uitleg: 'Reactieduel: vijf ronden stoplicht met dezelfde wachttijden voor iedereen; tik zodra het groen wordt, de laagste totaaltijd wint.',
-      tips: ['Te vroeg tikken is een valse start en kost 1500 ms -- geduld loont.', 'Kijk naar het vlak, niet naar je duim; je reageert sneller dan je denkt.'] }
+      tips: ['Te vroeg tikken is een valse start en kost 1500 ms -- geduld loont.', 'Kijk naar het vlak, niet naar je duim; je reageert sneller dan je denkt.'] },
+    quiz: { uitleg: 'Quizduel: tien vragen, dezelfde voor iedereen, in eigen tempo; de meeste goed wint, bij gelijke stand wie het eerst klaar was.',
+      tips: ['Gokken mag: bij drie opties is een kwart seconde twijfel al duurder dan een gok.', 'Lees de vraag helemaal; het venijn zit vaak in een woord.'] },
+    schat: { uitleg: 'Schatduel: vijf schattingsvragen; zodra iedereen een ronde binnen heeft, pakt de dichtstbijzijnde het punt.',
+      tips: ['Denk in ordegroottes: eerst tientallen, honderden of duizenden, dan pas het getal.', 'Extreem gokken loont zelden; het punt gaat naar wie het dichtstbij zit.'] }
   };
 
   function standVan(p, mij) {

@@ -54,7 +54,7 @@
         opts.input.value = '';
         opts.chat.insertAdjacentHTML('beforeend', '<div class="b ik">' + esc2(t) + '</div>');
         gesprek.push({ role: 'user', content: t });
-        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = (NM[buddyKeuze()] || 'Rahul') + ' denkt mee...';
+        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = opts.wacht || ((NM[buddyKeuze()] || 'Rahul') + ' denkt mee...');
         opts.chat.appendChild(w); opts.chat.scrollTop = opts.chat.scrollHeight;
         api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek, buddy: buddyKeuze(), groep: groepVan() })
           .then(function (d) { w.textContent = d.text; gesprek.push({ role: 'assistant', content: d.text }); opts.chat.scrollTop = opts.chat.scrollHeight; })

@@ -1564,3 +1564,33 @@ animaties uit.
 
 Tests: rtfwelzijn2.test.js (3: eigen demotekst per soort,
 veiligheidslijnen, veilige terugval) en rtfrust.e2e.js door het scherm.
+
+## RTF-golf 6 (deel 3): de consistentie-eindronde over de welzijnspagina's
+
+De laatste ronde van golf 6 maakt de tien welzijnsapps een gezin: zelfde
+beloften, zelfde chatlaag, warme kruisverwijzingen -- zonder ergens een
+chat te forceren waar die niet hoort.
+
+**De privacyregel overal**: "Wat je hier typt wordt niet bewaard." stond
+al onder de chats van gevoel, mediawijs, gezondheid, dromen, steun en
+kompas; nu ook onder pesten (Sam) en de hulpwijzer (Meike). Een chat
+zonder die regel bestaat niet meer.
+
+**De hulpwijzer op de gedeelde coach-laag**: de pagina had een eigen,
+handgeschreven chat-implementatie naast Sessie.coach. Die is vervangen
+door een aanroep van de gedeelde helper (soort 'hulp', wachttekst
+"Meike denkt mee..."), zodat er een chatlaag is in plaats van twee.
+
+**Sessie.coach honoreert nu de wacht-optie**: de helper documenteerde
+opts.wacht al maar gebruikte hem niet -- pesten.html gaf "Sam
+luistert..." mee en kreeg toch de standaardtekst. Opgelost in het losse
+deel (sessie/sessie-01.js) en meegebouwd in de bundel.
+
+**veilig.html blijft praktisch**: geen chat, wel een warme
+doorverwijzing onderaan naar Steun en de Hulpwijzer. Een pagina voor
+"waar ben je nu" hoeft geen gesprek te zijn; hij moet je alleen nooit
+met lege handen laten staan.
+
+Test: rtfhulpwijzer.e2e.js door het scherm (privacyregel, Meike via de
+coach-laag met het demo-antwoord, en veilig.html met kruislinks maar
+zonder chat).

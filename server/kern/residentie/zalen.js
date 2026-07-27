@@ -100,7 +100,7 @@ const ZALEN = {
     ]
   },
   biljart: {
-    naam: 'De Biljartkamer', sub: 'caramboles en een goed gesprek',
+    naam: 'De Biljartkamer', sub: 'carambole of pool, en een goed gesprek',
     b: 11, d: 9, spawn: [5, 8],
     meubels: [
       ['biljarttafel', 4, 3], ['lamp', 5, 2],

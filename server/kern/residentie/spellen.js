@@ -16,6 +16,9 @@ const SPELLEN = {
     punt: a => Math.round((14 - a / 10) * 10) / 10 },
   biljart: { zaal: 'biljart', naam: 'Biljart', beurten: 5, eenheid: 'caramboles',
     punt: a => a >= 90 ? 3 : a >= 65 ? 2 : a >= 35 ? 1 : 0 },
+  // de tweede tafel in de biljartkamer: pool, met zes zakken
+  pool: { zaal: 'biljart', naam: 'Pool', beurten: 5, eenheid: 'ballen',
+    punt: a => a >= 88 ? 2 : a >= 55 ? 1 : 0 },
   boogschieten: { zaal: 'boog', naam: 'Boogschieten', beurten: 5, eenheid: 'punten',
     punt: a => Math.min(10, Math.max(0, Math.round(a / 10))) },
   // dansen is samen: geen winnaar, een gezamenlijke score voor de gratie

@@ -10,9 +10,12 @@
 
   function kiesSpel(codenaam) {
     const zaalSpel = S.kamer && SPELZAAL[S.kamer.id];
+    // sommige zalen hebben een tweede tafel naast het zaalspel
+    const tweede = S.kamer && S.kamer.id === 'biljart' ? [['pool', 'Pool', 'de tafel met de zes zakken']] : [];
     $('#spelKeuze').innerHTML = '<h2>' + esc(codenaam) + ' uitdagen</h2>' +
       '<div class="sub">kies waarmee u het ijs breekt</div>' +
       (zaalSpel ? '<button class="rij-item" id="kiesZaal" type="button"><span><b>Het spel van de zaal</b></span><span class="tel">' + esc(zaalSpel) + '</span></button>' : '') +
+      tweede.map(([k, n, t2]) => '<button class="rij-item" data-zaal2="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">' + t2 + '</span></button>').join('') +
       Object.entries(KAST).map(([k, n]) =>
         '<button class="rij-item" data-kast="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">aan de speeltafel</span></button>').join('') +
       '<button class="knop2 stil2" id="kiesWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
@@ -24,6 +27,13 @@
         meld('Uitnodiging verstuurd; even wachten op ' + codenaam + '.');
       } catch (e) { meld(e.message); }
     });
+    $('#spelKeuze').querySelectorAll('[data-zaal2]').forEach(b2 => b2.addEventListener('click', async () => {
+      $('#spelLaag').classList.remove('open');
+      try {
+        await api('/api/residentie/spel/daag', { codenaam, spel: b2.dataset.zaal2 });
+        meld('Uitnodiging verstuurd; even wachten op ' + codenaam + '.');
+      } catch (e) { meld(e.message); }
+    }));
     $('#spelKeuze').querySelectorAll('[data-kast]').forEach(b2 => b2.addEventListener('click', async () => {
       try {
         const r = await api('/api/member/spel/nieuw', { soort: b2.dataset.kast, codenamen: [codenaam] });

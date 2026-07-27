@@ -6,7 +6,7 @@
   const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen',
     balzaal: 'dansen', biljart: 'biljart', boog: 'boogschieten', renbaan: 'racen' };
   const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem',
-    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet', racen: 'Geef gas' };
+    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet', racen: 'Geef gas', pool: 'Stoot' };
   let P = null, meterAan = false, meterWaarde = 0;
   // tikspellen: geen timing-meter maar tikken -- het tempo is de kracht
   const TIK = { zwemmen: 1, racen: 1, dansen: 1 };

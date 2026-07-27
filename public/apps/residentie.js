@@ -701,7 +701,7 @@
   const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen',
     balzaal: 'dansen', biljart: 'biljart', boog: 'boogschieten', renbaan: 'racen' };
   const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem',
-    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet', racen: 'Geef gas' };
+    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet', racen: 'Geef gas', pool: 'Stoot' };
   let P = null, meterAan = false, meterWaarde = 0;
   // tikspellen: geen timing-meter maar tikken -- het tempo is de kracht
   const TIK = { zwemmen: 1, racen: 1, dansen: 1 };
@@ -1004,7 +1004,8 @@
      dansvloer glanst. En boven de speler zweeft het puntenaantal omhoog. */
   const EFX = [];
   const RAAK = { golf: p => p <= 1, darts: p => p >= 40, kegelen: p => p >= 9, zwemmen: p => p <= 7.5,
-    biljart: p => p >= 2, boogschieten: p => p >= 9, dansen: p => p >= 35, racen: p => p >= 85 };
+    biljart: p => p >= 2, boogschieten: p => p >= 9, dansen: p => p >= 35, racen: p => p >= 85,
+    pool: p => p >= 1 };
 
   function doelVan(spel, l) {
     const zoek = soorten => {
@@ -1750,6 +1751,95 @@
     }
   };
 
+  SCENES.pool = {
+    st: null, stoot: null,
+    reset() { this.st = null; this.stoot = null; },
+    vak(W, H) { const tw = Math.min(W * 0.84, 560), th = tw * 0.62;
+      return { tx: (W - tw) / 2, ty: H * 0.2, tw, th }; },
+    zakken(tx, ty, tw, th) {
+      return [[tx, ty], [tx + tw / 2, ty - 4], [tx + tw, ty],
+        [tx, ty + th], [tx + tw / 2, ty + th + 4], [tx + tw, ty + th]];
+    },
+    // per beurt een andere opstelling: de bal ligt voor een andere zak
+    OPSTELLING: [{ b: [0.68, 0.26], z: 2 }, { b: [0.28, 0.7], z: 3 }, { b: [0.5, 0.22], z: 1 }],
+    beurtVan(naam) {
+      const w = ((P && P.spelers) || []).find(s2 => s2.codenaam === naam);
+      return (w && w.punten.length) || 0;
+    },
+    op(naam) { return this.OPSTELLING[this.beurtVan(naam) % 3]; },
+    ballen(tx, ty, tw, th, o) {
+      return { wx: tx + tw * 0.25, wy: ty + th * 0.76, bx: tx + tw * o.b[0], by: ty + th * o.b[1] };
+    },
+    draai() { return performance.now() / 900; },
+    tik(m) { // tik een: de keu stilzetten; tik twee: de kracht van de meter
+      if (!this.st) { this.st = { hoek: this.draai() % (Math.PI * 2) }; return null; }
+      const { tx, ty, tw, th } = this.vak(SW, SH), o = this.op(S.ik);
+      const b = this.ballen(tx, ty, tw, th, o);
+      const naarBal = Math.atan2(b.by - b.wy, b.bx - b.wx);
+      const afw = Math.abs(((this.st.hoek - naarBal) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
+      const kr = Math.max(0, Math.min(100, Math.round(m - afw * 110)));
+      this.stoot = this.st.hoek; this.st = null;
+      return kr;
+    },
+    teken(c, W, H, m, beurt) {
+      doek('#131610', '#0A0C08');
+      const { tx, ty, tw, th } = this.vak(W, H);
+      c.fillStyle = '#4A2F16'; c.fillRect(tx - 16, ty - 16, tw + 32, th + 32);
+      c.fillStyle = '#25543A'; c.fillRect(tx, ty, tw, th);
+      c.strokeStyle = 'rgba(12,10,7,0.5)'; c.lineWidth = 2; c.strokeRect(tx, ty, tw, th);
+      const o = this.op((P && P.aanZet) || S.ik), b = this.ballen(tx, ty, tw, th, o);
+      const zk = this.zakken(tx, ty, tw, th);
+      zk.forEach(([zx, zy], i) => { // de zes zakken; de doelzak licht op
+        c.fillStyle = '#070605'; c.beginPath(); c.arc(zx, zy, 11, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = i === o.z ? 'rgba(216,184,88,0.95)' : 'rgba(216,184,88,0.35)';
+        c.lineWidth = i === o.z ? 2.4 : 1.2;
+        c.beginPath(); c.arc(zx, zy, i === o.z ? 14 : 11, 0, Math.PI * 2); c.stroke();
+      });
+      if (beurt) {
+        const hk = this.st ? this.st.hoek : this.draai();
+        c.setLineDash([5, 7]); c.lineWidth = 1.8;
+        c.strokeStyle = this.st ? 'rgba(216,184,88,0.95)' : 'rgba(242,236,220,0.6)';
+        c.beginPath(); c.moveTo(b.wx, b.wy); c.lineTo(b.wx + Math.cos(hk) * tw * 0.4, b.wy + Math.sin(hk) * tw * 0.4); c.stroke();
+        c.setLineDash([]);
+        c.textAlign = 'center'; c.fillStyle = 'rgba(216,184,88,0.9)'; c.font = '600 11px Inter, sans-serif';
+        c.fillText(this.st ? 'de keu staat -- tik op het topje voor de kracht'
+          : 'de keu draait -- tik als de lijn de gekleurde bal pakt', W / 2, 140);
+      }
+      const bal = (x, y, k) => { c.fillStyle = k; c.beginPath(); c.arc(x, y, 8, 0, Math.PI * 2); c.fill();
+        c.fillStyle = 'rgba(255,255,255,0.35)'; c.beginPath(); c.arc(x - 2.5, y - 2.5, 2.2, 0, Math.PI * 2); c.fill(); };
+      bal(tx + tw * 0.82, ty + th * 0.62, '#C9A94B'); bal(tx + tw * 0.14, ty + th * 0.3, '#1E1910');
+      bal(b.bx, b.by, '#9E1C40'); bal(b.wx, b.wy, '#F2ECDC');
+      kopScene('Pool', 'pot de bal in de oplichtende zak');
+    },
+    anim(c, W, H, a, t) {
+      const { tx, ty, tw, th } = this.vak(W, H);
+      const o = this.OPSTELLING[Math.max(0, this.beurtVan(a.wie) - 1) % 3];
+      const b = this.ballen(tx, ty, tw, th, o), zak = this.zakken(tx, ty, tw, th)[o.z];
+      const tt = 1 - (1 - t) * (1 - t);
+      if (a.raak) { // wit naar de bal, de bal rolt door de zak in
+        const f = Math.min(1, tt * 1.7);
+        const x = b.wx + (b.bx - b.wx) * f, y = b.wy + (b.by - b.wy) * f;
+        c.fillStyle = '#F2ECDC'; c.beginPath(); c.arc(x, y, 8, 0, Math.PI * 2); c.fill();
+        if (f >= 1) {
+          const g = Math.min(1, (tt - 0.58) / 0.42);
+          if (g < 0.96) { c.fillStyle = '#9E1C40';
+            c.beginPath(); c.arc(b.bx + (zak[0] - b.bx) * g, b.by + (zak[1] - b.by) * g, 8 * (1 - g * 0.4), 0, Math.PI * 2); c.fill(); }
+          else sceneVonken(zak[0], zak[1], (tt - 0.9) * 6, '#E3C878');
+        }
+      } else { // de misser volgt de eigen keu over het laken
+        let dx = b.wx + tw * 0.3, dy = ty + th * 0.9;
+        if (a.eigen && this.stoot != null) {
+          dx = Math.max(tx + 10, Math.min(tx + tw - 10, b.wx + Math.cos(this.stoot) * tw * 0.45));
+          dy = Math.max(ty + 10, Math.min(ty + th - 10, b.wy + Math.sin(this.stoot) * tw * 0.45));
+        }
+        const f = Math.min(1, tt * 1.4);
+        c.fillStyle = '#F2ECDC';
+        c.beginPath(); c.arc(b.wx + (dx - b.wx) * f, b.wy + (dy - b.wy) * f, 8, 0, Math.PI * 2); c.fill();
+      }
+      puntZweef(b.bx, b.by - 22, a, t);
+    }
+  };
+
   /* ---------- deel 3k: de spellenkast ----------
      Naast het spel van de zaal staan alle bordspellen van het huis klaar:
      schaken, Woordduel, Magnaat en Proost (18+). Een potje loopt via de
@@ -1761,9 +1851,12 @@
 
   function kiesSpel(codenaam) {
     const zaalSpel = S.kamer && SPELZAAL[S.kamer.id];
+    // sommige zalen hebben een tweede tafel naast het zaalspel
+    const tweede = S.kamer && S.kamer.id === 'biljart' ? [['pool', 'Pool', 'de tafel met de zes zakken']] : [];
     $('#spelKeuze').innerHTML = '<h2>' + esc(codenaam) + ' uitdagen</h2>' +
       '<div class="sub">kies waarmee u het ijs breekt</div>' +
       (zaalSpel ? '<button class="rij-item" id="kiesZaal" type="button"><span><b>Het spel van de zaal</b></span><span class="tel">' + esc(zaalSpel) + '</span></button>' : '') +
+      tweede.map(([k, n, t2]) => '<button class="rij-item" data-zaal2="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">' + t2 + '</span></button>').join('') +
       Object.entries(KAST).map(([k, n]) =>
         '<button class="rij-item" data-kast="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">aan de speeltafel</span></button>').join('') +
       '<button class="knop2 stil2" id="kiesWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
@@ -1775,6 +1868,13 @@
         meld('Uitnodiging verstuurd; even wachten op ' + codenaam + '.');
       } catch (e) { meld(e.message); }
     });
+    $('#spelKeuze').querySelectorAll('[data-zaal2]').forEach(b2 => b2.addEventListener('click', async () => {
+      $('#spelLaag').classList.remove('open');
+      try {
+        await api('/api/residentie/spel/daag', { codenaam, spel: b2.dataset.zaal2 });
+        meld('Uitnodiging verstuurd; even wachten op ' + codenaam + '.');
+      } catch (e) { meld(e.message); }
+    }));
     $('#spelKeuze').querySelectorAll('[data-kast]').forEach(b2 => b2.addEventListener('click', async () => {
       try {
         const r = await api('/api/member/spel/nieuw', { soort: b2.dataset.kast, codenamen: [codenaam] });

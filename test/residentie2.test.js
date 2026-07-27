@@ -78,6 +78,21 @@ test('de vragen van het huis: alleen aan het diner, met een adempauze', async ()
   assert.equal((await api(base, '/api/residentie/vraag', {}, b.token)).status, 429, 'even laten landen');
 });
 
+test('pool: de tweede tafel in de biljartkamer, potten telt', async () => {
+  await api(base, '/api/residentie/betreed', { kamer: 'biljart' }, a.token);
+  await api(base, '/api/residentie/betreed', { kamer: 'biljart' }, b.token);
+  const d = await api(base, '/api/residentie/spel/daag', { codenaam: b.codenaam, spel: 'pool' }, a.token);
+  assert.equal(d.status, 200, 'pool hoort ook in de biljartkamer');
+  const ja = await api(base, '/api/residentie/spel/antwoord', { ja: true }, b.token);
+  assert.equal(ja.status, 200);
+  assert.equal(ja.body.potje.eenheid, 'ballen');
+  const za = await api(base, '/api/residentie/spel/zet', { kracht: 95 }, a.token);
+  assert.equal(za.body.punt, 2, 'een zuivere stoot pot er twee');
+  const zb = await api(base, '/api/residentie/spel/zet', { kracht: 10 }, b.token);
+  assert.equal(zb.body.punt, 0, 'een wilde stoot pot niets');
+  assert.equal((await api(base, '/api/residentie/spel/stop', {}, a.token)).status, 200);
+});
+
 test('de huistelefoon: nodig een lid in het huis uit, echte namen nergens', async () => {
   const su = await api(base, '/api/residentie/suite', {}, a.token);
   await api(base, '/api/residentie/betreed', { kamer: su.body.suite.adres }, a.token);

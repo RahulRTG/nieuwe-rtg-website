@@ -36,6 +36,9 @@
   .h2k{background:var(--h-zee);color:#0E2A28;}
   .h3k{background:var(--h-koraal);color:#3A0F08;}
   .h4k{background:var(--h-blauw);color:#0C2440;}
+  .h5k{background:var(--h-gras);color:#12300C;}
+  .h6k{background:var(--h-lila);color:#F5F0FF;}
+  .h7k{background:#EF8FB2;color:#3C1024;}
   .menu .naarhuis{background:transparent;border:2px solid #BFD4EA;color:#BFD4EA;border-radius:999px;
     padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.6rem;}
 </style>
@@ -51,7 +54,7 @@
 
 <div class="menu" id="menu" role="main">
   <h1>De Speelhal</h1>
-  <div class="sub">Vier spellen die steeds een beetje moeilijker durven. Voor wie de Speeltuin al te klein is.</div>
+  <div class="sub">Zeven spellen die steeds een beetje moeilijker durven. Voor wie de Speeltuin al te klein is.</div>
   <button class="spelkaartje h1k" data-spel="sommen" type="button">
     <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="16" cy="30" r="10" fill="#F0715C"/><circle cx="33" cy="17" r="8" fill="#3FB8AF"/><path d="M12 30h8M16 26v8" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/></svg>
     <span><b>Flitssommen</b><span>Tik de ballon met het goede antwoord</span></span>
@@ -67,6 +70,18 @@
   <button class="spelkaartje h4k" data-spel="sterren" type="button">
     <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6l5 11 12 1-9 8 3 12-11-7-11 7 3-12-9-8 12-1z" fill="#F6C445"/><ellipse cx="36" cy="38" rx="8" ry="4.5" fill="#C9D2E0"/></svg>
     <span><b>Sterrenvanger</b><span>Vang de sterren, laat de wolken met rust</span></span>
+  </button>
+  <button class="spelkaartje h5k" data-spel="doolhof" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 8h32v32H8zM16 8v16M24 16v16M32 8v8M16 32h16M32 24h8" stroke="#12300C" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="3" fill="#F0715C"/><circle cx="36" cy="36" r="3" fill="#F6C445"/></svg>
+    <span><b>Het doolhof</b><span>Tik de richting en vind de ster</span></span>
+  </button>
+  <button class="spelkaartje h6k" data-spel="klok" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="#F5F0FF"/><path d="M24 24V12M24 24l8 5" stroke="#3C1024" stroke-width="3" stroke-linecap="round"/></svg>
+    <span><b>Klokkijken</b><span>Hoe laat is het? Kies het goede antwoord</span></span>
+  </button>
+  <button class="spelkaartje h7k" data-spel="raket" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 30L34 10c2 8 0 16-8 24l-6 2z" fill="#5AA7E8"/><circle cx="28" cy="18" r="3" fill="#FFF"/><path d="M12 38c2-4 4-6 8-6-2 4-4 6-8 6z" fill="#F0715C"/></svg>
+    <span><b>Raketvlucht</b><span>Tik om te stijgen, vang de sterren</span></span>
   </button>
   <button class="naarhuis" id="naarhuis" type="button">Terug naar de app</button>
 </div>
@@ -325,6 +340,185 @@
     }
   }
 
+  /* ---------- spel 5: het doolhof ---------- */
+  const DOOL = { C: 7, R: 9, muren: null, px: 0, py: 0 };
+  function doolNieuw(C, R) {
+    DOOL.C = C; DOOL.R = R;
+    const m = []; // per cel de muren [boven, rechts, onder, links]
+    for (let i = 0; i < C * R; i++) m.push([1, 1, 1, 1]);
+    const bezocht = new Array(C * R).fill(false);
+    const stapel = [0]; bezocht[0] = true;
+    while (stapel.length) {
+      const hier = stapel[stapel.length - 1];
+      const x = hier % C, y = Math.floor(hier / C), buren = [];
+      if (y > 0 && !bezocht[hier - C]) buren.push([hier - C, 0, 2]);
+      if (x < C - 1 && !bezocht[hier + 1]) buren.push([hier + 1, 1, 3]);
+      if (y < R - 1 && !bezocht[hier + C]) buren.push([hier + C, 2, 0]);
+      if (x > 0 && !bezocht[hier - 1]) buren.push([hier - 1, 3, 1]);
+      if (!buren.length) { stapel.pop(); continue; }
+      const [vlg, w1, w2] = buren[Math.floor(Math.random() * buren.length)];
+      m[hier][w1] = 0; m[vlg][w2] = 0; bezocht[vlg] = true; stapel.push(vlg);
+    }
+    DOOL.muren = m; DOOL.px = 0; DOOL.py = 0;
+    $('#opdracht').textContent = 'Vind de ster';
+  }
+  function doolMaat() {
+    const cw = Math.min((W - 30) / DOOL.C, (H - 140) / DOOL.R);
+    return { cw, ox: (W - cw * DOOL.C) / 2, oy: 84 + (H - 140 - cw * DOOL.R) / 2 };
+  }
+  function doolLus() {
+    lucht('#1E3B2E', '#0F2018');
+    const { cw, ox, oy } = doolMaat();
+    ctx.strokeStyle = '#9BD4A8'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    for (let y = 0; y < DOOL.R; y++) for (let x = 0; x < DOOL.C; x++) {
+      const m = DOOL.muren[y * DOOL.C + x], X = ox + x * cw, Y = oy + y * cw;
+      ctx.beginPath();
+      if (m[0]) { ctx.moveTo(X, Y); ctx.lineTo(X + cw, Y); }
+      if (m[1]) { ctx.moveTo(X + cw, Y); ctx.lineTo(X + cw, Y + cw); }
+      if (m[2]) { ctx.moveTo(X, Y + cw); ctx.lineTo(X + cw, Y + cw); }
+      if (m[3]) { ctx.moveTo(X, Y); ctx.lineTo(X, Y + cw); }
+      ctx.stroke();
+    }
+    const dx = ox + (DOOL.C - 0.5) * cw, dy = oy + (DOOL.R - 0.5) * cw;
+    ctx.fillStyle = '#F6C445';
+    ctx.beginPath();
+    for (let k = 0; k < 10; k++) {
+      const rr = k % 2 ? cw * 0.14 : cw * 0.3, a = -Math.PI / 2 + k * Math.PI / 5;
+      ctx[k ? 'lineTo' : 'moveTo'](dx + Math.cos(a) * rr, dy + Math.sin(a) * rr);
+    }
+    ctx.closePath(); ctx.fill();
+    const sx = ox + (DOOL.px + 0.5) * cw, sy = oy + (DOOL.py + 0.5) * cw;
+    ctx.fillStyle = '#F0715C';
+    ctx.beginPath(); ctx.arc(sx, sy, cw * 0.3, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#14283C';
+    ctx.beginPath(); ctx.arc(sx - cw * 0.1, sy - cw * 0.05, cw * 0.05, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(sx + cw * 0.1, sy - cw * 0.05, cw * 0.05, 0, Math.PI * 2); ctx.fill();
+    tekenFeest();
+  }
+  function doolTik(x, y) {
+    const { cw, ox, oy } = doolMaat();
+    const sx = ox + (DOOL.px + 0.5) * cw, sy = oy + (DOOL.py + 0.5) * cw;
+    const vx = x - sx, vy = y - sy;
+    const r = Math.abs(vx) > Math.abs(vy) ? (vx > 0 ? 1 : 3) : (vy > 0 ? 2 : 0);
+    if (DOOL.muren[DOOL.py * DOOL.C + DOOL.px][r]) { toon(196, 0.15); return; }
+    if (r === 0) DOOL.py--; if (r === 1) DOOL.px++; if (r === 2) DOOL.py++; if (r === 3) DOOL.px--;
+    if (DOOL.px === DOOL.C - 1 && DOOL.py === DOOL.R - 1) {
+      feest(W / 2, H / 2, 50); toon(880, 0.4);
+      $('#opdracht').textContent = 'Gevonden! De volgende is groter...';
+      setTimeout(() => doolNieuw(Math.min(9, DOOL.C + 1), Math.min(13, DOOL.R + 1)), 1100);
+    }
+  }
+
+  /* ---------- spel 6: klokkijken ---------- */
+  const KLOK = { u: 3, m: 0, keuzes: [], goed: 0 };
+  const UREN = ['twaalf', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht', 'negen', 'tien', 'elf'];
+  function tijdTekst(u, m) {
+    if (m === 0) return UREN[u % 12] + ' uur';
+    if (m === 15) return 'kwart over ' + UREN[u % 12];
+    if (m === 30) return 'half ' + UREN[(u + 1) % 12];
+    return 'kwart voor ' + UREN[(u + 1) % 12];
+  }
+  function klokNieuw() {
+    const stap = KLOK.goed < 5 ? [0] : KLOK.goed < 10 ? [0, 30] : [0, 15, 30, 45];
+    KLOK.u = 1 + Math.floor(Math.random() * 12);
+    KLOK.m = stap[Math.floor(Math.random() * stap.length)];
+    const set = new Set([tijdTekst(KLOK.u, KLOK.m)]);
+    while (set.size < 3) set.add(tijdTekst(1 + Math.floor(Math.random() * 12), stap[Math.floor(Math.random() * stap.length)]));
+    KLOK.keuzes = [...set].sort(() => Math.random() - 0.5);
+    $('#opdracht').textContent = KLOK.goed + ' goed';
+  }
+  function klokLus() {
+    lucht('#33244A', '#1C1230');
+    const cx = W / 2, cy = H * 0.32, r = Math.min(W * 0.36, 165);
+    ctx.fillStyle = '#F5F0FF'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#9C7BD8'; ctx.lineWidth = 6; ctx.stroke();
+    ctx.fillStyle = '#33244A'; ctx.font = '700 ' + Math.round(r * 0.16) + 'px ' + LET; ctx.textAlign = 'center';
+    for (let i = 1; i <= 12; i++) {
+      const a = -Math.PI / 2 + i * Math.PI / 6;
+      ctx.fillText(String(i), cx + Math.cos(a) * r * 0.8, cy + Math.sin(a) * r * 0.8 + r * 0.055);
+    }
+    const mh = KLOK.m / 60 * Math.PI * 2 - Math.PI / 2;
+    const uh = ((KLOK.u % 12) + KLOK.m / 60) / 12 * Math.PI * 2 - Math.PI / 2;
+    ctx.strokeStyle = '#33244A'; ctx.lineCap = 'round';
+    ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(uh) * r * 0.45, cy + Math.sin(uh) * r * 0.45); ctx.stroke();
+    ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(mh) * r * 0.66, cy + Math.sin(mh) * r * 0.66); ctx.stroke();
+    ctx.fillStyle = '#F0715C'; ctx.beginPath(); ctx.arc(cx, cy, 7, 0, Math.PI * 2); ctx.fill();
+    KLOK.keuzes.forEach((t, i) => {
+      const y = H * 0.6 + i * 78;
+      ctx.fillStyle = KLEUREN[i % KLEUREN.length];
+      ctx.beginPath(); ctx.roundRect(W * 0.1, y, W * 0.8, 62, 16); ctx.fill();
+      ctx.fillStyle = '#14283C'; ctx.font = '700 22px ' + LET;
+      ctx.fillText(t, W / 2, y + 39);
+    });
+    tekenFeest();
+  }
+  function klokTik(x, y) {
+    KLOK.keuzes.forEach((t, i) => {
+      const ky = H * 0.6 + i * 78;
+      if (x > W * 0.1 && x < W * 0.9 && y > ky && y < ky + 62) {
+        if (t === tijdTekst(KLOK.u, KLOK.m)) { KLOK.goed++; feest(W / 2, ky + 30, 24); toon(784, 0.3); setTimeout(klokNieuw, 500); }
+        else toon(196, 0.3);
+      }
+    });
+  }
+
+  /* ---------- spel 7: raketvlucht ---------- */
+  const RAKET = { y: 0, vy: 0, dingen: [], sterren: 0, oeps: 0 };
+  function raketStart() {
+    RAKET.y = H / 2; RAKET.vy = 0; RAKET.dingen = []; RAKET.sterren = 0; RAKET.oeps = 0;
+    $('#opdracht').textContent = 'Tik om te stijgen';
+  }
+  function raketLus() {
+    lucht('#122142', '#080D1F');
+    RAKET.vy += 0.18; RAKET.y += RAKET.vy;
+    if (RAKET.y > H - 70) { RAKET.y = H - 70; RAKET.vy = 0; }
+    if (RAKET.y < 70) { RAKET.y = 70; RAKET.vy = 0; }
+    if (Math.random() < 0.035 && RAKET.dingen.length < 8)
+      RAKET.dingen.push({ ster: Math.random() < 0.6, x: W + 50, y: 100 + Math.random() * (H - 240), w: Math.random() * 6 });
+    const rx = W * 0.28;
+    for (let i = RAKET.dingen.length - 1; i >= 0; i--) {
+      const d = RAKET.dingen[i];
+      d.x -= 2.6; d.w += 0.05;
+      if (d.x < -60) { RAKET.dingen.splice(i, 1); continue; }
+      if (Math.hypot(d.x - rx, d.y - RAKET.y) < 48) {
+        if (d.ster) { RAKET.sterren++; feest(d.x, d.y, 14); toon(880, 0.2); $('#opdracht').textContent = RAKET.sterren + ' sterren'; }
+        else { RAKET.oeps = 1; toon(147, 0.3); }
+        RAKET.dingen.splice(i, 1); continue;
+      }
+      if (d.ster) {
+        ctx.fillStyle = '#F6C445';
+        ctx.beginPath();
+        for (let k = 0; k < 10; k++) {
+          const rr = k % 2 ? 10 : 22, a = -Math.PI / 2 + k * Math.PI / 5 + d.w * 0.3;
+          ctx[k ? 'lineTo' : 'moveTo'](d.x + Math.cos(a) * rr, d.y + Math.sin(a) * rr);
+        }
+        ctx.closePath(); ctx.fill();
+      } else {
+        ctx.fillStyle = '#8A96AC';
+        ctx.beginPath(); ctx.ellipse(d.x, d.y, 28, 16, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(d.x - 15, d.y + 5, 17, 11, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(d.x + 15, d.y + 5, 17, 11, 0, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    if (RAKET.oeps > 0) RAKET.oeps -= 0.02;
+    if (!(RAKET.oeps > 0 && Math.floor(RAKET.oeps * 12) % 2)) { // knippert na een wolk
+      ctx.save(); ctx.translate(rx, RAKET.y); ctx.rotate(Math.max(-0.4, Math.min(0.4, RAKET.vy * 0.06)));
+      if (RAKET.vy < -1) { // de vlam bij een zetje omhoog
+        ctx.fillStyle = '#F6C445';
+        ctx.beginPath(); ctx.moveTo(-26, 8); ctx.lineTo(-44, 0); ctx.lineTo(-26, -8); ctx.closePath(); ctx.fill();
+      }
+      ctx.fillStyle = '#5AA7E8';
+      ctx.beginPath(); ctx.ellipse(0, 0, 26, 13, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#F0715C';
+      ctx.beginPath(); ctx.moveTo(22, -6); ctx.lineTo(38, 0); ctx.lineTo(22, 6); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-16, -10); ctx.lineTo(-28, -18); ctx.lineTo(-12, -4); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-16, 10); ctx.lineTo(-28, 18); ctx.lineTo(-12, 4); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#FFF'; ctx.beginPath(); ctx.arc(6, -2, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+    tekenFeest();
+  }
+
   /* ---------- de lus en de bediening ---------- */
   function lus() {
     requestAnimationFrame(lus);
@@ -332,6 +526,9 @@
     else if (SPEL === 'echo') echoLus();
     else if (SPEL === 'letters') jachtLus();
     else if (SPEL === 'sterren') vangLus();
+    else if (SPEL === 'doolhof') doolLus();
+    else if (SPEL === 'klok') klokLus();
+    else if (SPEL === 'raket') raketLus();
   }
   requestAnimationFrame(lus);
   function start(spel) {
@@ -342,6 +539,9 @@
     if (spel === 'echo') echoNieuw(2);
     if (spel === 'letters') jachtNieuw();
     if (spel === 'sterren') { VANG.dingen = []; VANG.sterren = 0; $('#opdracht').textContent = 'Vang de sterren'; }
+    if (spel === 'doolhof') doolNieuw(7, 9);
+    if (spel === 'klok') { KLOK.goed = 0; klokNieuw(); }
+    if (spel === 'raket') raketStart();
   }
   document.querySelectorAll('[data-spel]').forEach(b => b.addEventListener('click', () => start(b.dataset.spel)));
   $('#terugMenu').addEventListener('click', () => { SPEL = null; $('#menu').classList.remove('weg'); $('#bovenrij').hidden = true; });
@@ -351,6 +551,9 @@
     if (SPEL === 'echo') echoTik(ev.clientX, ev.clientY);
     if (SPEL === 'letters') jachtTik(ev.clientX, ev.clientY);
     if (SPEL === 'sterren') vangTik(ev.clientX, ev.clientY);
+    if (SPEL === 'doolhof') doolTik(ev.clientX, ev.clientY);
+    if (SPEL === 'klok') klokTik(ev.clientX, ev.clientY);
+    if (SPEL === 'raket') { RAKET.vy = -5.6; }
   });
   maat();
 })();

@@ -1114,6 +1114,7 @@ const meet = require('./kern/meet').maakMeet({
    en favorieten zijn verwijzingen, nooit kopieen van de bytes. */
 const galerij = require('./kern/galerij').maakGalerij({ db, save, crypto, schoon });
 const boeken = require('./kern/boeken').maakBoeken({ db, save });
+const onderwijs = require('./kern/onderwijs').maakOnderwijs({ db, save, schoon });
 /* RTG Klok (kern/klok.js): wekkers en timers die op de server aftellen,
    zoals de Thuiswacht -- en daardoor ook door Rahul te zetten. */
 const klok = require('./kern/klok').maakKlok({
@@ -1990,7 +1991,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, facturatie, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, facturatie, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
@@ -2759,6 +2760,7 @@ require('./routes/klok')(kern);
 require('./routes/vertaal')(kern);
 require('./routes/memo')(kern);
 require('./routes/boeken')(kern);
+require('./routes/onderwijs')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);

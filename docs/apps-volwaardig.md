@@ -1802,3 +1802,23 @@ boeken.test.js (3: gevulde bieb met echte teksten, de plek zetten en
 teruglezen zonder extra's, nette grenzen en dichte poort) en
 boeken.e2e.js door het scherm (plank + kluisboek, scrollen bewaart,
 heropenen springt terug).
+
+## RTG School golf 1: de officiële ladder + het levenslange leerpaspoort
+
+De ruggengraat van de onderwijs-toren. `server/kern/onderwijs-ladder.js` legt
+de officiële Nederlandse niveaustructuur vast als data met vaste id's: groep
+1 t/m 8, de referentieniveaus (1F/2F/1S/3F/4F) als meetlint, vmbo
+(bb/kb/gl/tl), havo, vwo, mbo 1-4, hbo (Ad/bachelor/master), wo
+(bachelor/master/PhD) en als laatste trede "een leven lang leren". De
+doorstroomkaart kent alle officiële overstapjes (vmbo-tl naar havo, mbo-4
+naar hbo, havo naar vwo, enzovoort). `kern/onderwijs.js` beheert het
+leerpaspoort per codenaam: inschrijven, leerjaren stapelen, overgaan langs
+de kaart (met een stap terug als dat de beste stap is), en behaalde
+leerdoelen bijschrijven -- de haakjes waar de leerstof-motor (golf 2) op
+gaat afvinken. Eerlijkheid ingebouwd en getest: elk ladder-antwoord zegt
+letterlijk dat RTG School geen school of examenbureau is en dat diploma's
+via de officiële instellingen lopen; het paspoort kent geen echte namen en
+geen ranglijsten. Routes onder `/api/onderwijs/*` (ladder, mijn, inschrijf,
+jaar-over, doel), via de stuur-laag direct Rahul-bedienbaar. De test loopt
+een heel leven door: van groep 1 via het schooladvies naar vwo, de
+universiteit in, tot het leren nooit meer stopt.

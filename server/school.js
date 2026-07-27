@@ -119,4 +119,5 @@ module.exports = (ctx) => {
   require('./school/bijdrage')(sctx); // vrijwillige ouderbijdrage + telefoonboom
   require('./school/bijles')(sctx); // de eigen Rahul Bijles van elk kind
   require('./school/bellen')(sctx); // bellen binnen de app (klas-belkanaal, geen nummers nodig)
+  require('./school/hulplijn')(sctx); // golf 4: de ene knop van het kind (toestemming bepaalt wie meeleest)
 };

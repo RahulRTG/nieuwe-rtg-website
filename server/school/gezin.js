@@ -26,6 +26,10 @@ module.exports = (sctx) => {
           rooster: k.rooster,
           huiswerk: (k.huiswerk || []).map(h => ({ id: h.id, titel: h.titel, vak: h.vak, omschrijving: h.omschrijving,
             deadline: h.deadline, doel: h.doel || null, at: h.at, af: (h.afDoor || []).includes(l.sleutel) })),
+          // golf 4, leercurve-sync: aankomende toetsen reizen mee naar de gezins- en leerapps
+          aankomendeToetsen: (k.toetsen || []).filter(t => t.status === 'open' && !(t.werk[l.sleutel] && t.werk[l.sleutel].klaar))
+            .map(t => ({ id: t.id, naam: t.naam, soort: t.soort, vak: t.vak,
+              doelen: t.doelen, bezig: !!t.werk[l.sleutel] })),
           cijfers: (k.cijfers || []).filter(c => c.leerling === l.sleutel)
             .map(c => ({ id: c.id, vak: c.vak, cijfer: c.cijfer, weging: c.weging, omschrijving: c.omschrijving, at: c.at })),
           mededelingen: k.mededelingen || [],

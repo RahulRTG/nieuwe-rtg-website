@@ -1774,3 +1774,31 @@ Tests: scannerpdf.test.js (3, puur: geldige structuur met twee beelden,
 de xref wijst byte-precies naar tabel en objecten, nette fout zonder
 pagina's) en scanner.e2e.js door het scherm (foto's kiezen, strook,
 pagina weghalen, PDF aantoonbaar als application/pdf in de map Scans).
+
+## RTG Boeken: een rustige lezer, een plank die meegroeit
+
+De laatste app van het blok Vertaler/Memo/Scanner/Boeken, op hetzelfde
+principe: zo min mogelijk nieuwe serverlaag, zoveel mogelijk hergebruik.
+
+**De plank.** De huisbibliotheek (kern/boeken-data.js: zes korte
+klassiekers in eigen navertelling -- huisuitgaven, van oorsprong publiek
+domein) staat voor elk lid klaar. Zet een tekstbestand (.txt) in je
+Bestanden-kluis en het staat er vanzelf naast: de kluis is de opslag,
+Boeken leest hem alleen.
+
+**De lezer.** Bodoni op leesregelafstand, instelbare lettergrootte
+(onthouden op het toestel), en een voortgangsbalkje per boek op de
+plank.
+
+**De leesplek reist mee -- en alleen de plek.** kern/boeken.js bewaart
+per lid per boek een getal tussen 0 en 1 plus het moment; op elk toestel
+ga je verder waar je was. Bewust geen leesstatistieken, geen doelen en
+geen reeksen: lezen is geen wedstrijd, en de test asserteert dat er
+niet meer dan de plek wordt bewaard.
+
+Bedrading: kern naast galerij/klok, route naast memo (via de stuur-laag
+ook voor Rahul: "waar was ik?"), catalogusrij en appgids-entry. Tests:
+boeken.test.js (3: gevulde bieb met echte teksten, de plek zetten en
+teruglezen zonder extra's, nette grenzen en dichte poort) en
+boeken.e2e.js door het scherm (plank + kluisboek, scrollen bewaart,
+heropenen springt terug).

@@ -53,6 +53,7 @@ module.exports = [
   ['vertaler', 'Vertaler', 'media', '/apps/vertaler.html', 'Typen of spreken, live vertalen, voorlezen en reiszinnen per situatie. Geschiedenis blijft op het toestel; zonder AI-sleutel vertaalt het huiswoordenboek eerlijk.'],
   ['memo', 'Memo', 'media', '/apps/memo.html', 'Spraakmemo\'s opnemen; de audio staat als gewoon bestand in je Bestanden-kluis. Het toestel luistert mee voor een transcript en Rahul vat samen als jij dat vraagt.'],
   ['scanner', 'Scanner', 'media', '/apps/scanner.html', 'Documenten vastleggen met de camera of uit je foto\'s, documentmodus voor leesbaar papier, en bewaren als PDF of losse foto\'s in je Bestanden-kluis.'],
+  ['boeken', 'Boeken', 'media', '/apps/boeken.html', 'De huisbibliotheek plus je eigen tekstbestanden uit de kluis, met een rustige lezer. Alleen je leesplek reist mee; geen leesdoelen, geen reeksen.'],
   ['krant', 'RTG Krant', 'media', '/apps/krant.html', 'De kiosk: de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.'],
   ['nieuws', 'Nieuws', 'media', '/apps/nieuws.html', 'RTG Nieuws per rubriek, met wat je later wilt lezen bewaard.'],
   ['garderobe', 'Garde-robe', 'media', '/apps/garderobe.html', 'Je kledingkast en looks bij elkaar.'],

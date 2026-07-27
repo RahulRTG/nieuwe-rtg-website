@@ -79,5 +79,10 @@ module.exports = {
     ['Open de camera en leg pagina voor pagina vast, of kies bestaande foto\'s',
      'De documentmodus maakt papier vlak en leesbaar (zwart-wit, extra contrast)',
      'Bewaar als een PDF of als losse foto\'s in de map Scans van je Bestanden-kluis'],
-    'De beeldbewerking en de PDF worden op je toestel gemaakt; er gaat geen beeld naar een andere server dan je eigen kluis.')
+    'De beeldbewerking en de PDF worden op je toestel gemaakt; er gaat geen beeld naar een andere server dan je eigen kluis.'),
+  '/apps/boeken.html': G('RTG Boeken: een rustige lezer met een plank die met je meegroeit.',
+    ['Kies uit de huisbibliotheek, of zet een tekstbestand (.txt) in je kluis en hij staat op de plank',
+     'Lees in de eigen lezer; de lettergrootte stel je zelf in',
+     'Je leesplek reist met je account mee: op elk toestel ga je verder waar je was'],
+    'Bewust geen leesdoelen en geen reeksen -- lezen is geen wedstrijd. De server bewaart alleen je leesplek.')
 };

@@ -26,7 +26,10 @@
   .kop h1{font-size:1.25rem;line-height:1.15;}
   .kop .sub{font-size:.72rem;color:var(--soft);}
   .kop .rek{flex:1;}
-  .knopje{background:rgba(21,19,18,.85);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:.45rem .85rem;font:inherit;font-size:.78rem;cursor:pointer;backdrop-filter:blur(6px);}
+  /* de knoppenrij scrollt zijwaarts als hij niet past (zes hoteldiensten) */
+  .kop .knoppen{display:flex;gap:.5rem;overflow-x:auto;max-width:64vw;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .kop .knoppen::-webkit-scrollbar{display:none;}
+  .knopje{background:rgba(21,19,18,.85);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:.45rem .85rem;font:inherit;font-size:.78rem;cursor:pointer;backdrop-filter:blur(6px);white-space:nowrap;flex:0 0 auto;}
   .knopje.aan{border-color:var(--gold);color:var(--gold);}
   /* de chatbalk */
   /* de zaal-balk staat boven de OS-brede stuurbalk (handenvrij, bottom:0) */
@@ -79,12 +82,14 @@
   <a class="terug" href="/apps/app.html">←</a>
   <div><div class="ey">De Résidence</div><h1 id="kamerNaam">…</h1><div class="sub" id="kamerSub"></div></div>
   <div class="rek"></div>
-  <button class="knopje" id="knopPaar" type="button" hidden>Wandel samen</button>
-  <button class="knopje" id="knopSpel" type="button" hidden>Samen spelen</button>
-  <button class="knopje" id="knopVraag" type="button" hidden>Vraag</button>
-  <button class="knopje" id="knopGids" type="button">Gids</button>
-  <button class="knopje" id="knopSuite" type="button">Mijn suite</button>
-  <button class="knopje" id="knopAtelier" type="button" hidden>Inrichten</button>
+  <div class="knoppen">
+    <button class="knopje" id="knopPaar" type="button" hidden>Wandel samen</button>
+    <button class="knopje" id="knopSpel" type="button" hidden>Samen spelen</button>
+    <button class="knopje" id="knopVraag" type="button" hidden>Vraag</button>
+    <button class="knopje" id="knopGids" type="button">Gids</button>
+    <button class="knopje" id="knopSuite" type="button">Mijn suite</button>
+    <button class="knopje" id="knopAtelier" type="button" hidden>Inrichten</button>
+  </div>
 </header>
 <div class="balk" id="balk" hidden>
   <input id="zegIn" maxlength="140" placeholder="Zeg iets tegen de zaal" autocomplete="off" aria-label="Bericht">

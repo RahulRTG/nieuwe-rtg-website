@@ -86,6 +86,11 @@
         if (d.kind === 'volg') return betreed(d.naar); // de partner neemt u mee
         if (d.kind && d.kind.slice(0, 5) === 'paar-') paarSein(d);
       });
+      // de speeltafel (bordspellen) seint over hetzelfde kanaal
+      bron.addEventListener('social', ev => {
+        let d; try { d = JSON.parse(ev.data); } catch (e) { return; }
+        if (d.kind === 'spel') bordSein(d);
+      });
       bron.onerror = () => { bron.close(); setTimeout(luister, 4000); };
     } catch (e) {}
   }

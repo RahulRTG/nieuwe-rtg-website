@@ -517,7 +517,7 @@ function tekenMejn(){
 }
 
 /* ---------- Schaken ---------- */
-const SCH_TEKEN = { k:'', q:'', r:'', b:'', n:'', p:'', K:'', Q:'', R:'', B:'', N:'', P:'' };
+const SCH_TEKEN = { k:'♚', q:'♛', r:'♜', b:'♝', n:'♞', p:'♟', K:'♔', Q:'♕', R:'♖', B:'♗', N:'♘', P:'♙' };
 let schVan = null;
 function tekenSchaak(){
   const p = huidig, st = p.staat, bord = st.bord;
@@ -546,7 +546,7 @@ async function schKlik(veld){
 }
 
 /* ---------- Pesten ---------- */
-const P_SYM = { H:'', R:'', K:'', S:'' };
+const P_SYM = { H:'♥', R:'♦', K:'♣', S:'♠' };
 let pBoer = null; // gekozen boer die op een kleur wacht
 function pKaartHtml(k){ return k ? pRangVan(k)+'<span style="font-size:1.3rem;">'+P_SYM[k[0]]+'</span>' : ''; }
 function pRangVan(k){ return k.slice(1); }

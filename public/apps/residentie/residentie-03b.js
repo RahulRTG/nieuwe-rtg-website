@@ -16,8 +16,8 @@
   let laatsteKracht = 0; // de kracht van de eigen laatste zet, voor de scene
 
   function kamerKnoppen() {
-    const spel = S.kamer && SPELZAAL[S.kamer.id];
-    $('#knopSpel').hidden = !spel;
+    // samen spelen kan overal: het zaalspel waar dat er is, de kast altijd
+    $('#knopSpel').hidden = !S.kamer;
     $('#knopVraag').hidden = !(S.kamer && (S.kamer.id === 'restaurant' || S.kamer.soort === 'suite'));
     $('#knopPaar').hidden = !S.kamer;
     zetKnopPaar();
@@ -34,11 +34,7 @@
       '<button class="knop2 stil2" id="spelKeuzeWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
     $('#spelLaag').classList.add('open');
     $('#spelKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
-    $('#spelKeuze').querySelectorAll('[data-daag]').forEach(b => b.addEventListener('click', async () => {
-      $('#spelLaag').classList.remove('open');
-      try { await api('/api/residentie/spel/daag', { codenaam: b.dataset.daag, spel: SPELZAAL[S.kamer.id] });
-        meld('Uitnodiging verstuurd; even wachten op ' + b.dataset.daag + '.'); } catch (e) { meld(e.message); }
-    }));
+    $('#spelKeuze').querySelectorAll('[data-daag]').forEach(b => b.addEventListener('click', () => kiesSpel(b.dataset.daag)));
   });
 
   function startPotje(d) {

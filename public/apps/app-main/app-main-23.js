@@ -73,5 +73,6 @@
     flits:       { naam: 'Flits',        url: '/apps/flits.html' },
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
     theater:     { naam: 'Theater',      url: '/apps/theater.html' },
+    residentie:  { naam: 'De Résidence', url: '/apps/residentie.html' },
     wbw:         { naam: 'Wie betaalt wat', url: '/apps/wbw.html' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },

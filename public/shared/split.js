@@ -15,6 +15,7 @@
     { naam: 'Beginscherm', url: '/apps/index.html' },
     { naam: 'De Salon', url: '/apps/app.html#salon' },
     { naam: 'RTG Mall', url: '/apps/mall.html' },
+      { naam: 'De Résidence', url: '/apps/residentie.html' },
     { naam: 'Food Court', url: '/apps/foodcourt.html' },
     { naam: 'RTG OV', url: '/apps/ov.html' },
     { naam: 'RTG Clips', url: '/apps/clips.html' },

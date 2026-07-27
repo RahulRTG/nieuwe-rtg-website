@@ -2824,6 +2824,10 @@ require('./routes/rtfschool')(kern);
 /* Samen (kern/samen.js): met vrienden meekijken en samen doen door het hele
    leden-OS; kamers op code, live seintjes via de SSE-stroom. */
 Object.assign(kern, require('./kern/samen')({ db, save, crypto, sseToCustomer, schoon }));
+/* De Residence (kern/residentie): het virtuele grandhotel -- zalen en eigen
+   suites waar leden als pionnen op codenaam rondlopen en praten, live over
+   het bestaande SSE-kanaal. */
+Object.assign(kern, require('./kern/residentie').maakResidentie({ db, save, schoon, sseToCustomer }));
 require('./routes/samen')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);

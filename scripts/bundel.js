@@ -48,6 +48,7 @@ const bundels = {
   'shared/klok.js': 'shared/klok',
   'shared/metgezel.js': 'shared/metgezel',
   'shared/rtghorloge.js': 'shared/rtghorloge',
+  'apps/residentie.js': 'apps/residentie',
   'apps/leverancier.js': 'apps/leverancier',
   'apps/app-main.js': 'apps/app-main',
   'apps/personeel.js': 'apps/personeel',

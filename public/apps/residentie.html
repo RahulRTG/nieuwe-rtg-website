@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>De Résidence</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#C9A94B; --goud-diep:#857007;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  #wereld{position:fixed;inset:0;display:block;cursor:pointer;}
+  /* de kop: kamernaam en de hoteldiensten */
+  .kop{position:fixed;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:.7rem;padding:.85rem 1rem .7rem;background:linear-gradient(180deg,rgba(12,12,11,.92),rgba(12,12,11,0));pointer-events:none;}
+  .kop>*{pointer-events:auto;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;text-decoration:none;}
+  .kop .ey{font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);}
+  .kop h1{font-size:1.25rem;line-height:1.15;}
+  .kop .sub{font-size:.72rem;color:var(--soft);}
+  .kop .rek{flex:1;}
+  .knopje{background:rgba(21,19,18,.85);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:.45rem .85rem;font:inherit;font-size:.78rem;cursor:pointer;backdrop-filter:blur(6px);}
+  .knopje.aan{border-color:var(--gold);color:var(--gold);}
+  /* de chatbalk */
+  /* de zaal-balk staat boven de OS-brede stuurbalk (handenvrij, bottom:0) */
+  .balk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(4.4rem + env(safe-area-inset-bottom));z-index:6;display:flex;gap:.4rem;width:min(560px,94vw);background:rgba(21,19,18,.88);border:1px solid var(--line);border-radius:999px;padding:.4rem;backdrop-filter:blur(8px);}
+  .balk input{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font:inherit;font-size:.86rem;padding:.35rem .7rem;}
+  .balk button{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .balk .zeg{background:var(--gold);border-color:var(--gold);color:#000;font-weight:600;}
+  /* overlays: gids en suite-atelier */
+  .laag{position:fixed;inset:0;z-index:40;background:rgba(12,12,11,.78);backdrop-filter:blur(6px);display:none;overflow-y:auto;padding:4.5rem 1rem 5rem;}
+  .laag.open{display:block;}
+  .paneel{max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.1rem;}
+  .paneel h2{font-size:1.2rem;margin-bottom:.2rem;}
+  .paneel .sub{font-size:.78rem;color:var(--soft);margin-bottom:.8rem;}
+  .rij-item{display:flex;align-items:center;gap:.7rem;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;margin-top:.5rem;color:var(--txt);font:inherit;cursor:pointer;}
+  .rij-item:hover{border-color:var(--gold);}
+  .rij-item b{font-family:'Bodoni Moda',serif;font-weight:500;display:block;}
+  .rij-item .m{font-size:.72rem;color:var(--soft);}
+  .rij-item .tel{margin-left:auto;font-size:.74rem;color:var(--gold);white-space:nowrap;}
+  .catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.45rem;margin-top:.6rem;}
+  .cat{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.5rem .6rem;color:var(--txt);font:inherit;font-size:.76rem;cursor:pointer;text-align:left;}
+  .cat.aan{border-color:var(--gold);color:var(--gold);}
+  .veldje{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.84rem;padding:.5rem .7rem;width:100%;}
+  .paneel .knop2{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;}
+  .paneel .stil2{background:transparent;color:var(--txt);border:1px solid var(--line);}
+  .melding{position:fixed;left:50%;bottom:8.4rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .inlog{max-width:420px;margin:22vh auto 0;text-align:center;padding:0 1.2rem;position:relative;z-index:7;}
+  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body>
+<main style="display:contents">
+<canvas id="wereld" aria-label="De Residence: de zaal met aanwezige leden"></canvas>
+<header class="kop">
+  <a class="terug" href="/apps/app.html">←</a>
+  <div><div class="ey">De Résidence</div><h1 id="kamerNaam">…</h1><div class="sub" id="kamerSub"></div></div>
+  <div class="rek"></div>
+  <button class="knopje" id="knopGids" type="button">Gids</button>
+  <button class="knopje" id="knopSuite" type="button">Mijn suite</button>
+  <button class="knopje" id="knopAtelier" type="button" hidden>Inrichten</button>
+</header>
+<div class="balk" id="balk" hidden>
+  <input id="zegIn" maxlength="140" placeholder="Zeg iets tegen de zaal" autocomplete="off" aria-label="Bericht">
+  <button id="emoteSter" type="button" aria-label="Schitter">✶</button>
+  <button id="emoteHart" type="button" aria-label="Hart">♥</button>
+  <button class="zeg" id="zegGo" type="button">Zeg</button>
+</div>
+
+<section class="laag" id="gidsLaag" aria-label="Gids">
+  <div class="paneel">
+    <h2>De gids</h2>
+    <div class="sub">de zalen van het huis en de open suites · wie er nu is</div>
+    <div id="gidsZalen"></div>
+    <div class="sub" style="margin-top:1rem;">open suites van leden</div>
+    <div id="gidsSuites"></div>
+    <button class="knop2 stil2" id="gidsDicht" type="button" style="margin-top:.9rem;width:100%;">Sluiten</button>
+  </div>
+</section>
+
+<section class="laag" id="atelierLaag" aria-label="Suite inrichten">
+  <div class="paneel">
+    <h2>Het atelier</h2>
+    <div class="sub">richt uw suite in met RTG Maison; alles is inbegrepen bij de pas</div>
+    <div style="display:flex;gap:.4rem;">
+      <input class="veldje" id="suiteNaam" maxlength="24" placeholder="Naam van de suite">
+      <button class="knop2" id="suiteNaamZet" type="button">Bewaar</button>
+    </div>
+    <div style="display:flex;gap:.4rem;margin-top:.5rem;">
+      <button class="knop2 stil2" id="suiteOpen" type="button" style="flex:1;">…</button>
+      <button class="knop2 stil2" id="atelierWeg" type="button" style="flex:1;">Weghaal-modus</button>
+    </div>
+    <div class="sub" style="margin-top:.7rem;" id="atelierUitleg">Kies een meubel en tik daarna op een tegel; in de weghaal-modus tikt u op een meubel om het terug te geven.</div>
+    <div class="catgrid" id="catalogus"></div>
+    <button class="knop2 stil2" id="atelierDicht" type="button" style="margin-top:.9rem;width:100%;">Klaar met inrichten</button>
+  </div>
+</section>
+
+<div class="melding" id="melding" role="status"></div>
+<div id="poort"></div>
+</main>
+<script src="/apps/residentie.js" defer></script>
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

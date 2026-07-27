@@ -460,6 +460,14 @@
     <p class="deck">Het besloten ontwerpbureau van de kantoren voor mode en alles wat je aan het lijf draagt: couture, tassen, horloges, schoenen, hoeden, haute joaillerie, eyewear en kleinlederwaren. Geef een brief, de AI tekent het concept uit met silhouet, materialen, een gedempt palet en een verhaal, levert een tech pack en de blik van de creatief directeur. <a href="/apps/websitestudio.html" style="color:var(--gold);">Bouw met de muis een eigen website-sjabloon in de Website-studio →</a></p>
     <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">💡 Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="aKpi"></div>
+    <div class="kaart" id="atelier3dKaart">
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;justify-content:space-between;">
+        <h3 class="sec" style="margin:0;">Het Ontwerp-podium (3D)</h3>
+        <select class="veld" id="atelier3dKies" style="max-width:16rem;font-size:.78rem;padding:.3rem .5rem;" aria-label="Kies een ontwerp voor het podium"></select>
+      </div>
+      <canvas id="atelier3d" style="display:block;width:100%;margin-top:.5rem;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
+      <p style="font-size:.72rem;color:var(--muted);margin:.4rem 0 0;" id="atelier3dUitleg"></p>
+    </div>
     <h3 class="sec">Nieuw ontwerp briefen</h3>
     <div class="kaart">
       <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
@@ -958,6 +966,8 @@ function renderAtelier(){
         '<button class="knop stil aDel" data-o="'+o.id+'" style="margin-left:auto;color:var(--burgundy);">Verwijder</button>'+
       '</div></div>';
   }).join('') : '<div class="leeg">Nog geen ontwerpen in deze categorie.</div>';
+  if (window.Atelier3D && lijst.length) Atelier3D.podium(lijst);
+  else if (!lijst.length) { const pk = $('#atelier3dKaart'); if (pk) pk.hidden = true; }
   bindAtelier();
 }
 function techpackHtml(p){
@@ -2699,6 +2709,8 @@ else uitgelogd();
   const t = setInterval(() => { if (window.RTGWerkblad || ++n > 25) { clearInterval(t); start(); } }, 120);
 })();
 </script>
+<script src="/shared/drie.js"></script>
+<script src="/apps/kantoren-atelier3d.js"></script>
 <script src="/shared/glyf.js"></script>
 <script src="/shared/desktopframe.js" defer></script>
 <script src="/shared/werkblad.js" defer></script>

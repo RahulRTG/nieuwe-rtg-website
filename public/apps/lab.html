@@ -66,10 +66,17 @@
     <div class="rij"><input class="veld" id="aiVraag" placeholder="Bijv. hoe zet ik een eerlijke nulmeting op?" maxlength="400"><button class="knop stil" id="aiStuur">Vraag</button></div>
     <div class="ai" id="aiUit" hidden></div>
   </div>
+  <div class="kaart" id="lab3dKaart">
+    <div class="sec">De Prototypehal (3D)</div>
+    <canvas id="lab3d" style="display:block;width:100%;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibare 3D-hal waarin elk onderzoeksproject een blok is: de hoogte toont hoe ver het in de keten is, de kleur het onderzoeksveld, en een gouden pin markeert het nieuwste project."></canvas>
+    <div class="leeg" id="lab3dUitleg"></div>
+  </div>
   <div class="chips" id="filters"></div>
   <div id="lijst"><div class="leeg">Laden...</div></div>
   <div class="kaart"><div class="sec">Kennisbank (<span id="kbTel">0</span> bevindingen, ook uit het archief)</div><div id="kb"></div></div>
 </main>
+<script src="/shared/drie.js"></script>
+<script src="/apps/lab3d.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -88,6 +95,7 @@ async function laad(){
   document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; render(); }));
   $('#kbTel').textContent = kb.totaal;
   $('#kb').innerHTML = kb.bevindingen.slice(0, 12).map(b => '<div class="log"><b>' + esc(b.titel) + '</b> · ' + esc(b.project) + ' (' + esc(b.veld) + ')' + (b.tekst ? '<br>' + esc(b.tekst) : '') + '</div>').join('') || '<div class="leeg">De eerste bevinding moet nog geschreven worden.</div>';
+  if (window.Lab3D) Lab3D.toon(D.projecten, D.velden);
   render();
 }
 function render(){

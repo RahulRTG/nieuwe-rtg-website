@@ -10,6 +10,8 @@
    wedstrijd, en een fout is gewoon de volgende stap in de les. */
 const { REKENEN } = require('./leerstof-data/rekenen');
 const { TAAL } = require('./leerstof-data/taal');
+const { VO } = require('./leerstof-data/vo');
+const { VERVOLG } = require('./leerstof-data/vervolg');
 const { opgave } = require('./leerstof-gen');
 
 const OPGAVEN_PER_SESSIE = 5;
@@ -29,6 +31,19 @@ for (const [vak, lijn] of [['rekenen', REKENEN], ['taal', TAAL]]) {
     }
   }
 }
+/* golf 3: het voortgezet en vervolgonderwijs, per FASE uit de niveauladder
+   (vmbo t/m wo). Zelfde bibliotheek, dus toetsen en huiswerk kunnen er net
+   zo uit putten als bij groep 1 t/m 8. */
+const PER_FASE = {};
+for (const blok of VO.concat(VERVOLG)) {
+  for (const fase of blok.fasen) {
+    PER_FASE[fase] = PER_FASE[fase] || [];
+    for (const d of blok.doelen) {
+      DOELEN[d.id] = DOELEN[d.id] || Object.assign({ vak: blok.vak, fase: blok.fasen[0] }, d);
+      PER_FASE[fase].push(d.id);
+    }
+  }
+}
 
 function maakLeerstof({ db, save, onderwijs }) {
   const nu = () => new Date().toISOString();
@@ -41,8 +56,21 @@ function maakLeerstof({ db, save, onderwijs }) {
 
   /* ---- de leerlijn voor een groep: wat leer je hier, en wat heb je al ---- */
   function vakken(key, d) {
+    // per fase (vmbo t/m wo) of per groep (1 t/m 8): zelfde antwoordvorm
+    const fase = String(d && d.fase || '').trim();
+    if (fase) {
+      if (!PER_FASE[fase]) return { status: 400, error: 'Voor deze fase is er (nog) geen leerlijn.' };
+      const behaaldF = (onderwijs.mijn(key).doelen) || {};
+      const perVakF = {};
+      for (const id of PER_FASE[fase]) {
+        const doel = DOELEN[id];
+        perVakF[doel.vak] = perVakF[doel.vak] || [];
+        perVakF[doel.vak].push({ id, naam: doel.naam, ref: doel.ref || null, behaald: !!behaaldF[id] });
+      }
+      return { ok: true, fase, vakken: Object.entries(perVakF).map(([vak, doelen]) => ({ vak, doelen })) };
+    }
     const groep = Number(String(d && d.groep || '').replace(/\D/g, ''));
-    if (!PER_GROEP[groep]) return { status: 400, error: 'Kies een groep van 1 tot en met 8.' };
+    if (!PER_GROEP[groep]) return { status: 400, error: 'Kies een groep van 1 tot en met 8, of een fase uit de ladder.' };
     const pas = onderwijs.mijn(key);
     const behaald = (pas.doelen) || {};
     const perVak = {};
@@ -104,4 +132,4 @@ function maakLeerstof({ db, save, onderwijs }) {
   return { leerstofVakken: vakken, leerstofLes: les, leerstofOefenStart: oefenStart, leerstofOefenAntwoord: oefenAntwoord, DOELEN };
 }
 
-module.exports = { maakLeerstof, DOELEN };
+module.exports = { maakLeerstof, DOELEN, PER_FASE };

@@ -96,6 +96,16 @@ const GEN = {
     const [goed, fout] = kies(g.paren);
     return { v: 'Welke is goed geschreven?', a: goed, opties: schud([goed, fout]) };
   },
+  // algemene meerkeuze (VO en vervolgonderwijs): g.vragen = [[vraag, goed, fout, fout], ...]
+  mc(g) {
+    const [v, goed, ...fout] = kies(g.vragen);
+    return { v, a: goed, opties: schud([goed].concat(fout)) };
+  },
+  // lineaire vergelijking: los x op uit ax + b = c
+  vergelijking(g) {
+    const a = 2 + r(g.maxA - 1), x = 1 + r(g.maxX), b = 1 + r(20);
+    return { v: 'Los op: ' + a + 'x + ' + b + ' = ' + (a * x + b) + '. x =', a: String(x) };
+  },
   dt(g) {
     const w = kies(g.ww);
     if (g.tijd === 'tt') { const hij = r(2) === 1;

@@ -1117,6 +1117,7 @@ const boeken = require('./kern/boeken').maakBoeken({ db, save });
 const onderwijs = require('./kern/onderwijs').maakOnderwijs({ db, save, schoon });
 const leerstof = require('./kern/leerstof').maakLeerstof({ db, save, onderwijs });
 const bijles = require('./kern/bijles').maakBijles({ winkel: () => (db.data.bijles = db.data.bijles || {}), save, schoon });
+const vervolg = require('./kern/leerstof-vervolg').maakVervolg({ db, save, onderwijs });
 /* RTG Klok (kern/klok.js): wekkers en timers die op de server aftellen,
    zoals de Thuiswacht -- en daardoor ook door Rahul te zetten. */
 const klok = require('./kern/klok').maakKlok({
@@ -1993,7 +1994,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, facturatie, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,

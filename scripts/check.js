@@ -165,10 +165,11 @@ console.log('\n10) de 9+-keuring op alle app-pagina\'s');
     if (!/rel="icon"/.test(s)) { np++; fout('9+: geen favicon in ' + rel); }
     if (!/<main\b/i.test(s) && !/role="main"/.test(s)) { np++; fout('9+: geen main-landmark in ' + rel); }
     if (!s.includes('/shared/basis.js')) { np++; fout('9+: basis-laag (shared/basis.js) ontbreekt in ' + rel); }
+    if (!s.includes('/shared/metgezel.js')) { np++; fout('9+: metgezel-laag (Rahul + wauw + palet) ontbreekt in ' + rel); }
     const gids = appgids.gidsVan('/' + rel);
     if (!gids || gids.algemeen) { np++; fout('9+: geen eigen app-gids voor /' + rel + ' (vul kern/appgids.js aan)'); }
   }
-  if (!np) ok(paginas.length + ' app-pagina\'s voldoen aan de 9+-basis (taal, viewport, titel, favicon, landmark, basis-laag, eigen gids)');
+  if (!np) ok(paginas.length + ' app-pagina\'s voldoen aan de 9+-basis (taal, viewport, titel, favicon, landmark, basis-laag, metgezel/wauw, eigen gids)');
 }
 
 /* 11) bedradings-contract: elke `accounts.<methode>(` die de server aanroept,

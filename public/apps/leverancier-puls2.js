@@ -44,6 +44,7 @@
       }).join('<br>') + '</div>';
     }
     h += '<div class="row-gap" style="margin-top:0.7rem;"><button id="dpPrint" style="' + GOUD + 'flex:1;">' + T('dp.print', 'Draaiboek (print)') + '</button>' +
+      '<button id="dpDeel" style="' + STIL + '">' + T('wf.deel', 'Delen') + '</button>' +
       '<button id="dpRahul" style="' + STIL + 'flex:1;">' + T('dp.rahul', 'Rahul plant de dag') + '</button></div>' +
       '<div id="dpRahulUit" class="sub" style="margin-top:0.5rem;white-space:pre-wrap;"></div>';
     w.innerHTML = h;
@@ -56,6 +57,11 @@
       });
     });
     w.querySelector('#dpPrint').addEventListener('click', function () { rapport(plan, blik, ctx); });
+    w.querySelector('#dpDeel').addEventListener('click', function () {
+      if (!window.RTGWauw) return;
+      RTGWauw.deel({ titel: ((ctx.S && ctx.S.name) || '') + ' -- ' + ctx.T('dp.kop', 'Het draaiboek van vandaag'),
+        tekst: plan.advies + ' ' + plan.taken.filter(function (t2) { return !t2.klaar; }).map(function (t2) { return t2.tekst; }).join(' ') });
+    });
     w.querySelector('#dpRahul').addEventListener('click', function () {
       var uit = w.querySelector('#dpRahulUit');
       uit.textContent = ctx.T('ge.rahul.leest', 'Rahul kijkt mee...');

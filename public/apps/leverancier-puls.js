@@ -37,11 +37,18 @@
       h += '<p class="sub" style="margin-top:0.5rem;">' + T('pu.rust', 'Geen signalen; de dag loopt zoals hij hoort.') + '</p>';
     }
     h += '<div class="row-gap" style="margin-top:0.7rem;"><button id="puRapport" style="' + GOUD + 'flex:1;">' + T('pu.rapport', 'Polsrapport (print)') + '</button>' +
+      '<button id="puDeel" style="' + STIL + '">' + T('wf.deel', 'Delen') + '</button>' +
       '<button id="puRahul" style="' + STIL + 'flex:1;">' + T('ge.rahul', 'Rahul denkt mee') + '</button></div>' +
       '<div id="puRahulUit" class="sub" style="margin-top:0.5rem;white-space:pre-wrap;"></div>';
     w.innerHTML = h;
 
     w.querySelector('#puRapport').addEventListener('click', function () { rapport(p, ctx); });
+    w.querySelector('#puDeel').addEventListener('click', function () {
+      if (!window.RTGWauw) return;
+      RTGWauw.deel({ titel: ((ctx.S && ctx.S.name) || '') + ' -- ' + T('pu.kop', 'De pols van vandaag'),
+        tekst: p.meters.map(function (m) { return m[0] + ': ' + m[1]; }).join(', ') +
+          ((p.signalen || []).length ? '. ' + p.signalen.map(function (s) { return s.tekst; }).join(' ') : '') });
+    });
     w.querySelector('#puRahul').addEventListener('click', function () {
       var uit = w.querySelector('#puRahulUit');
       uit.textContent = T('ge.rahul.leest', 'Rahul kijkt mee...');

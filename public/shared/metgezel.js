@@ -166,10 +166,12 @@
       fab.classList.add('mgz-meld');
       if (!stip) { stip = maakEl('<span class="mgz-stip"></span>'); fab.appendChild(stip); }
       stip.textContent = nieuw.length > 9 ? '9+' : String(nieuw.length);
+      if (window.RTGWauw) RTGWauw.badge(nieuw.length); // ook op het app-icoon
       if (!meldTimer) meldTimer = setInterval(function () { if (!document.hidden && fab.classList.contains('mgz-meld')) mond.praat(700); }, 4200);
     }
     function doofMelding() {
       fab.classList.remove('mgz-meld');
+      if (window.RTGWauw) RTGWauw.badge(0);
       if (stip) { stip.remove(); stip = null; }
       if (meldTimer) { clearInterval(meldTimer); meldTimer = null; }
       if (laatsteSeintjes.length) bewaarGezien(laatsteSeintjes.map(idVan));

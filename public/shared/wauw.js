@@ -81,9 +81,13 @@
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') pak();
   });
-  /* Werkstations herkennen we aan hun eigen aanvraag (RTGWauw.wakker())
-     of aan een actieve stationsstand van de zaak-app. */
-  try { if (localStorage.getItem('rtg_sup_station')) wakker(true); } catch (e) {}
+  /* Werkstations herkennen we aan hun eigen aanvraag (RTGWauw.wakker()),
+     aan een actieve stationsstand van de zaak-app, of aan een PDA-pagina
+     (daar hoort het scherm aan te blijven tijdens de dienst). */
+  try {
+    var pda = /\/apps\/(personeel|gemeentepda|kantoorpda|architect-pda|hardware-pda|redactie-pda|studio-pda)\.html$/.test(location.pathname);
+    if (pda || localStorage.getItem('rtg_sup_station')) wakker(true);
+  } catch (e) {}
 
   /* 6. Het ROS-palet erbij (shared/palet.js): Ctrl/Cmd+K, overal. */
   if (!window.RTGPalet) {

@@ -9,6 +9,15 @@
    - zonder inlog doet het script niets (geen knoppen, geen verkeer) */
 (function () {
   if (window.__metgezel) return; window.__metgezel = true;
+  /* De wauw-laag (shared/wauw.js) eerst: zachte overgangen, haptiek,
+     delen, badge en wake lock. Voor de inlogcheck, zodat ook de poort
+     hem heeft; net als handenvrij is het een script erbij in plaats
+     van 120+ pagina's aanpassen, en zonder laag verandert er niets. */
+  if (!window.RTGWauw) {
+    var wauwS = document.createElement('script');
+    wauwS.src = '/shared/wauw.js'; wauwS.defer = true;
+    document.head.appendChild(wauwS);
+  }
   var memTok = null, supTok = null;
   try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}

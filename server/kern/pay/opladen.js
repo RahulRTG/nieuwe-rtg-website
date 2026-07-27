@@ -1,0 +1,88 @@
+/* RTG Pay, het oplaaddeel: geld de wallet in. Opladen via de betaal-naad
+   (Apple Pay/kaart), de eigen bank als eerste dekking bij een tekort, het
+   automatische bijladen achter "EEN knop" (zorgSaldo), en de herstart-
+   reconcile in motor-modus. De grootboekregels zelf staan in ./index.js;
+   dit deel krijgt de guard (boekAsync) en de helpers mee en verandert
+   NIETS aan de boekingsregels. */
+function maakOpladen(basis) {
+  const { betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
+    motorklant, geldModus, keyVanCodenaam,
+    OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP } = basis;
+
+  /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
+  async function laadOp({ codenaam, centen, idem, oms }) {
+    const c = Math.round(Number(centen));
+    if (!Number.isFinite(c) || c < OPLAAD_MIN || c > MAX_CENTEN) return { status: 400, error: 'Opladen kan van 1 tot 5000 euro.' };
+    return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, async () => {
+      let betaling;
+      try {
+        betaling = await betaal.maakBetaling({
+          bedrag: c, referentie: 'pay-oplaad-' + codenaam + '-' + nu(),
+          idempotentieSleutel: idem ? 'pay-oplaad:' + codenaam + ':' + idem : undefined,
+          omschrijving: oms || 'RTG Pay opladen'
+        });
+      } catch (e) { return { status: 502, error: 'De betaling lukte niet: ' + e.message }; }
+      if (betaling.status !== 'betaald' && betaling.status !== 'succeeded') {
+        // bij een echte aanbieder rondt de klant het af (Apple Pay-sheet); de
+        // webhook crediteert daarna. In de demo is hij altijd meteen betaald.
+        return { status: 402, error: 'De betaling wacht op bevestiging.', betaalStatus: betaling.status };
+      }
+      const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref: betaling.id });
+      if (b.error) return b;
+      return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c };
+    });
+  }
+
+  /* De eigen bank als eerste dekking: is de RTG Bank live en heeft het lid
+     daar een betaalrekening met ruimte, dan komt een saldotekort DAAR vandaan
+     (eigen rails) in plaats van via de kaart-naad. De koppeling komt na het
+     opstarten binnen (de bank bouwt op pay, dus late binding). */
+  let bankDekking = null;
+  function koppelBank(dekking) { bankDekking = typeof dekking === 'function' ? dekking : null; }
+
+  /* Herstart-reconcile (cutover): bij het opstarten in motor-modus is de motor de
+     autoriteit, dus de JS-spiegel moet zijn saldi uit de motor-snapshot overnemen
+     i.p.v. uit zijn eigen (mogelijk verouderde) snapshot. We halen de volledige
+     saldi-stand op en vervangen db.data.paySaldi ermee. Zo start de spiegel altijd
+     in lockstep met de motor, ook na een crash of nadat de motor los is bijgewerkt.
+     No-op buiten motor-modus. */
+  async function reconcileVanMotor() {
+    if (geldModus !== 'motor') return { ok: true, overgeslagen: true };
+    const r = await motorklant.saldiSnapshot();
+    if (!r || r.error) return { ok: false, error: (r && r.error) || 'Geen saldi van de motor.' };
+    const nieuw = {};
+    for (const k in r.saldi) {
+      if (!Object.prototype.hasOwnProperty.call(r.saldi, k)) continue;
+      const v = Math.round(Number(r.saldi[k]) || 0);
+      if (v !== 0) nieuw[k] = v; // nul-saldi laten we weg (schone spiegel)
+    }
+    d().paySaldi = nieuw;
+    save();
+    let som = 0; for (const k in nieuw) som += nieuw[k];
+    return { ok: true, rekeningen: Object.keys(nieuw).length, som };
+  }
+
+  /* Het hart van "EEN knop": is er te weinig saldo, dan laadt de wallet zelf
+     bij en betaalt door. Eerst via de eigen bank (exact het tekort), anders
+     via de kaart-naad (afgerond op tientjes). Het lid merkt er niets van
+     behalve een regel "bijgeladen" in het overzicht. */
+  async function zorgSaldo({ codenaam, centen, idem }) {
+    const tekort = Math.round(centen) - saldoVan(rekLid(codenaam));
+    if (tekort <= 0) return { ok: true, bijgeladen: 0 };
+    if (bankDekking) {
+      try { const b = await bankDekking({ codenaam, centen: tekort }); if (b && b.ok) return { ok: true, bijgeladen: tekort, via: 'bank' }; }
+      catch (e) { /* de bank kon niet dekken: gewoon door naar de kaart */ }
+    }
+    const stap = Math.ceil(tekort / AUTOLAAD_STAP) * AUTOLAAD_STAP;
+    const r = await laadOp({ codenaam, centen: stap, idem: idem ? idem + ':autolaad' : null, oms: 'Automatisch bijgeladen' });
+    if (r.error) return r;
+    return { ok: true, bijgeladen: stap, via: 'kaart' };
+  }
+  async function bestaatLid(codenaam) {
+    try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
+  }
+
+  return { laadOp, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid };
+}
+
+module.exports = { maakOpladen };

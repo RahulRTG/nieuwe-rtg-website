@@ -66,6 +66,7 @@
             .then(function (r2) { meld(r2.body.error || 'Besluit vastgelegd.'); directie(); });
         });
       });
+      if (window.RTGSchoolDirectie) RTGSchoolDirectie.bind(api, S, esc, meld);
     });
   }
 

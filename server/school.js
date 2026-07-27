@@ -110,6 +110,7 @@ module.exports = (ctx) => {
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief };
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));
+  require('./school/directie')(sctx); // golf 3: de directie-cockpit op kantoren-niveau
   require('./school/taal')(sctx); // thuistaal + tweetalige laag (zet sctx.tweetalig)
   require('./school/gezin')(sctx);
   require('./school/planner')(sctx);

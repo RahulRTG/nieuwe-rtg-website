@@ -20,6 +20,7 @@
     var wortel = opts.wortel, onWijzig = opts.onWijzig || function () {}, meld = opts.meld || function () {};
     var data = { lijsten: [] };
     var open = null;   // { lijstId, kaartId } van de kaart die open staat
+    var mag = true;    // meelezers kijken, bewerken doet de eigenaar of meeschrijver
 
     var norm = function (inhoud) {
       var l = (inhoud && Array.isArray(inhoud.lijsten)) ? inhoud.lijsten : [];
@@ -59,6 +60,7 @@
     }
 
     wortel.addEventListener('click', function (e) {
+      if (!mag) return;
       var q = function (s) { return e.target.closest(s); };
       var b;
       if (q('[data-bpaneel]') && !q('button')) return;   // typen in het paneel is geen klik
@@ -105,6 +107,7 @@
 
     // typen in het open paneel en de lijstnamen: direct in de data, autosave volgt
     wortel.addEventListener('input', function (e) {
+      if (!mag) return;
       var veld = e.target.closest('[data-bv]');
       if (veld && open) {
         var l = vind(open.lijstId), k = l && l.kaarten.find(function (x) { return x.id === open.kaartId; });
@@ -116,7 +119,8 @@
     });
 
     var api = {
-      laad: function (inhoud) {
+      laad: function (inhoud, magBewerken) {
+        mag = magBewerken !== false;
         data = norm(inhoud);
         if (!data.lijsten.length) data.lijsten = [
           { id: rid(), titel: 'Te doen', kaarten: [] },

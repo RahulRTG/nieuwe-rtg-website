@@ -72,11 +72,13 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
       return { status: 409, error: 'U heeft het maximum van ' + MAX_DOCS + ' documenten; verwijder er eerst een.' };
     const titel = schoon(data.titel, MAX_TITEL) || (sjab ? sjab.titel
       : soort === 'blad' ? 'Nieuw rekenblad' : soort === 'presentatie' ? 'Nieuwe presentatie'
-      : soort === 'formulier' ? 'Nieuw formulier' : soort === 'schets' ? 'Nieuwe schets' : 'Nieuw document');
+      : soort === 'formulier' ? 'Nieuw formulier' : soort === 'schets' ? 'Nieuwe schets'
+      : soort === 'bord' ? 'Nieuw bord' : 'Nieuw document');
     const leeg = soort === 'blad' ? { cellen: {}, rijen: 20, kolommen: 8 }
       : soort === 'presentatie' ? { dias: [{ titel: 'Titelblad', tekst: '' }] }
       : soort === 'formulier' ? { vragen: [{ tekst: '', soort: 'open', opties: [] }], wijze: 'codenaam' }
       : soort === 'schets' ? { vormen: [] }
+      : soort === 'bord' ? { lijsten: [] }
       : { tekst: '' };
     const inhoud = sjab ? schoonInhoud(soort, JSON.parse(JSON.stringify(sjab.inhoud))) : leeg;
     const d = { id: id(), key, soort, titel, inhoud, gedeeldMet: [], bewerkers: [], versies: [], gemaakt: nu(), gewijzigd: nu() };

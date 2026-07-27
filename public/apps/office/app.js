@@ -20,8 +20,8 @@
   var glyf = function (naam) {
     return (window.RTGGlyf && RTGGlyf.svgHTML) ? RTGGlyf.svgHTML(String(naam || ''), {}) : '';
   };
-  var GLYF_SOORT = { tekst: 'logboek', blad: 'grafiek', presentatie: 'podium', formulier: 'opties', schets: 'ontwerp' };
-  var NAAM_SOORT = { tekst: 'Document', blad: 'Rekenblad', presentatie: 'Presentatie', formulier: 'Formulier', schets: 'Schets' };
+  var GLYF_SOORT = { tekst: 'logboek', blad: 'grafiek', presentatie: 'podium', formulier: 'opties', schets: 'ontwerp', bord: 'agenda' };
+  var NAAM_SOORT = { tekst: 'Document', blad: 'Rekenblad', presentatie: 'Presentatie', formulier: 'Formulier', schets: 'Schets', bord: 'Bord' };
 
   var PAR = new URLSearchParams(location.search);
   var WERK = PAR.get('werk') || '';
@@ -84,7 +84,7 @@
   };
 
   var open = null, magBewerken = false, bewaarT = null, vuil = false, leesT = null, stand = null;
-  var blad = null, pres = null, presLoop = null, formulier = null, schets = null;
+  var blad = null, pres = null, presLoop = null, formulier = null, schets = null, bord = null;
 
   /* ---------- de drive ---------- */
   function laadLijst() {
@@ -188,6 +188,7 @@
   $('#nieuwPres').addEventListener('click', function () { nieuw('presentatie'); });
   $('#nieuwFormulier').addEventListener('click', function () { nieuw('formulier'); });
   $('#nieuwSchets').addEventListener('click', function () { nieuw('schets'); });
+  $('#nieuwBord').addEventListener('click', function () { nieuw('bord'); });
 
   /* ---------- openen ---------- */
   function openen(id) {
@@ -199,16 +200,18 @@
         : 'alleen lezen · van ' + r.body.door;
       $('#deelBtn').style.display = r.body.eigenaar ? '' : 'none';
       // Rahul leest tekst en dia's; op een formulier of schets heeft hij niets te zoeken
-      $('#aiBtn').style.display = magBewerken && r.body.soort !== 'formulier' && r.body.soort !== 'schets' ? '' : 'none';
+      $('#aiBtn').style.display = magBewerken && r.body.soort !== 'formulier' && r.body.soort !== 'schets' && r.body.soort !== 'bord' ? '' : 'none';
       $('#presBtn').style.display = r.body.soort === 'presentatie' ? '' : 'none';
       $('#formBalk').style.display = r.body.soort === 'blad' ? '' : 'none';
       $('#tekstTools').style.display = 'none'; $('#bladTools').style.display = 'none';
       $('#tekst').style.display = 'none'; $('#bladWrap').style.display = 'none'; $('#presWrap').style.display = 'none';
       $('#formWrap').style.display = 'none'; $('#schetsWrap').style.display = 'none';
+      $('#bordWrap').style.display = 'none';
       if (r.body.soort === 'blad') toonBlad(r.body.inhoud);
       else if (r.body.soort === 'presentatie') toonPres(r.body.inhoud);
       else if (r.body.soort === 'formulier') toonFormulier(r.body.inhoud);
       else if (r.body.soort === 'schets') toonSchets(r.body.inhoud);
+      else if (r.body.soort === 'bord') toonBord(r.body.inhoud);
       else toonTekst(r.body.inhoud);
       $('#lijst').style.display = 'none'; $('#editor').classList.add('aan');
       volgMee();
@@ -230,6 +233,7 @@
         else if (open.soort === 'presentatie') pres.laad(v.body.inhoud, magBewerken);
         else if (open.soort === 'formulier') formulier.laad(v.body.inhoud, magBewerken, open.id);
         else if (open.soort === 'schets') schets.laad(v.body.inhoud, magBewerken);
+        else if (open.soort === 'bord') bord.laad(v.body.inhoud, magBewerken);
         else $('#tekst').innerHTML = (v.body.inhoud && v.body.inhoud.tekst) || '';
         zeg('Bijgewerkt door ' + (v.body.door || 'een ander'));
       });
@@ -280,6 +284,13 @@
     if (!schets) schets = RTGOfficeSchets.maak({ wrap: $('#schetsWrap'), onWijzig: markeer, meld: zeg, voet: $('#voetbalk') });
     schets.laad(inhoud, magBewerken);
   }
+  function toonBord(inhoud) {
+    $('#bordWrap').style.display = '';
+    if (!bord) bord = RTGOfficeBord.maak({ wortel: $('#bordWrap'), onWijzig: markeer, meld: zeg });
+    bord.laad(inhoud, magBewerken);
+    var n = ((inhoud && inhoud.lijsten) || []).reduce(function (a, l) { return a + ((l.kaarten || []).length); }, 0);
+    $('#voetbalk').textContent = n + (n === 1 ? ' kaart' : ' kaarten');
+  }
 
   /* ---------- presentatie ---------- */
   function toonPres(inhoud) {
@@ -319,6 +330,7 @@
       : open.soort === 'presentatie' ? pres.inhoud()
       : open.soort === 'formulier' ? formulier.inhoud()
       : open.soort === 'schets' ? schets.inhoud()
+      : open.soort === 'bord' ? bord.inhoud()
       : { tekst: $('#tekst').innerHTML.slice(0, 500000) };
   }
   function bewaarNu() {
@@ -398,6 +410,7 @@
             else if (open.soort === 'presentatie') pres.laad(t.body.inhoud, magBewerken);
             else if (open.soort === 'formulier') formulier.laad(t.body.inhoud, magBewerken, open.id);
             else if (open.soort === 'schets') schets.laad(t.body.inhoud, magBewerken);
+            else if (open.soort === 'bord') bord.laad(t.body.inhoud, magBewerken);
             else { $('#tekst').innerHTML = (t.body.inhoud && t.body.inhoud.tekst) || ''; telBij(); }
             $('#versieScrim').classList.remove('open'); zeg('Versie teruggezet.');
           });

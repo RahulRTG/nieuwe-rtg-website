@@ -4,7 +4,7 @@
    leden op eigen account, teams als 'sup:CODE', de RTG-kantoren als
    'rtg:kantoor' en RTF-gezinsprofielen als 'rtf:CODE:handle'. */
 
-const SOORTEN = ['tekst', 'blad', 'presentatie', 'formulier', 'schets'];
+const SOORTEN = ['tekst', 'blad', 'presentatie', 'formulier', 'schets', 'bord'];
 const MAX_DOCS = 200;            // per eigenaar (lid, zaak of kantoor)
 const MAX_BYTES = 500000;        // per document (ruime kantoortekst, blad of deck)
 const MAX_TITEL = 120;
@@ -56,6 +56,25 @@ function maakBasis({ db, crypto, codenaamVan }) {
 
   // de inhoud netjes begrenzen per soort (geen vreemde velden, geen enorme cellen)
   function schoonInhoud(soort, inhoud) {
+    if (soort === 'bord') {
+      // het bord: lijsten met kaarten, strak geklemd zoals alles hier
+      const BORDLABELS = ['geen', 'bordeaux', 'goud', 'grijs'];
+      const bron = Array.isArray(inhoud.lijsten) ? inhoud.lijsten : [];
+      const lijsten = bron.slice(0, 12).map(l => ({
+        id: String((l && l.id) || '').slice(0, 12) || Math.random().toString(36).slice(2, 9),
+        titel: String((l && l.titel) || 'Lijst').slice(0, 60),
+        kaarten: (Array.isArray(l && l.kaarten) ? l.kaarten : []).slice(0, 100).map(k => ({
+          id: String((k && k.id) || '').slice(0, 12) || Math.random().toString(36).slice(2, 9),
+          titel: String((k && k.titel) || '').slice(0, 120),
+          notitie: String((k && k.notitie) || '').slice(0, 600),
+          label: BORDLABELS.includes(k && k.label) ? k.label : 'geen',
+          wie: String((k && k.wie) || '').slice(0, 40),
+          voor: /^\d{4}-\d{2}-\d{2}$/.test(String((k && k.voor) || '')) ? k.voor : '',
+          klaar: !!(k && k.klaar)
+        }))
+      }));
+      return { lijsten };
+    }
     if (soort === 'blad') {
       const cellen = {};
       const bron = (inhoud.cellen && typeof inhoud.cellen === 'object') ? inhoud.cellen : {};

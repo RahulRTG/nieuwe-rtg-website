@@ -56,6 +56,7 @@
             else if (open.soort === 'presentatie') pres.laad(t.body.inhoud, magBewerken);
             else if (open.soort === 'formulier') formulier.laad(t.body.inhoud, magBewerken, open.id);
             else if (open.soort === 'schets') schets.laad(t.body.inhoud, magBewerken);
+            else if (open.soort === 'bord') bord.laad(t.body.inhoud, magBewerken);
             else { $('#tekst').innerHTML = (t.body.inhoud && t.body.inhoud.tekst) || ''; telBij(); }
             $('#versieScrim').classList.remove('open'); zeg('Versie teruggezet.');
           });

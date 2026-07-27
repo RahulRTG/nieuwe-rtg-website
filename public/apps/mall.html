@@ -425,7 +425,7 @@ function tekenDiensten(genres){
   DZAKEN = {};
   w.innerHTML = '<div class="etage"><div class="etage-kop"><h2>Het Dienstenplein</h2>'+
     '<span class="n">diensten aan huis, op de villa of aan boord · boek direct of vraag een offerte</span></div>'+
-    '<div id="dpOff"></div>'+
+    '<div id="dpOff"></div><div id="dpRitmes"></div><div id="dpReviews"></div>'+
     genres.map(g => {
       g.zaken.forEach(z => DZAKEN[z.code] = z);
       return '<div class="dp-sub">'+esc(g.label)+' <span class="n">· '+g.aantal+' '+(g.aantal===1?'zaak':'zaken')+'</span></div>'+
@@ -434,7 +434,7 @@ function tekenDiensten(genres){
           '<span class="stad">'+esc(z.stad||'RTG')+'</span>'+
           '<h3>'+esc(z.naam)+'</h3>'+
           (z.vak?'<span class="tag">'+esc(z.vak)+'</span>':(z.tagline?'<span class="tag">'+esc(z.tagline)+'</span>':''))+
-          '<span class="meta">'+z.diensten.length+' dienst'+(z.diensten.length===1?'':'en')+(z.vanaf!=null?' · vanaf '+euro(z.vanaf):'')+'</span>'+
+          '<span class="meta">'+z.diensten.length+' dienst'+(z.diensten.length===1?'':'en')+(z.vanaf!=null?' · vanaf '+euro(z.vanaf):'')+(z.beoordeling?' · <span style="color:var(--gold);">✶ '+z.beoordeling.score+'</span> ('+z.beoordeling.aantal+')':'')+'</span>'+
         '</button>').join('')+'</div>';
     }).join('')+'</div>';
   w.querySelectorAll('.dpz').forEach(b => b.addEventListener('click', () => openDienstZaak(b.dataset.code)));
@@ -468,6 +468,52 @@ async function tekenOffertes(){
   w.querySelectorAll('.offweg').forEach(b => b.addEventListener('click', async () => {
     try { await api('/api/vak/offerte/intrek', { id: b.dataset.id }); meld('Ingetrokken.'); tekenOffertes(); }
     catch(e){ meld(e.message); }
+  }));
+  tekenRitmes(); tekenReviews();
+}
+
+/* Mijn vaste afspraken: het lopende ritme per zaak, met een stopknop */
+async function tekenRitmes(){
+  const w = $('#dpRitmes'); if (!w) return;
+  let d; try { d = await api('/api/vak/ritmes/mijn'); } catch(e){ w.innerHTML=''; return; }
+  const rit = d.ritmes || [];
+  if (!rit.length){ w.innerHTML=''; return; }
+  w.innerHTML = '<div class="dp-sub">Mijn vaste afspraken <span class="n">· '+rit.length+'</span></div>'+
+    '<div class="boutieks">'+rit.map(r =>
+      '<div class="boutiek" style="cursor:default;">'+
+        '<span class="stad">'+esc(r.zaak)+'</span>'+
+        '<span class="tag">'+esc(r.dienst)+' · '+(r.intervalWeken===1?'elke week':'elke '+r.intervalWeken+' weken')+' om '+esc(r.tijd)+'</span>'+
+        '<span class="meta">laatst gepland: '+esc(r.laatst)+'</span>'+
+        '<div class="rij"><button class="knop stil ritstop" data-id="'+esc(r.id)+'">Stop vaste afspraak</button></div>'+
+      '</div>').join('')+'</div>';
+  w.querySelectorAll('.ritstop').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/vak/ritme/stop', { id: b.dataset.id }); meld('Gestopt; de zaak krijgt bericht.'); tekenRitmes(); }
+    catch(e){ meld(e.message); }
+  }));
+}
+
+/* Hoe was het? Afgeronde klussen zonder beoordeling: 1 tot 5 sterren */
+async function tekenReviews(){
+  const w = $('#dpReviews'); if (!w) return;
+  let d; try { d = await api('/api/vak/reviews/open'); } catch(e){ w.innerHTML=''; return; }
+  const open = d.open || [];
+  if (!open.length){ w.innerHTML=''; return; }
+  w.innerHTML = '<div class="dp-sub">Hoe was het? <span class="n">· beoordeel je afgeronde klussen</span></div>'+
+    '<div class="boutieks">'+open.map(o =>
+      '<div class="boutiek" style="cursor:default;">'+
+        '<span class="stad">'+esc(o.zaak)+' · '+esc(o.datum)+'</span>'+
+        '<span class="tag">'+esc(o.dienst)+'</span>'+
+        '<div class="rij" data-ref="'+esc(o.ref)+'" data-code="'+esc(o.supplierCode)+'">'+
+          [1,2,3,4,5].map(n => '<button class="knop stil ster" data-n="'+n+'" aria-label="'+n+' sterren">✶'+n+'</button>').join('')+
+        '</div>'+
+      '</div>').join('')+'</div>';
+  w.querySelectorAll('.ster').forEach(b => b.addEventListener('click', async () => {
+    const rij = b.closest('[data-ref]');
+    try {
+      const r = await api('/api/vak/review', { supplierCode: rij.dataset.code, ref: rij.dataset.ref, sterren: Number(b.dataset.n) });
+      meld('Dank je wel; de zaak staat nu op ✶ '+r.score.score+' ('+r.score.aantal+').');
+      tekenReviews();
+    } catch(e){ meld(e.message); }
   }));
 }
 function openDienstZaak(code){
@@ -522,25 +568,49 @@ function boekDienst(code, dienstId){
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
       '<label class="opties" for="dbDatum">Datum</label><input class="veld" id="dbDatum" type="date" style="margin-bottom:.5rem;">'+
       '<label class="opties" for="dbTijd">Tijd</label><select class="veld" id="dbTijd" style="margin-bottom:.5rem;"><option value="">Kies eerst een datum</option></select>'+
+      '<label class="opties" for="dbHerhaal">Herhalen</label><select class="veld" id="dbHerhaal" style="margin-bottom:.5rem;">'+
+        '<option value="">Eenmalig</option><option value="1">Elke week</option><option value="2">Elke 2 weken</option><option value="4">Elke 4 weken</option></select>'+
       '<textarea class="veld" id="dbNote" rows="2" maxlength="140" placeholder="Opmerking voor de zaak (optioneel)" style="margin-bottom:.6rem;resize:vertical;"></textarea>'+
       '<button class="knop" id="dbGa" style="width:100%;">Vraag aan · '+(d.prijs?euro(d.prijs):'op aanvraag')+'</button>'+
-      '<p class="opties" style="margin-top:.5rem;">Je boekt op je codenaam; de zaak bevestigt je aanvraag in de app.</p>'+
+      '<button class="knop stil" id="dbWacht" style="width:100%;margin-top:.4rem;" hidden>Vol? Zet mij op de wachtlijst voor deze dag</button>'+
+      '<p class="opties" style="margin-top:.5rem;">Je boekt op je codenaam; de zaak bevestigt je aanvraag in de app. Een vaste afspraak stop je wanneer je wilt.</p>'+
     '</div></div>';
   document.body.appendChild(wrap);
   wrap.querySelector('#dbTerug').addEventListener('click', () => wrap.remove());
   const datum = wrap.querySelector('#dbDatum'), tijd = wrap.querySelector('#dbTijd');
   datum.min = new Date().toISOString().slice(0,10);
+  const wachtKnop = wrap.querySelector('#dbWacht');
   datum.addEventListener('change', async () => {
     tijd.innerHTML = '<option value="">Laden...</option>';
     try {
       const r = await api('/api/booking/slots', { supplierCode: code, serviceId: d.id, date: datum.value });
-      tijd.innerHTML = (r.tijden && r.tijden.length)
-        ? '<option value="">Kies een tijd</option>'+r.tijden.map(t => '<option>'+esc(t)+'</option>').join('')
-        : '<option value="">Geen vrije tijden op deze dag</option>';
+      const vol = !(r.tijden && r.tijden.length);
+      tijd.innerHTML = vol
+        ? '<option value="">Geen vrije tijden op deze dag</option>'
+        : '<option value="">Kies een tijd</option>'+r.tijden.map(t => '<option>'+esc(t)+'</option>').join('');
+      wachtKnop.hidden = !vol;
     } catch(e){ tijd.innerHTML = '<option value="">'+esc(e.message)+'</option>'; }
   });
-  wrap.querySelector('#dbGa').addEventListener('click', async () => {
+  wachtKnop.addEventListener('click', async () => {
     try {
+      await api('/api/vak/wachtlijst/zet', { supplierCode: code, serviceId: d.id, datum: datum.value });
+      wrap.remove();
+      meld('Je staat op de wachtlijst; komt er plek vrij, dan krijg je een seintje en boek je zelf.');
+    } catch(e){ meld(e.message); }
+  });
+  wrap.querySelector('#dbGa').addEventListener('click', async () => {
+    const herhaal = wrap.querySelector('#dbHerhaal').value;
+    try {
+      if (herhaal){
+        // een vaste afspraak: de eerste staat direct aangevraagd, daarna
+        // plant de app telkens de volgende; stoppen kan altijd
+        if (!tijd.value){ meld('Kies eerst een datum en tijd.'); return; }
+        const r = await api('/api/vak/ritme/start', { supplierCode: code, serviceId: d.id, intervalWeken: Number(herhaal), tijd: tijd.value, start: datum.value });
+        wrap.remove();
+        meld('Vaste afspraak gestart ('+r.ritme.id+'); de eerste staat aangevraagd voor '+r.boeking.wanneer+'.');
+        tekenOffertes();
+        return;
+      }
       const r = await api('/api/booking/request', { supplierCode: code, serviceId: d.id, date: datum.value, time: tijd.value, note: wrap.querySelector('#dbNote').value });
       wrap.remove();
       meld(r.boeking.status === 'wacht-op-betaling'

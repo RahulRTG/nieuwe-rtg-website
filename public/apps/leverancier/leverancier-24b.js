@@ -31,3 +31,16 @@
       try { await API.call('/supplier/vak/dienst/herhaal', { id: b.dataset.vphzet, mnd: inp && inp.value });
         kantoorMsg = ''+T('vp.herhok','Herhaal-interval bewaard.'); await refresh(); } catch(e){ toast(e.message); }
     }));
+    // Vakwerk Pro laag 2: ritme stoppen, wachtende uitnodigen, capaciteit
+    el.querySelectorAll('[data-vprstop]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/vak/ritme/stop', { id: b.dataset.vprstop });
+        vakPro = null; vakData = null; kantoorMsg = ''+T('vp.rstopok','Vaste afspraak gestopt; het lid krijgt bericht.'); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-vpwnodig]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/vak/wachtlijst/uitnodig', { id: b.dataset.vpwnodig });
+        vakPro = null; kantoorMsg = ''+T('vp.nodigok','Seintje gestuurd; het lid boekt zelf.'); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    const vpCapBtn = el.querySelector('#vpCapZet'); if (vpCapBtn) vpCapBtn.addEventListener('click', async () => {
+      try { const r = await API.call('/supplier/vak/capaciteit', { capaciteit: el.querySelector('#vpCap').value });
+        vakUren = r.uren; kantoorMsg = ''+T('vp.capok','Capaciteit bewaard; de tijdvakken rekenen er direct mee.'); await refresh(); } catch(e){ toast(e.message); }
+    });

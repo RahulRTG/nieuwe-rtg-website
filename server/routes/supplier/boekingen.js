@@ -28,6 +28,9 @@ app.post('/api/supplier/booking/status', supplierAuth, (req, res) => {
   }
   b.status = status;
   if (status === 'afgerond') b.finishedAt = new Date().toISOString();
+  // komt er een plek vrij, dan krijgt de eerste op de wachtlijst een seintje
+  if (status === 'geweigerd' && b.wanneer && kern.vakwerk && kern.vakwerk.wachtVrij)
+    kern.vakwerk.wachtVrij(req.supplier.code, String(b.wanneer).slice(0, 10));
   save();
   const MELDING = { bevestigd: 'Uw afspraak is bevestigd.', afgerond: 'Dank u wel; uw afspraak is afgerond.', geweigerd: 'Uw aanvraag kon helaas niet worden bevestigd.' };
   notify(b.customerTier, { icon: 'agenda', title: req.supplier.name, body: MELDING[status] + (b.wanneer && status === 'bevestigd' ? ' (' + b.wanneer + ')' : ''), scope: 'orders' });

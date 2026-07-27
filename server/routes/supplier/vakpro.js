@@ -8,17 +8,35 @@ module.exports = (kern) => {
   const vak = () => kern.vakwerk;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
-  // het pro-overzicht: alles voor het vandaag-bord in een aanroep
+  // het pro-overzicht: alles voor het vandaag-bord in een aanroep; de
+  // ritme-tick plant hier meteen de volgende vaste afspraken in
   app.post('/api/supplier/vak/pro', supplierAuth, (req, res) => {
     const code = req.supplier.code;
     if (!vak().isVak(req.supplier)) return res.status(403).json({ error: 'Alleen voor dienstverlenende zaken.' });
+    vak().ritmeTick(code);
     res.json({
       ok: true,
       offertes: vak().offertesVanZaak(code),
       werkbonOpen: vak().werkbonOpen(code),
       klanten: vak().klantenboek(code),
-      onderhoud: vak().onderhoudLijst(code)
+      onderhoud: vak().onderhoudLijst(code),
+      ritmes: vak().ritmesVanZaak(code),
+      wachtlijst: vak().wachtVanZaak(code),
+      beoordelingen: vak().reviewsVanZaak(code)
     });
+  });
+
+  app.post('/api/supplier/vak/ritme/stop', supplierAuth, (req, res) => {
+    stuur(res, vak().ritmeStop({ code: req.supplier.code }, (req.body || {}).id));
+  });
+  app.post('/api/supplier/vak/wachtlijst/uitnodig', supplierAuth, (req, res) => {
+    const r = vak().wachtUitnodig(req.supplier.code, req.body || {});
+    if (!r.error) logActivity(req.supplier.code, req.actor, 'nodigde een wachtende uit');
+    stuur(res, r);
+  });
+  app.post('/api/supplier/vak/capaciteit', supplierAuth, (req, res) => {
+    if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor de eigenaar.' });
+    stuur(res, vak().urenZet(req.supplier.code, { capaciteit: (req.body || {}).capaciteit }));
   });
 
   app.post('/api/supplier/vak/offerte/antwoord', supplierAuth, (req, res) => {

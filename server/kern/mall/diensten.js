@@ -10,6 +10,13 @@ module.exports = (ctx) => {
   const heeftDiensten = (s, types) =>
     ((types[s.type] || {}).caps || []).includes('services') && (s.services || []).length > 0;
 
+  // de beoordelingsscore van een zaak (gemiddelde sterren + aantal)
+  function score(code) {
+    const eigen = (db.data.vakReviews || []).filter(r => r.supplierCode === code);
+    if (!eigen.length) return null;
+    return { score: Math.round((eigen.reduce((n, r) => n + r.sterren, 0) / eigen.length) * 10) / 10, aantal: eigen.length };
+  }
+
   function kraam(s, def) {
     const diensten = (s.services || []).map(d => ({
       id: d.id, naam: d.name, uitleg: d.desc || null,
@@ -23,6 +30,7 @@ module.exports = (ctx) => {
       vak: s.vak || null,
       tagline: (s.mall && s.mall.tagline) || null,
       vanaf: prijzen.length ? Math.min(...prijzen) : null,
+      beoordeling: score(s.code),
       diensten
     };
   }

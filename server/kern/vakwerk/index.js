@@ -114,7 +114,7 @@ function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, scho
     crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe };
   const api = { GENRES: VAK_GENRES, isVak, bord };
   Object.assign(api, require('./agenda')(ctx), require('./advies')(ctx),
-    require('./pro')(ctx), require('./pro2')(ctx));
+    require('./pro')(ctx), require('./pro2')(ctx), require('./pro3')(ctx), require('./pro4')(ctx));
   return { vakwerk: api };
 }
 

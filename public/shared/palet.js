@@ -3,7 +3,8 @@
    elke app uit de canonieke catalogus (shared/rosapps.js), met je
    recente apps bovenaan en Rahul als vangnet -- staat het er niet
    tussen, dan opent de vraag zo in de metgezel. Pijltjes en Enter
-   werken; Esc sluit. Puur client-side, geen verkeer tot je springt. */
+   werken; Esc sluit. Puur client-side, geen verkeer tot je springt.
+   Sneltoets: Ctrl/Cmd+Spatie (Ctrl+K blijft van de app zelf). */
 (function () {
   'use strict';
   if (window.RTGPalet) return;
@@ -137,8 +138,10 @@
     if (wrap) { wrap.remove(); wrap = null; }
   }
 
+  /* Ctrl/Cmd+Spatie: het OS-niveau (Spotlight-gevoel); Ctrl+K blijft
+     vrij voor het eigen zoekvel van een app. */
   document.addEventListener('keydown', function (e) {
-    if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); open ? sluit() : toon(); }
+    if ((e.metaKey || e.ctrlKey) && e.code === 'Space') { e.preventDefault(); open ? sluit() : toon(); }
   });
 
   window.RTGPalet = { open: toon, sluit: sluit };

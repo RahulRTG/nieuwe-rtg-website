@@ -85,5 +85,12 @@
      of aan een actieve stationsstand van de zaak-app. */
   try { if (localStorage.getItem('rtg_sup_station')) wakker(true); } catch (e) {}
 
+  /* 6. Het ROS-palet erbij (shared/palet.js): Ctrl/Cmd+K, overal. */
+  if (!window.RTGPalet) {
+    var paletS = document.createElement('script');
+    paletS.src = '/shared/palet.js'; paletS.defer = true;
+    document.head.appendChild(paletS);
+  }
+
   window.RTGWauw = { vt: vt, tik: tik, deel: deel, badge: badge, wakker: wakker };
 })();

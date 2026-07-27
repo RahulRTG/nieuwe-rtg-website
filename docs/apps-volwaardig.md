@@ -1700,3 +1700,29 @@ precies het duwtje dat een tiener nodig heeft die bevriest bij een leeg
   knoppen, tabs, meldingen) zijn omgezet naar huisstijl-glyfen. Het
   stickerpalet van de snap-studio blijft bewust staan: stickers zijn
   beeldinhoud die het kind zelf kiest, geen interface-chrome.
+
+## RTG Vertaler: de vertaal-app op de eigen motor
+
+Een losse, volwaardige vertaal-app (/apps/vertaler.html) op de bestaande
+vertaalmotor (server/translate.js) -- geen tweede motor, een route:
+
+**Het scherm.** Typen of spreken (SpeechRecognition waar het toestel dat
+kan), live vertalen met een halve seconde rustpauze, voorlezen
+(speechSynthesis), kopieren, talen omwisselen, en reiszinnen per
+situatie (begroeten, restaurant, onderweg, hulp) die met een tik
+vertaald worden. Zestien talen in de lijst.
+
+**Eerlijk en prive.** Geschiedenis en bewaarde zinnen blijven in
+localStorage op het toestel; de server onthoudt gesprekken niet. Zonder
+AI-sleutel vertaalt het huiswoordenboek (nl<->en) en reist de
+eerlijkheidsvlag (vertaald:false) mee naar het scherm: "deze taal lukt
+nu even niet volledig" in plaats van neptaal.
+
+**AI-bedienbaar.** De route (POST /api/vertaal) loopt door de stuur-laag,
+dus "hoe zeg ik dit in het Japans" is voor Rahul een aanroep.
+
+Bedrading: route naast klok/galerij gemount, catalogusrij in de
+app-catalogus, appgids-entry (in deel5, dat nog ruimte had onder de
+10K-grens). Tests: vertaal.test.js (3: talenlijst + dicht zonder token,
+echte woordenboekvertaling, eerlijkheidsvlag) en vertaler.e2e.js door
+het scherm (live vertalen, bewaren op het toestel, reiszin).

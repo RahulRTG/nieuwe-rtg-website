@@ -64,5 +64,10 @@ module.exports = {
     'Algemene informatie over de Nederlandse regels, geen juridisch advies; je cao of school kan strenger zijn.'),
   '/apps/foundation/mediawijs.html': G('Online wijs: echte situaties van je telefoon, met eerlijke uitleg over wat je keuze oplevert.',
     ['Lees de situatie en kies wat je zou doen', 'Zie meteen waarom die keuze verstandig, matig of riskant is', 'Onthoud de regel die eronder staat en ga door naar de volgende'],
-    'Er is geen goed cijfer te halen; de bedoeling is dat je de valkuil herkent voordat hij echt langskomt.')
+    'Er is geen goed cijfer te halen; de bedoeling is dat je de valkuil herkent voordat hij echt langskomt.'),
+  '/apps/vertaler.html': G('RTG Vertaler: typen of spreken, live vertalen op de eigen motor.',
+    ['Kies de talen (of wissel ze om) en typ; na een halve seconde rust staat de vertaling er',
+     'Druk op Spreek om te dicteren en op Lees voor om de vertaling te horen',
+     'Onderweg? De reiszinnen per situatie vertalen met een tik; bewaar je vaste zinnen op het toestel'],
+    'Geschiedenis en bewaarde zinnen blijven op je toestel; zonder AI-sleutel vertaalt het huiswoordenboek en zegt de app eerlijk wat niet lukt.')
 };

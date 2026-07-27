@@ -63,12 +63,87 @@
     }
   }
 
+  // presentatiemodus: schermvullend, vanzelf doordraaiend -- voor een
+  // wandscherm of het teamoverleg; sluiten met Escape of de sluitknop
+  let presDia = 0, presKlok = null;
+  function presStop(){
+    const o = document.getElementById('zaakPresOverlay');
+    if (o) o.remove();
+    if (presKlok){ clearInterval(presKlok); presKlok = null; }
+    document.removeEventListener('keydown', presToets);
+  }
+  function presToets(e){ if (e.key === 'Escape') presStop(); }
+  function presEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])); }
+  function presDias(){
+    const b3 = ctx && ctx.boData; if (!b3 || b3.error) return [];
+    const eur2 = c => (ctx && ctx.eur) ? ctx.eur(c) : '€ ' + (Number(c || 0) / 100).toFixed(2);
+    const maxW = Math.max.apply(null, b3.week.map(d => d.omzet).concat([1]));
+    const kpiRij = [[T('bz.today','Omzet vandaag'), eur2(b3.stats.omzetVandaag)], [T('bz.trans','Transacties'), b3.stats.transactiesVandaag],
+      [T('bz.week','Weekomzet'), eur2(b3.stats.omzetWeek)], [T('bz.binnen','Nu ingeklokt'), b3.stats.binnenNu]];
+    const dias = [];
+    dias.push('<div class="zp-kpis">' + kpiRij.map(x => '<div><b>' + x[1] + '</b><span>' + x[0] + '</span></div>').join('') + '</div>');
+    dias.push('<h2>' + T('bz.weekh','Omzet per dag') + '</h2><div class="zp-staaf">' +
+      b3.week.map(d => '<div><i style="height:' + Math.max(2, Math.round(d.omzet / maxW * 100)) + '%"></i><span>' + presEsc(d.label) + '</span></div>').join('') + '</div>');
+    if ((b3.toppers || []).length) dias.push('<h2>' + T('bz.top','Toppers') + '</h2>' +
+      b3.toppers.slice(0, 5).map(t3 => '<div class="zp-rij"><b>' + presEsc(t3.naam) + '</b><span>' + t3.aantal + 'x</span></div>').join(''));
+    if (b3.briefing) dias.push('<h2>' + T('bz.brief','Dagbriefing') + '</h2><p class="zp-tekst">' + presEsc(b3.briefing) + '</p>');
+    const m3 = ctx.vwData && ctx.vwData.ok && ctx.vwData.morgen;
+    if (m3) dias.push('<h2>' + T('vw.h','Verwachting voor morgen') + '</h2><p class="zp-tekst">' +
+      m3.verwachtTransacties + ' ' + T('vw.trans','transacties') + ' &middot; ' + eur2(m3.verwachtCenten) + ' (' + presEsc(m3.dagNaam) + ')' +
+      (m3.advies ? '<br>' + presEsc(m3.advies) : '') + '</p>');
+    return dias;
+  }
+  function presTeken(){
+    const vlak = document.getElementById('zaakPresVlak');
+    const dias = presDias();
+    if (!vlak || !dias.length) return;
+    presDia = presDia % dias.length;
+    vlak.innerHTML = dias[presDia];
+  }
+  function zaakPresentatie(){
+    const b3 = ctx && ctx.boData;
+    if (!b3 || b3.error){ if (ctx && ctx.toast) ctx.toast(T('z3.geen', 'De backoffice is nog aan het laden.')); return; }
+    presStop();
+    const S2 = ctx.S;
+    const naam3 = (S2 && (S2.name || S2.naam)) || (S2 && S2.code) || '';
+    const o = document.createElement('div');
+    o.id = 'zaakPresOverlay';
+    o.innerHTML = '<style>' +
+      '#zaakPresOverlay{position:fixed;inset:0;z-index:9000;background:#0C0C0B;color:#F4F1EC;display:flex;flex-direction:column;font-family:"Inter",system-ui,sans-serif;}' +
+      '#zaakPresOverlay .zp-kop{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 1.6rem;border-bottom:1px solid rgba(244,241,236,.14);}' +
+      '#zaakPresOverlay .zp-kop b{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.15rem;letter-spacing:.02em;}' +
+      '#zaakPresOverlay .zp-kop button{background:none;border:1px solid rgba(244,241,236,.3);color:#F4F1EC;border-radius:999px;padding:.35rem 1rem;font:inherit;font-size:.8rem;cursor:pointer;}' +
+      '#zaakPresVlak{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:1.2rem;padding:2rem;text-align:center;}' +
+      '#zaakPresVlak h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:clamp(1.4rem,3.5vw,2.4rem);}' +
+      '#zaakPresOverlay .zp-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:1.2rem;width:min(60rem,90%);}' +
+      '#zaakPresOverlay .zp-kpis b{display:block;font-family:"Bodoni Moda",serif;font-weight:500;font-size:clamp(1.8rem,4.5vw,3.2rem);color:#A98F1C;}' +
+      '#zaakPresOverlay .zp-kpis span{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,241,236,.62);}' +
+      '#zaakPresOverlay .zp-staaf{display:flex;align-items:flex-end;gap:1rem;height:38vh;width:min(56rem,88%);}' +
+      '#zaakPresOverlay .zp-staaf>div{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:.4rem;font-size:.75rem;color:rgba(244,241,236,.62);}' +
+      '#zaakPresOverlay .zp-staaf i{display:block;width:100%;max-width:70px;margin:0 auto;background:#A98F1C;border-radius:6px 6px 3px 3px;}' +
+      '#zaakPresOverlay .zp-staaf>div:last-child i{background:#7F1634;}' +
+      '#zaakPresOverlay .zp-rij{display:flex;justify-content:space-between;gap:2rem;width:min(34rem,86%);font-size:1.05rem;padding:.5rem 0;border-bottom:1px solid rgba(244,241,236,.14);}' +
+      '#zaakPresOverlay .zp-tekst{max-width:44rem;font-size:1.05rem;line-height:1.7;color:rgba(244,241,236,.78);}' +
+      '</style>' +
+      '<div class="zp-kop"><b>' + presEsc(naam3) + '</b>' +
+      '<button type="button" id="zaakPresDicht">' + T('z3.sluit','Sluiten') + '</button></div>' +
+      '<div id="zaakPresVlak"></div>';
+    document.body.appendChild(o);
+    o.querySelector('#zaakPresDicht').addEventListener('click', presStop);
+    document.addEventListener('keydown', presToets);
+    presDia = 0;
+    presTeken();
+    presKlok = setInterval(() => { presDia++; presTeken(); }, 8000);
+  }
+
   // de app roept dit bij elke bo-render aan en geeft zijn verse context mee
   window.RTGZaakKantoor = {
     bind: function(el, c){
       ctx = c || ctx;
       const rb = el.querySelector('#boRapport');
       if (rb) rb.addEventListener('click', () => { if (window.RTGZaakRapport) RTGZaakRapport.open(ctx); });
+      const pb = el.querySelector('#boPresent');
+      if (pb) pb.addEventListener('click', zaakPresentatie);
       zaak3dTeken();
     }
   };

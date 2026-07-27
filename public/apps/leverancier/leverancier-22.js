@@ -71,6 +71,8 @@
     });
     // de kantoorvleugel (los script): 3D-weekskyline + het drukklare Weekrapport
     if (window.RTGZaakKantoor) RTGZaakKantoor.bind(el, { boData: boData, vwData: vwData, T: T, S: S, toast: toast, esc: esc, eur: eur, lang: lang });
+    // hr-plus (los script): de volle HR-kamer op de eigen API
+    if (window.RTGZaakHR) RTGZaakHR.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, staff: (state && state.staff) || [] });
     // synergie: tekenen, stoppen en een nieuwe deal voorstellen
     const synVer = async () => { boData = null; synData = null; await refresh(); };
     el.querySelectorAll('[data-synkans]').forEach(b => b.addEventListener('click', async () => {

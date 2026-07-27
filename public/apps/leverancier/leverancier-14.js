@@ -22,7 +22,8 @@
           '<div class="tkc-who" style="margin-top:0.5rem;">'+T('bz.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div>'+
           '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;">'+
           '<button class="obtn" id="boBrief">'+T('bz.brief','Dagbriefing')+'</button>'+
-          '<button class="obtn ghost" id="boRapport">'+T('z3.rapport','Weekrapport')+' (print)</button></div>'+
+          '<button class="obtn ghost" id="boRapport">'+T('z3.rapport','Weekrapport')+' (print)</button>'+
+          '<button class="obtn ghost" id="boPresent">'+T('z3.pres','Presentatie')+'</button></div>'+
           '<div id="boBriefTxt" style="display:none;border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;"></div></div>';
         // de kantoorvleugel: de week als 3D-skyline op de huiseigen Drie-motor
         html += '<div class="tkc" id="zaak3dKaart" style="grid-column:1/-1;"><h3>'+T('z3.h','De zaak in 3D')+'</h3>'+

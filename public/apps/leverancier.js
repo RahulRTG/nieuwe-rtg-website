@@ -1630,7 +1630,8 @@
           '<div class="tkc-who" style="margin-top:0.5rem;">'+T('bz.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div>'+
           '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;">'+
           '<button class="obtn" id="boBrief">'+T('bz.brief','Dagbriefing')+'</button>'+
-          '<button class="obtn ghost" id="boRapport">'+T('z3.rapport','Weekrapport')+' (print)</button></div>'+
+          '<button class="obtn ghost" id="boRapport">'+T('z3.rapport','Weekrapport')+' (print)</button>'+
+          '<button class="obtn ghost" id="boPresent">'+T('z3.pres','Presentatie')+'</button></div>'+
           '<div id="boBriefTxt" style="display:none;border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;"></div></div>';
         // de kantoorvleugel: de week als 3D-skyline op de huiseigen Drie-motor
         html += '<div class="tkc" id="zaak3dKaart" style="grid-column:1/-1;"><h3>'+T('z3.h','De zaak in 3D')+'</h3>'+
@@ -1850,6 +1851,12 @@
         (klok2.binnen.length ? klok2.binnen.map(n => '<div class="st-row"><span>\uD83D\uDFE2 '+n+'</span></div>').join('')
           : '<div class="tkc-who">'+T('kt.niemandin','Niemand is nu ingeklokt.')+'</div>')+
         (klok2.vandaag.length ? '<div class="tkc-who" style="margin-top:0.4rem;">'+T('kt.klokv','Vandaag geklokt')+': '+klok2.vandaag.length+' '+T('kt.klokr','registratie(s)')+' \u00B7 '+[...new Set(klok2.vandaag.map(e=>e.name))].length+' '+T('kt.klokp','personen')+'</div>' : '')+'</div>';
+    }
+    if (kantoorSec === 'hr'){
+      // hr-plus (los script leverancier-hr.js): inwerktrajecten,
+      // groeigesprekken, certificaten & bevoegdheden en dienstjaren;
+      // display:contents laat de kaarten in het kantoorraster meelopen
+      html += '<div id="hrPlusWortel" style="display:contents;"></div>';
     }
     if (kantoorSec === 'keuken' || kantoorSec === 'bar'){
       const stn = kantoorSec;
@@ -2324,6 +2331,8 @@
     });
     // de kantoorvleugel (los script): 3D-weekskyline + het drukklare Weekrapport
     if (window.RTGZaakKantoor) RTGZaakKantoor.bind(el, { boData: boData, vwData: vwData, T: T, S: S, toast: toast, esc: esc, eur: eur, lang: lang });
+    // hr-plus (los script): de volle HR-kamer op de eigen API
+    if (window.RTGZaakHR) RTGZaakHR.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, staff: (state && state.staff) || [] });
     // synergie: tekenen, stoppen en een nieuwe deal voorstellen
     const synVer = async () => { boData = null; synData = null; await refresh(); };
     el.querySelectorAll('[data-synkans]').forEach(b => b.addEventListener('click', async () => {

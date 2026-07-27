@@ -82,7 +82,10 @@ async function startEens(opts) {
   // geladen is (belangrijk in Postgres-modus), en een test die meteen na
   // "gezond" een API aanroept zou daarop stranden.
   const wachtPad = opts.wachtPad || '/api/ready';
-  const pogingen = opts.pogingen || 150;
+  // 250 x 100ms = 25s: als de hele suite parallel draait boot een server soms
+  // ruim boven de 15s die hier eerst stond (twee keer zo gezien in een verder
+  // groene run); dit is alleen geduld op het foutpad, een snelle boot blijft snel
+  const pogingen = opts.pogingen || 250;
   const port = await vrijePoort();
   const base = 'http://127.0.0.1:' + port;
   // Zonder eigen stderr-optie vangen we de stderr op (pipe) om de strenge poort te

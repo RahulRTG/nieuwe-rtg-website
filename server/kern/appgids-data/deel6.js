@@ -90,5 +90,8 @@ module.exports = {
     'Plan je ritten om de voorspelde pieken heen; tien minuten schuiven scheelt vaak een half uur file.'),
   '/apps/vonk.html': G('RTG Vonk: kennismaken op wensen, met een reservering in het midden.',
     ['Vertel wat jij zoekt', 'Bij een wederzijdse like regelt de app een plek in het midden', 'De eerste ronde is geregeld; de rest is aan jullie'],
-    'Wees eerlijk in je wensen; de match wordt er alleen maar beter van.')
+    'Wees eerlijk in je wensen; de match wordt er alleen maar beter van.'),
+  '/apps/rtgschool.html': G('RTG School: je leerpaspoort dat een leven lang meegaat, met lessen, oefenen, examentraining en je eigen Rahul Bijles.',
+    ['Schrijf je in op je fase van de officiele ladder; je paspoort telt elk behaald leerdoel mee', 'Kies een groep of fase, lees de les en oefen vijf opgaven; bij vier goed wordt het doel bijgeschreven', 'Train voor een examen (terugblik pas aan het eind) of vraag het niveau-advies; Rahul Bijles legt alles geduldig uit op jouw niveau'],
+    'Alles hier is oefening en advies: over overgaan, toelating en echte examens beslissen mensen en de officiele instellingen. Geen scores buiten de sessie, geen ranglijsten; leren is geen wedstrijd.')
 };

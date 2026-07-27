@@ -12,6 +12,7 @@
     { naam: 'RTG Mall',        url: '/apps/mall.html' },
     { naam: 'Food Court',      url: '/apps/foodcourt.html' },
     { naam: 'Spelen',          url: '/apps/spelen.html' },
+    { naam: 'RTG School',      url: '/apps/rtgschool.html' },
     { naam: 'Vrienden',        url: '/apps/foundation/vrienden.html' },
     { naam: 'Berichten',       url: '/apps/berichten.html' },
     { naam: 'Camera',          url: '/apps/camera.html' },

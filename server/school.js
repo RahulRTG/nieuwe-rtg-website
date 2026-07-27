@@ -109,4 +109,5 @@ module.exports = (ctx) => {
   Object.assign(sctx, require('./school/klas')(sctx));
   require('./school/gezin')(sctx);
   require('./school/planner')(sctx);
+  require('./school/toets')(sctx); // toetsen (SO/MO/proefwerk/examen) op de leerstof-motor
 };

@@ -15,21 +15,23 @@ const { opgave } = require('./leerstof-gen');
 const OPGAVEN_PER_SESSIE = 5;
 const BEHAALD_BIJ = 4;
 
-function maakLeerstof({ db, save, onderwijs }) {
-  const nu = () => new Date().toISOString();
-
-  /* alle leerdoelen plat, geindexeerd op id, met vak en groep erbij */
-  const DOELEN = {};
-  const PER_GROEP = {};
-  for (const [vak, lijn] of [['rekenen', REKENEN], ['taal', TAAL]]) {
-    for (const g of lijn) {
-      PER_GROEP[g.groep] = PER_GROEP[g.groep] || [];
-      for (const d of g.doelen) {
-        DOELEN[d.id] = Object.assign({ vak, groep: g.groep }, d);
-        PER_GROEP[g.groep].push(d.id);
-      }
+/* alle leerdoelen plat, geindexeerd op id, met vak en groep erbij -- op
+   moduleniveau, zodat ook de schooltoetsen (school/toets.js) uit dezelfde
+   bibliotheek putten zonder de stateful motor nodig te hebben */
+const DOELEN = {};
+const PER_GROEP = {};
+for (const [vak, lijn] of [['rekenen', REKENEN], ['taal', TAAL]]) {
+  for (const g of lijn) {
+    PER_GROEP[g.groep] = PER_GROEP[g.groep] || [];
+    for (const d of g.doelen) {
+      DOELEN[d.id] = Object.assign({ vak, groep: g.groep }, d);
+      PER_GROEP[g.groep].push(d.id);
     }
   }
+}
+
+function maakLeerstof({ db, save, onderwijs }) {
+  const nu = () => new Date().toISOString();
 
   function sessies() {
     if (!db.data.leerstofSessies || typeof db.data.leerstofSessies !== 'object') db.data.leerstofSessies = {};
@@ -102,4 +104,4 @@ function maakLeerstof({ db, save, onderwijs }) {
   return { leerstofVakken: vakken, leerstofLes: les, leerstofOefenStart: oefenStart, leerstofOefenAntwoord: oefenAntwoord, DOELEN };
 }
 
-module.exports = { maakLeerstof };
+module.exports = { maakLeerstof, DOELEN };

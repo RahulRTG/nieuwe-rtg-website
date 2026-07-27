@@ -1841,3 +1841,23 @@ oefening met een vriendelijk advies -- bewust geen scores buiten de sessie,
 geen reeksen en geen ranglijsten. Routes onder `/api/leerstof/*`
 (vakken, les, oefen, antwoord), via de stuur-laag Rahul-bedienbaar
 ("overhoor me de tafel van 7"). De testleerling rekent de sommen echt uit.
+
+## RTG School x de klas: toetsen uit de leerlijn, in een tik
+
+De koppeling tussen de leerstof-motor en het bestaande schoolkanaal
+("slimmer dan Magister"). De leraar opent de leerdoelen-bibliotheek
+(`/school/toets/bibliotheek`, alle leerdoelen per groep), vinkt er een paar
+aan en kiest SO, proefwerk of examen -- klaar. De motor maakt voor ELKE
+leerling verse opgaven (afkijken heeft geen zin) en kijkt zelf na; anders
+dan bij het oefenen verklikt een toets niet halverwege wat goed was, want
+nakijken hoort na het inleveren. Bij een MO (mondeling) draait de stroom
+om: de leraar krijgt de vragen met antwoorden op het scherm en vinkt af
+tijdens het gesprek. De uitslag is per leerdoel uitgesplitst, zodat de
+leraar ziet wat de klas nog moeilijk vindt, en het cijfervoorstel
+(1 + 9 x goed/totaal) is een ADVIES: de leraar beslist, mag afwijken, en
+zet het met een tik in het bestaande cijferboek van de klas -- waar het
+gezin het ziet zoals altijd, afgeschermd per kind. Deelmodule
+server/school/toets.js op de school-context; de leerdoelen komen statisch
+uit kern/leerstof.js, dus de klas en de leden-app putten uit exact dezelfde
+leerlijn. Getest over de hele keten (school, juf, klas, gezin, kind dat de
+sommen echt uitrekent) in test/schooltoets.test.js.

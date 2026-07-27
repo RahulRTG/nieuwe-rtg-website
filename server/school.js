@@ -116,4 +116,5 @@ module.exports = (ctx) => {
   require('./school/verbonden')(sctx); // lerarenteam, overname, online les, oefen-huiswerk
   require('./school/excursie')(sctx); // excursies: tijdelijke GPS met toestemming + kijklog
   require('./school/bijdrage')(sctx); // vrijwillige ouderbijdrage + telefoonboom
+  require('./school/bijles')(sctx); // de eigen Rahul Bijles van elk kind
 };

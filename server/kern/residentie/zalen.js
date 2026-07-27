@@ -117,6 +117,15 @@ const ZALEN = {
       ['bank', 0, 8], ['palm', 0, 0], ['palm', 11, 4], ['lamp', 0, 4], ['lamp', 11, 8]
     ]
   },
+  renbaan: {
+    naam: 'De Renbaan', sub: 'karts en kerbstones, de grand prix van het huis',
+    b: 13, d: 9, spawn: [6, 8],
+    meubels: [
+      ['dansvloer', 2, 1], ['dansvloer', 4, 1], ['dansvloer', 6, 1], ['dansvloer', 8, 1],
+      ['golfmat', 2, 6], ['golfmat', 5, 6], ['golfmat', 8, 6], ['golfmat', 11, 6],
+      ['bank', 0, 8], ['bank', 12, 8], ['lamp', 0, 0], ['lamp', 12, 0], ['palm', 0, 4], ['palm', 12, 4]
+    ]
+  },
   sterrenwacht: {
     naam: 'De Sterrenwacht', sub: 'stil samen kijken, hoog boven het huis',
     b: 11, d: 9, spawn: [5, 8],

@@ -90,7 +90,7 @@ test('de gids: alle zalen met wie er is, en open suites op codenaam', async () =
   await api(base, '/api/residentie/betreed', { kamer: 'bar' }, b.token);
   const g = await api(base, '/api/residentie/gids', {}, b.token);
   assert.equal(g.status, 200);
-  assert.equal(g.body.zalen.length, 12, 'de klassieke zalen plus alle activiteitenzalen');
+  assert.equal(g.body.zalen.length, 13, 'de klassieke zalen plus alle activiteitenzalen');
   assert.ok(g.body.zalen.find(z => z.id === 'bar').aanwezig >= 1);
   const mijn = g.body.suites.find(s => s.adres === 'suite:' + ik);
   assert.ok(mijn && mijn.naam === 'Salon Prive');

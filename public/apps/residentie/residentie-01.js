@@ -28,7 +28,8 @@
   // elke zaal een eigen ondertoon in het licht
   const SFEER = { lobby: '#D8B858', bar: '#D24A6E', bibliotheek: '#C09A48', terras: '#5C82A6',
     golf: '#4E8A5E', kegel: '#A66E38', badhuis: '#4A96AA', restaurant: '#9E1C40',
-    balzaal: '#C9A050', biljart: '#3E7A50', boog: '#8A6E3A', sterrenwacht: '#3A4E7A' };
+    balzaal: '#C9A050', biljart: '#3E7A50', boog: '#8A6E3A', sterrenwacht: '#3A4E7A',
+    renbaan: '#A64A2E' };
 
   /* ---------- canvas en isometrie ---------- */
   const canvas = $('#wereld'), ctx = canvas.getContext('2d');

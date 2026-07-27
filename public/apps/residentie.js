@@ -28,7 +28,8 @@
   // elke zaal een eigen ondertoon in het licht
   const SFEER = { lobby: '#D8B858', bar: '#D24A6E', bibliotheek: '#C09A48', terras: '#5C82A6',
     golf: '#4E8A5E', kegel: '#A66E38', badhuis: '#4A96AA', restaurant: '#9E1C40',
-    balzaal: '#C9A050', biljart: '#3E7A50', boog: '#8A6E3A', sterrenwacht: '#3A4E7A' };
+    balzaal: '#C9A050', biljart: '#3E7A50', boog: '#8A6E3A', sterrenwacht: '#3A4E7A',
+    renbaan: '#A64A2E' };
 
   /* ---------- canvas en isometrie ---------- */
   const canvas = $('#wereld'), ctx = canvas.getContext('2d');
@@ -693,10 +694,13 @@
      de zaal uit, de ander zegt ja, en om de beurt speelt u met de
      timing-meter. Geen ranglijsten -- de uitslag is van het moment. */
   const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen',
-    balzaal: 'dansen', biljart: 'biljart', boog: 'boogschieten' };
+    balzaal: 'dansen', biljart: 'biljart', boog: 'boogschieten', renbaan: 'racen' };
   const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem',
-    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet' };
+    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet', racen: 'Geef gas' };
   let P = null, meterAan = false, meterWaarde = 0;
+  // tikspellen: geen timing-meter maar tikken -- het tempo is de kracht
+  const TIK = { zwemmen: 1, racen: 1 };
+  let gas = null; // { taps, tot } tijdens een tik-beurt
 
   function kamerKnoppen() {
     const spel = S.kamer && SPELZAAL[S.kamer.id];
@@ -704,7 +708,7 @@
     $('#knopVraag').hidden = !(S.kamer && (S.kamer.id === 'restaurant' || S.kamer.soort === 'suite'));
     $('#knopPaar').hidden = !S.kamer;
     zetKnopPaar();
-    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; sceneDicht(); }
+    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; gas = null; $('#spelBalk').hidden = true; sceneDicht(); }
   }
 
   $('#knopSpel').addEventListener('click', () => {
@@ -728,6 +732,7 @@
     P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
+    $('#spelPin').parentElement.style.opacity = TIK[P.spel] ? '0.25' : '1';
     tekenSpel(); sceneOpen(P.spel);
     if (!meterAan) { meterAan = true; requestAnimationFrame(meterLus); }
   }
@@ -751,12 +756,25 @@
   $('#spelDoe').addEventListener('click', async () => {
     if (!P) return;
     if (P.aanZet !== S.ik) return meld('De ander is aan zet.');
+    if (TIK[P.spel]) { // eerste druk opent het tikvenster, elke tik erna telt
+      if (gas) { gas.taps++; return; }
+      gas = { taps: 0, tot: performance.now() + 3500 };
+      setTimeout(gasKlaar, 3500);
+      return;
+    }
     try { verwerkZet(await api('/api/residentie/spel/zet', { kracht: meterWaarde }), S.ik); }
     catch (e) { meld(e.message); }
   });
+  function gasKlaar() {
+    if (!gas) return;
+    const kr = Math.min(100, Math.round(gas.taps * 4.5));
+    gas = null;
+    if (!P) return;
+    api('/api/residentie/spel/zet', { kracht: kr }).then(d => verwerkZet(d, S.ik)).catch(e => meld(e.message));
+  }
   $('#spelWeg').addEventListener('click', async () => {
     try { await api('/api/residentie/spel/stop', {}); } catch (e) {}
-    P = null; $('#spelBalk').hidden = true; sceneDicht();
+    P = null; gas = null; $('#spelBalk').hidden = true; sceneDicht();
   });
 
   function verwerkZet(d, wie) {
@@ -805,7 +823,7 @@
     if (d.kind === 'spel-start') startPotje(d);
     if (d.kind === 'spel-zet' && d.codenaam !== S.ik) verwerkZet(d, d.codenaam);
     if (d.kind === 'spel-afgewezen') meld(d.van + ' slaat het potje even over.');
-    if (d.kind === 'spel-gestopt') { P = null; $('#spelBalk').hidden = true; sceneDicht(); meld('Het potje is gestopt.'); }
+    if (d.kind === 'spel-gestopt') { P = null; gas = null; $('#spelBalk').hidden = true; sceneDicht(); meld('Het potje is gestopt.'); }
   }
 
   /* ---------- deel 3c: de vragen van het huis en de huistelefoon ----------
@@ -964,7 +982,7 @@
      dansvloer glanst. En boven de speler zweeft het puntenaantal omhoog. */
   const EFX = [];
   const RAAK = { golf: p => p <= 1, darts: p => p >= 40, kegelen: p => p >= 9, zwemmen: p => p <= 7.5,
-    biljart: p => p >= 2, boogschieten: p => p >= 9, dansen: p => p >= 35 };
+    biljart: p => p >= 2, boogschieten: p => p >= 9, dansen: p => p >= 35, racen: p => p >= 85 };
 
   function doelVan(spel, l) {
     const zoek = soorten => {
@@ -1357,7 +1375,9 @@
         c.beginPath(); c.arc(tx + tw * i / 4, ty + th + 8, 2.2, 0, Math.PI * 2); c.fill(); }
       const b = this.ballen(tx, ty, tw, th);
       if (beurt) {
-        const hk = m / 100 * Math.PI * 2;
+        // de lijn wijst pas op het topje van de meter precies naar de rode
+        const naarRood = Math.atan2(b.ry - b.wy, b.rx - b.wx);
+        const hk = naarRood + (100 - m) / 100 * Math.PI;
         c.setLineDash([5, 7]); c.strokeStyle = 'rgba(242,236,220,0.75)'; c.lineWidth = 1.6;
         c.beginPath(); c.moveTo(b.wx, b.wy); c.lineTo(b.wx + Math.cos(hk) * tw * 0.32, b.wy + Math.sin(hk) * tw * 0.32); c.stroke();
         c.setLineDash([]);
@@ -1403,9 +1423,13 @@
       for (let i = 1; i < n; i++) { c.beginPath(); c.moveTo(px + pw * i / n, py); c.lineTo(px + pw * i / n, py + ph); c.stroke(); }
       c.setLineDash([]);
       const t2 = Date.now() / 600;
+      // wie sneller zwemt (minder seconden) ligt zichtbaar iets voor
+      const sommen = sp.map(s2 => s2.punten.reduce((a2, b2) => a2 + b2, 0));
+      const gem = sommen.reduce((a2, b2) => a2 + b2, 0) / (sommen.length || 1);
       sp.forEach((s2, i) => {
         const lx = px + pw * (i + 0.5) / n;
-        const v = Math.min(1, s2.punten.length / ((P && P.beurten) || 4));
+        const voor = Math.max(-0.05, Math.min(0.05, (gem - sommen[i]) * 0.01));
+        const v = Math.max(0, Math.min(1, s2.punten.length / ((P && P.beurten) || 4) + voor));
         const y = py + ph - 26 - v * (ph - 56);
         c.strokeStyle = 'rgba(242,236,220,0.5)'; c.lineWidth = 1.2;
         c.beginPath(); c.ellipse(lx, y, 13 + Math.sin(t2 + i) * 2, 6, 0, 0, Math.PI * 2); c.stroke();
@@ -1415,9 +1439,16 @@
         c.fillStyle = '#EFE8D6'; c.font = '600 10px Inter, sans-serif'; c.textAlign = 'center';
         c.fillText(s2.codenaam, lx, py + ph + 18 + (i % 2) * 12);
       });
-      if (beurt) { c.fillStyle = 'rgba(216,184,88,0.9)'; c.font = '600 11px Inter, sans-serif'; c.textAlign = 'center';
-        c.fillText('duik op het topje van de meter', W / 2, py - 12); }
-      kopScene('Baantjes trekken', 'vier banen, de snelste tijd wint');
+      if (beurt) {
+        c.textAlign = 'center'; c.fillStyle = 'rgba(216,184,88,0.9)'; c.font = '600 11px Inter, sans-serif';
+        if (gas) {
+          const rest = Math.max(0, (gas.tot - performance.now()) / 1000);
+          c.fillText('tik, tik, tik -- nog ' + rest.toFixed(1) + ' s', W / 2, py - 12);
+          c.font = '500 34px "Bodoni Moda", serif'; c.fillStyle = '#F2ECDC';
+          c.fillText(String(gas.taps), W / 2, py + 42);
+        } else c.fillText('druk op Zwem en tik dan zo snel als u kunt', W / 2, py - 12);
+      }
+      kopScene('Baantjes trekken', 'tik uzelf door het water, de snelste tijd wint');
     },
     anim(c, W, H, a, t) {
       const { px, py, pw, ph } = this.vak(W, H);
@@ -1433,6 +1464,9 @@
     }
   };
 
+
+  /* ---------- deel 3i: de vloerscenes ----------
+     De dansvloer in het spotlicht en (verderop) de renbaan van het huis. */
   SCENES.dansen = {
     teken(c, W, H, m, beurt) {
       doek('#100C0A', '#070505');
@@ -1470,6 +1504,77 @@
         }
       }
       puntZweef(cx, fy - 90, a, t);
+    }
+  };
+
+  function kart(c, x, y, eigen, s) { // een kart van achteren, met gemaskerde coureur
+    c.fillStyle = '#0A0908';
+    c.fillRect(x - 11 * s, y - 3 * s, 5 * s, 8 * s); c.fillRect(x + 6 * s, y - 3 * s, 5 * s, 8 * s);
+    c.fillStyle = eigen ? '#7F1634' : '#1E1910';
+    c.fillRect(x - 8 * s, y - 8 * s, 16 * s, 11 * s);
+    c.strokeStyle = 'rgba(216,184,88,0.8)'; c.lineWidth = 1.2;
+    c.strokeRect(x - 8 * s, y - 8 * s, 16 * s, 11 * s);
+    c.fillStyle = '#D8B858'; // de helm als masker
+    c.beginPath(); c.ellipse(x, y - 12 * s, 5.5 * s, 4.5 * s, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = eigen ? '#D24A6E' : '#F2ECDC';
+    c.fillRect(x - 6 * s, y - 20 * s, 12 * s, 2.2 * s); // het vleugeltje
+  }
+
+  SCENES.racen = {
+    teken(c, W, H, m, beurt) {
+      doek('#15120E', '#0A0806');
+      const b = baan('#3A3630', '#242019', 'rgba(216,184,88,0.4)');
+      for (let k = 0; k < 20; k++) { // kerbstones langs beide randen
+        const v = k * 0.05;
+        for (const zij of [-1.22, 1.22]) {
+          const [x, y] = opBaan(b, v, zij);
+          c.fillStyle = k % 2 ? '#7F1634' : '#EFE8D6';
+          c.fillRect(x - 5, y - 3, 10, 5);
+        }
+      }
+      const [fx, fy] = opBaan(b, 0.94, 0), fw = b.tw * 1.05; // de geblokte finish
+      for (let i = 0; i < 10; i++) for (let j = 0; j < 2; j++) {
+        c.fillStyle = (i + j) % 2 ? '#16130E' : '#EFE8D6';
+        c.fillRect(fx - fw / 2 + i * fw / 10, fy - 6 + j * 5, fw / 10, 5);
+      }
+      c.setLineDash([8, 12]); c.strokeStyle = 'rgba(242,236,220,0.28)'; c.lineWidth = 2;
+      const [m1x, m1y] = opBaan(b, 0, 0), [m2x, m2y] = opBaan(b, 0.92, 0);
+      c.beginPath(); c.moveTo(m1x, m1y); c.lineTo(m2x, m2y); c.stroke(); c.setLineDash([]);
+      const sp = (P && P.spelers) || [], tot = ((P && P.beurten) || 4) * 100;
+      sp.forEach((s2, i) => {
+        const zij = sp.length > 2 ? -0.75 + i * 0.5 : (i ? 0.45 : -0.45);
+        const afs = s2.punten.reduce((a2, b2) => a2 + b2, 0);
+        let v = 0.14 + Math.min(1, afs / tot) * 0.74;
+        if (gas && beurt && s2.codenaam === S.ik) v += Math.min(0.03, gas.taps * 0.0012);
+        const [kx, ky] = opBaan(b, v, zij);
+        kart(c, kx, ky, s2.codenaam === S.ik, 1.15 - v * 0.55);
+        c.fillStyle = '#EFE8D6'; c.font = '600 9px Inter, sans-serif'; c.textAlign = 'center';
+        c.fillText(s2.codenaam, kx, ky + 16);
+      });
+      if (beurt) {
+        c.textAlign = 'center'; c.fillStyle = 'rgba(216,184,88,0.9)'; c.font = '600 11px Inter, sans-serif';
+        if (gas) {
+          const rest = Math.max(0, (gas.tot - performance.now()) / 1000);
+          c.fillText('tik, tik, tik -- nog ' + rest.toFixed(1) + ' s', W / 2, 226);
+          c.font = '500 34px "Bodoni Moda", serif'; c.fillStyle = '#F2ECDC';
+          c.fillText(String(gas.taps), W / 2, 268);
+        } else c.fillText('druk op Geef gas en tik dan zo snel als u kunt', W / 2, 226);
+      }
+      kopScene('De Grand Prix van het huis', 'tik uzelf naar de finish');
+    },
+    anim(c, W, H, a, t) {
+      const b = baanVak(), sp = (P && P.spelers) || [];
+      const i = Math.max(0, sp.findIndex(s2 => s2.codenaam === a.wie));
+      const zij = sp.length > 2 ? -0.75 + i * 0.5 : (i ? 0.45 : -0.45);
+      const afs = sp[i] ? sp[i].punten.reduce((a2, b2) => a2 + b2, 0) : 0;
+      const v = 0.14 + Math.min(1, afs / (((P && P.beurten) || 4) * 100)) * 0.74;
+      const [x, y] = opBaan(b, v, zij);
+      c.strokeStyle = 'rgba(216,184,88,' + Math.max(0, 0.7 - t) + ')'; c.lineWidth = 2;
+      for (let k = 0; k < 3; k++) { // stofwolkjes achter de kart
+        c.beginPath(); c.arc(x - 8 + k * 8, y + 10 + t * 26, 3 + t * 9, 0, Math.PI * 2); c.stroke();
+      }
+      if (a.raak) sceneVonken(x, y - 10, t, '#E3C878');
+      puntZweef(x, y - 26, a, t);
     }
   };
 

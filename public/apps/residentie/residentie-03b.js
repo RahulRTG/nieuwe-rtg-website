@@ -4,10 +4,13 @@
      de zaal uit, de ander zegt ja, en om de beurt speelt u met de
      timing-meter. Geen ranglijsten -- de uitslag is van het moment. */
   const SPELZAAL = { golf: 'golf', bar: 'darts', kegel: 'kegelen', badhuis: 'zwemmen',
-    balzaal: 'dansen', biljart: 'biljart', boog: 'boogschieten' };
+    balzaal: 'dansen', biljart: 'biljart', boog: 'boogschieten', renbaan: 'racen' };
   const SPELWERK = { golf: 'Sla af', darts: 'Gooi', kegelen: 'Rol', zwemmen: 'Zwem',
-    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet' };
+    dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet', racen: 'Geef gas' };
   let P = null, meterAan = false, meterWaarde = 0;
+  // tikspellen: geen timing-meter maar tikken -- het tempo is de kracht
+  const TIK = { zwemmen: 1, racen: 1 };
+  let gas = null; // { taps, tot } tijdens een tik-beurt
 
   function kamerKnoppen() {
     const spel = S.kamer && SPELZAAL[S.kamer.id];
@@ -15,7 +18,7 @@
     $('#knopVraag').hidden = !(S.kamer && (S.kamer.id === 'restaurant' || S.kamer.soort === 'suite'));
     $('#knopPaar').hidden = !S.kamer;
     zetKnopPaar();
-    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; sceneDicht(); }
+    if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; gas = null; $('#spelBalk').hidden = true; sceneDicht(); }
   }
 
   $('#knopSpel').addEventListener('click', () => {
@@ -39,6 +42,7 @@
     P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
+    $('#spelPin').parentElement.style.opacity = TIK[P.spel] ? '0.25' : '1';
     tekenSpel(); sceneOpen(P.spel);
     if (!meterAan) { meterAan = true; requestAnimationFrame(meterLus); }
   }
@@ -62,12 +66,25 @@
   $('#spelDoe').addEventListener('click', async () => {
     if (!P) return;
     if (P.aanZet !== S.ik) return meld('De ander is aan zet.');
+    if (TIK[P.spel]) { // eerste druk opent het tikvenster, elke tik erna telt
+      if (gas) { gas.taps++; return; }
+      gas = { taps: 0, tot: performance.now() + 3500 };
+      setTimeout(gasKlaar, 3500);
+      return;
+    }
     try { verwerkZet(await api('/api/residentie/spel/zet', { kracht: meterWaarde }), S.ik); }
     catch (e) { meld(e.message); }
   });
+  function gasKlaar() {
+    if (!gas) return;
+    const kr = Math.min(100, Math.round(gas.taps * 4.5));
+    gas = null;
+    if (!P) return;
+    api('/api/residentie/spel/zet', { kracht: kr }).then(d => verwerkZet(d, S.ik)).catch(e => meld(e.message));
+  }
   $('#spelWeg').addEventListener('click', async () => {
     try { await api('/api/residentie/spel/stop', {}); } catch (e) {}
-    P = null; $('#spelBalk').hidden = true; sceneDicht();
+    P = null; gas = null; $('#spelBalk').hidden = true; sceneDicht();
   });
 
   function verwerkZet(d, wie) {
@@ -116,5 +133,5 @@
     if (d.kind === 'spel-start') startPotje(d);
     if (d.kind === 'spel-zet' && d.codenaam !== S.ik) verwerkZet(d, d.codenaam);
     if (d.kind === 'spel-afgewezen') meld(d.van + ' slaat het potje even over.');
-    if (d.kind === 'spel-gestopt') { P = null; $('#spelBalk').hidden = true; sceneDicht(); meld('Het potje is gestopt.'); }
+    if (d.kind === 'spel-gestopt') { P = null; gas = null; $('#spelBalk').hidden = true; sceneDicht(); meld('Het potje is gestopt.'); }
   }

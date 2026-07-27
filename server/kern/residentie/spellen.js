@@ -20,7 +20,10 @@ const SPELLEN = {
     punt: a => Math.min(10, Math.max(0, Math.round(a / 10))) },
   // dansen is samen: geen winnaar, een gezamenlijke score voor de gratie
   dansen: { zaal: 'balzaal', naam: 'Samen dansen', beurten: 4, samen: true, eenheid: 'gratie',
-    punt: a => Math.round(a / 2) }
+    punt: a => Math.round(a / 2) },
+  // racen gaat niet op timing maar op tikken: het tik-tempo is het gas
+  racen: { zaal: 'renbaan', naam: 'De Grand Prix', beurten: 4, eenheid: 'meters',
+    punt: a => Math.round(a) }
 };
 
 /* per zaal: waar de spelers gaan staan bij de start van een potje */
@@ -31,7 +34,8 @@ const SPOTS = {
   badhuis: [[3, 5], [5, 5], [4, 5], [6, 5]],
   biljart: [[3, 5], [7, 3], [4, 6], [6, 1]],
   boog: [[2, 6], [6, 6], [10, 6], [4, 6]],
-  balzaal: [[5, 4], [6, 5], [4, 5], [7, 4]]
+  balzaal: [[5, 4], [6, 5], [4, 5], [7, 4]],
+  renbaan: [[2, 6], [5, 6], [8, 6], [11, 6]]
 };
 
 /* de spelers naar hun speelplek brengen; de zaal ziet ze aantreden */

@@ -6,7 +6,7 @@
      dansvloer glanst. En boven de speler zweeft het puntenaantal omhoog. */
   const EFX = [];
   const RAAK = { golf: p => p <= 1, darts: p => p >= 40, kegelen: p => p >= 9, zwemmen: p => p <= 7.5,
-    biljart: p => p >= 2, boogschieten: p => p >= 9, dansen: p => p >= 35 };
+    biljart: p => p >= 2, boogschieten: p => p >= 9, dansen: p => p >= 35, racen: p => p >= 85 };
 
   function doelVan(spel, l) {
     const zoek = soorten => {

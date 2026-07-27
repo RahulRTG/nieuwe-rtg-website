@@ -30,6 +30,7 @@ const bundels = {
   'apps/defensie.js': 'apps/defensie',
   'apps/office/blad.js': 'apps/office/blad',
   'apps/office/app.js': 'apps/office/app',
+  'apps/office/blad.js': 'apps/office/blad',
   'shared/handenvrij-scherm.js': 'shared/handenvrij-scherm',
   'shared/werkblad.js': 'shared/werkblad',
   'shared/mond.js': 'shared/mond',

@@ -24,6 +24,11 @@
     var ouder = !!(d && d.ouder);
     var codes = [], gezien = {};
     ((d && d.school) || []).forEach(function (x) { if (!gezien[x.klas.code]) { gezien[x.klas.code] = true; codes.push(x.klas.code); } });
+    // bellen binnen de app: de ouder zet het klas-belkanaal een keer open
+    if (ouder && codes.length && window.SchoolBel && !laad.belAan && typeof s !== 'undefined' && s) {
+      laad.belAan = true;
+      SchoolBel.start({ klasCode: codes[0], gezin: { code: s.code, token: s.token } });
+    }
     var uit = '';
     for (var i = 0; i < codes.length; i++) {
       var kc = codes[i];
@@ -100,10 +105,12 @@
         : '<div class="mini">Geen alarm; de boom staat klaar.</div>';
       var takken = boom.ikBel.length
         ? '<div class="mini">Bij een alarm bellen jullie: ' + boom.ikBel.map(function (t) {
-            return esc(t.kind) + (t.nummer ? ' via ' + esc(t.nummer) : ' (nog geen nummer)');
+            return esc(t.kind) + ' <button class="knop mini" data-doe="belapp" data-klas="' + esc(kc) + '" data-gezin="' + esc(t.gezinCode) + '" data-naam="ouders van ' + esc(t.kind) + '">Bel in de app</button>' +
+              (t.nummer ? ' <span class="mini">(reserve: ' + esc(t.nummer) + ')</span>' : '');
           }).join(' en ') + '</div>'
         : '<div class="mini">Jullie zijn een blad van de boom: niemand meer te bellen.</div>';
-      uit += kaart('Telefoonboom · klas ' + esc(kc), alarm + takken +
+      uit += kaart('Telefoonboom · klas ' + esc(kc),
+        '<button class="knop mini" data-doe="belleraar" data-klas="' + esc(kc) + '">Bel de leraar in de app</button>' + alarm + takken +
         '<div class="rij" style="display:flex;gap:.4rem;margin-top:.4rem;">' +
         '<input class="veld" data-nummer="' + esc(kc) + '" placeholder="' + (boom.nummerGezet ? 'Nummer staat erin; hier wijzigen' : 'Jullie telefoonnummer voor de boom') + '" style="flex:1;">' +
         '<button class="knop mini" data-doe="nummer" data-klas="' + esc(kc) + '">Bewaar</button></div>');
@@ -115,6 +122,10 @@
     wortel.querySelectorAll('[data-doe]').forEach(function (b) {
       b.addEventListener('click', async function () {
         var kc = b.dataset.klas, doe = b.dataset.doe;
+        if (doe === 'belapp' || doe === 'belleraar') {
+          if (window.SchoolBel) SchoolBel.bel(doe === 'belapp' ? b.dataset.gezin : 'leraar', b.dataset.naam || 'de leraar');
+          return;
+        }
         try {
           if (doe === 'toestem') await gezinApi('/school/excursie/toestemming', { klasCode: kc, excursieId: b.dataset.ex, profielId: b.dataset.kind, akkoord: b.dataset.ja === '1' });
           if (doe === 'betaal') await gezinApi('/school/bijdrage/betaal', { klasCode: kc, bijdrageId: b.dataset.bij, profielId: b.dataset.kind });

@@ -14,9 +14,11 @@ if (process.env.ANTHROPIC_API_KEY) {
 
 const MAX_BEURTEN = 40;
 
-function systeem(naam, niveau, doelen) {
+function systeem(naam, niveau, doelen, taal) {
   return 'Je bent Rahul, de eigen bijles-AI van ' + (naam || 'deze leerling') + '. ' +
     'Niveau van dit moment: ' + (niveau || 'nog onbekend; vraag er rustig naar') + '. ' +
+    (taal ? 'De thuistaal van de leerling is "' + taal + '". Antwoord TWEETALIG: eerst in de thuistaal, ' +
+      'daarna dezelfde uitleg in eenvoudig Nederlands -- dat is de taal die de leerling erbij leert. ' : '') +
     (doelen && doelen.length ? 'Er wordt gewerkt aan: ' + doelen.slice(0, 5).join(', ') + '. ' : '') +
     'Werk precies op dit niveau: niet te makkelijk, niet te moeilijk. Wees warm en geduldig, ' +
     'leg stap voor stap uit, geef eerst een hint en laat de leerling de laatste stap zelf zetten. ' +
@@ -25,11 +27,12 @@ function systeem(naam, niveau, doelen) {
     'Wees eerlijk: je bent geen school of examenbureau; echte diploma’s en examens lopen via de officiële instellingen.';
 }
 
-function demoAntwoord(niveau) {
+function demoAntwoord(niveau, taal) {
   return 'Fijn dat je het vraagt; dat is precies hoe leren werkt. We pakken dit samen op, stap voor stap' +
     (niveau ? ', op jouw niveau (' + niveau + ')' : '') +
     '. Vertel eerst wat je al weet en waar het precies stokt; dan geef ik je een hint, en de laatste stap zet jij zelf. ' +
-    'Elke poging telt, ook de mislukte: daar leer je het meest van.';
+    'Elke poging telt, ook de mislukte: daar leer je het meest van.' +
+    (taal ? ' En omdat jouw thuistaal (' + taal + ') meedoet: ik leg het uit in je eigen taal en zet er het Nederlands naast, zo leer je beide talen tegelijk.' : '');
 }
 
 /* winkel() geeft de opslagmap (per wereld een eigen: leden of gezinnen);
@@ -41,7 +44,7 @@ function maakBijles({ winkel, save, schoon }) {
     return w[sleutel];
   }
 
-  async function vraag({ sleutel, naam, niveau, doelen, tekst }) {
+  async function vraag({ sleutel, naam, niveau, doelen, taal, tekst }) {
     const t = schoon(tekst, 600);
     if (!t) return { error: 'Stel eerst je vraag.', status: 400 };
     const g = gesprekVan(sleutel);
@@ -52,12 +55,12 @@ function maakBijles({ winkel, save, schoon }) {
         const msgs = g.beurten.slice(-13);
         while (msgs.length && msgs[0].rol !== 'user') msgs.shift();
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 400,
-          system: systeem(naam, niveau, doelen),
+          system: systeem(naam, niveau, doelen, taal),
           messages: msgs.map(b => ({ role: b.rol === 'user' ? 'user' : 'assistant', content: b.tekst })) });
-        uit = { text: (r.content || []).map(b => b.text || '').join('').trim() || demoAntwoord(niveau) };
-      } catch (e) { uit = { text: demoAntwoord(niveau), demo: true }; }
+        uit = { text: (r.content || []).map(b => b.text || '').join('').trim() || demoAntwoord(niveau, taal) };
+      } catch (e) { uit = { text: demoAntwoord(niveau, taal), demo: true }; }
     } else {
-      uit = { text: demoAntwoord(niveau), demo: true };
+      uit = { text: demoAntwoord(niveau, taal), demo: true };
     }
     g.beurten.push({ rol: 'rahul', tekst: uit.text, at: new Date().toISOString() });
     if (g.beurten.length > MAX_BEURTEN) g.beurten.splice(0, g.beurten.length - MAX_BEURTEN);

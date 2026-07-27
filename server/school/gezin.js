@@ -5,7 +5,7 @@ module.exports = (sctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
   const { gemiddelde } = sctx;
-  router.post('/school/mijn', (req, res) => {
+  router.post('/school/mijn', async (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
     // een ouder ziet alle gekoppelde kinderen; een kind alleen zichzelf
     const mijnIds = s.beheerder ? Object.keys(s.g.profielen) : [s.p.id];
@@ -15,6 +15,9 @@ module.exports = (sctx) => {
       for (const l of (k.leerlingen || [])) {
         if (l.gezinCode !== s.g.code || !mijnIds.includes(l.profielId)) continue;
         uit.push({
+          // de thuistaal van deze klasgenoot + de tweetalige laag (NL blijft staan)
+          taal: l.taal || null,
+          vertaling: l.taal && sctx.tweetalig ? await sctx.tweetalig(k, l) : undefined,
           klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school },
           kind: { profielId: l.profielId, naam: l.naam, sleutel: l.sleutel },
           // thuiswerken: staat de online les aan, dan reist de kamercode mee

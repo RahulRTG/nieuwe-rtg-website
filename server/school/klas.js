@@ -21,7 +21,7 @@ module.exports = (sctx) => {
       leraren: k.leraren || (k.leraarId ? [{ id: k.leraarId, naam: k.leraar }] : []),
       waarnemer: k.waarnemer || null, onlineLes: k.onlineLes || null,
       // per leerling het gewogen gemiddelde: de leraar ziet in een oogopslag wie aandacht nodig heeft
-      leerlingen: (k.leerlingen || []).map(l => ({ sleutel: l.sleutel, naam: l.naam, at: l.at,
+      leerlingen: (k.leerlingen || []).map(l => ({ sleutel: l.sleutel, naam: l.naam, at: l.at, taal: l.taal || null,
         gemiddelde: gemiddelde(alle.filter(c => c.leerling === l.sleutel)) })),
       klasGemiddelde: gemiddelde(alle),
       rooster: k.rooster,

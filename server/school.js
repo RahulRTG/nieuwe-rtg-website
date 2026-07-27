@@ -110,6 +110,7 @@ module.exports = (ctx) => {
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief };
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));
+  require('./school/taal')(sctx); // thuistaal + tweetalige laag (zet sctx.tweetalig)
   require('./school/gezin')(sctx);
   require('./school/planner')(sctx);
   require('./school/toets')(sctx); // toetsen (SO/MO/proefwerk/examen) op de leerstof-motor
@@ -117,4 +118,5 @@ module.exports = (ctx) => {
   require('./school/excursie')(sctx); // excursies: tijdelijke GPS met toestemming + kijklog
   require('./school/bijdrage')(sctx); // vrijwillige ouderbijdrage + telefoonboom
   require('./school/bijles')(sctx); // de eigen Rahul Bijles van elk kind
+  require('./school/bellen')(sctx); // bellen binnen de app (klas-belkanaal, geen nummers nodig)
 };

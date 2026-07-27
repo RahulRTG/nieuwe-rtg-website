@@ -97,9 +97,11 @@ module.exports = (sctx) => {
     res.json({ ok: true, aantal: b.volgorde.length });
   });
 
+  // elke tak draagt zijn gezinscode: de belknop in de app weet zo wie hij belt;
+  // het nummer is een vrijwillige reserve voor wie de app even niet bij zich heeft
   const tak = (k, n) => {
     const num = boomVan(k).nummers[n.gezinCode];
-    return { kind: n.kind, naam: num ? num.naam : null, nummer: num ? num.nummer : null };
+    return { kind: n.kind, gezinCode: n.gezinCode, naam: num ? num.naam : null, nummer: num ? num.nummer : null };
   };
 
   router.post('/school/telefoonboom/start', (req, res) => {
@@ -143,7 +145,7 @@ module.exports = (sctx) => {
     const k = klasVan(req, res); if (!k) return;
     const b = boomVan(k);
     res.json({ ok: true, alarm: b.alarm ? { bericht: b.alarm.bericht, at: b.alarm.at } : null,
-      volgorde: (b.volgorde || []).map((n, i) => ({ kind: n.kind, nummer: !!b.nummers[n.gezinCode],
+      volgorde: (b.volgorde || []).map((n, i) => ({ kind: n.kind, gezinCode: n.gezinCode, nummer: !!b.nummers[n.gezinCode],
         belt: takken(b.volgorde, i).map(x => x.kind),
         doorgegeven: b.alarm ? !!b.alarm.bevestigd[n.gezinCode] : null })) });
   });

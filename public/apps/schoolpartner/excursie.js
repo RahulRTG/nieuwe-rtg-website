@@ -16,8 +16,17 @@
     return uit || '<p class="stil">Nog geen plekken doorgegeven.</p>';
   }
 
-  window.SPart.excursie = function () {
+  var belAan = false;
+  window.SPart.excursie = function (kc) {
     var P = window.SPart, kl = P.kl, esc = P.esc, meld = P.meld;
+
+    // bellen binnen de app: de leraar zet het klas-belkanaal een keer open
+    if (kc && window.SchoolBel && !belAan) {
+      try {
+        var sessie = JSON.parse(localStorage.getItem('rtg_schoolpartner') || 'null');
+        if (sessie && sessie.token) { belAan = true; SchoolBel.start({ klasCode: kc, leraar: { token: sessie.token } }); }
+      } catch (e) {}
+    }
 
     kl('/school/excursie/lijst').then(function (r) {
       if (r.body.error) return;
@@ -47,11 +56,17 @@
         return '<div class="item"><span>' + (i < 2 ? 'Leraar belt: ' : '') + esc(n.kind) +
           (n.nummer ? '' : ' <span class="tag">geen nummer</span>') +
           (n.doorgegeven ? ' <span class="tag aan">doorgegeven</span>' : '') + '</span>' +
-          '<span class="stil">' + (n.belt.length ? 'belt: ' + n.belt.map(esc).join(', ') : 'blad van de boom') + '</span></div>';
+          '<span class="rij"><span class="stil">' + (n.belt.length ? 'belt: ' + n.belt.map(esc).join(', ') : 'blad van de boom') + '</span>' +
+          '<button class="knop" data-belg="' + esc(n.gezinCode) + '" data-naam="ouders van ' + esc(n.kind) + '">Bel in de app</button></span></div>';
       }).join('') || '<p class="stil">Nog geen boom; druk op Boom (opnieuw) maken.</p>';
     });
     if (gebonden) return;
     gebonden = true;
+
+    $('#boomLijst').addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('[data-belg]') : null;
+      if (b && window.SchoolBel) SchoolBel.bel(b.dataset.belg, b.dataset.naam);
+    });
 
     $('#exLijst').addEventListener('click', function (ev) {
       var b = ev.target.closest ? ev.target.closest('[data-ex]') : null;

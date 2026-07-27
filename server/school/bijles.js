@@ -20,14 +20,14 @@ module.exports = (sctx) => {
     const doelen = l ? (k.huiswerk || [])
       .filter(h => h.doel && !(h.afDoor || []).includes(l.sleutel))
       .map(h => h.titel).slice(0, 5) : [];
-    return { niveau: l ? k.naam : null, doelen };
+    return { niveau: l ? k.naam : null, doelen, taal: (l && l.taal) || null };
   }
 
   router.post('/school/bijles/vraag', async (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
     const c = context(s, req);
     const r = await motor.vraag({ sleutel: 'gezin:' + s.g.code + ':' + s.p.id, naam: s.p.naam,
-      niveau: c.niveau, doelen: c.doelen, tekst: req.body.tekst });
+      niveau: c.niveau, doelen: c.doelen, taal: c.taal, tekst: req.body.tekst });
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
   });

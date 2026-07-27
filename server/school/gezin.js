@@ -17,10 +17,12 @@ module.exports = (sctx) => {
         uit.push({
           klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school },
           kind: { profielId: l.profielId, naam: l.naam, sleutel: l.sleutel },
+          // thuiswerken: staat de online les aan, dan reist de kamercode mee
+          onlineLes: k.onlineLes || null,
           vandaag: (k.rooster || []).filter(r => r.dag === DAG),
           rooster: k.rooster,
           huiswerk: (k.huiswerk || []).map(h => ({ id: h.id, titel: h.titel, vak: h.vak, omschrijving: h.omschrijving,
-            deadline: h.deadline, at: h.at, af: (h.afDoor || []).includes(l.sleutel) })),
+            deadline: h.deadline, doel: h.doel || null, at: h.at, af: (h.afDoor || []).includes(l.sleutel) })),
           cijfers: (k.cijfers || []).filter(c => c.leerling === l.sleutel)
             .map(c => ({ id: c.id, vak: c.vak, cijfer: c.cijfer, weging: c.weging, omschrijving: c.omschrijving, at: c.at })),
           mededelingen: k.mededelingen || [],

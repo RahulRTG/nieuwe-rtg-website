@@ -69,7 +69,10 @@ module.exports = (ctx) => {
       if (sch) {
         if (sch.token === tok) mag = true; // directie
         const p = Object.values(sch.personeel || {}).find(x => x.token === tok);
-        if (p && p.status === 'actief' && p.id === k.leraarId) mag = true; // de eigen leraar
+        // de eigen leraar, een teamlid (max 3 vast) of de actieve waarnemer
+        if (p && p.status === 'actief' && (p.id === k.leraarId
+          || (k.leraren || []).some(x => x.id === p.id)
+          || (k.waarnemer && k.waarnemer.id === p.id))) mag = true;
       }
     }
     if (!mag) {
@@ -110,4 +113,5 @@ module.exports = (ctx) => {
   require('./school/gezin')(sctx);
   require('./school/planner')(sctx);
   require('./school/toets')(sctx); // toetsen (SO/MO/proefwerk/examen) op de leerstof-motor
+  require('./school/verbonden')(sctx); // lerarenteam, overname, online les, oefen-huiswerk
 };

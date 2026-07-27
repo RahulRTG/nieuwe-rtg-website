@@ -106,6 +106,7 @@
       }).join('') || 'Nog geen cijfers.';
     });
     window.SPart.toetslijst();
+    if (window.SPart.hulplijn) window.SPart.hulplijn();
     if (window.SPart.excursie) window.SPart.excursie(KLAS);
     if (!BIEB) kl('/school/toets/bibliotheek').then(function (r) {
       BIEB = r.body.groepen || [];

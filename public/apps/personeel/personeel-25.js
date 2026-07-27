@@ -54,7 +54,9 @@
     if (!window.EventSource) return;
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
-      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); if (zbData) laadZorgbalie(); if (mkHulp || mkZorg) laadMeldkamerPda(); });
+      src.addEventListener('sync', e => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); if (zbData) laadZorgbalie(); if (mkHulp || mkZorg) laadMeldkamerPda();
+        // losstaande scripts (hr-mijn e.d.) luisteren mee via een window-event
+        try { window.dispatchEvent(new CustomEvent('rtgsync', { detail: JSON.parse(e.data || '{}') })); } catch(err){} });
       // de keuken praat met de bediening: bon compleet op de pas -> belletje op de PDA,
       // maar alleen op toestellen waar de pas-bel aanstaat (de gekozen personen)
       src.addEventListener('pas', e => {

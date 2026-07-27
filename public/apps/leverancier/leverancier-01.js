@@ -88,7 +88,7 @@
     juwelier:    { label:'RTG Juwelier', labelEn:'RTG Jeweller', codes:['ORODOR'], icon:'' },
     galerie:     { label:'RTG Kunst & Galerie', labelEn:'RTG Art & Gallery', codes:['LIENZO'], icon:'' },
     vracht:      { label:'RTG Vracht', labelEn:'RTG Freight', codes:['TERRAMAR'], icon:'' },
-    kantoorgebouw: { label:'RTG Zuidas', labelEn:'RTG Zuidas', codes:['MERIDIAAN'], icon:'' },
+    kantoorgebouw: { label:'RTG Enterprise', labelEn:'RTG Enterprise', codes:['MERIDIAAN'], icon:'' },
     golfclub:    { label:'RTG Golf & Countryclub', labelEn:'RTG Golf & Country Club', codes:['SAROCA'], icon:'' },
     fitnessclub: { label:'RTG Sport & Fitness', labelEn:'RTG Sports & Fitness', codes:['FORTIA'], icon:'' },
     beautysalon: { label:'RTG Beauty & Barbier', labelEn:'RTG Beauty & Barber', codes:['VELVET'], icon:'' },

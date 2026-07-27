@@ -56,7 +56,7 @@ const TYPEN = [
       { naam: 'Finance', r: 1, k: 1, w: 1, h: 1, kleur: '#C23A5E' },
       { naam: 'Demo', r: 1, k: 2, w: 1, h: 1, kleur: '#857007' }
     ],
-    huur: { kantoor: 'Zuidas · kantoorverdieping', wat: 'Een verdieping met vergaderzalen, toegangspassen en een executive lounge; schaalt mee met je team.' }
+    huur: { kantoor: 'RTG Enterprise · kantoorverdieping', wat: 'Een verdieping met vergaderzalen, toegangspassen en een executive lounge; schaalt mee met je team.' }
   },
   {
     id: 'horeca', naam: 'Horeca-ondernemer', kort: 'Restaurant, bar, club of beachclub.',

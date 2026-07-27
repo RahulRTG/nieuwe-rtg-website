@@ -4,7 +4,7 @@
     }));
   }
 
-  // ---- het kantoorgebouw (Zuidas): het hele huis op een scherm ----
+  // ---- het kantoorgebouw (RTG Enterprise): het hele huis op een scherm ----
   const GB_MELD = { schoonmaak: 'Schoonmaak', onderhoud: 'Onderhoud', catering: 'Catering' };
   const GB_JET = { concierge: 'Concierge', chauffeur: 'Chauffeur', 'jet-transfer': 'Jet-transfer', lounge: 'Executive lounge' };
 

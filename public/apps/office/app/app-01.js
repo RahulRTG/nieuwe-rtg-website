@@ -37,7 +37,7 @@
         terug: '/apps/werkplek.html', mijnKop: 'Documenten van dit huis',
         leeg: 'Log eerst in en kies een werkplek.' }
     : WERK === 'zaak'
-    ? { basis: '/api/supplier/kantoorpakket/', tokenKey: 'rtg_sup_token', chip: 'Team-drive van de zaak',
+    ? { basis: '/api/supplier/kantoorpakket/', tokenKey: ['rtg_sup_token', 'rtg_pda_token'], chip: 'Team-drive van de zaak',
         terug: '/apps/leverancier.html', mijnKop: 'Documenten van de zaak', leeg: 'Log eerst in op de zaak-app.' }
     : WERK === 'kantoor'
     ? { basis: '/api/office/kantoorpakket/', tokenKey: 'rtg_office_token', chip: 'RTG Kantoor-drive',

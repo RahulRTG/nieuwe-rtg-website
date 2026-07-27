@@ -1,4 +1,4 @@
-/* RTG Zuidas: het complete kantoorgebouw-systeem (demo Meridiaan Toren).
+/* RTG Enterprise: het complete kantoorgebouw-systeem (demo Meridiaan Toren).
    Bewaakt de zalen zonder dubbele boekingen, de bezoekersstroom langs de
    receptie, badges, facilitaire meldingen, valet, de jetset-laag en de
    cap-poort. Draai los: node --experimental-sqlite --test test/gebouw.test.js */

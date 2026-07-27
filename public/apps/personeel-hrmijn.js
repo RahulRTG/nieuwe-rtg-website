@@ -60,4 +60,6 @@
     api('/supplier/hr/inwerk/vink', { trajectId: b.dataset.pdhrvink, stapId: b.dataset.stap }).then(laad).catch(function () {});
   });
   document.addEventListener('DOMContentLoaded', function () { setTimeout(laad, 1500); setTimeout(laad, 6000); });
+  // live mee met het kantoor: een hr-sync van de zaak ververst de eigen lijst
+  window.addEventListener('rtgsync', function (e) { if (e.detail && e.detail.scope === 'hr') laad(); });
 })();

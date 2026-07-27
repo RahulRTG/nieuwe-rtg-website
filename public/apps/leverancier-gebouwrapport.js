@@ -13,8 +13,8 @@
     var sec = function (t) { return '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.6rem 0 0.5rem;">' + t + '</h2>'; };
     var h = '<!doctype html><html><head><meta charset="utf-8"><title>' + esc(d.naam || 'Gebouwrapport') + '</title></head>' +
       '<body style="font-family:Georgia,serif;color:#0C0C0B;max-width:46em;margin:2.5em auto;line-height:1.6;">' +
-      '<div id="pbtn" style="text-align:right;"><button onclick="window.print()" style="padding:0.5rem 1rem;font-family:inherit;">Print / PDF</button></div>' +
-      '<style>@media print { #pbtn { display:none; } }</style>' +
+      '<div id="pwrap" style="text-align:right;"><button id="pbtn" type="button" style="padding:0.5rem 1rem;font-family:inherit;">Print / PDF</button></div>' +
+      '<style>@media print { #pwrap { display:none; } }</style>' +
       '<h1 style="font-size:1.6rem;margin-bottom:0.2rem;">' + esc(d.naam || 'Het gebouw') + '</h1>' +
       '<p style="color:#8A8680;margin-top:0;">RTG Enterprise · Gebouwrapport · ' + new Date().toLocaleDateString('nl-NL') + '</p>' +
       sec(T('ge.r.kern', 'Kerncijfers')) + '<table style="border-collapse:collapse;">' +
@@ -50,7 +50,8 @@
       h += sec(T('ge.r.signalen', 'Signalen'));
       h += p.signalen.map(function (s) { return '<div style="padding:0.2rem 0;">&#9670; ' + esc(s.tekst) + '</div>'; }).join('');
     }
-    h += '<p style="color:#8A8680;margin-top:2rem;font-size:0.85rem;">' + T('ge.r.voet', 'Opgesteld in de zaak-app van RTG; cijfers zijn de stand van dit moment.') + '</p></body></html>';
+    h += '<p style="color:#8A8680;margin-top:2rem;font-size:0.85rem;">' + T('ge.r.voet', 'Opgesteld in de zaak-app van RTG; cijfers zijn de stand van dit moment.') + '</p>' +
+      '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script></body></html>';
 
     var b = new Blob([h], { type: 'text/html;charset=utf-8' });
     var u = URL.createObjectURL(b);

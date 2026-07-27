@@ -52,7 +52,9 @@ const GENRE_SETS = {
   creator: ['studio', 'planning', 'promo', 'sales', 'kantoor', 'it'],
   activiteiten: ['entree', 'gidsen', 'materiaal', 'planning', ...BASIS],
   zzp: ['agenda2', 'offertes', 'materiaal', 'kantoor', 'promo', 'inkoop', 'it'],
-  vakwerk: ['agenda2', 'offertes', 'materiaal', 'kantoor', 'promo', 'inkoop', 'it']
+  vakwerk: ['agenda2', 'offertes', 'materiaal', 'kantoor', 'promo', 'inkoop', 'it'],
+  // RTG Enterprise: het hele kantoorgebouw als dorp, van plint tot dak
+  kantoorgebouw: ['frontoffice', 'concierge', 'parking', 'security', 'klussen', 'it', 'sales', 'events', 'kantoor', 'promo', 'inkoop']
 };
 
 /* Elke andere zaak (nieuw genre, niches) krijgt in elk geval het

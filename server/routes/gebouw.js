@@ -1,4 +1,4 @@
-/* Domein "gebouw": het complete kantoorgebouw-systeem (Zuidas) voor
+/* Domein "gebouw": het complete kantoorgebouw-systeem (RTG Enterprise) voor
    partners met de gebouw-cap. De manager stuurt alles vanuit de
    leverancier-app; receptie, security, facilitair en de concierge werken
    met dezelfde endpoints vanaf de PDA (personeels-app). */

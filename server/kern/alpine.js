@@ -1,5 +1,5 @@
 /* RTG Alpine: het wintersport- en seizoensresort (demo Val d'Aurora), de
-   derde wereld naast Ibiza en de Zuidas. Pistes met kleuren en liften met
+   derde wereld naast Ibiza en RTG Enterprise. Pistes met kleuren en liften met
    status, het lawineniveau dat alleen de berggids zet (informatief, en
    vanaf niveau 4 gaan de zwarte pistes uit voorzorg dicht), skipassen,
    materiaalverhuur, de skischool met groepslessen en privelessen, en

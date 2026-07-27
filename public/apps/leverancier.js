@@ -88,7 +88,7 @@
     juwelier:    { label:'RTG Juwelier', labelEn:'RTG Jeweller', codes:['ORODOR'], icon:'' },
     galerie:     { label:'RTG Kunst & Galerie', labelEn:'RTG Art & Gallery', codes:['LIENZO'], icon:'' },
     vracht:      { label:'RTG Vracht', labelEn:'RTG Freight', codes:['TERRAMAR'], icon:'' },
-    kantoorgebouw: { label:'RTG Zuidas', labelEn:'RTG Zuidas', codes:['MERIDIAAN'], icon:'' },
+    kantoorgebouw: { label:'RTG Enterprise', labelEn:'RTG Enterprise', codes:['MERIDIAAN'], icon:'' },
     golfclub:    { label:'RTG Golf & Countryclub', labelEn:'RTG Golf & Country Club', codes:['SAROCA'], icon:'' },
     fitnessclub: { label:'RTG Sport & Fitness', labelEn:'RTG Sports & Fitness', codes:['FORTIA'], icon:'' },
     beautysalon: { label:'RTG Beauty & Barbier', labelEn:'RTG Beauty & Barber', codes:['VELVET'], icon:'' },
@@ -4191,7 +4191,7 @@
     }));
   }
 
-  // ---- het kantoorgebouw (Zuidas): het hele huis op een scherm ----
+  // ---- het kantoorgebouw (RTG Enterprise): het hele huis op een scherm ----
   const GB_MELD = { schoonmaak: 'Schoonmaak', onderhoud: 'Onderhoud', catering: 'Catering' };
   const GB_JET = { concierge: 'Concierge', chauffeur: 'Chauffeur', 'jet-transfer': 'Jet-transfer', lounge: 'Executive lounge' };
 
@@ -4269,6 +4269,10 @@
     doe('data-gbvk', '/supplier/gebouw/valet/status', ds => ({ id: ds.gbvk, status: 'klaar' }));
     doe('data-gbjb', '/supplier/gebouw/jetset/status', ds => ({ id: ds.gbjb, status: 'bevestigd' }));
     doe('data-gbja', '/supplier/gebouw/jetset/status', ds => ({ id: ds.gbja, status: 'afgerond' }));
+    // RTG Enterprise (losse scripts): 3D-toren + contracten/leads/energie en het hele pand
+    const geCtx = { api: (p, b2) => API.call(p, b2), T, esc, toast, eur, d };
+    if (window.RTGZaakGebouw) RTGZaakGebouw.bind(el, geCtx);
+    if (window.RTGZaakPand) RTGZaakPand.bind(el, geCtx);
   }
 
   // ---- de golf- en countryclub: teetimes, pro's, wedstrijden, baanstatus ----

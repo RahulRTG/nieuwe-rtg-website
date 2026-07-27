@@ -1,4 +1,4 @@
-/* RTG Zuidas: het complete systeem van EEN heel kantoorgebouw, van de plint
+/* RTG Enterprise: het complete systeem van EEN heel kantoorgebouw, van de plint
    tot het dak. Verdiepingen en huurders, vergaderzalen met boekingen,
    toegangspassen, de bezoekersstroom langs de receptie, facilitaire
    meldingen (schoonmaak, onderhoud, catering), valet-parkeren en daar

@@ -21,7 +21,7 @@
     { id:'boerderij', icon:'oogst', nl:'Boerderij', en:'Farm', sub:'Land, kas, dieren en oogst', codes:['CANFERRER'] },
     { id:'creator', icon:'camera', nl:'Creators', en:'Creators', sub:'Content, planning, samenwerkingen', codes:['LUMINA'] },
     { id:'vracht', icon:'logistiek', nl:'Vracht', en:'Freight', sub:'Zendingen, douane, de loods', codes:['TERRAMAR'] },
-    { id:'gebouw', icon:'gebouw', nl:'Kantoorgebouw', en:'Office tower', sub:'Receptie, facilitair, concierge (Zuidas)', codes:['MERIDIAAN'] },
+    { id:'gebouw', icon:'gebouw', nl:'Kantoorgebouw', en:'Office tower', sub:'Receptie, facilitair, concierge (RTG Enterprise)', codes:['MERIDIAAN'] },
     { id:'marina', icon:'boot', nl:'Marina', en:'Marina', sub:'Steiger, brandstof, service, concierge', codes:['PORTELL'] },
     { id:'verzekeraar', icon:'parasol', nl:'Verzekeraar', en:'Insurer', sub:'Adviesvragen, declaraties, pas-controle', codes:['SEGUR'] }
   ];

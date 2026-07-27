@@ -21,7 +21,7 @@
     { id:'boerderij', icon:'oogst', nl:'Boerderij', en:'Farm', sub:'Land, kas, dieren en oogst', codes:['CANFERRER'] },
     { id:'creator', icon:'camera', nl:'Creators', en:'Creators', sub:'Content, planning, samenwerkingen', codes:['LUMINA'] },
     { id:'vracht', icon:'logistiek', nl:'Vracht', en:'Freight', sub:'Zendingen, douane, de loods', codes:['TERRAMAR'] },
-    { id:'gebouw', icon:'gebouw', nl:'Kantoorgebouw', en:'Office tower', sub:'Receptie, facilitair, concierge (Zuidas)', codes:['MERIDIAAN'] },
+    { id:'gebouw', icon:'gebouw', nl:'Kantoorgebouw', en:'Office tower', sub:'Receptie, facilitair, concierge (RTG Enterprise)', codes:['MERIDIAAN'] },
     { id:'marina', icon:'boot', nl:'Marina', en:'Marina', sub:'Steiger, brandstof, service, concierge', codes:['PORTELL'] },
     { id:'verzekeraar', icon:'parasol', nl:'Verzekeraar', en:'Insurer', sub:'Adviesvragen, declaraties, pas-controle', codes:['SEGUR'] }
   ];
@@ -2522,7 +2522,9 @@
     if (!window.EventSource) return;
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
-      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); if (zbData) laadZorgbalie(); if (mkHulp || mkZorg) laadMeldkamerPda(); });
+      src.addEventListener('sync', e => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); if (zbData) laadZorgbalie(); if (mkHulp || mkZorg) laadMeldkamerPda();
+        // losstaande scripts (hr-mijn e.d.) luisteren mee via een window-event
+        try { window.dispatchEvent(new CustomEvent('rtgsync', { detail: JSON.parse(e.data || '{}') })); } catch(err){} });
       // de keuken praat met de bediening: bon compleet op de pas -> belletje op de PDA,
       // maar alleen op toestellen waar de pas-bel aanstaat (de gekozen personen)
       src.addEventListener('pas', e => {

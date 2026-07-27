@@ -2884,7 +2884,7 @@ require('./routes/home')(kern);
    lucht, water en land; publiek volgen op volgcode zonder klantgegevens. */
 Object.assign(kern, require('./kern/vracht')({ db, save, crypto, schoon }));
 require('./routes/vracht')(kern);
-/* RTG Zuidas (kern/gebouw.js): het complete kantoorgebouw-systeem met
+/* RTG Enterprise (kern/gebouw.js): het complete kantoorgebouw-systeem met
    receptie, zalen, badges, facilitair, valet en de luxe jetset-laag. */
 Object.assign(kern, require('./kern/gebouw')({ db, save, crypto, schoon }));
 require('./routes/gebouw')(kern);

@@ -18,7 +18,7 @@ module.exports = (ctx) => {
     juwelier:    { label: 'Juwelier & horloges', icon: '\u{1F48E}', caps: ['retail', 'services', 'location', 'pricing'] },
     galerie:     { label: 'Kunst & galerie', icon: '\u{1F5BC}️', caps: ['tickets', 'retail', 'location', 'pricing'] },
     vracht:      { label: 'Vracht & expeditie', icon: '\u{1F6A2}', caps: ['vracht', 'location', 'pricing'] },
-    kantoorgebouw: { label: 'Kantoorgebouw (Zuidas)', icon: '\u{1F3E2}', caps: ['gebouw', 'location', 'pricing'] },
+    kantoorgebouw: { label: 'Kantoorgebouw (RTG Enterprise)', icon: '\u{1F3E2}', caps: ['gebouw', 'location', 'pricing'] },
     golfclub:    { label: 'Golf & countryclub', icon: '\u{26F3}', caps: ['golf', 'location', 'pricing'] },
     fitnessclub: { label: 'Sport & fitnessclub', icon: '\u{1F3CB}️', caps: ['fitclub', 'location', 'pricing'] },
     beautysalon: { label: 'Beauty-salon & barbier', icon: '\u{2702}️', caps: ['beauty', 'location', 'pricing'] },

@@ -16,6 +16,10 @@
     doe('data-gbvk', '/supplier/gebouw/valet/status', ds => ({ id: ds.gbvk, status: 'klaar' }));
     doe('data-gbjb', '/supplier/gebouw/jetset/status', ds => ({ id: ds.gbjb, status: 'bevestigd' }));
     doe('data-gbja', '/supplier/gebouw/jetset/status', ds => ({ id: ds.gbja, status: 'afgerond' }));
+    // RTG Enterprise (losse scripts): 3D-toren + contracten/leads/energie en het hele pand
+    const geCtx = { api: (p, b2) => API.call(p, b2), T, esc, toast, eur, d };
+    if (window.RTGZaakGebouw) RTGZaakGebouw.bind(el, geCtx);
+    if (window.RTGZaakPand) RTGZaakPand.bind(el, geCtx);
   }
 
   // ---- de golf- en countryclub: teetimes, pro's, wedstrijden, baanstatus ----

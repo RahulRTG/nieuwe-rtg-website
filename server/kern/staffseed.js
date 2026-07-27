@@ -61,7 +61,7 @@ const STAFF_SEED = {
   LIENZO: [['Valeria Pinto', 'manager', 'Galeriehouder'], ['Hugo Ram', 'staff', 'Exposities & entree']],
   // vracht & expeditie: de expediteur plant, de declarant klaart in, de loods laadt
   TERRAMAR: [['Marc Torres', 'manager', 'Expediteur'], ['Aina Salom', 'staff', 'Douane-declarant'], ['Pau Ribas', 'staff', 'Loods & laden']],
-  // het kantoorgebouw op de Zuidas: het hele huis, van receptie tot concierge
+  // het RTG Enterprise-kantoorgebouw: het hele huis, van receptie tot concierge
   MERIDIAAN: [['Evi van Dalen', 'manager', 'Gebouwmanager'], ['Sanne Roos', 'staff', 'Receptie'],
     ['Deniz Kaya', 'staff', 'Security'], ['Ruben Smits', 'staff', 'Facilitair'], ['Chiara de Wit', 'staff', 'Concierge & jetset']],
   // de golfclub: de secretaris beheert, de caddiemaster en de pro's op de baan

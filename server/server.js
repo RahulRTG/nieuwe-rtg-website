@@ -181,6 +181,11 @@ const { STAFF_SEED } = require('./kern/staffseed');
 // demopersoneel bestaat alleen in demostand; in productie komt personeel
 // uitsluitend via de eigen zaak binnen (uitnodiging + eigen pincode)
 if (DEMO) {
+  /* Later toegevoegde demo-zaken (zoals De Ibiza Bode) ook op bestaande
+     demo-databases aanvullen; de verse seed draait immers maar een keer. */
+  for (const s of require('./seed/leveranciers').suppliers) {
+    if (!db.data.suppliers.some(x => x.code === s.code)) db.data.suppliers.push(JSON.parse(JSON.stringify(s)));
+  }
   for (const [code, people] of Object.entries(STAFF_SEED)) {
     if (accounts.countStaff(code) === 0) {
       people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));

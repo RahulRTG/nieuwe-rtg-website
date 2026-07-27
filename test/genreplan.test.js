@@ -35,10 +35,8 @@ test.before(async () => {
   golf = await supLogin('SAROCA');
   resto = await supLogin('KIKUNOI');
   assert.ok(haven && opvang && golf && resto, 'de vier zaken zijn binnen');
-  // de genre-motoren lazy seeden via hun eigen routes, zoals de views dat doen
-  assert.equal((await api('supplier/marina', {}, haven)).status, 200);
-  assert.equal((await api('supplier/opvang', {}, opvang)).status, 200);
-  assert.equal((await api('supplier/golf', {}, golf)).status, 200);
+  // bewust NIET voorseeden via de genre-routes: het draaiboek en het
+  // weekblik wekken de genre-motor zelf, en dat bewijzen deze tests
   gewired = (await api('supplier/puls/plan', {}, haven)).status !== 404;
 });
 test.after(() => {
@@ -107,4 +105,14 @@ test('6. zonder inlog blijven draaiboek en weekblik dicht', async t => {
   if (!gewired) return t.skip('wiring volgt');
   assert.equal((await api('supplier/puls/plan', {})).status, 401);
   assert.equal((await api('supplier/puls/blik', {})).status, 401);
+});
+
+test('7. De Ibiza Bode heeft een redactie: ook de laatste demo-zaak kan inloggen', async t => {
+  if (!gewired) return t.skip('wiring volgt');
+  const roster = await api('supplier/roster', { code: 'BODE' });
+  const mgr = (roster.body.staff || []).find(x => x.role === 'manager');
+  assert.ok(mgr, 'de hoofdredactie staat op het rooster');
+  const tk = (await api('supplier/login', { code: 'BODE', staffId: mgr.id, pin: '1234' })).body.token;
+  assert.ok(tk, 'de hoofdredacteur kan inloggen');
+  assert.equal((await api('supplier/dorp', {}, tk)).status, 200, 'en heeft het vangnet-bedrijfsdorp');
 });

@@ -11,6 +11,16 @@ module.exports = (kern) => {
   const overDagen = d => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
   const bak = (naam, code) => (db.data[naam] || {})[code] || null;
   const t = (id, prio, tekst) => ({ id, prio, tekst });
+  /* Net als de pols: de genre-motor wekken als hij nog nooit is geopend.
+     De motoren hangen pas NA deze routes aan de kern -- op aanroepmoment
+     via de kern-sleutel pakken, niet destructuren. */
+  const MOTOR = { golfclub: ['golfclub', 'golfclub'], fitnessclub: ['fitclub', 'fitclub'], beautysalon: ['beauty', 'beauty'],
+    petcare: ['petcare', 'petcare'], kinderopvang: ['opvang', 'opvang'], weddingplanner: ['weddings', 'weddings'],
+    marina: ['marina', 'marina'], wintersport: ['alpine', 'alpine'] };
+  const wek = (type, code) => {
+    const m = MOTOR[type], motor = m && kern[m[0]];
+    if (motor && !(db.data[m[1]] || {})[code]) { try { motor.overzicht(code); } catch (e) {} }
+  };
 
   const PLAN = {
     golfclub(c) {
@@ -97,6 +107,7 @@ module.exports = (kern) => {
   };
 
   app.post('/api/supplier/puls/plan', supplierAuth, (req, res) => {
+    wek(req.supplier.type, req.supplier.code);
     const maak = PLAN[req.supplier.type];
     const taken = maak ? maak(req.supplier.code) : null;
     if (!taken) return res.json({ ok: true, plan: null });

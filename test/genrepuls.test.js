@@ -39,10 +39,11 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('1. voordat de haven ooit open was is er geen pols (de route seedt niets)', async () => {
+test('1. de pols staat er vanaf dag een: de route wekt de genre-motor zelf', async () => {
   const r = await api('supplier/puls', {}, haven);
   assert.equal(r.status, 200);
-  assert.equal(r.body.puls, null, 'geen geseede genre-motor, dus geen pols');
+  assert.ok(r.body.puls && r.body.puls.genre === 'marina', 'geen leeg Kantoor op de eerste dag');
+  assert.ok(r.body.puls.meters.length >= 3, 'de meters staan er meteen');
 });
 
 test('2. de marina-pols: meters en de vertrekdag van de passant als signaal', async () => {

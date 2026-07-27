@@ -34,6 +34,7 @@ const STAFF_SEED = {
   CANFERRER: [['Aina Torres', 'manager', 'Bedrijfsleider'], ['Marc Prats', 'staff', 'Veehouderij'], ['Lucia Roig', 'staff', 'Akker & kas']],
   // content creator: vaak solo; de creator zelf plus een editor
   LUMINA: [['Nora Vidal', 'manager', 'Creator'], ['Tim Bakker', 'staff', 'Editor']],
+  BODE: [['Elvira Sanz', 'manager', 'Hoofdredactie'], ['Joan Prats', 'staff', 'Redactie']],
   IBIZAIR: [['Nadia Fischer', 'manager', 'Operations'], ['Tomas Weller', 'staff', 'Piloot']],
   // charter: een vlootbeheerder en een schipper aan boord
   AZUL: [['Nerea Costa', 'manager', 'Charterbeheer'], ['Marco Silva', 'staff', 'Schipper']],

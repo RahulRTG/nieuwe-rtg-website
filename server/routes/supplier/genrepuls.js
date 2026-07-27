@@ -11,6 +11,18 @@ module.exports = (kern) => {
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const overDagen = d => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
   const bak = (naam, code) => (db.data[naam] || {})[code] || null;
+  /* De pols staat er vanaf dag een: als de genre-motor nog nooit is
+     geopend, wekken we hem hier met dezelfde accessor als het eigen
+     tabblad (lazy seed), zodat een verse zaak geen leeg Kantoor ziet.
+     De motoren hangen pas NA deze routes aan de kern, dus we pakken ze
+     op aanroepmoment via hun kern-sleutel (niet destructuren). */
+  const MOTOR = { golfclub: ['golfclub', 'golfclub'], fitnessclub: ['fitclub', 'fitclub'], beautysalon: ['beauty', 'beauty'],
+    petcare: ['petcare', 'petcare'], kinderopvang: ['opvang', 'opvang'], weddingplanner: ['weddings', 'weddings'],
+    marina: ['marina', 'marina'], wintersport: ['alpine', 'alpine'] };
+  const wek = (type, code) => {
+    const m = MOTOR[type], motor = m && kern[m[0]];
+    if (motor && !(db.data[m[1]] || {})[code]) { try { motor.overzicht(code); } catch (e) {} }
+  };
 
   const PULS = {
     golfclub(c) {
@@ -90,6 +102,7 @@ module.exports = (kern) => {
   };
 
   app.post('/api/supplier/puls', supplierAuth, (req, res) => {
+    wek(req.supplier.type, req.supplier.code);
     const maak = PULS[req.supplier.type];
     const p = maak ? maak(req.supplier.code) : null;
     if (!p) return res.json({ ok: true, puls: null });

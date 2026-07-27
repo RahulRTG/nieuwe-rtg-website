@@ -8,6 +8,11 @@ module.exports = (kern) => {
 
   const bak = (naam, code) => (db.data[naam] || {})[code] || null;
   const DAG = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
+  /* Net als de pols: de genre-motor wekken als hij nog nooit is geopend.
+     De motoren hangen pas NA deze routes aan de kern -- op aanroepmoment
+     via de kern-sleutel pakken, niet destructuren. */
+  const WEKKER = { golfclub: 'golfclub', fitnessclub: 'fitclub', beautysalon: 'beauty', petcare: 'petcare',
+    kinderopvang: 'opvang', weddingplanner: 'weddings', marina: 'marina', wintersport: 'alpine' };
 
   const BLIK = {
     golfclub(g, d) {
@@ -60,6 +65,8 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/puls/blik', supplierAuth, (req, res) => {
     const maak = BLIK[req.supplier.type];
+    const motor = kern[WEKKER[req.supplier.type]];
+    if (maak && motor && !bak(STORE[req.supplier.type], req.supplier.code)) { try { motor.overzicht(req.supplier.code); } catch (e) {} }
     const data = maak ? bak(STORE[req.supplier.type], req.supplier.code) : null;
     if (!maak || !data) return res.json({ ok: true, blik: null });
     const dagen = [];

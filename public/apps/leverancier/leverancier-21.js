@@ -58,6 +58,8 @@
             '<div style="margin-top:0.4rem;"><div class="tkc-who" style="color:var(--txt);">'+pl.vraag+'</div>'+
             pl.opties.map(o => '<div class="st-row" style="padding:0.3rem 0;"><span class="sub">'+o.tekst+'</span><b style="color:var(--gold);">'+o.stemmen+'</b></div>').join('')+'</div>').join('') : '')+'</div>';
       }
+      // pr-plus (los script leverancier-pr.js): planner, nieuwsbrief, bereik
+      html += '<div id="prPlusWortel" style="display:contents;"></div>';
     }
     return html;
   }

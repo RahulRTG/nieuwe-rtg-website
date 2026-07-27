@@ -70,9 +70,14 @@
     knop.disabled = false;
   }
 
+  // de sectieknoppen dragen nog oude emoji-glyfen; het rapport en Rahul
+  // krijgen alleen de kale kamernaam
+  function kaalLabel(s){ return String(s || '').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').trim(); }
+
   window.RTGZaakKamer = {
     bind: function(el, c){
       ctx = c || ctx;
+      if (ctx && ctx.label) ctx.label = kaalLabel(ctx.label);
       const oud = el.querySelector('#kamerToolbar');
       if (ctx.sectie === 'bo'){ if (oud) oud.remove(); return; }
       if (oud) return;
@@ -82,7 +87,9 @@
       t.innerHTML = '<button class="obtn ghost" id="kamerRapport" type="button">' + T('km.rapport', 'Kamerrapport') + ' (print)</button>' +
         '<button class="obtn ghost" id="kamerRahul" type="button">' + T('km.rahul', 'Rahul-advies') + '</button>' +
         '<div id="kamerRahulUit" style="flex-basis:100%;display:none;border-left:2px solid var(--gold);padding:0.3rem 0 0.3rem 0.8rem;font-size:0.82rem;line-height:1.6;color:var(--soft);white-space:pre-wrap;"></div>';
-      el.insertBefore(t, el.firstChild);
+      // tussen de kamertabs en de eerste kaart in, niet erboven
+      const eerste = el.querySelector('.tkc');
+      el.insertBefore(t, eerste || el.firstChild);
       t.querySelector('#kamerRapport').addEventListener('click', () => rapport(el));
       t.querySelector('#kamerRahul').addEventListener('click', e => advies(e.currentTarget));
       if (antwoorden[ctx.sectie]){

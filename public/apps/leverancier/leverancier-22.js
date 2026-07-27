@@ -73,6 +73,11 @@
     if (window.RTGZaakKantoor) RTGZaakKantoor.bind(el, { boData: boData, vwData: vwData, T: T, S: S, toast: toast, esc: esc, eur: eur, lang: lang });
     // hr-plus (los script): de volle HR-kamer op de eigen API
     if (window.RTGZaakHR) RTGZaakHR.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, staff: (state && state.staff) || [] });
+    // pr-plus (los script): planner, nieuwsbrief, bereik + Persdossier
+    if (window.RTGZaakPR) RTGZaakPR.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, S: S, lang: lang, mktData: mktData, fotos: (state && state.photos) || [] });
+    // de generieke kamer-laag: Kamerrapport (print) + Rahul-advies in elke kamer
+    if (window.RTGZaakKamer) RTGZaakKamer.bind(el, { api: (p, b) => API.call(p, b), T: T, esc: esc, toast: toast, S: S, lang: lang, sectie: kantoorSec,
+      label: ((el.querySelector('[data-ksec="' + kantoorSec + '"]') || {}).textContent || kantoorSec).trim() });
     // synergie: tekenen, stoppen en een nieuwe deal voorstellen
     const synVer = async () => { boData = null; synData = null; await refresh(); };
     el.querySelectorAll('[data-synkans]').forEach(b => b.addEventListener('click', async () => {

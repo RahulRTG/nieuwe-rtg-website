@@ -69,5 +69,10 @@ module.exports = {
     ['Kies de talen (of wissel ze om) en typ; na een halve seconde rust staat de vertaling er',
      'Druk op Spreek om te dicteren en op Lees voor om de vertaling te horen',
      'Onderweg? De reiszinnen per situatie vertalen met een tik; bewaar je vaste zinnen op het toestel'],
-    'Geschiedenis en bewaarde zinnen blijven op je toestel; zonder AI-sleutel vertaalt het huiswoordenboek en zegt de app eerlijk wat niet lukt.')
+    'Geschiedenis en bewaarde zinnen blijven op je toestel; zonder AI-sleutel vertaalt het huiswoordenboek en zegt de app eerlijk wat niet lukt.'),
+  '/apps/memo.html': G('RTG Memo: spraakmemo\'s die gewoon in je Bestanden-kluis leven.',
+    ['Druk op Neem op en spreek in; stoppen is bewaren (map Memo\'s in je kluis)',
+     'Zet het meeluisteren aan voor een transcript; dat blijft op je toestel',
+     'Druk op Samenvatting en Rahul vat het transcript samen -- de audio gaat nooit naar de AI'],
+    'Weggooien is naar de prullenbak van je kluis (30 dagen te herstellen) en je kluiskwota is dezelfde; geen tweede opslaglaag.')
 };

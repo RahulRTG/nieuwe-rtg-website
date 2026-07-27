@@ -1726,3 +1726,29 @@ app-catalogus, appgids-entry (in deel5, dat nog ruimte had onder de
 10K-grens). Tests: vertaal.test.js (3: talenlijst + dicht zonder token,
 echte woordenboekvertaling, eerlijkheidsvlag) en vertaler.e2e.js door
 het scherm (live vertalen, bewaren op het toestel, reiszin).
+
+## RTG Memo: spraakmemo's die gewoon in de kluis leven
+
+Een opname-app zonder eigen opslaglaag: elke memo is een gewoon bestand
+in de RTG Bestanden-kluis (map Memo's), met alles wat daarbij hoort --
+zelfde kwota, prullenbak van 30 dagen, hernoemen en delen via de
+bestaande kluis-routes.
+
+**Opnemen.** MediaRecorder op het toestel, een rustige teller, en
+stoppen is bewaren. Terwijl je spreekt kan het toestel meeluisteren
+(SpeechRecognition, aan te zetten met een vinkje): dat transcript blijft
+in localStorage -- op je toestel, niet op de server.
+
+**De Rahul-samenvatting, eerlijk begrensd.** Druk op Samenvatting en het
+transcript (nooit de audio) gaat naar POST /api/memo/samenvat. Met
+AI-sleutel vat Rahul samen in maximaal drie zinnen plus actiepunten;
+zonder sleutel komt er een demo die zichzelf zo noemt en alleen telt en
+citeert -- geen neptekst die slim lijkt. Geen transcript? Dan zegt de
+app dat er niets te vatten valt, in plaats van te fantaseren. Via de
+stuur-laag is de route ook voor Rahul zelf bereikbaar.
+
+Bedrading: route naast vertaal gemount, catalogusrij en appgids-entry
+(deel5). Tests: memo.test.js (3: de kluis-flow van map tot prullenbak,
+de eerlijke demo-samenvatting met echte woordtelling + dicht zonder
+token, en de nette fout zonder transcript) en memo.e2e.js door het
+scherm (lijst uit de kluis, samenvatting, weggooien).

@@ -2756,6 +2756,7 @@ require('./routes/meet')(kern);
 require('./routes/galerij')(kern);
 require('./routes/klok')(kern);
 require('./routes/vertaal')(kern);
+require('./routes/memo')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);

@@ -14,6 +14,9 @@
 /* De afdelingsdata (afdelingen, sets en meters) staat als pure data in een
    deelmodule. */
 const { AFDELINGEN, HOTEL_SET, CLUB_SET, RESTO_SET, BEACH_SET, CLUB_TYPES, METERS } = require('./hoteldorp/afdelingen');
+/* En de dorpen van alle overige genres: zelfde motor, eigen indeling. */
+const { EXTRA_AFDELINGEN, GENRE_SETS, VANGNET_SET } = require('./hoteldorp/genresets');
+Object.assign(AFDELINGEN, EXTRA_AFDELINGEN);
 
 module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, haversine }) => {
   const nu = () => new Date().toISOString();
@@ -22,7 +25,8 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     : CLUB_TYPES.includes(s.type) ? CLUB_SET
     : s.type === 'restaurant' ? RESTO_SET
     : s.type === 'beachclub' ? BEACH_SET
-    : null;
+    // elk ander genre: de eigen indeling, en anders het gedeelde bedrijfsdorp
+    : GENRE_SETS[s.type] || VANGNET_SET;
   const dorpKan = s => !!dorpSet(s);
 
   function dorpPost(s, afdelingIn, waar, tekst, wie, directKlaar) {

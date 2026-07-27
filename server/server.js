@@ -760,6 +760,8 @@ const rtmailTeam = require('./kern/rtmail-team')({ db, save, crypto, rtmail, fin
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
 const automatisering = require('./kern/automatisering')({ rtmail });
 const atelierweb = require('./kern/atelierweb')({ db, save, crypto, schoon });
+// de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
+const naamlaag = require('./kern/naamlaag')({ db, save, schoon });
 const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon });
 // het welkom-draaiboek ook voor nieuwe RTF-profielen (foundation, eigen router)
 try { rtf.setAutomatisering(automatisering); } catch (e) {}
@@ -1985,7 +1987,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, rtmail, rtmailTeam, automatisering, antivirus, atelierweb, webmaker, eigenaar, zaakdoos,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, rtmail, rtmailTeam, automatisering, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,

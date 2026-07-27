@@ -64,6 +64,16 @@
     <div class="praat" id="praat">...</div>
     <button class="knop grijs klein" id="nogKaart" style="margin-top:.6rem;">Nieuwe kaart</button>
   </div>
+
+  <div class="kaart kaartblok">
+    <h2>Vertel je droom</h2>
+    <div class="chat" id="chat"><div class="b ai">Wat zou jij later willen? Grote en kleine dromen zijn hier allebei welkom.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Ik zou later willen..." maxlength="1000"></textarea>
+      <button class="knop klein" id="stuur">Stuur</button>
+    </div>
+    <div style="color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
+  </div>
 </div>
 
 <script src="sessie.js"></script>
@@ -116,6 +126,7 @@ async function kaart(){ try{ const d = await fetch('/api/foundation/gesprekskaar
 $('#nogKaart').onclick = kaart;
 
 laad(); kaart();
+Sessie.coach({ kind: 'dromen', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 <script src="/shared/schermbeeld.js" defer></script>

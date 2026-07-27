@@ -73,6 +73,16 @@
   </div>
 
   <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Even praten?</h2>
+    <div class="chat" id="chat"><div class="b ai">Hoi. Alles wat je voelt mag er zijn. Wil je vertellen hoe het met je is?</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Typ maar gewoon wat er in je zit..." maxlength="1000"></textarea>
+      <button class="knop klein" id="stuur">Stuur</button>
+    </div>
+    <div class="mini" style="padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
+  </div>
+
+  <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-voeler</h2>
     <p class="ouder">Deze app stuurt niets door en legt uit zichzelf niets vast: wat het kind aantikt blijft op dit scherm. Alleen als het kind zelf op "bewaar in mijn dagboekje" tikt, wordt dat ene gevoel bewaard -- en dat dagboekje kan uitsluitend het kind zelf inzien, u niet. Dat is met opzet: een kind dat weet dat niemand meeleest, durft eerlijk te zijn. Benoem wat u ziet ("je kijkt boos") en wacht daarna even; kinderen hebben eerst erkenning nodig en pas daarna een oplossing. Blijft een kind langere tijd bang of verdrietig, dan is dit spel geen vervanging voor een gesprek met de huisarts of de school.</p>
   </div>
@@ -218,6 +228,7 @@ $('#ademknop').addEventListener('click', () => {
 });
 
 teken();
+Sessie.coach({ kind: 'gevoel', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 <script src="samen.js" defer></script>

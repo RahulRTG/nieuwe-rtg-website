@@ -55,6 +55,16 @@
   <div id="allergie"></div>
   <div class="kies" id="kies"></div>
   <div id="paneel"><div class="kaart blok"><div class="leeg">Laden…</div></div></div>
+
+  <div class="kaart blok" style="padding:1rem 1.1rem;margin-top:.8rem;">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Samen gezonder, in kleine stappen</h2>
+    <div class="chat" id="chat"><div class="b ai">Waar willen jullie mee beginnen: eten, slapen of bewegen? Kleine stappen tellen het hardst.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Vertel wat jullie willen aanpakken..." maxlength="1000"></textarea>
+      <button class="knop klein" id="stuur">Stuur</button>
+    </div>
+    <div style="color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je typt wordt niet bewaard. Dit is geen medisch advies; bij klachten is de huisarts je adres.</div>
+  </div>
 </div>
 
 <script src="sessie.js"></script>
@@ -161,6 +171,7 @@ async function doe(pad, extra, herlaad){
 }
 
 laad();
+Sessie.coach({ kind: 'gezondheid', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 <script src="/shared/schermbeeld.js" defer></script>

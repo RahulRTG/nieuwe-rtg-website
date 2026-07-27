@@ -59,6 +59,16 @@
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Als het echt misgaat</h2>
     <p class="hulp">Ben je afgeperst, bestolen of staat er iets van jou online dat er niet hoort te staan: <b>zeg het tegen een volwassene die je vertrouwt</b>, ook als je je schaamt en ook als je zelf iets stoms hebt gedaan. Bewaar de berichten en maak schermafbeeldingen voordat je iets blokkeert; dat is later je bewijs. Betaal nooit, want betalen stopt het bijna nooit. In Nederland kun je terecht bij de politie (aangifte kan ook online), bij de Kindertelefoon voor een gesprek, en bij Helpwanted voor hulp bij beeld dat verspreid wordt. Deze app geeft algemene uitleg, geen juridisch advies.</p>
   </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Even sparren over schermen?</h2>
+    <div class="chat" id="chat"><div class="b ai">Vragen over schermen, games of appgroepen? Vertel maar, ik denk zonder preken mee.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Waar loop je tegenaan?" maxlength="1000"></textarea>
+      <button class="knop klein" id="stuur">Stuur</button>
+    </div>
+    <div class="mini" style="background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard. Vragen naar je wachtwoord doe ik nooit.</div>
+  </div>
 </div>
 
 <script src="sessie.js"></script>
@@ -214,6 +224,7 @@ $('#verder').addEventListener('click', () => {
 });
 
 start();
+Sessie.coach({ kind: 'mediawijs', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 <script src="samen.js" defer></script>

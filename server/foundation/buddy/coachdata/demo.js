@@ -1,0 +1,19 @@
+/* Buddy (deelmodule): de demo-antwoorden per hulpsoort -- wat de coach
+   zegt als er geen AI-sleutel is (of de AI even hapert). Verbatim
+   afgesplitst uit prompts.js om de module onder de grens te houden. */
+const HULP_DEMO = {
+  geld: 'Fijn dat je het vraagt. Kleine stappen helpen echt: kook een paar vaste, goedkope maaltijden, zet de verwarming een graadje lager en check of je recht hebt op zorgtoeslag of het kindgebonden budget. Aanvragen is gratis; de gemeente helpt je erbij. Wil je dat ik met een van deze meedenk?',
+  hulp: 'Je staat er niet alleen voor. Vertel me kort wat je nodig hebt: eten, kleding, hulp voor de kinderen, of hulp met geld en post? Dan wijs ik je de juiste, gratis plek. Voor eten is er de Voedselbank; voor school en sport zijn er Stichting Leergeld en het Jeugdfonds.',
+  opvoeden: 'Wat fijn dat je meedenkt over je kind; dat je het vraagt zegt al genoeg. Vertel me kort wat er speelt, bijvoorbeeld driftbuien, huiswerk of schermtijd, dan geef ik een paar liefdevolle stappen die vandaag te doen zijn. En weet: het zwaar hebben betekent niet dat je het verkeerd doet.',
+  steun: 'Fijn dat je dit even deelt. Jij doet er ook toe, niet alleen als ouder. Vertel me hoe het echt met je gaat; ik luister. En als het te veel wordt, praat er dan over met je huisarts of bel MIND Korrelatie. Bij hele donkere gedachten: bel gratis 113, dag en nacht.',
+  studie: 'Wat goed dat je verder wilt leren; daar word je sterker van en het geeft je kinderen een mooi voorbeeld. Vertel me wat je zou willen kunnen of worden, dan zoeken we samen een gratis of goedkope weg, via de Bibliotheek, het Taalhuis, een online cursus of de gemeente. Klein beginnen mag.',
+  tiener: 'Hoi, goed dat je er bent. Hier hoef je niks mooier te maken dan het is: school, vrienden, thuis, sociale media, alles mag op tafel. Vertel maar wat er speelt, ik luister en denk in kleine stappen mee. En als het echt zwaar voelt: de Kindertelefoon is er ook, gratis en anoniem, 0800-0432.',
+  baby: 'Wat fijn dat je even inlogt tussen alles door; met een kleintje thuis is dat al een prestatie. Vertel me wat er speelt: slapen, huilen, voeding, of gewoon even je hart luchten? Ik denk mee met kleine stappen. En weet: het consultatiebureau denkt gratis met je mee, en om hulp vragen is sterk, niet zwak.',
+  pesten: 'Hoi, fijn dat je het durft te zeggen. Wat er ook gebeurt: het is niet jouw schuld. Vertel me maar wat er is, ik luister. En het is heel dapper en slim om het ook aan een volwassene te vertellen die je vertrouwt, zoals je vader, moeder, juf of meester. Je kunt ook gratis bellen met de Kindertelefoon: 0800-0432.',
+  gevoel: 'Hoi, fijn dat je er bent. Hoe je je voelt mag er gewoon zijn: blij, boos, verdrietig of iets ertussenin, er is geen goed of fout. Vertel maar wat er in je zit, ik luister. En als het lang zwaar voelt, is het slim om het ook te vertellen aan iemand die je vertrouwt. De Kindertelefoon is er ook: 0800-0432, gratis.',
+  mediawijs: 'Goeie vraag om hier even over te praten. Schermen zijn leuk, en soms ook lastig: appgroepen, games die maar doorgaan, dingen die je liever niet zag. Vertel wat er speelt, dan denk ik mee. En weet: bij nare berichten is bewaren (schermafbeelding), blokkeren en het vertellen aan een volwassene altijd een sterke zet.',
+  gezondheid: 'Fijn dat je hiermee bezig bent; kleine stappen tellen het hardst. Denk aan samen buiten spelen, water in plaats van fris, en een vast ritueel voor het slapen. Vertel wat jullie willen aanpakken, dan maken we het klein en haalbaar. En bij klachten of zorgen: de huisarts denkt graag met je mee.',
+  dromen: 'Wat leuk dat je over later nadenkt. Elke droom is serieus, groot of klein. Vertel me wat je later zou willen, dan zoeken we samen EEN eerste stapje dat deze week al kan: iets proberen, iemand vragen, of iets opzoeken in de Bibliotheek. Proberen levert altijd iets op.'
+};
+
+module.exports = { HULP_DEMO };

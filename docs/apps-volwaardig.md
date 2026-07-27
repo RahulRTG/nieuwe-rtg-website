@@ -1536,3 +1536,31 @@ Server: kern/welzijn.js + routes/welzijn.js (dagboek, stemming).
 Client: gevoel.html (bewaarknop, dagboekstrook met gezichtjes,
 hulpregel). Tests: rtfwelzijn.test.js (3) en rtfwelzijn.e2e.js.
 De overige welzijnsapps volgen in de volgende delen van deze golf.
+
+## RTF-golf 6 (deel 2): rust op pro-niveau + de coach overal waar praten helpt
+
+**Vier nieuwe coach-soorten** in de buddy-motor, elk met een eigen
+systeemprompt en een eigen warme demotekst (de knop werkt dus ook
+zonder AI-sleutel): gevoel en dromen (Sam, voor kinderen: erkennen
+eerst, nooit een diagnose, dromen serieus nemen met een eerste stapje),
+mediawijs (Sam: schermtijd en online groepsdruk, praktisch en zonder
+preken, vraagt nooit naar wachtwoorden) en gezondheid (Nora: kleine
+stappen, nooit medisch advies -- bij zorgen wijst ze naar de huisarts).
+De veiligheidslijnen (Kindertelefoon 0800-0432, huisarts) staan in de
+teksten zelf en worden getest. De demoteksten verhuisden naar
+coachdata/demo.js om beide modules onder de grens te houden.
+
+**Chat op vier pagina's** via de bestaande Sessie.coach-helper: gevoel,
+mediawijs, gezondheid en dromen, telkens met de eerlijke regel "wat je
+hier typt wordt niet bewaard" in beeld.
+
+**rust.html naar pro**: de box-ademhaling kreeg een zachte teller
+(4-3-2-1 per fase), en er is een nieuw Stiltemoment -- een minuut
+helemaal niets, met een ring die rustig volloopt en een kalme eindregel.
+Tijdens de minuut is het scherm bewust stil (geen tekst, geen druk) en
+stoppen mag altijd. Alles op deze pagina blijft lokaal: rust hoeft geen
+data, er gaat niets naar de server. prefers-reduced-motion zet de
+animaties uit.
+
+Tests: rtfwelzijn2.test.js (3: eigen demotekst per soort,
+veiligheidslijnen, veilige terugval) en rtfrust.e2e.js door het scherm.

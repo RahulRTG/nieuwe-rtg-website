@@ -67,7 +67,10 @@
     <div class="ai" id="aiUit" hidden></div>
   </div>
   <div class="kaart" id="lab3dKaart">
-    <div class="sec">De Prototypehal (3D)</div>
+    <div class="rij" style="justify-content:space-between;align-items:center;">
+      <div class="sec" style="margin:0;">De Prototypehal (3D)</div>
+      <button class="knop stil" id="lab3dTour" type="button" hidden style="font-size:.74rem;padding:.3rem .7rem;">Presentatie</button>
+    </div>
     <canvas id="lab3d" style="display:block;width:100%;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibare 3D-hal waarin elk onderzoeksproject een blok is: de hoogte toont hoe ver het in de keten is, de kleur het onderzoeksveld, en een gouden pin markeert het nieuwste project."></canvas>
     <div class="leeg" id="lab3dUitleg"></div>
   </div>
@@ -77,6 +80,7 @@
 </main>
 <script src="/shared/drie.js"></script>
 <script src="/apps/lab3d.js"></script>
+<script src="/apps/lab-dossier.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -85,10 +89,11 @@ function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' +
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/lab/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
-let D = null, filter = '';
+let D = null, filter = '', KB = [];
 async function laad(){
   D = await api('overzicht');
   const kb = await api('kennisbank');
+  KB = kb.bevindingen || [];
   if (!$('#pVeld').options.length) $('#pVeld').innerHTML = D.velden.map(v => '<option value="' + v.veld + '">' + v.emoji + ' ' + esc(v.naam) + '</option>').join('');
   $('#filters').innerHTML = '<button class="chip' + (filter === '' ? ' aan' : '') + '" data-f="">Alle</button>' +
     D.velden.map(v => '<button class="chip' + (filter === v.veld ? ' aan' : '') + '" data-f="' + v.veld + '">' + v.emoji + ' ' + esc(v.naam) + (v.aantal ? ' (' + v.aantal + ')' : '') + '</button>').join('');
@@ -113,7 +118,8 @@ function render(){
         (nx ? '<button class="knop" data-fase="' + nx + '" style="margin-left:auto;">→ ' + nx + '</button>' : '') + '</div>' +
       (p.logboek || []).slice(0, 3).map(l => '<div class="log">' + esc(l.tekst) + '</div>').join('') +
       '<div class="rij" style="margin-top:.4rem;"><input class="veld" data-log placeholder="Logboek-regel"><button class="knop stil" data-logmaak>Log</button>' +
-      '<input class="veld" data-bev placeholder="Bevinding (titel)"><button class="knop stil" data-bevmaak>Bevinding</button></div>' +
+      '<input class="veld" data-bev placeholder="Bevinding (titel)"><button class="knop stil" data-bevmaak>Bevinding</button>' +
+      '<button class="knop stil" data-dossier>Dossier</button></div>' +
       '</div>';
   }).join('') : '<div class="leeg">Geen projecten in dit veld; start het eerste hierboven.</div>';
   bind();
@@ -128,6 +134,10 @@ function bind(){
     if (fase) fase.addEventListener('click', () => doe(api('project/fase', { id, fase: fase.dataset.fase })));
     k.querySelector('[data-logmaak]').addEventListener('click', () => doe(api('project/log', { id, tekst: k.querySelector('[data-log]').value })));
     k.querySelector('[data-bevmaak]').addEventListener('click', () => doe(api('project/bevinding', { id, titel: k.querySelector('[data-bev]').value })));
+    k.querySelector('[data-dossier]').addEventListener('click', () => {
+      const p = D.projecten.find(x => x.id === id);
+      if (window.LabDossier && p) LabDossier.open(p, D.fasen, KB);
+    });
   });
 }
 $('#pMaak').addEventListener('click', async () => {

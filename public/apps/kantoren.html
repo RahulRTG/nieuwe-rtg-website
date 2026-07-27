@@ -463,7 +463,11 @@
     <div class="kaart" id="atelier3dKaart">
       <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;justify-content:space-between;">
         <h3 class="sec" style="margin:0;">Het Ontwerp-podium (3D)</h3>
-        <select class="veld" id="atelier3dKies" style="max-width:16rem;font-size:.78rem;padding:.3rem .5rem;" aria-label="Kies een ontwerp voor het podium"></select>
+        <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">
+          <button class="knop stil" id="atelier3dShow" type="button" hidden style="font-size:.72rem;padding:.25rem .6rem;">Modeshow</button>
+          <button class="knop stil" id="aBoek" type="button" style="font-size:.72rem;padding:.25rem .6rem;">Collectieboek</button>
+          <select class="veld" id="atelier3dKies" style="max-width:16rem;font-size:.78rem;padding:.3rem .5rem;" aria-label="Kies een ontwerp voor het podium"></select>
+        </div>
       </div>
       <canvas id="atelier3d" style="display:block;width:100%;margin-top:.5rem;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
       <p style="font-size:.72rem;color:var(--muted);margin:.4rem 0 0;" id="atelier3dUitleg"></p>
@@ -999,6 +1003,15 @@ function bindAtelier(){
 }
 function vervangOntwerp(o){ if (!o || !ATELIER) return; const i = ATELIER.ontwerpen.findIndex(x => x.id === o.id); if (i >= 0) ATELIER.ontwerpen[i] = o; renderAtelier(); }
 $('#aTerug').addEventListener('click', laadKamers);
+// premium: het Collectieboek -- de huidige selectie als drukklaar boek
+$('#aBoek').addEventListener('click', () => {
+  if (!window.Collectieboek || !ATELIER) return;
+  const lijst = ATELIER.ontwerpen.filter(o => !aFilter || o.categorie === aFilter);
+  if (!lijst.length) { meld('Geen ontwerpen in deze selectie.'); return; }
+  const cat = aFilter ? (ATELIER.categorieen.find(c => c.id === aFilter) || {}).label : '';
+  Collectieboek.open(lijst, cat || 'Het atelier');
+  meld('Collectieboek geopend in een nieuw tabblad.');
+});
 $('#aMaak').addEventListener('click', async () => {
   const naam = $('#aNaam').value.trim(); if (!naam){ meld('Geef het ontwerp een naam.'); return; }
   try {
@@ -2711,6 +2724,7 @@ else uitgelogd();
 </script>
 <script src="/shared/drie.js"></script>
 <script src="/apps/kantoren-atelier3d.js"></script>
+<script src="/apps/kantoren-collectieboek.js"></script>
 <script src="/shared/glyf.js"></script>
 <script src="/shared/desktopframe.js" defer></script>
 <script src="/shared/werkblad.js" defer></script>

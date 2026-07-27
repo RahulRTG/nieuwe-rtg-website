@@ -6,6 +6,7 @@
 (function () {
   'use strict';
   var R = null, hoek = 0.6, kantel = 0.5, sleep = null, draai = true, huidige = null;
+  var show = null; // de modeshow-timer: elke paar tellen het volgende ontwerp op het podium
 
   function hexRgb(hex) {
     var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim());
@@ -86,6 +87,27 @@
     for (var i = vanaf + 1; i < m.posities.length; i += 3) m.posities[i] += y;
   }
 
+  /* de modeshow: het podium wisselt vanzelf van ontwerp, als een rustige
+     defile. Nogmaals klikken (of zelf een ontwerp kiezen) stopt hem. */
+  function modeshow() {
+    var kies = document.getElementById('atelier3dKies');
+    var knop = document.getElementById('atelier3dShow');
+    if (show) {
+      clearInterval(show); show = null;
+      if (knop) knop.textContent = 'Modeshow';
+      return;
+    }
+    if (!kies || !podium.lijst || podium.lijst.length < 2) return;
+    if (knop) knop.textContent = 'Stop modeshow';
+    show = setInterval(function () {
+      var n = podium.lijst.length;
+      var ix = ((Number(kies.value) || 0) + 1) % n;
+      kies.value = String(ix);
+      draai = true; // op de show draait het podium altijd
+      sculptuur(podium.lijst[ix]);
+    }, 6000);
+  }
+
   // het podium: kies-lijst vullen en het eerste ontwerp neerzetten
   function podium(ontwerpen) {
     var kies = document.getElementById('atelier3dKies');
@@ -97,12 +119,19 @@
     kies.innerHTML = ontwerpen.map(function (o, i) { return '<option value="' + i + '">' + String(o.naam || 'Ontwerp ' + (i + 1)).replace(/[<>&]/g, '') + '</option>'; }).join('');
     if (!kies.dataset.aan) {
       kies.dataset.aan = '1';
-      kies.addEventListener('change', function () { var o = podium.lijst[Number(kies.value) || 0]; if (o) sculptuur(o); });
+      kies.addEventListener('change', function (e) {
+        if (e.isTrusted && show) modeshow(); // zelf kiezen = de show is klaar
+        var o = podium.lijst[Number(kies.value) || 0]; if (o) sculptuur(o);
+      });
+      var knop = document.getElementById('atelier3dShow');
+      if (knop) knop.addEventListener('click', modeshow);
     }
     podium.lijst = ontwerpen;
+    var knop2 = document.getElementById('atelier3dShow');
+    if (knop2) knop2.hidden = ontwerpen.length < 2;
     if (vorige && ontwerpen[Number(vorige)]) kies.value = vorige;
     sculptuur(ontwerpen[Number(kies.value) || 0]);
   }
 
-  window.Atelier3D = { podium: podium, sculptuur: sculptuur };
+  window.Atelier3D = { podium: podium, sculptuur: sculptuur, modeshow: modeshow };
 })();

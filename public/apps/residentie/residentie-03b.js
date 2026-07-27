@@ -9,8 +9,11 @@
     dansen: 'Dans', biljart: 'Stoot', boogschieten: 'Schiet', racen: 'Geef gas' };
   let P = null, meterAan = false, meterWaarde = 0;
   // tikspellen: geen timing-meter maar tikken -- het tempo is de kracht
-  const TIK = { zwemmen: 1, racen: 1 };
-  let gas = null; // { taps, tot } tijdens een tik-beurt
+  const TIK = { zwemmen: 1, racen: 1, dansen: 1 };
+  // vrij richten: daar doet de timing-meter niet mee
+  const VRIJ = { darts: 1, boogschieten: 1 };
+  let gas = null; // { taps, tijden, tot } tijdens een tik-beurt
+  let laatsteKracht = 0; // de kracht van de eigen laatste zet, voor de scene
 
   function kamerKnoppen() {
     const spel = S.kamer && SPELZAAL[S.kamer.id];
@@ -42,7 +45,7 @@
     P = { spel: d.spel, naam: d.naam, eenheid: d.eenheid, laag: d.laag, samen: d.samen, beurten: d.beurten,
       kamerId: d.kamerId || (S.kamer && S.kamer.id), spelers: d.spelers, aanZet: d.aanZet };
     $('#spelBalk').hidden = false;
-    $('#spelPin').parentElement.style.opacity = TIK[P.spel] ? '0.25' : '1';
+    $('#spelPin').parentElement.style.opacity = (TIK[P.spel] || VRIJ[P.spel]) ? '0.25' : '1';
     tekenSpel(); sceneOpen(P.spel);
     if (!meterAan) { meterAan = true; requestAnimationFrame(meterLus); }
   }
@@ -66,19 +69,37 @@
   $('#spelDoe').addEventListener('click', async () => {
     if (!P) return;
     if (P.aanZet !== S.ik) return meld('De ander is aan zet.');
+    const sc = SCENES[P.spel];
     if (TIK[P.spel]) { // eerste druk opent het tikvenster, elke tik erna telt
-      if (gas) { gas.taps++; return; }
-      gas = { taps: 0, tot: performance.now() + 3500 };
-      setTimeout(gasKlaar, 3500);
+      if (gas) {
+        if (gas.rood && performance.now() < gas.rood) { gas.vals = true; return; }
+        gas.taps++; gas.tijden.push(performance.now());
+        return;
+      }
+      const cfg = (sc && sc.gasCfg) ? sc.gasCfg() : { rood: 0, duur: 3500 };
+      gas = { taps: 0, tijden: [], vals: false,
+        rood: cfg.rood ? performance.now() + cfg.rood : 0,
+        tot: performance.now() + cfg.rood + cfg.duur };
+      setTimeout(gasKlaar, cfg.rood + cfg.duur);
       return;
     }
+    if (sc && sc.tik) { // het spel zelf vangt de tik (richten, kracht)
+      const kr = sc.tik(meterWaarde);
+      if (kr == null) return;
+      laatsteKracht = kr;
+      try { verwerkZet(await api('/api/residentie/spel/zet', { kracht: kr }), S.ik); }
+      catch (e) { meld(e.message); }
+      return;
+    }
+    laatsteKracht = meterWaarde;
     try { verwerkZet(await api('/api/residentie/spel/zet', { kracht: meterWaarde }), S.ik); }
     catch (e) { meld(e.message); }
   });
   function gasKlaar() {
     if (!gas) return;
-    const kr = Math.min(100, Math.round(gas.taps * 4.5));
-    gas = null;
+    const sc = P && SCENES[P.spel];
+    const kr = sc && sc.gasScore ? sc.gasScore(gas) : Math.min(100, Math.round(gas.taps * 4.5));
+    gas = null; laatsteKracht = kr;
     if (!P) return;
     api('/api/residentie/spel/zet', { kracht: kr }).then(d => verwerkZet(d, S.ik)).catch(e => meld(e.message));
   }
@@ -90,7 +111,7 @@
   function verwerkZet(d, wie) {
     if (d.punt != null && wie && P) {
       voegEffect(P.spel, wie, d.punt, d.punt + ' ' + P.eenheid);
-      sceneZet(wie, d.punt, (RAAK[P.spel] || (() => true))(d.punt), meterWaarde);
+      sceneZet(wie, d.punt, (RAAK[P.spel] || (() => true))(d.punt), wie === S.ik ? laatsteKracht : meterWaarde);
     }
     if (d.punt != null && wie) meld(wie === S.ik ? 'U: ' + d.punt + ' ' + (P ? P.eenheid : '') : wie + ': ' + d.punt + ' ' + (P ? P.eenheid : ''));
     if (d.uitslag) {

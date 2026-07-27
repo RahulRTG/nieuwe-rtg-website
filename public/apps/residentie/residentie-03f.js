@@ -23,6 +23,7 @@
   function sceneOpen(spel) {
     if (!SCENES[spel]) return;
     SC.aan = true; SC.spel = spel; SC.anims = [];
+    if (SCENES[spel].reset) SCENES[spel].reset();
     veld.hidden = false; document.body.classList.add('scene-aan');
     sceneMaat();
     requestAnimationFrame(sceneLus);

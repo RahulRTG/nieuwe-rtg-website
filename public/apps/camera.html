@@ -128,7 +128,7 @@
 <header class="boven">
   <button class="knopje" id="terug" aria-label="Terug naar de app">←</button>
   <span class="rek"></span>
-  <button class="knopje" id="openKnop" aria-label="Open een bestaande foto in de Studio">🖼️</button>
+  <button class="knopje" id="openKnop" aria-label="Open een bestaande foto in de Studio">🖼</button>
   <input type="file" id="openBestand" accept="image/*" class="vis-verborgen" tabindex="-1" aria-label="Fotobestand kiezen">
   <button class="knopje" id="rasterKnop" aria-label="Raster aan of uit" aria-pressed="true">▦</button>
   <button class="knopje" id="flitsKnop" aria-label="Lamp aan of uit" aria-pressed="false" hidden>⚡</button>
@@ -163,10 +163,10 @@
   <div class="studio-doek"><canvas id="stDoek" aria-label="Voorbeeld van de bewerkte foto"></canvas></div>
   <div class="studio-voet">
     <div class="rahul"><span aria-hidden="true">✦</span>
-      <span class="tekst"><b>Rahul</b> · <span id="stRahul">Tik op ✨ en ik werk hem voor u af; daarna kunt u alles zelf verfijnen.</span></span>
+      <span class="tekst"><b>Rahul</b> · <span id="stRahul">Tik op ✶ en ik werk hem voor u af; daarna kunt u alles zelf verfijnen.</span></span>
     </div>
     <div class="chips" role="group" aria-label="Looks">
-      <button id="stAuto" class="goud" aria-pressed="false">✨ Rahul: werk af</button>
+      <button id="stAuto" class="goud" aria-pressed="false">✶ Rahul: werk af</button>
       <button data-look="origineel" aria-pressed="true">Origineel</button>
       <button data-look="quiet" aria-pressed="false">Quiet Luxury</button>
       <button data-look="ibiza" aria-pressed="false">Ibiza Zon</button>
@@ -415,7 +415,7 @@ window.Studio = (function () {
     bron = await createImageBitmap(blob);
     look('origineel'); R.recht = 0; ar = 0; spiegel = false; zetSchuiven();
     sect.classList.add('aan'); teken();
-    rahul.textContent = 'Tik op ✨ en ik werk hem voor u af; of kies een look en schuif zelf.';
+    rahul.textContent = 'Tik op ✶ en ik werk hem voor u af; of kies een look en schuif zelf.';
   }
   function sluit() { sect.classList.remove('aan'); if (bron) { bron.close(); bron = null; } }
   return { open, sluit, spraak, isOpen: () => sect.classList.contains('aan'), micKnop: () => $('#stMic') };

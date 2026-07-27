@@ -7,8 +7,8 @@
         (rp ? rp.days.map(d=>'<div class="st-row"><span><b>'+d.label+'</b> <span class="sub">'+d.date+'</span></span>'+
             '<span class="sub" style="text-align:right;">'+d.staff.map(m=>m.name.split(' ')[0]+': '+m.shift.split(' ')[0]).join(' · ')+'</span></div>').join('')+
           (rp.status==='voorstel'
-            ? '<div class="tkc-act"><button class="tkc-ready" id="agRoosterOk">✔ '+T('ag2.rooster.ok','Stel vast')+'</button><button class="obtn warn" id="agRoosterNee" style="margin-left:0.5rem;">'+T('ag2.nee','Wijs af')+'</button></div>'
-            : '<div class="tkc-who">✔ '+T('ag2.rooster.vast','Vastgesteld; het rooster in de PDA volgt dit plan.')+'</div>')
+            ? '<div class="tkc-act"><button class="tkc-ready" id="agRoosterOk">✓ '+T('ag2.rooster.ok','Stel vast')+'</button><button class="obtn warn" id="agRoosterNee" style="margin-left:0.5rem;">'+T('ag2.nee','Wijs af')+'</button></div>'
+            : '<div class="tkc-who">✓ '+T('ag2.rooster.vast','Vastgesteld; het rooster in de PDA volgt dit plan.')+'</div>')
         : '<div class="tkc-act"><button class="tkc-start" id="agRooster">'+T('ag2.rooster.stel','Stel het weekrooster voor')+'</button></div>')+'</div>';
       // urenregistratie: wie is binnen, wie werkte wanneer en hoelang
       if (!klokOverzicht) laadKlok();

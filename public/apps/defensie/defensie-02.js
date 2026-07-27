@@ -1,6 +1,6 @@
   async function laad() {
     const d = await api('def/overzicht');
-    $('#titel').textContent = '🎖️ ' + d.naam;
+    $('#titel').textContent = '🎖 ' + d.naam;
     const p = d.paraatheid;
     $('#paraatheid').innerHTML =
       '<div class="kpi"><b style="color:var(--groen);">' + p.gevechtsgereed + '</b><span>gevechtsgereed</span></div>' +
@@ -34,7 +34,7 @@
       '<button class="knop klein" data-gz="ontslagen" data-g="' + g.id + '" type="button">Ontsla</button></div></div>').join('')
       : '<p class="stil">Geen gewonden op het bord.</p>';
     $('#verplaatsingen').innerHTML = d.verplaatsingen.length ? d.verplaatsingen.map(v =>
-      '<div class="item"><b>' + esc(v.van) + ' → ' + esc(v.naar) + '</b> · ' + ({ land: '🚚', water: '🚢', lucht: '✈️' }[v.soort] || '') + ' ' + esc(v.soort) + ' · ' + esc(v.lading) + (v.wanneer ? ' · ' + esc(v.wanneer) : '') + ' · ' + esc(v.status) +
+      '<div class="item"><b>' + esc(v.van) + ' → ' + esc(v.naar) + '</b> · ' + ({ land: '🚚', water: '🚢', lucht: '✈' }[v.soort] || '') + ' ' + esc(v.soort) + ' · ' + esc(v.lading) + (v.wanneer ? ' · ' + esc(v.wanneer) : '') + ' · ' + esc(v.status) +
       '<div class="rij"><button class="knop klein" data-vpz="onderweg" data-vp="' + v.id + '" type="button">Onderweg</button>' +
       '<button class="knop klein" data-vpz="aangekomen" data-vp="' + v.id + '" type="button">Aangekomen</button>' +
       '<button class="knop klein" data-vpz="afgelast" data-vp="' + v.id + '" type="button">Afgelast</button></div></div>').join('')

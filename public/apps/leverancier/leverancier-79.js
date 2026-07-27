@@ -102,7 +102,7 @@
     const t = $('#aiThread'); if (!t) return;
     t.innerHTML = aiMsgs.length ? aiMsgs.map(m =>
       '<div class="tt-msg ' + (m.role === 'user' ? 'me' : 'other') + '">' +
-      (m.role === 'ai' ? '<span class="who">✦ AI</span>' : '') +
+      (m.role === 'ai' ? '<span class="who">AI</span>' : '') +
       m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
       (m.did ? '<span class="ai-did">✓ ' + T('ai.did','uitgevoerd') + '</span>' : '') + '</div>'
     ).join('') : '<div class="pcempty" style="padding:1.4rem 0.5rem;text-align:center;color:var(--soft);font-size:0.82rem;line-height:1.6;">' + T('ai.empty','Uw assistent kent het hele bedrijf: de kassa, de kamers, de klussen, de gasten. Vraag iets of geef een opdracht.') + '</div>';

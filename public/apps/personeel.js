@@ -1704,7 +1704,7 @@
       const perKok = koks.length ? Math.ceil(mijn.length / koks.length) : mijn.length;
       html += '<div class="card" style="display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;"><span style="font-size:0.8rem;">'+
         (koks.length ? esc(koks.map(k=>k.name.split(' ')[0]).join(', '))+' · <b>'+perKok+'</b> '+T('lijn.perkok','bon(nen) p.p.') : T('lijn.leeg','Niemand aangemeld'))+'</span>'+
-        '<button class="abtn'+(ikSta?'':' ghost')+'" data-pklijn style="margin-left:auto;">'+(ikSta?'✔ '+T('lijn.af2','Aangemeld'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
+        '<button class="abtn'+(ikSta?'':' ghost')+'" data-pklijn style="margin-left:auto;">'+(ikSta?'✓ '+T('lijn.af2','Aangemeld'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
       // maak nu: in een keer maken, gebundeld over de bonnen
       const nuPer = {};
       mijn.forEach(o => {

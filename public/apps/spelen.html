@@ -1000,7 +1000,7 @@ function tekenWaarheid(){
     b.onclick=async()=>{ try{ await speelZet(zet); }catch(e){ meld(e.message); } };
     acties.appendChild(b); };
   if (!st.kaart){ knop('Doen','knop',{actie:'kies', wat:'doen'}); knop('Waarheid','knop grijs',{actie:'kies', wat:'waarheid'}); }
-  else { knop('✔ Gedaan (+1 punt)','knop',{actie:'af', gedaan:true}); knop('Toch maar niet','knop grijs',{actie:'af', gedaan:false}); }
+  else { knop('✓ Gedaan (+1 punt)','knop',{actie:'af', gedaan:true}); knop('Toch maar niet','knop grijs',{actie:'af', gedaan:false}); }
 }
 
 /* ---------- Proost (18+) ---------- */

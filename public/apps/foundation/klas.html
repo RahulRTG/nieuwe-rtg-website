@@ -95,7 +95,7 @@ function teken(){
   if (LES.fase === 'vraag' && LES.vraag){
     if (LES.vraagIx !== laatsteVraag){ gekozen = null; laatsteVraag = LES.vraagIx; }
     if (LES.beantwoord){
-      inhoud.innerHTML = '<div class="groot '+(LES.goedFout?'goed':'fout')+'">'+(LES.goedFout?'✔ Goed!':'Helaas')+'</div>'+
+      inhoud.innerHTML = '<div class="groot '+(LES.goedFout?'goed':'fout')+'">'+(LES.goedFout?'✓ Goed!':'Helaas')+'</div>'+
         '<p class="stil" style="text-align:center;">Wacht op de volgende vraag…</p>';
       opties.innerHTML = ''; return;
     }
@@ -110,7 +110,7 @@ function teken(){
       try {
         const r = await api('/api/les/antwoord', { code: CODE, naam: NAAM, deelnemerToken: TOKEN, keuze: gekozen });
         $('#sScore').textContent = r.score;
-        $('#kInhoud').innerHTML = '<div class="groot '+(r.goed?'goed':'fout')+'">'+(r.goed?'✔ Goed! +'+r.punten:'Helaas')+'</div>'+
+        $('#kInhoud').innerHTML = '<div class="groot '+(r.goed?'goed':'fout')+'">'+(r.goed?'✓ Goed! +'+r.punten:'Helaas')+'</div>'+
           '<p class="stil" style="text-align:center;">Wacht op de volgende vraag…</p>';
         opties.innerHTML = '';
       } catch(e){ gekozen = null; opties.querySelectorAll('.optie').forEach(x => x.disabled = false); }

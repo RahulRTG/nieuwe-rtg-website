@@ -58,19 +58,19 @@
 <main id="main" role="main">
   <p class="stil">Alle elektronica op één plek: lampen, klimaat, gordijnen, audio en meer, per kamer. Maak met Rahul complete scènes ("filmavond") en start ze met één tik. Sloten bedient u altijd zelf, los van scènes; dat is een vaste veiligheidsregel.</p>
 
-  <div class="kop2"><h2>✨ Scènes</h2><span class="n">één tik, heel het huis</span><button class="knop stil2" id="allesUit" style="margin-left:auto;">Alles uit</button></div>
+  <div class="kop2"><h2>✶ Scènes</h2><span class="n">één tik, heel het huis</span><button class="knop stil2" id="allesUit" style="margin-left:auto;">Alles uit</button></div>
   <div class="scenes" id="scenes"><span class="stil">Laden…</span></div>
   <div class="maker">
     <b style="font-size:.95rem;">Nieuwe scène met Rahul</b>
     <p class="stil" style="margin:.3rem 0 .6rem;">Vertel het moment; Rahul stelt de standen voor. U bekijkt, bewaart en start zelf.</p>
     <div class="rij">
       <input class="veld" id="wens" maxlength="200" placeholder="Bijv. filmavond, rustige ochtend, iedereen weg…" style="flex:1;min-width:12rem;">
-      <button class="knop" id="maak">✨ Stel voor</button>
+      <button class="knop" id="maak">✶ Stel voor</button>
     </div>
     <div class="voorstel" id="voorstel" hidden></div>
   </div>
 
-  <div class="kop2"><h2>🔗 Merken</h2><span class="n">werkt met RTG Home Kit · elk merk kan aansluiten</span></div>
+  <div class="kop2"><h2>Merken</h2><span class="n">werkt met RTG Home Kit · elk merk kan aansluiten</span></div>
   <p class="stil" style="margin-bottom:.6rem;">Verbind een merk en zijn apparaten verschijnen meteen in uw kamers en scènes. Ontkoppelen haalt ze net zo netjes weer weg. Elk RTG-partnermerk kan zich via de open koppelstandaard aanmelden.</p>
   <div class="scenes" id="merken"><span class="stil">Laden…</span></div>
 
@@ -149,7 +149,7 @@ function tekenKamers(){
       else stand = { aan: !ap.stand.aan };
       const r = await api('/api/home/zet', { id: ap.id, stand });
       ap.stand = r.apparaat.stand; tekenKamers();
-      if (b.dataset.slot) meld(ap.stand.opSlot ? '🔒 Op slot.' : '🔓 Open; vergeet niet weer af te sluiten.');
+      if (b.dataset.slot) meld(ap.stand.opSlot ? 'Op slot.' : 'Open; vergeet niet weer af te sluiten.');
     } catch(e){ meld(e.message); }
   }));
   $('#kamers').querySelectorAll('.schuif').forEach(sl => sl.addEventListener('change', async () => {
@@ -184,7 +184,7 @@ $('#maak').addEventListener('click', async () => {
     VOORSTEL = r.voorstel;
     const alle = HUIS.kamers.flatMap(k => k.apparaten);
     $('#voorstel').hidden = false;
-    $('#voorstel').innerHTML = '<b>✨ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(demo-voorstel; met AI-sleutel bouwt Rahul hem zelf)</small>':'')+
+    $('#voorstel').innerHTML = '<b>✶ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(demo-voorstel; met AI-sleutel bouwt Rahul hem zelf)</small>':'')+
       '<p class="stil" style="margin-top:.2rem;">'+esc(VOORSTEL.uitleg)+'</p>'+
       '<ul>'+Object.entries(VOORSTEL.standen).map(([id,s]) => { const a = alle.find(x => x.id === id); return '<li>'+esc(a?a.naam:id)+': '+esc(JSON.stringify(s).replace(/[{}"]/g,'').replace(/,/g,', ').replace(/aan:true/,'aan').replace(/aan:false/,'uit'))+'</li>'; }).join('')+'</ul>'+
       '<div class="rij" style="margin-top:.6rem;"><button class="knop" id="vBewaar">Bewaar als scène</button><span class="stil">Sloten doet u altijd zelf; die zitten er nooit in.</span></div>';

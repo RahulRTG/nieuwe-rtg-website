@@ -6631,7 +6631,7 @@
     const labelVoor = k => k === 'pas' ? (T('zg.pas','Pas') + ': ' + claims[k]) : (ZG_CLAIMS.find(c => c.id === k) || {}).label || k;
     const kies = document.getElementById('zgKies'); if (kies) kies.style.display = 'none';
     const res = document.getElementById('zgResultaat');
-    res.innerHTML = '<div class="zg-qrwrap"><div class="zg-badge">\u{1F6E1}️ '+T('zg.geverifieerd','RTG-geverifieerd')+'</div>'+
+    res.innerHTML = '<div class="zg-qrwrap"><div class="zg-badge">\u{1F6E1} '+T('zg.geverifieerd','RTG-geverifieerd')+'</div>'+
       '<div class="zg-qr" id="zgQr"></div>'+
       '<div class="zg-claims">'+ bewezen.map(k => '<span class="zg-claim">✓ '+labelVoor(k)+'</span>').join('') +'</div>'+
       '<div class="zg-tel" id="zgTel"></div>'+

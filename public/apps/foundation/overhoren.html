@@ -224,7 +224,7 @@ $('#hCheck').addEventListener('click', async () => {
   const k = H.rij[H.i];
   const goed = norm($('#hAntwoord').value) === norm(k.a);
   $('#hUitslag').textContent = goed ? '✓ Goed! Die komt later vanzelf terug.'
-    : '✗ Het was: ' + k.a + ' -- die komt vandaag nog een keer.';
+    : 'Het was: ' + k.a + ' -- die komt vandaag nog een keer.';
   $('#hUitslag').className = 'uitslag ' + (goed ? 'goed' : 'fout');
   if (goed) H.goed++; else H.rij.push(k); // fout: achteraan vandaag opnieuw
   try { await api('herhaal-antwoord', { lijstId: k.lijstId, idx: k.idx, goed }); } catch(e){}
@@ -260,7 +260,7 @@ $('#oCheck').addEventListener('click', () => {
   if (!O || O.i >= O.rij.length) return;
   const p = O.paren[O.rij[O.i]];
   const goed = norm($('#oAntwoord').value) === norm(p.a);
-  $('#oUitslag').textContent = goed ? '✓ Goed!' : '✗ Het was: ' + p.a;
+  $('#oUitslag').textContent = goed ? '✓ Goed!' : 'Het was: ' + p.a;
   $('#oUitslag').className = 'uitslag ' + (goed ? 'goed' : 'fout');
   if (goed) O.goed++; else O.fouten.push(O.rij[O.i]);
   O.i++;
@@ -343,7 +343,7 @@ $('#dCheck').addEventListener('click', async () => {
   const antwoord = $('#dAntwoord').value;
   try {
     const d = await api('sessie-zet', { id: D.id, antwoord });
-    $('#dUitslag').textContent = d.goed ? '✓ Goed!' : '✗ Het was: ' + d.juist;
+    $('#dUitslag').textContent = d.goed ? '✓ Goed!' : 'Het was: ' + d.juist;
     $('#dUitslag').className = 'uitslag ' + (d.goed ? 'goed' : 'fout');
     setTimeout(ververs, d.goed ? 600 : 1500);
   } catch (e) { $('#dUitslag').textContent = e.message; }

@@ -35,8 +35,8 @@
   };
   var zetKamer = function (c) { kamer = c; try { c ? localStorage.setItem(CODEKEY, c) : localStorage.removeItem(CODEKEY); } catch (e) {} };
 
-  var knop = maakEl('<button class="rsm-knop" type="button" aria-label="Samen">👥 Samen</button>');
-  var sheet = maakEl('<section class="rsm-sheet" aria-label="Samen" hidden><div class="rsm-kop"><span>👥 Samen</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div><div class="rsm-vak"></div></section>');
+  var knop = maakEl('<button class="rsm-knop" type="button" aria-label="Samen">Samen</button>');
+  var sheet = maakEl('<section class="rsm-sheet" aria-label="Samen" hidden><div class="rsm-kop"><span>Samen</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div><div class="rsm-vak"></div></section>');
   document.body.appendChild(knop); document.body.appendChild(sheet);
   var vak = sheet.querySelector('.rsm-vak');
   knop.addEventListener('click', function () { sheet.hidden = false; knop.hidden = true; teken(); });
@@ -70,7 +70,7 @@
       vak.innerHTML = '<div class="rsm-uit">Kamer-code: <span class="rsm-code">' + esc(k.code) + '</span><br>Hier zijn: ' + k.leden.map(esc).join(', ') + '</div>' +
         '<div class="rsm-chat" data-chat>' + k.chat.map(function (c) { return '<div><b>' + esc(c.van) + ':</b> ' + esc(c.tekst) + '</div>'; }).join('') + '</div>' +
         '<form class="rsm-rij" data-zeg><input placeholder="Zeg iets" maxlength="300" aria-label="Chatbericht"><button class="rsm-go" type="submit">→</button></form>' +
-        '<div class="rsm-rij"><button class="rsm-stil" data-hier type="button" style="flex:1;">📍 Kom hierheen</button><button class="rsm-stil" data-weg type="button">Verlaat</button></div>';
+        '<div class="rsm-rij"><button class="rsm-stil" data-hier type="button" style="flex:1;">Kom hierheen</button><button class="rsm-stil" data-weg type="button">Verlaat</button></div>';
       var chatEl = vak.querySelector('[data-chat]'); chatEl.scrollTop = chatEl.scrollHeight;
       vak.querySelector('[data-zeg]').addEventListener('submit', function (ev) {
         ev.preventDefault(); var i2 = ev.target.querySelector('input'); var t = i2.value.trim(); if (!t) return; i2.value = '';
@@ -119,9 +119,9 @@
     '.rsm-rsheet{position:fixed;right:1rem;bottom:3.6rem;z-index:37;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
     '.rsm-rsheet[hidden]{display:none;}.rsm-ruit{font-size:.84rem;color:var(--zacht,#bbb);line-height:1.55;max-height:38vh;overflow-y:auto;white-space:pre-wrap;}';
   var rSt = document.createElement('style'); rSt.textContent = rCss; document.head.appendChild(rSt);
-  var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul">✨ Rahul</button>');
+  var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul">✶ Rahul</button>');
   var rSheet = maakEl('<section class="rsm-rsheet" aria-label="Vraag Rahul" hidden>' +
-    '<div class="rsm-kop"><span>✨ Vraag het Rahul</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>' +
+    '<div class="rsm-kop"><span>✶ Vraag het Rahul</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="rsm-ruit" aria-live="polite"></div>' +
     '<form class="rsm-rij"><input placeholder="Wat wil je weten?" maxlength="300" autocomplete="off" aria-label="Je vraag"><button class="rsm-go" type="submit" aria-label="Versturen">→</button></form></section>');
   document.body.appendChild(rFab); document.body.appendChild(rSheet);

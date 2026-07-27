@@ -192,7 +192,7 @@
           const perKok = koks.length ? Math.ceil(actief.length / koks.length) : actief.length;
           html += '<div class="allday"><span class="ad-h">'+T('lijn.h','Bezetting')+'</span>'+
             (koks.length ? '<span class="ad">'+koks.map(k=>k.name.split(' ')[0]).join(', ')+' · <b>'+perKok+'</b> '+T('lijn.perkok','bon(nen) p.p.')+'</span>' : '<span class="ad">'+T('lijn.leeg','Niemand aangemeld')+'</span>')+
-            '<button class="obtn'+(ikSta?' primary':'')+'" data-lijnaan="'+sec+'">'+(ikSta?'✔ '+T('lijn.af','Aangemeld, tik om af te melden'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
+            '<button class="obtn'+(ikSta?' primary':'')+'" data-lijnaan="'+sec+'">'+(ikSta?'✓ '+T('lijn.af','Aangemeld, tik om af te melden'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
           // maak nu: wat deze kant NU in een keer maakt, gebundeld over de bonnen
           const nuPer = {};
           actief.forEach(o => {

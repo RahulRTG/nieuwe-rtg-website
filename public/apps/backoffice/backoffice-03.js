@@ -133,7 +133,7 @@
     // partnerprestaties: omzetranglijst met open werk en gemiddelde ritduur
     const perf = state.performance || [];
     const maxOmzet = Math.max.apply(null, perf.map(p=>p.omzet).concat([1]));
-    const medaille = ['🥇','🥈','🥉'];
+    const medaille = ['1.','2.','3.'];
     $('#perfList').innerHTML = perf.length ? perf.filter(p => past(p.name, p.code, p.type)).map((p, i) =>
       '<div class="row"><div class="r1"><div style="flex:1;min-width:0;"><div class="nm">'+(medaille[i]||'')+' '+p.name+
         ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+p.code+'</span></div>'+
@@ -196,7 +196,7 @@
         const d = await call('/office/partner/decide', { id: b.dataset.paok, action: 'goedkeuren' });
         const box = $('#paResult');
         box.style.display = 'block';
-        box.innerHTML = '✅ '+T('bo.pa.done','Goedgekeurd. Geef dit eenmalig door (staat ook in de welkomstmail):')+
+        box.innerHTML = '✓ '+T('bo.pa.done','Goedgekeurd. Geef dit eenmalig door (staat ook in de welkomstmail):')+
           '<br><b>'+T('bo.pa.code','Leverancierscode')+': '+d.code+'</b> · <b>'+T('bo.pa.pin','Manager-PIN')+': '+d.pin+'</b>';
         await refresh();
       } catch(e){ alert(e.message); }

@@ -18,8 +18,8 @@
         var lijst = (d.berichten || []);
         if (!lijst.length) { box.innerHTML = '<div class="sb-leeg">Nog geen berichten. Je gezin kan hier iets achterlaten.</div>'; return; }
         box.innerHTML = lijst.map(function (b) {
-          var extra = b.soort === 'reis' ? '<a class="sb-reisknop" href="reis.html">✈️ Naar de reis</a>' : '';
-          var kop = b.soort === 'hulp' ? '<div class="sb-hulplabel">🆘 Vraagt om hulp</div>' : '';
+          var extra = b.soort === 'reis' ? '<a class="sb-reisknop" href="reis.html">Naar de reis</a>' : '';
+          var kop = b.soort === 'hulp' ? '<div class="sb-hulplabel">SOS Vraagt om hulp</div>' : '';
           var wie = b.vanMij ? 'Jij' : esc(b.vanNaam);
           var aan = b.naar === 'allen' ? '' : '<span class="sb-aan"> aan ' + esc(b.naarNaam) + '</span>';
           return '<div class="sb-b ' + (b.soort || '') + '">' + kop + '<div class="sb-bkop">' + (b.vanAvatar || '') + ' <b>' + wie + '</b>' + aan + '</div><div class="sb-btxt">' + esc(b.tekst) + '</div>' + extra + '</div>';

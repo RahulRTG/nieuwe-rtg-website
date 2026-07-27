@@ -90,7 +90,7 @@ module.exports = (ctx) => {
     const vaartuig = (id, o) => Object.assign({ id, actief: true, type: 'Motorjacht', lengte: 12, bouwjaar: 2022,
       gasten: 8, hutten: 2, slaapplaatsen: 4, brandstof: 'diesel', snelheidKn: 25, ligplaats: 'Marina Botafoch',
       dagprijs: 900, borg: 2000, skipperVerplicht: false, skipperPrijsPerDag: 300, vaarbewijsVereist: true,
-      icoon: '\u{1F6E5}️', foto: null }, o);
+      icoon: '\u{1F6E5}', foto: null }, o);
     db.data.suppliers.push({
       code: 'AZUL', name: 'Azul Yacht Charter', type: 'charter', city: 'Ibiza',
       loc: { lat: 38.918, lng: 1.449, label: 'Marina Botafoch, Ibiza' }, rate: 0.12,

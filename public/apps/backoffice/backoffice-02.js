@@ -29,7 +29,7 @@
     const kop = '<div class="vrow"><div class="vi"><div class="nm">'+d.compleet+' / '+d.totaal+' '+T('bo.saloncompleet','profielen compleet')+'</div>'+
       '<div class="sub">'+(d.achter.length ? d.achter.length+' '+T('bo.salonachter','partner(s) nog niet zichtbaar voor leden') : T('bo.salonok','alle partners zijn zichtbaar'))+'</div></div></div>';
     const rows = (d.partners || []).map(p =>
-      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✅':'⚠️')+' '+escHtml(p.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(p.type)+'</span></div>'+
+      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✓':'⚠')+' '+escHtml(p.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(p.type)+'</span></div>'+
       '<div class="sub">'+(p.bio?'✓':'✗')+' bio · '+(p.foto?'✓':'✗')+' foto · '+p.items+' '+T('bo.salonitems','items')+' · '+p.volgers+' '+T('bo.salonvolgers','volgers')+'</div></div></div>').join('');
     el.innerHTML = kop + rows;
   }
@@ -44,7 +44,7 @@
       const nood = dt.sos && dt.sos.length;
       const namen = dt.deelnemers.map(p => escHtml(p.codenaam) + (p.getekend ? ' ✓' : ' ⌛')).join(' · ');
       const pos = dt.deelnemers.filter(p => p.pos).map(p => escHtml(p.codenaam) + ': ' + p.pos.lat.toFixed(4) + ', ' + p.pos.lng.toFixed(4)).join(' · ') || T('bo.ontgeenpos','nog geen locatie');
-      const status = dt.status === 'noodgeval' ? '🚨 '+T('bo.ontnood','NOODGEVAL') : dt.status === 'actief' ? '🛰️ '+T('bo.ontactief','loopt') : '⌛ '+T('bo.onttekenen','wacht op tekenen');
+      const status = dt.status === 'noodgeval' ? '🚨 '+T('bo.ontnood','NOODGEVAL') : dt.status === 'actief' ? '🛰 '+T('bo.ontactief','loopt') : '⌛ '+T('bo.onttekenen','wacht op tekenen');
       let sosBlok = '';
       if (nood) sosBlok = dt.sos.map(s =>
         '<div style="margin-top:0.4rem;background:rgba(220,40,40,0.12);border-radius:8px;padding:0.5rem 0.7rem;">'+

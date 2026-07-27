@@ -41,7 +41,7 @@ module.exports = [
           airco: false, bagage: 1, kmPerDag: 0, meerKm: 0, borg: 150, minLeeftijd: 18, icoon: '\u{1F6F5}' },
         { id: 'm2', name: 'Yamaha MT-07', plate: 'IB-70-MT', dagprijs: 79, actief: true,
           categorie: 'Motor (A2)', transmissie: 'handgeschakeld', brandstof: 'benzine', stoelen: 2, deuren: 0,
-          airco: false, bagage: 1, kmPerDag: 250, meerKm: 0.2, borg: 500, minLeeftijd: 21, icoon: '\u{1F3CD}️' },
+          airco: false, bagage: 1, kmPerDag: 250, meerKm: 0.2, borg: 500, minLeeftijd: 21, icoon: '\u{1F3CD}' },
         { id: 'm3', name: 'CFMOTO CForce quad', plate: 'IB-44-QD', dagprijs: 95, actief: true,
           categorie: 'Quad', transmissie: 'automaat', brandstof: 'benzine', stoelen: 2, deuren: 0,
           airco: false, bagage: 1, kmPerDag: 150, meerKm: 0.3, borg: 600, minLeeftijd: 21, icoon: '\u{1F69C}' }

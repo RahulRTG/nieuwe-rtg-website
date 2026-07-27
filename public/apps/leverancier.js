@@ -1157,7 +1157,7 @@
           const perKok = koks.length ? Math.ceil(actief.length / koks.length) : actief.length;
           html += '<div class="allday"><span class="ad-h">'+T('lijn.h','Bezetting')+'</span>'+
             (koks.length ? '<span class="ad">'+koks.map(k=>k.name.split(' ')[0]).join(', ')+' · <b>'+perKok+'</b> '+T('lijn.perkok','bon(nen) p.p.')+'</span>' : '<span class="ad">'+T('lijn.leeg','Niemand aangemeld')+'</span>')+
-            '<button class="obtn'+(ikSta?' primary':'')+'" data-lijnaan="'+sec+'">'+(ikSta?'✔ '+T('lijn.af','Aangemeld, tik om af te melden'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
+            '<button class="obtn'+(ikSta?' primary':'')+'" data-lijnaan="'+sec+'">'+(ikSta?'✓ '+T('lijn.af','Aangemeld, tik om af te melden'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
           // maak nu: wat deze kant NU in een keer maakt, gebundeld over de bonnen
           const nuPer = {};
           actief.forEach(o => {
@@ -1795,8 +1795,8 @@
         (rp ? rp.days.map(d=>'<div class="st-row"><span><b>'+d.label+'</b> <span class="sub">'+d.date+'</span></span>'+
             '<span class="sub" style="text-align:right;">'+d.staff.map(m=>m.name.split(' ')[0]+': '+m.shift.split(' ')[0]).join(' · ')+'</span></div>').join('')+
           (rp.status==='voorstel'
-            ? '<div class="tkc-act"><button class="tkc-ready" id="agRoosterOk">✔ '+T('ag2.rooster.ok','Stel vast')+'</button><button class="obtn warn" id="agRoosterNee" style="margin-left:0.5rem;">'+T('ag2.nee','Wijs af')+'</button></div>'
-            : '<div class="tkc-who">✔ '+T('ag2.rooster.vast','Vastgesteld; het rooster in de PDA volgt dit plan.')+'</div>')
+            ? '<div class="tkc-act"><button class="tkc-ready" id="agRoosterOk">✓ '+T('ag2.rooster.ok','Stel vast')+'</button><button class="obtn warn" id="agRoosterNee" style="margin-left:0.5rem;">'+T('ag2.nee','Wijs af')+'</button></div>'
+            : '<div class="tkc-who">✓ '+T('ag2.rooster.vast','Vastgesteld; het rooster in de PDA volgt dit plan.')+'</div>')
         : '<div class="tkc-act"><button class="tkc-start" id="agRooster">'+T('ag2.rooster.stel','Stel het weekrooster voor')+'</button></div>')+'</div>';
       // urenregistratie: wie is binnen, wie werkte wanneer en hoelang
       if (!klokOverzicht) laadKlok();
@@ -2462,7 +2462,7 @@
     el.querySelectorAll('[data-agok]').forEach(b => b.addEventListener('click', async () => {
       const id = b.dataset.agok;
       const regels = [...el.querySelectorAll('[data-agr="'+id+'"]')].map(inp => ({ productId: inp.dataset.pid, aantal: inp.value }));
-      try { const d = await API.call('/supplier/agent/beslis', { id, actie: 'akkoord', regels }); toast('✔ '+T('ag2.besteld','Besteld bij de leverancier')+(d.order?' ('+d.order.ref+')':'')); agentData = null; renderStation(); } catch(e){ toast(e.message); }
+      try { const d = await API.call('/supplier/agent/beslis', { id, actie: 'akkoord', regels }); toast('✓ '+T('ag2.besteld','Besteld bij de leverancier')+(d.order?' ('+d.order.ref+')':'')); agentData = null; renderStation(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-agnee]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/agent/beslis', { id: b.dataset.agnee, actie: 'afwijzen' }); agentData = null; renderStation(); } catch(e){ toast(e.message); }
@@ -7497,7 +7497,7 @@
     const t = $('#aiThread'); if (!t) return;
     t.innerHTML = aiMsgs.length ? aiMsgs.map(m =>
       '<div class="tt-msg ' + (m.role === 'user' ? 'me' : 'other') + '">' +
-      (m.role === 'ai' ? '<span class="who">✦ AI</span>' : '') +
+      (m.role === 'ai' ? '<span class="who">AI</span>' : '') +
       m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
       (m.did ? '<span class="ai-did">✓ ' + T('ai.did','uitgevoerd') + '</span>' : '') + '</div>'
     ).join('') : '<div class="pcempty" style="padding:1.4rem 0.5rem;text-align:center;color:var(--soft);font-size:0.82rem;line-height:1.6;">' + T('ai.empty','Uw assistent kent het hele bedrijf: de kassa, de kamers, de klussen, de gasten. Vraag iets of geef een opdracht.') + '</div>';

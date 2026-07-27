@@ -61,7 +61,7 @@
     el.querySelectorAll('[data-agok]').forEach(b => b.addEventListener('click', async () => {
       const id = b.dataset.agok;
       const regels = [...el.querySelectorAll('[data-agr="'+id+'"]')].map(inp => ({ productId: inp.dataset.pid, aantal: inp.value }));
-      try { const d = await API.call('/supplier/agent/beslis', { id, actie: 'akkoord', regels }); toast('✔ '+T('ag2.besteld','Besteld bij de leverancier')+(d.order?' ('+d.order.ref+')':'')); agentData = null; renderStation(); } catch(e){ toast(e.message); }
+      try { const d = await API.call('/supplier/agent/beslis', { id, actie: 'akkoord', regels }); toast('✓ '+T('ag2.besteld','Besteld bij de leverancier')+(d.order?' ('+d.order.ref+')':'')); agentData = null; renderStation(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-agnee]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/agent/beslis', { id: b.dataset.agnee, actie: 'afwijzen' }); agentData = null; renderStation(); } catch(e){ toast(e.message); }

@@ -11,6 +11,8 @@
     const spel = S.kamer && SPELZAAL[S.kamer.id];
     $('#knopSpel').hidden = !spel;
     $('#knopVraag').hidden = !(S.kamer && (S.kamer.id === 'restaurant' || S.kamer.soort === 'suite'));
+    $('#knopPaar').hidden = !S.kamer;
+    zetKnopPaar();
     if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; }
   }
 
@@ -40,7 +42,11 @@
   }
   function tekenSpel() {
     if (!P) return;
-    const st = P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(' tegen ');
+    // met vier spelers (koppel tegen koppel) tellen we per team
+    const st = P.spelers.length === 4
+      ? [0, 1].map(t => P.spelers.filter(s2 => s2.team === t).map(s2 => esc(s2.codenaam)).join(' & ') + ' ' +
+          P.spelers.filter(s2 => s2.team === t).reduce((a, s2) => a + s2.punten.reduce((x, y) => x + y, 0), 0)).join(' tegen ')
+      : P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(' tegen ');
     $('#spelInfo').innerHTML = '<b>' + esc(P.naam) + '</b> · ' + st + ' ' + esc(P.eenheid) +
       '<span style="color:var(--gold);"> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
     $('#spelDoe').textContent = SPELWERK[P.spel] || 'Speel';
@@ -65,7 +71,7 @@
   function verwerkZet(d, wie) {
     if (d.punt != null && wie) meld(wie === S.ik ? 'U: ' + d.punt + ' ' + (P ? P.eenheid : '') : wie + ': ' + d.punt + ' ' + (P ? P.eenheid : ''));
     if (d.uitslag) {
-      const namen = P ? P.spelers.map(s2 => s2.codenaam) : ['', ''];
+      const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);
       const w = d.uitslag.winnaar;
       $('#spelKeuze').innerHTML = '<h2>' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
         '<div class="sub">' + esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1] + '</div>' +

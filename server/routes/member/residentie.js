@@ -37,6 +37,16 @@ module.exports = (kern) => {
   app.post('/api/residentie/spel/zet', auth, (req, res) => stuur(res, res9().spelZet(req.session.key, req.body || {})));
   app.post('/api/residentie/spel/stop', auth, (req, res) => stuur(res, res9().spelStop(req.session.key)));
   app.post('/api/residentie/vraag', auth, (req, res) => stuur(res, res9().vraag(req.session.key)));
+  /* vast aan elkaar wandelen: verzoek, antwoord en losmaken */
+  app.post('/api/residentie/paar/vraag', auth, (req, res) => {
+    if (!lid(req, res)) return;
+    stuur(res, res9().paarVraag(req.session.key, req.body || {}));
+  });
+  app.post('/api/residentie/paar/antwoord', auth, (req, res) => {
+    if (!lid(req, res)) return;
+    stuur(res, res9().paarAntwoord(req.session.key, req.body || {}));
+  });
+  app.post('/api/residentie/paar/los', auth, (req, res) => stuur(res, res9().paarLos(req.session.key)));
   app.post('/api/residentie/huis', auth, (req, res) => {
     if (!lid(req, res)) return;
     stuur(res, res9().huis(req.session.key));

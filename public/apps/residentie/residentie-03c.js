@@ -3,15 +3,20 @@
      Aan tafel (restaurant of suite) stelt het huis een vraag om het gesprek
      op gang te helpen; iedereen aan tafel ziet dezelfde kaart. De telefoon
      in de suite belt een lid dat nu in het huis is en nodigt uit. */
-  function toonVraag(tekst) {
-    const k = $('#vraagKaart');
-    k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem;">Vraag van het huis</div>' +
-      '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(tekst) + '</div>';
+  function toonVraag(v) {
+    if (typeof v === 'string') v = { tekst: v };
+    const k = $('#vraagKaart'), rahul = v.van === 'rahul';
+    k.classList.toggle('rahul', rahul);
+    k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:' +
+      (rahul ? 'var(--burgundy)' : 'var(--gold)') + ';margin-bottom:.35rem;">' +
+      (rahul ? 'Rahul · directeur van het huis' + (v.niveau === 'gewaagd' ? ' · gewaagd' : '') : 'Vraag van het huis') + '</div>' +
+      (rahul && v.intro ? '<div style="font-size:.74rem;color:var(--soft);margin-bottom:.3rem;">' + esc(v.intro) + '</div>' : '') +
+      '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(v.tekst) + '</div>';
     k.classList.add('open');
-    clearTimeout(k._t); k._t = setTimeout(() => k.classList.remove('open'), 12000);
+    clearTimeout(k._t); k._t = setTimeout(() => k.classList.remove('open'), rahul ? 16000 : 12000);
   }
   $('#knopVraag').addEventListener('click', async () => {
-    try { const r = await api('/api/residentie/vraag', {}); toonVraag(r.tekst); }
+    try { toonVraag(await api('/api/residentie/vraag', {})); }
     catch (e) { meld(e.message); }
   });
 

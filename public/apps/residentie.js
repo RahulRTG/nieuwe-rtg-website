@@ -480,11 +480,13 @@
     for (const l of S.leden.values()) items.push({ z: (l.rx + l.ry) * 10 + 6, doe: () => tekenGast(l, l.codenaam === S.ik) });
     items.sort((a, b) => a.z - b.z);
     for (const it of items) it.doe();
+    tekenParen(); // de gouden draad tussen wie samen wandelt
   }
 
   /* ---------- staat bijwerken vanuit server-antwoorden ---------- */
   function neemStaat(d, hou) {
     if (d.ik) S.ik = d.ik;
+    if ('paar' in d) S.paar = d.paar;
     S.kamer = d.kamer;
     $('#kamerNaam').textContent = d.kamer.naam;
     $('#kamerSub').textContent = (d.kamer.sub || '') + ' · ' + d.leden.length + ' aanwezig';
@@ -531,8 +533,10 @@
         if (d.kind === 'emote') { const l = lid(d.codenaam); if (l) { l.emote = d.glyf; l.emoteTot = Date.now() + 1800; } }
         if (d.kind === 'meubel' && S.kamer.soort === 'suite') { S.kamer.meubels = d.meubels; }
         if (d.kind && d.kind.slice(0, 4) === 'spel') spelSein(d);
-        if (d.kind === 'vraag') toonVraag(d.tekst);
+        if (d.kind === 'vraag') toonVraag(d);
         if (d.kind === 'telefoon') toonBel(d);
+        if (d.kind === 'volg') return betreed(d.naar); // de partner neemt u mee
+        if (d.kind && d.kind.slice(0, 5) === 'paar-') paarSein(d);
       });
       bron.onerror = () => { bron.close(); setTimeout(luister, 4000); };
     } catch (e) {}
@@ -594,6 +598,8 @@
     const spel = S.kamer && SPELZAAL[S.kamer.id];
     $('#knopSpel').hidden = !spel;
     $('#knopVraag').hidden = !(S.kamer && (S.kamer.id === 'restaurant' || S.kamer.soort === 'suite'));
+    $('#knopPaar').hidden = !S.kamer;
+    zetKnopPaar();
     if (P && P.kamerId !== (S.kamer && S.kamer.id)) { P = null; $('#spelBalk').hidden = true; }
   }
 
@@ -623,7 +629,11 @@
   }
   function tekenSpel() {
     if (!P) return;
-    const st = P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(' tegen ');
+    // met vier spelers (koppel tegen koppel) tellen we per team
+    const st = P.spelers.length === 4
+      ? [0, 1].map(t => P.spelers.filter(s2 => s2.team === t).map(s2 => esc(s2.codenaam)).join(' & ') + ' ' +
+          P.spelers.filter(s2 => s2.team === t).reduce((a, s2) => a + s2.punten.reduce((x, y) => x + y, 0), 0)).join(' tegen ')
+      : P.spelers.map(s2 => esc(s2.codenaam) + ' ' + (s2.punten.length ? s2.punten.reduce((a, b) => a + b, 0) : 0)).join(' tegen ');
     $('#spelInfo').innerHTML = '<b>' + esc(P.naam) + '</b> · ' + st + ' ' + esc(P.eenheid) +
       '<span style="color:var(--gold);"> · ' + (P.aanZet === S.ik ? 'u bent aan zet' : esc(P.aanZet || '') + ' is aan zet') + '</span>';
     $('#spelDoe').textContent = SPELWERK[P.spel] || 'Speel';
@@ -648,7 +658,7 @@
   function verwerkZet(d, wie) {
     if (d.punt != null && wie) meld(wie === S.ik ? 'U: ' + d.punt + ' ' + (P ? P.eenheid : '') : wie + ': ' + d.punt + ' ' + (P ? P.eenheid : ''));
     if (d.uitslag) {
-      const namen = P ? P.spelers.map(s2 => s2.codenaam) : ['', ''];
+      const namen = d.uitslag.teams || (P ? P.spelers.map(s2 => s2.codenaam) : ['', '']);
       const w = d.uitslag.winnaar;
       $('#spelKeuze').innerHTML = '<h2>' + (P ? esc(P.naam) : 'Uitslag') + '</h2>' +
         '<div class="sub">' + esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1] + '</div>' +
@@ -691,15 +701,20 @@
      Aan tafel (restaurant of suite) stelt het huis een vraag om het gesprek
      op gang te helpen; iedereen aan tafel ziet dezelfde kaart. De telefoon
      in de suite belt een lid dat nu in het huis is en nodigt uit. */
-  function toonVraag(tekst) {
-    const k = $('#vraagKaart');
-    k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem;">Vraag van het huis</div>' +
-      '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(tekst) + '</div>';
+  function toonVraag(v) {
+    if (typeof v === 'string') v = { tekst: v };
+    const k = $('#vraagKaart'), rahul = v.van === 'rahul';
+    k.classList.toggle('rahul', rahul);
+    k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:' +
+      (rahul ? 'var(--burgundy)' : 'var(--gold)') + ';margin-bottom:.35rem;">' +
+      (rahul ? 'Rahul · directeur van het huis' + (v.niveau === 'gewaagd' ? ' · gewaagd' : '') : 'Vraag van het huis') + '</div>' +
+      (rahul && v.intro ? '<div style="font-size:.74rem;color:var(--soft);margin-bottom:.3rem;">' + esc(v.intro) + '</div>' : '') +
+      '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(v.tekst) + '</div>';
     k.classList.add('open');
-    clearTimeout(k._t); k._t = setTimeout(() => k.classList.remove('open'), 12000);
+    clearTimeout(k._t); k._t = setTimeout(() => k.classList.remove('open'), rahul ? 16000 : 12000);
   }
   $('#knopVraag').addEventListener('click', async () => {
-    try { const r = await api('/api/residentie/vraag', {}); toonVraag(r.tekst); }
+    try { toonVraag(await api('/api/residentie/vraag', {})); }
     catch (e) { meld(e.message); }
   });
 
@@ -734,6 +749,100 @@
     $('#spelLaag').classList.add('open');
     $('#belGa').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); betreed(d.adres); });
     $('#belNiet').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+  }
+
+  /* ---------- deel 3d: samen wandelen (het paar) ----------
+     Een verzoek, een ja, en twee pionnen wandelen vast aan elkaar door het
+     huis: een gouden draad met een hartje ertussen. Losmaken mag altijd;
+     wie wil, wordt via de bestaande vriendenlaag ook echt vrienden. */
+  function tekenParen() {
+    if (!S.kamer || !S.kamer.paren || !S.kamer.paren.length) return;
+    for (const [na, nb] of S.kamer.paren) {
+      const a = S.leden.get(na), b = S.leden.get(nb);
+      if (!a || !b) continue;
+      const ax = isoX(a.rx + 0.5, a.ry + 0.5), ay = isoY(a.rx + 0.5, a.ry + 0.5) - TH * 0.8;
+      const bx = isoX(b.rx + 0.5, b.ry + 0.5), by = isoY(b.rx + 0.5, b.ry + 0.5) - TH * 0.8;
+      const mx = (ax + bx) / 2, my = (ay + by) / 2 - 14;
+      ctx.strokeStyle = 'rgba(201,169,75,0.55)'; ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo(mx, my, bx, by); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '10px Inter, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = KLEUR.bordeauxLicht;
+      ctx.fillText('♥', mx, my + 4);
+    }
+  }
+
+  function zetKnopPaar() {
+    $('#knopPaar').textContent = S.paar ? 'Losmaken' : 'Wandel samen';
+  }
+  $('#knopPaar').addEventListener('click', async () => {
+    if (S.paar) {
+      try { await api('/api/residentie/paar/los', {}); S.paar = null; zetKnopPaar(); meld('U wandelt weer alleen.'); }
+      catch (e) { meld(e.message); }
+      return;
+    }
+    const anderen = [...S.leden.values()].filter(l => l.codenaam !== S.ik);
+    if (!anderen.length) return meld('U bent hier nog alleen.');
+    $('#spelKeuze').innerHTML = '<h2>Samen wandelen</h2><div class="sub">vast aan elkaar door het huis, zolang u allebei hier bent</div>' +
+      anderen.map(l => '<button class="rij-item" data-paar="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">vraag</span></button>').join('') +
+      '<button class="knop2 stil2" id="paarKeuzeWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
+    $('#spelLaag').classList.add('open');
+    $('#paarKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+    $('#spelKeuze').querySelectorAll('[data-paar]').forEach(b => b.addEventListener('click', async () => {
+      $('#spelLaag').classList.remove('open');
+      try { await api('/api/residentie/paar/vraag', { codenaam: b.dataset.paar });
+        meld('Gevraagd; even wachten op ' + b.dataset.paar + '.'); } catch (e) { meld(e.message); }
+    }));
+  });
+
+  async function wordVrienden(naam) {
+    try {
+      const z = await api('/api/member/find', { q: naam });
+      const t = (z.results || []).find(r => r.codename === naam) || (z.results || [])[0];
+      if (!t) return meld('Niet gevonden in de ledengids.');
+      await api('/api/member/connect', { key: t.key });
+      meld('Vriendschapsverzoek verstuurd naar ' + naam + '.');
+    } catch (e) { meld(e.message); }
+  }
+
+  function paarSein(d) {
+    if (d.kind === 'paar-verzoek') {
+      $('#spelKeuze').innerHTML = '<h2>Samen wandelen?</h2>' +
+        '<div class="sub">' + esc(d.van) + ' wil vast aan u wandelen, zolang u hier samen bent</div>' +
+        '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+        '<button class="knop2" id="paarJa" type="button" style="flex:1;">Graag</button>' +
+        '<button class="knop2 stil2" id="paarNee" type="button" style="flex:1;">Liever niet</button></div>';
+      $('#spelLaag').classList.add('open');
+      $('#paarJa').addEventListener('click', async () => {
+        $('#spelLaag').classList.remove('open');
+        try { const r = await api('/api/residentie/paar/antwoord', { ja: true }); S.paar = r.paar || d.van; zetKnopPaar(); }
+        catch (e) { meld(e.message); }
+      });
+      $('#paarNee').addEventListener('click', async () => {
+        $('#spelLaag').classList.remove('open');
+        try { await api('/api/residentie/paar/antwoord', { ja: false }); } catch (e) {}
+      });
+    }
+    if (d.kind === 'paar-aan') {
+      if (S.kamer && S.kamer.paren && !S.kamer.paren.some(p2 => p2.includes(d.a))) S.kamer.paren.push([d.a, d.b]);
+      if (d.a === S.ik || d.b === S.ik) {
+        S.paar = d.a === S.ik ? d.b : d.a; zetKnopPaar();
+        $('#spelKeuze').innerHTML = '<h2>U wandelt samen</h2>' +
+          '<div class="sub">met ' + esc(S.paar) + ' · u loopt nu vast aan elkaar door het huis</div>' +
+          '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+          '<button class="knop2" id="paarVriend" type="button" style="flex:1;">Word ook vrienden</button>' +
+          '<button class="knop2 stil2" id="paarKlaar" type="button" style="flex:1;">Verder</button></div>';
+        $('#spelLaag').classList.add('open');
+        $('#paarVriend').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); wordVrienden(S.paar); });
+        $('#paarKlaar').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
+      } else meld(d.a + ' en ' + d.b + ' wandelen nu samen.');
+    }
+    if (d.kind === 'paar-los') {
+      if (S.kamer && S.kamer.paren) S.kamer.paren = S.kamer.paren.filter(p2 => !(p2.includes(d.a) || p2.includes(d.b)));
+      if (d.a === S.ik || d.b === S.ik || S.paar) { S.paar = null; zetKnopPaar(); meld('Het paar is losgemaakt.'); }
+    }
+    if (d.kind === 'paar-nee') meld('Nu even niet; misschien straks.');
   }
 
   /* ---------- deel 4: de gids, het suite-atelier en de start ---------- */

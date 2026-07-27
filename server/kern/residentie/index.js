@@ -57,6 +57,7 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     for (const key of Object.keys(k.leden)) if (nu - (k.leden[key].at || 0) > TTL) {
       const weg = k.leden[key]; delete k.leden[key];
       potjeWeg(id, key);
+      if (kop.partnerVan && kop.partnerVan(key)) kop.paarLos(key);
       sein(id, 'weg', { codenaam: weg.codenaam });
     }
   }
@@ -72,7 +73,20 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     ruimOp(id);
     const k = kamer(id);
     return { ok: true, kamer: { id, soort: p.soort, naam: p.naam, sub: p.sub || null, b: p.b, d: p.d,
-      meubels: p.meubels || [], eigen: false }, leden: Object.values(k.leden).map(pub), chat: k.chat.slice(-30) };
+      meubels: p.meubels || [], paren: kop.parenIn ? kop.parenIn(id) : [], eigen: false },
+      leden: Object.values(k.leden).map(pub), chat: k.chat.slice(-30) };
+  }
+  // iemand neerzetten op de eerste vrije tegel rond de spawn (geen tenen)
+  function zetNeer(p, id, key, codenaam) {
+    const k = kamer(id);
+    let [sx, sy] = p.spawn;
+    const bezet = (x2, y2) => Object.values(k.leden).some(l => l.dx === x2 && l.dy === y2);
+    for (const [ox, oy] of [[0, 0], [1, 0], [-1, 0], [0, -1], [1, -1], [-1, -1], [2, 0], [-2, 0]]) {
+      const nx = p.spawn[0] + ox, ny = p.spawn[1] + oy;
+      if (nx >= 0 && nx < p.b && ny >= 0 && ny < p.d && !geblokkeerd(p, nx, ny) && !bezet(nx, ny)) { sx = nx; sy = ny; break; }
+    }
+    k.leden[key] = { codenaam, x: sx, y: sy, dx: sx, dy: sy, zit: false, at: Date.now() };
+    return pub(k.leden[key]);
   }
 
   function betreed(key, codenaam, id) {
@@ -86,19 +100,14 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     ruimOp(id);
     const k = kamer(id);
     if (!k.leden[key] && Object.keys(k.leden).length >= 40) return { status: 409, error: 'Deze zaal is vol (40 gasten); probeer een andere.' };
-    // niet op elkaars tenen binnenkomen: pak de eerste vrije tegel rond de spawn
-    let [sx, sy] = p.spawn;
-    const bezet = (x2, y2) => Object.values(k.leden).some(l => l.dx === x2 && l.dy === y2);
-    for (const [ox, oy] of [[0, 0], [1, 0], [-1, 0], [0, -1], [1, -1], [-1, -1], [2, 0], [-2, 0]]) {
-      const nx = p.spawn[0] + ox, ny = p.spawn[1] + oy;
-      if (nx >= 0 && nx < p.b && ny >= 0 && ny < p.d && !geblokkeerd(p, nx, ny) && !bezet(nx, ny)) { sx = nx; sy = ny; break; }
-    }
-    k.leden[key] = k.leden[key] || { codenaam, x: sx, y: sy, dx: sx, dy: sy, zit: false, at: Date.now() };
+    if (!k.leden[key]) zetNeer(p, id, key, codenaam);
     k.leden[key].codenaam = codenaam; k.leden[key].at = Date.now();
     save();
     sein(id, 'kom', pub(k.leden[key]), key);
+    if (kop.volgBetreed) kop.volgBetreed(id, key); // de partner wandelt mee
     const uit = staat(id, p);
     uit.ik = codenaam;
+    uit.paar = kop.partnerNaam ? kop.partnerNaam(key) : null;
     uit.kamer.eigen = p.soort === 'suite' && p.eigenaarKey === key;
     return uit;
   }
@@ -115,6 +124,7 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     l.x = l.dx; l.y = l.dy; l.dx = x; l.dy = y; l.zit = zit; l.at = Date.now();
     save();
     sein(id, 'stap', { codenaam: l.codenaam, x: l.x, y: l.y, dx: x, dy: y, zit }, key);
+    if (kop.volgStap) kop.volgStap(id, key, l.x, l.y); // vast aan elkaar: de partner volgt
     return { status: 200, ok: true, zit };
   }
 
@@ -144,6 +154,7 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
 
   function weg(key) {
     const id = kamerVan(key);
+    if (kop.partnerVan && kop.partnerVan(key)) kop.paarLos(key); // het huis uit = het paar los
     if (id) { const l = kamer(id).leden[key]; delete kamer(id).leden[key]; potjeWeg(id, key); save(); if (l) sein(id, 'weg', { codenaam: l.codenaam }); }
     return { status: 200, ok: true };
   }
@@ -152,12 +163,17 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     const id = kamerVan(key);
     if (!id) return { status: 409, error: 'U bent geen kamer binnen.' };
     kamer(id).leden[key].at = Date.now();
-    return staat(id, plattegrond(id));
+    const uit = staat(id, plattegrond(id));
+    uit.paar = kop.partnerNaam ? kop.partnerNaam(key) : null;
+    return uit;
   }
 
+  const kop = {};
   const api = { betreed, stap, zeg, emote, weg, pols };
   Object.assign(api, require('./suite')({ R, suiteVan, kamer, sein, save, schoon, MEUBELS, ZALEN, SUITE }));
-  Object.assign(api, require('./spel')({ R, kamer, kamerVan, sein, sseToCustomer, save }));
+  Object.assign(kop, require('./koppel')({ R, kamer, kamerVan, sein, sseToCustomer, save, zetNeer, zitplek, plattegrond }));
+  Object.assign(api, { paarVraag: kop.paarVraag, paarAntwoord: kop.paarAntwoord, paarLos: k => kop.paarLos(k) });
+  Object.assign(api, require('./spel')({ R, kamer, kamerVan, sein, sseToCustomer, save, partnerVan: kop.partnerVan }));
   return { residentie: api };
 }
 

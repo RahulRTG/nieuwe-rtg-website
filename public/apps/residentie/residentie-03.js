@@ -27,11 +27,13 @@
     for (const l of S.leden.values()) items.push({ z: (l.rx + l.ry) * 10 + 6, doe: () => tekenGast(l, l.codenaam === S.ik) });
     items.sort((a, b) => a.z - b.z);
     for (const it of items) it.doe();
+    tekenParen(); // de gouden draad tussen wie samen wandelt
   }
 
   /* ---------- staat bijwerken vanuit server-antwoorden ---------- */
   function neemStaat(d, hou) {
     if (d.ik) S.ik = d.ik;
+    if ('paar' in d) S.paar = d.paar;
     S.kamer = d.kamer;
     $('#kamerNaam').textContent = d.kamer.naam;
     $('#kamerSub').textContent = (d.kamer.sub || '') + ' · ' + d.leden.length + ' aanwezig';
@@ -78,8 +80,10 @@
         if (d.kind === 'emote') { const l = lid(d.codenaam); if (l) { l.emote = d.glyf; l.emoteTot = Date.now() + 1800; } }
         if (d.kind === 'meubel' && S.kamer.soort === 'suite') { S.kamer.meubels = d.meubels; }
         if (d.kind && d.kind.slice(0, 4) === 'spel') spelSein(d);
-        if (d.kind === 'vraag') toonVraag(d.tekst);
+        if (d.kind === 'vraag') toonVraag(d);
         if (d.kind === 'telefoon') toonBel(d);
+        if (d.kind === 'volg') return betreed(d.naar); // de partner neemt u mee
+        if (d.kind && d.kind.slice(0, 5) === 'paar-') paarSein(d);
       });
       bron.onerror = () => { bron.close(); setTimeout(luister, 4000); };
     } catch (e) {}

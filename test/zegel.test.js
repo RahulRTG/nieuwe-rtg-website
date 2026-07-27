@@ -22,8 +22,12 @@ test('1. selectieve onthulling: alleen toegestane claims, ruwe gegevens eruit', 
   assert.equal(r.claims.pas, 'business');
   assert.equal(r.claims.naam, undefined, 'naam is NIET in het zegel beland');
   assert.equal(r.claims.geboortedatum, undefined, 'geboortedatum is NIET in het zegel beland');
-  // het token bevat de ruwe gegevens ook letterlijk niet
-  assert.doesNotMatch(Buffer.from(token.split('.')[0], 'base64url').toString(), /Jan|1990/);
+  // het token bevat de ruwe gegevens ook letterlijk niet. De tijdvelden (iat/exp)
+  // eerst eruit: een epoch-seconde kan toevallig "1990" bevatten (zo een keer
+  // geflaked in de suite) en die velden zijn geen persoonsgegevens.
+  const kaal = JSON.parse(Buffer.from(token.split('.')[0], 'base64url').toString());
+  delete kaal.iat; delete kaal.exp;
+  assert.doesNotMatch(JSON.stringify(kaal), /Jan|1990/);
 });
 
 test('2. offline verifieerbaar met ALLEEN de publieke sleutel', () => {

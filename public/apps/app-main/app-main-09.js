@@ -42,10 +42,10 @@
     }
     html += '<div class="sc-strip">' +
       '<button class="sc-p add" id="scAddBtn"><span class="sc-av">+</span><span>' + T('sal.add','Toevoegen') + '</span></button>' +
-      (social.connections || []).map(c =>
-        '<button class="sc-p" data-scdm="' + escT(c.key) + '" data-cn="' + escT(c.codename) + '">' +
-          '<span class="sc-av">' + initCN(c.codename) + (c.unread ? '<span class="sc-badge">' + c.unread + '</span>' : '') + '</span>' +
-          '<span>' + escT(c.codename.split(' ')[0]) + '</span></button>'
+      (social.connections || []).map(c => { const nm = c.eigenNaam || c.codename; return (
+        '<button class="sc-p" data-scdm="' + escT(c.key) + '" data-cn="' + escT(nm) + '" title="' + escT(c.codename) + '">' +
+          '<span class="sc-av">' + initCN(nm) + (c.unread ? '<span class="sc-badge">' + c.unread + '</span>' : '') + '</span>' +
+          '<span>' + escT(nm.split(' ')[0]) + '</span></button>'); }
       ).join('') + '</div>';
     html += '<div class="sc-zoek" id="scZoek"><input id="scQ" placeholder="' + T('sal.zoekph','Zoek op codenaam, bijv. Gouden Ibis') + '"><button id="scGo">' + T('sal.zoek','Zoek') + '</button></div>' +
       '<div class="sc-res" id="scRes"></div>';

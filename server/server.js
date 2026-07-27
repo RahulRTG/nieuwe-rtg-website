@@ -2210,7 +2210,7 @@ Object.assign(kern, require('./kern/werkplek')({ db, save, crypto }));
    geautomatiseerd (berichten, onboarding, rondleiding, RTF, veiligheid, privacy);
    alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
    Lifestyle/Business toe. */
-Object.assign(kern, require('./kern/aanmeldingen')({ db, save, crypto, schoon,
+Object.assign(kern, require('./kern/aanmeldingen')({ db, save, crypto, schoon, accounts,
   // laat gebonden: de geld-regie wordt verderop gemount; bij het accepteren
   // (request-tijd) is kern.geldPasprijzen al beschikbaar voor het betaalschema.
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null) }));

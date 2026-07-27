@@ -21,4 +21,8 @@ module.exports = (kern) => {
   // het betaalschema: na een akkoord loopt de bijdrage 12 maanden automatisch,
   // met de 30%-foundationsplit. Alleen voor het personeel.
   app.post('/api/aanmelding/betalingen', officeAuth, (req, res) => veilig(res, () => aanmeldingen.betalingen(req.body || {})));
+  // een termijn aftekenen als voldaan (administratieve bevestiging, geen
+  // betaalclaim); de eerste voldane termijn zet een ondernemerszaak klaar
+  app.post('/api/aanmelding/termijn-voldaan', officeAuth, (req, res) => veilig(res, () =>
+    aanmeldingen.termijnVoldaan(String((req.body || {}).id || ''), (req.body || {}).maand, wie(req))));
 };

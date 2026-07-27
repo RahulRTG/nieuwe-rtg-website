@@ -6,14 +6,17 @@
         '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek in De Salon iemand die bij me past en help me die toe te voegen als connectie">Laat Rahul iemand voorstellen</button>'+
         '</div>';
     } else {
-      html += conns.map(c =>
+      // de naamlaag: een zelfgekozen naam (eigenNaam) gaat voor de codenaam;
+      // het potloodje zet of wist hem, en hij werkt overal in dit account door
+      html += conns.map(c => { const nm = c.eigenNaam || c.codename; return (
         '<div class="hc-rij" style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+
-        '<span class="sc-av" style="width:2.2rem;height:2.2rem;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+initCN(c.codename)+(c.unread?'<span class="sc-badge">'+c.unread+'</span>':'')+'</span>'+
-        '<b style="flex:1;min-width:0;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+escT(c.codename)+'</b>'+
-        '<button class="go" style="padding:.2rem .5rem;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">Bericht</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-snap="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'" title="Snap">'+RTGGlyf.svgHTML('camera')+'</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+RTGGlyf.svgHTML('bellen')+'</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'
+        '<span class="sc-av" style="width:2.2rem;height:2.2rem;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+initCN(nm)+(c.unread?'<span class="sc-badge">'+c.unread+'</span>':'')+'</span>'+
+        '<b style="flex:1;min-width:0;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="'+escT(c.codename)+'">'+escT(nm)+(c.eigenNaam?' <span class="meta" style="font-weight:400;">· '+escT(c.codename)+'</span>':'')+'</b>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;color:var(--muted);" data-hernoem="'+escT(c.codename)+'" title="Eigen naam geven">✎</button>'+
+        '<button class="go" style="padding:.2rem .5rem;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'">Bericht</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-snap="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="Snap">'+RTGGlyf.svgHTML('camera')+'</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('bellen')+'</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'); }
       ).join('') + '<button class="go" style="margin-top:.7rem;background:transparent;color:var(--muted);" data-goto="salon">+ Iemand toevoegen</button>';
     }
     el.innerHTML = html;
@@ -21,6 +24,11 @@
     el.querySelectorAll('[data-snap]').forEach(b => b.addEventListener('click', () => snapKies(b.dataset.snap)));
     el.querySelectorAll('[data-bel]').forEach(b => b.addEventListener('click', () => snelBel(b.dataset.bel, b.dataset.cn, false)));
     el.querySelectorAll('[data-vid]').forEach(b => b.addEventListener('click', () => snelBel(b.dataset.vid, b.dataset.cn, true)));
+    el.querySelectorAll('[data-hernoem]').forEach(b => b.addEventListener('click', async () => {
+      const naam = prompt('Hoe wil jij deze vriend noemen? (leeg = terug naar de codenaam)', '');
+      if (naam === null) return;
+      try { await API.call('/member/naam/zet', { codenaam: b.dataset.hernoem, naam }); toast(naam.trim() ? 'Opgeslagen; alleen jij ziet deze naam.' : 'Terug naar de codenaam.'); loadSocial(); } catch(e){ toast(e.message); }
+    }));
     renderSnapsStories();
     el.querySelectorAll('[data-cja]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/member/connect/respond', { key: b.dataset.cja, action: 'accept' }); toast(T('sal.verbonden','Verbonden.')); loadSocial(); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-cnee]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/member/connect/respond', { key: b.dataset.cnee, action: 'decline' }); loadSocial(); } catch(e){ toast(e.message); } }));

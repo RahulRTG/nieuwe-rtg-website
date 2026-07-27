@@ -22,6 +22,7 @@ require('./supplier/hrplus')(kern);
 require('./supplier/prplus')(kern);
 require('./supplier/gebouwplus')(kern);
 require('./supplier/gebouwpand')(kern);
+require('./supplier/wensen')(kern);
 
 app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
 

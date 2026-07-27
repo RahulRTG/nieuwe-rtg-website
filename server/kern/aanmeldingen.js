@@ -53,7 +53,7 @@ const REIS = [
     u: 'Privacy (AVG): u mag uw gegevens altijd inzien, corrigeren en laten wissen.' }
 ];
 
-module.exports = ({ db, save, crypto, schoon, geldPasprijzen }) => {
+module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const kap = (t, n) => schoon(String(t == null ? '' : t), n || 200);
@@ -66,6 +66,9 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen }) => {
      kantooroverzicht) draait als submodule op dezelfde context; zie
      aanmeldingen/betaalschema.js. */
   const { startBetalingen, betalingen } = require('./aanmeldingen/betaalschema')({ B, geldPasprijzen, rid, nu, eur, PASSEN });
+  /* De ondernemersintake en de automatische bedrijfsprovisioning na de
+     eerste voldane termijn; zie aanmeldingen/bedrijf.js. */
+  const bedrijfMod = require('./aanmeldingen/bedrijf')({ db, save, kap, nu, accounts });
   const vind = id => A().find(a => a.id === String(id || ''));
 
   // De geautomatiseerde reis opbouwen in de toon van de pas. Elke stap is meteen
@@ -79,6 +82,7 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen }) => {
     return { id: a.id, pas: a.pas, pasNaam: (PASSEN[a.pas] || {}).naam || a.pas,
       naam: a.naam, contact: a.contact, status: a.status,
       reis: a.reis, welkom: a.welkom, viaUitnodiging: !!a.viaUitnodiging,
+      bedrijf: a.bedrijf || null, gezaakt: a.gezaakt || null,
       besluit: a.besluit || null, at: a.at, bijgewerkt: a.bijgewerkt };
   }
 
@@ -102,6 +106,9 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen }) => {
     const a = { id: rid(), pas, naam, contact, viaUitnodiging,
       welkom: def.welkom, reis: bouwReis(def.stem),
       status: 'in behandeling', besluit: null, at: nu(), bijgewerkt: nu() };
+    // de ondernemersintake: de AI vraagt bij het gesprek al wat het bedrijf
+    // nodig heeft; dat komt netjes geklemd op de aanmelding
+    bedrijfMod.zetBedrijf(a, b.bedrijf);
     A().unshift(a);
     if (A().length > 5000) A().pop();
     save();
@@ -140,5 +147,13 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen }) => {
      Lifestyle/Business. Zo kan geen enkele assistent per ongeluk toegang beloven. */
   function magAutomatischToekennen(pas) { return false; }
 
-  return { aanmeldingen: { aanvraag, lijst, een, beslis, betalingen, magAutomatischToekennen, PASSEN } };
+  /* Een termijn aftekenen als voldaan (administratieve bevestiging door een
+     mens, geen betaalclaim); de eerste voldane termijn van een geaccepteerde
+     ondernemersaanmelding zet de zaak automatisch klaar. */
+  function termijnVoldaan(id, maand, door) {
+    const a = vind(id); if (!a) return { status: 404, error: 'Deze aanmelding bestaat niet.' };
+    return bedrijfMod.termijnVoldaan(B, a, maand, door);
+  }
+
+  return { aanmeldingen: { aanvraag, lijst, een, beslis, betalingen, termijnVoldaan, magAutomatischToekennen, PASSEN } };
 };

@@ -2334,7 +2334,8 @@ Object.assign(kern, require('./kern/rampbeeld')({ db, save, findSupplier, anthro
    genres (zzp, chef, wellness). Zelfde aanbod-/boekingsmodel als voorheen,
    maar met een vandaag-bord, KPI's en een genre-bewuste AI-assistent, zodat
    deze apps op het niveau van de horeca- en hoteltorens komen. */
-Object.assign(kern, require('./kern/vakwerk').maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon }));
+Object.assign(kern, require('./kern/vakwerk').maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon,
+  crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,

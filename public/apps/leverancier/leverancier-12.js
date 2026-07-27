@@ -117,14 +117,16 @@
     finBusy = false;
     renderStation();
   }
-  // het vakwerk-dashboard (zzp, chef, wellness): vandaag-bord, aanvragen, KPI's en AI
-  let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false, vakUren = null;
+  // het vakwerk-dashboard (dienstverlenende genres): vandaag-bord, aanvragen, KPI's en AI
+  let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false, vakUren = null, vakPro = null;
   async function laadVakwerk(){
     if (vakBusy) return;
     vakBusy = true;
     try { vakData = await API.call('/supplier/vak/bord', {}); }
     catch(e){ vakData = { error: e.message }; }
     try { vakUren = (await API.call('/supplier/vak/uren', {})).uren; } catch(e){ vakUren = null; }
+    // de pro-laag: offertes, klantenboek, werkbonnen en onderhoud
+    try { vakPro = await API.call('/supplier/vak/pro', {}); } catch(e){ vakPro = null; }
     vakBusy = false;
     renderStation();
   }

@@ -47,6 +47,7 @@ module.exports = (kern) => {
   require('./member/onderweg')(kern);
   // Boeken en bestellen: diensten, historie, cadeaukaarten, partnerlijst, orders.
   require('./member/boeken')(kern);
+  require('./member/vakpro')(kern);
   // De zakelijke tools van de Business Pass: zzp-belastingtool en AI-boekhouder.
   require('./member/zakelijk')(kern);
   // De Rechterhand: de premium suite van de Lifestyle Pass

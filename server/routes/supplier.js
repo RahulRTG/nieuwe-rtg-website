@@ -65,6 +65,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/gastcontact')(kern);
   require('./supplier/tafels-team')(kern);
   require('./supplier/boekingen')(kern);
+  require('./supplier/vakpro')(kern);
   require('./supplier/ai')(kern);
   require('./supplier/menukaart')(kern);
   require('./supplier/orders')(kern);

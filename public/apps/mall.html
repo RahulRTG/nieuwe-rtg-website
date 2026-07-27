@@ -424,7 +424,8 @@ function tekenDiensten(genres){
   if (!genres.length){ w.innerHTML = ''; return; }
   DZAKEN = {};
   w.innerHTML = '<div class="etage"><div class="etage-kop"><h2>Het Dienstenplein</h2>'+
-    '<span class="n">diensten aan huis, op de villa of aan boord · boek direct</span></div>'+
+    '<span class="n">diensten aan huis, op de villa of aan boord · boek direct of vraag een offerte</span></div>'+
+    '<div id="dpOff"></div>'+
     genres.map(g => {
       g.zaken.forEach(z => DZAKEN[z.code] = z);
       return '<div class="dp-sub">'+esc(g.label)+' <span class="n">· '+g.aantal+' '+(g.aantal===1?'zaak':'zaken')+'</span></div>'+
@@ -437,6 +438,37 @@ function tekenDiensten(genres){
         '</button>').join('')+'</div>';
     }).join('')+'</div>';
   w.querySelectorAll('.dpz').forEach(b => b.addEventListener('click', () => openDienstZaak(b.dataset.code)));
+  tekenOffertes();
+}
+
+/* Mijn offertes: vrije klussen die je hebt aangevraagd; bij een aanbod geef
+   je hier akkoord (de klus staat dan bevestigd in je boekingen) of trek je in. */
+async function tekenOffertes(){
+  const w = $('#dpOff'); if (!w) return;
+  let d; try { d = await api('/api/vak/offertes/mijn'); } catch(e){ w.innerHTML=''; return; }
+  const off = (d.offertes || []).filter(o => o.status !== 'ingetrokken');
+  if (!off.length){ w.innerHTML=''; return; }
+  const LBL = { aangevraagd:'wacht op antwoord', aangeboden:'aanbod ontvangen', akkoord:'akkoord · geboekt', afgewezen:'kon niet' };
+  w.innerHTML = '<div class="dp-sub">Mijn offertes <span class="n">· '+off.length+'</span></div>'+
+    '<div class="boutieks">'+off.slice(0,6).map(o =>
+      '<div class="boutiek" style="cursor:default;">'+
+        '<span class="stad">'+esc(o.zaak)+' · '+esc(LBL[o.status]||o.status)+'</span>'+
+        '<span class="tag">'+esc(o.omschrijving)+'</span>'+
+        (o.prijs!=null?'<span class="prijs" style="font-size:.95rem;">'+euro(o.prijs)+(o.toelichting?' <span style="color:var(--soft);font-size:.78rem;">· '+esc(o.toelichting)+'</span>':'')+'</span>':'')+
+        (o.status==='akkoord'&&o.boekingRef?'<span class="meta">boeking '+esc(o.boekingRef)+' · de zaak neemt contact op</span>':'')+
+        (o.status==='aangeboden'
+          ? '<div class="rij"><button class="knop offok" data-id="'+esc(o.id)+'">Akkoord</button><button class="knop stil offweg" data-id="'+esc(o.id)+'">Intrekken</button></div>'
+          : (o.status==='aangevraagd'?'<div class="rij"><button class="knop stil offweg" data-id="'+esc(o.id)+'">Intrekken</button></div>':''))+
+      '</div>').join('')+'</div>';
+  w.querySelectorAll('.offok').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('/api/vak/offerte/akkoord', { id: b.dataset.id });
+      meld('Akkoord; de klus staat als bevestigde boeking klaar ('+r.boeking.ref+').'); tekenOffertes(); }
+    catch(e){ meld(e.message); }
+  }));
+  w.querySelectorAll('.offweg').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/vak/offerte/intrek', { id: b.dataset.id }); meld('Ingetrokken.'); tekenOffertes(); }
+    catch(e){ meld(e.message); }
+  }));
 }
 function openDienstZaak(code){
   const z = DZAKEN[code]; if (!z) return;
@@ -444,15 +476,42 @@ function openDienstZaak(code){
   $('#bladNaam').textContent = z.naam;
   $('#bladStad').textContent = (z.stad || 'RTG') + ' · ' + z.genreLabel;
   $('#blad').classList.add('open');
-  $('#bladArt').innerHTML = z.diensten.length ? z.diensten.map(d =>
+  $('#bladArt').innerHTML = (z.diensten.length ? z.diensten.map(d =>
     '<div class="kaart">'+
       '<span class="cat">'+(d.soort==='product'?'Product':'Dienst')+'</span>'+
       '<h3>'+esc(d.naam)+'</h3>'+
       (d.uitleg?'<span class="oms">'+esc(d.uitleg)+'</span>':'')+
       '<span class="prijs">'+euro(d.prijs)+(d.duurMin?' <span style="color:var(--soft);font-size:.8rem;">· '+d.duurMin+' min</span>':'')+'</span>'+
       '<div class="rij"><button class="knop dboek" data-id="'+esc(d.id)+'">Boeken</button></div>'+
-    '</div>').join('') : '<div class="leeg">Deze zaak vult haar aanbod nog.</div>';
+    '</div>').join('') : '<div class="leeg">Deze zaak vult haar aanbod nog.</div>')+
+    '<div class="kaart"><span class="cat">Vrije klus</span><h3>Staat het er niet tussen?</h3>'+
+    '<span class="oms">Omschrijf je klus; de zaak antwoordt met een prijs op maat en jij beslist.</span>'+
+    '<div class="rij"><button class="knop stil" id="dOfferte">Offerte aanvragen</button></div></div>';
   $('#bladArt').querySelectorAll('.dboek').forEach(b => b.addEventListener('click', () => boekDienst(code, b.dataset.id)));
+  $('#dOfferte').addEventListener('click', () => vraagOfferte(code));
+}
+function vraagOfferte(code){
+  const z = DZAKEN[code]; if (!z) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'blad open'; wrap.style.zIndex = '40';
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="ofTerug">← Terug</button>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">Offerte aanvragen</h1></div></div>'+
+    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+      '<label class="opties" for="ofTekst">Omschrijf de klus</label>'+
+      '<textarea class="veld" id="ofTekst" rows="4" maxlength="300" placeholder="Bijv. schutting van 8 meter vervangen, hout mag je zelf voorstellen" style="margin-bottom:.5rem;resize:vertical;"></textarea>'+
+      '<label class="opties" for="ofWens">Gewenste datum (optioneel)</label><input class="veld" id="ofWens" type="date" style="margin-bottom:.6rem;">'+
+      '<button class="knop" id="ofGa" style="width:100%;">Vraag offerte aan</button>'+
+      '<p class="opties" style="margin-top:.5rem;">Je vraagt aan op je codenaam; het antwoord met prijs verschijnt hier op het Dienstenplein onder Mijn offertes.</p>'+
+    '</div></div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('#ofTerug').addEventListener('click', () => wrap.remove());
+  wrap.querySelector('#ofGa').addEventListener('click', async () => {
+    try {
+      await api('/api/vak/offerte/vraag', { supplierCode: code, omschrijving: wrap.querySelector('#ofTekst').value, wens: wrap.querySelector('#ofWens').value });
+      wrap.remove(); $('#blad').classList.remove('open');
+      meld('Aangevraagd; de zaak antwoordt met een prijs.'); tekenOffertes();
+    } catch(e){ meld(e.message); }
+  });
 }
 function boekDienst(code, dienstId){
   const z = DZAKEN[code]; const d = z && z.diensten.find(x => x.id === dienstId); if (!d) return;

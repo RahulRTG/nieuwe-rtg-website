@@ -112,4 +112,3 @@
     el.querySelectorAll('[data-vakaf]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = ''+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
     }));
-    // vakwerk: werkdagen aan/uit tikken (lokaal, tot Opslaan)

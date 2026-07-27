@@ -1,3 +1,4 @@
+    // vakwerk: werkdagen aan/uit tikken (lokaal, tot Opslaan)
     el.querySelectorAll('[data-vakdag]').forEach(b => b.addEventListener('click', () => {
       b.classList.toggle('primary');
     }));

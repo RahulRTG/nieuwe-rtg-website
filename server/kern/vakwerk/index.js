@@ -15,7 +15,8 @@
 
 const { VAK_GENRES } = require('./genres');
 
-function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon }) {
+function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon,
+  crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
   const rond = n => Math.round((Number(n) || 0) * 100) / 100;
@@ -109,9 +110,11 @@ function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, scho
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = { db, save, anthropic, findSupplier, boekingenVanZaak, scho, vandaagStr, rond,
-    datumVan, tijdVan, geldDag, genreVan, isVak, geldigeTijd, naarMin, naarTijd, publiek, bord, VAK_GENRES };
+    datumVan, tijdVan, geldDag, genreVan, isVak, geldigeTijd, naarMin, naarTijd, publiek, bord, VAK_GENRES,
+    crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe };
   const api = { GENRES: VAK_GENRES, isVak, bord };
-  Object.assign(api, require('./agenda')(ctx), require('./advies')(ctx));
+  Object.assign(api, require('./agenda')(ctx), require('./advies')(ctx),
+    require('./pro')(ctx), require('./pro2')(ctx));
   return { vakwerk: api };
 }
 

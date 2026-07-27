@@ -1628,8 +1628,14 @@
             '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--gold);margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
           '<div class="tkc-who" style="margin-top:0.5rem;">'+T('bz.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div>'+
-          '<button class="obtn" id="boBrief" style="align-self:flex-start;">'+T('bz.brief','Dagbriefing')+'</button>'+
+          '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;">'+
+          '<button class="obtn" id="boBrief">'+T('bz.brief','Dagbriefing')+'</button>'+
+          '<button class="obtn ghost" id="boRapport">'+T('z3.rapport','Weekrapport')+' (print)</button></div>'+
           '<div id="boBriefTxt" style="display:none;border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;"></div></div>';
+        // de kantoorvleugel: de week als 3D-skyline op de huiseigen Drie-motor
+        html += '<div class="tkc" id="zaak3dKaart" style="grid-column:1/-1;"><h3>'+T('z3.h','De zaak in 3D')+'</h3>'+
+          '<canvas id="zaak3d" style="display:block;width:100%;border-radius:10px;touch-action:none;cursor:grab;" aria-label="'+T('z3.aria','Een draaibare 3D-skyline van uw omzet per dag: hoe hoger het blok, hoe meer omzet; vandaag in bordeaux en een gouden pin op de beste dag.')+'"></canvas>'+
+          '<div class="tkc-who" id="zaak3dUitleg"></div></div>';
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('bz.actie','Actiecentrum van de zaak')+'</h3>'+
           (b.alerts.length ? b.alerts.map(a =>
             '<div class="st-row"><span>'+(a.level==='rood'?'':a.level==='amber'?'':'')+' '+a.text+'</span></div>').join('')
@@ -2316,6 +2322,8 @@
       t2.textContent = (boData && boData.briefing) || '';
       t2.style.display = t2.style.display === 'none' ? 'block' : 'none';
     });
+    // de kantoorvleugel (los script): 3D-weekskyline + het drukklare Weekrapport
+    if (window.RTGZaakKantoor) RTGZaakKantoor.bind(el, { boData: boData, vwData: vwData, T: T, S: S, toast: toast, esc: esc, eur: eur, lang: lang });
     // synergie: tekenen, stoppen en een nieuwe deal voorstellen
     const synVer = async () => { boData = null; synData = null; await refresh(); };
     el.querySelectorAll('[data-synkans]').forEach(b => b.addEventListener('click', async () => {

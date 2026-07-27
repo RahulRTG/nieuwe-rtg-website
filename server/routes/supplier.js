@@ -24,6 +24,8 @@ require('./supplier/gebouwplus')(kern);
 require('./supplier/gebouwpand')(kern);
 require('./supplier/wensen')(kern);
 require('./supplier/genrepuls')(kern);
+require('./supplier/genreplan')(kern);
+require('./supplier/genreblik')(kern);
 
 app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
 

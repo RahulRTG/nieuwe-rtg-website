@@ -18,6 +18,8 @@
       var w = document.createElement('div'); w.id = 'zaakPuls';
       el.appendChild(w);
       teken(w, r.puls, ctx);
+      // het draaiboek en de week vooruit haken hier aan, in dezelfde ctx
+      if (window.RTGZaakPuls2) RTGZaakPuls2.bind(el, ctx);
     }).catch(function () {});
   }
 

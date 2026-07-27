@@ -1,5 +1,5 @@
 /* Supplier-submodule "genreblik": de week vooruit voor de acht dunnere
-   genres. Zeven dagen op de echte agenda-data van de eigen genre-motor:
+   genres. Vandaag plus zeven dagen op de echte agenda-data van de motor:
    flights en wedstrijden, afspraken, events, vertrek- en ophaaldagen,
    nanny-boekingen en privelessen. Alleen lezen; boeken en verzetten
    blijft in de eigen genre-schermen. */
@@ -63,7 +63,7 @@ module.exports = (kern) => {
     const data = maak ? bak(STORE[req.supplier.type], req.supplier.code) : null;
     if (!maak || !data) return res.json({ ok: true, blik: null });
     const dagen = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 8; i++) {
       const dt = new Date(Date.now() + i * 86400000);
       const datum = dt.toISOString().slice(0, 10);
       const items = maak(data, datum).slice(0, 4);

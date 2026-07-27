@@ -85,7 +85,7 @@ test('3. de opvang plant slim: nanny-aanvraag wordt een taak en telt mee in de w
   assert.ok(nb && nb.tekst.indexOf('Leeuwenberg') >= 0 && nb.tekst.indexOf('gescreende nanny') >= 0, 'de aanvraag staat als taak met de screeningsregel');
   assert.ok(plan.taken.some(t => t.id === 'verslag' && t.prio === 3), 'de dagverslagen staan als weektaak klaar');
   const blik = (await api('supplier/puls/blik', {}, opvang)).body.blik;
-  assert.ok(blik.dagen.length === 7 && blik.dagen[0].items.join(' ').indexOf('Leeuwenberg') >= 0, 'de nanny-boeking staat in de week vooruit');
+  assert.ok(blik.dagen.length === 8 && blik.dagen[0].items.join(' ').indexOf('Leeuwenberg') >= 0, 'de nanny-boeking staat in de week vooruit');
 });
 
 test('4. de golfclub kijkt vooruit: de wedstrijd staat in draaiboek en weekblik', async t => {

@@ -33,7 +33,7 @@
     }).join('');
     if (blik && blik.dagen) {
       h += '<div class="st-sec" style="margin-top:1.1rem;">' + T('dp.week', 'De week vooruit') + '</div>';
-      h += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;">' + blik.dagen.map(function (d2) {
+      h += '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:0.3rem;">' + blik.dagen.map(function (d2) {
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:0.4rem 0.2rem;text-align:center;' + (d2.n ? '' : 'opacity:0.45;') + '">' +
           '<span class="sub" style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;">' + esc(d2.dag) + '</span>' +
           '<b style="display:block;font-size:0.95rem;">' + d2.n + '</b></div>';

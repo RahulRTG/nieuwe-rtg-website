@@ -17,6 +17,9 @@ const { NL2EN, WORDS_NL_EN, WORDS_EN_NL, EN2NL, WORDS_ES } = require('./translat
    Spaanse tabel dekt Nederlands en Engels als bron; andere talen vallen
    zonder AI-sleutel terug op de oorspronkelijke tekst (nooit kapot). */
 const WORDS = { en: WORDS_NL_EN, nl: WORDS_EN_NL, es: WORDS_ES };
+/* Het wereld-kernwoordenboek: 30 school-kernwoorden in ALLE registertalen,
+   zodat elke taal ook zonder AI-sleutel iets zinnigs teruggeeft. */
+const wereld = require('./translate/woordenboek/wereld');
 
 let anthropic = null;
 function setAnthropic(a) { anthropic = a; }
@@ -49,7 +52,7 @@ function localizeList(list, lang) {
 }
 
 function wordLevel(text, to) {
-  const dict = WORDS[to];
+  const dict = WORDS[to] || wereld.dictVan(to);
   if (!dict) return null;
   let hit = false;
   const out = String(text).split(/(\s+)/).map(tok => {
@@ -97,7 +100,7 @@ async function translate(text, to, from) {
 
   let out = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
   if (!out && anthropic) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
-  if (!out && WORDS[to]) out = wordLevel(text, to);
+  if (!out) out = wordLevel(text, to); // woordenboek of wereld-kern: elke registertaal doet mee
   const result = out || text;
   cache.set(key, result);
   if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value);

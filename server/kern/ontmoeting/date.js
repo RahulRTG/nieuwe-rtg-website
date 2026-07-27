@@ -35,7 +35,7 @@ module.exports = (ctx) => {
     const ander = d.a === key ? d.b : d.a;
     if (d.contract.ondertekend[d.a] && d.contract.ondertekend[d.b]) {
       d.status = 'actief'; d.gestartAt = nu();
-      for (const k of [d.a, d.b]) { sseToCustomer(k, 'sync', { scope: 'ontmoeting' }); notify(k, { icon: '✅', title: 'Afspraak gestart', body: 'Het veiligheidscontract is getekend. RTG kijkt mee voor jullie veiligheid.', scope: 'ontmoeting' }); }
+      for (const k of [d.a, d.b]) { sseToCustomer(k, 'sync', { scope: 'ontmoeting' }); notify(k, { icon: 'pas', title: 'Afspraak gestart', body: 'Het veiligheidscontract is getekend. RTG kijkt mee voor jullie veiligheid.', scope: 'ontmoeting' }); }
       sseToOffice('sync', { scope: 'ontmoeting' });
     } else {
       sseToCustomer(ander, 'sync', { scope: 'ontmoeting' });

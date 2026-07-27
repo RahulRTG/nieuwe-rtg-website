@@ -80,7 +80,7 @@ app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
   save();
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
-  if (o.customerTier) notify(o.customerTier, { icon: '🍽️', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
+  if (o.customerTier) notify(o.customerTier, { icon: 'horeca', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
   logActivity(req.supplier.code, req.actor, 'zette ' + o.ref + ' op "' + status + '"');
   res.json({ ok: true, order: o });
 });
@@ -99,7 +99,7 @@ app.post('/api/supplier/refund', supplierAuth, (req, res) => {
   logActivity(req.supplier.code, req.actor, 'stortte € ' + o.total + ' terug (' + o.ref + ')');
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
-  notify(o.customerTier, { icon: '↩️', title: req.supplier.name + ', terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
+  notify(o.customerTier, { icon: 'betalen', title: req.supplier.name + ', terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
   res.json({ ok: true, order: o });
 });
 

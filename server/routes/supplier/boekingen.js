@@ -30,7 +30,7 @@ app.post('/api/supplier/booking/status', supplierAuth, (req, res) => {
   if (status === 'afgerond') b.finishedAt = new Date().toISOString();
   save();
   const MELDING = { bevestigd: 'Uw afspraak is bevestigd.', afgerond: 'Dank u wel; uw afspraak is afgerond.', geweigerd: 'Uw aanvraag kon helaas niet worden bevestigd.' };
-  notify(b.customerTier, { icon: '🗓️', title: req.supplier.name, body: MELDING[status] + (b.wanneer && status === 'bevestigd' ? ' (' + b.wanneer + ')' : ''), scope: 'orders' });
+  notify(b.customerTier, { icon: 'agenda', title: req.supplier.name, body: MELDING[status] + (b.wanneer && status === 'bevestigd' ? ' (' + b.wanneer + ')' : ''), scope: 'orders' });
   sseToCustomer(b.customerKey || b.customerTier, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   logActivity(req.supplier.code, req.actor, 'zette boeking ' + b.ref + ' op "' + status + '"');

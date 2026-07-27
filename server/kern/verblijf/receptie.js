@@ -18,7 +18,7 @@ module.exports = (ctx) => {
     const tekst = v.status === 'bevestigd'
       ? 'Uw verblijf bij ' + supplier.name + ' is bevestigd: ' + v.roomName + ', ' + v.aankomst + ' tot ' + v.vertrek + '.'
       : supplier.name + ' kan uw verblijf van ' + v.aankomst + ' helaas niet plaatsen.';
-    notify(v.customerKey, { icon: '🛎️', title: supplier.name, body: tekst, scope: 'orders' });
+    notify(v.customerKey, { icon: 'hotel', title: supplier.name, body: tekst, scope: 'orders' });
     sseToCustomer(v.customerKey, 'sync', { scope: 'verblijf' });
     sseToSupplier(supplier.code, 'sync', { scope: 'receptie' });
     return { ok: true, verblijf: v };
@@ -70,7 +70,7 @@ module.exports = (ctx) => {
     const rm = (supplier.rooms || []).find(r => r.id === v.roomId);
     if (rm) rm.hk = { status: 'vuil', by: 'Systeem (check-out)', at: nu() };
     save();
-    notify(v.customerKey, { icon: '🛎️', title: supplier.name, body: 'Tot ziens; uw check-out is rond. Graag tot een volgende keer.', scope: 'orders' });
+    notify(v.customerKey, { icon: 'hotel', title: supplier.name, body: 'Tot ziens; uw check-out is rond. Graag tot een volgende keer.', scope: 'orders' });
     sseToCustomer(v.customerKey, 'sync', { scope: 'verblijf' });
     sseToSupplier(supplier.code, 'sync', { scope: 'receptie' });
     return { ok: true, verblijf: v };

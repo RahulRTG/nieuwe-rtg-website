@@ -37,7 +37,7 @@ module.exports = (ctx) => {
     bk.status = 'afgerond';
     bk.afgerondOp = nu();
     save();
-    if (bk.key) notify(bk.key, { icon: '✅', title: bk.aanbiederNaam + ': tot ziens', body: bk.behandelingNaam + ' afgerond. Fijne dag.', scope: 'care' });
+    if (bk.key) notify(bk.key, { icon: 'pas', title: bk.aanbiederNaam + ': tot ziens', body: bk.behandelingNaam + ' afgerond. Fijne dag.', scope: 'care' });
     return { ok: true, ref: bk.ref };
   }
 

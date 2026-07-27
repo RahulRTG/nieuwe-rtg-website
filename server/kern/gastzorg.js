@@ -54,7 +54,7 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
     db.data.locatieDelen.unshift(d);
     db.data.locatieDelen = db.data.locatieDelen.slice(0, 20000);
     save();
-    notifySupplier(s.code, { icon: '📍', title: 'Gast deelt live locatie', body: codenaam + ' deelt de live locatie met u. Zet het uit zodra u het niet meer nodig heeft.' });
+    notifySupplier(s.code, { icon: 'gps', title: 'Gast deelt live locatie', body: codenaam + ' deelt de live locatie met u. Zet het uit zodra u het niet meer nodig heeft.' });
     sseToSupplier(s.code, 'sync', { scope: 'gastloc' });
     return { ok: true, deel: publiekDeel(d) };
   }
@@ -64,7 +64,7 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
     if (!d) return { status: 404, error: 'Deze deling is er niet (meer).' };
     d.status = 'gestopt'; d.stoppedAt = nu(); d.gestoptDoor = 'de gast';
     save();
-    notifySupplier(d.supplierCode, { icon: '📍', title: 'Live meekijken gestopt', body: d.codenaam + ' deelt de locatie niet meer met u.' });
+    notifySupplier(d.supplierCode, { icon: 'gps', title: 'Live meekijken gestopt', body: d.codenaam + ' deelt de locatie niet meer met u.' });
     sseToSupplier(d.supplierCode, 'sync', { scope: 'gastloc' });
     return { ok: true, deel: publiekDeel(d) };
   }
@@ -75,7 +75,7 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
     if (!d) return { status: 404, error: 'Deze deling is er niet (meer).' };
     d.status = 'gestopt'; d.stoppedAt = nu(); d.gestoptDoor = schoon(wie, 40) || s.name;
     save();
-    try { notify(d.key, { icon: '📍', title: s.name, body: 'heeft het live meekijken beeindigd (niet meer nodig). Uw locatie wordt daar niet meer getoond.', scope: 'privacy' }); } catch (e) {}
+    try { notify(d.key, { icon: 'gps', title: s.name, body: 'heeft het live meekijken beeindigd (niet meer nodig). Uw locatie wordt daar niet meer getoond.', scope: 'privacy' }); } catch (e) {}
     sseToCustomer(d.key, 'sync', { scope: 'gastloc' });
     sseToSupplier(s.code, 'sync', { scope: 'gastloc' });
     return { ok: true, deel: publiekDeel(d) };

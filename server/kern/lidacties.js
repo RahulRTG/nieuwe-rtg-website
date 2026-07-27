@@ -74,7 +74,7 @@ function betaalBoekingVoor(session, body) {
   verdienPunten(session.key, (b.price || 0) - kortingB - voordeelB, b.supplierName);
   openLijnVoor(findSupplier(b.supplierCode), session);
   save();
-  notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
+  notifySupplier(b.supplierCode, { icon: 'agenda', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
   sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   return { ok: true, boeking: b };

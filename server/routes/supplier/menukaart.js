@@ -30,7 +30,7 @@ app.post('/api/supplier/price', supplierAuth, (req, res) => {
   save();
   // backoffice ziet het live binnenkomen
   sseToOffice('sync', { scope: 'prices' });
-  sseToOffice('notify', { icon: '💶', title: 'Nieuwe dynamische prijs', body: req.supplier.name + ': ' + service + ', € ' + price });
+  sseToOffice('notify', { icon: 'betalen', title: 'Nieuwe dynamische prijs', body: req.supplier.name + ': ' + service + ', € ' + price });
   logActivity(req.supplier.code, req.actor, 'gaf een prijs door: ' + service + ' (€ ' + price + ')');
   res.json({ ok: true, entry });
 });

@@ -11,7 +11,7 @@ const BUREAUS = {
   atelier:   { label: 'RTG Atelier', icon: '✂️', wat: 'mode en alles wat je draagt' },
   studio:    { label: 'RTG Ontwerpstudio', icon: '🏎️', wat: 'voertuigen en vaartuigen' },
   hardware:  { label: 'RTG Hardwarelab', icon: '🔧', wat: 'apparaten en wearables' },
-  architect: { label: 'RTG Architectenbureau', icon: '🏛️', wat: 'gebouwen en huizen' },
+  architect: { label: 'RTG Architectenbureau', icon: 'gebouw', wat: 'gebouwen en huizen' },
   redactie:  { label: 'RTG Redactie', icon: '📰', wat: 'verhalen, de krant en het magazine' }
 };
 const BUREAU_IDS = Object.keys(BUREAUS);

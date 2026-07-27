@@ -6,7 +6,7 @@
 const DISCIPLINES = {
   automotive: { label: 'Automotive', icon: '🏎️' },
   jacht:      { label: 'Jachten & boten', icon: '🛥️' },
-  vliegtuig:  { label: 'Luchtvaart', icon: '✈️' },
+  vliegtuig:  { label: 'Luchtvaart', icon: 'vluchten' },
   helikopter: { label: 'Helikopter', icon: '🚁' }
 };
 const STATUS = ['schets', 'ontwikkeling', 'maquette', 'prototype', 'productie', 'archief'];

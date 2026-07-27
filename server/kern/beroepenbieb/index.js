@@ -14,7 +14,7 @@ const EDITIES = ['Start', 'Basis', 'Plus', 'Compleet', 'Praktijk', 'Compact', 'O
 const NIVEAUS = ['Verkenner', 'Starter', 'Leerling', 'Gevorderd', 'Gezel', 'Specialist', 'Vakman', 'Expert', 'Meester', 'Grootmeester'];
 
 const WERELDEN = {
-  techniek: { label: 'Technisch & agrarisch', icon: '🛠️', beroepen: TECHNIEK_BEROEPEN, soorten: TECHNIEK_SOORTEN },
+  techniek: { label: 'Technisch & agrarisch', icon: 'gear', beroepen: TECHNIEK_BEROEPEN, soorten: TECHNIEK_SOORTEN },
   zaken: { label: 'Bedrijfsleven', icon: '💼', beroepen: ZAKEN_BEROEPEN, soorten: ZAKEN_SOORTEN }
 };
 const PER_BS = EDITIES.length * NIVEAUS.length;            // 200 per beroep x soort

@@ -146,7 +146,9 @@
       app.appendChild(bannerEl);
     }
     bannerEl.textContent = '';
-    const ic = document.createElement('span'); ic.className = 'ob-ic'; ic.textContent = icoon || '';
+    const ic = document.createElement('span'); ic.className = 'ob-ic';
+    const glyf = (window.RTGGlyf && RTGGlyf.heeft(icoon)) ? RTGGlyf.svg(icoon) : null;
+    if (glyf) ic.appendChild(glyf); else ic.textContent = icoon || '';
     const kol = document.createElement('span');
     const t = document.createElement('div'); t.className = 'ob-titel'; t.textContent = titel || 'RTG';
     kol.appendChild(t);

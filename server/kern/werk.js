@@ -85,7 +85,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
   }
   // een bericht van de sollicitant laat de werkgever meteen iets weten
   function meldWerkgever(chat, tekst) {
-    notifySupplier(chat.supplierCode, { icon: '💬', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80) });
+    notifySupplier(chat.supplierCode, { icon: 'berichten', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80) });
   }
 
   /* Openbare lijst met alle openstaande vacatures over alle partners heen. De
@@ -143,7 +143,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     if (!a.key) return;
     if (db.data.notifications[a.key]) {
       notify(a.key, {
-        icon: hired ? '🎉' : '📝',
+        icon: hired ? 'ster' : 'werk',
         title: hired ? 'U bent aangenomen!' : 'Sollicitatie afgerond',
         body: supplier.name + ' heeft uw sollicitatie als ' + a.func + (hired ? ' geaccepteerd. Het bedrijf neemt contact met u op.' : ' helaas afgewezen.')
       });

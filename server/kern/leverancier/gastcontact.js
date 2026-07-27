@@ -40,7 +40,7 @@ module.exports = (ctx) => {
       chat.messages.push({ from: 'systeem', text: 'U heeft nu een open lijn met ' + s.name + '. Bekijk gerust elkaars Salon.', at: new Date().toISOString() });
       chat.lastAt = new Date().toISOString();
       try { save(); } catch (e) {}
-      try { notify(tier || 'rtg', { icon: '💬', title: 'Open lijn met ' + s.name, body: 'App direct en bekijk elkaars Salon.', scope: 'gchat' }); } catch (e) {}
+      try { notify(tier || 'rtg', { icon: 'berichten', title: 'Open lijn met ' + s.name, body: 'App direct en bekijk elkaars Salon.', scope: 'gchat' }); } catch (e) {}
       try { sseToCustomer(customerKey, 'sync', { scope: 'gchat' }); } catch (e) {}
       try { sseToSupplier(s.code, 'sync', { scope: 'gchat' }); } catch (e) {}
     }

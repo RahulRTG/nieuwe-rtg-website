@@ -116,7 +116,7 @@ module.exports = (ctx) => {
     db.data.stylingVoorstellen.unshift(rec);
     db.data.stylingVoorstellen = db.data.stylingVoorstellen.slice(0, 20000);
     save();
-    notify(key, { icon: '✨', title: s.name + ' · stylingvoorstel', body: rec.titel + (rec.bericht ? ' · ' + rec.bericht.slice(0, 60) : ''), scope: 'salon' });
+    notify(key, { icon: 'ster', title: s.name + ' · stylingvoorstel', body: rec.titel + (rec.bericht ? ' · ' + rec.bericht.slice(0, 60) : ''), scope: 'salon' });
     sseToCustomer(key, 'sync', { scope: 'retail' });
     return { ok: true, voorstel: rec };
   }

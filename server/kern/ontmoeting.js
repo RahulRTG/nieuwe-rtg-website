@@ -28,7 +28,7 @@ const MIN_LEEFTIJD = 18;
 const ACTIVITEITEN = [
   { id: 'wandelen', label: 'Wandelen', icon: '\u{1F6B6}', tekst: 'Een rustige wandeling', rust: 0 },
   { id: 'borrelen', label: 'Borrelen', icon: '\u{1F942}', tekst: 'Iets drinken op een terras', rust: 1 },
-  { id: 'jetset',   label: 'Jetset',   icon: '✨',    tekst: 'Uitgaan in stijl', rust: 2 }
+  { id: 'jetset',   label: 'Jetset',   icon: 'ster',    tekst: 'Uitgaan in stijl', rust: 2 }
 ];
 const ACT_IDS = ACTIVITEITEN.map(a => a.id);
 

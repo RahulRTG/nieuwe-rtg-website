@@ -120,7 +120,7 @@ module.exports = (ctx) => {
     try {
       await pay.stuur({ van: 'RTG Treasury', aanCodenaam: codenaam, centen: t.prijs * 100, oms: 'Herroeping ' + a.naam + ' (volledige terugbetaling)', idem: 'herroep-' + t.id, soort: 'tik' });
     } catch (e) { /* de terugbetaling staat vast op het ticket; de tik volgt */ }
-    notify(sess.key, { icon: '↩️', title: 'Herroepen: ' + a.naam, body: 'De volledige koopsom van € ' + t.prijs + ' staat in uw tegoed. Het ticket is terug in de pool.', scope: 'assets' });
+    notify(sess.key, { icon: 'betalen', title: 'Herroepen: ' + a.naam, body: 'De volledige koopsom van € ' + t.prijs + ' staat in uw tegoed. Het ticket is terug in de pool.', scope: 'assets' });
     return { ok: true, terug: t.prijs, ticket: t };
   }
 

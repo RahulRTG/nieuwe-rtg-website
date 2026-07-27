@@ -80,7 +80,7 @@ module.exports = (kern) => {
     // de drempelwachter: een melding per keer dat het item onder zijn minimum zakt
     if (item.min > 0 && item.aantal <= item.min && !item.laagGemeld) {
       item.laagGemeld = true;
-      notifySupplier(s.code, { icon: '📉', title: 'Voorraad laag: ' + item.naam, body: 'Nog ' + item.aantal + ' ' + item.eenheid + ' (minimum ' + item.min + '). Zet hem op de AI-inkooplijst of bestel bij.' });
+      notifySupplier(s.code, { icon: 'grafiek', title: 'Voorraad laag: ' + item.naam, body: 'Nog ' + item.aantal + ' ' + item.eenheid + ' (minimum ' + item.min + '). Zet hem op de AI-inkooplijst of bestel bij.' });
     } else if (item.aantal > item.min) {
       item.laagGemeld = false;
     }

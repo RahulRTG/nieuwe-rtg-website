@@ -23,7 +23,7 @@ module.exports = (ctx) => {
       o.geannuleerdDoor = 'lid';
       save();
       if (wasBetaald || o.status !== 'wacht-op-betaling') {
-        notifySupplier(o.supplierCode, { icon: '↩️', title: 'Bestelling geannuleerd', body: o.customerCodename + ' annuleerde ' + o.ref + (wasBetaald ? ' (€ ' + o.total + ' retour)' : '') });
+        notifySupplier(o.supplierCode, { icon: 'betalen', title: 'Bestelling geannuleerd', body: o.customerCodename + ' annuleerde ' + o.ref + (wasBetaald ? ' (€ ' + o.total + ' retour)' : '') });
         sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
       }
       sseToOffice('sync', { scope: 'orders' });
@@ -39,7 +39,7 @@ module.exports = (ctx) => {
       r.status = 'geweigerd';
       r.geannuleerdDoor = 'lid';
       save();
-      notifySupplier(r.supplierCode, { icon: '↩️', title: 'Rit geannuleerd', body: r.customerCodename + ' annuleerde ' + r.ref + (wasBetaald ? ' (€ ' + r.quote + ' retour)' : '') });
+      notifySupplier(r.supplierCode, { icon: 'betalen', title: 'Rit geannuleerd', body: r.customerCodename + ' annuleerde ' + r.ref + (wasBetaald ? ' (€ ' + r.quote + ' retour)' : '') });
       sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
       sseToOffice('sync', { scope: 'orders' });
       return { ok: true, terugbetaald: wasBetaald ? r.quote : 0 };
@@ -58,7 +58,7 @@ module.exports = (ctx) => {
       b.status = 'geweigerd';
       b.geannuleerdDoor = 'lid';
       save();
-      notifySupplier(b.supplierCode, { icon: '↩️', title: (b.kind === 'ticket' ? 'Ticket' : 'Boeking') + ' geannuleerd', body: b.customerCodename + ' annuleerde ' + b.ref + (wasBetaald ? ' (€ ' + b.price + ' retour)' : '') });
+      notifySupplier(b.supplierCode, { icon: 'betalen', title: (b.kind === 'ticket' ? 'Ticket' : 'Boeking') + ' geannuleerd', body: b.customerCodename + ' annuleerde ' + b.ref + (wasBetaald ? ' (€ ' + b.price + ' retour)' : '') });
       sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
       sseToOffice('sync', { scope: 'orders' });
       // vrijgekomen plek: de eerste op de wachtlijst hoort het meteen
@@ -109,7 +109,7 @@ module.exports = (ctx) => {
     if (i < 0) return null;
     const [w] = db.data.wachtlijsten.splice(i, 1);
     save();
-    notify(w.key, { icon: '🎉', title: 'Er is een plek vrij!', body: 'Er kwam een plek vrij voor ' + w.omschrijving + '. Wees er snel bij: de plek is niet gereserveerd.', scope: 'wachtlijst' });
+    notify(w.key, { icon: 'ster', title: 'Er is een plek vrij!', body: 'Er kwam een plek vrij voor ' + w.omschrijving + '. Wees er snel bij: de plek is niet gereserveerd.', scope: 'wachtlijst' });
     sseToCustomer(w.key, 'sync', { scope: 'wachtlijst' });
     return w;
   }
@@ -122,7 +122,7 @@ module.exports = (ctx) => {
     if (i < 0) return { status: 404, error: 'U staat niet op deze gastenlijst.' };
     const [g] = e.guests.splice(i, 1);
     save();
-    notifySupplier(s.code, { icon: '🎟', title: 'Afmelding voor ' + e.name, body: g.codename + ', ' + g.qty + ' pers.' });
+    notifySupplier(s.code, { icon: 'ticket', title: 'Afmelding voor ' + e.name, body: g.codename + ', ' + g.qty + ' pers.' });
     sseToSupplier(s.code, 'sync', { scope: 'events' });
     meldWachtlijst('event:' + s.code + ':' + e.id);
     return { ok: true };

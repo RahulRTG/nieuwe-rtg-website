@@ -110,7 +110,7 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
   sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
-  notify(o.customerTier, { icon: '✨', title: req.supplier.name, body: 'Uw bestelling is uitgegeven. Veel plezier.', scope: 'orders' });
+  notify(o.customerTier, { icon: 'ster', title: req.supplier.name, body: 'Uw bestelling is uitgegeven. Veel plezier.', scope: 'orders' });
   res.json({ ok: true, order: { ref: o.ref, codename: o.customerCodename, items: o.items, total: o.total, wasPaid }, sale });
 });
 

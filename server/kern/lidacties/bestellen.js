@@ -87,7 +87,7 @@ function plaatsOrderVoor(session, body) {
   save();
   if (!vooraf) {
     const kop = naarKassa ? 'Nieuwe bestelling (afrekenen aan de kassa)' : 'Nieuwe bestelling (betaling achteraf)';
-    notifySupplier(s.code, { icon: '\u{1F6CE}️', title: kop, body: codename + (order.table ? ' · ' + order.table : '') + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+    notifySupplier(s.code, { icon: 'hotel', title: kop, body: codename + (order.table ? ' · ' + order.table : '') + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }
@@ -117,7 +117,7 @@ function betaalOrderVoor(session, body) {
   // betaald = definitief: het keukenbrein boekt de ingredienten af via de recepten
   try { keuken.boekVerkoopAf(findSupplier(o.supplierCode), o.items || [], 'bestelling ' + o.ref); } catch (e) {}
   // nu pas hoort de zaak ervan: betaald = definitief
-  notifySupplier(o.supplierCode, { icon: '\u{1F6CE}\uFE0F', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
+  notifySupplier(o.supplierCode, { icon: 'hotel', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
   sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   return { ok: true, order: o };

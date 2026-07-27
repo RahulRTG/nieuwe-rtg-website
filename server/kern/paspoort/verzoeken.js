@@ -75,7 +75,7 @@ module.exports = (ctx) => {
     if (akkoord) {
       v.status = 'goedgekeurd';
       v.vervalt = new Date(Date.now() + VIEW_TTL_MS).toISOString();
-      notifySupplier(v.supplierCode, { icon: '✅', title: 'Identiteit gedeeld', body: (v.codenaam || 'Een lid') + ' keurde uw ' + (v.niveau === 'paspoort' ? 'paspoort' : 'ID-kaart') + '-verzoek goed.' });
+      notifySupplier(v.supplierCode, { icon: 'pas', title: 'Identiteit gedeeld', body: (v.codenaam || 'Een lid') + ' keurde uw ' + (v.niveau === 'paspoort' ? 'paspoort' : 'ID-kaart') + '-verzoek goed.' });
     } else {
       v.status = 'geweigerd';
       notifySupplier(v.supplierCode, { icon: '⛔', title: 'Verzoek geweigerd', body: (v.codenaam || 'Een lid') + ' weigerde uw identiteitsverzoek.' });

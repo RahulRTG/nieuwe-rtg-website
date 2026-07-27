@@ -21,7 +21,7 @@ function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, 
   const doetMee = (d, code) => d.aandelen.some(a => a.code === code);
   const zeg = (d, vanCode, tekst) => {
     for (const a of d.aandelen) if (a.code !== vanCode && notifySupplier)
-      notifySupplier(a.code, { icon: '🤝', title: 'Synergie', body: tekst });
+      notifySupplier(a.code, { icon: 'rechterhand', title: 'Synergie', body: tekst });
   };
 
   function dealMaak(makerCode, body) {

@@ -50,7 +50,7 @@ module.exports = (ctx) => {
     b.afgeleverdAt = nu();
     b.stappen.push({ status: 'afgeleverd', at: b.afgeleverdAt, door: (actor && actor.name) || null });
     save();
-    notify(b.key, { icon: '✅', title: b.supplierName, body: 'Veilig afgeleverd. Bedankt voor uw aankoop.', scope: 'orders' });
+    notify(b.key, { icon: 'pas', title: b.supplierName, body: 'Veilig afgeleverd. Bedankt voor uw aankoop.', scope: 'orders' });
     sseToSupplier(code, 'sync', { scope: 'modebezorg' });
     sseToOffice('sync', { scope: 'modebezorg' });
     return { status: 200, ok: true, status2: b.status };
@@ -65,7 +65,7 @@ module.exports = (ctx) => {
     b.status = 'retour'; b.retourReden = schoon(reden, 160) || 'Retour aan de deur';
     b.stappen.push({ status: 'retour', at: nu(), door: (actor && actor.name) || null });
     save();
-    notify(b.key, { icon: '↩️', title: b.supplierName, body: 'Uw bezorging is retour genomen. Het bedrag wordt teruggestort.', scope: 'orders' });
+    notify(b.key, { icon: 'betalen', title: b.supplierName, body: 'Uw bezorging is retour genomen. Het bedrag wordt teruggestort.', scope: 'orders' });
     sseToSupplier(code, 'sync', { scope: 'modebezorg' });
     return { status: 200, ok: true };
   }

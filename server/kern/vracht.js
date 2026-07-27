@@ -7,7 +7,7 @@
    Opslag per zaak in db.data.vracht[code]; begrensd, nette demo-start. */
 
 const MODALITEITEN = {
-  lucht:       { label: 'Luchtvracht',  icon: '✈️',      document: 'AWB (luchtvrachtbrief)' },
+  lucht:       { label: 'Luchtvracht',  icon: 'vluchten',      document: 'AWB (luchtvrachtbrief)' },
   zee:         { label: 'Zeevracht',    icon: '\u{1F6A2}',         document: 'B/L (cognossement)' },
   binnenvaart: { label: 'Binnenvaart',  icon: '⛴️',      document: 'CMNI-vrachtbrief' },
   weg:         { label: 'Wegtransport', icon: '\u{1F69A}',         document: 'CMR-vrachtbrief' },

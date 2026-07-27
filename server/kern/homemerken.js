@@ -29,7 +29,7 @@ const MERKEN_SEED = [
       { naam: 'Slimme meter', kamer: 'Hal', soort: 'stekker', icon: '📈', stand: { aan: true } }] },
   { id: 'slotwerk', naam: 'SLOTWERK', soort: 'Toegang', icon: '🔐', uitleg: 'Sloten en de deurbel. Sloten blijven altijd handwerk.',
     apparaten: [{ naam: 'Achterdeurslot', kamer: 'Hal', soort: 'slot', icon: '🔒', stand: { opSlot: true } },
-      { naam: 'Videodeurbel', kamer: 'Hal', soort: 'stekker', icon: '🔔', stand: { aan: true } }] },
+      { naam: 'Videodeurbel', kamer: 'Hal', soort: 'stekker', icon: 'meldingen', stand: { aan: true } }] },
   { id: 'friswit', naam: 'FRISWIT', soort: 'Witgoed', icon: '🧺', uitleg: 'Wasmachine en droger, klaar-seintjes incluis.',
     apparaten: [{ naam: 'Wasmachine', kamer: 'Badkamer', soort: 'stekker', icon: '🧺', stand: { aan: false } },
       { naam: 'Droger', kamer: 'Badkamer', soort: 'stekker', icon: '🌀', stand: { aan: false } }] },

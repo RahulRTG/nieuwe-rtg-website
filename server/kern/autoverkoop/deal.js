@@ -74,7 +74,7 @@ module.exports = (ctx) => {
     deals().unshift(d);
     db.data.verkoopDeals = deals().slice(0, 20000);
     save();
-    notifySupplier(s.code, { icon: d.soort === 'proefrit' ? '\u{1F697}' : '\u{1F511}', title: d.soort === 'proefrit' ? 'Proefrit-aanvraag' : 'Koop-aanvraag', body: d.codenaam + ' · ' + d.autoNaam + (d.soort === 'koop' && d.bod ? ' · bod € ' + d.bod : '') });
+    notifySupplier(s.code, { icon: d.soort === 'proefrit' ? 'auto' : 'sleutel', title: d.soort === 'proefrit' ? 'Proefrit-aanvraag' : 'Koop-aanvraag', body: d.codenaam + ' · ' + d.autoNaam + (d.soort === 'koop' && d.bod ? ' · bod € ' + d.bod : '') });
     sseToSupplier(s.code, 'sync', { scope: 'verkoop' });
     sseToOffice('sync', { scope: 'verkoop' });
   }

@@ -68,7 +68,7 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
     if (post.reacties.length >= 500) return { status: 400, error: 'Dit gesprek zit vol.' };
     post.reacties.push({ id: rid(), key, codenaam: naam, tekst: t, at: nu() });
     save();
-    if (notify && post.key !== key) { try { notify(post.key, { icon: '💬', title: 'Pulse', body: naam + ' reageerde op je bericht.', scope: 'pulse' }); } catch (e) {} }
+    if (notify && post.key !== key) { try { notify(post.key, { icon: 'berichten', title: 'Pulse', body: naam + ' reageerde op je bericht.', scope: 'pulse' }); } catch (e) {} }
     return { status: 200, ok: true };
   }
   function pulseVolg(key, anderKey) {

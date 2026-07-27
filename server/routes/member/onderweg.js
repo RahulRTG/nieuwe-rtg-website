@@ -24,7 +24,7 @@ module.exports = (kern) => {
       updatedAt: new Date().toISOString(), startedAt: new Date().toISOString(), arrived: false
     };
     save();
-    if (dest) notifySupplier(dest.code, { icon: '📍', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
+    if (dest) notifySupplier(dest.code, { icon: 'gps', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
     pushLive(key);
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
   });
@@ -42,8 +42,8 @@ module.exports = (kern) => {
       const d = haversine({ lat: L.lat, lng: L.lng }, dest.loc);
       if (d != null && d < 150) {
         L.arrived = true; aangekomen = true;
-        notifySupplier(dest.code, { icon: '🎉', title: 'Gast gearriveerd', body: L.codename + ' is bij u aangekomen.' });
-        notify(L.tier, { icon: '📍', title: 'Aangekomen', body: 'U bent bij ' + dest.name + '.', scope: 'live' });
+        notifySupplier(dest.code, { icon: 'ster', title: 'Gast gearriveerd', body: L.codename + ' is bij u aangekomen.' });
+        notify(L.tier, { icon: 'gps', title: 'Aangekomen', body: 'U bent bij ' + dest.name + '.', scope: 'live' });
       }
     }
     // De live locatie is vluchtig en komt vele keren per minuut per lid binnen; een

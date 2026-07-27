@@ -2,11 +2,11 @@
    de sets per dorpssoort (hotel, club, restaurant, beachclub) en de meters
    per afdeling. Pure data, geen logica. */
 const AFDELINGEN = {
-  frontoffice: { label: 'Front office', icon: '🛎️', waar: 'Kamer of plek', wat: 'Overdracht of actie, bijv. late check-out geregeld', keten: ['open', 'klaar'] },
-  guest: { label: 'Guest manager', icon: '🤝', waar: 'Kamer', wat: 'Voorkeur of bijzonderheid, bijv. verjaardag morgen', keten: ['open', 'opgevolgd'] },
+  frontoffice: { label: 'Front office', icon: 'hotel', waar: 'Kamer of plek', wat: 'Overdracht of actie, bijv. late check-out geregeld', keten: ['open', 'klaar'] },
+  guest: { label: 'Guest manager', icon: 'rechterhand', waar: 'Kamer', wat: 'Voorkeur of bijzonderheid, bijv. verjaardag morgen', keten: ['open', 'opgevolgd'] },
   relations: { label: 'Guest relations', icon: '🌹', waar: 'Kamer of gast', wat: 'Signaal, bijv. klacht over geluid, compliment voor het team', keten: ['gemeld', 'in gesprek', 'opgelost', 'nagebeld'] },
   concierge: { label: 'Concierge', icon: '🎩', waar: 'Kamer', wat: 'Wens van de gast, bijv. tafel voor twee om 21:00', keten: ['open', 'bezig', 'geregeld'] },
-  parking: { label: 'Parking', icon: '🚗', waar: 'Plek, bijv. P2-14', wat: 'Auto en kamer, bijv. blauwe Defender, Sea-view suite', keten: ['geparkeerd', 'voorrijden', 'staat voor'] },
+  parking: { label: 'Parking', icon: 'auto', waar: 'Plek, bijv. P2-14', wat: 'Auto en kamer, bijv. blauwe Defender, Sea-view suite', keten: ['geparkeerd', 'voorrijden', 'staat voor'] },
   security: { label: 'Security', icon: '🛡️', waar: 'Plek', wat: 'Melding of ronde, bijv. poolronde gelopen', keten: ['gemeld', 'bezig', 'afgehandeld'] },
   gym: { label: 'Gym', icon: '🏋️', waar: 'Toestel of zaal', wat: 'Melding, bijv. loopband 2 piept', keten: ['open', 'klaar'] },
   spa: { label: 'Spa', icon: '💆', waar: 'Tijd en kamer, bijv. 15:00, Garden kamer', wat: 'Behandeling, bijv. massage 60 minuten', keten: ['gepland', 'bezig', 'klaar'] },
@@ -31,7 +31,7 @@ const AFDELINGEN = {
   inkoop: { label: 'Inkoop & voorraad', icon: '📦', waar: 'Leverancier of product', wat: 'Bestelling, bijv. tien kratten cava bijbestellen', keten: ['besteld', 'onderweg', 'binnen'] },
   kantoor: { label: 'Kantoor & administratie', icon: '🗂️', waar: 'Map of onderwerp', wat: 'Taak, bijv. facturen van het weekend inboeken', keten: ['open', 'bezig', 'afgehandeld'] },
   // het restaurantdorp: van het boek tot de pas
-  host: { label: 'Host & reserveringen', icon: '📖', waar: 'Tijd en gezelschap', wat: 'Reservering of ontvangst, bijv. 20:00, vier personen, raamtafel', keten: ['gereserveerd', 'ontvangen', 'aan tafel'] },
+  host: { label: 'Host & reserveringen', icon: 'salon', waar: 'Tijd en gezelschap', wat: 'Reservering of ontvangst, bijv. 20:00, vier personen, raamtafel', keten: ['gereserveerd', 'ontvangen', 'aan tafel'] },
   bediening: { label: 'Bediening', icon: '🤵', waar: 'Tafel', wat: 'Wens of signaal, bijv. tafel 4 vraagt de kaart nog een keer', keten: ['gevraagd', 'bezig', 'geserveerd'] },
   keuken: { label: 'Keuken', icon: '🔪', waar: 'Sectie of gerecht', wat: 'Doorgifte, bijv. 86 op de zeebaars, mise en place bijna op', keten: ['gemeld', 'bezig', 'klaar'] },
   // en het strand van de beachclub

@@ -78,7 +78,7 @@ app.post('/api/supplier/ride/assign', supplierAuth, (req, res) => {
   sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
-  notify(r.customerTier, { icon: r.type === 'jet' ? '✈️' : '🚗', title: req.supplier.name,
+  notify(r.customerTier, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: req.supplier.name,
     body: m.name.split(' ')[0] + ' komt u halen' + (v ? ' in de ' + v.name + ' (' + v.plate + ')' : '') + '.', scope: 'orders' });
   logActivity(req.supplier.code, req.actor, 'wees rit ' + r.ref + ' toe aan ' + m.name + (v ? ' met ' + v.name : ''));
   res.json({ ok: true, ride: r });

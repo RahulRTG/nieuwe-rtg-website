@@ -56,7 +56,7 @@ module.exports = (ctx) => {
     if (!tekst) return { status: 400, error: 'Schrijf eerst een reactie.' };
     r.reactie = { tekst, at: nu() };
     save();
-    notify(r.key, { icon: '💬', title: r.supplierName + ' reageerde op uw review', body: tekst.slice(0, 120), scope: 'orders' });
+    notify(r.key, { icon: 'berichten', title: r.supplierName + ' reageerde op uw review', body: tekst.slice(0, 120), scope: 'orders' });
     sseToSupplier(s.code, 'sync', { scope: 'reviews' });
     return { ok: true, review: { id: r.id, reactie: r.reactie } };
   }

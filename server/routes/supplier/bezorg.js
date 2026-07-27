@@ -107,7 +107,7 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
     o.status = status;
     if (status !== 'onderweg') { o.finishedAt = new Date().toISOString(); delete o.etaMin; }
     bijgewerkt.push(o.ref);
-    notify(o.customerTier, { icon: status === 'onderweg' ? '\u{1F6F5}' : '\u2705', title: s.name,
+    notify(o.customerTier, { icon: status === 'onderweg' ? 'logistiek' : 'meldingen', title: s.name,
       body: status === 'onderweg' ? 'Uw bestelling is onderweg.' : status === 'bezorgd' ? 'Uw bestelling is bezorgd. Eet smakelijk!' : 'Uw bestelling is opgehaald. Dank u wel!', scope: 'orders' });
     sseToCustomer(o.customerKey || o.customerTier, 'bezorg', { ref: o.ref, kind: 'status', status });
   }

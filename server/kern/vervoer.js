@@ -26,7 +26,7 @@ function maakVervoer({ db, etaMinutes, haversine, save, broadcastSync, sseToCust
     broadcastSync([r.customerTier], 'orders');
     sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' });
     sseToOffice('sync', { scope: 'orders' });
-    notify(r.customerTier, { icon: r.type === 'jet' ? '✈️' : '🚗', title: req.supplier.name, body: RIT_MELDING[status] || ('Uw rit is nu: ' + status + '.'), scope: 'orders' });
+    notify(r.customerTier, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: req.supplier.name, body: RIT_MELDING[status] || ('Uw rit is nu: ' + status + '.'), scope: 'orders' });
     logActivity(req.supplier.code, req.actor, 'zette rit ' + r.ref + ' op "' + status + '"');
     res.json({ ok: true, ride: r });
   }

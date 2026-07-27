@@ -60,7 +60,7 @@ module.exports = (kern) => {
     // de eigenaar van de post krijgt een notificatie (niet bij eigen reactie)
     const ownerTier = AUTHOR_TIER[post.author];
     if (ownerTier && ownerTier !== req.session.tier) {
-      notify(ownerTier, { icon: '💬', title: 'Nieuwe reactie', body: who + ': “' + text.slice(0, 80) + '”', scope: 'salon' });
+      notify(ownerTier, { icon: 'berichten', title: 'Nieuwe reactie', body: who + ': “' + text.slice(0, 80) + '”', scope: 'salon' });
     }
     res.json({ ok: true, comment });
   });
@@ -90,7 +90,7 @@ module.exports = (kern) => {
     // de ontvanger krijgt een notificatie/push van het privébericht
     const ownerTier = AUTHOR_TIER[post.author];
     if (ownerTier && ownerTier !== req.session.tier) {
-      notify(ownerTier, { icon: '✉', title: 'Nieuw bericht in De Salon', body: fromName + ' stuurde u een bericht.', scope: 'salon' });
+      notify(ownerTier, { icon: 'berichten', title: 'Nieuw bericht in De Salon', body: fromName + ' stuurde u een bericht.', scope: 'salon' });
     }
     res.json({ ok: true });
   });
@@ -159,7 +159,7 @@ module.exports = (kern) => {
     const claim = { key: req.session.key, codename, code: 'RTG-D-' + crypto.randomBytes(3).toString('hex').toUpperCase(), at: new Date().toISOString(), used: false };
     p.deal.claims.push(claim);
     save();
-    notifySupplier(p.partnerCode, { icon: '🎁', title: 'Aanbieding geclaimd', body: codename + ' claimde "' + p.deal.titel + '" (' + p.deal.claims.length + 'x totaal).' });
+    notifySupplier(p.partnerCode, { icon: 'attenties', title: 'Aanbieding geclaimd', body: codename + ' claimde "' + p.deal.titel + '" (' + p.deal.claims.length + 'x totaal).' });
     res.json({ ok: true, code: claim.code });
   });
 

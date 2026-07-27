@@ -80,7 +80,7 @@ module.exports = (cctx) => {
     c.status = status;
     save();
     logActivity(s.code, req.actor, (status === 'lopend' ? 'liet uitvaren: ' : status === 'afgerond' ? 'nam terug: ' : 'annuleerde ') + (c.bootNaam || c.ref) + ' (' + c.customerCodename + ')');
-    notify(c.customerTier, { icon: '⛵', title: s.name,
+    notify(c.customerTier, { icon: 'boot', title: s.name,
       body: status === 'lopend' ? 'Behouden vaart! De staat is vastgelegd met ' + f.voor.length + ' foto(’s).' + (c.metSkipper ? ' Uw schipper is ' + (c.skipperNaam || 'aan boord') + '.' : '')
         : status === 'afgerond' ? 'Teruggegeven. ' + (c.teruggave.meerkosten > 0 ? 'Meerkosten: € ' + c.teruggave.meerkosten + ' (motoruren/brandstof).' : 'Geen meerkosten. Uw borg wordt vrijgegeven.') + ' Bedankt voor de vaart!'
         : 'De charter is geannuleerd.', scope: 'orders' });

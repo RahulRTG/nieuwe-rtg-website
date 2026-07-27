@@ -73,7 +73,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     db.data.samenwerkingen.unshift(sw);
     db.data.samenwerkingen = db.data.samenwerkingen.slice(0, 5000);
     save();
-    if (notifySupplier) notifySupplier(naarCode, { icon: '🤝', title: 'Nieuw samenwerkingsvoorstel', body: vanS.name + ' wil samenwerken.' });
+    if (notifySupplier) notifySupplier(naarCode, { icon: 'rechterhand', title: 'Nieuw samenwerkingsvoorstel', body: vanS.name + ' wil samenwerken.' });
     if (sseToSupplier) sseToSupplier(naarCode, 'sync', { scope: 'samenwerking' });
     return { ok: true, id: sw.id };
   }
@@ -88,7 +88,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     sw.status = actie === 'accepteren' ? 'geaccepteerd' : 'afgewezen';
     sw.beslistOp = nu();
     save();
-    if (notifySupplier) notifySupplier(sw.vanCode, { icon: sw.status === 'geaccepteerd' ? '✅' : '✖️', title: 'Samenwerking ' + sw.status, body: s.name + ' heeft gereageerd.' });
+    if (notifySupplier) notifySupplier(sw.vanCode, { icon: sw.status === 'geaccepteerd' ? 'rechterhand' : 'meldingen', title: 'Samenwerking ' + sw.status, body: s.name + ' heeft gereageerd.' });
     if (sseToSupplier) sseToSupplier(sw.vanCode, 'sync', { scope: 'samenwerking' });
     return { ok: true, status: sw.status };
   }
@@ -171,7 +171,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     };
     db.data.samenwerkingen.unshift(sw);
     save();
-    if (notifySupplier) notifySupplier(creatorCode, { icon: '🎉', title: 'Je bent gekozen!', body: s.name + ' koos jou voor "' + op.titel + '".' });
+    if (notifySupplier) notifySupplier(creatorCode, { icon: 'ster', title: 'Je bent gekozen!', body: s.name + ' koos jou voor "' + op.titel + '".' });
     if (sseToSupplier) sseToSupplier(creatorCode, 'sync', { scope: 'samenwerking' });
     return { ok: true, id: sw.id };
   }

@@ -1509,7 +1509,7 @@
     list.innerHTML = R.notifications.length
       ? R.notifications.map(x =>
           '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +
-            '<div class="ic">' + (x.icon || '•') + '</div>' +
+            '<div class="ic">' + (window.RTGGlyf && RTGGlyf.heeft(x.icon) ? RTGGlyf.svgHTML(x.icon, { klasse: 'gl-inline' }) : (x.icon || '•')) + '</div>' +
             '<div class="tx"><b>' + x.title + '</b><span>' + x.body + '</span><time>' + timeAgo(x.at) + '</time></div>' +
           '</div>').join('')
       : '<div class="notif-empty">'+T('app.nonotif','Nog geen meldingen. Zodra iemand op uw post reageert of u een bericht stuurt, ziet u het hier.')+'</div>';
@@ -3513,7 +3513,9 @@
       app.appendChild(bannerEl);
     }
     bannerEl.textContent = '';
-    const ic = document.createElement('span'); ic.className = 'ob-ic'; ic.textContent = icoon || '';
+    const ic = document.createElement('span'); ic.className = 'ob-ic';
+    const glyf = (window.RTGGlyf && RTGGlyf.heeft(icoon)) ? RTGGlyf.svg(icoon) : null;
+    if (glyf) ic.appendChild(glyf); else ic.textContent = icoon || '';
     const kol = document.createElement('span');
     const t = document.createElement('div'); t.className = 'ob-titel'; t.textContent = titel || 'RTG';
     kol.appendChild(t);

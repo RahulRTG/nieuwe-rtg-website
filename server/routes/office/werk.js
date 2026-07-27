@@ -73,7 +73,7 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
     (status === 'verified' ? 'Uw identiteit is geverifieerd. U kunt nu in een tik boeken.' :
      'We konden uw document niet goedkeuren. Probeer het opnieuw met een duidelijkere foto.') +
     '\n\nRahul Travel Group');
-  notify(user.tier, { icon: status === 'verified' ? '✅' : '⚠',
+  notify(user.tier, { icon: status === 'verified' ? 'pas' : 'meldingen',
     title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
     body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
   res.json({ ok: true, status, pending: pendingVerifications() });
@@ -123,7 +123,7 @@ app.post('/api/office/reply', officeAuth, (req, res) => {
   md.needsConcierge = false;
   accounts.saveMemberState(u.id, md);
   broadcastSync([u.tier], 'chat');
-  notify(u.tier, { icon: '💬', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
+  notify(u.tier, { icon: 'berichten', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
   // Het antwoord verschijnt in de app van het lid (met push-melding); RTG gebruikt
   // geen externe berichtenkanalen.
   const inbox = conciergeInbox();

@@ -52,7 +52,7 @@ module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
     if (!db.data.assetKas) db.data.assetKas = {};               // poolkas per object, in centen
     if (!Array.isArray(db.data.sharedAssets) || !db.data.sharedAssets.length) {
       db.data.sharedAssets = [
-        { id: 'sa-jet', naam: 'Aria One, Gulfstream G650', soort: 'privejet', icon: '✈️', waar: 'Thuisbasis Schiphol Oost',
+        { id: 'sa-jet', naam: 'Aria One, Gulfstream G650', soort: 'privejet', icon: 'vluchten', waar: 'Thuisbasis Schiphol Oost',
           entiteit: 'RTG Asset Pool Aria One B.V.',
           beschrijving: 'Volledig bemand, wereldwijd inzetbaar. Uw 24 uur is een retour binnen Europa of een enkele reis intercontinentaal.',
           waarde: 42000000 },

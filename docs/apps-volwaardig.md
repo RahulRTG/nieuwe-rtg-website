@@ -1822,3 +1822,22 @@ geen ranglijsten. Routes onder `/api/onderwijs/*` (ladder, mijn, inschrijf,
 jaar-over, doel), via de stuur-laag direct Rahul-bedienbaar. De test loopt
 een heel leven door: van groep 1 via het schooladvies naar vwo, de
 universiteit in, tot het leren nooit meer stopt.
+
+## RTG School golf 2: de leerstof-motor voor groep 1 t/m 8
+
+Echte leerstof, geen plaatjes van leerstof. De leerlijnen staan als data in
+`server/kern/leerstof-data/` (rekenen en taal, 31 leerdoelen over groep 1
+t/m 8, elk met een vaste id, een miniles in gewone taal en generator-
+parameters; de groep 8-doelen dragen hun referentieniveau 1F/1S). De 22
+opgave-generatoren in `kern/leerstof-gen.js` maken onbeperkt verse opgaven
+-- van stippen tellen en rijmen tot verhoudingstabellen, procenten, het
+kofschip en het metriek stelsel -- met crypto.randomInt als dobbelsteen.
+`kern/leerstof.js` is de stroom: de leerlijn per groep (met wat je al
+behaald hebt uit het leerpaspoort), de les, en de oefensessie van vijf
+opgaven. Server-authoritatief: antwoorden blijven op de server en de test
+bewaakt dat ze nooit met de vraag meereizen. Vier van de vijf goed schrijft
+het leerdoel bij in het leerpaspoort (kern/onderwijs.js); minder is gewoon
+oefening met een vriendelijk advies -- bewust geen scores buiten de sessie,
+geen reeksen en geen ranglijsten. Routes onder `/api/leerstof/*`
+(vakken, les, oefen, antwoord), via de stuur-laag Rahul-bedienbaar
+("overhoor me de tafel van 7"). De testleerling rekent de sommen echt uit.

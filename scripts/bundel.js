@@ -41,6 +41,7 @@ const bundels = {
   'shared/drie.js': 'shared/drie',
   'shared/flagship.js': 'shared/flagship',
   'shared/levendekleur.js': 'shared/levendekleur',
+  'shared/bediening.js': 'shared/bediening',
   'shared/klok3d.js': 'shared/klok3d',
   'shared/glyf.js': 'shared/glyf',
   'shared/qr.js': 'shared/qr',

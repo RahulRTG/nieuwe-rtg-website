@@ -52,6 +52,8 @@ const duur = ms => (ms < 1000 ? ms + ' ms' : ms < 60000 ? (ms / 1000).toFixed(1)
 
 /* ---------- de lagen ---------- */
 const NODE = process.execPath;
+const testBestanden = () => fs.readdirSync(path.join(WORTEL, 'test'))
+  .filter(n => n.endsWith('.test.js')).sort().map(n => path.join('test', n));
 const LAGEN = [
   { id: 'bouw', naam: 'DE BOUW', hard: true, bouw: true },
   { id: 'poorten', naam: 'DE POORTEN', hard: true, stappen: [
@@ -60,7 +62,9 @@ const LAGEN = [
     ['geheimen', [NODE, ['scripts/geheimen.js']]]
   ] },
   { id: 'tests', naam: 'DE TESTSUITE', hard: true, stappen: [
-    ['test/*.test.js', [NODE, ['--experimental-sqlite', '--test', '--test-reporter=dot', 'test/']]]
+    // de bestanden zelf opsommen: node --test wil paden naar bestanden, en
+    // spawn kent geen shell die een * voor ons uitvouwt
+    ['test/*.test.js', [NODE, ['--experimental-sqlite', '--test', '--test-reporter=dot'].concat(testBestanden())]]
   ] },
   { id: 'a11y', naam: 'DE TOEGANKELIJKHEID', hard: true, stappen: [
     ['a11y-scan', [NODE, ['scripts/a11y.js']]]
@@ -226,8 +230,11 @@ function schrijfRapport(uitslagen, keuring, gg, gezakt) {
   fs.writeFileSync(RAPPORT, r.join('\n') + '\n');
 }
 
-/* ---------- de suite ---------- */
-(function () {
+/* ---------- de suite ----------
+   Alleen draaien als hij zelf wordt aangeroepen. Zonder dit slot start een
+   require('./slotsuite') de hele suite, en dat is een valstrik die ik zelf al
+   in ben gelopen. */
+function suite() {
   const t0 = Date.now();
   console.log('\n' + K.vet + 'DE SLOTSUITE' + K.uit + K.dim + ' -- de laatste die spreekt' + K.uit);
   if (SNEL) console.log(K.geel + '  (snelle modus: de Beproeving wordt overgeslagen)' + K.uit);
@@ -310,4 +317,7 @@ function schrijfRapport(uitslagen, keuring, gg, gezakt) {
   }
   console.log('');
   process.exit(gezakt === 0 ? 0 : 1);
-})();
+}
+
+if (require.main === module) suite();
+module.exports = { suite };

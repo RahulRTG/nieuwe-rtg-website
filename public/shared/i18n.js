@@ -334,20 +334,12 @@
     },
     closeModal() { const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.remove('open'); },
 
-    /* ---------- kleine taalschakelaar (heropent de keuze) ---------- */
-    buildSwitch() {
-      if (document.getElementById('rtg-lang-switch')) return;
-      // op het leden-OS (app.html) hoort de taal in Instellingen, niet als een
-      // los knopje op het scherm; daar zet de tegel "Taal" de keuze open.
-      if (/\/apps\/app\.html$/.test(location.pathname)) return;
-      const btn = document.createElement('button');
-      btn.id = 'rtg-lang-switch';
-      btn.className = 'rtg-lang-switch';
-      btn.setAttribute('aria-label', 'Taal wijzigen / Change language');
-      btn.addEventListener('click', () => this.openModal());
-      document.body.appendChild(btn);
-      this.updateSwitch();
-    },
+    /* ---------- de taalkeuze heropenen ----------
+       De taalknop zweefde linksonder op elk scherm, boven op de themakiezer en
+       het vraagteken. Taal is een instelling, dus hij staat nu waar de andere
+       instellingen staan: in het bedieningspaneel (shared/bediening.js), dat
+       openModal() aanroept. Het leden-OS deed dit al met de tegel "Taal". */
+    buildSwitch() { /* geen zwevende knop meer; zie het bedieningspaneel */ },
     updateSwitch() {
       const btn = document.getElementById('rtg-lang-switch');
       if (btn) btn.innerHTML = '<span class="rtg-sw-globe">' + ICOON.globe + '</span>' + this.lang.toUpperCase();

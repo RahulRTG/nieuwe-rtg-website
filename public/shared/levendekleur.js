@@ -207,48 +207,13 @@
     r.setProperty('--levend-basis', p.basis);
   }
 
-  /* ---- het knopje: een pil die door vier standen loopt (stil / rustig /
-     normaal / levendig). Linksonder, boven de themakiezer als die er is. ---- */
+  /* ---- de vier standen (stil / rustig / normaal / levendig).
+     Dit stond als een zwevende pil linksonder op elk scherm, samen met de
+     themakiezer, de taalknop en het vraagteken -- vier losse knopjes op
+     dezelfde vierkante centimeter. Ze staan nu bij elkaar in het
+     bedieningspaneel (shared/bediening.js), dat ze via RTGBeweging bedient.
+     Het leden-OS had zijn eigen schuif in het paneel en houdt die. ---- */
   var STANDEN = [{ w: 0, n: 'Stil' }, { w: 30, n: 'Rustig' }, { w: 62, n: 'Normaal' }, { w: 100, n: 'Levendig' }];
-  function bMerk() {
-    var el = d.getElementById('bewegingKnop'); if (!el) return;
-    var lab = el.querySelector('.bw-label'); if (lab) lab.textContent = bNiveau().charAt(0).toUpperCase() + bNiveau().slice(1);
-  }
-  function bStijl() {
-    if (d.getElementById('bewegingCss')) return;
-    var st = d.createElement('style'); st.id = 'bewegingCss';
-    st.textContent =
-      '#bewegingKnop{position:fixed;left:max(14px,env(safe-area-inset-left,0px));z-index:9990;' +
-        'bottom:calc(64px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:.45rem;' +
-        'padding:.4rem .7rem .4rem .55rem;border-radius:999px;cursor:pointer;font-family:Inter,system-ui,sans-serif;' +
-        'font-size:.7rem;font-weight:600;letter-spacing:.02em;color:var(--txt,#F4F1EC);' +
-        'background:color-mix(in srgb, var(--card,#151312) 82%, transparent);' +
-        'border:1px solid var(--line,rgba(255,255,255,.14));box-shadow:0 10px 30px rgba(0,0,0,.4);' +
-        'backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}' +
-      '#bewegingKnop svg{flex:0 0 auto;color:var(--gold,#A98F1C);}' +
-      '#bewegingKnop:focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}' +
-      '@media print{#bewegingKnop{display:none;}}';
-    (d.head || d.documentElement).appendChild(st);
-  }
-  function bouwKnop() {
-    if (d.getElementById('bewegingKnop') || !d.body) return;
-    // op het leden-OS zit de beweging in het bedieningspaneel (een schuif), dus
-    // daar geen zwevend knopje dat de tabbalk zou overlappen
-    if (d.getElementById('osCcScrim')) return;
-    bStijl();
-    var b = d.createElement('button'); b.id = 'bewegingKnop'; b.type = 'button';
-    b.setAttribute('aria-label', 'Snelheid en intensiteit van de beweging');
-    b.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">' +
-      '<path d="M4 12a8 8 0 0 1 8-8"/><path d="M7.5 12a4.5 4.5 0 0 1 4.5-4.5"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>' +
-      '<span class="bw-label"></span>';
-    b.addEventListener('click', function () {
-      var v = bWaarde(), i = 0;
-      for (var k = 0; k < STANDEN.length; k++) if (Math.abs(STANDEN[k].w - v) <= 8) { i = k; break; }
-      bZet(STANDEN[(i + 1) % STANDEN.length].w);
-    });
-    d.body.appendChild(b);
-    bMerk();
-  }
 
   // continu, maar zuinig: rAF pauzeert vanzelf als het tabblad weg is, en we
   // schrijven alleen bij een echte verandering (de tint schuift heel traag).
@@ -267,7 +232,7 @@
         if (doel) doel.setAttribute('data-levendegrond', '');
       }
     }
-    bPas(); bouwKnop();
+    bPas();
     zorgStijl(); verf();
     if (!loopt && w.requestAnimationFrame) { loopt = true; w.requestAnimationFrame(lus); }
   }
@@ -279,7 +244,8 @@
   else start();
 
   w.RTGLevend = { palet: palet, verf: verf, familie: familie };
-  // de beweging (snelheid/intensiteit) is ook los te bedienen, bv. vanuit een
-  // eigen schuif in het bedieningspaneel
-  w.RTGBeweging = { waarde: bWaarde, factor: bFactor, niveau: bNiveau, zet: bZet };
+  // de beweging (snelheid/intensiteit) is los te bedienen: met de vier vaste
+  // standen vanuit het bedieningspaneel, of met een eigen schuif zoals het
+  // leden-OS die heeft
+  w.RTGBeweging = { standen: STANDEN, waarde: bWaarde, factor: bFactor, niveau: bNiveau, zet: bZet };
 })(window, document);

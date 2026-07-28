@@ -90,6 +90,7 @@
   let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
   let zakData = null, zakBusy = false;
   let thuisData = null, thuisBusy = false;
+  let wvData = null, wvBusy = false, wvTab = 'koppel';
   // Salon-bedrijfsprofiel: volgers, aanbiedingen, polls en cijfers
   let mktData = null, mktBusy = false, mktMsg = '';
   async function laadMarketing(){
@@ -153,7 +154,9 @@
       ['fin','\uD83D\uDCDA',T('kt.fin','Boekhouding')],
       ['hr','\uD83D\uDC65',T('kt.hr','HR & team')],
       // hosts horen bij de leveranciers: elke zaak host op RTG Thuis
-      ['thuis','\u2302',T('kt.thuis','RTG Thuis')]
+      ['thuis','\u2302',T('kt.thuis','RTG Thuis')],
+      // de werkvloer: het andere scherm, de tafellijst en de checklijsten
+      ['werkvloer','\u21C4',T('kt.werkvloer','Werkvloer')]
     ];
     if (horeca) secs.push(
       ['keuken','\uD83D\uDD25',T('kt.keuken','Keuken')],

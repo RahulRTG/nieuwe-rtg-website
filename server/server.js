@@ -282,6 +282,8 @@ app.set('trust proxy', 1); // achter een reverse proxy (hosting) klopt req.secur
 app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.
+// (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het
+// gedeelde headerblok -- daar gelden ze voor elk antwoord, ook lokaal.)
 app.use((req, res, next) => {
   if (PRODUCTION) {
     if (!req.secure) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
@@ -341,6 +343,15 @@ app.use((req, res, next) => {
   // apps schermvullend insluiten; andere sites kunnen ons nog steeds niet
   // framen (clickjacking-bescherming blijft tegen derden overeind).
   res.set('X-Frame-Options', 'SAMEORIGIN');
+  /* Referrer-Policy is hier geen formaliteit. De live-verbindingen (SSE)
+     kunnen geen Authorization-header meesturen -- EventSource kan dat niet --
+     dus daar reist het sessietoken mee als ?token= in de URL. Met deze regel
+     krijgt een externe partij hooguit onze origin te zien, nooit de hele URL,
+     en lekt dat token dus niet via de Referer-header weg.
+     Wat dit NIET oplost: een reverse proxy of CDN legt standaard de complete
+     URL vast in zijn access log. Onze eigen logger doet dat niet (die schrijft
+     req.path, zonder querystring; test/loghygiene.test.js bewaakt het), maar
+     de proxy moet apart worden ingesteld -- zie PRODUCTION.md. */
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   // 9+-hardening: eigen vensters delen geen proces met vreemden (COOP), onze
   // bestanden zijn niet als bron voor andere sites bruikbaar (CORP), de

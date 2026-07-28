@@ -75,6 +75,8 @@ logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
 |---|---|
 | `NODE_ENV=production` | Zet demo uit, https-redirect + HSTS aan |
 | `RTG_ENC_KEY` | Versleuteling-at-rest. 64 hex-tekens (`openssl rand -hex 32`). Zonder dit weigert de start, tenzij je bewust `RTG_ALLOW_PLAINTEXT=1` zet |
+| `RTG_VAULT_KEY` | De sleutel van de identiteitskluis (echte naam, e-mail, telefoon). 64 hex-tekens. **Zonder dit weigert de start.** Staat hij niet in de omgeving, dan maakt de server hem als bestand `vault.key` in de datamap — naast `rtg.db`. Wie die map steelt heeft dan de data én de sleutel, en zijn de codenamen weer namen. Hoort uit een secrets manager te komen |
+| `RTG_SECRET_KEY` | Ondertekent de sessietokens. 64 hex-tekens. **Zonder dit weigert de start**, om dezelfde reden: anders komt `secret.key` naast de database te liggen, en kan wie hem heeft zelf geldige sessies maken |
 | `DATABASE_URL` | PostgreSQL voor de gedeelde data (aanbevolen voor productie en meerdere instances). Leeg = lokaal bestand |
 | `APP_URL` | Correcte links in e-mails |
 | `REDIS_URL` | Nodig zodra je meer dan één instance draait (realtime over instances) |
@@ -95,6 +97,31 @@ De app kan HTTPS zelf termineren, zonder nginx/Caddy ervoor:
 - **Local/dev:** alleen `RTG_TLS=1` — de app genereert een self-signed cert (in `<datamap>/tls/`, gitignore) en spreekt meteen HTTPS.
 
 Het sleutelmateriaal (self-signed cert, ACME-accountsleutel, opgehaalde certificaten) staat onder `<datamap>/tls/` en wordt nooit gecommit. Een reverse proxy/CDN (Cloudflare) ervoor mag nog steeds — dan laat je `RTG_TLS` uit en blijft `trust proxy` de bron van waarheid voor `X-Forwarded-Proto`.
+
+### Zet een proxy ervoor? Strip dan `token` uit zijn access log
+
+De live-verbindingen (SSE) kunnen geen `Authorization`-header meesturen —
+`EventSource` in de browser kan dat simpelweg niet — dus daar reist het
+sessietoken mee als `?token=…` in de URL.
+
+De app zelf logt dat niet: `server/log.js` schrijft `req.path`, en dat is het
+pad **zonder** querystring (`test/loghygiene.test.js` bewaakt dat). Ook stuurt
+de app `Referrer-Policy: strict-origin-when-cross-origin`, zodat een externe
+partij hooguit onze origin ziet en nooit de volledige URL met het token erin.
+
+Maar een reverse proxy of CDN logt standaard de **hele** URL. Doe je dat niet
+uit, dan staan er geldige sessietokens in de access log van nginx/Caddy/
+Cloudflare — en logs gaan naar plekken waar de kluis niet geldt. Dus:
+
+```nginx
+# nginx: log het pad, niet de querystring
+log_format rtg '$remote_addr "$request_method $uri" $status $body_bytes_sent';
+access_log /var/log/nginx/rtg.log rtg;
+```
+
+Bij Cloudflare: zet in de Logpush-configuratie het veld `ClientRequestURI` uit
+(of gebruik `ClientRequestPath`). Draai je met `RTG_TLS=1` zonder proxy, dan
+speelt dit niet.
 
 ### Eigen interne CA + mTLS (intern verkeer)
 

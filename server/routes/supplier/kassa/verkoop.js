@@ -54,6 +54,9 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     actor: req.actor.name,
     // welke kassa van de zaak dit was (de schermnaam, bv. "Kassa bar")
     kassa: req.body.kassa ? String(req.body.kassa).slice(0, 40) : null,
+    // korting op de bon (al in het totaal verrekend), met de reden erbij
+    korting: req.body.korting && Number(req.body.korting.bedrag) > 0
+      ? { bedrag: Math.round(Number(req.body.korting.bedrag) * 100) / 100, reden: String(req.body.korting.reden || '').slice(0, 80) } : null,
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
     items, total, method, betaler, luchtzijde,

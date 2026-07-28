@@ -15,4 +15,5 @@ module.exports = (kern) => {
 require('./kassa/verkoop')(kern);
 require('./kassa/afrekenen')(kern);
 require('./kassa/modus')(kern);
+require('./kassa/premium')(kern);
 };

@@ -72,6 +72,24 @@
       <button class="knop stil" id="payTafel" hidden>Op de tafel</button>
       <button class="knop stil" id="bonLeeg">Wis</button>
     </div>
+    <div class="sec" style="margin-top:.7rem;">Premium, gewoon inbegrepen</div>
+    <div class="rij">
+      <button class="knop stil" id="pKorting">Korting</button>
+      <button class="knop stil" id="pParkeer">Parkeer bon</button>
+      <button class="knop stil" id="pWacht">Wachtbonnen</button>
+      <button class="knop stil" id="pRetour">Retour</button>
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <button class="knop stil" data-derf="verspil">Verspil</button>
+      <button class="knop stil" data-derf="breuk">Breuk</button>
+      <button class="knop stil" data-derf="eigen">Eigen gebruik</button>
+      <button class="knop stil" id="pRepro">Repro</button>
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <button class="knop stil" id="pRapport">Dagrapport</button>
+      <button class="knop stil" id="pKas">Kasopmaak</button>
+    </div>
+    <div class="hint" style="margin-top:.45rem;">De functies waar andere kassa's een abonnement voor vragen, zitten er hier gewoon in. Verspil, breuk en eigen gebruik boeken ook de voorraad af.</div>
     <div class="hint" id="uitkomst" style="margin-top:.55rem;"></div>
   </section>
 </main>
@@ -85,6 +103,17 @@
   <div class="sec">Kies de kassamodus</div>
   <div id="modusLijst" style="display:flex;flex-direction:column;gap:.4rem;"></div>
   <div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="modusDicht">Sluit</button></div>
+</dialog>
+<dialog id="dlgVraag">
+  <div class="sec" id="vraagKop"></div>
+  <p class="hint" id="vraagUitleg" style="margin-bottom:.5rem;"></p>
+  <div class="rij"><input class="veld" id="vraagVeld" style="flex:1;" autocomplete="off"></div>
+  <div class="rij" style="margin-top:.6rem;"><button class="knop" id="vraagOk">Akkoord</button><button class="knop stil" id="vraagWeg">Annuleer</button></div>
+</dialog>
+<dialog id="dlgInfo">
+  <div class="sec" id="infoKop"></div>
+  <div id="infoIn" style="font-size:.86rem;line-height:1.6;"></div>
+  <div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="infoDicht">Sluit</button></div>
 </dialog>
 <dialog id="dlgScherm">
   <div class="sec">Welke kassa is dit toestel?</div>
@@ -113,6 +142,8 @@ const api = (pad, body) => fetch('/api/supplier/' + pad, { method: 'POST',
 let INSTEL = null;       // modus + modi + artikelen + sneltoetsen + tafels
 let BON = [];            // { naam, qty, prijs } -- prijs per regel (bij kilo al gerekend)
 let KGART = null;        // het weeg-artikel dat op het gewicht wacht
+let KORTING = null;      // { bedrag, reden } -- korting op de hele bon
+let LAATSTE = null;      // de laatste bon (voor Repro/herdruk)
 let SCHERM = null;       // het scherm-id van DIT toestel (elke kassa een eigen naam)
 try { SCHERM = localStorage.getItem('rtg_kassa_scherm'); } catch (e) {}
 const modus = () => (INSTEL && INSTEL.modi.find(m => m.id === INSTEL.modus)) || { naam: '...' };
@@ -153,31 +184,51 @@ function zetOpBon(naam, prijs){
   if (zelfde) zelfde.qty++; else BON.push({ naam, prijs, qty: 1 });
   bonToon();
 }
+const subtotaal = () => Math.round(BON.reduce((s, r) => s + r.prijs * r.qty, 0) * 100) / 100;
+const bonTotaal = () => Math.max(0, Math.round((subtotaal() - (KORTING ? KORTING.bedrag : 0)) * 100) / 100);
 function bonToon(){
-  $('#bon').innerHTML = BON.length ? BON.map((r, i) =>
+  $('#bon').innerHTML = (BON.length ? BON.map((r, i) =>
     '<div class="regel"><span>' + r.qty + 'x ' + esc(r.naam) + '</span><span class="min">' + eur(r.prijs * r.qty) +
     ' <button class="knop stil" data-min="' + i + '" style="padding:.15rem .5rem;font-size:.74rem;">-</button></span></div>').join('')
-    : '<div class="leeg">Nog leeg; tik links een artikel aan.</div>';
-  $('#totaal').textContent = eur(BON.reduce((s, r) => s + r.prijs * r.qty, 0));
+    : '<div class="leeg">Nog leeg; tik links een artikel aan.</div>') +
+    (KORTING ? '<div class="regel"><span>Korting' + (KORTING.reden ? ' (' + esc(KORTING.reden) + ')' : '') + '</span><span class="min">-' + eur(KORTING.bedrag) +
+      ' <button class="knop stil" id="kortWeg" style="padding:.15rem .5rem;font-size:.74rem;">-</button></span></div>' : '');
+  $('#totaal').textContent = eur(bonTotaal());
   document.querySelectorAll('[data-min]').forEach(b => b.addEventListener('click', () => {
     const r = BON[Number(b.dataset.min)];
     if (r) { r.qty--; if (r.qty <= 0) BON.splice(Number(b.dataset.min), 1); }
     bonToon();
   }));
+  const kw = document.getElementById('kortWeg'); if (kw) kw.addEventListener('click', () => { KORTING = null; bonToon(); });
 }
+// een kleine vraag-dialoog: geeft de ingevoerde tekst terug, of null bij annuleren
+function vraag(kop, uitleg, standaard){
+  return new Promise(af => {
+    $('#vraagKop').textContent = kop; $('#vraagUitleg').textContent = uitleg || '';
+    const veld = $('#vraagVeld'); veld.value = standaard || '';
+    const dicht = (uit) => { $('#dlgVraag').close(); ok.removeEventListener('click', ja); weg.removeEventListener('click', nee); af(uit); };
+    const ok = $('#vraagOk'), weg = $('#vraagWeg');
+    const ja = () => dicht(veld.value.trim()), nee = () => dicht(null);
+    ok.addEventListener('click', ja); weg.addEventListener('click', nee);
+    $('#dlgVraag').showModal(); veld.focus();
+  });
+}
+function info(kop, html){ $('#infoKop').textContent = kop; $('#infoIn').innerHTML = html; $('#dlgInfo').showModal(); }
+const bonItems = () => BON.map(x => ({ name: x.naam, qty: x.qty, price: x.prijs }));
 async function rekenAf(method, extra){
   if (!BON.length) return;
-  const total = Math.round(BON.reduce((s, r) => s + r.prijs * r.qty, 0) * 100) / 100;
   const badge = $('#badgeNaam').value.trim();
   try {
     const r = await api('pos/sale', Object.assign({
-      total, method, items: BON.map(x => ({ name: x.naam, qty: x.qty, price: x.prijs })),
+      total: bonTotaal(), method, items: bonItems(),
       kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined,
+      korting: KORTING || undefined,
       desc: 'De Kassa (' + modus().naam + ')' + (badge ? ' · ' + badge : ''),
       codenaam: badge || undefined, idem: 'kassa-' + Date.now()
     }, extra || {}));
+    LAATSTE = r.sale;
     $('#uitkomst').textContent = 'Afgerekend: ' + eur(r.sale.total) + ' (' + method + (r.betaler ? ', ' + r.betaler : '') + '), bon ' + r.sale.bon + (r.sale.kassa ? ' op ' + r.sale.kassa : '') + '.';
-    BON = []; $('#badgeNaam').value = ''; bonToon();
+    BON = []; KORTING = null; $('#badgeNaam').value = ''; bonToon();
   } catch (e) { $('#uitkomst').textContent = e.message; }
 }
 $('#payContant').addEventListener('click', () => rekenAf('contant'));
@@ -188,7 +239,104 @@ $('#payTafel').addEventListener('click', () => {
   if ($('#tafelRij').hidden) { $('#tafelRij').hidden = false; return; }
   rekenAf('tafel', { room: $('#tafelKies').value });
 });
-$('#bonLeeg').addEventListener('click', () => { BON = []; bonToon(); $('#uitkomst').textContent = ''; });
+$('#bonLeeg').addEventListener('click', () => { BON = []; KORTING = null; bonToon(); $('#uitkomst').textContent = ''; });
+// -- premium, gewoon inbegrepen --
+$('#pKorting').addEventListener('click', async () => {
+  if (!BON.length) { $('#uitkomst').textContent = 'Zet eerst iets op de bon.'; return; }
+  const in1 = await vraag('Korting', 'Typ een bedrag (bv. 2,50) of een percentage (bv. 10%).', '');
+  if (!in1) return;
+  let bedrag = /%$/.test(in1) ? Math.round(subtotaal() * (parseFloat(in1) / 100) * 100) / 100 : Number(in1.replace(',', '.'));
+  if (!(bedrag > 0)) { $('#uitkomst').textContent = 'Geen geldige korting.'; return; }
+  bedrag = Math.min(bedrag, subtotaal());
+  const reden = await vraag('Reden van de korting', 'Bijvoorbeeld: vaste klant, actie, klacht opgelost.', '');
+  if (reden === null) return;
+  KORTING = { bedrag, reden }; bonToon();
+});
+$('#pParkeer').addEventListener('click', async () => {
+  if (!BON.length) { $('#uitkomst').textContent = 'Een lege bon parkeren heeft geen zin.'; return; }
+  const naam = await vraag('Bon parkeren', 'Geef de wachtbon een naam, bv. "tafel raam" of de voornaam van de klant.', '');
+  if (naam === null) return;
+  try {
+    await api('kassa/parkeer', { naam, items: bonItems(), kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined });
+    BON = []; KORTING = null; bonToon();
+    $('#uitkomst').textContent = 'Bon geparkeerd; haal hem terug via Wachtbonnen (op elk scherm).';
+  } catch (e) { $('#uitkomst').textContent = e.message; }
+});
+$('#pWacht').addEventListener('click', async () => {
+  try {
+    const d = await api('kassa/wachtbon', {});
+    info('Wachtbonnen', (d.wachtbonnen || []).map(b =>
+      '<div class="regel"><span><b>' + esc(b.naam) + '</b> · ' + b.items.map(i => i.qty + 'x ' + esc(i.name)).join(', ') + '</span>' +
+      '<button class="knop stil min" data-haal="' + esc(b.id) + '" style="font-size:.74rem;padding:.2rem .55rem;">Terughalen</button></div>').join('')
+      || '<div class="leeg">Geen wachtbonnen.</div>');
+    document.querySelectorAll('[data-haal]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const r = await api('kassa/wachtbon', { id: b.dataset.haal });
+        BON = r.bon.items.map(i => ({ naam: i.name, qty: i.qty, prijs: i.price }));
+        KORTING = null; bonToon(); $('#dlgInfo').close();
+        $('#uitkomst').textContent = 'Wachtbon "' + r.bon.naam + '" staat weer op de bon.';
+      } catch (e) { $('#uitkomst').textContent = e.message; $('#dlgInfo').close(); }
+    }));
+  } catch (e) { $('#uitkomst').textContent = e.message; }
+});
+$('#pRetour').addEventListener('click', async () => {
+  if (!BON.length) { $('#uitkomst').textContent = 'Zet eerst op de bon wat er terugkomt.'; return; }
+  const reden = await vraag('Retour', 'Waarom komt dit terug? (bv. verkeerd gerecht, klacht)', '');
+  if (reden === null) return;
+  try {
+    const r = await api('kassa/retour', { items: bonItems(), reden, kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined });
+    LAATSTE = r.sale;
+    BON = []; KORTING = null; bonToon();
+    $('#uitkomst').textContent = 'Retour geboekt: ' + eur(r.sale.total) + ', bon ' + r.sale.bon + '.';
+  } catch (e) { $('#uitkomst').textContent = e.message; }
+});
+document.querySelectorAll('[data-derf]').forEach(k => k.addEventListener('click', async () => {
+  if (!BON.length) { $('#uitkomst').textContent = 'Zet eerst op de bon wat er weg is; tik dan ' + k.textContent + '.'; return; }
+  const notitie = await vraag(k.textContent, 'Korte notitie (mag leeg): wat gebeurde er?', '');
+  if (notitie === null) return;
+  try {
+    const r = await api('kassa/derving', { soort: k.dataset.derf, items: bonItems(), notitie, kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined });
+    BON = []; KORTING = null; bonToon();
+    $('#uitkomst').textContent = r.derving.label + ' geboekt (' + eur(r.derving.waarde) + '); de voorraad is bijgewerkt.';
+  } catch (e) { $('#uitkomst').textContent = e.message; }
+}));
+$('#pRepro').addEventListener('click', async () => {
+  if (!LAATSTE) { $('#uitkomst').textContent = 'Nog geen bon om opnieuw te tonen; reken eerst iets af.'; return; }
+  info('Repro · bon ' + esc(LAATSTE.bon),
+    (LAATSTE.items || []).map(i => '<div class="regel"><span>' + i.qty + 'x ' + esc(i.name) + '</span><span class="min">' + eur(i.price * i.qty) + '</span></div>').join('') +
+    '<div class="tot"><span>Totaal</span><span>' + eur(LAATSTE.total) + '</span></div>' +
+    '<div class="hint">' + esc(LAATSTE.at.slice(0, 16).replace('T', ' ')) + (LAATSTE.kassa ? ' · ' + esc(LAATSTE.kassa) : '') + ' · ' + esc(LAATSTE.actor) + '</div>');
+  try { await api('kassa/derving', { soort: 'repro', items: LAATSTE.items || [{ name: 'bon ' + LAATSTE.bon, qty: 1, price: 0 }], notitie: 'herdruk bon ' + LAATSTE.bon, kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined }); } catch (e) {}
+});
+$('#pRapport').addEventListener('click', async () => {
+  try {
+    const d = await api('kassa/dagrapport', {});
+    info('Dagrapport · ' + d.dag,
+      '<div class="regel"><span>Omzet (' + d.bonnen + ' bonnen)</span><span class="min"><b>' + eur(d.omzet) + '</b></span></div>' +
+      Object.entries(d.perMethode).map(([m, v]) => '<div class="regel"><span>· ' + esc(m) + '</span><span class="min">' + eur(v) + '</span></div>').join('') +
+      '<div class="sec" style="margin-top:.5rem;">Per kassa</div>' +
+      Object.entries(d.perKassa).map(([k2, v]) => '<div class="regel"><span>' + esc(k2) + '</span><span class="min">' + eur(v) + '</span></div>').join('') +
+      '<div class="sec" style="margin-top:.5rem;">Bijzonderheden</div>' +
+      '<div class="regel"><span>Retouren (' + d.retouren + ')</span><span class="min">-' + eur(d.retourBedrag) + '</span></div>' +
+      '<div class="regel"><span>Kortingen</span><span class="min">-' + eur(d.kortingen) + '</span></div>' +
+      '<div class="regel"><span>Derving (' + d.derving.regels + ')</span><span class="min">' + eur(d.derving.waarde) + '</span></div>' +
+      Object.entries(d.derving.perSoort).map(([s2, n]) => '<div class="hint">· ' + esc(s2) + ': ' + n + 'x</div>').join(''));
+  } catch (e) { $('#uitkomst').textContent = e.message; }
+});
+$('#pKas').addEventListener('click', async () => {
+  const in1 = await vraag('Kasopmaak', 'Tel de lade en typ het bedrag (bv. 154,30).', '');
+  if (in1 === null) return;
+  try {
+    const r = await api('kassa/kasopmaak', { geteld: Number(in1.replace(',', '.')), kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined });
+    const o = r.opmaak;
+    info('Kasopmaak · ' + o.dag,
+      '<div class="regel"><span>Geteld</span><span class="min">' + eur(o.geteld) + '</span></div>' +
+      '<div class="regel"><span>Verwacht contant</span><span class="min">' + eur(o.verwacht) + '</span></div>' +
+      '<div class="tot"><span>Verschil</span><span>' + (o.verschil >= 0 ? '+' : '') + eur(o.verschil).replace('€ ', '€ ') + '</span></div>' +
+      '<div class="hint">Vastgelegd op naam van ' + esc(o.actor) + '; de werkgever ziet de opmaak terug.</div>');
+  } catch (e) { $('#uitkomst').textContent = e.message; }
+});
+$('#infoDicht').addEventListener('click', () => $('#dlgInfo').close());
 $('#kgOk').addEventListener('click', () => {
   const kg = Number(String($('#kgVeld').value).replace(',', '.'));
   if (!(kg > 0) || kg > 500 || !KGART) return;

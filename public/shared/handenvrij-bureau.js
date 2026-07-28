@@ -202,7 +202,8 @@
      over wat deze pagina kan. */
   if (!opWerk || !api || !api.plekken) return;
   var rij = document.createElement('div');
-  rij.className = 'hv-werk';
+  // hoort bij de handenvrij-balk en ligt dus met hem weg tot je hem oproept
+  rij.className = 'hv-werk hv-weg';
   rij.setAttribute('role', 'group');
   rij.setAttribute('aria-label', 'Snel naar (het broodnodige; de rest gaat via Rahul)');
 

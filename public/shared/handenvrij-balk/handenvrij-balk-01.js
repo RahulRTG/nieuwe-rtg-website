@@ -45,12 +45,20 @@
     '.hv-go{font-size:1rem;line-height:1;padding:.4rem .6rem;}' +
     '.hv-k[aria-pressed="true"]{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);font-weight:700;}' +
     '.hv-k.hv-hoort{background:#9E1C40;color:#fff;border-color:#9E1C40;}' +
+    /* Weggelegd tot je hem oproept. Deze strook stond op ELK scherm onderaan,
+       altijd, en was daarmee de grootste vaste knoppenrij van het huis --
+       terwijl hij hetzelfde doet als Rahul: zeggen of typen wat er moet
+       gebeuren. Je haalt hem nu van de onderrand omhoog (shared/randen.js),
+       net als het bedieningspaneel van de bovenrand. Escape legt hem weg.
+       Zolang hij weg is neemt hij ook geen ruimte meer in (hv-ruimte). */
+    '.hv-balk.hv-weg,.hv-werk.hv-weg,.hv-chat.hv-weg{display:none;}' +
     'body.hv-ruimte{padding-bottom:3.6rem;}' +
+    'body.hv-opgeruimd{padding-bottom:0;}' +
     '@media (prefers-reduced-motion: reduce){.hv-balk{backdrop-filter:none;}}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   var balk = document.createElement('div');
-  balk.className = 'hv-balk';
+  balk.className = 'hv-balk hv-weg';
   balk.innerHTML = '<form><input type="text" maxlength="300" autocomplete="off" spellcheck="false"' +
     ' aria-label="Zeg of typ wat er moet gebeuren" placeholder="Zeg of typ het">' +
     '<button class="hv-k hv-go" type="submit" aria-label="Versturen">→</button></form>' +
@@ -69,11 +77,30 @@
      dan nog niet. Een aanroep naar de gedeelde kamer hoort hier dus niet: die
      wierp een TypeError, waarna de rest van de module (inclusief de toets-luister)
      nooit meer werd opgezet. Het gesprek laadt zichzelf, in handenvrij-chat.js. */
+  /* Oproepen en wegleggen. De onderrand (shared/randen.js) zoekt hiernaar via
+     window.RTGRahul.open; is er op deze pagina al een andere Rahul-balk, dan
+     laat die zijn eigen open() staan en blijft deze weg. Zo staat er nooit
+     meer dan een. */
+  function haalOp() {
+    balk.classList.remove('hv-weg');
+    var w = document.querySelector('.hv-werk'); if (w) w.classList.remove('hv-weg');
+    document.body.classList.remove('hv-opgeruimd');
+    if (inp) inp.focus();
+  }
+  function legWeg() {
+    balk.classList.add('hv-weg'); chat.classList.add('hv-weg');
+    var w = document.querySelector('.hv-werk'); if (w) w.classList.add('hv-weg');
+    document.body.classList.add('hv-opgeruimd');
+  }
+
   function klaar() {
     if (balk.parentNode || !document.body) return;
     document.body.appendChild(chat); document.body.appendChild(balk);
-    document.body.classList.add('hv-ruimte');
+    document.body.classList.add('hv-ruimte', 'hv-opgeruimd');
     knStem.setAttribute('aria-pressed', String(stemAan));
+    root.RTGRahul = root.RTGRahul || {};
+    if (!root.RTGRahul.open) { root.RTGRahul.open = haalOp; root.RTGRahul.sluit = legWeg; }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') legWeg(); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', klaar);
   else klaar();

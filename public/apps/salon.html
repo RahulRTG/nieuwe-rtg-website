@@ -369,7 +369,18 @@ function teken(){
 }
 if(!TOKEN){
   toon('<div class="leeg"><h2>Log eerst in</h2><p style="margin-top:.6rem;">Open de RTG-app en log in; De Salon staat daarna voor je klaar.</p></div>');
-}else{ $('#aibalk').hidden=false; teken(); }
+}else{
+  /* De AI-balk stond hier permanent onderaan. Hij blijft weggelegd tot je hem
+     van de onderrand omhoog haalt (shared/randen.js), net als overal elders. */
+  var _ab=$('#aibalk');
+  window.RTGRahul=window.RTGRahul||{};
+  if(!window.RTGRahul.open){
+    window.RTGRahul.open=function(){ _ab.hidden=false; var i=_ab.querySelector('input'); if(i) i.focus(); };
+    window.RTGRahul.sluit=function(){ _ab.hidden=true; };
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') _ab.hidden=true; });
+  }
+  teken();
+}
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

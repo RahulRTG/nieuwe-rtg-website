@@ -135,7 +135,12 @@
     stijl();
     laag = document.createElement('div'); laag.id = 'bureau';
     document.body.insertBefore(laag, document.body.firstChild);
+    /* De plus stond als los knopje op het bureaublad te zweven. Hij bestaat nog
+       -- het menu hangt eraan -- maar staat niet meer in beeld: je opent hem
+       vanuit het bedieningspaneel (rij "Widgets"), zoals alles wat je zelden
+       nodig hebt. Voor het toetsenbord blijft hij bereikbaar via die rij. */
     plusKnop = document.createElement('button'); plusKnop.id = 'bureauPlus'; plusKnop.setAttribute('aria-label', 'Widget toevoegen'); plusKnop.textContent = '+';
+    plusKnop.hidden = true;
     menu = document.createElement('div'); menu.id = 'bureauMenu';
     document.body.appendChild(plusKnop); document.body.appendChild(menu);
     plusKnop.addEventListener('click', function () { menu.classList.toggle('open'); });
@@ -168,5 +173,10 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 
-  window.RTGBureau = { beoordeel: beoordeel };
+  window.RTGBureau = {
+    beoordeel: beoordeel,
+    // het bedieningspaneel opent hiermee het widget-menu; er is geen knop meer
+    kiezer: function () { if (menu) menu.classList.toggle('open'); },
+    mogelijk: function () { return !!menu; }
+  };
 })();

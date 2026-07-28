@@ -141,6 +141,13 @@
     doe.appendChild(k);
   }
 
+  /* Widgets op het bureaublad: hier stond een losse plus-knop voor te zweven. */
+  function vulWidgets() {
+    if (!w.RTGBureau || !w.RTGBureau.mogelijk || !w.RTGBureau.mogelijk()) return;
+    var doe = rij(T('bdn.widgets', 'Widgets'), T('bdn.widgets.sub', 'Kaarten naast het scherm neerzetten of terugleggen.'));
+    doe.appendChild(knopje(T('bdn.kiezen', 'Kiezen'), false, function () { sluit(); w.RTGBureau.kiezer(); }));
+  }
+
   function vulUitleg() {
     if (!w.RTGUitleg || !w.RTGUitleg.open) return;
     var doe = rij(T('bdn.uitleg', 'Uitleg over dit scherm'), T('bdn.uitleg.sub', 'Wat u hier kunt doen, in gewone taal.'));
@@ -166,7 +173,7 @@
     var uit = d.createElement('p'); uit.className = 'bdn-uit';
     uit.textContent = T('bdn.uit', 'Alles wat u aan dit scherm kunt instellen, bij elkaar. Uw keuzes blijven op dit toestel.');
     blad.appendChild(uit);
-    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulVol(); vulUitleg();
+    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulVol(); vulWidgets(); vulUitleg();
     scrim.appendChild(blad);
     scrim.addEventListener('click', function (e) { if (e.target === scrim) sluit(); });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });

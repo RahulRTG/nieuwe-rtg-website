@@ -79,6 +79,9 @@
       '.bw-resize:hover::after{opacity:1;border-color:var(--gold,#857007);}' +
       '.bw-body > .card,.bw-body > .os-social{margin:0!important;background:none!important;border:none!important;box-shadow:none!important;padding:0!important;}' +
       '.bw-leeg{color:var(--soft,#8A8680);font-size:.8rem;}' +
+      /* de plus zweeft niet meer op het bureaublad; hij hangt aan de rij
+         "Widgets" in het bedieningspaneel (display beats [hidden], vandaar) */
+      '#bureauPlus[hidden]{display:none !important;}' +
       '#bureauPlus{position:fixed;pointer-events:auto;z-index:2;bottom:calc(env(safe-area-inset-bottom,0px) + 1.1rem);' +
         'width:44px;height:44px;border-radius:50%;border:1px solid var(--line,rgba(255,255,255,.14));' +
         'background:color-mix(in srgb, var(--card,#151312) 70%, transparent);backdrop-filter:blur(18px);' +

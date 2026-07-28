@@ -79,6 +79,9 @@
       '.bw-resize:hover::after{opacity:1;border-color:var(--gold,#857007);}' +
       '.bw-body > .card,.bw-body > .os-social{margin:0!important;background:none!important;border:none!important;box-shadow:none!important;padding:0!important;}' +
       '.bw-leeg{color:var(--soft,#8A8680);font-size:.8rem;}' +
+      /* de plus zweeft niet meer op het bureaublad; hij hangt aan de rij
+         "Widgets" in het bedieningspaneel (display beats [hidden], vandaar) */
+      '#bureauPlus[hidden]{display:none !important;}' +
       '#bureauPlus{position:fixed;pointer-events:auto;z-index:2;bottom:calc(env(safe-area-inset-bottom,0px) + 1.1rem);' +
         'width:44px;height:44px;border-radius:50%;border:1px solid var(--line,rgba(255,255,255,.14));' +
         'background:color-mix(in srgb, var(--card,#151312) 70%, transparent);backdrop-filter:blur(18px);' +
@@ -283,7 +286,12 @@
     stijl();
     laag = document.createElement('div'); laag.id = 'bureau';
     document.body.insertBefore(laag, document.body.firstChild);
+    /* De plus stond als los knopje op het bureaublad te zweven. Hij bestaat nog
+       -- het menu hangt eraan -- maar staat niet meer in beeld: je opent hem
+       vanuit het bedieningspaneel (rij "Widgets"), zoals alles wat je zelden
+       nodig hebt. Voor het toetsenbord blijft hij bereikbaar via die rij. */
     plusKnop = document.createElement('button'); plusKnop.id = 'bureauPlus'; plusKnop.setAttribute('aria-label', 'Widget toevoegen'); plusKnop.textContent = '+';
+    plusKnop.hidden = true;
     menu = document.createElement('div'); menu.id = 'bureauMenu';
     document.body.appendChild(plusKnop); document.body.appendChild(menu);
     plusKnop.addEventListener('click', function () { menu.classList.toggle('open'); });
@@ -316,5 +324,10 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 
-  window.RTGBureau = { beoordeel: beoordeel };
+  window.RTGBureau = {
+    beoordeel: beoordeel,
+    // het bedieningspaneel opent hiermee het widget-menu; er is geen knop meer
+    kiezer: function () { if (menu) menu.classList.toggle('open'); },
+    mogelijk: function () { return !!menu; }
+  };
 })();

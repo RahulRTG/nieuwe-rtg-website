@@ -1147,6 +1147,18 @@ function geenGast(req, res) {
   if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten.' }); return true; }
   return false;
 }
+/* Is de identiteit RTG-geverifieerd? Een gratis account mag pas reserveren
+   (en telt pas als volwassene) nadat RTG het paspoort echt gecontroleerd
+   heeft; tot die tijd geldt de standaard "onder de 18". Betalende passen
+   zijn al met paspoort geballoteerd. */
+function idGeverifieerd(sess) {
+  if (!sess) return false;
+  if (sess.account) {
+    const u = accounts.getUserById(sess.account.id);
+    return !!u && u.verified === 'verified';
+  }
+  return sess.tier !== 'guest'; // demo-persona's gelden als geverifieerd lid
+}
 
 /* ---------- gedeelde vriendenlaag over RTG en RTFoundation ----------
    Iedereen (RTG-lid, gratis account, RTFoundation-gezinslid) heeft een codenaam
@@ -2010,7 +2022,7 @@ const kern = {
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
-  findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
+  findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,
@@ -2524,7 +2536,7 @@ Object.assign(kern, require('./kern/aidata').maakAidata({ db, accounts }));
    (session, body) -> { ok, ... } | { status, error }. */
 Object.assign(kern, require('./kern/lidacties')({
   db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
-  leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
+  leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
   notifySupplier, sseToSupplier, sseToOffice,
   zorgVoor: kern.zorgVoor, zorgContact, keuken: kern.keuken,

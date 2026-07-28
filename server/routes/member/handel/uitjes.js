@@ -10,7 +10,7 @@ module.exports = (hctx) => {
     gastDeur, toggleFavoriet, favorietenVan, agendaVoor, maakSplits,
     mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer,
     puntenVan, verzilverPunten, salonZichtbaar, ghMarkt, ghPlaatsBestelling,
-    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact } = kern;
+    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact, idGeverifieerd } = kern;
 app.post('/api/verblijf', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const r = verblijfBoek(req.session, liveCodename(req.session), req.body);
@@ -37,9 +37,11 @@ app.post('/api/verblijf/deur', auth, (req, res) => {
   res.json({ ok: true, door: { name: r.door.name, relockSec: DOOR_RELOCK_MS / 1000 } });
 });
 
-// tafel reserveren: het lid vraagt aan, de zaak beslist
+// tafel reserveren: het lid vraagt aan, de zaak beslist. Een gratis account
+// mag wel (mee)bestellen, maar pas reserveren als het ID geverifieerd is.
 app.post('/api/reserveer', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  if (req.session.tier === 'guest' && !idGeverifieerd(req.session))
+    return res.status(403).json({ error: 'Reserveren kan zodra uw identiteit geverifieerd is. Eten bestellen en meebestellen kan wel gewoon.' });
   const r = reserveerTafel(req.session, liveCodename(req.session), req.body);
   if (r.error) return res.status(r.status).json({ error: r.error });
   // het zorgprofiel reist mee (alleen met toestemming): de zaak weet het al bij het dekken

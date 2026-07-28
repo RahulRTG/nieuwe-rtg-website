@@ -10,6 +10,13 @@ module.exports = (kern) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Pay is voor leden.' }); return true; }
     return false;
   };
+  // Een anonieme demo-gast heeft geen wallet; een GRATIS ACCOUNT wel: die mag
+  // opladen en met de QR-kassacode betalen (bv. eten bestellen als niet-lid).
+  // De sociale kant van Pay (tikken, verzoeken) blijft voor leden.
+  const geenEchtAccount = (req, res) => {
+    if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account om met RTG Pay te betalen.' }); return true; }
+    return false;
+  };
   // Een gratis lid dat RTG Pay gebruikt, laat eenmalig zijn paspoort zien; de
   // betaalde passen deden dat al bij de onboarding. Blokkeert het geld-moment
   // netjes tot dat rond is (met kyc:true zodat de app naar de paspoort-stap gaat).
@@ -27,7 +34,7 @@ module.exports = (kern) => {
   });
   // opladen (Apple Pay/kaart via de betaal-naad)
   app.post('/api/pay/oplaad', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     stuur(res, await pay.laadOp({ codenaam: liveCodename(req.session), centen: req.body.centen, idem: req.body.idem }));
   });
@@ -68,7 +75,7 @@ module.exports = (kern) => {
   });
   // de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
   app.post('/api/pay/kascode', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     res.json(pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten }));
   });
 

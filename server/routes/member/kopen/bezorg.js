@@ -56,12 +56,19 @@ app.post('/api/bezorg/bestel', auth, (req, res) => {
     if (Number.isFinite(lat) && Number.isFinite(lng)) geo = { lat, lng };
   }
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  // servicekosten voor niet-leden: een gratis account betaalt EUR 2,50 ex btw
+  // per etensbestelling (EUR 3,03 incl. 21% btw); leden betalen dit nooit.
+  let servicekosten;
+  if (req.session.tier === 'guest') {
+    servicekosten = { exBtw: 2.5, btwPct: 21, inBtw: 3.03 };
+    total = Math.round((total + servicekosten.inBtw) * 100) / 100;
+  }
   const order = {
     ref: 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     pickup: pickupCode(),
     supplierCode: s.code, supplierName: s.name, type: s.type,
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
-    items, total, levering, adres, geo,
+    items, total, servicekosten, levering, adres, geo,
     allergyNote: schoon(req.body.note, 200),
     zorg: zorgVoor(req.session.key),
     betaalMoment: 'vooraf',

@@ -2393,7 +2393,9 @@
           adres: bzLevering === 'bezorgen' ? bzAdresW : undefined,
           lat: bzGeo ? bzGeo.lat : undefined, lng: bzGeo ? bzGeo.lng : undefined });
         await API.call('/order/pay', { ref: b.order.ref });
-        toast(bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.'));
+        // niet-leden zien de servicekosten eerlijk terug op de bevestiging
+        const sk = b.order.servicekosten ? ' ' + T('bz.service','(incl. EUR 2,50 servicekosten ex btw voor niet-leden)') : '';
+        toast((bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.')) + sk);
         bzZaak = null; bzMand = {};
         renderBestellen(); laadBzMijn();
       } catch(e){ toast(e.message); }

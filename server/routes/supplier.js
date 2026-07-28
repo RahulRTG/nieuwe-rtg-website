@@ -78,6 +78,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/gast')(kern);
   require('./supplier/pda')(kern);
   require('./supplier/bezorg')(kern);
+  require('./supplier/bezorg-keten')(kern);
   require('./supplier/tickets')(kern);
   require('./supplier/verhuur')(kern);
   require('./supplier/charter')(kern);

@@ -67,7 +67,8 @@ app.post('/api/supplier/bezorg/overzicht', supplierAuth, (req, res) => {
   const vandaag = new Date().toISOString().slice(0, 10);
   const klaarVandaag = ordersVanZaak(s.code).filter(o => o.levering &&
     ['bezorgd', 'opgehaald'].includes(o.status) && String(o.finishedAt || o.at).slice(0, 10) === vandaag);
-  res.json({ bezorg: bezorgVan(s), lopend, vandaag: { aantal: klaarVandaag.length, omzet: klaarVandaag.reduce((x, o) => x + (o.total || 0), 0) } });
+  res.json({ bezorg: bezorgVan(s), lopend, zaakLoc: s.loc || null,
+    vandaag: { aantal: klaarVandaag.length, omzet: klaarVandaag.reduce((x, o) => x + (o.total || 0), 0) } });
 });
 
 /* De bezorger neemt een of meer leveringen tegelijk aan, op eigen naam. */
@@ -104,6 +105,9 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
     if (status === 'opgehaald' && o.levering !== 'ophalen') continue;
     if (status !== 'opgehaald' && o.levering !== 'bezorgen') continue;
     if (status !== 'opgehaald' && o.bezorger && req.actor.staffId && o.bezorger.staffId !== req.actor.staffId && !req.actor.manager) continue;
+    // de keten sluit: vertrekken kan pas als de inpakker EN de bezorger hebben afgevinkt
+    if (status === 'onderweg' && !(o.inpak && o.pakcheck))
+      return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.' });
     o.status = status;
     if (status !== 'onderweg') { o.finishedAt = new Date().toISOString(); delete o.etaMin; }
     bijgewerkt.push(o.ref);

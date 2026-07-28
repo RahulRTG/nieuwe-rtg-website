@@ -90,6 +90,13 @@ test('meerdere ritten op naam: de bezorger bundelt twee leveringen, GPS geeft de
   // nog een keer nemen kan niet: ze staan al op naam
   assert.equal((await api('/api/supplier/bezorg/neem', { refs }, pdaToken)).status, 409);
 
+  // vertrekken zonder de keten (inpakker + bezorger afgevinkt) is dicht
+  assert.equal((await api('/api/supplier/bezorg/status', { refs, status: 'onderweg' }, pdaToken)).status, 409);
+  await api('/api/supplier/bezorg/inpak', { ref: refs[0], bon: refs[0], tas: 'tas 1', items: [zaak.producten[0].id] }, pdaToken);
+  await api('/api/supplier/bezorg/inpak', { ref: refs[1], bon: refs[1], tas: 'tas 2', items: [zaak.producten[1].id] }, pdaToken);
+  const pc = await json(await api('/api/supplier/bezorg/pakcheck', { refs }, pdaToken));
+  assert.equal(pc.refs.length, 2);
+
   // de rit vertrekt (beide tegelijk) en de bezorger deelt GPS
   const weg = await json(await api('/api/supplier/bezorg/status', { refs, status: 'onderweg' }, pdaToken));
   assert.equal(weg.refs.length, 2);

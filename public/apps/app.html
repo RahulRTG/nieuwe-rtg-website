@@ -101,11 +101,16 @@
     }
     #shell{
       /* een echte tablet: los venster met marge rondom, afgeronde hoeken en een
-         duidelijke rand + schaduw, zodat hij op het donkere bureau "ligt" */
-      max-width:820px;
-      width:calc(100% - 3rem);
-      height:90vh;
-      max-height:1040px;
+         duidelijke rand + schaduw, zodat hij op het donkere bureau "ligt".
+
+         De VERHOUDING is die van de iPad (786:1001). Zo is de middenconsole op
+         de computer hetzelfde ding als op de tablet en niet een breder, platter
+         familielid: dezelfde compositie, dezelfde volgorde, alleen zo groot als
+         er past. Wat er links en rechts overblijft is voor de widgets. */
+      aspect-ratio:786 / 1001;
+      height:min(92vh, 1040px);
+      width:auto;
+      max-width:min(820px, calc(100% - 3rem));
       min-height:0;
       border:1px solid rgba(255,255,255,0.13);
       border-radius:26px;
@@ -154,7 +159,15 @@
      overblijft wordt lucht in plaats van een extra kolom. */
   #app{
     display:none;flex:1;flex-direction:column;min-height:0;
-    --e:clamp(15px, 3.85cqi, 19.5px);
+    /* --e wordt door TWEE dingen begrensd: de breedte van de shell en zijn
+       HOOGTE. Het beginscherm is namelijk één scherm -- je scrolt er niet in.
+       De hele pagina past in ongeveer 57 keer --e (klok, groet, pas, drie
+       rijen apps en de dockzone), dus 1.754cqh is de hoogte-maat. Wat het
+       kleinst is wint; zo past het altijd, op elk toestel.
+
+       De 1.5 is gemeten, niet geschat: het eerste blad (klok, groet, pas,
+       drie rijen apps, dockzone) beslaat ongeveer 66 keer --e. */
+    --e:min(clamp(11px, 3.85cqi, 19.5px), 1.48cqh);
     --os-kolom:calc(var(--e) * 34);
   }
   #app.active{display:flex;}
@@ -334,14 +347,17 @@
     background:var(--card2);color:var(--txt);font-family:inherit;font-weight:600;font-size:calc(var(--e) * 0.85);
     padding:calc(var(--e) * 0.55) calc(var(--e) * 1.1);cursor:pointer;transition:border-color var(--rust-traag) var(--rust-ease);}
   .opw-knop:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
+  /* De pas schaalt mee met --e, net als de rest. Deed hij dat niet, dan zou
+     hij op een klein scherm alle ruimte opeisen en zou het eerste blad alsnog
+     moeten scrollen -- en dat mag niet. */
   .codecard{
-    margin-top:1rem;
-    border-radius:20px;
+    margin-top:calc(var(--e) * 0.9);
+    border-radius:calc(var(--e) * 1.35);
     border:1px solid var(--line);
     background:
       radial-gradient(120% 140% at 85% -10%, rgba(158,28,64,0.4), transparent 60%),
       linear-gradient(150deg, #191412 0%, #100D0C 70%);
-    padding:1.5rem 1.4rem;
+    padding:calc(var(--e) * 1.05) calc(var(--e) * 1.0);
     position:relative;
     overflow:hidden;
   }
@@ -998,6 +1014,11 @@
      exact de viewport en scrolt alles BINNEN de app, zoals op een echt
      toestel; dock, zoekpil en stippen staan dan echt onderin beeld. De gate
      blijft vrij scrollen (lange inlogformulieren op kleine schermen). */
+  /* Pas als je binnen bent meet de shell zich ook in de HOOGTE als container
+     (container-type:size i.p.v. inline-size). Dat is wat --e nodig heeft om
+     te weten hoeveel ruimte er is. Op de inlogpoort doen we dat niet: daar
+     heeft de shell geen vaste hoogte en zou size-containment hem platslaan. */
+  body.os-vast #shell{container-type:size;}
   body.os-vast{overflow:hidden;}
   /* op de telefoon vult de actieve app exact de viewport; op de computer laten
      we het gecentreerde tablet-venster (media-query hierboven) staan i.p.v.
@@ -1069,11 +1090,16 @@
     scroll-behavior:smooth;
   }
   .os-pages::-webkit-scrollbar{display:none;}
+  /* Eén scherm. Niet scrollen: wat er is past, en anders is het te veel.
+     Zijwaarts vegen naar het tweede scherm mag wel -- dat is bladeren, geen
+     scrollen, en de stipjes onderin zeggen dat er een tweede blad is. */
   .os-pagina{
     min-width:100%;scroll-snap-align:start;scroll-snap-stop:always;
-    overflow-y:auto;overflow-x:hidden;
-    padding:calc(var(--e) * 1.1) calc(var(--e) * 1.7) calc(env(safe-area-inset-bottom, 0px) + var(--e) * 11);
+    overflow:hidden;
+    padding:calc(var(--e) * 1.1) calc(var(--e) * 1.7) calc(env(safe-area-inset-bottom, 0px) + var(--e) * 7);
   }
+  /* het tweede blad heeft losse kaarten en mag wel meegeven */
+  #osPagina2{overflow-y:auto;}
   /* de inhoud houdt zijn eigen breedte; wat overblijft is lucht */
   .os-pagina > *{max-width:var(--os-kolom);margin-inline:auto;}
   .os-dots{
@@ -1318,8 +1344,8 @@
     font-variant-numeric:tabular-nums;color:var(--txt);justify-content:center;
   }
   /* het horloge bovenaan het beginscherm: gecentreerd, ingetogen formaat */
-  .os-home-klok-wrap{display:flex;justify-content:center;margin:0.3rem 0 1.1rem;}
-  .os-home-klok.rtg-ring{width:12.5rem;height:12.5rem;max-width:66vw;max-height:66vw;}
+  .os-home-klok-wrap{display:flex;justify-content:center;margin:calc(var(--e) * 0.2) 0 calc(var(--e) * 0.75);}
+  .os-home-klok.rtg-ring{width:calc(var(--e) * 7);height:calc(var(--e) * 7);max-width:66vw;max-height:66vw;}
   .os-merk-logo{width:18px;height:18px;border-radius:4px;vertical-align:middle;}
 
   /* -------- Rahul: de gouden orb in het midden van het dock -------- */
@@ -1494,15 +1520,19 @@
                  gewoon vol, zonder widget ernaast). -->
             <div class="os-paskrow">
               <div class="codecard" id="codecard"></div>
-              <aside class="os-pas-widget" id="osPasWidget" aria-label="Rahul">
-                <span class="opw-eyebrow" data-i18n="app.pas.widget.eyebrow">Rahul</span>
-                <p class="opw-zin" data-i18n="app.pas.widget.zin">Vraag me om een reis te plannen, iets te boeken of te regelen.</p>
-                <button type="button" class="opw-knop" id="osPasWidgetBtn" data-i18n="app.pas.widget.knop">Vraag Rahul</button>
-              </aside>
             </div>
             <nav class="os-grid" id="osGrid" aria-label="Apps"></nav>
           </section>
           <section class="os-pagina" aria-label="Hoofdscherm 2" id="osPagina2">
+            <!-- De Rahul-kaart stond onder de pas op het eerste blad, maar dan
+                 past dat blad niet meer op een scherm. Hij hoort bij de andere
+                 widgets, dus staat hij hier: het eerste blad blijft de pas en
+                 je apps, het tweede is waar je spullen liggen. -->
+            <aside class="os-pas-widget" id="osPasWidget" aria-label="Rahul">
+              <span class="opw-eyebrow" data-i18n="app.pas.widget.eyebrow">Rahul</span>
+              <p class="opw-zin" data-i18n="app.pas.widget.zin">Vraag me om een reis te plannen, iets te boeken of te regelen.</p>
+              <button type="button" class="opw-knop" id="osPasWidgetBtn" data-i18n="app.pas.widget.knop">Vraag Rahul</button>
+            </aside>
             <nav class="os-grid" id="osGrid2" aria-label="Meer apps"></nav>
             <div class="os-w-chips" id="osWChips"></div>
             <div class="card os-klok-widget" id="homeKlok2" aria-label="Klok">

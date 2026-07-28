@@ -8,7 +8,7 @@ module.exports = (kern) => {
 
   // de verzekeraar: werkplek en PDA
   const z = (pad, fn) => app.post('/api/supplier/zorgpolis' + pad, supplierAuth, async (req, res) => {
-    const caps = (db.data.supplierTypes[req.supplier.type] || {}).caps || [];
+    const caps = db.capsVan(req.supplier);
     if (!caps.includes('polis')) { res.status(403).json({ error: 'Deze zaak is geen verzekeraar.' }); return; }
     stuur(res, await fn(req.supplier.code, req.body || {}));
   });

@@ -78,7 +78,7 @@ function maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 120));
   const getal = (v, max) => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.min(n, max) : 0; };
 
-  function isBoer(s) { return !!s && ((db.data.supplierTypes[s.type] || {}).caps || []).includes('boerderij'); }
+  function isBoer(s) { return !!s && (db.capsVan(s)).includes('boerderij'); }
 
   // Zorg dat de boerderij-structuur bestaat.
   function ensure(s) {

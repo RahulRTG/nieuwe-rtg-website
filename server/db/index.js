@@ -22,6 +22,11 @@ const seed = require('../seed');
 const kluis = require('../kluis'); // versleuteling-at-rest (met RTG_ENC_KEY)
 const state = require('./state');
 const db = state.db;
+/* De werkvormen hangen aan db: db.capsVan(zaak) zegt wat een zaak mag
+   gebruiken, afgeleid uit wat zij is en wat zij doet (een zzp'er die
+   ritten rijdt krijgt de vervoerstools en de zzp-tools). Hier aangehaakt
+   zodat elke ingang (server, trio, noodserver, tests) hem heeft. */
+require('../kern/werkvormen').haakAan(db);
 const { merge3 } = require('./merge');
 const opslag = require('./opslag');
 const snapshot = require('./snapshot');

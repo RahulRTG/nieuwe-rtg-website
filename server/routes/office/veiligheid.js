@@ -44,7 +44,7 @@ module.exports = (octx) => {
   // Naleving van de Salon-verplichting: welke partners zijn (niet) zichtbaar
   app.post('/api/office/salon-naleving', officeAuth, (req, res) => {
     const lijst = db.data.suppliers.map(s => {
-      const t = db.data.supplierTypes[s.type] || {};
+      const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
       const bio = ((s.salon && s.salon.bio) || '').trim();
       const heeftFoto = !!(s.salon && s.salon.foto) || (Array.isArray(s.photos) && s.photos.length > 0);
       return {

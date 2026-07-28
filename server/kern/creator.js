@@ -24,7 +24,7 @@ function maakCreator({ db, save, crypto, anthropic, schoon }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 120));
   const getal = (v, max) => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.min(n, max) : 0; };
 
-  function isCreator(s) { return !!s && ((db.data.supplierTypes[s.type] || {}).caps || []).includes('creator'); }
+  function isCreator(s) { return !!s && (db.capsVan(s)).includes('creator'); }
   function ensure(s) {
     if (!s.creator) s.creator = { niche: '', bio: '', platforms: [], portfolio: [], tarieven: [], ideeen: [], opgezet: false };
     const c = s.creator;

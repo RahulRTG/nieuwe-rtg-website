@@ -8,7 +8,7 @@ module.exports = (ctx) => {
     ordersVanZaak, boekingenVanZaak, publicTrip } = ctx;
   const { deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen, ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor, makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor } = ctx;
   function supplierState(s, actor) {
-    const t = db.data.supplierTypes[s.type] || {};
+    const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
     const vandaag = new Date().toISOString().slice(0, 10);
     const ORDER_KLAAR = { 'geserveerd': 1, 'geweigerd': 1, 'terugbetaald': 1, 'bezorgd': 1, 'opgehaald': 1 };
     const alleOrders = ordersVanZaak(s.code).filter(o => o.status !== 'wacht-op-betaling');

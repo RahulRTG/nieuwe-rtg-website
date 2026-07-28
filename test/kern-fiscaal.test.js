@@ -9,10 +9,12 @@ const { btwSplit } = require('../server/kern/afgeleid');
 
 // Minimale db met precies de collecties die financeVoor leest.
 function stubDb(extra) {
-  return { data: Object.assign({
+  const db = { data: Object.assign({
     supplierTypes: { horeca: { caps: ['menu'] } },
     orders: [], posSales: {}, rides: [], boekingen: [], giftcards: [], klok: {}
   }, extra || {}) };
+  // dezelfde werkvormen-afleiding als de echte db (db.capsVan)
+  return require('../server/kern/werkvormen').haakAan(db);
 }
 
 test('tabellen zijn compleet en het peiljaar is een jaartal', () => {

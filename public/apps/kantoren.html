@@ -214,6 +214,51 @@
       <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Deze kamer bewaakt het huis zelf: opruimen, beschermen, repareren en upgraden. Dezelfde knoppen staan in de boardroom.</p>
       <div id="kZelfzorgVak"><div class="leeg">Laden...</div></div>
     </div>
+    <!-- het Regeringskantoor: alleen in de kamer 'regering' -->
+    <div class="kaart" id="kRegering" hidden>
+      <h4 style="margin:0 0 .4rem;">De ochtendbriefing</h4>
+      <div id="kRegBriefing"><div class="leeg">Laden...</div></div>
+      <h4 style="margin:1rem 0 .4rem;">Kabinetsbesluiten (twee handtekeningen)</h4>
+      <div id="kRegBesluiten"><div class="leeg">Laden...</div></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">
+        <span><label for="kRegNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Wie bent u?</label><input id="kRegNaam" placeholder="minister-president" style="width:11rem;"></span>
+        <span><label for="kRegPort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Portefeuille</label><select id="kRegPort"></select></span>
+        <span style="flex:1;min-width:14rem;"><label for="kRegTitel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Besluit</label><input id="kRegTitel" placeholder="Bijv. 500 extra opvangplekken vrijmaken" style="width:100%;"></span>
+        <button class="knop" id="kRegNieuw" type="button">Voorgenomen besluit</button>
+      </div>
+    </div>
+    <!-- de Opvang-afdeling (AZC/COA): alleen in de kamer 'opvang' -->
+    <div class="kaart" id="kOpvang" hidden>
+      <h4 style="margin:0 0 .4rem;">Locaties en bezetting</h4>
+      <div id="kOpvLocaties"><div class="leeg">Laden...</div></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">
+        <span><label for="kOpvNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe locatie</label><input id="kOpvNaam" placeholder="Naam" style="width:11rem;"></span>
+        <span><label for="kOpvPlaats" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Plaats</label><input id="kOpvPlaats" placeholder="Plaats" style="width:9rem;"></span>
+        <span><label for="kOpvSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Soort</label><select id="kOpvSoort"></select></span>
+        <span><label for="kOpvCap" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Plekken</label><input id="kOpvCap" type="number" min="0" value="200" style="width:6rem;"></span>
+        <button class="knop stil" id="kOpvZet" type="button">Open locatie</button>
+      </div>
+      <h4 style="margin:1rem 0 .4rem;">Dossiers (op nummer, nooit op naam)</h4>
+      <div id="kOpvDossiers"><div class="leeg">Laden...</div></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">
+        <span><label for="kOpvDosLoc" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Locatie</label><select id="kOpvDosLoc"></select></span>
+        <span><label for="kOpvPers" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Personen</label><input id="kOpvPers" type="number" min="1" max="12" value="1" style="width:5.5rem;"></span>
+        <span><label for="kOpvKind" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Kinderen</label><input id="kOpvKind" type="number" min="0" max="10" value="0" style="width:5.5rem;"></span>
+        <button class="knop stil" id="kOpvDos" type="button">Meld aan</button>
+      </div>
+    </div>
+    <!-- elke afdeling heeft haar eigen huis: het afdelingshotel -->
+    <div class="kaart" id="kHotel" hidden>
+      <h4 style="margin:0 0 .4rem;" id="kHotelNaam">Het huis van deze afdeling</h4>
+      <div id="kHotelVak"><div class="leeg">Laden...</div></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">
+        <span><label for="kHotSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Kamertype</label><select id="kHotSoort"></select></span>
+        <span><label for="kHotVoor" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Voor (codenaam)</label><input id="kHotVoor" placeholder="codenaam" style="width:9rem;"></span>
+        <span><label for="kHotVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Van</label><input id="kHotVan" type="date"></span>
+        <span><label for="kHotTot" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Tot</label><input id="kHotTot" type="date"></span>
+        <button class="knop stil" id="kHotBoek" type="button">Reserveer</button>
+      </div>
+    </div>
     </div>
     <div id="tabStats" hidden><div class="kpis" id="kStats"></div></div>
     <div id="tabChat" hidden></div>
@@ -824,6 +869,110 @@ async function openKamer(id){
   // de zelfzorg hoort bij de kamers die het huis zelf draaiend houden
   $('#kZelfzorg').hidden = (id !== 'intern' && id !== 'ingenieurs');
   if (id === 'intern' || id === 'ingenieurs') laadZelfzorg($('#kZelfzorgVak'));
+  // het Regeringskantoor en de Opvang-afdeling hebben hun eigen werkbladen
+  $('#kRegering').hidden = (id !== 'regering');
+  if (id === 'regering') laadRegering();
+  $('#kOpvang').hidden = (id !== 'opvang');
+  if (id === 'opvang') laadOpvang();
+  // en elke afdeling heeft haar eigen huis
+  $('#kHotel').hidden = false;
+  laadAfdHotel(id, d.naam);
+}
+
+/* ---------- het Regeringskantoor: briefing en kabinetsbesluiten ---------- */
+async function laadRegering(){
+  try {
+    const b = await api('regering/briefing');
+    $('#kRegBriefing').innerHTML = b.regels.map(r => '<div style="font-size:.86rem;padding:.25rem 0;">' + esc(r) + '</div>').join('') +
+      b.aandacht.map(a => '<div style="font-size:.86rem;padding:.3rem .5rem;margin-top:.3rem;border-left:2px solid ' + (a.urgent ? 'var(--burgundy)' : 'var(--gold)') + ';">' +
+        '<strong>' + esc(a.portefeuille) + '</strong> · ' + esc(a.tekst) + '</div>').join('') +
+      '<div style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">' + esc(b.slot) + '</div>';
+  } catch (e) { $('#kRegBriefing').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  try {
+    const d = await api('regering/besluiten');
+    if (!$('#kRegPort').options.length)
+      $('#kRegPort').innerHTML = Object.entries(d.portefeuilles).map(([k, v]) => '<option value="' + esc(k) + '">' + esc(v) + '</option>').join('');
+    $('#kRegBesluiten').innerHTML = d.besluiten.length ? d.besluiten.map(b =>
+      '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.35rem 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.84rem;">' +
+      '<strong style="min-width:14rem;">' + esc(b.titel) + '</strong>' +
+      '<span style="color:var(--soft);">' + esc(b.portefeuilleNaam) + ' · door ' + esc(b.door) + '</span>' +
+      (b.status === 'voorgenomen'
+        ? '<button class="knop stil" data-teken="' + esc(b.id) + '" style="margin-left:auto;padding:.2rem .7rem;font-size:.76rem;">Teken mee</button>'
+        : '<span style="margin-left:auto;color:var(--gold);font-size:.76rem;">genomen · meegetekend door ' + esc(b.medeondertekend) + '</span>') + '</div>').join('')
+      : '<div class="leeg">Nog geen besluiten.</div>';
+    $('#kRegBesluiten').querySelectorAll('[data-teken]').forEach(btn => btn.addEventListener('click', async () => {
+      try { await api('regering/teken', { id: btn.dataset.teken, naam: $('#kRegNaam').value });
+        meld('Meegetekend; het besluit staat.'); laadRegering(); } catch (e) { meld(e.message); }
+    }));
+  } catch (e) { $('#kRegBesluiten').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  const nieuw = $('#kRegNieuw');
+  if (nieuw && !nieuw._b) { nieuw._b = 1; nieuw.addEventListener('click', async () => {
+    try { await api('regering/besluit', { titel: $('#kRegTitel').value, portefeuille: $('#kRegPort').value, naam: $('#kRegNaam').value });
+      $('#kRegTitel').value = ''; meld('Voorgenomen besluit; een tweede bewindspersoon tekent mee.'); laadRegering();
+    } catch (e) { meld(e.message); }
+  }); }
+}
+
+/* ---------- de Opvang-afdeling (AZC/COA) ---------- */
+async function laadOpvang(){
+  try {
+    const d = await api('opvang/locaties');
+    if (!$('#kOpvSoort').options.length)
+      $('#kOpvSoort').innerHTML = Object.entries(d.soorten).map(([k, v]) => '<option value="' + esc(k) + '">' + esc(v) + '</option>').join('');
+    $('#kOpvDosLoc').innerHTML = d.locaties.map(l => '<option value="' + esc(l.id) + '">' + esc(l.naam) + ' (' + l.vrij + ' vrij)</option>').join('');
+    $('#kOpvLocaties').innerHTML =
+      '<div style="font-size:.84rem;color:var(--gold);margin-bottom:.3rem;">' + d.totaal.bezet + ' van ' + d.totaal.capaciteit + ' plekken bezet (' + d.totaal.bezettingPct + '%) · ' + d.totaal.vrij + ' vrij</div>' +
+      (d.locaties.length ? d.locaties.map(l =>
+        '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.84rem;">' +
+        '<strong style="min-width:11rem;">' + esc(l.naam) + '</strong>' +
+        '<span style="color:var(--soft);">' + esc(l.soortLabel) + ' · ' + esc(l.plaats) + ' · ' + l.bezet + '/' + l.capaciteit + ' (' + l.bezettingPct + '%)</span></div>').join('')
+        : '<div class="leeg">Nog geen locaties.</div>');
+  } catch (e) { $('#kOpvLocaties').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  try {
+    const d = await api('opvang/dossiers');
+    $('#kOpvDossiers').innerHTML = d.dossiers.length ? d.dossiers.slice(0, 20).map(x =>
+      '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.84rem;">' +
+      '<strong>' + esc(x.nummer) + '</strong><span style="color:var(--soft);">' + x.personen + ' persoon(en)' + (x.kinderen ? ', ' + x.kinderen + ' kind(eren)' : '') + ' · ' + esc(x.locatieNaam) + ' · ' + esc(x.fase) + '</span>' +
+      (x.fase !== 'gehuisvest' && x.fase !== 'vertrokken'
+        ? '<button class="knop stil" data-fase="' + esc(x.nummer) + '" data-naar="' + esc(volgendeFase(d.fasen, x.fase)) + '" style="margin-left:auto;padding:.2rem .7rem;font-size:.76rem;">→ ' + esc(volgendeFase(d.fasen, x.fase)) + '</button>' : '') + '</div>').join('')
+      : '<div class="leeg">Nog geen dossiers.</div>';
+    $('#kOpvDossiers').querySelectorAll('[data-fase]').forEach(btn => btn.addEventListener('click', async () => {
+      try { await api('opvang/fase', { nummer: btn.dataset.fase, fase: btn.dataset.naar }); laadOpvang(); } catch (e) { meld(e.message); }
+    }));
+  } catch (e) { $('#kOpvDossiers').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  const zet = $('#kOpvZet');
+  if (zet && !zet._b) { zet._b = 1; zet.addEventListener('click', async () => {
+    try { await api('opvang/locatie', { locatie: { naam: $('#kOpvNaam').value, plaats: $('#kOpvPlaats').value, soort: $('#kOpvSoort').value, capaciteit: Number($('#kOpvCap').value) } });
+      $('#kOpvNaam').value = ''; meld('Locatie geopend.'); laadOpvang(); } catch (e) { meld(e.message); }
+  }); }
+  const dos = $('#kOpvDos');
+  if (dos && !dos._b) { dos._b = 1; dos.addEventListener('click', async () => {
+    try { await api('opvang/dossier', { dossier: { locatie: $('#kOpvDosLoc').value, personen: Number($('#kOpvPers').value), kinderen: Number($('#kOpvKind').value) } });
+      meld('Aangemeld op dossiernummer.'); laadOpvang(); } catch (e) { meld(e.message); }
+  }); }
+}
+const volgendeFase = (fasen, nu) => fasen[Math.min(fasen.length - 2, fasen.indexOf(nu) + 1)] || 'gehuisvest';
+
+/* ---------- het eigen huis van elke afdeling ---------- */
+async function laadAfdHotel(kamerId, kamerNaam){
+  try {
+    const d = await api('afdelingshotel', { kamer: kamerId });
+    $('#kHotelNaam').textContent = d.hotel.naam;
+    $('#kHotSoort').innerHTML = d.kamers.map(k => '<option value="' + esc(k.soort) + '">' + esc(k.naam) + ' (' + k.vrij + ' vrij)</option>').join('');
+    $('#kHotelVak').innerHTML =
+      '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + esc(d.hotel.motto) + '</div>' +
+      '<div style="font-size:.84rem;">' + d.eenheden + ' kamers · vannacht ' + d.vannacht + ' bezet (' + d.bezettingPct + '%)</div>' +
+      d.kamers.map(k => '<div style="display:flex;gap:.6rem;font-size:.82rem;padding:.2rem 0;"><span style="min-width:9rem;">' + esc(k.naam) + '</span>' +
+        '<span style="color:var(--soft);">' + esc(k.beschrijving) + '</span><span style="margin-left:auto;">' + k.vrij + '/' + k.aantal + '</span></div>').join('') +
+      (d.komend.length ? '<div style="margin-top:.5rem;font-size:.82rem;">' + d.komend.slice(0, 6).map(b =>
+        '<div style="color:var(--soft);">' + esc(b.van) + ' → ' + esc(b.tot) + ' · ' + esc(b.soortNaam) + ' · ' + esc(b.voor) + '</div>').join('') + '</div>' : '') +
+      '<div style="color:var(--soft);font-size:.76rem;margin-top:.4rem;">' + esc(d.verrekening) + '</div>';
+  } catch (e) { $('#kHotelVak').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  const boek = $('#kHotBoek');
+  if (boek && !boek._b) { boek._b = 1; boek.addEventListener('click', async () => {
+    try { await api('afdelingshotel/boek', { kamer: KAMER, soort: $('#kHotSoort').value, voor: $('#kHotVoor').value, van: $('#kHotVan').value, tot: $('#kHotTot').value });
+      meld('Kamer gereserveerd.'); laadAfdHotel(KAMER, ''); } catch (e) { meld(e.message); }
+  }); }
 }
 
 /* ---------- de zelfzorg: opruimen, beschermen, repareren, upgraden ----------

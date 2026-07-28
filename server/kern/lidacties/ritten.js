@@ -11,7 +11,7 @@ module.exports = (ctx) => {
 function vraagRitVoor(session, body) {
   if (session.tier === 'guest') return { status: 403, error: 'Alleen voor leden.' };
   const s = findSupplier(body.supplierCode);
-  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  const caps = s ? (db.capsVan(s)) : [];
   if (!s || !caps.includes('rides')) return { status: 404, error: 'Geen vervoerspartner gevonden.' };
   // activiteitenzaken rijden alleen hun eigen transfers: die regel je via je ticket
   if (s.type === 'activiteit') return { status: 409, error: 'De transfer van ' + s.name + ' regel je via je ticket (Ter plaatse, Mijn tickets).' };

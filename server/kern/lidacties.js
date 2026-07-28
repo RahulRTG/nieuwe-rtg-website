@@ -25,7 +25,7 @@ module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs
 
 function koopTicketVoor(session, body) {
   const s = findSupplier(body.supplierCode);
-  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  const caps = s ? (db.capsVan(s)) : [];
   if (!s || !caps.includes('tickets')) return { status: 404, error: 'Geen activiteitenpartner gevonden.' };
   const act = (s.activiteiten || []).find(a => a.id === body.activiteitId);
   if (!act) return { status: 404, error: 'Deze activiteit bestaat niet (meer).' };

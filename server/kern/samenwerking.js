@@ -22,14 +22,14 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     if (!Array.isArray(db.data.creatorOproepen)) db.data.creatorOproepen = [];
     return db.data;
   }
-  function isCreator(s) { return !!s && ((db.data.supplierTypes[s.type] || {}).caps || []).includes('creator'); }
+  function isCreator(s) { return !!s && (db.capsVan(s)).includes('creator'); }
   function creatorInfo(s) {
     const c = s.creator || {};
     const bereik = (c.platforms || []).reduce((n, p) => n + (p.volgers || 0), 0);
     return { code: s.code, name: s.name, city: s.city || null, niche: c.niche || null, bereik, platforms: (c.platforms || []).length };
   }
   function supplierInfo(s) {
-    const t = db.data.supplierTypes[s.type] || {};
+    const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
     return { code: s.code, name: s.name, city: s.city || null, type: s.type, typeLabel: t.label || s.type, icon: t.icon || '🏷️' };
   }
 

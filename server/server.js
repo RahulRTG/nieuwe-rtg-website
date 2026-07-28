@@ -2487,6 +2487,18 @@ if (regelTimer.unref) regelTimer.unref();
 /* RTG Thuis (kern/thuis): thuisverhuur van lid aan lid -- ons antwoord op
    Airbnb, met alle premium functies gratis en de Reiswijzer aan boord. */
 Object.assign(kern, require('./kern/thuis')({ db, save, crypto, schoon, reiswijzer: kern.reiswijzer, landVind: kern.landVind, findSupplier }));
+/* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
+   gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft
+   de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db
+   (db.capsVan); dit is de kern-ingang voor de route. */
+Object.assign(kern, require('./kern/werkvormen')({ db }));
+/* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
+   minister-president en het eigen hotel van elke afdeling -- alle drie
+   kamers van RTG Kantoren. */
+Object.assign(kern, require('./kern/opvang')({ db, save, crypto }));
+Object.assign(kern, require('./kern/afdelingshotel')({ db, save, crypto }));
+Object.assign(kern, require('./kern/regering')({ db, save, crypto, LANDEN,
+  regelwacht: kern.regelwacht, bank: kern.bank, opvang: kern.opvang, afdelingen: kern.afdelingen, ledenAantal }));
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */
@@ -2903,6 +2915,7 @@ require('./routes/bank')(kern);
 require('./routes/bankhart')(kern);
 require('./routes/reis')(kern);
 require('./routes/thuis')(kern);
+require('./routes/regering')(kern);
 require('./routes/stad')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);

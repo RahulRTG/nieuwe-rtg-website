@@ -5,7 +5,7 @@ module.exports = (kern) => {
   const { app, db, supplierAuth, beauty, petcare, opvang } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
   const maak = (basis, capNaam, domein) => (pad, fn) => app.post(basis + pad, supplierAuth, (req, res) => {
-    const caps = (db.data.supplierTypes[req.supplier.type] || {}).caps || [];
+    const caps = db.capsVan(req.supplier);
     if (!caps.includes(capNaam)) { res.status(403).json({ error: 'Deze zaak is geen ' + domein + '.' }); return; }
     stuur(res, fn(req.supplier.code, req.body || {}));
   });

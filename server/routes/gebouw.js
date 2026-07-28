@@ -6,7 +6,7 @@ module.exports = (kern) => {
   const { app, db, supplierAuth, gebouw } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
   function eisGebouw(req, res) {
-    const caps = (db.data.supplierTypes[req.supplier.type] || {}).caps || [];
+    const caps = db.capsVan(req.supplier);
     if (!caps.includes('gebouw')) { res.status(403).json({ error: 'Dit is geen kantoorgebouw-partner.' }); return false; }
     return true;
   }

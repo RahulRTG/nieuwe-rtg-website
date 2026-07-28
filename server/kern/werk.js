@@ -95,7 +95,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     for (const [code, list] of Object.entries(db.data.vacatures || {})) {
       const s = findSupplier(code);
       if (!s) continue;
-      const t = db.data.supplierTypes[s.type] || {};
+      const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
       const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
       if (land && landCode !== land) continue;
       for (const v of list) {

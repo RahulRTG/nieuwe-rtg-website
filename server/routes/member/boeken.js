@@ -13,7 +13,7 @@ module.exports = (kern) => {
   app.post('/api/booking/request', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const s = findSupplier(req.body.supplierCode);
-    const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+    const caps = s ? (db.capsVan(s)) : [];
     if (!s || !caps.includes('services')) return res.status(404).json({ error: 'Geen zelfstandige professional gevonden.' });
     if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen boekingen aan.' });
     const dienst = (s.services || []).find(x => x.id === req.body.serviceId);

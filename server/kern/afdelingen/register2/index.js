@@ -8,4 +8,6 @@
    een codenaam opvragen (elke opvraging komt in het auditlog). */
 module.exports = (ctx) => Object.assign({},
   require('./kantoorkamers')(ctx),
-  require('./ontwerpbureaus')(ctx));
+  require('./ontwerpbureaus')(ctx),
+  // de staatskamers: het Regeringskantoor en Opvang & migratie (AZC/COA)
+  require('./staatskamers')(ctx));

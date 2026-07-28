@@ -18,7 +18,7 @@ function maakFiscaal({ db, centen, btwSplit }) {
     const L = LANDEN[landCode];
     const maand = new Date().toISOString().slice(0, 7);
     const inMaand = iso => String(iso || '').slice(0, 7) === maand;
-    const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
+    const caps = db.capsVan(s);
     const basisCat = caps.includes('rides') ? (s.type === 'jet' ? 'jet' : 'vervoer') : caps.includes('rooms') ? 'logies' : 'eten';
     // omzet per belastingcategorie: bar-items zijn drank, keuken-items eten
     const potten = {};

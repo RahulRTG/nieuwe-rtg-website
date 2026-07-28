@@ -65,7 +65,7 @@ function ensureSupplierDefaults(s) {
   if (typeof s.rate !== 'number') s.rate = 0.12;
   // vervoerders: een vloot en een tarief, zodat elke rit direct een vaste
   // nettoprijs krijgt en het kantoor voertuigen aan chauffeurs kan koppelen
-  const caps2 = (db.data.supplierTypes[s.type] || {}).caps || [];
+  const caps2 = db.capsVan(s);
   if (caps2.includes('rides')) {
     if (!Array.isArray(s.fleet)) s.fleet = s.type === 'jet'
       ? [{ id: 'v1', name: 'Cessna Citation XLS', plate: 'PH-RTG', seats: 8, active: true },

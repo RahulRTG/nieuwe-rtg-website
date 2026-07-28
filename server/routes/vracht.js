@@ -5,7 +5,7 @@ module.exports = (kern) => {
   const { app, db, supplierAuth, vracht } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
   function eisVracht(req, res) {
-    const caps = (db.data.supplierTypes[req.supplier.type] || {}).caps || [];
+    const caps = db.capsVan(req.supplier);
     if (!caps.includes('vracht')) { res.status(403).json({ error: 'Dit is geen vracht- of expeditiepartner.' }); return false; }
     return true;
   }

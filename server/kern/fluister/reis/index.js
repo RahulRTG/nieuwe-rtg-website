@@ -15,7 +15,7 @@ module.exports = (ctx) => {
 
   const zaken = () => db.data.suppliers || [];
   const open = s => !(s.settings && s.settings.ordersOpen === false);
-  const caps = s => (db.data.supplierTypes[s.type] || {}).caps || [];
+  const caps = s => db.capsVan(s);
   const datumPlus = (d, n) => new Date(new Date(d + 'T12:00:00').getTime() + n * 86400000).toISOString().slice(0, 10);
 
   const deelCtx = { ...ctx, zaken, open, caps, datumPlus };

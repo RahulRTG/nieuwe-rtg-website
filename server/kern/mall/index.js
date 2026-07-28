@@ -120,7 +120,7 @@ function maakMall({ db, save, crypto, isRetail }) {
     save();
   }
 
-  function isBoer(s) { return !!s && ((db.data.supplierTypes[s.type] || {}).caps || []).includes('boerderij'); }
+  function isBoer(s) { return !!s && (db.capsVan(s)).includes('boerderij'); }
   const farmTeKoop = s => ((s.boerderij && s.boerderij.producten) || []).filter(p => (p.prijs || 0) > 0 && (p.voorraad || 0) > 0);
   // een leverancier die het kantoor in de Mall heeft verborgen (schakelaar in de
   // boardroom); geldt voor zowel de koop-etages als de gids

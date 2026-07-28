@@ -76,3 +76,32 @@ test('de personeelskantine: de bon draagt de naam van de collega (interne verrek
   }, stafToken));
   assert.match(sale.sale.desc, /Mees/, 'de collega staat op de bon');
 });
+
+test('meerdere kassaschermen: elk een eigen naam en eigen modus, en de bon draagt de schermnaam', async () => {
+  // een medewerker zet het eerste scherm neer; dubbele namen bestaan niet
+  const deur = await json(await api('/api/supplier/kassa/scherm', { naam: 'Kassa deur' }, stafToken));
+  assert.ok(deur.scherm.id, 'het scherm heeft een id');
+  const bar = await json(await api('/api/supplier/kassa/scherm', { naam: 'Kassa bar' }, stafToken));
+  assert.equal((await api('/api/supplier/kassa/scherm', { naam: 'kassa BAR' }, stafToken)).status, 409, 'dezelfde naam (ongeacht hoofdletters) kan niet twee keer');
+  // hernoemen en weghalen is voor de werkgever
+  assert.equal((await api('/api/supplier/kassa/scherm', { id: deur.scherm.id, naam: 'Kassa entree' }, stafToken)).status, 403);
+  const her = await json(await api('/api/supplier/kassa/scherm', { id: deur.scherm.id, naam: 'Kassa entree' }, managerToken));
+  assert.ok(her.schermen.some(x => x.naam === 'Kassa entree'));
+  // elk scherm een eigen modus: de entreekassa draait discotheek, de bar bakker
+  await api('/api/supplier/kassa/instel', { scherm: deur.scherm.id, modus: 'discotheek' }, managerToken);
+  await api('/api/supplier/kassa/instel', { scherm: bar.scherm.id, modus: 'bakker' }, managerToken);
+  const opDeur = await json(await api('/api/supplier/kassa/instel', { scherm: deur.scherm.id }, stafToken));
+  const opBar = await json(await api('/api/supplier/kassa/instel', { scherm: bar.scherm.id }, stafToken));
+  assert.equal(opDeur.modus, 'discotheek');
+  assert.equal(opBar.modus, 'bakker');
+  assert.equal(opDeur.scherm.naam, 'Kassa entree');
+  // de verkoop draagt de schermnaam, zodat de zaak per kassa kan terugkijken
+  const sale = await json(await api('/api/supplier/pos/sale', {
+    total: 5, method: 'contant', kassa: 'Kassa bar', items: [{ name: 'Croissant', qty: 1, price: 5 }]
+  }, stafToken));
+  assert.equal(sale.sale.kassa, 'Kassa bar');
+  // weghalen: werkgever; het andere scherm blijft staan
+  const weg = await json(await api('/api/supplier/kassa/scherm', { id: bar.scherm.id, weg: true }, managerToken));
+  assert.ok(!weg.schermen.some(x => x.id === bar.scherm.id));
+  assert.ok(weg.schermen.some(x => x.naam === 'Kassa entree'));
+});

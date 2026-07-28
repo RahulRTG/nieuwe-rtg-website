@@ -24,32 +24,75 @@ module.exports = (kern) => {
   const kassaVan = (s) => {
     if (!s.kassa || typeof s.kassa !== 'object') s.kassa = { modus: 'bakker', artikelen: [] };
     if (!Array.isArray(s.kassa.artikelen)) s.kassa.artikelen = [];
+    if (!Array.isArray(s.kassa.schermen)) s.kassa.schermen = [];
     return s.kassa;
   };
 
   /* Alles wat De Kassa nodig heeft in een antwoord: de modus, de modi-lijst,
      het eigen assortiment plus de menukaart en het bezorg-assortiment als
-     sneltoetsen, en de tafels voor de restaurantmodus. */
+     sneltoetsen, en de tafels voor de restaurantmodus. Gebruikt de zaak
+     meerdere kassaschermen, dan meldt het toestel zijn scherm-id mee: elk
+     scherm heeft een eigen naam en (desgewenst) een eigen modus -- de
+     deurkassa en de barkassa van dezelfde club zijn verschillende kassa's. */
   app.post('/api/supplier/kassa/instel', supplierAuth, (req, res) => {
     const s = req.supplier;
     const k = kassaVan(s);
+    const scherm = req.body.scherm ? k.schermen.find(x => x.id === req.body.scherm) : null;
     if (req.body.modus !== undefined) {
       if (!managerOnly(req, res)) return;
       if (!MODI.some(m => m.id === req.body.modus)) return res.status(400).json({ error: 'Onbekende kassamodus.' });
-      k.modus = String(req.body.modus);
+      if (scherm) scherm.modus = String(req.body.modus);
+      else k.modus = String(req.body.modus);
       save();
-      logActivity(s.code, req.actor, 'zette De Kassa in de modus "' + k.modus + '"');
+      logActivity(s.code, req.actor, 'zette ' + (scherm ? 'kassa "' + scherm.naam + '"' : 'De Kassa') + ' in de modus "' + req.body.modus + '"');
       sseToSupplier(s.code, 'sync', { scope: 'pos' });
     }
     const snel = [];
     for (const m of (s.menu || []).slice(0, 80)) snel.push({ id: 'menu:' + m.id, naam: m.name, prijs: m.price, bron: 'menukaart', station: m.station || null });
     for (const p of ((s.bezorg && s.bezorg.producten) || []).slice(0, 60)) snel.push({ id: 'bezorg:' + p.id, naam: p.name, prijs: p.price, bron: 'bezorg' });
     res.json({
-      modus: k.modus, modi: MODI,
+      modus: (scherm && scherm.modus) || k.modus, modi: MODI,
+      scherm: scherm ? { id: scherm.id, naam: scherm.naam, modus: scherm.modus || null } : null,
+      schermen: k.schermen,
       artikelen: k.artikelen, sneltoetsen: snel,
       tafels: (s.tables || []).map(t => t.name),
       naam: s.name, type: s.type
     });
+  });
+
+  /* De kassaschermen van de zaak: elk toestel meldt zich aan onder een eigen
+     naam ("Kassa deur", "Kassa bar", "Kassa 2"). Aanmaken kan elke
+     medewerker (het toestel neerzetten hoort bij het werk); hernoemen en
+     weghalen is voor de werkgever. */
+  app.post('/api/supplier/kassa/scherm', supplierAuth, (req, res) => {
+    const s = req.supplier;
+    const k = kassaVan(s);
+    if (req.body.weg || (req.body.id && req.body.naam !== undefined)) {
+      if (!managerOnly(req, res)) return;
+    }
+    if (req.body.weg) {
+      k.schermen = k.schermen.filter(x => x.id !== req.body.id);
+      save(); sseToSupplier(s.code, 'sync', { scope: 'pos' });
+      return res.json({ ok: true, schermen: k.schermen });
+    }
+    const naam = schoon(req.body.naam, 40);
+    if (!naam) return res.status(400).json({ error: 'Geef de kassa een naam, bijvoorbeeld "Kassa bar".' });
+    if (k.schermen.some(x => x.naam.toLowerCase() === naam.toLowerCase() && x.id !== req.body.id))
+      return res.status(409).json({ error: 'Er is al een kassa met deze naam; kies een andere.' });
+    let scherm;
+    if (req.body.id) {
+      scherm = k.schermen.find(x => x.id === req.body.id);
+      if (!scherm) return res.status(404).json({ error: 'Kassascherm niet gevonden.' });
+      scherm.naam = naam;
+    } else {
+      if (k.schermen.length >= 20) return res.status(400).json({ error: 'Een zaak kan tot 20 kassaschermen hebben.' });
+      scherm = { id: 'ks' + crypto.randomBytes(3).toString('hex'), naam };
+      k.schermen.push(scherm);
+    }
+    save();
+    logActivity(s.code, req.actor, (req.body.id ? 'hernoemde' : 'zette') + ' kassascherm "' + naam + '"' + (req.body.id ? '' : ' erbij'));
+    sseToSupplier(s.code, 'sync', { scope: 'pos' });
+    res.json({ ok: true, scherm, schermen: k.schermen });
   });
 
   /* Het eigen kassa-assortiment: de werkgever (manager) voegt toe, past aan

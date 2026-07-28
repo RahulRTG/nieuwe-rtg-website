@@ -44,6 +44,7 @@
   <div><div class="ey">RTG · werkplek</div><h1>De Kassa</h1></div>
   <span class="pil" id="zaakNaam">...</span>
   <span class="pil" id="modusNaam">...</span>
+  <button class="pil" id="schermKnop" style="cursor:pointer;background:transparent;font:inherit;">Kassa benoemen</button>
   <button class="knop stil" id="modusKnop">Modus wisselen</button>
 </header>
 <main>
@@ -85,6 +86,13 @@
   <div id="modusLijst" style="display:flex;flex-direction:column;gap:.4rem;"></div>
   <div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="modusDicht">Sluit</button></div>
 </dialog>
+<dialog id="dlgScherm">
+  <div class="sec">Welke kassa is dit toestel?</div>
+  <p class="hint" style="margin-bottom:.5rem;">Gebruikt de zaak meerdere kassaschermen, dan krijgt elk scherm een eigen naam; elke bon draagt die naam en elk scherm kan een eigen modus hebben.</p>
+  <div id="schermLijst" style="display:flex;flex-direction:column;gap:.35rem;margin-bottom:.6rem;"></div>
+  <div class="rij"><input class="veld" id="schermNieuw" placeholder='Nieuwe kassa, bv. "Kassa bar"' style="flex:1;"><button class="knop" id="schermMaak">Zet neer</button></div>
+  <div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="schermDicht">Sluit</button></div>
+</dialog>
 <dialog id="dlgPay">
   <div class="sec">RTG Pay</div>
   <p class="hint" style="margin-bottom:.5rem;">De gast toont de betaalcode (QR of cijfers) uit de app.</p>
@@ -105,14 +113,19 @@ const api = (pad, body) => fetch('/api/supplier/' + pad, { method: 'POST',
 let INSTEL = null;       // modus + modi + artikelen + sneltoetsen + tafels
 let BON = [];            // { naam, qty, prijs } -- prijs per regel (bij kilo al gerekend)
 let KGART = null;        // het weeg-artikel dat op het gewicht wacht
+let SCHERM = null;       // het scherm-id van DIT toestel (elke kassa een eigen naam)
+try { SCHERM = localStorage.getItem('rtg_kassa_scherm'); } catch (e) {}
 const modus = () => (INSTEL && INSTEL.modi.find(m => m.id === INSTEL.modus)) || { naam: '...' };
 
 async function laad(zet){
-  try { INSTEL = await api('kassa/instel', zet || {}); }
+  try { INSTEL = await api('kassa/instel', Object.assign({ scherm: SCHERM || undefined }, zet || {})); }
   catch (e) { $('#artGrid').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
   const m = modus();
   $('#zaakNaam').textContent = INSTEL.naam;
   $('#modusNaam').textContent = m.naam;
+  $('#schermKnop').textContent = INSTEL.scherm ? INSTEL.scherm.naam : 'Kassa benoemen';
+  // dit toestel kent zijn scherm niet (meer), maar de zaak heeft er wel: kies er een
+  if (!INSTEL.scherm && (INSTEL.schermen || []).length && !window.__schermGevraagd) { window.__schermGevraagd = true; schermKiezer(); }
   $('#leeftijdBand').hidden = !m.leeftijd;
   $('#badgeRij').hidden = !m.badge;
   $('#tafelRij').hidden = true;
@@ -159,10 +172,11 @@ async function rekenAf(method, extra){
   try {
     const r = await api('pos/sale', Object.assign({
       total, method, items: BON.map(x => ({ name: x.naam, qty: x.qty, price: x.prijs })),
+      kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined,
       desc: 'De Kassa (' + modus().naam + ')' + (badge ? ' · ' + badge : ''),
       codenaam: badge || undefined, idem: 'kassa-' + Date.now()
     }, extra || {}));
-    $('#uitkomst').textContent = 'Afgerekend: ' + eur(r.sale.total) + ' (' + method + (r.betaler ? ', ' + r.betaler : '') + '), bon ' + r.sale.bon + '.';
+    $('#uitkomst').textContent = 'Afgerekend: ' + eur(r.sale.total) + ' (' + method + (r.betaler ? ', ' + r.betaler : '') + '), bon ' + r.sale.bon + (r.sale.kassa ? ' op ' + r.sale.kassa : '') + '.';
     BON = []; $('#badgeNaam').value = ''; bonToon();
   } catch (e) { $('#uitkomst').textContent = e.message; }
 }
@@ -200,6 +214,28 @@ $('#modusKnop').addEventListener('click', () => {
   $('#dlgModus').showModal();
 });
 $('#modusDicht').addEventListener('click', () => $('#dlgModus').close());
+function schermKiezer(){
+  $('#schermLijst').innerHTML = ((INSTEL && INSTEL.schermen) || []).map(x =>
+    '<button class="knop stil" data-scherm="' + esc(x.id) + '" style="text-align:left;"><b>' + esc(x.naam) + '</b>' +
+    (x.modus ? ' <span class="hint">· eigen modus: ' + esc(x.modus) + '</span>' : '') + '</button>').join('')
+    || '<div class="leeg">Nog geen kassaschermen; zet hieronder de eerste neer.</div>';
+  document.querySelectorAll('[data-scherm]').forEach(b => b.addEventListener('click', () => {
+    SCHERM = b.dataset.scherm;
+    try { localStorage.setItem('rtg_kassa_scherm', SCHERM); } catch (e) {}
+    $('#dlgScherm').close(); laad();
+  }));
+  $('#dlgScherm').showModal();
+}
+$('#schermKnop').addEventListener('click', schermKiezer);
+$('#schermMaak').addEventListener('click', async () => {
+  try {
+    const r = await api('kassa/scherm', { naam: $('#schermNieuw').value.trim() });
+    SCHERM = r.scherm.id;
+    try { localStorage.setItem('rtg_kassa_scherm', SCHERM); } catch (e) {}
+    $('#schermNieuw').value = ''; $('#dlgScherm').close(); laad();
+  } catch (e) { $('#uitkomst').textContent = e.message; $('#dlgScherm').close(); }
+});
+$('#schermDicht').addEventListener('click', () => $('#dlgScherm').close());
 laad();
 </script>
 <script src="/shared/metgezel.js" defer></script>

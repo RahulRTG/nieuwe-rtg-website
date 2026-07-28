@@ -2473,6 +2473,10 @@ Object.assign(kern, bankregie);
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
 Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic }));
+/* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
+   rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
+   LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
+Object.assign(kern, require('./kern/reis')({ LANDEN }));
 /* De Regelwacht (kern/fiscaal/regelwacht.js): belastingen en regels worden
    automatisch bijgewerkt -- een gevalideerde overlay op de gedeelde
    LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
@@ -2894,6 +2898,7 @@ require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/bank')(kern);
 require('./routes/bankhart')(kern);
+require('./routes/reis')(kern);
 require('./routes/stad')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);

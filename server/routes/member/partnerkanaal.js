@@ -50,7 +50,10 @@ module.exports = (kern) => {
       at: new Date().toISOString()
     });
     save();
-    res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total });
+    // de boeker krijgt meteen alle reisregels van de bestemming mee
+    const wijzer = kern.reiswijzer(trip.dest);
+    res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total,
+      reiswijzer: wijzer.error ? null : wijzer });
   });
 
   app.post('/api/partner/apply', (req, res) => {

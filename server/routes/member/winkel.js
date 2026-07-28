@@ -29,6 +29,9 @@ app.post('/api/reisbureau/boek', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const r = reisbureau.boek(req.session, liveCodename(req.session), req.body || {});
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  // wie ergens naartoe gaat, krijgt meteen ALLE regels van dat land mee
+  const wijzer = kern.reiswijzer(r.aanvraag.bestemming);
+  if (!wijzer.error) r.reiswijzer = wijzer;
   res.json(r);
 });
 // mijn reisaanvragen

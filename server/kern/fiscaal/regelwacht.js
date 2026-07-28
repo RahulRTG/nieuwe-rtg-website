@@ -17,6 +17,10 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
   const haal = fetchImpl || ((...a) => fetch(...a));
   const GETALLEN = { lasten: [0, 0.6], vakantiegeld: [0, 0.25], uurloonMin: [1, 100], alcoholLeeftijd: [16, 25] };
   const TEKSTEN = ['aangifte', 'extra'];
+  // de reisregels (kern/reis.js zet ze op LANDEN[cc].reis) zijn net zo
+  // automatisch bij te werken als de belastingen: streng gevalideerd
+  const REIS_ENUM = { visum: ['geen', 'vrij', 'toestemming', 'aankomst', 'evisum', 'visum'], rijden: ['links', 'rechts'] };
+  const REIS_TEKST = { alarm: [2, 8], fooi: [1, 200], letOp: [0, 400] };
 
   const staat = () => (db.data.fiscaalRegels = db.data.fiscaalRegels || { versie: null, bron: null, at: null, wijzigingen: {} });
 
@@ -43,6 +47,19 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
         } else if (TEKSTEN.includes(veld) && typeof waarde === 'string' && waarde.trim()) {
           const s = waarde.replace(/[<>]/g, '').slice(0, 400);
           if (LANDEN[cc][veld] !== s) { LANDEN[cc][veld] = s; wijz[veld] = s; }
+        } else if (veld === 'reis' && typeof waarde === 'object' && LANDEN[cc].reis) {
+          const rs = LANDEN[cc].reis;
+          for (const [rv, rw] of Object.entries(waarde)) {
+            if (REIS_ENUM[rv] && REIS_ENUM[rv].includes(rw) && rs[rv] !== rw) { rs[rv] = rw; (wijz.reis = wijz.reis || {})[rv] = rw; }
+            else if (rv === 'dagen') { const n = Number(rw); if (Number.isFinite(n) && n >= 0 && n <= 365 && rs.dagen !== n) { rs.dagen = n; (wijz.reis = wijz.reis || {}).dagen = n; } }
+            else if (rv === 'water') { const b = rw === true; if (typeof rw === 'boolean' && rs.water !== b) { rs.water = b; (wijz.reis = wijz.reis || {}).water = b; } }
+            else if (REIS_TEKST[rv] && typeof rw === 'string') {
+              const [min, max] = REIS_TEKST[rv];
+              const s = rw.replace(/[<>]/g, '').trim().slice(0, max);
+              if (s.length >= min && rs[rv] !== s) { rs[rv] = s; (wijz.reis = wijz.reis || {})[rv] = s; }
+            }
+          }
+          if (wijz.reis && !Object.keys(wijz.reis).length) delete wijz.reis;
         }
       }
       if (Object.keys(wijz).length) gedaan[cc] = wijz;
@@ -51,8 +68,11 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
     // de overlay stapelt: latere updates winnen per veld, zodat een herstart
     // altijd op de laatste stand uitkomt
     for (const [cc, wijz] of Object.entries(gedaan)) {
-      st.wijzigingen[cc] = Object.assign(st.wijzigingen[cc] || {}, JSON.parse(JSON.stringify(wijz)));
-      if (wijz.tarieven) st.wijzigingen[cc].tarieven = Object.assign((st.wijzigingen[cc] || {}).tarieven || {}, wijz.tarieven);
+      const eerder = st.wijzigingen[cc] || {};
+      const eerderTarieven = eerder.tarieven, eerderReis = eerder.reis;
+      st.wijzigingen[cc] = Object.assign(eerder, JSON.parse(JSON.stringify(wijz)));
+      if (wijz.tarieven) st.wijzigingen[cc].tarieven = Object.assign(eerderTarieven || {}, wijz.tarieven);
+      if (wijz.reis) st.wijzigingen[cc].reis = Object.assign(eerderReis || {}, wijz.reis);
     }
     if (Object.keys(gedaan).length || versie) {
       st.versie = versie || st.versie;

@@ -2491,6 +2491,15 @@ if (regelTimer.unref) regelTimer.unref();
    commerciele tak (kern/thuis/zakelijk) draait op dezelfde landtabel als de
    rest van het huis: daar komt de logies-btw vandaan. */
 Object.assign(kern, require('./kern/thuis')({ db, save, crypto, schoon, reiswijzer: kern.reiswijzer, landVind: kern.landVind, findSupplier, LANDEN }));
+/* De werkvloer-laag: de koppellaag (kern/koppel.js) zet een handeling van
+   het ene scherm op het andere -- betalen op afstand met een RTG-code,
+   aftekenen voor verzending, tekenen voor ontvangst. De tafellijst
+   (kern/tafelwensen.js) brengt allergenen en wensen per stoel bij de
+   bediening en per tafel bij de keuken. De checklijst (kern/checklijst.js)
+   deel je met je team; iedereen vinkt zelf af. */
+Object.assign(kern, require('./kern/koppel')({ db, save, crypto, schoon, dyncode: kern.dyncode, sseToSupplier }));
+Object.assign(kern, require('./kern/tafelwensen')({ db, save, crypto, schoon }));
+Object.assign(kern, require('./kern/checklijst')({ db, save, crypto, schoon }));
 /* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
    gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft
    de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db
@@ -2919,6 +2928,7 @@ require('./routes/bank')(kern);
 require('./routes/bankhart')(kern);
 require('./routes/reis')(kern);
 require('./routes/thuis')(kern);
+require('./routes/werkvloer')(kern);
 require('./routes/regering')(kern);
 require('./routes/stad')(kern);
 require('./routes/podium')(kern);

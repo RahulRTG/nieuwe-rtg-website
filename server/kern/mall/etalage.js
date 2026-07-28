@@ -5,7 +5,7 @@
    als gedeelde helper uit de catalogus. Krijgt de gedeelde ctx van kern/mall/index.js. */
 module.exports = (ctx) => {
   const { db, save, seed, isRetail, isBoer, verborgen, boutiek, eigenBoutiek, farmBoutieks,
-    dienstenplein, ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA } = ctx;
+    dienstenplein, thuisplein, ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA } = ctx;
 
   /* De gids van alle leveranciers, per genre. Eerst de vaste, gecureerde
      volgorde (tafelen, verblijven, uitgaan, diensten), daarna ELK overig genre
@@ -52,6 +52,8 @@ module.exports = (ctx) => {
     return {
       ok: true,
       etages,
+      // de verdieping RTG Thuis: het commerciele verblijfsaanbod van zaken
+      thuis: thuisplein(),
       diensten: dienstenplein().genres,
       gids: gidsen().genres,
       totaalBoutieks: winkels.length + farms.length + (eigenBoutiek() ? 1 : 0),

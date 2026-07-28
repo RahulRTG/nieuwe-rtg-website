@@ -20,6 +20,21 @@
         if (uitEl) uitEl.textContent = T('th.advies', 'AI-prijsadvies') + ': ' + eur(d.advies) + ' (' + T('th.nu', 'nu') + ' ' + eur(d.huidig) + ', ' + T('th.bez2', 'bezetting') + ' ' + d.bezettingPct + '%). ' + d.uitleg;
       } catch(e){ toast(e.message); }
     }));
+    /* de commerciele tak aan- of uitzetten; aan vraagt om het maandtarief
+       voor langverblijf (leeg of 0 laten kan gewoon) */
+    el.querySelectorAll('[data-thzak]').forEach(b => b.addEventListener('click', async () => {
+      const aan = b.dataset.thzaan !== '1';
+      let maand = 0;
+      if (aan) {
+        const inv = prompt(T('th.zvraag', 'Maandtarief voor langverblijf (vanaf 28 nachten), 0 = geen:'), '0');
+        if (inv === null) return;
+        maand = Number(inv) || 0;
+      }
+      try { await API.call('/supplier/thuis/zakelijk', { id: b.dataset.thzak, zakelijk: { aan, opFactuur: aan, maandprijs: maand } });
+        kantoorMsg = '✓ ' + (aan ? T('th.zaan', 'Commercieel aanbod: de logies-btw van het land staat nu op de prijs en zakelijke gasten kunnen op factuur boeken.')
+                                 : T('th.zuit2', 'Terug naar prive-verhuur: geen btw en geen commissie.'));
+        thuisData = null; renderStation(); } catch(e){ toast(e.message); }
+    }));
     el.querySelectorAll('[data-thblok]').forEach(b => b.addEventListener('click', async () => {
       const van = prompt(T('th.blokvan', 'Blokkeer van (JJJJ-MM-DD):')); if (!van) return;
       const tot = prompt(T('th.bloktot', 'tot (JJJJ-MM-DD):')); if (!tot) return;

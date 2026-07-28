@@ -12,7 +12,7 @@
    Orkestrator: de stores en gedeelde helpers; het aanbod (host) in
    ./aanbod, zoeken/boeken in ./boeken, reviews/wenslijst/berichten/bord
    in ./extra. */
-module.exports = ({ db, save, crypto, schoon, reiswijzer, landVind, findSupplier }) => {
+module.exports = ({ db, save, crypto, schoon, reiswijzer, landVind, findSupplier, LANDEN }) => {
   const nu = () => new Date().toISOString();
   const d = () => db.data;
   const huizen = () => { if (!d().thuisHuizen || typeof d().thuisHuizen !== 'object') d().thuisHuizen = {}; return d().thuisHuizen; };
@@ -64,15 +64,20 @@ module.exports = ({ db, save, crypto, schoon, reiswijzer, landVind, findSupplier
     return (z && z.name) || 'RTG-zaak';
   }
 
-  const ctx = { db, save, crypto, schoon, reiswijzer, landVind, nu, d, huizen, boekingen, reviews, wensen,
+  const ctx = { db, save, crypto, schoon, reiswijzer, landVind, findSupplier, LANDEN, nu, d, huizen, boekingen, reviews, wensen,
     TYPES, VOORZIENINGEN, ANNULERING, geldigeDatum, nachten, raakt, vrij, ratingVan, gastScore, superhost, magBeheren, hostNaam };
 
   const aanbod = require('./aanbod')(ctx);
+  /* De commerciele tak staat voor het boeken: zij levert de prijsopbouw die
+     boeken.js gebruikt zodra een huis van een zaak commercieel verhuurt. */
+  const zakelijkM = require('./zakelijk')(ctx);
+  ctx.zakelijkOpbouw = zakelijkM.thuisZakelijkOpbouw;
+  ctx.commercieel = zakelijkM.thuisCommercieel;
   const boekenM = require('./boeken')(ctx);
   // extra (reviews/wenslijst/bord) hergebruikt de publieke weergaves van boeken
   ctx.thuisPubliek = boekenM.thuisPubliek;
   ctx.thuisGastZicht = boekenM.thuisGastZicht;
-  const api = Object.assign({}, aanbod, boekenM, require('./extra')(ctx));
+  const api = Object.assign({}, aanbod, zakelijkM, boekenM, require('./extra')(ctx));
   api.thuisTypes = () => ({ types: TYPES, voorzieningen: VOORZIENINGEN, annulering: ANNULERING });
   return { thuis: api };
 };

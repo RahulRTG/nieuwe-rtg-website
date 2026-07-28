@@ -1836,8 +1836,8 @@
       if (!thuisData){
         if (!thuisBusy){
           thuisBusy = true;
-          Promise.all([API.call('/supplier/thuis/bord', {}), API.call('/supplier/thuis/huizen', {})])
-            .then(function(u){ thuisData = { bord: u[0], huizen: u[1].huizen }; })
+          Promise.all([API.call('/supplier/thuis/bord', {}), API.call('/supplier/thuis/huizen', {}), API.call('/supplier/thuis/zakelijkbord', {})])
+            .then(function(u){ thuisData = { bord: u[0], huizen: u[1].huizen, z: u[2] }; })
             .catch(function(e){ thuisData = { error: e.message }; })
             .then(function(){ thuisBusy = false; renderStation(); });
         }
@@ -1863,12 +1863,28 @@
             return '<div class="st-row"><span>'+escT(k.titel)+' · '+escT(k.van)+' → '+escT(k.tot)+'<span class="sub">'+escT(k.status)+' · '+T('th.gast','gast')+' '+escT(k.gast)+'</span></span>'+
               (k.status === 'ingecheckt' ? '<button class="obtn" data-thuit="'+escT(k.ref)+'">'+T('th.uit','Check uit')+'</button>' : '')+'</div>';
           }).join('') : '<div class="tkc-who">'+T('th.geenkomend','Nog niets geboekt.')+'</div>')+'</div>';
+        /* de commerciele tak: wat een zaak anders maakt dan een prive-host --
+           logies-btw uit de landtabel, langverblijf, factuur en de commissie */
+        const zb = thuisData.z || {};
+        const zHuizen = zb.huizen || [];
+        const zVan = function(id){ for (var i=0;i<zHuizen.length;i++) if (zHuizen[i].id === id) return zHuizen[i]; return null; };
+        html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);"><h3>'+T('th.zkop','De commerciele tak')+'</h3>'+
+          '<div class="st-row"><span>'+T('th.zport','Commercieel aanbod (live)')+'</span><b>'+((zb.portefeuille||{}).live||0)+' / '+((zb.portefeuille||{}).commercieel||0)+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.zverb','Afgeronde verblijven')+'</span><b>'+(zb.verblijven||0)+' · '+(zb.nachten||0)+' '+T('th.znachten','nachten')+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.zomzet','Omzet exclusief btw')+'</span><b>'+eur(zb.omzetExclBtw||0)+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.zbtw','Logies-btw af te dragen')+'</span><b>'+eur(zb.btwAfTeDragen||0)+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.zcomm','Partnercommissie')+' ('+(zb.commissiePct||0)+'%)</span><b>'+eur(zb.commissie||0)+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.znetto','Netto uitbetaling (gepland)')+'</span><b style="color:var(--gold);">'+eur(zb.nettoUitbetaling||0)+'</b></div>'+
+          '<div class="tkc-who">'+escT(zb.uitleg || T('th.zuit','Zet een huis commercieel om er beroepsmatig mee te verhuren: logies-btw uit de landtabel, langverblijf op maandtarief en boeken op factuur.'))+'</div></div>';
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.huizen','Ons aanbod op RTG Thuis')+'</h3>'+
           (thuisData.huizen.length ? thuisData.huizen.map(function(h){
+            const zk = zVan(h.id);
             return '<div class="st-row"><span><b>'+escT(h.titel)+'</b> · '+escT(h.plaats)+' · '+eur(h.prijs)+'/'+T('th.nacht','nacht')+
               (h.rating.sterren ? ' · ★ '+h.rating.sterren : '')+(h.live ? '' : ' · '+T('th.pauze','gepauzeerd'))+
+              (zk ? ' · <span style="color:var(--gold);">'+T('th.zcom','commercieel')+' · btw '+zk.btwPct+'%'+(zk.zakelijk.maandprijs?' · '+eur(zk.zakelijk.maandprijs)+'/'+T('th.zmaand','maand'):'')+'</span>' : '')+
               '<span class="sub" data-thadvuit="'+escT(h.id)+'">'+(h.instant?T('th.instant','instant boeken'):T('th.opaanvraag','op aanvraag'))+(h.keyless?' · keyless':'')+'</span></span>'+
-              '<span><button class="obtn" data-thadv="'+escT(h.id)+'">'+T('th.advies','AI-prijsadvies')+'</button> <button class="obtn" data-thblok="'+escT(h.id)+'">'+T('th.blok','Blokkeer')+'</button></span></div>';
+              '<span><button class="obtn" data-thzak="'+escT(h.id)+'" data-thzaan="'+(zk?'1':'0')+'">'+(zk?T('th.zuitzet','Terug naar prive'):T('th.zaanzet','Maak commercieel'))+'</button> '+
+              '<button class="obtn" data-thadv="'+escT(h.id)+'">'+T('th.advies','AI-prijsadvies')+'</button> <button class="obtn" data-thblok="'+escT(h.id)+'">'+T('th.blok','Blokkeer')+'</button></span></div>';
           }).join('') : '<div class="tkc-who">'+T('th.geenhuizen','Nog geen huizen; zet er hieronder een live.')+'</div>')+'</div>';
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.nieuw','Zet een huis live (manager)')+'</h3>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'+
@@ -2595,6 +2611,21 @@
         const uitEl = el.querySelector('[data-thadvuit="' + b.dataset.thadv + '"]');
         if (uitEl) uitEl.textContent = T('th.advies', 'AI-prijsadvies') + ': ' + eur(d.advies) + ' (' + T('th.nu', 'nu') + ' ' + eur(d.huidig) + ', ' + T('th.bez2', 'bezetting') + ' ' + d.bezettingPct + '%). ' + d.uitleg;
       } catch(e){ toast(e.message); }
+    }));
+    /* de commerciele tak aan- of uitzetten; aan vraagt om het maandtarief
+       voor langverblijf (leeg of 0 laten kan gewoon) */
+    el.querySelectorAll('[data-thzak]').forEach(b => b.addEventListener('click', async () => {
+      const aan = b.dataset.thzaan !== '1';
+      let maand = 0;
+      if (aan) {
+        const inv = prompt(T('th.zvraag', 'Maandtarief voor langverblijf (vanaf 28 nachten), 0 = geen:'), '0');
+        if (inv === null) return;
+        maand = Number(inv) || 0;
+      }
+      try { await API.call('/supplier/thuis/zakelijk', { id: b.dataset.thzak, zakelijk: { aan, opFactuur: aan, maandprijs: maand } });
+        kantoorMsg = '✓ ' + (aan ? T('th.zaan', 'Commercieel aanbod: de logies-btw van het land staat nu op de prijs en zakelijke gasten kunnen op factuur boeken.')
+                                 : T('th.zuit2', 'Terug naar prive-verhuur: geen btw en geen commissie.'));
+        thuisData = null; renderStation(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-thblok]').forEach(b => b.addEventListener('click', async () => {
       const van = prompt(T('th.blokvan', 'Blokkeer van (JJJJ-MM-DD):')); if (!van) return;

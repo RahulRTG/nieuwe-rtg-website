@@ -32,6 +32,7 @@
   .boutiek{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.35rem;text-align:left;}
   .boutiek:hover{border-color:var(--gold);transform:translateY(-2px);}
   .boutiek h3{font-size:1.05rem;}
+  a.boutiek{text-decoration:none;color:inherit;}
   .boutiek .stad{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
   .boutiek .stad .stad-glyf{width:.95em;height:.95em;vertical-align:-.12em;margin-right:.3em;}
   .etage-kop h2 .kop-glyf{width:1em;height:1em;vertical-align:-.14em;margin-right:.4em;}
@@ -88,6 +89,7 @@
   <div id="reisbieb"></div>
   <div id="rtfbieb"></div>
   <div id="etages"></div>
+  <div id="thuisWrap"></div>
   <div id="dienstenWrap"></div>
   <div id="gidsWrap"></div>
 </main>
@@ -411,8 +413,32 @@ async function laad(){
       '</button>').join('')+'</div></div>'
   ).join('');
   $('#etages').querySelectorAll('.boutiek').forEach(b => b.addEventListener('click', () => openBoutiek(b.dataset.code, b.dataset.naam, b.dataset.stad, b.dataset.kind)));
+  tekenThuis(d.thuis || null);
   tekenDiensten(d.diensten || []);
   tekenGids(d.gids || []);
+}
+
+/* ---------- De verdieping RTG Thuis: de commerciële tak ----------
+   Zaken die beroepsmatig verhuren, per stad. De Mall wijst de weg; boeken
+   doe je in RTG Thuis zelf, op je codenaam en met dezelfde regels. Voor het
+   lid is het overal 0% servicekosten -- ook hier. */
+function tekenThuis(t){
+  const w = $('#thuisWrap');
+  if (!t || !t.steden || !t.steden.length){ w.innerHTML = ''; return; }
+  w.innerHTML = '<div class="etage"><div class="etage-kop"><h2>RTG Thuis</h2>'+
+    '<span class="n">'+t.aantal+' verblijf'+(t.aantal===1?'':'ven')+' van '+t.zaken+' zaak'+(t.zaken===1?'':'en')+' · zakelijk verhuurd, met btw en factuur</span></div>'+
+    t.steden.map(s =>
+      '<div class="dp-sub">'+esc(s.stad)+' <span class="n">· '+s.aantal+' verblijf'+(s.aantal===1?'':'ven')+' · vanaf '+euro(s.vanaf)+' per nacht</span></div>'+
+      '<div class="boutieks">'+s.huizen.map(h =>
+        '<a class="boutiek" href="/apps/thuis.html?huis='+encodeURIComponent(h.id)+'">'+
+          '<span class="stad">'+esc(h.zaak)+'</span>'+
+          '<h3>'+esc(h.titel)+'</h3>'+
+          '<span class="tag">'+esc(h.doelgroep || h.typeLabel)+'</span>'+
+          '<span class="meta">'+euro(h.prijs)+' per nacht'+(h.maandprijs?' · '+euro(h.maandprijs)+' per maand':'')+
+            ' · '+h.maxGasten+' gasten'+(h.btwPct?' · incl. '+h.btwPct+'% logies-btw':'')+(h.opFactuur?' · op factuur':'')+'</span>'+
+        '</a>').join('')+'</div>').join('')+
+    '<p style="color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0;">'+esc(t.opmerking)+
+    ' <a href="'+esc(t.pagina)+'" style="color:var(--gold);">Naar RTG Thuis</a></p></div>';
 }
 
 /* ---------- Het Dienstenplein: de dienstverlenende zaken (zelfstandigen,

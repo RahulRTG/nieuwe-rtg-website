@@ -15,6 +15,8 @@ module.exports = (kern) => {
   app.post('/api/supplier/thuis/huizen', supplierAuth, (req, res) => res.json(thuis.thuisMijnHuizen(vlag(req))));
   app.post('/api/supplier/thuis/prijsadvies', supplierAuth, (req, res) => stuur(res, thuis.thuisSlimmePrijs(vlag(req), String(req.body.id || ''))));
   app.post('/api/supplier/thuis/berichten', supplierAuth, (req, res) => stuur(res, thuis.thuisBerichten(vlag(req), req.body.ref)));
+  // de commerciele tak: omzet, af te dragen logies-btw, commissie en netto
+  app.post('/api/supplier/thuis/zakelijkbord', supplierAuth, (req, res) => res.json(thuis.thuisZakelijkBord(vlag(req))));
 
   // beheren: de manager zet huizen live, beslist en blokkeert
   app.post('/api/supplier/thuis/huis', supplierAuth, (req, res) => {
@@ -36,6 +38,13 @@ module.exports = (kern) => {
   app.post('/api/supplier/thuis/checkuit', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
     stuur(res, thuis.thuisCheckuit(vlag(req), req.body.ref));
+  });
+  app.post('/api/supplier/thuis/zakelijk', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const r = thuis.thuisZakelijkZet(vlag(req), String(req.body.id || ''), req.body.zakelijk || {});
+    if (!r.error) logActivity(req.supplier.code, req.actor,
+      (r.huis.commercieel ? 'zette een Thuis-huis in de commerciele tak' : 'zette een Thuis-huis terug op prive-verhuur') + ': ' + r.huis.titel);
+    stuur(res, r);
   });
   app.post('/api/supplier/thuis/bericht', supplierAuth, (req, res) => stuur(res, thuis.thuisBericht(vlag(req), req.body.ref, req.body.tekst)));
   app.post('/api/supplier/thuis/review', supplierAuth, (req, res) => {

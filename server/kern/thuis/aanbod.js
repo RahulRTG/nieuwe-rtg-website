@@ -15,8 +15,11 @@ module.exports = (ctx) => {
     const bestaand = id ? huizen()[id] : null;
     if (id && !bestaand) return { status: 404, error: 'Dit huis bestaat niet.' };
     if (bestaand && !magBeheren(bestaand, codenaam)) return { status: 403, error: 'Alleen de host (of een co-host) beheert dit huis.' };
-    if (!bestaand && Object.values(huizen()).filter(h => h.host === codenaam).length >= 10)
-      return { status: 429, error: 'Maximaal 10 huizen per host.' };
+    /* Een lid verhuurt zijn eigen huis (of een paar); een zaak draait een
+       portefeuille -- dat is de commerciele tak, geen hobbyverhuur. */
+    const grens = String(codenaam).startsWith('zaak:') ? 200 : 10;
+    if (!bestaand && Object.values(huizen()).filter(h => h.host === codenaam).length >= grens)
+      return { status: 429, error: 'Maximaal ' + grens + ' huizen per host.' };
     const titel = schoon(data.titel, 80), plaats = schoon(data.plaats, 60);
     if (!titel || !plaats) return { status: 400, error: 'Geef je huis een titel en een plaats.' };
     const type = TYPES[data.type] ? data.type : 'huis';

@@ -2207,7 +2207,9 @@ Object.assign(kern, require('./kern/architect').maakArchitect({ db, save, crypto
 Object.assign(kern, require('./kern/werkplaats').maakWerkplaats({ db, save, crypto, anthropic, schoon }));
 /* De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app; een
    gecureerde etagelijst van de retail-partners, elk met een eigen catalogus. */
-Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail }));
+Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail,
+  // de verdieping RTG Thuis; laat opgehaald omdat Thuis verderop wordt gebouwd
+  haalThuis: () => (kern.thuis && typeof kern.thuis.thuisMallAanbod === 'function' ? kern.thuis.thuisMallAanbod() : null) }));
 /* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,
    elk rond de duizend euro winkelwaarde, voor leden inbegrepen bij de pas. */
 Object.assign(kern, require('./kern/appbieb').maakAppbieb({ db, save }));
@@ -2485,8 +2487,10 @@ kern.regelwacht.herstelOverlay();
 const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
 if (regelTimer.unref) regelTimer.unref();
 /* RTG Thuis (kern/thuis): thuisverhuur van lid aan lid -- ons antwoord op
-   Airbnb, met alle premium functies gratis en de Reiswijzer aan boord. */
-Object.assign(kern, require('./kern/thuis')({ db, save, crypto, schoon, reiswijzer: kern.reiswijzer, landVind: kern.landVind, findSupplier }));
+   Airbnb, met alle premium functies gratis en de Reiswijzer aan boord. De
+   commerciele tak (kern/thuis/zakelijk) draait op dezelfde landtabel als de
+   rest van het huis: daar komt de logies-btw vandaan. */
+Object.assign(kern, require('./kern/thuis')({ db, save, crypto, schoon, reiswijzer: kern.reiswijzer, landVind: kern.landVind, findSupplier, LANDEN }));
 /* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
    gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft
    de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db

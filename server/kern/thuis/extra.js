@@ -88,7 +88,9 @@ module.exports = (ctx) => {
       komend: alle.filter(b => ['bevestigd', 'ingecheckt'].includes(b.status)).slice(0, 20).map(ctx.thuisGastZicht),
       inkomstenTotaal: inkomsten, bezettingPct: Math.min(100, Math.round(bezetteNachten / capaciteit * 100)),
       superhost: superhost(codenaam),
-      uitbetaling: 'Uitbetalingen staan gepland naar je RTG Bank-rekening; RTG houdt 0% in.' };
+      uitbetaling: String(codenaam).startsWith('zaak:')
+        ? 'Uitbetalingen staan gepland naar de zakelijke RTG Bank-rekening. Op prive-aanbod houdt RTG 0% in; op commercieel aanbod geldt de gewone partnercommissie. Het lid betaalt altijd 0% servicekosten.'
+        : 'Uitbetalingen staan gepland naar je RTG Bank-rekening; RTG houdt 0% in.' };
   }
 
   return { thuisReview: review, thuisHuisReviews: huisReviews, thuisWensToggle: wensToggle,

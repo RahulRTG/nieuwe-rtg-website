@@ -47,7 +47,7 @@ const GENRE_PAGINA = {
   zzp: '/apps/mall.html', chef: '/apps/mall.html', wellness: '/apps/mall.html', bouw: '/apps/mall.html'
 };
 
-function maakMall({ db, save, crypto, isRetail }) {
+function maakMall({ db, save, crypto, isRetail, haalThuis }) {
   const nu = () => new Date().toISOString();
   const va = (sku, kleuren, maten, v) => {
     const out = [];
@@ -128,12 +128,13 @@ function maakMall({ db, save, crypto, isRetail }) {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, isRetail, nu, va, seed, isBoer, farmTeKoop, verborgen, winkelCatalogus,
+    db, save, crypto, isRetail, haalThuis, nu, va, seed, isBoer, farmTeKoop, verborgen, winkelCatalogus,
     ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA
   };
   const api = { ETAGES, seed };
   Object.assign(api, require('./catalogus')(ctx)); // vult ctx met de boutiekweergaven
   Object.assign(api, require('./diensten')(ctx)); // vult ctx met het Dienstenplein
+  Object.assign(api, require('./thuisplein')(ctx)); // vult ctx met de verdieping RTG Thuis
   Object.assign(api, require('./etalage')(ctx));
   return { mall: api };
 }

@@ -36,4 +36,8 @@ module.exports = (kern) => {
   app.post('/api/thuis/prijsadvies', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisSlimmePrijs(cn(req), String(req.body.id || ''))); });
   app.post('/api/thuis/beslis', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisBeslis(cn(req), req.body.ref, req.body.akkoord === true)); });
   app.post('/api/thuis/bord', auth, (req, res) => { if (gast(req, res)) return; res.json(thuis.thuisHostBord(cn(req))); });
+  /* De commerciele tak is voor zaken; een lid dat het hier probeert krijgt
+     een eerlijk nee met de reden erbij (en verhuurt gewoon prive verder). */
+  app.post('/api/thuis/zakelijk', auth, (req, res) => { if (gast(req, res)) return;
+    stuur(res, thuis.thuisZakelijkZet(cn(req), String(req.body.id || ''), req.body.zakelijk || {})); });
 };

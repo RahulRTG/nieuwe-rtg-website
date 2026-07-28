@@ -187,9 +187,12 @@ async function openHuis(id){
           (p.korting ? '<div class="r"><span class="k">Korting ('+p.kortingPct+'%)</span><span>− '+euro(p.korting)+'</span></div>' : '')+
           (p.schoonmaak ? '<div class="r"><span class="k">Schoonmaak</span><span>'+euro(p.schoonmaak)+'</span></div>' : '')+
           '<div class="r"><span class="k">Servicekosten</span><span style="color:var(--gold);">'+euro(0)+'</span></div>'+
+          (p.zakelijk && p.btw ? '<div class="r"><span class="k">Logies-btw ('+p.btwPct+'%)</span><span>'+euro(p.btw)+'</span></div>' : '')+
           '<div class="r" style="border-top:1px solid var(--line);"><span><b>Totaal</b></span><b style="color:var(--gold);">'+euro(p.totaal)+'</b></div>'+
           (p.borg ? '<div class="r"><span class="k">Borg (apart, terug na verblijf)</span><span>'+euro(p.borg)+'</span></div>' : '')+
-          '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(p.serviceTekst)+'</div>'
+          '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(p.serviceTekst)+
+            (p.langverblijf ? ' ' + esc(p.langverblijf.tekst) : '')+
+            (p.zakelijk ? ' ' + esc(p.btwTekst || '') + (p.opFactuur ? ' Deze zaak kan op factuur werken; geef bij het boeken een kostenplaats mee.' : '') : '')+'</div>'
         : '<div class="leeg">Kies eerst datums in de zoekbalk voor de volledige prijsopbouw.</div>')+
         '<div style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">'+esc(HUIDIG.annuleringTekst||'')+'</div></div>'+
       (w ? '<div class="kaart"><h3 style="font-size:1rem;">Alle regels van '+esc(w.naam)+'</h3>'+
@@ -200,6 +203,10 @@ async function openHuis(id){
         (w.letOp ? '<div class="r"><span class="k">Let op</span><span style="color:var(--burgundy);">'+esc(w.letOp)+'</span></div>' : '')+'</div>' : '')+
       '<div class="kaart" id="bReviews"><h3 style="font-size:1rem;">Reviews</h3><div class="leeg">Laden…</div></div>'+
       (HUIDIG.huisregels ? '<div class="kaart"><h3 style="font-size:1rem;">Huisregels</h3><p style="font-size:.84rem;color:var(--muted);line-height:1.6;">'+esc(HUIDIG.huisregels)+'</p></div>' : '')+
+      ((HUIDIG.prijsopbouw && HUIDIG.prijsopbouw.opFactuur) ?
+        '<div class="kaart"><h3 style="font-size:1rem;">Zakelijk boeken</h3>'+
+        '<p style="font-size:.82rem;color:var(--muted);line-height:1.6;">Deze zaak verhuurt beroepsmatig en kan op factuur werken. Geef een kostenplaats mee, dan staat die op de boeking en op de factuur.</p>'+
+        '<input class="veld" id="bKost" placeholder="Kostenplaats of projectcode (optioneel)" maxlength="40" style="width:100%;"></div>' : '')+
       '<button class="knop" id="bBoek" style="width:100%;margin-top:1rem;">'+(HUIDIG.instant?'Boek direct':'Vraag aan bij de host')+'</button>';
     $('#blad').classList.add('open');
     $('#bBoek').addEventListener('click', boek);
@@ -218,9 +225,12 @@ async function boek(){
   const van = $('#zVan').value, tot = $('#zTot').value;
   if (!van || !tot) { meld('Kies eerst aankomst- en vertrekdatum in de zoekbalk.'); return; }
   try {
-    const d = await api('boek', { id: HUIDIG.id, van, tot, gasten: Number($('#zGasten').value)||1 });
+    const kost = $('#bKost');
+    const d = await api('boek', { id: HUIDIG.id, van, tot, gasten: Number($('#zGasten').value)||1,
+      kostenplaats: (kost && kost.value) || undefined });
     $('#blad').classList.remove('open');
     meld((d.boeking.status === 'bevestigd' ? 'Geboekt! ' : 'Aangevraagd -- de host beslist. ') +
+      (d.boeking.opFactuur ? 'De factuur volgt van de zaak; er is nog niets afgeschreven. ' : '') +
       (d.reiswijzer ? 'Je hebt alle regels van ' + d.reiswijzer.naam + ' meegekregen.' : ''));
   } catch(e){ meld(e.message); }
 }
@@ -325,6 +335,9 @@ $('#nZet').addEventListener('click', async () => {
 
 vulTypen();
 zoek();
+/* diepe link vanuit de Mall: /apps/thuis.html?huis=TH... opent dat verblijf */
+const _diep = new URLSearchParams(location.search).get('huis');
+if (_diep) openHuis(_diep);
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

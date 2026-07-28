@@ -14,6 +14,9 @@ module.exports = (ctx) => {
     kortingWeek: h.kortingWeek, kortingMaand: h.kortingMaand, annulering: h.annulering,
     annuleringTekst: ANNULERING[h.annulering], huisregels: h.huisregels, visual: h.visual,
     host: hostNaam(h.host), hostZaak: String(h.host).startsWith('zaak:'),
+    // commercieel aanbod van een zaak: btw op de prijs, factuur mogelijk
+    commercieel: !!(ctx.commercieel && ctx.commercieel(h)),
+    doelgroep: (h.zakelijk && h.zakelijk.doelgroep) || null,
     superhost: superhost(h.host), rating: ratingVan(h.id) });
 
   /* De prijsopbouw, transparant: nachten x prijs, week-/maandkorting,
@@ -23,9 +26,13 @@ module.exports = (ctx) => {
     const kortingPct = n >= 28 ? h.kortingMaand : n >= 7 ? h.kortingWeek : 0;
     const korting = Math.round(basis * kortingPct) / 100;
     const totaal = Math.round((basis - korting + h.schoonmaak) * 100) / 100;
-    return { nachten: n, perNacht: h.prijs, basis, kortingPct, korting, schoonmaak: h.schoonmaak,
+    const p = { nachten: n, perNacht: h.prijs, basis, kortingPct, korting, schoonmaak: h.schoonmaak,
       serviceKosten: 0, serviceTekst: '0% servicekosten voor leden -- bij RTG betaal je wat de host vraagt',
       borg: h.borg, totaal };
+    /* Verhuurt een zaak beroepsmatig, dan legt de commerciele tak er het
+       maandtarief en de logies-btw van het land overheen. Een prive-huis
+       gaat hier ongewijzigd doorheen. */
+    return ctx.zakelijkOpbouw ? ctx.zakelijkOpbouw(h, n, p) : p;
   }
 
   function zoek(codenaam, f) {
@@ -76,14 +83,20 @@ module.exports = (ctx) => {
     const gasten = Math.round(Number(data.gasten) || 1);
     if (gasten < 1 || gasten > h.maxGasten) return { status: 400, error: 'Dit huis is voor maximaal ' + h.maxGasten + ' gasten.' };
     if (!vrij(h.id, van, tot)) return { status: 409, error: 'Deze periode is (deels) al bezet; kies andere datums.' };
+    const opbouw = prijsVoor(h, n);
     const b = {
       ref: 'RTG-T-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
       huisId: h.id, titel: h.titel, plaats: h.plaats, land: h.land, host: h.host, gast: codenaam,
-      van, tot, gasten, prijsopbouw: prijsVoor(h, n),
+      van, tot, gasten, prijsopbouw: opbouw,
       bericht: schoon(data.bericht, 300),
       status: h.instant ? 'bevestigd' : 'aangevraagd',
       deurcode: h.keyless ? String(crypto.randomInt(100000, 1000000)) : null,
-      betaling: 'De betaling loopt via RTG Pay bij bevestiging; er is nog niets afgeschreven.',
+      // zakelijk boeken: de kostenplaats reist mee, de factuur volgt van de zaak
+      opFactuur: !!opbouw.opFactuur,
+      kostenplaats: opbouw.opFactuur ? (schoon(data.kostenplaats, 40) || null) : null,
+      betaling: opbouw.opFactuur
+        ? 'De factuur volgt van de zaak; er is nog niets afgeschreven.'
+        : 'De betaling loopt via RTG Pay bij bevestiging; er is nog niets afgeschreven.',
       berichten: [], at: nu()
     };
     boekingen().unshift(b);

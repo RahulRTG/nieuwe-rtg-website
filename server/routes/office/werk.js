@@ -3,6 +3,22 @@
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, talen, trChat, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, totpOk, veiligGelijk, logInlog, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
+
+/* Wie kijkt hier in de identiteitskluis? De backoffice-code is gedeeld, dus
+   een office-sessie alleen zegt "iemand van kantoor" en niet meer -- eerlijker
+   is dat dan een verzonnen naam. Komt de eigenaar met zijn eigen accountlogin
+   binnen (officeAuth zet dan req.eigenaar), dan weten we het wel precies, en
+   dan hoort dat ook in het inzagejournaal te staan. */
+function wieKijkt(req) {
+  const h = req.get('authorization') || '';
+  const tok = h.startsWith('Bearer ') ? h.slice(7) : null;
+  try {
+    const u = tok && accounts.verifyToken(tok);
+    if (u && req.eigenaar) return { id: u.id, naam: 'eigenaar' };
+  } catch (e) {}
+  return { naam: 'backoffice (gedeelde code)' };
+}
+
 app.post('/api/office/nudge', officeAuth, (req, res) => {
   const kind = req.body.kind === 'ride' ? 'ride' : 'order';
   const lijst = kind === 'ride' ? db.data.rides : db.data.orders;
@@ -50,7 +66,7 @@ app.post('/api/office/briefing', officeAuth, (req, res) => {
   res.json({ briefing: zinnen.join(' ') });
 });
 
-app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications() }));
+app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications(wieKijkt(req)) }));
 
 app.post('/api/office/verify', officeAuth, (req, res) => {
   const user = accounts.getUserById(Number(req.body.userId));
@@ -76,7 +92,7 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
   notify(user.tier, { icon: status === 'verified' ? 'pas' : 'meldingen',
     title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
     body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
-  res.json({ ok: true, status, pending: pendingVerifications() });
+  res.json({ ok: true, status, pending: pendingVerifications(wieKijkt(req)) });
 });
 
 /* ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ---- */

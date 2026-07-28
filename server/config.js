@@ -31,6 +31,34 @@ function valideer(env) {
     if (env.RTG_ENC_KEY && env.RTG_ENC_KEY.length < 16)
       fouten.push('RTG_ENC_KEY is te kort; gebruik 32+ willekeurige tekens of 64 hex-tekens.');
 
+    /* 2b. De twee sleutels van de identiteitskluis MOETEN uit de omgeving komen.
+
+       Zonder deze regel valt server/accounts terug op vault.key en secret.key
+       IN DE DATAMAP -- dezelfde map als rtg.db. Wie die map heeft, heeft dan de
+       database en de sleutel om hem te ontcijferen, en is de hele
+       pseudonimisering waardeloos: codenamen worden weer namen.
+
+       De kluis hoort te beschermen tegen een gestolen dump. Dat doet ze alleen
+       als de sleutel ergens anders woont: een secrets manager, een gemounte
+       sleutel, of desnoods een pad buiten het datavolume. Daarom blokkeert dit
+       de start in plaats van te waarschuwen -- een waarschuwing die je kunt
+       negeren beschermt niemand.
+
+       Bij meer dan één instance is dit trouwens sowieso verplicht: elke
+       instance zou anders zijn eigen sleutel maken, en dan klopt de
+       e-mail-hash niet meer en kan de ene instance de gegevens van de andere
+       niet lezen. */
+    for (const [naam, waarvoor] of [
+      ['RTG_VAULT_KEY', 'de identiteitskluis (namen, e-mail, telefoon)'],
+      ['RTG_SECRET_KEY', 'de ondertekening van sessietokens']
+    ]) {
+      const v = String(env[naam] || '');
+      if (!v)
+        fouten.push(naam + ' ontbreekt: de sleutel voor ' + waarvoor + ' zou dan als bestand naast de database komen te staan. Wie de datamap steelt heeft dan ook de sleutel. Zet hem uit een secrets manager.');
+      else if (v.length < 32)
+        fouten.push(naam + ' is te kort; gebruik 64 hex-tekens (openssl rand -hex 32).');
+    }
+
     // 3. Geen standaard-/zwakke geheimen laten staan.
     if (env.DEMO_PASS && env.DEMO_PASS === 'Imran')
       fouten.push('DEMO_PASS staat nog op de standaardwaarde.');
@@ -54,18 +82,9 @@ function valideer(env) {
     // 4. Aanbevolen, maar niet blokkerend.
     if (!env.APP_URL) waarschuwingen.push('APP_URL niet gezet: links in e-mails vallen terug op de Host-header.');
     if (!env.DATABASE_URL && env.RTG_STORE !== 'sqlite') waarschuwingen.push('DATABASE_URL niet gezet: de gedeelde data draait op een lokaal bestand. Voor productie/meerdere instances wordt PostgreSQL aangeraden.');
-    // Met gedeelde accounts (Postgres) MOETEN de kluis- en tokensleutel gedeeld
-    // zijn, anders kan de ene instance de gegevens van de andere niet lezen.
-    if (env.DATABASE_URL && !env.RTG_VAULT_KEY) waarschuwingen.push('RTG_VAULT_KEY niet gezet: bij meerdere instances kunnen ze elkaars versleutelde naam/e-mail niet ontsleutelen en klopt de e-mail-login-hash niet. Zet een gedeelde sleutel.');
-    if (env.DATABASE_URL && !env.RTG_SECRET_KEY) waarschuwingen.push('RTG_SECRET_KEY niet gezet: sessietokens van de ene instance gelden dan niet op de andere.');
-    /* Losstaand van het instance-verhaal hierboven: staat de kluissleutel niet in
-       de omgeving, dan maakt de server hem als BESTAND in de datamap. Dat is prima
-       lokaal, maar op productie ligt de sleutel dan naast de versleutelde data, en
-       opent een gestolen schijf zichzelf. Dat holt de hele versleuteling-in-rust
-       uit, dus dat hoort de keuring te zeggen. */
-    for (const [naam, wat] of [['RTG_VAULT_KEY', 'de identiteitskluis (naam, e-mail, ledendossier)'], ['RTG_SECRET_KEY', 'de ondertekening van sessietokens']])
-      if (!env[naam]) waarschuwingen.push(naam + ' niet gezet: de sleutel voor ' + wat +
-        ' wordt als bestand in de datamap gezet, dus naast de data die hij beschermt. Zet hem als omgevingsvariabele.');
+    /* RTG_VAULT_KEY en RTG_SECRET_KEY stonden hier vroeger als waarschuwing.
+       Ze zijn nu blokkerende fouten (punt 2b hierboven) -- twee keer melden zou
+       de lijst alleen langer maken zonder iets toe te voegen. */
     if (!env.REDIS_URL) waarschuwingen.push('REDIS_URL niet gezet: realtime werkt alleen binnen één proces (niet over meerdere instances).');
     // Media (Salon-foto's, snaps) op lokale schijf worden niet gedeeld tussen
     // instances; bij meerdere instances is S3-compatibele opslag (of een gedeeld

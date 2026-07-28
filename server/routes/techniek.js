@@ -9,6 +9,7 @@ const techniek = require('../techniek');
 const functies = require('../functies');
 const eigenaar = require('../eigenaar');
 const dbmod = require('../db');
+const inzagelog = require('../inzagelog');
 const { log } = require('../log');
 
 module.exports = (kern) => {
@@ -141,6 +142,11 @@ module.exports = (kern) => {
       uit.archief = archief ? { dagen: archief.dagen(), levend: (db.data.orders || []).length, gearchiveerd: archief.stat().aantal } : null;
       // de moderniseringsverzoeken die de eigenaar zelf via de AI heeft gevraagd
       uit.moderniseringen = (t.moderniseringen || []).slice(-8).reverse();
+      /* Het inzagejournaal: hoe vaak is er deze week in de identiteitskluis
+         gekeken, en stond er ergens geen reden bij? Dat laatste getal is het
+         interessantste van de twee -- inzage zonder opgegeven aanleiding is
+         precies waar je naar wilt kijken. */
+      uit.inzage = inzagelog.samenvatting();
     }
     res.json(uit);
   });

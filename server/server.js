@@ -118,6 +118,11 @@ require('./config').pasToe(process.env, log);
 
 load();
 
+/* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde
+   duurzame opslag als de rest; hier krijgt het de database en save() aangereikt.
+   Meteen na load(), zodat de eerste inzage al een spoor achterlaat. */
+require('./inzagelog').zet(db, save);
+
 /* Is het eigenaarschap ooit overgedragen vanuit de boardroom, dan staat de
    opvolger in de database. Dat zetten we hier meteen terug in de eigenaar-
    module, VOOR de routers geladen worden. Anders zou het platform na een

@@ -49,6 +49,31 @@ test('config: het voorbeeld-eigenaarsadres blokkeert de productiestart', () => {
   assert.ok(zwak.fouten.some(f => /OFFICE_CODE/.test(f)));
 });
 
+test('config: de kluissleutels MOETEN uit de omgeving komen in productie', () => {
+  /* Zonder RTG_VAULT_KEY/RTG_SECRET_KEY zet server/accounts ze als bestand in
+     de datamap -- naast rtg.db. Wie de map steelt, heeft dan de database en de
+     sleutel om hem te ontcijferen, en zijn de codenamen weer namen. Dat moet de
+     start blokkeren, niet waarschuwen. */
+  const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'e@x.nl' };
+  const leeg = config.valideer(basis);
+  assert.ok(leeg.fouten.some(f => /^RTG_VAULT_KEY ontbreekt/.test(f)));
+  assert.ok(leeg.fouten.some(f => /^RTG_SECRET_KEY ontbreekt/.test(f)));
+
+  // een te korte sleutel is net zo goed geen sleutel
+  const kort = config.valideer({ ...basis, RTG_VAULT_KEY: 'kort', RTG_SECRET_KEY: 's'.repeat(64) });
+  assert.ok(kort.fouten.some(f => /RTG_VAULT_KEY is te kort/.test(f)));
+  assert.ok(!kort.fouten.some(f => /RTG_SECRET_KEY/.test(f)));
+
+  // en met beide sleutels zwijgt de keuring erover -- ook geen waarschuwing meer
+  const goed = config.valideer({ ...basis, RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64) });
+  assert.ok(!goed.fouten.some(f => /RTG_VAULT_KEY|RTG_SECRET_KEY/.test(f)));
+  assert.ok(!goed.waarschuwingen.some(w => /RTG_VAULT_KEY|RTG_SECRET_KEY/.test(w)));
+
+  // buiten productie blokkeert het niets: lokaal werken blijft werken
+  const lokaal = config.valideer({ NODE_ENV: 'development' });
+  assert.equal(lokaal.fouten.length, 0);
+});
+
 test('config: ontbrekende enc-key mag met bewuste opt-out', () => {
   const r = config.valideer({ NODE_ENV: 'production', RTG_ALLOW_PLAINTEXT: '1', RTG_ENC_KEY: '' });
   assert.ok(!r.fouten.some(f => /RTG_ENC_KEY ontbreekt/.test(f)));

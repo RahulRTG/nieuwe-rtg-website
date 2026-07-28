@@ -34,7 +34,7 @@ module.exports = {
 
   /* ---- de kleinsten (0 t/m 5), samen met papa of mama ---- */
   '/apps/foundation/societeit.html': G('De Societeit: quiz- en schatduels voor jongvolwassenen, tegen wie jij uitdaagt.',
-    ['Kies het Quizduel (tien vragen) of het Schatduel (dichtstbij pakt het punt)', 'Daag vrienden of klasgenoten uit, of iedereen op codenaam', 'De uitslag valt binnen het potje; daarna begint alles gewoon opnieuw'],
+    ['Kies het Quizduel, het Schatduel of het Rangschikduel (vier dingen in de juiste volgorde)', 'Daag vrienden of klasgenoten uit, of iedereen op codenaam', 'De uitslag valt binnen het potje; daarna begint alles gewoon opnieuw'],
     'Scherpzinnigheid om de eer: geen ranglijst, geen bewaarde scores.'),
   '/apps/foundation/speeltuin.html': G('De Speeltuin: zes grote schermvullende spelletjes voor de kleinsten.',
     ['Kies een kaart: van ballonnen knappen en kiekeboe tot de toverkwast', 'Tik met grote gebaren; het hele scherm is speelveld', 'Klaar is klaar: een tik op de knop en u bent terug bij de kaarten'],

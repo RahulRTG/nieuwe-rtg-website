@@ -13,7 +13,7 @@ module.exports = {
     ['Zoek op waar je hulp bij wilt', 'Zie wie je kunt bellen of schrijven', 'Alles is vertrouwelijk'],
     'Hulp vragen is dapper, niet zwak; de eerste stap is de moeilijkste en die kun jij.'),
   '/apps/foundation/arena.html': G('De Arena: snelle duels tegen je vrienden of klasgenoten, of solo trainen.',
-    ['Kies het Flitsduel (tien sommen) of het Reactieduel (het stoplicht)', 'Daag vrienden of klasgenoten uit; klasgenoten zien alleen je codenaam', 'Solo oefenen kan altijd, zonder tegenstander'],
+    ['Kies het Flitsduel (tien sommen), het Reactieduel (het stoplicht) of het Geheugenduel (reeksen natikken)', 'Daag vrienden of klasgenoten uit; klasgenoten zien alleen je codenaam', 'Solo oefenen kan altijd, zonder tegenstander'],
     'Alles telt alleen binnen het potje: geen ranglijst, geen bewaarde scores.'),
   '/apps/foundation/keuken.html': G('De gezinskeuken: samen koken, boodschappen en weekmenu\'s.',
     ['Kies recepten voor de week', 'Maak samen het boodschappenlijstje', 'Kook met de stap-voor-stap-hulp'],

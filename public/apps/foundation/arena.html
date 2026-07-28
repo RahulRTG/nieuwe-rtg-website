@@ -80,6 +80,18 @@
   #licht.groen{background:#3E9A2E;box-shadow:0 0 60px rgba(183,240,75,.5);}
   .tijden{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;color:var(--a-amber);font-weight:700;}
   .uitslagkop{font-size:1.7rem;font-weight:800;text-align:center;}
+  /* het geheugenduel: vier vakken die oplichten */
+  .pads{display:grid;grid-template-columns:repeat(2,minmax(7.2rem,8.8rem));gap:.8rem;}
+  .pad{height:7.2rem;border:0;border-radius:20px;cursor:pointer;opacity:.4;transition:opacity .12s;}
+  .pad.aan{opacity:1;}
+  .pad.p0{background:var(--a-cyaan);}
+  .pad.p1{background:var(--a-magenta);}
+  .pad.p2{background:var(--a-lime);}
+  .pad.p3{background:var(--a-amber);}
+  .pad.p0.aan{box-shadow:0 0 34px rgba(53,224,212,.6);}
+  .pad.p1.aan{box-shadow:0 0 34px rgba(242,92,168,.6);}
+  .pad.p2.aan{box-shadow:0 0 34px rgba(183,240,75,.6);}
+  .pad.p3.aan{box-shadow:0 0 34px rgba(246,185,59,.6);}
   .fb{min-height:1.6rem;font-weight:700;}
   .fb.goed{color:var(--a-lime);}
   .fb.fout{color:var(--a-magenta);}
@@ -106,6 +118,11 @@
   <button class="kaart-a m2" data-start="reactie-multi" type="button">
     <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="none" stroke="#F25CA8" stroke-width="4"/><circle cx="24" cy="24" r="7" fill="#F25CA8"/></svg>
     <span><b>Reactieduel</b><span>Rood... rood... GROEN: wie tikt het eerst?</span></span>
+    <span class="duelbadge">2-4 spelers</span>
+  </button>
+  <button class="kaart-a m5" data-start="geheugen-multi" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="7" width="15" height="15" rx="4" fill="#7C6CF0"/><rect x="26" y="7" width="15" height="15" rx="4" fill="#35E0D4" opacity=".8"/><rect x="7" y="26" width="15" height="15" rx="4" fill="#B7F04B" opacity=".8"/><rect x="26" y="26" width="15" height="15" rx="4" fill="#F25CA8" opacity=".8"/></svg>
+    <span><b>Geheugenduel</b><span>Kijk de reeks af en tik hem foutloos na</span></span>
     <span class="duelbadge">2-4 spelers</span>
   </button>
   <button class="kaart-a m3" data-start="flits-solo" type="button">
@@ -158,6 +175,18 @@
   <div class="stand" id="reactieStand"></div>
 </div>
 
+<div class="scherm" id="sGeheugen" hidden>
+  <div class="voortgang" id="gehNr"></div>
+  <div class="fb" id="gehFb">Kijk goed...</div>
+  <div class="pads" id="gehPads">
+    <button type="button" class="pad p0" data-p="0" aria-label="Vak 1"></button>
+    <button type="button" class="pad p1" data-p="1" aria-label="Vak 2"></button>
+    <button type="button" class="pad p2" data-p="2" aria-label="Vak 3"></button>
+    <button type="button" class="pad p3" data-p="3" aria-label="Vak 4"></button>
+  </div>
+  <div class="stand" id="gehStand"></div>
+</div>
+
 <div class="scherm" id="sUitslag" hidden>
   <div class="uitslagkop" id="uitslagKop"></div>
   <div class="sub" id="uitslagSub"></div>
@@ -205,7 +234,7 @@
     if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
     return d;
   }
-  const SCHERMEN = ['sMenu', 'sKies', 'sWacht', 'sFlits', 'sReactie', 'sUitslag'];
+  const SCHERMEN = ['sMenu', 'sKies', 'sWacht', 'sFlits', 'sReactie', 'sGeheugen', 'sUitslag'];
   let potje = null, modus = 'solo', soort = 'flits', pollT = null;
   function toon(id) {
     SCHERMEN.forEach(s => { $('#' + s).hidden = s !== id; });
@@ -230,7 +259,7 @@
     const vak = $('#uitnodigingen');
     try {
       const d = await api('mijn', {});
-      const duels = (d.uitnodigingen || []).filter(u => u.soort === 'flits' || u.soort === 'reactie');
+      const duels = (d.uitnodigingen || []).filter(u => u.soort === 'flits' || u.soort === 'reactie' || u.soort === 'geheugen');
       vak.innerHTML = '';
       for (const u of duels.slice(0, 4)) {
         const rij = document.createElement('div');
@@ -253,7 +282,7 @@
   const gekozen = new Set();
   async function openKies() {
     gekozen.clear();
-    $('#kiesKop').textContent = soort === 'flits' ? 'Flitsduel: wie daag je uit?' : 'Reactieduel: wie daag je uit?';
+    $('#kiesKop').textContent = (soort === 'flits' ? 'Flitsduel' : soort === 'reactie' ? 'Reactieduel' : 'Geheugenduel') + ': wie daag je uit?';
     $('#kiesLijst').textContent = 'Even laden...';
     $('#kiesStart').disabled = true;
     toon('sKies');
@@ -320,6 +349,7 @@
   }
   function startDuel() {
     if (soort === 'flits') { toon('sFlits'); flitsToonStaat(); }
+    else if (soort === 'geheugen') { gehGetoond = -1; toon('sGeheugen'); gehToon(); }
     else { toon('sReactie'); reactieToonStaat(); }
     clearInterval(pollT);
     pollT = setInterval(async () => {
@@ -328,7 +358,7 @@
         const d = await api('staat', { id: potje.id });
         potje = d.potje;
         if (potje.status === 'klaar') { clearInterval(pollT); return toonUitslag(); }
-        if (soort === 'flits') flitsToonStaat(); else reactieToonStaat();
+        if (soort === 'flits') flitsToonStaat(); else if (soort === 'geheugen') gehToon(); else reactieToonStaat();
       } catch (e) {}
     }, 2500);
   }
@@ -464,6 +494,50 @@
   licht.addEventListener('pointerdown', lichtTik);
   licht.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') lichtTik(); });
 
+  /* ---------- Geheugenduel: dezelfde reeksen, foutloos natikken ---------- */
+  let gehGetoond = -1, gehFase = 'wacht', gehInvoer = [], gehTimer = null;
+  function gehToon() {
+    const st = potje.staat || {};
+    $('#kopInfo').textContent = 'Geheugenduel';
+    $('#gehNr').textContent = st.reeks ? ('Ronde ' + (st.nr + 1) + ' van ' + st.tot + ' · ' + st.punten + ' punten') : 'Klaar! Wachten op de rest...';
+    standRijen($('#gehStand'), i => st.stand[i].af + '/' + st.tot + ' af · ' + st.stand[i].punten + ' punten');
+    if (!st.reeks) { $('#gehFb').textContent = '✓'; return; }
+    // een nieuwe ronde: de reeks een keer voorspelen, daarna zelf natikken
+    if (gehGetoond !== st.nr) {
+      gehGetoond = st.nr; gehFase = 'kijk'; gehInvoer = [];
+      $('#gehFb').textContent = 'Kijk goed...'; $('#gehFb').className = 'fb';
+      let i = 0;
+      clearInterval(gehTimer);
+      gehTimer = setInterval(() => {
+        document.querySelectorAll('.pad').forEach(p => p.classList.remove('aan'));
+        if (i >= st.reeks.length) {
+          clearInterval(gehTimer); gehFase = 'doe';
+          $('#gehFb').textContent = 'Nu jij: tik de reeks na';
+          return;
+        }
+        const pad = document.querySelector('.pad.p' + st.reeks[i]);
+        if (pad) { pad.classList.add('aan'); setTimeout(() => pad.classList.remove('aan'), 420); }
+        i++;
+      }, 620);
+    }
+  }
+  $('#gehPads').addEventListener('click', async (e) => {
+    const pad = e.target.closest('.pad');
+    if (!pad || gehFase !== 'doe' || !potje) return;
+    const st = potje.staat || {};
+    if (!st.reeks) return;
+    pad.classList.add('aan'); setTimeout(() => pad.classList.remove('aan'), 200);
+    gehInvoer.push(Number(pad.dataset.p));
+    if (gehInvoer.length < st.reeks.length) return;
+    gehFase = 'wacht';
+    try {
+      const r = await api('zet', { id: potje.id, zet: { actie: 'reeks', r: gehInvoer } });
+      fb($('#gehFb'), r.goedWas, r.goedWas ? 'Foutloos!' : 'Net niet -- dit was hem: ' + r.juistR.map(k => k + 1).join(' '));
+      if (r.potje) { potje = r.potje; if (potje.status === 'klaar') return setTimeout(toonUitslag, 1100); }
+      setTimeout(gehToon, 1100);
+    } catch (e2) { gehToon(); }
+  });
+
   /* ---------- de uitslag ---------- */
   function soloUitslag(kop, sub, regels) {
     $('#uitslagKop').textContent = kop;
@@ -476,11 +550,12 @@
   }
   function toonUitslag() {
     $('#uitslagKop').textContent = potje.gelijk ? 'Precies gelijk!' : (potje.winnaar === potje.spelers[potje.ik] ? 'Jij wint!' : potje.winnaar + ' wint');
-    $('#uitslagSub').textContent = (soort === 'flits' ? 'De meeste sommen goed telt.' : 'De laagste totaaltijd wint.') + ' Niets wordt bewaard.';
+    $('#uitslagSub').textContent = (soort === 'flits' ? 'De meeste sommen goed telt.' : soort === 'geheugen' ? 'De meeste reeksen foutloos telt.' : 'De laagste totaaltijd wint.') + ' Niets wordt bewaard.';
     const st = potje.staat || {};
-    standRijen($('#uitslagStand'), i => soort === 'flits'
-      ? (st.stand ? st.stand[i].goed + ' van ' + st.tot + ' goed' : '')
-      : (st.stand ? st.stand[i].totaal + ' ms totaal' : ''));
+    standRijen($('#uitslagStand'), i => !st.stand ? '' : soort === 'flits'
+      ? st.stand[i].goed + ' van ' + st.tot + ' goed'
+      : soort === 'geheugen' ? st.stand[i].punten + ' van ' + st.tot + ' foutloos'
+      : st.stand[i].totaal + ' ms totaal');
     toon('sUitslag');
   }
 

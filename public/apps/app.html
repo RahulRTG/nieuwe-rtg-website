@@ -144,7 +144,19 @@
 
   /* ---------- app-chroom ---------- */
 
-  #app{display:none;flex:1;flex-direction:column;min-height:0;}
+  /* --e is DE maat van het OS. Alles wat de indeling bepaalt -- tegels, gaten,
+     letters, dock -- is een veelvoud van --e, en --e groeit met de shell mee
+     (cqi = procent van de shell-breedte, niet van het browservenster). Zo is
+     het beeld op telefoon, iPad en computer hetzelfde en alleen groter:
+     15px bij een shell van 390, vanaf ~507 vlak op 19,5px. Geen sprongen.
+
+     --os-kolom houdt de inhoud op leesbare breedte. Wat er op een breed scherm
+     overblijft wordt lucht in plaats van een extra kolom. */
+  #app{
+    display:none;flex:1;flex-direction:column;min-height:0;
+    --e:clamp(15px, 3.85cqi, 19.5px);
+    --os-kolom:calc(var(--e) * 34);
+  }
   #app.active{display:flex;}
 
   .topbar{
@@ -307,22 +319,21 @@
   /* De Members-kaart (codenaam-pas) + widget ernaast. Op de telefoon staat de
      kaart gewoon vol; op een breed scherm (tablet-venster) houdt hij zijn echte
      pas-formaat i.p.v. uitgerekt, en vult een widget de overgebleven ruimte. */
-  .os-paskrow{margin-top:1rem;}
+  /* De pas en de Rahul-kaart stonden op een breed scherm naast elkaar en op de
+     telefoon was de Rahul-kaart er helemaal niet. Dat waren dus twee schermen.
+     Nu staan ze overal onder elkaar -- zelfde volgorde, zelfde beeld -- en
+     krijgt de telefoon er een kaart bij in plaats van er een te missen. */
+  .os-paskrow{display:flex;flex-direction:column;gap:calc(var(--e) * 0.7);margin-top:calc(var(--e) * 1.05);}
   .os-paskrow .codecard{margin-top:0;}
-  .os-pas-widget{display:none;}
-  @media (min-width:600px){
-    .os-paskrow{display:flex;gap:1rem;align-items:stretch;}
-    .os-paskrow .codecard{flex:0 0 clamp(320px,42%,400px);max-width:400px;}
-    .os-pas-widget{display:flex;flex:1;flex-direction:column;justify-content:center;gap:0.7rem;
-      border-radius:20px;border:1px solid var(--line);padding:1.4rem;min-width:0;
-      background:color-mix(in srgb, var(--card) 68%, transparent);}
-    .opw-eyebrow{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
-    .opw-zin{font-family:'Bodoni Moda',serif;font-size:1.15rem;line-height:1.3;color:var(--txt);margin:0;}
-    .opw-knop{align-self:flex-start;border-radius:999px;border:1px solid var(--line);
-      background:var(--card2);color:var(--txt);font-family:inherit;font-weight:600;font-size:0.8rem;
-      padding:0.6rem 1.1rem;cursor:pointer;transition:border-color 0.13s ease;}
-    .opw-knop:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
-  }
+  .os-pas-widget{display:flex;flex-direction:column;justify-content:center;gap:calc(var(--e) * 0.5);
+    border-radius:calc(var(--e) * 1.35);border:1px solid var(--line);padding:calc(var(--e) * 1.15);min-width:0;
+    background:color-mix(in srgb, var(--card) 68%, transparent);}
+  .opw-eyebrow{font-size:calc(var(--e) * 0.64);letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+  .opw-zin{font-family:'Bodoni Moda',serif;font-size:calc(var(--e) * 1.23);line-height:1.3;color:var(--txt);margin:0;}
+  .opw-knop{align-self:flex-start;border-radius:999px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);font-family:inherit;font-weight:600;font-size:calc(var(--e) * 0.85);
+    padding:calc(var(--e) * 0.55) calc(var(--e) * 1.1);cursor:pointer;transition:border-color var(--rust-traag) var(--rust-ease);}
+  .opw-knop:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
   .codecard{
     margin-top:1rem;
     border-radius:20px;
@@ -912,21 +923,34 @@
   /* springboard: datumkop + widgets + app-grid */
   .os-datum{
     margin:0.2rem 0 0.1rem;
-    font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;
+    font-size:calc(var(--e) * 0.77);letter-spacing:0.14em;text-transform:uppercase;
     color:var(--gold);font-weight:600;
   }
+  /* EEN LAY-OUT, DIE MEESCHAALT.
+
+     Telefoon, iPad en computer laten hetzelfde beeld zien -- zelfde vier
+     kolommen, zelfde kaart, zelfde dock -- alleen op een groter scherm iets
+     ruimer. Daarom staan hier geen breekpunten meer die de indeling omgooien
+     (er stond eerst een sprong naar zes kolommen); er is één maat-eenheid
+     --e die met de shell meegroeit, en alles in het OS is een veelvoud
+     daarvan. Van 15px op de telefoon naar 19,5px vanaf ongeveer een halve
+     tablet: precies de "iets groter" die het al was, maar dan vloeiend en
+     zonder dat het beeld verspringt.
+
+     De inhoud houdt daarbij een eigen maximumbreedte (--os-kolom). De extra
+     ruimte op een breed scherm wordt dus lucht, geen extra kolommen. Rust
+     boven dichtheid. */
   .os-grid{
     display:grid;grid-template-columns:repeat(4,1fr);
-    gap:1.5rem 0.7rem;margin-top:1.7rem;
+    gap:calc(var(--e) * 1.6) calc(var(--e) * 0.75);margin-top:calc(var(--e) * 1.8);
   }
-  @container os (min-width:600px){.os-grid{grid-template-columns:repeat(6,1fr);}}
   .os-app{
     background:none;border:none;color:var(--txt);
-    display:flex;flex-direction:column;align-items:center;gap:0.42rem;
+    display:flex;flex-direction:column;align-items:center;gap:calc(var(--e) * 0.45);
     min-width:0;position:relative;
   }
   .os-app .os-tegel{
-    width:58px;height:58px;border-radius:18px;
+    width:calc(var(--e) * 3.87);height:calc(var(--e) * 3.87);border-radius:calc(var(--e) * 1.2);
     display:flex;align-items:center;justify-content:center;position:relative;
     background:linear-gradient(160deg, var(--card2), var(--card));
     border:1px solid var(--line);
@@ -941,7 +965,7 @@
     }
   }
   .os-app:active .os-tegel{transform:scale(0.97);}
-  .os-app svg{width:26px;height:26px;stroke:#fff;fill:none;}
+  .os-app svg{width:calc(var(--e) * 1.73);height:calc(var(--e) * 1.73);stroke:#fff;fill:none;}
   /* huisstijl-monogram als een app (nog) geen eigen glyf heeft */
   .os-monogram{
     font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.55rem;line-height:1;
@@ -950,7 +974,7 @@
   #osZoekLijst .zi .os-monogram,#osBelLijst .zi .os-monogram,.os-winkel-rij .zi .os-monogram{font-size:0.8rem;}
   #osZoekLijst .zm svg,#osBelLijst .zm svg{width:15px;height:15px;stroke:var(--soft);fill:none;}
   .os-app .os-naam{
-    font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;
+    font-size:calc(var(--e) * 0.6);letter-spacing:0.14em;text-transform:uppercase;
     font-weight:600;color:var(--txt);
     max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
     text-shadow:0 1px 4px rgba(0,0,0,0.5);
@@ -983,9 +1007,9 @@
   /* dock: zwevend glas met de vier kernapps */
   .os-dock{
     position:absolute;left:50%;transform:translateX(-50%);
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 0.7rem);
-    z-index:30;display:flex;gap:1rem;padding:0.7rem 0.9rem;
-    border-radius:18px;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + var(--e) * 0.75);
+    z-index:30;display:flex;gap:calc(var(--e) * 1.05);padding:calc(var(--e) * 0.75) calc(var(--e) * 0.95);
+    border-radius:calc(var(--e) * 1.2);
     background:color-mix(in srgb, var(--card) 55%, transparent);
     backdrop-filter:blur(26px) saturate(1.5);
     -webkit-backdrop-filter:blur(26px) saturate(1.5);
@@ -1048,15 +1072,17 @@
   .os-pagina{
     min-width:100%;scroll-snap-align:start;scroll-snap-stop:always;
     overflow-y:auto;overflow-x:hidden;
-    padding:1.05rem 1.6rem calc(env(safe-area-inset-bottom, 0px) + 10.5rem);
+    padding:calc(var(--e) * 1.1) calc(var(--e) * 1.7) calc(env(safe-area-inset-bottom, 0px) + var(--e) * 11);
   }
+  /* de inhoud houdt zijn eigen breedte; wat overblijft is lucht */
+  .os-pagina > *{max-width:var(--os-kolom);margin-inline:auto;}
   .os-dots{
     position:absolute;left:0;right:0;
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 8.6rem);
+    bottom:calc(env(safe-area-inset-bottom, 0px) + var(--e) * 9);
     display:flex;justify-content:center;gap:0.45rem;z-index:29;pointer-events:auto;
   }
   .os-dots button{
-    width:7px;height:7px;border-radius:50%;border:none;padding:0;
+    width:calc(var(--e) * 0.47);height:calc(var(--e) * 0.47);border-radius:50%;border:none;padding:0;
     background:color-mix(in srgb, var(--txt) 30%, transparent);
   }
   .os-dots button.actief{background:var(--txt);}
@@ -1064,7 +1090,7 @@
   /* -------- zoekpil (Spotlight-ingang) boven het dock -------- */
   .os-zoekpil{
     position:absolute;left:50%;transform:translateX(-50%);
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 6.6rem);
+    bottom:calc(env(safe-area-inset-bottom, 0px) + var(--e) * 7);
     z-index:29;display:flex;align-items:center;gap:0.4rem;
     padding:0.42rem 1rem;border-radius:999px;
     background:color-mix(in srgb, var(--card) 60%, transparent);
@@ -1297,12 +1323,12 @@
   .os-merk-logo{width:18px;height:18px;border-radius:4px;vertical-align:middle;}
 
   /* -------- Rahul: de gouden orb in het midden van het dock -------- */
-  .os-dock .os-app[data-tab="ai"]{margin-top:-14px;}
+  .os-dock .os-app[data-tab="ai"]{margin-top:calc(var(--e) * -0.93);}
   /* Rahul is het hart van het OS: de AI-knop in het dock is zijn signatuurmond
      van bewegende lichtpuntjes (shared/mond.js), glimmend op een donkere ronde
      bol met een gouden rand. Zo kijkt Rahul je overal aan. */
   .os-dock .os-app[data-tab="ai"] .os-tegel{
-    width:64px;height:64px;border-radius:50%;overflow:hidden;
+    width:calc(var(--e) * 4.27);height:calc(var(--e) * 4.27);border-radius:50%;overflow:hidden;
     background:radial-gradient(circle at 50% 42%, #211C17, #0C0C0B 72%);
     border:1px solid rgba(201,162,75,0.55);
     box-shadow:0 10px 26px rgba(0,0,0,0.5), 0 0 22px rgba(158,28,64,0.28), inset 0 1px 0 rgba(255,255,255,0.14);
@@ -1311,36 +1337,13 @@
      mond in (de bol snijdt de zachte randen af) en tillen we ze wat op, zodat
      Rahul ook op telefoonformaat duidelijk leest */
   .os-dock .os-app[data-tab="ai"] .os-ai-mond{width:150%;height:auto;display:block;filter:brightness(1.28) saturate(1.08);}
-  .os-dock .os-app[data-tab="ai"] svg{width:30px;height:30px;stroke:#C9A24B;}
+  .os-dock .os-app[data-tab="ai"] svg{width:calc(var(--e) * 2);height:calc(var(--e) * 2);stroke:#C9A24B;}
   .os-dock .os-app[data-tab="ai"].actief::after{background:var(--txt);}
 
-  /* -------- de tablet: in het 820px-kader op de computer groeit het OS mee --------
-     Het springboard voelt als een ruime tablet: iets grotere tegels dan op de
-     telefoon, meer lucht, een wat royaler dock. Geen uitvergroot volscherm:
-     de maten zijn afgestemd op het venster zelf (container-query), zodat alles
-     binnen het kader ademt in plaats van tegen de randen te duwen. */
-  @container os (min-width:640px){
-    .os-grid{
-      grid-template-columns:repeat(6,1fr);gap:2.1rem 0.9rem;margin-top:1.7rem;
-    }
-    .os-app{gap:0.55rem;}
-    .os-app .os-tegel{width:74px;height:74px;border-radius:22px;}
-    .os-app svg{width:34px;height:34px;}
-    .os-app .os-tegel > span{font-size:2rem !important;}
-    .os-app .os-naam{font-size:0.62rem;letter-spacing:0.15em;}
-    .os-badge{width:14px;height:14px;top:-4px;right:-4px;}
-    .os-datum{font-size:0.82rem;}
-    .os-pagina{padding:1.6rem 2.2rem calc(env(safe-area-inset-bottom, 0px) + 8.5rem);}
-    .os-dock{gap:1.2rem;padding:0.8rem 1.1rem;border-radius:22px;}
-    .os-dock .os-app .os-tegel{width:60px;height:60px;border-radius:18px;}
-    .os-dock .os-app svg{width:28px;height:28px;}
-    .os-dock .os-app[data-tab="ai"]{margin-top:-14px;}
-    .os-dock .os-app[data-tab="ai"] .os-tegel{width:70px;height:70px;}
-    .os-dock .os-app[data-tab="ai"] svg{width:32px;height:32px;}
-    .os-zoekpil{bottom:calc(env(safe-area-inset-bottom, 0px) + 6.6rem);}
-    .os-dots{bottom:calc(env(safe-area-inset-bottom, 0px) + 8.2rem);gap:0.5rem;}
-    .os-dots button{width:8px;height:8px;}
-  }
+  /* Hier stond een tweede indeling voor "de tablet": zes kolommen, grotere
+     tegels, een royaler dock. Dat maakte de computer een ander scherm dan de
+     telefoon. Nu groeit alles gewoon mee met --e, dus dit blok is niet meer
+     nodig -- er is nog maar één indeling, van 390 tot 2560 pixels breed. */
 
   /* -------- notificatie-banner: glijdt bovenin binnen, zoals op een telefoon -------- */
   .os-banner{
@@ -1710,6 +1713,7 @@
           <button id="osCcSplit"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/></svg></b><span data-i18n="os.cc.split">Twee naast elkaar</span></button>
           <button id="osCcDraai"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></b><span data-i18n="os.cc.draai">Beeld draaien</span></button>
           <button id="osCcVol"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></b><span data-i18n="os.cc.vol">Volledig scherm</span></button>
+          <button id="osCcRand" hidden><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 9h8M8 15h8"/></svg></b><span data-i18n="os.cc.rand">Rand tot rand</span></button>
           <button id="osCcZoek"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></b><span data-i18n="os.zoek">Zoeken</span></button>
           <button id="osCcUit"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"/><path d="M6.6 7a8 8 0 1 0 10.8 0"/></svg></b><span data-i18n="app.logout">Uitloggen</span></button>
         </div>
@@ -2350,6 +2354,7 @@ window.I18N = { en: {
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosapps.js" defer></script>
 <script src="/shared/split.js" defer></script>

@@ -45,6 +45,20 @@
   var ccVol = $('#osCcVol');
   if (ccVol) ccVol.addEventListener('click', function () { if (window.RTGscherm) RTGscherm.volledig(); sluitScrims(); });
 
+  /* Rand tot rand: de tablet laat zijn kader los en het OS wordt het hele
+     scherm. Iets anders dan "volledig scherm" hierboven -- dat gaat over de
+     browser, dit over het kader waar de app in staat. Op de telefoon is er
+     geen kader, dus dan blijft de tegel weg (RTGVol.mogelijk). */
+  var ccRand = $('#osCcRand');
+  if (ccRand && window.RTGVol && RTGVol.mogelijk()) {
+    ccRand.hidden = false;
+    ccRand.classList.toggle('aan', RTGVol.aan());
+    ccRand.addEventListener('click', function () {
+      RTGVol.wissel();
+      ccRand.classList.toggle('aan', RTGVol.aan());
+    });
+  }
+
   /* ---------- De Boardroom: functies aan en uit vanuit Instellingen ----------
      Uw eigen boardroom: alle functies waar u recht op heeft, aan of uit te zetten.
      De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de

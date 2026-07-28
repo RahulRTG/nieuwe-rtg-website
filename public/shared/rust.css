@@ -12,6 +12,19 @@
 :root{
   --rust-traag: 0.3s;
   --rust-ease: cubic-bezier(0.22, 0.61, 0.36, 1);  /* zacht uitlopend, geen ruk */
+  /* Eén tempo voor het hele huis. Wie iets nieuws laat bewegen pakt een van
+     deze drie -- niet een eigen getal. Zo loopt alles in de maat en voelt het
+     systeem als één ding in plaats van als losse schermen die elk hun eigen
+     haast hebben.
+       kort  -- een knop die reageert onder je vinger
+       traag -- een paneel dat opengaat, een kaart die verschijnt
+       lang  -- een heel scherm dat van plek wisselt */
+  --rust-kort: 0.16s;
+  --rust-lang: 0.46s;
+}
+@media (prefers-reduced-motion: reduce){
+  /* wie rust vraagt krijgt rust: alles staat er meteen, niets glijdt */
+  :root{ --rust-kort: 0.001s; --rust-traag: 0.001s; --rust-lang: 0.001s; }
 }
 
 @media (prefers-reduced-motion: no-preference){

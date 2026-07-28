@@ -73,6 +73,20 @@
     doe.appendChild(vol);
   }
 
+  /* Vul het scherm: het kader waar de app in staat laten vallen. Hoort bij
+     Beeld, maar krijgt een eigen rij omdat het over de app gaat en niet over
+     het toestel -- en omdat het overal geldt, niet alleen hier. */
+  function vulVol() {
+    if (!w.RTGVol || !w.RTGVol.mogelijk || !w.RTGVol.mogelijk()) return;
+    var doe = rij(T('bdn.vol.kop', 'Vul het scherm'),
+      T('bdn.vol.sub', 'De app rekt op tot de randen van uw beeldscherm. Uw keuze geldt voor alle apps.'));
+    var k = knopje(T('bdn.vol.aan', 'Rand tot rand'), w.RTGVol.aan(), function () {
+      w.RTGVol.wissel();
+      k.classList.toggle('actief', w.RTGVol.aan());
+    });
+    doe.appendChild(k);
+  }
+
   function vulUitleg() {
     if (!w.RTGUitleg || !w.RTGUitleg.open) return;
     var doe = rij(T('bdn.uitleg', 'Uitleg over dit scherm'), T('bdn.uitleg.sub', 'Wat u hier kunt doen, in gewone taal.'));
@@ -98,7 +112,7 @@
     var uit = d.createElement('p'); uit.className = 'bdn-uit';
     uit.textContent = T('bdn.uit', 'Alles wat u aan dit scherm kunt instellen, bij elkaar. Uw keuzes blijven op dit toestel.');
     blad.appendChild(uit);
-    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulUitleg();
+    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulVol(); vulUitleg();
     scrim.appendChild(blad);
     scrim.addEventListener('click', function (e) { if (e.target === scrim) sluit(); });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });

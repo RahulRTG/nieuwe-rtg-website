@@ -5,7 +5,7 @@
    betaling al verwerkt is. Krijgt de gedeelde ctx. */
 module.exports = (ctx) => {
   const { save, crypto, schoon, huizen, boekingen, TYPES, ANNULERING, geldigeDatum,
-    nachten, vrij, nu, reiswijzer, ratingVan, gastScore, superhost } = ctx;
+    nachten, vrij, nu, reiswijzer, ratingVan, gastScore, superhost, hostNaam } = ctx;
 
   const publiek = h => ({ id: h.id, titel: h.titel, plaats: h.plaats, land: h.land, type: h.type,
     typeLabel: TYPES[h.type] || h.type, beschrijving: h.beschrijving, prijs: h.prijs, schoonmaak: h.schoonmaak,
@@ -13,7 +13,8 @@ module.exports = (ctx) => {
     voorzieningen: h.voorzieningen || [], instant: !!h.instant, keyless: !!h.keyless, minNachten: h.minNachten,
     kortingWeek: h.kortingWeek, kortingMaand: h.kortingMaand, annulering: h.annulering,
     annuleringTekst: ANNULERING[h.annulering], huisregels: h.huisregels, visual: h.visual,
-    host: h.host, superhost: superhost(h.host), rating: ratingVan(h.id) });
+    host: hostNaam(h.host), hostZaak: String(h.host).startsWith('zaak:'),
+    superhost: superhost(h.host), rating: ratingVan(h.id) });
 
   /* De prijsopbouw, transparant: nachten x prijs, week-/maandkorting,
      schoonmaak, en 0% servicekosten (expliciet als regel, dat is het punt). */
@@ -99,6 +100,7 @@ module.exports = (ctx) => {
     const kopie = Object.assign({}, b);
     const dichtbij = new Date(b.van) - Date.now() <= 3 * 86400000;
     if (!(b.status === 'ingecheckt' || (b.status === 'bevestigd' && dichtbij))) kopie.deurcode = null;
+    kopie.host = hostNaam(b.host); // een zaak-host toont zijn zaaknaam
     delete kopie.berichten;
     return kopie;
   }

@@ -1535,6 +1535,7 @@
   // boekhouding: btw per genre, personeelskosten en cadeaukaarten, per land
   let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
   let zakData = null, zakBusy = false;
+  let thuisData = null, thuisBusy = false;
   // Salon-bedrijfsprofiel: volgers, aanbiedingen, polls en cijfers
   let mktData = null, mktBusy = false, mktMsg = '';
   async function laadMarketing(){
@@ -1596,7 +1597,9 @@
     const secs = [
       ['bo','\uD83D\uDCCA',T('kt.bo','Backoffice')],
       ['fin','\uD83D\uDCDA',T('kt.fin','Boekhouding')],
-      ['hr','\uD83D\uDC65',T('kt.hr','HR & team')]
+      ['hr','\uD83D\uDC65',T('kt.hr','HR & team')],
+      // hosts horen bij de leveranciers: elke zaak host op RTG Thuis
+      ['thuis','\u2302',T('kt.thuis','RTG Thuis')]
     ];
     if (horeca) secs.push(
       ['keuken','\uD83D\uDD25',T('kt.keuken','Keuken')],
@@ -1825,6 +1828,59 @@
           '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
           '<button class="obtn" id="accAdvies" style="margin-top:0.6rem;">'+T('fn.adviezen','Stuur mij bij, geef adviezen')+'</button>'+
           '<div id="accAdv"></div></div>';
+      }
+    }
+    if (kantoorSec === 'thuis'){
+      // het THUIS-KANTOOR: de zaak als host op RTG Thuis (verhuur onder de
+      // zaaknaam) -- dashboard, aanvragen, aanbod, prijsadvies en blokkades
+      if (!thuisData){
+        if (!thuisBusy){
+          thuisBusy = true;
+          Promise.all([API.call('/supplier/thuis/bord', {}), API.call('/supplier/thuis/huizen', {})])
+            .then(function(u){ thuisData = { bord: u[0], huizen: u[1].huizen }; })
+            .catch(function(e){ thuisData = { error: e.message }; })
+            .then(function(){ thuisBusy = false; renderStation(); });
+        }
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.kop','RTG Thuis')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+      } else if (thuisData.error){
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.kop','RTG Thuis')+'</h3><div class="tkc-who">'+thuisData.error+'</div></div>';
+      } else {
+        const bord = thuisData.bord;
+        html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);"><h3>'+T('th.bord','Het host-dashboard')+'</h3>'+
+          '<div class="st-row"><span>'+T('th.live','Huizen live')+'</span><b>'+bord.live+' / '+bord.huizen+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.ink','Inkomsten (afgeronde verblijven)')+'</span><b style="color:var(--gold);">'+eur(bord.inkomstenTotaal)+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.bez','Bezetting komende 30 dagen')+'</span><b>'+bord.bezettingPct+'%</b></div>'+
+          '<div class="st-row"><span>Superhost</span><b>'+(bord.superhost ? '★ '+T('th.ja','ja') : T('th.nog','nog niet (3 verblijven, gemiddeld 4,8+)'))+'</b></div>'+
+          '<div class="tkc-who">'+T('th.uitbet','Uitbetalingen staan gepland naar de zakelijke RTG Bank-rekening; RTG houdt 0% in. Gasten zien uw zaaknaam als host.')+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.aanvragen','Aanvragen')+' ('+bord.aanvragen.length+')</h3>'+
+          (bord.aanvragen.length ? bord.aanvragen.map(function(a){
+            return '<div class="st-row"><span><b>'+escT(a.titel)+'</b> · '+escT(a.van)+' → '+escT(a.tot)+' · '+a.gasten+' '+T('th.gasten','gasten')+
+              '<span class="sub">'+T('th.gast','gast')+' '+escT(a.gast)+(a.gastRating ? ' · ★ '+a.gastRating : '')+' · '+eur(a.prijsopbouw.totaal)+'</span></span>'+
+              '<span><button class="obtn primary" data-thok="'+escT(a.ref)+'">'+T('th.ok','Accepteer')+'</button> <button class="obtn" data-thnee="'+escT(a.ref)+'">'+T('th.nee','Wijs af')+'</button></span></div>';
+          }).join('') : '<div class="tkc-who">'+T('th.geenaanvr','Geen openstaande aanvragen.')+'</div>')+'</div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.komend','Komende en lopende verblijven')+'</h3>'+
+          (bord.komend.length ? bord.komend.map(function(k){
+            return '<div class="st-row"><span>'+escT(k.titel)+' · '+escT(k.van)+' → '+escT(k.tot)+'<span class="sub">'+escT(k.status)+' · '+T('th.gast','gast')+' '+escT(k.gast)+'</span></span>'+
+              (k.status === 'ingecheckt' ? '<button class="obtn" data-thuit="'+escT(k.ref)+'">'+T('th.uit','Check uit')+'</button>' : '')+'</div>';
+          }).join('') : '<div class="tkc-who">'+T('th.geenkomend','Nog niets geboekt.')+'</div>')+'</div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.huizen','Ons aanbod op RTG Thuis')+'</h3>'+
+          (thuisData.huizen.length ? thuisData.huizen.map(function(h){
+            return '<div class="st-row"><span><b>'+escT(h.titel)+'</b> · '+escT(h.plaats)+' · '+eur(h.prijs)+'/'+T('th.nacht','nacht')+
+              (h.rating.sterren ? ' · ★ '+h.rating.sterren : '')+(h.live ? '' : ' · '+T('th.pauze','gepauzeerd'))+
+              '<span class="sub" data-thadvuit="'+escT(h.id)+'">'+(h.instant?T('th.instant','instant boeken'):T('th.opaanvraag','op aanvraag'))+(h.keyless?' · keyless':'')+'</span></span>'+
+              '<span><button class="obtn" data-thadv="'+escT(h.id)+'">'+T('th.advies','AI-prijsadvies')+'</button> <button class="obtn" data-thblok="'+escT(h.id)+'">'+T('th.blok','Blokkeer')+'</button></span></div>';
+          }).join('') : '<div class="tkc-who">'+T('th.geenhuizen','Nog geen huizen; zet er hieronder een live.')+'</div>')+'</div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.nieuw','Zet een huis live (manager)')+'</h3>'+
+          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'+
+          '<input class="st-in" id="thTitel" placeholder="'+T('th.titel','Titel')+'" style="flex:2;min-width:150px;">'+
+          '<input class="st-in" id="thPlaats" placeholder="'+T('th.plaats','Plaats')+'" style="flex:1;min-width:110px;">'+
+          '<select class="st-in" id="thType" style="flex:1;min-width:110px;"><option value="villa">Villa</option><option value="appartement">Appartement</option><option value="huis">Huis</option><option value="kamer">'+T('th.kamer','Privekamer')+'</option><option value="boot">'+T('th.boot','Woonboot')+'</option><option value="natuur">'+T('th.natuur','Natuurhuisje')+'</option></select>'+
+          '<input class="st-in" id="thPrijs" type="number" min="1" value="150" style="flex:1;min-width:80px;" placeholder="€/'+T('th.nacht','nacht')+'">'+
+          '<input class="st-in" id="thGasten" type="number" min="1" max="20" value="4" style="flex:1;min-width:70px;" placeholder="'+T('th.gasten','gasten')+'">'+
+          '<label style="font-size:0.8rem;display:flex;gap:0.3rem;align-items:center;"><input type="checkbox" id="thInstant" checked> instant</label>'+
+          '<label style="font-size:0.8rem;display:flex;gap:0.3rem;align-items:center;"><input type="checkbox" id="thKeyless" checked> keyless</label>'+
+          '<button class="obtn primary" id="thZet">'+T('th.zet','Zet live')+'</button></div>'+
+          '<div class="tkc-who">'+T('th.zet.s','Alle premium functies zijn inbegrepen: instant of aanvraag, kortingen, borg, keyless deurcodes, co-hosts en AI-prijsadvies. Leden betalen 0% servicekosten.')+'</div></div>';
       }
     }
     if (kantoorSec === 'hr'){
@@ -2348,7 +2404,7 @@
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; thuisData = null; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
       try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = ''+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }
@@ -2518,6 +2574,47 @@
     el.querySelectorAll('[data-kdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/staff/remove', { staffId: b.dataset.kdel }); await refresh(); } catch(e){ toast(e.message); }
     }));
+    // binds van het THUIS-KANTOOR (sectie 'thuis' in het Kantoor)
+    el.querySelectorAll('[data-thok]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/thuis/beslis', { ref: b.dataset.thok, akkoord: true });
+        kantoorMsg = '✓ ' + T('th.geaccepteerd', 'Aanvraag geaccepteerd; de gast krijgt de bevestiging (en bij keyless straks de deurcode).');
+        thuisData = null; renderStation(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-thnee]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/thuis/beslis', { ref: b.dataset.thnee, akkoord: false });
+        thuisData = null; renderStation(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-thuit]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/thuis/checkuit', { ref: b.dataset.thuit });
+        kantoorMsg = '✓ ' + T('th.uitgecheckt', 'Uitgecheckt; de uitbetaling staat gepland en jullie kunnen elkaar een review geven.');
+        thuisData = null; renderStation(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-thadv]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/thuis/prijsadvies', { id: b.dataset.thadv });
+        const uitEl = el.querySelector('[data-thadvuit="' + b.dataset.thadv + '"]');
+        if (uitEl) uitEl.textContent = T('th.advies', 'AI-prijsadvies') + ': ' + eur(d.advies) + ' (' + T('th.nu', 'nu') + ' ' + eur(d.huidig) + ', ' + T('th.bez2', 'bezetting') + ' ' + d.bezettingPct + '%). ' + d.uitleg;
+      } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-thblok]').forEach(b => b.addEventListener('click', async () => {
+      const van = prompt(T('th.blokvan', 'Blokkeer van (JJJJ-MM-DD):')); if (!van) return;
+      const tot = prompt(T('th.bloktot', 'tot (JJJJ-MM-DD):')); if (!tot) return;
+      try { await API.call('/supplier/thuis/blokkeer', { id: b.dataset.thblok, van, tot });
+        kantoorMsg = '✓ ' + T('th.geblokt', 'Periode geblokkeerd in de kalender.');
+        thuisData = null; renderStation(); } catch(e){ toast(e.message); }
+    }));
+    const thZ = el.querySelector('#thZet'); if (thZ) thZ.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/thuis/huis', { huis: {
+          titel: el.querySelector('#thTitel').value, plaats: el.querySelector('#thPlaats').value,
+          type: el.querySelector('#thType').value, prijs: Number(el.querySelector('#thPrijs').value),
+          maxGasten: Number(el.querySelector('#thGasten').value),
+          instant: el.querySelector('#thInstant').checked, keyless: el.querySelector('#thKeyless').checked,
+          visual: Math.floor(Math.random() * 8) } });
+        kantoorMsg = '✓ ' + T('th.livegezet', 'Het huis staat live op RTG Thuis, onder de zaaknaam.');
+        thuisData = null; renderStation();
+      } catch(e){ toast(e.message); }
+    });
     const ktInvite = el.querySelector('#ktInvite'); if (ktInvite) ktInvite.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/staff/invite', { name: el.querySelector('#ktName').value.trim(), func: el.querySelector('#ktFunc').value.trim(), role: el.querySelector('#ktRole').value });

@@ -75,6 +75,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/tools')(kern);
   require('./supplier/keuken')(kern);
   require('./supplier/verblijf')(kern);
+  require('./supplier/thuis')(kern);
   require('./supplier/gast')(kern);
   require('./supplier/pda')(kern);
   require('./supplier/bezorg')(kern);

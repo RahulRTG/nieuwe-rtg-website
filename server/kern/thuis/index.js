@@ -12,7 +12,7 @@
    Orkestrator: de stores en gedeelde helpers; het aanbod (host) in
    ./aanbod, zoeken/boeken in ./boeken, reviews/wenslijst/berichten/bord
    in ./extra. */
-module.exports = ({ db, save, crypto, schoon, reiswijzer, landVind }) => {
+module.exports = ({ db, save, crypto, schoon, reiswijzer, landVind, findSupplier }) => {
   const nu = () => new Date().toISOString();
   const d = () => db.data;
   const huizen = () => { if (!d().thuisHuizen || typeof d().thuisHuizen !== 'object') d().thuisHuizen = {}; return d().thuisHuizen; };
@@ -55,8 +55,17 @@ module.exports = ({ db, save, crypto, schoon, reiswijzer, landVind }) => {
   }
   const magBeheren = (h, codenaam) => !!h && (h.host === codenaam || (h.coHosts || []).includes(codenaam));
 
+  /* De host kan een lid zijn (codenaam) OF een zaak (vlag 'zaak:CODE') --
+     hosts horen bij de leveranciers. Gasten zien dan de zaaknaam. */
+  function hostNaam(id) {
+    const s = String(id || '');
+    if (!s.startsWith('zaak:')) return s;
+    const z = findSupplier && findSupplier(s.slice(5));
+    return (z && z.name) || 'RTG-zaak';
+  }
+
   const ctx = { db, save, crypto, schoon, reiswijzer, landVind, nu, d, huizen, boekingen, reviews, wensen,
-    TYPES, VOORZIENINGEN, ANNULERING, geldigeDatum, nachten, raakt, vrij, ratingVan, gastScore, superhost, magBeheren };
+    TYPES, VOORZIENINGEN, ANNULERING, geldigeDatum, nachten, raakt, vrij, ratingVan, gastScore, superhost, magBeheren, hostNaam };
 
   const aanbod = require('./aanbod')(ctx);
   const boekenM = require('./boeken')(ctx);

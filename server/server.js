@@ -2486,7 +2486,7 @@ const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); 
 if (regelTimer.unref) regelTimer.unref();
 /* RTG Thuis (kern/thuis): thuisverhuur van lid aan lid -- ons antwoord op
    Airbnb, met alle premium functies gratis en de Reiswijzer aan boord. */
-Object.assign(kern, require('./kern/thuis')({ db, save, crypto, schoon, reiswijzer: kern.reiswijzer, landVind: kern.landVind }));
+Object.assign(kern, require('./kern/thuis')({ db, save, crypto, schoon, reiswijzer: kern.reiswijzer, landVind: kern.landVind, findSupplier }));
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */

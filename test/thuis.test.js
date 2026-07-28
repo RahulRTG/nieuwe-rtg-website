@@ -138,6 +138,42 @@ test('wenslijst, berichten en het hostbord met inkomsten en blokkades', async ()
   assert.equal(bord.body.inkomstenTotaal, 840, 'de afgeronde finca-boeking telt als inkomsten (4 nachten x 200 + 40 schoonmaak, geen weekkorting)');
 });
 
+test('hosts horen bij de leveranciers: de zaak host onder de zaaknaam, manager beheert, staf leest', async () => {
+  const roster = await (await fetch(base + '/api/supplier/roster', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'KIKUNOI' }) })).json();
+  const man = roster.staff.find(x => x.role === 'manager');
+  const staf = roster.staff.find(x => x.role !== 'manager');
+  const sup = (pad, body, token) => fetch(base + '/api/supplier/' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {})
+  }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const manT = (await sup('login', { code: 'KIKUNOI', staffId: man.id, pin: '1234' })).body.token;
+  const stafT = (await sup('login', { code: 'KIKUNOI', staffId: staf.id, pin: '5678' })).body.token;
+
+  // de manager zet een huis van de zaak live; de staf mag dat niet
+  assert.equal((await sup('thuis/huis', { huis: { titel: 'Gastenverblijf boven de zaak', plaats: 'Ibiza', prijs: 95, maxGasten: 2, instant: true } }, stafT)).status, 403, 'alleen de manager zet huizen live');
+  const zet = await sup('thuis/huis', { huis: { titel: 'Gastenverblijf boven de zaak', plaats: 'Ibiza', land: 'Spanje', type: 'appartement', prijs: 95, maxGasten: 2, instant: false, keyless: true } }, manT);
+  assert.equal(zet.status, 200);
+  const zaakHuisId = zet.body.huis.id;
+
+  // gasten zien de ZAAKNAAM als host (nooit de vlag 'zaak:CODE')
+  const vind = await api('zoek', { plaats: 'gastenverblijf' }, gastLid.token);
+  assert.equal(vind.body.huizen.length, 1);
+  assert.ok(vind.body.huizen[0].hostZaak, 'het huis is herkenbaar als zaak-aanbod');
+  assert.ok(!/^zaak:/.test(vind.body.huizen[0].host), 'de interne vlag lekt nooit naar buiten');
+  assert.match(vind.body.huizen[0].host, /Sal de Mar|Kikunoi/i, 'de gast ziet de zaaknaam');
+
+  // een lid vraagt aan; de staf ziet het bord, de manager beslist
+  const b = await api('boek', { id: zaakHuisId, van: dag(50), tot: dag(52), gasten: 2 }, gastLid.token);
+  assert.equal(b.body.boeking.status, 'aangevraagd');
+  const bord = await sup('thuis/bord', {}, stafT);
+  assert.equal(bord.status, 200);
+  assert.equal(bord.body.aanvragen.length, 1, 'het hele team leest het bord');
+  assert.equal((await sup('thuis/beslis', { ref: b.body.boeking.ref, akkoord: true }, stafT)).status, 403, 'beslissen is voor de manager');
+  const ok = await sup('thuis/beslis', { ref: b.body.boeking.ref, akkoord: true }, manT);
+  assert.equal(ok.body.boeking.status, 'bevestigd');
+  assert.equal((await sup('thuis/prijsadvies', { id: zaakHuisId }, stafT)).status, 200, 'het prijsadvies mag het team lezen');
+});
+
 test('prijsadvies en poorten: gast (gratis app) mag kijken, niet boeken', async () => {
   const adv = await api('prijsadvies', { id: huisId }, host.token);
   assert.equal(adv.status, 200);

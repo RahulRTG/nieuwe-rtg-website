@@ -89,6 +89,7 @@
   // boekhouding: btw per genre, personeelskosten en cadeaukaarten, per land
   let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
   let zakData = null, zakBusy = false;
+  let thuisData = null, thuisBusy = false;
   // Salon-bedrijfsprofiel: volgers, aanbiedingen, polls en cijfers
   let mktData = null, mktBusy = false, mktMsg = '';
   async function laadMarketing(){
@@ -150,7 +151,9 @@
     const secs = [
       ['bo','\uD83D\uDCCA',T('kt.bo','Backoffice')],
       ['fin','\uD83D\uDCDA',T('kt.fin','Boekhouding')],
-      ['hr','\uD83D\uDC65',T('kt.hr','HR & team')]
+      ['hr','\uD83D\uDC65',T('kt.hr','HR & team')],
+      // hosts horen bij de leveranciers: elke zaak host op RTG Thuis
+      ['thuis','\u2302',T('kt.thuis','RTG Thuis')]
     ];
     if (horeca) secs.push(
       ['keuken','\uD83D\uDD25',T('kt.keuken','Keuken')],

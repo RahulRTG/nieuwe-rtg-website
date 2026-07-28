@@ -4,7 +4,7 @@
    rijen buiten het geheugen (ledenGids* uit db.js); zonder Postgres draait
    alles op db.data.memberDir zoals voorheen. De lezers merken het verschil
    niet: gidsHaal/gidsZoekCodenaam/keyVanCodenaam blijven hetzelfde. */
-module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsExact, ledenGidsZoek, ledenGidsAantal }) => {
+module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal }) => {
   // de demo-persona's die bij het opstarten in de gids komen; geen echte leden
   const GIDS_SEED_TIERS = ['rtg', 'lifestyle', 'business'];
 
@@ -94,5 +94,21 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
     return treffers.length ? { key: treffers[0].key, tier: treffers[0].tier, codename: treffers[0].codename } : null;
   }
 
-  return { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam };
+  /* Een lid uit de gids halen bij het recht op vergetelheid (AVG art. 17).
+     De gids is de laatste plek waar de sleutel aan de codenaam vastzit; blijft
+     hij staan, dan is een verwijderd lid nog steeds op codenaam te vinden en is
+     "verwijderd" een halve waarheid. Dekt allebei de opslagvormen, want anders
+     werkt het lokaal wel en op productie (Postgres) niet -- precies het soort
+     verschil dat je pas ontdekt als iemand erover klaagt. */
+  function gidsWeg(key) {
+    if (!key) return;
+    if (ledenGidsActief()) { if (ledenGidsWeg) ledenGidsWeg(key).catch(() => {}); return; }
+    if (db.data.memberDir && db.data.memberDir[key]) {
+      delete db.data.memberDir[key];
+      if (ledenAantalCache != null && ledenAantalCache > 0) ledenAantalCache--;
+      save();
+    }
+  }
+
+  return { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam, gidsWeg };
 };

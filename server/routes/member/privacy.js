@@ -7,7 +7,7 @@ const inzagelog = require('../../inzagelog');
 
 module.exports = (kern) => {
   const { app, auth, db, save, stateFor, myApplications, ordersVanKlant, accounts,
-    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync } = kern;
+    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg } = kern;
 
   app.post('/api/privacy/export', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -72,6 +72,12 @@ module.exports = (kern) => {
     }
     // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
     if (db.data.notifications[key]) db.data.notifications[key] = [];
+    /* Uit de ledengids. Dit is de laatste plek waar de sleutel aan de codenaam
+       vastzit; bleef hij staan, dan was het lid na "verwijderen" nog gewoon op
+       codenaam te vinden en te bellen -- en dan is verwijderd een halve
+       waarheid. test/vergeten.test.js veegt na afloop door de hele database om
+       te controleren dat er geen enkele tak meer overblijft. */
+    if (typeof gidsWeg === 'function') gidsWeg(key);
     // echt account: verwijder het account zelf, inclusief documentupload
     if (req.session.account) {
       const doc = accounts.deleteUser(req.session.account.id);

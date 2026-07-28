@@ -2233,6 +2233,9 @@ Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropi
 // De Stadsraad: per stad een invloedrijke partner die in het gezamenlijke
 // foundation-kantoor mee beslist over de lab-uitslagen
 Object.assign(kern, require('./kern/stadsraad')({ db, save, crypto }));
+/* RTG Payroll (kern/payroll.js): het loonkantoor draait op wat het platform
+   al weet -- de klok, de rollen en de fiscale landtabellen. */
+Object.assign(kern, require('./kern/payroll')({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, findSupplier }));
 Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));
 /* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
    werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun
@@ -2805,6 +2808,7 @@ require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);
 require('./routes/werkmail')(kern);
+require('./routes/payroll')(kern);
 require('./routes/huis')(kern);
 require('./routes/muziek')(kern);
 require('./routes/muziek-samen')(kern);

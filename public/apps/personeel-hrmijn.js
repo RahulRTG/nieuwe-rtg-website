@@ -54,12 +54,48 @@
 
   function laad() { api('/supplier/hr/mijn').then(function (d) { if (d && d.ok) teken(d); }).catch(function () {}); }
 
+  /* Loon & kansen (RTG Payroll): de eigen loonstroken, en de "open voor
+     werk"-schakelaar -- staat hij aan, dan suggereert de matchlaag bedrijven
+     die bij je passen; staat hij uit, dan ben je voor werkgevers onvindbaar. */
+  function tekenLoon(stroken, kans) {
+    var w = document.getElementById('hulpWrap');
+    if (!w) return;
+    var el = document.getElementById('pdLoon');
+    if (!el) { el = document.createElement('div'); el.id = 'pdLoon'; w.parentNode.insertBefore(el, w.nextSibling); }
+    var h = '<div style="' + kaartStijl + '"><div style="' + kopStijl + '">Mijn loon & kansen (RTG Payroll)</div>';
+    h += (stroken || []).slice(0, 3).map(function (s) {
+      return '<div style="margin-top:0.45rem;font-size:0.8rem;"><b>' + esc(s.periode) + '</b> · netto € ' + s.regel.netto.toFixed(2).replace('.', ',') +
+        ' <span style="' + subStijl + '">' + s.regel.uren + ' u · bruto € ' + s.regel.bruto.toFixed(2).replace('.', ',') + ' · ' + esc(s.status) + '</span></div>';
+    }).join('') || '<div style="' + subStijl + 'margin-top:0.3rem;">Nog geen loonstrook; die verschijnt hier na de eerste loonrun.</div>';
+    h += '<button id="pdLoonOpen" style="display:block;width:100%;text-align:left;margin-top:0.55rem;padding:0.5rem 0.7rem;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,0.1));background:none;color:inherit;font:inherit;font-size:0.78rem;cursor:pointer;">' +
+      (kans.open ? '✓ Ik sta open voor werk -- tik om dit uit te zetten' : '○ Zet "open voor werk" aan: passende bedrijven vinden jou') + '</button>';
+    if (kans.open) {
+      h += (kans.kansen || []).slice(0, 4).map(function (k) {
+        return '<div style="margin-top:0.4rem;font-size:0.78rem;"><b>' + esc(k.bedrijf) + '</b> -- ' + esc(k.func) +
+          ' <span style="' + subStijl + '">' + esc(k.plaats || '') + ' · ' + esc(k.soort || '') + '</span></div>';
+      }).join('') || '<div style="' + subStijl + 'margin-top:0.35rem;">Nog geen passende vacature; zodra er een is, staat hij hier.</div>';
+    } else {
+      h += '<div style="' + subStijl + 'margin-top:0.35rem;">Staat de schakelaar uit, dan ben je voor werkgevers onvindbaar.</div>';
+    }
+    el.innerHTML = h + '</div>';
+  }
+  function laadLoon() {
+    Promise.all([api('/supplier/payroll/stroken'), api('/supplier/payroll/kansen')])
+      .then(function (r) { tekenLoon(r[0].stroken, r[1]); }).catch(function () {});
+  }
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('#pdLoonOpen')) return;
+    api('/supplier/payroll/kansen').then(function (k) {
+      return api('/supplier/payroll/openvoorwerk', { aan: !k.open });
+    }).then(laadLoon).catch(function () {});
+  });
+
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-pdhrvink]');
     if (!b) return;
     api('/supplier/hr/inwerk/vink', { trajectId: b.dataset.pdhrvink, stapId: b.dataset.stap }).then(laad).catch(function () {});
   });
-  document.addEventListener('DOMContentLoaded', function () { setTimeout(laad, 1500); setTimeout(laad, 6000); });
+  document.addEventListener('DOMContentLoaded', function () { setTimeout(laad, 1500); setTimeout(laad, 6000); setTimeout(laadLoon, 1800); });
   // live mee met het kantoor: een hr-sync van de zaak ververst de eigen lijst
   window.addEventListener('rtgsync', function (e) { if (e.detail && e.detail.scope === 'hr') laad(); });
 })();

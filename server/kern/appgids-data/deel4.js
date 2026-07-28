@@ -102,6 +102,9 @@ module.exports = {
   '/apps/hardware-pda.html': G('De hardware-PDA: het Hardwarelab op locatie.',
     ['Bekijk ontwerpen en prototypes', 'Leg testresultaten vast', 'Meld wat de werkplaats moet weten'],
     'Een goed testverslag noemt ook wat er wél werkte.'),
+  '/apps/payroll.html': G('RTG Payroll: het loonkantoor van de RTG-kantoren, plus de matchtafel.',
+    ['Zie wie waar werkt, met het past-signaal op de weekuren', 'Draai de loonrun per zaak en periode; elke medewerker krijgt zijn loonstrook', 'Bekijk de matchtafel: vacatures met kandidaten en mensen met passende bedrijven'],
+    'Alleen wie zichzelf "open voor werk" zet, staat op de matchtafel; de rest is voor werkgevers onvindbaar.'),
   '/apps/kassa.html': G('De Kassa: een kassa-app voor elke zaak, met een modus per sector.',
     ['Kies de modus die bij de zaak past (bakker, restaurant, discotheek, sportkantine, personeelskantine, groenteboer)', 'Tik artikelen op de bon; weeg-artikelen rekenen per kilo', 'Reken af met contant, een RTG Pay-code of parkeer de bon op een tafel'],
     'Een kassamodus is een werkvorm, geen keurslijf: wissel gerust als de avond anders loopt dan de ochtend.')

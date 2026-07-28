@@ -1147,17 +1147,17 @@ function geenGast(req, res) {
   if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten.' }); return true; }
   return false;
 }
-/* Is de identiteit RTG-geverifieerd? Een gratis account mag pas reserveren
+/* Is de identiteit RTG-geverifieerd? Een GRATIS account mag pas reserveren
    (en telt pas als volwassene) nadat RTG het paspoort echt gecontroleerd
-   heeft; tot die tijd geldt de standaard "onder de 18". Betalende passen
-   zijn al met paspoort geballoteerd. */
+   heeft; tot die tijd geldt de standaard "onder de 18". De betaalde passen
+   lopen door de ballotage (aanmelden met paspoort) en houden hun bestaande
+   rechten; een anonieme demo-gast zonder account telt nooit als bekend. */
 function idGeverifieerd(sess) {
   if (!sess) return false;
-  if (sess.account) {
-    const u = accounts.getUserById(sess.account.id);
-    return !!u && u.verified === 'verified';
-  }
-  return sess.tier !== 'guest'; // demo-persona's gelden als geverifieerd lid
+  if (sess.tier !== 'guest') return true; // pas-leden: met paspoort geballoteerd
+  if (!sess.account) return false;        // anonieme demo-gast
+  const u = accounts.getUserById(sess.account.id);
+  return !!u && u.verified === 'verified';
 }
 
 /* ---------- gedeelde vriendenlaag over RTG en RTFoundation ----------

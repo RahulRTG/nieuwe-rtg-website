@@ -97,6 +97,31 @@ function leesEnvBestand(pad) {
   if (process.env.RTG_DEMO !== '1')
     goed('Demo-inlog (universeel account) staat uit in productie; leden loggen in via hun account, personeel met pincode.');
 
+  /* De papieren kant, als ECHTE controle in plaats van een herinnering.
+
+     Hier stond eerst alleen een regel tekst: "AVG op orde: verwerkersafspraken
+     en het verwerkingsregister bijgewerkt." Dat is precies het soort
+     proces-schijnvertoning waar niemand iets aan heeft -- een zin die je leest
+     en waar niets van afhangt. Nu leest de keuring de documenten echt en kijkt
+     of de plekken die alleen RTG kan invullen ook zijn ingevuld.
+
+     Wat hij NIET kan: beoordelen of wat er staat juridisch klopt. Dat blijft
+     mensenwerk. Hij controleert alleen dat het bestaat en niet half af is. */
+  const wortel = path.join(__dirname, '..');
+  for (const [bestand, waarvoor] of [
+    ['VERWERKINGSREGISTER.md', 'het verwerkingsregister (AVG art. 30)'],
+    ['DATALEK.md', 'het datalek-draaiboek (72-uursklok, art. 33)']
+  ]) {
+    const pad = path.join(wortel, bestand);
+    if (!fs.existsSync(pad)) { blokkeer(bestand + ' ontbreekt: ' + waarvoor + ' is verplicht voor je live gaat.'); continue; }
+    const tekst = fs.readFileSync(pad, 'utf8');
+    const open = (tekst.match(/\[VUL IN/g) || []).length;
+    const controleer = (tekst.match(/\[(CONTROLEER|TE DOEN)/g) || []).length;
+    if (open) blokkeer(bestand + ': nog ' + open + ' plek(ken) met [VUL IN] -- ' + waarvoor + ' is niet af.');
+    else if (controleer) waarschuw(bestand + ': ' + controleer + ' punt(en) die een jurist moet nakijken voor je live gaat.');
+    else goed(bestand + ' is ingevuld (' + waarvoor + '). Laat het alsnog juridisch nakijken.');
+  }
+
   // afdrukken, blokkers eerst
   uit.sort((a, b) => (b[2] ? 1 : 0) - (a[2] ? 1 : 0));
   console.log('\n=== RTG go-live-keuring ===\n');
@@ -109,9 +134,8 @@ function leesEnvBestand(pad) {
   console.log('\nBuiten de code, op de server zelf (zie PRODUCTION.md):');
   console.log(' - TLS-terminatie (reverse proxy of load balancer) VOOR de app; trust proxy staat al aan.');
   console.log(' - Rand-DDoS: DNS achter Cloudflare of gelijkwaardig met proxy aan; de app-WAF is de tweede linie.');
-  console.log(' - Backups van server/data (en Postgres) draaien EN terugzetten is echt getest.');
   console.log(' - Een onafhankelijke pentest voor de lancering; eigen tests vervangen geen vreemde ogen.');
-  console.log(' - AVG op orde: verwerkersafspraken met partners en het verwerkingsregister bijgewerkt.');
+  console.log('   (Backups: npm test -- test/herstelproef.test.js zet er echt een terug.)');
 
   console.log('');
   if (blokkers) {

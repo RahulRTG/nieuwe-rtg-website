@@ -88,6 +88,7 @@
   }
   // boekhouding: btw per genre, personeelskosten en cadeaukaarten, per land
   let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
+  let zakData = null, zakBusy = false;
   // Salon-bedrijfsprofiel: volgers, aanbiedingen, polls en cijfers
   let mktData = null, mktBusy = false, mktMsg = '';
   async function laadMarketing(){

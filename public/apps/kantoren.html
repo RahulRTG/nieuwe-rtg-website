@@ -647,6 +647,9 @@
     <h3 class="sec">Instellingen: spaarrente en rood-staan-ruimte</h3>
     <div class="kaart" id="bankInstel"></div>
 
+    <h3 class="sec">De Regelwacht: belastingen en regels, automatisch bij</h3>
+    <div class="kaart" id="bankRegels"><div class="leeg">Laden…</div></div>
+
     <h3 class="sec">Openstaande kredietaanvragen (een mens beslist)</h3>
     <div class="kaart lijst" id="bankKrediet"><div class="leeg">Geen aanvragen.</div></div>
 
@@ -1932,8 +1935,8 @@ async function openBank(){
 }
 async function bankVervers(){
   try {
-    const [o, k] = await Promise.all([api('bank'), api('bank/krediet')]);
-    bankRenderKnop(o.regie); bankRenderGezond(o.gezondheid); bankRenderInstel(o.regie);
+    const [o, k, rg] = await Promise.all([api('bank'), api('bank/krediet'), api('bank/regels')]);
+    bankRenderKnop(o.regie); bankRenderGezond(o.gezondheid); bankRenderInstel(o.regie); bankRenderRegels(rg);
     bankRenderKrediet(k.aanvragen); bankRenderSalaris(o.rekeningen); bankRenderRekOpen(); bankRenderRek(o.rekeningen);
   } catch (e) { meld(e.message); }
 }
@@ -1998,6 +2001,38 @@ function bankRenderInstel(r){
     '<button class="knop stil" id="bankInstelZet" type="button">Bewaar</button></div>';
   $('#bankInstelZet').addEventListener('click', async () => {
     try { await api('bank/instellingen', { spaarrenteBp: Math.round(Number($('#bankRente').value) * 100), roodLimietEuro: Number($('#bankRood').value) }); meld('Instellingen bewaard.'); bankVervers(); } catch (e) { meld(e.message); }
+  });
+}
+/* De Regelwacht: de belasting- en regeltabellen waarmee het hele systeem
+   rekent (btw, loonrun, zzp, minimumloon). Updates uit de gekoppelde bron of
+   het kantoor gaan in place op de gedeelde tabel: elke rekenplek rekent per
+   direct met de nieuwe regels. */
+function bankRenderRegels(s){
+  const rijen = (s.landen || []).map(l =>
+    '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.35rem 0;' + bkLijn + 'font-size:.82rem;">' +
+    '<strong style="min-width:9rem;">' + esc(l.naam) + ' (' + esc(l.code) + ')' + (l.bijgewerkt ? ' <span style="color:var(--gold);font-size:.7rem;">· bijgewerkt</span>' : '') + '</strong>' +
+    '<span style="color:var(--soft);">btw ' + l.standaardBtw + '% · minimumloon € ' + l.uurloonMin + '/u · lasten ' + Math.round(l.lasten * 100) + '% · vakantiegeld ' + Math.round(l.vakantiegeld * 100) + '%</span></div>').join('');
+  $('#bankRegels').innerHTML =
+    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Basis: ingebouwd peiljaar <strong>' + esc(String(s.peiljaar)) + '</strong>' +
+      (s.versie ? ' · bronversie <strong>' + esc(String(s.versie)) + '</strong>' : '') +
+      (s.laatsteCheck ? ' · laatste controle ' + esc(new Date(s.laatsteCheck).toLocaleString('nl-NL')) : '') +
+      (s.checkUitslag ? '<br>' + esc(s.checkUitslag) : '') + '</p>' + rijen +
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">' +
+      '<span><label for="rwLand" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Land</label><select id="rwLand">' + (s.landen || []).map(l => '<option value="' + esc(l.code) + '">' + esc(l.naam) + '</option>').join('') + '</select></span>' +
+      '<span><label for="rwVeld" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Regel</label><select id="rwVeld"><option value="uurloonMin">Minimumloon (€/u)</option><option value="lasten">Werkgeverslasten (0-0,6)</option><option value="vakantiegeld">Vakantiegeld (0-0,25)</option><option value="alcoholLeeftijd">Alcoholleeftijd</option></select></span>' +
+      '<span><label for="rwWaarde" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe waarde</label><input id="rwWaarde" type="number" step="0.01" style="width:7rem;"></span>' +
+      '<button class="knop stil" id="rwZet" type="button">Voer door</button>' +
+      '<button class="knop stil" id="rwCheck" type="button" style="margin-left:auto;">Controleer de bron nu</button></div>';
+  $('#rwZet').addEventListener('click', async () => {
+    try {
+      const d = await api('bank/regels/update', { landen: { [$('#rwLand').value]: { [$('#rwVeld').value]: Number($('#rwWaarde').value) } } });
+      meld(d.landen ? 'Doorgevoerd -- het hele systeem rekent per direct met de nieuwe regel.' : 'Niets gewijzigd (zelfde of ongeldige waarde).');
+      bankVervers();
+    } catch (e) { meld(e.message); }
+  });
+  $('#rwCheck').addEventListener('click', async () => {
+    try { const d = await api('bank/regels/check'); meld(d.ok ? (d.bron ? 'Bron gecontroleerd: ' + (d.bijgewerkt || 0) + ' land(en) bijgewerkt.' : 'Geen externe bron gekoppeld; het peiljaar plus doorgevoerde updates geldt.') : d.fout); bankVervers(); }
+    catch (e) { meld(e.message); }
   });
 }
 function bankRenderKrediet(rij){

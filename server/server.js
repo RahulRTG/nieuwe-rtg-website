@@ -2473,6 +2473,13 @@ Object.assign(kern, bankregie);
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
 Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic }));
+/* De Regelwacht (kern/fiscaal/regelwacht.js): belastingen en regels worden
+   automatisch bijgewerkt -- een gevalideerde overlay op de gedeelde
+   LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
+Object.assign(kern, require('./kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR }));
+kern.regelwacht.herstelOverlay();
+const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
+if (regelTimer.unref) regelTimer.unref();
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */
@@ -2886,6 +2893,7 @@ require('./routes/sportclub')(kern);
 require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/bank')(kern);
+require('./routes/bankhart')(kern);
 require('./routes/stad')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);

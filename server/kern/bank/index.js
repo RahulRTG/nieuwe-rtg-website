@@ -88,6 +88,9 @@ module.exports = (deps) => {
   const incasso = require('./incasso')(ctx);
   const zakelijk = require('./zakelijk')(ctx);
   const advies = require('./advies')(ctx);
+  // het financiele hart leunt op de rekening-opening (auto-spaarpot bij de veeg)
+  ctx.rekeningOpen = rek.rekeningOpen;
+  const hart = require('./hart')(ctx);
 
   /* ---- afschrift: de boekingen die een rekening raken, nieuwste eerst ---- */
   function afschrift({ iban, limit = 50, offset = 0 }) {
@@ -121,7 +124,7 @@ module.exports = (deps) => {
   }
 
   const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand };
-  Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies);
+  Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies, hart);
 
   /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
      op de klok: alleen hele verstreken dagen) en de vervallen vaste betalingen

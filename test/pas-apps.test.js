@@ -8,7 +8,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, elevateTier } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pasapp-'));
@@ -18,8 +18,17 @@ function post(pad, body) {
   return fetch(BASE + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
 }
 async function registreer(naam, email, tier) {
-  const r = await post('/api/auth/register', { name: naam, email, phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier });
+  // zelf-registreren geeft altijd hooguit RTG; een echt Business/Lifestyle-account
+  // (dat de pas-vergrendeling per app aantoont) ontstaat pas na een menselijk
+  // akkoord. Dus: als RTG registreren en langs de office-akkoordflow optillen.
+  const regTier = (tier === 'business' || tier === 'lifestyle') ? 'rtg' : tier;
+  const r = await post('/api/auth/register', { name: naam, email, phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier: regTier });
   assert.equal(r.status, 200, 'registratie van ' + tier + ' lukt');
+  if (tier === 'business' || tier === 'lifestyle') {
+    const token = (await r.json()).token;
+    const office = (await (await post('/api/office/login', { code: 'RTG-OFFICE' })).json()).token;
+    await elevateTier(BASE, token, tier, office);
+  }
 }
 
 test.before(async () => {

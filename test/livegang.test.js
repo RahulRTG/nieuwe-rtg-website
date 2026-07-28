@@ -26,7 +26,10 @@ test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: {
     NODE_ENV: 'production', RTG_DATA_DIR: TMP, SMTP_URL: '',
     RTG_ENC_KEY: 'k'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
-    OFFICE_CODE: 'GEHEIME-CODE-123'
+    OFFICE_CODE: 'GEHEIME-CODE-123',
+    // sinds de sleutel-hardening (config fail-fast) eist een productiestart de
+    // gedeelde kluis- en tokensleutel; zonder deze weigert de server te starten.
+    RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64)
   } }));
 });
 test.after(() => {

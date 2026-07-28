@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, elevateTier } = require('./helper');
 
 const OWNER = 'boardroom-owner@x.nl';
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
@@ -30,11 +30,14 @@ test.before(async () => {
   // en wachtwoord DEMO_PASS (standaard 'Imran'); daarmee loggen we in.
   const li = await api(base, '/api/techniek/inloggen', { login: OWNER, wachtwoord: 'Imran' });
   owner = li.body.token;
-  // een gewoon lid (geen eigenaar, geen land) voor de toegangs- en per-pas-tests
+  // een gewoon lid (geen eigenaar, geen land) voor de toegangs- en per-pas-tests.
+  // Zelf-registreren geeft altijd RTG; de per-pas-test (8) heeft een echt
+  // Business-lid nodig, dus tillen we het op langs de menselijke akkoord-flow.
   lidEmail = 'g' + u + '@x.nl';
   const reg = await api(base, '/api/auth/register', { name: 'Gewoon Lid', email: lidEmail,
-    phone: '067' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    phone: '067' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   lidToken = reg.body.token;
+  await elevateTier(base, lidToken, 'business', owner);
   // een lid met land ES voor de per-land-test
   const regEs = await api(base, '/api/auth/register', { name: 'Lid Spanje', email: 'es' + u + '@x.nl',
     phone: '068' + u, password: 'geheim123', geboortedatum: '1990-01-01', land: 'ES', tier: 'business', pasApp: 'business' });

@@ -101,14 +101,19 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('de go-live-keuring keurt af zonder geheimen en goed met de complete set', () => {
+test('de go-live-keuring keurt af zonder geheimen, en met alle geheimen blijft het AVG-papierwerk de laatste poort', () => {
   const script = path.join(__dirname, '..', 'scripts', 'golive.js');
   const kaal = spawnSync(process.execPath, [script], {
     env: { PATH: process.env.PATH }, timeout: 20000, encoding: 'utf8'
   });
   assert.equal(kaal.status, 1, 'kale omgeving: niet klaar om live te gaan');
   assert.match(kaal.stdout, /NIET klaar/);
+  // Met een complete secrets-/configset is de techniek in orde, maar de keuring
+  // leest sinds de AVG-ronde ook het verwerkingsregister en het datalek-draaiboek
+  // en blokkeert zolang daar [VUL IN]-velden openstaan die alleen RTG kan invullen.
+  // Dat is de bedoeling: zonder ingevuld papierwerk ga je niet live.
   const goed = spawnSync(process.execPath, [script], { env: PROD_ENV, timeout: 20000, encoding: 'utf8' });
-  assert.equal(goed.status, 0, 'complete omgeving: klaar om live te gaan');
-  assert.match(goed.stdout, /Klaar om live te gaan/);
+  assert.match(goed.stdout, /Configuratie: geen blokkerende fouten/, 'de configuratie zelf is in orde');
+  assert.equal(goed.status, 1, 'maar het AVG-papierwerk is de laatste, bewuste poort');
+  assert.match(goed.stdout, /\[VUL IN\]/, 'de blokkade wijst naar de nog in te vullen AVG-documenten');
 });

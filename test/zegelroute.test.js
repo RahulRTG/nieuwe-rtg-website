@@ -6,7 +6,7 @@
    Draai los: node --experimental-sqlite --test test/zegelroute.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, elevateTier } = require('./helper');
 const { controleer } = require('../server/lib/zegel');
 const fs = require('fs');
 const os = require('os');
@@ -21,10 +21,20 @@ async function api(base, pad, body, token) {
 }
 async function registreer(base, extra) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  return (await api(base, '/api/auth/register', Object.assign({
+  // zelf-registreren geeft altijd RTG; een echt Business-lid (dat de pas-claim
+  // 'business' in het zegel oplevert) ontstaat pas na een menselijk akkoord.
+  // Dus: als RTG registreren en langs de office-akkoordflow optillen.
+  const gewenst = (extra && extra.tier) || 'business';
+  const body = Object.assign({
     name: 'Zegel Lid', email: u + '@x.nl', phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
-  }, extra))).body.token;
+    password: 'geheim123', geboortedatum: '1990-01-01'
+  }, extra, { tier: 'rtg', pasApp: 'rtg' });
+  const token = (await api(base, '/api/auth/register', body)).body.token;
+  if (gewenst === 'business' || gewenst === 'lifestyle') {
+    const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    await elevateTier(base, token, gewenst, office);
+  }
+  return token;
 }
 
 test('1. lid maakt zegel, partner verifieert offline; geen ruwe gegevens', async () => {

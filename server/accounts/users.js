@@ -73,6 +73,20 @@ function renameUser(id, { username, realName, email }) {
   return getUserById(id);
 }
 
+/* De pas van een account wijzigen. Dit is de ENIGE manier waarop een account op
+   Lifestyle of Business terechtkomt: zelf-registreren levert altijd hooguit RTG
+   (zie routes/auth/account.js), en de merkregel eist een menselijk besluit voor
+   de betaalde passen. Daarom wordt dit uitsluitend aangeroepen vanuit de
+   goedkeuringsflow (kern/aanmeldingen.js beslis), nooit vanuit een client. */
+function setTier(id, tier) {
+  if (!['rtg', 'lifestyle', 'business', 'guest'].includes(tier)) return null;
+  const u = getUserById(id);
+  if (!u) return null;
+  S.db.prepare('UPDATE users SET tier = ? WHERE id = ?').run(tier, id);
+  mirror.markUser(id);
+  return getUserById(id);
+}
+
 /* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
    setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
 function setPasswordSync(userId, password) {
@@ -175,7 +189,7 @@ function deleteUser(id) {
 
 module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
-  renameUser, realNameOf, emailOf, phoneOf,
+  renameUser, setTier, realNameOf, emailOf, phoneOf,
   issueToken, verifyToken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser

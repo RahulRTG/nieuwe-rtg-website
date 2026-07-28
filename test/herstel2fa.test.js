@@ -8,7 +8,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, elevateTier } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-2fa-'));
@@ -24,8 +24,12 @@ const tokenUit = (url) => new URL(url).searchParams.get('reset');
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  await post('/api/auth/register', { name: 'Vera Vergeet', email: 'vera@x.nl', phone: '0612345678',
-    password: 'oudgeheim', geboortedatum: '1990-01-01', tier: 'lifestyle' });
+  // zelf-registreren geeft altijd RTG; Vera hoort op de Lifestyle Pass (zodat de
+  // herstel-link in háár pas-app landt), dus registreren als RTG en optillen.
+  const vera = await json(await post('/api/auth/register', { name: 'Vera Vergeet', email: 'vera@x.nl', phone: '0612345678',
+    password: 'oudgeheim', geboortedatum: '1990-01-01', tier: 'rtg' }));
+  const office = (await json(await post('/api/office/login', { code: 'RTG-OFFICE' }))).token;
+  await elevateTier(BASE, vera.token, 'lifestyle', office);
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -70,7 +74,11 @@ test('herstel: na vijf foute codes gaat de poging op slot', async () => {
 
 test('backoffice: wachtwoord wijzigen vereist het huidige wachtwoord', async () => {
   const reg = await json(await post('/api/auth/register', { name: 'Wim Wijzig', email: 'wim@x.nl', phone: '0612345678',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business' }));
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
+  // Wim hoort op de Business Pass (voor de business-pas-app-login onderaan): zelf
+  // registreren geeft RTG, dus tillen we hem op langs de office-akkoordflow.
+  const office = (await json(await post('/api/office/login', { code: 'RTG-OFFICE' }))).token;
+  await elevateTier(BASE, reg.token, 'business', office);
   // fout huidig wachtwoord: 403; te kort nieuw: 400
   assert.equal((await post('/api/auth/password', { huidig: 'fout', nieuw: 'nieuwgeheim' }, reg.token)).status, 403);
   assert.equal((await post('/api/auth/password', { huidig: 'geheim123', nieuw: 'kort' }, reg.token)).status, 400);

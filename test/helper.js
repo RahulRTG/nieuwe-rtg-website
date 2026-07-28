@@ -126,6 +126,24 @@ async function startEens(opts) {
 
 function stop(child) { if (child) try { child.kill('SIGKILL'); } catch (e) {} }
 
-module.exports = { vrijePoort, startServer, stop,
+/* Een lid optillen naar Lifestyle/Business langs de ENIGE geldige weg: zelf
+   registreren geeft altijd hooguit RTG, dus dienen we met het ledentoken een
+   aanvraag in (dat koppelt het account) en laten RTG-personeel die accepteren.
+   `approverToken` is een office- of eigenaars-token (beide komen door officeAuth).
+   Handig voor tests die een echt Business/Lifestyle-lid nodig hebben. */
+async function elevateTier(base, memberToken, pas, approverToken) {
+  const post = (pad, body, tok) => fetch(base + pad, {
+    method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    body: JSON.stringify(body || {}) }).then(r => r.json());
+  const aanvraag = await post('/api/aanmelding/aanvraag', { pas, naam: 'Test ' + pas, contact: pas + '@test.example' }, memberToken);
+  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+  if (!id) throw new Error('elevateTier: aanvraag mislukt (' + JSON.stringify(aanvraag).slice(0, 120) + ')');
+  const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, approverToken);
+  if (!besluit.aanmelding || besluit.aanmelding.status !== 'geaccepteerd')
+    throw new Error('elevateTier: beslis mislukt (' + JSON.stringify(besluit).slice(0, 120) + ')');
+  return besluit;
+}
+
+module.exports = { vrijePoort, startServer, stop, elevateTier,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

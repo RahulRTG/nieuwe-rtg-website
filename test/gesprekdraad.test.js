@@ -15,7 +15,7 @@
    Draai los: node --experimental-sqlite --test test/gesprekdraad.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, elevateTier } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -29,12 +29,19 @@ async function api(base, pad, body, token) {
 }
 async function registreer(base, tier) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  // zelf-registreren geeft altijd RTG; Lifestyle/Business komt na een menselijk
+  // akkoord, dus registreren als RTG en optillen langs de office-flow.
+  const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
   const r = await api(base, '/api/auth/register', {
     name: 'Draad Lid', email: u + '@x.nl',
     phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: tier, pasApp: tier
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: regTier, pasApp: regTier
   });
   assert.equal(r.status, 200, 'registreren met pas ' + tier);
+  if (tier === 'lifestyle' || tier === 'business') {
+    const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    await elevateTier(base, r.body.token, tier, office);
+  }
   return r.body.token;
 }
 

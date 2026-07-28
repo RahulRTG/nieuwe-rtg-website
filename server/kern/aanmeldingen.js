@@ -82,6 +82,7 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
     return { id: a.id, pas: a.pas, pasNaam: (PASSEN[a.pas] || {}).naam || a.pas,
       naam: a.naam, contact: a.contact, status: a.status,
       reis: a.reis, welkom: a.welkom, viaUitnodiging: !!a.viaUitnodiging,
+      gekoppeld: !!a.accountId,  // account gekoppeld? dan tilt een akkoord het op
       bedrijf: a.bedrijf || null, gezaakt: a.gezaakt || null,
       besluit: a.besluit || null, at: a.at, bijgewerkt: a.bijgewerkt };
   }
@@ -91,7 +92,7 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
      komt op 'in behandeling': klaar voor de menselijke ja of nee. Voor Lifestyle
      en Business wordt NOOIT toegang beloofd of gezet -- de reis is voorbereiding,
      geen toelating. */
-  function aanvraag(b) {
+  function aanvraag(b, aanvragerId) {
     b = b || {};
     const pas = String(b.pas || '');
     const def = PASSEN[pas];
@@ -100,10 +101,14 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
     if (naam.length < 2) return { status: 400, error: 'Vul de naam van de aanvrager in.' };
     const contact = kap(b.contact, 120);
     const viaUitnodiging = !!b.viaUitnodiging;
+    // Was de aanvrager ingelogd, dan koppelen we zijn account (zodat een akkoord
+    // dat kan optillen). Het id komt UITSLUITEND uit het geverifieerde token via
+    // de route, nooit uit de body -- anders tilde je andermans account op.
+    const accountId = (aanvragerId && accounts && accounts.getUserById(aanvragerId)) ? aanvragerId : null;
     // De poort van het merk: Lifestyle/Business alleen na menselijke goedkeuring
     // of op uitnodiging. De aanvraag zelf mag altijd binnenkomen (de AI belooft
     // niets); alleen beslis() door een mens kent hem later toe.
-    const a = { id: rid(), pas, naam, contact, viaUitnodiging,
+    const a = { id: rid(), pas, naam, contact, viaUitnodiging, accountId,
       welkom: def.welkom, reis: bouwReis(def.stem),
       status: 'in behandeling', besluit: null, at: nu(), bijgewerkt: nu() };
     // de ondernemersintake: de AI vraagt bij het gesprek al wat het bedrijf
@@ -137,8 +142,17 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
     a.status = besluit;
     a.besluit = { besluit, door: wie, notitie: kap(notitie, 300), at: nu() };
     a.bijgewerkt = nu();
-    // na een akkoord loopt de betaling automatisch: 12 maanden, met de 30%-split
-    if (besluit === 'geaccepteerd') startBetalingen(a);
+    if (besluit === 'geaccepteerd') {
+      // na een akkoord loopt de betaling automatisch: 12 maanden, met de 30%-split
+      startBetalingen(a);
+      // De poort van het merk: een Lifestyle-/Business Pass ontstaat hier, door dit
+      // menselijke besluit, en nergens anders (zelf-registreren geeft ze niet).
+      // Is er een account gekoppeld, dan tillen we het nu op via setTier.
+      if ((a.pas === 'lifestyle' || a.pas === 'business') && a.accountId && accounts && accounts.setTier) {
+        const opgetild = accounts.setTier(a.accountId, a.pas);
+        a.besluit.optillen = opgetild ? { naar: a.pas } : { mislukt: true };
+      }
+    }
     save();
     return { ok: true, aanmelding: beeld(a), betaalschema: besluit === 'geaccepteerd' };
   }

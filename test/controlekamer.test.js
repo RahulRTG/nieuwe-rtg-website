@@ -10,7 +10,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, elevateTier } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ck-'));
@@ -28,11 +28,14 @@ test.before(async () => {
   const rtg = await json(await api('/api/auth/register', { name: 'RTG Lid', email: 'rtg@x.nl', phone: '0612345700',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }));
   rtgToken = rtg.token;
+  // zelf-registreren geeft altijd RTG; een echt Business-lid ontstaat pas na een
+  // menselijk akkoord. We registreren dus als RTG en tillen op via de eigenaar.
   const biz = await json(await api('/api/auth/register', { name: 'Zaak Lid', email: 'biz@x.nl', phone: '0612345701',
-    password: 'geheim123', geboortedatum: '1985-01-01', tier: 'business', pasApp: 'business' }));
+    password: 'geheim123', geboortedatum: '1985-01-01', tier: 'rtg', pasApp: 'rtg' }));
   bizToken = biz.token;
   techToken = (await json(await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' }))).token;
   assert.ok(techToken, 'de eigenaar komt op de technische pagina');
+  await elevateTier(BASE, bizToken, 'business', techToken);
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

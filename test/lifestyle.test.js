@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, elevateTier } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lifestyle-'));
@@ -34,7 +34,11 @@ test.after(() => {
 let teller = 0;
 async function lidMet(tier) {
   const t = Date.now() + '' + (teller++);
-  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'l' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1980-05-05', tier }));
+  // zelf-registreren geeft altijd RTG; Lifestyle/Business komt na een menselijk
+  // akkoord, dus registreren als RTG en optillen langs de office-flow.
+  const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
+  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'l' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1980-05-05', tier: regTier }));
+  if (tier === 'lifestyle' || tier === 'business') await elevateTier(BASE, r.token, tier, await officeTok());
   return r.token;
 }
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);

@@ -8,7 +8,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, elevateTier } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zakelijk-'));
@@ -23,11 +23,18 @@ const json = r => r.json();
 
 // registreer een echt account met een eigen sessie (elke pas zijn eigen sleutel)
 async function lid(naam, email, tier) {
+  // zelf-registreren geeft altijd RTG; Lifestyle/Business komt na een menselijk
+  // akkoord, dus registreren als RTG en optillen langs de office-akkoordflow.
+  const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
   const d = await json(await post('/api/auth/register', {
     name: naam, email, phone: '0612345678', password: 'geheim123',
-    geboortedatum: '1990-01-01', tier
+    geboortedatum: '1990-01-01', tier: regTier
   }));
   assert.ok(d.token, 'registratie geeft een sessietoken');
+  if (tier === 'lifestyle' || tier === 'business') {
+    const office = (await json(await post('/api/office/login', { code: 'RTG-OFFICE' }))).token;
+    await elevateTier(BASE, d.token, tier, office);
+  }
   return { token: d.token, codename: d.state.user.codename };
 }
 

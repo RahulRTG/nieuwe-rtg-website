@@ -101,5 +101,8 @@ module.exports = {
     'Een goede melding heeft een foto en een plek; dan kan de buitendienst er direct mee aan de slag.'),
   '/apps/hardware-pda.html': G('De hardware-PDA: het Hardwarelab op locatie.',
     ['Bekijk ontwerpen en prototypes', 'Leg testresultaten vast', 'Meld wat de werkplaats moet weten'],
-    'Een goed testverslag noemt ook wat er wél werkte.')
+    'Een goed testverslag noemt ook wat er wél werkte.'),
+  '/apps/kassa.html': G('De Kassa: een kassa-app voor elke zaak, met een modus per sector.',
+    ['Kies de modus die bij de zaak past (bakker, restaurant, discotheek, sportkantine, personeelskantine, groenteboer)', 'Tik artikelen op de bon; weeg-artikelen rekenen per kilo', 'Reken af met contant, een RTG Pay-code of parkeer de bon op een tafel'],
+    'Een kassamodus is een werkvorm, geen keurslijf: wissel gerust als de avond anders loopt dan de ochtend.')
 };

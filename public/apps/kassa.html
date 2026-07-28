@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>De Kassa · RTG</title>
+<link rel="icon" href="/icons/rtg.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;--muted:rgba(244,241,236,0.68);--soft:rgba(244,241,236,0.55);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.15rem;}
+  header{padding:.8rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+  header .ey{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  .pil{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.2rem .6rem;color:var(--muted);}
+  #modusKnop{margin-left:auto;}
+  main{flex:1;display:grid;grid-template-columns:1.4fr 1fr;gap:.8rem;padding:.8rem;max-width:1100px;width:100%;margin:0 auto;}
+  @media (max-width:700px){ main{grid-template-columns:1fr;} }
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.8rem;}
+  .sec{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.2rem,1fr));gap:.5rem;}
+  .art{background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--txt);font:inherit;padding:.7rem .5rem;cursor:pointer;text-align:center;min-height:4.4rem;display:flex;flex-direction:column;justify-content:center;gap:.15rem;}
+  .art b{font-size:.86rem;line-height:1.25;}
+  .art span{font-size:.74rem;color:var(--soft);}
+  .art:active{border-color:var(--gold);}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .95rem;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop[disabled]{opacity:.4;cursor:default;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  .regel{display:flex;gap:.5rem;align-items:center;border-bottom:1px solid var(--line);padding:.4rem 0;font-size:.86rem;}
+  .regel .min{margin-left:auto;}
+  .tot{display:flex;justify-content:space-between;font-size:1.05rem;margin:.6rem 0;font-weight:600;}
+  .rij{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;}
+  .leeg{color:var(--muted);font-size:.84rem;padding:.4rem 0;}
+  .band{border:1px solid var(--burgundy);border-radius:10px;color:var(--burgundy);font-size:.76rem;padding:.4rem .6rem;margin-bottom:.5rem;}
+  dialog{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:16px;padding:1rem;max-width:20rem;width:92vw;margin:auto;}
+  dialog::backdrop{background:rgba(0,0,0,.6);}
+  .hint{font-size:.74rem;color:var(--soft);line-height:1.5;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="ey">RTG · werkplek</div><h1>De Kassa</h1></div>
+  <span class="pil" id="zaakNaam">...</span>
+  <span class="pil" id="modusNaam">...</span>
+  <button class="knop stil" id="modusKnop">Modus wisselen</button>
+</header>
+<main>
+  <section class="kaart">
+    <div class="band" id="leeftijdBand" hidden>18+: controleer de leeftijd met het Zegel voor u alcohol aanslaat.</div>
+    <div class="sec" id="artKop">Artikelen</div>
+    <div class="grid" id="artGrid"><div class="leeg">Laden...</div></div>
+    <div class="sec" style="margin-top:.8rem;">Eigen artikel (werkgever)</div>
+    <div class="rij">
+      <input class="veld" id="nNaam" placeholder="Naam" style="flex:2;min-width:7rem;">
+      <input class="veld" id="nPrijs" placeholder="Prijs" inputmode="decimal" style="flex:1;min-width:4.5rem;">
+      <label class="hint" style="display:flex;align-items:center;gap:.3rem;"><input type="checkbox" id="nKg">per kilo</label>
+      <button class="knop stil" id="nVoeg">Toevoegen</button>
+    </div>
+  </section>
+  <section class="kaart">
+    <div class="sec">De bon</div>
+    <div id="bon"><div class="leeg">Nog leeg; tik links een artikel aan.</div></div>
+    <div class="tot"><span>Totaal</span><span id="totaal">€ 0,00</span></div>
+    <div class="rij" id="badgeRij" hidden><input class="veld" id="badgeNaam" placeholder="Naam van de collega (interne verrekening)" style="flex:1;"></div>
+    <div class="rij" id="tafelRij" hidden><select class="veld" id="tafelKies" style="flex:1;"></select></div>
+    <div class="rij" style="margin-top:.55rem;">
+      <button class="knop" id="payContant">Contant</button>
+      <button class="knop" id="payRtg">RTG Pay-code</button>
+      <button class="knop stil" id="payTafel" hidden>Op de tafel</button>
+      <button class="knop stil" id="bonLeeg">Wis</button>
+    </div>
+    <div class="hint" id="uitkomst" style="margin-top:.55rem;"></div>
+  </section>
+</main>
+<dialog id="dlgKg">
+  <div class="sec">Gewicht</div>
+  <p class="hint" id="kgUitleg" style="margin-bottom:.5rem;"></p>
+  <div class="rij"><input class="veld" id="kgVeld" inputmode="decimal" placeholder="bv. 0,750" style="flex:1;"><span class="hint">kg</span></div>
+  <div class="rij" style="margin-top:.6rem;"><button class="knop" id="kgOk">Op de bon</button><button class="knop stil" id="kgWeg">Annuleer</button></div>
+</dialog>
+<dialog id="dlgModus">
+  <div class="sec">Kies de kassamodus</div>
+  <div id="modusLijst" style="display:flex;flex-direction:column;gap:.4rem;"></div>
+  <div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="modusDicht">Sluit</button></div>
+</dialog>
+<dialog id="dlgPay">
+  <div class="sec">RTG Pay</div>
+  <p class="hint" style="margin-bottom:.5rem;">De gast toont de betaalcode (QR of cijfers) uit de app.</p>
+  <div class="rij"><input class="veld" id="payCode" placeholder="Betaalcode" style="flex:1;" autocomplete="off"></div>
+  <div class="rij" style="margin-top:.6rem;"><button class="knop" id="payOk">Innen</button><button class="knop stil" id="payWeg">Annuleer</button></div>
+</dialog>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = n => '€ ' + Number(n).toFixed(2).replace('.', ',');
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
+if (!TOKEN) location.replace('/apps/personeel.html?terug=' + encodeURIComponent(location.pathname));
+const api = (pad, body) => fetch('/api/supplier/' + pad, { method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {}) })
+  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+let INSTEL = null;       // modus + modi + artikelen + sneltoetsen + tafels
+let BON = [];            // { naam, qty, prijs } -- prijs per regel (bij kilo al gerekend)
+let KGART = null;        // het weeg-artikel dat op het gewicht wacht
+const modus = () => (INSTEL && INSTEL.modi.find(m => m.id === INSTEL.modus)) || { naam: '...' };
+
+async function laad(zet){
+  try { INSTEL = await api('kassa/instel', zet || {}); }
+  catch (e) { $('#artGrid').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
+  const m = modus();
+  $('#zaakNaam').textContent = INSTEL.naam;
+  $('#modusNaam').textContent = m.naam;
+  $('#leeftijdBand').hidden = !m.leeftijd;
+  $('#badgeRij').hidden = !m.badge;
+  $('#tafelRij').hidden = true;
+  $('#payTafel').hidden = !m.tafels || !INSTEL.tafels.length;
+  if (m.tafels) $('#tafelKies').innerHTML = INSTEL.tafels.map(t => '<option>' + esc(t) + '</option>').join('');
+  // de knoppen: eerst het eigen kassa-assortiment, dan de sneltoetsen van
+  // de menukaart en het bezorg-assortiment (zelfde zaak, een kassa)
+  const alle = INSTEL.artikelen.map(a => ({ id: a.id, naam: a.naam, prijs: a.prijs, perKg: a.perKg, eigen: true }))
+    .concat(INSTEL.sneltoetsen.map(x => ({ id: x.id, naam: x.naam, prijs: x.prijs })));
+  $('#artKop').textContent = 'Artikelen (' + alle.length + ')' + (m.gewicht ? ' · weeg-artikelen rekenen per kilo' : '');
+  $('#artGrid').innerHTML = alle.length ? alle.map(a =>
+    '<button class="art" data-naam="' + esc(a.naam) + '" data-prijs="' + a.prijs + '"' + (a.perKg ? ' data-kg="1"' : '') + (a.eigen ? ' data-eigen="' + esc(a.id) + '"' : '') + '>' +
+    '<b>' + esc(a.naam) + '</b><span>' + eur(a.prijs) + (a.perKg ? ' / kg' : '') + '</span></button>').join('')
+    : '<div class="leeg">Nog geen artikelen. Voeg er hieronder een toe (werkgever), of vul de menukaart.</div>';
+  document.querySelectorAll('.art').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.kg) { KGART = { naam: b.dataset.naam, prijsKg: Number(b.dataset.prijs) };
+      $('#kgUitleg').textContent = KGART.naam + ' kost ' + eur(KGART.prijsKg) + ' per kilo. Typ het gewicht van de weegschaal.';
+      $('#kgVeld').value = ''; $('#dlgKg').showModal(); $('#kgVeld').focus(); return; }
+    zetOpBon(b.dataset.naam, Number(b.dataset.prijs));
+  }));
+  bonToon();
+}
+function zetOpBon(naam, prijs){
+  const zelfde = BON.find(r => r.naam === naam && r.prijs === prijs);
+  if (zelfde) zelfde.qty++; else BON.push({ naam, prijs, qty: 1 });
+  bonToon();
+}
+function bonToon(){
+  $('#bon').innerHTML = BON.length ? BON.map((r, i) =>
+    '<div class="regel"><span>' + r.qty + 'x ' + esc(r.naam) + '</span><span class="min">' + eur(r.prijs * r.qty) +
+    ' <button class="knop stil" data-min="' + i + '" style="padding:.15rem .5rem;font-size:.74rem;">-</button></span></div>').join('')
+    : '<div class="leeg">Nog leeg; tik links een artikel aan.</div>';
+  $('#totaal').textContent = eur(BON.reduce((s, r) => s + r.prijs * r.qty, 0));
+  document.querySelectorAll('[data-min]').forEach(b => b.addEventListener('click', () => {
+    const r = BON[Number(b.dataset.min)];
+    if (r) { r.qty--; if (r.qty <= 0) BON.splice(Number(b.dataset.min), 1); }
+    bonToon();
+  }));
+}
+async function rekenAf(method, extra){
+  if (!BON.length) return;
+  const total = Math.round(BON.reduce((s, r) => s + r.prijs * r.qty, 0) * 100) / 100;
+  const badge = $('#badgeNaam').value.trim();
+  try {
+    const r = await api('pos/sale', Object.assign({
+      total, method, items: BON.map(x => ({ name: x.naam, qty: x.qty, price: x.prijs })),
+      desc: 'De Kassa (' + modus().naam + ')' + (badge ? ' · ' + badge : ''),
+      codenaam: badge || undefined, idem: 'kassa-' + Date.now()
+    }, extra || {}));
+    $('#uitkomst').textContent = 'Afgerekend: ' + eur(r.sale.total) + ' (' + method + (r.betaler ? ', ' + r.betaler : '') + '), bon ' + r.sale.bon + '.';
+    BON = []; $('#badgeNaam').value = ''; bonToon();
+  } catch (e) { $('#uitkomst').textContent = e.message; }
+}
+$('#payContant').addEventListener('click', () => rekenAf('contant'));
+$('#payRtg').addEventListener('click', () => { if (BON.length) { $('#payCode').value = ''; $('#dlgPay').showModal(); $('#payCode').focus(); } });
+$('#payOk').addEventListener('click', () => { $('#dlgPay').close(); rekenAf('rtgpay', { payCode: $('#payCode').value.trim() }); });
+$('#payWeg').addEventListener('click', () => $('#dlgPay').close());
+$('#payTafel').addEventListener('click', () => {
+  if ($('#tafelRij').hidden) { $('#tafelRij').hidden = false; return; }
+  rekenAf('tafel', { room: $('#tafelKies').value });
+});
+$('#bonLeeg').addEventListener('click', () => { BON = []; bonToon(); $('#uitkomst').textContent = ''; });
+$('#kgOk').addEventListener('click', () => {
+  const kg = Number(String($('#kgVeld').value).replace(',', '.'));
+  if (!(kg > 0) || kg > 500 || !KGART) return;
+  const prijs = Math.round(KGART.prijsKg * kg * 100) / 100;
+  zetOpBon(KGART.naam + ' ' + String(kg).replace('.', ',') + ' kg', prijs);
+  KGART = null; $('#dlgKg').close();
+});
+$('#kgWeg').addEventListener('click', () => { KGART = null; $('#dlgKg').close(); });
+$('#nVoeg').addEventListener('click', async () => {
+  try {
+    await api('kassa/artikel', { naam: $('#nNaam').value.trim(), prijs: Number(String($('#nPrijs').value).replace(',', '.')), perKg: $('#nKg').checked });
+    $('#nNaam').value = ''; $('#nPrijs').value = ''; $('#nKg').checked = false;
+    laad();
+  } catch (e) { $('#uitkomst').textContent = e.message; }
+});
+$('#modusKnop').addEventListener('click', () => {
+  $('#modusLijst').innerHTML = (INSTEL ? INSTEL.modi : []).map(m =>
+    '<button class="knop stil" data-modus="' + m.id + '" style="text-align:left;"><b>' + esc(m.naam) + '</b><br><span class="hint">' + esc(m.hint) + '</span></button>').join('');
+  document.querySelectorAll('[data-modus]').forEach(b => b.addEventListener('click', async () => {
+    $('#dlgModus').close();
+    try { await laad({ modus: b.dataset.modus }); } catch (e) { $('#uitkomst').textContent = e.message; }
+  }));
+  $('#dlgModus').showModal();
+});
+$('#modusDicht').addEventListener('click', () => $('#dlgModus').close());
+laad();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

@@ -24,38 +24,43 @@
     if (!wrap || !wvPdaData) return;
     const k = wvPdaData.k, c = wvPdaData.c, t = wvPdaData.t;
     const open = k.verzoeken.filter(v => v.status === 'open');
+    /* Dezelfde bouwstenen als de rest van de PDA: .card met een .k-kopje,
+       .mbrow voor een regel met een knop rechts, .abtn voor de knop zelf.
+       Eigen klassen zouden hier als kale blokjes uitkomen. */
+    const meta = s => '<div style="font-size:0.72rem;color:var(--soft);line-height:1.45;">' + s + '</div>';
+    const leeg = s => '<div style="font-size:0.78rem;color:var(--soft);padding:0.5rem 0;">' + s + '</div>';
     let h = '';
 
-    h += '<div class="kaart"><h3>' + T('pd.wv.open','Van het andere scherm') + ' (' + open.length + ')</h3>' +
+    h += '<div class="card"><div class="k">' + T('pd.wv.open','Van het andere scherm') + ' (' + open.length + ')</div>' +
       (open.length ? open.map(v =>
-        '<div class="rij"><div><b>' + esc(v.titel) + '</b><span class="sub">' + esc(v.soortLabel) +
+        '<div class="mbrow"><div><b>' + esc(v.titel) + '</b>' + meta(esc(v.soortLabel) +
           (v.bedrag ? ' · ' + eur(v.bedrag) : '') + (v.ref ? ' · ' + esc(v.ref) : '') +
-          ' · ' + T('pd.wv.van','van') + ' ' + esc(v.door) + '</span></div>' +
-        '<div>' + (v.soort === 'betaal'
-          ? '<button class="btn" data-wvcode="' + esc(v.id) + '">' + T('pd.wv.toon','Toon de code') + '</button>'
-          : '<button class="btn" data-wvteken="' + esc(v.id) + '">' + T('pd.wv.teken','Tekenen') + '</button>') + '</div></div>'
-      ).join('') : '<div class="leeg">' + T('pd.wv.niets','Niets klaargezet op het andere scherm.') + '</div>') +
+          ' · ' + T('pd.wv.van','van') + ' ' + esc(v.door)) + '</div>' +
+        (v.soort === 'betaal'
+          ? '<button class="abtn" data-wvcode="' + esc(v.id) + '">' + T('pd.wv.toon','Toon de code') + '</button>'
+          : '<button class="abtn" data-wvteken="' + esc(v.id) + '">' + T('pd.wv.teken','Tekenen') + '</button>') + '</div>'
+      ).join('') : leeg(T('pd.wv.niets','Niets klaargezet op het andere scherm.'))) +
       '<div id="wvVak"></div></div>';
 
-    h += '<div class="kaart"><h3>' + T('pd.wv.chk','Mijn checklijsten') + '</h3>' +
+    h += '<div class="card"><div class="k">' + T('pd.wv.chk','Mijn checklijsten') + '</div>' +
       (c.lijsten.length ? c.lijsten.map(l =>
-        '<div class="rij"><div><b>' + esc(l.titel) + '</b>' + (l.event ? ' · ' + esc(l.event) : '') +
-          '<span class="sub">' + l.af + '/' + l.totaal + ' (' + l.pct + '%)</span></div></div>' +
+        '<div style="margin-top:0.6rem;"><b>' + esc(l.titel) + '</b>' + (l.event ? ' · ' + esc(l.event) : '') +
+          meta(l.af + '/' + l.totaal + ' (' + l.pct + '%)') + '</div>' +
         l.items.map(i =>
-          '<div class="rij" style="padding-left:0.8rem;"><div>' + (i.klaar ? '✓ ' : '○ ') + esc(i.tekst) +
-            (i.klaar ? '<span class="sub">' + T('pd.wv.door','door') + ' ' + esc(i.klaar.door) + '</span>' : '') + '</div>' +
-          '<button class="btn" data-wvv="' + esc(l.id) + '" data-wvi="' + esc(i.id) + '" data-wva="' + (i.klaar ? '0' : '1') + '">' +
+          '<div class="mbrow"><div>' + (i.klaar ? '✓ ' : '○ ') + esc(i.tekst) +
+            (i.klaar ? meta(T('pd.wv.door','door') + ' ' + esc(i.klaar.door)) : '') + '</div>' +
+          '<button class="abtn" data-wvv="' + esc(l.id) + '" data-wvi="' + esc(i.id) + '" data-wva="' + (i.klaar ? '0' : '1') + '">' +
             (i.klaar ? T('pd.wv.terug','Terug') : T('pd.wv.af','Af')) + '</button></div>'
         ).join('')
-      ).join('') : '<div class="leeg">' + T('pd.wv.geenchk','Er is nog geen lijst met je gedeeld.') + '</div>') + '</div>';
+      ).join('') : leeg(T('pd.wv.geenchk','Er is nog geen lijst met je gedeeld.'))) + '</div>';
 
-    h += '<div class="kaart"><h3>' + T('pd.wv.tafels','Tafels: wensen aan tafel invullen') + '</h3>' +
+    h += '<div class="card"><div class="k">' + T('pd.wv.tafels','Tafels: wensen aan tafel invullen') + '</div>' +
       (t.tafels.length ? t.tafels.map(x =>
-        '<div class="rij"><div><b>' + T('pd.wv.tafel','Tafel') + ' ' + esc(x.tafel) + '</b>' + (x.event ? ' · ' + esc(x.event) : '') +
-          '<span class="sub">' + x.aantalGasten + ' ' + T('pd.wv.pers','personen') +
-          (x.allergenenTotaal ? ' · ' + x.allergenenTotaal + ' ' + T('pd.wv.all','allergieen') : '') + '</span></div>' +
-        '<button class="btn" data-wvt="' + esc(x.id) + '">' + T('pd.wv.invul','Invullen') + '</button></div>'
-      ).join('') : '<div class="leeg">' + T('pd.wv.geentafels','Nog geen tafels op de lijst.') + '</div>') +
+        '<div class="mbrow"><div><b>' + T('pd.wv.tafel','Tafel') + ' ' + esc(x.tafel) + '</b>' + (x.event ? ' · ' + esc(x.event) : '') +
+          meta(x.aantalGasten + ' ' + T('pd.wv.pers','personen') +
+          (x.allergenenTotaal ? ' · ' + x.allergenenTotaal + ' ' + T('pd.wv.all','allergieen') : '')) + '</div>' +
+        '<button class="abtn" data-wvt="' + esc(x.id) + '">' + T('pd.wv.invul','Invullen') + '</button></div>'
+      ).join('') : leeg(T('pd.wv.geentafels','Nog geen tafels op de lijst.'))) +
       '<div id="wvTafelVak"></div></div>';
 
     wrap.innerHTML = h;
@@ -69,10 +74,11 @@
     wvPdaTekent = id; wvPdaPaden = [];
     $('#wvVak').innerHTML = '<div style="margin-top:0.6rem;"><b>' + esc(titel) + '</b>' +
       '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:12px;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
-      '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">' +
-      '<button class="btn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
-      '<button class="btn primary" id="wvKlaar">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
-      '<div class="sub">' + T('pd.wv.tekenuit','Uw naam komt automatisch bij de handtekening te staan; het bureau ziet hem meteen.') + '</div></div>';
+      '<div class="row">' +
+      '<button class="abtn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
+      '<button class="abtn" id="wvKlaar" style="border-color:var(--gold);color:var(--gold);">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
+      '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.5rem;line-height:1.45;">' +
+      T('pd.wv.tekenuit','Uw naam komt automatisch bij de handtekening te staan; het bureau ziet hem meteen.') + '</div></div>';
     const cv = $('#wvCanvas'), ctx = cv.getContext('2d');
     ctx.strokeStyle = '#e8e4dc'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     let pad = null;
@@ -133,9 +139,11 @@
       try {
         const d = await API.call('/werkvloer/bedieningskaart', { id: b.dataset.wvt });
         $('#wvTafelVak').innerHTML = '<div style="margin-top:0.6rem;"><b>' + T('pd.wv.tafel','Tafel') + ' ' + esc(d.tafel) + '</b>' +
-          d.stoelen.map(s => '<div class="rij"><div>' + esc(s.naam) +
-            '<span class="sub"' + (s.let_op ? ' style="color:var(--gold);"' : '') + '>' + esc(s.regel) + '</span></div></div>').join('') +
-          '<div class="sub">' + T('pd.wv.tafeluit','Vul aan tafel aan wat de gast vertelt; de keuken ziet het meteen opgeteld.') + '</div></div>';
+          d.stoelen.map(s => '<div class="mbrow"><div>' + esc(s.naam) +
+            '<div style="font-size:0.72rem;line-height:1.45;color:' + (s.let_op ? 'var(--gold)' : 'var(--soft)') + ';">' +
+            esc(s.regel) + '</div></div></div>').join('') +
+          '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.5rem;line-height:1.45;">' +
+          T('pd.wv.tafeluit','Vul aan tafel aan wat de gast vertelt; de keuken ziet het meteen opgeteld.') + '</div></div>';
       } catch(e){ toast(e.message); }
     }));
   }

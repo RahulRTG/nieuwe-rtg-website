@@ -4,7 +4,9 @@
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
   // dynamische tekst (taken, bonnen, opdrachten) in de moedertaal van de medewerker
   const MTX = t => (window.MoederTaal ? MoederTaal.tekst(t) : t);
-  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  // geld krijgt altijd twee decimalen: "184,50" leest als een bedrag, "184,5" niet
+  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL',
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const SECTORS = [
     { id:'horeca',  icon:'horeca', nl:'Horeca',  en:'Hospitality', sub:'Restaurants, bars, beachclubs, koffie', codes:['KIKUNOI','PONTO','VORA','BRISA','FUEGO'] },

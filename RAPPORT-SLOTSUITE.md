@@ -1,6 +1,6 @@
 # Rapport van de Slotsuite
 
-_Automatisch geschreven door `scripts/slotsuite.js` op 2026-07-28 11:43 UTC. Niet met de hand bijwerken:
+_Automatisch geschreven door `scripts/slotsuite.js` op 2026-07-28 11:56 UTC. Niet met de hand bijwerken:
 de volgende ronde overschrijft dit bestand en leest het JSON-blok onderaan terug als geheugen._
 
 ## Oordeel
@@ -9,25 +9,16 @@ de volgende ronde overschrijft dit bestand en leest het JSON-blok onderaan terug
 
 | Laag | Uitslag | Tijd | Toelichting |
 |---|---|---|---|
-| DE BOUW | overgeslagen | - | niet gevraagd |
-| DE POORTEN | overgeslagen | - | niet gevraagd |
+| DE BOUW | staat | 3.6 s | het bouwsel stond al vers |
+| DE POORTEN | staat | 49.5 s | alle stappen staan |
 | DE TESTSUITE | overgeslagen | - | niet gevraagd |
 | DE TOEGANKELIJKHEID | overgeslagen | - | niet gevraagd |
 | DE BEPROEVING | overgeslagen | - | niet gevraagd |
-| DE KEURING | staat | 12.7 s | 0 stuk, 1 scheef, 126 kan beter |
-
-## Het logica-oordeel
-
-- endpoints die in een test voorkomen: **1285 van 2489** (52%)
-- genres op pariteit bekeken: **43**
-- teksten gescand op beloftes: **1676** bestanden, 2 zin(nen) eerder gewogen en goedgekeurd
-- oordeel: **0 stuk, 1 scheef, 126 kan beter**
+| DE KEURING | overgeslagen | - | niet gevraagd |
 
 ## Sinds de vorige ronde
 
-- opgelost: **0**
-- nieuw: **127**
-- blijft staan: **0**
+De Keuring draaide deze ronde niet, dus de backlog hieronder is die van de vorige ronde, ongewijzigd overgenomen.
 
 ## De backlog -- wat de volgende ronde verdient
 
@@ -166,7 +157,7 @@ _(nog 87 punten van lagere prioriteit; zie het JSON-blok.)_
 <!-- geheugen van de Slotsuite; hier leest de volgende ronde uit terug -->
 ```json
 {
- "ronde": "2026-07-28 11:43",
+ "ronde": "2026-07-28 11:56",
  "gezakt": 0,
  "backlog": [
   {

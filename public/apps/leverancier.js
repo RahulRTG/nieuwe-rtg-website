@@ -2,7 +2,9 @@
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
-  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  // geld krijgt altijd twee decimalen: "184,50" leest als een bedrag, "184,5" niet
+  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL',
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded',
     'aangevraagd':'requested', 'onderweg':'on the way', 'aangekomen':'at pickup', 'rijdt':'driving', 'gearriveerd':'completed' };
   const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);

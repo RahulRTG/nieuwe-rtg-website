@@ -104,7 +104,10 @@ module.exports = (ctx) => {
   }
   // --- beveiliging: een commandocentrum + PDA voor topbeveiligingsteams ---
   if (!db.data.supplierTypes.beveiliging)
-    db.data.supplierTypes.beveiliging = { label: 'Beveiliging & security', icon: 'schild', caps: ['beveiliging', 'location'] };
+    db.data.supplierTypes.beveiliging = { label: 'Beveiliging & security', icon: 'schild', caps: ['beveiliging', 'location', 'pricing'] };
+  // een beveiligingsbureau rekent uurtarieven; het genre miste als enige de prijzenkant
+  if (db.data.supplierTypes.beveiliging && !db.data.supplierTypes.beveiliging.caps.includes('pricing'))
+    db.data.supplierTypes.beveiliging.caps.push('pricing');
   if (!Array.isArray(db.data.bevDiensten)) db.data.bevDiensten = [];
   if (!Array.isArray(db.data.bevAanvragen)) db.data.bevAanvragen = [];
   if (!Array.isArray(db.data.bevIncidenten)) db.data.bevIncidenten = [];

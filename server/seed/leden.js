@@ -25,7 +25,7 @@ module.exports = {
     dates: '18 - 25 juli 2026',
     days: 7,
     items: [
-      { when: '18 jul', title: 'KLM KL1263, Amsterdam Schiphol → Ibiza', sub: 'Economy comfort, 2 personen · de rest van de groep vloog privé', status: 'paid', label: 'Bevestigd' },
+      { when: '18 jul', title: 'Lijnvlucht RTG-1263, Amsterdam Schiphol → Ibiza', sub: 'Economy comfort, 2 personen · de rest van de groep vloog privé', status: 'paid', label: 'Bevestigd' },
       { when: '18 jul', title: 'Privétransfer luchthaven → Aguamarina', sub: 'Chauffeur wacht bij aankomsthal, naambord RTG', status: 'paid', label: 'Bevestigd' },
       { when: '18-21 jul', title: 'Aguamarina Ibiza, Sea-view suite', sub: '3 nachten, ontbijt, late check-out', status: 'open', label: 'Wacht op betaling', invoiceId: 'RTG-2026-0158' },
       { when: '19 jul', title: 'Diner, Sal de Mar', sub: 'Chef-menu · tafel 21:00 uur', status: 'req', label: 'In aanvraag' },

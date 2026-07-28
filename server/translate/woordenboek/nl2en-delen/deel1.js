@@ -15,7 +15,7 @@ module.exports = {
   // reis
   '18 - 25 juli 2026': '18 - 25 July 2026',
   '18 jul': '18 Jul', '18-21 jul': '18-21 Jul', '19 jul': '19 Jul', '20 jul': '20 Jul', '21-25 jul': '21-25 Jul',
-  'KLM KL1263, Amsterdam Schiphol → Ibiza': 'KLM KL1263, Amsterdam Schiphol → Ibiza',
+  'Lijnvlucht RTG-1263, Amsterdam Schiphol → Ibiza': 'Scheduled flight RTG-1263, Amsterdam Schiphol → Ibiza',
   'Economy comfort, 2 personen · de rest van de groep vloog privé': 'Economy comfort, 2 people · the rest of the group flew private',
   'Economy comfort, 2 personen': 'Economy comfort, 2 people',
   'Privétransfer luchthaven → Aguamarina': 'Private transfer airport → Aguamarina',

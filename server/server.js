@@ -2484,6 +2484,9 @@ Object.assign(kern, require('./kern/fiscaal/regelwacht')({ db, save, LANDEN, pei
 kern.regelwacht.herstelOverlay();
 const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
 if (regelTimer.unref) regelTimer.unref();
+/* RTG Thuis (kern/thuis): thuisverhuur van lid aan lid -- ons antwoord op
+   Airbnb, met alle premium functies gratis en de Reiswijzer aan boord. */
+Object.assign(kern, require('./kern/thuis')({ db, save, crypto, schoon, reiswijzer: kern.reiswijzer, landVind: kern.landVind }));
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */
@@ -2899,6 +2902,7 @@ require('./routes/pay')(kern);
 require('./routes/bank')(kern);
 require('./routes/bankhart')(kern);
 require('./routes/reis')(kern);
+require('./routes/thuis')(kern);
 require('./routes/stad')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);

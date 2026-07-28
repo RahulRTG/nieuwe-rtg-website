@@ -54,6 +54,10 @@ const LANDEN = {
       jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } }
 };
 
+/* De wereldtabel erbij: alle overige landen van de wereld, in dezelfde
+   structuur (./wereld.js vult aan, de rijke kernlanden hierboven winnen). */
+require('./wereld').vulAan(LANDEN);
+
 /* ---- de boekhouding van de zaak: btw per genre, personeelskosten, cadeaukaarten ---- */
 const FIN_CAT = { eten: 'Eten (keuken)', drank: 'Dranken (bar)', logies: 'Logies', vervoer: 'Personenvervoer', jet: 'Internationaal vervoer', dienst: 'Diensten & producten' };
 

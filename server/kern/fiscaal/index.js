@@ -59,7 +59,7 @@ function maakFiscaal({ db, centen, btwSplit }) {
     const bruto = centen(uren * uurloon);
     return {
       land: landCode, landNaam: L.naam,
-      landen: Object.entries(LANDEN).map(([k, v]) => ({ code: k, naam: v.naam })),
+      landen: Object.entries(LANDEN).map(([k, v]) => ({ code: k, naam: v.naam })).sort((a, b) => a.naam.localeCompare(b.naam)),
       peiljaar: FISCAAL_PEILJAAR,
       maand,
       btw, btwTotaal: centen(btw.reduce((x, r2) => x + r2.btw, 0)),

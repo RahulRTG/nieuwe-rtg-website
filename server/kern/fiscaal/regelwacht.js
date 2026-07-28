@@ -97,9 +97,10 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
     return { peiljaar, versie: st.versie, bron: st.bron, laatsteUpdate: st.at,
       laatsteCheck: st.laatsteCheck || null, checkUitslag: st.checkUitslag || null,
       landenMetUpdates: Object.keys(st.wijzigingen || {}),
-      landen: Object.entries(LANDEN).map(([cc, l]) => ({ code: cc, naam: l.naam, uurloonMin: l.uurloonMin,
+      totaal: Object.keys(LANDEN).length,
+      landen: Object.entries(LANDEN).map(([cc, l]) => ({ code: cc, naam: l.naam, regio: l.regio || '', uurloonMin: l.uurloonMin,
         lasten: l.lasten, vakantiegeld: l.vakantiegeld, standaardBtw: l.tarieven && l.tarieven.standaard,
-        bijgewerkt: !!(st.wijzigingen || {})[cc] })) };
+        bijgewerkt: !!(st.wijzigingen || {})[cc] })).sort((a, b) => a.naam.localeCompare(b.naam)) };
   }
 
   return { regelwacht: { pasToe, herstelOverlay, check, status } };

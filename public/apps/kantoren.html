@@ -2009,20 +2009,28 @@ function bankRenderInstel(r){
    direct met de nieuwe regels. */
 function bankRenderRegels(s){
   const rijen = (s.landen || []).map(l =>
-    '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.35rem 0;' + bkLijn + 'font-size:.82rem;">' +
-    '<strong style="min-width:9rem;">' + esc(l.naam) + ' (' + esc(l.code) + ')' + (l.bijgewerkt ? ' <span style="color:var(--gold);font-size:.7rem;">· bijgewerkt</span>' : '') + '</strong>' +
-    '<span style="color:var(--soft);">btw ' + l.standaardBtw + '% · minimumloon € ' + l.uurloonMin + '/u · lasten ' + Math.round(l.lasten * 100) + '% · vakantiegeld ' + Math.round(l.vakantiegeld * 100) + '%</span></div>').join('');
+    '<div data-rwrij data-zoek="' + esc((l.naam + ' ' + l.code + ' ' + l.regio).toLowerCase()) + '" style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.35rem 0;' + bkLijn + 'font-size:.82rem;">' +
+    '<strong style="min-width:11rem;">' + esc(l.naam) + ' (' + esc(l.code) + ')' + (l.bijgewerkt ? ' <span style="color:var(--gold);font-size:.7rem;">· bijgewerkt</span>' : '') + '</strong>' +
+    '<span style="color:var(--soft);">' + esc(l.regio) + ' · btw ' + l.standaardBtw + '% · minimumloon € ' + l.uurloonMin + '/u · lasten ' + Math.round(l.lasten * 100) + '% · vakantiegeld ' + Math.round(l.vakantiegeld * 100) + '%</span></div>').join('');
   $('#bankRegels').innerHTML =
-    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Basis: ingebouwd peiljaar <strong>' + esc(String(s.peiljaar)) + '</strong>' +
+    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;"><strong style="color:var(--gold);">' + (s.totaal || (s.landen || []).length) + ' landen</strong> -- de hele wereld, elke rekenplek rekent hiermee. Basis: ingebouwd peiljaar <strong>' + esc(String(s.peiljaar)) + '</strong>' +
       (s.versie ? ' · bronversie <strong>' + esc(String(s.versie)) + '</strong>' : '') +
+      ((s.landenMetUpdates || []).length ? ' · ' + s.landenMetUpdates.length + ' land(en) bijgewerkt' : '') +
       (s.laatsteCheck ? ' · laatste controle ' + esc(new Date(s.laatsteCheck).toLocaleString('nl-NL')) : '') +
-      (s.checkUitslag ? '<br>' + esc(s.checkUitslag) : '') + '</p>' + rijen +
+      (s.checkUitslag ? '<br>' + esc(s.checkUitslag) : '') + '</p>' +
+    '<input id="rwZoek" placeholder="Zoek een land of regio (bijv. Japan, Afrika, BR)…" style="width:100%;margin-bottom:.4rem;">' +
+    '<div id="rwRijen" style="max-height:340px;overflow-y:auto;">' + rijen + '</div>' +
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">' +
-      '<span><label for="rwLand" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Land</label><select id="rwLand">' + (s.landen || []).map(l => '<option value="' + esc(l.code) + '">' + esc(l.naam) + '</option>').join('') + '</select></span>' +
+      '<span><label for="rwLand" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Land</label><select id="rwLand" style="max-width:14rem;">' + (s.landen || []).map(l => '<option value="' + esc(l.code) + '">' + esc(l.naam) + '</option>').join('') + '</select></span>' +
       '<span><label for="rwVeld" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Regel</label><select id="rwVeld"><option value="uurloonMin">Minimumloon (€/u)</option><option value="lasten">Werkgeverslasten (0-0,6)</option><option value="vakantiegeld">Vakantiegeld (0-0,25)</option><option value="alcoholLeeftijd">Alcoholleeftijd</option></select></span>' +
       '<span><label for="rwWaarde" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe waarde</label><input id="rwWaarde" type="number" step="0.01" style="width:7rem;"></span>' +
       '<button class="knop stil" id="rwZet" type="button">Voer door</button>' +
       '<button class="knop stil" id="rwCheck" type="button" style="margin-left:auto;">Controleer de bron nu</button></div>';
+  $('#rwZoek').addEventListener('input', () => {
+    const q = $('#rwZoek').value.trim().toLowerCase();
+    // inline display:flex wint van [hidden], dus schakel display zelf
+    document.querySelectorAll('#rwRijen [data-rwrij]').forEach(r => { r.style.display = (q && !r.dataset.zoek.includes(q)) ? 'none' : 'flex'; });
+  });
   $('#rwZet').addEventListener('click', async () => {
     try {
       const d = await api('bank/regels/update', { landen: { [$('#rwLand').value]: { [$('#rwVeld').value]: Number($('#rwWaarde').value) } } });

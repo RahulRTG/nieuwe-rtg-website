@@ -17,6 +17,16 @@ module.exports = (kern) => {
     if (req.session.tier !== 'business') return res.status(403).json({ error: 'De AI-boekhouder is onderdeel van de Business Pass.' });
     const landCode = LANDEN[req.body.land] ? req.body.land : 'NL';
     const L = LANDEN[landCode];
+    /* De rijke kernlanden dragen uitgeschreven aftrekregels; de wereldtabel
+       geeft een eerlijke indicatie op de eigen tarieven van dat land. */
+    const zak = L.zakelijk || {
+      horeca: 'Indicatie (wereldtabel): horeca valt op ' + L.tarieven.eten + '% btw; of die aftrekbaar is verschilt per land -- bewaar volledige facturen op bedrijfsnaam.',
+      logies: 'Indicatie (wereldtabel): logies valt op ' + L.tarieven.logies + '%; zakelijke overnachtingen zijn doorgaans aftrekbaar met factuur.',
+      vervoer: 'Indicatie (wereldtabel): personenvervoer valt op ' + L.tarieven.vervoer + '%.',
+      jet: 'Internationaal personenvervoer valt vrijwel overal onder het 0%-tarief.'
+    };
+    const zzpR = ZZP[landCode] || { regime: 'Zelfstandige (wereldtabel, indicatie)',
+      regels: ['Het echte regime van ' + L.naam + ' kent eigen drempels en aftrekposten; de zzp-rekentool geeft een indicatie en de Regelwacht houdt de tarieven automatisch bij.'] };
     const vraag = String(req.body.question || '').trim().slice(0, 400);
     if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
     const key = req.session.key;
@@ -28,8 +38,8 @@ module.exports = (kern) => {
         const msg = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 450,
           system: 'Je bent de AI-boekhouder van de RTG Business Pass. Het lid reist zakelijk; het gekozen land is ' + L.naam + '. ' +
-            'Aftrekregels daar: horeca: ' + L.zakelijk.horeca + ' logies: ' + L.zakelijk.logies + ' vervoer: ' + L.zakelijk.vervoer + ' jet: ' + L.zakelijk.jet + ' ' +
-            'Voor zelfstandigen geldt daar het regime ' + ZZP[landCode].regime + ': ' + ZZP[landCode].regels.join(' ') + ' Er is een zzp-rekentool in de app voor een indicatie van belasting en nettowinst. ' +
+            'Aftrekregels daar: horeca: ' + zak.horeca + ' logies: ' + zak.logies + ' vervoer: ' + zak.vervoer + ' jet: ' + zak.jet + ' ' +
+            'Voor zelfstandigen geldt daar het regime ' + zzpR.regime + ': ' + zzpR.regels.join(' ') + ' Er is een zzp-rekentool in de app voor een indicatie van belasting en nettowinst. ' +
             'Uitgaven via RTG: horeca € ' + horeca + ', vervoer € ' + vervoer + '. Facturen staan boekhoudklaar in het portaal met afboekcode en btw-specificatie. ' +
             'Antwoord in het Nederlands, maximaal 120 woorden, praktisch. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
           messages: [{ role: 'user', content: vraag }]
@@ -40,13 +50,13 @@ module.exports = (kern) => {
     if (!answer) {
       const v = vraag.toLowerCase();
       if (/zzp|zelfstandig|eenmanszaak|freelan|kor\b|urencriterium|autonomo|micro-?entre|freiberuf/.test(v))
-        answer = 'Voor zelfstandigen in ' + L.naam + ' (' + ZZP[landCode].regime + '): ' + ZZP[landCode].regels.join(' ') + ' Gebruik de zzp-rekentool hieronder voor een indicatie van uw belasting, nettowinst en hoeveel u maandelijks opzij zet.';
-      else if (/hotel|overnacht|logies|slapen/.test(v)) answer = L.naam + ': ' + L.zakelijk.logies;
-      else if (/taxi|vervoer|rit|jet|vlieg/.test(v)) answer = L.naam + ': ' + L.zakelijk.vervoer + ' ' + L.zakelijk.jet + ' Via RTG gaf u € ' + vervoer + ' uit aan vervoer.';
-      else if (/eten|diner|restaurant|horeca|lunch|terugvorder|aftrek|btw/.test(v)) answer = L.naam + ': ' + L.zakelijk.horeca + ' Via RTG gaf u € ' + horeca + ' uit in de horeca. Uw facturen staan boekhoudklaar in het portaal, met afboekcode en btw-specificatie.';
-      else answer = 'Voor ' + L.naam + ' geldt: ' + L.zakelijk.horeca + ' ' + L.zakelijk.logies + ' ' + L.zakelijk.vervoer + ' Vraag me gerust naar een specifieke uitgave.';
+        answer = 'Voor zelfstandigen in ' + L.naam + ' (' + zzpR.regime + '): ' + zzpR.regels.join(' ') + ' Gebruik de zzp-rekentool hieronder voor een indicatie van uw belasting, nettowinst en hoeveel u maandelijks opzij zet.';
+      else if (/hotel|overnacht|logies|slapen/.test(v)) answer = L.naam + ': ' + zak.logies;
+      else if (/taxi|vervoer|rit|jet|vlieg/.test(v)) answer = L.naam + ': ' + zak.vervoer + ' ' + zak.jet + ' Via RTG gaf u € ' + vervoer + ' uit aan vervoer.';
+      else if (/eten|diner|restaurant|horeca|lunch|terugvorder|aftrek|btw/.test(v)) answer = L.naam + ': ' + zak.horeca + ' Via RTG gaf u € ' + horeca + ' uit in de horeca. Uw facturen staan boekhoudklaar in het portaal, met afboekcode en btw-specificatie.';
+      else answer = 'Voor ' + L.naam + ' geldt: ' + zak.horeca + ' ' + zak.logies + ' ' + zak.vervoer + ' Vraag me gerust naar een specifieke uitgave.';
       answer += ' Dit is voorlichting, geen bindend fiscaal advies.';
     }
-    res.json({ answer, land: landCode, landen: Object.entries(LANDEN).map(([k, v2]) => ({ code: k, naam: v2.naam })), ai: !!anthropic });
+    res.json({ answer, land: landCode, landen: Object.entries(LANDEN).map(([k, v2]) => ({ code: k, naam: v2.naam })).sort((a, b) => a.naam.localeCompare(b.naam)), ai: !!anthropic });
   });
 };

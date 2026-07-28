@@ -773,6 +773,9 @@ const rtmailTeam = require('./kern/rtmail-team')({ db, save, crypto, rtmail, fin
   CODENAMES: require('./accounts/kluis').CODENAMES });
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
 const automatisering = require('./kern/automatisering')({ rtmail });
+// Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
+// eigenaar- en managementadressen, rahul@<domein>, de buitenpost en -poort)
+const { werkmail } = require('./kern/werkmail')({ db, save, crypto, rtmail, mail, accounts });
 const atelierweb = require('./kern/atelierweb')({ db, save, crypto, schoon });
 // de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
 const naamlaag = require('./kern/naamlaag')({ db, save, schoon });
@@ -2001,7 +2004,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, rtmail, rtmailTeam, automatisering, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, naamlaag,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
@@ -2215,6 +2218,9 @@ Object.assign(kern, require('./kern/geloofbieb').maakGeloofBieb({ db, save }));
 Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto, anthropic }));
 Object.assign(kern, require('./kern/rtfclubs')({ db, save, crypto }));
 Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropic }));
+// De Stadsraad: per stad een invloedrijke partner die in het gezamenlijke
+// foundation-kantoor mee beslist over de lab-uitslagen
+Object.assign(kern, require('./kern/stadsraad')({ db, save, crypto }));
 Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));
 /* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
    werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun
@@ -2786,6 +2792,7 @@ require('./routes/bijles')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/rtmail')(kern);
 require('./routes/rtmail-team')(kern);
+require('./routes/werkmail')(kern);
 require('./routes/huis')(kern);
 require('./routes/muziek')(kern);
 require('./routes/muziek-samen')(kern);

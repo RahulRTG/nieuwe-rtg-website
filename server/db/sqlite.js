@@ -154,10 +154,24 @@ function startSqliteSync() {
    een database van 1,9 MB -- en moet de volgende start dat eerst inlezen.
    TRUNCATE lukt alleen als geen ander proces meer leest; mislukt hij, dan is dat
    geen probleem (de data staat al gecommit in de WAL), dus alleen loggen. */
+/* De WAL leegdrukken in store.db zelf.
+
+   In WAL-modus staat verse data NIET in store.db maar in store.db-wal, en
+   pas een checkpoint schuift hem over. Wie store.db kopieert zonder eerst te
+   checkpointen, kopieert dus een bestand waar de recentste gegevens niet in
+   staan -- en bij een verse installatie is dat letterlijk een leeg bestand van
+   4 KB. Daarom roept de backup dit eerst aan. */
+function checkpointSqlite() {
+  if (!kvdb) return false;
+  try { saveSqlite(true); } catch (e) {}
+  try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); return true; }
+  catch (e) { return false; }        // een ander proces leest nog; de -wal-kopie vangt dat op
+}
+
 function afrondSqlite() {
   if (!kvdb) return;
   try { saveSqlite(true); } catch (e) { console.warn('[db] laatste sqlite-save mislukt:', e.message); }
   try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (e) { /* ander proces leest nog */ }
 }
 
-module.exports = { loadSqlite, saveSqlite, startSqliteSync, afrondSqlite };
+module.exports = { loadSqlite, saveSqlite, startSqliteSync, afrondSqlite, checkpointSqlite };

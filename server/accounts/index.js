@@ -120,8 +120,22 @@ function init() {
   S.VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');
 }
 
+/* De WAL van rtg.db leegdrukken in het hoofdbestand.
+
+   De identiteitskluis draait in WAL-modus: verse accounts staan in rtg.db-wal
+   en pas een checkpoint schuift ze naar rtg.db. Een backup die alleen rtg.db
+   kopieert, kopieert daardoor een bestand zonder de recentste leden -- bij een
+   verse installatie zelfs een leeg bestand van 4 KB. De backup roept dit dus
+   aan voordat hij kopieert. Faalt het (een ander proces leest nog), dan vangt
+   de meegekopieerde -wal dat op. */
+function checkpoint() {
+  if (!S.db) return false;
+  try { S.db.exec('PRAGMA wal_checkpoint(TRUNCATE)'); return true; }
+  catch (e) { return false; }
+}
+
 module.exports = {
-  init,
+  init, checkpoint,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   ...users,

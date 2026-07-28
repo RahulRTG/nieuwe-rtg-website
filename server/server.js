@@ -36,7 +36,7 @@ const { db, load, save, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal } = require('./db');
+  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, checkpointSqlite } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
@@ -3058,11 +3058,26 @@ const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 function backupData() {
   if (!db.writable) return; // standby-servers maken geen backups, dat doet de actieve
   try {
+    /* EERST de WAL leegdrukken, dan pas kopieren.
+
+       SQLite draait hier in WAL-modus: verse gegevens staan NIET in rtg.db of
+       store.db maar in het bijbehorende -wal-bestand, tot een checkpoint ze
+       overhevelt. Zonder deze twee regels kopieerde de backup dus bestanden
+       zonder de recentste data -- en op een verse installatie letterlijk twee
+       lege bestanden van 4 KB, terwijl alles in een WAL van megabytes stond.
+       De backup zag er elke nacht keurig uit en was leeg. Gevonden met
+       test/herstelproef.test.js, die de hele ronde echt doorloopt. */
+    try { accounts.checkpoint(); } catch (e) {}
+    try { checkpointSqlite(); } catch (e) {}
+
     const day = new Date().toISOString().slice(0, 10);
     const dir = path.join(BACKUP_DIR, day);
     fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
     try { fs.chmodSync(dir, 0o700); } catch (e) {}
-    for (const f of ['db.json', 'rtg.db', 'store.db']) {
+    /* De -wal-bestanden gaan mee als vangnet: lukt het checkpointen niet omdat
+       een ander proces nog leest, dan is de kopie samen met zijn WAL alsnog
+       compleet. SQLite leest een database met bijbehorende -wal gewoon uit. */
+    for (const f of ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal']) {
       const from = path.join(DATA_DIR, f);
       if (fs.existsSync(from)) { const doel = path.join(dir, f); fs.copyFileSync(from, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
     }
@@ -3075,7 +3090,7 @@ function backupData() {
     if (process.env.RTG_BACKUP_DIR) {
       const off = path.join(process.env.RTG_BACKUP_DIR, day);
       fs.mkdirSync(off, { recursive: true });
-      for (const f of ['db.json', 'rtg.db', 'store.db']) {
+      for (const f of ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal']) {
         const from = path.join(DATA_DIR, f);
         if (fs.existsSync(from)) fs.copyFileSync(from, path.join(off, f));
       }

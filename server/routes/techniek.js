@@ -142,11 +142,10 @@ module.exports = (kern) => {
       uit.archief = archief ? { dagen: archief.dagen(), levend: (db.data.orders || []).length, gearchiveerd: archief.stat().aantal } : null;
       // de moderniseringsverzoeken die de eigenaar zelf via de AI heeft gevraagd
       uit.moderniseringen = (t.moderniseringen || []).slice(-8).reverse();
-      /* Het inzagejournaal: hoe vaak is er deze week in de identiteitskluis
-         gekeken, en stond er ergens geen reden bij? Dat laatste getal is het
-         interessantste van de twee -- inzage zonder opgegeven aanleiding is
-         precies waar je naar wilt kijken. */
+      // het inzagejournaal: hoe vaak is er in de identiteitskluis gekeken, en
+      // hoe vaak zonder opgegeven reden (dat tweede getal is het interessantste)
       uit.inzage = inzagelog.samenvatting();
+      uit.bewaren = bewaarDeel ? bewaarDeel.statusDeel() : null;  // zie ./techniek/bewaren.js
     }
     res.json(uit);
   });
@@ -174,6 +173,7 @@ module.exports = (kern) => {
   const tctx = { app, accounts, anthropic, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser,
     LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
     geldPasprijsZet, geldKortingZet, geldCommissieZet };
+  const bewaarDeel = require('./techniek/bewaren')(tctx);
   require('./techniek/functie')(tctx);
   require('./techniek/boardroom')(tctx);
   require('./techniek/beheer')(tctx);

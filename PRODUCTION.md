@@ -98,6 +98,38 @@ De app kan HTTPS zelf termineren, zonder nginx/Caddy ervoor:
 
 Het sleutelmateriaal (self-signed cert, ACME-accountsleutel, opgehaalde certificaten) staat onder `<datamap>/tls/` en wordt nooit gecommit. Een reverse proxy/CDN (Cloudflare) ervoor mag nog steeds — dan laat je `RTG_TLS` uit en blijft `trust proxy` de bron van waarheid voor `X-Forwarded-Proto`.
 
+### Backup en herstel (oefen dit, geloof het niet)
+
+De server maakt elke dag een backup in `<datamap>/backups/<datum>/`, en met
+`RTG_BACKUP_DIR` ook een kopie op een tweede schijf. Meegekopieerd worden
+`db.json`, `rtg.db`, `store.db` en hun `-wal`-bestanden. Vóór het kopiëren
+wordt de SQLite-WAL in het hoofdbestand gevouwen; zonder die stap kopieert hij
+bestanden waar de recentste gegevens niet in staan.
+
+**De sleutels zitten NIET in de backup, en dat hoort zo.** `vault.key` en
+`secret.key` staan er bewust buiten: zou de sleutel in dezelfde backup zitten,
+dan opent een gestolen backup zichzelf. Dat betekent wel dat de backup in zijn
+eentje waardeloos is. Bewaar `RTG_VAULT_KEY` en `RTG_SECRET_KEY` in een
+secrets manager, met een tweede kopie ergens waar je erbij kunt als die
+secrets manager onbereikbaar is. Zonder die sleutels krijg je na een herstel
+wel alle accounts terug, maar geen enkele naam: die blijven versleuteld.
+
+Herstellen:
+
+```bash
+systemctl stop rtg                      # of: docker compose down
+cp <datamap>/backups/<datum>/* <datamap>/
+export RTG_VAULT_KEY=...  RTG_SECRET_KEY=...   # uit de secrets manager
+systemctl start rtg
+```
+
+Controleer daarna dat een bestaand lid kan inloggen én dat zijn echte naam
+zichtbaar is -- dat tweede bewijst dat de kluis het weer doet.
+
+`test/herstelproef.test.js` loopt deze hele ronde automatisch door: aanmaken,
+backuppen, datamap wissen, terugzetten, opstarten, controleren. Draai hem als
+je iets aan de opslag verandert.
+
 ### Zet een proxy ervoor? Strip dan `token` uit zijn access log
 
 De live-verbindingen (SSE) kunnen geen `Authorization`-header meesturen —

@@ -28,7 +28,7 @@ const G = {
       'Welk verhaal over uzelf en {X} vertelt u altijd op feestjes?',
       'Wanneer ging het bij u volledig mis met {X}?',
       'Welke blunder rond {X} kunt u inmiddels weglachen?',
-      'Doe eens een imitatie van uzelf tijdens {X}.',
+      'Hoe klinkt de imitatie van uzelf tijdens {X}?',
       'Wat is uw slechtste eigenschap zodra het om {X} gaat?',
       'Welk kinderlijk plezier heeft u nog steeds bij {X}?'],
     sub: ['karaoke', 'een blind date', 'dansen op een bruiloft', 'zelf klussen',

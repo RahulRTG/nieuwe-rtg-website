@@ -39,7 +39,11 @@ module.exports = (ctx) => {
     quiz: { uitleg: 'Quizduel: tien vragen, dezelfde voor iedereen, in eigen tempo; de meeste goed wint, bij gelijke stand wie het eerst klaar was.',
       tips: ['Gokken mag: bij drie opties is een kwart seconde twijfel al duurder dan een gok.', 'Lees de vraag helemaal; het venijn zit vaak in een woord.'] },
     schat: { uitleg: 'Schatduel: vijf schattingsvragen; zodra iedereen een ronde binnen heeft, pakt de dichtstbijzijnde het punt.',
-      tips: ['Denk in ordegroottes: eerst tientallen, honderden of duizenden, dan pas het getal.', 'Extreem gokken loont zelden; het punt gaat naar wie het dichtstbij zit.'] }
+      tips: ['Denk in ordegroottes: eerst tientallen, honderden of duizenden, dan pas het getal.', 'Extreem gokken loont zelden; het punt gaat naar wie het dichtstbij zit.'] },
+    geheugen: { uitleg: 'Geheugenduel: vijf kleurenreeksen, elke ronde eentje langer (4 tot 8); foutloos natikken is een punt.',
+      tips: ['Zeg de kleuren in je hoofd hardop mee; klank onthoudt beter dan beeld.', 'Hak de reeks in groepjes van twee of drie -- dat is hoe geheugen echt werkt.'] },
+    orde: { uitleg: 'Rangschikduel: zet vier dingen in de enige juiste volgorde; alleen helemaal goed is een punt.',
+      tips: ['Zoek eerst het uiterste dat u zeker weet; de rest valt daartussen.', 'Twijfel tussen twee buren telt net zo zwaar als alles fout -- kies met reden.'] }
   };
 
   function standVan(p, mij) {

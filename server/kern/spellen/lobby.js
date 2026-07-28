@@ -8,10 +8,10 @@ module.exports = (ctx) => {
     mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
     pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
     magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
-    flitsInit, reactieInit, quizInit, schatInit, klasgenotenVan } = ctx;
+    flitsInit, reactieInit, quizInit, schatInit, geheugenInit, ordeInit, klasgenotenVan } = ctx;
   const INITS = { mejn: mejnInit, schaak: schaakInit, pesten: pestenInit, woord: woordInit,
     dam: damInit, rummi: rummiInit, magnaat: magnaatInit, seconden: secondenInit, waarheid: waarheidInit, proost: proostInit,
-    flits: flitsInit, reactie: reactieInit, quiz: quizInit, schat: schatInit };
+    flits: flitsInit, reactie: reactieInit, quiz: quizInit, schat: schatInit, geheugen: geheugenInit, orde: ordeInit };
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
     INITS[potje.soort](potje);

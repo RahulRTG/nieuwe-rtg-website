@@ -41,7 +41,9 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     flits:    { naam: 'Flitsduel',          max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
     reactie:  { naam: 'Reactieduel',        max: 4, wereld: 'rtf', buitenBeurt: ['tik'] },
     quiz:     { naam: 'Quizduel',           max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
-    schat:    { naam: 'Schatduel',          max: 4, wereld: 'rtf', buitenBeurt: ['schat'] }
+    schat:    { naam: 'Schatduel',          max: 4, wereld: 'rtf', buitenBeurt: ['schat'] },
+    geheugen: { naam: 'Geheugenduel',       max: 4, wereld: 'rtf', buitenBeurt: ['reeks'] },
+    orde:     { naam: 'Rangschikduel',      max: 4, wereld: 'rtf', buitenBeurt: ['orde'] }
   };
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
   const TEAMS = [0, 1, 0, 1, 0, 1]; // om en om twee teams, tot zes spelers
@@ -104,6 +106,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { reactieInit, reactieZet, reactieView } = require('./spellen/reactie')(spelCtx);
   const { quizInit, quizZet, quizView } = require('./spellen/quiz')(spelCtx);
   const { schatInit, schatZet, schatView } = require('./spellen/schat')(spelCtx);
+  const { geheugenInit, geheugenZet, geheugenView } = require('./spellen/geheugen')(spelCtx);
+  const { ordeInit, ordeZet, ordeView } = require('./spellen/orde')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
 
@@ -116,7 +120,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
     magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
     flitsInit, flitsZet, flitsView, reactieInit, reactieZet, reactieView, klasgenotenVan,
-    quizInit, quizZet, quizView, schatInit, schatZet, schatView };
+    quizInit, quizZet, quizView, schatInit, schatZet, schatView,
+    geheugenInit, geheugenZet, geheugenView, ordeInit, ordeZet, ordeView };
   const { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
   const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk

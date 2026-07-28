@@ -58,6 +58,21 @@
     teken();
   }
 
+  /* Beeld draaien en volledig scherm: twee handelingen die over het scherm
+     zelf gaan, dus ze horen in dit paneel en niet als losse pil in de hoek. */
+  function vulBeeld() {
+    if (!w.RTGscherm || !w.RTGscherm.draai) return;
+    var doe = rij(T('bdn.beeld', 'Beeld'), T('bdn.beeld.sub', 'Draai het beeld een kwartslag, of vul het hele scherm.'));
+    doe.appendChild(knopje(T('bdn.draai', 'Draaien'), false, function () { w.RTGscherm.draai(); }));
+    var vol = knopje(T('bdn.vol', 'Volledig'), !!(w.RTGscherm.volledigAan && w.RTGscherm.volledigAan()), function () {
+      w.RTGscherm.volledig();
+      setTimeout(function () {
+        vol.classList.toggle('actief', !!(w.RTGscherm.volledigAan && w.RTGscherm.volledigAan()));
+      }, 120);
+    });
+    doe.appendChild(vol);
+  }
+
   function vulUitleg() {
     if (!w.RTGUitleg || !w.RTGUitleg.open) return;
     var doe = rij(T('bdn.uitleg', 'Uitleg over dit scherm'), T('bdn.uitleg.sub', 'Wat u hier kunt doen, in gewone taal.'));
@@ -83,7 +98,7 @@
     var uit = d.createElement('p'); uit.className = 'bdn-uit';
     uit.textContent = T('bdn.uit', 'Alles wat u aan dit scherm kunt instellen, bij elkaar. Uw keuzes blijven op dit toestel.');
     blad.appendChild(uit);
-    vulTaal(); vulThema(); vulBeweging(); vulUitleg();
+    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulUitleg();
     scrim.appendChild(blad);
     scrim.addEventListener('click', function (e) { if (e.target === scrim) sluit(); });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
@@ -103,30 +118,20 @@
     return r.width > 0 && r.height > 0;
   }
 
-  /* De schermknoppen (.rtg-scherm: beeld draaien, volledig scherm) zijn de
-     natuurlijke buren -- dat is al de groep voor "dingen over dit scherm", en
-     hij staat op vrijwel elke pagina op dezelfde plek. Daar hoort de instelling
-     bij, als derde ronde knop. Heeft de pagina die groep niet, dan de eigen
-     balk; en pas als er niets zichtbaar is, hangt hij los. Dat laatste geldt
-     onder meer voor de PDA achter zijn inlogpoort, dus we kijken later nog een
-     paar keer of de balk alsnog opengaat. */
+  /* Liefst in een balk die de pagina al heeft, tussen zijn eigen knoppen.
+     Heeft de pagina die niet, of is hij nog niet te zien -- de PDA verbergt
+     zijn topbar achter de inlogpoort -- dan hangt de knop rechtsboven, op de
+     plek waar de schermknoppen stonden. Verschijnt de balk later alsnog, dan
+     schuift hij er vanzelf in. */
   function plaats() {
     var eigen = d.querySelector('[data-bediening]');
-    var scherm = d.querySelector('.rtg-scherm');
     var balk = d.querySelector('.topbar') || d.querySelector('.osbar') || d.querySelector('header');
-    var gast = zichtbaar(eigen) ? eigen : (zichtbaar(scherm) ? scherm : (zichtbaar(balk) ? balk : null));
+    var gast = zichtbaar(eigen) ? eigen : (zichtbaar(balk) ? balk : null);
     if (gast) {
-      var rond = gast === scherm;
-      if (knop.parentElement !== gast) {
-        knop.classList.remove('bdn-los');
-        knop.classList.toggle('bdn-rond', rond);
-        gast.appendChild(knop);
-      }
+      if (knop.parentElement !== gast) { knop.classList.remove('bdn-los'); gast.appendChild(knop); }
       return true;
     }
-    if (knop.parentElement !== d.body) {
-      knop.classList.remove('bdn-rond'); knop.classList.add('bdn-los'); d.body.appendChild(knop);
-    }
+    if (knop.parentElement !== d.body) { knop.classList.add('bdn-los'); d.body.appendChild(knop); }
     return false;
   }
 

@@ -1,21 +1,18 @@
 /* HET BEDIENINGSPANEEL -- één plek voor de instellingen van dit scherm.
 
-   Er dreven vier losse knopjes over elk scherm, alle vier linksonder en drie
-   ervan boven op elkaar: de bewegingspil ("Rustig"), de themakiezer, de
-   taalknop en het vraagteken van de app-gids. Ze horen bij elkaar, dus staan
-   ze nu bij elkaar: in één paneel, achter één ingang. Het leden-OS had dit al
-   -- daar zit alles in het bedieningspaneel -- en dit is datzelfde idee voor
-   elk ander scherm.
+   Er dreven zes losse knopjes over elk scherm. Linksonder vier, waarvan drie
+   boven op elkaar: de bewegingspil ("Rustig"), de themakiezer, de taalknop en
+   het vraagteken van de app-gids. Rechtsboven nog twee: beeld draaien en
+   volledig scherm. Ze horen bij elkaar, dus staan ze nu bij elkaar: in één
+   paneel, achter één ingang. Het leden-OS had dit al -- daar zit alles in het
+   bedieningspaneel -- en dit is datzelfde idee voor elk ander scherm.
 
    De ingang zoekt een plek die de pagina al heeft, in deze volgorde:
      1. het leden-OS (#osCcScrim)  -> niets bouwen, dat paneel bestaat al
      2. [data-bediening]           -> de pagina wijst zelf een plek aan
-     3. .rtg-scherm                -> als derde ronde knop bij "beeld draaien"
-                                      en "volledig scherm": dat is al de groep
-                                      voor dingen die over dit scherm gaan
-     4. .topbar / .osbar / header  -> een knop tussen de knoppen die er staan
-     5. anders                     -> één knop linksonder, op de plek die de
-                                      vier oude knopjes hebben vrijgemaakt
+     3. .topbar / .osbar / header  -> een knop tussen de knoppen die er staan
+     4. anders                     -> één knop rechtsboven, op de plek waar de
+                                      schermknoppen stonden
 
    Elke rij verschijnt alleen als de bijbehorende laag echt geladen is. */
 (function (w, d) {
@@ -42,15 +39,9 @@
       '.bdn-knop:hover{border-color:var(--gold,#A98F1C);}' +
       '.bdn-knop:focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}' +
       '.bdn-knop svg{flex:0 0 auto;color:var(--gold,#A98F1C);}' +
-      /* als buurman van de schermknoppen: dezelfde ronde vorm, geen label */
-      '.bdn-rond{width:2.1rem;height:2.1rem;padding:0;border:none;background:none;' +
-        'border-radius:50%;justify-content:center;}' +
-      '.bdn-rond:hover{background:rgba(255,255,255,.1);}' +
-      '.bdn-rond span{display:none;}' +
-      '.bdn-rond svg{color:#F4F1EC;}' +
-      /* de terugval: linksonder, waar nu niets meer staat */
-      '.bdn-los{position:fixed;z-index:36;left:calc(env(safe-area-inset-left,0px) + .8rem);' +
-        'bottom:calc(env(safe-area-inset-bottom,0px) + .8rem);backdrop-filter:blur(14px);' +
+      /* de terugval: rechtsboven, de plek van de oude schermknoppen */
+      '.bdn-los{position:fixed;z-index:36;top:calc(env(safe-area-inset-top,0px) + .7rem);' +
+        'right:calc(env(safe-area-inset-right,0px) + .7rem);backdrop-filter:blur(14px);' +
         '-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 24px rgba(0,0,0,.35);}' +
       '.bdn-scrim{position:fixed;inset:0;z-index:9995;display:none;align-items:flex-end;justify-content:center;' +
         'background:rgba(6,5,5,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}' +

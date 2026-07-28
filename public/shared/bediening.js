@@ -1,21 +1,18 @@
 /* HET BEDIENINGSPANEEL -- één plek voor de instellingen van dit scherm.
 
-   Er dreven vier losse knopjes over elk scherm, alle vier linksonder en drie
-   ervan boven op elkaar: de bewegingspil ("Rustig"), de themakiezer, de
-   taalknop en het vraagteken van de app-gids. Ze horen bij elkaar, dus staan
-   ze nu bij elkaar: in één paneel, achter één ingang. Het leden-OS had dit al
-   -- daar zit alles in het bedieningspaneel -- en dit is datzelfde idee voor
-   elk ander scherm.
+   Er dreven zes losse knopjes over elk scherm. Linksonder vier, waarvan drie
+   boven op elkaar: de bewegingspil ("Rustig"), de themakiezer, de taalknop en
+   het vraagteken van de app-gids. Rechtsboven nog twee: beeld draaien en
+   volledig scherm. Ze horen bij elkaar, dus staan ze nu bij elkaar: in één
+   paneel, achter één ingang. Het leden-OS had dit al -- daar zit alles in het
+   bedieningspaneel -- en dit is datzelfde idee voor elk ander scherm.
 
    De ingang zoekt een plek die de pagina al heeft, in deze volgorde:
      1. het leden-OS (#osCcScrim)  -> niets bouwen, dat paneel bestaat al
      2. [data-bediening]           -> de pagina wijst zelf een plek aan
-     3. .rtg-scherm                -> als derde ronde knop bij "beeld draaien"
-                                      en "volledig scherm": dat is al de groep
-                                      voor dingen die over dit scherm gaan
-     4. .topbar / .osbar / header  -> een knop tussen de knoppen die er staan
-     5. anders                     -> één knop linksonder, op de plek die de
-                                      vier oude knopjes hebben vrijgemaakt
+     3. .topbar / .osbar / header  -> een knop tussen de knoppen die er staan
+     4. anders                     -> één knop rechtsboven, op de plek waar de
+                                      schermknoppen stonden
 
    Elke rij verschijnt alleen als de bijbehorende laag echt geladen is. */
 (function (w, d) {
@@ -42,15 +39,9 @@
       '.bdn-knop:hover{border-color:var(--gold,#A98F1C);}' +
       '.bdn-knop:focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}' +
       '.bdn-knop svg{flex:0 0 auto;color:var(--gold,#A98F1C);}' +
-      /* als buurman van de schermknoppen: dezelfde ronde vorm, geen label */
-      '.bdn-rond{width:2.1rem;height:2.1rem;padding:0;border:none;background:none;' +
-        'border-radius:50%;justify-content:center;}' +
-      '.bdn-rond:hover{background:rgba(255,255,255,.1);}' +
-      '.bdn-rond span{display:none;}' +
-      '.bdn-rond svg{color:#F4F1EC;}' +
-      /* de terugval: linksonder, waar nu niets meer staat */
-      '.bdn-los{position:fixed;z-index:36;left:calc(env(safe-area-inset-left,0px) + .8rem);' +
-        'bottom:calc(env(safe-area-inset-bottom,0px) + .8rem);backdrop-filter:blur(14px);' +
+      /* de terugval: rechtsboven, de plek van de oude schermknoppen */
+      '.bdn-los{position:fixed;z-index:36;top:calc(env(safe-area-inset-top,0px) + .7rem);' +
+        'right:calc(env(safe-area-inset-right,0px) + .7rem);backdrop-filter:blur(14px);' +
         '-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 24px rgba(0,0,0,.35);}' +
       '.bdn-scrim{position:fixed;inset:0;z-index:9995;display:none;align-items:flex-end;justify-content:center;' +
         'background:rgba(6,5,5,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}' +
@@ -142,6 +133,21 @@
     teken();
   }
 
+  /* Beeld draaien en volledig scherm: twee handelingen die over het scherm
+     zelf gaan, dus ze horen in dit paneel en niet als losse pil in de hoek. */
+  function vulBeeld() {
+    if (!w.RTGscherm || !w.RTGscherm.draai) return;
+    var doe = rij(T('bdn.beeld', 'Beeld'), T('bdn.beeld.sub', 'Draai het beeld een kwartslag, of vul het hele scherm.'));
+    doe.appendChild(knopje(T('bdn.draai', 'Draaien'), false, function () { w.RTGscherm.draai(); }));
+    var vol = knopje(T('bdn.vol', 'Volledig'), !!(w.RTGscherm.volledigAan && w.RTGscherm.volledigAan()), function () {
+      w.RTGscherm.volledig();
+      setTimeout(function () {
+        vol.classList.toggle('actief', !!(w.RTGscherm.volledigAan && w.RTGscherm.volledigAan()));
+      }, 120);
+    });
+    doe.appendChild(vol);
+  }
+
   function vulUitleg() {
     if (!w.RTGUitleg || !w.RTGUitleg.open) return;
     var doe = rij(T('bdn.uitleg', 'Uitleg over dit scherm'), T('bdn.uitleg.sub', 'Wat u hier kunt doen, in gewone taal.'));
@@ -167,7 +173,7 @@
     var uit = d.createElement('p'); uit.className = 'bdn-uit';
     uit.textContent = T('bdn.uit', 'Alles wat u aan dit scherm kunt instellen, bij elkaar. Uw keuzes blijven op dit toestel.');
     blad.appendChild(uit);
-    vulTaal(); vulThema(); vulBeweging(); vulUitleg();
+    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulUitleg();
     scrim.appendChild(blad);
     scrim.addEventListener('click', function (e) { if (e.target === scrim) sluit(); });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
@@ -187,30 +193,20 @@
     return r.width > 0 && r.height > 0;
   }
 
-  /* De schermknoppen (.rtg-scherm: beeld draaien, volledig scherm) zijn de
-     natuurlijke buren -- dat is al de groep voor "dingen over dit scherm", en
-     hij staat op vrijwel elke pagina op dezelfde plek. Daar hoort de instelling
-     bij, als derde ronde knop. Heeft de pagina die groep niet, dan de eigen
-     balk; en pas als er niets zichtbaar is, hangt hij los. Dat laatste geldt
-     onder meer voor de PDA achter zijn inlogpoort, dus we kijken later nog een
-     paar keer of de balk alsnog opengaat. */
+  /* Liefst in een balk die de pagina al heeft, tussen zijn eigen knoppen.
+     Heeft de pagina die niet, of is hij nog niet te zien -- de PDA verbergt
+     zijn topbar achter de inlogpoort -- dan hangt de knop rechtsboven, op de
+     plek waar de schermknoppen stonden. Verschijnt de balk later alsnog, dan
+     schuift hij er vanzelf in. */
   function plaats() {
     var eigen = d.querySelector('[data-bediening]');
-    var scherm = d.querySelector('.rtg-scherm');
     var balk = d.querySelector('.topbar') || d.querySelector('.osbar') || d.querySelector('header');
-    var gast = zichtbaar(eigen) ? eigen : (zichtbaar(scherm) ? scherm : (zichtbaar(balk) ? balk : null));
+    var gast = zichtbaar(eigen) ? eigen : (zichtbaar(balk) ? balk : null);
     if (gast) {
-      var rond = gast === scherm;
-      if (knop.parentElement !== gast) {
-        knop.classList.remove('bdn-los');
-        knop.classList.toggle('bdn-rond', rond);
-        gast.appendChild(knop);
-      }
+      if (knop.parentElement !== gast) { knop.classList.remove('bdn-los'); gast.appendChild(knop); }
       return true;
     }
-    if (knop.parentElement !== d.body) {
-      knop.classList.remove('bdn-rond'); knop.classList.add('bdn-los'); d.body.appendChild(knop);
-    }
+    if (knop.parentElement !== d.body) { knop.classList.add('bdn-los'); d.body.appendChild(knop); }
     return false;
   }
 

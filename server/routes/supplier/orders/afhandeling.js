@@ -76,6 +76,10 @@ app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
   const allowed = ['nieuw', 'in bereiding', 'klaar', 'geserveerd', 'geweigerd', 'onderweg', 'bezorgd', 'opgehaald'];
   const status = String(req.body.status || '');
   if (!allowed.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+  // de bezorgketen geldt ook langs deze weg: een levering vertrekt pas als de
+  // inpakker (tas + bonnummer) en de bezorger (alles gepakt) hebben afgevinkt
+  if (status === 'onderweg' && o.levering && !(o.inpak && o.pakcheck))
+    return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.' });
   o.status = status;
   save();
   broadcastSync([o.customerTier], 'orders');

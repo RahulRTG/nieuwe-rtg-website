@@ -48,9 +48,12 @@
   }
 
   /* ---------- Rahul: vraagt en doet, met de inlog die er is ---------- */
-  // de grote apps (leden-OS, leverancier, PDA, backoffice) hebben Rahul al
-  // diep ingebouwd; daar voegen we alleen Samen toe, geen tweede knop
-  var eigenRahul = /\/apps\/(app|leverancier|personeel|backoffice)\.html$/.test(location.pathname);
+  // Het leden-OS heeft Rahul als eigen app in het dock; daar zou een tweede
+  // chatbalk een kopie zijn. Op de werk-apps (leverancier, PDA, backoffice)
+  // zit Rahul wel ingebouwd, maar alleen per kamer of per kaart -- daar is een
+  // chatbalk die je overal vandaan kunt oproepen (van de onderrand,
+  // shared/randen.js) juist een toevoeging, geen dubbeling.
+  var eigenRahul = /\/apps\/app\.html$/.test(location.pathname);
   if (!eigenRahul && !document.getElementById('rahulFab')) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;

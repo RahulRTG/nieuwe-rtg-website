@@ -1,5 +1,5 @@
   /* Deel 2 van het bedieningspaneel: de rijen, het blad en de ingang.
-     Deel 1 (bediening-01.js) opent de module en levert stijl() en GLYF. */
+     Deel 1 (bediening-01.js) opent de module en levert stijl(). */
   var scrim = null, blad = null;
 
   function rij(label, sub) {
@@ -109,49 +109,15 @@
   function sluit() { if (scrim) scrim.classList.remove('open'); }
 
 
-  /* ---- de ingang: liefst tussen de knoppen die de pagina al heeft ---- */
-  var knop = null;
-  // niet op offsetParent varen: dat is bij position:fixed altijd null
-  function zichtbaar(el) {
-    if (!el) return false;
-    var r = el.getBoundingClientRect();
-    return r.width > 0 && r.height > 0;
-  }
-
-  /* Liefst in een balk die de pagina al heeft, tussen zijn eigen knoppen.
-     Heeft de pagina die niet, of is hij nog niet te zien -- de PDA verbergt
-     zijn topbar achter de inlogpoort -- dan hangt de knop rechtsboven, op de
-     plek waar de schermknoppen stonden. Verschijnt de balk later alsnog, dan
-     schuift hij er vanzelf in. */
-  function plaats() {
-    var eigen = d.querySelector('[data-bediening]');
-    var balk = d.querySelector('.topbar') || d.querySelector('.osbar') || d.querySelector('header');
-    var gast = zichtbaar(eigen) ? eigen : (zichtbaar(balk) ? balk : null);
-    if (gast) {
-      if (knop.parentElement !== gast) { knop.classList.remove('bdn-los'); gast.appendChild(knop); }
-      return true;
-    }
-    if (knop.parentElement !== d.body) { knop.classList.add('bdn-los'); d.body.appendChild(knop); }
-    return false;
-  }
-
-  function ingang() {
-    if (d.getElementById('bdnKnop')) return;
-    stijl();
-    knop = d.createElement('button');
-    knop.type = 'button'; knop.id = 'bdnKnop'; knop.className = 'bdn-knop';
-    knop.setAttribute('aria-label', T('bdn.kop', 'Instellingen'));
-    knop.innerHTML = GLYF + '<span>' + T('bdn.kop', 'Instellingen') + '</span>';
-    knop.addEventListener('click', open);
-    if (plaats()) return;
-    // nog even meekijken of de balk alsnog opengaat (inloggen, laat renderen)
-    var n = 0, tik = setInterval(function () { if (plaats() || ++n > 12) clearInterval(tik); }, 1200);
-  }
+  /* Geen eigen ingang meer. Het paneel wordt opgeroepen zoals een
+     besturingssysteem dat doet: slepen vanaf de bovenrand van het scherm
+     (shared/randen.js). Een knop die permanent in beeld staat om iets te
+     openen dat je zelden nodig hebt, is precies wat we hier aan het opruimen
+     waren. Menu's en zoekschermen kunnen RTGBediening.open() aanroepen. */
 
   function start() {
     // het leden-OS heeft zijn eigen bedieningspaneel; daar niets bijbouwen
     if (d.getElementById('osCcScrim')) { w.RTGBediening = { open: function () {}, aanwezig: false }; return; }
-    ingang();
     w.RTGBediening = { open: open, sluit: sluit, aanwezig: true };
   }
 

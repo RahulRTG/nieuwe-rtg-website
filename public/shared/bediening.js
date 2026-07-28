@@ -7,12 +7,10 @@
    paneel, achter één ingang. Het leden-OS had dit al -- daar zit alles in het
    bedieningspaneel -- en dit is datzelfde idee voor elk ander scherm.
 
-   De ingang zoekt een plek die de pagina al heeft, in deze volgorde:
-     1. het leden-OS (#osCcScrim)  -> niets bouwen, dat paneel bestaat al
-     2. [data-bediening]           -> de pagina wijst zelf een plek aan
-     3. .topbar / .osbar / header  -> een knop tussen de knoppen die er staan
-     4. anders                     -> één knop rechtsboven, op de plek waar de
-                                      schermknoppen stonden
+   Er is geen knop om hem te openen: je haalt hem van de bovenrand omlaag,
+   zoals een besturingssysteem dat doet (shared/randen.js). Op het leden-OS
+   bouwt deze module niets -- daar bestaat het bedieningspaneel al, en de
+   bovenrand opent dat.
 
    Elke rij verschijnt alleen als de bijbehorende laag echt geladen is. */
 (function (w, d) {
@@ -20,29 +18,10 @@
   if (w.RTGBediening) return;
 
   var T = function (k, nl) { return (w.RTGi18n && w.RTGi18n.t) ? w.RTGi18n.t(k, nl) : nl; };
-  // drie schuifjes: leest meteen als "instellingen". Een cirkel met stralen zou
-  // als zon/helderheid lezen, en dat is maar een van de rijen.
-  var GLYF = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" ' +
-    'stroke-width="1.6" stroke-linecap="round" aria-hidden="true">' +
-    '<path d="M4 7h10M18 7h2M4 12h3M11 12h9M4 17h8M16 17h4"/>' +
-    '<circle cx="16" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="17" r="2"/></svg>';
-
   function stijl() {
     if (d.getElementById('bdnCss')) return;
     var s = d.createElement('style'); s.id = 'bdnCss';
     s.textContent =
-      '.bdn-knop{display:inline-flex;align-items:center;gap:.4rem;border-radius:999px;cursor:pointer;' +
-        'font-family:Inter,system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.02em;' +
-        'padding:.42rem .8rem;color:var(--txt,#F4F1EC);' +
-        'background:color-mix(in srgb, var(--card,#151312) 82%, transparent);' +
-        'border:1px solid var(--line,rgba(255,255,255,.14));}' +
-      '.bdn-knop:hover{border-color:var(--gold,#A98F1C);}' +
-      '.bdn-knop:focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}' +
-      '.bdn-knop svg{flex:0 0 auto;color:var(--gold,#A98F1C);}' +
-      /* de terugval: rechtsboven, de plek van de oude schermknoppen */
-      '.bdn-los{position:fixed;z-index:36;top:calc(env(safe-area-inset-top,0px) + .7rem);' +
-        'right:calc(env(safe-area-inset-right,0px) + .7rem);backdrop-filter:blur(14px);' +
-        '-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 24px rgba(0,0,0,.35);}' +
       '.bdn-scrim{position:fixed;inset:0;z-index:9995;display:none;align-items:flex-end;justify-content:center;' +
         'background:rgba(6,5,5,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}' +
       '.bdn-scrim.open{display:flex;}' +
@@ -68,13 +47,13 @@
       '.bdn-do button:hover,.bdn-do button.actief{border-color:var(--gold,#A98F1C);}' +
       '.bdn-do button.actief{color:var(--gold,#A98F1C);}' +
       '.bdn-stip{width:22px;height:22px;border-radius:999px;padding:0;border:2px solid transparent;}' +
-      '@media print{.bdn-knop,.bdn-scrim{display:none !important;}}';
+      '@media print{.bdn-scrim{display:none !important;}}';
     (d.head || d.documentElement).appendChild(s);
   }
 
   // deel 2 zet de rijen, het paneel en de ingang; zie bediening-02.js
   /* Deel 2 van het bedieningspaneel: de rijen, het blad en de ingang.
-     Deel 1 (bediening-01.js) opent de module en levert stijl() en GLYF. */
+     Deel 1 (bediening-01.js) opent de module en levert stijl(). */
   var scrim = null, blad = null;
 
   function rij(label, sub) {
@@ -184,49 +163,15 @@
   function sluit() { if (scrim) scrim.classList.remove('open'); }
 
 
-  /* ---- de ingang: liefst tussen de knoppen die de pagina al heeft ---- */
-  var knop = null;
-  // niet op offsetParent varen: dat is bij position:fixed altijd null
-  function zichtbaar(el) {
-    if (!el) return false;
-    var r = el.getBoundingClientRect();
-    return r.width > 0 && r.height > 0;
-  }
-
-  /* Liefst in een balk die de pagina al heeft, tussen zijn eigen knoppen.
-     Heeft de pagina die niet, of is hij nog niet te zien -- de PDA verbergt
-     zijn topbar achter de inlogpoort -- dan hangt de knop rechtsboven, op de
-     plek waar de schermknoppen stonden. Verschijnt de balk later alsnog, dan
-     schuift hij er vanzelf in. */
-  function plaats() {
-    var eigen = d.querySelector('[data-bediening]');
-    var balk = d.querySelector('.topbar') || d.querySelector('.osbar') || d.querySelector('header');
-    var gast = zichtbaar(eigen) ? eigen : (zichtbaar(balk) ? balk : null);
-    if (gast) {
-      if (knop.parentElement !== gast) { knop.classList.remove('bdn-los'); gast.appendChild(knop); }
-      return true;
-    }
-    if (knop.parentElement !== d.body) { knop.classList.add('bdn-los'); d.body.appendChild(knop); }
-    return false;
-  }
-
-  function ingang() {
-    if (d.getElementById('bdnKnop')) return;
-    stijl();
-    knop = d.createElement('button');
-    knop.type = 'button'; knop.id = 'bdnKnop'; knop.className = 'bdn-knop';
-    knop.setAttribute('aria-label', T('bdn.kop', 'Instellingen'));
-    knop.innerHTML = GLYF + '<span>' + T('bdn.kop', 'Instellingen') + '</span>';
-    knop.addEventListener('click', open);
-    if (plaats()) return;
-    // nog even meekijken of de balk alsnog opengaat (inloggen, laat renderen)
-    var n = 0, tik = setInterval(function () { if (plaats() || ++n > 12) clearInterval(tik); }, 1200);
-  }
+  /* Geen eigen ingang meer. Het paneel wordt opgeroepen zoals een
+     besturingssysteem dat doet: slepen vanaf de bovenrand van het scherm
+     (shared/randen.js). Een knop die permanent in beeld staat om iets te
+     openen dat je zelden nodig hebt, is precies wat we hier aan het opruimen
+     waren. Menu's en zoekschermen kunnen RTGBediening.open() aanroepen. */
 
   function start() {
     // het leden-OS heeft zijn eigen bedieningspaneel; daar niets bijbouwen
     if (d.getElementById('osCcScrim')) { w.RTGBediening = { open: function () {}, aanwezig: false }; return; }
-    ingang();
     w.RTGBediening = { open: open, sluit: sluit, aanwezig: true };
   }
 

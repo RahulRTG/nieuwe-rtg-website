@@ -3,6 +3,9 @@
        en stuurt zelf, zodat de rust en de geld-drempel bij de gebruiker blijven.
        Via event-delegatie, dus het werkt ook op later bijgeladen schermen. */
     window.RTGRahul = window.RTGRahul || {};
+    // de chatbalk zonder opdracht openen: zo roept de onderrand hem op
+    // (shared/randen.js), zonder dat er ergens een knop hoeft te staan
+    window.RTGRahul.open = function () { sheet.hidden = false; fab.hidden = true; doofMelding(); inp.focus(); };
     window.RTGRahul.vraag = function (tekst) {
       sheet.hidden = false; fab.hidden = true; doofMelding();
       inp.value = String(tekst || '').slice(0, 300); inp.focus();

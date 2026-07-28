@@ -37,11 +37,11 @@
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
-  var css = '.mgz-knop{position:fixed;right:1rem;z-index:35;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+  var css = '.mgz-knop{position:fixed;right:1rem;z-index:9980;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
     '.mgz-knop.mgz-sleept{cursor:grabbing;opacity:.9;box-shadow:0 12px 34px rgba(0,0,0,.55);}' +
     '.mgz-rahul{bottom:1rem;background:var(--gold,#857007);color:#000;}' +
     '.mgz-samen{bottom:3.6rem;background:#151312;color:#eee;border:1px solid var(--gold,#857007);}' +
-    '.mgz-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
+    '.mgz-sheet{position:fixed;right:1rem;bottom:1rem;z-index:9981;width:min(360px,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
     '.mgz-sheet[hidden]{display:none;}.mgz-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;cursor:move;touch-action:none;user-select:none;-webkit-user-select:none;}' +
     '.mgz-sheet.mgz-sleept{opacity:.96;box-shadow:0 16px 44px rgba(0,0,0,.6);}' +
     '.mgz-x{background:transparent;border:1px solid #333;border-radius:8px;color:#eee;padding:.15rem .5rem;cursor:pointer;}' +
@@ -49,7 +49,7 @@
     '.mgz-rij{display:flex;gap:.4rem;}.mgz-rij input{flex:1;background:#0C0C0B;border:1px solid #333;border-radius:10px;color:#eee;font:inherit;font-size:.85rem;padding:.5rem .7rem;}' +
     '.mgz-go{background:var(--gold,#857007);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}' +
     '.mgz-stil{background:transparent;color:#eee;border:1px solid #444;border-radius:10px;padding:.5rem .8rem;font:inherit;font-size:.83rem;cursor:pointer;}' +
-    '.mgz-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:6.4rem;z-index:37;background:#0C0C0B;border:1px solid var(--gold,#857007);border-radius:12px;padding:.6rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.84rem;color:#eee;display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
+    '.mgz-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:6.4rem;z-index:9982;background:#0C0C0B;border:1px solid var(--gold,#857007);border-radius:12px;padding:.6rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.84rem;color:#eee;display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
     '.mgz-code{font-family:ui-monospace,monospace;letter-spacing:.2em;color:var(--gold,#857007);font-weight:700;}' +
     '.mgz-chat{font-size:.82rem;color:#bbb;max-height:26vh;overflow-y:auto;line-height:1.5;}' +
     /* de melding-staat: de lippen verkleuren (gouden gloed die ademt) en er
@@ -113,9 +113,12 @@
   }
 
   /* ---------- Rahul: vraagt en doet, met de inlog die er is ---------- */
-  // de grote apps (leden-OS, leverancier, PDA, backoffice) hebben Rahul al
-  // diep ingebouwd; daar voegen we alleen Samen toe, geen tweede knop
-  var eigenRahul = /\/apps\/(app|leverancier|personeel|backoffice)\.html$/.test(location.pathname);
+  // Het leden-OS heeft Rahul als eigen app in het dock; daar zou een tweede
+  // chatbalk een kopie zijn. Op de werk-apps (leverancier, PDA, backoffice)
+  // zit Rahul wel ingebouwd, maar alleen per kamer of per kaart -- daar is een
+  // chatbalk die je overal vandaan kunt oproepen (van de onderrand,
+  // shared/randen.js) juist een toevoeging, geen dubbeling.
+  var eigenRahul = /\/apps\/app\.html$/.test(location.pathname);
   if (!eigenRahul && !document.getElementById('rahulFab')) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;
@@ -230,6 +233,9 @@
        en stuurt zelf, zodat de rust en de geld-drempel bij de gebruiker blijven.
        Via event-delegatie, dus het werkt ook op later bijgeladen schermen. */
     window.RTGRahul = window.RTGRahul || {};
+    // de chatbalk zonder opdracht openen: zo roept de onderrand hem op
+    // (shared/randen.js), zonder dat er ergens een knop hoeft te staan
+    window.RTGRahul.open = function () { sheet.hidden = false; fab.hidden = true; doofMelding(); inp.focus(); };
     window.RTGRahul.vraag = function (tekst) {
       sheet.hidden = false; fab.hidden = true; doofMelding();
       inp.value = String(tekst || '').slice(0, 300); inp.focus();

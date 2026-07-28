@@ -5,6 +5,13 @@
    lippen bewegen mee. Inklapbaar tot alleen de lippen, zodat het nooit in de weg
    zit -- rustig, en nergens te druk.
 
+   De balk stond permanent onderin beeld. Dat hoeft niet: je roept hem op door
+   vanaf de ONDERRAND omhoog te halen (shared/randen.js), net zoals je het
+   bedieningspaneel van de bovenrand haalt. Een tik op de lippen (of Escape)
+   legt hem weer helemaal weg -- niet ingeklapt tot een pil in de hoek, want
+   dat is precies wat we van de schermen af hebben gehaald. Zo is Rahul altijd
+   binnen handbereik zonder ooit in beeld te staan.
+
    Alleen actief met een zaak-inlog (rtg_sup_token); zonder token doet het niets.
    Zelfstandig: plak <script src="/shared/rahul-mond.js" defer> op een werk-scherm
    en de balk richt zichzelf in. Laadt maar een keer. */
@@ -14,13 +21,12 @@
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
   if (!supTok) return; // alleen de bedrijfssoftware (zaak)
 
-  var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
-  var open = false;
-  try { open = localStorage.getItem('rtg_mond_open') !== '0'; } catch (e) {}
-
   var css =
     '.rmond{position:fixed;left:50%;transform:translateX(-50%);' +
-    'bottom:calc(env(safe-area-inset-bottom,0px) + 0.7rem);z-index:34;' +
+    /* Rahul komt van de onderrand over de app heen; de werkschillen van de
+       zaak-apps staan zelf al vast op z-index 60 tot ruim 100, dus hij moet
+       daarboven. Alleen het bedieningspaneel (9995) gaat er nog overheen. */
+    'bottom:calc(env(safe-area-inset-bottom,0px) + 0.7rem);z-index:9981;' +
     'display:flex;align-items:center;gap:.5rem;background:#0C0C0B;' +
     'border:1px solid var(--gold,#857007);border-radius:999px;padding:.32rem .4rem .32rem .32rem;' +
     'box-shadow:0 10px 30px rgba(0,0,0,.5);font-family:Inter,system-ui,sans-serif;max-width:min(30rem,92vw);}' +
@@ -29,10 +35,9 @@
     '.rmond .rm-veld::placeholder{color:rgba(244,241,236,.55);}' +
     '.rmond .rm-go{flex:0 0 auto;width:1.9rem;height:1.9rem;border-radius:50%;border:none;cursor:pointer;' +
     'background:var(--gold,#857007);color:#0C0C0B;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;}' +
-    '.rmond.rm-dicht{padding:.28rem;}' +
-    '.rmond.rm-dicht .rm-veld,.rmond.rm-dicht .rm-go{display:none;}' +
+    '.rmond.rm-weg,.rm-uit.rm-weg{display:none;}' +
     '.rm-uit{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 3.6rem);' +
-    'z-index:34;max-width:min(30rem,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:14px;' +
+    'z-index:9982;max-width:min(30rem,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:14px;' +
     'padding:.6rem .8rem;color:#eee;font-family:Inter,system-ui,sans-serif;font-size:.85rem;line-height:1.5;' +
     'box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:pre-wrap;max-height:40vh;overflow-y:auto;}' +
     '.rm-uit[hidden]{display:none;}' +
@@ -45,13 +50,15 @@
   function bouw() {
     stijl();
     uit = document.createElement('div'); uit.className = 'rm-uit'; uit.hidden = true; uit.setAttribute('role', 'status'); uit.setAttribute('aria-live', 'polite');
-    bar = document.createElement('div'); bar.className = 'rmond' + (open ? '' : ' rm-dicht');
+    // weggelegd tot je hem van de onderrand omhoog haalt
+    bar = document.createElement('div'); bar.className = 'rmond rm-weg';
     // id 'rahulFab' is het huismerk voor "hier is Rahul al"; de metgezel-laag
     // ziet dit en laat zijn eigen Rahul-knop weg (alleen Samen blijft), zodat
     // er nooit twee monden naast elkaar staan -- nergens te druk.
     bar.id = 'rahulFab';
     bar.setAttribute('aria-label', 'Rahul, vraag of laat iets doen');
-    var can = document.createElement('canvas'); can.width = 132; can.height = 132; can.title = 'Rahul';
+    var can = document.createElement('canvas'); can.width = 132; can.height = 132;
+    can.title = 'Rahul wegleggen'; can.setAttribute('aria-label', 'Rahul wegleggen');
     veld = document.createElement('input'); veld.className = 'rm-veld'; veld.type = 'text'; veld.maxLength = 300;
     veld.placeholder = 'Vraag Rahul, of laat iets doen...';
     veld.setAttribute('aria-label', 'Vraag of opdracht aan Rahul');
@@ -81,12 +88,10 @@
     s.onerror = function () { can.style.background = 'radial-gradient(circle,#C23A5E,#7F1634)'; };
     document.head.appendChild(s);
 
-    // de lippen tikken = in-/uitklappen (het schrijfveld tonen of verbergen)
-    can.addEventListener('click', function () {
-      open = bar.classList.toggle('rm-dicht') ? false : true;
-      try { localStorage.setItem('rtg_mond_open', open ? '1' : '0'); } catch (e) {}
-      if (open) veld.focus();
-    });
+    /* De lippen tikken = wegleggen. Vroeger klapte hij in tot alleen de lippen,
+       maar dat is weer een pil die blijft zweven; nu gaat hij helemaal weg en
+       haal je hem opnieuw van de onderrand. */
+    can.addEventListener('click', function () { window.RTGRahul.sluit(); });
     go.addEventListener('click', vraag);
     veld.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); vraag(); } });
   }
@@ -109,10 +114,21 @@
      mee en stuurt zelf. Zelfde afspraak als bij de leden-metgezel. */
   function bindLeeg() {
     window.RTGRahul = window.RTGRahul || {};
+    /* De balk tevoorschijn halen (de onderrand doet dit) en weer wegleggen. */
+    window.RTGRahul.open = function () {
+      if (!bar) return;
+      bar.classList.remove('rm-weg');
+      if (veld) veld.focus();
+    };
+    window.RTGRahul.sluit = function () {
+      if (bar) bar.classList.add('rm-weg');
+      if (uit) uit.hidden = true;
+    };
     window.RTGRahul.vraag = function (tekst) {
-      if (bar && bar.classList.contains('rm-dicht')) { bar.classList.remove('rm-dicht'); open = true; try { localStorage.setItem('rtg_mond_open', '1'); } catch (e) {} }
+      window.RTGRahul.open();
       if (veld) { veld.value = String(tekst || '').slice(0, 300); veld.focus(); }
     };
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') window.RTGRahul.sluit(); });
     if (!window.__rahulLeegBound) {
       window.__rahulLeegBound = true;
       document.addEventListener('click', function (ev) {

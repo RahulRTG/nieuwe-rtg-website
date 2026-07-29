@@ -13,6 +13,44 @@ function maakTokens(getUserById) {
     const body = userId + '.' + (Date.now() + days * 86400000);
     return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
   }
+  /* DE INTREKLIJST -- waarom een staatloos token er toch een nodig heeft.
+
+     Een sessietoken is hier staatloos: alles staat erin, ondertekend met HMAC.
+     Dat is snel en het schaalt, maar het heeft één gevolg dat lang onopgemerkt
+     bleef: er is server-side niets om weg te gooien, dus UITLOGGEN KON NIETS
+     INTREKKEN. /api/logout antwoordde { ok: true } en het token bleef daarna
+     gewoon werken -- tot de vervaldatum, dertig dagen later. Op een geleende
+     of gedeelde computer is dat precies het moment waarop iemand denkt veilig
+     te zijn. Gevonden in aanvalsronde 2 (scripts/aanval.js, punt 14).
+
+     De lijst blijft klein en heeft geen opruimtaak nodig: een ingetrokken
+     token hoeft maar te worden onthouden tot het moment waarop het toch al zou
+     verlopen. Daarna mag het weg -- verifyToken wijst het dan af op de datum.
+     We ruimen luk-raak op tijdens het intrekken zelf, zodat er geen timer bij
+     hoeft. */
+  function trekIn(token) {
+    let exp = 0;
+    try {
+      const body = Buffer.from(String(token).split('.')[0], 'base64url').toString();
+      exp = Number(body.split('.')[1]) || 0;
+    } catch (e) { return false; }
+    if (!exp || exp < Date.now()) return true; // al verlopen: niets te onthouden
+    try {
+      // meteen opruimen wat toch al verlopen was: geen aparte taak nodig
+      S.db.prepare('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(Date.now());
+      S.db.prepare('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
+        .run(kluis.sign(String(token)), exp);
+      return true;
+    } catch (e) { return false; }
+  }
+  function isIngetrokken(token) {
+    try {
+      const r = S.db.prepare('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
+        .get(kluis.sign(String(token)));
+      return !!r && Number(r.verloopt) >= Date.now();
+    } catch (e) { return false; }
+  }
+
   function verifyToken(token) {
     try {
       const [b64, sig] = String(token).split('.');
@@ -21,6 +59,7 @@ function maakTokens(getUserById) {
       if (kluis.sign(body) !== sig) return null;
       const [id, exp] = body.split('.');
       if (Number(exp) < Date.now()) return null;
+      if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
       return getUserById(Number(id));
     } catch (e) { return null; }
   }
@@ -65,7 +104,7 @@ function maakTokens(getUserById) {
     return getUserById(userId);
   }
 
-  return { issueToken, verifyToken, issueActionToken, verifyActionToken,
+  return { issueToken, verifyToken, trekIn, isIngetrokken, issueActionToken, verifyActionToken,
     setEmailVerified, createReset, findByReset, setPassword };
 }
 

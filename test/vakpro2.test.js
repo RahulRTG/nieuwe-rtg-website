@@ -16,7 +16,27 @@ function api(base, pad, body, token) {
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-const dag = new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10);
+/* Een WERKDAG drie dagen vooruit, niet zomaar "+3 dagen".
+
+   Hier stond new Date(Date.now() + 3 * 864e5). De standaardwerkdagen van een
+   vakwerk-zaak zijn maandag t/m vrijdag (urenVan in server/kern/vakwerk/
+   agenda.js), dus op woensdag en donderdag viel "+3" op zaterdag of zondag.
+   Dan geeft /api/booking/slots een lege lijst terug, is de eerste vrije tijd
+   undefined, en zakte de capaciteitstest -- twee dagen per week, terwijl er
+   met de capaciteit niets mis was.
+
+   Een test die twee van de zeven dagen rood staat is erger dan geen test: hij
+   leert je om rood te negeren. test/vakwerk.test.js loste dit eerder op met
+   een vaste dinsdag ver in de toekomst; hier blijft de datum dichtbij (dat
+   hoort bij het scenario) en rollen we door naar de eerstvolgende werkdag.
+
+   getUTCDay bij toISOString: allebei UTC, anders schuift het rond middernacht. */
+function werkdagVooruit(dagen) {
+  const d = new Date(Date.now() + dagen * 864e5);
+  while (d.getUTCDay() === 0 || d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+const dag = werkdagVooruit(3);
 
 let srv, base, lid, lid2, zaak;
 test.before(async () => {

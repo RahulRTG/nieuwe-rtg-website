@@ -97,6 +97,20 @@ function init() {
   // een miljoen leden is dat ~170 ms per poging; met de index blijft het < 1 ms.
   try { db.exec('CREATE INDEX IF NOT EXISTS idx_users_lower_username ON users(lower(username))'); } catch (e) {}
 
+  /* Ingetrokken sessietokens ("uitgelogd").
+
+     Sessietokens zijn staatloos ondertekend, dus er valt server-side niets weg
+     te gooien bij uitloggen. Dat betekende dat /api/logout { ok: true } gaf en
+     het token daarna gewoon bleef werken -- tot dertig dagen later. Gevonden in
+     aanvalsronde 2. Deze tabel is de tegenhanger: een token dat is ingetrokken
+     staat erin tot het moment waarop het tóch zou verlopen, en verifyToken
+     wijst het tot dan af. Daarna mag de regel weg; het opruimen gebeurt bij het
+     intrekken zelf, zodat er geen aparte taak voor hoeft te draaien. */
+  db.exec(`CREATE TABLE IF NOT EXISTS ingetrokken_tokens (
+    hash TEXT PRIMARY KEY,
+    verloopt INTEGER NOT NULL
+  )`);
+
   // Personeelsaccounts binnen een leverancier-bedrijfsaccount (PIN-login).
   db.exec(`CREATE TABLE IF NOT EXISTS supplier_staff (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

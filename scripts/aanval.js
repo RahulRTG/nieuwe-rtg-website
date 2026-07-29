@@ -189,12 +189,21 @@ async function aanvallen() {
 
   // 14. UITGELOGD TOKEN BLIJFT WERKEN: na uitloggen hoort de sleutel dood te
   //     zijn. Zo niet, dan helpt uitloggen op een gedeelde computer niets.
+  /* Let op het PAD. Mijn eerste versie klopte op /api/auth/logout -- dat
+     bestaat niet (het is /api/logout), dus de 404 leverde "het token werkt nog"
+     op en dat zag eruit als een ernstige bevinding. Een aanvalsscript dat op
+     een verkeerd adres klopt meldt een gat dat er niet is, en dat is net zo
+     schadelijk als een gat missen: je gaat een dag lang iets repareren wat
+     niet kapot was. Daarom eerst controleren DAT het endpoint bestaat. */
   const C = await nieuwLid();
   if (C && C.token) {
-    await post('/api/auth/logout', {}, C.token);
-    const na = await post('/api/state', {}, C.token);
-    if (na.status >= 200 && na.status < 300) meld(raak, 'token na uitloggen', 'het token werkt nog na uitloggen');
-    else meld(ok, 'token na uitloggen', 'ingetrokken (' + na.status + ')');
+    const uit = await post('/api/logout', {}, C.token);
+    if (uit.status === 404) meld(let_op, 'token na uitloggen', 'geen uitlog-endpoint gevonden op /api/logout; controleer het pad voordat je hier iets uit concludeert');
+    else {
+      const na = await post('/api/state', {}, C.token);
+      if (na.status >= 200 && na.status < 300) meld(raak, 'token na uitloggen', 'het token werkt nog na uitloggen');
+      else meld(ok, 'token na uitloggen', 'ingetrokken (' + na.status + ')');
+    }
   }
 
   // 15. BRUTE FORCE: honderd verkeerde wachtwoorden achter elkaar. Ergens

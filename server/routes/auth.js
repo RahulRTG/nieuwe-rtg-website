@@ -52,8 +52,20 @@ app.post('/api/login', (req, res) => {
   res.json({ token, state: stateFor(sess, req.body.lang) });
 });
 
+/* UITLOGGEN MOET OOK ECHT UITLOGGEN.
+
+   Hier stond alleen de lus over `sessions`. Die dekt de demo-sessies, maar een
+   ECHT ledenaccount komt via accounts.verifyToken binnen (zie resolveSession in
+   server.js) en staat helemaal niet in die map. Voor elk gewoon lid deed
+   uitloggen dus niets: het antwoord was { ok: true } en het token bleef daarna
+   gewoon werken. Op een geleende of gedeelde computer is dat precies het moment
+   waarop iemand denkt veilig te zijn. Gevonden in aanvalsronde 2, punt 14. */
 app.post('/api/logout', auth, (req, res) => {
   for (const [token, sess] of sessions) if (sess === req.session) forgetSession(token);
+  // en de staatloze kant: het aangeboden token op de intreklijst
+  const kop = req.get('authorization') || '';
+  const tok = kop.startsWith('Bearer ') ? kop.slice(7) : null;
+  if (tok && accounts && typeof accounts.trekIn === 'function') accounts.trekIn(tok);
   res.json({ ok: true });
 });
 

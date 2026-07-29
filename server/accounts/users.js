@@ -104,7 +104,7 @@ function phoneOf(u) { return u ? kluis.dec(u.enc_phone) : null; }
 /* De staatloze tokens, de e-mailbevestiging en het wachtwoord-herstel staan
    in ./tokens.js; ze krijgen getUserById mee en verhuizen mee in de export,
    zodat aanroepers niets merken. */
-const { issueToken, verifyToken, issueActionToken, verifyActionToken,
+const { issueToken, verifyToken, trekIn, isIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword } = require('./tokens').maakTokens(getUserById);
 
 /* Openbaar profiel voor de client (nooit de wachtwoord-hash of ruwe kluis). */
@@ -190,7 +190,7 @@ function deleteUser(id) {
 module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
   renameUser, setTier, realNameOf, emailOf, phoneOf,
-  issueToken, verifyToken, issueActionToken, verifyActionToken,
+  issueToken, verifyToken, trekIn, isIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

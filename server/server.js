@@ -135,6 +135,11 @@ try {
   }
 } catch (e) {}
 accounts.init();
+/* De SSO-tabellen horen bij de identiteitskluis en gaan dus in dezelfde
+   database, meteen na accounts.init() -- niet in een eigen bestand. Wie de
+   koppelingen kan lezen, kan zien welke organisatie waar inlogt; dat hoort bij
+   de identiteiten te staan en niet bij de operationele data. */
+require('./sso').zorgTabel();
 // Demo-modus: alleen buiten productie, of expliciet met RTG_DEMO=1. Zo staan de
 // demo-inlog en het demo-account (Rahul/Imran) nooit per ongeluk open op productie.
 const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
@@ -2879,6 +2884,10 @@ for (const naam of gekozenDomeinen) {
 // leveranciers; net als de infra-endpoints draait dit altijd mee.
 require('./routes/onboarding')(kern);
 require('./routes/aanmeldgesprek')(kern);
+/* SSO staat naast de auth-routes en niet erin: het is een tweede weg naar
+   binnen, met een eigen levensloop (koppelingen, providers), en het moet ook
+   draaien als het auth-domein apart is opgestart. */
+require('./routes/sso')(kern);
 require('./routes/algpin')(kern);
 require('./routes/sleutelwoorden')(kern);
 require('./routes/agenda')(kern);

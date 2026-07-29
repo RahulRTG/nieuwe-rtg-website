@@ -43,6 +43,34 @@ function maakTokens(getUserById) {
       return true;
     } catch (e) { return false; }
   }
+  /* Een DOELGEBONDEN token intrekken (e-mailbevestiging, SSO-overdracht).
+
+     trekIn() hierboven werkt niet voor deze vorm: een sessietoken heeft de body
+     `id.exp`, een actie-token `id.doel.exp`. trekIn leest daardoor het DOEL waar
+     hij de vervaldatum verwacht, krijgt NaN, en concludeert "al verlopen, niets
+     te onthouden" -- hij geeft netjes true terug en doet niets. Stil falen, en
+     precies bij het soort token dat je eenmalig wilt kunnen maken.
+
+     Nodig geworden bij de SSO-overdracht: die geeft de bezoeker een bewijs van
+     zestig seconden mee dat hij bij ons inruilt voor een echt sessietoken.
+     Zonder intrekken zou dat bewijs die hele minuut opnieuw te gebruiken zijn --
+     en het staat in een URL, dus het staat ook in de browsergeschiedenis. */
+  function trekInActie(token, doel) {
+    let exp = 0;
+    try {
+      const body = Buffer.from(String(token).split('.')[0], 'base64url').toString();
+      const delen = body.split('.');
+      if (doel !== undefined && delen[1] !== String(doel)) return false; // ander doel: niet aan zitten
+      exp = Number(delen[2]) || 0;
+    } catch (e) { return false; }
+    if (!exp || exp < Date.now()) return true; // al verlopen: niets te onthouden
+    try {
+      S.db.prepare('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(Date.now());
+      S.db.prepare('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
+        .run(kluis.sign(String(token)), exp);
+      return true;
+    } catch (e) { return false; }
+  }
   function isIngetrokken(token) {
     try {
       const r = S.db.prepare('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
@@ -74,6 +102,10 @@ function maakTokens(getUserById) {
       if (!b64 || !sig || kluis.sign(Buffer.from(b64, 'base64url').toString()) !== sig) return null;
       const [id, p, exp] = Buffer.from(b64, 'base64url').toString().split('.');
       if (p !== purpose || Number(exp) < Date.now()) return null;
+      /* Zonder deze regel is trekInActie een gebaar: het token staat dan wel op
+         de lijst, maar niemand kijkt ernaar. Dat was hierboven bij het uitloggen
+         precies het gat (aanvalsronde 2, punt 14) -- niet nog een keer. */
+      if (isIngetrokken(token)) return null;
       return getUserById(Number(id));
     } catch (e) { return null; }
   }
@@ -104,7 +136,7 @@ function maakTokens(getUserById) {
     return getUserById(userId);
   }
 
-  return { issueToken, verifyToken, trekIn, isIngetrokken, issueActionToken, verifyActionToken,
+  return { issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
     setEmailVerified, createReset, findByReset, setPassword };
 }
 

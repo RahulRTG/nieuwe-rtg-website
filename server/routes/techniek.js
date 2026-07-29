@@ -179,6 +179,7 @@ module.exports = (kern) => {
   require('./techniek/beheer')(tctx);
   require('./techniek/wacht')(tctx);
   require('./techniek/papieren')(tctx);
+  require('./techniek/sso')(tctx);
 
   // Hulp voor de kern: mag een door een zekering bewaakt subsysteem draaien?
   kern.zekeringMag = (id) => { const z = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen[id]; return !z || z.aan !== false; };

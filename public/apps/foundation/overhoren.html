@@ -351,10 +351,17 @@ $('#dCheck').addEventListener('click', async () => {
 $('#dAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#dCheck').click(); });
 $('#dTerug').addEventListener('click', () => { toon('vLijsten'); laadLijsten(); });
 
-laadLijsten();
-laadHerhaal();
-const qs = new URLSearchParams(location.search);
-if (qs.get('duel')) openDuel(qs.get('duel'));
+/* Zonder sessie heeft eisFamilie() hierboven al doorgestuurd naar de inlog.
+   Deze pagina hoort dan niets meer te beginnen: api() leest s.code, en op een
+   lege sessie liep dat stuk met een TypeError -- in het gezicht van een kind
+   dat alleen maar te vroeg op de tegel tikte. Niet booten is het antwoord;
+   de omleiding doet de rest. */
+if (s) {
+  laadLijsten();
+  laadHerhaal();
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('duel')) openDuel(qs.get('duel'));
+}
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

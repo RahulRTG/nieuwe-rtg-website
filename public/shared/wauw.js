@@ -23,7 +23,18 @@
 
   /* 1. Zachte overgangen binnen een pagina. */
   function vt(fn) {
-    if (document.startViewTransition && !rustig()) return document.startViewTransition(fn);
+    if (document.startViewTransition && !rustig()) {
+      var t = document.startViewTransition(fn);
+      /* Wordt de overgang overgeslagen -- er komt er meteen een tweede
+         achteraan, of het tabblad is niet zichtbaar -- dan verwerpt .ready
+         met een AbortError. De schermwissel zelf is dan gewoon gebeurd;
+         alleen de animatie viel weg. Zonder deze vangst blijft die afwijzing
+         onafgevangen en meldt de browser 'Transition was skipped' als een
+         paginafout. Een overgeslagen animatie is geen fout, dus slikken we
+         hem hier op: dezelfde nette terugval als een toestel zonder de API. */
+      if (t && t.ready && t.ready.catch) t.ready.catch(function () {});
+      return t;
+    }
     var r = fn(); return { finished: Promise.resolve(r) };
   }
 

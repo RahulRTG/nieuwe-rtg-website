@@ -63,7 +63,14 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 20000 });
 
-    // 1. de balk staat er (via metgezel -> handenvrij -> handenvrij-balk)
+    /* 1. de balk hangt klaar (via metgezel -> handenvrij -> handenvrij-balk),
+       maar staat niet uit zichzelf op het scherm: sinds "Losse knoppen weg"
+       is er geen vaste balk meer. Je roept Rahul, en dan is hij er. Beide
+       kanten horen hier vast te liggen, anders sluipt de balk zo weer terug. */
+    await page.waitForSelector('.hv-balk input', { state: 'attached', timeout: 15000 });
+    assert.equal(await page.evaluate(() => document.querySelector('.hv-balk').classList.contains('hv-weg')),
+      true, 'de balk hoort weg te staan tot je Rahul roept');
+    await page.evaluate(() => window.RTGRahul.open());
     await page.waitForSelector('.hv-balk input', { state: 'visible', timeout: 15000 });
 
     // 2. typen zonder de muis: een losse letter belandt in de balk
@@ -156,6 +163,9 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     // met de mond aan: eerst een bevestiging, en pas daarna gaat het uit
     await page.evaluate(() => { sessionStorage.setItem('rtg_handenvrij_geldmond', '1'); });
     await page.reload({ waitUntil: 'load' });
+    // na het herladen hangt de balk weer weg; roep Rahul opnieuw
+    await page.waitForSelector('.hv-balk input', { state: 'attached', timeout: 15000 });
+    await page.evaluate(() => window.RTGRahul.open());
     await page.waitForSelector('.hv-balk input', { state: 'visible', timeout: 15000 });
     let naarRahul2 = 0;
     await page.route('**/api/fluister', async r => {

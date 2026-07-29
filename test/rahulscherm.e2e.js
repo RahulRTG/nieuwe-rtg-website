@@ -49,8 +49,12 @@ test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: pw ? fal
     const fouten = [];
     page.on('pageerror', (e) => fouten.push(String(e && e.message || e)));
     await page.goto(srv.base + '/apps/berichten.html', { waitUntil: 'domcontentloaded' });
-    // de balk en het paneel horen er te komen zonder dat er iets geopend wordt
-    await page.waitForSelector('.hv-balk input', { timeout: 20000 });
+    /* de balk en het paneel horen er te komen zonder dat er iets geopend wordt.
+       Let op 'attached', niet zichtbaar: sinds "Losse knoppen weg" staat er geen
+       vaste balk meer op het scherm. Hij hangt klaar en komt pas als je Rahul
+       roept -- precies het punt van deze test: het paneel bemoeit zich nergens
+       mee tot er iets te melden is. */
+    await page.waitForSelector('.hv-balk input', { state: 'attached', timeout: 20000 });
     await page.waitForFunction(() => !!window.RTGChatScherm, null, { timeout: 20000 });
 
     const stand = () => page.evaluate(() => window.RTGChatScherm.stand());

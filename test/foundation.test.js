@@ -94,8 +94,18 @@ test('op reis met de foundation: een aanvraag wordt bewaard, onvolledig geweiger
   // volledige aanvraag lukt
   const r = await api('/reis/aanvraag', { soort: 'aanvraag', naam: 'Fatima', contact: 'fatima@voorbeeld.test', gezin: '2 volwassenen, 3 kinderen', waarom: 'Na een zwaar jaar zou even weg heel veel betekenen.' });
   assert.equal(r.status, 200);
+  const bewaard = await json(r);
+  assert.ok(bewaard.ok || bewaard.id, 'de aanvraag is bewaard');
+
+  /* Deze test las het aantal aanvragen eerst uit /api/foundation/health. Dat
+     kon, want die health-check gaf onbeschermd door hoeveel gezinnen en
+     hulpaanvragen er waren -- bedrijfsinformatie over kwetsbare mensen, aan
+     iedereen die het adres kende. Dat veld is weg (zie server/foundation.js);
+     de bevestiging komt nu uit het antwoord op de aanvraag zelf. */
   const h = await json(await fetch(BASE + '/api/foundation/health'));
-  assert.ok(h.aanvragen >= 1, 'de aanvraag is bewaard');
+  assert.equal(h.ok, true, 'de health-check zegt nog steeds dat het werkt');
+  assert.equal(h.aanvragen, undefined, 'maar verklapt geen aantallen meer');
+  assert.equal(h.gezinnen, undefined);
 });
 
 test('het gezin: aanmaken, profiel toevoegen, kiezen met pincode, en een reis-oproep', async () => {

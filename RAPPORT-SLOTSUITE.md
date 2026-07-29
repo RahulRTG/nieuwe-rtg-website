@@ -1,6 +1,6 @@
 # Rapport van de Slotsuite
 
-_Automatisch geschreven door `scripts/slotsuite.js` op 2026-07-29 08:32 UTC. Niet met de hand bijwerken:
+_Automatisch geschreven door `scripts/slotsuite.js` op 2026-07-29 08:53 UTC. Niet met de hand bijwerken:
 de volgende ronde overschrijft dit bestand en leest het JSON-blok onderaan terug als geheugen._
 
 ## Oordeel
@@ -11,7 +11,7 @@ de volgende ronde overschrijft dit bestand en leest het JSON-blok onderaan terug
 |---|---|---|---|
 | DE BOUW | overgeslagen | - | niet gevraagd |
 | DE POORTEN | overgeslagen | - | niet gevraagd |
-| DE TESTSUITE | GEZAKT | 18m 18s | test/*.test.js gezakt |
+| DE TESTSUITE | GEZAKT | 18m 42s | test/*.test.js gezakt |
 | DE TOEGANKELIJKHEID | overgeslagen | - | niet gevraagd |
 | DE BEPROEVING | overgeslagen | - | niet gevraagd |
 | DE KEURING | overgeslagen | - | niet gevraagd |
@@ -157,7 +157,7 @@ _(nog 87 punten van lagere prioriteit; zie het JSON-blok.)_
 <!-- geheugen van de Slotsuite; hier leest de volgende ronde uit terug -->
 ```json
 {
- "ronde": "2026-07-29 08:32",
+ "ronde": "2026-07-29 08:53",
  "gezakt": 1,
  "backlog": [
   {

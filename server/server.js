@@ -372,8 +372,21 @@ app.use((req, res, next) => {
   res.set('X-DNS-Prefetch-Control', 'off');
   res.set('X-Permitted-Cross-Domain-Policies', 'none');
   res.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), serial=(), bluetooth=(), midi=()');
+  /* DE TERUGVAL-CSP, EN WAAROM HIER GEEN 'unsafe-inline' MEER STAAT.
+
+     HTML-pagina's krijgen hun CSP van cspNonce (middleware/voordeur.js): een
+     verse nonce per verzoek, geen unsafe-inline. Deze regel geldt voor al het
+     ANDERE -- JSON-antwoorden, statische bestanden, foutpagina's -- en gold
+     tot nu toe ook voor elke HTML-pagina die cspNonce om wat voor reden dan
+     ook niet oppakte.
+
+     Dat is geen theorie: de kop van voordeur.js beschrijft precies zo'n geval,
+     waarin "/" terugviel op deze regel en juist de meest bezochte pagina de
+     zwakste bescherming kreeg. Een terugval die stiller is dan het origineel
+     is de verkeerde kant op falen. Zonder unsafe-inline breekt zo'n pagina
+     zichtbaar in plaats van dat ze haar bescherming stilletjes verliest. */
   res.set('Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
     "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
     "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
   next();

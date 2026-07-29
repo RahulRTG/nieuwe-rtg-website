@@ -54,7 +54,36 @@ const PUBLIEK = new Map([
   ['/api/gids/app', 'welke apps bestaan er; geen ledengegevens'],
   ['/api/config', 'publieke front-end-configuratie'],
   ['/api/i18n', 'vertalingen'],
-  ['/api/talen', 'talenlijst']
+  ['/api/talen', 'talenlijst'],
+  ['/api/webauthn/opties', 'passkey-inlog begint voor je bent ingelogd'],
+  ['/api/zegel/controleer', 'partners verifieren een zegel; de sleutel is toch al publiek'],
+  ['/api/translate', 'de taalkiezer staat op het inlogscherm; met rem, en zonder inlog geen AI'],
+  ['/api/vertaal/ui', 'idem: de knopteksten van een uitgelogd scherm'],
+  ['/api/pasprijzen', 'de prijzen staan op de website'],
+  ['/api/partnertrips', 'het partnerkanaal is er juist voor niet-leden'],
+  ['/api/rtf/vacatures', 'vacatures zijn openbaar; daar solliciteer je op'],
+  ['/api/krant/gids', 'de krantengids is publieke redactionele inhoud'],
+  ['/api/les/apps', 'zoekt in de publieke bibliotheken; leeg zonder zoekterm'],
+  ['/api/munt/opties', 'welke munten geaccepteerd worden; geen gegevens'],
+  ['/api/push/key', 'de PUBLIEKE VAPID-sleutel -- die hoort iedereen te hebben'],
+  ['/api/pay/gezond', 'leven-teken van de betaallaag'],
+  ['/api/sat/ping', 'leven-teken voor de satellietverbinding'],
+  ['/api/foundation/health', 'leven-teken van de RTF (zonder cijfers, zie server/foundation.js)'],
+  ['/api/foundation/impact', 'de RTFoundation legt haar impact juist publiek af'],
+  ['/api/foundation/tip', 'een opvoedtip; vaste tekst, geen gegevens'],
+  ['/api/foundation/bespaartip', 'een bespaartip; vaste tekst, geen gegevens'],
+  ['/api/foundation/gesprekskaart', 'een gesprekskaart; vaste tekst, geen gegevens'],
+  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Wel een uurgrens per IP -- zie server/routes/lesmaker.js'],
+  /* De twee webhooks MOETEN publiek bereikbaar zijn: de betaalprovider belt ze.
+     Ze zijn niet onbeschermd -- ze verifieren een handtekening, en in productie
+     zonder secret weigeren ze (zie server/betaal.js en test/poortwacht.test.js). */
+  ['/api/betaal/webhook', 'de betaalprovider belt hier aan; beveiligd met een handtekening'],
+  ['/api/munt/webhook', 'idem voor de munt-aanbieder'],
+  /* De zaakdoos meldt zijn status op het EIGEN net van de zaak. Dat is een
+     bewuste keuze (zie server/routes/doos.js), maar hij hangt hiermee wel aan
+     de publieke kant van de server. Bedrijfstelemetrie, geen ledengegevens. */
+  ['/api/doos/status', 'de zaakdoos meldt zijn status op het eigen net; bedrijfstelemetrie, geen ledengegevens'],
+  ['/api/doos/rapport', 'idem: het dagrapport van de doos zelf']
 ]);
 
 const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0 };

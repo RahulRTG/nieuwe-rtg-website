@@ -33,8 +33,14 @@ module.exports = (kern) => {
   }
 
   // welke huizen kan ik binnen? (de kiezer op het startscherm)
+  /* Zonder sleutel gaf dit een keurige 200 met een lege lijst. Geen gegevens
+     eruit, maar wel de verkeerde vorm: een dichte deur hoort dicht te KLINKEN,
+     anders leest een controle die van buitenaf kijkt (scripts/poortwacht.js)
+     "open" waar "niets te halen" bedoeld is -- en verdrinkt het echte geval in
+     de ruis. */
   app.post('/api/werkplek/mijn', (req, res) => veilig(res, () => {
     const { key, baas } = wie(req);
+    if (!key && !baas) return { status: 401, error: 'Log eerst in.' };
     const alles = werkplek.bedrijven();
     const van_mij = werkplek.mijnHuizen(key, baas);
     return { ok: true, baas, bedrijven: alles.bedrijven.filter(b => van_mij.includes(b.code)) };

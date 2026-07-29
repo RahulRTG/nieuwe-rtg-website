@@ -73,7 +73,12 @@ function setAutomatisering(a) {
 const { verifieerProfiel, bewaarSollicitatie, alGesolliciteerd } = require('./foundation/sollicitaties')(ctx);
 const { setMarkt } = require('./foundation/markt')(ctx);
 
-router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
+/* Een health-check hoort te zeggen DAT het werkt, niet hoeveel gezinnen er in
+   de hulpverlening zitten. Dat laatste stond hier onbeschermd: aantallen
+   gezinnen en hulpaanvragen zijn bedrijfsinformatie over kwetsbare mensen, en
+   een load balancer heeft er niets aan. De cijfers staan op het RTF-kantoor,
+   achter een inlog; hier blijft alleen het leven-teken over. */
+router.get('/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claude' : 'demo' }));
 
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.

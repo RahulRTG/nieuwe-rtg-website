@@ -313,8 +313,20 @@ app.use(require('./routelog').middleware());
 // gedeelde headerblok -- daar gelden ze voor elk antwoord, ook lokaal.)
 app.use((req, res, next) => {
   if (PRODUCTION) {
-    if (!req.secure) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
-    res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    /* De gezondheidsprikken gaan hier NIET doorheen. De poortwachter
+       (server/trio.js) controleert zijn drie servers op /api/health over
+       gewone http op de loopback -- daar hoort geen TLS bij, en er komt dus
+       ook geen X-Forwarded-Proto mee. Kreeg die prik een 301, dan zag de
+       poortwachter nooit een 200, concludeerde hij dat geen enkele server
+       leefde, en gaf de site 503 terwijl alle drie de servers kerngezond
+       stonden te draaien. De failover-opstelling kon in productie dus nooit
+       gezond worden. Dat gebeurde op de eerste echte productiemachine, en het
+       is van buitenaf niet te zien: lsof laat drie luisterende servers zien
+       en de browser krijgt "alle servers zijn tijdelijk onbereikbaar".
+       Hetzelfde geldt voor /api/ready en voor de healthcheck in de Dockerfile. */
+    const prik = req.path === '/api/health' || req.path === '/api/ready';
+    if (!req.secure && !prik) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
+    if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
   next();
 });

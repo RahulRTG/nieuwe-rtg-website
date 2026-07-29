@@ -1,13 +1,13 @@
 {
   "vastgelegd": "2026-07-29",
   "meters": {
-    "endpointsZonderTest": 968,
-    "dekkingPct": 61,
+    "endpointsZonderTest": 958,
+    "dekkingPct": 62,
     "keuringStuk": 0,
     "keuringScheef": 0,
     "keuringBeter": 127,
     "dependencies": 0,
-    "testbestanden": 413,
+    "testbestanden": 414,
     "dekkingWaargenomenPct": 84
   }
 }

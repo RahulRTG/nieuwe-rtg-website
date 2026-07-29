@@ -26,6 +26,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { DatabaseSync } = require('node:sqlite');
 const S = require('./state');
+const migraties = require('../migraties');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
 const users = require('./users');
@@ -63,88 +64,15 @@ function init() {
   db.exec('PRAGMA journal_mode=WAL');
   db.exec('PRAGMA synchronous=NORMAL');
   db.exec('PRAGMA busy_timeout=5000');
-  db.exec(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email_hash TEXT UNIQUE,
-    username TEXT UNIQUE,
-    password_hash TEXT NOT NULL,
-    tier TEXT NOT NULL DEFAULT 'rtg',
-    codename TEXT,
-    enc_name TEXT,
-    enc_email TEXT,
-    enc_phone TEXT,
-    phone_hash TEXT,
-    created_at TEXT NOT NULL,
-    verified TEXT NOT NULL DEFAULT 'unverified',
-    id_doc TEXT,
-    member_state TEXT,
-    email_verified INTEGER NOT NULL DEFAULT 0,
-    reset_hash TEXT,
-    reset_expires INTEGER
-  )`);
-  // Migratie: voeg ontbrekende kolommen toe voor oudere databases.
-  const cols = db.prepare('PRAGMA table_info(users)').all().map(c => c.name);
-  const add = (n, d) => { if (!cols.includes(n)) db.exec(`ALTER TABLE users ADD COLUMN ${n} ${d}`); };
-  add('email_hash', 'TEXT'); add('enc_name', 'TEXT'); add('enc_email', 'TEXT');
-  add('enc_phone', 'TEXT'); add('phone_hash', 'TEXT');
-  add('verified', "TEXT NOT NULL DEFAULT 'unverified'"); add('id_doc', 'TEXT'); add('member_state', 'TEXT');
-  add('email_verified', 'INTEGER NOT NULL DEFAULT 0'); add('reset_hash', 'TEXT'); add('reset_expires', 'INTEGER');
-  /* actief: de aan/uit-schakelaar van een account.
 
-     Nodig geworden voor SCIM: als de IdP van een klant meldt dat iemand uit
-     dienst is, moet die persoon ER OOK METEEN UIT. Losse sessietokens intrekken
-     kan dat niet -- die zijn staatloos en we bewaren niet welke er zijn
-     uitgegeven, dus we zouden er altijd een missen.
-
-     Een vlag op het account wel, want er is precies EEN plek waar een echt
-     ledenaccount uit een token komt: verifyToken. Staat de vlag uit, dan is
-     elke sessie in hetzelfde moment weg, ook de sessies die op dat moment open
-     staan op een telefoon die niemand meer in handen heeft.
-
-     Uit dienst is niet hetzelfde als vergeten: het account, de facturen en de
-     boekingen blijven staan (Art. 52 AWR eist die administratie zelfs). Wissen
-     blijft de aparte, menselijke handeling die het al was. */
-  add('actief', 'INTEGER NOT NULL DEFAULT 1');
-
-  // Inloggen op gebruikersnaam gebeurt hoofdletter-ongevoelig (lower(username)).
-  // De UNIQUE-index op username is hoofdlettergevoelig en kan die zoekopdracht
-  // niet bedienen, dus zonder deze expressie-index scant elke gebruikersnaam-login
-  // (en elke MISLUKTE login, die door de e-mail-tak heen valt) de hele tabel. Bij
-  // een miljoen leden is dat ~170 ms per poging; met de index blijft het < 1 ms.
-  try { db.exec('CREATE INDEX IF NOT EXISTS idx_users_lower_username ON users(lower(username))'); } catch (e) {}
-
-  /* Ingetrokken sessietokens ("uitgelogd").
-
-     Sessietokens zijn staatloos ondertekend, dus er valt server-side niets weg
-     te gooien bij uitloggen. Dat betekende dat /api/logout { ok: true } gaf en
-     het token daarna gewoon bleef werken -- tot dertig dagen later. Gevonden in
-     aanvalsronde 2. Deze tabel is de tegenhanger: een token dat is ingetrokken
-     staat erin tot het moment waarop het tóch zou verlopen, en verifyToken
-     wijst het tot dan af. Daarna mag de regel weg; het opruimen gebeurt bij het
-     intrekken zelf, zodat er geen aparte taak voor hoeft te draaien. */
-  db.exec(`CREATE TABLE IF NOT EXISTS ingetrokken_tokens (
-    hash TEXT PRIMARY KEY,
-    verloopt INTEGER NOT NULL
-  )`);
-
-  // Personeelsaccounts binnen een leverancier-bedrijfsaccount (PIN-login).
-  db.exec(`CREATE TABLE IF NOT EXISTS supplier_staff (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    supplier_code TEXT NOT NULL,
-    name TEXT NOT NULL,
-    pin_hash TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'staff',
-    active INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL
-  )`);
-  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN func TEXT'); } catch (e) { /* kolom bestaat al */ }
-  // Personeel is voortaan een RTG-lid: member_id koppelt het personeelsaccount
-  // aan het ledenaccount (users.id), member_tier bewaart de pas op moment van
-  // aanmelden. Oudere/geseede accounts hebben deze leeg (member_id NULL).
-  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN member_id INTEGER'); } catch (e) { /* bestaat al */ }
-  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN member_tier TEXT'); } catch (e) { /* bestaat al */ }
-  // Personeel wordt altijd per bedrijf opgevraagd (listStaff/verifyStaffPin).
-  try { db.exec('CREATE INDEX IF NOT EXISTS idx_staff_supplier ON supplier_staff(supplier_code)'); } catch (e) {}
+  /* Het schema komt uit server/migraties: genummerde stappen die precies een
+     keer draaien, met een grootboek erbij en een weigering om te starten op een
+     database die nieuwer is dan deze code. Hiervoor stond de DDL hier, als een
+     rij CREATE TABLE IF NOT EXISTS en ALTER TABLE in een try/catch -- dat werkt
+     wel, maar je kunt zo'n database nooit vragen waar hij staat. Zie de kop van
+     server/migraties/index.js voor waarom dat bij een storing het eerste is wat
+     je wilt weten. */
+  migraties.draai(db);
 
   S.SECRET = loadKey(SECRET_FILE, 'RTG_SECRET_KEY');
   S.VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');

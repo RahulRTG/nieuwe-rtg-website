@@ -134,13 +134,11 @@ try {
     console.log('[eigenaar] overgedragen eigenaarschap hersteld: ' + eigenaar.eigenaarEmail());
   }
 } catch (e) {}
+/* accounts.init() draait ook de schemamigraties (server/migraties), dus de
+   sso- en scim-tabellen komen daar vandaan. Ze stonden hier even als losse
+   aanroep; twee plekken die hetzelfde schema maken is precies hoe ze uit elkaar
+   gaan lopen. */
 accounts.init();
-/* De SSO-tabellen horen bij de identiteitskluis en gaan dus in dezelfde
-   database, meteen na accounts.init() -- niet in een eigen bestand. Wie de
-   koppelingen kan lezen, kan zien welke organisatie waar inlogt; dat hoort bij
-   de identiteiten te staan en niet bij de operationele data. */
-require('./sso').zorgTabel();
-require('./scim').zorgTabel();
 // Demo-modus: alleen buiten productie, of expliciet met RTG_DEMO=1. Zo staan de
 // demo-inlog en het demo-account (Rahul/Imran) nooit per ongeluk open op productie.
 const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';

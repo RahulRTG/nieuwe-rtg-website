@@ -136,19 +136,19 @@ module.exports = (kern) => {
   // ---- Rahul als loopbaancoach: stelt voor, verstuurt nooit ----
   app.post('/api/metier/ai/profiel', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    try { const r = await metierAI.profielKritiek(req.session); res.status(r.ok ? 200 : 503).json(r); }
+    try { const r = await metierAI.profielKritiek(req.session); res.status(r.ok ? 200 : (r.status || 400)).json(r); }
     catch (e) { fout(res, e); }
   });
 
   app.post('/api/metier/ai/brief', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    try { const r = await metierAI.brief(req.session, req.body.vacature); res.status(r.ok ? 200 : 503).json(r); }
+    try { const r = await metierAI.brief(req.session, req.body.vacature); res.status(r.ok ? 200 : (r.status || 400)).json(r); }
     catch (e) { fout(res, e); }
   });
 
   app.post('/api/metier/ai/oefen', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    try { const r = await metierAI.oefengesprek(req.session, req.body || {}); res.status(r.ok ? 200 : 503).json(r); }
+    try { const r = await metierAI.oefengesprek(req.session, req.body || {}); res.status(r.ok ? 200 : (r.status || 400)).json(r); }
     catch (e) { fout(res, e); }
   });
 };

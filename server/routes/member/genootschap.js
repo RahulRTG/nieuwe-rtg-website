@@ -148,19 +148,19 @@ module.exports = (kern) => {
   // ---- Rahul: schrijft en telt, plaatst nooit ----
   app.post('/api/genootschap/ai/aankondiging', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    try { const r = await genootschapAI.aankondiging(req.session, id(req), req.body.steekwoorden); res.status(r.ok ? 200 : 503).json(r); }
+    try { const r = await genootschapAI.aankondiging(req.session, id(req), req.body.steekwoorden); res.status(r.ok ? 200 : (r.status || 400)).json(r); }
     catch (e) { fout(res, e); }
   });
 
   app.post('/api/genootschap/ai/prikbord', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    try { const r = await genootschapAI.prikbordSamen(req.session, id(req)); res.status(r.ok ? 200 : 503).json(r); }
+    try { const r = await genootschapAI.prikbordSamen(req.session, id(req)); res.status(r.ok ? 200 : (r.status || 400)).json(r); }
     catch (e) { fout(res, e); }
   });
 
   app.post('/api/genootschap/ai/datum', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    try { const r = await genootschapAI.datumRaad(req.session, id(req)); res.status(r.ok ? 200 : 503).json(r); }
+    try { const r = await genootschapAI.datumRaad(req.session, id(req)); res.status(r.ok ? 200 : (r.status || 400)).json(r); }
     catch (e) { fout(res, e); }
   });
 };

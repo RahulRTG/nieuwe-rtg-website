@@ -16,7 +16,7 @@ const { tekst } = require('../../ai');
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Schrijf rustig, ' +
   'zeker en zonder opsmuk. Nooit uitroeptekens, geen overdrijving, geen verkooppraat. ' +
   'Antwoord in het Nederlands.';
-const geenAI = { ok: false, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
+const geenAI = { ok: false, status: 503, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
 
 module.exports = ({ anthropic, salon }) => {
 
@@ -38,7 +38,7 @@ module.exports = ({ anthropic, salon }) => {
   async function reactiesSamen(sess, postId) {
     const p = salon.postMet(postId);
     if (!p) return { ok: false, reden: 'Deze post bestaat niet.' };
-    if (p.authorKey !== sess.key) return { ok: false, reden: 'Dit kan alleen op je eigen post.' };
+    if (p.authorKey !== sess.key) return { ok: false, status: 403, reden: 'Dit kan alleen op je eigen post.' };
     const regels = (p.comments || []).slice(-120).map(c => c.who + ': ' + String(c.text || ''));
     if (!regels.length) return { ok: true, samenvatting: 'Er zijn nog geen reacties.' };
     const t = await tekst(anthropic, TOON + ' Vat de reacties samen in maximaal vijf korte zinnen: ' +

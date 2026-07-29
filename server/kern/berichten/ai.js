@@ -16,14 +16,14 @@ const { tekst } = require('../../ai');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Schrijf rustig, ' +
   'zeker en zonder opsmuk. Nooit uitroeptekens, nooit overdrijven. Antwoord in het Nederlands.';
-const geenAI = { ok: false, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
+const geenAI = { ok: false, status: 503, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
 // De agenda (kern/agenda.js) weigert alles wat geen geldige datum is; hier
 // filteren we daarom hard op vorm in plaats van te hopen dat het model het goed doet.
 const DATUM = /^\d{4}-\d{2}-\d{2}$/;
 const TIJD = /^\d{2}:\d{2}$/;
 
 module.exports = ({ draad, anthropic }) => {
-  const geenDraad = { ok: false, reden: 'Dit gesprek kan ik niet lezen.' };
+  const geenDraad = { ok: false, status: 403, reden: 'Dit gesprek kan ik niet lezen.' };
 
   async function samenvat(mij, id) {
     const d = draad(mij, id);

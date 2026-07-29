@@ -19,13 +19,13 @@ const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Je helpt bij e
   'genootschap van leden. Schrijf rustig, zeker en zonder opsmuk: geen uitroeptekens, geen ' +
   'overdrijving, geen verkooppraat. Antwoord in het Nederlands. Verzin nooit feiten, namen of ' +
   'afspraken die niet in de aangeleverde gegevens staan.';
-const geenAI = { ok: false, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
+const geenAI = { ok: false, status: 503, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
 
 module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
 
   async function aankondiging(sess, groepId, steekwoorden) {
     const gr = genootschap.groepMet(groepId);
-    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, reden: 'Je bent hier geen lid van.' };
+    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
     const w = String(steekwoorden || '').slice(0, 300).trim();
     if (!w) return { ok: false, reden: 'Geef me eerst een paar woorden om mee te werken.' };
     const t = await tekst(anthropic, TOON + ' Schrijf EEN aankondiging voor het prikbord, hooguit vier zinnen. ' +
@@ -37,7 +37,7 @@ module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
 
   async function prikbordSamen(sess, groepId) {
     const gr = genootschap.groepMet(groepId);
-    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, reden: 'Je bent hier geen lid van.' };
+    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
     const regels = prikbord.regels(groepId, 60);
     if (!regels.length) return { ok: true, samenvatting: 'Er staat nog niets op het prikbord.' };
     const t = await tekst(anthropic, TOON + ' Vat het prikbord samen in maximaal vijf korte zinnen: ' +
@@ -52,7 +52,7 @@ module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
      staan, en dat is het antwoord ook. */
   async function datumRaad(sess, groepId) {
     const gr = genootschap.groepMet(groepId);
-    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, reden: 'Je bent hier geen lid van.' };
+    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
     const a = bijeenkomst.agenda(sess, groepId);
     if (a.error) return { ok: false, reden: a.error };
     const leden = (gr.leden || []).length;

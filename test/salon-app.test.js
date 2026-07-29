@@ -202,9 +202,16 @@ test('de AI stelt voor en plaatst nooit zelf; zonder AI een eerlijke 503', async
   const na = await json(await raw('/salon/lid', { wie: 'ik' }, a.token));
   assert.equal(na.posts, voor.posts, 'een bijschrift vragen plaatst niets');
 
-  // zonder woorden werkt de knop niet, ook niet met sleutel
+  /* Zonder woorden werkt de knop niet -- maar dat is een 400, geen 503.
+
+     Hier stond 503 omdat de route elke niet-ok van de AI-laag als 503 doorgaf.
+     "Je hebt niets ingevuld" is geen storing: een 503 laat een load balancer
+     opnieuw proberen en telt in SLO.md als verbruikt foutbudget. De statuscode
+     komt nu uit de AI-laag zelf (503 alleen als de assistent echt onbereikbaar
+     is, 403 als het niet van jou is, anders 400). De 503 hierboven -- geen
+     sleutel, dus de assistent IS er niet -- blijft dus staan. */
   const leeg = await raw('/salon/ai/bijschrift', { steekwoorden: '' }, a.token);
-  assert.equal(leeg.status, 503);
+  assert.equal(leeg.status, 400, 'niets ingevuld is een invoerfout, geen storing');
 });
 
 test('de reactie-samenvatting kan alleen op je eigen post', async () => {

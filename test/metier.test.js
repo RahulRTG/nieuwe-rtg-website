@@ -213,12 +213,20 @@ test('Rahul coacht maar vult niets in, en zonder AI een eerlijke 503', async () 
   assert.equal(na.profiel.kop, voor.profiel.kop, 'de coach heeft niets aan je profiel veranderd');
   assert.equal(na.profiel.rollen.length, voor.profiel.rollen.length);
 
-  // zonder vacature geen brief, ook niet met sleutel
+  /* Zonder vacature geen brief, en zonder rol geen oefengesprek -- maar dat is
+     een 400 en geen 503.
+
+     Hier stond 503, en die stond er omdat de route ELKE niet-ok van de AI-laag
+     als 503 doorgaf. Dat is de verkeerde code voor "je vergat iets in te vullen":
+     503 betekent "de dienst is even weg", dus een load balancer probeert het
+     opnieuw, en de foutbudget-teller van SLO.md telt het als storing. Gevonden
+     met de grens-sweep; de statuscodes komen nu uit de AI-laag zelf (status 503
+     alleen als de assistent echt onbereikbaar is, 403 als het niet van jou is,
+     anders 400). */
   const leeg = await raw('/metier/ai/brief', { vacature: '' }, a.token);
-  assert.equal(leeg.status, 503);
-  // en het oefengesprek wil weten waarvoor
+  assert.equal(leeg.status, 400, 'niets ingevuld is een invoerfout, geen storing');
   const zonderRol = await raw('/metier/ai/oefen', {}, a.token);
-  assert.equal(zonderRol.status, 503);
+  assert.equal(zonderRol.status, 400);
 });
 
 test('zonder aanmelding geen beroepsprofiel', async () => {

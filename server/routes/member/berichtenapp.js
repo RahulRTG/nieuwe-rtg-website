@@ -32,7 +32,7 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     try {
       const r = await berichten.samenvat(req.session.key, req.body.id);
-      res.status(r.ok ? 200 : 503).json(r);
+      res.status(r.ok ? 200 : (r.status || 400)).json(r);
     } catch (e) { fout(res, e); }
   });
 
@@ -44,7 +44,7 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     try {
       const r = await berichten.concept(req.session.key, req.body.id, req.body.wens);
-      res.status(r.ok ? 200 : 503).json(r);
+      res.status(r.ok ? 200 : (r.status || 400)).json(r);
     } catch (e) { fout(res, e); }
   });
 
@@ -54,7 +54,7 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     try {
       const r = await berichten.afspraken(req.session.key, req.body.id);
-      res.status(r.ok ? 200 : 503).json(r);
+      res.status(r.ok ? 200 : (r.status || 400)).json(r);
     } catch (e) { fout(res, e); }
   });
 };

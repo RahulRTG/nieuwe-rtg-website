@@ -22,7 +22,7 @@ const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Je helpt een l
   'Verzin NOOIT ervaring, opleidingen of vaardigheden die niet in de aangeleverde gegevens staan: ' +
   'een lid dat met een verzonnen regel bij een werkgever zit, is slechter af dan met een lege regel. ' +
   'Beloof nooit een baan, en nooit toegang tot een pas of lidmaatschap.';
-const geenAI = { ok: false, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
+const geenAI = { ok: false, status: 503, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
 
 module.exports = ({ anthropic, metier, netwerk }) => {
 

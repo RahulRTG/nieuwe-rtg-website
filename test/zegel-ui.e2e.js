@@ -6,7 +6,7 @@
    browser. Draai: node --experimental-sqlite --test test/zegel-ui.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zguI-')); }
@@ -36,7 +36,7 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.addInitScript(([tok]) => {
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');

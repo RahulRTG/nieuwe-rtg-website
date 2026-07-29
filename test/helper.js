@@ -144,6 +144,31 @@ async function elevateTier(base, memberToken, pas, approverToken) {
   return besluit;
 }
 
-module.exports = { vrijePoort, startServer, stop, elevateTier,
+/* Paginafouten verzamelen, zonder de ruis van de browser zelf.
+
+   De site zet zachte overgangen tussen pagina's aan met @view-transition in
+   shared/rtg-uniform.css. Die overgang maakt de BROWSER; wij krijgen hem pas
+   te zien in het pagereveal-event, en dat vuurt voordat ons eerste script
+   draait. Slaat de browser zo'n overgang over -- een tweede navigatie er
+   meteen achteraan, of een tabblad dat niet zichtbaar is -- dan verwerpt de
+   ready-promise van die overgang met "Transition was skipped". Niemand van
+   ons heeft die promise gemaakt, dus niemand kan hem opvangen, en Playwright
+   meldt hem als paginafout.
+
+   Het is geen fout. De navigatie is gewoon gebeurd; alleen de animatie viel
+   weg. Het is bovendien een race: welke test erop struikelt verschilt per
+   run. Hem meetellen als "JS-fout op de pagina" maakt de tests onbetrouwbaar
+   zonder ook maar iets te bewaken. Alles wat WEL uit onze code komt telt
+   onverkort mee -- dit filter noemt precies een bericht, geen patroon. */
+const BROWSERRUIS = ['Transition was skipped'];
+function letOpFouten(page, bak) {
+  page.on('pageerror', (e) => {
+    const bericht = String((e && e.message) || e);
+    if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);
+  });
+  return bak;
+}
+
+module.exports = { vrijePoort, startServer, stop, elevateTier, letOpFouten,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

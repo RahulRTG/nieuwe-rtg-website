@@ -31,6 +31,14 @@ beveiligingsmaatregel (art. 32): een gestolen database toont codenamen.
 Elke blik in de kluis wordt vastgelegd in het inzagejournaal
 (`server/inzagelog.js`): wie, wanneer, welk account, en waarom.
 
+De bewaartermijnen hieronder staan niet alleen op papier. `server/bewaarwacht.js`
+telt dagelijks wat er over zijn termijn staat en meldt dat maandelijks op het
+technische bord; `server/bewaartermijnen.js` houdt het beleid zelf bij. Die wacht
+**wist nooit uit zichzelf** -- opruimen is een menselijke handeling met een
+bevestiging. Dat onderscheid is bewust: het maakt de opslagbeperking
+aantoonbaar (art. 5 lid 2) zonder dat een automaat administratie kan weggooien
+die zeven jaar moet blijven.
+
 ---
 
 ## Verwerkingen

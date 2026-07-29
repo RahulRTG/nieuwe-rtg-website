@@ -97,12 +97,49 @@ laat hij je instellingen met rust en laat hij alleen zien hoe ze nu staan.
 
 ## Van buitenaf bereikbaar
 
-Standaard draait de site op poort 3000 op je eigen netwerk. Wil je hem publiek
-maken, dan is de volgorde: eerst een echt domein en TLS, dan pas openzetten.
-Zie `PRODUCTION.md` (native TLS met `RTG_TLS=1` en `RTG_ACME=1`, of een reverse
-proxy ervoor). Poorten onder 1024 kan de server niet zelf pakken, want hij
-draait niet als root; gebruik daarvoor poortdoorverwijzing in je router of
-`pfctl`, of zet er een proxy voor.
+Standaard draait de site op poort 3000 op je eigen netwerk. Er zijn twee wegen
+naar buiten.
+
+### Cloudflare Tunnel (aanbevolen voor een Mac thuis)
+
+De Mac maakt zelf een uitgaande verbinding naar Cloudflare. Je hoeft geen enkele
+poort in je router open te zetten, je hebt geen vast IP-adres nodig, en het
+werkt ook achter CGNAT -- waar poortdoorverwijzing simpelweg onmogelijk is.
+
+```bash
+brew install cloudflared
+cloudflared tunnel login                                  # zonder sudo; opent je browser
+sudo scripts/mac/tunnel.sh --domein=rtg.voorbeeld.nl
+```
+
+Het script maakt de tunnel, schrijft `/etc/cloudflared/config.yml`, zet het
+DNS-record, installeert cloudflared als LaunchDaemon (dus terug na een
+herstart) en controleert daarna of `https://<domein>/api/health` echt
+antwoordt. Weghalen kan met `sudo launchctl bootout system/com.cloudflare.cloudflared`.
+
+Twee dingen die het script controleert en waar je zelf op moet letten:
+
+- **`RTG_TLS` blijft UIT.** Cloudflare doet de TLS; de app praat gewoon http
+  op de loopback. Zet je het toch aan, dan praten twee partijen tegelijk TLS
+  en werkt er niets.
+- **`APP_URL=https://<domein>`** in het geheimenbestand. Daar staan de links in
+  die RTG mailt; blijft daar `http://...local` staan, dan krijgt iedereen
+  links die alleen bij jou thuis werken.
+
+De doorstuurkoppen (`X-Forwarded-Proto` en `X-Forwarded-For`) worden hier
+vertrouwd, en dat is geen aanname: cloudflared draait op dezelfde machine en
+verbindt vanaf `127.0.0.1`. De app vertrouwt die koppen alleen van een privaat
+adres (`server/web/verrijk.js`). Draait de tunnel op een andere machine, dan
+hoort daar `RTG_PROXY_IPS` bij.
+
+### Zelf poorten openzetten
+
+Kan ook: eerst een echt domein en TLS, dan pas openzetten. Zie `PRODUCTION.md`
+(native TLS met `RTG_TLS=1` en `RTG_ACME=1`, of een reverse proxy ervoor).
+Poorten onder 1024 kan de server niet zelf pakken, want hij draait niet als
+root; gebruik daarvoor poortdoorverwijzing in je router of `pfctl`, of zet er
+een proxy voor. Let op dat veel providers poort 80 en 443 blokkeren of je
+achter CGNAT zetten -- dan is de tunnel hierboven de enige weg.
 
 ## Getest en niet getest
 

@@ -38,8 +38,14 @@ jobs:
       # functies): zakt de in-proces-dekking onder de vloer, dan faalt de stap.
       # De vloeren staan bewust een paar punten onder de gemeten basislijn
       # (63/80/51) zodat normale ruis niet flaket, maar echte terugval hard opvalt.
+      # RTG_ROUTELOG laat elke kindserver opschrijven welk ROUTEPATROON hij heeft
+      # afgehandeld. Dat kost niets extra's in deze stap en levert de volgende
+      # stap een waargenomen dekkingscijfer in plaats van een tekstzoektocht
+      # door de tests. Zie server/routelog.js en scripts/dekking.js.
       - name: Unit- en integratietests + dekkingsvloer (json-opslag)
         run: npm run test:gate
+        env:
+          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
       # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
       # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
       # kv-tabel en zouden elkaar bij parallel draaien resetten.
@@ -55,6 +61,13 @@ jobs:
       # deze stap zakt kwaliteit weg zonder dat iemand een besluit neemt.
       - name: De norm (mag alleen strakker, nooit losser)
         run: npm run norm
+      # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
+      # van de tests: te laag voor suites die een hulpje gebruiken, en op te
+      # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de
+      # servers hierboven zelf schreven -- wat erin staat is echt aangeroepen.
+      # De vloer staat in NORM.json (dekkingWaargenomenPct).
+      - name: Waargenomen endpoint-dekking (uit het routejournaal)
+        run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)

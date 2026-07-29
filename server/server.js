@@ -303,6 +303,10 @@ app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, stat
 /* De meting draait NA het logboek en VOOR de routes: hij hangt aan res.finish,
    dus hij ziet alles wat er daarna gebeurt, inclusief de 404's. */
 app.use(require('./meting').middleware());
+/* Het routejournaal staat ernaast en doet alleen iets met RTG_ROUTELOG gezet
+   (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
+   een tekstzoektocht door de tests -- zie server/routelog.js. */
+app.use(require('./routelog').middleware());
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.
 // (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het

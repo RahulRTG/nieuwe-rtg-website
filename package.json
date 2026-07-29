@@ -34,6 +34,8 @@
     "test:pg": "node --experimental-sqlite --test --test-concurrency=1 test/pg.test.js test/pgaccounts.test.js test/chaos.pg.test.js test/leden-gids-pg.test.js test/txledger.pg.test.js test/grand-integratie.pg.test.js test/sloophamer.pg.test.js",
     "icons": "node scripts/icons.js",
     "norm": "node --experimental-sqlite scripts/norm.js",
-    "norm:vast": "node --experimental-sqlite scripts/norm.js --vastleggen"
+    "norm:vast": "node --experimental-sqlite scripts/norm.js --vastleggen",
+    "dekking": "node --experimental-sqlite scripts/dekking.js",
+    "dekking:vast": "node --experimental-sqlite scripts/dekking.js --vastleggen"
   }
 }

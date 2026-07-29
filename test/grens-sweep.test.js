@@ -66,7 +66,12 @@ async function nieuwLid(naam, mailLokaal, n) {
 }
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-SWEEP' } });
+  /* RTG_ROUTELOG uit voor DEZE server, ook als de suite met het routejournaal
+     draait. De sweep raakt met opzet elk endpoint een keer; telde hij mee, dan
+     sprong de gemeten dekking naar honderd procent terwijl er niets diepgaands
+     bewezen was, en wees de teller nergens meer heen. De vloer is een vloer,
+     geen dekking. */
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-SWEEP', RTG_ROUTELOG: '' } });
   base = srv.base;
   A = await nieuwLid(A_NAAM, A_MAIL_LOKAAL, 1);
   B = await nieuwLid('Beta Bezoeker', null, 2);

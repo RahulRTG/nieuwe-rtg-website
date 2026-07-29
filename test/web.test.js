@@ -122,6 +122,36 @@ test('sub-router mounten op een prefix met het strippen van het mount-pad', asyn
   } finally { s.close(); }
 });
 
+test('req.routePatroon draagt het mount-voorvoegsel, en telt op met de routekaart', async () => {
+  /* Het patroon is waar de meting (server/meting.js) op telt en waar het
+     routejournaal (server/routelog.js) op schrijft. Zonder voorvoegsel heet een
+     route in een gemounte router naar zichzelf: /api/foundation/lijst meldde
+     zich als /lijst. Twee gevolgen, allebei stil: de meting gooit elke /lijst
+     uit elke router op EEN hoop, en de dekkingsmeting kan het patroon niet
+     terugvinden op de routekaart. Daarom moeten deze twee lijsten gelijk zijn. */
+  const app = web();
+  const r = web.Router();
+  r.post('/lijst', (req, res) => res.json({ patroon: req.routePatroon }));
+  r.get('/item/:code', (req, res) => res.json({ patroon: req.routePatroon }));
+  app.use('/api/foundation', r);
+  app.post('/api/lijst', (req, res) => res.json({ patroon: req.routePatroon }));
+  const { s, poort } = await start(app);
+  try {
+    const diep = await vraag(poort, '/api/foundation/lijst', { method: 'POST' });
+    assert.equal(JSON.parse(diep.body).patroon, '/api/foundation/lijst');
+    const param = await vraag(poort, '/api/foundation/item/AB12');
+    assert.equal(JSON.parse(param.body).patroon, '/api/foundation/item/:code',
+      'het PATROON, niet het pad -- anders is het een tijdreeks per waarde');
+    const ondiep = await vraag(poort, '/api/lijst', { method: 'POST' });
+    assert.equal(JSON.parse(ondiep.body).patroon, '/api/lijst',
+      'en de gelijknamige route buiten de mount blijft een andere reeks');
+
+    // wat de routekaart leest en wat de router meldt, hoort hetzelfde te zijn
+    const kaart = app._routes().map(x => x.pad);
+    assert.ok(kaart.includes('/api/foundation/item/:code'), 'routekaart: ' + kaart.join(', '));
+  } finally { s.close(); }
+});
+
 test('_router.stack geeft de express-vorm (path + methods) voor introspectie', () => {
   const app = web();
   app.post('/api/x', (req, res) => res.end());

@@ -86,7 +86,14 @@ function maakRouter() {
         req.params = { ...buitenParams };
         const oudUrl = req.url;
         req.url = mm.len ? req.url.slice(mm.len) || '/' : req.url;
-        const verder = (e) => { req.url = oudUrl; req.params = buitenParams; next(e); };
+        /* Het voorvoegsel meenemen naar binnen. Zonder dit heet een route in een
+           gemounte router naar zichzelf: /api/foundation/leden meldde zich als
+           /leden, en dat botst met elke andere router die ook een /leden heeft.
+           De meting telde die dan als EEN reeks, en de dekkingsmeting kon een
+           waargenomen route niet terugvinden op de routekaart. */
+        const oudVoor = req.routeVoorvoegsel || '';
+        if (mm.len) req.routeVoorvoegsel = oudVoor + laag.prefix;
+        const verder = (e) => { req.url = oudUrl; req.params = buitenParams; req.routeVoorvoegsel = oudVoor; next(e); };
         return laag.fout ? laag.fn(err, req, res, verder) : laag.fn(req, res, verder);
       }
 
@@ -98,7 +105,8 @@ function maakRouter() {
          het er een per gebruiker-id -- en dan legt de monitoring zichzelf om.
          Alleen bij een echte route (laag.method gezet), niet bij middleware,
          want die matcht op alles en zou het patroon overschrijven. */
-      if (laag.method) req.routePatroon = laag.pad;
+      if (laag.method && typeof laag.pad === 'string')
+        req.routePatroon = ((req.routeVoorvoegsel || '') + laag.pad).replace(/\/+$/, '') || '/';
       try {
         if (laag.fout) return laag.fn(err, req, res, next);
         return laag.fn(req, res, next);

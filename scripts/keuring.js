@@ -110,7 +110,19 @@ function dekking() {
 
      WAT DIT NOG STEEDS MIST: routes met een :param die een test opbouwt met
      string-plakwerk (`'leden/' + id`). Die blijven als ongedekt tellen. Dat is
-     een onderschatting en geen overschatting -- de goede kant om te missen. */
+     een onderschatting en geen overschatting -- de goede kant om te missen.
+
+     EN DIT BLIJFT EEN BENADERING. Een tekstzoektocht zit er twee kanten op
+     naast: hij mist elke suite die zijn routes via een hulpje in twee stappen
+     opbouwt (`rh('cellier')` boven `'/api/member/rechterhand/' + pad` -- de hele
+     Rechterhand-suite telde zo als ongetest), en hij telt een pad in een
+     COMMENTAARREGEL gewoon mee, waardoor het cijfer met een zoek-en-vervang op
+     te poetsen is zonder een enkele test te schrijven.
+
+     Het echte cijfer komt daarom uit `scripts/dekking.js`: dat leest het
+     journaal dat de server tijdens de testrun zelf schrijft (server/routelog.js).
+     Wat daar in staat is aangeroepen. Deze teller blijft staan omdat hij snel is
+     en geen suite hoeft te draaien -- maar hij is de indicatie, niet het bewijs. */
   function gedekt(route) {
     if (testTekst.includes(route)) return true;
     const staart = route.slice(5);          // zonder '/api/'

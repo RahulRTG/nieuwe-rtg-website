@@ -18,6 +18,7 @@ const sso = require('../../sso');
 const koppelingen = require('../../sso/koppelingen');
 const oidc = require('../../sso/oidc');
 const jwks = require('../../sso/jwks');
+const scim = require('../../scim');
 const { log } = require('../../log');
 
 module.exports = (tctx) => {
@@ -79,6 +80,29 @@ module.exports = (tctx) => {
     jwks.leeg();
     log.warn('sso.koppeling verwijderd', { org: weg.org, door: wie(req) });
     res.json({ ok: true, verwijderd: weg.org });
+  });
+
+  /* ---------- de SCIM-sleutel van een organisatie ----------
+
+     Deze sleutel laat de IdP van een klant accounts aanmaken en uitzetten. Hij
+     wordt EEN KEER getoond, hier, en daarna nooit meer -- ook niet aan de
+     eigenaar. Kwijt = een nieuwe draaien, en dan is de oude meteen dood. */
+  app.post('/api/techniek/sso/scimsleutel', techAuth, eigenaarAlleen, (req, res) => {
+    const k = koppelingen.vind(req.body && req.body.org);
+    if (!k) return res.status(404).json({ error: 'Maak eerst de SSO-koppeling aan; een SCIM-sleutel hoort bij een organisatie.' });
+    const nieuw = scim.sleutels.draai(k.org);
+    log.warn('scim.sleutel gedraaid', { org: k.org, door: wie(req) });
+    res.json({
+      ok: true, org: k.org, sleutel: nieuw.sleutel, hint: nieuw.hint,
+      let_op: 'Dit is het enige moment waarop deze sleutel te zien is. Zet hem nu in de SCIM-instellingen van de klant.',
+      endpoint: '/api/scim/v2'
+    });
+  });
+
+  app.delete('/api/techniek/sso/scimsleutel/:org', techAuth, eigenaarAlleen, (req, res) => {
+    if (!scim.sleutels.weg(req.params.org)) return res.status(404).json({ error: 'Deze organisatie heeft geen SCIM-sleutel.' });
+    log.warn('scim.sleutel ingetrokken', { org: String(req.params.org).toLowerCase(), door: wie(req) });
+    res.json({ ok: true });
   });
 
   /* De proef op de som: bereikt de server de provider, en klopt zijn discovery?

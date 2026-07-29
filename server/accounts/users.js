@@ -87,6 +87,21 @@ function setTier(id, tier) {
   return getUserById(id);
 }
 
+/* Een account aan- of uitzetten (in/uit dienst bij een SSO-organisatie).
+
+   Uitzetten is geen wissen: alles blijft staan, er komt alleen niemand meer
+   mee binnen. Dat is precies wat je wilt bij uitdiensttreding -- de facturen
+   en boekingen van die persoon horen bewaard te blijven, en als het een
+   vergissing was, is het met een schakelaar terug te draaien. */
+function zetActief(id, aan) {
+  const u = getUserById(id);
+  if (!u) return null;
+  S.db.prepare('UPDATE users SET actief = ? WHERE id = ?').run(aan ? 1 : 0, id);
+  mirror.markUser(id);
+  return getUserById(id);
+}
+const isActief = (u) => !!u && u.actief !== 0;
+
 /* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
    setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
 function setPasswordSync(userId, password) {
@@ -189,7 +204,7 @@ function deleteUser(id) {
 
 module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
-  renameUser, setTier, realNameOf, emailOf, phoneOf,
+  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf,
   issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser

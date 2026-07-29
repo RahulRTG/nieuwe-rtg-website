@@ -89,6 +89,22 @@ function init() {
   add('enc_phone', 'TEXT'); add('phone_hash', 'TEXT');
   add('verified', "TEXT NOT NULL DEFAULT 'unverified'"); add('id_doc', 'TEXT'); add('member_state', 'TEXT');
   add('email_verified', 'INTEGER NOT NULL DEFAULT 0'); add('reset_hash', 'TEXT'); add('reset_expires', 'INTEGER');
+  /* actief: de aan/uit-schakelaar van een account.
+
+     Nodig geworden voor SCIM: als de IdP van een klant meldt dat iemand uit
+     dienst is, moet die persoon ER OOK METEEN UIT. Losse sessietokens intrekken
+     kan dat niet -- die zijn staatloos en we bewaren niet welke er zijn
+     uitgegeven, dus we zouden er altijd een missen.
+
+     Een vlag op het account wel, want er is precies EEN plek waar een echt
+     ledenaccount uit een token komt: verifyToken. Staat de vlag uit, dan is
+     elke sessie in hetzelfde moment weg, ook de sessies die op dat moment open
+     staan op een telefoon die niemand meer in handen heeft.
+
+     Uit dienst is niet hetzelfde als vergeten: het account, de facturen en de
+     boekingen blijven staan (Art. 52 AWR eist die administratie zelfs). Wissen
+     blijft de aparte, menselijke handeling die het al was. */
+  add('actief', 'INTEGER NOT NULL DEFAULT 1');
 
   // Inloggen op gebruikersnaam gebeurt hoofdletter-ongevoelig (lower(username)).
   // De UNIQUE-index op username is hoofdlettergevoelig en kan die zoekopdracht

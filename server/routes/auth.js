@@ -79,6 +79,11 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket);
+  /* Uit dienst gemeld door de organisatie (SCIM) = ook met het juiste wachtwoord
+     niet meer naar binnen. verifyToken weigert de sessie toch al, dus zonder
+     deze regel zou iemand een token krijgen dat meteen daarna nergens voor
+     deugt: verwarrend, en het verbergt de echte reden. */
+  if (!accounts.isActief(user)) return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });
   // juiste gegevens, maar de verkeerde pas-app: netjes doorverwijzen
   if (!pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
   const token = accounts.issueToken(user.id);

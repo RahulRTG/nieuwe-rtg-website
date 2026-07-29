@@ -88,7 +88,12 @@ function maakTokens(getUserById) {
       const [id, exp] = body.split('.');
       if (Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
-      return getUserById(Number(id));
+      const u = getUserById(Number(id));
+      /* De ene plek waar een uitgezet account eruit valt. Zie de toelichting bij
+         de kolom in accounts/index.js: staatloze tokens zijn niet allemaal
+         terug te halen, een vlag op het account wel. */
+      if (u && u.actief === 0) return null;
+      return u;
     } catch (e) { return null; }
   }
   /* Doel-gebonden token (bijv. e-mailbevestiging), los van de sessie. */

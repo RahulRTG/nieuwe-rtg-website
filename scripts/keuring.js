@@ -90,7 +90,35 @@ function dekking() {
   }
   const testTekst = testJs.map(lees).join('\n');
   const apiRoutes = routes.filter(r => r.startsWith('/api/'));
-  const ongedekt = apiRoutes.filter(r => !testTekst.includes(r));
+
+  /* EEN ROUTE HEET IN EEN TEST NIET ALTIJD ZOALS HIJ IN DE ROUTEKAART HEET.
+
+     Bijna elke testfile heeft bovenaan een helper van deze vorm:
+
+         const api = (pad, body, token) => fetch(base + '/api/' + pad, ...)
+         await api('bank/overzicht', {}, lid.token)
+
+     De letterlijke string '/api/bank/overzicht' staat dan NERGENS in het
+     bestand, terwijl die route wel degelijk wordt aangeroepen. Zoeken op alleen
+     de volledige route telde 187 routes als ongedekt die het niet zijn -- ruim
+     zeven procentpunt, en het stuurde elke ronde werk naar endpoints die allang
+     getest waren.
+
+     Daarom kijken we ook naar de afgeknipte vorm, tussen aanhalingstekens. Die
+     eis is streng met opzet: `'bank/overzicht'` als losse string is een
+     aanroep, terwijl bank/overzicht ergens in lopende tekst dat niet is.
+
+     WAT DIT NOG STEEDS MIST: routes met een :param die een test opbouwt met
+     string-plakwerk (`'leden/' + id`). Die blijven als ongedekt tellen. Dat is
+     een onderschatting en geen overschatting -- de goede kant om te missen. */
+  function gedekt(route) {
+    if (testTekst.includes(route)) return true;
+    const staart = route.slice(5);          // zonder '/api/'
+    return testTekst.includes("'" + staart + "'") ||
+           testTekst.includes('"' + staart + '"') ||
+           testTekst.includes('`' + staart + '`');
+  }
+  const ongedekt = apiRoutes.filter(r => !gedekt(r));
   const pct = apiRoutes.length ? Math.round((apiRoutes.length - ongedekt.length) / apiRoutes.length * 100) : 100;
   if (pct < 60) meld('scheef', 'dekking', 'Minder dan zestig procent van de endpoints komt in een test voor (' + pct + '%).',
     null, 'Elke ronde een paar endpoints erbij is genoeg; begin bij de lijst hieronder.');

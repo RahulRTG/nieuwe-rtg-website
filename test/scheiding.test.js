@@ -181,7 +181,11 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      zien. Daar, en alleen daar, is "poortwachter zonder eigenaarscontrole" een
      echt gat. De scan is dus streng op die twee en laat de kantoorroutes met
      rust -- niet uit gemak, maar omdat het daar een andere vraag is. */
-  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen)\s*[,)]|\.\.\.lid\b/;
+  /* scimAuth hoort in deze rij: hij weigert met 401 zonder geldige SCIM-sleutel
+     en zet req.scimOrg, waarna elke bewerking door binnenOrg() gaat (zie
+     server/scim/index.js). Dat is dezelfde soort poort als de andere hier --
+     alleen is de sleutel van een klant in plaats van een sessie van een lid. */
+  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth)\s*[,)]|\.\.\.lid\b/;
   /* Niet elke poort staat in de registratie. Een flink deel van het huis
      controleert in de handler zelf -- rtfSociaal(req, res), profiel(req, res),
      appSessie(req), rtf.verifieerProfiel(code, token) -- en stuurt bij twijfel
@@ -191,12 +195,17 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      zodra iemand een nieuwe schrijft) herkennen we de VORM: de handler weigert
      ergens met 401/403. Dat kan hij alleen als hij iets heeft gecontroleerd. */
   const POORT_IN_BODY = /res\.status\(\s*40[13]\s*\)|(rtfSociaal|appSessie|profiel|eisAccount)\s*\(\s*req/;
-  const VEELPARTIJ = /,\s*(auth|supplierAuth|huisAuth)\s*[,)]/;
+  /* SCIM is bij uitstek veelpartij: elke klant heeft een eigen sleutel en mag
+     alleen bij zijn eigen mensen. Daarom staat scimAuth hier OOK -- zo eist de
+     test verderop dat de handler req.scimOrg echt gebruikt, en is een SCIM-route
+     die de organisatie vergeet net zo goed een fout als een member-route die de
+     sessie vergeet. */
+  const VEELPARTIJ = /,\s*(auth|supplierAuth|huisAuth|scimAuth)\s*[,)]/;
   /* req.<iets> dat een poortwachter zelf heeft gezet telt ook: huisAuth zet
      req.werkplekCode, de zaak-poort zet req.actor. En een helper mag naast de
      request ook het antwoord meekrijgen -- eisAccount(req, res) is net zo goed
      een afleiding uit DEZE request als cn(req). */
-  const GEBRUIKT = /req\.(session|techUser|supplier|staff|user|eigenaar|account|werkplekCode|actor)\b|\b[a-zA-Z_$][a-zA-Z0-9_$]*\(req[,)]/;
+  const GEBRUIKT = /req\.(session|techUser|supplier|staff|user|eigenaar|account|werkplekCode|actor|scimOrg)\b|\b[a-zA-Z_$][a-zA-Z0-9_$]*\(req[,)]/;
   const VRAAGID = /req\.(body|params|query)\.(id|ref|userId|memberId|key|code|codenaam)\b/;
   /* ---- de beoordeelde uitzonderingen ----
      Wat hierna nog opduikt is stuk voor stuk nagelopen en valt in twee soorten.
@@ -233,7 +242,15 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
     'server/routes/member/winkel-bieb.js:38': 'catalogus van een boerderij: openbaar aanbod',
     'server/routes/member/winkel-bieb.js:78': 'reisgids lezen: openbare bibliotheekinhoud',
     'server/routes/thuis.js:13': 'detail van een advertentie: openbaar aanbod',
-    'server/routes/thuis.js:14': 'reviews bij een advertentie: openbaar'
+    'server/routes/thuis.js:14': 'reviews bij een advertentie: openbaar',
+    /* (c) de terugkeer van een identiteitsprovider. Hier IS er per definitie nog
+       geen sessie: de provider stuurt de browser van de bezoeker hierheen met
+       een code, en pas daarna wordt er ingelogd. De poort is de `state`: die is
+       versleuteld en ondertekend met de kluissleutel (server/sso/staat.js), dus
+       niemand anders kan er een maken of hem wijzigen. Uit die state komt de
+       koppeling, de nonce en de PKCE-verifier; klopt hij niet, dan gebeurt er
+       niets. Een auth-middleware ervoor zetten zou inloggen onmogelijk maken. */
+    'server/routes/sso.js:78': 'terugkeer van de identiteitsprovider: de versleutelde state IS de poort'
   };
   const verdacht = [];
 

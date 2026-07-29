@@ -102,9 +102,15 @@ function main() {
 
   /* Patronen die WEL geraakt zijn maar niet op de routekaart staan. Meestal een
      teken dat de routekaart en de router uit elkaar lopen -- het soort stille
-     drift waar dit gereedschap juist voor bestaat. */
+     drift waar dit gereedschap juist voor bestaat.
+
+     /api/test/* hoort daar niet bij en is geen drift: die twee opzettelijke
+     storingen registreert server.js alleen onder NODE_ENV=test (zie het blok bij
+     "opzettelijke testbug"). De routekaart start zonder die vlag en kan ze dus
+     niet kennen -- precies zoals bedoeld, want ze horen nergens anders te
+     bestaan. Ze uitzonderen houdt de melding bruikbaar voor echte drift. */
   const opKaart = new Set(routes);
-  const vreemd = [...paden].filter(p => p.startsWith('/api/') && !opKaart.has(p));
+  const vreemd = [...paden].filter(p => p.startsWith('/api/') && !opKaart.has(p) && !p.startsWith('/api/test/'));
 
   const perDomein = {};
   for (const r of ongeraakt) { const d = r.split('/')[2] || 'overig'; (perDomein[d] = perDomein[d] || []).push(r); }

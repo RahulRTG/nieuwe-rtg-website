@@ -24,14 +24,15 @@
     var kleur = { bordeaux: '#1E0912', parelmoer: '#ECE6DD' }[t] || '#0C0C0B';
     var meta = d.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', kleur);
     if (w.RTGLevend) w.RTGLevend.familie();
-    merk();
   }
   function zet(t) { try { localStorage.setItem(KEY, t); } catch (e) {} pas(t); }
-  function merk() {
-    var box = d.getElementById('rosThema'); if (!box) return;
-    var nu = huidig();
-    box.querySelectorAll('button').forEach(function (b) { b.classList.toggle('actief', b.dataset.thema === nu); });
-  }
+  /* Hier stond merk(): dat zette de 'actief'-klasse op de knoppen in #rosThema.
+     Dat kiezertje dreef als los kaartje linksonder en is naar het
+     bedieningspaneel verhuisd; sindsdien bestaat #rosThema op geen enkele
+     pagina meer en deed merk() bij elke themawissel niets. De blindevlek-toets
+     ving het. Het paneel zet de klasse zelf op de stip waarop geklikt is
+     (vulThema in shared/bediening.js) en leest bij elke opening opnieuw uit
+     huidig(), dus er is niets om over te nemen. */
   function start() {
     // de levende grond aan de pagina hangen (als er nog geen doel is aangewezen)
     if (!d.querySelector('[data-levendegrond]') && d.body) d.body.setAttribute('data-levendegrond', '');

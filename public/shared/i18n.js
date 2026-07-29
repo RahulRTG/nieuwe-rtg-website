@@ -340,10 +340,14 @@
        instellingen staan: in het bedieningspaneel (shared/bediening.js), dat
        openModal() aanroept. Het leden-OS deed dit al met de tegel "Taal". */
     buildSwitch() { /* geen zwevende knop meer; zie het bedieningspaneel */ },
-    updateSwitch() {
-      const btn = document.getElementById('rtg-lang-switch');
-      if (btn) btn.innerHTML = '<span class="rtg-sw-globe">' + ICOON.globe + '</span>' + this.lang.toUpperCase();
-    },
+    /* updateSwitch bijgewerkt de knop die er niet meer is. Hij zocht nog naar
+       #rtg-lang-switch, en dat element staat sinds de verhuizing naar het
+       bedieningspaneel op geen enkele pagina meer -- de blindevlek-toets ving
+       het. Het paneel leest de taal vers uit bij elke opening (vulTaal in
+       shared/bediening.js), dus er valt hier niets bij te werken. De methode
+       blijft bestaan omdat applyTranslations() hem aanroept en losse pagina's
+       hem kunnen overschrijven; hij doet alleen niets meer. */
+    updateSwitch() { /* geen zwevende knop meer; het paneel leest zelf uit */ },
 
     injectStyles() {
       if (document.getElementById('rtg-i18n-styles')) return;

@@ -128,7 +128,7 @@ test('3. lid B kan de rekening van lid A niet bevriezen', async () => {
   // en de rekening van A doet het daarna gewoon nog
   const eigen = await api('bank/rekening', { iban: lid.iban }, lid.token);
   assert.equal(eigen.status, 200);
-  assert.notEqual(eigen.body.bevroren, true, 'de rekening van A is niet bevroren geraakt');
+  assert.equal(eigen.body.rekening.bevroren, false, 'de rekening van A is niet bevroren geraakt');
 });
 
 test('4. lid B kan geen geld van A naar zijn wallet halen', async () => {
@@ -202,10 +202,11 @@ test('9. een spaardoel zetten op je eigen spaarrekening', async () => {
 test('10. het rentevoorbeeld rekent en raakt geen rekening aan', async () => {
   /* Dit is een rekenmachine, geen boeking. Hij hoort dus ook zonder IBAN te
      werken, en het saldo mag er niet van veranderen. */
-  const voor = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body;
+  const voor = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening;
+  assert.ok(Number.isFinite(voor.saldoCenten), 'we lezen een ECHT saldo, geen undefined');
   const r = await api('bank/rente-voorbeeld', { euro: 10000 }, lid.token);
   assert.equal(r.status, 200);
-  const na = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body;
+  const na = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening;
   assert.equal(na.saldoCenten, voor.saldoCenten, 'een voorbeeld boekt niets');
 });
 
@@ -247,7 +248,8 @@ test('12. bevriezen doet ook echt iets: daarna gaat er geen geld meer af', async
 test('13. naar-wallet en sepa halen geen geld uit het niets', async () => {
   /* Meer overmaken dan er staat hoort te falen. Zonder deze grens is de bank
      een geldpers. */
-  const saldo = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.saldoCenten;
+  const saldo = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
+  assert.ok(Number.isFinite(saldo), 'we lezen een ECHT saldo, geen undefined');
   const teveel = await api('bank/naar-wallet', { iban: lid.iban, centen: saldo + 1000000 }, lid.token);
   assert.notEqual(teveel.status, 200, 'meer naar de wallet dan er staat mag niet');
 
@@ -257,6 +259,6 @@ test('13. naar-wallet en sepa halen geen geld uit het niets', async () => {
   }, lid.token);
   assert.notEqual(negatief.status, 200, 'een negatief bedrag is geen opdracht maar een truc');
 
-  const na = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.saldoCenten;
+  const na = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
   assert.equal(na, saldo, 'na twee mislukte pogingen staat het saldo er nog precies zo');
 });

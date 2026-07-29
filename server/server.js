@@ -3183,14 +3183,37 @@ if (PRODUCTION) {
 }
 
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => {
+/* Waar luisteren we? Draait deze server achter een poortwachter -- als kind
+   van server/trio.js (RTG_CLUSTER_KEY) of van de vloot (RTG_DOMAINS) -- dan
+   hoort hij ALLEEN op de loopback te staan. Twee redenen:
+
+   1. Veiligheid. Zonder host bindt node op alle interfaces. Dan staat elke
+      reserveserver open op het netwerk en kan iedereen in het pand de
+      poortwachter overslaan: geen doorstuurregels, geen X-Forwarded-For,
+      geen enkele laag ertussen. Alleen de poortwachter hoort naar buiten.
+
+   2. Bereikbaarheid, en die kostte een avond. Zonder host luistert node op
+      :: (IPv6). Op een macOS waar net.inet6.ip6.v6only aan staat komt een
+      verbinding naar 127.0.0.1 daar nooit aan. De poortwachter gebruikt
+      127.0.0.1 en concludeerde dus dat er geen enkele server leefde --
+      terwijl alle drie keurig stonden te luisteren. lsof laat ze zien op
+      *:3001 tot *:3003, en de site geeft ondertussen "alle servers zijn
+      tijdelijk onbereikbaar".
+
+   RTG_BIND overschrijft dit als iemand het bewust anders wil. Draait de
+   server los (npm run single), dan blijft hij gewoon op alle interfaces --
+   dan is hij zelf de voordeur. */
+const HOST = process.env.RTG_BIND ||
+  ((process.env.RTG_CLUSTER_KEY || process.env.RTG_DOMAINS) ? '127.0.0.1' : '');
+function gestart() {
   if (process.env.RTG_SERVER) {
     console.log(`klaar op poort ${PORT}, rol: ${db.writable ? 'actief' : 'standby'}`);
   } else {
     console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/app.html`);
   }
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
-});
+}
+const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
 // Eigen STUN-server (RFC 5389) voor (video)bellen: geen leun meer op de publieke
 // STUN van Google. Draait op UDP (STUN_PORT, standaard 3478); STUN_UIT=1 zet uit.
 // De socket is unref'd, dus dit houdt het afsluiten nooit tegen.

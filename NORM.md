@@ -129,17 +129,18 @@ aanziet.
 
 Zie `NORM.json` voor de exacte cijfers. Op het moment van vastleggen:
 
-- 2511 API-routes, waarvan **2101 (84%) tijdens de suite echt zijn aangeroepen**
-  -- gemeten, niet geschat, uit het routejournaal van 2414 tests
-- 1497 (60%) komen bij NAAM in een test voor; dat lagere getal is de
+- 2511 API-routes, waarvan **2263 (90%) tijdens de suite echt zijn aangeroepen**
+  -- gemeten, niet geschat, uit het routejournaal van 2478 tests
+- 1597 (64%) komen bij NAAM in een test voor; dat lagere getal is de
   tekstzoektocht, niet de werkelijkheid (zie hierboven)
-- de 410 die nooit werden aangeraakt, zitten vooral in `supplier` (137),
-  `member` (57), `werkplek` (49) en `office` (43) -- daar ligt het volgende werk
+- de 248 die nooit werden aangeraakt, zitten vooral in `supplier` (122),
+  `werkplek` (49), `office` (34), `foundation` (22) en `rtf` (21) -- daar ligt
+  het volgende werk
 - `test/grens-sweep.test.js` roept ze wel aan met vier harde eisen, maar telt
   bewust niet mee: dat is een vloer, geen dekking
 - 0 stuk, 0 scheef, 127 "kan beter" in de keuring
 - 0 externe pakketten
-- 408 testbestanden
+- 415 testbestanden
 
 De teller hoort te blijven wijzen waar de echte tests nog moeten komen. Dat is
 precies waarom de sweep er niet in meetelt en waarom het waargenomen cijfer

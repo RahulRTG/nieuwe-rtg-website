@@ -171,13 +171,22 @@ kop "6. cloudflared als dienst"
 
 # service install leest /etc/cloudflared/config.yml en zet een LaunchDaemon neer,
 # zodat de tunnel terugkomt na een herstart -- net als RTG zelf
+# --config VOOR het subcommando, en dat is geen detail: 'service install'
+# zonder pad zoekt de configuratie in ~/.cloudflared (het macOS-pad). Wij
+# schrijven hem naar /etc/cloudflared (het Linux-pad), dus zonder deze vlag
+# start de dienst wel maar weet hij niet WELKE tunnel hij moet draaien. In het
+# logboek staat dan eindeloos "use `cloudflared tunnel run` to start tunnel
+# <id>" en de site geeft van buiten een 530. Dat kostte een avond.
+#
+# Bestaat de dienst al, dan weigert 'service install' met een nette melding;
+# eerst uninstall. Alleen 'launchctl bootout' is niet genoeg -- dat haalt hem
+# uit het geheugen maar laat het plist staan.
 if launchctl print "system/$LABEL" >/dev/null 2>&1; then
-  zeg "de dienst draait al; opnieuw laden met de nieuwe configuratie"
-  launchctl kickstart -k "system/$LABEL" || true
-else
-  cloudflared service install
-  zeg "geinstalleerd als system/$LABEL"
+  zeg "de dienst bestaat al; opnieuw neerzetten met deze configuratie"
+  cloudflared service uninstall >/dev/null 2>&1 || true
 fi
+cloudflared --config "$CONFIG" service install
+zeg "geinstalleerd als system/$LABEL"
 
 kop "7. Controleren"
 gelukt=0

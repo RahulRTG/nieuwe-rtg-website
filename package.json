@@ -13,6 +13,7 @@
     "outbox": "node scripts/outbox.js",
     "golive": "node scripts/golive.js",
     "poortwacht": "node scripts/poortwacht.js",
+    "rand": "node scripts/rand.js",
     "beproeving": "node --experimental-sqlite scripts/beproeving.js",
     "beproeving:streng": "STRENG=1 node --experimental-sqlite scripts/beproeving.js",
     "beproeving:mega": "node --max-old-space-size=8192 scripts/beproeving.js",

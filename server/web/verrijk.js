@@ -22,15 +22,37 @@ function verrijk(req, res, instellingen) {
     return req.headers[n];
   };
   req.header = req.get;
-  const xfProto = trustProxy ? String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() : '';
+  /* DE X-FORWARDED-KOP: VAN RECHTS LEZEN, NIET VAN LINKS.
+
+     Hier stond .split(',')[0] -- het LINKSE adres. Dat is precies het stuk dat
+     de bezoeker zelf mag verzinnen: een proxy plakt zijn waarneming er rechts
+     achter, hij wist links nooit. Met "trust proxy: 1" en een linkse lezing
+     kon iedereen dus zelf zeggen wie hij was:
+
+         X-Forwarded-For: 9.9.9.9
+
+     en daarmee bij elk verzoek een vers IP tonen. De rem (server/rem.js) telt
+     op req.ip, dus alle snelheidslimieten -- ook de brute-force-grens op de
+     inlog -- waren met één kop te omzeilen. En het beveiligingslogboek en de
+     quarantaine van De Wacht wezen dan naar een IP van andermans keuze.
+
+     Goed is: van de N hops die we vertrouwen (trust proxy = N) is de meest
+     rechtse N onze eigen keten; de eerste daarvoor is de echte aanroeper. Met
+     één proxy en één waarde verandert er niets -- alleen het geval waarin
+     iemand er zelf iets vóór plakt wordt nu genegeerd. */
+  const hops = Math.max(1, Number(instellingen && instellingen['trust proxy']) || 1);
+  const vanRechts = (kop) => {
+    const lijst = String(req.headers[kop] || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (!lijst.length) return '';
+    return lijst[Math.max(0, lijst.length - hops)] || '';
+  };
+
+  const xfProto = trustProxy ? vanRechts('x-forwarded-proto') : '';
   req.protocol = xfProto || ((req.socket && req.socket.encrypted) ? 'https' : 'http');
   req.secure = req.protocol === 'https';
-  const xfHost = trustProxy ? String(req.headers['x-forwarded-host'] || '').split(',')[0].trim() : '';
+  const xfHost = trustProxy ? vanRechts('x-forwarded-host') : '';
   req.hostname = String(xfHost || req.headers.host || '').replace(/:\d+$/, '') || undefined;
-  if (trustProxy) {
-    const xff = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-    req.ip = xff || (req.socket && req.socket.remoteAddress);
-  } else req.ip = req.socket && req.socket.remoteAddress;
+  req.ip = (trustProxy && vanRechts('x-forwarded-for')) || (req.socket && req.socket.remoteAddress);
 
   res.status = (code) => { res.statusCode = code; return res; };
   res.set = res.header = function (veld, waarde) {

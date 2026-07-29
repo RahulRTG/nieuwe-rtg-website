@@ -278,7 +278,17 @@ for (const methode of ['get', 'post', 'put', 'delete', 'patch', 'all']) {
 }
 app.disable('x-powered-by');
 const PRODUCTION = process.env.NODE_ENV === 'production';
-app.set('trust proxy', 1); // achter een reverse proxy (hosting) klopt req.secure dan
+/* Hoeveel proxy-hops staan er ECHT voor deze app?
+
+   Dit stond vast op 1. Dat klopt achter een reverse proxy, maar is gevaarlijk
+   zodra de app rechtstreeks bereikbaar is: dan IS de bezoeker de eerste hop en
+   mag hij zijn eigen X-Forwarded-For verzinnen -- waarmee elke snelheidslimiet
+   (die op req.ip telt) met één kop te omzeilen is. Zie test/proxykop.test.js.
+
+   RTG_PROXY_HOPS=0 zet het vertrouwen helemaal uit: dan telt alleen het adres
+   van de verbinding zelf. Dat is de juiste stand voor een app die zonder proxy
+   aan het internet hangt. */
+app.set('trust proxy', Number(process.env.RTG_PROXY_HOPS != null ? process.env.RTG_PROXY_HOPS : 1));
 app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.

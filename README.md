@@ -565,6 +565,18 @@ geen documentatie maar reclame.
   twee niet klopten (zie `test/poortwacht.test.js`). Dit dekt **één** klasse
   fouten volledig; een route die 401 geeft kan tussen twee ingelogde leden nog
   steeds lekken, en daarvoor is `scripts/aanval.js`.
+- **De randcontrole: alles wat buiten de code ligt.** `npm run rand -- https://uwadres`
+  meet aan een draaiende installatie wat de testsuite per definitie niet ziet:
+  certificaat en TLS-versie, HSTS, de CSP zoals hij echt wordt uitgeserveerd
+  (met onderscheid tussen `script-src` en `style-src` — alleen het eerste is een
+  gat), of `http` doorstuurt, of `.env`/`.git`/`server/data` op straat liggen, en
+  of een verzonnen `X-Forwarded-For` de snelheidslimiet omzeilt. Die laatste
+  vond een echt gat: `trust proxy` stond vast op 1 en `verrijk.js` las het
+  **linkse** adres uit de kop — het deel dat de bezoeker zelf verzint. Daarmee
+  was elke rem, inclusief de brute-force-grens op de inlog, met één kop te
+  omzeilen. Nu wordt er van rechts gelezen, en `RTG_PROXY_HOPS=0` zet het
+  vertrouwen helemaal uit voor een app die zonder proxy aan het internet hangt.
+  Zie `test/proxykop.test.js`.
 - **Het papierwerk is een poort, geen herinnering.** `npm run golive` **vult**
   `VERWERKINGSREGISTER.md` (AVG art. 30) en `DATALEK.md` (72-uursklok, art. 33)
   in met de antwoorden uit `server/papieren/` en **blokkeert** zolang daar

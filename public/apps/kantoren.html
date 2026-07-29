@@ -1005,10 +1005,10 @@ function zelfzorgHtml(s){
 function zelfzorgUitslag(soort, r){
   const adv = a => (a && a.length) ? '<div style="margin-top:.3rem;">'+a.map(x =>
     '<div>'+(x.ernst === 'hoog' ? '&#9679;' : '&#9679;')+' '+esc(x.tekst)+' <span style="color:var(--soft);">('+esc(x.waar)+')</span></div>').join('')+'</div>' : '';
-  if (soort === 'opruim') return r.schoon ? '✓ Alles was al schoon.' : '🧹 '+r.acties.map(a => esc(a.wat)+' ('+a.aantal+')').join('; ');
+  if (soort === 'opruim') return r.schoon ? '✓ Alles was al schoon.' : ''+r.acties.map(a => esc(a.wat)+' ('+a.aantal+')').join('; ');
   if (soort === 'bescherm') return (r.oordeel === 'ok' ? 'Alles staat er goed bij' : 'Er vraagt iets om aandacht')+
     ' · checks: '+r.checks.ok+' groen, '+r.checks.waarschuwing+' oranje, '+r.checks.fout+' rood.'+adv(r.adviezen);
-  if (soort === 'herstel') return (r.gezond ? '✓ Niets kapot gevonden.' : '🔧 '+r.reparaties.map(x => esc(x.wat)).join('; '))+adv(r.adviezen);
+  if (soort === 'herstel') return (r.gezond ? '✓ Niets kapot gevonden.' : ''+r.reparaties.map(x => esc(x.wat)).join('; '))+adv(r.adviezen);
   if (soort === 'upgrade') return r.bijgewerkt ? '⬆ Bijgewerkt naar schema v'+r.schema+'.' : '✓ De datakast staat al op schema v'+r.schema+'.';
   return '';
 }
@@ -1886,7 +1886,7 @@ function chatWidget(el, kamerId){
   el.innerHTML = '<div class="kaart lijst"><div id="cb_'+kamerId+'" style="max-height:20rem;overflow-y:auto;"></div>'+
     '<div class="taakrij"><input class="veld" data-cnaam style="max-width:9rem;" placeholder="Jouw naam" maxlength="30" value="'+esc(mijnNaam)+'">'+
     '<input class="veld" data-ctekst style="flex:1;" placeholder="Bericht aan de kamer..." maxlength="500">'+
-    '<label class="knop stil" style="padding:.5rem .8rem;">📸<input type="file" data-csnap accept="image/*" style="display:none;"></label>'+
+    '<label class="knop stil" style="padding:.5rem .8rem;"><input type="file" data-csnap accept="image/*" style="display:none;"></label>'+
     '<button class="knop stil" data-cstuur>Stuur</button></div>'+
     '<div class="leeg" style="margin-top:.3rem;">Snaps en berichten blijven binnen het kantoor; videobellen doe je via de personeels-app (walkie-talkie en teamcall).</div></div>';
   const laad = async () => {
@@ -1993,7 +1993,7 @@ function wereldWidget(el){
       const d = await api('wereld');
       tekenWereldKaart(el.querySelector('canvas'), d.items);
       el.querySelector('[data-wtelling]').textContent = d.telling.groen + ' groen, ' + d.telling.oranje + ' oranje, ' + d.telling.rood + ' rood' + (d.opdrachtenOpen ? ' | ' + d.opdrachtenOpen + ' opdracht(en) onderweg' : '');
-      const soortIco = { doos: '📦', functie: '🧩', systeem: '🏛' };
+      const soortIco = { doos: 'logistiek', functie: 'spelen', systeem: 'gebouw' };
       el.querySelector('[data-wlijst]').innerHTML = d.items.map(it =>
         '<div class="witem"><span class="bol '+it.status+'"></span><span class="wnm">'+(soortIco[it.soort]||'')+' '+esc(it.naam)+'</span><span class="wdt">'+esc(it.detail)+'</span>'+
         (it.acties || []).map(a => '<button class="knop stil" data-wact="'+a+'" data-wid="'+esc(it.id)+'" style="padding:.25rem .8rem;font-size:.75rem;">'+(a === 'reset' ? '↻ Reset' : 'SOS Help')+'</button>').join('')+
@@ -2027,7 +2027,7 @@ function voorstelKaart(v, alsBoardroom){
   return '<div class="voorstel" style="flex-direction:column;align-items:stretch;gap:.3rem;" data-vid="'+v.id+'">'+
     '<div><b>'+esc(v.functieNaam)+'</b> '+(v.aan ? 'AAN' : 'UIT')+(v.doelgroep ? ' voor '+esc(v.doelgroep) : ' (globaal)')+
     ' · <span style="color:var(--gold);">'+esc(stand)+'</span>'+(v.reden ? '<br><small style="color:var(--soft);">Reden: '+esc(v.reden)+'</small>' : '')+'</div>'+
-    (v.discussie.length ? '<div style="font-size:.8rem;color:var(--muted);">'+v.discussie.map(m => '<div>'+(m.wie==='boardroom'?'🏛':'🚨')+' '+esc(m.tekst)+'</div>').join('')+'</div>' : '')+
+    (v.discussie.length ? '<div style="font-size:.8rem;color:var(--muted);">'+v.discussie.map(m => '<div>'+(m.wie==='boardroom'?'gebouw':'help')+' '+esc(m.tekst)+'</div>').join('')+'</div>' : '')+
     (v.status === 'open' ? '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">'+
       (alsBoardroom ? '<button class="knop stil" data-acc="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Accepteer en schakel</button>'+
       '<button class="knop stil" data-afw="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Wijs af</button>' : '')+
@@ -2110,11 +2110,11 @@ async function bankSchakel(pad, body){
 function bankRenderKnop(r){
   const seg = r.modi.map(m => '<button class="knop' + (m === r.modus ? '' : ' stil') + '" data-modus="' + m + '" style="padding:.45rem 1rem;">' + esc(BK_MODUS[m]) + '</button>').join(' ');
   const nood = r.nood && r.nood.actief
-    ? '<div style="margin:.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:8px;color:var(--burgundy-on-dark,#C23A5E);">🚨 <strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:.4rem;">Herstel</button></div>'
+    ? '<div style="margin:.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:8px;color:var(--burgundy-on-dark,#C23A5E);"><strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:.4rem;">Herstel</button></div>'
     : '';
   const a = r.autorisatie;
   const aut = a
-    ? '<div style="margin:.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:8px;">⏳ <strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:.4rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
+    ? '<div style="margin:.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:8px;"><strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:.4rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
     : '';
   $('#bankKnop').innerHTML =
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.6rem;">' +
@@ -2375,7 +2375,7 @@ function stadRenderDomeinen(){
       '<div style="font-size:1.05rem;margin:.25rem 0;color:' + (stKleur[x.stand] || '#fff') + ';">' +
         (x.waarde == null ? 'geen data' : esc(String(x.waarde)) + ' <span style="font-size:.7rem;color:var(--soft);">' + esc(x.eenheid) + '</span>') +
         ' · ' + esc(x.stand) + '</div>' +
-      (x.ovOnderweg != null ? '<div style="font-size:.72rem;color:var(--soft);margin-bottom:.25rem;">🚌 ' + x.ovOnderweg + ' OV-voertuig(en) onderweg</div>' : '') +
+      (x.ovOnderweg != null ? '<div style="font-size:.72rem;color:var(--soft);margin-bottom:.25rem;">' + x.ovOnderweg + ' OV-voertuig(en) onderweg</div>' : '') +
       '<select data-regime="' + x.id + '" style="width:100%;font-size:.78rem;">' +
         x.regimes.map(r => '<option value="' + r + '"' + (r === x.regime ? ' selected' : '') + '>regime: ' + r + '</option>').join('') +
       '</select></div>').join('');
@@ -2401,7 +2401,7 @@ function stadRenderNodeAan(){
     try {
       const r = await api('stad/node/aanmeld', { doosNaam: $('#stadDoosNaam').value, zone: $('#stadZoneSel').value,
         sensoren: $('#stadSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: stadWie });
-      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;">🔑 <strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;"><strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
       $('#stadDoosNaam').value = ''; $('#stadSens').value = '';
       stadVervers();
     } catch (e) { meld(e.message); }
@@ -2410,7 +2410,7 @@ function stadRenderNodeAan(){
 function stadRenderNodes(){
   const rij = STAD.nodes;
   if (!rij.length){ $('#stadNodes').innerHTML = '<div class="leeg">Nog geen Stadsdozen.</div>'; return; }
-  $('#stadNodes').innerHTML = '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + STAD.vloot.online + ' van ' + STAD.vloot.totaal + ' online · 🧰 ' + STADWERK + ' klus(sen) open op de veld-lijst</div>' + rij.map(n =>
+  $('#stadNodes').innerHTML = '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + STAD.vloot.online + ' van ' + STAD.vloot.totaal + ' online · ' + STADWERK + ' klus(sen) open op de veld-lijst</div>' + rij.map(n =>
     '<div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;' + bkLijn + '">' +
     '<span style="width:.6rem;height:.6rem;border-radius:50%;background:' + (n.online ? 'var(--gold)' : 'var(--soft)') + ';"></span>' +
     '<span style="flex:1;min-width:13rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">demo</span>' : '') +

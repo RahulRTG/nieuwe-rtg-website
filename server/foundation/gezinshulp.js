@@ -22,11 +22,11 @@ const ROLLEN = ['beheerder', 'ouder', 'kind', 'gezinslid', 'gast'];
 // en tegels iemand ziet, en of iemand mag solliciteren op vacatures (vanaf 16).
 const GROEPEN = ['mini', 'kind', 'tiener', 'jong', 'volw'];
 const GROEP_INFO = {
-  mini:   { naam: 'Allerkleinsten', bereik: '0 t/m 4 jaar',   emoji: '🧸', vanaf: 0 },
-  kind:   { naam: 'Kind',           bereik: '5 t/m 11 jaar',  emoji: '🎒', vanaf: 5 },
-  tiener: { naam: 'Tiener',         bereik: '12 t/m 15 jaar', emoji: '🛹', vanaf: 12 },
-  jong:   { naam: 'Jongvolwassen',  bereik: '16 t/m 21+ jaar', emoji: '🚀', vanaf: 16 },
-  volw:   { naam: 'Volwassen',      bereik: 'volwassen',      emoji: '🧑', vanaf: 22 }
+  mini:   { naam: 'Allerkleinsten', bereik: '0 t/m 4 jaar',   emoji: 'rtf-kind', vanaf: 0 },
+  kind:   { naam: 'Kind',           bereik: '5 t/m 11 jaar',  emoji: 'diploma', vanaf: 5 },
+  tiener: { naam: 'Tiener',         bereik: '12 t/m 15 jaar', emoji: 'sport', vanaf: 12 },
+  jong:   { naam: 'Jongvolwassen',  bereik: '16 t/m 21+ jaar', emoji: 'vluchten', vanaf: 16 },
+  volw:   { naam: 'Volwassen',      bereik: 'volwassen',      emoji: 'entourage', vanaf: 22 }
 };
 const magSolliciteren = groep => groep === 'jong' || groep === 'volw';
 const groepLeeftijd = groep => (GROEP_INFO[groep] || {}).vanaf; // ondergrens voor de vacature-filter
@@ -55,7 +55,7 @@ async function checkPin(rec, pin) {
   return h.length === b.length && crypto.timingSafeEqual(h, b);
 }
 const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
-function schoonAvatar(v) { const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim(); return s ? Array.from(s).slice(0, 2).join('') : '🙂'; }
+function schoonAvatar(v) { const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim(); return s ? Array.from(s).slice(0, 2).join('') : 'emo-blij'; }
 function schoonKleur(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? v : KLEUREN[0]; }
 
 /* Elk gezinslid krijgt een codenaam, net als een RTG-lid, zodat RTF- en

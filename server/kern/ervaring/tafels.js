@@ -42,7 +42,7 @@ module.exports = (ctx) => {
     db.data.reserveringen.unshift(r);
     db.data.reserveringen = db.data.reserveringen.slice(0, 20000);
     save();
-    notifySupplier(s.code, { icon: '🪑', title: 'Nieuwe reservering', body: codename + ': ' + datum + ' ' + tijd + ', ' + personen + 'p' + (r.notitie ? ' · ' + r.notitie : '') + (r.perDirect ? ' · per direct' : r.lastMinute ? ' · last-minute' : ' · in bedenktijd') });
+    notifySupplier(s.code, { icon: 'table', title: 'Nieuwe reservering', body: codename + ': ' + datum + ' ' + tijd + ', ' + personen + 'p' + (r.notitie ? ' · ' + r.notitie : '') + (r.perDirect ? ' · per direct' : r.lastMinute ? ' · last-minute' : ' · in bedenktijd') });
     sseToSupplier(s.code, 'sync', { scope: 'reserveringen' });
     sseToOffice('sync', { scope: 'orders' });
     return { ok: true, reservering: r };
@@ -61,7 +61,7 @@ module.exports = (ctx) => {
     r.status = 'geannuleerd';
     if (boeteCenten) r.annuleerBoeteCenten = boeteCenten;
     save();
-    notifySupplier(r.supplierCode, { icon: '🪑', title: 'Reservering geannuleerd', body: r.customerCodename + ': ' + r.datum + ' ' + r.tijd + ', ' + r.personen + 'p' });
+    notifySupplier(r.supplierCode, { icon: 'table', title: 'Reservering geannuleerd', body: r.customerCodename + ': ' + r.datum + ' ' + r.tijd + ', ' + r.personen + 'p' });
     sseToSupplier(r.supplierCode, 'sync', { scope: 'reserveringen' });
     return { ok: true, reservering: r, boeteCenten };
   }
@@ -75,7 +75,7 @@ module.exports = (ctx) => {
     const tekst = r.status === 'bevestigd'
       ? 'Uw tafel bij ' + supplier.name + ' op ' + r.datum + ' om ' + r.tijd + ' (' + r.personen + 'p) is bevestigd.'
       : supplier.name + ' kan uw reservering voor ' + r.datum + ' ' + r.tijd + ' helaas niet plaatsen.';
-    notify(r.customerKey, { icon: '🪑', title: supplier.name, body: tekst, scope: 'orders' });
+    notify(r.customerKey, { icon: 'table', title: supplier.name, body: tekst, scope: 'orders' });
     sseToCustomer(r.customerKey, 'sync', { scope: 'reserveringen' });
     return { ok: true, reservering: r };
   }

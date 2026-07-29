@@ -77,7 +77,7 @@ module.exports = (ctx) => {
     aanvragen().unshift(a);
     db.data.bevAanvragen = aanvragen().slice(0, 20000);
     save();
-    notifySupplier(s.code, { icon: '🛡️', title: 'Nieuwe inzetaanvraag', body: a.klant + ' · ' + object + ' · ' + datum + ' · ' + a.aantal + ' bewaker(s)' });
+    notifySupplier(s.code, { icon: 'schild', title: 'Nieuwe inzetaanvraag', body: a.klant + ' · ' + object + ' · ' + datum + ' · ' + a.aantal + ' bewaker(s)' });
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     sseToOffice('sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, aanvraag: a };

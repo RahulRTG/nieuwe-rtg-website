@@ -14,7 +14,7 @@
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
   }
   function lidNaam(id) { var l = S.leden[id]; return l ? l.naam : 'Gezinslid'; }
-  function lidAvatar(id) { var l = S.leden[id]; return l ? (l.avatar || '🙂') : '🙂'; }
+  function lidAvatar(id) { var l = S.leden[id]; return l ? (l.avatar || 'emo-blij') : 'emo-blij'; }
 
   var GezinRT = {
     init: function (opts) {

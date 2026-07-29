@@ -71,7 +71,7 @@ module.exports = (ctx) => {
     if (f.koper.supplierCode && sseToSupplier) sseToSupplier(f.koper.supplierCode, 'sync', { scope: 'facturen' });
     if (f.koper.key) {
       if (sseToCustomer) sseToCustomer(f.koper.key, 'sync', { scope: 'facturen' });
-      if (notify) notify(f.koper.key, { icon: '🧾', title: 'Nieuwe factuur', body: f.verkoper.naam + ': € ' + f.totaal.toFixed(2), scope: 'facturen' });
+      if (notify) notify(f.koper.key, { icon: 'rekening', title: 'Nieuwe factuur', body: f.verkoper.naam + ': € ' + f.totaal.toFixed(2), scope: 'facturen' });
     }
     // facturen-draaiboek: een RTMAIL-seintje naar beide kanten (over de rail)
     try {

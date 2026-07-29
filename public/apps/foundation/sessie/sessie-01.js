@@ -73,8 +73,8 @@
       el.innerHTML =
         '<div class="sb-balk">' +
         '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
-        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten">🔔<span class="sb-tel" id="sbTel" hidden>0</span></button>' +
-        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + '">' + (p.avatar || '🙂') + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
+        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
+        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + '">' + (p.avatar || 'emo-blij') + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
         (p.beheerder ? '<a href="beheer.html">Gezin beheren</a>' : '') +

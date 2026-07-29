@@ -61,6 +61,34 @@ for (const map of ['server', 'public', 'test', 'scripts']) {
 }
 if (!streep) ok('geen brede streepjes');
 
+/* Emoji horen niet in de bron van server/ en public/: het beeld komt uit de
+   eigen glyfenset (public/shared/glyf.js), niet uit de emoji-font van het
+   besturingssysteem. Een tegel die een onbekende glyfnaam krijgt valt netjes
+   terug op een Bodoni-monogram, dus een naam is altijd veiliger dan een
+   plaatje dat er op elk toestel anders uitziet.
+
+   test/ en scripts/ vallen er bewust BUITEN: die voeren emoji juist als INVOER
+   aan de server (onnozel.test.js, beproeving.js). Daar zijn ze een test, geen
+   huisstijl. */
+console.log('3b) geen emoji in server/ en public/ (het beeld komt uit glyf.js)');
+const EMOJI = new RegExp(
+  '[\\u{1F000}-\\u{1FAFF}]' +
+  '|[\\u{2190}-\\u{27BF}]\\u{FE0F}' +
+  '|[\\u{231A}-\\u{231B}\\u{23E9}-\\u{23F3}\\u{25FD}-\\u{25FE}\\u{2614}-\\u{2615}' +
+  '\\u{26A1}\\u{26AA}-\\u{26AB}\\u{26BD}-\\u{26BE}\\u{26C4}-\\u{26C5}\\u{26D4}' +
+  '\\u{26EA}\\u{26F2}-\\u{26F3}\\u{26F5}\\u{26FA}\\u{26FD}\\u{2705}\\u{270A}-\\u{270B}' +
+  '\\u{2728}\\u{274C}\\u{274E}\\u{2753}-\\u{2755}\\u{2757}\\u{2795}-\\u{2797}' +
+  '\\u{27B0}\\u{27BF}]', 'gu');
+let emo = 0;
+for (const map of ['server', 'public']) {
+  loop(path.join(ROOT, map), /\.(js|html|css|json|webmanifest)$/, f => {
+    if (/[\\/](dist|min|data|campagne)[\\/]/.test(f)) return; // gegenereerd of runtime
+    const m = fs.readFileSync(f, 'utf8').match(EMOJI);
+    if (m) { emo += m.length; fout(m.length + ' emoji in ' + path.relative(ROOT, f) + ' (' + [...new Set(m)].slice(0, 6).join('') + ')'); }
+  });
+}
+if (!emo) ok('geen emoji in de bron');
+
 console.log('4) service-workers verwijzen naar bestaande bestanden');
 let shellFout = 0;
 loop(path.join(ROOT, 'public'), /^sw\.js$/, f => {

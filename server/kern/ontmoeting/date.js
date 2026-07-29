@@ -39,7 +39,7 @@ module.exports = (ctx) => {
       sseToOffice('sync', { scope: 'ontmoeting' });
     } else {
       sseToCustomer(ander, 'sync', { scope: 'ontmoeting' });
-      notify(ander, { icon: '✍️', title: 'Contract getekend', body: codenaamVan(key) + ' tekende het veiligheidscontract. Teken jij ook om te starten?', scope: 'ontmoeting' });
+      notify(ander, { icon: 'sneltekst', title: 'Contract getekend', body: codenaamVan(key) + ' tekende het veiligheidscontract. Teken jij ook om te starten?', scope: 'ontmoeting' });
     }
     save();
     return { status: 200, ok: true, status2: d.status };

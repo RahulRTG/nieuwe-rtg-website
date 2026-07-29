@@ -24,7 +24,7 @@ const BANDEN = [1, 2, 3, 4];
 /* Drie categorieen op een veld: de lijnvluchten, de privejets (GA-stands, een
    lichtere draai) en de helikopters (helipads, de lichtste draai; de klaring
    van de toren is een helipad in plaats van een baan). */
-const CATEGORIEEN = { lijn: '✈️', privejet: '🛩️', helikopter: '🚁' };
+const CATEGORIEEN = { lijn: 'vluchten', privejet: 'vluchten', helikopter: 'hangar' };
 const DRAAI_LICHT = {
   privejet: ['brandstof', 'catering', 'schoonmaak', 'pushback-gereed'],
   helikopter: ['brandstof', 'schoonmaak', 'pushback-gereed']

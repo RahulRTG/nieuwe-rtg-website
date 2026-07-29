@@ -317,10 +317,11 @@ test('10. een partneraanvraag beslissen: het kantoor beslist, de Business Pass i
   const uit = await ko('uitgifte', {});
   assert.equal(uit.status, 200);
 
-  /* De aanvraagpoort leest het pas-bewijs met sessionFor(): dat kent ALLEEN de
-     sessies uit /api/login. Een echt ledenaccount komt via accounts.verifyToken
-     binnen (resolveSession in server.js) en staat daar niet in. Zie de
-     bevinding onderaan deze test; hier toetsen we de stand zoals hij nu is. */
+  /* De aanvraagpoort leest het pas-bewijs met resolveSession(): die kent zowel
+     een demosessie als een ECHT ledenaccount. Dat laatste is de weg die een
+     klant in de praktijk loopt, en die weg toetsen we hier van begin tot eind:
+     registreren -> aanvraag afgewezen (nog geen pas) -> menselijk besluit tilt
+     het account naar Business -> opnieuw inloggen -> aanvraag lukt. */
   const t = Date.now().toString().slice(-7);
   const gewoon = await post('/api/auth/register', { name: 'Partner Aanvrager', email: 'pa' + t + '@rtg.test',
     phone: '+31612340003', password: 'Wachtwoord123', geboortedatum: '1988-03-11' });
@@ -330,8 +331,12 @@ test('10. een partneraanvraag beslissen: het kantoor beslist, de Business Pass i
   assert.equal(zonderPas.status, 403, 'zonder Business Pass komt de aanvraag er niet in');
   assert.match(zonderPas.body.error, /Business Pass/);
 
-  const zakelijk = await post('/api/login', { tier: 'business', pasApp: 'business' });
+  // het menselijke besluit: pas hierna bestaat de Business Pass
+  await elevateTier(base, gewoon.body.token, 'business', kantoor);
+  const zakelijk = await post('/api/auth/login', { login: 'pa' + t + '@rtg.test',
+    password: 'Wachtwoord123', pasApp: 'business' });
   assert.equal(zakelijk.status, 200);
+  assert.equal(zakelijk.body.state.user.tier, 'business');
 
   // ook met een pas blijven de gewone eisen staan
   assert.equal((await post('/api/partner/apply', { company: 'Geen Akkoord BV', type: 'restaurant',
@@ -366,19 +371,8 @@ test('10. een partneraanvraag beslissen: het kantoor beslist, de Business Pass i
   assert.equal((await post('/api/office/partner/decide', { id: mijn.id, action: 'goedkeuren' }, lid)).status, 401);
 });
 
-/* BEVINDING (niet in deze ronde gerepareerd, want het verandert een toegangspoort).
-
-   /api/partner/apply leest het Business Pass-bewijs met sessionFor(passToken).
-   Die functie kent alleen de sessies uit /api/login (de demopassen). Een ECHT
-   ledenaccount dat via /api/auth/login binnenkomt krijgt een accounttoken, en
-   dat staat niet in die map -- ook niet als het account wel degelijk op
-   Business staat na een menselijk besluit (aanmeldingen.beslis -> setTier).
-
-   Gevolg: een echte Business Pass-houder kan langs de normale weg GEEN
-   partnerplek aanvragen; alleen de demosessie komt erdoor. Elders in de code
-   is dit precies de fout die bij uitloggen al een keer is opgelost (zie de
-   toelichting boven /api/logout in routes/auth.js).
-
-   De reparatie is klein: resolveSession() gebruiken in plaats van sessionFor(),
-   net als de gewone auth-middleware in server.js doet. Ik laat hem hier staan
-   omdat het een POORT is en die keuze bij de eigenaar hoort. */
+/* Deze test toetste eerst de demoweg (/api/login), want de echte weg WERKTE
+   NIET: /api/partner/apply las het pas-bewijs met sessionFor(), en die kent
+   alleen de demosessies. Een echte Business Pass-houder kwam er dus nooit door.
+   Dat is nu gerepareerd (resolveSession, zie routes/member/partnerkanaal.js) en
+   de test loopt de echte weg. Blijft deze test groen, dan blijft die weg open. */

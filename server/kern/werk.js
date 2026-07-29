@@ -103,7 +103,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
         if (minLeeftijd != null && v.minLeeftijd > minLeeftijd) continue;
         uit.push({
           id: v.id, supplierCode: code, bedrijf: s.name, soort: v.soort,
-          type: s.type || null, typeLabel: t.label || null, icon: t.icon || '🏢',
+          type: s.type || null, typeLabel: t.label || null, icon: t.icon || 'gebouw',
           func: v.func, omschrijving: v.omschrijving, plaats: v.plaats, uren: v.uren,
           minLeeftijd: v.minLeeftijd, at: v.at,
           // land van het bedrijf: RTG is internationaal, dus je solliciteert ook

@@ -11,7 +11,7 @@
 module.exports = ({ db, save, accounts, socialConnecties }) => {
   const vandaag = () => new Date().toISOString().slice(0, 10);
   // de vaste 9+-lijst: vrolijk, neutraal, niets om achter te verschuilen
-  const STEMMINGEN = ['😊', '😎', '🤩', '😴', '🥳', '🌞', '🌧️', '⛵', '📚', '🎨', '⚽', '🎧', '🧘', '☕'];
+  const STEMMINGEN = ['emo-blij', 'emo-cool', 'emo-ster', 'emo-slaap', 'emo-feest', 'balans', 'balans', 'boot', 'reisboek', 'ontwerp', 'sport', 'muziek', 'balans', 'bar'];
 
   function W() {
     if (!db.data.wauw || typeof db.data.wauw !== 'object') db.data.wauw = { stemmingen: {} };

@@ -49,7 +49,7 @@ module.exports = (ctx) => {
     kas.unshift(sale);
     db.data.posSales[supplier.code] = kas.slice(0, 300);
     save();
-    notify(v.customerKey, { icon: '🗝️', title: supplier.name, body: 'Welkom. Uw kamer is ' + v.roomName + (v.deurId ? '; uw telefoon is de sleutel' : '') + '. Alles wat u bestelt kan op de kamer.', scope: 'orders' });
+    notify(v.customerKey, { icon: 'sleutel', title: supplier.name, body: 'Welkom. Uw kamer is ' + v.roomName + (v.deurId ? '; uw telefoon is de sleutel' : '') + '. Alles wat u bestelt kan op de kamer.', scope: 'orders' });
     sseToCustomer(v.customerKey, 'sync', { scope: 'verblijf' });
     sseToSupplier(supplier.code, 'sync', { scope: 'receptie' });
     return { ok: true, verblijf: v };

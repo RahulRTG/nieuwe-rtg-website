@@ -90,7 +90,7 @@ module.exports = (ctx) => {
       save();
       try { await pay.stuur({ van: koper.codenaam, aanCodenaam: 'RTG Treasury', centen: (waarde + fee) * 100, oms: 'Overname Asset-ticket ' + a.naam + ' (incl. ' + Math.round(OVERDRACHT_FEE_PCT * 100) + '% overdracht)', idem: 'overname-' + t.id + '-' + koper.id, soort: 'tik' }); } catch (e) {}
       try { await pay.stuur({ van: 'RTG Treasury', aanCodenaam: codenaam, centen: waarde * 100, oms: 'Verkoop Asset-ticket ' + a.naam + ' via de wachtlijst', idem: 'uitstap-' + t.id + '-' + koper.id, soort: 'tik' }); } catch (e) {}
-      notify(sess.key, { icon: '💰', title: 'Verkocht via de wachtlijst', body: a.naam + ': de Tik van € ' + waarde + ' staat in uw tegoed.', scope: 'assets' });
+      notify(sess.key, { icon: 'betalen', title: 'Verkocht via de wachtlijst', body: a.naam + ': de Tik van € ' + waarde + ' staat in uw tegoed.', scope: 'assets' });
       notify(koper.key, { icon: a.icon, title: 'U bent aan de beurt: ' + a.naam, body: 'Het Asset-ticket is van u (€ ' + waarde + ' + € ' + fee + ' overdracht). Restlooptijd tot ' + t.vervaltOp + '.', scope: 'assets' });
       return { ok: true, soort: 'overdracht', waarde, naar: koper.codenaam };
     }
@@ -101,7 +101,7 @@ module.exports = (ctx) => {
     db.data.assetTerugkoop.unshift(v);
     db.data.assetTerugkoop = db.data.assetTerugkoop.slice(0, 50000);
     save();
-    notify(sess.key, { icon: '⏳', title: 'Terugkoop aangevraagd: ' + a.naam, body: 'Er staat nu geen koper op de wachtlijst; RTG koopt terug en betaalt uiterlijk ' + uiterlijk + ' € ' + waarde + ' uit via een Tik.', scope: 'assets' });
+    notify(sess.key, { icon: 'agenda', title: 'Terugkoop aangevraagd: ' + a.naam, body: 'Er staat nu geen koper op de wachtlijst; RTG koopt terug en betaalt uiterlijk ' + uiterlijk + ' € ' + waarde + ' uit via een Tik.', scope: 'assets' });
     return { ok: true, soort: 'terugkoop-aangevraagd', waarde, uiterlijk, verzoek: v };
   }
 

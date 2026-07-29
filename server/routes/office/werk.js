@@ -28,7 +28,7 @@ app.post('/api/office/nudge', officeAuth, (req, res) => {
     return res.status(409).json({ error: 'Er is net al een herinnering gestuurd. Geef de zaak even de tijd.' });
   x.nudgedAt = new Date().toISOString();
   save();
-  notifySupplier(x.supplierCode, { icon: '⏰', title: 'Herinnering van RTG',
+  notifySupplier(x.supplierCode, { icon: 'agenda', title: 'Herinnering van RTG',
     body: (kind === 'ride' ? 'Rit ' : 'Bestelling ') + x.ref + ' van ' + x.customerCodename + ' wacht nog op actie. Kunt u er even naar kijken?' });
   sseToSupplier(x.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });

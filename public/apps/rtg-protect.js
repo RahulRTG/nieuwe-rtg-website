@@ -124,7 +124,7 @@
 
     var lock = document.createElement('div');
     lock.className = 'rtgp-lock';
-    lock.innerHTML = '<span class="ic">🔒</span><b>Beschermde inhoud</b>' +
+    lock.innerHTML = '<span class="ic"></span><b>Beschermde inhoud</b>' +
       '<span>Log in als lid om te kijken. Dit beeld is beveiligd en van een watermerk voorzien.</span>';
     wrap.appendChild(lock);
 

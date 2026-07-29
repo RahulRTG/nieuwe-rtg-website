@@ -62,8 +62,8 @@ module.exports = (ctx) => {
     // 0. spoed van de bediening: rustig, maar als eerste
     for (const o of open) if (o.spoed) {
       const wie = o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '');
-      lines.push(en ? '⚡ Ticket ' + wie + ': service asked for a rush' + (o.spoed.itemId ? ' on one dish' : '') + '; take it along first.'
-                    : '⚡ Bon ' + wie + ': de bediening vraagt spoed' + (o.spoed.itemId ? ' op een gerecht' : '') + '; pak deze als eerste mee.');
+      lines.push(en ? 'Ticket ' + wie + ': service asked for a rush' + (o.spoed.itemId ? ' on one dish' : '') + '; take it along first.'
+                    : 'Bon ' + wie + ': de bediening vraagt spoed' + (o.spoed.itemId ? ' op een gerecht' : '') + '; pak deze als eerste mee.');
     }
     // 1. voorrang: oudste onaangeroerde bon
     const vers = open.filter(o => !Object.keys(o.secties || {}).length && !Object.keys(o.stations || {}).length);
@@ -85,11 +85,11 @@ module.exports = (ctx) => {
       const bon = open.find(o => (o.items || []).some(it => it.id === ov.itemId));
       if (bon) {
         const wie = bon.pickup + (tafel(bon) ? ' (' + tafel(bon) + ')' : '');
-        lines.push(en ? '🥡 ' + ov.qty + 'x ' + ov.name + ' is left on the pass: use it for ticket ' + wie + ' instead of cooking new.'
-                      : '🥡 Er ligt nog ' + ov.qty + 'x ' + ov.name + ' op de pas: gebruik die voor bon ' + wie + ' in plaats van nieuw te maken.');
+        lines.push(en ? '' + ov.qty + 'x ' + ov.name + ' is left on the pass: use it for ticket ' + wie + ' instead of cooking new.'
+                      : 'Er ligt nog ' + ov.qty + 'x ' + ov.name + ' op de pas: gebruik die voor bon ' + wie + ' in plaats van nieuw te maken.');
       } else {
-        lines.push(en ? '🥡 On the pass: ' + ov.qty + 'x ' + ov.name + ' left over; work it into the next ticket or write it off.'
-                      : '🥡 Op de pas over: ' + ov.qty + 'x ' + ov.name + '; werk het weg in de eerstvolgende bon of schrijf af.');
+        lines.push(en ? 'On the pass: ' + ov.qty + 'x ' + ov.name + ' left over; work it into the next ticket or write it off.'
+                      : 'Op de pas over: ' + ov.qty + 'x ' + ov.name + '; werk het weg in de eerstvolgende bon of schrijf af.');
       }
     }
     // 3. batchen: hetzelfde gerecht op meerdere bonnen tegelijk maken
@@ -103,8 +103,8 @@ module.exports = (ctx) => {
       per[it.id].qty += it.qty; per[it.id].bonnen.push(o.pickup);
     }
     for (const p of Object.values(per)) if (p.bonnen.length >= 2)
-      lines.push(en ? '🍳 Make ' + p.qty + '× ' + p.name + ' in one go (tickets ' + p.bonnen.join(', ') + ').'
-                    : '🍳 Maak ' + p.qty + '× ' + p.name + ' in één keer (bonnen ' + p.bonnen.join(', ') + ').');
+      lines.push(en ? 'Make ' + p.qty + '× ' + p.name + ' in one go (tickets ' + p.bonnen.join(', ') + ').'
+                    : 'Maak ' + p.qty + '× ' + p.name + ' in één keer (bonnen ' + p.bonnen.join(', ') + ').');
     // 4. het vuurplan: de kanten van een bon zo starten dat alles tegelijk
     //    warm op de pas ligt, met concrete minuten per kant
     for (const o of open) {
@@ -114,18 +114,18 @@ module.exports = (ctx) => {
       const nu2 = Object.keys(plan).filter(k => plan[k].doe === 'nu');
       const wacht = Object.keys(plan).filter(k => plan[k].doe === 'wacht');
       if (warm.length)
-        lines.push(en ? '♨ Ticket ' + wie + ': ' + warm.join('/') + ' is done but the rest needs ~' + doel + ' min; keep it warm and close the gap.'
-                      : '♨ Bon ' + wie + ': ' + warm.join('/') + ' ligt klaar maar de rest heeft nog ~' + doel + ' min; houd warm en trek de kanten gelijk.');
+        lines.push(en ? 'Ticket ' + wie + ': ' + warm.join('/') + ' is done but the rest needs ~' + doel + ' min; keep it warm and close the gap.'
+                      : 'Bon ' + wie + ': ' + warm.join('/') + ' ligt klaar maar de rest heeft nog ~' + doel + ' min; houd warm en trek de kanten gelijk.');
       else if (nu2.length && wacht.length)
-        lines.push(en ? '⏱ Ticket ' + wie + ': fire ' + nu2.join(' and ') + ' now, ' + wacht.map(k => k + ' in ~' + plan[k].min + ' min').join(' and ') + ', so the whole table leaves hot at once.'
-                      : '⏱ Bon ' + wie + ': start ' + nu2.join(' en ') + ' nu, ' + wacht.map(k => k + ' over ~' + plan[k].min + ' min').join(' en ') + ', dan gaat de hele tafel in een keer warm uit.');
+        lines.push(en ? 'Ticket ' + wie + ': fire ' + nu2.join(' and ') + ' now, ' + wacht.map(k => k + ' in ~' + plan[k].min + ' min').join(' and ') + ', so the whole table leaves hot at once.'
+                      : 'Bon ' + wie + ': start ' + nu2.join(' en ') + ' nu, ' + wacht.map(k => k + ' over ~' + plan[k].min + ' min').join(' en ') + ', dan gaat de hele tafel in een keer warm uit.');
     }
     // 5. tafels: meerdere bonnen voor dezelfde tafel gelijktrekken
     const perTafel = {};
     for (const o of open) if (o.table) { perTafel[o.table] = perTafel[o.table] || []; perTafel[o.table].push(o); }
     for (const [t, os] of Object.entries(perTafel)) if (os.length >= 2)
-      lines.push(en ? '🪑 ' + t + ' has ' + os.length + ' tickets (' + os.map(o => o.pickup).join(', ') + '): line up the sections so the table leaves in one go.'
-                    : '🪑 ' + t + ' heeft ' + os.length + ' bonnen (' + os.map(o => o.pickup).join(', ') + '): stem de kanten af zodat de tafel in één keer uitgaat.');
+      lines.push(en ? '' + t + ' has ' + os.length + ' tickets (' + os.map(o => o.pickup).join(', ') + '): line up the sections so the table leaves in one go.'
+                    : '' + t + ' heeft ' + os.length + ' bonnen (' + os.map(o => o.pickup).join(', ') + '): stem de kanten af zodat de tafel in één keer uitgaat.');
     // 6. de bezetting: veel open werk op een kant met weinig aangemelde koks
     const lijn = s.lijn || {};
     const perKant = {};
@@ -133,8 +133,8 @@ module.exports = (ctx) => {
     for (const [sec, n2] of Object.entries(perKant)) {
       const koks = (lijn[sec] || []).length;
       if (n2 >= 4 && koks <= 1)
-        lines.push(en ? '👥 The ' + sec + ' side has ' + n2 + ' open tickets with ' + (koks || 'no') + ' cook(s) signed in: jump in or sign someone in.'
-                      : '👥 De kant ' + sec + ' heeft ' + n2 + ' open bonnen met ' + (koks || 'geen') + ' aangemelde kok(s): spring bij of meld iemand aan.');
+        lines.push(en ? 'The ' + sec + ' side has ' + n2 + ' open tickets with ' + (koks || 'no') + ' cook(s) signed in: jump in or sign someone in.'
+                      : 'De kant ' + sec + ' heeft ' + n2 + ' open bonnen met ' + (koks || 'geen') + ' aangemelde kok(s): spring bij of meld iemand aan.');
     }
     return lines.slice(0, 6);
   }

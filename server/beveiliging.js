@@ -112,7 +112,7 @@ module.exports = (ctx) => {
     if ((nu - (laatstGemeld.get(sleutel) || 0)) < ESCALATIE_MS) return;
     laatstGemeld.set(sleutel, nu);
     if (typeof notifyOwner === 'function') {
-      try { notifyOwner({ title: '🛡️ Beveiligingsalarm', body: tekst }); } catch (e) {}
+      try { notifyOwner({ title: 'Beveiligingsalarm', body: tekst }); } catch (e) {}
     }
   }
 

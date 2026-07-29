@@ -67,7 +67,7 @@ module.exports = (ctx) => {
     incidenten().unshift(x);
     db.data.bevIncidenten = incidenten().slice(0, 50000);
     save();
-    notifySupplier(s.code, { icon: '🆘', title: 'SOS · ' + naam, body: 'Noodknop ingedrukt. Bekijk de live locatie en stuur bijstand.' });
+    notifySupplier(s.code, { icon: 'help', title: 'SOS · ' + naam, body: 'Noodknop ingedrukt. Bekijk de live locatie en stuur bijstand.' });
     logActivity(s.code, { name: naam }, 'drukte de SOS-noodknop in');
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     sseToOffice('sync', { scope: 'beveiliging' });

@@ -4,10 +4,10 @@
    een concept). Puur data + functies; de runtime woont in index.js en aiwerk.js. */
 
 const DISCIPLINES = {
-  automotive: { label: 'Automotive', icon: '🏎️' },
-  jacht:      { label: 'Jachten & boten', icon: '🛥️' },
+  automotive: { label: 'Automotive', icon: 'ontwerp' },
+  jacht:      { label: 'Jachten & boten', icon: 'boot' },
   vliegtuig:  { label: 'Luchtvaart', icon: 'vluchten' },
-  helikopter: { label: 'Helikopter', icon: '🚁' }
+  helikopter: { label: 'Helikopter', icon: 'hangar' }
 };
 const STATUS = ['schets', 'ontwikkeling', 'maquette', 'prototype', 'productie', 'archief'];
 

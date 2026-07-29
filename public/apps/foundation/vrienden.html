@@ -189,7 +189,7 @@
   <div style="padding:.7rem;overflow-y:auto;">
     <canvas class="studio-cv" id="stCv" aria-label="Bewerk je foto"></canvas>
     <div class="strij" id="stFilters" role="group" aria-label="Filters"></div>
-    <div class="strij"><span style="color:var(--zacht);font-size:.8rem;">✏️</span><span id="stKleuren" style="display:flex;gap:.4rem;"></span><span style="flex:1;"></span><button class="stchip" id="stWis" type="button">↶ wis laatste</button></div>
+    <div class="strij"><span style="color:var(--zacht);font-size:.8rem;"></span><span id="stKleuren" style="display:flex;gap:.4rem;"></span><span style="flex:1;"></span><button class="stchip" id="stWis" type="button">↶ wis laatste</button></div>
     <div class="strij" id="stEmojis" role="group" aria-label="Stickers"></div>
     <input class="veld" id="stTekst" placeholder="Tekst erbij (mag leeg)" maxlength="120" style="margin-top:.5rem;">
     <button class="knop" id="stStuur" type="button" style="width:100%;margin-top:.55rem;">Versturen</button>
@@ -311,7 +311,7 @@ function renderMeekijk(kinderen){
   if (!(mij.beheerder && kinderen.length)) return;
   $('#meekijk').innerHTML = kinderen.map(k=>
     '<div class="rij"><span class="av">'+initcn(k.codenaam)+'</span><div class="nm">'+esc(k.codenaam)+'<small>jij voegt vrienden toe en kijkt mee</small></div>'+
-    '<button class="knop mini" data-voeg="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">➕ Vriend</button>'+
+    '<button class="knop mini" data-voeg="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Vriend</button>'+
     '<button class="knop grijs mini" data-kijk="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Bekijk</button>'+
     '<button class="knop grijs mini" data-board="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Boardroom</button></div>'
   ).join('');
@@ -439,7 +439,7 @@ $('#fotoIn').addEventListener('change', async e=>{
 const ST = { img:null, ops:[], filter:'dag', pen:'#F2E7C9', modus:'pen', emoji:null };
 const ST_FILTERS = [['geen','Geen'],['dag','Dagkleur'],['warm','Warm'],['zw','Zwart-wit']];
 const ST_KLEUREN = ['#F2E7C9','#E05B5B','#5FA56A','#5B8FE0','#111111'];
-const ST_EMOJIS = ['😄','😍','🔥','⭐','🎉','💛','🦊','👑'];
+const ST_EMOJIS = ['emo-lol','emo-hart','ster','⭐','emo-feest','emo-hart','emo-bloem','pas'];
 function dagkleur(){ return (getComputedStyle(document.documentElement).getPropertyValue('--dag-kleur')||'').trim() || '#C9A24B'; }
 function stTeken(){
   const cv=$('#stCv'), ctx=cv.getContext('2d'); if(!ST.img) return;
@@ -563,7 +563,7 @@ async function laadStories(){
 async function openStory(id){
   let d; try{ d = await soc('/story/view', { id }); }catch(e){ alert(e.message); return; }
   $('#storyVan').textContent = 'Verhaal van '+d.van; $('#storyImg').src = d.foto; $('#storyTxt').textContent = d.tekst||'';
-  $('#storyOpdracht').textContent = d.opdracht ? '✅ Deed mee met de dag-opdracht: '+d.opdracht : '';
+  $('#storyOpdracht').textContent = d.opdracht ? 'Deed mee met de dag-opdracht: '+d.opdracht : '';
   $('#storyOv').classList.add('open');
 }
 $('#storyX').addEventListener('click', ()=>{ $('#storyOv').classList.remove('open'); $('#storyImg').src=''; laadStories(); });

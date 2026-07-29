@@ -127,8 +127,8 @@
   align-items: center;
   gap: .3rem;
 }
-.rtgp-badge.eme::before { content: '🔒'; }
-.rtgp-badge.zicht::before { content: '👁'; }
+.rtgp-badge.eme::before { content: 'slot'; }
+.rtgp-badge.zicht::before { content: 'ontdek'; }
 
 @media (prefers-reduced-motion: reduce) {
   .rtgp-media, .rtgp > video, .rtgp > img, .rtgp > canvas { transition: none; }

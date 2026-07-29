@@ -122,7 +122,7 @@ module.exports = (ctx) => {
     pb.paid = true; pb.paidAt = nu(); pb.status = 'geboekt';
     save();
     if (typeof verdien === 'function') { try { verdien(sess.key, pb.prijs, pb.naam); } catch (e) {} }
-    notify(sess.key, { icon: '🌸', title: 'Pakket geboekt: ' + pb.naam, body: pb.nachten + ' nachten bij ' + pb.hotelNaam + ' + behandeling op ' + pb.datum + ' om ' + pb.tijd + '.', scope: 'care' });
+    notify(sess.key, { icon: 'oogst', title: 'Pakket geboekt: ' + pb.naam, body: pb.nachten + ' nachten bij ' + pb.hotelNaam + ' + behandeling op ' + pb.datum + ' om ' + pb.tijd + '.', scope: 'care' });
     return { ok: true, pakket: pb };
   }
 

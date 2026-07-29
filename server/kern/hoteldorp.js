@@ -47,7 +47,7 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     if (s.hotelPosten.length > 500) s.hotelPosten.length = 500;
     save();
     // security is de enige afdeling waar een nieuwe post meteen mag rinkelen
-    if (key === 'security') try { notifySupplier(s.code, { icon: '🛡️', title: 'Security: ' + (post.waar || 'melding'), body: post.tekst + ' (' + post.door + ')' }); } catch (e) {}
+    if (key === 'security') try { notifySupplier(s.code, { icon: 'schild', title: 'Security: ' + (post.waar || 'melding'), body: post.tekst + ' (' + post.door + ')' }); } catch (e) {}
     sseToSupplier(s.code, 'sync', { scope: 'dorp' });
     return { ok: true, post };
   }
@@ -101,7 +101,7 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
       .map(x => ({
         code: x.code, naam: x.name, stad: x.city,
         soort: (types[x.type] || {}).label || x.type,
-        icon: (types[x.type] || {}).icon || '📍',
+        icon: (types[x.type] || {}).icon || 'gps',
         km: Math.round((haversine(s.loc, x.loc) || 0) / 100) / 10
       }))
       .filter(x => x.km > 0 && x.km <= 30)

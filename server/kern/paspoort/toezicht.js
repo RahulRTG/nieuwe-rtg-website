@@ -58,7 +58,7 @@ module.exports = (ctx) => {
     } else {
       inc.status = 'afgewezen'; inc.besluit = 'afwijzen';
       log({ soort: 'incident-afgewezen', incidentId: inc.id, supplierCode: inc.supplierCode, key: inc.key, door: inc.beoordeeldDoor });
-      notifySupplier(inc.supplierCode, { icon: '⛔', title: 'Incident afgewezen', body: 'RTG wees uw incidentverzoek af; de identiteit wordt niet gedeeld.' });
+      notifySupplier(inc.supplierCode, { icon: 'slot', title: 'Incident afgewezen', body: 'RTG wees uw incidentverzoek af; de identiteit wordt niet gedeeld.' });
     }
     sseToOffice('sync', { scope: 'incident' });
     sseToSupplier(inc.supplierCode, 'sync', { scope: 'paspoort' });

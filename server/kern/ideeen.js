@@ -8,11 +8,11 @@
    referenties meegegeven zodat een spin-off echt een concept aanmaakt. */
 
 const BUREAUS = {
-  atelier:   { label: 'RTG Atelier', icon: '✂️', wat: 'mode en alles wat je draagt' },
-  studio:    { label: 'RTG Ontwerpstudio', icon: '🏎️', wat: 'voertuigen en vaartuigen' },
-  hardware:  { label: 'RTG Hardwarelab', icon: '🔧', wat: 'apparaten en wearables' },
+  atelier:   { label: 'RTG Atelier', icon: 'mode', wat: 'mode en alles wat je draagt' },
+  studio:    { label: 'RTG Ontwerpstudio', icon: 'ontwerp', wat: 'voertuigen en vaartuigen' },
+  hardware:  { label: 'RTG Hardwarelab', icon: 'gear', wat: 'apparaten en wearables' },
   architect: { label: 'RTG Architectenbureau', icon: 'gebouw', wat: 'gebouwen en huizen' },
-  redactie:  { label: 'RTG Redactie', icon: '📰', wat: 'verhalen, de krant en het magazine' }
+  redactie:  { label: 'RTG Redactie', icon: 'krant', wat: 'verhalen, de krant en het magazine' }
 };
 const BUREAU_IDS = Object.keys(BUREAUS);
 const STATUS = ['nieuw', 'in-uitwerking', 'uitgewerkt', 'geparkeerd'];

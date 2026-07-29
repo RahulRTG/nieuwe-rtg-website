@@ -83,7 +83,7 @@ module.exports = (ctx) => {
         accounts.saveMemberState(p.koppel.userId, md);
       } catch (e) { /* een gekoppelde gast minder bereikt: niet fataal */ }
       if (ctx.pushHook) {
-        const kop = bericht.soort === 'hulp' ? '🆘 ' + g.naam : (bericht.soort === 'reis' ? '✈️ ' + g.naam : g.naam);
+        const kop = bericht.soort === 'hulp' ? '' + g.naam : (bericht.soort === 'reis' ? '' + g.naam : g.naam);
         try { ctx.pushHook(p.koppel.userId, { title: 'RTFoundation · ' + kop, body: (bericht.vanNaam ? bericht.vanNaam + ': ' : '') + tekst.slice(0, 120), tag: 'rtf-' + bericht.id }); } catch (e) {}
       }
     }

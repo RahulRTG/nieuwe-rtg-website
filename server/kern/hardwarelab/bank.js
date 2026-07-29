@@ -5,12 +5,12 @@
    de runtime woont in index.js en aiwinkel.js. */
 
 const DISCIPLINES = {
-  apparaat:   { label: 'Apparaten', icon: '📱' },
-  wearable:   { label: 'Wearables', icon: '⌚' },
-  scherm:     { label: 'Schermen & panelen', icon: '🖥️' },
-  sensor:     { label: 'Sensoren & IoT', icon: '📡' },
-  edge:       { label: 'Edge & servers', icon: '🗄️' },
-  accessoire: { label: 'Accessoires', icon: '🎛️' }
+  apparaat:   { label: 'Apparaten', icon: 'paneel' },
+  wearable:   { label: 'Wearables', icon: 'juweel' },
+  scherm:     { label: 'Schermen & panelen', icon: 'paneel' },
+  sensor:     { label: 'Sensoren & IoT', icon: 'antenne' },
+  edge:       { label: 'Edge & servers', icon: 'logboek' },
+  accessoire: { label: 'Accessoires', icon: 'opties' }
 };
 const STATUS = ['schets', 'ontwikkeling', 'maquette', 'prototype', 'productie', 'archief'];
 

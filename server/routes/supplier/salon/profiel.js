@@ -78,7 +78,7 @@ app.post('/api/supplier/salon/folder', express.json({ limit: '8mb' }), supplierA
   salon.kap();   // het venster: een grens, op een plek (kern/salon)
   save();
   logActivity(req.supplier.code, req.actor, 'plaatste een folder op De Salon: "' + titel + '"');
-  salonNaarVolgers(req.supplier, '📖 ' + titel);
+  salonNaarVolgers(req.supplier, '' + titel);
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
   sseToOffice('sync', { scope: 'salon' });
   res.json({ ok: true, postId: post.id });

@@ -4,7 +4,7 @@
   async function ontHaalIce(){ try { ontIce = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ ontIce = [{ urls:'stun:stun.l.google.com:19302' }]; } return ontIce; }
   function ontLiveWacht(dateId, naam){
     ontLiveDate = dateId;
-    $('#ontLiveNaam').textContent = '🚨 ' + naam;
+    $('#ontLiveNaam').textContent = '' + naam;
     $('#ontLiveStatus').textContent = T('bo.ontwacht','Wachten op het camerabeeld van het lid…');
     $('#ontLiveVid').srcObject = null;
     $('#ontLiveScrim').style.display = 'flex';
@@ -19,7 +19,7 @@
     // een nieuw aanbod: open het scherm als dat nog niet openstaat
     if (d.payload.sdp && d.payload.sdp.type === 'offer'){
       ontLiveDate = d.dateId;
-      if ($('#ontLiveScrim').style.display !== 'flex'){ $('#ontLiveNaam').textContent = '🚨 ' + (d.codenaam||'SOS'); $('#ontLiveScrim').style.display = 'flex'; }
+      if ($('#ontLiveScrim').style.display !== 'flex'){ $('#ontLiveNaam').textContent = '' + (d.codenaam||'SOS'); $('#ontLiveScrim').style.display = 'flex'; }
       await ontHaalIce();
       if (ontPc){ try { ontPc.close(); } catch(e){} }
       ontPc = new RTCPeerConnection({ iceServers: ontIce || [{ urls:'stun:stun.l.google.com:19302' }] });
@@ -66,7 +66,7 @@
   function openTrustThread(id){
     const t = trustData.find(x => x.id === id); if (!t) return;
     trustId = id; convUser = null;
-    $('#convWho').textContent = '🤝 ' + t.name + ' · ' + t.company;
+    $('#convWho').textContent = '' + t.name + ' · ' + t.company;
     $('#convBody').innerHTML = t.messages.map(m =>
       '<div class="cmsg '+(m.from==='staff'?'in':'out')+'">'+escHtml(m.text)+'</div>').join('');
     $('#convScrim').classList.add('open');
@@ -120,7 +120,7 @@
       const koeling = a.nudgedAt && (Date.now() - new Date(a.nudgedAt)) < 10*60000;
       const knop = (a.kind === 'order' || a.kind === 'ride')
         ? (koeling ? '<span class="pill klaar">'+T('bo.nudged','herinnerd')+'</span>'
-                   : '<button class="vbtn ok" data-nudge="'+a.ref+'" data-nkind="'+a.kind+'">⏰ '+T('bo.nudge','Stuur herinnering')+'</button>')
+                   : '<button class="vbtn ok" data-nudge="'+a.ref+'" data-nkind="'+a.kind+'">'+T('bo.nudge','Stuur herinnering')+'</button>')
         : '';
       return '<div class="alert '+a.level+'"><span class="lv"></span><div class="tx">'+escHtml(a.text)+'</div>'+knop+'</div>';
     }).join('') : '<div class="empty">✓ '+T('bo.noalerts','Alles loopt. Vastgelopen bestellingen, wachtende leden en open beoordelingen verschijnen hier vanzelf.')+'</div>';

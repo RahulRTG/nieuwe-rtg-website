@@ -14,11 +14,11 @@
    Opslag: db.data.labProjecten. De AI-onderzoekscoach staat in ./onderzoekslab-ai.js. */
 
 const VELDEN = {
-  hardware: { naam: 'Hardware', emoji: '🔩' }, software: { naam: 'Software', emoji: '💻' },
-  dorp: { naam: 'Dorpshulp (een heel dorp helpen)', emoji: '🏘️' }, meta: { naam: 'Onderzoek naar onderzoek', emoji: '🔁' },
-  landbouw: { naam: 'Boeren & landbouw', emoji: '🌾' }, energie: { naam: 'Energie', emoji: '⚡' },
-  water: { naam: 'Water', emoji: '💧' }, zorg: { naam: 'Zorg & gezondheid', emoji: '🩺' },
-  onderwijs: { naam: 'Onderwijs', emoji: '📚' }
+  hardware: { naam: 'Hardware', emoji: 'gear' }, software: { naam: 'Software', emoji: 'paneel' },
+  dorp: { naam: 'Dorpshulp (een heel dorp helpen)', emoji: 'stad' }, meta: { naam: 'Onderzoek naar onderzoek', emoji: 'agenda' },
+  landbouw: { naam: 'Boeren & landbouw', emoji: 'oogst' }, energie: { naam: 'Energie', emoji: 'flits' },
+  water: { naam: 'Water', emoji: 'balans' }, zorg: { naam: 'Zorg & gezondheid', emoji: 'zorg' },
+  onderwijs: { naam: 'Onderwijs', emoji: 'reisboek' }
 };
 const FASEN = ['idee', 'onderzoek', 'prototype', 'proef', 'uitrol', 'archief'];
 const VERBODEN = ['wapen', 'wapens', 'munitie', 'explosief', 'explosieven', 'biowapen', 'gifgas'];

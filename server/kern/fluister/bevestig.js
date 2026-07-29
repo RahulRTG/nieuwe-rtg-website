@@ -100,7 +100,7 @@ module.exports = (ctx) => {
     const hits = [];
     for (const s of (db.data.suppliers || [])) {
       if (((s.name || '') + ' ' + (s.type || '') + ' ' + (s.city || '')).toLowerCase().includes(term))
-        hits.push((s.icon || '🏛') + ' ' + s.name + (s.type ? ' (' + s.type + ')' : '') + (s.city ? ' in ' + s.city : ''));
+        hits.push((s.icon || 'gebouw') + ' ' + s.name + (s.type ? ' (' + s.type + ')' : '') + (s.city ? ' in ' + s.city : ''));
       for (const it of [].concat(s.menu || [], s.services || [], s.products || [])) {
         const naam = it.name || it.naam || '';
         if (!naam.toLowerCase().includes(term)) continue;

@@ -45,20 +45,20 @@ const dagVan = (t) => new Date(t || Date.now()).toISOString().slice(0, 10);
 
 /* ---------- de dag-opdracht: elke dag een snap-uitdaging voor iedereen ---------- */
 const OPDRACHTEN = [
-  { emoji: '💛', tekst: 'iets geels' }, { emoji: '🌅', tekst: 'je uitzicht van nu' },
-  { emoji: '🍳', tekst: 'je ontbijt of lunch' }, { emoji: '👟', tekst: 'je schoenen van vandaag' },
-  { emoji: '🌿', tekst: 'iets dat groeit' }, { emoji: '📚', tekst: 'wat je aan het leren bent' },
-  { emoji: '😄', tekst: 'iets dat je aan het lachen maakte' }, { emoji: '🎨', tekst: 'de mooiste kleur om je heen' },
-  { emoji: '💧', tekst: 'iets met water' }, { emoji: '🐾', tekst: 'een dier (of iets dat erop lijkt)' },
-  { emoji: '🔺', tekst: 'een driehoek in het wild' }, { emoji: '☁️', tekst: 'de lucht van dit moment' },
-  { emoji: '🤝', tekst: 'iets dat je samen doet' }, { emoji: '🏠', tekst: 'je favoriete plek thuis' },
-  { emoji: '🎵', tekst: 'waar jij muziek van krijgt' }, { emoji: '🧦', tekst: 'de gekste sok die je vindt' },
-  { emoji: '🌳', tekst: 'de oudste boom die je ziet' }, { emoji: '✍️', tekst: 'je eigen handschrift' },
-  { emoji: '🪞', tekst: 'een spiegelbeeld (niet van jezelf)' }, { emoji: '🍎', tekst: 'iets gezonds' },
-  { emoji: '🔤', tekst: 'de eerste letter van je naam, ergens gevonden' }, { emoji: '🌙', tekst: 'iets dat bij de avond hoort' },
-  { emoji: '🧩', tekst: 'iets dat precies past' }, { emoji: '🚲', tekst: 'iets met wielen' },
-  { emoji: '🌈', tekst: 'drie kleuren in een beeld' }, { emoji: '⏰', tekst: 'hoe laat het is, zonder klok' },
-  { emoji: '🫶', tekst: 'iets waar je dankbaar voor bent' }, { emoji: '🔍', tekst: 'iets heel kleins, heel dichtbij' }
+  { emoji: 'emo-hart', tekst: 'iets geels' }, { emoji: 'balans', tekst: 'je uitzicht van nu' },
+  { emoji: 'horeca', tekst: 'je ontbijt of lunch' }, { emoji: 'sport', tekst: 'je schoenen van vandaag' },
+  { emoji: 'oogst', tekst: 'iets dat groeit' }, { emoji: 'reisboek', tekst: 'wat je aan het leren bent' },
+  { emoji: 'emo-lol', tekst: 'iets dat je aan het lachen maakte' }, { emoji: 'ontwerp', tekst: 'de mooiste kleur om je heen' },
+  { emoji: 'balans', tekst: 'iets met water' }, { emoji: 'emo-bloem', tekst: 'een dier (of iets dat erop lijkt)' },
+  { emoji: 'help', tekst: 'een driehoek in het wild' }, { emoji: 'balans', tekst: 'de lucht van dit moment' },
+  { emoji: 'entourage', tekst: 'iets dat je samen doet' }, { emoji: 'wonen', tekst: 'je favoriete plek thuis' },
+  { emoji: 'muziek', tekst: 'waar jij muziek van krijgt' }, { emoji: 'mode', tekst: 'de gekste sok die je vindt' },
+  { emoji: 'oogst', tekst: 'de oudste boom die je ziet' }, { emoji: 'sneltekst', tekst: 'je eigen handschrift' },
+  { emoji: 'wonen', tekst: 'een spiegelbeeld (niet van jezelf)' }, { emoji: 'horeca', tekst: 'iets gezonds' },
+  { emoji: 'taal', tekst: 'de eerste letter van je naam, ergens gevonden' }, { emoji: 'balans', tekst: 'iets dat bij de avond hoort' },
+  { emoji: 'spelen', tekst: 'iets dat precies past' }, { emoji: 'auto', tekst: 'iets met wielen' },
+  { emoji: 'balans', tekst: 'drie kleuren in een beeld' }, { emoji: 'agenda', tekst: 'hoe laat het is, zonder klok' },
+  { emoji: 'emo-hart', tekst: 'iets waar je dankbaar voor bent' }, { emoji: 'ontdek', tekst: 'iets heel kleins, heel dichtbij' }
 ];
 function dagOpdracht() {
   const dag = dagVan();

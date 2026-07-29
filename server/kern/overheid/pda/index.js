@@ -14,7 +14,7 @@
    Krijgt de gedeelde ctx van kern/overheid/index.js. */
 
 const LOCATIES = {
-  rechtbank: { label: 'De Rechtbank', icoon: '⚖️',
+  rechtbank: { label: 'De Rechtbank', icoon: 'juridisch',
     ruimtes: ['Hal en balie', 'Zittingszaal A', 'Zittingszaal B', 'Zittingszaal C', 'Raadkamer', 'Archief'] },
   belastingkantoor: { label: 'Het Belastingkantoor', icoon: '\u{1F3E6}',
     ruimtes: ['Hal en balie', 'Spreekkamer 1', 'Spreekkamer 2', 'Kantoortuin', 'Archief'] },

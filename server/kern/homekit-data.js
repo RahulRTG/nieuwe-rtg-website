@@ -6,26 +6,26 @@ const KAMERS = ['Woonkamer', 'Keuken', 'Slaapkamer', 'Badkamer', 'Werkkamer', 'H
 
 // de standaard-inrichting van een nieuwe woning (id's blijven stabiel)
 const BASIS = [
-  { id: 'lamp-woon', kamer: 'Woonkamer', naam: 'Plafondlamp', soort: 'lamp', icon: '💡', stand: { aan: false, dim: 80 } },
-  { id: 'lamp-sfeer', kamer: 'Woonkamer', naam: 'Sfeerlampen', soort: 'lamp', icon: '🕯️', stand: { aan: false, dim: 40 } },
-  { id: 'tv-woon', kamer: 'Woonkamer', naam: 'Televisie', soort: 'tv', icon: '📺', stand: { aan: false } },
-  { id: 'speaker-woon', kamer: 'Woonkamer', naam: 'Speakers', soort: 'audio', icon: '🔊', stand: { aan: false, volume: 30 } },
-  { id: 'gordijn-woon', kamer: 'Woonkamer', naam: 'Gordijnen', soort: 'gordijn', icon: '🪟', stand: { open: true } },
-  { id: 'thermostaat', kamer: 'Woonkamer', naam: 'Thermostaat', soort: 'klimaat', icon: '🌡️', stand: { aan: true, temp: 20 } },
-  { id: 'lamp-keuken', kamer: 'Keuken', naam: 'Keukenlamp', soort: 'lamp', icon: '💡', stand: { aan: false, dim: 100 } },
-  { id: 'koffie', kamer: 'Keuken', naam: 'Koffiezetter', soort: 'stekker', icon: '☕', stand: { aan: false } },
-  { id: 'vaatwasser', kamer: 'Keuken', naam: 'Vaatwasser', soort: 'stekker', icon: '🫧', stand: { aan: false } },
-  { id: 'lamp-slaap', kamer: 'Slaapkamer', naam: 'Bedlampjes', soort: 'lamp', icon: '🛏️', stand: { aan: false, dim: 30 } },
-  { id: 'gordijn-slaap', kamer: 'Slaapkamer', naam: 'Gordijnen', soort: 'gordijn', icon: '🪟', stand: { open: true } },
-  { id: 'wekker', kamer: 'Slaapkamer', naam: 'Wekkerlicht', soort: 'lamp', icon: '⏰', stand: { aan: false, dim: 50 } },
-  { id: 'lamp-bad', kamer: 'Badkamer', naam: 'Spiegellamp', soort: 'lamp', icon: '🪞', stand: { aan: false, dim: 100 } },
-  { id: 'vloer-bad', kamer: 'Badkamer', naam: 'Vloerverwarming', soort: 'klimaat', icon: '🦶', stand: { aan: false, temp: 22 } },
-  { id: 'lamp-werk', kamer: 'Werkkamer', naam: 'Bureaulamp', soort: 'lamp', icon: '💡', stand: { aan: false, dim: 90 } },
-  { id: 'monitor', kamer: 'Werkkamer', naam: 'Beeldschermen', soort: 'stekker', icon: '🖥️', stand: { aan: false } },
-  { id: 'slot-voordeur', kamer: 'Hal', naam: 'Voordeurslot', soort: 'slot', icon: '🔒', stand: { opSlot: true } },
-  { id: 'lamp-hal', kamer: 'Hal', naam: 'Hallamp', soort: 'lamp', icon: '💡', stand: { aan: false, dim: 60 } },
-  { id: 'lamp-terras', kamer: 'Terras', naam: 'Terrasverlichting', soort: 'lamp', icon: '🌿', stand: { aan: false, dim: 50 } },
-  { id: 'laadpaal', kamer: 'Terras', naam: 'Laadpaal', soort: 'stekker', icon: '🔌', stand: { aan: true } }
+  { id: 'lamp-woon', kamer: 'Woonkamer', naam: 'Plafondlamp', soort: 'lamp', icon: 'thema', stand: { aan: false, dim: 80 } },
+  { id: 'lamp-sfeer', kamer: 'Woonkamer', naam: 'Sfeerlampen', soort: 'lamp', icon: 'thema', stand: { aan: false, dim: 40 } },
+  { id: 'tv-woon', kamer: 'Woonkamer', naam: 'Televisie', soort: 'tv', icon: 'theater', stand: { aan: false } },
+  { id: 'speaker-woon', kamer: 'Woonkamer', naam: 'Speakers', soort: 'audio', icon: 'muziek', stand: { aan: false, volume: 30 } },
+  { id: 'gordijn-woon', kamer: 'Woonkamer', naam: 'Gordijnen', soort: 'gordijn', icon: 'wonen', stand: { open: true } },
+  { id: 'thermostaat', kamer: 'Woonkamer', naam: 'Thermostaat', soort: 'klimaat', icon: 'balans', stand: { aan: true, temp: 20 } },
+  { id: 'lamp-keuken', kamer: 'Keuken', naam: 'Keukenlamp', soort: 'lamp', icon: 'thema', stand: { aan: false, dim: 100 } },
+  { id: 'koffie', kamer: 'Keuken', naam: 'Koffiezetter', soort: 'stekker', icon: 'bar', stand: { aan: false } },
+  { id: 'vaatwasser', kamer: 'Keuken', naam: 'Vaatwasser', soort: 'stekker', icon: 'zorg', stand: { aan: false } },
+  { id: 'lamp-slaap', kamer: 'Slaapkamer', naam: 'Bedlampjes', soort: 'lamp', icon: 'wonen', stand: { aan: false, dim: 30 } },
+  { id: 'gordijn-slaap', kamer: 'Slaapkamer', naam: 'Gordijnen', soort: 'gordijn', icon: 'wonen', stand: { open: true } },
+  { id: 'wekker', kamer: 'Slaapkamer', naam: 'Wekkerlicht', soort: 'lamp', icon: 'agenda', stand: { aan: false, dim: 50 } },
+  { id: 'lamp-bad', kamer: 'Badkamer', naam: 'Spiegellamp', soort: 'lamp', icon: 'wonen', stand: { aan: false, dim: 100 } },
+  { id: 'vloer-bad', kamer: 'Badkamer', naam: 'Vloerverwarming', soort: 'klimaat', icon: 'zorg', stand: { aan: false, temp: 22 } },
+  { id: 'lamp-werk', kamer: 'Werkkamer', naam: 'Bureaulamp', soort: 'lamp', icon: 'thema', stand: { aan: false, dim: 90 } },
+  { id: 'monitor', kamer: 'Werkkamer', naam: 'Beeldschermen', soort: 'stekker', icon: 'paneel', stand: { aan: false } },
+  { id: 'slot-voordeur', kamer: 'Hal', naam: 'Voordeurslot', soort: 'slot', icon: 'slot', stand: { opSlot: true } },
+  { id: 'lamp-hal', kamer: 'Hal', naam: 'Hallamp', soort: 'lamp', icon: 'thema', stand: { aan: false, dim: 60 } },
+  { id: 'lamp-terras', kamer: 'Terras', naam: 'Terrasverlichting', soort: 'lamp', icon: 'oogst', stand: { aan: false, dim: 50 } },
+  { id: 'laadpaal', kamer: 'Terras', naam: 'Laadpaal', soort: 'stekker', icon: 'gear', stand: { aan: true } }
 ];
 
 // de demo-scenemotor: herkenbare wensen krijgen een doordacht voorstel

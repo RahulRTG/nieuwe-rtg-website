@@ -126,7 +126,7 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     idemBewaar(b);
     const L = ledger(s.code); L.som += cent; L.aantal += 1;
     save();
-    try { notifySupplier(s.code, { icon: '💸', title: 'Rechtstreeks betaald', body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
+    try { notifySupplier(s.code, { icon: 'betalen', title: 'Rechtstreeks betaald', body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
     try { logActivity(s.code, { name: b.codename }, 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2)); } catch (e) {}
     try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
     try { sseToCustomer(key, 'sync', { scope: 'betalingen' }); } catch (e) {}
@@ -152,7 +152,7 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     db.data.directBetalingen = db.data.directBetalingen.slice(0, 200000);
     const L = ledger(s.code); L.som += cent; L.aantal += 1;
     save();
-    try { notifySupplier(s.code, { icon: '💸', title: 'Rechtstreeks betaald (munten)', body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
+    try { notifySupplier(s.code, { icon: 'betalen', title: 'Rechtstreeks betaald (munten)', body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
     try { logActivity(s.code, { name: b.codename }, 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2) + ' met munten'); } catch (e) {}
     try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
     try { sseToCustomer(key, 'sync', { scope: 'betalingen' }); } catch (e) {}

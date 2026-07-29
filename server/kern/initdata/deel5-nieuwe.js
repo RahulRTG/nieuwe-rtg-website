@@ -9,7 +9,7 @@ module.exports = (ctx) => {
      werken; per sector een demopartner om mee te spelen. ---- */
   const NIEUWE_TYPES = {
     beachclub:   { label: 'Beachclub', icon: '\u{1F3D6}', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
-    koffie:      { label: 'Koffie & patisserie', icon: '☕', caps: ['menu', 'orders', 'location', 'pricing'] },
+    koffie:      { label: 'Koffie & patisserie', icon: 'bar', caps: ['menu', 'orders', 'location', 'pricing'] },
     chef:        { label: 'Privéchef & catering', icon: '\u{1F468}‍\u{1F373}', caps: ['services', 'location', 'pricing'] },
     villa:       { label: "Villa's & fincas", icon: '\u{1F334}', caps: ['bookings', 'doors', 'location', 'pricing'] },
     tweewielers: { label: 'Tweewielers & quads', icon: '\u{1F6F5}', caps: ['huur', 'location', 'pricing'] },

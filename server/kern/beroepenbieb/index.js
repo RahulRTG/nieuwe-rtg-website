@@ -15,7 +15,7 @@ const NIVEAUS = ['Verkenner', 'Starter', 'Leerling', 'Gevorderd', 'Gezel', 'Spec
 
 const WERELDEN = {
   techniek: { label: 'Technisch & agrarisch', icon: 'gear', beroepen: TECHNIEK_BEROEPEN, soorten: TECHNIEK_SOORTEN },
-  zaken: { label: 'Bedrijfsleven', icon: '💼', beroepen: ZAKEN_BEROEPEN, soorten: ZAKEN_SOORTEN }
+  zaken: { label: 'Bedrijfsleven', icon: 'werk', beroepen: ZAKEN_BEROEPEN, soorten: ZAKEN_SOORTEN }
 };
 const PER_BS = EDITIES.length * NIVEAUS.length;            // 200 per beroep x soort
 const PER_BEROEP = 50 * PER_BS;                            // 10.000 per beroep

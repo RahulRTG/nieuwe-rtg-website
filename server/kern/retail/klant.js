@@ -48,7 +48,7 @@ module.exports = (ctx) => {
     if (i >= 0) rec.wishlist.splice(i, 1);
     else { rec.wishlist.push(artikelId); if (rec.wishlist.length > 300) rec.wishlist.shift(); }
     save();
-    if (i < 0) notifySupplier(s.code, { icon: '💛', title: 'Toegevoegd aan verlanglijst', body: ((gidsHaal(key) || {}).codename || 'Een lid') + ' wil "' + artikelVan(s, artikelId).naam + '"' });
+    if (i < 0) notifySupplier(s.code, { icon: 'emo-hart', title: 'Toegevoegd aan verlanglijst', body: ((gidsHaal(key) || {}).codename || 'Een lid') + ' wil "' + artikelVan(s, artikelId).naam + '"' });
     return { ok: true, wishlist: i < 0 };
   }
 
@@ -68,7 +68,7 @@ module.exports = (ctx) => {
     db.data.retailApart.unshift(rec);
     db.data.retailApart = db.data.retailApart.slice(0, 20000);
     save();
-    notify(key, { icon: '🛍', title: s.name, body: '"' + rec.artikelNaam + '" (' + rec.kleur + ', ' + rec.maat + ') ligt voor u apart tot ' + rec.tot + '.', scope: 'orders' });
+    notify(key, { icon: 'store', title: s.name, body: '"' + rec.artikelNaam + '" (' + rec.kleur + ', ' + rec.maat + ') ligt voor u apart tot ' + rec.tot + '.', scope: 'orders' });
     sseToCustomer(key, 'sync', { scope: 'retail' });
     sseToSupplier(s.code, 'sync', { scope: 'retail' });
     return { ok: true, apart: rec };
@@ -89,7 +89,7 @@ module.exports = (ctx) => {
     db.data.paskamerVerzoeken.unshift(rec);
     db.data.paskamerVerzoeken = db.data.paskamerVerzoeken.slice(0, 20000);
     save();
-    notifySupplier(s.code, { icon: '🚪', title: 'Paskamerverzoek', body: rec.codenaam + ': ' + rec.artikelNaam + ' (' + rec.kleur + ', ' + rec.maat + ')' + (rec.paskamer ? ' → ' + rec.paskamer : '') });
+    notifySupplier(s.code, { icon: 'slot', title: 'Paskamerverzoek', body: rec.codenaam + ': ' + rec.artikelNaam + ' (' + rec.kleur + ', ' + rec.maat + ')' + (rec.paskamer ? ' → ' + rec.paskamer : '') });
     sseToSupplier(s.code, 'sync', { scope: 'retail' });
     return { ok: true, verzoek: rec };
   }
@@ -98,7 +98,7 @@ module.exports = (ctx) => {
     if (!v) return { status: 404, error: 'Verzoek niet gevonden.' };
     v.status = 'gebracht'; v.paskamer = schoon(paskamer, 12) || v.paskamer; v.door = schoon(door, 60) || 'Team';
     save();
-    if (v.key) notify(v.key, { icon: '🚪', title: 'Uw maat ligt klaar', body: v.artikelNaam + ' (' + v.maat + ') ligt in ' + (v.paskamer || 'de paskamer') + '.', scope: 'orders' });
+    if (v.key) notify(v.key, { icon: 'slot', title: 'Uw maat ligt klaar', body: v.artikelNaam + ' (' + v.maat + ') ligt in ' + (v.paskamer || 'de paskamer') + '.', scope: 'orders' });
     sseToSupplier(s.code, 'sync', { scope: 'retail' });
     return { ok: true };
   }

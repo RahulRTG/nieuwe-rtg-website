@@ -38,7 +38,7 @@ module.exports = (ctx) => {
     // niveau 'bevestiging': meteen terug, wel een melding aan het lid (transparant)
     if (nv === 'bevestiging') {
       log({ soort: 'bevestiging', supplierCode: supplier.code, key, codenaam, door: (actor && actor.name) || 'Team' });
-      notify(key, { icon: '🪪', title: supplier.name, body: 'controleerde uw verificatiestatus (ja/nee, geen gegevens gedeeld).', scope: 'privacy' });
+      notify(key, { icon: 'pas', title: supplier.name, body: 'controleerde uw verificatiestatus (ja/nee, geen gegevens gedeeld).', scope: 'privacy' });
       sseToCustomer(key, 'sync', { scope: 'paspoort' });
       return { ok: true, niveau: 'bevestiging', bevestiging };
     }
@@ -57,7 +57,7 @@ module.exports = (ctx) => {
     log({ soort: 'aanvraag', verzoekId: verzoek.id, niveau: nv, supplierCode: supplier.code, key, codenaam, door: verzoek.door });
     save();
     notify(key, {
-      icon: '🪪', title: supplier.name + ' vraagt uw ' + (nv === 'paspoort' ? 'paspoort' : 'ID-kaart'),
+      icon: 'pas', title: supplier.name + ' vraagt uw ' + (nv === 'paspoort' ? 'paspoort' : 'ID-kaart'),
       body: (verzoek.reden ? verzoek.reden + ' · ' : '') + 'U kunt dit goedkeuren of weigeren in de app.', scope: 'privacy'
     });
     sseToCustomer(key, 'sync', { scope: 'paspoort' });
@@ -78,7 +78,7 @@ module.exports = (ctx) => {
       notifySupplier(v.supplierCode, { icon: 'pas', title: 'Identiteit gedeeld', body: (v.codenaam || 'Een lid') + ' keurde uw ' + (v.niveau === 'paspoort' ? 'paspoort' : 'ID-kaart') + '-verzoek goed.' });
     } else {
       v.status = 'geweigerd';
-      notifySupplier(v.supplierCode, { icon: '⛔', title: 'Verzoek geweigerd', body: (v.codenaam || 'Een lid') + ' weigerde uw identiteitsverzoek.' });
+      notifySupplier(v.supplierCode, { icon: 'slot', title: 'Verzoek geweigerd', body: (v.codenaam || 'Een lid') + ' weigerde uw identiteitsverzoek.' });
     }
     log({ soort: akkoord ? 'goedgekeurd' : 'geweigerd', verzoekId: v.id, niveau: v.niveau, supplierCode: v.supplierCode, key });
     save();

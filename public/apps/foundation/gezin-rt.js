@@ -14,7 +14,7 @@
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
   }
   function lidNaam(id) { var l = S.leden[id]; return l ? l.naam : 'Gezinslid'; }
-  function lidAvatar(id) { var l = S.leden[id]; return l ? (l.avatar || '🙂') : '🙂'; }
+  function lidAvatar(id) { var l = S.leden[id]; return l ? (l.avatar || 'emo-blij') : 'emo-blij'; }
 
   var GezinRT = {
     init: function (opts) {
@@ -66,7 +66,7 @@
   }
   function toonScherm(naam, video, statusTekst) {
     document.getElementById('grt-naam').textContent = naam;
-    document.getElementById('grt-av').textContent = (S.leden[call ? call.met : (inkomend && inkomend.van)] || {}).avatar || '🙂';
+    document.getElementById('grt-av').textContent = (S.leden[call ? call.met : (inkomend && inkomend.van)] || {}).avatar || 'emo-blij';
     document.getElementById('grt-av').style.display = video ? 'none' : 'flex';
     document.getElementById('grt-local').style.display = video ? '' : 'none';
     document.getElementById('grt-status').textContent = statusTekst || '';
@@ -151,10 +151,10 @@
     var wrap = document.createElement('div');
     wrap.innerHTML =
       '<div id="grt-call"><video id="grt-remote" autoplay playsinline></video><video id="grt-local" autoplay playsinline muted></video>' +
-      '<div id="grt-tijd"></div><div id="grt-av">🙂</div><div id="grt-naam"></div><div id="grt-status"></div>' +
-      '<div class="grt-knoppen"><button class="grt-b" id="grt-mute" title="Microfoon">🎤</button><button class="grt-b" id="grt-cam" title="Camera">📷</button><button class="grt-b weg" id="grt-weg" title="Ophangen">📵</button></div></div>' +
-      '<div id="grt-incoming"><div id="grt-iav">🙂</div><div id="grt-inaam"></div><div id="grt-isoort"></div>' +
-      '<div class="grt-knoppen"><button class="grt-b weg" id="grt-nee">📵</button><button class="grt-b op" id="grt-ja">📞</button></div></div>';
+      '<div id="grt-tijd"></div><div id="grt-av"></div><div id="grt-naam"></div><div id="grt-status"></div>' +
+      '<div class="grt-knoppen"><button class="grt-b" id="grt-mute" title="Microfoon"></button><button class="grt-b" id="grt-cam" title="Camera"></button><button class="grt-b weg" id="grt-weg" title="Ophangen"></button></div></div>' +
+      '<div id="grt-incoming"><div id="grt-iav"></div><div id="grt-inaam"></div><div id="grt-isoort"></div>' +
+      '<div class="grt-knoppen"><button class="grt-b weg" id="grt-nee"></button><button class="grt-b op" id="grt-ja"></button></div></div>';
     document.body.appendChild(wrap);
     document.getElementById('grt-weg').onclick = function () { eindeGesprek(true); };
     document.getElementById('grt-ja').onclick = neemOp;

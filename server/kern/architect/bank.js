@@ -4,11 +4,11 @@
    voor een concept). Puur data + functies; de runtime woont in index.js en aiwerk.js. */
 
 const DISCIPLINES = {
-  villa:      { label: "Villa's", icon: '🏖️' },
-  penthouse:  { label: 'Penthouses', icon: '🏙️' },
-  landgoed:   { label: 'Landgoederen', icon: '🏰' },
-  chalet:     { label: 'Chalets', icon: '🏔️' },
-  paviljoen:  { label: 'Paviljoens', icon: '🌿' }
+  villa:      { label: "Villa's", icon: 'parasol' },
+  penthouse:  { label: 'Penthouses', icon: 'stad' },
+  landgoed:   { label: 'Landgoederen', icon: 'gebouw' },
+  chalet:     { label: 'Chalets', icon: 'stad' },
+  paviljoen:  { label: 'Paviljoens', icon: 'oogst' }
 };
 const STATUS = ['schets', 'voorontwerp', 'ontwerp', 'maquette', 'realisatie', 'archief'];
 

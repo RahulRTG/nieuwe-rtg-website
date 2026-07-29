@@ -57,7 +57,7 @@ app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
   salon.kap();   // het venster: een grens, op een plek (kern/salon)
   save();
   logActivity(req.supplier.code, req.actor, 'zette een aanbieding op De Salon: "' + titel + '"');
-  salonNaarVolgers(req.supplier, '🎁 ' + titel);
+  salonNaarVolgers(req.supplier, '' + titel);
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
   res.json({ ok: true, postId: post.id });
 });
@@ -96,7 +96,7 @@ app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
   salon.kap();   // het venster: een grens, op een plek (kern/salon)
   save();
   logActivity(req.supplier.code, req.actor, 'zette een poll op De Salon');
-  salonNaarVolgers(req.supplier, '📊 ' + vraag);
+  salonNaarVolgers(req.supplier, '' + vraag);
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
   res.json({ ok: true, postId: post.id });
 });

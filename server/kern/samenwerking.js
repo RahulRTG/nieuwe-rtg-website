@@ -30,7 +30,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
   }
   function supplierInfo(s) {
     const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
-    return { code: s.code, name: s.name, city: s.city || null, type: s.type, typeLabel: t.label || s.type, icon: t.icon || '🏷️' };
+    return { code: s.code, name: s.name, city: s.city || null, type: s.type, typeLabel: t.label || s.type, icon: t.icon || 'ticket' };
   }
 
   // Lijsten om te bladeren (met een limiet; voor grote aantallen komt er later
@@ -152,7 +152,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     if (op.reacties.some(r => r.creatorCode === creatorS.code)) return { error: 'U heeft al gereageerd.' };
     op.reacties.push({ creatorCode: creatorS.code, bericht: scho(data.bericht, 400), status: 'open', at: nu() });
     save();
-    if (notifySupplier) notifySupplier(op.supplierCode, { icon: '🎬', title: 'Reactie op je oproep', body: creatorS.name + ' reageerde op "' + op.titel + '".' });
+    if (notifySupplier) notifySupplier(op.supplierCode, { icon: 'film', title: 'Reactie op je oproep', body: creatorS.name + ' reageerde op "' + op.titel + '".' });
     if (sseToSupplier) sseToSupplier(op.supplierCode, 'sync', { scope: 'samenwerking' });
     return { ok: true };
   }

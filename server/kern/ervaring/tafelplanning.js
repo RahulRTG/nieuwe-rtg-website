@@ -46,7 +46,7 @@ module.exports = (ctx, { rijpMaak }) => {
     if (r.datum === vandaag() && t.status === 'vrij') t.status = 'gereserveerd';
     save();
     if (r.customerKey) {
-      notify(r.customerKey, { icon: '🪑', title: supplier.name, body: 'Uw tafel op ' + r.datum + ' om ' + r.tijd + ': ' + t.name + '.', scope: 'orders' });
+      notify(r.customerKey, { icon: 'table', title: supplier.name, body: 'Uw tafel op ' + r.datum + ' om ' + r.tijd + ': ' + t.name + '.', scope: 'orders' });
       sseToCustomer(r.customerKey, 'sync', { scope: 'reserveringen' });
     }
     sseToSupplier(supplier.code, 'sync', { scope: 'reserveringen' });

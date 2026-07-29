@@ -310,6 +310,8 @@ wérkt, maar of een belofte waar is:
 - `bewaarwacht.test.js` bewaakt vooral dat de wacht nóóit wist;
 - `pas-escalatie.test.js` bewijst dat zelf-registreren geen betaalde pas geeft
   en dat een menselijk akkoord dat wél doet;
+- `papieren.test.js` bewaakt dat Rahul het AVG-papierwerk uitvraagt maar er
+  nooit een antwoord bij verzint, en dat het register zijn eigen gaten toont;
 - `vergeten.test.js`, `inzagelog.test.js`, `scheiding.test.js` en
   `loghygiene.test.js` voor vergetelheid, het inzagejournaal, de scheiding
   tussen codenaam en identiteit, en of er geen persoonsgegevens in de logs
@@ -554,11 +556,26 @@ geen documentatie maar reclame.
   server schreef, en dat is een echte beperking — je zoekt niet naar de aanname
   waarvan je niet weet dat je hem hebt. Voor de lancering hoort hier een vreemd
   paar ogen overheen.
-- **Het papierwerk is een poort, geen herinnering.** `npm run golive` leest
+- **Het papierwerk is een poort, geen herinnering.** `npm run golive` **vult**
   `VERWERKINGSREGISTER.md` (AVG art. 30) en `DATALEK.md` (72-uursklok, art. 33)
-  en **blokkeert** zolang daar `[VUL IN]`-velden openstaan. Wat een jurist moet
-  nakijken geeft een waarschuwing. De keuring kan niet beoordelen of de inhoud
-  juridisch klopt — alleen dat hij bestaat en niet half af is.
+  in met de antwoorden uit `server/papieren/` en **blokkeert** zolang daar
+  plekken openstaan. Wat een jurist moet nakijken geeft een waarschuwing. De
+  keuring kan niet beoordelen of de inhoud juridisch klopt — alleen dat hij
+  bestaat en niet half af is.
+- **Rahul vraagt het papierwerk uit; hij vult het nooit zelf in.** In beide
+  documenten stond eerst een rij `[VUL IN]`-plekken. Een invullijst vult
+  niemand in, dus stond het er nog steeds. Nu stelt Rahul de 19 vragen uit
+  `server/papieren/vragen.js` op de technische pagina — één per keer, met erbij
+  waaróm hij het vraagt (KvK-nummer, wie er 's nachts beslist bij een lek, of
+  er een verwerkersovereenkomst ligt). Er zit **geen generatiepad** in die
+  module: er komt niets in het register zonder dat een mens het intypte. Een
+  verzonnen KvK-nummer is erger dan een leeg veld — een leeg veld ziet
+  iedereen, een verzonnen nummer gelooft iedereen. Weet iemand iets niet, dan
+  parkeert Rahul het eerlijk als "nog niet bekend"; dat telt gewoon als open en
+  de keuring gaat er niet overheen. De antwoorden staan in
+  `server/data/papieren.json` (0600, buiten git en buiten de database) — juist
+  omdat de database tijdens een datalek het ding is dat je misschien niet
+  vertrouwt, moet het draaiboek daar los van leesbaar zijn.
 
 ## Partner worden & e-mail
 
@@ -717,7 +734,7 @@ Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk 
 - **docs/de-lijn.md** — wat we zelf bouwen, wat bewust niet, en waarom (de filosofie achter de afhankelijkheden).
 - **docs/architectuur.md** — gedeelde kern + aparte domeinmodules, gateway en losse processen.
 - **docs/hardening.md** — beveiligings- en betrouwbaarheidskeuzes.
-- **VERWERKINGSREGISTER.md** — het AVG-verwerkingsregister (art. 30), opgesteld op wat de code werkelijk doet. De `[VUL IN]`-velden kan alleen RTG zelf invullen; zolang die openstaan blokkeert `npm run golive`.
-- **DATALEK.md** — het datalek-draaiboek: de 72-uursklok van art. 33, wie wat doet, en wat er vooraf ingevuld moet zijn.
+- **VERWERKINGSREGISTER.md** — het AVG-verwerkingsregister (art. 30), opgesteld op wat de code werkelijk doet. De plekken die alleen RTG weet vraagt Rahul uit op de technische pagina; zolang die openstaan blokkeert `npm run golive`.
+- **DATALEK.md** — het datalek-draaiboek: de 72-uursklok van art. 33, wie wat doet, en wat er vooraf uitgevraagd moet zijn.
 - **PRODUCTION.md** / **LAUNCH.md** — runbook en livegang-checklist.
 - **scripts/mac/LEESMIJ.md** — RTG als launchd-dienst op een Mac (Mac mini als thuisserver): `sudo scripts/mac/installeer.sh`.

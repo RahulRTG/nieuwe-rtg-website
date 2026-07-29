@@ -3,14 +3,18 @@
 Dit register is opgesteld op basis van wat de code werkelijk doet, niet op basis
 van een sjabloon. Elke regel is te herleiden naar een module in deze repository.
 
-**Nog te doen voordat dit klopt:** de velden gemarkeerd met `[VUL IN]` kunnen
-alleen door RTG zelf worden ingevuld, en een jurist hoort het geheel na te
-kijken. Zolang die velden openstaan, blokkeert `npm run golive`.
+**Hoe de open velden ingevuld raken:** een aantal plekken hieronder weet alleen
+RTG zelf. Ze worden niet met de hand in dit bestand getypt: **Rahul vraagt ze
+uit** op de technische pagina, één vraag per keer en met erbij waarom hij het
+vraagt. Wat hij te horen krijgt landt hier op de goede plek. Rahul
+verzint nooit een antwoord — een verzonnen KvK-nummer is erger dan een leeg
+veld, want een leeg veld ziet iedereen. Zolang er iets openstaat, blokkeert
+`npm run golive`. Een jurist hoort het geheel daarna alsnog na te kijken.
 
-- **Verwerkingsverantwoordelijke:** `[VUL IN -- juridische naam, KvK, adres]`
-- **Contactpersoon privacy:** `[VUL IN -- naam + e-mail]`
-- **Functionaris gegevensbescherming:** `[VUL IN -- of: niet verplicht, met reden]`
-- **Laatst bijgewerkt:** `[VUL IN -- datum]`
+- **Verwerkingsverantwoordelijke:** {{verantwoordelijke}}
+- **Contactpersoon privacy:** {{privacycontact}}
+- **Functionaris gegevensbescherming:** {{fg}}
+- **Laatst bijgewerkt:** {{bijgewerkt}}
 
 ---
 
@@ -66,7 +70,7 @@ die zeven jaar moet blijven.
 | **Bijzondere categorie?** | Een pasfoto is **geen** biometrisch gegeven zolang er geen geautomatiseerde herkenning op draait. Wordt dat wel ingebouwd, dan valt het onder art. 9 en is een aparte grondslag nodig. `[CONTROLEER dit bij de jurist voordat er gezichtsherkenning bij komt]` |
 | **Waar** | `server/kern/kantoor/` (`pendingVerifications`), upload in `UPLOAD_DIR` |
 | **Ontvangers** | RTG-backoffice. Elke inzage komt in het inzagejournaal |
-| **Bewaartermijn** | `[VUL IN -- advies: document verwijderen zodra de verificatie rond is; alleen de uitkomst bewaren]` |
+| **Bewaartermijn** | {{kyctermijn}} |
 
 ### 3. Bestellingen, boekingen en betalingen
 
@@ -94,7 +98,7 @@ die zeven jaar moet blijven.
 | **Doel** | Live meekijken tijdens een rit of bezorging, en de zorgketen |
 | **Grondslag** | **Toestemming** (art. 6 lid 1 a) -- het lid zet het zelf aan en kan het intrekken |
 | **Gegevens** | Coördinaten, gekoppeld aan de codenaam |
-| **Bewaartermijn** | Kort; niet langer dan de rit `[BEVESTIG de exacte termijn]` |
+| **Bewaartermijn** | {{locatietermijn}} |
 
 ### 6. Werk en sollicitaties
 
@@ -114,7 +118,7 @@ die zeven jaar moet blijven.
 | **Grondslag** | **Uitdrukkelijke toestemming** (art. 9 lid 2 a) -- dit is een **bijzondere categorie** (gezondheid) |
 | **Gegevens** | Allergieën, medische aandachtspunten, intake bij RTG Care |
 | **Ontvangers** | Alleen de zaak waar het lid op dat moment iets afneemt, en alleen wat nodig is |
-| **Let op** | Bijzondere persoonsgegevens hebben een zwaarder regime: expliciete toestemming, strikte toegang, en een DPIA is hier waarschijnlijk verplicht. `[TE DOEN: DPIA laten uitvoeren]` |
+| **Let op** | Bijzondere persoonsgegevens hebben een zwaarder regime: expliciete toestemming, strikte toegang, en een DPIA is hier waarschijnlijk verplicht. **DPIA:** {{dpia}} |
 
 ### 8. Beveiligingslogboek en inzagejournaal
 
@@ -135,19 +139,22 @@ RTG.
 
 | Partij | Wat zij verwerken | Overeenkomst? |
 |---|---|---|
-| Hostingpartij / VPS | Alles wat op de schijf staat | `[VUL IN]` |
-| Cloudflare of andere CDN/WAF | IP-adressen, verzoeken | `[VUL IN]` |
-| Betaalprovider (Stripe) | Betaalgegevens, bedragen | `[VUL IN]` |
-| E-mailverzender (SMTP) | E-mailadressen, berichtinhoud | `[VUL IN]` |
-| Anthropic (AI, indien `ANTHROPIC_API_KEY` is gezet) | Wat er in een gesprek met Rahul wordt getypt | `[VUL IN]` |
-| Sentry (indien `SENTRY_DSN` is gezet) | Foutmeldingen, mogelijk met context | `[VUL IN]` |
-| **Elke partner-zaak** | Codenaam, bestelling, eventueel zorgprofiel | `[VUL IN -- dit zijn er veel; regel het in het onboarding-proces]` |
+| Hostingpartij / VPS | Alles wat op de schijf staat | {{vwoHosting}} |
+| Cloudflare of andere CDN/WAF | IP-adressen, verzoeken | {{vwoCdn}} |
+| Betaalprovider (Stripe) | Betaalgegevens, bedragen | {{vwoBetaal}} |
+| E-mailverzender (SMTP) | E-mailadressen, berichtinhoud | {{vwoSmtp}} |
+| Anthropic (AI, indien `ANTHROPIC_API_KEY` is gezet) | Wat er in een gesprek met Rahul wordt getypt | {{vwoAi}} |
+| Externe foutentracker (indien in gebruik) | Foutmeldingen, mogelijk met context | {{vwoFouten}} |
+| **Elke partner-zaak** | Codenaam, bestelling, eventueel zorgprofiel | {{vwoPartners}} |
 
 De laatste rij is de belangrijkste en de makkelijkste om te vergeten: elke
 horecazaak, elk hotel en elke vervoerder die de app gebruikt is een verwerker.
+Dat hoort in het onboarding-proces te zitten, niet in een los mapje.
 
 ## Doorgifte buiten de EU
 
-`[VUL IN]` -- controleer per verwerker hierboven. Let in elk geval op de
-AI-aanbieder en de foutentracker; die verwerken vaak buiten de EU en vragen dan
-om aanvullende waarborgen.
+{{doorgifte}}
+
+Controleer dit per verwerker hierboven. Let in elk geval op de AI-aanbieder en
+een eventuele foutentracker; die verwerken vaak buiten de EU en vragen dan om
+aanvullende waarborgen.

@@ -176,6 +176,28 @@
           <div class="muted" style="font-size:.72rem;margin-top:.5rem;">Kleiner venster = kleinere levende kast = sneller onder zware belasting. De boekhouding en export tellen het archief altijd mee.</div>
         </div>
       </div>
+      <div id="papierenBlok" hidden>
+        <div class="sec">Het papierwerk: Rahul vraagt het uit</div>
+        <div class="kaart">
+          <div class="muted" style="font-size:.82rem;">Het verwerkingsregister (AVG art. 30) en het datalek-draaiboek (art. 33) staan klaar, op een paar plekken na die alleen u weet. Rahul stelt ze hier &eacute;&eacute;n voor &eacute;&eacute;n. Hij <b>verzint nooit een antwoord</b>: een verzonnen KvK-nummer of telefoonnummer is erger dan een leeg veld, want een leeg veld ziet iedereen. Weet u iets nu niet, dan parkeert hij het &mdash; het blijft dan gewoon openstaan.</div>
+          <div class="muted" id="papStand" style="font-size:.78rem;margin-top:.6rem;"></div>
+          <div id="papVraagBlok" style="margin-top:.8rem;">
+            <p id="papVraag" style="margin:0 0 .35rem;font-weight:600;"></p>
+            <div class="muted" id="papWaarom" style="font-size:.8rem;"></div>
+            <div class="muted" id="papVoorbeeld" style="font-size:.74rem;margin-top:.35rem;"></div>
+            <textarea class="veld" id="papAntwoord" placeholder="Uw antwoord, in uw eigen woorden&hellip;" aria-label="Antwoord op de vraag van Rahul" style="min-height:3rem;resize:vertical;margin-top:.6rem;"></textarea>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+              <button class="knop" id="bPapOk">Vastleggen</button>
+              <button class="knop grijs klein" id="bPapParkeer">Weet ik nu niet</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;">
+            <button class="knop grijs klein" id="bPapReg">Register lezen</button>
+            <button class="knop grijs klein" id="bPapLek">Datalek-draaiboek lezen</button>
+          </div>
+          <pre id="papDoc" class="advies" hidden style="white-space:pre-wrap;font-size:.72rem;max-height:22rem;overflow:auto;"></pre>
+        </div>
+      </div>
       <div id="moderniseerBlok" hidden>
         <div class="sec">Modernisering: vraag de AI om een update</div>
         <div class="kaart">

@@ -587,6 +587,10 @@
         Util.tekst($('#archiefInfo'), 'Nu ' + d.archief.dagen + ' dagen \u00B7 ' + d.archief.levend.toLocaleString('nl-NL') + ' levend \u00B7 ' + d.archief.gearchiveerd.toLocaleString('nl-NL') + ' gearchiveerd');
         if (document.activeElement !== $('#archiefDagen')) $('#archiefDagen').value = d.archief.dagen;
       }
+      // het papierwerk: eenmalig ophalen, niet elke 12 seconden -- anders staat
+      // Rahul de vraag te verversen terwijl de eigenaar zijn antwoord typt
+      $('#papierenBlok').hidden = !d.eigenaar;
+      if (d.eigenaar && !papGeladen){ papGeladen = true; papieren(); }
       $('#moderniseerBlok').hidden = !d.eigenaar;
       if (d.eigenaar){
         var ms = d.moderniseringen || [];
@@ -625,6 +629,49 @@
       else toast(e.message);
     });
   }
+
+  /* HET PAPIERWERK: Rahul vraagt het AVG-register en het datalek-draaiboek uit.
+     Eerder stond in die documenten een rij [VUL IN]-plekken. Een invullijst
+     vult niemand in, dus stond het er nog steeds. Hier stelt Rahul de vraag,
+     met erbij waarom hij hem stelt, en het antwoord landt meteen in het
+     document. Verzinnen doet hij niet: op deze pagina komt alleen te staan wat
+     een mens intypt. */
+  var papVraagId = null, papGeladen = false;
+  function papieren(){
+    return api('/api/techniek/papieren').then(function(d){
+      Util.tekst($('#papStand'), d.open
+        ? (d.totaal - d.open) + ' van de ' + d.totaal + ' beantwoord · nog ' + d.open + ' te gaan'
+        : 'Alle ' + d.totaal + ' vragen beantwoord. Laat het geheel nog juridisch nakijken.');
+      var v = d.volgende;
+      papVraagId = v ? v.id : null;
+      $('#papVraagBlok').hidden = !v;
+      if (!v) return;
+      Util.tekst($('#papVraag'), v.vraag);
+      Util.tekst($('#papWaarom'), v.waarom);
+      Util.tekst($('#papVoorbeeld'), v.voorbeeld ? 'Bijvoorbeeld: ' + v.voorbeeld
+        : (v.jaVraag ? 'Bij ja: ' + v.jaVraag + '  Bij nee: ' + v.neeVraag : ''));
+      $('#papAntwoord').value = '';
+      $('#papAntwoord').placeholder = v.eerderGeparkeerd
+        ? 'Dit stond geparkeerd; weet u het inmiddels?' : 'Uw antwoord, in uw eigen woorden…';
+    }).catch(function(e){ toast(e.message); });
+  }
+  function papZeg(parkeer){
+    if (!papVraagId) return;
+    api('/api/techniek/papieren/antwoord', { method:'POST',
+      body:{ id: papVraagId, waarde: $('#papAntwoord').value, parkeer: !!parkeer } })
+      .then(function(d){ toast(d.terug || 'Genoteerd.'); $('#papDoc').hidden = true; papieren(); })
+      .catch(function(e){ toast(e.message); });
+  }
+  $('#bPapOk').addEventListener('click', function(){ papZeg(false); });
+  $('#bPapParkeer').addEventListener('click', function(){ papZeg(true); });
+  function papToon(naam){
+    api('/api/techniek/papieren/document?naam=' + naam).then(function(d){
+      Util.tekst($('#papDoc'), d.tekst);
+      $('#papDoc').hidden = false;
+    }).catch(function(e){ toast(e.message); });
+  }
+  $('#bPapReg').addEventListener('click', function(){ papToon('verwerkingsregister'); });
+  $('#bPapLek').addEventListener('click', function(){ papToon('datalek'); });
 
   function start(){
     if (!token){ toonLogin(); return; }

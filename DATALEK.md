@@ -2,7 +2,12 @@
 
 Dit is geen juridisch advies. Het is het draaiboek dat voorkomt dat de eerste
 drie uur na een lek opgaan aan uitzoeken wie je moet bellen. Laat het door een
-jurist nakijken voordat je live gaat, en vul de namen en telefoonnummers in.
+jurist nakijken voordat je live gaat.
+
+De namen en nummers hieronder typ je niet met de hand in dit bestand: **Rahul
+vraagt ze uit** op de technische pagina en zet ze op de goede plek. Hij verzint
+er nooit een — een verzonnen telefoonnummer is hier het gevaarlijkste dat er
+bestaat, want je ontdekt het pas op het moment dat je belt.
 
 **De klok: 72 uur.** Vanaf het moment dat je *bekend bent* met het lek heb je
 72 uur om het bij de Autoriteit Persoonsgegevens te melden (AVG art. 33). Die
@@ -13,12 +18,12 @@ zelf ook informeren, en dan geldt "onverwijld" (art. 34).
 
 ## Wie doet wat
 
-| Rol | Wie | Bereikbaar op |
-|---|---|---|
-| Beslisser (meldt of niet) | **[VUL IN -- eigenaar]** | **[VUL IN]** |
-| Techniek (dicht het gat) | **[VUL IN]** | **[VUL IN]** |
-| Communicatie naar leden | **[VUL IN]** | **[VUL IN]** |
-| Jurist / DPO | **[VUL IN]** | **[VUL IN]** |
+| Rol | Wie, en hoe bereikbaar |
+|---|---|
+| Beslisser (meldt of niet) | {{rolBeslisser}} |
+| Techniek (dicht het gat) | {{rolTechniek}} |
+| Communicatie naar leden | {{rolCommunicatie}} |
+| Jurist / DPO | {{rolJurist}} |
 
 Eén beslisser. Bij twijfel meldt die; een melding die achteraf niet nodig bleek
 kost niets, een gemiste melding kost een boete.
@@ -80,8 +85,10 @@ Geen juridisch jargon, geen bagatelliseren.
 
 ## Vooraf regelen (nu, niet straks)
 
-- [ ] Namen en nummers hierboven ingevuld
+- [ ] Alle vragen van Rahul beantwoord (`npm run golive` telt wat er nog openstaat)
 - [ ] Iemand aangewezen die 's nachts bereikbaar is
+- [ ] Dit draaiboek een keer ingevuld uitgeprint of opgeslagen buiten het systeem —
+      tijdens een lek is de server precies het ding dat je misschien niet vertrouwt
 - [ ] Verwerkersovereenkomst met elke partner die klantdata ziet -- zij zijn
       verwerker, en moeten een lek *bij jou* melden, niet zelf afhandelen
 - [ ] Intern register aangelegd (een spreadsheet volstaat)

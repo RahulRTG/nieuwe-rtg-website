@@ -109,11 +109,13 @@ test('de go-live-keuring keurt af zonder geheimen, en met alle geheimen blijft h
   assert.equal(kaal.status, 1, 'kale omgeving: niet klaar om live te gaan');
   assert.match(kaal.stdout, /NIET klaar/);
   // Met een complete secrets-/configset is de techniek in orde, maar de keuring
-  // leest sinds de AVG-ronde ook het verwerkingsregister en het datalek-draaiboek
-  // en blokkeert zolang daar [VUL IN]-velden openstaan die alleen RTG kan invullen.
-  // Dat is de bedoeling: zonder ingevuld papierwerk ga je niet live.
+  // vult sinds de AVG-ronde ook het verwerkingsregister en het datalek-draaiboek
+  // echt in (met de antwoorden die Rahul heeft uitgevraagd) en blokkeert zolang
+  // daar plekken open staan. Dat is de bedoeling: zonder ingevuld papierwerk ga
+  // je niet live. RTG_DATA_DIR wijst hier naar een verse map, dus alles staat open.
   const goed = spawnSync(process.execPath, [script], { env: PROD_ENV, timeout: 20000, encoding: 'utf8' });
   assert.match(goed.stdout, /Configuratie: geen blokkerende fouten/, 'de configuratie zelf is in orde');
   assert.equal(goed.status, 1, 'maar het AVG-papierwerk is de laatste, bewuste poort');
-  assert.match(goed.stdout, /\[VUL IN\]/, 'de blokkade wijst naar de nog in te vullen AVG-documenten');
+  assert.match(goed.stdout, /open plek\(ken\)/, 'de blokkade telt de open plekken in de AVG-documenten');
+  assert.match(goed.stdout, /vragen staan nog open/, 'en wijst naar de vragen die Rahul nog moet stellen');
 });

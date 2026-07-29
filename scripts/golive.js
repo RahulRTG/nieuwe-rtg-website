@@ -105,22 +105,28 @@ function leesEnvBestand(pad) {
      en waar niets van afhangt. Nu leest de keuring de documenten echt en kijkt
      of de plekken die alleen RTG kan invullen ook zijn ingevuld.
 
+     De documenten staan in git met {{merktekens}} op de plekken die alleen RTG
+     kan invullen; de antwoorden komen uit de vragen die Rahul stelt (zie
+     server/papieren/). De keuring vult het document hier dus echt in en telt
+     hoeveel gaten er overblijven -- geen aparte administratie die uit de pas
+     kan gaan lopen met het papier zelf.
+
      Wat hij NIET kan: beoordelen of wat er staat juridisch klopt. Dat blijft
      mensenwerk. Hij controleert alleen dat het bestaat en niet half af is. */
-  const wortel = path.join(__dirname, '..');
-  for (const [bestand, waarvoor] of [
-    ['VERWERKINGSREGISTER.md', 'het verwerkingsregister (AVG art. 30)'],
-    ['DATALEK.md', 'het datalek-draaiboek (72-uursklok, art. 33)']
-  ]) {
-    const pad = path.join(wortel, bestand);
-    if (!fs.existsSync(pad)) { blokkeer(bestand + ' ontbreekt: ' + waarvoor + ' is verplicht voor je live gaat.'); continue; }
-    const tekst = fs.readFileSync(pad, 'utf8');
-    const open = (tekst.match(/\[VUL IN/g) || []).length;
-    const controleer = (tekst.match(/\[(CONTROLEER|TE DOEN)/g) || []).length;
-    if (open) blokkeer(bestand + ': nog ' + open + ' plek(ken) met [VUL IN] -- ' + waarvoor + ' is niet af.');
-    else if (controleer) waarschuw(bestand + ': ' + controleer + ' punt(en) die een jurist moet nakijken voor je live gaat.');
-    else goed(bestand + ' is ingevuld (' + waarvoor + '). Laat het alsnog juridisch nakijken.');
+  const papieren = require('../server/papieren');
+  const nogOpen = papieren.openVragen();
+  for (const naam of Object.keys(papieren.DOCUMENTEN)) {
+    const d = papieren.document(naam);
+    if (d.fout) { blokkeer(papieren.DOCUMENTEN[naam].bestand + ' ontbreekt: ' + papieren.DOCUMENTEN[naam].waarvoor + ' is verplicht voor je live gaat.'); continue; }
+    const controleer = (d.tekst.match(/\[(CONTROLEER|TE DOEN)/g) || []).length;
+    if (d.gaten) blokkeer(d.bestand + ': nog ' + d.gaten + ' open plek(ken) -- ' + d.waarvoor + ' is niet af.');
+    else if (controleer) waarschuw(d.bestand + ': ' + controleer + ' punt(en) die een jurist moet nakijken voor je live gaat.');
+    else goed(d.bestand + ' is ingevuld (' + d.waarvoor + '). Laat het alsnog juridisch nakijken.');
   }
+  if (nogOpen.length)
+    blokkeer('Papierwerk: ' + nogOpen.length + ' van de ' + papieren.VRAGEN.length + ' vragen staan nog open (eerste: "' +
+      nogOpen[0].vraag + '"). Laat Rahul ze uitvragen op de technische pagina; met de hand in het bestand typen hoeft niet.');
+  else goed('Papierwerk: alle ' + papieren.VRAGEN.length + ' vragen zijn beantwoord.');
 
   // afdrukken, blokkers eerst
   uit.sort((a, b) => (b[2] ? 1 : 0) - (a[2] ? 1 : 0));

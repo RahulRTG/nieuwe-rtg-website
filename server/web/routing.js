@@ -93,6 +93,12 @@ function maakRouter() {
       const params = padMatch(laag, pn);
       if (params === null) return next(err);
       req.params = { ...buitenParams, ...params };
+      /* Het PATROON onthouden, niet het pad. De meting (server/meting.js) telt
+         hierop: op het patroon zijn het een paar duizend waarden, op het pad is
+         het er een per gebruiker-id -- en dan legt de monitoring zichzelf om.
+         Alleen bij een echte route (laag.method gezet), niet bij middleware,
+         want die matcht op alles en zou het patroon overschrijven. */
+      if (laag.method) req.routePatroon = laag.pad;
       try {
         if (laag.fout) return laag.fn(err, req, res, next);
         return laag.fn(req, res, next);

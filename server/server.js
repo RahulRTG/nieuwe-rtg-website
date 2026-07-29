@@ -300,6 +300,9 @@ app.set('trust proxy', Number(process.env.RTG_PROXY_HOPS != null ? process.env.R
    publiek adres, zet die dan hier (komma-gescheiden). */
 app.set('proxy ips', String(process.env.RTG_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean));
 app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
+/* De meting draait NA het logboek en VOOR de routes: hij hangt aan res.finish,
+   dus hij ziet alles wat er daarna gebeurt, inclusief de 404's. */
+app.use(require('./meting').middleware());
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.
 // (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het
@@ -2890,6 +2893,7 @@ require('./routes/sso')(kern);
 /* SCIM: de provisioning-deur voor de IdP van een klant. Eigen auth (een sleutel
    per organisatie), dus bewust naast de gewone routes en niet in een domein. */
 require('./routes/scim')(kern);
+require('./routes/meting')(kern);
 require('./routes/algpin')(kern);
 require('./routes/sleutelwoorden')(kern);
 require('./routes/agenda')(kern);

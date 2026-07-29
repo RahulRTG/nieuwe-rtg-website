@@ -300,6 +300,26 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
 De tests draaien in een tijdelijke datamap (`RTG_DATA_DIR`) en raken de echte
 data nooit aan.
 
+Uit de veiligheidsrondes kwam een tweede groep die niet controleert of iets
+wérkt, maar of een belofte waar is:
+
+- `herstelproef.test.js` zet een backup echt terug en logt daarna in — de test
+  die de lege backups vond;
+- `bewaartermijnen.test.js` bewaakt beide kanten: niet te lang bewaren (AVG) en
+  niet te kort (de zeven jaar van art. 52 AWR);
+- `bewaarwacht.test.js` bewaakt vooral dat de wacht nóóit wist;
+- `pas-escalatie.test.js` bewijst dat zelf-registreren geen betaalde pas geeft
+  en dat een menselijk akkoord dat wél doet;
+- `vergeten.test.js`, `inzagelog.test.js`, `scheiding.test.js` en
+  `loghygiene.test.js` voor vergetelheid, het inzagejournaal, de scheiding
+  tussen codenaam en identiteit, en of er geen persoonsgegevens in de logs
+  belanden.
+
+Sommige tests hebben een écht Lifestyle- of Business-lid nodig. Dat kan sinds de
+pas-poort niet meer via registratie; `test/helper.js` heeft daarvoor
+`elevateTier()`, dat de geldige weg loopt (registreren als RTG → aanvraag →
+kantoor accepteert).
+
 ### De Postgres-toetsen (`npm run test:pg`)
 
 Zeven toetsen bewijzen de meerdere-instances-kant: de gedeelde store, de
@@ -488,6 +508,58 @@ en wordt bij het opstarten teruggezet, dus een herstart draait hem niet terug.
 - **Wachtwoorden en PIN's** worden gehasht met scrypt; identiteitsdocumenten staan buiten de webroot en zijn alleen voor de backoffice toegankelijk.
 - **Juridisch:** [privacybeleid](public/apps/juridisch/privacy.html), [algemene voorwaarden](public/apps/juridisch/voorwaarden.html) en [partnervoorwaarden](public/apps/juridisch/partnervoorwaarden.html) staan gebundeld in de juridische ROS-app (`/apps/juridisch.html`) en kloppen met wat de techniek doet.
 
+### De veiligheidsrondes: van beloftes naar bewijs
+
+Een tweede reeks rondes ging niet over nieuwe functies maar over de vraag of de
+bovenstaande beloftes ook waar zijn. Dat leverde een paar echte gaten op; die
+staan hieronder mét de fout erbij, want een lijst die alleen successen noemt is
+geen documentatie maar reclame.
+
+- **Sleutels moeten uit de omgeving komen.** `server/config.js` weigert een
+  productiestart zonder `RTG_VAULT_KEY` en `RTG_SECRET_KEY` (elk ≥32 tekens).
+  Eerder was dat een waarschuwing die je kon negeren — en een waarschuwing die
+  je kunt negeren is geen maatregel.
+- **Inzagejournaal** (`server/inzagelog.js`): elke blik in de identiteitskluis
+  wordt vastgelegd — wie, wanneer, welk account, en waarom. Het journaal bewaart
+  bewust *niet* de opgezochte naam; anders was het een tweede, onversleutelde
+  kopie van de kluis. Een betrokkene ziet via `/api/privacy/inzage` wél dát er
+  in zijn dossier is gekeken en waarom, nooit wie er keek.
+- **Bewaartermijnen** (`server/bewaartermijnen.js`): tien categorieën met een
+  termijn, een grond en een uitleg. De wet wint van minimalisatie — facturen en
+  loonadministratie blijven zeven jaar staan (art. 52 AWR) en de veger raakt ze
+  niet aan. Wissen gebeurt nooit vanzelf: `veeg()` maakt standaard alleen een
+  rapport, en pas `bevestig: 'WIS'` op het techniekbord verwijdert echt.
+  `zonderBeleid()` noemt de takken die nog géén termijn hebben, zodat het gat
+  zichtbaar blijft in plaats van vergeten.
+- **De bewaarwacht** (`server/bewaarwacht.js`): telt dagelijks wat over zijn
+  termijn staat en meldt dat maandelijks op het technische bord, met de grootste
+  posten bij naam. Hij wist nooit — dat blijft mensenwerk met een bevestiging.
+  Het moment van de laatste melding staat in de database en niet in het
+  geheugen, anders reset elke herstart de teller en hoor je hem alsnog elke dag.
+- **Geteste herstelproef** (`test/herstelproef.test.js`): zet een backup echt
+  terug en logt daarna in. Precies die test vond het ernstigste probleem van de
+  hele reeks: **de backups waren leeg.** In WAL-modus stond alle verse data nog
+  in de `-wal`-bestanden terwijl de kopie alleen de (lege) `.db` meenam. Nu
+  checkpoint de backup eerst en kopieert hij de `-wal`-bestanden mee. Een backup
+  die je nooit hebt teruggezet is een aanname, geen backup.
+- **De pas-poort** (merkregel): zelf-registreren levert **altijd** hooguit een
+  RTG Pass. Lifestyle en Business ontstaan uitsluitend door een menselijk besluit
+  (`kern/aanmeldingen.js` → `beslis`, dat `accounts.setTier` aanroept). Eerder
+  gaf het `tier`-veld bij registratie direct een Business Pass; dat gat vond de
+  aanvalsronde hieronder, niet de eigen testsuite.
+- **Aanvalsronde** (`node scripts/aanval.js`): een batterij aanvallen tegen een
+  draaiende server (IDOR, kapotte tokens, rechten-escalatie, WAF-sondes,
+  injectie), exitcode 1 zodra er iets raak is. Wat dit **niet** is: een
+  onafhankelijke pentest. Het script is geschreven door dezelfde partij die de
+  server schreef, en dat is een echte beperking — je zoekt niet naar de aanname
+  waarvan je niet weet dat je hem hebt. Voor de lancering hoort hier een vreemd
+  paar ogen overheen.
+- **Het papierwerk is een poort, geen herinnering.** `npm run golive` leest
+  `VERWERKINGSREGISTER.md` (AVG art. 30) en `DATALEK.md` (72-uursklok, art. 33)
+  en **blokkeert** zolang daar `[VUL IN]`-velden openstaan. Wat een jurist moet
+  nakijken geeft een waarschuwing. De keuring kan niet beoordelen of de inhoud
+  juridisch klopt — alleen dat hij bestaat en niet half af is.
+
 ## Partner worden & e-mail
 
 Bedrijven worden aangemaakt vanuit de backoffice (de losse publieke wervingspagina is met de marketingsite verwijderd; het aanvraag-endpoint blijft bestaan). Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.
@@ -645,5 +717,7 @@ Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk 
 - **docs/de-lijn.md** — wat we zelf bouwen, wat bewust niet, en waarom (de filosofie achter de afhankelijkheden).
 - **docs/architectuur.md** — gedeelde kern + aparte domeinmodules, gateway en losse processen.
 - **docs/hardening.md** — beveiligings- en betrouwbaarheidskeuzes.
+- **VERWERKINGSREGISTER.md** — het AVG-verwerkingsregister (art. 30), opgesteld op wat de code werkelijk doet. De `[VUL IN]`-velden kan alleen RTG zelf invullen; zolang die openstaan blokkeert `npm run golive`.
+- **DATALEK.md** — het datalek-draaiboek: de 72-uursklok van art. 33, wie wat doet, en wat er vooraf ingevuld moet zijn.
 - **PRODUCTION.md** / **LAUNCH.md** — runbook en livegang-checklist.
 - **scripts/mac/LEESMIJ.md** — RTG als launchd-dienst op een Mac (Mac mini als thuisserver): `sudo scripts/mac/installeer.sh`.

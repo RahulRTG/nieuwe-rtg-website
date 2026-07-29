@@ -67,9 +67,20 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
   assert.equal((await post('/api/supplier/login', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (leveranciers)');
   assert.equal((await post('/api/staff', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (personeel)');
 
-  // en kaal http wordt onherroepelijk naar https gestuurd
-  const kaal = await fetch(BASE + '/api/health', { redirect: 'manual' });
+  /* En kaal http wordt onherroepelijk naar https gestuurd. Let op WELK adres
+     we daarvoor nemen: een gewone pagina, niet /api/health. De prikken van de
+     poortwachter (/api/health, /api/ready) en het interne clusterkanaal gaan
+     bewust NIET door die omleiding -- zij praten http op de loopback, en een
+     301 daarop betekende dat geen enkele server ooit gezond of actief werd en
+     de site in productie altijd 503 gaf. Deze test gebruikte /api/health als
+     voorbeeld en legde daarmee precies het verkeerde vast. Nu allebei de
+     kanten, zodat geen van beide stilletjes kan omslaan. */
+  const kaal = await fetch(BASE + '/', { redirect: 'manual' });
   assert.equal(kaal.status, 301, 'onbeveiligd http wordt doorgestuurd naar https');
+  const prik = await fetch(BASE + '/api/health', { redirect: 'manual' });
+  assert.equal(prik.status, 200, 'de gezondheidsprik wordt NIET omgeleid');
+  const klaar = await fetch(BASE + '/api/ready', { redirect: 'manual' });
+  assert.notEqual(klaar.status, 301, '/api/ready wordt NIET omgeleid');
 
   // echte registratie en inlog werken gewoon
   const reg = await post('/api/auth/register', { name: 'Eerste Lid', email: 'lid@echtdomein.nl', phone: '0612345678',

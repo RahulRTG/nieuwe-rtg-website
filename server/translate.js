@@ -84,7 +84,7 @@ async function claudeTranslate(text, to) {
    bewaakt de aanroeper (talen.taalVan). Voor nl/en werkt het woordenboek ook
    zonder AI; voor andere talen vertaalt de AI, en zonder AI-sleutel komt het
    bericht onvertaald terug (translated:false), nooit kapot. */
-async function translate(text, to, from) {
+async function translate(text, to, from, opties) {
   text = String(text || '');
   to = bestaat(to) ? String(to).toLowerCase() : 'nl';
   if (!text.trim()) return { text, translated: false, from: from || to };
@@ -99,7 +99,14 @@ async function translate(text, to, from) {
   }
 
   let out = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
-  if (!out && anthropic) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
+  /* De AI-weg alleen voor wie we kennen. Zonder deze grens is een open
+     vertaal-endpoint een gratis doorgeefluik naar een betaalde aanbieder: geen
+     inlog, geen kosten voor de aanvrager, en elke ingetypte zin gaat naar een
+     derde partij (vaak buiten de EU) zonder dat daar een lid tegenover staat.
+     Het woordenboek hieronder blijft voor iedereen werken, dus de taalkiezer op
+     het inlogscherm doet het gewoon. */
+  const magAi = !opties || opties.ai !== false;
+  if (!out && anthropic && magAi) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
   if (!out) out = wordLevel(text, to); // woordenboek of wereld-kern: elke registertaal doet mee
   const result = out || text;
   cache.set(key, result);

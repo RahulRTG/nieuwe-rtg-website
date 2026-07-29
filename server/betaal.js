@@ -110,6 +110,19 @@ function verifieerWebhook(ruweBody, handtekening) {
   if (stripe && WEBHOOK_SECRET) {
     return stripe.webhooks.constructEvent(buf, handtekening, WEBHOOK_SECRET);
   }
+  /* ZONDER SECRET IN PRODUCTIE: WEIGEREN.
+
+     Hier stond alleen een waarschuwing in het commentaar hierboven ("zet in
+     productie altijd een secret"). Dat is precies het soort belofte waar niets
+     van afhangt: zonder secret viel de code door naar JSON.parse en gaf de
+     webhook een onondertekend bericht terug als geverifieerde waarheid. Wie het
+     adres kent, kan dan zelf "betaald" roepen.
+
+     De poortwacht-ronde vond dit doordat /api/betaal/webhook anoniem 200 gaf.
+     Buiten productie blijft de doorval bestaan -- daar draait alles op
+     demo-geld en zou een verplicht secret elke lokale start blokkeren. */
+  if (!WEBHOOK_SECRET && process.env.NODE_ENV === 'production')
+    throw new Error('Webhook geweigerd: er is geen webhook-secret ingesteld, dus dit bericht is niet te vertrouwen.');
   if (WEBHOOK_SECRET) {
     const verwacht = crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
     const gegeven = Buffer.from(String(handtekening || ''), 'utf8');

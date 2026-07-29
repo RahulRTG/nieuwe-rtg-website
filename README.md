@@ -556,6 +556,15 @@ geen documentatie maar reclame.
   server schreef, en dat is een echte beperking — je zoekt niet naar de aanname
   waarvan je niet weet dat je hem hebt. Voor de lancering hoort hier een vreemd
   paar ogen overheen.
+- **De poortwacht: elke route anoniem aangeklopt.** `npm run poortwacht` leest de
+  routekaart uit de server zelf en klopt bij alle 2496 API-routes aan zonder
+  inlog. Niet "doet dit endpoint het goed" (dat zijn 2496 tests), maar de vraag
+  die er veiligheidsmatig het meest toe doet en die je voor allemaal tegelijk
+  kunt stellen: *komt er iemand binnen die niet is ingelogd?* Uitslag van de
+  eerste ronde: 2220 netjes geweigerd, 244 stil afgeslagen, 25 open — waarvan er
+  twee niet klopten (zie `test/poortwacht.test.js`). Dit dekt **één** klasse
+  fouten volledig; een route die 401 geeft kan tussen twee ingelogde leden nog
+  steeds lekken, en daarvoor is `scripts/aanval.js`.
 - **Het papierwerk is een poort, geen herinnering.** `npm run golive` **vult**
   `VERWERKINGSREGISTER.md` (AVG art. 30) en `DATALEK.md` (72-uursklok, art. 33)
   in met de antwoorden uit `server/papieren/` en **blokkeert** zolang daar

@@ -1217,12 +1217,17 @@ app.post('/api/push/subscribe', auth, (req, res) => {
 
 /* Vertaal een bericht naar de taal van de ontvanger. Iedereen schrijft in de
    eigen taal; de lezer krijgt het in de zijne (en andersom). */
-app.post('/api/translate', async (req, res) => {
+/* Publiek, want de taalkiezer staat al op het inlogscherm. Maar wel met een
+   rem, en zonder inlog gaat er niets naar de AI-aanbieder: het woordenboek
+   volstaat voor de knoppen die een uitgelogde bezoeker ziet. Zie de toelichting
+   bij magAi in server/translate.js. */
+app.post('/api/translate', require('./rem')({ windowMs: 60000, limit: 30 }), async (req, res) => {
   const text = String(req.body.text || '').slice(0, 1500);
   const to = talen.taalVan(req.body.to); // elke actieve wereldtaal mag als doel
   const from = req.body.from || undefined; // translate valideert tegen het register
+  const ingelogd = /^Bearer\s+\S/i.test(req.get('authorization') || '');
   try {
-    const out = await i18n.translate(text, to, from);
+    const out = await i18n.translate(text, to, from, { ai: ingelogd });
     res.json(out);
   } catch (e) {
     res.json({ text, translated: false });

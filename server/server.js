@@ -324,8 +324,17 @@ app.use((req, res, next) => {
        is van buitenaf niet te zien: lsof laat drie luisterende servers zien
        en de browser krijgt "alle servers zijn tijdelijk onbereikbaar".
        Hetzelfde geldt voor /api/ready en voor de healthcheck in de Dockerfile. */
-    const prik = req.path === '/api/health' || req.path === '/api/ready';
-    if (!req.secure && !prik) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
+    /* Hetzelfde geldt voor het hele /api/cluster-kanaal. Dat is het interne
+       gesprek tussen poortwachter en servers: promote (word actief), de
+       hartslag, het doorgeven van wie de baas is. Ook http, ook loopback.
+       Alleen /api/health vrijstellen was half werk: de prik lukte daarna wel,
+       maar promote kreeg nog een 301, er werd dus nooit iemand actief, en de
+       site bleef 503 geven. Dit kanaal is niet van buiten te misbruiken: het
+       eist de gedeelde x-rtg-cluster-sleutel en luistert alleen op 127.0.0.1
+       (zie de HOST-keuze onderaan dit bestand). */
+    const intern = req.path === '/api/health' || req.path === '/api/ready' ||
+      req.path.indexOf('/api/cluster/') === 0;
+    if (!req.secure && !intern) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
     if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
   next();

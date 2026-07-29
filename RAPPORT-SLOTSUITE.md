@@ -1,6 +1,6 @@
 # Rapport van de Slotsuite
 
-_Automatisch geschreven door `scripts/slotsuite.js` op 2026-07-29 08:53 UTC. Niet met de hand bijwerken:
+_Automatisch geschreven door `scripts/slotsuite.js` op 2026-07-29 09:16 UTC. Niet met de hand bijwerken:
 de volgende ronde overschrijft dit bestand en leest het JSON-blok onderaan terug als geheugen._
 
 ## Oordeel
@@ -157,7 +157,7 @@ _(nog 87 punten van lagere prioriteit; zie het JSON-blok.)_
 <!-- geheugen van de Slotsuite; hier leest de volgende ronde uit terug -->
 ```json
 {
- "ronde": "2026-07-29 08:53",
+ "ronde": "2026-07-29 09:16",
  "gezakt": 1,
  "backlog": [
   {

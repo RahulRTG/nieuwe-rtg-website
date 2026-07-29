@@ -46,7 +46,15 @@ async function nieuwLid() {
     name: 'Aanvaller ' + u, email: 'aanval-' + u + '@proef.test', phone: '0612345678',
     password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg'
   });
-  try { return { token: JSON.parse(reg.tekst).token, u }; } catch (e) { return { token: null, u }; }
+  const email = 'aanval-' + u + '@proef.test';
+  // de codenaam hebben we nodig om iets NAAR een ander te proberen te sturen
+  let codenaam = null;
+  try {
+    const t = JSON.parse(reg.tekst).token;
+    const st = await post('/api/state', {}, t);
+    codenaam = ((JSON.parse(st.tekst).state || {}).user || {}).codenaam || null;
+    return { token: t, u, email, codenaam };
+  } catch (e) { return { token: null, u, email, codenaam }; }
 }
 
 async function aanvallen() {
@@ -126,6 +134,99 @@ async function aanvallen() {
   const zoek = await post('/api/salon/feed', { q: "' OR 1=1 --" }, A.token);
   if (zoek.status >= 500) meld(raak, 'injectie salon', 'een rare query gaf een 500 (' + zoek.status + ')');
   else meld(ok, 'injectie salon', 'netjes afgehandeld (' + zoek.status + ')');
+
+  /* ---------- ronde 2: de klassen die in ronde 1 ontbraken ----------
+
+     De eerste ronde toetste vooral "mag een vreemde erin". Dat is inmiddels
+     ook volledig gedekt door scripts/poortwacht.js, die bij alle 2496 routes
+     anoniem aanklopt. Wat daar per definitie buiten valt is het gevaarlijkere
+     geval: iemand die WEL is ingelogd, maar niet gerechtigd tot wat hij doet.
+     Daar gaat deze tweede helft over. */
+
+  // 10. MASSATOEWIJZING: velden meesturen die de client niet mag zetten.
+  //     Klassieke fout: de server neemt req.body over en een lid promoveert
+  //     zichzelf, verhoogt zijn saldo of maakt zichzelf eigenaar.
+  for (const [veld, waarde] of [['tier', 'business'], ['saldo', 999999], ['balanceCents', 999999], ['eigenaar', true], ['role', 'manager']]) {
+    const voor = await post('/api/state', {}, B.token);
+    await post('/api/profiel/zet', { [veld]: waarde }, B.token);
+    const na = await post('/api/state', {}, B.token);
+    const st = (o) => { try { return JSON.stringify(JSON.parse(o.tekst).state || {}); } catch (e) { return ''; } };
+    if (st(na) !== st(voor) && new RegExp('"' + veld + '":' + JSON.stringify(waarde)).test(st(na)))
+      meld(raak, 'massatoewijzing ' + veld, 'een lid kon zelf "' + veld + '" op ' + waarde + ' zetten');
+    else meld(ok, 'massatoewijzing ' + veld, 'genegeerd');
+  }
+
+  // 11. GELD UIT HET NIETS: een negatief of nul-bedrag overmaken. Bij een
+  //     slordige controle keert een negatieve overboeking de richting om.
+  for (const bedrag of [-5000, 0, -0.01]) {
+    const r = await post('/api/pay/tik', { naar: A.codenaam || 'onbekend', centen: bedrag }, B.token);
+    if (r.status >= 200 && r.status < 300) meld(raak, 'bedrag ' + bedrag, 'een overboeking van ' + bedrag + ' werd geaccepteerd');
+    else meld(ok, 'bedrag ' + bedrag, 'geweigerd (' + r.status + ')');
+  }
+
+  // 12. TOKEN VAN EEN ANDERE ROL: een leden-token op leverancier- en
+  //     kantoorroutes. Rollen mogen niet uitwisselbaar zijn.
+  for (const pad of ['/api/supplier/orders', '/api/office/leden', '/api/staff/rooster']) {
+    const r = await post(pad, {}, B.token);
+    if (r.status >= 200 && r.status < 300) meld(raak, 'rolverwisseling ' + pad, 'een LEDEN-token werd geaccepteerd op ' + pad);
+    else meld(ok, 'rolverwisseling ' + pad, 'geweigerd (' + r.status + ')');
+  }
+
+  // 13. ZEGEL VERVALSEN: de handtekening bijknippen of het feit omzetten.
+  //     Een zegel is een bewijs; als je het kunt bewerken is het niets waard.
+  const mk = await post('/api/zegel/maak', { partner: 'KIKUNOI', claims: ['lid'] }, B.token);
+  try {
+    const tok = JSON.parse(mk.tekst).token;
+    const [kop, hand] = String(tok).split('.');
+    const geknoeid = Buffer.from(JSON.stringify(Object.assign(
+      JSON.parse(Buffer.from(kop, 'base64url').toString()), { claims: { leeftijd21: true, lid: true } }
+    ))).toString('base64url') + '.' + hand;
+    const c = await post('/api/supplier/zegel/check', { token: geknoeid }, null);
+    const geldig = /"geldig"\s*:\s*true/.test(c.tekst);
+    if (geldig) meld(raak, 'zegel vervalsen', 'een bewerkt zegel werd als geldig gezien');
+    else meld(ok, 'zegel vervalsen', 'bewerkt zegel afgewezen');
+  } catch (e) { meld(let_op, 'zegel vervalsen', 'kon geen zegel maken om te toetsen (' + mk.status + ')'); }
+
+  // 14. UITGELOGD TOKEN BLIJFT WERKEN: na uitloggen hoort de sleutel dood te
+  //     zijn. Zo niet, dan helpt uitloggen op een gedeelde computer niets.
+  const C = await nieuwLid();
+  if (C && C.token) {
+    await post('/api/auth/logout', {}, C.token);
+    const na = await post('/api/state', {}, C.token);
+    if (na.status >= 200 && na.status < 300) meld(raak, 'token na uitloggen', 'het token werkt nog na uitloggen');
+    else meld(ok, 'token na uitloggen', 'ingetrokken (' + na.status + ')');
+  }
+
+  // 15. BRUTE FORCE: honderd verkeerde wachtwoorden achter elkaar. Ergens
+  //     hoort een rem of een slot te komen; anders is een zwak wachtwoord
+  //     een kwestie van tijd.
+  let geremd = false;
+  for (let i = 0; i < 100 && !geremd; i++) {
+    const r = await post('/api/auth/login', { email: B.email || 'x@y.nl', password: 'fout' + i });
+    if (r.status === 429 || /te veel|geblokkeerd|wacht/i.test(r.tekst)) geremd = true;
+  }
+  if (geremd) meld(ok, 'brute force', 'de rem sloeg aan');
+  else meld(raak, 'brute force', 'honderd inlogpogingen zonder rem of slot');
+
+  // 16. XFF-SPOOF OP DE REM: dezelfde stormloop, maar met een vers verzonnen
+  //     adres per poging. Telt de rem op een kop die de bezoeker zelf zet,
+  //     dan is elke limiet een formaliteit. (Zie test/proxykop.test.js.)
+  let geremd2 = false;
+  for (let i = 0; i < 100 && !geremd2; i++) {
+    const r = await post('/api/auth/login', { email: B.email || 'x@y.nl', password: 'fout' + i },
+      null, { 'X-Forwarded-For': '9.9.' + (i % 250) + '.' + (i % 200) });
+    if (r.status === 429 || /te veel|geblokkeerd|wacht/i.test(r.tekst)) geremd2 = true;
+  }
+  if (geremd2) meld(ok, 'rem via X-Forwarded-For', 'de rem laat zich niet omzeilen met een verzonnen adres');
+  else meld(raak, 'rem via X-Forwarded-For', 'met een eigen X-Forwarded-For per poging loopt de rem niet vol');
+
+  // 17. PADDOORLOOP IN EEN BESTANDSNAAM: een upload die uit zijn map wil.
+  for (const naam of ['../../etc/passwd', '..\\..\\windows\\system32', 'geldig/../../buiten.txt']) {
+    const r = await post('/api/bestanden/upload', { naam, inhoud: 'x' }, B.token);
+    if (r.status >= 200 && r.status < 300 && !/fout|ongeldig/i.test(r.tekst))
+      meld(let_op, 'paddoorloop upload', 'de naam "' + naam + '" werd geaccepteerd; controleer waar het bestand landt');
+    else meld(ok, 'paddoorloop upload', 'geweigerd (' + r.status + ')');
+  }
 
   // --- rapport ---
   const regel = (x) => '   - ' + x.wat + ': ' + x.hoe;

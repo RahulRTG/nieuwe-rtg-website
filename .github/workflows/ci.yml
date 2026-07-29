@@ -49,6 +49,12 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      # DE NORM: een ratel, geen rapportcijfer. NORM.json legt vast waar de code
+      # staat; deze stap zakt zodra een van die meters SLECHTER wordt. Beter mag
+      # altijd -- dan meldt hij dat de norm strakker gezet kan worden. Zonder
+      # deze stap zakt kwaliteit weg zonder dat iemand een besluit neemt.
+      - name: De norm (mag alleen strakker, nooit losser)
+        run: npm run norm
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)

@@ -66,6 +66,22 @@ Punt 1 tot en met 4 zijn geen technische restpunten maar de voorwaarden om deze
 tabel serieus te kunnen noemen. Ze staan hier omdat een SLO-document dat zijn
 eigen gaten verzwijgt, erger is dan geen SLO-document.
 
+## Herstel: gemeten
+
+| Leden | RTO (schijf weg -> lid ingelogd) | RPO |
+|---|---|---|
+| 25.000 | 9,8 s | tot 24 uur |
+| 250.000 | 13,1 s | tot 24 uur |
+
+Gemeten op 29 juli 2026 met `scripts/hersteltijd.js`; zie `PRODUCTION.md` voor
+de voorbehouden (lokale schijf, en de tijd tot het BESLUIT om te herstellen zit
+er niet in -- dat is meestal het langste deel).
+
+De RPO van 24 uur is de zwakste schakel in dit document. Hij volgt uit het
+dagelijkse back-upritme, en hij is niet met code op te lossen: er moet vaker
+een back-up gemaakt worden, of de opslag moet naar Postgres met point-in-time
+recovery. Dat is een keuze met kosten, en dus een besluit van de directie.
+
 ## Wat wij bij een storing doen
 
 Zie `DATALEK.md` voor een incident met persoonsgegevens (andere keten, andere

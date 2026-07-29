@@ -130,6 +130,34 @@ zichtbaar is -- dat tweede bewijst dat de kluis het weer doet.
 backuppen, datamap wissen, terugzetten, opstarten, controleren. Draai hem als
 je iets aan de opslag verandert.
 
+#### Hoe lang duurt het? (gemeten, niet aangenomen)
+
+`scripts/hersteltijd.js` doet dezelfde ronde maar met een stopwatch, op een
+database van een opgegeven omvang. Draai: `node --experimental-sqlite
+scripts/hersteltijd.js 250000`.
+
+Gemeten op **29 juli 2026**, op de ontwikkelmachine:
+
+| Leden | Back-up | Terugzetten | Server op | **RTO** |
+|---|---|---|---|---|
+| 25.000 (13,9 MB) | 27 ms | 51 ms | 9,6 s | **9,8 s** |
+| 250.000 (144,2 MB) | 394 ms | 1,4 s | 11,6 s | **13,1 s** |
+
+RTO = van "de schijf is weg" tot "een lid is ingelogd en zijn naam is weer
+leesbaar". Tienmaal zoveel leden kost maar drie seconden extra, omdat het
+grootste deel de serverstart is en niet de gegevens -- dat is goed nieuws voor
+de schaalbaarheid en slecht nieuws als je de RTO omlaag wilt: dan moet de
+opstarttijd omlaag, niet de back-up.
+
+**Twee dingen die deze cijfers NIET zeggen.** Ze zijn gemeten op een lokale
+schijf; een back-up van een tweede locatie ophalen telt daar de overdracht bij
+op. En de echte tijd tot dienstverlening begint bij het OPMERKEN en het besluit
+om te herstellen -- meestal het langste deel van de keten. Zie `SLO.md`.
+
+**RPO** (hoeveel werk je kwijt bent) volgt uit het back-upritme, niet uit een
+meting: bij een dagelijkse back-up is dat tot 24 uur. Wil je daaronder, dan is
+er vaker back-uppen nodig, of Postgres met point-in-time recovery.
+
 ### Zet een proxy ervoor? Strip dan `token` uit zijn access log
 
 De live-verbindingen (SSE) kunnen geen `Authorization`-header meesturen —

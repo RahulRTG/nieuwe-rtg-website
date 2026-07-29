@@ -226,7 +226,15 @@ async function aanvallen() {
       null, { 'X-Forwarded-For': '9.9.' + (i % 250) + '.' + (i % 200) });
     if (r.status === 429 || /te veel|geblokkeerd|wacht/i.test(r.tekst)) geremd2 = true;
   }
+  /* De uitslag hangt af van WAAR we vandaan aanvallen, en dat is geen slordigheid
+     maar de kern van de maatregel: de server gelooft een X-Forwarded-For alleen
+     van een vertrouwde proxy-positie (loopback of een privaat adres). Vallen we
+     aan vanaf localhost, dan ZIJN wij die positie -- dan zegt "de kop telt" niets
+     over de veiligheid in productie. Vandaar het onderscheid. */
+  const vanafLokaal = /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])/i.test(BASIS);
   if (geremd2) meld(ok, 'rem via X-Forwarded-For', 'de rem laat zich niet omzeilen met een verzonnen adres');
+  else if (vanafLokaal) meld(let_op, 'rem via X-Forwarded-For',
+    'niet te toetsen vanaf localhost: die verbinding geldt zelf als vertrouwde proxy-positie. Draai dit vanaf een ANDERE machine tegen het echte adres om het te bewijzen.');
   else meld(raak, 'rem via X-Forwarded-For', 'met een eigen X-Forwarded-For per poging loopt de rem niet vol');
 
   // 17. PADDOORLOOP IN EEN BESTANDSNAAM: een upload die uit zijn map wil.

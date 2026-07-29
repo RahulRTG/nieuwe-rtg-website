@@ -574,9 +574,14 @@ geen documentatie maar reclame.
   vond een echt gat: `trust proxy` stond vast op 1 en `verrijk.js` las het
   **linkse** adres uit de kop — het deel dat de bezoeker zelf verzint. Daarmee
   was elke rem, inclusief de brute-force-grens op de inlog, met één kop te
-  omzeilen. Nu wordt er van rechts gelezen, en `RTG_PROXY_HOPS=0` zet het
-  vertrouwen helemaal uit voor een app die zonder proxy aan het internet hangt.
-  Zie `test/proxykop.test.js`.
+  omzeilen. Nu wordt er van rechts gelezen — en, de tweede helft: de kop wordt
+  **alleen geloofd van een vertrouwde proxy-positie**. `trust proxy` zei hoevéél
+  hops, niet wie; zonder dat tweede stuk kon een bezoeker die rechtstreeks
+  binnenkomt nog steeds zijn eigen adres verzinnen, want dan is hij zelf de
+  rechtse. Het adres van de verbinding is de enige waarneming die niemand kan
+  vervalsen, dus die beslist: loopback en private adressen (waar een reverse
+  proxy staat) worden geloofd, een publieke bezoeker niet. Staat uw proxy op een
+  publiek adres, dan `RTG_PROXY_IPS`. Zie `test/proxykop.test.js` (9 tests).
 - **Het papierwerk is een poort, geen herinnering.** `npm run golive` **vult**
   `VERWERKINGSREGISTER.md` (AVG art. 30) en `DATALEK.md` (72-uursklok, art. 33)
   in met de antwoorden uit `server/papieren/` en **blokkeert** zolang daar

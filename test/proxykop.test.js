@@ -28,8 +28,11 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { verrijk } = require('../server/web/verrijk');
 
-function verzoek(headers, opties) {
-  const req = { url: '/iets', headers: headers || {}, socket: { remoteAddress: '10.0.0.9' } };
+/* Standaard komt de verbinding hier van 10.0.0.9 -- een privaat adres, dus een
+   geldige proxy-positie. Zo toetsen de eerste tests de leesvolgorde. Test 7 en 8
+   toetsen de tweede helft: WIE de kop mag sturen. */
+function verzoek(headers, opties, vanaf) {
+  const req = { url: '/iets', headers: headers || {}, socket: { remoteAddress: vanaf || '10.0.0.9' } };
   const res = { setHeader() {}, getHeader() {}, end() {} };
   verrijk(req, res, opties || { 'trust proxy': 1 });
   return req;
@@ -66,4 +69,38 @@ test('5. hetzelfde voor protocol en host: rechts telt', () => {
 test('6. zonder trust proxy wordt de kop helemaal genegeerd', () => {
   const r = verzoek({ 'x-forwarded-for': '9.9.9.9' }, {});
   assert.equal(r.ip, '10.0.0.9', 'geen proxy ingesteld = geen enkele kop geloven');
+});
+
+/* ---------- de tweede helft: WIE mag die kop sturen ----------
+
+   Van rechts lezen dekt het geval "er staat een proxy voor de app". Het dekt
+   NIET het geval waarin de app rechtstreeks aan het internet hangt: dan is de
+   bezoeker zelf de rechtse, en verzint hij nog steeds zijn eigen adres. Zolang
+   dat kon, bleef elke snelheidslimiet met een kop te omzeilen.
+
+   De enige waarneming die niemand kan vervalsen is het adres van de verbinding.
+   Dus geloven we de kop alleen van een vertrouwde proxy-positie. */
+
+test('7. een bezoeker die RECHTSTREEKS binnenkomt mag niets verzinnen', () => {
+  // publiek bronadres = geen proxy ertussen = de kop is van de bezoeker zelf
+  const r = verzoek({ 'x-forwarded-for': '9.9.9.9' }, { 'trust proxy': 1 }, '203.0.113.77');
+  assert.equal(r.ip, '203.0.113.77', 'we tellen op de verbinding, niet op zijn kop');
+  assert.notEqual(r.ip, '9.9.9.9', 'anders is de rem een formaliteit zodra er geen proxy staat');
+});
+
+test('8. een reverse proxy op loopback of in het eigen net wordt wel geloofd', () => {
+  for (const proxy of ['127.0.0.1', '::1', '10.0.0.9', '172.17.0.3', '192.168.1.2']) {
+    assert.equal(verzoek({ 'x-forwarded-for': '203.0.113.5' }, { 'trust proxy': 1 }, proxy).ip,
+      '203.0.113.5', 'proxy op ' + proxy + ' hoort vertrouwd te zijn');
+  }
+  // en ook daar wint de waarneming van de proxy van wat de bezoeker ervoor plakt
+  assert.equal(verzoek({ 'x-forwarded-for': '9.9.9.9, 203.0.113.5' }, { 'trust proxy': 1 }, '127.0.0.1').ip, '203.0.113.5');
+});
+
+test('9. staat de proxy op een publiek adres, dan kan dat expliciet', () => {
+  const inst = { 'trust proxy': 1, 'proxy ips': ['198.51.100.9'] };
+  assert.equal(verzoek({ 'x-forwarded-for': '203.0.113.5' }, inst, '198.51.100.9').ip, '203.0.113.5',
+    'de opgegeven proxy wordt geloofd');
+  assert.equal(verzoek({ 'x-forwarded-for': '9.9.9.9' }, inst, '203.0.113.77').ip, '203.0.113.77',
+    'iedereen daarbuiten niet -- ook loopback niet meer, want de lijst is dan de hele waarheid');
 });

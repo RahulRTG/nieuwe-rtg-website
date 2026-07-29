@@ -289,6 +289,12 @@ const PRODUCTION = process.env.NODE_ENV === 'production';
    van de verbinding zelf. Dat is de juiste stand voor een app die zonder proxy
    aan het internet hangt. */
 app.set('trust proxy', Number(process.env.RTG_PROXY_HOPS != null ? process.env.RTG_PROXY_HOPS : 1));
+/* WIE die proxy is. Zonder opgave vertrouwen we alleen loopback en private
+   adressen -- de gebruikelijke plek voor een reverse proxy. Een bezoeker die
+   rechtstreeks vanaf het internet binnenkomt valt daar nooit onder, dus zijn
+   X-Forwarded-For wordt genegeerd in plaats van geloofd. Staat de proxy op een
+   publiek adres, zet die dan hier (komma-gescheiden). */
+app.set('proxy ips', String(process.env.RTG_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean));
 app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.

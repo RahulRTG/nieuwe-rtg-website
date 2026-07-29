@@ -222,8 +222,30 @@ fi
 
 kop "6. Service laden"
 launchctl bootout "system/$LABEL" >/dev/null 2>&1 || true
-launchctl bootstrap system "$PLIST"
+# enable VOOR bootstrap. Heeft launchd dit label ooit uitgezet (een eerdere
+# mislukte poging, of iemand die 'launchctl disable' draaide), dan weigert
+# bootstrap met "Input/output error" -- en een enable achteraf is te laat,
+# want er is dan niets geladen om aan te zetten.
 launchctl enable "system/$LABEL" >/dev/null 2>&1 || true
+if ! launchctl bootstrap system "$PLIST"; then
+  # launchd geeft alleen een errno terug en zegt niet wat er mis is. Zoek het
+  # hier op, in plaats van de gebruiker met "5: Input/output error" te laten
+  # zitten: de drie oorzaken die het in de praktijk zijn.
+  echo
+  echo "   Laden mislukte. Wat launchd hierover kwijt wil:" >&2
+  echo "   -- staat hij al geladen?" >&2
+  launchctl print "system/$LABEL" 2>&1 | head -3 >&2 || true
+  echo "   -- staat hij uitgezet?" >&2
+  launchctl print-disabled system 2>/dev/null | grep -i "$LABEL" >&2 || echo "      nee" >&2
+  echo "   -- klopt het plist?" >&2
+  plutil -lint "$PLIST" >&2 || true
+  echo "   -- kan launchd bij het startscript?" >&2
+  ls -ld "$HIER/rtg-start.sh" >&2 || true
+  echo >&2
+  echo "   Draaien kan intussen gewoon met de hand:" >&2
+  echo "     cd $REPO && RTG_ENV_BESTAND=$ENVBESTAND bash scripts/mac/rtg-start.sh" >&2
+  exit 1
+fi
 launchctl kickstart -k "system/$LABEL" >/dev/null 2>&1 || true
 zeg "geladen als system/$LABEL"
 

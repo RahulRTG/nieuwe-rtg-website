@@ -29,7 +29,12 @@ test('config: onveilige productie geeft blokkerende fouten', () => {
 test('config: veilige productie is foutloos', () => {
   const r = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
     APP_URL: 'https://x', DATABASE_URL: 'postgresql://x', RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
-    REDIS_URL: 'r', SENTRY_DSN: 's', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k',
+    /* STRIPE_WEBHOOK_SECRET hoort hier sinds de poortwacht-ronde bij: een
+       betaalsleutel zonder webhook-secret is gevaarlijker dan geen van beide,
+       want dan komt de "is er betaald"-melding onondertekend binnen en kan wie
+       het adres kent zelf "betaald" roepen. Een veilige productie heeft ze dus
+       allebei -- deze opsomming is precies dat: hoe veilig eruitziet. */
+    REDIS_URL: 'r', SENTRY_DSN: 's', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
     RTF_IBAN: 'NL11FOUND0000000001', RTG_MEDIA_BACKEND: 's3',
     OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });

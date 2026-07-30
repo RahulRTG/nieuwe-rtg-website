@@ -17,12 +17,28 @@
   var mq = window.matchMedia('(min-width: 1000px)');
   var KEY = 'rtg_venster_' + location.pathname.replace(/[^a-z0-9]/gi, '_');
   var st = null; try { st = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
-  var greep = null, actief = false, ro = null, zetten = false, drag = null;
+  var greep = null, actief = false, ro = null, roKop = null, zetten = false, drag = null;
+  // heeft de gebruiker het venster zelf een plek gegeven? Dan blijven we eraf.
+  var eigenPlek = !!(st && st.eigen);
 
   function bewaar() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  /* Waar de bovenkant van het venster hoort te beginnen. Hier stond 84 pixels,
+     een gok. De kopbalk van een app blijft op een breed scherm boven het
+     venster hangen (body > header staat op z-index 7, het venster op 6), en een
+     app met een volle balk -- titel, zoekveld en filters -- is ruim honderd-
+     tachtig pixels hoog. Dan opent het venster ONDER die balk en is de bovenste
+     regel niet aan te wijzen. We meten de balk dus gewoon. */
+  function balkOnder() {
+    var h = document.querySelector('body > header');
+    if (!h) return 84;
+    var r = h.getBoundingClientRect();
+    if (!r.height) return 84;
+    return Math.round(Math.min(r.bottom, window.innerHeight * 0.5)) + 12;
+  }
   function standaard() {
     var w = Math.min(1080, window.innerWidth - 80);
-    return { x: Math.round((window.innerWidth - w) / 2), y: 84, w: w, h: Math.min(main.scrollHeight + 80, window.innerHeight - 140) };
+    var y = balkOnder();
+    return { x: Math.round((window.innerWidth - w) / 2), y: y, w: w, h: Math.min(main.scrollHeight + 80, window.innerHeight - y - 56) };
   }
   function klem() {
     st.w = Math.max(340, Math.min(st.w, window.innerWidth - 16));
@@ -58,7 +74,7 @@
       '<span class="streep"></span><button type="button" class="herstel" aria-label="Venster terug naar het midden">Herstel</button>';
     main.appendChild(greep);
     greep.querySelector('.rtg-vollamp').addEventListener('click', function (e) { e.stopPropagation(); vol(); });
-    greep.querySelector('.herstel').addEventListener('click', function (e) { e.stopPropagation(); main.classList.remove('rtg-vol'); st = standaard(); pas(); bewaar(); });
+    greep.querySelector('.herstel').addEventListener('click', function (e) { e.stopPropagation(); main.classList.remove('rtg-vol'); st = standaard(); eigenPlek = false; pas(); bewaar(); });
     greep.addEventListener('pointerdown', sleepStart);
   }
   function sleepStart(e) {
@@ -78,7 +94,24 @@
     drag = null;
     document.removeEventListener('pointermove', sleepMove);
     document.removeEventListener('pointerup', sleepEnd);
+    st.eigen = true; eigenPlek = true;   // vanaf nu is de plek van de gebruiker
     bewaar();
+  }
+  /* De kopbalk is bij het opstarten nog niet op zijn eindmaat: de filters en de
+     teller komen pas als de gegevens binnen zijn. Meten we alleen dan, dan zet
+     het venster zich te hoog en verdwijnt de bovenste regel achter de balk.
+     Dus kijken we mee zolang de gebruiker het venster niet zelf heeft verzet. */
+  function volgKop() {
+    var kop = document.querySelector('body > header');
+    if (!kop || !window.ResizeObserver || roKop) return;
+    roKop = new ResizeObserver(function () {
+      if (!actief || drag || eigenPlek) return;
+      var y = balkOnder();
+      if (Math.abs(y - st.y) < 1) return;
+      st.y = y; st.h = Math.min(st.h, window.innerHeight - y - 56);
+      pas();
+    });
+    roKop.observe(kop);
   }
   function aan() {
     if (actief) return; actief = true;
@@ -93,6 +126,7 @@
       });
       ro.observe(main);
     }
+    volgKop();
   }
   function uit() {
     if (!actief) return; actief = false;

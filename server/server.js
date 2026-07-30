@@ -306,7 +306,7 @@ app.use(require('./meting').middleware());
 /* Het routejournaal staat ernaast en doet alleen iets met RTG_ROUTELOG gezet
    (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
    een tekstzoektocht door de tests -- zie server/routelog.js. */
-app.use(require('./routelog').middleware());
+require('./routelog');   // zet de haak in de router (alleen met RTG_ROUTELOG)
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.
 // (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het
@@ -1675,7 +1675,9 @@ const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarket
 /* De eigen boardroom per lid (kern/lidboard.js): elk lid zet zijn eigen
    functies aan/uit; een ouder/beheerder stuurt via dezelfde motor de boardroom
    van zijn beschermde kind bij (de route bewaakt het gezinsverband). */
-const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardAan, lidPadFunctie, lidBoardUit } = maakLidboard({ db, save });
+const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
+  lidBoardVersie, lidPadFunctie, lidBoardUit, lidBoardLog, lidBoardLogWis,
+  werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan } = maakLidboard({ db, save });
 
 /* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
    autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,
@@ -2141,7 +2143,10 @@ const kern = {
   mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
-  LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardAan,
+  LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
+  lidBoardVersie, lidBoardLog, lidBoardLogWis,
+  // het werkgeversbeleid op de boardroom van het lid (alleen dichtzetten)
+  werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan,
   // de autoverkoop-laag (kern/autoverkoop.js)
   AUTOVERKOOP_BRANDSTOF, avMagVerkopen, avZetAan, avZetAuto, avVerwijderAuto, avShowroom,
   avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox,
@@ -2960,6 +2965,7 @@ require('./routes/sso')(kern);
 require('./routes/scim')(kern);
 require('./routes/meting')(kern);
 require('./routes/algpin')(kern);
+require('./routes/werkbeleid')(kern);
 require('./routes/sleutelwoorden')(kern);
 require('./routes/agenda')(kern);
 require('./routes/notities')(kern);

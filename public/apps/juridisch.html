@@ -10,9 +10,10 @@
 <link rel="stylesheet" href="/shared/os.css">
 <link rel="stylesheet" href="/shared/osmenu.css">
 <script src="/apps/foundation/palet.js"></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;
-    --soft:rgba(244,241,236,0.60);--acc:var(--dag-kleur,#C23A5E);}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
+    --soft:var(--rtg-soft);--acc:var(--dag-kleur,#C23A5E);}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   .wrap{max-width:720px;margin:0 auto;padding:1.4rem 1.1rem 4rem;}
@@ -35,7 +36,7 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
-<body data-osbar="Juridisch" data-oswereld="lid" data-osterug="apps/app.html">
+<body data-osbar="Juridisch" data-oswereld="lid" data-osterug="apps/app.html" class="rtg-stijl">
 <main class="wrap" id="hoofd">
   <a class="terug" href="/apps/app.html">← naar de app</a>
   <div class="intro">

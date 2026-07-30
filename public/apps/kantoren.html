@@ -17,8 +17,9 @@
 <script src="/shared/rosthema.js" defer></script>
 <script src="/shared/rosapps.js" defer></script>
 <script src="/shared/flagship.js" defer></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}
@@ -136,7 +137,7 @@
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
 </head>
-<body data-osbar="Kantoren" data-oswereld="kantoor" data-flagship>
+<body data-osbar="Kantoren" data-oswereld="kantoor" data-flagship class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
@@ -1385,7 +1386,7 @@ async function exportLookbook(naam){
   const html = '<!doctype html><html lang="nl"><head><meta charset="utf-8">'+
     '<meta name="viewport" content="width=device-width, initial-scale=1">'+
     '<title>Lookbook '+esc(p.naam)+'</title><style>'+
-    ':root{--bg:#0C0C0B;--ink:#F4F1EC;--muted:rgba(244,241,236,.62);--soft:rgba(244,241,236,.4);--gold:#A98F1C;--line:rgba(244,241,236,.14);}'+
+    ':root{--bg:var(--rtg-bg);--ink:#F4F1EC;--muted:var(--rtg-muted);--soft:var(--rtg-soft);--gold:#A98F1C;--line:rgba(244,241,236,.14);}'+
     '*{box-sizing:border-box;margin:0;}body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.6;padding:3rem 1.4rem 5rem;}'+
     'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}'+
     '.wrap{max-width:820px;margin:0 auto;}'+
@@ -1577,7 +1578,7 @@ async function exportProductblad(naam){
   const html = '<!doctype html><html lang="nl"><head><meta charset="utf-8">'+
     '<meta name="viewport" content="width=device-width, initial-scale=1">'+
     '<title>Productblad '+esc(p.naam)+'</title><style>'+
-    ':root{--bg:#0C0C0B;--ink:#F4F1EC;--muted:rgba(244,241,236,.62);--soft:rgba(244,241,236,.4);--gold:#A98F1C;--line:rgba(244,241,236,.14);}'+
+    ':root{--bg:var(--rtg-bg);--ink:#F4F1EC;--muted:var(--rtg-muted);--soft:var(--rtg-soft);--gold:#A98F1C;--line:rgba(244,241,236,.14);}'+
     '*{box-sizing:border-box;margin:0;}body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.6;padding:3rem 1.4rem 5rem;}'+
     'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}'+
     '.wrap{max-width:820px;margin:0 auto;}'+
@@ -1750,7 +1751,7 @@ async function exportPortfolio(naam){
   const html = '<!doctype html><html lang="nl"><head><meta charset="utf-8">'+
     '<meta name="viewport" content="width=device-width, initial-scale=1">'+
     '<title>Portfolio '+esc(p.naam)+'</title><style>'+
-    ':root{--bg:#0C0C0B;--ink:#F4F1EC;--muted:rgba(244,241,236,.62);--soft:rgba(244,241,236,.4);--gold:#A98F1C;--line:rgba(244,241,236,.14);}'+
+    ':root{--bg:var(--rtg-bg);--ink:#F4F1EC;--muted:var(--rtg-muted);--soft:var(--rtg-soft);--gold:#A98F1C;--line:rgba(244,241,236,.14);}'+
     '*{box-sizing:border-box;margin:0;}body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.6;padding:3rem 1.4rem 5rem;}'+
     'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}'+
     '.wrap{max-width:820px;margin:0 auto;}'+

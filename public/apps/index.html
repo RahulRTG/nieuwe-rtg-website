@@ -13,6 +13,7 @@
 <link href="/shared/seizoen.css" rel="stylesheet">
 <link href="/shared/uitleg.css" rel="stylesheet">
 <link href="/shared/osmenu.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   :root{
     --grond:#0C0C0B; --paneel:#151312; --inkt:#F4F1EC; --lijn:rgba(255,255,255,0.09);
@@ -87,7 +88,11 @@
     box-shadow:0 10px 26px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.07);}
   @media (min-width:700px){.tegel{width:88px; height:88px; border-radius:22px; font-size:2.2rem;}}
   .app:hover .tegel{border-color:color-mix(in srgb, var(--goud) 50%, transparent);}
-  .naam{font-size:0.74rem; text-align:center; color:var(--grijs); letter-spacing:0.01em;}
+  /* Het bijschrift onder een tegel is geen regelnaam maar een label: het moet
+     smal en licht blijven, anders breekt "Lifestyle Pass" over twee regels en
+     staat het raster scheef. Daarom hier expliciet (met body.rtg-stijl ervoor,
+     anders wint de kit met zijn maat voor namen in een lijst). */
+  .naam,body.rtg-stijl .naam{font-size:0.74rem; font-weight:400; text-align:center; color:var(--grijs); letter-spacing:0.01em;}
   .foot{display:flex; gap:1.3rem; flex-wrap:wrap; margin-top:2.6rem;}
   .foot a{font-size:0.78rem; color:var(--grijs-zacht); text-decoration:none;}
   .foot a:hover{color:var(--goud);}
@@ -103,7 +108,7 @@
   .appterug svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
 </style>
 </head>
-<body>
+<body class="rtg-stijl">
 <a href="#hoofd" class="skip">Naar het bureaublad</a>
 
 <header class="bar">
@@ -118,7 +123,7 @@
 <main id="hoofd">
   <div class="demo" role="note">
     <span class="dot" aria-hidden="true"></span>
-    <p data-i18n-html="hub.demo"><b>Demo.</b> Alle functies werken. Alleen echt betalen, echte bestellingen en de RTG Boardroom zijn uit. Wissel linksonder tussen licht en donker.</p>
+    <p data-i18n-html="hub.demo"><b>Demo.</b> Alle functies werken. Alleen echt betalen, echte bestellingen en de RTG Boardroom zijn uit. Wissel bovenin tussen licht en donker.</p>
     <button class="chip" id="allesKnop" type="button" style="margin-left:auto;flex-shrink:0;" hidden>Toon alles</button>
   </div>
 
@@ -262,7 +267,7 @@ window.I18N = { en: {
   'hub.g.beleven':'Experiences', 'hub.g.handel':'Retail & trade',
   'hub.bo':'Back office', 'hub.tech':'Tech',
   'hub.juridisch':'Legal', 'hub.privacy':'Privacy',
-  'hub.demo':'<b>Demo.</b> Every function works. Only real payments, real orders and the RTG Boardroom are switched off. Toggle light and dark at the bottom left.'
+  'hub.demo':'<b>Demo.</b> Every function works. Only real payments, real orders and the RTG Boardroom are switched off. Toggle light and dark in the bar at the top.'
 } };
 </script>
 <script>

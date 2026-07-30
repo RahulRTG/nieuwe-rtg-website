@@ -47,11 +47,14 @@
     :root[data-thema="licht"] #station{background:#EFECE5;}
     :root[data-thema="licht"] #toast{background:#161310;color:#FFFFFF;}
     :root[data-thema="licht"] .vlin{color-scheme:light;background:rgba(12,12,11,0.04);}
-    .rtg-thema-knop{position:fixed;left:104px;bottom:14px;z-index:9990;display:inline-flex;align-items:center;gap:0.45rem;
+    /* De knop staat IN de balk van de pagina, niet zwevend onderin. Hij hing als
+       pil linksonder over het tegelraster heen; op het bureaublad lag hij
+       precies over de onderste rij apps. Geen zwevende knoppen meer: hij hoort
+       bij de balk waar ook het merk en het account staan. */
+    .rtg-thema-knop{display:inline-flex;align-items:center;gap:0.45rem;
       background:rgba(12,12,11,0.82);color:#fff;border:1px solid rgba(255,255,255,0.16);border-radius:999px;
       padding:0.42rem 0.85rem;font-family:'Inter',-apple-system,sans-serif;font-size:0.72rem;font-weight:600;
-      letter-spacing:0.04em;cursor:pointer;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,0.25);
-      transition:background .18s;padding-bottom:calc(0.42rem + env(safe-area-inset-bottom,0));}
+      letter-spacing:0.04em;cursor:pointer;transition:background .18s;white-space:nowrap;}
     .rtg-thema-knop:hover{background:#7F1634;border-color:#7F1634;}
     .rtg-thema-dot{width:0.7rem;height:0.7rem;border-radius:50%;border:1px solid rgba(255,255,255,0.5);}
     :root[data-thema="licht"] .rtg-thema-knop{background:rgba(251,250,247,0.9);color:#161310;border-color:rgba(20,18,16,0.2);}
@@ -63,13 +66,26 @@
   /* ---------- wisselknop, naast de taalknop ---------- */
   function bouwKnop() {
     if (document.getElementById('rtg-thema-knop')) return;
+    /* Heeft de pagina zijn eigen themakeuze (het bedieningspaneel van het
+       leden-OS heeft er een met drie kleuren), dan bouwen we er geen tweede
+       bij. Dat scheelt een knop die hetzelfde doet maar minder kan. */
+    if (document.querySelector('.os-cc-thema')) return;
     const b = document.createElement('button');
     b.id = 'rtg-thema-knop';
     b.className = 'rtg-thema-knop';
     b.setAttribute('aria-label', 'Weergave wisselen (licht/donker)');
     b.addEventListener('click', wissel);
-    document.body.appendChild(b);
+    plaats(b);
     knopBij();
+  }
+  /* Waar de knop komt te staan: in de balk van de pagina. We nemen de eerste
+     die er is; heeft een pagina er geen, dan gaat hij onderaan de inhoud staan.
+     In alle gevallen staat hij IN de bladzijde en nergens overheen. */
+  function plaats(b) {
+    const balk = document.querySelector('header.bar, body > header, .topbar, .sb-balk');
+    if (balk) { balk.appendChild(b); return; }
+    const m = document.querySelector('main') || document.body;
+    m.appendChild(b);
   }
   function knopBij() {
     const b = document.getElementById('rtg-thema-knop');

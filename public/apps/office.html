@@ -11,12 +11,13 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   /* RTG Office draagt de huisstijl, maar niet de dagkleur-was: een kantoor
      hoort een rustige, neutrale ondergrond te hebben waarop cijfers en tekst
      het werk doen. Bordeaux blijft accent, goud alleen op de hoofdknop. */
   :root{--bg:#0E0E0D;--paneel:#151413;--rail:#121110;--veld:#1C1A19;
-    --line:rgba(255,255,255,0.09);--line2:rgba(255,255,255,0.16);
+    --line:var(--rtg-line);--line2:rgba(255,255,255,0.16);
     --txt:#F2EFEA;--soft:rgba(242,239,234,0.58);--zacht:rgba(242,239,234,0.38);
     --acc:#C23A5E;--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -308,7 +309,7 @@
 <script src="/shared/glyf.js"></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
-<body>
+<body class="rtg-stijl">
 <header class="kop">
   <a href="/apps/app.html" class="terug" id="terug" aria-label="Terug">←</a>
   <h1>RTG Office</h1>

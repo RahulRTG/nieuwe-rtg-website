@@ -29,6 +29,19 @@
    een paar duizend kleine appends over een hele suite, eenmaal per patroon per
    proces.
 
+   WANNEER we noteren: op het moment dat de ROUTE MATCHT (de haak in
+   web/routing.js), niet bij 'finish' van het antwoord. Dat scheelt een
+   wedloop die echt bestond: fetch() geeft zijn Response zodra de KOPPEN
+   binnen zijn, dus een test kan al verder zijn -- en zijn server met SIGKILL
+   stoppen -- voordat de server 'finish' heeft uitgezonden. Dan was het
+   patroon nooit weggeschreven en miste het journaal een route die wel
+   degelijk is aangeroepen. Onder belasting werd dat venster groot genoeg om
+   de toets af en toe te laten omvallen.
+
+   Op matchmoment noteren is bovendien niet alleen stabieler maar ook JUISTER:
+   de vraag is "is dit endpoint aangeraakt". Een verzoek waarvan de verbinding
+   halverwege wegvalt, heeft het endpoint even goed aangeraakt.
+
    Meerdere serverprocessen schrijven in hetzelfde bestand. Dat mag: O_APPEND
    zet elke schrijfactie aan het eind, en de regels zijn kort. Een enkele
    verminkte regel bij extreme gelijktijdigheid zou een patroon missen -- een
@@ -55,26 +68,16 @@ function noteer(methode, patroon) {
   schrijf(k);
 }
 
-/* De middleware. Net als de meting op 'finish': dan pas staat req.routePatroon
-   vast (routing.js zet hem op het moment dat de route matcht).
+/* Een 4xx of 5xx telt ook mee. De vraag die dit journaal beantwoordt is "is dit
+   endpoint aangeraakt", niet "ging het goed" -- een test die bewijst dat een
+   vreemde er 403 krijgt, heeft dat endpoint wel degelijk beproefd. Dat gaat
+   vanzelf: de auth-middleware van een route is in onze router een eigen laag
+   met datzelfde pad en dezelfde methode, dus de match (en dus de notitie) is
+   al gebeurd voordat hij 401 teruggeeft.
 
-   We tellen ook een 4xx of 5xx mee. De vraag die dit journaal beantwoordt is
-   "is dit endpoint aangeraakt", niet "ging het goed" -- een test die bewijst
-   dat een vreemde er 403 krijgt, heeft dat endpoint wel degelijk beproefd. */
-function middleware() {
-  if (!bestand) return function routejournaalUit(req, res, next) { next(); };
-  return function routejournaal(req, res, next) {
-    let gedaan = false;
-    const klaar = () => {
-      if (gedaan) return;
-      gedaan = true;
-      noteer(req.method, req.routePatroon);
-    };
-    res.on('finish', klaar);
-    res.on('close', klaar);
-    next();
-  };
-}
+   Er is geen middleware meer. Die hing op 'finish' en moest dus wachten tot
+   het antwoord de deur uit was; de haak in web/routing.js noteert op het
+   moment dat de route matcht. Dat scheelt een laag op elk verzoek. */
 
 /* Aanzetten gebeurt bij het laden, uit de omgeving. Als losse functie zodat de
    test hem kan aansturen zonder een serverproces te starten. */
@@ -82,6 +85,9 @@ function begin(pad) {
   bestand = pad ? String(pad) : null;
   gezien.clear();
   stuk = false;
+  // aan de router hangen we onszelf alleen als er echt een journaal is: staat
+  // het uit, dan is er geen haak en kost dit de router helemaal niets
+  try { require('./web/routing').opPatroon(bestand ? noteer : null); } catch (e) { /* zonder router ook goed */ }
   return !!bestand;
 }
 begin(process.env.RTG_ROUTELOG);
@@ -99,4 +105,4 @@ function lees(pad) {
   return uit;
 }
 
-module.exports = { middleware, noteer, begin, lees, aan: () => !!bestand };
+module.exports = { noteer, begin, lees, aan: () => !!bestand };

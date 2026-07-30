@@ -28,6 +28,16 @@ server/            Node.js/Express-backend + data (db.json, rtg.db, sleutels, up
 
 Er is geen losse marketingsite meer: `/` toont direct het RTG OS-bureaublad (`/apps/index.html`); wie nog niet is aangemeld ziet daar de welkomstkaart (het gratis RTG-abonnement is de minimale ingang). Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
 
+### Eén vormtaal: de UI-kit (`shared/rtg-ui.css`)
+
+Elke ROS-app schreef zijn eigen kaart, eigen knop en eigen melding: honderdtachtig keer bijna hetzelfde, met net andere randen, hoeken en grijstinten. **`public/shared/rtg-ui.css`** is nu de maat. Hij is letterlijk de vormtaal van de boardroom (`apps/boardroom.html`), tot onderdelen gemaakt: een donkere kaart met een fijne rand, een kapitaaltjes-kopje erboven, rijen gescheiden door haarlijnen, pilknoppen, en één accent dat met de dagkleur meeademt.
+
+- **De tokens** (`--rtg-bg/card/card2/line/txt/muted/soft/goud/acc/rond`) staan op één plek. Alle app-pagina's verwijzen ernaar, dus één hairline-grijs en één kaartkleur voor de hele familie in plaats van drie varianten per waarde.
+- **De onderdelen** heten `rtg-`: `.rtg-wrap`, `.rtg-intro`, `.rtg-groep` (+ `h2`, `.rtg-uitleg`), `.rtg-rij` (+ `.rtg-naam`, `.rtg-sub`), `.rtg-knop` (`.vol` = primair/goud), `.rtg-veld`, `.rtg-sw` (een echte `role="switch"`), `.rtg-merk`, `.rtg-melder` (`.goed`/`.let`/`.fout`), `.rtg-leeg`, `.rtg-logrij`. Nieuwe schermen gebruiken deze direct.
+- **De overstap-laag** vangt de bestaande woordenschat op. De pagina's delen al jaren `.kaart`, `.knop`, `.rij`, `.veld`, `.kop`, `.stil`, `.leeg`, `.melding` — alleen tekende elke pagina ze zelf. Zet `class="rtg-stijl"` op de `<body>` en die namen krijgen de vormtaal van de boardroom; de HTML en het JavaScript blijven ongemoeid, dus er hoeven geen classe-namen in honderden string-sjablonen om. Daarna kan de pagina zijn eigen kaart-, knop- en veldregels weggooien.
+
+De kit staat vóór de eigen `<style>` van een pagina en gebruikt nergens `!important`: wie iets echt anders nodig heeft, overschrijft gewoon.
+
 ### Modulebeleid: behapbare bestanden van ~5-10KB
 
 De bron is opgeknipt in modules van grofweg 5 tot 10KB, op twee manieren:
@@ -623,9 +633,61 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 
 ## De app (PWA)
 
-**apps/app.html** is de RTG-app als installeerbare web-app (PWA, met `manifest.webmanifest` + `sw.js`): mobiele app-schil met tabbalk (Home, Reizen, Betalen met Face ID, AI en De Salon), draaiend op dezelfde backend als de site. Open op een telefoon en kies "Zet op beginscherm" om te installeren.
+**apps/app.html** is de RTG-app als installeerbare web-app (PWA, met `manifest.webmanifest` + `sw.js`), draaiend op dezelfde backend als de site. Open op een telefoon en kies "Zet op beginscherm" om te installeren.
+
+### Het beginscherm: vier lagen, één scherm
+
+De app is een besturingssysteem (het "ROS"). Het beginscherm heeft vier lagen, van boven naar beneden, en verder niets:
+
+1. **De mappen met apps** — vier mappen (Reizen, Geld, De Salon, Het Huis). Alles waar je pas je recht op geeft zit er al in; je hoeft niets te installeren. Een tik opent de map, een tik op een app opent hem schermvullend.
+2. **De ronde RTG-klok**, in het midden — hetzelfde horloge als op het inlogscherm (`shared/klok.js`, `data-rtg-klok="ring"`).
+3. **De functierij**: Bellen, Berichten, Videobellen en je **Wallet**. Deze vier staan vast en kunnen niet uit.
+4. **De balk van Rahul**. Typ wat je wilt: is het iets dat het OS zelf kan ("open Reizen", "donker", "zoek villa", "hernoem Geld naar Bank"), dan gebeurt het meteen en blijf je thuis; al het andere gaat naar Rahul, wiens app opent met je vraag erin.
+
+Het beginscherm scrolt niet en heeft geen tweede blad: de maat-eenheid `--e` groeit met het venster mee, zodat hetzelfde beeld op telefoon, tablet en computer past.
+
+Openen en sluiten is één beweging: **inlogscherm → app openen → sluiten → beginscherm.** Sluiten kan met de terugknop linksboven, met een tik op de home-indicator onderin, of door omhoog te vegen op die indicator.
+
+Wat je niet wilt zien, zet je uit in de **Boardroom** (bedieningspaneel → Boardroom). Die werkt andersom dan een App Store: alles staat aan, jij zet uit. De keuze staat per pas in `localStorage` (`rtg_os_uit_<pas>`).
+
+De statusbalk houdt drie dingen vast: batterij, de bel en het bedieningspaneel. Scannen, je Zegel tonen en je backoffice zitten in dat paneel.
+
+### De wallet en de ledenpas
+
+**apps/wallet.html** is alles wat je bij je draagt. Bovenaan ligt je **ledenpas**: codenaam, lidnummer, welke pas en een QR met je lidnummer (onze eigen codec, `shared/qr.js` + `shared/qrteken.js`). Daaronder je passen, tickets, sleutels, feestmunten en klantenkaarten (`/api/wallet`, `server/kern/wallet.js`). De pas stond vroeger op het beginscherm van de app; daar staat nu de klok.
 
 **Codenaam (privacy by design):** elke klant krijgt een codenaam (bijv. *Zilveren Valk*). Reserveringen, betalingen en reisdata staan in de systemen op de codenaam; de echte naam ligt in een gescheiden kluis en wordt pas bij ticketing/check-in gekoppeld. Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam.
+
+### De boardroom van het lid
+
+**apps/boardroom.html** (`server/kern/lidboard/`) is het schakelbord van het lid zelf: 22 functies in vier groepen (app-onderdelen, privacy & sociaal, AI & meldingen, verbindingen). Er is er **één**, en die staat op de server — de stand reist mee naar elk toestel en de app spiegelt hem, hij bewaart geen tweede lijstje. Bereikbaar via het bedieningspaneel in de app.
+
+Wat het bord bestuurt, bestuurt het ook echt:
+
+- **Handhaving.** Een uitgezette functie zet ook zijn API dicht (`lidPadFunctie` + `lidBoardUit`, gecontroleerd in `server.js` vóór de routes). Zet je "Spelen" uit, dan geeft `/api/member/spel` 403 — en verdwijnt de tegel van je beginscherm. Een tegel die je kunt openen en die daarna weigert, is erger dan geen tegel.
+- **Privacy by design.** Alles wat gegevens *deelt* (locatie, GPS, paspoort delen, Bluetooth) staat standaard **uit**; de rest staat aan. "Terug naar standaard" herstelt precies dat, en is dus iets anders dan "alles aan".
+- **Beheerd door RTG.** Zet de platform-schakelkast (`server/functies`) een functie globaal of voor jouw pas uit, dan toont het bord hem als *beheerd* met de reden erbij, en weigert het schakelen. Een schakelaar die niets doet is een leugen.
+- **Vast.** Sommige functies kunnen niet uit (je wallet met de ledenpas): zet je die uit, dan kun je hem daarna niet meer aanzetten omdat het scherm met de knop weg is. Dat is geen keuze maar een val. Het bord markeert ze `vast`, en bulk-acties slaan ze stil over.
+- **Versie.** Elk bord telt zijn wijzigingen. Wie schakelt mag zijn versie meesturen; klopt die niet meer, dan volgt een 409 mét het verse bord in plaats van dat de wijziging van je andere toestel stilzwijgend wordt overschreven.
+- **In één keer.** `zetveel` en `herstel` zijn alles-of-niets: eerst valideren, dan schrijven, één versie-stap, één regel in het journaal. Een bord blijft nooit half om.
+- **Een spoor.** Elke omzetting komt in het journaal (`db.data.ledenBoardLog`, max 200 per bord): wat er omging, van welke stand naar welke, door wie (`lid` of `ouder`) en vanwaar. Zichtbaar onderaan de app, meegenomen in de AVG-export, en gewist bij "verwijder mijn gegevens". Zonder spoor is "wie heeft dat uitgezet?" onbeantwoordbaar — en bij een kind is het antwoord vaak "een ouder".
+- **Een rem.** Dertig schakelingen per minuut per account; daarboven 429. Elke omzetting schrijft de database weg, dus een lus zonder rem is een schrijfstorm.
+
+**Ouderlijk beheer:** een ouder/beheerder stuurt via dezelfde motor de boardroom van zijn beschermde kind bij (RTF-handle als sleutel, `/api/rtf/social/kind/boardroom*`). De voogd-check houdt een vreemde ouder buiten, functies die niet bij een kind horen (paspoort, Pay, Care) staan niet op het kinder-bord, en wat de ouder omzet staat als `door: 'ouder'` in het journaal van het kind.
+
+**Werkgeversbeleid (Business Pass).** Een bedrijf dat passen voor zijn mensen neemt, moet kunnen zeggen welke functies op die passen dicht staan — compliance, geheimhouding, of gewoon een keuze. Dat kan via `/api/supplier/werkbeleid{,/zet}`, achter de zaak-inlog. Eén regel maakt dit veilig en is niet configureerbaar:
+
+> **Een werkgever kan alleen dichtzetten, nooit openzetten.**
+
+Er is dus geen "verplicht aan" — de API kent die vorm niet. Een werkgever kan een medewerker niet dwingen zijn locatie te delen, zijn GPS aan te zetten of zijn paspoort beschikbaar te stellen: de enige richting waarin hij die knoppen kan bewegen is dicht, en dat is voor de medewerker altijd de veilige kant. Wat de werkgever níet dichtzet, blijft van de medewerker zelf; het beleid is een bovengrens, geen dictaat over de rest. De basis van het toestel (je wallet met je ledenpas, `vast:true`) blijft buiten zijn bereik.
+
+Het bedienen gebeurt in de **eigen boardroom van de zaak** (`/apps/leverancier.html` → Boardroom), onder *Werkbeleid op de passen van uw mensen*: een chip per functie, groen = de medewerker beslist zelf, rood = wij hebben hem dicht gezet, met de regel er in gewone taal boven. Een chip omzetten stuurt de vólledige dicht-lijst terug, niet een los aan/uit — dan kan een half mislukt verzoek nooit een beleid achterlaten dat niemand zo bedoeld heeft.
+
+De koppeling lid ↔ werkgever zijn de rollen aan het ene RTG-account (`kern/eenaccount`): een `personeel`- of `zaak`-rol wijst een zaak-code aan. Werk je voor twee bedrijven, dan gelden beide beleiden opgeteld — de strengste wint. Wat dicht staat, staat op je eigen bord met de **naam van het bedrijf** erbij (`beheerdDoor: 'werkgever'`), en gaat ook echt dicht op de API: anders was het beleid een grijze knop en verder niets.
+
+**Taal.** De labels van dit bord komen van de server (ze staan in de catalogus, niet in de pagina), dus `bord()` krijgt de taal mee en `kern/lidboard/talen.js` levert de vertaling; een onbekende taal valt terug op Engels, een ontbrekende sleutel op het Nederlands. De pagina zelf gebruikt de gewone i18n-laag (`window.I18N` + `shared/i18n.js`) en haalt bij een taalwissel (`rtglang`) het bord opnieuw op.
+
+API: `/api/member/boardroom{,/zet,/zetveel,/herstel,/logboek}` en `/api/supplier/werkbeleid{,/zet}`. Getoetst in `test/lidboard.test.js` (21 toetsen: standaarden, handhaving, voogdij, versie-botsing, bulk, herstel, journaal, export, rem, beheerd-door-RTG, vergetelheid, taal en het werkgeversbeleid).
 
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 

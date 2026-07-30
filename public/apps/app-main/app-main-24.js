@@ -34,7 +34,9 @@
     hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
     entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
-    rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' }
+    rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' },
+    // De wallet draagt je ledenpas; hij staat in de functierij onder de klok.
+    wallet:      { naam: 'Wallet',        url: '/apps/wallet.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -45,8 +47,7 @@
     bellen:      { naam: 'Bellen' },
     videobellen: { naam: 'Videobellen' },
     snaps:       { naam: 'Snaps' },
-    rtf:         { naam: 'RTFoundation' },
-    store:       { naam: 'App Store' }
+    rtf:         { naam: 'RTFoundation' }
   };
   const RTF_GROEPEN = [
     { g: 'mini',   naam: 'RTF Mini',      sub: '0 t/m 4 jaar' },
@@ -55,29 +56,43 @@
     { g: 'jong',   naam: 'RTF Jong',      sub: '16 t/m 21+' },
     { g: 'volw',   naam: 'RTF Volwassen', sub: 'ouders en verzorgers' }
   ];
-  /* ---------- de ROS als telefoon: alleen de basis + de App Store ----------
-     Standaard staan alleen de "telefoon-apps", de RTFoundation en de App Store
-     op het beginscherm; de drie RTG-kern-tabs (Betalen, Rahul, De Salon) zitten
-     in het dock. Al het andere leeft in de App Store en verschijnt op pagina 2
-     zodra je het installeert (keuze per pas in localStorage). */
-  const STANDAARD = ['os:bellen', 'os:videobellen', 'os:snaps', 'link:berichten',
-    'link:camera', 'link:navigatie', 'link:muziek', 'os:rtf', 'os:store'];
-  // pagina 1 = de vaste basis; pagina 2 = geïnstalleerde apps (begint leeg,
-  // wordt door bouw() gevuld uit de installatiekeuze).
-  const INDELING = [STANDAARD.slice(), []];
+  /* ---------- de functierij, onder de klok ----------
+     Bellen, berichten, videobellen en je wallet: de vier dingen die je zonder
+     nadenken moet kunnen pakken. Ze staan vast en kunnen niet uit. */
+  const FUNCTIES = ['os:bellen', 'link:berichten', 'os:videobellen', 'link:wallet'];
 
-  /* De App Store-catalogus: alle diensten die je erbij kunt zetten, netjes
-     gegroepeerd. De Store filtert zelf op wat echt bestaat (itemZichtbaar) en,
-     voor de premium-suite, op de pas. */
-  const WINKEL_GROEPEN = [
-    { titel: 'Reizen & onderweg', items: ['tab:reizen', 'link:ov', 'link:vluchten', 'link:flits', 'link:stad', 'tab:terplaatse'] },
-    { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:rtgcode', 'link:office'] },
-    { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:krant', 'link:sport'] },
-    { titel: 'Het huis & diensten', items: ['link:ontdek', 'link:school', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:labfonds', 'link:juridisch', 'link:passkeys', 'os:werk'] },
-    { titel: 'Onderneem: eigen website & het RTG-web', items: ['link:sitemaker', 'link:browser'] },
-    { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],
-      items: ['link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous'] }
+  /* ---------- de mappen, boven de klok ----------
+     Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets
+     installeren: het staat er al. Wil je iets niet zien, dan zet je het uit
+     in de Boardroom (die zet het uit, hij hoeft het niet aan te zetten).
+
+     Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
+     een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
+     vallen er vanzelf uit (itemZichtbaar). */
+  const MAPPEN = [
+    { sleutel: 'map-reizen', naam: 'Reizen', items: [
+      'tab:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie', 'link:maison'] },
+    { sleutel: 'map-geld', naam: 'Geld', items: [
+      'tab:betalen', 'tab:bestellen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
+      'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat', 'link:nalatenschap', 'link:logboek'] },
+    { sleutel: 'map-salon', naam: 'De Salon', items: [
+      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
+      'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
+      'link:krant', 'link:sport', 'link:cercle', 'link:entourage', 'link:rendezvous',
+      'link:attenties', 'link:table', 'link:cellier', 'link:garderobe'] },
+    { sleutel: 'map-huis', naam: 'Het Huis', items: [
+      'link:ontdek', 'os:rtf', 'link:school', 'tab:zorg', 'tab:gezin', 'link:rechterhand',
+      'link:office', 'link:browser', 'link:sitemaker', 'link:juridisch', 'link:passkeys',
+      'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:vitaal', 'link:thuisrust', 'os:werk'] }
   ];
+
+  /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
+     Business. De registry kent de apps voor iedereen; hier staat wie ze mag
+     zien, zodat een RTG-pas ze niet in zijn mappen of in Spotlight tegenkomt. */
+  const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
+    'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
+  const premiumPas = pas === 'lifestyle' || pas === 'business';
 
   /* ---------- Werk op het OS + de algemene pin ----------
      De werk-apps zijn gewone apps op het RTG-OS: een tik op "Werk" toont de
@@ -86,10 +101,9 @@
      privacygevoelige apps op dit OS beschermt. Onder water munt
      /api/account/start de werksessie, dus alle regels (zoals het werkvenster
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
-     OSAPPS/INDELING/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
+     OSAPPS/MAPPEN/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
   OSAPPS.werk = { naam: 'Werk' };
-  // Werk zit in de App Store (categorie "Het huis & diensten"); installeer je
-  // het, dan verschijnt het op pagina 2 en opent het met de algemene pin.
+  // Werk staat in de map "Het Huis" en opent met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
   for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
 

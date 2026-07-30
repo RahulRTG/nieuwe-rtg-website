@@ -42,10 +42,14 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [reg.token]);
     await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
-    await page.waitForSelector('#zegelBtn', { timeout: 15000 });
+    // Sinds het OS-beginscherm zit "Toon je Zegel" in het bedieningspaneel en
+    // niet meer als los knopje in de statusbalk; de knop zelf blijft het model.
+    await page.waitForSelector('#zegelBtn', { state: 'attached', timeout: 15000 });
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
 
-    await page.click('#zegelBtn');
+    await page.click('#osCcBtn');
+    await page.waitForSelector('#osCcZegel', { state: 'visible', timeout: 8000 });
+    await page.click('#osCcZegel');
     await page.waitForSelector('.zg-ov', { timeout: 8000 });
     // 18+ staat standaard aangevinkt; toon de Zegel
     await page.click('#zgMaak');

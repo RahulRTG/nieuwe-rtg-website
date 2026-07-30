@@ -91,7 +91,12 @@ test('flitsduel: zelfde sommen, buiten de beurt, de meeste goed wint', async () 
   assert.ok(nieuw.id, 'het duel start met een klasgenoot');
   const uitn = await json(await spel('mijn', {}, B));
   assert.ok(uitn.uitnodigingen.some(u => u.id === nieuw.id && u.van === aCn), 'B ziet de uitdaging van A');
-  await spel('antwoord', { id: nieuw.id, akkoord: true }, B);
+  /* Het antwoord van B ook echt NAKIJKEN. Zonder dit is een mislukte accept
+     onzichtbaar en struikelt de test pas drie regels verder over een potje
+     dat nog in 'wacht' staat, met een nietszeggende TypeError. */
+  const acc = await json(await spel('antwoord', { id: nieuw.id, akkoord: true }, B));
+  assert.equal(acc.ok, true, 'B neemt de uitdaging aan: ' + JSON.stringify(acc));
+  assert.equal(acc.gestart, true, 'en daarmee begint het potje: ' + JSON.stringify(acc));
   // A rekent alles goed (de som staat als tekst in de eigen weergave),
   // B beantwoordt alles fout; niemand hoeft op een beurt te wachten
   const reken = t => { const [x, op, y] = t.split(' '); const a = +x, b = +y;
@@ -134,4 +139,34 @@ test('reactieduel: laagste totaaltijd wint en een valse start kost 1500 ms', asy
   const cheat = await json(await spel('zet', { id: test2.id, zet: { actie: 'tik', ms: 3 } }, B));
   assert.equal(cheat.ms, 1500, 'onder de menselijke ondergrens = straftijd');
   await spel('opgeven', { id: test2.id }, B);
+});
+
+test('flitsduel: honderd potjes starten allemaal (geen lege trekking in een som)', async () => {
+  /* Deze toets bestaat om een echte fout. De plus-som trok zijn tweede term
+     uit [11, 99 - a], met a tot en met 89 -- en bij a=89 is dat bereik leeg.
+     crypto.randomInt gooit daar op, midden in het opzetten van het potje, dus
+     ongeveer drie op de honderd Flitsduels vielen om met "Er ging iets mis".
+     In de suite zag je dat als een toets die af en toe omviel; voor een tiener
+     was het een duel dat soms gewoon niet begon.
+
+     Honderd potjes achter elkaar: bij drie procent per potje is de kans dat
+     dit ongemerkt blijft verwaarloosbaar (0,97^100 is ongeveer 5%... en dat
+     alleen als de fout er nog in zou zitten). We toetsen bovendien de sommen
+     zelf: elk antwoord moet kloppen met de tekst. */
+  const reken = t => { const [x, op, y] = t.split(' '); const a = +x, b = +y;
+    return op === '+' ? a + b : op === '-' ? a - b : op === 'x' ? a * b : a / b; };
+  // via de echte server, zodat we de motor toetsen die ook draait
+  for (let potje = 0; potje < 100; potje++) {
+    const kg = await json(await spel('klasgenoten', {}, A));
+    const nieuw = await json(await spel('nieuw', { soort: 'flits', grootte: 2, klasgenoten: [kg.klasgenoten[0].key] }, A));
+    if (nieuw.error === 'Rustig aan met uitnodigen.') break;   // het uitnodig-budget: dan is het bewijs geleverd
+    assert.ok(nieuw.id, 'potje ' + potje + ' start: ' + JSON.stringify(nieuw));
+    const acc = await json(await spel('antwoord', { id: nieuw.id, akkoord: true }, B));
+    assert.equal(acc.gestart, true, 'potje ' + potje + ' begint echt: ' + JSON.stringify(acc));
+    const st = await json(await spel('staat', { id: nieuw.id }, A));
+    assert.ok(st.potje.staat && st.potje.staat.som, 'potje ' + potje + ' heeft een som');
+    assert.equal(Number.isFinite(reken(st.potje.staat.som)), true,
+      'de som is te lezen: ' + st.potje.staat.som);
+    await spel('opgeven', { id: nieuw.id }, A);
+  }
 });

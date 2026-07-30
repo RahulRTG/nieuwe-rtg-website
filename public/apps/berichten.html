@@ -11,9 +11,10 @@
 <meta name="apple-mobile-web-app-title" content="Berichten">
 <link href="/fonts/fonts.css" rel="stylesheet">
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
-    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:5.5rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
@@ -28,16 +29,34 @@
   .filters{display:flex;gap:.4rem;margin-top:.6rem;overflow-x:auto;padding-bottom:.15rem;}
   .filters button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .8rem;font:inherit;font-size:.76rem;white-space:nowrap;cursor:pointer;}
   .filters button[aria-pressed="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  /* Deze kopbalk draagt drie regels: titel, zoekveld en filters. Hij blijft
+     bovenaan plakken, dus elke millimeter gaat af van de gesprekken eronder.
+     De kit rekent .kop als een royale PAGINAkop; hier is het een balk. We
+     zeggen dat expliciet (met body.rtg-stijl ervoor, anders wint de kit) en
+     houden hem compact -- dat scheelt vijftig pixels. */
+  body.rtg-stijl header .kop{margin-bottom:0;}
+  body.rtg-stijl header h1{font-size:1.35rem;}
+  body.rtg-stijl header #zoekveld{font-size:.85rem;padding:.5rem .7rem;}
   main{padding:1.1rem;max-width:680px;margin:0 auto;}
-  .rijk{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.8rem .9rem;margin-bottom:.6rem;transition:border-color .15s;text-decoration:none;color:inherit;width:100%;text-align:left;font:inherit;cursor:pointer;}
+  /* een regel waar je naartoe springt, mag niet onder de plakkende balk
+     verdwijnen; deze marge houdt hem eronder vandaan */
+  .rijk{scroll-margin-top:11rem;display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.8rem .9rem;margin-bottom:.6rem;transition:border-color .15s;text-decoration:none;color:inherit;width:100%;text-align:left;font:inherit;cursor:pointer;}
   .rijk:hover{border-color:var(--gold);}
-  .rijk .ic{font-size:1.4rem;width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex-shrink:0;}
+  .rijk .ic{font-size:1.4rem;width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex-shrink:0;overflow:hidden;}
+  .rijk .ic .rtg-glyf{width:1.3rem;height:1.3rem;color:var(--gold);}
+  .rijk .ic .mono{font-family:'Bodoni Moda',serif;font-size:1.05rem;font-weight:500;color:var(--gold);}
   .rijk .b{flex:1;min-width:0;}
   .rijk .nm{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.4rem;}
   .rijk .lt{font-size:.82rem;color:var(--soft);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .rijk .tijd{font-size:.7rem;color:var(--soft);white-space:nowrap;}
   .badge{background:var(--burgundy);color:#fff;font-size:.66rem;border-radius:999px;padding:.08rem .45rem;}
   .merk{font-size:.62rem;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.02rem .4rem;}
+  /* De gespreksregel en de drie beheerknopjes (vast/stil/archief) staan naast
+     elkaar. De regel stond op width:100% en duwde de knopjes het scherm af: op
+     de telefoon was "archiveren" niet te raken. Nu deelt de regel de ruimte en
+     mag hij krimpen (min-width:0), en houden de knopjes hun maat. */
+  .krij{display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem;}
+  .krij > .rijk{flex:1;min-width:0;width:auto;margin-bottom:0;}
   .beheer{display:flex;gap:.3rem;flex-shrink:0;}
   .beheer button{background:none;border:1px solid var(--line);color:var(--soft);border-radius:9px;width:1.9rem;height:1.9rem;font-size:.72rem;cursor:pointer;}
   .beheer button[aria-pressed="true"]{color:var(--gold);border-color:var(--gold);}
@@ -76,7 +95,7 @@
 <script src="/shared/desktopframe.js" defer></script>
 <script src="/shared/realtime.js" defer></script>
 </head>
-<body>
+<body class="rtg-stijl">
 <header>
   <div class="kop">
     <div><div class="ey">Alles op een plek</div><h1>Berichten</h1></div>
@@ -126,6 +145,15 @@ async function api(pad,body){
 }
 function toon(html){ $('#main').innerHTML=html; }
 
+/* De server geeft bij elk kanaal een GLYFNAAM mee ('berichten', 'ster',
+   'gebouw'). Die stond hier gewoon als tekst in het vakje: de woorden
+   "berichten" en "ster" liepen dwars over de gesprekken heen. Nu tekenen we het
+   glyf uit de gedeelde set, en is dat er niet, dan een monogram in Bodoni. */
+function glyf(naam,titel){
+  if(window.RTGGlyf&&RTGGlyf.heeft(naam)) return RTGGlyf.svgHTML(naam);
+  return '<b class="mono">'+esc(String(titel||'?').trim().charAt(0).toUpperCase())+'</b>';
+}
+
 /* ---------- 1. de lijst ---------- */
 function tekenFilters(){
   $('#filters').innerHTML=SOORTEN.map(([id,label])=>
@@ -151,8 +179,8 @@ async function laad(){
       ? '<button class="rijk" type="button" data-open="'+esc(k.key)+'" data-naam="'+esc(k.titel)+'">'
       : '<a class="rijk" href="'+esc(k.link)+'">';
     const eind = k.soort==='dm' ? '</button>' : '</a>';
-    return '<div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem;">'+
-      knop+'<span class="ic">'+esc(k.icoon)+'</span><span class="b"><span class="nm">'+esc(k.titel)+
+    return '<div class="krij">'+
+      knop+'<span class="ic">'+glyf(k.icoon,k.titel)+'</span><span class="b"><span class="nm">'+esc(k.titel)+
       (k.vast?' <span class="merk">vast</span>':'')+(k.stil?' <span class="merk">stil</span>':'')+
       (k.stemming?' '+esc(k.stemming):'')+
       (k.ongelezen&&!k.stil?' <span class="badge">'+k.ongelezen+'</span>':'')+
@@ -322,6 +350,7 @@ document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !OPEN)
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/aibalk.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
+<script src="/shared/glyf.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>

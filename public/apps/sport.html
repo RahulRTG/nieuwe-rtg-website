@@ -11,9 +11,10 @@
 <meta name="apple-mobile-web-app-title" content="Sport">
 <link href="/fonts/fonts.css" rel="stylesheet">
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
-    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3.5rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
@@ -58,7 +59,7 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
-<body>
+<body class="rtg-stijl">
 <header><div class="ey">Alle uitslagen, standen en tickets</div><h1>RTG Sport</h1></header>
 <main>
   <div class="tabs" id="tabs">

@@ -532,6 +532,7 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
   ];
   const MAG_ZONDER = new Map([
     ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
+    ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verhuur/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verkoop/showroom', 'de showroom bekijken; er gebeurt nog niets'],

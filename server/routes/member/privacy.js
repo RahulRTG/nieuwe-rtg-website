@@ -8,7 +8,8 @@ const maakVergeten = require('../../kern/vergeten');
 
 module.exports = (kern) => {
   const { app, auth, db, save, stateFor, myApplications, ordersVanKlant, accounts,
-    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg, liveCodename } = kern;
+    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg, liveCodename,
+    lidBoard, lidBoardLog } = kern;
   const { wisLid } = maakVergeten(kern);
 
   app.post('/api/privacy/export', auth, (req, res) => {
@@ -33,6 +34,14 @@ module.exports = (kern) => {
       guestChats: chats,
       likedPosts: likes,
       notifications: db.data.notifications[key] || [],
+      /* Uw boardroom hoort in dit dossier. Die knoppen bepalen of uw locatie
+         gedeeld wordt, of uw paspoort opvraagbaar is en of u vindbaar bent:
+         dat is niet zomaar een voorkeur, dat is de instelling waarmee u uw
+         eigen gegevensdeling regelt. Het journaal erbij, want anders zou een
+         export wel de huidige stand tonen maar niet wie hem heeft gezet -- en
+         bij een kind is dat een ouder. */
+      boardroom: typeof lidBoard === 'function' ? lidBoard(key) : null,
+      boardroomLogboek: typeof lidBoardLog === 'function' ? lidBoardLog(key, 200) : [],
       // wie er in uw identiteitsdossier heeft gekeken, en waarom
       inzageInUwDossier: req.session.account ? inzagelog.voorBetrokkene(req.session.account.id) : []
     });

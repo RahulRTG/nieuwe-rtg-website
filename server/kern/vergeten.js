@@ -21,7 +21,7 @@
    pas apart, want een Lifestyle-lid heeft takken die een RTG-lid niet heeft. */
 module.exports = function maakVergeten(kern) {
   const { db, save, accounts, sessions, forgetSession, fs, path, UPLOAD_DIR,
-    broadcastSync, gidsWeg, liveCodename } = kern;
+    broadcastSync, gidsWeg, liveCodename, lidBoardLogWis } = kern;
 
   /* Wist dit lid definitief. Geeft niets terug; de aanroeper antwoordt. */
   function wisLid(sessie) {
@@ -73,8 +73,15 @@ module.exports = function maakVergeten(kern) {
       'clipsVolg',          // wie u volgt
       'lifestyle',          // uw rechterhand-voorkeuren
       'ontmoetVoorkeur', 'ontmoetPosities',   // Salon-ontmoetingen en uw positie daarin
-      'accountRollen'       // uw koppelingen aan werkplekken
+      'accountRollen',      // uw koppelingen aan werkplekken
+      'ledenBoard'          // uw eigen boardroom: wat u wel en niet deelt
     ]) { if (db.data[tak]) delete db.data[tak][key]; }
+    /* En het journaal van die boardroom. Dat staat apart omdat het geen tak op
+       de sleutel is maar een eigen lijst; het hoort er wel bij, want het legt
+       vast WIE welke knop zette -- bij een kind is dat een ouder. Blijft het
+       staan na "verwijder mijn gegevens", dan houden we een spoor van iemand
+       die er niet meer is. */
+    if (typeof lidBoardLogWis === 'function') lidBoardLogWis(key);
     /* De bel van de zaak. Daar staat na een bestelling of een cadeaukaart een
        regel als "<codenaam> kocht ...", en die codenaam is precies waarmee dit
        lid weer terug te vinden is. De zaak mag haar eigen administratie houden,

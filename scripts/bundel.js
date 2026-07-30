@@ -24,6 +24,7 @@ const PUB = path.join(__dirname, '..', 'public');
 // gesorteerd samengevoegd (vandaar de NN- prefix), en rauw aaneengeplakt zodat
 // het resultaat exact de oorspronkelijke bron is.
 const bundels = {
+  'apps/boardroom.js': 'apps/boardroom',
   'apps/foundation/samen.js': 'apps/foundation/samen',
   'apps/rtg-protect.js': 'apps/rtg-protect',
   'apps/werkplek-bureaus.js': 'apps/werkplek-bureaus',
@@ -34,6 +35,7 @@ const bundels = {
   'shared/handenvrij-scherm.js': 'shared/handenvrij-scherm',
   'shared/werkblad.js': 'shared/werkblad',
   'shared/mond.js': 'shared/mond',
+  'shared/rahulpoort.js': 'shared/rahulpoort',
   'shared/geluid.js': 'shared/geluid',
   'shared/handenvrij-bureau.js': 'shared/handenvrij-bureau',
   'shared/handenvrij-balk.js': 'shared/handenvrij-balk',

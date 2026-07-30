@@ -5,7 +5,8 @@
   if (hernoemIn) hernoemIn.addEventListener('keydown', e => { if (e.key === 'Enter' && hernoemOk) hernoemOk.click(); });
 
   /* ---------- overlays: gedeeld sluiten ---------- */
-  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim'].map(s => $(s)).filter(Boolean);
+  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim']
+    .map(s => $(s)).filter(Boolean);
   function sluitScrims() { scrims.forEach(s => s.classList.remove('open')); }
   scrims.forEach(s => s.addEventListener('click', e => { if (e.target === s) sluitScrims(); }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { sluitScrims(); zetWiebel(false); } });
@@ -13,11 +14,13 @@
   /* ---------- zoeken (Spotlight) ---------- */
   const zoekScrim = $('#osZoekScrim'), zoekInput = $('#osZoekInput'), zoekLijst = $('#osZoekLijst');
   function alleItems() {
-    const uit = [];
-    INDELING.flat().forEach(it => {
-      if (typeof it === 'string') { if (itemZichtbaar(it)) uit.push({ item: it, uit: null }); }
-      else it.items.forEach(sub => { if (itemZichtbaar(sub)) uit.push({ item: sub, uit: mapNaam(it) }); });
-    });
+    const uit = [], gezien = new Set();
+    const voeg = (item, map) => {
+      if (gezien.has(item) || !itemZichtbaar(item)) return;
+      gezien.add(item); uit.push({ item: item, uit: map });
+    };
+    FUNCTIES.forEach(it => voeg(it, null));
+    MAPPEN.forEach(mp => mp.items.forEach(sub => voeg(sub, mapNaam(mp))));
     return uit;
   }
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
@@ -104,8 +107,6 @@
     }
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
-  const zoekPil = $('#osZoekPil');
-  if (zoekPil) zoekPil.addEventListener('click', openZoek);
   if (zoekInput) zoekInput.addEventListener('input', zoek);
 
   /* ---------- bedieningspaneel ---------- */
@@ -130,6 +131,14 @@
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
   const ccZoek = $('#osCcZoek');
   if (ccZoek) ccZoek.addEventListener('click', openZoek);
+  /* Scannen, je Zegel en je backoffice zaten als losse knopjes in de
+     statusbalk; die staat nu leeg op de bel en dit paneel na. De knoppen zelf
+     blijven het model -- we klikken ze hier gewoon aan. */
+  [['#osCcScan', '#scanBtn'], ['#osCcZegel', '#zegelBtn'], ['#osCcBo', '#boBtn']].forEach(([tegel, knop]) => {
+    const t = $(tegel), k = $(knop);
+    if (t && k) t.addEventListener('click', () => { sluitScrims(); k.click(); });
+    else if (t) t.hidden = true;
+  });
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');
   if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });
@@ -159,9 +168,9 @@
   function zetWiebel(aan) {
     wiebel = aan;
     if (aan) wiebelStart = Date.now();
-    grids.forEach(g => g.classList.toggle('os-wiebel', aan));
+    rijen.forEach(g => g.classList.toggle('os-wiebel', aan));
     if (klaarKnop) klaarKnop.hidden = !aan;
-    if (!aan) { grids.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); sleepEl = null; }
+    if (!aan) { rijen.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); sleepEl = null; }
   }
   if (klaarKnop) klaarKnop.addEventListener('click', () => zetWiebel(false));
-  grids.forEach(grid => {
+  rijen.forEach(grid => {

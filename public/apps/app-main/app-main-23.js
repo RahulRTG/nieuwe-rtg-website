@@ -36,10 +36,19 @@
     }).catch(e => toast(e.message));
   }
 /* ============================== RTG OS-schil ==============================
-   De leden-app als telefoon-besturingssysteem: meerdere hoofdschermen
-   (scroll-snap + stippen), apps in mappen, een zoekpil (Spotlight), een
-   bedieningspaneel (thema, taal, push, helderheid, uitloggen) en iconen
-   herschikken met een lange druk (wiebel-modus, volgorde in localStorage).
+   De leden-app als besturingssysteem. Het beginscherm is één scherm met vier
+   lagen, van boven naar beneden:
+
+     1. de mappen met apps
+     2. de ronde RTG-klok, in het midden
+     3. de functierij: bellen, berichten, videobellen, je wallet
+     4. de balk van Rahul
+
+   Verder is er een bedieningspaneel (thema, taal, push, helderheid,
+   uitloggen), Spotlight-zoeken en herschikken met een lange druk
+   (wiebel-modus, volgorde in localStorage). Geen tweede beginscherm, geen
+   dock, geen App Store: alles waar je pas je recht op geeft staat er al, en
+   in de Boardroom zet je uit wat je niet wilt zien.
 
    De (verborgen) tabbar blijft het model: alle bestaande logica schakelt daar
    tabs, zichtbaarheid (gast-modus, Assets, Gezin) en badges. Deze laag
@@ -48,15 +57,11 @@
 (() => {
   const $ = s => document.querySelector(s);
   const tabbar = $('#tabbar'), app = $('#app'), content = $('#content');
-  const grids = [$('#osGrid'), $('#osGrid2')];
-  const dock = $('#osDock'), pages = $('#osPages'), dots = $('#osDots');
-  if (!tabbar || !app || !grids[0] || !grids[1] || !dock || !pages) return;
+  // rij 0 = de mappen boven de klok, rij 1 = de functies eronder
+  const rijen = [$('#osMappen'), $('#osFuncties')];
+  if (!tabbar || !app || !rijen[0] || !rijen[1]) return;
 
   const pas = new URLSearchParams(location.search).get('pas') || 'rtg';
-  // Rahul in het midden van het dock, als grotere gouden orb: hij is het
-  // hart van het OS en doet alles wat je hem vraagt. Het dock houdt de drie
-  // RTG-kern-tabs vast; de overige diensten komen uit de App Store.
-  const DOCK = ['betalen', 'ai', 'salon'];
 
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */

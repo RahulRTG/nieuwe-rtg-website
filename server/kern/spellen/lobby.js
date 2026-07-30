@@ -7,9 +7,11 @@ module.exports = (ctx) => {
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
     mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
     pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
-    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet } = ctx;
+    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
+    flitsInit, reactieInit, quizInit, schatInit, geheugenInit, ordeInit, klasgenotenVan } = ctx;
   const INITS = { mejn: mejnInit, schaak: schaakInit, pesten: pestenInit, woord: woordInit,
-    dam: damInit, rummi: rummiInit, magnaat: magnaatInit, seconden: secondenInit, waarheid: waarheidInit, proost: proostInit };
+    dam: damInit, rummi: rummiInit, magnaat: magnaatInit, seconden: secondenInit, waarheid: waarheidInit, proost: proostInit,
+    flits: flitsInit, reactie: reactieInit, quiz: quizInit, schat: schatInit, geheugen: geheugenInit, orde: ordeInit };
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
     INITS[potje.soort](potje);
@@ -19,7 +21,7 @@ module.exports = (ctx) => {
     const s = SPEL[soort];
     return Math.min(s.max, Math.max(s.min || 2, Number(grootte) || 2));
   }
-  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, taal, wereld }) {
+  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld }) {
     opschonen();
     if (!SPEL[soort]) return { status: 400, error: 'Onbekend spel.' };
     const wf = wereldFout(wereld, soort);
@@ -40,6 +42,17 @@ module.exports = (ctx) => {
       if (!hit) return { status: 404, error: 'De codenaam "' + String(cn).slice(0, 40) + '" is niet gevonden.' };
       if (isGeblokkeerd(mij, hit.key)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
       if (!uitgenodigd.includes(hit.key) && hit.key !== mij) uitgenodigd.push(hit.key);
+    }
+    /* Klasgenoten: beschermde tieners zijn onvindbaar via de zoeker, maar de
+       eigen klas is een echte, bevestigde kring. De server controleert het
+       klasgenootschap zelf (zelfde klas in de schooldata); blokkades gelden. */
+    if (Array.isArray(klasgenoten) && klasgenoten.length) {
+      const kring = new Set(klasgenotenVan(mij).map(kg => kg.key));
+      for (const key of klasgenoten.slice(0, max - 1)) {
+        if (!kring.has(key)) return { status: 403, error: 'Alleen echte klasgenoten kun je zo uitnodigen.' };
+        if (isGeblokkeerd(mij, key)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
+        if (!uitgenodigd.includes(key)) uitgenodigd.push(key);
+      }
     }
     if (!uitgenodigd.length) return { status: 400, error: 'Nodig minstens een speler uit (vriend of codenaam), of speel random.' };
     if (uitgenodigd.length > max - 1) return { status: 400, error: 'Te veel spelers voor dit spel.' };

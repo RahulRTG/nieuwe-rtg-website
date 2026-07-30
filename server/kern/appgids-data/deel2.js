@@ -1,4 +1,4 @@
-/* App-gids data, deel2 (32 pagina's). Zie ../appgids.js voor de uitleg;
+/* App-gids data, deel2 (26 pagina's). Zie ../appgids.js voor de uitleg;
    nieuwe pagina's krijgen hier (of in het passende deel) een eigen entry. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
@@ -78,22 +78,7 @@ module.exports = {
   '/apps/leverancier.html': G('De leverancier-app: uw hele zaak in één scherm, van orders tot personeel.',
     ['Beheer orders, reserveringen en voorraad', 'Stuur uw team aan met rooster en taken', 'Vraag de zaak-AI om cijfers en advies'],
     'Kijk elke ochtend één minuut naar het actiecentrum; dan begint de dag zonder verrassingen.'),
-  '/apps/personeel.html': G('De personeels-app (PDA): uw dienst, taken en team op zak.',
-    ['Klok in en zie uw dienst', 'Pak taken op en meld ze af', 'Praat met collega\'s via chat of walkie-talkie'],
-    'Meld afwijkingen meteen; een klein bericht nu voorkomt groot gedoe later.'),
-  '/apps/backoffice.html': G('De RTG Backoffice: het kantoor dat leden en partners helpt.',
-    ['Behandel verificaties en aanvragen', 'Zoek dwars door het systeem', 'Bekijk prestaties en weekcijfers'],
-    'Het actiecentrum sorteert op urgentie: van boven naar beneden werken is genoeg.'),
-  '/apps/rtgkantoor.html': G('Het RTG Kantoor: het huis van de eigen RTG AI, die meeleest, zichzelf traint en pas na uw knop het roer krijgt.',
-    ['Volg de gereedheid: dekking en ervaring groeien door mee te lezen', 'De AI meldt zelf wanneer hij er klaar voor is', 'Geef het roer met de knop; daarna draait het routinewerk automatisch door, en de terug-knop is altijd van u'],
-    'De AI adviseert, de mens beslist: overnemen kan alleen via uw knop, en aan het roer doet hij uitsluitend het veilige routinewerk.'),
-  '/apps/kantoren.html': G('RTG Kantoren: alle afdelingen en de boardroom, met de zelfzorg van het systeem.',
-    ['Loop de afdelingen langs met hun KPI\'s', 'Schakel in de boardroom wat aan of uit moet', 'Bekijk opruimen, beschermen, repareren en upgraden'],
-    'De boardroom kan alles zien en alles schakelen; grote knoppen vragen om een tweede blik.'),
-  '/apps/boardroom.html': G('De boardroom: het hoogste overzicht, alles zien en alles kunnen schakelen.',
-    ['Bekijk het hele systeem in één oogopslag', 'Zet regie-schakelaars om', 'Laat Rahul voorstellen doen en beslis zelf'],
-    'De AI adviseert, de boardroom beslist; die volgorde is een principe, geen toeval.'),
-  '/apps/architect-pda.html': G('De architect-PDA: het architectenbureau op zak.',
-    ['Bekijk projecten en hun fase', 'Leg bevindingen op locatie vast', 'Deel met het bureau'],
-    'Foto\'s op locatie zeggen meer dan een pagina notities.'),
+  '/apps/leverancier-rtmail.html': G('RTMAIL voor uw zaak: het postvak op uw zaakcode, waar de draaiboeken (sollicitatie, inkoop, factuur, overheid) hun seintjes bezorgen.',
+    ['Lees ontvangen en verzonden post op codenaam', 'Stuur zelf een bericht naar een andere zaak of groothandel', 'Alles op codenamen; echte namen blijven in de kluis'],
+    'Kijk hier na een drukke dag even langs; de seintjes staan gebundeld klaar zonder dat u een externe mailbox hoeft te openen.')
 };

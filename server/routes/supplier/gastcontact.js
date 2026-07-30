@@ -27,7 +27,7 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
   chat.lastAt = new Date().toISOString();
   save();
   logActivity(req.supplier.code, req.actor, 'antwoordde ' + chat.codename + ' (' + (chat.dept || 'Team') + ')');
-  notify(chat.tier, { icon: '💬', title: req.supplier.name + (chat.dept ? ' · ' + chat.dept : ''), body: text.slice(0, 90), scope: 'gchat' });
+  notify(chat.tier, { icon: 'berichten', title: req.supplier.name + (chat.dept ? ' · ' + chat.dept : ''), body: text.slice(0, 90), scope: 'gchat' });
   sseToCustomer(chat.customerKey, 'sync', { scope: 'gchat' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
   trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
@@ -77,7 +77,7 @@ app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
   L.connected = [...new Set([...(L.connected || []), req.supplier.code])];
   save();
   logActivity(req.supplier.code, req.actor, 'verbond met gast ' + codename);
-  notify(L.tier, { icon: '🤝', title: req.supplier.name, body: 'Volgt uw aankomst om alles voor u klaar te zetten.', scope: 'live' });
+  notify(L.tier, { icon: 'rechterhand', title: req.supplier.name, body: 'Volgt uw aankomst om alles voor u klaar te zetten.', scope: 'live' });
   pushLive(key);
   res.json({ ok: true, guests: guestsFor(req.supplier.code) });
 });

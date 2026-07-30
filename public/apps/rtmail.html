@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTMAIL · RTG</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RTMAIL">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:999px;padding:.15rem .6rem;}
+  main{padding:1.1rem;max-width:640px;margin:0 auto;}
+  .rij{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;color:inherit;font:inherit;}
+  .rij:hover{border-color:var(--gold);}
+  .rij .ic{width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex-shrink:0;font-size:1.1rem;}
+  .rij .b{flex:1;min-width:0;}
+  .rij .nm{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.45rem;}
+  .rij.ongelezen .nm::before{content:'';width:.5rem;height:.5rem;border-radius:50%;background:var(--burgundy);flex:0 0 auto;}
+  .rij .lt{font-size:.82rem;color:var(--soft);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rij .lt .ongev{color:#E78AA0;font-weight:600;}
+  .rij .tijd{font-size:.7rem;color:var(--soft);white-space:nowrap;}
+  .terug{background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer;margin-bottom:.8rem;padding:.2rem 0;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.15rem;}
+  .kaart h2{font-size:1.15rem;margin-bottom:.3rem;}
+  .kaart .meta{font-size:.72rem;color:var(--soft);margin-bottom:.9rem;}
+  .kaart .body{font-size:.92rem;line-height:1.65;white-space:pre-wrap;color:var(--muted);word-break:break-word;}
+  .band{display:flex;align-items:center;gap:.5rem;font-size:.72rem;border-radius:10px;padding:.45rem .6rem;margin-bottom:.8rem;border:1px solid var(--line);}
+  .band svg{width:1rem;height:1rem;flex:0 0 auto;}
+  .band.ok{color:#8FD6A6;background:rgba(70,150,95,.1);border-color:rgba(120,200,150,.28);}
+  .band.sys{color:var(--gold);background:rgba(169,143,28,.1);border-color:rgba(169,143,28,.3);}
+  .band.no{color:#E78AA0;background:rgba(194,58,94,.12);border-color:rgba(194,58,94,.35);}
+  .lk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;}
+  .lk.no{color:var(--soft);text-decoration:line-through;text-decoration-color:rgba(194,58,94,.6);}
+  .lk.no .lkb{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:#E78AA0;text-decoration:none;margin-left:.25rem;}
+  a.lk.ok{color:var(--gold);text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+  .bijlaag-noot{font-size:.72rem;color:var(--soft);margin-top:.9rem;border-top:1px solid var(--line);padding-top:.7rem;line-height:1.5;}
+  .ai{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.85rem .9rem;margin-bottom:.9rem;}
+  .ai h3{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+  .ai .tx{font-size:.86rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;}
+  .ai-knop{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;font-weight:600;border-radius:10px;padding:.55rem;cursor:pointer;margin-bottom:.9rem;}
+  .ai-knop:hover{border-color:var(--gold);}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.66);display:grid;place-items:center;z-index:20;padding:1.2rem;}
+  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;max-width:420px;width:100%;}
+  .modal h2{font-size:1.1rem;margin-bottom:.5rem;}
+  .modal p{font-size:.85rem;color:var(--muted);line-height:1.55;margin-bottom:.4rem;word-break:break-word;}
+  .modal .url{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--gold);background:var(--card2);border-radius:8px;padding:.5rem .6rem;margin:.6rem 0;word-break:break-all;}
+  .modal .rij2{display:flex;gap:.5rem;margin-top:.8rem;}
+  .modal button{flex:1;border-radius:10px;font:inherit;font-size:.85rem;font-weight:600;padding:.6rem;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);}
+  .modal button.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2.5rem 1rem;line-height:1.6;}
+  .inlog{text-align:center;padding:3rem 1rem;}
+  .noot{font-size:.72rem;color:var(--soft);text-align:center;margin-top:1rem;line-height:1.5;}
+  /* Teams: een adres dat je samen leest. Het label van wie iets oppakte staat
+     bij het bericht zelf - niet als score, maar zodat niemand dubbel werkt. */
+  .kop{font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
+  .adr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.76rem;color:var(--gold);word-break:break-all;}
+  .vld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.86rem;padding:.55rem .65rem;margin-bottom:.5rem;}
+  .vld:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .knp{border:1px solid var(--line);background:var(--card2);color:var(--txt);font:inherit;font-size:.78rem;font-weight:600;border-radius:9px;padding:.42rem .7rem;cursor:pointer;}
+  .knp:hover{border-color:var(--gold);}
+  .knp.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .knp[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .knprij{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem;}
+  .tag{display:inline-block;font-size:.66rem;letter-spacing:.04em;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.1rem .5rem;margin-right:.35rem;}
+  .tag.af{color:#8FD6A6;}
+  .fout{font-size:.78rem;color:#E78AA0;margin-top:.5rem;}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body>
+<header><div><div class="ey">Je eigen postvak</div><h1>RTMAIL</h1></div>
+  <span class="tel" id="tel" hidden></span></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+let LIJST=[], TEAM=null, TEAMPOST=[];
+const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(), dag=86400000;
+  if(nu-d<dag && d.getDate()===nu.getDate()) return d.toTimeString().slice(0,5);
+  if(nu-d<7*dag) return ['zo','ma','di','wo','do','vr','za'][d.getDay()];
+  return d.getDate()+'/'+(d.getMonth()+1); };
+const langTijd=iso=>{ try{ return new Date(iso).toLocaleString('nl-NL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } };
+// De trust-band: waar komt dit bericht vandaan, en is het geverifieerd?
+const SCHILD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>';
+const SLOT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+function bandVan(m){
+  if(m.bron==='systeem') return {cls:'sys',t:'Systeem · Rahul - geverifieerd afzender'};
+  if(m.vertrouwd) return {cls:'ok',t:m.bron==='zaak'?'Geverifieerde RTG-partner':'Geverifieerd RTG-lid'};
+  return {cls:'no',t:'Niet-geverifieerde afzender - links en bijlagen zijn geblokkeerd'};
+}
+// Veilige body: tekst escapen en elke externe link defangen. Bij een niet-
+// geverifieerd bericht is de link inert (nooit te openen); bij een vertrouwd
+// bericht kan de link alleen na een expliciete bevestiging open in een nieuw
+// tabblad. RTMAIL rendert nooit HTML uit een bericht.
+const LINK_RE=/(?:https?:\/\/|ftp:\/\/|www\.)[^\s<>()"']+/gi;
+function veiligBody(raw, vertrouwd){
+  raw=String(raw==null?'':raw); let out='',last=0,mm;
+  while((mm=LINK_RE.exec(raw))){
+    out+=esc(raw.slice(last,mm.index));
+    const full=mm[0], u=full.replace(/[.,;:!?)]+$/,''), rest=full.slice(u.length);
+    if(vertrouwd) out+='<a href="#" class="lk ok" data-ext="'+esc(u)+'">'+esc(u)+'</a>';
+    else out+='<span class="lk no" title="Niet-geverifieerd - geblokkeerd">'+esc(u)+'<span class="lkb">geblokkeerd</span></span>';
+    out+=esc(rest); last=mm.index+full.length;
+  }
+  out+=esc(raw.slice(last)); LINK_RE.lastIndex=0; return out;
+}
+function bindLinks(root){ root.querySelectorAll('a.lk.ok[data-ext]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault(); externPoort(a.dataset.ext);})); }
+function externPoort(url){
+  const m=document.createElement('div'); m.className='modal';
+  m.innerHTML='<div class="box"><h2>Externe link</h2><p>Deze link leidt buiten RTG. RTG heeft de bestemming niet gecontroleerd - open alleen wat je vertrouwt.</p><div class="url">'+esc(url)+'</div><div class="rij2"><button id="mAnn">Annuleren</button><button class="prim" id="mOpen">Toch openen</button></div></div>';
+  document.body.appendChild(m);
+  const weg=()=>m.remove();
+  m.addEventListener('click',e=>{ if(e.target===m) weg(); });
+  m.querySelector('#mAnn').addEventListener('click',weg);
+  m.querySelector('#mOpen').addEventListener('click',()=>{ let u=url; if(/^www\./i.test(u)) u='https://'+u; window.open(u,'_blank','noopener,noreferrer'); weg(); });
+}
+async function api(pad, body){
+  const r=await fetch('/api/member/rtmail/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})});
+  const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;
+}
+async function laadInbox(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Open de RTG-app en log in; daarna staat je post hier.</p></div>'; return; }
+  let d; try{ d=await api('inbox'); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  LIJST=d.berichten||[];
+  if(d.ongelezen){ $('#tel').textContent=d.ongelezen; $('#tel').hidden=false; } else $('#tel').hidden=true;
+  /* Je eigen adres bovenaan: het draagt sinds deze ronde welk huis je hoort
+     (rtgpass.rtg, lifestyle.rtg, business.rtg, rahultravelgroup.rtg,
+     rahultravelfoundation.rtg, partner.rtg of gouvernement.rtg). Het linkerdeel
+     is je codenaam -- je echte naam blijft in de kluis. */
+  const kaart = d.adres
+    ? '<div class="noot" style="margin:0 0 .8rem;"><b style="color:var(--txt);font-size:.95rem;">' + esc(d.adres) + '</b><br>' +
+      'Dit is je RTMAIL-adres. Het volgt je lidmaatschap: verandert je pas, dan verandert het domein mee, en post aan je vorige adres komt gewoon aan.</div>'
+    : '';
+  $('#main').innerHTML = kaart + (LIJST.length ? (
+    '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
+    LIJST.map((m,i)=>
+      '<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+(m.van==='rtg@rtmail'?'RTG':esc((m.van||'@').replace('@rtmail','').slice(0,3).toUpperCase()))+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>'
+    ).join('')+'<div class="noot">RTMAIL bezorgt en bewaart je post op je codenaam, binnen RTG. Links en bijlagen van niet-geverifieerde afzenders zijn geblokkeerd; je vindt dit ook als kanaal in de Berichten-app.</div>'
+  ) : '<div class="leeg">Je postvak is leeg.<br>Zodra RTG je iets stuurt, verschijnt het hier.</div>');
+  const vs=$('#vatSamen'); if(vs) vs.addEventListener('click',vatSamenNu);
+  $('#main').querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>openBericht(LIJST[+b.dataset.i])));
+  teamsErbij();
+}
+
+/* ---- teams: een adres dat je samen leest ----
+   Een receptie, een keuken, een boekhouding. Onder je eigen postvak, want het
+   is je tweede postvak en niet je eerste. */
+async function teamsErbij(){
+  let d; try{ d=await api('team/mijn'); }catch(e){ return; }
+  const wrap=document.createElement('div');
+  wrap.innerHTML='<div class="kop">Teams · een adres dat je samen leest</div>'+
+    ((d.teams||[]).map(t=>
+      '<button class="rij" data-team="'+esc(t.id)+'"><span class="ic">'+esc((t.naam||'?').slice(0,1).toUpperCase())+'</span>'+
+      '<span class="b"><span class="nm">'+esc(t.naam)+'</span><span class="lt adr">'+esc(t.adres)+'</span></span>'+
+      '<span class="tijd">'+t.aantalLeden+(t.aantalLeden===1?' persoon':' mensen')+'</span></button>').join('')
+      || '<div class="noot" style="margin:0 0 .6rem;text-align:left;">Nog geen team. Een team is handig zodra post niet aan jou is maar aan een functie - de receptie, de boekhouding.</div>')+
+    '<button class="ai-knop" id="tNieuw" style="margin-bottom:0;">Team oprichten</button>';
+  $('#main').appendChild(wrap);
+  wrap.querySelectorAll('[data-team]').forEach(b=>b.addEventListener('click',()=>openTeam(b.dataset.team)));
+  $('#tNieuw').addEventListener('click',nieuwTeamForm);
+}
+function nieuwTeamForm(){
+  const k=$('#tNieuw');
+  k.outerHTML='<div class="kaart" id="tForm"><h2>Team oprichten</h2>'+
+    '<div class="meta">Het domein volgt je lidmaatschap; dat kies je niet zelf.</div>'+
+    '<label class="meta" for="tNaam">Naam van het team</label>'+
+    '<input class="vld" id="tNaam" placeholder="De Receptie" maxlength="60">'+
+    '<label class="meta" for="tAdres">Linkerdeel van het adres</label>'+
+    '<input class="vld" id="tAdres" placeholder="receptie" maxlength="40">'+
+    '<div class="knprij"><button class="knp prim" id="tMaak">Oprichten</button><button class="knp" id="tAf">Annuleren</button></div>'+
+    '<div class="fout" id="tFout" hidden></div></div>';
+  $('#tAf').addEventListener('click',laadInbox);
+  $('#tMaak').addEventListener('click',async()=>{
+    const naam=$('#tNaam').value.trim(), adres=$('#tAdres').value.trim();
+    try{ const d=await api('team/maak',{naam,adres:adres||naam}); await openTeam(d.team.id); }
+    catch(e){ const f=$('#tFout'); f.textContent=e.message; f.hidden=false; }
+  });
+}
+
+/* Het gedeelde postvak. Bij elk bericht staat wie het oppakte -- dat is het
+   hele punt: zonder dat antwoorden twee mensen hetzelfde, of niemand. */
+async function openTeam(id, alles){
+  let d; try{ d=await api('team/postvak',{id,alles:!!alles}); }catch(e){ alert(e.message); return laadInbox(); }
+  const t=d.team;
+  $('#main').innerHTML=
+    '<button class="terug" id="terug">← je eigen postvak</button>'+
+    '<div class="kaart"><h2>'+esc(t.naam)+'</h2><div class="meta adr">'+esc(t.adres)+'</div>'+
+    '<div class="body" style="font-size:.84rem;">'+t.leden.map(l=>'<span class="tag">'+esc(l.codenaam||'lid')+(l.ikZelf?' · jij':'')+'</span>').join('')+'</div>'+
+    '<div class="knprij">'+
+      '<button class="knp" id="tSchrijf">Schrijven namens het team</button>'+
+      '<button class="knp" id="tAlles" aria-pressed="'+(alles?'true':'false')+'">'+(alles?'Alleen wat open staat':'Ook wat af is')+'</button>'+
+      (t.ikBenEigenaar?'<button class="knp" id="tErbij">Iemand erbij</button><button class="knp" id="tHef">Team opheffen</button>'
+                      :'<button class="knp" id="tWeg">Team verlaten</button>')+
+    '</div><div class="fout" id="tFout" hidden></div></div>'+
+    '<div class="kop">'+(alles?'Alle post':d.open+(d.open===1?' bericht open':' berichten open'))+'</div>'+
+    (d.berichten.length ? d.berichten.map((m,i)=>
+      '<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-tb="'+i+'"><span class="ic">'+esc((m.van||'@').split('@')[0].slice(0,3).toUpperCase())+'</span>'+
+      '<span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+
+        (m.af?'<span class="tag af">afgehandeld</span>':m.opgepakt?'<span class="tag">'+esc(m.opgepakt)+(m.doorMij?' · jij':'')+'</span>':'')+
+        esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>').join('')
+      : '<div class="leeg">Niets meer open. Dat is het hele idee.</div>');
+  TEAM=t; TEAMPOST=d.berichten;
+  $('#terug').addEventListener('click',laadInbox);
+  $('#tAlles').addEventListener('click',()=>openTeam(id,!alles));
+  $('#tSchrijf').addEventListener('click',()=>schrijfNamens(t));
+  const kn=(sel,fn)=>{ const b=$(sel); if(b) b.addEventListener('click',fn); };
+  kn('#tErbij',()=>lidErbij(t));
+  kn('#tHef',async()=>{ if(!confirm('Het team en zijn adres verdwijnen. Doorgaan?')) return;
+    try{ await api('team/hef',{id}); }catch(e){ return toonFout(e); } laadInbox(); });
+  kn('#tWeg',async()=>{ if(!confirm('Je leest de post van dit team dan niet meer. Doorgaan?')) return;
+    try{ await api('team/verlaat',{id}); }catch(e){ return toonFout(e); } laadInbox(); });
+  $('#main').querySelectorAll('[data-tb]').forEach(b=>b.addEventListener('click',()=>openTeamBericht(t,TEAMPOST[+b.dataset.tb],alles)));
+}
+function toonFout(e){ const f=$('#tFout'); if(f){ f.textContent=e.message; f.hidden=false; } }
+function lidErbij(t){
+  const box=$('#tFout');
+  box.hidden=false;
+  box.innerHTML='<label class="meta" for="tWie">Codenaam van wie je erbij wilt</label>'+
+    '<input class="vld" id="tWie" placeholder="Gouden Panter 2679" maxlength="60">'+
+    '<div class="knprij"><button class="knp prim" id="tWieOk">Toevoegen</button></div><div id="tWieFout"></div>';
+  $('#tWieOk').addEventListener('click',async()=>{
+    try{ await api('team/lid',{id:t.id,codenaam:$('#tWie').value.trim()}); openTeam(t.id); }
+    catch(e){ $('#tWieFout').textContent=e.message; }
+  });
+}
+/* Schrijven vanuit het teamadres. Onder de tekst komt altijd je codenaam te
+   staan -- het adres is gedeeld, de hand niet. Daar is geen schakelaar voor,
+   dus staat het er ook gewoon bij op het scherm. */
+function schrijfNamens(t){
+  $('#main').innerHTML='<button class="terug" id="terug">← '+esc(t.naam)+'</button>'+
+    '<div class="kaart"><h2>Namens '+esc(t.naam)+'</h2><div class="meta adr">van '+esc(t.adres)+'</div>'+
+    '<input class="vld" id="sNaar" placeholder="Aan (codenaam of adres)" maxlength="80">'+
+    '<input class="vld" id="sOnd" placeholder="Onderwerp" maxlength="160">'+
+    '<textarea class="vld" id="sTekst" rows="6" placeholder="Je bericht"></textarea>'+
+    '<div class="bijlaag-noot">Je codenaam komt onder het bericht te staan. Een gedeeld adres mag geen masker worden: "de receptie zegt dat het geregeld is" is geen antwoord.</div>'+
+    '<div class="knprij"><button class="knp prim" id="sStuur">Versturen</button></div>'+
+    '<div class="fout" id="tFout" hidden></div></div>';
+  $('#terug').addEventListener('click',()=>openTeam(t.id));
+  $('#sStuur').addEventListener('click',async()=>{
+    try{ await api('team/stuur',{id:t.id,naar:$('#sNaar').value.trim(),onderwerp:$('#sOnd').value.trim(),tekst:$('#sTekst').value});
+      openTeam(t.id); }catch(e){ toonFout(e); }
+  });
+}
+async function openTeamBericht(t,m,alles){
+  const band=bandVan(m);
+  $('#main').innerHTML='<button class="terug" id="terug">← '+esc(t.naam)+'</button>'+
+    '<div class="kaart"><div class="band '+band.cls+'">'+(band.cls==='no'?SLOT:SCHILD)+'<span>'+esc(band.t)+'</span></div>'+
+    '<h2>'+esc(m.onderwerp)+'</h2>'+
+    '<div class="meta">Van '+esc(m.van)+' · '+esc(langTijd(m.at))+
+      (m.opgepakt?' · opgepakt door '+esc(m.opgepakt):'')+'</div>'+
+    '<div class="body" id="body">'+veiligBody(m.tekst,!!m.vertrouwd)+'</div>'+
+    '<div class="knprij">'+
+      '<button class="knp" id="bPak" aria-pressed="'+(m.doorMij?'true':'false')+'">'+(m.doorMij?'Toch niet, laat los':'Ik pak dit op')+'</button>'+
+      '<button class="knp" id="bAf" aria-pressed="'+(m.af?'true':'false')+'">'+(m.af?'Toch nog open':'Afgehandeld')+'</button>'+
+    '</div><div class="fout" id="tFout" hidden></div></div>';
+  bindLinks($('#body'));
+  $('#terug').addEventListener('click',()=>openTeam(t.id,alles));
+  $('#bPak').addEventListener('click',async()=>{
+    try{ await api('team/pak',{id:t.id,bericht:m.id,aan:!m.doorMij}); openTeam(t.id,alles); }catch(e){ toonFout(e); }
+  });
+  $('#bAf').addEventListener('click',async()=>{
+    try{ await api('team/af',{id:t.id,bericht:m.id,aan:!m.af}); openTeam(t.id,alles); }catch(e){ toonFout(e); }
+  });
+}
+async function vatSamenNu(){
+  const b=$('#vatSamen'); if(!b) return; b.disabled=true; b.textContent='Rahul leest je postvak…';
+  try{ const d=await api('assist',{}); b.outerHTML='<div class="ai"><h3>Rahul · samenvatting</h3><div class="tx">'+esc(d.samenvatting||'')+'</div></div>'; }
+  catch(e){ b.disabled=false; b.textContent='Rahul vat je postvak samen'; }
+}
+async function openBericht(m){
+  let volledig=m;
+  try{ const d=await api('lees',{id:m.id}); if(d.bericht) volledig=d.bericht; }catch(e){}
+  $('#tel').hidden=true;
+  const band=bandVan(volledig);
+  $('#main').innerHTML =
+    '<button class="terug" id="terug">← alle berichten</button>'+
+    '<div class="kaart"><div class="band '+band.cls+'">'+(band.cls==='no'?SLOT:SCHILD)+'<span>'+esc(band.t)+'</span></div>'+
+    '<h2>'+esc(volledig.onderwerp)+'</h2>'+
+    '<div class="meta">Van '+esc(volledig.van)+' · '+esc(langTijd(volledig.at))+'</div>'+
+    '<div class="body" id="body">'+veiligBody(volledig.tekst, !!volledig.vertrouwd)+'</div>'+
+    '<div class="bijlaag-noot">RTMAIL draagt nooit een bijlage die je kunt openen. Ontvang je een bestand? Dan is dat bewust geweigerd - vraag de afzender het via een geverifieerd kanaal te delen.</div></div>';
+  bindLinks($('#body'));
+  $('#terug').addEventListener('click', laadInbox);
+}
+laadInbox();
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !$('#terug')) laadInbox(); });
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

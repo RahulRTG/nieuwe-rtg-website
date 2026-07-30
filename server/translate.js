@@ -17,6 +17,9 @@ const { NL2EN, WORDS_NL_EN, WORDS_EN_NL, EN2NL, WORDS_ES } = require('./translat
    Spaanse tabel dekt Nederlands en Engels als bron; andere talen vallen
    zonder AI-sleutel terug op de oorspronkelijke tekst (nooit kapot). */
 const WORDS = { en: WORDS_NL_EN, nl: WORDS_EN_NL, es: WORDS_ES };
+/* Het wereld-kernwoordenboek: 30 school-kernwoorden in ALLE registertalen,
+   zodat elke taal ook zonder AI-sleutel iets zinnigs teruggeeft. */
+const wereld = require('./translate/woordenboek/wereld');
 
 let anthropic = null;
 function setAnthropic(a) { anthropic = a; }
@@ -49,7 +52,7 @@ function localizeList(list, lang) {
 }
 
 function wordLevel(text, to) {
-  const dict = WORDS[to];
+  const dict = WORDS[to] || wereld.dictVan(to);
   if (!dict) return null;
   let hit = false;
   const out = String(text).split(/(\s+)/).map(tok => {
@@ -81,7 +84,7 @@ async function claudeTranslate(text, to) {
    bewaakt de aanroeper (talen.taalVan). Voor nl/en werkt het woordenboek ook
    zonder AI; voor andere talen vertaalt de AI, en zonder AI-sleutel komt het
    bericht onvertaald terug (translated:false), nooit kapot. */
-async function translate(text, to, from) {
+async function translate(text, to, from, opties) {
   text = String(text || '');
   to = bestaat(to) ? String(to).toLowerCase() : 'nl';
   if (!text.trim()) return { text, translated: false, from: from || to };
@@ -96,8 +99,15 @@ async function translate(text, to, from) {
   }
 
   let out = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
-  if (!out && anthropic) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
-  if (!out && WORDS[to]) out = wordLevel(text, to);
+  /* De AI-weg alleen voor wie we kennen. Zonder deze grens is een open
+     vertaal-endpoint een gratis doorgeefluik naar een betaalde aanbieder: geen
+     inlog, geen kosten voor de aanvrager, en elke ingetypte zin gaat naar een
+     derde partij (vaak buiten de EU) zonder dat daar een lid tegenover staat.
+     Het woordenboek hieronder blijft voor iedereen werken, dus de taalkiezer op
+     het inlogscherm doet het gewoon. */
+  const magAi = !opties || opties.ai !== false;
+  if (!out && anthropic && magAi) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
+  if (!out) out = wordLevel(text, to); // woordenboek of wereld-kern: elke registertaal doet mee
   const result = out || text;
   cache.set(key, result);
   if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value);

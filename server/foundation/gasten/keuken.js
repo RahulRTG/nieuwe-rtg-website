@@ -22,6 +22,7 @@ module.exports = (ctx) => {
     if (!g.keuken || typeof g.keuken !== 'object') g.keuken = {};
     if (!g.keuken.menu || typeof g.keuken.menu !== 'object') g.keuken.menu = {};
     if (!Array.isArray(g.keuken.lijst)) g.keuken.lijst = [];
+    if (!Array.isArray(g.keuken.vast)) g.keuken.vast = [];
     return g.keuken;
   }
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
@@ -88,6 +89,23 @@ module.exports = (ctx) => {
     res.json({ ok: true });
   });
 
+  /* ---------- vaste boodschappen: wat elke week terugkomt tik je zo weer op de lijst ---------- */
+  router.post('/gezin/keuken/vast', (req, res) => {
+    const s = familieVan(req, res); if (!s) return;
+    const wat = schoon(req.body.wat, 60);
+    if (!wat) return res.status(400).json({ error: 'Wat komt er elke week terug?' });
+    const k = bak(s.g);
+    if (k.vast.length >= 40) return res.status(400).json({ error: 'Veertig vaste boodschappen is genoeg.' });
+    if (!k.vast.some(x => x.toLowerCase() === wat.toLowerCase())) { k.vast.push(wat); save(); }
+    res.json({ ok: true });
+  });
+  router.post('/gezin/keuken/vast/verwijder', (req, res) => {
+    const s = familieVan(req, res); if (!s) return;
+    const k = bak(s.g);
+    k.vast = k.vast.filter(x => x !== req.body.wat); save();
+    res.json({ ok: true });
+  });
+
   /* ---------- het overzicht: zeven dagen vooruit + de lijst ---------- */
   router.get('/gezin/:code/keuken', (req, res) => {
     const s = familieVan(req, res); if (!s) return;
@@ -109,6 +127,6 @@ module.exports = (ctx) => {
       .sort((a, b) => (a.af === b.af ? 0 : a.af ? 1 : -1));
     const koks = Object.entries(s.g.profielen).filter(([, p]) => p.rol !== 'gast')
       .map(([id, p]) => ({ id, naam: p.naam }));
-    res.json({ dagen, lijst, koks, mijnId: s.p.id });
+    res.json({ dagen, lijst, koks, vast: k.vast, mijnId: s.p.id });
   });
 };

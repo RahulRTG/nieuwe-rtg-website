@@ -15,8 +15,8 @@
 (function () {
   const STORE = 'rtg_lang';
   const LANGS = {
-    nl: { label: 'Nederlands', native: 'Nederlands', flag: '🇳🇱' },
-    en: { label: 'Engels', native: 'English', flag: '🇬🇧' }
+    nl: { label: 'Nederlands', native: 'Nederlands' },
+    en: { label: 'Engels', native: 'English' }
   };
   /* Wereldtalen: de Boardroom bepaalt welke talen aanstaan; de kiezer toont ze
      allemaal. UI-teksten vallen voor andere talen terug op Engels; chats en
@@ -334,24 +334,20 @@
     },
     closeModal() { const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.remove('open'); },
 
-    /* ---------- kleine taalschakelaar (heropent de keuze) ---------- */
-    buildSwitch() {
-      if (document.getElementById('rtg-lang-switch')) return;
-      // op het leden-OS (app.html) hoort de taal in Instellingen, niet als een
-      // los knopje op het scherm; daar zet de tegel "Taal" de keuze open.
-      if (/\/apps\/app\.html$/.test(location.pathname)) return;
-      const btn = document.createElement('button');
-      btn.id = 'rtg-lang-switch';
-      btn.className = 'rtg-lang-switch';
-      btn.setAttribute('aria-label', 'Taal wijzigen / Change language');
-      btn.addEventListener('click', () => this.openModal());
-      document.body.appendChild(btn);
-      this.updateSwitch();
-    },
-    updateSwitch() {
-      const btn = document.getElementById('rtg-lang-switch');
-      if (btn) btn.innerHTML = '<span class="rtg-sw-globe">' + ICOON.globe + '</span>' + this.lang.toUpperCase();
-    },
+    /* ---------- de taalkeuze heropenen ----------
+       De taalknop zweefde linksonder op elk scherm, boven op de themakiezer en
+       het vraagteken. Taal is een instelling, dus hij staat nu waar de andere
+       instellingen staan: in het bedieningspaneel (shared/bediening.js), dat
+       openModal() aanroept. Het leden-OS deed dit al met de tegel "Taal". */
+    buildSwitch() { /* geen zwevende knop meer; zie het bedieningspaneel */ },
+    /* updateSwitch bijgewerkt de knop die er niet meer is. Hij zocht nog naar
+       #rtg-lang-switch, en dat element staat sinds de verhuizing naar het
+       bedieningspaneel op geen enkele pagina meer -- de blindevlek-toets ving
+       het. Het paneel leest de taal vers uit bij elke opening (vulTaal in
+       shared/bediening.js), dus er valt hier niets bij te werken. De methode
+       blijft bestaan omdat applyTranslations() hem aanroept en losse pagina's
+       hem kunnen overschrijven; hij doet alleen niets meer. */
+    updateSwitch() { /* geen zwevende knop meer; het paneel leest zelf uit */ },
 
     injectStyles() {
       if (document.getElementById('rtg-i18n-styles')) return;

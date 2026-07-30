@@ -33,7 +33,7 @@ module.exports = (ctx) => {
     lijst().unshift(v);
     if (lijst().length > 50000) lijst().length = 50000;
     save();
-    notifySupplier(s.code, { icon: '🛎️', title: 'Nieuwe verblijfsaanvraag', body: codenaam + ': ' + kamer.name + ', ' + aankomst + ' tot ' + vertrek + ' (' + nachten + ' nacht(en), ' + personen + 'p)' });
+    notifySupplier(s.code, { icon: 'hotel', title: 'Nieuwe verblijfsaanvraag', body: codenaam + ': ' + kamer.name + ', ' + aankomst + ' tot ' + vertrek + ' (' + nachten + ' nacht(en), ' + personen + 'p)' });
     sseToSupplier(s.code, 'sync', { scope: 'receptie' });
     return { ok: true, verblijf: v };
   }
@@ -49,7 +49,7 @@ module.exports = (ctx) => {
     if (v.aankomst <= vandaag() && v.status === 'bevestigd') return { status: 409, error: 'Op de aankomstdag zelf annuleren gaat via het hotel.' };
     v.status = 'geannuleerd';
     save();
-    notifySupplier(v.supplierCode, { icon: '🛎️', title: 'Verblijf geannuleerd', body: v.codenaam + ': ' + v.roomName + ', ' + v.aankomst + ' tot ' + v.vertrek });
+    notifySupplier(v.supplierCode, { icon: 'hotel', title: 'Verblijf geannuleerd', body: v.codenaam + ': ' + v.roomName + ', ' + v.aankomst + ' tot ' + v.vertrek });
     sseToSupplier(v.supplierCode, 'sync', { scope: 'receptie' });
     return { ok: true, verblijf: v };
   }

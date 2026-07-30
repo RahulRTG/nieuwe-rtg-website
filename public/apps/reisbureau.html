@@ -6,8 +6,12 @@
 <title>RTG Reisbureau</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
 <link href="/apps/rtg-onthul.css" rel="stylesheet">
 <script src="/apps/rtg-onthul.js" defer></script>
+<script src="/shared/seizoen.js" defer></script>
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
@@ -49,6 +53,7 @@
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
 </style>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
@@ -75,6 +80,8 @@
     <p id="bladTag" style="color:var(--muted);font-size:.9rem;line-height:1.6;"></p>
     <div class="sec">Inbegrepen</div>
     <ul class="inbeg" id="bladInbeg"></ul>
+    <div class="sec">Alle regels van je bestemming</div>
+    <div id="bladRegels" style="font-size:.86rem;color:var(--muted);line-height:1.7;">Laden…</div>
     <div class="sec">Jouw aanvraag</div>
     <div class="rij">
       <div><div class="lbl">Voorkeursdatum</div><input class="veld" id="rDatum" type="date"></div>
@@ -154,15 +161,40 @@ function openReis(id){
   const iso = new Date().toISOString().slice(0,10);
   $('#rDatum').min = iso; $('#rDatum').value = '';
   herbereken();
+  laadRegels(HUIDIG.bestemming);
   $('#blad').classList.add('open');
+}
+/* De Reiswijzer: wie ergens naartoe gaat, krijgt ALLE regels van dat land --
+   visum, paspoort, verkeer, alarmnummer, water, fooi, alcohol en let-op.
+   Automatisch bijgehouden door de Regelwacht. */
+async function laadRegels(bestemming){
+  const el = $('#bladRegels');
+  el.textContent = 'Laden…';
+  try {
+    const w = await api('/api/reis/wijzer', { bestemming });
+    const rij = (k, v) => '<div style="display:flex;gap:.6rem;"><span style="min-width:7.5rem;color:var(--soft);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding-top:.15rem;">'+k+'</span><span>'+v+'</span></div>';
+    el.innerHTML =
+      '<div style="color:var(--gold);margin-bottom:.35rem;"><b>'+esc(w.naam)+'</b> · '+esc(w.regio)+'</div>' +
+      rij('Visum', esc(w.visum.tekst)) +
+      rij('Paspoort', esc(w.paspoort)) +
+      rij('Verkeer', 'Er wordt '+esc(w.rijden)+' gereden') +
+      rij('Alarmnummer', esc(w.alarm)) +
+      rij('Kraanwater', esc(w.waterTekst)) +
+      rij('Fooi', esc(w.fooi)) +
+      rij('Alcohol', 'Vanaf '+w.alcoholLeeftijd+' jaar') +
+      rij('Btw', w.btwStandaard+'% standaardtarief') +
+      (w.letOp ? rij('Let op', '<span style="color:var(--burgundy);">'+esc(w.letOp)+'</span>') : '') +
+      '<div style="color:var(--soft);font-size:.76rem;margin-top:.4rem;">'+esc(w.basis)+'</div>';
+  } catch(e){ el.textContent = e.message; }
 }
 function herbereken(){ $('#rTotaal').textContent = HUIDIG ? ('Richtprijs: € ' + (HUIDIG.prijs * AANTAL) + ' voor ' + AANTAL + ' reiziger' + (AANTAL>1?'s':'')) : ''; }
 async function boek(){
   if (!HUIDIG) return;
   try {
-    await api('/api/reisbureau/boek', { tripId: HUIDIG.id, personen: AANTAL, vertrek: $('#rDatum').value || undefined, notitie: $('#rNotitie').value });
+    const d = await api('/api/reisbureau/boek', { tripId: HUIDIG.id, personen: AANTAL, vertrek: $('#rDatum').value || undefined, notitie: $('#rNotitie').value });
     $('#blad').classList.remove('open');
-    meld('Je reisaanvraag staat klaar. Een RTG-reisadviseur neemt contact met je op.');
+    meld('Je reisaanvraag staat klaar. Een RTG-reisadviseur neemt contact met je op.' +
+      (d.reiswijzer ? ' Je hebt alle regels van ' + d.reiswijzer.naam + ' meegekregen' + (d.reiswijzer.visum.soort !== 'geen' ? ' -- let op: ' + d.reiswijzer.visum.label.toLowerCase() + '.' : '.') : ''));
   } catch(e){ meld(e.message); }
 }
 $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
@@ -170,7 +202,7 @@ $('#rMin').addEventListener('click', () => { AANTAL = Math.max(1, AANTAL-1); $('
 $('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $('#rAantal').textContent = AANTAL; herbereken(); });
 $('#rBoek').addEventListener('click', boek);
 </script>
-<button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
+<button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
   <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
@@ -204,6 +236,9 @@ $('#rBoek').addEventListener('click', boek);
 
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

@@ -7,8 +7,8 @@
       toetsenbord-gebruikers een zichtbare focusrand
    3. begrenzing: zet een maxlength-vangnet op tekstvelden die er geen hebben
       (de server begrenst altijd al; dit voorkomt stil afgekapte invoer)
-   4. leren: het ?-knopje linksonder opent de app-gids (wat is dit, wat kun je
-      hier, een leerzame tip) via /api/gids/app
+   4. leren: de app-gids (wat is dit, wat kun je hier, een leerzame tip) via
+      /api/gids/app; te openen vanuit het bedieningspaneel via RTGUitleg.open()
    5. sfeer: laadt het lopende werk bij (shared/uurwerk.js), de gangreserve
       van het huis die als een stil verhaal over alle pagina's doorloopt
    6. kaart: laadt de kaart-uitwijk bij (shared/kaart.js), die geo:-links op
@@ -34,8 +34,6 @@
   var css = '@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}}' +
     ':focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}' +
     '.bss-net{position:fixed;left:50%;transform:translateX(-50%);top:.6rem;z-index:60;background:#0C0C0B;border:1px solid #444;border-radius:10px;color:#eee;font:500 .8rem Inter,system-ui,sans-serif;padding:.45rem .8rem;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
-    '.bss-vraag{position:fixed;left:1rem;bottom:1rem;z-index:34;width:2.1rem;height:2.1rem;border-radius:999px;border:1px solid #555;background:rgba(12,12,11,.82);color:#ddd;font:600 .95rem Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35);}' +
-    '.bss-vraag:hover{border-color:var(--gold,#A98F1C);color:#fff;}' +
     '.bss-sheet{position:fixed;left:1rem;bottom:1rem;z-index:38;width:min(340px,92vw);background:#151312;border:1px solid var(--gold,#A98F1C);border-radius:16px;padding:1rem;color:#eee;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:.55rem;}' +
     '.bss-sheet[hidden]{display:none;}' +
     '.bss-kop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-weight:600;font-size:.92rem;}' +
@@ -108,15 +106,15 @@
       }).observe(document.body, { childList: true, subtree: true });
     } catch (e) {}
 
-    /* ---- 4. het ?-knopje: de app-gids als rustige leerlaag ---- */
-    var knop = document.createElement('button');
-    knop.type = 'button'; knop.className = 'bss-vraag'; knop.textContent = '?';
-    knop.setAttribute('aria-label', 'Uitleg over deze app');
-    document.body.appendChild(knop);
+    /* ---- 4. de app-gids als rustige leerlaag ----
+       Dit was een zwevend vraagteken linksonder, precies onder de themakiezer
+       en de taalknop: drie losse knopjes op dezelfde vierkante centimeter. De
+       gids zelf blijft ongewijzigd; alleen de ingang verhuisde naar het
+       bedieningspaneel (shared/bediening.js), dat RTGUitleg.open() aanroept. */
     var sheet = null;
-    function sluit() { if (sheet) { sheet.remove(); sheet = null; knop.hidden = false; } }
-    knop.addEventListener('click', function () {
-      knop.hidden = true;
+    function sluit() { if (sheet) { sheet.remove(); sheet = null; } }
+    function openGids() {
+      if (sheet) return;
       sheet = document.createElement('section');
       sheet.className = 'bss-sheet'; sheet.setAttribute('aria-label', 'Uitleg over deze app');
       sheet.innerHTML = '<div class="bss-kop"><span></span><button class="bss-x" type="button" aria-label="Sluiten">✕</button></div>' +
@@ -133,11 +131,12 @@
           var ul = document.createElement('ul'); ul.className = 'bss-doe';
           (g.doe || []).forEach(function (x) { var li = document.createElement('li'); li.textContent = x; ul.appendChild(li); });
           sheet.appendChild(ul);
-          var tip = document.createElement('div'); tip.className = 'bss-tip'; tip.textContent = '💡 ' + g.tip;
+          var tip = document.createElement('div'); tip.className = 'bss-tip'; tip.textContent = '' + g.tip;
           sheet.appendChild(tip);
         })
         .catch(function () { if (sheet) sheet.querySelector('.bss-wat').textContent = 'De uitleg is er zo weer; probeer het straks opnieuw.'; });
-    });
+    }
+    window.RTGUitleg = { open: openGids, sluit: sluit };
     document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') sluit(); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

@@ -1,5 +1,5 @@
 /* Care (deelmodule): de aanbiederkant (dagagenda, afronden met verdiensten)
-   en de herstel-/verblijfpakketten met de Butler-boekactie. careBoek en
+   en de herstel-/verblijfpakketten met Rahul-boekactie. careBoek en
    careBetaal komen via de context binnen nadat kern/care.js de ledenlaag
    heeft gemount. */
 module.exports = (ctx) => {
@@ -37,7 +37,7 @@ module.exports = (ctx) => {
     bk.status = 'afgerond';
     bk.afgerondOp = nu();
     save();
-    if (bk.key) notify(bk.key, { icon: '✅', title: bk.aanbiederNaam + ': tot ziens', body: bk.behandelingNaam + ' afgerond. Fijne dag.', scope: 'care' });
+    if (bk.key) notify(bk.key, { icon: 'pas', title: bk.aanbiederNaam + ': tot ziens', body: bk.behandelingNaam + ' afgerond. Fijne dag.', scope: 'care' });
     return { ok: true, ref: bk.ref };
   }
 
@@ -122,7 +122,7 @@ module.exports = (ctx) => {
     pb.paid = true; pb.paidAt = nu(); pb.status = 'geboekt';
     save();
     if (typeof verdien === 'function') { try { verdien(sess.key, pb.prijs, pb.naam); } catch (e) {} }
-    notify(sess.key, { icon: '🌸', title: 'Pakket geboekt: ' + pb.naam, body: pb.nachten + ' nachten bij ' + pb.hotelNaam + ' + behandeling op ' + pb.datum + ' om ' + pb.tijd + '.', scope: 'care' });
+    notify(sess.key, { icon: 'oogst', title: 'Pakket geboekt: ' + pb.naam, body: pb.nachten + ' nachten bij ' + pb.hotelNaam + ' + behandeling op ' + pb.datum + ' om ' + pb.tijd + '.', scope: 'care' });
     return { ok: true, pakket: pb };
   }
 
@@ -135,7 +135,7 @@ module.exports = (ctx) => {
     };
   }
 
-  /* De Butler-actie: exact dezelfde functies achter een gewone zin.
+  /* Rahul-actie: exact dezelfde functies achter een gewone zin.
      "boek een massage bij Zenith morgen om 15:00" -> voorstel -> ja. */
   function boekBehandelingActie(session, body, verdien) {
     const r = careBoek(session, body.codenaam || '', body);

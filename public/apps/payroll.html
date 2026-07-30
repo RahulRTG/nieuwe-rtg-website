@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Payroll · het loonkantoor</title>
+<link rel="icon" href="/icons/backoffice.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;--muted:rgba(244,241,236,0.68);--soft:rgba(244,241,236,0.55);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:2rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;flex-wrap:wrap;}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  nav{display:flex;gap:.4rem;margin-left:auto;flex-wrap:wrap;}
+  nav button{background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:inherit;font-size:.78rem;padding:.3rem .8rem;cursor:pointer;}
+  nav button.aan{color:var(--txt);border-color:var(--gold);}
+  main{padding:1rem;max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;}
+  .sec{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .stat{flex:1;min-width:7rem;text-align:center;} .stat b{font-size:1.25rem;display:block;} .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.55rem .95rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
+  .regel{display:flex;gap:.5rem;align-items:baseline;border-bottom:1px solid var(--line);padding:.42rem 0;font-size:.85rem;flex-wrap:wrap;}
+  .regel .r{margin-left:auto;text-align:right;}
+  .pil{font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;color:var(--muted);}
+  .pil.rood{color:var(--burgundy);border-color:var(--burgundy);}
+  .pil.goud{color:var(--gold);border-color:var(--gold);}
+  .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;}
+  .kpi{font-size:.74rem;color:var(--soft);}
+  .noot{font-size:.72rem;color:var(--soft);line-height:1.55;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="ey">RTG-kantoren · loonkantoor</div><h1>RTG Payroll</h1></div>
+  <nav>
+    <button data-tab="overzicht" class="aan">Wie werkt waar</button>
+    <button data-tab="loonrun">Loonrun</button>
+    <button data-tab="match">Matching</button>
+  </nav>
+</header>
+<main>
+  <div class="kaart"><div class="rij" id="top"><div class="leeg">Laden...</div></div></div>
+  <section id="tabOverzicht">
+    <div class="kaart">
+      <div class="sec">Wie werkt waar -- met het past-signaal</div>
+      <div class="noot" style="margin-bottom:.5rem;">Omdat RTG de klok en het rooster al kent, ziet het loonkantoor in een blik of het werk past: overbelast, rustig of in balans.</div>
+      <div id="mensen"><div class="leeg">Laden...</div></div>
+    </div>
+  </section>
+  <section id="tabLoonrun" hidden>
+    <div class="kaart">
+      <div class="sec">De loonrun: geklokte uren x uurloon, per zaak en periode</div>
+      <div class="rij">
+        <select class="veld" id="lrZaak" style="flex:2;min-width:12rem;"></select>
+        <input class="veld" id="lrPeriode" style="flex:1;min-width:7rem;" placeholder="2026-07">
+        <button class="knop" id="lrDraai">Draai de loonrun</button>
+      </div>
+      <div class="noot" style="margin-top:.45rem;">Uurloon per land (nooit onder het minimum), plus vakantiegeld, min loonheffing; de werkgeverslasten uit de fiscale landtabellen staan ernaast. Elke medewerker krijgt zijn loonstrook in de personeels-app; de uitbetaling loopt via RTG Pay.</div>
+      <div id="lrUit" style="margin-top:.6rem;"></div>
+    </div>
+  </section>
+  <section id="tabMatch" hidden>
+    <div class="kaart">
+      <div class="sec">De matchtafel -- vacatures en mensen die bij elkaar passen</div>
+      <div class="noot" style="margin-bottom:.5rem;">Alleen medewerkers die zichzelf "open voor werk" hebben gezet, staan op deze tafel; wie de schakelaar uit laat is voor werkgevers onvindbaar.</div>
+      <div id="matchIn"><div class="leeg">Laden...</div></div>
+    </div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = n => '€ ' + Number(n).toFixed(2).replace('.', ',');
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+if (!TOKEN) uitgelogd();
+const api = (pad, body) => fetch('/api/office/payroll/' + pad, { method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
+  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+const pastPil = p => '<span class="pil' + (p === 'overbelast' ? ' rood' : p === 'rustig' ? ' goud' : '') + '">' + esc(p) + '</span>';
+
+async function laadOverzicht(){
+  const d = await api('overzicht');
+  $('#top').innerHTML =
+    '<div class="stat"><b>' + d.mensen.length + '</b><i>medewerkers</i></div>' +
+    '<div class="stat"><b>' + d.zaken.length + '</b><i>zaken</i></div>' +
+    '<div class="stat"><b>' + d.overbelast + '</b><i>overbelast</i></div>' +
+    '<div class="stat"><b>' + d.openVoorWerk + '</b><i>open voor werk</i></div>';
+  $('#mensen').innerHTML = d.mensen.map(m =>
+    '<div class="regel"><b>' + esc(m.naam) + '</b><span class="kpi">' + esc(m.rol) + ' · ' + esc(m.zaak) + ' · ' + esc(m.stad || '') + '</span>' +
+    '<span class="r">' + m.weekUren + ' u/w ' + pastPil(m.past) + (m.openVoorWerk ? ' <span class="pil goud">open voor werk</span>' : '') + '</span></div>').join('')
+    || '<div class="leeg">Nog geen medewerkers.</div>';
+  const zaak = $('#lrZaak');
+  zaak.innerHTML = d.zaken.map(z => '<option value="' + esc(z.code) + '">' + esc(z.naam) + ' (' + z.mensen + ')' +
+    (z.laatsteRun ? ' · laatste run ' + z.laatsteRun.periode : '') + '</option>').join('');
+}
+async function laadMatch(){
+  const d = await api('match');
+  $('#matchIn').innerHTML =
+    '<div class="sec">Per vacature: wie past erbij</div>' +
+    (d.vacatures.filter(v => v.kandidaten.length).map(v =>
+      '<div class="regel"><b>' + esc(v.vacature.func) + '</b><span class="kpi">' + esc(v.vacature.bedrijf) + ' · ' + esc(v.vacature.plaats || '') + '</span>' +
+      '<span class="r kpi">' + v.kandidaten.map(k => esc(k.naam) + ' (' + esc(k.rol) + ', score ' + k.score + ')').join(' · ') + '</span></div>').join('')
+      || '<div class="leeg">Nog geen matches; zodra iemand zich open voor werk zet, verschijnt hij hier.</div>') +
+    '<div class="sec" style="margin-top:.7rem;">Per persoon: welke bedrijven passen</div>' +
+    (d.open.map(p =>
+      '<div class="regel"><b>' + esc(p.naam) + '</b><span class="kpi">' + esc(p.rol) + ' · nu bij ' + esc(p.zaak) + '</span>' +
+      '<span class="r kpi">' + (p.kansen.map(k => esc(k.bedrijf) + ' -- ' + esc(k.func) + ' (score ' + k.score + ')').join(' · ') || 'nog geen passende vacature') + '</span></div>').join('')
+      || '<div class="leeg">Niemand heeft zich (nog) open voor werk gezet.</div>');
+}
+$('#lrDraai').addEventListener('click', async () => {
+  try {
+    const r = await api('loonrun', { code: $('#lrZaak').value, periode: $('#lrPeriode').value.trim() });
+    const run = r.run;
+    $('#lrUit').innerHTML = '<div class="sec">' + esc(run.zaak) + ' · ' + esc(run.periode) + ' · ' + esc(run.status) + '</div>' +
+      run.regels.map(x => '<div class="regel"><b>' + esc(x.naam) + '</b><span class="kpi">' + esc(x.rol) + ' · ' + x.uren + ' u x ' + eur(x.uurloon) + '</span>' +
+        '<span class="r">' + eur(x.netto) + ' netto<br><span class="kpi">bruto ' + eur(x.bruto) + ' + vak.geld ' + eur(x.vakantiegeld) + ' - heffing ' + eur(x.loonheffing) + '</span></span></div>').join('') +
+      '<div class="regel"><b>Totaal</b><span class="r"><b>' + eur(run.totaalNetto) + ' netto</b><br><span class="kpi">werkgeverskosten ' + eur(run.totaalKosten) + ' (' + esc(run.land) + ')</span></span></div>';
+    laadOverzicht();
+  } catch (e) { $('#lrUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
+document.querySelectorAll('nav [data-tab]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('nav [data-tab]').forEach(x => x.classList.toggle('aan', x === b));
+  $('#tabOverzicht').hidden = b.dataset.tab !== 'overzicht';
+  $('#tabLoonrun').hidden = b.dataset.tab !== 'loonrun';
+  $('#tabMatch').hidden = b.dataset.tab !== 'match';
+  if (b.dataset.tab === 'match') laadMatch();
+}));
+$('#lrPeriode').value = new Date().toISOString().slice(0, 7);
+laadOverzicht();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

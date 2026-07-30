@@ -78,29 +78,46 @@
     display:flex;
     flex-direction:column;
     position:relative;
+    /* het OS meet zich naar zijn eigen venster, niet naar het scherm: op de
+       telefoon is de shell de viewport, op de computer het 820px tablet-kader.
+       Het springboard schaalt daarom mee met de shell (container-query), niet
+       met de browserbreedte, zodat de home op de desktop een nette tablet
+       i.p.v. een uitvergroot volscherm. */
+    container-type:inline-size;
+    container-name:os;
     overflow:hidden; /* off-screen panelen (meldingen) mogen de mobiele viewport niet oprekken */
   }
-  /* op desktop: schermvullende desktop-app. Het kader vult het hele scherm
-     (geen smal telefoonvenster meer); de app-chrome (koptekst, tabbalk) loopt
-     over de volle breedte en de leesinhoud centreert in een royale kolom via
-     een padding-truc, zodat een-koloms schermen prettig lezen en de bestaande
-     rasters (keuken, hubs, dashboards) uitwaaieren over de breedte. */
+  /* op desktop: geen uitgerekte mobiele lay-out en geen kaal schermvullend
+     scherm, maar één net, gecentreerd tablet-venster. De app staat als een
+     grote tablet midden op het scherm (ruimer dan een telefoon, ~820px), met
+     een rustige donkere achtergrond eromheen en een subtiel kader. Zo ziet de
+     computerversie er hetzelfde uit als de app, alleen ruimer. */
   @media (min-width:520px){
-    body{background:var(--bg);padding:0;align-items:stretch;min-height:100dvh;}
+    body{
+      /* het "bureaublad" eromheen is duidelijk donkerder dan de tablet, zodat
+         het venster als een los paneel op het scherm ligt */
+      background:radial-gradient(130% 100% at 50% -10%, #141013, #000 78%);
+      padding:0;align-items:center;justify-content:center;min-height:100dvh;
+    }
     #shell{
-      max-width:none;
-      width:100%;
-      height:100dvh;
+      /* een echte tablet: los venster met marge rondom, afgeronde hoeken en een
+         duidelijke rand + schaduw, zodat hij op het donkere bureau "ligt".
+
+         De VERHOUDING is die van de iPad (786:1001). Zo is de middenconsole op
+         de computer hetzelfde ding als op de tablet en niet een breder, platter
+         familielid: dezelfde compositie, dezelfde volgorde, alleen zo groot als
+         er past. Wat er links en rechts overblijft is voor de widgets. */
+      aspect-ratio:786 / 1001;
+      height:min(92vh, 1040px);
+      width:auto;
+      max-width:min(820px, calc(100% - 3rem));
       min-height:0;
-      border-radius:0;
-      border:none;
-      box-shadow:none;
+      border:1px solid rgba(255,255,255,0.13);
+      border-radius:26px;
+      overflow:hidden;
+      box-shadow:0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.5);
     }
-    .content,.topbar,.tabbar{
-      padding-left:max(1.5rem, calc((100% - 1100px) / 2));
-      padding-right:max(1.5rem, calc((100% - 1100px) / 2));
-    }
-    /* meldingenpaneel blijft binnen het scherm */
+    /* meldingenpaneel blijft binnen het venster */
     .notif-panel{position:absolute;height:100%;}
     .notif-scrim{position:absolute;}
   }
@@ -132,16 +149,57 @@
 
   /* ---------- app-chroom ---------- */
 
-  #app{display:none;flex:1;flex-direction:column;min-height:0;}
+  /* --e is DE maat van het OS. Alles wat de indeling bepaalt -- tegels, gaten,
+     letters, dock -- is een veelvoud van --e, en --e groeit met de shell mee
+     (cqi = procent van de shell-breedte, niet van het browservenster). Zo is
+     het beeld op telefoon, iPad en computer hetzelfde en alleen groter:
+     15px bij een shell van 390, vanaf ~507 vlak op 19,5px. Geen sprongen.
+
+     --os-kolom houdt de inhoud op leesbare breedte. Wat er op een breed scherm
+     overblijft wordt lucht in plaats van een extra kolom. */
+  #app{
+    display:none;flex:1;flex-direction:column;min-height:0;
+    /* --e wordt door TWEE dingen begrensd: de breedte van de shell en zijn
+       HOOGTE. Het beginscherm is namelijk één scherm -- je scrolt er niet in.
+       De hele pagina past in ongeveer 57 keer --e (klok, groet, pas, drie
+       rijen apps en de dockzone), dus 1.754cqh is de hoogte-maat. Wat het
+       kleinst is wint; zo past het altijd, op elk toestel.
+
+       De 1.5 is gemeten, niet geschat: het eerste blad (klok, groet, pas,
+       drie rijen apps, dockzone) beslaat ongeveer 66 keer --e. */
+    --e:min(clamp(11px, 3.85cqi, 19.5px), 1.48cqh);
+    --os-kolom:calc(var(--e) * 34);
+  }
   #app.active{display:flex;}
 
   .topbar{
-    padding:calc(env(safe-area-inset-top, 0px) + 1rem) 1.5rem 0.9rem;
+    padding:calc(env(safe-area-inset-top, 0px) + 1rem) max(1rem, env(safe-area-inset-right, 0px)) 0.9rem max(1rem, env(safe-area-inset-left, 0px));
     display:flex;
     align-items:center;
     justify-content:space-between;
+    column-gap:0.5rem;
+    flex-wrap:nowrap;
     border-bottom:1px solid var(--line);
     background:var(--bg);
+  }
+  /* het rechtercluster (paneel/scan/zegel/meldingen/backoffice + codechip) blijft
+     compact en overlapt nooit de klok+merk links; het rechtercluster blijft heel
+     (flex-shrink:0), de klok+merk links wijken (overflow verborgen) en op elk
+     telefoonformaat krimpen de knoppen en klapt de codechip in tot alleen zijn
+     stip, zodat de balk nooit overloopt of overlapt. */
+  .os-rechts{display:flex;align-items:center;gap:0.6rem;flex-shrink:0;}
+  .os-links{overflow:hidden;flex-shrink:1;}
+  @media (max-width:500px){
+    .topbar{padding-left:max(0.85rem, env(safe-area-inset-left,0px));padding-right:max(0.85rem, env(safe-area-inset-right,0px));}
+    .os-rechts{gap:0.28rem;}
+    .os-links{gap:0.55rem;}
+    .bell{width:30px;height:30px;}
+    .bell svg{width:19px;height:19px;}
+    .code-chip{padding:0.34rem 0.42rem;gap:0;}
+    .code-chip #codeChipTxt{display:none;}
+  }
+  @media (max-width:340px){
+    .topbar .brand small{display:none;}
   }
   .topbar .brand{
     font-family:'Bodoni Moda',serif;
@@ -271,14 +329,35 @@
   }
 
   /* codenaam-kaart (de digitale pas in de app) */
+  /* De Members-kaart (codenaam-pas) + widget ernaast. Op de telefoon staat de
+     kaart gewoon vol; op een breed scherm (tablet-venster) houdt hij zijn echte
+     pas-formaat i.p.v. uitgerekt, en vult een widget de overgebleven ruimte. */
+  /* De pas en de Rahul-kaart stonden op een breed scherm naast elkaar en op de
+     telefoon was de Rahul-kaart er helemaal niet. Dat waren dus twee schermen.
+     Nu staan ze overal onder elkaar -- zelfde volgorde, zelfde beeld -- en
+     krijgt de telefoon er een kaart bij in plaats van er een te missen. */
+  .os-paskrow{display:flex;flex-direction:column;gap:calc(var(--e) * 0.7);margin-top:calc(var(--e) * 1.05);}
+  .os-paskrow .codecard{margin-top:0;}
+  .os-pas-widget{display:flex;flex-direction:column;justify-content:center;gap:calc(var(--e) * 0.5);
+    border-radius:calc(var(--e) * 1.35);border:1px solid var(--line);padding:calc(var(--e) * 1.15);min-width:0;
+    background:color-mix(in srgb, var(--card) 68%, transparent);}
+  .opw-eyebrow{font-size:calc(var(--e) * 0.64);letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+  .opw-zin{font-family:'Bodoni Moda',serif;font-size:calc(var(--e) * 1.23);line-height:1.3;color:var(--txt);margin:0;}
+  .opw-knop{align-self:flex-start;border-radius:999px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);font-family:inherit;font-weight:600;font-size:calc(var(--e) * 0.85);
+    padding:calc(var(--e) * 0.55) calc(var(--e) * 1.1);cursor:pointer;transition:border-color var(--rust-traag) var(--rust-ease);}
+  .opw-knop:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
+  /* De pas schaalt mee met --e, net als de rest. Deed hij dat niet, dan zou
+     hij op een klein scherm alle ruimte opeisen en zou het eerste blad alsnog
+     moeten scrollen -- en dat mag niet. */
   .codecard{
-    margin-top:1rem;
-    border-radius:20px;
+    margin-top:calc(var(--e) * 0.9);
+    border-radius:calc(var(--e) * 1.35);
     border:1px solid var(--line);
     background:
       radial-gradient(120% 140% at 85% -10%, rgba(158,28,64,0.4), transparent 60%),
       linear-gradient(150deg, #191412 0%, #100D0C 70%);
-    padding:1.5rem 1.4rem;
+    padding:calc(var(--e) * 1.05) calc(var(--e) * 1.0);
     position:relative;
     overflow:hidden;
   }
@@ -448,12 +527,32 @@
   .post .head b{display:block;font-size:0.84rem;}
   .post .head span{font-size:0.68rem;color:var(--soft);}
   .post .visual{
+    position:relative;
     aspect-ratio:16/10;
     display:flex;align-items:flex-end;padding:1rem 1.15rem;
   }
   .post .visual .place{
     font-family:'Bodoni Moda',serif;font-style:italic;font-size:1.4rem;color:#fff;
     text-shadow:0 2px 16px rgba(0,0,0,0.4);
+  }
+  /* waarom staat dit bericht in De Salon: viraal ('Trending') of maatschappelijk
+     belangrijk ('Belangrijk'). Ingetogen chip, geen kunstmatige urgentie. */
+  .post .visual .salon-reden{
+    position:absolute;top:0.85rem;left:1.15rem;
+    font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;
+    padding:0.16rem 0.55rem;border-radius:999px;
+    background:rgba(12,12,11,0.55);color:#fff;
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,0.28);
+  }
+  .post .visual .salon-reden-belangrijk{
+    color:#fff;border-color:rgba(194,58,94,0.7);
+    background:linear-gradient(180deg,rgba(126,22,52,0.85),rgba(126,22,52,0.7));
+  }
+  /* vriend/volger: een persoonlijke band, warm goud in plaats van de neutrale chip */
+  .post .visual .salon-reden-vriend,
+  .post .visual .salon-reden-volgend{
+    color:#F0E4B8;border-color:rgba(133,112,7,0.6);
   }
   .v-ibiza{background:linear-gradient(160deg,#0B2A3A 0%,#1E7A8C 55%,#F2A65A 100%);}
   .v-gstaad{background:linear-gradient(160deg,#1A2230 0%,#3E5A7A 55%,#C9D6E4 100%);}
@@ -532,6 +631,13 @@
   /* ter plaatse: leveranciers, orders, menu-overlay */
   .sup-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.15rem;margin-top:0.8rem;display:flex;align-items:center;gap:0.9rem;}
   .sup-card .ic{font-size:1.6rem;flex-shrink:0;}
+  .sup-card .ic svg{width:1.5rem;height:1.5rem;display:block;}
+  .sup-card .chatb svg{width:1.1rem;height:1.1rem;vertical-align:-0.12em;}
+  .rt-fav svg{width:1.05rem;height:1.05rem;vertical-align:-0.12em;}
+  .js-star svg{width:0.9rem;height:0.9rem;vertical-align:-0.08em;margin-right:0.1rem;}
+  .go svg{width:1.15rem;height:1.15rem;vertical-align:-0.18em;}
+  .js-like svg{width:1rem;height:1rem;vertical-align:-0.12em;}
+  .js-dppick svg{width:1.15rem;height:1.15rem;vertical-align:-0.18em;}
   .sup-card .t{flex:1;min-width:0;}
   .sup-card .t b{display:block;font-size:0.92rem;font-weight:600;}
   .sup-card .t span{font-size:0.72rem;color:var(--soft);}
@@ -769,29 +875,23 @@
   .soft-sm{font-size:0.72rem;color:var(--soft);}
   .soft-sm-grow{flex:1;font-size:0.72rem;color:var(--soft);}
   .grow-min{flex:1;min-width:0;}
-  /* Verplichte onboarding + contract: een blokkerende poort na het inloggen. */
-  #onbGate{position:fixed;inset:0;z-index:130;background:var(--bg,#0C0C0B);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 1.4rem) 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.6rem);}
+  /* Verplichte onboarding als gesprek met Rahul: dezelfde poort-taal als de
+     inlog (Bodoni-zin, één invoerregel), geen formulier. Blokkeert tot rond. */
+  #onbGate{position:fixed;inset:0;z-index:130;background:radial-gradient(130% 100% at 50% -10%, #141013, #000 82%);overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 1.4rem) 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.6rem);}
   #onbGate[hidden]{display:none;}
-  .onb-card{max-width:34rem;margin:0 auto;}
-  .onb-card h1{font-size:1.5rem;line-height:1.15;}
-  .onb-deck{margin:.5rem 0 1.2rem;font-size:.86rem;color:var(--muted);line-height:1.55;}
-  .onb-sec{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.3rem 0 .5rem;}
-  .onb-veld{display:block;margin-bottom:.7rem;}
-  .onb-veld span{display:block;font-size:.78rem;color:var(--soft);margin-bottom:.25rem;}
-  .onb-veld input{width:100%;background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,.09));border-radius:10px;padding:.6rem .7rem;color:var(--txt,#F4F1EC);font-family:inherit;font-size:.9rem;}
-  .onb-kyc{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,.09));border-radius:10px;padding:.6rem .8rem;margin-bottom:.7rem;}
-  .onb-kyc b{font-size:.82rem;} .onb-kyc .sub{display:block;font-size:.7rem;color:var(--soft);}
-  .onb-kyc .st{font-size:.72rem;font-weight:700;}
-  .onb-btn{background:var(--gold,#A98F1C);color:#0C0C0B;border:none;border-radius:10px;padding:.55rem .9rem;font-weight:700;font-family:inherit;font-size:.82rem;cursor:pointer;}
-  .onb-btn.ghost{background:none;border:1px solid var(--line);color:var(--txt);}
-  .onb-contract{border:1px solid var(--line,rgba(255,255,255,.09));border-radius:12px;background:var(--card,#151312);margin-top:.4rem;}
-  .onb-contract h2{font-size:.95rem;padding:.7rem .9rem 0;}
-  .onb-tekst{max-height:15rem;overflow-y:auto;padding:.5rem .9rem .9rem;font-size:.8rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;}
-  .onb-akkoord{display:flex;gap:.5rem;align-items:flex-start;margin:.9rem 0 .5rem;font-size:.82rem;color:var(--txt);}
-  .onb-akkoord input{margin-top:.15rem;width:1.1rem;height:1.1rem;flex-shrink:0;}
-  #onbNaam{width:100%;background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,.09));border-radius:10px;padding:.6rem .7rem;color:var(--txt,#F4F1EC);font-family:inherit;font-size:.9rem;margin-bottom:.6rem;}
-  #onbKlaar{width:100%;padding:.8rem;font-size:.9rem;}
-  .onb-fout{color:#F4B8C6;font-size:.78rem;min-height:1rem;margin:.4rem 0;}
+  .onb-card{max-width:30rem;width:100%;margin:0 auto;text-align:center;}
+  .onb-mond{display:block;margin:0 auto .5rem;width:170px;height:auto;}
+  .onb-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.22rem;line-height:1.5;color:var(--txt);min-height:3.6rem;text-wrap:balance;margin:.2rem 0 1.1rem;animation:agZin .5s ease;}
+  .onb-rij{display:flex;align-items:center;border-bottom:1px solid var(--line);margin:0 .3rem;transition:border-color .2s;}
+  .onb-rij:focus-within{border-color:var(--burgundy);}
+  .onb-rij input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt);font-family:'Inter',sans-serif;font-size:.95rem;text-align:center;padding:.75rem .4rem;}
+  .onb-rij input::placeholder{color:var(--soft);}
+  .onb-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;padding:.4rem .2rem;font-family:inherit;}
+  .onb-acties{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1rem;}
+  .onb-acties button{background:none;border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.72rem;color:var(--txt);font-family:inherit;cursor:pointer;letter-spacing:.02em;}
+  .onb-acties button.prim{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);font-weight:700;}
+  .onb-lees{max-height:14rem;overflow-y:auto;margin-top:1rem;padding:.8rem 1rem;border:1px solid var(--line);border-radius:12px;background:var(--card,#151312);font-size:.8rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;text-align:left;}
+  .onb-fout{color:#F4B8C6;font-size:.78rem;min-height:1rem;margin:.6rem 0 0;}
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
   /* ============================== RTG OS ==============================
      De leden-app als telefoon-besturingssysteem: statusbalk met klok, het
@@ -839,21 +939,34 @@
   /* springboard: datumkop + widgets + app-grid */
   .os-datum{
     margin:0.2rem 0 0.1rem;
-    font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;
+    font-size:calc(var(--e) * 0.77);letter-spacing:0.14em;text-transform:uppercase;
     color:var(--gold);font-weight:600;
   }
+  /* EEN LAY-OUT, DIE MEESCHAALT.
+
+     Telefoon, iPad en computer laten hetzelfde beeld zien -- zelfde vier
+     kolommen, zelfde kaart, zelfde dock -- alleen op een groter scherm iets
+     ruimer. Daarom staan hier geen breekpunten meer die de indeling omgooien
+     (er stond eerst een sprong naar zes kolommen); er is één maat-eenheid
+     --e die met de shell meegroeit, en alles in het OS is een veelvoud
+     daarvan. Van 15px op de telefoon naar 19,5px vanaf ongeveer een halve
+     tablet: precies de "iets groter" die het al was, maar dan vloeiend en
+     zonder dat het beeld verspringt.
+
+     De inhoud houdt daarbij een eigen maximumbreedte (--os-kolom). De extra
+     ruimte op een breed scherm wordt dus lucht, geen extra kolommen. Rust
+     boven dichtheid. */
   .os-grid{
     display:grid;grid-template-columns:repeat(4,1fr);
-    gap:1.15rem 0.6rem;margin-top:1.3rem;
+    gap:calc(var(--e) * 1.6) calc(var(--e) * 0.75);margin-top:calc(var(--e) * 1.8);
   }
-  @media (min-width:700px){.os-grid{grid-template-columns:repeat(6,1fr);}}
   .os-app{
     background:none;border:none;color:var(--txt);
-    display:flex;flex-direction:column;align-items:center;gap:0.42rem;
+    display:flex;flex-direction:column;align-items:center;gap:calc(var(--e) * 0.45);
     min-width:0;position:relative;
   }
   .os-app .os-tegel{
-    width:58px;height:58px;border-radius:18px;
+    width:calc(var(--e) * 3.87);height:calc(var(--e) * 3.87);border-radius:calc(var(--e) * 1.2);
     display:flex;align-items:center;justify-content:center;position:relative;
     background:linear-gradient(160deg, var(--card2), var(--card));
     border:1px solid var(--line);
@@ -868,9 +981,16 @@
     }
   }
   .os-app:active .os-tegel{transform:scale(0.97);}
-  .os-app svg{width:26px;height:26px;stroke:#fff;fill:none;}
+  .os-app svg{width:calc(var(--e) * 1.73);height:calc(var(--e) * 1.73);stroke:#fff;fill:none;}
+  /* huisstijl-monogram als een app (nog) geen eigen glyf heeft */
+  .os-monogram{
+    font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.55rem;line-height:1;
+    color:#fff;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  }
+  #osZoekLijst .zi .os-monogram,#osBelLijst .zi .os-monogram,.os-winkel-rij .zi .os-monogram{font-size:0.8rem;}
+  #osZoekLijst .zm svg,#osBelLijst .zm svg{width:15px;height:15px;stroke:var(--soft);fill:none;}
   .os-app .os-naam{
-    font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;
+    font-size:calc(var(--e) * 0.6);letter-spacing:0.14em;text-transform:uppercase;
     font-weight:600;color:var(--txt);
     max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
     text-shadow:0 1px 4px rgba(0,0,0,0.5);
@@ -894,15 +1014,23 @@
      exact de viewport en scrolt alles BINNEN de app, zoals op een echt
      toestel; dock, zoekpil en stippen staan dan echt onderin beeld. De gate
      blijft vrij scrollen (lange inlogformulieren op kleine schermen). */
+  /* Pas als je binnen bent meet de shell zich ook in de HOOGTE als container
+     (container-type:size i.p.v. inline-size). Dat is wat --e nodig heeft om
+     te weten hoeveel ruimte er is. Op de inlogpoort doen we dat niet: daar
+     heeft de shell geen vaste hoogte en zou size-containment hem platslaan. */
+  body.os-vast #shell{container-type:size;}
   body.os-vast{overflow:hidden;}
-  body.os-vast #shell{height:100dvh;min-height:0;}
+  /* op de telefoon vult de actieve app exact de viewport; op de computer laten
+     we het gecentreerde tablet-venster (media-query hierboven) staan i.p.v.
+     schermvullend, zodat de desktop eruitziet als de app in een tablet-kader. */
+  @media (max-width:519px){ body.os-vast #shell{height:100dvh;min-height:0;} }
 
   /* dock: zwevend glas met de vier kernapps */
   .os-dock{
     position:absolute;left:50%;transform:translateX(-50%);
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 0.7rem);
-    z-index:30;display:flex;gap:1rem;padding:0.7rem 0.9rem;
-    border-radius:18px;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + var(--e) * 0.75);
+    z-index:30;display:flex;gap:calc(var(--e) * 1.05);padding:calc(var(--e) * 0.75) calc(var(--e) * 0.95);
+    border-radius:calc(var(--e) * 1.2);
     background:color-mix(in srgb, var(--card) 55%, transparent);
     backdrop-filter:blur(26px) saturate(1.5);
     -webkit-backdrop-filter:blur(26px) saturate(1.5);
@@ -962,18 +1090,25 @@
     scroll-behavior:smooth;
   }
   .os-pages::-webkit-scrollbar{display:none;}
+  /* Eén scherm. Niet scrollen: wat er is past, en anders is het te veel.
+     Zijwaarts vegen naar het tweede scherm mag wel -- dat is bladeren, geen
+     scrollen, en de stipjes onderin zeggen dat er een tweede blad is. */
   .os-pagina{
     min-width:100%;scroll-snap-align:start;scroll-snap-stop:always;
-    overflow-y:auto;overflow-x:hidden;
-    padding:1.4rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 10.5rem);
+    overflow:hidden;
+    padding:calc(var(--e) * 1.1) calc(var(--e) * 1.7) calc(env(safe-area-inset-bottom, 0px) + var(--e) * 7);
   }
+  /* het tweede blad heeft losse kaarten en mag wel meegeven */
+  #osPagina2{overflow-y:auto;}
+  /* de inhoud houdt zijn eigen breedte; wat overblijft is lucht */
+  .os-pagina > *{max-width:var(--os-kolom);margin-inline:auto;}
   .os-dots{
     position:absolute;left:0;right:0;
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 8.6rem);
+    bottom:calc(env(safe-area-inset-bottom, 0px) + var(--e) * 9);
     display:flex;justify-content:center;gap:0.45rem;z-index:29;pointer-events:auto;
   }
   .os-dots button{
-    width:7px;height:7px;border-radius:50%;border:none;padding:0;
+    width:calc(var(--e) * 0.47);height:calc(var(--e) * 0.47);border-radius:50%;border:none;padding:0;
     background:color-mix(in srgb, var(--txt) 30%, transparent);
   }
   .os-dots button.actief{background:var(--txt);}
@@ -981,7 +1116,7 @@
   /* -------- zoekpil (Spotlight-ingang) boven het dock -------- */
   .os-zoekpil{
     position:absolute;left:50%;transform:translateX(-50%);
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 6.6rem);
+    bottom:calc(env(safe-area-inset-bottom, 0px) + var(--e) * 7);
     z-index:29;display:flex;align-items:center;gap:0.4rem;
     padding:0.42rem 1rem;border-radius:999px;
     background:color-mix(in srgb, var(--card) 60%, transparent);
@@ -1117,6 +1252,10 @@
     transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), color 0.13s cubic-bezier(0.22,0.7,0.3,1);
   }
   .os-cc-knoppen button.actief{border-color:var(--gold);color:var(--gold);}
+  .os-cc-thema button{display:flex;align-items:center;justify-content:center;gap:0.4rem;}
+  .os-thema-stip{width:0.85rem;height:0.85rem;border-radius:50%;flex:0 0 auto;
+    box-shadow:0 0 0 1px var(--line) inset;}
+  .os-cc-thema button.actief .os-thema-stip{box-shadow:0 0 0 1.5px var(--gold) inset;}
   #osCcHelder{width:100%;accent-color:var(--gold);}
   .os-cc-tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;}
   .os-cc-tegels button{
@@ -1159,6 +1298,18 @@
     transition:border-color 0.13s ease, color 0.13s ease, background 0.13s ease;
   }
   .os-winkel-knop.geinst{background:transparent;color:var(--soft);border-color:var(--line);}
+  /* -------- Boardroom: telling + vergrendelde basisregels -------- */
+  .os-board-sum{display:flex;align-items:baseline;gap:0.4rem;color:var(--soft);font-size:0.74rem;
+    padding:0.55rem 0 0.15rem;letter-spacing:0.02em;}
+  .os-board-sum strong{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.2rem;color:var(--txt);letter-spacing:0.01em;}
+  .os-board-rij{display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-top:1px solid var(--line);}
+  .os-winkel-groep + .os-board-rij{border-top:none;}
+  .os-board-rij .zi{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--card2);}
+  .os-board-rij .zi svg{width:18px;height:18px;stroke:#fff;fill:none;}
+  .os-board-rij .zi .os-monogram{font-size:0.9rem;}
+  .os-board-vast{opacity:0.9;}
+  .os-board-slot{margin-left:auto;color:var(--gold,#857007);display:flex;align-items:center;opacity:0.75;}
+  .os-board-slot svg{width:16px;height:16px;stroke:currentColor;fill:none;}
 
   /* -------- achtergrond (wallpaper), gekozen in het bedieningspaneel -------- */
   #app.os-wall-nacht{background:#000;}
@@ -1187,20 +1338,23 @@
       radial-gradient(130% 70% at 50% 112%, color-mix(in srgb, var(--dag-kleur, #C23A5E) 15%, transparent), transparent 62%),
       var(--bg);
   }
-  .os-lock{text-align:center;padding-top:calc(env(safe-area-inset-top, 0px) + 2.4rem);margin-bottom:0.6rem;}
+  .os-lock{text-align:center;padding-top:calc(env(safe-area-inset-top, 0px) + 1.9rem);margin-bottom:1.1rem;}
   .os-lock-klok{
     font-size:4.2rem;font-weight:200;letter-spacing:0.01em;line-height:1;
     font-variant-numeric:tabular-nums;color:var(--txt);justify-content:center;
   }
+  /* het horloge bovenaan het beginscherm: gecentreerd, ingetogen formaat */
+  .os-home-klok-wrap{display:flex;justify-content:center;margin:calc(var(--e) * 0.2) 0 calc(var(--e) * 0.75);}
+  .os-home-klok.rtg-ring{width:calc(var(--e) * 7);height:calc(var(--e) * 7);max-width:66vw;max-height:66vw;}
   .os-merk-logo{width:18px;height:18px;border-radius:4px;vertical-align:middle;}
 
-  /* -------- De Butler: de gouden orb in het midden van het dock -------- */
-  .os-dock .os-app[data-tab="ai"]{margin-top:-14px;}
+  /* -------- Rahul: de gouden orb in het midden van het dock -------- */
+  .os-dock .os-app[data-tab="ai"]{margin-top:calc(var(--e) * -0.93);}
   /* Rahul is het hart van het OS: de AI-knop in het dock is zijn signatuurmond
      van bewegende lichtpuntjes (shared/mond.js), glimmend op een donkere ronde
      bol met een gouden rand. Zo kijkt Rahul je overal aan. */
   .os-dock .os-app[data-tab="ai"] .os-tegel{
-    width:64px;height:64px;border-radius:50%;overflow:hidden;
+    width:calc(var(--e) * 4.27);height:calc(var(--e) * 4.27);border-radius:50%;overflow:hidden;
     background:radial-gradient(circle at 50% 42%, #211C17, #0C0C0B 72%);
     border:1px solid rgba(201,162,75,0.55);
     box-shadow:0 10px 26px rgba(0,0,0,0.5), 0 0 22px rgba(158,28,64,0.28), inset 0 1px 0 rgba(255,255,255,0.14);
@@ -1209,43 +1363,13 @@
      mond in (de bol snijdt de zachte randen af) en tillen we ze wat op, zodat
      Rahul ook op telefoonformaat duidelijk leest */
   .os-dock .os-app[data-tab="ai"] .os-ai-mond{width:150%;height:auto;display:block;filter:brightness(1.28) saturate(1.08);}
-  .os-dock .os-app[data-tab="ai"] svg{width:30px;height:30px;stroke:#C9A24B;}
+  .os-dock .os-app[data-tab="ai"] svg{width:calc(var(--e) * 2);height:calc(var(--e) * 2);stroke:#C9A24B;}
   .os-dock .os-app[data-tab="ai"].actief::after{background:var(--txt);}
 
-  /* -------- de super grote tablet: op ruime schermen groeit het OS mee --------
-     Het springboard vult het hele scherm zoals op een enorme telefoon of
-     tablet: grote tegels, een groot dock met de gouden orb, een brede
-     zoekpil. Dezelfde huisstijl; alleen de maat verandert. */
-  @media (min-width:900px){
-    .os-grid{
-      grid-template-columns:repeat(6,1fr);gap:2.6rem 1.4rem;margin-top:2.4rem;
-      max-width:1280px;margin-left:auto;margin-right:auto;width:100%;
-    }
-    .os-app{gap:0.75rem;}
-    .os-app .os-tegel{width:110px;height:110px;border-radius:30px;}
-    .os-app svg{width:46px;height:46px;}
-    .os-app .os-tegel > span{font-size:2.7rem !important;}
-    .os-app .os-naam{font-size:0.72rem;letter-spacing:0.16em;}
-    .os-badge{width:16px;height:16px;top:-5px;right:-5px;}
-    .os-datum{font-size:0.95rem;max-width:1280px;margin-left:auto;margin-right:auto;width:100%;}
-    .os-pagina{padding:2.2rem 3rem calc(env(safe-area-inset-bottom, 0px) + 13rem);}
-    .os-dock{gap:1.5rem;padding:1rem 1.4rem;border-radius:26px;bottom:calc(env(safe-area-inset-bottom, 0px) + 1.1rem);}
-    .os-dock .os-app .os-tegel{width:84px;height:84px;border-radius:24px;}
-    .os-dock .os-app svg{width:38px;height:38px;}
-    .os-dock .os-app[data-tab="ai"]{margin-top:-20px;}
-    .os-dock .os-app[data-tab="ai"] .os-tegel{width:98px;height:98px;}
-    .os-dock .os-app[data-tab="ai"] svg{width:44px;height:44px;}
-    .os-zoekpil{bottom:calc(env(safe-area-inset-bottom, 0px) + 8.8rem);}
-    .os-dots{bottom:calc(env(safe-area-inset-bottom, 0px) + 11.2rem);gap:0.6rem;}
-    .os-dots button{width:9px;height:9px;}
-  }
-  @media (min-width:1500px){
-    .os-grid{max-width:1560px;gap:3rem 1.8rem;}
-    .os-app .os-tegel{width:128px;height:128px;border-radius:34px;}
-    .os-app svg{width:54px;height:54px;}
-    .os-app .os-tegel > span{font-size:3.1rem !important;}
-    .os-app .os-naam{font-size:0.8rem;}
-  }
+  /* Hier stond een tweede indeling voor "de tablet": zes kolommen, grotere
+     tegels, een royaler dock. Dat maakte de computer een ander scherm dan de
+     telefoon. Nu groeit alles gewoon mee met --e, dus dit blok is niet meer
+     nodig -- er is nog maar één indeling, van 390 tot 2560 pixels breed. */
 
   /* -------- notificatie-banner: glijdt bovenin binnen, zoals op een telefoon -------- */
   .os-banner{
@@ -1284,62 +1408,44 @@
     border:1px dashed var(--line);border-radius:999px;background:none;
     color:var(--muted);font-size:0.7rem;padding:0.35rem 0.8rem;
   }
+  /* de klok als widget: dezelfde RTG-ring, ingetogen op kaartformaat, zodat je
+     hem net als de andere widgets kunt verbergen, terughalen en verslepen */
+  .os-klok-widget{display:flex;justify-content:center;align-items:center;padding:1.1rem;}
+  .os-klok-widget .rtg-ring{width:11rem;height:11rem;max-width:62vw;max-height:62vw;}
 </style>
+<link href="/shared/vensters.css" rel="stylesheet">
+<script src="/shared/vensters.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#content">Naar de inhoud</a>
-<div id="shell">
+<div id="shell" data-levendegrond>
 
   <!-- login -->
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
-    <!-- inlogscherm: de naam van de app, de klok en de datum; daaronder alleen
-         inloggen, aanmelden en wachtwoord vergeten. Na het inloggen opent uw
-         account vanzelf de juiste pas-app. -->
+    <!-- De poort is een gesprek met Rahul: geen ouderwetse formulieren. Boven
+         de klok, daaronder Rahuls signatuurmond, zijn zin en de ene regel van
+         de gebruiker. Inloggen, aanmelden en wachtwoord-herstel lopen allemaal
+         door het gesprek (00-kern-03b.js). Na afloop opent uw account vanzelf
+         de juiste pas-app. -->
     <div class="os-lock">
       <div class="os-lock-klok" id="gateKlok" data-rtg-klok="ring">--:--</div>
     </div>
-    <form class="login-form" id="loginForm">
-      <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
-      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
-      <button type="submit" data-i18n="gate.signin">Inloggen</button>
-    </form>
-    <form class="login-form" id="regForm" style="display:none;">
-      <div id="regKop" style="font-size:0.82rem;color:var(--muted);line-height:1.5;margin-bottom:0.2rem;"></div>
-      <input id="rgName" placeholder="Je naam" data-i18n-ph="gate.name" autocapitalize="words">
-      <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
-      <input id="rgPhone" type="tel" placeholder="Mobiel nummer" data-i18n-ph="gate.phone" autocomplete="tel">
-      <label style="display:block;font-size:0.68rem;color:var(--soft);margin:0.15rem 0 0.25rem;" data-i18n="gate.geb">Geboortedatum (zoals in je paspoort; lidmaatschap vanaf 15 jaar)</label>
-      <input id="rgGeb" type="date" autocomplete="bday">
-      <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
-      <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
-    </form>
-    <form class="login-form" id="forgotForm" style="display:none;">
-      <input id="fgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
-      <button type="submit" data-i18n="gate.sendreset">Stuur herstel-link</button>
-    </form>
-    <form class="login-form" id="resetForm" style="display:none;">
-      <input id="rsCode" inputmode="numeric" maxlength="6" placeholder="Code van je telefoon (6 cijfers)" data-i18n-ph="gate.smscode" autocomplete="one-time-code">
-      <input id="rsPass" type="password" placeholder="Nieuw wachtwoord" data-i18n-ph="gate.newpass2" autocomplete="new-password">
-      <button type="submit" data-i18n="gate.doreset">Stel nieuw wachtwoord in</button>
-    </form>
-    <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Aanmelden</button>
-    <button class="gate-switch" id="toForgot" type="button" data-i18n="gate.forgot">Wachtwoord vergeten?</button>
-    <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
   </div>
 
-  <!-- verplichte onboarding + contract (blokkeert de app tot alles rond is) -->
+  <!-- verplichte onboarding: geen formulier, maar een gesprek met Rahul. Hij
+       vraagt de ontbrekende gegevens één voor één, laat de overeenkomst lezen
+       en laat je tekenen door je naam te typen (10-social-01/02.js). -->
   <div id="onbGate" role="dialog" aria-modal="true" aria-labelledby="onbTitel" hidden>
     <div class="onb-card">
-      <h1 id="onbTitel">Nog even dit, dan gaan we op reis</h1>
-      <p class="onb-deck">Je pas is bedoeld om te reizen. Vul je gegevens aan en teken de overeenkomst; daarna staat de hele wereld voor je open.</p>
-      <div id="onbVelden"></div>
-      <div class="onb-sec">De overeenkomst</div>
-      <div class="onb-contract"><h2 id="onbCTitel"></h2><div class="onb-tekst" id="onbCTekst"></div></div>
-      <label class="onb-akkoord"><input type="checkbox" id="onbAkkoord"><span id="onbAkkoordTxt">Ik heb de overeenkomst gelezen en ga akkoord.</span></label>
-      <label class="onb-veld"><span id="onbNaamLbl">Typ je volledige naam om digitaal te ondertekenen</span>
-        <input id="onbNaam" autocomplete="name"></label>
+      <canvas class="onb-mond" id="onbMond" width="440" height="200" aria-hidden="true"></canvas>
+      <h1 id="onbTitel" class="onb-zin" role="status" aria-live="polite">Nog even dit, dan gaan we op reis.</h1>
+      <div class="onb-rij" id="onbRij">
+        <input id="onbIn" autocomplete="off" aria-label="Je antwoord aan Rahul" placeholder="Typ je antwoord">
+        <button type="button" id="onbGo" aria-label="Stuur">&#8594;</button>
+      </div>
+      <div class="onb-acties" id="onbActies"></div>
+      <div class="onb-lees" id="onbLees" hidden></div>
       <div class="onb-fout" id="onbFout" role="alert"></div>
-      <button class="onb-btn" id="onbKlaar" type="button">Onderteken en ga verder</button>
       <input type="file" id="onbKycFile" accept="image/*" hidden>
     </div>
   </div>
@@ -1348,14 +1454,13 @@
   <div id="app">
     <div class="topbar" role="banner">
       <div class="os-links">
-        <span class="os-klok" id="osKlok" data-rtg-klok>--:--</span>
         <button class="os-terug" id="osTerug" hidden aria-label="Terug naar het beginscherm">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
           <span id="osAppTitel"></span>
         </button>
         <div class="brand" id="osBrand"><img class="os-merk-logo" src="/icon.svg" alt="RTG" width="18" height="18"><small>OS</small></div>
       </div>
-      <div style="display:flex;align-items:center;gap:0.6rem;">
+      <div class="os-rechts">
         <span class="os-bat" id="osBat" hidden aria-hidden="true"><i><b id="osBatVul"></b></i><em id="osBatPct"></em></span>
         <button class="os-klaar" id="osKlaar" hidden>Klaar</button>
         <button class="bell" id="osCcBtn" aria-label="Bedieningspaneel">
@@ -1401,19 +1506,38 @@
         <!-- RTG OS: twee veegbare hoofdschermen (scroll-snap) met pagina-stippen -->
         <div class="os-pages" id="osPages">
           <section class="os-pagina" aria-label="Hoofdscherm 1">
-            <div class="os-datum" id="osDatum" data-rtg-datum></div>
+            <!-- De RTG-klok is de enige tijd in de ROS: het horloge bovenaan het
+                 beginscherm (het vergrendelscherm toont dezelfde wijzerplaat). -->
+            <div class="os-home-klok-wrap"><div class="os-home-klok" id="homeKlok" data-rtg-klok="ring" aria-label="RTG-horloge"></div></div>
             <h2 id="homeGreeting">Welkom.</h2>
             <p class="sub" id="homeSub"></p>
             <div id="verifyBanner"></div>
             <input type="file" id="verifyFile" accept="image/*" style="display:none;">
             <input type="file" id="selfieFile" accept="image/*" capture="user" style="display:none;">
             <div id="paspoortInbox"></div>
-            <div class="codecard" id="codecard"></div>
+            <!-- De Members-kaart houdt op een breed scherm zijn echte pas-formaat;
+                 de ruimte ernaast vult een widget (op de telefoon staat de kaart
+                 gewoon vol, zonder widget ernaast). -->
+            <div class="os-paskrow">
+              <div class="codecard" id="codecard"></div>
+            </div>
             <nav class="os-grid" id="osGrid" aria-label="Apps"></nav>
           </section>
           <section class="os-pagina" aria-label="Hoofdscherm 2" id="osPagina2">
+            <!-- De Rahul-kaart stond onder de pas op het eerste blad, maar dan
+                 past dat blad niet meer op een scherm. Hij hoort bij de andere
+                 widgets, dus staat hij hier: het eerste blad blijft de pas en
+                 je apps, het tweede is waar je spullen liggen. -->
+            <aside class="os-pas-widget" id="osPasWidget" aria-label="Rahul">
+              <span class="opw-eyebrow" data-i18n="app.pas.widget.eyebrow">Rahul</span>
+              <p class="opw-zin" data-i18n="app.pas.widget.zin">Vraag me om een reis te plannen, iets te boeken of te regelen.</p>
+              <button type="button" class="opw-knop" id="osPasWidgetBtn" data-i18n="app.pas.widget.knop">Vraag Rahul</button>
+            </aside>
             <nav class="os-grid" id="osGrid2" aria-label="Meer apps"></nav>
             <div class="os-w-chips" id="osWChips"></div>
+            <div class="card os-klok-widget" id="homeKlok2" aria-label="Klok">
+              <div data-rtg-klok="ring" aria-label="RTG-horloge"></div>
+            </div>
             <div class="card" id="homeTrip"></div>
             <div class="card" id="homePay"></div>
             <div class="card" id="homeSalon"></div>
@@ -1452,7 +1576,7 @@
         <div class="chips" id="chips"></div>
         <div class="askrow">
           <input id="askInput" placeholder="Stel een vraag…" data-i18n-ph="app.v.ai.ph">
-          <button id="askMic" aria-label="Spreek uw vraag in">🎤</button>
+          <button id="askMic" aria-label="Spreek uw vraag in"></button>
           <button id="askBtn" data-i18n="app.v.ai.send">Stuur</button>
         </div>
       </div>
@@ -1587,15 +1711,19 @@
         </div>
         <div class="os-cc-rij" id="osCcThema">
           <span class="os-cc-label" data-i18n="os.cc.thema">Thema</span>
-          <div class="os-cc-knoppen">
-            <button data-thema="standaard" data-i18n="os.cc.klassiek">Klassiek</button>
-            <button data-thema="bordeaux">Bordeaux</button>
-            <button data-thema="parelmoer">Parelmoer</button>
+          <div class="os-cc-knoppen os-cc-thema">
+            <button data-thema="parelmoer"><span class="os-thema-stip" style="background:linear-gradient(135deg,#F3EBDA,#E4CF9E)"></span><span data-i18n="os.cc.champagne">Champagne</span></button>
+            <button data-thema="standaard"><span class="os-thema-stip" style="background:linear-gradient(135deg,#2A2724,#0C0C0B)"></span><span data-i18n="os.cc.donker">Donker</span></button>
+            <button data-thema="bordeaux"><span class="os-thema-stip" style="background:linear-gradient(135deg,#9E1C40,#4A0C1E)"></span><span data-i18n="os.cc.bordeaux">Bordeaux</span></button>
           </div>
         </div>
         <div class="os-cc-rij">
           <span class="os-cc-label" data-i18n="os.cc.helder">Helderheid</span>
           <input type="range" id="osCcHelder" min="60" max="110" value="100" aria-label="Helderheid">
+        </div>
+        <div class="os-cc-rij">
+          <span class="os-cc-label" data-i18n="os.cc.beweging">Beweging</span>
+          <input type="range" id="osCcBeweging" min="0" max="100" value="35" aria-label="Snelheid en intensiteit van de beweging">
         </div>
         <div class="os-cc-rij" id="osCcWpRij">
           <span class="os-cc-label" data-i18n="os.cc.wall">Achtergrond</span>
@@ -1612,6 +1740,10 @@
           <button id="osCcLicht"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></b><span data-i18n="os.cc.licht">Weergave</span></button>
           <button id="osCcPush"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></b><span data-i18n="os.cc.push">Push</span></button>
           <button id="osCcSamen"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.8M20.5 20a5.5 5.5 0 0 0-3.6-5.2"/></svg></b><span data-i18n="os.cc.samen">Samen</span></button>
+          <button id="osCcSplit"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/></svg></b><span data-i18n="os.cc.split">Twee naast elkaar</span></button>
+          <button id="osCcDraai"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></b><span data-i18n="os.cc.draai">Beeld draaien</span></button>
+          <button id="osCcVol"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></b><span data-i18n="os.cc.vol">Volledig scherm</span></button>
+          <button id="osCcRand" hidden><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 9h8M8 15h8"/></svg></b><span data-i18n="os.cc.rand">Rand tot rand</span></button>
           <button id="osCcZoek"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></b><span data-i18n="os.zoek">Zoeken</span></button>
           <button id="osCcUit"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"/><path d="M6.6 7a8 8 0 1 0 10.8 0"/></svg></b><span data-i18n="app.logout">Uitloggen</span></button>
         </div>
@@ -1621,7 +1753,7 @@
     <!-- RTG OS: App Store (apps installeren en verwijderen) -->
     <div class="os-scrim" id="osWinkelScrim">
       <div class="os-winkel-paneel" role="dialog" aria-modal="true" aria-labelledby="osWinkelTitel">
-        <h3 class="os-bel-titel" id="osWinkelTitel">🛍️ App Store</h3>
+        <h3 class="os-bel-titel" id="osWinkelTitel">App Store</h3>
         <div id="osWinkelLijst"></div>
       </div>
     </div>
@@ -1702,9 +1834,9 @@
     </div>
     <div class="pc-depts" id="pcDepts"></div>
     <div class="pc-depts" id="pcAttn" style="padding-top:0.35rem;">
-      <button data-attn="hulp">🔔 <span data-i18n="app.attn.roep">Roep de bediening</span></button>
-      <button data-attn="rekening">🧾 <span data-i18n="app.attn.rekening">De rekening</span></button>
-      <button data-attn="bestellen">🍽️ <span data-i18n="app.attn.bestellen">Ik wil bestellen</span></button>
+      <button data-attn="hulp"><span data-i18n="app.attn.roep">Roep de bediening</span></button>
+      <button data-attn="rekening"><span data-i18n="app.attn.rekening">De rekening</span></button>
+      <button data-attn="bestellen"><span data-i18n="app.attn.bestellen">Ik wil bestellen</span></button>
     </div>
     <div class="ms-body pc-body" id="pcBody"></div>
     <div class="pc-foot">
@@ -1760,9 +1892,10 @@
     <div class="ms-head">
       <div><b id="dmNaam"></b><span data-i18n="sal.dm.sub">Ledenchat, op codenaam</span></div>
       <div class="dm-call">
-        <button id="dmBel" title="Bellen">📞</button>
-        <button id="dmVideo" title="Videobellen">🎥</button>
-        <button id="dmBlok" title="Blokkeren of melden">🚫</button>
+        <button id="dmBel" title="Bellen"></button>
+        <button id="dmVideo" title="Videobellen"></button>
+        <button id="dmBlok" title="Blokkeren of melden"></button>
+        <button id="dmKlets" title="Laat de Rahuls kletsen">RR</button>
         <button class="ms-close" id="dmClose" aria-label="Sluiten">✕</button>
       </div>
     </div>
@@ -1771,6 +1904,16 @@
       <input id="dmInput" placeholder="Typ een bericht" data-i18n-ph="app.pc.ph" autocomplete="off">
       <button id="dmSend" data-i18n="app.pc.send">Stuur</button>
     </div>
+  </div>
+
+  <!-- het salongesprek: jouw Rahul en die van je vriend, over hoe de dag was -->
+  <div id="klets-scrim" class="menu-scrim"></div>
+  <div id="klets-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b>Rahul &amp; Rahul</b><span>Een gesprek over jullie dag &middot; <span id="kletsNaam"></span></span></div>
+      <button class="ms-close" id="kletsClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body" id="kletsBody" style="padding:1rem 1.1rem;"></div>
   </div>
 
   <!-- salon-post delen met een connectie -->
@@ -1801,8 +1944,8 @@
     <video id="csLocal" autoplay muted playsinline></video>
     <div class="cs-top"><span id="csNaam"></span><span id="csTijd">0:00</span></div>
     <div class="cs-foot">
-      <button class="cs-mini" id="csMute" aria-label="Microfoon">🎙</button>
-      <button class="cs-mini" id="csCam" aria-label="Camera">🎥</button>
+      <button class="cs-mini" id="csMute" aria-label="Microfoon"></button>
+      <button class="cs-mini" id="csCam" aria-label="Camera"></button>
       <button class="cs-knop uit" id="csWeg" aria-label="Ophangen">✕</button>
     </div>
   </div>
@@ -1829,6 +1972,10 @@
 <script src="/shared/toestelkluis.js" defer></script>
 <script src="/shared/schermrust.js" defer></script>
 <script src="/shared/inlogkleur.js" defer></script>
+<script src="/shared/mond.js" defer></script>
+<script src="/shared/typ.js" defer></script>
+<script src="/shared/mrz.js" defer></script>
+<script src="/shared/paspoortscan.js" defer></script>
 <script src="/shared/focus.js" data-app="leden" data-kaart=".live-start" data-kop=".lh"></script>
 <script src="/shared/spraak.js"></script>
 <script src="/shared/seizoen.js" defer></script>
@@ -1845,6 +1992,8 @@
 <script src="/shared/rtgcode.js"></script>
 <script src="/shared/speler.js"></script>
 <script src="/shared/geluid.js"></script>
+<script src="/shared/glyf.js"></script>
+<script src="/shared/emoji.js"></script>
 <script src="/apps/app-main.js"></script>
 <script>
 window.I18N = { en: {
@@ -1926,6 +2075,30 @@ window.I18N = { en: {
   'live.jet18':'Private jets can be booked from age 18. We will gladly arrange a taxi for you.',
   'sal.dm.sub':'Member chat, on codenames', 'sal.dm.leeg':'No messages yet. Say hello.',
   'sal.share.h':'Share with a connection', 'sal.deel':'Share with a connection', 'sal.gedeeld':'Shared.',
+  'ag.plho':'I\'d like to say…', 'ag.in':'Your reply to Rahul', 'ag.ww':'Your password',
+  'ag.stuur':'Send', 'ag.log':'Rahul',
+  'ag.pk.knop':'Face ID or passkey', 'ag.pk.geen':'This device does not have Face ID or a passkey yet. Please type your password.',
+  'ag.pk.vraag':'Your device is now asking for your Face ID, fingerprint or key.',
+  'ag.pk.mis':'That did not work with the passkey. Type your password instead.',
+  'onb.intro':'Good to have you. Just a few things and you are ready to travel.',
+  'onb.typ':'Type your answer', 'onb.naamph':'Type your full name',
+  'onb.q.adres':'What is your street and house number?', 'onb.q.postcode':'And your postcode?',
+  'onb.q.woonplaats':'Which town do you live in?', 'onb.q.land':'And in which country?',
+  'onb.q.geboortedatum':'What is your date of birth?', 'onb.q.nationaliteit':'What is your nationality?',
+  'onb.q.naam':'What is your full name?', 'onb.q.email':'What is your email address?',
+  'onb.q.telefoon':'And your phone number?', 'onb.q.veld':'What is your ',
+  'onb.upload':'Choose a photo', 'onb.scan':'Scan your passport', 'onb.overeenkomst':'agreement',
+  'onb.q.paspoort':'Lastly, your passport, so I know it is really you. Scan it with the RTG scanner or choose a photo.',
+  'scan.titel':'Place your passport in the frame', 'scan.hint':'Keep the two bottom lines (the << <) clearly readable.',
+  'scan.af':'Close', 'scan.maak':'Take the scan', 'scan.check':'Readable? All four corners in view?',
+  'scan.opnieuw':'Retake', 'scan.ok':'Use this scan',
+  'scan.geen':'This device has no camera access. Choose a photo instead.',
+  'scan.geenrecht':'No access to the camera. Choose a photo instead.',
+  'onb.teken':'Last step: the ', 'onb.teken2':'. Type your full name to sign; that is your agreement. Want to read it first?',
+  'onb.lees':'Read the agreement', 'onb.naamkort':'Type your full name to sign.',
+  'onb.mis':'That did not work, please try again.', 'onb.upmis':'Upload failed.',
+  'onb.toobig':'The photo is too large (max 5 MB).', 'onb.welkom':'Welcome aboard! Have a wonderful trip.',
+  'onb.mrz1':'I read your passport: ', 'onb.mrz2':'. Is that right? Then we continue.',
   'sal.add':'Add', 'sal.zoek':'Search', 'sal.zoekph':'Search by codename, e.g. Golden Ibis',
   'sal.zoekkort':'Type at least two letters.', 'sal.niksgevonden':'No members found with this codename.',
   'sal.verzoek':'Send request', 'sal.verzonden':'Request sent.', 'sal.isverbonden':'connected',
@@ -1952,6 +2125,8 @@ window.I18N = { en: {
   'gate.smscode':'Code from your phone (6 digits)',
   'bo2.weergave':'Appearance', 'bo2.weergave.s':'Choose the colour theme of this app.',
   'bo2.thema.bordeaux':'Bordeaux (RTG)', 'bo2.thema.parel':'Mother-of-pearl (Lifestyle)', 'bo2.thema.klassiek':'Classic (dark)',
+  'os.cc.champagne':'Champagne', 'os.cc.donker':'Dark', 'os.cc.bordeaux':'Bordeaux', 'os.cc.beweging':'Motion',
+  'os.cc.split':'Split screen', 'os.cc.draai':'Rotate screen', 'os.cc.vol':'Full screen',
   'bo2.h':'My back office', 'bo2.acties':'Needs your attention', 'bo2.alsklaar':'All in order',
   'bo2.geen':'Nothing outstanding on your account.', 'bo2.open':'outstanding invoice(s); pay in one tap via Payments.',
   'bo2.mailniet':'Your email address has not been confirmed yet.', 'bo2.kyc':'Verify your identity to book in one tap.',
@@ -2092,6 +2267,7 @@ window.I18N = { en: {
   'app.ms.order':'Order', 'app.ms.choose':'Choose dishes', 'app.orderplaced':'Order placed with', 'app.paidto':'Paid to',
   'app.welcome':'Welcome,', 'app.membersince':'member since',
   'app.cc.label':'Your codename, your identity in our systems', 'app.cc.membernr':'Member no.', 'app.cc.pass':'Membership',
+  'app.pas.widget.eyebrow':'Rahul', 'app.pas.widget.zin':'Ask me to plan a trip, book something or arrange it.', 'app.pas.widget.knop':'Ask Rahul',
   'app.cc.why':'Why a codename?', 'app.cc.why.h':'Your real name is not in our travel data.',
   'app.cc.why.b':'Reservations, payments and Salon activity are held under your codename. Your real name sits in a separate, encrypted vault and is linked only once, at ticketing and check-in. Were travel data ever stolen, the attacker would never have the right name with your journeys.',
   'app.nexttrip':'Next journey', 'app.in':'in', 'app.days':'days', 'app.viewtrip':'View your journey',
@@ -2187,7 +2363,7 @@ window.I18N = { en: {
   'ai.a.rest':'Your table at Sal de Mar (19 Jul, 21:00) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of a beach restaurant in Cala Jondal.',
   'ai.a.default':'I will come back to that today. In the meantime I can help with the packing list, documents, the weather or a day plan, just say the word.',
   'ai.title.rtg':'Rahul.', 'ai.title.life':'Your AI.', 'ai.title.biz':'Your executive AI.',
-  'chat.concierge.title':'Your concierge.', 'chat.butler.deck':'Rahul, in your secure in-app line. One continuous conversation.',
+  'chat.concierge.title':'Your concierge.', 'chat.rahul.deck':'Rahul, in your secure in-app line. One continuous conversation.',
   'chat.concierge.deck':'Your personal concierge, in your secure in-app line. One continuous conversation.',
   'chat.concierge.hi':'Good day. Write to us here in the app; your concierge will help you personally.',
   'chat.concierge.pending':'Your concierge has been notified and will reply shortly.',
@@ -2206,5 +2382,20 @@ window.I18N = { en: {
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/rosapps.js" defer></script>
+<script src="/shared/split.js" defer></script>
+<script src="/shared/bureau.js" defer></script>
+<script>
+  // de widget naast de Members-kaart opent Rahul (het hart van het OS)
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('#osPasWidgetBtn')) return;
+    var ai = document.querySelector('.os-dock [data-tab="ai"], [data-tab="ai"]');
+    if (ai) ai.click();
+  });
+</script>
 </body>
 </html>

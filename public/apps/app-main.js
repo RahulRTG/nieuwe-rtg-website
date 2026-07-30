@@ -37,8 +37,8 @@
           note.innerHTML = '<button class="msg-toggle" type="button"></button>';
           const btn = note.querySelector('.msg-toggle');
           const setLabel = shown => btn.textContent = shown==='t'
-            ? '🌐 ' + T('msg.from','vertaald uit') + ' ' + langName(from) + ' · ' + T('msg.orig','toon origineel')
-            : '🌐 ' + T('msg.showtrans','toon vertaling');
+            ? '' + T('msg.from','vertaald uit') + ' ' + langName(from) + ' · ' + T('msg.orig','toon origineel')
+            : '' + T('msg.showtrans','toon vertaling');
           let shown = 't'; setLabel(shown);
           btn.addEventListener('click', () => {
             shown = shown==='t' ? 'o' : 't';
@@ -69,7 +69,7 @@
   let trip = {
     dest:'Ibiza', dates:'18 - 25 juli 2026', days:7,
     items:[
-      {when:'18 jul', title:'KLM KL1263, Amsterdam Schiphol → Ibiza', sub:'Economy comfort · 2 personen', status:'paid', label:'Bevestigd'},
+      {when:'18 jul', title:'Lijnvlucht RTG-1263, Amsterdam Schiphol → Ibiza', sub:'Economy comfort · 2 personen', status:'paid', label:'Bevestigd'},
       {when:'18 jul', title:'Privétransfer luchthaven → Aguamarina', sub:'Chauffeur bij aankomsthal', status:'paid', label:'Bevestigd'},
       {when:'18-21 jul', title:'Aguamarina Ibiza, Sea-view suite', sub:'3 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
       {when:'19 jul', title:'Diner, Sal de Mar', sub:'Chef-menu · 21:00 uur', status:'req', label:'In aanvraag'},
@@ -132,6 +132,15 @@
 
   // API-client uit de gedeelde app-shell (public/shared/appshell.js).
   const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
+  // Een 403 met kyc:true (bijv. een gratis lid dat RTG Pay gebruikt zonder
+  // paspoort) laat Rahul meteen de paspoort-stap van de onboarding tonen.
+  const _apiCall = API.call.bind(API);
+  API.call = function (pad, body) {
+    return _apiCall(pad, body).catch(function (e) {
+      if (e && e.data && e.data.kyc && typeof checkOnboarding === 'function') { try { checkOnboarding(); } catch (x) {} }
+      throw e;
+    });
+  };
 
   function applyState(state){
     if (!state) return;
@@ -164,25 +173,12 @@
     return true;
   }
 
-  /* ---------- login & tabs ---------- */
-
-  // De gratis (bestel/betaal) laag is alleen te gebruiken na registratie met een
-  // paspoort. De gratis-knop opent daarom het registratieformulier, niet een
-  // anonieme sessie. De betaalde passen (demo) loggen wel direct in.
-  let regTier = 'rtg';
-  function updateRegKop(){
-    const el = $('#regKop'); if (!el) return;
-    el.textContent = regTier === 'guest'
-      ? T('gate.reg.free','Gratis account met paspoort: bestel en betaal bij partners, bekijk De Salon en solliciteer. Geen betaalde pas.')
-      : T('gate.reg.paid','Maak uw RTG-account aan. Aanmelden gebeurt met uw paspoort (geboortedatum).');
-    const btn = $('#regForm button[type="submit"]');
-    if (btn) btn.textContent = regTier === 'guest' ? T('gate.reg.freebtn','Gratis account aanmaken') : T('gate.createacc','Account aanmaken');
-  }
-  document.querySelectorAll('[data-login]').forEach(b =>
-    b.addEventListener('click', () => {
-      if (b.dataset.login === 'guest'){ regTier = 'guest'; showGateForm('register'); updateRegKop(); }
-      else login(b.dataset.login);
-    }));
+  /* ---------- login & tabs ----------
+     De poort zelf is een gesprek met Rahul (app-main-06); die roept login()
+     aan met de gegevens uit het gesprek. De oude keuzeknoppen per pas
+     ([data-login]) en de kop boven het registratieformulier bestaan niet meer,
+     dus staat er hier ook geen bediening meer voor. De gratis laag blijft wat
+     hij was: alleen na aanmelden met een paspoort, nooit een anonieme sessie. */
 
   /* ---------- eigen app per pas, geen brede app ----------
      Elke betaalde pas heeft zijn eigen ingang (pas-rtg/lifestyle/business.html)
@@ -204,10 +200,6 @@
     const tl = document.getElementById('touchLink');
     if (tl) tl.href = '/icons/pas-' + vastePas + '-192.png';
     document.title = { rtg:'RTG Pass', lifestyle:'RTG Lifestyle Pass', business:'RTG Business Pass' }[vastePas];
-    // in de RTG-app mag ook de gratis ingang (minder functies); elders alleen de eigen pas
-    const mag = vastePas === 'rtg' ? ['rtg','guest'] : [vastePas];
-    document.querySelectorAll('[data-login]').forEach(b => { if (!mag.includes(b.dataset.login)) b.style.display = 'none'; });
-    regTier = vastePas;
   } else {
 
     // de ene poort: het scherm blijft kaal (alleen inloggen, aanmelden en
@@ -216,19 +208,22 @@
     document.title = 'RTG, log in';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
-    regTier = 'rtg';
   }
 
   /* ---------- pas-thema (kleuren van de website) ----------
      RTG krijgt het bordeauxrode thema, Lifestyle het parelmoeren thema,
      Business blijft klassiek donker. RTG en Lifestyle mogen terug naar
      klassiek; die keuze onthouden we per pas in localStorage. */
+  // Het ROS-thema (Champagne=parelmoer, Donker=standaard, Bordeaux) is een keuze
+  // voor IEDEREEN, per apparaat onthouden. Zonder eigen keuze heeft elke pas zijn
+  // eigen standaard: RTG bordeaux (de huiskleur), Lifestyle champagne, Business
+  // zwart. Wie geen pas heeft (bv. de poort) valt terug op bordeaux (rood).
   const THEMA_STANDAARD = { rtg: 'bordeaux', lifestyle: 'parelmoer', business: 'standaard' };
-  function pasThemaKey(){ return 'rtg_pas_thema_' + (vastePas || 'rtg'); }
+  function pasThemaKey(){ return 'rtg_ros_thema'; }
   function pasThemaHuidig(){
-    if (!vastePas || vastePas === 'business') return 'standaard'; // Business: geen keuze
     let t = null; try { t = localStorage.getItem(pasThemaKey()); } catch(e){}
-    return t || THEMA_STANDAARD[vastePas] || 'standaard';
+    if (t === 'standaard' || t === 'bordeaux' || t === 'parelmoer') return t;
+    return THEMA_STANDAARD[vastePas] || 'bordeaux';
   }
   function pasThemaToepassen(){
     const t = pasThemaHuidig();
@@ -238,6 +233,8 @@
     // de systeem-themakleur (statusbalk) meelaten kleuren
     const kleur = { bordeaux: '#1E0912', parelmoer: '#ECE6DD' }[t] || '#0C0C0B';
     const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', kleur);
+    // de levende grond de nieuwe familie laten oppakken (donker/champagne/bordeaux)
+    if (window.RTGLevend) RTGLevend.familie();
   }
   function pasThemaZet(t){
     try { localStorage.setItem(pasThemaKey(), t); } catch(e){}
@@ -246,8 +243,8 @@
   // meteen toepassen, ook op het beginscherm
   pasThemaToepassen();
   // seam voor de OS-schil (bedieningspaneel): thema lezen/zetten zonder de
-  // logica hierboven te dupliceren
-  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => !!vastePas && vastePas !== 'business' };
+  // logica hierboven te dupliceren. Iedereen mag kiezen.
+  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => true };
 
   /* ---------- de stem van de pas (tone of voice) ----------
      Dezelfde vriend als op de website, maar in de taal van de pas:
@@ -306,58 +303,20 @@
   // meteen: de poort spreekt de taal van de gekozen ingang (?pas=...)
   stemKoppen();
 
-  const loginForm = document.getElementById('loginForm');
-  if (loginForm) loginForm.addEventListener('submit', e => {
-    e.preventDefault();
-    login(null, { u: $('#liUser').value, p: $('#liPass').value });
-  });
-  const regForm = document.getElementById('regForm');
-  if (regForm) regForm.addEventListener('submit', e => {
-    e.preventDefault();
-    login(null, { register: true, tier: regTier, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, geboortedatum: $('#rgGeb').value, p: $('#rgPass').value });
-  });
-  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
-  function showGateForm(which){
-    ['#loginForm','#regForm','#forgotForm','#resetForm'].forEach(sel => { const f=$(sel); if(f) f.style.display='none'; });
-    const map = { login:'#loginForm', register:'#regForm', forgot:'#forgotForm', reset:'#resetForm' };
-    const f = $(map[which]); if (f) f.style.display = 'flex';
-    if (toReg) toReg.style.display = which==='login' ? '' : 'none';
-    if (toForgot) toForgot.style.display = which==='login' ? '' : 'none';
-    if (toLogin) toLogin.style.display = which==='login' ? 'none' : '';
-  }
-  if (toReg) toReg.addEventListener('click', () => { regTier = 'rtg'; showGateForm('register'); updateRegKop(); });
-  if (toForgot) toForgot.addEventListener('click', () => showGateForm('forgot'));
-  if (toLogin) toLogin.addEventListener('click', () => showGateForm('login'));
-  const forgotForm = document.getElementById('forgotForm');
-  if (forgotForm) forgotForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    try { await API.call('/auth/forgot', { email: $('#fgEmail').value }); }
-    catch (e2){ /* stil, geen bestaan lekken */ }
-    toast(T('gate.forgotsent','Als dit e-mailadres bekend is, sturen we een herstel-link.'));
-    showGateForm('login');
-  });
-  // wachtwoord-herstel: de link uit de e-mail komt hier binnen (?reset=)
-  let resetToken = null;
-  const resetForm = document.getElementById('resetForm');
-  if (resetForm) resetForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    try {
-      await API.call('/auth/reset', { token: resetToken, code: $('#rsCode').value, password: $('#rsPass').value });
-      toast(T('gate.resetok','Wachtwoord aangepast. Log in met uw nieuwe wachtwoord.'));
-      showGateForm('login');
-    } catch (e2){ toast(e2.message || 'Herstel mislukt.'); }
-  });
-  // bevestigings- en herstel-links uit de e-mail afhandelen (voorheen het
-  // aparte ledenportaal; het grote scherm zit nu gewoon in de pas-apps zelf)
-  (function handleAuthLinks(){
-    const q = new URLSearchParams(location.search);
-    if (q.get('verify')){
-      API.call('/auth/verify-email', { token: q.get('verify') })
-        .then(() => toast(T('gate.verified','Uw e-mailadres is bevestigd.')))
-        .catch(() => toast(T('gate.verifyfail','Bevestigingslink ongeldig of verlopen.')))
-        .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
-    }
-    if (q.get('reset')){ resetToken = q.get('reset'); showGateForm('reset'); }
+  /* De poort is een gesprek met Rahul (zie app-main-06): inloggen, aanmelden en
+     wachtwoord-herstel gaan alle drie via dat gesprek. De oude formulieren
+     (loginForm/regForm/forgotForm/resetForm met hun wisselknoppen) staan niet
+     meer in app.html; hun afhandeling hoort hier dus ook niet meer te staan. Wat
+     blijft, zijn de LINKS uit de e-mail: die komen los van de poort binnen. */
+  (function bevestigEmailLink(){
+    const token = new URLSearchParams(location.search).get('verify');
+    if (!token) return;
+    API.call('/auth/verify-email', { token })
+      .then(() => toast(T('gate.verified','Uw e-mailadres is bevestigd.')))
+      .catch(() => toast(T('gate.verifyfail','Bevestigingslink ongeldig of verlopen.')))
+      // alleen ?verify= uit het adres halen; ?reset= NIET aanraken, want de poort
+      // van Rahul (app-main-04/05) leest die parameter hierna zelf nog
+      .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
   })();
 
   async function login(tier, cred){
@@ -443,29 +402,23 @@
     location.reload();
   }
 
-  /* De poort is van Rahul: inloggen EN aanmelden als een gesprek. Rahul
-     ontdekt zelf of je terugkomt of nieuw bent, vraagt subtiel wat hij nodig
-     heeft en legt op "waarom?" uit waarvoor iets dient. Beide paden eindigen
-     op de bestaande routes: aanmelden via login() -> /auth/register, inloggen
-     via login() -> /auth/login; het wachtwoord van een terugkerend lid gaat
-     NOOIT door het gesprek maar rechtstreeks naar de inlogroute. In beeld:
-     de klok, de RTG-signatuurmond van bewegende lichtpuntjes, Rahuls zin
-     en de ene regel van de gebruiker.
-     Er is geen klassieke keuze: Rahul is de poort; de formulieren bestaan
-     alleen nog als vangnet voor wachtwoord-herstel. Deelt de
-     IIFE-scope met 00-kern-03.js (toReg, toForgot, login, API, T). */
+  /* De poort is van Rahul: inloggen, aanmelden EN wachtwoord-herstel als een
+     gesprek. Er zijn geen ouderwetse formulieren meer; Rahul is de enige poort.
+     Hij ontdekt zelf of je terugkomt of nieuw bent, vraagt subtiel wat hij
+     nodig heeft en legt op "waarom?" uit waarvoor iets dient. Alle paden
+     eindigen op de bestaande routes: aanmelden via login() -> /auth/register,
+     inloggen via login() -> /auth/login, herstel via /auth/reset. Het
+     wachtwoord van een terugkerend lid gaat NOOIT door het gespreks-endpoint
+     maar rechtstreeks naar de inlogroute. In beeld: de klok, Rahuls
+     signatuurmond van bewegende lichtpuntjes, zijn zin en de ene regel van de
+     gebruiker. Deelt de IIFE-scope met 00-kern-03.js (login, restoreSession,
+     API, T). */
   (function aanmeldGesprek(){
-    const loginFormEl = document.getElementById('loginForm');
-    const regForm = document.getElementById('regForm');
-    if (!regForm || !loginFormEl || !API.enabled) return;
-    const ouder = loginFormEl.parentNode;
+    const gate = document.getElementById('gate');
+    if (!gate || !API.enabled) return;
     const st = document.createElement('style');
     st.textContent =
-      // Rahul neemt de poort volledig over: geen formulieren en geen knoppen;
-      // wachtwoord-herstel regelt Rahul in het gesprek zelf
-      '.ag-over #loginForm,.ag-over #regForm,.ag-over #forgotForm,.ag-over #resetForm,.ag-over #toReg,.ag-over #toForgot,.ag-over #toLogin{display:none !important;}' +
-      '.ag-doos{display:none;flex-direction:column;width:100%;}' +
-      '.ag-over .ag-doos{display:flex;}' +
+      '.ag-doos{display:flex;flex-direction:column;width:100%;}' +
       // geen chatbubbels: alleen Rahuls zin, groot en stil in Bodoni, en
       // daaronder de ene regel van de gebruiker; verder niets
       ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:var(--txt);" +
@@ -481,14 +434,19 @@
         'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
       '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
       '.ag-mond{display:block;margin:0.15rem auto 0.3rem;width:220px;height:100px;}' +
+      // Face ID / passkey: een ingetogen gouden regel onder het veld, alleen
+      // zichtbaar zodra Rahul weet met wie hij praat (een terugkerend lid)
+      '.ag-passkey{margin:0.95rem auto 0;background:none;border:none;color:var(--gold,#857007);' +
+        'font-family:inherit;font-size:0.78rem;letter-spacing:0.03em;cursor:pointer;opacity:0.9;' +
+        'display:flex;align-items:center;gap:0.4rem;}' +
+      '.ag-passkey[hidden]{display:none;}' +
+      '.ag-passkey svg{width:15px;height:15px;stroke:currentColor;fill:none;}' +
       // de sterrenhemel gaat achter alles; de poort-inhoud eroverheen
       '#gate > *:not(canvas){position:relative;z-index:1;}';
     document.head.appendChild(st);
 
     // een heel subtiele 3D-sterrenhemel over het hele inlogscherm, in RTG-stijl
     (function sterrenhemel(){
-      var gate = document.getElementById('gate');
-      if (!gate) return;
       var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { helderheid: 0.9 }); };
       if (window.RTGSterren) return hang();
       var s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
@@ -500,12 +458,14 @@
     doos.innerHTML =
       '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
-      '<div class="ag-rij"><input id="agIn" autocomplete="off" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
-      '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>';
-    ouder.insertBefore(doos, loginFormEl);
-    // een wachtwoord-herstel-link uit de e-mail heeft voorrang op het gesprek
+      '<div class="ag-rij"><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
+      '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
+      '<button type="button" class="ag-passkey" id="agPasskey" hidden>' +
+        '<svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5"/><path d="M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5"/><path d="M12 13c0 3-.6 5.6-1.6 7.7"/><path d="M5.5 8a7 7 0 0 1 12 3c0 1"/></svg>' +
+        '<span>' + T('ag.pk.knop','Face ID of passkey') + '</span></button>';
+    gate.appendChild(doos);
+    // een wachtwoord-herstel-link uit de e-mail (?reset=): Rahul regelt het herstel zelf
     const herstel = new URLSearchParams(location.search).get('reset');
-    if (!herstel) ouder.classList.add('ag-over');
 
     const zin = doos.querySelector('#agZin');
     const inp = doos.querySelector('#agIn');
@@ -572,25 +532,113 @@
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
+      // Rahul typt zijn zin letter voor letter en de mond beweegt mee
+      if (window.RTGTyp){ RTGTyp.schrijf(zin, tekst, { praat: praat }); return; }
       zin.style.animation = 'none';
       void zin.offsetWidth; // de fade opnieuw laten lopen
       zin.style.animation = '';
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));
     }
+    const pkKnop = doos.querySelector('#agPasskey');
+    function toonPasskey(aan){
+      if (!pkKnop) return;
+      pkKnop.hidden = !aan;
+      // het label pas hier vertalen: bij het bouwen van de poort is de i18n
+      // soms nog niet geladen
+      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.knop','Face ID of passkey'); }
+    }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';
       inp.placeholder = placeholder || T('ag.ww','Je wachtwoord');
+      // wie herkend is (loginU) mag ook met Face ID / vingerafdruk / sleutel
+      toonPasskey(!!loginU);
     }
     function tekstVeld(){
       inp.type = 'text';
       inp.placeholder = T('ag.plho','Ik wil zeggen dat..');
+      toonPasskey(false);
     }
+
+    /* Face ID / passkey: dezelfde WebAuthn-dans als de aparte passkey-pagina,
+       maar binnen de poort. Rahul kent de gebruikersnaam al (loginU); het
+       toestel bewijst de identiteit, de server munt een echte sessie. */
+    async function passkeyInlog(){
+      if (!loginU || bezig) return;
+      if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)){
+        zeg('rahul', T('ag.pk.geen','Dit toestel kent nog geen Face ID of passkey. Typ je wachtwoord.')); return;
+      }
+      const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+      const u2b = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      bezig = true;
+      try {
+        zeg('rahul', T('ag.pk.vraag','Je toestel vraagt nu om je Face ID, vingerafdruk of sleutel.'));
+        const o = await API.call('/webauthn/opties', { login: loginU });
+        const pub = o.opties; pub.challenge = b2u(pub.challenge);
+        pub.allowCredentials = (pub.allowCredentials || []).map(c => Object.assign({}, c, { id: b2u(c.id) }));
+        const cred = await navigator.credentials.get({ publicKey: pub });
+        const antwoord = { id: cred.id, rawId: u2b(cred.rawId), type: cred.type,
+          clientExtensionResults: cred.getClientExtensionResults(),
+          response: { authenticatorData: u2b(cred.response.authenticatorData), clientDataJSON: u2b(cred.response.clientDataJSON),
+            signature: u2b(cred.response.signature), userHandle: cred.response.userHandle ? u2b(cred.response.userHandle) : null } };
+        const r = await API.call('/webauthn/login', { login: loginU, antwoord });
+        bezig = false;
+        if (r && r.token){
+          API.token = r.token; try { localStorage.setItem('rtg_member_token', r.token); } catch(e){}
+          zeg('rahul', T('ag.welkom','Daar ben je weer. Welkom terug.'));
+          if (typeof restoreSession === 'function') await restoreSession();
+        }
+      } catch(e){
+        bezig = false;
+        if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) return; // afgebroken door de gebruiker
+        zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.pk.mis','Dat lukte niet met de passkey. Typ anders je wachtwoord.'));
+      }
+    }
+    if (pkKnop) pkKnop.addEventListener('click', passkeyInlog);
+
+    /* ---------- wachtwoord-herstel, geheel in het gesprek ----------
+       Rahul vraagt de zescijferige code (tweede kanaal, per SMS) en daarna het
+       nieuwe wachtwoord, en zet het via de bestaande /auth/reset-route (die de
+       herstel-link uit de e-mail plus de code samen eist). Daarna gaat het
+       gewone inloggesprek verder. */
+    let resetStap = 0, resetCode = '';
+    function resetStart(){
+      resetStap = 1;
+      inp.type = 'text'; inp.inputMode = 'numeric';
+      inp.placeholder = T('ag.reset.codeph','De zes cijfers');
+      zeg('rahul', T('ag.reset.hoi','Je stelt een nieuw wachtwoord in. Uit veiligheid stuurde ik een code van zes cijfers naar je telefoon. Wat is die code?'));
+    }
+    async function resetStuur(tekst){
+      if (resetStap === 1){
+        resetCode = tekst.replace(/\D/g, '').slice(0, 6);
+        if (resetCode.length !== 6){ zeg('rahul', T('ag.reset.code6','Het zijn zes cijfers; kijk nog even in het bericht op je telefoon.')); return; }
+        resetStap = 2;
+        wachtwoordVeld(T('ag.wwnieuw','Kies een wachtwoord'));
+        zeg('rahul', T('ag.reset.ww','Dank je. En wat wordt je nieuwe wachtwoord? Minstens zes tekens.'));
+      } else if (resetStap === 2){
+        if (tekst.length < 6){ zeg('rahul', T('ag.reset.ww6','Minstens zes tekens graag.')); return; }
+        try {
+          await API.call('/auth/reset', { token: herstel, code: resetCode, password: tekst });
+          resetStap = 3; resetCode = ''; tekstVeld(); inp.inputMode = 'text';
+          zeg('rahul', T('ag.reset.klaar','Klaar, je nieuwe wachtwoord staat. Zeg "inloggen" en ik laat je binnen.'));
+        } catch(e){
+          resetStap = 1; resetCode = ''; inp.type = 'text';
+          zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.reset.mis','Zeg "opnieuw" en dan proberen we het nog eens.'));
+        }
+      } else {
+        // klaar: over naar het gewone inloggesprek, ?reset uit de URL halen
+        resetStap = 0;
+        const pas = new URLSearchParams(location.search).get('pas');
+        try { history.replaceState(null, '', location.pathname + (pas ? '?pas=' + pas : '')); } catch(e){}
+        gesprek = null; start();
+      }
+    }
+
     async function start(){
       if (gesprek || bezig) return;
       bezig = true;
       try { const d = await API.call('/aanmeld/start', { lang: document.documentElement.lang || 'nl' }); gesprek = d.id; zeg('rahul', d.tekst); }
-      catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; de formulieren werken altijd.')); klassiek(); }
+      catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; zeg iets, dan probeer ik het opnieuw.')); gesprek = null; }
       bezig = false;
     }
     async function stuur(){
@@ -598,6 +646,8 @@
       if (!tekst || bezig) return;
       inp.value = '';
       inp.closest('.ag-rij').classList.remove('vol');
+      // wachtwoord-herstel loopt via zijn eigen kleine gesprek
+      if (resetStap){ bezig = true; try { await resetStuur(tekst); } catch(e){ zeg('rahul', e.message || T('ag.mis2','Dat ging even mis; zeg het nog eens.')); } bezig = false; inp.focus(); return; }
       bezig = true;
       try {
         // "opnieuw" en "wachtwoord vergeten" zijn commando's voor het gesprek,
@@ -652,20 +702,16 @@
       bezig = false;
       inp.focus();
     }
-    // er is GEEN klassieke keuze meer: Rahul is de poort. De formulieren
-    // bestaan alleen nog als vangnet: voor wachtwoord-herstel (de knop
-    // hieronder en de e-maillink) en als het gesprek zelf niet kan starten.
-    function klassiek(){
-      ouder.classList.remove('ag-over');
-    }
     doos.querySelector('#agGo').addEventListener('click', stuur);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); stuur(); } });
     inp.addEventListener('input', () => inp.closest('.ag-rij').classList.toggle('vol', !!inp.value.trim()));
-    // het gesprek begint vanzelf zodra duidelijk is dat er geen sessie ligt
+    // herstel-link uit de e-mail: Rahul begint meteen het herstel-gesprek.
+    // Anders begint het gewone gesprek zodra duidelijk is dat er geen sessie ligt.
     let onthouden = null;
     try { onthouden = localStorage.getItem('rtg_member_token'); } catch(e){}
-    if (!herstel && !onthouden) setTimeout(start, 400);
-    inp.addEventListener('focus', start, { once: true });
+    if (herstel) setTimeout(resetStart, 400);
+    else if (!onthouden) setTimeout(start, 400);
+    inp.addEventListener('focus', () => { if (!herstel && !resetStap) start(); }, { once: true });
   })();
   /* ================= SALON-CONNECTIES =================
      Leden voegen elkaar toe op codenaam, chatten 1-op-1, delen posts
@@ -698,7 +744,7 @@
     if (!socialOK || !user || (user.tier === 'guest' && !user.account)){ el.hidden = true; return; }
     el.hidden = false;
     el.innerHTML = '<div class="label">'+T('spel.label','Spelen')+'</div>'+
-      '<div class="big" style="font-size:1.02rem;">🎲 '+T('spel.kop','Een potje tussendoor?')+'</div>'+
+      '<div class="big" style="font-size:1.02rem;">'+T('spel.kop','Een potje tussendoor?')+'</div>'+
       '<div class="meta" style="margin:.2rem 0 .7rem;">'+T('spel.uitleg','Schaken, Woordduel, Magnaat, 30 Seconden, Proost (18+) en Vingerroulette. Tegen vrienden of een random tegenstander; samen spelen maakt je niet automatisch vrienden.')+'</div>'+
       '<button class="go" id="gaSpelen">'+T('spel.ga','Naar de spellen')+' →</button>';
     el.querySelector('#gaSpelen').addEventListener('click', () => { location.href = '/apps/spelen.html?pas=' + encodeURIComponent(vastePas || 'rtg'); });
@@ -725,16 +771,22 @@
     if (!conns.length && !reqs.length){
       html += '<div class="big" style="font-size:1.02rem;">Nog geen contacten</div>'+
         '<div class="meta" style="margin:.2rem 0 .7rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
-        '<button class="go" data-goto="salon">Iemand toevoegen →</button>';
+        '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">'+
+        '<button class="go" data-goto="salon">Iemand toevoegen →</button>'+
+        '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek in De Salon iemand die bij me past en help me die toe te voegen als connectie">Laat Rahul iemand voorstellen</button>'+
+        '</div>';
     } else {
-      html += conns.map(c =>
+      // de naamlaag: een zelfgekozen naam (eigenNaam) gaat voor de codenaam;
+      // het potloodje zet of wist hem, en hij werkt overal in dit account door
+      html += conns.map(c => { const nm = c.eigenNaam || c.codename; return (
         '<div class="hc-rij" style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+
-        '<span class="sc-av" style="width:2.2rem;height:2.2rem;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+initCN(c.codename)+(c.unread?'<span class="sc-badge">'+c.unread+'</span>':'')+'</span>'+
-        '<b style="flex:1;min-width:0;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+escT(c.codename)+'</b>'+
-        '<button class="go" style="padding:.2rem .5rem;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">Bericht</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-snap="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'" title="Snap">📷</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">📞</button>'+
-        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">🎥</button></div>'
+        '<span class="sc-av" style="width:2.2rem;height:2.2rem;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+initCN(nm)+(c.unread?'<span class="sc-badge">'+c.unread+'</span>':'')+'</span>'+
+        '<b style="flex:1;min-width:0;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="'+escT(c.codename)+'">'+escT(nm)+(c.eigenNaam?' <span class="meta" style="font-weight:400;">· '+escT(c.codename)+'</span>':'')+'</b>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;color:var(--muted);" data-hernoem="'+escT(c.codename)+'" title="Eigen naam geven">✎</button>'+
+        '<button class="go" style="padding:.2rem .5rem;" data-dm="'+escT(c.key)+'" data-cn="'+escT(nm)+'">Bericht</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-snap="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="Snap">'+RTGGlyf.svgHTML('camera')+'</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('bellen')+'</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'); }
       ).join('') + '<button class="go" style="margin-top:.7rem;background:transparent;color:var(--muted);" data-goto="salon">+ Iemand toevoegen</button>';
     }
     el.innerHTML = html;
@@ -742,6 +794,11 @@
     el.querySelectorAll('[data-snap]').forEach(b => b.addEventListener('click', () => snapKies(b.dataset.snap)));
     el.querySelectorAll('[data-bel]').forEach(b => b.addEventListener('click', () => snelBel(b.dataset.bel, b.dataset.cn, false)));
     el.querySelectorAll('[data-vid]').forEach(b => b.addEventListener('click', () => snelBel(b.dataset.vid, b.dataset.cn, true)));
+    el.querySelectorAll('[data-hernoem]').forEach(b => b.addEventListener('click', async () => {
+      const naam = prompt('Hoe wil jij deze vriend noemen? (leeg = terug naar de codenaam)', '');
+      if (naam === null) return;
+      try { await API.call('/member/naam/zet', { codenaam: b.dataset.hernoem, naam }); toast(naam.trim() ? 'Opgeslagen; alleen jij ziet deze naam.' : 'Terug naar de codenaam.'); loadSocial(); } catch(e){ toast(e.message); }
+    }));
     renderSnapsStories();
     el.querySelectorAll('[data-cja]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/member/connect/respond', { key: b.dataset.cja, action: 'accept' }); toast(T('sal.verbonden','Verbonden.')); loadSocial(); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-cnee]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/member/connect/respond', { key: b.dataset.cnee, action: 'decline' }); loadSocial(); } catch(e){ toast(e.message); } }));
@@ -758,8 +815,8 @@
     const foto = await snapVerklein(f); if(!foto){ toast(T('snap.leesfout','Kon de foto niet lezen.')); return; }
     const tekst = prompt(T('snap.tekst','Tekst erbij (mag leeg):'),'') || '';
     try {
-      if (snapStoryMode){ await API.call('/member/story/post', { foto, tekst }); toast('✨ '+T('snap.storyok','Je verhaal staat er 24 uur op.')); loadStories(); }
-      else { await API.call('/member/snap/send', { toKey: snapNaar, foto, tekst }); toast('📷 '+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
+      if (snapStoryMode){ await API.call('/member/story/post', { foto, tekst }); toast(''+T('snap.storyok','Je verhaal staat er 24 uur op.')); loadStories(); }
+      else { await API.call('/member/snap/send', { toKey: snapNaar, foto, tekst }); toast(''+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
     } catch(err){ toast(err.message); }
   }
   function snapVerklein(file){
@@ -767,73 +824,210 @@
       rd.onload=()=>{ img.onload=()=>{ const max=1000; let w=img.width,h=img.height; if(w>max||h>max){ const r=Math.min(max/w,max/h); w=Math.round(w*r); h=Math.round(h*r);} const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h); res(cv.toDataURL('image/jpeg',0.7)); }; img.onerror=()=>res(null); img.src=rd.result; };
       rd.onerror=()=>res(null); rd.readAsDataURL(file); });
   }
-  /* ---------- verplichte onboarding + contract (blokkeert de app) ---------- */
-  let onbBezig = false;
+  /* ---------- verplichte onboarding als gesprek met Rahul ----------
+     Geen formulier meer: Rahul vraagt de ontbrekende gegevens één voor één,
+     laat de overeenkomst lezen en laat je tekenen door je naam te typen. Alles
+     loopt over dezelfde routes als voorheen (/onboarding/status|opslaan|teken
+     en /verify/upload). De invoerregel + knoppen worden in 10-social-02
+     bedraad; de gespreksfuncties staan hier. */
+  let onbBezig = false, onbSt = null, onbRij = [], onbStap = null, onbHuidig = null, onbGeopend = false, onbMond = null;
+  function onbEl(id){ return document.getElementById(id); }
+  // Rahuls signatuurmond boven de onboarding, dezelfde als op de poort; en zijn
+  // woorden verschijnen letter voor letter (RTGTyp) terwijl de mond meebeweegt.
+  function onbMondMaak(){ const c = onbEl('onbMond'); if (c && !onbMond && window.RTGMond) onbMond = RTGMond.maak(c); }
+  function onbZeg(t){
+    const z = onbEl('onbTitel'); if (!z) return;
+    const praat = onbMond ? function(ms){ onbMond.praat(ms); } : null;
+    if (window.RTGTyp) RTGTyp.schrijf(z, t, { praat: praat });
+    else { z.textContent = t; if (praat) praat(400); }
+  }
+  function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
+  function onbOpenVelden(){ return ((onbSt && onbSt.velden) || []).filter(function(v){ return !v.ingevuld; }); }
+
   async function checkOnboarding(){
     if (!API.live || !API.token || onbBezig) return;
     let st; try { st = await API.call('/onboarding/status'); } catch(e){ return; }
-    if (!st || st.klaar){ var g0 = document.getElementById('onbGate'); if (g0) g0.hidden = true; return; }
-    tekenOnbGate(st);
+    if (!st || st.klaar){ const g0 = onbEl('onbGate'); if (g0) g0.hidden = true; return; }
+    onbStartGesprek(st);
   }
-  function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
-  function tekenOnbGate(st){
-    const g = document.getElementById('onbGate'); if (!g) return;
+  function onbStartGesprek(st){
+    const g = onbEl('onbGate'); if (!g) return;
+    if (!g.hidden && onbStap) return; // al bezig, niet opnieuw beginnen
+    onbSt = st; onbMondMaak();
+    onbRij = onbOpenVelden();
+    onbStap = onbRij.length ? 'veld' : 'teken';
+    const eerste = !onbGeopend; onbGeopend = true;
     g.hidden = false;
-    const vBox = document.getElementById('onbVelden');
-    // bewaar wat de gebruiker al typte (een KYC-upload herbouwt dit paneel)
-    const huidig = {}; vBox.querySelectorAll('input[data-veld]').forEach(function(i){ if (i.value) huidig[i.dataset.veld] = i.value; });
-    vBox.textContent='';
-    (st.velden||[]).forEach(function(v){
-      if (v.type === 'kyc'){
-        const d = document.createElement('div'); d.className='onb-kyc';
-        const l = document.createElement('div');
-        const b = document.createElement('b'); b.textContent = v.label; l.appendChild(b);
-        const s = document.createElement('span'); s.className='sub';
-        s.textContent = v.ingevuld ? T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.') : T('onb.kyc.upl','Upload een foto van de voorkant van uw paspoort.');
-        l.appendChild(s); d.appendChild(l);
-        if (v.ingevuld){ const st2 = document.createElement('span'); st2.className='st'; st2.style.color='#7EE0A3'; st2.textContent='✓'; d.appendChild(st2); }
-        else { const btn = document.createElement('button'); btn.type='button'; btn.className='onb-btn ghost'; btn.textContent=T('onb.kyc.knop','Uploaden');
-          btn.addEventListener('click', ()=> document.getElementById('onbKycFile').click()); d.appendChild(btn); }
-        vBox.appendChild(d); return;
-      }
-      const wrap = document.createElement('label'); wrap.className='onb-veld';
-      const sp = document.createElement('span'); sp.textContent = v.label + (v.ingevuld ? ' ✓' : '');
-      wrap.appendChild(sp);
-      const inp = document.createElement('input'); inp.type = onbInputType(v.type); inp.dataset.veld = v.id;
-      inp.value = huidig[v.id] != null ? huidig[v.id] : (v.waarde || ''); inp.autocomplete = ({naam:'name',email:'email',telefoon:'tel',adres:'street-address',postcode:'postal-code',woonplaats:'address-level2',land:'country-name'})[v.id] || 'off';
-      wrap.appendChild(inp); vBox.appendChild(wrap);
-    });
-    document.getElementById('onbCTitel').textContent = st.contract.titel || '';
-    document.getElementById('onbCTekst').textContent = st.contract.tekst || '';
-    const ak = document.getElementById('onbAkkoord'); ak.checked = ak.checked || !!st.contract.ondertekend;
-    document.getElementById('onbFout').textContent = '';
+    if (eerste) onbZeg(T('onb.intro','Fijn dat je er bent. Nog een paar dingen en je kunt op reis.'));
+    setTimeout(onbVolgende, eerste ? 750 : 0);
   }
-  (function initOnb(){
-    const kf = document.getElementById('onbKycFile');
-    if (kf) kf.addEventListener('change', async () => {
-      const file = kf.files[0]; kf.value=''; if (!file) return;
-      if (file.size > 5*1024*1024){ document.getElementById('onbFout').textContent = T('onb.toobig','De foto is te groot (max 5 MB).'); return; }
-      const data = await snapVerklein(file); if (!data) return;
-      try { await API.call('/verify/upload', { image: data }); if (user) user.verified='pending'; toast(T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.')); checkOnboarding(); }
-      catch(e){ document.getElementById('onbFout').textContent = e.message || 'Upload mislukt.'; }
+  function onbVolgende(){
+    if (onbStap === 'veld' && onbRij.length){
+      onbHuidig = onbRij[0];
+      if (onbHuidig.type === 'kyc') return onbVraagPaspoort();
+      return onbVraagVeld(onbHuidig);
+    }
+    onbStap = 'teken';
+    onbTekenVraag();
+  }
+  function onbVraagTekst(v){
+    const M = {
+      adres: T('onb.q.adres','Wat is je straat en huisnummer?'),
+      postcode: T('onb.q.postcode','En je postcode?'),
+      woonplaats: T('onb.q.woonplaats','In welke plaats woon je?'),
+      land: T('onb.q.land','En in welk land?'),
+      geboortedatum: T('onb.q.geboortedatum','Wat is je geboortedatum?'),
+      nationaliteit: T('onb.q.nationaliteit','Wat is je nationaliteit?'),
+      naam: T('onb.q.naam','Hoe heet je voluit?'),
+      email: T('onb.q.email','Wat is je e-mailadres?'),
+      telefoon: T('onb.q.telefoon','En je telefoonnummer?')
+    };
+    return M[v.id] || (T('onb.q.veld','Wat is je ') + String(v.label || '').toLowerCase() + '?');
+  }
+  function onbVraagVeld(v){
+    const inp = onbEl('onbIn'), rij = onbEl('onbRij');
+    if (rij) rij.style.display = '';
+    if (inp){ inp.type = onbInputType(v.type); inp.value = ''; inp.placeholder = T('onb.typ','Typ je antwoord'); }
+    onbActies([]);
+    onbZeg(onbVraagTekst(v));
+    if (inp) inp.focus();
+  }
+  function onbVraagPaspoort(){
+    const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
+    onbZeg(T('onb.q.paspoort','Tot slot je paspoort, zodat ik zeker weet dat jij het bent. Scan het met de RTG-scanner of kies een foto.'));
+    onbActies([
+      { txt: T('onb.scan','Scan je paspoort'), prim: true, doe: function(){
+          if (window.RTGPaspoortScan) RTGPaspoortScan.open({ onKlaar: function(d, mrz){ onbPaspoortUpload(d, mrz); } });
+          else onbEl('onbKycFile').click();
+        } },
+      { txt: T('onb.upload','Kies een foto'), doe: function(){ onbEl('onbKycFile').click(); } }
+    ]);
+  }
+  // de gekozen/gescande foto versleuteld naar de kluis en het gesprek vervolgen.
+  // mrz = (optioneel) de op het toestel uitgelezen paspoortzone; kloppen de
+  // controlecijfers, dan vult Rahul naam/geboortedatum/nationaliteit vast in.
+  async function onbPaspoortUpload(data, mrz){
+    if (!data) return;
+    const fout = onbEl('onbFout'); if (fout) fout.textContent = '';
+    onbBezig = true;
+    try {
+      await API.call('/verify/upload', { image: data });
+      if (user) user.verified = 'pending';
+      const gelezen = await onbMrzOpslaan(mrz);
+      try { onbSt = await API.call('/onboarding/status'); } catch(e){}
+      onbBezig = false;
+      if (gelezen) onbZeg(T('onb.mrz1','Ik heb je paspoort gelezen: ') + gelezen + T('onb.mrz2','. Klopt dat? Dan gaan we verder.'));
+      if (onbSt && onbSt.klaar) return setTimeout(onbKlaar, gelezen ? 900 : 0);
+      onbRij = onbOpenVelden();
+      onbStap = onbRij.length ? 'veld' : 'teken';
+      if (gelezen) setTimeout(onbVolgende, 900); else onbVolgende();
+    } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.upmis','Uploaden lukte niet.'); }
+  }
+  // MRZ-velden opslaan in het onboarding-profiel; geeft een korte omschrijving
+  // terug van wat gelezen is (voor Rahul), of '' als er niets bruikbaars was.
+  async function onbMrzOpslaan(mrz){
+    if (!mrz) return '';
+    // de vervaldatum los bewaren (geen onboarding-veld): Rahul seint er een half
+    // jaar vooraf mee dat het paspoort verloopt
+    if (mrz.vervaldatum){ try { await API.call('/onboarding/paspoort', { vervaldatum: mrz.vervaldatum, nummer: mrz.nummer }); } catch(e){} }
+    const heeft = {}; (onbSt && onbSt.velden || []).forEach(function(v){ heeft[v.id] = v; });
+    const velden = {}, stukjes = [];
+    if (mrz.geboortedatum && heeft.geboortedatum){ velden.geboortedatum = mrz.geboortedatum; stukjes.push(mrz.geboortedatum); }
+    if (mrz.nationaliteit && heeft.nationaliteit){ velden.nationaliteit = mrz.nationaliteit; stukjes.push(mrz.nationaliteit); }
+    if (mrz.naam && heeft.naam && !heeft.naam.ingevuld){ velden.naam = mrz.naam; stukjes.push(mrz.naam); }
+    if (!Object.keys(velden).length) return '';
+    try { onbSt = await API.call('/onboarding/opslaan', { velden }); } catch(e){ return ''; }
+    return stukjes.join(', ');
+  }
+  function onbTekenVraag(){
+    const inp = onbEl('onbIn'), rij = onbEl('onbRij');
+    if (rij) rij.style.display = '';
+    if (inp){ inp.type = 'text'; inp.value = ''; inp.placeholder = T('onb.naamph','Typ je volledige naam'); }
+    const c = (onbSt && onbSt.contract) || {};
+    onbZeg(T('onb.teken','Laatste stap: de ') + (c.titel || T('onb.overeenkomst','overeenkomst')) + T('onb.teken2','. Typ je volledige naam om te tekenen; daarmee ga je akkoord. Wil je hem eerst lezen?'));
+    onbActies([{ txt: T('onb.lees','Lees de overeenkomst'), doe: onbToonLees }]);
+    if (inp) inp.focus();
+  }
+  function onbToonLees(){
+    const l = onbEl('onbLees'); if (!l) return;
+    if (l.hidden){ l.textContent = ((onbSt && onbSt.contract) || {}).tekst || ''; l.hidden = false; }
+    else l.hidden = true;
+  }
+  function onbActies(lijst){
+    const box = onbEl('onbActies'); if (!box) return;
+    box.textContent = '';
+    (lijst || []).forEach(function(a){
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = a.txt;
+      if (a.prim) b.className = 'prim'; b.addEventListener('click', a.doe); box.appendChild(b);
     });
-    const kn = document.getElementById('onbKlaar');
-    if (kn) kn.addEventListener('click', async () => {
-      const fout = document.getElementById('onbFout'); fout.textContent='';
+  }
+  function onbKlaar(){
+    const g = onbEl('onbGate'); if (g) g.hidden = true;
+    onbStap = null; onbGeopend = false; onbSt = null; onbRij = [];
+    onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
+    toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
+  }
+  async function onbInvoer(tekst){
+    if (onbBezig || !onbStap) return;
+    tekst = String(tekst == null ? '' : tekst).trim();
+    const inp = onbEl('onbIn'); if (inp) inp.value = '';
+    const fout = onbEl('onbFout'); if (fout) fout.textContent = '';
+    if (onbStap === 'veld'){
+      if (!tekst || !onbHuidig) return;
       onbBezig = true;
       try {
-        const velden = {};
-        document.querySelectorAll('#onbVelden input[data-veld]').forEach(function(i){ if (i.value.trim()) velden[i.dataset.veld] = i.value.trim(); });
-        if (Object.keys(velden).length) { try { await API.call('/onboarding/opslaan', { velden }); } catch(e){} }
-        const naam = (document.getElementById('onbNaam').value || '').trim();
-        const akkoord = document.getElementById('onbAkkoord').checked;
-        const r = await API.call('/onboarding/teken', { naam, akkoord });
-        if (r.klaar){ document.getElementById('onbGate').hidden = true; toast(T('onb.welkom','Welkom aan boord! Fijne reis.')); onbBezig=false; return; }
-        tekenOnbGate(r);
-        fout.textContent = T('onb.rest','Nog niet compleet: vul de resterende velden in (ook uw paspoort).');
-      } catch(e){ fout.textContent = e.message || 'Er ging iets mis.'; }
-      onbBezig = false;
+        const velden = {}; velden[onbHuidig.id] = tekst;
+        onbSt = await API.call('/onboarding/opslaan', { velden });
+        onbBezig = false;
+        onbRij = onbOpenVelden();
+        onbStap = onbRij.length ? 'veld' : 'teken';
+        onbVolgende();
+      } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
+    } else if (onbStap === 'teken'){
+      if (tekst.length < 2){ if (fout) fout.textContent = T('onb.naamkort','Typ je volledige naam om te tekenen.'); return; }
+      onbBezig = true;
+      try {
+        const r = await API.call('/onboarding/teken', { naam: tekst, akkoord: true });
+        onbBezig = false; onbSt = r;
+        if (r && r.klaar) return onbKlaar();
+        onbRij = onbOpenVelden();
+        onbStap = onbRij.length ? 'veld' : 'teken';
+        onbVolgende();
+      } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
+    }
+  }
+  async function onbPaspoortGekozen(file){
+    const fout = onbEl('onbFout'); if (fout) fout.textContent = '';
+    if (!file) return;
+    if (file.size > 5*1024*1024){ if (fout) fout.textContent = T('onb.toobig','De foto is te groot (max 5 MB).'); return; }
+    const data = await snapVerklein(file); if (!data) return;
+    const mrz = await onbMrzUitFoto(data);
+    return onbPaspoortUpload(data, mrz);
+  }
+  // een gekozen foto in een canvas laden en er de MRZ uit proberen te lezen
+  function onbMrzUitFoto(dataURL){
+    return new Promise(function(res){
+      if (!window.RTGMRZ){ res(null); return; }
+      const img = new Image();
+      img.onload = function(){
+        try {
+          const cv = document.createElement('canvas'); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+          cv.getContext('2d').drawImage(img, 0, 0);
+          res(RTGMRZ.lees(cv));
+        } catch(e){ res(null); }
+      };
+      img.onerror = function(){ res(null); };
+      img.src = dataURL;
     });
+  }
+  // Het onboarding-gesprek bedraden: de invoerregel, de stuur-knop en de
+  // paspoort-upload. De gespreksfuncties zelf staan in 10-social-01.
+  (function initOnbGesprek(){
+    const go = document.getElementById('onbGo'), inp = document.getElementById('onbIn');
+    if (go && inp) go.addEventListener('click', function(){ onbInvoer(inp.value); });
+    if (inp) inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); onbInvoer(inp.value); } });
+    const kf = document.getElementById('onbKycFile');
+    if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();
 
   function snapOverlay(){
@@ -863,7 +1057,7 @@
     h += '</div>';
     if (snaps.length){
       h += '<div style="display:flex;flex-direction:column;gap:.35rem;margin-bottom:.5rem;">'+snaps.map(sn=>
-        '<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;"><span>📷</span><b style="flex:1;color:var(--gold);">'+escT(sn.van)+'</b><span style="color:var(--soft);">stuurde een snap</span><button class="js-opensnap go" data-id="'+escT(sn.id)+'" style="padding:.15rem .55rem;">Bekijk</button></div>'
+        '<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;"><span></span><b style="flex:1;color:var(--gold);">'+escT(sn.van)+'</b><span style="color:var(--soft);">stuurde een snap</span><button class="js-opensnap go" data-id="'+escT(sn.id)+'" style="padding:.15rem .55rem;">Bekijk</button></div>'
       ).join('')+'</div>';
     }
     box.innerHTML = h;
@@ -901,10 +1095,10 @@
     }
     html += '<div class="sc-strip">' +
       '<button class="sc-p add" id="scAddBtn"><span class="sc-av">+</span><span>' + T('sal.add','Toevoegen') + '</span></button>' +
-      (social.connections || []).map(c =>
-        '<button class="sc-p" data-scdm="' + escT(c.key) + '" data-cn="' + escT(c.codename) + '">' +
-          '<span class="sc-av">' + initCN(c.codename) + (c.unread ? '<span class="sc-badge">' + c.unread + '</span>' : '') + '</span>' +
-          '<span>' + escT(c.codename.split(' ')[0]) + '</span></button>'
+      (social.connections || []).map(c => { const nm = c.eigenNaam || c.codename; return (
+        '<button class="sc-p" data-scdm="' + escT(c.key) + '" data-cn="' + escT(nm) + '" title="' + escT(c.codename) + '">' +
+          '<span class="sc-av">' + initCN(nm) + (c.unread ? '<span class="sc-badge">' + c.unread + '</span>' : '') + '</span>' +
+          '<span>' + escT(nm.split(' ')[0]) + '</span></button>'); }
       ).join('') + '</div>';
     html += '<div class="sc-zoek" id="scZoek"><input id="scQ" placeholder="' + T('sal.zoekph','Zoek op codenaam, bijv. Gouden Ibis') + '"><button id="scGo">' + T('sal.zoek','Zoek') + '</button></div>' +
       '<div class="sc-res" id="scRes"></div>';
@@ -970,7 +1164,8 @@
   function dmBubbel(m){
     const mijn = m.from === social.me;
     const tijd = new Date(m.at).toLocaleTimeString(lang()==='en'?'en-GB':'nl-NL',{hour:'2-digit',minute:'2-digit'});
-    const txt = mijn ? escT(m.text) : '<span class="xlate">' + escT(m.text) + '</span>';
+    const emo = s => window.RTGEmoji ? RTGEmoji.render(escT(s)) : escT(s);
+    const txt = mijn ? emo(m.text) : '<span class="xlate">' + escT(m.text) + '</span>';
     return '<div class="dm-m' + (mijn ? ' mine' : '') + '">' + txt +
       (m.post ? '<div class="dm-post"><b>↗ ' + escT(m.post.author) + ' · ' + escT(m.post.place) + '</b>' + escT(m.post.text) + '…</div>' : '') +
       '<span class="tijd">' + tijd + '</span></div>';
@@ -987,6 +1182,8 @@
   }
   $('#dmSend').addEventListener('click', stuurDm);
   $('#dmInput').addEventListener('keydown', e => { if (e.key === 'Enter') stuurDm(); });
+  // RTG-eigen emoji-kiezer bij de DM-invoer
+  (function(){ const inp = $('#dmInput'); if (inp && inp.parentNode && window.RTGEmoji && !inp.parentNode.querySelector('.rtg-emo-knop')) { inp.parentNode.insertBefore(RTGEmoji.knop(inp), inp); } })();
   const dmDicht = () => { $('#dm-sheet').classList.remove('open'); $('#dm-scrim').classList.remove('open'); dmWith = null; };
   $('#dmClose').addEventListener('click', dmDicht);
   $('#rideGo').addEventListener('click', verstuurRit);
@@ -1168,14 +1365,14 @@
   }
 
   function opSociaal(d){
-    if (d.kind === 'request'){ toast('🤝 ' + d.from + ' ' + T('sal.wilverbinden','wil verbinden')); loadSocial(); }
-    else if (d.kind === 'accepted'){ toast('🤝 ' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
+    if (d.kind === 'request'){ toast('' + d.from + ' ' + T('sal.wilverbinden','wil verbinden')); loadSocial(); }
+    else if (d.kind === 'accepted'){ toast('' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
     else if (d.kind === 'dm'){
       if (dmWith === d.from && $('#dm-sheet').classList.contains('open')){
         dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
         API.call('/member/dm', { withKey: d.from }).catch(()=>{}); // gelezen
       } else {
-        toast('💬 ' + d.codename + ': ' + (d.text || '↗').slice(0, 60));
+        toast('' + d.codename + ': ' + (d.text || '↗').slice(0, 60));
         loadSocial();
       }
     }
@@ -1190,6 +1387,85 @@
     bel: (key, naam, video) => snelBel(key, naam, video),
     snap: key => snapKies(key)
   };
+
+  /* ---- het salongesprek: jouw Rahul kletst met die van je vriend ----
+
+     Een gimmick, en zo staat het er ook. De knop zit in de kop van de DM,
+     want daar zit je al met precies die ene persoon.
+
+     Twee dingen die hier bewust in het scherm staan en niet alleen in de
+     server: de schakelaar (standaard uit) en de zin dat alle plekken
+     verzonnen zijn. Wie niet weet dat er iets over zijn dag verteld wordt,
+     heeft geen keuze gemaakt, en dan is "aan" geen toestemming. */
+  let kletsAan = false;
+
+  async function kletsLaad(){
+    try {
+      const d = await API.call('/klets', {});
+      kletsAan = !!d.aan;
+      return d;
+    } catch(e){ return { aan: false, gesprekken: [], uitleg: '' }; }
+  }
+
+  function kletsTekenLeeg(d){
+    $('#kletsBody').innerHTML =
+      '<p class="stil" style="font-size:.82rem;color:var(--soft);line-height:1.6;">' + escT(d.uitleg || '') + '</p>' +
+      '<label style="display:flex;gap:.6rem;align-items:flex-start;margin:.9rem 0;font-size:.85rem;">' +
+        '<input type="checkbox" id="kletsSchakel"' + (kletsAan ? ' checked' : '') + ' style="margin-top:.2rem;">' +
+        '<span>Rahul mag met de Rahul van mijn vrienden kletsen over hoe mijn dag was.' +
+        '<br><span style="color:var(--soft);font-size:.78rem;">Uit te zetten wanneer je wilt. Zolang het uit staat, gebeurt er niets.</span></span>' +
+      '</label>' +
+      '<button class="knop" id="kletsGo"' + (kletsAan ? '' : ' disabled') + '>Laat ze kletsen</button>' +
+      (d.gesprekken && d.gesprekken.length
+        ? '<div style="margin-top:1rem;border-top:1px solid var(--line);padding-top:.8rem;">' +
+          d.gesprekken.slice(0, 8).map(g =>
+            '<button class="klets-eerder" data-klets="' + escT(g.id) + '" style="display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:.5rem 0;font:inherit;cursor:pointer;">' +
+            '<b style="font-size:.78rem;color:var(--gold);">' + escT(g.metCodenaam) + '</b>' +
+            '<span style="display:block;font-size:.82rem;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escT(g.eerste) + '</span></button>'
+          ).join('') + '</div>'
+        : '');
+    const schakel = $('#kletsSchakel');
+    if (schakel) schakel.addEventListener('change', async () => {
+      try { const r = await API.call('/klets/zet', { aan: schakel.checked }); kletsAan = !!r.aan; $('#kletsGo').disabled = !kletsAan; }
+      catch(e){ toast(e.message); schakel.checked = kletsAan; }
+    });
+    const go = $('#kletsGo');
+    if (go) go.addEventListener('click', kletsStart);
+    $('#kletsBody').querySelectorAll('[data-klets]').forEach(b => b.addEventListener('click', async () => {
+      try { kletsToon(await API.call('/klets/gesprek', { id: b.dataset.klets })); } catch(e){ toast(e.message); }
+    }));
+  }
+
+  function kletsToon(g){
+    $('#kletsBody').innerHTML =
+      '<div class="klets-draad">' + (g.beurten || []).map(b =>
+        '<div class="dm-m' + (b.mij ? ' mine' : '') + '">' + escT(b.tekst) + '</div>').join('') + '</div>' +
+      '<p style="font-size:.75rem;color:var(--soft);line-height:1.6;margin-top:.9rem;">' + escT(g.noot || '') +
+      (g.echt ? '' : ' Dit is een demogesprek: er staat geen AI-sleutel ingesteld.') + '</p>' +
+      '<button class="knop" id="kletsTerug" style="margin-top:.7rem;">Terug</button>';
+    const t = $('#kletsTerug');
+    if (t) t.addEventListener('click', async () => kletsTekenLeeg(await kletsLaad()));
+  }
+
+  async function kletsStart(){
+    if (!dmWith) return;
+    const go = $('#kletsGo');
+    if (go) { go.disabled = true; go.textContent = 'Ze zijn bezig...'; }
+    try { kletsToon(await API.call('/klets/start', { vriend: dmWith })); }
+    catch(e){ toast(e.message); if (go) { go.disabled = false; go.textContent = 'Laat ze kletsen'; } }
+  }
+
+  async function kletsOpen(){
+    if (!dmWith) return;
+    $('#kletsNaam').textContent = dmNaam || '';
+    $('#klets-sheet').classList.add('open'); $('#klets-scrim').classList.add('open');
+    $('#kletsBody').innerHTML = '<p style="color:var(--soft);font-size:.85rem;">Laden...</p>';
+    kletsTekenLeeg(await kletsLaad());
+  }
+  const kletsDicht = () => { $('#klets-sheet').classList.remove('open'); $('#klets-scrim').classList.remove('open'); };
+  if ($('#dmKlets')) $('#dmKlets').addEventListener('click', kletsOpen);
+  if ($('#kletsClose')) $('#kletsClose').addEventListener('click', kletsDicht);
+  if ($('#klets-scrim')) $('#klets-scrim').addEventListener('click', kletsDicht);
   /* ---------- live updates ---------- */
 
   // een scherm werkt zichzelf bij zonder page-refresh
@@ -1241,7 +1517,7 @@
     list.innerHTML = R.notifications.length
       ? R.notifications.map(x =>
           '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +
-            '<div class="ic">' + (x.icon || '•') + '</div>' +
+            '<div class="ic">' + (window.RTGGlyf && RTGGlyf.heeft(x.icon) ? RTGGlyf.svgHTML(x.icon, { klasse: 'gl-inline' }) : (x.icon || '•')) + '</div>' +
             '<div class="tx"><b>' + x.title + '</b><span>' + x.body + '</span><time>' + timeAgo(x.at) + '</time></div>' +
           '</div>').join('')
       : '<div class="notif-empty">'+T('app.nonotif','Nog geen meldingen. Zodra iemand op uw post reageert of u een bericht stuurt, ziet u het hier.')+'</div>';
@@ -1436,7 +1712,7 @@
     if (!mijn.length){ el.innerHTML = ''; return; }
     el.innerHTML = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:0 0 0.5rem;">'+T('care.mijn','Mijn afspraken')+'</div>'+
       mijn.map(b => '<div class="card" style="border-color:rgba(139,195,168,0.35);">'+
-        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green,#8bc3a8);">🌿 '+esc(b.aanbiederNaam)+'</div>'+
+        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green,#8bc3a8);">'+esc(b.aanbiederNaam)+'</div>'+
         '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(b.behandelingNaam)+'</b>'+(b.behandelaarNaam?' · '+esc(b.behandelaarNaam):'')+'</div>'+
         '<div class="soft-sm" style="margin-top:0.15rem;">'+b.datum+' · '+b.tijd+' · '+eur(b.prijs)+' · '+
           (b.paid ? '<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>' : '<span style="color:var(--gold);">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
@@ -1458,7 +1734,7 @@
     const list = (careOv && careOv.intakes) || [];
     if (!list.length){ el.innerHTML = ''; return; }
     el.innerHTML = '<div class="card" style="border-color:rgba(208,172,87,0.3);">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">🩺 '+T('care.intakes','Gedeelde medische context')+'</div>'+
+      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">'+T('care.intakes','Gedeelde medische context')+'</div>'+
       list.map(i => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.5rem;">'+
         '<div style="font-size:0.85rem;">'+esc(i.aanbiederNaam)+'<div class="soft-sm">'+T('care.tot','tot')+' '+i.vervaltOp+'</div></div>'+
         '<button class="bz-btn" data-care-intakestop="'+esc(i.id)+'">'+T('care.stopdelen','Stop delen')+'</button></div>').join('')+
@@ -1477,15 +1753,15 @@
     let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('care.aanbod','Spa’s, wellness en klinieken')+'</div>';
     for (const a of aanb){
       const medisch = a.soort === 'kliniek' || (a.behandelingen || []).some(b => b.soort === 'medisch');
-      html += '<div class="card"><div style="display:flex;gap:0.5rem;align-items:baseline;"><span style="font-size:1.1rem;">'+esc(a.icon||'🌿')+'</span>'+
+      html += '<div class="card"><div style="display:flex;gap:0.5rem;align-items:baseline;"><span style="font-size:1.1rem;">'+esc(a.icon||'')+'</span>'+
         '<div style="flex:1;"><b>'+esc(a.naam)+'</b> <span class="soft-sm">· '+esc(careSoort[a.soort]||a.soort)+(a.waar?' · '+esc(a.waar):'')+'</span>'+
         (a.beschrijving?'<div class="soft-sm" style="margin-top:0.15rem;">'+esc(a.beschrijving)+'</div>':'')+
-        ((a.behandelaars||[]).length?'<div class="soft-sm" style="margin-top:0.2rem;">👤 '+a.behandelaars.map(b => esc(b.naam)+(b.functie?' ('+esc(b.functie)+')':'')).join(' · ')+'</div>':'')+'</div></div>';
+        ((a.behandelaars||[]).length?'<div class="soft-sm" style="margin-top:0.2rem;">'+a.behandelaars.map(b => esc(b.naam)+(b.functie?' ('+esc(b.functie)+')':'')).join(' · ')+'</div>':'')+'</div></div>';
       // intake-deling voor klinieken/medische zorg: uitdrukkelijk en per aanbieder
       if (medisch){
         const actief = !!a.intakeActief;
         html += '<div style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div class="soft-sm" style="margin-bottom:0.35rem;">🩺 '+(actief
+          '<div class="soft-sm" style="margin-bottom:0.35rem;">'+(actief
             ? T('care.intakeaan','U deelt medische context met deze kliniek. U kunt dit bij Mijn afspraken stoppen.')
             : T('care.intakeuit','Wilt u dat de behandelaar iets weet (medicijnen, allergie, aandoening)? Deel het apart en alleen met deze kliniek.'))+'</div>'+
           (actief ? '' :
@@ -1549,7 +1825,7 @@
     // mijn geboekte pakketten
     for (const b of carePakMijn){
       html += '<div class="card" style="border-color:rgba(194,58,94,0.3);">'+
-        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);">🌸 '+T('care.pakket','Pakket')+'</div>'+
+        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);">'+T('care.pakket','Pakket')+'</div>'+
         '<div style="margin-top:0.3rem;font-size:0.92rem;"><b>'+esc(b.naam)+'</b></div>'+
         '<div class="soft-sm">'+b.nachten+' '+T('care.nachten','nachten')+' · '+esc(b.hotelNaam)+' · '+b.datum+' '+b.tijd+' · '+eur(b.prijs)+
           ' · '+(b.paid?'<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>':'<span style="color:var(--gold);">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
@@ -1562,7 +1838,7 @@
       html += '<div class="card"><div style="display:flex;justify-content:space-between;gap:0.5rem;">'+
         '<div style="flex:1;"><b>'+esc(p.naam)+'</b>'+
         '<div class="soft-sm" style="margin-top:0.15rem;">'+esc(p.beschrijving)+'</div>'+
-        '<div class="soft-sm" style="margin-top:0.25rem;">🏨 '+esc(p.hotelNaam)+' · '+p.nachten+' '+T('care.nachten','nachten')+' + '+esc(p.behandelingNaam)+' ('+p.duurMin+' min)</div></div>'+
+        '<div class="soft-sm" style="margin-top:0.25rem;">'+esc(p.hotelNaam)+' · '+p.nachten+' '+T('care.nachten','nachten')+' + '+esc(p.behandelingNaam)+' ('+p.duurMin+' min)</div></div>'+
         '<div style="text-align:right;white-space:nowrap;"><div style="color:var(--gold);font-size:0.95rem;">'+eur(p.prijs)+'</div>'+
         (p.bespaar>0?'<div class="soft-sm" style="color:var(--green,#8bc3a8);">'+T('care.bespaar','bespaar')+' '+eur(p.bespaar)+'</div>':'')+'</div></div>';
       if (open){
@@ -1738,17 +2014,17 @@
     const CH_ST = { 'aangevraagd': T('ch.m.geboekt','geboekt; leg de staat vast bij het uitvaren'), 'lopend': T('ch.m.lopend','op zee; behouden vaart'), 'afgerond': T('ch.m.af','afgerond') };
     if (el) el.innerHTML = mijn.filter(c => c.status !== 'afgerond' || c.tot >= new Date().toISOString().slice(0, 10)).map(c =>
       '<div class="card" style="border-color:rgba(91,185,140,0.35);">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);">⛵ '+T('ch.m.kop','Charter')+' · '+esc(c.supplierName)+'</div>'+
+      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);">'+T('ch.m.kop','Charter')+' · '+esc(c.supplierName)+'</div>'+
       '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(c.boot)+'</b> ('+esc(c.type)+') · '+c.van+' → '+c.tot+' · '+eur(c.prijs)+'</div>'+
-      (c.spec ? '<div style="margin-top:0.25rem;font-size:0.72rem;color:var(--soft);">'+(c.spec.lengte||0)+'m · 👥'+(c.spec.gasten||'-')+(c.spec.hutten?' · 🛏️'+c.spec.hutten:'')+' · '+(c.spec.snelheidKn||0)+' kn · '+esc(c.spec.ligplaats||'')+(c.borg?' · '+T('ch.borg','borg')+' '+eur(c.borg):'')+'</div>' : '')+
-      '<div style="margin-top:0.3rem;font-size:0.78rem;color:var(--muted);">'+(c.metSkipper?'⚓ '+T('ch.m.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.m.bareboat','bareboat'))+' · '+(CH_ST[c.status]||c.status)+' · 📷 '+c.fotosVoor+'/'+c.fotosNa+'</div>'+
+      (c.spec ? '<div style="margin-top:0.25rem;font-size:0.72rem;color:var(--soft);">'+(c.spec.lengte||0)+'m · '+(c.spec.gasten||'-')+(c.spec.hutten?' · '+c.spec.hutten:'')+' · '+(c.spec.snelheidKn||0)+' kn · '+esc(c.spec.ligplaats||'')+(c.borg?' · '+T('ch.borg','borg')+' '+eur(c.borg):'')+'</div>' : '')+
+      '<div style="margin-top:0.3rem;font-size:0.78rem;color:var(--muted);">'+(c.metSkipper?''+T('ch.m.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.m.bareboat','bareboat'))+' · '+(CH_ST[c.status]||c.status)+' ·  '+c.fotosVoor+'/'+c.fotosNa+'</div>'+
       (c.teruggave ? '<div style="margin-top:0.25rem;font-size:0.78rem;color:'+(c.teruggave.meerkosten>0?'var(--gold)':'var(--green)')+';">'+(c.teruggave.meerkosten>0 ? T('ch.m.meer','Meerkosten')+': '+eur(c.teruggave.meerkosten) : '✓ '+T('ch.m.geenmeer','geen meerkosten, borg vrij'))+'</div>' : '')+
       (c.status !== 'afgerond' ?
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.55rem;">'+
-        (c.status === 'aangevraagd' ? '<button class="bz-btn" data-chf="'+c.ref+'" data-fase="voor">📷 '+T('ch.m.fotovoor','Staat vastleggen (voor)')+'</button>' : '')+
-        (c.status === 'lopend' ? '<button class="bz-btn" data-chf="'+c.ref+'" data-fase="na">📷 '+T('ch.m.fotona','Staat vastleggen (na)')+'</button>'+
-          '<button class="bz-btn'+(c.locatieAan?' on':'')+'" data-chloc="'+c.ref+'" data-aan="'+(c.locatieAan?'0':'1')+'">📍 '+(c.locatieAan?T('ch.m.locuit','Positie delen uit'):T('ch.m.locaan','Deel live positie'))+'</button>' : '')+
-        '<button data-chsos="'+c.ref+'" style="background:var(--burgundy-deep);border:1px solid var(--burgundy);color:#fff;border-radius:999px;padding:0.5rem 1rem;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;">🆘 SOS</button>'+
+        (c.status === 'aangevraagd' ? '<button class="bz-btn" data-chf="'+c.ref+'" data-fase="voor">'+T('ch.m.fotovoor','Staat vastleggen (voor)')+'</button>' : '')+
+        (c.status === 'lopend' ? '<button class="bz-btn" data-chf="'+c.ref+'" data-fase="na">'+T('ch.m.fotona','Staat vastleggen (na)')+'</button>'+
+          '<button class="bz-btn'+(c.locatieAan?' on':'')+'" data-chloc="'+c.ref+'" data-aan="'+(c.locatieAan?'0':'1')+'">'+(c.locatieAan?T('ch.m.locuit','Positie delen uit'):T('ch.m.locaan','Deel live positie'))+'</button>' : '')+
+        '<button data-chsos="'+c.ref+'" style="background:var(--burgundy-deep);border:1px solid var(--burgundy);color:#fff;border-radius:999px;padding:0.5rem 1rem;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;">SOS</button>'+
         '</div>' : '')+
       '</div>').join('');
     renderChAanbod();
@@ -1805,10 +2081,10 @@
       for (const b of p.boten){
         const open = chOpen === p.code + ':' + b.id;
         html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="font-size:0.88rem;">'+(b.icoon||'🛥️')+' '+esc(b.naam)+'</div>'+
+          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="font-size:0.88rem;">'+(b.icoon||'')+' '+esc(b.naam)+'</div>'+
           '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(b.dagprijs)+'/'+T('ch.dag','dag')+'</span></div>'+
-          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+esc(b.type||'')+' · '+(b.lengte||0)+'m · 👥'+(b.gasten||'-')+(b.hutten?' · 🛏️'+b.hutten:'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+
-          ' · '+(b.skipperVerplicht?'⚓ '+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs of schipper'):T('ch.vrij','vrij')))+'</div>';
+          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+esc(b.type||'')+' · '+(b.lengte||0)+'m · '+(b.gasten||'-')+(b.hutten?' · '+b.hutten:'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+
+          ' · '+(b.skipperVerplicht?''+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs of schipper'):T('ch.vrij','vrij')))+'</div>';
         if (open){
           const verplicht = b.skipperVerplicht;
           html += '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+
@@ -1816,8 +2092,8 @@
             '<div class="bz-veld" style="flex:1;margin-top:0;"><label>'+T('ch.tot','Tot')+'</label><input type="date" id="chTot" value="'+chKeuze.tot+'"></div>'+
             '<div class="bz-veld" style="width:76px;margin-top:0;"><label>'+T('ch.gastn','Gasten')+'</label><input type="number" id="chGasten" min="1" max="'+(b.gasten||12)+'" value="'+Math.min(2,b.gasten||2)+'"></div></div>'+
             (verplicht
-              ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;">⚓ '+T('ch.altijdskipper','Dit vaartuig vaart altijd met een schipper (+'+eur(b.skipperPrijsPerDag||0)+'/'+T('ch.dag','dag')+').')+'</div>'
-              : '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.55rem;"><input type="checkbox" id="chSkipper"> ⚓ '+T('ch.wilskipper','Met schipper (+'+eur(b.skipperPrijsPerDag||0)+'/'+T('ch.dag','dag')+')')+'</label>'+
+              ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;">'+T('ch.altijdskipper','Dit vaartuig vaart altijd met een schipper (+'+eur(b.skipperPrijsPerDag||0)+'/'+T('ch.dag','dag')+').')+'</div>'
+              : '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.55rem;"><input type="checkbox" id="chSkipper">  '+T('ch.wilskipper','Met schipper (+'+eur(b.skipperPrijsPerDag||0)+'/'+T('ch.dag','dag')+')')+'</label>'+
                 '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.35rem;"><input type="checkbox" id="chVaarbewijs"> '+T('ch.hebvaarbewijs','Ik vaar bareboat en heb een geldig vaarbewijs')+'</label>')+
             '<button class="bz-groot" id="chBoek" style="margin-top:0.7rem;" data-verplicht="'+(verplicht?'1':'0')+'">'+T('ch.boek','Boek en betaal, vaste prijs')+'</button>';
         } else {
@@ -1966,14 +2242,14 @@
     const autos = d.autos || [];
     const deals = (mijn.deals || []).filter(x => !['gereden','afgeleverd','afgewezen','geannuleerd'].includes(x.status));
     if (!autos.length && !deals.length){ el.innerHTML = ''; return; }
-    let h = '<h3 style="margin:1.6rem 0 0.3rem;font-size:1rem;">🚗 ' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('vk.sub','Exclusieve occasions. Proefrit, bod of inruil.') + '</p>';
+    let h = '<h3 style="margin:1.6rem 0 0.3rem;font-size:1rem;">' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('vk.sub','Exclusieve occasions. Proefrit, bod of inruil.') + '</p>';
     for (const d2 of deals){
-      h += '<div style="border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">' + (d2.soort==='koop'?'🔑 '+T('vk.koop','Koop'):'🚗 '+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
+      h += '<div style="border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">' + (d2.soort==='koop'?''+T('vk.koop','Koop'):''+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
         '<div style="font-size:0.86rem;margin-top:0.2rem;">' + escT(d2.autoNaam) + (d2.prijs?' · € ' + d2.prijs.toLocaleString('nl-NL'):'') + (d2.moment?' · ' + escT(d2.moment):'') + '</div>' +
-        (d2.soort==='koop' && d2.status==='aanvaard' ? '<button class="js-vkteken" data-ref="' + d2.ref + '" style="margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem 0.9rem;font-weight:600;font-family:inherit;cursor:pointer;">✍️ ' + T('vk.teken','Koopcontract tekenen') + '</button>' : '') + '</div>';
+        (d2.soort==='koop' && d2.status==='aanvaard' ? '<button class="js-vkteken" data-ref="' + d2.ref + '" style="margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem 0.9rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('vk.teken','Koopcontract tekenen') + '</button>' : '') + '</div>';
     }
     h += autos.slice(0,20).map(a => '<div style="border:1px solid var(--line);border-radius:16px;padding:0.85rem;margin-bottom:0.7rem;" data-av="' + a.id + '">' +
-      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.95rem;">' + (a.vip?'★ ':'') + escT(a.naam) + '</b><span style="font-weight:600;">€ ' + a.prijs.toLocaleString('nl-NL') + '</span></div>' +
+      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.95rem;">' + (a.vip?'':'') + escT(a.naam) + '</b><span style="font-weight:600;">€ ' + a.prijs.toLocaleString('nl-NL') + '</span></div>' +
       '<div class="sub">' + a.km.toLocaleString('nl-NL') + ' km · ' + escT(a.brandstof) + ' · ' + escT(a.transmissie) + (a.vermogenPk?' · ' + a.vermogenPk + ' pk':'') + (a.garantieMnd?' · ' + a.garantieMnd + ' mnd garantie':'') + '</div>' +
       (a.opties && a.opties.length ? '<div class="sub" style="margin-top:0.2rem;">' + a.opties.slice(0,4).map(escT).join(' · ') + '</div>' : '') +
       '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;">' +
@@ -1983,11 +2259,11 @@
     el.innerHTML = h;
     el.querySelectorAll('.js-vkteken').forEach(b => b.addEventListener('click', async () => {
       const naam = prompt(T('vk.tekennaam','Typ uw naam om het koopcontract te tekenen:')); if (!naam) return;
-      try { await API.call('/verkoop/teken', { ref: b.dataset.ref, naam }); toast('✍️ ' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/verkoop/teken', { ref: b.dataset.ref, naam }); toast('' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vkproef').forEach(b => b.addEventListener('click', async () => {
       const wens = prompt(T('vk.wens','Wanneer wilt u proefrijden? (bv. zaterdagochtend)')) || '';
-      try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('🚗 ' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vkkoop').forEach(b => b.addEventListener('click', async () => {
       const bod = prompt(T('vk.bodvraag','Uw bod in € (leeg = vraagprijs):'), b.dataset.prijs);
@@ -1997,7 +2273,7 @@
       if (wilInruil){ const merk = prompt(T('vk.inmerk','Merk + model van uw inruilauto:')); if (merk){ const jaar = prompt(T('vk.injaar','Bouwjaar?'),''); const km = prompt(T('vk.inkm','Kilometerstand?'),''); inruil = { merk, model: '', jaar, km }; } }
       const concierge = confirm(T('vk.concvraag','Concierge-aflevering op uw adres?'));
       const adres = concierge ? (prompt(T('vk.adres','Afleveradres:')) || '') : '';
-      try { await API.call('/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres }); toast('🔑 ' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres }); toast('' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
   }
 
@@ -2009,7 +2285,7 @@
     try { markt = await API.call('/groothandel/markt'); mijn = await API.call('/groothandel/mijn'); } catch(e){ el.innerHTML = ''; return; }
     const winkels = markt.groothandels || [];
     if (!winkels.length && !(mijn.bestellingen||[]).length){ el.innerHTML = ''; return; }
-    let h = '<h3 style="margin:1.4rem 0 0.3rem;font-size:1rem;">🛒 ' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('bo.sub','Bestel en laat bezorgen.') + '</p>';
+    let h = '<h3 style="margin:1.4rem 0 0.3rem;font-size:1rem;">' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('bo.sub','Bestel en laat bezorgen.') + '</p>';
     for (const g of winkels){
       h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">' +
         '<b>' + escT(g.naam) + '</b><span class="sub"> · ' + escT(g.city||'') + '</span>' +
@@ -2027,7 +2303,7 @@
       const regels = [];
       el.querySelectorAll('.js-boq[data-code="' + b.dataset.code + '"]').forEach(inp => { const a = Number(inp.value)||0; if (a>0) regels.push({ productId: inp.dataset.pid, aantal: a }); });
       if (!regels.length) return toast(T('bo.kies','Vul minstens een aantal in.'));
-      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels }); toast('🛒 ' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
     }));
   }
   async function laadBzMijn(){
@@ -2060,7 +2336,8 @@
     const el = $('#bzInhoud'); if (!el) return;
     if (bzZaak) return renderBzZaak();
     if (!bzPartners.length){
-      el.innerHTML = '<div class="card"><div style="font-size:0.85rem;color:var(--muted);">'+T('bz.geen','Nog geen partners met een bezorgdienst op uw bestemming. Zodra een zaak de dienst opent, staat hij hier.')+'</div></div>';
+      el.innerHTML = '<div class="card"><div style="font-size:0.85rem;color:var(--muted);">'+T('bz.geen','Nog geen partners met een bezorgdienst op uw bestemming. Zodra een zaak de dienst opent, staat hij hier.')+'</div>'+
+        '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek waar ik hier iets kan bestellen en laten bezorgen, en regel het" style="margin-top:0.6rem;">'+T('bz.geendoe','Laat Rahul iets bestellen')+'</button></div>';
       return;
     }
     el.innerHTML = bzPartners.map(p =>
@@ -2116,7 +2393,9 @@
           adres: bzLevering === 'bezorgen' ? bzAdresW : undefined,
           lat: bzGeo ? bzGeo.lat : undefined, lng: bzGeo ? bzGeo.lng : undefined });
         await API.call('/order/pay', { ref: b.order.ref });
-        toast(bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.'));
+        // niet-leden zien de servicekosten eerlijk terug op de bevestiging
+        const sk = b.order.servicekosten ? ' ' + T('bz.service','(incl. EUR 2,50 servicekosten ex btw voor niet-leden)') : '';
+        toast((bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.')) + sk);
         bzZaak = null; bzMand = {};
         renderBestellen(); laadBzMijn();
       } catch(e){ toast(e.message); }
@@ -2155,11 +2434,11 @@
     });
     const rekLijst = Object.entries(rekBij);
     const rekHtml = rekLijst.length
-      ? '<div class="sec-label">🧾 ' + T('app.rek.k','De rekening') + '</div>' + rekLijst.map(([code, r]) =>
+      ? '<div class="sec-label">' + T('app.rek.k','De rekening') + '</div>' + rekLijst.map(([code, r]) =>
           '<div class="rek-card"><div class="rek-top"><div><b>' + r.naam + '</b>' + (r.tafel ? ' · ' + r.tafel : '') +
             '<div class="sub2">' + r.n + ' ' + T('app.rek.bonnen','bon(nen) lopen') + ' · ' + T('app.rek.napm','betaal na het eten') + '</div></div>' +
             '<div class="amt">' + eur(r.som) + '</div></div>' +
-          '<button class="rek-pay" data-rekpay="' + code + '">🧾 ' + T('app.rek.vraag','Vraag de rekening') + '</button></div>').join('')
+          '<button class="rek-pay" data-rekpay="' + code + '">' + T('app.rek.vraag','Vraag de rekening') + '</button></div>').join('')
       : '';
     $('#myOrders').innerHTML = rekHtml + (active.length
       ? '<div class="sec-label">'+T('app.tp.myorders','Mijn bestellingen')+'</div>' + active.map(o => {
@@ -2173,8 +2452,8 @@
               : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
               (o.pickup ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon ophaalcode') + '</button>' : '') +
               (['nieuw','wacht-op-betaling'].includes(o.status) ? '<button class="mo-code js-oann">✕ ' + T('erv.annuleer','Annuleer') + '</button>' : '') +
-              (o.paid && !o.splitst ? '<button class="mo-code js-osplit">🤝 ' + T('erv.splits','Splits') + '</button>' : '') +
-              (['geserveerd','bezorgd','opgehaald'].includes(o.status) ? '<button class="mo-code js-orev">⭐ ' + T('erv.review','Beoordeel') + '</button>' : '') +
+              (o.paid && !o.splitst ? '<button class="mo-code js-osplit">' + T('erv.splits','Splits') + '</button>' : '') +
+              (['geserveerd','bezorgd','opgehaald'].includes(o.status) ? '<button class="mo-code js-orev">' + T('erv.review','Beoordeel') + '</button>' : '') +
               (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ '+T('app.taggedsalon','getagd voor Salon')+'</span>' : '') +
             '</div></div>';
         }).join('')
@@ -2190,7 +2469,7 @@
       if (ab) ab.addEventListener('click', async () => {
         try {
           const d = await API.call('/annuleer', { soort: 'order', ref: o.ref });
-          toast(d.terugbetaald ? '↩️ ' + T('erv.retour','U ontvangt') + ' ' + eur(d.terugbetaald) + ' ' + T('erv.terug','retour.') : T('erv.geannuleerd','Geannuleerd.'));
+          toast(d.terugbetaald ? T('erv.retour','U ontvangt') + ' ' + eur(d.terugbetaald) + ' ' + T('erv.terug','retour.') : T('erv.geannuleerd','Geannuleerd.'));
           renderTerPlaatse();
         } catch(e){ toast(e.message); }
       });
@@ -2208,14 +2487,14 @@
       const rooms = (s.rooms || []).length, photos = (s.photos || []).length;
       const zzp = (s.services || []).length > 0;
       const viewable = s.hasMenu || rooms || photos;
-      const afst = km!=null ? ' · 📍 ' + Geo.tekst(km) : '';
-      const ster = s.rating ? ' · ⭐ ' + s.rating.score : '';
+      const afst = km!=null ? ' · ' + Geo.tekst(km) : '';
+      const ster = s.rating ? ' · ' + s.rating.score : '';
       const sub = (s.vak ? s.vak : tType(s.typeLabel)) + ster + ' · ' + s.city + (rooms ? ' · ' + rooms + ' ' + T('app.roomsfree','kamer(s) vrij') : '') + afst;
       return '<div class="sup-card">' +
-        '<span class="ic">' + (s.icon || '📍') + '</span>' +
+        '<span class="ic">' + (s.icon || RTGGlyf.svgHTML('gps')) + '</span>' +
         '<div class="t"><b>' + s.name + '</b><span>' + sub + '</span></div>' +
-        '<button class="chatb js-fav" data-fav="' + s.code + '" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '❤️' : '🤍') + '</button>' +
-        '<button class="chatb" data-chat="' + s.code + '" aria-label="Chat">💬</button>' +
+        '<button class="chatb js-fav" data-fav="' + s.code + '" aria-label="' + T('fav.aria','Favoriet') + '">' + RTGGlyf.svgHTML('hart', s.favoriet ? { fill: true } : {}) + '</button>' +
+        '<button class="chatb" data-chat="' + s.code + '" aria-label="Chat">' + RTGGlyf.svgHTML('berichten') + '</button>' +
         (zzp
           ? '<button class="go" data-boek="' + s.code + '">'+T('app.tp.boek','Boek')+'</button>'
           : viewable
@@ -2229,8 +2508,8 @@
     $('#supplierList').querySelectorAll('.js-fav').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/favoriet', { supplierCode: b.dataset.fav });
-        b.textContent = d.favoriet ? '❤️' : '🤍';
-        toast(d.favoriet ? '❤️ ' + T('fav.on','Bewaard bij mijn adressen.') : T('fav.off','Uit mijn adressen gehaald.'));
+        b.innerHTML = RTGGlyf.svgHTML('hart', d.favoriet ? { fill: true } : {});
+        toast(d.favoriet ? T('fav.on','Bewaard bij mijn adressen.') : T('fav.off','Uit mijn adressen gehaald.'));
       } catch(e){ toast(e.message); }
     }));
     // eenmalig de locatie ophalen zodat partners op afstand worden getoond en gesorteerd
@@ -2242,11 +2521,11 @@
   function reviewUI(el, o){
     const acts = el.querySelector('.acts');
     acts.innerHTML = '<span style="font-size:0.72rem;color:var(--soft);align-self:center;">' + T('erv.hoewas','Hoe was het?') + '</span>' +
-      [1,2,3,4,5].map(n => '<button class="mo-code js-star" data-n="' + n + '" aria-label="' + n + ' ' + T('erv.sterren','sterren') + '">' + '⭐'.repeat(1) + n + '</button>').join('');
+      [1,2,3,4,5].map(n => '<button class="mo-code js-star" data-n="' + n + '" aria-label="' + n + ' ' + T('erv.sterren','sterren') + '">' + RTGGlyf.svgHTML('ster', { fill: true }) + n + '</button>').join('');
     acts.querySelectorAll('.js-star').forEach(b => b.addEventListener('click', async () => {
       try {
         await API.call('/review', { soort: 'order', ref: o.ref, score: Number(b.dataset.n) });
-        toast('⭐ ' + T('erv.bedanktreview','Dank voor uw beoordeling.'));
+        toast('' + T('erv.bedanktreview','Dank voor uw beoordeling.'));
         renderTerPlaatse();
       } catch(e){ toast(e.message); renderTerPlaatse(); }
     }));
@@ -2261,13 +2540,13 @@
     acts.innerHTML = '<div style="width:100%;">' +
       '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.35rem;">' + T('erv.splitsmet','Splits gelijk met:') + '</div>' +
       cons.slice(0,8).map(c => '<label style="display:inline-flex;align-items:center;gap:0.3rem;margin:0 0.6rem 0.4rem 0;font-size:0.78rem;"><input type="checkbox" class="js-splid" value="' + c.key + '"> ' + c.codename + '</label>').join('') +
-      '<button class="mo-pay js-splgo" style="width:100%;margin-top:0.2rem;">🤝 ' + T('erv.stuurverzoek','Stuur betaalverzoeken') + '</button></div>';
+      '<button class="mo-pay js-splgo" style="width:100%;margin-top:0.2rem;">' + T('erv.stuurverzoek','Stuur betaalverzoeken') + '</button></div>';
     acts.querySelector('.js-splgo').addEventListener('click', async () => {
       const metKeys = [...acts.querySelectorAll('.js-splid:checked')].map(x => x.value);
       if (!metKeys.length){ toast(T('erv.kiesvriend','Kies minstens een vriend.')); return; }
       try {
         const d = await API.call('/splits', { ref: o.ref, metKeys });
-        toast('🤝 ' + T('erv.verzoekweg','Betaalverzoeken verstuurd:') + ' ' + eur(d.splits.delen[0].bedrag) + ' ' + T('erv.pp','p.p.'));
+        toast('' + T('erv.verzoekweg','Betaalverzoeken verstuurd:') + ' ' + eur(d.splits.delen[0].bedrag) + ' ' + T('erv.pp','p.p.'));
         renderTerPlaatse();
       } catch(e){ toast(e.message); }
     });
@@ -2285,7 +2564,7 @@
       'aangevraagd': [T('boek.st.aan','aangevraagd'), 'var(--soft)'],
       'bevestigd': [T('boek.st.ok','bevestigd'), 'var(--green, #4C9A75)']
     };
-    wrap.innerHTML = actief.length ? '<div class="sec-label">🗓️ '+T('boek.mijn','Mijn afspraken')+'</div>' + actief.map(b => {
+    wrap.innerHTML = actief.length ? '<div class="sec-label">'+T('boek.mijn','Mijn afspraken')+'</div>' + actief.map(b => {
       const st = BST[b.status] || [b.status, 'var(--soft)'];
       return '<div class="myorder">' +
         '<div class="r1"><div><div class="nm">' + b.supplierName + '</div><div class="sub2">' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + '</div></div>' +
@@ -2316,7 +2595,7 @@
       (s.vak ? '<div style="font-size:0.72rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;">' + s.vak + ' · ' + s.city + '</div>' : '') +
       s.services.map(x =>
         '<div class="rowitem js-svc" data-svc="' + x.id + '" style="cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;margin-bottom:0.55rem;">' +
-        '<div class="t"><b>' + (x.soort === 'product' ? '📦 ' : '🗓️ ') + x.name + '</b><span>' + (x.desc || '') + (x.duurMin ? ' · ' + x.duurMin + ' min' : '') + '</span></div>' +
+        '<div class="t"><b>' + (x.soort === 'product' ? '' : '') + x.name + '</b><span>' + (x.desc || '') + (x.duurMin ? ' · ' + x.duurMin + ' min' : '') + '</span></div>' +
         '<span class="amount">' + eur(x.price) + '</span></div>').join('') +
       '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">' +
       '<input id="boekDatum" type="date" value="' + morgen + '" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;color-scheme:dark;">' +
@@ -2369,7 +2648,7 @@
           return d.boeking;
         }, { message: () => T('boek.betaald','Geboekt en betaald; u hoort het zodra het bevestigd is.'), after: () => renderTerPlaatse() });
       } else {
-        toast('🗓️ ' + T('boek.ok','Aanvraag verstuurd; betalen kan achteraf.'));
+        toast('' + T('boek.ok','Aanvraag verstuurd; betalen kan achteraf.'));
         renderTerPlaatse();
       }
     });
@@ -2392,7 +2671,7 @@
       const regels = r.regels.map(o => (o.items || []).map(it =>
         '<div class="rek-reg"><span><span class="q">' + it.qty + '× </span>' + esc(it.name) + '</span><span>' + eur(it.price * it.qty) + '</span></div>').join('')).join('');
       ov.innerHTML = '<div class="rek-sheet" role="dialog" aria-modal="true" aria-label="' + T('app.rek.k','De rekening') + '">' +
-        '<h3>🧾 ' + T('app.rek.k','De rekening') + '</h3>' +
+        '<h3>' + T('app.rek.k','De rekening') + '</h3>' +
         '<div class="sub2" style="color:var(--soft);margin-bottom:0.6rem;">' + esc(r.supplierName) + (r.tafel ? ' · ' + esc(r.tafel) : '') + ' · ' + r.aantal + ' ' + T('app.rek.bonnen','bon(nen) lopen') + '</div>' +
         regels +
         '<div class="rek-sub"><span>' + T('app.rek.totaal','Totaal') + '</span><span>' + eur(r.subtotaal) + '</span></div>' +
@@ -2404,7 +2683,7 @@
           '<option value="e10">' + T('erv.fooi.team','Fooi voor het team') + ': € 10</option>' +
         '</select>' +
         '<div style="font-size:0.66rem;color:var(--soft);margin:0.5rem 0;">' + T('app.rek.uitleg','U rekent alle bonnen van dit bezoek in een keer af. De betaling gaat rechtstreeks naar de zaak.') + '</div>' +
-        '<button class="rek-pay" id="rekBetaal">🧾 ' + T('app.rek.betaal','Betaal de rekening') + '</button>' +
+        '<button class="rek-pay" id="rekBetaal">' + T('app.rek.betaal','Betaal de rekening') + '</button>' +
         '<button id="rekSluit" style="margin-top:0.5rem;width:100%;background:none;border:none;text-align:center;color:var(--soft);cursor:pointer;font-family:inherit;font-size:0.8rem;padding:0.5rem;">' + T('app.later','Later') + '</button>' +
       '</div>';
       document.body.appendChild(ov);
@@ -2417,7 +2696,7 @@
         payWithFaceId(eur(r.subtotaal + fooi), async () => {
           const res = await API.call('/rekening/betaal', { supplierCode: code, fooi });
           return res.rekening;
-        }, { message: () => '🧾 ' + T('app.rek.voldaan','De rekening is voldaan bij') + ' ' + r.supplierName + '.' + (fooi ? ' 💛 ' + eur(fooi) + ' ' + T('erv.fooivoorteam','fooi voor het team.') : ''), after: () => renderTerPlaatse() });
+        }, { message: () => '' + T('app.rek.voldaan','De rekening is voldaan bij') + ' ' + r.supplierName + '.' + (fooi ? '  ' + eur(fooi) + ' ' + T('erv.fooivoorteam','fooi voor het team.') : ''), after: () => renderTerPlaatse() });
       });
     }).catch(e => toast(e.message));
   }
@@ -2439,51 +2718,66 @@
   if (!tabbar || !app || !grids[0] || !grids[1] || !dock || !pages) return;
 
   const pas = new URLSearchParams(location.search).get('pas') || 'rtg';
-  // De Butler in het midden van het dock, als grotere gouden orb: hij is het
+  // Rahul in het midden van het dock, als grotere gouden orb: hij is het
   // hart van het OS en doet alles wat je hem vraagt. Het dock houdt de drie
   // RTG-kern-tabs vast; de overige diensten komen uit de App Store.
   const DOCK = ['betalen', 'ai', 'salon'];
 
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
+  // Elke app kent zijn eigen huisstijl-glyf (shared/glyf.js) op naam van de
+  // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
-    ontdek:      { naam: 'Het Huis',     icoon: '📖', url: '/apps/rtg.html' },
-    spelen:      { naam: 'Spelen',       icoon: '🎲', url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
-    vrienden:    { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
-    juridisch:   { naam: 'Juridisch',    icoon: '📜', url: '/apps/juridisch.html' },
-    camera:      { naam: 'Camera',       icoon: '📸', url: '/apps/camera.html' },
-    muziek:      { naam: 'RTG Sound',    icoon: '🎧', url: '/apps/muziek.html' },
-    podium:      { naam: 'Podium',       icoon: '🎬', url: '/apps/podium.html' },
-    flits:       { naam: 'Flits',        icoon: '🛣️', url: '/apps/flits.html' },
-    navigatie:   { naam: 'Navigatie',    icoon: '🧭', url: '/apps/navigatie.html' },
-    theater:     { naam: 'Theater',      icoon: '🎞️', url: '/apps/theater.html' },
-    wbw:         { naam: 'Wie betaalt wat', icoon: '💶', url: '/apps/wbw.html' },
-    passkeys:    { naam: 'Passkeys',     icoon: '🔑', url: '/apps/passkeys.html' },
-    ov:          { naam: 'OV',           icoon: '🚌', url: '/apps/ov.html' },
-    stad:        { naam: 'Mijn Stad',    icoon: '🏙️', url: '/apps/stad.html' },
-    clips:       { naam: 'Clips',        icoon: '🎥', url: '/apps/clips.html' },
-    office:      { naam: 'RTG Office',   icoon: '📊', url: '/apps/office.html' },
-    vonk:        { naam: 'Vonk',         icoon: '💘', url: '/apps/vonk.html' },
-    balans:      { naam: 'Balans',       icoon: '🌿', url: '/apps/balans.html' },
-    rechterhand: { naam: 'De Rechterhand', icoon: '🎩', url: '/apps/lifestyle.html' },
-    reisboek:    { naam: 'Reisboek',      icoon: '🧳', url: '/apps/reisboek.html' },
-    cellier:     { naam: 'Cellier',       icoon: '🍷', url: '/apps/cellier.html' },
-    table:       { naam: 'Table',         icoon: '🍽️', url: '/apps/table.html' },
-    maison:      { naam: 'Maison',        icoon: '🏛️', url: '/apps/maison.html' },
-    garderobe:   { naam: 'Garde-robe',    icoon: '🧥', url: '/apps/garderobe.html' },
-    mecenaat:    { naam: 'Mecenaat',      icoon: '🤲', url: '/apps/mecenaat.html' },
-    nalatenschap:{ naam: 'Nalatenschap',  icoon: '🗝️', url: '/apps/nalatenschap.html' },
-    logboek:     { naam: 'Logboek',       icoon: '⚓', url: '/apps/logboek.html' },
-    cercle:      { naam: 'Cercle',        icoon: '🎟️', url: '/apps/cercle.html' },
-    pulse:       { naam: 'Pulse',         icoon: '⚡', url: '/apps/pulse.html' },
-    nieuws:      { naam: 'Nieuws',        icoon: '📰', url: '/apps/nieuws.html' },
-    vluchten:    { naam: 'Vluchten',      icoon: '✈️', url: '/apps/vluchten.html' },
-    sport:       { naam: 'Sport',         icoon: '⚽', url: '/apps/sport.html' },
-    berichten:   { naam: 'Berichten',     icoon: '✉️', url: '/apps/berichten.html' },
-    hangar:      { naam: 'Hangar',        icoon: '🛩️', url: '/apps/hangar.html' },
-    entourage:   { naam: 'Entourage',     icoon: '👥', url: '/apps/entourage.html' },
-    attenties:   { naam: 'Attenties',     icoon: '🎁', url: '/apps/attenties.html' },
-    rendezvous:  { naam: 'Rendez-vous',   icoon: '💞', url: '/apps/rendezvous.html' }
+    ontdek:      { naam: 'Het Huis',     url: '/apps/rtg.html' },
+    spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
+    vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
+    juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
+    camera:      { naam: 'Camera',       url: '/apps/camera.html' },
+    muziek:      { naam: 'RTG Sound',    url: '/apps/muziek.html' },
+    podium:      { naam: 'Podium',       url: '/apps/podium.html' },
+    flits:       { naam: 'Flits',        url: '/apps/flits.html' },
+    navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
+    theater:     { naam: 'Theater',      url: '/apps/theater.html' },
+    residentie:  { naam: 'De Résidence', url: '/apps/residentie.html' },
+    wbw:         { naam: 'Wie betaalt wat', url: '/apps/wbw.html' },
+    passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
+    // veiligheid en verbinding: vier apps op een gedeelde kern
+    ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
+    thuiswacht:  { naam: 'Thuiswacht',   url: '/apps/thuiswacht.html' },
+    codewoord:   { naam: 'Codewoord',    url: '/apps/codewoord.html' },
+    vitaal:      { naam: 'Vitaal',       url: '/apps/vitaal.html' },
+    thuisrust:   { naam: 'Thuisrust',    url: '/apps/thuisrust.html' },
+    ov:          { naam: 'OV',           url: '/apps/ov.html' },
+    stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
+    clips:       { naam: 'Clips',        url: '/apps/clips.html' },
+    office:      { naam: 'RTG Office',   url: '/apps/office.html' },
+    sitemaker:   { naam: 'Website-maker', url: '/apps/sitemaker.html' },
+    browser:     { naam: 'RTG Browser',  url: '/apps/browser.html' },
+    vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
+    balans:      { naam: 'Balans',       url: '/apps/balans.html' },
+    rechterhand: { naam: 'De Rechterhand', url: '/apps/lifestyle.html' },
+    reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
+    cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
+    table:       { naam: 'Table',         url: '/apps/table.html' },
+    maison:      { naam: 'Maison',        url: '/apps/maison.html' },
+    garderobe:   { naam: 'Garde-robe',    url: '/apps/garderobe.html' },
+    mecenaat:    { naam: 'Mecenaat',      url: '/apps/mecenaat.html' },
+    labfonds:    { naam: 'Lab-fonds',     url: '/apps/labfonds.html' },
+    rtgcode:     { naam: 'RTG-code',      url: '/apps/rtgcode.html' },
+    nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/nalatenschap.html' },
+    logboek:     { naam: 'Logboek',       url: '/apps/logboek.html' },
+    cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
+    pulse:       { naam: 'Pulse',         url: '/apps/pulse.html' },
+    nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
+    krant:       { naam: 'RTG Krant',     url: '/apps/krant.html' },
+    vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
+    sport:       { naam: 'Sport',         url: '/apps/sport.html' },
+    school:      { naam: 'RTG School',    url: '/apps/rtgschool.html' },
+    berichten:   { naam: 'Berichten',     url: '/apps/berichten.html' },
+    hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
+    entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
+    attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
+    rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -2491,18 +2785,18 @@
      RTFoundation is EEN app: een tik toont de leeftijdskeuze en opent dan
      de hub in de passende jas (?groep= zet de bril op). */
   const OSAPPS = {
-    bellen:      { naam: 'Bellen',       icoon: '📞' },
-    videobellen: { naam: 'Videobellen',  icoon: '🎥' },
-    snaps:       { naam: 'Snaps',        icoon: '📷' },
-    rtf:         { naam: 'RTFoundation', icoon: '🕊️' },
-    store:       { naam: 'App Store',    icoon: '🛍️' }
+    bellen:      { naam: 'Bellen' },
+    videobellen: { naam: 'Videobellen' },
+    snaps:       { naam: 'Snaps' },
+    rtf:         { naam: 'RTFoundation' },
+    store:       { naam: 'App Store' }
   };
   const RTF_GROEPEN = [
-    { g: 'mini',   naam: 'RTF Mini',      icoon: '🧸', sub: '0 t/m 4 jaar' },
-    { g: 'kind',   naam: 'RTF Kids',      icoon: '🎒', sub: '5 t/m 11 jaar' },
-    { g: 'tiener', naam: 'RTF Tiener',    icoon: '🛹', sub: '12 t/m 15 jaar' },
-    { g: 'jong',   naam: 'RTF Jong',      icoon: '🚀', sub: '16 t/m 21+' },
-    { g: 'volw',   naam: 'RTF Volwassen', icoon: '🧑', sub: 'ouders en verzorgers' }
+    { g: 'mini',   naam: 'RTF Mini',      sub: '0 t/m 4 jaar' },
+    { g: 'kind',   naam: 'RTF Kids',      sub: '5 t/m 11 jaar' },
+    { g: 'tiener', naam: 'RTF Tiener',    sub: '12 t/m 15 jaar' },
+    { g: 'jong',   naam: 'RTF Jong',      sub: '16 t/m 21+' },
+    { g: 'volw',   naam: 'RTF Volwassen', sub: 'ouders en verzorgers' }
   ];
   /* ---------- de ROS als telefoon: alleen de basis + de App Store ----------
      Standaard staan alleen de "telefoon-apps", de RTFoundation en de App Store
@@ -2520,9 +2814,10 @@
      voor de premium-suite, op de pas. */
   const WINKEL_GROEPEN = [
     { titel: 'Reizen & onderweg', items: ['tab:reizen', 'link:ov', 'link:vluchten', 'link:flits', 'link:stad', 'tab:terplaatse'] },
-    { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:office'] },
-    { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:sport'] },
-    { titel: 'Het huis & diensten', items: ['link:ontdek', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:juridisch', 'link:passkeys', 'os:werk'] },
+    { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:rtgcode', 'link:office'] },
+    { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:krant', 'link:sport'] },
+    { titel: 'Het huis & diensten', items: ['link:ontdek', 'link:school', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:labfonds', 'link:juridisch', 'link:passkeys', 'os:werk'] },
+    { titel: 'Onderneem: eigen website & het RTG-web', items: ['link:sitemaker', 'link:browser'] },
     { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],
       items: ['link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous'] }
   ];
@@ -2535,7 +2830,7 @@
      /api/account/start de werksessie, dus alle regels (zoals het werkvenster
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
      OSAPPS/INDELING/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
-  OSAPPS.werk = { naam: 'Werk', icoon: '💼' };
+  OSAPPS.werk = { naam: 'Werk' };
   // Werk zit in de App Store (categorie "Het huis & diensten"); installeer je
   // het, dan verschijnt het op pagina 2 en opent het met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
@@ -2551,9 +2846,9 @@
       () => af(null), { enableHighAccuracy: true, timeout: 8000 });
   });
   const WERKDOEL = {
-    personeel: { icoon: '🧭', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
-    zaak:      { icoon: '🏛️', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
-    kantoor:   { icoon: '📊', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
+    personeel: { glyf: 'navigatie', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
+    zaak:      { glyf: 'maison', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
+    kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
   };
 
   /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
@@ -2561,7 +2856,7 @@
     if (Date.now() < pinOkTot) return af(null);
     API.call('/pin/status', {}).then(st => {
       const zetten = !st.gezet;
-      belTitel.textContent = zetten ? '🔒 ' + T('pin.zet', 'Kies uw algemene pin') : '🔒 ' + T('pin.vraag', 'Algemene pin');
+      belTitel.textContent = zetten ? T('pin.zet', 'Kies uw algemene pin') : T('pin.vraag', 'Algemene pin');
       belLijst.textContent = '';
       const uitleg = document.createElement('div');
       uitleg.className = 'os-bel-leeg';
@@ -2600,7 +2895,7 @@
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
-    belTitel.textContent = '💼 ' + T('werk.h', 'Werk');
+    belTitel.textContent = T('werk.h', 'Werk');
     belLijst.textContent = '';
     API.call('/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
@@ -2614,7 +2909,8 @@
       for (const r of rollen) {
         const doel = WERKDOEL[r.rol];
         const b = document.createElement('button');
-        const zi = document.createElement('span'); zi.className = 'zi'; zi.textContent = doel.icoon;
+        const zi = document.createElement('span'); zi.className = 'zi';
+        const zg = window.RTGGlyf && RTGGlyf.svg(doel.glyf); if (zg) zi.appendChild(zg);
         b.appendChild(zi);
         b.appendChild(document.createTextNode(doel.app));
         const m = document.createElement('span'); m.className = 'zm';
@@ -2632,8 +2928,12 @@
               s = await API.call('/account/start', Object.assign({ positie: pos }, body));
             }
             try { doel.bewaar(s.token, r); } catch (e2) {}
-            location.href = doel.url;
-          } catch (e) { bannerToon('💼', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
+            // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren
+            if (s.welzijn) bannerToon('', 'Rahul', s.welzijn);
+            // werk-app als venster op het bureaublad (breed scherm), anders schermvullend
+            if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(doel.url, doel.app || 'Werk');
+            else location.href = doel.url;
+          } catch (e) { bannerToon('', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
         }));
         belLijst.appendChild(b);
       }
@@ -2647,7 +2947,7 @@
   }
   /* ---------- mappen: eigen namen ----------
      De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus
-     (tik op de map) of via de Butler; de keuze staat per pas in localStorage. */
+     (tik op de map) of via Rahul; de keuze staat per pas in localStorage. */
   function mapNamen() { try { return JSON.parse(localStorage.getItem('rtg_os_mapnamen_' + pas) || '{}'); } catch (e) { return {}; } }
   function mapNaam(map) { return (mapNamen()[map.sleutel] || '').trim() || map.naam; }
   function zetMapNaam(map, naam) {
@@ -2705,15 +3005,27 @@
   function itemDef(item) { // os-app of link-app: de registry-invoer
     return item.startsWith('os:') ? OSAPPS[item.slice(3)] : LINKS[item.slice(5)];
   }
-  function tegelInhoud(item) { // svg (tab) of emoji (link/os-app) in de tegel
+  // een Bodoni-monogram als de app (nog) geen eigen glyf heeft: de eerste
+  // letters van de naam, netjes in de display-letter (huisstijl, geen emoji).
+  function monogram(naam) {
+    const woorden = String(naam || '').trim().split(/\s+/).filter(w => !/^(de|het|een|rtg|rtf|mijn)$/i.test(w));
+    let m = woorden.length >= 2 ? (woorden[0][0] + woorden[1][0])
+      : (woorden[0] || naam || '?').slice(0, 2);
+    const span = document.createElement('span');
+    span.className = 'os-monogram';
+    span.textContent = m.toUpperCase();
+    return span;
+  }
+  function glyfVoor(item) { // huisstijl-glyf op naam van de sleutel
+    const sleutel = item.slice(item.indexOf(':') + 1);
+    return window.RTGGlyf ? RTGGlyf.svg(sleutel) : null;
+  }
+  function tegelInhoud(item) { // svg (tab), glyf (link/os-app) of monogram in de tegel
     if (item.startsWith('tab:')) {
       const svg = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('svg');
       return svg ? svg.cloneNode(true) : document.createTextNode('•');
     }
-    const span = document.createElement('span');
-    span.style.fontSize = '1.5rem';
-    span.textContent = (itemDef(item) || {}).icoon || '•';
-    return span;
+    return glyfVoor(item) || monogram((itemDef(item) || {}).naam || item);
   }
   function itemNaam(item) {
     return item.startsWith('tab:') ? tabNaam(item.slice(4)) : (itemDef(item) || {}).naam || item;
@@ -2727,9 +3039,15 @@
     else {
       const l = LINKS[item.slice(5)];
       if (!l) return;
+      // op een breed scherm opent een app als venster op het bureaublad
+      // (meerdere naast elkaar); op de telefoon gewoon schermvullend.
+      const openen = () => {
+        if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(l.url, l.app || l.naam || 'App');
+        else location.href = l.url;
+      };
       // prive-apps openen pas na de algemene pin (25-os-01a.js)
-      if (l.prive) return metAlgPin(() => { location.href = l.url; });
-      location.href = l.url;
+      if (l.prive) return metAlgPin(openen);
+      openen();
     }
   }
 
@@ -2744,7 +3062,7 @@
     if (naam === 'store') { openWinkel(); return; }
     // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
     if (naam === 'werk') { openWerkKiezer(); return; }
-    belTitel.textContent = app.icoon + ' ' + app.naam;
+    belTitel.textContent = app.naam;
     belLijst.textContent = '';
     // RTFoundation: een leeftijdskeuze, daarna opent de juiste app (RTF-jas)
     if (naam === 'rtf') {
@@ -2752,7 +3070,9 @@
       try { onthouden = localStorage.getItem('rtf_app_groep'); } catch (e) {}
       for (const gr of RTF_GROEPEN) {
         const b = document.createElement('button');
-        const zi = document.createElement('span'); zi.className = 'zi'; zi.textContent = gr.icoon;
+        const zi = document.createElement('span'); zi.className = 'zi';
+        const gg = window.RTGGlyf && RTGGlyf.svg('rtf-' + gr.g);
+        if (gg) zi.appendChild(gg); else zi.textContent = (gr.naam.match(/[A-Z]/g) || ['R']).slice(0, 2).join('');
         b.appendChild(zi);
         b.appendChild(document.createTextNode(gr.naam));
         const m = document.createElement('span'); m.className = 'zm';
@@ -2772,7 +3092,8 @@
       d.textContent = 'Nog geen contacten. Voeg iemand toe in De Salon; daarna belt, videobelt en snapt u met een tik, zonder telefoonnummer.';
       belLijst.appendChild(d);
       const ga = document.createElement('button');
-      const gi = document.createElement('span'); gi.className = 'zi'; gi.textContent = '🫂';
+      const gi = document.createElement('span'); gi.className = 'zi';
+      const gis = window.RTGGlyf && RTGGlyf.svg('salon'); if (gis) gi.appendChild(gis);
       ga.appendChild(gi); ga.appendChild(document.createTextNode('Naar De Salon'));
       ga.addEventListener('click', () => { sluitScrims(); const b = tabKnop('salon'); if (b) b.click(); });
       belLijst.appendChild(ga);
@@ -2783,7 +3104,8 @@
       zi.textContent = String(c.codename || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
       b.appendChild(zi);
       b.appendChild(document.createTextNode(c.codename || ''));
-      const m = document.createElement('span'); m.className = 'zm'; m.textContent = app.icoon; b.appendChild(m);
+      const m = document.createElement('span'); m.className = 'zm';
+      const mg = window.RTGGlyf && RTGGlyf.svg(naam); if (mg) m.appendChild(mg); b.appendChild(m);
       b.addEventListener('click', () => {
         sluitScrims();
         if (!window.RTGSocial) return;
@@ -2881,7 +3203,7 @@
     mapScrim.classList.add('open');
   }
 
-  /* ---------- map hernoemen (wiebel-modus of Butler) ---------- */
+  /* ---------- map hernoemen (wiebel-modus of Rahul) ---------- */
   const hernoemScrim = $('#osHernoemScrim'), hernoemIn = $('#osHernoemIn');
   const hernoemOk = $('#osHernoemOk'), hernoemReset = $('#osHernoemReset');
   let hernoemDoel = null;
@@ -2915,24 +3237,24 @@
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
   function osActies() {
     const uit = [
-      { naam: 'Licht of donker', icoon: '🌗', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
-      { naam: 'Meldingen', icoon: '🔔', doe: () => { const b = $('#bell'); if (b) b.click(); } },
-      { naam: 'Bedieningspaneel', icoon: '🎛️', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
-      { naam: 'Taal kiezen', icoon: '🌐', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
-      { naam: 'Push aanzetten', icoon: '📳', doe: () => { if (window.RTGRealtime) RTGRealtime.enablePush(); } },
-      { naam: 'Uitloggen', icoon: '⏻', doe: () => { const b = $('#logoutBtn'); if (b) b.click(); } }
+      { naam: 'Licht of donker', glyf: 'thema', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
+      { naam: 'Meldingen', glyf: 'meldingen', doe: () => { const b = $('#bell'); if (b) b.click(); } },
+      { naam: 'Bedieningspaneel', glyf: 'paneel', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
+      { naam: 'Taal kiezen', glyf: 'taal', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
+      { naam: 'Push aanzetten', glyf: 'push', doe: () => { if (window.RTGRealtime) RTGRealtime.enablePush(); } },
+      { naam: 'Uitloggen', glyf: 'uitloggen', doe: () => { const b = $('#logoutBtn'); if (b) b.click(); } }
     ];
     if (window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
       for (const t of ['bordeaux', 'parelmoer', 'standaard']) {
-        uit.push({ naam: 'Thema ' + (t === 'standaard' ? 'klassiek' : t), icoon: '🎨', doe: () => RTGOSThema.zet(t) });
+        uit.push({ naam: 'Thema ' + (t === 'standaard' ? 'klassiek' : t), glyf: 'thema', doe: () => RTGOSThema.zet(t) });
       }
     }
     return uit;
   }
-  // De Butler vanuit het zoekscherm: open zijn app, vul de vraag in en verstuur
-  // via de bestaande chat-knoppen; de hele acties-registry van de Butler
+  // Rahul vanuit het zoekscherm: open zijn app, vul de vraag in en verstuur
+  // via de bestaande chat-knoppen; de hele acties-registry van Rahul
   // (bestellen, boeken, betalen, plannen, annuleren) doet dan gewoon zijn werk.
-  function vraagButler(q) {
+  function vraagRahul(q) {
     sluitScrims();
     const b = tabKnop('ai'); if (b) b.click();
     const inp = $('#askInput'), knop = $('#askBtn');
@@ -2955,6 +3277,14 @@
   function zoek() {
     const q = (zoekInput.value || '').trim().toLowerCase();
     zoekLijst.textContent = '';
+    // zodra je iets typt: Rahul bovenaan. Zoeken gaat zo naadloos over in laten-
+    // doen -- wat je ook typt (een app-naam, een klus, een vraag), Rahul pakt het
+    // op met je eigen inlog. De letterlijke tekst gaat mee (niet de lowercase).
+    if (q) {
+      const bt = document.createElement('span'); bt.textContent = '✦';
+      zoekRij(bt, 'Laat Rahul dit doen: "' + zoekInput.value.trim() + '"', null,
+        () => vraagRahul(zoekInput.value.trim()));
+    }
     // leeg veld: eerst "Voor u", de apps die u hier het vaakst opent
     if (!q) {
       const top = topGebruik(4);
@@ -2974,15 +3304,18 @@
       if (acts.length) {
         zoekSectie('Acties');
         for (const a of acts) {
-          const ic = document.createElement('span'); ic.textContent = a.icoon;
+          const ic = (window.RTGGlyf && RTGGlyf.svg(a.glyf)) || document.createTextNode('');
           zoekRij(ic, a.naam, null, () => { sluitScrims(); a.doe(); });
         }
       }
     }
-    // altijd onderaan: geef de vraag aan de Butler, wat het ook is
-    const bi = document.createElement('span'); bi.textContent = '✦';
-    zoekRij(bi, q ? 'Vraag Rahul: "' + zoekInput.value.trim() + '"' : 'Vraag Rahul', null,
-      () => vraagButler(zoekInput.value.trim()));
+    // altijd onderaan: geef de vraag aan Rahul, wat het ook is
+    // bij een lege zoekbalk staat Rahul onderaan als vaste ingang; zodra je typt
+    // staat hij al bovenaan (zie zoek()), dus dan slaan we de dubbele rij over.
+    if (!q) {
+      const bi = document.createElement('span'); bi.textContent = '✦';
+      zoekRij(bi, 'Vraag Rahul', null, () => vraagRahul(''));
+    }
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
   const zoekPil = $('#osZoekPil');
@@ -2996,7 +3329,8 @@
   function ccSync() {
     const T = window.RTGOSThema;
     const rij = $('#osCcThema');
-    if (rij) rij.style.display = T && T.keuzeMogelijk() ? '' : 'none';
+    // het thema (Champagne / Donker / Bordeaux) is een ROS-brede keuze voor iedereen
+    if (rij) rij.style.display = '';
     if (T) document.querySelectorAll('#osCcThema button').forEach(b => b.classList.toggle('actief', b.dataset.thema === T.huidig()));
     const push = $('#osCcPush');
     if (push && window.RTGRealtime) push.classList.toggle('aan', RTGRealtime.pushOn && RTGRealtime.pushOn());
@@ -3010,6 +3344,9 @@
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
   const ccZoek = $('#osCcZoek');
   if (ccZoek) ccZoek.addEventListener('click', openZoek);
+  // twee apps naast elkaar (split screen)
+  const ccSplit = $('#osCcSplit');
+  if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });
   // licht/donker: de (verborgen) gedeelde themaknop blijft de motor
   const ccLicht = $('#osCcLicht');
   if (ccLicht) ccLicht.addEventListener('click', () => { const b = $('#rtg-thema-knop'); if (b) b.click(); });
@@ -3022,6 +3359,12 @@
     const h = Number(localStorage.getItem('rtg_os_helder') || 100);
     helder.value = h; zetHelder(h);
     helder.addEventListener('input', () => zetHelder(Number(helder.value)));
+  }
+  // beweging: snelheid/intensiteit van de levende grond (via de gedeelde motor)
+  const beweeg = $('#osCcBeweging');
+  if (beweeg) {
+    if (window.RTGBeweging) beweeg.value = RTGBeweging.waarde();
+    beweeg.addEventListener('input', () => { if (window.RTGBeweging) RTGBeweging.zet(Number(beweeg.value)); });
   }
 
   /* ---------- wiebel-modus: herschikken met een lange druk ---------- */
@@ -3099,7 +3442,7 @@
   const naarHome = () => { const b = tabKnop('home'); if (b) b.click(); };
   const terug = $('#osTerug'), pill = $('#osPill');
   if (terug) terug.addEventListener('click', naarHome);
-  // de pill: een tik gaat naar het beginscherm, vasthouden roept de Butler
+  // de pill: een tik gaat naar het beginscherm, vasthouden roept Rahul
   // (het Siri-gebaar van dit OS), en omhoog vegen sluit de open app: de app
   // krimpt onder de vinger weg (of veert terug als de veeg te kort was)
   let pillLang = false, pillTimer = null, pillY = null, pillDy = 0, pillVeeg = false;
@@ -3108,7 +3451,7 @@
     pill.addEventListener('pointerdown', e => {
       pillLang = false; pillY = e.clientY; pillDy = 0; pillVeeg = false;
       try { pill.setPointerCapture(e.pointerId); } catch (x) {}
-      pillTimer = setTimeout(() => { pillLang = true; vraagButler(''); }, 550);
+      pillTimer = setTimeout(() => { pillLang = true; vraagRahul(''); }, 550);
     });
     pill.addEventListener('pointermove', e => {
       if (pillY == null || pillLang) return;
@@ -3184,7 +3527,9 @@
       app.appendChild(bannerEl);
     }
     bannerEl.textContent = '';
-    const ic = document.createElement('span'); ic.className = 'ob-ic'; ic.textContent = icoon || '🔔';
+    const ic = document.createElement('span'); ic.className = 'ob-ic';
+    const glyf = (window.RTGGlyf && RTGGlyf.heeft(icoon)) ? RTGGlyf.svg(icoon) : null;
+    if (glyf) ic.appendChild(glyf); else ic.textContent = icoon || '';
     const kol = document.createElement('span');
     const t = document.createElement('div'); t.className = 'ob-titel'; t.textContent = titel || 'RTG';
     kol.appendChild(t);
@@ -3207,16 +3552,16 @@
       const oud = opts.onChange;
       opts.onChange = n => {
         if (oud) oud(n);
-        if (n && n.title) bannerToon(n.icon || '🔔', n.title, n.body || '');
+        if (n && n.title) bannerToon(n.icon || '', n.title, n.body || '');
       };
       return echteStart(token, opts);
     };
   }
 
-  /* ---------- de Butler bestuurt het OS ----------
+  /* ---------- Rahul bestuurt het OS ----------
      Zinnen die het OS zelf kan uitvoeren (open <app>, thema, licht/donker,
      zoek, home) onderscheppen we in de capture-fase, vóór de chat-handlers;
-     al het andere gaat gewoon door naar de Butler-chat, die met zijn
+     al het andere gaat gewoon door naar Rahul-chat, die met zijn
      acties-registry op de server bestelt, boekt, betaalt en annuleert. */
   function alleDoelen() {
     const uit = [];
@@ -3229,7 +3574,7 @@
     const q = schoon.toLowerCase();
     if (!q) return false;
     if (/^(home|thuis|beginscherm)$/.test(q)) { sluitScrims(); naarHome(); bannerToon('✦', 'Rahul', 'Naar het beginscherm.'); return true; }
-    // elke functie een eigen app: bellen en videobellen direct via de Butler
+    // elke functie een eigen app: bellen en videobellen direct via Rahul
     if (/^(bel|bellen|iemand bellen)$/.test(q)) { sluitScrims(); openItem('os:bellen'); return true; }
     if (/^(videobel|videobellen|video bellen)$/.test(q)) { sluitScrims(); openItem('os:videobellen'); return true; }
     // RTF met leeftijd erbij slaat de keuze over: "open rtf kids"
@@ -3291,6 +3636,7 @@
      blijven van de app; wij beheren alleen onze eigen klasse. */
   const pagina2 = $('#osPagina2'), wChips = $('#osWChips');
   const W_NAMEN = {
+    homeKlok2: 'Klok',
     homeTrip: 'Reis', homePay: 'Betalen', homeSalon: 'De Salon', homeContacts: 'Contacten',
     homeSpelen: 'Spelen', homeCv: 'CV', homeVacatures: 'Vacatures', homeFoundation: 'Foundation'
   };
@@ -3404,7 +3750,7 @@
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
-        if (d && d.online) { LINKS.bank = { naam: 'RTG Bank', icoon: '🏦', url: '/apps/bank.html' }; bouw(); }
+        if (d && d.online) { LINKS.bank = { naam: 'RTG Bank', url: '/apps/bank.html' }; bouw(); }
       }).catch(() => {});
   })();
 
@@ -3425,7 +3771,7 @@
   function installeer(item) { var a = geinst(); if (a.indexOf(item) < 0) { a.push(item); zetGeinst(a); } bouw(); }
   function verwijder(item) { zetGeinst(geinst().filter(function (x) { return x !== item; })); bouw(); }
 
-  var winkelScrim = $('#osWinkelScrim'), winkelLijst = $('#osWinkelLijst');
+  var winkelScrim = $('#osWinkelScrim'), winkelLijst = $('#osWinkelLijst'), winkelTitel = $('#osWinkelTitel');
   function winkelRij(item) {
     var rij = document.createElement('div'); rij.className = 'os-winkel-rij';
     var zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(tegelInhoud(item)); rij.appendChild(zi);
@@ -3440,24 +3786,98 @@
     verf(); rij.appendChild(knop);
     return rij;
   }
-  function openWinkel() {
-    if (!winkelScrim) return;
-    sluitScrims();
-    winkelLijst.textContent = '';
-    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
-    intro.textContent = T('os.board.uitleg', 'Uw boardroom: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, de Butler, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
-    winkelLijst.appendChild(intro);
-    var n = 0;
+  // de groepen die deze pas mag zien, met alleen de echt-bestaande extra-apps
+  function winkelGroepen() {
+    var uit = [];
     for (var i = 0; i < WINKEL_GROEPEN.length; i++) {
       var groep = WINKEL_GROEPEN[i];
       if (groep.pas && groep.pas.indexOf(pas) < 0) continue;
       var items = groep.items.filter(function (it) { return !vasteAppsSet().has(it) && itemZichtbaar(it); });
-      if (!items.length) continue;
-      var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = groep.titel;
-      winkelLijst.appendChild(kop);
-      items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); n++; });
+      if (items.length) uit.push({ titel: groep.titel, items: items });
     }
+    return uit;
+  }
+  function openWinkel() {
+    if (!winkelScrim) return;
+    sluitScrims();
+    if (winkelTitel) winkelTitel.textContent = T('os.store.h', 'App Store');
+    winkelLijst.textContent = '';
+    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
+    intro.textContent = T('os.store.uitleg', 'Zet functies op uw beginscherm of haal ze eraf. De basis en het dock blijven altijd staan.');
+    winkelLijst.appendChild(intro);
+    var groepen = winkelGroepen(), n = 0;
+    groepen.forEach(function (g) {
+      var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = g.titel;
+      winkelLijst.appendChild(kop);
+      g.items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); n++; });
+    });
     if (!n) { var leeg = document.createElement('div'); leeg.className = 'os-bel-leeg'; leeg.textContent = T('os.store.leeg', 'Er is nu niets extra beschikbaar.'); winkelLijst.appendChild(leeg); }
+    winkelScrim.classList.add('open');
+  }
+
+  /* ---------- De Boardroom: uw eigen regiekamer ----------
+     Rijker dan de kale App Store: bovenaan een telling (hoeveel functies aan
+     staan van hoeveel u er mag), dan de vaste basis als vergrendelde rij (met
+     een slot-glyf, niet uit te zetten), en daaronder per groep de functies
+     waar u recht op heeft, met een aan/uit-schakelaar. Onder water dezelfde
+     install-laag als de App Store. */
+  var BASIS_REGELS = [
+    { glyf: 'bellen',  naam: 'Bellen, videobellen en snaps' },
+    { glyf: 'betalen', naam: 'RTG Pay' },
+    { glyf: null, mono: 'R', naam: 'Rahul, uw AI' },
+    { glyf: 'pas',     naam: 'Uw pas-app' },
+    { glyf: 'rtf',     naam: 'De RTFoundation' }
+  ];
+  function boardBasisRij(def) {
+    var rij = document.createElement('div'); rij.className = 'os-board-rij os-board-vast';
+    var zi = document.createElement('span'); zi.className = 'zi';
+    var g = def.glyf && window.RTGGlyf && RTGGlyf.svg(def.glyf);
+    if (g) zi.appendChild(g);
+    else { var mo = document.createElement('span'); mo.className = 'os-monogram'; mo.textContent = def.mono || '•'; zi.appendChild(mo); }
+    rij.appendChild(zi);
+    var naam = document.createElement('span'); naam.className = 'os-winkel-naam'; naam.textContent = def.naam; rij.appendChild(naam);
+    var slot = document.createElement('span'); slot.className = 'os-board-slot'; slot.setAttribute('aria-label', T('os.board.vast', 'Altijd aan'));
+    var sg = window.RTGGlyf && RTGGlyf.svg('slot'); if (sg) slot.appendChild(sg);
+    rij.appendChild(slot);
+    return rij;
+  }
+  function openBoardroom() {
+    if (!winkelScrim) return;
+    sluitScrims();
+    if (winkelTitel) winkelTitel.textContent = T('os.board.h', 'Boardroom');
+    winkelLijst.textContent = '';
+    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
+    intro.textContent = T('os.board.uitleg', 'Uw eigen regiekamer: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
+    winkelLijst.appendChild(intro);
+
+    // telling: hoeveel van de beschikbare extra-functies staan aan
+    var groepen = winkelGroepen();
+    var alle = []; groepen.forEach(function (g) { alle = alle.concat(g.items); });
+    var aan = alle.filter(isGeinst).length;
+    var sum = document.createElement('div'); sum.className = 'os-board-sum';
+    var cijfer = document.createElement('strong'); cijfer.textContent = aan + ' / ' + alle.length;
+    sum.appendChild(cijfer);
+    sum.appendChild(document.createTextNode(' ' + T('os.board.telling', 'functies staan aan')));
+    winkelLijst.appendChild(sum);
+
+    // de vaste basis, vergrendeld
+    var basisKop = document.createElement('div'); basisKop.className = 'os-winkel-groep';
+    basisKop.textContent = T('os.board.basis', 'Altijd aan · de basis');
+    winkelLijst.appendChild(basisKop);
+    BASIS_REGELS.forEach(function (d) { winkelLijst.appendChild(boardBasisRij(d)); });
+
+    // en de functies waar u recht op heeft, met een schakelaar
+    if (!alle.length) {
+      var leeg = document.createElement('div'); leeg.className = 'os-bel-leeg';
+      leeg.textContent = T('os.board.leeg', 'Buiten de basis heeft u nu geen extra functies om te schakelen.');
+      winkelLijst.appendChild(leeg);
+    } else {
+      groepen.forEach(function (g) {
+        var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = g.titel;
+        winkelLijst.appendChild(kop);
+        g.items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); });
+      });
+    }
     winkelScrim.classList.add('open');
   }
 
@@ -3484,14 +3904,38 @@
     else bannerToon('', T('os.samen', 'Samen'), T('os.samen.straks', 'Samen is zo beschikbaar.'));
   });
 
+  /* ---------- Scherm draaien en volledig scherm: verhuisd naar het paneel ----------
+     De schermbeeld-laag (shared/schermbeeld.js) houdt op dit OS zijn zwevende
+     pil weg en biedt window.RTGscherm aan; hier bedienen we die vanuit het
+     bedieningspaneel. Volledig scherm vraagt om een gebruikersgebaar -- de tik
+     op deze knop is dat gebaar, dus we roepen het meteen aan. */
+  var ccDraai = $('#osCcDraai');
+  if (ccDraai) ccDraai.addEventListener('click', function () { sluitScrims(); if (window.RTGscherm) RTGscherm.draai(); });
+  var ccVol = $('#osCcVol');
+  if (ccVol) ccVol.addEventListener('click', function () { if (window.RTGscherm) RTGscherm.volledig(); sluitScrims(); });
+
+  /* Rand tot rand: de tablet laat zijn kader los en het OS wordt het hele
+     scherm. Iets anders dan "volledig scherm" hierboven -- dat gaat over de
+     browser, dit over het kader waar de app in staat. Op de telefoon is er
+     geen kader, dus dan blijft de tegel weg (RTGVol.mogelijk). */
+  var ccRand = $('#osCcRand');
+  if (ccRand && window.RTGVol && RTGVol.mogelijk()) {
+    ccRand.hidden = false;
+    ccRand.classList.toggle('aan', RTGVol.aan());
+    ccRand.addEventListener('click', function () {
+      RTGVol.wissel();
+      ccRand.classList.toggle('aan', RTGVol.aan());
+    });
+  }
+
   /* ---------- De Boardroom: functies aan en uit vanuit Instellingen ----------
      Uw eigen boardroom: alle functies waar u recht op heeft, aan of uit te zetten.
-     De basis van het toestel (bellen, betalen, de Butler, uw pas-app en de
+     De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de
      RTFoundation) blijft altijd staan - die valt niet uit te zetten, zodat het
      systeem veilig en werkend blijft. Onder water is dit dezelfde install-laag
      als de App Store. */
   var ccBoard = $('#osCcBoardroom');
-  if (ccBoard) ccBoard.addEventListener('click', function () { openWinkel(); });
+  if (ccBoard) ccBoard.addEventListener('click', function () { openBoardroom(); });
 
   /* ---------- Now Playing: je muziek bedienen vanaf de ROS ----------
      De muziek-apps melden hun stand via de gedeelde speler-laag
@@ -3574,7 +4018,8 @@
         '<div class="live-dest-row"><select id="liveDest">' + opts + '</select></div>' +
         '<div class="live-mode">' + modes.map(m => '<button data-mode="' + m[0] + '"' + (m[0]===liveMode?' class="on"':'') + '>' + T('live.mode.'+m[0], m[1]) + '</button>').join('') + '</div>' +
         '<button class="live-go" id="liveGo">' + T('live.go','Start onderweg') + '</button>' +
-        '<button class="live-go" id="liveDeel" style="margin-top:0.45rem;background:none;border:1px solid var(--line);color:var(--txt);">📍 ' + T('live.deel','Deel mijn live locatie met deze zaak') + '</button>' +
+        '<button class="rahul-leeg-knop" data-rahul-leeg="Boek een rit voor me: vraag waar ik heen wil en regel het vervoer" style="margin-top:0.45rem;">' + T('live.rahulrit','Laat Rahul een rit boeken') + '</button>' +
+        '<button class="live-go" id="liveDeel" style="margin-top:0.45rem;background:none;border:1px solid var(--line);color:var(--txt);">' + T('live.deel','Deel mijn live locatie met deze zaak') + '</button>' +
         '<div style="margin-top:0.4rem;font-size:0.62rem;color:var(--soft);line-height:1.5;">' + T('live.deel.s','Alleen deze zaak ziet dan waar u bent, tot de zaak het niet meer nodig heeft of u het zelf stopt.') + '</div>' +
       '</div>';
     $('#livePanel').querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
@@ -3586,7 +4031,7 @@
     if (ld) ld.addEventListener('click', async () => {
       try {
         const r = await API.call('/locatie/deel', { supplierCode: $('#liveDest').value });
-        toast('📍 ' + r.deel.supplierName + ' ' + T('live.deelok','kijkt nu met u mee, tot het niet meer nodig is.'));
+        toast('' + r.deel.supplierName + ' ' + T('live.deelok','kijkt nu met u mee, tot het niet meer nodig is.'));
         renderZorg();
       } catch(e){ toast(e.message); }
     });
@@ -3619,8 +4064,8 @@
             '<b>' + T('as.mijn','Mijn positie') + ':</b> ' + p.tickets + ' ' + T('as.tickets','tickets') + ' (' + p.access + ' Access · ' + p.asset + ' Asset)' + (p.tickets ? ' · ' +
             '<b style="color:var(--gold-bright,#C99A2E);">' + p.dagenTegoed + '</b> ' + T('as.dagen','x 24 uur over dit jaar') + ' · ' + T('as.geldig','geldig tot') + ' ' + p.vervaltOp : '') +
             (p.asset ? '<br>' + T('as.uitstapw','Uitstapwaarde vandaag') + ': <b>' + eur(p.uitstapWaarde) + '</b>' : '') +
-            ((p.terugkoopOnderweg||[]).length ? '<br>⏳ ' + T('as.tkw','Terugkoop onderweg') + ': ' + p.terugkoopOnderweg.map(v => eur(v.waarde) + ' ' + T('as.uiterlijk','uiterlijk') + ' ' + v.uiterlijk).join(', ') : '') +
-            (p.gepland.length ? '<br>📅 ' + T('as.gepland','Gepland') + ': ' + p.gepland.join(', ') : '') +
+            ((p.terugkoopOnderweg||[]).length ? '<br>' + T('as.tkw','Terugkoop onderweg') + ': ' + p.terugkoopOnderweg.map(v => eur(v.waarde) + ' ' + T('as.uiterlijk','uiterlijk') + ' ' + v.uiterlijk).join(', ') : '') +
+            (p.gepland.length ? '<br>' + T('as.gepland','Gepland') + ': ' + p.gepland.join(', ') : '') +
             '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;">' +
               (p.tickets ? '<input type="date" data-asdatum="' + a.id + '" min="' + new Date().toISOString().slice(0,10) + '" style="flex:1;min-width:130px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.6rem;font-size:0.78rem;color:var(--txt);" aria-label="' + T('as.dag','Kies uw dag') + '">' +
               '<button class="mo-code js-asboek" data-id="' + a.id + '">' + T('as.boek','Boek mijn 24 uur') + '</button>' : '') +
@@ -3641,7 +4086,7 @@
             '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="access" style="flex:1;margin-top:0;">Access</button>' +
             '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="asset" data-ent="' + esc(a.entiteit) + '" data-fee="' + a.serviceFee + '" style="flex:1;margin-top:0;background:var(--gold-bright,#C99A2E);">Asset</button>' +
           '</div>')+
-        '<button class="mo-code js-asdoc" data-id="' + a.id + '" style="margin-top:0.5rem;">📄 ' + T('as.doc','Essentiele informatie') + '</button>' +
+        '<button class="mo-code js-asdoc" data-id="' + a.id + '" style="margin-top:0.5rem;">' + T('as.doc','Essentiele informatie') + '</button>' +
         '<div data-asdocuit="' + a.id + '" style="display:none;margin-top:0.5rem;font-size:0.7rem;color:var(--soft);line-height:1.6;border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.75rem;"></div>' +
       '</div>';
     }).join('');
@@ -3657,12 +4102,12 @@
       }
       try {
         const r = await API.call('/asset/koop', body);
-        toast('🎟️ ' + r.tickets.length + ' ticket(s) · ' + eur(r.totaalPrijs) + '. ' + T('as.welkom','Welkom in de pool.'));
+        toast('' + r.tickets.length + ' ticket(s) · ' + eur(r.totaalPrijs) + '. ' + T('as.welkom','Welkom in de pool.'));
         renderAssets();
       } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-aswacht').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await API.call('/asset/wachtlijst', { assetId: b.dataset.id }); toast('📋 ' + T('as.wlok','U staat op de wachtlijst, positie') + ' ' + r.positie + '.'); renderAssets(); }
+      try { const r = await API.call('/asset/wachtlijst', { assetId: b.dataset.id }); toast('' + T('as.wlok','U staat op de wachtlijst, positie') + ' ' + r.positie + '.'); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asherroep').forEach(b => b.addEventListener('click', async () => {
@@ -3685,24 +4130,24 @@
     el.querySelectorAll('.js-asboek').forEach(b => b.addEventListener('click', async () => {
       const datum = (el.querySelector('[data-asdatum="' + b.dataset.id + '"]') || {}).value;
       if (!datum){ toast(T('as.kiesdag','Kies eerst een dag.')); return; }
-      try { const r = await API.call('/asset/gebruik', { assetId: b.dataset.id, datum }); toast('📅 ' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
+      try { const r = await API.call('/asset/gebruik', { assetId: b.dataset.id, datum }); toast('' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asuit').forEach(b => b.addEventListener('click', async () => {
       if (!window.confirm(T('as.uitvraag','Uitstappen? RTG betaalt de actuele ticketwaarde') + ' (' + eur(Number(b.dataset.w)) + ') ' + T('as.uitvraag2','uit via een Tik en het ticket gaat terug in de pool.'))) return;
-      try { const r = await API.call('/asset/uitstap', { ticketId: b.dataset.tid }); toast('💰 ' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
+      try { const r = await API.call('/asset/uitstap', { ticketId: b.dataset.tid }); toast('' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
   }
 
-  /* ---------- het brein van De Butler: geheugen en seintjes ----------
-     Het gesprek zelf loopt via de gewone Butler-chat op de AI-tab; deze
+  /* ---------- het brein van Rahul: geheugen en seintjes ----------
+     Het gesprek zelf loopt via de gewone Rahul-chat op de AI-tab; deze
      kaart toont rustig wat hij weet (wisbaar) en wat hij zelf ziet. */
   let fluisterSyncAt = 0;
   async function renderFluister(){
     const el = $('#fluisterWrap'); if (!el) return;
     if (!API.live){ el.innerHTML = ''; return; }
-    // de inklap-laag deelt (alleen) de gebruikstellers, zodat de Butler leert
+    // de inklap-laag deelt (alleen) de gebruikstellers, zodat Rahul leert
     if (window.FocusUI && Date.now() - fluisterSyncAt > 60000){
       fluisterSyncAt = Date.now();
       API.call('/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
@@ -3723,15 +4168,15 @@
     el.innerHTML =
       (v
         ? '<div class="live-start" style="margin-bottom:0.8rem;">' +
-            '<div class="lh">🔮 ' + T('vs.h','Rahul verwacht') + '</div>' +
+            '<div class="lh">' + T('vs.h','Rahul verwacht') + '</div>' +
             '<div class="ld">' + esc(v.wat) + ' · ' + esc(v.waarom) + '. ' +
               T('vs.d','Klopt het niet, dan negeert u dit gewoon; Rahul leert vanzelf bij.') + '</div>' +
-            '<button class="chip js-vsdoe" style="margin-top:0.5rem;">🤵 ' + T('vs.doe','Laat Rahul het klaarzetten') + '</button>' +
+            '<button class="chip js-vsdoe" style="margin-top:0.5rem;">' + T('vs.doe','Laat Rahul het klaarzetten') + '</button>' +
           '</div>'
         : '') +
       (pk.length
         ? '<div class="live-start" style="margin-bottom:0.8rem;">' +
-            '<div class="lh">🤝 ' + T('pk.h','Pakketten van onze huizen') + '</div>' +
+            '<div class="lh">' + T('pk.h','Pakketten van onze huizen') + '</div>' +
             pk.map(p => '<div style="margin-top:0.45rem;">' +
               '<div style="font-size:0.85rem;"><b>' + esc(p.naam) + '</b> · € ' + (p.prijsCenten/100).toFixed(2).replace('.', ',') + '</div>' +
               '<div style="font-size:0.72rem;color:var(--soft);">' + p.zaken.map(esc).join(' + ') +
@@ -3740,7 +4185,7 @@
           '</div>'
         : '') +
       '<div class="live-start" style="margin-bottom:0.8rem;">' +
-        '<div class="lh">🤵 ' + T('fl.h','Wat Rahul weet en ziet') + '</div>' +
+        '<div class="lh">' + T('fl.h','Wat Rahul weet en ziet') + '</div>' +
         '<div class="ld">' + T('fl.d','Hij onthoudt wat u vertelt ("onthoud dat..."), leert van wat u gebruikt en regelt alles in de chat hieronder: zoeken, reserveren, bestellen en afrekenen, uw 24 uur, een Tik of betaalverzoek. Vraag "wat kun je" voor het hele overzicht; geld gaat nooit zonder uw "ja" de deur uit.') + '</div>' +
         ((prof.seintjes || []).length
           ? '<div style="margin-top:0.55rem;border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;">' +
@@ -3769,7 +4214,7 @@
       if (!window.confirm(T('pk.zeker','Pakket boeken voor') + ' ' + prijs + '? ' + T('pk.zeker2','Het bedrag gaat direct van uw RTG Pay-saldo.'))) return;
       try {
         await API.call('/pakket/koop', { id: b.dataset.pk, idem: 'pk' + Date.now() });
-        toast('🤝 ' + T('pk.ok','Geboekt. De zaken weten ervan.'));
+        toast('' + T('pk.ok','Geboekt. De zaken weten ervan.'));
         renderFluister();
       } catch(e){ toast(e.message); }
     }));
@@ -3786,7 +4231,7 @@
     } catch(e){ el.innerHTML = ''; return; }
     el.innerHTML =
       '<div class="live-start" style="margin-top:0.8rem;">' +
-        '<div class="lh">🩺 ' + T('zorg.h','Mijn zorgprofiel') + '</div>' +
+        '<div class="lh">' + T('zorg.h','Mijn zorgprofiel') + '</div>' +
         '<div class="ld">' + T('zorg.d','Allergenen en aandachtspunten reizen automatisch mee met uw bestellingen en verblijven, alleen als u delen aanzet. De keuken en de receptie weten het dan meteen.') + '</div>' +
         '<input id="zAll" placeholder="' + T('zorg.all','Allergenen, gescheiden door komma (bijv. noten, schaaldieren)') + '" value="' + esc((zorg.allergenen || []).join(', ')) + '" style="width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
         '<input id="zDieet" placeholder="' + T('zorg.dieet','Dieet (bijv. vegetarisch, halal)') + '" value="' + esc(zorg.dieet || '') + '" style="width:100%;margin-top:0.4rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
@@ -3794,18 +4239,18 @@
         '<label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.55rem;font-size:0.74rem;color:var(--txt);"><input type="checkbox" id="zDelen"' + (zorg.delen ? ' checked' : '') + '> ' + T('zorg.delen','Deel dit automatisch met zaken waar ik bestel of verblijf') + '</label>' +
         '<button class="live-go" id="zOpslaan" style="margin-top:0.55rem;">' + T('zorg.opslaan','Bewaar zorgprofiel') + '</button>' +
         ((delen.actief || []).length
-          ? '<div style="margin-top:0.8rem;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">📍 ' + T('zorg.kijkt','Kijkt live met mij mee') + '</div>' +
+          ? '<div style="margin-top:0.8rem;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">' + T('zorg.kijkt','Kijkt live met mij mee') + '</div>' +
             delen.actief.map(d => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.4rem;font-size:0.78rem;"><span><b>' + esc(d.supplierName) + '</b> · ' + T('zorg.sinds','sinds') + ' ' + String(d.at).slice(11, 16) + '</span><button class="mo-code js-zstop" data-id="' + d.id + '">' + T('zorg.stop','Stop delen') + '</button></div>').join('')
-          : '<div style="margin-top:0.8rem;font-size:0.68rem;color:var(--soft);">📍 ' + T('zorg.niemand','Er kijkt nu niemand live met u mee.') + '</div>') +
+          : '<div style="margin-top:0.8rem;font-size:0.68rem;color:var(--soft);">' + T('zorg.niemand','Er kijkt nu niemand live met u mee.') + '</div>') +
       '</div>';
     $('#zOpslaan').addEventListener('click', async () => {
       try {
         await API.call('/zorgprofiel/zet', { allergenen: $('#zAll').value, dieet: $('#zDieet').value, medisch: $('#zMed').value, delen: $('#zDelen').checked });
-        toast('🩺 ' + T('zorg.bewaard','Zorgprofiel bewaard.'));
+        toast('' + T('zorg.bewaard','Zorgprofiel bewaard.'));
       } catch(e){ toast(e.message); }
     });
     el.querySelectorAll('.js-zstop').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/locatie/stop', { id: b.dataset.id }); toast('📍 ' + T('zorg.gestopt','Delen gestopt.')); renderZorg(); }
+      try { await API.call('/locatie/stop', { id: b.dataset.id }); toast('' + T('zorg.gestopt','Delen gestopt.')); renderZorg(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -3862,7 +4307,7 @@
       if (p.ride){
         line2 += ' · ' + T('live.ride','rit') + ' ' + tRide(p.ride.status);
         const extra = [];
-        if (p.ride.driver) extra.push('🚘 ' + p.ride.driver + (p.ride.vehicle ? ' · ' + p.ride.vehicle : ''));
+        if (p.ride.driver) extra.push('' + p.ride.driver + (p.ride.vehicle ? ' · ' + p.ride.vehicle : ''));
         if (p.ride.quote) extra.push(T('live.vast','vaste nettoprijs') + ' ' + eur(p.ride.quote));
         if (extra.length) line2 += '<br>' + extra.join(' · ');
         // betaling achteraf: de zaak liet de rit direct rijden; afrekenen kan nu
@@ -3882,7 +4327,7 @@
     const hasVeh = L.partners.some(p => p.type === 'taxi' || p.type === 'jet');
     const canDoor = L.arrived && dest && dest.hasDoors;
     const acts = '<div class="live-acts">' +
-      (canDoor ? '<button class="prim glowbtn" id="liveDoor">🔓 ' + T('live.door','Open de deur') + '</button>' : '') +
+      (canDoor ? '<button class="prim glowbtn" id="liveDoor">' + T('live.door','Open de deur') + '</button>' : '') +
       '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
       (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
       (canDoor ? '' : '<button class="prim" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>') +
@@ -3911,7 +4356,7 @@
     const tx = $('#liveTaxi'); if (tx) tx.addEventListener('click', requestTaxi);
     const pre = $('#livePre'); if (pre) pre.addEventListener('click', () => { if (dest) openMenu(dest.code); });
     const dr = $('#liveDoor'); if (dr) dr.addEventListener('click', async () => {
-      try { const d = await API.call('/live/door'); toast('🔓 ' + d.door.name + ' ' + T('live.dooropen','is open. Vergrendelt zichzelf na') + ' ' + d.door.relockSec + ' ' + T('live.sec','seconden.')); }
+      try { const d = await API.call('/live/door'); toast('' + d.door.name + ' ' + T('live.dooropen','is open. Vergrendelt zichzelf na') + ' ' + d.door.relockSec + ' ' + T('live.sec','seconden.')); }
       catch(e){ toast(e.message); }
     });
   }
@@ -3954,7 +4399,7 @@
           return d.ride;
         }, { message: () => T('live.ritbetaald','Rit betaald en definitief:') + ' ' + eur(d.ride.quote), after: () => renderLive() });
       } else {
-        toast('🚘 ' + T('live.taxireq2','Rit aangevraagd.') + (d.ride && d.ride.quote ? ' ' + T('live.vast','vaste nettoprijs') + ': ' + eur(d.ride.quote) : ''));
+        toast('' + T('live.taxireq2','Rit aangevraagd.') + (d.ride && d.ride.quote ? ' ' + T('live.vast','vaste nettoprijs') + ': ' + eur(d.ride.quote) : ''));
         await renderLive();
       }
     } catch (e){ toast(e.message); }
@@ -4018,11 +4463,11 @@
     let head = '';
     // rating + favoriet-hart + tafel reserveren (de ervaring-laag)
     head += '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.2rem 0 0.6rem;">' +
-      (s.rating ? '<span style="font-size:0.8rem;">⭐ <b>' + s.rating.score + '</b> <span style="color:var(--soft);font-size:0.7rem;">(' + s.rating.aantal + ')</span></span>' : '<span style="font-size:0.72rem;color:var(--soft);">' + T('erv.nogGeenReviews','Nog geen reviews') + '</span>') +
-      '<button id="msFav" style="margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.85rem;" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '❤️ ' + T('fav.bewaard','Bewaard') : '🤍 ' + T('fav.bewaar','Bewaar')) + '</button></div>';
+      (s.rating ? '<span style="font-size:0.8rem;"><b>' + s.rating.score + '</b> <span style="color:var(--soft);font-size:0.7rem;">(' + s.rating.aantal + ')</span></span>' : '<span style="font-size:0.72rem;color:var(--soft);">' + T('erv.nogGeenReviews','Nog geen reviews') + '</span>') +
+      '<button id="msFav" style="margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.85rem;" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '' + T('fav.bewaard','Bewaard') : '' + T('fav.bewaar','Bewaar')) + '</button></div>';
     if ((s.tableNames || []).length && s.reservationsOpen !== false){
       const morgen = new Date(Date.now() + 86400000).toISOString().slice(0,10);
-      head += '<div class="ms-cat">🪑 ' + T('erv.reserveer.h','Tafel reserveren') + '</div>' +
+      head += '<div class="ms-cat">' + T('erv.reserveer.h','Tafel reserveren') + '</div>' +
         '<div style="display:flex;gap:0.4rem;align-items:center;padding:0.2rem 0 0.9rem;flex-wrap:wrap;">' +
         '<input type="date" id="rsvDatum" value="' + morgen + '" min="' + new Date().toISOString().slice(0,10) + '" style="flex:2;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);" aria-label="' + T('erv.datum','Datum') + '">' +
         '<input type="time" id="rsvTijd" value="20:00" style="flex:1;min-width:84px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);" aria-label="' + T('erv.tijd','Tijd') + '">' +
@@ -4047,7 +4492,7 @@
         '<div style="margin:0.5rem 0 0.6rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote2','Tegen nettoprijs; het huis bevestigt uw verblijf en de rekening loopt op de kamer.') + '</div>' +
         // keyless: tijdens een ingecheckt verblijf is de telefoon de sleutel
         '<div style="display:flex;gap:0.5rem;padding-bottom:0.8rem;">' +
-        '<button class="vbtn" id="vbDeurKamer" style="flex:1;">🗝️ ' + T('vb.deurkamer','Open mijn kamerdeur') + '</button>' +
+        '<button class="vbtn" id="vbDeurKamer" style="flex:1;">' + T('vb.deurkamer','Open mijn kamerdeur') + '</button>' +
         '<button class="vbtn" id="vbDeurEntree" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);">' + T('vb.deurentree','Open de entree') + '</button></div>';
     }
     const funcs = APPLY_FUNCS[s.type] || [];
@@ -4067,7 +4512,7 @@
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;gap:0.6rem;">' +
           '<span style="font-size:0.72rem;color:' + (e.spotsLeft > 0 ? 'var(--soft)' : 'var(--burgundy)') + ';">' + (e.spotsLeft > 0 ? e.spotsLeft + ' ' + T('ev.spots','plekken vrij') : T('ev.full','Vol')) + (e.price ? ' \u00b7 ' + eur(e.price) + ' p.p.' : ' \u00b7 ' + T('ev.free','gratis')) + '</span>' +
           (e.spotsLeft > 0 ? '<button class="vbtn" data-rsvp="' + e.id + '">' + T('ev.join','Zet mij op de lijst') + '</button>'
-            : '<button class="vbtn" data-wl="' + e.id + '">⏳ ' + T('erv.wachtlijst','Wachtlijst') + '</button>') +
+            : '<button class="vbtn" data-wl="' + e.id + '">' + T('erv.wachtlijst','Wachtlijst') + '</button>') +
           '</div></div>'
         ).join('')
       : '';
@@ -4085,12 +4530,12 @@
         return '<div class="ms-item' + (botst.length ? ' ms-allergie' : '') + '" data-id="' + x.id + '"' + (op86 ? ' style="opacity:0.5;"' : '') + '>' +
           '<div class="info"><div class="nm">' + x.name + '</div>' +
             (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
-            (botst.length ? '<div class="alg-waarschuwing">⚠️ ' + T('menu.jouwallergie','jouw allergie') + ': ' + botst.map(a => tAlg(a)).join(', ') + '</div>' : '') +
+            (botst.length ? '<div class="alg-waarschuwing">' + T('menu.jouwallergie','jouw allergie') + ': ' + botst.map(a => tAlg(a)).join(', ') + '</div>' : '') +
             (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + tAlg(a) + '</span>').join('') + '</div>' : '') +
           '</div>' +
           '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +
             (op86 ? '<div class="qty" style="opacity:0.7;font-size:0.64rem;justify-content:center;">' + T('menu.86','uitverkocht') + '</div>'
-              : slot ? '<div class="qty" style="opacity:0.55;font-size:0.64rem;justify-content:center;">🔞 ' + menuState.alcohol.grens + '+</div>'
+              : slot ? '<div class="qty" style="opacity:0.55;font-size:0.64rem;justify-content:center;">' + menuState.alcohol.grens + '+</div>'
               : '<div class="qty"><button class="js-minus">−</button><b>' + q + '</b><button class="js-plus">+</button></div>') +
           '</div></div>';
       }).join('')
@@ -4108,7 +4553,7 @@
     document.querySelectorAll('[data-wl]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/wachtlijst', { supplierCode: menuState.supplier.code, eventId: b.dataset.wl });
-        toast('⏳ ' + T('erv.wlok','U staat op de wachtlijst (nr. ') + d.positie + '). ' + T('erv.wlbericht','Bij een vrije plek hoort u het meteen.'));
+        toast('' + T('erv.wlok','U staat op de wachtlijst (nr. ') + d.positie + '). ' + T('erv.wlbericht','Bij een vrije plek hoort u het meteen.'));
       } catch(e){ toast(e.message); }
     }));
     // favoriet-hart + tafel reserveren
@@ -4124,14 +4569,14 @@
     if (rsvGo) rsvGo.addEventListener('click', async () => {
       try {
         const d = await API.call('/reserveer', { supplierCode: s.code, datum: $('#rsvDatum').value, tijd: $('#rsvTijd').value, personen: Number($('#rsvPers').value) });
-        toast('🪑 ' + T('erv.reserveerok','Reservering aangevraagd voor') + ' ' + d.reservering.datum + ' ' + d.reservering.tijd + '. ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
+        toast('' + T('erv.reserveerok','Reservering aangevraagd voor') + ' ' + d.reservering.datum + ' ' + d.reservering.tijd + '. ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
       } catch(e){ toast(e.message); }
     });
     // keyless: de deur van je kamer of de entree, met je telefoon als sleutel
     const deur = async welke => {
       try {
         const d = await API.call('/verblijf/deur', { supplierCode: s.code, welke });
-        toast('🔓 ' + d.door.name + ' ' + T('vb.deuropen','is open; hij vergrendelt zelf weer na') + ' ' + d.door.relockSec + 's.');
+        toast('' + d.door.name + ' ' + T('vb.deuropen','is open; hij vergrendelt zelf weer na') + ' ' + d.door.relockSec + 's.');
       } catch(e){ toast(e.message); }
     };
     const dk = $('#vbDeurKamer'); if (dk) dk.addEventListener('click', () => deur('kamer'));
@@ -4144,7 +4589,7 @@
           aankomst: $('#vbAankomst').value, vertrek: $('#vbVertrek').value,
           personen: Number($('#vbPers').value)
         });
-        toast('🛎️ ' + T('vb.ok','Verblijf aangevraagd:') + ' ' + d.verblijf.roomName + ', ' + d.verblijf.nachten + ' ' + T('vb.nachten','nacht(en)') + ' (' + eur(d.verblijf.totaal) + '). ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
+        toast('' + T('vb.ok','Verblijf aangevraagd:') + ' ' + d.verblijf.roomName + ', ' + d.verblijf.nachten + ' ' + T('vb.nachten','nacht(en)') + ' (' + eur(d.verblijf.totaal) + '). ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
       } catch(e){ toast(e.message); }
     }));
     if (menuState.retail) bindRetailMenu();
@@ -4156,7 +4601,7 @@
     });
     if (!m.length){ $('#msFoot').innerHTML = ''; return; }
     if (menuState.supplier.ordersOpen === false){
-      $('#msFoot').innerHTML = '<div style="padding:0.9rem 0;text-align:center;font-size:0.82rem;color:var(--soft);">⏸ ' + T('app.ms.closed','Bestellingen zijn tijdelijk gesloten. De kaart blijft ter inzage.') + '</div>';
+      $('#msFoot').innerHTML = '<div style="padding:0.9rem 0;text-align:center;font-size:0.82rem;color:var(--soft);">' + T('app.ms.closed','Bestellingen zijn tijdelijk gesloten. De kaart blijft ter inzage.') + '</div>';
       return;
     }
     const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
@@ -4176,12 +4621,12 @@
       '</select>' +
       '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">' + T('app.ms.los','U bestelt rechtstreeks bij deze zaak: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de zaak.') + '</div>' +
       ((menuState.supplier.hasMenu !== false && (menuState.menu || []).some(x => x.station === 'bar'))
-        ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">🔞 ' +
+        ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">' +
           (menuState.alcohol && menuState.alcohol.mag === false
             ? T('app.ms.geenalc','Alcohol staat voor u uit:') + ' ' + (menuState.alcohol.land || '') + ' ' + T('app.ms.vanaf','hanteert') + ' ' + menuState.alcohol.grens + '+ ' + T('app.ms.pasp','(leeftijd geverifieerd via uw paspoort).')
             : 'Alcohol: ' + ((menuState.alcohol && menuState.alcohol.grens) || 18) + '+; ' + T('app.ms.18b','de zaak kan om legitimatie vragen.')) + '</div>' : '') +
       '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? T('app.ms.order','Bestel') + ' ' + count + ' ' + T('app.items','item(s)') + ', ' + eur(total) : T('app.ms.choose','Kies gerechten')) + '</button>' +
-      (count ? '<button class="ms-order" id="msKassa" style="margin-top:0.4rem;background:none;border:1px solid var(--line);color:var(--txt);">🧾 ' + T('app.ms.naarkassa','Stuur naar de kassa, betaal aan de balie') + '</button>' : '');
+      (count ? '<button class="ms-order" id="msKassa" style="margin-top:0.4rem;background:none;border:1px solid var(--line);color:var(--txt);">' + T('app.ms.naarkassa','Stuur naar de kassa, betaal aan de balie') + '</button>' : '');
     const mt = $('#msTable');
     if (mt) mt.addEventListener('change', e => menuState.table = e.target.value);
     $('#msNote').addEventListener('input', e => menuState.note = e.target.value);
@@ -4198,20 +4643,20 @@
   function retailMenuBlock(){
     const r = menuState.retail;
     const mijn = menuState.retailMijn || { apart: [], styling: [] };
-    let html = '<div class="ms-cat">🛍 ' + T('rt.m.cat','Collectie') + '</div>';
+    let html = '<div class="ms-cat">' + T('rt.m.cat','Collectie') + '</div>';
     // eigen apart-artikelen en stylingvoorstellen bij dit merk
     const apart = (mijn.apart || []).filter(a => a.supplierName === r.supplier.name);
     if (apart.length) html += '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">' + T('rt.m.apart','Voor u apart gelegd') + '</div>' +
       apart.map(a => '<div style="font-size:0.82rem;margin-top:0.3rem;">' + esc(a.artikelNaam) + ' · ' + esc(a.kleur) + ', ' + esc(a.maat) + ' <span style="color:var(--soft);">(' + T('rt.m.tot','tot') + ' ' + esc(a.tot) + ')</span></div>').join('') +
-      '<button class="rt-bezorg" style="margin-top:0.55rem;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem;font-weight:600;font-family:inherit;cursor:pointer;">🚚 ' + T('mb.laat','Veilig laten bezorgen') + '</button>' +
+      '<button class="rt-bezorg" style="margin-top:0.55rem;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('mb.laat','Veilig laten bezorgen') + '</button>' +
       '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.3rem;">' + T('mb.veiliguitleg','Met bezorgcode, live volgen en pas-aan-de-deur. Dure stukken: ID aan de deur.') + '</div></div>';
     // lopende bezorgingen van deze winkel
     const bez = (menuState.modeBezorg || []).filter(b => b.supplierName === r.supplier.name && !['afgeleverd','retour','geannuleerd'].includes(b.status));
-    if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">🚚 ' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
+    if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
       '<div style="font-size:0.85rem;margin-top:0.3rem;">' + T('mb.code','Bezorgcode') + ': <b style="letter-spacing:0.2em;font-size:1.05rem;">' + esc(b.bezorgcode) + '</b></div>' +
       '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + (b.koerier ? T('mb.koerieris','Koerier') + ': ' + esc(b.koerier) + (b.etaMin != null ? ' · ETA ' + b.etaMin + ' min' : '') : T('mb.geefcode','Geef deze code alleen aan de RTG-koerier aan de deur.')) + '</div></div>').join('');
     const styling = (mijn.styling || []).filter(v => v.supplierName === r.supplier.name);
-    if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">✨ ' + esc(v.titel) + '</div>' +
+    if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">' + esc(v.titel) + '</div>' +
       (v.bericht ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + esc(v.bericht) + '</div>' : '') +
       '<div style="font-size:0.8rem;margin-top:0.3rem;">' + v.items.map(i => esc(i.naam)).join(' · ') + '</div><div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + T('rt.m.van','van') + ' ' + esc(v.van) + '</div></div>').join('');
     // de artikelen
@@ -4221,14 +4666,14 @@
       const bes = a.beschikbaar || [];
       return '<div style="border:1px solid var(--line);border-radius:16px;padding:0.8rem;margin-bottom:0.7rem;" data-rart="' + escAttr(a.id) + '">' +
         '<div style="display:flex;gap:0.8rem;">' +
-        (a.foto ? '<img src="' + escAttr(a.foto) + '" alt="' + escAttr(a.naam) + '" style="width:72px;height:92px;object-fit:cover;border-radius:10px;flex-shrink:0;">' : '<div style="width:72px;height:92px;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem;">👗</div>') +
+        (a.foto ? '<img src="' + escAttr(a.foto) + '" alt="' + escAttr(a.naam) + '" style="width:72px;height:92px;object-fit:cover;border-radius:10px;flex-shrink:0;">' : '<div style="width:72px;height:92px;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem;"></div>') +
         '<div style="flex:1;min-width:0;">' +
         '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.92rem;">' + esc(a.naam) + '</b>' +
-        '<button class="rt-fav" data-rfav="' + escAttr(a.id) + '" style="background:none;border:none;font-size:1.1rem;flex-shrink:0;cursor:pointer;" aria-label="' + T('rt.m.verlang','Verlanglijst') + '">' + (a.opWishlist ? '💛' : '🤍') + '</button></div>' +
+        '<button class="rt-fav" data-rfav="' + escAttr(a.id) + '" style="background:none;border:none;font-size:1.1rem;flex-shrink:0;cursor:pointer;" aria-label="' + T('rt.m.verlang','Verlanglijst') + '">' + RTGGlyf.svgHTML('hart', a.opWishlist ? { fill: true } : {}) + '</button></div>' +
         '<div style="font-size:0.78rem;color:var(--soft);">' + esc(a.categorie || '') + (a.materiaal ? ' · ' + esc(a.materiaal) : '') + '</div>' +
         (a.kleuren && a.kleuren.length ? '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.2rem;">' + a.kleuren.map(k => esc(k)).join(' · ') + '</div>' : '') +
         '<div style="font-weight:600;margin-top:0.3rem;">' + eur(a.price) + '</div>' +
-        (drop ? '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.3rem;">⏳ ' + T('rt.m.drop','Drop') + ' ' + esc(a.drop.datum) + ' ' + esc(a.drop.tijd) + '</div>' : '') +
+        (drop ? '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.3rem;">' + T('rt.m.drop','Drop') + ' ' + esc(a.drop.datum) + ' ' + esc(a.drop.tijd) + '</div>' : '') +
         '</div></div>' +
         (!drop && bes.length ? '<div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.6rem;flex-wrap:wrap;">' +
           '<span style="font-size:0.72rem;color:var(--soft);">' + T('rt.m.paskamer','Vraag een maat in de paskamer:') + '</span>' +
@@ -4252,7 +4697,7 @@
       if (!adres || !adres.trim()) return;
       try {
         const r = await API.call('/mode/bezorg/aanvraag', { supplierCode: code, adres: adres.trim(), items });
-        toast('🚚 ' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + r.bezorging.bezorgcode);
+        toast('' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + r.bezorging.bezorgcode);
         try { menuState.modeBezorg = (await API.call('/mode/bezorg/mijn', {})).bezorgingen || []; } catch(e){}
         renderMenuSheet();
       } catch(e){ toast(e.message); }
@@ -4260,7 +4705,7 @@
     document.querySelectorAll('[data-rfav]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/retail/wishlist', { code, artikelId: b.dataset.rfav });
-        b.textContent = d.wishlist ? '💛' : '🤍';
+        b.innerHTML = RTGGlyf.svgHTML('hart', d.wishlist ? { fill: true } : {});
         const a = (menuState.retail.artikelen || []).find(x => x.id === b.dataset.rfav); if (a) a.opWishlist = d.wishlist;
         toast(d.wishlist ? T('rt.m.opverlang','Op uw verlanglijst. De boetiek ziet het.') : T('rt.m.afverlang','Van uw verlanglijst gehaald.'));
       } catch(e){ toast(e.message); }
@@ -4271,7 +4716,7 @@
       if (!sel || !sel.value) return;
       try {
         await API.call('/retail/paskamer', { code, vsku: sel.value });
-        toast('🚪 ' + T('rt.m.pasok','Uw maat is aangevraagd. Een medewerker brengt hem naar de paskamer.'));
+        toast('' + T('rt.m.pasok','Uw maat is aangevraagd. Een medewerker brengt hem naar de paskamer.'));
       } catch(e){ toast(e.message); }
     }));
   }
@@ -4289,7 +4734,7 @@
       const bots = e.status === 409 && e.data && e.data.allergieBotsing;
       if (bots && !opts.allergieAkkoord){
         const namen = bots.map(b => b.naam + ' (' + b.allergenen.map(a => tAlg(a)).join(', ') + ')').join('; ');
-        if (confirm('⚠️ ' + T('menu.allergiebevestig','Dit botst met je allergieprofiel') + ': ' + namen + '.\n\n' + T('menu.allergietochbestel','Weet je zeker dat je dit toch wilt bestellen?')))
+        if (confirm('' + T('menu.allergiebevestig','Dit botst met je allergieprofiel') + ': ' + namen + '.\n\n' + T('menu.allergietochbestel','Weet je zeker dat je dit toch wilt bestellen?')))
           return placeOrder(Object.assign({}, opts, { allergieAkkoord: true }));
         return;
       }
@@ -4303,12 +4748,12 @@
     } else if (d.order.aanBalie){
       // naar de kassa: de keuken maakt hem al; toon de code groot om aan de balie
       // te laten scannen of tonen
-      toast('🧾 ' + T('app.naarkassaok','Naar de kassa gestuurd. Toon je code aan de balie.'));
+      toast('' + T('app.naarkassaok','Naar de kassa gestuurd. Toon je code aan de balie.'));
       showGlow(d.order);
     } else {
       // deze zaak koos betaling achteraf: de bestelling loopt al; na het eten
       // vraagt u de rekening (alle bonnen in een keer) bij Mijn bestellingen
-      toast('🛎️ ' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalnaeten','Betaal na het eten: vraag de rekening bij Mijn bestellingen.'));
+      toast('' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalnaeten','Betaal na het eten: vraag de rekening bij Mijn bestellingen.'));
     }
     renderTerPlaatse();
   }
@@ -4321,7 +4766,7 @@
     payWithFaceId(eur(o.total + fooi), async () => {
       await API.call('/order/pay', { ref: o.ref, fooi });
       return o;
-    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.' + (fooi ? ' 💛 ' + eur(fooi) + ' ' + T('erv.fooivoorteam','fooi voor het team.') : ''), after: () => renderTerPlaatse() });
+    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.' + (fooi ? '  ' + eur(fooi) + ' ' + T('erv.fooivoorteam','fooi voor het team.') : ''), after: () => renderTerPlaatse() });
   }
 
   $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
@@ -4355,7 +4800,7 @@
         return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;font-size:0.78rem;color:var(--muted);">'+
           '<span>'+a.company+' · '+a.func+'</span>'+
           '<span style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">'+
-          (a.chatId ? '<button class="chatb" style="width:auto;padding:0.2rem 0.55rem;font-size:0.7rem;" data-apchat="'+a.chatId+'" data-apco="'+encodeURIComponent(a.company)+'">💬 '+T('cv.chat','Chat')+'</button>' : '')+
+          (a.chatId ? '<button class="chatb" style="width:auto;padding:0.2rem 0.55rem;font-size:0.7rem;" data-apchat="'+a.chatId+'" data-apco="'+encodeURIComponent(a.company)+'">'+T('cv.chat','Chat')+'</button>' : '')+
           '<span style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:'+kleur+';border:1px solid '+kleur+';border-radius:999px;padding:0.15rem 0.55rem;">'+label+'</span></span></div>';
       }).join('')+'</div>' : '')+
       '<button class="vbtn" style="margin-top:0.8rem;" id="cvOpen">'+(myCvReady?T('cv.card.edit','Bewerk mijn cv'):T('cv.card.make','Maak mijn cv'))+'</button>';
@@ -4402,7 +4847,6 @@
 
   /* ---------- vacatures: dezelfde partnervacatures als in de RTFoundation,
      nu ook voor RTG-leden, met land- en afstandfilter en solliciteren met cv ---------- */
-  const VLAG = { NL:'🇳🇱', BE:'🇧🇪', DE:'🇩🇪', FR:'🇫🇷', ES:'🇪🇸', JP:'🇯🇵' };
   const VACSOORT = { bijbaan:'Bijbaan', vakantiewerk:'Vakantiewerk', parttime:'Parttime', fulltime:'Fulltime', stage:'Stage', vrijwilliger:'Vrijwilliger' };
   let vacs = [], vacLanden = [], vacLand = '';
   async function loadVacatures(){
@@ -4422,17 +4866,18 @@
     const rij = vacs.map(v => ({ v, km: mijnPlek && v.loc ? Geo.afstandKm(mijnPlek, v.loc) : null }));
     if (mijnPlek) rij.sort((a,b) => (a.km==null?1e9:a.km) - (b.km==null?1e9:b.km));
     const isApplied = (v) => myApps.some(a => a.func === v.func && a.company === v.bedrijf);
-    const landOpts = '<option value="">🌍 '+T('vac.overal','Overal')+'</option>' +
-      vacLanden.map(l => '<option value="'+l.code+'"'+(l.code===vacLand?' selected':'')+'>'+(VLAG[l.code]||'🏳️')+' '+esc(l.naam)+'</option>').join('');
+    const landOpts = '<option value="">'+T('vac.overal','Overal')+'</option>' +
+      vacLanden.map(l => '<option value="'+l.code+'"'+(l.code===vacLand?' selected':'')+'>'+(VLAG[l.code]||'')+' '+esc(l.naam)+'</option>').join('');
     let h = '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">💼 '+T('vac.k','Werk en vacatures')+'</div>'+
+      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('vac.k','Werk en vacatures')+'</div>'+
       '<select id="vacLand" style="background:var(--card2);color:var(--txt,#fff);border:1px solid var(--line);border-radius:999px;padding:0.3rem 0.6rem;font-size:0.72rem;">'+landOpts+'</select></div>';
     if (!rij.length){
-      h += '<div style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);">'+T('vac.leeg','Nu geen open vacatures die bij u passen. Kijk gerust later nog eens.')+'</div>';
+      h += '<div style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);">'+T('vac.leeg','Nu geen open vacatures die bij u passen. Kijk gerust later nog eens.')+'</div>'+
+        '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek werk dat bij mijn profiel past en help me solliciteren" style="margin-top:0.5rem;">'+T('vac.leegdoe','Laat Rahul werk zoeken dat past')+'</button>';
     } else {
       h += '<div style="margin-top:0.7rem;display:flex;flex-direction:column;gap:0.6rem;">'+ rij.slice(0,20).map(({v,km})=>{
         const al = isApplied(v);
-        const meta = [ VACSOORT[v.soort]||v.soort, (VLAG[v.land]||'')+' '+(v.landNaam||''), v.plaats||v.stad, km!=null?('📍 '+Geo.tekst(km)):'' ].filter(x=>x&&x.trim()).join(' · ');
+        const meta = [ VACSOORT[v.soort]||v.soort, (VLAG[v.land]||'')+' '+(v.landNaam||''), v.plaats||v.stad, km!=null?(''+Geo.tekst(km)):'' ].filter(x=>x&&x.trim()).join(' · ');
         return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;">'+
           '<div style="display:flex;align-items:flex-start;gap:0.5rem;justify-content:space-between;">'+
           '<div style="min-width:0;"><b style="font-size:0.9rem;">'+esc(v.func)+'</b>'+
@@ -4590,14 +5035,14 @@
      30-live-menu-werk-03.js, zodat beide parts in de 5-10 KB-band blijven. */
   function sparBlokHtml(sparLijst){
     return '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">' +
-      '<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">💭 ' + T('spar.h','Sparren met Rahul') + '</div>' +
+      '<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">' + T('spar.h','Sparren met Rahul') + '</div>' +
       '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.25rem;">' + T('spar.d','Hij denkt mee om je idee beter te maken, niet om zijn gelijk te halen. Parkeer een gedachte; als je rustig thuis bent met een lege agenda komt hij er zelf op terug.') + '</div>' +
       ((sparLijst || []).length
         ? '<div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.5rem;">' + sparLijst.map(s =>
             '<div style="border:1px solid var(--line);border-radius:12px;padding:0.5rem 0.65rem;">' +
             '<div style="font-size:0.78rem;line-height:1.4;">' + esc(s.tekst) + '</div>' +
             '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;">' +
-              '<button class="chip js-sparchat" data-t="' + esc(s.tekst) + '" style="font-size:0.68rem;">💬 ' + T('spar.nu','Spar nu') + '</button>' +
+              '<button class="chip js-sparchat" data-t="' + esc(s.tekst) + '" style="font-size:0.68rem;">' + T('spar.nu','Spar nu') + '</button>' +
               '<button class="chip js-spardone" data-id="' + esc(s.id) + '" style="font-size:0.68rem;">✓ ' + T('spar.klaar','Besproken') + '</button>' +
               '<button class="chip js-sparweg" data-id="' + esc(s.id) + '" style="font-size:0.68rem;">✕ ' + T('spar.weg','Weg') + '</button>' +
             '</div></div>').join('') + '</div>'
@@ -4624,7 +5069,7 @@
     if (sparPark && sparIn) {
       const park = async () => {
         const tekst = sparIn.value.trim(); if (!tekst) return;
-        try { await API.call('/spar/parkeer', { tekst }); sparIn.value = ''; toast('💭 ' + T('spar.geparkeerd','Geparkeerd. Rahul komt er op een rustig moment op terug.')); renderFluister(); } catch(e){ toast(e.message); }
+        try { await API.call('/spar/parkeer', { tekst }); sparIn.value = ''; toast('' + T('spar.geparkeerd','Geparkeerd. Rahul komt er op een rustig moment op terug.')); renderFluister(); } catch(e){ toast(e.message); }
       };
       sparPark.addEventListener('click', park);
       sparIn.addEventListener('keydown', e => { if (e.key === 'Enter') park(); });
@@ -4727,7 +5172,7 @@
     const lopend = (paspoortInboxData.verzoeken || []).filter(v => v.status === 'goedgekeurd');
     let html = '';
     if (open.length) html += open.map(v => '<div class="vbanner" style="border-color:var(--gold,#c9a227);">' +
-      '<b>🪪 '+esc(v.supplierName)+' '+T('pi.vraagt','vraagt uw')+' '+T('pi.n.'+v.niveau, v.niveau)+'</b>' +
+      '<b>'+esc(v.supplierName)+' '+T('pi.vraagt','vraagt uw')+' '+T('pi.n.'+v.niveau, v.niveau)+'</b>' +
       '<span>'+(v.reden?esc(v.reden)+' · ':'')+T('pi.uitleg','U beslist. Bij goedkeuren ziet de partner dit 10 minuten; daarna vervalt het vanzelf.')+'</span>' +
       '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="vbtn" data-pigo="'+v.id+'">'+T('pi.goed','Goedkeuren')+'</button>' +
       '<button class="vbtn" data-piweiger="'+v.id+'" style="background:none;border:1px solid var(--line);color:var(--txt);">'+T('pi.weiger','Weigeren')+'</button></div></div>').join('');
@@ -4900,7 +5345,7 @@
   }
   function rtfBerichtHtml(x){
     return '<div style="padding:.55rem .7rem;border:1px solid var(--line);border-radius:12px;margin:.4rem 0;'+(x.gelezen?'':'border-color:var(--burgundy,#C23A5E);')+(x.soort==='hulp'?'background:rgba(194,58,94,.08);':'')+'">'+
-      '<div style="font-size:.72rem;color:var(--muted);">'+(x.soort==='hulp'?'🆘 ':(x.soort==='reis'?'✈️ ':''))+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
+      '<div style="font-size:.72rem;color:var(--muted);">'+(x.soort==='hulp'?'':(x.soort==='reis'?'':''))+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
       '<div style="font-size:.92rem;line-height:1.4;margin-top:.15rem;white-space:pre-wrap;">'+esc(x.tekst)+'</div></div>';
   }
   function renderGezin(){
@@ -4909,7 +5354,7 @@
     $('#gezinSub').textContent = g.length ? 'De RTFoundation-gezinnen die je als oppas of familie volgt.' : 'Je volgt nog geen gezin.';
     fam.innerHTML = '<div class="label">Gevolgde gezinnen</div>'+
       (g.length ? g.map(x=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><b style="flex:1;">'+esc(x.gezinNaam)+'</b><span class="meta">als '+esc(x.profielNaam)+'</span><button class="go" style="background:transparent;color:var(--muted);padding:.2rem .4rem;" data-los="'+x.code+'|'+x.profielId+'">Ontkoppel</button></div>').join('') : '<div class="meta">Nog geen gezin gekoppeld.</div>')+
-      '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;"><button class="go" id="rtfKoppelBtn2">Koppel een gezin →</button><button class="go" id="rtfPushBtn" style="background:transparent;color:var(--muted);">🔔 Meldingen op mijn telefoon</button></div>';
+      '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;"><button class="go" id="rtfKoppelBtn2">Koppel een gezin →</button><button class="go" id="rtfPushBtn" style="background:transparent;color:var(--muted);">Meldingen op mijn telefoon</button></div>';
     feed.innerHTML = '<div class="label">Meldingen van het gezin</div>'+
       (m.length ? m.slice(0,30).map(rtfBerichtHtml).join('') : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier en op je telefoon.</div>')+
       (g.length ? '<div style="display:flex;gap:.5rem;margin-top:.8rem;"><input id="rtfReplyIn" placeholder="Antwoord het gezin..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;color:var(--txt);"><button class="go" id="rtfReplyBtn">Stuur</button></div>' : '');
@@ -4931,9 +5376,9 @@
     else if (window.GezinRT){ GezinRT.setLeden(kan.leden); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
     const byId={}; chats.forEach(c=> byId[c.id]=c);
-    box.innerHTML='<div class="label">💬 Chat en bellen</div>'+
+    box.innerHTML='<div class="label">Chat en bellen</div>'+
       '<div class="meta" style="margin-bottom:.4rem;">Bericht of (video)bel het gezin in de app.</div>'+
-      kan.leden.map(function(l){ var c=byId[l.id]||{}; return '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><span style="width:2rem;height:2rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+(l.avatar||'🙂')+'</span><div class="grow-min"><b>'+esc(l.naam)+'</b>'+(c.ongelezen?' <span style="color:var(--burgundy);">('+c.ongelezen+')</span>':'')+(c.laatste?'<div class="meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(c.laatste)+'</div>':'')+'</div><button class="go" style="padding:.2rem .5rem;" data-chat="'+l.id+'">Chat</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-bel="'+l.id+'">📞</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-video="'+l.id+'">🎥</button></div>'; }).join('')+
+      kan.leden.map(function(l){ var c=byId[l.id]||{}; return '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><span style="width:2rem;height:2rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;font-weight:700;color:#0C0C0B;">'+(l.avatar||esc((l.naam||'?').charAt(0).toUpperCase()))+'</span><div class="grow-min"><b>'+esc(l.naam)+'</b>'+(c.ongelezen?' <span style="color:var(--burgundy);">('+c.ongelezen+')</span>':'')+(c.laatste?'<div class="meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(c.laatste)+'</div>':'')+'</div><button class="go" style="padding:.2rem .5rem;" data-chat="'+l.id+'">Chat</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-bel="'+l.id+'">'+RTGGlyf.svgHTML('bellen')+'</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-video="'+l.id+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'; }).join('')+
       '<div id="grtThread" style="display:none;margin-top:.7rem;"></div>';
     box.querySelectorAll('[data-chat]').forEach(function(b){ b.onclick=function(){ openGrtThread(b.dataset.chat, kan.leden.find(function(x){return x.id===b.dataset.chat;})); }; });
     box.querySelectorAll('[data-bel]').forEach(function(b){ b.onclick=function(){ GezinRT.bel(b.dataset.bel,false); }; });
@@ -4965,23 +5410,23 @@
       let h = '';
       if (meerdan1) h += '<div class="label" style="margin:.4rem 0 .2rem;color:var(--burgundy);">'+esc(gz.gezinNaam)+'</div>';
       // Belangrijke info
-      h += '<div class="card"><div class="label">📋 Belangrijke info</div>';
+      h += '<div class="card"><div class="label">Belangrijke info</div>';
       h += (o.noodcontacten&&o.noodcontacten.length)
-        ? '<div style="margin:.2rem 0 .6rem;">'+o.noodcontacten.map(c=>'<a href="'+telHref(c.telefoon)+'" style="display:flex;align-items:center;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--txt);"><span>📞</span><b style="flex:1;">'+esc(c.naam||'Contact')+(c.wie?' <span class="meta">· '+esc(c.wie)+'</span>':'')+'</b><span style="color:var(--gold);">'+esc(c.telefoon)+'</span></a>').join('')+'</div>'
+        ? '<div style="margin:.2rem 0 .6rem;">'+o.noodcontacten.map(c=>'<a href="'+telHref(c.telefoon)+'" style="display:flex;align-items:center;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--txt);"><b style="flex:1;">'+esc(c.naam||'Contact')+(c.wie?' <span class="meta">· '+esc(c.wie)+'</span>':'')+'</b><span style="color:var(--gold);">'+esc(c.telefoon)+'</span></a>').join('')+'</div>'
         : '';
-      h += infoRij('💊 Allergieën en medisch', o.allergie);
-      h += infoRij('🍽️ Eten en bedtijden', o.eten);
-      h += infoRij('🏠 Huisregels', o.huisregels);
+      h += infoRij('Allergieën en medisch', o.allergie);
+      h += infoRij('Eten en bedtijden', o.eten);
+      h += infoRij('Huisregels', o.huisregels);
       if (!(o.noodcontacten&&o.noodcontacten.length) && !o.allergie && !o.eten && !o.huisregels) h += '<div class="meta">Het gezin heeft nog geen info ingevuld.</div>';
       h += '<div class="meta" style="margin-top:.6rem;">Bij nood: bel 112.</div></div>';
       // Agenda
       const ag = (gz.agenda||[]).filter(a=>!a.voorbij).slice(0,8);
-      h += '<div class="card"><div class="label">📅 Agenda</div>'+
+      h += '<div class="card"><div class="label">Agenda</div>'+
         (ag.length ? ag.map(a=>'<div style="display:flex;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);white-space:nowrap;">'+(a.tijd||datumKort(a.datum))+'</b><span style="flex:1;">'+esc(a.titel)+(a.wieNaam?' <span class="meta">· '+esc(a.wieNaam)+'</span>':'')+'<div class="meta">'+datumKort(a.datum)+'</div></span></div>').join('') : '<div class="meta">Niets gepland.</div>')+'</div>';
       // Waar is iedereen
       const loc = (gz.locaties||[]);
-      h += '<div class="card"><div class="label">📍 Waar is iedereen</div>'+
-        (loc.length ? loc.map(l=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);"><span style="width:1.8rem;height:1.8rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;">'+(l.avatar||'🙂')+'</span><div style="flex:1;"><b>'+esc(l.naam)+'</b><div class="meta">'+esc(l.status)+' · '+geleden(l.at)+'</div></div>'+(l.lat!=null?'<a href="geo:'+l.lat+','+l.lon+'?q='+l.lat+','+l.lon+'" target="_blank" rel="noopener" style="color:var(--gold);white-space:nowrap;">Kaart →</a>':'')+'</div>').join('') : '<div class="meta">Niemand deelt nu iets.</div>')+'</div>';
+      h += '<div class="card"><div class="label">Waar is iedereen</div>'+
+        (loc.length ? loc.map(l=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);"><span style="width:1.8rem;height:1.8rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#0C0C0B;">'+(l.avatar||esc((l.naam||'?').charAt(0).toUpperCase()))+'</span><div style="flex:1;"><b>'+esc(l.naam)+'</b><div class="meta">'+esc(l.status)+' · '+geleden(l.at)+'</div></div>'+(l.lat!=null?'<a href="geo:'+l.lat+','+l.lon+'?q='+l.lat+','+l.lon+'" target="_blank" rel="noopener" style="color:var(--gold);white-space:nowrap;">Kaart →</a>':'')+'</div>').join('') : '<div class="meta">Niemand deelt nu iets.</div>')+'</div>';
       return h;
     }).join('');
   }
@@ -5043,7 +5488,7 @@
 
   /* de reisagenda: alles met een datum (tafels, tickets, ritten, events)
      automatisch samengevoegd tot een dagprogramma onder de reis */
-  const AGENDA_ICO = { reservering: '🪑', ticket: '🎟', boeking: '🗓', rit: '🚗', event: '🎉' };
+  const AGENDA_ICO = {};  // geen emoji-markers meer; alle items dragen het rustige '·'
   async function renderAgenda(){
     if (!API.live) return;
     let wrap = $('#agendaWrap');
@@ -5056,7 +5501,7 @@
     try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch(e){ return; }
     if (!dagen.length){ wrap.innerHTML = ''; return; }
     const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang() === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
-    wrap.innerHTML = '<div class="sec-label" style="margin-top:1.2rem;">📅 ' + T('erv.agenda','Mijn programma') + '</div>' +
+    wrap.innerHTML = '<div class="sec-label" style="margin-top:1.2rem;">' + T('erv.agenda','Mijn programma') + '</div>' +
       dagen.map(d =>
         '<div style="font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin:0.7rem 0 0.35rem;">' + dagNaam(d.datum) + '</div>' +
         d.items.map(it =>
@@ -5403,7 +5848,7 @@
     const mijnKey = user.id != null ? 'user-' + user.id : user.tier;
     const echteOpen = splitsen.filter(s => s.delen.some(d2 => !d2.paid)).slice(0, 6);
     if (echteOpen.length) html += kaart(
-      '<b style="font-size:0.86rem;">🤝 ' + T('erv.verzoeken','Gesplitste rekeningen') + '</b>' +
+      '<b style="font-size:0.86rem;">' + T('erv.verzoeken','Gesplitste rekeningen') + '</b>' +
       echteOpen.map(s => {
         const mijnDeel = s.delen.find(d2 => d2.key === mijnKey && !d2.paid);
         return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.78rem;">' +
@@ -5415,7 +5860,7 @@
       }).join(''));
     // meldingsvoorkeuren: per soort aan of uit
     if (vk) html += kaart(
-      '<b style="font-size:0.86rem;">🔔 ' + T('erv.meldingen','Meldingen') + '</b>' +
+      '<b style="font-size:0.86rem;">' + T('erv.meldingen','Meldingen') + '</b>' +
       '<div style="display:flex;flex-wrap:wrap;gap:0.5rem 1rem;margin-top:0.55rem;">' +
       [['orders', T('erv.m.orders','Bestellingen')], ['events', T('erv.m.events','Events')], ['salon', 'De Salon'], ['live', T('erv.m.live','Onderweg')], ['wachtlijst', T('erv.wachtlijst','Wachtlijst')]].map(([k, l]) =>
         '<label style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.76rem;"><input type="checkbox" class="js-vk" data-scope="' + k + '"' + (vk[k] !== false ? ' checked' : '') + '> ' + l + '</label>'
@@ -5446,7 +5891,7 @@
     }
     const opties = suppliers.map(s => '<option value="' + s.code + '">' + s.name + '</option>').join('');
     wrap.innerHTML = '<div style="margin-top:1.6rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;">' +
-      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">🎁 ' + T('gc.h','Cadeaukaarten') + '</div>' +
+      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">' + T('gc.h','Cadeaukaarten') + '</div>' +
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('gc.s','Koop een cadeaukaart van een partner en geef de code cadeau. Inwisselen gaat bij de zaak.') + '</div>' +
       (kaarten.length ? kaarten.map(k =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;">' +
@@ -5477,7 +5922,7 @@
     try { land = localStorage.getItem('rtg_boekland') || 'NL'; } catch(e){}
     const landen = [['NL','Nederland'],['BE','Belgie'],['DE','Duitsland'],['FR','Frankrijk'],['ES','Spanje'],['JP','Japan']];
     wrap.innerHTML = '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;">' +
-      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">📚 ' + T('bh2.h','AI-boekhouder · Business Pass') + '</div>' +
+      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">' + T('bh2.h','AI-boekhouder · Business Pass') + '</div>' +
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('bh2.s','Kent per land de aftrekregels voor uw zakelijke reiskosten. Uw facturen staan al boekhoudklaar, met afboekcode en btw-specificatie.') + '</div>' +
       '<div style="display:flex;gap:0.5rem;margin-top:0.7rem;">' +
       '<select id="bhLand" style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.55rem;color:var(--txt);font-family:inherit;">' +
@@ -5487,7 +5932,7 @@
       '<div id="bhA" style="display:none;margin-top:0.7rem;border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.78rem;line-height:1.6;color:var(--muted);"></div>' +
       // zzp-belastingtool: jaarwinst in, indicatie van aftrek, belasting en netto uit
       '<div style="margin-top:0.9rem;border-top:1px solid var(--line);padding-top:0.9rem;">' +
-      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">🧮 ' + T('zzp.h','Zzp-belastingtool') + '</div>' +
+      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">' + T('zzp.h','Zzp-belastingtool') + '</div>' +
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('zzp.s','Voor zelfstandigen: vul uw verwachte jaarwinst in voor een indicatie van uw belasting, nettowinst en wat u maandelijks opzij zet. Het land volgt de keuze hierboven.') + '</div>' +
       '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">' +
       '<input id="zzpWinst" type="number" placeholder="' + T('zzp.winstph','Jaarwinst, bijv. 60000') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.8rem;">' +
@@ -5498,7 +5943,7 @@
       '<div id="zzpRes" style="display:none;margin-top:0.7rem;border:1px solid var(--line);border-radius:12px;padding:0.8rem 0.95rem;font-size:0.76rem;line-height:1.7;color:var(--muted);"></div></div></div>' +
       // Borden: dezelfde werkbord-module als de zaken gebruiken (shared/borden.js)
       '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;">' +
-      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">📋 ' + T('bd2.h','Borden · uw projecten') + '</div>' +
+      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">' + T('bd2.h','Borden · uw projecten') + '</div>' +
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('bd2.s','Hetzelfde werkbord als in de RTG-bedrijfsapps: lijsten en kaarten voor uw eigen projecten en administratie.') + '</div>' +
       '<div id="lidBordenWrap"></div></div>';
     if (window.BordenUI){
@@ -5542,7 +5987,7 @@
           rij(T('zzp.belastbaar','Belastbaar (na aftrek)'), eur(d.belastbaar)) +
           rij(T('zzp.teBetalen','Te betalen (indicatie)'), eur(d.belasting), true) +
           rij(T('zzp.netto','Netto over'), eur(d.netto), true) +
-          '<div style="margin-top:0.55rem;padding-top:0.55rem;border-top:1px solid var(--line);color:var(--gold);">💡 ' + T('zzp.reserveer','Zet ~') + d.reserveerPct + '% ' + T('zzp.opzij','opzij: ongeveer') + ' ' + eur(d.perMaand) + ' ' + T('zzp.pm','per maand') + '.</div>' +
+          '<div style="margin-top:0.55rem;padding-top:0.55rem;border-top:1px solid var(--line);color:var(--gold);">' + T('zzp.reserveer','Zet ~') + d.reserveerPct + '% ' + T('zzp.opzij','opzij: ongeveer') + ' ' + eur(d.perMaand) + ' ' + T('zzp.pm','per maand') + '.</div>' +
           '<div style="margin-top:0.5rem;">' + d.regels.map(r => '• ' + r).join('<br>') + '</div>' +
           '<div style="margin-top:0.5rem;font-size:0.64rem;color:var(--soft);">' + T('zzp.disc','Indicatie op jaarbasis; dit is voorlichting, geen bindend fiscaal advies.') + '</div>';
       } catch(e){ box.textContent = e.message; }
@@ -5601,7 +6046,7 @@
 
   const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
-  // een voorstel van de Butler ("even checken...") krijgt echte knoppen
+  // een voorstel van Rahul ("even checken...") krijgt echte knoppen
   function voorstelChips(aan){
     const box = $('#chips'); if (!box) return;
     if (aan){
@@ -5623,7 +6068,7 @@
   async function ask(qIn){
     const q = String(qIn || '').trim();
     if (!q) return;
-    // eerst de Butler-motor: geheugen, seintjes, zoeken en echt regelen
+    // eerst Rahul-motor: geheugen, seintjes, zoeken en echt regelen
     // (reserveren, het 24-uursblok, een Tik, betaalverzoeken); pakt hij de
     // vraag niet, dan neemt de gewone gesprekslaag het over
     if (API.live){
@@ -5633,7 +6078,7 @@
         bubble(q, 'user');
         bubble(r.antwoord, 'ai');
         if (!user.account){ chatHistory.push({role:'user', content:q}); chatHistory.push({role:'assistant', content:r.antwoord}); }
-        if (r.gedaan) toast('🤵 ' + T('fl.gedaan','Rahul heeft het geregeld.'));
+        if (r.gedaan) toast('' + T('fl.gedaan','Rahul heeft het geregeld.'));
         voorstelChips(!!r.voorstel);
         if (typeof renderFluister === 'function') renderFluister();
         $('#content').scrollTop = $('#content').scrollHeight;
@@ -5681,7 +6126,7 @@
     const deck = document.querySelector('.view[data-view="ai"] .sub');
     if (deck) deck.textContent = concierge
       ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
-      : T('chat.butler.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
+      : T('chat.rahul.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
     // Vaste snelactie: alles regelen én afrekenen kan hier. Face ID, direct naar de partner.
     if (user.tier !== 'guest'){
       $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
@@ -5702,7 +6147,7 @@
     ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
     ov.innerHTML = '<div style="width:100%;max-width:460px;max-height:80vh;overflow-y:auto;background:var(--bg);border-radius:20px 20px 0 0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem;">' +
       '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;"><b style="font-size:1rem;">' + T('dp.kiespartner','Aan welke partner?') + '</b><button id="dpPickX" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;">✕</button></div>' +
-      lijst.map(s => '<button class="js-dppick" data-code="' + s.code + '" style="display:flex;align-items:center;gap:0.6rem;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-bottom:0.4rem;color:var(--txt);font-family:inherit;cursor:pointer;"><span style="font-size:1.1rem;">' + (s.icon || '🏛️') + '</span><span><b style="font-size:0.86rem;">' + escT(s.name) + '</b><span style="display:block;font-size:0.68rem;color:var(--soft);">' + escT(s.typeLabel || '') + (s.city ? ' · ' + escT(s.city) : '') + '</span></span></button>').join('') +
+      lijst.map(s => '<button class="js-dppick" data-code="' + s.code + '" style="display:flex;align-items:center;gap:0.6rem;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-bottom:0.4rem;color:var(--txt);font-family:inherit;cursor:pointer;"><span style="font-size:1.1rem;">' + (s.icon || RTGGlyf.svgHTML('gebouw')) + '</span><span><b style="font-size:0.86rem;">' + escT(s.name) + '</b><span style="display:block;font-size:0.68rem;color:var(--soft);">' + escT(s.typeLabel || '') + (s.city ? ' · ' + escT(s.city) : '') + '</span></span></button>').join('') +
       '</div>';
     ov.querySelector('#dpPickX').addEventListener('click', () => ov.remove());
     ov.querySelectorAll('.js-dppick').forEach(b => b.addEventListener('click', () => {
@@ -5735,7 +6180,7 @@
   }
   $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
   $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
-  // spreek uw vraag in: de gedeelde spraakmotor luistert, De Butler doet de rest
+  // spreek uw vraag in: de gedeelde spraakmotor luistert, Rahul doet de rest
   if (window.Spraak) Spraak.koppel($('#askMic'), {
     opTekst: zin => { $('#askInput').value = zin; ask(zin); $('#askInput').value = ''; },
     nietVerstaan: () => toast(T('fl.michoor','Ik kon u niet verstaan; probeer het nog eens of typ het gewoon.')),
@@ -5763,7 +6208,7 @@
   function zakProfielKaart(p){
     const skills = (p.vaardigheden || []).map(v =>
       '<span class="zak-chip' + (p.status === 'verbonden' ? ' klik js-zaanb' : '') + (v.doorMij ? ' mijn' : '') + '"' +
-      ' data-key="' + escT(p.key) + '" data-v="' + escT(v.naam) + '">' + escT(v.naam) + (v.aanbevolen ? ' · ' + v.aanbevolen + ' 👍' : '') + '</span>').join('');
+      ' data-key="' + escT(p.key) + '" data-v="' + escT(v.naam) + '">' + escT(v.naam) + (v.aanbevolen ? ' · ' + v.aanbevolen + ' ' : '') + '</span>').join('');
     return '<div class="zak-kaart">' +
       '<div style="display:flex;align-items:center;gap:0.6rem;">' +
         '<div class="grow-min"><b>' + escT(p.naam) + '</b>' +
@@ -5798,12 +6243,12 @@
             (x.openVoorWerk ? '<span class="zak-open">' + T('zak.open','open voor werk') + '</span>' : '') + '</div>' +
             '<div style="font-size:0.8rem;line-height:1.55;margin-top:0.35rem;white-space:pre-wrap;">' + msgHTML(x.tekst, x.lang) + '</div>' +
             '<div style="display:flex;gap:0.9rem;margin-top:0.5rem;font-size:0.7rem;color:var(--muted);">' +
-            '<button class="js-zlike" data-id="' + x.id + '" style="background:none;border:none;color:' + (x.mijnLike ? 'var(--gold)' : 'var(--muted)') + ';font-family:inherit;cursor:pointer;">👍 ' + x.likes + '</button>' +
-            '<span>💬 ' + x.reactiesTotaal + '</span></div>' +
+            '<button class="js-zlike" data-id="' + x.id + '" style="background:none;border:none;color:' + (x.mijnLike ? 'var(--gold)' : 'var(--muted)') + ';font-family:inherit;cursor:pointer;">' + x.likes + '</button>' +
+            '<span>' + x.reactiesTotaal + '</span></div>' +
             x.reacties.map(r => '<div style="font-size:0.72rem;margin-top:0.35rem;color:var(--muted);"><b style="color:var(--txt);">' + escT(r.naam) + '</b> ' + msgHTML(r.tekst, r.lang) + '</div>').join('') +
             '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input class="js-zretxt" data-id="' + x.id + '" placeholder="' + T('zak.reageer','Reageer…') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.75rem;color:var(--txt);font-family:inherit;font-size:0.72rem;">' +
             '<button class="js-zre" data-id="' + x.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.68rem;cursor:pointer;">↩</button></div></div>').join('')
-          : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.leeg','Nog geen posts. Wees de eerste: deel waar u aan werkt.') + '</div>');
+          : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.leeg','Nog geen posts. Wees de eerste: deel waar u aan werkt.') + '<br><button class="rahul-leeg-knop" data-rahul-leeg="Stel een korte zakelijke post voor me op over waar ik aan werk" style="margin-top:0.6rem;">' + T('zak.leegdoe','Laat Rahul een post opstellen') + '</button></div>');
         $('#zakPost').addEventListener('click', async () => {
           try { await API.call('/zakelijk/post', { tekst: $('#zakPostTekst').value }); zakRender(); }
           catch(e){ if (e.status === 409){ zakView = 'profiel'; document.querySelectorAll('.zak-tab').forEach(x => x.classList.toggle('active', x.dataset.zaktab === 'profiel')); zakRender(); } toast(e.message); }
@@ -5841,11 +6286,11 @@
         $('#zakFilterWerk').addEventListener('change', () => zoek($('#zakZoek').value));
         zoek('');
       } else if (zakView === 'kansen'){
-        const SOORT_ICO = { opdracht:'🛠️', samenwerking:'🤝', vacature:'📋', investering:'💶', anders:'✨' };
+        const SOORT_ICO = { opdracht:'', samenwerking:'', vacature:'', investering:'', anders:'' };
         const laad = async () => {
           const d = await API.call('/zakelijk/kansen', { q: $('#kansZoek').value, soort: $('#kansSoortF').value || undefined });
           const kaart = (k) => '<div class="zak-kaart">' +
-            '<div style="display:flex;gap:0.5rem;align-items:baseline;"><span>' + (SOORT_ICO[k.soort] || k.icon || '✨') + '</span>' +
+            '<div style="display:flex;gap:0.5rem;align-items:baseline;"><span>' + (SOORT_ICO[k.soort] || k.icon || '') + '</span>' +
             '<div class="grow-min"><b style="font-size:0.84rem;">' + escT(k.titel) + '</b>' +
             (!k.open ? ' <span class="zak-chip">' + T('zak.k.dicht','vervuld') + '</span>' : '') +
             '<div style="font-size:0.66rem;color:var(--soft);">' +
@@ -5866,7 +6311,7 @@
             '</div>';
           const alle = (d.kansen || []).concat(d.partnerVacatures || []);
           $('#kansLijst').innerHTML = alle.length ? alle.map(kaart).join('')
-            : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.k.leeg','Nog geen kansen. Plaats de eerste: een opdracht, samenwerking of investeringsvraag.') + '</div>';
+            : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.k.leeg','Nog geen kansen. Plaats de eerste: een opdracht, samenwerking of investeringsvraag.') + '<br><button class="rahul-leeg-knop" data-rahul-leeg="Stel een kans op (een opdracht, samenwerking of investeringsvraag) en plaats hem voor me" style="margin-top:0.6rem;">' + T('zak.k.leegdoe','Laat Rahul een kans opstellen') + '</button></div>';
           $('#kansLijst').querySelectorAll('.js-kre').forEach(b => b.addEventListener('click', async () => {
             const inp = $('#kansLijst').querySelector('.js-kretxt[data-id="' + b.dataset.id + '"]');
             try { await API.call('/zakelijk/kans/reageer', { id: b.dataset.id, tekst: inp.value }); toast(T('zak.k.gereageerd','Reactie geplaatst; de plaatser ziet hem direct.')); laad(); }
@@ -5881,8 +6326,8 @@
           '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('zak.k.nieuw','Plaats een kans') + '</b>' +
           '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">' +
           '<select id="kansSoort" aria-label="' + T('zak.k.soort','Soort kans') + '" style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.5rem;color:var(--txt);font-family:inherit;font-size:0.74rem;">' +
-          opt('opdracht','🛠️ ' + T('zak.k.opdracht','Opdracht')) + opt('samenwerking','🤝 ' + T('zak.k.samen','Samenwerking')) +
-          opt('vacature','📋 ' + T('zak.k.vac','Vacature')) + opt('investering','💶 ' + T('zak.k.inv','Investering')) + opt('anders','✨ ' + T('zak.k.anders','Anders')) + '</select>' +
+          opt('opdracht','' + T('zak.k.opdracht','Opdracht')) + opt('samenwerking','' + T('zak.k.samen','Samenwerking')) +
+          opt('vacature','' + T('zak.k.vac','Vacature')) + opt('investering','' + T('zak.k.inv','Investering')) + opt('anders','' + T('zak.k.anders','Anders')) + '</select>' +
           '<input id="kansTitel" placeholder="' + T('zak.k.titelph','Titel, bijv. Fotograaf gezocht voor merkcampagne') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.6rem;color:var(--txt);font-family:inherit;font-size:0.74rem;"></div>' +
           '<textarea id="kansOms" placeholder="' + T('zak.k.omsph','Omschrijf kort wat u zoekt of biedt…') + '" style="width:100%;min-height:52px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);font-family:inherit;font-size:0.74rem;margin-top:0.4rem;"></textarea>' +
           '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;align-items:center;">' +
@@ -5914,7 +6359,7 @@
         const veld = (label, id, val, ph) => '<div class="field"><label>' + label + '</label><input id="' + id + '" value="' + escT(val || '') + '"' + (ph ? ' placeholder="' + ph + '"' : '') + '></div>';
         body.innerHTML =
           '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.6rem;line-height:1.5;">' + T('zak.uitleg','Uw profiel is pas zichtbaar in de gids als u het bewaart. U kiest zelf welke naam u zakelijk gebruikt.') + '</div>' +
-          (d.cvSuggestie ? '<button id="zakUitCv" class="zak-chip klik" style="margin-top:0.5rem;">📄 ' + T('zak.uitcv','Vul aan vanuit mijn RTG-cv') + '</button>' : '') +
+          (d.cvSuggestie ? '<button id="zakUitCv" class="zak-chip klik" style="margin-top:0.5rem;">' + T('zak.uitcv','Vul aan vanuit mijn RTG-cv') + '</button>' : '') +
           veld(T('zak.naam','Professionele naam'), 'zakNaam', p.naam, T('zak.naamph','Standaard: uw codenaam')) +
           veld(T('zak.kop','Kop'), 'zakKop', p.kop, T('zak.kopph','Bijv. Oprichter, Fotograaf, Jurist')) +
           veld(T('zak.sector','Sector'), 'zakSector', p.sector) +
@@ -5967,14 +6412,15 @@
   function agendaToeLid(r){ if (r && r.items){ memberAgenda = r; agendaBadgeLid(r.telling || 0); } renderAgendaLid(); }
   function renderAgendaLid(){
     const el = document.getElementById('boAgendaCard'); if (!el) return;
-    if (!memberAgenda){ el.innerHTML = '<div class="zak-kaart"><b style="font-size:0.8rem;">📅 ' + T('ag.titel','Agenda') + '</b><div class="fineprint">…</div></div>'; laadAgendaLid().then(renderAgendaLid); return; }
+    if (!memberAgenda){ el.innerHTML = '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('ag.titel','Agenda') + '</b><div class="fineprint">…</div></div>'; laadAgendaLid().then(renderAgendaLid); return; }
     const o = memberAgenda, items = o.items || [];
     const dagLbl = d => { try { return new Date(d+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{weekday:'short',day:'numeric',month:'short'}); } catch(e){ return d; } };
     const inp = 'style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.55rem;color:var(--txt);font-family:inherit;font-size:0.76rem;"';
-    let h = '<div class="zak-kaart"><b style="font-size:0.8rem;">📅 ' + T('ag.titel','Agenda') + (o.telling?' <span style="color:#E0736A;">('+o.telling+')</span>':'') + '</b>';
-    h += items.length ? items.map(i => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.78rem;margin-top:0.45rem;opacity:'+(i.gedaan?'0.55':'1')+';"><span>'+(i.gedaan?'✓ ':'')+esc(i.titel)+'<span style="color:var(--muted);"> · '+esc(dagLbl(i.datum))+(i.tijd?' '+esc(i.tijd):'')+'</span></span><span style="white-space:nowrap;">'+(!i.gedaan?'<button class="ag-done" data-agdone="'+i.id+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.15rem 0.45rem;color:var(--txt);font-size:0.68rem;cursor:pointer;">✓</button> ':'')+'<button class="ag-del" data-agdel="'+i.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></span></div>').join('') : '<div class="fineprint" style="margin-top:0.4rem;">'+T('ag.leeg','Nog niets gepland. Typ het of laat de AI het inplannen.')+'</div>';
+    let h = '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('ag.titel','Agenda') + (o.telling?' <span style="color:#E0736A;">('+o.telling+')</span>':'') + '</b>';
+    h += items.length ? items.map(i => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.78rem;margin-top:0.45rem;opacity:'+(i.gedaan?'0.55':'1')+';"><span>'+(i.gedaan?'✓ ':'')+esc(i.titel)+'<span style="color:var(--muted);"> · '+esc(dagLbl(i.datum))+(i.tijd?' '+esc(i.tijd):'')+'</span></span><span style="white-space:nowrap;">'+(!i.gedaan?'<button class="ag-done" data-agdone="'+i.id+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.15rem 0.45rem;color:var(--txt);font-size:0.68rem;cursor:pointer;">✓</button> ':'')+'<button class="ag-del" data-agdel="'+i.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></span></div>').join('') : '<div class="fineprint" style="margin-top:0.4rem;">'+T('ag.leeg','Nog niets gepland. Typ het of laat de AI het inplannen.')+'</div>'+
+      '<button class="rahul-leeg-knop" data-rahul-leeg="Plan mijn dag: kijk wat er speelt en zet afspraken klaar" style="margin-top:0.5rem;">'+T('ag.leegdoe','Laat Rahul mijn dag plannen')+'</button>';
     h += '<div style="display:flex;gap:0.35rem;margin-top:0.6rem;flex-wrap:wrap;"><input id="agLidTitel" placeholder="'+T('ag.wat','Afspraak')+'" '+inp+' style="flex:1;min-width:7rem;"><input id="agLidDatum" type="date" '+inp+'><input id="agLidTijd" type="time" '+inp+'><button id="agLidAdd" style="background:var(--gold);border:none;border-radius:10px;padding:0.45rem 0.7rem;color:#000;font-weight:700;cursor:pointer;">+</button></div>';
-    h += '<div style="margin-top:0.55rem;border-top:1px solid var(--line);padding-top:0.5rem;"><div style="font-size:0.68rem;color:var(--soft);margin-bottom:0.3rem;">✨ '+T('ag.aihint','Of typ het in gewone taal:')+'</div><div id="agLidAiOut"></div><div style="display:flex;gap:0.35rem;margin-top:0.35rem;"><input id="agLidAiIn" placeholder="'+T('ag.aiph','bijv. vergadering morgen om 15u')+'" '+inp+' style="flex:1;"><button id="agLidAiGo" style="background:var(--gold);border:none;border-radius:10px;padding:0.45rem 0.7rem;color:#000;font-weight:700;cursor:pointer;">'+T('ag.plan','Plan')+'</button></div></div>';
+    h += '<div style="margin-top:0.55rem;border-top:1px solid var(--line);padding-top:0.5rem;"><div style="font-size:0.68rem;color:var(--soft);margin-bottom:0.3rem;">'+T('ag.aihint','Of typ het in gewone taal:')+'</div><div id="agLidAiOut"></div><div style="display:flex;gap:0.35rem;margin-top:0.35rem;"><input id="agLidAiIn" placeholder="'+T('ag.aiph','bijv. vergadering morgen om 15u')+'" '+inp+' style="flex:1;"><button id="agLidAiGo" style="background:var(--gold);border:none;border-radius:10px;padding:0.45rem 0.7rem;color:#000;font-weight:700;cursor:pointer;">'+T('ag.plan','Plan')+'</button></div></div>';
     h += '</div>';
     el.innerHTML = h;
     el.querySelectorAll('[data-agdone]').forEach(b => b.addEventListener('click', async () => { try { agendaToeLid(await API.call('/agenda/wijzig', { id: b.dataset.agdone, gedaan: true })); } catch(e){ toast(e.message); } }));
@@ -5991,7 +6437,7 @@
     if (!memberFacturen){ laadFacturenLid(); return; }
     const o = memberFacturen, items = o.facturen || [];
     const inp = 'style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.55rem;color:var(--txt);font-family:inherit;font-size:0.76rem;"';
-    let h = '<div class="zak-kaart"><b style="font-size:0.8rem;">🧾 ' + T('fact.mijn','Mijn facturen') + (o.telling?' <span style="color:var(--gold);">('+o.telling+')</span>':'') + '</b>';
+    let h = '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('fact.mijn','Mijn facturen') + (o.telling?' <span style="color:var(--gold);">('+o.telling+')</span>':'') + '</b>';
     h += items.length
       ? '<div style="font-size:0.72rem;color:var(--muted);margin:0.3rem 0 0.4rem;">'+T('fact.besteed','Samen besteed')+': '+eur(o.besteed||0)+'</div>' + items.slice(0,30).map(f => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.78rem;margin-top:0.4rem;"><span>'+esc(f.verkoper)+'<span style="color:var(--muted);"> · '+esc(f.datum)+' · '+esc(f.nummer)+'</span></span><span style="white-space:nowrap;"><b>'+eur(f.totaal)+'</b> <button class="fact-pdf" data-fpdf="'+f.id+'" data-nr="'+esc(f.nummer)+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.15rem 0.45rem;color:var(--txt);font-size:0.68rem;cursor:pointer;">PDF</button></span></div>').join('')
       : '<div class="fineprint" style="margin-top:0.4rem;">'+T('fact.geenlid','U heeft nog geen facturen. Bij een aankoop op uw codenaam verschijnt hier automatisch de factuur.')+'</div>';
@@ -6012,7 +6458,7 @@
     const items = await Toestelkluis.lijst();
     const kaart = document.createElement('div');
     kaart.className = 'zak-kaart';
-    kaart.innerHTML = '<b style="font-size:0.8rem;">📱 ' + T('kluis.h','Op dit toestel') + '</b>' +
+    kaart.innerHTML = '<b style="font-size:0.8rem;">' + T('kluis.h','Op dit toestel') + '</b>' +
       '<div class="fineprint" style="margin-top:0.25rem;">' + T('kluis.d','Uw eigen kopieen, opgeslagen in de beveiligde opslag van deze browser. Alleen u kunt erbij; er gaat niets over de lijn.') + '</div>' +
       (items.length ? items.slice(0, 10).map(x =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.76rem;margin-top:0.4rem;">' +
@@ -6053,17 +6499,17 @@
     const totaalBetaald = betaald.reduce((s, i) => s + (i.netto || 0) + (i.bijdrage || 0), 0);
     const fonds = betaald.reduce((s, i) => s + Math.round((i.bijdrage || 0) * 0.3), 0);
     const acties = [];
-    if (open.length) acties.push('💳 ' + open.length + ' ' + T('bo2.open','openstaande factuur/facturen; betaal in één tik via Betalen.'));
-    if (user.account && user.emailVerified === false) acties.push('✉️ ' + T('bo2.mailniet','Uw e-mailadres is nog niet bevestigd.'));
-    if (user.account && user.verified && user.verified !== 'verified') acties.push('🪪 ' + T('bo2.kyc','Verifieer uw identiteit om in één tik te boeken.'));
+    if (open.length) acties.push('' + open.length + ' ' + T('bo2.open','openstaande factuur/facturen; betaal in één tik via Betalen.'));
+    if (user.account && user.emailVerified === false) acties.push('' + T('bo2.mailniet','Uw e-mailadres is nog niet bevestigd.'));
+    if (user.account && user.verified && user.verified !== 'verified') acties.push('' + T('bo2.kyc','Verifieer uw identiteit om in één tik te boeken.'));
 
     let html = '';
-    if (acties.length) html += kaart('⚡ ' + T('bo2.acties','Nu aandacht nodig'),
+    if (acties.length) html += kaart('' + T('bo2.acties','Nu aandacht nodig'),
       acties.map(a => '<div class="fineprint">' + a + '</div>').join('') +
       (open.length ? knopje('boNaarBetalen', T('bo2.betaalnu','Naar Betalen')) : ''));
     else html += kaart('✓ ' + T('bo2.alsklaar','Alles op orde'), '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;">' + T('bo2.geen','Geen openstaande zaken op uw account.') + '</div>');
 
-    html += kaart('📊 ' + T('bo2.cijfers','Mijn cijfers'),
+    html += kaart('' + T('bo2.cijfers','Mijn cijfers'),
       rij(T('bo2.betaald','Betaald via RTG'), eur(totaalBetaald)) +
       rij(T('bo2.facturen','Facturen'), betaald.length + ' ' + T('bo2.voldaan','voldaan') + (open.length ? ' · ' + open.length + ' open' : '')) +
       rij('RTFoundation', eur(fonds) + ' ' + T('bo2.viamij','via mijn bijdragen')) +
@@ -6075,7 +6521,7 @@
     if (user.tier !== 'guest') html += '<div id="boFacturenCard"></div>';
 
     if (user.account){
-      html += kaart('🔐 ' + T('bo2.beveiliging','Beveiliging'),
+      html += kaart('' + T('bo2.beveiliging','Beveiliging'),
         rij(T('bo2.lidsinds','Lid sinds'), user.since || '') +
         rij(T('bo2.email','E-mail bevestigd'), user.emailVerified === false ? T('bo2.nee','nee') : T('bo2.ja','ja')) +
         '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.5rem;line-height:1.5;">' + T('bo2.2fa','Wachtwoord vergeten? Dat herstelt u via de website in twee stappen: een link per e-mail plus een code op uw telefoon.') + '</div>' +
@@ -6085,7 +6531,7 @@
         '</div>' + knopje('boWwZet', T('bo2.wijzig','Wijzig wachtwoord')) +
         (user.emailVerified === false ? knopje('boVerstuur', T('bo2.verstuur','Stuur bevestigingsmail opnieuw')) : ''));
     } else {
-      html += kaart('🔐 ' + T('bo2.beveiliging','Beveiliging'),
+      html += kaart('' + T('bo2.beveiliging','Beveiliging'),
         '<div class="fineprint">' + T('bo2.demo','U gebruikt een demoprofiel. Met een echt account beheert u hier uw wachtwoord en tweestapsherstel.') + '</div>');
     }
 
@@ -6094,22 +6540,22 @@
       const pasNaam = vastePas === 'rtg' ? T('bo2.thema.bordeaux','Bordeaux (RTG)') : T('bo2.thema.parel','Parelmoer (Lifestyle)');
       const nu = pasThemaHuidig();
       const knop = (val, tekst) => '<button class="js-thema" data-thema="' + val + '" style="margin-top:0.5rem;margin-right:0.4rem;border-radius:999px;padding:0.4rem 0.85rem;font-family:inherit;font-size:0.7rem;cursor:pointer;border:1px solid ' + (nu===val?'var(--gold)':'var(--line)') + ';background:' + (nu===val?'var(--gold)':'none') + ';color:' + (nu===val?'#000':'var(--txt)') + ';">' + tekst + '</button>';
-      html += kaart('🎨 ' + T('bo2.weergave','Weergave'),
+      html += kaart('' + T('bo2.weergave','Weergave'),
         '<div class="fineprint">' + T('bo2.weergave.s','Kies het kleurthema van deze app.') + '</div>' +
         knop(THEMA_STANDAARD[vastePas], pasNaam) + knop('standaard', T('bo2.thema.klassiek','Klassiek (donker)')));
     }
 
     // pas-specifiek: elke pas zijn eigen slimme snelkoppelingen
     if (user.tier === 'business'){
-      html += kaart('💼 ' + T('bo2.vb','Voor uw Business Pass'),
+      html += kaart('' + T('bo2.vb','Voor uw Business Pass'),
         '<div class="fineprint">' + T('bo2.vb.s','Uw facturen zijn boekhoudklaar. De AI-boekhouder en de zzp-belastingtool staan onder Betalen; uw netwerk onder Salon.') + '</div>' +
-        knopje('boNaarBoekhouder', '📚 ' + T('bo2.boekhouder','AI-boekhouder')) + knopje('boNaarZakelijk', '💼 RTG Zakelijk'));
+        knopje('boNaarBoekhouder', '' + T('bo2.boekhouder','AI-boekhouder')) + knopje('boNaarZakelijk', 'RTG Zakelijk'));
     } else if (user.tier === 'lifestyle'){
-      html += kaart('🌙 ' + T('bo2.vl','Voor uw Lifestyle Pass'),
+      html += kaart('' + T('bo2.vl','Voor uw Lifestyle Pass'),
         '<div class="fineprint">' + T('bo2.vl.s','Uw concierge denkt vooruit onder AI; uw professionele netwerk staat onder Salon.') + '</div>' +
-        knopje('boNaarAi', '✨ ' + T('bo2.concierge','Concierge')) + knopje('boNaarZakelijk', '💼 RTG Zakelijk'));
+        knopje('boNaarAi', '' + T('bo2.concierge','Concierge')) + knopje('boNaarZakelijk', 'RTG Zakelijk'));
     } else {
-      html += kaart('🎫 ' + T('bo2.vr','Voor uw pas'),
+      html += kaart('' + T('bo2.vr','Voor uw pas'),
         '<div class="fineprint">' + T('bo2.vr.s','Boeken, betalen, vrienden en De Salon zitten in uw pas. Lifestyle en Business voegen de concierge, de AI-boekhouder en RTG Zakelijk toe.') + '</div>');
     }
     body.innerHTML = html;
@@ -6204,7 +6650,7 @@
     const labelVoor = k => k === 'pas' ? (T('zg.pas','Pas') + ': ' + claims[k]) : (ZG_CLAIMS.find(c => c.id === k) || {}).label || k;
     const kies = document.getElementById('zgKies'); if (kies) kies.style.display = 'none';
     const res = document.getElementById('zgResultaat');
-    res.innerHTML = '<div class="zg-qrwrap"><div class="zg-badge">\u{1F6E1}️ '+T('zg.geverifieerd','RTG-geverifieerd')+'</div>'+
+    res.innerHTML = '<div class="zg-qrwrap"><div class="zg-badge">\u{1F6E1} '+T('zg.geverifieerd','RTG-geverifieerd')+'</div>'+
       '<div class="zg-qr" id="zgQr"></div>'+
       '<div class="zg-claims">'+ bewezen.map(k => '<span class="zg-claim">✓ '+labelVoor(k)+'</span>').join('') +'</div>'+
       '<div class="zg-tel" id="zgTel"></div>'+
@@ -6289,7 +6735,7 @@
         (items.length
           ? items.map(it =>
             '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.7rem;">' +
-            '<div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">' + (it.soort === 'folder' ? '📖 ' + T('sal.folder','Folder') : it.soort === 'deal' ? '🎁 ' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? '📊 Poll' : '📣 ' + T('sal.bericht','Bericht')) + '</div>' +
+            '<div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">' + (it.soort === 'folder' ? '' + T('sal.folder','Folder') : it.soort === 'deal' ? '' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? 'Poll' : '' + T('sal.bericht','Bericht')) + '</div>' +
             (it.folder ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.folder.titel) + '</div>' +
               ((it.folder.fotos && it.folder.fotos.length) ? '<div style="display:flex;gap:0.4rem;overflow-x:auto;margin-top:0.45rem;">' + it.folder.fotos.map(f => '<img src="' + f + '" alt="" style="height:90px;border-radius:8px;flex-shrink:0;">').join('') + '</div>' : '') +
               ((it.folder.items && it.folder.items.length) ? '<div style="margin-top:0.45rem;display:grid;gap:0.2rem;">' + it.folder.items.map(x => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(x.naam) + '</span>' + (x.prijs != null ? '<span style="color:var(--gold);">' + eur2(x.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '')
@@ -6318,7 +6764,7 @@
     if (user && (user.tier === 'business' || user.tier === 'lifestyle')){
       zakL.style.display = 'block';
       zakL.innerHTML = '<button id="zakOpenBtn" style="display:flex;align-items:center;gap:0.7rem;width:100%;text-align:left;background:none;border:1px solid var(--gold);border-radius:14px;padding:0.75rem 1rem;margin-bottom:0.8rem;color:var(--txt);font-family:inherit;cursor:pointer;">' +
-        '<span style="font-size:1.2rem;">💼</span><span style="flex:1;"><b style="font-size:0.85rem;">' + T('zak.h','RTG Zakelijk') + '</b>' +
+        '<span style="font-size:1.2rem;"></span><span style="flex:1;"><b style="font-size:0.85rem;">' + T('zak.h','RTG Zakelijk') + '</b>' +
         '<span style="display:block;font-size:0.68rem;color:var(--muted);">' + T('zak.launch','Uw professionele netwerk: profiel, gids, feed en aanbevelingen.') + '</span></span>' +
         '<span style="color:var(--gold);">›</span></button>';
       $('#zakOpenBtn').addEventListener('click', zakOpen);
@@ -6327,9 +6773,22 @@
       const engage = canEngage(p);
       // gratis gebruikers (zonder pas) liken/reageren niet bij particulieren
       const mayLike = !(isGuest && !p.partner);
+      // waarom staat dit bericht in De Salon? Vreemden zien alleen wat viraal
+      // gaat of maatschappelijk belangrijk is; van een vriend of iemand die je
+      // volgt zie je het sowieso. Een klein, ingetogen chipje maakt de reden
+      // zichtbaar (partner-etalage en uitgelichte posts dragen geen chip).
+      const REDEN_LABEL = {
+        vriend: T('sal.reden.vriend', 'Vriend'),
+        volgend: T('sal.reden.volgend', 'Je volgt'),
+        belangrijk: T('sal.reden.belangrijk', 'Belangrijk'),
+        viraal: T('sal.reden.viraal', 'Trending')
+      };
+      const redenChip = (p.reden && REDEN_LABEL[p.reden])
+        ? '<span class="salon-reden salon-reden-' + p.reden + '">' + REDEN_LABEL[p.reden] + '</span>'
+        : '';
       const visual = p.photo
-        ? '<div class="visual"><img src="' + p.photo + '" alt=""><span class="place">' + escT(p.place) + '</span></div>'
-        : '<div class="visual ' + (p.visual || 'v-partner') + '"><span class="place">' + escT(p.place) + '</span></div>';
+        ? '<div class="visual"><img src="' + p.photo + '" alt="">' + redenChip + '<span class="place">' + escT(p.place) + '</span></div>'
+        : '<div class="visual ' + (p.visual || 'v-partner') + '">' + redenChip + '<span class="place">' + escT(p.place) + '</span></div>';
       // partners posten zonder wachttijd: hun bericht staat er direct, met
       // tijdstempel; de 7-dagen-privacyregel geldt alleen voor ledenposts
       const meta = p.partner
@@ -6341,7 +6800,7 @@
         : '';
       const deal = p.deal
         ? '<div style="margin:0.6rem 1.1rem 0;border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">🎁 ' + T('sal.deal','Exclusief voor leden') + (p.deal.geldigTot ? ' · t/m ' + p.deal.geldigTot : '') + '</div>' +
+          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">' + T('sal.deal','Exclusief voor leden') + (p.deal.geldigTot ? ' · t/m ' + p.deal.geldigTot : '') + '</div>' +
           '<div style="font-weight:600;font-size:0.9rem;margin-top:0.25rem;">' + p.deal.titel + '</div>' +
           (p.deal.mijnCode
             ? '<div style="margin-top:0.45rem;font-size:0.8rem;color:var(--gold);letter-spacing:0.08em;">' + T('sal.uwcode','Uw code') + ': <b>' + p.deal.mijnCode + '</b> <span style="color:var(--soft);font-size:0.68rem;">· ' + T('sal.toon','toon aan de kassa') + '</span></div>'
@@ -6350,7 +6809,7 @@
         : '';
       const poll = p.poll
         ? '<div style="margin:0.6rem 1.1rem 0;border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">📊 ' + T('sal.poll','Poll') + ' · ' + p.poll.totaal + ' ' + T('sal.stemmen','stem(men)') + '</div>' +
+          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">' + T('sal.poll','Poll') + ' · ' + p.poll.totaal + ' ' + T('sal.stemmen','stem(men)') + '</div>' +
           p.poll.opties.map((o, i) => {
             const pct = p.poll.totaal ? Math.round(o.stemmen / p.poll.totaal * 100) : 0;
             return p.poll.gestemd
@@ -6361,14 +6820,14 @@
         : '';
       const folder = p.folder
         ? '<div style="margin:0.6rem 1.1rem 0;border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">📖 ' + T('sal.folder','Folder') + '</div>' +
+          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">' + T('sal.folder','Folder') + '</div>' +
           '<div style="font-weight:600;font-size:0.9rem;margin-top:0.25rem;">' + escT(p.folder.titel) + '</div>' +
           ((p.folder.fotos && p.folder.fotos.length) ? '<div style="display:flex;gap:0.4rem;overflow-x:auto;margin-top:0.5rem;">' + p.folder.fotos.map(f => '<img src="' + f + '" alt="" style="height:96px;border-radius:8px;flex-shrink:0;">').join('') + '</div>' : '') +
           ((p.folder.items && p.folder.items.length) ? '<div style="margin-top:0.5rem;display:grid;gap:0.2rem;">' + p.folder.items.slice(0, 12).map(it => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(it.naam) + (it.tekst ? ' <span style="color:var(--soft);">· ' + escT(it.tekst) + '</span>' : '') + '</span>' + (it.prijs != null ? '<span style="color:var(--gold);white-space:nowrap;">' + eur(it.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '') +
           '</div>'
         : '';
       const etalageBtn = p.partnerCode
-        ? '<button class="pa js-etalage" data-code="' + p.partnerCode + '" title="' + T('sal.etalage','Etalage') + '">🏬 ' + T('sal.etalage','Etalage') + '</button>'
+        ? '<button class="pa js-etalage" data-code="' + p.partnerCode + '" title="' + T('sal.etalage','Etalage') + '">' + T('sal.etalage','Etalage') + '</button>'
         : '';
       return '<article class="post" data-post="' + p.id + '">' +
         '<div class="head">' +
@@ -6380,7 +6839,7 @@
         '<div class="body">' + msgHTML(p.text, p.lang) + '</div>' +
         folder + deal + poll +
         '<div class="acts">' +
-          '<button class="pa js-like' + (p.liked ? ' liked' : '') + '"' + (mayLike ? '' : ' disabled') + '>♥ <span class="lc">' + p.likes + '</span></button>' +
+          '<button class="pa js-like' + (p.liked ? ' liked' : '') + '"' + (mayLike ? '' : ' disabled') + '>' + RTGGlyf.svgHTML('hart', p.liked ? { fill: true } : {}) + ' <span class="lc">' + p.likes + '</span></button>' +
           '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>' + T('app.salon.comment','Reageren') + ' (' + p.comments.length + ')</button>' +
           etalageBtn +
           '<button class="pa js-share" title="' + T('sal.deel','Delen met een connectie') + '">↗</button>' +
@@ -6419,7 +6878,7 @@
       if (claimBtn) claimBtn.addEventListener('click', async () => {
         try {
           const d = await API.call('/salon/deal/claim', { postId: post.id });
-          toast('🎁 ' + T('sal.claimok','Geclaimd. Uw code:') + ' ' + d.code);
+          toast('' + T('sal.claimok','Geclaimd. Uw code:') + ' ' + d.code);
           await refreshState();
           renderSalon();
         } catch(e){ toast(e.message); }
@@ -6523,7 +6982,7 @@
     // kop met aan/uit
     const uit = !s.aan;
     h += '<div style="display:flex;align-items:flex-start;gap:0.7rem;">' +
-      '<span style="font-size:1.3rem;">🌟</span>' +
+      '<span style="font-size:1.3rem;"></span>' +
       '<div style="flex:1;"><b style="font-size:0.9rem;">' + T('ont.titel','Ontmoetingen') + '</b>' +
       '<span style="display:block;font-size:0.68rem;color:var(--muted);">' + T('ont.sub','Connecties die vlakbij zijn kunnen samen afspreken. Alleen jij bepaalt of dit aanstaat.') + '</span></div>' +
       (s.mag
@@ -6531,7 +6990,7 @@
         : '') +
       '</div>';
     if (!s.mag){
-      h += '<div style="margin-top:0.6rem;font-size:0.72rem;color:var(--soft);border-top:1px solid var(--line);padding-top:0.6rem;">🔒 ' + escT(s.reden || T('ont.magniet','Nog niet beschikbaar.')) + '</div>';
+      h += '<div style="margin-top:0.6rem;font-size:0.72rem;color:var(--soft);border-top:1px solid var(--line);padding-top:0.6rem;">' + escT(s.reden || T('ont.magniet','Nog niet beschikbaar.')) + '</div>';
       el.innerHTML = kaart(h);
       bindOntmoet();
       return;
@@ -6553,18 +7012,18 @@
           '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">' +
           (d.ikTekende
             ? '<span style="flex:1;font-size:0.72rem;color:var(--gold);align-self:center;">✓ ' + T('ont.jijtekende','Jij tekende. ') + (d.anderTekende ? '' : T('ont.wachtander','Wachten op ') + metNaam) + '</span>'
-            : '<button class="js-oteken" data-d="' + d.id + '" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:999px;padding:0.55rem;font-weight:600;font-family:inherit;cursor:pointer;">✍️ ' + T('ont.teken','Contract tekenen') + '</button>') +
+            : '<button class="js-oteken" data-d="' + d.id + '" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:999px;padding:0.55rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('ont.teken','Contract tekenen') + '</button>') +
           '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.55rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">' + T('ont.annuleer','Annuleren') + '</button>' +
           '</div></div>';
       } else if (d.status === 'actief' || d.status === 'noodgeval'){
         const nood = d.status === 'noodgeval';
         blokken += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;' + (nood ? 'background:rgba(220,40,40,0.08);border-radius:10px;padding:0.7rem;' : '') + '">' +
           '<b style="font-size:0.82rem;">' + d.icon + ' ' + escT(d.activiteitLabel) + ' ' + T('ont.met','met') + ' ' + metNaam + '</b>' +
-          '<div style="font-size:0.64rem;color:var(--muted);margin:0.25rem 0 0.5rem;">🛰️ ' + T('ont.kijktmee','RTG-kantoor kijkt live mee voor jullie veiligheid, tot jullie afronden.') + '</div>' +
-          (nood ? '<div style="font-size:0.72rem;color:#ff8a8a;font-weight:600;margin-bottom:0.4rem;">🚨 ' + T('ont.noodloopt','Noodsignaal actief. Kantoor kijkt mee via je camera.') + '</div>' : '') +
+          '<div style="font-size:0.64rem;color:var(--muted);margin:0.25rem 0 0.5rem;">' + T('ont.kijktmee','RTG-kantoor kijkt live mee voor jullie veiligheid, tot jullie afronden.') + '</div>' +
+          (nood ? '<div style="font-size:0.72rem;color:#ff8a8a;font-weight:600;margin-bottom:0.4rem;">' + T('ont.noodloopt','Noodsignaal actief. Kantoor kijkt mee via je camera.') + '</div>' : '') +
           '<div style="display:flex;gap:0.5rem;">' +
-          '<button class="js-osos" data-d="' + d.id + '" style="flex:1;background:#c62828;color:#fff;border:none;border-radius:999px;padding:0.6rem;font-weight:700;font-family:inherit;cursor:pointer;">🚨 ' + T('ont.sos','SOS') + '</button>' +
-          '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.6rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">🏁 ' + T('ont.afronden','Afronden') + '</button>' +
+          '<button class="js-osos" data-d="' + d.id + '" style="flex:1;background:#c62828;color:#fff;border:none;border-radius:999px;padding:0.6rem;font-weight:700;font-family:inherit;cursor:pointer;">' + T('ont.sos','SOS') + '</button>' +
+          '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.6rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">' + T('ont.afronden','Afronden') + '</button>' +
           '</div></div>';
       }
     }
@@ -6573,7 +7032,7 @@
     for (const v of (s.voorstellen || [])){
       const metNaam = escT(v.met);
       voors += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;">' +
-        '<b style="font-size:0.82rem;">📍 ' + metNaam + ' ' + T('ont.indebuurt','is in de buurt') + '</b>';
+        '<b style="font-size:0.82rem;">' + metNaam + ' ' + T('ont.indebuurt','is in de buurt') + '</b>';
       if (v.mijnKeuze){
         voors += '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.35rem;">✓ ' + T('ont.jijkoos','Jij koos') + ' ' + escT((s.activiteiten.find(a => a.id === v.mijnKeuze) || {}).label || v.mijnKeuze) + '. ' + T('ont.wachtkeuze','Wachten op de keuze van ') + metNaam + '.</div>';
       } else {
@@ -6603,14 +7062,14 @@
   }
   async function ontmoetKies(voorstelId, keuze){
     try { const r = await API.call('/ontmoeten/kies', { voorstelId, keuze }); ontmoetState = r.state;
-      if (r.status === 'gematcht') toast('🎉 ' + T('ont.match','Match! Teken het contract om te starten.'));
+      if (r.status === 'gematcht') toast('' + T('ont.match','Match! Teken het contract om te starten.'));
       renderOntmoet();
     } catch(e){ toast(e.message); }
   }
   async function ontmoetTeken(dateId){
     if (!confirm(T('ont.tekenbevestig','Ik ben 18+ met een geverifieerd paspoort en ga akkoord met het veiligheidscontract: RTG-kantoor mag mijn live-locatie zien tot de afspraak klaar is, en bij SOS meekijken via de camera en 112 bellen.'))) return;
     try { const r = await API.call('/ontmoeten/teken', { dateId }); ontmoetState = r.state; renderOntmoet(); beheerOntmoetTimer();
-      if (r.status === 'actief') toast('✅ ' + T('ont.gestart','Afspraak gestart. RTG kijkt mee voor jullie veiligheid.'));
+      if (r.status === 'actief') toast('' + T('ont.gestart','Afspraak gestart. RTG kijkt mee voor jullie veiligheid.'));
     } catch(e){ toast(e.message); }
   }
   async function ontmoetStop(dateId){
@@ -6621,7 +7080,7 @@
     const pos = await ontmoetPositie();
     try {
       await API.call('/ontmoeten/sos', { dateId, bericht: T('ont.sosbericht','Ik voel me niet veilig'), lat: pos ? pos.lat : undefined, lng: pos ? pos.lng : undefined });
-      toast('🚨 ' + T('ont.sosverstuurd','SOS verstuurd. RTG-kantoor is gewaarschuwd en kijkt mee.'));
+      toast('' + T('ont.sosverstuurd','SOS verstuurd. RTG-kantoor is gewaarschuwd en kijkt mee.'));
       ontmoetSosLive(dateId);         // camera + microfoon naar kantoor
       try { window.location.href = 'tel:112'; } catch(e){}   // en direct de hulpdiensten
       await laadOntmoet();

@@ -82,18 +82,7 @@ module.exports = (ctx) => {
     catch (e) { console.error('[architect]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
-  /* De Ideeenkamer: de gedeelde werkbank van de vier ontwerpbureaus. Ideeen met
-     bureau-tags, reacties, AI-uitwerking per bureau en spin-off naar een bureau. */
-  app.post('/api/office/ideeen', officeAuth, (req, res) => veilig(res, () => kern.ideeen.overzicht()));
-  app.post('/api/office/ideeen/maak', officeAuth, (req, res) => veilig(res, () => kern.ideeen.ideeMaak(req.body || {})));
-  app.post('/api/office/ideeen/zet', officeAuth, (req, res) => veilig(res, () => kern.ideeen.ideeZet(String(req.body.id || ''), req.body || {})));
-  app.post('/api/office/ideeen/verwijder', officeAuth, (req, res) => veilig(res, () => kern.ideeen.ideeVerwijder(String(req.body.id || ''))));
-  app.post('/api/office/ideeen/reactie', officeAuth, (req, res) => veilig(res, () => kern.ideeen.reactie(String(req.body.id || ''), req.body || {})));
-  app.post('/api/office/ideeen/spinoff', officeAuth, (req, res) => veilig(res, () => kern.ideeen.spinOff(String(req.body.id || ''), String(req.body.bureau || ''))));
-  app.post('/api/office/ideeen/uitwerken', officeAuth, async (req, res) => {
-    try { const r = await kern.ideeen.aiUitwerken(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
-    catch (e) { console.error('[ideeen]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
-  });
+  require('./werkplaats')(ctx);
 
   // het persbureau (RTG Redactie) staat apart, in ./redactie.js
   require('./redactie')(ctx);

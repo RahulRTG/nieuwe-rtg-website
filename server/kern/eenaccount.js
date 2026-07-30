@@ -143,7 +143,19 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, lidKey: key });
     logInlog('zaak', true, s.code + ' · ' + actor.name + ' via RTG-account', req);
     logActivity(s.code, actor, actor.name + ' logde in met het RTG-account');
-    return { status: 200, ok: true, rol: r.rol, token, state: supplierState(s, actor) };
+    /* Rahuls welzijnszin: een stille, eenmalige opmerking bij de start --
+       nooit een blokkade, nooit een score, alleen zorg. Diep in de nacht
+       of bij een zoveelste werkstart vandaag mag dat gezegd worden. */
+    let welzijn = null;
+    const uur = new Date().getHours();
+    const wm = db.data.accountWelzijn = db.data.accountWelzijn || {};
+    const vandaag = new Date().toISOString().slice(0, 10);
+    const wr = wm[key] = (wm[key] && wm[key].dag === vandaag) ? wm[key] : { dag: vandaag, starts: 0 };
+    wr.starts++;
+    save();
+    if (uur >= 23 || uur < 6) welzijn = 'Late dienst; neem morgen bewust je rust.';
+    else if (wr.starts >= 5) welzijn = 'Dit is al je ' + wr.starts + 'e werkstart vandaag; vergeet de pauze niet.';
+    return { status: 200, ok: true, rol: r.rol, token, state: supplierState(s, actor), ...(welzijn ? { welzijn } : {}) };
   }
 
   function accOntkoppel(key, body) {

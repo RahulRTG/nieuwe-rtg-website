@@ -170,3 +170,10 @@ test('MIME-eenheid: adres uithalen, kopwaarde, dot-stuffing in de ruwe boodschap
   assert.match(ruw, /\r\nContent-Transfer-Encoding: base64\r\n\r\n/);
   assert.doesNotMatch(ruw.split('\r\n\r\n')[1] || '', /^\./m); // geen ruwe regel begint met een enkele punt
 });
+
+test('SSRF-afweer: een smarthost op het cloud-metadata-adres wordt geweigerd', () => {
+  // localhost/interne relays blijven toegestaan (dat testen de andere gevallen);
+  // alleen het metadata/link-local-adres is nooit een echte mailserver.
+  assert.throws(() => smtp.createTransport('smtp://user:pass@169.254.169.254:587'), /metadata|link-local/);
+  assert.doesNotThrow(() => smtp.createTransport('smtp://user:pass@127.0.0.1:1025'));
+});

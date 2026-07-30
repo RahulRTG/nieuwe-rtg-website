@@ -35,7 +35,8 @@ module.exports = ({ save, crypto, media, anthropic }) => {
   function uiterlijk(e, s) {
     return {
       id: e.id, dag: e.dag, tekst: e.tekst, foto: e.foto ? media.url(e.foto) : null,
-      van: e.van, avatar: e.avatar, at: e.at, magWeg: e.vanId === s.p.id || s.beheerder
+      van: e.van, avatar: e.avatar, at: e.at, magWeg: e.vanId === s.p.id || s.beheerder,
+      fav: (e.favVan || []).length, mijnFav: (e.favVan || []).includes(s.p.id)
     };
   }
 
@@ -57,7 +58,7 @@ module.exports = ({ save, crypto, media, anthropic }) => {
     return { ok: true, kindNaam: b.kindNaam, geboren: b.geboren, leeftijd: leeftijdTekst(b.geboren) };
   }
 
-  async function entryMaak(s, { tekst, foto }) {
+  async function entryMaak(s, { tekst, foto, dag }) {
     const b = boek(s.g);
     const t = schoonTekst(tekst, 2000);
     if (!t && !foto) return fout(400, 'Schrijf een stukje of kies een foto.');
@@ -67,8 +68,10 @@ module.exports = ({ save, crypto, media, anthropic }) => {
       naam = await media.bewaar(foto, 1.5 * 1024 * 1024);
       if (!naam) return fout(400, 'Die foto lukt niet: te groot, of geen jpg, png of webp.');
     }
+    // een oude foto mag op zijn echte dag het boekje in -- nooit op een dag die nog moet komen
+    const d = /^\d{4}-\d{2}-\d{2}$/.test(String(dag || '')) && dag <= vandaag() ? dag : vandaag();
     const e = {
-      id: crypto.randomBytes(8).toString('hex'), dag: vandaag(), tekst: t, foto: naam,
+      id: crypto.randomBytes(8).toString('hex'), dag: d, tekst: t, foto: naam,
       van: s.p.naam, avatar: s.p.avatar, vanId: s.p.id, at: Date.now()
     };
     b.entries.unshift(e);
@@ -85,6 +88,36 @@ module.exports = ({ save, crypto, media, anthropic }) => {
     b.entries = b.entries.filter(x => x.id !== id);
     save();
     return { ok: true };
+  }
+
+  /* ---------- het album: maandgroepen, terugblik en het gedeelde hartje ---------- */
+  // favorieten zijn van het gezin samen: iedereen kan een hartje geven, en
+  // het scherm laat zien of JIJ hem mooi vond. Geen ranglijst, gewoon warmte.
+  function favoriet(s, id) {
+    const b = boek(s.g);
+    const e = b.entries.find(x => x.id === id);
+    if (!e) return fout(404, 'Dit momentje staat er niet meer.');
+    e.favVan = e.favVan || [];
+    const i = e.favVan.indexOf(s.p.id);
+    if (i >= 0) e.favVan.splice(i, 1); else e.favVan.push(s.p.id);
+    save();
+    return { ok: true, fav: e.favVan.length, mijnFav: e.favVan.includes(s.p.id) };
+  }
+  /* de tijdlijn: het boekje per maand, plus de terugblik -- dezelfde maand in
+     eerdere jaren (dezelfde eerlijke regel als de RTG Galerij, max 12). */
+  function tijdlijn(s) {
+    const b = boek(s.g);
+    const rij = b.entries.slice().sort((x, y) => y.dag.localeCompare(x.dag) || y.at - x.at);
+    const maanden = [];
+    for (const e of rij) {
+      const m = e.dag.slice(0, 7);
+      if (!maanden.length || maanden[maanden.length - 1].maand !== m) maanden.push({ maand: m, items: [] });
+      maanden[maanden.length - 1].items.push(uiterlijk(e, s));
+    }
+    const nuMaand = vandaag().slice(5, 7), nuJaar = vandaag().slice(0, 4);
+    const terugblik = rij.filter(e => e.dag.slice(5, 7) === nuMaand && e.dag.slice(0, 4) < nuJaar)
+      .slice(0, 12).map(e => uiterlijk(e, s));
+    return { ok: true, kindNaam: b.kindNaam, leeftijd: leeftijdTekst(b.geboren), maanden, terugblik };
   }
 
   /* De namen van de rest van het gezin (broertjes, zusjes, opa, oma, ook de
@@ -148,5 +181,5 @@ module.exports = ({ save, crypto, media, anthropic }) => {
     return { ok: true, demo, momenten: b.momenten };
   }
 
-  return { baby: { boekVan, instellen, entryMaak, entryWeg, gezinZet, momentAi } };
+  return { baby: { boekVan, instellen, entryMaak, entryWeg, gezinZet, momentAi, favoriet, tijdlijn } };
 };

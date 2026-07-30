@@ -2,8 +2,9 @@
    Alles achter de office-inlog (dezelfde als de backoffice); het schakelen
    van functies raakt het hele platform en hoort dus bij het kantoor. De
    ontwerpbureaus staan in ./bureaus, de boardroom-/geld-/paniek-/wereldregie in
-   ./regie; hier de kamers zelf, de kluis-inzage, de kantine, het rampbeeld, het
-   reisbureau, de doos-regie, de diensten en de interne chat. */
+   ./regie, de Salon-curatie in ./salon; hier de kamers zelf, de kluis-inzage, de
+   kantine, het rampbeeld, het reisbureau, de doos-regie, de diensten en de
+   interne chat. */
 module.exports = (kern) => {
   const { app, officeAuth, afdelingen, sseToOffice, db, save,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = kern;
@@ -14,6 +15,11 @@ module.exports = (kern) => {
   app.post('/api/office/kamer', officeAuth, (req, res) => veilig(res, () => afdelingen.kamer(String(req.body.id || ''))));
   app.post('/api/office/kamer/taak', officeAuth, (req, res) => veilig(res, () => afdelingen.taakMaak(String(req.body.id || ''), req.body.tekst)));
   app.post('/api/office/kamer/taak-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.taakZet(String(req.body.id || ''), String(req.body.taakId || ''), req.body.af)));
+  // Rahul denkt mee in deze kamer: adviserend, uit de echte cijfers van de kamer
+  app.post('/api/office/kamer/ai', officeAuth, async (req, res) => {
+    try { const r = await afdelingen.kamerAdvies(String(req.body.id || ''), req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Rahul kon nu even niet meedenken.' }); }
+  });
 
   /* De identiteitskluis-inzage: kamers met naamInzage (en de boardroom)
      vragen de echte naam bij een codenaam op; elke opvraging komt in het
@@ -61,7 +67,9 @@ module.exports = (kern) => {
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet };
   require('./bureaus')(ctx);
   require('./regie')(ctx);
+  require('./salon')(ctx);
   require('./bank')(ctx);
   require('./stad')(ctx);
+  require('./techniek')(ctx);
   require('./zelfzorg')(ctx);
 };

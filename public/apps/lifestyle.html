@@ -56,6 +56,10 @@
   .inlog{text-align:center;padding:2.5rem 1rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
@@ -108,7 +112,7 @@ async function vOverzicht(){
     + stat(euro(d.bezittingenWaarde), 'Registerwaarde')
     + '</div>'
     + '<div class="kaart"><h2>Attentiepunten</h2><div class="sub">Wat binnenkort uw aandacht vraagt in het bezittingenregister.</div>'
-    + (att.length ? att.map(a=>'<div class="att'+(a.verlopen?'':' ok')+'">'+(a.verlopen?'⚠ ':'• ')+esc(a.naam)+' - '+esc(a.soort)+' '+(a.verlopen?'verlopen op ':'op ')+datum(a.datum)+'</div>').join('') : '<div class="leeg">Niets dat op korte termijn uw aandacht vraagt.</div>')
+    + (att.length ? att.map(a=>'<div class="att'+(a.verlopen?'':' ok')+'">'+(a.verlopen?'':'• ')+esc(a.naam)+' - '+esc(a.soort)+' '+(a.verlopen?'verlopen op ':'op ')+datum(a.datum)+'</div>').join('') : '<div class="leeg">Niets dat op korte termijn uw aandacht vraagt.</div>')
     + '</div>'
     + '<div class="kaart"><h2>Vraag De Rechterhand</h2><div class="sub">Rahul kijkt met u mee, regelt en noteert - en bevestigt pas als iets echt rond is.</div>'
     + '<div class="rij"><div style="flex:1;"><input class="veld" id="aiV" placeholder="Waarmee kan ik u van dienst zijn?"></div><button class="knop" id="aiK">Vraag</button></div>'
@@ -222,6 +226,9 @@ start();
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

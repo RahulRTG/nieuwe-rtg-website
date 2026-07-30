@@ -5,7 +5,7 @@
    Het kamerregister zelf staat in ./rtfkantoor-data.js; de clubs-samenwerking
    in ./rtfclubs.js en het lab in ./onderzoekslab.js vullen twee eigen kamers.
    Opslag: db.data.rtfKantoorTaken (taken per kamer). */
-module.exports = ({ db, save, crypto }) => {
+module.exports = ({ db, save, crypto, anthropic }) => {
   const nu = () => Date.now();
   const d = () => db.data;
   const lijst = x => Array.isArray(x) ? x : (x && typeof x === 'object' ? Object.values(x) : []);
@@ -42,7 +42,7 @@ module.exports = ({ db, save, crypto }) => {
     const a = AFDELINGEN[id];
     if (!a) return { status: 404, error: 'Deze kamer bestaat niet.' };
     return {
-      ok: true, id, naam: a.naam, emoji: a.emoji, missie: a.missie,
+      ok: true, id, naam: a.naam, icoon: a.icoon, missie: a.missie,
       kpis: a.kpis().map(([label, waarde]) => ({ label, waarde })),
       lijsten: a.lijsten(), taken: taken(id).slice(0, 30)
     };
@@ -50,7 +50,7 @@ module.exports = ({ db, save, crypto }) => {
   function kamers() {
     return { ok: true, kamers: KAMER_IDS.map(id => {
       const a = AFDELINGEN[id];
-      return { id, naam: a.naam, emoji: a.emoji, missie: a.missie, kpi: a.kpis()[0], takenOpen: taken(id).filter(t => !t.af).length };
+      return { id, naam: a.naam, icoon: a.icoon, missie: a.missie, kpi: a.kpis()[0], takenOpen: taken(id).filter(t => !t.af).length };
     }) };
   }
 
@@ -69,5 +69,11 @@ module.exports = ({ db, save, crypto }) => {
       lab: { projecten: lab.length, inProef: lab.filter(p => p.fase === 'proef' || p.fase === 'uitrol').length, toetsOpen: lab.filter(p => (p.veiligheid || {}).status === 'open').length } };
   }
 
-  return { rtfkantoor: { kamers, kamer, taakMaak, taakZet, overzicht, KAMER_IDS } };
+  /* Rahul denkt mee, per kamer en over het hele huis (./rtfkantoor-advies.js).
+     Krijgt dezelfde bronnen als het kantoor zelf, zodat advies en scherm nooit
+     uit elkaar lopen. */
+  const advies = require('./rtfkantoor-advies')({ anthropic, AFDELINGEN, kamer, taken, KAMER_IDS });
+
+  return { rtfkantoor: { kamers, kamer, taakMaak, taakZet, overzicht, KAMER_IDS,
+    kamerAdvies: advies.kamerAdvies, huisAdvies: advies.huisAdvies } };
 };

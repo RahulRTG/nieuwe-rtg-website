@@ -22,15 +22,15 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     if (!Array.isArray(db.data.creatorOproepen)) db.data.creatorOproepen = [];
     return db.data;
   }
-  function isCreator(s) { return !!s && ((db.data.supplierTypes[s.type] || {}).caps || []).includes('creator'); }
+  function isCreator(s) { return !!s && (db.capsVan(s)).includes('creator'); }
   function creatorInfo(s) {
     const c = s.creator || {};
     const bereik = (c.platforms || []).reduce((n, p) => n + (p.volgers || 0), 0);
     return { code: s.code, name: s.name, city: s.city || null, niche: c.niche || null, bereik, platforms: (c.platforms || []).length };
   }
   function supplierInfo(s) {
-    const t = db.data.supplierTypes[s.type] || {};
-    return { code: s.code, name: s.name, city: s.city || null, type: s.type, typeLabel: t.label || s.type, icon: t.icon || '🏷️' };
+    const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
+    return { code: s.code, name: s.name, city: s.city || null, type: s.type, typeLabel: t.label || s.type, icon: t.icon || 'ticket' };
   }
 
   // Lijsten om te bladeren (met een limiet; voor grote aantallen komt er later
@@ -73,7 +73,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     db.data.samenwerkingen.unshift(sw);
     db.data.samenwerkingen = db.data.samenwerkingen.slice(0, 5000);
     save();
-    if (notifySupplier) notifySupplier(naarCode, { icon: '🤝', title: 'Nieuw samenwerkingsvoorstel', body: vanS.name + ' wil samenwerken.' });
+    if (notifySupplier) notifySupplier(naarCode, { icon: 'rechterhand', title: 'Nieuw samenwerkingsvoorstel', body: vanS.name + ' wil samenwerken.' });
     if (sseToSupplier) sseToSupplier(naarCode, 'sync', { scope: 'samenwerking' });
     return { ok: true, id: sw.id };
   }
@@ -88,7 +88,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     sw.status = actie === 'accepteren' ? 'geaccepteerd' : 'afgewezen';
     sw.beslistOp = nu();
     save();
-    if (notifySupplier) notifySupplier(sw.vanCode, { icon: sw.status === 'geaccepteerd' ? '✅' : '✖️', title: 'Samenwerking ' + sw.status, body: s.name + ' heeft gereageerd.' });
+    if (notifySupplier) notifySupplier(sw.vanCode, { icon: sw.status === 'geaccepteerd' ? 'rechterhand' : 'meldingen', title: 'Samenwerking ' + sw.status, body: s.name + ' heeft gereageerd.' });
     if (sseToSupplier) sseToSupplier(sw.vanCode, 'sync', { scope: 'samenwerking' });
     return { ok: true, status: sw.status };
   }
@@ -152,7 +152,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     if (op.reacties.some(r => r.creatorCode === creatorS.code)) return { error: 'U heeft al gereageerd.' };
     op.reacties.push({ creatorCode: creatorS.code, bericht: scho(data.bericht, 400), status: 'open', at: nu() });
     save();
-    if (notifySupplier) notifySupplier(op.supplierCode, { icon: '🎬', title: 'Reactie op je oproep', body: creatorS.name + ' reageerde op "' + op.titel + '".' });
+    if (notifySupplier) notifySupplier(op.supplierCode, { icon: 'film', title: 'Reactie op je oproep', body: creatorS.name + ' reageerde op "' + op.titel + '".' });
     if (sseToSupplier) sseToSupplier(op.supplierCode, 'sync', { scope: 'samenwerking' });
     return { ok: true };
   }
@@ -171,7 +171,7 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
     };
     db.data.samenwerkingen.unshift(sw);
     save();
-    if (notifySupplier) notifySupplier(creatorCode, { icon: '🎉', title: 'Je bent gekozen!', body: s.name + ' koos jou voor "' + op.titel + '".' });
+    if (notifySupplier) notifySupplier(creatorCode, { icon: 'ster', title: 'Je bent gekozen!', body: s.name + ' koos jou voor "' + op.titel + '".' });
     if (sseToSupplier) sseToSupplier(creatorCode, 'sync', { scope: 'samenwerking' });
     return { ok: true, id: sw.id };
   }

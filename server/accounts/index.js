@@ -26,6 +26,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { DatabaseSync } = require('node:sqlite');
 const S = require('./state');
+const migraties = require('../migraties');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
 const users = require('./users');
@@ -63,65 +64,36 @@ function init() {
   db.exec('PRAGMA journal_mode=WAL');
   db.exec('PRAGMA synchronous=NORMAL');
   db.exec('PRAGMA busy_timeout=5000');
-  db.exec(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email_hash TEXT UNIQUE,
-    username TEXT UNIQUE,
-    password_hash TEXT NOT NULL,
-    tier TEXT NOT NULL DEFAULT 'rtg',
-    codename TEXT,
-    enc_name TEXT,
-    enc_email TEXT,
-    enc_phone TEXT,
-    phone_hash TEXT,
-    created_at TEXT NOT NULL,
-    verified TEXT NOT NULL DEFAULT 'unverified',
-    id_doc TEXT,
-    member_state TEXT,
-    email_verified INTEGER NOT NULL DEFAULT 0,
-    reset_hash TEXT,
-    reset_expires INTEGER
-  )`);
-  // Migratie: voeg ontbrekende kolommen toe voor oudere databases.
-  const cols = db.prepare('PRAGMA table_info(users)').all().map(c => c.name);
-  const add = (n, d) => { if (!cols.includes(n)) db.exec(`ALTER TABLE users ADD COLUMN ${n} ${d}`); };
-  add('email_hash', 'TEXT'); add('enc_name', 'TEXT'); add('enc_email', 'TEXT');
-  add('enc_phone', 'TEXT'); add('phone_hash', 'TEXT');
-  add('verified', "TEXT NOT NULL DEFAULT 'unverified'"); add('id_doc', 'TEXT'); add('member_state', 'TEXT');
-  add('email_verified', 'INTEGER NOT NULL DEFAULT 0'); add('reset_hash', 'TEXT'); add('reset_expires', 'INTEGER');
 
-  // Inloggen op gebruikersnaam gebeurt hoofdletter-ongevoelig (lower(username)).
-  // De UNIQUE-index op username is hoofdlettergevoelig en kan die zoekopdracht
-  // niet bedienen, dus zonder deze expressie-index scant elke gebruikersnaam-login
-  // (en elke MISLUKTE login, die door de e-mail-tak heen valt) de hele tabel. Bij
-  // een miljoen leden is dat ~170 ms per poging; met de index blijft het < 1 ms.
-  try { db.exec('CREATE INDEX IF NOT EXISTS idx_users_lower_username ON users(lower(username))'); } catch (e) {}
-
-  // Personeelsaccounts binnen een leverancier-bedrijfsaccount (PIN-login).
-  db.exec(`CREATE TABLE IF NOT EXISTS supplier_staff (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    supplier_code TEXT NOT NULL,
-    name TEXT NOT NULL,
-    pin_hash TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'staff',
-    active INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL
-  )`);
-  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN func TEXT'); } catch (e) { /* kolom bestaat al */ }
-  // Personeel is voortaan een RTG-lid: member_id koppelt het personeelsaccount
-  // aan het ledenaccount (users.id), member_tier bewaart de pas op moment van
-  // aanmelden. Oudere/geseede accounts hebben deze leeg (member_id NULL).
-  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN member_id INTEGER'); } catch (e) { /* bestaat al */ }
-  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN member_tier TEXT'); } catch (e) { /* bestaat al */ }
-  // Personeel wordt altijd per bedrijf opgevraagd (listStaff/verifyStaffPin).
-  try { db.exec('CREATE INDEX IF NOT EXISTS idx_staff_supplier ON supplier_staff(supplier_code)'); } catch (e) {}
+  /* Het schema komt uit server/migraties: genummerde stappen die precies een
+     keer draaien, met een grootboek erbij en een weigering om te starten op een
+     database die nieuwer is dan deze code. Hiervoor stond de DDL hier, als een
+     rij CREATE TABLE IF NOT EXISTS en ALTER TABLE in een try/catch -- dat werkt
+     wel, maar je kunt zo'n database nooit vragen waar hij staat. Zie de kop van
+     server/migraties/index.js voor waarom dat bij een storing het eerste is wat
+     je wilt weten. */
+  migraties.draai(db);
 
   S.SECRET = loadKey(SECRET_FILE, 'RTG_SECRET_KEY');
   S.VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');
 }
 
+/* De WAL van rtg.db leegdrukken in het hoofdbestand.
+
+   De identiteitskluis draait in WAL-modus: verse accounts staan in rtg.db-wal
+   en pas een checkpoint schuift ze naar rtg.db. Een backup die alleen rtg.db
+   kopieert, kopieert daardoor een bestand zonder de recentste leden -- bij een
+   verse installatie zelfs een leeg bestand van 4 KB. De backup roept dit dus
+   aan voordat hij kopieert. Faalt het (een ander proces leest nog), dan vangt
+   de meegekopieerde -wal dat op. */
+function checkpoint() {
+  if (!S.db) return false;
+  try { S.db.exec('PRAGMA wal_checkpoint(TRUNCATE)'); return true; }
+  catch (e) { return false; }
+}
+
 module.exports = {
-  init,
+  init, checkpoint,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   ...users,

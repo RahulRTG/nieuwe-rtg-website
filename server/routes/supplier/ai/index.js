@@ -18,7 +18,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   const ql = q.toLowerCase();
   const A = (reply, did) => res.json({ reply, did: !!did });
 
-  // het persoonlijke geheugen (dezelfde motor als De Butler van de leden):
+  // het persoonlijke geheugen (dezelfde motor als Rahul van de leden):
   // onthouden, opvragen en wissen, per persoon binnen deze zaak
   if (fluisterZeg && (/^onthoud\b/i.test(q) || /vergeet alles/i.test(q) || /wat (weet|onthoud) je (over|van) mij/i.test(q) || /plan (mijn|onze|de) (service)?dag|dagplan|servicedag/i.test(q))) {
     const fKey = 'zaak:' + s.code + ':' + (req.actor && req.actor.staffId != null ? req.actor.staffId : 'eigenaar');

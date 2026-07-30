@@ -16,6 +16,7 @@
 (function (w) {
   'use strict';
   function esc(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  var VUILNIS = '<svg class="bd-vuil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>';
 
   function stijl(){
     if (document.getElementById('bordStijl')) return;
@@ -38,6 +39,8 @@
       '.bd-knopjes{display:flex;gap:0.25rem;margin-top:0.4rem;}' +
       '.bd-knopjes button{background:none;border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:7px;color:var(--soft,rgba(244,241,236,0.62));font-size:0.68rem;padding:0.18rem 0.42rem;cursor:pointer;}' +
       '.bd-knopjes button:hover{color:var(--txt,#F4F1EC);border-color:var(--gold,#A98F1C);}' +
+      '.bd-vuil{width:0.9em;height:0.9em;vertical-align:-0.12em;display:inline-block;}' +
+      '.bd-kolom .kop .bd-vuil{width:0.95em;height:0.95em;}' +
       '.bd-add{width:100%;background:none;border:1px dashed var(--line,rgba(255,255,255,0.16));border-radius:10px;color:var(--soft,rgba(244,241,236,0.62));font-size:0.76rem;padding:0.5rem;cursor:pointer;}' +
       '.bd-in{width:100%;background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:10px;padding:0.5rem 0.6rem;font-size:0.82rem;color:var(--txt,#F4F1EC);outline:none;margin-bottom:0.4rem;}' +
       '.bd-groep{font-size:0.72rem;color:var(--soft,rgba(244,241,236,0.62));margin-top:0.3rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}' +
@@ -71,7 +74,7 @@
         '<b>'+esc(k.titel)+'</b>'+
         (k.notitie ? '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.2rem;white-space:pre-wrap;">'+esc(k.notitie)+'</div>' : '')+
         '<div class="mt">'+
-          (k.due ? '<span class="bd-due'+(laat?' laat':'')+'">📅 '+esc(k.due)+(laat?' · '+T('bd.laat','te laat'):'')+'</span>' : '')+
+          (k.due ? '<span class="bd-due'+(laat?' laat':'')+'">'+esc(k.due)+(laat?' · '+T('bd.laat','te laat'):'')+'</span>' : '')+
           namen.map(n => '<span class="bd-av" title="'+esc(n)+'">'+esc(init(n))+'</span>').join('')+
         '</div>'+
         '<div class="bd-knopjes">'+
@@ -79,7 +82,7 @@
           (li<b.lijsten.length-1 ? '<button data-zet="'+k.id+'" data-naar="'+b.lijsten[li+1].id+'" title="'+T('bd.rechts','naar rechts')+'">▶</button>' : '')+
           '<button data-klaar="'+k.id+'" data-nu="'+(k.klaar?'0':'1')+'">'+(k.klaar?'↺':'✓')+'</button>'+
           '<button data-bewerk="'+k.id+'">✎</button>'+
-          '<button data-kweg="'+k.id+'">🗑</button>'+
+          '<button data-kweg="'+k.id+'" title="'+T('bd.weg2','verwijderen')+'">'+VUILNIS+'</button>'+
         '</div></div>';
     }
 
@@ -88,18 +91,18 @@
       const team = opt.teamleden ? (opt.teamleden() || []) : null;
       let html = '<div class="bd-chips">'+
         borden.map(x => '<button class="bd-chip'+(x.id===open?' aan':'')+'" data-open="'+x.id+'">'+esc(x.naam)+
-          ((x.leden||[]).length?' · '+x.leden.length+' 👤':'')+'</button>').join('')+
+          ((x.leden||[]).length?' · '+x.leden.length+' '+T('bd.leden','leden'):'')+'</button>').join('')+
         '<button class="bd-chip" data-nieuw>＋ '+T('bd.nieuw','Nieuw bord')+'</button></div>';
       if (b){
         if (opt.kanBeheren && opt.kanBeheren()){
           html += '<div class="bd-groep">'+
             (team && team.length ? T('bd.groep','Groep (leeg = hele team):')+' '+
               team.map(m => '<label><input type="checkbox" data-lid="'+m.id+'"'+((b.leden||[]).includes(m.id)?' checked':'')+'> '+esc(m.name)+'</label>').join('') : '')+
-            '<button class="bd-chip" data-bweg style="margin-left:auto;">🗑 '+T('bd.weg','Bord weg')+'</button></div>';
+            '<button class="bd-chip" data-bweg style="margin-left:auto;">'+T('bd.weg','Bord weg')+'</button></div>';
         }
         html += '<div class="bd-kolommen">'+
           b.lijsten.map((l, li) => '<div class="bd-kolom"><div class="kop"><span>'+esc(l.naam)+' · '+l.kaarten.length+'</span>'+
-            (!l.kaarten.length?'<button data-lweg="'+l.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">🗑</button>':'')+'</div>'+
+            (!l.kaarten.length?'<button data-lweg="'+l.id+'" title="'+T('bd.weg2','verwijderen')+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">'+VUILNIS+'</button>':'')+'</div>'+
             l.kaarten.map(k => kaartHtml(b, l, k, li)).join('')+
             '<button class="bd-add" data-plus="'+l.id+'">＋ '+T('bd.kaart','Kaart')+'</button>'+
           '</div>').join('')+

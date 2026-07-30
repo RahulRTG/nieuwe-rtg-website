@@ -2,6 +2,8 @@
    archiefkast, toegangsbeheer en de AI-diagnose per check. Gemount vanuit
    routes/techniek.js op de gedeelde context. */
 const techniek = require('../../techniek');
+const eigenaar = require('../../eigenaar');
+const { log } = require('../../log');
 module.exports = (tctx) => {
   const { app, accounts, anthropic, archief, beveilig, crypto, db, mail, save, sendPushToUser, LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx } = tctx;
   /* De eigenaar vraagt ZELF om een update/modernisering, in gewone taal. De AI
@@ -79,40 +81,72 @@ module.exports = (tctx) => {
     res.json({ ok: true, toegang: t.toegang.length });
   });
 
-  // AI-hulp: geef een diagnose en herstelstappen voor een (falende) check.
-  app.post('/api/techniek/ai', techAuth, async (req, res) => {
-    if (staat().zekeringen.ai && staat().zekeringen.ai.aan === false)
-      return res.status(503).json({ error: 'De AI-zekering staat uit.' });
-    const checks = await techniek.draaiChecks(ctx());
-    const chk = checks.find(c => c.id === req.body.checkId);
-    if (!chk) return res.status(404).json({ error: 'Onbekende check.' });
-    const prompt = `Je bent de technische assistent van het RTG-platform (Node.js/Express, PostgreSQL). ` +
-      `Subsysteem "${chk.naam}" (code ${chk.code}) heeft status ${chk.status.toUpperCase()}: ${chk.detail}\n` +
-      `Geef in het Nederlands een korte diagnose en concrete herstelstappen (maximaal 6 bondige bullets). ` +
-      `Noem waar nuttig de betrokken omgevingsvariabele of het bestand.`;
-    let advies;
-    if (anthropic) {
-      try {
-        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 600, messages: [{ role: 'user', content: prompt }] });
-        advies = (r.content && r.content[0] && r.content[0].text) || null;
-      } catch (e) { advies = null; }
+  /* Het eigenaarschap overdragen. Dit is de zwaarste handeling die het systeem
+     kent: de eigenaar is de enige die zekeringen mag omzetten, functies mag
+     uitschakelen en anderen toegang mag geven. Daarom drie sloten:
+
+     1. Het wachtwoord opnieuw. Een geleend of gestolen token is niet genoeg;
+        wie overdraagt moet op dat moment bewijzen dat hij het is.
+     2. Het nieuwe adres MOET een bestaand account zijn. Draag je over aan een
+        adres dat niemand heeft, dan is de technische pagina voor iedereen
+        dicht en kan degene die dat adres later registreert hem overnemen.
+        Precies het gat waar de go-live-controle voor waarschuwt.
+     3. Er blijft een spoor. Elke overdracht komt in het logboek en gaat als
+        kritieke melding het beveiligingsbord op. Een stille machtsoverdracht
+        hoort niet te kunnen. */
+  app.post('/api/techniek/eigenaar', techAuth, eigenaarAlleen, async (req, res) => {
+    const t = staat();
+    const nieuw = String(req.body.email || '').trim().toLowerCase();
+    if (!nieuw) return res.status(400).json({ error: 'Vul het e-mailadres van de nieuwe eigenaar in.' });
+
+    // slot 1: het wachtwoord van de HUIDIGE eigenaar, hier en nu
+    const wachtwoord = String(req.body.wachtwoord || '');
+    if (!wachtwoord || !await accounts.verifyPassword(wachtwoord, req.techUser.password_hash)) {
+      if (beveilig) beveilig.meld('eigenaar-overdracht-mislukt', 'kritiek',
+        'Poging tot overdracht van het eigenaarschap met een onjuist wachtwoord.',
+        { bron: 'user:' + req.techUser.id });
+      return res.status(401).json({ error: 'Onjuist wachtwoord; er is niets gewijzigd.' });
     }
-    if (!advies) advies = canned(chk);
-    res.json({ check: { id: chk.id, naam: chk.naam, code: chk.code, status: chk.status }, advies, bron: anthropic ? 'ai' : 'ingebouwd' });
+
+    // slot 2: er moet een account achter zitten, anders sluit je jezelf buiten
+    const doel = accounts.findByLogin(nieuw);
+    if (!doel) {
+      return res.status(404).json({
+        error: 'Er is nog geen RTG-account met dat e-mailadres. Maak dat account eerst aan; ' +
+          'anders zou de technische pagina voor iedereen dicht zitten.'
+      });
+    }
+    const doelEmail = (accounts.emailOf(doel) || '').trim().toLowerCase();
+    if (!doelEmail) return res.status(400).json({ error: 'Dat account heeft geen e-mailadres in de kluis.' });
+    if (doelEmail === eigenaar.eigenaarEmail()) {
+      return res.status(400).json({ error: 'Dat is al de eigenaar; er is niets gewijzigd.' });
+    }
+
+    const vorige = eigenaar.eigenaarEmail();
+    if (!eigenaar.zetEigenaarEmail(doelEmail)) {
+      return res.status(400).json({ error: 'Dat is geen geldig e-mailadres.' });
+    }
+    t.eigenaarEmail = doelEmail;
+    t.eigenaarId = doel.id;
+
+    // slot 3: het spoor
+    if (!Array.isArray(t.eigenaarLog)) t.eigenaarLog = [];
+    t.eigenaarLog.unshift({
+      van: vorige, naar: doelEmail,
+      doorId: req.techUser.id, doorNaam: accounts.realNameOf(req.techUser),
+      at: new Date().toISOString()
+    });
+    if (t.eigenaarLog.length > 50) t.eigenaarLog.length = 50;
+    save();
+
+    log.info('eigenaar-overgedragen', { van: vorige, naar: doelEmail, door: req.techUser.id });
+    if (beveilig) beveilig.meld('eigenaar-overgedragen', 'kritiek',
+      'Het eigenaarschap van het platform is overgedragen van ' + vorige + ' naar ' + doelEmail +
+      ' door ' + accounts.realNameOf(req.techUser) + '.',
+      { bron: 'user:' + req.techUser.id });
+
+    res.json({ ok: true, eigenaar: doelEmail, naam: accounts.realNameOf(doel), vorige });
   });
 
-  // Terugvaladvies zonder AI-sleutel: vaste, nuttige herstelstappen per check.
-  function canned(chk) {
-    const t = {
-      postgres: '- Controleer of PostgreSQL draait en bereikbaar is.\n- Controleer DATABASE_URL (host, poort, wachtwoord).\n- Kijk of het connection-limiet niet vol zit (PG_POOL_MAX).\n- De app draait intussen door op de lokale snapshot als fallback.',
-      schijf: '- Ruim oude bestanden/back-ups op in de datamap.\n- Vergroot de schijf of het volume.\n- Controleer of logs niet vollopen.',
-      backups: '- Controleer of de back-uptaak draait (dagelijks).\n- Controleer schrijfrechten op de back-upmap.\n- Zet RTG_BACKUP_DIR voor een tweede kopie.',
-      email: '- Zet SMTP_URL of SMTP_HOST/PORT/USER/PASS.\n- Test met een herstel-mail.',
-      betalingen: '- Zet STRIPE_SECRET_KEY en STRIPE_WEBHOOK_SECRET voor echte betalingen.',
-      ai: '- Zet ANTHROPIC_API_KEY voor echte AI-antwoorden.',
-      versleuteling: '- Zet RTG_ENC_KEY (64 hex-tekens) voor versleuteling-at-rest.'
-    };
-    return (t[chk.id] || '- Bekijk de logs rond dit subsysteem.\n- Controleer de bijbehorende omgevingsvariabelen.') +
-      '\n\n(Ingebouwd advies; zet ANTHROPIC_API_KEY voor een AI-diagnose op maat.)';
-  }
+  require('./diagnose')(tctx);
 };

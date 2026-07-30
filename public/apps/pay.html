@@ -60,12 +60,15 @@
   .hist .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;}
   .hist span:first-child{color:var(--muted);}
   .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--gold);text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
+  .tik-qr{display:block;width:min(220px,62vw);height:auto;margin:.5rem auto .1rem;background:#fff;padding:.55rem;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.35);}
   .leeg{color:var(--soft);font-size:.85rem;}
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
   .schakel{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--muted);cursor:pointer;}
   .schakel input{width:1.05rem;height:1.05rem;accent-color:var(--gold);}
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body data-osbar="RTG Pay" data-oswereld="lid">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -111,8 +114,9 @@
         <button class="knop stil" id="xOntvang">Zet op ontvangen</button>
       </div>
       <div id="xOntvangAan" hidden>
+        <img id="xQr" class="tik-qr" alt="Scan deze QR om mij te betalen" hidden>
         <div class="kascode" id="xCode" aria-live="polite"></div>
-        <p class="leeg" style="text-align:center;">Tik hier je telefoon tegenaan; geldig tot <span id="xTot"></span>.</p>
+        <p class="leeg" style="text-align:center;">Laat je vriend deze QR scannen om te betalen; geldig tot <span id="xTot"></span>.</p>
       </div>
     </div>
     <div class="kaart" id="pTiks" hidden></div>
@@ -152,9 +156,10 @@
         </div>
       </div>
       <div id="kasAan" hidden>
+        <img id="kQr" class="tik-qr" alt="Scan deze betaalcode aan de kassa" hidden>
         <div class="kascode" id="kCode" aria-live="polite"></div>
-        <p class="leeg" style="text-align:center;">geldig tot <span id="kTot"></span>, max <span id="kMaxToon"></span></p>
-        <p class="leeg" id="kTap" style="text-align:center;" hidden>📳 Tap to pay staat aan: houd uw telefoon tegen de kassa.</p>
+        <p class="leeg" style="text-align:center;">Laat de kassa deze QR scannen; geldig tot <span id="kTot"></span>, max <span id="kMaxToon"></span></p>
+        <p class="leeg" id="kTap" style="text-align:center;" hidden>Tap to pay staat aan: houd uw telefoon tegen de kassa.</p>
       </div>
     </div>
 
@@ -309,24 +314,21 @@ $('#xOntvang').addEventListener('click', async () => {
     $('#xOntvangAan').hidden = false;
     $('#xCode').textContent = r.code;
     $('#xTot').textContent = new Date(r.geldigTot).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    // de tikcode als QR: je vriend scant hem en betaalt. De code blijft er als
+    // terugval onder staan (met de hand in te tikken).
+    const qi = $('#xQr');
+    try { if (window.RTGQRteken && qi) { qi.src = RTGQRteken.dataURL(r.code, { schaal: 5, quiet: 3 }); qi.hidden = false; } else if (qi) qi.hidden = true; }
+    catch (e) { if (qi) qi.hidden = true; }
     if (window.TapPay && TapPay.kan()) TapPay.schrijf(r.code, Math.max(1000, r.geldigTot - Date.now())).catch(() => {});
     clearTimeout(tikTimer);
     tikTimer = setTimeout(() => { $('#xOntvangAan').hidden = true; }, Math.max(1000, r.geldigTot - Date.now()));
   } catch (e) { meld(e.message); }
 });
-$('#xBetaal').addEventListener('click', async () => {
-  const centen = Math.round(Number(String($('#xBedrag').value).replace(',', '.')) * 100);
-  if (!(centen > 0)) { meld('Vul een bedrag in.'); return; }
-  let code = null;
-  if (window.TapPay && TapPay.kan()) {
-    meld('Houd je telefoon tegen die van je vriend...');
-    code = await TapPay.lees(15000);
-  }
-  if (!code) {
-    const c = prompt('Tikcode van je vriend:');
-    if (!c) return;
-    code = c.trim().toUpperCase();
-  }
+// betalen met een tik gaat via de QR van je vriend: scan hem en het bedrag gaat
+// over. Geen camera? Dan biedt het scanscherm zelf het tikcode-veld aan.
+async function tikBetaalMet(ruweCode, centen){
+  const code = String(ruweCode || '').trim().toUpperCase();
+  if (!code) return;
   try {
     const r = await api('pay/tik', { code, centen, oms: $('#xOms').value.trim(), idem: 'tik' + Date.now() });
     meld(euro(centen) + ' eur getikt naar ' + r.aan + '.' + (r.bijgeladen ? ' Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : ''));
@@ -334,6 +336,21 @@ $('#xBetaal').addEventListener('click', async () => {
     ververs();
     laadTiks();
   } catch (e) { meld(e.message); }
+}
+$('#xBetaal').addEventListener('click', () => {
+  const centen = Math.round(Number(String($('#xBedrag').value).replace(',', '.')) * 100);
+  if (!(centen > 0)) { meld('Vul een bedrag in.'); return; }
+  if (window.RTGScanknop) {
+    RTGScanknop.open({
+      titel: 'Scan om te betalen',
+      hint: 'Richt de camera op de QR van je vriend.',
+      handTekst: 'Of typ de tikcode',
+      onCode: (c) => { tikBetaalMet(c.tekst, centen); }
+    });
+    return;
+  }
+  const c = prompt('Tikcode van je vriend:');
+  if (c) tikBetaalMet(c, centen);
 });
 
 /* de kassacode */
@@ -345,6 +362,9 @@ $('#kMaak').addEventListener('click', async () => {
     $('#kasUit').hidden = true;
     $('#kasAan').hidden = false;
     $('#kCode').textContent = r.code;
+    const kqi = $('#kQr');
+    try { if (window.RTGQRteken && kqi) { kqi.src = RTGQRteken.dataURL(r.code, { schaal: 5, quiet: 3 }); kqi.hidden = false; } else if (kqi) kqi.hidden = true; }
+    catch (e) { if (kqi) kqi.hidden = true; }
     $('#kMaxToon').textContent = euro(r.maxCenten) + ' eur';
     $('#kTot').textContent = new Date(r.geldigTot).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
     // tap to pay: het toestel staat klaar om de code contactloos af te geven
@@ -371,7 +391,17 @@ if (TOKEN) start(); else toon('vGate');
 <script src="/shared/osmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<!-- QR: de tikcode als scanbare code tonen (RTGQRteken) en scannen om te
+     betalen (RTGScanknop -> RTGScanner -> onze eigen QR-decoder) -->
+<script src="/shared/qr.js" defer></script>
+<script src="/shared/qrteken.js" defer></script>
+<script src="/shared/qrscan.js" defer></script>
+<script src="/shared/scanner.js" defer></script>
+<script src="/shared/scanknop.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

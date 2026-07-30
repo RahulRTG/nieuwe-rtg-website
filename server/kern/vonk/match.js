@@ -28,7 +28,7 @@ module.exports = (ctx) => {
     save();
     for (const wie of [key, doel]) {
       const ander = wie === key ? doel : key;
-      try { notify(wie, { icon: '🔥', title: 'Een vonk!', body: 'U en ' + codenaamVan(ander) + ' liken elkaar. ' + (m.tafel ? 'Er staat een tafel klaar bij ' + m.tafel.supplierName + '; bevestig met EUR 10 p.p.' : 'De chatlijn is open.') }); } catch (e) {}
+      try { notify(wie, { icon: 'ster', title: 'Een vonk!', body: 'U en ' + codenaamVan(ander) + ' liken elkaar. ' + (m.tafel ? 'Er staat een tafel klaar bij ' + m.tafel.supplierName + '; bevestig met EUR 10 p.p.' : 'De chatlijn is open.') }); } catch (e) {}
       try { sseToCustomer(wie, 'vonk', { kind: 'match', id: m.id }); } catch (e) {}
     }
     return { status: 200, ok: true, match: true, id: m.id, tafel: m.tafel };
@@ -58,9 +58,9 @@ module.exports = (ctx) => {
     if (m.betaald[key]) return { status: 200, ok: true, al: true, status2: m.status };
     const codenaam = codenaamVan(key);
     // EUR 5 naar RTG en EUR 5 als aanbetaling bij de zaak, in een keer uit de wallet
-    const r1 = pay.boek({ van: 'lid:' + codenaam, naar: 'extern:vonk-rtg', centen: RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, deel RTG', ref: m.id });
+    const r1 = await pay.boekAsync({ van: 'lid:' + codenaam, naar: 'extern:vonk-rtg', centen: RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, deel RTG', ref: m.id });
     if (r1 && r1.error) return { status: 402, error: r1.error };
-    const r2 = pay.boek({ van: 'lid:' + codenaam, naar: 'partner:' + m.tafel.supplierCode, centen: PRIJS_CENTEN - RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, aanbetaling zaak', ref: m.id });
+    const r2 = await pay.boekAsync({ van: 'lid:' + codenaam, naar: 'partner:' + m.tafel.supplierCode, centen: PRIJS_CENTEN - RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, aanbetaling zaak', ref: m.id });
     if (r2 && r2.error) return { status: 402, error: r2.error };
     m.betaald[key] = nu();
     const ander = m.a === key ? m.b : m.a;
@@ -70,7 +70,7 @@ module.exports = (ctx) => {
         { supplierCode: m.tafel.supplierCode, datum: m.tafel.datum, tijd: m.tafel.tijd, personen: 2, notitie: 'Vonk-date (aanbetaling voldaan)' });
       m.status = res && res.ok ? 'bevestigd' : 'betaald';
       m.reserveringId = res && res.ok ? res.reservering.id : null;
-      for (const wie of [m.a, m.b]) { try { notify(wie, { icon: '🥂', title: 'De date staat', body: m.tafel.supplierName + ', ' + m.tafel.datum + ' ' + m.tafel.tijd + '. Veel plezier!' }); } catch (e) {} }
+      for (const wie of [m.a, m.b]) { try { notify(wie, { icon: 'bar', title: 'De date staat', body: m.tafel.supplierName + ', ' + m.tafel.datum + ' ' + m.tafel.tijd + '. Veel plezier!' }); } catch (e) {} }
     }
     save();
     return { status: 200, ok: true, status2: m.status };

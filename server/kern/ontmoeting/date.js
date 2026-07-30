@@ -35,11 +35,11 @@ module.exports = (ctx) => {
     const ander = d.a === key ? d.b : d.a;
     if (d.contract.ondertekend[d.a] && d.contract.ondertekend[d.b]) {
       d.status = 'actief'; d.gestartAt = nu();
-      for (const k of [d.a, d.b]) { sseToCustomer(k, 'sync', { scope: 'ontmoeting' }); notify(k, { icon: '✅', title: 'Afspraak gestart', body: 'Het veiligheidscontract is getekend. RTG kijkt mee voor jullie veiligheid.', scope: 'ontmoeting' }); }
+      for (const k of [d.a, d.b]) { sseToCustomer(k, 'sync', { scope: 'ontmoeting' }); notify(k, { icon: 'pas', title: 'Afspraak gestart', body: 'Het veiligheidscontract is getekend. RTG kijkt mee voor jullie veiligheid.', scope: 'ontmoeting' }); }
       sseToOffice('sync', { scope: 'ontmoeting' });
     } else {
       sseToCustomer(ander, 'sync', { scope: 'ontmoeting' });
-      notify(ander, { icon: '✍️', title: 'Contract getekend', body: codenaamVan(key) + ' tekende het veiligheidscontract. Teken jij ook om te starten?', scope: 'ontmoeting' });
+      notify(ander, { icon: 'sneltekst', title: 'Contract getekend', body: codenaamVan(key) + ' tekende het veiligheidscontract. Teken jij ook om te starten?', scope: 'ontmoeting' });
     }
     save();
     return { status: 200, ok: true, status2: d.status };

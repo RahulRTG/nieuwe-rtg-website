@@ -221,12 +221,17 @@ content-negotiation) staan bewust niet in `web.js`. Zou er ooit een web-randgeva
 opduiken dat dit framework mist, dan is de eerlijke stap terug: `express` er weer
 achter zetten -- de vorm is identiek, dus dat kan zonder de rest te raken.
 
-En nog precies één **optioneel** pakket dat alleen laadt als je het configureert —
-zonder dat draait alles gewoon door in demo/lokaal:
+Ook optionele pakketten zijn er niet meer. `stripe` was de laatste, en die stond
+in `optionalDependencies` terwijl de code hem al niet meer gebruikte: de
+betaal-naad (`server/betaal.js`) draait op onze EIGEN dunne Stripe-client
+(`server/stripe.js`, form-urlencoded op de eigen HTTP-client, met
+webhook-verificatie op `node:crypto`). Die vermelding kostte dus 22 pakketten in
+de lockfile voor niets en is eruit. **`package.json` noemt nu geen enkel pakket,
+in geen enkel veld, en `package-lock.json` bevat alleen het project zelf.**
 
-| Pakket | Rol | Zonder |
-|---|---|---|
-| `stripe` | echt geld | demo-provider (geen echt geld) |
+Let op wat dit NIET verandert: het echte geld gaat nog steeds langs Stripe (regel
+2 hierboven). Wij bouwden de naad en het HTTP-verkeer ernaartoe, niet de
+PCI-afhandeling; zonder `STRIPE_SECRET_KEY` draait de demo-provider.
 
 De *externe systemen* waar we op leunen — een Postgres-database, een Redis-broker,
 een SMTP-smarthost, een fout-webhook — blijven extern; wat we zelf bouwden zijn de
@@ -240,6 +245,16 @@ techniekbord) en de externe bezorging is nu de eigen `server/foutmelder.js`
 node:net) -- de realtime-bus en de gedeelde-data-mirror draaien erop. De Redis-
 *broker zelf* draaien we niet, en de eigen client verbindt alleen als `REDIS_URL`
 gezet is (anders realtime binnen één proces).
+
+Bewaakt in plaats van belofte: keuringsregel 14 (`npm run check`) leest ALLE
+JS in `server/`, `scripts/`, `test/` en `public/` en keurt elke require af die
+geen ingebouwde Node-module en geen eigen pad is -- plus package.json en de
+lockfile. De AST-scan had al een verbodslijst van pakketnamen, maar dat is een
+naamlijst: `require('lodash')` glipte daar zo langs. Regel 14 doet het omgekeerd
+(alles fout tenzij), met twee benoemde dev-uitzonderingen die in een try/catch
+staan en dus nooit nodig zijn om te draaien: `playwright` (met de eigen
+browser-driver als terugval) en `redis` (kruiscontrole van onze client tegen de
+npm-client, slaat zichzelf over als hij er niet is).
 
 Dev-only pakketten: geen meer. `axe-core` (a11y-keuring) is vervangen door de
 eigen keuring (`scripts/a11ykeuring.js`), en de minify doen we zelf

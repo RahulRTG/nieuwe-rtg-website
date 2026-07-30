@@ -5,7 +5,7 @@
    op de betaalrekening is de andere kredietvorm en zit al in de rekening-bodem.
    Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, d, boek, rekMeta, bankregie, seintje } = ctx;
+  const { db, save, crypto, nu, d, boekAsync, rekMeta, bankregie, seintje } = ctx;
 
   const RENTE_BP = 700;              // 7% per jaar op de openstaande hoofdsom (standaard)
   const MAX_CENTEN = 5000000000;    // tot 50 miljoen euro (zakelijk kan groot)
@@ -38,12 +38,12 @@ module.exports = (ctx) => {
   }
   /* Het besluit (kantoor). Bij akkoord stort de bank de hoofdsom op de rekening
      en zet het openstaande saldo; bij afwijzing blijft er niets staan. */
-  function besluit({ id, akkoord, wie }) {
+  async function besluit({ id, akkoord, wie }) {
     const k = kredieten().find(x => x.id === id);
     if (!k) return { status: 404, error: 'Deze aanvraag bestaat niet meer.' };
     if (k.status !== 'aangevraagd') return { status: 409, error: 'Over deze aanvraag is al beslist.' };
     if (akkoord !== true) { k.status = 'afgewezen'; k.besluitAt = nu(); save(); seintje(k.codenaam); return { ok: true, krediet: publiek(k) }; }
-    const b = boek({ van: 'extern:krediet', naar: k.iban, centen: k.bedragCenten, soort: 'lening', oms: 'Lening ' + k.id, ref: (wie || 'kantoor') });
+    const b = await boekAsync({ van: 'extern:krediet', naar: k.iban, centen: k.bedragCenten, soort: 'lening', oms: 'Lening ' + k.id, ref: (wie || 'kantoor') });
     if (b.error) return b;
     k.status = 'goedgekeurd'; k.restCenten = k.bedragCenten; k.besluitAt = nu();
     save();
@@ -52,16 +52,16 @@ module.exports = (ctx) => {
   }
   /* Aflossen: het afgeloste deel gaat terug naar extern:krediet, de rente over
      het afgeloste deel (naar rato van het jaartarief, één maand) naar rtg:reserve. */
-  function aflossing({ id, centen, codenaam }) {
+  async function aflossing({ id, centen, codenaam }) {
     const k = kredieten().find(x => x.id === id);
     if (!k || (codenaam && k.codenaam !== String(codenaam).trim())) return { status: 404, error: 'Deze lening bestaat niet.' };
     if (k.status !== 'goedgekeurd' || k.restCenten <= 0) return { status: 409, error: 'Op deze lening valt niets af te lossen.' };
     const c = Math.min(Math.round(Number(centen)), k.restCenten);
     if (!Number.isFinite(c) || c < 1) return { status: 400, error: 'Dat bedrag kan niet.' };
     const rente = Math.round(c * (k.renteBp / 10000) / 12);
-    const b = boek({ van: k.iban, naar: 'extern:krediet', centen: c, soort: 'aflossing', oms: 'Aflossing ' + k.id });
+    const b = await boekAsync({ van: k.iban, naar: 'extern:krediet', centen: c, soort: 'aflossing', oms: 'Aflossing ' + k.id });
     if (b.error) return b;
-    if (rente > 0) boek({ van: k.iban, naar: 'rtg:reserve', centen: rente, soort: 'kredietrente', oms: 'Rente ' + k.id });
+    if (rente > 0) await boekAsync({ van: k.iban, naar: 'rtg:reserve', centen: rente, soort: 'kredietrente', oms: 'Rente ' + k.id });
     k.restCenten -= c;
     if (k.restCenten <= 0) k.status = 'afgelost';
     save();

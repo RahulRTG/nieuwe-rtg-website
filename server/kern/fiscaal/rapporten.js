@@ -9,7 +9,7 @@ module.exports = (ctx) => {
     const opDag = iso => String(iso || '').slice(0, 10) === dag;
     const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
     const L = LANDEN[landCode];
-    const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
+    const caps = db.capsVan(s);
     const basisCat = caps.includes('rides') ? (s.type === 'jet' ? 'jet' : 'vervoer') : caps.includes('rooms') ? 'logies' : 'eten';
     const catVan = naam => { const m = (s.menu || []).find(x => x.name === naam); return m && m.station === 'bar' ? 'drank' : basisCat === 'eten' ? 'eten' : basisCat; };
     const potten = {};

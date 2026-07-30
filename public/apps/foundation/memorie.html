@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Memorie</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:38rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .toon{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap;}
+  .toon button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
+    padding:.4rem .9rem;font-size:.85rem;cursor:pointer;}
+  .toon button.aan{border-color:var(--goud);color:var(--goud2);}
+  .bord{display:grid;gap:.6rem;}
+  .kaartje{aspect-ratio:1;background:var(--paneel2);border:2px solid var(--lijn);border-radius:14px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;padding:.5rem;color:var(--goud);}
+  .kaartje:hover{border-color:var(--goud);}
+  .kaartje svg{width:100%;height:100%;display:block;}
+  .kaartje .rug{width:60%;height:60%;opacity:.35;color:var(--zacht);}
+  .kaartje.gevonden{border-color:var(--groen);color:var(--groen);}
+  .melding{text-align:center;min-height:1.6rem;margin-top:1rem;color:var(--goud2);}
+  .onderrij{display:flex;gap:.6rem;justify-content:center;margin-top:.8rem;flex-wrap:wrap;}
+  .stand{color:var(--zacht);font-size:.85rem;text-align:center;margin-top:.6rem;}
+  .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Memorie</h1>
+  <div class="intro">Draai twee kaartjes om. Zijn ze hetzelfde, dan blijven ze open liggen. Zoek alle paren. Er is geen klok: je speelt zo lang je wilt, alleen of samen om de beurt.</div>
+
+  <div class="kaart blok">
+    <div class="toon" id="maat" role="group" aria-label="Hoeveel paren">
+      <button type="button" data-p="3" class="aan">3 paren</button>
+      <button type="button" data-p="6">6 paren</button>
+      <button type="button" data-p="8">8 paren</button>
+    </div>
+    <div class="toon" id="samen" role="group" aria-label="Alleen of samen">
+      <button type="button" data-s="1" class="aan">Alleen</button>
+      <button type="button" data-s="2">Samen om de beurt</button>
+    </div>
+    <div class="melding" id="beurt" style="margin:0 0 .7rem;min-height:0;"></div>
+    <div class="bord" id="bord"></div>
+    <div class="melding" id="melding" aria-live="polite"></div>
+    <div class="onderrij"><button class="knop grijs" id="opnieuw" type="button">Nieuw spel</button></div>
+    <div class="stand" id="stand"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-speler</h2>
+    <p class="ouder">Begin bij drie paren en ga pas omhoog als dat makkelijk gaat. Benoem hardop wat er op het kaartje staat ("een vis, en daar nog een vis") - zo oefent het kind woorden en geheugen tegelijk. Bij Samen om de beurt speel je met z'n tweeen op een scherm; er wordt bewust niet geteld wie de meeste paren vond, want samen het bord leeg spelen is het feest. Er wordt niets bijgehouden buiten dit ene spel; sluit je de app, dan is de stand weg.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+const BEELD = [
+  ['vis', '<path d="M8 32c10-13 26-13 34 0-8 13-24 13-34 0z" fill="currentColor"/><path d="M42 32l13-10v20z" fill="currentColor"/>'],
+  ['ster', '<path d="M32 7l7 16 18 2-13 12 3 18-15-9-15 9 3-18L7 25l18-2z" fill="currentColor"/>'],
+  ['maan', '<path d="M40 8a26 26 0 100 48 20 20 0 010-48z" fill="currentColor"/>'],
+  ['huis', '<path d="M32 10L8 30h6v22h36V30h6z" fill="currentColor"/>'],
+  ['boom', '<circle cx="32" cy="24" r="16" fill="currentColor"/><rect x="28" y="36" width="8" height="20" rx="2" fill="currentColor"/>'],
+  ['bloem', '<circle cx="32" cy="16" r="9" fill="currentColor"/><circle cx="32" cy="38" r="9" fill="currentColor"/><circle cx="21" cy="27" r="9" fill="currentColor"/><circle cx="43" cy="27" r="9" fill="currentColor"/>'],
+  ['hart', '<path d="M32 55S9 39 9 24c0-8 6-13 13-13 4.6 0 8.3 2.4 10 5.3C33.7 13.4 37.4 11 42 11c7 0 13 5 13 13 0 15-23 31-23 31z" fill="currentColor"/>'],
+  ['wolk', '<path d="M20 44a11 11 0 010-22 14 14 0 0126-4 10 10 0 012 26z" fill="currentColor"/>']
+];
+const RUG = '<svg viewBox="0 0 64 64" class="rug" aria-hidden="true"><circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="currentColor"/></svg>';
+
+let paren = 3, spelers = 1, beurt = 1, kaartjes = [], open = [], bezig = false, gevonden = 0, spellen = 0;
+
+function nieuwSpel() {
+  const set = BEELD.slice(0, paren);
+  kaartjes = set.concat(set).map((b, i) => ({ sleutel: b[0], svg: b[1], id: i, op: false, uit: false }))
+    .sort(() => Math.random() - 0.5);
+  open = []; bezig = false; gevonden = 0; beurt = 1;
+  $('#melding').textContent = '';
+  $('#bord').style.gridTemplateColumns = 'repeat(' + (paren <= 3 ? 3 : 4) + ',1fr)';
+  toonBeurt();
+  teken();
+  tekenStand();
+}
+
+// samen spelen: alleen laten zien wie er mag -- er wordt niets per speler geteld
+function toonBeurt() {
+  $('#beurt').textContent = spelers === 2 && gevonden < paren ? 'Nu mag speler ' + beurt : '';
+}
+
+function teken() {
+  const bord = $('#bord');
+  bord.innerHTML = '';
+  kaartjes.forEach(k => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'kaartje' + (k.uit ? ' gevonden' : '');
+    if (k.op || k.uit) {
+      b.innerHTML = '<svg viewBox="0 0 64 64" aria-hidden="true">' + k.svg + '</svg>';
+      b.setAttribute('aria-label', k.sleutel);
+    } else {
+      b.innerHTML = RUG;
+      b.setAttribute('aria-label', 'dicht kaartje');
+    }
+    b.addEventListener('click', () => draai(k));
+    bord.appendChild(b);
+  });
+}
+
+function draai(k) {
+  if (bezig || k.op || k.uit) return;
+  k.op = true;
+  open.push(k);
+  teken();
+  if (open.length < 2) return;
+  const [a, b] = open;
+  if (a.sleutel === b.sleutel) {
+    a.uit = b.uit = true;
+    a.op = b.op = false;
+    open = [];
+    gevonden++;
+    $('#melding').textContent = spelers === 2 ? 'Een paar gevonden. Je mag nog een keer.' : 'Een paar gevonden.';
+    teken();
+    try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) {}
+    if (gevonden === paren) {
+      spellen++;
+      $('#melding').textContent = spelers === 2 ? 'Samen alle paren gevonden. Goed gedaan, allebei.' : 'Alle paren gevonden. Wat een geheugen.';
+      toonBeurt();
+      tekenStand();
+    }
+    return;
+  }
+  bezig = true;
+  $('#melding').textContent = 'Die twee zijn niet hetzelfde.';
+  setTimeout(() => {
+    a.op = b.op = false;
+    open = []; bezig = false;
+    if (spelers === 2) { beurt = beurt === 1 ? 2 : 1; toonBeurt(); }
+    $('#melding').textContent = '';
+    teken();
+  }, 1100);
+}
+
+function tekenStand() { $('#stand').textContent = spellen ? 'Je hebt vandaag ' + spellen + (spellen === 1 ? ' spel' : ' spellen') + ' uitgespeeld.' : ''; }
+
+$('#maat').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  paren = Number(b.dataset.p);
+  $('#maat').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
+  nieuwSpel();
+}));
+$('#samen').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  spelers = Number(b.dataset.s);
+  $('#samen').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
+  nieuwSpel();
+}));
+$('#opnieuw').addEventListener('click', nieuwSpel);
+nieuwSpel();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

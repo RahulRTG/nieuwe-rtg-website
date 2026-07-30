@@ -99,3 +99,63 @@ test('de 9+-poort geldt ook in De Salon (reacties op een seed-post)', async () =
   const d = await json(fout);
   assert.match(d.error || '', /9\+/, 'de uitleg noemt de 9+-grens');
 });
+
+/* ---- ronde 5: bewerken met open geschiedenis, en bewaren in mappen ----
+   Elders de twee functies achter het abonnement van een microblog. */
+
+test('bewerken mag, maar nooit stiekem: de vorige versie blijft en iedereen kan hem lezen', async () => {
+  const a = await lid(), b = await lid();
+  const p = await json(await pu('post', { tekst: 'De vergadering is om drie uur.' }, a));
+  assert.ok(p.ok, p.error);
+  const id = p.post.id;
+  assert.equal(p.post.bewerkt, null, 'een verse post is niet bewerkt');
+
+  const bew = await json(await pu('bewerk', { id, tekst: 'De vergadering is om vier uur.' }, a));
+  assert.ok(bew.ok, bew.error);
+  assert.ok(bew.post.bewerkt, 'er staat nu een bewerkt-stempel op');
+  assert.equal(bew.post.versies, 1);
+
+  // de geschiedenis staat open voor een ander lid, niet alleen voor de schrijver
+  const hist = await json(await pu('versies', { id }, b));
+  assert.equal(hist.nu, 'De vergadering is om vier uur.');
+  assert.equal(hist.versies.length, 1);
+  assert.equal(hist.versies[0].tekst, 'De vergadering is om drie uur.',
+    'wat er stond blijft leesbaar voor wie het bericht mag zien');
+
+  // een ander bewerkt jouw bericht niet
+  const inbraak = await pu('bewerk', { id, tekst: 'Iets anders.' }, b);
+  assert.equal(inbraak.status, 403);
+
+  // dezelfde tekst is geen bewerking, en leeg mag niet
+  assert.ok((await json(await pu('bewerk', { id, tekst: 'De vergadering is om vier uur.' }, a))).error);
+  assert.ok((await json(await pu('bewerk', { id, tekst: '   ' }, a))).error);
+});
+
+test('bewaren met mappen is prive, en de schrijver merkt er niets van', async () => {
+  const a = await lid(), b = await lid();
+  const p = await json(await pu('post', { tekst: 'Een tip over de haven van Ibiza.' }, a));
+  const id = p.post.id;
+
+  const bw = await json(await pu('bewaar', { id, map: 'Reizen' }, b));
+  assert.equal(bw.bewaard, true);
+  assert.equal(bw.map, 'Reizen');
+
+  const plank = await json(await pu('bewaard', {}, b));
+  assert.equal(plank.aantal, 1);
+  assert.equal(plank.bewaard[0].id, id);
+  assert.deepEqual(plank.mappen, [{ naam: 'Reizen', aantal: 1 }], 'de map telt mee');
+
+  // filteren op map, en een lege map geeft niets
+  assert.equal((await json(await pu('bewaard', { map: 'Reizen' }, b))).bewaard.length, 1);
+  assert.equal((await json(await pu('bewaard', { map: 'Werk' }, b))).bewaard.length, 0);
+
+  // de plank van B is niet die van A, en A ziet nergens dat B iets bewaarde
+  assert.equal((await json(await pu('bewaard', {}, a))).aantal, 0);
+  const feed = await json(await pu('feed', { soort: 'ontdek' }, a));
+  const mijn = feed.feed.find(x => x.id === id);
+  assert.equal(mijn.bewaard, false, 'in de feed van de schrijver staat niets over andermans plank');
+
+  // nog een keer drukken haalt hem er weer af
+  assert.equal((await json(await pu('bewaar', { id }, b))).bewaard, false);
+  assert.equal((await json(await pu('bewaard', {}, b))).aantal, 0);
+});

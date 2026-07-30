@@ -136,7 +136,7 @@ function maakGhost({ db, findSupplier, boekingenVanZaak, haversine }) {
   function kantoorBeeld() {
     const uit = [];
     for (const s of db.data.suppliers || []) {
-      const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
+      const caps = db.capsVan(s);
       if (!caps.includes('rides')) continue;
       const r = simuleer(s);
       if (r.waarschuwingen.length) uit.push({ code: s.code, zaak: s.name, stad: s.city, waarschuwingen: r.waarschuwingen.slice(0, 3) });

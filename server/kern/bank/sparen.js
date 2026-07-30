@@ -4,7 +4,7 @@
    rente-uitgave zichtbaar in de bank-gezondheid. Daarnaast spaardoelen (een potje
    met een doelbedrag) per rekening. Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, nu, d, boek, rekeningen, rekMeta, saldoVan, bankregie, seintje } = ctx;
+  const { db, save, nu, d, boekAsync, rekeningen, rekMeta, saldoVan, bankregie, seintje } = ctx;
 
   const DAG_MS = 86400000;
 
@@ -12,7 +12,7 @@ module.exports = (ctx) => {
      spaarsaldo. Idempotent op de klok: twee keer draaien op dezelfde dag boekt
      niet dubbel (er zijn dan 0 nieuwe dagen). Met { dagen } kan het kantoor
      (of een test) een vast aantal dagen forceren. */
-  function renteRonde({ dagen } = {}) {
+  async function renteRonde({ dagen } = {}) {
     if (!Number.isFinite(d().bankRenteAt)) d().bankRenteAt = nu();
     const verstreken = Math.floor((nu() - d().bankRenteAt) / DAG_MS);
     const n = Number.isFinite(dagen) ? Math.max(0, Math.round(dagen)) : verstreken;
@@ -26,7 +26,7 @@ module.exports = (ctx) => {
       if (saldo <= 0) continue;
       const rente = Math.round(saldo * dagFactor);
       if (rente < 1) continue;
-      const b = boek({ van: 'rtg:rente', naar: m.iban, centen: rente, soort: 'rente', oms: 'Spaarrente ' + (bp / 100) + '% (' + n + ' dg)' });
+      const b = await boekAsync({ van: 'rtg:rente', naar: m.iban, centen: rente, soort: 'rente', oms: 'Spaarrente ' + (bp / 100) + '% (' + n + ' dg)' });
       if (b.ok) { totaal += rente; tel++; seintje(m.codenaam); }
     }
     d().bankRenteAt += n * DAG_MS;

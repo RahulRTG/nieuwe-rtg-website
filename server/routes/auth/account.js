@@ -3,7 +3,7 @@
    de gedeelde context een keer bij het opstarten vanuit routes/auth.js. */
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN } = actx;
+    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering } = actx;
 app.post('/api/auth/register', async (req, res) => {
   // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
   // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
@@ -27,11 +27,30 @@ app.post('/api/auth/register', async (req, res) => {
   if (lftNieuw < 15) return res.status(400).json({ error: 'Het RTG-lidmaatschap kan vanaf 15 jaar.' });
   if (lftNieuw > 120) return res.status(400).json({ error: 'Controleer uw geboortedatum.' });
   if (accounts.findByLogin(email)) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
-  // in een pas-app registreer je alleen een account van die pas (gratis mag in de RTG-app)
-  if (!pasAppOk(String(req.body.pasApp || ''), String(req.body.tier || 'rtg'))) return res.status(403).json({ error: PAS_FOUT });
+  /* De poort van het merk: zelf-registreren levert ALTIJD hooguit een RTG Pass
+     (of de gratis gast-laag). Lifestyle en Business komen -- per merkregel --
+     uitsluitend na een menselijk besluit (kern/aanmeldingen.js beslis, dat
+     accounts.setTier aanroept). Wie zich rechtstreeks als Lifestyle/Business
+     probeert in te schrijven, krijgt gewoon RTG: geen enkele registratie geeft
+     die passen zelf. Eerder gaf dit veld DIRECT een Business Pass -- dat gat is
+     hier dicht. */
+  const gevraagd = String(req.body.tier || 'rtg');
+  const betaald = (gevraagd === 'lifestyle' || gevraagd === 'business');
+  const tier = betaald ? 'rtg' : gevraagd;
+  const pasApp = String(req.body.pasApp || '');
+  /* In een pas-app registreer je alleen een account van die pas (gratis mag in de
+     RTG-app). Vroeg iemand zich in de EIGEN betaalde-pas-app aan voor die pas
+     (bijv. de Business-app, tier business) -- die we hierboven naar RTG
+     terugbrengen -- dan zou de pasApp niet meer bij de (nu RTG-)pas passen. Dat
+     is geen fout van de aanvrager maar het gevolg van onze eigen clamp, dus
+     toetsen we dat geval tegen RTG: hij krijgt een RTG-account i.p.v. een
+     weigering. Een ECHTE kruismismatch (bijv. business-tier in de Lifestyle-app)
+     blijft gewoon geweigerd. */
+  const pasAppKeuze = (betaald && pasApp === gevraagd) ? 'rtg' : pasApp;
+  if (!pasAppOk(pasAppKeuze, tier)) return res.status(403).json({ error: PAS_FOUT });
   let user;
   try {
-    user = await accounts.createUser({ email, username: req.body.username || null, password, tier: req.body.tier, realName: name, phone });
+    user = await accounts.createUser({ email, username: req.body.username || null, password, tier, realName: name, phone });
   } catch (e) {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
@@ -49,6 +68,8 @@ app.post('/api/auth/register', async (req, res) => {
     const ln = String(req.body.land || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
     if (ln.length === 2) mdNieuw.land = ln;
     accounts.saveMemberState(user.id, mdNieuw);
+    // welkom-draaiboek: een automatisch bericht in het eigen RTMAIL-postvak
+    try { if (automatisering) automatisering.welkomLid({ codename: user.codename, wereld: 'RTG' }); } catch (e) {}
     // bevestigingsmail met een echte, werkende link
     const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
     const verifyUrl = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(user.tier) + '&verify=' + vtok;

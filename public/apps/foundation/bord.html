@@ -70,9 +70,9 @@
   <div class="board-wrap"><div class="board-inner">
     <canvas id="bord"></canvas>
     <div class="tools" id="tools">
-      <button class="tbtn aan" data-tool="pen" title="Pen">✏️</button>
-      <button class="tbtn" data-tool="marker" title="Marker">🖍️</button>
-      <button class="tbtn" data-tool="gum" title="Gum">🧽</button>
+      <button class="tbtn aan" data-tool="pen" title="Pen">✏</button>
+      <button class="tbtn" data-tool="marker" title="Marker">✎</button>
+      <button class="tbtn" data-tool="gum" title="Gum">◻</button>
       <span style="width:1px;height:1.6rem;background:var(--lijn)"></span>
       <span class="kleur aan" data-kleur="#ffffff" style="background:#ffffff"></span>
       <span class="kleur" data-kleur="#C9A24B" style="background:#C9A24B"></span>
@@ -82,23 +82,23 @@
       <input type="range" id="dikte" min="1" max="40" value="4" title="Dikte">
       <span style="width:1px;height:1.6rem;background:var(--lijn)"></span>
       <button class="tbtn" id="btnUndo" title="Ongedaan maken">↶</button>
-      <button class="tbtn" id="btnWis" title="Bord wissen">🗑️</button>
+      <button class="tbtn" id="btnWis" title="Bord wissen">✕</button>
     </div>
   </div></div>
 
   <div class="zij" id="zij">
     <div class="kaart paneel">
-      <h3>👩‍🎓 Leerlingen (<span id="llAantal">0</span>)</h3>
+      <h3>Leerlingen (<span id="llAantal">0</span>)</h3>
       <div id="llLijst"><div class="mini">Nog niemand. Deel de lescode <b id="codeInline">------</b>.</div></div>
     </div>
     <div class="kaart paneel">
-      <h3>📝 Opgave klaarzetten</h3>
+      <h3>Opgave klaarzetten</h3>
       <textarea class="veld" id="opgTekst" placeholder="Typ hier een vraag of opdracht voor de klas..."></textarea>
       <button class="knop groen klein" id="opgZet">Zet klaar voor de klas</button>
       <div id="opgLijst" style="margin-top:.6rem;"></div>
     </div>
     <div class="kaart paneel">
-      <h3>📅 Agenda / huiswerk</h3>
+      <h3>Agenda / huiswerk</h3>
       <input class="veld" id="agTekst" placeholder="Bijv. Maak §3.2, opgave 1 t/m 8" style="margin-bottom:.4rem;">
       <div style="display:flex;gap:.4rem;">
         <input class="veld" id="agDatum" type="date" style="flex:1;">
@@ -190,6 +190,11 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

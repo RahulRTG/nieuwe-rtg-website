@@ -3,6 +3,22 @@
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, talen, trChat, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, totpOk, veiligGelijk, logInlog, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
+
+/* Wie kijkt hier in de identiteitskluis? De backoffice-code is gedeeld, dus
+   een office-sessie alleen zegt "iemand van kantoor" en niet meer -- eerlijker
+   is dat dan een verzonnen naam. Komt de eigenaar met zijn eigen accountlogin
+   binnen (officeAuth zet dan req.eigenaar), dan weten we het wel precies, en
+   dan hoort dat ook in het inzagejournaal te staan. */
+function wieKijkt(req) {
+  const h = req.get('authorization') || '';
+  const tok = h.startsWith('Bearer ') ? h.slice(7) : null;
+  try {
+    const u = tok && accounts.verifyToken(tok);
+    if (u && req.eigenaar) return { id: u.id, naam: 'eigenaar' };
+  } catch (e) {}
+  return { naam: 'backoffice (gedeelde code)' };
+}
+
 app.post('/api/office/nudge', officeAuth, (req, res) => {
   const kind = req.body.kind === 'ride' ? 'ride' : 'order';
   const lijst = kind === 'ride' ? db.data.rides : db.data.orders;
@@ -12,7 +28,7 @@ app.post('/api/office/nudge', officeAuth, (req, res) => {
     return res.status(409).json({ error: 'Er is net al een herinnering gestuurd. Geef de zaak even de tijd.' });
   x.nudgedAt = new Date().toISOString();
   save();
-  notifySupplier(x.supplierCode, { icon: '⏰', title: 'Herinnering van RTG',
+  notifySupplier(x.supplierCode, { icon: 'agenda', title: 'Herinnering van RTG',
     body: (kind === 'ride' ? 'Rit ' : 'Bestelling ') + x.ref + ' van ' + x.customerCodename + ' wacht nog op actie. Kunt u er even naar kijken?' });
   sseToSupplier(x.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
@@ -50,7 +66,7 @@ app.post('/api/office/briefing', officeAuth, (req, res) => {
   res.json({ briefing: zinnen.join(' ') });
 });
 
-app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications() }));
+app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications(wieKijkt(req)) }));
 
 app.post('/api/office/verify', officeAuth, (req, res) => {
   const user = accounts.getUserById(Number(req.body.userId));
@@ -73,10 +89,10 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
     (status === 'verified' ? 'Uw identiteit is geverifieerd. U kunt nu in een tik boeken.' :
      'We konden uw document niet goedkeuren. Probeer het opnieuw met een duidelijkere foto.') +
     '\n\nRahul Travel Group');
-  notify(user.tier, { icon: status === 'verified' ? '✅' : '⚠',
+  notify(user.tier, { icon: status === 'verified' ? 'pas' : 'meldingen',
     title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
     body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
-  res.json({ ok: true, status, pending: pendingVerifications() });
+  res.json({ ok: true, status, pending: pendingVerifications(wieKijkt(req)) });
 });
 
 /* ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ---- */
@@ -123,7 +139,7 @@ app.post('/api/office/reply', officeAuth, (req, res) => {
   md.needsConcierge = false;
   accounts.saveMemberState(u.id, md);
   broadcastSync([u.tier], 'chat');
-  notify(u.tier, { icon: '💬', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
+  notify(u.tier, { icon: 'berichten', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
   // Het antwoord verschijnt in de app van het lid (met push-melding); RTG gebruikt
   // geen externe berichtenkanalen.
   const inbox = conciergeInbox();

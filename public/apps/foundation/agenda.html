@@ -11,115 +11,229 @@
 <link rel="stylesheet" href="stijl.css">
 <script src="palet.js"></script>
 <style>
-  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  .wrap{max-width:64rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
-  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
-  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
-  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.7rem;}
-  .rijveld{display:flex;gap:.5rem;flex-wrap:wrap;}
-  .rijveld .veld{flex:1;min-width:8rem;}
-  .datumtijd{display:flex;gap:.5rem;}
-  .datumtijd .veld{flex:1;}
-  select.veld{appearance:none;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
+  .stuur{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;}
+  .stuur .knop{padding:.4rem .75rem;font-size:.82rem;}
+  .stuur .knop.aan{border-color:var(--goud);color:var(--goud);}
+  #periode{font-family:var(--serif);font-size:1.05rem;margin:0 .3rem;}
   .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
-  .dag{margin-bottom:1.1rem;}
-  .dagkop{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--goud);font-weight:700;margin-bottom:.4rem;}
-  .item{display:flex;align-items:center;gap:.7rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .9rem;margin-bottom:.4rem;}
-  .item.voorbij{opacity:.5;}
-  .item .tijd{font-weight:700;color:var(--goud2);white-space:nowrap;min-width:3rem;}
-  .item .tijd.leeg{color:var(--zacht);font-weight:400;font-size:.8rem;}
-  .item .tk{flex:1;}
-  .item .wie{font-size:.78rem;color:var(--zacht);}
-  .item .del{background:transparent;color:var(--zacht);font-size:1.1rem;padding:.1rem .3rem;}
-  .item .del:hover{color:var(--rood);}
-  .leeg{color:var(--zacht);font-size:.9rem;}
+
+  /* het maandraster en de week: dezelfde taal als de ledenagenda */
+  .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .mkop{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--goud);
+    text-align:center;padding:.25rem 0;}
+  .mdag{background:var(--paneel2);border:1px solid var(--lijn);border-radius:9px;min-height:5.2rem;
+    padding:.3rem;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;
+    color:inherit;font:inherit;overflow:hidden;}
+  .mdag:hover{border-color:var(--goud);}
+  .mdag.buiten{opacity:.4;}
+  .mdag.vandaag{border-color:var(--goud);}
+  .mdag .dnr{font-size:.68rem;color:var(--zacht);}
+  .mdag.vandaag .dnr{color:var(--goud);font-weight:700;}
+  .chip{display:block;border:1px solid var(--lijn);border-left-width:3px;border-radius:6px;
+    font-size:.62rem;padding:.1rem .3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chip b{color:var(--goud2);}
+  .meer{font-size:.6rem;color:var(--zacht);}
+  .wgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .wdag{display:flex;flex-direction:column;gap:3px;}
+  .ldag h3{font-family:var(--serif);font-weight:500;font-size:1rem;margin:.9rem 0 .35rem;}
+  .litem{display:flex;gap:.7rem;align-items:center;background:var(--paneel2);border:1px solid var(--lijn);
+    border-radius:11px;padding:.55rem .8rem;margin-bottom:.35rem;cursor:pointer;}
+  .litem:hover{border-color:var(--goud);}
+  .litem .tijd{font-weight:700;color:var(--goud2);min-width:4.5rem;font-size:.85rem;}
+  .litem .wat b{display:block;font-size:.9rem;}
+  .litem .wat small{color:var(--zacht);}
+  .stil{color:var(--zacht);font-size:.9rem;}
+
+  /* het paneel */
+  .scrim{position:fixed;inset:0;z-index:30;background:rgba(8,8,7,.86);display:none;
+    align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
+  .scrim.open{display:flex;}
+  .paneel{background:var(--paneel);border:1px solid var(--lijn);border-radius:14px;padding:1.2rem;
+    width:min(480px,100%);margin:auto 0;}
+  .paneel h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.7rem;}
+  .paneel label{display:block;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--zacht);margin:.6rem 0 .2rem;}
+  .twee{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+  .rijknoppen{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>📅 Gezinsagenda</h1>
-
-  <div class="kaart blok" id="maakBlok">
-    <h2>Zet iets in de agenda</h2>
-    <input class="veld" id="aTitel" placeholder="Wat? (bijv. Tim naar voetbal)" maxlength="80" style="margin-bottom:.5rem;">
-    <div class="datumtijd" style="margin-bottom:.5rem;">
-      <input class="veld" id="aDatum" type="date">
-      <input class="veld" id="aTijd" type="time">
-    </div>
-    <select class="veld" id="aWie" style="margin-bottom:.5rem;"><option value="">Voor het hele gezin</option></select>
-    <div class="fout" id="aFout"></div>
-    <button class="knop" id="aDoe">Toevoegen</button>
+  <h1>Gezinsagenda</h1>
+  <p class="intro">Maand, week of lijst; ieder gezinslid zijn eigen kleur. Een verjaardag zet je EEN keer neer
+    en hij rolt elk jaar vanzelf mee.</p>
+  <div class="stuur">
+    <button class="knop" id="vorige" type="button" aria-label="Vorige">&#8592;</button>
+    <button class="knop" id="vandaagKnop" type="button">Vandaag</button>
+    <button class="knop" id="volgende" type="button" aria-label="Volgende">&#8594;</button>
+    <span id="periode"></span>
+    <span style="flex:1;"></span>
+    <button class="knop aan" data-zicht="maand" type="button">Maand</button>
+    <button class="knop" data-zicht="week" type="button">Week</button>
+    <button class="knop" data-zicht="lijst" type="button">Lijst</button>
+    <button class="knop" id="nieuwKnop" type="button" style="display:none;">+ Nieuw</button>
   </div>
+  <div id="bord" aria-live="polite"><div class="stil">Laden...</div></div>
+</div>
 
-  <div id="lijst"><div class="leeg">Laden...</div></div>
+<div class="scrim" id="afScrim" role="dialog" aria-label="Agendapunt">
+  <div class="paneel">
+    <h2 id="afKop">Agendapunt</h2>
+    <label for="afTitel">Wat</label>
+    <input class="veld" id="afTitel" maxlength="80" placeholder="Bijv. Noor naar zwemles" style="width:100%;">
+    <div class="twee">
+      <span><label for="afDatum">Datum</label><input class="veld" id="afDatum" type="date" style="width:100%;"></span>
+      <span><label for="afTijd">Tijd (mag leeg)</label><input class="veld" id="afTijd" type="time" style="width:100%;"></span>
+    </div>
+    <label for="afWie">Voor wie</label>
+    <select class="veld" id="afWie" style="width:100%;"><option value="">Het hele gezin</option></select>
+    <div class="twee">
+      <span><label for="afHerhaal">Herhaal</label>
+        <select class="veld" id="afHerhaal" style="width:100%;">
+          <option value="geen">Niet</option><option value="dag">Elke dag</option>
+          <option value="week">Elke week</option><option value="maand">Elke maand</option>
+          <option value="jaar">Elk jaar (verjaardag)</option>
+        </select></span>
+      <span><label for="afHerhaalTot">Tot (mag leeg)</label><input class="veld" id="afHerhaalTot" type="date" style="width:100%;"></span>
+    </div>
+    <label for="afNotitie">Notitie (mag leeg)</label>
+    <input class="veld" id="afNotitie" maxlength="120" style="width:100%;">
+    <div class="fout" id="afFout"></div>
+    <div id="afSchool" style="display:none;color:var(--goud);font-size:.85rem;">
+      Dit punt komt van school en leest de agenda alleen mee.
+      Afvinken en plannen doe je in <a href="school.html" style="color:var(--goud2);">School</a>.</div>
+    <div class="rijknoppen">
+      <button class="knop" id="afBewaar" type="button">Bewaar</button>
+      <button class="knop" id="afVerjaardag" type="button">Dit is een verjaardag</button>
+      <button class="knop" id="afWeg" type="button" style="display:none;">Weghalen</button>
+      <span style="flex:1;"></span>
+      <button class="knop" id="afDicht" type="button">Sluit</button>
+    </div>
+  </div>
 </div>
 
 <script src="sessie.js"></script>
+<script src="/apps/agenda/kalender.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) {}
 const api = Sessie.api;
 const s = Sessie.huidig();
-Sessie.balk($('#balk'), { terug:'index.html' });
-function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
-let magBewerken = true;
+Sessie.balk($('#balk'), { terug: 'index.html' });
 
-const DAGEN = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
-const MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-function datumLabel(d){
-  const dt = new Date(d+'T00:00:00'); const vandaag = new Date(); vandaag.setHours(0,0,0,0);
-  const morgen = new Date(vandaag); morgen.setDate(morgen.getDate()+1);
-  if (dt.getTime()===vandaag.getTime()) return 'Vandaag';
-  if (dt.getTime()===morgen.getTime()) return 'Morgen';
-  return DAGEN[dt.getDay()]+' '+dt.getDate()+' '+MAANDEN[dt.getMonth()];
+const Kal = window.RTGAgendaKal;
+let zicht = 'maand', anker = Kal.iso(new Date()), items = [], profielen = [], magBewerken = true, open = null;
+const vandaag = () => Kal.iso(new Date());
+
+function venster() {
+  if (zicht === 'maand') {
+    const eerste = anker.slice(0, 8) + '01';
+    const start = Kal.maandagVan(eerste);
+    return { van: start, tot: Kal.plusDagen(start, 41) };
+  }
+  if (zicht === 'week') { const start = Kal.maandagVan(anker); return { van: start, tot: Kal.plusDagen(start, 6) }; }
+  return { van: vandaag(), tot: Kal.plusDagen(vandaag(), 30) };
 }
-async function laad(){
-  try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/agenda?token='+encodeURIComponent(s.token)).then(r=>r.json());
+async function laad() {
+  const v = venster();
+  try {
+    const d = await api('/gezin/agenda/bereik', { code: s.code, token: s.token, van: v.van, tot: v.tot });
     magBewerken = d.magBewerken;
-    $('#maakBlok').style.display = magBewerken ? 'block' : 'none';
-    const box = $('#lijst');
-    if (!d.agenda || !d.agenda.length){ box.innerHTML = '<div class="leeg">Nog niets gepland. '+(magBewerken?'Zet hierboven het eerste punt neer.':'')+'</div>'; return; }
-    const perDag = {};
-    d.agenda.forEach(a=>{ (perDag[a.datum] = perDag[a.datum] || []).push(a); });
-    box.innerHTML = Object.keys(perDag).sort().map(datum=>
-      '<div class="dag"><div class="dagkop">'+esc(datumLabel(datum))+'</div>'+
-      perDag[datum].map(a=>
-        '<div class="item'+(a.voorbij?' voorbij':'')+'">'+
-        '<span class="tijd'+(a.tijd?'':' leeg')+'">'+(a.tijd||'hele dag')+'</span>'+
-        '<span class="tk">'+esc(a.titel)+(a.wieNaam?'<span class="wie"> · '+esc(a.wieNaam)+'</span>':'')+'</span>'+
-        (magBewerken?'<button class="del" data-del="'+a.id+'" title="Weghalen">×</button>':'')+
-        '</div>').join('')+'</div>'
-    ).join('');
-    box.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=> verwijder(b.dataset.del));
-  }catch(e){ $('#lijst').innerHTML='<div class="leeg">Kon de agenda niet laden.</div>'; }
+    profielen = d.profielen || [];
+    $('#nieuwKnop').style.display = magBewerken ? '' : 'none';
+    items = (d.items || []).map(i => ({ datum: i.datum, tijd: i.tijd || null, kleur: i.wieKleur || '',
+      bron: i.bron || '', titel: i.titel + (i.wieNaam ? ' · ' + i.wieNaam : ''), _r: i }));
+    teken();
+  } catch (e) { $('#bord').innerHTML = '<div class="stil">Kon de agenda niet laden.</div>'; }
 }
-async function verwijder(id){ try{ await api('/gezin/agenda/verwijder', { code:s.code, token:s.token, itemId:id }); laad(); }catch(e){ alert(e.message); } }
+function teken() {
+  const opDag = {
+    item: x => toon(x._r),
+    dag: d => { if (magBewerken) toon(null, d); }
+  };
+  const kop = Kal[zicht]($('#bord'), anker, items, opDag, vandaag());
+  $('#periode').textContent = kop;
+  document.querySelectorAll('[data-zicht]').forEach(k => k.classList.toggle('aan', k.dataset.zicht === zicht));
+}
+function stap(r) {
+  if (zicht === 'maand') { const d = new Date(anker + 'T12:00:00Z'); d.setUTCMonth(d.getUTCMonth() + r, 1); anker = Kal.iso(d); }
+  else if (zicht === 'week') anker = Kal.plusDagen(anker, 7 * r);
+  laad();
+}
+$('#vorige').onclick = () => stap(-1);
+$('#volgende').onclick = () => stap(1);
+$('#vandaagKnop').onclick = () => { anker = vandaag(); laad(); };
+document.querySelectorAll('[data-zicht]').forEach(k => k.onclick = () => { zicht = k.dataset.zicht; laad(); });
 
-$('#aDoe').onclick = async ()=>{
-  $('#aFout').textContent='';
-  try{
-    await api('/gezin/agenda', { code:s.code, token:s.token, titel:$('#aTitel').value, datum:$('#aDatum').value, tijd:$('#aTijd').value, wie:$('#aWie').value });
-    $('#aTitel').value=''; $('#aTijd').value=''; laad();
-  }catch(e){ $('#aFout').textContent = e.message; }
+/* ---- het paneel ---- */
+function toon(item, datum) {
+  if (!magBewerken && !item) return;
+  // een schoolpunt is alleen-lezen: de agenda leest school, hij herschrijft school niet
+  const school = !!(item && item.bron === 'school');
+  open = school ? null : (item || null);
+  $('#afKop').textContent = school ? 'Van school' : item ? 'Agendapunt' : 'Nieuw agendapunt';
+  $('#afTitel').value = item ? item.titel : '';
+  // bij een reeks bewerken we de STARTdatum, niet de toevallig aangeklikte keer
+  $('#afDatum').value = item ? (item.basis || item.datum) : (datum || vandaag());
+  $('#afTijd').value = item ? (item.tijd || '') : '';
+  $('#afWie').innerHTML = '<option value="">Het hele gezin</option>' + profielen.map(p =>
+    '<option value="' + p.id + '"' + (item && item.wie === p.id ? ' selected' : '') + '>' + p.naam.replace(/</g, '&lt;') + '</option>').join('');
+  $('#afHerhaal').value = item ? (item.herhaal || 'geen') : 'geen';
+  $('#afHerhaalTot').value = item ? (item.herhaalTot || '') : '';
+  $('#afNotitie').value = item ? (item.notitie || '') : '';
+  $('#afWeg').style.display = item && !school ? '' : 'none';
+  $('#afFout').textContent = '';
+  $('#afSchool').style.display = school ? '' : 'none';
+  ['afTitel', 'afDatum', 'afTijd', 'afWie', 'afHerhaal', 'afHerhaalTot', 'afNotitie'].forEach(id => { $('#' + id).disabled = !magBewerken || school; });
+  $('#afBewaar').style.display = magBewerken && !school ? '' : 'none';
+  $('#afVerjaardag').style.display = school ? 'none' : '';
+  $('#afScrim').classList.add('open');
+}
+function dicht() { $('#afScrim').classList.remove('open'); open = null; }
+$('#afDicht').onclick = dicht;
+$('#nieuwKnop').onclick = () => toon(null);
+$('#afVerjaardag').onclick = () => {
+  $('#afHerhaal').value = 'jaar';
+  $('#afHerhaalTot').value = '';
+  $('#afTijd').value = '';
+  if (!$('#afTitel').value) $('#afTitel').value = 'Jarig: ';
+  $('#afTitel').focus();
+};
+$('#afBewaar').onclick = async () => {
+  $('#afFout').textContent = '';
+  const b = { code: s.code, token: s.token, titel: $('#afTitel').value, datum: $('#afDatum').value,
+    tijd: $('#afTijd').value, wie: $('#afWie').value, herhaal: $('#afHerhaal').value,
+    herhaalTot: $('#afHerhaalTot').value, notitie: $('#afNotitie').value };
+  try {
+    if (open) await api('/gezin/agenda/wijzig', Object.assign({ itemId: open.id }, b));
+    else await api('/gezin/agenda', b);
+    dicht(); laad();
+  } catch (e) { $('#afFout').textContent = e.message; }
+};
+$('#afWeg').onclick = async () => {
+  if (!open) return;
+  if (open.herhaal && open.herhaal !== 'geen' &&
+    !confirm('Dit punt herhaalt zich; weghalen haalt ALLE keren weg. Doorgaan?')) return;
+  try { await api('/gezin/agenda/verwijder', { code: s.code, token: s.token, itemId: open.id }); dicht(); laad(); }
+  catch (e) { $('#afFout').textContent = e.message; }
 };
 
-// wie-keuze vullen uit de profielen
-(async ()=>{
-  try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
-    (d.profielen||[]).forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.naam; $('#aWie').appendChild(o); });
-  }catch(e){}
-  $('#aDatum').value = new Date().toISOString().slice(0,10);
-  laad();
-})();
-if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+laad();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

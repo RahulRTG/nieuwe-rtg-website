@@ -30,7 +30,7 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
   /* ---- de demo-zaak: Ibiza Transit met vier lijnsoorten ---- */
   function ensureOv() {
     if (!db.data.supplierTypes.ov)
-      db.data.supplierTypes.ov = { label: 'Openbaar vervoer', icon: '\u{1F68C}', caps: ['ov', 'location', 'pricing'] };
+      db.data.supplierTypes.ov = { label: 'Openbaar vervoer', icon: 'ov', caps: ['ov', 'location', 'pricing'] };
     if (!db.data.suppliers.find(s => s.code === 'TRANSIT')) {
       db.data.suppliers.push({
         code: 'TRANSIT', name: 'Ibiza Transit', type: 'ov', city: 'Ibiza',

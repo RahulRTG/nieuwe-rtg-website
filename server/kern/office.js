@@ -8,8 +8,9 @@
 
    De onderdelen wonen onder ./office/: basis.js (grenzen, sjablonen,
    rechten-helpers), docs.js (mappenlijst, maken, openen, bewaren,
-   verwijderen) en delen.js (versies, delen op codenaam, gezinskring,
-   AI-schrijfhulp). maakOffice(state) voegt ze samen; de API blijft gelijk. */
+   verwijderen), delen.js (versies, delen op codenaam, gezinskring,
+   AI-schrijfhulp) en formulier.js (invullen en de uitslag).
+   maakOffice(state) voegt ze samen; de API blijft gelijk. */
 
 const { maakBasis } = require('./office/basis');
 
@@ -17,7 +18,8 @@ function maakOffice(state) {
   const basis = maakBasis(state);
   return {
     ...require('./office/docs')(state, basis),
-    ...require('./office/delen')(state, basis)
+    ...require('./office/delen')(state, basis),
+    ...require('./office/formulier')(state, basis)
   };
 }
 

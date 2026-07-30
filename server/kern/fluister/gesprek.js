@@ -1,4 +1,4 @@
-/* Het gesprek van de Butler (kern/fluister): fluisterZeg verstaat de vraag,
+/* Het gesprek van Rahul (kern/fluister): fluisterZeg verstaat de vraag,
    antwoordt (Claude of eigen regels) en handelt met de drempel: alles met
    geld of een poolclaim wordt eerst een voorstel dat u met "ja" bevestigt.
    Verbatim afgesplitst uit acties.js; voerUit komt via de context binnen. */
@@ -6,7 +6,7 @@ module.exports = (ctx) => {
   const { db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
-    butlerExtra, voerReisUit, voerKledingUit, voerUit, sparHouding, sparParkeer } = ctx;
+    rahulExtra, voerReisUit, voerKledingUit, voerUit, sparHouding, sparParkeer } = ctx;
   // sparren: waaraan Rahul herkent dat je wil meedenken over een idee
   const SPAR = /\b(spar(ren)?|brainstorm|denk (even )?met me mee|wat vind je van (mijn |het )?idee|help me (na)?denken)\b/i;
   const intent = require('./intent')(ctx);
@@ -68,8 +68,8 @@ module.exports = (ctx) => {
        kleding en voorspellen voor leden, en de servicedag voor zaak en
        personeel (zonder sessie). "ja"/"nee" matcht hier bewust niet, dus
        de bevestigingsdrempel hieronder blijft de baas. */
-    if (butlerExtra) {
-      const extra = await butlerExtra(q, p, sess, klaar, key);
+    if (rahulExtra) {
+      const extra = await rahulExtra(q, p, sess, klaar, key);
       if (extra) return extra;
     }
     /* ---- doen: Fluister voert het ook echt uit, alleen voor het lid zelf
@@ -104,7 +104,7 @@ module.exports = (ctx) => {
     }
     // de eigen regels: persoonlijk waar het kan, eerlijk waar het moet
     const groet = p.weetjes.length ? 'Ik denk aan uw ' + p.weetjes.length + ' weetje(s). ' : '';
-    const fluistert = seintjes.length ? ' Mijn seintjes: ' + seintjes.map(x => x.icoon + ' ' + x.tekst).join(' | ') + '.' : '';
+    const fluistert = seintjes.length ? ' Mijn seintjes: ' + seintjes.map(x => x.tekst).join(' | ') + '.' : '';
     if (stand.length || seintjes.length) return klaar(groet + (stand.length ? 'Dit speelt er nu voor u: ' + stand.join('; ') + '.' : 'Er staat niets open.') + fluistert + ' Vraag gerust door, of leer me iets met "onthoud dat...".');
     // niets persoonlijks te melden: pakte=false, zodat de app dit gesprek
     // aan de gewone gesprekslaag kan geven (het brein deed hier niets mee)

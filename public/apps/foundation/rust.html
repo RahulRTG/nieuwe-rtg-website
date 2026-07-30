@@ -26,7 +26,17 @@
     background:radial-gradient(circle at 50% 40%, rgba(201,162,75,.35), rgba(201,162,75,.05));
     border:2px solid rgba(201,162,75,.5);transition:transform 4s ease-in-out;transform:scale(.6);color:var(--txt);}
   .ademfase{font-family:var(--serif);font-size:1.3rem;}
+  .ademtel{color:var(--goud2);font-size:1rem;font-variant-numeric:tabular-nums;min-height:1.3rem;}
   .ademsub{color:var(--zacht);font-size:.85rem;max-width:24rem;text-align:center;}
+  @media(prefers-reduced-motion:reduce){ .ademkring{transition:none;} .stilring circle{transition:none;} }
+  /* stiltemoment: een cirkel die in een minuut rustig volloopt */
+  .stilring{width:220px;height:220px;transform:rotate(-90deg);}
+  .stilring circle{fill:none;stroke-width:6;}
+  .stilring .grond{stroke:rgba(201,162,75,.18);}
+  .stilring .loop{stroke:var(--goud);stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+  .stiltekst{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:1.15rem;color:var(--txt);text-align:center;padding:2rem;}
+  .stilhoes{position:relative;width:220px;height:220px;}
   /* teken */
   .tekenbox{width:100%;max-width:40rem;flex:1;position:relative;background:#12110F;border:1px solid var(--lijn);border-radius:16px;overflow:hidden;min-height:0;}
   .tekenbox canvas{position:absolute;inset:0;width:100%;height:100%;}
@@ -42,16 +52,29 @@
 <body>
 <div class="topnav"><span class="brand">RT<b>Foundation</b></span><a href="index.html">← Alle hulp</a></div>
 <div class="seg">
-  <button data-t="adem" class="aan">🫧 Adem</button>
-  <button data-t="teken">🎨 Teken</button>
-  <button data-t="kaart">💛 Bemoediging</button>
+  <button data-t="adem" class="aan">Adem</button>
+  <button data-t="stil">Stiltemoment</button>
+  <button data-t="teken">Teken</button>
+  <button data-t="kaart">Bemoediging</button>
 </div>
 
 <div class="view" role="main">
   <div class="tab aan" id="tab-adem">
-    <div class="ademkring" id="kring"><div><div class="ademfase" id="fase">Klaar?</div></div></div>
+    <div class="ademkring" id="kring"><div><div class="ademfase" id="fase">Klaar?</div><div class="ademtel" id="tel"></div></div></div>
     <div class="ademsub" id="ademsub">Adem rustig mee met de cirkel. In als hij groter wordt, vasthouden, en uit als hij kleiner wordt. Een paar minuten helpt je hoofd tot rust.</div>
     <button class="knop" id="ademStart">Begin</button>
+  </div>
+
+  <div class="tab" id="tab-stil">
+    <div class="stilhoes">
+      <svg class="stilring" viewBox="0 0 220 220" aria-hidden="true">
+        <circle class="grond" cx="110" cy="110" r="100"></circle>
+        <circle class="loop" id="stilLoop" cx="110" cy="110" r="100"></circle>
+      </svg>
+      <div class="stiltekst" id="stilTekst">Een minuut helemaal niets. Durf je?</div>
+    </div>
+    <div class="ademsub">Geen telefoon, geen taak, geen doel. Kijk naar de ring of doe je ogen dicht; hij is vanzelf klaar.</div>
+    <button class="knop" id="stilStart">Begin de minuut</button>
   </div>
 
   <div class="tab" id="tab-teken">
@@ -68,7 +91,7 @@
   </div>
 
   <div class="tab" id="tab-kaart">
-    <div class="kaart bemkaart" id="bemkaart"><span class="em">💛</span><span id="bemtekst">…</span></div>
+    <div class="kaart bemkaart" id="bemkaart"><span class="em"></span><span id="bemtekst">…</span></div>
     <button class="knop" id="bemVolgende">Nog een</button>
   </div>
 </div>
@@ -81,20 +104,56 @@ document.querySelectorAll('.seg button').forEach(b=> b.addEventListener('click',
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('aan')); $('#tab-'+b.dataset.t).classList.add('aan');
   if(b.dataset.t==='teken' && doodle) setTimeout(()=>doodle.resize(),30);
   if(b.dataset.t!=='adem') stopAdem();
+  if(b.dataset.t!=='stil') stopStil();
 }));
 
-/* ---- ademhaling (box breathing 4-4-4-4) ---- */
-let ademTimer=null;
+/* ---- ademhaling (box breathing 4-4-4-4, met een zachte teller) ---- */
+let ademTimer=null, telTimer=null;
 const fasen=[['Adem in','.6','1'],['Houd vast','1','1'],['Adem uit','1','.6'],['Houd vast','.6','.6']];
+function telAf(){
+  let n=4; $('#tel').textContent=n;
+  telTimer=setInterval(()=>{ n--; $('#tel').textContent = n>0 ? n : ''; if(n<=0) clearInterval(telTimer); },1000);
+}
 function stapAdem(i){
   const [tekst,van,naar]=fasen[i];
   $('#fase').textContent=tekst;
   $('#kring').style.transform='scale('+naar+')';
+  if(telTimer) clearInterval(telTimer);
+  telAf();
   ademTimer=setTimeout(()=>stapAdem((i+1)%fasen.length), 4000);
 }
 function startAdem(){ stopAdem(); $('#ademStart').textContent='Stop'; $('#kring').style.transform='scale(.6)'; setTimeout(()=>stapAdem(0),50); }
-function stopAdem(){ if(ademTimer){ clearTimeout(ademTimer); ademTimer=null; } $('#ademStart').textContent='Begin'; $('#fase').textContent='Klaar?'; $('#kring').style.transform='scale(.6)'; }
+function stopAdem(){ if(ademTimer){ clearTimeout(ademTimer); ademTimer=null; } if(telTimer){ clearInterval(telTimer); telTimer=null; } $('#ademStart').textContent='Begin'; $('#fase').textContent='Klaar?'; $('#tel').textContent=''; $('#kring').style.transform='scale(.6)'; }
 $('#ademStart').addEventListener('click', ()=> ademTimer ? stopAdem() : startAdem());
+
+/* ---- stiltemoment: een minuut niets, en dat is precies de bedoeling ----
+   Alles blijft op dit scherm; er gaat niets naar de server. */
+const OMTREK = 2*Math.PI*100;
+$('#stilLoop').style.strokeDasharray = OMTREK;
+$('#stilLoop').style.strokeDashoffset = OMTREK;
+let stilTimer=null;
+function startStil(){
+  stopStil();
+  $('#stilStart').textContent='Stop maar';
+  let sec=0;
+  $('#stilTekst').textContent='';
+  stilTimer=setInterval(()=>{
+    sec++;
+    $('#stilLoop').style.strokeDashoffset = OMTREK * (1 - sec/60);
+    if(sec>=60){
+      clearInterval(stilTimer); stilTimer=null;
+      $('#stilTekst').textContent='Dat was een minuut helemaal voor jou.';
+      $('#stilStart').textContent='Nog een minuut';
+    }
+  },1000);
+}
+function stopStil(){
+  if(stilTimer){ clearInterval(stilTimer); stilTimer=null; }
+  $('#stilLoop').style.strokeDashoffset = OMTREK;
+  $('#stilStart').textContent='Begin de minuut';
+  $('#stilTekst').textContent='Een minuut helemaal niets. Durf je?';
+}
+$('#stilStart').addEventListener('click', ()=> stilTimer ? stopStil() : startStil());
 
 /* ---- vrij tekenen ---- */
 let doodle=null;
@@ -126,6 +185,11 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

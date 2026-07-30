@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Maandbegroting</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:42rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.7rem;}
+  .rij{display:flex;gap:.6rem;align-items:center;margin-bottom:.55rem;}
+  .rij .veld{flex:1;min-width:0;}
+  .rij .bedrag{width:6.5rem;flex:0 0 auto;text-align:right;font-variant-numeric:tabular-nums;}
+  .rij .weg{background:transparent;border:1px solid var(--lijn);color:var(--zacht);border-radius:10px;
+    width:2.1rem;height:2.1rem;flex:0 0 auto;cursor:pointer;font-size:1.1rem;line-height:1;}
+  .rij .weg:hover{border-color:var(--rood);color:var(--rood);}
+  .toevoeg{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+  .toevoeg button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
+    padding:.35rem .8rem;font-size:.82rem;cursor:pointer;}
+  .toevoeg button:hover{border-color:var(--goud);color:var(--goud2);}
+  .totaal{display:flex;justify-content:space-between;border-top:1px solid var(--lijn);margin-top:.8rem;padding-top:.7rem;
+    font-variant-numeric:tabular-nums;}
+  .totaal b{font-family:var(--serif);font-weight:500;}
+  .uitkomst{font-family:var(--serif);font-size:1.5rem;text-align:center;margin:.3rem 0 .6rem;font-variant-numeric:tabular-nums;}
+  .uitkomst.plus{color:var(--groen);}
+  .uitkomst.min{color:var(--rood);}
+  .balk{height:.65rem;border-radius:999px;background:var(--paneel2);overflow:hidden;display:flex;margin:.8rem 0 .5rem;}
+  .balk span{display:block;height:100%;}
+  .legenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.8rem;color:var(--zacht);}
+  .legenda i{display:inline-block;width:.7rem;height:.7rem;border-radius:2px;margin-right:.35rem;vertical-align:middle;}
+  .advies{margin-top:1rem;line-height:1.6;color:var(--zacht);}
+  .advies li{margin-bottom:.4rem;}
+  .doelrij{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;}
+  .doelrij .veld{flex:1;min-width:8rem;}
+  .doeluit{margin-top:.8rem;line-height:1.6;}
+  .klein{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Maandbegroting</h1>
+  <div class="intro">Zet erin wat er binnenkomt en wat eruit gaat, dan zie je meteen wat je overhoudt. Alles blijft op je eigen toestel: er wordt niets verstuurd en niemand kan meekijken.</div>
+
+  <div class="kaart blok">
+    <h2>Wat komt er binnen</h2>
+    <div id="in"></div>
+    <div class="toevoeg" id="inknoppen"></div>
+    <div class="totaal"><span>Totaal binnen</span><b id="totIn">0,00</b></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Wat gaat eruit</h2>
+    <div id="uit"></div>
+    <div class="toevoeg" id="uitknoppen"></div>
+    <div class="totaal"><span>Totaal eruit</span><b id="totUit">0,00</b></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Wat houd je over</h2>
+    <div class="uitkomst" id="over" aria-live="polite">0,00</div>
+    <div class="balk" id="verdeling" aria-hidden="true"></div>
+    <div class="legenda">
+      <span><i style="background:var(--rood)"></i>vaste lasten</span>
+      <span><i style="background:var(--goud)"></i>vrij uitgeven</span>
+      <span><i style="background:var(--groen)"></i>sparen en over</span>
+    </div>
+    <ul class="advies" id="advies"></ul>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Sparen voor iets</h2>
+    <div class="doelrij">
+      <input class="veld" id="doelnaam" type="text" placeholder="waarvoor spaar je?" aria-label="Waarvoor spaar je">
+      <input class="veld bedrag" id="doelbedrag" type="number" inputmode="decimal" min="0" step="1" placeholder="0" aria-label="Bedrag in euro">
+    </div>
+    <div class="doeluit" id="doeluit"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Hoe je dit leest</h2>
+    <p class="klein">Een begroting is geen rapportcijfer. Kom je onder nul uit, dan is dat informatie, geen fout: het betekent dat er iets van de lijst af moet of dat er iets bij moet komen. Vaste lasten (abonnement, verzekering, telefoon) horen bij "eruit" en zijn het moeilijkst te veranderen; kijk daarom eerst naar de posten die je wel zelf in de hand hebt. Vuistregel die veel mensen aanhouden: probeer ongeveer een tiende van wat binnenkomt opzij te zetten voordat je de rest verdeelt. Dit is algemene uitleg, geen financieel advies.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+const SUGGESTIE_IN = ['zakgeld', 'bijbaan', 'oppassen', 'krantenwijk', 'cadeau gekregen', 'iets verkocht'];
+const SUGGESTIE_UIT = [
+  { n: 'telefoonabonnement', vast: true }, { n: 'streaming', vast: true }, { n: 'sportclub', vast: true },
+  { n: 'reiskosten', vast: true }, { n: 'uitgaan', vast: false }, { n: 'eten en drinken onderweg', vast: false },
+  { n: 'kleding', vast: false }, { n: 'games', vast: false }, { n: 'cadeaus', vast: false }, { n: 'sparen', vast: false, spaar: true }
+];
+
+let inkomsten = [{ naam: 'zakgeld', bedrag: 0 }];
+let uitgaven = [{ naam: 'telefoonabonnement', bedrag: 0, vast: true }, { naam: 'sparen', bedrag: 0, spaar: true }];
+
+const geld = n => n.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function tekenLijst(waar, lijst) {
+  const doos = $(waar === 'in' ? '#in' : '#uit');
+  doos.innerHTML = '';
+  lijst.forEach((p, i) => {
+    const rij = document.createElement('div');
+    rij.className = 'rij';
+
+    const naam = document.createElement('input');
+    naam.className = 'veld';
+    naam.type = 'text';
+    naam.value = p.naam;
+    naam.setAttribute('aria-label', 'omschrijving');
+    naam.addEventListener('input', () => { p.naam = naam.value; });
+
+    const bed = document.createElement('input');
+    bed.className = 'veld bedrag';
+    bed.type = 'number';
+    bed.inputMode = 'decimal';
+    bed.min = '0';
+    bed.step = '0.01';
+    bed.value = p.bedrag || '';
+    bed.placeholder = '0,00';
+    bed.setAttribute('aria-label', 'bedrag in euro voor ' + p.naam);
+    bed.addEventListener('input', () => { p.bedrag = Number(bed.value) || 0; reken(); });
+
+    const weg = document.createElement('button');
+    weg.type = 'button';
+    weg.className = 'weg';
+    weg.textContent = 'x';
+    weg.setAttribute('aria-label', p.naam + ' weghalen');
+    weg.addEventListener('click', () => { lijst.splice(i, 1); tekenLijst(waar, lijst); reken(); });
+
+    rij.append(naam, bed, weg);
+    doos.appendChild(rij);
+  });
+}
+
+function tekenKnoppen() {
+  const a = $('#inknoppen');
+  a.innerHTML = '';
+  for (const s of SUGGESTIE_IN) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = '+ ' + s;
+    b.addEventListener('click', () => { inkomsten.push({ naam: s, bedrag: 0 }); tekenLijst('in', inkomsten); reken(); });
+    a.appendChild(b);
+  }
+  const c = $('#uitknoppen');
+  c.innerHTML = '';
+  for (const s of SUGGESTIE_UIT) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = '+ ' + s.n;
+    b.addEventListener('click', () => {
+      uitgaven.push({ naam: s.n, bedrag: 0, vast: !!s.vast, spaar: !!s.spaar });
+      tekenLijst('uit', uitgaven); reken();
+    });
+    c.appendChild(b);
+  }
+}
+
+function reken() {
+  const totIn = inkomsten.reduce((s, p) => s + (p.bedrag || 0), 0);
+  const totUit = uitgaven.reduce((s, p) => s + (p.bedrag || 0), 0);
+  const vast = uitgaven.filter(p => p.vast).reduce((s, p) => s + (p.bedrag || 0), 0);
+  const spaar = uitgaven.filter(p => p.spaar).reduce((s, p) => s + (p.bedrag || 0), 0);
+  const vrij = totUit - vast - spaar;
+  const over = totIn - totUit;
+
+  $('#totIn').textContent = geld(totIn);
+  $('#totUit').textContent = geld(totUit);
+  const o = $('#over');
+  o.textContent = (over >= 0 ? '+ ' : '- ') + geld(Math.abs(over)) + ' euro per maand';
+  o.className = 'uitkomst ' + (over >= 0 ? 'plus' : 'min');
+
+  const bk = $('#verdeling');
+  bk.innerHTML = '';
+  const basis = Math.max(totIn, totUit, 1);
+  const delen = [
+    { w: vast / basis, k: 'var(--rood)' },
+    { w: vrij / basis, k: 'var(--goud)' },
+    { w: Math.max(0, spaar + over) / basis, k: 'var(--groen)' }
+  ];
+  for (const d of delen) {
+    if (d.w <= 0) continue;
+    const s = document.createElement('span');
+    s.style.width = (d.w * 100).toFixed(1) + '%';
+    s.style.background = d.k;
+    bk.appendChild(s);
+  }
+
+  const tips = [];
+  if (totIn === 0) tips.push('Vul eerst in wat er binnenkomt, dan wordt de rest zinvol.');
+  else if (over < 0) {
+    tips.push('Je geeft ' + geld(Math.abs(over)) + ' euro meer uit dan er binnenkomt. Kijk eerst naar de posten die geen vaste lasten zijn.');
+    const grootste = uitgaven.filter(p => !p.vast && !p.spaar).sort((a, b) => b.bedrag - a.bedrag)[0];
+    if (grootste && grootste.bedrag > 0) tips.push('Je grootste vrije post is ' + grootste.naam + ' met ' + geld(grootste.bedrag) + ' euro.');
+  } else {
+    tips.push('Je houdt ' + geld(over) + ' euro over. Dat is ruimte, geen verplichting om uit te geven.');
+    if (spaar === 0) tips.push('Er staat nog niets bij sparen. Zet eerst een bedrag opzij en verdeel daarna de rest; andersom lukt het bijna nooit.');
+    else if (spaar < totIn / 10) tips.push('Je spaart ' + Math.round(spaar / totIn * 100) + ' procent van wat binnenkomt. Veel mensen houden een tiende aan als richtlijn.');
+    else tips.push('Je zet ' + Math.round(spaar / totIn * 100) + ' procent opzij. Dat is een stevig percentage.');
+  }
+  if (vast > totIn * 0.5 && totIn > 0) tips.push('Meer dan de helft van je inkomen zit vast in abonnementen en vaste kosten. Loop ze een keer langs: wat gebruik je echt?');
+  const ul = $('#advies');
+  ul.innerHTML = '';
+  for (const t of tips) {
+    const li = document.createElement('li');
+    li.textContent = t;
+    ul.appendChild(li);
+  }
+  rekenDoel(over, spaar);
+}
+
+function rekenDoel(over, spaar) {
+  const naam = $('#doelnaam').value.trim();
+  const bedrag = Number($('#doelbedrag').value) || 0;
+  const doos = $('#doeluit');
+  if (!bedrag) { doos.textContent = 'Vul in waarvoor je spaart en hoeveel het kost, dan reken ik uit hoe lang je erover doet.'; doos.style.color = 'var(--zacht)'; return; }
+  const perMaand = Math.max(0, spaar) + Math.max(0, over);
+  if (perMaand <= 0) {
+    doos.textContent = 'Zo lang je niets overhoudt komt er niets bij. Zet eerst een bedrag bij sparen of haal iets van de uitgaven af.';
+    doos.style.color = 'var(--rood)';
+    return;
+  }
+  const maanden = Math.ceil(bedrag / perMaand);
+  const jaar = Math.floor(maanden / 12), rest = maanden % 12;
+  let duur = maanden + (maanden === 1 ? ' maand' : ' maanden');
+  if (jaar >= 1) duur += ' (' + jaar + (jaar === 1 ? ' jaar' : ' jaar') + (rest ? ' en ' + rest + (rest === 1 ? ' maand' : ' maanden') : '') + ')';
+  doos.textContent = 'Met ' + geld(perMaand) + ' euro per maand heb je ' + duur + ' nodig voor ' + (naam || 'dit doel') + '.';
+  doos.style.color = 'var(--txt)';
+}
+
+$('#doelnaam').addEventListener('input', reken);
+$('#doelbedrag').addEventListener('input', reken);
+
+tekenLijst('in', inkomsten);
+tekenLijst('uit', uitgaven);
+tekenKnoppen();
+reken();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

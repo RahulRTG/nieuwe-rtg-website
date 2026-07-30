@@ -30,6 +30,17 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   const nu = () => Date.now();
   const d = () => db.data;
 
+  // Schaduw-modus: spiegelt elke boeking naar de Rust-motor (RTG_MOTOR_SHADOW).
+  // Uit = een no-op; JS blijft altijd de baas.
+  const schaduw = require('./schaduw')();
+
+  // CUTOVER-modus (RTG_MOTOR_GELD=motor): de Rust-motor wordt het ENIGE
+  // autoritatieve grootboek. Standaard uit -> geldModus 'schaduw' = JS blijft de
+  // baas, exact als voorheen. In 'motor' loopt elke boeking eerst geguard langs
+  // de motor en past de JS-engine daarna dezelfde bevestigde regel toe (spiegel).
+  const motorklant = require('./motorklant')();
+  const geldModus = motorklant.aan ? 'motor' : 'schaduw';
+
   const MIN_CENTEN = 1;              // vanaf 1 cent (een rondje delen mag klein zijn)
   const MAX_CENTEN = 500000;         // tot 5000 euro per boeking
   const OPLAAD_MIN = 100;            // opladen vanaf 1 euro
@@ -70,18 +81,49 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     return r;
   }
 
-  /* ---------- het grootboek zelf ---------- */
+  /* ---------- het grootboek zelf ----------
+     `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek
+     (geen guard meer). Gedeeld door de JS-guard (boek, schaduw-modus) en door de
+     motor-spiegel (boekAsync, motor-modus past de door de motor bevestigde regel
+     toe). */
+  function pasToe(rij) {
+    saldi()[rij.van] = saldoVan(rij.van) - rij.centen;
+    saldi()[rij.naar] = saldoVan(rij.naar) + rij.centen;
+    grootboek().unshift(rij);
+    if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
+    save();
+  }
+  // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
+  // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
+  // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
   function boek({ van, naar, centen, soort, oms, ref }) {
+    if (geldModus === 'motor') {
+      const bron = (new Error().stack || '').split('\n')[2] || '';
+      throw new Error('pay.boek (synchroon) is niet toegestaan in RTG_MOTOR_GELD=motor; gebruik boekAsync.' + bron);
+    }
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     if (!van || !naar || van === naar) return { status: 400, error: 'Van en naar kloppen niet.' };
     if (!van.startsWith('extern:') && saldoVan(van) < c) return { status: 402, error: 'Onvoldoende saldo.' };
-    saldi()[van] = saldoVan(van) - c;
-    saldi()[naar] = saldoVan(naar) + c;
     const rij = { id: id('PB'), van, naar, centen: c, soort: soort || 'boeking', oms: schoon(oms, 120), ref: ref || null, at: nu() };
-    grootboek().unshift(rij);
-    if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
-    save();
+    pasToe(rij);
+    schaduw.spiegel(rij); // schaduw-modus: naar de Rust-motor (no-op als uit)
+    return { ok: true, boeking: rij };
+  }
+  /* De async boeking: het EEN choke-point voor de cutover. In schaduw-modus is
+     dit exact de sync-guard (gewoon awaitbaar gemaakt) -- geen gedragsverandering.
+     In motor-modus gaat de boeking geguard naar de motor (de autoriteit); pas als
+     die hem bevestigt, spiegelt de JS-engine dezelfde regel. Weigert de motor
+     (onvoldoende saldo) of is hij onbereikbaar, dan verandert er NIETS aan de
+     JS-saldi -- de fout gaat netjes terug naar de caller. */
+  async function boekAsync({ van, naar, centen, soort, oms, ref }) {
+    if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref });
+    const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
+    if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
+    // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
+    const b = r.boeking;
+    const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
+    pasToe(rij);
     return { ok: true, boeking: rij };
   }
   // de sluitcontrole: som van alle saldi is nul, en niemand staat rood
@@ -104,65 +146,31 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     } catch (e) {}
   }
 
-  /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
-  async function laadOp({ codenaam, centen, idem, oms }) {
-    const c = Math.round(Number(centen));
-    if (!Number.isFinite(c) || c < OPLAAD_MIN || c > MAX_CENTEN) return { status: 400, error: 'Opladen kan van 1 tot 5000 euro.' };
-    return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, async () => {
-      let betaling;
-      try {
-        betaling = await betaal.maakBetaling({
-          bedrag: c, referentie: 'pay-oplaad-' + codenaam + '-' + nu(),
-          idempotentieSleutel: idem ? 'pay-oplaad:' + codenaam + ':' + idem : undefined,
-          omschrijving: oms || 'RTG Pay opladen'
-        });
-      } catch (e) { return { status: 502, error: 'De betaling lukte niet: ' + e.message }; }
-      if (betaling.status !== 'betaald' && betaling.status !== 'succeeded') {
-        // bij een echte aanbieder rondt de klant het af (Apple Pay-sheet); de
-        // webhook crediteert daarna. In de demo is hij altijd meteen betaald.
-        return { status: 402, error: 'De betaling wacht op bevestiging.', betaalStatus: betaling.status };
-      }
-      const b = boek({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref: betaling.id });
-      if (b.error) return b;
-      return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c };
-    });
-  }
-  /* De eigen bank als eerste dekking: is de RTG Bank live en heeft het lid
-     daar een betaalrekening met ruimte, dan komt een saldotekort DAAR vandaan
-     (eigen rails) in plaats van via de kaart-naad. De koppeling komt na het
-     opstarten binnen (de bank bouwt op pay, dus late binding). */
-  let bankDekking = null;
-  function koppelBank(dekking) { bankDekking = typeof dekking === 'function' ? dekking : null; }
-
-  /* Het hart van "EEN knop": is er te weinig saldo, dan laadt de wallet zelf
-     bij en betaalt door. Eerst via de eigen bank (exact het tekort), anders
-     via de kaart-naad (afgerond op tientjes). Het lid merkt er niets van
-     behalve een regel "bijgeladen" in het overzicht. */
-  async function zorgSaldo({ codenaam, centen, idem }) {
-    const tekort = Math.round(centen) - saldoVan(rekLid(codenaam));
-    if (tekort <= 0) return { ok: true, bijgeladen: 0 };
-    if (bankDekking) {
-      try { const b = bankDekking({ codenaam, centen: tekort }); if (b && b.ok) return { ok: true, bijgeladen: tekort, via: 'bank' }; }
-      catch (e) { /* de bank kon niet dekken: gewoon door naar de kaart */ }
-    }
-    const stap = Math.ceil(tekort / AUTOLAAD_STAP) * AUTOLAAD_STAP;
-    const r = await laadOp({ codenaam, centen: stap, idem: idem ? idem + ':autolaad' : null, oms: 'Automatisch bijgeladen' });
-    if (r.error) return r;
-    return { ok: true, bijgeladen: stap, via: 'kaart' };
-  }
-  async function bestaatLid(codenaam) {
-    try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
-  }
+  /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
+     in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
+     raakt de boekingsregels zelf niet aan. */
+  const { laadOp, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
+    betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
+    motorklant, geldModus, keyVanCodenaam,
+    OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
+  });
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
     db, save, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, kascodes, tikcodes,
-    rekLid, rekPartner, saldoVan, id, metIdem, boek, zorgSaldo, seintje, bestaatLid,
+    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0),
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, saldoVan, koppelBank };
+  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, saldoVan, koppelBank, reconcileVanMotor };
+  // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
+  // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
+  // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk
+  // wordt alleen hier berekend (statusbord-poll), niet in het warme geld-pad.
+  // `aan` is false als RTG_MOTOR_SHADOW niet is gezet.
+  const { vingerafdruk } = require('./vingerafdruk');
+  api.schaduw = { aan: schaduw.aan, stand: () => schaduw.stand(sluitcontrole().som, vingerafdruk(saldi())) };
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
   return { pay: api };

@@ -30,7 +30,7 @@ app.post('/api/supplier/apply', (req, res) => {
   list.unshift(entry);
   db.data.applications[s.code] = list.slice(0, 100);
   save();
-  notifySupplier(s.code, { icon: '📝', title: 'Nieuwe sollicitatie', body: name + ' solliciteert als ' + func + '.' });
+  notifySupplier(s.code, { icon: 'werk', title: 'Nieuwe sollicitatie', body: name + ' solliciteert als ' + func + '.' });
   sseToSupplier(s.code, 'sync', { scope: 'team' });
   sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
@@ -65,7 +65,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     notifyApplicant(a, req.supplier);
     // krijgt de sollicitant meldingen in de app, dan sturen we de kassacode direct mee
     if (a.key && db.data.notifications[a.key])
-      notify(a.key, { icon: '🎉', title: 'Aangenomen bij ' + req.supplier.name, body: 'Meld u aan in de leverancier-app met bedrijfsnaam "' + req.supplier.name + '" en kassacode ' + inv.kassacode + '.' });
+      notify(a.key, { icon: 'ster', title: 'Aangenomen bij ' + req.supplier.name, body: 'Meld u aan in de leverancier-app met bedrijfsnaam "' + req.supplier.name + '" en kassacode ' + inv.kassacode + '.' });
     return res.json({ ok: true, invite: { kassacode: inv.kassacode, naam: a.name, func: a.func }, bedrijf: req.supplier.name });
   }
   a.status = 'afgewezen';
@@ -91,7 +91,7 @@ app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
   // de sollicitant krijgt een seintje
   const app = (db.data.applications[req.supplier.code] || []).find(x => x.id === chat.id);
   if (app && app.key && db.data.notifications[app.key])
-    notify(app.key, { icon: '💬', title: 'Bericht van ' + chat.bedrijf, body: m.tekst.slice(0, 80) });
+    notify(app.key, { icon: 'berichten', title: 'Bericht van ' + chat.bedrijf, body: m.tekst.slice(0, 80) });
   applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 

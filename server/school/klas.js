@@ -1,6 +1,7 @@
 /* School (deelmodule): de klasweergave voor de leraar: koppelen, rooster, huiswerk, cijfers, mededelingen en absenties afhandelen.
    Krijgt de gedeelde schoolcontext een keer bij het opstarten vanuit
    server/school.js. */
+const { DOELEN } = require('../kern/leerstof');
 module.exports = (sctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
@@ -16,8 +17,11 @@ module.exports = (sctx) => {
     const alle = k.cijfers || [];
     res.json({
       code: k.code, naam: k.naam, leraar: k.leraar, school: k.school, leraarAccount: !!k.leraarId,
+      // het lerarenteam (max drie vast), de waarnemer en de online les
+      leraren: k.leraren || (k.leraarId ? [{ id: k.leraarId, naam: k.leraar }] : []),
+      waarnemer: k.waarnemer || null, onlineLes: k.onlineLes || null,
       // per leerling het gewogen gemiddelde: de leraar ziet in een oogopslag wie aandacht nodig heeft
-      leerlingen: (k.leerlingen || []).map(l => ({ sleutel: l.sleutel, naam: l.naam, at: l.at,
+      leerlingen: (k.leerlingen || []).map(l => ({ sleutel: l.sleutel, naam: l.naam, at: l.at, taal: l.taal || null,
         gemiddelde: gemiddelde(alle.filter(c => c.leerling === l.sleutel)) })),
       klasGemiddelde: gemiddelde(alle),
       rooster: k.rooster,
@@ -95,8 +99,11 @@ module.exports = (sctx) => {
     const k = klasVan(req, res); if (!k) return;
     const titel = schoon(req.body.titel, 80);
     if (!titel) return res.status(400).json({ error: 'Geef het huiswerk een titel.' });
+    // optioneel: een leerdoel uit de leerlijn; dan kan het kind het rechtstreeks oefenen
+    const doel = String(req.body.doel == null ? '' : req.body.doel).trim();
+    if (doel && !eigenVeld(DOELEN, doel)) return res.status(400).json({ error: 'Dit leerdoel staat niet in de leerlijn.' });
     const h = { id: rid(4), titel, vak: schoon(req.body.vak, 40), omschrijving: schoon(req.body.omschrijving, 500),
-      deadline: schoon(req.body.deadline, 10), at: nu(), afDoor: [] };
+      deadline: schoon(req.body.deadline, 10), doel: doel || null, at: nu(), afDoor: [] };
     k.huiswerk.unshift(h); k.huiswerk = k.huiswerk.slice(0, 200);
     save();
     res.json({ ok: true, huiswerk: h });

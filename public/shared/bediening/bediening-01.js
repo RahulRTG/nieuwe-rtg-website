@@ -1,0 +1,54 @@
+/* HET BEDIENINGSPANEEL -- één plek voor de instellingen van dit scherm.
+
+   Er dreven zes losse knopjes over elk scherm. Linksonder vier, waarvan drie
+   boven op elkaar: de bewegingspil ("Rustig"), de themakiezer, de taalknop en
+   het vraagteken van de app-gids. Rechtsboven nog twee: beeld draaien en
+   volledig scherm. Ze horen bij elkaar, dus staan ze nu bij elkaar: in één
+   paneel, achter één ingang. Het leden-OS had dit al -- daar zit alles in het
+   bedieningspaneel -- en dit is datzelfde idee voor elk ander scherm.
+
+   Er is geen knop om hem te openen: je haalt hem van de bovenrand omlaag,
+   zoals een besturingssysteem dat doet (shared/randen.js). Op het leden-OS
+   bouwt deze module niets -- daar bestaat het bedieningspaneel al, en de
+   bovenrand opent dat.
+
+   Elke rij verschijnt alleen als de bijbehorende laag echt geladen is. */
+(function (w, d) {
+  'use strict';
+  if (w.RTGBediening) return;
+
+  var T = function (k, nl) { return (w.RTGi18n && w.RTGi18n.t) ? w.RTGi18n.t(k, nl) : nl; };
+  function stijl() {
+    if (d.getElementById('bdnCss')) return;
+    var s = d.createElement('style'); s.id = 'bdnCss';
+    s.textContent =
+      '.bdn-scrim{position:fixed;inset:0;z-index:9995;display:none;align-items:flex-end;justify-content:center;' +
+        'background:rgba(6,5,5,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}' +
+      '.bdn-scrim.open{display:flex;}' +
+      '.bdn-blad{width:min(430px,100%);max-height:86vh;overflow-y:auto;' +
+        'background:linear-gradient(180deg,#151312,#0C0C0B);color:#F4F1EC;' +
+        'border:1px solid var(--line,rgba(255,255,255,.14));border-bottom:none;' +
+        'border-radius:20px 20px 0 0;padding:1rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.1rem);' +
+        'font-family:Inter,system-ui,sans-serif;box-shadow:0 -18px 50px rgba(0,0,0,.5);}' +
+      '@media (min-width:640px){.bdn-scrim{align-items:center;}' +
+        '.bdn-blad{border-radius:20px;border-bottom:1px solid var(--line,rgba(255,255,255,.14));}}' +
+      '.bdn-kop{display:flex;align-items:center;justify-content:space-between;margin-bottom:.2rem;}' +
+      '.bdn-kop b{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.18rem;letter-spacing:-.01em;}' +
+      '.bdn-x{background:none;border:none;color:#8A8680;font-size:1rem;cursor:pointer;padding:.3rem .1rem;}' +
+      '.bdn-x:hover{color:#F4F1EC;}' +
+      '.bdn-uit{color:#8A8680;font-size:.73rem;line-height:1.5;margin:0 0 .7rem;}' +
+      '.bdn-rij{display:flex;align-items:center;justify-content:space-between;gap:.8rem;' +
+        'padding:.72rem 0;border-top:1px solid var(--line,rgba(255,255,255,.1));}' +
+      '.bdn-rij > span{font-size:.86rem;}' +
+      '.bdn-rij small{display:block;color:#8A8680;font-size:.7rem;line-height:1.45;margin-top:.12rem;}' +
+      '.bdn-do{flex:0 0 auto;display:flex;gap:.35rem;align-items:center;}' +
+      '.bdn-do button{background:rgba(255,255,255,.05);border:1px solid var(--line,rgba(255,255,255,.14));' +
+        'color:#F4F1EC;border-radius:999px;padding:.4rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;}' +
+      '.bdn-do button:hover,.bdn-do button.actief{border-color:var(--gold,#A98F1C);}' +
+      '.bdn-do button.actief{color:var(--gold,#A98F1C);}' +
+      '.bdn-stip{width:22px;height:22px;border-radius:999px;padding:0;border:2px solid transparent;}' +
+      '@media print{.bdn-scrim{display:none !important;}}';
+    (d.head || d.documentElement).appendChild(s);
+  }
+
+  // deel 2 zet de rijen, het paneel en de ingang; zie bediening-02.js

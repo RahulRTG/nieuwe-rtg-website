@@ -5,7 +5,7 @@ module.exports = (sctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
   const { gemiddelde } = sctx;
-  router.post('/school/mijn', (req, res) => {
+  router.post('/school/mijn', async (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
     // een ouder ziet alle gekoppelde kinderen; een kind alleen zichzelf
     const mijnIds = s.beheerder ? Object.keys(s.g.profielen) : [s.p.id];
@@ -15,12 +15,21 @@ module.exports = (sctx) => {
       for (const l of (k.leerlingen || [])) {
         if (l.gezinCode !== s.g.code || !mijnIds.includes(l.profielId)) continue;
         uit.push({
+          // de thuistaal van deze klasgenoot + de tweetalige laag (NL blijft staan)
+          taal: l.taal || null,
+          vertaling: l.taal && sctx.tweetalig ? await sctx.tweetalig(k, l) : undefined,
           klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school },
           kind: { profielId: l.profielId, naam: l.naam, sleutel: l.sleutel },
+          // thuiswerken: staat de online les aan, dan reist de kamercode mee
+          onlineLes: k.onlineLes || null,
           vandaag: (k.rooster || []).filter(r => r.dag === DAG),
           rooster: k.rooster,
           huiswerk: (k.huiswerk || []).map(h => ({ id: h.id, titel: h.titel, vak: h.vak, omschrijving: h.omschrijving,
-            deadline: h.deadline, at: h.at, af: (h.afDoor || []).includes(l.sleutel) })),
+            deadline: h.deadline, doel: h.doel || null, at: h.at, af: (h.afDoor || []).includes(l.sleutel) })),
+          // golf 4, leercurve-sync: aankomende toetsen reizen mee naar de gezins- en leerapps
+          aankomendeToetsen: (k.toetsen || []).filter(t => t.status === 'open' && !(t.werk[l.sleutel] && t.werk[l.sleutel].klaar))
+            .map(t => ({ id: t.id, naam: t.naam, soort: t.soort, vak: t.vak,
+              doelen: t.doelen, bezig: !!t.werk[l.sleutel] })),
           cijfers: (k.cijfers || []).filter(c => c.leerling === l.sleutel)
             .map(c => ({ id: c.id, vak: c.vak, cijfer: c.cijfer, weging: c.weging, omschrijving: c.omschrijving, at: c.at })),
           mededelingen: k.mededelingen || [],

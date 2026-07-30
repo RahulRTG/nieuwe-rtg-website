@@ -8,6 +8,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
   :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
     --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#C23A5E;}
@@ -53,9 +54,9 @@
 <a class="skip" href="#inhoud" style="position:absolute;left:-999px;">Naar de inhoud</a>
 <header class="kop">
   <a href="/apps/index.html" aria-label="Terug naar de hub">←</a>
-  <h1 id="titel">🚨 RTG Meldkamer</h1>
+  <h1 id="titel">RTG Meldkamer</h1>
   <div class="rek"></div>
-  <button class="knop" id="noodKnop" type="button" hidden style="border-color:var(--rood);color:var(--rood);">🚨 Nood</button>
+  <button class="knop" id="noodKnop" type="button" hidden style="border-color:var(--rood);color:var(--rood);">Nood</button>
   <span class="stil" id="wie"></span>
 </header>
 <main id="inhoud">
@@ -189,12 +190,12 @@
       <div class="kpis" id="rampKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(6.5rem,1fr));gap:0.5rem;margin:0.6rem 0;"></div>
       <div id="rampDetail"></div>
       <div class="rij" style="margin-top:0.7rem;">
-        <button class="knop klein" id="coordKnop" type="button">🧭 Vraag de coordinator om voorstellen</button>
+        <button class="knop klein" id="coordKnop" type="button">Vraag de coordinator om voorstellen</button>
       </div>
       <div class="stil" id="coordUit" style="font-size:0.83rem;line-height:1.55;margin-top:0.5rem;white-space:pre-wrap;"></div>
       <p class="stil" style="font-size:0.7rem;margin-top:0.4rem;">De coordinator adviseert; u beslist en wijst de eenheid zelf toe.</p>
       <div class="rij" style="margin-top:0.5rem;">
-        <button class="knop klein" id="rapportKnop" type="button">📋 Naoefening-rapport</button>
+        <button class="knop klein" id="rapportKnop" type="button">Naoefening-rapport</button>
       </div>
       <div id="rapportUit" style="font-size:0.82rem;line-height:1.55;margin-top:0.5rem;"></div>
     </div>
@@ -240,6 +241,9 @@
 <script src="/apps/meldkamer.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

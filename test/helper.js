@@ -82,7 +82,10 @@ async function startEens(opts) {
   // geladen is (belangrijk in Postgres-modus), en een test die meteen na
   // "gezond" een API aanroept zou daarop stranden.
   const wachtPad = opts.wachtPad || '/api/ready';
-  const pogingen = opts.pogingen || 150;
+  // 250 x 100ms = 25s: als de hele suite parallel draait boot een server soms
+  // ruim boven de 15s die hier eerst stond (twee keer zo gezien in een verder
+  // groene run); dit is alleen geduld op het foutpad, een snelle boot blijft snel
+  const pogingen = opts.pogingen || 250;
   const port = await vrijePoort();
   const base = 'http://127.0.0.1:' + port;
   // Zonder eigen stderr-optie vangen we de stderr op (pipe) om de strenge poort te
@@ -123,6 +126,49 @@ async function startEens(opts) {
 
 function stop(child) { if (child) try { child.kill('SIGKILL'); } catch (e) {} }
 
-module.exports = { vrijePoort, startServer, stop,
+/* Een lid optillen naar Lifestyle/Business langs de ENIGE geldige weg: zelf
+   registreren geeft altijd hooguit RTG, dus dienen we met het ledentoken een
+   aanvraag in (dat koppelt het account) en laten RTG-personeel die accepteren.
+   `approverToken` is een office- of eigenaars-token (beide komen door officeAuth).
+   Handig voor tests die een echt Business/Lifestyle-lid nodig hebben. */
+async function elevateTier(base, memberToken, pas, approverToken) {
+  const post = (pad, body, tok) => fetch(base + pad, {
+    method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    body: JSON.stringify(body || {}) }).then(r => r.json());
+  const aanvraag = await post('/api/aanmelding/aanvraag', { pas, naam: 'Test ' + pas, contact: pas + '@test.example' }, memberToken);
+  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+  if (!id) throw new Error('elevateTier: aanvraag mislukt (' + JSON.stringify(aanvraag).slice(0, 120) + ')');
+  const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, approverToken);
+  if (!besluit.aanmelding || besluit.aanmelding.status !== 'geaccepteerd')
+    throw new Error('elevateTier: beslis mislukt (' + JSON.stringify(besluit).slice(0, 120) + ')');
+  return besluit;
+}
+
+/* Paginafouten verzamelen, zonder de ruis van de browser zelf.
+
+   De site zet zachte overgangen tussen pagina's aan met @view-transition in
+   shared/rtg-uniform.css. Die overgang maakt de BROWSER; wij krijgen hem pas
+   te zien in het pagereveal-event, en dat vuurt voordat ons eerste script
+   draait. Slaat de browser zo'n overgang over -- een tweede navigatie er
+   meteen achteraan, of een tabblad dat niet zichtbaar is -- dan verwerpt de
+   ready-promise van die overgang met "Transition was skipped". Niemand van
+   ons heeft die promise gemaakt, dus niemand kan hem opvangen, en Playwright
+   meldt hem als paginafout.
+
+   Het is geen fout. De navigatie is gewoon gebeurd; alleen de animatie viel
+   weg. Het is bovendien een race: welke test erop struikelt verschilt per
+   run. Hem meetellen als "JS-fout op de pagina" maakt de tests onbetrouwbaar
+   zonder ook maar iets te bewaken. Alles wat WEL uit onze code komt telt
+   onverkort mee -- dit filter noemt precies een bericht, geen patroon. */
+const BROWSERRUIS = ['Transition was skipped'];
+function letOpFouten(page, bak) {
+  page.on('pageerror', (e) => {
+    const bericht = String((e && e.message) || e);
+    if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);
+  });
+  return bak;
+}
+
+module.exports = { vrijePoort, startServer, stop, elevateTier, letOpFouten,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

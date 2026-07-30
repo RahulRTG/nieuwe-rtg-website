@@ -1,4 +1,4 @@
-/* De RTG-kantoren en de boardroom: eenentwintig afdelingskamers met echte cijfers,
+/* De RTG-kantoren en de boardroom: drieentwintig afdelingskamers met echte cijfers,
    taken per kamer, en de boardroom die alles ziet, elke platformfunctie kan
    schakelen (globaal en per doelgroep, en het werkt echt: het pad gaat dicht)
    en een verbeterkamer bijhoudt. Draai los:
@@ -33,13 +33,13 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('eenentwintig kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
+test('drieentwintig kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
   const dicht = await fetch(base + '/api/office/kamers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401);
   const d = await api('kamers');
   assert.equal(d.status, 200);
-  assert.equal(d.body.kamers.length, 21, 'eenentwintig afdelingen');
-  for (const id of ['sales', 'marketing', 'pr', 'hr', 'financien', 'inkoop', 'verkoop', 'juridisch', 'creatief', 'intern', 'onderzoek', 'klantenservice', 'atelier', 'studio', 'hardware', 'architect']) {
+  assert.equal(d.body.kamers.length, 23, 'drieentwintig afdelingen');
+  for (const id of ['sales', 'marketing', 'pr', 'hr', 'financien', 'inkoop', 'verkoop', 'juridisch', 'creatief', 'intern', 'onderzoek', 'klantenservice', 'atelier', 'studio', 'hardware', 'architect', 'regering', 'opvang']) {
     assert.ok(d.body.kamers.some(k => k.id === id), id + ' heeft een kamer');
   }
   const hr = await api('kamer', { id: 'hr' });
@@ -63,7 +63,7 @@ test('taken per kamer: maken, afvinken en terugzien in het grid', async () => {
 test('de boardroom ziet alles en schakelt echt: functie uit, pad dicht, weer aan', async () => {
   const b = await api('boardroom');
   assert.equal(b.status, 200);
-  assert.equal(b.body.kamers.length, 21, 'alle kamers in beeld');
+  assert.equal(b.body.kamers.length, 23, 'alle kamers in beeld');
   assert.ok(b.body.functies.length >= 5, 'het volledige schakelbord staat erop');
   assert.ok(b.body.verbeterkamer.voorstellen.length >= 1, 'de verbeterkamer heeft een dagronde');
   // pak een echte functie van het bord en zet hem uit
@@ -156,4 +156,37 @@ test('de verbeterkamer loopt op verzoek een verse ronde', async () => {
   assert.equal(v.status, 200);
   assert.ok(v.body.verbeterkamer.voorstellen.length >= 1);
   assert.ok(v.body.verbeterkamer.voorstellen.every(p => p.kamer && p.tekst), 'elk voorstel wijst een kamer aan');
+});
+
+test('Techniek-controlekamer: de motorkap-momentopname (grootboek, motor, De Wacht)', async () => {
+  const dicht = await fetch(base + '/api/office/techniek', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(dicht.status, 401, 'zonder inlog blijft de controlekamer dicht');
+  const t = await api('techniek');
+  assert.equal(t.status, 200);
+  assert.ok(t.body.grootboek && t.body.grootboek.pay, 'het pay-grootboek zit in het bord');
+  assert.equal(t.body.grootboek.pay.klopt, true, 'RTG Pay sluit op de cent');
+  assert.ok(t.body.motor, 'de motor-stand zit erin');
+  assert.equal(t.body.motor.aan, false, 'in schaduw draait de motor niet mee');
+  assert.ok(t.body.wacht && t.body.wacht.meters, 'het De Wacht-immuunbord zit erin');
+  assert.ok('lastafworp' in t.body.wacht, 'de lastafworp-stand (voor de gezondheidsband) is aanwezig');
+});
+
+test('Rahul denkt mee in een kamer: adviserend, uit de echte cijfers (zonder AI-sleutel)', async () => {
+  const dicht = await fetch(base + '/api/office/kamer/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'hr' }) });
+  assert.equal(dicht.status, 401, 'zonder inlog blijft de kamer-AI dicht');
+  const r = await api('kamer/ai', { id: 'hr', q: 'Waar liggen de risico\'s?' });
+  assert.equal(r.status, 200);
+  assert.match(r.body.kamer, /HR|Human|Mensen|Personeel/i);
+  assert.ok(typeof r.body.antwoord === 'string' && r.body.antwoord.length > 0, 'er komt een advies terug');
+  assert.ok(Array.isArray(r.body.punten) && r.body.punten.length >= 1, 'de punten uit de cijfers zitten erbij');
+  assert.equal((await api('kamer/ai', { id: 'kelder' })).status, 404, 'een niet-bestaande kamer geeft 404');
+});
+
+test('Rahul kijkt over het hele huis: overkoepelend boardroom-advies (zonder AI-sleutel)', async () => {
+  const dicht = await fetch(base + '/api/office/boardroom/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(dicht.status, 401, 'zonder inlog blijft de boardroom-AI dicht');
+  const r = await api('boardroom/ai', { q: 'Welke kamer voelt de meeste druk?' });
+  assert.equal(r.status, 200);
+  assert.ok(typeof r.body.antwoord === 'string' && r.body.antwoord.length > 0, 'er komt een overkoepelend advies terug');
+  assert.ok(Array.isArray(r.body.punten) && r.body.punten.length >= 1, 'de punten uit de dagronde zitten erbij');
 });

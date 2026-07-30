@@ -1,134 +1,66 @@
-        if (v.inkomend) return '<div class="task"><span class="ic">📥</span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span style="font-size:0.7rem;color:var(--soft);">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';
-        return '<div class="task"><span class="ic">📤</span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.wait','wacht op akkoord')+'</span></div></div>';
-      }).join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.none','Nog geen verbindingen.')+'</div>')+
-      (me.role==='manager' ? '<div class="compose" style="margin-top:0.5rem;"><input id="netCode" placeholder="'+T('pd.net.code','Bedrijfscode')+'" style="text-transform:uppercase;"><button id="netAdd">'+T('pd.net.connect','Verbind')+'</button></div>' : '')+
-      '<div id="netChat"></div></div>';
-    const send = async () => {
-      const inp = $('#tmMsg'); const text = (inp.value||'').trim(); if (!text) return;
-      inp.value = '';
-      try { await API.call('/supplier/team/message', { text }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
-    };
-    $('#tmSend').addEventListener('click', send);
-    $('#tmMsg').addEventListener('keydown', e => { if (e.key==='Enter') send(); });
-    const tc = document.getElementById('teamCall'); if (tc) tc.addEventListener('click', () => window.TeamCall && TeamCall.groep());
-    const ba = document.getElementById('buzzAll'); if (ba) ba.addEventListener('click', async () => {
-      try { const d = await API.call('/supplier/team/buzz', { all: true }); toast('📢 '+T('pd.allbuzzed','Hele team opgeroepen')+' ('+d.reached+').'); }
-      catch(e){ toast(e.message); }
-    });
-    document.querySelectorAll('[data-belm]').forEach(b => b.addEventListener('click', () => window.TeamCall && TeamCall.bel(parseInt(b.dataset.belm, 10), b.dataset.naam)));
-    document.querySelectorAll('[data-dmm]').forEach(b => b.addEventListener('click', () => window.CollegaChat && CollegaChat.open(parseInt(b.dataset.dmm, 10), b.dataset.naam)));
-    if (window.CollegaChat) CollegaChat.badges();
-    document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
-      try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
-        toast(d.reached ? '📳 '+d.name+' '+T('pd.buzzed','wordt opgeroepen.') : d.name+' '+T('pd.buzzoff','heeft de app nu niet open.')); }
-      catch(e){ toast(e.message); }
-    }));
-    // personeelsnetwerk: verbinden, goedkeuren en chatten in de aparte ruimte
-    const na = document.getElementById('netAdd');
-    if (na) na.addEventListener('click', async () => {
-      const c = (document.getElementById('netCode').value||'').trim().toUpperCase(); if (!c) return;
-      try { const d = await API.call('/supplier/net/verzoek', { code:c }); toast(d.status==='akkoord'?T('pd.net.linked','Verbonden.'):T('pd.net.sent','Verzoek verstuurd.')); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
-    });
-    document.querySelectorAll('[data-netja]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/net/beslis', { code:b.dataset.netja, actie:'akkoord' }); toast(T('pd.net.linked','Verbonden.')); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
-    }));
-    document.querySelectorAll('[data-netopen]').forEach(b => b.addEventListener('click', async () => {
-      netOpen = b.dataset.netopen;
-      try { netBerichten = (await API.call('/supplier/net/gesprek', { code:netOpen })).berichten || []; } catch(e){ netBerichten = []; }
-      renderNetChat();
-    }));
-    renderNetChat();
-  }
-  let netOpen = null, netBerichten = [];
-  function renderNetChat(){
-    const box = document.getElementById('netChat'); if (!box) return;
-    if (!netOpen){ box.innerHTML = ''; return; }
-    const naam = (netwerk.find(v => v.code === netOpen) || {}).naam || netOpen;
-    box.innerHTML = '<div class="k" style="margin-top:0.7rem;">'+esc(naam)+'</div><div class="chat">'+
-      (netBerichten.length ? netBerichten.map(m => '<div class="msg '+(m.code===code?'me':'other')+'"><span class="who">'+esc(m.naam+' · '+m.door)+'</span>'+esc(m.tekst)+'</div>').join('')
-        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.nomsg','Nog geen berichten.')+'</div>')+
-      '</div><div class="compose"><input id="netMsg" placeholder="'+T('pd.net.msgph','Bericht')+'"><button id="netSend">'+T('pd.send','Stuur')+'</button></div>';
-    const doSend = async () => {
-      const i = document.getElementById('netMsg'); const t = (i.value||'').trim(); if (!t) return; i.value = '';
-      try { await API.call('/supplier/net/bericht', { code:netOpen, tekst:t }); netBerichten = (await API.call('/supplier/net/gesprek', { code:netOpen })).berichten || []; renderNetChat(); } catch(e){ toast(e.message); }
-    };
-    document.getElementById('netSend').addEventListener('click', doSend);
-    document.getElementById('netMsg').addEventListener('keydown', e => { if (e.key==='Enter') doSend(); });
+    if (perc.length) html += '<div class="card"><div class="k">'+T('pd.boer.perc','Percelen')+'</div>'+
+      perc.map(p => '<div class="task"><span class="ic">'+(p.fase==='te-oogsten'?'':'')+'</span><div class="t"><b>'+esc(p.naam)+' · '+esc(p.gewasLabel)+'</b><span>'+(p.fase==='te-oogsten'?T('pd.boer.oogstklaar','oogstklaar'):(p.restDagen+' '+T('pd.boer.dgn','dagen tot oogst')))+'</span></div>'+
+        (p.fase==='te-oogsten' ? '<button class="abtn" data-boogst="'+p.id+'">'+T('pd.boer.oogsten','Oogst')+'</button>' : '<button class="abtn" data-bwater="'+p.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);"></button>')+'</div>').join('')+'</div>';
+    // Dieren: voeren
+    const dr = (o.dieren||[]);
+    if (dr.length) html += '<div class="card"><div class="k">'+T('pd.boer.dieren','Dieren voeren')+'</div>'+
+      dr.map(d => { const gevoerd = d.laatsteVoer && d.laatsteVoer.slice(0,10)===vandaag;
+        return '<div class="task"><span class="ic">'+(d.soort==='melkkoe'?'':d.soort==='legkip'?'':d.soort==='varken'?'':d.soort==='geit'?'':'')+'</span><div class="t"><b>'+esc(d.soortLabel)+' × '+d.aantal+'</b><span>'+(d.stal?esc(d.stal)+' · ':'')+d.voerKgPerDag+' kg '+T('pd.boer.voer','voer')+(gevoerd?' · ✓ '+T('pd.boer.gevoerd','gevoerd'):'')+'</span></div>'+
+        (gevoerd?'<span style="color:#7EE0A3;font-size:1.1rem;">✓</span>':'<button class="abtn" data-bvoer="'+d.id+'">'+T('pd.boer.voeren','Voeren')+'</button>')+'</div>'; }).join('')+'</div>';
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-btaak]').forEach(b => b.addEventListener('click', async () => { try { boerPdaToe(await API.call('/supplier/boerderij/taak/klaar', { id: b.dataset.btaak })); toast(T('pd.boer.klaarok','Taak afgerond.')); } catch(e){ toast(e.message); } }));
+    wrap.querySelectorAll('[data-boogst]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/oogst', { id: b.dataset.boogst }); toast(T('pd.boer.oogstok','Geoogst: ')+r.opbrengst+' '+r.eenheid); boerPdaToe(r); } catch(e){ toast(e.message); } }));
+    wrap.querySelectorAll('[data-bwater]').forEach(b => b.addEventListener('click', async () => { try { boerPdaToe(await API.call('/supplier/boerderij/water', { id: b.dataset.bwater })); toast(T('pd.boer.waterok','Beregend.')); } catch(e){ toast(e.message); } }));
+    wrap.querySelectorAll('[data-bvoer]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/voer', { id: b.dataset.bvoer }); toast(T('pd.boer.voerok','Gevoerd.')); boerPdaToe(r); } catch(e){ toast(e.message); } }));
   }
 
-  // opgeroepen worden: trilscherm
-  function showBuzz(from){
-    if (navigator.vibrate) navigator.vibrate([300,120,300,120,600]);
-    let el = document.getElementById('buzzOverlay');
-    if (!el){
-      el = document.createElement('div');
-      el.id = 'buzzOverlay';
-      document.getElementById('shell').appendChild(el);
-      el.addEventListener('click', () => el.classList.remove('on'));
-    }
-    el.innerHTML = '<div class="bz"><div class="bz-ic">📳</div><b>'+esc(from)+'</b><span>'+T('pd.buzzcalls','roept u op')+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
-    el.classList.add('on');
-    setTimeout(() => el.classList.remove('on'), 8000);
+  const heeftEntree = () => !!(state && state.supplier && (state.supplier.caps || []).includes('tickets'));
+  async function laadEntree(){
+    if (!heeftEntree()) return;
+    try { pdProgramma = await API.call('/supplier/programma', {}); } catch(e){ pdProgramma = { datum: '', slots: [] }; }
+    renderEntree();
   }
-
-  function showAlarm(d){
-    if (navigator.vibrate) navigator.vibrate([500,150,500,150,800]);
-    let el = document.getElementById('alarmOverlay');
-    if (!el){
-      el = document.createElement('div');
-      el.id = 'alarmOverlay';
-      document.getElementById('shell').appendChild(el);
-      el.addEventListener('click', () => el.classList.remove('on'));
-    }
-    const locTxt = d.loc ? (d.label ? d.label + ' · ' : '') + d.loc.lat.toFixed(4) + ', ' + d.loc.lng.toFixed(4) : T('pd.noloc','locatie onbekend');
-    el.innerHTML = '<div class="bz"><div class="bz-ic">🚨</div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('pd.needs','heeft direct assistentie nodig'))+'</span>'+
-      '<span style="margin-top:0.6rem;font-size:0.8rem;">📍 '+esc(locTxt)+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
-    el.classList.add('on');
-  }
-
-  // SOS en EHBO-alarm: locatie meesturen als die er is, direct het hele bedrijf
-  // alarmeren. Een noodknop mag nooit blijven hangen: als de locatievraag niet
-  // (op tijd) beantwoord wordt, gaat het alarm zonder locatie de deur uit.
-  async function sendSOS(note, melding){
-    let klaar = false;
-    const fire = async (lat, lng) => {
-      if (klaar) return;
-      klaar = true;
-      try { await API.call('/supplier/security', { lat, lng, note: note || '' }); toast(melding || ('🚨 '+T('pd.sossent','Noodoproep verstuurd. Het team en RTG zijn gealarmeerd.'))); }
-      catch(e){ toast(e.message); }
-    };
-    if (navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        pos => fire(pos.coords.latitude, pos.coords.longitude),
-        () => fire(undefined, undefined),
-        { timeout: 2500 }
-      );
-      setTimeout(() => fire(undefined, undefined), 3200);
-    } else fire(undefined, undefined);
-  }
-
-  /* ---------- de zorgbalie: de behandelaar-agenda (spa of kliniek) ----------
-     Alleen zaken die als zorgaanbieder gekoppeld zijn (bijv. Zenith, Clara)
-     krijgen deze tab; de agenda toont per behandelaar wie er komt, met de
-     zorgcontext (allergenen, intake) die het lid met toestemming deelt. */
-  let zbData = null, zbDatum = null;
-  async function laadZorgbalie(){
-    if (!API.token) return;
-    try { zbData = await API.call('/supplier/care/agenda', zbDatum ? { datum: zbDatum } : {}); }
-    catch(e){ zbData = null; }
-    renderZorgbalie();
-  }
-  function renderZorgbalie(){
-    const tabBtn = document.getElementById('tabZorgbalie');
-    if (tabBtn) tabBtn.style.display = zbData ? '' : 'none';
-    const wrap = $('#zorgbalieWrap');
+  function renderEntree(){
+    const tabBtn = document.getElementById('tabEntree');
+    if (tabBtn) tabBtn.style.display = heeftEntree() ? '' : 'none';
+    const wrap = $('#entreeWrap');
     if (!wrap) return;
-    if (!zbData){ wrap.innerHTML = ''; return; }
-    const dagen = [];
-    for (let i = 0; i < 7; i++){
-      const dt = new Date(Date.now() + i * 86400000).toISOString().slice(0, 10);
-      const aan = dt === zbData.datum;
-      dagen.push('<button class="abtn ghost" data-zbdag="'+dt+'" style="padding:0.4rem 0.7rem;'+(aan?'border-color:var(--gold);color:var(--gold);':'')+'"'+(aan?' aria-current="date"':'')+'>'+
-        (i===0 ? T('pd.zb.vandaag','vandaag') : dt.slice(8)+'/'+dt.slice(5,7))+'</button>');
-    }
-    const perBehandelaar = (zbData.behandelaars || []).map(b => {
+    if (!heeftEntree()){ wrap.innerHTML = ''; return; }
+    if (!pdProgramma){ wrap.innerHTML = '<div class="card">\u2026</div>'; laadEntree(); return; }
+    const slots = pdProgramma.slots || [];
+    const totBinnen = slots.reduce((n, x) => n + x.binnen, 0);
+    const totVerkocht = slots.reduce((n, x) => n + x.verkocht, 0);
+    wrap.innerHTML =
+      '<div class="card"><div class="k">'+T('pd.e.check','Entree-check')+'</div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+
+      '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
+      '<button class="abtn" id="pdCheck">'+T('pd.e.binnen','Binnen')+'</button></div>'+
+      '<div id="pdCheckUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);"></div></div>'+
+      // de kassa aan de deur: kaartje verkopen, contant of met RTG Pay, VIP kan
+      (slots.length ? '<div class="card"><div class="k">'+T('pd.e.verkoop','Deurverkoop')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
+      '<select id="pdVkSlot" style="flex:2;min-width:150px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;">'+
+        slots.map((x,i) => '<option value="'+i+'">'+x.tijd+' \u00B7 '+esc(x.naam)+' ('+(x.capaciteit-x.verkocht)+' '+T('pd.e.vrij','vrij')+')</option>').join('')+'</select>'+
+      '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
+      '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
+      '<button class="abtn" data-pdvk="contant" style="flex:1;">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
+      '<button class="abtn" data-pdvk="rtgpay" style="flex:1;">RTG Pay</button></div>'+
+      '<div id="pdVkUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);">'+(pdVkLaatst||'')+'</div></div>' : '')+
+      '<div class="card"><div class="k">'+T('pd.e.prog','Programma vandaag')+' \u00B7 '+totBinnen+'/'+totVerkocht+' '+T('pd.e.binnen2','binnen')+'</div>'+
+      (slots.length ? slots.map(x =>
+        '<div class="task"><span class="ic">'+(x.binnen>=x.verkocht&&x.verkocht?'\u2705':'\uD83C\uDF9F\uFE0F')+'</span><div class="t"><b>'+x.tijd+' \u00B7 '+esc(x.naam)+'</b>'+
+        '<span>'+x.binnen+'/'+x.verkocht+' '+T('pd.e.binnen2','binnen')+' \u00B7 '+T('pd.e.verkocht','verkocht')+' '+x.verkocht+'/'+x.capaciteit+'</span></div></div>'
+      ).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.e.leeg','Vandaag geen tijdsloten.')+'</div>')+'</div>';
+    const c = document.getElementById('pdCheck');
+    if (c) c.addEventListener('click', async () => {
+      const uit = document.getElementById('pdCheckUit');
+      try {
+        const r = await API.call('/supplier/ticket/checkin', { code: $('#pdCode').value });
+        uit.innerHTML = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>'+
+          (r.ticket.zorg?'<div style="margin-top:0.3rem;color:#E2B93B;">\u26A0 '+esc(pkZorg(r.ticket.zorg))+'</div>':'');
+        $('#pdCode').value = '';
+        laadEntree();
+      } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }
+    });
+    // de deurverkoop: het kaartje is meteen betaald en de code kan naar binnen

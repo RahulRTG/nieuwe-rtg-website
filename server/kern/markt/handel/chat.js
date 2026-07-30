@@ -34,7 +34,7 @@ module.exports = (ctx) => {
     chat.berichten.push({ van: pk(koper), naam: chat.koper.naam, tekst: t, at: nu(), let: scam });
     chat.laatst = nu();
     save();
-    sein(ad.verkoper, { icon: '🏷️', title: 'Bericht over "' + ad.titel.slice(0, 30) + '"', body: t.slice(0, 80) });
+    sein(ad.verkoper, { icon: 'ticket', title: 'Bericht over "' + ad.titel.slice(0, 30) + '"', body: t.slice(0, 80) });
     return { ok: true, chat: chatPub(chat, koper), tip: scam ? 'Let op: betaal nooit vooraf en houd het gesprek hier in de app.' : null };
   }
   // De verkoper (of koper) antwoordt in een bestaande chat.
@@ -51,7 +51,7 @@ module.exports = (ctx) => {
     chat.berichten.push({ van: pk(partij), naam, tekst: t, at: nu(), let: scam });
     chat.laatst = nu();
     save();
-    sein(ander, { icon: '🏷️', title: 'Bericht over "' + (chat.adTitel || '').slice(0, 30) + '"', body: t.slice(0, 80) });
+    sein(ander, { icon: 'ticket', title: 'Bericht over "' + (chat.adTitel || '').slice(0, 30) + '"', body: t.slice(0, 80) });
     return { ok: true, chat: chatPub(chat, partij), tip: scam ? 'Let op: betaal nooit vooraf en houd het gesprek hier in de app.' : null };
   }
   // Een bestaand gesprek openen (zonder iets te versturen).

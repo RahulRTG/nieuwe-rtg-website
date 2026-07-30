@@ -7,7 +7,24 @@
    - geen browser-tikflitsen, nette font-rendering,
    - de ene RTG-beweging (--rtg-ease) voor wie hem gebruikt,
    - en rust voor wie minder beweging wil. */
-:root{ --rtg-ease:cubic-bezier(0.22, 0.61, 0.21, 1); }
+:root{ --rtg-ease:cubic-bezier(0.22, 0.61, 0.21, 1); --rtg-stroke:1.6; }
+
+/* Eén lijndikte voor de hele familie: de gedeelde huisstijl-glyfen (shared/glyf.js)
+   erven de RTG-lijndikte, zodat elke sub-app exact hetzelfde icoon-gewicht toont.
+   Puur op de gedeelde iconenset; bespoke afbeeldingen (klok, mond) blijven vrij. */
+.rtg-glyf{ stroke-width:var(--rtg-stroke); }
+/* een glyf die inline in een tekstregel/knop meeloopt (sector-, genre-labels) */
+.rtg-glyf.gl-inline{ width:1.05em; height:1.05em; vertical-align:-.14em; }
+
+/* RTG-eigen emoji in de chats (shared/emoji.js) */
+.rtg-emo{ width:1.15em; height:1.15em; vertical-align:-.22em; display:inline-block; }
+.rtg-emo-knop{ background:transparent; border:0; padding:.3rem; cursor:pointer; color:var(--grey-soft,#8A8680); display:inline-flex; align-items:center; }
+.rtg-emo-knop:hover{ color:var(--burgundy-bright,#9E1C40); }
+.rtg-emo-knop .rtg-emo{ width:1.4rem; height:1.4rem; }
+.rtg-emo-paneel{ z-index:9999; background:var(--card,#141210); border:1px solid var(--line,#DEDBD5); border-radius:14px; padding:.5rem; display:grid; grid-template-columns:repeat(6,1fr); gap:.1rem; box-shadow:0 14px 44px rgba(0,0,0,.5); }
+.rtg-emo-keuze{ background:transparent; border:0; border-radius:9px; padding:.42rem; cursor:pointer; color:var(--burgundy-on-dark,#C23A5E); display:flex; align-items:center; justify-content:center; }
+.rtg-emo-keuze:hover{ background:rgba(194,58,94,.15); }
+.rtg-emo-groot{ width:1.55rem; height:1.55rem; }
 
 html{ -webkit-tap-highlight-color:transparent; }
 body{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
@@ -24,4 +41,13 @@ body{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
 
 @media (prefers-reduced-motion: reduce){
   *, *::before, *::after{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+}
+
+/* De wauw-laag: zachte document-overgangen tussen alle ROS-pagina's --
+   het OS-gevoel bij het openen en sluiten van apps, zonder JS per app.
+   Rustig-bewegen zet hem uit (de regel hierboven dekt de animaties). */
+@view-transition{ navigation:auto; }
+::view-transition-old(root), ::view-transition-new(root){ animation-duration:0.22s; }
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-old(root), ::view-transition-new(root){ animation:none; }
 }

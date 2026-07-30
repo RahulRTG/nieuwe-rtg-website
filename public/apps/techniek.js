@@ -86,6 +86,41 @@
     }}, 'Intrekken');
     return el('div',{class:'zeker'}, el('div',{class:'mid'}, el('div',{class:'naam'}, t.naam||'?'), el('div',{class:'muted'}, t.email||('#'+t.id))), knop);
   }
+  /* ---------- eigenaarschap overdragen ----------
+     Bewust stroef: een bevestiging waarin het adres letterlijk staat, en het
+     eigen wachtwoord erbij. Wie dit per ongeluk aanklikt raakt anders in één
+     tik de zeggenschap over het hele platform kwijt. */
+  $('#bEigenaar').addEventListener('click', function(){
+    $('#eigFout').textContent='';
+    var email = $('#eigEmail').value.trim();
+    var ww = $('#eigWw').value;
+    if (!email) { $('#eigFout').textContent = 'Vul het e-mailadres van de nieuwe eigenaar in.'; return; }
+    if (!ww) { $('#eigFout').textContent = 'Vul uw eigen wachtwoord in ter bevestiging.'; return; }
+    if (!confirm('Het eigenaarschap van het hele platform overdragen aan ' + email + '?\n\n' +
+      'Daarna bepaalt dat account de zekeringen, de functieschakelaars en wie er toegang heeft. ' +
+      'U verliest die zeggenschap, tenzij de nieuwe eigenaar hem teruggeeft.')) return;
+    api('/api/techniek/eigenaar', { method:'POST', body:{ email:email, wachtwoord:ww } })
+      .then(function(r){
+        $('#eigEmail').value=''; $('#eigWw').value='';
+        toast('Eigenaarschap overgedragen aan ' + (r.naam || r.eigenaar) + '.');
+        laad();
+      })
+      .catch(function(e){ $('#eigWw').value=''; $('#eigFout').textContent = e.message; });
+  });
+  function eigLogRij(o){
+    return el('div',{class:'zeker'}, el('div',{class:'mid'},
+      el('div',{class:'naam'}, (o.van||'?') + ' → ' + (o.naar||'?')),
+      el('div',{class:'muted'}, 'door ' + (o.doorNaam||'?') + ' op ' + new Date(o.at).toLocaleString('nl-NL'))));
+  }
+  window.RTGTechEigenaar = function(e){
+    $('#eigNu').textContent = e && e.email ? e.email : '-';
+    $('#eigHerkomst').textContent = e && e.herkomst ? '(' + e.herkomst + ')' : '';
+    var log = (e && e.overdrachten) || [];
+    vervang($('#eigLog'), log.length
+      ? [el('div',{class:'muted',style:'margin-bottom:.3rem;'},'Eerdere overdrachten')].concat(log.map(eigLogRij))
+      : el('div',{class:'muted'},'Nog nooit overgedragen.'));
+  };
+
   $('#bGrant').addEventListener('click', function(){
     $('#grantFout').textContent='';
     api('/api/techniek/toegang', { method:'POST', body:{ email:$('#grantEmail').value.trim(), actie:'verleen' } })
@@ -118,13 +153,156 @@
 
   /* ---------- tabbladen ---------- */
   function toonTab(naam){
-    var status = naam !== 'functies';
-    $('#tabStatus').hidden = !status; $('#tabFuncties').hidden = status;
-    $('#tabBtnStatus').setAttribute('aria-selected', status?'true':'false');
-    $('#tabBtnFuncties').setAttribute('aria-selected', status?'false':'true');
+    var panelen = { status:'#tabStatus', wacht:'#tabWacht', functies:'#tabFuncties' };
+    var knoppen = { status:'#tabBtnStatus', wacht:'#tabBtnWacht', functies:'#tabBtnFuncties' };
+    if (!panelen[naam]) naam = 'status';
+    for (var k in panelen){ $(panelen[k]).hidden = (k !== naam); $(knoppen[k]).setAttribute('aria-selected', k===naam?'true':'false'); }
+    if (naam === 'wacht') laadWacht();
   }
   $('#tabBtnStatus').addEventListener('click', function(){ toonTab('status'); });
+  $('#tabBtnWacht').addEventListener('click', function(){ toonTab('wacht'); });
   $('#tabBtnFuncties').addEventListener('click', function(){ toonTab('functies'); });
+
+  /* ---------- De Wacht: immuunsysteem + meters/grafiek + raadkamer ---------- */
+  function wachtActie(pad, body, melding){
+    api('/api/techniek/wacht/' + pad, { method:'POST', body:body||{} })
+      .then(function(d){ if (melding) toast(melding); if (d && d.bord) tekenWacht(d.bord); })
+      .catch(function(e){ toast(e.message); });
+  }
+  $('#bWachtAnalyseer').addEventListener('click', function(){ wachtActie('analyseer', {}, 'AI heeft de signalen uitgekauwd.'); });
+  $('#bWachtOpruimen').addEventListener('click', function(){ wachtActie('opruimen', {}, 'Opgeruimd.'); });
+  $('#bWachtIsoleer').addEventListener('click', function(){
+    var b = $('#wachtBron').value.trim(); if(!b){ toast('Vul een bron (IP) in.'); return; }
+    wachtActie('quarantaine', { bron:b, actie:'isoleer' }, 'In quarantaine gezet.'); $('#wachtBron').value='';
+  });
+  $('#bAvTest').addEventListener('click', function(){
+    var eicar = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
+    api('/api/techniek/wacht/av-test', { method:'POST', body:{ inhoud:eicar, naam:'eicar.com', mime:'application/octet-stream' } })
+      .then(function(d){ toast('Scanner: ' + d.resultaat.verdict + ' (' + (d.resultaat.redenen[0]||'') + ')'); laadWacht(); })
+      .catch(function(e){ toast(e.message); });
+  });
+
+  function avRij(x){
+    var badge = el('span',{class:'badge '+(x.verdict==='besmet'?'uit':'aan')}, (x.verdict||'').toUpperCase());
+    return el('div',{class:'zeker'}, badge,
+      el('div',{class:'mid'},
+        el('div',null, el('span',{class:'naam'}, x.naam||'(upload)'), el('span',{class:'code'}, (x.sha256||'').slice(0,10))),
+        el('div',{class:'muted', style:{fontSize:'.74rem'}}, (x.redenen||[]).join('; ') + (x.bron?(' · ' + x.bron):''))));
+  }
+
+  function meterKaart(n, label){ return el('div',{class:'tel'}, el('div',{class:'n'}, String(n)), el('div',{class:'l'}, label)); }
+
+  // Een simpele multi-lijn grafiek op canvas (geen externe library).
+  function tekenGrafiek(reeks){
+    var c = $('#wachtGrafiek'); if (!c || !c.getContext) return;
+    var dpr = window.devicePixelRatio || 1;
+    var w = c.clientWidth || 600, h = 120;
+    c.width = w * dpr; c.height = h * dpr;
+    var x = c.getContext('2d'); x.scale(dpr, dpr); x.clearRect(0,0,w,h);
+    if (!reeks || reeks.length < 2){ x.fillStyle = '#8A8680'; x.font = '12px Inter, sans-serif'; x.fillText('Nog te weinig metingen voor een grafiek.', 8, 20); return; }
+    var series = [ { k:'verzoeken', kleur:'#FFFFFF' }, { k:'alarm', kleur:'#C23A5E' }, { k:'quarantaine', kleur:'#C9A227' } ];
+    series.forEach(function(s){
+      var max = 1; for (var i=0;i<reeks.length;i++) if ((reeks[i][s.k]||0) > max) max = reeks[i][s.k];
+      x.beginPath(); x.lineWidth = 1.5; x.strokeStyle = s.kleur;
+      for (var j=0;j<reeks.length;j++){
+        var px = (j/(reeks.length-1)) * (w-6) + 3;
+        var py = h - 6 - ((reeks[j][s.k]||0)/max) * (h-16);
+        if (j===0) x.moveTo(px, py); else x.lineTo(px, py);
+      }
+      x.stroke();
+    });
+  }
+
+  function quarantaineRij(q){
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, q.bron)),
+      el('div',{class:'muted', style:{fontSize:'.74rem'}}, (q.reden||'') + ' · nog ' + Math.round((q.resterend||0)/60) + ' min'));
+    var knop = eigenaar ? el('button',{class:'knop grijs klein', onclick:function(){ wachtActie('quarantaine', { bron:q.bron, actie:'vrij' }, 'Vrijgegeven.'); }}, 'Vrijgeven') : null;
+    return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'AFGESNEDEN'), mid, knop);
+  }
+
+  var VERDICT_LABEL = { open:'OPEN', inconclaaf:'INCONCLAAF', geaccepteerd:'GEACCEPTEERD', afgewezen:'AFGEWEZEN' };
+  function raadRij(v){
+    var badgeKlas = (v.status==='geaccepteerd') ? 'aan' : 'uit';
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, v.titel), el('span',{class:'code'}, (v.soort||'').toUpperCase())),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, v.uitleg || ''),
+      v.resultaat ? el('div',{class:'muted', style:{fontSize:'.72rem',color:'#9ED3A6'}}, 'Uitgevoerd: '+v.resultaat) : null);
+    var acties = el('div',null);
+    if (eigenaar && (v.status==='open' || v.status==='inconclaaf')){
+      acties.appendChild(el('button',{class:'knop klein', onclick:function(){ wachtActie('beslis', { id:v.id, verdict:'accepteren' }, 'Geaccepteerd.'); }}, 'Accepteren'));
+      acties.appendChild(el('button',{class:'knop grijs klein', onclick:function(){
+        var n = prompt('Napraten met de AI (inconclaaf) - noteer je vraag of twijfel:', ''); if (n===null) return;
+        wachtActie('beslis', { id:v.id, verdict:'inconclaaf', notitie:n }, 'Inconclaaf: geparkeerd om na te praten.');
+      }}, 'Inconclaaf'));
+      acties.appendChild(el('button',{class:'knop rood klein', onclick:function(){ wachtActie('beslis', { id:v.id, verdict:'afwijzen' }, 'Afgewezen.'); }}, 'Afwijzen'));
+    } else {
+      acties.appendChild(el('span',{class:'badge '+badgeKlas}, VERDICT_LABEL[v.status] || v.status));
+    }
+    return el('div',{class:'zeker'}, mid, acties);
+  }
+
+  // De rand-status (Cloudflare/edge): staat de eerste linie?
+  function randChip(r){
+    if (!r) return el('div',{class:'muted', style:{fontSize:'.78rem'}}, 'Rand-status onbekend.');
+    var kleur = r.status==='actief' ? '#9ED3A6' : (r.status==='stil' ? '#C23A5E' : '#C9A227');
+    var label = r.status==='actief' ? 'RAND ACTIEF' : (r.status==='stil' ? 'RAND STIL' : (r.status==='wachtend' ? 'RAND WACHT' : 'GEEN RAND'));
+    return el('div',{style:{display:'flex',alignItems:'center',gap:'.6rem',flexWrap:'wrap'}},
+      el('span',{class:'badge', style:{background:'transparent',border:'1px solid '+kleur,color:kleur}}, label),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, r.uitleg || ''),
+      r.ouderdomSec!=null ? el('span',{class:'code'}, 'laatst ' + r.ouderdomSec + 's geleden') : null);
+  }
+  // De automatische lastafworp (L7-zekering): 503 "kom zo terug".
+  function lastafworpBanner(la){
+    if (!la || !la.actief) return el('div');
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, 'Automatische lastafworp actief')),
+      el('div',{class:'muted', style:{fontSize:'.78rem'}}, (la.reden||'') + ' - de server serveert tijdelijk 503 en dooft vanzelf.'));
+    var knop = eigenaar ? el('button',{class:'knop grijs klein', onclick:function(){ wachtActie('lastafworp', { aan:false }, 'Lastafworp opgeheven.'); }}, 'Nu opheffen') : null;
+    return el('div',{class:'zeker', style:{borderColor:'#C23A5E'}}, el('span',{class:'badge uit'}, '503'), mid, knop);
+  }
+
+  function tekenWacht(bord){
+    var m = bord.meters || {};
+    var la = bord.lastafworp || {};
+    vervang($('#wachtMeters'), [
+      meterKaart(m.verzoeken||0, 'verzoeken/10s'),
+      meterKaart(m.bans||0, 'op de banlijst'),
+      meterKaart(m.quarantaine||0, 'in quarantaine'),
+      meterKaart(m.alarm||0, 'open alarmen'),
+      meterKaart(m.kritiek||0, 'kritiek'),
+      meterKaart(m.openVoorstellen||0, 'open voorstellen'),
+      meterKaart(la.actief ? 'AAN' : 'rustig', 'lastafworp'),
+      meterKaart((m.geheugen||0)+' MB', 'geheugen')
+    ]);
+    vervang($('#wachtLastafworp'), lastafworpBanner(la));
+    vervang($('#wachtRand'), randChip(bord.rand));
+    tekenGrafiek(bord.grafiek || []);
+    $('#wachtIsoleer').hidden = !eigenaar;
+    $('#bWachtAnalyseer').hidden = !eigenaar;
+    var q = bord.quarantaine || [];
+    vervang($('#wachtQuarantaine'), q.length ? q.map(quarantaineRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Niemand in quarantaine. De afweer is rustig.'));
+    var r = bord.raad || [];
+    vervang($('#wachtRaad'), r.length ? r.map(raadRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Geen voorstellen. Laat de AI de signalen uitkauwen met "AI kauwt uit".'));
+    // De Ontsmetter (malware-scanner)
+    var a = bord.av;
+    if (a){
+      vervang($('#avMeters'), [
+        meterKaart(a.totaal||0, 'gescand'),
+        meterKaart(a.besmet||0, 'besmet geweigerd'),
+        meterKaart(a.verdacht||0, 'verdacht'),
+        meterKaart(a.definities||0, 'handtekeningen'),
+        meterKaart('v'+(a.versie||1), 'definitie-versie')
+      ]);
+      var det = a.laatste || [];
+      vervang($('#avLaatste'), det.length ? det.map(avRij) : el('div',{class:'muted', style:{padding:'.4rem 0'}}, 'Nog geen verdachte of besmette uploads. Alles schoon.'));
+      $('#bAvTest').hidden = !eigenaar;
+    }
+  }
+
+  function laadWacht(){
+    api('/api/techniek/wacht/bord', {}).then(tekenWacht).catch(function(e){ toast(e.message); });
+  }
 
   /* ---------- controlekamer: functies per doelgroep, alles via een aanvraag ---------- */
   var wachtend = {};         // sleutel id|doelgroep -> open aanvraag
@@ -373,6 +551,19 @@
         tellerKaart(d.samenvatting.fout,'Storing')];
       if (bev.open) tellers.push(tellerKaart(bev.open, bev.kritiek?'Beveiliging!':'Beveiliging'));
       vervang($('#tellers'), tellers);
+      // de motorkap-band: grootboek/motor/bank op een oogopslag, uit de checks
+      var kap = { wallet:'Grootboek', motorschaduw:'Motor', bank:'Bank' };
+      var kapChecks = (d.checks||[]).filter(function(c){ return kap[c.id]; });
+      $('#motorkapBand').hidden = !kapChecks.length;
+      if (kapChecks.length){
+        var pillen = [el('span',{class:'mk-titel'},'De motorkap')];
+        kapChecks.forEach(function(c){
+          pillen.push(el('span',{class:'mk-pil', title:c.detail||''},
+            el('span',{class:'mk-stip '+c.status}), kap[c.id]));
+        });
+        var band = el('div',{class:'motorkap'}, pillen);
+        vervang($('#motorkapBand'), band);
+      }
       // beveiligingsmeldingen: tonen bij meldingen, en altijd voor de eigenaar
       // (die ziet er ook de noodrem-schakelaar)
       $('#beveiligBlok').hidden = !(d.eigenaar || (bev.recent && bev.recent.length));
@@ -396,6 +587,10 @@
         Util.tekst($('#archiefInfo'), 'Nu ' + d.archief.dagen + ' dagen \u00B7 ' + d.archief.levend.toLocaleString('nl-NL') + ' levend \u00B7 ' + d.archief.gearchiveerd.toLocaleString('nl-NL') + ' gearchiveerd');
         if (document.activeElement !== $('#archiefDagen')) $('#archiefDagen').value = d.archief.dagen;
       }
+      // het papierwerk: eenmalig ophalen, niet elke 12 seconden -- anders staat
+      // Rahul de vraag te verversen terwijl de eigenaar zijn antwoord typt
+      $('#papierenBlok').hidden = !d.eigenaar;
+      if (d.eigenaar && !papGeladen){ papGeladen = true; papieren(); }
       $('#moderniseerBlok').hidden = !d.eigenaar;
       if (d.eigenaar){
         var ms = d.moderniseringen || [];
@@ -405,7 +600,13 @@
       if (d.eigenaar && d.grenzen) vervang($('#grenzen'), d.grenzen.map(function(g){
         return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'DICHT'), el('div',{class:'mid'}, el('div',{class:'muted'}, g))); }));
       $('#toegangBlok').hidden = !d.eigenaar;
+      // het eigenaarschap: alleen de eigenaar ziet wie het is en kan overdragen
+      $('#eigenaarBlok').hidden = !d.eigenaar;
+      if (d.eigenaar && window.RTGTechEigenaar) RTGTechEigenaar(d.eigenaarschap);
       if (d.eigenaar) vervang($('#toegangLijst'), (d.toegang&&d.toegang.length)? d.toegang.map(toegangRij) : el('div',{class:'muted'},'Nog niemand extra toegelaten.'));
+      // De Wacht-tab: zichtbaar voor iedereen met toegang (lezen); de acties
+      // (afsnijden, beslissen, opruimen) zijn in de UI en op de server owner-only.
+      $('#tabBtnWacht').hidden = false;
       // functies-tab: iedereen met toegang kan aanvragen; alleen de eigenaar besluit
       $('#tabBtnFuncties').hidden = false;
       var verzoeken = d.verzoeken || [];
@@ -428,6 +629,49 @@
       else toast(e.message);
     });
   }
+
+  /* HET PAPIERWERK: Rahul vraagt het AVG-register en het datalek-draaiboek uit.
+     Eerder stond in die documenten een rij [VUL IN]-plekken. Een invullijst
+     vult niemand in, dus stond het er nog steeds. Hier stelt Rahul de vraag,
+     met erbij waarom hij hem stelt, en het antwoord landt meteen in het
+     document. Verzinnen doet hij niet: op deze pagina komt alleen te staan wat
+     een mens intypt. */
+  var papVraagId = null, papGeladen = false;
+  function papieren(){
+    return api('/api/techniek/papieren').then(function(d){
+      Util.tekst($('#papStand'), d.open
+        ? (d.totaal - d.open) + ' van de ' + d.totaal + ' beantwoord · nog ' + d.open + ' te gaan'
+        : 'Alle ' + d.totaal + ' vragen beantwoord. Laat het geheel nog juridisch nakijken.');
+      var v = d.volgende;
+      papVraagId = v ? v.id : null;
+      $('#papVraagBlok').hidden = !v;
+      if (!v) return;
+      Util.tekst($('#papVraag'), v.vraag);
+      Util.tekst($('#papWaarom'), v.waarom);
+      Util.tekst($('#papVoorbeeld'), v.voorbeeld ? 'Bijvoorbeeld: ' + v.voorbeeld
+        : (v.jaVraag ? 'Bij ja: ' + v.jaVraag + '  Bij nee: ' + v.neeVraag : ''));
+      $('#papAntwoord').value = '';
+      $('#papAntwoord').placeholder = v.eerderGeparkeerd
+        ? 'Dit stond geparkeerd; weet u het inmiddels?' : 'Uw antwoord, in uw eigen woorden…';
+    }).catch(function(e){ toast(e.message); });
+  }
+  function papZeg(parkeer){
+    if (!papVraagId) return;
+    api('/api/techniek/papieren/antwoord', { method:'POST',
+      body:{ id: papVraagId, waarde: $('#papAntwoord').value, parkeer: !!parkeer } })
+      .then(function(d){ toast(d.terug || 'Genoteerd.'); $('#papDoc').hidden = true; papieren(); })
+      .catch(function(e){ toast(e.message); });
+  }
+  $('#bPapOk').addEventListener('click', function(){ papZeg(false); });
+  $('#bPapParkeer').addEventListener('click', function(){ papZeg(true); });
+  function papToon(naam){
+    api('/api/techniek/papieren/document?naam=' + naam).then(function(d){
+      Util.tekst($('#papDoc'), d.tekst);
+      $('#papDoc').hidden = false;
+    }).catch(function(e){ toast(e.message); });
+  }
+  $('#bPapReg').addEventListener('click', function(){ papToon('verwerkingsregister'); });
+  $('#bPapLek').addEventListener('click', function(){ papToon('datalek'); });
 
   function start(){
     if (!token){ toonLogin(); return; }

@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -39,7 +39,7 @@ async function bootTest(opts) {
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const paginaFouten = [];
-    page.on('pageerror', e => paginaFouten.push(e.message));
+    letOpFouten(page, paginaFouten);
     await page.addInitScript((kv) => {
       for (const k in kv) localStorage.setItem(k, kv[k]);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
@@ -106,7 +106,7 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'en'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
@@ -153,7 +153,7 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, login.token);
     await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
     await page.waitForSelector('#app.active', { timeout: 15000 });
@@ -199,7 +199,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     // Deze test gaat over XSS-veiligheid in het conciergegesprek, niet over
     // onboarding. Mock de onboarding-status op "klaar" zodat de verplichte
     // onboarding-modal (die anders de app blokkeert) niet verschijnt.
@@ -208,8 +208,15 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 
-    // naar het AI/concierge-scherm en een bericht met een XSS-payload sturen
-    await page.click('[data-tab="ai"]');
+    /* Naar het AI/concierge-scherm en een bericht met een XSS-payload sturen.
+
+       Let op de selector. '[data-tab="ai"]' raakt TWEE elementen: de knop in de
+       oude tabbalk (die in de OS-weergave verborgen is) en de tegel in het dock.
+       Playwright pakt de eerste, en die is onzichtbaar -- dan wacht de klik 30
+       seconden en valt de toets om op een timeout, terwijl er niets mis is met
+       de app. Zo stond het hier, en daarom faalde deze toets al langer. Dus:
+       expliciet de tegel in het dock. */
+    await page.click('.os-dock [data-tab="ai"]');
     const payload = '<img src=x onerror="window.__xss=1">';
     await page.fill('#askInput', payload);
     await page.click('#askBtn');

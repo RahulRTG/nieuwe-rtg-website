@@ -13,7 +13,7 @@ module.exports = (kern) => {
   app.post('/api/booking/request', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const s = findSupplier(req.body.supplierCode);
-    const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+    const caps = s ? (db.capsVan(s)) : [];
     if (!s || !caps.includes('services')) return res.status(404).json({ error: 'Geen zelfstandige professional gevonden.' });
     if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen boekingen aan.' });
     const dienst = (s.services || []).find(x => x.id === req.body.serviceId);
@@ -39,7 +39,7 @@ module.exports = (kern) => {
     boekingenVoegToe(boeking);
     save();
     if (!vooraf) {
-      notifySupplier(s.code, { icon: '🗓️', title: 'Nieuwe boeking (betaling achteraf)', body: codename + ': ' + dienst.name + (wanneer ? ' · ' + wanneer : '') + ' · € ' + dienst.price });
+      notifySupplier(s.code, { icon: 'agenda', title: 'Nieuwe boeking (betaling achteraf)', body: codename + ': ' + dienst.name + (wanneer ? ' · ' + wanneer : '') + ' · € ' + dienst.price });
       sseToSupplier(s.code, 'sync', { scope: 'orders' });
       sseToOffice('sync', { scope: 'orders' });
     }
@@ -84,7 +84,7 @@ module.exports = (kern) => {
     db.data.giftcards.unshift(kaart);
     db.data.giftcards = db.data.giftcards.slice(0, 20000);
     save();
-    notifySupplier(s.code, { icon: '🎁', title: 'Cadeaukaart verkocht', body: codename + ' kocht via de app een cadeaukaart van € ' + bedrag + '.' });
+    notifySupplier(s.code, { icon: 'attenties', title: 'Cadeaukaart verkocht', body: codename + ' kocht via de app een cadeaukaart van € ' + bedrag + '.' });
     sseToSupplier(s.code, 'sync', { scope: 'pos' });
     res.json({ ok: true, kaart });
   });

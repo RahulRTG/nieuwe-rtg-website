@@ -14,7 +14,10 @@ module.exports = (ctx) => {
       dagen: Array.isArray(u.dagen) && u.dagen.length === 7 ? u.dagen.map(Boolean) : [false, true, true, true, true, true, false],
       van: geldigeTijd(u.van) ? u.van : '09:00',
       tot: geldigeTijd(u.tot) ? u.tot : '18:00',
-      geblokkeerd: Array.isArray(u.geblokkeerd) ? u.geblokkeerd.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(0, 366) : []
+      geblokkeerd: Array.isArray(u.geblokkeerd) ? u.geblokkeerd.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(0, 366) : [],
+      // team-capaciteit: zoveel vaklieden werken tegelijk, dus zoveel
+      // boekingen mogen elkaar overlappen (1 = eenmanszaak)
+      capaciteit: Math.min(20, Math.max(1, Math.round(Number(u.capaciteit)) || 1))
     };
   }
   function uren(code) {
@@ -34,9 +37,10 @@ module.exports = (ctx) => {
     let geblokkeerd = nu.geblokkeerd;
     if (d.blokkeer && /^\d{4}-\d{2}-\d{2}$/.test(d.blokkeer)) geblokkeerd = [...new Set([...geblokkeerd, d.blokkeer])];
     if (d.deblokkeer) geblokkeerd = geblokkeerd.filter(x => x !== d.deblokkeer);
-    s.vakUren = { dagen, van, tot, geblokkeerd: geblokkeerd.slice(0, 366) };
+    const capaciteit = d.capaciteit != null ? Math.min(20, Math.max(1, Math.round(Number(d.capaciteit)) || 1)) : nu.capaciteit;
+    s.vakUren = { dagen, van, tot, geblokkeerd: geblokkeerd.slice(0, 366), capaciteit };
     save();
-    return { ok: true, uren: s.vakUren };
+    return { ok: true, uren: urenVan(s) };
   }
 
   // de bezette tijdvakken (start-eindminuten) op een datum, uit de actieve boekingen
@@ -61,7 +65,8 @@ module.exports = (ctx) => {
     const tijden = [];
     for (let m = open; m + duur <= dicht; m += stap) {
       if (m <= nuMin) continue;
-      if (bezet.some(b => m < b.eind && (m + duur) > b.start)) continue;
+      // vol is pas vol als het hele team bezet is (capaciteit overlappende boekingen)
+      if (bezet.filter(b => m < b.eind && (m + duur) > b.start).length >= u.capaciteit) continue;
       tijden.push(naarTijd(m));
     }
     return { ok: true, datum, duurMin: duur, tijden };

@@ -8,14 +8,15 @@ module.exports = {
      heeft eigen mogelijkheden (caps) die de app-schermen bepalen. Leveranciers
      gebruiken de app gratis in ruil voor de beste dynamische prijs aan RTG. */
   supplierTypes: {
-    hotel:      { label: 'Hotel',        icon: '🏨', caps: ['bookings', 'location', 'pricing'] },
-    apartment:  { label: 'Appartement',  icon: '🏡', caps: ['bookings', 'doors', 'location', 'pricing'] },
-    taxi:       { label: 'Taxi',         icon: '🚘', caps: ['rides', 'location', 'pricing'] },
-    jet:        { label: 'Privéjet',     icon: '✈️', caps: ['rides', 'location', 'pricing'] },
-    restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
-    bar:        { label: 'Bar',          icon: '🍸', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
-    club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
-    zorg:       { label: 'Zorg & welzijn', icon: '🌿', caps: ['care', 'location', 'pricing'] }
+    hotel:      { label: 'Hotel',        icon: 'hotel', caps: ['bookings', 'location', 'pricing'] },
+    apartment:  { label: 'Appartement',  icon: 'maison', caps: ['bookings', 'doors', 'location', 'pricing'] },
+    taxi:       { label: 'Taxi',         icon: 'auto', caps: ['rides', 'location', 'pricing'] },
+    jet:        { label: 'Privéjet',     icon: 'vluchten', caps: ['rides', 'location', 'pricing'] },
+    restaurant: { label: 'Restaurant',   icon: 'horeca', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
+    bar:        { label: 'Bar',          icon: 'bar', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
+    club:       { label: 'Club',         icon: 'muziek', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
+    zorg:       { label: 'Zorg & welzijn', icon: 'zorg', caps: ['care', 'location', 'pricing'] },
+    journalistiek: { label: 'Journalistiek', icon: 'nieuws', caps: ['redactie', 'location', 'pricing'] }
   },
 
   /* Voorbeeldleveranciers (demo-inlogcodes). rate = de dynamische prijs die
@@ -29,7 +30,7 @@ module.exports = {
       rooms: [
         { id: 'r1', name: 'Sea-view suite', desc: '55 m², zeezicht, eigen terras', price: 780, available: true },
         { id: 'r2', name: 'Garden kamer', desc: '40 m², tuinzicht, loungehoek', price: 520, available: true },
-        { id: 'r3', name: 'Cliff suite', desc: '70 m², twee terrassen, butler-service', price: 940, available: false }
+        { id: 'r3', name: 'Cliff suite', desc: '70 m², twee terrassen, persoonlijke suiteservice', price: 940, available: false }
       ],
       minibar: [
         { id: 'mb1', name: 'Mineraalwater', price: 6 },
@@ -99,6 +100,11 @@ module.exports = {
     {
       code: 'CLARA', name: 'Kliniek Clara Ibiza', type: 'zorg', city: 'Ibiza',
       loc: { lat: 38.907, lng: 1.432, label: 'Vila, Ibiza' }, rate: 0.12,
+      menu: []
+    },
+    {
+      code: 'BODE', name: 'De Ibiza Bode', type: 'journalistiek', city: 'Ibiza',
+      loc: { lat: 38.909, lng: 1.433, label: 'Vila, Ibiza' }, rate: 0.10,
       menu: []
     }
   ],

@@ -7,8 +7,39 @@ const { padNaar } = require('./routing');
 const { stuurBestand, MIME } = require('./bestanden');
 const rtgjson = require('../lib/rtgjson');
 
+/* WIE MAG ER EIGENLIJK EEN X-FORWARDED-KOP STUREN?
+
+   "trust proxy: 1" zegt hoeveel hops we vertrouwen, maar niet WIE. Dat is het
+   gat dat overbleef: leest de app de kop van iedereen, dan kan een bezoeker die
+   RECHTSTREEKS verbinding maakt (geen proxy ertussen) nog steeds zijn eigen
+   adres verzinnen -- en dus elke snelheidslimiet omzeilen. Van rechts lezen
+   helpt daar niet tegen: zonder proxy IS hij de rechtse.
+
+   De enige waarneming die niemand kan vervalsen is het adres van de verbinding
+   zelf. Dus: geloof de kop alleen als de verbinding van een vertrouwde proxy
+   komt. Dat klopt in beide opstellingen, zonder dat iemand iets hoeft in te
+   stellen:
+
+     - reverse proxy op dezelfde machine of in hetzelfde netwerk -> loopback of
+       een privaat adres -> vertrouwd -> de kop telt, per bezoeker geremd;
+     - app hangt rechtstreeks aan het internet -> de bezoeker komt van een
+       publiek adres -> niet vertrouwd -> zijn kop wordt genegeerd en we tellen
+       op de verbinding. Onvervalsbaar.
+
+   Staat de proxy op een publiek adres, zet dan RTG_PROXY_IPS. */
+const PRIVATE_IP = /^(::1|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|::ffff:(10\.|127\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)|f[cd])/i;
+function vertrouwdeProxy(adres, extra) {
+  const a = String(adres || '');
+  if (!a) return false;
+  if (extra && extra.length) return extra.some(x => a === x || a === '::ffff:' + x);
+  return PRIVATE_IP.test(a);
+}
+
 function verrijk(req, res, instellingen) {
-  const trustProxy = !!(instellingen && instellingen['trust proxy']);
+  const aanZet = !!(instellingen && instellingen['trust proxy']);
+  const eigenLijst = (instellingen && instellingen['proxy ips']) || null;
+  // vertrouwen = de instelling staat aan EN de verbinding komt van een proxy
+  const trustProxy = aanZet && vertrouwdeProxy(req.socket && req.socket.remoteAddress, eigenLijst);
   req.originalUrl = req.originalUrl || req.url;
   const vraag = padNaar(req.url);
   req.path = vraag;
@@ -22,15 +53,37 @@ function verrijk(req, res, instellingen) {
     return req.headers[n];
   };
   req.header = req.get;
-  const xfProto = trustProxy ? String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() : '';
+  /* DE X-FORWARDED-KOP: VAN RECHTS LEZEN, NIET VAN LINKS.
+
+     Hier stond .split(',')[0] -- het LINKSE adres. Dat is precies het stuk dat
+     de bezoeker zelf mag verzinnen: een proxy plakt zijn waarneming er rechts
+     achter, hij wist links nooit. Met "trust proxy: 1" en een linkse lezing
+     kon iedereen dus zelf zeggen wie hij was:
+
+         X-Forwarded-For: 9.9.9.9
+
+     en daarmee bij elk verzoek een vers IP tonen. De rem (server/rem.js) telt
+     op req.ip, dus alle snelheidslimieten -- ook de brute-force-grens op de
+     inlog -- waren met één kop te omzeilen. En het beveiligingslogboek en de
+     quarantaine van De Wacht wezen dan naar een IP van andermans keuze.
+
+     Goed is: van de N hops die we vertrouwen (trust proxy = N) is de meest
+     rechtse N onze eigen keten; de eerste daarvoor is de echte aanroeper. Met
+     één proxy en één waarde verandert er niets -- alleen het geval waarin
+     iemand er zelf iets vóór plakt wordt nu genegeerd. */
+  const hops = Math.max(1, Number(instellingen && instellingen['trust proxy']) || 1);
+  const vanRechts = (kop) => {
+    const lijst = String(req.headers[kop] || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (!lijst.length) return '';
+    return lijst[Math.max(0, lijst.length - hops)] || '';
+  };
+
+  const xfProto = trustProxy ? vanRechts('x-forwarded-proto') : '';
   req.protocol = xfProto || ((req.socket && req.socket.encrypted) ? 'https' : 'http');
   req.secure = req.protocol === 'https';
-  const xfHost = trustProxy ? String(req.headers['x-forwarded-host'] || '').split(',')[0].trim() : '';
+  const xfHost = trustProxy ? vanRechts('x-forwarded-host') : '';
   req.hostname = String(xfHost || req.headers.host || '').replace(/:\d+$/, '') || undefined;
-  if (trustProxy) {
-    const xff = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-    req.ip = xff || (req.socket && req.socket.remoteAddress);
-  } else req.ip = req.socket && req.socket.remoteAddress;
+  req.ip = (trustProxy && vanRechts('x-forwarded-for')) || (req.socket && req.socket.remoteAddress);
 
   res.status = (code) => { res.statusCode = code; return res; };
   res.set = res.header = function (veld, waarde) {

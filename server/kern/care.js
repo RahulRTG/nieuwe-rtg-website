@@ -30,7 +30,7 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor }) => {
     if (!Array.isArray(db.data.careAanbieders) || !db.data.careAanbieders.length) {
       db.data.careAanbieders = [
         {
-          id: 'zenith', naam: 'Zenith Spa & Wellness', soort: 'spa', icon: '🧖', waar: 'Talamanca, Ibiza',
+          id: 'zenith', naam: 'Zenith Spa & Wellness', soort: 'spa', icon: 'beauty', waar: 'Talamanca, Ibiza',
           supplierCode: 'ZENITH', // gekoppeld leveranciersaccount voor de aanbieder-agenda
           beschrijving: 'Rustige dagspa aan zee: massages, sauna en gezichtsbehandelingen.',
           behandelaars: [
@@ -44,7 +44,7 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor }) => {
           ]
         },
         {
-          id: 'clara', naam: 'Kliniek Clara Ibiza', soort: 'kliniek', icon: '🩺', waar: 'Vila, Ibiza',
+          id: 'clara', naam: 'Kliniek Clara Ibiza', soort: 'kliniek', icon: 'zorg', waar: 'Vila, Ibiza',
           supplierCode: 'CLARA',
           beschrijving: 'Privékliniek voor consulten, kleine ingrepen en herstelbegeleiding.',
           behandelaars: [

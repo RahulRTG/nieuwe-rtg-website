@@ -7,6 +7,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const { TOTAAL: RTF_TOTAAL } = require('../server/kern/rtfbieb');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -31,7 +32,7 @@ test.after(() => stop(srv && srv.child));
 test('1. de RTF-afdeling in de Mall is voor de gast volledig open, installeren incluis', async () => {
   const o = await api(base, '/api/mall/rtf', {}, gast);
   assert.equal(o.status, 200);
-  assert.equal(o.body.totaal, 20000);
+  assert.equal(o.body.totaal, RTF_TOTAAL, 'de RTF-afdeling toont de echte apps, geen verzonnen aantal');
   assert.ok(o.body.gratis);
   const cat = await api(base, '/api/mall/rtf/catalogus', { pagina: 1 }, gast);
   assert.ok(cat.body.items.length > 0);

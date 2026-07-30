@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · De Societeit</title>
+<meta name="theme-color" content="#171310">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  /* De Societeit voor 18 t/m 21: houtskool en goud, quiz- en schatduels */
+  :root{--s-nacht:#171310;--s-paneel:#241E17;--s-goud:#C9A34A;--s-koper:#A9744A;
+    --s-creme:#F2E9D8;--s-mat:#9A8D78;--s-groen:#7A9A57;--s-rood:#B4553F;}
+  html,body{height:100%;}
+  body{overflow:hidden;background:var(--s-nacht);color:var(--s-creme);}
+  #doek{position:fixed;inset:0;display:block;}
+  .scherm{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;
+    justify-content:flex-start;gap:.8rem;padding:1.2rem;overflow-y:auto;}
+  .scherm[hidden]{display:none;}
+  .scherm::before{content:'';flex:1 0 .2rem;}
+  .scherm::after{content:'';flex:1 0 .2rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:2.1rem;margin:0;color:var(--s-creme);}
+  .sub{color:var(--s-mat);text-align:center;margin-bottom:.6rem;max-width:26rem;}
+  .kaart-s{width:min(26rem,92vw);border:1px solid rgba(201,163,74,.35);border-radius:14px;padding:1.05rem 1.25rem;
+    cursor:pointer;display:flex;align-items:center;gap:1rem;font:inherit;text-align:left;
+    background:var(--s-paneel);color:var(--s-creme);}
+  .kaart-s b{font-family:var(--serif);font-weight:500;font-size:1.35rem;display:block;}
+  .kaart-s span{font-size:.9rem;color:var(--s-mat);}
+  .kaart-s svg{width:2.9rem;height:2.9rem;flex:0 0 auto;}
+  .duelbadge{margin-left:auto;background:rgba(201,163,74,.14);color:var(--s-goud);border-radius:999px;
+    padding:.2rem .7rem;font-size:.78rem;font-weight:700;white-space:nowrap;}
+  .rand{background:transparent;border:2px solid var(--s-mat);color:var(--s-mat);border-radius:999px;
+    padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.4rem;}
+  .neon{background:var(--s-goud);border:0;color:#241A06;border-radius:999px;padding:.8rem 2rem;
+    font:inherit;font-size:1.1rem;font-weight:800;cursor:pointer;box-shadow:0 0 24px rgba(201,163,74,.3);}
+  .neon[disabled]{opacity:.4;box-shadow:none;cursor:default;}
+  .bovenrij{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;}
+  .bovenrij[hidden]{display:none;}
+  .terugknop{background:rgba(23,19,16,.85);border:2px solid var(--s-goud);color:var(--s-creme);border-radius:999px;
+    padding:.5rem 1.05rem;font:inherit;font-size:.95rem;font-weight:700;cursor:pointer;}
+  .kop-info{flex:1;text-align:center;font-weight:700;font-size:1.05rem;}
+  .uitnodiging{width:min(26rem,92vw);background:rgba(169,116,74,.12);border:1px solid var(--s-koper);
+    border-radius:14px;padding:.75rem 1rem;display:flex;align-items:center;gap:.7rem;font-size:.95rem;}
+  .uitnodiging button{margin-left:auto;background:var(--s-koper);border:0;color:#26150A;border-radius:999px;
+    padding:.45rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
+  .keuze{width:min(26rem,92vw);display:flex;flex-direction:column;gap:.45rem;}
+  .keuze h3{margin:.4rem 0 .1rem;font-size:.95rem;color:var(--s-mat);text-transform:uppercase;letter-spacing:.08em;}
+  .persoon{display:flex;align-items:center;gap:.7rem;background:var(--s-paneel);border-radius:12px;
+    padding:.65rem .9rem;cursor:pointer;border:2px solid transparent;}
+  .persoon.aan{border-color:var(--s-goud);}
+  .persoon .wie{font-weight:700;}
+  .persoon .waar{margin-left:auto;font-size:.8rem;color:var(--s-mat);}
+  .persoon .vink{width:1.3rem;text-align:center;color:var(--s-goud);font-weight:800;}
+  .cnrij{display:flex;gap:.5rem;}
+  .cnrij input{flex:1;font:inherit;padding:.6rem .9rem;border-radius:12px;border:1px solid var(--s-mat);
+    background:var(--s-paneel);color:var(--s-creme);}
+  .cnrij button{background:var(--s-paneel);border:1px solid var(--s-goud);color:var(--s-goud);border-radius:12px;
+    padding:.6rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
+  /* het duel */
+  .vraag{font-family:var(--serif);font-size:clamp(1.5rem,5.6vw,2rem);text-align:center;max-width:24rem;
+    min-height:4.6rem;text-wrap:balance;}
+  .opties{width:min(24rem,90vw);display:flex;flex-direction:column;gap:.6rem;}
+  .opties button{font:inherit;font-size:1.1rem;font-weight:700;padding:.9rem 1.1rem;border-radius:14px;
+    border:1px solid rgba(201,163,74,.4);background:var(--s-paneel);color:var(--s-creme);cursor:pointer;text-align:left;}
+  .invoer{min-height:3.2rem;font-size:2.1rem;font-weight:800;color:var(--s-goud);letter-spacing:.06em;}
+  .eenheid{color:var(--s-mat);margin-top:-.6rem;}
+  .toetsen{display:grid;grid-template-columns:repeat(3,minmax(4.6rem,5.6rem));gap:.55rem;}
+  .toetsen button{font:inherit;font-size:1.5rem;font-weight:800;padding:.85rem 0;border-radius:14px;border:0;
+    background:var(--s-paneel);color:var(--s-creme);cursor:pointer;}
+  .toetsen .ok{background:var(--s-goud);color:#241A06;}
+  .toetsen .wis{color:var(--s-koper);font-size:1.1rem;}
+  .stand{width:min(26rem,92vw);display:flex;flex-direction:column;gap:.3rem;font-size:.92rem;}
+  .stand .rij{display:flex;gap:.6rem;align-items:center;background:rgba(255,255,255,.04);border-radius:10px;padding:.4rem .8rem;}
+  .stand .rij b{flex:1;font-weight:700;}
+  .stand .rij.ik b{color:var(--s-goud);}
+  .voortgang{color:var(--s-mat);}
+  .fb{min-height:1.8rem;font-weight:700;text-align:center;}
+  .fb.goed{color:var(--s-groen);}
+  .fb.fout{color:var(--s-rood);}
+  .uitslagkop{font-family:var(--serif);font-size:1.9rem;font-weight:500;text-align:center;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<canvas id="doek" aria-hidden="true"></canvas>
+
+<div class="bovenrij" hidden id="bovenrij">
+  <button class="terugknop" id="terugMenu" type="button">← Stop</button>
+  <div class="kop-info" id="kopInfo" aria-live="polite"></div>
+</div>
+
+<div class="scherm" id="sMenu" role="main">
+  <h1>De Societeit</h1>
+  <div class="sub">Een avondje scherpzinnigheid: quiz en schat tegen je vrienden, je klasgenoten of iedereen op codenaam. Alles telt alleen binnen het potje.</div>
+  <div id="uitnodigingen" class="keuze" aria-live="polite"></div>
+  <button class="kaart-s" data-start="quiz" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 18a9 9 0 1 1 12 8.5c-2.4 1-3 2.5-3 5" stroke="#C9A34A" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="24" cy="38" r="2.4" fill="#C9A34A"/></svg>
+    <span><b>Het Quizduel</b><span>Tien vragen, dezelfde voor iedereen</span></span>
+    <span class="duelbadge">2-4 spelers</span>
+  </button>
+  <button class="kaart-s" data-start="schat" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 34l8-12 7 7 9-14 8 10" stroke="#A9744A" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 40h32" stroke="#C9A34A" stroke-width="3"/></svg>
+    <span><b>Het Schatduel</b><span>Vijf keer schatten; het dichtstbij pakt het punt</span></span>
+    <span class="duelbadge">2-4 spelers</span>
+  </button>
+  <button class="kaart-s" data-start="orde" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="30" width="7" height="10" fill="#C9A34A"/><rect x="18" y="24" width="7" height="16" fill="#C9A34A" opacity=".8"/><rect x="28" y="16" width="7" height="24" fill="#A9744A"/><rect x="38" y="8" width="4" height="32" fill="#A9744A" opacity=".7"/></svg>
+    <span><b>Het Rangschikduel</b><span>Zet vier dingen in de enige juiste volgorde</span></span>
+    <span class="duelbadge">2-4 spelers</span>
+  </button>
+  <a class="kaart-s" href="/apps/spelen.html" style="text-decoration:none">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="3" fill="#C9A34A"/><rect x="26" y="26" width="14" height="14" rx="3" fill="#C9A34A" opacity=".5"/><rect x="26" y="8" width="14" height="14" rx="3" fill="#A9744A" opacity=".6"/><rect x="8" y="26" width="14" height="14" rx="3" fill="#A9744A"/></svg>
+    <span><b>De speeltafel</b><span>Schaken, dammen, Rummi, Magnaat en meer</span></span>
+  </a>
+  <button class="rand" id="naarhuis" type="button">Terug naar de app</button>
+</div>
+
+<div class="scherm" id="sKies" hidden>
+  <h1 id="kiesKop">Wie daag je uit?</h1>
+  <div class="sub">Kies 1 tot 3 tegenspelers, of voeg iemand toe op codenaam.</div>
+  <div class="keuze" id="kiesLijst" aria-live="polite">Even laden...</div>
+  <div class="keuze">
+    <h3>Op codenaam</h3>
+    <div class="cnrij">
+      <input id="cnVeld" type="text" autocomplete="off" placeholder="Bijvoorbeeld: Gouden Ibis" aria-label="Codenaam">
+      <button id="cnVoeg" type="button">Voeg toe</button>
+    </div>
+    <div id="cnFout" class="fb"></div>
+  </div>
+  <button class="neon" id="kiesStart" type="button" disabled>Start het duel</button>
+  <button class="rand" data-terug type="button">Toch niet</button>
+</div>
+
+<div class="scherm" id="sWacht" hidden>
+  <h1>De uitdaging is verstuurd</h1>
+  <div class="sub" id="wachtWie">We wachten tot iedereen de uitdaging heeft aangenomen...</div>
+  <button class="rand" data-terug type="button">Terug naar het menu</button>
+</div>
+
+<div class="scherm" id="sQuiz" hidden>
+  <div class="voortgang" id="quizNr"></div>
+  <div class="vraag" id="quizVraag">--</div>
+  <div class="opties" id="quizOpties"></div>
+  <div class="fb" id="quizFb">&nbsp;</div>
+  <div class="stand" id="quizStand"></div>
+</div>
+
+<div class="scherm" id="sSchat" hidden>
+  <div class="voortgang" id="schatNr"></div>
+  <div class="vraag" id="schatVraag">--</div>
+  <div class="eenheid" id="schatEenheid"></div>
+  <div class="invoer" id="schatInvoer">&nbsp;</div>
+  <div class="fb" id="schatFb">&nbsp;</div>
+  <div class="toetsen" id="schatToetsen">
+    <button type="button" data-t="7">7</button><button type="button" data-t="8">8</button><button type="button" data-t="9">9</button>
+    <button type="button" data-t="4">4</button><button type="button" data-t="5">5</button><button type="button" data-t="6">6</button>
+    <button type="button" data-t="1">1</button><button type="button" data-t="2">2</button><button type="button" data-t="3">3</button>
+    <button type="button" class="wis" data-t="wis">wis</button><button type="button" data-t="0">0</button><button type="button" class="ok" data-t="ok">OK</button>
+  </div>
+  <div class="stand" id="schatStand"></div>
+</div>
+
+<div class="scherm" id="sOrde" hidden>
+  <div class="voortgang" id="ordeNr"></div>
+  <div class="vraag" id="ordeOpdracht">--</div>
+  <div class="opties" id="ordeItems"></div>
+  <div class="fb" id="ordeFb">&nbsp;</div>
+  <button class="neon" id="ordeVast" type="button" disabled>Leg de volgorde vast</button>
+  <div class="stand" id="ordeStand"></div>
+</div>
+
+<div class="scherm" id="sUitslag" hidden>
+  <div class="uitslagkop" id="uitslagKop"></div>
+  <div class="sub" id="uitslagSub"></div>
+  <div class="stand" id="uitslagStand"></div>
+  <button class="neon" data-terug type="button">Terug naar het menu</button>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  let sess = null;
+  try { sess = JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); } catch (e) {}
+  if (!sess || !sess.token) { location.href = '/apps/foundation/index.html'; return; }
+
+  /* ---------- kaarslicht op de achtergrond ---------- */
+  const doek = $('#doek'), ctx = doek.getContext('2d');
+  let W = 0, H = 0, VONK = [];
+  function maat() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    doek.width = W * dpr; doek.height = H * dpr;
+    doek.style.width = W + 'px'; doek.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    VONK = [];
+    for (let i = 0; i < 40; i++) VONK.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.4 + .3, s: Math.random() * .18 + .04 });
+  }
+  window.addEventListener('resize', maat);
+  maat();
+  (function gloed() {
+    ctx.fillStyle = '#171310'; ctx.fillRect(0, 0, W, H);
+    const g = ctx.createRadialGradient(W / 2, H * .12, 10, W / 2, H * .12, H * .8);
+    g.addColorStop(0, 'rgba(201,163,74,.10)'); g.addColorStop(1, 'rgba(201,163,74,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    for (const v of VONK) {
+      v.y -= v.s; if (v.y < -2) { v.y = H + 2; v.x = Math.random() * W; }
+      ctx.globalAlpha = .45; ctx.fillStyle = '#C9A34A';
+      ctx.beginPath(); ctx.arc(v.x, v.y, v.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(gloed);
+  })();
+
+  /* ---------- api en schermwissel ---------- */
+  async function api(actie, body) {
+    const r = await fetch('/api/rtf/spel/' + actie, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ code: sess.code, token: sess.token }, body || {})) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+    return d;
+  }
+  const SCHERMEN = ['sMenu', 'sKies', 'sWacht', 'sQuiz', 'sSchat', 'sOrde', 'sUitslag'];
+  let potje = null, soort = 'quiz', pollT = null;
+  function toon(id) {
+    SCHERMEN.forEach(s => { $('#' + s).hidden = s !== id; });
+    $('#bovenrij').hidden = id === 'sMenu';
+    if (id === 'sMenu') { potje = null; clearInterval(pollT); laadUitnodigingen(); }
+  }
+  document.querySelectorAll('[data-terug]').forEach(b => b.addEventListener('click', () => toon('sMenu')));
+  $('#terugMenu').addEventListener('click', async () => {
+    if (potje && potje.status === 'bezig') { try { await api('opgeven', { id: potje.id }); } catch (e) {} }
+    toon('sMenu');
+  });
+  $('#naarhuis').addEventListener('click', () => { location.href = '/apps/foundation/index.html'; });
+
+  /* ---------- het menu: starten en uitnodigingen ---------- */
+  document.querySelectorAll('[data-start]').forEach(b => b.addEventListener('click', () => {
+    soort = b.dataset.start;
+    openKies();
+  }));
+  async function laadUitnodigingen() {
+    const vak = $('#uitnodigingen');
+    try {
+      const d = await api('mijn', {});
+      const duels = (d.uitnodigingen || []).filter(u => u.soort === 'quiz' || u.soort === 'schat' || u.soort === 'orde');
+      vak.innerHTML = '';
+      for (const u of duels.slice(0, 4)) {
+        const rij = document.createElement('div');
+        rij.className = 'uitnodiging';
+        const tekst = document.createElement('span');
+        tekst.textContent = u.van + ' daagt je uit: ' + u.naam;
+        const knop = document.createElement('button');
+        knop.type = 'button'; knop.textContent = 'Doe mee';
+        knop.addEventListener('click', async () => {
+          try { await api('antwoord', { id: u.id, akkoord: true }); openPotje(u.id); }
+          catch (e) { rij.remove(); }
+        });
+        rij.append(tekst, knop); vak.append(rij);
+      }
+    } catch (e) {}
+  }
+  setInterval(() => { if (!$('#sMenu').hidden && !document.hidden) laadUitnodigingen(); }, 5000);
+
+  /* ---------- kiezen: vrienden, klasgenoten en codenamen ---------- */
+  const gekozen = new Map(); // key -> bron ('vriend' | 'klas' | 'cn:<naam>')
+  function telStart() { $('#kiesStart').disabled = !gekozen.size; }
+  async function openKies() {
+    gekozen.clear();
+    $('#kiesKop').textContent = (soort === 'quiz' ? 'Quizduel' : soort === 'schat' ? 'Schatduel' : 'Rangschikduel') + ': wie daag je uit?';
+    $('#kiesLijst').textContent = 'Even laden...';
+    $('#cnVeld').value = ''; $('#cnFout').textContent = '';
+    telStart(); toon('sKies');
+    let vrienden = [], klasgenoten = [];
+    try {
+      const r = await fetch('/api/rtf/social/connections', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: sess.code, token: sess.token }) });
+      vrienden = ((await r.json()).connections || []);
+    } catch (e) {}
+    try { klasgenoten = (await api('klasgenoten', {})).klasgenoten || []; } catch (e) {}
+    const lijst = $('#kiesLijst');
+    lijst.innerHTML = '';
+    const vriendKeys = new Set(vrienden.map(v => v.key));
+    const blok = (kop, rijen, bron) => {
+      if (!rijen.length) return;
+      const h = document.createElement('h3'); h.textContent = kop; lijst.append(h);
+      for (const p of rijen) {
+        const rij = document.createElement('div');
+        rij.className = 'persoon';
+        rij.innerHTML = '<span class="vink"></span><span class="wie"></span><span class="waar"></span>';
+        rij.querySelector('.wie').textContent = p.codename || p.codenaam;
+        rij.querySelector('.waar').textContent = bron === 'klas' ? (p.klas || 'klasgenoot') : 'vriend';
+        rij.addEventListener('click', () => {
+          if (gekozen.has(p.key)) { gekozen.delete(p.key); rij.classList.remove('aan'); rij.querySelector('.vink').textContent = ''; }
+          else if (gekozen.size < 3) { gekozen.set(p.key, bron); rij.classList.add('aan'); rij.querySelector('.vink').textContent = '✓'; }
+          telStart();
+        });
+        lijst.append(rij);
+      }
+    };
+    blok('Vrienden', vrienden, 'vriend');
+    blok('Klasgenoten', klasgenoten.filter(k => !vriendKeys.has(k.key)), 'klas');
+    if (!lijst.children.length) lijst.textContent = 'Nog geen vrienden of klasgenoten hier -- nodig iemand uit op codenaam.';
+  }
+  $('#cnVoeg').addEventListener('click', () => {
+    const naam = $('#cnVeld').value.trim();
+    if (naam.length < 2 || gekozen.size >= 3) return;
+    gekozen.set('cn:' + naam.toLowerCase(), 'cn:' + naam);
+    const rij = document.createElement('div');
+    rij.className = 'persoon aan';
+    rij.innerHTML = '<span class="vink">✓</span><span class="wie"></span><span class="waar">op codenaam</span>';
+    rij.querySelector('.wie').textContent = naam;
+    rij.addEventListener('click', () => { gekozen.delete('cn:' + naam.toLowerCase()); rij.remove(); telStart(); });
+    $('#kiesLijst').append(rij);
+    $('#cnVeld').value = '';
+    telStart();
+  });
+  $('#kiesStart').addEventListener('click', async () => {
+    const vrienden = [], klasgenoten = [], codenamen = [];
+    for (const [key, bron] of gekozen) {
+      if (bron === 'vriend') vrienden.push(key);
+      else if (bron === 'klas') klasgenoten.push(key);
+      else codenamen.push(bron.slice(3));
+    }
+    try {
+      const d = await api('nieuw', { soort, grootte: gekozen.size + 1, vrienden, klasgenoten, codenamen });
+      $('#wachtWie').textContent = 'We wachten tot iedereen de uitdaging heeft aangenomen...';
+      toon('sWacht');
+      volgPotje(d.id);
+    } catch (e) { $('#cnFout').textContent = e.message; $('#cnFout').className = 'fb fout'; toon('sKies'); }
+  });
+  function volgPotje(id) {
+    clearInterval(pollT);
+    pollT = setInterval(async () => {
+      try {
+        const d = await api('staat', { id });
+        potje = d.potje;
+        if (potje.status === 'bezig') { clearInterval(pollT); startDuel(); }
+        else if (potje.status === 'klaar') { clearInterval(pollT); toonUitslag(); }
+      } catch (e) { clearInterval(pollT); toon('sMenu'); }
+    }, 2000);
+  }
+  async function openPotje(id) {
+    try {
+      const d = await api('staat', { id });
+      potje = d.potje; soort = potje.soort;
+      if (potje.status === 'bezig') startDuel();
+      else if (potje.status === 'klaar') toonUitslag();
+      else { $('#wachtWie').textContent = 'We wachten tot iedereen de uitdaging heeft aangenomen...'; toon('sWacht'); volgPotje(id); }
+    } catch (e) { toon('sMenu'); }
+  }
+  function startDuel() {
+    if (soort === 'quiz') { toon('sQuiz'); quizToon(); }
+    else if (soort === 'orde') { ordeRonde = -1; toon('sOrde'); ordeToon(); }
+    else { toon('sSchat'); schatToon(); }
+    clearInterval(pollT);
+    pollT = setInterval(async () => {
+      if (!potje || document.hidden) return;
+      try {
+        const d = await api('staat', { id: potje.id });
+        potje = d.potje;
+        if (potje.status === 'klaar') { clearInterval(pollT); return toonUitslag(); }
+        if (soort === 'quiz') quizToon(); else if (soort === 'orde') ordeToon(); else schatToon();
+      } catch (e) {}
+    }, 2500);
+  }
+  function standRijen(el, maak) {
+    el.innerHTML = '';
+    if (!potje) return;
+    potje.spelers.forEach((cn, i) => {
+      const rij = document.createElement('div');
+      rij.className = 'rij' + (i === potje.ik ? ' ik' : '');
+      const b = document.createElement('b'); b.textContent = cn;
+      const s = document.createElement('span'); s.className = 'voortgang'; s.textContent = maak(i);
+      rij.append(b, s); el.append(rij);
+    });
+  }
+  const fb = (el, goed, tekst) => { el.textContent = tekst; el.className = 'fb ' + (goed ? 'goed' : 'fout');
+    setTimeout(() => { el.textContent = ' '; el.className = 'fb'; }, 1600); };
+
+  /* ---------- het Quizduel ---------- */
+  function quizToon() {
+    const st = potje.staat || {};
+    $('#kopInfo').textContent = 'Het Quizduel';
+    $('#quizNr').textContent = st.vraag ? ('Vraag ' + (st.nr + 1) + ' van ' + st.tot + ' · ' + st.goed + ' goed') : 'Klaar! Wachten op de rest...';
+    $('#quizVraag').textContent = st.vraag || '✓';
+    const vak = $('#quizOpties');
+    vak.innerHTML = '';
+    (st.vraag ? st.opties : []).forEach((optie, i) => {
+      const k = document.createElement('button');
+      k.type = 'button'; k.textContent = optie;
+      k.addEventListener('click', async () => {
+        try {
+          const r = await api('zet', { id: potje.id, zet: { actie: 'antwoord', keuze: i } });
+          fb($('#quizFb'), r.goedWas, r.goedWas ? 'Goed!' : 'Het was: ' + r.juistTekst);
+          if (r.potje) { potje = r.potje; if (potje.status === 'klaar') return toonUitslag(); }
+          quizToon();
+        } catch (e) {}
+      });
+      vak.append(k);
+    });
+    standRijen($('#quizStand'), i => st.stand[i].af + '/' + st.tot + ' af · ' + st.stand[i].goed + ' goed');
+  }
+
+  /* ---------- het Schatduel ---------- */
+  let invoer = '';
+  function schatToon() {
+    const st = potje.staat || {};
+    $('#kopInfo').textContent = 'Het Schatduel';
+    $('#schatNr').textContent = st.vraag ? ('Ronde ' + (st.nr + 1) + ' van ' + st.tot) : 'Klaar! Wachten op de rest...';
+    $('#schatVraag').textContent = st.vraag || '✓';
+    $('#schatEenheid').textContent = st.eenheid ? 'in ' + st.eenheid : '';
+    $('#schatInvoer').textContent = invoer || ' ';
+    standRijen($('#schatStand'), i => st.stand[i].af + '/' + st.tot + ' af · ' + st.stand[i].punten + (st.stand[i].punten === 1 ? ' punt' : ' punten'));
+  }
+  $('#schatToetsen').addEventListener('click', async (e) => {
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.t === 'wis') invoer = '';
+    else if (t.dataset.t === 'ok') {
+      if (!invoer) return;
+      const w = Number(invoer); invoer = '';
+      try {
+        const r = await api('zet', { id: potje.id, zet: { actie: 'schat', w } });
+        fb($('#schatFb'), true, 'Het echte antwoord: ' + r.juist + (r.eenheid && r.eenheid !== 'jaartal' ? ' ' + r.eenheid : ''));
+        if (r.potje) { potje = r.potje; if (potje.status === 'klaar') return setTimeout(toonUitslag, 900); }
+        schatToon();
+      } catch (e2) {}
+      return;
+    }
+    else if (invoer.length < 6) invoer += t.dataset.t;
+    $('#schatInvoer').textContent = invoer || ' ';
+  });
+
+  /* ---------- het Rangschikduel ---------- */
+  let ordeRonde = -1, ordeKeuze = [];
+  function ordeToon() {
+    const st = potje.staat || {};
+    $('#kopInfo').textContent = 'Het Rangschikduel';
+    $('#ordeNr').textContent = st.opdracht ? ('Ronde ' + (st.nr + 1) + ' van ' + st.tot + ' · ' + st.punten + ' punten') : 'Klaar! Wachten op de rest...';
+    $('#ordeOpdracht').textContent = st.opdracht || '✓';
+    if (ordeRonde !== st.nr) { ordeRonde = st.nr; ordeKeuze = []; }
+    const vak = $('#ordeItems');
+    vak.innerHTML = '';
+    (st.items || []).forEach((naam, i) => {
+      const k = document.createElement('button');
+      k.type = 'button';
+      const plek = ordeKeuze.indexOf(i);
+      k.textContent = (plek >= 0 ? (plek + 1) + '. ' : '') + naam;
+      if (plek >= 0) k.style.borderColor = 'var(--s-goud)';
+      k.addEventListener('click', () => {
+        const idx = ordeKeuze.indexOf(i);
+        if (idx >= 0) ordeKeuze.splice(idx, 1); else if (ordeKeuze.length < 4) ordeKeuze.push(i);
+        $('#ordeVast').disabled = ordeKeuze.length !== 4;
+        ordeToon();
+      });
+      vak.append(k);
+    });
+    $('#ordeVast').disabled = ordeKeuze.length !== 4;
+    standRijen($('#ordeStand'), i => st.stand[i].af + '/' + st.tot + ' af · ' + st.stand[i].punten + (st.stand[i].punten === 1 ? ' punt' : ' punten'));
+  }
+  $('#ordeVast').addEventListener('click', async () => {
+    if (ordeKeuze.length !== 4 || !potje) return;
+    const volgorde = ordeKeuze.slice(); ordeKeuze = [];
+    $('#ordeVast').disabled = true;
+    try {
+      const r = await api('zet', { id: potje.id, zet: { actie: 'orde', volgorde } });
+      fb($('#ordeFb'), r.goedWas, r.goedWas ? 'De enige juiste volgorde!' : 'Het was: ' + r.juist.join(' · '));
+      if (r.potje) { potje = r.potje; if (potje.status === 'klaar') return setTimeout(toonUitslag, 1600); }
+      setTimeout(ordeToon, 400);
+    } catch (e) { ordeToon(); }
+  });
+
+  /* ---------- de uitslag ---------- */
+  function toonUitslag() {
+    $('#uitslagKop').textContent = potje.gelijk ? 'Precies gelijk' : (potje.winnaar === potje.spelers[potje.ik] ? 'De eer is aan jou' : 'De eer is aan ' + potje.winnaar);
+    $('#uitslagSub').textContent = (soort === 'quiz' ? 'De meeste vragen goed telt.' : soort === 'orde' ? 'Alleen de enige juiste volgorde telde.' : 'Het dichtstbij pakte elk punt.') + ' Niets wordt bewaard.';
+    const st = potje.staat || {};
+    standRijen($('#uitslagStand'), i => !st.stand ? '' : soort === 'quiz'
+      ? st.stand[i].goed + ' van ' + st.tot + ' goed'
+      : st.stand[i].punten + ' van ' + st.tot + ' punten');
+    toon('sUitslag');
+  }
+
+  /* ---------- diepe link vanuit een uitnodiging elders ---------- */
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('potje')) openPotje(qs.get('potje'));
+  else laadUitnodigingen();
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

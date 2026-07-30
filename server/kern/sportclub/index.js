@@ -42,7 +42,7 @@ function maakSportclub({ db, save, crypto, anthropic }) {
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
     if (!db.data.supplierTypes.sportclub)
-      db.data.supplierTypes.sportclub = { label: 'Sportclub', icon: '⚽', caps: ['sportclub'] };
+      db.data.supplierTypes.sportclub = { label: 'Sportclub', icon: 'sport', caps: ['sportclub'] };
     if (!db.data.suppliers.find(s => s.code === 'FCRTG')) {
       db.data.suppliers.push({
         code: 'FCRTG', name: 'FC RTG', type: 'sportclub', city: 'Ibiza',
@@ -87,7 +87,7 @@ function maakSportclub({ db, save, crypto, anthropic }) {
         { id: id('wd'), teamId: t1, tegenstander: 'Es Vedra FC', thuis: true, datum: dagen(5), tijd: '16:00', veld: 'Hoofdveld', uitslag: null, at: nu() }
       ];
       c.sponsors = [{ id: id('sp'), pakket: 'Hoofdsponsor shirt', prijsCenten: 2500000, tekst: 'Het shirt van RTG 1, een heel seizoen.', status: 'open', interesse: [], at: nu() }];
-      c.momenten = [{ id: id('mo'), tekst: 'De 3-1 tegen CD Salinas: wat een middag op de Noord!', beeld: '🏟️', door: 'FC RTG', at: nu() }];
+      c.momenten = [{ id: id('mo'), tekst: 'De 3-1 tegen CD Salinas: wat een middag op de Noord!', beeld: 'sport', door: 'FC RTG', at: nu() }];
       save();
     }
     return c;

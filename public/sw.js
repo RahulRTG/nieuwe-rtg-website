@@ -2,7 +2,7 @@
    is en offline opent. API-verkeer gaat altijd naar het netwerk.
    Pagina's en scripts zijn network-first: een update op de server komt
    direct door, de cache is alleen het vangnet zonder verbinding. */
-const CACHE = 'rtg-app-a8b3a357';
+const CACHE = 'rtg-app-46ddec40';
 const SHELL = ['/apps/app.html', '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -47,7 +47,9 @@ self.addEventListener('push', e => {
   const title = data.title || 'Rahul Travel Group';
   e.waitUntil(self.registration.showNotification(title, {
     body: data.body || '',
-    icon: data.icon || '/icon.svg',
+    // het icon-veld draagt tegenwoordig een glyf-naam voor de app zelf; een
+    // OS-melding wil een URL, dus alleen echte paden gaan door
+    icon: /^\//.test(data.icon || '') ? data.icon : '/icon.svg',
     badge: '/icon.svg',
     tag: data.tag,
     data: { url: '/apps/app.html' }

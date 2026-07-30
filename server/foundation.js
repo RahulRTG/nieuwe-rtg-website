@@ -60,16 +60,28 @@ const { gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht,
   kanaalInfo, setPushHook, bezorgAanGasten, berichtVanGast } = require('./foundation/gasten')(ctx);
 require('./foundation/berichten')(ctx);
 gctx.bezorgAanGasten = bezorgAanGasten; // late binding voor de gezinsberichten
+gctx.welkomRtf = () => {}; // late binding: het welkom-draaiboek (RTMAIL) komt via setAutomatisering
+/* De server bindt hier het welkom-draaiboek in: elk nieuw RTF-profiel krijgt
+   een welkom in zijn eigen RTMAIL-postvak (op codenaam). Los te laten (blijft
+   de lege functie hierboven) als de automatisering niet meedraait. */
+function setAutomatisering(a) {
+  gctx.welkomRtf = (codenaam) => { try { if (a && codenaam) a.welkomLid({ codename: codenaam, wereld: 'RTF' }); } catch (e) {} };
+}
 /* ---------- sollicitaties + marktplaats: eigen modules op de context ----------
    De gezins-helpers gaan op de context; de submodules registreren hun routes
    op dezelfde router en geven hun publieke functies terug. */
 const { verifieerProfiel, bewaarSollicitatie, alGesolliciteerd } = require('./foundation/sollicitaties')(ctx);
 const { setMarkt } = require('./foundation/markt')(ctx);
 
-router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
+/* Een health-check hoort te zeggen DAT het werkt, niet hoeveel gezinnen er in
+   de hulpverlening zitten. Dat laatste stond hier onbeschermd: aantallen
+   gezinnen en hulpaanvragen zijn bedrijfsinformatie over kwetsbare mensen, en
+   een load balancer heeft er niets aan. De cijfers staan op het RTF-kantoor,
+   achter een inlog; hier blijft alleen het leven-teken over. */
+router.get('/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claude' : 'demo' }));
 
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
 require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto });
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr };

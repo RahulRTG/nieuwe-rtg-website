@@ -44,8 +44,13 @@
 
   <!-- overzicht -->
   <section id="vLijsten">
-    <h1>📇 Overhoren</h1>
+    <h1>Overhoren</h1>
     <p class="intro">Maak je eigen overhoorlijsten (woordjes, topografie, tafels), oefen ze zelf, of daag iemand uit voor een overhoorduel.</p>
+
+    <div class="kaart rij" id="hBlok" style="border-color:var(--goud);">
+      <div class="nm">Vandaag herhalen<small id="hUitleg">Even kijken wat er klaarstaat&hellip;</small></div>
+      <button class="knop klein" id="hStart" hidden>Start</button>
+    </div>
 
     <div class="kaart blok">
       <input class="veld" id="mNaam" placeholder="Naam van je lijst (bijv. Frans hoofdstuk 3)" maxlength="60">
@@ -54,7 +59,7 @@
       <div style="text-align:center;margin:.5rem 0 .1rem;color:var(--zacht);font-size:.8rem;">of laat je buddy er een maken</div>
       <div style="display:flex;gap:.5rem;">
         <input class="veld" id="mOnderwerp" style="flex:1;" placeholder="Waarover? (bijv. hoofdsteden van Europa)" maxlength="80">
-        <button class="knop grijs" id="mAi">✨ Maak</button>
+        <button class="knop grijs" id="mAi">Maak</button>
       </div>
       <div class="fout" id="mFout"></div>
     </div>
@@ -64,6 +69,24 @@
     <div id="lijsten"><div class="leeg">Nog geen lijsten. Maak er hierboven een.</div></div>
     <h2 class="sec">Jouw duels</h2>
     <div id="sessies"><div class="leeg">Nog geen duels gespeeld.</div></div>
+  </section>
+
+  <!-- vandaag herhalen: de eerlijke vergeetcurve -->
+  <section id="vHerhaal" hidden>
+    <h1>Vandaag herhalen</h1>
+    <div class="kaart kaartgroot" id="hSpeel">
+      <div style="color:var(--zacht);font-size:.82rem;" id="hTeller"></div>
+      <div class="vraag" id="hVraag"></div>
+      <div style="color:var(--zacht);font-size:.78rem;margin:.2rem 0;" id="hBron"></div>
+      <input class="veld" id="hAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
+      <button class="knop" id="hCheck" style="width:100%;margin-top:.6rem;">Controleer</button>
+      <div class="uitslag" id="hUitslag"></div>
+    </div>
+    <div class="kaart kaartgroot" id="hKlaar" hidden>
+      <div class="vraag" id="hScore"></div>
+      <p class="intro">Wat je goed wist komt later vanzelf terug; wat lastig was, staat morgen weer klaar. Meer hoeft niet.</p>
+      <button class="knop grijs" id="hTerug" style="width:100%;">Klaar voor vandaag</button>
+    </div>
   </section>
 
   <!-- solo overhoren -->
@@ -85,7 +108,7 @@
 
   <!-- samen leren: uitdagen -->
   <section id="vSamen" hidden>
-    <h1>🤝 Overhoorduel</h1>
+    <h1>Overhoorduel</h1>
     <p class="intro" id="sIntro"></p>
     <div class="kaart blok">
       <div class="keuzerij" id="sVrienden"><span class="leeg">Vrienden laden…</span></div>
@@ -122,13 +145,13 @@ if (!window.Sessie || !Sessie.eisFamilie()) {}
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const groep = (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || 'kind';
+const groep = (s && s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || 'kind';
 const api = (actie, body) => fetch('/api/rtf/leren/' + actie, {
   method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
-function toon(v){ ['vLijsten','vOverhoor','vSamen','vDuel'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vLijsten','vHerhaal','vOverhoor','vSamen','vDuel'].forEach(x => $('#'+x).hidden = (x!==v)); }
 
 /* ---------- overzicht ---------- */
 async function laadLijsten(){
@@ -164,8 +187,56 @@ $('#mAi').addEventListener('click', async () => {
   $('#mAi').disabled = true; $('#mAi').textContent = '…';
   try { const d = await api('lijst-ai', { onderwerp: $('#mOnderwerp').value, groep }); $('#mOnderwerp').value=''; if (d.demo) $('#mFout').textContent = 'De buddy koos een kant-en-klaar setje (demo).'; laadLijsten(); }
   catch (e) { $('#mFout').textContent = e.message; }
-  $('#mAi').disabled = false; $('#mAi').textContent = '✨ Maak';
+  $('#mAi').disabled = false; $('#mAi').textContent = 'Maak';
 });
+
+/* ---------- vandaag herhalen: de eerlijke vergeetcurve ----------
+   De server bepaalt de dagstapel en de bakjes; het scherm overhoort alleen.
+   Goed = een bakje omhoog en later terug, fout = achteraan vandaag opnieuw. */
+let H = null;
+async function laadHerhaal(){
+  try {
+    const d = await api('herhaal-stand');
+    $('#hUitleg').textContent = d.vandaag
+      ? d.vandaag + (d.vandaag === 1 ? ' vraag staat' : ' vragen staan') + ' vandaag klaar. Goed = later terug, fout = vandaag nog een keer.'
+      : 'Niets meer voor vandaag. Wat je oefent komt vanzelf terug op de goede dag.';
+    $('#hStart').hidden = !d.vandaag;
+  } catch(e){ /* het blok blijft dan stil */ }
+}
+$('#hStart').addEventListener('click', async () => {
+  const d = await api('herhaal');
+  if (!d.stapel.length) return laadHerhaal();
+  H = { rij: d.stapel, i: 0, goed: 0 };
+  $('#hKlaar').hidden = true;
+  toon('vHerhaal'); hVolgende();
+});
+function hVolgende(){
+  if (H.i >= H.rij.length) return hEinde();
+  const k = H.rij[H.i];
+  $('#hTeller').textContent = 'nog ' + (H.rij.length - H.i) + ' vandaag';
+  $('#hVraag').textContent = k.v;
+  $('#hBron').textContent = k.lijst + ' · bakje ' + k.bak;
+  $('#hAntwoord').value = ''; $('#hUitslag').textContent = ''; $('#hUitslag').className = 'uitslag';
+  $('#hAntwoord').focus();
+}
+$('#hCheck').addEventListener('click', async () => {
+  if (!H || H.i >= H.rij.length) return;
+  const k = H.rij[H.i];
+  const goed = norm($('#hAntwoord').value) === norm(k.a);
+  $('#hUitslag').textContent = goed ? '✓ Goed! Die komt later vanzelf terug.'
+    : 'Het was: ' + k.a + ' -- die komt vandaag nog een keer.';
+  $('#hUitslag').className = 'uitslag ' + (goed ? 'goed' : 'fout');
+  if (goed) H.goed++; else H.rij.push(k); // fout: achteraan vandaag opnieuw
+  try { await api('herhaal-antwoord', { lijstId: k.lijstId, idx: k.idx, goed }); } catch(e){}
+  H.i++;
+  setTimeout(hVolgende, goed ? 650 : 1600);
+});
+$('#hAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#hCheck').click(); });
+function hEinde(){
+  $('#hScore').textContent = 'Alles van vandaag gehad.';
+  $('#hKlaar').hidden = false;
+}
+$('#hTerug').addEventListener('click', () => { toon('vLijsten'); laadLijsten(); laadHerhaal(); });
 
 /* ---------- solo overhoren (op het scherm; de score gaat naar de server) ---------- */
 const norm = t => String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -174,7 +245,7 @@ async function beginOverhoor(id){
   const d = await api('lijst-haal', { id });
   const volgorde = d.lijst.paren.map((_,i)=>i).sort(()=>Math.random()-0.5);
   O = { id, naam: d.lijst.naam, paren: d.lijst.paren, rij: volgorde, i: 0, goed: 0, fouten: [], herkansing: false };
-  $('#oTitel').textContent = '📇 ' + d.lijst.naam;
+  $('#oTitel').textContent = '' + d.lijst.naam;
   $('#oKlaar').hidden = true; $('#oCheck').disabled = false;
   toon('vOverhoor'); volgende();
 }
@@ -189,7 +260,7 @@ $('#oCheck').addEventListener('click', () => {
   if (!O || O.i >= O.rij.length) return;
   const p = O.paren[O.rij[O.i]];
   const goed = norm($('#oAntwoord').value) === norm(p.a);
-  $('#oUitslag').textContent = goed ? '✓ Goed!' : '✗ Het was: ' + p.a;
+  $('#oUitslag').textContent = goed ? '✓ Goed!' : 'Het was: ' + p.a;
   $('#oUitslag').className = 'uitslag ' + (goed ? 'goed' : 'fout');
   if (goed) O.goed++; else O.fouten.push(O.rij[O.i]);
   O.i++;
@@ -197,7 +268,7 @@ $('#oCheck').addEventListener('click', () => {
 });
 $('#oAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#oCheck').click(); });
 async function oEinde(){
-  $('#oScore').textContent = O.goed + ' van ' + O.rij.length + ' goed' + (O.goed === O.rij.length ? ' 🎉' : '');
+  $('#oScore').textContent = O.goed + ' van ' + O.rij.length + ' goed' + (O.goed === O.rij.length ? ' ' : '');
   $('#oFouten').hidden = !O.fouten.length;
   $('#oKlaar').hidden = false;
   if (!O.herkansing) try { await api('overhoor-klaar', { id: O.id, goed: O.goed, totaal: O.rij.length }); } catch (e) {}
@@ -248,12 +319,12 @@ async function openDuel(id){
 async function ververs(){
   let d; try { d = await api('sessie-staat', { id: D.id }); } catch (e) { return; }
   const x = d.sessie;
-  $('#dTitel').textContent = '🤝 ' + x.naam;
+  $('#dTitel').textContent = '' + x.naam;
   const balk = (naam, wie) => '<div class="balkje"><span class="naam">'+esc(naam)+'</span><div class="spoor"><div class="vul" style="width:'+Math.round(100*wie.idx/x.aantal)+'%"></div></div><span>'+wie.goed+' goed</span></div>';
   $('#dStanden').innerHTML = balk('jij', x.ik) + (x.ander ? balk(x.ander.codenaam, x.ander) : '<div class="leeg">Wacht tot de ander meedoet…</div>');
   if (x.status === 'klaar'){
     $('#dSpeel').hidden = true; $('#dKlaar').hidden = false;
-    $('#dWin').textContent = x.gelijk ? 'Gelijkspel! Sterk van allebei.' : '🏆 ' + x.winnaar + ' wint dit duel!';
+    $('#dWin').textContent = x.gelijk ? 'Gelijkspel! Sterk van allebei.' : '' + x.winnaar + ' wint dit duel!';
     clearInterval(dPoll);
     return;
   }
@@ -272,7 +343,7 @@ $('#dCheck').addEventListener('click', async () => {
   const antwoord = $('#dAntwoord').value;
   try {
     const d = await api('sessie-zet', { id: D.id, antwoord });
-    $('#dUitslag').textContent = d.goed ? '✓ Goed!' : '✗ Het was: ' + d.juist;
+    $('#dUitslag').textContent = d.goed ? '✓ Goed!' : 'Het was: ' + d.juist;
     $('#dUitslag').className = 'uitslag ' + (d.goed ? 'goed' : 'fout');
     setTimeout(ververs, d.goed ? 600 : 1500);
   } catch (e) { $('#dUitslag').textContent = e.message; }
@@ -280,13 +351,26 @@ $('#dCheck').addEventListener('click', async () => {
 $('#dAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#dCheck').click(); });
 $('#dTerug').addEventListener('click', () => { toon('vLijsten'); laadLijsten(); });
 
-laadLijsten();
-const qs = new URLSearchParams(location.search);
-if (qs.get('duel')) openDuel(qs.get('duel'));
+/* Zonder sessie heeft eisFamilie() hierboven al doorgestuurd naar de inlog.
+   Deze pagina hoort dan niets meer te beginnen: api() leest s.code, en op een
+   lege sessie liep dat stuk met een TypeError -- in het gezicht van een kind
+   dat alleen maar te vroeg op de tegel tikte. Niet booten is het antwoord;
+   de omleiding doet de rest. */
+if (s) {
+  laadLijsten();
+  laadHerhaal();
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('duel')) openDuel(qs.get('duel'));
+}
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

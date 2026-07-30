@@ -40,9 +40,15 @@ module.exports = (ctx) => {
     const ruw = String(codenaam || '').trim();
     if (!ruw) return { status: 400, error: 'Voor wie is de rekening?' };
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekende rekeningsoort.' };
-    let rec; try { rec = await keyVanCodenaam(ruw); } catch (e) { rec = null; }
-    if (!rec) return { status: 404, error: 'Die codenaam kennen we niet.' };
-    const c = rec.codename || ruw;
+    /* Een zaak bankiert onder de eigen vlag 'zaak:<code>' (het financiele
+       hart): die staat niet in de ledengids, dus geen codenaam-opzoek. */
+    let c;
+    if (ruw.startsWith('zaak:')) c = ruw;
+    else {
+      let rec; try { rec = await keyVanCodenaam(ruw); } catch (e) { rec = null; }
+      if (!rec) return { status: 404, error: 'Die codenaam kennen we niet.' };
+      c = rec.codename || ruw;
+    }
     const eigen = Object.values(rekeningen()).filter(m => m.codenaam === c);
     if (eigen.length >= 12) return { status: 429, error: 'Het maximaal aantal rekeningen is bereikt.' };
     const iban = genIban();
@@ -113,7 +119,7 @@ module.exports = (ctx) => {
       modus: bankregie.bankModus(), spaarrentePct: bankregie.bankSpaarrenteBp() / 100,
       rekeningen: mijn.rekeningen, totaalCenten: mijn.totaalCenten };
   }
-  async function ledenAkkoord(codenaam) {
+  async function ledenAkkoord(codenaam, tier) {
     if (!bankregie.bankLedenAan()) return { status: 403, error: 'De RTG Bank is nog niet live voor leden.' };
     const c = String(codenaam || '').trim();
     if (!c) return { status: 400, error: 'Onbekend lid.' };
@@ -123,7 +129,13 @@ module.exports = (ctx) => {
     save();
     let rekening = null;
     if (!alHad) { const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid' }); if (r.error) return r; rekening = r.rekening; }
-    return { ok: true, akkoord: true, rekening };
+    // de Business Pass krijgt er AUTOMATISCH een zakelijke rekening bij (gratis)
+    let zakelijk = null;
+    if (tier === 'business' && !Object.values(rekeningen()).some(m => m.codenaam === c && m.soort === 'zakelijk')) {
+      const z = await open({ codenaam: c, soort: 'zakelijk', naam: 'RTG Zakelijke rekening', wie: 'lid' });
+      if (!z.error) zakelijk = z.rekening;
+    }
+    return { ok: true, akkoord: true, rekening, zakelijk };
   }
 
   return {

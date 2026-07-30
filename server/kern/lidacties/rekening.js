@@ -65,7 +65,7 @@ module.exports = (ctx) => {
     save();
     const aantalItems = bonnen.reduce((n, o) => n + (o.items || []).reduce((m, it) => m + it.qty, 0), 0);
     const eerste = bonnen[0];
-    notifySupplier(s.code, { icon: '\u{1F9FE}', title: 'Rekening voldaan', body: eerste.customerCodename + (eerste.table ? ' · ' + eerste.table : '') + ', ' + bonnen.length + ' bon(nen), ' + aantalItems + ' item(s), € ' + subtotaal + (fooi ? ' · \u{1F49B} fooi € ' + fooi : '') });
+    notifySupplier(s.code, { icon: 'rekening', title: 'Rekening voldaan', body: eerste.customerCodename + (eerste.table ? ' · ' + eerste.table : '') + ', ' + bonnen.length + ' bon(nen), ' + aantalItems + ' item(s), € ' + subtotaal + (fooi ? ' · fooi € ' + fooi : '') });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
     return { ok: true, rekening: { supplierName: s.name, aantal: bonnen.length, subtotaal, fooi, puntenKorting: korting, regieKorting: voordeel, betaald: subtotaal + fooi, refs: bonnen.map(o => o.ref) } };

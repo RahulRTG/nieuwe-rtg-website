@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Browser</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RTG Browser">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/webblok.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  /* de browser-chrome (adresbalk + knoppen), in de huisstijl */
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:.4rem;padding:calc(env(safe-area-inset-top) + .55rem) .7rem .55rem;}
+  .nav{width:34px;height:34px;flex:0 0 auto;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;display:grid;place-items:center;font-size:1rem;}
+  .nav:hover{border-color:var(--gold);}
+  .nav:disabled{opacity:.35;cursor:default;}
+  .nav.home{color:var(--gold);}
+  form.balk{flex:1 1 auto;display:flex;align-items:center;gap:.4rem;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:.3rem .5rem .3rem .8rem;}
+  form.balk:focus-within{border-color:var(--gold);}
+  form.balk .slot{color:var(--soft);font-size:.9rem;flex:0 0 auto;}
+  form.balk input{flex:1 1 auto;background:transparent;border:0;color:var(--txt);font:inherit;font-size:.9rem;outline:none;}
+  form.balk .ga{flex:0 0 auto;background:var(--burgundy);border:0;color:#fff;border-radius:999px;padding:.28rem .7rem;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;}
+  main{min-height:calc(100dvh - 60px);}
+  /* de RTG-startpagina (het "internet" van RTG) */
+  .start{max-width:960px;margin:0 auto;padding:2.4rem 1.2rem 4rem;}
+  .start .merk{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);text-align:center;}
+  .start h1{font-size:clamp(2rem,6vw,3.4rem);text-align:center;margin:.3rem 0 .2rem;}
+  .start .lead{text-align:center;color:var(--muted);max-width:52ch;margin:0 auto 1.6rem;line-height:1.6;}
+  .zoekgroot{display:flex;max-width:560px;margin:0 auto 2.2rem;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .5rem .4rem 1rem;align-items:center;gap:.5rem;}
+  .zoekgroot:focus-within{border-color:var(--gold);}
+  .zoekgroot input{flex:1;background:transparent;border:0;color:var(--txt);font:inherit;font-size:1rem;outline:none;}
+  .zoekgroot .suf{color:var(--gold);font-weight:600;}
+  .zoekgroot button{background:var(--burgundy);border:0;color:#fff;border-radius:999px;padding:.5rem 1.1rem;font:inherit;font-weight:600;cursor:pointer;}
+  .rooster{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem;}
+  .kaart{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;cursor:pointer;color:var(--txt);}
+  .kaart:hover{border-color:var(--gold);}
+  .kaart .nm{font-family:'Bodoni Moda',serif;font-size:1.1rem;}
+  .kaart .ad{color:var(--gold);font-size:.8rem;margin-top:.15rem;}
+  .kaart .mt{color:var(--soft);font-size:.72rem;margin-top:.5rem;}
+  .kop2{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 .7rem;}
+  .leeg{text-align:center;color:var(--soft);padding:2rem;}
+  /* de site-weergave */
+  .sitewrap{padding:0;}
+  .foutpagina{max-width:520px;margin:5rem auto;text-align:center;padding:0 1.2rem;color:var(--muted);}
+  .foutpagina h2{font-family:'Bodoni Moda',serif;margin-bottom:.5rem;}
+  .foutpagina a,.inlog a{color:var(--gold);cursor:pointer;}
+  .inlog{max-width:460px;margin:5rem auto;text-align:center;padding:0 1.2rem;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
+</style>
+</head>
+<body>
+<header>
+  <button class="nav" id="terugKnop" title="Terug" aria-label="Terug">‹</button>
+  <button class="nav" id="vooruitKnop" title="Vooruit" aria-label="Vooruit">›</button>
+  <button class="nav" id="herlaadKnop" title="Herladen" aria-label="Herladen">↻</button>
+  <button class="nav home" id="homeKnop" title="RTG Start" aria-label="RTG Start">⌂</button>
+  <form class="balk" id="balk">
+    <span class="slot" aria-hidden="true">rtg://</span>
+    <input id="adres" inputmode="url" autocomplete="off" spellcheck="false" placeholder="typ een adres, bijv. jouwzaak.rtg" aria-label="Adres">
+    <button class="ga" type="submit">Ga</button>
+  </form>
+</header>
+<main id="hoofd"></main>
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+const api=(pad,body)=>fetch('/api/browser/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
+function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',2600);}
+function slug(v){return String(v==null?'':v).toLowerCase().replace(/^rtg:\/\//,'').replace(/\.rtg$/,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,30);}
+
+// geschiedenis voor terug/vooruit; een item is 'start' of {adres}
+let HIST=[], POS=-1;
+function knoppenBij(){ $('#terugKnop').disabled=POS<=0; $('#vooruitKnop').disabled=POS>=HIST.length-1; }
+function ga(item,duw){
+  if(duw!==false){ HIST=HIST.slice(0,POS+1); HIST.push(item); POS=HIST.length-1; }
+  knoppenBij();
+  if(item==='start'){ $('#adres').value=''; toonStart(); }
+  else { $('#adres').value=item.adres+'.rtg'; toonSite(item.adres); }
+}
+$('#terugKnop').addEventListener('click',()=>{ if(POS>0){ POS--; ga(HIST[POS],false); } });
+$('#vooruitKnop').addEventListener('click',()=>{ if(POS<HIST.length-1){ POS++; ga(HIST[POS],false); } });
+$('#herlaadKnop').addEventListener('click',()=>{ if(POS>=0) ga(HIST[POS],false); });
+$('#homeKnop').addEventListener('click',()=>ga('start'));
+$('#balk').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#adres').value); if(a.length<2){ meld('Typ een adres, bijv. jouwzaak.rtg'); return; } ga({adres:a}); });
+
+// ---- de RTG-startpagina ----
+async function toonStart(){
+  HUIDIGE=null;
+  const h=$('#hoofd');
+  h.innerHTML='<div class="start"><div class="merk">RTG · het web van het huis</div><h1>RTG Start</h1>'+
+    '<p class="lead">Het besloten web van Rahul Travel Group. Bezoek de sites die leden hier hebben gebouwd, of typ een adres in de balk.</p>'+
+    '<form class="zoekgroot" id="zoekGroot"><input id="zoekIn" placeholder="jouwzaak" aria-label="Zoek een adres"><span class="suf">.rtg</span><button type="submit">Ga</button></form>'+
+    '<div class="kop2">Sites van leden</div><div class="rooster" id="rooster"><div class="leeg">Laden…</div></div></div>';
+  $('#zoekGroot').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#zoekIn').value); if(a.length<2){meld('Typ een adres.');return;} ga({adres:a}); });
+  try{
+    const d=await api('gids');
+    const r=$('#rooster'); r.textContent='';
+    if(!(d.lijst||[]).length){ r.innerHTML='<div class="leeg">Nog geen sites online. Wees de eerste: open de Website-maker in de App Store.</div>'; return; }
+    d.lijst.forEach(it=>{
+      const b=document.createElement('button'); b.type='button'; b.className='kaart';
+      b.innerHTML='<div class="nm">'+esc(it.titel)+'</div><div class="ad">'+esc(it.adres)+'.rtg</div><div class="mt">'+it.bezoeken+' bezoek'+(it.bezoeken===1?'':'en')+'</div>';
+      b.addEventListener('click',()=>ga({adres:it.adres}));
+      r.appendChild(b);
+    });
+  }catch(e){ $('#rooster').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+
+// ---- een site tonen (alleen-lezen). De browser kiest live de versie
+//      (telefoon/tablet/desktop) op basis van de vensterbreedte, en past
+//      per versie de eigen tekst, volgorde en zichtbaarheid toe. ----
+let HUIDIGE=null;
+function versieNu(){ const w=Math.min(window.innerWidth,1080); return w<=640?'telefoon':(w<=1000?'tablet':'desktop'); }
+function toonBlok(blok,ver){ if(ver==='desktop')return blok; const ov=blok.varianten&&blok.varianten[ver]; return ov?Object.assign({},blok,ov):blok; }
+function ordenSite(site,ver){
+  const vs=site.volgorde&&site.volgorde[ver];
+  if(ver!=='desktop'&&Array.isArray(vs)&&vs.length){
+    const byId={}; (site.blokken||[]).forEach(b=>byId[b.id]=b);
+    const uit=[]; vs.forEach(id=>{ if(byId[id]){uit.push(byId[id]);delete byId[id];} });
+    (site.blokken||[]).forEach(b=>{ if(byId[b.id])uit.push(b); });
+    return uit;
+  }
+  return (site.blokken||[]).slice();
+}
+function tekenBlok(blok,ver){
+  const T=toonBlok(blok,ver); const s=document.createElement('section'); s.className='blok'; const t=blok.type;
+  const tekst=(el,v)=>{el.textContent=v||'';return el;};
+  if(t==='hero'){ s.classList.add('b-hero'); s.appendChild(tekst(document.createElement('h1'),T.kop)); const p=document.createElement('div');p.className='sub';tekst(p,T.sub);s.appendChild(p); if(T.knop){const a=document.createElement('span');a.className='b-knop';tekst(a,T.knop);s.appendChild(a);} }
+  else if(t==='kop'){ s.classList.add('b-kop'); s.appendChild(tekst(document.createElement('h2'),T.tekst)); }
+  else if(t==='tekst'){ s.classList.add('b-tekst'); const d=document.createElement('div');tekst(d,T.tekst);s.appendChild(d); }
+  else if(t==='knop'){ s.classList.add('b-knoprij'); const a=document.createElement('span');a.className='b-knop';tekst(a,T.tekst);s.appendChild(a); }
+  else if(t==='beeld'){ s.classList.add('b-beeld'); const img=document.createElement('img');img.src=blok.src;img.alt=T.bijschrift||'';s.appendChild(img); if(T.bijschrift){const b=document.createElement('div');b.className='bij';tekst(b,T.bijschrift);s.appendChild(b);} }
+  else if(t==='kolommen'){ s.classList.add('b-kol'); [['lk','lt'],['rk','rt']].forEach(([kk,kt])=>{const c=document.createElement('div');c.appendChild(tekst(document.createElement('h3'),T[kk]));const p=document.createElement('div');p.className='kt';tekst(p,T[kt]);c.appendChild(p);s.appendChild(c);}); }
+  else if(t==='galerij'){ s.classList.add('b-gal'); (blok.beelden||[]).forEach(src=>{const img=document.createElement('img');img.src=src;img.alt='';s.appendChild(img);}); }
+  else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div');q.className='q';tekst(q,T.tekst);s.appendChild(q); const br=document.createElement('div');br.className='bron';tekst(br,T.bron);s.appendChild(br); }
+  else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px'; }
+  else if(t==='voettekst'){ s.classList.add('b-voet'); tekst(s,T.tekst); }
+  return s;
+}
+function schilder(){
+  if(!HUIDIGE)return; const ver=versieNu(); const site=HUIDIGE.site;
+  const doek=document.querySelector('#hoofd .doek'); if(!doek)return;
+  if(doek.dataset.ver===ver)return;
+  doek.dataset.ver=ver; doek.textContent='';
+  ordenSite(site,ver).forEach(b=>{ if((b.verberg||[]).includes(ver))return; doek.appendChild(tekenBlok(b,ver)); });
+}
+window.addEventListener('resize',()=>{ clearTimeout(window._rt); window._rt=setTimeout(schilder,120); });
+async function toonSite(adres){
+  const h=$('#hoofd'); h.innerHTML='<div class="leeg" style="padding:4rem;">Laden…</div>';
+  try{
+    const d=await api('open',{adres});
+    const site=d.site; HUIDIGE={site};
+    document.title=site.titel+' · RTG Browser';
+    const wrap=document.createElement('div'); wrap.className='sitewrap';
+    const doek=document.createElement('div'); doek.className='doek'; doek.dataset.thema=site.thema||'donker'; doek.dataset.ver=''; doek.style.setProperty('--acc',site.accent||'#7F1634');
+    // vrije kleuren van de maker toepassen (achtergrond, tekst, kaart); ontbreekt
+    // er een, dan houdt het thema die kleur
+    const kk=site.kleuren||{};
+    if(kk.bg) doek.style.setProperty('--dbg',kk.bg);
+    if(kk.card) doek.style.setProperty('--dcard',kk.card);
+    if(kk.txt){ doek.style.setProperty('--dtxt',kk.txt); doek.style.setProperty('--dmut','color-mix(in srgb,'+kk.txt+' 66%,transparent)'); doek.style.setProperty('--dline','color-mix(in srgb,'+kk.txt+' 16%,transparent)'); }
+    wrap.appendChild(doek); h.textContent=''; h.appendChild(wrap);
+    schilder(); window.scrollTo(0,0);
+  }catch(e){
+    HUIDIGE=null;
+    h.innerHTML='<div class="foutpagina"><h2>Deze RTG-site bestaat niet</h2><p>Er staat niets op <b>'+esc(adres)+'.rtg</b>. Controleer het adres of ga terug naar <a id="naarStart">RTG Start</a>.</p></div>';
+    const b=$('#naarStart'); if(b) b.addEventListener('click',()=>ga('start'));
+  }
+}
+
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
+else {
+  const start=new URLSearchParams(location.search).get('adres');
+  if(start){ const a=slug(start); ga(a.length>=2?{adres:a}:'start'); } else ga('start');
+}
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

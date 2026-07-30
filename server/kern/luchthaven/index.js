@@ -24,7 +24,7 @@ const BANDEN = [1, 2, 3, 4];
 /* Drie categorieen op een veld: de lijnvluchten, de privejets (GA-stands, een
    lichtere draai) en de helikopters (helipads, de lichtste draai; de klaring
    van de toren is een helipad in plaats van een baan). */
-const CATEGORIEEN = { lijn: '✈️', privejet: '🛩️', helikopter: '🚁' };
+const CATEGORIEEN = { lijn: 'vluchten', privejet: 'vluchten', helikopter: 'hangar' };
 const DRAAI_LICHT = {
   privejet: ['brandstof', 'catering', 'schoonmaak', 'pushback-gereed'],
   helikopter: ['brandstof', 'schoonmaak', 'pushback-gereed']
@@ -67,7 +67,7 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
     if (!db.data.supplierTypes.luchthaven)
-      db.data.supplierTypes.luchthaven = { label: 'Luchthaven', icon: '✈️', caps: ['luchthaven'] };
+      db.data.supplierTypes.luchthaven = { label: 'Luchthaven', icon: 'vluchten', caps: ['luchthaven'] };
     if (!db.data.suppliers.find(s => s.code === 'LUCHT')) {
       db.data.suppliers.push({
         code: 'LUCHT', name: 'RTG Airport', type: 'luchthaven', city: 'Ibiza',

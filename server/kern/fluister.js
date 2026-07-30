@@ -1,5 +1,5 @@
-/* De Butler-motor: de persoonlijke assistent van het hele ecosysteem.
-   Voor leden heet hij De Butler (een gezicht, geen tweede assistent naast
+/* Rahul-motor: de persoonlijke assistent van het hele ecosysteem.
+   Voor leden heet hij Rahul (een gezicht, geen tweede assistent naast
    de bestaande AI: dit IS die AI); voor personeel en zaken is dezelfde
    motor "uw assistent". Iedereen gebruikt hem voor zichzelf, en hij leert
    de gebruiker kennen. De interne naam fluister blijft, zodat opslag en
@@ -41,7 +41,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
      (session, body) die { ok, ... } of { status, error } teruggeeft -
      exact dezelfde functie die de app-knoppen bedient, dus geen drift. */
   const nu = () => new Date().toISOString();
-  // hetzelfde brein, een passend gezicht: De Butler voor leden, "uw
+  // hetzelfde brein, een passend gezicht: Rahul voor leden, "uw
   // assistent" voor personeel en zaken
   const wieBen = () => 'Rahul'; // het ene AI-hart: iedereen praat met Rahul
   const lijsten = () => { if (!db.data.fluister) db.data.fluister = {}; };
@@ -138,7 +138,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
      via de context mee. */
   /* De reislaag (hele reis op een vraag, kleding, voorspellen) draait als
      eigen submodule en haakt via de context in fluisterZeg en voerUit. */
-  const { butlerExtra, voerReisUit, voerKledingUit } = require('./fluister/reis')({
+  const { rahulExtra, voerReisUit, voerKledingUit } = require('./fluister/reis')({
     db, save, acties, reserveerTafel, zorgVoor, eur, datumInZin, plusDagen, nu,
     verblijfBoek, retailLegApart, retailKlantProfiel });
 
@@ -146,7 +146,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
-    butlerExtra, voerReisUit, voerKledingUit, sparHouding: sparren.sparHouding, sparParkeer: sparren.parkeer });
+    rahulExtra, voerReisUit, voerKledingUit, sparHouding: sparren.sparHouding, sparParkeer: sparren.parkeer });
 
   return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle,
     sparParkeer: sparren.parkeer, sparLijst: sparren.lijst, sparStatus: sparren.status,

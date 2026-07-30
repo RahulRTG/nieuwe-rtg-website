@@ -3,7 +3,9 @@
    aan elkaar gezet, zoals de oorspronkelijke overhoren.js exporteerde:
    - ./lijsten: de woordenlijsten (maken, AI-lijst, overhoren, beste score)
    - ./duel   : samen leren, het overhoorduel (uitnodigen, antwoorden, beurten)
+   - ./curve  : de eerlijke vergeetcurve (Leitner-bakjes en de dagstapel)
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/leren.js. */
 module.exports = (ctx) => Object.assign({},
   require('./lijsten')(ctx),
-  require('./duel')(ctx));
+  require('./duel')(ctx),
+  require('./curve')(ctx));

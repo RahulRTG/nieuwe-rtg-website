@@ -172,3 +172,10 @@
 @media (prefers-reduced-motion:reduce){
   .osmenu, .osmenu-scrim, .osmenu-tegel{transition:none;}
 }
+
+/* Menu-iconen zijn nu huisstijl-glyfen (SVG) i.p.v. emoji: currentColor,
+   dezelfde lijndikte als de rest van de familie, netjes gecentreerd in .ic. */
+.osmenu .ic{display:flex;align-items:center;justify-content:center;}
+.osmenu .ic svg{width:1.15rem;height:1.15rem;stroke:currentColor;fill:none;display:block;}
+.osmenu-tegel .ic{min-height:1.6rem;}
+.osmenu-tegel .ic svg{width:1.5rem;height:1.5rem;}

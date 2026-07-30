@@ -5,14 +5,14 @@
    Puur data + functies; de runtime woont in index.js en aiwerk.js. */
 
 const CATEGORIEEN = {
-  kleding:      { label: 'Couture & tailoring', icon: '🧥' },
-  tassen:       { label: 'Maroquinerie', icon: '👜' },
-  horloges:     { label: 'Haute horlogerie', icon: '⌚' },
-  schoenen:     { label: 'Bottier', icon: '👞' },
-  hoeden:       { label: 'Millinery', icon: '🎩' },
-  sieraden:     { label: 'Haute joaillerie', icon: '💍' },
-  zonnebrillen: { label: 'Eyewear', icon: '🕶️' },
-  lederwaren:   { label: 'Kleinlederwaren', icon: '👛' }
+  kleding:      { label: 'Couture & tailoring', icon: 'mode' },
+  tassen:       { label: 'Maroquinerie', icon: 'tas' },
+  horloges:     { label: 'Haute horlogerie', icon: 'juweel' },
+  schoenen:     { label: 'Bottier', icon: 'mode' },
+  hoeden:       { label: 'Millinery', icon: 'garderobe' },
+  sieraden:     { label: 'Haute joaillerie', icon: 'juweel' },
+  zonnebrillen: { label: 'Eyewear', icon: 'mode' },
+  lederwaren:   { label: 'Kleinlederwaren', icon: 'tas' }
 };
 const STATUS = ['schets', 'ontwikkeling', 'prototype', 'monster', 'productie', 'archief'];
 

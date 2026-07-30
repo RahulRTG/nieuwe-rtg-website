@@ -6,6 +6,10 @@
 <title>Gemeente-PDA (buitendienst)</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rosthema.css" rel="stylesheet">
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/rosthema.js" defer></script>
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
@@ -59,7 +63,7 @@
 </main>
 
 <div class="melding" id="melding" role="status"></div>
-<button class="rahulfab" id="rahulFab" type="button" style="display:none;">✨ Vraag Rahul</button>
+<button class="rahulfab" id="rahulFab" type="button" style="display:none;">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Rahul · buitendienst</b><button type="button" id="rahulSluit" aria-label="Sluiten" style="background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:.2rem .55rem;cursor:pointer;">✕</button></div>
   <div class="rahulsug" id="rahulSug"></div>
@@ -175,6 +179,9 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); $
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

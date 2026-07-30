@@ -8,7 +8,7 @@ module.exports = (ctx) => {
     ordersVanZaak, boekingenVanZaak, publicTrip } = ctx;
   const { deptsFor } = ctx; // uit de gastcontactlaag, die eerder gemount is
   function publicSupplier(s, lang) {
-    const t = db.data.supplierTypes[s.type] || {};
+    const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
     const loc = s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : s.loc;
     // review-gemiddelde uit de lopende som (O(1), ook met miljoenen reviews)
     const rs = (db.data.reviewStats || {})[s.code];
@@ -37,7 +37,7 @@ module.exports = (ctx) => {
   /* Welke zaken mogen een ophaal/bezorgdienst voeren: horeca (orders-caps)
      en zelfstandigen. Hotels/vervoer hebben hun eigen kanalen al. */
   function magBezorgen(s) {
-    const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
+    const caps = db.capsVan(s);
     return caps.includes('orders') || s.type === 'zzp';
   }
   /* Tickets leven als boekingen met soort 'ticket'; verlopen onbetaalde (ouder

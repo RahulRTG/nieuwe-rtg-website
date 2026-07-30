@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Kleuren en vormen</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:40rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .opdracht{text-align:center;font-family:var(--serif);font-size:1.35rem;margin:.2rem 0 1rem;}
+  .rooster{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
+  .vak{background:var(--paneel2);border:2px solid var(--lijn);border-radius:18px;padding:1rem;cursor:pointer;line-height:0;}
+  .vak:hover{border-color:var(--goud);}
+  .vak svg{width:100%;height:5.5rem;display:block;}
+  .vak.goed{border-color:var(--groen);}
+  .vak.mis{border-color:var(--rood);opacity:.55;}
+  .melding{text-align:center;min-height:1.6rem;margin-top:1rem;color:var(--goud2);}
+  .onderrij{display:flex;gap:.6rem;justify-content:center;margin-top:.8rem;flex-wrap:wrap;}
+  .stand{color:var(--zacht);font-size:.85rem;text-align:center;margin-top:.6rem;}
+  .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+  .toon{display:flex;gap:.5rem;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap;}
+  .toon button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
+    padding:.4rem .9rem;font-size:.85rem;cursor:pointer;}
+  .toon button.aan{border-color:var(--goud);color:var(--goud2);}
+  @media(min-width:34rem){ .rooster{grid-template-columns:repeat(4,1fr);} }
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Kleuren en vormen</h1>
+  <div class="intro">Er staat steeds iets gevraagd, bijvoorbeeld: zoek de rode cirkel. Tik het goede vak aan. Kies hieronder of je op kleur, op vorm of op allebei speelt -- of speel Welke is anders?</div>
+
+  <div class="kaart blok">
+    <div class="toon" id="modus" role="group" aria-label="Waarop speel je">
+      <button type="button" data-m="kleur">Kleur</button>
+      <button type="button" data-m="vorm">Vorm</button>
+      <button type="button" data-m="beide" class="aan">Allebei</button>
+      <button type="button" data-m="anders">Welke is anders?</button>
+    </div>
+    <div class="opdracht" id="opdracht" aria-live="polite"></div>
+    <div class="rooster" id="rooster"></div>
+    <div class="melding" id="melding"></div>
+    <div class="onderrij">
+      <button class="knop grijs" id="opnieuw" type="button">Nog een keer</button>
+      <button class="knop" id="volgend" type="button" hidden>Verder</button>
+    </div>
+    <div class="stand" id="stand"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-kijker</h2>
+    <p class="ouder">Zeg de opdracht hardop mee en laat het kind eerst aanwijzen, dan pas tikken. Zit er een misser bij, dan blijft die keuze gewoon staan en mag het kind opnieuw kiezen; er wordt niets afgeteld. Speel eerst een tijdje alleen op kleur, daarna alleen op vorm, en pas als dat vlot gaat op allebei tegelijk. Welke is anders? is de volgende stap: goed kijken en vergelijken, zonder dat er een woord aan te pas komt.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+const KLEUREN = [
+  { id: 'rood', naam: 'rode', basis: 'rood', hex: '#C0473E' },
+  { id: 'geel', naam: 'gele', basis: 'geel', hex: '#D7B44A' },
+  { id: 'groen', naam: 'groene', basis: 'groen', hex: '#5FA56A' },
+  { id: 'blauw', naam: 'blauwe', basis: 'blauw', hex: '#4E7FB4' },
+  { id: 'paars', naam: 'paarse', basis: 'paars', hex: '#8A6BA8' },
+  { id: 'wit', naam: 'witte', basis: 'wit', hex: '#EFEAE0' }
+];
+const VORMEN = [
+  { id: 'cirkel', naam: 'cirkel', svg: '<circle cx="50" cy="50" r="34" fill="COLOR"/>' },
+  { id: 'vierkant', naam: 'vierkant', svg: '<rect x="17" y="17" width="66" height="66" rx="6" fill="COLOR"/>' },
+  { id: 'driehoek', naam: 'driehoek', svg: '<path d="M50 14l36 66H14z" fill="COLOR"/>' },
+  { id: 'ster', naam: 'ster', svg: '<path d="M50 12l11 26 28 3-21 19 6 28-24-14-24 14 6-28L11 41l28-3z" fill="COLOR"/>' },
+  { id: 'hart', naam: 'hart', svg: '<path d="M50 86S12 62 12 38C12 25 21 16 33 16c7.5 0 13.5 3.8 17 8.5C53.5 19.8 59.5 16 67 16c12 0 21 9 21 22 0 24-38 48-38 48z" fill="COLOR"/>' },
+  { id: 'maan', naam: 'maan', svg: '<path d="M62 14a38 38 0 100 72 30 30 0 010-72z" fill="COLOR"/>' }
+];
+
+let modus = 'beide', ronde = null, goed = 0, gedaan = 0;
+const dobbel = n => Math.floor(Math.random() * n);
+const trek = lijst => lijst[dobbel(lijst.length)];
+
+function nieuweRonde() {
+  if (modus === 'anders') return nieuweAnders();
+  const kleur = trek(KLEUREN), vorm = trek(VORMEN);
+  const opties = [{ kleur, vorm }];
+  // drie afleiders die op minstens een punt afwijken van het antwoord
+  let pogingen = 0;
+  while (opties.length < 4 && pogingen < 200) {
+    pogingen++;
+    const k = trek(KLEUREN), v = trek(VORMEN);
+    if (modus === 'kleur' && k.id === kleur.id) continue;
+    if (modus === 'vorm' && v.id === vorm.id) continue;
+    if (modus === 'beide' && k.id === kleur.id && v.id === vorm.id) continue;
+    if (opties.some(o => o.kleur.id === k.id && o.vorm.id === v.id)) continue;
+    opties.push({ kleur: k, vorm: v });
+  }
+  ronde = { kleur, vorm, opties: opties.sort(() => Math.random() - 0.5), klaar: false };
+  $('#opdracht').textContent = 'Zoek ' + omschrijving();
+  $('#melding').textContent = '';
+  $('#volgend').hidden = true;
+  tekenRooster();
+  tekenStand();
+}
+
+function omschrijving() {
+  if (modus === 'anders') return 'die ene die anders is';
+  if (modus === 'kleur') return 'iets dat ' + ronde.kleur.basis + ' is';
+  if (modus === 'vorm') return 'de ' + ronde.vorm.naam;
+  return 'de ' + ronde.kleur.naam + ' ' + ronde.vorm.naam;
+}
+
+// Welke is anders: drie dezelfde en een die net afwijkt, in kleur of in vorm
+function nieuweAnders() {
+  const kleur = trek(KLEUREN), vorm = trek(VORMEN);
+  const opKleur = Math.random() < 0.5;
+  let ander;
+  do { ander = opKleur ? { kleur: trek(KLEUREN), vorm } : { kleur, vorm: trek(VORMEN) }; }
+  while (ander.kleur.id === kleur.id && ander.vorm.id === vorm.id);
+  const opties = [{ kleur, vorm }, { kleur, vorm }, { kleur, vorm }, Object.assign({ anders: true }, ander)];
+  ronde = { kleur: ander.kleur, vorm: ander.vorm, opties: opties.sort(() => Math.random() - 0.5), klaar: false };
+  $('#opdracht').textContent = 'Welke is anders dan de rest?';
+  $('#melding').textContent = '';
+  $('#volgend').hidden = true;
+  tekenRooster();
+  tekenStand();
+}
+
+function past(o) {
+  if (modus === 'anders') return !!o.anders;
+  if (modus === 'kleur') return o.kleur.id === ronde.kleur.id;
+  if (modus === 'vorm') return o.vorm.id === ronde.vorm.id;
+  return o.kleur.id === ronde.kleur.id && o.vorm.id === ronde.vorm.id;
+}
+
+function tekenRooster() {
+  const doos = $('#rooster');
+  doos.innerHTML = '';
+  for (const o of ronde.opties) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'vak';
+    b.setAttribute('aria-label', o.kleur.naam + ' ' + o.vorm.naam);
+    b.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true">' + o.vorm.svg.replace('COLOR', o.kleur.hex) + '</svg>';
+    b.addEventListener('click', () => kies(o, b));
+    doos.appendChild(b);
+  }
+}
+
+function kies(o, knop) {
+  if (ronde.klaar) return;
+  if (!past(o)) {
+    knop.classList.add('mis');
+    $('#melding').textContent = 'Nog niet. Kijk nog eens goed naar ' + omschrijving() + '.';
+    return;
+  }
+  ronde.klaar = true;
+  knop.classList.add('goed');
+  goed++; gedaan++;
+  $('#melding').textContent = 'Precies, dat is ' + omschrijving() + '.';
+  $('#volgend').hidden = false;
+  tekenStand();
+  try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) {}
+}
+
+function tekenStand() { $('#stand').textContent = gedaan ? 'Je hebt er vandaag ' + goed + ' gevonden.' : ''; }
+
+$('#modus').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  modus = b.dataset.m;
+  $('#modus').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
+  nieuweRonde();
+}));
+$('#opnieuw').addEventListener('click', nieuweRonde);
+$('#volgend').addEventListener('click', nieuweRonde);
+nieuweRonde();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

@@ -68,7 +68,7 @@ module.exports = (kern) => {
           sh.toppers.length ? 'topper: ' + sh.toppers[0].aantal + 'x ' + sh.toppers[0].naam : null,
           sh.derving ? '€ ' + sh.derving.toFixed(2) + ' derving' : null
         ].filter(Boolean);
-        notifySupplier(req.supplier.code, { icon: '🌙', title: 'Shift-samenvatting ' + sh.datum, body: delen.join(' · ') });
+        notifySupplier(req.supplier.code, { icon: 'logboek', title: 'Shift-samenvatting ' + sh.datum, body: delen.join(' · ') });
       } catch (e) {}
     }
     res.json({ ok: true, settings: st });

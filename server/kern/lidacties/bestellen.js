@@ -5,7 +5,7 @@
    kern/lidacties.js. */
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
-    leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
+    leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
     orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor } = ctx;
@@ -29,11 +29,14 @@ function plaatsOrderVoor(session, body) {
   if (!items.length) return { status: 400, error: 'Geen geldige gerechten gekozen.' };
   const codename = session.account ? session.account.codename : PERSONAS[session.tier].codename;
   // leeftijd uit het paspoort: alcohol (bar-items) alleen boven de grens van
-  // het land van de zaak; de partner ziet enkel dat de leeftijd geverifieerd is
-  const lft = leeftijdVan(geborenVan(session));
+  // het land van de zaak; de partner ziet enkel dat de leeftijd geverifieerd is.
+  // Zonder RTG-geverifieerd ID geldt de STANDAARD "onder de 18": een onbekende
+  // of ongeverifieerde leeftijd telt dus als te jong, nooit als volwassen.
+  const lft = idGeverifieerd(session) ? leeftijdVan(geborenVan(session)) : null;
   const metAlcohol = items.some(it => { const m = (s.menu || []).find(x => x.id === it.id); return m && m.station === 'bar'; });
-  if (metAlcohol && lft != null) {
+  if (metAlcohol) {
     const a = alcoholGrensVan(s);
+    if (lft == null) return { status: 403, error: 'Zonder geverifieerde leeftijd geldt de standaard "onder de 18": alcohol kan niet. Laat uw identiteit verifieren, of kies iets zonder alcohol.' };
     if (lft < a.grens) return { status: 403, error: 'Alcohol is in ' + a.land + ' vanaf ' + a.grens + ' jaar; je leeftijd is via je paspoort geverifieerd. Kies iets zonder alcohol.' };
   }
   // zorg-/allergieveiligheid: keur gerechten af die botsen met het allergieprofiel
@@ -62,15 +65,22 @@ function plaatsOrderVoor(session, body) {
   // "Naar de kassa": het lid kiest zelf om de bestelling nu te laten maken en
   // straks aan de balie af te rekenen (met de ophaalcode); dit gaat voor op de
   // vooraf-voorkeur van de zaak, behalve bij jeugdleden.
-  const jeugd = lft != null && lft < 18;
+  const jeugd = lft == null || lft < 18; // onbekend/ongeverifieerd = standaard onder de 18
   const naarKassa = !!body.naarKassa && !jeugd;
   const vooraf = jeugd || (!naarKassa && optieAan(s, 'betaalVooraf'));
+  // servicekosten voor niet-leden: een gratis account betaalt EUR 2,50 ex btw
+  // per etensbestelling (EUR 3,03 incl. 21% btw); leden betalen dit nooit.
+  let servicekosten;
+  if (session.tier === 'guest') {
+    servicekosten = { exBtw: 2.5, btwPct: 21, inBtw: 3.03 };
+    total = Math.round((total + servicekosten.inBtw) * 100) / 100;
+  }
   const order = {
     ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     pickup: pickupCode(),
     supplierCode: s.code, supplierName: s.name, type: s.type,
     customerTier: session.tier, customerKey: session.key, customerCodename: codename,
-    items, total,
+    items, total, servicekosten,
     table: schoon(body.table, 24),
     allergyNote: schoon(body.allergyNote, 200),
     // het zorgprofiel reist automatisch mee naar de keuken (alleen met toestemming)
@@ -87,7 +97,7 @@ function plaatsOrderVoor(session, body) {
   save();
   if (!vooraf) {
     const kop = naarKassa ? 'Nieuwe bestelling (afrekenen aan de kassa)' : 'Nieuwe bestelling (betaling achteraf)';
-    notifySupplier(s.code, { icon: '\u{1F6CE}️', title: kop, body: codename + (order.table ? ' · ' + order.table : '') + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+    notifySupplier(s.code, { icon: 'hotel', title: kop, body: codename + (order.table ? ' · ' + order.table : '') + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }
@@ -117,7 +127,7 @@ function betaalOrderVoor(session, body) {
   // betaald = definitief: het keukenbrein boekt de ingredienten af via de recepten
   try { keuken.boekVerkoopAf(findSupplier(o.supplierCode), o.items || [], 'bestelling ' + o.ref); } catch (e) {}
   // nu pas hoort de zaak ervan: betaald = definitief
-  notifySupplier(o.supplierCode, { icon: '\u{1F6CE}\uFE0F', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
+  notifySupplier(o.supplierCode, { icon: 'hotel', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
   sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   return { ok: true, order: o };

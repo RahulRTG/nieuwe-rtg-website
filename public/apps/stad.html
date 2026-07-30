@@ -6,6 +6,7 @@
 <title>Mijn Stad</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
@@ -37,11 +38,15 @@
   .pil{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;}
   .toast{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
   <button class="terug" id="terug">←</button>
-  <div><div class="ey">RTG Stad · voor bewoners</div><h1>🏙️ Mijn Stad</h1></div>
+  <div><div class="ey">RTG Stad · voor bewoners</div><h1>Mijn Stad</h1></div>
 </header>
 <main id="app"><div class="leeg">Laden…</div></main>
 <div class="toast" id="toast" role="status"></div>
@@ -68,7 +73,7 @@ function render(){
   $('#app').innerHTML =
     '<div class="kaart"><h2 style="font-size:1.1rem;">' + esc(B.scenario.label) + '</h2>' +
       '<p style="color:var(--muted);font-size:.85rem;margin-top:.3rem;line-height:1.55;">' + esc(B.scenario.uitleg) + '</p>' +
-      (B.alerts.length ? '<div style="margin-top:.7rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;font-size:.83rem;line-height:1.55;">' + B.alerts.map(a => '⚠️ ' + esc(a.tekst)).join('<br>') + '</div>' : '') +
+      (B.alerts.length ? '<div style="margin-top:.7rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;font-size:.83rem;line-height:1.55;">' + B.alerts.map(a => '' + esc(a.tekst)).join('<br>') + '</div>' : '') +
     '</div>' +
     '<div class="sec">Hoe de stad er nu bij staat</div>' +
     '<div class="grid">' + B.domeinen.map(d =>
@@ -76,7 +81,7 @@ function render(){
       '<div class="w" style="color:' + (STAND[d.stand] || '#F4F1EC') + ';">' +
         (d.waarde == null ? 'stil' : esc(String(d.waarde)) + ' <span style="font-size:.65rem;color:var(--soft);">' + esc(d.eenheid) + '</span>') + '</div>' +
       '<div style="font-size:.72rem;color:var(--soft);margin-top:.15rem;">' + esc(d.stand) +
-        (d.ovOnderweg != null ? ' · 🚌 ' + d.ovOnderweg + ' OV onderweg' : '') + '</div></div>').join('') + '</div>' +
+        (d.ovOnderweg != null ? ' ·  ' + d.ovOnderweg + ' OV onderweg' : '') + '</div></div>').join('') + '</div>' +
     '<div class="sec">Iets kapot of vol gezien? Meld het</div>' +
     '<div class="kaart"><div class="rij">' +
       '<span><label for="mZone">Waar</label><select id="mZone">' + B.zones.map(z => '<option>' + esc(z) + '</option>').join('') + '</select></span>' +
@@ -117,6 +122,9 @@ live();
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

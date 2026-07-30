@@ -1,13 +1,3 @@
-    const opties = (st.kanalen || []).map(k => '<option value="' + k.id + '">' + esc(k.naam) + '</option>').join('');
-    const had = $('#ktKanaal').value;
-    $('#ktKanaal').innerHTML = opties || '<option value="">nog geen kanalen</option>';
-    if (had && [...$('#ktKanaal').options].some(o => o.value === had)) $('#ktKanaal').value = had;
-    ktGekozen = $('#ktKanaal').value || 'keten';
-    $('#ktGroepKorps').innerHTML = [st.eigen, ...(st.partners || [])].filter(Boolean)
-      .map(c => '<option value="' + c + '">' + c + '</option>').join('');
-    laadKetenGesprek();
-  }
-  async function laadKetenGesprek() {
     if (!ktGekozen) { $('#ktChat').innerHTML = ''; return; }
     try {
       const g = await api('keten/gesprek', { kanaal: ktGekozen });

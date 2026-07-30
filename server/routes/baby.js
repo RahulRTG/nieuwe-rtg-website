@@ -15,8 +15,10 @@ module.exports = (kern) => {
   const ACTIES = {
     boek: (s) => baby.boekVan(s),
     instellen: (s, b) => baby.instellen(s, { kindNaam: b.kindNaam, geboren: b.geboren }),
-    'entry-maak': (s, b) => baby.entryMaak(s, { tekst: b.tekst, foto: b.foto }),
+    'entry-maak': (s, b) => baby.entryMaak(s, { tekst: b.tekst, foto: b.foto, dag: b.dag }),
     'entry-weg': (s, b) => baby.entryWeg(s, String(b.id || '')),
+    tijdlijn: (s) => baby.tijdlijn(s),
+    favoriet: (s, b) => baby.favoriet(s, String(b.id || '')),
     'gezin-zet': (s, b) => baby.gezinZet(s, b.namen),
     'moment-ai': (s) => baby.momentAi(s)
   };

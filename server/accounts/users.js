@@ -58,12 +58,57 @@ function findByLogin(login) {
 function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().c; }
 
 /* Naamswijziging door het huis zelf (opstart-seed van het eigenaarsaccount):
-   inlognaam en echte naam in een keer, de kluis blijft de bron. */
-function renameUser(id, { username, realName }) {
-  S.db.prepare('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
-    .run(username, kluis.enc(realName), id);
+   inlognaam en echte naam in een keer, de kluis blijft de bron. Geef je ook een
+   e-mailadres mee, dan verhuist het account daarheen: de zoekhash en de
+   versleutelde waarde gaan samen mee, anders zou het account onvindbaar worden. */
+function renameUser(id, { username, realName, email }) {
+  if (email === undefined) {
+    S.db.prepare('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
+      .run(username, kluis.enc(realName), id);
+  } else {
+    S.db.prepare('UPDATE users SET username = ?, enc_name = ?, email_hash = ?, enc_email = ? WHERE id = ?')
+      .run(username, kluis.enc(realName), kluis.emailHash(email), kluis.enc(email), id);
+  }
   mirror.markUser(id);
   return getUserById(id);
+}
+
+/* De pas van een account wijzigen. Dit is de ENIGE manier waarop een account op
+   Lifestyle of Business terechtkomt: zelf-registreren levert altijd hooguit RTG
+   (zie routes/auth/account.js), en de merkregel eist een menselijk besluit voor
+   de betaalde passen. Daarom wordt dit uitsluitend aangeroepen vanuit de
+   goedkeuringsflow (kern/aanmeldingen.js beslis), nooit vanuit een client. */
+function setTier(id, tier) {
+  if (!['rtg', 'lifestyle', 'business', 'guest'].includes(tier)) return null;
+  const u = getUserById(id);
+  if (!u) return null;
+  S.db.prepare('UPDATE users SET tier = ? WHERE id = ?').run(tier, id);
+  mirror.markUser(id);
+  return getUserById(id);
+}
+
+/* Een account aan- of uitzetten (in/uit dienst bij een SSO-organisatie).
+
+   Uitzetten is geen wissen: alles blijft staan, er komt alleen niemand meer
+   mee binnen. Dat is precies wat je wilt bij uitdiensttreding -- de facturen
+   en boekingen van die persoon horen bewaard te blijven, en als het een
+   vergissing was, is het met een schakelaar terug te draaien. */
+function zetActief(id, aan) {
+  const u = getUserById(id);
+  if (!u) return null;
+  S.db.prepare('UPDATE users SET actief = ? WHERE id = ?').run(aan ? 1 : 0, id);
+  mirror.markUser(id);
+  return getUserById(id);
+}
+const isActief = (u) => !!u && u.actief !== 0;
+
+/* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
+   setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
+function setPasswordSync(userId, password) {
+  S.db.prepare('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
+    .run(kluis.hashPasswordSync(password), userId);
+  mirror.markUser(userId);
+  return getUserById(userId);
 }
 
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
@@ -71,62 +116,11 @@ function realNameOf(u) { return u ? (kluis.dec(u.enc_name) || u.username || 'Lid
 function emailOf(u) { return u ? kluis.dec(u.enc_email) : null; }
 function phoneOf(u) { return u ? kluis.dec(u.enc_phone) : null; }
 
-/* ---------- staatloze ondertekende tokens ---------- */
-function issueToken(userId, days = 30) {
-  const body = userId + '.' + (Date.now() + days * 86400000);
-  return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
-}
-function verifyToken(token) {
-  try {
-    const [b64, sig] = String(token).split('.');
-    if (!b64 || !sig) return null;
-    const body = Buffer.from(b64, 'base64url').toString();
-    if (kluis.sign(body) !== sig) return null;
-    const [id, exp] = body.split('.');
-    if (Number(exp) < Date.now()) return null;
-    return getUserById(Number(id));
-  } catch (e) { return null; }
-}
-/* Doel-gebonden token (bijv. e-mailbevestiging), los van de sessie. */
-function issueActionToken(userId, purpose, ttlMs) {
-  const body = userId + '.' + purpose + '.' + (Date.now() + ttlMs);
-  return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
-}
-function verifyActionToken(token, purpose) {
-  try {
-    const [b64, sig] = String(token).split('.');
-    if (!b64 || !sig || kluis.sign(Buffer.from(b64, 'base64url').toString()) !== sig) return null;
-    const [id, p, exp] = Buffer.from(b64, 'base64url').toString().split('.');
-    if (p !== purpose || Number(exp) < Date.now()) return null;
-    return getUserById(Number(id));
-  } catch (e) { return null; }
-}
-
-/* ---------- e-mailbevestiging & wachtwoord-herstel ---------- */
-function setEmailVerified(userId) {
-  S.db.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').run(userId);
-  mirror.markUser(userId);
-  return getUserById(userId);
-}
-function createReset(userId, ttlMs = 3600000) {
-  const token = crypto.randomBytes(24).toString('hex');
-  const hash = crypto.createHash('sha256').update(token).digest('hex');
-  S.db.prepare('UPDATE users SET reset_hash = ?, reset_expires = ? WHERE id = ?').run(hash, Date.now() + ttlMs, userId);
-  mirror.markUser(userId);
-  return token;
-}
-function findByReset(token) {
-  const hash = crypto.createHash('sha256').update(String(token || '')).digest('hex');
-  const u = S.db.prepare('SELECT * FROM users WHERE reset_hash = ?').get(hash);
-  if (!u || !u.reset_expires || u.reset_expires < Date.now()) return null;
-  return u;
-}
-async function setPassword(userId, password) {
-  S.db.prepare('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
-    .run(await kluis.hashPassword(password), userId);
-  mirror.markUser(userId);
-  return getUserById(userId);
-}
+/* De staatloze tokens, de e-mailbevestiging en het wachtwoord-herstel staan
+   in ./tokens.js; ze krijgen getUserById mee en verhuizen mee in de export,
+   zodat aanroepers niets merken. */
+const { issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
+  setEmailVerified, createReset, findByReset, setPassword } = require('./tokens').maakTokens(getUserById);
 
 /* Openbaar profiel voor de client (nooit de wachtwoord-hash of ruwe kluis). */
 function publicUser(u) {
@@ -149,10 +143,16 @@ function publicUser(u) {
 function getMemberState(userId) {
   const row = S.db.prepare('SELECT member_state FROM users WHERE id = ?').get(userId);
   if (!row || !row.member_state) return null;
-  try { return JSON.parse(row.member_state); } catch (e) { return null; }
+  try { return JSON.parse(kluis.decVeld(row.member_state)); } catch (e) { return null; }
 }
+/* Het ledendossier gaat versleuteld de kolom in. Dat is geen luxe: hier staan
+   de gesprekken met Rahul, de boekingen, de facturen en de geboortedatum, en
+   ze staan in DEZELFDE rij als de identiteit. Bleef dit platte tekst, dan zou
+   wie de accountdatabase in handen krijgt het hele dossier kunnen lezen, terwijl
+   de naam ernaast wel versleuteld is. Dat maakt het codenaam-ontwerp waardeloos.
+   De Postgres-spiegel kopieert de kolom ongewijzigd en erft de bescherming. */
 function saveMemberState(userId, obj) {
-  S.db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(JSON.stringify(obj), userId);
+  S.db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(kluis.encVeld(JSON.stringify(obj)), userId);
   mirror.markUser(userId);
 }
 
@@ -171,9 +171,24 @@ function listByVerification(status) {
 function conversations() {
   const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users WHERE member_state IS NOT NULL').all();
   return rows.map(r => {
-    let md = {}; try { md = JSON.parse(r.member_state) || {}; } catch (e) {}
+    let md = {}; try { md = JSON.parse(kluis.decVeld(r.member_state)) || {}; } catch (e) {}
     return { id: r.id, tier: r.tier, codename: r.codename, conversation: md.conversation || [], needsConcierge: !!md.needsConcierge };
   }).filter(x => x.conversation.length);
+}
+
+/* De leden voor het ledenregister (kantoor): codenaam, pas en de facetten
+   (geslacht v/m/x, land) uit de member_state. Nooit de echte naam -- die blijft
+   in de kluis. Begrensd (de boardroom leest een venster, geen miljoenen rijen);
+   met een echt grootboek (Postgres) zou dit aggregatie-per-facet worden. */
+function ledenRegisterRijen(limit) {
+  const n = Math.max(1, Math.min(Number(limit) || 5000, 20000));
+  const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users ORDER BY codename ASC LIMIT ?').all(n);
+  return rows.map(r => {
+    let md = {}; try { md = r.member_state ? (JSON.parse(kluis.decVeld(r.member_state)) || {}) : {}; } catch (e) {}
+    const gs = String(md.geslacht || '').toLowerCase();
+    return { id: r.id, key: 'user-' + r.id, tier: r.tier || 'rtg', codename: r.codename || null,
+      geslacht: (gs === 'v' || gs === 'm' || gs === 'x') ? gs : null, land: md.land || null };
+  });
 }
 
 /* AVG-vergetelheid: verwijdert het account definitief. Geeft de bestandsnaam
@@ -189,8 +204,8 @@ function deleteUser(id) {
 
 module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
-  realNameOf, emailOf, phoneOf,
-  issueToken, verifyToken, issueActionToken, verifyActionToken,
-  setEmailVerified, createReset, findByReset, setPassword,
-  getMemberState, saveMemberState, setVerification, listByVerification, conversations, deleteUser
+  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf,
+  issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
+  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
+  getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

@@ -17,7 +17,7 @@ module.exports = (kern) => {
     const door = dest.doors[0];
     unlockDoor(dest, door, L.codename);
     logActivity(dest.code, { name: L.codename }, 'gast opende "' + door.name + '" via de app');
-    notifySupplier(dest.code, { icon: '🔓', title: 'Deur geopend', body: L.codename + ' heeft "' + door.name + '" geopend via de app.' });
+    notifySupplier(dest.code, { icon: 'slot', title: 'Deur geopend', body: L.codename + ' heeft "' + door.name + '" geopend via de app.' });
     res.json({ ok: true, door: { name: door.name, relockSec: DOOR_RELOCK_MS / 1000 } });
   });
 
@@ -64,7 +64,7 @@ module.exports = (kern) => {
     chat.unreadPartner += 1;
     chat.lastAt = new Date().toISOString();
     save();
-    notifySupplier(s.code, { icon: '💬', title: codename + ' → ' + dept, body: text.slice(0, 90) });
+    notifySupplier(s.code, { icon: 'berichten', title: codename + ' → ' + dept, body: text.slice(0, 90) });
     sseToSupplier(s.code, 'sync', { scope: 'gchat' });
     sseToCustomer(req.session.key, 'sync', { scope: 'gchat' });
     trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
@@ -93,8 +93,8 @@ module.exports = (kern) => {
     const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
     e.guests.push({ key: req.session.key, codename, qty, at: new Date().toISOString(), checkedIn: false });
     save();
-    notifySupplier(s.code, { icon: '🎟', title: 'Aanmelding voor ' + e.name, body: codename + ', ' + qty + ' pers.' });
-    notify(req.session.tier, { icon: '🎟', title: s.name, body: 'U staat op de gastenlijst van ' + e.name + ' (' + e.date + (e.time ? ', ' + e.time : '') + '), ' + qty + ' pers. Uw codenaam is uw toegang.', scope: 'events' });
+    notifySupplier(s.code, { icon: 'ticket', title: 'Aanmelding voor ' + e.name, body: codename + ', ' + qty + ' pers.' });
+    notify(req.session.tier, { icon: 'ticket', title: s.name, body: 'U staat op de gastenlijst van ' + e.name + ' (' + e.date + (e.time ? ', ' + e.time : '') + '), ' + qty + ' pers. Uw codenaam is uw toegang.', scope: 'events' });
     sseToSupplier(s.code, 'sync', { scope: 'events' });
     sseToOffice('sync', { scope: 'events' });
     res.json({ ok: true, spotsLeft: Math.max(0, e.capacity - taken - qty) });

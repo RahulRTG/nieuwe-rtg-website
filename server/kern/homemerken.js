@@ -12,36 +12,36 @@
 
 // de aangesloten demo-merken: samen dekken ze alle elektronica in huis
 const MERKEN_SEED = [
-  { id: 'lumo', naam: 'LUMO', soort: 'Verlichting', icon: '💡', uitleg: 'Slimme lampen en strips voor elke kamer.',
-    apparaten: [{ naam: 'Lichtstrip', kamer: 'Woonkamer', soort: 'lamp', icon: '🌈', stand: { aan: false, dim: 50 } },
-      { naam: 'Buitenspot', kamer: 'Terras', soort: 'lamp', icon: '🔦', stand: { aan: false, dim: 70 } }] },
-  { id: 'therma', naam: 'THERMA', soort: 'Klimaat', icon: '🌡️', uitleg: 'Radiatorknoppen en koeling, per kamer geregeld.',
-    apparaten: [{ naam: 'Radiatorknop slaapkamer', kamer: 'Slaapkamer', soort: 'klimaat', icon: '♨️', stand: { aan: true, temp: 18 } },
-      { naam: 'Airco werkkamer', kamer: 'Werkkamer', soort: 'klimaat', icon: '❄️', stand: { aan: false, temp: 21 } }] },
-  { id: 'klank', naam: 'KLANK', soort: 'Audio', icon: '🔊', uitleg: 'Speakers die in elke scene meedoen.',
-    apparaten: [{ naam: 'Soundbar', kamer: 'Woonkamer', soort: 'audio', icon: '🎵', stand: { aan: false, volume: 35 } },
-      { naam: 'Keukenspeaker', kamer: 'Keuken', soort: 'audio', icon: '🎶', stand: { aan: false, volume: 25 } }] },
-  { id: 'helder', naam: 'HELDER', soort: 'Zonwering', icon: '🪟', uitleg: 'Rolluiken en zonwering, ook op zonstand.',
-    apparaten: [{ naam: 'Rolluiken slaapkamer', kamer: 'Slaapkamer', soort: 'gordijn', icon: '🎚️', stand: { open: true } },
-      { naam: 'Zonwering terras', kamer: 'Terras', soort: 'gordijn', icon: '⛱️', stand: { open: false } }] },
-  { id: 'groenvolt', naam: 'GROENVOLT', soort: 'Energie', icon: '⚡', uitleg: 'Slimme meter en thuisbatterij; zien en sturen.',
-    apparaten: [{ naam: 'Thuisbatterij', kamer: 'Hal', soort: 'stekker', icon: '🔋', stand: { aan: true } },
-      { naam: 'Slimme meter', kamer: 'Hal', soort: 'stekker', icon: '📈', stand: { aan: true } }] },
-  { id: 'slotwerk', naam: 'SLOTWERK', soort: 'Toegang', icon: '🔐', uitleg: 'Sloten en de deurbel. Sloten blijven altijd handwerk.',
-    apparaten: [{ naam: 'Achterdeurslot', kamer: 'Hal', soort: 'slot', icon: '🔒', stand: { opSlot: true } },
-      { naam: 'Videodeurbel', kamer: 'Hal', soort: 'stekker', icon: '🔔', stand: { aan: true } }] },
-  { id: 'friswit', naam: 'FRISWIT', soort: 'Witgoed', icon: '🧺', uitleg: 'Wasmachine en droger, klaar-seintjes incluis.',
-    apparaten: [{ naam: 'Wasmachine', kamer: 'Badkamer', soort: 'stekker', icon: '🧺', stand: { aan: false } },
-      { naam: 'Droger', kamer: 'Badkamer', soort: 'stekker', icon: '🌀', stand: { aan: false } }] },
-  { id: 'kokka', naam: 'KOKKA', soort: 'Keuken', icon: '🍳', uitleg: 'Oven en afzuigkap die met het koken meedenken.',
-    apparaten: [{ naam: 'Oven', kamer: 'Keuken', soort: 'stekker', icon: '🍞', stand: { aan: false } },
-      { naam: 'Afzuigkap', kamer: 'Keuken', soort: 'stekker', icon: '💨', stand: { aan: false } }] },
-  { id: 'tuinrijk', naam: 'TUINRIJK', soort: 'Tuin', icon: '🌿', uitleg: 'Beregening en de robotmaaier, op schema.',
-    apparaten: [{ naam: 'Beregening', kamer: 'Terras', soort: 'stekker', icon: '💦', stand: { aan: false } },
-      { naam: 'Robotmaaier', kamer: 'Terras', soort: 'stekker', icon: '🤖', stand: { aan: false } }] },
-  { id: 'zuiver', naam: 'ZUIVER', soort: 'Luchtkwaliteit', icon: '🍃', uitleg: 'Luchtreinigers voor een fris huis.',
-    apparaten: [{ naam: 'Luchtreiniger', kamer: 'Slaapkamer', soort: 'stekker', icon: '🍃', stand: { aan: false } },
-      { naam: 'Luchtreiniger woonkamer', kamer: 'Woonkamer', soort: 'stekker', icon: '🍃', stand: { aan: false } }] }
+  { id: 'lumo', naam: 'LUMO', soort: 'Verlichting', icon: 'thema', uitleg: 'Slimme lampen en strips voor elke kamer.',
+    apparaten: [{ naam: 'Lichtstrip', kamer: 'Woonkamer', soort: 'lamp', icon: 'balans', stand: { aan: false, dim: 50 } },
+      { naam: 'Buitenspot', kamer: 'Terras', soort: 'lamp', icon: 'flits', stand: { aan: false, dim: 70 } }] },
+  { id: 'therma', naam: 'THERMA', soort: 'Klimaat', icon: 'balans', uitleg: 'Radiatorknoppen en koeling, per kamer geregeld.',
+    apparaten: [{ naam: 'Radiatorknop slaapkamer', kamer: 'Slaapkamer', soort: 'klimaat', icon: 'cellier', stand: { aan: true, temp: 18 } },
+      { naam: 'Airco werkkamer', kamer: 'Werkkamer', soort: 'klimaat', icon: 'balans', stand: { aan: false, temp: 21 } }] },
+  { id: 'klank', naam: 'KLANK', soort: 'Audio', icon: 'muziek', uitleg: 'Speakers die in elke scene meedoen.',
+    apparaten: [{ naam: 'Soundbar', kamer: 'Woonkamer', soort: 'audio', icon: 'muziek', stand: { aan: false, volume: 35 } },
+      { naam: 'Keukenspeaker', kamer: 'Keuken', soort: 'audio', icon: 'muziek', stand: { aan: false, volume: 25 } }] },
+  { id: 'helder', naam: 'HELDER', soort: 'Zonwering', icon: 'wonen', uitleg: 'Rolluiken en zonwering, ook op zonstand.',
+    apparaten: [{ naam: 'Rolluiken slaapkamer', kamer: 'Slaapkamer', soort: 'gordijn', icon: 'opties', stand: { open: true } },
+      { naam: 'Zonwering terras', kamer: 'Terras', soort: 'gordijn', icon: 'parasol', stand: { open: false } }] },
+  { id: 'groenvolt', naam: 'GROENVOLT', soort: 'Energie', icon: 'flits', uitleg: 'Slimme meter en thuisbatterij; zien en sturen.',
+    apparaten: [{ naam: 'Thuisbatterij', kamer: 'Hal', soort: 'stekker', icon: 'gear', stand: { aan: true } },
+      { naam: 'Slimme meter', kamer: 'Hal', soort: 'stekker', icon: 'grafiek', stand: { aan: true } }] },
+  { id: 'slotwerk', naam: 'SLOTWERK', soort: 'Toegang', icon: 'slot', uitleg: 'Sloten en de deurbel. Sloten blijven altijd handwerk.',
+    apparaten: [{ naam: 'Achterdeurslot', kamer: 'Hal', soort: 'slot', icon: 'slot', stand: { opSlot: true } },
+      { naam: 'Videodeurbel', kamer: 'Hal', soort: 'stekker', icon: 'meldingen', stand: { aan: true } }] },
+  { id: 'friswit', naam: 'FRISWIT', soort: 'Witgoed', icon: 'gear', uitleg: 'Wasmachine en droger, klaar-seintjes incluis.',
+    apparaten: [{ naam: 'Wasmachine', kamer: 'Badkamer', soort: 'stekker', icon: 'gear', stand: { aan: false } },
+      { naam: 'Droger', kamer: 'Badkamer', soort: 'stekker', icon: 'balans', stand: { aan: false } }] },
+  { id: 'kokka', naam: 'KOKKA', soort: 'Keuken', icon: 'horeca', uitleg: 'Oven en afzuigkap die met het koken meedenken.',
+    apparaten: [{ naam: 'Oven', kamer: 'Keuken', soort: 'stekker', icon: 'horeca', stand: { aan: false } },
+      { naam: 'Afzuigkap', kamer: 'Keuken', soort: 'stekker', icon: 'balans', stand: { aan: false } }] },
+  { id: 'tuinrijk', naam: 'TUINRIJK', soort: 'Tuin', icon: 'oogst', uitleg: 'Beregening en de robotmaaier, op schema.',
+    apparaten: [{ naam: 'Beregening', kamer: 'Terras', soort: 'stekker', icon: 'balans', stand: { aan: false } },
+      { naam: 'Robotmaaier', kamer: 'Terras', soort: 'stekker', icon: 'emoji', stand: { aan: false } }] },
+  { id: 'zuiver', naam: 'ZUIVER', soort: 'Luchtkwaliteit', icon: 'oogst', uitleg: 'Luchtreinigers voor een fris huis.',
+    apparaten: [{ naam: 'Luchtreiniger', kamer: 'Slaapkamer', soort: 'stekker', icon: 'oogst', stand: { aan: false } },
+      { naam: 'Luchtreiniger woonkamer', kamer: 'Woonkamer', soort: 'stekker', icon: 'oogst', stand: { aan: false } }] }
 ];
 
 const KAMERS_OK = ['Woonkamer', 'Keuken', 'Slaapkamer', 'Badkamer', 'Werkkamer', 'Hal', 'Terras'];
@@ -97,7 +97,7 @@ module.exports = ({ db, save, schoon }) => {
     const id = 'p-' + String(supplier.code || '').toLowerCase();
     const lijst = (Array.isArray(apparaten) ? apparaten : []).slice(0, 12).map(a => ({
       naam: schoon(String(a.naam || ''), 60), kamer: KAMERS_OK.includes(a.kamer) ? a.kamer : 'Woonkamer',
-      soort: SOORTEN_OK.includes(a.soort) ? a.soort : 'stekker', icon: schoon(String(a.icon || '🔌'), 4),
+      soort: SOORTEN_OK.includes(a.soort) ? a.soort : 'stekker', icon: schoon(String(a.icon || 'gear'), 4),
       stand: a.soort === 'slot' ? { opSlot: true } : a.soort === 'klimaat' ? { aan: false, temp: 20 }
         : a.soort === 'audio' ? { aan: false, volume: 30 } : a.soort === 'gordijn' ? { open: false }
         : a.soort === 'lamp' ? { aan: false, dim: 60 } : { aan: false }
@@ -105,7 +105,7 @@ module.exports = ({ db, save, schoon }) => {
     if (!lijst.length) return { status: 400, error: 'Meld minstens een apparaat aan (naam + soort).' };
     const alle = M();
     const bestaand = alle.find(x => x.id === id);
-    const merk = { id, naam: n, soort: schoon(String(soort || 'Elektronica'), 30), icon: '🔗',
+    const merk = { id, naam: n, soort: schoon(String(soort || 'Elektronica'), 30), icon: 'netwerk',
       uitleg: schoon(String(uitleg || 'Aangesloten via de open RTG-koppelstandaard.'), 160), apparaten: lijst, partner: true };
     if (bestaand) Object.assign(bestaand, merk); else alle.push(merk);
     save();

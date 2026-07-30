@@ -1,98 +1,105 @@
-    const lijnBtn = wrap.querySelector('[data-pklijn]'); if (lijnBtn) lijnBtn.addEventListener('click', async () => {
-      try { const d = await API.call('/supplier/lijn', { sectie: pdaKant }); toast(d.aangemeld ? '👥 '+T('lijn.aant','Aangemeld op deze kant.') : T('lijn.aftoast','Afgemeld van deze kant.')); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
-    });
-    // de gekozen personen: pas-meldingen (tril + toast) per toestel aan of uit
-    const bel = wrap.querySelector('[data-pkbel]'); if (bel) bel.addEventListener('click', () => {
-      pdaPasBel = !pdaPasBel;
-      try { localStorage.setItem('rtg_pda_pasbel', pdaPasBel ? 'aan' : 'uit'); } catch(e){}
-      toast(pdaPasBel ? '🔔 '+T('pd.k.belaan','Dit toestel krijgt pas-meldingen.') : '🔕 '+T('pd.k.beluit','Pas-meldingen staan uit op dit toestel.'));
-      renderKeuken();
-    });
-    wrap.querySelectorAll('[data-pkgo]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/order/sectie', { ref: b.dataset.pkgo, sectie: pdaKant, phase: b.dataset.phase }); toast(b.dataset.phase==='klaar'?T('pd.k.klaar','Kant klaargemeld; het keukenscherm ziet het direct.'):T('pd.k.gestart','Gestart.')); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
-    }));
-    // de barkant meldt via het station, precies zoals het grote barscherm
-    wrap.querySelectorAll('[data-pkbar]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/order/station', { ref: b.dataset.pkbar, station: 'bar', phase: b.dataset.phase }); toast(b.dataset.phase==='klaar'?T('pd.b.klaar','Drankjes klaargemeld; de bediening ziet het direct.'):T('pd.k.gestart','Gestart.')); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
-    }));
-    wrap.querySelectorAll('[data-pkdish]').forEach(d => d.addEventListener('click', async () => {
-      // gerechtenkennis op zak: tik op het gerecht voor de bereidingswijze
-      const open = d.nextElementSibling && d.nextElementSibling.classList.contains('pk-kennis');
-      wrap.querySelectorAll('.pk-kennis').forEach(x => x.remove());
-      if (open) return;
-      const div = document.createElement('div');
-      div.className = 'pk-kennis';
-      div.style.cssText = 'white-space:pre-line;font-size:0.78rem;color:var(--soft);background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.75rem;margin:0.25rem 0 0.4rem;line-height:1.55;';
-      div.textContent = T('ds.laden','De AI-chef schrijft...');
-      d.insertAdjacentElement('afterend', div);
-      try { const k = await API.call('/supplier/menu/kennis', { itemId: d.dataset.pkdish, soort: 'bereiding' }); div.textContent = k.tekst; } catch(e){ div.textContent = e.message; }
-    }));
+    if (!gpsPos || !o.geo || !Number.isFinite(o.geo.lat)) return null;
+    return meters(gpsPos, o.geo);
   }
-
-  /* ---- entree: programma van vandaag + check-in op eigen naam ---- */
-  let pdProgramma = null;
-  let pdVkLaatst = ''; // de laatste deurverkoop (de entreecode blijft leesbaar na verversen)
-  // ---- winkelvloer (retail) ----
-  let pdRetail = null;      // retail-toestand van het merk (voorraad, paskamer, apart)
-  let winkelKlant = null;   // geopend klantdossier op de vloer
-  let winkelCart = [];      // mobiele kassa: [{vsku, naam, kleur, maat, price, aantal}]
-  const heeftRetail = () => !!(state && state.supplier && (state.supplier.caps || []).includes('retail'));
-  async function laadWinkel(){
-    if (!heeftRetail()) return;
-    try { pdRetail = (await API.call('/supplier/retail', {})).retail; } catch(e){ pdRetail = { artikelen:[], paskamer:[], apart:[], klanten:[], stats:{} }; }
-    renderWinkel();
+  function meters(a, b){
+    const R = 6371000, rad = d => d * Math.PI / 180;
+    const dLat = rad(b.lat - a.lat), dLng = rad(b.lng - a.lng);
+    const x = Math.sin(dLat/2)**2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng/2)**2;
+    return Math.round(2 * R * Math.asin(Math.sqrt(x)));
   }
-  function winkelInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;font-size:0.95rem;color:var(--txt);outline:none;font-family:inherit;">'; }
-  function renderWinkel(){
-    const tabBtn = document.getElementById('tabWinkel');
-    if (tabBtn) tabBtn.style.display = heeftRetail() ? '' : 'none';
-    const wrap = $('#winkelWrap');
+  async function gpsStuur(lat, lng){
+    if (Date.now() - gpsLaatst < 8000) return; // hooguit elke 8 s naar de server
+    gpsLaatst = Date.now();
+    try { await API.call('/supplier/bezorg/gps', { lat, lng }); } catch(e){}
+  }
+  const zaakLoc = () => (state && state.supplier && state.supplier.loc) || null;
+  let terugBezig = false;
+  async function autoTerug(){
+    // de GPS gaat vanzelf uit zodra de bezorger zonder open rit weer bij de zaak is
+    const zl = zaakLoc();
+    if (gpsWatch == null || terugBezig || !zl || !gpsPos || !Number.isFinite(zl.lat)) return;
+    const nogWeg = ((state.bezorg && state.bezorg.lopend) || []).some(o => o.status === 'onderweg' && o.bezorger && o.bezorger.staffId === me.staffId);
+    if (nogWeg || meters(gpsPos, zl) > 60) return;
+    terugBezig = true;
+    try { await API.call('/supplier/bezorg/terug', {}); } catch(e){}
+    navigator.geolocation.clearWatch(gpsWatch); gpsWatch = null; window.__pdRoute = null;
+    toast(T('pd.bz.terug','Terug op de zaak; de GPS staat weer uit.'));
+    terugBezig = false;
+    renderBezorgen();
+  }
+  function gpsAanUit(){
+    if (gpsWatch != null){ navigator.geolocation.clearWatch(gpsWatch); gpsWatch = null; renderBezorgen(); return; }
+    if (!navigator.geolocation){ toast(T('pd.bz.geengps','Dit apparaat deelt geen GPS.')); return; }
+    gpsWatch = navigator.geolocation.watchPosition(p => {
+      gpsPos = { lat: p.coords.latitude, lng: p.coords.longitude };
+      gpsStuur(gpsPos.lat, gpsPos.lng);
+      autoTerug();
+    }, () => toast(T('pd.bz.gpsfout','GPS staat uit of is geweigerd.')), { enableHighAccuracy: true, maximumAge: 5000 });
+    renderBezorgen();
+  }
+  const VOERTUIGEN = [['auto','Auto'],['motor','Motor'],['scooter','Scooter'],['fatbike','Fatbike/e-bike'],['lopen','Lopen']];
+  const voertuig = () => { try { return localStorage.getItem('pd_voertuig') || 'auto'; } catch(e){ return 'auto'; } };
+  function renderBezorgen(){
+    const tabBtn = document.getElementById('tabBezorgen');
+    if (tabBtn) tabBtn.style.display = heeftBezorg() ? '' : 'none';
+    const wrap = $('#bezorgenWrap');
     if (!wrap) return;
-    if (!heeftRetail()){ wrap.innerHTML = ''; return; }
-    if (!pdRetail){ wrap.innerHTML = '<div class="card">…</div>'; laadWinkel(); return; }
-    let html = '';
-    // mobiele kassa (bon)
-    const cartTot = winkelCart.reduce((n, r) => n + r.price * r.aantal, 0);
-    html += '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.w.kassa','Mobiele kassa')+
-      (winkelKlant?'<span style="color:var(--gold);font-size:0.66rem;">'+esc(winkelKlant.codenaam||winkelKlant.key)+'</span>':'')+'</div>'+
-      (winkelCart.length ? '<div style="margin-top:0.5rem;">'+winkelCart.map((r,i) => '<div class="task"><span class="ic">👕</span><div class="t"><b>'+esc(r.naam)+'</b><span>'+esc(r.kleur)+' · '+esc(r.maat)+' · '+eur(r.price)+' × '+r.aantal+'</span></div><button class="abtn ghost" data-wcartdel="'+i+'">✕</button></div>').join('')+
-        '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.6rem;font-size:1rem;"><span>'+T('pd.w.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
-        '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;"><button class="abtn" data-wbetaal="rtgpay" style="flex:1;">RTG Pay</button><button class="abtn" data-wbetaal="contant" style="flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.w.contant','Contant')+'</button></div>'+
-        '<button class="abtn ghost" id="wCartLeeg" style="margin-top:0.5rem;width:100%;">'+T('pd.w.leeg','Bon leegmaken')+'</button></div>'
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.w.leegbon','Zoek een artikel en tik + om het op de bon te zetten.')+'</div>')+'</div>';
-    // voorraad opzoeken
-    html += '<div class="card"><div class="k">'+T('pd.w.zoek','Voorraad opzoeken')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wZoek', T('pd.w.zoekph','Naam, kleur of maat…'))+'<button class="abtn" id="wZoekBtn">'+T('pd.w.zoekbtn','Zoek')+'</button></div>'+
-      '<div id="wZoekUit" style="margin-top:0.5rem;"></div></div>';
-    // paskamerverzoeken
-    const pk = pdRetail.paskamer || [];
-    html += '<div class="card"><div class="k">'+T('pd.w.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
-      (pk.length ? pk.map(v => '<div class="task"><span class="ic">🚪</span><div class="t"><b>'+esc(v.artikelNaam)+' · '+esc(v.maat)+'</b><span>'+esc(v.codenaam||'Gast')+' · '+esc(v.kleur)+(v.paskamer?' · '+esc(v.paskamer):'')+'</span></div><button class="abtn" data-wbreng="'+v.id+'">'+T('pd.w.breng','Gebracht')+'</button></div>').join('')
-        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.w.geenpk','Geen open verzoeken.')+'</div>')+'</div>';
-    // apart gelegd
-    const ap = pdRetail.apart || [];
-    if (ap.length) html += '<div class="card"><div class="k">'+T('pd.w.apart','Apart gelegd')+' ('+ap.length+')</div>'+
-      ap.map(r => '<div class="task"><span class="ic">🛍</span><div class="t"><b>'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</b><span>'+esc(r.codenaam||r.key)+' · '+T('pd.w.tot','tot')+' '+esc(r.tot)+'</span></div></div>').join('')+'</div>';
-    // klant erbij pakken
-    html += '<div class="card"><div class="k">'+T('pd.w.klant','Klant erbij pakken')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wKlantKey', T('pd.w.klantph','Codenaam of sleutel van het lid'))+'<button class="abtn" id="wKlantBtn">'+T('pd.w.open','Open')+'</button></div>'+
-      '<div id="wKlantUit" style="margin-top:0.5rem;">'+(winkelKlant?winkelKlantKaart(winkelKlant):'')+'</div></div>';
-    wrap.innerHTML = html;
-    winkelBind(wrap);
-  }
-  function winkelKlantKaart(k){
-    const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
-    return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;">'+
-      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
-      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('pd.w.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
-      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
-      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;color:var(--txt);margin-top:0.35rem;">💛 '+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
-      '</div>';
-  }
-  function winkelBind(wrap){
-    // kassa
-    wrap.querySelectorAll('[data-wcartdel]').forEach(b => b.addEventListener('click', () => { winkelCart.splice(Number(b.dataset.wcartdel), 1); renderWinkel(); }));
-    const leeg = wrap.querySelector('#wCartLeeg'); if (leeg) leeg.addEventListener('click', () => { winkelCart = []; renderWinkel(); });
-    wrap.querySelectorAll('[data-wbetaal]').forEach(b => b.addEventListener('click', async () => {
-      if (!winkelCart.length) return;
-      const body = { method: b.dataset.wbetaal, regels: winkelCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
+    if (!heeftBezorg()){ wrap.innerHTML = ''; return; }
+    const alle = (state.bezorg && state.bezorg.lopend) || [];
+    const mijn = alle.filter(o => o.levering === 'bezorgen' && o.bezorger && o.bezorger.staffId === me.staffId && !['bezorgd','opgehaald'].includes(o.status));
+    const vrij = alle.filter(o => o.levering === 'bezorgen' && !o.bezorger);
+    const inpakLijst = alle.filter(o => o.levering === 'bezorgen' && !o.inpak && !['onderweg','bezorgd','opgehaald'].includes(o.status));
+    const mijnKlaar = mijn.filter(o => o.status === 'klaar');
+    const tePakken = mijnKlaar.filter(o => o.inpak && !o.pakcheck).map(o => o.ref);
+    const teVertrekken = mijnKlaar.filter(o => o.inpak && o.pakcheck).map(o => o.ref);
+    const rt = window.__pdRoute;
+    const rij = (o, extra) => {
+      const m = afstandNaar(o);
+      const keten = (o.inpak ? '✓ ' + T('pd.bz.tasje','tas') + ' ' + esc(o.inpak.tas) : T('pd.bz.wachtinpak','wacht op de inpakker')) +
+        ' · ' + (o.pakcheck ? '✓ ' + T('pd.bz.gepakt','gepakt') : T('pd.bz.noggepakt','nog afvinken'));
+      return '<div class="task"><div class="t">'+
+        '<b>'+esc(o.customerCodename)+' · '+esc(o.status)+(o.etaMin?' · '+o.etaMin+' min':'')+'</b>'+
+        '<span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' · '+esc(o.adres||'')+(m!=null?' · '+(m<1000?m+' m':(m/1000).toFixed(1)+' km'):'')+'</span>'+
+        '<span style="color:var(--soft);">'+keten+'</span>'+
+        '<span><a href="'+kaartLink(o)+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></span></div>'+(extra||'')+'</div>';
+    };
+    wrap.innerHTML =
+      '<div class="card"><div class="k">'+T('pd.bz.gps','Live GPS')+'</div>'+
+      '<div class="task"><div class="t"><b>'+(gpsWatch!=null?T('pd.bz.gpsaan','U deelt uw positie; de klant ziet u rijden.'):T('pd.bz.gpsuit','GPS staat uit.'))+'</b>'+
+      '<span>'+T('pd.bz.gpsauto','Gaat vanzelf aan zodra u vertrekt en vanzelf uit zodra u terug bent op de zaak.')+'</span></div>'+
+      '<button class="abtn" id="pdGps">'+(gpsWatch!=null?T('pd.bz.stop','Stop'):T('pd.bz.start','Start'))+'</button></div></div>'+
+      '<div class="card"><div class="k">'+T('pd.bz.inpak','Inpakken: afvinken per tas en bonnummer')+'</div>'+
+      (inpakLijst.length ? inpakLijst.map(o =>
+        '<div class="task" style="flex-direction:column;align-items:stretch;gap:0.25rem;" data-inpak="'+o.ref+'">'+
+        '<b>'+esc(o.customerCodename)+' · '+T('pd.bz.bonnr','bon')+' '+o.ref+'</b>'+
+        o.items.map(i=>'<label style="display:block;font-size:0.82rem;cursor:pointer;"><input type="checkbox" class="ipItem" value="'+esc(i.id)+'" style="accent-color:var(--gold);margin-right:0.35rem;">'+i.qty+'x '+esc(i.name)+'</label>').join('')+
+        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+        '<input class="ipTas" placeholder="'+T('pd.bz.tas','Welke tas? (bv. tas 2)')+'" style="flex:1;min-width:6rem;background:transparent;border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
+        '<input class="ipBon" placeholder="'+T('pd.bz.bon','Typ het bonnummer')+'" style="flex:1;min-width:7rem;background:transparent;border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
+        '<button class="abtn ipKlaar">'+T('pd.bz.ingepakt','Alles zit erin')+'</button></div></div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geeninpak','Niets om in te pakken; nieuwe bestellingen verschijnen hier.')+'</div>')+'</div>'+
+      '<div class="card"><div class="k">'+T('pd.bz.mijn','Mijn rit')+' ('+mijn.length+')</div>'+
+      (mijn.length ? mijn.map(o => rij(o,
+          o.status==='onderweg' ? '<button class="abtn" data-pdbz="'+o.ref+'" data-st="bezorgd">'+T('pd.bz.bezorgd','Bezorgd')+'</button>' : ''
+        )).join('') +
+        '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.55rem;">'+
+        VOERTUIGEN.map(v => '<button class="abtn" data-vt="'+v[0]+'"'+(voertuig()===v[0]?' style="border-color:var(--gold);color:var(--gold);"':'')+'>'+T('pd.bz.vt.'+v[0], v[1])+'</button>').join('')+'</div>'+
+        (tePakken.length ? '<button class="abtn" id="pdPakcheck" style="margin-top:0.5rem;">'+T('pd.bz.pakcheck','Ik heb alles gepakt')+' ('+tePakken.length+')</button>' : '')+
+        (teVertrekken.length ? '<button class="abtn" id="pdVertrek" style="margin-top:0.5rem;">'+T('pd.bz.vertrek','Ik ga rijden')+' ('+teVertrekken.length+')</button>' : '')+
+        (rt && rt.stops ? '<div style="margin-top:0.55rem;font-size:0.82rem;"><b>'+T('pd.bz.route','Beste route')+' ('+T('pd.bz.vt.'+rt.voertuig, rt.voertuig)+' · '+rt.totaal.minuten+' min)</b>'+
+          rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenmijn','Geen rit op uw naam. Neem hieronder leveringen aan.')+'</div>')+'</div>'+
+      '<div class="card"><div class="k">'+T('pd.bz.vrij','Klaar om mee te nemen')+' ('+vrij.length+')</div>'+
+      (vrij.length ? vrij.map(o =>
+        '<label class="task" style="cursor:pointer;"><input type="checkbox" class="pdbzkies" value="'+o.ref+'" style="margin-right:0.4rem;accent-color:var(--gold);">'+
+        '<div class="t"><b>'+esc(o.customerCodename)+' · '+esc(o.status)+(o.inpak?' · ✓ '+T('pd.bz.tasje','tas')+' '+esc(o.inpak.tas):'')+'</b><span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' · '+esc(o.adres||'')+'</span></div></label>'
+      ).join('') + '<button class="abtn" id="pdNeem" style="margin-top:0.6rem;">'+T('pd.bz.neem','Neem geselecteerde ritten (op uw naam)')+'</button>'
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenvrij','Niets klaar om mee te nemen. Nieuwe leveringen verschijnen hier live.')+'</div>')+'</div>'+
+      '<div class="card"><div class="k">'+T('pd.bz.ai','Snelle hulp (AI)')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
+      [[T('pd.bz.ai1','Adres klopt niet'),'Het bezorgadres lijkt niet te kloppen, wat doe ik?'],
+       [T('pd.bz.ai2','Gast doet niet open'),'De gast doet niet open bij de bezorging, wat doe ik?'],
+       [T('pd.bz.ai3','Ik heb vertraging'),'Ik heb vertraging met de bezorging, wat doe ik?'],
+       [T('pd.bz.ai4','Bestelling beschadigd'),'De bestelling is onderweg beschadigd, wat doe ik?']]
+      .map(c => '<button class="abtn" data-pdbzai="'+esc(c[1])+'">'+c[0]+'</button>').join('')+'</div>'+
+      '<div id="pdBzAiUit" style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);"></div></div>';

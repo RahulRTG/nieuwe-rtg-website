@@ -12,6 +12,19 @@
 :root{
   --rust-traag: 0.3s;
   --rust-ease: cubic-bezier(0.22, 0.61, 0.36, 1);  /* zacht uitlopend, geen ruk */
+  /* Eén tempo voor het hele huis. Wie iets nieuws laat bewegen pakt een van
+     deze drie -- niet een eigen getal. Zo loopt alles in de maat en voelt het
+     systeem als één ding in plaats van als losse schermen die elk hun eigen
+     haast hebben.
+       kort  -- een knop die reageert onder je vinger
+       traag -- een paneel dat opengaat, een kaart die verschijnt
+       lang  -- een heel scherm dat van plek wisselt */
+  --rust-kort: 0.16s;
+  --rust-lang: 0.46s;
+}
+@media (prefers-reduced-motion: reduce){
+  /* wie rust vraagt krijgt rust: alles staat er meteen, niets glijdt */
+  :root{ --rust-kort: 0.001s; --rust-traag: 0.001s; --rust-lang: 0.001s; }
 }
 
 @media (prefers-reduced-motion: no-preference){
@@ -30,4 +43,30 @@
 :focus-visible{
   outline: 2px solid color-mix(in srgb, var(--gold, #C9A24B) 70%, transparent);
   outline-offset: 3px;
+}
+
+/* ---- de adem-laag: nooit te druk, voor niemand niet, op elk scherm ----
+   Deze laag is er voor de belofte dat de UI voor miljarden mensen werkt: op de
+   kleinste telefoon, het grootste scherm, in elke taal (ook lange woorden). Het
+   is bewust een vangnet, geen herontwerp -- we raken alleen universele, veilige
+   dingen aan en laten pagina-eigen componenten met rust.
+
+   1. Beeld ademt mee: nooit breder dan zijn kolom, dus geen zijwaartse scroll of
+      afgesneden randen op een smal scherm. Foto's en video houden hun verhouding;
+      svg-iconen en canvas-widgets hebben vaste maten, dus die krijgen alleen de
+      breedte-plafond mee (geen height:auto die hun maat zou verstoren). */
+img, picture, video{
+  max-width: 100%;
+  height: auto;
+}
+svg, canvas{ max-width: 100%; }
+/* 2. Lange woorden en onafgebroken tekst (URL's, codes, samengestelde woorden in
+      andere talen) breken netjes af in plaats van de kolom uit te duwen. */
+p, li, dd, dt, figcaption, blockquote, h1, h2, h3, h4, h5, h6, th, td, label, summary{
+  overflow-wrap: break-word;
+}
+/* 3. Wie "minder data" vraagt (zuinig toestel, trage lijn) krijgt een nog
+      rustiger beeld: decoratieve overgangen vallen weg. */
+@media (prefers-reduced-data: reduce){
+  a, button, summary, input, select, textarea{ transition: none; }
 }

@@ -243,8 +243,8 @@
       document.body.appendChild(satEl);
     }
     var delen = [];
-    if (aan) delen.push(T('net.sat', '🛰 Trage verbinding: zuinige stand aan'));
-    if (rij) delen.push(T('net.rijTel', '📮 ') + rij + T('net.rijWacht', ' in de wachtrij'));
+    if (aan) delen.push(T('net.sat', 'Trage verbinding: zuinige stand aan'));
+    if (rij) delen.push(rij + T('net.rijWacht', ' in de wachtrij'));
     satEl.querySelector('#rtg-sat-tekst').textContent = delen.join(' · ');
   }
   if (satActief() || wachtrij().length) satTeken();

@@ -21,6 +21,10 @@ module.exports = (kern) => {
   app.post('/api/onboarding/opslaan', express.json({ limit: '256kb' }), auth, (req, res) => {
     res.json(onboarding.slaOp('rtg', req.session, req.body.velden || {}));
   });
+  // De vervaldatum uit de MRZ-scan bewaren, zodat Rahul een half jaar vooraf seint.
+  app.post('/api/onboarding/paspoort', express.json({ limit: '16kb' }), auth, (req, res) => {
+    res.json(onboarding.bewaarPaspoort(req.session, req.body || {}));
+  });
   app.post('/api/onboarding/teken', auth, (req, res) => {
     const r = onboarding.teken('rtg', req.session, req.body.naam, req.body.akkoord === true);
     if (r.error) return res.status(r.status).json({ error: r.error });

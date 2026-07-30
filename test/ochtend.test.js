@@ -1,6 +1,8 @@
 /* Integratietests voor het Ochtendritme (RTFoundation-gezin): een persoonlijk
-   ochtendlijstje dat elke dag reset, de rustige reeks bij een afgeronde ochtend,
-   het ouder-beheer van een kindritme, en het gezinsbord. Dicht voor gasten.
+   ochtendlijstje dat elke dag reset, de zachte weektelling bij een afgeronde
+   ochtend (bewust geen reeks en geen record -- een ketting die je kunt breken
+   is druk), het ouder-beheer van een kindritme, en het gezinsbord. Dicht voor
+   gasten.
 
    Draai los: node --experimental-sqlite --test test/ochtend.test.js */
 const test = require('node:test');
@@ -39,13 +41,14 @@ async function gezin() {
   return { code: g.code, token: g.token, kindId: kind.profiel.id, kt, gt };
 }
 
-test('mijn ritme: stappen erbij, afvinken, en alles-af geeft een reeks van 1', async () => {
+test('mijn ritme: stappen erbij, afvinken, en alles-af telt zacht mee voor de week', async () => {
   const G = await gezin();
   // begin leeg, met voorbeelden om uit te kiezen
   const start = await overzicht(G.code, G.token);
   assert.equal(start.mijn.stappen.length, 0);
   assert.ok(start.voorbeelden.length > 3, 'er zijn voorbeeldstappen');
-  assert.equal(start.mijn.reeks, 0);
+  assert.equal(start.mijn.week, 0);
+  assert.ok(!('reeks' in start.mijn) && !('record' in start.mijn), 'geen reeks en geen record -- bewust');
 
   // twee stappen toevoegen; een dubbele wordt genegeerd
   assert.equal((await api('/gezin/ochtend/stap', { code: G.code, token: G.token, tekst: 'Tanden poetsen' })).status, 200);
@@ -56,26 +59,25 @@ test('mijn ritme: stappen erbij, afvinken, en alles-af geeft een reeks van 1', a
   let d = await overzicht(G.code, G.token);
   assert.equal(d.mijn.stappen.length, 2, 'geen dubbele stap');
 
-  // de eerste stap afvinken: nog niet klaar, dus geen reeks
+  // de eerste stap afvinken: nog niet klaar, dus telt nog niet
   const s1 = d.mijn.stappen[0].id, s2 = d.mijn.stappen[1].id;
   let r = await json(await api('/gezin/ochtend/vink', { code: G.code, token: G.token, stapId: s1, aan: true }));
   assert.equal(r.klaar, false);
-  assert.equal(r.reeks, 0);
-  // de tweede ook: nu alles af -> reeks 1 en netKlaar
+  assert.equal(r.week, 0);
+  // de tweede ook: nu alles af -> vandaag telt mee (week 1) en netKlaar
   r = await json(await api('/gezin/ochtend/vink', { code: G.code, token: G.token, stapId: s2, aan: true }));
   assert.equal(r.klaar, true);
   assert.equal(r.netKlaar, true);
-  assert.equal(r.reeks, 1);
-  // nog een keer vinken op dezelfde dag telt de reeks niet dubbel
+  assert.equal(r.week, 1);
+  // nog een keer vinken op dezelfde dag telt niet dubbel, en af is af
   r = await json(await api('/gezin/ochtend/vink', { code: G.code, token: G.token, stapId: s2, aan: false }));
   r = await json(await api('/gezin/ochtend/vink', { code: G.code, token: G.token, stapId: s2, aan: true }));
   assert.equal(r.netKlaar, false, 'geen dubbele telling op dezelfde dag');
-  assert.equal(r.reeks, 1);
+  assert.equal(r.week, 1);
 
   d = await overzicht(G.code, G.token);
   assert.equal(d.mijn.klaar, true);
-  assert.equal(d.mijn.reeks, 1);
-  assert.equal(d.mijn.record, 1);
+  assert.equal(d.mijn.week, 1);
 });
 
 test('ouder zet het ritme van het kind klaar; het kind vinkt zelf af', async () => {
@@ -95,7 +97,7 @@ test('ouder zet het ritme van het kind klaar; het kind vinkt zelf af', async () 
   assert.ok(dp.kinderen.some(k => k.pid === G.kindId && k.stappen.some(x => x.tekst === 'Tas inpakken')));
 });
 
-test('het gezinsbord toont wie klaar is en de reeks; de gast doet niet mee', async () => {
+test('het gezinsbord toont wie klaar is, op naam gesorteerd; de gast doet niet mee', async () => {
   const G = await gezin();
   // ouder krijgt een stap en vinkt die af (alles af -> klaar)
   await api('/gezin/ochtend/stap', { code: G.code, token: G.token, tekst: 'Koffie' });
@@ -104,7 +106,10 @@ test('het gezinsbord toont wie klaar is en de reeks; de gast doet niet mee', asy
   const d = await overzicht(G.code, G.token);
   const ouderRij = d.bord.find(b => b.pid === d.mijnId);
   assert.ok(ouderRij.klaar, 'de ouder staat als klaar op het bord');
-  assert.equal(ouderRij.reeks, 1);
+  assert.equal(ouderRij.week, 1);
+  // geen ranglijst: het bord staat op naam, niet op prestatie
+  const namen = d.bord.map(b => b.naam);
+  assert.deepEqual(namen, [...namen].sort((a, b) => a.localeCompare(b)), 'het bord is geen ranglijst');
   // de gast (oma) staat niet op het bord
   assert.ok(!d.bord.some(b => b.naam === 'Oma'), 'een gast staat niet op het ochtendbord');
 });

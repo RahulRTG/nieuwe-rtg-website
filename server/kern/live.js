@@ -54,7 +54,7 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
     const mode = (L && L.mode) || 'driving';
     const partners = connectedSupplierCodes(key).map(code => {
       const s = findSupplier(code); if (!s) return null;
-      const t = db.data.supplierTypes[s.type] || {};
+      const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
       const dist = me && s.loc ? haversine(me, s.loc) : null;
       const order = vanKlant(key).find(o => o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status));
       const ride = db.data.rides.find(r => (r.customerKey || r.customerTier) === key && r.supplierCode === code && r.status !== 'gearriveerd' && r.status !== 'geweigerd');

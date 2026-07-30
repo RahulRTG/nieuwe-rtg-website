@@ -1,31 +1,3 @@
-        const box = $('#paResult');
-        box.style.display = 'block';
-        box.innerHTML = '✅ '+T('bo.pa.done','Goedgekeurd. Geef dit eenmalig door (staat ook in de welkomstmail):')+
-          '<br><b>'+T('bo.pa.code','Leverancierscode')+': '+d.code+'</b> · <b>'+T('bo.pa.pin','Manager-PIN')+': '+d.pin+'</b>';
-        await refresh();
-      } catch(e){ alert(e.message); }
-    }));
-    document.querySelectorAll('[data-pano]').forEach(b => b.addEventListener('click', async () => {
-      try { await call('/office/partner/decide', { id: b.dataset.pano, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
-    }));
-
-    // schoolaanmeldingen: een school kan pas personeel toelaten en klassen maken
-    // nadat RTG hem hier goedkeurt
-    const scholen = (state.pendingSchools || []).filter(x => past(x.naam, x.code, x.plaats));
-    $('#schoolList').innerHTML = scholen.length ? scholen.map(x =>
-      '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.naam)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.plaats||'')+'</span></div>'+
-        '<div class="sub">'+T('bo.sc.code','code')+' '+escHtml(x.code)+' · '+x.personeel+' '+T('bo.sc.staff','aanmelding(en) personeel')+' · '+timeAgo(x.at)+'</div></div>'+
-        '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-scok="'+escHtml(x.code)+'">'+T('bo.sc.approve','Goedkeuren')+'</button><button class="vbtn" data-scno="'+escHtml(x.code)+'">'+T('bo.sc.reject','Afwijzen')+'</button></div>'+
-      '</div></div>'
-    ).join('') : '<div class="empty">'+T('bo.nosc','Geen wachtende schoolaanmeldingen. Scholen melden zich aan via de RTFoundation-app; hier keurt u ze goed voordat ze personeel en klassen kunnen aanmaken.')+'</div>';
-    document.querySelectorAll('[data-scok]').forEach(b => b.addEventListener('click', async () => {
-      try { await call('/office/school/decide', { code: b.dataset.scok, action: 'goedkeuren' }); await refresh(); } catch(e){ alert(e.message); }
-    }));
-    document.querySelectorAll('[data-scno]').forEach(b => b.addEventListener('click', async () => {
-      try { await call('/office/school/decide', { code: b.dataset.scno, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
-    }));
-  }
-
   // De tijdlijn is schaalvast: de server bladert en zoekt door de volledige
   // historie; het scherm toont altijd 25 regels plus het eerlijke totaal.
   async function laadTimeline(){
@@ -39,7 +11,7 @@
     $('#tlTot').textContent = '(' + tl.total.toLocaleString(lang()==='en'?'en-US':'nl-NL') + ')';
     $('#orders').innerHTML = tl.items.length ? tl.items.map(x => {
       const pc = (x.status==='nieuw'||x.status==='aangevraagd')?'nieuw':KLAAR_R[x.status]?'klaar':'bereiding';
-      const icoon = x.soort==='order'?'🛎️':x.soort==='jet'?'✈️':'🚗';
+      const icoon = x.soort==='order'?'hotel':x.soort==='jet'?'✈':'auto';
       return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.supplierName)+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+escHtml(x.customerCodename)+'</span></div>'+
         '<div class="sub">'+icoon+' '+escHtml(x.sub||'')+' · '+timeAgo(x.at)+(x.when?' · '+escHtml(x.when):'')+' · '+(x.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
         '<div style="text-align:right;"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';

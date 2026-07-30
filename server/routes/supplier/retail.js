@@ -11,7 +11,7 @@ module.exports = (kern) => {
    Merk-backoffice (manager) + winkelvloer (elke medewerker). De PDA logt in als
    staflid van het merk en gebruikt dezelfde supplierAuth. */
 function eisRetail(req, res) {
-  const caps = (db.data.supplierTypes[req.supplier.type] || {}).caps || [];
+  const caps = db.capsVan(req.supplier);
   if (!caps.includes('retail')) { res.status(409).json({ error: 'Dit is geen mode-/retailpartner.' }); return false; }
   return true;
 }

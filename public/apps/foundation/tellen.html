@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Tellen tot tien</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:40rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .veld-groot{display:flex;flex-wrap:wrap;gap:.9rem;justify-content:center;min-height:9rem;align-items:center;}
+  .ding{background:transparent;border:0;padding:.25rem;position:relative;color:var(--goud);cursor:pointer;line-height:0;}
+  .ding svg{width:3.2rem;height:3.2rem;display:block;}
+  .ding.geteld{color:var(--goud2);}
+  .ding .nr{position:absolute;right:0;bottom:0;background:var(--paneel2);border:1px solid var(--goud);color:var(--goud2);
+    border-radius:999px;font-size:.8rem;line-height:1.3rem;width:1.4rem;height:1.4rem;text-align:center;font-weight:700;}
+  .vraag{text-align:center;font-size:1.15rem;margin:1rem 0 .8rem;}
+  .keuzes{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;}
+  .getal{background:var(--paneel2);border:2px solid var(--lijn);color:var(--txt);border-radius:18px;
+    width:4.5rem;height:4.5rem;font-size:2rem;font-weight:700;cursor:pointer;font-family:var(--serif);}
+  .getal:hover{border-color:var(--goud);}
+  .getal.goed{border-color:var(--groen);color:var(--groen);}
+  .getal.mis{border-color:var(--rood);color:var(--rood);}
+  .melding{text-align:center;min-height:1.6rem;margin-top:.9rem;font-size:1rem;color:var(--goud2);}
+  .onderrij{display:flex;gap:.6rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:.9rem;}
+  .stand{color:var(--zacht);font-size:.85rem;text-align:center;margin-top:.6rem;}
+  .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+  .toon{display:flex;gap:.5rem;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap;}
+  .toon button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
+    padding:.4rem .9rem;font-size:.85rem;cursor:pointer;}
+  .toon button.aan{border-color:var(--goud);color:var(--goud2);}
+  .ding.gepakt{color:var(--goud2);}
+  .ding.gepakt svg{filter:drop-shadow(0 0 6px rgba(201,162,75,.55));}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Tellen tot tien</h1>
+  <div class="intro">Twee spelletjes in een: bij Tellen tik je de dingen aan en kies je het goede getal; bij Pakken krijg je een getal en pak je er precies zoveel. Samen zijn dat de twee kanten van tellen.</div>
+
+  <div class="kaart blok">
+    <div class="toon" id="spelvorm" role="group" aria-label="Welk spel">
+      <button type="button" data-m="tel" class="aan">Tellen</button>
+      <button type="button" data-m="pak">Pakken</button>
+    </div>
+    <div class="veld-groot" id="veld" aria-live="polite"></div>
+    <div class="vraag" id="vraag">Hoeveel zie je er?</div>
+    <div class="keuzes" id="keuzes"></div>
+    <div class="melding" id="melding"></div>
+    <div class="onderrij">
+      <button class="knop grijs" id="opnieuw" type="button">Nog een keer</button>
+      <button class="knop" id="pakKlaar" type="button" hidden>Klaar met pakken</button>
+      <button class="knop" id="volgend" type="button" hidden>Verder</button>
+    </div>
+    <div class="stand" id="stand"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-teller</h2>
+    <p class="ouder">Tel samen hardop en wijs elk ding aan; dat is precies wat een kleuter nodig heeft om getallen aan hoeveelheden te koppelen. Het Pakken-spel oefent de andere kant op: van het getal naar de hoeveelheid ("pak er drie"), en terugleggen is gewoon nog eens tikken -- niets is fout. Er zit geen tijd op, geen geluid en geen beloningssysteem in.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+const FIG = {
+  appel: '<circle cx="24" cy="28" r="15" fill="currentColor"/><rect x="22.5" y="7" width="3" height="10" rx="1.5" fill="currentColor"/>',
+  ster: '<path d="M24 5l5.5 12.5L43 19l-9.5 9 2.5 13.5L24 35l-12 6.5L14.5 28 5 19l13.5-1.5z" fill="currentColor"/>',
+  hart: '<path d="M24 42S6 30 6 18.5C6 12 11 8 16.5 8c3.6 0 6.4 1.8 7.5 4 1.1-2.2 3.9-4 7.5-4C37 8 42 12 42 18.5 42 30 24 42 24 42z" fill="currentColor"/>',
+  bal: '<circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="4"/><path d="M7 24h34M24 7v34" stroke="currentColor" stroke-width="3"/>',
+  bloem: '<circle cx="24" cy="13" r="7.5" fill="currentColor"/><circle cx="24" cy="35" r="7.5" fill="currentColor"/><circle cx="13" cy="24" r="7.5" fill="currentColor"/><circle cx="35" cy="24" r="7.5" fill="currentColor"/>',
+  vis: '<path d="M6 24c8-10 20-10 26 0-6 10-18 10-26 0z" fill="currentColor"/><path d="M32 24l10-8v16z" fill="currentColor"/>'
+};
+const NAAM = { appel: 'appels', ster: 'sterren', hart: 'hartjes', bal: 'ballen', bloem: 'bloemen', vis: 'visjes' };
+const SOORTEN = Object.keys(FIG);
+const WOORD = ['nul', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht', 'negen', 'tien'];
+
+let spelvorm = 'tel', ronde = null, goed = 0, gedaan = 0;
+const dobbel = n => Math.floor(Math.random() * n);
+
+function nieuweRonde() {
+  const soort = SOORTEN[dobbel(SOORTEN.length)];
+  if (spelvorm === 'pak') {
+    // andersom denken: het getal komt eerst, de hoeveelheid maak je zelf
+    const doel = 1 + dobbel(6);
+    const totaal = Math.min(10, doel + 2 + dobbel(3));
+    ronde = { soort, aantal: doel, totaal, geteld: 0, klaar: false };
+    $('#vraag').textContent = 'Pak er precies ' + WOORD[doel] + ' (' + doel + ')';
+  } else {
+    const aantal = 1 + dobbel(10);
+    ronde = { soort, aantal, totaal: aantal, geteld: 0, klaar: false };
+    $('#vraag').textContent = 'Hoeveel ' + NAAM[soort] + ' zie je?';
+  }
+  $('#melding').textContent = '';
+  $('#volgend').hidden = true;
+  $('#pakKlaar').hidden = spelvorm !== 'pak';
+  $('#keuzes').innerHTML = '';
+  tekenVeld();
+  if (spelvorm === 'tel') tekenKeuzes();
+  tekenStand();
+}
+
+function tekenVeld() {
+  const veld = $('#veld');
+  veld.innerHTML = '';
+  for (let i = 0; i < ronde.totaal; i++) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ding';
+    b.setAttribute('aria-label', NAAM[ronde.soort].replace(/s$/, '') + ' ' + (i + 1));
+    b.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true">' + FIG[ronde.soort] + '</svg>';
+    b.addEventListener('click', () => (spelvorm === 'pak' ? pak(b) : tel(b)));
+    veld.appendChild(b);
+  }
+}
+
+// tel-spel: elk ding krijgt bij het aantikken zijn eigen cijfer
+function tel(b) {
+  if (b.classList.contains('geteld')) return;
+  b.classList.add('geteld');
+  ronde.geteld++;
+  const nr = document.createElement('span');
+  nr.className = 'nr';
+  nr.textContent = ronde.geteld;
+  b.appendChild(nr);
+}
+
+// pak-spel: aantikken pakt, nog eens tikken legt terug -- niets is fout
+function pak(b) {
+  if (ronde.klaar) return;
+  b.classList.toggle('gepakt');
+  const n = $('#veld').querySelectorAll('.gepakt').length;
+  $('#melding').textContent = n === 0 ? '' : 'Je hebt er nu ' + WOORD[n] + '.';
+}
+
+function tekenKeuzes() {
+  // drie getallen: het goede antwoord en twee buren, altijd tussen 1 en 10
+  const set = new Set([ronde.aantal]);
+  while (set.size < 3) {
+    const kandidaat = ronde.aantal + (dobbel(5) - 2);
+    if (kandidaat >= 1 && kandidaat <= 10) set.add(kandidaat);
+  }
+  const lijst = [...set].sort(() => Math.random() - 0.5);
+  const doos = $('#keuzes');
+  doos.innerHTML = '';
+  for (const n of lijst) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'getal';
+    b.textContent = n;
+    b.setAttribute('aria-label', WOORD[n]);
+    b.addEventListener('click', () => kies(n, b));
+    doos.appendChild(b);
+  }
+}
+
+function kies(n, knop) {
+  if (ronde.klaar) return;
+  if (n !== ronde.aantal) {
+    knop.classList.add('mis');
+    $('#melding').textContent = 'Bijna. Tel ze samen nog een keer, dan lukt het.';
+    return;
+  }
+  ronde.klaar = true;
+  knop.classList.add('goed');
+  goed++; gedaan++;
+  $('#melding').textContent = 'Ja, ' + WOORD[n] + '. Goed geteld.';
+  $('#volgend').hidden = false;
+  tekenStand();
+  try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) {}
+}
+
+// pak-spel nakijken: precies goed is feest, anders rustig verder proberen
+$('#pakKlaar').addEventListener('click', () => {
+  if (ronde.klaar || spelvorm !== 'pak') return;
+  const n = $('#veld').querySelectorAll('.gepakt').length;
+  if (n === ronde.aantal) {
+    ronde.klaar = true;
+    goed++; gedaan++;
+    $('#melding').textContent = 'Ja! Precies ' + WOORD[n] + '. Knap gepakt.';
+    $('#pakKlaar').hidden = true;
+    $('#volgend').hidden = false;
+    tekenStand();
+    try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) {}
+  } else if (n < ronde.aantal) {
+    $('#melding').textContent = 'Je hebt er nu ' + WOORD[n] + '. Pak er nog een paar bij.';
+  } else {
+    $('#melding').textContent = 'Je hebt er nu ' + WOORD[n] + '. Leg er een paar terug (tik ze nog eens aan).';
+  }
+});
+
+$('#spelvorm').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  spelvorm = b.dataset.m;
+  $('#spelvorm').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
+  nieuweRonde();
+}));
+
+function tekenStand() {
+  $('#stand').textContent = gedaan ? 'Je hebt er vandaag ' + goed + ' goed geteld.' : '';
+}
+
+$('#opnieuw').addEventListener('click', nieuweRonde);
+$('#volgend').addEventListener('click', nieuweRonde);
+nieuweRonde();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

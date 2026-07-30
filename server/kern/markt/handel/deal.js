@@ -33,7 +33,7 @@ module.exports = (ctx) => {
     chat.berichten.push({ van: pk(partij), naam: rolIn(chat, partij) === 'verkoper' ? chat.verkoper.naam : chat.koper.naam, tekst: 'Prijs afgesproken: € ' + b + '. Betalen kan zodra jullie samen zijn.', at: nu(), systeem: true });
     save();
     const ander = pk(partij) === pk(chat.koper) ? chat.verkoper : chat.koper;
-    sein(ander, { icon: '🤝', title: 'Prijs afgesproken', body: '€ ' + b + ' voor "' + (chat.adTitel || '').slice(0, 30) + '"' });
+    sein(ander, { icon: 'rechterhand', title: 'Prijs afgesproken', body: '€ ' + b + ' voor "' + (chat.adTitel || '').slice(0, 30) + '"' });
     return { ok: true, chat: chatPub(chat, partij) };
   }
 
@@ -59,7 +59,7 @@ module.exports = (ctx) => {
           chat.deal.status = 'samen';
           chat.deal.factuur = maakFactuur(chat);
           const ander = pk(partij) === pk(chat.koper) ? chat.verkoper : chat.koper;
-          sein(ander, { icon: '📍', title: 'Jullie zijn samen', body: 'De factuur staat klaar; de koper kan nu betalen.' });
+          sein(ander, { icon: 'gps', title: 'Jullie zijn samen', body: 'De factuur staat klaar; de koper kan nu betalen.' });
         }
       }
     }
@@ -109,7 +109,7 @@ module.exports = (ctx) => {
     const ad = vind(chat.adId); if (ad) ad.status = 'verkocht';
     chat.berichten.push({ van: pk(partij), naam: chat.koper.naam, tekst: 'Betaald via ' + (m === 'apple-pay' ? 'Apple Pay' : m) + ': € ' + chat.deal.bedrag + '. Bedankt!', at: nu(), systeem: true });
     save();
-    sein(chat.verkoper, { icon: '✅', title: 'Betaald', body: chat.koper.naam + ' heeft € ' + chat.deal.bedrag + ' betaald voor "' + (chat.adTitel || '').slice(0, 30) + '".' });
+    sein(chat.verkoper, { icon: 'pas', title: 'Betaald', body: chat.koper.naam + ' heeft € ' + chat.deal.bedrag + ' betaald voor "' + (chat.adTitel || '').slice(0, 30) + '".' });
     return { ok: true, betaald: true, factuur: chat.deal.factuur, chat: chatPub(chat, partij) };
   }
 

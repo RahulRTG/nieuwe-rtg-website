@@ -13,7 +13,10 @@ app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
     if (!a.businessPass || !a.businessPass.key)
       return res.status(409).json({ error: 'Deze aanvraag heeft geen Business Pass-bewijs; zonder Business Pass geen bedrijfscode. Vraag de aanvrager de aanvraag opnieuw te doen met een actieve Business Pass.' });
     const code = makeSupplierCode(a.company);
-    const s = { code, name: a.company, type: a.type, city: a.city, loc: null, rate: 0.12, menu: [] };
+    // Een nieuw goedgekeurde partner start OFFLINE: eerst door de ondernemer-
+    // poort (Salon-pagina vullen + de rondleidingen), dan pas online en
+    // zichtbaar voor leden. online:false zet ensureSupplierDefaults niet terug.
+    const s = { code, name: a.company, type: a.type, city: a.city, loc: null, rate: 0.12, menu: [], online: false };
     ensureSupplierDefaults(s);
     db.data.suppliers.push(s);
     const pin = accounts.makePin();
@@ -26,6 +29,9 @@ app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
       'Uw leverancierscode: ' + code + '\nUw manager-PIN: ' + pin + ' (op naam van ' + a.contactName + ')\n\n' +
       'Open de partner-app op ' + url + '/apps/leverancier.html, kies uw bedrijf via de code, ' +
       'log in als management met uw PIN en stel uw pagina, menukaart en team in.\n\n' +
+      'Uw zaak staat nog offline. Loop eerst even de ondernemer-poort door: vul uw ' +
+      'Salon-pagina (een bio en een foto) en volg de korte rondleidingen door de kassa ' +
+      'en de werk-apps. Daarna zet u uw zaak zelf online en bent u zichtbaar voor leden.\n\n' +
       'Uw bedrijfsaccount op De Salon is direct aangemaakt; dit is een vast onderdeel van elk RTG-partnerschap. ' +
       'Via Kantoor, Marketing stelt u uw profiel in, plaatst u berichten, aanbiedingen en polls, en ziet u uw volgers en cijfers.\n\nRahul Travel Group');
     sseToOffice('sync', { scope: 'team' });

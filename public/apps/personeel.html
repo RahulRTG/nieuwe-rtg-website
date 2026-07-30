@@ -10,6 +10,7 @@
 <link rel="apple-touch-icon" href="/icons/personeel-192.png">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rosthema.css" rel="stylesheet">
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
@@ -58,7 +59,8 @@
     transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), transform 0.13s cubic-bezier(0.22,0.7,0.3,1);}
   @media (hover:hover){.gbtn:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));transform:translateY(-2px);}}
   .gbtn:active{background:var(--card2);transform:scale(0.98);}
-  .gbtn .ic{font-size:1.4rem;}
+  .gbtn .ic{font-size:1.4rem;display:flex;align-items:center;}
+  .gbtn .ic .rtg-glyf{width:1.5rem;height:1.5rem;color:var(--burgundy-on-dark,#C23A5E);}
   .gbtn b{display:block;font-size:0.92rem;font-weight:600;}
   .gbtn span{font-size:0.72rem;color:var(--soft);}
   .gback{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:0.82rem;margin-bottom:1rem;padding:0;}
@@ -191,7 +193,7 @@
     <div class="topbar" role="banner">
       <div class="who"><b id="meName"></b><span id="meSub"></span></div>
       <div style="display:flex;gap:0.5rem;align-items:center;">
-        <button class="sos" id="sosBtn">🚨 SOS</button>
+        <button class="sos" id="sosBtn">SOS</button>
         <button class="switch" id="switchBtn" data-i18n="pd.switch">Wissel</button>
       </div>
     </div>
@@ -291,6 +293,11 @@
         <p class="sub" data-i18n="pd.v.mk.sub">Het korps in uw binnenzak: de open meldingen met de veld-knoppen, de medische receptie en de eerste hulp.</p>
         <div id="meldkamerWrap"></div>
       </div>
+      <div class="view" data-view="werkvloer">
+        <h2 data-i18n="pd.v.werkvloer">Werkvloer</h2>
+        <p class="sub" data-i18n="pd.v.werkvloer.sub">Wat op het andere scherm klaarstaat: tekenen, een betaalcode tonen, tafels en checklijsten.</p>
+        <div id="wvPda"></div>
+      </div>
       <div class="view" data-view="borden">
         <h2 data-i18n="pd.v.borden">Borden</h2>
         <p class="sub" data-i18n="pd.v.borden.sub">Het werkbord van de zaak: uw groepen, lijsten en kaarten, live met iedereen.</p>
@@ -353,6 +360,7 @@
       <button data-tab="verzekeraar" id="tabPolis" style="display:none;"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12h6M12 9v6"/></svg><span data-i18n="pd.t.pol">Polis</span></button>
       <button data-tab="zorgbalie" id="tabZorgbalie" style="display:none;"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/></svg><span data-i18n="pd.t.zb">Zorgbalie</span></button>
       <button data-tab="meldkamer" id="tabMeldkamer" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 5V3M12 21v-2M5 12H3M21 12h-2M6.5 6.5L5 5M19 19l-1.5-1.5M17.5 6.5L19 5M5 19l1.5-1.5"/></svg><span data-i18n="pd.t.mk">Meldkamer</span></button>
+      <button data-tab="werkvloer"><svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><span data-i18n="pd.t.werkvloer">Werkvloer</span></button>
       <button data-tab="borden"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 8v8M12.5 8v5M17 8v3"/></svg><span data-i18n="pd.t.borden">Borden</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
@@ -361,7 +369,9 @@
   <div id="toast"></div>
 </div>
 
-<script src="/shared/thema.js"></script>
+<script src="/shared/glyf.js"></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/rosthema.js" defer></script>
 <script src="/shared/klok.js" defer></script>
 <script src="/shared/inlogkleur.js" defer></script>
 <script src="/apps/util.js"></script>
@@ -369,6 +379,8 @@
 <script src="/shared/teamcall.js"></script>
 <script src="/shared/collegachat.js"></script>
 <script src="/shared/moedertaal.js"></script>
+<script src="/apps/personeel-hrmijn.js" defer></script>
+<script src="/apps/personeel-office.js" defer></script>
 <script src="/shared/focus.js" data-app="pda" data-kaart=".card" data-kop=".k"></script>
 <script src="/shared/spraak.js"></script>
 <script src="/shared/borden.js"></script>
@@ -376,6 +388,8 @@
 <script src="/shared/werkos.js"></script>
 <script src="/shared/accounts-os.js"></script>
 <script src="/shared/accounts-brug.js" data-wereld="personeel"></script>
+<script src="/shared/qr.js"></script>
+<script src="/shared/qrteken.js"></script>
 <script src="/apps/personeel.js"></script>
 <script>
 window.I18N = { en: {
@@ -497,6 +511,13 @@ window.I18N = { en: {
   'pd.bz.stop':'Stop', 'pd.bz.start':'Start', 'pd.bz.mijn':'My ride', 'pd.bz.bezorgd':'Delivered', 'pd.bz.vertrek':'Depart',
   'pd.bz.geenmijn':'No ride in your name. Take deliveries below.', 'pd.bz.vrij':'Ready to take along',
   'pd.bz.neem':'Take selected rides (in your name)',
+  'pd.bz.terug':'Back at the venue; GPS is off again.', 'pd.bz.gpsauto':'Turns on by itself when you depart and off by itself once you are back at the venue.',
+  'pd.bz.inpak':'Packing: tick off per bag and receipt number', 'pd.bz.bonnr':'receipt', 'pd.bz.tas':'Which bag? (e.g. bag 2)',
+  'pd.bz.bon':'Type the receipt number', 'pd.bz.ingepakt':'Everything is in', 'pd.bz.geeninpak':'Nothing to pack; new orders appear here.',
+  'pd.bz.tasje':'bag', 'pd.bz.wachtinpak':'waiting for the packer', 'pd.bz.gepakt':'picked up', 'pd.bz.noggepakt':'still to tick off',
+  'pd.bz.vt.auto':'Car', 'pd.bz.vt.motor':'Motorcycle', 'pd.bz.vt.scooter':'Scooter', 'pd.bz.vt.fatbike':'Fatbike/e-bike', 'pd.bz.vt.lopen':'Walking',
+  'pd.bz.pakcheck':'I have picked up everything', 'pd.bz.route':'Best route', 'pd.bz.ipok':'Packed: everything ticked off on bag and receipt.',
+  'pd.bz.pakok':'Ticked off: you have everything.',
   'pd.bz.geenvrij':'Nothing ready to take along. New deliveries appear here live.', 'pd.bz.ai':'Quick help (AI)',
   'pd.bz.ai1':'Address is wrong', 'pd.bz.ai2':'Guest does not answer', 'pd.bz.ai3':'I am delayed',
   'pd.bz.ai4':'Order damaged', 'pd.bz.kies':'Tick one or more deliveries first.', 'pd.bz.opnaam':'ride(s) in your name.',
@@ -545,6 +566,9 @@ window.I18N = { en: {
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

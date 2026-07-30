@@ -1,7 +1,6 @@
 /* Het demopersoneel per leverancier (alleen in demostand gebruikt): per
    zaak een manager (PIN 1234) en vloerpersoneel (PIN 5678) voor de PDA.
    Pure data, geen logica. */
-// Demo-personeel per leverancier: een manager (PIN 1234) en een medewerker (PIN 5678).
 const STAFF_SEED = {
   SAKURA: [['Marc Bosch', 'manager', 'Beheer'], ['Rosa Torres', 'staff', 'Onderhoud']],
   // de hulpdiensten: per korps een meldkamer-chef (PIN 1234) en een collega
@@ -25,6 +24,7 @@ const STAFF_SEED = {
   // zelfstandigen: eenmanszaken, dus alleen een eigenaar met beheer-rechten
   AYAKA: [['Livia Bergkamp', 'manager', 'Goudsmid']],
   KAITO: [['Milan de Wit', 'manager', 'Personal trainer']],
+  CASTELL: [['Ferran Castell', 'manager', 'Aannemer'], ['Marc Soler', 'staff', 'Timmerman'], ['Pau Ricard', 'staff', 'Loodgieter']],
   // activiteiten: beheer plus de mensen aan de deur en op de boot
   ESVEDRA: [['Marta Salas', 'manager', 'Beheer'], ['Joel Ferrer', 'staff', 'Gids']],
   MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']],
@@ -34,6 +34,7 @@ const STAFF_SEED = {
   CANFERRER: [['Aina Torres', 'manager', 'Bedrijfsleider'], ['Marc Prats', 'staff', 'Veehouderij'], ['Lucia Roig', 'staff', 'Akker & kas']],
   // content creator: vaak solo; de creator zelf plus een editor
   LUMINA: [['Nora Vidal', 'manager', 'Creator'], ['Tim Bakker', 'staff', 'Editor']],
+  BODE: [['Elvira Sanz', 'manager', 'Hoofdredactie'], ['Joan Prats', 'staff', 'Redactie']],
   IBIZAIR: [['Nadia Fischer', 'manager', 'Operations'], ['Tomas Weller', 'staff', 'Piloot']],
   // charter: een vlootbeheerder en een schipper aan boord
   AZUL: [['Nerea Costa', 'manager', 'Charterbeheer'], ['Marco Silva', 'staff', 'Schipper']],
@@ -61,7 +62,7 @@ const STAFF_SEED = {
   LIENZO: [['Valeria Pinto', 'manager', 'Galeriehouder'], ['Hugo Ram', 'staff', 'Exposities & entree']],
   // vracht & expeditie: de expediteur plant, de declarant klaart in, de loods laadt
   TERRAMAR: [['Marc Torres', 'manager', 'Expediteur'], ['Aina Salom', 'staff', 'Douane-declarant'], ['Pau Ribas', 'staff', 'Loods & laden']],
-  // het kantoorgebouw op de Zuidas: het hele huis, van receptie tot concierge
+  // het RTG Enterprise-kantoorgebouw: het hele huis, van receptie tot concierge
   MERIDIAAN: [['Evi van Dalen', 'manager', 'Gebouwmanager'], ['Sanne Roos', 'staff', 'Receptie'],
     ['Deniz Kaya', 'staff', 'Security'], ['Ruben Smits', 'staff', 'Facilitair'], ['Chiara de Wit', 'staff', 'Concierge & jetset']],
   // de golfclub: de secretaris beheert, de caddiemaster en de pro's op de baan

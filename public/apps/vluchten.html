@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Vluchten">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
   :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
     --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
@@ -44,6 +45,10 @@
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .sec{font-size:.78rem;color:var(--muted);line-height:1.6;margin:-.2rem 0 .8rem;}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header><div class="ey">RTG Airport</div><h1>Vluchten</h1></header>
@@ -71,7 +76,7 @@ async function laad(){
 async function laadBord(){
   let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const sec=d.security.filter(f=>f.open).map(f=>esc(f.naam)+': '+f.wachtMinuten+' min').join(' · ');
-  let h='<div class="sec">🛂 Security nu · '+(sec||'geen filter open')+'</div>';
+  let h='<div class="sec">Security nu · '+(sec||'geen filter open')+'</div>';
   h+= d.vluchten.length ? d.vluchten.map(v=>{
     const st = v.geannuleerd?'<span class="status open">geannuleerd</span>'
       : v.status==='inchecken'?'<span class="status goud">inchecken open</span>'
@@ -81,7 +86,7 @@ async function laadBord(){
       : '<span class="status">'+esc(v.status)+'</span>';
     const ver=v.vertraging?' <span class="status open">+'+v.vertraging.minuten+' min</span>':'';
     const boek=(v.soort==='vertrek'&&['gepland','inchecken'].includes(v.status))?'<div class="rij"><button class="knop stil" data-boek="'+v.id+'">Boek deze vlucht</button></div>':'';
-    return '<div class="item"><h4>'+(v.icoon||'✈️')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4><div class="meta">'+esc(v.soort)+' · '+esc(v.tijd)+' · '+esc(v.gate)+' · '+st+ver+'</div>'+boek+'</div>';
+    return '<div class="item"><h4>'+(v.icoon||'')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4><div class="meta">'+esc(v.soort)+' · '+esc(v.tijd)+' · '+esc(v.gate)+' · '+st+ver+'</div>'+boek+'</div>';
   }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
   $('#inhoud').innerHTML=h;
   document.querySelectorAll('[data-boek]').forEach(b=>b.onclick=async()=>{
@@ -90,12 +95,12 @@ async function laadBord(){
 }
 async function laadMijn(){
   let d; try{ d=await api('/mijn'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  const charterBlok='<div class="item" style="border-color:rgba(169,143,7,.4);"><h4>🛩️ Charter aanvragen</h4>'+
+  const charterBlok='<div class="item" style="border-color:rgba(169,143,7,.4);"><h4>Charter aanvragen</h4>'+
     '<div class="meta">Een privejet of helikopter op uw moment. Operations bevestigt persoonlijk; daarna staat de vlucht in uw reizen.</div>'+
-    '<div class="rij"><select class="veld" id="chSoort"><option value="privejet">🛩️ Privejet</option><option value="helikopter">🚁 Helikopter</option></select>'+
+    '<div class="rij"><select class="veld" id="chSoort"><option value="privejet">Privejet</option><option value="helikopter">Helikopter</option></select>'+
     '<input class="veld" id="chBest" style="flex:1;min-width:8rem;" placeholder="Bestemming" maxlength="60"></div>'+
     '<div class="rij"><input class="veld" id="chDatum" type="date"><input class="veld" id="chTijd" type="time" value="12:00"><button class="knop" id="chVraag">Vraag aan</button></div>'+
-    ((d.charters||[]).length?'<div style="margin-top:.5rem;">'+d.charters.map(c=>'<div class="meta">'+(c.icoon||'🛩️')+' '+esc(c.code)+' · '+esc(c.bestemming)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</div>';
+    ((d.charters||[]).length?'<div style="margin-top:.5rem;">'+d.charters.map(c=>'<div class="meta">'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</div>';
   $('#inhoud').innerHTML= charterBlok + (d.boekingen.length ? d.boekingen.map(b=>{
     const v=b.vlucht;
     if(b.status==='ingecheckt'){
@@ -128,6 +133,9 @@ laad();
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

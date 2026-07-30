@@ -20,6 +20,34 @@ schrijven en elkaars data zien. Alleen een JSON-bestand herschrijven is niet
 meer nodig. (Binnen EEN collectie serialiseert SQLite; geef een collectie aan
 een domein. Row-niveau-concurrency binnen een collectie zou de volgende stap zijn.)
 
+Een profiel onder gemengde last wees uit dat 42% van alle server-CPU naar het
+OPSPOREN van wijzigingen ging: om te zien of een collectie veranderd was, werd
+hij geserialiseerd -- alle 164, bij elke save, terwijl `sessions` alleen al
+780 KB van de 1027 KB is. `server/db/voorcheck.js` slaat die serialisatie nu
+over voor grote collecties waarvan het aantal items gelijk is, en hooguit
+`RTG_SQLITE_GROOT_MS` (2 s). De grenzen zijn met opzet streng: toevoegen en
+verwijderen veranderen het aantal en landen dus altijd meteen (in- en uitloggen
+staan direct op schijf), geld wordt altijd exact nagekeken -- op naam én op een
+namenlijst -- en netjes afsluiten kijkt alles na en vouwt de WAL dicht. Gemeten
+op een sessie-zware last: 5,9 -> 1,2 ms per save. Vastgelegd in
+`test/opslag-voorcheck.test.js`.
+
+Daarna bleef er nog een tweede O(alles) staan: een collectie die alleen maar
+GROEIT (`orders`) werd bij elke nieuwe order in zijn geheel herschreven -- gemeten
+460 KB na 1050 orders, lineair groeiend. Het tx-grootboek bestond daar al voor,
+maar werkte alleen met Postgres ("zonder Postgres is dit inert"), dus juist de
+standaardopslag hield die serialisatie in stand. Het grootboek is nu
+opslag-onafhankelijk: `server/db/tx/ledger.js` kent alleen nog een ACHTERKANT
+(`pgachter.js` of `sqliteachter.js`), en dezelfde veeg- en vensterlogica draait op
+beide. In de SQLite-stand houdt het RAM een venster van de recentste items en
+staat de rest als geindexeerde rij in een eigen `grootboek.db` -- eigen bestand,
+zodat de kv-schrijvers en het grootboek niet op dezelfde schrijflock wachten.
+Gemeten op een order-zware last: `saveSqlite` van 35,2% naar 26,1% van de CPU en
+1119 -> 1380 rondes in dezelfde 25 s. Uit te zetten met `TX_LEDGER_SQLITE=0`.
+Vastgelegd in `test/txledger-sqlite.test.js`, dat hetzelfde contract afdwingt als
+de Postgres-variant: venster, verlies-vrij vegen, historie voorbij het venster,
+doorstromende statuswissels, en dat de kv-blob niet meer meegroeit.
+
 ## 3. Misbruik/spam  (aangepakt)
 Snelheidslimieten: vriendschapsverzoeken (30/uur), berichten (60/min), snaps
 (40/5min). Blokkeren en melden zoals bij zwakheid 1.

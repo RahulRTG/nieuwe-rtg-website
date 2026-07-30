@@ -59,7 +59,7 @@ module.exports = (ctx) => {
     kasAdd(v.assetId, -v.waarde * 100);
     save();
     try { await pay.stuur({ van: 'RTG Treasury', aanCodenaam: v.codenaam, centen: v.waarde * 100, oms: 'Terugkoop ' + v.assetNaam + ' (RTG Asset)', idem: 'terugkoop-' + v.id, soort: 'tik' }); } catch (e) {}
-    notify(v.key, { icon: '💰', title: 'Terugkoop uitbetaald: ' + v.assetNaam, body: 'De Tik van € ' + v.waarde + ' staat in uw tegoed. Het ticket is terug in de pool.', scope: 'assets' });
+    notify(v.key, { icon: 'betalen', title: 'Terugkoop uitbetaald: ' + v.assetNaam, body: 'De Tik van € ' + v.waarde + ' staat in uw tegoed. Het ticket is terug in de pool.', scope: 'assets' });
     return { ok: true, waarde: v.waarde, verzoek: v };
   }
   // de jaarlijkse servicefee innen: per actief ticket een keer per jaar, naar de poolkas

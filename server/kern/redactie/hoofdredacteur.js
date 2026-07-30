@@ -17,13 +17,13 @@ module.exports = (ctx) => {
       for (const t of (p.tags || [])) tel[t] = (tel[t] || 0) + 1;
     }
     for (const [tag, n] of Object.entries(tel).sort((a, b) => b[1] - a[1]).slice(0, 4))
-      tips.push({ bron: 'Pulse', icoon: '⚡', tip: '#' + tag + ' leeft deze week onder de leden (' + n + ' berichten). Wat zit erachter?' });
+      tips.push({ bron: 'Pulse', icoon: 'flits', tip: '#' + tag + ' leeft deze week onder de leden (' + n + ' berichten). Wat zit erachter?' });
     // wat kondigt het Rijk aan (de bekendmakingen van De Overheid)
     for (const b of (db.data.rijkBekend || []).slice(0, 3))
-      tips.push({ bron: 'Rijksoverheid', icoon: '🏛️', tip: b.titel + ' -- goed voor een uitlegstuk.' });
+      tips.push({ bron: 'Rijksoverheid', icoon: 'gebouw', tip: b.titel + ' -- goed voor een uitlegstuk.' });
     // wat hebben de ontwerpbureaus uitgewerkt (de Ideeenkamer)
     for (const o of ((db.data.ideeen || {}).lijst || []).filter(x => x.status === 'uitgewerkt').slice(0, 3))
-      tips.push({ bron: 'Ideeenkamer', icoon: '💡', tip: '"' + o.titel + '" is uitgewerkt door de bureaus -- een makingsverhaal.' });
+      tips.push({ bron: 'Ideeenkamer', icoon: 'thema', tip: '"' + o.titel + '" is uitgewerkt door de bureaus -- een makingsverhaal.' });
     return { ok: true, tips: tips.slice(0, 10) };
   }
 

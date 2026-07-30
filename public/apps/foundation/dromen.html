@@ -42,7 +42,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>⭐ Onze dromen</h1>
+  <h1>Onze dromen</h1>
 
   <div class="kaart maak">
     <div class="rijveld">
@@ -54,7 +54,7 @@
 
   <div id="open"></div>
   <div id="behaaldSec" hidden>
-    <h2 class="sec">🏆 Gevierd en gehaald</h2>
+    <h2 class="sec">Gevierd en gehaald</h2>
     <div id="behaald"></div>
   </div>
 
@@ -63,6 +63,16 @@
     <div class="h">Even samen praten? Trek een kaart en beantwoord hem om de beurt.</div>
     <div class="praat" id="praat">...</div>
     <button class="knop grijs klein" id="nogKaart" style="margin-top:.6rem;">Nieuwe kaart</button>
+  </div>
+
+  <div class="kaart kaartblok">
+    <h2>Vertel je droom</h2>
+    <div class="chat" id="chat"><div class="b ai">Wat zou jij later willen? Grote en kleine dromen zijn hier allebei welkom.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Ik zou later willen..." maxlength="1000"></textarea>
+      <button class="knop klein" id="stuur">Stuur</button>
+    </div>
+    <div style="color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
   </div>
 </div>
 
@@ -77,12 +87,12 @@ function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;',
 
 function kaartHtml(d){
   return '<div class="kaart droom'+(d.behaald?' behaald':'')+'" style="border-left-color:'+(d.behaald?'':(d.kleur||'#C9A24B'))+'">'+
-    '<div class="wie"><span class="av" style="background:'+(d.kleur||'#C9A24B')+'">'+(d.vanAvatar||'🙂')+'</span>'+esc(d.vanNaam)+(d.vanMij?' (jij)':'')+'</div>'+
+    '<div class="wie"><span class="av" style="background:'+(d.kleur||'#C9A24B')+'">'+(d.vanAvatar||'')+'</span>'+esc(d.vanNaam)+(d.vanMij?' (jij)':'')+'</div>'+
     '<div class="tk">'+esc(d.tekst)+'</div>'+
     '<div class="acties">'+
-      '<button class="moedig'+(d.aangemoedigd?' aan':'')+'" data-moedig="'+d.id+'">👏 <span>'+d.aantal+'</span></button>'+
+      '<button class="moedig'+(d.aangemoedigd?' aan':'')+'" data-moedig="'+d.id+'"><span>'+d.aantal+'</span></button>'+
       ((d.vanMij||Sessie.isBeheerder()) && !d.behaald ? '<button class="mini" data-behaald="'+d.id+'">✓ Gehaald!</button>' : '')+
-      (d.behaald && (d.vanMij||Sessie.isBeheerder()) ? '<span class="vlag">Gehaald 🎉</span> <button class="mini" data-terug="'+d.id+'">Terugzetten</button>' : '')+
+      (d.behaald && (d.vanMij||Sessie.isBeheerder()) ? '<span class="vlag">Gehaald </span> <button class="mini" data-terug="'+d.id+'">Terugzetten</button>' : '')+
       ((d.vanMij||Sessie.isBeheerder()) ? '<button class="mini" data-del="'+d.id+'">Weg</button>' : '')+
     '</div></div>';
 }
@@ -116,11 +126,17 @@ async function kaart(){ try{ const d = await fetch('/api/foundation/gesprekskaar
 $('#nogKaart').onclick = kaart;
 
 laad(); kaart();
+Sessie.coach({ kind: 'dromen', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

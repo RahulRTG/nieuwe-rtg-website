@@ -9,32 +9,116 @@
    - zonder inlog doet het script niets (geen knoppen, geen verkeer) */
 (function () {
   if (window.__metgezel) return; window.__metgezel = true;
+  /* De wauw-laag (shared/wauw.js) eerst: zachte overgangen, haptiek,
+     delen, badge en wake lock. Voor de inlogcheck, zodat ook de poort
+     hem heeft; net als handenvrij is het een script erbij in plaats
+     van 120+ pagina's aanpassen, en zonder laag verandert er niets. */
+  if (!window.RTGWauw) {
+    var wauwS = document.createElement('script');
+    wauwS.src = '/shared/wauw.js'; wauwS.defer = true;
+    document.head.appendChild(wauwS);
+  }
   var memTok = null, supTok = null;
   try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
   if (!memTok && !supTok) return;
+
+  /* De muisvrije laag erbij (shared/handenvrij.js): de stuurbalk waar je in typt
+     of tegen praat, met navigatie zonder tik. Hij hangt hier omdat de metgezel
+     al op elke app-pagina staat en al weet dat er iemand is ingelogd; zo is het
+     een script erbij in plaats van 150+ pagina's aanpassen. Lukt het laden niet,
+     dan verandert er niets: alle knoppen blijven gewoon staan. */
+  (function () {
+    if (window.__handenvrij) return;
+    var s = document.createElement('script');
+    s.src = '/shared/handenvrij.js'; s.defer = true;
+    document.head.appendChild(s);
+  })();
+
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
-  var css = '.mgz-knop{position:fixed;right:1rem;z-index:35;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+  var css = '.mgz-knop{position:fixed;right:1rem;z-index:9980;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+    '.mgz-knop.mgz-sleept{cursor:grabbing;opacity:.9;box-shadow:0 12px 34px rgba(0,0,0,.55);}' +
     '.mgz-rahul{bottom:1rem;background:var(--gold,#857007);color:#000;}' +
     '.mgz-samen{bottom:3.6rem;background:#151312;color:#eee;border:1px solid var(--gold,#857007);}' +
-    '.mgz-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
-    '.mgz-sheet[hidden]{display:none;}.mgz-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;}' +
+    '.mgz-sheet{position:fixed;right:1rem;bottom:1rem;z-index:9981;width:min(360px,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
+    '.mgz-sheet[hidden]{display:none;}.mgz-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;cursor:move;touch-action:none;user-select:none;-webkit-user-select:none;}' +
+    '.mgz-sheet.mgz-sleept{opacity:.96;box-shadow:0 16px 44px rgba(0,0,0,.6);}' +
     '.mgz-x{background:transparent;border:1px solid #333;border-radius:8px;color:#eee;padding:.15rem .5rem;cursor:pointer;}' +
     '.mgz-uit{font-size:.84rem;color:#bbb;line-height:1.55;max-height:40vh;overflow-y:auto;white-space:pre-wrap;}' +
     '.mgz-rij{display:flex;gap:.4rem;}.mgz-rij input{flex:1;background:#0C0C0B;border:1px solid #333;border-radius:10px;color:#eee;font:inherit;font-size:.85rem;padding:.5rem .7rem;}' +
     '.mgz-go{background:var(--gold,#857007);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}' +
     '.mgz-stil{background:transparent;color:#eee;border:1px solid #444;border-radius:10px;padding:.5rem .8rem;font:inherit;font-size:.83rem;cursor:pointer;}' +
-    '.mgz-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:6.4rem;z-index:37;background:#0C0C0B;border:1px solid var(--gold,#857007);border-radius:12px;padding:.6rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.84rem;color:#eee;display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
+    '.mgz-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:6.4rem;z-index:9982;background:#0C0C0B;border:1px solid var(--gold,#857007);border-radius:12px;padding:.6rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.84rem;color:#eee;display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
     '.mgz-code{font-family:ui-monospace,monospace;letter-spacing:.2em;color:var(--gold,#857007);font-weight:700;}' +
-    '.mgz-chat{font-size:.82rem;color:#bbb;max-height:26vh;overflow-y:auto;line-height:1.5;}';
+    '.mgz-chat{font-size:.82rem;color:#bbb;max-height:26vh;overflow-y:auto;line-height:1.5;}' +
+    /* de melding-staat: de lippen verkleuren (gouden gloed die ademt) en er
+       komt een klein bordeaux teken met het aantal; tikken opent de melding */
+    '.mgz-rahul.mgz-meld{background:#0C0C0B;border:1px solid var(--gold,#857007);animation:mgzPuls 1.8s ease-in-out infinite;}' +
+    '@keyframes mgzPuls{0%,100%{box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 0 0 rgba(158,28,64,.55);}50%{box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 14px 5px rgba(158,28,64,.55);}}' +
+    '@media (prefers-reduced-motion: reduce){.mgz-rahul.mgz-meld{animation:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 12px 4px rgba(158,28,64,.5);}}' +
+    '.mgz-stip{position:absolute;top:-4px;right:-4px;min-width:1.05rem;height:1.05rem;padding:0 .25rem;border-radius:999px;background:#9E1C40;color:#fff;font-size:.66rem;font-weight:700;line-height:1.05rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.5);}' +
+    '.mgz-seintjes{display:flex;flex-direction:column;gap:.4rem;}' +
+    '.mgz-seintje{background:#0C0C0B;border:1px solid var(--gold,#857007);border-radius:12px;padding:.5rem .7rem;font-size:.82rem;color:#eee;line-height:1.45;cursor:pointer;text-align:left;width:100%;}' +
+    '.mgz-seintje:hover{border-color:#C23A5E;}.mgz-seintje b{color:var(--gold,#857007);display:block;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.15rem;}' +
+    /* de lege-toestand-knop: overal waar nog niets staat, kan Rahul het regelen */
+    '.rahul-leeg-knop{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--gold,#857007);color:var(--gold,#857007);border-radius:999px;padding:.5rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;}' +
+    '.rahul-leeg-knop:hover{background:var(--gold,#857007);color:#0C0C0B;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; };
 
+  /* Alles wat uitspringt is te verslepen: geef het element (el) een greep
+     (greep, bv. de kopbalk; standaard het element zelf). Sleep de greep en het
+     hele blok verhuist mee; de plek onthouden we per toestel (localStorage).
+     Knoppen en velden binnen de greep blijven gewoon werken (die starten geen
+     sleep). Een korte tik telt niet als sleep -- pas voorbij een kleine drempel
+     beweegt het. */
+  function maakSleepbaar(el, sleutel, greep) {
+    greep = greep || el;
+    var neer = null, sleept = false;
+    function klem(x, y) {
+      var b = el.getBoundingClientRect();
+      var mx = window.innerWidth - b.width - 6, my = window.innerHeight - b.height - 6;
+      return { x: Math.max(6, Math.min(x, mx)), y: Math.max(6, Math.min(y, my)) };
+    }
+    function zet(x, y) {
+      var p = klem(x, y);
+      el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
+      el.style.right = 'auto'; el.style.bottom = 'auto';
+    }
+    try { var s = JSON.parse(localStorage.getItem(sleutel) || 'null'); if (s) requestAnimationFrame(function () { zet(s.x, s.y); }); } catch (e) {}
+    greep.addEventListener('pointerdown', function (e) {
+      // knoppen, links en invoervelden in de greep gewoon laten werken
+      if (e.target.closest && e.target.closest('button, a, input, textarea, select')) return;
+      var r = el.getBoundingClientRect();
+      neer = { x: e.clientX, y: e.clientY, bx: r.left, by: r.top }; sleept = false;
+      try { greep.setPointerCapture(e.pointerId); } catch (er) {}
+    });
+    greep.addEventListener('pointermove', function (e) {
+      if (!neer) return;
+      var dx = e.clientX - neer.x, dy = e.clientY - neer.y;
+      if (!sleept && Math.abs(dx) + Math.abs(dy) > 6) { sleept = true; el.classList.add('mgz-sleept'); }
+      if (sleept) { zet(neer.bx + dx, neer.by + dy); e.preventDefault(); }
+    });
+    greep.addEventListener('pointerup', function () {
+      if (neer && sleept) {
+        var r = el.getBoundingClientRect();
+        try { localStorage.setItem(sleutel, JSON.stringify({ x: r.left, y: r.top })); } catch (er) {}
+      }
+      neer = null; sleept = false; el.classList.remove('mgz-sleept');
+    });
+    // bij het verkleinen van het scherm: alleen bijsturen als het blok al een
+    // eigen (versleepte) plek heeft, anders blijft de nette CSS-hoek staan
+    window.addEventListener('resize', function () { if (el.style.left) { var r = el.getBoundingClientRect(); zet(r.left, r.top); } });
+  }
+
   /* ---------- Rahul: vraagt en doet, met de inlog die er is ---------- */
-  // de grote apps (leden-OS, leverancier, PDA, backoffice) hebben Rahul al
-  // diep ingebouwd; daar voegen we alleen Samen toe, geen tweede knop
-  var eigenRahul = /\/apps\/(app|leverancier|personeel|backoffice)\.html$/.test(location.pathname);
+  // Het leden-OS heeft Rahul als eigen app in het dock; daar zou een tweede
+  // chatbalk een kopie zijn. Op de werk-apps (leverancier, PDA, backoffice)
+  // zit Rahul wel ingebouwd, maar alleen per kamer of per kaart -- daar is een
+  // chatbalk die je overal vandaan kunt oproepen (van de onderrand,
+  // shared/randen.js) juist een toevoeging, geen dubbeling.
+  var eigenRahul = /\/apps\/app\.html$/.test(location.pathname);
   if (!eigenRahul && !document.getElementById('rahulFab')) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;
@@ -49,42 +133,145 @@
       if (window.RTGMond) return zet();
       var s = document.createElement('script'); s.src = '/shared/mond.js'; s.onload = zet; document.head.appendChild(s);
     })();
+    fab.style.position = 'fixed'; // zodat de melding-stip erop past
     var sheet = maakEl('<section class="mgz-sheet" aria-label="Vraag Rahul" hidden>' +
       '<div class="mgz-kop"><span>Vraag het Rahul</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
+      '<div class="mgz-seintjes" data-seintjes></div>' +
       '<div class="mgz-uit" aria-live="polite"></div>' +
-      '<form class="mgz-rij"><input placeholder="Vraag of opdracht" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
-    document.body.appendChild(fab); document.body.appendChild(sheet);
+      '<form class="mgz-rij"><input placeholder="bv. boek een taxi naar huis" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht aan Rahul"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
+    // De zwevende Rahul-knop rechtsonder is overal weggehaald: te druk in beeld.
+    // Rahul blijft bereikbaar -- in het leden-OS via het dock en de zoekbalk, en
+    // op elke pagina via de lege-toestand-nudges (window.RTGRahul.vraag). We
+    // houden het vraagvenster (sheet) in de DOM, alleen de knop tonen we niet.
+    document.body.appendChild(sheet);
+    // het vraagvenster is te verslepen aan zijn kopbalk; de plek blijft bewaard
+    maakSleepbaar(sheet, 'rtg_rahul_sheet_pos', sheet.querySelector('.mgz-kop'));
     var uit = sheet.querySelector('.mgz-uit'), form = sheet.querySelector('form'), inp = form.querySelector('input');
-    fab.addEventListener('click', function () { sheet.hidden = false; fab.hidden = true; inp.focus();
+    var seintjesVak = sheet.querySelector('[data-seintjes]');
+    fab.addEventListener('click', function () { sheet.hidden = false; fab.hidden = true; inp.focus(); doofMelding();
       if (!uit.textContent) uit.textContent = memTok ? 'Zeg wat je wilt. Ik zoek, reserveer, boek en bestel, alles met jouw eigen inlog.' : 'Vraag me alles over je zaak: cijfers, rooster, voorraad, en ik voer uit waar dat kan.'; });
     sheet.querySelector('.mgz-x').addEventListener('click', function () { sheet.hidden = true; fab.hidden = false; });
+
+    /* ---------- Rahul heeft een melding: de lippen verkleuren en bewegen ----------
+       We halen zuinig de eigen seintjes op (kern/fluister). Zijn er nieuwe
+       (t.o.v. wat de gebruiker al zag), dan gloeit de knop, komt er een teken
+       met het aantal en bewegen de lippen af en toe. Tikt de gebruiker, dan
+       ziet ze de melding boven de vraagbalk en kan ze meteen reageren. */
+    var stip = null, laatsteSeintjes = [], meldTimer = null;
+    var ZIEN = 'rtg_rahul_gezien';
+    function gezienIds() { try { return JSON.parse(localStorage.getItem(ZIEN) || '[]'); } catch (e) { return []; } }
+    function bewaarGezien(ids) { try { localStorage.setItem(ZIEN, JSON.stringify(ids.slice(0, 60))); } catch (e) {} }
+    function idVan(s) { return (s && (s.id || s.tekst || (s.titel || '') + (s.bron || ''))) || ''; }
+    function nieuweSeintjes() { var g = gezienIds(); return laatsteSeintjes.filter(function (s) { return g.indexOf(idVan(s)) === -1; }); }
+    function toonMelding() {
+      var nieuw = nieuweSeintjes();
+      if (!nieuw.length) { doofMelding(); return; }
+      fab.classList.add('mgz-meld');
+      if (!stip) { stip = maakEl('<span class="mgz-stip"></span>'); fab.appendChild(stip); }
+      stip.textContent = nieuw.length > 9 ? '9+' : String(nieuw.length);
+      if (window.RTGWauw) RTGWauw.badge(nieuw.length); // ook op het app-icoon
+      if (!meldTimer) meldTimer = setInterval(function () { if (!document.hidden && fab.classList.contains('mgz-meld')) mond.praat(700); }, 4200);
+    }
+    function doofMelding() {
+      fab.classList.remove('mgz-meld');
+      if (window.RTGWauw) RTGWauw.badge(0);
+      if (stip) { stip.remove(); stip = null; }
+      if (meldTimer) { clearInterval(meldTimer); meldTimer = null; }
+      if (laatsteSeintjes.length) bewaarGezien(laatsteSeintjes.map(idVan));
+      tekenSeintjes();
+    }
+    function tekenSeintjes() {
+      if (!seintjesVak) return;
+      if (!laatsteSeintjes.length) { seintjesVak.innerHTML = ''; return; }
+      seintjesVak.innerHTML = laatsteSeintjes.slice(0, 5).map(function (s) {
+        var t = typeof s === 'string' ? s : (s.tekst || s.titel || '');
+        var kop = (s && s.titel && s.tekst) ? '<b>' + esc(s.titel) + '</b>' : '';
+        return '<button class="mgz-seintje" type="button" data-vraag="' + esc(s && s.actie ? s.actie : t) + '">' + kop + esc(t) + '</button>';
+      }).join('');
+      [].forEach.call(seintjesVak.querySelectorAll('.mgz-seintje'), function (b) {
+        b.addEventListener('click', function () { inp.value = b.getAttribute('data-vraag') || ''; inp.focus(); });
+      });
+    }
+    function haalSeintjes() {
+      if (!memTok || document.hidden) return;
+      fetch('/api/fluister/profiel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + memTok }, body: '{}' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { if (!d) return; laatsteSeintjes = (d.seintjes || []).filter(Boolean); tekenSeintjes(); if (sheet.hidden) toonMelding(); })
+        .catch(function () {});
+    }
+    if (memTok) {
+      haalSeintjes();
+      setInterval(haalSeintjes, 60000);
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) haalSeintjes(); });
+    }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault(); var q = inp.value.trim(); if (!q) return; inp.value = '';
       uit.textContent = 'Rahul denkt na...';
+      /* Voor een zware taak stroomt de server live de voortgang ("Stap 4/24:
+         taxi zoeken...") over de eigen SSE-verbinding. We openen die alleen
+         zolang de vraag loopt en sluiten hem als het antwoord er is. */
+      var vBron = null;
+      if (memTok && window.EventSource) {
+        try {
+          vBron = new EventSource('/api/stream?token=' + encodeURIComponent(memTok));
+          vBron.addEventListener('rahul-voortgang', function (e) {
+            var v = {}; try { v = JSON.parse(e.data); } catch (x) {}
+            if (v.klaar) return;
+            if (v.totaal) { uit.textContent = 'Stap ' + v.stap + '/' + v.totaal + (v.bericht ? ': ' + v.bericht : '') + '...'; mond.praat(600); }
+          });
+        } catch (e) {}
+      }
+      var sluitBron = function () { if (vBron) { try { vBron.close(); } catch (e) {} vBron = null; } };
       fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ q: q }) })
         .then(function (r) { return r.json(); })
-        .then(function (d) { uit.textContent = (d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400); })
-        .catch(function () { uit.textContent = 'Even geen verbinding; probeer het zo weer.'; });
+        .then(function (d) { sluitBron(); uit.textContent = (d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400); })
+        .catch(function () { sluitBron(); uit.textContent = 'Even geen verbinding; probeer het zo weer.'; });
     });
+
+    /* Lege-toestand-nudge: elke plek met data-rahul-leeg="opdracht" opent Rahul
+       met die opdracht al ingevuld. Geen auto-verstuur -- de gebruiker leest mee
+       en stuurt zelf, zodat de rust en de geld-drempel bij de gebruiker blijven.
+       Via event-delegatie, dus het werkt ook op later bijgeladen schermen. */
+    window.RTGRahul = window.RTGRahul || {};
+    // de chatbalk zonder opdracht openen: zo roept de onderrand hem op
+    // (shared/randen.js), zonder dat er ergens een knop hoeft te staan
+    window.RTGRahul.open = function () { sheet.hidden = false; fab.hidden = true; doofMelding(); inp.focus(); };
+    window.RTGRahul.vraag = function (tekst) {
+      sheet.hidden = false; fab.hidden = true; doofMelding();
+      inp.value = String(tekst || '').slice(0, 300); inp.focus();
+      try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
+    };
+    if (!window.__rahulLeegBound) {
+      window.__rahulLeegBound = true;
+      document.addEventListener('click', function (ev) {
+        var el = ev.target && ev.target.closest ? ev.target.closest('[data-rahul-leeg]') : null;
+        if (!el || !window.RTGRahul || !window.RTGRahul.vraag) return;
+        ev.preventDefault(); window.RTGRahul.vraag(el.getAttribute('data-rahul-leeg'));
+      });
+    }
   }
 
   /* ---------- Samen: meekijken en samen doen (alleen leden) ---------- */
   if (!memTok) return;
+  // Heeft de pagina al haar eigen Samen-knop (bv. de RTF-pagina's met samen.js),
+  // dan laten we die met rust en voegen we geen tweede toe. Rahul komt er wel bij.
+  if (document.querySelector('script[src="samen.js"], script[src$="/samen.js"]')) return;
   var CODEKEY = 'rtg_samen_code';
   var kamerCode = null; try { kamerCode = localStorage.getItem(CODEKEY); } catch (e) {}
   var api = function (p, b) {
     return fetch('/api/samen/' + p, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + memTok }, body: JSON.stringify(b || {}) })
       .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
   };
-  var sKnop = maakEl('<button class="mgz-knop mgz-samen" type="button" aria-label="Samen kijken en doen">👥 Samen</button>');
+  var sKnop = maakEl('<button class="mgz-knop mgz-samen" type="button" aria-label="Samen kijken en doen">Samen</button>');
   var sSheet = maakEl('<section class="mgz-sheet" aria-label="Samen" hidden style="bottom:3.6rem;">' +
-    '<div class="mgz-kop"><span>👥 Samen</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
+    '<div class="mgz-kop"><span>Samen</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="mgz-vak"></div></section>');
-  // Op het leden-OS (app.html) hoort Samen in het bedieningspaneel, niet als
-  // zwevende knop; daar opent Instellingen het via window.RTGMetgezel.samen().
-  var samenInPaneel = /\/apps\/app\.html$/.test(location.pathname);
-  if (!samenInPaneel) document.body.appendChild(sKnop);
+  // De zwevende Samen-knop is overal weggehaald en verhuisd naar het
+  // bedieningspaneel van het leden-OS; daar opent Instellingen hem via
+  // window.RTGMetgezel.samen(). We houden alleen het Samen-venster (sSheet) in
+  // de DOM; de knop zelf tonen we niet meer.
   document.body.appendChild(sSheet);
+  maakSleepbaar(sSheet, 'rtg_samen_sheet_pos', sSheet.querySelector('.mgz-kop'));
   var vak = sSheet.querySelector('.mgz-vak');
   function toonSamen() { sSheet.hidden = false; sKnop.hidden = true; teken(); }
   sKnop.addEventListener('click', toonSamen);
@@ -121,7 +308,7 @@
       vak.innerHTML = '<div class="mgz-uit">Samen-code: <span class="mgz-code">' + esc(k.code) + '</span><br>In de kamer: ' + k.leden.map(esc).join(', ') + '</div>' +
         '<div class="mgz-chat" data-chat>' + k.chat.map(function (c) { return '<div><b>' + esc(c.van) + ':</b> ' + esc(c.tekst) + '</div>'; }).join('') + '</div>' +
         '<form class="mgz-rij" data-zeg><input placeholder="Zeg iets tegen de kamer" maxlength="300" aria-label="Chatbericht"><button class="mgz-go" type="submit">→</button></form>' +
-        '<div class="mgz-rij"><button class="mgz-stil" data-hier type="button" style="flex:1;">📍 Kom hierheen</button><button class="mgz-stil" data-weg type="button">Verlaat</button></div>';
+        '<div class="mgz-rij"><button class="mgz-stil" data-hier type="button" style="flex:1;">Kom hierheen</button><button class="mgz-stil" data-weg type="button">Verlaat</button></div>';
       var chatEl = vak.querySelector('[data-chat]'); chatEl.scrollTop = chatEl.scrollHeight;
       vak.querySelector('[data-zeg]').addEventListener('submit', function (ev) {
         ev.preventDefault(); var inp2 = ev.target.querySelector('input'); var t = inp2.value.trim(); if (!t) return; inp2.value = '';

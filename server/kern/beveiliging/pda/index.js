@@ -39,7 +39,7 @@ module.exports = (ctx) => {
     incidenten().unshift(x);
     db.data.bevIncidenten = incidenten().slice(0, 50000);
     save();
-    notifySupplier(s.code, { icon: x.ernst === 'kritiek' || x.ernst === 'hoog' ? '🚨' : '📋', title: 'Incident · ' + x.ernst, body: x.guardNaam + ' @ ' + x.postNaam + ': ' + tekst.slice(0, 80) });
+    notifySupplier(s.code, { icon: x.ernst === 'kritiek' || x.ernst === 'hoog' ? 'megafoon' : 'logboek', title: 'Incident · ' + x.ernst, body: x.guardNaam + ' @ ' + x.postNaam + ': ' + tekst.slice(0, 80) });
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     if (x.ernst === 'kritiek' || x.ernst === 'hoog') sseToOffice('sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, incident: incidentPubliek(x) };
@@ -67,7 +67,7 @@ module.exports = (ctx) => {
     incidenten().unshift(x);
     db.data.bevIncidenten = incidenten().slice(0, 50000);
     save();
-    notifySupplier(s.code, { icon: '🆘', title: 'SOS · ' + naam, body: 'Noodknop ingedrukt. Bekijk de live locatie en stuur bijstand.' });
+    notifySupplier(s.code, { icon: 'help', title: 'SOS · ' + naam, body: 'Noodknop ingedrukt. Bekijk de live locatie en stuur bijstand.' });
     logActivity(s.code, { name: naam }, 'drukte de SOS-noodknop in');
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     sseToOffice('sync', { scope: 'beveiliging' });

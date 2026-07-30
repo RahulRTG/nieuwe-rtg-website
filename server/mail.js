@@ -28,11 +28,23 @@ if (SMTP_URL) {
 }
 const CONFIGURED = !!transporter;
 
+/* De outbox is niet alleen de ontwikkelstand: hij vangt ook mail op als een
+   ECHTE verzending mislukt (zie send() hieronder). Dan liggen er dus op de
+   productiemachine bestanden met het e-mailadres van een lid en een werkende
+   bevestigings- of herstel-link erin. Daarom gaat de outbox door dezelfde kluis
+   als de rest: staat RTG_ENC_KEY, dan versleuteld (.eml.enc), anders leesbaar
+   (.txt) zodat lokaal ontwikkelen niet omslachtig wordt. Terugkijken kan met
+   `npm run outbox`. */
 function toOutbox(to, subject, text) {
-  fs.mkdirSync(OUTBOX, { recursive: true });
+  fs.mkdirSync(OUTBOX, { recursive: true, mode: 0o700 });
+  try { fs.chmodSync(OUTBOX, 0o700); } catch (e) {}
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  fs.writeFileSync(path.join(OUTBOX, stamp + '.txt'), `From: ${FROM}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`);
-  console.log(`[mail] (outbox) naar ${to}: ${subject}`);
+  const bericht = `From: ${FROM}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`;
+  const kluis = require('./kluis');
+  const naam = stamp + (kluis.AAN ? '.eml.enc' : '.txt');
+  fs.writeFileSync(path.join(OUTBOX, naam), kluis.versleutel(bericht), { mode: 0o600 });
+  // het adres zelf hoort niet in het logboek als de inhoud wel beschermd is
+  console.log(`[mail] (outbox) ${kluis.AAN ? 'versleuteld opgeslagen' : 'naar ' + to}: ${subject}`);
 }
 
 function send(to, subject, text) {

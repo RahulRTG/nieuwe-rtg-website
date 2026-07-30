@@ -1,0 +1,16 @@
+/* Wereld-kernwoordenboek deel 8: Afrika B, de Amerika's en Oceanie. */
+module.exports = {
+  mg: "rahampitso|androany|sekoly|asa an-trano|lesona|fanadinana|kilasy|mpampianatra|ray aman-dreny|ankizy|boky|mamaky|manoratra|kajy|manazatra|fanontaniana|valiny|tsara|miaraka|fanampiana|fiteny|herinandro|marary|mandoa|miantso|tongasoa|misaotra|eny|tsia|fiatoana",
+  wo: "suba|tey|daara|liggéeyu kër|njàng|saytu|klaas|jàngalekat|waajur|xale|téere|jàng|bind|waññ|tàggat|laaj|tontu|baax|ànd|ndimbal|làkk|ayubés|feebar|fey|woo|dalal jàmm|jërëjëf|waaw|déedéet|noppalu",
+  ln: "lobi|lelo|eteyelo|mosala ya ndako|liteya|momekano|kelasi|molakisi|baboti|mwana|buku|kotanga|kokoma|mituya|komeka|motuna|eyano|malamu|elongo|lisalisi|lokota|poso|kobela|kofuta|kobenga|boyei malamu|matondi|ee|te|bopemi",
+  ny: "mawa|lero|sukulu|ntchito yapakhomo|phunziro|mayeso|kalasi|mphunzitsi|makolo|mwana|buku|kuwerenga|kulemba|masamu|kuyeserera|funso|yankho|bwino|pamodzi|thandizo|chilankhulo|sabata|kudwala|kulipira|kuimba foni|takulandirani|zikomo|inde|ayi|kupuma",
+  lg: "enkya|leero|essomero|omulimu gw'awaka|essomo|ekigezo|ekibiina|omusomesa|abazadde|omwana|ekitabo|okusoma|okuwandiika|okubala|okwegezaamu|ekibuuzo|eky'okuddamu|kirungi|awamu|obuyambi|olulimi|wiiki|omulwadde|okusasula|okukuba essimu|tukwanirizza|weebale|yee|nedda|ekiwummulo",
+  ht: "demen|jodi a|lekòl|devwa|leson|egzamen|klas|pwofesè|paran|timoun|liv|li|ekri|kalkil|pratike|kesyon|repons|bon|ansanm|èd|lang|semèn|malad|peye|rele|byenveni|mèsi|wi|non|rekreyasyon",
+  qu: "paqarin|kunan|yachaywasi|wasipi ruray|yachay|tupuy|yachay t'aqa|yachachiq|tayta-mama|wawa|liwru|ñawiriy|qillqay|yupay|yachakuy|tapuy|kutichiy|allin|kuska|yanapay|simi|simana|unquy|pagay|waqyay|allin hamusqayki|sulpayki|arí|mana|samay",
+  gn: "ko'ẽro|ko árape|mbo'ehao|tembiapo ogapegua|mbo'epy|ha'ã|mbo'esyry|mbo'ehára|tuvakuéra|mitã|kuatiañe'ẽ|moñe'ẽ|hai|papapy|ñembokatupyry|porandu|mbohovái|porã|oñondive|pytyvõ|ñe'ẽ|arapokõindy|hasýva|hepyme'ẽ|henói|tereguahẽporãite|aguyje|heẽ|nahániri|pytu'u",
+  ay: "arumanthi|jichhüru|yatiqañ uta|utan lurawi|yatichawi|yant'awi|yatiqañ tama|yatichiri|awk-tayka|wawa|panka|ullaña|qillqaña|jakhuña|yatintaña|jiskt'a|jaysaña|suma|chika|yanapa|aru|simana|usuta|pagaña|jawsaña|suma jutawi|yuspagara|jisa|janiwa|samart'aña",
+  mi: "āpōpō|i tēnei rā|kura|mahi kāinga|akoranga|whakamātautau|akomanga|kaiako|mātua|tamaiti|pukapuka|pānui|tuhituhi|tātai|parakatihi|pātai|whakautu|pai|tahi|āwhina|reo|wiki|māuiui|utu|waea|nau mai|ngā mihi|āe|kāo|wā okioki",
+  sm: "taeao|aso nei|a'oga|meaaoga|lesona|su'ega|vasega|faia'oga|mātua|tamaitiiti|tusi|faitau|tusitusi|numera|fa'ata'ita'i|fesili|tali|lelei|fa'atasi|fesoasoani|gagana|vaiaso|ma'i|totogi|vala'au|afio mai|fa'afetai|ioe|leai|malolo",
+  to: "'apongipongi|he 'aho ni|'apiako|ngāue 'api|lēsoni|sivi|kalasi|faiako|mātu'a|tamasi'i|tohi|lau|tohitohi|fika|ako|fehu'i|tali|lelei|fakataha|tokoni|lea|uike|puke|totongi|tā telefoni|mālō e lelei|mālō|'io|'ikai|mālōlō",
+  fj: "nimataka|nikua|koronivuli|cakacaka ni vale|vuli|veitarogi|kalasi|qasenivuli|itubutubu|gone|ivola|wiliki|vola|wiliwili|vakatovotovo|taro|isau|vinaka|vata|veivuke|vosa|macawa|tauvimate|sauma|qiri|ni sa bula|vinaka vakalevu|io|sega|vakacegu"
+};

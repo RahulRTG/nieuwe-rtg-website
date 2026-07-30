@@ -5,7 +5,7 @@
 
    AI_TONE is pure data; de rest draagt state (db, accounts, de Claude-client en
    de realtime-helpers) en komt uit maakAi(state). De interne kanaalsleutel van
-   Rahul's berichten blijft 'butler' (dataplumbing, niet zichtbaar voor het lid). */
+   Rahul's berichten is 'rahul' (dataplumbing, niet zichtbaar voor het lid). */
 
 // Het register verschilt per pas; het karakter van Rahul (zie aiSystemPrompt)
 // blijft altijd hetzelfde.
@@ -17,12 +17,15 @@ const AI_TONE = {
 
 const { naamEn } = require('../talen');
 const { dagContext } = require('./context');
+// Geen AI-taal: de schrobber gaat over alles wat Rahul zegt, ook over de vaste
+// demo-antwoorden (die komen niet langs een model, dus een prompt helpt daar niet).
+const { schrob } = require('./rahul/taal');
 
-function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n }) {
+function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, stemmingVoor, geloofRegel }) {
   /* De promptlaag (system prompt + demo-antwoorden) draait als submodule
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n,
-    AI_TONE, naamEn, dagContext };
+    AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel };
   const { aiSystemPrompt, cannedAnswer } = require('./ai/prompt')(ctx);
 
   /* Geeft { text, lang }: met AI antwoordt Rahul direct in de taal van het
@@ -31,7 +34,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
   async function generateAiReply(tier, convo, lang, key) {
     lang = lang || 'nl';
     const history = convo
-      .filter(m => m.from === 'member' || m.from === 'butler')
+      .filter(m => m.from === 'member' || m.from === 'rahul')
       .map(m => ({ role: m.from === 'member' ? 'user' : 'assistant', content: String(m.text).slice(0, 2000) }))
       .slice(-12);
     while (history.length && history[0].role !== 'user') history.shift();
@@ -40,10 +43,10 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
       try {
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 1024, system: aiSystemPrompt(tier, lang, key), messages: history });
         const reply = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-        if (reply) return { text: reply, lang };
-      } catch (e) { console.error('Claude-fout (butler):', e.message); }
+        if (reply) return { text: schrob(reply), lang };
+      } catch (e) { console.error('Claude-fout (rahul):', e.message); }
     }
-    const canned = cannedAnswer(last);
+    const canned = schrob(cannedAnswer(last));
     if (lang !== 'nl' && i18n) {
       try {
         const t = await i18n.translate(canned, lang, 'nl');
@@ -62,7 +65,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     if (user.tier === 'rtg') {
       // Rahul (AI) antwoordt meteen, in de taal van het lid.
       const reply = await generateAiReply(user.tier, md.conversation, lang, 'user-' + user.id);
-      md.conversation.push({ from: 'butler', text: reply.text, lang: reply.lang, at: new Date().toISOString(), channel: 'butler' });
+      md.conversation.push({ from: 'rahul', text: reply.text, lang: reply.lang, at: new Date().toISOString(), channel: 'rahul' });
       md.needsConcierge = false;
     } else {
       // Lifestyle/Business: een mens (concierge) reageert via de backoffice.
@@ -72,6 +75,34 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     accounts.saveMemberState(user.id, md);
     broadcastSync([user.tier], 'chat');
     if (user.tier !== 'rtg') sseToOffice('sync', { scope: 'concierge' });
+  }
+
+  /* Een uitwisseling die AL heeft plaatsgevonden vastleggen in het gesprek.
+     Nodig omdat de assistent (/api/fluister) buiten deze chat om antwoordt: zonder
+     dit zou de balk in het OS een ander gesprek tonen dan de chat in de app, en
+     zou je geschiedenis half zijn.
+
+     Twee dingen die dit met opzet NIET doet:
+     - geen tweede antwoord genereren (memberSays doet dat; hier is het antwoord
+       er al, en nog een beurt erbij zou een dubbel gesprek opleveren);
+     - niets aanraken van needsConcierge, en alleen voor de RTG Pass schrijven.
+       Bij Lifestyle en Business is de chat de lijn naar een MENS. Zou de AI daar
+       beurten in het draadje zetten, dan leest de concierge straks antwoorden
+       die zij niet gaf, en lijkt het alsof de AI in haar naam heeft gesproken.
+       Dat is precies de grens die niet mag verschuiven. */
+  function noteerBeurt(user, vraag, antwoord, lang) {
+    if (!user || user.tier !== 'rtg') return false;
+    const v = String(vraag || '').trim(), a = String(antwoord || '').trim();
+    if (!v || !a) return false;
+    const md = accounts.getMemberState(user.id) || {};
+    md.conversation = md.conversation || [];
+    const nu = new Date().toISOString();
+    md.conversation.push({ from: 'member', text: v.slice(0, 1000), lang: lang || 'nl', at: nu, channel: 'assistent' });
+    md.conversation.push({ from: 'rahul', text: a.slice(0, 4000), lang: lang || 'nl', at: nu, channel: 'assistent' });
+    md.conversation = md.conversation.slice(-120);
+    accounts.saveMemberState(user.id, md);
+    broadcastSync([user.tier], 'chat');
+    return true;
   }
 
   /* Backoffice: concierge-inbox voor Lifestyle/Business-leden. */
@@ -86,6 +117,6 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
       .sort((a, b) => (b.needsConcierge - a.needsConcierge) || (new Date(b.lastAt) - new Date(a.lastAt)));
   }
 
-  return { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, conciergeInbox };
+  return { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox };
 }
 module.exports = { AI_TONE, maakAi };

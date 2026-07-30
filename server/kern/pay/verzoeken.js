@@ -5,7 +5,7 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan,
-    id, metIdem, boek, zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN, KASCODE_MS } = ctx;
+    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN, KASCODE_MS } = ctx;
 
   /* ---------- geld sturen en Klompjes ---------- */
   async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
@@ -15,7 +15,7 @@ module.exports = (ctx) => {
     return metIdem(idem ? 'stuur:' + van + ':' + idem : null, async () => {
       const z = await zorgSaldo({ codenaam: van, centen, idem });
       if (z.error) return z;
-      const b = boek({ van: rekLid(van), naar: rekLid(aan), centen, soort: soort || 'p2p', oms: oms || 'Zomaar' });
+      const b = await boekAsync({ van: rekLid(van), naar: rekLid(aan), centen, soort: soort || 'p2p', oms: oms || 'Zomaar' });
       if (b.error) return b;
       seintje(aan);
       return { ok: true, saldo: saldoVan(rekLid(van)), bijgeladen: z.bijgeladen, boeking: b.boeking.id };
@@ -61,7 +61,7 @@ module.exports = (ctx) => {
     return metIdem(idem ? 'klompje:' + codenaam + ':' + idem : null, async () => {
       const z = await zorgSaldo({ codenaam, centen: v.centen, idem });
       if (z.error) return z;
-      const b = boek({ van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'klompje', oms: v.oms, ref: v.id });
+      const b = await boekAsync({ van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'klompje', oms: v.oms, ref: v.id });
       if (b.error) return b;
       v.status = 'betaald';
       v.betaaldAt = nu();

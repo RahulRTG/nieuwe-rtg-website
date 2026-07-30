@@ -52,6 +52,7 @@
     startWerkOS();
     render();
     laadTimeline();
+    loadAanmeldingen();
     loadVerify();
     loadConcierge();
     loadIncidenten();
@@ -107,6 +108,46 @@
     loadVerify();
   }
 
+  // ---- aanmeldingen per pas: de AI deed alles, alleen ja/nee is aan het personeel ----
+  async function loadAanmeldingen(){
+    const el = document.getElementById('aanmeldingen'); if (!el) return;
+    let lijst = [];
+    try { lijst = (await call('/aanmelding/lijst', { status: 'in behandeling' })).aanmeldingen || []; } catch(e){ return; }
+    el.innerHTML = lijst.length ? lijst.map(a => {
+      const gedaan = (a.reis || []).map(s => s.naam).join(' · ');
+      const uitnod = a.viaUitnodiging ? ' <span style="color:var(--gold);font-size:0.7rem;">op uitnodiging</span>' : '';
+      return '<div class="vrow" data-id="'+a.id+'">' +
+        '<div class="vi"><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(a.pasNaam)+'</span>'+uitnod+'</div>' +
+          '<div class="sub">'+escHtml(a.contact||'')+'</div>' +
+          '<div class="sub" style="color:var(--soft);">'+T('bo.aanmklaar','AI klaar')+': '+escHtml(gedaan)+'</div></div>' +
+        '<button class="vbtn ok" data-ok>'+T('bo.accept','Accepteren')+'</button>' +
+        '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
+      '</div>';
+    }).join('') : '<div class="empty">'+T('bo.noaanm','Geen openstaande aanmeldingen.')+'</div>';
+    el.querySelectorAll('.vrow').forEach(row => {
+      const id = row.dataset.id;
+      row.querySelector('[data-ok]').addEventListener('click', () => beslisAanm(id, 'geaccepteerd'));
+      row.querySelector('[data-no]').addEventListener('click', () => beslisAanm(id, 'afgewezen'));
+    });
+    // de lopende lidmaatschapsbetalingen: na een akkoord loopt de bijdrage 12
+    // maanden automatisch, met de 30%-foundationsplit (20% lokaal, 10% RTF).
+    try {
+      const b = await call('/aanmelding/betalingen', {});
+      const eur = n => '€ ' + (Math.round(Number(n))).toLocaleString('nl-NL');
+      if (b && b.aantalLeden) {
+        el.insertAdjacentHTML('beforeend',
+          '<div style="margin-top:.7rem;border-top:1px solid var(--line,#2a2a2a);padding-top:.6rem;font-size:0.8rem;color:var(--soft);line-height:1.7;">' +
+          '<b style="color:var(--txt);">'+b.aantalLeden+'</b> '+T('bo.aanmlopend','lopende lidmaatschap(pen), 12 maanden automatisch.')+'<br>' +
+          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b style="color:var(--gold);">'+eur(b.totaal.foundation)+'</b> ('+
+          T('bo.aanmlokaal','20% lokaal')+' '+eur(b.totaal.lokaal)+' &middot; '+T('bo.aanmrtf','10% RTF')+' '+eur(b.totaal.rtf)+')</div>');
+      }
+    } catch(e){}
+  }
+  async function beslisAanm(id, besluit){
+    try { await call('/aanmelding/beslis', { id, besluit }); } catch(e){ alert(e.message); return; }
+    loadAanmeldingen();
+  }
+
   // ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ----
   async function loadIncidenten(){
     const el = document.getElementById('incidenten'); if (!el) return;
@@ -138,7 +179,7 @@
     const kop = '<div class="vrow"><div class="vi"><div class="nm">'+d.compleet+' / '+d.totaal+' '+T('bo.saloncompleet','profielen compleet')+'</div>'+
       '<div class="sub">'+(d.achter.length ? d.achter.length+' '+T('bo.salonachter','partner(s) nog niet zichtbaar voor leden') : T('bo.salonok','alle partners zijn zichtbaar'))+'</div></div></div>';
     const rows = (d.partners || []).map(p =>
-      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✅':'⚠️')+' '+escHtml(p.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(p.type)+'</span></div>'+
+      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✓':'⚠')+' '+escHtml(p.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(p.type)+'</span></div>'+
       '<div class="sub">'+(p.bio?'✓':'✗')+' bio · '+(p.foto?'✓':'✗')+' foto · '+p.items+' '+T('bo.salonitems','items')+' · '+p.volgers+' '+T('bo.salonvolgers','volgers')+'</div></div></div>').join('');
     el.innerHTML = kop + rows;
   }
@@ -151,21 +192,21 @@
     if (!d.dates || !d.dates.length){ el.innerHTML = '<div class="empty">'+T('bo.ontgeen','Geen lopende afspraken.')+'</div>'; return; }
     el.innerHTML = d.dates.map(dt => {
       const nood = dt.sos && dt.sos.length;
-      const namen = dt.deelnemers.map(p => escHtml(p.codenaam) + (p.getekend ? ' ✓' : ' ⌛')).join(' · ');
+      const namen = dt.deelnemers.map(p => escHtml(p.codenaam) + (p.getekend ? ' ✓' : '')).join(' · ');
       const pos = dt.deelnemers.filter(p => p.pos).map(p => escHtml(p.codenaam) + ': ' + p.pos.lat.toFixed(4) + ', ' + p.pos.lng.toFixed(4)).join(' · ') || T('bo.ontgeenpos','nog geen locatie');
-      const status = dt.status === 'noodgeval' ? '🚨 '+T('bo.ontnood','NOODGEVAL') : dt.status === 'actief' ? '🛰️ '+T('bo.ontactief','loopt') : '⌛ '+T('bo.onttekenen','wacht op tekenen');
+      const status = dt.status === 'noodgeval' ? ''+T('bo.ontnood','NOODGEVAL') : dt.status === 'actief' ? ''+T('bo.ontactief','loopt') : ''+T('bo.onttekenen','wacht op tekenen');
       let sosBlok = '';
       if (nood) sosBlok = dt.sos.map(s =>
         '<div style="margin-top:0.4rem;background:rgba(220,40,40,0.12);border-radius:8px;padding:0.5rem 0.7rem;">'+
-        '<b style="color:#ff8a8a;">🚨 '+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
+        '<b style="color:#ff8a8a;">'+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
         '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
-        '<button class="vbtn ok" data-live="'+dt.id+'" data-naam="'+escHtml(s.door)+'">📹 '+T('bo.ontlive','Live meekijken')+'</button>'+
+        '<button class="vbtn ok" data-live="'+dt.id+'" data-naam="'+escHtml(s.door)+'">'+T('bo.ontlive','Live meekijken')+'</button>'+
         '<a class="vbtn" href="tel:112" style="text-decoration:none;background:#c62828;color:#fff;">'+T('bo.ont112','Bel 112')+'</a>'+
         '<button class="vbtn" data-sosaf="'+dt.id+'" data-sosid="'+s.id+'">'+T('bo.ontsosaf','SOS afgehandeld')+'</button>'+
         '</div></div>').join('');
       return '<div class="vrow" style="'+(nood?'border:1px solid #c62828;border-radius:12px;':'')+'"><div class="vi" style="width:100%;">'+
         '<div class="nm">'+dt.icon+' '+escHtml(dt.activiteitLabel)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+namen+'</span></div>'+
-        '<div class="sub">'+status+' · 📍 '+pos+'</div>'+ sosBlok +'</div></div>';
+        '<div class="sub">'+status+' · '+pos+'</div>'+ sosBlok +'</div></div>';
     }).join('');
     el.querySelectorAll('[data-sosaf]').forEach(b => b.addEventListener('click', async () => {
       try { await call('/office/ontmoeting/sos-af', { dateId: b.dataset.sosaf, sosId: b.dataset.sosid }); loadOntmoetingen(); } catch(e){ alert(e.message); }
@@ -179,7 +220,7 @@
   async function ontHaalIce(){ try { ontIce = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ ontIce = [{ urls:'stun:stun.l.google.com:19302' }]; } return ontIce; }
   function ontLiveWacht(dateId, naam){
     ontLiveDate = dateId;
-    $('#ontLiveNaam').textContent = '🚨 ' + naam;
+    $('#ontLiveNaam').textContent = '' + naam;
     $('#ontLiveStatus').textContent = T('bo.ontwacht','Wachten op het camerabeeld van het lid…');
     $('#ontLiveVid').srcObject = null;
     $('#ontLiveScrim').style.display = 'flex';
@@ -194,7 +235,7 @@
     // een nieuw aanbod: open het scherm als dat nog niet openstaat
     if (d.payload.sdp && d.payload.sdp.type === 'offer'){
       ontLiveDate = d.dateId;
-      if ($('#ontLiveScrim').style.display !== 'flex'){ $('#ontLiveNaam').textContent = '🚨 ' + (d.codenaam||'SOS'); $('#ontLiveScrim').style.display = 'flex'; }
+      if ($('#ontLiveScrim').style.display !== 'flex'){ $('#ontLiveNaam').textContent = '' + (d.codenaam||'SOS'); $('#ontLiveScrim').style.display = 'flex'; }
       await ontHaalIce();
       if (ontPc){ try { ontPc.close(); } catch(e){} }
       ontPc = new RTCPeerConnection({ iceServers: ontIce || [{ urls:'stun:stun.l.google.com:19302' }] });
@@ -241,7 +282,7 @@
   function openTrustThread(id){
     const t = trustData.find(x => x.id === id); if (!t) return;
     trustId = id; convUser = null;
-    $('#convWho').textContent = '🤝 ' + t.name + ' · ' + t.company;
+    $('#convWho').textContent = '' + t.name + ' · ' + t.company;
     $('#convBody').innerHTML = t.messages.map(m =>
       '<div class="cmsg '+(m.from==='staff'?'in':'out')+'">'+escHtml(m.text)+'</div>').join('');
     $('#convScrim').classList.add('open');
@@ -295,7 +336,7 @@
       const koeling = a.nudgedAt && (Date.now() - new Date(a.nudgedAt)) < 10*60000;
       const knop = (a.kind === 'order' || a.kind === 'ride')
         ? (koeling ? '<span class="pill klaar">'+T('bo.nudged','herinnerd')+'</span>'
-                   : '<button class="vbtn ok" data-nudge="'+a.ref+'" data-nkind="'+a.kind+'">⏰ '+T('bo.nudge','Stuur herinnering')+'</button>')
+                   : '<button class="vbtn ok" data-nudge="'+a.ref+'" data-nkind="'+a.kind+'">'+T('bo.nudge','Stuur herinnering')+'</button>')
         : '';
       return '<div class="alert '+a.level+'"><span class="lv"></span><div class="tx">'+escHtml(a.text)+'</div>'+knop+'</div>';
     }).join('') : '<div class="empty">✓ '+T('bo.noalerts','Alles loopt. Vastgelopen bestellingen, wachtende leden en open beoordelingen verschijnen hier vanzelf.')+'</div>';
@@ -308,7 +349,7 @@
     // partnerprestaties: omzetranglijst met open werk en gemiddelde ritduur
     const perf = state.performance || [];
     const maxOmzet = Math.max.apply(null, perf.map(p=>p.omzet).concat([1]));
-    const medaille = ['🥇','🥈','🥉'];
+    const medaille = ['1.','2.','3.'];
     $('#perfList').innerHTML = perf.length ? perf.filter(p => past(p.name, p.code, p.type)).map((p, i) =>
       '<div class="row"><div class="r1"><div style="flex:1;min-width:0;"><div class="nm">'+(medaille[i]||'')+' '+p.name+
         ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+p.code+'</span></div>'+
@@ -371,7 +412,7 @@
         const d = await call('/office/partner/decide', { id: b.dataset.paok, action: 'goedkeuren' });
         const box = $('#paResult');
         box.style.display = 'block';
-        box.innerHTML = '✅ '+T('bo.pa.done','Goedgekeurd. Geef dit eenmalig door (staat ook in de welkomstmail):')+
+        box.innerHTML = '✓ '+T('bo.pa.done','Goedgekeurd. Geef dit eenmalig door (staat ook in de welkomstmail):')+
           '<br><b>'+T('bo.pa.code','Leverancierscode')+': '+d.code+'</b> · <b>'+T('bo.pa.pin','Manager-PIN')+': '+d.pin+'</b>';
         await refresh();
       } catch(e){ alert(e.message); }
@@ -410,7 +451,7 @@
     $('#tlTot').textContent = '(' + tl.total.toLocaleString(lang()==='en'?'en-US':'nl-NL') + ')';
     $('#orders').innerHTML = tl.items.length ? tl.items.map(x => {
       const pc = (x.status==='nieuw'||x.status==='aangevraagd')?'nieuw':KLAAR_R[x.status]?'klaar':'bereiding';
-      const icoon = x.soort==='order'?'🛎️':x.soort==='jet'?'✈️':'🚗';
+      const icoon = x.soort==='order'?'hotel':x.soort==='jet'?'✈':'auto';
       return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.supplierName)+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+escHtml(x.customerCodename)+'</span></div>'+
         '<div class="sub">'+icoon+' '+escHtml(x.sub||'')+' · '+timeAgo(x.at)+(x.when?' · '+escHtml(x.when):'')+' · '+(x.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
         '<div style="text-align:right;"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';

@@ -55,7 +55,7 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
     if (!db.data.supplierTypes.gemeente)
-      db.data.supplierTypes.gemeente = { label: 'Gemeente & overheid', icon: '\u{1F3DB}️', caps: ['gemeente', 'location'] };
+      db.data.supplierTypes.gemeente = { label: 'Gemeente & overheid', icon: 'gebouw', caps: ['gemeente', 'location'] };
     if (!Array.isArray(db.data.gemeenteMeldingen)) db.data.gemeenteMeldingen = [];
     if (!Array.isArray(db.data.gemeenteAfspraken)) db.data.gemeenteAfspraken = [];
     if (!Array.isArray(db.data.gemeenteVergunningen)) db.data.gemeenteVergunningen = [];

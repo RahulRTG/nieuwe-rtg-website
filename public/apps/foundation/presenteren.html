@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Spreekbeurt en presentatie</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:42rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.6rem;}
+  .deel{border-left:2px solid var(--lijn);padding-left:.9rem;margin-bottom:1.1rem;}
+  .deel.klaar{border-left-color:var(--groen);}
+  .deel .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;margin-bottom:.15rem;flex-wrap:wrap;}
+  .deel .kop b{font-family:var(--serif);font-weight:500;font-size:1.05rem;}
+  .deel .kop span{color:var(--zacht);font-size:.8rem;white-space:nowrap;}
+  .deel .hint{color:var(--zacht);font-size:.86rem;line-height:1.5;margin-bottom:.5rem;}
+  textarea.veld{width:100%;min-height:4.5rem;resize:vertical;line-height:1.55;}
+  .tijdbalk{display:flex;height:.55rem;border-radius:999px;overflow:hidden;background:var(--paneel2);margin:.7rem 0 .4rem;}
+  .tijdbalk span{display:block;height:100%;border-right:1px solid var(--bg);}
+  .meta{color:var(--zacht);font-size:.85rem;line-height:1.6;}
+  .klok{font-family:var(--serif);font-size:2.6rem;text-align:center;font-variant-numeric:tabular-nums;margin:.3rem 0;}
+  .klok.over{color:var(--rood);}
+  .klokrij{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:.5rem;}
+  .doelrij{display:flex;gap:.6rem;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:.5rem;}
+  .doelrij .veld{width:5rem;text-align:right;}
+  ul.tips{margin:0 0 0 1.1rem;color:var(--zacht);line-height:1.7;}
+  ul.tips b{color:var(--txt);font-weight:600;}
+  .uitvoer{white-space:pre-line;font-family:var(--serif);line-height:1.7;background:var(--paneel2);border:1px solid var(--lijn);
+    border-radius:14px;padding:1rem;margin-top:.8rem;}
+  .onderrij{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Spreekbeurt en presentatie</h1>
+  <div class="intro">Bouw je verhaal op in vaste stukken, kijk of de tijd klopt en oefen hardop met de klok erbij. Wat je typt blijft op dit toestel staan zolang de app open is; er gaat niets naar een server.</div>
+
+  <div class="kaart blok">
+    <h2>Waar gaat het over</h2>
+    <div class="doelrij">
+      <input class="veld" id="onderwerp" type="text" placeholder="onderwerp" aria-label="Onderwerp" style="flex:1;min-width:10rem;">
+      <label class="meta" for="minuten">minuten</label>
+      <input class="veld" id="minuten" type="number" min="1" max="60" step="1" value="5" aria-label="Hoeveel minuten">
+    </div>
+    <div class="tijdbalk" id="tijdbalk" aria-hidden="true"></div>
+    <div class="meta" id="tijduitleg"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Je opbouw</h2>
+    <div id="delen"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Hardop oefenen</h2>
+    <div class="klok" id="klok" aria-live="off">00:00</div>
+    <div class="meta" id="klokmeta" style="text-align:center;"></div>
+    <div class="klokrij">
+      <button class="knop" id="startknop" type="button">Start</button>
+      <button class="knop grijs" id="nulknop" type="button">Op nul</button>
+    </div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Je spiekbriefje</h2>
+    <p class="meta">Hieronder staat je verhaal in steekwoorden, in de goede volgorde. Neem dit mee, niet je hele tekst: voorlezen klinkt altijd vlakker dan vertellen.</p>
+    <div class="onderrij">
+      <button class="knop" id="maakknop" type="button">Maak spiekbriefje</button>
+      <button class="knop grijs" id="kopieerknop" type="button">Kopieer</button>
+    </div>
+    <div class="uitvoer" id="uitvoer" hidden></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Wat echt helpt</h2>
+    <ul class="tips">
+      <li><b>Begin met iets concreets.</b> Een vraag, een getal of een klein verhaal werkt beter dan "mijn spreekbeurt gaat over".</li>
+      <li><b>Drie punten is genoeg.</b> Wat je publiek onthoudt is bijna nooit meer dan drie dingen; liever drie goed dan zeven half.</li>
+      <li><b>Oefen staand en hardop.</b> In je hoofd gaat alles twee keer zo snel als in het echt; daarom staat hier een klok.</li>
+      <li><b>Kijk naar drie plekken in de zaal.</b> Links, midden, rechts, om de beurt. Dan lijkt het alsof je iedereen aankijkt.</li>
+      <li><b>Stiltes zijn niet erg.</b> Een pauze van twee seconden voelt voor jou lang en voor de zaal precies goed.</li>
+      <li><b>Zeg aan het eind wat je wilt dat ze onthouden.</b> Een spreekbeurt die stopt met "ja, dat was het" gooit het slot weg.</li>
+      <li><b>Zenuwen horen erbij.</b> Ze verdwijnen meestal na de eerste twee zinnen; leer daarom juist die twee zinnen uit je hoofd.</li>
+    </ul>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+const DELEN = [
+  { id: 'opening', naam: 'Opening', deel: .1, hint: 'De eerste twee zinnen. Een vraag aan de zaal, een verrassend getal of een kort voorval. Nog geen uitleg.' },
+  { id: 'waarom', naam: 'Waarom dit onderwerp', deel: .1, hint: 'Waarom heb jij dit gekozen, en waarom zou het publiek willen luisteren? Een persoonlijke reden werkt het best.' },
+  { id: 'punt1', naam: 'Punt 1', deel: .18, hint: 'Je eerste hoofdpunt, met een voorbeeld erbij. Een voorbeeld onthouden mensen, een definitie niet.' },
+  { id: 'punt2', naam: 'Punt 2', deel: .18, hint: 'Je tweede hoofdpunt. Zorg dat het echt iets anders is dan punt 1, anders lijkt je verhaal stil te staan.' },
+  { id: 'punt3', naam: 'Punt 3', deel: .18, hint: 'Je derde hoofdpunt, of het antwoord op de vraag uit je opening.' },
+  { id: 'verrassing', naam: 'Iets dat ze niet weten', deel: .11, hint: 'Een feit, een voorwerp dat je meeneemt of een kort filmpje. Dit is het stuk waar mensen later over praten.' },
+  { id: 'slot', naam: 'Slot', deel: .1, hint: 'Wat moeten ze onthouden, in een zin? Sluit af met dezelfde beeldspraak als je opening; dat maakt het rond.' },
+  { id: 'vragen', naam: 'Vragen', deel: .05, hint: 'Bedenk vooraf twee vragen die zeker komen, en wat je daarop antwoordt.' }
+];
+
+const invoer = {};
+
+function tekenDelen() {
+  const doos = $('#delen');
+  doos.innerHTML = '';
+  for (const d of DELEN) {
+    const wrap = document.createElement('div');
+    wrap.className = 'deel';
+    wrap.dataset.id = d.id;
+
+    const kop = document.createElement('div');
+    kop.className = 'kop';
+    const b = document.createElement('b');
+    b.textContent = d.naam;
+    const s = document.createElement('span');
+    s.className = 'tijd';
+    kop.append(b, s);
+
+    const hint = document.createElement('div');
+    hint.className = 'hint';
+    hint.textContent = d.hint;
+
+    const ta = document.createElement('textarea');
+    ta.className = 'veld';
+    ta.setAttribute('aria-label', d.naam);
+    ta.placeholder = 'steekwoorden';
+    ta.addEventListener('input', () => {
+      invoer[d.id] = ta.value;
+      wrap.classList.toggle('klaar', ta.value.trim().length > 0);
+    });
+
+    wrap.append(kop, hint, ta);
+    doos.appendChild(wrap);
+  }
+  tekenTijd();
+}
+
+function tekenTijd() {
+  const min = Math.max(1, Math.min(60, Number($('#minuten').value) || 5));
+  const sec = min * 60;
+  const balk = $('#tijdbalk');
+  balk.innerHTML = '';
+  DELEN.forEach((d, i) => {
+    const s = document.createElement('span');
+    s.style.width = (d.deel * 100).toFixed(1) + '%';
+    s.style.background = i % 2 ? 'var(--goud)' : 'var(--goud2)';
+    s.style.opacity = (0.55 + (i % 3) * 0.15).toFixed(2);
+    balk.appendChild(s);
+    const el = document.querySelector('.deel[data-id="' + d.id + '"] .tijd');
+    if (el) {
+      const s2 = Math.round(d.deel * sec);
+      el.textContent = s2 >= 60 ? Math.round(s2 / 60 * 10) / 10 + ' min' : s2 + ' sec';
+    }
+  });
+  $('#tijduitleg').textContent = 'Bij ' + min + ' minuten heb je ongeveer ' + Math.round(sec * 0.18) +
+    ' seconden per hoofdpunt. Een normaal spreektempo is 130 woorden per minuut, dus reken op ongeveer ' +
+    Math.round(min * 130) + ' woorden in totaal.';
+}
+
+// oefenklok: verstreken tijd in seconden, loopt door tot je pauzeert
+let loopt = false, verstreken = 0, sinds = 0, tik = null;
+function toonKlok() {
+  const sec = verstreken + (loopt ? Math.floor((Date.now() - sinds) / 1000) : 0);
+  const m = String(Math.floor(sec / 60)).padStart(2, '0');
+  const s = String(sec % 60).padStart(2, '0');
+  const doel = Math.max(1, Number($('#minuten').value) || 5) * 60;
+  const k = $('#klok');
+  k.textContent = m + ':' + s;
+  k.classList.toggle('over', sec > doel);
+  const rest = doel - sec;
+  $('#klokmeta').textContent = rest >= 0
+    ? 'nog ' + Math.floor(rest / 60) + ' min ' + (rest % 60) + ' sec te gaan'
+    : 'je zit ' + Math.floor(-rest / 60) + ' min ' + ((-rest) % 60) + ' sec over je tijd heen';
+}
+$('#startknop').addEventListener('click', () => {
+  if (loopt) {
+    verstreken += Math.floor((Date.now() - sinds) / 1000);
+    clearInterval(tik); tik = null; loopt = false;
+    toonKlok();
+    $('#startknop').textContent = 'Verder';
+    return;
+  }
+  sinds = Date.now();
+  loopt = true;
+  toonKlok();
+  tik = setInterval(toonKlok, 250);
+  $('#startknop').textContent = 'Pauze';
+});
+$('#nulknop').addEventListener('click', () => {
+  clearInterval(tik); tik = null; loopt = false; verstreken = 0;
+  $('#klok').textContent = '00:00';
+  $('#klok').classList.remove('over');
+  $('#klokmeta').textContent = '';
+  $('#startknop').textContent = 'Start';
+});
+
+function briefje() {
+  const onderwerp = $('#onderwerp').value.trim() || 'mijn spreekbeurt';
+  const min = Math.max(1, Number($('#minuten').value) || 5);
+  const regels = [onderwerp.toUpperCase(), min + ' minuten', ''];
+  DELEN.forEach(d => {
+    const tekst = (invoer[d.id] || '').trim();
+    const sec = Math.round(d.deel * min * 60);
+    regels.push(d.naam.toUpperCase() + '  (' + (sec >= 60 ? Math.round(sec / 60 * 10) / 10 + ' min' : sec + ' sec') + ')');
+    regels.push(tekst ? tekst.split(/\n+/).map(r => '  - ' + r.trim()).join('\n') : '  - nog invullen');
+    regels.push('');
+  });
+  regels.push('Adem in voor je begint. Kijk links, midden, rechts.');
+  return regels.join('\n');
+}
+
+$('#maakknop').addEventListener('click', () => {
+  const u = $('#uitvoer');
+  u.textContent = briefje();
+  u.hidden = false;
+});
+$('#kopieerknop').addEventListener('click', async () => {
+  const tekst = briefje();
+  $('#uitvoer').textContent = tekst;
+  $('#uitvoer').hidden = false;
+  try {
+    await navigator.clipboard.writeText(tekst);
+    $('#kopieerknop').textContent = 'Gekopieerd';
+    setTimeout(() => { $('#kopieerknop').textContent = 'Kopieer'; }, 1800);
+  } catch (e) {
+    $('#kopieerknop').textContent = 'Selecteer en kopieer zelf';
+    setTimeout(() => { $('#kopieerknop').textContent = 'Kopieer'; }, 2500);
+  }
+});
+$('#minuten').addEventListener('input', tekenTijd);
+
+tekenDelen();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

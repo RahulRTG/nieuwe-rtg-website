@@ -1,4 +1,4 @@
-/* Member-submodule: de persoonlijke AI en de Butler/concierge-chat. De vrije
+/* Member-submodule: de persoonlijke AI en Rahul/concierge-chat. De vrije
    AI-conversatie (Claude met demo-terugval) en de doorlopende chat met het
    eigen account (vertaald in de taal van het lid).
    Gemount vanuit routes/member.js. */
@@ -44,11 +44,11 @@ module.exports = (kern) => {
   });
 
   app.post('/api/chat/history', auth, (req, res) => {
-    if (!req.session.account) return res.json({ messages: [], mode: 'butler', demo: true });
+    if (!req.session.account) return res.json({ messages: [], mode: 'rahul', demo: true });
     // het lid leest alles (ook concierge-antwoorden) in de eigen taal
     trChat(convOf(req.session.account.id), talen.taalVan(req.body.lang)).then(messages => res.json({
       messages,
-      mode: req.session.tier === 'rtg' ? 'butler' : 'concierge',
+      mode: req.session.tier === 'rtg' ? 'rahul' : 'concierge',
       phone: accounts.phoneOf(req.session.account)
     }));
   });
@@ -60,6 +60,6 @@ module.exports = (kern) => {
     const taal = talen.taalVan(req.body.lang);
     await memberSays(req.session.account, text, 'app', taal);
     const messages = await trChat(convOf(req.session.account.id), taal);
-    res.json({ ok: true, messages, mode: req.session.tier === 'rtg' ? 'butler' : 'concierge' });
+    res.json({ ok: true, messages, mode: req.session.tier === 'rtg' ? 'rahul' : 'concierge' });
   });
 };

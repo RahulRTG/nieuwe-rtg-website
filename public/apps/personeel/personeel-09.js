@@ -1,86 +1,97 @@
-    const pct = totaal ? Math.round(klaar / totaal * 100) : 0;
-    const label = { fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--soft)' };
-
-    const coachInp = E('input', { placeholder: coachRef ? T('pd.tr.askctx', 'Vraag over deze tafel... bijv. waar let ik op?') : T('pd.tr.ask', 'Vraag de coach... bijv. hoe stel ik een wijn voor?') });
-    const coachBtn = E('button', { onclick: async () => {
-      const vraag = (coachInp.value || '').trim();
-      if (!vraag) return;
-      coachBtn.disabled = true; coachBtn.textContent = '...';
-      try { coachAntwoord = await API.call('/supplier/coach', coachRef ? { vraag, ref: coachRef } : { vraag }); }
-      catch (e) { toast(e.message); }
-      vulTrainingKaart();
-    } }, T('pd.tr.coach', 'Vraag'));
-
-    function tipRij(x){
-      const g = gelezen.includes(x.t);
-      return E('div', { class: 'task', style: g ? { alignItems: 'flex-start', opacity: '0.7' } : { alignItems: 'flex-start' } },
-        E('button', { class: 'ic', 'aria-label': g ? T('pd.tr.unread', 'Markeer als ongelezen') : T('pd.tr.mark', 'Markeer als gelezen'),
-          style: { cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.1rem' },
-          onclick: async () => {
-            const uit = (trainData.gelezen || []).includes(x.t);
-            try { const d = await API.call('/supplier/training/gelezen', { titel: x.t, uit }); if (trainData) trainData.gelezen = d.gelezen; vulTrainingKaart(); }
-            catch (e) { toast(e.message); }
-          } }, g ? '✅' : '⬜'),
-        E('div', { class: 't' }, E('b', {}, x.t), E('span', { style: { lineHeight: '1.5' } }, x.s)),
-        (t.kanBeheren && eigen.some(e => e.t === x.t)) ? E('button', { class: 'abtn ghost', style: { flex: '0 0 auto', padding: '0.25rem 0.5rem', fontSize: '0.7rem' },
-          onclick: async () => { try { await API.call('/supplier/training/remove', { titel: x.t }); await laadZaken(); vulTrainingKaart(); } catch (e) { toast(e.message); } } }, '✕') : null
-      );
-    }
-
-    let beheer = null;
-    if (t.kanBeheren) {
-      const titelInp = E('input', { placeholder: T('pd.tr.title', 'Titel, bijv. Onze wijn-aanpak'), style: { width: '100%', marginBottom: '0.4rem' } });
-      const tekstInp = E('input', { placeholder: T('pd.tr.text', 'De tip in een of twee zinnen...') });
-      const addBtn = E('button', { onclick: async () => {
-        const titel = (titelInp.value || '').trim(), tekst = (tekstInp.value || '').trim();
-        if (!titel || !tekst) { toast(T('pd.tr.leeg', 'Geef een titel en een tekst.')); return; }
-        try { await API.call('/supplier/training/add', { titel, tekst }); toast('🎓 ' + T('pd.tr.added', 'Huistip toegevoegd voor het team.')); tipsOpen = true; await laadZaken(); vulTrainingKaart(); }
-        catch (e) { toast(e.message); }
-      } }, T('pd.tr.add', 'Voeg toe'));
-      beheer = E('div', { style: { marginTop: '0.7rem', paddingTop: '0.6rem', borderTop: '1px solid var(--line,rgba(255,255,255,0.08))' } },
-        E('div', { style: Object.assign({}, label, { marginBottom: '0.4rem' }) }, T('pd.tr.own', 'Eigen huistip toevoegen')),
-        titelInp,
-        E('div', { class: 'compose', style: { padding: '0' } }, tekstInp, addBtn));
-    }
-
-    return E('div', { class: 'card' },
-      E('div', { class: 'k' }, '🎓 ' + T('pd.tr.h', 'Training & tips'),
-        t.func ? E('span', { style: { fontWeight: '500', color: 'var(--soft)', fontSize: '0.72rem' } }, ' ' + t.func) : null),
-      tvd ? E('div', { style: { marginTop: '0.6rem', padding: '0.7rem 0.8rem', borderRadius: '12px', background: 'linear-gradient(135deg,rgba(197,160,89,0.16),rgba(197,160,89,0.05))', border: '1px solid rgba(197,160,89,0.3)' } },
-        E('div', { style: Object.assign({}, label, { color: 'var(--gold)' }) }, T('pd.tr.tvd', 'Tip van de dag')),
-        E('b', { style: { display: 'block', marginTop: '0.25rem', fontSize: '0.9rem' } }, tvd.t),
-        E('span', { style: { display: 'block', marginTop: '0.2rem', fontSize: '0.8rem', lineHeight: '1.5', color: 'var(--muted)' } }, tvd.s)) : null,
-      totaal ? E('div', { style: { marginTop: '0.6rem' } },
-        E('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '0.66rem', color: 'var(--soft)' } },
-          E('span', {}, T('pd.tr.prog', 'Voortgang')), E('span', {}, klaar + ' / ' + totaal + ' ' + T('pd.tr.read', 'gelezen'))),
-        E('div', { style: { height: '7px', borderRadius: '99px', background: 'var(--line,rgba(255,255,255,0.1))', marginTop: '0.3rem', overflow: 'hidden' } },
-          E('div', { style: { height: '100%', width: pct + '%', background: 'linear-gradient(90deg,var(--gold),#e6c874)', borderRadius: '99px', transition: 'width .35s' } })),
-        (klaar >= totaal) ? E('div', { style: { marginTop: '0.3rem', fontSize: '0.7rem', color: 'var(--green)' } }, '🎉 ' + T('pd.tr.allread', 'Alle tips gelezen. Topper!')) : null) : null,
-      coachRef ? E('div', { style: { marginTop: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', color: 'var(--gold)' } },
-        '🎓 ' + T('pd.tr.ctx', 'Coaching voor') + ' ' + (coachRefTafel || coachRef) + ' ',
-        E('button', { class: 'abtn ghost', style: { padding: '0.1rem 0.4rem', fontSize: '0.68rem', lineHeight: '1' },
-          onclick: () => { coachRef = null; coachRefTafel = null; vulTrainingKaart(); } }, '✕')) : null,
-      E('div', { class: 'compose', style: { padding: '0.55rem 0 0' } }, coachInp, coachBtn),
-      coachAntwoord ? E('div', { style: { marginTop: '0.55rem', padding: '0.65rem 0.8rem', borderRadius: '12px', background: 'var(--panel2,rgba(255,255,255,0.04))', border: '1px solid var(--line,rgba(255,255,255,0.08))' } },
-        E('div', { style: Object.assign({}, label, { letterSpacing: '0.1em' }) }, (coachAntwoord.bron === 'ai' ? T('pd.tr.ai', 'AI-coach') : T('pd.tr.bib', 'Uit de tips')) + (coachAntwoord.tafel ? ' · ' + coachAntwoord.tafel : '')),
-        E('span', { style: { display: 'block', marginTop: '0.25rem', fontSize: '0.82rem', lineHeight: '1.55' } }, coachAntwoord.antwoord)) : null,
-      alle.length ? E('button', { class: 'abtn ghost', style: { width: '100%', marginTop: '0.6rem' },
-        onclick: () => { tipsOpen = !tipsOpen; vulTrainingKaart(); } },
-        tipsOpen ? ('▲ ' + T('pd.tr.hide', 'Verberg de tips')) : ('▼ ' + T('pd.tr.all', 'Alle tips voor mijn rol') + ' (' + alle.length + ')')) : null,
-      tipsOpen ? E('div', { style: { marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' } }, alle.map(tipRij)) : null,
-      beheer
-    );
+    const regel = (icoon, links, rechts, rood) => '<div style="display:flex;justify-content:space-between;gap:0.5rem;font-size:0.8rem;margin-top:0.3rem;"><span>'+(icoon?icoon+' ':'')+links+'</span>'+(rechts?'<b style="color:'+(rood?'#FF8589':'var(--gold)')+';white-space:nowrap;">'+rechts+'</b>':'')+'</div>';
+    return t.tools.map(w => {
+      if (w.type === 'cijfers') return kop(w.titel)+regel('', w.items.map(i => esc(i.label)+' <b>'+esc(String(i.waarde))+'</b>').join(' · '), '');
+      if (w.type === 'lijst') return kop(w.titel)+((w.rijen||[]).length
+        ? w.rijen.slice(0, 6).map(r => regel(r.icoon||'', esc(r.tekst)+(r.sub?'<span style="display:block;font-size:0.7rem;opacity:0.7;">'+esc(r.sub)+'</span>':''), r.rechts?esc(r.rechts):'', r.rood)).join('')
+        : '<div style="font-size:0.75rem;opacity:0.65;margin-top:0.25rem;">'+esc(w.leeg||'')+'</div>');
+      if (w.type === 'knoppen') return kop(w.titel)+'<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+
+        (w.knoppen||[]).map(k => '<button class="abtn ghost" data-pkdsnelknop="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div>';
+      if (w.type === 'actie') return '<button class="abtn" data-pkdactie="'+esc(w.tekst)+'" style="width:100%;margin-top:0.45rem;">'+esc(w.knop)+'</button>';
+      // de leeftijdscheck aan de deur: ja/nee op codenaam, zonder gegevens
+      if (w.type === 'leeftijd') return kop(w.titel)+
+        '<div style="display:flex;gap:0.35rem;margin-top:0.35rem;"><input id="pkLftIn" placeholder="'+T('pd.lft.ph','Codenaam van de gast')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
+        '<button class="abtn" data-pklft="18">18+?</button><button class="abtn ghost" data-pklft="21">21+?</button></div>'+
+        '<div id="pkLftUit" style="margin-top:0.3rem;font-size:0.78rem;color:var(--soft);">'+esc(w.hint||'')+'</div>';
+      if (w.type === 'meter') return kop(w.titel)+'<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+
+        (w.opties||[]).map(o => '<button class="abtn'+(w.stand&&w.stand.stand===o?'':' ghost')+'" data-pkdmeter="'+esc(o)+'" style="flex:1;min-width:70px;">'+esc(o)+'</button>').join('')+'</div>';
+      return '';
+    }).join('');
   }
-  let pkFlLaatst = ''; // het laatste Fluister-antwoord blijft staan bij her-render
-  function renderHulp(){
-    const gids = EHBO_GIDS();
-    const tr = (zaken && zaken.trust) || { anon: false, messages: [] };
-    const vl = (zaken && zaken.verlof) || [];
-    const VST = {
-      nieuw: [T('pd.vl.new','in behandeling'), 'var(--soft)'],
-      goedgekeurd: [T('pd.vl.ok','goedgekeurd'), 'var(--green)'],
-      afgewezen: [T('pd.vl.no','afgewezen'), 'var(--burgundy)'],
-      gemeld: [T('pd.vl.zm','gemeld'), 'var(--green)']
-    };
-    $('#hulpWrap').innerHTML =
-      // Fluister: de persoonlijke assistent van dit personeelslid (eigen
+  function pkDorpKaart(){
+    pkLaadDorp();
+    if (!pkDorp) return '';
+    const afd = pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0];
+    pkDorpKant = afd.key;
+    pkLaadTools();
+    return '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.dorp','Afdelingen')+
+      '<button class="abtn ghost" id="pkDorpChat" style="font-size:0.66rem;">'+T('pd.dorp.chat','Teamchat')+'</button></div>'+
+      '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.4rem;">'+pkDorp.afdelingen.map(a =>
+        '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+a.icon+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
+      '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+afd.icon+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
+      pkToolsHtml()+
+      (afd.open.length ? afd.open.map(p => {
+        const i = afd.keten.indexOf(p.status);
+        const volgende = i >= 0 && i < afd.keten.length - 1 ? afd.keten[i + 1] : null;
+        return '<div class="task"><div class="t"><b>'+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</b><span>'+esc(p.status)+' · '+esc(p.door)+' · '+timeAgo(p.updatedAt||p.at)+
+          ((p.via||[]).length?' · '+T('pd.dorp.via','via')+' '+p.via.map(esc).join(', '):'')+'</span></div>'+
+          '<div style="display:flex;gap:0.3rem;">'+(volgende?'<button class="abtn" data-pkdverder="'+p.id+'">'+esc(volgende)+'</button>':'')+
+          '<button class="abtn ghost" data-pkdstuur="'+p.id+'" aria-label="doorsturen">↪</button></div></div>';
+      }).join('') : '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--soft);">'+T('pd.dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
+      (pkDorpKant === 'concierge' && pkBuurt && pkBuurt.length
+        ? '<div style="margin-top:0.5rem;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('pd.dorp.buurt','In de buurt')+'</div>'+
+          '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+pkBuurt.map(b =>
+            '<button class="abtn ghost" data-pkdbuurt="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'">'+b.icon+' '+esc(b.naam)+' · '+b.km+' km</button>').join('')+'</div>'
+        : '')+
+      '<button class="abtn ghost" data-pkdnieuw style="width:100%;margin-top:0.5rem;">+ '+T('pd.dorp.nieuw','Zet iets op de lijst')+'</button></div>';
+  }
+  // de buurt voor de concierge-kant op zak
+  let pkBuurt = null, pkBuurtBezig = false;
+  function pkLaadBuurt(){
+    if (pkBuurt || pkBuurtBezig) return;
+    pkBuurtBezig = true;
+    API.call('/supplier/dorp/buurt').then(d => { pkBuurt = d.buurt || []; pkBuurtBezig = false; renderKamers(); })
+      .catch(() => { pkBuurt = []; pkBuurtBezig = false; });
+  }
+  /* opdrachten: de flow voor schoonmaakbedrijven en zzp'ers. Geen kamerbord
+     maar de eigen boekingen: bevestigen, op locatie werken en afronden. */
+  function renderOpdrachten(wrap){
+    const bs = state.boekingen || [];
+    const open = bs.filter(b => b.status === 'aangevraagd');
+    const komend = bs.filter(b => b.status === 'bevestigd');
+    const kaart = (b, acties) => '<div class="card kamer '+(b.status==='bevestigd'?'bezig':'vuil')+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;"><b style="font-size:0.98rem;">'+esc(b.service && b.service.name || 'Opdracht')+'</b>'+
+      '<span class="hkchip'+(b.status==='bevestigd'?' amber':' rood')+'">'+(b.status==='bevestigd'?T('hk.o.bevestigd','Ingepland'):T('hk.o.nieuw','Nieuw'))+'</span></div>'+
+      '<div style="font-size:0.78rem;color:var(--soft);margin-top:0.25rem;">'+esc(b.customerCodename||'')+(b.wanneer?' · '+esc(b.wanneer):'')+(b.price?' · '+eur(b.price):'')+'</div>'+
+      (b.note?'<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">'+esc(b.note)+'</div>':'')+
+      (b.zorg?'<div style="font-size:0.76rem;color:#E2B93B;margin-top:0.3rem;">'+esc(pkZorg(b.zorg))+'</div>':'')+
+      '<div class="row" style="flex-wrap:wrap;">'+acties+'</div></div>';
+    let html = '<div class="card stat"><div><b style="color:#FF8589;">'+open.length+'</b><span>'+T('hk.o.nieuw','Nieuw')+'</span></div>'+
+      '<div><b style="color:#E2B93B;">'+komend.length+'</b><span>'+T('hk.o.bevestigd','Ingepland')+'</span></div></div>';
+    html += open.map(b => kaart(b, '<button class="abtn" data-bk="'+b.ref+'" data-st="bevestigd">✓ '+T('hk.o.bevestig','Bevestig')+'</button><button class="abtn warn" data-bk="'+b.ref+'" data-st="geweigerd">'+T('hk.o.weiger','Weiger')+'</button>')).join('');
+    html += komend.map(b => kaart(b, '<button class="abtn" data-bk="'+b.ref+'" data-st="afgerond">✓ '+T('hk.o.klaar','Rond af')+'</button>')).join('');
+    if (!open.length && !komend.length) html += '<div class="card">'+T('hk.o.leeg','Geen open opdrachten. Nieuwe boekingen verschijnen hier vanzelf.')+'</div>';
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-bk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.bk, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+  }
+  function minibarBlok(r){
+    const mb = (state.minibar && state.minibar.catalog) || [];
+    return '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.5rem;">'+
+      mb.map(x => '<div class="mbrow"><span style="font-size:0.86rem;">'+esc(x.name)+' <span style="color:var(--soft);font-size:0.74rem;">'+eur(x.price)+'</span></span>'+
+        '<span class="q"><button data-mbmin="'+x.id+'" aria-label="minder">−</button><b>'+(mbTel[x.id]||0)+'</b><button data-mbplus="'+x.id+'" aria-label="meer">+</button></span></div>').join('')+
+      '<button class="abtn" data-mbboek="'+esc(r.name)+'" style="width:100%;margin-top:0.4rem;">'+T('hk.boek','Boek op de kamer')+'</button></div>';
+  }
+  function bindKamers(wrap){
+    // het hoteldorp: kant kiezen, posten doorzetten, en er iets bij zetten
+    wrap.querySelectorAll('[data-pkdkant]').forEach(b => b.addEventListener('click', () => {
+      pkDorpKant = b.dataset.pkdkant;
+      try { localStorage.setItem('rtg_pda_dorp', pkDorpKant); } catch(e){}
+      renderKamers();
+    }));
+    // het specialistische gereedschap: logmoment, meter en snelposten
+    wrap.querySelectorAll('[data-pkdactie]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/dorp/post', { afdeling: pkDorpKant, waar: '', tekst: b.dataset.pkdactie, directKlaar: true }); toast(T('dorp.geklokt','Geklokt.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
+      catch(e){ toast(e.message); }
+    }));
+    // elke afdeling in een tik bij de teamchat, de collegachat en de teamcall

@@ -4,7 +4,7 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, betaal, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
-    metIdem, boek, zorgSaldo, seintje, betaaldienstKosten, MIN_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
+    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, MIN_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
 
   /* ---------- de kassacode: contactloos bij de partner ---------- */
   function kasCode({ codenaam, maxCenten }) {
@@ -26,7 +26,7 @@ module.exports = (ctx) => {
     return metIdem(idem ? 'kas:' + supplierCode + ':' + idem : null, async () => {
       const z = await zorgSaldo({ codenaam: k.codenaam, centen: c, idem });
       if (z.error) return z;
-      const b = boek({ van: rekLid(k.codenaam), naar: rekPartner(supplierCode), centen: c, soort: 'kassa', oms: oms || 'Kassa', ref: k.code });
+      const b = await boekAsync({ van: rekLid(k.codenaam), naar: rekPartner(supplierCode), centen: c, soort: 'kassa', oms: oms || 'Kassa', ref: k.code });
       if (b.error) return b;
       /* De kosten van de betaaldienst gaan DIRECT naar de ondernemer: per
          transactie meteen verrekend op de partnerrekening, als eigen regel in
@@ -35,7 +35,7 @@ module.exports = (ctx) => {
       let kosten = 0;
       try { kosten = Math.max(0, Math.round(betaaldienstKosten(c) || 0)); } catch (e) { kosten = 0; }
       if (kosten > 0) {
-        const kb = boek({ van: rekPartner(supplierCode), naar: 'rtg:betaaldienst', centen: kosten,
+        const kb = await boekAsync({ van: rekPartner(supplierCode), naar: 'rtg:betaaldienst', centen: kosten,
           soort: 'betaaldienstkosten', oms: 'Betaaldienstkosten, direct verrekend', ref: k.code });
         if (kb.error) kosten = 0;
       }
@@ -70,7 +70,7 @@ module.exports = (ctx) => {
           begunstigde: supplierCode, omschrijving: 'RTG Pay uitbetaling'
         });
       } catch (e) { return { status: 502, error: 'De uitbetaling lukte niet: ' + e.message }; }
-      const b = boek({ van: rek, naar: 'extern:uitbetaald', centen: c, soort: 'uitbetaling', oms: 'Uitbetaald naar de bank' });
+      const b = await boekAsync({ van: rek, naar: 'extern:uitbetaald', centen: c, soort: 'uitbetaling', oms: 'Uitbetaald naar de bank' });
       if (b.error) return b;
       return { ok: true, uitbetaald: c };
     });

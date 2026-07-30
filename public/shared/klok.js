@@ -51,17 +51,28 @@
     '.rtg-ring .rr-vijf{stroke:var(--klok-goud);stroke-opacity:0.85;stroke-width:1.0;}' +
     // toegepaste indexen in het vaste goud, met een lume-punt net erbinnen
     '.rtg-ring .rr-index{fill:var(--klok-goud);}' +
-    '.rtg-ring .rr-lume{fill:#E7E2CC;}' +
+    '.rtg-ring .rr-lume{fill:var(--klok-lume,#E7E2CC);}' +
     // signatuur (fijn, ruim gespatieerd) en de kastjes voor dag en datum
     '.rtg-ring .rr-naam{fill:var(--klok-goud);font-family:Inter,system-ui,sans-serif;font-size:4.6px;font-weight:500;letter-spacing:0.12em;}' +
-    '.rtg-ring .rr-venster{fill:#050504;}' +
+    '.rtg-ring .rr-venster{fill:var(--klok-venster,#050504);}' +
     '.rtg-ring .rr-vensterlijst{fill:none;stroke:var(--klok-goud);stroke-opacity:0.8;stroke-width:0.9;}' +
-    ".rtg-ring .rr-datum{fill:#EFE8D2;font-family:'Bodoni Moda',serif;font-size:7.4px;font-variant-numeric:tabular-nums;}" +
-    ".rtg-ring .rr-dagtekst{fill:#EFE8D2;font-family:'Bodoni Moda',serif;font-size:6.4px;letter-spacing:0.03em;}" +
+    ".rtg-ring .rr-datum{fill:var(--klok-datum,#EFE8D2);font-family:'Bodoni Moda',serif;font-size:7.4px;font-variant-numeric:tabular-nums;}" +
+    ".rtg-ring .rr-dagtekst{fill:var(--klok-datum,#EFE8D2);font-family:'Bodoni Moda',serif;font-size:6.4px;letter-spacing:0.03em;}" +
     // de fijne gouden secondewijzer met lollipop
     '.rtg-ring .rr-sec{stroke:var(--klok-goud);stroke-width:0.5;stroke-linecap:round;}' +
     '.rtg-ring .rr-seccw{fill:var(--klok-goud);}' +
-    '.rtg-ring .rr-seclolring{fill:#050504;stroke:var(--klok-goud);stroke-width:0.7;}';
+    '.rtg-ring .rr-seclolring{fill:var(--klok-venster,#050504);stroke:var(--klok-goud);stroke-width:0.7;}' +
+    // de wijzerplaat zelf (de drie radiale stops) volgt het thema, zodat de klok
+    // meekleurt i.p.v. altijd donker te blijven
+    '.rtg-ring .rr-plaat-a{stop-color:var(--klok-plaat-a,#1E1B1A);}' +
+    '.rtg-ring .rr-plaat-b{stop-color:var(--klok-plaat-b,#131110);}' +
+    '.rtg-ring .rr-plaat-c{stop-color:var(--klok-plaat-c,#080807);}' +
+    // vier thema's, elk een eigen wijzerplaat. Donker is de basis (geen attribuut,
+    // dus de fallbacks hierboven). Champagne (parelmoer) is licht met donkere
+    // datum; Bordeaux een diepe wijnrode plaat; pastel (RTF) een zacht blauw.
+    ':root[data-pas-thema="parelmoer"] .rtg-ring{--klok-plaat-a:#FBF6EA;--klok-plaat-b:#F0E7D3;--klok-plaat-c:#E2D6BC;--klok-datum:#3A2E1A;--klok-venster:#EADFC6;--klok-lume:#B8993C;}' +
+    ':root[data-pas-thema="bordeaux"] .rtg-ring{--klok-plaat-a:#3A1120;--klok-plaat-b:#260A16;--klok-plaat-c:#15040C;--klok-datum:#F2DEE4;--klok-venster:#0C0308;--klok-lume:#E7CFD6;}' +
+    ':root[data-levend="pastel"] .rtg-ring{--klok-plaat-a:#1B2733;--klok-plaat-b:#111C27;--klok-plaat-c:#0A121B;--klok-datum:#DCE7F2;--klok-venster:#070D15;--klok-lume:#CFE0F0;}';
   document.head.appendChild(stijl);
 
   const twee = n => String(n).padStart(2, '0');
@@ -113,8 +124,8 @@
     const defs = document.createElementNS(NS, 'defs');
     defs.innerHTML =
       '<radialGradient id="rr-plaat' + klokNr + '" cx="50%" cy="38%" r="70%">' +
-        '<stop offset="0%" stop-color="#1E1B1A"/><stop offset="68%" stop-color="#131110"/>' +
-        '<stop offset="100%" stop-color="#080807"/></radialGradient>' +
+        '<stop class="rr-plaat-a" offset="0%"/><stop class="rr-plaat-b" offset="68%"/>' +
+        '<stop class="rr-plaat-c" offset="100%"/></radialGradient>' +
       '<linearGradient id="rr-goud' + klokNr + '" x1="0" y1="0" x2="1" y2="0">' +
         '<stop offset="0%" stop-color="#6B5320"/><stop offset="20%" stop-color="#C0A45A"/>' +
         '<stop offset="46%" stop-color="#F3E6BC"/><stop offset="50%" stop-color="#FBF4DA"/>' +

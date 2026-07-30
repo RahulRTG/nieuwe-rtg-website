@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation &middot; Magazine</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation-192.png">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  /* Een echt tijdschrift voor kinderen en jongvolwassenen: speels, warm en
+     helder, in je-vorm. Dunne, fijne randen (hairlines) -- nooit zwaar of te
+     druk. Kleuren uit het logo (koningsblauw + goud) met een vrolijke groene
+     pop, op de rustige donkere foundation-grond. */
+  :root{ --blauw:#3A62C4; --goud-h:#D9B45E; --groen-h:#6FBF7C; --lijnfijn:rgba(255,255,255,.10); --room:#F3EEE2; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:var(--sans),'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .serif{font-family:'Bodoni Moda',Georgia,serif;}
+  .blad{max-width:48rem;margin:0 auto;padding:0 1.1rem 4.5rem;}
+  a{color:inherit;}
+  /* masthead-balk */
+  .top{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.82));backdrop-filter:blur(8px);border-bottom:1px solid var(--lijnfijn);padding:.6rem 1.1rem;display:flex;align-items:center;gap:.7rem;max-width:48rem;margin:0 auto;}
+  .terug{background:transparent;border:1px solid var(--lijnfijn);color:var(--txt);border-radius:999px;padding:.35rem .75rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .top .mh{font-family:'Bodoni Moda',serif;font-weight:600;letter-spacing:.02em;}
+  .top .mh b{color:var(--goud-h);}
+  /* cover */
+  .cover{text-align:center;padding:2rem 0 1rem;}
+  .cover .logo-img{display:block;width:min(100%,30rem);margin:0 auto 1.3rem;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);}
+  .flags{display:flex;justify-content:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.9rem;}
+  .flag{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:.25rem .6rem;border-radius:999px;border:1px solid var(--lijnfijn);color:var(--zacht);}
+  .cover h1{font-size:clamp(2rem,7vw,3rem);font-weight:600;line-height:1.05;margin:.3rem 0 .5rem;text-wrap:balance;}
+  .cover h1 em{font-style:normal;color:var(--goud-h);}
+  .cover .sub{color:var(--zacht);font-size:1rem;max-width:30rem;margin:0 auto;}
+  /* cover-lijnen zoals op een echt blad */
+  .coverlijnen{display:grid;gap:.5rem;margin:1.5rem auto 0;max-width:32rem;text-align:left;}
+  .cl{display:flex;align-items:center;gap:.7rem;border:1px solid var(--lijnfijn);border-radius:14px;padding:.7rem .9rem;background:var(--paneel);}
+  .cl .n{flex:0 0 1.7rem;height:1.7rem;border-radius:50%;border:1px solid var(--goud-h);color:var(--goud-h);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;}
+  .cl .t{font-size:.95rem;}
+  .cl.b .n{border-color:var(--blauw);color:var(--blauw);}
+  .cl.g .n{border-color:var(--groen-h);color:var(--groen-h);}
+  /* artikel */
+  .art{margin:2.6rem 0;}
+  .eyebrow{display:inline-block;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--goud-h);border:1px solid var(--lijnfijn);border-radius:999px;padding:.2rem .6rem;}
+  .eyebrow.b{color:var(--blauw);} .eyebrow.g{color:var(--groen-h);}
+  .art h2{font-size:clamp(1.4rem,5vw,2rem);font-weight:600;margin:.6rem 0 .7rem;text-wrap:balance;}
+  .art p{color:#e9e4d9;font-size:1.04rem;margin:.65rem 0;}
+  .art p b{color:var(--txt);}
+  /* de verdeling: dun en vrolijk */
+  .split{border:1px solid var(--lijnfijn);border-radius:16px;padding:1.2rem;margin:1.2rem 0;background:var(--paneel);}
+  .split h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;margin-bottom:.15rem;}
+  .split .h{color:var(--zacht);font-size:.88rem;margin-bottom:1rem;}
+  .balk{display:flex;height:2.4rem;border-radius:999px;overflow:hidden;border:1px solid var(--lijnfijn);}
+  .balk span{display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:800;color:#0c0c0b;}
+  .balk .lid{flex:70;background:#2a2620;color:var(--zacht);}
+  .balk .lok{flex:20;background:var(--goud-h);}
+  .balk .rtf{flex:10;background:var(--blauw);color:#fff;}
+  .legenda{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.8rem;font-size:.82rem;color:var(--zacht);}
+  .legenda i{display:inline-block;width:.75rem;height:.75rem;border-radius:4px;vertical-align:-.05em;margin-right:.35rem;}
+  /* kaarten: fijne randen, vrolijke chips */
+  .kaartjes{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.8rem;margin:1.2rem 0;}
+  .kj{border:1px solid var(--lijnfijn);border-radius:16px;padding:1.1rem;background:var(--paneel);}
+  .kj .chip{display:inline-block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;padding:.15rem .55rem;border-radius:999px;margin-bottom:.55rem;}
+  .kj:nth-child(1) .chip{color:var(--blauw);border:1px solid var(--blauw);}
+  .kj:nth-child(2) .chip{color:var(--goud-h);border:1px solid var(--goud-h);}
+  .kj:nth-child(3) .chip{color:var(--groen-h);border:1px solid var(--groen-h);}
+  .kj h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;margin-bottom:.3rem;}
+  .kj p{color:var(--zacht);font-size:.9rem;line-height:1.55;}
+  /* wist-je-dat */
+  .wist{border:1px solid var(--lijnfijn);border-left:2px solid var(--groen-h);border-radius:14px;padding:1rem 1.1rem;margin:2rem 0;background:var(--paneel2);}
+  .wist b{color:var(--groen-h);letter-spacing:.05em;}
+  .wist p{color:#e9e4d9;font-size:.98rem;margin-top:.3rem;}
+  /* citaat, groot en speels */
+  .quote{text-align:center;margin:2.4rem 0;}
+  .quote p{font-family:'Bodoni Moda',serif;font-size:clamp(1.4rem,5vw,1.9rem);line-height:1.35;color:var(--txt);}
+  .quote p .hl{color:var(--goud-h);}
+  .quote .bron{color:var(--zacht);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.7rem;}
+  /* ingangen */
+  .ingangen{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.7rem;margin-top:1rem;}
+  .ingang{border:1px solid var(--lijnfijn);border-radius:14px;padding:.9rem;text-decoration:none;color:var(--txt);background:var(--paneel2);transition:border-color .2s,transform .2s;}
+  .ingang:hover{border-color:var(--goud-h);transform:translateY(-2px);}
+  .ingang b{font-family:'Bodoni Moda',serif;font-weight:600;}
+  .ingang span{display:block;color:var(--zacht);font-size:.82rem;margin-top:.15rem;line-height:1.45;}
+  .voet{margin-top:2.6rem;padding-top:1.2rem;border-top:1px solid var(--lijnfijn);color:var(--zacht);font-size:.8rem;text-align:center;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="top">
+  <button class="terug" id="terug" aria-label="Terug">Terug</button>
+  <span class="mh serif">RTF <b>Magazine</b></span>
+</div>
+<main class="blad" role="main">
+
+  <header class="cover">
+    <img class="logo-img" src="beeld/rtf-logo.png" alt="Rahul Travel Foundation &mdash; Empowering Journeys, Building Futures">
+    <div class="flags"><span class="flag">Uitgave I</span><span class="flag">Voor jou</span><span class="flag">Gratis</span></div>
+    <h1 class="serif">Jouw reis maakt de <em>wereld mooier</em></h1>
+    <p class="sub">Elke keer dat iemand op reis gaat met RTG, gaat er een stukje naar de wereld. Dit tijdschrift laat zien hoe &mdash; en hoe jij meedoet.</p>
+
+    <div class="coverlijnen">
+      <div class="cl"><span class="n">1</span><span class="t"><b>30%</b> van elke bijdrage gaat naar goede dingen &rarr;</span></div>
+      <div class="cl b"><span class="n">2</span><span class="t">Het meeste blijft in <b>jouw eigen buurt</b> &rarr;</span></div>
+      <div class="cl g"><span class="n">3</span><span class="t">Jij mag <b>meebeslissen</b> waar het naartoe gaat &rarr;</span></div>
+    </div>
+  </header>
+
+  <article class="art">
+    <span class="eyebrow">Wat doen we?</span>
+    <h2 class="serif">Van elke reis een stukje voor de toekomst</h2>
+    <p>De <b>Rahul Travel Foundation</b> is het deel van RTG dat teruggeeft. Elke maand dat iemand lid is, gaat er automatisch <b>30% naar goede doelen</b>. Dat zit gewoon in het lidmaatschap &mdash; elke maand opnieuw, zonder dat je eraan hoeft te denken.</p>
+    <p>En dat geld gaat niet zomaar ergens ver weg heen. Het grootste deel blijft dichtbij, in de buurt waar jij woont. Zo zie je zelf wat het doet.</p>
+
+    <div class="split">
+      <h3>Zo wordt die 30% verdeeld</h3>
+      <div class="h">Twee derde blijft lokaal, een derde bouwt de foundation zelf.</div>
+      <div class="balk">
+        <span class="lid" title="Reis &amp; diensten">70% reis</span>
+        <span class="lok">20% lokaal</span>
+        <span class="rtf">10% RTF</span>
+      </div>
+      <div class="legenda">
+        <span><i style="background:#2a2620;"></i>70% &mdash; de reis zelf</span>
+        <span><i style="background:var(--goud-h);"></i>20% &mdash; jouw eigen buurt</span>
+        <span><i style="background:var(--blauw);"></i>10% &mdash; de foundation: lab, clubs &amp; gezinnen</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="art">
+    <span class="eyebrow b">Waarom?</span>
+    <h2 class="serif">Reizen laat je groeien</h2>
+    <p>Wie de wereld ziet, leert en groeit. En wie een kans krijgt, geeft die kans door. Dat is het idee: de vrijheid om te reizen verbinden aan iets moois bouwen &mdash; voor iemand die het harder nodig heeft.</p>
+  </article>
+
+  <div class="quote">
+    <p class="serif">&ldquo;Reizen opent de wereld. Wij zorgen dat die wereld ook <span class="hl">terugopent</span>, voor wie minder ver kan komen.&rdquo;</p>
+    <div class="bron">De belofte van de RTFoundation</div>
+  </div>
+
+  <article class="art">
+    <span class="eyebrow g">Hoe dan?</span>
+    <h2 class="serif">Drie dingen die echt gebeuren</h2>
+    <div class="kaartjes">
+      <div class="kj">
+        <span class="chip">Lokaal</span>
+        <h3>Jullie beslissen samen</h3>
+        <p>De 20% die dichtbij blijft, verdelen de leden zelf per plek &mdash; samen, met een eerlijke AI-scheidsrechter die meekijkt.</p>
+      </div>
+      <div class="kj">
+        <span class="chip">Uitvinden</span>
+        <h3>Het onderzoekslab</h3>
+        <p>Een deel bouwt aan slimme dingen: schoon water, energie, boeren en dorpen helpen. Kleine proefjes die echt verschil maken.</p>
+      </div>
+      <div class="kj">
+        <span class="chip">Samen</span>
+        <h3>Gezinnen &amp; jeugd</h3>
+        <p>De foundation-app is gratis: leren, lezen, spelen en hulp voor elk gezin &mdash; van de allerkleinsten tot jongvolwassenen.</p>
+      </div>
+    </div>
+  </article>
+
+  <div class="wist">
+    <b>Wist je dat?</b>
+    <p>Als 1.000 leden een jaar lang meedoen met de RTG Pass, gaat er bijna <b>&euro; 234.000</b> naar goede doelen &mdash; waarvan het grootste deel in hun eigen buurt blijft.</p>
+  </div>
+
+  <article class="art">
+    <span class="eyebrow b">Voor ouders</span>
+    <h2 class="serif">Veilig, gratis en met een goed hart</h2>
+    <p>De foundation-app is er ook voor u. Alles is <b>gratis</b> en met zorg gebouwd: uw kinderen leren, lezen, spelen en krijgen begeleiding die past bij hun leeftijd. U houdt zelf overzicht via het gezinsaccount.</p>
+    <p>En privacy staat voorop: kinderen zijn zichtbaar op een <b>codenaam</b>, nooit op hun echte naam. Elk lidmaatschap geeft bovendien terug &mdash; 30% naar goede doelen, waarvan het grootste deel in uw eigen omgeving blijft. Zo laat u uw kind niet alleen groeien, maar ook bijdragen.</p>
+    <div class="wist">
+      <b>Goed om te weten</b>
+      <p>U bepaalt wat uw kind ziet en doet. De AI-begeleider (Rahul) is warm en geduldig tegen kinderen, en bespreekt met minderjarigen nooit iets wat niet bij hun leeftijd past.</p>
+    </div>
+  </article>
+
+  <article class="art">
+    <span class="eyebrow">Doe je mee?</span>
+    <h2 class="serif">Hier kun je verder</h2>
+    <div class="ingangen">
+      <a class="ingang" href="/apps/labfonds.html"><b>Het Lab-fonds</b><span>Zamel samen in en beslis mee waar het naartoe gaat.</span></a>
+      <a class="ingang" href="clubswerk.html"><b>Clubs &amp; steden</b><span>Hoe de foundation met clubs in elke stad samenwerkt.</span></a>
+      <a class="ingang" href="index.html"><b>De foundation-app</b><span>Gratis leren, lezen en hulp voor je hele gezin.</span></a>
+    </div>
+  </article>
+
+  <div class="voet">
+    Rahul Travel Foundation &middot; Empowering Journeys, Building Futures<br>
+    30% van elke bijdrage naar goede doelen &mdash; 20% lokaal, 10% de foundation zelf.
+  </div>
+</main>
+
+<script>
+  document.getElementById('terug').onclick = function(){ if (history.length > 1) history.back(); else location.href = 'index.html'; };
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

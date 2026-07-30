@@ -47,8 +47,9 @@ module.exports = (kern) => {
     res.json(r);
   });
 
-  /* ---- de App-Bibliotheek: 20.000 professionele apps. Bladeren is voor
-     iedereen zichtbaar; installeren is het pas-voordeel van betalende leden. ---- */
+  /* ---- de App-Bibliotheek: de echte RTG-apps van het ecosysteem. Bladeren is
+     voor iedereen zichtbaar; op je startscherm zetten is het pas-voordeel van
+     betalende leden. ---- */
   app.post('/api/mall/apps', auth, (req, res) => res.json(appbieb.overzicht()));
   // bladeren en zoeken (gepagineerd; de catalogus wordt ter plekke samengesteld)
   app.post('/api/mall/apps/catalogus', auth, (req, res) => res.json(appbieb.catalogus(req.body || {})));
@@ -68,10 +69,17 @@ module.exports = (kern) => {
   // mijn geïnstalleerde apps (voor de gast gewoon leeg)
   app.post('/api/mall/apps/mijn', auth, (req, res) => res.json({ apps: appbieb.mijnApps(req.session.key) }));
 
-  /* ---- de Reis-Bibliotheek: een miljoen reisgidsen van Londen tot Gaza.
-     Volledig open voor iedereen die is aangemeld, ook de gratis gast. ---- */
+  /* ---- de Reis-Bibliotheek: echte, leesbare bestemmingsgidsen van eigen
+     redactie. Volledig open voor iedereen die is aangemeld, ook de gratis
+     gast: bladeren, lezen en in je kast zetten. ---- */
   app.post('/api/mall/reis', auth, (req, res) => res.json(reisbieb.overzicht()));
   app.post('/api/mall/reis/catalogus', auth, (req, res) => res.json(reisbieb.catalogus(req.body || {})));
+  // een gids echt lezen: de volledige tekst
+  app.post('/api/mall/reis/lees', auth, (req, res) => {
+    const r = reisbieb.lees(req.body.id);
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
   app.post('/api/mall/reis/installeer', auth, (req, res) => {
     const r = reisbieb.installeer(req.session.key, req.body.id);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
@@ -84,7 +92,7 @@ module.exports = (kern) => {
   });
   app.post('/api/mall/reis/mijn', auth, (req, res) => res.json({ apps: reisbieb.mijnApps(req.session.key) }));
 
-  /* ---- de RTF-Bibliotheek in de Mall: dezelfde 20.000 gratis kind- en
+  /* ---- de RTF-Bibliotheek in de Mall: dezelfde echte, gratis kind- en
      gezinsapps als in de foundation, volledig open voor iedereen die is
      aangemeld (ook de gast). Installaties staan los van de gezinsprofielen. ---- */
   const rtfSleutel = req => 'mall:' + req.session.key;

@@ -25,7 +25,7 @@ module.exports = (ctx) => {
     log({ soort: 'incident-ingediend', incidentId: inc.id, supplierCode: supplier.code, key, codenaam, door: inc.door });
     save();
     // het lid weet dat er een incident loopt; de identiteit is nog NIET vrijgegeven
-    notify(key, { icon: '⚠️', title: 'Incident gemeld', body: supplier.name + ' meldde een incident. RTG beoordeelt het; uw identiteit is niet zomaar gedeeld.', scope: 'privacy' });
+    notify(key, { icon: 'meldingen', title: 'Incident gemeld', body: supplier.name + ' meldde een incident. RTG beoordeelt het; uw identiteit is niet zomaar gedeeld.', scope: 'privacy' });
     sseToOffice('sync', { scope: 'incident' });
     sseToSupplier(supplier.code, 'sync', { scope: 'paspoort' });
     return { ok: true, incident: publiekIncident(inc) };
@@ -52,13 +52,13 @@ module.exports = (ctx) => {
       db.data.paspoortVerzoeken.unshift(v);
       inc.verzoekId = v.id;
       log({ soort: 'incident-vrijgegeven', incidentId: inc.id, verzoekId: v.id, supplierCode: inc.supplierCode, key: inc.key, door: inc.beoordeeldDoor });
-      notifySupplier(inc.supplierCode, { icon: '🔓', title: 'Incident vrijgegeven', body: 'RTG gaf de identiteit voor uw incident vrij. U kunt de inzage 10 minuten openen.' });
-      notify(inc.key, { icon: '🔓', title: 'Identiteit vrijgegeven', body: 'RTG gaf na beoordeling uw identiteit vrij aan ' + inc.supplierName + ' wegens het gemelde incident.', scope: 'privacy' });
+      notifySupplier(inc.supplierCode, { icon: 'slot', title: 'Incident vrijgegeven', body: 'RTG gaf de identiteit voor uw incident vrij. U kunt de inzage 10 minuten openen.' });
+      notify(inc.key, { icon: 'slot', title: 'Identiteit vrijgegeven', body: 'RTG gaf na beoordeling uw identiteit vrij aan ' + inc.supplierName + ' wegens het gemelde incident.', scope: 'privacy' });
       sseToCustomer(inc.key, 'sync', { scope: 'paspoort' });
     } else {
       inc.status = 'afgewezen'; inc.besluit = 'afwijzen';
       log({ soort: 'incident-afgewezen', incidentId: inc.id, supplierCode: inc.supplierCode, key: inc.key, door: inc.beoordeeldDoor });
-      notifySupplier(inc.supplierCode, { icon: '⛔', title: 'Incident afgewezen', body: 'RTG wees uw incidentverzoek af; de identiteit wordt niet gedeeld.' });
+      notifySupplier(inc.supplierCode, { icon: 'slot', title: 'Incident afgewezen', body: 'RTG wees uw incidentverzoek af; de identiteit wordt niet gedeeld.' });
     }
     sseToOffice('sync', { scope: 'incident' });
     sseToSupplier(inc.supplierCode, 'sync', { scope: 'paspoort' });

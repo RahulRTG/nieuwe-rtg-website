@@ -23,6 +23,7 @@
 </script>
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rosthema.css" rel="stylesheet">
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
@@ -589,7 +590,7 @@
     </form>
 
     <div class="enroll-box">
-      <button type="button" class="enroll-toggle" id="enrollToggle" aria-expanded="false" data-i18n="enr.toggle">🎟️ Uitgenodigd door uw werkgever? Meld u aan</button>
+      <button type="button" class="enroll-toggle" id="enrollToggle" aria-expanded="false" data-i18n="enr.toggle">Uitgenodigd door uw werkgever? Meld u aan</button>
       <form class="login-form enroll-form" id="enrollForm" hidden>
         <p class="enroll-hint" data-i18n="enr.hint">Bedrijfsnaam + kassacode van uw werkgever, bevestigd met uw eigen RTG-account (gratis is genoeg).</p>
         <input id="enBedrijf" placeholder="Bedrijfsnaam" data-i18n-ph="enr.biz" autocomplete="organization">
@@ -944,7 +945,10 @@
   <div id="toast"></div>
 </div>
 
-<script src="/shared/thema.js"></script>
+<script src="/shared/glyf.js"></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/rosthema.js" defer></script>
+<script src="/shared/keukenlicht.js" defer></script>
 <script src="/shared/klok.js" defer></script>
 <script src="/shared/inlogkleur.js" defer></script>
 <script src="/apps/util.js"></script>
@@ -965,6 +969,18 @@
 <script src="/shared/scanknop.js"></script>
 <script src="/shared/zegelcheck.js"></script>
 <script src="/shared/rtgcode.js"></script>
+<script src="/shared/drie.js"></script>
+<script src="/apps/leverancier-zaak.js"></script>
+<script src="/apps/leverancier-zaak-rapport.js"></script>
+<script src="/apps/leverancier-hr.js"></script>
+<script src="/apps/leverancier-pr.js"></script>
+<script src="/apps/leverancier-pr-dossier.js"></script>
+<script src="/apps/leverancier-kamer.js"></script>
+<script src="/apps/leverancier-gebouwplus.js"></script>
+<script src="/apps/leverancier-gebouwrapport.js"></script>
+<script src="/apps/leverancier-gebouwpand.js"></script>
+<script src="/apps/leverancier-puls.js"></script>
+<script src="/apps/leverancier-puls2.js"></script>
 <script src="/apps/leverancier.js"></script>
 <script>
 window.I18N = { en: {
@@ -1168,7 +1184,7 @@ window.I18N = { en: {
   'kt.invite.done':'Invitation ready. Give these two things to your employee:',
   'kt.invite.biz':'Company name', 'kt.invite.code':'Register code',
   'kt.invite.note':'One-time, valid for 30 days.',
-  'enr.toggle':'🎟️ Invited by your employer? Sign up', 'enr.submit':'Sign up with my employer',
+  'enr.toggle':'Invited by your employer? Sign up', 'enr.submit':'Sign up with my employer',
   'enr.hint':'Company name + register code from your employer, confirmed with your own RTG account (free is enough).',
   'enr.biz':'Company name', 'enr.code':'Register code', 'enr.login':'Your RTG email or username',
   'enr.pass':'Your RTG password', 'enr.pin':'Choose a PIN (4 digits)',
@@ -1238,6 +1254,52 @@ window.I18N = { en: {
   'bz.niks':'All running smoothly. Stuck orders, waiting guests and open staff matters appear here automatically.',
   'bz.weekh':'Revenue per day', 'bz.top':'Best sellers', 'bz.verkocht':'sold',
   'bz.geentop':'No sales yet. As soon as the app or the register sells something, your best sellers appear here.',
+  'z3.h':'The business in 3D', 'z3.rapport':'Weekly report',
+  'z3.uitleg':'Your week as a skyline: the taller the block, the more revenue. Today in burgundy, the golden pin marks your best day. Drag to rotate.',
+  'z3.aria':'3D view of this week\'s revenue per day', 'z3.geen':'The backoffice is still loading.',
+  'z3.open':'Weekly report opened in a new tab.',
+  'z3.pres':'Presentation', 'z3.sluit':'Close',
+  'ge.kop':'RTG Enterprise', 'ge.contract':'Lease contracts', 'ge.c.huurder':'Tenant', 'ge.c.verd':'Floors (e.g. 4+5)',
+  'ge.c.huur':'Monthly rent', 'ge.c.leg':'Record', 'ge.c.verleng':'Extend', 'ge.c.stop':'Terminate',
+  'ge.c.geen':'No contracts recorded yet.', 'ge.c.tot':'Extend until (yyyy-mm-dd):',
+  'ge.leads':'Leads for vacant floors', 'ge.l.naam':'Prospective tenant', 'ge.l.wens':'Wish (sqm, floor, when)',
+  'ge.l.leg':'Add', 'ge.l.geen':'No leads yet; the tower does not sell itself.',
+  'ge.energie':'Energy per week', 'ge.e.leg':'Record', 'ge.rapport':'Building report (print)',
+  'ge.rahul':'Rahul thinks along', 'ge.rahul.leest':'Rahul is looking at the building...',
+  'ge.r.kern':'Key figures', 'ge.r.bezetting':'Occupancy', 'ge.r.huurders':'Tenants',
+  'ge.r.zalen':'Room bookings today', 'ge.r.meld':'Open reports', 'ge.r.jetset':'Open jetset requests',
+  'ge.r.huur':'Tenants per floor', 'ge.r.verd':'Floor', 'ge.r.signalen':'Signals',
+  'ge.r.voet':'Drawn up in the RTG business app; figures reflect this moment.',
+  'gp.kop':'The whole building', 'gp.inst':'Systems and inspections', 'gp.i.naam':'Name (e.g. Lift A)',
+  'gp.i.leg':'Record', 'gp.i.tot':'inspection until', 'gp.i.herkeur':'Re-inspected',
+  'gp.i.geen':'No systems recorded yet.', 'gp.i.nieuw':'New inspection date (yyyy-mm-dd):',
+  'gp.post':'Mailroom', 'gp.p.voor':'For which tenant', 'gp.p.wat':'What (parcel, registered...)',
+  'gp.p.aan':'Receive', 'gp.p.klaar':'Picked up', 'gp.p.geen':'The mailroom is empty.',
+  'gp.park':'Parking', 'gp.k.wie':'Tenant (empty = free)', 'gp.k.zet':'Assign', 'gp.k.vrij':'free',
+  'gp.bhv':'Emergency response and evacuation', 'gp.b.op':'Turnout %', 'gp.b.punt':'Improvement points',
+  'gp.b.leg':'Record', 'gp.b.opkomst':'turnout',
+  'pu.kop':'Today at a glance', 'pu.rust':'No signals; the day runs as it should.', 'pu.rapport':'Pulse report (print)',
+  'wf.deel':'Share',
+  'dp.kop':'Today\'s playbook', 'dp.week':'The week ahead', 'dp.print':'Playbook (print)', 'dp.rahul':'Rahul plans the day',
+  'dp.vink':'Check off', 'dp.p1':'NOW', 'dp.p2':'TODAY', 'dp.p3':'WEEK',
+  'hr2.inwerk':'Onboarding tracks', 'hr2.inwerk.s':'A fixed route for every new colleague: day 1, week 1, month 1. The employee ticks along from their own app.',
+  'hr2.dag1':'Day 1', 'hr2.week1':'Week 1', 'hr2.maand1':'Month 1', 'hr2.stap':'Add your own step', 'hr2.start':'Start track', 'hr2.afgerond':'track(s) completed.',
+  'hr2.gesprek':'Growth conversations', 'hr2.gesprek.s':'A steady rhythm, no scores: what goes well, what needs attention, which agreements. Only management and the employee themselves can see this.',
+  'hr2.onderwerp':'Subject, e.g. first quarter', 'hr2.verslag':'Notes: what goes well, what needs attention', 'hr2.afspraken':'Agreements', 'hr2.vastleggen':'Record conversation', 'hr2.leeg':'Write a short note first.',
+  'hr2.cert':'Certificates & qualifications', 'hr2.cert.s':'First aid, safety, allergens: who is qualified for what, and when it expires.',
+  'hr2.soort':'Type, e.g. First aid', 'hr2.toevoegen':'Add', 'hr2.verloopt':'expires', 'hr2.verlopen':'expired', 'hr2.soortleeg':'Give the certificate a name.',
+  'hr2.dienst':'Years of service', 'hr2.dienst.s':'Who has been on board how long, and when the next work anniversary falls.', 'hr2.sinds':'since', 'hr2.jaar':'yr',
+  'pr2.plan':'Campaign planner', 'pr2.plan.s':'Schedule posts and offers ahead; RTG publishes them automatically at the chosen moment and your followers get a notification.',
+  'pr2.gaat':'goes live', 'pr2.live':'live since', 'pr2.post':'Salon post', 'pr2.deal':'Offer (members only)', 'pr2.titel':'Title (for an offer)',
+  'pr2.tekst':'The text of the post or offer', 'pr2.inplannen':'Schedule', 'pr2.leeg':'Write a text and pick a moment.', 'pr2.geplandok':'Scheduled; RTG publishes automatically.',
+  'pr2.brief':'Newsletter to followers', 'pr2.brief.s':'Via RTMAIL, by codename, to everyone following your business. At most 1 per 7 days: that keeps it welcome.',
+  'pr2.bezorgd':'delivered', 'pr2.onderwerp':'Subject', 'pr2.brieftekst':'The letter itself', 'pr2.verstuur':'Send to all followers',
+  'pr2.wacht':'The next letter can go 7 days after the previous one.', 'pr2.nbleeg':'Give the letter a subject and a text.', 'pr2.verstuurd':'Sent to',
+  'pr2.bereik':'Reach per message', 'pr2.bereik.s':'What your latest messages sparked on De Salon.', 'pr2.stemmen':'votes', 'pr2.geen':'No messages published yet.',
+  'pr2.dossier':'Press kit', 'pr2.open':'Press kit opened in a new tab.', 'pr2.overons':'About the business', 'pr2.beeld':'Imagery',
+  'pr2.contact':'Booking and contact', 'pr2.contact.s':'Members book directly in the RTG app; RTG charges 0% commission. Follow the business on De Salon for offers and news.',
+  'km.rapport':'Room report', 'km.rahul':'Rahul advice', 'km.bezig':'Rahul is looking at this room...',
+  'km.leeg':'This room has nothing to print yet.', 'km.open':'Room report opened in a new tab.',
   'sw.h':'In charge of your business',
   'sw.s':'Switch every feature on or off whenever you want. Only paying through the app is always on; the moment (upfront or afterwards) is your call.',
   'sw.orders':'Ordering via the app', 'sw.orders.s':'Members can place orders with you',
@@ -1263,6 +1325,22 @@ window.I18N = { en: {
   'fn.gcopen':'Outstanding balance', 'fn.gco.s':'liability on the balance sheet', 'fn.kaarten':'card(s)',
   'fn.gcsell':'Sell card', 'fn.gcredeem':'Redeem', 'fn.gcklaar':'Gift card sold. Hand over this code:', 'fn.gcgeind':'Redeemed. Remaining balance on the card:',
   'fn.regels':'Rules in ', 'fn.ai':'AI accountant',
+  'kt.thuis':'RTG Thuis', 'th.kop':'RTG Thuis', 'th.bord':'The host dashboard', 'th.live':'Homes live',
+  'th.ink':'Earnings (completed stays)', 'th.bez':'Occupancy next 30 days', 'th.ja':'yes',
+  'th.nog':'not yet (3 stays, 4.8+ average)', 'th.uitbet':'Payouts are scheduled to the business RTG Bank account; RTG keeps 0%. Guests see your business name as host.',
+  'th.aanvragen':'Requests', 'th.gasten':'guests', 'th.gast':'guest', 'th.ok':'Accept', 'th.nee':'Decline',
+  'th.geenaanvr':'No open requests.', 'th.komend':'Upcoming and current stays', 'th.geenkomend':'Nothing booked yet.',
+  'th.uit':'Check out', 'th.huizen':'Our listings on RTG Thuis', 'th.nacht':'night', 'th.pauze':'paused',
+  'th.instant':'instant book', 'th.opaanvraag':'on request', 'th.advies':'AI price advice', 'th.blok':'Block',
+  'th.geenhuizen':'No homes yet; put one live below.', 'th.nieuw':'Put a home live (manager)',
+  'th.titel':'Title', 'th.plaats':'Location', 'th.kamer':'Private room', 'th.boot':'Houseboat', 'th.natuur':'Nature cabin',
+  'th.zet':'Put live', 'th.zet.s':'All premium features included: instant or request, discounts, deposit, keyless door codes, co-hosts and AI price advice. Members pay 0% service fees.',
+  'th.geaccepteerd':'Request accepted; the guest gets the confirmation (and the door code when keyless).',
+  'th.uitgecheckt':'Checked out; the payout is scheduled and you can now review each other.',
+  'th.nu':'now', 'th.bez2':'occupancy', 'th.blokvan':'Block from (YYYY-MM-DD):', 'th.bloktot':'until (YYYY-MM-DD):',
+  'th.geblokt':'Period blocked in the calendar.', 'th.livegezet':'The home is live on RTG Thuis, under the business name.',
+  'fn.zak':'Business account (RTG Bank)', 'fn.zak.leeg':'No entries yet.',
+  'fn.zak.s':'Included free with the financial heart: every business banks under its own flag, alongside the payments that run over the card rails.',
   'fn.ai.s':'Knows your country, your figures and the rules. Ask about VAT, wage costs, gift cards or filing deadlines.',
   'fn.ai.ph':'E.g. how much VAT do I remit this month?', 'fn.vraag':'Ask',
   'fn.ai.s2':'Knows your industry, your figures and the rules. Ask a question, or let it proactively steer you with advice on your own numbers.',
@@ -1425,6 +1503,26 @@ window.I18N = { en: {
   'mb.vraagcode':'Delivery code from the customer (from the app):', 'mb.afgeleverd':'Delivered safely.',
   'sup.v.boardroom':'Boardroom', 'tab.boardroom':'Boardroom',
   'sup.v.verkoop':'Car sales', 'tab.verkoop':'Sales',
+  'vp.offertes':'Quotes', 'vp.offertes.s':'Members request custom jobs; you reply with a price. On approval the job lands as a confirmed booking in your agenda.',
+  'vp.wens':'preferred', 'vp.toel':'Note (optional)', 'vp.bied':'Send quote', 'vp.geenoff':'No open quote requests.',
+  'vp.werkbon':'Job sheets', 'vp.werkbon.s':'Close a finished job with a digital job sheet; the member sees it with the booking.',
+  'vp.wbwerk':'Work carried out', 'vp.wbmat':'Materials (optional)', 'vp.wbdoe':'Job sheet',
+  'vp.klanten':'Client book', 'vp.klanten.s':'Your clients by codename: history, revenue and your own note. This book deliberately holds no real names.',
+  'vp.laatst':'last', 'vp.notitie':'Own note, e.g. key with the neighbours', 'vp.bewaar':'Save', 'vp.geenklant':'No clients yet; after the first booking this book fills itself.',
+  'vp.onderhoud':'Maintenance due', 'vp.onderhoud.s':'These clients are due again based on the repeat interval; a reminder can be sent once every 30 days.',
+  'vp.mnd':'months ago', 'vp.herinnerd':'reminded', 'vp.herinner':'Remind',
+  'vp.herhaal':'Repeat maintenance', 'vp.herhaal.s':'Give a service a repeat interval in months; clients who are due appear on the today board.',
+  'vp.elke':'every', 'vp.mnd2':'months', 'vp.geenherhaal':'no repeat',
+  'vp.biedok':'Quote sent; the member is notified and can approve.', 'vp.weiok':'Declined; the member is politely notified.',
+  'vp.wbok':'Job sheet saved; the member sees it with the booking.', 'vp.notok':'Note saved.',
+  'vp.herok':'Reminder sent, once per 30 days.', 'vp.herhok':'Repeat interval saved.',
+  'vp.ritmes':'Recurring jobs', 'vp.ritmes.s':'The app schedules each next visit as a request; you simply confirm. Either side can stop at any time.',
+  'vp.elkeweek':'every week', 'vp.weken':'weeks', 'vp.stop':'Stop', 'vp.rstopok':'Recurring job stopped; the member is notified.',
+  'vp.wacht':'Waiting list', 'vp.wacht.s':'When a slot frees up the first person waiting is notified automatically; you can also invite by hand. The member always books themselves.',
+  'vp.uitgenodigd':'invited', 'vp.nodig':'Invite', 'vp.nodigok':'Notified; the member books themselves.',
+  'vp.reviews':'Reviews', 'vp.cap':'Team capacity',
+  'vp.cap.s':'How many professionals work at the same time? That many bookings may overlap in the time slots (1 = solo).',
+  'vp.capok':'Capacity saved; time slots use it immediately.',
   'vk.aan':'Car sales on (exclusive showroom for members)', 'vk.aanvragen':'Requests', 'vk.geen':'No open requests.',
   'vk.showroom':'Showroom', 'vk.nieuw':'Add car', 'vk.bewerk':'Edit', 'vk.moment':'When? (e.g. Sat 10:00)',
   'vk.tegenbod':'Confirm sale price or counter-offer (€):', 'vk.taxatie':'Value the trade-in at (€):',
@@ -1556,8 +1654,13 @@ window.I18N = { en: {
 <script src="/shared/i18n.js"></script>
 <script src="/shared/verbinding.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/ondernemerpoort.js" defer></script>
+<script src="/shared/rahul-mond.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

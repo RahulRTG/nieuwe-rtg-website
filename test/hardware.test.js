@@ -123,7 +123,10 @@ test('8. een concept naar de winkel zetten en weer terughalen', async () => {
   const slug = inWinkel.body.slug;
   // de RTG Mall (het eigen-merk) bevat het nu, naast de vaste producten
   const u = Date.now().toString().slice(-8);
-  const reg = await api('/api/auth/register', { name: 'Koper', email: 'k' + u + '@x.nl', phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+  // een gewoon ingelogd lid volstaat om in de Mall te bladeren en te bestellen;
+  // zelf-registreren levert altijd een RTG Pass (Business komt alleen na een
+  // menselijk besluit), dus registreren we hier netjes als RTG.
+  const reg = await api('/api/auth/register', { name: 'Koper', email: 'k' + u + '@x.nl', phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   const lid = reg.body.token;
   const cat = await api('/api/mall/eigen', {}, lid);
   assert.ok(cat.body.producten.some(p => p.slug === slug && p.eigen), 'het RTG-ontwerp staat in de Mall');

@@ -29,25 +29,29 @@
   .app .knop{margin-left:auto;padding:.35rem .8rem;font-size:.8rem;}
   .blader{display:flex;gap:.6rem;align-items:center;justify-content:center;margin-top:.9rem;color:var(--zacht);font-size:.82rem;}
   .leeg{color:var(--zacht);font-size:.9rem;padding:.8rem 0;}
+  .lees-overlay{position:fixed;inset:0;background:rgba(12,12,11,.7);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:1.2rem;overflow:auto;z-index:60;}
+  .lees-blad{background:var(--paneel,#141414);border:1px solid var(--lijn);border-radius:16px;max-width:40rem;width:100%;padding:1.4rem 1.5rem 2rem;margin:auto;}
+  .lees-blad .cat{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht);}
+  .lees-x{float:right;background:none;border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;padding:.25rem .8rem;font-size:.78rem;cursor:pointer;font-family:inherit;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🕊️ Geloof &amp; Wijsheid-Bibliotheek</h1>
-  <p class="intro" id="biebIntro">Een miljoen boeken en apps over alle religies en levensbeschouwingen; allemaal gratis, een cadeau van de RTFoundation. Geen aankopen, geen reclame.</p>
+  <h1>Geloof &amp; Wijsheid-Bibliotheek</h1>
+  <p class="intro" id="biebIntro">Een echte, leesbare kern over alle religies en levensbeschouwingen; als gelijken naast elkaar, allemaal gratis, een cadeau van de RTFoundation. Open een tekst en lees.</p>
 
   <div class="gelijk">
     <b>Alle tradities, als gelijken.</b> Elke religie en levensbeschouwing staat hier naast elkaar, met respect, zonder rangorde en zonder oordeel. Elke traditie vertelt haar eigen waarheid. Ook wie niet gelooft, vindt hier een plek. Je ziet alleen wat bij jouw leeftijd past.
   </div>
 
   <div class="kaart" style="padding:.8rem .9rem;margin-bottom:.9rem;">
-    <b style="font-size:.92rem;">💬 De bibliothecaris</b>
+    <b style="font-size:.92rem;">De bibliothecaris</b>
     <p class="intro" style="margin:.25rem 0 .5rem;font-size:.84rem;">Vertel wat je zoekt of wilt begrijpen; de bibliothecaris zoekt door alle tradities heen en raadt echte boeken aan. Neutraal en met respect, nooit om je te overtuigen.</p>
     <div class="zoekrij" style="margin-bottom:0;">
       <input id="bibVraag" class="veld" maxlength="300" placeholder="Bijv. verhalen over vrede en vergeving">
-      <button class="knop" id="bibGo" type="button">✨ Vraag</button>
+      <button class="knop" id="bibGo" type="button">Vraag</button>
     </div>
     <div id="bibUit" style="font-size:.84rem;color:var(--zacht);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>
   </div>
@@ -94,9 +98,9 @@ const euro = c => 'EUR ' + (c / 100).toFixed(2).replace('.', ',');
 async function start(){
   try {
     const d = await api('');
-    $('#biebIntro').textContent = d.totaal.toLocaleString('nl-NL') + ' boeken en apps over alle religies en levensbeschouwingen; allemaal gratis, een cadeau van de RTFoundation. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.';
+    $('#biebIntro').textContent = d.totaal.toLocaleString('nl-NL') + ' leesbare teksten over alle religies en levensbeschouwingen; als gelijken naast elkaar, allemaal gratis. Je ziet alleen wat bij jouw leeftijd past.';
     $('#bTrad').innerHTML = '<option value="">Alle tradities</option>' +
-      d.tradities.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+      d.tradities.map(c => '<option value="'+c.id+'">'+esc(c.label)+' ('+c.aantal+')</option>').join('');
     $('#bThema').innerHTML = '<option value="">Alle thema\'s</option>' +
       d.themas.map(t => '<option value="'+t.nr+'">'+esc(t.label)+'</option>').join('');
   } catch (e) { $('#bGrid').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
@@ -104,13 +108,32 @@ async function start(){
 }
 function kaart(a, vanMij){
   return '<div class="kaart app">'+
-    '<span class="cat">'+a.icon+' '+esc(a.traditieLabel)+'</span>'+
+    '<span class="cat">'+esc(a.traditieLabel)+' · '+esc(a.thema)+'</span>'+
     '<b>'+esc(a.naam)+'</b>'+
-    '<small>voor '+esc(a.doelgroepLabel)+' · ★ '+a.sterren.toFixed(1)+' · '+a.grootteMB+' MB</small>'+
-    '<div class="rij"><s>'+euro(a.winkelwaardeCenten)+'</s><span class="gratis">Gratis</span>'+
+    (a.uitleg?'<small style="line-height:1.5;">'+esc(a.uitleg)+'</small>':'')+
+    '<small>voor '+esc(a.doelgroepLabel)+'</small>'+
+    '<div class="rij"><span class="gratis">Gratis · leesbaar</span>'+
+    '<button class="knop blees" data-id="'+esc(a.id)+'">Lezen</button>'+
     (vanMij ? '<button class="knop stil bweg" data-id="'+esc(a.id)+'">Opruimen</button>'
-            : '<button class="knop bin" data-id="'+esc(a.id)+'">In mijn kast</button>')+
+            : '<button class="knop stil bin" data-id="'+esc(a.id)+'">In mijn kast</button>')+
     '</div></div>';
+}
+async function lees(id){
+  try {
+    const r = await api('/lees', { id });
+    const b = r.boek;
+    const wrap = document.createElement('div');
+    wrap.className = 'lees-overlay';
+    wrap.innerHTML = '<div class="lees-blad"><button class="lees-x" aria-label="Sluiten">Sluiten</button>'+
+      '<span class="cat">'+esc(b.traditieLabel)+' · '+esc(b.thema)+'</span>'+
+      '<h2 style="font-family:\'Bodoni Moda\',serif;margin:.2rem 0 .8rem;">'+esc(b.naam)+'</h2>'+
+      b.tekst.split('\n\n').map(p=>'<p style="line-height:1.75;margin:.6rem 0;">'+esc(p)+'</p>').join('')+
+      '<p style="margin-top:1.2rem;color:var(--soft,#8A8680);font-size:.82rem;">Uit de Geloof &amp; Wijsheid-Bibliotheek van de RTFoundation. Alle tradities als gelijken, met respect.</p></div>';
+    document.body.appendChild(wrap);
+    const sluit = ()=>wrap.remove();
+    wrap.querySelector('.lees-x').addEventListener('click', sluit);
+    wrap.addEventListener('click', e=>{ if(e.target===wrap) sluit(); });
+  } catch(e){ alert(e.message); }
 }
 async function teken(){
   const grid = $('#bGrid'), blader = $('#bBlader');
@@ -139,6 +162,7 @@ async function teken(){
     grid.querySelectorAll('.bweg').forEach(b => b.addEventListener('click', async () => {
       try { await api('/weg', { id: b.dataset.id }); teken(); } catch (e) { alert(e.message); }
     }));
+    grid.querySelectorAll('.blees').forEach(b => b.addEventListener('click', () => lees(b.dataset.id)));
   } catch (e) { grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 $('#bTrad').addEventListener('change', () => { ST.categorie = $('#bTrad').value; ST.pagina = 1; ST.mijn = false; teken(); });
@@ -149,6 +173,11 @@ start();
 </script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

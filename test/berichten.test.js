@@ -60,3 +60,107 @@ test('alle bronnen komen op een plek samen: Rahul, de Berichtenbox en Pulse-reac
 test('zonder inloggen geen berichten (401)', async () => {
   assert.equal((await raw('/member/berichten', {}, null)).status, 401);
 });
+
+/* ---- de app-kant: zoeken, vlaggen en de drie AI-taken ----
+   Deze toetsen leggen de BELOFTES van de app vast, want dat zijn de dingen die
+   stilletjes kunnen verschuiven: dat zoeken laat zien waarom iets een treffer
+   is, dat archiveren niets weggooit, dat een stilgezet gesprek niet meetelt, en
+   vooral: dat de AI OPSTELT en nooit VERSTUURT. */
+
+// twee leden die elkaars vriend zijn, met een gesprek ertussen
+async function tweeMetGesprek(tekst) {
+  const a = await lid(), b = await lid();
+  const mijA = await json(await raw('/member/connections', {}, a));
+  const mijB = await json(await raw('/member/connections', {}, b));
+  await raw('/member/connect', { key: mijB.me }, a);
+  await raw('/member/connect/respond', { key: mijA.me, action: 'accept' }, b);
+  const g = await raw('/member/dm/send', { toKey: mijB.me, text: tekst }, a);
+  return { a, b, keyB: mijB.me, gelukt: g.status === 200 };
+}
+
+test('zoeken vindt een woord terug in een prive-gesprek, met kanaal en tijdstip', async () => {
+  const { a, gelukt } = await tweeMetGesprek('De sleutel ligt bij de receptie');
+  assert.ok(gelukt, 'de twee leden zijn verbonden en het bericht is verstuurd');
+  const z = await json(await raw('/member/berichten/zoek', { vraag: 'sleutel' }, a));
+  assert.ok(z.treffers.length >= 1, 'de treffer staat erin');
+  const t = z.treffers[0];
+  assert.equal(t.soort, 'dm');
+  assert.ok(t.tekst.toLowerCase().includes('sleutel'), 'het stukje tekst laat zien WAAROM het een treffer is');
+  assert.ok(t.at, 'met een tijdstip');
+});
+
+test('een te korte zoekvraag zoekt niet (geen losse letter door alles heen)', async () => {
+  const a = await lid();
+  const z = await json(await raw('/member/berichten/zoek', { vraag: 'a' }, a));
+  assert.deepEqual(z.treffers, []);
+});
+
+test('vastzetten, stilzetten en archiveren doen precies wat ze beloven', async () => {
+  const { a, keyB, gelukt } = await tweeMetGesprek('hallo daar');
+  assert.ok(gelukt);
+  const id = 'dm:' + keyB;
+
+  await raw('/member/berichten/vlag', { id, vlag: 'vast', aan: true }, a);
+  let l = await json(await raw('/member/berichten', {}, a));
+  assert.equal(l.kanalen[0].id, id, 'een vastgezet gesprek staat bovenaan');
+  assert.equal(l.kanalen[0].vast, true);
+
+  // archiveren haalt hem uit de lijst, maar gooit NIETS weg
+  await raw('/member/berichten/vlag', { id, vlag: 'weg', aan: true }, a);
+  l = await json(await raw('/member/berichten', {}, a));
+  assert.ok(!l.kanalen.some(k => k.id === id), 'weg uit de gewone lijst');
+  assert.equal(l.inArchief, 1, 'en geteld als gearchiveerd');
+  const arch = await json(await raw('/member/berichten', { archief: true }, a));
+  assert.ok(arch.kanalen.some(k => k.id === id), 'het gesprek bestaat nog gewoon');
+
+  // terug uit het archief en stilzetten: telt niet meer mee in de teller
+  await raw('/member/berichten/vlag', { id, vlag: 'weg', aan: false }, a);
+  await raw('/member/berichten/vlag', { id, vlag: 'stil', aan: true }, a);
+  l = await json(await raw('/member/berichten', {}, a));
+  assert.equal(l.kanalen.find(k => k.id === id).stil, true);
+});
+
+test('een onbekende vlag wordt geweigerd', async () => {
+  const a = await lid();
+  assert.equal((await raw('/member/berichten/vlag', { id: 'dm:x', vlag: 'verwijder', aan: true }, a)).status, 400);
+});
+
+test('het gesprek zegt zelf welke bel van mij is (de client kent geen sessiesleutels)', async () => {
+  const { a, keyB, gelukt } = await tweeMetGesprek('dit is van mij');
+  assert.ok(gelukt);
+  const d = await json(await raw('/member/dm', { withKey: keyB }, a));
+  const m = d.messages[d.messages.length - 1];
+  assert.equal(m.mij, true, 'mijn eigen bericht staat als van mij gemarkeerd');
+});
+
+test('zonder AI-sleutel: een eerlijke melding, geen verzonnen samenvatting', async () => {
+  // de testserver draait zonder AI-sleutels, dus de uitwijkketen is leeg
+  const { a, keyB, gelukt } = await tweeMetGesprek('zullen we morgen om drie uur?');
+  assert.ok(gelukt);
+  for (const taak of ['samenvatting', 'concept', 'afspraken']) {
+    const r = await raw('/member/berichten/' + taak, { id: 'dm:' + keyB }, a);
+    const b = await json(r);
+    assert.equal(r.status, 503, taak + ': eerlijk melden dat de AI er niet is');
+    assert.equal(b.ok, false);
+    assert.ok(/niet bereikbaar/i.test(b.reden), taak + ': met een leesbare reden');
+    assert.equal(b.samenvatting, undefined, taak + ': en zonder verzonnen inhoud');
+    assert.equal(b.concept, undefined);
+  }
+});
+
+test('de AI stelt op maar verstuurt nooit', async () => {
+  const { a, keyB, gelukt } = await tweeMetGesprek('hoi');
+  assert.ok(gelukt);
+  const voor = await json(await raw('/member/dm', { withKey: keyB }, a));
+  await raw('/member/berichten/concept', { id: 'dm:' + keyB, wens: 'zeg dat het goed komt' }, a);
+  const na = await json(await raw('/member/dm', { withKey: keyB }, a));
+  assert.equal(na.messages.length, voor.messages.length,
+    'na een concept staat er geen enkel bericht extra in het gesprek');
+});
+
+test('een gesprek dat niet van mij is, lees ik niet', async () => {
+  const a = await lid();
+  const r = await raw('/member/berichten/samenvatting', { id: 'dm:iemand-anders' }, a);
+  const b = await json(r);
+  assert.equal(b.ok, false, 'geen draad, dus geen samenvatting');
+});

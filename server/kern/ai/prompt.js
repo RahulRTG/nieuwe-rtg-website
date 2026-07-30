@@ -4,8 +4,10 @@
    kern/ai.js. Het vaste karakterportret van Rahul (statische tekst) woont in
    ./karakter; hier wordt het aangevuld met het register en de dagcontext. */
 const RAHUL_KARAKTER = require('./karakter');
+const { TAALREGELS } = require('../rahul/taal');
+const { TWIJFELREGELS } = require('../rahul/twijfel');
 module.exports = (ctx) => {
-  const { db, PERSONAS, AI_TONE, naamEn, dagContext } = ctx;
+  const { db, PERSONAS, AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel } = ctx;
   function aiSystemPrompt(tier, lang, key) {
     const persona = PERSONAS[tier];
     const trip = db.data.trip;
@@ -29,6 +31,17 @@ module.exports = (ctx) => {
       // de dagcontext: Rahul denkt aan tijd, seizoen en temperatuur
       dagContext().zin + ' Weeg dat mee in adviezen (kleding, terras of binnen, dagplanning, seizoensgerechten).',
       AI_TONE[tier] || AI_TONE.rtg,
+      // Geen AI-taal (kern/rahul/taal.js): de regels hier, en een schrobber
+      // over de uitvoer, want een prompt is een verzoek en geen garantie.
+      ...TAALREGELS,
+      // Bij twijfel doet hij niets en vraagt hij door (kern/rahul/twijfel.js).
+      // Staat ook als harde poort in de doe-lus; hier voor het gewone gesprek.
+      ...TWIJFELREGELS,
+      // De bui van vandaag. Raakt alleen de toon; valt weg bij een kind, op de
+      // werkvloer en zodra het ergens over gaat (kern/rahul/stemming.js).
+      ...(stemmingVoor ? [stemmingVoor({ kind: false, werk: false })].filter(Boolean) : []),
+      // Wat het lid zelf over geloof heeft aangegeven, of juist niet.
+      ...(geloofRegel ? [geloofRegel(key)].filter(Boolean) : []),
       ...(omgang ? [omgang] : []),
       'Je bent de frictieloze rechterhand van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay), verwijs daarnaar, vraag nooit om betaalgegevens.',
       'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig je kort dat het geregeld is en noem je wat je vervolgens in de gaten houdt.',

@@ -47,7 +47,7 @@ function maakLidboard({ db, save }) {
     { id: 'rahul',     cat: 'ai', naam: 'Rahul (AI-hulp)',   uitleg: 'Je persoonlijke reis-AI.' },
     { id: 'spraak',    cat: 'ai', naam: 'Spraakbediening',   uitleg: 'Rahul met je stem bedienen.' },
     { id: 'push',      cat: 'ai', naam: 'Pushmeldingen',     uitleg: 'Meldingen op je toestel.' },
-    { id: 'streak',    cat: 'ai', naam: 'Dag-opdracht & vuurtjes', uitleg: 'De dagelijkse opdracht en streaks.' },
+    { id: 'streak',    cat: 'ai', naam: 'Dag-opdracht', uitleg: 'De dagelijkse foto-uitnodiging. Overslaan kost je niets.' },
     // --- Verbindingen (toestel; deel standaard uit) ---
     { id: 'gps',       cat: 'verbinding', naam: 'GPS-tracking',       uitleg: 'Locatiebepaling door het toestel.', standaard: false },
     { id: 'wifi',      cat: 'verbinding', naam: 'Wifi-koppeling',     uitleg: 'Koppelen met lokale wifi (bijv. een Zaakdoos).' },

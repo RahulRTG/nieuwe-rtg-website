@@ -1,6 +1,7 @@
 /* Vakwerk: het slimme dashboard voor de dienstverlenende genres, de
-   zelfstandige professional (zzp), de privechef (chef) en wellness & spa
-   (wellness). Deze genres draaien op hetzelfde aanbod-/boekingsmodel
+   zelfstandige professional (zzp), de privechef (chef), wellness & spa
+   (wellness) en bouw & installatie (bouw: timmerman, loodgieter,
+   elektricien). Deze genres draaien op hetzelfde aanbod-/boekingsmodel
    (s.services + db.data.boekingen met de statusketen aangevraagd ->
    bevestigd -> afgerond). Deze module tilt ze naar hetzelfde niveau als de
    horeca- en hoteltorens: een vandaag-bord, de eerstvolgende afspraken, de
@@ -12,25 +13,10 @@
    orkestrator: de genres, de gedeelde helpers en het bord wonen hier; de
    beschikbaarheid en tijdvakken in ./agenda, de AI-adviseur in ./advies. */
 
-const VAK_GENRES = {
-  zzp: {
-    label: 'Zelfstandig professional',
-    werk: 'afspraak', werkMv: 'afspraken',
-    persona: 'je bent de nuchtere bedrijfsadviseur van een zelfstandige professional op RTG. Je denkt mee over agenda, aanbod, tarieven en klantcontact, kort en concreet.'
-  },
-  chef: {
-    label: 'Privechef & catering',
-    werk: 'opdracht', werkMv: 'opdrachten',
-    persona: 'je bent de ervaren culinair bedrijfsadviseur van een privechef & cateraar op RTG. Je denkt mee over boekingen, menuvoorstellen, mise en place en marge, kort en concreet.'
-  },
-  wellness: {
-    label: 'Wellness & spa',
-    werk: 'behandeling', werkMv: 'behandelingen',
-    persona: 'je bent de spa-manager die meedenkt met een wellness- & spa-aanbieder op RTG. Je denkt mee over de behandelagenda, bezetting, het aanbod en rust in de planning, kort en concreet.'
-  }
-};
+const { VAK_GENRES } = require('./genres');
 
-function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon }) {
+function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon,
+  crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
   const rond = n => Math.round((Number(n) || 0) * 100) / 100;
@@ -124,9 +110,11 @@ function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, scho
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = { db, save, anthropic, findSupplier, boekingenVanZaak, scho, vandaagStr, rond,
-    datumVan, tijdVan, geldDag, genreVan, isVak, geldigeTijd, naarMin, naarTijd, publiek, bord, VAK_GENRES };
+    datumVan, tijdVan, geldDag, genreVan, isVak, geldigeTijd, naarMin, naarTijd, publiek, bord, VAK_GENRES,
+    crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe };
   const api = { GENRES: VAK_GENRES, isVak, bord };
-  Object.assign(api, require('./agenda')(ctx), require('./advies')(ctx));
+  Object.assign(api, require('./agenda')(ctx), require('./advies')(ctx),
+    require('./pro')(ctx), require('./pro2')(ctx), require('./pro3')(ctx), require('./pro4')(ctx));
   return { vakwerk: api };
 }
 

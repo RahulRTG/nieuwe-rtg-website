@@ -17,17 +17,17 @@
   if (window.RTGGeluid) return;
 
   var STATIONS = [
-    { id: 'sunset', naam: 'Sunset Lounge', sub: 'chill · 84 bpm', icoon: '🌅', hoes: 'h-sunset',
+    { id: 'sunset', naam: 'Sunset Lounge', sub: 'chill · 84 bpm', icoon: '', hoes: 'h-sunset',
       bpm: 84, toon: 57, akkoorden: [[0,3,7,10],[5,8,12,15],[3,7,10,14],[10,14,17,21]], perc: 'zacht', arp: true },
-    { id: 'beach', naam: 'Beach Club', sub: 'house · 118 bpm', icoon: '🏖️', hoes: 'h-beach',
+    { id: 'beach', naam: 'Beach Club', sub: 'house · 118 bpm', icoon: '', hoes: 'h-beach',
       bpm: 118, toon: 55, akkoorden: [[0,3,7,10],[8,12,15,19],[5,8,12,15],[7,10,14,17]], perc: 'club', arp: true },
-    { id: 'jazz', naam: 'Salon Jazz', sub: 'diner · 72 bpm', icoon: '🥂', hoes: 'h-jazz',
+    { id: 'jazz', naam: 'Salon Jazz', sub: 'diner · 72 bpm', icoon: '', hoes: 'h-jazz',
       bpm: 72, toon: 58, akkoorden: [[0,4,7,11],[5,9,12,16],[7,11,14,17],[2,5,9,12]], perc: 'brush', arp: false },
-    { id: 'golden', naam: 'Golden Hour', sub: 'warm · 64 bpm', icoon: '🌇', hoes: 'h-golden',
+    { id: 'golden', naam: 'Golden Hour', sub: 'warm · 64 bpm', icoon: '', hoes: 'h-golden',
       bpm: 64, toon: 53, akkoorden: [[0,4,7,11],[9,12,16,19],[5,9,12,16],[7,10,14,19]], perc: 'geen', arp: false },
-    { id: 'focus', naam: 'Focus', sub: 'ambient · 60 bpm', icoon: '🌿', hoes: 'h-focus',
+    { id: 'focus', naam: 'Focus', sub: 'ambient · 60 bpm', icoon: '', hoes: 'h-focus',
       bpm: 60, toon: 50, akkoorden: [[0,7,12,16],[5,12,17,21],[3,10,15,19],[0,7,12,16]], perc: 'geen', arp: true },
-    { id: 'nacht', naam: 'Club Nacht', sub: 'deep · 122 bpm', icoon: '🌙', hoes: 'h-nacht',
+    { id: 'nacht', naam: 'Club Nacht', sub: 'deep · 122 bpm', icoon: '', hoes: 'h-nacht',
       bpm: 122, toon: 52, akkoorden: [[0,3,7,12],[10,14,17,22],[8,12,15,20],[5,8,12,17]], perc: 'club', arp: true }
   ];
   var W1 = ['Cala', 'Vora', 'Luna', 'Brisa', 'Sal', 'Isla', 'Alba', 'Mar', 'Ola', 'Sombra'];

@@ -11,14 +11,16 @@ const PERSONAS = { rtg: { codename: 'De Reiziger' } };
 // Twee partners: een restaurant (bestemming) en een taxi (lopende rit).
 function opstelling() {
   const spied = { customer: [], supplier: [], office: 0 };
-  const db = { data: {
+  // db.capsVan komt van de werkvormen-laag; die haken we hier net zo aan als
+  // de echte db doet, zodat de stub dezelfde caps-afleiding gebruikt.
+  const db = require('../server/kern/werkvormen').haakAan({ data: {
     live: {}, orders: [], rides: [],
     supplierTypes: { horeca: { label: 'Restaurant', icon: '🍽' }, taxi: { label: 'Taxi', icon: '🚕' } },
     suppliers: [
       { code: 'KIKUNOI', name: 'Kikunoi', type: 'horeca', loc: { lat: 52.37, lng: 4.90, label: 'Amsterdam' }, doors: [] },
       { code: 'RTGCARS', name: 'RTG Cars', type: 'taxi', loc: { lat: 52.30, lng: 4.76 } }
     ]
-  } };
+  } });
   const live = maakLive({
     db, bus: { publish: (_ch, msg) => spied.customer.push(msg) },
     nextSseId: () => 1, PERSONAS,

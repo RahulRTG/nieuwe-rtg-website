@@ -64,12 +64,13 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
   }
 
   /* ---- de AI-schrijfhulp: stelt alleen voor, de mens voegt in of niet ---- */
-  const AI_OPDRACHTEN = ['samenvatten', 'herschrijven', 'doorschrijven', 'formule'];
+  const AI_OPDRACHTEN = ['samenvatten', 'herschrijven', 'doorschrijven', 'formule',
+    'actiepunten', 'inkorten', 'engels', 'kritisch'];
   async function aiHulp(key, did, opdracht, vraag, kring) {
     const d = docMet(did);
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
     if (!magSchrijven(d, key, kring)) return { status: 403, error: 'AI-hulp is er voor wie mag schrijven.' };
-    if (!AI_OPDRACHTEN.includes(opdracht)) return { status: 400, error: 'Kies samenvatten, herschrijven, doorschrijven of formule.' };
+    if (!AI_OPDRACHTEN.includes(opdracht)) return { status: 400, error: 'Deze opdracht kent RTG Office niet.' };
     const kaal = d.soort === 'tekst' ? String(d.inhoud.tekst || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 6000)
       : d.soort === 'presentatie' ? (d.inhoud.dias || []).map(x => x.titel + ': ' + x.tekst).join('\n').slice(0, 6000)
       : '';
@@ -77,9 +78,13 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
     if (anthropic) {
       try {
         const prompt = opdracht === 'formule'
-          ? 'Geef voor een eenvoudig rekenblad (functies: SOM, GEM, MIN, MAX, AANTAL over een bereik als =SOM(A1:A5), celverwijzingen en +-*/) precies een formule voor deze wens, alleen de formule zelf: ' + w
+          ? 'Geef voor een eenvoudig rekenblad (functies: SOM, GEM, MIN, MAX, AANTAL, AFRONDEN en ALS, over een bereik als =SOM(A1:A5), celverwijzingen en +-*/) precies een formule voor deze wens, alleen de formule zelf: ' + w
           : opdracht === 'samenvatten' ? 'Vat deze kantoortekst samen in drie tot vijf zinnen, in het Nederlands:\n' + kaal
           : opdracht === 'herschrijven' ? 'Herschrijf deze tekst zakelijk en helder, in het Nederlands, ongeveer even lang:\n' + kaal
+          : opdracht === 'actiepunten' ? 'Haal uit deze tekst de actiepunten. Geef per punt: wie, wat, en wanneer (laat open wat er niet staat). Alleen de lijst, in het Nederlands:\n' + kaal
+          : opdracht === 'inkorten' ? 'Kort deze tekst in tot ongeveer de helft, zonder dat er inhoud verdwijnt. Nederlands:\n' + kaal
+          : opdracht === 'engels' ? 'Translate this business document into professional British English. Keep the structure. Return only the translation:\n' + kaal
+          : opdracht === 'kritisch' ? 'Lees dit stuk als een kritische lezer in de directiekamer. Noem in maximaal vijf punten wat er zwak, onduidelijk of onbeantwoord is. Adviserend, in het Nederlands; jij beslist niets:\n' + kaal
           : 'Schrijf twee tot vier zinnen die dit stuk logisch voortzetten, in het Nederlands' + (w ? ' (wens: ' + w + ')' : '') + ':\n' + kaal;
         const uit = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 600,
           messages: [{ role: 'user', content: prompt }] });
@@ -92,7 +97,12 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
       samenvatten: 'Samenvatting (demo): dit document beschrijft de kern in enkele alinea\'s; de belangrijkste punten staan bovenaan en de afspraken onderaan.',
       herschrijven: 'Herschreven (demo): ' + (kaal ? kaal.slice(0, 240) : 'Begin met een korte, heldere openingszin en sluit af met de afspraak.'),
       doorschrijven: 'Vervolg (demo): In de volgende stap werken we dit punt concreet uit, met een verantwoordelijke en een datum per actie.',
-      formule: w && /som|totaal|optel/i.test(w) ? '=SOM(A1:A10)' : w && /gemiddel/i.test(w) ? '=GEM(A1:A10)' : '=SOM(A1:A5)'
+      formule: w && /som|totaal|optel/i.test(w) ? '=SOM(A1:A10)' : w && /gemiddel/i.test(w) ? '=GEM(A1:A10)'
+        : w && /afrond/i.test(w) ? '=AFRONDEN(A1;2)' : w && /als|indien|drempel/i.test(w) ? '=ALS(A1>100;"boven";"onder")' : '=SOM(A1:A5)',
+      actiepunten: 'Actiepunten (demo):\n- [wie] · [wat] · [wanneer]\n- [wie] · [wat] · [wanneer]\nZet er per punt een naam en een datum bij; zonder die twee is het geen actiepunt.',
+      inkorten: 'Ingekort (demo): ' + (kaal ? kaal.slice(0, 180) : 'Zeg hetzelfde in de helft van de woorden; schrap wat de lezer al weet.'),
+      engels: 'English (demo): this document sets out the background, the proposal and the decision requested. Set an API key for a real translation.',
+      kritisch: 'Kritisch gelezen (demo): 1) De gevraagde beslissing staat er niet expliciet in. 2) Er ontbreekt een datum bij de acties. 3) De cijfers worden genoemd maar niet onderbouwd. U beslist zelf wat u ermee doet.'
     };
     return { status: 200, opdracht, voorstel: demo[opdracht], demo: true };
   }

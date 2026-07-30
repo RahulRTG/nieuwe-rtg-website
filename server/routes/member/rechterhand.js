@@ -11,9 +11,9 @@ module.exports = (kern) => {
     mecenaat, mecGift, mecGiftWeg, mecBetaald,
     nalatenschap, nlDoc, nlDocWeg, nlContact, nlContactWeg, nlWens, nlWensWeg,
     logboek, lbObject, lbObjectWeg, lbRegel, lbRegelWeg,
-    cercle, crClub, crClubWeg,
+    cercle, crClub, crClubWeg, crGast, crGastTerug, crWaarheen,
     hangar, hgToestel, hgToestelWeg, hgVlucht, hgVluchtWeg,
-    entourage, enPersoon, enPersoonWeg,
+    entourage, enPersoon, enPersoonWeg, enDoc, enDocWeg, enGezelschap,
     attenties, atRelatie, atRelatieWeg, atGift, atGiftWeg,
     rechterhandAI } = kern;
 
@@ -89,6 +89,11 @@ module.exports = (kern) => {
   route('cercle', (k) => cercle(k));
   route('cercle/club', (k, b) => crClub(k, b));
   route('cercle/club/weg', (k, b) => crClubWeg(k, String(b.id || '')));
+  /* Gastpassen met een boekhouding en de reciprociteitsvraag "waar kan ik in
+     deze stad terecht" -- elders werk voor een conciergedienst. */
+  route('cercle/gast', (k, b) => crGast(k, b));
+  route('cercle/gast/terug', (k, b) => crGastTerug(k, b));
+  route('cercle/waarheen', (k, b) => crWaarheen(k, b));
   // Hangar
   route('hangar', (k) => hangar(k));
   route('hangar/toestel', (k, b) => hgToestel(k, b));
@@ -99,6 +104,11 @@ module.exports = (kern) => {
   route('entourage', (k) => entourage(k));
   route('entourage/persoon', (k, b) => enPersoon(k, b));
   route('entourage/persoon/weg', (k, b) => enPersoonWeg(k, String(b.id || '')));
+  /* Documenten met een vervaldatum (elders de betaalde functie van een reisapp)
+     en het gezelschap samenstellen met een gereedheidscheck. */
+  route('entourage/doc', (k, b) => enDoc(k, b));
+  route('entourage/doc/weg', (k, b) => enDocWeg(k, b));
+  route('entourage/gezelschap', (k, b) => enGezelschap(k, b));
   // Attenties
   route('attenties', (k) => attenties(k));
   route('attenties/relatie', (k, b) => atRelatie(k, b));

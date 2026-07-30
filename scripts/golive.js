@@ -97,6 +97,37 @@ function leesEnvBestand(pad) {
   if (process.env.RTG_DEMO !== '1')
     goed('Demo-inlog (universeel account) staat uit in productie; leden loggen in via hun account, personeel met pincode.');
 
+  /* De papieren kant, als ECHTE controle in plaats van een herinnering.
+
+     Hier stond eerst alleen een regel tekst: "AVG op orde: verwerkersafspraken
+     en het verwerkingsregister bijgewerkt." Dat is precies het soort
+     proces-schijnvertoning waar niemand iets aan heeft -- een zin die je leest
+     en waar niets van afhangt. Nu leest de keuring de documenten echt en kijkt
+     of de plekken die alleen RTG kan invullen ook zijn ingevuld.
+
+     De documenten staan in git met {{merktekens}} op de plekken die alleen RTG
+     kan invullen; de antwoorden komen uit de vragen die Rahul stelt (zie
+     server/papieren/). De keuring vult het document hier dus echt in en telt
+     hoeveel gaten er overblijven -- geen aparte administratie die uit de pas
+     kan gaan lopen met het papier zelf.
+
+     Wat hij NIET kan: beoordelen of wat er staat juridisch klopt. Dat blijft
+     mensenwerk. Hij controleert alleen dat het bestaat en niet half af is. */
+  const papieren = require('../server/papieren');
+  const nogOpen = papieren.openVragen();
+  for (const naam of Object.keys(papieren.DOCUMENTEN)) {
+    const d = papieren.document(naam);
+    if (d.fout) { blokkeer(papieren.DOCUMENTEN[naam].bestand + ' ontbreekt: ' + papieren.DOCUMENTEN[naam].waarvoor + ' is verplicht voor je live gaat.'); continue; }
+    const controleer = (d.tekst.match(/\[(CONTROLEER|TE DOEN)/g) || []).length;
+    if (d.gaten) blokkeer(d.bestand + ': nog ' + d.gaten + ' open plek(ken) -- ' + d.waarvoor + ' is niet af.');
+    else if (controleer) waarschuw(d.bestand + ': ' + controleer + ' punt(en) die een jurist moet nakijken voor je live gaat.');
+    else goed(d.bestand + ' is ingevuld (' + d.waarvoor + '). Laat het alsnog juridisch nakijken.');
+  }
+  if (nogOpen.length)
+    blokkeer('Papierwerk: ' + nogOpen.length + ' van de ' + papieren.VRAGEN.length + ' vragen staan nog open (eerste: "' +
+      nogOpen[0].vraag + '"). Laat Rahul ze uitvragen op de technische pagina; met de hand in het bestand typen hoeft niet.');
+  else goed('Papierwerk: alle ' + papieren.VRAGEN.length + ' vragen zijn beantwoord.');
+
   // afdrukken, blokkers eerst
   uit.sort((a, b) => (b[2] ? 1 : 0) - (a[2] ? 1 : 0));
   console.log('\n=== RTG go-live-keuring ===\n');
@@ -109,9 +140,8 @@ function leesEnvBestand(pad) {
   console.log('\nBuiten de code, op de server zelf (zie PRODUCTION.md):');
   console.log(' - TLS-terminatie (reverse proxy of load balancer) VOOR de app; trust proxy staat al aan.');
   console.log(' - Rand-DDoS: DNS achter Cloudflare of gelijkwaardig met proxy aan; de app-WAF is de tweede linie.');
-  console.log(' - Backups van server/data (en Postgres) draaien EN terugzetten is echt getest.');
   console.log(' - Een onafhankelijke pentest voor de lancering; eigen tests vervangen geen vreemde ogen.');
-  console.log(' - AVG op orde: verwerkersafspraken met partners en het verwerkingsregister bijgewerkt.');
+  console.log('   (Backups: npm test -- test/herstelproef.test.js zet er echt een terug.)');
 
   console.log('');
   if (blokkers) {

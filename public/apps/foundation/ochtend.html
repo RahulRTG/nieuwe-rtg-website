@@ -50,8 +50,8 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>☀️ Ochtendritme</h1>
-  <div class="intro">Een rustig ochtendlijstje dat elke dag weer op nul begint. Vink af wat je gedaan hebt; wie alles rondkrijgt houdt een reeks bij. Geen druk - gewoon een fijn begin van de dag.</div>
+  <h1>Ochtendritme</h1>
+  <div class="intro">Een rustig ochtendlijstje dat elke dag weer op nul begint. Vink af wat je gedaan hebt. Er is geen reeks om te breken: elke ochtend telt op zichzelf, en een gemiste dag maakt niets stuk.</div>
 
   <div class="kaart blok">
     <div class="kop">
@@ -93,9 +93,9 @@ async function laad(){
   try{
     const d = await fetch('/api/foundation/gezin/'+s.code+'/ochtend?token='+encodeURIComponent(s.token)).then(r=>r.json());
     if (d.error) throw new Error(d.error);
-    // mijn reeks
-    $('#mijnReeks').innerHTML = d.mijn.reeks > 0
-      ? '🔥 <b>'+d.mijn.reeks+'</b> '+(d.mijn.reeks===1?'dag':'dagen')+(d.mijn.record>d.mijn.reeks?' · record '+d.mijn.record:'')
+    // de zachte weektelling: hoeveel ochtenden waren er de laatste zeven dagen rond
+    $('#mijnReeks').innerHTML = d.mijn.week > 0
+      ? 'deze week <b>'+d.mijn.week+'</b> '+(d.mijn.week===1?'ochtend':'ochtenden')+' rond'
       : '';
     // mijn stappen
     if (!d.mijn.stappen.length){ $('#mijnStappen').innerHTML = '<div class="leeg">Nog geen stappen. Tik hieronder een voorbeeld aan of typ je eerste stap.</div>'; }
@@ -115,7 +115,7 @@ async function laad(){
       rij.querySelector('[data-del]').onclick = ()=> doe('/gezin/ochtend/stap/verwijder', { stapId:id }, true);
     });
     // klaar-vlag
-    $('#klaarVlag').innerHTML = d.mijn.klaar ? '<div class="klaar-vlag">✨ Helemaal klaar voor vandaag. Fijne dag!</div>' : '';
+    $('#klaarVlag').innerHTML = d.mijn.klaar ? '<div class="klaar-vlag">Helemaal klaar voor vandaag. Fijne dag!</div>' : '';
     // voorbeelden (alleen die nog niet in mijn ritme staan)
     const heb = new Set(d.mijn.stappen.map(x=>x.tekst.toLowerCase()));
     $('#voorbeelden').innerHTML = d.voorbeelden.filter(v=>!heb.has(v.toLowerCase()))
@@ -128,7 +128,7 @@ async function laad(){
       '<div class="bordrij">'
       + '<span class="naam">'+esc(b.naam)+(b.pid===d.mijnId?' <span class="meta">(jij)</span>':'')+'</span>'
       + '<span class="meta">'+ (b.heeftRitme ? (b.klaar ? '<span class="vinkje">✓ klaar</span>' : b.gedaan+'/'+b.totaal) : 'geen ritme') +'</span>'
-      + (b.reeks>0?'<span class="rk">🔥 '+b.reeks+'</span>':'')
+      + (b.week>0?'<span class="rk">'+b.week+'x deze week</span>':'')
       + '</div>'
     ).join('') || '<div class="leeg">Nog niemand met een ochtendritme.</div>';
     // kinderen (ouder/beheerder)
@@ -175,6 +175,11 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

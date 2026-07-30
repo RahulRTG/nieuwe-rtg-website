@@ -1,8 +1,3 @@
-    if (z.apotheken) {
-      $('#kVoorschrijf').hidden = false;
-      $('#rApotheek').innerHTML = z.apotheken.map(a => '<option value="' + a.code + '">' + esc(a.naam) + '</option>').join('');
-      $('#eigenRecepten').innerHTML = (z.eigenRecepten || []).slice(0, 5).map(r => esc(r.middel) + ' (' + esc(r.status) + ')').join('<br>');
-    }
     if (z.verwijsDoelen && z.verwijsDoelen.length) {
       $('#kVerwijs').hidden = false;
       $('#vNaar').innerHTML = z.verwijsDoelen.map(v => '<option value="' + v.code + '">' + esc(v.naam) + ' (' + esc(v.soort) + ')</option>').join('');
@@ -153,3 +148,13 @@
       '<button class="knop klein" data-ktnee="' + l.met + '" type="button">Weiger</button>').join('');
     document.querySelectorAll('[data-ktja]').forEach(b => b.addEventListener('click', () => ktDoe('keten/beslis', { korps: b.dataset.ktja, akkoord: true })));
     document.querySelectorAll('[data-ktnee]').forEach(b => b.addEventListener('click', () => ktDoe('keten/beslis', { korps: b.dataset.ktnee, akkoord: false })));
+    const opties = (st.kanalen || []).map(k => '<option value="' + k.id + '">' + esc(k.naam) + '</option>').join('');
+    const had = $('#ktKanaal').value;
+    $('#ktKanaal').innerHTML = opties || '<option value="">nog geen kanalen</option>';
+    if (had && [...$('#ktKanaal').options].some(o => o.value === had)) $('#ktKanaal').value = had;
+    ktGekozen = $('#ktKanaal').value || 'keten';
+    $('#ktGroepKorps').innerHTML = [st.eigen, ...(st.partners || [])].filter(Boolean)
+      .map(c => '<option value="' + c + '">' + c + '</option>').join('');
+    laadKetenGesprek();
+  }
+  async function laadKetenGesprek() {

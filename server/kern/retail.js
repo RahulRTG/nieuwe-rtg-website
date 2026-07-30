@@ -30,7 +30,7 @@ function maakRetail({ db, save, crypto, findSupplier, notify, notifySupplier, ss
   const rond = n => Math.round(n * 100) / 100;
   const schoon = (v, n) => String(v == null ? '' : v).trim().slice(0, n || 120);
 
-  function isRetail(s) { return s && ((db.data.supplierTypes[s.type] || {}).caps || []).includes('retail'); }
+  function isRetail(s) { return s && (db.capsVan(s)).includes('retail'); }
   function artikelVan(s, artikelId) { return (s.artikelen || []).find(a => a.id === artikelId); }
   function variantVan(s, vsku) {
     for (const a of s.artikelen || []) { const v = (a.varianten || []).find(x => x.vsku === vsku); if (v) return { artikel: a, variant: v }; }

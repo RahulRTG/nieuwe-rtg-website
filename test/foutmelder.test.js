@@ -23,7 +23,9 @@ const wacht = ms => new Promise(r => setTimeout(r, ms));
 test('stuurt een JSON-POST met de fout + context naar de webhook', async () => {
   const { srv, poort, ontvangen } = await nepWebhook();
   try {
-    const m = maakFoutmelder({ url: 'http://127.0.0.1:' + poort + '/hook', app: 'rtg-test' });
+    // localhost = een bewuste interne collector: intern:true (anders weigert de
+    // SSRF-poort een privé-adres, precies zoals bedoeld).
+    const m = maakFoutmelder({ url: 'http://127.0.0.1:' + poort + '/hook', app: 'rtg-test', intern: true });
     assert.strictEqual(m.actief, true);
     m.melden(new Error('kapot ding'), { p: '/api/x', id: 'abc' });
     for (let i = 0; i < 50 && ontvangen.length === 0; i++) await wacht(20);
@@ -38,7 +40,7 @@ test('stuurt een JSON-POST met de fout + context naar de webhook', async () => {
 test('tempert: dezelfde fout gaat binnen het venster maar één keer uit', async () => {
   const { srv, poort, ontvangen } = await nepWebhook();
   try {
-    const m = maakFoutmelder({ url: 'http://127.0.0.1:' + poort + '/hook', vensterMs: 60000 });
+    const m = maakFoutmelder({ url: 'http://127.0.0.1:' + poort + '/hook', vensterMs: 60000, intern: true });
     m.melden(new Error('zelfde'), { p: '/a' });
     m.melden(new Error('zelfde'), { p: '/a' });
     m.melden(new Error('zelfde'), { p: '/a' });
@@ -56,4 +58,15 @@ test('zonder URL: inert en gooit nooit', () => {
   const m = maakFoutmelder({ url: '' });
   assert.strictEqual(m.actief, false);
   assert.doesNotThrow(() => m.melden(new Error('x'), {}));
+});
+
+test('SSRF-poort: een privé/metadata-webhook wordt geweigerd (melder inert)', () => {
+  const stil = { warn() {} };
+  // standaard streng: elk privé-adres wordt geweigerd
+  assert.strictEqual(maakFoutmelder({ url: 'http://10.0.0.5/hook', log: stil }).actief, false);
+  // cloud-metadata wordt ALTIJD geweigerd, ook met intern:true
+  assert.strictEqual(maakFoutmelder({ url: 'http://169.254.169.254/latest/', log: stil }).actief, false);
+  assert.strictEqual(maakFoutmelder({ url: 'http://169.254.169.254/latest/', intern: true, log: stil }).actief, false);
+  // een gewone publieke https-webhook mag wel
+  assert.strictEqual(maakFoutmelder({ url: 'https://hooks.slack.com/services/T/B/x', log: stil }).actief, true);
 });

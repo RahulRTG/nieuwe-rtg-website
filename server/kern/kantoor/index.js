@@ -11,6 +11,7 @@
    zware berekeningen (weektrend/prestaties/actiecentrum) in ./metrics. */
 
 const { txLedgerAantal } = require('../../db'); // gecachete grootboek-teller (O(1), ~10 s vers)
+const inzagelog = require('../../inzagelog');  // spoor bij elke blik in de identiteitskluis
 
 function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   const metrics = require('./metrics')({ db, accounts, conciergeInbox, beveilig });
@@ -121,16 +122,35 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     };
   }
 
-  /* Backoffice: identiteitsverificaties beoordelen. */
-  function pendingVerifications() {
+  /* Backoffice: identiteitsverificaties beoordelen.
+
+     Dit is de grootste inzage die er bestaat: de backoffice ziet hier de echte
+     naam EN het e-mailadres van iedereen in de wachtrij. Precies daarom gaat
+     het door het inzagejournaal (server/inzagelog.js) -- één regel per keer dat
+     het scherm wordt geopend, met de id's die erin stonden. Anders is dit een
+     kluisdeur die openstaat zonder dat er ooit iets van te merken is.
+
+     wie = de backoffice-medewerker of eigenaar die het scherm opende; de route
+     geeft die mee. Wordt hij niet meegegeven, dan staat er 'backoffice' -- dat
+     is minder waard, maar nog altijd oneindig veel meer dan niets. */
+  function pendingVerifications(wie) {
+    const rij = accounts.listByVerification('pending');
+    try {
+      inzagelog.noteerVeel({
+        door: wie && wie.id != null ? { id: wie.id, naam: wie.naam } : { naam: 'backoffice' },
+        overIds: rij.map(u => u.id),
+        waarom: 'KYC: identiteitsverificaties beoordelen',
+        bron: 'backoffice/verificaties'
+      });
+    } catch (e) {}
     // De backoffice mag voor de KYC-controle de echte naam/e-mail uit de kluis zien.
-    return accounts.listByVerification('pending').map(u => ({
+    return rij.map(u => ({
       id: u.id, name: accounts.realNameOf(u), email: accounts.emailOf(u), codename: u.codename,
       tier: u.tier, doc: u.id_doc, at: u.created_at
     }));
   }
 
-  return { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, pendingVerifications };
+  return { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
 }
 
 module.exports = { maakKantoor };

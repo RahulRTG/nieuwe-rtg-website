@@ -55,7 +55,7 @@
     openMet = { staffId: Number(staffId), naam };
     const el = document.createElement('div');
     el.id = 'ccPaneel';
-    el.innerHTML = '<div id="ccKaart"><div id="ccKop">💬 ' + esc(naam) + '<button id="ccDicht" aria-label="' + T('cc.dicht', 'Sluiten') + '">✕</button></div>' +
+    el.innerHTML = '<div id="ccKaart"><div id="ccKop">' + esc(naam) + '<button id="ccDicht" aria-label="' + T('cc.dicht', 'Sluiten') + '">✕</button></div>' +
       '<div id="ccLijst"></div>' +
       '<div id="ccVoet"><input id="ccInput" placeholder="' + T('cc.ph', 'Bericht aan') + ' ' + esc(naam) + '"><button id="ccStuur">' + T('cc.stuur', 'Stuur') + '</button></div></div>';
     document.body.appendChild(el);
@@ -84,7 +84,7 @@
       return;
     }
     if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
-    toast('💬 ' + d.van + ': ' + String(d.text || '').slice(0, 70));
+    toast('' + d.van + ': ' + String(d.text || '').slice(0, 70));
     badges();
   }
 

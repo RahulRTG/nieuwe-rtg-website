@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · De Arena</title>
+<meta name="theme-color" content="#0E1220">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  /* De Arena voor 13 t/m 17: donker met neon, en echte tegenstanders */
+  :root{--a-nacht:#0E1220;--a-diep:#161B2E;--a-cyaan:#35E0D4;--a-magenta:#F25CA8;
+    --a-lime:#B7F04B;--a-amber:#F6B93B;--a-paars:#7C6CF0;--a-tekst:#EAF0FF;--a-mat:#8E97B8;}
+  html,body{height:100%;}
+  body{overflow:hidden;background:var(--a-nacht);color:var(--a-tekst);}
+  #doek{position:fixed;inset:0;display:block;}
+  .scherm{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;
+    justify-content:flex-start;gap:.8rem;padding:1.2rem;overflow-y:auto;}
+  .scherm[hidden]{display:none;}
+  .scherm::before{content:'';flex:1 0 .2rem;}
+  .scherm::after{content:'';flex:1 0 .2rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:2rem;margin:0;}
+  .sub{color:var(--a-mat);text-align:center;margin-bottom:.6rem;max-width:26rem;}
+  .kaart-a{width:min(26rem,92vw);border:0;border-radius:18px;padding:1.05rem 1.25rem;cursor:pointer;
+    display:flex;align-items:center;gap:1rem;font:inherit;text-align:left;background:var(--a-diep);
+    color:var(--a-tekst);border-left:5px solid var(--a-cyaan);}
+  .kaart-a b{font-size:1.25rem;display:block;}
+  .kaart-a span{font-size:.9rem;color:var(--a-mat);}
+  .kaart-a svg{width:2.9rem;height:2.9rem;flex:0 0 auto;}
+  .kaart-a.m2{border-left-color:var(--a-magenta);}
+  .kaart-a.m3{border-left-color:var(--a-lime);}
+  .kaart-a.m4{border-left-color:var(--a-amber);}
+  .kaart-a.m5{border-left-color:var(--a-paars);}
+  .duelbadge{margin-left:auto;background:rgba(53,224,212,.12);color:var(--a-cyaan);border-radius:999px;
+    padding:.2rem .7rem;font-size:.78rem;font-weight:700;white-space:nowrap;}
+  .m2 .duelbadge{background:rgba(242,92,168,.12);color:var(--a-magenta);}
+  .rand{background:transparent;border:2px solid var(--a-mat);color:var(--a-mat);border-radius:999px;
+    padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.4rem;}
+  .neon{background:var(--a-cyaan);border:0;color:#062522;border-radius:999px;padding:.8rem 2rem;
+    font:inherit;font-size:1.1rem;font-weight:800;cursor:pointer;box-shadow:0 0 24px rgba(53,224,212,.35);}
+  .neon[disabled]{opacity:.4;box-shadow:none;cursor:default;}
+  .bovenrij{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;}
+  .bovenrij[hidden]{display:none;}
+  .terugknop{background:rgba(14,18,32,.85);border:2px solid var(--a-cyaan);color:var(--a-tekst);border-radius:999px;
+    padding:.5rem 1.05rem;font:inherit;font-size:.95rem;font-weight:700;cursor:pointer;}
+  .kop-info{flex:1;text-align:center;font-weight:700;font-size:1.05rem;}
+  .uitnodiging{width:min(26rem,92vw);background:rgba(242,92,168,.1);border:1px solid var(--a-magenta);
+    border-radius:14px;padding:.75rem 1rem;display:flex;align-items:center;gap:.7rem;font-size:.95rem;}
+  .uitnodiging button{margin-left:auto;background:var(--a-magenta);border:0;color:#2C0617;border-radius:999px;
+    padding:.45rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
+  .keuze{width:min(26rem,92vw);display:flex;flex-direction:column;gap:.45rem;}
+  .keuze h3{margin:.4rem 0 .1rem;font-size:.95rem;color:var(--a-mat);text-transform:uppercase;letter-spacing:.08em;}
+  .persoon{display:flex;align-items:center;gap:.7rem;background:var(--a-diep);border-radius:12px;
+    padding:.65rem .9rem;cursor:pointer;border:2px solid transparent;}
+  .persoon.aan{border-color:var(--a-lime);}
+  .persoon .wie{font-weight:700;}
+  .persoon .waar{margin-left:auto;font-size:.8rem;color:var(--a-mat);}
+  .persoon .vink{width:1.3rem;text-align:center;color:var(--a-lime);font-weight:800;}
+  /* het duel zelf */
+  .som{font-size:clamp(2.6rem,10vw,4rem);font-weight:800;letter-spacing:.03em;text-shadow:0 0 30px rgba(53,224,212,.45);}
+  .invoer{min-height:3.2rem;font-size:2.2rem;font-weight:800;color:var(--a-amber);letter-spacing:.06em;}
+  .toetsen{display:grid;grid-template-columns:repeat(3,minmax(4.6rem,5.6rem));gap:.55rem;}
+  .toetsen button{font:inherit;font-size:1.5rem;font-weight:800;padding:.85rem 0;border-radius:14px;border:0;
+    background:var(--a-diep);color:var(--a-tekst);cursor:pointer;}
+  .toetsen .ok{background:var(--a-lime);color:#1D2B06;}
+  .toetsen .wis{color:var(--a-magenta);font-size:1.1rem;}
+  .stand{width:min(26rem,92vw);display:flex;flex-direction:column;gap:.3rem;font-size:.92rem;}
+  .stand .rij{display:flex;gap:.6rem;align-items:center;background:rgba(255,255,255,.04);border-radius:10px;padding:.4rem .8rem;}
+  .stand .rij b{flex:1;font-weight:700;}
+  .stand .rij.ik b{color:var(--a-cyaan);}
+  .voortgang{color:var(--a-mat);}
+  /* het stoplicht van het reactieduel */
+  #licht{width:min(22rem,86vw);height:min(22rem,52vh);border-radius:26px;display:flex;align-items:center;
+    justify-content:center;font-size:1.5rem;font-weight:800;cursor:pointer;user-select:none;
+    background:var(--a-diep);transition:background .12s;}
+  #licht.rood{background:#8E2043;}
+  #licht.groen{background:#3E9A2E;box-shadow:0 0 60px rgba(183,240,75,.5);}
+  .tijden{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;color:var(--a-amber);font-weight:700;}
+  .uitslagkop{font-size:1.7rem;font-weight:800;text-align:center;}
+  /* het geheugenduel: vier vakken die oplichten */
+  .pads{display:grid;grid-template-columns:repeat(2,minmax(7.2rem,8.8rem));gap:.8rem;}
+  .pad{height:7.2rem;border:0;border-radius:20px;cursor:pointer;opacity:.4;transition:opacity .12s;}
+  .pad.aan{opacity:1;}
+  .pad.p0{background:var(--a-cyaan);}
+  .pad.p1{background:var(--a-magenta);}
+  .pad.p2{background:var(--a-lime);}
+  .pad.p3{background:var(--a-amber);}
+  .pad.p0.aan{box-shadow:0 0 34px rgba(53,224,212,.6);}
+  .pad.p1.aan{box-shadow:0 0 34px rgba(242,92,168,.6);}
+  .pad.p2.aan{box-shadow:0 0 34px rgba(183,240,75,.6);}
+  .pad.p3.aan{box-shadow:0 0 34px rgba(246,185,59,.6);}
+  .fb{min-height:1.6rem;font-weight:700;}
+  .fb.goed{color:var(--a-lime);}
+  .fb.fout{color:var(--a-magenta);}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<canvas id="doek" aria-hidden="true"></canvas>
+
+<div class="bovenrij" hidden id="bovenrij">
+  <button class="terugknop" id="terugMenu" type="button">← Stop</button>
+  <div class="kop-info" id="kopInfo" aria-live="polite"></div>
+</div>
+
+<div class="scherm" id="sMenu" role="main">
+  <h1>De Arena</h1>
+  <div class="sub">Snelle duels tegen je vrienden of klasgenoten -- of train solo. Alles telt alleen binnen het potje; er bestaat geen ranglijst.</div>
+  <div id="uitnodigingen" class="keuze" aria-live="polite"></div>
+  <button class="kaart-a" data-start="flits-multi" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M26 4L12 28h9l-3 16 18-26h-10l6-14z" fill="#35E0D4"/></svg>
+    <span><b>Flitsduel</b><span>Tien sommen, wie rekent het snelst goed?</span></span>
+    <span class="duelbadge">2-4 spelers</span>
+  </button>
+  <button class="kaart-a m2" data-start="reactie-multi" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="none" stroke="#F25CA8" stroke-width="4"/><circle cx="24" cy="24" r="7" fill="#F25CA8"/></svg>
+    <span><b>Reactieduel</b><span>Rood... rood... GROEN: wie tikt het eerst?</span></span>
+    <span class="duelbadge">2-4 spelers</span>
+  </button>
+  <button class="kaart-a m5" data-start="geheugen-multi" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="7" width="15" height="15" rx="4" fill="#7C6CF0"/><rect x="26" y="7" width="15" height="15" rx="4" fill="#35E0D4" opacity=".8"/><rect x="7" y="26" width="15" height="15" rx="4" fill="#B7F04B" opacity=".8"/><rect x="26" y="26" width="15" height="15" rx="4" fill="#F25CA8" opacity=".8"/></svg>
+    <span><b>Geheugenduel</b><span>Kijk de reeks af en tik hem foutloos na</span></span>
+    <span class="duelbadge">2-4 spelers</span>
+  </button>
+  <button class="kaart-a m3" data-start="flits-solo" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 36l8-10 6 6 12-16" stroke="#B7F04B" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+    <span><b>Sprint solo</b><span>Tien sommen tegen jezelf, gewoon oefenen</span></span>
+  </button>
+  <button class="kaart-a m4" data-start="reactie-solo" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 8v10M24 8a16 16 0 1 1-11 4.7" stroke="#F6B93B" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+    <span><b>Reflex solo</b><span>Vijf ronden stoplicht, meet je reactie</span></span>
+  </button>
+  <a class="kaart-a m5" href="/apps/spelen.html" style="text-decoration:none">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="3" fill="#7C6CF0"/><rect x="26" y="26" width="14" height="14" rx="3" fill="#7C6CF0" opacity=".55"/><rect x="26" y="8" width="14" height="14" rx="3" fill="#7C6CF0" opacity=".3"/><rect x="8" y="26" width="14" height="14" rx="3" fill="#7C6CF0" opacity=".8"/></svg>
+    <span><b>Bordspellen</b><span>Dammen, Rummi, Pesten en meer, ook samen</span></span>
+  </a>
+  <button class="rand" id="naarhuis" type="button">Terug naar de app</button>
+</div>
+
+<div class="scherm" id="sKies" hidden>
+  <h1 id="kiesKop">Wie daag je uit?</h1>
+  <div class="sub">Kies 1 tot 3 tegenstanders. Klasgenoten zien alleen je codenaam.</div>
+  <div class="keuze" id="kiesLijst" aria-live="polite">Even laden...</div>
+  <button class="neon" id="kiesStart" type="button" disabled>Start het duel</button>
+  <button class="rand" data-terug type="button">Toch niet</button>
+</div>
+
+<div class="scherm" id="sWacht" hidden>
+  <h1>De uitdaging is verstuurd</h1>
+  <div class="sub" id="wachtWie">We wachten tot iedereen er is...</div>
+  <button class="rand" data-terug type="button">Terug naar het menu</button>
+</div>
+
+<div class="scherm" id="sFlits" hidden>
+  <div class="voortgang" id="flitsNr"></div>
+  <div class="som" id="flitsSom">--</div>
+  <div class="invoer" id="flitsInvoer">&nbsp;</div>
+  <div class="fb" id="flitsFb">&nbsp;</div>
+  <div class="toetsen" id="flitsToetsen">
+    <button type="button" data-t="7">7</button><button type="button" data-t="8">8</button><button type="button" data-t="9">9</button>
+    <button type="button" data-t="4">4</button><button type="button" data-t="5">5</button><button type="button" data-t="6">6</button>
+    <button type="button" data-t="1">1</button><button type="button" data-t="2">2</button><button type="button" data-t="3">3</button>
+    <button type="button" class="wis" data-t="wis">wis</button><button type="button" data-t="0">0</button><button type="button" class="ok" data-t="ok">OK</button>
+  </div>
+  <div class="stand" id="flitsStand"></div>
+</div>
+
+<div class="scherm" id="sReactie" hidden>
+  <div class="voortgang" id="reactieNr"></div>
+  <div id="licht" role="button" tabindex="0">Tik om te beginnen</div>
+  <div class="tijden" id="reactieTijden"></div>
+  <div class="stand" id="reactieStand"></div>
+</div>
+
+<div class="scherm" id="sGeheugen" hidden>
+  <div class="voortgang" id="gehNr"></div>
+  <div class="fb" id="gehFb">Kijk goed...</div>
+  <div class="pads" id="gehPads">
+    <button type="button" class="pad p0" data-p="0" aria-label="Vak 1"></button>
+    <button type="button" class="pad p1" data-p="1" aria-label="Vak 2"></button>
+    <button type="button" class="pad p2" data-p="2" aria-label="Vak 3"></button>
+    <button type="button" class="pad p3" data-p="3" aria-label="Vak 4"></button>
+  </div>
+  <div class="stand" id="gehStand"></div>
+</div>
+
+<div class="scherm" id="sUitslag" hidden>
+  <div class="uitslagkop" id="uitslagKop"></div>
+  <div class="sub" id="uitslagSub"></div>
+  <div class="stand" id="uitslagStand"></div>
+  <button class="neon" data-terug type="button">Terug naar het menu</button>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  let sess = null;
+  try { sess = JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); } catch (e) {}
+  if (!sess || !sess.token) { location.href = '/apps/foundation/index.html'; return; }
+
+  /* ---------- de sterrenhemel op de achtergrond ---------- */
+  const doek = $('#doek'), ctx = doek.getContext('2d');
+  let W = 0, H = 0, STER = [];
+  function maat() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    doek.width = W * dpr; doek.height = H * dpr;
+    doek.style.width = W + 'px'; doek.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    STER = [];
+    for (let i = 0; i < 70; i++) STER.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.6 + .4, s: Math.random() * .25 + .05 });
+  }
+  window.addEventListener('resize', maat);
+  maat();
+  (function hemel() {
+    ctx.fillStyle = '#0E1220'; ctx.fillRect(0, 0, W, H);
+    for (const s of STER) {
+      s.y += s.s; if (s.y > H) { s.y = -2; s.x = Math.random() * W; }
+      ctx.globalAlpha = .5; ctx.fillStyle = '#8E97B8';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(hemel);
+  })();
+
+  /* ---------- api en schermwissel ---------- */
+  async function api(actie, body) {
+    const r = await fetch('/api/rtf/spel/' + actie, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ code: sess.code, token: sess.token }, body || {})) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+    return d;
+  }
+  const SCHERMEN = ['sMenu', 'sKies', 'sWacht', 'sFlits', 'sReactie', 'sGeheugen', 'sUitslag'];
+  let potje = null, modus = 'solo', soort = 'flits', pollT = null;
+  function toon(id) {
+    SCHERMEN.forEach(s => { $('#' + s).hidden = s !== id; });
+    $('#bovenrij').hidden = id === 'sMenu';
+    if (id === 'sMenu') { potje = null; clearInterval(pollT); laadUitnodigingen(); }
+  }
+  document.querySelectorAll('[data-terug]').forEach(b => b.addEventListener('click', () => toon('sMenu')));
+  $('#terugMenu').addEventListener('click', async () => {
+    if (potje && potje.status === 'bezig') { try { await api('opgeven', { id: potje.id }); } catch (e) {} }
+    toon('sMenu');
+  });
+  $('#naarhuis').addEventListener('click', () => { location.href = '/apps/foundation/index.html'; });
+
+  /* ---------- het menu: starten en uitnodigingen ---------- */
+  document.querySelectorAll('[data-start]').forEach(b => b.addEventListener('click', () => {
+    const [sp, md] = b.dataset.start.split('-');
+    soort = sp; modus = md;
+    if (md === 'solo') return sp === 'flits' ? flitsSolo() : reactieSolo();
+    openKies();
+  }));
+  async function laadUitnodigingen() {
+    const vak = $('#uitnodigingen');
+    try {
+      const d = await api('mijn', {});
+      const duels = (d.uitnodigingen || []).filter(u => u.soort === 'flits' || u.soort === 'reactie' || u.soort === 'geheugen');
+      vak.innerHTML = '';
+      for (const u of duels.slice(0, 4)) {
+        const rij = document.createElement('div');
+        rij.className = 'uitnodiging';
+        const tekst = document.createElement('span');
+        tekst.textContent = u.van + ' daagt je uit: ' + u.naam;
+        const knop = document.createElement('button');
+        knop.type = 'button'; knop.textContent = 'Speel mee';
+        knop.addEventListener('click', async () => {
+          try { await api('antwoord', { id: u.id, akkoord: true }); openPotje(u.id); }
+          catch (e) { rij.remove(); }
+        });
+        rij.append(tekst, knop); vak.append(rij);
+      }
+    } catch (e) {}
+  }
+  setInterval(() => { if (!$('#sMenu').hidden && !document.hidden) laadUitnodigingen(); }, 5000);
+
+  /* ---------- kiezen: vrienden en klasgenoten ---------- */
+  const gekozen = new Set();
+  async function openKies() {
+    gekozen.clear();
+    $('#kiesKop').textContent = (soort === 'flits' ? 'Flitsduel' : soort === 'reactie' ? 'Reactieduel' : 'Geheugenduel') + ': wie daag je uit?';
+    $('#kiesLijst').textContent = 'Even laden...';
+    $('#kiesStart').disabled = true;
+    toon('sKies');
+    let vrienden = [], klasgenoten = [];
+    try {
+      const r = await fetch('/api/rtf/social/connections', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: sess.code, token: sess.token }) });
+      vrienden = ((await r.json()).connections || []);
+    } catch (e) {}
+    try { klasgenoten = (await api('klasgenoten', {})).klasgenoten || []; } catch (e) {}
+    const lijst = $('#kiesLijst');
+    lijst.innerHTML = '';
+    const vriendKeys = new Set(vrienden.map(v => v.key));
+    const blok = (kop, rijen, bron) => {
+      if (!rijen.length) return;
+      const h = document.createElement('h3'); h.textContent = kop; lijst.append(h);
+      for (const p of rijen) {
+        const rij = document.createElement('div');
+        rij.className = 'persoon'; rij.dataset.key = p.key; rij.dataset.bron = bron;
+        rij.innerHTML = '<span class="vink"></span><span class="wie"></span><span class="waar"></span>';
+        rij.querySelector('.wie').textContent = p.codename || p.codenaam;
+        rij.querySelector('.waar').textContent = bron === 'klas' ? (p.klas || 'klasgenoot') : 'vriend';
+        rij.addEventListener('click', () => {
+          if (gekozen.has(p.key)) { gekozen.delete(p.key); rij.classList.remove('aan'); rij.querySelector('.vink').textContent = ''; }
+          else if (gekozen.size < 3) { gekozen.add(p.key); rij.classList.add('aan'); rij.querySelector('.vink').textContent = '✓'; }
+          $('#kiesStart').disabled = !gekozen.size;
+        });
+        lijst.append(rij);
+      }
+    };
+    blok('Vrienden', vrienden, 'vriend');
+    blok('Klasgenoten', klasgenoten.filter(k => !vriendKeys.has(k.key)), 'klas');
+    if (!lijst.children.length) lijst.textContent = 'Nog niemand om uit te dagen: vraag je ouder om vrienden toe te voegen, of sluit je aan bij je klas.';
+  }
+  $('#kiesStart').addEventListener('click', async () => {
+    const vrienden = [], klasgenoten = [];
+    document.querySelectorAll('.persoon.aan').forEach(r => (r.dataset.bron === 'klas' ? klasgenoten : vrienden).push(r.dataset.key));
+    try {
+      const d = await api('nieuw', { soort, grootte: gekozen.size + 1, vrienden, klasgenoten });
+      $('#wachtWie').textContent = 'We wachten tot iedereen de uitdaging heeft aangenomen...';
+      toon('sWacht');
+      volgPotje(d.id);
+    } catch (e) { alert(e.message); }
+  });
+  function volgPotje(id) {
+    clearInterval(pollT);
+    pollT = setInterval(async () => {
+      try {
+        const d = await api('staat', { id });
+        potje = d.potje;
+        if (potje.status === 'bezig') { clearInterval(pollT); startDuel(); }
+        else if (potje.status === 'klaar') { clearInterval(pollT); toonUitslag(); }
+      } catch (e) { clearInterval(pollT); toon('sMenu'); }
+    }, 2000);
+  }
+  async function openPotje(id) {
+    try {
+      const d = await api('staat', { id });
+      potje = d.potje; modus = 'multi'; soort = potje.soort;
+      if (potje.status === 'bezig') startDuel();
+      else if (potje.status === 'klaar') toonUitslag();
+      else { $('#wachtWie').textContent = 'We wachten tot iedereen de uitdaging heeft aangenomen...'; toon('sWacht'); volgPotje(id); }
+    } catch (e) { toon('sMenu'); }
+  }
+  function startDuel() {
+    if (soort === 'flits') { toon('sFlits'); flitsToonStaat(); }
+    else if (soort === 'geheugen') { gehGetoond = -1; toon('sGeheugen'); gehToon(); }
+    else { toon('sReactie'); reactieToonStaat(); }
+    clearInterval(pollT);
+    pollT = setInterval(async () => {
+      if (!potje || document.hidden) return;
+      try {
+        const d = await api('staat', { id: potje.id });
+        potje = d.potje;
+        if (potje.status === 'klaar') { clearInterval(pollT); return toonUitslag(); }
+        if (soort === 'flits') flitsToonStaat(); else if (soort === 'geheugen') gehToon(); else reactieToonStaat();
+      } catch (e) {}
+    }, 2500);
+  }
+  function standRijen(el, maak) {
+    el.innerHTML = '';
+    if (!potje) return;
+    potje.spelers.forEach((cn, i) => {
+      const rij = document.createElement('div');
+      rij.className = 'rij' + (i === potje.ik ? ' ik' : '');
+      const b = document.createElement('b'); b.textContent = cn;
+      const s = document.createElement('span'); s.className = 'voortgang'; s.textContent = maak(i);
+      rij.append(b, s); el.append(rij);
+    });
+  }
+
+  /* ---------- Flitsduel (en Sprint solo): tien sommen ---------- */
+  let invoer = '', soloSommen = null, soloNr = 0, soloGoed = 0;
+  function somMaak() {
+    const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+    const k = R(0, 3);
+    if (k === 0) { const a = R(12, 89), b = R(11, 99 - a); return { t: a + ' + ' + b, a: a + b }; }
+    if (k === 1) { const b = R(11, 78), a = R(b + 11, 99); return { t: a + ' - ' + b, a: a - b }; }
+    if (k === 2) { const a = R(3, 12), b = R(4, 19); return { t: a + ' x ' + b, a: a * b }; }
+    const b = R(3, 12), u = R(4, 19); return { t: (b * u) + ' : ' + b, a: u };
+  }
+  function flitsSolo() {
+    modus = 'solo'; soort = 'flits';
+    soloSommen = []; for (let i = 0; i < 10; i++) soloSommen.push(somMaak());
+    soloNr = 0; soloGoed = 0; invoer = '';
+    toon('sFlits'); flitsToonSolo();
+  }
+  function flitsToonSolo() {
+    $('#kopInfo').textContent = 'Sprint solo';
+    $('#flitsNr').textContent = 'Som ' + (soloNr + 1) + ' van 10 · ' + soloGoed + ' goed';
+    $('#flitsSom').textContent = soloSommen[soloNr].t;
+    $('#flitsInvoer').textContent = invoer || ' ';
+    $('#flitsStand').innerHTML = '';
+  }
+  function flitsToonStaat() {
+    const st = potje.staat || {};
+    $('#kopInfo').textContent = 'Flitsduel';
+    $('#flitsNr').textContent = st.som ? ('Som ' + (st.nr + 1) + ' van ' + st.tot + ' · ' + st.goed + ' goed') : 'Klaar! Wachten op de rest...';
+    $('#flitsSom').textContent = st.som || '✓';
+    $('#flitsInvoer').textContent = invoer || ' ';
+    standRijen($('#flitsStand'), i => st.stand[i].af + '/' + st.tot + ' af · ' + st.stand[i].goed + ' goed');
+  }
+  const fb = (el, goed, tekst) => { el.textContent = tekst; el.className = 'fb ' + (goed ? 'goed' : 'fout');
+    setTimeout(() => { el.textContent = ' '; el.className = 'fb'; }, 900); };
+  $('#flitsToetsen').addEventListener('click', async (e) => {
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.t === 'wis') { invoer = ''; }
+    else if (t.dataset.t === 'ok') {
+      if (!invoer) return;
+      const a = Number(invoer); invoer = '';
+      if (modus === 'solo') {
+        const goed = a === soloSommen[soloNr].a;
+        if (goed) soloGoed++;
+        fb($('#flitsFb'), goed, goed ? 'Goed!' : 'Het was ' + soloSommen[soloNr].a);
+        soloNr++;
+        if (soloNr >= 10) return soloUitslag('Sprint solo', soloGoed + ' van de 10 goed', []);
+        return flitsToonSolo();
+      }
+      try {
+        const r = await api('zet', { id: potje.id, zet: { actie: 'antwoord', a } });
+        fb($('#flitsFb'), r.goedWas, r.goedWas ? 'Goed!' : 'Het was ' + r.juisteA);
+        if (r.potje) { potje = r.potje; if (potje.status === 'klaar') return toonUitslag(); }
+        flitsToonStaat();
+      } catch (e2) {}
+      return;
+    }
+    else if (invoer.length < 4) invoer += t.dataset.t;
+    if (modus === 'solo') flitsToonSolo(); else $('#flitsInvoer').textContent = invoer || ' ';
+  });
+
+  /* ---------- Reactieduel (en Reflex solo): het stoplicht ----------
+     De eigen reactietijd wordt hier gemeten en gemeld: het eer-systeem;
+     de server bewaakt de grenzen en bestraft een valse start. */
+  let fase = 'idle', groenOm = 0, wachtT = null, soloTijden = [];
+  const licht = $('#licht');
+  function reactieSolo() {
+    modus = 'solo'; soort = 'reactie'; soloTijden = [];
+    toon('sReactie'); fase = 'idle'; reactieToonSolo();
+  }
+  function reactieToonSolo() {
+    $('#kopInfo').textContent = 'Reflex solo';
+    $('#reactieNr').textContent = 'Ronde ' + Math.min(5, soloTijden.length + 1) + ' van 5';
+    $('#reactieTijden').textContent = soloTijden.map(t => t + ' ms').join(' · ');
+    $('#reactieStand').innerHTML = '';
+    licht.className = ''; licht.textContent = 'Tik om te beginnen';
+  }
+  function reactieToonStaat() {
+    const st = potje.staat || {};
+    $('#kopInfo').textContent = 'Reactieduel';
+    $('#reactieNr').textContent = st.ronde < st.tot ? ('Ronde ' + (st.ronde + 1) + ' van ' + st.tot) : 'Klaar! Wachten op de rest...';
+    $('#reactieTijden').textContent = (st.tijden || []).map(t => t + ' ms').join(' · ');
+    standRijen($('#reactieStand'), i => st.stand[i].af + '/5 · ' + st.stand[i].totaal + ' ms');
+    if (fase === 'idle') { licht.className = ''; licht.textContent = st.ronde < st.tot ? 'Tik om ronde ' + (st.ronde + 1) + ' te starten' : '✓'; }
+  }
+  function rondeStart(wacht) {
+    fase = 'rood'; licht.className = 'rood'; licht.textContent = 'Wacht op groen...';
+    clearTimeout(wachtT);
+    wachtT = setTimeout(() => { fase = 'groen'; groenOm = performance.now(); licht.className = 'groen'; licht.textContent = 'TIK!'; }, wacht);
+  }
+  async function rondeKlaar(ms, vals) {
+    fase = 'idle'; clearTimeout(wachtT);
+    if (modus === 'solo') {
+      soloTijden.push(vals ? 1500 : ms);
+      licht.className = ''; licht.textContent = vals ? 'Te vroeg! (1500 ms straf)' : ms + ' ms';
+      if (soloTijden.length >= 5) {
+        const tot = soloTijden.reduce((a, b) => a + b, 0);
+        return setTimeout(() => soloUitslag('Reflex solo', 'Totaal ' + tot + ' ms over 5 ronden', soloTijden.map(t => t + ' ms')), 700);
+      }
+      return setTimeout(reactieToonSolo, 700);
+    }
+    try {
+      const r = await api('zet', { id: potje.id, zet: vals ? { actie: 'tik', vals: true } : { actie: 'tik', ms } });
+      licht.className = ''; licht.textContent = r.vals ? 'Te vroeg! (1500 ms straf)' : r.ms + ' ms';
+      if (r.potje) { potje = r.potje; if (potje.status === 'klaar') return setTimeout(toonUitslag, 700); }
+      setTimeout(reactieToonStaat, 700);
+    } catch (e) { reactieToonStaat(); }
+  }
+  function lichtTik() {
+    if ($('#sReactie').hidden) return;
+    if (fase === 'idle') {
+      if (modus === 'solo') { if (soloTijden.length < 5) rondeStart(1200 + Math.random() * 2600); return; }
+      const st = (potje && potje.staat) || {};
+      if (st.ronde < st.tot && st.wacht != null) rondeStart(st.wacht);
+      return;
+    }
+    if (fase === 'rood') return rondeKlaar(0, true);
+    if (fase === 'groen') return rondeKlaar(Math.max(1, Math.round(performance.now() - groenOm)), false);
+  }
+  licht.addEventListener('pointerdown', lichtTik);
+  licht.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') lichtTik(); });
+
+  /* ---------- Geheugenduel: dezelfde reeksen, foutloos natikken ---------- */
+  let gehGetoond = -1, gehFase = 'wacht', gehInvoer = [], gehTimer = null;
+  function gehToon() {
+    const st = potje.staat || {};
+    $('#kopInfo').textContent = 'Geheugenduel';
+    $('#gehNr').textContent = st.reeks ? ('Ronde ' + (st.nr + 1) + ' van ' + st.tot + ' · ' + st.punten + ' punten') : 'Klaar! Wachten op de rest...';
+    standRijen($('#gehStand'), i => st.stand[i].af + '/' + st.tot + ' af · ' + st.stand[i].punten + ' punten');
+    if (!st.reeks) { $('#gehFb').textContent = '✓'; return; }
+    // een nieuwe ronde: de reeks een keer voorspelen, daarna zelf natikken
+    if (gehGetoond !== st.nr) {
+      gehGetoond = st.nr; gehFase = 'kijk'; gehInvoer = [];
+      $('#gehFb').textContent = 'Kijk goed...'; $('#gehFb').className = 'fb';
+      let i = 0;
+      clearInterval(gehTimer);
+      gehTimer = setInterval(() => {
+        document.querySelectorAll('.pad').forEach(p => p.classList.remove('aan'));
+        if (i >= st.reeks.length) {
+          clearInterval(gehTimer); gehFase = 'doe';
+          $('#gehFb').textContent = 'Nu jij: tik de reeks na';
+          return;
+        }
+        const pad = document.querySelector('.pad.p' + st.reeks[i]);
+        if (pad) { pad.classList.add('aan'); setTimeout(() => pad.classList.remove('aan'), 420); }
+        i++;
+      }, 620);
+    }
+  }
+  $('#gehPads').addEventListener('click', async (e) => {
+    const pad = e.target.closest('.pad');
+    if (!pad || gehFase !== 'doe' || !potje) return;
+    const st = potje.staat || {};
+    if (!st.reeks) return;
+    pad.classList.add('aan'); setTimeout(() => pad.classList.remove('aan'), 200);
+    gehInvoer.push(Number(pad.dataset.p));
+    if (gehInvoer.length < st.reeks.length) return;
+    gehFase = 'wacht';
+    try {
+      const r = await api('zet', { id: potje.id, zet: { actie: 'reeks', r: gehInvoer } });
+      fb($('#gehFb'), r.goedWas, r.goedWas ? 'Foutloos!' : 'Net niet -- dit was hem: ' + r.juistR.map(k => k + 1).join(' '));
+      if (r.potje) { potje = r.potje; if (potje.status === 'klaar') return setTimeout(toonUitslag, 1100); }
+      setTimeout(gehToon, 1100);
+    } catch (e2) { gehToon(); }
+  });
+
+  /* ---------- de uitslag ---------- */
+  function soloUitslag(kop, sub, regels) {
+    $('#uitslagKop').textContent = kop;
+    $('#uitslagSub').textContent = sub + ' -- niets wordt bewaard, elk potje begint opnieuw.';
+    const el = $('#uitslagStand'); el.innerHTML = '';
+    regels.forEach((r, i) => { const rij = document.createElement('div'); rij.className = 'rij';
+      rij.innerHTML = '<b></b><span class="voortgang"></span>';
+      rij.querySelector('b').textContent = 'Ronde ' + (i + 1); rij.querySelector('.voortgang').textContent = r; el.append(rij); });
+    toon('sUitslag');
+  }
+  function toonUitslag() {
+    $('#uitslagKop').textContent = potje.gelijk ? 'Precies gelijk!' : (potje.winnaar === potje.spelers[potje.ik] ? 'Jij wint!' : potje.winnaar + ' wint');
+    $('#uitslagSub').textContent = (soort === 'flits' ? 'De meeste sommen goed telt.' : soort === 'geheugen' ? 'De meeste reeksen foutloos telt.' : 'De laagste totaaltijd wint.') + ' Niets wordt bewaard.';
+    const st = potje.staat || {};
+    standRijen($('#uitslagStand'), i => !st.stand ? '' : soort === 'flits'
+      ? st.stand[i].goed + ' van ' + st.tot + ' goed'
+      : soort === 'geheugen' ? st.stand[i].punten + ' van ' + st.tot + ' foutloos'
+      : st.stand[i].totaal + ' ms totaal');
+    toon('sUitslag');
+  }
+
+  /* ---------- diepe link vanuit een uitnodiging elders ---------- */
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('potje')) openPotje(qs.get('potje'));
+  else laadUitnodigingen();
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

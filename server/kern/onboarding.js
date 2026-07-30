@@ -89,83 +89,9 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
   function profielId(sess) { return (sess && sess.key) || 'onbekend'; }
 
   // Wat we al van iemand weten (uit het account/lidstaat) prefillt de intake.
-  function bekend(veldId, sess) {
-    const acc = sess && sess.account;
-    const md = acc && accounts.getMemberState ? (accounts.getMemberState(acc.id) || {}) : {};
-    switch (veldId) {
-      case 'naam': return acc ? accounts.realNameOf(acc) : null;
-      case 'email': return acc ? accounts.emailOf(acc) : null;
-      case 'telefoon': return acc ? accounts.phoneOf(acc) : null;
-      case 'geboortedatum': return md.geboren || null;
-      case 'land': return md.land || null;
-      case 'nationaliteit': return md.nationaliteit || null;
-      // Demo-sessies zonder account kunnen geen identiteitsbewijs uploaden
-      // (de upload eist een echt account); daar telt het veld als voldaan,
-      // anders zou de demo eeuwig voor de onboarding-poort blijven staan.
-      case 'paspoort': return acc
-        ? (['pending', 'approved', 'geverifieerd', 'verified'].includes(acc.verified) ? 'ingediend' : null)
-        : 'demo-sessie';
-      default: return null;
-    }
-  }
-  function waardeVan(veld, sess, profiel) {
-    const eigen = profiel.velden[veld.id];
-    if (eigen != null && eigen !== '') return eigen;
-    return bekend(veld.id, sess);
-  }
-
-  // De volledige onboarding-status voor deze sessie binnen een scope.
-  function status(scope, sess) {
-    const sc = scopeVan(scope);
-    const tier = (sess && sess.tier) || 'guest';
-    const profiel = profielVan(profielId(sess));
-    const velden = sc.velden
-      .filter(v => (v.voorWie || []).includes(tier))
-      .map(v => {
-        const w = waardeVan(v, sess, profiel);
-        return { id: v.id, label: v.label, type: v.type, ingevuld: !!(w && String(w).trim()),
-          waarde: v.type === 'kyc' ? undefined : (w != null ? String(w) : '') };
-      });
-    const ontbrekend = velden.filter(v => !v.ingevuld).map(v => v.id);
-    const ond = (profiel.ondertekend || {})[scope];
-    const getekend = !!(ond && ond.versie === sc.contract.versie);
-    return {
-      scope, tier,
-      velden, ontbrekend,
-      contract: { versie: sc.contract.versie, titel: sc.contract.titel, tekst: sc.contract.tekst,
-        ondertekend: getekend, ondertekendAt: getekend ? ond.at : null },
-      klaar: ontbrekend.length === 0 && getekend
-    };
-  }
-  // Snelle ja/nee: is de onboarding van deze sessie (platform-scope) rond?
-  function klaar(sess, scope) { return status(scope || 'rtg', sess).klaar; }
-
-  // De intake-velden opslaan (paspoort loopt via de KYC-upload, niet hier).
-  function slaOp(scope, sess, velden) {
-    const sc = scopeVan(scope);
-    const geldig = new Set(sc.velden.map(v => v.id));
-    const p = profielVan(profielId(sess));
-    for (const [k, v] of Object.entries(velden || {})) {
-      if (!geldig.has(k) || k === 'paspoort') continue;
-      p.velden[k] = schoon(String(v == null ? '' : v), 200);
-    }
-    save();
-    return status(scope, sess);
-  }
-
-  // Het contract ondertekenen: getypte naam + akkoord -> bewijs met vingerafdruk.
-  function teken(scope, sess, naam, akkoord) {
-    if (!akkoord) return { status: 400, error: 'Zet een vinkje dat u akkoord bent met de overeenkomst.' };
-    naam = schoon(String(naam || ''), 80);
-    if (naam.length < 2) return { status: 400, error: 'Typ uw volledige naam om digitaal te ondertekenen.' };
-    const sc = scopeVan(scope);
-    const pid = profielId(sess);
-    const p = profielVan(pid);
-    const hash = crypto.createHash('sha256').update(sc.contract.versie + '|' + sc.contract.tekst + '|' + naam + '|' + pid).digest('hex');
-    p.ondertekend[scope] = { versie: sc.contract.versie, naam, at: nu(), hash };
-    save();
-    return { status: 200, ok: true, ...status(scope, sess) };
-  }
+  /* De lees/schrijf-acties voor het lid (status, intake opslaan, paspoort-meta,
+     RTG Pay-poort, contract tekenen) draaien als submodule op dezelfde context;
+     zie onboarding/lid.js. Ze worden hieronder na het opbouwen van ctx ingehaakt. */
 
   /* ---------- de config lezen en aanpassen (eigenaar / leverancier) ---------- */
 
@@ -175,8 +101,10 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
     ALLE_WIE, PAS_WIE, VELD_TYPES, DEFAULT_CONTRACT,
     nu, standaardVelden, standaardScope, store, scopeVan, profielVan, profielId };
   const { publiekeConfig, config, normaliseerVelden, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars } = require('./onboarding/beheer')(ctx);
+  // de lid-acties (status, intake, paspoort, RTG Pay-poort, tekenen)
+  const { status, klaar, payGate, slaOp, bewaarPaspoort, teken } = require('./onboarding/lid')(ctx);
 
-  return { store, standaardScope, status, klaar, slaOp, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
+  return { store, standaardScope, status, klaar, payGate, slaOp, bewaarPaspoort, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
     ALLE_WIE, PAS_WIE, VELD_TYPES };
 }
 

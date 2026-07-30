@@ -28,13 +28,13 @@ function weekBeeld({ agenda = [], rijen = [], nu = new Date() }) {
 /* puur: de adviezen, eerlijk en zonder opgeheven vinger; hooguit vier */
 function adviezenUit(b) {
   const a = [];
-  if (b.vrijeDagen === 0) a.push({ icoon: '🌿', tekst: 'Er staat de komende week geen enkele lege dag in uw agenda. Plan er een: niks doen is ook een afspraak.' });
-  else if (b.vrijeDagen <= 2) a.push({ icoon: '🌿', tekst: 'Nog ' + b.vrijeDagen + ' lege dag(en) deze week. Houd ze leeg; ontprikkelen werkt het best zonder plan.' });
-  else a.push({ icoon: '✨', tekst: 'Uw week ademt: ' + b.vrijeDagen + ' dagen zonder verplichtingen. Zo hoort het.' });
-  if (b.avonden >= 4) a.push({ icoon: '🌙', tekst: b.avonden + ' avonden gepland. Kies er een om vroeg te stoppen: schermen uit, een wandeling, een boek of uw hobby.' });
-  if (b.laat >= 3) a.push({ icoon: '😴', tekst: 'RTG ziet ' + b.laat + ' late nachten in twee weken. Slaap is de beste investering van het huis.' });
-  if (b.uitPerWeek >= 5) a.push({ icoon: '🥗', tekst: 'U at ongeveer ' + b.uitPerWeek + ' keer per week buiten de deur. Zelf koken is ook ontprikkelen; Rahul denkt mee met een simpel recept dat bij uw zorgprofiel past.' });
-  else a.push({ icoon: '🏃', tekst: 'Beweging hoeft geen sport te zijn: een half uur wandelen op een lege dag telt volop. Liever echt sporten? Rahul kent de spa- en wellnesspartners.' });
+  if (b.vrijeDagen === 0) a.push({ icoon: 'oogst', tekst: 'Er staat de komende week geen enkele lege dag in uw agenda. Plan er een: niks doen is ook een afspraak.' });
+  else if (b.vrijeDagen <= 2) a.push({ icoon: 'oogst', tekst: 'Nog ' + b.vrijeDagen + ' lege dag(en) deze week. Houd ze leeg; ontprikkelen werkt het best zonder plan.' });
+  else a.push({ icoon: 'ster', tekst: 'Uw week ademt: ' + b.vrijeDagen + ' dagen zonder verplichtingen. Zo hoort het.' });
+  if (b.avonden >= 4) a.push({ icoon: 'balans', tekst: b.avonden + ' avonden gepland. Kies er een om vroeg te stoppen: schermen uit, een wandeling, een boek of uw hobby.' });
+  if (b.laat >= 3) a.push({ icoon: 'emo-slaap', tekst: 'RTG ziet ' + b.laat + ' late nachten in twee weken. Slaap is de beste investering van het huis.' });
+  if (b.uitPerWeek >= 5) a.push({ icoon: 'horeca', tekst: 'U at ongeveer ' + b.uitPerWeek + ' keer per week buiten de deur. Zelf koken is ook ontprikkelen; Rahul denkt mee met een simpel recept dat bij uw zorgprofiel past.' });
+  else a.push({ icoon: 'sport', tekst: 'Beweging hoeft geen sport te zijn: een half uur wandelen op een lege dag telt volop. Liever echt sporten? Rahul kent de spa- en wellnesspartners.' });
   return a.slice(0, 4);
 }
 
@@ -44,7 +44,7 @@ function adviezenUit(b) {
 function seintjeVoorBalans(balansResultaat) {
   const b = balansResultaat && balansResultaat.beeld;
   if (!b || b.vrijeDagen > 0) return null;
-  return { icoon: '🌿', tekst: 'Uw komende week zit vol; niks doen is ook een afspraak. Vraag me gerust een rustmoment te plannen.' };
+  return { icoon: 'oogst', tekst: 'Uw komende week zit vol; niks doen is ook een afspraak. Vraag me gerust een rustmoment te plannen.' };
 }
 
 function maakBalans({ db, zorgVan, klokVan }) {
@@ -68,13 +68,13 @@ function maakBalans({ db, zorgVan, klokVan }) {
 
   /* de werkkant: klokuren vertellen eerlijk of iemand te vol zit */
   function balansVoorStaf(code, staffId, nu = new Date()) {
-    if (!staffId) return { ok: true, klok: null, adviezen: [{ icoon: '🌿', tekst: 'Log in op uw eigen naam (PIN) om uw persoonlijke balans te zien.' }] };
+    if (!staffId) return { ok: true, klok: null, adviezen: [{ icoon: 'oogst', tekst: 'Log in op uw eigen naam (PIN) om uw persoonlijke balans te zien.' }] };
     const klok = klokVan(code, staffId);
     const a = [];
-    if (klok.weekUren >= 45) a.push({ icoon: '🛑', tekst: 'U staat deze week al op ' + klok.weekUren + ' uur. Bespreek een vrije dag met de manager; het rooster kan het dragen.' });
-    else if (klok.weekUren >= 38) a.push({ icoon: '🌙', tekst: klok.weekUren + ' uur deze week: een volle week. Plan uw vrije dag bewust en doe er iets wat geen scherm nodig heeft.' });
-    else a.push({ icoon: '✨', tekst: klok.weekUren + ' uur deze week: gezond in balans. Houd dat vast.' });
-    if (klok.vandaagUren >= 9) a.push({ icoon: '😴', tekst: 'Vandaag al ' + klok.vandaagUren + ' uur geklokt. Rond af wat moet en klok uit; morgen is er ook nog.' });
+    if (klok.weekUren >= 45) a.push({ icoon: 'slot', tekst: 'U staat deze week al op ' + klok.weekUren + ' uur. Bespreek een vrije dag met de manager; het rooster kan het dragen.' });
+    else if (klok.weekUren >= 38) a.push({ icoon: 'balans', tekst: klok.weekUren + ' uur deze week: een volle week. Plan uw vrije dag bewust en doe er iets wat geen scherm nodig heeft.' });
+    else a.push({ icoon: 'ster', tekst: klok.weekUren + ' uur deze week: gezond in balans. Houd dat vast.' });
+    if (klok.vandaagUren >= 9) a.push({ icoon: 'emo-slaap', tekst: 'Vandaag al ' + klok.vandaagUren + ' uur geklokt. Rond af wat moet en klok uit; morgen is er ook nog.' });
     return { ok: true, klok, adviezen: a };
   }
 

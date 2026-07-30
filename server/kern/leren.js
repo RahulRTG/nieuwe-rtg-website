@@ -54,11 +54,13 @@ module.exports = ({ db, save, crypto, codenaamVan, zijnVrienden, socialZoek, isG
   const deelOverhoren = require('./leren/overhoren')(ctx);
   Object.assign(ctx, deelOverhoren);
   const { lijstenVan, lijstMaak, lijstHaal, lijstWeg, overhoorKlaar, lijstAi,
-    sessieStart, sessieAntwoord, sessiesVan, sessieStaat, sessieZet } = deelOverhoren;
+    sessieStart, sessieAntwoord, sessiesVan, sessieStaat, sessieZet,
+    herhaalVandaag, herhaalAntwoord, herhaalStand } = deelOverhoren;
   const { projectenVan, projectMaak, projectUitnodig, projectAntwoord, projectStaat, projectWeg, taakMaak, taakZet, notitie, projectAi } = require('./leren/projecten')(ctx);
   const { schrijfOpdracht, schrijfFeedback, schrijfBewaar, schrijfselsVan } = require('./leren/schrijven')(ctx);
 
   return { leren: { lijstenVan, lijstMaak, lijstHaal, lijstWeg, overhoorKlaar, lijstAi,
+    herhaalVandaag, herhaalAntwoord, herhaalStand,
     sessieStart, sessieAntwoord, sessiesVan, sessieStaat, sessieZet,
     projectenVan, projectMaak, projectUitnodig, projectAntwoord, projectStaat, projectWeg, taakMaak, taakZet, notitie, projectAi,
     schrijfOpdracht, schrijfFeedback, schrijfBewaar, schrijfselsVan } };

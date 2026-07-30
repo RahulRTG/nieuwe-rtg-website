@@ -68,7 +68,7 @@ module.exports = (ctx) => {
   async function taxi({ q, p, klaar }) {
     if (!(acties && acties.vraagRit && /\b(regel|boek|bestel|vraag)\b/i.test(q) && /\b(taxi|auto|rit|chauffeur|wagen|transfer)\b/i.test(q))) return null;
     const ql = q.toLowerCase();
-    const rijders = (db.data.suppliers || []).filter(x => ((db.data.supplierTypes[x.type] || {}).caps || []).includes('rides') && x.type !== 'activiteit');
+    const rijders = (db.data.suppliers || []).filter(x => db.capsVan(x).includes('rides') && x.type !== 'activiteit');
     const rijder = rijders.find(x => (x.name || '').toLowerCase().split(/\s+/).some(wrd => wrd.length > 3 && ql.includes(wrd))) ||
       rijders.find(x => x.type === 'taxi') || rijders[0];
     if (!rijder) return klaar('Ik zie nu geen vervoerspartner. Kijk anders even in Reizen.');

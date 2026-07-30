@@ -44,6 +44,10 @@
   .melding.zien{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
@@ -92,7 +96,7 @@
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
-  const IC = { pas: '🪪', ticket: '🎟️', sleutel: '🔑', munt: '🪙', klantenkaart: '💳' };
+  const IC = { pas: '', ticket: '', sleutel: '', munt: '', klantenkaart: '' };
 
   function toon(item){
     $('#toonTitel').textContent = item.titel;
@@ -156,6 +160,9 @@
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

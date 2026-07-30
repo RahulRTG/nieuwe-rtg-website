@@ -1,54 +1,29 @@
-/* De Reis-Bibliotheek: een miljoen reis-apps van over de hele wereld, van
-   Londen tot Gaza. De meest nuttige, exclusieve en educatieve reisgidsen die
-   in de winkel serieus geld kosten; voor betalende RTG-leden inbegrepen bij
-   de pas. 250 bestemmingen x 40 gidssoorten x 20 edities x 5 jaargangen =
-   exact 1.000.000.
+/* De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen van eigen RTG-redactie.
 
-   Op deze schaal bouwen we GEEN naamindex (een miljoen strings zou tientallen
-   MB's RAM vreten): zoeken werkt op de bouwstenen: de zoekterm vindt
-   bestemmingen en/of gidssoorten, en de treffers rollen daar procedureel uit.
-   Elk nummer levert altijd dezelfde app; alleen installaties worden bewaard. */
+   Geen miljoen lege titels meer. Wat hier staat kun je openen en lezen: sfeer en
+   hoogtepunten, wat je eet, en een praktisch woord. Klein begonnen, met zorg, en
+   uit te breiden -- kwaliteit boven aantal. Voor betalende leden inbegrepen bij
+   de pas; alleen wat een lid in zijn kast zet, wordt bewaard. */
 
-const { BESTEMMINGEN } = require('./bestemmingen');
+const { GIDSEN } = require('./gidsen');
 
-const SOORTEN = ['Stadsgids', 'Metrokaart', 'Wandelroutes', 'Museumgids', 'Foodgids', 'Taalgids', 'Geschiedenisgids', 'Architectuurgids',
-  'Kunstgids', 'Natuurgids', 'Strandgids', 'Bergroutes', 'Fietsroutes', 'Fotospots', 'Avondgids', 'Marktengids',
-  'Etiquettewijzer', 'Veiligheidswijzer', 'Valuta & fooien', 'OV-planner', 'Luchthavengids', 'Treingids', 'Roadtripplanner', 'Kids & gezin',
-  'Toegankelijkheid', 'Duurzaam reizen', 'Pelgrimsroutes', 'Erfgoedgids', 'Festivalkalender', 'Weerwijzer', 'Inpakhulp', 'Reisapotheek',
-  'Noodhulp & ambassade', 'Visumwijzer', 'Douanewijzer', 'Offline kaart', 'Audiotour', 'Dagtochten', 'Verborgen plekken', 'Streekkeuken'];
-const EDITIES = ['Pro', 'Compleet', 'Premium', 'Insider', 'Deluxe', 'Compact', 'Offline', 'Audio', 'Familie', 'Solo',
-  'Signature', 'Collector', 'Expeditie', 'Panorama', 'Meester', 'Grand', 'Royal', 'Atlas', 'Editie X', 'Nova'];
-const JAREN = [2022, 2023, 2024, 2025, 2026];
-
-const PER_BS = EDITIES.length * JAREN.length;                     // 100 per bestemming x soort
-const PER_B = SOORTEN.length * PER_BS;                            // 4.000 per bestemming
-const TOTAAL = BESTEMMINGEN.length * PER_B;                       // 1.000.000
-
-function appVan(i) {
-  if (!Number.isInteger(i) || i < 0 || i >= TOTAAL) return null;
-  const b = Math.floor(i / PER_B);
-  const s = Math.floor((i % PER_B) / PER_BS);
-  const rest = i % PER_BS;
-  const editie = EDITIES[rest % EDITIES.length];
-  const jaar = JAREN[Math.floor(rest / EDITIES.length)];
-  const waarde = 999 + ((i * 7919) % 140) * 100;                  // 9,99 .. 148,99: de dure gidsen
-  return {
-    id: 'reis-' + i, nr: i,
-    naam: SOORTEN[s] + ' ' + BESTEMMINGEN[b] + ' ' + editie + ' ' + jaar,
-    bestemming: BESTEMMINGEN[b], soort: SOORTEN[s], editie, jaar,
-    winkelwaardeCenten: waarde, ledenprijsCenten: 0,
-    sterren: (41 + ((i * 31) % 9)) / 10, versie: jaar + '.' + ((i * 13) % 10), grootteMB: 30 + ((i * 97) % 470),
-    uitleg: SOORTEN[s] + ' voor ' + BESTEMMINGEN[b] + ' (' + jaar + '): nuttig, exclusief en educatief, offline te gebruiken. In de winkel EUR ' +
-      (waarde / 100).toFixed(2).replace('.', ',') + '; voor RTG-leden inbegrepen bij de pas.'
-  };
+function teaser(tekst) {
+  const eerste = String(tekst || '').split('\n')[0];
+  return eerste.length > 170 ? eerste.slice(0, 167).trimEnd() + '…' : eerste;
 }
 
-// de totale winkelwaarde: een keer optellen bij het opstarten, zonder iets te bewaren
-let SOM_WAARDE = 0;
-for (let i = 0; i < TOTAAL; i++) SOM_WAARDE += 999 + ((i * 7919) % 140) * 100;
+const ITEMS = GIDSEN.map(([slug, bestemming, regio, titel, tekst], i) => ({
+  id: 'reis-' + slug, slug, nr: i, naam: titel, titel,
+  bestemming, regio, categorie: regio, categorieLabel: regio,
+  uitleg: teaser(tekst), tekst,
+  woorden: tekst.split(/\s+/).length,
+  gratis: true, prijsCenten: 0, ledenprijsCenten: 0
+}));
+const OP_ID = new Map(ITEMS.map(a => [a.id, a]));
+const TOTAAL = ITEMS.length;
 
-const B_LC = BESTEMMINGEN.map(x => x.toLowerCase());
-const S_LC = SOORTEN.map(x => x.toLowerCase());
+const BESTEMMINGEN = ITEMS.map(a => a.bestemming);
+const REGIOS = [...new Set(ITEMS.map(a => a.regio))];
 
 function maakReisBieb({ db, save }) {
   const rij = (key) => {
@@ -56,66 +31,59 @@ function maakReisBieb({ db, save }) {
     if (!Array.isArray(db.data.reisInstallaties[key])) db.data.reisInstallaties[key] = [];
     return db.data.reisInstallaties[key];
   };
+  const publiek = (a) => ({ id: a.id, slug: a.slug, naam: a.naam, titel: a.titel, bestemming: a.bestemming,
+    regio: a.regio, categorie: a.categorie, categorieLabel: a.categorieLabel, uitleg: a.uitleg,
+    woorden: a.woorden, gratis: true, prijsCenten: 0, ledenprijsCenten: 0 });
+  const appVan = (id) => OP_ID.get(String(id || '')) || null;
 
   function overzicht() {
-    return { totaal: TOTAAL, totaleWinkelwaardeCenten: SOM_WAARDE,
-      bestemmingen: BESTEMMINGEN, soorten: SOORTEN, perBestemming: PER_B };
+    const perRegio = {};
+    for (const a of ITEMS) perRegio[a.regio] = (perRegio[a.regio] || 0) + 1;
+    return {
+      totaal: TOTAAL, gratis: true, leesbaar: true,
+      regios: REGIOS.map(r => ({ id: r, label: r, aantal: perRegio[r] })),
+      bestemmingen: BESTEMMINGEN
+    };
   }
 
-  /* Bladeren en zoeken op de bouwstenen: kies een bestemming en/of soort, of
-     typ een zoekterm; die vindt bestemmingen en soorten (Londen, Gaza,
-     metrokaart...). De treffers rollen procedureel uit de gekozen assen. */
-  function catalogus({ bestemming, soort, zoek, pagina, per } = {}) {
-    const p = Math.max(1, Math.min(42000, Number(pagina) || 1));
+  function catalogus({ bestemming, regio, zoek, pagina, per } = {}) {
+    const p = Math.max(1, Math.min(1000, Number(pagina) || 1));
     const n = Math.max(1, Math.min(48, Number(per) || 24));
     const q = String(zoek || '').toLowerCase().trim().slice(0, 60);
-    let B = bestemming ? [BESTEMMINGEN.indexOf(String(bestemming))].filter(x => x >= 0) : null;
-    let S = soort ? [SOORTEN.indexOf(String(soort))].filter(x => x >= 0) : null;
-    if (q) {
-      const qb = B_LC.map((x, ix) => x.includes(q) ? ix : -1).filter(x => x >= 0);
-      const qs = S_LC.map((x, ix) => x.includes(q) ? ix : -1).filter(x => x >= 0);
-      if (qb.length && !B) B = qb;
-      else if (qs.length && !S) S = qs;
-      else if (!qb.length && !qs.length) return { items: [], totaal: 0, pagina: 1, paginas: 1, hint: 'Zoek op een bestemming (bijv. Londen, Gaza) of een gidssoort (bijv. metrokaart).' };
-    }
-    const Bx = B || BESTEMMINGEN.map((_, ix) => ix);
-    const Sx = S || SOORTEN.map((_, ix) => ix);
-    const totaal = Bx.length * Sx.length * PER_BS;
-    const pak = (k) => {
-      const perB = Sx.length * PER_BS;
-      const b = Bx[Math.floor(k / perB)];
-      const s = Sx[Math.floor((k % perB) / PER_BS)];
-      return b * PER_B + s * PER_BS + (k % PER_BS);
-    };
-    const start = (p - 1) * n;
-    const items = [];
-    for (let k = start; k < Math.min(start + n, totaal); k++) items.push(appVan(pak(k)));
-    return { items, totaal, pagina: p, paginas: Math.max(1, Math.ceil(totaal / n)) };
+    let arr = ITEMS;
+    if (bestemming) arr = arr.filter(a => a.bestemming === String(bestemming) || a.slug === String(bestemming));
+    if (regio) arr = arr.filter(a => a.regio === String(regio));
+    if (q) arr = arr.filter(a => (a.naam + ' ' + a.bestemming + ' ' + a.regio + ' ' + a.tekst).toLowerCase().includes(q));
+    return { items: arr.slice((p - 1) * n, (p - 1) * n + n).map(publiek), totaal: arr.length, pagina: p, paginas: Math.max(1, Math.ceil(arr.length / n)) };
+  }
+
+  // een gids echt lezen: de volledige tekst
+  function lees(id) {
+    const a = appVan(id);
+    if (!a) return { status: 404, error: 'Deze reisgids bestaat niet in de bibliotheek.' };
+    return { ok: true, gids: { ...publiek(a), tekst: a.tekst } };
   }
 
   function installeer(key, id) {
-    const nr = Number(String(id || '').replace(/^reis-/, ''));
-    const app = appVan(nr);
-    if (!app) return { status: 404, error: 'Deze reis-app bestaat niet in de bibliotheek.' };
+    const a = appVan(id);
+    if (!a) return { status: 404, error: 'Deze reisgids bestaat niet in de bibliotheek.' };
     const mijn = rij(key);
-    if (mijn.includes(nr)) return { status: 200, ok: true, app, alGeinstalleerd: true, aantal: mijn.length };
-    if (mijn.length >= 500) return { status: 400, error: 'Het maximum van 500 reis-apps is bereikt; verwijder er eerst een.' };
-    mijn.push(nr); save();
-    return { status: 200, ok: true, app, aantal: mijn.length };
+    if (mijn.includes(a.id)) return { status: 200, ok: true, app: publiek(a), alGeinstalleerd: true, aantal: mijn.length };
+    mijn.push(a.id); save();
+    return { status: 200, ok: true, app: publiek(a), aantal: mijn.length };
   }
 
   function verwijder(key, id) {
-    const nr = Number(String(id || '').replace(/^reis-/, ''));
     const mijn = rij(key);
-    const ix = mijn.indexOf(nr);
-    if (ix < 0) return { status: 404, error: 'Deze app staat niet bij uw reis-apps.' };
+    const ix = mijn.indexOf(String(id || ''));
+    if (ix < 0) return { status: 404, error: 'Deze gids staat niet bij uw reisgidsen.' };
     mijn.splice(ix, 1); save();
     return { status: 200, ok: true, aantal: mijn.length };
   }
 
-  const mijnApps = (key) => rij(key).map(appVan).filter(Boolean);
+  const mijnApps = (key) => rij(key).map(appVan).filter(Boolean).map(publiek);
 
-  return { reisbieb: { overzicht, catalogus, installeer, verwijder, mijnApps, appVan, TOTAAL } };
+  return { reisbieb: { overzicht, catalogus, lees, installeer, verwijder, mijnApps, appVan, TOTAAL } };
 }
 
-module.exports = { maakReisBieb, TOTAAL };
+module.exports = { maakReisBieb, GIDSEN, REGIOS, BESTEMMINGEN, TOTAAL };

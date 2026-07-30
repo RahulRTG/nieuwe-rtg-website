@@ -55,7 +55,7 @@
     await laadZorg(d);
     if (!d) return;
     korps = d;
-    $('#titel').textContent = '🚨 ' + d.korps.naam;
+    $('#titel').textContent = '' + d.korps.naam;
     $('#wie').textContent = d.korps.label;
     // special forces nemen zelf niets aan; hun werk komt via bijstand binnen
     $('#rNieuw').hidden = ['specials', 'ziekenhuis', 'huisarts'].includes(d.korps.soort);
@@ -109,7 +109,7 @@
     try { z = await api('zorg/overzicht'); } catch (e) { z = null; }
     ['#kReceptie', '#kSeh', '#kRecepten', '#kVoorschrijf', '#kVerwijs', '#kInbox', '#kAfspraken'].forEach(s => { $(s).hidden = true; });
     if (!z) return;
-    if (!hulpBord) { $('#titel').textContent = '🩺 ' + z.zaak.naam; $('#wie').textContent = z.zaak.label; }
+    if (!hulpBord) { $('#titel').textContent = '' + z.zaak.naam; $('#wie').textContent = z.zaak.label; }
     if (z.receptie) {
       $('#kReceptie').hidden = false;
       $('#wachtkamer').innerHTML = z.receptie.length ? z.receptie.map(p =>
@@ -137,4 +137,9 @@
         (r.status !== 'uitgereikt' ? '<div class="rij"><button class="knop klein" data-rz="klaar" data-r="' + r.id + '" type="button">Zet klaar</button>' +
           '<button class="knop klein" data-rz="uitgereikt" data-r="' + r.id + '" type="button">Reik uit</button></div>' : '') +
         '</div>').join('') : '<p class="stil">Geen recepten in de rij.</p>';
+    }
+    if (z.apotheken) {
+      $('#kVoorschrijf').hidden = false;
+      $('#rApotheek').innerHTML = z.apotheken.map(a => '<option value="' + a.code + '">' + esc(a.naam) + '</option>').join('');
+      $('#eigenRecepten').innerHTML = (z.eigenRecepten || []).slice(0, 5).map(r => esc(r.middel) + ' (' + esc(r.status) + ')').join('<br>');
     }

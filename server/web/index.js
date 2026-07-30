@@ -43,6 +43,12 @@ function maakApp() {
     }
   };
 
+  /* De HELE routekaart, ook door gemounte routers heen: [{ pad, methode }].
+     app._router.stack hierboven is met opzet de express-vorm van alleen de
+     bovenste laag; dit is het volledige beeld, en het is wat een toets nodig
+     heeft die wil weten of een pad echt bestaat. */
+  app._routes = () => router._routes('');
+
   app.handle = function (req, res) {
     verrijk(req, res, instellingen);
     router._handle(req, res, (err) => {

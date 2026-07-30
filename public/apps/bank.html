@@ -6,6 +6,7 @@
 <title>RTG Bank</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
@@ -49,12 +50,27 @@
   .banner{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.6rem;text-align:center;margin-top:2rem;}
   .banner h2{font-size:1.3rem;margin-bottom:.5rem;}
   .banner p{color:var(--muted);font-size:.9rem;line-height:1.6;}
+  /* het financiele hart: een afschrift over alles, met een klein bronlabel */
+  .hrow{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);font-size:.82rem;}
+  .hrow:last-child{border-bottom:none;}
+  .hrow .oms{color:var(--txt);}
+  .hrow .sub{color:var(--soft);font-size:.7rem;margin-top:.1rem;}
+  .hrow .bed{font-family:'Bodoni Moda',serif;font-size:1rem;white-space:nowrap;}
+  .pil{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:.06rem .5rem;font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:.4rem;vertical-align:middle;}
+  .pil.rtg{color:var(--gold);border-color:rgba(169,143,28,.5);}
+  .gratis{font-size:.78rem;color:var(--muted);margin-top:.4rem;line-height:1.55;}
+  .staaf{height:6px;background:rgba(169,143,28,.16);border-radius:3px;overflow:hidden;margin-top:.25rem;}
+  .staaf i{display:block;height:100%;background:var(--gold);}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
   <button class="terug" id="terug">←</button>
-  <div><div class="ey">RTG · Eigen bank</div><h1>🏦 RTG Bank</h1></div>
+  <div><div class="ey">RTG · Eigen bank</div><h1>RTG Bank</h1></div>
 </header>
 <main id="app"><div class="leeg">Laden…</div></main>
 
@@ -83,7 +99,7 @@ function render(){
   if (!OV.akkoord) {
     $('#app').innerHTML =
       '<div class="banner"><h2>Open je RTG Bank-rekening</h2>' +
-      '<p>Je eigen bank binnen RTG: een rekening met een echt IBAN, sparen tegen ' + (OV.spaarrentePct) + '% rente, passen en meer. Gebouwd op hetzelfde grootboek als RTG Pay. Ga je akkoord, dan openen we meteen je betaalrekening.</p>' +
+      '<p>Je eigen bank binnen RTG: een rekening met een echt IBAN, sparen tegen ' + (OV.spaarrentePct) + '% rente, passen en meer. Gebouwd op hetzelfde grootboek als RTG Pay. Alle premium functies zijn inbegrepen -- gratis. Heb je de Business Pass, dan komt je zakelijke rekening er automatisch bij. Ga je akkoord, dan openen we meteen je betaalrekening.</p>' +
       '<div style="margin-top:1rem;"><button class="knop" id="akk">Ik ga akkoord en open mijn rekening</button></div></div>';
     $('#akk').addEventListener('click', async () => {
       try { await api('bank/akkoord'); OV = await api('bank/overzicht'); render(); ai(); }
@@ -93,7 +109,7 @@ function render(){
   }
   const reks = OV.rekeningen || [];
   $('#app').innerHTML =
-    '<div class="ai" id="ai"><h2>🤖 De AI-bankier</h2><div class="we" id="aiWe">Ik kijk mee met je rekeningen en geef eerlijk advies. Ik adviseer; beslissen doe jij.</div>' +
+    '<div class="ai" id="ai"><h2>De AI-bankier</h2><div class="we" id="aiWe">Ik kijk mee met je rekeningen en geef eerlijk advies. Ik adviseer; beslissen doe jij.</div>' +
       '<div class="snel">' +
         '<button data-q="Hoe kan ik het beste sparen?">Beter sparen?</button>' +
         '<button data-q="Sta ik ergens rood en wat kan ik doen?">Sta ik rood?</button>' +
@@ -112,10 +128,55 @@ function render(){
       '<span><label for="ovan">Van</label>' + rekSelect('ovan') + '</span>' +
       '<span><label for="onaar">Naar</label>' + rekSelect('onaar') + '</span>' +
       '<span><label for="obed">Bedrag (€)</label><input id="obed" type="number" min="0" step="0.01" style="width:7rem;"></span>' +
-      '<button class="knop stil" id="odoe">Overboek</button></div></div>';
+      '<button class="knop stil" id="odoe">Overboek</button></div></div>' +
+    '<div class="sec">Het financiële hart</div>' +
+    '<div class="kaart"><div class="gratis">Alles op één afschrift: je bankrekeningen, je RTG Pay-wallet en betalingen die via een derde lopen -- die dragen alleen een klein bronlabel, verder staan ze er als elke eigen betaling.</div>' +
+      '<div id="hart" style="margin-top:.5rem;"><div class="leeg">Laden…</div></div></div>' +
+    '<div class="sec">Premium, inbegrepen · gratis</div>' +
+    '<div class="kaart"><h3 style="font-size:1rem;">Inzichten</h3><div class="gratis">Je uitgaven van deze maand, per soort.</div><div id="inz" style="margin-top:.5rem;"></div></div>' +
+    '<div class="kaart"><h3 style="font-size:1rem;">Vaste-lasten-radar</h3><div class="gratis">Terugkerende afschrijvingen, automatisch herkend.</div><div id="vast" style="margin-top:.5rem;"></div></div>' +
+    '<div class="kaart"><h3 style="font-size:1rem;">Wisselgeld sparen</h3><div class="gratis">Elke uitgave rekenen we af naar de hele euro; één veeg zet het wisselgeld van deze maand op je spaarrekening. Geen spaarrekening? Die komt er dan automatisch bij.</div>' +
+      '<div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="veeg">Veeg mijn wisselgeld</button><span id="veegUit" class="gratis"></span></div></div>';
   bindBank(reks);
+  hartLaad();
   if (!STIL) ai();
   STIL = false;
+}
+
+/* ---- het financiele hart + de premium-kaarten ---- */
+async function hartLaad(){
+  try {
+    const h = await api('bank/hart', { limit: 25 });
+    $('#hart').innerHTML = (h.regels && h.regels.length) ? h.regels.map(r =>
+      '<div class="hrow"><div><span class="oms">' + esc(r.oms || r.soort) + '</span>' +
+        '<span class="pil' + (r.bron === 'RTG Bank' || r.bron === 'RTG Pay' ? ' rtg' : '') + '">' + esc(r.bron) + '</span>' +
+        '<div class="sub">' + new Date(r.at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ' · ' + esc(r.tegen) + '</div></div>' +
+      '<div class="bed">' + (r.af ? '−' : '+') + ' ' + euro(r.centen) + '</div></div>').join('')
+      : '<div class="leeg">Nog geen boekingen.</div>';
+  } catch (e) { const el = $('#hart'); if (el) el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  try {
+    const i = await api('bank/inzichten');
+    const top = (i.perSoort || []).slice(0, 6), max = top.length ? top[0].centen : 1;
+    $('#inz').innerHTML = '<div class="gratis">' + i.maand + ' · ' + i.posten + ' posten · totaal ' + euro(i.uitgavenCenten) + '</div>' +
+      (top.length ? top.map(s => '<div style="margin-top:.45rem;font-size:.78rem;">' + esc(s.soort) + ' · ' + euro(s.centen) +
+        '<div class="staaf"><i style="width:' + Math.max(4, Math.round(100 * s.centen / max)) + '%;"></i></div></div>').join('')
+        : '<div class="leeg">Nog geen uitgaven deze maand.</div>');
+  } catch (e) { const el = $('#inz'); if (el) el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  try {
+    const v = await api('bank/vastelasten');
+    $('#vast').innerHTML = (v.vasteLasten && v.vasteLasten.length) ? v.vasteLasten.map(l =>
+      '<div class="hrow"><div><span class="oms">' + esc(l.oms || l.tegen) + '</span><div class="sub">' + esc(l.tegen) + ' · ' + l.maanden + ' maanden gezien</div></div>' +
+      '<div class="bed">' + euro(l.centen) + '</div></div>').join('')
+      : '<div class="leeg">Nog geen vaste lasten herkend.</div>';
+  } catch (e) { const el = $('#vast'); if (el) el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  const vg = $('#veeg');
+  if (vg && !vg._b) { vg._b = 1; vg.addEventListener('click', async () => {
+    try {
+      const r = await api('bank/veeg');
+      $('#veegUit').textContent = r.geveegdCenten ? euro(r.geveegdCenten) + ' naar je spaarpot geveegd.' : (r.melding || 'Niets te vegen.');
+      if (r.geveegdCenten) await herlaad();
+    } catch (e) { $('#veegUit').textContent = e.message; }
+  }); }
 }
 
 const rekSelect = id => '<select id="' + id + '">' + (OV.rekeningen||[]).map(r => '<option value="' + r.iban + '">' + esc(r.soortLabel || r.soort) + ' · ' + euro(r.saldoCenten) + '</option>').join('') + '</select>';
@@ -127,7 +188,7 @@ function rekHtml(r){
       '<button class="knop stil mini" data-pas="' + r.iban + '">Pas</button>' +
       (r.soort === 'spaar' ? '<button class="knop stil mini" data-doel="' + r.iban + '">Spaardoel</button>' : '') +
       '<button class="knop stil mini" data-afschrift="' + r.iban + '">Afschrift</button>' +
-      '<button class="knop stil mini" data-csv="' + r.iban + '" title="Download het afschrift als CSV-bestand">⬇ CSV</button>' +
+      '<button class="knop stil mini" data-csv="' + r.iban + '" title="Download het afschrift als CSV-bestand">CSV</button>' +
     '</div><div class="afschrift" data-blad="' + r.iban + '" hidden style="flex-basis:100%;font-size:.78rem;color:var(--muted);line-height:1.7;"></div></div>';
 }
 function bindBank(reks){
@@ -220,6 +281,9 @@ live();
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

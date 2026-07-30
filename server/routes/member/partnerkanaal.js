@@ -4,7 +4,7 @@
    toebehoren, prijzen in euro ex btw). Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
   const { app, db, save, crypto, findPartner, findStaffPartner, publicTrip, schoon,
-    sessionFor, mail, sseToOffice } = kern;
+    resolveSession, mail, sseToOffice } = kern;
 
   app.post('/api/partnertrips', (req, res) => {
     let staffRate = null;
@@ -50,7 +50,10 @@ module.exports = (kern) => {
       at: new Date().toISOString()
     });
     save();
-    res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total });
+    // de boeker krijgt meteen alle reisregels van de bestemming mee
+    const wijzer = kern.reiswijzer(trip.dest);
+    res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total,
+      reiswijzer: wijzer.error ? null : wijzer });
   });
 
   app.post('/api/partner/apply', (req, res) => {
@@ -58,9 +61,19 @@ module.exports = (kern) => {
     /* De toegangseis: een partnerplek (en dus een bedrijfscode) is er alleen
        voor bedrijven waar minstens een persoon een Business Pass heeft. De
        aanvrager bewijst dat met zijn eigen ingelogde pas: zonder geldige
-       Business Pass-sessie geen aanvraag, en dus geen code. */
+       Business Pass-sessie geen aanvraag, en dus geen code.
+
+       Hier stond sessionFor(). Die kent alleen de sessies uit /api/login -- de
+       demopassen. Een ECHT ledenaccount komt via accounts.verifyToken binnen en
+       staat daar helemaal niet in, ook niet als het account na een menselijk
+       besluit wel degelijk op Business staat (aanmeldingen.beslis -> setTier).
+       De poort sloot dus precies de mensen buiten voor wie hij bedoeld is: geen
+       enkele echte Business Pass-houder kon een partnerplek aanvragen.
+       resolveSession() kent allebei de wegen, net als de gewone auth-middleware
+       in server.js. Dezelfde fout is eerder bij uitloggen opgelost; zie de
+       toelichting boven /api/logout in routes/auth.js. */
     const passToken = String(b.passToken || (req.headers.authorization || '').replace(/^Bearer\s+/i, '') || '');
-    const passSess = passToken ? sessionFor(passToken) : null;
+    const passSess = passToken ? resolveSession(passToken) : null;
     if (!passSess || passSess.tier !== 'business')
       return res.status(403).json({ error: 'Zonder Business Pass geen bedrijfscode: een partnerplek vraagt u aan met een actieve Business Pass. Log op dit apparaat in op de Business Pass-app en probeer het opnieuw.' });
     // schoon(): strip < en > uit vrije tekst. De bedrijfsnaam en plaats komen later

@@ -1,7 +1,7 @@
 /* Lidacties: de transactiefuncties van het lid als kern-module met
    EXPLICIETE afhankelijkheden. Bestellen, tickets en ritten, elk als
    (session, body) -> { ok, ... } | { status, error }. Dit zijn exact de
-   functies achter de app-knoppen EN achter De Butler (via de
+   functies achter de app-knoppen EN achter Rahul (via de
    acties-registry in server.js), dus er is een codepad en geen drift.
    De regels reizen mee: ledenprijsgarantie, 86 van de keuken, de
    leeftijds/alcohol-grens per land, het zorgprofiel en het betaalmoment
@@ -11,7 +11,7 @@
 const { orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe } = require('../db');
 
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
-  leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
+  leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
   notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
   ledenvoordeelVoor }) => {
@@ -25,7 +25,7 @@ module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs
 
 function koopTicketVoor(session, body) {
   const s = findSupplier(body.supplierCode);
-  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  const caps = s ? (db.capsVan(s)) : [];
   if (!s || !caps.includes('tickets')) return { status: 404, error: 'Geen activiteitenpartner gevonden.' };
   const act = (s.activiteiten || []).find(a => a.id === body.activiteitId);
   if (!act) return { status: 404, error: 'Deze activiteit bestaat niet (meer).' };
@@ -53,7 +53,7 @@ function koopTicketVoor(session, body) {
   };
   boekingenVoegToe(ticket);
   save();
-  return { ok: true, ticket }; // afrekenen via /api/booking/pay of de Butler
+  return { ok: true, ticket }; // afrekenen via /api/booking/pay of Rahul
 }
 
 function betaalBoekingVoor(session, body) {
@@ -74,7 +74,7 @@ function betaalBoekingVoor(session, body) {
   verdienPunten(session.key, (b.price || 0) - kortingB - voordeelB, b.supplierName);
   openLijnVoor(findSupplier(b.supplierCode), session);
   save();
-  notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
+  notifySupplier(b.supplierCode, { icon: 'agenda', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
   sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   return { ok: true, boeking: b };
@@ -83,7 +83,7 @@ function betaalBoekingVoor(session, body) {
   /* De bestel- en ritlaag draaien als submodules op een gedeelde context,
      een keer opgebouwd bij het opstarten. */
   const ctx = { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
-    leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
+    leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
     orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor };

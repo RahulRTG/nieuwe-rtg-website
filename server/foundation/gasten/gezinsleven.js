@@ -1,9 +1,22 @@
 /* RTFoundation-gasten (deelmodule): de gezinsagenda (samen plannen) en de
    klusjes-met-sterren. Gemount vanuit foundation/gasten.js op de gedeelde
-   context; agendaPubliek gaat terug de context in voor de koppelinglaag. */
+   context; agendaPubliek gaat terug de context in voor de koppelinglaag.
+   De herhaalregel (keerN) komt uit de RTG-agendakern: EEN regel voor het
+   hele huis, dus een verjaardag op de 31e klemt en keert netjes terug. */
+const { keerN, HERHAAL } = require('../../kern/agenda-pro');
+const { schoolPunten } = require('../../school/planner');
+
 module.exports = (ctx) => {
-  const { router, G, eigenVeld, nu, save, rid, schoon, encS, decS,
+  const { router, F, G, eigenVeld, nu, save, rid, schoon, encS, decS,
     familieVan, sessieVan, isGast, locatiePubliek, oppasinfoPubliek } = ctx;
+  // de herhaal- en notitievelden van een agendapunt, netjes geschoond
+  function agendaVelden(body) {
+    return {
+      herhaal: HERHAAL.includes(body.herhaal) ? body.herhaal : 'geen',
+      herhaalTot: /^\d{4}-\d{2}-\d{2}$/.test(body.herhaalTot || '') ? body.herhaalTot : '',
+      notitie: schoon(body.notitie, 120)
+    };
+  }
   /* gezinsagenda: samen plannen. Het gezin voegt toe; iedereen (ook de oppas) mag
      de planning zien, zodat een oppas weet wat er die dag speelt. */
   router.post('/gezin/agenda', (req, res) => {
@@ -15,9 +28,60 @@ module.exports = (ctx) => {
     const wie = req.body.wie && s.g.profielen[req.body.wie] ? req.body.wie : '';
     if (!s.g.agenda) s.g.agenda = [];
     if (s.g.agenda.length >= 200) return res.status(400).json({ error: 'De agenda is vol. Haal eerst iets weg.' });
-    const item = { id: rid(3), titel, datum: req.body.datum, tijd, wie, door: s.p.id, at: nu() };
+    const item = Object.assign({ id: rid(3), titel, datum: req.body.datum, tijd, wie, door: s.p.id, at: nu() },
+      agendaVelden(req.body));
     s.g.agenda.push(item); save();
     res.json({ ok: true, item });
+  });
+  // wijzigen is verzetten, geen verdubbelen: hetzelfde punt schuift mee
+  router.post('/gezin/agenda/wijzig', (req, res) => {
+    const s = familieVan(req, res); if (!s) return;
+    const a = (s.g.agenda || []).find(x => x.id === req.body.itemId);
+    if (!a) return res.status(404).json({ error: 'Dit agendapunt bestaat niet (meer).' });
+    if (req.body.titel !== undefined) { const t = schoon(req.body.titel, 80); if (!t) return res.status(400).json({ error: 'Waar gaat het agendapunt over?' }); a.titel = t; }
+    if (req.body.datum !== undefined) { if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.datum)) return res.status(400).json({ error: 'Kies een datum.' }); a.datum = req.body.datum; }
+    if (req.body.tijd !== undefined) a.tijd = /^\d{2}:\d{2}$/.test(req.body.tijd || '') ? req.body.tijd : '';
+    if (req.body.wie !== undefined) a.wie = req.body.wie && s.g.profielen[req.body.wie] ? req.body.wie : '';
+    if (req.body.herhaal !== undefined || req.body.herhaalTot !== undefined || req.body.notitie !== undefined) {
+      Object.assign(a, agendaVelden(Object.assign({ herhaal: a.herhaal, herhaalTot: a.herhaalTot, notitie: a.notitie }, req.body)));
+    }
+    save();
+    res.json({ ok: true });
+  });
+  /* het bereik: herhalingen uitgerold tussen twee datums, met de kleur en de
+     naam van het gezinslid erbij -- klaar voor een maandraster. De oppas mag
+     dit ook lezen (sessieVan), schrijven blijft van het gezin. */
+  router.post('/gezin/agenda/bereik', (req, res) => {
+    const s = sessieVan(req, res); if (!s) return;
+    const van = /^\d{4}-\d{2}-\d{2}$/.test(req.body.van || '') ? req.body.van : new Date().toISOString().slice(0, 10);
+    const totD = /^\d{4}-\d{2}-\d{2}$/.test(req.body.tot || '') ? req.body.tot : keerN(van, 'maand', 2);
+    const uit = [];
+    const vandaag = new Date().toISOString().slice(0, 10);
+    for (const a of s.g.agenda || []) {
+      const p = a.wie && s.g.profielen[a.wie];
+      const basis = { id: a.id, titel: a.titel, tijd: a.tijd || '', wie: a.wie || '',
+        wieNaam: p ? p.naam : '', wieKleur: p && p.kleur ? p.kleur : '',
+        herhaal: a.herhaal || 'geen', herhaalTot: a.herhaalTot || '', notitie: a.notitie || '',
+        basis: a.datum };  // de startdatum van de reeks; bewerken rekent hiermee, niet met de uitgerolde dag
+      if (!a.herhaal || a.herhaal === 'geen') {
+        if (a.datum >= van && a.datum <= totD) uit.push(Object.assign({ datum: a.datum, vandaag: a.datum === vandaag }, basis));
+        continue;
+      }
+      const stop = a.herhaalTot && a.herhaalTot < totD ? a.herhaalTot : totD;
+      for (let n = 0; n < 500; n++) {
+        const d = keerN(a.datum, a.herhaal, n);
+        if (d > stop) break;
+        if (d >= van) uit.push(Object.assign({ datum: d, vandaag: d === vandaag }, basis));
+      }
+    }
+    /* school kijkt mee, alleen-lezen: open huiswerk en de toetsen van de
+       tieners op hun dag (dezelfde regel als de RTG-ecosysteemlaag: de
+       agenda leest school, hij herschrijft school niet). Niet voor de oppas. */
+    if (!isGast(s.p)) for (const x of schoolPunten(F(), s.g, van, totD)) uit.push(x);
+    uit.sort((x, y) => (x.datum + (x.tijd || '99:99')).localeCompare(y.datum + (y.tijd || '99:99')));
+    res.json({ items: uit, magBewerken: !isGast(s.p),
+      profielen: Object.values(s.g.profielen).filter(p => !isGast(p))
+        .map(p => ({ id: p.id, naam: p.naam, kleur: p.kleur || '' })) });
   });
   router.post('/gezin/agenda/verwijder', (req, res) => {
     const s = familieVan(req, res); if (!s) return;

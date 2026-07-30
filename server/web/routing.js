@@ -28,6 +28,31 @@ function mountMatch(prefix, pn) {
   return null;
 }
 
+/* ---------- de volledige routekaart ----------
+   app._router.stack (zie web/index.js) geeft alleen de BOVENSTE laag, in de
+   express-vorm die kern/stuur.js verwacht. Dat is een half beeld: alles wat via
+   app.use('/api/foundation', router) of via een voorvoegsel-hulpje hangt staat
+   er niet in. Wie op dat halve beeld toetst, meldt kloppende paden als kapot.
+
+   Deze functie loopt de mounts wel na en geeft elk ECHT pad terug met zijn
+   methode. Ze leest alleen; er verandert niets aan het routeren zelf. */
+function leesLagen(lagen, voorvoegsel) {
+  const uit = [];
+  for (const l of lagen) {
+    if (l.mount) {
+      const kind = l.fn && l.fn._stack;
+      if (!Array.isArray(kind)) continue;                 // gewone middleware
+      const p = l.prefix === '/' ? '' : String(l.prefix || '');
+      for (const r of leesLagen(kind, voorvoegsel + p)) uit.push(r);
+      continue;
+    }
+    if (typeof l.pad !== 'string') continue;              // RegExp-pad: niet te noemen
+    const pad = (voorvoegsel + l.pad).replace(/\/+$/, '') || '/';
+    uit.push({ pad, methode: l.method || 'ALL' });
+  }
+  return uit;
+}
+
 /* ---------- een router (ook de app is er een) ---------- */
 function maakRouter() {
   const lagen = [];
@@ -61,13 +86,27 @@ function maakRouter() {
         req.params = { ...buitenParams };
         const oudUrl = req.url;
         req.url = mm.len ? req.url.slice(mm.len) || '/' : req.url;
-        const verder = (e) => { req.url = oudUrl; req.params = buitenParams; next(e); };
+        /* Het voorvoegsel meenemen naar binnen. Zonder dit heet een route in een
+           gemounte router naar zichzelf: /api/foundation/leden meldde zich als
+           /leden, en dat botst met elke andere router die ook een /leden heeft.
+           De meting telde die dan als EEN reeks, en de dekkingsmeting kon een
+           waargenomen route niet terugvinden op de routekaart. */
+        const oudVoor = req.routeVoorvoegsel || '';
+        if (mm.len) req.routeVoorvoegsel = oudVoor + laag.prefix;
+        const verder = (e) => { req.url = oudUrl; req.params = buitenParams; req.routeVoorvoegsel = oudVoor; next(e); };
         return laag.fout ? laag.fn(err, req, res, verder) : laag.fn(req, res, verder);
       }
 
       const params = padMatch(laag, pn);
       if (params === null) return next(err);
       req.params = { ...buitenParams, ...params };
+      /* Het PATROON onthouden, niet het pad. De meting (server/meting.js) telt
+         hierop: op het patroon zijn het een paar duizend waarden, op het pad is
+         het er een per gebruiker-id -- en dan legt de monitoring zichzelf om.
+         Alleen bij een echte route (laag.method gezet), niet bij middleware,
+         want die matcht op alles en zou het patroon overschrijven. */
+      if (laag.method && typeof laag.pad === 'string')
+        req.routePatroon = ((req.routeVoorvoegsel || '') + laag.pad).replace(/\/+$/, '') || '/';
       try {
         if (laag.fout) return laag.fn(err, req, res, next);
         return laag.fn(req, res, next);
@@ -80,6 +119,7 @@ function maakRouter() {
   const router = function (req, res, next) { handle(req, res, next || (() => {})); };
   router._stack = lagen;
   router._handle = handle;
+  router._routes = function (voorvoegsel) { return leesLagen(lagen, voorvoegsel || ''); };
 
   router.use = function (arg0, ...rest) {
     if (typeof arg0 === 'string') {
@@ -102,4 +142,4 @@ function maakRouter() {
 }
 
 
-module.exports = { maakRouter, padNaar };
+module.exports = { maakRouter, padNaar, leesLagen };

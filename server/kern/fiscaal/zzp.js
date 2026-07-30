@@ -6,9 +6,21 @@
 const { FISCAAL_PEILJAAR, LANDEN, ZZP } = require('./landen');
 const { centen } = require('../util');
 
+/* Landen zonder eigen zzp-regime in de tabel (de wereldtabel) krijgen een
+   eerlijke indicatie: effectieve heffing afgeleid van de werkgeverslasten
+   van dat land plus een basisheffing, duidelijk als indicatie gelabeld. */
+function regimeVan(landCode) {
+  if (ZZP[landCode]) return ZZP[landCode];
+  const L = LANDEN[landCode];
+  return { regime: 'Zelfstandige (wereldtabel, indicatie)',
+    simpel: Math.max(0.15, Math.min(0.45, 0.18 + (L.lasten || 0) * 0.6)),
+    regels: ['Voor ' + L.naam + ' rekent de wereldtabel met een indicatieve effectieve heffing; het echte regime kent eigen drempels en aftrekposten.',
+      'De Regelwacht werkt de tarieven van dit land automatisch bij.'] };
+}
+
 function zzpBerekening(land, winstIn, opties) {
-  const landCode = ZZP[land] ? land : 'NL';
-  const Z = ZZP[landCode];
+  const landCode = LANDEN[land] ? land : 'NL';
+  const Z = regimeVan(landCode);
   const winst = Math.max(0, Math.min(5000000, Math.round(Number(winstIn) || 0)));
   if (!winst) return { error: 'Vul de verwachte jaarwinst in.', status: 400 };
   const o = opties || {};

@@ -1,4 +1,4 @@
-/* Butler-reislaag, deel "reisplan" (kern/fluister/reis): de hele reis in een
+/* Rahul-reislaag, deel "reisplan" (kern/fluister/reis): de hele reis in een
    vraag. bouwReisplan zet verblijf + transfer + diner + activiteit klaar als een
    voorstel met totaalprijs; voerReisUit boekt daarna alles in volgorde op het
    ene "ja", via exact dezelfde actie-functies als de app-knoppen. Verbatim

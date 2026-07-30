@@ -23,9 +23,9 @@ module.exports = (kern) => {
   app.post('/api/pakketten', auth, (req, res) => {
     res.json(synergie.pakketten());
   });
-  app.post('/api/pakket/koop', auth, (req, res) => {
+  app.post('/api/pakket/koop', auth, async (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Pakketten boeken is voor leden.' });
-    const r = synergie.pakketKoop(liveCodename(req.session), String(req.body.id || ''), req.body.idem);
+    const r = await synergie.pakketKoop(liveCodename(req.session), String(req.body.id || ''), req.body.idem);
     if (r.ok && sseToOffice) sseToOffice('sync', { scope: 'pay' });
     stuur(res, r);
   });

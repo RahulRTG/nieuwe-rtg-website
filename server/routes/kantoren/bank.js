@@ -94,20 +94,24 @@ module.exports = (ctx) => {
   app.post('/api/office/bank/afschrift', officeAuth, (req, res) => veilig(res, () => bank.afschrift({ iban: String(req.body.iban || ''), limit: Number(req.body.limit) || 50, offset: Number(req.body.offset) || 0 })));
 
   // de renteronde met de hand draaien (normaal een dagelijkse achtergrondronde)
-  app.post('/api/office/bank/rente', officeAuth, (req, res) => veilig(res, () => {
-    const r = bank.bankRenteRonde(req.body && req.body.dagen != null ? { dagen: Number(req.body.dagen) } : {});
-    if (r.ok && r.bijgeschrevenCenten > 0) { afdelingen.audit(naam(req), 'Spaarrente bijgeschreven: € ' + (r.bijgeschrevenCenten / 100).toFixed(2) + ' op ' + r.rekeningen + ' rekening(en)'); sync(); }
-    return r;
-  }));
+  app.post('/api/office/bank/rente', officeAuth, async (req, res) => {
+    const r = await bank.bankRenteRonde(req.body && req.body.dagen != null ? { dagen: Number(req.body.dagen) } : {});
+    veilig(res, () => {
+      if (r.ok && r.bijgeschrevenCenten > 0) { afdelingen.audit(naam(req), 'Spaarrente bijgeschreven: € ' + (r.bijgeschrevenCenten / 100).toFixed(2) + ' op ' + r.rekeningen + ' rekening(en)'); sync(); }
+      return r;
+    });
+  });
 
   /* Krediet: de openstaande leningaanvragen en het besluit. Een mens beslist,
      nooit de AI; goedkeuren stort de hoofdsom op de rekening van het lid. */
   app.post('/api/office/bank/krediet', officeAuth, (req, res) => veilig(res, () => bank.bankKredietOpenstaand()));
-  app.post('/api/office/bank/krediet/besluit', officeAuth, (req, res) => veilig(res, () => {
-    const r = bank.bankKredietBesluit({ id: String(req.body.id || ''), akkoord: req.body.akkoord === true, wie: naam(req) });
-    if (r.ok) { afdelingen.audit(naam(req), 'Kredietaanvraag ' + r.krediet.id + ' ' + (r.krediet.status === 'afgewezen' ? 'afgewezen' : 'goedgekeurd (€ ' + (r.krediet.bedragCenten / 100).toFixed(2) + ')')); sync(); }
-    return r;
-  }));
+  app.post('/api/office/bank/krediet/besluit', officeAuth, async (req, res) => {
+    const r = await bank.bankKredietBesluit({ id: String(req.body.id || ''), akkoord: req.body.akkoord === true, wie: naam(req) });
+    veilig(res, () => {
+      if (r.ok) { afdelingen.audit(naam(req), 'Kredietaanvraag ' + r.krediet.id + ' ' + (r.krediet.status === 'afgewezen' ? 'afgewezen' : 'goedgekeurd (€ ' + (r.krediet.bedragCenten / 100).toFixed(2) + ')')); sync(); }
+      return r;
+    });
+  });
 
   /* Salarisrun gekoppeld aan de personeelskosten: het voorstel rekent de
      geklokte maanduren van een zaak om naar posten (zelfde uurloon als het
@@ -116,19 +120,23 @@ module.exports = (ctx) => {
      batch-voorcontrole als elke bulkbetaling. */
   app.post('/api/office/bank/salaris/voorstel', officeAuth, (req, res) => veilig(res, () =>
     bank.bankSalarisVoorstel({ zaak: req.body.zaak })));
-  app.post('/api/office/bank/salaris/run', officeAuth, (req, res) => veilig(res, () => {
+  app.post('/api/office/bank/salaris/run', officeAuth, async (req, res) => {
     const v = bank.bankSalarisVoorstel({ zaak: req.body.zaak });
-    if (v.error) return v;
-    if (!v.posten.length) return { status: 400, error: 'Geen uitbetaalbare posten: niemand met geklokte uren en een gekoppelde betaalrekening.' };
-    const r = bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten: v.posten });
-    if (r.ok) { afdelingen.audit(naam(req), 'Salarisrun ' + v.zaak + ' (' + v.maand + '): ' + r.geboekt + ' loonbetaling(en), € ' + (r.totaalCenten / 100).toFixed(2)); sync(); }
-    return r.ok ? { ...r, zaak: v.zaak, maand: v.maand, zonderRekening: v.zonderRekening } : r;
-  }));
+    if (v.error) { veilig(res, () => v); return; }
+    if (!v.posten.length) { veilig(res, () => ({ status: 400, error: 'Geen uitbetaalbare posten: niemand met geklokte uren en een gekoppelde betaalrekening.' })); return; }
+    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten: v.posten });
+    veilig(res, () => {
+      if (r.ok) { afdelingen.audit(naam(req), 'Salarisrun ' + v.zaak + ' (' + v.maand + '): ' + r.geboekt + ' loonbetaling(en), € ' + (r.totaalCenten / 100).toFixed(2)); sync(); }
+      return r.ok ? { ...r, zaak: v.zaak, maand: v.maand, zonderRekening: v.zonderRekening } : r;
+    });
+  });
 
   // de incassoronde: alle vaste betalingen die aan de beurt zijn uitvoeren
-  app.post('/api/office/bank/incasso', officeAuth, (req, res) => veilig(res, () => {
-    const r = bank.bankIncassoRonde(req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {});
-    if (r.ok && r.uitgevoerd > 0) { afdelingen.audit(naam(req), 'Incassoronde: ' + r.uitgevoerd + ' vaste betaling(en), € ' + (r.bedragCenten / 100).toFixed(2)); sync(); }
-    return r;
-  }));
+  app.post('/api/office/bank/incasso', officeAuth, async (req, res) => {
+    const r = await bank.bankIncassoRonde(req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {});
+    veilig(res, () => {
+      if (r.ok && r.uitgevoerd > 0) { afdelingen.audit(naam(req), 'Incassoronde: ' + r.uitgevoerd + ' vaste betaling(en), € ' + (r.bedragCenten / 100).toFixed(2)); sync(); }
+      return r;
+    });
+  });
 };

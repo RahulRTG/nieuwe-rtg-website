@@ -32,7 +32,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>🧸 Opvoedhulp</h1>
+  <h1>Opvoedhulp</h1>
   <div class="intro">Opvoeden is het mooiste en soms het zwaarste werk dat er is. Hier vind je rustige, praktische hulp bij alledaagse situaties, en een coach die met je meedenkt. Zonder oordeel.</div>
 
   <div class="kaart blok">
@@ -50,6 +50,7 @@
       <textarea class="veld" id="vraag" rows="1" placeholder="Bijvoorbeeld: mijn kind wil niet naar bed..." maxlength="1000"></textarea>
       <button class="knop" id="stuur">Vraag</button>
     </div>
+    <div style="color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
     <div class="veilignote"><b>Maak je je zorgen over de veiligheid van je kind of jezelf?</b> Praat met je huisarts of het Centrum voor Jeugd en Gezin, of bel gratis Veilig Thuis: 0800-2000.</div>
   </div>
 </div>
@@ -104,6 +105,11 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

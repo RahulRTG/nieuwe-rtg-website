@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Voorleesverhaaltjes</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:40rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .keuzelijst{display:grid;gap:.7rem;}
+  .titelknop{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.85rem 1rem;
+    cursor:pointer;text-align:left;color:var(--txt);display:flex;gap:.9rem;align-items:center;}
+  .titelknop:hover{border-color:var(--goud);}
+  .titelknop svg{width:2.2rem;height:2.2rem;flex:0 0 auto;color:var(--goud);}
+  .titelknop b{display:block;font-family:var(--serif);font-weight:500;font-size:1.05rem;}
+  .titelknop span{color:var(--zacht);font-size:.85rem;}
+  .plaat{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:1rem;margin-bottom:1rem;}
+  .plaat svg{width:100%;height:9rem;display:block;color:var(--goud);}
+  .tekst{font-family:var(--serif);font-size:1.35rem;line-height:1.7;margin:.4rem 0 1rem;}
+  .onderrij{display:flex;gap:.6rem;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+  .paginaatje{color:var(--zacht);font-size:.85rem;}
+  .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Voorleesverhaaltjes</h1>
+  <div class="intro">Korte verhaaltjes om samen voor te lezen. Elke bladzijde is een paar zinnen, met een plaatje erbij. Kies een verhaal en blader rustig door.</div>
+
+  <div class="kaart blok" id="kiesblok">
+    <div class="keuzelijst" id="keuzelijst"></div>
+  </div>
+
+  <div class="kaart blok" id="leesblok" hidden>
+    <div class="plaat" id="plaat"></div>
+    <div class="tekst" id="tekst" aria-live="polite"></div>
+    <div class="doen" id="napraat" hidden style="background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.9rem 1rem;margin-bottom:1rem;color:var(--zacht);font-size:.88rem;line-height:1.55;"></div>
+    <div class="onderrij">
+      <button class="knop grijs klein" id="terug" type="button">Vorige</button>
+      <div class="paginaatje" id="paginaatje"></div>
+      <button class="knop klein" id="verder" type="button">Volgende</button>
+    </div>
+    <div class="onderrij" style="margin-top:.9rem;justify-content:center;">
+      <button class="knop grijs klein" id="andersverhaal" type="button">Ander verhaal</button>
+    </div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de voorlezer</h2>
+    <p class="ouder">Lees rustig en laat stiltes vallen; een kleuter heeft tijd nodig om het plaatje te bekijken. Stel bij elke bladzijde een vraag: wat zie jij hier? wat zou er nu gebeuren? Op de laatste bladzijde staat een napraatvraag: het boekje gaat dicht, het gesprek gaat open. Alle verhaaltjes zijn voor deze app geschreven, lopen goed af en bevatten niets engs. Er is geen geluid en geen automatische pagina-omslag: het kind bepaalt het tempo.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+const P = {
+  maan: '<svg viewBox="0 0 120 60" aria-hidden="true"><circle cx="90" cy="18" r="10" fill="currentColor"/><circle cx="86" cy="15" r="9" fill="var(--paneel2)"/><path d="M0 52h120" stroke="currentColor" stroke-width="2"/><circle cx="26" cy="44" r="8" fill="currentColor" opacity=".8"/><rect x="22" y="30" width="8" height="10" rx="4" fill="currentColor" opacity=".8"/><circle cx="55" cy="12" r="1.8" fill="currentColor"/><circle cx="40" cy="20" r="1.4" fill="currentColor"/><circle cx="68" cy="26" r="1.4" fill="currentColor"/></svg>',
+  boom: '<svg viewBox="0 0 120 60" aria-hidden="true"><circle cx="34" cy="24" r="16" fill="currentColor" opacity=".85"/><rect x="31" y="34" width="6" height="18" rx="2" fill="currentColor"/><circle cx="86" cy="28" r="12" fill="currentColor" opacity=".5"/><rect x="83" y="36" width="6" height="16" rx="2" fill="currentColor" opacity=".7"/><path d="M0 52h120" stroke="currentColor" stroke-width="2"/></svg>',
+  water: '<svg viewBox="0 0 120 60" aria-hidden="true"><path d="M0 36c12-8 24 8 36 0s24 8 36 0 24 8 36 0" fill="none" stroke="currentColor" stroke-width="3"/><path d="M0 48c12-8 24 8 36 0s24 8 36 0 24 8 36 0" fill="none" stroke="currentColor" stroke-width="2" opacity=".6"/><path d="M52 10l14 8-14 8z" fill="currentColor"/><rect x="49" y="8" width="3" height="22" rx="1.5" fill="currentColor"/></svg>',
+  huis: '<svg viewBox="0 0 120 60" aria-hidden="true"><path d="M60 8L34 30h6v22h40V30h6z" fill="currentColor" opacity=".85"/><rect x="54" y="38" width="12" height="14" rx="2" fill="var(--paneel2)"/><path d="M0 52h120" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="16" r="7" fill="currentColor" opacity=".5"/></svg>',
+  wolk: '<svg viewBox="0 0 120 60" aria-hidden="true"><path d="M34 36a10 10 0 010-20 13 13 0 0124-4 9 9 0 012 24z" fill="currentColor" opacity=".8"/><path d="M40 44v8M56 44v10M72 44v7" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".7"/></svg>',
+  vogel: '<svg viewBox="0 0 120 60" aria-hidden="true"><path d="M20 30c8-10 20-10 26 0-6 10-18 10-26 0z" fill="currentColor"/><circle cx="42" cy="26" r="2" fill="var(--paneel2)"/><path d="M18 30l-10-7v14z" fill="currentColor"/><path d="M74 20q8-8 16 0M84 34q8-8 16 0" fill="none" stroke="currentColor" stroke-width="2.5" opacity=".6"/></svg>',
+  kat: '<svg viewBox="0 0 120 60" aria-hidden="true"><circle cx="60" cy="32" r="16" fill="currentColor" opacity=".85"/><path d="M48 20l-2-12 12 7zM72 20l2-12-12 7z" fill="currentColor"/><circle cx="54" cy="30" r="2.4" fill="var(--paneel2)"/><circle cx="66" cy="30" r="2.4" fill="var(--paneel2)"/><path d="M76 40q14 4 14-12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M0 52h120" stroke="currentColor" stroke-width="2"/></svg>',
+  ster: '<svg viewBox="0 0 120 60" aria-hidden="true"><path d="M60 8l6 14 15 1-11 10 3 15-13-8-13 8 3-15-11-10 15-1z" fill="currentColor"/><circle cx="24" cy="18" r="2" fill="currentColor"/><circle cx="96" cy="24" r="2" fill="currentColor"/><circle cx="34" cy="42" r="1.6" fill="currentColor"/><circle cx="88" cy="44" r="1.6" fill="currentColor"/></svg>'
+};
+
+const VERHALEN = [
+  {
+    id: 'muis',
+    vraag: 'Wat doe jij als je niet kunt slapen? Zullen we het sterren-ademen van uil samen proberen?',
+    titel: 'De muis die niet kon slapen',
+    sub: 'zeven bladzijden, over rustig worden',
+    plaat: 'maan',
+    bladzijden: [
+      { p: 'maan', t: 'Het was avond. Alle dieren in het bos gingen slapen. Alleen muis Fien lag nog wakker.' },
+      { p: 'kat', t: 'Fien draaide om. En nog een keer om. Haar bedje van blaadjes bleef kriebelen.' },
+      { p: 'boom', t: 'Ze liep naar buiten. Daar zat uil op een tak. "Kun jij ook niet slapen?" vroeg uil.' },
+      { p: 'ster', t: '"Nee," zei Fien. "Mijn hoofd blijft praten." Uil knikte. "Dat ken ik," zei hij zacht.' },
+      { p: 'wolk', t: '"Kijk eens naar de sterren," zei uil. "Adem in als je er een ziet. Adem uit als hij knippert."' },
+      { p: 'maan', t: 'Fien keek. In. Uit. In. Uit. De sterren gingen langzamer. Fien ook.' },
+      { p: 'huis', t: 'Ze liep terug naar haar bedje. De blaadjes kriebelden niet meer. Fien sliep.' }
+    ]
+  },
+  {
+    id: 'druppel',
+    vraag: 'Waar zou jij weleens naartoe willen stromen? En wie neem je mee?',
+    titel: 'De druppel die de zee zocht',
+    sub: 'zes bladzijden, over onderweg zijn',
+    plaat: 'water',
+    bladzijden: [
+      { p: 'wolk', t: 'Hoog in een wolk woonde een kleine druppel. Hij wilde weten waar alle water naartoe ging.' },
+      { p: 'wolk', t: 'Op een dag werd de wolk zwaar. En daar viel de druppel: tik, op een blad.' },
+      { p: 'boom', t: 'Van het blad rolde hij op de grond. Van de grond in een slootje. Het slootje liep en liep.' },
+      { p: 'water', t: 'In het slootje kwamen andere druppels bij. Samen werden ze een beek. Samen werden ze een rivier.' },
+      { p: 'vogel', t: 'Een vogel vloog mee en riep: "Nog even! Ik zie hem al!" De druppel wist niet wat hij zou zien.' },
+      { p: 'water', t: 'En toen werd alles wijd en blauw. De zee. De druppel was thuis, en hij was nooit alleen geweest.' }
+    ]
+  },
+  {
+    id: 'beer',
+    vraag: 'Wanneer heb jij weleens iets gedeeld? Hoe voelde dat vanbinnen?',
+    titel: 'Beer deelt zijn appel',
+    sub: 'zes bladzijden, over samen delen',
+    plaat: 'boom',
+    bladzijden: [
+      { p: 'boom', t: 'Beer vond een appel. Een grote rode. Hij hield hem stevig vast met twee poten.' },
+      { p: 'kat', t: 'Egel kwam langs. "Wat een mooie appel," zei egel. Beer zei niets en liep door.' },
+      { p: 'vogel', t: 'Vogel kwam langs. "Wat een mooie appel," zei vogel. Beer hield hem nog steviger vast.' },
+      { p: 'huis', t: 'Beer ging zitten en nam een hap. De appel was lekker. Maar het was heel stil om hem heen.' },
+      { p: 'boom', t: 'Beer stond op. Hij zocht egel. Hij zocht vogel. "Hebben jullie zin in een stukje?"' },
+      { p: 'ster', t: 'Ze aten samen. Beer kreeg minder appel dan eerst. En toch smaakte het beter.' }
+    ]
+  },
+  {
+    id: 'kat',
+    vraag: 'Wat zou jij bovenop de heuvel willen zien? En wat is fijn aan thuiskomen?',
+    titel: 'Poes Miel gaat op reis',
+    sub: 'zeven bladzijden, over durven en thuiskomen',
+    plaat: 'kat',
+    bladzijden: [
+      { p: 'kat', t: 'Poes Miel woonde in een huis met een blauwe deur. Achter de tuin lag een heuvel. Daar was ze nog nooit geweest.' },
+      { p: 'huis', t: 'Op een ochtend zei Miel: vandaag ga ik kijken. Ze stapte over het tuinhek. Haar hart ging snel.' },
+      { p: 'boom', t: 'Ze liep langs een boom die ze niet kende. Er zaten drie vogels in. Ze keken haar rustig aan.' },
+      { p: 'vogel', t: '"Waar ga je heen?" vroeg de kleinste vogel. "Naar boven," zei Miel. "Dan lopen we een stukje mee," zei de vogel.' },
+      { p: 'wolk', t: 'Bovenop de heuvel woei de wind. Miel zag alles: de weilanden, het water, en heel klein haar eigen blauwe deur.' },
+      { p: 'ster', t: 'Ze bleef zitten tot de lucht oranje werd. "Ik ben verder geweest dan ooit," zei ze tegen de vogels.' },
+      { p: 'huis', t: 'Toen liep ze naar beneden, terug naar de blauwe deur. Binnen was het warm. Morgen, dacht Miel, ga ik weer.' }
+    ]
+  },
+  {
+    id: 'lantaarn',
+    vraag: 'Waar ben jij weleens een beetje bang voor? Wat zou de maan tegen jou zeggen?',
+    titel: 'De lantaarn die bang was voor het donker',
+    sub: 'zes bladzijden, over jezelf durven zijn',
+    plaat: 'ster',
+    bladzijden: [
+      { p: 'huis', t: 'Aan het eind van de straat stond een kleine lantaarn. Overdag deed hij niets. Dan sliep hij.' },
+      { p: 'wolk', t: 'Maar zodra het donker werd, moest hij aan. En juist dan werd hij bang. Want donker, dat vond hij eng.' },
+      { p: 'maan', t: '"Ik durf niet," zei hij tegen de maan. De maan zei: "Ik ben ook maar een lampje. En kijk eens hoe ver ik kom."' },
+      { p: 'kat', t: 'Onder de lantaarn liep een poes voorbij. Ze bleef staan in het lichtje en waste rustig haar poot.' },
+      { p: 'ster', t: 'Toen begreep de lantaarn iets: hij hoefde het donker niet weg te doen. Hij hoefde er alleen in te staan.' },
+      { p: 'huis', t: 'Sindsdien gaat hij elke avond gewoon aan. Niet fel, niet groot. Precies genoeg om even te blijven staan.' }
+    ]
+  },
+  {
+    id: 'zaadje',
+    vraag: 'Wat wil jij graag kunnen wat nu nog niet lukt? Welk klein stapje kan vandaag al?',
+    titel: 'Het zaadje dat wachten leerde',
+    sub: 'zes bladzijden, over geduld',
+    plaat: 'boom',
+    bladzijden: [
+      { p: 'boom', t: 'Diep in de grond lag een zaadje. Het was donker en stil. Het zaadje wilde nu al een boom zijn.' },
+      { p: 'water', t: 'Er kwam regen. Het zaadje dronk. "Ben ik al een boom?" vroeg het. "Nog niet," zei de regen.' },
+      { p: 'wolk', t: 'Er kwam zon. Het zaadje werd warm. "Nu dan?" vroeg het. "Nog niet," zei de zon. "Blijf maar even."' },
+      { p: 'boom', t: 'Toen gebeurde er iets kleins. Een klein wit puntje kwam uit het zaadje. Zo klein dat niemand het zag.' },
+      { p: 'vogel', t: 'Een vogel vloog over en zag een groen sprietje. "Hallo boom," zei de vogel. Het sprietje wist niet dat hij het was.' },
+      { p: 'ster', t: 'Elke dag een beetje. Meer hoefde niet. En op een dag stond er een boom waar een zaadje had liggen wachten.' }
+    ]
+  }
+];
+
+let huidig = null, bladzij = 0;
+
+function tekenKeuze() {
+  const doos = $('#keuzelijst');
+  doos.innerHTML = '';
+  for (const v of VERHALEN) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'titelknop';
+    b.innerHTML = P[v.plaat].replace('viewBox="0 0 120 60"', 'viewBox="0 0 120 60" preserveAspectRatio="xMidYMid meet"') +
+      '<span><b>' + v.titel + '</b><span>' + v.sub + '</span></span>';
+    b.addEventListener('click', () => open(v));
+    doos.appendChild(b);
+  }
+}
+
+function open(v) {
+  huidig = v; bladzij = 0;
+  $('#kiesblok').hidden = true;
+  $('#leesblok').hidden = false;
+  toon();
+}
+
+function toon() {
+  const bl = huidig.bladzijden[bladzij];
+  const laatste = bladzij === huidig.bladzijden.length - 1;
+  $('#plaat').innerHTML = P[bl.p];
+  $('#tekst').textContent = bl.t;
+  // op de laatste bladzijde: een vraag om samen na te praten -- het boekje dicht, het gesprek open
+  $('#napraat').hidden = !(laatste && huidig.vraag);
+  if (laatste && huidig.vraag) {
+    $('#napraat').innerHTML = '<b style="color:var(--txt);font-weight:600;">Om samen na te praten: </b><span></span>';
+    $('#napraat').querySelector('span').textContent = huidig.vraag;
+  }
+  $('#paginaatje').textContent = 'bladzijde ' + (bladzij + 1) + ' van ' + huidig.bladzijden.length;
+  $('#terug').disabled = bladzij === 0;
+  $('#verder').textContent = laatste ? 'Uit' : 'Volgende';
+}
+
+$('#terug').addEventListener('click', () => { if (bladzij > 0) { bladzij--; toon(); } });
+$('#verder').addEventListener('click', () => {
+  if (bladzij < huidig.bladzijden.length - 1) { bladzij++; toon(); return; }
+  naarKeuze();
+});
+$('#andersverhaal').addEventListener('click', naarKeuze);
+
+function naarKeuze() {
+  $('#leesblok').hidden = true;
+  $('#kiesblok').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+tekenKeuze();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

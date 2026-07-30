@@ -1,4 +1,4 @@
-/* De doe-laag van de Butler (kern/fluister): de intent-handlers die Fluister voor
+/* De doe-laag van Rahul (kern/fluister): de intent-handlers die Fluister voor
    het lid zelf uitvoert. Boven de drempel (geld, of een claim op een gedeeld object)
    zet elke handler eerst een voorstel klaar (p.wacht) dat op "ja" wacht; onder de
    drempel (gratis, altijd annuleerbaar) gebeurt het direct. doeActie loopt de

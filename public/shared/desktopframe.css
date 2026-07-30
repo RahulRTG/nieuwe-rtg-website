@@ -1,0 +1,95 @@
+/* Gedeelde desktop-omkadering voor de losse app-pagina's.
+
+   Op een telefoon is een app-pagina een smalle kolom -- precies goed. Op een
+   breed scherm werd dat een dun streepje midden op het zwart. Dit blad geeft de
+   pagina op desktop dezelfde warme, levende RTG-grond en een breed, omkaderd
+   vlak als het leden-OS: veel lucht, de gradient van de dag eronder, de inhoud
+   in een rustige kaart. Onder de 900px verandert er niets (de omkadering begint
+   pas daar), dus de telefoon-beleving blijft intact.
+
+   Hergebruikt de bestaande tokens (--bg/--card/--line/--gold/--burgundy) en de
+   dagkleur (--dag-kleur uit shared/dagkleur.css, gezet door shared/seizoen.js).
+   Geen nieuwe kleuren; alles buigt mee met zon en seizoen zoals het OS. */
+
+/* De levende grond: twee zachte warme wolken uit de dagkleur, subtiel, overal.
+   Op telefoon geeft dit alleen wat meer diepte; het breekt geen enkele layout. */
+body {
+  background:
+    radial-gradient(1200px 720px at 78% -10%, color-mix(in srgb, var(--dag-kleur, var(--burgundy, #C23A5E)) 12%, transparent), transparent 60%),
+    radial-gradient(950px 640px at 6% 112%, color-mix(in srgb, var(--dag-kleur, var(--gold, #A98F1C)) 9%, transparent), transparent 60%),
+    var(--bg, #0C0C0B);
+  background-attachment: fixed;
+}
+
+@media (min-width: 900px) {
+  /* De inhoud als een breed, warm omkaderd vlak -- gecentreerd, met lucht.
+     De <main>-landmark bestaat op elke app-pagina (9+-keuring), dus dit grijpt
+     overal aan zonder de opmaak binnenin te raken. */
+  main {
+    max-width: 1080px;
+    margin: 1.6rem auto 3rem;
+    padding: clamp(1.5rem, 2.4vw, 2.6rem) clamp(1.5rem, 3vw, 3rem);
+    background:
+      linear-gradient(158deg,
+        color-mix(in srgb, var(--card, #151312) 90%, var(--dag-kleur, transparent) 10%),
+        color-mix(in srgb, var(--card, #151312) 97%, transparent));
+    border: 1px solid var(--line, rgba(255, 255, 255, 0.10));
+    border-radius: 22px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+    /* De kaart is een venster: sleep de rechteronderhoek om te vergroten of te
+       verkleinen. Werkt ook zonder JS; de JS-laag voegt verplaatsen + onthouden
+       toe. */
+    overflow: auto;
+    resize: both;
+    min-width: 340px;
+    min-height: 280px;
+    max-height: calc(100dvh - 120px);
+  }
+  /* De vaste kopbalk mag over de volle breedte blijven, als de OS-topbalk.
+     En hij hoort BOVEN de vensterlaag: de apps zetten hun eigen kopbalk op
+     z-index 5, de kaart hieronder op 6. Zonder deze regel schuift het venster
+     over de topbalk heen zodra je scrollt, en zijn de tabs er niet meer
+     aan te klikken. Een topbalk die je niet kunt raken is geen topbalk. */
+  body > header { border-radius: 0; z-index: 7; }
+
+  /* ---- de vensterlaag (desktopframe.js maakt de kaart verplaatsbaar) ---- */
+  main.rtg-venster { margin: 0; max-width: none; z-index: 6; }
+  /* de sleepgreep bovenaan het venster: een rustige balk om te verplaatsen */
+  .rtg-greep {
+    position: absolute; top: 0; left: 0; right: 0; height: 26px;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    cursor: grab; user-select: none; border-radius: 22px 22px 0 0;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--dag-kleur, var(--gold, #A98F1C)) 10%, transparent), transparent);
+  }
+  .rtg-greep:active { cursor: grabbing; }
+  .rtg-greep .streep { width: 42px; height: 4px; border-radius: 999px; background: var(--line, rgba(255,255,255,0.18)); }
+  .rtg-greep .herstel {
+    position: absolute; right: 8px; top: 4px; height: 18px; padding: 0 .5rem;
+    font: inherit; font-size: .64rem; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--soft, rgba(244,241,236,.5)); background: transparent;
+    border: 1px solid var(--line, rgba(255,255,255,0.14)); border-radius: 999px; cursor: pointer;
+  }
+  .rtg-greep .herstel:hover { color: var(--txt, #F4F1EC); border-color: var(--gold, #A98F1C); }
+  /* het groene volledig-scherm-bolletje links op de greep (geen sluiten/rood:
+     dit is de pagina zelf) */
+  .rtg-greep .rtg-vollamp {
+    position: absolute; left: 8px; top: 5px; width: 12px; height: 12px;
+    border-radius: 50%; padding: 0; cursor: pointer; line-height: 0;
+    border: 1px solid rgba(0, 0, 0, 0.25); background: var(--green, #4C9A75);
+    transition: filter .12s ease, transform .12s ease;
+  }
+  .rtg-greep .rtg-vollamp:hover { filter: brightness(1.15); transform: scale(1.12); }
+  main.rtg-venster { padding-top: calc(clamp(1.5rem, 2.4vw, 2.6rem) + 22px); }
+}
+@media (prefers-reduced-motion: reduce) { main { scroll-behavior: auto; } }
+
+/* Binnen een OS-venster (iframe) laat de app zich niet omkaderen: hij vult het
+   venster dat de vensterbeheerder al levert. */
+html.rtg-in-frame body { background: var(--bg, #0C0C0B); }
+@media (min-width: 900px) {
+  html.rtg-in-frame main {
+    max-width: none; margin: 0; border: 0; border-radius: 0;
+    box-shadow: none; resize: none; height: auto; max-height: none; overflow: visible;
+  }
+  html.rtg-in-frame .rtg-greep { display: none; }
+}

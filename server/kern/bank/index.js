@@ -23,6 +23,15 @@ module.exports = (deps) => {
   const nu = () => Date.now();
   const d = () => db.data;
 
+  // CUTOVER-modus (RTG_MOTOR_GELD=motor): de Rust-motor wordt OOK voor de bank het
+  // autoritatieve saldi-grootboek (tweede, aparte Ledger naast pay). Anders dan pay
+  // doet de motor een RAUWE apply: de rijke bank-guard (rekening bestaat, bevroren,
+  // rood-staan-bodem) blijft hier in JS, want die leunt op de rekening-metadata die
+  // hier woont. Standaard uit -> geldModus 'schaduw' = JS blijft de baas, exact als
+  // voorheen (de synchrone boek-guard).
+  const motorklant = require('./motorklant')();
+  const geldModus = motorklant.aan ? 'motor' : 'schaduw';
+
   const MIN_CENTEN = 1;
   const MAX_CENTEN = 100000000;      // tot 1 miljoen euro per boeking (bank, geen wallet)
   const SOORTEN = { betaal: 'Betaalrekening', spaar: 'Spaarrekening', zakelijk: 'Zakelijke rekening' };
@@ -45,32 +54,6 @@ module.exports = (deps) => {
     return 0;
   }
 
-  /* De grootboekmotor. Boekt van -> naar, bewaakt de bodem en de dubbele
-     boeking. Bevroren rekeningen kunnen niet betalen (wel ontvangen). */
-  function boek({ van, naar, centen, soort, oms, ref }) {
-    const c = Math.round(Number(centen));
-    if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
-    if (!van || !naar || van === naar) return { status: 400, error: 'Van en naar kloppen niet.' };
-    if (!isExtern(van)) { const mv = rekMeta(van); if (!mv) return { status: 404, error: 'De rekening bestaat niet.' }; if (mv.bevroren) return { status: 423, error: 'Deze rekening is bevroren.' }; }
-    if (!isExtern(naar) && !rekMeta(naar)) return { status: 404, error: 'De tegenrekening bestaat niet.' };
-    if (saldoVan(van) - c < bodem(van)) return { status: 402, error: 'Onvoldoende saldo of rood-staan-ruimte.' };
-    saldi()[van] = saldoVan(van) - c;
-    saldi()[naar] = saldoVan(naar) + c;
-    const rij = { id: id('BB'), van, naar, centen: c, soort: soort || 'boeking', oms: schoon(oms, 140), ref: ref || null, at: nu() };
-    grootboek().unshift(rij);
-    if (grootboek().length > 100000) grootboek().pop();  // weergavecap; de saldi zijn de waarheid
-    save();
-    bordSeintje();
-    return { ok: true, boeking: rij };
-  }
-
-  // de sluitcontrole: som van alle saldi is nul, en niemand zit onder zijn bodem
-  function sluitcontrole() {
-    let som = 0; const onderBodem = [];
-    for (const [rek, c] of Object.entries(saldi())) { som += c; if (c < bodem(rek)) onderBodem.push(rek); }
-    return { klopt: som === 0 && !onderBodem.length, som, onderBodem };
-  }
-
   function seintje(codenaam) {
     try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'bank' }); }).catch(() => {}); } catch (e) {}
   }
@@ -85,9 +68,17 @@ module.exports = (deps) => {
     if (bordTimer.unref) bordTimer.unref();
   }
 
+  /* De boekhoudmotor + de cutover-naad naar de Rust-motor leven in ./grootboek:
+     de guard/apply, de synchrone `boek`, het async choke-point `boekAsync` met
+     het serialisatie-slot, de herstart-reconcile, de sluitcontrole en de drift-
+     stand voor het statusbord. */
+  const { boek, boekAsync, reconcileVanMotor, sluitcontrole, motorStand } = require('./grootboek')({
+    MIN_CENTEN, MAX_CENTEN, saldi, grootboek, saldoVan, rekMeta, isExtern, bodem,
+    id, schoon, nu, save, d, geldModus, motorklant, bordSeintje });
+
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
-    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, bodem, seintje };
+    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje };
 
   const rek = require('./rekeningen')(ctx);
   const over = require('./overboeken')(ctx);
@@ -97,6 +88,9 @@ module.exports = (deps) => {
   const incasso = require('./incasso')(ctx);
   const zakelijk = require('./zakelijk')(ctx);
   const advies = require('./advies')(ctx);
+  // het financiele hart leunt op de rekening-opening (auto-spaarpot bij de veeg)
+  ctx.rekeningOpen = rek.rekeningOpen;
+  const hart = require('./hart')(ctx);
 
   /* ---- afschrift: de boekingen die een rekening raken, nieuwste eerst ---- */
   function afschrift({ iban, limit = 50, offset = 0 }) {
@@ -129,8 +123,8 @@ module.exports = (deps) => {
     return { status: 200, regie: bankregie.bankregieOverzicht(), gezondheid: g, rekeningen: lijst };
   }
 
-  const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht };
-  Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies);
+  const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand };
+  Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies, hart);
 
   /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
      op de klok: alleen hele verstreken dagen) en de vervallen vaste betalingen
@@ -139,8 +133,12 @@ module.exports = (deps) => {
      tx-veegronde). */
   const RONDE_MS = Number(process.env.BANK_RONDE_MS || 3600000);
   const rondeTimer = setInterval(() => {
-    try { api.bankRenteRonde({}); api.bankIncassoRonde({}); }
-    catch (e) { console.warn('[bank] ronde mislukt:', e.message); }
+    // de rondes zijn async (ze kunnen via de motor lopen); ketenen en de fouten
+    // opvangen zodat een hapering het proces nooit omver trekt.
+    Promise.resolve()
+      .then(() => api.bankRenteRonde({}))
+      .then(() => api.bankIncassoRonde({}))
+      .catch(e => console.warn('[bank] ronde mislukt:', e.message));
   }, RONDE_MS);
   if (rondeTimer.unref) rondeTimer.unref();
 

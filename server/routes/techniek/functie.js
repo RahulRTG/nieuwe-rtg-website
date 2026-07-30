@@ -50,7 +50,7 @@ module.exports = (tctx) => {
     // melding naar de eigenaar: bevestigen of weigeren
     const o = eigenaarUser();
     if (o) {
-      try { sendPushToUser(o.id, { icon: '🔔', title: 'Bevestiging nodig: functieschakelaar', body: vz.label + ' (aangevraagd door ' + vz.doorNaam + '). Open de technische pagina om te accepteren of te weigeren.' }); } catch (e) {}
+      try { sendPushToUser(o.id, { icon: 'meldingen', title: 'Bevestiging nodig: functieschakelaar', body: vz.label + ' (aangevraagd door ' + vz.doorNaam + '). Open de technische pagina om te accepteren of te weigeren.' }); } catch (e) {}
       try { mail.send(accounts.emailOf(o), 'Bevestiging nodig: ' + vz.label,
         'Beste ' + accounts.realNameOf(o) + ',\n\nEr staat een wijziging van de functieschakelaars klaar:\n\n  ' + vz.label +
         ' (' + vz.wijzigingen.length + ' functie(s))\n  Aangevraagd door: ' + vz.doorNaam + '\n\n' +

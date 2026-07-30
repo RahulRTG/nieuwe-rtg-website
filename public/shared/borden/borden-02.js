@@ -1,3 +1,20 @@
+    function bind(b){
+      el.querySelectorAll('[data-open]').forEach(x => x.addEventListener('click', () => { open = x.dataset.open; render(); }));
+      const nieuw = el.querySelector('[data-nieuw]');
+      if (nieuw) nieuw.addEventListener('click', async () => {
+        const naam = prompt(T('bd.naamq','Naam van het bord?'), '');
+        if (naam) { await doe({ actie: 'maak', naam }); }
+      });
+      if (!b) return;
+      el.querySelectorAll('[data-lid]').forEach(x => x.addEventListener('change', () => {
+        const leden = [...el.querySelectorAll('[data-lid]')].filter(c => c.checked).map(c => parseInt(c.dataset.lid, 10));
+        doe({ actie: 'leden', id: b.id, leden });
+      }));
+      const bweg = el.querySelector('[data-bweg]');
+      if (bweg) bweg.addEventListener('click', () => { if (confirm(T('bd.wegq','Dit bord en alle kaarten verwijderen?'))) doe({ actie: 'weg', id: b.id }); });
+      const lijst = el.querySelector('[data-lijst]');
+      if (lijst) lijst.addEventListener('click', () => {
+        const naam = prompt(T('bd.lijstq','Naam van de lijst?'), '');
         if (naam) doe({ actie: 'lijst', id: b.id, naam });
       });
       el.querySelectorAll('[data-lweg]').forEach(x => x.addEventListener('click', () => doe({ actie: 'lijst-bewerk', id: b.id, lijstId: x.dataset.lweg, weg: true })));

@@ -6,6 +6,7 @@
 <title>De Rechtspraak (griffie)</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
@@ -52,6 +53,10 @@
   .ai .uit{font-size:.86rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.5rem;}
   .vonnis{font-style:italic;border-left:3px solid var(--gold);padding-left:.7rem;margin-top:.4rem;font-size:.82rem;color:var(--muted);line-height:1.5;}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
@@ -70,7 +75,7 @@
   <div id="app" hidden>
     <div class="kpis" id="kpis"></div>
     <div class="ai">
-      <h3>🎩 AI-griffier (Rahul)</h3>
+      <h3>AI-griffier (Rahul)</h3>
       <div class="rij" style="margin-top:0;">
         <input class="veld" id="aiV" style="flex:1;min-width:12rem;" placeholder="Bijv. hoe krijg ik de rol van deze week rond?">
         <button class="knop" id="aiK">Vraag</button>
@@ -279,6 +284,9 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

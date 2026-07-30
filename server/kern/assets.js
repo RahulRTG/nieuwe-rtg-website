@@ -52,15 +52,15 @@ module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
     if (!db.data.assetKas) db.data.assetKas = {};               // poolkas per object, in centen
     if (!Array.isArray(db.data.sharedAssets) || !db.data.sharedAssets.length) {
       db.data.sharedAssets = [
-        { id: 'sa-jet', naam: 'Aria One, Gulfstream G650', soort: 'privejet', icon: '✈️', waar: 'Thuisbasis Schiphol Oost',
+        { id: 'sa-jet', naam: 'Aria One, Gulfstream G650', soort: 'privejet', icon: 'vluchten', waar: 'Thuisbasis Schiphol Oost',
           entiteit: 'RTG Asset Pool Aria One B.V.',
           beschrijving: 'Volledig bemand, wereldwijd inzetbaar. Uw 24 uur is een retour binnen Europa of een enkele reis intercontinentaal.',
           waarde: 42000000 },
-        { id: 'sa-jacht', naam: 'Azul Horizon, 34 meter', soort: 'jacht', icon: '🛥️', waar: 'Marina Botafoc, Ibiza',
+        { id: 'sa-jacht', naam: 'Azul Horizon, 34 meter', soort: 'jacht', icon: 'boot', waar: 'Marina Botafoc, Ibiza',
           entiteit: 'RTG Asset Pool Azul Horizon B.V.',
           beschrijving: 'Met schipper en hostess. Uw 24 uur is een dag en een nacht op zee, Es Vedra bij zonsondergang inbegrepen.',
           waarde: 9000000 },
-        { id: 'sa-villa', naam: 'Sunset Beach Villa', soort: 'villa', icon: '🏖️', waar: 'Cala Conta, Ibiza',
+        { id: 'sa-villa', naam: 'Sunset Beach Villa', soort: 'villa', icon: 'parasol', waar: 'Cala Conta, Ibiza',
           entiteit: 'RTG Asset Pool Sunset Beach B.V.',
           beschrijving: 'Zes slaapkamers, eigen strandpad, dagelijkse housekeeping. Uw 24 uur is een volledige nacht met late check-out.',
           waarde: 6000000 }

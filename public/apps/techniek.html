@@ -33,6 +33,14 @@
   .login h1{font-size:1.3rem;margin-bottom:.3rem;}
   .login p{color:var(--soft);font-size:.85rem;margin-bottom:1.1rem;}
   .fout{color:var(--rood);font-size:.82rem;min-height:1.1rem;margin-top:.2rem;}
+  /* de motorkap-band: grootboek/motor/bank op een oogopslag, boven de tellers */
+  .motorkap{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1rem;padding:.7rem 1rem;border:1px solid var(--line);border-radius:12px;background:var(--card);}
+  .motorkap .mk-titel{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;}
+  .motorkap .mk-pil{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--muted);}
+  .motorkap .mk-stip{width:.6rem;height:.6rem;border-radius:50%;flex-shrink:0;background:var(--soft);}
+  .motorkap .mk-stip.ok{background:var(--groen);box-shadow:0 0 6px var(--groen);}
+  .motorkap .mk-stip.waarschuwing{background:var(--oranje);box-shadow:0 0 6px var(--oranje);}
+  .motorkap .mk-stip.fout{background:var(--rood);box-shadow:0 0 6px var(--rood);}
   .telrij{display:flex;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap;}
   .tel{flex:1;min-width:7rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
   .tel .n{font-size:1.5rem;font-weight:700;}
@@ -93,6 +101,8 @@
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body data-osbar="Techniek" data-oswereld="kantoor">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -119,10 +129,12 @@
     </header>
     <div class="tabs" role="tablist" id="tabbar">
       <button class="tab" role="tab" id="tabBtnStatus" aria-selected="true" aria-controls="tabStatus">Statusbord</button>
+      <button class="tab" role="tab" id="tabBtnWacht" aria-selected="false" aria-controls="tabWacht" hidden>De Wacht</button>
       <button class="tab" role="tab" id="tabBtnFuncties" aria-selected="false" aria-controls="tabFuncties" hidden>Controlekamer</button>
     </div>
 
     <div id="tabStatus" role="tabpanel" aria-labelledby="tabBtnStatus">
+      <div id="motorkapBand" hidden></div>
       <div class="telrij" id="tellers"></div>
       <div id="beveiligBlok" hidden>
         <div class="sec" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
@@ -164,6 +176,28 @@
           <div class="muted" style="font-size:.72rem;margin-top:.5rem;">Kleiner venster = kleinere levende kast = sneller onder zware belasting. De boekhouding en export tellen het archief altijd mee.</div>
         </div>
       </div>
+      <div id="papierenBlok" hidden>
+        <div class="sec">Het papierwerk: Rahul vraagt het uit</div>
+        <div class="kaart">
+          <div class="muted" style="font-size:.82rem;">Het verwerkingsregister (AVG art. 30) en het datalek-draaiboek (art. 33) staan klaar, op een paar plekken na die alleen u weet. Rahul stelt ze hier &eacute;&eacute;n voor &eacute;&eacute;n. Hij <b>verzint nooit een antwoord</b>: een verzonnen KvK-nummer of telefoonnummer is erger dan een leeg veld, want een leeg veld ziet iedereen. Weet u iets nu niet, dan parkeert hij het &mdash; het blijft dan gewoon openstaan.</div>
+          <div class="muted" id="papStand" style="font-size:.78rem;margin-top:.6rem;"></div>
+          <div id="papVraagBlok" style="margin-top:.8rem;">
+            <p id="papVraag" style="margin:0 0 .35rem;font-weight:600;"></p>
+            <div class="muted" id="papWaarom" style="font-size:.8rem;"></div>
+            <div class="muted" id="papVoorbeeld" style="font-size:.74rem;margin-top:.35rem;"></div>
+            <textarea class="veld" id="papAntwoord" placeholder="Uw antwoord, in uw eigen woorden&hellip;" aria-label="Antwoord op de vraag van Rahul" style="min-height:3rem;resize:vertical;margin-top:.6rem;"></textarea>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+              <button class="knop" id="bPapOk">Vastleggen</button>
+              <button class="knop grijs klein" id="bPapParkeer">Weet ik nu niet</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;">
+            <button class="knop grijs klein" id="bPapReg">Register lezen</button>
+            <button class="knop grijs klein" id="bPapLek">Datalek-draaiboek lezen</button>
+          </div>
+          <pre id="papDoc" class="advies" hidden style="white-space:pre-wrap;font-size:.72rem;max-height:22rem;overflow:auto;"></pre>
+        </div>
+      </div>
       <div id="moderniseerBlok" hidden>
         <div class="sec">Modernisering: vraag de AI om een update</div>
         <div class="kaart">
@@ -175,6 +209,28 @@
           </div>
           <div class="advies" id="modPlan" hidden></div>
           <div id="modHist" style="margin-top:.7rem;"></div>
+        </div>
+      </div>
+      <div id="eigenaarBlok" hidden>
+        <div class="sec">Eigenaarschap</div>
+        <div class="kaart">
+          <p style="margin:0 0 .6rem;">Eigenaar van dit platform:
+            <b id="eigNu">-</b> <span class="muted" id="eigHerkomst"></span></p>
+          <p class="muted" style="margin:0 0 .8rem;font-size:.9rem;">
+            De eigenaar is de enige die zekeringen omzet, functies uitschakelt en anderen
+            toegang geeft. Overdragen kan alleen naar een adres waar al een RTG-account
+            bij hoort, anders zou deze pagina voor iedereen dichtzitten.</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <input class="veld" id="eigEmail" type="email" autocomplete="off"
+              aria-label="E-mailadres van de nieuwe eigenaar"
+              placeholder="E-mailadres van de nieuwe eigenaar" style="flex:1;margin-bottom:0;min-width:14rem;">
+            <input class="veld" id="eigWw" type="password" autocomplete="current-password"
+              aria-label="Uw eigen wachtwoord ter bevestiging"
+              placeholder="Uw eigen wachtwoord" style="flex:1;margin-bottom:0;min-width:12rem;">
+            <button class="knop klein" id="bEigenaar">Eigenaarschap overdragen</button>
+          </div>
+          <div class="fout" id="eigFout"></div>
+          <div id="eigLog" style="margin-top:.7rem;"></div>
         </div>
       </div>
       <div id="toegangBlok" hidden>
@@ -221,6 +277,45 @@
       <div class="muted" id="ctxUitleg" style="font-size:.76rem;margin-bottom:.8rem;"></div>
       <div id="functies"></div>
     </div>
+
+    <!-- De Wacht: immuunsysteem + meters/grafiek + raadkamer -->
+    <div id="tabWacht" role="tabpanel" aria-labelledby="tabBtnWacht" hidden>
+      <div class="muted" style="font-size:.8rem;margin-bottom:.7rem;">
+        De Wacht bewaakt het platform: live meters, een grafiek, een afweer die indringers afsnijdt,
+        zelf opruimen, en een raadkamer waarin de AI voorstellen doet die u accepteert, afwijst of inconclaaf laat.
+      </div>
+      <div class="telrij" id="wachtMeters"></div>
+      <div id="wachtLastafworp"></div>
+      <div class="kaart" id="wachtRand" style="padding:.6rem .8rem;"></div>
+      <div class="kaart" style="padding:.7rem;">
+        <div class="muted" style="font-size:.74rem;margin-bottom:.4rem;">Laatste ~30 minuten · verzoeken (wit), alarmen (bordeaux), quarantaine (goud)</div>
+        <canvas id="wachtGrafiek" height="120" style="width:100%;height:120px;display:block;"></canvas>
+      </div>
+
+      <div class="blok-kop" style="margin-top:1rem;">
+        <h2>De Ontsmetter (malware-scanner)</h2>
+        <button class="knop grijs klein" id="bAvTest" hidden>EICAR-test</button>
+      </div>
+      <div class="muted" style="font-size:.76rem;margin-bottom:.5rem;">Elke geuploade foto/document wordt gescand op malware (handtekeningen, heuristiek, entropie). Besmet wordt geweigerd.</div>
+      <div class="telrij" id="avMeters"></div>
+      <div class="kaart" id="avLaatste"></div>
+
+      <div class="blok-kop" style="margin-top:1rem;"><h2>Afweer &amp; quarantaine</h2></div>
+      <div class="kaart">
+        <div id="wachtIsoleer" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem;" hidden>
+          <input class="veld" id="wachtBron" placeholder="IP of bron om af te snijden&hellip;" aria-label="Bron in quarantaine zetten" style="flex:1;margin-bottom:0;min-width:12rem;">
+          <button class="knop rood klein" id="bWachtIsoleer">In quarantaine</button>
+          <button class="knop grijs klein" id="bWachtOpruimen">Nu opruimen</button>
+        </div>
+        <div id="wachtQuarantaine"></div>
+      </div>
+
+      <div class="blok-kop" style="margin-top:1rem;">
+        <h2>Raadkamer</h2>
+        <button class="knop grijs klein" id="bWachtAnalyseer" hidden>AI kauwt uit</button>
+      </div>
+      <div class="kaart" id="wachtRaad"></div>
+    </div>
   </div>
 </main>
 <div class="toast" id="toast"></div>
@@ -233,6 +328,9 @@
 <script src="/shared/osbar.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

@@ -94,3 +94,34 @@ test('6. de kaart: leden zien leden-paden, de zaak ziet werk-paden', async () =>
   assert.ok(kz.body.paden.some(p => p.startsWith('/api/supplier')), 'de zaak ziet haar werk-paden');
   assert.ok(!kz.body.paden.some(p => p.startsWith('/api/member')), 'en geen leden-paden');
 });
+
+/* ---- de pure hulpfuncties: dynamisch stappen-budget + deeltaken ---- */
+const { classificeer, parseSubs } = require('../server/kern/stuur');
+
+test('7. classificeer: lichte taken krijgen 4 stappen', () => {
+  for (const q of ['zet een timer van 10 minuten', 'zoek lid Amara', 'hoe laat is het', 'wat is mijn saldo']) {
+    const c = classificeer(q);
+    assert.equal(c.zwaar, false, q);
+    assert.equal(c.maxStappen, 4, q);
+  }
+});
+
+test('8. classificeer: zware taken krijgen 24 stappen', () => {
+  for (const q of [
+    'plan een complete reis voor 4 personen naar Ibiza met hotel, taxi en tafel',
+    'boek een tafel voor vanavond en regel daarna een taxi en bestel bloemen',
+    'organiseer een heel weekend weg met diner, hotel en tickets'
+  ]) {
+    const c = classificeer(q);
+    assert.equal(c.zwaar, true, q);
+    assert.equal(c.maxStappen, 24, q);
+  }
+});
+
+test('9. parseSubs: leest JSON of een genummerde lijst, kapt op 3', () => {
+  assert.deepEqual(parseSubs('Prima. ["Hotel boeken","Taxi regelen","Tafel reserveren"]'),
+    ['Hotel boeken', 'Taxi regelen', 'Tafel reserveren']);
+  assert.deepEqual(parseSubs('1. Vlucht zoeken\n2. Hotel boeken\n3. Auto huren\n4. teveel'),
+    ['Vlucht zoeken', 'Hotel boeken', 'Auto huren']);
+  assert.deepEqual(parseSubs('   '), []);
+});

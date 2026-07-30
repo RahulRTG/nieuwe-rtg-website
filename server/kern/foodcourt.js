@@ -19,7 +19,7 @@ function maakFoodcourt({ db, save, crypto }) {
 
   // een eetgelegenheid is een partner die tafelreserveringen aanneemt
   function isEetgelegenheid(s) {
-    return !!s && ((db.data.supplierTypes[s.type] || {}).caps || []).includes('reservations') && Array.isArray(s.tables) && s.tables.length > 0;
+    return !!s && (db.capsVan(s)).includes('reservations') && Array.isArray(s.tables) && s.tables.length > 0;
   }
 
   function seed() {
@@ -93,4 +93,4 @@ function maakFoodcourt({ db, save, crypto }) {
   return { foodcourt: { KEUKENS, overzicht, tijden, seed, isEetgelegenheid } };
 }
 
-module.exports = { maakFoodcourt, FOODCOURT_KEUKENS: KEUKENS };
+module.exports = { maakFoodcourt };

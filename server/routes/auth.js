@@ -1,7 +1,7 @@
 /* Domein "auth" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog } = kern;
+  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog, automatisering } = kern;
   // Demo-inlog (snelle pas-login zonder wachtwoord, en het demo-account) alleen
   // buiten productie of met RTG_DEMO=1. Echte leden loggen in via /api/auth/login.
   const DEMO = !PRODUCTION || process.env.RTG_DEMO === '1';
@@ -52,8 +52,20 @@ app.post('/api/login', (req, res) => {
   res.json({ token, state: stateFor(sess, req.body.lang) });
 });
 
+/* UITLOGGEN MOET OOK ECHT UITLOGGEN.
+
+   Hier stond alleen de lus over `sessions`. Die dekt de demo-sessies, maar een
+   ECHT ledenaccount komt via accounts.verifyToken binnen (zie resolveSession in
+   server.js) en staat helemaal niet in die map. Voor elk gewoon lid deed
+   uitloggen dus niets: het antwoord was { ok: true } en het token bleef daarna
+   gewoon werken. Op een geleende of gedeelde computer is dat precies het moment
+   waarop iemand denkt veilig te zijn. Gevonden in aanvalsronde 2, punt 14. */
 app.post('/api/logout', auth, (req, res) => {
   for (const [token, sess] of sessions) if (sess === req.session) forgetSession(token);
+  // en de staatloze kant: het aangeboden token op de intreklijst
+  const kop = req.get('authorization') || '';
+  const tok = kop.startsWith('Bearer ') ? kop.slice(7) : null;
+  if (tok && accounts && typeof accounts.trekIn === 'function') accounts.trekIn(tok);
   res.json({ ok: true });
 });
 
@@ -67,6 +79,11 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket);
+  /* Uit dienst gemeld door de organisatie (SCIM) = ook met het juiste wachtwoord
+     niet meer naar binnen. verifyToken weigert de sessie toch al, dus zonder
+     deze regel zou iemand een token krijgen dat meteen daarna nergens voor
+     deugt: verwarrend, en het verbergt de echte reden. */
+  if (!accounts.isActief(user)) return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });
   // juiste gegevens, maar de verkeerde pas-app: netjes doorverwijzen
   if (!pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
   const token = accounts.issueToken(user.id);
@@ -81,10 +98,10 @@ app.post('/api/auth/me', auth, (req, res) => {
   /* De registratie-, herstel- en verificatieroutes draaien als submodules
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
   const actx = { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN,
+    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, antivirus: kern.antivirus,
     webauthnRegOpties: kern.webauthnRegOpties, webauthnRegMaak: kern.webauthnRegMaak,
     webauthnLoginOpties: kern.webauthnLoginOpties, webauthnLoginMaak: kern.webauthnLoginMaak,
-    webauthnLijst: kern.webauthnLijst, webauthnWeg: kern.webauthnWeg };
+    webauthnLijst: kern.webauthnLijst, webauthnWeg: kern.webauthnWeg, automatisering };
   require('./auth/account')(actx);
   require('./auth/herstel')(actx);
   require('./auth/verificatie')(actx);

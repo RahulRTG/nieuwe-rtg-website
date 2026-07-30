@@ -64,7 +64,7 @@ module.exports = (ctx) => {
     db.data.splitsen = db.data.splitsen.slice(0, 20000);
     save();
     for (const k of keys) {
-      notify(k, { icon: '💶', title: 'Betaalverzoek van ' + codename, body: 'Jouw deel van ' + o.supplierName + ': € ' + perPersoon, scope: 'orders' });
+      notify(k, { icon: 'betalen', title: 'Betaalverzoek van ' + codename, body: 'Jouw deel van ' + o.supplierName + ': € ' + perPersoon, scope: 'orders' });
       sseToCustomer(k, 'sync', { scope: 'splitsen' });
     }
     return { ok: true, splits: split };
@@ -80,7 +80,7 @@ module.exports = (ctx) => {
     deel.paid = true;
     deel.paidAt = nu();
     save();
-    notify(s.van, { icon: '✅', title: 'Deel ontvangen', body: 'Uw vriend betaalde € ' + deel.bedrag + ' voor ' + s.supplierName + '.', scope: 'orders' });
+    notify(s.van, { icon: 'pas', title: 'Deel ontvangen', body: 'Uw vriend betaalde € ' + deel.bedrag + ' voor ' + s.supplierName + '.', scope: 'orders' });
     sseToCustomer(s.van, 'sync', { scope: 'splitsen' });
     return { ok: true, bedrag: deel.bedrag, rond: s.delen.every(d => d.paid) };
   }

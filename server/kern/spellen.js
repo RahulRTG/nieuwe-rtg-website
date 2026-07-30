@@ -1,30 +1,17 @@
-/* Kern-module "spellen": verslavende potjes op de vriendenlaag, voor alle
-   leden (RTF en RTG spelen tegen elkaar, op codenaam).
-
-   Drie bordspellen en een scorebord:
-   - Mens erger je niet: 2, 3 of 4 spelers vrij-voor-allen, of 2-tegen-2 in
-     teams. Server-authoritatief: de server dobbelt, bewaakt de regels
-     (6 = eruit en nog een keer, slaan = terug naar start, exact thuisbrengen)
-     en wijst de winnaar aan.
-   - Schaken: volledige zetvalidatie (rokade, en passant, promotie naar dame,
-     schaak, mat en pat) op de server.
-   - Woordduel (wordfeud-achtig): 15x15 met premievelden, de Nederlandse
-     letterzak, kruiswoord-scoring en de 40-puntenbonus. Zonder woordenboek:
-     het eer-systeem, zoals thuis aan tafel.
-   - Dammen: 10x10 internationaal, slaan verplicht, meerslag met hetzelfde
-     stuk, een dam vliegt over de diagonaal.
-   - Rummi (rummikub-achtig): 106 stenen, eerste uitleg van 30 punten,
-     daarna vrij herschikken; de server keurt de hele tafel bij elke beurt.
-   - Magnaat (monopoly-achtig): 2 t/m 6 spelers, 40 velden in de RTG-wereld,
-     kopen, huur, bouwen, kanskaarten en de gevangenis; wie overblijft wint.
-   - Partyspellen: 30 Seconden (2 tegen 2, eer-systeem), Doen of Waarheid
-     (2 t/m 6) en Proost (2 t/m 6, alleen 18+ met paspoort-geboortedatum).
-   - Arcade (Sneek, Tetris, Sudoku): ieder speelt zelf; de beste scores
-     vormen een ranglijst onder vrienden.
+/* Kern-module "spellen": potjes op de vriendenlaag, voor alle leden (RTF
+   en RTG spelen tegen elkaar, op codenaam). Elk spel is server-
+   authoritatief en leeft in een eigen deelmodule onder ./spellen/:
+   bordspellen (mens erger je niet, schaken, dammen, Rummi, Magnaat),
+   Woordduel (eer-systeem, zonder woordenboek), partyspellen (30 Seconden,
+   Doen of Waarheid, Proost 18+ op paspoort-geboortedatum), de RTF-duels
+   van De Arena en De Societeit (flits, reactie, quiz, schat: dezelfde
+   opgaven voor iedereen, zetten buiten de beurt) en de arcade met een
+   ranglijst onder vrienden (Sneek, Tetris, Sudoku).
 
    Een potje start met uitgenodigde vrienden (die accepteren zelf), op
-   codenaam (maakt geen vriendschap) of via de random wachtrij per spel en
-   groepsgrootte. Beurten gaan via polling plus een SSE-duwtje. */
+   codenaam (maakt geen vriendschap), via het door de server bevestigde
+   klasgenoten-pad, of via de random wachtrij per spel en groepsgrootte.
+   Beurten gaan via polling plus een SSE-duwtje. */
 module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
@@ -48,7 +35,15 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     magnaat:  { naam: 'Magnaat',            max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'] },
     seconden: { naam: '30 Seconden',        max: 4, min: 4, wereld: 'rtg' },
     waarheid: { naam: 'Doen of Waarheid',   max: 6, wereld: 'rtf' },
-    proost:   { naam: 'Proost',             max: 6, wereld: 'rtg', volwassen: true }
+    proost:   { naam: 'Proost',             max: 6, wereld: 'rtg', volwassen: true },
+    // de Arena-duels (tieners): iedereen speelt dezelfde opgaven in eigen
+    // tempo, dus de zet mag buiten de beurt
+    flits:    { naam: 'Flitsduel',          max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
+    reactie:  { naam: 'Reactieduel',        max: 4, wereld: 'rtf', buitenBeurt: ['tik'] },
+    quiz:     { naam: 'Quizduel',           max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
+    schat:    { naam: 'Schatduel',          max: 4, wereld: 'rtf', buitenBeurt: ['schat'] },
+    geheugen: { naam: 'Geheugenduel',       max: 4, wereld: 'rtf', buitenBeurt: ['reeks'] },
+    orde:     { naam: 'Rangschikduel',      max: 4, wereld: 'rtf', buitenBeurt: ['orde'] }
   };
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
   const TEAMS = [0, 1, 0, 1, 0, 1]; // om en om twee teams, tot zes spelers
@@ -107,6 +102,14 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { secondenInit, secondenZet } = require('./spellen/seconden')(spelCtx);
   const { waarheidInit, waarheidZet } = require('./spellen/waarheid')(spelCtx);
   const { proostInit, proostZet } = require('./spellen/proost')(spelCtx);
+  const { flitsInit, flitsZet, flitsView } = require('./spellen/flits')(spelCtx);
+  const { reactieInit, reactieZet, reactieView } = require('./spellen/reactie')(spelCtx);
+  const { quizInit, quizZet, quizView } = require('./spellen/quiz')(spelCtx);
+  const { schatInit, schatZet, schatView } = require('./spellen/schat')(spelCtx);
+  const { geheugenInit, geheugenZet, geheugenView } = require('./spellen/geheugen')(spelCtx);
+  const { ordeInit, ordeZet, ordeView } = require('./spellen/orde')(spelCtx);
+  // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
+  const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
 
 
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
@@ -115,7 +118,10 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
     mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
     pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
-    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet };
+    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
+    flitsInit, flitsZet, flitsView, reactieInit, reactieZet, reactieView, klasgenotenVan,
+    quizInit, quizZet, quizView, schatInit, schatZet, schatView,
+    geheugenInit, geheugenZet, geheugenView, ordeInit, ordeZet, ordeView };
   const { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
   const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
@@ -148,7 +154,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet, W_PREMIE } };

@@ -15,7 +15,30 @@
    Zie GRENZEN hieronder; die worden door de code van iedereen afgedwongen,
    dus een eigenaar-token opent ze niet alsnog. */
 
+/* Het startadres: de omgevingsvariabele wint, anders de ingebouwde standaard.
+   Dit is waar het platform mee opstart als er nog niets is overgedragen. */
 const OWNER_EMAIL = (process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com').trim().toLowerCase();
+
+/* Het eigenaarschap is overdraagbaar vanuit de boardroom. De gekozen opvolger
+   staat in de database; bij het opstarten zet server.js hem hier neer, zodat
+   ELKE plek die isEigenaar() gebruikt meteen meebeweegt. Dat is belangrijker
+   dan het lijkt: zou alleen de technische pagina de nieuwe eigenaar kennen en
+   de hoofdzekering niet, dan zou de oude eigenaar er stilletjes nog doorheen
+   komen. Eén bron van waarheid, dus ook bij een wisseling. */
+let overgedragen = null;
+
+function eigenaarEmail() { return overgedragen || OWNER_EMAIL; }
+
+/* Zet de eigenaar. Geeft het genormaliseerde adres terug, of null als het geen
+   bruikbaar adres is; de aanroeper hoort dan niets te wijzigen. De controle of
+   er ook echt een account achter zit hoort bij de route, want daar zit de
+   accounts-laag. */
+function zetEigenaarEmail(email) {
+  const schoon = String(email || '').trim().toLowerCase();
+  if (!schoon || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(schoon)) return null;
+  overgedragen = schoon;
+  return schoon;
+}
 
 // De juridische grenzen, expliciet, zodat ze niet per ongeluk wegzakken.
 const GRENZEN = [
@@ -26,13 +49,14 @@ const GRENZEN = [
 ];
 
 /* Is dit accountobject de eigenaar? Vergelijkt op e-mailadres via de kluis
-   (accounts.emailOf), zodat het ook klopt als de naam versleuteld is. */
+   (accounts.emailOf), zodat het ook klopt als de naam versleuteld is. Leest het
+   adres via eigenaarEmail(), dus een overdracht telt hier onmiddellijk. */
 function isEigenaar(accounts, user) {
   if (!user) return false;
   try {
     const email = (accounts.emailOf(user) || '').trim().toLowerCase();
-    return !!email && email === OWNER_EMAIL;
+    return !!email && email === eigenaarEmail();
   } catch (e) { return false; }
 }
 
-module.exports = { OWNER_EMAIL, GRENZEN, isEigenaar };
+module.exports = { OWNER_EMAIL, GRENZEN, isEigenaar, eigenaarEmail, zetEigenaarEmail };

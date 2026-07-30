@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Scanner</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Scanner">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));
+    backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
+    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.15rem;}
+  header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
+  main{padding:1rem 1.1rem;max-width:640px;margin:0 auto;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
+  .knop:hover{border-color:var(--gold);}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
+  .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
+  .vangkaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;}
+  #beeldWrap{display:none;margin:.7rem 0;border-radius:12px;overflow:hidden;border:1px solid var(--line);}
+  #beeld{width:100%;display:block;}
+  #docWrap{margin-top:.6rem;font-size:.82rem;color:var(--muted);}
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
+  #strook{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .pag{position:relative;display:inline-block;}
+  .pag img{width:5.2rem;height:6.8rem;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block;}
+  .pag .weg{position:absolute;top:-.4rem;right:-.4rem;background:var(--card2);border:1px solid var(--line);
+    border-radius:999px;color:var(--txt);width:1.4rem;height:1.4rem;font-size:.7rem;cursor:pointer;}
+  .kieslabel{display:inline-block;}
+  .kieslabel input{display:none;}
+  .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
+    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
+  .melding.zie{opacity:1;}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/index.html" aria-label="Terug naar het bureaublad">&#8592;</a>
+  <span><span class="ey">RTG</span><h1>Scanner</h1></span>
+</header>
+<main>
+  <div class="vangkaart">
+    <div class="rij">
+      <button class="knop vol" id="cameraKnop" type="button">Open de camera</button>
+      <button class="knop" id="cameraStop" type="button" style="display:none;">Camera dicht</button>
+      <label class="knop kieslabel">Kies foto's<input type="file" id="kies" accept="image/*" multiple></label>
+    </div>
+    <div id="beeldWrap"><video id="beeld" playsinline muted></video></div>
+    <div id="docWrap"><label><input type="checkbox" id="docmodus" checked>
+      Documentmodus: zwart-wit en extra contrast, zodat papier leesbaar blijft</label></div>
+  </div>
+
+  <div class="kop">Pagina's</div>
+  <p class="stil" id="leegTip">Nog geen pagina's. Leg vast met de camera of kies foto's; je kunt meerdere
+    pagina's stapelen voor een document.</p>
+  <div id="strook"></div>
+  <div class="rij" id="bewaarRij" style="margin-top:.8rem;display:none;">
+    <button class="knop vol" id="bewaarPdf" type="button">Bewaar als PDF</button>
+    <button class="knop" id="bewaarFotos" type="button">Bewaar als losse foto's</button>
+  </div>
+
+  <p class="stil" style="margin-top:.8rem;">Alles gebeurt op je toestel: de documentmodus en de PDF worden
+    hier gemaakt, en het resultaat gaat als gewoon bestand naar je RTG Bestanden-kluis (map Scans) -- zelfde
+    kwota, zelfde prullenbak. Er gaat geen beeld naar een andere server.</p>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/apps/scanner/pdfje.js"></script>
+<script src="/apps/scanner/app.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

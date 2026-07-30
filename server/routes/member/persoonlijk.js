@@ -1,9 +1,9 @@
 /* Domein "member", deelmodule persoonlijk: alles wat van het lid zelf is.
-   Het zorgprofiel en locatie-delen (kern/gastzorg.js), De Butler
+   Het zorgprofiel en locatie-delen (kern/gastzorg.js), Rahul
    (kern/fluister.js) en de Shared Assets (kern/assets.js). Alleen routes;
    de logica woont in de kern-modules. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, verdienPunten, pestgrens,
+  const { app, auth, liveCodename, verdienPunten, pestgrens, bus, noteerBeurt,
     zorgVan, zorgZet, locDeel, locStopKlant, locMijn,
     fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, stuurLus,
     sparLijst, sparParkeer, sparStatus,
@@ -39,6 +39,13 @@ app.post('/api/fluister', auth, async (req, res) => {
      vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de
      deur weer (kern/pestgrens.js). Neemt de poort het gesprek over, dan
      komt er geen gewone AI-beurt en ook geen stuur-lus. */
+  /* Het stille codewoord (kern/veilig/codewoord.js). Staat hier, in de gewone
+     Rahul-route, omdat de zin juist in een DOODGEWOON gesprek moet kunnen
+     vallen: je hoeft geen app te openen, en degene die meekijkt ziet je niets
+     bijzonders doen. Wat er ook gebeurt, hierna gaat het gesprek precies
+     verder zoals altijd: geen ander antwoord, geen extra veld, geen vinkje.
+     Elk zichtbaar verschil zou de functie kapotmaken. */
+  if (kern.codewoordCheck) { try { kern.codewoordCheck(req.session.key, req.body.q, 'rahul'); } catch (e) {} }
   const grens = pestgrens.poort(req.session.key, req.body.q);
   if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
   // de sessie reist mee zodat Fluister ook kan doen (reserveren, 24 uur plannen)
@@ -51,14 +58,39 @@ app.post('/api/fluister', auth, async (req, res) => {
   if (stuurLus && !r.pakte) {
     const lus = await stuurLus(req, {
       vraag: req.body.q,
-      filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/foundation', '/api/partner'].some(w => p.startsWith(w)),
+      // streamende voortgang voor een zware taak: elke stap wordt live
+      // "Stap X/24: taxi zoeken..." op de eigen SSE-verbinding (de UI toont het)
+      opStap: (v) => {
+        try { bus && bus.publish('sse', { doel: 'tier', match: [req.session.tier],
+          event: 'rahul-voortgang', data: { stap: v.stap, totaal: v.totaal, bericht: v.bericht, klaar: !!v.klaar } }); } catch (e) {}
+      },
+      // alles wat het lid zelf mag: de hele leden-app EN de RTFoundation
+      // (gezin/kinderen). Alleen de zakelijke werk-apps van andere rollen
+      // (leverancier/personeel/kantoor/partner) blijven buiten bereik; de
+      // API zelf bewaakt verder wie waar recht op heeft (bv. ouder-goedkeuring).
+      filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/partner'].some(w => p.startsWith(w)),
       systeem: require('../../kern/rahul').RAHUL_LEAD +
-        'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app.'
+        'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app. ' +
+        'Je regelt niet alleen reizen, bestellen, betalen en de Salon, maar ook de RTFoundation voor het gezin (bijvoorbeeld het babyboek, school, toetsen of het zakgeldpotje) als het lid daar recht op heeft.'
     });
-    if (lus && lus.tekst) return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
+    if (lus && lus.tekst) {
+      onthoudGesprek(req, lus.tekst);
+      return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
+    }
   }
+  onthoudGesprek(req, r && r.antwoord);
   res.json(r);
 });
+/* De uitwisseling in het doorlopende gesprek zetten, zodat de chat in de app en
+   de balk in het OS EEN draadje zijn en je geschiedenis niet half is. Alleen
+   vastleggen wat er al gebeurd is; kern/ai.js weigert dit voor Lifestyle en
+   Business, waar de chat de lijn naar een mens is. */
+function onthoudGesprek(req, antwoord) {
+  try {
+    if (!req.session.account || !antwoord) return;
+    noteerBeurt(req.session.account, req.body.q, antwoord, req.body.lang);
+  } catch (e) { /* het gesprek loggen mag het antwoord nooit in de weg zitten */ }
+}
 app.post('/api/fluister/profiel', auth, (req, res) => {
   // nieuwe seintjes worden meteen ook een melding op het toestel (met dedupe)
   fluisterPush(req.session.key);

@@ -4,7 +4,7 @@ module.exports = (kern) => {
   const { app, db, supplierAuth, alpine } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
   const r = (pad, fn) => app.post('/api/supplier/alpine' + pad, supplierAuth, (req, res) => {
-    const caps = (db.data.supplierTypes[req.supplier.type] || {}).caps || [];
+    const caps = db.capsVan(req.supplier);
     if (!caps.includes('alpine')) { res.status(403).json({ error: 'Deze zaak is geen wintersportresort.' }); return; }
     stuur(res, fn(req.supplier.code, req.body || {}));
   });

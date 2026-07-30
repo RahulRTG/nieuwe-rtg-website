@@ -6,6 +6,7 @@
 <title>RTG Mall</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/apps/rtg-onthul.css" rel="stylesheet">
 <script src="/apps/rtg-onthul.js" defer></script>
 <style>
@@ -31,16 +32,22 @@
   .boutiek{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.35rem;text-align:left;}
   .boutiek:hover{border-color:var(--gold);transform:translateY(-2px);}
   .boutiek h3{font-size:1.05rem;}
+  a.boutiek{text-decoration:none;color:inherit;}
   .boutiek .stad{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
+  .boutiek .stad .stad-glyf{width:.95em;height:.95em;vertical-align:-.12em;margin-right:.3em;}
+  .etage-kop h2 .kop-glyf{width:1em;height:1em;vertical-align:-.14em;margin-right:.4em;}
   .boutiek .tag{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:.15rem;}
   .boutiek .meta{font-size:.76rem;color:var(--soft);margin-top:.35rem;}
   .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
+  .dp-sub{font-family:'Bodoni Moda',serif;font-size:1.02rem;margin:1rem 0 .55rem;}
+  .dp-sub .n{font-family:'Inter',system-ui,sans-serif;font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
   /* gids: alle leveranciers per genre, met een diepe link naar boeken/reserveren */
   .gids{margin-top:2.4rem;}
   .genres{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;}
   .genre{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .95rem;display:flex;gap:.7rem;align-items:flex-start;text-decoration:none;color:var(--txt);transition:border-color .2s,transform .2s;}
   .genre:hover{border-color:var(--gold);transform:translateY(-2px);}
-  .genre .gi{font-size:1.3rem;line-height:1;}
+  .genre .gi{font-size:1.3rem;line-height:1;color:var(--gold);}
+  .genre .gi .rtg-glyf{width:1.35rem;height:1.35rem;display:block;}
   .genre b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;display:block;}
   .genre .gn{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
   .genre .gl{font-size:.8rem;color:var(--muted);line-height:1.45;display:block;margin-top:.25rem;}
@@ -65,6 +72,10 @@
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
@@ -78,6 +89,8 @@
   <div id="reisbieb"></div>
   <div id="rtfbieb"></div>
   <div id="etages"></div>
+  <div id="thuisWrap"></div>
+  <div id="dienstenWrap"></div>
   <div id="gidsWrap"></div>
 </main>
 
@@ -87,6 +100,14 @@
     <div><div class="ey" id="bladStad" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
   </div>
   <div class="art" id="bladArt"></div>
+</section>
+
+<section class="blad" id="lezer" aria-label="Reisgids lezen">
+  <div class="blad-kop">
+    <button class="terug" id="lezerTerug">← Bibliotheek</button>
+    <div><div class="ey" id="lezerMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);"></div><h1 id="lezerTitel" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+  </div>
+  <div id="lezerTekst" style="max-width:38rem;margin:0 auto;padding:1.6rem 1.2rem 4rem;font-size:.95rem;line-height:1.8;color:var(--muted);"></div>
 </section>
 
 <div class="melding" id="melding" role="status"></div>
@@ -113,14 +134,14 @@ if (!TOKEN) {
    het Reis-gedeelte en de RTF-bieb zijn ook voor de gratis gast open). */
 function tekenBiebKop(){
   $('#biebKop').innerHTML =
-    '<div class="etage"><div class="etage-kop"><h2>📖 De RTG Bibliotheek</h2>'+
+    '<div class="etage"><div class="etage-kop"><h2>De RTG Bibliotheek</h2>'+
     '<span class="n">drie afdelingen · bladeren voor iedereen · vraag de bibliothecaris</span></div>'+
     '<div class="boutiek" style="cursor:default;">'+
-      '<b>💬 De bibliothecaris</b>'+
+      '<b>De bibliothecaris</b>'+
       '<span class="tag">Vertel wat u zoekt of wilt leren; de bibliothecaris zoekt dwars door de App-, Reis- en RTF-afdeling en raadt echte titels aan.</span>'+
       '<div class="rij" style="margin-top:.5rem;">'+
         '<input class="veld" id="bibVraag" maxlength="300" placeholder="Bijv. ik wil leren fotograferen, of: we gaan naar Londen" style="flex:1;min-width:12rem;">'+
-        '<button class="knop" id="bibGo">✨ Vraag advies</button>'+
+        '<button class="knop" id="bibGo">Vraag advies</button>'+
       '</div>'+
       '<div id="bibUit" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>'+
     '</div></div>';
@@ -137,18 +158,18 @@ function tekenBiebKop(){
   });
 }
 
-/* ---------- De RTF-afdeling: 20.000 gratis kind- en gezinsapps, open voor
-   iedereen die is aangemeld (ook de gast) ---------- */
+/* ---------- De RTF-afdeling: de echte, gratis kind- en gezinsapps van de
+   stichting, open voor iedereen die is aangemeld (ook de gast) ---------- */
 const RF = { categorie: '', zoek: '', pagina: 1, mijn: false };
 async function laadRtfbieb(){
   let d;
   try { d = await api('/api/mall/rtf'); } catch(e){ return; }
   $('#rtfbieb').innerHTML =
-    '<div class="etage"><div class="etage-kop"><h2>🧸 RTF-Bibliotheek</h2>'+
-    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
+    '<div class="etage"><div class="etage-kop"><h2>RTF-Bibliotheek</h2>'+
+    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' echte kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="rfCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
-        d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('')+'</select>'+
+        d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('')+'</select>'+
       '<input id="rfZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
       '<button class="knop stil" id="rfMijn" type="button">Mijn RTF-apps</button>'+
     '</div>'+
@@ -159,16 +180,19 @@ async function laadRtfbieb(){
   tekenRtf();
 }
 function rtfKaart(a, geinstalleerd){
+  // een echte foundation-app: elke tegel opent een bestaande, werkende pagina
+  const open = a.url ? '<a class="knop stil" href="'+esc(a.url)+'" style="text-decoration:none;">Openen</a>' : '';
   return '<div class="boutiek" style="cursor:default;">'+
-    '<span class="stad">'+a.icon+' '+esc(a.categorieLabel||a.categorie||'')+'</span>'+
+    '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel||a.categorie||'')+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</span>'+
-    '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
-      '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
+    (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
+    (a.doelgroepLabel?'<span style="font-size:.72rem;color:var(--soft);display:block;">voor '+esc(a.doelgroepLabel)+'</span>':'')+
+    '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
       '<b style="color:var(--gold);font-size:.8rem;">Gratis</b>'+
+      '<span style="flex:1;"></span>'+ open +
       (geinstalleerd
-        ? '<button class="knop stil rfweg" data-id="'+esc(a.id)+'" style="margin-left:auto;">Verwijder</button>'
-        : '<button class="knop rfin" data-id="'+esc(a.id)+'" style="margin-left:auto;">Installeer</button>')+
+        ? '<button class="knop stil rfweg" data-id="'+esc(a.id)+'">Verwijder</button>'
+        : '<button class="knop rfin" data-id="'+esc(a.id)+'">Installeer</button>')+
     '</div></div>';
 }
 let rfTekenNr = 0;
@@ -210,20 +234,21 @@ async function tekenRtf(){
   } catch(e){ if (nr === rfTekenNr) grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
-/* ---------- De App-Bibliotheek: 20.000 professionele apps, inbegrepen ----------
-   Bladeren per categorie, zoeken op naam, installeren met één knop. De
-   winkelwaarde staat er eerlijk bij; voor leden is de prijs altijd 0. */
+/* ---------- De App-Bibliotheek: de echte RTG-apps, inbegrepen ----------
+   Alle apps die werkelijk in het ecosysteem draaien: elke tegel opent een
+   bestaande, werkende pagina of zet hem op je startscherm. Bladeren per
+   categorie, zoeken op naam; voor leden is alles inbegrepen bij de pas. */
 const AB = { categorie: '', zoek: '', pagina: 1, mijn: false, cats: [] };
 async function laadAppbieb(){
   let d;
   try { d = await api('/api/mall/apps'); } catch(e){ return; }
   AB.cats = d.categorieen;
   $('#appbieb').innerHTML =
-    '<div class="etage"><div class="etage-kop"><h2>📱 App-Bibliotheek</h2>'+
-    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' apps · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · bladeren voor iedereen · installeren bij de pas</span></div>'+
+    '<div class="etage"><div class="etage-kop"><h2>App-Bibliotheek</h2>'+
+    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' echte apps · bladeren voor iedereen · alles inbegrepen bij de pas</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="abCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
-        d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+' ('+c.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
+        d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+' ('+c.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
       '<input id="abZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
       '<button class="knop stil" id="abMijn" type="button">Mijn apps</button>'+
     '</div>'+
@@ -234,16 +259,20 @@ async function laadAppbieb(){
   tekenApps();
 }
 function appKaart(a, geinstalleerd){
+  // een echte app: open de bestaande pagina, of zet hem op je startscherm
+  const open = a.url
+    ? '<a class="knop stil" href="'+esc(a.url)+'" style="text-decoration:none;">Openen</a>'
+    : (a.plankLabel ? '<span style="font-size:.74rem;color:var(--gold);">'+esc(a.plankLabel)+'</span>' : '');
   return '<div class="boutiek" style="cursor:default;">'+
-    '<span class="stad">'+a.icon+' '+esc(a.categorieLabel)+'</span>'+
+    '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel)+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</span>'+
-    '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
-      '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
+    (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
+    '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
       '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>'+
+      '<span style="flex:1;"></span>'+ open +
       (geinstalleerd
-        ? '<button class="knop stil abweg" data-id="'+esc(a.id)+'" style="margin-left:auto;">Verwijder</button>'
-        : '<button class="knop abin" data-id="'+esc(a.id)+'" style="margin-left:auto;">Installeer</button>')+
+        ? '<button class="knop stil abweg" data-id="'+esc(a.id)+'">Van startscherm</button>'
+        : '<button class="knop abin" data-id="'+esc(a.id)+'">Op startscherm</button>')+
     '</div></div>';
 }
 async function tekenApps(){
@@ -281,43 +310,57 @@ async function tekenApps(){
   } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
-/* ---------- De Reis-Bibliotheek: een miljoen reisgidsen, van Londen tot Gaza ----------
-   Kies een bestemming en/of gidssoort, of zoek erop; de gidsen zijn nuttig,
-   exclusief en educatief, en voor betalende leden altijd inbegrepen. */
-const RB = { bestemming: '', soort: '', zoek: '', pagina: 1, mijn: false };
+/* ---------- De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen ----------
+   Geen lege titels: elke gids opent en is te lezen. Kies een bestemming of een
+   werelddeel, of zoek erop; alles is open voor iedereen die is aangemeld. */
+const RB = { bestemming: '', regio: '', zoek: '', pagina: 1, mijn: false };
 async function laadReisbieb(){
   let d;
   try { d = await api('/api/mall/reis'); } catch(e){ return; }
   $('#reisbieb').innerHTML =
-    '<div class="etage"><div class="etage-kop"><h2>🌍 Reis-Bibliotheek</h2>'+
-    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' reisgidsen · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · van Londen tot Gaza</span></div>'+
+    '<div class="etage"><div class="etage-kop"><h2>Reis-Bibliotheek</h2>'+
+    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' gidsen van eigen redactie · echt te lezen · voor iedereen open</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="rbBestemming" class="veld" style="max-width:13rem;" aria-label="Bestemming"><option value="">Alle bestemmingen</option>'+
         d.bestemmingen.map(b => '<option value="'+esc(b)+'">'+esc(b)+'</option>').join('')+'</select>'+
-      '<select id="rbSoort" class="veld" style="max-width:13rem;" aria-label="Gidssoort"><option value="">Alle gidssoorten</option>'+
-        d.soorten.map(s => '<option value="'+esc(s)+'">'+esc(s)+'</option>').join('')+'</select>'+
-      '<input id="rbZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek een bestemming of gidssoort" maxlength="60" aria-label="Zoeken">'+
-      '<button class="knop stil" id="rbMijn" type="button">Mijn reis-apps</button>'+
+      '<select id="rbRegio" class="veld" style="max-width:13rem;" aria-label="Werelddeel"><option value="">Alle werelddelen</option>'+
+        d.regios.map(r => '<option value="'+esc(r.id)+'">'+esc(r.label)+' ('+r.aantal+')</option>').join('')+'</select>'+
+      '<input id="rbZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek een bestemming of een woord uit de gids" maxlength="60" aria-label="Zoeken">'+
+      '<button class="knop stil" id="rbMijn" type="button">Mijn reisgidsen</button>'+
     '</div>'+
     '<div id="rbGrid"></div><div class="rij" id="rbBlader" style="justify-content:center;"></div></div>';
   $('#rbBestemming').addEventListener('change', () => { RB.bestemming = $('#rbBestemming').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
-  $('#rbSoort').addEventListener('change', () => { RB.soort = $('#rbSoort').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
+  $('#rbRegio').addEventListener('change', () => { RB.regio = $('#rbRegio').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
   let zt; $('#rbZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { RB.zoek = $('#rbZoek').value; RB.pagina = 1; RB.mijn = false; tekenReis(); }, 300); });
   $('#rbMijn').addEventListener('click', () => { RB.mijn = !RB.mijn; RB.pagina = 1; tekenReis(); });
   tekenReis();
 }
 function reisKaart(a, geinstalleerd){
   return '<div class="boutiek" style="cursor:default;">'+
-    '<span class="stad">🌍 '+esc(a.bestemming)+' · '+esc(a.soort)+'</span>'+
+    '<span class="stad">'+esc(a.bestemming)+' · '+esc(a.regio)+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</span>'+
-    '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
-      '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
+    (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
+    '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
       '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>'+
+      '<span style="flex:1;"></span>'+
+      '<button class="knop stil rblees" data-id="'+esc(a.id)+'">Lezen</button>'+
       (geinstalleerd
-        ? '<button class="knop stil rbweg" data-id="'+esc(a.id)+'" style="margin-left:auto;">Verwijder</button>'
-        : '<button class="knop rbin" data-id="'+esc(a.id)+'" style="margin-left:auto;">Installeer</button>')+
+        ? '<button class="knop stil rbweg" data-id="'+esc(a.id)+'">Verwijder</button>'
+        : '<button class="knop rbin" data-id="'+esc(a.id)+'">In mijn kast</button>')+
     '</div></div>';
+}
+// de leeszaal: de volledige tekst van een gids, in hetzelfde blad-formaat
+async function leesGids(id){
+  try {
+    const d = await api('/api/mall/reis/lees', { id });
+    const g = d.gids;
+    $('#lezerTitel').textContent = g.naam;
+    $('#lezerMeta').textContent = g.bestemming + ' · ' + g.regio;
+    $('#lezerTekst').innerHTML = String(g.tekst || '').split('\n').filter(Boolean)
+      .map(p => '<p style="margin-bottom:1rem;">'+esc(p)+'</p>').join('');
+    $('#lezer').classList.add('open');
+    window.scrollTo(0, 0);
+  } catch(e){ meld(e.message); }
 }
 async function tekenReis(){
   const grid = $('#rbGrid'), blader = $('#rbBlader');
@@ -328,12 +371,12 @@ async function tekenReis(){
     if (RB.mijn) {
       const mijn = (await api('/api/mall/reis/mijn')).apps;
       grid.innerHTML = mijn.length ? '<div class="boutieks">'+mijn.map(a => reisKaart(a, true)).join('')+'</div>'
-        : '<div class="leeg">Nog geen reis-apps geïnstalleerd. Kies een bestemming en druk op Installeer.</div>';
+        : '<div class="leeg">Nog geen gidsen in je kast. Kies een bestemming en druk op In mijn kast.</div>';
       blader.innerHTML = '';
     } else {
-      const d = await api('/api/mall/reis/catalogus', { bestemming: RB.bestemming, soort: RB.soort, zoek: RB.zoek, pagina: RB.pagina });
+      const d = await api('/api/mall/reis/catalogus', { bestemming: RB.bestemming, regio: RB.regio, zoek: RB.zoek, pagina: RB.pagina });
       grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => reisKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
-        : '<div class="leeg">'+esc(d.hint || 'Niets gevonden. Probeer een andere zoekterm.')+'</div>';
+        : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
         ? '<button class="knop stil" id="rbVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
           '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' gidsen</span>'+
@@ -343,8 +386,9 @@ async function tekenReis(){
       if (vorig) vorig.addEventListener('click', () => { RB.pagina--; tekenReis(); });
       if (volgend) volgend.addEventListener('click', () => { RB.pagina++; tekenReis(); });
     }
+    grid.querySelectorAll('.rblees').forEach(b => b.addEventListener('click', () => leesGids(b.dataset.id)));
     grid.querySelectorAll('.rbin').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await api('/api/mall/reis/installeer', { id: b.dataset.id }); meld('Geïnstalleerd: '+r.app.naam+' ('+r.aantal+' reis-apps)'); tekenReis(); }
+      try { const r = await api('/api/mall/reis/installeer', { id: b.dataset.id }); meld('In je kast: '+r.app.naam+' ('+r.aantal+' gidsen)'); tekenReis(); }
       catch(e){ meld(e.message); }
     }));
     grid.querySelectorAll('.rbweg').forEach(b => b.addEventListener('click', async () => {
@@ -359,7 +403,7 @@ async function laad(){
   try { d = await api('/api/mall'); } catch(e){ $('#etages').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   if (!d.etages || !d.etages.length){ $('#etages').innerHTML = '<div class="leeg">De mall wordt ingericht. Kom snel terug.</div>'; return; }
   $('#etages').innerHTML = d.etages.map(e =>
-    '<div class="etage"><div class="etage-kop"><h2>'+e.icon+' '+esc(e.label)+'</h2><span class="n">'+e.boutieks.length+' '+(e.boutieks.length===1?'boutique':'boutieks')+'</span></div>'+
+    '<div class="etage"><div class="etage-kop"><h2>'+(window.RTGGlyf?RTGGlyf.svgHTML(e.icon,{klasse:'kop-glyf'}):'')+esc(e.label)+'</h2><span class="n">'+e.boutieks.length+' '+(e.boutieks.length===1?'boutique':'boutieks')+'</span></div>'+
     '<div class="boutieks">'+e.boutieks.map(b =>
       '<button class="boutiek" data-code="'+esc(b.code)+'" data-kind="'+esc(b.kind||'retail')+'" data-naam="'+esc(b.naam)+'" data-stad="'+esc(b.stad||'')+'">'+
         '<span class="stad">'+esc(b.stad||'RTG')+'</span>'+
@@ -369,7 +413,237 @@ async function laad(){
       '</button>').join('')+'</div></div>'
   ).join('');
   $('#etages').querySelectorAll('.boutiek').forEach(b => b.addEventListener('click', () => openBoutiek(b.dataset.code, b.dataset.naam, b.dataset.stad, b.dataset.kind)));
+  tekenThuis(d.thuis || null);
+  tekenDiensten(d.diensten || []);
   tekenGids(d.gids || []);
+}
+
+/* ---------- De verdieping RTG Thuis: de commerciële tak ----------
+   Zaken die beroepsmatig verhuren, per stad. De Mall wijst de weg; boeken
+   doe je in RTG Thuis zelf, op je codenaam en met dezelfde regels. Voor het
+   lid is het overal 0% servicekosten -- ook hier. */
+function tekenThuis(t){
+  const w = $('#thuisWrap');
+  if (!t || !t.steden || !t.steden.length){ w.innerHTML = ''; return; }
+  w.innerHTML = '<div class="etage"><div class="etage-kop"><h2>RTG Thuis</h2>'+
+    '<span class="n">'+t.aantal+' verblijf'+(t.aantal===1?'':'ven')+' van '+t.zaken+' zaak'+(t.zaken===1?'':'en')+' · zakelijk verhuurd, met btw en factuur</span></div>'+
+    t.steden.map(s =>
+      '<div class="dp-sub">'+esc(s.stad)+' <span class="n">· '+s.aantal+' verblijf'+(s.aantal===1?'':'ven')+' · vanaf '+euro(s.vanaf)+' per nacht</span></div>'+
+      '<div class="boutieks">'+s.huizen.map(h =>
+        '<a class="boutiek" href="/apps/thuis.html?huis='+encodeURIComponent(h.id)+'">'+
+          '<span class="stad">'+esc(h.zaak)+'</span>'+
+          '<h3>'+esc(h.titel)+'</h3>'+
+          '<span class="tag">'+esc(h.doelgroep || h.typeLabel)+'</span>'+
+          '<span class="meta">'+euro(h.prijs)+' per nacht'+(h.maandprijs?' · '+euro(h.maandprijs)+' per maand':'')+
+            ' · '+h.maxGasten+' gasten'+(h.btwPct?' · incl. '+h.btwPct+'% logies-btw':'')+(h.opFactuur?' · op factuur':'')+'</span>'+
+        '</a>').join('')+'</div>').join('')+
+    '<p style="color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0;">'+esc(t.opmerking)+
+    ' <a href="'+esc(t.pagina)+'" style="color:var(--gold);">Naar RTG Thuis</a></p></div>';
+}
+
+/* ---------- Het Dienstenplein: de dienstverlenende zaken (zelfstandigen,
+   privéchef, wellness, bouw & installatie) bieden hier hun aanbod aan.
+   Boeken loopt op je codenaam via de gewone boekroute; de zaak bevestigt. */
+let DZAKEN = {};
+function tekenDiensten(genres){
+  const w = $('#dienstenWrap');
+  if (!genres.length){ w.innerHTML = ''; return; }
+  DZAKEN = {};
+  w.innerHTML = '<div class="etage"><div class="etage-kop"><h2>Het Dienstenplein</h2>'+
+    '<span class="n">diensten aan huis, op de villa of aan boord · boek direct of vraag een offerte</span></div>'+
+    '<div id="dpOff"></div><div id="dpRitmes"></div><div id="dpReviews"></div>'+
+    genres.map(g => {
+      g.zaken.forEach(z => DZAKEN[z.code] = z);
+      return '<div class="dp-sub">'+esc(g.label)+' <span class="n">· '+g.aantal+' '+(g.aantal===1?'zaak':'zaken')+'</span></div>'+
+      '<div class="boutieks">'+g.zaken.map(z =>
+        '<button class="boutiek dpz" data-code="'+esc(z.code)+'">'+
+          '<span class="stad">'+esc(z.stad||'RTG')+'</span>'+
+          '<h3>'+esc(z.naam)+'</h3>'+
+          (z.vak?'<span class="tag">'+esc(z.vak)+'</span>':(z.tagline?'<span class="tag">'+esc(z.tagline)+'</span>':''))+
+          '<span class="meta">'+z.diensten.length+' dienst'+(z.diensten.length===1?'':'en')+(z.vanaf!=null?' · vanaf '+euro(z.vanaf):'')+(z.beoordeling?' · <span style="color:var(--gold);">✶ '+z.beoordeling.score+'</span> ('+z.beoordeling.aantal+')':'')+'</span>'+
+        '</button>').join('')+'</div>';
+    }).join('')+'</div>';
+  w.querySelectorAll('.dpz').forEach(b => b.addEventListener('click', () => openDienstZaak(b.dataset.code)));
+  tekenOffertes();
+}
+
+/* Mijn offertes: vrije klussen die je hebt aangevraagd; bij een aanbod geef
+   je hier akkoord (de klus staat dan bevestigd in je boekingen) of trek je in. */
+async function tekenOffertes(){
+  const w = $('#dpOff'); if (!w) return;
+  let d; try { d = await api('/api/vak/offertes/mijn'); } catch(e){ w.innerHTML=''; return; }
+  const off = (d.offertes || []).filter(o => o.status !== 'ingetrokken');
+  if (!off.length){ w.innerHTML=''; return; }
+  const LBL = { aangevraagd:'wacht op antwoord', aangeboden:'aanbod ontvangen', akkoord:'akkoord · geboekt', afgewezen:'kon niet' };
+  w.innerHTML = '<div class="dp-sub">Mijn offertes <span class="n">· '+off.length+'</span></div>'+
+    '<div class="boutieks">'+off.slice(0,6).map(o =>
+      '<div class="boutiek" style="cursor:default;">'+
+        '<span class="stad">'+esc(o.zaak)+' · '+esc(LBL[o.status]||o.status)+'</span>'+
+        '<span class="tag">'+esc(o.omschrijving)+'</span>'+
+        (o.prijs!=null?'<span class="prijs" style="font-size:.95rem;">'+euro(o.prijs)+(o.toelichting?' <span style="color:var(--soft);font-size:.78rem;">· '+esc(o.toelichting)+'</span>':'')+'</span>':'')+
+        (o.status==='akkoord'&&o.boekingRef?'<span class="meta">boeking '+esc(o.boekingRef)+' · de zaak neemt contact op</span>':'')+
+        (o.status==='aangeboden'
+          ? '<div class="rij"><button class="knop offok" data-id="'+esc(o.id)+'">Akkoord</button><button class="knop stil offweg" data-id="'+esc(o.id)+'">Intrekken</button></div>'
+          : (o.status==='aangevraagd'?'<div class="rij"><button class="knop stil offweg" data-id="'+esc(o.id)+'">Intrekken</button></div>':''))+
+      '</div>').join('')+'</div>';
+  w.querySelectorAll('.offok').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('/api/vak/offerte/akkoord', { id: b.dataset.id });
+      meld('Akkoord; de klus staat als bevestigde boeking klaar ('+r.boeking.ref+').'); tekenOffertes(); }
+    catch(e){ meld(e.message); }
+  }));
+  w.querySelectorAll('.offweg').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/vak/offerte/intrek', { id: b.dataset.id }); meld('Ingetrokken.'); tekenOffertes(); }
+    catch(e){ meld(e.message); }
+  }));
+  tekenRitmes(); tekenReviews();
+}
+
+/* Mijn vaste afspraken: het lopende ritme per zaak, met een stopknop */
+async function tekenRitmes(){
+  const w = $('#dpRitmes'); if (!w) return;
+  let d; try { d = await api('/api/vak/ritmes/mijn'); } catch(e){ w.innerHTML=''; return; }
+  const rit = d.ritmes || [];
+  if (!rit.length){ w.innerHTML=''; return; }
+  w.innerHTML = '<div class="dp-sub">Mijn vaste afspraken <span class="n">· '+rit.length+'</span></div>'+
+    '<div class="boutieks">'+rit.map(r =>
+      '<div class="boutiek" style="cursor:default;">'+
+        '<span class="stad">'+esc(r.zaak)+'</span>'+
+        '<span class="tag">'+esc(r.dienst)+' · '+(r.intervalWeken===1?'elke week':'elke '+r.intervalWeken+' weken')+' om '+esc(r.tijd)+'</span>'+
+        '<span class="meta">laatst gepland: '+esc(r.laatst)+'</span>'+
+        '<div class="rij"><button class="knop stil ritstop" data-id="'+esc(r.id)+'">Stop vaste afspraak</button></div>'+
+      '</div>').join('')+'</div>';
+  w.querySelectorAll('.ritstop').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/vak/ritme/stop', { id: b.dataset.id }); meld('Gestopt; de zaak krijgt bericht.'); tekenRitmes(); }
+    catch(e){ meld(e.message); }
+  }));
+}
+
+/* Hoe was het? Afgeronde klussen zonder beoordeling: 1 tot 5 sterren */
+async function tekenReviews(){
+  const w = $('#dpReviews'); if (!w) return;
+  let d; try { d = await api('/api/vak/reviews/open'); } catch(e){ w.innerHTML=''; return; }
+  const open = d.open || [];
+  if (!open.length){ w.innerHTML=''; return; }
+  w.innerHTML = '<div class="dp-sub">Hoe was het? <span class="n">· beoordeel je afgeronde klussen</span></div>'+
+    '<div class="boutieks">'+open.map(o =>
+      '<div class="boutiek" style="cursor:default;">'+
+        '<span class="stad">'+esc(o.zaak)+' · '+esc(o.datum)+'</span>'+
+        '<span class="tag">'+esc(o.dienst)+'</span>'+
+        '<div class="rij" data-ref="'+esc(o.ref)+'" data-code="'+esc(o.supplierCode)+'">'+
+          [1,2,3,4,5].map(n => '<button class="knop stil ster" data-n="'+n+'" aria-label="'+n+' sterren">✶'+n+'</button>').join('')+
+        '</div>'+
+      '</div>').join('')+'</div>';
+  w.querySelectorAll('.ster').forEach(b => b.addEventListener('click', async () => {
+    const rij = b.closest('[data-ref]');
+    try {
+      const r = await api('/api/vak/review', { supplierCode: rij.dataset.code, ref: rij.dataset.ref, sterren: Number(b.dataset.n) });
+      meld('Dank je wel; de zaak staat nu op ✶ '+r.score.score+' ('+r.score.aantal+').');
+      tekenReviews();
+    } catch(e){ meld(e.message); }
+  }));
+}
+function openDienstZaak(code){
+  const z = DZAKEN[code]; if (!z) return;
+  HUIDIG = code;
+  $('#bladNaam').textContent = z.naam;
+  $('#bladStad').textContent = (z.stad || 'RTG') + ' · ' + z.genreLabel;
+  $('#blad').classList.add('open');
+  $('#bladArt').innerHTML = (z.diensten.length ? z.diensten.map(d =>
+    '<div class="kaart">'+
+      '<span class="cat">'+(d.soort==='product'?'Product':'Dienst')+'</span>'+
+      '<h3>'+esc(d.naam)+'</h3>'+
+      (d.uitleg?'<span class="oms">'+esc(d.uitleg)+'</span>':'')+
+      '<span class="prijs">'+euro(d.prijs)+(d.duurMin?' <span style="color:var(--soft);font-size:.8rem;">· '+d.duurMin+' min</span>':'')+'</span>'+
+      '<div class="rij"><button class="knop dboek" data-id="'+esc(d.id)+'">Boeken</button></div>'+
+    '</div>').join('') : '<div class="leeg">Deze zaak vult haar aanbod nog.</div>')+
+    '<div class="kaart"><span class="cat">Vrije klus</span><h3>Staat het er niet tussen?</h3>'+
+    '<span class="oms">Omschrijf je klus; de zaak antwoordt met een prijs op maat en jij beslist.</span>'+
+    '<div class="rij"><button class="knop stil" id="dOfferte">Offerte aanvragen</button></div></div>';
+  $('#bladArt').querySelectorAll('.dboek').forEach(b => b.addEventListener('click', () => boekDienst(code, b.dataset.id)));
+  $('#dOfferte').addEventListener('click', () => vraagOfferte(code));
+}
+function vraagOfferte(code){
+  const z = DZAKEN[code]; if (!z) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'blad open'; wrap.style.zIndex = '40';
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="ofTerug">← Terug</button>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">Offerte aanvragen</h1></div></div>'+
+    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+      '<label class="opties" for="ofTekst">Omschrijf de klus</label>'+
+      '<textarea class="veld" id="ofTekst" rows="4" maxlength="300" placeholder="Bijv. schutting van 8 meter vervangen, hout mag je zelf voorstellen" style="margin-bottom:.5rem;resize:vertical;"></textarea>'+
+      '<label class="opties" for="ofWens">Gewenste datum (optioneel)</label><input class="veld" id="ofWens" type="date" style="margin-bottom:.6rem;">'+
+      '<button class="knop" id="ofGa" style="width:100%;">Vraag offerte aan</button>'+
+      '<p class="opties" style="margin-top:.5rem;">Je vraagt aan op je codenaam; het antwoord met prijs verschijnt hier op het Dienstenplein onder Mijn offertes.</p>'+
+    '</div></div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('#ofTerug').addEventListener('click', () => wrap.remove());
+  wrap.querySelector('#ofGa').addEventListener('click', async () => {
+    try {
+      await api('/api/vak/offerte/vraag', { supplierCode: code, omschrijving: wrap.querySelector('#ofTekst').value, wens: wrap.querySelector('#ofWens').value });
+      wrap.remove(); $('#blad').classList.remove('open');
+      meld('Aangevraagd; de zaak antwoordt met een prijs.'); tekenOffertes();
+    } catch(e){ meld(e.message); }
+  });
+}
+function boekDienst(code, dienstId){
+  const z = DZAKEN[code]; const d = z && z.diensten.find(x => x.id === dienstId); if (!d) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'blad open'; wrap.style.zIndex = '40';
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="dbTerug">← Terug</button>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(d.naam)+'</h1></div></div>'+
+    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+      '<label class="opties" for="dbDatum">Datum</label><input class="veld" id="dbDatum" type="date" style="margin-bottom:.5rem;">'+
+      '<label class="opties" for="dbTijd">Tijd</label><select class="veld" id="dbTijd" style="margin-bottom:.5rem;"><option value="">Kies eerst een datum</option></select>'+
+      '<label class="opties" for="dbHerhaal">Herhalen</label><select class="veld" id="dbHerhaal" style="margin-bottom:.5rem;">'+
+        '<option value="">Eenmalig</option><option value="1">Elke week</option><option value="2">Elke 2 weken</option><option value="4">Elke 4 weken</option></select>'+
+      '<textarea class="veld" id="dbNote" rows="2" maxlength="140" placeholder="Opmerking voor de zaak (optioneel)" style="margin-bottom:.6rem;resize:vertical;"></textarea>'+
+      '<button class="knop" id="dbGa" style="width:100%;">Vraag aan · '+(d.prijs?euro(d.prijs):'op aanvraag')+'</button>'+
+      '<button class="knop stil" id="dbWacht" style="width:100%;margin-top:.4rem;" hidden>Vol? Zet mij op de wachtlijst voor deze dag</button>'+
+      '<p class="opties" style="margin-top:.5rem;">Je boekt op je codenaam; de zaak bevestigt je aanvraag in de app. Een vaste afspraak stop je wanneer je wilt.</p>'+
+    '</div></div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('#dbTerug').addEventListener('click', () => wrap.remove());
+  const datum = wrap.querySelector('#dbDatum'), tijd = wrap.querySelector('#dbTijd');
+  datum.min = new Date().toISOString().slice(0,10);
+  const wachtKnop = wrap.querySelector('#dbWacht');
+  datum.addEventListener('change', async () => {
+    tijd.innerHTML = '<option value="">Laden...</option>';
+    try {
+      const r = await api('/api/booking/slots', { supplierCode: code, serviceId: d.id, date: datum.value });
+      const vol = !(r.tijden && r.tijden.length);
+      tijd.innerHTML = vol
+        ? '<option value="">Geen vrije tijden op deze dag</option>'
+        : '<option value="">Kies een tijd</option>'+r.tijden.map(t => '<option>'+esc(t)+'</option>').join('');
+      wachtKnop.hidden = !vol;
+    } catch(e){ tijd.innerHTML = '<option value="">'+esc(e.message)+'</option>'; }
+  });
+  wachtKnop.addEventListener('click', async () => {
+    try {
+      await api('/api/vak/wachtlijst/zet', { supplierCode: code, serviceId: d.id, datum: datum.value });
+      wrap.remove();
+      meld('Je staat op de wachtlijst; komt er plek vrij, dan krijg je een seintje en boek je zelf.');
+    } catch(e){ meld(e.message); }
+  });
+  wrap.querySelector('#dbGa').addEventListener('click', async () => {
+    const herhaal = wrap.querySelector('#dbHerhaal').value;
+    try {
+      if (herhaal){
+        // een vaste afspraak: de eerste staat direct aangevraagd, daarna
+        // plant de app telkens de volgende; stoppen kan altijd
+        if (!tijd.value){ meld('Kies eerst een datum en tijd.'); return; }
+        const r = await api('/api/vak/ritme/start', { supplierCode: code, serviceId: d.id, intervalWeken: Number(herhaal), tijd: tijd.value, start: datum.value });
+        wrap.remove();
+        meld('Vaste afspraak gestart ('+r.ritme.id+'); de eerste staat aangevraagd voor '+r.boeking.wanneer+'.');
+        tekenOffertes();
+        return;
+      }
+      const r = await api('/api/booking/request', { supplierCode: code, serviceId: d.id, date: datum.value, time: tijd.value, note: wrap.querySelector('#dbNote').value });
+      wrap.remove();
+      meld(r.boeking.status === 'wacht-op-betaling'
+        ? 'Aanvraag '+r.boeking.ref+' staat klaar; rond de betaling af in de app.'
+        : 'Aangevraagd ('+r.boeking.ref+'); de zaak bevestigt je aanvraag.');
+    } catch(e){ meld(e.message); }
+  });
 }
 
 function tekenGids(genres){
@@ -377,7 +651,7 @@ function tekenGids(genres){
   $('#gidsWrap').innerHTML = '<div class="gids"><div class="etage-kop"><h2>Alle leveranciers</h2><span class="n">per genre · boek en reserveer</span></div>'+
     '<div class="genres">'+genres.map(g => {
       const namen = g.leveranciers.map(l => l.naam).slice(0,4).join(', ') + (g.aantal>4?' e.a.':'');
-      return '<a class="genre" href="'+esc(g.pagina)+'"><span class="gi">'+g.icon+'</span>'+
+      return '<a class="genre" href="'+esc(g.pagina)+'"><span class="gi">'+(window.RTGGlyf?RTGGlyf.svgHTML(g.icon):'')+'</span>'+
         '<div><b>'+esc(g.label)+'</b><span class="gn">'+g.aantal+' adres'+(g.aantal===1?'':'sen')+'</span>'+
         '<span class="gl">'+esc(namen)+'</span>'+
         (g.boekbaar?'<span class="ga">Openen →</span>':'')+
@@ -479,19 +753,20 @@ function tekenArt(arts){
       ((a.kleuren&&a.kleuren.length)||(a.maten&&a.maten.length)?'<span class="opties">'+esc((a.kleuren||[]).join(', '))+(a.maten&&a.maten.length?' · maten '+esc(a.maten.join('/')):'')+'</span>':'')+
       (a.drop?'<span class="opties" style="color:var(--gold);">Drop op '+esc(a.drop.datum)+' om '+esc(a.drop.tijd||'')+'</span>':'')+
       '<div class="rij">'+
-        '<button class="knop stil wl'+(a.opWishlist?' aan':'')+'" data-id="'+esc(a.id)+'">'+(a.opWishlist?'♥ Op verlanglijst':'♡ Verlanglijst')+'</button>'+
+        '<button class="knop stil wl'+(a.opWishlist?' aan':'')+'" data-id="'+esc(a.id)+'">'+(a.opWishlist?'Op verlanglijst':'Verlanglijst')+'</button>'+
       '</div></div>';
   }).join('') : '<div class="leeg">Deze boutique vult haar collectie nog.</div>';
   $('#bladArt').querySelectorAll('.wl').forEach(b => b.addEventListener('click', async () => {
     try { const r = await api('/api/retail/wishlist', { supplierCode: HUIDIG, artikelId: b.dataset.id });
-      const aan = !!r.wishlist; b.classList.toggle('aan', aan); b.textContent = aan ? '♥ Op verlanglijst' : '♡ Verlanglijst';
+      const aan = !!r.wishlist; b.classList.toggle('aan', aan); b.textContent = aan ? 'Op verlanglijst' : 'Verlanglijst';
       meld(aan ? 'Op je verlanglijst gezet.' : 'Van je verlanglijst gehaald.');
     } catch(e){ meld(e.message); }
   }));
 }
 $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
+$('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('open'));
 </script>
-<button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
+<button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
   <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
@@ -523,8 +798,12 @@ $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('ope
   });
 })();</script>
 
+<script src="/shared/glyf.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

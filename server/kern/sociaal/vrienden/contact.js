@@ -1,13 +1,10 @@
-/* Sociaal-vrienden (deelmodule): verzoeken beantwoorden, de connectielijst
-   (met vuurtjes), DM en de voogd-goedkeuring. Krijgt de gedeelde context
-   een keer bij het opstarten vanuit kern/sociaal/vrienden.js. */
+/* Sociaal-vrienden (deelmodule): verzoeken beantwoorden, de connectielijst,
+   DM en de voogd-goedkeuring. Krijgt de gedeelde context een keer bij het
+   opstarten vanuit kern/sociaal/vrienden.js. */
 module.exports = (ctx) => {
 const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate } = ctx;
-// late binding: de snapslaag (met streakVan) wordt NA deze laag gemount en
-// komt dan de context in; tegen het eerste verzoek is hij er altijd.
-const streakVan = (a, b) => ctx.streakVan(a, b);
 function socialAntwoord(mij, ander, action) {
   const c = connectieTussen(mij, ander);
   if (!c || c.status !== 'pending' || c.requestedBy === mij) return { status: 404, error: 'Geen openstaand verzoek van deze codenaam.' };
@@ -28,7 +25,7 @@ function socialConnecties(mij) {
     const laatst = chat && chat.messages.length ? chat.messages[chat.messages.length - 1] : null;
     const gelezen = chat && chat.read && chat.read[mij] ? chat.read[mij] : '';
     const unread = chat ? chat.messages.filter(m => m.from !== mij && m.at > gelezen).length : 0;
-    return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt, vuurtje: streakVan(mij, ander) };
+    return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
   }).sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
   const requests = db.data.connections.filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isBeschermdHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at }));
   return { connections: conns, requests };

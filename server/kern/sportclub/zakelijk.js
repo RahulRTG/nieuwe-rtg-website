@@ -76,7 +76,7 @@ module.exports = (ctx) => {
     data = data || {};
     const tekst = schoon(data.tekst, 300);
     if (tekst.length < 3) return { status: 400, error: 'Schrijf er iets bij.' };
-    const m = { id: id('mo'), tekst, beeld: schoon(data.beeld, 8) || '⚽', door: schoon(data.door, 60) || 'De club', at: nu() };
+    const m = { id: id('mo'), tekst, beeld: schoon(data.beeld, 8) || 'sport', door: schoon(data.door, 60) || 'De club', at: nu() };
     club(code).momenten.unshift(m);
     club(code).momenten = club(code).momenten.slice(0, 200);
     save();

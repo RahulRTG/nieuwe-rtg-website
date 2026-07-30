@@ -83,7 +83,7 @@ module.exports = (ctx) => {
     const t = due[due.length - 1]; // het langst geleden geparkeerde onderwerp eerst
     t.laatst = d.toISOString();
     t.getoond = (t.getoond || 0) + 1;
-    notify(key, { icon: '💭', title: 'Rahul', body: 'Je zei laatst iets toen je het druk had: "' + t.tekst + '". Je bent nu rustig thuis en je agenda is leeg. Zullen we er even samen over sparren?', scope: 'fluister' });
+    notify(key, { icon: 'berichten', title: 'Rahul', body: 'Je zei laatst iets toen je het druk had: "' + t.tekst + '". Je bent nu rustig thuis en je agenda is leeg. Zullen we er even samen over sparren?', scope: 'fluister' });
     save();
     return 1;
   }

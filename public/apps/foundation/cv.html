@@ -78,6 +78,8 @@
     <div class="kaart sec">
       <h3>Over jou</h3>
       <textarea class="veld" data-f="profiel" placeholder="Een paar zinnen over wie je bent en wat je goed kunt. Bijvoorbeeld: 'Ik werk hard, ben op tijd en leer snel.'"></textarea>
+      <div class="hint" style="margin:0 0 .3rem;">Weet je niet hoe je moet beginnen? Tik een zin aan en maak hem van jezelf.</div>
+      <div id="hulpzinnen" style="display:flex;flex-wrap:wrap;gap:.35rem;"></div>
     </div>
 
     <div class="kaart sec">
@@ -169,6 +171,32 @@ function render(){
   $('#cvpaper').innerHTML=h;
 }
 
+/* hulpzinnen tegen het lege vak: een aanzet die je zelf afmaakt */
+const HULPZINNEN = [
+  'Ik werk hard en kom mijn afspraken na.',
+  'Ik ben op tijd en je kunt op mij rekenen.',
+  'Ik leer snel en vraag het als ik iets niet weet.',
+  'Ik werk graag samen, maar kan ook goed alleen aan de slag.',
+  'Ik blijf rustig als het druk is.',
+  'Ik ga netjes om met spullen en met mensen.'
+];
+const hz = $('#hulpzinnen');
+if (hz) {
+  const profielVeld = document.querySelector('[data-f="profiel"]');
+  HULPZINNEN.forEach(zin => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = '+ ' + zin;
+    b.style.cssText = 'font-size:.76rem;padding:.3rem .65rem;border:1px solid var(--lijn);border-radius:999px;background:transparent;color:var(--zacht);cursor:pointer;text-align:left;';
+    b.addEventListener('click', () => {
+      const nu = profielVeld.value.trim();
+      profielVeld.value = nu ? nu + ' ' + zin : zin;
+      cv.velden.profiel = profielVeld.value; bewaar(); render();
+    });
+    hz.appendChild(b);
+  });
+}
+
 $('#btnPrint').addEventListener('click', ()=> window.print());
 $('#btnWis').addEventListener('click', ()=>{ if(confirm('Je hele cv leegmaken?')){ cv={velden:{},werk:[],opleiding:[]}; bewaar(); location.reload(); } });
 $('#btnBekijk') && $('#btnBekijk').addEventListener('click', ()=> $('#cvapp').classList.add('toon-preview'));
@@ -180,6 +208,11 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

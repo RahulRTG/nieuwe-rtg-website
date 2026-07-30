@@ -42,6 +42,10 @@
   .inlog{text-align:center;padding:2.5rem 1rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header><div><div class="ey">Lifestyle Pass</div><h1>Cercle</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
@@ -53,25 +57,44 @@ const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
 const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
-const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag de clubsecretaris</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+const AIBOX=app=>'<div class="kaart"><h2>Vraag de clubsecretaris</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
   let d; try{ d=await api('cercle'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Cercle is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon uw Cercle niet laden.</div>'; return; }
   let h='<div class="grid"><div class="stat"><div class="n">'+d.aantal+'</div><div class="l">Clubs</div></div><div class="stat"><div class="n">'+d.steden+'</div><div class="l">Steden</div></div><div class="stat"><div class="n">'+d.gastpassen+'</div><div class="l">Gastpassen</div></div></div>';
   h+='<div class="kaart"><h2>Club toevoegen</h2><div class="rij"><input class="veld" id="cN" placeholder="clubnaam"><input class="veld" id="cS" placeholder="stad"></div><div class="rij"><input class="veld" id="cL" placeholder="lidnummer"><input class="veld" id="cSi" type="number" placeholder="lid sinds"><input class="veld" id="cG" type="number" placeholder="gastpassen"></div><div class="rij"><input class="veld" id="cD" placeholder="dresscode"></div><div class="rij"><textarea class="veld" id="cR" placeholder="reciprociteit: bij welke clubs bent u als gast welkom?"></textarea></div><div style="margin-top:.6rem;"><button class="knop" id="cAdd">+ club</button></div></div>';
-  h+='<div class="kaart"><h2>Uw clubs</h2><div id="lijst">'+(d.clubs.length?d.clubs.map(c=>'<div class="club"><div class="b"><div class="nm">'+esc(c.naam)+'</div><div class="st">'+[esc(c.stad),c.sinds?'sinds '+c.sinds:''].filter(Boolean).join(' · ')+'</div><small>'+[c.lidnummer?'nr. '+esc(c.lidnummer):'',c.dresscode?'dresscode: '+esc(c.dresscode):'',c.reciprociteit?'reciprociteit: '+esc(c.reciprociteit):''].filter(Boolean).join(' · ')+'</small></div>'+(Number(c.gastpassen)>0?'<span class="pas">'+c.gastpassen+' passen</span>':'')+'<button class="weg" data-weg="'+c.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen clubs.</div>')+'</div></div>';
+  h+='<div class="kaart"><h2>Uw clubs</h2><div id="lijst">'+(d.clubs.length?d.clubs.map(c=>'<div class="club"><div class="b"><div class="nm">'+esc(c.naam)+'</div><div class="st">'+[esc(c.stad),c.sinds?'sinds '+c.sinds:''].filter(Boolean).join(' · ')+'</div><small>'+[c.lidnummer?'nr. '+esc(c.lidnummer):'',c.dresscode?'dresscode: '+esc(c.dresscode):'',(c.reciprociteit||[]).length?'reciprociteit: '+esc((c.reciprociteit||[]).join(', ')):''].filter(Boolean).join(' · ')+'</small>'+((c.gastlog||[]).length?'<small>gastpassen gebruikt: '+(c.gastlog||[]).map(g=>esc(g.wie||'gast')+(g.stad?' ('+esc(g.stad)+')':'')).join(', ')+'</small>':'')+'</div>'+(Number(c.gastpassen)>0?'<span class="pas">'+c.gastpassen+' passen</span>':'')+'<button class="knop" data-gast="'+c.id+'" style="margin-right:.4rem;">gastpas</button><button class="weg" data-weg="'+c.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen clubs.</div>')+'</div></div>';
+  /* Waarheen: de enige vraag die reciprociteit de moeite waard maakt. Elders
+     belt u hiervoor een conciergedienst; hier staat het antwoord in uw eigen
+     gegevens -- en de app zegt erbij dat zij niets belooft namens een club. */
+  h+='<div class="kaart"><h2>Waar kan ik terecht?</h2><div class="rij"><input class="veld" id="cW" placeholder="stad of clubnaam"><button class="knop" id="cWk">zoeken</button></div><div id="cWu"></div></div>';
   h+=AIBOX('Bijv. waar kan ik in Parijs als gast terecht?');
   $('#main').innerHTML=h;
   bindAi('cercle');
   $('#cAdd').onclick=async()=>{ const naam=$('#cN').value.trim(); if(!naam) return meld('Welke club?'); try{ await api('cercle/club',{naam,stad:$('#cS').value,lidnummer:$('#cL').value,sinds:$('#cSi').value,gastpassen:$('#cG').value,dresscode:$('#cD').value,reciprociteit:$('#cR').value}); laad(); }catch(e){ meld(e.message); } };
   document.querySelectorAll('[data-weg]').forEach(b=> b.onclick=async()=>{ if(!confirm('Deze club verwijderen?'))return; try{ await api('cercle/club/weg',{id:b.dataset.weg}); laad(); }catch(e){ meld(e.message); } });
+  $('#cWk').onclick=async()=>{
+    try{
+      const w=await api('cercle/waarheen',{stad:$('#cW').value});
+      const rij=(x)=>'<div class="club"><div class="b"><div class="nm">'+esc(x.club)+'</div><div class="st">'+esc(x.via)+(x.stad?' · '+esc(x.stad):'')+'</div>'+((x.lidnummer||x.dresscode)?'<small>'+[x.lidnummer?'nr. '+esc(x.lidnummer):'',x.dresscode?'dresscode: '+esc(x.dresscode):''].filter(Boolean).join(' · ')+'</small>':'')+'</div></div>';
+      $('#cWu').innerHTML=(w.eigen.length||w.viaGast.length)
+        ? w.eigen.map(rij).join('')+w.viaGast.map(rij).join('')+'<small style="color:var(--muted);display:block;margin-top:.5rem;">'+esc(w.bron)+'</small>'
+        : '<div class="leeg">Niets gevonden in uw eigen gegevens.</div>';
+    }catch(e){ meld(e.message); }
+  };
+  document.querySelectorAll('[data-gast]').forEach(b=> b.onclick=async()=>{
+    const wie=prompt('Wie neemt u mee?'); if(wie===null) return;
+    try{ const r=await api('cercle/gast',{id:b.dataset.gast,wie}); meld('Genoteerd. Nog '+r.gastpassen+' gastpassen bij deze club.'); laad(); }catch(e){ meld(e.message); } });
 }
 laad();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

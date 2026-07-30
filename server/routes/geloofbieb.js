@@ -37,6 +37,11 @@ module.exports = (kern) => {
     const s = profiel(req, res); if (!s) return;
     res.json({ boeken: geloofbieb.mijnApps(s.handle) });
   });
+  // een item echt lezen: de volledige tekst, met dezelfde leeftijdspoort
+  app.post('/api/rtf/geloof/lees', (req, res) => {
+    const s = profiel(req, res); if (!s) return;
+    stuur(res, geloofbieb.lees(s.groep, req.body.id));
+  });
 
   // de bibliothecaris, neutraal: raadt echte boeken aan uit alle tradities
   // naast elkaar, kiest nooit partij en bekeert nooit

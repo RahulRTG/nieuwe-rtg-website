@@ -1,5 +1,5 @@
 /* RTG Marina: het complete jachthaven-systeem, naar het model van het
-   kantoorgebouw op de Zuidas maar dan op het water. Ligplaatsen met vaste
+   RTG Enterprise-kantoorgebouw maar dan op het water. Ligplaatsen met vaste
    liggers en passanten (de havenmeester wijst de eerste passende plaats
    toe), de brandstofsteiger, service en de hellingbaan (hijsen, onderhoud,
    schoonmaak) en de marina-concierge voor de jetset op het water: tender,

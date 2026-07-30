@@ -11,27 +11,27 @@
    eigen groep en alles eronder (herhalen mag altijd), nooit erboven. */
 
 const GROEPEN = [
-  { id: 'mini', label: 'Kleuter & peuter', icon: '🧸', prijsVan: 999, prijsStap: 200, vak: [
+  { id: 'mini', label: 'Kleuter & peuter', icon: 'rtf-kind', prijsVan: 999, prijsStap: 200, vak: [
     'Kleuren & vormen', 'Letters ontdekken', 'Cijfers 1 tot 10', 'Voorbereidend schrijven', 'Luisteren',
     'Rijmen', 'Knippen & plakken', 'Samen delen', 'Seizoenen', 'Dieren & natuur',
     'Verkeer voor kleuters', 'Liedjes & taal', 'Puzzelen', 'Tellen met spel', 'Voorlezen',
     'Eerste Engels', 'Gevoelens', 'Bouwen & ruimte', 'Geheugenspel', 'Dagritme'] },
-  { id: 'kind', label: 'Basisschool (groep 3-8)', icon: '🎒', prijsVan: 1999, prijsStap: 350, vak: [
+  { id: 'kind', label: 'Basisschool (groep 3-8)', icon: 'diploma', prijsVan: 1999, prijsStap: 350, vak: [
     'Technisch lezen', 'Begrijpend lezen', 'Spelling', 'Rekenen', 'Breuken',
     'Tafels', 'Topografie', 'Geschiedenis', 'Natuur & techniek', 'Engels',
     'Mooi schrijven', 'Werkstukken', 'Verkeer', 'Toets-oefening', 'Studievaardigheden',
     'Muziekleer', 'Tekenen & kunst', 'Programmeren junior', 'Wereldoriëntatie', 'Verhaalsommen'] },
-  { id: 'tiener', label: 'Voortgezet (vmbo, havo, vwo)', icon: '📐', prijsVan: 2999, prijsStap: 600, vak: [
+  { id: 'tiener', label: 'Voortgezet (vmbo, havo, vwo)', icon: 'ontwerp', prijsVan: 2999, prijsStap: 600, vak: [
     'Wiskunde', 'Nederlands', 'Engels', 'Frans', 'Duits',
     'Natuurkunde', 'Scheikunde', 'Biologie', 'Geschiedenis', 'Aardrijkskunde',
     'Economie', 'Maatschappijleer', 'Latijn & Grieks', 'Informatica', 'NaSk vmbo',
     'Examentraining vmbo', 'Examentraining havo', 'Examentraining vwo', 'Profielwerkstuk', 'Studieplanning'] },
-  { id: 'jong', label: 'mbo, hbo & universiteit', icon: '🎓', prijsVan: 4999, prijsStap: 1250, vak: [
+  { id: 'jong', label: 'mbo, hbo & universiteit', icon: 'diploma', prijsVan: 4999, prijsStap: 1250, vak: [
     'Statistiek', 'Programmeren', 'Anatomie & fysiologie', 'Recht', 'Bedrijfskunde',
     'Economie & finance', 'Psychologie', 'Hogere wiskunde', 'Onderzoeksmethoden', 'Academisch schrijven',
     'Presenteren', 'Boekhouden', 'Werktuigbouw', 'Verpleegkunde', 'Didactiek',
     'Marketing', 'Data-analyse', 'Filosofie', 'Vaktalen', 'Scriptiehulp'] },
-  { id: 'volw', label: 'Leven lang leren', icon: '📚', prijsVan: 3999, prijsStap: 800, vak: [
+  { id: 'volw', label: 'Leven lang leren', icon: 'reisboek', prijsVan: 3999, prijsStap: 800, vak: [
     'Taal opfrissen', 'Rekenen opfrissen', 'Digitale vaardigheden', 'NT2 & inburgering', 'Geldzaken',
     'Omscholing IT', 'Omscholing zorg', 'Ondernemen', 'Rijbewijs theorie', 'EHBO',
     'Reistalen', 'Geschiedenis verdieping', 'Kunstgeschiedenis', 'Muziektheorie', 'Schrijven',

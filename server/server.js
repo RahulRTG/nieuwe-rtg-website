@@ -33,10 +33,10 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const { db, load, save, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
-  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsExact, ledenGidsZoek,
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal } = require('./db');
+  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, checkpointSqlite } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
@@ -117,6 +117,27 @@ function appUrl(req) {
 require('./config').pasToe(process.env, log);
 
 load();
+
+/* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde
+   duurzame opslag als de rest; hier krijgt het de database en save() aangereikt.
+   Meteen na load(), zodat de eerste inzage al een spoor achterlaat. */
+require('./inzagelog').zet(db, save);
+
+/* Is het eigenaarschap ooit overgedragen vanuit de boardroom, dan staat de
+   opvolger in de database. Dat zetten we hier meteen terug in de eigenaar-
+   module, VOOR de routers geladen worden. Anders zou het platform na een
+   herstart terugvallen op het startadres en zou de vorige eigenaar er weer
+   doorheen komen, terwijl de nieuwe buiten staat. */
+try {
+  const bewaard = db.data && db.data.techniek && db.data.techniek.eigenaarEmail;
+  if (bewaard && eigenaar.zetEigenaarEmail(bewaard)) {
+    console.log('[eigenaar] overgedragen eigenaarschap hersteld: ' + eigenaar.eigenaarEmail());
+  }
+} catch (e) {}
+/* accounts.init() draait ook de schemamigraties (server/migraties), dus de
+   sso- en scim-tabellen komen daar vandaan. Ze stonden hier even als losse
+   aanroep; twee plekken die hetzelfde schema maken is precies hoe ze uit elkaar
+   gaan lopen. */
 accounts.init();
 // Demo-modus: alleen buiten productie, of expliciet met RTG_DEMO=1. Zo staan de
 // demo-inlog en het demo-account (Rahul/Imran) nooit per ongeluk open op productie.
@@ -127,12 +148,24 @@ const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '
 // Sync-varianten: de seed draait voor 'listen', dus blokkeren kan geen kwaad
 // en zodra de poort opengaat bestaan de accounts gegarandeerd (geen race in tests).
 if (DEMO) {
-  let u = accounts.findByLogin(require('./eigenaar').OWNER_EMAIL);
-  if (!u && accounts.count() === 0) {
-    u = accounts.createUserSync({ username: 'Rahul', email: require('./eigenaar').OWNER_EMAIL, password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
-    accounts.saveMemberState(u.id, memberTemplate());
-    accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
-  } else if (u && accounts.realNameOf(u) !== 'Rahul Imran Ismail') {
+  const DEMO_WACHTWOORD = process.env.DEMO_PASS || 'Imran';
+  let u = accounts.findByLogin(eigenaar.OWNER_EMAIL);
+  if (!u) {
+    /* Nog geen account op het eigenaarsadres. Op een verse database maken we er
+       een; op een database die al demoleden bevat draagt de seed-persona de
+       naam Rahul al, en verhuizen we die naar het eigenaarsadres. Anders zou
+       de inlognaam botsen en bleef de eigenaar buiten de boardroom staan. */
+    const bestaand = accounts.findByLogin('Rahul');
+    if (bestaand) {
+      u = accounts.renameUser(bestaand.id, { username: 'Rahul', realName: 'Rahul Imran Ismail', email: eigenaar.OWNER_EMAIL });
+      accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
+      accounts.setVerification(u.id, 'verified');
+    } else {
+      u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
+      accounts.saveMemberState(u.id, memberTemplate());
+      accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
+    }
+  } else if (accounts.realNameOf(u) !== 'Rahul Imran Ismail') {
     u = accounts.renameUser(u.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
   }
   /* De sleutelbos van de eigenaar: alles zien en alles doen met het ene
@@ -153,11 +186,25 @@ if (DEMO) {
 }
 
 /* Het demopersoneel per leverancier staat als pure data in een kern-module. */
-const { STAFF_SEED } = require('./kern/staffseed');
+const STAFF_SEED = Object.assign({}, require('./kern/staffseed').STAFF_SEED, require('./kern/staffseed2').STAFF_SEED);
 // demopersoneel bestaat alleen in demostand; in productie komt personeel
 // uitsluitend via de eigen zaak binnen (uitnodiging + eigen pincode)
 if (DEMO) {
+  /* Later toegevoegde demo-zaken (zoals De Ibiza Bode) ook op bestaande
+     demo-databases aanvullen; de verse seed draait immers maar een keer. */
+  for (const s of require('./seed/leveranciers').suppliers) {
+    if (!db.data.suppliers.some(x => x.code === s.code)) db.data.suppliers.push(JSON.parse(JSON.stringify(s)));
+  }
   for (const [code, people] of Object.entries(STAFF_SEED)) {
+    /* heling: bij een allereerste start kunnen de drie werkers tegelijk
+       countStaff 0 zien en elk seeden; dubbele seed-rijen (zelfde naam+rol)
+       worden hier bij elke start weer opgeruimd */
+    const seedNamen = new Set(people.map(p => p[0] + '|' + p[1]));
+    const gezien = new Set();
+    for (const st of accounts.listStaff(code)) {
+      const k = st.name + '|' + st.role;
+      if (seedNamen.has(k) && gezien.has(k)) accounts.deactivateStaff(st.id); else gezien.add(k);
+    }
     if (accounts.countStaff(code) === 0) {
       people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }
@@ -235,14 +282,60 @@ for (const methode of ['get', 'post', 'put', 'delete', 'patch', 'all']) {
 }
 app.disable('x-powered-by');
 const PRODUCTION = process.env.NODE_ENV === 'production';
-app.set('trust proxy', 1); // achter een reverse proxy (hosting) klopt req.secure dan
+/* Hoeveel proxy-hops staan er ECHT voor deze app?
+
+   Dit stond vast op 1. Dat klopt achter een reverse proxy, maar is gevaarlijk
+   zodra de app rechtstreeks bereikbaar is: dan IS de bezoeker de eerste hop en
+   mag hij zijn eigen X-Forwarded-For verzinnen -- waarmee elke snelheidslimiet
+   (die op req.ip telt) met één kop te omzeilen is. Zie test/proxykop.test.js.
+
+   RTG_PROXY_HOPS=0 zet het vertrouwen helemaal uit: dan telt alleen het adres
+   van de verbinding zelf. Dat is de juiste stand voor een app die zonder proxy
+   aan het internet hangt. */
+app.set('trust proxy', Number(process.env.RTG_PROXY_HOPS != null ? process.env.RTG_PROXY_HOPS : 1));
+/* WIE die proxy is. Zonder opgave vertrouwen we alleen loopback en private
+   adressen -- de gebruikelijke plek voor een reverse proxy. Een bezoeker die
+   rechtstreeks vanaf het internet binnenkomt valt daar nooit onder, dus zijn
+   X-Forwarded-For wordt genegeerd in plaats van geloofd. Staat de proxy op een
+   publiek adres, zet die dan hier (komma-gescheiden). */
+app.set('proxy ips', String(process.env.RTG_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean));
 app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
+/* De meting draait NA het logboek en VOOR de routes: hij hangt aan res.finish,
+   dus hij ziet alles wat er daarna gebeurt, inclusief de 404's. */
+app.use(require('./meting').middleware());
+/* Het routejournaal staat ernaast en doet alleen iets met RTG_ROUTELOG gezet
+   (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
+   een tekstzoektocht door de tests -- zie server/routelog.js. */
+app.use(require('./routelog').middleware());
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.
+// (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het
+// gedeelde headerblok -- daar gelden ze voor elk antwoord, ook lokaal.)
 app.use((req, res, next) => {
   if (PRODUCTION) {
-    if (!req.secure) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
-    res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    /* De gezondheidsprikken gaan hier NIET doorheen. De poortwachter
+       (server/trio.js) controleert zijn drie servers op /api/health over
+       gewone http op de loopback -- daar hoort geen TLS bij, en er komt dus
+       ook geen X-Forwarded-Proto mee. Kreeg die prik een 301, dan zag de
+       poortwachter nooit een 200, concludeerde hij dat geen enkele server
+       leefde, en gaf de site 503 terwijl alle drie de servers kerngezond
+       stonden te draaien. De failover-opstelling kon in productie dus nooit
+       gezond worden. Dat gebeurde op de eerste echte productiemachine, en het
+       is van buitenaf niet te zien: lsof laat drie luisterende servers zien
+       en de browser krijgt "alle servers zijn tijdelijk onbereikbaar".
+       Hetzelfde geldt voor /api/ready en voor de healthcheck in de Dockerfile. */
+    /* Hetzelfde geldt voor het hele /api/cluster-kanaal. Dat is het interne
+       gesprek tussen poortwachter en servers: promote (word actief), de
+       hartslag, het doorgeven van wie de baas is. Ook http, ook loopback.
+       Alleen /api/health vrijstellen was half werk: de prik lukte daarna wel,
+       maar promote kreeg nog een 301, er werd dus nooit iemand actief, en de
+       site bleef 503 geven. Dit kanaal is niet van buiten te misbruiken: het
+       eist de gedeelde x-rtg-cluster-sleutel en luistert alleen op 127.0.0.1
+       (zie de HOST-keuze onderaan dit bestand). */
+    const intern = req.path === '/api/health' || req.path === '/api/ready' ||
+      req.path.indexOf('/api/cluster/') === 0;
+    if (!req.secure && !intern) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
+    if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
   next();
 });
@@ -250,11 +343,44 @@ app.use((req, res, next) => {
 /* Het schild voor de voordeur (kern/schild.js): applicatie-WAF + DDoS-rem.
    Altijd aan; localhost (health-checks, tests, poortwachter) slaat hij over.
    Treffers en bans landen als melding op het beveiligingsbord (techniek). */
+/* De Wacht (kern/wacht.js) wordt verderop gebouwd (na db + beveilig), maar het
+   schild raadpleegt hem nu al voor de quarantaine - laat-gebonden via deze
+   verwijzing zodat een afgesneden indringer er ook echt niet meer in komt. */
+const ssrf = require('./kern/ssrf'); // SSRF-afweer voor client-bepaalde uitgaande doelen
+let wacht = null;
 const schild = require('./kern/schild').maakSchild({
   meld: (type, ernst, tekst, meta) => { if (beveilig) beveilig.meld(type, ernst, tekst, meta); },
-  logboek: log
+  logboek: log,
+  quarantaine: (ip) => !!(wacht && wacht.inQuarantaine(ip))
 });
 app.use(schild.middleware);
+
+/* De Wacht, voordeur-reflex (laat-gebonden; `wacht` wordt verderop gebouwd):
+   1. RAND-STATUS. Komt dit verzoek via de rand (Cloudflare/edge) binnen, dan
+      draagt het CF-Ray / CF-Connecting-IP. We noteren dat als live signaal zodat
+      de boardroom ziet of de eerste linie staat -- eerlijk, want het is wat we
+      echt kunnen waarnemen, geen bevoorrechte inkijk in Cloudflare zelf.
+   2. AUTOMATISCHE LASTAFWORP. Trip De Wacht bij een L7-piek zelf een zekering,
+      dan serveren we hier 503 "kom zo terug" (met Retry-After) zolang die dicht
+      staat. Localhost slaan we over (health-checks, tests, poortwachter), net als
+      het schild. De zekering dooft vanzelf; een mens kan hem eerder opheffen. */
+app.use((req, res, next) => {
+  if (wacht) {
+    const ray = req.get('cf-ray'); const cfip = req.get('cf-connecting-ip');
+    if (ray || cfip) { try { wacht.randGezien({ ray, provider: ray ? 'cloudflare' : 'edge' }); } catch (e) {} }
+    const ip = String(req.ip || '');
+    const lokaal = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+    if (!lokaal) {
+      try {
+        if (wacht.lastAfworpActief()) {
+          res.set('Retry-After', '30');
+          return res.status(503).json({ error: 'De Wacht heeft even de deur op een kier gezet wegens grote drukte. Kom zo terug.' });
+        }
+      } catch (e) {}
+    }
+  }
+  next();
+});
 
 /* Security-headers op elk antwoord. De CSP staat inline scripts/styles toe
    (de apps zijn bewust self-contained), maar verbiedt elk ander extern
@@ -265,6 +391,15 @@ app.use((req, res, next) => {
   // apps schermvullend insluiten; andere sites kunnen ons nog steeds niet
   // framen (clickjacking-bescherming blijft tegen derden overeind).
   res.set('X-Frame-Options', 'SAMEORIGIN');
+  /* Referrer-Policy is hier geen formaliteit. De live-verbindingen (SSE)
+     kunnen geen Authorization-header meesturen -- EventSource kan dat niet --
+     dus daar reist het sessietoken mee als ?token= in de URL. Met deze regel
+     krijgt een externe partij hooguit onze origin te zien, nooit de hele URL,
+     en lekt dat token dus niet via de Referer-header weg.
+     Wat dit NIET oplost: een reverse proxy of CDN legt standaard de complete
+     URL vast in zijn access log. Onze eigen logger doet dat niet (die schrijft
+     req.path, zonder querystring; test/loghygiene.test.js bewaakt het), maar
+     de proxy moet apart worden ingesteld -- zie PRODUCTION.md. */
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   // 9+-hardening: eigen vensters delen geen proces met vreemden (COOP), onze
   // bestanden zijn niet als bron voor andere sites bruikbaar (CORP), de
@@ -275,8 +410,21 @@ app.use((req, res, next) => {
   res.set('X-DNS-Prefetch-Control', 'off');
   res.set('X-Permitted-Cross-Domain-Policies', 'none');
   res.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), serial=(), bluetooth=(), midi=()');
+  /* DE TERUGVAL-CSP, EN WAAROM HIER GEEN 'unsafe-inline' MEER STAAT.
+
+     HTML-pagina's krijgen hun CSP van cspNonce (middleware/voordeur.js): een
+     verse nonce per verzoek, geen unsafe-inline. Deze regel geldt voor al het
+     ANDERE -- JSON-antwoorden, statische bestanden, foutpagina's -- en gold
+     tot nu toe ook voor elke HTML-pagina die cspNonce om wat voor reden dan
+     ook niet oppakte.
+
+     Dat is geen theorie: de kop van voordeur.js beschrijft precies zo'n geval,
+     waarin "/" terugviel op deze regel en juist de meest bezochte pagina de
+     zwakste bescherming kreeg. Een terugval die stiller is dan het origineel
+     is de verkeerde kant op falen. Zonder unsafe-inline breekt zo'n pagina
+     zichtbaar in plaats van dat ze haar bescherming stilletjes verliest. */
   res.set('Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
     "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
     "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
   next();
@@ -369,150 +517,29 @@ if (zaakdoos.actief) {
   });
 }
 
-/* ---------- rem op de deur (rate-limiter) ----------
-   In productie (of met RTG_RATELIMIT=1) mag een IP maximaal 300 API-verzoeken
-   per minuut; daarboven 429. Ruim genoeg voor elk normaal gebruik, en het
-   haalt de scherpte van scripts en scrapers. De live-streams (SSE) tellen
-   niet mee: dat zijn langlopende verbindingen, geen verzoeken. */
-if (PRODUCTION || process.env.RTG_RATELIMIT === '1') {
-  const rem = require('./rem');
-  app.use(rem({
-    windowMs: 60000,
-    limit: 300,
-    skip: req => !req.path.startsWith('/api/') || req.path.endsWith('/stream'),
-    handler: (req, res) => res.status(429).json({ error: 'Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.' })
-  }));
-}
+/* ---------- de poortwachters voor de routers (server/middleware/) ----------
+   Drie remmen, de functieschakelaars, de compressie en de voordeur. Ze staan
+   in deze volgorde omdat elke laag werk bespaart voor de laag erna: eerst
+   weigeren wat we sowieso weigeren, dan pas comprimeren en serveren. */
+const { remOpDeDeur, opslagPoort, hoofdzekering } = require('./middleware/remmen');
+const { schakelaars } = require('./middleware/functieschakelaars');
+const { jsonGzip, statischGzip } = require('./middleware/compressie');
+const { bureaublad, cspNonce } = require('./middleware/voordeur');
 
-/* Hoofdzekering: staat de onderhouds-zekering uit (gesprongen), dan is de app in
-   onderhoud. Alle API's geven dan 503, behalve de technische pagina en de
-   health/ready-checks, en behalve verzoeken van de eigenaar (met geldig token).
-   Zo kan de eigenaar de app bewust "spanningsloos" maken en er zelf bij blijven
-   om de zekering er weer in te doen. */
-/* De opslag-poortwachter: een instance die zijn duurzame staat nog niet
-   volledig geladen heeft (Postgres-herstart: de gedeelde data en het
-   RAM-venster zijn nog onderweg) mag GEEN API-verkeer beantwoorden. Anders
-   serveert hij de verouderde lokale snapshot-cache, en kan een schrijfactie
-   in dat venster (geld!) de echte Postgres-staat daarna overschrijven --
-   precies wat fase D van de beproeving op 65M-schaal ving: saldi die een
-   herstart niet 'overleefden'. Health/ready/techniek blijven bereikbaar,
-   zodat de load balancer en de eigenaar de instance gewoon kunnen zien. */
-app.use((req, res, next) => {
-  const p = req.path || '';
-  if (!p.startsWith('/api/')) return next();
-  if (p === '/api/health' || p === '/api/ready' || p.startsWith('/api/techniek') || p.startsWith('/api/cluster')) return next();
-  let klaar = true;
-  try { klaar = opslagKlaar(); } catch (e) { klaar = false; }
-  if (klaar) return next();
-  res.set('Retry-After', '2');
-  res.status(503).json({ error: 'De server laadt zijn gegevens nog; een ogenblik.' });
-});
-app.use((req, res, next) => {
-  const z = db.data && db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.onderhoud;
-  if (!z || z.aan !== false) return next(); // normaal: stroom staat erop
-  const p = req.path;
-  if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
-  try {
-    const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || req.query.token;
-    const u = tok ? accounts.verifyToken(tok) : null;
-    if (eigenaar.isEigenaar(accounts, u)) return next(); // de eigenaar mag er wel bij
-  } catch (e) {}
-  if (p.startsWith('/api/')) return res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' });
-  next();
-});
-
-/* Functieschakelaars: per functionaliteit een bewuste aan/uit-knop (beheerd op
-   de technische pagina). Staat een functie uit, dan geeft zijn API 503. De
-   technische pagina zelf en de health/ready-checks blijven altijd bereikbaar,
-   zodat de eigenaar alles weer aan kan zetten. */
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
 const functies = require('./functies');
-/* Landcode van een lid voor de "per land"-regels van de Boardroom: het bij
-   registratie gekozen land wint, anders leiden we het af uit de nationaliteit
-   op het geverifieerde paspoort (bijv. "Duitse" -> DE). */
-function natieNaarLand(nat) {
-  const s = String(nat || '').toLowerCase();
-  if (!s) return null;
-  if (/nederland|dutch|holland/.test(s)) return 'NL';
-  if (/belg/.test(s)) return 'BE';
-  if (/duits|german|deutsch/.test(s)) return 'DE';
-  if (/frans|french|franc/.test(s)) return 'FR';
-  if (/spaan|spanish|espa/.test(s)) return 'ES';
-  if (/japan/.test(s)) return 'JP';
-  return null;
-}
-app.use((req, res, next) => {
-  const p = req.path;
-  if (!p.startsWith('/api/')) return next();
-  if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
-  const staat = db.data && db.data.techniek && db.data.techniek.functies;
-  if (!staat) return next(); // niets uitgezet: alles staat aan
-  // De doelgroep van dit verzoek: uit het pad (leverancier/personeel/intern/
-  // foundation) of uit de pas van het ingelogde lid (RTG/Lifestyle/Business).
-  let user = null, sessieTier = null, zaakGenre = null;
-  const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
-  try {
-    if (tok) user = accounts.verifyToken(tok);
-  } catch (e) {}
-  // geen accounttoken? dan kan het een sessietoken zijn: een gast (de gratis
-  // app) of een demo-pas; zo kan de boardroom ook de gratis app besturen
-  if (tok && !user) {
-    try { const s = sessionFor(tok); if (s && s.tier) sessieTier = s.tier; } catch (e) {}
-  }
-  const doelgroep = functies.doelgroepVanVerzoek(p, user) ||
-    (sessieTier ? functies.tierNaarDoelgroep(sessieTier) : null);
-  // de leveranciers-regie: alleen als er genre-regels staan (bewaard of als
-  // standaard-matrix in de catalogus) zoeken we de zaak achter een
-  // leveranciers-/personeelsverzoek op (scheelt werk per verzoek)
-  if ((p.startsWith('/api/supplier') || p.startsWith('/api/staff')) &&
-      (functies.HEEFT_GENRE_STANDAARD || functies.heeftGenreRegels(staat))) {
-    try {
-      const s = tok && sessionFor(tok);
-      if (s && s.role === 'supplier') { const z = findSupplier(s.code); zaakGenre = z ? z.type : null; }
-    } catch (e) {}
-  }
-  // land van het lid (alleen opzoeken als er ergens land-regels staan) en de
-  // persoonssleutel (voor per-persoon uitschakelen): 'user-<id>'.
-  let land = null, persoon = null;
-  if (user) {
-    persoon = 'user-' + user.id;
-    if (functies.heeftLandRegels(staat)) {
-      try { const md = accounts.getMemberState(user.id) || {}; land = md.land || natieNaarLand(md.nationaliteit) || null; } catch (e) {}
-    }
-  }
-  const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, persoon, genre: zaakGenre });
-  if (dicht) {
-    const zin = { globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
-      pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
-      land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
-      persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.',
-      genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.' };
-    return res.status(503).json({
-      error: zin[dicht.reden] || zin.globaal,
-      functie: dicht.id, naam: dicht.naam, reden: dicht.reden, doelgroep: doelgroep || undefined
-    });
-  }
-  next();
-});
 
-/* Satellietvriendelijk: ook alle API-antwoorden gaan gecomprimeerd over de
-   lijn (de statische laag deed dat al). Op een smalle, trage verbinding
-   (satelliet, buitengebied, traag mobiel) scheelt dat 70 tot 90 procent per
-   antwoord. Kleine antwoorden laten we met rust: daar kost gzip meer dan het
-   oplevert. Moet voor de routers staan, anders missen die de wikkel. */
-app.use((req, res, next) => {
-  if (!/\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) return next();
-  const gewoonJson = res.json.bind(res);
-  res.json = (data) => {
-    let s;
-    try { s = JSON.stringify(data); } catch (e) { return gewoonJson(data); }
-    if (typeof s !== 'string' || s.length < 1024 || res.headersSent) return gewoonJson(data);
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Content-Encoding', 'gzip');
-    res.setHeader('Vary', 'Accept-Encoding');
-    return res.send(zlib.gzipSync(Buffer.from(s), { level: 6 }));
-  };
-  next();
-});
+remOpDeDeur(app, PRODUCTION || process.env.RTG_RATELIMIT === '1');
+app.use(opslagPoort(opslagKlaar));
+app.use(hoofdzekering({ db, accounts, eigenaar }));
+// sessionFor en findSupplier staan verderop in dit bestand; ze worden pas bij
+// een echt verzoek geraadpleegd, dus geven we ze lui door in plaats van hier
+// hun waarde te lezen (die er op dit punt nog niet is).
+app.use(schakelaars({ db, accounts, functies,
+  sessionFor: t => sessionFor(t),
+  findSupplier: c => findSupplier(c) }));
+app.use(jsonGzip());
 
 // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
 // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
@@ -522,102 +549,10 @@ app.use('/api/foundation', rtf.router);
 // een gezinsmelding voor een gekoppelde oppas/familie ook als telefoonmelding (web-push)
 rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch (e) {} });
 
-/* De voordeur is het RTG-OS-bureaublad (ROS): wie naar / gaat, krijgt meteen
-   het besturingssysteem met alle apps als tegels. GEEN omleiding meer: we
-   serveren het bureaublad rechtstreeks (interne rewrite), zodat de nonce-/CSP-
-   laag hieronder er gewoon overheen gaat en er geen 302-sprong in de weg zit.
-   De losse apps regelen hun eigen inlog zodra je er een opent. */
-/* De voordeur: de site-root IS het RTG OS-bureaublad, zonder omleiding (een
-   interne herschrijving, zodat de nonce-laag gewoon meedraait). Web en mobiel
-   krijgen exact dezelfde pagina; de tegels schalen mee met het formaat. De
-   oude bureau-URL blijft werken en serveert hetzelfde bureaublad. */
-app.get('/', (req, res, next) => { req.url = '/apps/index.html'; next(); });
-app.get('/apps/bureau.html', (req, res, next) => { req.url = '/apps/index.html'; next(); });
-
-/* Strengere CSP voor de app-pagina's: geen 'unsafe-inline' voor scripts, maar
-   een per-antwoord nonce. We lezen het .html-bestand, geven elke <script> die
-   nonce mee en zetten de CSP navenant. De apps gebruiken addEventListener (geen
-   inline on-handlers), dus dit werkt zonder ze om te bouwen en sluit de deur
-   voor ingespoten scripts. Uit te zetten met RTG_CSP_NONCE=0. Losse statische
-   pagina's (bijv. 404) vallen terug op de gewone CSP hierboven. */
-const PUBLIC_DIR = path.join(__dirname, '..', 'public');
-const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
-app.use((req, res, next) => {
-  if (!CSP_NONCE || req.method !== 'GET') return next();
-  let rel = req.path;
-  if (rel.endsWith('/')) rel += 'index.html';
-  if (!rel.endsWith('.html')) return next();
-  const bestand = path.join(PUBLIC_DIR, rel);
-  if (!bestand.startsWith(PUBLIC_DIR + path.sep)) return next(); // geen path traversal
-  fs.readFile(bestand, 'utf8', (err, html) => {
-    if (err) return next(); // bestaat niet: laat de statische laag/404 het doen
-    const nonce = crypto.randomBytes(16).toString('base64');
-    html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
-    res.set('Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline'; " +
-      "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
-      "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
-    res.type('html');
-    // ook de pagina's zelf gecomprimeerd over de lijn (satelliet en traag mobiel)
-    if (html.length > 2048 && /\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) {
-      res.setHeader('Content-Encoding', 'gzip');
-      res.setHeader('Vary', 'Accept-Encoding');
-      return res.send(zlib.gzipSync(Buffer.from(html), { level: 6 }));
-    }
-    res.send(html);
-  });
-});
-
-/* Lichte gzip voor statische tekstassets (js/css/svg/json/webmanifest), met een
-   in-memory cache op pad + mtime. De grote app-scripts (leverancier.js ~5000
-   regels, app-main.js ~4400) gaan zo ~75% kleiner over de lijn, zonder extra
-   dependency (ingebouwde zlib) en zonder per-verzoek opnieuw te comprimeren.
-   Valt netjes terug op express.static bij range-verzoeken of onbekende paden. */
-const PUBLIC_DIR_STATIC = path.join(__dirname, '..', 'public');
-const GZIP_TYPE = { '.js': 'application/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json' };
-const MIN_DIR_STATIC = path.join(PUBLIC_DIR_STATIC, 'dist', 'min');
-const gzipCache = new Map(); // absoluut pad -> { mtimeMs, minMtimeMs, gz }
-app.get(/\.(?:js|css|svg|json|webmanifest)$/, (req, res, next) => {
-  if (req.headers.range) return next(); // range-verzoeken: laat express.static het doen
-  if (!/\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) return next();
-  let rel; try { rel = decodeURIComponent(req.path); } catch (e) { return next(); }
-  if (rel.indexOf('..') !== -1) return next();
-  const bestand = path.join(PUBLIC_DIR_STATIC, rel);
-  if (!bestand.startsWith(PUBLIC_DIR_STATIC)) return next();
-  const type = GZIP_TYPE[path.extname(bestand)]; if (!type) return next();
-  let st; try { st = fs.statSync(bestand); } catch (e) { return next(); }
-  if (!st.isFile()) return next();
-  // Is er een verse geminificeerde versie (npm run build)? Dan die serveren,
-  // anders de bron. Vers = gebouwd na de laatste bronwijziging (mtime-controle),
-  // zodat een lokaal bewerkt bronbestand nooit een oude minify uitserveert.
-  let minPad = null, minMtimeMs = 0;
-  if (type.indexOf('javascript') !== -1) {
-    const kandidaat = path.join(MIN_DIR_STATIC, rel);
-    if (kandidaat.startsWith(MIN_DIR_STATIC)) {
-      try {
-        const mst = fs.statSync(kandidaat);
-        if (mst.isFile() && mst.mtimeMs >= st.mtimeMs) { minPad = kandidaat; minMtimeMs = mst.mtimeMs; }
-      } catch (e) { /* geen minify aanwezig: bron gebruiken */ }
-    }
-  }
-  let hit = gzipCache.get(bestand);
-  if (!hit || hit.mtimeMs !== st.mtimeMs || hit.minMtimeMs !== minMtimeMs) {
-    try {
-      const bron = fs.readFileSync(minPad || bestand);
-      hit = { mtimeMs: st.mtimeMs, minMtimeMs, gz: zlib.gzipSync(bron, { level: 6 }) };
-    }
-    catch (e) { return next(); }
-    if (gzipCache.size > 300) gzipCache.clear();
-    gzipCache.set(bestand, hit);
-  }
-  res.setHeader('Content-Type', type);
-  res.setHeader('Content-Encoding', 'gzip');
-  res.setHeader('Vary', 'Accept-Encoding');
-  res.setHeader('Cache-Control', 'public, max-age=3600');
-  res.end(hit.gz);
-});
-
-app.use(express.static(path.join(__dirname, '..', 'public')));
+bureaublad(app);
+app.use(cspNonce(PUBLIC_DIR, CSP_NONCE));
+app.get(/\.(?:js|css|svg|json|webmanifest)$/, statischGzip(PUBLIC_DIR));
+app.use(express.static(PUBLIC_DIR));
 
 /* ---------- Claude API (optioneel) ---------- */
 
@@ -782,8 +717,8 @@ const { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveState
   maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n, ordersVanKlant });
 /* De ledengids (sleutel -> codenaam + pas) staat in server/kern/gids.js:
    dirTouch, ledental, opzoeken en zoeken op codenaam, met of zonder Postgres. */
-const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam } =
-  require('./kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsExact, ledenGidsZoek, ledenGidsAantal });
+const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam, gidsWeg } =
+  require('./kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal });
 // Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
 // vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
 onExternalChange(() => {
@@ -812,7 +747,11 @@ function salonProfielCompleet(s) {
   const heeftFoto = !!(s.salon && s.salon.foto) || (Array.isArray(s.photos) && s.photos.length > 0);
   return bio.length >= 15 && heeftFoto;
 }
-function salonZichtbaar(s) { return salonProfielCompleet(s); }
+// De ondernemer-poort: de klaar-checklist en de online-schakelaar per zaak. Een
+// zaak is pas zichtbaar/boekbaar voor leden als de Salon-pagina compleet is EN
+// de zaak online staat (bestaande zaken zijn online tenzij expliciet uitgezet).
+const ondernemerpoort = require('./kern/ondernemerpoort')({ salonProfielCompleet });
+function salonZichtbaar(s) { return salonProfielCompleet(s) && s.online !== false; }
 // hoeveel Salon-items (posts/folders/deals/polls) deze partner al plaatste
 function salonItemsVan(code) { return db.data.posts.filter(p => p.partnerCode === code).length; }
 
@@ -875,7 +814,10 @@ function sendPush(tier, note) {
 /* Beveiligingsmeldingen (inbraakdetectie) voor het technische bord. Een kritieke
    melding gaat meteen naar de eigenaar: web-push op zijn telefoon en een e-mail. */
 function eigenaarAccount() {
-  try { return accounts.findByLogin(process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example'); } catch (e) { return null; }
+  // Hetzelfde adres als de boardroom- en kantoorpoort gebruiken (kern/eigenaar.js).
+  // Stond hier eerder een eigen voorbeeldadres, waardoor de meldingen bij een
+  // ander account uitkwamen dan de poort als eigenaar herkende.
+  try { return accounts.findByLogin(eigenaar.eigenaarEmail()); } catch (e) { return null; }
 }
 /* De archiefkast: houdt de levende kast klein door afgeronde tickets ouder
    dan een afgesloten kwartaal naar append-only maandbestanden te verhuizen. */
@@ -891,6 +833,60 @@ const beveilig = require('./beveiliging')({
       'Beste ' + accounts.realNameOf(o) + ',\n\n' + note.body +
       '\n\nOpen de technische pagina (Beveiliging) om te zien wat er speelt.\n\nRahul Travel Group'); } catch (e) {}
   }
+});
+
+/* De Wacht (kern/wacht.js): het immuunsysteem + de raadkamer. Leest zijn meters
+   uit het schild (verzoeken, bans, actieve IP's, aanvalstreffers) en uit de
+   beveiligingsmeldingen; de quarantaine wordt door het schild afgedwongen. Elke
+   ~10 s een momentopname voor de grafiek. `wacht` is hierboven al gedeclareerd
+   (het schild raadpleegt hem voor de quarantaine). */
+wacht = require('./kern/wacht')({ db, save, beveilig, lees: schild.signalen });
+// RTMAIL: het interne postsysteem (de rail voor de automatiseringen)
+const rtmail = require('./kern/rtmail')({ db, save, crypto });
+/* Teams: een adres dat meerderen samen lezen (receptie@partner.rtg). Krijgt de
+   codenaam-lijst en het zaakregister mee om te toetsen of een adres nog vrij
+   is -- een team mag nooit het postvak van een persoon of zaak kapen. */
+const rtmailTeam = require('./kern/rtmail-team')({ db, save, crypto, rtmail, findSupplier,
+  CODENAMES: require('./accounts/kluis').CODENAMES });
+// De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
+const automatisering = require('./kern/automatisering')({ rtmail });
+// Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
+// eigenaar- en managementadressen, rahul@<domein>, de buitenpost en -poort)
+const { werkmail } = require('./kern/werkmail')({ db, save, crypto, rtmail, mail, accounts });
+const atelierweb = require('./kern/atelierweb')({ db, save, crypto, schoon });
+// de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
+const naamlaag = require('./kern/naamlaag')({ db, save, schoon });
+const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon });
+// het welkom-draaiboek ook voor nieuwe RTF-profielen (foundation, eigen router)
+try { rtf.setAutomatisering(automatisering); } catch (e) {}
+{
+  const t = setInterval(() => { try { wacht.meet(); } catch (e) {} }, 10000);
+  if (t.unref) t.unref();
+}
+
+/* De Ontsmetter (kern/antivirus.js): de platform-malware-scanner. Elk bestand
+   dat RTG binnenkomt wordt gescand (handtekeningen + heuristiek + entropie);
+   besmette inhoud wordt geweigerd, gemeld op het bord, en de bron wordt via De
+   Wacht ter afsnijding voorgesteld. */
+const antivirus = require('./kern/antivirus')({ db, save, beveilig, wacht });
+
+/* Universeel scan-net: elke schrijf-aanvraag wordt door De Ontsmetter gehaald.
+   Zit er een BESMETTE beeld-/PDF-data-URL in de body (waar dan ook, hoe diep
+   ook), dan weigeren we hem hier -- zo zijn ALLE upload-plekken (snaps, De Salon,
+   markt, clips, en alles wat later bijkomt) in één klap gedekt zonder elke route
+   apart aan te raken. Verdacht mag door (staat wel op het bord). /api/verify/*
+   scant al expliciet; /api/techniek/* en health blijven ongemoeid. */
+app.use((req, res, next) => {
+  const m = req.method;
+  if (m !== 'POST' && m !== 'PUT' && m !== 'PATCH') return next();
+  const p = req.path || '';
+  if (p.startsWith('/api/techniek') || p.startsWith('/api/verify') || p === '/api/health' || p === '/api/ready') return next();
+  if (!req.body || (typeof req.body !== 'object' && typeof req.body !== 'string')) return next();
+  try {
+    const raak = antivirus.scanBody(req.body, { bron: req.ip, naam: p });
+    if (raak) return res.status(422).json({ error: 'Dit bestand is geweigerd door de beveiliging (mogelijke malware).' });
+  } catch (e) { /* een scanfout mag nooit een verzoek breken */ }
+  next();
 });
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
@@ -946,8 +942,12 @@ function auth(req, res, next) {
    uit; iedereen chat in de eigen taal en de ander leest alles in de zijne. Vroeg
    opgezet zodat de leden-laag (en alles daarna) taalVan kan gebruiken. */
 const talen = maakTalen({ db, save });
+// De leden-kern wordt vóór de sociale laag gebouwd; deps.zijnVrienden wordt
+// hieronder laat-gebonden gevuld zodra de vriendenlaag bestaat (voor de
+// Salon-zichtbaarheid: van een vriend zie je een bericht altijd).
+const lidDeps = { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan };
 const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications } =
-  maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan });
+  maakLid(lidDeps);
 
 /* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
    -facturen. Hoisted en dus ook bruikbaar door de demo-seed hierboven (die vóór
@@ -1162,6 +1162,8 @@ const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypt
 // De slimme boerderij-laag (kern/boerderij.js): boerderijtypes, percelen+gewassen,
 // dieren, takenbord, seizoensbriefing en een AI-adviseur die ook dingen doet.
 const boerderij = require('./kern/boerderij').maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon });
+// Het Journalistiek-genre (kern/journalistiek.js): redactie + eigen krantsite.
+const journalistiek = require('./kern/journalistiek')({ db, save, crypto, schoon, findSupplier });
 // De content-creator-laag (kern/creator.js): carriere-profiel, platforms, tarieven,
 // portfolio, content-kalender en een AI content/script-helper.
 const creator = require('./kern/creator').maakCreator({ db, save, crypto, anthropic, schoon });
@@ -1174,7 +1176,7 @@ const agenda = require('./kern/agenda').maakAgenda({ db, save, crypto, anthropic
 // De centrale facturatielaag (kern/facturatie.js): bij elke verkoop/dienst/verhuur
 // automatisch EGn tweezijdige factuur die beide partijen in de app zien, plus een
 // AI-factuurtool. Alle apps haken hierop in.
-const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon });
+const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering });
 // De marktplaats (kern/markt.js): één gedeelde motor voor de RTFoundation-app
 // (gezinnen kopen/verkopen) en voor leveranciers die er ook op willen verkopen.
 const markt = require('./kern/markt').maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal });
@@ -1182,11 +1184,57 @@ rtf.setMarkt(markt);
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
 } = sociaal;
+// laat-gebonden: de leden-kern (De Salon) mag nu de vriendschap tussen kijker en
+// auteur nakijken, zodat je een bericht van een vriend altijd ziet
+lidDeps.zijnVrienden = zijnVrienden;
+/* De pro-laag over de agenda (kern/agenda-pro.js): kalenderbereik met
+   herhalingen, uitnodigen op codenaam, herinneringen, ICS-export en de
+   alleen-lezen laag met eigen RTG-boekingen. Ligt hier omdat hij
+   codenaamVan uit de sociale kern nodig heeft. */
+Object.assign(agenda, require('./kern/agenda-pro').maakAgendaPro({
+  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
+/* Notities & Taken (kern/notities.js): het bord met notities en lijstjes.
+   Krijgt de agenda mee, want een notitie met datum en tijd wordt een
+   gekoppelde afspraak -- een wekkerlaag, niet drie. */
+const notities = require('./kern/notities').maakNotities({
+  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda);
+/* RTG Bestanden (kern/bestanden.js): de kluis. Bytes versleuteld op schijf
+   (zelfde aanpak als media.js), alleen verwijzingen in de database. */
+const bestanden = require('./kern/bestanden').maakBestanden({
+  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR });
+/* RTG Meet (kern/meet.js): vergaderkamers op codenaam; de server geeft
+   alleen WebRTC-seinen door, beeld en geluid lopen peer-to-peer. */
+const meet = require('./kern/meet').maakMeet({
+  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer });
+/* RTG Galerij (kern/galerij.js): leest De Salon en RTG Bestanden; albums
+   en favorieten zijn verwijzingen, nooit kopieen van de bytes. */
+const galerij = require('./kern/galerij').maakGalerij({ db, save, crypto, schoon });
+const boeken = require('./kern/boeken').maakBoeken({ db, save });
+const onderwijs = require('./kern/onderwijs').maakOnderwijs({ db, save, schoon });
+const leerstof = require('./kern/leerstof').maakLeerstof({ db, save, onderwijs });
+const bijles = require('./kern/bijles').maakBijles({ winkel: () => (db.data.bijles = db.data.bijles || {}), save, schoon });
+const vervolg = require('./kern/leerstof-vervolg').maakVervolg({ db, save, onderwijs });
+/* RTG Klok (kern/klok.js): wekkers en timers die op de server aftellen,
+   zoals de Thuiswacht -- en daardoor ook door Rahul te zetten. */
+const klok = require('./kern/klok').maakKlok({
+  db, save, crypto, schoon, sseToCustomer, sendPushToUser });
 function geenGast(req, res) {
   // vrienden toevoegen, chatten en bellen kan met elk echt account, ook de
   // gratis laag (met paspoort). Alleen een anonieme demo-gast zonder account niet.
   if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten.' }); return true; }
   return false;
+}
+/* Is de identiteit RTG-geverifieerd? Een GRATIS account mag pas reserveren
+   (en telt pas als volwassene) nadat RTG het paspoort echt gecontroleerd
+   heeft; tot die tijd geldt de standaard "onder de 18". De betaalde passen
+   lopen door de ballotage (aanmelden met paspoort) en houden hun bestaande
+   rechten; een anonieme demo-gast zonder account telt nooit als bekend. */
+function idGeverifieerd(sess) {
+  if (!sess) return false;
+  if (sess.tier !== 'guest') return true; // pas-leden: met paspoort geballoteerd
+  if (!sess.account) return false;        // anonieme demo-gast
+  const u = accounts.getUserById(sess.account.id);
+  return !!u && u.verified === 'verified';
 }
 
 /* ---------- gedeelde vriendenlaag over RTG en RTFoundation ----------
@@ -1200,6 +1248,15 @@ app.post('/api/push/subscribe', auth, (req, res) => {
   if (!webpush) return res.status(501).json({ error: 'Push niet beschikbaar.' });
   const sub = req.body.subscription;
   if (!sub || !sub.endpoint) return res.status(400).json({ error: 'Ongeldige subscription.' });
+  // SSRF-afweer: het endpoint komt van de client en de server POST daar later
+  // naartoe. Alleen https naar bekende push-diensten; anders weigeren en melden
+  // (een intern/metadata-adres hier is een SSRF-poging).
+  if (!ssrf.pushEndpointOk(sub.endpoint)) {
+    if (beveilig) beveilig.meld('ssrf-push', 'kritiek',
+      'Push-subscription met een niet-vertrouwd endpoint geweigerd (mogelijke SSRF): ' + String(sub.endpoint).slice(0, 120),
+      { bron: 'user:' + (req.session.account ? req.session.account.id : req.ip) });
+    return res.status(400).json({ error: 'Ongeldig push-endpoint.' });
+  }
   const list = db.data.pushSubs[req.session.tier] = (db.data.pushSubs[req.session.tier] || []);
   if (!list.some(s => s.endpoint === sub.endpoint)) list.push(sub);
   // echte accounts krijgen ook een persoonlijke push-lijst (voor o.a. RTFoundation-meldingen)
@@ -1221,12 +1278,17 @@ app.post('/api/push/subscribe', auth, (req, res) => {
 
 /* Vertaal een bericht naar de taal van de ontvanger. Iedereen schrijft in de
    eigen taal; de lezer krijgt het in de zijne (en andersom). */
-app.post('/api/translate', async (req, res) => {
+/* Publiek, want de taalkiezer staat al op het inlogscherm. Maar wel met een
+   rem, en zonder inlog gaat er niets naar de AI-aanbieder: het woordenboek
+   volstaat voor de knoppen die een uitgelogde bezoeker ziet. Zie de toelichting
+   bij magAi in server/translate.js. */
+app.post('/api/translate', require('./rem')({ windowMs: 60000, limit: 30 }), async (req, res) => {
   const text = String(req.body.text || '').slice(0, 1500);
   const to = talen.taalVan(req.body.to); // elke actieve wereldtaal mag als doel
   const from = req.body.from || undefined; // translate valideert tegen het register
+  const ingelogd = /^Bearer\s+\S/i.test(req.get('authorization') || '');
   try {
-    const out = await i18n.translate(text, to, from);
+    const out = await i18n.translate(text, to, from, { ai: ingelogd });
     res.json(out);
   } catch (e) {
     res.json({ text, translated: false });
@@ -1999,18 +2061,27 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (PRODUCTION ? crypto.randomBytes(
    doorlopende conversatie) staat in server/kern/ai.js. AI_TONE komt daar
    rechtstreeks vandaan; de functies dragen db, PERSONAS, de Claude-client,
    accounts en de realtime-helpers. broadcastSync en sseToOffice zijn hoisted. */
-const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, conciergeInbox } =
-  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n });
+/* De stemming van Rahul (kern/rahul/stemming.js) en de geloofslaag
+   (kern/geloof/). Allebei nodig voordat de promptlaag wordt opgebouwd, want
+   die draagt ze mee in elke system prompt. */
+const stemming = require('./kern/rahul/stemming')({ db, save, crypto });
+const geloof = require('./kern/geloof')({ accounts });
+const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox } =
+  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n,
+    stemmingVoor: (c) => stemming.stemmingVoor(c), geloofRegel: (key) => {
+      const m = /^user-(\d+)$/.exec(String(key || ''));
+      return m ? geloof.promptRegel(Number(m[1]), null) : null;
+    } });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, pendingVerifications } = maakKantoor({
+const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
   db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
 
 /* ================= DOORLOPEND GESPREK IN DE APP =================
    Elk lid heeft één doorlopend gesprek, volledig binnen de beveiligde RTG-app.
-   RTG Pass wordt beantwoord door de Butler (AI); Lifestyle en Business gaan naar
+   RTG Pass wordt beantwoord door Rahul (AI); Lifestyle en Business gaan naar
    een menselijke concierge, die in de backoffice antwoordt. Er zijn geen externe
    berichtenkoppelingen (WhatsApp/Meta) meer: alle communicatie loopt via de app
    en de push-/e-maillaag van RTG zelf. */
@@ -2027,24 +2098,27 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, eigenaar, zaakdoos,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
-  findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
+  findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij, creator, samenwerking, agenda, facturatie, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, openVacatures, optieAan,
-  entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
+  entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
-  runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sendPush,
+  runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   zorgContact, klantSalon,
+  // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
+  geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
+  stemmingVoor: stemming.stemmingVoor,
   webpush, weekdagFactor, werkgeverSollicitatie,
   // de ervaring-laag (kern/ervaring.js)
   MELDING_SCOPES, reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
@@ -2101,6 +2175,9 @@ Object.assign(kern, sociaal); // de sociale kern-helpers erbij
    gezegeld ticket (HMAC), met verse controle bij het afrekenen. De AI en de
    kassa lopen over dezelfde /api/supplier/tafelticket-route. */
 Object.assign(kern, { tafelticket: require('./kern/tafelticket')({ crypto, dataDir: DATA_DIR, findSupplier, ordersVanZaak }) });
+// De dynamische, gesloten RTG-code: HMAC-ondertekende, kort houdbare tokens die
+// alleen ons systeem maakt en verifieert (dyncode.key, 0600, in .gitignore).
+Object.assign(kern, { dyncode: require('./kern/dyncode')({ crypto, dataDir: DATA_DIR }) });
 /* Spellen (kern/spellen.js): mens-erger-je-niet, schaken, woordduel en het
    Sneek-scorebord op de vriendenlaag; RTF- en RTG-leden spelen tegen elkaar. */
 Object.assign(kern, require('./kern/spellen')({
@@ -2117,6 +2194,61 @@ Object.assign(kern, require('./kern/spellen')({
     return lft != null && lft >= 18;
   }
 }));
+/* RTG Veilig (kern/veilig/): de ruggengraat onder vier apps -- Thuiswacht
+   ("ik ben over X minuten thuis"), het stille Codewoord, de Vitale check-in
+   en Thuisrust ("niet storen tot thuis").
+
+   De dodemansknop telt op de klok van DEZE server, niet in de app. Dat is de
+   hele reden dat het werkt als de telefoon uitvalt: geen levensteken is zelf
+   het signaal. Zie kern/veilig/wacht.js. */
+function meldAan(handle, note) {
+  if (!handle) return null;
+  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
+  /* De veiligheidsbaan: een rust-stand ("niet storen") mag een
+     veiligheidsmelding NOOIT tegenhouden. Daarom vraagt deze poort het
+     expliciet, in plaats van de gewone meldingsvoorkeuren te volgen. */
+  if (kern.rustMagDoor && !kern.rustMagDoor(handle, n)) return n;
+  db.data.notifications[handle] = (db.data.notifications[handle] || []);
+  db.data.notifications[handle].unshift(n);
+  db.data.notifications[handle] = db.data.notifications[handle].slice(0, 40);
+  save();
+  sseToCustomer(handle, 'notify', n);
+  sseToCustomer(handle, 'veilig', n);          // de vier apps luisteren hierop
+  try { sendPush(handle, n); } catch (e) { /* push mag een alarm nooit tegenhouden */ }
+  const m = /^user-(.+)$/.exec(String(handle));
+  if (m) { try { sendPushToUser(m[1], n); } catch (e) {} }
+  return n;
+}
+Object.assign(kern, require('./kern/veiligheid')({
+  db, save, crypto, schoon, mail,
+  kluis: require('./accounts/kluis'),
+  sociaal: { codenaamVan: kern.codenaamVan, zijnVrienden: kern.zijnVrienden },
+  meldAan,
+  appUrl: () => process.env.APP_URL || ''
+}));
+kern.meldAan = meldAan;
+
+/* Rahul kijkt mee (kern/kijken.js): een foto van iets, en hij zegt wat het is.
+   De foto wordt nergens bewaard; zie de kop van die module. */
+Object.assign(kern, require('./kern/kijken').maakKijken({ anthropic }));
+
+/* Het salongesprek (kern/kletspraat/): de Rahul van het ene lid kletst met de
+   Rahul van een vriend over hoe hun dag was. Een gimmick met drie sloten:
+   alleen tussen vrienden, alleen als beiden het aan hebben staan, en altijd
+   met verzonnen plaatsnamen. Zie de kop van die module. */
+Object.assign(kern, require('./kern/kletspraat')({
+  db, save, crypto,
+  sociaal: { codenaamVan: kern.codenaamVan, zijnVrienden: kern.zijnVrienden },
+  ordersVanKlant, boekingenVanKlant, anthropic,
+  dagContext: require('./kern/context').dagContext, sseToCustomer
+}));
+/* De sweep: elke halve minuut kijken of er een wacht is afgelopen. Dit is de
+   klok die doortikt terwijl de telefoon van het lid uit staat. De overgangen
+   zijn idempotent (elke stap kijkt eerst naar de huidige status), dus een
+   dubbele sweep levert hooguit een dubbele melding op, nooit een dubbele
+   toestand. */
+setInterval(() => { try { kern.veiligSweep(); } catch (e) { console.error('[veilig] sweep:', e.message); } }, 30 * 1000).unref();
+
 /* De leerlaag (kern/leren.js): overhoorlijsten, het overhoorduel, samen aan
    projecten en schrijven met buddy-feedback; RTF- en RTG-leden doen samen mee. */
 Object.assign(kern, require('./kern/leren')({
@@ -2126,6 +2258,9 @@ Object.assign(kern, require('./kern/leren')({
 /* Het babyboekje (kern/baby.js): het dagboek van de allerkleinsten, met
    gezinsnamen en AI-gezinsmomenten; foto's gaan naar de mediastore. */
 Object.assign(kern, require('./kern/baby')({ save, crypto, media, anthropic }));
+/* De welzijnslaag (kern/welzijn.js): het prive-gevoelsdagboek van een kind;
+   niemand leest mee, het scherm wijst zelf warm de weg naar hulp. */
+Object.assign(kern, require('./kern/welzijn')({ save }));
 /* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
    boardroom die alles ziet en het functieschakelbord bedient. */
 Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCodenaam }));
@@ -2148,17 +2283,24 @@ Object.assign(kern, require('./kern/hardwarelab').maakHardwarelab({ db, save, cr
    gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. AI tekent
    het concept uit, levert een bouwstaat en de blik van de chef-architect. */
 Object.assign(kern, require('./kern/architect').maakArchitect({ db, save, crypto, anthropic, schoon }));
+/* RTG Werkplaats (kern/werkplaats.js): het app-bureau van de kantoren. Bedenkt
+   nieuwe apps en verbetert bestaande apps, de Bibliotheek en de App Store met AI
+   (advies; een mens beslist en bouwt). */
+Object.assign(kern, require('./kern/werkplaats').maakWerkplaats({ db, save, crypto, anthropic, schoon }));
 /* De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app; een
    gecureerde etagelijst van de retail-partners, elk met een eigen catalogus. */
-Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail }));
+Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail,
+  // de verdieping RTG Thuis; laat opgehaald omdat Thuis verderop wordt gebouwd
+  haalThuis: () => (kern.thuis && typeof kern.thuis.thuisMallAanbod === 'function' ? kern.thuis.thuisMallAanbod() : null) }));
 /* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,
    elk rond de duizend euro winkelwaarde, voor leden inbegrepen bij de pas. */
 Object.assign(kern, require('./kern/appbieb').maakAppbieb({ db, save }));
-/* De Reis-Bibliotheek (kern/reisbieb): een miljoen reisgidsen van over de
-   hele wereld, van Londen tot Gaza; alleen voor betalende leden. */
+/* De Reis-Bibliotheek (kern/reisbieb): echte, leesbare bestemmingsgidsen van
+   eigen redactie; open voor iedereen die is aangemeld. */
 Object.assign(kern, require('./kern/reisbieb').maakReisBieb({ db, save }));
-/* De RTF App-Bibliotheek (kern/rtfbieb.js): 20.000 kind- en gezinsapps; de
-   kern staat hier al zodat de Mall (routes/member) hem ook kan tonen. */
+/* De RTF App-Bibliotheek (kern/rtfbieb.js): de echte, gratis kind- en
+   gezinsapps van de stichting; de kern staat hier al zodat de Mall
+   (routes/member) hem ook kan tonen. */
 Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
 /* De Geloof & Wijsheid-Bibliotheek (kern/geloofbieb.js): een miljoen boeken en
    apps over alle religies en levensbeschouwingen, als gelijken naast elkaar,
@@ -2169,9 +2311,28 @@ Object.assign(kern, require('./kern/geloofbieb').maakGeloofBieb({ db, save }));
    (kern/rtfclubs.js: samenwerking met grote (sport)clubs per stad) en het
    RTG Onderzoekslab (kern/onderzoekslab.js: hardware, software, dorpshulp,
    landbouw en onderzoek naar onderzoek, met een menselijke veiligheidstoets). */
-Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto }));
+Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto, anthropic }));
 Object.assign(kern, require('./kern/rtfclubs')({ db, save, crypto }));
 Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropic }));
+// De Stadsraad: per stad een invloedrijke partner die in het gezamenlijke
+// foundation-kantoor mee beslist over de lab-uitslagen
+Object.assign(kern, require('./kern/stadsraad')({ db, save, crypto }));
+/* RTG Payroll (kern/payroll.js): het loonkantoor draait op wat het platform
+   al weet -- de klok, de rollen en de fiscale landtabellen. */
+Object.assign(kern, require('./kern/payroll')({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, findSupplier }));
+Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));
+/* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
+   werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun
+   takenlijst; wie binnenkomt kiest eerst een huis. */
+Object.assign(kern, require('./kern/werkplek')({ db, save, crypto }));
+/* Aanmeldingen (kern/aanmeldingen.js): de aanmelding per pas is geheel
+   geautomatiseerd (berichten, onboarding, rondleiding, RTF, veiligheid, privacy);
+   alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
+   Lifestyle/Business toe. */
+Object.assign(kern, require('./kern/aanmeldingen')({ db, save, crypto, schoon, accounts,
+  // laat gebonden: de geld-regie wordt verderop gemount; bij het accepteren
+  // (request-tijd) is kern.geldPasprijzen al beschikbaar voor het betaalschema.
+  geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null) }));
 /* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
    vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
 Object.assign(kern, require('./kern/pestgrens')({ db, save }));
@@ -2239,6 +2400,22 @@ Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));
 Object.assign(kern, require('./kern/redactie').maakRedactie({ db, save, crypto, anthropic, schoon }));
 Object.assign(kern, require('./kern/ideeen').maakIdeeen({ db, save, crypto, anthropic, schoon,
   bureaus: { atelier: kern.atelier, studio: kern.studio, hardware: kern.hardware, architect: kern.architect, redactie: kern.redactie } }));
+/* Dezelfde zes bureaus nog een keer, nu voor de RTFoundation. De modules
+   blijven onaangeraakt; ze krijgen via kern/huisdb.js alleen een andere bril op
+   waardoor hun opslagsleutel naar een eigen la wijst (atelier -> atelierRtf).
+   Zo ontwerpt de stichting in haar eigen atelier, studio, hardwarelab,
+   architectenbureau, redactie en ideeenkamer, zonder dat het werk van RTG en
+   dat van de stichting op een hoop belandt. */
+const { huisDb, RTF_OMLEIDING, huisNaam } = require('./kern/huisdb');
+const rtfBureauCtx = { db: huisDb(db, RTF_OMLEIDING), save, crypto, anthropic, schoon };
+Object.assign(kern, huisNaam(require('./kern/atelier').maakAtelier(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/studio').maakStudio(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/hardwarelab').maakHardwarelab(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/architect').maakArchitect(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/redactie').maakRedactie(rtfBureauCtx), 'Rtf'));
+Object.assign(kern, huisNaam(require('./kern/ideeen').maakIdeeen(Object.assign({}, rtfBureauCtx, {
+  bureaus: { atelier: kern.atelierRtf, studio: kern.studioRtf, hardware: kern.hardwareRtf,
+    architect: kern.architectRtf, redactie: kern.redactieRtf } })), 'Rtf'));
 /* De hulpdiensten (kern/hulpdienst.js): zes korpsen met een meldkamer,
    eenheden over land, water en door de lucht, bijstand tussen korpsen en
    de zorgketen ambulance -> ziekenhuis -> huisarts. */
@@ -2262,7 +2439,8 @@ Object.assign(kern, require('./kern/rampbeeld')({ db, save, findSupplier, anthro
    genres (zzp, chef, wellness). Zelfde aanbod-/boekingsmodel als voorheen,
    maar met een vandaag-bord, KPI's en een genre-bewuste AI-assistent, zodat
    deze apps op het niveau van de horeca- en hoteltorens komen. */
-Object.assign(kern, require('./kern/vakwerk').maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon }));
+Object.assign(kern, require('./kern/vakwerk').maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon,
+  crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
@@ -2286,6 +2464,15 @@ Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify,
 Object.assign(kern, require('./kern/lifestyle')({ db, save, crypto, anthropic, liveCodename, notify }));
 // De extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison
 Object.assign(kern, require('./kern/rechterhand')({ db, save, crypto, liveCodename, anthropic, DATA_DIR }));
+/* Het Huis: het reisdossier achter de hoofdingang. Leest alleen wat er al is --
+   de eigen reis van het lid, en de papieren die Entourage al bewaakt. Die grens
+   wordt daar berekend en hier niet nog een keer: een limiet hoort op één plek. */
+kern.huis = require('./kern/huis')({
+  reisVan: (sess) => (sess && sess.account
+    ? (accounts.getMemberState(sess.account.id) || {}).trip
+    : (sess && sess.tier !== 'guest' ? db.data.trip : null)) || null,
+  entourageVan: (sess) => { try { return kern.entourage(sess.key); } catch (e) { return null; } }
+});
 // Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass (match -> jetset-date)
 Object.assign(kern, require('./kern/rendezvous')({ db, save, crypto, liveCodename, anthropic, notify }));
 // De wauw-laag: stemming, verjaardagsglans en De Terugblik over alle socials
@@ -2293,6 +2480,57 @@ Object.assign(kern, require('./kern/wauw')({ db, save, accounts, socialConnectie
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)
 Object.assign(kern, require('./kern/pulse')({ db, save, crypto, liveCodename, notify,
   stemmingVan: kern.stemmingVan, jarigVan: kern.jarigVan }));
+/* De Salon als volwaardige app: leden die zelf plaatsen (karrousel, onderwerpen),
+   een feed met echte paginering in plaats van het oude plafond van 60, profielen
+   op codenaam met volgen tussen leden, reacties met antwoorden en vermeldingen,
+   bewaren, de veiligheidsknoppen, en drie AI-taken die voorstellen maar nooit
+   plaatsen. De zichtbaarheidspoort blijft kern/salonviraal.js. */
+kern.salon = require('./kern/salon')({ db, save, media, liveCodename, codenaamVan: kern.codenaamVan,
+  crypto, broadcastSync });
+kern.salonProfiel = require('./kern/salon/profiel')({ db, save, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam: kern.keyVanCodenaam, liveCodename, salon: kern.salon });
+kern.salonReacties = require('./kern/salon/reacties')({ db, save, liveCodename, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam: kern.keyVanCodenaam, zijnVrienden: kern.zijnVrienden, salon: kern.salon, notify });
+kern.salonAI = require('./kern/salon/ai')({ anthropic, salon: kern.salon });
+kern.salonInzicht = require('./kern/salon/inzicht')({ db, save, salon: kern.salon });
+
+/* Métier (kern/metier/): de beroepskant. Het profiel draait op de codenaam, RTG
+   bevestigt alleen wat het echt zag (de bewezen rollen komen uit de sleutelbos
+   van kern/eenaccount.js) en de echte naam geeft het lid per werkgever vrij uit
+   de kluis -- intrekbaar, met een eigen inzagelog. Zie kern/metier/bewijs.js. */
+kern.metier = require('./kern/metier')({ db, save, liveCodename, codenaamVan: kern.codenaamVan, findSupplier });
+kern.metierZoek = require('./kern/metier/zoek')({ codenaamVan: kern.codenaamVan, metier: kern.metier, PAGINA: kern.metier.PAGINA });
+kern.metier.zoek = kern.metierZoek.zoek;
+kern.metierBewijs = require('./kern/metier/bewijs')({ db, save, accounts, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam, findSupplier, notifySupplier, notify });
+kern.metierNetwerk = require('./kern/metier/netwerk')({ db, save, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam, zijnVrienden: kern.zijnVrienden, liveCodename, notify, metier: kern.metier });
+kern.metierAI = require('./kern/metier/ai')({ anthropic, metier: kern.metier, netwerk: kern.metierNetwerk });
+kern.metierLoon = require('./kern/metier/loon')({ db });
+
+/* Genootschap (kern/genootschap/): besloten groepen van leden, met een prikbord
+   en bijeenkomsten. Bewust een EIGEN app en geen verbouwing van Cercle (het
+   register van je societeiten) of Rendez-vous (de datingdienst van de Lifestyle
+   Pass); zie de kop van kern/genootschap/index.js voor waarom. */
+kern.genootschap = require('./kern/genootschap')({ db, save, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam, liveCodename, notify, zijnVrienden: kern.zijnVrienden });
+kern.genootschapBeheer = require('./kern/genootschap/beheer')({ save, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam, genootschap: kern.genootschap });
+kern.prikbord = require('./kern/genootschap/prikbord')({ db, save, codenaamVan: kern.codenaamVan,
+  liveCodename, notify, genootschap: kern.genootschap });
+kern.bijeenkomst = require('./kern/genootschap/bijeenkomst')({ db, save, codenaamVan: kern.codenaamVan,
+  notify, genootschap: kern.genootschap });
+kern.genootschapAI = require('./kern/genootschap/ai')({ anthropic, genootschap: kern.genootschap,
+  prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
+kern.genootschapInzicht = require('./kern/genootschap/inzicht')({ db, save, genootschap: kern.genootschap,
+  prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
+kern.genootschapUitvoer = require('./kern/genootschap/uitvoer')({ genootschap: kern.genootschap,
+  codenaamVan: kern.codenaamVan });
+/* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
+   archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
+   afspraken eruit halen). De AI stelt op, de mens verstuurt. */
+kern.berichten = require('./kern/berichten')({ db, save, socialConnecties: kern.socialConnecties,
+  dmSleutel: kern.dmSleutel, codenaamVan: kern.codenaamVan, rtmail, overheid: kern.overheid, anthropic });
 // Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
 // dat meereist en een aparte, veilige intake-deling per aanbieder.
 Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));
@@ -2303,6 +2541,11 @@ Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, z
    belofte uit de voorwaarden blijft intact). Voor lidacties gemount, want
    de betaal-seams rekenen het voordeel mee. */
 Object.assign(kern, require('./kern/geldregie').maakGeldregie({ db, save }));
+/* Ledenregister (kern/ledenregister.js): het kantooroverzicht van alle leden op
+   codenaam, gesplitst per stad/land/alfabet/geslacht en pas, met de omzet per pas
+   en de 30%-foundationsplit (20% lokaal, 10% RTF). Na de geldregie gemount, want
+   het leunt op de pasprijzen daaruit. */
+Object.assign(kern, require('./kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal }));
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
    RTG Bank clearet: via de externe kaart-naad, als eigen emissie, of allebei.
@@ -2314,21 +2557,79 @@ Object.assign(kern, bankregie);
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
 Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic }));
+/* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
+   rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
+   LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
+Object.assign(kern, require('./kern/reis')({ LANDEN }));
+/* De Regelwacht (kern/fiscaal/regelwacht.js): belastingen en regels worden
+   automatisch bijgewerkt -- een gevalideerde overlay op de gedeelde
+   LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
+Object.assign(kern, require('./kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR }));
+kern.regelwacht.herstelOverlay();
+const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
+if (regelTimer.unref) regelTimer.unref();
+/* RTG Thuis (kern/thuis): thuisverhuur van lid aan lid -- ons antwoord op
+   Airbnb, met alle premium functies gratis en de Reiswijzer aan boord. De
+   commerciele tak (kern/thuis/zakelijk) draait op dezelfde landtabel als de
+   rest van het huis: daar komt de logies-btw vandaan. */
+Object.assign(kern, require('./kern/thuis')({ db, save, crypto, schoon, reiswijzer: kern.reiswijzer, landVind: kern.landVind, findSupplier, LANDEN }));
+/* De werkvloer-laag: de koppellaag (kern/koppel.js) zet een handeling van
+   het ene scherm op het andere -- betalen op afstand met een RTG-code,
+   aftekenen voor verzending, tekenen voor ontvangst. De tafellijst
+   (kern/tafelwensen.js) brengt allergenen en wensen per stoel bij de
+   bediening en per tafel bij de keuken. De checklijst (kern/checklijst.js)
+   deel je met je team; iedereen vinkt zelf af. */
+Object.assign(kern, require('./kern/koppel')({ db, save, crypto, schoon, dyncode: kern.dyncode, sseToSupplier }));
+Object.assign(kern, require('./kern/tafelwensen')({ db, save, crypto, schoon }));
+Object.assign(kern, require('./kern/checklijst')({ db, save, crypto, schoon }));
+/* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
+   gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft
+   de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db
+   (db.capsVan); dit is de kern-ingang voor de route. */
+Object.assign(kern, require('./kern/werkvormen')({ db }));
+/* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
+   minister-president en het eigen hotel van elke afdeling -- alle drie
+   kamers van RTG Kantoren. */
+Object.assign(kern, require('./kern/opvang')({ db, save, crypto }));
+Object.assign(kern, require('./kern/afdelingshotel')({ db, save, crypto }));
+Object.assign(kern, require('./kern/regering')({ db, save, crypto, LANDEN,
+  regelwacht: kern.regelwacht, bank: kern.bank, opvang: kern.opvang, afdelingen: kern.afdelingen, ledenAantal }));
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */
 kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
   ? kern.bank.bankDekWallet({ codenaam, centen })
   : { status: 403, error: 'De leden-bank is niet live.' });
+/* Cutover-reconcile: draait de wallet in motor-modus (RTG_MOTOR_GELD=motor), dan
+   is de Rust-motor de autoriteit -- neem bij het opstarten de saldi-spiegel over
+   uit de motor-snapshot, zodat we altijd in lockstep starten (ook na een crash of
+   nadat de motor los is bijgewerkt). No-op in de standaard schaduw-modus. */
+if (kern.pay.geldModus === 'motor') {
+  Promise.resolve(kern.pay.reconcileVanMotor())
+    .then(r => {
+      if (r && r.ok && !r.overgeslagen) log.info('motor-reconcile', { rekeningen: r.rekeningen, som: r.som });
+      else if (r && r.error) log.warn('motor-reconcile mislukt', { fout: r.error });
+    })
+    .catch(e => log.warn('motor-reconcile uitzondering', { fout: e.message }));
+}
+// Zelfde herstart-reconcile voor het BANK-grootboek (tweede motor-ledger).
+if (kern.bank.geldModus === 'motor') {
+  Promise.resolve(kern.bank.reconcileVanMotor())
+    .then(r => {
+      if (r && r.ok && !r.overgeslagen) log.info('motor-reconcile bank', { rekeningen: r.rekeningen, som: r.som });
+      else if (r && r.error) log.warn('motor-reconcile bank mislukt', { fout: r.error });
+    })
+    .catch(e => log.warn('motor-reconcile bank uitzondering', { fout: e.message }));
+}
 /* De RTFoundation-afdracht over de eigen rails: staat de knop effectief op
    "eigen" (en niet in nood), dan boekt de 30% als grootboekboeking van de
    reserve naar de foundation-tegenrekening. Anders geeft de naad null terug
    en volgt fonds.js gewoon de bestaande betaal-naad. Late binding, want het
    fonds is eerder gemount dan de bank. */
-fonds.koppelBank(({ centen, referentie, oms }) => {
+fonds.koppelBank(async ({ centen, referentie, oms }) => {
   const c = bankregie.bankClearing();
   if (c.modus !== 'eigen') return null;
-  return kern.bank.boek({ van: 'rtg:reserve', naar: 'extern:foundation', centen, soort: 'afdracht', oms, ref: referentie });
+  return kern.bank.boekAsync({ van: 'rtg:reserve', naar: 'extern:foundation', centen, soort: 'afdracht', oms, ref: referentie });
 });
 /* RTG Stad (kern/stad): het slimme-stad-platform op EIGEN hardware (de
    Stadsdoos-vloot, dezelfde familie als de Zaakdoos) en eigen software --
@@ -2355,17 +2656,17 @@ kern.stad.stadKoppelVerkeer(() => ({
 Object.assign(kern, require('./kern/aidata').maakAidata({ db, accounts }));
 /* Lidacties (kern/lidacties.js): de transactiefuncties van het lid, als
    kern-module met expliciete afhankelijkheden. Ze bedienen de app-routes
-   EN vullen de acties-registry van de Butler, volgens het contract
+   EN vullen de acties-registry van Rahul, volgens het contract
    (session, body) -> { ok, ... } | { status, error }. */
 Object.assign(kern, require('./kern/lidacties')({
   db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
-  leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
+  leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
   notifySupplier, sseToSupplier, sseToOffice,
   zorgVoor: kern.zorgVoor, zorgContact, keuken: kern.keuken,
   ledenvoordeelVoor: kern.ledenvoordeelVoor
 }));
-kern.butlerActies = {
+kern.rahulActies = {
   plaatsOrder: kern.plaatsOrderVoor, betaalOrder: kern.betaalOrderVoor,
   // de rekening in een keer afrekenen (betalen na het eten)
   betaalRekening: kern.betaalRekeningVoor,
@@ -2379,8 +2680,8 @@ kern.butlerActies = {
 Object.assign(kern, require('./kern/fluister')({
   db, save, schoon, anthropic, notify,
   reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,
-  acties: kern.butlerActies,
-  // de reislaag van De Butler: een hele reis op een vraag, kleding apart
+  acties: kern.rahulActies,
+  // de reislaag van Rahul: een hele reis op een vraag, kleding apart
   // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen
   verblijfBoek: (session, body) => kern.verblijfBoek(session, liveCodename(session), body),
   retailLegApart: legApart, retailKlantProfiel: klantProfiel
@@ -2445,8 +2746,26 @@ Object.assign(kern, require('./kern/navigatie').maakNavigatie({
    toestel van de maker staan (OPFS); RTG bewaart enkel titel, affiche en
    het signaal-doorgeefluik. De feed is een eindige dagselectie, bewust
    zonder oneindige scroll. Na sociaal gemount (codenamen). */
+/* RTG Studio: zelf muziek maken. Alles wordt opgewekt, niets gesampled -- zie
+   kern/muziek-instrumenten.js. Daardoor zit er geen licentie van een ander in
+   wat een lid maakt, en mag zijn eigen stuk wel onder zijn eigen clip. */
+/* De studio is in drie lagen bedraad, en de volgorde is nodig: samen levert de
+   makers-lijst waar muziek zijn toegang op baseert, en uitgave heeft beide. */
+kern.muziekSamen = null;
+Object.assign(kern, require('./kern/muziek')({ db, save, crypto, schoon,
+  magBij: (t, key) => (kern.muziekSamen ? kern.muziekSamen.muziekMagBij(t, key) : t.key === key),
+  stempel: (t, key) => { if (kern.muziekSamen) kern.muziekSamen.muziekStempel(t, key); } }));
+kern.muziekSamen = require('./kern/muziek-samen')({ save,
+  trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan });
+Object.assign(kern, kern.muziekSamen);
+Object.assign(kern, require('./kern/muziek-uitgave')({ db, save, crypto, schoon,
+  trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan,
+  makersVan: kern.muziekMakersVan, notify }));
+kern.muziekRahul = require('./kern/muziek-rahul')({ schoonTrack: kern.muziekSchoonTrack });
 Object.assign(kern, require('./kern/clips').maakClips({
-  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, sseToCustomer, sseToOffice
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, sseToCustomer, sseToOffice,
+  // eigen muziek mag onder een eigen clip; de muziekmodule toetst het eigendom
+  eigenTrack: kern.muziekEigenTrack
 }));
 /* RTG Office (kern/office.js): het eigen kantoorpakket. Documenten
    (tekstdocument of rekenblad) op het account, alleen-lezen te delen op
@@ -2537,18 +2856,36 @@ require('./kern/rahul').zetRahulBron(() => db.data.rahulProfiel || null);
    het lid komt uit het eigen profiel (v/m/x). Volwassen leden krijgen de
    vrouw-/man-vorm; minderjarige leden (15-17) krijgen het kind-hart (het grote
    luisterende oor); onbekend geeft null en dan blijft Rahul neutraal. */
+/* Hoe Rahul zich verhoudt tot dit lid. Dit liep op GESLACHT en loopt nu op
+   wat het lid ZELF heeft gekozen (kern/rahul-omgang.js legt uit waarom).
+   Leeftijd telt nog wel: onder de 18 het kind-hart, en de plagerige stand
+   bestaat alleen voor volwassenen. */
 require('./kern/rahul').zetGeslachtBron((key) => {
   const m = /^user-(\d+)$/.exec(String(key || ''));
   if (!m) return null;
   let md = null;
   try { md = accounts.getMemberState(Number(m[1])); } catch (e) { return null; }
-  if (!md || !md.geboren) return null;
-  const g = new Date(md.geboren), nu2 = new Date();
-  let lft = nu2.getFullYear() - g.getFullYear();
-  if (nu2 < new Date(nu2.getFullYear(), g.getMonth(), g.getDate())) lft -= 1;
-  if (!(lft >= 18)) return 'kind';
-  const gs = String(md.geslacht || '').toLowerCase();
-  return (gs === 'v' || gs === 'm') ? gs : null;
+  if (!md) return null;
+  let lft = null;
+  if (md.geboren) {
+    const g = new Date(md.geboren), nu2 = new Date();
+    lft = nu2.getFullYear() - g.getFullYear();
+    if (nu2 < new Date(nu2.getFullYear(), g.getMonth(), g.getDate())) lft -= 1;
+  }
+  /* De levensfase (kern/rahul-fases.js) bepaalt in welke ROL Rahul staat:
+     kind, scholier, student, volwassen of senior. De leeftijd geeft de
+     standaard, het lid mag hem bijstellen, en faseVoor() bewaakt dat een
+     minderjarige alleen tussen kind en scholier kan kiezen. */
+  const fase = require('./kern/rahul-fases').faseVoor(lft, md.fase);
+  return {
+    fase,
+    soort: (fase === 'kind' || fase === 'scholier') ? 'kind' : 'volwassen',
+    omgang: md.omgang || 'maatje',
+    voornaamwoord: md.voornaamwoord || '',
+    aanhef: md.aanhef || '',
+    // Bij een onbekende leeftijd is het antwoord nee: geen plagerige stand.
+    volwassen: lft != null && lft >= 18
+  };
 });
 
 /* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
@@ -2574,10 +2911,39 @@ for (const naam of gekozenDomeinen) {
 // leveranciers; net als de infra-endpoints draait dit altijd mee.
 require('./routes/onboarding')(kern);
 require('./routes/aanmeldgesprek')(kern);
+/* SSO staat naast de auth-routes en niet erin: het is een tweede weg naar
+   binnen, met een eigen levensloop (koppelingen, providers), en het moet ook
+   draaien als het auth-domein apart is opgestart. */
+require('./routes/sso')(kern);
+/* SCIM: de provisioning-deur voor de IdP van een klant. Eigen auth (een sleutel
+   per organisatie), dus bewust naast de gewone routes en niet in een domein. */
+require('./routes/scim')(kern);
+require('./routes/meting')(kern);
 require('./routes/algpin')(kern);
 require('./routes/sleutelwoorden')(kern);
 require('./routes/agenda')(kern);
+require('./routes/notities')(kern);
+require('./routes/bestanden')(kern);
+require('./routes/meet')(kern);
+require('./routes/galerij')(kern);
+require('./routes/klok')(kern);
+require('./routes/vertaal')(kern);
+require('./routes/memo')(kern);
+require('./routes/boeken')(kern);
+require('./routes/onderwijs')(kern);
+require('./routes/leerstof')(kern);
+require('./routes/bijles')(kern);
 require('./routes/facturatie')(kern);
+require('./routes/rtmail')(kern);
+require('./routes/rtmail-team')(kern);
+require('./routes/werkmail')(kern);
+require('./routes/payroll')(kern);
+require('./routes/huis')(kern);
+require('./routes/muziek')(kern);
+require('./routes/muziek-samen')(kern);
+require('./routes/atelierweb')(kern);
+require('./routes/webmaker')(kern);
+require('./routes/journalistiek')(kern);
 require('./routes/markt')(kern);
 require('./routes/borden')(kern);
 require('./routes/spellen')(kern);
@@ -2588,6 +2954,11 @@ require('./routes/rtfbieb')(kern);
 require('./routes/geloofbieb')(kern);
 /* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
 require('./routes/rtfkantoor')(kern);
+/* De twee werkplekken RTG en RTF (kern staat al hierboven). */
+require('./routes/werkplek')(kern);
+require('./routes/labfonds')(kern);
+require('./routes/aanmeldingen')(kern);
+require('./routes/ledenregister')(kern);
 /* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
    school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
    (kern/samenrtf.js): kindveilig meekijken binnen gezin en vrienden. */
@@ -2605,9 +2976,14 @@ require('./routes/rtfschool')(kern);
 /* Samen (kern/samen.js): met vrienden meekijken en samen doen door het hele
    leden-OS; kamers op code, live seintjes via de SSE-stroom. */
 Object.assign(kern, require('./kern/samen')({ db, save, crypto, sseToCustomer, schoon }));
+/* De Residence (kern/residentie): het virtuele grandhotel -- zalen en eigen
+   suites waar leden als pionnen op codenaam rondlopen en praten, live over
+   het bestaande SSE-kanaal. */
+Object.assign(kern, require('./kern/residentie').maakResidentie({ db, save, schoon, sseToCustomer }));
 require('./routes/samen')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
+require('./routes/welzijn')(kern);
 /* De zelfzorg (kern/zelfzorg): de code ruimt zichzelf op, beschermt zichzelf,
    repareert zichzelf en upgradet zichzelf. De knoppen staan in de boardroom en
    de kamers Intern & IT en Ingenieurs; de veilige delen draaien ook als stille
@@ -2639,6 +3015,11 @@ require('./routes/sportclub')(kern);
 require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/bank')(kern);
+require('./routes/bankhart')(kern);
+require('./routes/reis')(kern);
+require('./routes/thuis')(kern);
+require('./routes/werkvloer')(kern);
+require('./routes/regering')(kern);
 require('./routes/stad')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);
@@ -2679,7 +3060,7 @@ require('./routes/home')(kern);
    lucht, water en land; publiek volgen op volgcode zonder klantgegevens. */
 Object.assign(kern, require('./kern/vracht')({ db, save, crypto, schoon }));
 require('./routes/vracht')(kern);
-/* RTG Zuidas (kern/gebouw.js): het complete kantoorgebouw-systeem met
+/* RTG Enterprise (kern/gebouw.js): het complete kantoorgebouw-systeem met
    receptie, zalen, badges, facilitair, valet en de luxe jetset-laag. */
 Object.assign(kern, require('./kern/gebouw')({ db, save, crypto, schoon }));
 require('./routes/gebouw')(kern);
@@ -2710,6 +3091,11 @@ require('./routes/lesmaker')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);
+require('./routes/code')(kern);
+// RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
+require('./routes/veiligheid')(kern);
+// Wie ben ik voor Rahul: omgang, voornaamwoorden en de eigen geloofskeuze.
+require('./routes/ik')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet
@@ -2746,11 +3132,26 @@ const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 function backupData() {
   if (!db.writable) return; // standby-servers maken geen backups, dat doet de actieve
   try {
+    /* EERST de WAL leegdrukken, dan pas kopieren.
+
+       SQLite draait hier in WAL-modus: verse gegevens staan NIET in rtg.db of
+       store.db maar in het bijbehorende -wal-bestand, tot een checkpoint ze
+       overhevelt. Zonder deze twee regels kopieerde de backup dus bestanden
+       zonder de recentste data -- en op een verse installatie letterlijk twee
+       lege bestanden van 4 KB, terwijl alles in een WAL van megabytes stond.
+       De backup zag er elke nacht keurig uit en was leeg. Gevonden met
+       test/herstelproef.test.js, die de hele ronde echt doorloopt. */
+    try { accounts.checkpoint(); } catch (e) {}
+    try { checkpointSqlite(); } catch (e) {}
+
     const day = new Date().toISOString().slice(0, 10);
     const dir = path.join(BACKUP_DIR, day);
     fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
     try { fs.chmodSync(dir, 0o700); } catch (e) {}
-    for (const f of ['db.json', 'rtg.db', 'store.db']) {
+    /* De -wal-bestanden gaan mee als vangnet: lukt het checkpointen niet omdat
+       een ander proces nog leest, dan is de kopie samen met zijn WAL alsnog
+       compleet. SQLite leest een database met bijbehorende -wal gewoon uit. */
+    for (const f of ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal']) {
       const from = path.join(DATA_DIR, f);
       if (fs.existsSync(from)) { const doel = path.join(dir, f); fs.copyFileSync(from, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
     }
@@ -2763,7 +3164,7 @@ function backupData() {
     if (process.env.RTG_BACKUP_DIR) {
       const off = path.join(process.env.RTG_BACKUP_DIR, day);
       fs.mkdirSync(off, { recursive: true });
-      for (const f of ['db.json', 'rtg.db', 'store.db']) {
+      for (const f of ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal']) {
         const from = path.join(DATA_DIR, f);
         if (fs.existsSync(from)) fs.copyFileSync(from, path.join(off, f));
       }
@@ -2803,14 +3204,37 @@ if (PRODUCTION) {
 }
 
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => {
+/* Waar luisteren we? Draait deze server achter een poortwachter -- als kind
+   van server/trio.js (RTG_CLUSTER_KEY) of van de vloot (RTG_DOMAINS) -- dan
+   hoort hij ALLEEN op de loopback te staan. Twee redenen:
+
+   1. Veiligheid. Zonder host bindt node op alle interfaces. Dan staat elke
+      reserveserver open op het netwerk en kan iedereen in het pand de
+      poortwachter overslaan: geen doorstuurregels, geen X-Forwarded-For,
+      geen enkele laag ertussen. Alleen de poortwachter hoort naar buiten.
+
+   2. Bereikbaarheid, en die kostte een avond. Zonder host luistert node op
+      :: (IPv6). Op een macOS waar net.inet6.ip6.v6only aan staat komt een
+      verbinding naar 127.0.0.1 daar nooit aan. De poortwachter gebruikt
+      127.0.0.1 en concludeerde dus dat er geen enkele server leefde --
+      terwijl alle drie keurig stonden te luisteren. lsof laat ze zien op
+      *:3001 tot *:3003, en de site geeft ondertussen "alle servers zijn
+      tijdelijk onbereikbaar".
+
+   RTG_BIND overschrijft dit als iemand het bewust anders wil. Draait de
+   server los (npm run single), dan blijft hij gewoon op alle interfaces --
+   dan is hij zelf de voordeur. */
+const HOST = process.env.RTG_BIND ||
+  ((process.env.RTG_CLUSTER_KEY || process.env.RTG_DOMAINS) ? '127.0.0.1' : '');
+function gestart() {
   if (process.env.RTG_SERVER) {
     console.log(`klaar op poort ${PORT}, rol: ${db.writable ? 'actief' : 'standby'}`);
   } else {
     console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/app.html`);
   }
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
-});
+}
+const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
 // Eigen STUN-server (RFC 5389) voor (video)bellen: geen leun meer op de publieke
 // STUN van Google. Draait op UDP (STUN_PORT, standaard 3478); STUN_UIT=1 zet uit.
 // De socket is unref'd, dus dit houdt het afsluiten nooit tegen.
@@ -2855,3 +3279,9 @@ for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
   // landt, ook als dit vangnet toch nog vuurt.
   setTimeout(() => process.exit(0), Number(process.env.RTG_STOP_GRACE_MS || 20000)).unref();
 });
+
+/* Naar buiten toe is dit een startscript, geen module: niets require't
+   server.js. Toch geven we de app mee, zodat een gereedschap (scripts/
+   routekaart.js) de ECHT geregistreerde routes kan uitlezen in plaats van ze
+   uit de broncode te raden. Alleen lezen; de app draait al. */
+module.exports = { app, server };

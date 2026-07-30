@@ -1,11 +1,17 @@
 /* Member-submodule: de Berichten-app -- alle gesprekken van het hele platform op
    een plek: Rahul (de leden-chat), de priveberichten met vrienden (de sociale
    laag), de Berichtenbox van MijnOverheid, de sollicitatie-chats van de werk-app
-   en de reacties op je Pulse-berichten. De app leest alleen en verwijst door;
-   lezen/beantwoorden gebeurt in de bron-app (die houdt zelf de leesstanden bij).
-   Gemount vanuit routes/member.js. */
+   en de reacties op je Pulse-berichten.
+
+   Dit bestand levert de LIJST (met de vlaggen van het lid erop); de handelingen
+   -- zoeken, vlaggen zetten en de drie AI-taken -- staan in ./berichtenapp.js.
+   Prive-gesprekken worden sinds die ronde IN de app gelezen en beantwoord; de
+   overige kanalen verwijzen nog door naar hun bron-app, die zelf de leesstanden
+   bijhoudt. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan } = kern;
+  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan, rtmail, berichten } = kern;
+  // het RTMAIL-adres van dit lid: zijn codenaam (privacy by design)
+  const mijnCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
 
   app.post('/api/member/berichten', auth, (req, res) => {
     const mij = req.session.key;
@@ -16,7 +22,7 @@ module.exports = (kern) => {
       if (req.session.account) {
         const conv = convOf(req.session.account.id) || [];
         const l = conv[conv.length - 1];
-        kanalen.push({ soort: 'rahul', titel: 'Rahul', icoon: '✨', laatste: l ? String(l.text).slice(0, 120) : 'Stel me gerust een vraag.',
+        kanalen.push({ soort: 'rahul', titel: 'Rahul', icoon: 'ster', laatste: l ? String(l.text).slice(0, 120) : 'Stel me gerust een vraag.',
           at: l ? l.at : null, ongelezen: 0, link: '/apps/app.html' });
       }
     } catch (e) {}
@@ -30,7 +36,7 @@ module.exports = (kern) => {
         const l = chat.messages[chat.messages.length - 1];
         const gelezen = chat.read && chat.read[mij];
         const ongelezen = chat.messages.filter(m => m.from !== mij && (!gelezen || m.at > gelezen)).length;
-        kanalen.push({ soort: 'dm', titel: c.codename || codenaamVan(c.key), icoon: '💬',
+        kanalen.push({ soort: 'dm', key: c.key, titel: c.codename || codenaamVan(c.key), icoon: 'berichten',
           laatste: String(l.text || (l.post ? 'Deelde een Salon-post' : '')).slice(0, 120),
           at: l.at, ongelezen, link: '/apps/vrienden.html',
           // de wauw-laag reist mee: de dag-stemming en verjaardagsglans van je vriend
@@ -42,7 +48,7 @@ module.exports = (kern) => {
     try {
       const box = overheid.berichten(mij);
       const l = (box.berichten || [])[0];
-      if (l) kanalen.push({ soort: 'overheid', titel: 'Berichtenbox (MijnOverheid)', icoon: '🏛️',
+      if (l) kanalen.push({ soort: 'overheid', titel: 'Berichtenbox (MijnOverheid)', icoon: 'gebouw',
         laatste: l.titel, at: l.at, ongelezen: box.ongelezen || 0, link: '/apps/overheid.html' });
     } catch (e) {}
 
@@ -51,7 +57,7 @@ module.exports = (kern) => {
       for (const c of Object.values(db.data.applyChats || {})) {
         if (!c.applicant || c.applicant.kind !== 'rtg' || c.applicant.key !== mij) continue;
         const l = c.berichten[c.berichten.length - 1];
-        kanalen.push({ soort: 'werk', titel: c.bedrijf + ' · ' + c.func, icoon: '💼',
+        kanalen.push({ soort: 'werk', titel: c.bedrijf + ' · ' + c.func, icoon: 'werk',
           laatste: l ? String(l.tekst).slice(0, 120) : 'Sollicitatie gestart.',
           at: l ? l.at : c.at, ongelezen: l && l.van !== 'sollicitant' ? 1 : 0, link: '/apps/app.html' });
       }
@@ -63,11 +69,33 @@ module.exports = (kern) => {
       let laatste = null;
       let n = 0;
       for (const p of posts) for (const r of p.reacties) if (r.key !== mij) { n += 1; if (!laatste || r.at > laatste.at) laatste = r; }
-      if (laatste) kanalen.push({ soort: 'pulse', titel: 'Pulse-reacties', icoon: '⚡',
+      if (laatste) kanalen.push({ soort: 'pulse', titel: 'Pulse-reacties', icoon: 'flits',
         laatste: laatste.codenaam + ': ' + String(laatste.tekst).slice(0, 100), at: laatste.at, ongelezen: 0, link: '/apps/pulse.html' });
     } catch (e) {}
 
-    kanalen.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
-    res.json({ ok: true, kanalen: kanalen.slice(0, 60), ongelezen: kanalen.reduce((s, k) => s + (k.ongelezen || 0), 0) });
+    // 6. RTMAIL: het interne postvak (welkom + de automatiserings-seintjes)
+    try {
+      const codenaam = mijnCodenaam(req);
+      if (rtmail && codenaam) {
+        const vak = rtmail.postvak(codenaam, { limit: 1 });
+        const l = vak[0];
+        if (l) kanalen.push({ soort: 'rtmail', titel: 'RTMAIL', icoon: 'berichten',
+          laatste: l.onderwerp, at: l.at, ongelezen: rtmail.ongelezen(codenaam), link: '/apps/rtmail.html' });
+      }
+    } catch (e) {}
+
+    /* De vlaggen van dit lid erbij: vastgezette gesprekken bovenaan,
+       stilgezette tellen niet mee in de teller, gearchiveerde staan alleen in de
+       lijst als je er expliciet om vraagt (archief:true). Elk kanaal heeft een
+       vast id (soort + sleutel) waar de vlag aan hangt. */
+    const vlaggen = berichten.vlaggenVan(mij);
+    const idVan = k => k.soort === 'dm' ? 'dm:' + (k.key || k.titel) : k.soort;
+    for (const k of kanalen) { k.id = idVan(k); Object.assign(k, vlaggen[k.id] || {}); }
+    const archief = !!req.body.archief;
+    const zicht = kanalen.filter(k => archief ? k.weg : !k.weg);
+    zicht.sort((a, b) => (b.vast ? 1 : 0) - (a.vast ? 1 : 0) || String(b.at || '').localeCompare(String(a.at || '')));
+    res.json({ ok: true, kanalen: zicht.slice(0, 60), archief,
+      ongelezen: zicht.reduce((s, k) => s + (k.stil ? 0 : (k.ongelezen || 0)), 0),
+      inArchief: kanalen.filter(k => k.weg).length });
   });
 };

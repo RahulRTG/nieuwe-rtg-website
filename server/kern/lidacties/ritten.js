@@ -11,7 +11,7 @@ module.exports = (ctx) => {
 function vraagRitVoor(session, body) {
   if (session.tier === 'guest') return { status: 403, error: 'Alleen voor leden.' };
   const s = findSupplier(body.supplierCode);
-  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  const caps = s ? (db.capsVan(s)) : [];
   if (!s || !caps.includes('rides')) return { status: 404, error: 'Geen vervoerspartner gevonden.' };
   // activiteitenzaken rijden alleen hun eigen transfers: die regel je via je ticket
   if (s.type === 'activiteit') return { status: 409, error: 'De transfer van ' + s.name + ' regel je via je ticket (Ter plaatse, Mijn tickets).' };
@@ -64,7 +64,7 @@ function vraagRitVoor(session, body) {
   db.data.rides.unshift(ride);
   save();
   if (ride.status === 'aangevraagd') {
-    notifySupplier(s.code, { icon: '\u{1F697}', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
+    notifySupplier(s.code, { icon: 'auto', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }
@@ -91,7 +91,7 @@ function betaalRitVoor(session, body) {
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
   verdienPunten(session.key, r.quote - kortingR - voordeelR, r.supplierName);
   save();
-  notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? '\u2708\uFE0F' : '\u{1F697}', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
+  notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
   sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   pushLive(session.key);

@@ -6,6 +6,7 @@
 <title>RTG Lesmaker</title>
 <link rel="icon" href="/icons/foundation.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
   :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,.1);--txt:#F4F1EC;--muted:rgba(244,241,236,.68);--soft:rgba(244,241,236,.5);--gold:#A98F1C;--groen:#3E7A4E;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -39,6 +40,10 @@
   .leeg{color:var(--muted);text-align:center;padding:1.4rem 0;}
   .stap{display:none;} .stap.aan{display:block;}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
@@ -61,7 +66,7 @@
       <input class="veld" id="mAppZoek" maxlength="60" placeholder="Zoek in de School-, App- en Reis-Bibliotheek…">
       <div class="appkeus" id="mApps"></div>
       <div class="rij" style="margin-top:.9rem;">
-        <button class="knop" id="mGo">✨ Maak de les</button>
+        <button class="knop" id="mGo">Maak de les</button>
         <span class="stil2" id="mStatus"></span>
       </div>
     </div>
@@ -148,7 +153,7 @@ function teken(){
   } else { $('#lVraag').hidden = true; $('#lBalken').hidden = true; }
   const s = LES.stand || [];
   $('#lStand').innerHTML = s.length
-    ? (klaar ? '<h3 style="margin:.4rem 0;">🏆 Het podium</h3>' : '<div class="lbl">Tussenstand</div>')+
+    ? (klaar ? '<h3 style="margin:.4rem 0;">Het podium</h3>' : '<div class="lbl">Tussenstand</div>')+
       s.slice(0,10).map((x,i) => (i+1)+'. '+esc(x.naam)+' · <span>'+x.score+'</span> punten').join('<br>')
     : '<p class="leeg">Nog geen kinderen; deel de klascode.</p>';
 }
@@ -162,6 +167,9 @@ $('#lSluit').addEventListener('click', async () => {
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

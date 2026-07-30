@@ -5,10 +5,15 @@ module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
   const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding, lidBoard, lidBoardZet } = kern;
 
-// leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam)
+// leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam).
+// De eigen naamlaag zoekt mee: wie zijn vriend een eigen naam gaf, vindt
+// hem ook onder die naam -- alleen in het eigen account.
 app.post('/api/member/find', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  res.json({ results: await socialZoek(req.session.key, req.body.q) });
+  const q = String(req.body.q || '');
+  const viaEigen = kern.naamlaag ? kern.naamlaag.aliasNaar(req.session.key, q) : null;
+  const results = await socialZoek(req.session.key, viaEigen || q);
+  res.json({ results: kern.naamlaag ? kern.naamlaag.verrijk(req.session.key, results, 'codename') : results });
 });
 
 // verzoek sturen (mag ook naar een RTF-codenaam)
@@ -31,7 +36,9 @@ app.post('/api/member/connect/respond', auth, (req, res) => {
 app.post('/api/member/connections', auth, (req, res) => {
   if (geenGast(req, res)) return;
   const sc = socialConnecties(req.session.key);
-  res.json({ me: req.session.key, codename: liveCodename(req.session), connections: sc.connections, requests: sc.requests });
+  // de eigen naamlaag: elk contact draagt (alleen hier) het eigen etiket mee
+  const eigen = l => kern.naamlaag ? kern.naamlaag.verrijk(req.session.key, l, 'codename') : l;
+  res.json({ me: req.session.key, codename: liveCodename(req.session), connections: eigen(sc.connections), requests: eigen(sc.requests) });
 });
 
 // gesprek ophalen (en als gelezen markeren). Moedertaal: heeft de lezer een
@@ -58,7 +65,11 @@ app.post('/api/member/dm', auth, async (req, res) => {
       } catch (e) { return m; }
     }));
   }
-  res.json({ messages: uit, codename: codenaamVan(ander), taal: mijnTaal || null });
+  /* mij: is dit bericht van mij? De client kent zijn eigen sessiesleutel niet
+     (en hoort die niet te kennen), maar moet wel weten welke kant de bel op
+     staat. Een extra veld, dus bestaande lezers merken er niets van. */
+  res.json({ messages: uit.map(m => ({ ...m, mij: m.from === req.session.key })),
+    codename: codenaamVan(ander), taal: mijnTaal || null });
 });
 
 // bericht sturen; optioneel met een gedeelde Salon-post erbij
@@ -113,7 +124,7 @@ app.post('/api/member/snap/send', express.json({ limit: '1.5mb' }), auth, async 
   if (geenGast(req, res)) return;
   const r = await snapSturen(req.session.key, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true, vuurtje: r.vuurtje || 0 });
+  res.json({ ok: true });
 });
 app.post('/api/member/snaps', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ snaps: snapsVoor(req.session.key) }); });
 app.post('/api/member/snap/view', auth, async (req, res) => {

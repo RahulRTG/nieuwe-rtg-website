@@ -1,4 +1,4 @@
-/* De Butler-acties (kern/fluister): het doe-deel van de assistent. voerUit
+/* Rahul-acties (kern/fluister): het doe-deel van de assistent. voerUit
    voert een bevestigd voorstel uit (bestellen, Tik, tickets, behandeling,
    rit, 24-uursblok, reisplan) via exact dezelfde functies als de
    app-knoppen. Het gesprek zelf (fluisterZeg) woont in gesprek.js en
@@ -7,7 +7,7 @@ module.exports = (ctx) => {
   const { db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
-    butlerExtra, voerReisUit, voerKledingUit } = ctx;
+    rahulExtra, voerReisUit, voerKledingUit } = ctx;
 
   async function voerUit(key, codenaam, w, sess) {
     // bestellen: plaatsen en direct afrekenen via exact dezelfde functies

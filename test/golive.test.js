@@ -67,9 +67,20 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
   assert.equal((await post('/api/supplier/login', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (leveranciers)');
   assert.equal((await post('/api/staff', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (personeel)');
 
-  // en kaal http wordt onherroepelijk naar https gestuurd
-  const kaal = await fetch(BASE + '/api/health', { redirect: 'manual' });
+  /* En kaal http wordt onherroepelijk naar https gestuurd. Let op WELK adres
+     we daarvoor nemen: een gewone pagina, niet /api/health. De prikken van de
+     poortwachter (/api/health, /api/ready) en het interne clusterkanaal gaan
+     bewust NIET door die omleiding -- zij praten http op de loopback, en een
+     301 daarop betekende dat geen enkele server ooit gezond of actief werd en
+     de site in productie altijd 503 gaf. Deze test gebruikte /api/health als
+     voorbeeld en legde daarmee precies het verkeerde vast. Nu allebei de
+     kanten, zodat geen van beide stilletjes kan omslaan. */
+  const kaal = await fetch(BASE + '/', { redirect: 'manual' });
   assert.equal(kaal.status, 301, 'onbeveiligd http wordt doorgestuurd naar https');
+  const prik = await fetch(BASE + '/api/health', { redirect: 'manual' });
+  assert.equal(prik.status, 200, 'de gezondheidsprik wordt NIET omgeleid');
+  const klaar = await fetch(BASE + '/api/ready', { redirect: 'manual' });
+  assert.notEqual(klaar.status, 301, '/api/ready wordt NIET omgeleid');
 
   // echte registratie en inlog werken gewoon
   const reg = await post('/api/auth/register', { name: 'Eerste Lid', email: 'lid@echtdomein.nl', phone: '0612345678',
@@ -101,14 +112,21 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('de go-live-keuring keurt af zonder geheimen en goed met de complete set', () => {
+test('de go-live-keuring keurt af zonder geheimen, en met alle geheimen blijft het AVG-papierwerk de laatste poort', () => {
   const script = path.join(__dirname, '..', 'scripts', 'golive.js');
   const kaal = spawnSync(process.execPath, [script], {
     env: { PATH: process.env.PATH }, timeout: 20000, encoding: 'utf8'
   });
   assert.equal(kaal.status, 1, 'kale omgeving: niet klaar om live te gaan');
   assert.match(kaal.stdout, /NIET klaar/);
+  // Met een complete secrets-/configset is de techniek in orde, maar de keuring
+  // vult sinds de AVG-ronde ook het verwerkingsregister en het datalek-draaiboek
+  // echt in (met de antwoorden die Rahul heeft uitgevraagd) en blokkeert zolang
+  // daar plekken open staan. Dat is de bedoeling: zonder ingevuld papierwerk ga
+  // je niet live. RTG_DATA_DIR wijst hier naar een verse map, dus alles staat open.
   const goed = spawnSync(process.execPath, [script], { env: PROD_ENV, timeout: 20000, encoding: 'utf8' });
-  assert.equal(goed.status, 0, 'complete omgeving: klaar om live te gaan');
-  assert.match(goed.stdout, /Klaar om live te gaan/);
+  assert.match(goed.stdout, /Configuratie: geen blokkerende fouten/, 'de configuratie zelf is in orde');
+  assert.equal(goed.status, 1, 'maar het AVG-papierwerk is de laatste, bewuste poort');
+  assert.match(goed.stdout, /open plek\(ken\)/, 'de blokkade telt de open plekken in de AVG-documenten');
+  assert.match(goed.stdout, /vragen staan nog open/, 'en wijst naar de vragen die Rahul nog moet stellen');
 });

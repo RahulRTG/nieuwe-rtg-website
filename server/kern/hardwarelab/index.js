@@ -40,7 +40,7 @@ function maakHardwarelab({ db, save, crypto, anthropic, schoon }) {
   function publiek(o) {
     return {
       id: o.id, discipline: o.discipline, disciplineLabel: (DISCIPLINES[o.discipline] || {}).label || o.discipline,
-      icon: (DISCIPLINES[o.discipline] || {}).icon || '🔧',
+      icon: (DISCIPLINES[o.discipline] || {}).icon || 'gear',
       naam: o.naam, brief: o.brief, huis: o.huis || null, collectie: o.collectie || null,
       status: o.status, concept: o.concept || null, stuklijst: o.stuklijst || null,
       kritiek: o.kritiek || null, winkel: o.winkel || null,

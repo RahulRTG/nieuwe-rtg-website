@@ -68,14 +68,14 @@
 <div class="view" role="main">
   <div class="tab aan" id="tab-bord">
     <div class="boardbox"><canvas id="liveBord"></canvas><div class="wachtbord" id="wacht">Zodra de begeleider op het bord schrijft, zie je het hier live.</div></div>
-    <button class="knop groen" id="bewaarFoto">📸 Bewaar dit bord in mijn schrift</button>
+    <button class="knop groen" id="bewaarFoto">Bewaar dit bord in mijn schrift</button>
   </div>
 
   <div class="tab" id="tab-schrift">
     <div class="pgstrip" id="pgStrip"></div>
     <div class="schrijftools" id="tekentools" style="display:none;">
-      <button class="tbtn aan" data-tool="pen">✏️</button>
-      <button class="tbtn" data-tool="gum">🧽</button>
+      <button class="tbtn aan" data-tool="pen">✏</button>
+      <button class="tbtn" data-tool="gum">◻</button>
       <span class="kleur aan" data-kleur="#111111" style="background:#111"></span>
       <span class="kleur" data-kleur="#3f6fb0" style="background:#3f6fb0"></span>
       <span class="kleur" data-kleur="#b4574e" style="background:#b4574e"></span>
@@ -90,18 +90,18 @@
   <div class="tab" id="tab-agenda"><div id="agLijst"><div class="mini">Nog niets in de agenda.</div></div></div>
 
   <div class="tab" id="tab-bram">
-    <div class="tip" id="tipBox">💡 <b>Tip van de dag:</b> <span id="tipTxt">…</span></div>
+    <div class="tip" id="tipBox"><b>Tip van de dag:</b> <span id="tipTxt">…</span></div>
     <div class="chat" id="chat"></div>
     <div class="chatrij"><input class="veld" id="vraag" placeholder="Vraag om hulp met leren…"><button class="knop" id="stuur">Vraag</button></div>
   </div>
 </div>
 
 <div class="tabbar">
-  <button data-tab="bord" class="aan"><span class="ic">🖍️</span>Bord</button>
-  <button data-tab="schrift"><span class="ic">📓</span>Schrift</button>
-  <button data-tab="opgaven"><span class="ic">📝</span>Opgaven</button>
-  <button data-tab="agenda"><span class="ic">📅</span>Agenda</button>
-  <button data-tab="bram"><span class="ic">🤖</span><span id="tabBuddyNaam">Rahul</span></button>
+  <button data-tab="bord" class="aan"><span class="ic">✎</span>Bord</button>
+  <button data-tab="schrift"><span class="ic">▤</span>Schrift</button>
+  <button data-tab="opgaven"><span class="ic">✍</span>Opgaven</button>
+  <button data-tab="agenda"><span class="ic">▦</span>Agenda</button>
+  <button data-tab="bram"><span class="ic">◉</span><span id="tabBuddyNaam">Rahul</span></button>
 </div>
 
 <script src="tekenen.js"></script>
@@ -141,7 +141,7 @@ function vangHuidigeTekening(){ if(tekenbord && pages[huidig] && pages[huidig].t
 async function bewaar(){ vangHuidigeTekening(); try{ await api('/schrift/opslaan',{ pages }); $('#bewaard').textContent='opgeslagen'; }catch(e){ $('#bewaard').textContent='niet opgeslagen'; } }
 function tekenStrip(){
   const strip=$('#pgStrip');
-  strip.innerHTML = pages.map((p,i)=> '<div class="pg '+(i===huidig?'aan':'')+'" data-i="'+i+'">'+(p.type==='tekening'?'✎':p.type==='foto'?'📷':(i+1))+'</div>').join('')
+  strip.innerHTML = pages.map((p,i)=> '<div class="pg '+(i===huidig?'aan':'')+'" data-i="'+i+'">'+(p.type==='tekening'?'✎':p.type==='foto'?'◨':(i+1))+'</div>').join('')
     + '<div class="pg add" data-add="tekst" title="Tekstblad">T</div><div class="pg add" data-add="tekening" title="Tekenblad">✎</div>';
   strip.querySelectorAll('[data-i]').forEach(el=> el.addEventListener('click', ()=>{ vangHuidigeTekening(); huidig=Number(el.dataset.i); huidigePagina(); tekenStrip(); }));
   strip.querySelectorAll('[data-add]').forEach(el=> el.addEventListener('click', ()=>{ vangHuidigeTekening(); pages.push(el.dataset.add==='tekening'?{type:'tekening',titel:'',strokes:[]}:{type:'tekst',titel:'',inhoud:''}); huidig=pages.length-1; huidigePagina(); tekenStrip(); markDirty(); }));
@@ -184,7 +184,7 @@ function buddyKeuze(){ try{ return localStorage.getItem('rtf_buddy')||'vrouw'; }
 function groepVan(){ return document.documentElement.getAttribute('data-rtf-groep')||''; }
 // de tab en het vraagveld dragen de naam van de gekozen buddy
 (function(){ const n=BUDDYNM[buddyKeuze()]||'Rahul'; const t=$('#tabBuddyNaam'); if(t) t.textContent=n; const v=$('#vraag'); if(v) v.placeholder='Vraag '+n+' om hulp met leren…'; })();
-let gesprek=[{role:'assistant',content:'Hoi! Ik ben '+(BUDDYNM[buddyKeuze()]||'Rahul')+', je bijleshulp. Waar ben je mee bezig? Ik help je graag op weg, zonder het antwoord zomaar te geven. 😊'}];
+let gesprek=[{role:'assistant',content:'Hoi! Ik ben '+(BUDDYNM[buddyKeuze()]||'Rahul')+', je bijleshulp. Waar ben je mee bezig? Ik help je graag op weg, zonder het antwoord zomaar te geven.'}];
 function toonChat(){ $('#chat').innerHTML = gesprek.map(m=> '<div class="bubbel '+(m.role==='user'?'ik':'bram')+'">'+esc(m.content)+'</div>').join(''); $('#chat').scrollTop=1e9; }
 async function vraagBram(){
   const t=$('#vraag').value.trim(); if(!t) return;
@@ -216,6 +216,11 @@ window.addEventListener('beforeunload', ()=>{ try{ vangHuidigeTekening(); naviga
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

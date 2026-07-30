@@ -4,6 +4,8 @@
 module.exports = (sctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
+  // "mijn klas" = ik heb hem gemaakt OF ik sta vast op het lerarenteam
+  const vanLeraar = (k, p) => k.leraarId === p.id || (k.leraren || []).some(x => x.id === p.id);
   router.post('/school/school/maak', (req, res) => {
     const naam = schoon(req.body.naam, 80);
     const plaats = schoon(req.body.plaats, 60);
@@ -35,7 +37,7 @@ module.exports = (sctx) => {
     const pv = personeelVan(req, res); if (!pv) return;
     const { sch, p } = pv;
     const klassen = p.status === 'actief' && p.rol === 'leraar'
-      ? Object.values(K()).filter(k => k.schoolCode === sch.code && k.leraarId === p.id).map(klasSamenvatting)
+      ? Object.values(K()).filter(k => k.schoolCode === sch.code && vanLeraar(k, p)).map(klasSamenvatting)
       : [];
     res.json({ ok: true, naam: p.naam, rol: p.rol, status: p.status,
       school: { naam: sch.naam, plaats: sch.plaats, code: sch.code, status: sch.status || 'actief' }, klassen });
@@ -94,7 +96,7 @@ module.exports = (sctx) => {
     const pv = personeelVan(req, res); if (!pv) return;
     const { sch, p } = pv;
     if (p.status !== 'actief') return res.status(403).json({ error: 'De school moet je aanmelding eerst goedkeuren.' });
-    const klassen = Object.values(K()).filter(k => k.schoolCode === sch.code && k.leraarId === p.id).map(klasSamenvatting);
+    const klassen = Object.values(K()).filter(k => k.schoolCode === sch.code && vanLeraar(k, p)).map(klasSamenvatting);
     res.json({ ok: true, naam: p.naam, school: sch.naam, klassen });
   });
 

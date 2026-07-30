@@ -8,6 +8,12 @@
    Draait alleen met DATABASE_URL + pg; anders overgeslagen.
      DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtgtest \
        node --test test/chaos.pg.test.js */
+/* LET OP -- deze toets vraagt de database VOOR ZICHZELF. Verschillende
+   PG-toetsen maken en droppen dezelfde tabellen (kv, tx_ledger, users), en
+   `node --test` draait bestanden standaard PARALLEL: dan trekt de een de tabel
+   onder de ander weg en zie je "spookfouten" die niets met de code te maken
+   hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
+   eigen database). */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

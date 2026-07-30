@@ -38,13 +38,18 @@
 </head>
 <body>
 <header>
-  <div><div class="ey">RTFoundation</div><h1>🏛️ RTF-kantoor</h1></div>
+  <div><div class="ey">RTFoundation</div><h1>RTF-kantoor</h1></div>
   <a href="clubswerk.html">Clubs & steden</a>
+  <a href="partner.html">Stadsraad-portaal</a>
   <a href="/apps/lab.html">Onderzoekslab</a>
 </header>
 <main id="main">
   <div class="kaart"><div class="sec">Het huis in een oogopslag</div><div class="rij" id="top"><div class="leeg">Laden...</div></div></div>
   <div class="grid" id="grid"></div>
+  <div class="kaart" id="raadKaart">
+    <div class="sec">De Stadsraad -- samen met de stadspartners beslissen over lab-uitslagen</div>
+    <div id="raadIn"><div class="leeg">Laden...</div></div>
+  </div>
   <div id="kamer" hidden>
     <div class="kaart">
       <div class="rij" style="justify-content:space-between;"><h2 id="kNaam" style="font-size:1.1rem;"></h2><button class="knop stil" id="terug">← Alle kamers</button></div>
@@ -53,15 +58,30 @@
     </div>
     <div class="kaart" style="margin-top:.7rem;"><div class="sec">Werklijsten</div><div id="kLijsten"></div></div>
     <div class="kaart" style="margin-top:.7rem;">
+      <div class="sec">Rahul denkt mee in deze kamer</div>
+      <div class="rij" style="margin-bottom:.5rem;">
+        <input class="veld" id="aVraag" placeholder="Stel een vraag, of laat leeg" maxlength="300" aria-label="Vraag aan Rahul">
+        <button class="knop" id="aVraag2">Vraag</button>
+      </div>
+      <div id="kAdvies" class="leeg">Rahul kijkt naar de cijfers van deze kamer en zegt wat opvalt. Hij adviseert; u beslist.</div>
+    </div>
+    <div class="kaart" style="margin-top:.7rem;">
       <div class="sec">Taken van deze kamer</div>
       <div class="rij" style="margin-bottom:.5rem;"><input class="veld" id="tTekst" placeholder="Nieuwe taak" maxlength="200"><button class="knop" id="tMaak">+</button></div>
       <div id="kTaken"></div>
     </div>
   </div>
 </main>
+<script src="/shared/glyf.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Het kamericoon als huisstijl-glyf; ontbreekt de glyf, dan valt de kop stil
+// terug op alleen de naam (nooit een leeg vierkantje of een emoji).
+const glyf = naam => {
+  const s = (window.RTGGlyf && RTGGlyf.svgHTML) ? RTGGlyf.svgHTML(String(naam || ''), { klasse: 'kic' }) : '';
+  return s ? s + ' ' : '';
+};
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
 function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
 if (!TOKEN) uitgelogd();
@@ -78,7 +98,7 @@ async function laad(){
     '<div class="stat"><b>' + o.lab.projecten + '</b><i>lab-projecten</i></div>' +
     '<div class="stat"><b>' + o.takenOpen + '</b><i>taken open</i></div>';
   $('#grid').innerHTML = k.kamers.map(x => '<div class="kaart kamer" data-id="' + x.id + '">' +
-    '<div class="rij" style="justify-content:space-between;"><h2>' + x.emoji + ' ' + esc(x.naam) + '</h2>' + (x.takenOpen ? '<span class="pil">' + x.takenOpen + ' taken</span>' : '') + '</div>' +
+    '<div class="rij" style="justify-content:space-between;"><h2>' + glyf(x.icoon) + esc(x.naam) + '</h2>' + (x.takenOpen ? '<span class="pil">' + x.takenOpen + ' taken</span>' : '') + '</div>' +
     '<div class="mi">' + esc(x.missie) + '</div>' +
     (x.kpi ? '<div class="kpi">' + esc(x.kpi[0]) + ': <b>' + esc(x.kpi[1]) + '</b></div>' : '') + '</div>').join('');
   document.querySelectorAll('.kamer').forEach(el => el.addEventListener('click', () => open(el.dataset.id)));
@@ -87,7 +107,7 @@ async function open(id){
   KAMER = id;
   const d = await api('kamer', { id });
   $('#grid').hidden = true; $('#kamer').hidden = false;
-  $('#kNaam').textContent = d.emoji + ' ' + d.naam;
+  $('#kNaam').innerHTML = glyf(d.icoon) + esc(d.naam);
   $('#kMissie').textContent = d.missie;
   $('#kKpis').innerHTML = d.kpis.map(k => '<div class="stat"><b>' + esc(k.waarde) + '</b><i>' + esc(k.label) + '</i></div>').join('');
   $('#kLijsten').innerHTML = d.lijsten.map(l => '<div class="sec" style="margin-top:.5rem;">' + esc(l.titel) + '</div>' +
@@ -100,6 +120,49 @@ function toonTaken(taken){
     await api('kamer/taak-zet', { id: KAMER, taakId: c.dataset.id, af: c.checked }); open(KAMER);
   }));
 }
+$('#aVraag2').addEventListener('click', async () => {
+  const doel = $('#kAdvies');
+  doel.textContent = 'Rahul kijkt...';
+  try {
+    const r = await api('kamer/advies', { id: KAMER, vraag: $('#aVraag').value.trim() });
+    doel.innerHTML = '<div>' + esc(r.antwoord) + '</div>' +
+      (r.punten && r.punten.length ? '<ul style="margin-top:.5rem;">' + r.punten.map(p => '<li>· ' + esc(p) + '</li>').join('') + '</ul>' : '');
+  } catch (e) { doel.textContent = e.message; }
+});
+/* ---------- De Stadsraad: per stad een invloedrijke partner; RTG-personeel
+   en de partner beslissen SAMEN over de lab-uitslagen (rtf/samen-werk). ---------- */
+async function raadLaad(){
+  let d; try { d = await api('stadsraad'); } catch (e) { $('#raadIn').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
+  const partners = (d.partners || []).map(p => '<div class="taak' + (p.actief ? '' : ' af') + '"><span><b>' + esc(p.stad) + '</b> -- ' + esc(p.naam) + ' (' + esc(p.soort) + ')' + (p.actief ? ' · raadcode <b>' + esc(p.code) + '</b>' : ' · gestopt') + '</span>' + (p.actief ? '<button class="knop stil" data-stop="' + esc(p.id) + '" style="margin-left:auto;font-size:.72rem;padding:.25rem .6rem;">Stop</button>' : '') + '</div>').join('') || '<div class="leeg">Nog geen stadspartners. Elke stad krijgt er precies een.</div>';
+  const uitslagen = (d.uitslagen || []).map(u => '<div class="taak"><span><b>' + esc(u.titel) + '</b> · ' + esc(u.fase) + ' · ' + u.bevindingen.length + ' bevinding(en)</span><button class="knop stil" data-voorstel="' + esc(u.id) + '" style="margin-left:auto;font-size:.72rem;padding:.25rem .6rem;">Voorstel</button></div>').join('') || '<div class="leeg">Nog geen uitslagen op de raadstafel (rtf- en samen-onderzoek met bevindingen).</div>';
+  const besluiten = (d.besluiten || []).map(b => {
+    const stemmen = b.stemmen.map(s => (s.voor ? '✓ ' : '✕ ') + esc(s.wie) + ' (' + s.kant + ')').join(' · ') || 'nog geen stemmen';
+    const knoppen = b.status === 'open'
+      ? '<div class="rij" style="margin-top:.3rem;"><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="1" style="font-size:.72rem;padding:.25rem .6rem;">Voor</button><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="0" style="font-size:.72rem;padding:.25rem .6rem;">Tegen</button><button class="knop stil" data-sluit="' + esc(b.id) + '" style="font-size:.72rem;padding:.25rem .6rem;">Sluit besluit</button></div>'
+      : '';
+    return '<div style="border-bottom:1px solid var(--line);padding:.45rem 0;font-size:.84rem;"><b>' + esc(b.titel) + '</b> -- ' + esc(b.voorstel) + '<div class="kpi">door ' + esc(b.door) + ' · status: <b>' + esc(b.status) + '</b>' + (b.uitslag ? ' (' + esc(b.uitslag) + ')' : '') + '</div><div class="kpi">' + stemmen + '</div>' + knoppen + '</div>';
+  }).join('') || '<div class="leeg">Nog geen besluiten.</div>';
+  $('#raadIn').innerHTML =
+    '<div class="sec" style="margin-top:.4rem;">Stadspartners (een per stad)</div>' + partners +
+    '<div class="rij" style="margin:.5rem 0 .2rem;"><input class="veld" id="pStad" placeholder="Stad"><input class="veld" id="pNaam" placeholder="Naam van de foundation of club"><select class="veld" id="pSoort" style="flex:0 0 8rem;"><option value="foundation">foundation</option><option value="club">club</option><option value="instelling">instelling</option></select><button class="knop" id="pMaak">Partner toevoegen</button></div>' +
+    '<div class="sec" style="margin-top:.6rem;">Lab-uitslagen op de raadstafel</div>' + uitslagen +
+    '<div class="sec" style="margin-top:.6rem;">Besluiten</div>' + besluiten;
+  $('#pMaak').addEventListener('click', async () => {
+    try { await api('stadsraad/partner-maak', { stad: $('#pStad').value.trim(), naam: $('#pNaam').value.trim(), soort: $('#pSoort').value }); raadLaad(); }
+    catch (e) { alert(e.message); }
+  });
+  document.querySelectorAll('[data-stop]').forEach(b => b.addEventListener('click', async () => { try { await api('stadsraad/partner-stop', { id: b.dataset.stop }); } catch (e) { alert(e.message); } raadLaad(); }));
+  document.querySelectorAll('[data-voorstel]').forEach(b => b.addEventListener('click', async () => {
+    const v = prompt('Wat stelt het kantoor voor met deze uitslag?'); if (!v) return;
+    try { await api('stadsraad/besluit-start', { projectId: b.dataset.voorstel, voorstel: v }); raadLaad(); } catch (e) { alert(e.message); }
+  }));
+  document.querySelectorAll('[data-stem]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('stadsraad/stem', { besluitId: b.dataset.stem, naam: 'Kantoor', voor: b.dataset.voor === '1' }); raadLaad(); } catch (e) { alert(e.message); }
+  }));
+  document.querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('stadsraad/besluit-sluit', { besluitId: b.dataset.sluit }); raadLaad(); } catch (e) { alert(e.message); }
+  }));
+}
 $('#terug').addEventListener('click', () => { $('#kamer').hidden = true; $('#grid').hidden = false; laad(); });
 $('#tMaak').addEventListener('click', async () => {
   const t = $('#tTekst').value.trim(); if (!t) return;
@@ -107,9 +170,14 @@ $('#tMaak').addEventListener('click', async () => {
   $('#tTekst').value = ''; toonTaken(r.taken);
 });
 laad().catch(e => { $('#top').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+raadLaad();
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

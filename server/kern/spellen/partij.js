@@ -7,7 +7,9 @@ module.exports = (ctx) => {
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
     mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
     pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
-    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet } = ctx;
+    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
+    flitsZet, flitsView, reactieZet, reactieView, quizZet, quizView, schatZet, schatView,
+    geheugenZet, geheugenView, ordeZet, ordeView } = ctx;
   /* De staat zoals EEN speler hem mag zien (handen en rekken van anderen
      blijven verborgen). Een expliciete map per soort: een nieuw spel zonder
      eigen weergave faalt luid in plaats van stil als Woordduel te renderen. */
@@ -26,7 +28,9 @@ module.exports = (ctx) => {
       return { scores: st.scores, kaart: st.kaart && p.spelers.indexOf(mij) !== rader ? st.kaart : null, tot: st.tot, rader, bezig: !!st.kaart };
     },
     waarheid: (p, st) => ({ punten: p.spelers.map(sp => st.punten[sp]), kaart: st.kaart, wat: st.wat, doel: 8 }),
-    proost: (p, st) => ({ kaart: st.kaart, teller: st.teller, totaal: st.totaal })
+    proost: (p, st) => ({ kaart: st.kaart, teller: st.teller, totaal: st.totaal }),
+    flits: flitsView, reactie: reactieView, quiz: quizView, schat: schatView,
+    geheugen: geheugenView, orde: ordeView
   };
   function spelStaat(mij, id, metVelden) {
     const p = S().potjes[id];
@@ -41,7 +45,7 @@ module.exports = (ctx) => {
     }
     return { status: 200, potje: uit };
   }
-  const ZETTEN = { mejn: mejnZet, schaak: schaakZet, woord: woordZet, pesten: pestenZet, dam: damZet, rummi: rummiZet, magnaat: magnaatZet, seconden: secondenZet, waarheid: waarheidZet, proost: proostZet };
+  const ZETTEN = { mejn: mejnZet, schaak: schaakZet, woord: woordZet, pesten: pestenZet, dam: damZet, rummi: rummiZet, magnaat: magnaatZet, seconden: secondenZet, waarheid: waarheidZet, proost: proostZet, flits: flitsZet, reactie: reactieZet, quiz: quizZet, schat: schatZet, geheugen: geheugenZet, orde: ordeZet };
   function spelZet(mij, id, zet) {
     const p = S().potjes[id];
     if (!p || !p.spelers.includes(mij)) return { status: 404, error: 'Dit potje bestaat niet (meer).' };

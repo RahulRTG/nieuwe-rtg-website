@@ -6,6 +6,7 @@
 <title>Gemeente-loket (medewerker)</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
@@ -42,6 +43,10 @@
   .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
   .login .veld{width:100%;margin-bottom:.6rem;}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header>
@@ -76,7 +81,7 @@
 </main>
 
 <div class="melding" id="melding" role="status"></div>
-<button class="rahulfab" id="rahulFab" type="button" style="display:none;">✨ Vraag Rahul</button>
+<button class="rahulfab" id="rahulFab" type="button" style="display:none;">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Rahul · gemeentebalie</b><button class="knop stil" id="rahulSluit" type="button" aria-label="Sluiten" style="padding:.2rem .55rem;">✕</button></div>
   <div class="rahulsug" id="rahulSug"></div>
@@ -247,6 +252,9 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

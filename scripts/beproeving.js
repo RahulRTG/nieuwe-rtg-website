@@ -52,7 +52,9 @@
                                 node --max-old-space-size=8192 scripts/beproeving.js
    Knoppen (env): MEGA_LEDEN, MEGA_CHUNK, SOAK_MIN, STORM_WERKERS, MEGA_SEED,
                   SLO_P99_MS (2000), SLO_DEKKING (3), SLO_VLOER_MBMIN (40),
-                  MEGA_PSQL, RUIS_UIT (=1: schaal de latentie-lat niet mee).
+                  MEGA_PSQL, RUIS_UIT (=1: schaal de latentie-lat niet mee),
+                  STRENG (=1: de lat 10x scherper -- dekking 30, lek-vloer 4,
+                  latentie-SLO 200 ms, meer werkers, extra lek-ronde).
    ============================================================================ */
 const { spawn, execFileSync } = require('child_process');
 const fs = require('fs'), os = require('os'), path = require('path');
@@ -71,13 +73,27 @@ const N_BETAAL = Number(process.env.MEGA_BETAAL || (MODE === 'postgres' ? 200000
 const N_VERZ = Number(process.env.MEGA_VERZ || (MODE === 'postgres' ? 100000 : 0));
 const N_MELD = Number(process.env.MEGA_MELD || (MODE === 'postgres' ? 100000 : 0));
 const N_REVIEW = Number(process.env.MEGA_REVIEW || (MODE === 'postgres' ? 60000 : 0));
+/* STRENG=1: de standaardlat 10x scherper. Elke drempel die een echte regressie
+   vangt gaat een orde strakker (dekking 3->30, lek-vloer 40->4 MB/min, latentie-
+   SLO 2000->200 ms), met meer werkers (meer gelijktijdigheid = meer race-
+   blootstelling), een langere storm en een extra lek-ronde. De machine-ruis
+   schaalt de latentie-lat nog steeds mee, zodat het een echte, haalbare lat
+   blijft die regressies vangt in plaats van een onmogelijke muur. */
+const STRENG = process.env.STRENG === '1';
 const SOAK_MS = Number(process.env.SOAK_MIN || (MODE === 'postgres' ? 20 : 3)) * 60000;
-const WERKERS = Number(process.env.STORM_WERKERS || (MODE === 'postgres' ? 24 : 12));
-const SLO_P99_MS = Number(process.env.SLO_P99_MS || 2000);
-const SLO_DEKKING = Number(process.env.SLO_DEKKING || 3);
-const SLO_VLOER = Number(process.env.SLO_VLOER_MBMIN || 40);
+const WERKERS = Number(process.env.STORM_WERKERS || (MODE === 'postgres' ? (STRENG ? 48 : 24) : (STRENG ? 24 : 12)));
+/* De 10x-strenge latentie-lat (200 ms) geldt voor de in-memory sqlite-standaard
+   (bewezen p99 ~55 ms). In postgres-modus dragen echte DB-heen-en-weertjes en de
+   write-behind-flush onder 48-voudige schrijf-chaos het p99; die tegen een
+   in-memory lat van 200 ms houden zou een onhaalbare, nietszeggende muur zijn.
+   De mega-schaal houdt daarom de DB-realistische 2000 ms-lat -- de overige 10x-
+   verscherpingen (dekking 30, lek-vloer 4, 48 werkers, extra lek-ronde) gelden er
+   onverkort. */
+const SLO_P99_MS = Number(process.env.SLO_P99_MS || ((STRENG && MODE !== 'postgres') ? 200 : 2000));
+const SLO_DEKKING = Number(process.env.SLO_DEKKING || (STRENG ? 30 : 3));
+const SLO_VLOER = Number(process.env.SLO_VLOER_MBMIN || (STRENG ? 4 : 40));
 const LEK_MS = Number(process.env.LEK_MS || (MODE === 'postgres' ? 30000 : 15000));
-const LEK_RONDES = Number(process.env.LEK_RONDES || (MODE === 'postgres' ? 3 : 2));
+const LEK_RONDES = Number(process.env.LEK_RONDES || (MODE === 'postgres' ? 3 : (STRENG ? 3 : 2)));
 
 function vindPsql() {
   if (process.env.MEGA_PSQL) return process.env.MEGA_PSQL;
@@ -276,6 +292,15 @@ function stopNet(ms) {
 /* ---------- Postgres: 100M + activiteit zaaien (alleen mega-modus) ---------- */
 async function zaaiPostgres() {
   const { Pool } = require('../server/pgwire');
+  /* Controle-vlak schoonvegen (test-hygiene). Een HERGEBRUIKTE Postgres-DB kan
+     uit een vorige run een GETRIPTE zekering dragen -- de chaos-storm fuzzt de
+     schakelkast/techniek en kan bijv. de registratie-zekering uitzetten. Die
+     staat blijft dan in kv staan en de volgende run start met "registreren
+     uitgeschakeld" (503), waardoor Fase B/D omvallen op een spookoorzaak. We
+     wissen daarom de vluchtige controle-vlak-sleutels; ze herstellen bij het
+     opstarten naar de standaard (alles aan). De ledengids en de accounts raken
+     we niet aan. (In CI draait dit tegen een wegwerp-DB en is het een no-op.) */
+  try { psql("DELETE FROM kv WHERE key IN ('techniek','appregie','ledenregie','geldregie','leveranciersregie')"); } catch (e) {}
   psql('DROP INDEX IF EXISTS member_dir_codename_lower'); psql('DROP INDEX IF EXISTS member_dir_codename_trgm'); psql('TRUNCATE member_dir');
   for (let s = 1; s <= LEDEN; s += CHUNK) {
     const e = Math.min(s + CHUNK - 1, LEDEN); const tc = Date.now();
@@ -283,7 +308,12 @@ async function zaaiPostgres() {
     process.stdout.write('  ' + ('member_dir +' + nl(e - s + 1)).padEnd(46) + ' \x1b[36m' + (Date.now() - tc) + ' ms\x1b[0m\n');
   }
   psql('CREATE INDEX member_dir_codename_lower ON member_dir(codename_lower)');
-  try { psql('CREATE EXTENSION IF NOT EXISTS pg_trgm'); psql('CREATE INDEX member_dir_codename_trgm ON member_dir USING gin(codename_lower gin_trgm_ops)'); } catch (e) {}
+  // De trgm-gin (fuzzy zoeken) is de duurste index qua schijf en bouwtijd. Op de
+  // echte 100M-schaal met een krappe schijf kun je hem overslaan (MEGA_TRGM=0);
+  // de btree op codename_lower blijft de exacte-zoek/buiten-RAM-belofte bewijzen.
+  if (process.env.MEGA_TRGM !== '0') {
+    try { psql('CREATE EXTENSION IF NOT EXISTS pg_trgm'); psql('CREATE INDEX member_dir_codename_trgm ON member_dir USING gin(codename_lower gin_trgm_ops)'); } catch (e) {}
+  }
   const pool = new Pool({ connectionString: DB, max: 4 });
   const NU = Date.now();
   const SUPS = ['KIKUNOI', 'PONTO', 'HOSHI', 'SAKURA', 'MKKX'];
@@ -340,11 +370,21 @@ async function allesAan(office) { try { return (await post('/api/office/boardroo
 /* ============================================================================
    GELD-INTEGRITEIT -- op de cent, idempotent, en bestand tegen onzin.
    ============================================================================ */
+// een 1x1 PNG als geldig "paspoort" voor de KYC-upload (de poort eist een echte
+// afbeelding, niet de inhoud). Zo doorloopt het testlid dezelfde eenmalige
+// identiteitsstap die een echt gratis lid bij het eerste RTG Pay-moment doet.
+const KYC_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 async function registreerAccount(merk) {
   const email = merk + '+' + Date.now().toString(36) + rint(1e6).toString(36) + '@beproeving.test';
   const ww = 'Geheim' + rint(1e6) + '!';
   const r = await post('/api/auth/register', { name: 'Beproeving ' + merk, email, phone: '06' + (10000000 + rint(8e7)), password: ww, geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
-  return { email, ww, token: r.data && r.data.token, status: r.status };
+  const token = r.data && r.data.token;
+  // Een gratis RTG-lid laat eenmalig zijn paspoort zien voor het eerste RTG
+  // Pay-moment (merkregel). Het testlid doorloopt diezelfde stap, anders toetst
+  // Fase B niet het geld maar de KYC-poort (en zou vacuous slagen op 0 -> 0).
+  let kyc = 'n/a';
+  if (token) { const u = await post('/api/verify/upload', { image: KYC_PNG }, token); kyc = u.data && u.data.status || u.status; }
+  return { email, ww, token, status: r.status, kyc };
 }
 async function saldoVan(token) { const r = await post('/api/pay/overzicht', {}, token); return { saldo: r.data && typeof r.data.saldo === 'number' ? r.data.saldo : null, codenaam: r.data && r.data.codenaam }; }
 
@@ -521,7 +561,13 @@ async function misbruikBeproeving(tok) {
   // ---------- FASE D: DUURZAAMHEID NA HERSTART ----------
   kop('FASE D: DUURZAAMHEID - herstart met de volle kast');
   const duurFouten = [];
-  if (geld.A && geld.A.token && geld.bCode) {
+  // De duurzaamheid mag niet vacuous slagen: als Fase B geen echt geld bewoog
+  // (saldo 0 -> 0), bewijst "overleefde de herstart" niets. Eis dus dat er echt
+  // saldo stond voor we de persistentie ervan toetsen.
+  if (geld.A && geld.A.token && geld.bCode && !(geld.saldoB > 0)) {
+    duurFouten.push('Fase B bewoog geen echt geld (saldo B = ' + geld.saldoB + '); duurzaamheid zou vacuous slagen');
+    rij('  DUURZAAMHEID', 'niet-toetsbaar: ' + duurFouten[0]);
+  } else if (geld.A && geld.A.token && geld.bCode) {
     await stopNet(); const tB = Date.now(); await boot();   // nette herstart: de server flusht zijn write-behind
     rij('herstart-tijd', ((Date.now() - tB) / 1000).toFixed(1) + ' s');
     await new Promise(r => setTimeout(r, 1500));

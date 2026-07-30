@@ -1,0 +1,53 @@
+/* Reisregels, regio Europa. Rijformaat (uitgevouwen door ../reis.js):
+   [code, visum, dagen, rijden, alarm, water, letOp?]
+   visum: geen (vrij verblijf, EU/Schengen) | vrij (visumvrij tot N dagen) |
+   toestemming (elektronische reistoestemming vooraf) | aankomst | evisum |
+   visum (vooraf via ambassade). Indicatie voor een Nederlands paspoort;
+   de Regelwacht werkt de rijen automatisch bij. */
+module.exports = ['Europa', 'Afronden of 5-10% bij goede service is gebruikelijk', [
+  ['NL', 'geen', 0, 'rechts', '112', 1],
+  ['BE', 'geen', 0, 'rechts', '112', 1],
+  ['DE', 'geen', 0, 'rechts', '112', 1],
+  ['FR', 'geen', 0, 'rechts', '112', 1],
+  ['ES', 'geen', 0, 'rechts', '112', 1],
+  ['AL', 'vrij', 90, 'rechts', '112', 0],
+  ['AD', 'geen', 0, 'rechts', '112', 1],
+  ['AT', 'geen', 0, 'rechts', '112', 1],
+  ['BA', 'vrij', 90, 'rechts', '112', 1],
+  ['BG', 'geen', 0, 'rechts', '112', 1],
+  ['BY', 'visum', 0, 'rechts', '112', 0],
+  ['CH', 'geen', 0, 'rechts', '112', 1],
+  ['CY', 'geen', 0, 'links', '112', 1],
+  ['CZ', 'geen', 0, 'rechts', '112', 1],
+  ['DK', 'geen', 0, 'rechts', '112', 1],
+  ['EE', 'geen', 0, 'rechts', '112', 1],
+  ['FI', 'geen', 0, 'rechts', '112', 1],
+  ['GB', 'toestemming', 180, 'links', '999', 1, 'Elektronische reistoestemming (ETA) vooraf aanvragen'],
+  ['GR', 'geen', 0, 'rechts', '112', 1],
+  ['HR', 'geen', 0, 'rechts', '112', 1],
+  ['HU', 'geen', 0, 'rechts', '112', 1],
+  ['IE', 'geen', 0, 'links', '112', 1],
+  ['IS', 'geen', 0, 'rechts', '112', 1],
+  ['IT', 'geen', 0, 'rechts', '112', 1],
+  ['LI', 'geen', 0, 'rechts', '112', 1],
+  ['LT', 'geen', 0, 'rechts', '112', 1],
+  ['LU', 'geen', 0, 'rechts', '112', 1],
+  ['LV', 'geen', 0, 'rechts', '112', 1],
+  ['MC', 'geen', 0, 'rechts', '112', 1],
+  ['MD', 'vrij', 90, 'rechts', '112', 0],
+  ['ME', 'vrij', 90, 'rechts', '112', 1],
+  ['MK', 'vrij', 90, 'rechts', '112', 1],
+  ['MT', 'geen', 0, 'links', '112', 1],
+  ['NO', 'geen', 0, 'rechts', '112', 1],
+  ['PL', 'geen', 0, 'rechts', '112', 1],
+  ['PT', 'geen', 0, 'rechts', '112', 1],
+  ['RO', 'geen', 0, 'rechts', '112', 1],
+  ['RS', 'vrij', 90, 'rechts', '112', 1],
+  ['RU', 'visum', 0, 'rechts', '112', 0, 'Controleer het actuele reisadvies voor vertrek'],
+  ['SE', 'geen', 0, 'rechts', '112', 1],
+  ['SI', 'geen', 0, 'rechts', '112', 1],
+  ['SK', 'geen', 0, 'rechts', '112', 1],
+  ['SM', 'geen', 0, 'rechts', '112', 1],
+  ['TR', 'vrij', 90, 'rechts', '112', 0],
+  ['UA', 'vrij', 90, 'rechts', '112', 0, 'Controleer het actuele reisadvies voor vertrek']
+]];

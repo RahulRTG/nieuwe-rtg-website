@@ -85,7 +85,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
   }
   // een bericht van de sollicitant laat de werkgever meteen iets weten
   function meldWerkgever(chat, tekst) {
-    notifySupplier(chat.supplierCode, { icon: '💬', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80) });
+    notifySupplier(chat.supplierCode, { icon: 'berichten', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80) });
   }
 
   /* Openbare lijst met alle openstaande vacatures over alle partners heen. De
@@ -95,7 +95,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     for (const [code, list] of Object.entries(db.data.vacatures || {})) {
       const s = findSupplier(code);
       if (!s) continue;
-      const t = db.data.supplierTypes[s.type] || {};
+      const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
       const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
       if (land && landCode !== land) continue;
       for (const v of list) {
@@ -103,7 +103,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
         if (minLeeftijd != null && v.minLeeftijd > minLeeftijd) continue;
         uit.push({
           id: v.id, supplierCode: code, bedrijf: s.name, soort: v.soort,
-          type: s.type || null, typeLabel: t.label || null, icon: t.icon || '🏢',
+          type: s.type || null, typeLabel: t.label || null, icon: t.icon || 'gebouw',
           func: v.func, omschrijving: v.omschrijving, plaats: v.plaats, uren: v.uren,
           minLeeftijd: v.minLeeftijd, at: v.at,
           // land van het bedrijf: RTG is internationaal, dus je solliciteert ook
@@ -143,7 +143,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     if (!a.key) return;
     if (db.data.notifications[a.key]) {
       notify(a.key, {
-        icon: hired ? '🎉' : '📝',
+        icon: hired ? 'ster' : 'werk',
         title: hired ? 'U bent aangenomen!' : 'Sollicitatie afgerond',
         body: supplier.name + ' heeft uw sollicitatie als ' + a.func + (hired ? ' geaccepteerd. Het bedrijf neemt contact met u op.' : ' helaas afgewezen.')
       });

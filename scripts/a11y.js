@@ -44,6 +44,10 @@ const PAGINAS = [
   '/apps/scherm.html',
   '/apps/office.html',
   '/apps/vonk.html',
+  '/apps/berichten.html',
+  '/apps/salon.html',
+  '/apps/metier.html',
+  '/apps/genootschap.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

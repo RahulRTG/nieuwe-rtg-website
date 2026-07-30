@@ -47,6 +47,8 @@ module.exports = (kern) => {
   require('./member/onderweg')(kern);
   // Boeken en bestellen: diensten, historie, cadeaukaarten, partnerlijst, orders.
   require('./member/boeken')(kern);
+  require('./member/vakpro')(kern);
+  require('./member/residentie')(kern);
   // De zakelijke tools van de Business Pass: zzp-belastingtool en AI-boekhouder.
   require('./member/zakelijk')(kern);
   // De Rechterhand: de premium suite van de Lifestyle Pass
@@ -57,8 +59,17 @@ module.exports = (kern) => {
   require('./member/rendezvous')(kern);
   // RTG Pulse: het eigen 9+-microblog op codenaam
   require('./member/pulse')(kern);
-  // De Berichten-app: alle gesprekken van het platform op een plek
+  // De Berichten-app: alle gesprekken van het platform op een plek (de lijst),
+  // en de handelingen erbij: zoeken, vlaggen en de drie AI-taken
   require('./member/berichten')(kern);
+  require('./member/berichtenapp')(kern);
+  // De Salon als app: plaatsen, feed met paginering, profielen, reacties, AI
+  require('./member/salonapp')(kern);
+  // Métier: het beroepsprofiel op codenaam, met de naam als sleutel die je per
+  // werkgever afgeeft en weer intrekt
+  require('./member/metier')(kern);
+  // Genootschap: besloten groepen met een prikbord en bijeenkomsten
+  require('./member/genootschap')(kern);
   // De wauw-laag: stemming, verjaardagsglans en De Terugblik
   require('./member/wauw')(kern);
   // De moedertaal van het account: iedereen praat en leest in de eigen taal
@@ -67,9 +78,11 @@ module.exports = (kern) => {
   require('./member/nieuws')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
-  // De persoonlijke AI en de Butler/concierge-chat.
+  // De persoonlijke AI en Rahul/concierge-chat.
   require('./member/assistent')(kern);
-  // De persoonlijke laag (zorgprofiel, locatie-delen, De Butler, Shared Assets).
+  // Rahul kijkt mee met een foto (kern/kijken.js) en zegt waar die foto heen kan
+  require('./member/kijk')(kern);
+  // De persoonlijke laag (zorgprofiel, locatie-delen, Rahul, Shared Assets).
   require('./member/persoonlijk')(kern);
   // Rechtstreeks betalen, de bezorgdienst, tickets en transfers.
   require('./member/kopen')(kern);
@@ -87,4 +100,6 @@ module.exports = (kern) => {
   require('./member/salon')(kern);
   // Werk & sollicitaties: cv, vacatures, solliciteren en de sollicitatie-chat.
   require('./member/werk')(kern);
+  // Bedrijfspakketten: bedrijfstype -> juiste indeling voor de eigen zaak.
+  require('./member/pakket')(kern);
 };

@@ -28,14 +28,17 @@
     // is de brontekst; to is de gekozen taal van de lezer.
     vul: function (el, origineel, to) {
       if (!el) return;
-      el.textContent = origineel;
+      // RTG-eigen emoji (sneltekst :naam:) meteen als glyf tonen, ook zolang de
+      // vertaling nog laadt of als het bericht al in de goede taal staat.
+      var emo = function (s) { return (w.RTGEmoji ? w.RTGEmoji.render(esc(s)) : esc(s)); };
+      el.innerHTML = emo(origineel);
       Vertaal.naar(origineel, to).then(function (r) {
         if (!r.vertaald) return; // al in de goede taal
         var toon = 'vertaling';
         function teken() {
-          el.innerHTML = '<span class="vt-txt">' + esc(toon === 'vertaling' ? r.text : origineel) + '</span>' +
+          el.innerHTML = '<span class="vt-txt">' + emo(toon === 'vertaling' ? r.text : origineel) + '</span>' +
             ' <button type="button" class="vt-knop" style="background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--gold,#C9A24B);cursor:pointer;opacity:.75;">' +
-            (toon === 'vertaling' ? '🌐 ' + (to === 'en' ? 'original' : 'origineel') : (to === 'en' ? 'translation' : 'vertaling')) + '</button>';
+            (toon === 'vertaling' ? (to === 'en' ? 'original' : 'origineel') : (to === 'en' ? 'translation' : 'vertaling')) + '</button>';
           var b = el.querySelector('.vt-knop');
           if (b) b.addEventListener('click', function () { toon = (toon === 'vertaling' ? 'origineel' : 'vertaling'); teken(); });
         }

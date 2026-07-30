@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wie ben ik</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<style>
+  .keus{display:block;width:100%;text-align:left;margin:.45rem 0;padding:.85rem 1rem;background:transparent;
+    border:1px solid var(--line);border-radius:12px;color:var(--txt);font:inherit;cursor:pointer;}
+  .keus:focus-visible{outline:2px solid var(--goldlicht);outline-offset:2px;}
+  .keus[aria-pressed="true"]{border-color:var(--goldlicht);background:rgba(201,162,75,.09);}
+  .keus b{display:block;font-size:.96rem;margin-bottom:.15rem;}
+  .keus span{display:block;color:var(--soft);font-size:.8rem;line-height:1.5;}
+  .vinkjes{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0;}
+  .vinkjes label{display:flex;align-items:center;gap:.35rem;border:1px solid var(--line);border-radius:999px;
+    padding:.4rem .8rem;font-size:.82rem;cursor:pointer;}
+  .vinkjes input{width:auto;}
+  .stemming{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
+  .welkom{border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin:1rem 0;
+    font-size:.85rem;line-height:1.6;color:var(--soft);}
+  .welkom strong{color:var(--txt);}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#inhoud" style="position:absolute;left:-999px;">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Wie ben ik</h1>
+  <div class="rek"></div>
+  <span class="stil">voor Rahul</span>
+</header>
+<main id="inhoud">
+  <div class="welkom">
+    <strong>Alles hier is van u, en alles is optioneel.</strong> Vult u niets in, dan krijgt u
+    precies dezelfde Rahul; alleen weet hij dan de dingen niet die u niet heeft verteld.
+    Hij raadt nooit iets: niet uw geloof uit uw naam, niet hoe u aangesproken wilt worden uit uw
+    paspoort. Wat u hier zet, blijft in huis en gaat nergens heen.
+  </div>
+
+  <section aria-label="Waar staat u in het leven">
+    <h2>Waar staat u in het leven</h2>
+    <div class="kaart" id="fase"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Hoe Rahul tegen u doet">
+    <h2>Hoe Rahul tegen u doet</h2>
+    <div class="kaart" id="omgang"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Uw naam en voornaamwoorden">
+    <h2>Naam en voornaamwoorden</h2>
+    <div class="kaart">
+      <p class="stil">Hoe u genoemd wilt worden en wat er in uw paspoort staat, zijn twee
+      verschillende dingen. Hier telt het eerste.</p>
+      <label class="stil lbl" for="vnw">Voornaamwoorden</label>
+      <input id="vnw" maxlength="40" placeholder="Bijv. zij/haar, hij/hem, die/diens">
+      <label class="stil lbl" for="aanhef">Hoe spreekt Rahul u aan?</label>
+      <input id="aanhef" maxlength="40" placeholder="Uw naam, of hoe u genoemd wilt worden">
+      <button class="knop hoofd" id="bewaar" style="margin-top:.8rem;">Bewaren</button>
+    </div>
+  </section>
+
+  <section aria-label="Geloof of levensbeschouwing">
+    <h2>Geloof of levensbeschouwing</h2>
+    <div class="kaart" id="geloof"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Vandaag" id="vandaagVak" hidden>
+    <h2>Vandaag</h2>
+    <div class="kaart" id="vandaag"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Hoe Rahul erbij zit">
+    <h2>Hoe Rahul er vandaag bij zit</h2>
+    <div class="kaart" id="bui"><p class="stil">Laden...</p></div>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const BUI = {
+    gewoon: 'Gewoon zichzelf', blij: 'Uitgelaten', chagrijnig: 'Chagrijnig', moe: 'Moe',
+    wervelend: 'Stuiterend', kort: 'Geirriteerd', ondeugend: 'Ondeugend', dromerig: 'Dromerig'
+  };
+
+  /* De levensfase bepaalt in welke ROL Rahul staat. De leeftijd geeft de
+     standaard; wie zich ergens anders thuis voelt, past hem aan. Onder de
+     achttien staan alleen de jeugdfases in de lijst (de server bewaakt dat
+     ook, dus dit is de nette weergave en niet de grens zelf). */
+  function tekenFase(d) {
+    $('#fase').innerHTML =
+      '<p class="stil">Hier kiest u de rol waarin Rahul staat. Uw leeftijd geeft de standaard; ' +
+      'voelt een andere fase beter, dan zet u hem gewoon om.' +
+      (d.leeftijdBekend ? '' : ' Uw geboortedatum staat nog niet in uw paspoort. Zolang die ontbreekt ' +
+        'houden we het bij de voorzichtige kant; vult u hem aan, dan staan de andere fases er ook.') + '</p>' +
+      d.faseKeuzes.map(k => '<button class="keus" data-fase="' + k.id + '" aria-pressed="' + (k.id === d.fase) + '">' +
+        '<b>' + Veilig.esc(k.naam) + '</b><span>' + Veilig.esc(k.uitleg) + '</span></button>').join('');
+    $('#fase').querySelectorAll('[data-fase]').forEach(b => b.addEventListener('click', async () => {
+      try { teken(await Veilig.api('/api/ik/zet', { fase: b.dataset.fase })); Veilig.melding('Genoteerd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function tekenOmgang(d) {
+    $('#omgang').innerHTML = d.keuzes.omgang.map(k =>
+      '<button class="keus" data-omgang="' + k.id + '" aria-pressed="' + (k.id === d.omgang) + '">' +
+      '<b>' + Veilig.esc(k.naam) + '</b><span>' + Veilig.esc(k.uitleg) + '</span></button>').join('');
+    $('#omgang').querySelectorAll('[data-omgang]').forEach(b => b.addEventListener('click', async () => {
+      try { teken(await Veilig.api('/api/ik/zet', { omgang: b.dataset.omgang })); Veilig.melding('Genoteerd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function tekenGeloof(d) {
+    const g = d.geloof;
+    $('#geloof').innerHTML =
+      '<p class="stil">Kies wat op u van toepassing is, of laat alles leeg. Rahul feliciteert dan met ' +
+      'uw feestdagen en houdt er rekening mee bij eten, vasten en planning. Hij gaat nooit preken en ' +
+      'schrijft u nooit iets voor.</p>' +
+      '<div class="vinkjes">' + d.keuzes.geloof.map(k =>
+        '<label><input type="checkbox" data-tr="' + k.id + '"' + (g.tradities.includes(k.id) ? ' checked' : '') +
+        '> ' + Veilig.esc(k.naam) + '</label>').join('') + '</div>' +
+      '<label class="stil lbl" for="eigen">Wilt u het zelf zeggen?</label>' +
+      '<input id="eigen" maxlength="120" placeholder="In uw eigen woorden" value="' + Veilig.esc(g.eigen) + '">' +
+      '<label class="mini" style="margin-top:.8rem;"><input type="checkbox" id="fd"' + (g.feestdagen ? ' checked' : '') +
+        '> Rahul mag me feliciteren met feestdagen</label>' +
+      '<label class="mini" style="margin-top:.5rem;"><input type="checkbox" id="gb"' + (g.gebed ? ' checked' : '') +
+        '> Toon gebedstijden en de richting van Mekka</label>' +
+      '<div id="gbOpties"' + (g.gebed ? '' : ' hidden') + '>' +
+        '<label class="stil lbl" for="methode">Berekeningsmethode</label>' +
+        '<select id="methode">' + d.keuzes.methodes.map(m =>
+          '<option value="' + m.id + '"' + (m.id === g.methode ? ' selected' : '') + '>' + Veilig.esc(m.naam) + '</option>').join('') + '</select>' +
+        '<label class="stil lbl" for="asr">Asr</label>' +
+        '<select id="asr"><option value="standaard"' + (g.asr === 'standaard' ? ' selected' : '') + '>Standaard</option>' +
+        '<option value="hanafi"' + (g.asr === 'hanafi' ? ' selected' : '') + '>Hanafi</option></select>' +
+      '</div>' +
+      '<button class="knop hoofd" id="gBewaar" style="margin-top:.9rem;">Bewaren</button>';
+
+    $('#gb').addEventListener('change', e => { $('#gbOpties').hidden = !e.target.checked; });
+    $('#gBewaar').addEventListener('click', async () => {
+      const tradities = [...$('#geloof').querySelectorAll('[data-tr]')].filter(c => c.checked).map(c => c.dataset.tr);
+      try {
+        teken(await Veilig.api('/api/ik/geloof', {
+          tradities, eigen: $('#eigen').value.trim(), feestdagen: $('#fd').checked,
+          gebed: $('#gb').checked, methode: $('#methode') ? $('#methode').value : 'mwl',
+          asr: $('#asr') ? $('#asr').value : 'standaard'
+        }));
+        Veilig.melding('Genoteerd.');
+        vandaag();
+      } catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
+  // Gebedstijden komen in UTC binnen; het scherm rekent om naar de eigen tijd.
+  function lokaal(t) {
+    if (!t) return '--:--';
+    const nu = new Date();
+    const d = new Date(Date.UTC(nu.getUTCFullYear(), nu.getUTCMonth(), nu.getUTCDate(), 0, t.minutenUtc));
+    return d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function vandaag(plek) {
+    const host = $('#vandaag');
+    try {
+      const d = await Veilig.api('/api/ik/vandaag', plek || {});
+      if (!d.tradities.length) { $('#vandaagVak').hidden = true; return; }
+      $('#vandaagVak').hidden = false;
+      let h = '';
+      if (d.vandaag && d.vandaag.length)
+        h += d.vandaag.map(f => '<p><strong>Vandaag is het ' + Veilig.esc(f.naam) + '.</strong>' +
+          (f.groet ? ' ' + Veilig.esc(f.groet) + '.' : '') + '</p>').join('');
+      if (d.vanavond && d.vanavond.length)
+        h += d.vanavond.map(f => '<p><strong>Vanavond begint ' + Veilig.esc(f.naam) + '</strong> (die dag begint bij zonsondergang).</p>').join('');
+      const komend = (d.feesten || []).filter(f => f.overDagen > 0).slice(0, 4);
+      if (komend.length) h += '<p class="stil" style="margin-top:.5rem;">Komende weken: ' +
+        komend.map(f => Veilig.esc(f.naam) + ' (' + f.datum + (f.zekerheid === 'berekend' ? ', kan een dag schelen' : '') + ')').join(' &middot; ') + '</p>';
+
+      if (d.gebed) {
+        h += '<h2 style="margin-top:1.2rem;">Gebedstijden</h2><p class="stil">' + Veilig.esc(d.gebed.methode) + '</p>' +
+          ['fajr', 'zonsopgang', 'dhuhr', 'asr', 'maghrib', 'isha'].filter(k => d.gebed[k]).map(k =>
+            '<div class="rij"><span class="cn" style="text-transform:capitalize;">' + k + '</span><strong>' + lokaal(d.gebed[k]) + '</strong></div>').join('');
+        if (d.gebed.waarschuwing) h += '<p class="stil" style="margin-top:.5rem;">' + Veilig.esc(d.gebed.waarschuwing) + '</p>';
+      }
+      if (d.qibla) h += '<h2 style="margin-top:1.2rem;">Richting van Mekka</h2>' +
+        '<p><strong>' + d.qibla.graden + ' graden</strong> (' + Veilig.esc(d.qibla.streek) + '), ' + d.qibla.afstandKm + ' km hemelsbreed.</p>' +
+        '<p class="stil" style="margin-top:.3rem;">' + Veilig.esc(d.qibla.uitleg) + '</p>';
+      if (d.plekNodig) h += '<p class="stil" style="margin-top:.6rem;">Voor gebedstijden en de richting van Mekka ' +
+        'is uw plek nodig. Die wordt alleen gebruikt om de zonnestand uit te rekenen en niet bewaard.</p>' +
+        '<button class="knop" id="plekKnop" style="margin-top:.5rem;">Gebruik mijn plek</button>';
+      host.innerHTML = h || '<p class="stil">Voorlopig niets bijzonders.</p>';
+      const pk = $('#plekKnop');
+      if (pk) pk.addEventListener('click', () => {
+        if (!navigator.geolocation) return Veilig.melding('Dit toestel geeft geen plek door.');
+        navigator.geolocation.getCurrentPosition(
+          p => vandaag({ lat: p.coords.latitude, lon: p.coords.longitude }),
+          () => Veilig.melding('Geen plek gekregen.'), { timeout: 12000 });
+      });
+    } catch (e) { host.innerHTML = '<p class="stil">' + Veilig.esc(e.message) + '</p>'; }
+  }
+
+  function teken(d) { tekenFase(d); tekenOmgang(d); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
+
+  async function laad() {
+    try { teken(await Veilig.api('/api/ik')); vandaag(); }
+    catch (e) { $('#omgang').innerHTML = '<p class="stil">' + Veilig.esc(e.message) + '</p>'; }
+    try {
+      const s = (await Veilig.api('/api/rahul/stemming')).stemming;
+      $('#bui').innerHTML = '<p class="stemming">' + Veilig.esc(BUI[s.id] || s.id) + '</p>' +
+        '<p class="stil" style="margin-top:.4rem;">' +
+        (s.vast ? 'Vastgezet vanuit de boardroom.' : (s.restMin != null ? 'Nog ongeveer ' + s.restMin + ' minuten, daarna slaat het weer om.' : '')) + '</p>' +
+        '<p class="stil" style="margin-top:.6rem;">Rahul heeft buien, net als iedereen. Het raakt alleen ' +
+        'hoe hij praat: hij helpt even goed, en zodra het ergens over gaat laat hij zijn bui los.</p>';
+    } catch (e) { $('#bui').innerHTML = '<p class="stil">Onbekend.</p>'; }
+  }
+
+  function start() {
+    $('#bewaar').addEventListener('click', async () => {
+      try { teken(await Veilig.api('/api/ik/zet', { voornaamwoord: $('#vnw').value.trim(), aanhef: $('#aanhef').value.trim() })); Veilig.melding('Genoteerd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    });
+    laad();
+  }
+  if (window.Veilig) start();
+  else window.addEventListener('load', start);
+})();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

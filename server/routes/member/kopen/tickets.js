@@ -15,7 +15,7 @@ module.exports = (kern) => {
    de deur op eigen naam afvinkt. */
 app.post('/api/tickets/aanbod', auth, (req, res) => {
   const partners = db.data.suppliers
-    .filter(s => ((db.data.supplierTypes[s.type] || {}).caps || []).includes('tickets') && (s.activiteiten || []).length && salonZichtbaar(s))
+    .filter(s => (db.capsVan(s)).includes('tickets') && (s.activiteiten || []).length && salonZichtbaar(s))
     .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null, activiteiten: s.activiteiten.slice(0, 30) }));
   res.json({ partners });
 });

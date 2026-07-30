@@ -38,8 +38,9 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 **Regel: bordeaux is een accent, nooit een tekstkleur op zwarte achtergrond** (te weinig contrast). Op zwart: wit of `--burgundy-on-dark`.
 
 ### Typografie
-- **Bodoni Moda** (Google Fonts) voor koppen/display
+- **Bodoni Moda** voor koppen/display
 - **Inter** voor functionele tekst (nav, knoppen, chat-UI, formulieren) en lopende tekst
+- Beide **zelf gehost** in `public/fonts/` (woff2 + `@font-face` in `public/fonts/fonts.css`), niet van Google Fonts of een andere CDN. De CSP staat dat ook niet toe (`default-src 'self'`, `font-src 'self'`), dus een externe font-link laadt gewoon niet. Zelfde lettertypes, alleen niet van een vreemde server.
 - In deze versie wordt **geen EB Garamond** meer geladen (dat was de body-font van de oude statische versie) — niet opnieuw introduceren, en ook geen andere fonts toevoegen zonder overleg
 
 ### Design-principes

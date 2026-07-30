@@ -18,7 +18,7 @@ const SOORTEN = ['verkoop', 'dienst', 'huur'];
 // Standaard-btw per genre: eten/drinken en agrarisch 9%, de rest 21%.
 const LAAG_BTW_TYPES = ['restaurant', 'bar', 'hotel', 'groothandel', 'boerderij'];
 
-function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon }) {
+function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering }) {
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const rond = n => Math.round((Number(n) || 0) * 100) / 100;
@@ -26,7 +26,7 @@ function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify
   /* De motor- en loketlaag draaien als submodules op een gedeelde context,
      een keer opgebouwd bij het opstarten; de motor gaat eerst de context
      in omdat het loket (o.a. de AI) boekMetCodenaam gebruikt. */
-  const ctx = { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon,
+  const ctx = { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering,
     SOORTEN, LAAG_BTW_TYPES, nu, scho, rond };
   const deelMotor = require('./facturatie/motor')(ctx);
   Object.assign(ctx, deelMotor);

@@ -30,6 +30,36 @@ module.exports = (kern) => {
     res.json({ antwoord: r.antwoord, gedaan: !!r.gedaan, items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
   });
 
+  /* ---------- de pro-laag: kalender, uitnodigen, ICS (kern/agenda-pro.js) ---------- */
+  app.post('/api/agenda/bereik', auth, (req, res) => {
+    const van = String(req.body.van || ''), tot = String(req.body.tot || '');
+    const r = agenda.bereik(lidKey(req), van, tot);
+    if (r.error) return res.status(400).json(r);
+    // de laag uit het ecosysteem: eigen RTG-boekingen, alleen-lezen, met bronlabel
+    r.ecosysteem = agenda.ecosysteem(req.session.key, van, tot);
+    res.json(r);
+  });
+  app.post('/api/agenda/bewaar', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const r = agenda.bewaarAfspraak(lidKey(req), req.body || {});
+    if (r.error) return res.status(400).json(r);
+    res.json(r);
+  });
+  app.post('/api/agenda/uitnodig', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    const r = await agenda.nodigUit(lidKey(req), String(req.body.id || ''), String(req.body.codenaam || ''));
+    if (r.error) return res.status(400).json(r);
+    res.json(r);
+  });
+  app.post('/api/agenda/antwoord', auth, (req, res) => {
+    const r = agenda.antwoordUitnodiging(lidKey(req), String(req.body.id || ''), req.body.ja !== false);
+    if (r.error) return res.status(400).json(r);
+    res.json(r);
+  });
+  app.post('/api/agenda/ics', auth, (req, res) => {
+    res.json({ ics: agenda.ics(lidKey(req)) });
+  });
+
   // ---------- leverancier ----------
   const supKey = (req) => 'sup:' + req.supplier.code;
   app.post('/api/supplier/agenda/lijst', supplierAuth, (req, res) => {

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Hoe voel je je?</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:40rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .koppen{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
+  @media(min-width:34rem){ .koppen{grid-template-columns:repeat(3,1fr);} }
+  .kop{background:var(--paneel2);border:2px solid var(--lijn);border-radius:18px;padding:.9rem .6rem .7rem;
+    cursor:pointer;color:var(--goud);display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+  .kop:hover{border-color:var(--goud);}
+  .kop.gekozen{border-color:var(--goud2);}
+  .kop svg{width:100%;max-width:5.5rem;height:auto;display:block;}
+  .kop b{color:var(--txt);font-family:var(--serif);font-weight:500;font-size:1.05rem;}
+  .antwoord{margin-top:1.1rem;}
+  .antwoord .zin{font-family:var(--serif);font-size:1.25rem;line-height:1.6;margin-bottom:.7rem;}
+  .antwoord ul{margin:0 0 .2rem 1.1rem;color:var(--zacht);line-height:1.7;}
+  .adem{display:flex;flex-direction:column;align-items:center;gap:.7rem;padding:.5rem 0;}
+  .bol{width:9rem;height:9rem;border-radius:50%;border:2px solid var(--goud);background:var(--paneel2);
+    display:flex;align-items:center;justify-content:center;color:var(--goud2);font-family:var(--serif);font-size:1.1rem;
+    transform:scale(.62);transition:transform 4s ease-in-out;}
+  .bol.uit{transform:scale(1);}
+  @media(prefers-reduced-motion:reduce){ .bol{transition:none;} }
+  .onderrij{display:flex;gap:.6rem;justify-content:center;margin-top:.9rem;flex-wrap:wrap;}
+  .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>Hoe voel je je?</h1>
+  <div class="intro">Tik het gezichtje aan dat lijkt op hoe jij je nu voelt. Er is geen goed of fout: alle gevoelens mogen er zijn.</div>
+
+  <div class="kaart blok">
+    <div class="koppen" id="koppen"></div>
+    <div class="antwoord" id="antwoord" aria-live="polite"></div>
+    <div id="bewaarRij" hidden style="margin-top:.7rem;">
+      <button class="knop klein" id="bewaarKnop" type="button">Bewaar in mijn dagboekje</button>
+      <span style="color:var(--zacht);font-size:.8rem;margin-left:.4rem;">alleen jij kunt erin kijken</span>
+    </div>
+  </div>
+
+  <!-- het dagboekje: alleen wat het kind ZELF bewaarde, alleen voor het kind zelf -->
+  <div class="kaart blok" id="dagboekBlok" hidden>
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Mijn dagboekje</h2>
+    <p style="color:var(--zacht);font-size:.85rem;line-height:1.5;margin-bottom:.6rem;">Alleen jij ziet dit. Niet papa, niet mama, niemand.</p>
+    <div id="dagboekStrook" style="display:flex;gap:.35rem;flex-wrap:wrap;"></div>
+    <div id="hulpRegel" hidden style="margin-top:.8rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;">
+      Je had een paar zware dagen achter elkaar. Dat hoef je niet alleen te dragen:
+      <a href="steun.html" style="color:var(--goud2);">praat met iemand</a> of kijk in de
+      <a href="hulpwijzer.html" style="color:var(--goud2);">hulpwijzer</a>.</div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Rustig ademen</h2>
+    <p style="color:var(--zacht);line-height:1.55;margin-bottom:.9rem;">Wordt de bol groot, dan adem je in. Wordt hij klein, dan adem je uit. Doe gewoon mee met de bol.</p>
+    <div class="adem">
+      <div class="bol" id="bol">klaar?</div>
+      <button class="knop" id="ademknop" type="button">Begin met ademen</button>
+    </div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Even praten?</h2>
+    <div class="chat" id="chat"><div class="b ai">Hoi. Alles wat je voelt mag er zijn. Wil je vertellen hoe het met je is?</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Typ maar gewoon wat er in je zit..." maxlength="1000"></textarea>
+      <button class="knop klein" id="stuur">Stuur</button>
+    </div>
+    <div class="mini" style="padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
+  </div>
+
+  <div class="kaart blok">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-voeler</h2>
+    <p class="ouder">Deze app stuurt niets door en legt uit zichzelf niets vast: wat het kind aantikt blijft op dit scherm. Alleen als het kind zelf op "bewaar in mijn dagboekje" tikt, wordt dat ene gevoel bewaard -- en dat dagboekje kan uitsluitend het kind zelf inzien, u niet. Dat is met opzet: een kind dat weet dat niemand meeleest, durft eerlijk te zijn. Benoem wat u ziet ("je kijkt boos") en wacht daarna even; kinderen hebben eerst erkenning nodig en pas daarna een oplossing. Blijft een kind langere tijd bang of verdrietig, dan is dit spel geen vervanging voor een gesprek met de huisarts of de school.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+function gezicht(mond, extra) {
+  return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+    '<circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="4"/>' +
+    '<circle cx="36" cy="42" r="4.5" fill="currentColor"/><circle cx="64" cy="42" r="4.5" fill="currentColor"/>' +
+    mond + (extra || '') + '</svg>';
+}
+
+const GEVOELENS = [
+  { id: 'blij', naam: 'blij',
+    svg: gezicht('<path d="M32 62q18 16 36 0" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>'),
+    zin: 'Wat fijn dat je blij bent.',
+    tips: ['Vertel iemand wat er zo leuk was.', 'Doe het nog een keer, samen.', 'Onthoud dit gevoel voor een dag die minder gaat.'] },
+  { id: 'verdrietig', naam: 'verdrietig',
+    svg: gezicht('<path d="M32 68q18-16 36 0" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>',
+      '<path d="M36 50v10" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".7"/>'),
+    zin: 'Verdrietig zijn mag. Het gaat weer over.',
+    tips: ['Zoek iemand op die je lief vindt.', 'Vertel wat er gebeurd is, ook als het klein lijkt.', 'Een knuffel of een deken helpt vaak meer dan praten.'] },
+  { id: 'boos', naam: 'boos',
+    svg: gezicht('<path d="M34 66h32" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>',
+      '<path d="M28 32l14 6M72 32l-14 6" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>'),
+    zin: 'Boos zijn mag. Iets anders kapot maken niet.',
+    tips: ['Stamp tien keer heel hard met je voeten.', 'Adem hieronder mee met de bol.', 'Zeg hardop waar je boos om bent.'] },
+  { id: 'bang', naam: 'bang',
+    svg: gezicht('<ellipse cx="50" cy="66" rx="9" ry="7" fill="none" stroke="currentColor" stroke-width="4"/>',
+      '<path d="M26 34q8-6 16-2M74 34q-8-6-16-2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'),
+    zin: 'Bang zijn is niet raar. Je hoeft het niet alleen te doen.',
+    tips: ['Pak de hand van iemand die groot is.', 'Zeg wat je bang maakt, hardop.', 'Kijk om je heen en noem vijf dingen die je ziet.'] },
+  { id: 'moe', naam: 'moe',
+    svg: gezicht('<path d="M40 66h20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>',
+      '<path d="M28 42h16M56 42h16" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>'),
+    zin: 'Je bent moe. Dan mag je even niets.',
+    tips: ['Ga ergens zacht zitten of liggen.', 'Drink wat water.', 'Vraag of het licht wat zachter mag.'] },
+  { id: 'rustig', naam: 'rustig',
+    svg: gezicht('<path d="M38 64q12 8 24 0" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>'),
+    zin: 'Lekker rustig. Dat is een fijn gevoel.',
+    tips: ['Blijf nog even zo zitten.', 'Kijk uit het raam en zoek iets moois.', 'Adem hieronder een paar keer mee met de bol.'] }
+];
+
+function teken() {
+  const doos = $('#koppen');
+  doos.innerHTML = '';
+  for (const g of GEVOELENS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'kop';
+    b.setAttribute('aria-label', g.naam);
+    b.innerHTML = g.svg + '<b></b>';
+    b.querySelector('b').textContent = g.naam;
+    b.addEventListener('click', () => kies(g, b));
+    doos.appendChild(b);
+  }
+}
+
+function kies(g, knop) {
+  $('#koppen').querySelectorAll('.kop').forEach(k => k.classList.toggle('gekozen', k === knop));
+  const doos = $('#antwoord');
+  doos.innerHTML = '<div class="zin"></div><ul></ul>';
+  doos.querySelector('.zin').textContent = g.zin;
+  const ul = doos.querySelector('ul');
+  for (const t of g.tips) {
+    const li = document.createElement('li');
+    li.textContent = t;
+    ul.appendChild(li);
+  }
+  gekozen = g;
+  $('#bewaarRij').hidden = false;
+  $('#bewaarKnop').textContent = 'Bewaar in mijn dagboekje';
+  $('#bewaarKnop').disabled = false;
+}
+
+/* ---------- het dagboekje: opt-in, prive, een woord per dag ----------
+   De app blijft bij zijn belofte: er wordt pas iets bewaard als het kind
+   ZELF op de knop tikt, en alleen het kind kan het teruglezen. */
+const s = Sessie.huidig();
+let gekozen = null;
+const ZWAAR = ['verdrietig', 'bang', 'boos'];
+const api = (actie, body) => fetch('/api/rtf/welzijn/' + actie, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: s && s.code, token: s && s.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+$('#bewaarKnop').addEventListener('click', async () => {
+  if (!gekozen) return;
+  try {
+    await api('stemming', { gevoel: gekozen.id });
+    laadDagboek(); // een bron van waarheid: het dagboek zet de knoptekst
+  } catch (e) { $('#bewaarKnop').textContent = e.message; }
+});
+
+async function laadDagboek() {
+  let d;
+  try { d = await api('dagboek'); } catch (e) { return; } // een oppas heeft hier geen dagboekje
+  $('#dagboekBlok').hidden = !d.stemmingen.length;
+  if (!d.stemmingen.length) return;
+  const naam = {};
+  GEVOELENS.forEach(g => { naam[g.id] = g; });
+  $('#dagboekStrook').innerHTML = d.stemmingen.map(x => {
+    const g = naam[x.gevoel];
+    return '<span class="kop" style="width:3.6rem;min-width:3.6rem;padding:.3rem;cursor:default;" title="' + x.dag + '">' +
+      (g ? g.svg : '') + '<b style="font-size:.62rem;">' + x.dag.slice(8) + '-' + x.dag.slice(5, 7) + '</b></span>';
+  }).join('');
+  // hulp dichtbij: waren 3 van de laatste 5 bewaarde dagen zwaar, wijs dan warm de weg
+  const laatste = d.stemmingen.slice(-5);
+  $('#hulpRegel').hidden = laatste.filter(x => ZWAAR.includes(x.gevoel)).length < 3;
+  if (d.dagVandaag) {
+    $('#bewaarRij').hidden = false;
+    $('#bewaarKnop').textContent = 'Vandaag bewaard: ' + d.dagVandaag.gevoel + ' (tik een gezichtje om te herzien)';
+    $('#bewaarKnop').disabled = true;
+  }
+}
+laadDagboek();
+
+let ademLoop = null, ademUit = false;
+$('#ademknop').addEventListener('click', () => {
+  const bol = $('#bol');
+  if (ademLoop) {
+    clearInterval(ademLoop); ademLoop = null;
+    bol.classList.remove('uit');
+    bol.textContent = 'klaar?';
+    $('#ademknop').textContent = 'Begin met ademen';
+    return;
+  }
+  ademUit = false;
+  const stap = () => {
+    ademUit = !ademUit;
+    bol.classList.toggle('uit', ademUit);
+    bol.textContent = ademUit ? 'in' : 'uit';
+  };
+  stap();
+  ademLoop = setInterval(stap, 4000);
+  $('#ademknop').textContent = 'Stop maar';
+});
+
+teken();
+Sessie.coach({ kind: 'gevoel', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

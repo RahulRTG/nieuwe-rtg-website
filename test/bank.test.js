@@ -188,7 +188,7 @@ test('Pay draait op de eigen bank: een saldotekort in de wallet komt van de beta
   assert.equal(voor - na, 3000, 'het tekort kwam van de eigen bankrekeningen (eigen rails)');
 });
 
-test('de Butler-drempel: bankpaden die geld bewegen komen eerst terug als voorstel (428)', async () => {
+test('Rahul-drempel: bankpaden die geld bewegen komen eerst terug als voorstel (428)', async () => {
   const doe = await api('member/doe', { pad: '/api/bank/overboek', body: { vanIban: lid.iban, naarIban: lid.iban, centen: 100 } }, lid.token);
   assert.equal(doe.status, 428, 'een bank-geldpad komt eerst terug als voorstel');
   assert.equal(doe.body.bevestigNodig, true, 'geen directe uitvoering: eerst bevestigen');

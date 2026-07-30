@@ -49,12 +49,13 @@
 <body>
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>💶 Zakgeld</h1>
+  <h1>Zakgeld</h1>
   <p class="intro">Jouw eigen potje: houd bij wat erin komt en eruit gaat, en spaar voor wat jij wilt. Niemand kijkt mee; dit is van jou.</p>
 
   <div class="kaart saldo">
     <div class="b" id="saldo">€ 0,00</div>
     <small>vrij in je potje</small>
+    <div class="mini" id="week" style="display:none;margin-top:.4rem;"></div>
   </div>
 
   <div class="kaart blok">
@@ -108,13 +109,16 @@ const TIPS = [
   'Deel je potje in je hoofd in drie stukken: uitgeven, sparen, en een beetje voor onverwachte dingen.',
   'Gratis is ook leuk: eerst kijken wat je al hebt of kunt lenen, voordat je koopt.'
 ];
-$('#tip').textContent = '💡 ' + TIPS[Math.floor(Date.now() / 86400000) % TIPS.length];
+$('#tip').textContent = '' + TIPS[Math.floor(Date.now() / 86400000) % TIPS.length];
 
 function toon(d){
   $('#saldo').textContent = euro(d.saldoCenten);
+  // weekgeld (de geldschool): komt er elke week vanzelf bij, zonder timer-fratsen
+  $('#week').style.display = d.weekgeldCenten ? '' : 'none';
+  if (d.weekgeldCenten) $('#week').textContent = 'Je krijgt ' + euro(d.weekgeldCenten) + ' per week; dat komt er elke week vanzelf bij.';
   $('#doelen').innerHTML = d.doelen.length ? d.doelen.map(x => {
     const pct = Math.min(100, Math.round(100 * x.gespaard / x.doelCenten));
-    return '<div class="kaart doel' + (x.behaald ? ' klaar' : '') + '"><div class="kop"><span class="nm">' + (x.behaald ? '🎉 ' : '🎯 ') + esc(x.naam) + '</span>' +
+    return '<div class="kaart doel' + (x.behaald ? ' klaar' : '') + '"><div class="kop"><span class="nm">' + (x.behaald ? '' : '') + esc(x.naam) + '</span>' +
       '<span class="st">' + euro(x.gespaard) + ' van ' + euro(x.doelCenten) + '</span>' +
       '<button class="mini" data-weg="' + x.id + '" title="Doel weghalen (het gespaarde valt terug in je potje)">✕</button></div>' +
       '<div class="spoor"><div style="width:' + pct + '%"></div></div>' +
@@ -156,6 +160,11 @@ api('potje').then(toon).catch(() => {});
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

@@ -82,6 +82,10 @@
   #samenStatus b{color:var(--gold,#C9A24B);letter-spacing:0.14em;}
   #samenWeg{background:transparent;color:var(--soft);border:1px solid var(--line);font-weight:600;flex-shrink:0;}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header class="kop">
@@ -94,7 +98,7 @@
 
 <main>
   <section class="samen" id="samen" aria-label="Samen luisteren">
-    <div class="samen-kop"><b>👥 Samen luisteren</b>
+    <div class="samen-kop"><b>Samen luisteren</b>
       <span class="samen-uit">Van afstand of samen in de kamer: iedereen hoort exact hetzelfde, tegelijk.</span></div>
     <div class="samen-start" id="samenStart">
       <button type="button" id="samenMaak">Start een sessie</button>
@@ -113,7 +117,7 @@
 
 <div class="rahul"><span aria-hidden="true">✦</span>
   <span class="tekst"><b>Rahul</b> · <span id="rahulTekst">Zeg wat u wilt horen ("iets voor bij het diner") en ik zet het juiste station op.</span></span>
-  <button id="micKnop" aria-label="Spraaksturing: zeg wat u wilt horen">🎤</button>
+  <button id="micKnop" aria-label="Spraaksturing: zeg wat u wilt horen"></button>
 </div>
 
 <canvas class="golf" id="golf" aria-hidden="true"></canvas>
@@ -124,9 +128,9 @@
       <div class="titel" id="spTitel">Nog stil</div>
       <div class="sub" id="spSub">Kies een station om te beginnen</div>
     </div>
-    <button id="knopVorige" aria-label="Opnieuw beginnen">⏮</button>
+    <button id="knopVorige" aria-label="Opnieuw beginnen"></button>
     <button id="knopSpeel" class="afspeel" aria-label="Afspelen of pauzeren">▶</button>
-    <button id="knopVolgende" aria-label="Volgende track">⏭</button>
+    <button id="knopVolgende" aria-label="Volgende track"></button>
   </div>
 </footer>
 
@@ -342,6 +346,9 @@
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

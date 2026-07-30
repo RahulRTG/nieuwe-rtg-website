@@ -116,23 +116,23 @@ test('gastchat: lid schrijft in eigen taal; partner leest in de zijne (cache + o
   assert.ok(fm, 'het Franse bericht is er, met de brontaal vastgelegd');
 });
 
-test('Butler/concierge: antwoordt in de taal van het lid en de geschiedenis leest per kijker', async () => {
+test('Rahul/concierge: antwoordt in de taal van het lid en de geschiedenis leest per kijker', async () => {
   const u = Date.now().toString().slice(-8);
-  const rtg = (await api(base, '/api/auth/register', { name: 'Butler Lid', email: 'b' + u + '@x.nl',
+  const rtg = (await api(base, '/api/auth/register', { name: 'Rahul Lid', email: 'b' + u + '@x.nl',
     phone: '061' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
 
   // het lid schrijft in het Engels; zonder AI-sleutel vertaalt het demo-antwoord
   // via het woordenboek mee en draagt het de juiste taal
   const r = await api(base, '/api/chat/send', { text: 'hallo', lang: 'en' }, rtg);
   assert.equal(r.status, 200);
-  const butler = r.body.messages.filter(m => m.from === 'butler').pop();
-  assert.ok(butler && butler.text.length > 0, 'de Butler antwoordt');
-  assert.equal(butler.lang, 'en', 'het antwoord draagt de taal van het lid');
+  const rahul = r.body.messages.filter(m => m.from === 'rahul').pop();
+  assert.ok(rahul && rahul.text.length > 0, 'Rahul antwoordt');
+  assert.equal(rahul.lang, 'en', 'het antwoord draagt de taal van het lid');
 
   // de geschiedenis leest per kijker: zelfde gesprek, nl-bril -> nl-mechaniek
   const hist = await api(base, '/api/chat/history', { lang: 'en' }, rtg);
   assert.equal(hist.status, 200);
-  assert.ok(hist.body.messages.length >= 2, 'lid + Butler staan in de geschiedenis');
+  assert.ok(hist.body.messages.length >= 2, 'lid + Rahul staan in de geschiedenis');
 });
 
 test('sollicitatiechat: ook daar leest ieder in de eigen taal', async () => {

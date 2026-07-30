@@ -6,12 +6,12 @@
      codenaam verschijnt (Pulse, de Berichten-app). Verloopt vanzelf per dag.
    - De verjaardagsglans: op je verjaardag krijgt je codenaam overal een taartje.
    - De Terugblik: jouw sociale week in een warm overzicht (berichten, likes,
-     reacties, gesprekken, vuurtjes) -- terugkijken, geen scorebord.
+     reacties, gesprekken) -- terugkijken, geen scorebord.
    Gedeelde context vanuit server.js (na de sociale laag gemount). */
 module.exports = ({ db, save, accounts, socialConnecties }) => {
   const vandaag = () => new Date().toISOString().slice(0, 10);
   // de vaste 9+-lijst: vrolijk, neutraal, niets om achter te verschuilen
-  const STEMMINGEN = ['😊', '😎', '🤩', '😴', '🥳', '🌞', '🌧️', '⛵', '📚', '🎨', '⚽', '🎧', '🧘', '☕'];
+  const STEMMINGEN = ['emo-blij', 'emo-cool', 'emo-ster', 'emo-slaap', 'emo-feest', 'balans', 'balans', 'boot', 'reisboek', 'ontwerp', 'sport', 'muziek', 'balans', 'bar'];
 
   function W() {
     if (!db.data.wauw || typeof db.data.wauw !== 'object') db.data.wauw = { stemmingen: {} };
@@ -58,16 +58,15 @@ module.exports = ({ db, save, accounts, socialConnecties }) => {
       if (!k.split('|').includes(key)) continue;
       gestuurd += (chat.messages || []).filter(mm => mm.from === key && mm.at > grens).length;
     }
-    let vrienden = 0, vuurtjes = 0;
+    let vrienden = 0;
     try {
       const sc = socialConnecties(key);
       vrienden = (sc.connections || []).length;
-      vuurtjes = (sc.connections || []).filter(c => c.vuurtje).length;
     } catch (e) {}
     const zin = mijnPosts.length || gestuurd
       ? 'Wat een week: je deelde ' + mijnPosts.length + ' bericht(en), kreeg ' + likes + ' hartjes en ' + reacties + ' reactie(s), en stuurde ' + gestuurd + ' berichtje(s) naar je vrienden.'
       : 'Een stille week op de socials -- en dat is helemaal prima. Je vrienden zijn er nog steeds.';
-    return { status: 200, ok: true, week: { posts: mijnPosts.length, likes, reacties, gestuurd, vrienden, vuurtjes },
+    return { status: 200, ok: true, week: { posts: mijnPosts.length, likes, reacties, gestuurd, vrienden },
       jarig: jarigVan(key), stemming: stemmingVan(key), zin };
   }
 

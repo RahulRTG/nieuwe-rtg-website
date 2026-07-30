@@ -5,7 +5,7 @@
    vooruit, dus twee keer draaien op dezelfde dag boekt niet dubbel). Krijgt de
    gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, nu, d, boek, rekMeta } = ctx;
+  const { db, save, crypto, schoon, nu, d, boekAsync, rekMeta } = ctx;
 
   const DAG_MS = 86400000;
   const INTERVAL = { week: 7 * DAG_MS, maand: 30 * DAG_MS };
@@ -40,14 +40,14 @@ module.exports = (ctx) => {
   }
   /* De incassoronde: voer alles uit wat aan de beurt is. Met { nu: t } of
      { vooruitMs } kan het kantoor (of een test) de klok vooruitzetten. */
-  function ronde({ tot } = {}) {
+  async function ronde({ tot } = {}) {
     const grens = Number.isFinite(tot) ? tot : nu();
     let uitgevoerd = 0, mislukt = 0, bedrag = 0;
     for (const t of reeks()) {
       if (!t.actief) continue;
       let veiligheid = 0;
       while (t.volgendeAt <= grens && veiligheid++ < 500) {
-        const b = boek({ van: t.vanIban, naar: t.naarIban, centen: t.centen, soort: 'incasso', oms: t.oms });
+        const b = await boekAsync({ van: t.vanIban, naar: t.naarIban, centen: t.centen, soort: 'incasso', oms: t.oms });
         if (b.error) { t.mislukt = (t.mislukt || 0) + 1; mislukt++; if (t.mislukt >= 5) t.actief = false; break; }
         t.laatsteAt = t.volgendeAt; t.volgendeAt += INTERVAL[t.interval]; t.mislukt = 0;
         uitgevoerd++; bedrag += t.centen;

@@ -6,6 +6,10 @@
 <title>Rijks-loket (ambtenaar)</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+  <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rosthema.css" rel="stylesheet">
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/rosthema.js" defer></script>
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
@@ -42,6 +46,10 @@
   .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
   .login .veld{width:100%;margin-bottom:.6rem;}
 </style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
 </head>
 <body>
 <header style="display:flex;align-items:flex-end;gap:.8rem;">
@@ -84,7 +92,7 @@
 </main>
 
 <div class="melding" id="melding" role="status"></div>
-<button class="rahulfab" id="rahulFab" type="button" style="display:none;">✨ Vraag Rahul</button>
+<button class="rahulfab" id="rahulFab" type="button" style="display:none;">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Rahul · rijksbalie</b><button class="knop stil" id="rahulSluit" type="button" aria-label="Sluiten" style="padding:.2rem .55rem;">✕</button></div>
   <div class="rahulsug" id="rahulSug"></div>
@@ -152,7 +160,7 @@ $('#loginGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
 });
 
-const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['sub','Subsidies'],['wm','Watermeldingen'],['kvk','Handelsregister'],['stem','Stemming'],['bek','Bekendmakingen'],['bieb','📚 Bibliotheek']];
+const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['sub','Subsidies'],['wm','Watermeldingen'],['kvk','Handelsregister'],['stem','Stemming'],['bek','Bekendmakingen'],['bieb','Bibliotheek']];
 let HUIDIG = 'tos';
 function toon(t){
   HUIDIG = t;
@@ -191,7 +199,7 @@ async function laadBieb(){
 }
 function biebKaart(a, heeft){
   return '<div class="item"><h4>'+a.icon+' '+esc(a.naam)+'</h4>'+
-    '<div class="meta">'+esc(a.afdelingLabel)+' · '+esc(a.taak)+' · v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+
+    '<div class="meta">'+esc(a.afdelingLabel)+' · '+esc(a.taak)+' · v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+
     ' · <s>€ '+(a.winkelwaardeCenten/100).toLocaleString('nl-NL')+'</s> <b style="color:var(--gold);">inbegrepen</b></div>'+
     (heeft ? '<button class="tab rbweg" data-id="'+esc(a.id)+'">Verwijder</button>'
            : '<button class="tab aan rbin" data-id="'+esc(a.id)+'">Installeer</button>')+'</div>';
@@ -375,6 +383,9 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

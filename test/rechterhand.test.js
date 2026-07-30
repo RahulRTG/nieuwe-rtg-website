@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, elevateTier } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rechterhand-'));
@@ -29,9 +29,14 @@ test.after(() => {
 });
 
 let teller = 0;
+const officeTok = async () => (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
 async function lidMet(tier) {
   const t = Date.now() + '' + (teller++);
-  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'l' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1980-05-05', tier }));
+  // zelf-registreren geeft altijd RTG; een echt Lifestyle/Business-lid ontstaat
+  // pas na een menselijk akkoord, dus registreren we als RTG en tillen op.
+  const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
+  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'l' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1980-05-05', tier: regTier }));
+  if (tier === 'lifestyle' || tier === 'business') await elevateTier(BASE, r.token, tier, await officeTok());
   return r.token;
 }
 const gisteren = () => new Date(Date.now() - 86400000).toISOString().slice(0, 10);
@@ -227,4 +232,110 @@ test('de extra ROS-apps zijn gated op de Lifestyle Pass (RTG niet, Business wel)
   const biz = await lidMet('business');
   assert.equal((await rh('maison', {}, biz)).status, 200);
   assert.equal((await rh('hangar', {}, biz)).status, 200);
+});
+
+/* ---- ronde 5: wat elders een conciergedienst of een reisabonnement kost ---- */
+
+test('Cercle: reciprociteit is een lijst, en waarheen beantwoordt de echte vraag', async () => {
+  const tok = await lidMet('lifestyle');
+  await rh('cercle/club', { naam: 'Club Milano', stad: 'Milaan', lidnummer: 'M-88', sinds: 2019,
+    dresscode: 'Jasje verplicht', reciprociteit: ['Casa Lisboa', 'The Athenaeum'], gastpassen: 2 }, tok);
+  // een oude tekstregel blijft werken: die wordt op komma's gesplitst
+  await rh('cercle/club', { naam: 'Club Parijs', stad: 'Parijs', reciprociteit: 'Casa Lisboa; Club Milano', gastpassen: 1 }, tok);
+
+  const d = await json(await rh('cercle', {}, tok));
+  assert.equal(d.aantal, 2);
+  const milaan = d.clubs.find(c => c.naam === 'Club Milano');
+  assert.deepEqual(milaan.reciprociteit, ['Casa Lisboa', 'The Athenaeum'], 'een echte lijst, geen tekstveld');
+  const parijs = d.clubs.find(c => c.naam === 'Club Parijs');
+  assert.deepEqual(parijs.reciprociteit, ['Casa Lisboa', 'Club Milano'], 'de oude tekstregel leest als twee clubs');
+  assert.equal(d.reciprociteiten, 4);
+
+  // de vraag die het waard is: waar kan ik terecht?
+  const w = await json(await rh('cercle/waarheen', { stad: 'Milaan' }, tok));
+  assert.equal(w.eigen.length, 1);
+  assert.equal(w.eigen[0].club, 'Club Milano');
+  assert.equal(w.eigen[0].lidnummer, 'M-88');
+  assert.ok(w.bron.includes('zelf heeft ingevuld'), 'de app zegt erbij dat zij niets belooft namens een club');
+
+  const lissabon = await json(await rh('cercle/waarheen', { stad: 'Casa Lisboa' }, tok));
+  assert.equal(lissabon.viaGast.length, 2, 'twee lidmaatschappen geven toegang tot Casa Lisboa');
+});
+
+test('Cercle: gastpassen hebben een boekhouding en die klopt', async () => {
+  const tok = await lidMet('lifestyle');
+  await rh('cercle/club', { naam: 'Club Wenen', stad: 'Wenen', gastpassen: 2 }, tok);
+  let d = await json(await rh('cercle', {}, tok));
+  const id = d.clubs[0].id;
+
+  const g1 = await json(await rh('cercle/gast', { id, wie: 'Een gast', stad: 'Wenen' }, tok));
+  assert.equal(g1.gastpassen, 1, 'het saldo loopt terug');
+  const g2 = await json(await rh('cercle/gast', { id, wie: 'Nog een gast' }, tok));
+  assert.equal(g2.gastpassen, 0);
+  const g3 = await json(await rh('cercle/gast', { id, wie: 'Te veel' }, tok));
+  assert.ok(g3.error, 'op is op');
+
+  d = await json(await rh('cercle', {}, tok));
+  assert.equal(d.clubs[0].gastlog.length, 2, 'wie er mee was staat in het logboek');
+  assert.equal(d.gastenDitJaar, 2);
+
+  // een vergissing kan terug
+  const terug = await json(await rh('cercle/gast/terug', { id, gastId: d.clubs[0].gastlog[0].id }, tok));
+  assert.equal(terug.gastpassen, 1);
+});
+
+test('Entourage: elk document heeft een vervaldatum, en er is een waarschuwlijst', async () => {
+  const tok = await lidMet('lifestyle');
+  const over = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+  const lang = new Date(Date.now() + 900 * 86400000).toISOString().slice(0, 10);
+  const weg = new Date(Date.now() - 10 * 86400000).toISOString().slice(0, 10);
+
+  await rh('entourage/persoon', { naam: 'Reisgenoot A', band: 'partner', telefoon: '0600', dieet: 'geen noten' }, tok);
+  await rh('entourage/persoon', { naam: 'Reisgenoot B', band: 'vriend', paspoortTot: weg }, tok);
+  let d = await json(await rh('entourage', {}, tok));
+  const a = d.gezelschap.find(p => p.naam === 'Reisgenoot A');
+  const b = d.gezelschap.find(p => p.naam === 'Reisgenoot B');
+
+  // het oude losse paspoortveld telt gewoon mee als document
+  assert.ok(d.attenties.some(x => x.naam === 'Reisgenoot B' && x.soort === 'paspoort' && x.verlopen),
+    'een verlopen paspoort uit het oude veld staat in de lijst');
+
+  await rh('entourage/doc', { id: a.id, soort: 'visum', tot: over, nummer: 'V-1' }, tok);
+  await rh('entourage/doc', { id: a.id, soort: 'rijbewijs', tot: lang }, tok);
+  d = await json(await rh('entourage', {}, tok));
+  const soorten = d.attenties.filter(x => x.naam === 'Reisgenoot A').map(x => x.soort);
+  assert.deepEqual(soorten, ['visum'], 'alleen wat binnen het venster valt; het rijbewijs van 2029 niet');
+  assert.equal(d.attenties[0].verlopen, true, 'wat al verlopen is staat bovenaan');
+  assert.ok(d.bron.includes('Inreisvereisten'), 'de app belooft niets over inreisregels');
+
+  // documenten kunnen ook weer weg
+  const av = (await json(await rh('entourage', {}, tok))).gezelschap.find(p => p.naam === 'Reisgenoot A');
+  await rh('entourage/doc/weg', { id: av.id, docId: av.documenten.find(x => x.soort === 'visum').id }, tok);
+  d = await json(await rh('entourage', {}, tok));
+  assert.equal(d.attenties.some(x => x.naam === 'Reisgenoot A'), false);
+});
+
+test('Entourage: een gezelschap samenstellen zegt wat er nog ontbreekt', async () => {
+  const tok = await lidMet('lifestyle');
+  const lang = new Date(Date.now() + 900 * 86400000).toISOString().slice(0, 10);
+  await rh('entourage/persoon', { naam: 'Compleet', band: 'partner', telefoon: '0600', dieet: 'vis' }, tok);
+  await rh('entourage/persoon', { naam: 'Half', band: 'vriend' }, tok);
+  let d = await json(await rh('entourage', {}, tok));
+  const compleet = d.gezelschap.find(p => p.naam === 'Compleet');
+  const half = d.gezelschap.find(p => p.naam === 'Half');
+  await rh('entourage/doc', { id: compleet.id, soort: 'paspoort', tot: lang }, tok);
+
+  const alleen = await json(await rh('entourage/gezelschap', { ids: [compleet.id] }, tok));
+  assert.equal(alleen.gereed, true, alleen.tekst);
+  assert.deepEqual(alleen.dieten, [{ naam: 'Compleet', dieet: 'vis' }], 'de dieetlijst voor wie de tafel reserveert');
+
+  const samen = await json(await rh('entourage/gezelschap', { ids: [compleet.id, half.id] }, tok));
+  assert.equal(samen.gereed, false);
+  const wat = samen.punten.filter(p => p.naam === 'Half').map(p => p.wat);
+  assert.ok(wat.some(w => /geen enkel document/.test(w)));
+  assert.ok(wat.some(w => /telefoonnummer/.test(w)));
+  assert.ok(wat.some(w => /dieet onbekend/.test(w)));
+  assert.equal(samen.punten.some(p => p.naam === 'Compleet'), false, 'over wie compleet is staat er niets');
+
+  assert.ok((await json(await rh('entourage/gezelschap', { ids: [] }, tok))).error, 'zonder mensen geen gezelschap');
 });

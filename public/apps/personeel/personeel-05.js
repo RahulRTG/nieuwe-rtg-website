@@ -1,117 +1,136 @@
-    if (wisselOpties.length){
-      $('#todayWrap').insertAdjacentHTML('beforeend',
-        '<div class="card"><div class="k">'+T('pd.ws.h','Andere afdeling')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.ws.sub','U bent hier ook geaccrediteerd; wisselen kan direct, uw inlog reist mee.')+'</div>'+
-        wisselOpties.map(o => '<div class="task"><span class="ic">'+(BEDRIJVEN[o.code]?BEDRIJVEN[o.code].icon:'🏢')+'</span><div class="t"><b>'+esc(o.naam)+'</b><span>'+T('pd.ws.acc','Geaccrediteerd via het personeelsnetwerk')+'</span></div>'+
-          '<button class="abtn" data-wissel="'+esc(o.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
-      document.querySelectorAll('[data-wissel]').forEach(b => b.addEventListener('click', async () => {
-        b.disabled = true;
+    const go = async () => {
+      $('#kaFout').textContent = '';
+      try {
+        const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#kaCode').value.trim(), totp: $('#kaTotp').value.trim() }) });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(d.error || T('pd.ka.fout','Die code klopt niet.'));
+        kaToken = d.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
+        // een account voor alles: net bewezen code stil aan het RTG-account koppelen
         try {
-          const d = await API.call('/supplier/wissel', { code: b.dataset.wissel });
-          try {
-            localStorage.setItem('rtg_pda_token', d.token);
-            localStorage.setItem('rtg_pda_code', d.supplier.code);
-            localStorage.setItem('rtg_pda_bedrijf', d.supplier.code);
-          } catch(e){}
-          toast('🔁 ' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
-          setTimeout(() => location.reload(), 400);
-        } catch(e){ toast(e.message); b.disabled = false; }
-      }));
-    }
-    // 1x aanmelden: wie met het eigen RTG-account is ingelogd en bij meer bedrijven
-    // werkt, wisselt hier direct van werkplek. Inklokken doet u daar zelf, apart.
-    const andere = (mijnPosities || []).filter(p => p.code !== code);
-    if (andere.length){
-      $('#todayWrap').insertAdjacentHTML('beforeend',
-        '<div class="card"><div class="k">'+T('pd.mw.h','Mijn werkplekken')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.mw.sub','U werkt bij meer bedrijven; wissel met één tik. U klokt daar zelf in.')+'</div>'+
-        andere.map(p => '<div class="task"><span class="ic">'+(BEDRIJVEN[p.code]?BEDRIJVEN[p.code].icon:'🏢')+'</span><div class="t"><b>'+esc(p.naam)+'</b><span>'+esc(p.func || (p.manager?'Manager':T('pd.staff','Medewerker')))+'</span></div>'+
-          '<button class="abtn" data-mijn="'+esc(p.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
-      document.querySelectorAll('[data-mijn]').forEach(b => b.addEventListener('click', async () => {
-        b.disabled = true;
-        try {
-          const d = await API.call('/supplier/mijn/wissel', { code: b.dataset.mijn });
-          toast('🔁 ' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
-          await landMijn(d); openTab('vandaag');
-        } catch(e){ toast(e.message); b.disabled = false; }
-      }));
-    }
+          const lt = localStorage.getItem('rtg_member_token');
+          if (lt) fetch('/api/account/koppel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
+            body: JSON.stringify({ soort: 'kantoor', code: $('#kaCode').value.trim(), totp: $('#kaTotp').value.trim() }) });
+        } catch(e){}
+        enterKantoor();
+      } catch(e){ $('#kaFout').textContent = e.message; }
+    };
+    $('#kaGo').addEventListener('click', go);
+    $('#kaCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    $('#kaCode').focus();
+    // is de kantoor-rol al aan het RTG-account op dit toestel gekoppeld,
+    // dan is een tik genoeg (het ene account start dezelfde kantoor-sessie)
+    (async () => {
+      let lt = null; try { lt = localStorage.getItem('rtg_member_token'); } catch(e){}
+      if (!lt) return;
+      try {
+        const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok || !(d.rollen || []).some(x => x.rol === 'kantoor')) return;
+        const b = document.createElement('button');
+        b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
+        b.textContent = '' + T('pd.ka.een', 'Verder met uw RTG-account');
+        b.addEventListener('click', async () => {
+          const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: JSON.stringify({ rol: 'kantoor' }) });
+          const sd = await s.json().catch(() => ({}));
+          if (!s.ok) { $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.'); return; }
+          kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
+          enterKantoor();
+        });
+        const kaart = $('#gateStep').querySelector('.card');
+        if (kaart) kaart.appendChild(b);
+      } catch(e){}
+    })();
   }
-
-  function renderRooster(){
-    if (!week){ $('#roosterWrap').innerHTML = ''; return; }
-    $('#roosterWrap').innerHTML = week.days.map((d,i) =>
-      '<div class="rooster-day"><div class="dh">'+d.label+' · '+d.date.slice(8,10)+'-'+d.date.slice(5,7)+'</div>'+
-      d.staff.map(m => '<div class="rrow'+(m.id===me.staffId?' me':'')+'"><b>'+esc(m.name)+(m.id===me.staffId?' ('+T('pd.you','u')+')':'')+'</b><span>'+m.shift+'</span></div>').join('')+
-      '</div>'
-    ).join('');
-  }
-
-  function renderTaken(){
-    const tasks = taskList();
-    $('#takenWrap').innerHTML = '<div class="card">'+(tasks.length ? tasks.map(t => {
-      let act = '';
-      if (t.kind==='ticket') act = t.status==='open'
-        ? '<button class="abtn" data-tk="'+t.id+'" data-st="bezig">'+T('pd.pickup','Oppakken')+'</button>'
-        : '<button class="abtn" data-tk="'+t.id+'" data-st="klaar">'+T('pd.done','Klaar')+'</button>';
-      if (t.kind==='hk') act = '<button class="abtn" data-hk="'+t.id+'">'+T('pd.clean','Schoon')+'</button>';
-      return '<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div>'+act+'</div>';
-    }).join('') : '<div style="font-size:0.84rem;color:var(--green);padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
-    const tw = $('#takenWrap');
-    // melden hoort bij iedereen: een klus doorgeven en gevonden voorwerpen registreren
-    const kamers = (state && state.rooms || []).map(r => r.name);
-    const kamerSel = id => '<select class="hin" id="'+id+'" style="flex:1;"><option value="">'+T('hk.geenk','geen kamer')+'</option>'+kamers.map(k=>'<option>'+esc(k)+'</option>').join('')+'</select>';
-    tw.innerHTML += '<div class="card"><div class="k">🔧 '+T('hk.klus.meld','Meld klus')+'</div>'+
-      '<div class="row"><input class="hin" id="klusTekst" placeholder="'+T('hk.klus.ph','Omschrijf de klus...')+'" style="flex:2;">'+kamerSel('klusKamer')+'</div>'+
-      '<button class="abtn" id="klusMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.klus.meld','Meld klus')+'</button></div>';
-    const lf = (state && state.lostfound || []).slice(0, 6);
-    tw.innerHTML += '<div class="card"><div class="k">🧳 '+T('hk.lf','Gevonden voorwerp')+'</div>'+
-      '<div class="row"><input class="hin" id="lfItem" placeholder="'+T('hk.lf.item','Wat heb je gevonden?')+'" style="flex:2;">'+kamerSel('lfKamer')+'</div>'+
-      '<div class="row"><input class="hin" id="lfPlek" placeholder="'+T('hk.lf.plek','Bewaarplek')+'"></div>'+
-      '<button class="abtn" id="lfMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.lf.meld','Registreer')+'</button>'+
-      (lf.length ? '<div class="k" style="margin-top:0.8rem;">'+T('hk.lf.recent','Laatst geregistreerd')+'</div>'+
-        lf.map(x => '<div class="task"><div class="t"><b>'+esc(x.item)+'</b><span>'+(x.room?esc(x.room)+' · ':'')+(x.storage?esc(x.storage)+' · ':'')+timeAgo(x.at)+'</span></div></div>').join('') : '')+'</div>';
-    tw.querySelectorAll('[data-tk]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/ticket/status', { id:b.dataset.tk, status:b.dataset.st }); toast(b.dataset.st==='klaar'?T('pd.tickdone','Klus afgerond.'):T('pd.tickbusy','Opgepakt.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
-    }));
-    tw.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/room/hk', { id:b.dataset.hk, status:'schoon' }); toast(T('pd.cleaned','Kamer staat op schoon.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
-    }));
-    const km = $('#klusMeld'); if (km) km.addEventListener('click', async () => {
-      const text = $('#klusTekst').value.trim(); if (!text) return;
-      try { await API.call('/supplier/ticket/add', { text, room: $('#klusKamer').value }); toast('🔧 '+T('hk.klusok','Klus gemeld.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+  async function enterKantoor(){
+    const k = await kaApi('kamers');
+    // een kantoren-deeplink bracht ons hier alleen voor het inloggen: meteen door
+    const terug = kaTerugPad();
+    if (terug){ location.replace(terug); return; }
+    let naam = ''; try { naam = localStorage.getItem('rtg_kantoor_naam') || ''; } catch(e){}
+    $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.ka.staf','Personeel van een zaak')+'</button>'+
+      '<div class="card" id="kaMeld">'+
+        '<div class="k">'+T('pd.ka.naam','Jouw naam')+'</div>'+
+        '<input class="hin" id="kaNaam" maxlength="30" style="margin-top:0.4rem;" value="'+esc(naam)+'">'+
+        '<div class="row"><select class="hin" id="kaKamer">'+k.kamers.map(x => '<option value="'+x.id+'">'+esc(x.naam)+'</option>').join('')+'</select>'+
+        '<select class="hin" id="kaWaar" style="max-width:9.5rem;"><option value="thuis">'+T('pd.ka.thuis','Thuis')+'</option><option value="kantoor">'+T('pd.ka.hier','Kantoor')+'</option></select></div>'+
+        '<button class="abtn" id="kaMeldGo" style="margin-top:0.7rem;width:100%;padding:0.8rem;">'+T('pd.ka.meld','Meld je aan voor je dienst')+'</button>'+
+        '<div id="kaMFout" style="margin-top:0.4rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>'+
+      '<div class="card" id="kaDienstBlok" hidden><div id="kaDienstTekst" style="font-size:0.9rem;"></div>'+
+        '<button class="abtn ghost" id="kaAfmeld" style="margin-top:0.6rem;">'+T('pd.ka.afmeld','Meld je af')+'</button></div>'+
+      '<div class="card"><div class="k">'+T('pd.ka.wie','Nu aan het werk')+'</div><div id="kaWie" style="margin-top:0.4rem;"></div></div>'+
+      '<div class="card"><div class="k">'+T('pd.ka.chat','De chat van jouw kamer')+'</div>'+
+        '<div id="kaChat" style="max-height:15rem;overflow-y:auto;font-size:0.85rem;margin-top:0.4rem;"></div>'+
+        '<div class="row"><input class="hin" id="kaTekst" maxlength="500" placeholder="'+T('pd.ka.bericht','Bericht...')+'">'+
+        '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
+      '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
+    $('#kaTerug').addEventListener('click', stepSector);
+    const toonDienst = () => {
+      $('#kaMeld').hidden = !!kaDienst;
+      $('#kaDienstBlok').hidden = !kaDienst;
+      if (kaDienst) $('#kaDienstTekst').textContent = '' + kaDienst.naam + ' ' + T('pd.ka.aangemeld','is aangemeld') + ' (' + kaDienst.waar + ', ' + kaDienst.kamer + ').';
+    };
+    const laadWie = async () => {
+      try {
+        const d = await kaApi('dienst');
+        $('#kaWie').innerHTML = d.aangemeld.length ? d.aangemeld.map(x =>
+          '<div class="task"><span class="ic">'+(x.waar==='thuis'?'':'')+'</span><div class="t"><b>'+esc(x.naam)+'</b><span>'+esc(x.kamer)+'</span></div></div>').join('')
+          : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.niemand','Nog niemand aangemeld.')+'</div>';
+      } catch(e){}
+    };
+    const laadChat = async () => {
+      try {
+        const kamer = kaDienst ? kaDienst.kamer : $('#kaKamer').value;
+        if (!kamer) return;
+        const d = await kaApi('kachat', { kamer });
+        $('#kaChat').innerHTML = d.berichten.length ? d.berichten.slice(-25).map(m =>
+          '<div style="padding:0.25rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' ':'')+'</div>').join('')
+          : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.stil','Nog stil hier.')+'</div>';
+        $('#kaChat').scrollTop = $('#kaChat').scrollHeight;
+      } catch(e){}
+    };
+    $('#kaMeldGo').addEventListener('click', async () => {
+      $('#kaMFout').textContent = '';
+      try {
+        const d = await kaApi('dienst/in', { naam: $('#kaNaam').value, kamer: $('#kaKamer').value, waar: $('#kaWaar').value });
+        kaDienst = d.dienst;
+        try { localStorage.setItem('rtg_kantoor_dienst', JSON.stringify(kaDienst)); localStorage.setItem('rtg_kantoor_naam', kaDienst.naam); } catch(e){}
+        toonDienst(); laadWie();
+      } catch(e){ $('#kaMFout').textContent = e.message; }
     });
-    const lm = $('#lfMeld'); if (lm) lm.addEventListener('click', async () => {
-      const item = $('#lfItem').value.trim(); if (!item) return;
-      try { await API.call('/supplier/lost/add', { item, room: $('#lfKamer').value, storage: $('#lfPlek').value }); toast('🧳 '+T('hk.lfok','Geregistreerd.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    $('#kaAfmeld').addEventListener('click', async () => {
+      try { await kaApi('dienst/uit', { id: kaDienst.id }); } catch(e){}
+      kaDienst = null; try { localStorage.removeItem('rtg_kantoor_dienst'); } catch(e){}
+      toonDienst(); laadWie();
     });
+    const stuur = async () => {
+      try {
+        await kaApi('kachat/stuur', { kamer: kaDienst ? kaDienst.kamer : $('#kaKamer').value, naam: (kaDienst && kaDienst.naam) || $('#kaNaam').value || T('pd.ka.collega','collega'), tekst: $('#kaTekst').value });
+        $('#kaTekst').value = ''; laadChat();
+      } catch(e){}
+    };
+    $('#kaStuur').addEventListener('click', stuur);
+    $('#kaTekst').addEventListener('keydown', e => { if (e.key === 'Enter') stuur(); });
+    toonDienst(); laadWie(); laadChat();
+    kantoorStop();
+    kaTimer = setInterval(() => { if (!document.hidden && document.getElementById('kaChat')) { laadWie(); laadChat(); } else kantoorStop(); }, 8000);
   }
 
-  /* ---------- Kamers: het volledige housekeeping-bord in de PDA ----------
-     Alle PDA's leven in deze ene app. Voor zaken met kamers (hotel,
-     appartementen) is dit het kamerbord met een tik per stap, vroege
-     check-in vrijgeven en de minibar. Voor zaken zonder kamers
-     (schoonmaakbedrijven, zzp'ers) werkt dezelfde tab op opdrachten. */
-  const HK_ORDE = { defect: 0, vuil: 1, bezig: 2, schoon: 3, bezet: 4 };
-  const hkVan = r => (r.hk && r.hk.status) || (r.available ? 'schoon' : 'bezet');
-  const heeftKamers = () => !!(state && (state.rooms || []).length);
-  const heeftOpdrachten = () => !!(state && !(state.rooms || []).length && (state.boekingen || []).length);
-  // het eigen dorp op zak: bars, clubs, beachclubs en restaurants krijgen het afdelingenbord
-  const heeftClubdorp = () => !!(state && !(state.rooms || []).length && state.supplier && ['bar', 'club', 'beachclub', 'restaurant'].includes(state.supplier.type));
-  // het zorgprofiel van de gast, kort op een regel (reist mee met toestemming)
-  const pkZorg = z => [((z.allergenen || []).length ? T('zorg.allergie', 'Allergie') + ': ' + z.allergenen.join(', ') : ''), z.dieet, z.medisch].filter(Boolean).join(' · ');
-  let mbOpen = null;          // kamer waarvan de minibar-teller openstaat
-  let mbTel = {};             // minibar-aantallen van die kamer
-  // het receptiebord op zak: alleen de housekeeping-prioriteit is hier nodig
-  let pkReceptie = null, pkReceptieAt = 0, pkReceptieBezig = false;
-  function pkLaadReceptie(){
-    if (pkReceptieBezig || Date.now() - pkReceptieAt < 30000) return;
-    pkReceptieBezig = true;
-    API.call('/supplier/receptie').then(d => { pkReceptie = d; pkReceptieAt = Date.now(); pkReceptieBezig = false; renderKamers(); })
-      .catch(() => { pkReceptieBezig = false; pkReceptieAt = Date.now(); });
+  function enter(){
+    $('#gate').style.display = 'none';
+    $('#app').classList.add('active');
+    $('#meName').textContent = me.name;
+    const bedrijfNaam = (BEDRIJVEN[code] && BEDRIJVEN[code].name) || (state && state.supplier && state.supplier.name) || code;
+    $('#meSub').textContent = bedrijfNaam + ' · ' + (me.role==='manager'?'Manager':T('pd.staff','Medewerker'));
+    renderAll();
+    laadZaken().then(renderAll);
+    laadZorgbalie();
+    laadMeldkamerPda();
+    startStream();
+    // de moedertaal van dit personeelslid: het hele scherm en de taken volgen
+    if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), renderAll);
   }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderGebouwPda(); renderMarinaPda(); renderPolisPda(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
 
-  function renderKamers(){
-    const tabBtn = $('#tabKamers');
-    const aan = heeftKamers() || heeftOpdrachten() || heeftClubdorp();
-    const tabNaam = heeftKamers() ? T('pd.t.kamers','Kamers') : heeftClubdorp() ? T('pd.t.dorp','Afdelingen') : T('pd.t.opdr','Opdrachten');
+  /* ---- Borden: hetzelfde werkbord als in de leverancier-app (shared/borden.js) ---- */
+  let pdBordenUI = null;
+  function renderBorden(){

@@ -18,6 +18,14 @@ module.exports = (kern) => {
 require('./supplier/toegang')(kern);
 require('./supplier/moedertaal')(kern);
 require('./supplier/backoffice')(kern);
+require('./supplier/hrplus')(kern);
+require('./supplier/prplus')(kern);
+require('./supplier/gebouwplus')(kern);
+require('./supplier/gebouwpand')(kern);
+require('./supplier/wensen')(kern);
+require('./supplier/genrepuls')(kern);
+require('./supplier/genreplan')(kern);
+require('./supplier/genreblik')(kern);
 
 app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
 
@@ -57,17 +65,21 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/gastcontact')(kern);
   require('./supplier/tafels-team')(kern);
   require('./supplier/boekingen')(kern);
+  require('./supplier/vakpro')(kern);
   require('./supplier/ai')(kern);
   require('./supplier/menukaart')(kern);
   require('./supplier/orders')(kern);
   require('./supplier/reserveringen')(kern);
+  require('./supplier/poort')(kern);
   require('./supplier/agent')(kern);
   require('./supplier/tools')(kern);
   require('./supplier/keuken')(kern);
   require('./supplier/verblijf')(kern);
+  require('./supplier/thuis')(kern);
   require('./supplier/gast')(kern);
   require('./supplier/pda')(kern);
   require('./supplier/bezorg')(kern);
+  require('./supplier/bezorg-keten')(kern);
   require('./supplier/tickets')(kern);
   require('./supplier/verhuur')(kern);
   require('./supplier/charter')(kern);

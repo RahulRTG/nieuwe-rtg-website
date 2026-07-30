@@ -4,7 +4,7 @@ module.exports = (kern) => {
 
 /* ================== tickets: activiteiten, tours en musea ================== */
 function heeftTickets(s) {
-  return ((db.data.supplierTypes[s.type] || {}).caps || []).includes('tickets');
+  return (db.capsVan(s)).includes('tickets');
 }
 
 app.post('/api/supplier/activiteit', supplierAuth, (req, res) => {

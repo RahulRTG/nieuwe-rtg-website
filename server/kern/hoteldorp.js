@@ -14,6 +14,9 @@
 /* De afdelingsdata (afdelingen, sets en meters) staat als pure data in een
    deelmodule. */
 const { AFDELINGEN, HOTEL_SET, CLUB_SET, RESTO_SET, BEACH_SET, CLUB_TYPES, METERS } = require('./hoteldorp/afdelingen');
+/* En de dorpen van alle overige genres: zelfde motor, eigen indeling. */
+const { EXTRA_AFDELINGEN, GENRE_SETS, VANGNET_SET } = require('./hoteldorp/genresets');
+Object.assign(AFDELINGEN, EXTRA_AFDELINGEN);
 
 module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, haversine }) => {
   const nu = () => new Date().toISOString();
@@ -22,7 +25,8 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     : CLUB_TYPES.includes(s.type) ? CLUB_SET
     : s.type === 'restaurant' ? RESTO_SET
     : s.type === 'beachclub' ? BEACH_SET
-    : null;
+    // elk ander genre: de eigen indeling, en anders het gedeelde bedrijfsdorp
+    : GENRE_SETS[s.type] || VANGNET_SET;
   const dorpKan = s => !!dorpSet(s);
 
   function dorpPost(s, afdelingIn, waar, tekst, wie, directKlaar) {
@@ -43,7 +47,7 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     if (s.hotelPosten.length > 500) s.hotelPosten.length = 500;
     save();
     // security is de enige afdeling waar een nieuwe post meteen mag rinkelen
-    if (key === 'security') try { notifySupplier(s.code, { icon: '🛡️', title: 'Security: ' + (post.waar || 'melding'), body: post.tekst + ' (' + post.door + ')' }); } catch (e) {}
+    if (key === 'security') try { notifySupplier(s.code, { icon: 'schild', title: 'Security: ' + (post.waar || 'melding'), body: post.tekst + ' (' + post.door + ')' }); } catch (e) {}
     sseToSupplier(s.code, 'sync', { scope: 'dorp' });
     return { ok: true, post };
   }
@@ -97,7 +101,7 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
       .map(x => ({
         code: x.code, naam: x.name, stad: x.city,
         soort: (types[x.type] || {}).label || x.type,
-        icon: (types[x.type] || {}).icon || '📍',
+        icon: (types[x.type] || {}).icon || 'gps',
         km: Math.round((haversine(s.loc, x.loc) || 0) / 100) / 10
       }))
       .filter(x => x.km > 0 && x.km <= 30)

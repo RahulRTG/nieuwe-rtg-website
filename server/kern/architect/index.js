@@ -40,7 +40,7 @@ function maakArchitect({ db, save, crypto, anthropic, schoon }) {
   function publiek(o) {
     return {
       id: o.id, discipline: o.discipline, disciplineLabel: (DISCIPLINES[o.discipline] || {}).label || o.discipline,
-      icon: (DISCIPLINES[o.discipline] || {}).icon || '🏛️',
+      icon: (DISCIPLINES[o.discipline] || {}).icon || 'gebouw',
       naam: o.naam, brief: o.brief, huis: o.huis || null, collectie: o.collectie || null,
       status: o.status, concept: o.concept || null, bouwstaat: o.bouwstaat || null,
       kritiek: o.kritiek || null, at: o.at, updatedAt: o.updatedAt || o.at, door: o.door || null

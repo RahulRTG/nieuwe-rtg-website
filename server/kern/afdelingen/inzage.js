@@ -4,6 +4,8 @@
    naamInzage op de kamer) en de boardroom mogen de naam bij een codenaam
    opvragen. Elke opvraging, ook zonder treffer, komt in het auditlog:
    inzage is een handeling, geen bladerfunctie. */
+const inzagelog = require('../../inzagelog');
+
 module.exports = (ctx) => {
   const { AFDELINGEN, accounts, keyVanCodenaam } = ctx;
   const audit = (wie, wat) => ctx.audit(wie, wat);
@@ -21,6 +23,18 @@ module.exports = (ctx) => {
     const m = /^user-(\d+)$/.exec(String(tref.key || ''));
     const u = m ? accounts.getUserById(Number(m[1])) : null;
     if (!u) return { status: 404, error: 'Bij deze codenaam hoort geen accountdossier (demo-persona of gast zonder account).' };
+    /* Ook naar het centrale inzagejournaal. Het kantoor-auditlog hierboven is
+       van het kantoor; dit journaal is van de betrokkene -- daar kan een lid
+       later opvragen wie in ZIJN dossier heeft gekeken (AVG art. 15). Twee
+       lezers, twee doelen, dus twee sporen. */
+    try {
+      inzagelog.noteer({
+        door: { naam: String(wie || kamer.naam) },
+        over: { id: u.id, codenaam: tref.codename },
+        waarom: 'Naam opgevraagd bij codenaam vanuit ' + kamer.naam,
+        bron: 'kantoren/' + kamerId
+      });
+    } catch (e) {}
     return { ok: true, inzage: { codenaam: tref.codename, pas: tref.tier, naam: accounts.realNameOf(u), email: accounts.emailOf(u) } };
   }
 

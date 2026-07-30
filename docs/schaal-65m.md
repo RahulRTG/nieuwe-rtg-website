@@ -61,6 +61,17 @@ extensie niet (geen rechten), dan valt alleen het deelzoeken terug op een scan
 en werkt de rest gewoon door. De trigram-index kost extra opslag (~15 byte/lid),
 vandaar de bandbreedte 165–180 byte/lid hierboven.
 
+**Bewust overslaan op een krappe schijf (`MEGA_TRGM=0`).** De trigram-gin is
+de duurste index qua opslag én bouwtijd. Op een schaal-run met beperkte schijf
+(bijv. de 100M-beproeving in een sandbox met ~24 GB vrij) kun je hem overslaan
+met `MEGA_TRGM=0`: de btree op `codename_lower` blijft dan de
+exacte-opzoek/buiten-RAM-belofte op 100M bewijzen (de betaal-/Tik-weg is
+razendsnel), alleen het fuzzy deelzoeken valt terug op een scan. Dit is een
+bewuste, verdedigbare afweging voor de meting; **in productie hoort de
+trigram-index er wél te zijn** zodra fuzzy zoeken op die schaal een echte eis
+is. De grens ligt bij ongeveer 100M rijen + btree ≈ 12–16 GB (past); met
+trigram erbij ≈ 22–25 GB (paste niet binnen de sandbox-schijf).
+
 ## Waarom "Leden in de gids" nu de O(1)-teller gebruikt
 
 De kantoor- en afdelingen-KPI's telden het ledental met
@@ -201,7 +212,7 @@ json/sqlite/postgres en wordt dus door de VOLLEDIGE bestaande suite gedekt,
 plus een eigen equivalentietest (`test/txindex.test.js`) die bewijst dat de
 helpers exact hetzelfde antwoorden als de scans die ze vervangen.
 
-**2. Het transactie-grootboek (`tx_ledger`, Postgres).** Dezelfde behandeling
+**2. Het transactie-grootboek (`tx_ledger`).** Dezelfde behandeling
 als de ledengids: orders/boekingen als geïndexeerde rijen (soort+ref sleutel,
 klant/zaak/at geïndexeerd, data versleuteld at rest), buiten het
 procesgeheugen. Het RAM houdt een VENSTER van de recentste items
@@ -214,10 +225,19 @@ items stromen via de hete kop van de veegronde na (grootboek is bewust hooguit
 (`/api/orders/mine`, `/api/bookings/mine`) leest de eerste pagina vers uit het
 venster en diepere pagina's plus het eerlijke totaal uit het grootboek; de
 kantoor-totalen tellen via de gecachete grootboek-teller ook wat uit het venster
-is gerold. Dit Postgres-pad kan de sqlite/json-suite per definitie niet dekken,
+is gerold. Het Postgres-pad kan de sqlite/json-suite per definitie niet dekken,
 dus het heeft een eigen integratietest (`test/txledger.pg.test.js`) die tegen
 een echte Postgres draait en zonder `DATABASE_URL` expliciet skipt — geen vals
 groen.
+
+Sinds de opslagronde is dit grootboek niet langer Postgres-only. De laag kent
+alleen nog een ACHTERKANT (`server/db/tx/pgachter.js` of `sqliteachter.js`) en
+dezelfde veeg- en vensterlogica draait op beide; in de SQLite-stand — de
+standaardopslag — leven de rijen in een eigen `grootboek.db`. Dat moest, want
+juist daar was `orders` één kv-rij die bij elke nieuwe order in zijn geheel werd
+herschreven (gemeten 460 KB na 1050 orders). Hetzelfde contract wordt zonder
+database afgedwongen in `test/txledger-sqlite.test.js`. Uit met
+`TX_LEDGER_SQLITE=0`.
 
 ### Gemeten effect (zelfde harnas-werkpunt: 1M orders, 200k leden, 2 min soak)
 

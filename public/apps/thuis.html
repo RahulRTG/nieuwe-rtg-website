@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Thuis</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:900px;margin:0 auto;}
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .65rem;}
+  .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;display:block;}
+  .rij{display:flex;gap:.7rem;flex-wrap:wrap;align-items:flex-end;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:11px;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .sec{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 .5rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.9rem;}
+  .huis{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;text-align:left;display:flex;flex-direction:column;}
+  .huis:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .beeld{height:120px;display:flex;align-items:flex-end;padding:.6rem;}
+  .v0{background:linear-gradient(135deg,#2b2320,#5a4630);} .v1{background:linear-gradient(135deg,#1e2a2b,#3f6257);}
+  .v2{background:linear-gradient(135deg,#2a1e2b,#6a3a55);} .v3{background:linear-gradient(135deg,#232b1e,#5c6a3a);}
+  .v4{background:linear-gradient(135deg,#1e222b,#3a4d6a);} .v5{background:linear-gradient(135deg,#2b271e,#6a5a3a);}
+  .v6{background:linear-gradient(135deg,#2b1e1e,#6a3a3a);} .v7{background:linear-gradient(135deg,#1e2b26,#3a6a5a);}
+  .badge{background:rgba(0,0,0,.55);border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:.1rem .55rem;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;}
+  .huis .inhoud{padding:.8rem .9rem 1rem;display:flex;flex-direction:column;gap:.25rem;}
+  .huis .meta{font-size:.7rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
+  .huis h3{font-size:1.05rem;}
+  .huis .prijs{color:var(--gold);font-size:.85rem;font-variant-numeric:tabular-nums;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:1.4rem 0;text-align:center;}
+  .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
+  .blad.open{display:block;}
+  .blad-kop{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  .paneel{max-width:620px;margin:0 auto;padding:1.1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-top:.8rem;}
+  .r{display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;font-size:.86rem;}
+  .r .k{color:var(--soft);}
+  .chip{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:.15rem .6rem;font-size:.74rem;color:var(--muted);margin:.15rem .2rem 0 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:92%;z-index:40;}
+  .tabs{display:flex;gap:.4rem;margin-top:1rem;}
+  .tabs button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:.55rem;font:inherit;font-size:.84rem;cursor:pointer;}
+  .tabs button.aan{border-color:var(--gold);color:var(--gold);}
+  .boeking{border-bottom:1px solid var(--line);padding:.7rem 0;font-size:.86rem;}
+  .boeking:last-child{border-bottom:none;}
+  .st{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+  .deur{font-family:'Bodoni Moda',serif;font-size:1.5rem;letter-spacing:.35em;color:var(--gold);}
+</style>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/app.html">← App</a>
+  <div><div class="ey">Thuisverhuur van lid aan lid</div><h1>RTG Thuis</h1></div>
+</header>
+<main>
+  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:62ch;">Logeren bij leden, wereldwijd. Alle premium functies inbegrepen -- 0% servicekosten, keyless check-in, superhosts, AI-prijsadvies -- en bij elke boeking krijg je automatisch alle reisregels van het land.</p>
+  <div class="tabs"><button id="tabZoek" class="aan">Zoeken</button><button id="tabReizen">Mijn reizen</button><button id="tabHost">Host</button></div>
+
+  <section id="secZoek">
+    <div class="rij" style="margin-top:1rem;">
+      <span><span class="lbl">Waarheen</span><input class="veld" id="zPlaats" placeholder="Plaats, land of titel" style="width:12rem;"></span>
+      <span><span class="lbl">Aankomst</span><input class="veld" id="zVan" type="date"></span>
+      <span><span class="lbl">Vertrek</span><input class="veld" id="zTot" type="date"></span>
+      <span><span class="lbl">Gasten</span><input class="veld" id="zGasten" type="number" min="1" max="20" value="2" style="width:4.5rem;"></span>
+      <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="zInstant"> Instant boeken</label>
+      <button class="knop" id="zGo">Zoek</button>
+    </div>
+    <div class="sec">Aanbod</div>
+    <div class="grid" id="zUit"><div class="leeg">Zoek een plaats of laat alles zien met een lege zoekopdracht.</div></div>
+  </section>
+
+  <section id="secReizen" hidden>
+    <div class="sec">Mijn reizen</div>
+    <div class="kaart" id="rUit"><div class="leeg">Laden…</div></div>
+    <div class="sec">Mijn wenslijst</div>
+    <div class="grid" id="wUit"><div class="leeg">Nog leeg. Tik het hartje bij een huis.</div></div>
+  </section>
+
+  <section id="secHost" hidden>
+    <div class="sec">Mijn dashboard</div>
+    <div class="kaart" id="hBord"><div class="leeg">Laden…</div></div>
+    <div class="sec">Mijn huizen</div>
+    <div class="kaart" id="hHuizen"><div class="leeg">Nog geen huizen.</div></div>
+    <div class="sec">Zet je huis op RTG Thuis</div>
+    <div class="kaart">
+      <div class="rij">
+        <span><span class="lbl">Titel</span><input class="veld" id="nTitel" placeholder="Bijv. Finca met zeezicht" style="width:14rem;"></span>
+        <span><span class="lbl">Plaats</span><input class="veld" id="nPlaats" placeholder="Bijv. Ibiza" style="width:9rem;"></span>
+        <span><span class="lbl">Type</span><select class="veld" id="nType"></select></span>
+        <span><span class="lbl">Prijs/nacht (€)</span><input class="veld" id="nPrijs" type="number" min="1" value="120" style="width:6.5rem;"></span>
+        <span><span class="lbl">Max gasten</span><input class="veld" id="nGasten" type="number" min="1" max="20" value="4" style="width:5rem;"></span>
+      </div>
+      <div class="rij" style="margin-top:.7rem;">
+        <span><span class="lbl">Schoonmaak (€)</span><input class="veld" id="nSchoon" type="number" min="0" value="0" style="width:6rem;"></span>
+        <span><span class="lbl">Weekkorting %</span><input class="veld" id="nWeek" type="number" min="0" max="50" value="10" style="width:6rem;"></span>
+        <span><span class="lbl">Annulering</span><select class="veld" id="nAnnul"><option value="flex">Flexibel</option><option value="gemiddeld">Gemiddeld</option><option value="streng">Streng</option></select></span>
+        <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="nInstant" checked> Instant</label>
+        <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="nKeyless" checked> Keyless deurcode</label>
+        <button class="knop" id="nZet">Zet live</button>
+      </div>
+      <div style="font-size:.76rem;color:var(--soft);margin-top:.5rem;">RTG houdt 0% in; de uitbetaling staat gepland naar je RTG Bank-rekening. Host en gast kennen elkaar als codenaam.</div>
+    </div>
+  </section>
+</main>
+
+<section class="blad" id="blad" aria-label="Huis bekijken">
+  <div class="blad-kop">
+    <button class="terug" id="bladTerug">← Terug</button>
+    <div><div class="ey" id="bMeta"></div><h1 id="bTitel" style="font-size:1.3rem;"></h1></div>
+    <button class="terug" id="bWens" style="margin-left:auto;">♥</button>
+  </div>
+  <div class="paneel" id="bInhoud"></div>
+</section>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const euro = n => '€ ' + (Math.round((Number(n)||0)*100)/100);
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3500); }
+const api = (pad, body) => fetch('/api/thuis/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const TABS = { tabZoek: 'secZoek', tabReizen: 'secReizen', tabHost: 'secHost' };
+for (const [t, s] of Object.entries(TABS)) $('#'+t).addEventListener('click', () => {
+  for (const [t2, s2] of Object.entries(TABS)) { $('#'+t2).classList.toggle('aan', t2===t); $('#'+s2).hidden = s2 !== s; }
+  if (s === 'secReizen') { laadReizen(); laadWens(); }
+  if (s === 'secHost') { laadBord(); laadHuizen(); }
+});
+
+/* ---------- zoeken ---------- */
+function huisKaart(h){
+  return '<button class="huis" data-id="'+esc(h.id)+'"><div class="beeld v'+(h.visual||0)+'">'+
+    (h.superhost ? '<span class="badge">Superhost</span>' : (h.instant ? '<span class="badge">Instant</span>' : ''))+'</div>'+
+    '<div class="inhoud"><span class="meta">'+esc(h.plaats)+' · '+esc(h.typeLabel)+(h.rating && h.rating.sterren ? ' · ★ '+h.rating.sterren : '')+'</span>'+
+    '<h3>'+esc(h.titel)+'</h3>'+
+    '<span class="meta">host '+esc(h.host)+' · max '+h.maxGasten+' gasten</span>'+
+    '<span class="prijs">'+euro(h.prijs)+' per nacht'+(h.prijsopbouw ? ' · '+euro(h.prijsopbouw.totaal)+' totaal' : '')+'</span></div></button>';
+}
+async function zoek(){
+  try {
+    const d = await api('zoek', { plaats: $('#zPlaats').value, van: $('#zVan').value || undefined, tot: $('#zTot').value || undefined,
+      gasten: Number($('#zGasten').value)||1, instant: $('#zInstant').checked || undefined });
+    $('#zUit').innerHTML = d.huizen.length ? d.huizen.map(huisKaart).join('') : '<div class="leeg">Niets gevonden; probeer een andere plaats of periode.</div>';
+    $('#zUit').querySelectorAll('.huis').forEach(b => b.addEventListener('click', () => openHuis(b.dataset.id)));
+  } catch(e){ meld(e.message); }
+}
+$('#zGo').addEventListener('click', zoek);
+
+/* ---------- detail + boeken ---------- */
+let HUIDIG = null;
+async function openHuis(id){
+  try {
+    const d = await api('detail', { id, van: $('#zVan').value || undefined, tot: $('#zTot').value || undefined });
+    HUIDIG = d.huis;
+    $('#bMeta').textContent = HUIDIG.plaats + ' · ' + HUIDIG.typeLabel + (HUIDIG.superhost ? ' · Superhost' : '');
+    $('#bTitel').textContent = HUIDIG.titel;
+    const p = HUIDIG.prijsopbouw;
+    const w = HUIDIG.reiswijzer;
+    $('#bInhoud').innerHTML =
+      '<div class="beeld v'+(HUIDIG.visual||0)+'" style="border-radius:14px;height:150px;"></div>'+
+      '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:.8rem;">'+esc(HUIDIG.beschrijving||'')+'</p>'+
+      '<div style="margin-top:.4rem;">'+(HUIDIG.voorzieningen||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join('')+
+        '<span class="chip">'+HUIDIG.slaapkamers+' slaapkamers</span><span class="chip">'+HUIDIG.bedden+' bedden</span><span class="chip">'+HUIDIG.badkamers+' badkamers</span>'+
+        (HUIDIG.keyless?'<span class="chip" style="color:var(--gold);border-color:var(--gold);">keyless check-in</span>':'')+'</div>'+
+      '<div class="kaart"><h3 style="font-size:1rem;">Prijs</h3>'+
+        (p ? '<div class="r"><span class="k">'+p.nachten+' nachten × '+euro(p.perNacht)+'</span><span>'+euro(p.basis)+'</span></div>'+
+          (p.korting ? '<div class="r"><span class="k">Korting ('+p.kortingPct+'%)</span><span>− '+euro(p.korting)+'</span></div>' : '')+
+          (p.schoonmaak ? '<div class="r"><span class="k">Schoonmaak</span><span>'+euro(p.schoonmaak)+'</span></div>' : '')+
+          '<div class="r"><span class="k">Servicekosten</span><span style="color:var(--gold);">'+euro(0)+'</span></div>'+
+          (p.zakelijk && p.btw ? '<div class="r"><span class="k">Logies-btw ('+p.btwPct+'%)</span><span>'+euro(p.btw)+'</span></div>' : '')+
+          '<div class="r" style="border-top:1px solid var(--line);"><span><b>Totaal</b></span><b style="color:var(--gold);">'+euro(p.totaal)+'</b></div>'+
+          (p.borg ? '<div class="r"><span class="k">Borg (apart, terug na verblijf)</span><span>'+euro(p.borg)+'</span></div>' : '')+
+          '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(p.serviceTekst)+
+            (p.langverblijf ? ' ' + esc(p.langverblijf.tekst) : '')+
+            (p.zakelijk ? ' ' + esc(p.btwTekst || '') + (p.opFactuur ? ' Deze zaak kan op factuur werken; geef bij het boeken een kostenplaats mee.' : '') : '')+'</div>'
+        : '<div class="leeg">Kies eerst datums in de zoekbalk voor de volledige prijsopbouw.</div>')+
+        '<div style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">'+esc(HUIDIG.annuleringTekst||'')+'</div></div>'+
+      (w ? '<div class="kaart"><h3 style="font-size:1rem;">Alle regels van '+esc(w.naam)+'</h3>'+
+        '<div class="r"><span class="k">Visum</span><span>'+esc(w.visum.tekst)+'</span></div>'+
+        '<div class="r"><span class="k">Verkeer</span><span>'+esc(w.rijden)+' rijden · alarm '+esc(w.alarm)+'</span></div>'+
+        '<div class="r"><span class="k">Kraanwater</span><span>'+esc(w.waterTekst)+'</span></div>'+
+        '<div class="r"><span class="k">Fooi</span><span>'+esc(w.fooi)+'</span></div>'+
+        (w.letOp ? '<div class="r"><span class="k">Let op</span><span style="color:var(--burgundy);">'+esc(w.letOp)+'</span></div>' : '')+'</div>' : '')+
+      '<div class="kaart" id="bReviews"><h3 style="font-size:1rem;">Reviews</h3><div class="leeg">Laden…</div></div>'+
+      (HUIDIG.huisregels ? '<div class="kaart"><h3 style="font-size:1rem;">Huisregels</h3><p style="font-size:.84rem;color:var(--muted);line-height:1.6;">'+esc(HUIDIG.huisregels)+'</p></div>' : '')+
+      ((HUIDIG.prijsopbouw && HUIDIG.prijsopbouw.opFactuur) ?
+        '<div class="kaart"><h3 style="font-size:1rem;">Zakelijk boeken</h3>'+
+        '<p style="font-size:.82rem;color:var(--muted);line-height:1.6;">Deze zaak verhuurt beroepsmatig en kan op factuur werken. Geef een kostenplaats mee, dan staat die op de boeking en op de factuur.</p>'+
+        '<input class="veld" id="bKost" placeholder="Kostenplaats of projectcode (optioneel)" maxlength="40" style="width:100%;"></div>' : '')+
+      '<button class="knop" id="bBoek" style="width:100%;margin-top:1rem;">'+(HUIDIG.instant?'Boek direct':'Vraag aan bij de host')+'</button>';
+    $('#blad').classList.add('open');
+    $('#bBoek').addEventListener('click', boek);
+    laadReviews(HUIDIG.id);
+  } catch(e){ meld(e.message); }
+}
+async function laadReviews(id){
+  try {
+    const d = await api('reviews', { id });
+    $('#bReviews').innerHTML = '<h3 style="font-size:1rem;">Reviews'+(d.rating.sterren?' · ★ '+d.rating.sterren+' ('+d.rating.aantal+')':'')+'</h3>'+
+      (d.reviews.length ? d.reviews.map(r=>'<div class="r"><span class="k">'+esc(r.door)+' · ★ '+r.sterren+'</span><span style="text-align:right;">'+esc(r.tekst||'')+'</span></div>').join('') : '<div class="leeg">Nog geen reviews.</div>');
+  } catch(e){}
+}
+async function boek(){
+  if (!HUIDIG) return;
+  const van = $('#zVan').value, tot = $('#zTot').value;
+  if (!van || !tot) { meld('Kies eerst aankomst- en vertrekdatum in de zoekbalk.'); return; }
+  try {
+    const kost = $('#bKost');
+    const d = await api('boek', { id: HUIDIG.id, van, tot, gasten: Number($('#zGasten').value)||1,
+      kostenplaats: (kost && kost.value) || undefined });
+    $('#blad').classList.remove('open');
+    meld((d.boeking.status === 'bevestigd' ? 'Geboekt! ' : 'Aangevraagd -- de host beslist. ') +
+      (d.boeking.opFactuur ? 'De factuur volgt van de zaak; er is nog niets afgeschreven. ' : '') +
+      (d.reiswijzer ? 'Je hebt alle regels van ' + d.reiswijzer.naam + ' meegekregen.' : ''));
+  } catch(e){ meld(e.message); }
+}
+$('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
+$('#bWens').addEventListener('click', async () => { if (!HUIDIG) return; try { await api('wens', { id: HUIDIG.id }); meld('Wenslijst bijgewerkt.'); } catch(e){ meld(e.message); } });
+
+/* ---------- mijn reizen ---------- */
+async function laadReizen(){
+  try {
+    const d = await api('mijn');
+    $('#rUit').innerHTML = d.reizen.length ? d.reizen.map(b =>
+      '<div class="boeking"><div class="st">'+esc(b.status)+'</div><b>'+esc(b.titel)+'</b> · '+esc(b.plaats)+'<br>'+
+      '<span style="color:var(--soft);">'+esc(b.van)+' tot '+esc(b.tot)+' · '+b.gasten+' gasten · '+euro(b.prijsopbouw.totaal)+' · host '+esc(b.host)+'</span>'+
+      (b.deurcode ? '<div style="margin:.4rem 0;">Deurcode: <span class="deur">'+esc(b.deurcode)+'</span></div>' : '')+
+      '<div class="rij" style="margin-top:.4rem;">'+
+        (b.status==='bevestigd' ? '<button class="knop stil" data-doe="checkin" data-ref="'+esc(b.ref)+'">Check-in</button>' : '')+
+        (b.status==='ingecheckt' ? '<button class="knop stil" data-doe="checkuit" data-ref="'+esc(b.ref)+'">Check-uit</button>' : '')+
+        (['aangevraagd','bevestigd'].includes(b.status) ? '<button class="knop stil" data-doe="annuleer" data-ref="'+esc(b.ref)+'">Annuleer</button>' : '')+
+        (b.status==='uitgecheckt' ? '<button class="knop stil" data-doe="review" data-ref="'+esc(b.ref)+'">Review</button>' : '')+
+        '<button class="knop stil" data-doe="bericht" data-ref="'+esc(b.ref)+'">Bericht</button>'+
+      '</div></div>').join('') : '<div class="leeg">Nog geen reizen. Zoek een huis en boek.</div>';
+    $('#rUit').querySelectorAll('[data-doe]').forEach(b => b.addEventListener('click', () => doeActie(b.dataset.doe, b.dataset.ref)));
+  } catch(e){ $('#rUit').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+async function doeActie(doe, ref){
+  try {
+    if (doe === 'review'){
+      const sterren = prompt('Hoeveel sterren (1-5)?'); if (sterren == null) return;
+      const tekst = prompt('Je review (optioneel):') || '';
+      await api('review', { ref, sterren: Number(sterren), tekst }); meld('Dank voor je review.');
+    } else if (doe === 'bericht'){
+      const tekst = prompt('Je bericht aan de andere kant:'); if (!tekst) return;
+      await api('bericht', { ref, tekst }); meld('Bericht verstuurd.');
+    } else {
+      const d = await api(doe, { ref });
+      meld(doe === 'annuleer' ? 'Geannuleerd; ' + d.terugPct + '% terug volgens het beleid.' : 'Gedaan.');
+    }
+    laadReizen();
+  } catch(e){ meld(e.message); }
+}
+async function laadWens(){
+  try {
+    const d = await api('wenslijst');
+    $('#wUit').innerHTML = d.huizen.length ? d.huizen.map(huisKaart).join('') : '<div class="leeg">Nog leeg. Tik het hartje bij een huis.</div>';
+    $('#wUit').querySelectorAll('.huis').forEach(b => b.addEventListener('click', () => openHuis(b.dataset.id)));
+  } catch(e){}
+}
+
+/* ---------- host ---------- */
+async function laadBord(){
+  try {
+    const d = await api('bord');
+    $('#hBord').innerHTML =
+      '<div class="r"><span class="k">Huizen live</span><span>'+d.live+' van '+d.huizen+'</span></div>'+
+      '<div class="r"><span class="k">Inkomsten (afgerond)</span><b style="color:var(--gold);">'+euro(d.inkomstenTotaal)+'</b></div>'+
+      '<div class="r"><span class="k">Bezetting komende 30 dagen</span><span>'+d.bezettingPct+'%</span></div>'+
+      '<div class="r"><span class="k">Superhost</span><span>'+(d.superhost?'★ ja':'nog niet (3 verblijven, gemiddeld 4,8+)')+'</span></div>'+
+      '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(d.uitbetaling)+'</div>'+
+      (d.aanvragen.length ? '<div class="sec">Aanvragen</div>'+d.aanvragen.map(a =>
+        '<div class="boeking"><b>'+esc(a.titel)+'</b> · '+esc(a.van)+' tot '+esc(a.tot)+' · gast '+esc(a.gast)+(a.gastRating?' (★ '+a.gastRating+')':'')+
+        '<div class="rij" style="margin-top:.4rem;"><button class="knop" data-ok="'+esc(a.ref)+'">Accepteer</button><button class="knop stil" data-nee="'+esc(a.ref)+'">Wijs af</button></div></div>').join('') : '');
+    $('#hBord').querySelectorAll('[data-ok]').forEach(b => b.addEventListener('click', async () => { try { await api('beslis', { ref: b.dataset.ok, akkoord: true }); meld('Geaccepteerd.'); laadBord(); } catch(e){ meld(e.message); } }));
+    $('#hBord').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => { try { await api('beslis', { ref: b.dataset.nee, akkoord: false }); meld('Afgewezen.'); laadBord(); } catch(e){ meld(e.message); } }));
+  } catch(e){ $('#hBord').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+async function laadHuizen(){
+  try {
+    const d = await api('huizen');
+    $('#hHuizen').innerHTML = d.huizen.length ? d.huizen.map(h =>
+      '<div class="boeking"><b>'+esc(h.titel)+'</b> · '+esc(h.plaats)+' · '+euro(h.prijs)+'/nacht'+(h.rating.sterren?' · ★ '+h.rating.sterren:'')+
+      '<div class="rij" style="margin-top:.4rem;">'+
+      '<button class="knop stil" data-advies="'+esc(h.id)+'">AI-prijsadvies</button>'+
+      '<button class="knop stil" data-blok="'+esc(h.id)+'">Blokkeer datums</button>'+
+      '<button class="knop stil" data-cohost="'+esc(h.id)+'">Co-host</button></div>'+
+      '<div style="font-size:.78rem;color:var(--soft);margin-top:.3rem;" data-uit="'+esc(h.id)+'"></div></div>').join('') : '<div class="leeg">Nog geen huizen. Zet er hieronder een live.</div>';
+    $('#hHuizen').querySelectorAll('[data-advies]').forEach(b => b.addEventListener('click', async () => {
+      try { const d2 = await api('prijsadvies', { id: b.dataset.advies });
+        document.querySelector('[data-uit="'+b.dataset.advies+'"]').textContent = 'Advies: ' + euro(d2.advies) + '/nacht (nu ' + euro(d2.huidig) + ', bezetting ' + d2.bezettingPct + '%). ' + d2.uitleg;
+      } catch(e){ meld(e.message); } }));
+    $('#hHuizen').querySelectorAll('[data-blok]').forEach(b => b.addEventListener('click', async () => {
+      const van = prompt('Blokkeer van (JJJJ-MM-DD):'); if (!van) return;
+      const tot = prompt('tot (JJJJ-MM-DD):'); if (!tot) return;
+      try { await api('blokkeer', { id: b.dataset.blok, van, tot }); meld('Geblokkeerd.'); } catch(e){ meld(e.message); } }));
+    $('#hHuizen').querySelectorAll('[data-cohost]').forEach(b => b.addEventListener('click', async () => {
+      const wie = prompt('Codenaam van de co-host:'); if (!wie) return;
+      try { await api('cohost', { id: b.dataset.cohost, wie }); meld('Co-host toegevoegd.'); } catch(e){ meld(e.message); } }));
+  } catch(e){ $('#hHuizen').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+async function vulTypen(){
+  try { const d = await api('typen'); $('#nType').innerHTML = Object.entries(d.types).map(([k,v])=>'<option value="'+esc(k)+'">'+esc(v)+'</option>').join(''); } catch(e){}
+}
+$('#nZet').addEventListener('click', async () => {
+  try {
+    await api('huis', { huis: { titel: $('#nTitel').value, plaats: $('#nPlaats').value, type: $('#nType').value,
+      prijs: Number($('#nPrijs').value), maxGasten: Number($('#nGasten').value), schoonmaak: Number($('#nSchoon').value),
+      kortingWeek: Number($('#nWeek').value), annulering: $('#nAnnul').value,
+      instant: $('#nInstant').checked, keyless: $('#nKeyless').checked, visual: Math.floor(Math.random()*8) } });
+    meld('Je huis staat live op RTG Thuis.');
+    $('#nTitel').value = ''; laadHuizen(); laadBord();
+  } catch(e){ meld(e.message); }
+});
+
+vulTypen();
+zoek();
+/* diepe link vanuit de Mall: /apps/thuis.html?huis=TH... opent dat verblijf */
+const _diep = new URLSearchParams(location.search).get('huis');
+if (_diep) openHuis(_diep);
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

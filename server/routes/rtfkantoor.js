@@ -4,7 +4,10 @@
    het clubportaal: dat opent op de eigen clubcode en toont uitsluitend het
    eigen clubdossier. */
 module.exports = (kern) => {
-  const { app, officeAuth, rtfkantoor, rtfclubs, lab } = kern;
+  const { app, officeAuth, boardroomWie, magBoardroom, rtfkantoor, rtfclubs, lab, stadsraad } = kern;
+  // de kijker in het lab: bedrijfsgeheimen zijn besloten, dus wie het lab opent
+  // ziet alleen de projecten van zijn eigen team; de boardroom ziet alles.
+  const labKijker = req => { const key = boardroomWie(req); return { key, boardroom: magBoardroom(key) }; };
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const veilig = (res, werk) => { try { stuur(res, werk()); } catch (e) { console.error('[rtfkantoor]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
 
@@ -14,6 +17,15 @@ module.exports = (kern) => {
   app.post('/api/rtfkantoor/kamer/taak', officeAuth, (req, res) => veilig(res, () => rtfkantoor.taakMaak(String(req.body.id || ''), req.body.tekst)));
   app.post('/api/rtfkantoor/kamer/taak-zet', officeAuth, (req, res) => veilig(res, () => rtfkantoor.taakZet(String(req.body.id || ''), String(req.body.taakId || ''), req.body.af)));
   app.post('/api/rtfkantoor/overzicht', officeAuth, (req, res) => veilig(res, () => rtfkantoor.overzicht()));
+  // Rahul denkt mee: per kamer en over het hele huis. Adviserend, nooit beslissend.
+  app.post('/api/rtfkantoor/kamer/advies', officeAuth, async (req, res) => {
+    try { const r = await rtfkantoor.kamerAdvies(String(req.body.id || ''), req.body.vraag); stuur(res, r); }
+    catch (e) { console.error('[rtfkantoor]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  app.post('/api/rtfkantoor/advies', officeAuth, async (req, res) => {
+    try { const r = await rtfkantoor.huisAdvies(req.body.vraag); stuur(res, r); }
+    catch (e) { console.error('[rtfkantoor]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
 
   // Clubs & steden: het register, de programma's, het team en de afspraken
   app.post('/api/rtfkantoor/clubs', officeAuth, (req, res) => veilig(res, () => rtfclubs.overzicht()));
@@ -30,14 +42,40 @@ module.exports = (kern) => {
   app.post('/api/rtf/club/portaal', (req, res) => veilig(res, () => rtfclubs.portaal(req.body.code)));
   app.post('/api/rtf/club/bericht', (req, res) => veilig(res, () => rtfclubs.berichtClub(req.body.code, req.body.naam, req.body.tekst)));
 
-  // het Onderzoekslab: projecten, de fase-keten, de toets, kennis en de coach
-  app.post('/api/lab/overzicht', officeAuth, (req, res) => veilig(res, () => lab.overzicht()));
-  app.post('/api/lab/project/maak', officeAuth, (req, res) => veilig(res, () => lab.projectMaak(req.body || {})));
+  // het Onderzoekslab: projecten, de fase-keten, de toets, kennis en de coach.
+  // Het overzicht is besloten: iedereen ziet alleen zijn eigen teamprojecten,
+  // de boardroom ziet alles. Wie een project start, staat meteen op het team.
+  app.post('/api/lab/overzicht', officeAuth, (req, res) => veilig(res, () => lab.overzichtVoor(labKijker(req))));
+  app.post('/api/lab/project/maak', officeAuth, (req, res) => veilig(res, () => lab.projectMaak(req.body || {}, boardroomWie(req))));
+  app.post('/api/lab/project/team', officeAuth, (req, res) => veilig(res, () => lab.teamZet(String(req.body.id || ''), req.body.team)));
   app.post('/api/lab/project/fase', officeAuth, (req, res) => veilig(res, () => lab.faseZet(String(req.body.id || ''), String(req.body.fase || ''))));
   app.post('/api/lab/project/veiligheid', officeAuth, (req, res) => veilig(res, () => lab.veiligheidZet(String(req.body.id || ''), req.body || {})));
   app.post('/api/lab/project/log', officeAuth, (req, res) => veilig(res, () => lab.logMaak(String(req.body.id || ''), req.body.tekst, req.body.wie)));
   app.post('/api/lab/project/bevinding', officeAuth, (req, res) => veilig(res, () => lab.bevindingMaak(String(req.body.id || ''), req.body.titel, req.body.tekst)));
   app.post('/api/lab/kennisbank', officeAuth, (req, res) => veilig(res, () => lab.kennisbank()));
+
+  /* De Stadsraad: per stad EEN invloedrijke partner die in het gezamenlijke
+     foundation-kantoor met RTG-personeel beslist over de lab-uitslagen.
+     RTG-kant achter de office-inlog; de partner opent op de eigen raadcode
+     en ziet alleen de raadstafel (rtf/samen-uitslagen), nooit het besloten
+     RTG-bedrijfswerk. */
+  app.post('/api/rtfkantoor/stadsraad', officeAuth, (req, res) => veilig(res, () => stadsraad.raad('rtg')));
+  app.post('/api/rtfkantoor/stadsraad/partner-maak', officeAuth, (req, res) => veilig(res, () => stadsraad.partnerMaak(req.body || {})));
+  app.post('/api/rtfkantoor/stadsraad/partner-stop', officeAuth, (req, res) => veilig(res, () => stadsraad.partnerStop(String(req.body.id || ''))));
+  app.post('/api/rtfkantoor/stadsraad/besluit-start', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, boardroomWie(req) || 'kantoor', 'rtg')));
+  app.post('/api/rtfkantoor/stadsraad/stem', officeAuth, (req, res) => veilig(res, () => stadsraad.stem(String(req.body.besluitId || ''), 'rtg', req.body.naam || boardroomWie(req), req.body.voor === true)));
+  app.post('/api/rtfkantoor/stadsraad/besluit-sluit', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
+
+  // het partnerportaal: op raadcode; de partner stemt namens zijn stad
+  const metPartner = (req, res, werk) => {
+    const p = stadsraad.vindCode(req.body.code);
+    if (!p) return res.status(404).json({ error: 'Deze raadcode kennen we niet. Vraag het RTF-kantoor om de code.' });
+    veilig(res, () => werk(p));
+  };
+  app.post('/api/rtf/partner/raad', (req, res) => veilig(res, () => stadsraad.portaal(req.body.code)));
+  app.post('/api/rtf/partner/besluit-start', (req, res) => metPartner(req, res, p => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, p.naam + ' (' + p.stad + ')', 'partner')));
+  app.post('/api/rtf/partner/stem', (req, res) => metPartner(req, res, p => stadsraad.stem(String(req.body.besluitId || ''), 'partner', p.naam + ' (' + p.stad + ')', req.body.voor === true)));
+  app.post('/api/rtf/partner/besluit-sluit', (req, res) => metPartner(req, res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
   app.post('/api/lab/ai', officeAuth, async (req, res) => {
     try { const r = await lab.labAI(req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
     catch (e) { console.error('[lab]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }

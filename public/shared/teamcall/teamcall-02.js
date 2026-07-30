@@ -1,3 +1,7 @@
+  /* ---------- de publieke knoppen ---------- */
+  async function bel(staffId, naam){
+    if (stream || kamer){ toast(T('tc.bezig', 'Er loopt al een gesprek.')); return; }
+    await haalIce();
     if (!(await pakMedia())) return;
     try { await API.call('/staff/call', { kind: 'ring', staffId, video: true }); }
     catch (e) { toast(e.message); einde(); return; }
@@ -27,7 +31,7 @@
       if (stream || kamer){ zend('decline', { staffId: d.van }); return; }
       binnenkomend = { van: d.van, vanNaam: d.vanNaam };
       if (navigator.vibrate) navigator.vibrate([200, 80, 200, 80, 200]);
-      const el = ringUI('<div style="font-size:2rem;">📹</div><b style="display:block;margin-top:0.4rem;">' + esc(d.vanNaam) + '</b>' +
+      const el = ringUI('<div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg></div><b style="display:block;margin-top:0.4rem;">' + esc(d.vanNaam) + '</b>' +
         '<div style="font-size:0.85rem;opacity:0.7;margin-top:0.3rem;">' + T('tc.belt', 'belt je (video)...') + '</div>' +
         '<div class="knoppen"><button class="ja" id="tcJa">' + T('tc.aan', 'Neem aan') + '</button><button class="nee" id="tcNee">' + T('tc.weiger', 'Weiger') + '</button></div>');
       el.querySelector('#tcJa').addEventListener('click', async () => {

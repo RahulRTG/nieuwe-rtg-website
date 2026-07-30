@@ -5,13 +5,21 @@
   "description": "Rahul Travel Group, website, ledenportaal en backend",
   "scripts": {
     "start": "node server/trio.js",
+    "telefoon": "RTG_LOKAAL_TLS=1 node server/trio.js",
     "single": "node --experimental-sqlite server/server.js",
     "gateway": "node server/poort.js",
     "vloot": "node server/vloot.js",
     "sleutels": "node scripts/sleutels.js",
+    "outbox": "node scripts/outbox.js",
     "golive": "node scripts/golive.js",
+    "poortwacht": "node scripts/poortwacht.js",
+    "rand": "node scripts/rand.js",
     "beproeving": "node --experimental-sqlite scripts/beproeving.js",
+    "beproeving:streng": "STRENG=1 node --experimental-sqlite scripts/beproeving.js",
     "beproeving:mega": "node --max-old-space-size=8192 scripts/beproeving.js",
+    "slotsuite": "node --experimental-sqlite scripts/slotsuite.js",
+    "slotsuite:snel": "node --experimental-sqlite scripts/slotsuite.js --snel",
+    "keuring": "node --experimental-sqlite scripts/keuring.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
     "ast-scan": "node scripts/ast-scan.js",
@@ -23,9 +31,11 @@
     "audit": "npm audit --audit-level=high",
     "secrets": "node scripts/geheimen.js",
     "e2e": "node --experimental-sqlite --test test/*.e2e.js",
-    "icons": "node scripts/icons.js"
-  },
-  "optionalDependencies": {
-    "stripe": "^17.0.0"
+    "test:pg": "node --experimental-sqlite --test --test-concurrency=1 test/pg.test.js test/pgaccounts.test.js test/chaos.pg.test.js test/leden-gids-pg.test.js test/txledger.pg.test.js test/grand-integratie.pg.test.js test/sloophamer.pg.test.js",
+    "icons": "node scripts/icons.js",
+    "norm": "node --experimental-sqlite scripts/norm.js",
+    "norm:vast": "node --experimental-sqlite scripts/norm.js --vastleggen",
+    "dekking": "node --experimental-sqlite scripts/dekking.js",
+    "dekking:vast": "node --experimental-sqlite scripts/dekking.js --vastleggen"
   }
 }

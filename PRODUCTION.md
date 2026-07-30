@@ -47,6 +47,26 @@ verplicht (anders heeft elk proces zijn eigen data-snapshot). Daarnaast is
 elke route-handler omhuld: een (async) bug in een route geeft die ene
 aanvraag een nette 500 en raakt de rest van het proces nooit.
 
+### Op een Mac (Mac mini als thuisserver)
+
+```bash
+mv ~/Desktop/nieuwe-rtg-website ~/rtg        # niet in een map die macOS afschermt
+cd ~/rtg
+sudo scripts/mac/installeer.sh --eigenaar=jij@voorbeeld.nl --slaap-uit
+```
+
+Dit zet RTG als **launchd-daemon** neer: hij start bij het aanzetten van de
+machine (zonder dat er iemand inlogt), komt terug na een crash en na een
+stroomstoring. Het installatiescript maakt de geheimen met `npm run sleutels`,
+zet ze in `/usr/local/etc/rtg/rtg.env` met rechten 600, keurt de configuratie
+vóórdat het de dienst laadt, en overschrijft een bestaand geheimenbestand
+**nooit** (daar zit `RTG_VAULT_KEY` in). In het plist staan geen sleutels:
+alles in `/Library/LaunchDaemons` is voor iedereen leesbaar.
+
+Details, achtergrond en het dagelijks gebruik (`launchctl print`, `kickstart`,
+logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
+`sudo scripts/mac/verwijder.sh`.
+
 ---
 
 ## 3. Verplichte configuratie in productie
@@ -55,6 +75,8 @@ aanvraag een nette 500 en raakt de rest van het proces nooit.
 |---|---|
 | `NODE_ENV=production` | Zet demo uit, https-redirect + HSTS aan |
 | `RTG_ENC_KEY` | Versleuteling-at-rest. 64 hex-tekens (`openssl rand -hex 32`). Zonder dit weigert de start, tenzij je bewust `RTG_ALLOW_PLAINTEXT=1` zet |
+| `RTG_VAULT_KEY` | De sleutel van de identiteitskluis (echte naam, e-mail, telefoon). 64 hex-tekens. **Zonder dit weigert de start.** Staat hij niet in de omgeving, dan maakt de server hem als bestand `vault.key` in de datamap — naast `rtg.db`. Wie die map steelt heeft dan de data én de sleutel, en zijn de codenamen weer namen. Hoort uit een secrets manager te komen |
+| `RTG_SECRET_KEY` | Ondertekent de sessietokens. 64 hex-tekens. **Zonder dit weigert de start**, om dezelfde reden: anders komt `secret.key` naast de database te liggen, en kan wie hem heeft zelf geldige sessies maken |
 | `DATABASE_URL` | PostgreSQL voor de gedeelde data (aanbevolen voor productie en meerdere instances). Leeg = lokaal bestand |
 | `APP_URL` | Correcte links in e-mails |
 | `REDIS_URL` | Nodig zodra je meer dan één instance draait (realtime over instances) |
@@ -75,6 +97,91 @@ De app kan HTTPS zelf termineren, zonder nginx/Caddy ervoor:
 - **Local/dev:** alleen `RTG_TLS=1` — de app genereert een self-signed cert (in `<datamap>/tls/`, gitignore) en spreekt meteen HTTPS.
 
 Het sleutelmateriaal (self-signed cert, ACME-accountsleutel, opgehaalde certificaten) staat onder `<datamap>/tls/` en wordt nooit gecommit. Een reverse proxy/CDN (Cloudflare) ervoor mag nog steeds — dan laat je `RTG_TLS` uit en blijft `trust proxy` de bron van waarheid voor `X-Forwarded-Proto`.
+
+### Backup en herstel (oefen dit, geloof het niet)
+
+De server maakt elke dag een backup in `<datamap>/backups/<datum>/`, en met
+`RTG_BACKUP_DIR` ook een kopie op een tweede schijf. Meegekopieerd worden
+`db.json`, `rtg.db`, `store.db` en hun `-wal`-bestanden. Vóór het kopiëren
+wordt de SQLite-WAL in het hoofdbestand gevouwen; zonder die stap kopieert hij
+bestanden waar de recentste gegevens niet in staan.
+
+**De sleutels zitten NIET in de backup, en dat hoort zo.** `vault.key` en
+`secret.key` staan er bewust buiten: zou de sleutel in dezelfde backup zitten,
+dan opent een gestolen backup zichzelf. Dat betekent wel dat de backup in zijn
+eentje waardeloos is. Bewaar `RTG_VAULT_KEY` en `RTG_SECRET_KEY` in een
+secrets manager, met een tweede kopie ergens waar je erbij kunt als die
+secrets manager onbereikbaar is. Zonder die sleutels krijg je na een herstel
+wel alle accounts terug, maar geen enkele naam: die blijven versleuteld.
+
+Herstellen:
+
+```bash
+systemctl stop rtg                      # of: docker compose down
+cp <datamap>/backups/<datum>/* <datamap>/
+export RTG_VAULT_KEY=...  RTG_SECRET_KEY=...   # uit de secrets manager
+systemctl start rtg
+```
+
+Controleer daarna dat een bestaand lid kan inloggen én dat zijn echte naam
+zichtbaar is -- dat tweede bewijst dat de kluis het weer doet.
+
+`test/herstelproef.test.js` loopt deze hele ronde automatisch door: aanmaken,
+backuppen, datamap wissen, terugzetten, opstarten, controleren. Draai hem als
+je iets aan de opslag verandert.
+
+#### Hoe lang duurt het? (gemeten, niet aangenomen)
+
+`scripts/hersteltijd.js` doet dezelfde ronde maar met een stopwatch, op een
+database van een opgegeven omvang. Draai: `node --experimental-sqlite
+scripts/hersteltijd.js 250000`.
+
+Gemeten op **29 juli 2026**, op de ontwikkelmachine:
+
+| Leden | Back-up | Terugzetten | Server op | **RTO** |
+|---|---|---|---|---|
+| 25.000 (13,9 MB) | 27 ms | 51 ms | 9,6 s | **9,8 s** |
+| 250.000 (144,2 MB) | 394 ms | 1,4 s | 11,6 s | **13,1 s** |
+
+RTO = van "de schijf is weg" tot "een lid is ingelogd en zijn naam is weer
+leesbaar". Tienmaal zoveel leden kost maar drie seconden extra, omdat het
+grootste deel de serverstart is en niet de gegevens -- dat is goed nieuws voor
+de schaalbaarheid en slecht nieuws als je de RTO omlaag wilt: dan moet de
+opstarttijd omlaag, niet de back-up.
+
+**Twee dingen die deze cijfers NIET zeggen.** Ze zijn gemeten op een lokale
+schijf; een back-up van een tweede locatie ophalen telt daar de overdracht bij
+op. En de echte tijd tot dienstverlening begint bij het OPMERKEN en het besluit
+om te herstellen -- meestal het langste deel van de keten. Zie `SLO.md`.
+
+**RPO** (hoeveel werk je kwijt bent) volgt uit het back-upritme, niet uit een
+meting: bij een dagelijkse back-up is dat tot 24 uur. Wil je daaronder, dan is
+er vaker back-uppen nodig, of Postgres met point-in-time recovery.
+
+### Zet een proxy ervoor? Strip dan `token` uit zijn access log
+
+De live-verbindingen (SSE) kunnen geen `Authorization`-header meesturen —
+`EventSource` in de browser kan dat simpelweg niet — dus daar reist het
+sessietoken mee als `?token=…` in de URL.
+
+De app zelf logt dat niet: `server/log.js` schrijft `req.path`, en dat is het
+pad **zonder** querystring (`test/loghygiene.test.js` bewaakt dat). Ook stuurt
+de app `Referrer-Policy: strict-origin-when-cross-origin`, zodat een externe
+partij hooguit onze origin ziet en nooit de volledige URL met het token erin.
+
+Maar een reverse proxy of CDN logt standaard de **hele** URL. Doe je dat niet
+uit, dan staan er geldige sessietokens in de access log van nginx/Caddy/
+Cloudflare — en logs gaan naar plekken waar de kluis niet geldt. Dus:
+
+```nginx
+# nginx: log het pad, niet de querystring
+log_format rtg '$remote_addr "$request_method $uri" $status $body_bytes_sent';
+access_log /var/log/nginx/rtg.log rtg;
+```
+
+Bij Cloudflare: zet in de Logpush-configuratie het veld `ClientRequestURI` uit
+(of gebruik `ClientRequestPath`). Draai je met `RTG_TLS=1` zonder proxy, dan
+speelt dit niet.
 
 ### Eigen interne CA + mTLS (intern verkeer)
 
@@ -243,8 +350,11 @@ dev-lekken, registratie/eigenaar/backoffice werken.
    `.env.productie` als omgeving en start met `NODE_ENV=production`.
 
 - [ ] `npm run golive` geeft exitcode 0 op de productiemachine
-- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar (verplicht; het voorbeeldadres blokkeert de start)
+- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). Overdragen kan later op de technische pagina onder "Eigenaarschap"
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
+- [ ] Versleuteling in rust bewezen op de echte machine: `node --experimental-sqlite --test test/rust.test.js` is groen. Die test zet gegevens via de gewone endpoints in een server en zoekt daarna de hele datamap byte voor byte af; hij vertrouwt niet op de belofte
+- [ ] De sleutels (`RTG_ENC_KEY`, `RTG_VAULT_KEY`, `RTG_SECRET_KEY`) staan als omgevingsvariabele, **niet** in de datamap. Zonder deze regel schrijft de server ze als bestand naast de data, en dan opent een gestolen schijf zichzelf
+- [ ] Weet dat de outbox met een sleutel versleuteld is: mislukte verzendingen teruglezen gaat met `npm run outbox` (met dezelfde `RTG_ENC_KEY`)
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
 - [ ] TLS geregeld: óf een reverse proxy/load balancer vóór de app met `trust proxy` aan, óf native in de app (`RTG_TLS=1`, evt. `RTG_ACME=1` voor een automatisch Let's Encrypt-certificaat) — poort 80 + 443 bereikbaar
 - [ ] Redis draait en `REDIS_URL` is gezet (bij >1 instance)

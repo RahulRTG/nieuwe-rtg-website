@@ -80,9 +80,16 @@ test('4. tikken tussen leden blijven kosteloos: dit raakt alleen de kassa van de
   const u = Date.now().toString().slice(-8);
   const lidB = (await api(base, '/api/auth/register', { name: 'Tik Vriend', email: 'bd2' + u + '@x.nl',
     phone: '062' + u.slice(1), password: 'geheim123', geboortedatum: '1991-02-02', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  // Een gratis RTG-lid toont eenmalig zijn paspoort voordat het RTG Pay gebruikt
+  // (de payGate). Dat is een echte precondititie voor de zender; daarna is de
+  // tik zelf gratis. De minimale, schone PNG passeert de malware-scanner.
+  const PNG = 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]).toString('base64');
+  await api(base, '/api/verify/upload', { image: PNG }, lid);
+  await api(base, '/api/verify/selfie', { image: PNG }, lid);
   const mij = await api(base, '/api/pay/overzicht', {}, lidB);
   const voor = mij.body.saldo;
-  await api(base, '/api/pay/stuur', { aan: mij.body.codenaam || (await api(base, '/api/member/connections', {}, lidB)).body.codename, centen: 500, idem: 'bd-tik-1' }, lid);
+  const send = await api(base, '/api/pay/stuur', { aan: mij.body.codenaam || (await api(base, '/api/member/connections', {}, lidB)).body.codename, centen: 500, idem: 'bd-tik-1' }, lid);
+  assert.ok(send.body.ok, 'de tik gaat door: ' + JSON.stringify(send.body));
   const na = await api(base, '/api/pay/overzicht', {}, lidB);
   assert.equal(na.body.saldo, voor + 500, 'de vriend ontvangt het volle bedrag, zonder kosten');
 });

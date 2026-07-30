@@ -49,11 +49,12 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
   function schrijfBytes(buf) {
     try { fs.mkdirSync(OPSLAG, { recursive: true, mode: 0o700 }); } catch (e) {}
     const naam = crypto.randomBytes(16).toString('hex') + '.bin';
-    fs.writeFileSync(path.join(OPSLAG, naam), kluis.versleutelBuf(buf), { mode: 0o600 });
+    fs.writeFileSync(path.join(OPSLAG, naam), kluis.versleutelBestand(buf, naam), { mode: 0o600 });
     return naam;
   }
   function leesBytes(ref) {
-    try { return kluis.ontsleutelBuf(fs.readFileSync(path.join(OPSLAG, path.basename(String(ref || ''))))); }
+    // de naam is de context: een omgewisseld blob gaat niet open
+    try { const n = path.basename(String(ref || '')); return kluis.ontsleutelBestand(fs.readFileSync(path.join(OPSLAG, n)), n); }
     catch (e) { return null; }
   }
   function wisBytes(ref) {

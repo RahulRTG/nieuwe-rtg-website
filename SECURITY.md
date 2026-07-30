@@ -102,3 +102,17 @@ npm run kluisbinding -- --migreer # herzegel alles wat nog ongebonden is
 Een rij die niet opengaat wordt met opzet niet aangeraakt: migreren mag nooit
 gegevens vernietigen. `test/kluis-binding.test.js` valt de verplaatsing met rauwe
 SQL aan en bewaakt tegelijk dat de oudere vormen leesbaar blijven.
+
+### Opgeslagen bestanden zijn aan hun naam gebonden
+
+Hetzelfde geldt voor de bestandsopslag (`server/kluis.js`). De versleuteling
+beschermde de inhoud van een KYC-document, maar zei niet welk document het was —
+dus kon wie bij de opslag kan twee blobs **omwisselen**, waarna de backoffice het
+verkeerde identiteitsbewijs bij een goedkeuring te zien krijgt. Daarom gaat nu de
+bestandsnaam als additional authenticated data mee, voor alle drie de
+opslagplaatsen (`uploads`, `media`, `bestanden`): ze verwijzen allemaal met de kale
+naam naar hun bestanden, en die naam is bij schrijven én lezen bekend.
+
+Bestaande bestanden blijven leesbaar (`RTGENC1`, ongebonden) en nieuwe
+schrijfacties zijn gebonden (`RTGENC2`). `test/bestand-binding.test.js` wisselt
+twee blobs om en eist dat er niets opengaat.

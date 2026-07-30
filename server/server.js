@@ -1091,7 +1091,7 @@ function leesUploadDataUrl(fname) {
     const file = path.basename(String(fname || ''));
     const full = path.join(UPLOAD_DIR, file);
     if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return null;
-    const buf = require('./kluis').ontsleutelBuf(fs.readFileSync(full));
+    const buf = require('./kluis').ontsleutelBestand(fs.readFileSync(full), file);
     const ext = (file.split('.').pop() || 'jpg').toLowerCase();
     const mime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
     return 'data:' + mime + ';base64,' + buf.toString('base64');

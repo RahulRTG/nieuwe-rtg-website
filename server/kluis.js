@@ -54,4 +54,49 @@ function ontsleutelBuf(buf) {
   return Buffer.concat([d.update(buf.subarray(p + 28)), d.final()]);
 }
 
-module.exports = { AAN, versleutel, ontsleutel, versleutelBuf, ontsleutelBuf };
+/* ---------- bestanden gebonden aan hun naam ----------
+
+   versleutelBuf hierboven beschermt de INHOUD van een bestand, maar zegt niets
+   over WELK bestand het is. Wie bij de opslag kan, kan een blob dus omwisselen:
+   het identiteitsbewijs van de een op de plek van de ander. De AEAD merkt daar
+   niets van -- het blob is ongeschonden -- en de backoffice ziet daarna het
+   verkeerde document bij een goedkeuring. Voor KYC-bestanden is dat het ergste
+   wat er met deze opslag kan gebeuren.
+
+   Daarom gaat de bestandsnaam als additional authenticated data mee. Alle drie de
+   opslagplaatsen (uploads, media, bestanden) verwijzen naar hun bestanden met de
+   kale naam, en die naam is bij zowel schrijven als lezen bekend -- dus is het
+   overal dezelfde conventie. Verwissel je twee blobs, dan klopt de naam niet meer
+   en gaat er niets open.
+
+   Bestaande bestanden blijven leesbaar: RTGENC1 (ongebonden) en onversleutelde
+   bytes gaan door de oude weg. Nieuwe schrijfacties zijn gebonden (RTGENC2).
+   Zonder RTG_ENC_KEY versleutelt deze laag niets, en dan valt er ook niets te
+   binden -- dat is dezelfde afweging als hierboven. */
+const MAGIC2 = Buffer.from('RTGENC2'); // zelfde lengte als MAGIC: offsets blijven gelijk
+
+function versleutelBestand(buf, naam) {
+  if (!KEY) return buf;
+  if (!naam) throw new Error('versleutelBestand vraagt de bestandsnaam (de context).');
+  const iv = crypto.randomBytes(12);
+  const c = crypto.createCipheriv('aes-256-gcm', KEY, iv);
+  c.setAAD(Buffer.from('rtg-bestand-v2|' + naam, 'utf8'));
+  const enc = Buffer.concat([c.update(buf), c.final()]);
+  return Buffer.concat([MAGIC2, iv, c.getAuthTag(), enc]);
+}
+
+function ontsleutelBestand(buf, naam) {
+  if (!buf || buf.length < MAGIC2.length) return buf;
+  if (!buf.subarray(0, MAGIC2.length).equals(MAGIC2)) return ontsleutelBuf(buf); // RTGENC1 of plat
+  if (!KEY) throw new Error('Bestand is versleuteld maar RTG_ENC_KEY ontbreekt.');
+  const p = MAGIC2.length;
+  const d = crypto.createDecipheriv('aes-256-gcm', KEY, buf.subarray(p, p + 12));
+  d.setAAD(Buffer.from('rtg-bestand-v2|' + String(naam || ''), 'utf8'));
+  d.setAuthTag(buf.subarray(p + 12, p + 28));
+  return Buffer.concat([d.update(buf.subarray(p + 28)), d.final()]); // gooit bij een verkeerde naam
+}
+
+module.exports = {
+  AAN, versleutel, ontsleutel, versleutelBuf, ontsleutelBuf,
+  versleutelBestand, ontsleutelBestand
+};

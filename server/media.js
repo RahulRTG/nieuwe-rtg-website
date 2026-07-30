@@ -82,13 +82,13 @@ function maakMedia({ dir, env }) {
     if (!buf.length) return null;
     if (maxBytes && buf.length > maxBytes) return null;
     const naam = crypto.randomBytes(16).toString('hex') + '.' + EXT_VAN_MIME[m[1]];
-    try { await put(naam, kluis.versleutelBuf(buf)); } catch (e) { return null; }
+    try { await put(naam, kluis.versleutelBestand(buf, naam)); } catch (e) { return null; }
     return naam;
   }
   async function bewaarPubliek(dataUrl, maxBytes) { const n = await bewaar(dataUrl, maxBytes); return n ? url(n) : null; }
 
   async function leesBuf(ref) {
-    try { return kluis.ontsleutelBuf(await haal(naamVan(ref))); } catch (e) { return null; }
+    try { const n = naamVan(ref); return kluis.ontsleutelBestand(await haal(n), n); } catch (e) { return null; }
   }
   async function leesDataUrl(ref) {
     if (typeof ref === 'string' && ref.startsWith('data:')) return ref; // oude, nog-inline foto: gewoon teruggeven

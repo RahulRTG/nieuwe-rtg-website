@@ -49,8 +49,12 @@ function maakPost(base) {
 let teller = 0;
 const uniek = () => (Date.now().toString(36) + (teller++).toString(36)).slice(-9);
 
-async function bouwGezelschap(base, officeToken) {
+/* opties.genres = false laat het genre-deel weg. Dat is voor toetsen die het
+   publiek nodig hebben maar niet de breedte: zeventig leden aanmaken om er drie
+   te verwijderen kost een minuut per run en levert niets extra's op. */
+async function bouwGezelschap(base, officeToken, opties) {
   const post = maakPost(base);
+  const metGenres = !opties || opties.genres !== false;
 
   /* Een gewoon lid. Krijgt ALTIJD een RTG Pass, wat je ook meestuurt; dat is de
      pas-poort en die toetsen we elders. */
@@ -123,7 +127,7 @@ async function bouwGezelschap(base, officeToken) {
   const aanwezig = [...new Set(partners.map(p => p.type).filter(Boolean))].sort();
 
   const perGenre = {};
-  for (const genre of aanwezig) {
+  for (const genre of (metGenres ? aanwezig : [])) {
     const l = await lid('Genre ' + genre, '1990-01-01');
     l.genre = genre;
     l.partner = partners.find(p => p.type === genre);

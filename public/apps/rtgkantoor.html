@@ -44,6 +44,7 @@
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/kantoorgesprek.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
@@ -56,8 +57,7 @@
   <section id="vLogin" class="kaart" hidden>
     <h2 style="font-size:1.05rem;">Kantoor-inlog</h2>
     <p class="stil" style="margin:.4rem 0 .6rem;">Het RTG Kantoor is alleen voor het kantoor zelf.</p>
-    <div class="rij"><input class="veld" id="lCode" maxlength="40" placeholder="Kantoorcode" style="flex:1;min-width:10rem;"><button class="knop" id="lGo">Binnen</button></div>
-    <p class="stil" id="lFout" role="alert" style="color:#E39AA2;margin-top:.5rem;"></p>
+    <div id="lGesprek"></div>
   </section>
 
   <section id="vAi" hidden>
@@ -125,14 +125,10 @@ function start(){
   $('#vAi').hidden = !TOKEN;
   if (TOKEN) { ververs(); verversO(); }
 }
-$('#lGo').addEventListener('click', async () => {
-  $('#lFout').textContent = '';
-  try {
-    const r = await fetch('/api/office/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code: $('#lCode').value.trim() }) }).then(x => x.json());
-    if (!r.token) throw new Error(r.error || 'Onbekende kantoorcode.');
-    TOKEN = r.token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch(e){}
-    start();
-  } catch(e){ $('#lFout').textContent = e.message; }
+// de inlog is een gesprek met Rahul (shared/kantoorgesprek.js), geen codeveld
+RTGKantoorGesprek.toon($('#lGesprek'), (token) => {
+  TOKEN = token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch(e){}
+  start();
 });
 
 let S = null;

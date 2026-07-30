@@ -653,5 +653,42 @@ console.log('\n17) een scherm dat door de poort kan, kan het gesprek ook voeren'
   if (!mist) ok(gedekt + ' pagina\'s die achter de poort kunnen komen laden het gesprek (' + poortPaden.size + ' poortpaden)');
 }
 
+/* 18) de kantoordeur staat maar op een plek nagebouwd.
+
+   Dit is met schade geleerd. /api/office/login was op vijf schermen los
+   nagebouwd, en toen de backoffice een tweede factor kreeg, kreeg maar EEN van
+   die vijf een veld om die code in te typen. De andere vier liepen vast op een
+   vraag die ze niet konden stellen: "Tweede factor vereist" zonder plek om hem
+   te geven. Niemand had iets verkeerd gedaan; het was gewoon vier keer hetzelfde
+   scherm dat niet meebewoog.
+
+   Dus: een pagina praat met de kantoordeur via het gesprek
+   (shared/kantoorgesprek.js), of ze staat hieronder met naam en reden. Zo kan er
+   geen zesde kopie bijkomen die stilletjes achterloopt.
+
+   personeel is de benoemde uitzondering: dat is de werk-app waar het ene
+   RTG-account zijn rollen koppelt, en die heeft de code EN de tweede factor
+   allebei al als veld. Daar is de deur dus compleet. */
+console.log('\n18) de kantoordeur staat maar op een plek nagebouwd');
+{
+  const MAG_ZELF = new Map([
+    ['public/apps/personeel.js', 'de werk-app koppelt rollen aan het ene account; heeft code en tweede factor allebei'],
+    ['public/apps/personeel/personeel-05.js', 'de bron-slice van dezelfde werk-app']
+  ]);
+  let eigen = 0, viaGesprek = 0;
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || rel === 'public/shared/kantoorgesprek.js') return;
+    const bron = fs.readFileSync(f, 'utf8');
+    if (/RTGKantoorGesprek/.test(bron)) viaGesprek++;
+    if (!/['"]\/api\/office\/login['"]/.test(bron)) return;
+    if (MAG_ZELF.has(rel)) return;
+    eigen++;
+    fout('eigen kantoor-inlog: ' + rel +
+      ' -- praat met de deur via RTGKantoorGesprek.toon(), of noem hem in MAG_ZELF');
+  });
+  if (!eigen) ok(viaGesprek + ' plek(ken) doen de kantoor-inlog via het gesprek (' + MAG_ZELF.size + ' benoemd met een eigen veld)');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

@@ -2826,6 +2826,16 @@ Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
   logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken,
   pinInfo: kern.pinInfo, pinCheck: kern.pinCheck
 }));
+/* Het kantoorgesprek (kern/kantoorgesprek.js): de backoffice binnenkomen door
+   met Rahul te praten in plaats van een codeveld in te vullen. Zelfde slot als
+   de kantoordeur zelf (bucket 'office:<ip>'), zodat de vriendelijkere weg geen
+   zwakkere weg is; wat er ingetypt wordt gaat nergens heen. */
+Object.assign(kern, require('./kern/kantoorgesprek').maakKantoorgesprek({
+  OFFICE_CODE: kern.OFFICE_CODE, veiligGelijk: kern.veiligGelijk, totpOk: kern.totpOk,
+  crypto, rememberSession, officeState: kern.officeState, logInlog: kern.logInlog,
+  loginFails, noteFailedTry
+}));
+
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
    koerier) vraagt Rahul in een gesprek precies wat die handeling nodig heeft. */
@@ -2940,6 +2950,7 @@ for (const naam of gekozenDomeinen) {
 // leveranciers; net als de infra-endpoints draait dit altijd mee.
 require('./routes/onboarding')(kern);
 require('./routes/aanmeldgesprek')(kern);
+require('./routes/kantoorgesprek')(kern);
 /* SSO staat naast de auth-routes en niet erin: het is een tweede weg naar
    binnen, met een eigen levensloop (koppelingen, providers), en het moet ook
    draaien als het auth-domein apart is opgestart. */

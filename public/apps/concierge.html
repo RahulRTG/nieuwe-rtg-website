@@ -41,6 +41,7 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/kantoorgesprek.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
@@ -60,14 +61,11 @@ const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov',
 function tijd(s){ if(!s) return ''; const d=new Date(s); return d.getDate()+' '+MND[d.getMonth()+1]+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'); }
 
 function inlog(){
-  $('#main').innerHTML = '<div class="inlog"><h2>Kantoor-inlog</h2><input id="code" placeholder="Backoffice-code" autocomplete="off"><button class="knop" id="in">Inloggen</button></div>';
-  $('#in').onclick = async ()=>{
-    const code = $('#code').value.trim(); if(!code) return;
-    try{ const r = await fetch('/api/office/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})}).then(x=>x.json());
-      if(!r.token) throw new Error(r.error||'Onjuiste code.'); TOKEN=r.token; try{ localStorage.setItem('rtg_office_token',TOKEN); }catch(e){} laad();
-    }catch(e){ meld(e.message); }
-  };
-  $('#code').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#in').click(); });
+  // de inlog is een gesprek met Rahul (shared/kantoorgesprek.js), geen codeveld
+  $('#main').innerHTML = '<div id="lGesprek"></div>';
+  RTGKantoorGesprek.toon($('#lGesprek'), token => {
+    TOKEN=token; try{ localStorage.setItem('rtg_office_token',TOKEN); }catch(e){} laad();
+  });
 }
 
 async function laad(){

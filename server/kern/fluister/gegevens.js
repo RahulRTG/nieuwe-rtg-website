@@ -55,7 +55,10 @@ module.exports = (ctx) => {
   /* De intent-handler. Staat er een vraag open, dan is dit bericht het antwoord
      erop -- daarom staat hij vooraan in de keten. Geeft null als er niets
      openstaat, en dan gaat het gesprek zijn gewone gang. */
-  async function gegevensAntwoord({ q, p, klaar, key, codenaam, sess }) {
+  async function gegevensAntwoord({ q, p, klaar, klaarStil, key, codenaam, sess }) {
+    /* stil, niet gewoon: wat hier binnenkomt is het antwoord op zijn vraag, en
+       dat hoort in de kluis en niet in het gespreksgeheugen (zie gesprek.js) */
+    const zeg = klaarStil || klaar;
     if (!vers(p) || !gegevensZeg || !sess) return null;
     const w = p.wachtGeg;
     // een kaal "nee" is hier hetzelfde als "laat maar"; de machine kent dat woord
@@ -64,16 +67,16 @@ module.exports = (ctx) => {
 
     if (d.status && d.status >= 400) {          // gesprek verlopen of niet meer van u
       p.wachtGeg = null; save();
-      return klaar(d.error + ' Zeg gerust opnieuw wat ik moet regelen.');
+      return zeg(d.error + ' Zeg gerust opnieuw wat ik moet regelen.');
     }
-    if (d.gestopt) { p.wachtGeg = null; save(); return klaar(d.tekst); }
-    if (!d.klaar) { w.at = nu(); save(); return klaar(d.tekst); }
+    if (d.gestopt) { p.wachtGeg = null; save(); return zeg(d.tekst); }
+    if (!d.klaar) { w.at = nu(); save(); return zeg(d.tekst); }
 
     // alles binnen: van de plank af en alsnog doen wat er gevraagd was
     const actie = w.actie;
     p.wachtGeg = null; save();
     const r = await voerActieUit(key, codenaam, sess, actie);
-    return klaar('Genoteerd. ' + r.tekst, r.gedaan);
+    return zeg('Genoteerd. ' + r.tekst, r.gedaan);
   }
 
   return { poortVraag, gegevensAntwoord, versGeg: vers };

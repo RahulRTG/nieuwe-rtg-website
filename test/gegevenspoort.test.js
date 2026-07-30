@@ -208,3 +208,53 @@ test('ook Rahul komt niet om de gegevenspoort heen', async () => {
     assert.equal((res3.body.reserveringen || []).length, 0, 'en dan is er ook niets gereserveerd');
   } finally { stop(child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
 });
+
+/* Wat je Rahul vertelt, blijft in de kluis -- ook al zit het in een gesprek.
+
+   Rahuls gespreksgeheugen bewaart de laatste vijf beurten in de gewone store, en
+   bij de volgende beurt reizen die mee als context naar het model. Zolang daar
+   "plan mijn dag" in staat is dat prima. Maar zodra Rahul zelf om een
+   telefoonnummer vraagt, is het antwoord precies het soort gegeven dat volgens
+   het codenaam-ontwerp NIET buiten de kluis hoort te komen -- en dan zou de
+   omweg om dat ontwerp heen in het gesprek zelf zitten.
+
+   Deze test gelooft dat niet op zijn woord. Hij draait bewust ZONDER
+   RTG_ENC_KEY, zodat versleuteling-at-rest niets kan verbergen, en zoekt daarna
+   de hele datamap af naar het nummer. Zo werd dit ook gevonden: het stond er
+   letterlijk in, als {"u":"06..."} in het gespreksgeheugen. */
+test('wat je Rahul vertelt komt niet in zijn gespreksgeheugen terecht', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gpl-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  const NUMMER = '0687654321';
+  try {
+    const reg = await api(base, '/api/auth/register', {
+      name: 'Stil Lid', email: 'stil@voorbeeld.test', password: 'stilgeheim12',
+      geboortedatum: '1989-09-09', tier: 'rtg', pasApp: 'rtg'
+    });
+    const token = reg.body.token;
+    const zaak = (await api(base, '/api/suppliers', {}, token)).body.suppliers.find(s => s.type === 'restaurant');
+    assert.ok(zaak, 'er is een restaurant om bij te reserveren');
+
+    // Rahul vraagt om het nummer, en het lid geeft het in het gesprek
+    await api(base, '/api/fluister', { q: 'reserveer bij ' + zaak.name + ' morgen om 20:00 met 2 personen' }, token);
+    const klaar2 = await api(base, '/api/fluister', { q: NUMMER }, token);
+    assert.match(klaar2.body.antwoord, /aangevraagd/i, 'de reservering is er (anders bewijst de rest niets)');
+
+    // en dan: nergens in de datamap terug te vinden
+    await new Promise(r => setTimeout(r, 1500));   // de opslaglus zijn werk laten doen
+    stop(child);
+    await new Promise(r => setTimeout(r, 600));
+    const alles = [];
+    (function loop(d) {
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        const p = path.join(d, e.name);
+        if (e.isDirectory()) loop(p); else alles.push(p);
+      }
+    })(TMP);
+    assert.ok(alles.length > 3, 'verwacht een gevulde datamap, kreeg ' + alles.length + ' bestand(en)');
+    const naald = Buffer.from(NUMMER);
+    const lekt = alles.filter(f => { try { return fs.readFileSync(f).includes(naald); } catch (e) { return false; } })
+      .map(f => path.relative(TMP, f));
+    assert.deepEqual(lekt, [], 'het nummer hoort alleen in de kluis; het staat plat in: ' + lekt.join(', '));
+  } finally { try { stop(child); } catch (e) {} try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
+});

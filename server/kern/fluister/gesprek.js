@@ -25,6 +25,21 @@ module.exports = (ctx) => {
       save();
       return { ok: true, antwoord, gedaan: !!gedaan, voorstel: !!voorstel, pakte: true };
     };
+    /* Sommige antwoorden mogen NIET in dit geheugen. Wat een lid intypt als
+       antwoord op een vraag van Rahul is precies het soort gegeven dat in de
+       kluis hoort -- een telefoonnummer, een adres -- en dit geheugen gaat bij
+       de volgende beurt mee als context naar het model. Dan zou de omweg om de
+       codenamen heen in het gesprek zelf zitten.
+
+       klaarStil bewaart daarom Rahuls vraag wel en het antwoord van het lid
+       niet: er komt een merkteken voor in de plaats. Het gesprek blijft
+       leesbaar, de waarde blijft waar hij hoort. */
+    const klaarStil = (antwoord, gedaan) => {
+      p.gesprek.push({ u: '[antwoord op een vraag van Rahul, niet bewaard]', a: String(antwoord).slice(0, 400), at: nu() });
+      p.gesprek = p.gesprek.slice(-5);
+      save();
+      return { ok: true, antwoord, gedaan: !!gedaan, pakte: true };
+    };
     if (/^onthoud\b/i.test(q)) {
       const r = fluisterOnthoud(key, q);
       if (r.error) return r;
@@ -82,7 +97,7 @@ module.exports = (ctx) => {
       // en voert uit (met de bevestigingsdrempel voor geld/poolclaims); geeft
       // null terug als geen handler pakt, dan valt dit door naar de AI hieronder.
       // In sparmodus slaan we dit over: dan wil je meedenken, niet iets doen.
-      const gedaan = await intent.doeActie({ q, p, klaar, key, codenaam, sess });
+      const gedaan = await intent.doeActie({ q, p, klaar, klaarStil, key, codenaam, sess });
       if (gedaan) return gedaan;
     }
 

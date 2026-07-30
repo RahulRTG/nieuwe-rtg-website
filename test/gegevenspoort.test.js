@@ -103,6 +103,37 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
     assert.equal(stop3.body.gestopt, true, 'stoppen kan');
     assert.match(stop3.body.tekst, /niet door/i, 'met de eerlijke gevolgtrekking');
 
+    /* 6b) DE POORT STAAT OVERAL WAAR EEN DERDE PARTIJ IS, niet alleen op /api/order.
+       Keuringsregel 16 bewaakt dat er geen nieuw pad omheen komt; deze test bewijst
+       dat de bestaande paden er ECHT langsgaan -- een regel die alleen in de keuring
+       staat is nog geen werkende poort. Een vers lid zonder telefoonnummer krijgt
+       overal netjes 428 met wat er mist, en niet stilletjes een geslaagde boeking. */
+    const vers = await api(base, '/api/auth/register', {
+      name: 'Derde Partij', email: 'derde@voorbeeld.test', password: 'derdegeheim12',
+      geboortedatum: '1988-04-04', tier: 'rtg', pasApp: 'rtg'
+    });
+    const vt = vers.body.token;
+    const paden = [
+      ['/api/reserveer', { supplierCode: 'KIKUNOI', personen: 2 }],
+      ['/api/verblijf', { supplierCode: 'KIKUNOI' }],
+      ['/api/bezorg/bestel', { supplierCode: 'KIKUNOI', items: [] }],
+      ['/api/ticket/koop', { supplierCode: 'KIKUNOI' }],
+      ['/api/huur/boek', { supplierCode: 'KIKUNOI' }],
+      ['/api/charter/boek', { supplierCode: 'KIKUNOI' }],
+      ['/api/verkoop/proefrit', { supplierCode: 'KIKUNOI' }],
+      ['/api/care/boek', {}],
+      ['/api/mall/bestel', {}],
+      ['/api/reisbureau/boek', {}],
+      ['/api/groothandel/bestel', {}],
+      ['/api/mode/bezorg/aanvraag', { supplierCode: 'KIKUNOI', items: [] }]
+    ];
+    for (const [pad, lijf] of paden) {
+      const r = await api(base, pad, lijf, vt);
+      assert.equal(r.status, 428, pad + ' hoort op de gegevens te wachten (kreeg ' + r.status + ')');
+      assert.ok(Array.isArray(r.body.ontbreekt) && r.body.ontbreekt.length,
+        pad + ' zegt ook WAT er mist');
+    }
+
     // 7) het gesprek van een ander is niet van jou
     const ander = await api(base, '/api/auth/register', {
       name: 'Ander Lid', email: 'ander@voorbeeld.test', password: 'andergeheim12',

@@ -9,7 +9,7 @@ module.exports = (vctx) => {
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
     avTeken, avMijnDeals, zorgVoor, zorgContact, media,
-    boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn } = vctx;
+    boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn, gegevensStop } = vctx;
 /* ================== charter: boten en jachten huren ==================
    Zelfde eerlijke opzet als autoverhuur (vaste prijs vooraf, staat met foto's
    voor en na, borg, SOS op zee, vrijwillig live positie), met vaartuig-specifieke
@@ -32,6 +32,7 @@ app.post('/api/charter/aanbod', auth, (req, res) => {
 });
 
 app.post('/api/charter/boek', auth, (req, res) => {
+  if (gegevensStop(req, res, 'reservering')) return;
   const s = findSupplier(req.body.supplierCode);
   if (!s || s.type !== 'charter') return res.status(404).json({ error: 'Geen charterpartner gevonden.' });
   const boot = (s.boten || []).find(v => v.id === req.body.bootId && v.actief !== false);

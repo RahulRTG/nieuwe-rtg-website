@@ -10,12 +10,15 @@ module.exports = (hctx) => {
     gastDeur, toggleFavoriet, favorietenVan, agendaVoor, maakSplits,
     mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer,
     puntenVan, verzilverPunten, salonZichtbaar, ghMarkt, ghPlaatsBestelling,
-    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact } = kern;
+    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact,
+    gegevensStop } = kern;
 /* ================== veilig laten bezorgen door een modewinkel ==================
    Een lid laat gekochte/apart-gelegde mode-artikelen thuisbezorgen. Veilig: een
    bezorgcode die je alleen aan de echte koerier geeft, live volgen, en bij dure
    stukken een ID-controle aan de deur (RTG-geverifieerd account vereist). */
 app.post('/api/mode/bezorg/aanvraag', auth, express.json({ limit: '1mb' }), (req, res) => {
+  // er komt een koerier langs: het bezorgadres staat in het verzoek, het nummer niet
+  if (gegevensStop(req, res, 'bestelling')) return;
   const r = mbAanvraag(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), req.body.items,
     { adres: req.body.adres, lat: req.body.lat, lng: req.body.lng });
   if (r.error) return res.status(r.status).json({ error: r.error });
@@ -33,6 +36,7 @@ app.post('/api/groothandel/markt', auth, (req, res) => {
   res.json({ groothandels: ghMarkt('lid', { zoek: req.body.zoek, categorie: req.body.categorie }) });
 });
 app.post('/api/groothandel/bestel', auth, (req, res) => {
+  if (gegevensStop(req, res, 'bestelling')) return;
   const koper = { soort: 'lid', id: req.session.key, naam: liveCodename(req.session) };
   const r = ghPlaatsBestelling(String(req.body.groothandelCode || ''), koper, req.body.regels, { bezorgen: req.body.bezorgen !== false });
   if (r.error) return res.status(r.status).json({ error: r.error });

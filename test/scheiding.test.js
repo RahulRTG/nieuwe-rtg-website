@@ -239,8 +239,8 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
     // (b) openbare inhoud achter een inlog
     'server/routes/luchthaven.js:48': 'boarding pass die de gast zelf toont aan de balie',
     'server/routes/member/winkel-bieb.js:21': 'vrije tijdsloten van een restaurant: openbare beschikbaarheid',
-    'server/routes/member/winkel-bieb.js:38': 'catalogus van een boerderij: openbaar aanbod',
-    'server/routes/member/winkel-bieb.js:78': 'reisgids lezen: openbare bibliotheekinhoud',
+    'server/routes/member/winkel-bieb.js:39': 'catalogus van een boerderij: openbaar aanbod',
+    'server/routes/member/winkel-bieb.js:80': 'reisgids lezen: openbare bibliotheekinhoud',
     'server/routes/thuis.js:13': 'detail van een advertentie: openbaar aanbod',
     'server/routes/thuis.js:14': 'reviews bij een advertentie: openbaar',
     /* (c) de terugkeer van een identiteitsprovider. Hier IS er per definitie nog

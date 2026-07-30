@@ -10,9 +10,12 @@ module.exports = (hctx) => {
     gastDeur, toggleFavoriet, favorietenVan, agendaVoor, maakSplits,
     mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer,
     puntenVan, verzilverPunten, salonZichtbaar, ghMarkt, ghPlaatsBestelling,
-    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact, idGeverifieerd } = kern;
+    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact, idGeverifieerd,
+    gegevensStop } = kern;
 app.post('/api/verblijf', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  // een verblijf staat op uw naam bij een derde: de receptie moet u kunnen bereiken
+  if (gegevensStop(req, res, 'reservering')) return;
   const r = verblijfBoek(req.session, liveCodename(req.session), req.body);
   if (r.error) return res.status(r.status).json({ error: r.error });
   // het zorgprofiel reist mee (alleen met toestemming): de receptie weet het meteen
@@ -42,6 +45,7 @@ app.post('/api/verblijf/deur', auth, (req, res) => {
 app.post('/api/reserveer', auth, (req, res) => {
   if (req.session.tier === 'guest' && !idGeverifieerd(req.session))
     return res.status(403).json({ error: 'Reserveren kan zodra uw identiteit geverifieerd is. Eten bestellen en meebestellen kan wel gewoon.' });
+  if (gegevensStop(req, res, 'reservering')) return;
   const r = reserveerTafel(req.session, liveCodename(req.session), req.body);
   if (r.error) return res.status(r.status).json({ error: r.error });
   // het zorgprofiel reist mee (alleen met toestemming): de zaak weet het al bij het dekken

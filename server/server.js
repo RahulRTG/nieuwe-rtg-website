@@ -2832,7 +2832,7 @@ Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
     getMemberState: accounts.getMemberState, schoon
   });
   Object.assign(kern, {
-    gegevensPoort: poort.poort, gegevensNodig: poort.ontbreekt,
+    gegevensPoort: poort.poort, gegevensNodig: poort.ontbreekt, gegevensStop: poort.stop,
     gegevensStart: gesprek.gegevensStart, gegevensZeg: gesprek.gegevensZeg
   });
 }

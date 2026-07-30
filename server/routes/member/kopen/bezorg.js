@@ -8,7 +8,7 @@ module.exports = (kern) => {
     liveCodename, notifySupplier, pickupCode, publicPartner, save,
     schoon, sseToOffice, sseToSupplier, salonZichtbaar, zorgVoor,
     koopTicketVoor, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek,
-    orderMetRef, ordersVoegToe } = kern;
+    orderMetRef, ordersVoegToe, gegevensStop } = kern;
 app.post('/api/partner', (req, res) => {
   const partner = findPartner(req.body.code);
   if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });
@@ -30,6 +30,9 @@ app.post('/api/bezorg/partners', auth, (req, res) => {
 });
 
 app.post('/api/bezorg/bestel', auth, (req, res) => {
+  // ophalen of bezorgen: de zaak moet je kunnen bereiken. Het bezorgadres vraagt
+  // deze route zelf per bestelling, want dat is niet altijd je eigen adres.
+  if (gegevensStop(req, res, 'bestelling')) return;
   const s = findSupplier(req.body.supplierCode);
   if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
   if (!magBezorgen(s) || !s.bezorg || !s.bezorg.aan || !s.bezorg.producten.length)

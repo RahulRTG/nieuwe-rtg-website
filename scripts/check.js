@@ -483,5 +483,84 @@ console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.ra
   if (!mist) ok(pag + ' pagina\'s die RTGId gebruiken laden shared/id.js (zonder defer)');
 }
 
+/* 16) een pad met een DERDE PARTIJ gaat langs de gegevenspoort.
+
+   De afspraak: een gratis RTG-account vraagt vier dingen (naam, geboortedatum,
+   e-mail, wachtwoord). Wie alleen rondkijkt hoeft nooit meer te geven. Maar zodra
+   er een zaak, een koerier of een professional in beeld komt, moet die iemand
+   kunnen bereiken -- en dan vraagt Rahul de rest, in een gesprek
+   (kern/gegevenspoort.js + kern/gegevensgesprek.js).
+
+   Die afspraak leeft in een regel per route: `if (gegevensStop(req, res, ...))
+   return;`. Een regel die je moet ONTHOUDEN wordt vroeg of laat vergeten, en dan
+   staat er ineens een koerier voor de deur van een lid van wie we geen
+   telefoonnummer hebben -- of erger: dan vraagt een nieuw pad wel alles vast,
+   "voor de zekerheid", en is de belofte weg.
+
+   Daarom kijkt de keuring mee. Elke leden-route (server/routes/member/**) die in
+   zijn pad een handeling met een derde noemt -- bestellen, boeken, reserveren,
+   bezorgen, huren, kopen -- heeft die regel, of staat hieronder met naam en
+   reden. De namenlijst is het punt: een NIEUW pad staat er per definitie niet in
+   en valt dus op, en wie er een in zet, zet zijn reden erbij.
+
+   Uitgezonderd is niet hetzelfde als vergeten: kijken kost niets, en een
+   vervolgstap binnen iets wat al loopt (de deur van je eigen hotelkamer, een
+   foto bij de huurauto die voor je klaarstaat) vraagt niet opnieuw. */
+console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoort');
+{
+  const DERDE = /bestel|order|reserve|boek|booking|bezorg|leveri|koerier|courier|afhaal|ophaal|verblijf|proefrit|koop|huur|ticket|vervoer|taxi|\brit\b/i;
+  // alleen kijken/opvragen: geen handeling, dus niets te vragen
+  const KIJKEN = /\/(mijn|mine|status|volg|slots|annuleer|betaal|pay|partners|overzicht|lijst|list|historie|history|zoek|markt|advies|check|info)\b/i;
+  const MAG_ZONDER = new Map([
+    ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    ['/api/verhuur/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    ['/api/verkoop/showroom', 'de showroom bekijken; er gebeurt nog niets'],
+    ['/api/verblijf/deur', 'je bent al ingecheckt: dit opent je eigen kamerdeur'],
+    ['/api/huur/foto', 'vervolgstap in een lopende huur'],
+    ['/api/huur/locatie', 'vervolgstap in een lopende huur (vrijwillige positie)'],
+    ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
+    ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
+    ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover']
+  ]);
+  let gaten = 0, poorten = 0;
+  loop(path.join(ROOT, 'server/routes/member'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const m of bron.matchAll(/app\.post\('(\/api\/[^']+)'/g)) {
+      const pad = m[1];
+      if (!DERDE.test(pad) || KIJKEN.test(pad)) continue;
+      if (MAG_ZONDER.has(pad)) continue;
+      // de body loopt tot de volgende route in hetzelfde bestand
+      const volgende = bron.indexOf("app.post('", m.index + 5);
+      const body = bron.slice(m.index, volgende < 0 ? bron.length : volgende);
+      const regel = bron.slice(0, m.index).split('\n').length;
+      if (/gegevensStop\s*\(|gegevensPoort\s*\(/.test(body)) { poorten++; continue; }
+      gaten++;
+      fout('derde partij zonder gegevenspoort: ' + pad + ' (' + rel + ':' + regel + ')'
+        + " -- zet er `if (gegevensStop(req, res, 'bestelling')) return;` bij, of noem hem in MAG_ZONDER");
+    }
+  });
+  if (!gaten) ok(poorten + ' leden-paden met een derde partij gaan langs de poort (' + MAG_ZONDER.size + ' benoemd zonder)');
+
+  /* En de andere kant: de poort moet ook echt iets kunnen vragen. Staat er een
+     soort in een route die de poort niet kent, dan valt hij stil terug op "niets
+     nodig" en denkt iedereen dat het geregeld is. */
+  const NODIG = require(path.join(ROOT, 'server/kern/gegevenspoort')).NODIG;
+  let onbekend = 0;
+  loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const m of bron.matchAll(/gegevensStop\s*\(([^)]*)\)/g)) {
+      // ook een keuze in de aanroep (`? 'bezorging' : 'bestelling'`) telt mee
+      for (const s of m[1].matchAll(/'([a-z]+)'/g)) {
+        if (NODIG[s[1]]) continue;
+        onbekend++;
+        fout('onbekende soort in de gegevenspoort: \'' + s[1] + '\' in ' + path.relative(ROOT, f)
+          + ' -- die staat niet in NODIG, dus de poort vraagt niets');
+      }
+    }
+  });
+  if (!onbekend) ok('elke soort die een route noemt staat in NODIG (' + Object.keys(NODIG).join(', ') + ')');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

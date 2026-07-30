@@ -86,7 +86,19 @@ function maakGegevenspoort({ accounts, getMemberState }) {
     };
   }
 
-  return { ontbreekt, poort, NODIG, VELDEN };
+  /* Hetzelfde, maar als een regel die in een route past. Geeft `true` als het
+     antwoord al verstuurd is; de route doet er dan `return` op. Dat is met opzet
+     zo kort: een pad met een derde partij hoort niet meer dan een regel te
+     kosten, anders wordt het een keer overgeslagen. Keuringsregel 16 rekent er
+     op dat elk zo'n pad deze regel heeft. */
+  function stop(req, res, soort) {
+    const p = poort(req.session, soort);
+    if (!p) return false;
+    res.status(p.status).json({ error: p.error, ontbreekt: p.ontbreekt });
+    return true;
+  }
+
+  return { ontbreekt, poort, stop, NODIG, VELDEN };
 }
 
 module.exports = { maakGegevenspoort, NODIG, VELDEN };

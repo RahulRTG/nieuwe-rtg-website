@@ -9,7 +9,7 @@ module.exports = (vctx) => {
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
     avTeken, avMijnDeals, zorgVoor, zorgContact, media,
-    boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn } = vctx;
+    boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn, gegevensStop } = vctx;
 /* ================== autoverhuur: eerlijk huren ==================
    Tegen de schimmige verhuurders in: vaste dagprijs vooraf betaald (geen
    verrassingen aan de balie), de staat van de auto met foto's vastgelegd
@@ -43,6 +43,7 @@ app.post('/api/verhuur/aanbod', auth, (req, res) => {
 });
 
 app.post('/api/huur/boek', auth, (req, res) => {
+  if (gegevensStop(req, res, 'reservering')) return;
   const s = findSupplier(req.body.supplierCode);
   if (!s || (s.type !== 'verhuur' && s.type !== 'tweewielers')) return res.status(404).json({ error: 'Geen verhuurpartner gevonden.' });
   const auto = (s.autos || []).find(a => a.id === req.body.autoId && a.actief !== false);

@@ -1,12 +1,17 @@
-/* Het poortgesprek: Rahul neemt inloggen EN aanmelden over. Getoetst: hij
-   opent met "Hi, ik ben Rahul.." en biedt aanmelden, inloggen of uitleg aan;
-   het hele aanmeldgesprek van "hoe gaat het" tot bruikbare velden voor de ene
-   registratieroute; de "waarom?"-uitleg per stap; de woonplaats die het liefst
-   vanzelf komt en anders een keer subtiel gevraagd wordt (overslaan mag); de
-   werkgever-herkenning met de eerlijke PIN-boodschap; dat Business-interesse
-   genoteerd maar NOOIT beloofd wordt; het uitleg-pad; en het inlogpad dat via
-   de sleutelwoorden loopt (drie van vier woorden in een gesprek, het wachtwoord
-   gaat nooit door het gesprek).
+/* Het poortgesprek: Rahul neemt inloggen EN aanmelden over.
+
+   Een gratis RTG-account vraagt VIER dingen: volledige naam, geboortedatum,
+   e-mailadres en een wachtwoord. Geen telefoonnummer en geen adres -- die vraagt
+   Rahul pas wanneer er iets geregeld moet worden waar een derde partij bij komt.
+   Deze test rekent dat hard af: hij loopt de hele aanmelding door en eist dat er
+   nergens naar een nummer of een adres wordt gevraagd.
+
+   Verder getoetst: Rahul stelt zich voor en biedt de drie wegen aan; hij spreekt
+   KORT (aan de poort staat iemand die binnen wil); de "waarom?"-uitleg per stap;
+   de woonplaats die hij nooit vraagt maar wel onthoudt als je hem noemt; de
+   werkgever-herkenning; dat Business-interesse genoteerd maar NOOIT beloofd wordt;
+   het uitleg-pad; en het inlogpad via de sleutelwoorden (drie van vier woorden in
+   een gesprek, het wachtwoord gaat nooit door het gesprek).
    Draai los: node --experimental-sqlite --test test/aanmeldgesprek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -52,9 +57,8 @@ test('de poort is van Rahul: aanmelden en inloggen als gesprek', async () => {
     r = await zeg('Waarom wil je mijn e-mailadres weten?');
     assert.match(r.tekst, /bevestigingslink|wachtwoord kwijt/i, 'eerlijke uitleg waarom');
     r = await zeg('gesprek@test.nl');
-    assert.match(r.tekst, /nummer/i);
-    r = await zeg('0612345678');
-    assert.match(r.tekst, /geboren/i, 'woonplaats al bekend = niet alsnog vragen');
+    assert.match(r.tekst, /geboortedatum/i, 'na de e-mail meteen de geboortedatum');
+    assert.doesNotMatch(r.tekst, /nummer|telefoon|mobiel/i, 'GEEN telefoonnummer aan de poort');
     r = await zeg('14-03-1992');
     assert.match(r.tekst, /wachtwoord/i);
     r = await zeg('gespreksgeheim123');
@@ -62,6 +66,10 @@ test('de poort is van Rahul: aanmelden en inloggen als gesprek', async () => {
     assert.equal(r.woonplaats, 'Rotterdam');
     assert.equal(r.velden.geboortedatum, '1992-03-14');
     assert.equal(r.velden.tier, 'rtg', 'het accounttype is voor je bepaald');
+    // precies vier gevraagde velden: naam, geboortedatum, e-mail, wachtwoord
+    assert.deepEqual(Object.keys(r.velden).sort(), ['email', 'geboortedatum', 'name', 'password', 'tier'],
+      'een gratis account vraagt niets meer dan dit');
+    assert.equal(r.velden.phone, undefined, 'geen telefoonnummer bij de aanmelding');
 
     // en de velden werken op de ENE registratieroute (geen tweede pad)
     const reg = await api(base, '/api/auth/register', { ...r.velden, pasApp: 'rtg' });
@@ -77,19 +85,16 @@ test('de poort is van Rahul: aanmelden en inloggen als gesprek', async () => {
     await zeg2('Ik ben nieuw en wil me aanmelden.');
     await zeg2('Prima. Ik run mijn bedrijf en ik werk bij Sal de Mar in de bediening.');
     await zeg2('Zakelijke Ondernemer');
-    await zeg2('onder@nemer.nl');
-    let w = await zeg2('0687654321');
-    assert.match(w.tekst, /waar woon je/i, 'de woonplaats wordt een keer subtiel gevraagd');
-    assert.match(w.tekst, /reistijden|aanraders/i, 'met de reden erbij');
-    w = await zeg2('Ibiza');
-    assert.match(w.tekst, /geboren/i);
+    const w = await zeg2('onder@nemer.nl');
+    assert.match(w.tekst, /geboortedatum/i, 'ook hier: na de e-mail de geboortedatum');
+    assert.doesNotMatch(w.tekst, /waar woon je|adres|woonplaats/i, 'GEEN adres of woonplaats aan de poort');
     await zeg2('01-01-1990');
     const eind = await zeg2('zakelijkgeheim1');
     assert.equal(eind.klaar, true);
-    assert.equal(eind.woonplaats, 'Ibiza', 'het antwoord op de subtiele vraag telt');
+    assert.equal(eind.woonplaats, null, 'niet gevraagd en niet genoemd = niet bekend');
     assert.match(eind.tekst, /kan en wil ik je niet beloven|beloven kan ik niets/i, 'Business wordt nooit beloofd');
     assert.ok(eind.werkgever && eind.werkgever.code === 'KIKUNOI', 'de werkgever is herkend');
-    assert.match(eind.tekst, /pincode/i, 'koppelen blijft met het eigen PIN-bewijs');
+    assert.match(eind.tekst, /noteer/i, 'de werkgever wordt genoteerd, niets beloofd wat nog niet bestaat');
 
     // uitleg-pad: wie eerst wil weten wat RTG is, krijgt uitleg (en geen formulier)
     const su = await api(base, '/api/aanmeld/start', {});

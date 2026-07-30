@@ -7,7 +7,7 @@ module.exports = function maakHulp({ db, schoon }) {
   const ord = i => ['eerste', 'tweede', 'derde', 'vierde'][i] || (i + 1) + 'e';
 
   // korte, eerlijke uitleg voor wie eerst wil weten wat RTG is (het uitleg-pad)
-  const UITLEG = 'RTG is een membership-reisbureau: je pas opent reizen, verblijven, uitgaan en meer, met een persoonlijke AI (dat ben ik) die alles voor je regelt. Er zijn drie passen: de RTG Pass als instap, en de Lifestyle en Business Pass op uitnodiging. Wil je lid worden, dan meld ik je hier gewoon aan; ben je al lid, dan log ik je in. Zeg het maar: aanmelden, inloggen, of nog een vraag?';
+  const UITLEG = 'RTG is een membership-reisbureau. Je pas opent reizen, verblijven en uitgaan; ik regel het. Drie passen: RTG als instap, Lifestyle en Business op uitnodiging. Aanmelden, inloggen, of nog een vraag?';
 
   /* de warmtespiegel: 0 = gewoon vriendelijk, 1 = warm. Rahul volgt de
      gebruiker en blijft er altijd een stapje onder: pas bij duidelijke
@@ -48,18 +48,20 @@ module.exports = function maakHulp({ db, schoon }) {
   }
 
   /* op elke "waarom?" een eerlijk antwoord, per stap */
+  /* Op elke "waarom?" een eerlijk antwoord, per stap. Hier mag het iets langer dan
+     Rahuls gewone zinnen: er is om uitleg gevraagd. Telefoon en adres staan er niet
+     bij -- die vraagt hij niet meer aan de poort, maar pas bij een bestelling of
+     reservering (zie kern/aanmeldgesprek-aanmeld.js). */
   const WAAROM = {
-    doel: 'Ik vraag het alleen om je meteen goed te helpen: terugkerende leden log ik in, nieuwe gasten meld ik aan, en wie eerst wil weten wat RTG is, leg ik het uit. Meer zit er niet achter.',
-    'login-naam': 'Je e-mailadres of gebruikersnaam is hoe de kluis jouw account terugvindt; zonder kan ik je niet inloggen.',
-    'sw-open': 'We loggen je in met je vier sleutelwoorden in plaats van een wachtwoord: ik vraag er telkens drie, in een andere volgorde. Zo staat er nergens een vast wachtwoord op de lijn en geeft een keer meekijken nooit al je woorden prijs. Liever toch je wachtwoord? Zeg "wachtwoord".',
-    'sw-sluit': 'Nog een laatste sleutelwoord en je bent binnen. Je woorden zijn versleuteld opgeslagen; ik kan ze zelf niet teruglezen.',
-    'login-af': 'Je wachtwoord typ je hieronder in een apart veld: het gaat rechtstreeks en versleuteld naar de inlogcontrole, niet door dit gesprek. Zo leest niemand het mee, ik ook niet.',
-    woonplaats: 'Je woonplaats helpt me met reistijden, aanraders in de buurt en de regels van je land. Alleen de plaatsnaam; je volledige adres vraag ik pas als er echt iets bezorgd moet worden, en overslaan is ook gewoon goed.',
-    naam: 'Eerlijk antwoord: je naam staat straks op je pas en in de kluis met je echte gegevens; in de app zelf werk je onder een codenaam, zodat zaken en personeel je echte naam nooit hoeven te zien.',
-    email: 'Je e-mailadres gebruik ik voor de bevestigingslink en om je account terug te geven als je ooit je wachtwoord kwijt bent. Reclame sturen we er niet mee.',
-    telefoon: 'Je nummer is voor herstel en voor belangrijke seintjes (bijvoorbeeld als je ergens verwacht wordt). Niet voor spam; dat vinden wij zelf ook niks.',
-    geboren: 'Je geboortedatum zoals in je paspoort bepaalt eerlijk wat er opengaat: sommige onderdelen zijn 18+, en voor 15 tot 17 gelden beschermende regels per land. Daarom wil ik hem precies weten.',
-    wachtwoord: 'Je wachtwoord gaat versleuteld de kluis in; ik kan het zelf niet eens teruglezen. Minstens 6 tekens, en kies iets wat je nergens anders gebruikt.'
+    doel: 'Zodat ik je meteen goed help: leden log ik in, nieuwe gasten meld ik aan, en wie wil weten wat RTG is, leg ik het uit.',
+    'login-naam': 'Daarmee vindt de kluis jouw account terug. Zonder kan ik je niet inloggen.',
+    'sw-open': 'We loggen je in met je vier sleutelwoorden in plaats van een wachtwoord: ik vraag er telkens drie, in een andere volgorde. Zo staat er nergens een vast wachtwoord op de lijn. Liever je wachtwoord? Zeg "wachtwoord".',
+    'sw-sluit': 'Nog een woord en je bent binnen. Je woorden staan versleuteld; ik kan ze niet teruglezen.',
+    'login-af': 'Je wachtwoord gaat via een apart veld rechtstreeks naar de inlogcontrole, niet door dit gesprek. Niemand leest het mee, ik ook niet.',
+    naam: 'Je naam staat op je pas en in de kluis. In de app werk je onder een codenaam, zodat zaken en personeel je echte naam nooit zien.',
+    email: 'Voor de bevestigingslink, en om je account terug te geven als je je wachtwoord kwijt bent. Reclame sturen we niet.',
+    geboren: 'Je leeftijd bepaalt wat er opengaat: sommige onderdelen zijn 18+, en van 15 tot 17 gelden beschermende regels. Daarom precies.',
+    wachtwoord: 'Het gaat versleuteld de kluis in; ik kan het niet teruglezen. Minstens 6 tekens, en kies iets wat je nergens anders gebruikt.'
   };
   const isWaarom = t => /\b(waarom|hoezo|waarvoor|wat moet je daarmee|wat doe je daarmee)\b/i.test(t);
 

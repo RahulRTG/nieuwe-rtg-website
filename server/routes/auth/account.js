@@ -1,4 +1,4 @@
-/* Auth (deelmodule): het account: registreren met paspoortgegevens, de
+/* Auth (deelmodule): het account: registreren, de
    e-mailbevestiging en het opnieuw sturen van de bevestigingslink. Krijgt
    de gedeelde context een keer bij het opstarten vanuit routes/auth.js. */
 module.exports = (actx) => {
@@ -17,13 +17,20 @@ app.post('/api/auth/register', async (req, res) => {
   const password = String(req.body.password || '');
   if (!name) return res.status(400).json({ error: 'Vul uw naam in.' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
-  if (phone.replace(/\D/g, '').length < 8) return res.status(400).json({ error: 'Vul een geldig mobiel nummer in (voor herstel en meldingen).' });
+  /* Een gratis RTG-account vraagt VIER dingen: naam, geboortedatum, e-mail en een
+     wachtwoord. Een telefoonnummer hoort daar niet bij -- dat vraagt Rahul pas als
+     er iets geregeld moet worden waar een derde partij bij komt (een bestelling,
+     een reservering, een bezorging). Geeft iemand hem hier toch mee, dan nemen we
+     hem aan; is hij te kort om te kloppen, dan laten we hem weg in plaats van de
+     aanmelding te weigeren. */
+  const telefoon = phone.replace(/\D/g, '').length >= 8 ? phone : null;
   if (password.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
-  // de pas wordt met paspoort aangevraagd: geboortedatum is verplicht en
-  // bepaalt de leeftijdsgroep (15-17 alleen met toestemming van ouder/voogd)
+  // de geboortedatum bepaalt de leeftijdsgroep en dus wat er opengaat
+  // (15-17 alleen met toestemming van ouder/voogd); het paspoort komt pas later,
+  // bij een bestelling of reservering waar een derde partij bij komt
   const geboren = String(req.body.geboortedatum || '').slice(0, 10);
   const lftNieuw = leeftijdVan(geboren);
-  if (lftNieuw == null) return res.status(400).json({ error: 'Vul uw geboortedatum in zoals in uw paspoort.' });
+  if (lftNieuw == null) return res.status(400).json({ error: 'Vul uw geboortedatum in.' });
   if (lftNieuw < 15) return res.status(400).json({ error: 'Het RTG-lidmaatschap kan vanaf 15 jaar.' });
   if (lftNieuw > 120) return res.status(400).json({ error: 'Controleer uw geboortedatum.' });
   if (accounts.findByLogin(email)) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
@@ -50,7 +57,7 @@ app.post('/api/auth/register', async (req, res) => {
   if (!pasAppOk(pasAppKeuze, tier)) return res.status(403).json({ error: PAS_FOUT });
   let user;
   try {
-    user = await accounts.createUser({ email, username: req.body.username || null, password, tier, realName: name, phone });
+    user = await accounts.createUser({ email, username: req.body.username || null, password, tier, realName: name, phone: telefoon });
   } catch (e) {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }

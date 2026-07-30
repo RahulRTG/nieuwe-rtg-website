@@ -66,9 +66,12 @@
   .gbtn span{font-size:0.72rem;color:var(--soft);}
   .gback{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:0.82rem;margin-bottom:1rem;padding:0;}
   .pinrow{margin-top:1.4rem;display:flex;gap:0.6rem;}
-  .pinrow input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:0.9rem 1rem;color:var(--txt);font-size:1.1rem;letter-spacing:0.4em;text-align:center;outline:none;font-variant-numeric:tabular-nums;}
+  /* min-width:0 is hier geen detail. Zonder die regel krimpt een invoerveld nooit
+     onder zijn eigen min-content, en met letter-spacing 0.4em is dat breder dan
+     een telefoon: de knop "Binnen" liep het scherm af en was half onzichtbaar. */
+  .pinrow input{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:0.9rem 1rem;color:var(--txt);font-size:1.1rem;letter-spacing:0.4em;text-align:center;outline:none;font-variant-numeric:tabular-nums;}
   .pinrow input:focus{border-color:var(--burgundy);}
-  .pinrow button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.4rem;font-size:0.86rem;font-weight:600;}
+  .pinrow button{flex:0 0 auto;white-space:nowrap;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.4rem;font-size:0.86rem;font-weight:600;}
 
   /* app */
   #app{display:none;flex:1;flex-direction:column;min-height:0;}

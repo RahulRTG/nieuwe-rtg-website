@@ -61,7 +61,7 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
-<body>
+<body class="rtg-stijl">
 <header>
   <a class="terug" href="/apps/app.html">← App</a>
   <div><div class="ey">MijnOverheid · het rijk</div><h1>De Overheid</h1></div>
@@ -262,9 +262,9 @@ if (!TOKEN) {
       }
     }, 1500);
   });
-} else { start(); }
+}
 
-const TABS = [['box','Berichtenbox'],['belasting','Belasting'],['rdw','RDW'],['kvk','Onderneming'],['sociaal','Sociaal'],['prov','Provincie'],['water','Waterschap'],['stem','Stemmen']];
+const TABS =[['box','Berichtenbox'],['belasting','Belasting'],['rdw','RDW'],['kvk','Onderneming'],['sociaal','Sociaal'],['prov','Provincie'],['water','Waterschap'],['stem','Stemmen']];
 const TOESLAGEN = { zorgtoeslag:'Zorgtoeslag', huurtoeslag:'Huurtoeslag', kindgebonden:'Kindgebonden budget' };
 const VORMEN = { eenmanszaak:'Eenmanszaak', vof:'V.O.F.', bv:'Besloten vennootschap', stichting:'Stichting' };
 const UITK = { ww:'WW-uitkering', bijstand:'Bijstand', aow:'AOW', kinderbijslag:'Kinderbijslag' };
@@ -503,6 +503,12 @@ async function laadBekend(){
   const l = d.bekendmakingen || [];
   $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Geen bekendmakingen.</div>';
 }
+
+/* Starten helemaal onderaan. Dit stond bij het inloggedeelte bovenaan, en dat
+   brak het loket voor iedereen die WEL was ingelogd: start() leest TABS,
+   TOESLAGEN en VORMEN, en die worden met const pas hierboven gemaakt. Een
+   const aanraken voordat hij bestaat gooit, dus bleef het scherm leeg. */
+if (TOKEN) start();
 </script>
 <button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>

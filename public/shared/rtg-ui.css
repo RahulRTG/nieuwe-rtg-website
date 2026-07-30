@@ -200,8 +200,13 @@ body.rtg-stijl{background:var(--rtg-bg);color:var(--rtg-txt);
 body.rtg-stijl main{max-width:840px;margin:0 auto;padding:1.4rem 1.1rem 4rem;}
 body.rtg-stijl .kop,body.rtg-stijl .intro{margin:0 0 1.4rem;}
 body.rtg-stijl .intro p{color:var(--rtg-soft);font-size:.9rem;margin-top:.3rem;max-width:52ch;}
-body.rtg-stijl .kop h1,body.rtg-stijl h1{
-  font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
+/* Bodoni voor elke h1 -- dat is de merkregel. De MAAT laten we met opzet aan de
+   pagina: een paginakop is groot, maar een titel in een smalle balk hoort klein
+   te blijven. Toen de kit hier ook 1.7rem oplegde, groeide de kopbalk van de
+   berichten-app van 157 naar 207 pixels: een halve telefoon vol balk voordat je
+   het eerste gesprek zag. Alleen een echte paginakop (.kop) krijgt de maat. */
+body.rtg-stijl h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:600;letter-spacing:-.01em;}
+body.rtg-stijl .kop h1{font-size:1.7rem;}
 body.rtg-stijl .ey{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;display:block;margin-bottom:.15rem;}
 body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);
@@ -222,7 +227,8 @@ body.rtg-stijl main > h2{
 body.rtg-stijl .rij{display:flex;align-items:flex-start;gap:1rem;padding:.75rem 0;
   border-top:1px solid var(--rtg-line);}
 body.rtg-stijl .rij:first-of-type{border-top:none;}
-body.rtg-stijl .naam{font-weight:600;font-size:.95rem;}
+/* .nm is op tientallen pagina's de afkorting van .naam en betekent hetzelfde */
+body.rtg-stijl .naam,body.rtg-stijl .nm{font-weight:600;font-size:.95rem;}
 body.rtg-stijl .sub,body.rtg-stijl .meta,body.rtg-stijl .stil{
   font-size:.8rem;color:var(--rtg-soft);line-height:1.5;}
 body.rtg-stijl .lbl{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
@@ -238,6 +244,10 @@ body.rtg-stijl .knop[disabled]{opacity:.45;cursor:not-allowed;}
 body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
 body.rtg-stijl .knop.vol:hover{filter:brightness(1.07);}
 body.rtg-stijl .knop.weg{color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
+/* .klein is de derde maat uit de woordenschat van het huis, naast .vol en .weg:
+   een knopje dat in een regel of een chip meeloopt. Zonder deze regel kreeg zo'n
+   knopje de volle maat en liep de regel eromheen het scherm af. */
+body.rtg-stijl .knop.klein{font-size:.72rem;padding:.28rem .7rem;}
 
 /* velden */
 body.rtg-stijl .veld,body.rtg-stijl input:not([type=range]):not([type=checkbox]):not([type=radio]),
@@ -254,3 +264,69 @@ body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:var(--rtg
   border:1px solid var(--rtg-line);background:var(--rtg-card2);padding:.65rem .9rem;margin-bottom:1rem;}
 body.rtg-stijl .melding.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
 body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
+
+/* ---- de overstap-laag, deel 2: de rest van de gedeelde woordenschat ----
+   Na de eerste ronde bleek welke namen er nog meer overal terugkomen: statistiek-
+   tegels (.kpi), rijen pilknoppen (.tabs, .chips), een klein statuslabel
+   (.status, .pil, .merk), de inlogkaart van een werkplek (.inlog/.login) en de
+   sectietitel (.titel). Ook die krijgen hier de vormtaal van de boardroom, zodat
+   een pagina met EEN classe op de body echt helemaal meegaat. */
+
+/* statistiek-tegels: een cijfer met een klein label eronder */
+body.rtg-stijl .kpis{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
+body.rtg-stijl .kpi{
+  flex:1;min-width:4.5rem;background:var(--rtg-card2);border:1px solid var(--rtg-line);
+  border-radius:var(--rtg-rond-klein);padding:.7rem .8rem;
+}
+body.rtg-stijl .kpi .v,body.rtg-stijl .kpi b{
+  display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.35rem;font-weight:500;line-height:1.1;}
+body.rtg-stijl .kpi .l,body.rtg-stijl .kpi small{
+  display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-soft);margin-top:.25rem;}
+
+/* rijen pilknoppen: tabs boven een lijst, of chips om te filteren */
+body.rtg-stijl .tabs,body.rtg-stijl .chips{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:.9rem;}
+/* sommige pagina's zetten er kale <button>'s in zonder eigen classe; dat is
+   dezelfde rij en hoort er dus ook hetzelfde uit te zien */
+body.rtg-stijl .tab,body.rtg-stijl .chip,body.rtg-stijl .pil,
+body.rtg-stijl .tabs > button,body.rtg-stijl .chips > button{
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+  color:var(--rtg-txt);font:inherit;font-size:.78rem;padding:.42rem .95rem;cursor:pointer;
+  transition:border-color .15s, background .15s;
+}
+body.rtg-stijl .tab:hover,body.rtg-stijl .chip:hover{border-color:color-mix(in srgb,var(--rtg-acc) 55%,var(--rtg-line));}
+body.rtg-stijl .tab.aan,body.rtg-stijl .tab.actief,body.rtg-stijl .tab.active,
+body.rtg-stijl .chip.aan,body.rtg-stijl .chip.actief,
+body.rtg-stijl .tabs > button.aan,body.rtg-stijl .chips > button.aan{
+  background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+
+/* een klein statuslabel achter een naam */
+body.rtg-stijl .status,body.rtg-stijl .merk,body.rtg-stijl .badge{
+  display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  color:var(--rtg-soft);border:1px solid var(--rtg-line);border-radius:999px;padding:.08rem .45rem;
+  vertical-align:middle;}
+body.rtg-stijl .status.ok,body.rtg-stijl .status.goed,body.rtg-stijl .badge.ok{
+  color:var(--rtg-groen);border-color:color-mix(in srgb,var(--rtg-groen) 45%,transparent);}
+body.rtg-stijl .status.rood,body.rtg-stijl .status.fout,body.rtg-stijl .badge.rood{
+  color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 45%,transparent);}
+
+/* de sectietitel binnen een kaart, en de inlogkaart van een werkplek */
+body.rtg-stijl .titel,body.rtg-stijl .sectiekop,body.rtg-stijl .st-sec{
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--rtg-soft);font-weight:700;margin:1.2rem 0 .4rem;}
+body.rtg-stijl .inlog,body.rtg-stijl .login{
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond);
+  padding:1.4rem 1.3rem;max-width:26rem;margin:2.5rem auto;}
+body.rtg-stijl .inlog h1,body.rtg-stijl .login h1{font-size:1.35rem;margin-bottom:.4rem;}
+
+/* de overslaan-link: onzichtbaar tot je hem met de toets bereikt
+   Op een stuk of tien pagina's stond hij op left:-999px en verder niets. Dan is
+   hij te bereiken met tab, maar hij komt nooit in beeld: je springt naar een
+   link die je niet ziet staan, in het blauw van de browser. Zo hoort het: weg
+   tot hij focus krijgt, en dan schuift hij in het goud van het huis naar
+   binnen. Dezelfde vorm als in de leden-app. */
+body.rtg-stijl .skip{
+  position:absolute;left:.6rem;top:-3rem;z-index:120;
+  background:var(--rtg-goud);color:#1C1608;padding:.5rem .9rem;
+  border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;
+  transition:top .15s;}
+body.rtg-stijl .skip:focus{top:0;}

@@ -924,7 +924,7 @@
     font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.55rem;line-height:1;
     color:#fff;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);
   }
-  #osZoekLijst .zi .os-monogram,#osBelLijst .zi .os-monogram,.os-winkel-rij .zi .os-monogram{font-size:0.8rem;}
+  #osZoekLijst .zi .os-monogram,#osBelLijst .zi .os-monogram{font-size:0.8rem;}
   #osZoekLijst .zm svg,#osBelLijst .zm svg{width:15px;height:15px;stroke:var(--soft);fill:none;}
   .os-app .os-naam{
     font-size:calc(var(--e) * 0.6);letter-spacing:0.14em;text-transform:uppercase;
@@ -1234,48 +1234,9 @@
   .os-cc-tegels button b svg{display:block;}
   .os-cc-tegels button.aan{border-color:var(--green);color:var(--green);}
 
-  /* -------- App Store: apps installeren en verwijderen -------- */
-  .os-winkel-paneel{
-    margin-top:calc(env(safe-area-inset-top, 0px) + 3.4rem);
-    width:min(400px, 92%);max-height:80vh;overflow-y:auto;
-    background:color-mix(in srgb, var(--card) 84%, transparent);
-    border:1px solid var(--line);border-radius:18px;padding:1rem 1rem 1.3rem;
-    box-shadow:0 24px 60px rgba(0,0,0,0.5);
-  }
-  .os-winkel-intro{color:var(--soft);font-size:0.74rem;line-height:1.5;margin:0.6rem 0 0.2rem;}
-  .os-winkel-groep{
-    font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);
-    margin:1.1rem 0 0.4rem;
-  }
-  .os-winkel-rij{
-    display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;
-    border-top:1px solid color-mix(in srgb, var(--line) 55%, transparent);
-  }
-  .os-winkel-groep + .os-winkel-rij{border-top:none;}
-  .os-winkel-rij .zi{
-    width:34px;height:34px;border-radius:10px;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;background:var(--card2);font-size:1.1rem;
-  }
-  .os-winkel-rij .zi svg{width:18px;height:18px;stroke:#fff;}
-  .os-winkel-naam{flex:1;font-size:0.82rem;color:var(--txt);}
-  .os-winkel-knop{
-    flex-shrink:0;border:1px solid var(--gold);background:var(--gold);color:#0C0C0B;
-    border-radius:999px;padding:0.4rem 0.95rem;font-size:0.72rem;font-weight:600;cursor:pointer;
-    transition:border-color 0.13s ease, color 0.13s ease, background 0.13s ease;
-  }
-  .os-winkel-knop.geinst{background:transparent;color:var(--soft);border-color:var(--line);}
-  /* -------- Boardroom: telling + vergrendelde basisregels -------- */
-  .os-board-sum{display:flex;align-items:baseline;gap:0.4rem;color:var(--soft);font-size:0.74rem;
-    padding:0.55rem 0 0.15rem;letter-spacing:0.02em;}
-  .os-board-sum strong{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.2rem;color:var(--txt);letter-spacing:0.01em;}
-  .os-board-rij{display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-top:1px solid var(--line);}
-  .os-winkel-groep + .os-board-rij{border-top:none;}
-  .os-board-rij .zi{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--card2);}
-  .os-board-rij .zi svg{width:18px;height:18px;stroke:#fff;fill:none;}
-  .os-board-rij .zi .os-monogram{font-size:0.9rem;}
-  .os-board-vast{opacity:0.9;}
-  .os-board-slot{margin-left:auto;color:var(--gold,#857007);display:flex;align-items:center;opacity:0.75;}
-  .os-board-slot svg{width:16px;height:16px;stroke:currentColor;fill:none;}
+  /* De Boardroom is een eigen app (/apps/boardroom.html) met de echte,
+     server-side schakelaars; hier stond een tweede paneel met een tweede
+     lijstje. Weg: een instelling hoort op EEN plek te staan. */
 
   /* -------- achtergrond (wallpaper), gekozen in het bedieningspaneel -------- */
   #app.os-wall-nacht{background:#000;}
@@ -1693,15 +1654,6 @@
       </div>
     </div>
 
-    <!-- RTG OS: de Boardroom. Alles waar je recht op hebt staat standaard al
-         op je beginscherm; hier zet je aan en uit wat je wel en niet wilt
-         zien. Geen App Store meer: je hoeft niets te installeren. -->
-    <div class="os-scrim" id="osWinkelScrim">
-      <div class="os-winkel-paneel" role="dialog" aria-modal="true" aria-labelledby="osWinkelTitel">
-        <h3 class="os-bel-titel" id="osWinkelTitel">Boardroom</h3>
-        <div id="osWinkelLijst"></div>
-      </div>
-    </div>
   </div>
 
   <!-- betaaloverlay -->

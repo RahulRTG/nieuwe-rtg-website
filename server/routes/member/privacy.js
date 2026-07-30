@@ -7,7 +7,8 @@ const inzagelog = require('../../inzagelog');
 
 module.exports = (kern) => {
   const { app, auth, db, save, stateFor, myApplications, ordersVanKlant, accounts,
-    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg } = kern;
+    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg,
+    lidBoard, lidBoardLog, lidBoardLogWis } = kern;
 
   app.post('/api/privacy/export', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -31,6 +32,14 @@ module.exports = (kern) => {
       guestChats: chats,
       likedPosts: likes,
       notifications: db.data.notifications[key] || [],
+      /* Uw boardroom hoort in dit dossier. Die knoppen bepalen of uw locatie
+         gedeeld wordt, of uw paspoort opvraagbaar is en of u vindbaar bent:
+         dat is niet zomaar een voorkeur, dat is de instelling waarmee u uw
+         eigen gegevensdeling regelt. Het journaal erbij, want anders zou een
+         export wel de huidige stand tonen maar niet wie hem heeft gezet -- en
+         bij een kind is dat een ouder. */
+      boardroom: typeof lidBoard === 'function' ? lidBoard(key) : null,
+      boardroomLogboek: typeof lidBoardLog === 'function' ? lidBoardLog(key, 200) : [],
       // wie er in uw identiteitsdossier heeft gekeken, en waarom
       inzageInUwDossier: req.session.account ? inzagelog.voorBetrokkene(req.session.account.id) : []
     });
@@ -72,6 +81,11 @@ module.exports = (kern) => {
     }
     // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
     if (db.data.notifications[key]) db.data.notifications[key] = [];
+    /* De boardroom en zijn journaal gaan mee. Het journaal is bewust van de
+       betrokkene; blijft het staan na "verwijder mijn gegevens", dan houden we
+       een spoor van iemand die er niet meer is. */
+    if (db.data.ledenBoard) delete db.data.ledenBoard[key];
+    if (typeof lidBoardLogWis === 'function') lidBoardLogWis(key);
     /* Uit de ledengids. Dit is de laatste plek waar de sleutel aan de codenaam
        vastzit; bleef hij staan, dan was het lid na "verwijderen" nog gewoon op
        codenaam te vinden en te bellen -- en dan is verwijderd een halve

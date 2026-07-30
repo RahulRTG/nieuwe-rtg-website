@@ -644,6 +644,25 @@ De statusbalk houdt drie dingen vast: batterij, de bel en het bedieningspaneel. 
 
 **Codenaam (privacy by design):** elke klant krijgt een codenaam (bijv. *Zilveren Valk*). Reserveringen, betalingen en reisdata staan in de systemen op de codenaam; de echte naam ligt in een gescheiden kluis en wordt pas bij ticketing/check-in gekoppeld. Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam.
 
+### De boardroom van het lid
+
+**apps/boardroom.html** (`server/kern/lidboard/`) is het schakelbord van het lid zelf: 22 functies in vier groepen (app-onderdelen, privacy & sociaal, AI & meldingen, verbindingen). Er is er **één**, en die staat op de server — de stand reist mee naar elk toestel en de app spiegelt hem, hij bewaart geen tweede lijstje. Bereikbaar via het bedieningspaneel in de app.
+
+Wat het bord bestuurt, bestuurt het ook echt:
+
+- **Handhaving.** Een uitgezette functie zet ook zijn API dicht (`lidPadFunctie` + `lidBoardUit`, gecontroleerd in `server.js` vóór de routes). Zet je "Spelen" uit, dan geeft `/api/member/spel` 403 — en verdwijnt de tegel van je beginscherm. Een tegel die je kunt openen en die daarna weigert, is erger dan geen tegel.
+- **Privacy by design.** Alles wat gegevens *deelt* (locatie, GPS, paspoort delen, Bluetooth) staat standaard **uit**; de rest staat aan. "Terug naar standaard" herstelt precies dat, en is dus iets anders dan "alles aan".
+- **Beheerd door RTG.** Zet de platform-schakelkast (`server/functies`) een functie globaal of voor jouw pas uit, dan toont het bord hem als *beheerd* met de reden erbij, en weigert het schakelen. Een schakelaar die niets doet is een leugen.
+- **Vast.** Sommige functies kunnen niet uit (je wallet met de ledenpas): zet je die uit, dan kun je hem daarna niet meer aanzetten omdat het scherm met de knop weg is. Dat is geen keuze maar een val. Het bord markeert ze `vast`, en bulk-acties slaan ze stil over.
+- **Versie.** Elk bord telt zijn wijzigingen. Wie schakelt mag zijn versie meesturen; klopt die niet meer, dan volgt een 409 mét het verse bord in plaats van dat de wijziging van je andere toestel stilzwijgend wordt overschreven.
+- **In één keer.** `zetveel` en `herstel` zijn alles-of-niets: eerst valideren, dan schrijven, één versie-stap, één regel in het journaal. Een bord blijft nooit half om.
+- **Een spoor.** Elke omzetting komt in het journaal (`db.data.ledenBoardLog`, max 200 per bord): wat er omging, van welke stand naar welke, door wie (`lid` of `ouder`) en vanwaar. Zichtbaar onderaan de app, meegenomen in de AVG-export, en gewist bij "verwijder mijn gegevens". Zonder spoor is "wie heeft dat uitgezet?" onbeantwoordbaar — en bij een kind is het antwoord vaak "een ouder".
+- **Een rem.** Dertig schakelingen per minuut per account; daarboven 429. Elke omzetting schrijft de database weg, dus een lus zonder rem is een schrijfstorm.
+
+**Ouderlijk beheer:** een ouder/beheerder stuurt via dezelfde motor de boardroom van zijn beschermde kind bij (RTF-handle als sleutel, `/api/rtf/social/kind/boardroom*`). De voogd-check houdt een vreemde ouder buiten, functies die niet bij een kind horen (paspoort, Pay, Care) staan niet op het kinder-bord, en wat de ouder omzet staat als `door: 'ouder'` in het journaal van het kind.
+
+API: `/api/member/boardroom{,/zet,/zetveel,/herstel,/logboek}`. Getoetst in `test/lidboard.test.js` (18 toetsen: standaarden, handhaving, voogdij, versie-botsing, bulk, herstel, journaal, export, rem, beheerd-door-RTG en vergetelheid).
+
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 
 Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen

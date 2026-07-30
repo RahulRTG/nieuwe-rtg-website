@@ -25,6 +25,9 @@ const PAGINAS = [
   '/apps/foundation/vrienden.html',
   '/apps/foundation/school.html',
   '/apps/app.html',
+  // het schakelbord waarop een lid zijn privacy regelt: als er ergens geen
+  // schermlezer-gat mag zitten, is het hier
+  '/apps/boardroom.html',
   '/apps/leverancier.html',
   '/apps/backoffice.html',
   '/apps/personeel.html',

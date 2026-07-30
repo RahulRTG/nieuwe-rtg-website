@@ -1,16 +1,3 @@
-    if (!alle.length) {
-      var leeg = document.createElement('div'); leeg.className = 'os-bel-leeg';
-      leeg.textContent = T('os.board.leeg', 'Buiten de basis heeft u nu geen extra functies om te schakelen.');
-      winkelLijst.appendChild(leeg);
-    } else {
-      groepen.forEach(function (g) {
-        var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = g.titel;
-        winkelLijst.appendChild(kop);
-        g.items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); });
-      });
-    }
-    winkelScrim.classList.add('open');
-  }
 
   /* ---------- Achtergrond (wallpaper) in het bedieningspaneel ---------- */
   var WALLEN = ['standaard', 'nacht', 'bordeaux', 'beeld'];
@@ -58,15 +45,6 @@
       ccRand.classList.toggle('aan', RTGVol.aan());
     });
   }
-
-  /* ---------- De Boardroom: functies aan en uit vanuit Instellingen ----------
-     Uw eigen boardroom: alle functies waar u recht op heeft, aan of uit te zetten.
-     De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de
-     RTFoundation) blijft altijd staan - die valt niet uit te zetten, zodat het
-     systeem veilig en werkend blijft. Onder water is dit dezelfde install-laag
-     als de App Store. */
-  var ccBoard = $('#osCcBoardroom');
-  if (ccBoard) ccBoard.addEventListener('click', function () { openBoardroom(); });
 
   /* ---------- Now Playing: je muziek bedienen vanaf de ROS ----------
      De muziek-apps melden hun stand via de gedeelde speler-laag

@@ -7,19 +7,23 @@
   function itemNaam(item) {
     return item.startsWith('tab:') ? tabNaam(item.slice(4)) : (itemDef(item) || {}).naam || item;
   }
-  /* Zichtbaar is een app als hij bestaat, bij jouw pas hoort en in de
-     Boardroom niet is uitgezet. De functierij (bellen, berichten,
-     videobellen, wallet) blijft altijd staan: dat is de basis van het
-     toestel. */
+  /* Zichtbaar is een app als hij bestaat, bij jouw pas hoort, en als de functie
+     erachter in je boardroom aan staat (isAan, 25-os-04b.js). Ook de functierij
+     onder de klok volgt dat: zet je "Directe berichten" uit, dan verdwijnt de
+     tegel Berichten. Een tegel die je wel kunt openen maar die daarna 403 geeft
+     is erger dan geen tegel.
+
+     Wat NIET uit kan, bepaalt de boardroom zelf (vast:true op de server, zoals
+     je wallet met de ledenpas) -- niet dit scherm. Zo staat de regel op een
+     plek in plaats van op twee. */
   function itemZichtbaar(item) {
     if (!item || typeof item !== 'string') return false;
     if (gast() && LEDEN_ONLY.has(item)) return false;
-    if (item.startsWith('tab:')) return tabZichtbaar(item.slice(4)) && (vastItem(item) || isAan(item));
+    if (item.startsWith('tab:')) return tabZichtbaar(item.slice(4)) && isAan(item);
     if (item.startsWith('link:') && PREMIUM.has(item.slice(5)) && !premiumPas) return false;
     if (!itemDef(item)) return false;
-    return vastItem(item) || isAan(item);
+    return isAan(item);
   }
-  const vastItem = item => FUNCTIES.indexOf(item) >= 0;
   // een gratis account (zonder pas) heeft geen wallet en geen Rahul; de kern
   // zet daarvoor de klasse os-gast op #app (00-kern-05.js)
   const gast = () => app.classList.contains('os-gast');

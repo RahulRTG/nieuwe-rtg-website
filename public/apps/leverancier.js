@@ -2872,7 +2872,7 @@
     const ktM = el.querySelector('#ktMAdd'); if (ktM) ktM.addEventListener('click', async () => {
       const name = el.querySelector('#ktMn').value.trim(), price = Number(el.querySelector('#ktMp').value);
       if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
-      const item = { id: 'm'+Date.now().toString(36), cat: el.querySelector('#ktMc').value.trim()||T('menu.other','Overig'), name, desc:'', price, allergens:[], station: kantoorSec };
+      const item = { id: RTGId('m'), cat: el.querySelector('#ktMc').value.trim()||T('menu.other','Overig'), name, desc:'', price, allergens:[], station: kantoorSec };
       try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); await refresh(); } catch(e){ toast(e.message); }
     });
     // de AI-bedrijfsagent: koppelen, inkoop voorstellen, goedkeuren/aanpassen/afwijzen, rooster
@@ -6002,7 +6002,7 @@
     const add = $('#mnAdd'); if (add) add.addEventListener('click', async () => {
       const name = $('#mnName').value.trim(), price = Number($('#mnPrice').value);
       if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
-      const item = { id: 'm'+Date.now().toString(36), cat: $('#mnCat').value.trim()||T('menu.other','Overig'), name, desc: $('#mnDesc').value.trim(), price, allergens: $('#mnAlg').value.split(',').map(a=>a.trim().toLowerCase()).filter(Boolean), station: $('#mnStation') ? $('#mnStation').value : 'keuken' };
+      const item = { id: RTGId('m'), cat: $('#mnCat').value.trim()||T('menu.other','Overig'), name, desc: $('#mnDesc').value.trim(), price, allergens: $('#mnAlg').value.split(',').map(a=>a.trim().toLowerCase()).filter(Boolean), station: $('#mnStation') ? $('#mnStation').value : 'keuken' };
       try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); toast(T('menu.added','Staat op de kaart, gasten zien het direct.')); await refresh(); openTab('menu'); } catch(e){ toast(e.message); }
     });
   }

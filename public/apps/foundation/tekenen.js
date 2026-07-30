@@ -31,7 +31,7 @@ class TekenBord {
     c.addEventListener('pointerdown', e => {
       if (this.readOnly) return;
       c.setPointerCapture(e.pointerId);
-      this.huidig = { id: Math.random().toString(16).slice(2, 8), tool: this.tool,
+      this.huidig = { id: RTGId('s'), tool: this.tool,
         kleur: this.kleur, dikte: this.dikte, points: [pos(e)] };
       this._tekenStreek(this.huidig, true);
     });

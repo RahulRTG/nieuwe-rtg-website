@@ -403,39 +403,83 @@ console.log('\n14) zero dependencies: geen externe modules, package.json klopt')
   }
 }
 
-/* 15) idempotentie-sleutels in de client komen uit de CSPRNG, niet uit de klok.
+/* 15) id's in de client komen uit de CSPRNG, niet uit de klok of Math.random.
 
-   Een idem-sleutel hoort UNIEK te zijn per actie: de server herkent er een
-   herhaling aan en boekt dan niet nog eens. Uit Date.now() gebouwd is hij
-   milliseconde-grof, dus twee verschillende geld-acties in dezelfde milliseconde
-   krijgen dezelfde sleutel -- waarna de server de tweede voor een herhaling van
-   de eerste houdt en stil "gelukt" antwoordt zonder te boeken. Math.random is
-   evenmin een sleutelbron. Gebruik RTGIdem('voorvoegsel') uit shared/basis.js.
+   Een id hoort UNIEK te zijn, want de app gebruikt hem als opzoeksleutel. Twee
+   dingen met hetzelfde id zijn voor de app EEN ding, en dan gaat er stil iets
+   fout: bij een idem-sleutel houdt de server de tweede geld-actie voor een
+   herhaling van de eerste en antwoordt "gelukt" zonder te boeken; bij een
+   menu-item of een kanban-kaart bewerk je er ineens twee tegelijk.
 
-   Uitgezonderd: sleutels die BEWUST vastliggen aan iets wat al uniek is (een
-   betaalverzoek-ref). Die horen juist deterministisch te zijn, anders wordt een
-   dubbeltik een tweede betaling in plaats van een herhaling. Die staan hieronder
+   Date.now() is milliseconde-grof (twee acties in dezelfde ms krijgen hetzelfde
+   id) en Math.random().toString(36).slice(...) levert een handvol bits, waar de
+   botsingskans bij honderden id's al merkbaar is. Gebruik RTGId('voorvoegsel')
+   uit shared/basis.js; die staat op elke app-pagina (zie regel 10).
+
+   Twee signaturen zijn hier hard, want die bestaan ALLEEN om een id te maken:
+   `Math.random().toString(` en `Date.now().toString(36)`. Cosmetische willekeur
+   (ruis in een audiobuffer, een sterrenveld, jitter op een grafiekpunt) matcht
+   daar niet op en blijft dus gewoon Math.random gebruiken -- dat hoort ook.
+
+   Uitgezonderd: id's die BEWUST vastliggen aan iets wat al uniek is (een
+   betaalverzoek-ref). Die horen deterministisch te zijn, anders wordt een
+   dubbeltik een tweede betaling in plaats van een herhaling. Ze staan hieronder
    met naam, want ze zijn een keuze en geen vergissing. */
-console.log('\n15) idem-sleutels in de client uit de CSPRNG, niet uit de klok');
+console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.random');
 {
   const MAG_VAST = new Map([
     ["idem: 'bv-' + v.ref", 'vast aan de betaalverzoek-ref: een dubbeltik moet een herhaling zijn, geen tweede betaling']
   ]);
+  const vast = [...MAG_VAST.keys()];
   let zwak = 0;
+  const gebruikers = new Set();   // bestanden die RTGId/RTGIdem aanroepen
   loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');
-    if (rel.startsWith('public/dist/')) return;
-    const regels = fs.readFileSync(f, 'utf8').split('\n');
-    regels.forEach((regel, i) => {
-      if (!/\bidem\b\s*[:=]/.test(regel)) return;
-      if (/RTGIdem/.test(regel)) return;
-      if ([...MAG_VAST.keys()].some(k => regel.includes(k))) return;
-      if (!/Date\.now|Math\.random/.test(regel)) return;
+    if (rel.startsWith('public/dist/') || rel === 'public/shared/id.js') return;
+    const bron = fs.readFileSync(f, 'utf8');
+    if (/\bRTGId(em)?\s*\(/.test(bron)) gebruikers.add(rel.replace(/^public\//, ''));
+    bron.split('\n').forEach((regel, i) => {
+      if (/RTGId\b|RTGIdem\b/.test(regel)) return;          // gebruikt de CSPRNG-helper al
+      if (vast.some(k => regel.includes(k))) return;         // benoemde vaste sleutel
+      const idemZwak = /\bidem\b\s*[:=]/.test(regel) && /Date\.now|Math\.random/.test(regel);
+      const idVorm = /Math\.random\(\)\.toString\(|Date\.now\(\)\.toString\(36\)/.test(regel);
+      if (!idemZwak && !idVorm) return;
       zwak++;
-      fout('zwakke idem-sleutel: ' + rel + ':' + (i + 1) + " -- gebruik RTGIdem('voorvoegsel')");
+      fout('zwak id: ' + rel + ':' + (i + 1) + " -- gebruik RTGId('voorvoegsel')");
     });
   });
-  if (!zwak) ok('geen idem-sleutel uit de klok of Math.random (' + MAG_VAST.size + ' benoemde vaste sleutel)');
+  if (!zwak) ok('geen id uit de klok of Math.random (' + MAG_VAST.size + ' benoemde vaste sleutel)');
+
+  /* En de andere helft: wie RTGId gebruikt, moet shared/id.js ook inladen. Dat is
+     geen formaliteit -- de helper zat eerst in shared/basis.js, dat deferred laadt,
+     terwijl de documenteditors hun eerste blokken al TIJDENS het parsen aanmaken.
+     Die kregen daardoor een ReferenceError op een pad dat geen test raakte. Deze
+     controle sluit dat gat: per pagina kijken we of zij (of een script dat zij
+     laadt) RTGId gebruikt, en zo ja of /shared/id.js erin staat. */
+  let mist = 0, pag = 0;
+  loop(path.join(ROOT, 'public'), /\.html$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    const bron = fs.readFileSync(f, 'utf8');
+    const eigen = rel.replace(/^public\//, '');
+    const map = path.posix.dirname(eigen);
+    let nodig = gebruikers.has(eigen);
+    for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) {
+      const src = m[1];
+      const doel = src.startsWith('/') ? src.slice(1) : path.posix.normalize(path.posix.join(map, src));
+      if (gebruikers.has(doel)) nodig = true;
+    }
+    if (!nodig) return;
+    pag++;
+    if (!/<script[^>]*\ssrc="\/shared\/id\.js"/.test(bron)) {
+      mist++;
+      fout('RTGId zonder /shared/id.js: ' + rel + ' -- laad hem in (zonder defer, vooraan)');
+    } else if (/<script[^>]*\ssrc="\/shared\/id\.js"[^>]*\sdefer/.test(bron)) {
+      mist++;
+      fout('id.js met defer: ' + rel + ' -- dan is RTGId er nog niet tijdens het parsen');
+    }
+  });
+  if (!mist) ok(pag + ' pagina\'s die RTGId gebruiken laden shared/id.js (zonder defer)');
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

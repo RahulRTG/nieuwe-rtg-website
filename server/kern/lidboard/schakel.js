@@ -20,12 +20,12 @@
 const { CAPS, OP_ID, standaardAan } = require('./catalogus');
 
 module.exports = (ctx) => {
-  const { store, versie, aan, save, journaal, bord, platformStand } = ctx;
+  const { store, versie, aan, save, journaal, bord, beheerStand } = ctx;
 
   /* Mag deze boardroom deze functie omzetten? Geeft null als het mag, anders de
      fout die de route teruggeeft. Een plek, zodat enkel en bulk niet uit elkaar
      kunnen lopen. */
-  function toets(id, waarde, opts) {
+  function toets(sleutel, id, waarde, opts) {
     const o = opts || {};
     const c = OP_ID[id];
     if (!c) return { status: 400, error: 'Onbekende functie.' };
@@ -33,8 +33,12 @@ module.exports = (ctx) => {
     if (c.vast && waarde === false) {
       return { status: 409, error: '"' + c.naam + '" hoort bij de basis van je toestel en kan niet uit.' };
     }
-    const pf = platformStand(id, o.doelgroep);
-    if (pf) return { status: 409, error: '"' + c.naam + '" staat nu bij RTG uit: ' + pf.zin };
+    /* Beheerd door RTG of door je werkgever: dan is deze knop niet van jou, en
+       zeggen we dat met de naam erbij in plaats van dat we hem laten omgaan
+       zonder effect. */
+    const bh = beheerStand(sleutel, id, o);
+    if (bh) return { status: 409, beheerdDoor: bh.door, beheerder: bh.beheerder,
+      error: '"' + c.naam + '" is niet van jou om te schakelen: ' + bh.zin };
     return null;
   }
 
@@ -77,7 +81,7 @@ module.exports = (ctx) => {
   function zet(sleutel, id, waarde, opts) {
     const o = opts || {};
     const bots = versieBotst(sleutel, o); if (bots) return bots;
-    const fout = toets(id, waarde !== false, o); if (fout) return fout;
+    const fout = toets(sleutel, id, waarde !== false, o); if (fout) return fout;
     schrijf(sleutel, { [id]: waarde !== false }, o);
     return { status: 200, ok: true, bord: bord(sleutel, o) };
   }
@@ -98,7 +102,7 @@ module.exports = (ctx) => {
     const schoon = {};
     for (const id of ids) {
       const waarde = standen[id] !== false;
-      const fout = toets(id, waarde, o);
+      const fout = toets(sleutel, id, waarde, o);
       if (fout && fout.status === 409) continue;   // beheerd of vast: overslaan
       if (fout) return fout;                       // onbekend of niet voor een kind: hard stoppen
       schoon[id] = waarde;
@@ -115,7 +119,7 @@ module.exports = (ctx) => {
     const bots = versieBotst(sleutel, o); if (bots) return bots;
     const caps = o.kind ? CAPS.filter(c => c.kind !== false) : CAPS;
     const standen = {};
-    for (const c of caps) if (!platformStand(c.id, o.doelgroep)) standen[c.id] = standaardAan(c);
+    for (const c of caps) if (!beheerStand(sleutel, c.id, o)) standen[c.id] = standaardAan(c);
     const wijzigingen = schrijf(sleutel, standen, Object.assign({}, o, { bron: (o.bron || 'boardroom') + ':herstel' }));
     return { status: 200, ok: true, hersteld: wijzigingen.length, bord: bord(sleutel, o) };
   }

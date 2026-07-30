@@ -671,7 +671,17 @@ Wat het bord bestuurt, bestuurt het ook echt:
 
 **Ouderlijk beheer:** een ouder/beheerder stuurt via dezelfde motor de boardroom van zijn beschermde kind bij (RTF-handle als sleutel, `/api/rtf/social/kind/boardroom*`). De voogd-check houdt een vreemde ouder buiten, functies die niet bij een kind horen (paspoort, Pay, Care) staan niet op het kinder-bord, en wat de ouder omzet staat als `door: 'ouder'` in het journaal van het kind.
 
-API: `/api/member/boardroom{,/zet,/zetveel,/herstel,/logboek}`. Getoetst in `test/lidboard.test.js` (18 toetsen: standaarden, handhaving, voogdij, versie-botsing, bulk, herstel, journaal, export, rem, beheerd-door-RTG en vergetelheid).
+**Werkgeversbeleid (Business Pass).** Een bedrijf dat passen voor zijn mensen neemt, moet kunnen zeggen welke functies op die passen dicht staan — compliance, geheimhouding, of gewoon een keuze. Dat kan via `/api/supplier/werkbeleid{,/zet}`, achter de zaak-inlog. Eén regel maakt dit veilig en is niet configureerbaar:
+
+> **Een werkgever kan alleen dichtzetten, nooit openzetten.**
+
+Er is dus geen "verplicht aan" — de API kent die vorm niet. Een werkgever kan een medewerker niet dwingen zijn locatie te delen, zijn GPS aan te zetten of zijn paspoort beschikbaar te stellen: de enige richting waarin hij die knoppen kan bewegen is dicht, en dat is voor de medewerker altijd de veilige kant. Wat de werkgever níet dichtzet, blijft van de medewerker zelf; het beleid is een bovengrens, geen dictaat over de rest. De basis van het toestel (je wallet met je ledenpas, `vast:true`) blijft buiten zijn bereik.
+
+De koppeling lid ↔ werkgever zijn de rollen aan het ene RTG-account (`kern/eenaccount`): een `personeel`- of `zaak`-rol wijst een zaak-code aan. Werk je voor twee bedrijven, dan gelden beide beleiden opgeteld — de strengste wint. Wat dicht staat, staat op je eigen bord met de **naam van het bedrijf** erbij (`beheerdDoor: 'werkgever'`), en gaat ook echt dicht op de API: anders was het beleid een grijze knop en verder niets.
+
+**Taal.** De labels van dit bord komen van de server (ze staan in de catalogus, niet in de pagina), dus `bord()` krijgt de taal mee en `kern/lidboard/talen.js` levert de vertaling; een onbekende taal valt terug op Engels, een ontbrekende sleutel op het Nederlands. De pagina zelf gebruikt de gewone i18n-laag (`window.I18N` + `shared/i18n.js`) en haalt bij een taalwissel (`rtglang`) het bord opnieuw op.
+
+API: `/api/member/boardroom{,/zet,/zetveel,/herstel,/logboek}` en `/api/supplier/werkbeleid{,/zet}`. Getoetst in `test/lidboard.test.js` (21 toetsen: standaarden, handhaving, voogdij, versie-botsing, bulk, herstel, journaal, export, rem, beheerd-door-RTG, vergetelheid, taal en het werkgeversbeleid).
 
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 

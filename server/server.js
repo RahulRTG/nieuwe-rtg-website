@@ -1676,7 +1676,8 @@ const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarket
    functies aan/uit; een ouder/beheerder stuurt via dezelfde motor de boardroom
    van zijn beschermde kind bij (de route bewaakt het gezinsverband). */
 const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
-  lidBoardVersie, lidPadFunctie, lidBoardUit, lidBoardLog, lidBoardLogWis } = maakLidboard({ db, save });
+  lidBoardVersie, lidPadFunctie, lidBoardUit, lidBoardLog, lidBoardLogWis,
+  werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan } = maakLidboard({ db, save });
 
 /* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
    autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,
@@ -2144,6 +2145,8 @@ const kern = {
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
   LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
   lidBoardVersie, lidBoardLog, lidBoardLogWis,
+  // het werkgeversbeleid op de boardroom van het lid (alleen dichtzetten)
+  werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan,
   // de autoverkoop-laag (kern/autoverkoop.js)
   AUTOVERKOOP_BRANDSTOF, avMagVerkopen, avZetAan, avZetAuto, avVerwijderAuto, avShowroom,
   avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox,
@@ -2922,6 +2925,7 @@ require('./routes/sso')(kern);
 require('./routes/scim')(kern);
 require('./routes/meting')(kern);
 require('./routes/algpin')(kern);
+require('./routes/werkbeleid')(kern);
 require('./routes/sleutelwoorden')(kern);
 require('./routes/agenda')(kern);
 require('./routes/notities')(kern);

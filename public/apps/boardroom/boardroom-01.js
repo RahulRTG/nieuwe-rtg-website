@@ -26,14 +26,25 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var bordNu = null;      // het laatst ontvangen bord (met versie)
+  var werkgevers = [];    // wie er beleid op dit bord kan voeren
   var bezig = false;
+
+  /* De taal. De pagina-teksten komen uit window.I18N (shared/i18n.js); de NAMEN
+     van de functies komen van de server, want die staan in de catalogus en niet
+     hier. Vandaar dat elke aanroep zijn taal meestuurt. */
+  var T = function (sleutel, standaard) {
+    return (window.RTGi18n ? RTGi18n.t(sleutel, standaard) : standaard);
+  };
+  var taal = function () { return window.RTGi18n ? RTGi18n.lang : 'nl'; };
 
   function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
   function post(pad, body) {
+    var b = body || {};
+    if (b.lang === undefined) b.lang = taal();
     return fetch(pad, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
-      body: JSON.stringify(body || {})
+      body: JSON.stringify(b)
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) { return { status: r.status, d: d || {} }; });
     });
@@ -54,9 +65,9 @@
   function verwerk(r, gelukt) {
     if (r.d && r.d.bord) { bordNu = r.d.bord; teken(); }
     if (r.status === 200) { if (gelukt) zeg(gelukt, 'goed'); return true; }
-    if (r.d && r.d.conflict) { zeg(r.d.error || 'Je boardroom is elders gewijzigd; dit is de verse stand.', 'let'); return false; }
-    if (r.status === 429) { zeg(r.d.error || 'Even wachten, er gingen te veel wijzigingen achter elkaar.', 'let'); return false; }
-    zeg((r.d && r.d.error) || 'Dat lukte niet. Probeer het zo opnieuw.', 'fout');
+    if (r.d && r.d.conflict) { zeg(T('bo.botsing', r.d.error || 'Je boardroom is elders gewijzigd; dit is de verse stand.'), 'let'); return false; }
+    if (r.status === 429) { zeg(T('bo.terem', r.d.error || 'Even wachten, er gingen te veel wijzigingen achter elkaar.'), 'let'); return false; }
+    zeg((r.d && r.d.error) || T('bo.mislukt', 'Dat lukte niet. Probeer het zo opnieuw.'), 'fout');
     return false;
   }
 
@@ -73,7 +84,7 @@
 
     if (fn.beheerd || fn.vast) {
       knop.disabled = true;
-      knop.title = fn.beheerd ? fn.reden : 'Hoort bij de basis van je toestel.';
+      knop.title = fn.beheerd ? fn.reden : (fn.vastZin || T('bo.vast', 'Altijd aan'));
       return knop;
     }
     knop.addEventListener('click', function () {
@@ -81,8 +92,8 @@
       var naar = knop.getAttribute('aria-checked') !== 'true';
       bezig = true; knop.disabled = true;
       post('/api/member/boardroom/zet', { id: fn.id, aan: naar, versie: bordNu ? bordNu.versie : undefined })
-        .then(function (r) { verwerk(r, '"' + fn.naam + '" staat nu ' + (naar ? 'aan' : 'uit') + '.'); })
-        .catch(function () { zeg('Geen verbinding. Je wijziging is niet bewaard.', 'fout'); })
+        .then(function (r) { verwerk(r, '"' + fn.naam + '" ' + T(naar ? 'bo.nuaan' : 'bo.nuuit', naar ? 'staat nu aan.' : 'staat nu uit.')); })
+        .catch(function () { zeg(T('bo.geenverbinding', 'Geen verbinding. Je wijziging is niet bewaard.'), 'fout'); })
         .then(function () { bezig = false; knop.disabled = false; });
     });
     return knop;
@@ -93,8 +104,20 @@
     r.className = 'rtg-rij' + (fn.beheerd ? ' beheerd' : '');
     var t = document.createElement('div'); t.className = 'rtg-tekst';
     var n = document.createElement('div'); n.className = 'rtg-naam'; n.textContent = fn.naam;
-    if (fn.beheerd) { var b = document.createElement('span'); b.className = 'rtg-merk'; b.textContent = 'beheerd door RTG'; n.appendChild(b); }
-    else if (fn.vast) { var v = document.createElement('span'); v.className = 'rtg-merk stil'; v.textContent = 'altijd aan'; n.appendChild(v); }
+    /* Wie houdt deze knop vast? Dat hoort er met naam bij te staan: "beheerd"
+       zonder te zeggen door wie, is precies de stille voogdij die we niet
+       willen. RTG en je werkgever krijgen elk hun eigen merkje. */
+    if (fn.beheerd) {
+      var b = document.createElement('span');
+      b.className = 'rtg-merk' + (fn.beheerdDoor === 'werkgever' ? '' : ' stil');
+      b.textContent = fn.beheerdDoor === 'werkgever'
+        ? T('bo.beheerdDoor', 'beheerd door') + ' ' + (fn.beheerder || '?')
+        : T('bo.beheerd', 'beheerd door RTG');
+      n.appendChild(b);
+    } else if (fn.vast) {
+      var v = document.createElement('span'); v.className = 'rtg-merk stil';
+      v.textContent = T('bo.vast', 'altijd aan'); n.appendChild(v);
+    }
     t.appendChild(n);
     var uitleg = fn.beheerd ? fn.reden : fn.uitleg;
     if (uitleg) { var u = document.createElement('div'); u.className = 'rtg-sub'; u.textContent = uitleg; t.appendChild(u); }
@@ -113,10 +136,10 @@
     post('/api/member/boardroom/zetveel', { standen: standen, versie: bordNu.versie })
       .then(function (r) {
         verwerk(r, r.d && r.d.gewijzigd
-          ? r.d.gewijzigd + ' functie(s) staan nu ' + (aan ? 'aan' : 'uit') + '.'
-          : 'Er viel niets om te zetten.');
+          ? r.d.gewijzigd + ' ' + T('bo.staannu', 'functie(s) staan nu') + ' ' + T(aan ? 'bo.aanwoord' : 'bo.uitwoord', aan ? 'aan.' : 'uit.')
+          : T('bo.nietsom', 'Er viel niets om te zetten.'));
       })
-      .catch(function () { zeg('Geen verbinding. Er is niets veranderd.', 'fout'); })
+      .catch(function () { zeg(T('bo.geenverbinding2', 'Geen verbinding. Er is niets veranderd.'), 'fout'); })
       .then(function () { bezig = false; });
   }
 
@@ -126,18 +149,18 @@
     post('/api/member/boardroom/herstel', { versie: bordNu.versie })
       .then(function (r) {
         verwerk(r, r.d && r.d.hersteld
-          ? r.d.hersteld + ' functie(s) terug op de standaard.'
-          : 'Alles stond al op de standaard.');
+          ? r.d.hersteld + ' ' + T('bo.terugop', 'functie(s) terug op de standaard.')
+          : T('bo.alstandaard', 'Alles stond al op de standaard.'));
       })
-      .catch(function () { zeg('Geen verbinding. Er is niets veranderd.', 'fout'); })
+      .catch(function () { zeg(T('bo.geenverbinding2', 'Geen verbinding. Er is niets veranderd.'), 'fout'); })
       .then(function () { bezig = false; });
   }
 
   function acties() {
     var wrap = document.createElement('div'); wrap.className = 'rtg-acties';
-    [['Alles aan', function () { allesUit(true); }],
-     ['Alles uit', function () { allesUit(false); }],
-     ['Terug naar standaard', herstel]
+    [[T('bo.aan', 'Alles aan'), function () { allesUit(true); }],
+     [T('bo.uit', 'Alles uit'), function () { allesUit(false); }],
+     [T('bo.standaard', 'Terug naar standaard'), herstel]
     ].forEach(function (a) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'rtg-knop';
       b.textContent = a[0];

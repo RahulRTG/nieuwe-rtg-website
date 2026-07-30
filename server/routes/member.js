@@ -4,7 +4,7 @@
    De helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
   const { app, auth, db, stateFor, geenGast, lidBoard, lidBoardZet, lidBoardZetVeel,
-    lidBoardHerstel, lidBoardLog } = kern;
+    lidBoardHerstel, lidBoardLog, werkgeversVan } = kern;
   const functies = require('../functies');
 
   app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
@@ -37,8 +37,11 @@ module.exports = (kern) => {
      seconde doen. Dertig schakelingen per minuut per account is ruim boven
      wat een mens haalt en ver onder wat schade doet. */
   const dgVan = req => functies.tierNaarDoelgroep(req.session.tier);
+  // de taal komt van de lezer mee: de labels van dit bord staan op de server
+  // (kern/lidboard/talen), dus de pagina kan ze niet zelf vertalen
+  const taalVan = req => String((req.body && req.body.lang) || 'nl').slice(0, 5);
   const bordOpts = (req, extra) => Object.assign({
-    doelgroep: dgVan(req), versie: req.body.versie, door: 'lid', bron: 'app'
+    doelgroep: dgVan(req), lang: taalVan(req), versie: req.body.versie, door: 'lid', bron: 'app'
   }, extra || {});
 
   const schakelTellers = new Map(); // sleutel -> { n, tot }
@@ -63,7 +66,12 @@ module.exports = (kern) => {
 
   app.post('/api/member/boardroom', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    res.json({ bord: lidBoard(req.session.key, { doelgroep: dgVan(req) }) });
+    res.json({
+      bord: lidBoard(req.session.key, { doelgroep: dgVan(req), lang: taalVan(req) }),
+      // wie er beleid op je bord kan voeren: de bedrijven waar je aan gekoppeld
+      // bent. Ze kunnen alleen dichtzetten, nooit openzetten.
+      werkgevers: typeof werkgeversVan === 'function' ? werkgeversVan(req.session.key) : []
+    });
   });
   app.post('/api/member/boardroom/zet', auth, (req, res) => {
     if (geenGast(req, res)) return;

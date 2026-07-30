@@ -29,14 +29,49 @@
 </head>
 <body data-osbar="Boardroom" data-oswereld="lid" data-osterug="apps/app.html">
 <main class="rtg-wrap" id="hoofd">
-  <a class="rtg-terug" href="/apps/app.html">← naar de app</a>
+  <a class="rtg-terug" href="/apps/app.html" data-i18n="bo.terug">← naar de app</a>
   <div class="rtg-intro">
-    <h1>Jouw boardroom</h1>
-    <p>Zet zelf aan wat je gebruikt en uit wat je niet wilt. Gevoelige deel-functies staan bewust standaard uit. Je keuzes reizen mee naar al je toestellen, en wat je hier uitzet gaat ook echt dicht.</p>
+    <h1 data-i18n="bo.h">Jouw boardroom</h1>
+    <p data-i18n="bo.sub">Zet zelf aan wat je gebruikt en uit wat je niet wilt. Gevoelige deel-functies staan bewust standaard uit. Je keuzes reizen mee naar al je toestellen, en wat je hier uitzet gaat ook echt dicht.</p>
   </div>
   <div class="rtg-melder" id="melder" role="status" aria-live="polite"></div>
-  <div id="bord"><p class="rtg-leeg" id="melding">Boardroom laden&hellip;</p></div>
+  <div id="bord"><p class="rtg-leeg" id="melding" data-i18n="bo.laden">Boardroom laden&hellip;</p></div>
 </main>
+
+<script>
+/* De labels van de functies zelf komen van de server (kern/lidboard/talen):
+   die staan in de catalogus, niet in deze pagina. Hier staat alleen de tekst
+   die de pagina zelf schrijft. */
+window.I18N = { en: {
+  'bo.terug':'← back to the app',
+  'bo.h':'Your boardroom',
+  'bo.sub':'Switch on what you use and off what you do not want. Sensitive sharing features are deliberately off by default. Your choices travel to all your devices, and what you switch off here really does close.',
+  'bo.laden':'Loading boardroom…',
+  'bo.aan':'All on', 'bo.uit':'All off', 'bo.standaard':'Back to defaults',
+  'bo.aanwoord':'on', 'bo.uitwoord':'off',
+  'bo.beheerd':'managed by RTG', 'bo.beheerdDoor':'managed by', 'bo.vast':'always on',
+  'bo.spoor':'What has changed',
+  'bo.spoor.sub':'Every switch on this board, with who made it. This trail is yours and travels with your data download.',
+  'bo.spoor.leeg':'Nothing switched yet.',
+  'bo.spoor.laden':'Loading log…',
+  'bo.doorjou':'by you', 'bo.doorouder':'by your parent/guardian',
+  'bo.gewijzigd':'Last changed on', 'bo.nooit':'You have not switched anything here yet; everything is on its default.',
+  'bo.nulogin':'Sign in as a member to see your boardroom.',
+  'bo.geenbord':'Your boardroom is only for members with an account.',
+  'bo.nietgeladen':'Could not load the boardroom.',
+  'bo.nuaan':'is now on.', 'bo.nuuit':'is now off.',
+  'bo.geenverbinding':'No connection. Your change was not saved.',
+  'bo.geenverbinding2':'No connection. Nothing changed.',
+  'bo.mislukt':'That did not work. Please try again.',
+  'bo.botsing':'Your boardroom was changed elsewhere; this is the fresh state.',
+  'bo.terem':'Hold on, that was a lot of changes at once.',
+  'bo.nietsom':'There was nothing to switch.',
+  'bo.alstandaard':'Everything was already on its default.',
+  'bo.staannu':'feature(s) are now', 'bo.terugop':'feature(s) back to their default.',
+  'bo.werkgever':'Your employer can close features on this board, never open them.'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
 <script src="/shared/osbar.js" defer></script>
 <script src="/shared/osmenu.js" defer></script>
 <script src="/apps/boardroom.js" defer></script>

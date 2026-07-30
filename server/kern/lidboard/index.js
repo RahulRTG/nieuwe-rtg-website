@@ -17,18 +17,23 @@
 
    Dit is de orkestrator. Hij bouwt de gedeelde context (opslag, standen,
    journaal) en mount de delen:
-     ./catalogus  wat er op het bord staat, de pad-kaart, de platform-brug
-     ./bord       de leeskant: het bord samenstellen, inclusief wat RTG
-                  platform-breed heeft dichtgezet ("beheerd")
-     ./schakel    de schrijfkant: omzetten, in bulk, en terug naar standaard,
-                  met versie-bescherming tussen twee toestellen
-     ./journaal   het audit-spoor: wie zette wat om, wanneer, waarvandaan */
+     ./catalogus   wat er op het bord staat, de pad-kaart, de platform-brug
+     ./talen       de labels in de taal van de lezer (de server levert ze, dus
+                   de pagina kan ze niet zelf vertalen)
+     ./bord        de leeskant: het bord samenstellen, inclusief wie welke knop
+                   vasthoudt -- RTG, je werkgever, of de basis van het toestel
+     ./werkbeleid  wat een werkgever mag dichtzetten (en nooit openzetten)
+     ./schakel     de schrijfkant: omzetten, in bulk, en terug naar standaard,
+                   met versie-bescherming tussen twee toestellen
+     ./journaal    het audit-spoor: wie zette wat om, wanneer, waarvandaan */
 
 const { CAPS, OP_ID, standaardAan, padFunctie } = require('./catalogus');
 const { maakJournaal } = require('./journaal');
+const { maakWerkbeleid } = require('./werkbeleid');
 
 function maakLidboard({ db, save }) {
   const journaal = maakJournaal({ db, save });
+  const werk = maakWerkbeleid({ db, save });
 
   function store() { if (!db.data.ledenBoard || typeof db.data.ledenBoard !== 'object') db.data.ledenBoard = {}; return db.data.ledenBoard; }
   function eigen(sleutel) { const s = store(); return (s[sleutel] && typeof s[sleutel] === 'object') ? s[sleutel] : {}; }
@@ -41,15 +46,22 @@ function maakLidboard({ db, save }) {
     return Object.prototype.hasOwnProperty.call(eig, id) ? eig[id] !== false : standaardAan(c);
   }
 
-  /* Alleen een BEWUST uitgezette functie (opgeslagen false) blokkeert de API.
-     Een functie die enkel op zijn standaard-uit staat (bv. paspoort/locatie, met
-     een eigen toestemmingsflow) blokkeren we hier niet. */
+  /* Blokkeert deze functie de API voor dit lid? Twee redenen, en allebei tellen:
+
+     1. het lid heeft hem BEWUST uitgezet (opgeslagen false). Een functie die
+        enkel op zijn standaard-uit staat (bv. paspoort/locatie, met een eigen
+        toestemmingsflow) blokkeren we hier niet;
+     2. de werkgever heeft hem dichtgezet. Anders zou het beleid alleen een
+        grijze knop in de app zijn en zou de API er gewoon omheen werken -- dan
+        is het geen beleid maar een suggestie. */
   function bewustUit(sleutel, id) {
     const eig = eigen(sleutel);
-    return Object.prototype.hasOwnProperty.call(eig, id) && eig[id] === false;
+    if (Object.prototype.hasOwnProperty.call(eig, id) && eig[id] === false) return true;
+    return !!werk.werkbeleidDicht(sleutel, id);
   }
 
-  const ctx = { db, save, store, eigen, versie, aan, standaardAan, journaal };
+  const ctx = { db, save, store, eigen, versie, aan, standaardAan, journaal,
+    werkbeleidDicht: werk.werkbeleidDicht };
   const lees = require('./bord')(ctx);
   Object.assign(ctx, lees);
   const schrijf = require('./schakel')(ctx);
@@ -65,7 +77,12 @@ function maakLidboard({ db, save }) {
     lidPadFunctie: padFunctie,
     lidBoardUit: bewustUit,
     lidBoardLog: journaal.lijst,
-    lidBoardLogWis: journaal.wis
+    lidBoardLogWis: journaal.wis,
+    // het werkgeversbeleid (kan alleen dichtzetten, nooit openzetten)
+    werkbeleid: werk.werkbeleid,
+    werkbeleidZet: werk.werkbeleidZet,
+    werkbeleidOverzicht: werk.werkbeleidOverzicht,
+    werkgeversVan: werk.werkgeversVan
   };
 }
 

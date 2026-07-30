@@ -313,3 +313,86 @@ test('"verwijder mijn gegevens" wist ook de boardroom en zijn journaal', async (
   assert.deepEqual(d.boardroomLogboek, [], 'een vers account begint met een leeg journaal');
   assert.equal(d.boardroom.versie, 0, 'en met een onaangeroerd bord');
 });
+
+/* ---------------- 10. De taal van het bord ---------------- */
+
+test('het bord komt in de taal van de lezer; de namen staan op de server', async () => {
+  const l = await lid('Taal Lid');
+  const nl = await json(await l.call('/member/boardroom', {}));
+  assert.equal(nl.bord.taal, 'nl');
+  const vindNl = nl.bord.categorieen.flatMap(c => c.functies).find(f => f.id === 'locatie');
+  assert.equal(vindNl.naam, 'Locatie delen');
+
+  const en = await json(await l.call('/member/boardroom', { lang: 'en' }));
+  assert.equal(en.bord.taal, 'en');
+  assert.equal(en.bord.categorieen[0].naam, 'App features', 'de categorie is vertaald');
+  const vindEn = en.bord.categorieen.flatMap(c => c.functies).find(f => f.id === 'locatie');
+  assert.equal(vindEn.naam, 'Share location', 'en de functie ook');
+  assert.equal(vindEn.uitleg, 'Your live location, with whom you choose.');
+
+  // een taal die we niet kennen valt terug op Engels, niet op een lege regel
+  const de = await json(await l.call('/member/boardroom', { lang: 'de' }));
+  assert.equal(de.bord.categorieen[0].naam, 'App features', 'onbekende taal valt terug op Engels');
+});
+
+/* ---------------- 11. Het werkgeversbeleid ---------------- */
+
+/* De koppeling lid <-> werkgever zijn de rollen aan het ene RTG-account
+   (kern/eenaccount): een 'personeel'- of 'zaak'-rol wijst een zaak-code aan.
+   Die zetten we hier direct in de nepdatabase; het echte koppelpad (zaak-code
+   + pincode bewijzen) heeft zijn eigen toets. De regel zelf woont in de kern,
+   en de route is er een dunne schil omheen -- dus toetsen we de kern. */
+test('een werkgever kan functies dichtzetten voor zijn mensen, en nooit openzetten', async () => {
+  const { maakWerkbeleid } = require('../server/kern/lidboard/werkbeleid');
+  const db = { data: { accountRollen: { lid1: [{ rol: 'personeel', code: 'ACME', zaakNaam: 'Acme BV' }] } } };
+  const wb = maakWerkbeleid({ db, save: () => {} });
+
+  // dichtzetten mag
+  const zet = wb.werkbeleidZet('ACME', ['salon', 'locatie'], 'HR');
+  assert.equal(zet.status, 200, 'een werkgever mag functies dichtzetten');
+  assert.ok(wb.werkbeleidDicht('lid1', 'salon'), 'De Salon staat dicht voor deze medewerker');
+  assert.ok(wb.werkbeleidDicht('lid1', 'locatie'), 'locatie delen ook');
+  assert.equal(wb.werkbeleidDicht('lid1', 'pay'), null, 'wat niet in het beleid staat, blijft van het lid');
+
+  // er BESTAAT geen "verplicht aan": het beleid is alleen een dicht-lijst.
+  // De vorm van de API laat het niet toe, en dat is precies de bedoeling.
+  const overzicht = wb.werkbeleidOverzicht('ACME');
+  assert.ok(overzicht.functies.every(f => typeof f.dicht === 'boolean'),
+    'het overzicht kent alleen dicht/niet-dicht, geen "verplicht aan"');
+  assert.match(overzicht.regel, /alleen dichtzetten, nooit openzetten/i,
+    'de regel staat in het antwoord, zodat een beheerder hem leest');
+
+  // en de basis van het toestel blijft buiten bereik van de werkgever
+  const wallet = wb.werkbeleidZet('ACME', ['wallet']);
+  assert.equal(wallet.status, 409, 'de wallet met de ledenpas kan een werkgever niet dichtzetten');
+
+  // een lid zonder werkgever raakt het beleid niet
+  assert.equal(wb.werkbeleidDicht('lid-zonder-werk', 'salon'), null);
+});
+
+test('wat de werkgever dichtzet, staat op het bord met zijn naam en gaat ook echt dicht', async () => {
+  const { maakLidboard } = require('../server/kern/lidboard');
+  const db = { data: { accountRollen: { w1: [{ rol: 'personeel', code: 'ACME', zaakNaam: 'Acme BV' }] } } };
+  const lb = maakLidboard({ db, save: () => {} });
+  lb.werkbeleidZet('ACME', ['salon'], 'HR');
+
+  const salon = lb.lidBoard('w1').categorieen.flatMap(c => c.functies).find(f => f.id === 'salon');
+  assert.equal(salon.beheerd, true, 'het bord meldt dat deze functie beheerd wordt');
+  assert.equal(salon.beheerdDoor, 'werkgever', 'en door wie: de werkgever, niet RTG');
+  assert.equal(salon.beheerder, 'Acme BV', 'met de naam van het bedrijf erbij');
+  assert.equal(salon.aan, false, 'en hij staat uit');
+
+  // het lid kan hem niet zelf aanzetten
+  const r = lb.lidBoardZet('w1', 'salon', true);
+  assert.equal(r.status, 409);
+  assert.equal(r.beheerdDoor, 'werkgever');
+
+  // en de handhaving grijpt op de API, niet alleen in het scherm: anders was
+  // het beleid een grijze knop en verder niets
+  assert.equal(lb.lidBoardUit('w1', 'salon'), true, 'de API gaat ook dicht');
+  assert.equal(lb.lidBoardUit('w2', 'salon'), false, 'voor een lid zonder deze werkgever niet');
+
+  // in het Engels heet het ook zo
+  const en = lb.lidBoard('w1', { lang: 'en' }).categorieen.flatMap(c => c.functies).find(f => f.id === 'salon');
+  assert.match(en.reden, /employer/i, 'de reden is vertaald');
+});

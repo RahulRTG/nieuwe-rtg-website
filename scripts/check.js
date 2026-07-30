@@ -403,5 +403,40 @@ console.log('\n14) zero dependencies: geen externe modules, package.json klopt')
   }
 }
 
+/* 15) idempotentie-sleutels in de client komen uit de CSPRNG, niet uit de klok.
+
+   Een idem-sleutel hoort UNIEK te zijn per actie: de server herkent er een
+   herhaling aan en boekt dan niet nog eens. Uit Date.now() gebouwd is hij
+   milliseconde-grof, dus twee verschillende geld-acties in dezelfde milliseconde
+   krijgen dezelfde sleutel -- waarna de server de tweede voor een herhaling van
+   de eerste houdt en stil "gelukt" antwoordt zonder te boeken. Math.random is
+   evenmin een sleutelbron. Gebruik RTGIdem('voorvoegsel') uit shared/basis.js.
+
+   Uitgezonderd: sleutels die BEWUST vastliggen aan iets wat al uniek is (een
+   betaalverzoek-ref). Die horen juist deterministisch te zijn, anders wordt een
+   dubbeltik een tweede betaling in plaats van een herhaling. Die staan hieronder
+   met naam, want ze zijn een keuze en geen vergissing. */
+console.log('\n15) idem-sleutels in de client uit de CSPRNG, niet uit de klok');
+{
+  const MAG_VAST = new Map([
+    ["idem: 'bv-' + v.ref", 'vast aan de betaalverzoek-ref: een dubbeltik moet een herhaling zijn, geen tweede betaling']
+  ]);
+  let zwak = 0;
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    const regels = fs.readFileSync(f, 'utf8').split('\n');
+    regels.forEach((regel, i) => {
+      if (!/\bidem\b\s*[:=]/.test(regel)) return;
+      if (/RTGIdem/.test(regel)) return;
+      if ([...MAG_VAST.keys()].some(k => regel.includes(k))) return;
+      if (!/Date\.now|Math\.random/.test(regel)) return;
+      zwak++;
+      fout('zwakke idem-sleutel: ' + rel + ':' + (i + 1) + " -- gebruik RTGIdem('voorvoegsel')");
+    });
+  });
+  if (!zwak) ok('geen idem-sleutel uit de klok of Math.random (' + MAG_VAST.size + ' benoemde vaste sleutel)');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

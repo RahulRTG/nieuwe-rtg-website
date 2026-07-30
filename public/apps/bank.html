@@ -199,7 +199,7 @@ function bindBank(reks){
   });
   document.querySelectorAll('[data-stort]').forEach(b => b.addEventListener('click', async () => {
     const euroS = prompt('Hoeveel storten op deze rekening? (euro)'); if (euroS == null) return;
-    try { const r = await api('bank/storten', { iban: b.dataset.stort, centen: Math.round(Number(euroS)*100), idem: 'm'+Date.now() }); alert('Gestort via ' + r.via + '. Saldo: ' + euro(r.saldoCenten)); await herlaad(); } catch (e) { alert(e.message); }
+    try { const r = await api('bank/storten', { iban: b.dataset.stort, centen: Math.round(Number(euroS)*100), idem: RTGIdem('stort') }); alert('Gestort via ' + r.via + '. Saldo: ' + euro(r.saldoCenten)); await herlaad(); } catch (e) { alert(e.message); }
   }));
   document.querySelectorAll('[data-nwallet]').forEach(b => b.addEventListener('click', async () => {
     const euroS = prompt('Hoeveel naar je RTG Pay-wallet? (euro)'); if (euroS == null) return;

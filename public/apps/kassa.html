@@ -224,7 +224,7 @@ async function rekenAf(method, extra){
       kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined,
       korting: KORTING || undefined,
       desc: 'De Kassa (' + modus().naam + ')' + (badge ? ' · ' + badge : ''),
-      codenaam: badge || undefined, idem: 'kassa-' + Date.now()
+      codenaam: badge || undefined, idem: RTGIdem('kassa')
     }, extra || {}));
     LAATSTE = r.sale;
     $('#uitkomst').textContent = 'Afgerekend: ' + eur(r.sale.total) + ' (' + method + (r.betaler ? ', ' + r.betaler : '') + '), bon ' + r.sale.bon + (r.sale.kassa ? ' op ' + r.sale.kassa : '') + '.';

@@ -1,5 +1,5 @@
 /* De gedeelde basis-laag: het vangnet dat elke app-pagina op 9+-niveau houdt.
-   Eén klein script, vier stille taken:
+   Eén klein script, vier stille taken plus RTGIdem (0: sleutels voor geld):
    1. offline: registreert de juiste service worker (leden-OS of RTFoundation),
       zodat elke pagina ook zonder bereik opent, en meldt rustig als de
       verbinding wegvalt of terugkomt
@@ -22,6 +22,18 @@
   'use strict';
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
+
+  /* ---- 0. idem: idempotentie-sleutel voor geld-acties, uit de CSPRNG ----
+     Date.now() is milliseconde-grof: twee acties in dezelfde ms krijgen dan
+     dezelfde sleutel en de server houdt de tweede voor een herhaling van de
+     eerste. Alleen voor sleutels die per AANROEP verschillen; ligt een sleutel
+     bewust vast aan iets unieks (betaalverzoek-ref), dan blijft hij zoals hij is. */
+  window.RTGIdem = function (voor) {
+    var b = new Uint8Array(16), k;
+    try { crypto.getRandomValues(b); k = Array.prototype.map.call(b, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
+    catch (e) { k = Date.now() + '-' + String(Math.random()).slice(2); }
+    return (voor ? voor + '-' : '') + k;
+  };
 
   /* ---- 1. offline: de service worker + een rustig verbindingsseintje ---- */
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

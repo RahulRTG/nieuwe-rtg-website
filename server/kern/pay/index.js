@@ -60,47 +60,10 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   const id = p => (p || 'P') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
   /* Idempotentie die een herstart overleeft: dezelfde knop twee keer indrukken
-     (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en
-     boekt nooit dubbel. */
-  function idemStore() {
-    if (!d().payIdem || typeof d().payIdem !== 'object') d().payIdem = { _keys: [] };
-    if (!Array.isArray(d().payIdem._keys)) d().payIdem._keys = [];
-    return d().payIdem;
-  }
-  /* Per idem-sleutel een afdruk van het VERZOEK waarvoor hij gold. Zonder die
-     binding geeft dezelfde sleutel met een ander verzoek stil het oude antwoord
-     terug: de client krijgt "gelukt" voor iets wat nooit is geboekt. En dat is
-     geen theorie -- de apps bouwen hun sleutel uit Date.now(), dus twee
-     verschillende acties in dezelfde milliseconde krijgen echt dezelfde sleutel.
-     Dezelfde afdrukvorm als de Rust-motor (motor/src/pay.rs), zodat beide
-     engines dezelfde verzoeken als "gelijk" zien. */
-  function idemAfdrukStore() {
-    if (!d().payIdemAfdruk || typeof d().payIdemAfdruk !== 'object') d().payIdemAfdruk = {};
-    return d().payIdemAfdruk;
-  }
-  async function metIdem(sleutel, afdruk, werk) {
-    if (!sleutel) return werk();
-    const s = idemStore();
-    const a = idemAfdrukStore();
-    if (sleutel in s && sleutel !== '_keys') {
-      /* Een sleutel zonder bekende afdruk komt uit een database van voor deze
-         binding: die laten we door zoals voorheen, anders zou een upgrade
-         lopende idem-sleutels breken. */
-      if (afdruk && typeof a[sleutel] === 'string' && a[sleutel] !== afdruk) {
-        return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
-      }
-      return Object.assign({}, s[sleutel], { herhaald: true });
-    }
-    const r = await werk();
-    if (r && r.ok) {
-      s._keys.push(sleutel);
-      if (s._keys.length > 20000) for (const weg of s._keys.splice(0, s._keys.length - 20000)) { delete s[weg]; delete a[weg]; }
-      s[sleutel] = r;
-      if (afdruk) a[sleutel] = afdruk;
-      save();
-    }
-    return r;
-  }
+     (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
+     nooit dubbel -- en dezelfde sleutel met een ANDER verzoek geeft een 409 in
+     plaats van stil het oude antwoord. Zie ../../lib/idem.js. */
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem' });
 
   /* ---------- het grootboek zelf ----------
      `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek

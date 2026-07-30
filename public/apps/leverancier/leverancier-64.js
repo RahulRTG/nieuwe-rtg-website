@@ -15,7 +15,7 @@
     }
     if (method === 'rtgpay'){
       body.payCode = await vraagPayCode(); if (!body.payCode) return;
-      body.idem = 'pos' + Date.now();
+      body.idem = RTGIdem('pos');
     }
     try {
       const d = await API.call('/supplier/pos/sale', body);

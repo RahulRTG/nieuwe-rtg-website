@@ -101,7 +101,7 @@
       const prijs = '€ ' + (Number(b.dataset.pkprijs)/100).toFixed(2).replace('.', ',');
       if (!window.confirm(T('pk.zeker','Pakket boeken voor') + ' ' + prijs + '? ' + T('pk.zeker2','Het bedrag gaat direct van uw RTG Pay-saldo.'))) return;
       try {
-        await API.call('/pakket/koop', { id: b.dataset.pk, idem: 'pk' + Date.now() });
+        await API.call('/pakket/koop', { id: b.dataset.pk, idem: RTGIdem('pk') });
         toast('' + T('pk.ok','Geboekt. De zaken weten ervan.'));
         renderFluister();
       } catch(e){ toast(e.message); }

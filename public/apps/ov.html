@@ -195,7 +195,7 @@
 
   /* ---- uitchecken ---- */
   $('#uitKnop').addEventListener('click', async () => {
-    const r = await api('uit', { ...hier, idem: Math.random().toString(36).slice(2, 10) });
+    const r = await api('uit', { ...hier, idem: RTGIdem('ov') });
     if (r.body.error) return zeg(r.body.error);
     zeg('Uitgecheckt: ' + r.body.km + ' km · ' + eur(r.body.prijs) + ' · saldo ' + eur(r.body.saldo) + '.');
     ververs();

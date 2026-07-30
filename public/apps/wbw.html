@@ -131,7 +131,7 @@
     clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
   const toon = naam => { for (const v of ['vPoort', 'vLijst', 'vGroep']) $('#' + v).classList.toggle('weg', v !== naam); };
   const eur = c => (c < 0 ? '− ' : '') + '€ ' + (Math.abs(c) / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
-  const idem = () => Math.random().toString(36).slice(2, 10);
+  const idem = () => RTGIdem('wbw');
   let groep = null;
 
   /* ---------- mijn lijstjes ---------- */

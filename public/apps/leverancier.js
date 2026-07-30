@@ -5864,7 +5864,7 @@
           const body = Object.assign({ room: el.dataset.tafelrek }, extra);
           if (body.method === 'rtgpay'){
             body.payCode = await vraagPayCode(); if (!body.payCode) return;
-            body.idem = 'trek' + Date.now();
+            body.idem = RTGIdem('trek');
           }
           const d = await API.call('/supplier/pos/checkout', body);
           let boodschap = T('res.rekklaar','Rekening afgerekend:')+' '+el.dataset.tafelrek+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')';
@@ -6286,7 +6286,7 @@
         const body = { room: b.dataset.room, method: b.dataset.method };
         if (body.method === 'rtgpay'){
           body.payCode = await vraagPayCode(); if (!body.payCode) return;
-          body.idem = 'co' + Date.now();
+          body.idem = RTGIdem('co');
         }
         const d = await API.call('/supplier/pos/checkout', body);
         toast(T('pos.checkedout','Uitgecheckt:')+' '+b.dataset.room+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')');
@@ -6335,7 +6335,7 @@
     }
     if (method === 'rtgpay'){
       body.payCode = await vraagPayCode(); if (!body.payCode) return;
-      body.idem = 'pos' + Date.now();
+      body.idem = RTGIdem('pos');
     }
     try {
       const d = await API.call('/supplier/pos/sale', body);

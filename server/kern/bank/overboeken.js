@@ -11,28 +11,8 @@ module.exports = (ctx) => {
 
   /* Idempotentie die een herstart overleeft: dezelfde sleutel geeft exact
      hetzelfde antwoord terug en clearet nooit twee keer. */
-  function idemStore() { if (!d().bankIdem || typeof d().bankIdem !== 'object') d().bankIdem = { _keys: [] }; if (!Array.isArray(d().bankIdem._keys)) d().bankIdem._keys = []; return d().bankIdem; }
-  /* Per idem-sleutel een afdruk van het VERZOEK waarvoor hij gold, net als in
-     server/kern/pay/index.js. Zonder die binding geeft dezelfde sleutel met een
-     ander verzoek stil het oude antwoord terug -- bij een SEPA-overboeking zou de
-     client dus "gelukt" krijgen voor een bedrag of een tegenrekening die nooit is
-     geboekt. Een sleutel zonder bekende afdruk komt uit een database van voor deze
-     binding en gedraagt zich als voorheen. */
-  function idemAfdrukStore() { if (!d().bankIdemAfdruk || typeof d().bankIdemAfdruk !== 'object') d().bankIdemAfdruk = {}; return d().bankIdemAfdruk; }
-  async function metIdem(sleutel, afdruk, werk) {
-    if (!sleutel) return werk();
-    const s = idemStore();
-    const a = idemAfdrukStore();
-    if (sleutel in s && sleutel !== '_keys') {
-      if (afdruk && typeof a[sleutel] === 'string' && a[sleutel] !== afdruk) {
-        return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
-      }
-      return Object.assign({}, s[sleutel], { herhaald: true });
-    }
-    const r = await werk();
-    if (r && r.ok) { s._keys.push(sleutel); if (s._keys.length > 20000) for (const weg of s._keys.splice(0, s._keys.length - 20000)) { delete s[weg]; delete a[weg]; } s[sleutel] = r; if (afdruk) a[sleutel] = afdruk; save(); }
-    return r;
-  }
+  // met verzoek-binding; dezelfde module als RTG Pay, zie ../../lib/idem.js
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem' });
 
   /* Storten: extern geld op een rekening zetten. De knop bepaalt hoe het clearet:
      - partner/hybride: via de kaart-naad (Apple Pay/kaart), tegenrekening extern:kaart;

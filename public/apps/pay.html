@@ -176,7 +176,7 @@
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const euro = c => (c/100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const idem = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
+const idem = () => RTGIdem('pay');
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
 const api = (pad, body) => fetch('/api/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
@@ -330,7 +330,7 @@ async function tikBetaalMet(ruweCode, centen){
   const code = String(ruweCode || '').trim().toUpperCase();
   if (!code) return;
   try {
-    const r = await api('pay/tik', { code, centen, oms: $('#xOms').value.trim(), idem: 'tik' + Date.now() });
+    const r = await api('pay/tik', { code, centen, oms: $('#xOms').value.trim(), idem: idem() });
     meld(euro(centen) + ' eur getikt naar ' + r.aan + '.' + (r.bijgeladen ? ' Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : ''));
     $('#xBedrag').value = ''; $('#xOms').value = '';
     ververs();

@@ -2820,6 +2820,13 @@ Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
   logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken,
   pinInfo: kern.pinInfo, pinCheck: kern.pinCheck
 }));
+/* Werk bij het inloggen (kern/werkbijlogin.js): wie een werkplek heeft, krijgt
+   die er bij het inloggen meteen bij -- geen tweede inlog en geen pincode. Het
+   werkvenster van de werkgever bepaalt of hij open of dicht is. */
+Object.assign(kern, require('./kern/werkbijlogin').maakWerkBijLogin({
+  accounts, crypto, findSupplier, magWerken: kern.magWerken, rememberSession,
+  logInlog: kern.logInlog, logActivity, supplierState
+}));
 /* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
    (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een
    match automatisch een tafel bij een partner rond het midden van de twee

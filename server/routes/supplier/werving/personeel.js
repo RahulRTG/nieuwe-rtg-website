@@ -122,9 +122,15 @@ app.post('/api/supplier/staff/join', async (req, res) => {
   if (tooManyTries(res, bucket)) return;
   const bedrijf = String(req.body.bedrijf || '').trim();
   const kassacode = String(req.body.kassacode || '').trim().toUpperCase();
-  const pin = String(req.body.pin || '').trim();
+  /* Een pincode hoeft niet meer: wie zich met zijn eigen RTG-account aanmeldt,
+     logt daarna gewoon in op dat account en heeft zijn werk-app meteen (zie
+     kern/werkbijlogin.js). De pincode bestaat alleen nog voor de losse
+     personeelslogin op een gedeeld apparaat, dus kiest iemand er zelf geen, dan
+     maken we er een en hoeft hij er nooit aan te denken. */
+  const gekozen = String(req.body.pin || '').trim();
   if (!bedrijf || !kassacode) { noteFailedTry(bucket); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
-  if (!/^\d{4}$/.test(pin)) return res.status(400).json({ error: 'Kies een pincode van 4 cijfers voor uw dagelijkse inlog.' });
+  if (gekozen && !/^\d{4}$/.test(gekozen)) return res.status(400).json({ error: 'Een pincode is vier cijfers; laat hem leeg als u er geen wilt.' });
+  const pin = gekozen || accounts.makePin();
   // 1) bewijs dat u een eigen RTG-account hebt (een betaalde pas is niet nodig)
   const lid = accounts.findByLogin(req.body.login);
   if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {

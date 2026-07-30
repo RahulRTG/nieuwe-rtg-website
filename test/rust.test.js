@@ -110,9 +110,13 @@ test('3. het ledendossier gaat versleuteld de accountdatabase in', async () => {
   const rijen = db.prepare('SELECT member_state FROM users WHERE member_state IS NOT NULL').all();
   db.close();
   assert.ok(rijen.length, 'er hoort minstens een ledendossier te zijn');
+  /* Twee markeringen zijn goed: RTGV1 is versleuteld, RTGV2 is versleuteld EN aan
+     zijn rij gebonden (server/accounts/gebonden.js). Verse schrijfacties leveren
+     RTGV2; een rij die sinds de binding niet is aangeraakt mag nog RTGV1 zijn. */
   for (const r of rijen) {
-    assert.ok(String(r.member_state).startsWith('RTGV1:'),
-      'ledendossier zonder kluis-markering: ' + String(r.member_state).slice(0, 40));
+    const s = String(r.member_state);
+    assert.ok(s.startsWith('RTGV1:') || s.startsWith('RTGV2:'),
+      'ledendossier zonder kluis-markering: ' + s.slice(0, 40));
   }
 });
 
@@ -170,6 +174,8 @@ test('6. een bestaand, nog PLAT dossier blijft leesbaar en migreert bij het opsl
   const db2 = new DatabaseSync(path.join(TMP, 'rtg.db'));
   const na = db2.prepare('SELECT member_state FROM users WHERE id = ?').get(rij.id);
   db2.close();
-  assert.ok(String(na.member_state).startsWith('RTGV1:'), 'na het opslaan hoort het dossier versleuteld te zijn');
+  /* Een VERSE schrijfactie levert de gebonden vorm: versleuteld en vastgezet aan
+     deze rij, zodat het dossier niet naar een ander lid te verplaatsen is. */
+  assert.ok(String(na.member_state).startsWith('RTGV2:'), 'na het opslaan hoort het dossier versleuteld EN gebonden te zijn');
   assert.ok(!String(na.member_state).includes(OUD), 'en de oude tekst hoort er niet meer leesbaar in te staan');
 });

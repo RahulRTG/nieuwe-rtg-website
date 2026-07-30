@@ -74,3 +74,31 @@ De beveiliging wordt in de CI en de testsuite continu bewaakt:
 
 Zet daarnaast in de repo-instellingen GitHub's eigen **Secret scanning** en
 **Push protection** aan; die vullen de bovenstaande lagen aan.
+
+### De identiteitskluis is aan zijn rij gebonden
+
+Persoonsgegevens (naam, e-mail, telefoon en het ledendossier) staan versleuteld in
+de kluis, met een sleutel die los van de database leeft. Versleuteling alleen is
+daar niet genoeg: een versleuteld veld zegt niets over waar het thuishoort, dus wie
+de database kan bewerken zou een blob kunnen **verplaatsen** — de versleutelde naam
+van het ene lid naar de naamkolom van het andere. De AEAD merkt daar niets van (het
+blob is ongeschonden) en het huis leest daarna een echte naam bij de verkeerde
+codenaam. Dat holt de scheiding tussen codenaam en kluis uit.
+
+Daarom gaat de identiteit van de **plek** (tabel, kolom, rij-id) als additional
+authenticated data mee in de authenticatie (`server/accounts/gebonden.js`).
+Verplaatst iemand een blob naar een andere rij of kolom, dan klopt die context niet
+meer, faalt de authenticatie en komt er niets uit. De Rust-kluis
+(`motor/src/kluis.rs`) doet hetzelfde met de codenaam als context.
+
+Bestaande installaties blijven leesbaar en migreren per rij mee bij de
+eerstvolgende schrijfactie. Actief migreren en de stand aantonen:
+
+```
+npm run kluisbinding              # stand opnemen, verandert niets
+npm run kluisbinding -- --migreer # herzegel alles wat nog ongebonden is
+```
+
+Een rij die niet opengaat wordt met opzet niet aangeraakt: migreren mag nooit
+gegevens vernietigen. `test/kluis-binding.test.js` valt de verplaatsing met rauwe
+SQL aan en bewaakt tegelijk dat de oudere vormen leesbaar blijven.

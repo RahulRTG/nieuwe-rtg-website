@@ -6,6 +6,7 @@
 const crypto = require('crypto');
 const S = require('./state');
 const kluis = require('./kluis');
+const gebonden = require('./gebonden'); // kluis, gebonden aan (kolom, rij-id)
 const mirror = require('./mirror');
 
 /* createUser is asynchroon (scrypt in de threadpool); createUserSync bestaat
@@ -44,6 +45,7 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
     const info = S.db.prepare(`INSERT INTO users (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
     newId = info.lastInsertRowid;
   }
+  gebonden.herzegel(S.db, newId); // id is nu bekend: de kluiskolommen eraan binden
   mirror.markUser(newId);
   return getUserById(newId);
 }
@@ -64,10 +66,10 @@ function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().
 function renameUser(id, { username, realName, email }) {
   if (email === undefined) {
     S.db.prepare('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
-      .run(username, kluis.enc(realName), id);
+      .run(username, gebonden.zegel('enc_name', id, realName), id);
   } else {
     S.db.prepare('UPDATE users SET username = ?, enc_name = ?, email_hash = ?, enc_email = ? WHERE id = ?')
-      .run(username, kluis.enc(realName), kluis.emailHash(email), kluis.enc(email), id);
+      .run(username, gebonden.zegel('enc_name', id, realName), kluis.emailHash(email), gebonden.zegel('enc_email', id, email), id);
   }
   mirror.markUser(id);
   return getUserById(id);
@@ -112,9 +114,7 @@ function setPasswordSync(userId, password) {
 }
 
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
-function realNameOf(u) { return u ? (kluis.dec(u.enc_name) || u.username || 'Lid') : null; }
-function emailOf(u) { return u ? kluis.dec(u.enc_email) : null; }
-function phoneOf(u) { return u ? kluis.dec(u.enc_phone) : null; }
+const { realNameOf, emailOf, phoneOf } = gebonden; // lezen zit bij de binding
 
 /* De staatloze tokens, de e-mailbevestiging en het wachtwoord-herstel staan
    in ./tokens.js; ze krijgen getUserById mee en verhuizen mee in de export,
@@ -141,9 +141,9 @@ function publicUser(u) {
 
 /* ---------- ledeninhoud per persoon (eigen boekingen/betalingen) ---------- */
 function getMemberState(userId) {
-  const row = S.db.prepare('SELECT member_state FROM users WHERE id = ?').get(userId);
+  const row = S.db.prepare('SELECT id, member_state FROM users WHERE id = ?').get(userId);
   if (!row || !row.member_state) return null;
-  try { return JSON.parse(kluis.decVeld(row.member_state)); } catch (e) { return null; }
+  try { return JSON.parse(gebonden.lees('member_state', row)); } catch (e) { return null; }
 }
 /* Het ledendossier gaat versleuteld de kolom in. Dat is geen luxe: hier staan
    de gesprekken met Rahul, de boekingen, de facturen en de geboortedatum, en
@@ -152,7 +152,7 @@ function getMemberState(userId) {
    de naam ernaast wel versleuteld is. Dat maakt het codenaam-ontwerp waardeloos.
    De Postgres-spiegel kopieert de kolom ongewijzigd en erft de bescherming. */
 function saveMemberState(userId, obj) {
-  S.db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(kluis.encVeld(JSON.stringify(obj)), userId);
+  S.db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(gebonden.zegel('member_state', userId, JSON.stringify(obj)), userId);
   mirror.markUser(userId);
 }
 
@@ -171,7 +171,7 @@ function listByVerification(status) {
 function conversations() {
   const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users WHERE member_state IS NOT NULL').all();
   return rows.map(r => {
-    let md = {}; try { md = JSON.parse(kluis.decVeld(r.member_state)) || {}; } catch (e) {}
+    let md = {}; try { md = JSON.parse(gebonden.lees('member_state', r)) || {}; } catch (e) {}
     return { id: r.id, tier: r.tier, codename: r.codename, conversation: md.conversation || [], needsConcierge: !!md.needsConcierge };
   }).filter(x => x.conversation.length);
 }
@@ -184,7 +184,7 @@ function ledenRegisterRijen(limit) {
   const n = Math.max(1, Math.min(Number(limit) || 5000, 20000));
   const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users ORDER BY codename ASC LIMIT ?').all(n);
   return rows.map(r => {
-    let md = {}; try { md = r.member_state ? (JSON.parse(kluis.decVeld(r.member_state)) || {}) : {}; } catch (e) {}
+    let md = {}; try { md = r.member_state ? (JSON.parse(gebonden.lees('member_state', r)) || {}) : {}; } catch (e) {}
     const gs = String(md.geslacht || '').toLowerCase();
     return { id: r.id, key: 'user-' + r.id, tier: r.tier || 'rtg', codename: r.codename || null,
       geslacht: (gs === 'v' || gs === 'm' || gs === 'x') ? gs : null, land: md.land || null };

@@ -21,7 +21,9 @@
     return d;
   }
 
-  /* ---------- aanmelden ---------- */
+  /* ---------- aanmelden: het vangnet ----------
+     De gewone ingang is het gesprek met Rahul (onderaan deel 3). Dit blijft
+     eronder staan voor als dat gesprek er niet is. */
   $('#lZoek').addEventListener('click', async () => {
     $('#lFout').textContent = '';
     try {

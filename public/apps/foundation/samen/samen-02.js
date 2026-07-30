@@ -2,7 +2,8 @@
      Praat op het niveau van je leeftijdsgroep, belooft nooit iets dat geld
      kost (alles hier is gratis) en wijst bij zware onderwerpen liefdevol
      naar een vertrouwde grote. ---- */
-  var rCss = '.rsm-rahul{position:fixed;right:1rem;bottom:3.6rem;z-index:35;background:var(--goud,#857007);color:#000;border:none;border-radius:999px;padding:.6rem 1rem;font:600 .83rem Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+  /* Ook Rahul staat in de balk, niet zwevend in de hoek. Zie samen-01.js. */
+  var rCss = '.rsm-rahul{background:var(--goud,#857007);color:#000;border:none;border-radius:999px;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
     '.rsm-rsheet{position:fixed;right:1rem;bottom:3.6rem;z-index:37;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
     '.rsm-rsheet[hidden]{display:none;}.rsm-ruit{font-size:.84rem;color:var(--zacht,#bbb);line-height:1.55;max-height:38vh;overflow-y:auto;white-space:pre-wrap;}';
   var rSt = document.createElement('style'); rSt.textContent = rCss; document.head.appendChild(rSt);
@@ -11,7 +12,16 @@
     '<div class="rsm-kop"><span>✶ Vraag het Rahul</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="rsm-ruit" aria-live="polite"></div>' +
     '<form class="rsm-rij"><input placeholder="Wat wil je weten?" maxlength="300" autocomplete="off" aria-label="Je vraag"><button class="rsm-go" type="submit" aria-label="Versturen">→</button></form></section>');
-  document.body.appendChild(rFab); document.body.appendChild(rSheet);
+  (function dokR() {
+    if (window.rtfDok && window.rtfDok(rFab)) return;
+    var n = 0, tik = setInterval(function () {
+      if ((window.rtfDok && window.rtfDok(rFab)) || ++n > 20) {
+        clearInterval(tik);
+        if (!rFab.parentNode) { var m = document.querySelector('main, .wrap') || document.body; m.insertBefore(rFab, m.firstChild); }
+      }
+    }, 150);
+  })();
+  document.body.appendChild(rSheet);
   var rUit = rSheet.querySelector('.rsm-ruit'), rForm = rSheet.querySelector('form'), rInp = rForm.querySelector('input');
   rFab.addEventListener('click', function () {
     rSheet.hidden = false; rFab.hidden = true; rInp.focus();

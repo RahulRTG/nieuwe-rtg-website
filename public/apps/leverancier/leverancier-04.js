@@ -62,6 +62,32 @@
       e.preventDefault();
       login({ username: document.getElementById('liUser').value, password: document.getElementById('liPass').value }, true);
     });
+    /* De poort is een gesprek met Rahul, net als in de leden-app: hij vraagt de
+       gebruikersnaam, dan het wachtwoord, en belt daarna aan bij dezelfde route
+       als het formulier hiernaast (/api/supplier/login). Er gaat niets van dit
+       gesprek naar een taalmodel en Rahul beslist niets -- de server zegt ja of
+       nee. Het formulier blijft in de pagina staan als vangnet: is de poort er
+       niet, dan is er gewoon het oude blok. */
+    if (lf && window.RTGPoort && window.RTGPoort.gesprek){
+      const doos = document.createElement('div');
+      lf.parentNode.insertBefore(doos, lf);
+      lf.style.display = 'none';   // .login-form staat op display:flex, dus [hidden] alleen is niet genoeg
+      window.RTGPoort.gesprek(doos, {
+        groet: () => T('gate.rp.groet','Welkom terug.'),
+        wacht: () => T('gate.rp.wacht','Een ogenblik, ik kijk het na.'),
+        stuurLabel: T('gate.rp.stuur','Stuur'),
+        stappen: [
+          { sleutel:'username', vraag: () => T('gate.rp.wie','Met wie heb ik het genoegen?'),
+            plho: () => T('gate.user','Gebruikersnaam'), type:'text', autocomplete:'username' },
+          { sleutel:'password', vraag: () => T('gate.rp.pass','Dank u. En uw wachtwoord?'),
+            plho: () => T('gate.pass','Wachtwoord'), type:'password', autocomplete:'current-password' }
+        ],
+        klaar: async (a) => {
+          const ok = await login({ username: a.username, password: a.password }, true, true);
+          if (!ok) throw new Error(T('login.bad','Onjuiste gebruikersnaam of wachtwoord.'));
+        }
+      });
+    }
     const tog = document.getElementById('enrollToggle'), ef = document.getElementById('enrollForm');
     if (tog && ef) tog.addEventListener('click', () => {
       const open = ef.hasAttribute('hidden');

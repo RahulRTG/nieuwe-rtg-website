@@ -38,8 +38,11 @@
 
   /* stappen-gate */
   #gate{flex:1;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 1.75rem 3rem;}
-  #gate .gate-top{display:flex;flex-direction:column;align-items:flex-start;gap:0.35rem;}
-  #gate .badge{align-self:flex-start;background:#7F1734;border:1px solid #7F1734;border-radius:4px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#fff;}
+  /* De klok hoort in het midden. Hij stond links tegen de rand, en dan staat
+     een ronde wijzerplaat scheef op het scherm: het is het enige beeld op deze
+     pagina, dus hij hoort op de as. Het merkje erboven gaat mee. */
+  #gate .gate-top{display:flex;flex-direction:column;align-items:center;gap:0.35rem;text-align:center;}
+  #gate .badge{align-self:center;background:#7F1734;border:1px solid #7F1734;border-radius:4px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#fff;}
   .gate-klok{margin-top:1.1rem;font-size:3.9rem;font-weight:200;line-height:1;letter-spacing:0.01em;font-variant-numeric:tabular-nums;color:var(--txt);}
   .gate-datum{font-size:0.82rem;color:var(--soft);text-transform:capitalize;}
   .lform{margin-top:1.9rem;display:flex;flex-direction:column;gap:0.7rem;}
@@ -394,12 +397,20 @@
 <script src="/shared/accounts-brug.js" data-wereld="personeel"></script>
 <script src="/shared/qr.js"></script>
 <script src="/shared/qrteken.js"></script>
+<!-- de poort is een gesprek met Rahul; beide moeten er zijn voordat personeel.js
+     zijn inlogscherm opbouwt, vandaar hierboven en zonder defer -->
+<script src="/shared/mond.js"></script>
+<script src="/shared/rahulpoort.js"></script>
 <script src="/apps/personeel.js"></script>
 <script>
 window.I18N = { en: {
   'pd.title':'Your shift, <em>in your pocket</em>.',
   'pd.deck':'Schedule, tasks, team chat and the work of your business. Pick your sector, your company and sign in with your PIN.',
   'pd.back':'Back', 'pd.choose':'Choose your company', 'pd.staff':'Staff member', 'pd.login':'Sign in',
+  /* de poort is een gesprek met Rahul; dit is wat hij zegt */
+  'pd.rp.groet':'Welcome back to RTG Personnel.', 'pd.rp.wacht':'One moment, let me check.',
+  'pd.rp.wie':'Who do I have the pleasure of speaking to?', 'pd.rp.pass':'Thank you. And your password?',
+  'pd.rp.stuur':'Send',
   'pd.taal.h':'My language', 'pd.taal.s':'Pick your native language. Your whole screen, your tickets and your tasks will follow, on every work app you sign in to.',
   'pd.taal.ok':'Your language is set; the screen will follow.',
   'pd.vast':'This PDA is set to this company', 'pd.switch':'Other company',

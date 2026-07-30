@@ -21,7 +21,9 @@
     return d;
   }
 
-  /* ---------- aanmelden ---------- */
+  /* ---------- aanmelden: het vangnet ----------
+     De gewone ingang is het gesprek met Rahul (onderaan deel 3). Dit blijft
+     eronder staan voor als dat gesprek er niet is. */
   $('#lZoek').addEventListener('click', async () => {
     $('#lFout').textContent = '';
     try {
@@ -414,6 +416,46 @@
     $('#noodKnop').hidden = false;
     laad().then(laadKeten).then(laadRamp).catch(e => { $('#vLogin').hidden = false; $('#vBord').hidden = true; $('#lFout').textContent = e.message; token = ''; });
   }
+  /* ---------- de poort als GESPREK met Rahul ----------
+     Korpscode, dan wie u bent, dan uw pincode. Hij haalt onderweg dezelfde
+     lijst op en belt aan bij dezelfde routes als de knoppenversie in deel 1
+     (/api/supplier/roster en /login); die blijft eronder staan als vangnet.
+     Er gaat niets van dit gesprek naar een taalmodel en Rahul beslist niets:
+     de server zegt ja of nee. Dit blok staat HIER, aan het eind, omdat de
+     delen van deze bundel middenin een functie kunnen eindigen -- en dan
+     draait het pas na het inloggen, wat precies te laat is. */
+  let staflijst = [];
+  (function poort(){
+    const doos = document.querySelector('#vLogin .kaart');
+    if (!doos || !window.RTGPoort || !window.RTGPoort.gesprek) return;
+    const gesprek = document.createElement('div');
+    doos.parentNode.insertBefore(gesprek, doos);
+    doos.hidden = true;
+    window.RTGPoort.gesprek(gesprek, {
+      groet: 'Meldkamer. Goed dat u er bent.',
+      wacht: 'Een ogenblik, ik meld u aan.',
+      stappen: [
+        { sleutel: 'code', vraag: 'Van welk korps bent u?', plho: 'bijv. GUARDIA',
+          type: 'text', maxlength: 20,
+          doe: async (a) => {
+            const d = await api('roster', { code: String(a.code).toUpperCase() });
+            staflijst = d.staff || [];
+            if (!staflijst.length) throw new Error('Dat korps heeft nog niemand op de lijst staan.');
+          } },
+        { sleutel: 'staffId', vraag: 'En wie bent u?', type: 'keuze',
+          opties: () => staflijst.map(m => ({ waarde: m.id, label: m.name + ' (' + (m.func || m.role) + ')' })) },
+        { sleutel: 'pin', vraag: 'Uw pincode, dan bent u binnen.', plho: 'PIN',
+          type: 'password', inputmode: 'numeric', maxlength: 8 }
+      ],
+      klaar: async (a) => {
+        const d = await api('login', { code: String(a.code).toUpperCase(), staffId: Number(a.staffId), pin: a.pin });
+        token = d.token;
+        try { sessionStorage.setItem('rtg_meldkamer_token', token); } catch (e) {}
+        start();
+      }
+    });
+  })();
+
   setInterval(() => { if (!$('#vBord').hidden && !document.hidden) laad().catch(() => {}); }, 20000);
   if (token) start();
 })();

@@ -254,34 +254,40 @@
   }
   // de klok en de datum op het inlogscherm (de naam van de app staat in de badge)
   function gateTik(){ if (window.RTGKlok) RTGKlok.alles(); }
-  // De hoofd-ingang: inloggen met het eigen RTG-account (e-mail/gebruikersnaam +
-  // wachtwoord). Daaronder alleen aanmelden en wachtwoord vergeten; een vast
-  // apparaat kan nog op naam met pincode.
+  /* De hoofd-ingang is een GESPREK met Rahul, net als in de leden-app: hij
+     vraagt wie u bent, daarna uw wachtwoord, en pas dan gaat hij aanbellen bij
+     dezelfde inlogroute als voorheen (mijnLogin -> /api/auth/login). Er gaat
+     niets van dit gesprek naar een taalmodel, en Rahul beslist niets: de server
+     zegt ja of nee, precies als eerst. De zijpaden (aanmelden, wachtwoord
+     vergeten, vast apparaat) staan er rustig onder.
+     Is shared/rahulpoort.js er niet, dan valt hij terug op het oude formulier;
+     zonder inlogscherm zou de app onbruikbaar zijn en dat risico nemen we niet. */
   function stepLogin(){
     kantoorStop();
-    $('#gateStep').innerHTML =
-      '<form class="lform" id="loginForm" autocomplete="on">'+
-        '<input id="liUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
-        '<input id="liPass" type="password" autocomplete="current-password" placeholder="'+T('pd.li.pass','Wachtwoord')+'" aria-label="'+T('pd.li.pass','Wachtwoord')+'">'+
-        '<div class="err" id="liErr" role="alert"></div>'+
-        '<button class="prim" type="submit">'+T('pd.login','Inloggen')+'</button>'+
-      '</form>'+
-      '<div class="llinks">'+
-        '<button class="llink" id="toJoin" type="button">'+T('pd.aanmelden','Aanmelden bij een bedrijf')+'</button>'+
-        '<button class="llink" id="toForgot" type="button">'+T('pd.forgot','Wachtwoord vergeten?')+'</button>'+
-        '<button class="llink" id="toDevice" type="button">'+T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode')+'</button>'+
-      '</div>';
-    $('#loginForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      $('#liErr').textContent = '';
-      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
-      try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
-      catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
+    if (window.RTGPoort && window.RTGPoort.gesprek) return poortGesprek();
+    formulierLogin();
+  }
+  function poortGesprek(){
+    window.RTGPoort.gesprek($('#gateStep'), {
+      groet: () => T('pd.rp.groet','Welkom terug bij RTG Personeel.'),
+      wacht: () => T('pd.rp.wacht','Een ogenblik, ik kijk het na.'),
+      stuurLabel: T('pd.rp.stuur','Stuur'),
+      stappen: [
+        { sleutel:'user', vraag: () => T('pd.rp.wie','Met wie heb ik het genoegen?'),
+          plho: () => T('pd.li.user','E-mail of gebruikersnaam'), type:'text', autocomplete:'username' },
+        { sleutel:'pass', vraag: () => T('pd.rp.pass','Dank u. En uw wachtwoord?'),
+          plho: () => T('pd.li.pass','Wachtwoord'), type:'password', autocomplete:'current-password' }
+      ],
+      klaar: async (a) => {
+        try { await mijnLogin(a.user, a.pass); }
+        catch(err){ throw new Error(err && err.message || T('pd.badlogin','Onjuiste inloggegevens.')); }
+      },
+      zijpaden: [
+        { tekst: () => T('pd.aanmelden','Aanmelden bij een bedrijf'), doe: stepAanmelden },
+        { tekst: () => T('pd.forgot','Wachtwoord vergeten?'), doe: stepForgot },
+        { tekst: () => T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode'), doe: stepSector }
+      ]
     });
-    $('#toJoin').addEventListener('click', stepAanmelden);
-    $('#toForgot').addEventListener('click', stepForgot);
-    $('#toDevice').addEventListener('click', stepSector);
-    $('#liUser').focus();
   }
   // Aanmelden bij een bedrijf: bedrijfsnaam + kassacode (van de werkgever) +
   // het eigen RTG-account + een zelfgekozen pincode. Daarna landt u meteen.
@@ -335,6 +341,37 @@
   }
   // Inloggen met het RTG-account en landen op de juiste bedrijfspagina.
   async function mijnLogin(login, password, bedrijf){
+/* Personeel, deel 3b: het oude inlogFORMULIER, nog als vangnet.
+   De gewone ingang is het gesprek met Rahul (deel 3). Dit blok staat er
+   voor het geval shared/rahulpoort.js niet geladen is; zonder inlogscherm
+   zou de app onbruikbaar zijn en dat risico nemen we niet. Deelt de
+   IIFE-scope met de andere delen. */
+  // Het oude formulier, nog als vangnet (zie stepLogin).
+  function formulierLogin(){
+    $('#gateStep').innerHTML =
+      '<form class="lform" id="loginForm" autocomplete="on">'+
+        '<input id="liUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
+        '<input id="liPass" type="password" autocomplete="current-password" placeholder="'+T('pd.li.pass','Wachtwoord')+'" aria-label="'+T('pd.li.pass','Wachtwoord')+'">'+
+        '<div class="err" id="liErr" role="alert"></div>'+
+        '<button class="prim" type="submit">'+T('pd.login','Inloggen')+'</button>'+
+      '</form>'+
+      '<div class="llinks">'+
+        '<button class="llink" id="toJoin" type="button">'+T('pd.aanmelden','Aanmelden bij een bedrijf')+'</button>'+
+        '<button class="llink" id="toForgot" type="button">'+T('pd.forgot','Wachtwoord vergeten?')+'</button>'+
+        '<button class="llink" id="toDevice" type="button">'+T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode')+'</button>'+
+      '</div>';
+    $('#loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('#liErr').textContent = '';
+      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
+      catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
+    });
+    $('#toJoin').addEventListener('click', stepAanmelden);
+    $('#toForgot').addEventListener('click', stepForgot);
+    $('#toDevice').addEventListener('click', stepSector);
+    $('#liUser').focus();
+  }
     const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
     await landMijn(d);
   }

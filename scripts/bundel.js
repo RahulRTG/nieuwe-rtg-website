@@ -35,6 +35,7 @@ const bundels = {
   'shared/handenvrij-scherm.js': 'shared/handenvrij-scherm',
   'shared/werkblad.js': 'shared/werkblad',
   'shared/mond.js': 'shared/mond',
+  'shared/rahulpoort.js': 'shared/rahulpoort',
   'shared/geluid.js': 'shared/geluid',
   'shared/handenvrij-bureau.js': 'shared/handenvrij-bureau',
   'shared/handenvrij-balk.js': 'shared/handenvrij-balk',

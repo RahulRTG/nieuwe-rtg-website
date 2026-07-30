@@ -316,7 +316,8 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
-    'server/accounts/users.js',
+    // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
+    // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',
     'server/kern/pay/index.js',
     'server/kern/werkplaats.js',

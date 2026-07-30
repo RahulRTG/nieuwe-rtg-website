@@ -15,32 +15,8 @@ function maakLid(deps) {
   // opgebouwd, dus server.js vult deps.zijnVrienden later in. Zonder die functie
   // (bijv. losse module-test) telt niemand als vriend.
   const zijnVriendenVan = (a, b) => { try { return typeof deps.zijnVrienden === 'function' ? !!deps.zijnVrienden(a, b) : false; } catch (e) { return false; } };
-  function hasContact(higherFull, rtgFull) {
-    return db.data.contacts.some(c => c.higher === higherFull && c.rtg === rtgFull);
-  }
-  function addContact(higherFull, rtgFull) {
-    if (!hasContact(higherFull, rtgFull)) {
-      db.data.contacts.push({ higher: higherFull, rtg: rtgFull });
-    }
-  }
-  function canEngage(sess, post) {
-    if (sess.tier === 'guest') return false;
-    if (sess.tier === 'rtg') {
-      if (post.tier === 'rtg') return true;
-      return hasContact(post.author, PERSONAS.rtg.full);
-    }
-    return true;
-  }
-  function engageError(viewerTier) {
-    if (viewerTier === 'guest') return 'Zonder pas kunt u alleen liken. Reageren en berichten zijn voor leden.';
-    return 'Met de RTG Pass reageert en dm’t u alleen met andere RTG-leden, tenzij dit lid u eerst heeft aangesproken.';
-  }
-  /* Na een reactie/DM van een hoger lid op een RTG-post: leg het contact vast. */
-  function registerContact(sess, post) {
-    if ((sess.tier === 'lifestyle' || sess.tier === 'business') && post.tier === 'rtg') {
-      addContact(PERSONAS[sess.tier].full, post.author);
-    }
-  }
+  const { hasContact, addContact, canEngage, engageError, registerContact } =
+    require('./lid/contact')({ db, PERSONAS });
 
   /* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
      -facturen, zodat elk lid zijn eigen boekingen/betalingen heeft. */

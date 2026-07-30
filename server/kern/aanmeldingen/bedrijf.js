@@ -19,7 +19,11 @@ const GENRES = ['restaurant', 'hotel', 'bar', 'club', 'beachclub', 'retail', 'mo
   'autogarage', 'schoonmaak', 'hovenier', 'wasserij', 'rijschool', 'dierenarts',
   'tandarts', 'fotograaf', 'verhuizer', 'ithulp'];
 
-module.exports = (ctx) => {
+/* De fabriek, met de genrelijst er los naast: het proefpubliek in
+   test/gezelschap.js zet voor elk genre een lid neer en moet die lijst kunnen
+   lezen zonder de hele kern op te bouwen. Overtypen zou betekenen dat een nieuw
+   genre stil buiten dat publiek blijft. */
+module.exports = Object.assign((ctx) => {
   const { db, save, kap, nu, accounts } = ctx;
 
   /* De behoeften-intake: wat de ondernemer invult (of aan Rahul vertelt)
@@ -93,4 +97,4 @@ module.exports = (ctx) => {
   }
 
   return { zetBedrijf, provisioneer, termijnVoldaan, GENRES };
-};
+}, { GENRES });

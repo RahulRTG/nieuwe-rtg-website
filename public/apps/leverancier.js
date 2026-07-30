@@ -5429,6 +5429,29 @@
           '<button class="js-zbnaar" data-tab="boerderij" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-size:0.75rem;font-family:inherit;margin-bottom:1rem;">'+T('zb.naarboer','Naar de boerderij ›')+'</button>';
       }
     }
+    /* ---- Werkbeleid: wat staat er dicht op de passen van uw mensen? ----
+       Een bedrijf dat passen voor zijn mensen neemt, moet kunnen zeggen welke
+       functies daarop dicht staan. Eén regel maakt dat veilig, en die staat er
+       met zoveel woorden bij: u kunt alleen DICHTzetten, nooit openzetten.
+       Verplicht aanzetten van locatie, GPS of paspoort delen bestaat hier
+       bewust niet -- dat zou geen beleid zijn maar een afluisterknop.
+
+       De chips lezen als de rest van dit scherm: groen = de medewerker beslist
+       zelf, rood = wij hebben hem dicht gezet. */
+    let wb = null; try { wb = await API.call('/supplier/werkbeleid'); } catch(e){}
+    if (wb && wb.beleid){
+      const fns = (wb.beleid.functies||[]);
+      const wbChips = '<div class="sub" style="margin:0 0 0.5rem;">'+T('wb.regel','U kunt functies alleen dichtzetten, nooit openzetten. Verplicht aanzetten van locatie, GPS of paspoort delen bestaat hier bewust niet.')+'</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
+        fns.map(f => '<button class="js-wbf" data-id="'+f.id+'" data-dicht="'+f.dicht+'" title="'+esc(f.uitleg||'')+'" style="border:1px solid '+(f.dicht?'var(--rood)':'#1f5637')+';background:'+(f.dicht?'#3a1420':'#12321f')+';color:'+(f.dicht?'#F4B8C6':'#7EE0A3')+';border-radius:999px;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.dicht?'○ ':'● ')+esc(f.naam)+'</button>').join('')+
+        '</div>'+
+        (wb.beleid.gewijzigd ? '<div class="sub" style="margin-top:0.5rem;font-size:0.7rem;">'+T('wb.laatst','Laatst gewijzigd')+': '+esc(String(wb.beleid.gewijzigd).slice(0,10))+(wb.beleid.door?' · '+esc(wb.beleid.door):'')+'</div>' : '');
+      // het blok telt hoeveel er VRIJ zijn, zodat de kop leest als de andere
+      const alsFuncties = fns.map(f => ({ id:f.id, naam:f.naam, aan: !f.dicht }));
+      h += '<div class="st-sec">'+T('wb.kop','Werkbeleid op de passen van uw mensen')+'</div>'+
+        funcBlok(T('wb.functies','Vrij voor de medewerker'), alsFuncties, wbChips);
+    }
+
     // de belastingtool van de zaak: dezelfde motor als de Business Pass
     h += '<div class="st-sec">'+T('zb.bel','Belastingtool')+'</div>'+
       '<div class="sub" style="margin-bottom:0.4rem;">'+T('zb.bel.s','Vul de verwachte jaarwinst in voor een indicatie van de belasting, de nettowinst en wat u maandelijks opzij zet. Het land van de zaak is het vertrekpunt.')+'</div>'+
@@ -5456,6 +5479,18 @@
     wireFuncBlok(el);
     el.querySelectorAll('.js-zbf').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/zaak/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); await refresh(); renderZaakBoard(); } catch(e){ toast(e.message); }
+    }));
+    /* Een chip omzetten stuurt de VOLLEDIGE dicht-lijst terug, niet een los
+       aan/uit: dan kan een half mislukt verzoek nooit een beleid achterlaten
+       dat niemand zo bedoeld heeft. */
+    el.querySelectorAll('.js-wbf').forEach(b => b.addEventListener('click', async () => {
+      const dicht = [];
+      el.querySelectorAll('.js-wbf').forEach(x => {
+        const nu = x === b ? x.dataset.dicht !== 'true' : x.dataset.dicht === 'true';
+        if (nu) dicht.push(x.dataset.id);
+      });
+      try { await API.call('/supplier/werkbeleid/zet', { uit: dicht }); renderZaakBoard(); }
+      catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-zbnaar').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
     const bvSend = $('#bvSend');

@@ -20,7 +20,21 @@ module.exports = (ctx) => {
     vervoer:      { label: 'Vervoer & transfers', icon: 'auto', caps: ['rides', 'location', 'pricing'] },
     care:         { label: 'Zorg aan huis', icon: 'zorg', caps: ['services', 'location', 'pricing'] },
     activiteiten: { label: 'Activiteiten & excursies', icon: 'tickets', caps: ['tickets', 'location', 'pricing'] },
-    vakwerk:      { label: 'Vakwerk & klussen', icon: 'werk', caps: ['services', 'location', 'pricing'] }
+    vakwerk:      { label: 'Vakwerk & klussen', icon: 'werk', caps: ['services', 'location', 'pricing'] },
+
+    /* En de acht genres die al WEL een partner hadden maar geen eigen type. Dat
+       kostte geen functie -- capsVan leidt de mogelijkheden af uit wat de zaak
+       doet -- maar wel een naam: de partner-app kende het soort niet, dus die
+       ondernemer zag zijn eigen vak nergens terug. De caps hieronder zijn de
+       bodem; wat de zaak werkelijk heeft komt er vanzelf bij. */
+    retail:    { label: 'Winkel & retail', icon: 'winkel', caps: ['retail', 'location', 'pricing'] },
+    charter:   { label: 'Charter & vaartuigen', icon: 'boot', caps: ['bookings', 'location', 'pricing'] },
+    verhuur:   { label: 'Autoverhuur', icon: 'auto', caps: ['bookings', 'location', 'pricing'] },
+    vastgoed:  { label: 'Vastgoed & makelaardij', icon: 'maison', caps: ['services', 'location', 'pricing'] },
+    boerderij: { label: 'Boerderij & landbouw', icon: 'oogst', caps: ['retail', 'location', 'pricing'] },
+    creator:   { label: 'Creator & media', icon: 'camera', caps: ['services', 'location', 'pricing'] },
+    zzp:       { label: 'Zelfstandig (zzp)', icon: 'werk', caps: ['services', 'agenda', 'location', 'pricing'] },
+    bouw:      { label: 'Bouw & renovatie', icon: 'werk', caps: ['services', 'location', 'pricing'] }
   };
   for (const [t, def] of Object.entries(GENRE_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
 

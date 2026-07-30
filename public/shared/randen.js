@@ -72,8 +72,11 @@
     if (over) return over;
     // de gedeelde chatbalk (shared/metgezel.js) staat op bijna elke pagina
     if (w.RTGRahul && w.RTGRahul.open) return w.RTGRahul.open;
-    // het leden-OS: Rahul is daar een eigen app in het dock
-    var tab = d.querySelector('.os-dock [data-tab="ai"], .tabbar button[data-tab="ai"]');
+    // het leden-OS: Rahul heeft daar zijn eigen balk onderaan het beginscherm;
+    // is die er niet, dan doet de (verborgen) tab-knop hetzelfde
+    var balk = d.getElementById('osAiIn');
+    if (balk) return function () { balk.focus(); };
+    var tab = d.querySelector('.tabbar button[data-tab="ai"]');
     if (tab) return function () { tab.click(); };
     return null;
   }

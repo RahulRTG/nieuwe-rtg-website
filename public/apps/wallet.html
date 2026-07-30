@@ -42,12 +42,49 @@
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:40;
     background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;opacity:0;transition:opacity .25s;}
   .melding.zien{opacity:1;}
+
+  /* ---------- de ledenpas: de kaart die je bij je draagt ----------
+     Hij stond op het beginscherm van de app; daar staat nu de klok, en je pas
+     ligt waar hij hoort: bovenin je wallet, als eerste wat je ziet. Zelfde
+     kaart als vroeger -- codenaam groot, lidnummer, pas en de QR ernaast. */
+  .ledenpas{
+    background:linear-gradient(150deg,#241016,#150C0F 55%,#0C0C0B);
+    border:1px solid rgba(201,162,75,0.34);
+    border-radius:18px;padding:1.3rem 1.35rem 1.2rem;
+    box-shadow:0 18px 44px rgba(0,0,0,0.5);
+    position:relative;overflow:hidden;
+  }
+  .ledenpas::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 80% at 85% -10%, rgba(201,162,75,0.16), transparent 62%);
+  }
+  .ledenpas .label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--soft);}
+  .ledenpas .cn{
+    font-family:'Bodoni Moda',serif;font-weight:400;line-height:1.1;
+    font-size:clamp(1.7rem,7vw,2.35rem);margin:0.45rem 0 0.9rem;
+  }
+  .ledenpas .row{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;}
+  .ledenpas .mrow{font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
+  .ledenpas .mrow + .mrow{margin-top:0.55rem;}
+  .ledenpas .mrow b{display:block;font-size:0.78rem;color:rgba(244,241,236,0.9);font-weight:500;margin-top:0.2rem;letter-spacing:0.08em;}
+  .ledenpas .qr{background:#fff;padding:4px;border-radius:6px;line-height:0;flex-shrink:0;}
+  .ledenpas .qr svg{width:62px;height:62px;display:block;}
+  .ledenpas .waarom{
+    margin-top:1rem;background:none;border:none;padding:0;position:relative;z-index:1;
+    color:var(--gold);font-size:0.72rem;font-weight:600;text-align:left;
+  }
+  .paswaarom{display:none;font-size:0.72rem;line-height:1.6;color:var(--soft);margin-top:0.7rem;position:relative;z-index:1;}
+  .paswaarom.open{display:block;}
+  .paswaarom b{color:var(--txt);font-weight:600;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
+<!-- onze eigen QR-codec + tekenlaag, voor de QR op de ledenpas -->
+<script src="/shared/qr.js"></script>
+<script src="/shared/qrteken.js"></script>
 </head>
 <body>
 <header>
@@ -55,7 +92,10 @@
   <h1>RTG Wallet</h1>
 </header>
 <main>
-  <p class="stil">Alles wat u bij zich draagt, op een plek: passen, tickets, sleutels, feestmunten en klantenkaarten. Tik op een kaart voor het grote codescherm.</p>
+  <p class="stil">Alles wat u bij zich draagt, op een plek: uw ledenpas, tickets, sleutels, feestmunten en klantenkaarten. Tik op een kaart voor het grote codescherm.</p>
+
+  <h2>Uw ledenpas</h2>
+  <div id="ledenpas"></div>
 
   <h2>Passen</h2><div id="lijstPas"></div>
   <h2>Tickets</h2><div id="lijstTicket"></div>
@@ -97,6 +137,63 @@
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
   const IC = { pas: '', ticket: '', sleutel: '', munt: '', klantenkaart: '' };
+
+  /* ---------- de ledenpas bovenin de wallet ----------
+     Uw pas hoorde op het beginscherm van de app; daar staat nu de klok. Hij
+     ligt hier, als eerste kaart in uw wallet: codenaam, lidnummer, pas en een
+     QR met uw lidnummer erin (onze eigen codec, geen extern pakket). Uw echte
+     naam staat er bewust niet op -- die ligt in de gescheiden kluis. */
+  const TIERNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass', guest: 'Gratis account' };
+  function pasQr(tekst){
+    if (!window.RTGQRteken) return null;
+    try {
+      const cv = RTGQRteken.teken(String(tekst), { schaal: 4, quiet: 2 });
+      cv.style.width = '62px'; cv.style.height = '62px'; cv.style.display = 'block';
+      cv.setAttribute('role', 'img');
+      cv.setAttribute('aria-label', 'QR met lidnummer ' + tekst);
+      return cv;
+    } catch (e) { return null; }
+  }
+  function tekenLedenpas(user){
+    const host = $('#ledenpas'); if (!host || !user) return;
+    host.innerHTML =
+      '<div class="ledenpas">' +
+        '<div class="label">Uw codenaam, uw identiteit in onze systemen</div>' +
+        '<div class="cn">' + esc(user.codename || '') + '</div>' +
+        '<div class="row"><div>' +
+          '<div class="mrow">Lidnummer<b>' + esc(user.number || 'nog niet toegekend') + '</b></div>' +
+          '<div class="mrow">Pas<b>' + esc(TIERNAAM[user.tier] || user.tier || '') + '</b></div>' +
+          (user.leeftijdsgroep ? '<div class="mrow">Leeftijd<b>' + esc(user.leeftijdsgroep) + ' · paspoort</b></div>' : '') +
+        '</div><div class="qr" id="pasQr"></div></div>' +
+        '<button class="waarom" type="button" id="pasWaarom">Waarom een codenaam? →</button>' +
+        '<div class="paswaarom" id="pasWaaromT"><b>Uw echte naam staat niet in onze reisdata.</b> ' +
+          'Reserveringen, betalingen en Salon-activiteit staan op uw codenaam. Uw echte naam ligt in een gescheiden, ' +
+          'versleutelde kluis en wordt pas bij ticketing en check-in eenmalig gekoppeld. Zou reisdata ooit gestolen ' +
+          'worden, dan heeft de aanvaller nooit de juiste naam bij uw reizen.</div>' +
+      '</div>';
+    const qr = pasQr(user.number || user.codename || 'RTG');
+    if (qr) $('#pasQr').appendChild(qr); else $('#pasQr').remove();
+    $('#pasWaarom').addEventListener('click', () => {
+      const t = $('#pasWaaromT');
+      t.classList.toggle('open');
+      $('#pasWaarom').textContent = t.classList.contains('open') ? 'Sluiten ↑' : 'Waarom een codenaam? →';
+    });
+    // tik op de kaart zelf: hetzelfde grote codescherm als bij de andere passen
+    host.querySelector('.cn').style.cursor = 'pointer';
+    host.querySelector('.cn').addEventListener('click', () => toon({
+      titel: TIERNAAM[user.tier] || 'RTG', code: user.number || '', soort: 'pas', geldigTot: null, saldo: null
+    }));
+  }
+  async function laadLedenpas(){
+    if (!token) return;
+    try {
+      const r = await fetch('/api/state', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' });
+      if (!r.ok) return;
+      const d = await r.json();
+      tekenLedenpas(d && d.state && d.state.user);
+    } catch (e) { /* geen pas te tonen; de rest van de wallet werkt gewoon */ }
+  }
 
   function toon(item){
     $('#toonTitel').textContent = item.titel;
@@ -155,7 +252,7 @@
     zeg('Toegevoegd.'); laad();
   });
 
-  if (!token) zeg('Log eerst in op de leden-app.'); else laad();
+  if (!token) zeg('Log eerst in op de leden-app.'); else { laadLedenpas(); laad(); }
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>

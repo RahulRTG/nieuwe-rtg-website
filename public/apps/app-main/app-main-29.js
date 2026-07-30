@@ -17,7 +17,7 @@
   function alleDoelen() {
     const uit = [];
     for (const { item } of alleItems()) uit.push({ naam: itemNaam(item), doe: () => openItem(item) });
-    INDELING.flat().forEach(it => { if (typeof it !== 'string') uit.push({ naam: mapNaam(it), doe: () => openMap(it) }); });
+    MAPPEN.forEach(mp => uit.push({ naam: mapNaam(mp), doe: () => openMap(mp) }));
     return uit;
   }
   function osCommando(ruw) {
@@ -40,8 +40,7 @@
     if (mh) {
       // lidwoorden tellen niet mee: "de crew" en "crew" wijzen dezelfde map aan
       const kaal = s => String(s || '').toLowerCase().replace(/^(?:de|het|een)\s+/, '');
-      const mappen = INDELING.flat().filter(it => typeof it !== 'string');
-      const doel = mappen.find(mp => kaal(mapNaam(mp)) === kaal(mh[1]) || kaal(mp.naam) === kaal(mh[1]));
+      const doel = MAPPEN.find(mp => kaal(mapNaam(mp)) === kaal(mh[1]) || kaal(mp.naam) === kaal(mh[1]));
       if (doel) {
         zetMapNaam(doel, mh[2]);
         bannerToon('✦', 'Rahul', 'De map heet nu "' + mapNaam(doel) + '".');
@@ -80,92 +79,31 @@
     if (osCommando(e.target.value)) { e.target.value = ''; e.stopImmediatePropagation(); e.preventDefault(); }
   }, true);
 
-  /* ---------- widgets op hoofdscherm 2: verbergen, terughalen, herschikken ----------
-     Zelfde gebaar als bij de iconen: lang drukken op een kaart zet de
-     wiebel-modus aan; de minus verbergt, de gestippelde chips halen terug,
-     slepen herschikt. Kaarten die de app zelf verbergt (hidden-attribuut)
-     blijven van de app; wij beheren alleen onze eigen klasse. */
-  const pagina2 = $('#osPagina2'), wChips = $('#osWChips');
-  const W_NAMEN = {
-    homeKlok2: 'Klok',
-    homeTrip: 'Reis', homePay: 'Betalen', homeSalon: 'De Salon', homeContacts: 'Contacten',
-    homeSpelen: 'Spelen', homeCv: 'CV', homeVacatures: 'Vacatures', homeFoundation: 'Foundation'
-  };
-  function wStand() { try { return JSON.parse(localStorage.getItem('rtg_os_widgets_' + pas) || 'null') || {}; } catch (e) { return {}; } }
-  function wBewaar(st) { try { localStorage.setItem('rtg_os_widgets_' + pas, JSON.stringify(st)); } catch (e) {} }
-  const wKaarten = () => pagina2 ? [...pagina2.querySelectorAll(':scope > .card')].filter(c => W_NAMEN[c.id]) : [];
-  function wToepas() {
-    if (!pagina2) return;
-    const st = wStand(), kaarten = wKaarten();
-    kaarten.forEach(c => c.classList.toggle('os-w-verborgen', (st.verborgen || []).includes(c.id)));
-    const perId = new Map(kaarten.map(c => [c.id, c]));
-    (st.volgorde || []).forEach(id => { const c = perId.get(id); if (c) pagina2.appendChild(c); });
-  }
-  let wiebelW = false, wSleep = null, wTimer = null;
-  function wChipsBouw() {
-    if (!wChips) return;
-    wChips.textContent = '';
-    for (const id of wStand().verborgen || []) {
-      if (!document.getElementById(id)) continue;
-      const b = document.createElement('button');
-      b.textContent = '+ ' + (W_NAMEN[id] || id);
-      b.addEventListener('click', () => {
-        const s = wStand(); s.verborgen = (s.verborgen || []).filter(x => x !== id); wBewaar(s);
-        wToepas(); zetWiebelW(true);
-      });
-      wChips.appendChild(b);
+
+  /* ---------- de balk van Rahul, onderaan het beginscherm ----------
+     Eén regel waarin je alles kwijt kunt. Is het een opdracht die het OS zelf
+     kan uitvoeren ("open Reizen", "donker", "zoek villa", "hernoem Geld naar
+     Bank"), dan doet het OS het meteen en blijf je op het beginscherm. Al het
+     andere gaat naar Rahul zelf: zijn app opent met de vraag er al in, en zijn
+     acties-registry op de server regelt de rest.
+
+     Rahuls signatuurmond (dezelfde bewegende lippen als op het inlogscherm)
+     zit in de balk, zodat zichtbaar is tegen wie je praat. */
+  const aiBalk = $('#osAiBalk'), aiIn = $('#osAiIn'), aiOrb = $('#osAiOrb');
+  if (aiOrb) aiOrb.appendChild(aiMond());
+  if (aiBalk && aiIn) {
+    aiBalk.addEventListener('submit', e => {
+      e.preventDefault();
+      const vraag = aiIn.value.trim();
+      if (!vraag) { vraagRahul(''); return; } // lege balk: gewoon Rahul openen
+      aiIn.value = '';
+      aiIn.blur();
+      if (osCommando(vraag)) return; // het OS kon het zelf; blijf thuis
+      vraagRahul(vraag);
+    });
+    // een tik op de mond opent Rahul zonder dat je iets hoeft te typen
+    if (aiOrb) {
+      aiOrb.style.cursor = 'pointer';
+      aiOrb.addEventListener('click', () => vraagRahul(aiIn.value.trim()));
     }
   }
-  function zetWiebelW(aan) {
-    wiebelW = aan;
-    if (!pagina2) return;
-    pagina2.classList.toggle('os-wiebel-w', aan);
-    if (klaarKnop) klaarKnop.hidden = !(aan || wiebel);
-    pagina2.querySelectorAll('.os-w-min').forEach(b => b.remove());
-    if (aan) {
-      for (const c of wKaarten()) {
-        if (c.hidden || c.classList.contains('os-w-verborgen')) continue;
-        const min = document.createElement('button');
-        min.className = 'os-w-min'; min.textContent = '−';
-        min.setAttribute('aria-label', 'Verberg widget ' + (W_NAMEN[c.id] || c.id));
-        min.addEventListener('click', e => {
-          e.stopPropagation();
-          const s = wStand(); s.verborgen = [...new Set([...(s.verborgen || []), c.id])]; wBewaar(s);
-          wToepas(); zetWiebelW(true);
-        });
-        c.appendChild(min);
-      }
-      wChipsBouw();
-    } else {
-      const s = wStand(); s.volgorde = wKaarten().map(c => c.id); wBewaar(s); wSleep = null;
-    }
-  }
-  if (klaarKnop) klaarKnop.addEventListener('click', () => { if (wiebelW) zetWiebelW(false); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && wiebelW) zetWiebelW(false); });
-  if (pagina2) {
-    pagina2.addEventListener('pointerdown', e => {
-      const c = e.target.closest('.card');
-      if (!c || c.parentElement !== pagina2 || !W_NAMEN[c.id]) return;
-      if (e.target.closest('button, a, input') && !wiebelW) return; // knoppen in widgets gewoon laten werken
-      wTimer = setTimeout(() => zetWiebelW(true), 550);
-      if (wiebelW && !e.target.closest('.os-w-min')) { wSleep = c; c.classList.add('os-sleep'); }
-    });
-    pagina2.addEventListener('pointermove', e => {
-      if (wTimer && !wiebelW && (Math.abs(e.movementX) > 3 || Math.abs(e.movementY) > 3)) { clearTimeout(wTimer); wTimer = null; }
-      if (!wiebelW || !wSleep) return;
-      const onder = document.elementFromPoint(e.clientX, e.clientY);
-      const doel = onder && onder.closest && onder.closest('.card');
-      if (doel && doel !== wSleep && doel.parentElement === pagina2) {
-        const kinderen = [...pagina2.children];
-        pagina2.insertBefore(wSleep, kinderen.indexOf(doel) > kinderen.indexOf(wSleep) ? doel.nextSibling : doel);
-      }
-    });
-    const wLos = () => {
-      if (wTimer) { clearTimeout(wTimer); wTimer = null; }
-      if (wSleep) {
-        wSleep.classList.remove('os-sleep'); wSleep = null;
-        const s = wStand(); s.volgorde = wKaarten().map(c => c.id); wBewaar(s);
-      }
-    };
-    pagina2.addEventListener('pointerup', wLos);
-    pagina2.addEventListener('pointercancel', wLos);

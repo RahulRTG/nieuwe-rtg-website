@@ -1547,7 +1547,9 @@
 
   document.querySelectorAll('.tabbar button').forEach(b =>
     b.addEventListener('click', () => openTab(b.dataset.tab, true)));
-  $('#codeChip').addEventListener('click', () => { openTab('home'); toggleWhy(true); });
+  // de codenaam in de statusbalk is de korte weg naar je pas: die ligt sinds
+  // het OS-beginscherm in je wallet, niet meer op de home
+  $('#codeChip').addEventListener('click', () => { location.href = '/apps/wallet.html'; });
 
   function openTab(tab, focusView){
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));
@@ -1570,6 +1572,9 @@
     // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
     const guest = user.tier === 'guest';
     ['reizen','betalen','ai','assets','zorg'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
+    // van Rahul, want allebei zijn ze voor leden
+    document.getElementById('app').classList.toggle('os-gast', guest);
     renderHome();
     if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); renderFluister(); }
     renderSalon();
@@ -2701,10 +2706,19 @@
     }).catch(e => toast(e.message));
   }
 /* ============================== RTG OS-schil ==============================
-   De leden-app als telefoon-besturingssysteem: meerdere hoofdschermen
-   (scroll-snap + stippen), apps in mappen, een zoekpil (Spotlight), een
-   bedieningspaneel (thema, taal, push, helderheid, uitloggen) en iconen
-   herschikken met een lange druk (wiebel-modus, volgorde in localStorage).
+   De leden-app als besturingssysteem. Het beginscherm is één scherm met vier
+   lagen, van boven naar beneden:
+
+     1. de mappen met apps
+     2. de ronde RTG-klok, in het midden
+     3. de functierij: bellen, berichten, videobellen, je wallet
+     4. de balk van Rahul
+
+   Verder is er een bedieningspaneel (thema, taal, push, helderheid,
+   uitloggen), Spotlight-zoeken en herschikken met een lange druk
+   (wiebel-modus, volgorde in localStorage). Geen tweede beginscherm, geen
+   dock, geen App Store: alles waar je pas je recht op geeft staat er al, en
+   in de Boardroom zet je uit wat je niet wilt zien.
 
    De (verborgen) tabbar blijft het model: alle bestaande logica schakelt daar
    tabs, zichtbaarheid (gast-modus, Assets, Gezin) en badges. Deze laag
@@ -2713,15 +2727,11 @@
 (() => {
   const $ = s => document.querySelector(s);
   const tabbar = $('#tabbar'), app = $('#app'), content = $('#content');
-  const grids = [$('#osGrid'), $('#osGrid2')];
-  const dock = $('#osDock'), pages = $('#osPages'), dots = $('#osDots');
-  if (!tabbar || !app || !grids[0] || !grids[1] || !dock || !pages) return;
+  // rij 0 = de mappen boven de klok, rij 1 = de functies eronder
+  const rijen = [$('#osMappen'), $('#osFuncties')];
+  if (!tabbar || !app || !rijen[0] || !rijen[1]) return;
 
   const pas = new URLSearchParams(location.search).get('pas') || 'rtg';
-  // Rahul in het midden van het dock, als grotere gouden orb: hij is het
-  // hart van het OS en doet alles wat je hem vraagt. Het dock houdt de drie
-  // RTG-kern-tabs vast; de overige diensten komen uit de App Store.
-  const DOCK = ['betalen', 'ai', 'salon'];
 
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
@@ -2777,7 +2787,9 @@
     hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
     entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
-    rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' }
+    rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' },
+    // De wallet draagt je ledenpas; hij staat in de functierij onder de klok.
+    wallet:      { naam: 'Wallet',        url: '/apps/wallet.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -2788,8 +2800,7 @@
     bellen:      { naam: 'Bellen' },
     videobellen: { naam: 'Videobellen' },
     snaps:       { naam: 'Snaps' },
-    rtf:         { naam: 'RTFoundation' },
-    store:       { naam: 'App Store' }
+    rtf:         { naam: 'RTFoundation' }
   };
   const RTF_GROEPEN = [
     { g: 'mini',   naam: 'RTF Mini',      sub: '0 t/m 4 jaar' },
@@ -2798,29 +2809,43 @@
     { g: 'jong',   naam: 'RTF Jong',      sub: '16 t/m 21+' },
     { g: 'volw',   naam: 'RTF Volwassen', sub: 'ouders en verzorgers' }
   ];
-  /* ---------- de ROS als telefoon: alleen de basis + de App Store ----------
-     Standaard staan alleen de "telefoon-apps", de RTFoundation en de App Store
-     op het beginscherm; de drie RTG-kern-tabs (Betalen, Rahul, De Salon) zitten
-     in het dock. Al het andere leeft in de App Store en verschijnt op pagina 2
-     zodra je het installeert (keuze per pas in localStorage). */
-  const STANDAARD = ['os:bellen', 'os:videobellen', 'os:snaps', 'link:berichten',
-    'link:camera', 'link:navigatie', 'link:muziek', 'os:rtf', 'os:store'];
-  // pagina 1 = de vaste basis; pagina 2 = geïnstalleerde apps (begint leeg,
-  // wordt door bouw() gevuld uit de installatiekeuze).
-  const INDELING = [STANDAARD.slice(), []];
+  /* ---------- de functierij, onder de klok ----------
+     Bellen, berichten, videobellen en je wallet: de vier dingen die je zonder
+     nadenken moet kunnen pakken. Ze staan vast en kunnen niet uit. */
+  const FUNCTIES = ['os:bellen', 'link:berichten', 'os:videobellen', 'link:wallet'];
 
-  /* De App Store-catalogus: alle diensten die je erbij kunt zetten, netjes
-     gegroepeerd. De Store filtert zelf op wat echt bestaat (itemZichtbaar) en,
-     voor de premium-suite, op de pas. */
-  const WINKEL_GROEPEN = [
-    { titel: 'Reizen & onderweg', items: ['tab:reizen', 'link:ov', 'link:vluchten', 'link:flits', 'link:stad', 'tab:terplaatse'] },
-    { titel: 'Bestellen & geld', items: ['tab:bestellen', 'link:wbw', 'link:bank', 'link:rtgcode', 'link:office'] },
-    { titel: 'Sociaal & media', items: ['link:pulse', 'link:vrienden', 'link:spelen', 'link:clips', 'link:podium', 'link:theater', 'link:vonk', 'link:nieuws', 'link:krant', 'link:sport'] },
-    { titel: 'Het huis & diensten', items: ['link:ontdek', 'link:school', 'tab:zorg', 'tab:assets', 'tab:gezin', 'link:balans', 'link:labfonds', 'link:juridisch', 'link:passkeys', 'os:werk'] },
-    { titel: 'Onderneem: eigen website & het RTG-web', items: ['link:sitemaker', 'link:browser'] },
-    { titel: 'De Rechterhand · Lifestyle & Business', pas: ['lifestyle', 'business'],
-      items: ['link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle', 'link:hangar', 'link:entourage', 'link:attenties', 'link:rendezvous'] }
+  /* ---------- de mappen, boven de klok ----------
+     Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets
+     installeren: het staat er al. Wil je iets niet zien, dan zet je het uit
+     in de Boardroom (die zet het uit, hij hoeft het niet aan te zetten).
+
+     Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
+     een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
+     vallen er vanzelf uit (itemZichtbaar). */
+  const MAPPEN = [
+    { sleutel: 'map-reizen', naam: 'Reizen', items: [
+      'tab:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie', 'link:maison'] },
+    { sleutel: 'map-geld', naam: 'Geld', items: [
+      'tab:betalen', 'tab:bestellen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
+      'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat', 'link:nalatenschap', 'link:logboek'] },
+    { sleutel: 'map-salon', naam: 'De Salon', items: [
+      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
+      'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
+      'link:krant', 'link:sport', 'link:cercle', 'link:entourage', 'link:rendezvous',
+      'link:attenties', 'link:table', 'link:cellier', 'link:garderobe'] },
+    { sleutel: 'map-huis', naam: 'Het Huis', items: [
+      'link:ontdek', 'os:rtf', 'link:school', 'tab:zorg', 'tab:gezin', 'link:rechterhand',
+      'link:office', 'link:browser', 'link:sitemaker', 'link:juridisch', 'link:passkeys',
+      'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:vitaal', 'link:thuisrust', 'os:werk'] }
   ];
+
+  /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
+     Business. De registry kent de apps voor iedereen; hier staat wie ze mag
+     zien, zodat een RTG-pas ze niet in zijn mappen of in Spotlight tegenkomt. */
+  const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
+    'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
+  const premiumPas = pas === 'lifestyle' || pas === 'business';
 
   /* ---------- Werk op het OS + de algemene pin ----------
      De werk-apps zijn gewone apps op het RTG-OS: een tik op "Werk" toont de
@@ -2829,10 +2854,9 @@
      privacygevoelige apps op dit OS beschermt. Onder water munt
      /api/account/start de werksessie, dus alle regels (zoals het werkvenster
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
-     OSAPPS/INDELING/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
+     OSAPPS/MAPPEN/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
   OSAPPS.werk = { naam: 'Werk' };
-  // Werk zit in de App Store (categorie "Het huis & diensten"); installeer je
-  // het, dan verschijnt het op pagina 2 en opent het met de algemene pin.
+  // Werk staat in de map "Het Huis" en opent met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
   for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
 
@@ -2978,17 +3002,17 @@
       .map(([s, v]) => [s, (v.n || 0) * Math.pow(0.85, Math.max(0, (nu - (v.t || nu)) / 86400000))])
       .sort((a, b) => b[1] - a[1])
       .map(([s]) => s)
-      .filter(s => s.startsWith('tab:') ? itemZichtbaar(s)
-        : s.startsWith('os:') ? !!OSAPPS[s.slice(3)]
-        : (s.startsWith('link:') && !!LINKS[s.slice(5)]))
+      .filter(itemZichtbaar)
       .slice(0, k);
   }
 
   const sleutelVan = it => typeof it === 'string' ? it : it.sleutel;
+  // rij 0 = de mappen boven de klok, rij 1 = de functies eronder
+  const RIJEN = () => [MAPPEN, FUNCTIES];
   function bewaardeVolgorde(p) { try { return JSON.parse(localStorage.getItem('rtg_os_indeling_' + pas + '_' + p) || 'null'); } catch (e) { return null; } }
   function bewaarVolgorde(p, volgorde) { try { localStorage.setItem('rtg_os_indeling_' + pas + '_' + p, JSON.stringify(volgorde)); } catch (e) {} }
   function gesorteerd(p) {
-    const basis = INDELING[p], orde = bewaardeVolgorde(p);
+    const basis = RIJEN()[p], orde = bewaardeVolgorde(p);
     if (!orde) return basis;
     const perSleutel = new Map(basis.map(it => [sleutelVan(it), it]));
     const uit = [];
@@ -3030,7 +3054,23 @@
   function itemNaam(item) {
     return item.startsWith('tab:') ? tabNaam(item.slice(4)) : (itemDef(item) || {}).naam || item;
   }
-  function itemZichtbaar(item) { return item.startsWith('tab:') ? tabZichtbaar(item.slice(4)) : !!itemDef(item); }
+  /* Zichtbaar is een app als hij bestaat, bij jouw pas hoort en in de
+     Boardroom niet is uitgezet. De functierij (bellen, berichten,
+     videobellen, wallet) blijft altijd staan: dat is de basis van het
+     toestel. */
+  function itemZichtbaar(item) {
+    if (!item || typeof item !== 'string') return false;
+    if (gast() && LEDEN_ONLY.has(item)) return false;
+    if (item.startsWith('tab:')) return tabZichtbaar(item.slice(4)) && (vastItem(item) || isAan(item));
+    if (item.startsWith('link:') && PREMIUM.has(item.slice(5)) && !premiumPas) return false;
+    if (!itemDef(item)) return false;
+    return vastItem(item) || isAan(item);
+  }
+  const vastItem = item => FUNCTIES.indexOf(item) >= 0;
+  // een gratis account (zonder pas) heeft geen wallet en geen Rahul; de kern
+  // zet daarvoor de klasse os-gast op #app (00-kern-05.js)
+  const gast = () => app.classList.contains('os-gast');
+  const LEDEN_ONLY = new Set(['link:wallet']);
   function openItem(item) {
     if (wiebel) return; // in wiebel-modus opent er niets, net als op een telefoon
     telGebruik(item);
@@ -3058,8 +3098,6 @@
   function openOsApp(naam) {
     const app = OSAPPS[naam]; if (!app || !belScrim) return;
     sluitScrims();
-    // App Store: de eigen winkel-overlay (25-os-04b.js)
-    if (naam === 'store') { openWinkel(); return; }
     // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
     if (naam === 'werk') { openWerkKiezer(); return; }
     belTitel.textContent = app.naam;
@@ -3117,9 +3155,9 @@
     belScrim.classList.add('open');
   }
 
-  /* Rahuls signatuurmond als de AI-knop in het dock. Eén gedeeld canvas dat we
-     bij elke herbouw opnieuw in de bol hangen (de mond-lus hervat vanzelf zodra
-     hij weer in beeld is); de tekenlaag (shared/mond.js) laden we er zelf bij. */
+  /* Rahuls signatuurmond in de balk onderaan het beginscherm. Eén gedeeld
+     canvas (de mond-lus hervat vanzelf zodra hij weer in beeld is); de
+     tekenlaag (shared/mond.js) laden we er zelf bij. */
   var aiMondCv = null, aiMondBezig = false;
   function aiMond() {
     if (!aiMondCv) {
@@ -3137,21 +3175,19 @@
     return aiMondCv;
   }
 
-  function maakAppIcoon(item, inDock) {
+  function maakAppIcoon(item) {
     const el = document.createElement('button');
     el.className = 'os-app'; el.dataset.sleutel = item;
     if (item.startsWith('tab:')) el.dataset.tab = item.slice(4);
     el.setAttribute('aria-label', itemNaam(item));
     const tegel = document.createElement('span'); tegel.className = 'os-tegel';
-    // de AI-knop in het dock IS Rahul: zijn signatuurmond (bewegende lichtpuntjes)
-    if (item === 'tab:ai' && inDock) tegel.appendChild(aiMond());
-    else tegel.appendChild(tegelInhoud(item));
+    tegel.appendChild(tegelInhoud(item));
     if (item.startsWith('tab:')) {
       const dot = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('span[id$="Dot"]');
       if (dot && dot.style.display !== 'none') { const b = document.createElement('span'); b.className = 'os-badge'; tegel.appendChild(b); }
     }
     el.appendChild(tegel);
-    if (!inDock) { const n = document.createElement('span'); n.className = 'os-naam'; n.textContent = itemNaam(item); el.appendChild(n); }
+    const n = document.createElement('span'); n.className = 'os-naam'; n.textContent = itemNaam(item); el.appendChild(n);
     el.addEventListener('click', () => openItem(item));
     return el;
   }
@@ -3174,18 +3210,17 @@
     return el;
   }
 
+  /* Het beginscherm tekenen: de mappen bovenaan, de functies onder de klok.
+     Een lege map (alles erin uitgezet of niet van toepassing op deze pas)
+     laten we weg -- geen tegels die nergens heen gaan. */
   function bouw() {
-    // pagina 2 toont wat je in de App Store hebt geïnstalleerd (25-os-04b.js)
-    INDELING[1] = geinstalleerdeItems();
-    grids.forEach((grid, p) => {
-      grid.textContent = '';
+    rijen.forEach((rij, p) => {
+      rij.textContent = '';
       for (const it of gesorteerd(p)) {
-        if (typeof it === 'string') { if (itemZichtbaar(it)) grid.appendChild(maakAppIcoon(it, false)); }
-        else if (it.items.some(itemZichtbaar)) grid.appendChild(maakMapIcoon(it));
+        if (typeof it === 'string') { if (itemZichtbaar(it)) rij.appendChild(maakAppIcoon(it)); }
+        else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
       }
     });
-    dock.textContent = '';
-    for (const t of DOCK) if (tabZichtbaar(t)) dock.appendChild(maakAppIcoon('tab:' + t, true));
     sync();
   }
 
@@ -3195,7 +3230,7 @@
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     for (const item of map.items.filter(itemZichtbaar)) {
-      const el = maakAppIcoon(item, false);
+      const el = maakAppIcoon(item);
       // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
       el.addEventListener('click', () => mapScrim.classList.remove('open'));
       mapGrid.appendChild(el);
@@ -3219,7 +3254,8 @@
   if (hernoemIn) hernoemIn.addEventListener('keydown', e => { if (e.key === 'Enter' && hernoemOk) hernoemOk.click(); });
 
   /* ---------- overlays: gedeeld sluiten ---------- */
-  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim'].map(s => $(s)).filter(Boolean);
+  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim']
+    .map(s => $(s)).filter(Boolean);
   function sluitScrims() { scrims.forEach(s => s.classList.remove('open')); }
   scrims.forEach(s => s.addEventListener('click', e => { if (e.target === s) sluitScrims(); }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { sluitScrims(); zetWiebel(false); } });
@@ -3227,11 +3263,13 @@
   /* ---------- zoeken (Spotlight) ---------- */
   const zoekScrim = $('#osZoekScrim'), zoekInput = $('#osZoekInput'), zoekLijst = $('#osZoekLijst');
   function alleItems() {
-    const uit = [];
-    INDELING.flat().forEach(it => {
-      if (typeof it === 'string') { if (itemZichtbaar(it)) uit.push({ item: it, uit: null }); }
-      else it.items.forEach(sub => { if (itemZichtbaar(sub)) uit.push({ item: sub, uit: mapNaam(it) }); });
-    });
+    const uit = [], gezien = new Set();
+    const voeg = (item, map) => {
+      if (gezien.has(item) || !itemZichtbaar(item)) return;
+      gezien.add(item); uit.push({ item: item, uit: map });
+    };
+    FUNCTIES.forEach(it => voeg(it, null));
+    MAPPEN.forEach(mp => mp.items.forEach(sub => voeg(sub, mapNaam(mp))));
     return uit;
   }
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
@@ -3318,8 +3356,6 @@
     }
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
-  const zoekPil = $('#osZoekPil');
-  if (zoekPil) zoekPil.addEventListener('click', openZoek);
   if (zoekInput) zoekInput.addEventListener('input', zoek);
 
   /* ---------- bedieningspaneel ---------- */
@@ -3344,6 +3380,14 @@
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
   const ccZoek = $('#osCcZoek');
   if (ccZoek) ccZoek.addEventListener('click', openZoek);
+  /* Scannen, je Zegel en je backoffice zaten als losse knopjes in de
+     statusbalk; die staat nu leeg op de bel en dit paneel na. De knoppen zelf
+     blijven het model -- we klikken ze hier gewoon aan. */
+  [['#osCcScan', '#scanBtn'], ['#osCcZegel', '#zegelBtn'], ['#osCcBo', '#boBtn']].forEach(([tegel, knop]) => {
+    const t = $(tegel), k = $(knop);
+    if (t && k) t.addEventListener('click', () => { sluitScrims(); k.click(); });
+    else if (t) t.hidden = true;
+  });
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');
   if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });
@@ -3373,12 +3417,12 @@
   function zetWiebel(aan) {
     wiebel = aan;
     if (aan) wiebelStart = Date.now();
-    grids.forEach(g => g.classList.toggle('os-wiebel', aan));
+    rijen.forEach(g => g.classList.toggle('os-wiebel', aan));
     if (klaarKnop) klaarKnop.hidden = !aan;
-    if (!aan) { grids.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); sleepEl = null; }
+    if (!aan) { rijen.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); sleepEl = null; }
   }
   if (klaarKnop) klaarKnop.addEventListener('click', () => zetWiebel(false));
-  grids.forEach(grid => {
+  rijen.forEach(grid => {
     grid.addEventListener('pointerdown', e => {
       const el = e.target.closest('.os-app'); if (!el) return;
       drukTimer = setTimeout(() => { zetWiebel(true); }, 550);
@@ -3394,42 +3438,23 @@
         sleepEl.parentElement.insertBefore(sleepEl, kinderen.indexOf(doel) > kinderen.indexOf(sleepEl) ? doel.nextSibling : doel);
       }
     });
-    const laat = () => { if (drukTimer) { clearTimeout(drukTimer); drukTimer = null; } if (sleepEl) { sleepEl.classList.remove('os-sleep'); sleepEl = null; grids.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); } };
+    const laat = () => { if (drukTimer) { clearTimeout(drukTimer); drukTimer = null; } if (sleepEl) { sleepEl.classList.remove('os-sleep'); sleepEl = null; rijen.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); } };
     grid.addEventListener('pointerup', laat);
     grid.addEventListener('pointercancel', laat);
   });
-
-  /* ---------- pagina-stippen ---------- */
-  function bouwDots() {
-    dots.textContent = '';
-    INDELING.forEach((_, i) => {
-      const d = document.createElement('button');
-      d.setAttribute('aria-label', 'Hoofdscherm ' + (i + 1));
-      d.addEventListener('click', () => pages.scrollTo({ left: i * pages.clientWidth, behavior: 'smooth' }));
-      dots.appendChild(d);
-    });
-    dotSync();
-  }
-  function dotSync() {
-    const i = Math.round(pages.scrollLeft / Math.max(1, pages.clientWidth));
-    [...dots.children].forEach((d, j) => d.classList.toggle('actief', j === i));
-  }
-  let dotRaf = null;
-  pages.addEventListener('scroll', () => { if (!dotRaf) dotRaf = requestAnimationFrame(() => { dotRaf = null; dotSync(); }); });
 
   /* ---------- app-modus, statusbalk en model-spiegeling (als voorheen) ---------- */
   function actieveTab() { const b = tabbar.querySelector('button.active'); return b ? b.dataset.tab : 'home'; }
   function sync() {
     const tab = actieveTab(), open = tab !== 'home';
     app.classList.toggle('os-open', open);
-    // schermvast zodra de app zichtbaar is: dock en pill echt onderin beeld
+    // schermvast zodra de app zichtbaar is: de pill echt onderin beeld
     document.body.classList.toggle('os-vast', getComputedStyle(app).display !== 'none');
     if (content) content.classList.toggle('os-thuis', !open);
     const terug = $('#osTerug'), brand = $('#osBrand'), titel = $('#osAppTitel');
     if (terug) terug.hidden = !open;
     if (brand) brand.style.display = open ? 'none' : '';
     if (titel) titel.textContent = open ? tabNaam(tab) : '';
-    dock.querySelectorAll('.os-app').forEach(d => d.classList.toggle('actief', d.dataset.tab === tab));
   }
   let gepland = null;
   new MutationObserver(() => {
@@ -3495,7 +3520,7 @@
   /* Een app (zoals Balans) kan met #ai terugverwijzen naar de Rahul-chat:
      na het opstarten openen we dan meteen de AI-tab. */
   if (location.hash === '#ai') setTimeout(() => {
-    const t = document.querySelector('.os-app[data-tab="ai"]');
+    const t = tabKnop('ai');
     if (t) t.click();
   }, 600);
 
@@ -3566,7 +3591,7 @@
   function alleDoelen() {
     const uit = [];
     for (const { item } of alleItems()) uit.push({ naam: itemNaam(item), doe: () => openItem(item) });
-    INDELING.flat().forEach(it => { if (typeof it !== 'string') uit.push({ naam: mapNaam(it), doe: () => openMap(it) }); });
+    MAPPEN.forEach(mp => uit.push({ naam: mapNaam(mp), doe: () => openMap(mp) }));
     return uit;
   }
   function osCommando(ruw) {
@@ -3589,8 +3614,7 @@
     if (mh) {
       // lidwoorden tellen niet mee: "de crew" en "crew" wijzen dezelfde map aan
       const kaal = s => String(s || '').toLowerCase().replace(/^(?:de|het|een)\s+/, '');
-      const mappen = INDELING.flat().filter(it => typeof it !== 'string');
-      const doel = mappen.find(mp => kaal(mapNaam(mp)) === kaal(mh[1]) || kaal(mp.naam) === kaal(mh[1]));
+      const doel = MAPPEN.find(mp => kaal(mapNaam(mp)) === kaal(mh[1]) || kaal(mp.naam) === kaal(mh[1]));
       if (doel) {
         zetMapNaam(doel, mh[2]);
         bannerToon('✦', 'Rahul', 'De map heet nu "' + mapNaam(doel) + '".');
@@ -3629,99 +3653,35 @@
     if (osCommando(e.target.value)) { e.target.value = ''; e.stopImmediatePropagation(); e.preventDefault(); }
   }, true);
 
-  /* ---------- widgets op hoofdscherm 2: verbergen, terughalen, herschikken ----------
-     Zelfde gebaar als bij de iconen: lang drukken op een kaart zet de
-     wiebel-modus aan; de minus verbergt, de gestippelde chips halen terug,
-     slepen herschikt. Kaarten die de app zelf verbergt (hidden-attribuut)
-     blijven van de app; wij beheren alleen onze eigen klasse. */
-  const pagina2 = $('#osPagina2'), wChips = $('#osWChips');
-  const W_NAMEN = {
-    homeKlok2: 'Klok',
-    homeTrip: 'Reis', homePay: 'Betalen', homeSalon: 'De Salon', homeContacts: 'Contacten',
-    homeSpelen: 'Spelen', homeCv: 'CV', homeVacatures: 'Vacatures', homeFoundation: 'Foundation'
-  };
-  function wStand() { try { return JSON.parse(localStorage.getItem('rtg_os_widgets_' + pas) || 'null') || {}; } catch (e) { return {}; } }
-  function wBewaar(st) { try { localStorage.setItem('rtg_os_widgets_' + pas, JSON.stringify(st)); } catch (e) {} }
-  const wKaarten = () => pagina2 ? [...pagina2.querySelectorAll(':scope > .card')].filter(c => W_NAMEN[c.id]) : [];
-  function wToepas() {
-    if (!pagina2) return;
-    const st = wStand(), kaarten = wKaarten();
-    kaarten.forEach(c => c.classList.toggle('os-w-verborgen', (st.verborgen || []).includes(c.id)));
-    const perId = new Map(kaarten.map(c => [c.id, c]));
-    (st.volgorde || []).forEach(id => { const c = perId.get(id); if (c) pagina2.appendChild(c); });
-  }
-  let wiebelW = false, wSleep = null, wTimer = null;
-  function wChipsBouw() {
-    if (!wChips) return;
-    wChips.textContent = '';
-    for (const id of wStand().verborgen || []) {
-      if (!document.getElementById(id)) continue;
-      const b = document.createElement('button');
-      b.textContent = '+ ' + (W_NAMEN[id] || id);
-      b.addEventListener('click', () => {
-        const s = wStand(); s.verborgen = (s.verborgen || []).filter(x => x !== id); wBewaar(s);
-        wToepas(); zetWiebelW(true);
-      });
-      wChips.appendChild(b);
-    }
-  }
-  function zetWiebelW(aan) {
-    wiebelW = aan;
-    if (!pagina2) return;
-    pagina2.classList.toggle('os-wiebel-w', aan);
-    if (klaarKnop) klaarKnop.hidden = !(aan || wiebel);
-    pagina2.querySelectorAll('.os-w-min').forEach(b => b.remove());
-    if (aan) {
-      for (const c of wKaarten()) {
-        if (c.hidden || c.classList.contains('os-w-verborgen')) continue;
-        const min = document.createElement('button');
-        min.className = 'os-w-min'; min.textContent = '−';
-        min.setAttribute('aria-label', 'Verberg widget ' + (W_NAMEN[c.id] || c.id));
-        min.addEventListener('click', e => {
-          e.stopPropagation();
-          const s = wStand(); s.verborgen = [...new Set([...(s.verborgen || []), c.id])]; wBewaar(s);
-          wToepas(); zetWiebelW(true);
-        });
-        c.appendChild(min);
-      }
-      wChipsBouw();
-    } else {
-      const s = wStand(); s.volgorde = wKaarten().map(c => c.id); wBewaar(s); wSleep = null;
-    }
-  }
-  if (klaarKnop) klaarKnop.addEventListener('click', () => { if (wiebelW) zetWiebelW(false); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && wiebelW) zetWiebelW(false); });
-  if (pagina2) {
-    pagina2.addEventListener('pointerdown', e => {
-      const c = e.target.closest('.card');
-      if (!c || c.parentElement !== pagina2 || !W_NAMEN[c.id]) return;
-      if (e.target.closest('button, a, input') && !wiebelW) return; // knoppen in widgets gewoon laten werken
-      wTimer = setTimeout(() => zetWiebelW(true), 550);
-      if (wiebelW && !e.target.closest('.os-w-min')) { wSleep = c; c.classList.add('os-sleep'); }
-    });
-    pagina2.addEventListener('pointermove', e => {
-      if (wTimer && !wiebelW && (Math.abs(e.movementX) > 3 || Math.abs(e.movementY) > 3)) { clearTimeout(wTimer); wTimer = null; }
-      if (!wiebelW || !wSleep) return;
-      const onder = document.elementFromPoint(e.clientX, e.clientY);
-      const doel = onder && onder.closest && onder.closest('.card');
-      if (doel && doel !== wSleep && doel.parentElement === pagina2) {
-        const kinderen = [...pagina2.children];
-        pagina2.insertBefore(wSleep, kinderen.indexOf(doel) > kinderen.indexOf(wSleep) ? doel.nextSibling : doel);
-      }
-    });
-    const wLos = () => {
-      if (wTimer) { clearTimeout(wTimer); wTimer = null; }
-      if (wSleep) {
-        wSleep.classList.remove('os-sleep'); wSleep = null;
-        const s = wStand(); s.volgorde = wKaarten().map(c => c.id); wBewaar(s);
-      }
-    };
-    pagina2.addEventListener('pointerup', wLos);
-    pagina2.addEventListener('pointercancel', wLos);
-    wToepas();
-  }
 
-  bouw(); bouwDots();
+  /* ---------- de balk van Rahul, onderaan het beginscherm ----------
+     Eén regel waarin je alles kwijt kunt. Is het een opdracht die het OS zelf
+     kan uitvoeren ("open Reizen", "donker", "zoek villa", "hernoem Geld naar
+     Bank"), dan doet het OS het meteen en blijf je op het beginscherm. Al het
+     andere gaat naar Rahul zelf: zijn app opent met de vraag er al in, en zijn
+     acties-registry op de server regelt de rest.
+
+     Rahuls signatuurmond (dezelfde bewegende lippen als op het inlogscherm)
+     zit in de balk, zodat zichtbaar is tegen wie je praat. */
+  const aiBalk = $('#osAiBalk'), aiIn = $('#osAiIn'), aiOrb = $('#osAiOrb');
+  if (aiOrb) aiOrb.appendChild(aiMond());
+  if (aiBalk && aiIn) {
+    aiBalk.addEventListener('submit', e => {
+      e.preventDefault();
+      const vraag = aiIn.value.trim();
+      if (!vraag) { vraagRahul(''); return; } // lege balk: gewoon Rahul openen
+      aiIn.value = '';
+      aiIn.blur();
+      if (osCommando(vraag)) return; // het OS kon het zelf; blijf thuis
+      vraagRahul(vraag);
+    });
+    // een tik op de mond opent Rahul zonder dat je iets hoeft te typen
+    if (aiOrb) {
+      aiOrb.style.cursor = 'pointer';
+      aiOrb.addEventListener('click', () => vraagRahul(aiIn.value.trim()));
+    }
+  }
+  bouw();
 
   /* De app-regie van de RTG-boardroom: apps die voor deze pas zijn uitgezet
      verdwijnen van het springboard (de server weigert hun API's sowieso al;
@@ -3754,22 +3714,25 @@
       }).catch(() => {});
   })();
 
-  /* ============================== App Store ==============================
-     De ROS is standaard een schone telefoon: alleen de basis-apps, de
-     RTFoundation en de App Store staan er (25-os-01.js). Alles daarbuiten leeft
-     in de Store en verschijnt op pagina 2 zodra je het installeert. De keuze
-     staat per pas in localStorage; verwijderen haalt het er weer af (de basis
-     en het dock kun je niet verwijderen). Dit blok staat bewust op het top-
-     niveau van de OS-IIFE (functie-declaraties worden gehoist, dus bouw()
-     hierboven kan geinstalleerdeItems() al gebruiken). */
-  function vasteAppsSet() { return new Set(STANDAARD.concat(DOCK.map(function (t) { return 'tab:' + t; }))); }
-  function geinst() { try { return JSON.parse(localStorage.getItem('rtg_os_apps_' + pas) || '[]') || []; } catch (e) { return []; } }
-  function zetGeinst(a) { try { localStorage.setItem('rtg_os_apps_' + pas, JSON.stringify(a)); } catch (e) {} }
-  function isGeinst(item) { return geinst().indexOf(item) >= 0; }
-  // pagina 2 = de geïnstalleerde apps die echt bestaan (bouw() leest dit)
-  function geinstalleerdeItems() { var v = vasteAppsSet(); return geinst().filter(function (it) { return !v.has(it) && itemZichtbaar(it); }); }
-  function installeer(item) { var a = geinst(); if (a.indexOf(item) < 0) { a.push(item); zetGeinst(a); } bouw(); }
-  function verwijder(item) { zetGeinst(geinst().filter(function (x) { return x !== item; })); bouw(); }
+  /* ====================== Aan en uit (geen App Store) ======================
+     Er valt niets te installeren: alles waar je pas je recht op geeft staat
+     al in je mappen. Wat je bewaart is dus precies andersom als vroeger --
+     niet een lijstje van wat AAN staat, maar van wat je hebt UITgezet. Dat
+     scheelt een concept ("de Store"), en een nieuwe app hoeft niet gevonden
+     te worden: hij staat er de volgende keer gewoon bij.
+
+     De functierij onder de klok (bellen, berichten, videobellen, wallet) kan
+     niet uit: dat is de basis van het toestel. Dit blok staat bewust op het
+     topniveau van de OS-IIFE, want functie-declaraties worden gehoist en
+     itemZichtbaar() hierboven gebruikt isAan() al. */
+  function uitLijst() { try { return JSON.parse(localStorage.getItem('rtg_os_uit_' + pas) || '[]') || []; } catch (e) { return []; } }
+  function zetUit(a) { try { localStorage.setItem('rtg_os_uit_' + pas, JSON.stringify(a)); } catch (e) {} }
+  function isAan(item) { return uitLijst().indexOf(item) < 0; }
+  function zetAan(item, aan) {
+    var a = uitLijst().filter(function (x) { return x !== item; });
+    if (!aan) a.push(item);
+    zetUit(a); bouw();
+  }
 
   var winkelScrim = $('#osWinkelScrim'), winkelLijst = $('#osWinkelLijst'), winkelTitel = $('#osWinkelTitel');
   function winkelRij(item) {
@@ -3778,54 +3741,47 @@
     var naam = document.createElement('span'); naam.className = 'os-winkel-naam'; naam.textContent = itemNaam(item); rij.appendChild(naam);
     var knop = document.createElement('button'); knop.type = 'button'; knop.className = 'os-winkel-knop';
     var verf = function () {
-      var g = isGeinst(item);
-      knop.textContent = g ? T('os.store.uit', 'Verwijderen') : T('os.store.in', 'Installeren');
-      knop.classList.toggle('geinst', g);
+      var aan = isAan(item);
+      knop.textContent = aan ? T('os.board.aan', 'Staat aan') : T('os.board.uit', 'Staat uit');
+      knop.setAttribute('aria-pressed', aan ? 'true' : 'false');
+      knop.classList.toggle('geinst', !aan);
     };
-    knop.addEventListener('click', function () { if (isGeinst(item)) verwijder(item); else installeer(item); verf(); });
+    knop.addEventListener('click', function () { zetAan(item, !isAan(item)); verf(); });
     verf(); rij.appendChild(knop);
     return rij;
   }
-  // de groepen die deze pas mag zien, met alleen de echt-bestaande extra-apps
+  /* De schakelbare functies, per map gegroepeerd: precies wat er in je mappen
+     staat, plus wat je hebt uitgezet (dat valt uit itemZichtbaar, dus dat
+     halen we er hier expliciet bij -- anders kon je het nooit meer aanzetten). */
   function winkelGroepen() {
     var uit = [];
-    for (var i = 0; i < WINKEL_GROEPEN.length; i++) {
-      var groep = WINKEL_GROEPEN[i];
-      if (groep.pas && groep.pas.indexOf(pas) < 0) continue;
-      var items = groep.items.filter(function (it) { return !vasteAppsSet().has(it) && itemZichtbaar(it); });
-      if (items.length) uit.push({ titel: groep.titel, items: items });
-    }
+    MAPPEN.forEach(function (map) {
+      var items = map.items.filter(function (it) {
+        if (FUNCTIES.indexOf(it) >= 0) return false;           // de vaste basis niet
+        return itemZichtbaar(it) || (!isAan(it) && bestaatItem(it));
+      });
+      if (items.length) uit.push({ titel: mapNaam(map), items: items });
+    });
     return uit;
   }
-  function openWinkel() {
-    if (!winkelScrim) return;
-    sluitScrims();
-    if (winkelTitel) winkelTitel.textContent = T('os.store.h', 'App Store');
-    winkelLijst.textContent = '';
-    var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
-    intro.textContent = T('os.store.uitleg', 'Zet functies op uw beginscherm of haal ze eraf. De basis en het dock blijven altijd staan.');
-    winkelLijst.appendChild(intro);
-    var groepen = winkelGroepen(), n = 0;
-    groepen.forEach(function (g) {
-      var kop = document.createElement('div'); kop.className = 'os-winkel-groep'; kop.textContent = g.titel;
-      winkelLijst.appendChild(kop);
-      g.items.forEach(function (it) { winkelLijst.appendChild(winkelRij(it)); n++; });
-    });
-    if (!n) { var leeg = document.createElement('div'); leeg.className = 'os-bel-leeg'; leeg.textContent = T('os.store.leeg', 'Er is nu niets extra beschikbaar.'); winkelLijst.appendChild(leeg); }
-    winkelScrim.classList.add('open');
+  // bestaat de app echt (los van aan/uit)? Zelfde regels als itemZichtbaar,
+  // alleen zonder de aan/uit-toets.
+  function bestaatItem(item) {
+    if (item.startsWith('tab:')) return tabZichtbaar(item.slice(4));
+    if (item.startsWith('link:') && PREMIUM.has(item.slice(5)) && !premiumPas) return false;
+    return !!itemDef(item);
   }
 
   /* ---------- De Boardroom: uw eigen regiekamer ----------
-     Rijker dan de kale App Store: bovenaan een telling (hoeveel functies aan
-     staan van hoeveel u er mag), dan de vaste basis als vergrendelde rij (met
-     een slot-glyf, niet uit te zetten), en daaronder per groep de functies
-     waar u recht op heeft, met een aan/uit-schakelaar. Onder water dezelfde
-     install-laag als de App Store. */
+     De enige plek waar u aan uw beginscherm sleutelt: bovenaan een telling
+     (hoeveel functies aan staan van hoeveel u er mag), dan de vaste basis als
+     vergrendelde rij (met een slot-glyf, niet uit te zetten), en daaronder
+     per map de functies waar u recht op heeft, met een aan/uit-schakelaar.
+     Alles staat standaard aan; hier zet u uit wat u niet wilt zien. */
   var BASIS_REGELS = [
-    { glyf: 'bellen',  naam: 'Bellen, videobellen en snaps' },
-    { glyf: 'betalen', naam: 'RTG Pay' },
+    { glyf: 'bellen',  naam: 'Bellen, videobellen en berichten' },
+    { glyf: 'pas',     naam: 'Uw wallet met de ledenpas' },
     { glyf: null, mono: 'R', naam: 'Rahul, uw AI' },
-    { glyf: 'pas',     naam: 'Uw pas-app' },
     { glyf: 'rtf',     naam: 'De RTFoundation' }
   ];
   function boardBasisRij(def) {
@@ -3847,13 +3803,13 @@
     if (winkelTitel) winkelTitel.textContent = T('os.board.h', 'Boardroom');
     winkelLijst.textContent = '';
     var intro = document.createElement('p'); intro.className = 'os-winkel-intro';
-    intro.textContent = T('os.board.uitleg', 'Uw eigen regiekamer: zet de functies waar u recht op heeft aan of uit. Wat aan staat, verschijnt op uw beginscherm. De basis van het toestel (bellen, betalen, Rahul, uw pas-app en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
+    intro.textContent = T('os.board.uitleg', 'Uw eigen regiekamer: alles waar u recht op heeft staat al in uw mappen. Hier zet u uit wat u niet wilt zien, en weer aan als u het toch mist. De basis van het toestel (bellen, berichten, uw wallet, Rahul en de RTFoundation) blijft altijd aan, zodat het systeem veilig en werkend blijft.');
     winkelLijst.appendChild(intro);
 
-    // telling: hoeveel van de beschikbare extra-functies staan aan
+    // telling: hoeveel van de schakelbare functies staan aan
     var groepen = winkelGroepen();
     var alle = []; groepen.forEach(function (g) { alle = alle.concat(g.items); });
-    var aan = alle.filter(isGeinst).length;
+    var aan = alle.filter(isAan).length;
     var sum = document.createElement('div'); sum.className = 'os-board-sum';
     var cijfer = document.createElement('strong'); cijfer.textContent = aan + ' / ' + alle.length;
     sum.appendChild(cijfer);
@@ -5091,27 +5047,7 @@
   }
   $('#glowCode').addEventListener('click', () => $('#glowCode').classList.remove('open'));
 
-  /* ---------- home + codenaam ---------- */
-
-  function qrSvg(seed){
-    let s = seed, cells = '';
-    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-    for (let y = 0; y < 13; y++) for (let x = 0; x < 13; x++){
-      const corner = (x < 4 && y < 4) || (x > 8 && y < 4) || (x < 4 && y > 8);
-      const on = corner
-        ? ((x % 12 < 1 || x % 12 > 2 ? 1 : 0) || (y % 12 < 1 || y % 12 > 2 ? 1 : 0)) &&
-          !((x % 12 === 1 || x % 12 === 2) && (y % 12 === 1 || y % 12 === 2)) || (x===1&&y===1)||(x===2&&y===2)||(x===11&&y===1)||(x===1&&y===11)
-        : rnd() > 0.5;
-      if (on) cells += '<rect x="' + x + '" y="' + y + '" width="1" height="1"/>';
-    }
-    return '<svg viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg" fill="#0C0C0B">' + cells + '</svg>';
-  }
-
-  function toggleWhy(forceOpen){
-    const why = document.querySelector('.codecard .why');
-    if (!why) return;
-    why.classList.toggle('open', forceOpen === true ? true : !why.classList.contains('open'));
-  }
+  /* ---------- home ---------- */
 
   function renderVerifyBanner(){
     const el = $('#verifyBanner');
@@ -5208,27 +5144,10 @@
     ) || (T('app.welcome','Welkom,') + ' ' + first + '.');
     $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
 
-    // De codecard met Util.el: codenaam, lidnummer en leeftijdsgroep gaan
-    // structureel als tekstknoop. De QR is gegenereerd (geen gebruikerstekst) en
-    // blijft als kant-en-klare SVG in een eigen container.
-    const qr = E('div');
-    qr.innerHTML = qrSvg(user.number.length * 7919);
-    Util.vervang($('#codecard'),
-      E('div', { class: 'label' }, stem(
-        'Je codenaam, je identiteit in onze wereld',
-        'Je codenaam, de identiteit van de zaak onderweg',
-        'Uw codenaam, uw identiteit in onze wereld'
-      ) || T('app.cc.label', 'Uw codenaam, uw identiteit in onze systemen')),
-      E('div', { class: 'cn' }, user.codename),
-      E('div', { class: 'row' },
-        E('div', {},
-          E('div', { class: 'mrow' }, T('app.cc.membernr', 'Lidnummer'), E('b', {}, user.number)),
-          E('div', { class: 'mrow', style: { marginTop: '0.55rem' } }, T('app.cc.pass', 'Pas'), E('b', {}, TIER_LABEL[user.tier])),
-          user.leeftijdsgroep ? E('div', { class: 'mrow', style: { marginTop: '0.55rem' } }, T('app.cc.age', 'Leeftijd'), E('b', {}, user.leeftijdsgroep + ' \u00b7 ' + T('app.cc.ageok', 'paspoort'))) : null),
-        qr),
-      E('button', { class: 'whybtn', id: 'whyBtn', onclick: () => toggleWhy() }, T('app.cc.why', 'Waarom een codenaam?') + ' \u2192'),
-      E('div', { class: 'why' }, E('b', {}, T('app.cc.why.h', 'Uw echte naam staat niet in onze reisdata.')),
-        ' ' + T('app.cc.why.b', 'Reserveringen, betalingen en Salon-activiteit staan op uw codenaam. Uw echte naam ligt in een gescheiden, versleutelde kluis en wordt pas bij ticketing en check-in eenmalig gekoppeld. Zou reisdata ooit gestolen worden, dan heeft de aanvaller nooit de juiste naam bij uw reizen.')));
+    // De ledenpas staat niet meer op het beginscherm: daar staat de klok, en
+    // je pas ligt waar hij hoort -- bovenin je wallet (/apps/wallet.html, tegel
+    // in de functierij onder de klok). De codenaam in de statusbalk blijft de
+    // korte weg ernaartoe.
 
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
@@ -5259,18 +5178,22 @@
     renderFoundation();
   }
 
-  // Startpagina voor de gratis gebruiker (zonder pas): betalen bij partners,
-  // De Salon bekijken en solliciteren. Geen ledenkaart, reis of betalingen.
+  // De gratis gebruiker (zonder pas): betalen bij partners, De Salon bekijken
+  // en solliciteren. Geen ledenpas, geen reis, geen Rahul. Wat hij wel en niet
+  // kan staat bij Ter plaatse -- dat is zijn app.
   function renderHomeGuest(){
     document.documentElement.setAttribute('data-stem', 'rtg');
     stemKoppen();
     $('#homeGreeting').textContent = stem('Ha, fijn dat je er bent.', '', '') || (T('app.welcome','Welkom,') + '.');
     $('#homeSub').textContent = T('app.guestsub','Gratis, zonder pas');
-    $('#codecard').innerHTML =
-      '<div class="label">'+T('app.guest.k','Gratis account')+'</div>'+
-      '<div class="cn" style="font-size:1.35rem;">'+T('app.guest.title','Zonder pas')+'</div>'+
-      '<div style="font-size:0.82rem;color:var(--muted);line-height:1.55;margin-top:0.7rem;">'+T('app.guest.body','Je kunt bij RTG-partners betalen via de app, de foto’s in De Salon bekijken en solliciteren op vacatures met je cv. Liken en reageren bij leden hoort bij een pas.')+'</div>'+
-      '<button class="go" data-goto="terplaatse" style="margin-top:0.9rem;">'+T('app.guest.pay','Betaal bij een partner')+' →</button>';
+    const gastKaart = $('#homeGast');
+    if (gastKaart){
+      gastKaart.hidden = false;
+      gastKaart.innerHTML =
+        '<div class="label">'+T('app.guest.k','Gratis account')+'</div>'+
+        '<div class="big" style="font-size:1.35rem;">'+T('app.guest.title','Zonder pas')+'</div>'+
+        '<div class="meta" style="margin-top:0.7rem;line-height:1.55;">'+T('app.guest.body','Je kunt bij RTG-partners betalen via de app, de foto’s in De Salon bekijken en solliciteren op vacatures met je cv. Liken en reageren bij leden hoort bij een pas.')+'</div>';
+    }
     const trip = $('#homeTrip'); if (trip) trip.style.display='none';
     // de gratis app is een bestel/betaal-app: toon de betaalgeschiedenis
     const pay = $('#homePay'); if (pay){ pay.style.display=''; pay.innerHTML = '<div class="label">'+T('app.guest.history','Mijn bestellingen en betalingen')+'</div><div class="meta">'+T('app.loading','Laden...')+'</div>'; }

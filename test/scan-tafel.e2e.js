@@ -54,8 +54,11 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     }, [reg.token]);
     await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
 
-    // 4) de eigen QR-onderdelen zijn geladen en de scan-knop staat er
-    await page.waitForSelector('#scanBtn', { timeout: 15000 });
+    // 4) de eigen QR-onderdelen zijn geladen en scannen is bereikbaar. Sinds
+    //    het OS-beginscherm staat scannen in het bedieningspaneel en niet meer
+    //    als los knopje in de statusbalk; de knop zelf blijft het model.
+    await page.waitForSelector('#scanBtn', { state: 'attached', timeout: 15000 });
+    await page.waitForSelector('#osCcBtn', { timeout: 15000 });
     // de verplichte onboarding-poort staat los van deze test; we sluiten hem zoals
     // de app dat doet zodra de intake rond is, om de scan-stroom te kunnen toetsen
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
@@ -68,8 +71,10 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     const rt = await page.evaluate(() => { const q = RTGQR.encode('RTG-tafel', { ecc: 'M' }); return RTGQR.decode(q).tekst; });
     assert.equal(rt, 'RTG-tafel', 'de QR-codec round-tript in de browser');
 
-    // 5) scan-knop -> overlay -> met de hand de tafel-QR invoeren
-    await page.click('#scanBtn');
+    // 5) bedieningspaneel -> Scannen -> overlay -> met de hand de tafel-QR invoeren
+    await page.click('#osCcBtn');
+    await page.waitForSelector('#osCcScan', { state: 'visible', timeout: 8000 });
+    await page.click('#osCcScan');
     await page.waitForSelector('.rtg-scan-ov', { timeout: 8000 });
     await page.click('[data-hand]');
     await page.waitForSelector('.rtg-scan-hand.aan', { timeout: 5000 });

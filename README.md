@@ -619,7 +619,28 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 
 ## De app (PWA)
 
-**apps/app.html** is de RTG-app als installeerbare web-app (PWA, met `manifest.webmanifest` + `sw.js`): mobiele app-schil met tabbalk (Home, Reizen, Betalen met Face ID, AI en De Salon), draaiend op dezelfde backend als de site. Open op een telefoon en kies "Zet op beginscherm" om te installeren.
+**apps/app.html** is de RTG-app als installeerbare web-app (PWA, met `manifest.webmanifest` + `sw.js`), draaiend op dezelfde backend als de site. Open op een telefoon en kies "Zet op beginscherm" om te installeren.
+
+### Het beginscherm: vier lagen, één scherm
+
+De app is een besturingssysteem (het "ROS"). Het beginscherm heeft vier lagen, van boven naar beneden, en verder niets:
+
+1. **De mappen met apps** — vier mappen (Reizen, Geld, De Salon, Het Huis). Alles waar je pas je recht op geeft zit er al in; je hoeft niets te installeren. Een tik opent de map, een tik op een app opent hem schermvullend.
+2. **De ronde RTG-klok**, in het midden — hetzelfde horloge als op het inlogscherm (`shared/klok.js`, `data-rtg-klok="ring"`).
+3. **De functierij**: Bellen, Berichten, Videobellen en je **Wallet**. Deze vier staan vast en kunnen niet uit.
+4. **De balk van Rahul**. Typ wat je wilt: is het iets dat het OS zelf kan ("open Reizen", "donker", "zoek villa", "hernoem Geld naar Bank"), dan gebeurt het meteen en blijf je thuis; al het andere gaat naar Rahul, wiens app opent met je vraag erin.
+
+Het beginscherm scrolt niet en heeft geen tweede blad: de maat-eenheid `--e` groeit met het venster mee, zodat hetzelfde beeld op telefoon, tablet en computer past.
+
+Openen en sluiten is één beweging: **inlogscherm → app openen → sluiten → beginscherm.** Sluiten kan met de terugknop linksboven, met een tik op de home-indicator onderin, of door omhoog te vegen op die indicator.
+
+Wat je niet wilt zien, zet je uit in de **Boardroom** (bedieningspaneel → Boardroom). Die werkt andersom dan een App Store: alles staat aan, jij zet uit. De keuze staat per pas in `localStorage` (`rtg_os_uit_<pas>`).
+
+De statusbalk houdt drie dingen vast: batterij, de bel en het bedieningspaneel. Scannen, je Zegel tonen en je backoffice zitten in dat paneel.
+
+### De wallet en de ledenpas
+
+**apps/wallet.html** is alles wat je bij je draagt. Bovenaan ligt je **ledenpas**: codenaam, lidnummer, welke pas en een QR met je lidnummer (onze eigen codec, `shared/qr.js` + `shared/qrteken.js`). Daaronder je passen, tickets, sleutels, feestmunten en klantenkaarten (`/api/wallet`, `server/kern/wallet.js`). De pas stond vroeger op het beginscherm van de app; daar staat nu de klok.
 
 **Codenaam (privacy by design):** elke klant krijgt een codenaam (bijv. *Zilveren Valk*). Reserveringen, betalingen en reisdata staan in de systemen op de codenaam; de echte naam ligt in een gescheiden kluis en wordt pas bij ticketing/check-in gekoppeld. Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam.
 

@@ -13,42 +13,23 @@
         sleepEl.parentElement.insertBefore(sleepEl, kinderen.indexOf(doel) > kinderen.indexOf(sleepEl) ? doel.nextSibling : doel);
       }
     });
-    const laat = () => { if (drukTimer) { clearTimeout(drukTimer); drukTimer = null; } if (sleepEl) { sleepEl.classList.remove('os-sleep'); sleepEl = null; grids.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); } };
+    const laat = () => { if (drukTimer) { clearTimeout(drukTimer); drukTimer = null; } if (sleepEl) { sleepEl.classList.remove('os-sleep'); sleepEl = null; rijen.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); } };
     grid.addEventListener('pointerup', laat);
     grid.addEventListener('pointercancel', laat);
   });
-
-  /* ---------- pagina-stippen ---------- */
-  function bouwDots() {
-    dots.textContent = '';
-    INDELING.forEach((_, i) => {
-      const d = document.createElement('button');
-      d.setAttribute('aria-label', 'Hoofdscherm ' + (i + 1));
-      d.addEventListener('click', () => pages.scrollTo({ left: i * pages.clientWidth, behavior: 'smooth' }));
-      dots.appendChild(d);
-    });
-    dotSync();
-  }
-  function dotSync() {
-    const i = Math.round(pages.scrollLeft / Math.max(1, pages.clientWidth));
-    [...dots.children].forEach((d, j) => d.classList.toggle('actief', j === i));
-  }
-  let dotRaf = null;
-  pages.addEventListener('scroll', () => { if (!dotRaf) dotRaf = requestAnimationFrame(() => { dotRaf = null; dotSync(); }); });
 
   /* ---------- app-modus, statusbalk en model-spiegeling (als voorheen) ---------- */
   function actieveTab() { const b = tabbar.querySelector('button.active'); return b ? b.dataset.tab : 'home'; }
   function sync() {
     const tab = actieveTab(), open = tab !== 'home';
     app.classList.toggle('os-open', open);
-    // schermvast zodra de app zichtbaar is: dock en pill echt onderin beeld
+    // schermvast zodra de app zichtbaar is: de pill echt onderin beeld
     document.body.classList.toggle('os-vast', getComputedStyle(app).display !== 'none');
     if (content) content.classList.toggle('os-thuis', !open);
     const terug = $('#osTerug'), brand = $('#osBrand'), titel = $('#osAppTitel');
     if (terug) terug.hidden = !open;
     if (brand) brand.style.display = open ? 'none' : '';
     if (titel) titel.textContent = open ? tabNaam(tab) : '';
-    dock.querySelectorAll('.os-app').forEach(d => d.classList.toggle('actief', d.dataset.tab === tab));
   }
   let gepland = null;
   new MutationObserver(() => {
@@ -114,7 +95,7 @@
   /* Een app (zoals Balans) kan met #ai terugverwijzen naar de Rahul-chat:
      na het opstarten openen we dan meteen de AI-tab. */
   if (location.hash === '#ai') setTimeout(() => {
-    const t = document.querySelector('.os-app[data-tab="ai"]');
+    const t = tabKnop('ai');
     if (t) t.click();
   }, 600);
 

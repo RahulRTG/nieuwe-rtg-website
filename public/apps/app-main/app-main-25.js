@@ -122,17 +122,17 @@
       .map(([s, v]) => [s, (v.n || 0) * Math.pow(0.85, Math.max(0, (nu - (v.t || nu)) / 86400000))])
       .sort((a, b) => b[1] - a[1])
       .map(([s]) => s)
-      .filter(s => s.startsWith('tab:') ? itemZichtbaar(s)
-        : s.startsWith('os:') ? !!OSAPPS[s.slice(3)]
-        : (s.startsWith('link:') && !!LINKS[s.slice(5)]))
+      .filter(itemZichtbaar)
       .slice(0, k);
   }
 
   const sleutelVan = it => typeof it === 'string' ? it : it.sleutel;
+  // rij 0 = de mappen boven de klok, rij 1 = de functies eronder
+  const RIJEN = () => [MAPPEN, FUNCTIES];
   function bewaardeVolgorde(p) { try { return JSON.parse(localStorage.getItem('rtg_os_indeling_' + pas + '_' + p) || 'null'); } catch (e) { return null; } }
   function bewaarVolgorde(p, volgorde) { try { localStorage.setItem('rtg_os_indeling_' + pas + '_' + p, JSON.stringify(volgorde)); } catch (e) {} }
   function gesorteerd(p) {
-    const basis = INDELING[p], orde = bewaardeVolgorde(p);
+    const basis = RIJEN()[p], orde = bewaardeVolgorde(p);
     if (!orde) return basis;
     const perSleutel = new Map(basis.map(it => [sleutelVan(it), it]));
     const uit = [];

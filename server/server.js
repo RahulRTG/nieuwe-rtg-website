@@ -2820,6 +2820,22 @@ Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
   logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken,
   pinInfo: kern.pinInfo, pinCheck: kern.pinCheck
 }));
+/* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
+   account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
+   koerier) vraagt Rahul in een gesprek precies wat die handeling nodig heeft. */
+{
+  const poort = require('./kern/gegevenspoort').maakGegevenspoort({
+    accounts, getMemberState: accounts.getMemberState
+  });
+  const gesprek = require('./kern/gegevensgesprek').maakGegevensgesprek({
+    accounts, gegevenspoort: poort, saveMemberState: accounts.saveMemberState,
+    getMemberState: accounts.getMemberState, schoon
+  });
+  Object.assign(kern, {
+    gegevensPoort: poort.poort, gegevensNodig: poort.ontbreekt,
+    gegevensStart: gesprek.gegevensStart, gegevensZeg: gesprek.gegevensZeg
+  });
+}
 /* Werk bij het inloggen (kern/werkbijlogin.js): wie een werkplek heeft, krijgt
    die er bij het inloggen meteen bij -- geen tweede inlog en geen pincode. Het
    werkvenster van de werkgever bepaalt of hij open of dicht is. */

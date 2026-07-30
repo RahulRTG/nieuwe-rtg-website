@@ -59,6 +59,19 @@ function findByLogin(login) {
 }
 function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().c; }
 
+/* Het telefoonnummer bijzetten. Dat gebeurt niet meer bij de aanmelding maar pas
+   wanneer er iets geregeld moet worden waar een derde partij bij komt (zie
+   kern/gegevenspoort.js). Het nummer gaat gebonden de kluis in en de zoek-hash
+   gaat mee, zodat herstel op telefoonnummer blijft werken. */
+function setPhone(id, phone) {
+  const nummer = String(phone || '').trim().slice(0, 30);
+  if (!nummer) return null;
+  S.db.prepare('UPDATE users SET enc_phone = ?, phone_hash = ? WHERE id = ?')
+    .run(gebonden.zegel('enc_phone', id, nummer), kluis.phoneHash(nummer), id);
+  mirror.markUser(id);
+  return getUserById(id);
+}
+
 /* Naamswijziging door het huis zelf (opstart-seed van het eigenaarsaccount):
    inlognaam en echte naam in een keer, de kluis blijft de bron. Geef je ook een
    e-mailadres mee, dan verhuist het account daarheen: de zoekhash en de
@@ -147,7 +160,7 @@ const { getMemberState, saveMemberState, setVerification, listByVerification,
 
 module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
-  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf,
+  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone,
   issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser

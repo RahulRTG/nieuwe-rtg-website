@@ -170,15 +170,41 @@ test('ook Rahul komt niet om de gegevenspoort heen', async () => {
     const vraag = 'reserveer bij ' + zaak.name + ' morgen om 20:00 met 2 personen';
     const zonder = await api(base, '/api/fluister', { q: vraag }, token);
     assert.equal(zonder.status, 200);
-    assert.match(zonder.body.antwoord, /telefoonnummer/i, 'hij zegt wat hij nodig heeft');
+    assert.match(zonder.body.antwoord, /bereiken|telefoonnummer/i, 'hij vraagt het, in het gesprek zelf');
     assert.doesNotMatch(zonder.body.antwoord, /aangevraagd/i, 'en reserveert dus NIET');
+    assert.doesNotMatch(zonder.body.antwoord, /in de app/i, 'en stuurt u niet weg naar een ander scherm');
     const res1 = await api(base, '/api/reserveringen/mijn', {}, token);
     assert.equal((res1.body.reserveringen || []).length, 0, 'er staat echt niets in de boeken');
 
-    // het nummer geven via het gesprek, en dan doet hij het gewoon
-    const start = await api(base, '/api/gegevens/start', { soort: 'reservering' }, token);
-    await api(base, '/api/gegevens/zeg', { id: start.body.id, tekst: '0612345678' }, token);
-    const met = await api(base, '/api/fluister', { q: vraag }, token);
-    assert.match(met.body.antwoord, /aangevraagd/i, 'met het nummer erbij reserveert hij wel: ' + met.body.antwoord);
+    /* HIJ VRAAGT HET HIER, DUS HIJ VERWERKT HET HIER. "waarom?" krijgt hetzelfde
+       eerlijke antwoord als in de app -- het is dezelfde stappenmachine -- en een
+       te kort nummer wordt niet geslikt. */
+    const waaromR = await api(base, '/api/fluister', { q: 'waarom?' }, token);
+    assert.match(waaromR.body.antwoord, /bereiken/i, 'eerlijk waarom, ook in het gesprek');
+    const kortR = await api(base, '/api/fluister', { q: '12' }, token);
+    assert.match(kortR.body.antwoord, /te kort|voluit/i, 'onzin wordt ook hier niet geslikt');
+
+    // en dan het echte nummer: hij noteert het EN doet alsnog wat er gevraagd was
+    const antwoord = await api(base, '/api/fluister', { q: '0612345678' }, token);
+    assert.match(antwoord.body.antwoord, /aangevraagd/i,
+      'na het antwoord doet hij de reservering alsnog, zonder dat u het opnieuw hoeft te vragen: ' + antwoord.body.antwoord);
+    const res2 = await api(base, '/api/reserveringen/mijn', {}, token);
+    assert.equal((res2.body.reserveringen || []).length, 1, 'en hij staat echt in de boeken');
+
+    // het nummer zit in de kluis, dus de volgende keer vraagt hij niets meer
+    const na = await api(base, '/api/gegevens/nodig', { soort: 'reservering' }, token);
+    assert.deepEqual(na.body.ontbreekt, [], 'eenmaal gegeven is genoeg');
+
+    // en afbreken mag: een tweede lid stopt het gesprek en er gebeurt niets
+    const twee = await api(base, '/api/auth/register', {
+      name: 'Stop Sara', email: 'stop@voorbeeld.test', password: 'stopgeheim12',
+      geboortedatum: '1993-03-03', tier: 'rtg', pasApp: 'rtg'
+    });
+    const t2 = twee.body.token;
+    await api(base, '/api/fluister', { q: vraag }, t2);
+    const gestopt = await api(base, '/api/fluister', { q: 'laat maar' }, t2);
+    assert.match(gestopt.body.antwoord, /niet door/i, 'stoppen kan, met de eerlijke gevolgtrekking');
+    const res3 = await api(base, '/api/reserveringen/mijn', {}, t2);
+    assert.equal((res3.body.reserveringen || []).length, 0, 'en dan is er ook niets gereserveerd');
   } finally { stop(child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
 });

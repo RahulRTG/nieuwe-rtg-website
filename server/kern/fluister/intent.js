@@ -10,12 +10,17 @@
    behandeling, rit, 24-uursblok) en ./betalen (bestellen en het RTG Pay-verkeer).
    De keten hieronder houdt exact de volgorde aan van de oorspronkelijke acties.js. */
 module.exports = (ctx) => {
+  const g = require('./gegevens')(ctx);
   const b = require('./bevestig')(ctx);
   const k = require('./boeken')(ctx);
   const t = require('./betalen')(ctx);
 
+  /* g.gegevensAntwoord staat VOORAAN: heeft Rahul net iets gevraagd wat de
+     gegevenspoort nodig had, dan is het volgende bericht het antwoord daarop en
+     geen nieuwe opdracht. Staat er niets open, dan geeft hij null en gaat de
+     keten gewoon verder. */
   const keten = [
-    b.ja, b.nee, b.planDag, b.saldo, b.annuleerRes,
+    g.gegevensAntwoord, b.ja, b.nee, b.planDag, b.saldo, b.annuleerRes,
     k.tickets, k.behandeling, k.taxi, t.bestel, k.blok24, t.tik,
     b.reserveer, b.zoek, t.vraagKlompje, t.watBetalen
   ];

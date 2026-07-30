@@ -2685,10 +2685,12 @@ Object.assign(kern, require('./kern/fluister')({
   // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen
   verblijfBoek: (session, body) => kern.verblijfBoek(session, liveCodename(session), body),
   retailLegApart: legApart, retailKlantProfiel: klantProfiel,
-  /* De gegevenspoort komt verderop pas op de kern, dus we pakken hem hier laat
-     op. Rahul doet zijn acties buiten de routes om en zou anders de enige zijn
-     die er ongemerkt langs kan. */
-  gegevensNodig: (sessie, soort) => (kern.gegevensNodig ? kern.gegevensNodig(sessie, soort) : [])
+  /* Het gegevensgesprek komt verderop pas op de kern, dus we pakken het hier
+     laat op. Rahul doet zijn acties buiten de routes om -- en zou zonder dit de
+     enige zijn die ongemerkt langs de gegevenspoort kan. Hij voert hetzelfde
+     gesprek als de app, want de vraag hoort niet af te hangen van het kanaal. */
+  gegevensStart: (sessie, soort) => (kern.gegevensStart ? kern.gegevensStart(sessie, soort) : null),
+  gegevensZeg: (sessie, id, tekst) => (kern.gegevensZeg ? kern.gegevensZeg(sessie, id, tekst) : { status: 404, error: 'Dat gesprek ken ik niet meer.' })
 }));
 // nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
 // elk half uur, bouwt een index (een datapass voor alle gebruikers) en

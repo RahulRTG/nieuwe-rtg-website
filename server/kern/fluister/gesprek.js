@@ -35,6 +35,7 @@ module.exports = (ctx) => {
       p.gesprek = [];
       p.focus = {};
       p.wacht = null;
+      p.wachtGeg = null;
       save();
       return { ok: true, antwoord: 'Alles gewist: uw weetjes, ons gesprek en de gebruikstellers. We beginnen met een schone lei.', geleerd: true, pakte: true };
     }

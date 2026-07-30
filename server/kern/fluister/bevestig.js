@@ -5,7 +5,8 @@
    ./betalen. Elke handler krijgt {q,p,klaar,key,codenaam,sess} en geeft een
    klaar(...)-antwoord of null (dan probeert de orkestrator de volgende). */
 module.exports = (ctx) => {
-  const { db, save, reserveerTafel, annuleerReservering, zorgVoor, pay, nu, eur, datumInZin, voerUit, gegevensNodig } = ctx;
+  const { db, save, reserveerTafel, annuleerReservering, zorgVoor, pay, nu, eur, datumInZin, voerUit } = ctx;
+  const poort = require('./gegevens')(ctx);
 
   // "ja": het openstaande voorstel uitvoeren
   async function ja({ q, p, klaar, key, codenaam, sess }) {
@@ -85,10 +86,12 @@ module.exports = (ctx) => {
     const personen = parseInt((q.match(/(\d{1,2})\s*(personen|gasten|man)\b/i) || [])[1], 10) || 2;
     /* De gegevenspoort: een reservering staat op naam bij een derde, en die moet
        u kunnen bereiken. Rahul komt hier niet langs de route, dus de poort staat
-       hier zelf -- anders was dit het ene gaatje waar het wel doorheen kon. */
-    const mistR = gegevensNodig ? gegevensNodig(sess, 'reservering') : [];
-    if (mistR.length) return klaar('Dat kan ik nog niet aanvragen: hiervoor heb ik ' + mistR.map(m => m.label).join(' en ') +
-      ' nodig. ' + mistR[0].waarom + ' Doe het in de app, dan vraag ik het u daar meteen.');
+       hier zelf -- anders was dit het ene gaatje waar het wel doorheen kon. En
+       hij vraagt het gewoon hier: de reservering gaat op de plank en zodra u
+       antwoordt, doet hij hem alsnog (./gegevens.js). */
+    const vraagR = poort.poortVraag(key, sess, 'reservering',
+      { soort: 'reservering', r: { supplierCode: s.code, naam: s.name, datum, tijd: tijd[1].padStart(2, '0') + ':' + tijd[2], personen } });
+    if (vraagR) return klaar(vraagR);
     const r = reserveerTafel({ key, tier: sess.tier }, codenaam, { supplierCode: s.code, datum, tijd: tijd[1].padStart(2, '0') + ':' + tijd[2], personen });
     if (r.error) return klaar('Dat lukt niet: ' + r.error);
     // het zorgprofiel reist mee, precies zoals bij een gewone reservering

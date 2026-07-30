@@ -14,10 +14,19 @@
 
    De module weet niets van tokens. De pagina geeft haar eigen `call(pad, body)`
    mee, dus dit werkt zowel in de leden-app (API.call) als op de losse pagina's
-   met hun eigen fetch-helper. */
+   met hun eigen fetch-helper.
+
+   HIJ HEET RTGGegevensPoort EN NIET RTGPoort. Die naam was al bezet door
+   shared/rahulpoort.js -- de INLOGpoort, met een heel andere vorm
+   (.gesprek() in plaats van .vang()). Twee sessies kwamen los van elkaar op
+   dezelfde naam, en op een pagina waar de ander laadde zag de haak in
+   appshell.js een object dat leek te kloppen en riep er een functie op die er
+   niet was. Geen foutmelding in beeld: de aanroep sneuvelde in een async
+   afhandeling en de inlogpoort ging simpelweg nooit open. Vandaar een naam die
+   zegt om welke poort het gaat. */
 (function (w) {
   'use strict';
-  if (w.RTGPoort) return;
+  if (w.RTGGegevensPoort) return;
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
@@ -135,5 +144,5 @@
     });
   }
 
-  w.RTGPoort = { los: los, vang: vang };
+  w.RTGGegevensPoort = { los: los, vang: vang };
 })(window);

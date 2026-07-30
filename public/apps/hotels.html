@@ -105,7 +105,7 @@ const api = (pad, body, herkans) => fetch(pad, {
 }).then(async r => {
   const d = await r.json().catch(() => ({}));
   // 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door
-  const p = herkans ? null : (window.RTGPoort && window.RTGPoort.vang(d, r.status, () => api(pad, body, true), api));
+  const p = herkans ? null : (window.RTGGegevensPoort && window.RTGGegevensPoort.vang(d, r.status, () => api(pad, body, true), api));
   if (p) return p;
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 

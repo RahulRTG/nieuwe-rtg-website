@@ -79,7 +79,7 @@ let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
 const api=(pad,body,herkans)=>fetch('/api/member/sport'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));
   // 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door
-  const p=herkans?null:(window.RTGPoort&&window.RTGPoort.vang(d,r.status,()=>api(pad,body,true),(q,b)=>fetch(q,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(b||{})}).then(x=>x.json())));
+  const p=herkans?null:(window.RTGGegevensPoort&&window.RTGGegevensPoort.vang(d,r.status,()=>api(pad,body,true),(q,b)=>fetch(q,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(b||{})}).then(x=>x.json())));
   if(p)return p;
   if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
 const eur=c=>'€ '+(Number(c||0)/100).toFixed(2);

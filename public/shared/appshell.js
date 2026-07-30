@@ -29,8 +29,8 @@
            Rahul vraagt het, en daarna doen we gewoon wat er gevraagd was. Een
            herkansing krijgt geen tweede: anders kan dit blijven rondlopen. */
         var self = this;
-        if (!herkans && w.RTGPoort) {
-          var p = w.RTGPoort.vang(data, res.status,
+        if (!herkans && w.RTGGegevensPoort) {
+          var p = w.RTGGegevensPoort.vang(data, res.status,
             function () { return self.call(pad, body, true); },
             function (q, b) { return self.call(String(q).replace(/^\/api/, ''), b); });
           if (p) return p;

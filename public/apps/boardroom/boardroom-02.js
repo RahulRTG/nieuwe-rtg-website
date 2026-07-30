@@ -2,18 +2,18 @@
      beantwoordt de vraag die mensen echt stellen ("stond dat altijd al zo?"). */
   function tekenVoet() {
     var doel = $('bord');
-    var v = document.createElement('p'); v.className = 'voet';
+    var v = document.createElement('p'); v.className = 'rtg-voet';
     v.textContent = bordNu.gewijzigd
       ? 'Laatst gewijzigd op ' + datum(bordNu.gewijzigd) + '.'
       : 'Je hebt hier nog niets omgezet; alles staat op de standaard.';
     doel.appendChild(v);
-    var log = document.createElement('section'); log.className = 'groep';
+    var log = document.createElement('section'); log.className = 'rtg-groep';
     var h = document.createElement('h2'); h.textContent = 'Wat er is veranderd'; log.appendChild(h);
-    var gu = document.createElement('div'); gu.className = 'gu';
+    var gu = document.createElement('div'); gu.className = 'rtg-uitleg';
     gu.textContent = 'Elke omzetting op dit bord, met wie hem deed. Dit spoor is van jou en gaat mee in je gegevens-download.';
     log.appendChild(gu);
     var lijst = document.createElement('div'); lijst.id = 'logboek';
-    var laden = document.createElement('p'); laden.className = 'gu'; laden.textContent = 'Logboek laden...';
+    var laden = document.createElement('p'); laden.className = 'rtg-uitleg'; laden.textContent = 'Logboek laden...';
     lijst.appendChild(laden);
     log.appendChild(lijst);
     doel.appendChild(log);
@@ -31,12 +31,12 @@
       var regels = (r.d && r.d.logboek) || [];
       doel.textContent = '';
       if (!regels.length) {
-        var leeg = document.createElement('p'); leeg.className = 'gu';
+        var leeg = document.createElement('p'); leeg.className = 'rtg-uitleg';
         leeg.textContent = 'Nog niets omgezet.';
         doel.appendChild(leeg); return;
       }
       regels.forEach(function (r2) {
-        var rij2 = document.createElement('div'); rij2.className = 'logrij';
+        var rij2 = document.createElement('div'); rij2.className = 'rtg-logrij';
         var wat = (r2.wijzigingen || []).map(function (w) {
           return w.naam + ' ' + (w.naar ? 'aan' : 'uit');
         }).join(', ');

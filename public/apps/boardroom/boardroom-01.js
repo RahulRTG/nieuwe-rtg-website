@@ -44,9 +44,9 @@
     var el = $('melder');
     if (!el) return;
     el.textContent = tekst || '';
-    el.className = 'melder' + (tekst ? ' zien' : '') + (soort ? ' ' + soort : '');
+    el.className = 'rtg-melder' + (tekst ? ' zien' : '') + (soort ? ' ' + soort : '');
     if (meldTimer) clearTimeout(meldTimer);
-    if (tekst) meldTimer = setTimeout(function () { el.className = 'melder'; el.textContent = ''; }, 6000);
+    if (tekst) meldTimer = setTimeout(function () { el.className = 'rtg-melder'; el.textContent = ''; }, 6000);
   }
 
   /* Eén plek waar een antwoord van de server wordt gelezen. Een botsing (409 met
@@ -63,7 +63,7 @@
   function schakel(fn) {
     var knop = document.createElement('button');
     knop.type = 'button';
-    knop.className = 'sw';
+    knop.className = 'rtg-sw';
     knop.setAttribute('role', 'switch');
     knop.setAttribute('aria-checked', fn.aan ? 'true' : 'false');
     knop.setAttribute('aria-label', fn.naam);
@@ -90,14 +90,14 @@
 
   function rij(fn) {
     var r = document.createElement('div');
-    r.className = 'fn' + (fn.beheerd ? ' beheerd' : '');
-    var t = document.createElement('div'); t.className = 'tekst';
-    var n = document.createElement('div'); n.className = 'naam'; n.textContent = fn.naam;
-    if (fn.beheerd) { var b = document.createElement('span'); b.className = 'merk'; b.textContent = 'beheerd door RTG'; n.appendChild(b); }
-    else if (fn.vast) { var v = document.createElement('span'); v.className = 'merk'; v.textContent = 'altijd aan'; n.appendChild(v); }
+    r.className = 'rtg-rij' + (fn.beheerd ? ' beheerd' : '');
+    var t = document.createElement('div'); t.className = 'rtg-tekst';
+    var n = document.createElement('div'); n.className = 'rtg-naam'; n.textContent = fn.naam;
+    if (fn.beheerd) { var b = document.createElement('span'); b.className = 'rtg-merk'; b.textContent = 'beheerd door RTG'; n.appendChild(b); }
+    else if (fn.vast) { var v = document.createElement('span'); v.className = 'rtg-merk stil'; v.textContent = 'altijd aan'; n.appendChild(v); }
     t.appendChild(n);
     var uitleg = fn.beheerd ? fn.reden : fn.uitleg;
-    if (uitleg) { var u = document.createElement('div'); u.className = 'uit'; u.textContent = uitleg; t.appendChild(u); }
+    if (uitleg) { var u = document.createElement('div'); u.className = 'rtg-sub'; u.textContent = uitleg; t.appendChild(u); }
     r.appendChild(t);
     r.appendChild(schakel(fn));
     return r;
@@ -134,12 +134,12 @@
   }
 
   function acties() {
-    var wrap = document.createElement('div'); wrap.className = 'acties';
+    var wrap = document.createElement('div'); wrap.className = 'rtg-acties';
     [['Alles aan', function () { allesUit(true); }],
      ['Alles uit', function () { allesUit(false); }],
      ['Terug naar standaard', herstel]
     ].forEach(function (a) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'knop';
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'rtg-knop';
       b.textContent = a[0];
       b.addEventListener('click', a[1]);
       wrap.appendChild(b);
@@ -152,9 +152,9 @@
     doel.textContent = '';
     doel.appendChild(acties());
     (bordNu.categorieen || []).forEach(function (cat) {
-      var g = document.createElement('section'); g.className = 'groep';
+      var g = document.createElement('section'); g.className = 'rtg-groep';
       var h = document.createElement('h2'); h.textContent = cat.naam; g.appendChild(h);
-      if (cat.uitleg) { var gu = document.createElement('div'); gu.className = 'gu'; gu.textContent = cat.uitleg; g.appendChild(gu); }
+      if (cat.uitleg) { var gu = document.createElement('div'); gu.className = 'rtg-uitleg'; gu.textContent = cat.uitleg; g.appendChild(gu); }
       cat.functies.forEach(function (fn) { g.appendChild(rij(fn)); });
       doel.appendChild(g);
     });

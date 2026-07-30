@@ -28,6 +28,16 @@ server/            Node.js/Express-backend + data (db.json, rtg.db, sleutels, up
 
 Er is geen losse marketingsite meer: `/` toont direct het RTG OS-bureaublad (`/apps/index.html`); wie nog niet is aangemeld ziet daar de welkomstkaart (het gratis RTG-abonnement is de minimale ingang). Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
 
+### Eén vormtaal: de UI-kit (`shared/rtg-ui.css`)
+
+Elke ROS-app schreef zijn eigen kaart, eigen knop en eigen melding: honderdtachtig keer bijna hetzelfde, met net andere randen, hoeken en grijstinten. **`public/shared/rtg-ui.css`** is nu de maat. Hij is letterlijk de vormtaal van de boardroom (`apps/boardroom.html`), tot onderdelen gemaakt: een donkere kaart met een fijne rand, een kapitaaltjes-kopje erboven, rijen gescheiden door haarlijnen, pilknoppen, en één accent dat met de dagkleur meeademt.
+
+- **De tokens** (`--rtg-bg/card/card2/line/txt/muted/soft/goud/acc/rond`) staan op één plek. Alle app-pagina's verwijzen ernaar, dus één hairline-grijs en één kaartkleur voor de hele familie in plaats van drie varianten per waarde.
+- **De onderdelen** heten `rtg-`: `.rtg-wrap`, `.rtg-intro`, `.rtg-groep` (+ `h2`, `.rtg-uitleg`), `.rtg-rij` (+ `.rtg-naam`, `.rtg-sub`), `.rtg-knop` (`.vol` = primair/goud), `.rtg-veld`, `.rtg-sw` (een echte `role="switch"`), `.rtg-merk`, `.rtg-melder` (`.goed`/`.let`/`.fout`), `.rtg-leeg`, `.rtg-logrij`. Nieuwe schermen gebruiken deze direct.
+- **De overstap-laag** vangt de bestaande woordenschat op. De pagina's delen al jaren `.kaart`, `.knop`, `.rij`, `.veld`, `.kop`, `.stil`, `.leeg`, `.melding` — alleen tekende elke pagina ze zelf. Zet `class="rtg-stijl"` op de `<body>` en die namen krijgen de vormtaal van de boardroom; de HTML en het JavaScript blijven ongemoeid, dus er hoeven geen classe-namen in honderden string-sjablonen om. Daarna kan de pagina zijn eigen kaart-, knop- en veldregels weggooien.
+
+De kit staat vóór de eigen `<style>` van een pagina en gebruikt nergens `!important`: wie iets echt anders nodig heeft, overschrijft gewoon.
+
 ### Modulebeleid: behapbare bestanden van ~5-10KB
 
 De bron is opgeknipt in modules van grofweg 5 tot 10KB, op twee manieren:

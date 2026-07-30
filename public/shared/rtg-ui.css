@@ -1,0 +1,256 @@
+/* ====================== DE RTG UI-KIT ======================================
+
+   Eén vormtaal voor alle ROS-apps. Tot nu toe schreef elke pagina zijn eigen
+   kaart, eigen knop en eigen melding: honderdtachtig keer bijna hetzelfde, met
+   net andere randen, hoeken en grijstinten. Dat is niet te onderhouden en het
+   is te zien -- je merkt bij het overstappen van app naar app dat je in een
+   ander gebouw staat.
+
+   Dit bestand is de vormtaal van de boardroom (apps/boardroom.html), letterlijk
+   overgenomen en tot onderdelen gemaakt. Die pagina is de maat: een donkere
+   kaart met een fijne rand, een kapitaaltjes-kopje erboven, rijen gescheiden
+   door haarlijnen, pilknoppen, en één accentkleur die met de dagkleur meeademt.
+
+   HOE JE HEM GEBRUIKT
+
+     <link href="/shared/rtg-ui.css" rel="stylesheet">   voor je eigen <style>
+
+   Hij staat VOOR de eigen stijl van de pagina, dus een pagina die iets echt
+   anders nodig heeft, overschrijft gewoon. Niets is !important.
+
+   DE ONDERDELEN
+
+     .rtg-wrap      de kolom van een pagina (max 840px, eigen ademruimte)
+     .rtg-intro     de kop van een pagina: h1 in Bodoni + een zin eronder
+     .rtg-groep     een sectiekaart, met > h2 als kapitaaltjes-kopje en
+                    > .rtg-uitleg als zin eronder
+     .rtg-rij       een regel in een kaart, gescheiden door een haarlijn;
+                    binnenin .rtg-naam (vet) en .rtg-sub (klein, zacht)
+     .rtg-knop      een pilknop; .vol maakt hem primair (goud)
+     .rtg-veld      invoer, keuzelijst en tekstvak
+     .rtg-sw        een echte role="switch"-schakelaar
+     .rtg-merk      een klein kapitaaltjes-label bij een naam
+     .rtg-melder    de uitkomst van een handeling (.goed / .let / .fout)
+     .rtg-leeg      "hier staat nog niets"
+     .rtg-voet      een kleine voetregel
+
+   WAAROM ALLES rtg- HEET. De pagina's hebben al een .knop, een .kaart en een
+   .melding, elk met een eigen betekenis. Een kit die die namen overneemt, zou
+   bij het insluiten stilletjes honderdtachtig pagina's herschilderen -- ook waar
+   dat niet klopt. Met een eigen voorvoegsel kan een pagina er in zijn eigen
+   tempo op over, en breekt er onderweg niets. */
+
+/* ---------------------------------------------------------------- tokens ---
+   De kleuren stonden al op bijna elke pagina, alleen niet overal hetzelfde:
+   drie grijswaarden voor dezelfde lijn, twee gouden. Hier staat de maat. De
+   pagina mag ze overschrijven; wie niets doet, krijgt het huis. */
+:root{
+  --rtg-bg:#0C0C0B;
+  --rtg-card:#151312;
+  --rtg-card2:#1B1817;
+  --rtg-line:rgba(255,255,255,0.10);
+  --rtg-txt:#F4F1EC;
+  --rtg-muted:rgba(244,241,236,0.70);
+  --rtg-soft:rgba(244,241,236,0.60);
+  --rtg-goud:#C9A24B;
+  --rtg-groen:#4C9A75;
+  --rtg-rood:#DE6E92;
+  /* het accent ademt mee met de levende dagkleur (shared/dagkleur.css); staat
+     die niet aan, dan is het gewoon het bordeaux van het huis */
+  --rtg-acc:var(--dag-kleur, #C23A5E);
+  --rtg-rond:18px;      /* kaarten */
+  --rtg-rond-klein:12px; /* velden en meldingen */
+}
+
+/* ------------------------------------------------------------ de pagina ---*/
+.rtg-wrap{max-width:840px;margin:0 auto;padding:1.4rem 1.1rem 4rem;}
+.rtg-intro{margin:0 0 1.4rem;}
+.rtg-intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
+.rtg-intro p{color:var(--rtg-soft);font-size:.9rem;margin-top:.3rem;max-width:52ch;}
+/* de weg terug staat linksboven, in het accent, en is een gewone link */
+.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);text-decoration:none;font-size:.85rem;}
+.rtg-terug:hover{text-decoration:underline;}
+
+/* ------------------------------------------------------- de sectiekaart ---*/
+.rtg-groep{
+  background:var(--rtg-card);border:1px solid var(--rtg-line);
+  border-radius:var(--rtg-rond);padding:1.1rem 1.2rem;margin-bottom:1rem;
+}
+.rtg-groep > h2{
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--rtg-soft);font-weight:700;margin-bottom:.2rem;
+}
+.rtg-groep > .rtg-uitleg{font-size:.8rem;color:var(--rtg-soft);margin-bottom:.8rem;}
+
+/* ------------------------------------------------------------- de regel ---
+   Rijen in een kaart worden gescheiden door een haarlijn, niet door ruimte of
+   een eigen randje per rij: dat leest als een lijst in plaats van als losse
+   blokjes, en het scheelt visuele drukte. */
+.rtg-rij{display:flex;align-items:flex-start;gap:1rem;padding:.75rem 0;border-top:1px solid var(--rtg-line);}
+.rtg-rij:first-of-type{border-top:none;}
+.rtg-rij .rtg-tekst{flex:1;min-width:0;}
+.rtg-naam{font-weight:600;font-size:.95rem;}
+.rtg-sub{font-size:.8rem;color:var(--rtg-soft);margin-top:.1rem;}
+/* een rij die je kunt aantikken blijft een knop, geen div met een klikhandler */
+button.rtg-rij{width:100%;background:none;border-left:none;border-right:none;border-bottom:none;
+  color:inherit;font:inherit;text-align:left;cursor:pointer;}
+button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
+
+/* ------------------------------------------------------------- knoppen ----*/
+.rtg-knop{
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+  color:var(--rtg-txt);font:inherit;font-size:.8rem;padding:.5rem 1rem;cursor:pointer;
+  transition:border-color .15s, background .15s;
+}
+.rtg-knop:hover{border-color:color-mix(in srgb,var(--rtg-acc) 55%,var(--rtg-line));}
+.rtg-knop:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;}
+.rtg-knop[disabled]{opacity:.45;cursor:not-allowed;}
+/* de primaire actie: goud, want dat is de kleur waarmee dit huis "ja" zegt */
+.rtg-knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+.rtg-knop.vol:hover{filter:brightness(1.07);}
+/* een rij knoppen onder elkaar of naast elkaar */
+.rtg-acties{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;}
+
+/* --------------------------------------------------------------- velden ---*/
+.rtg-veld{
+  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond-klein);
+  color:var(--rtg-txt);font:inherit;font-size:.9rem;padding:.6rem .8rem;width:100%;
+  transition:border-color .15s;
+}
+.rtg-veld:focus{outline:none;border-color:color-mix(in srgb,var(--rtg-acc) 60%,var(--rtg-line));}
+.rtg-veld:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:1px;}
+.rtg-veld::placeholder{color:var(--rtg-soft);}
+.rtg-label{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--rtg-soft);font-weight:700;margin-bottom:.3rem;}
+
+/* ----------------------------------------------------------- schakelaar ---
+   Een echte knop met role="switch" en aria-checked, geen verstopte checkbox:
+   dan kondigt een schermlezer hem als schakelaar aan en leest hij de stand. */
+.rtg-sw{position:relative;flex:none;width:3.1rem;height:1.8rem;background:none;border:none;padding:0;cursor:pointer;}
+.rtg-sw .track{position:absolute;inset:0;background:var(--rtg-card2);border:1px solid var(--rtg-line);
+  border-radius:999px;transition:background .15s,border-color .15s;}
+.rtg-sw .dot{position:absolute;top:.22rem;left:.24rem;width:1.28rem;height:1.28rem;border-radius:50%;
+  background:var(--rtg-soft);transition:transform .15s,background .15s;}
+.rtg-sw[aria-checked="true"] .track{background:color-mix(in srgb,var(--rtg-acc) 34%,transparent);border-color:var(--rtg-acc);}
+.rtg-sw[aria-checked="true"] .dot{transform:translateX(1.28rem);background:var(--rtg-acc);}
+.rtg-sw:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;border-radius:999px;}
+.rtg-sw:disabled{cursor:not-allowed;opacity:.45;}
+
+/* ---------------------------------------------------------------- merk -----
+   Een klein kapitaaltjes-label achter een naam: "beheerd door RTG", "nieuw",
+   "altijd aan". Klein en in het accent, zodat het opvalt zonder te schreeuwen. */
+.rtg-merk{
+  display:inline-block;margin-left:.5rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:700;color:var(--rtg-acc);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
+  border-radius:999px;padding:.08rem .45rem;vertical-align:middle;
+}
+.rtg-merk.stil{color:var(--rtg-soft);border-color:var(--rtg-line);}
+.rtg-merk.goed{color:var(--rtg-groen);border-color:color-mix(in srgb,var(--rtg-groen) 45%,transparent);}
+
+/* -------------------------------------------------------------- melder -----
+   De uitkomst van een handeling, en tegelijk een aria-live-gebied. Lukt iets
+   niet, dan hoort daar een zin te staan: een knop die stil terugspringt is
+   erger dan een foutmelding. */
+.rtg-melder{
+  min-height:0;overflow:hidden;font-size:.85rem;line-height:1.5;border-radius:var(--rtg-rond-klein);
+  padding:0 .9rem;margin-bottom:0;border:1px solid transparent;transition:opacity .2s;opacity:0;
+}
+.rtg-melder.zien{min-height:auto;padding:.65rem .9rem;margin-bottom:1rem;opacity:1;}
+.rtg-melder.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
+.rtg-melder.let{background:color-mix(in srgb,var(--rtg-acc) 14%,transparent);border-color:var(--rtg-acc);}
+.rtg-melder.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
+
+/* --------------------------------------------------------- rest & rust -----*/
+.rtg-leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
+.rtg-voet{color:var(--rtg-soft);font-size:.78rem;margin:0 0 1rem;}
+/* een logregel: wat er gebeurde, en eronder klein wanneer en door wie */
+.rtg-logrij{display:flex;flex-direction:column;gap:.1rem;padding:.55rem 0;border-top:1px solid var(--rtg-line);}
+.rtg-logrij:first-child{border-top:none;}
+.rtg-logrij b{font-size:.85rem;font-weight:600;}
+.rtg-logrij span{font-size:.75rem;color:var(--rtg-soft);}
+
+@media (prefers-reduced-motion: reduce){
+  .rtg-knop,.rtg-veld,.rtg-sw .track,.rtg-sw .dot,.rtg-melder{transition:none;}
+}
+
+/* ============ DE OVERSTAP-LAAG: body class="rtg-stijl" ====================
+
+   De ROS-pagina's delen al jaren dezelfde woordenschat -- .kaart, .knop, .rij,
+   .veld, .kop, .stil, .leeg, .melding -- alleen tekende elke pagina ze zelf, en
+   dus net even anders. Honderdtachtig keer bijna hetzelfde.
+
+   Deze laag geeft die bestaande namen de vormtaal van de boardroom. Een pagina
+   stapt over met EEN wijziging:
+
+       <body class="rtg-stijl">
+
+   en kan daarna zijn eigen kaart-, knop- en veld-regels weggooien. De HTML en
+   het JavaScript blijven zoals ze zijn -- geen classe-namen omzetten in
+   honderden string-sjablonen, dus ook geen kans om er onderweg een te breken.
+
+   De laag is bewust specifieker (body.rtg-stijl .kaart) dan de eigen regels van
+   een pagina (.kaart), zodat de overstap ook echt zichtbaar is zonder dat er
+   ergens !important aan te pas komt. Wat een pagina daarna nog echt eigen wil,
+   maakt hij specifieker of geeft hij een eigen naam. */
+
+body.rtg-stijl{background:var(--rtg-bg);color:var(--rtg-txt);
+  font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+
+/* de kolom en de kop van de pagina */
+body.rtg-stijl main{max-width:840px;margin:0 auto;padding:1.4rem 1.1rem 4rem;}
+body.rtg-stijl .kop,body.rtg-stijl .intro{margin:0 0 1.4rem;}
+body.rtg-stijl .intro p{color:var(--rtg-soft);font-size:.9rem;margin-top:.3rem;max-width:52ch;}
+body.rtg-stijl .kop h1,body.rtg-stijl h1{
+  font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
+body.rtg-stijl .ey{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--rtg-soft);font-weight:700;display:block;margin-bottom:.15rem;}
+body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);
+  text-decoration:none;font-size:.85rem;}
+
+/* de sectiekaart: alles wat een blok inhoud omvat, krijgt dezelfde kaart */
+body.rtg-stijl .kaart,body.rtg-stijl .sec,body.rtg-stijl .item,
+body.rtg-stijl .paneel,body.rtg-stijl .groep,body.rtg-stijl .art,
+body.rtg-stijl .doc,body.rtg-stijl .blok,body.rtg-stijl .vak{
+  background:var(--rtg-card);border:1px solid var(--rtg-line);
+  border-radius:var(--rtg-rond);padding:1.1rem 1.2rem;margin-bottom:1rem;}
+body.rtg-stijl .kaart > h2,body.rtg-stijl .sec > h2,body.rtg-stijl .groep > h2,
+body.rtg-stijl main > h2{
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--rtg-soft);font-weight:700;margin-bottom:.2rem;}
+
+/* regels binnen een kaart, gescheiden door een haarlijn */
+body.rtg-stijl .rij{display:flex;align-items:flex-start;gap:1rem;padding:.75rem 0;
+  border-top:1px solid var(--rtg-line);}
+body.rtg-stijl .rij:first-of-type{border-top:none;}
+body.rtg-stijl .naam{font-weight:600;font-size:.95rem;}
+body.rtg-stijl .sub,body.rtg-stijl .meta,body.rtg-stijl .stil{
+  font-size:.8rem;color:var(--rtg-soft);line-height:1.5;}
+body.rtg-stijl .lbl{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--rtg-soft);font-weight:700;margin-bottom:.3rem;}
+
+/* knoppen: pillen, met goud voor de primaire actie */
+body.rtg-stijl .knop{background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+  color:var(--rtg-txt);font:inherit;font-size:.8rem;padding:.5rem 1rem;cursor:pointer;
+  transition:border-color .15s, background .15s;}
+body.rtg-stijl .knop:hover{border-color:color-mix(in srgb,var(--rtg-acc) 55%,var(--rtg-line));}
+body.rtg-stijl .knop:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;}
+body.rtg-stijl .knop[disabled]{opacity:.45;cursor:not-allowed;}
+body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+body.rtg-stijl .knop.vol:hover{filter:brightness(1.07);}
+body.rtg-stijl .knop.weg{color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
+
+/* velden */
+body.rtg-stijl .veld,body.rtg-stijl input:not([type=range]):not([type=checkbox]):not([type=radio]),
+body.rtg-stijl select,body.rtg-stijl textarea{
+  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond-klein);
+  color:var(--rtg-txt);font:inherit;font-size:.9rem;padding:.6rem .8rem;transition:border-color .15s;}
+body.rtg-stijl .veld:focus,body.rtg-stijl input:focus,body.rtg-stijl select:focus,body.rtg-stijl textarea:focus{
+  outline:none;border-color:color-mix(in srgb,var(--rtg-acc) 60%,var(--rtg-line));}
+body.rtg-stijl input::placeholder,body.rtg-stijl textarea::placeholder{color:var(--rtg-soft);}
+
+/* leegte en meldingen */
+body.rtg-stijl .leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
+body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:var(--rtg-rond-klein);
+  border:1px solid var(--rtg-line);background:var(--rtg-card2);padding:.65rem .9rem;margin-bottom:1rem;}
+body.rtg-stijl .melding.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
+body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}

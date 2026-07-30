@@ -12,11 +12,12 @@
 <link href="/shared/os.css" rel="stylesheet">
 <link href="/shared/uitleg.css" rel="stylesheet">
 <link href="/shared/osmenu.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   /* --burgundy volgt nu de levende dagkleur uit de machines (dagkleur.css),
      met de bordeaux-op-zwart als vaste terugval; --merk (wijn) en --gold
      blijven vast, precies zoals de merkregels voorschrijven. */
-  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--merk:#7F1734;--burgundy:var(--dag-kleur,#C23A5E);--gold:#A98F1C;--green:#4C9A75;}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--merk:#7F1734;--burgundy:var(--dag-kleur,#C23A5E);--gold:#A98F1C;--green:#4C9A75;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}

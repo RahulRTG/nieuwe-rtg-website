@@ -16,15 +16,16 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/seizoen-pas.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   :root{
-    --bg:#0C0C0B;
-    --card:#151312;
-    --card2:#1B1817;
-    --line:rgba(255,255,255,0.09);
-    --txt:#F4F1EC;
-    --muted:rgba(244,241,236,0.70);
-    --soft:rgba(244,241,236,0.62);
+    --bg:var(--rtg-bg);
+    --card:var(--rtg-card);
+    --card2:var(--rtg-card2);
+    --line:var(--rtg-line);
+    --txt:var(--rtg-txt);
+    --muted:var(--rtg-muted);
+    --soft:var(--rtg-soft);
     --burgundy:#C23A5E;
     --burgundy-deep:#7F1634;
     --gold:#A98F1C;
@@ -40,7 +41,7 @@
      één attribuut op <html> kleurt de hele app om. */
   :root[data-pas-thema="bordeaux"]{
     --bg:#1E0912; --card:#2B0E1B; --card2:#371425;
-    --line:rgba(255,255,255,0.11);
+    --line:var(--rtg-line);
     --txt:#F7ECEF; --muted:rgba(247,236,239,0.74); --soft:rgba(247,236,239,0.60);
     --burgundy:#E36385; --burgundy-deep:#C23A5E; --gold:#D0AC57; --green:#5BB98C;
   }

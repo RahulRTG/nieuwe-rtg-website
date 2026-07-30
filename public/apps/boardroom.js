@@ -44,9 +44,9 @@
     var el = $('melder');
     if (!el) return;
     el.textContent = tekst || '';
-    el.className = 'melder' + (tekst ? ' zien' : '') + (soort ? ' ' + soort : '');
+    el.className = 'rtg-melder' + (tekst ? ' zien' : '') + (soort ? ' ' + soort : '');
     if (meldTimer) clearTimeout(meldTimer);
-    if (tekst) meldTimer = setTimeout(function () { el.className = 'melder'; el.textContent = ''; }, 6000);
+    if (tekst) meldTimer = setTimeout(function () { el.className = 'rtg-melder'; el.textContent = ''; }, 6000);
   }
 
   /* Eén plek waar een antwoord van de server wordt gelezen. Een botsing (409 met
@@ -63,7 +63,7 @@
   function schakel(fn) {
     var knop = document.createElement('button');
     knop.type = 'button';
-    knop.className = 'sw';
+    knop.className = 'rtg-sw';
     knop.setAttribute('role', 'switch');
     knop.setAttribute('aria-checked', fn.aan ? 'true' : 'false');
     knop.setAttribute('aria-label', fn.naam);
@@ -90,14 +90,14 @@
 
   function rij(fn) {
     var r = document.createElement('div');
-    r.className = 'fn' + (fn.beheerd ? ' beheerd' : '');
-    var t = document.createElement('div'); t.className = 'tekst';
-    var n = document.createElement('div'); n.className = 'naam'; n.textContent = fn.naam;
-    if (fn.beheerd) { var b = document.createElement('span'); b.className = 'merk'; b.textContent = 'beheerd door RTG'; n.appendChild(b); }
-    else if (fn.vast) { var v = document.createElement('span'); v.className = 'merk'; v.textContent = 'altijd aan'; n.appendChild(v); }
+    r.className = 'rtg-rij' + (fn.beheerd ? ' beheerd' : '');
+    var t = document.createElement('div'); t.className = 'rtg-tekst';
+    var n = document.createElement('div'); n.className = 'rtg-naam'; n.textContent = fn.naam;
+    if (fn.beheerd) { var b = document.createElement('span'); b.className = 'rtg-merk'; b.textContent = 'beheerd door RTG'; n.appendChild(b); }
+    else if (fn.vast) { var v = document.createElement('span'); v.className = 'rtg-merk stil'; v.textContent = 'altijd aan'; n.appendChild(v); }
     t.appendChild(n);
     var uitleg = fn.beheerd ? fn.reden : fn.uitleg;
-    if (uitleg) { var u = document.createElement('div'); u.className = 'uit'; u.textContent = uitleg; t.appendChild(u); }
+    if (uitleg) { var u = document.createElement('div'); u.className = 'rtg-sub'; u.textContent = uitleg; t.appendChild(u); }
     r.appendChild(t);
     r.appendChild(schakel(fn));
     return r;
@@ -134,12 +134,12 @@
   }
 
   function acties() {
-    var wrap = document.createElement('div'); wrap.className = 'acties';
+    var wrap = document.createElement('div'); wrap.className = 'rtg-acties';
     [['Alles aan', function () { allesUit(true); }],
      ['Alles uit', function () { allesUit(false); }],
      ['Terug naar standaard', herstel]
     ].forEach(function (a) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'knop';
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'rtg-knop';
       b.textContent = a[0];
       b.addEventListener('click', a[1]);
       wrap.appendChild(b);
@@ -152,9 +152,9 @@
     doel.textContent = '';
     doel.appendChild(acties());
     (bordNu.categorieen || []).forEach(function (cat) {
-      var g = document.createElement('section'); g.className = 'groep';
+      var g = document.createElement('section'); g.className = 'rtg-groep';
       var h = document.createElement('h2'); h.textContent = cat.naam; g.appendChild(h);
-      if (cat.uitleg) { var gu = document.createElement('div'); gu.className = 'gu'; gu.textContent = cat.uitleg; g.appendChild(gu); }
+      if (cat.uitleg) { var gu = document.createElement('div'); gu.className = 'rtg-uitleg'; gu.textContent = cat.uitleg; g.appendChild(gu); }
       cat.functies.forEach(function (fn) { g.appendChild(rij(fn)); });
       doel.appendChild(g);
     });
@@ -166,18 +166,18 @@
      beantwoordt de vraag die mensen echt stellen ("stond dat altijd al zo?"). */
   function tekenVoet() {
     var doel = $('bord');
-    var v = document.createElement('p'); v.className = 'voet';
+    var v = document.createElement('p'); v.className = 'rtg-voet';
     v.textContent = bordNu.gewijzigd
       ? 'Laatst gewijzigd op ' + datum(bordNu.gewijzigd) + '.'
       : 'Je hebt hier nog niets omgezet; alles staat op de standaard.';
     doel.appendChild(v);
-    var log = document.createElement('section'); log.className = 'groep';
+    var log = document.createElement('section'); log.className = 'rtg-groep';
     var h = document.createElement('h2'); h.textContent = 'Wat er is veranderd'; log.appendChild(h);
-    var gu = document.createElement('div'); gu.className = 'gu';
+    var gu = document.createElement('div'); gu.className = 'rtg-uitleg';
     gu.textContent = 'Elke omzetting op dit bord, met wie hem deed. Dit spoor is van jou en gaat mee in je gegevens-download.';
     log.appendChild(gu);
     var lijst = document.createElement('div'); lijst.id = 'logboek';
-    var laden = document.createElement('p'); laden.className = 'gu'; laden.textContent = 'Logboek laden...';
+    var laden = document.createElement('p'); laden.className = 'rtg-uitleg'; laden.textContent = 'Logboek laden...';
     lijst.appendChild(laden);
     log.appendChild(lijst);
     doel.appendChild(log);
@@ -195,12 +195,12 @@
       var regels = (r.d && r.d.logboek) || [];
       doel.textContent = '';
       if (!regels.length) {
-        var leeg = document.createElement('p'); leeg.className = 'gu';
+        var leeg = document.createElement('p'); leeg.className = 'rtg-uitleg';
         leeg.textContent = 'Nog niets omgezet.';
         doel.appendChild(leeg); return;
       }
       regels.forEach(function (r2) {
-        var rij2 = document.createElement('div'); rij2.className = 'logrij';
+        var rij2 = document.createElement('div'); rij2.className = 'rtg-logrij';
         var wat = (r2.wijzigingen || []).map(function (w) {
           return w.naam + ' ' + (w.naar ? 'aan' : 'uit');
         }).join(', ');

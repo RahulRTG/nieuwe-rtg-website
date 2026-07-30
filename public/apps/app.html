@@ -1056,7 +1056,48 @@
     background:linear-gradient(160deg,#8A6D14,#5C4A0E);
   }
 
-  /* 4. de balk van Rahul, onderaan */
+  /* 4. het gesprek met Rahul, boven zijn balk
+     De draad groeit vanaf de balk omhoog en neemt hoogstens een derde van het
+     scherm; wat erboven staat (de klok) krimpt mee, want die heeft flex:1. Zo
+     blijft het beginscherm een beginscherm en wordt het geen chat-app. */
+  .os-aidraad{
+    flex-shrink:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+    max-height:34%;margin-top:calc(var(--e) * 0.9);
+    display:flex;flex-direction:column;gap:calc(var(--e) * 0.45);
+    -webkit-mask-image:linear-gradient(to bottom, transparent, #000 calc(var(--e) * 1.2));
+    mask-image:linear-gradient(to bottom, transparent, #000 calc(var(--e) * 1.2));
+  }
+  .os-aidraad[hidden]{display:none;}
+  .os-bel{
+    max-width:86%;padding:calc(var(--e) * 0.5) calc(var(--e) * 0.75);
+    border-radius:calc(var(--e) * 0.85);font-size:calc(var(--e) * 0.8);line-height:1.5;
+    white-space:pre-wrap;
+  }
+  .os-bel.van-rahul{
+    align-self:flex-start;background:color-mix(in srgb, var(--card) 78%, transparent);
+    border:1px solid var(--line);border-bottom-left-radius:calc(var(--e) * 0.3);
+  }
+  .os-bel.van-mij{
+    align-self:flex-end;background:color-mix(in srgb, var(--gold) 20%, transparent);
+    border:1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+    border-bottom-right-radius:calc(var(--e) * 0.3);
+  }
+  .os-bel.denkt{opacity:0.6;font-style:italic;}
+  /* de suggesties van Rahul: tikken in plaats van typen */
+  .os-aitips{
+    flex-shrink:0;display:flex;gap:calc(var(--e) * 0.35);flex-wrap:wrap;
+    margin-top:calc(var(--e) * 0.55);
+  }
+  .os-aitips[hidden]{display:none;}
+  .os-aitips button{
+    background:none;border:1px solid var(--line);border-radius:999px;color:var(--txt);
+    font-family:'Inter',sans-serif;font-size:calc(var(--e) * 0.72);
+    padding:calc(var(--e) * 0.28) calc(var(--e) * 0.7);cursor:pointer;
+  }
+  .os-aitips button:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
+  #app.os-gast .os-aidraad,#app.os-gast .os-aitips{display:none;}
+
+  /* de balk van Rahul, onderaan */
   .os-aibalk{
     flex-shrink:0;margin-top:calc(var(--e) * 1.15);
     display:flex;align-items:center;gap:calc(var(--e) * 0.5);
@@ -1422,9 +1463,17 @@
 
           <nav class="os-grid os-functies" id="osFuncties" aria-label="Functies"></nav>
 
+          <!-- Het gesprek met Rahul, hier op het beginscherm. Hij begint zelf:
+               wat hij ziet, wat hij verwacht, of iets dat hij voor je heeft
+               geparkeerd. Je antwoordt in de balk eronder en het antwoord komt
+               hier terug; je hoeft er niet voor weg. Is er niets te zeggen, dan
+               staat hier ook niets. -->
+          <div class="os-aidraad" id="osAiDraad" role="log" aria-live="polite" aria-label="Gesprek met Rahul" hidden></div>
+          <div class="os-aitips" id="osAiTips" hidden></div>
+
           <!-- De balk van Rahul: typ wat je wilt. Is het een opdracht aan het
                OS ("open Reizen", "donker"), dan doet het OS het meteen; al het
-               andere gaat naar Rahul zelf. -->
+               andere beantwoordt Rahul in de draad hierboven. -->
           <form class="os-aibalk" id="osAiBalk" autocomplete="off">
             <span class="os-aibalk-orb" id="osAiOrb" aria-hidden="true"></span>
             <input id="osAiIn" aria-label="Vraag Rahul" placeholder="Vraag Rahul…" data-i18n-ph="os.ai.ph">
@@ -2030,6 +2079,14 @@ window.I18N = { en: {
   'os.cc.push':'Push', 'os.cc.samen':'Together', 'os.cc.rand':'Edge to edge', 'os.zoek':'Search',
   'os.cc.scan':'Scan', 'os.cc.zegel':'My Seal', 'os.cc.bo':'My back office', 'os.cc.boardroom':'Boardroom',
   'os.ai.ph':'Ask Rahul…',
+  /* het gesprek met Rahul op het beginscherm: wat hij uit zichzelf zegt */
+  'os.ai.verwacht':'I expect', 'os.ai.spar':'We were still on',
+  'os.ai.rustig':'Nothing pressing. Just say the word: I will look it up, set it up or arrange it.',
+  'os.ai.denkt':'One moment…', 'os.ai.offline':'I cannot reach it right now; start the server and ask again.',
+  'os.ai.geen':'I did not get there. Feel free to ask it differently.',
+  'os.ai.t.regel':'Arrange this', 'os.ai.t.klaar':'Set it up',
+  'os.ai.t.dag':'How does my day look?', 'os.ai.q.dag':'how does my day look',
+  'os.ai.t.kun':'What can you do?', 'os.ai.q.kun':'what can you do',
   'os.board.h':'Boardroom', 'os.board.aan':'On', 'os.board.uit':'Off', 'os.board.vast':'Always on',
   'os.board.basis':'Always on · the basics', 'os.board.telling':'features are on',
   'os.board.leeg':'Beyond the basics there is nothing to switch right now.',

@@ -115,13 +115,14 @@
   /* Rahuls signatuurmond in de balk onderaan het beginscherm. Eén gedeeld
      canvas (de mond-lus hervat vanzelf zodra hij weer in beeld is); de
      tekenlaag (shared/mond.js) laden we er zelf bij. */
-  var aiMondCv = null, aiMondBezig = false;
+  var aiMondCv = null, aiMondBezig = false, aiOrbMond = null;
   function aiMond() {
     if (!aiMondCv) {
       aiMondCv = document.createElement('canvas');
       aiMondCv.width = 440; aiMondCv.height = 200;
       aiMondCv.className = 'os-ai-mond'; aiMondCv.setAttribute('aria-hidden', 'true');
-      var mount = function () { if (window.RTGMond) RTGMond.maak(aiMondCv); };
+      // de handle bewaren: als Rahul in de draad iets zegt, beweegt de mond mee
+      var mount = function () { if (window.RTGMond) aiOrbMond = RTGMond.maak(aiMondCv); };
       if (window.RTGMond) mount();
       else if (!aiMondBezig) {
         aiMondBezig = true;

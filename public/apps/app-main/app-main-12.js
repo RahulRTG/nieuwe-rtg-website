@@ -60,6 +60,8 @@
     // van Rahul, want allebei zijn ze voor leden
     document.getElementById('app').classList.toggle('os-gast', guest);
     renderHome();
+    // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
+    if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent();
     if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); renderFluister(); }
     renderSalon();
     renderTerPlaatse();

@@ -95,11 +95,12 @@
     aiBalk.addEventListener('submit', e => {
       e.preventDefault();
       const vraag = aiIn.value.trim();
-      if (!vraag) { vraagRahul(''); return; } // lege balk: gewoon Rahul openen
+      if (!vraag) { vraagRahul(''); return; } // lege balk: zijn hele app openen
       aiIn.value = '';
-      aiIn.blur();
       if (osCommando(vraag)) return; // het OS kon het zelf; blijf thuis
-      vraagRahul(vraag);
+      /* En anders antwoordt hij HIER, in de draad boven de balk. Je blijft dus
+         op het beginscherm; wie het hele gesprek wil ziet dat in zijn app. */
+      osRahulVraag(vraag);
     });
     // een tik op de mond opent Rahul zonder dat je iets hoeft te typen
     if (aiOrb) {

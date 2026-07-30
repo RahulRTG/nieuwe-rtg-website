@@ -260,12 +260,12 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
 
     /* Naar het AI/concierge-scherm en een bericht met een XSS-payload sturen.
 
-       De weg erheen is de balk van Rahul onderaan het beginscherm: typ iets,
-       verstuur, en zijn app opent met de vraag erin. Precies wat een gebruiker
-       doet. (De oude tabbalk bestaat nog als model, maar is onzichtbaar; daar
-       klikken loopt vast op een timeout.) */
-    await page.fill('#osAiIn', 'hallo');
-    await page.evaluate(() => document.getElementById('osAiBalk').requestSubmit());
+       De weg erheen is een tik op Rahuls mond in de balk onderaan het
+       beginscherm: dan opent zijn hele app. Typen in de balk zelf doet iets
+       anders sinds die balk een gesprek werd -- dan antwoordt hij daar, op het
+       beginscherm, en blijf je thuis. (De oude tabbalk bestaat nog als model,
+       maar is onzichtbaar; daar klikken loopt vast op een timeout.) */
+    await page.click('#osAiOrb');
     await page.waitForSelector('#askInput', { state: 'visible', timeout: 10000 });
     const payload = '<img src=x onerror="window.__xss=1">';
     await page.fill('#askInput', payload);
@@ -278,6 +278,56 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     assert.ok(!(await page.evaluate(() => window.__xss)), 'er is geen script uitgevoerd');
     assert.match(await page.textContent('#chat'), /onerror/, 'het bericht staat leesbaar als tekst');
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  /* De balk onderaan was een doorgeefluik naar zijn app; nu is het een gesprek
+     dat op het beginscherm staat. Twee dingen die echt moeten kloppen: hij
+     BEGINT uit zichzelf (anders is hij niet proactief, alleen aanwezig), en een
+     antwoord komt daar terug zonder dat je van het beginscherm af gaat. En wat
+     in de draad komt is TEKST -- ook als er html-achtigs in staat. */
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const reg = await api(base, '/api/auth/register', { name: 'Thuis Lid', email: 'thuis@x.nl', phone: '0612345004',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
+    assert.ok(reg.token, 'lid-registratie geeft een token');
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    await page.route('**/api/onboarding/status', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
+    await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
+    await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
+    await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
+
+    // 1. hij begint uit zichzelf: er staat een zin van Rahul in de draad
+    await page.waitForSelector('#osAiDraad .os-bel.van-rahul', { timeout: 10000 });
+    const opening = await page.textContent('#osAiDraad .os-bel.van-rahul');
+    assert.ok(opening && opening.trim().length > 5, 'Rahul opent met een zin: ' + opening);
+
+    // 2. een vraag wordt daar beantwoord, en we blijven op het beginscherm
+    await page.fill('#osAiIn', '<b>wat kun je</b>');
+    await page.evaluate(() => document.getElementById('osAiBalk').requestSubmit());
+    await page.waitForSelector('#osAiDraad .os-bel.van-mij', { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelectorAll('#osAiDraad .os-bel.van-rahul').length >= 2, null, { timeout: 15000 });
+    assert.equal(await page.evaluate(() => document.querySelector('.view.active').dataset.view), 'home',
+      'we zijn niet weggenavigeerd; het antwoord komt op het beginscherm');
+
+    // 3. wat er staat is tekst, geen opmaak die is uitgevoerd
+    assert.equal(await page.evaluate(() => document.querySelectorAll('#osAiDraad b').length), 0,
+      'de <b> uit het bericht is niet als opmaak uitgevoerd');
+    assert.match(await page.textContent('#osAiDraad .os-bel.van-mij'), /<b>/, 'hij staat leesbaar als tekst');
+
+    assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het gesprek');
   } finally {
     if (browser) await browser.close();
     stop(child);

@@ -14,7 +14,7 @@
       enabled: (typeof location !== 'undefined') && (location.protocol === 'http:' || location.protocol === 'https:'),
       token: null,
       get live() { return this.enabled && !!this.token; },
-      async call(pad, body) {
+      async call(pad, body, herkans) {
         var headers = { 'Content-Type': 'application/json' };
         if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
         var lang = (w.RTGi18n ? w.RTGi18n.lang : 'nl');
@@ -23,6 +23,18 @@
           body: JSON.stringify(Object.assign({ lang: lang }, body || {}))
         });
         var data = await res.json().catch(function () { return {}; });
+        /* De gegevenspoort (428): de server houdt een handeling met een derde
+           partij tegen omdat er nog iets nodig is. Dat hoort hier af te lopen en
+           niet bij de aanroeper, want anders moet elk scherm het los onthouden.
+           Rahul vraagt het, en daarna doen we gewoon wat er gevraagd was. Een
+           herkansing krijgt geen tweede: anders kan dit blijven rondlopen. */
+        var self = this;
+        if (!herkans && w.RTGPoort) {
+          var p = w.RTGPoort.vang(data, res.status,
+            function () { return self.call(pad, body, true); },
+            function (q, b) { return self.call(String(q).replace(/^\/api/, ''), b); });
+          if (p) return p;
+        }
         // de HTTP-status gaat mee op de fout, zodat aanroepers erop kunnen sturen.
         if (!res.ok) throw Object.assign(new Error(data.error || foutTekst), { status: res.status, data: data });
         return data;

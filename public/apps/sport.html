@@ -54,6 +54,7 @@
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/poortgesprek.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
@@ -75,7 +76,11 @@ const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
-const api=(pad,body)=>fetch('/api/member/sport'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
+const api=(pad,body,herkans)=>fetch('/api/member/sport'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));
+  // 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door
+  const p=herkans?null:(window.RTGPoort&&window.RTGPoort.vang(d,r.status,()=>api(pad,body,true),(q,b)=>fetch(q,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(b||{})}).then(x=>x.json())));
+  if(p)return p;
+  if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
 const eur=c=>'€ '+(Number(c||0)/100).toFixed(2);
 let TAB='bord', CLUB='FCRTG', VAK=null;
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x===b)); laad(); });

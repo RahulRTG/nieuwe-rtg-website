@@ -57,6 +57,7 @@
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/poortgesprek.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
@@ -93,10 +94,15 @@ const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-const api = (pad, body) => fetch(pad, {
+const api = (pad, body, herkans) => fetch(pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
   body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  // 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door
+  const p = herkans ? null : (window.RTGPoort && window.RTGPoort.vang(d, r.status, () => api(pad, body, true), api));
+  if (p) return p;
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+

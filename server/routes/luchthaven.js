@@ -6,7 +6,7 @@
    Operationele routes achter supplierAuth + type luchthaven; ledenroutes
    achter de gewone sessie-auth. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, liveCodename, lucht } = kern;
+  const { app, auth, supplierAuth, liveCodename, lucht, gegevensStop } = kern;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   function poort(req, res, next) {
     if (!lucht.isLucht(req.supplier)) return res.status(403).json({ error: 'Alleen voor het luchthavenpersoneel.' });
@@ -63,9 +63,9 @@ module.exports = (kern) => {
     return true;
   };
   app.post('/api/member/vluchten/bord', auth, (req, res) => res.json(lucht.bord(req.body || {})));
-  app.post('/api/member/vluchten/boek', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, lucht.boek(req.session, liveCodename(req.session), String(req.body.id || ''), req.body || {})); });
+  app.post('/api/member/vluchten/boek', auth, (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'reservering')) return; stuur(res, lucht.boek(req.session, liveCodename(req.session), String(req.body.id || ''), req.body || {})); });
   app.post('/api/member/vluchten/incheck', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, lucht.incheck(req.session, String(req.body.code || ''), req.body || {})); });
   app.post('/api/member/vluchten/mijn', auth, (req, res) => res.json(lucht.mijn(req.session.key)));
   // een charter aanvragen (privejet of helikopter); operations bevestigt of wijst af
-  app.post('/api/member/vluchten/charter', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, lucht.charterVraag(req.session, liveCodename(req.session), req.body || {})); });
+  app.post('/api/member/vluchten/charter', auth, (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'reservering')) return; stuur(res, lucht.charterVraag(req.session, liveCodename(req.session), req.body || {})); });
 };

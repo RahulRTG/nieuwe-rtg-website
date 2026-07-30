@@ -79,10 +79,14 @@ function maakGegevenspoort({ accounts, getMemberState }) {
     if (!mist.length) return null;
     const wat = mist.map(m => m.label);
     const zin = wat.length === 1 ? wat[0] : wat.slice(0, -1).join(', ') + ' en ' + wat[wat.length - 1];
+    /* `soort` gaat mee terug, want de app moet hiermee het gesprek kunnen
+       openen (/api/gegevens/start vraagt erom). Zonder dat zou het antwoord wel
+       zeggen WAT er mist maar niet waarvoor, en dan blijft "dat vraag ik even"
+       een loze belofte. */
     return {
       status: 428,
       error: 'Hiervoor heb ik nog ' + zin + ' nodig; dat vraag ik even.',
-      ontbreekt: mist
+      soort: String(soort || ''), ontbreekt: mist
     };
   }
 
@@ -94,7 +98,7 @@ function maakGegevenspoort({ accounts, getMemberState }) {
   function stop(req, res, soort) {
     const p = poort(req.session, soort);
     if (!p) return false;
-    res.status(p.status).json({ error: p.error, ontbreekt: p.ontbreekt });
+    res.status(p.status).json({ error: p.error, soort: p.soort, ontbreekt: p.ontbreekt });
     return true;
   }
 

@@ -7,9 +7,32 @@ module.exports = (ctx) => {
   const { db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
-    rahulExtra, voerReisUit, voerKledingUit } = ctx;
+    rahulExtra, voerReisUit, voerKledingUit, gegevensNodig } = ctx;
+
+  /* De gegevenspoort geldt ook hier. Rahul doet dit met exact dezelfde functies
+     als de app-knoppen, maar hij komt NIET langs de routes -- en daar zit de
+     poort. Zonder deze regel zou hij als enige om de afspraak heen kunnen: een
+     bestelling bij een zaak plaatsen van een lid dat niemand kan bereiken.
+     Wat een handeling nodig heeft, staat in kern/gegevenspoort.js. */
+  const POORT_SOORT = {
+    bestelling: 'bestelling', ticket: 'reservering', behandeling: 'reservering',
+    rit: 'reservering', reisplan: 'reservering'
+  };
+  function poortStopt(w, sess) {
+    const soort = POORT_SOORT[w && w.soort];
+    if (!soort || !sess || !gegevensNodig) return null;
+    const mist = gegevensNodig(sess, soort);
+    if (!mist.length) return null;
+    /* Eerlijk blijven over het kanaal: hier kan hij het niet zelf uitvragen, dus
+       belooft hij dat ook niet. Hij zegt wat er nodig is, waarom, en waar het
+       wel gevraagd wordt -- in de app opent het gesprek vanzelf. */
+    return { tekst: 'Dat kan ik nog niet afronden: hiervoor heb ik ' + mist.map(m => m.label).join(' en ') +
+      ' nodig. ' + mist[0].waarom + ' Doe het in de app, dan vraag ik het u daar meteen en gaat dit gewoon door.' };
+  }
 
   async function voerUit(key, codenaam, w, sess) {
+    const tegen = poortStopt(w, sess);
+    if (tegen) return tegen;
     // bestellen: plaatsen en direct afrekenen via exact dezelfde functies
     // als de app-knoppen (ledenprijs, 86, leeftijd, zorgprofiel incluis)
     if (w.soort === 'bestelling' && sess && acties && acties.plaatsOrder) {

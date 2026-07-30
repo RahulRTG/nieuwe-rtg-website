@@ -4,7 +4,7 @@
    gewone leden-inlog, boeken alleen voor echte leden. Kopen valt onder de
    geldremmen van het AI-stuur (het pad eindigt op /koop). */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, liveCodename, synergie, sseToOffice } = kern;
+  const { app, auth, supplierAuth, liveCodename, synergie, sseToOffice, gegevensStop } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
   app.post('/api/supplier/synergie', supplierAuth, (req, res) => {
@@ -25,6 +25,8 @@ module.exports = (kern) => {
   });
   app.post('/api/pakket/koop', auth, async (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Pakketten boeken is voor leden.' });
+    // een pakket betaalt uit aan partners: die moeten het lid kunnen bereiken
+    if (gegevensStop(req, res, 'bestelling')) return;
     const r = await synergie.pakketKoop(liveCodename(req.session), String(req.body.id || ''), req.body.idem);
     if (r.ok && sseToOffice) sseToOffice('sync', { scope: 'pay' });
     stuur(res, r);

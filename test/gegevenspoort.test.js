@@ -125,7 +125,12 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
       ['/api/mall/bestel', {}],
       ['/api/reisbureau/boek', {}],
       ['/api/groothandel/bestel', {}],
-      ['/api/mode/bezorg/aanvraag', { supplierCode: 'KIKUNOI', items: [] }]
+      ['/api/mode/bezorg/aanvraag', { supplierCode: 'KIKUNOI', items: [] }],
+      // en de paden BUITEN routes/member, die er eerst allemaal langs gleden
+      ['/api/member/vluchten/boek', { id: 'x' }],
+      ['/api/member/sport/ticket/koop', { club: 'FCRTG' }],
+      ['/api/thuis/boek', { id: 'x' }],
+      ['/api/pakket/koop', { id: 'x' }]
     ];
     for (const [pad, lijf] of paden) {
       const r = await api(base, pad, lijf, vt);
@@ -142,5 +147,38 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
     const s4 = await api(base, '/api/gegevens/start', { soort: 'bestelling' }, ander.body.token);
     const gestolen = await api(base, '/api/gegevens/zeg', { id: s4.body.id, tekst: '0611111111' }, token);
     assert.equal(gestolen.status, 403, 'je kunt niet in het gesprek van een ander praten');
+  } finally { stop(child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
+});
+
+/* En Rahul zelf. Hij doet zijn acties met exact dezelfde functies als de
+   app-knoppen, maar hij komt NIET langs de routes -- en daar zit de poort. Dat
+   maakte hem de enige die er ongemerkt langs kon: een tafel op naam van een lid
+   dat de zaak niet kan bereiken. Deze test rekent dat af aan de voorkant, via
+   /api/fluister, precies zoals een lid het zou vragen. */
+test('ook Rahul komt niet om de gegevenspoort heen', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gpr-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const reg = await api(base, '/api/auth/register', {
+      name: 'Ria Rahul', email: 'rahulpoort@voorbeeld.test', password: 'rahulgeheim12',
+      geboortedatum: '1987-07-07', tier: 'rtg', pasApp: 'rtg'
+    });
+    const token = reg.body.token;
+    const zaak = (await api(base, '/api/suppliers', {}, token)).body.suppliers.find(s => s.type === 'restaurant');
+    assert.ok(zaak, 'er is een restaurant om bij te reserveren');
+
+    const vraag = 'reserveer bij ' + zaak.name + ' morgen om 20:00 met 2 personen';
+    const zonder = await api(base, '/api/fluister', { q: vraag }, token);
+    assert.equal(zonder.status, 200);
+    assert.match(zonder.body.antwoord, /telefoonnummer/i, 'hij zegt wat hij nodig heeft');
+    assert.doesNotMatch(zonder.body.antwoord, /aangevraagd/i, 'en reserveert dus NIET');
+    const res1 = await api(base, '/api/reserveringen/mijn', {}, token);
+    assert.equal((res1.body.reserveringen || []).length, 0, 'er staat echt niets in de boeken');
+
+    // het nummer geven via het gesprek, en dan doet hij het gewoon
+    const start = await api(base, '/api/gegevens/start', { soort: 'reservering' }, token);
+    await api(base, '/api/gegevens/zeg', { id: start.body.id, tekst: '0612345678' }, token);
+    const met = await api(base, '/api/fluister', { q: vraag }, token);
+    assert.match(met.body.antwoord, /aangevraagd/i, 'met het nummer erbij reserveert hij wel: ' + met.body.antwoord);
   } finally { stop(child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
 });

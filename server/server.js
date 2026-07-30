@@ -2684,7 +2684,11 @@ Object.assign(kern, require('./kern/fluister')({
   // de reislaag van Rahul: een hele reis op een vraag, kleding apart
   // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen
   verblijfBoek: (session, body) => kern.verblijfBoek(session, liveCodename(session), body),
-  retailLegApart: legApart, retailKlantProfiel: klantProfiel
+  retailLegApart: legApart, retailKlantProfiel: klantProfiel,
+  /* De gegevenspoort komt verderop pas op de kern, dus we pakken hem hier laat
+     op. Rahul doet zijn acties buiten de routes om en zou anders de enige zijn
+     die er ongemerkt langs kan. */
+  gegevensNodig: (sessie, soort) => (kern.gegevensNodig ? kern.gegevensNodig(sessie, soort) : [])
 }));
 // nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
 // elk half uur, bouwt een index (een datapass voor alle gebruikers) en

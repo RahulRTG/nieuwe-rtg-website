@@ -3,7 +3,7 @@
    reviewen en berichten zijn voor leden (op codenaam -- privacy by design).
    De kern woont in kern/thuis/. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, thuis } = kern;
+  const { app, auth, liveCodename, thuis, gegevensStop } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const gast = (req, res) => { if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Thuis boeken en hosten is voor leden.' }); return true; } return false; };
   const cn = req => liveCodename(req.session);
@@ -15,7 +15,7 @@ module.exports = (kern) => {
   app.post('/api/thuis/typen', auth, (req, res) => res.json(thuis.thuisTypes()));
 
   // gast (lid): boeken, annuleren, check-in/uit, mijn reizen, wenslijst
-  app.post('/api/thuis/boek', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisBoek(cn(req), req.body || {})); });
+  app.post('/api/thuis/boek', auth, (req, res) => { if (gast(req, res)) return; if (gegevensStop(req, res, 'reservering')) return; stuur(res, thuis.thuisBoek(cn(req), req.body || {})); });
   app.post('/api/thuis/annuleer', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisAnnuleer(cn(req), req.body.ref)); });
   app.post('/api/thuis/checkin', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisCheckin(cn(req), req.body.ref)); });
   app.post('/api/thuis/checkuit', auth, (req, res) => { if (gast(req, res)) return; stuur(res, thuis.thuisCheckuit(cn(req), req.body.ref)); });

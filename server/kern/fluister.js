@@ -34,7 +34,7 @@
    object (het 24-uursblok) wordt eerst een voorstel dat u bevestigt met
    "ja" (of afblaast met "nee"). Een tafelreservering blijft direct:
    gratis en altijd annuleerbaar. */
-module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering, assetGebruik, zorgVoor, pay, acties, verblijfBoek, retailLegApart, retailKlantProfiel }) => {
+module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering, assetGebruik, zorgVoor, pay, acties, verblijfBoek, retailLegApart, retailKlantProfiel, gegevensNodig }) => {
   /* De acties-registry: vermogens die pas na deze module op de kern komen
      (bestellen, tickets, ritten worden in routes/member.js geregistreerd,
      want daar wonen die regels). Het contract: elke actie is een functie
@@ -146,7 +146,8 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
-    rahulExtra, voerReisUit, voerKledingUit, sparHouding: sparren.sparHouding, sparParkeer: sparren.parkeer });
+    rahulExtra, voerReisUit, voerKledingUit, sparHouding: sparren.sparHouding, sparParkeer: sparren.parkeer,
+    gegevensNodig });
 
   return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle,
     sparParkeer: sparren.parkeer, sparLijst: sparren.lijst, sparStatus: sparren.status,

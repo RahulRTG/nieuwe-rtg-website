@@ -497,21 +497,41 @@ console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.ra
    telefoonnummer hebben -- of erger: dan vraagt een nieuw pad wel alles vast,
    "voor de zekerheid", en is de belofte weg.
 
-   Daarom kijkt de keuring mee. Elke leden-route (server/routes/member/**) die in
+   Daarom kijkt de keuring mee. Elke route achter de leden-poort (`auth`) die in
    zijn pad een handeling met een derde noemt -- bestellen, boeken, reserveren,
    bezorgen, huren, kopen -- heeft die regel, of staat hieronder met naam en
    reden. De namenlijst is het punt: een NIEUW pad staat er per definitie niet in
    en valt dus op, en wie er een in zet, zet zijn reden erbij.
 
+   De scan kijkt naar HEEL server/routes, niet alleen naar routes/member. Dat is
+   met schade geleerd: vluchten boeken, een clubticket kopen en een verblijf
+   boeken staan in luchthaven.js, sportclub.js en thuis.js, en die gleden er
+   allemaal langs toen de regel alleen naar routes/member keek.
+
    Uitgezonderd is niet hetzelfde als vergeten: kijken kost niets, en een
    vervolgstap binnen iets wat al loopt (de deur van je eigen hotelkamer, een
-   foto bij de huurauto die voor je klaarstaat) vraagt niet opnieuw. */
+   foto bij de huurauto die voor je klaarstaat) vraagt niet opnieuw.
+
+   En de regel leest namen, dus hij ziet wat er als een handeling KLINKT. Twee
+   kanten daarvan staan hieronder: /api/boeken/* is de bibliotheek (boeken zijn
+   daar dingen met bladzijden) en gaat op de prefix-lijst, en omgekeerd zegt
+   /api/member/vluchten/charter niets over bestellen of boeken terwijl er wel
+   degelijk een derde partij aan te pas komt -- die heeft zijn poort omdat een
+   mens ernaar keek. Een namenlijst haalt de vergeetachtigheid eruit, niet het
+   nadenken. */
 console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoort');
 {
   const DERDE = /bestel|order|reserve|boek|booking|bezorg|leveri|koerier|courier|afhaal|ophaal|verblijf|proefrit|koop|huur|ticket|vervoer|taxi|\brit\b/i;
   // alleen kijken/opvragen: geen handeling, dus niets te vragen
   const KIJKEN = /\/(mijn|mine|status|volg|slots|annuleer|betaal|pay|partners|overzicht|lijst|list|historie|history|zoek|markt|advies|check|info)\b/i;
+  /* Hele domeinen waar het woord toevallig valt maar geen derde partij staat:
+     de bibliotheek (boeken = boeken) en de eigen bank. */
+  const NIET_DERDE = [
+    ['/api/boeken/', 'de RTG-bibliotheek: "boeken" zijn hier dingen met bladzijden'],
+    ['/api/bank/', 'de eigen bank van RTG; een overboeking gaat niet langs een derde']
+  ];
   const MAG_ZONDER = new Map([
+    ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verhuur/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verkoop/showroom', 'de showroom bekijken; er gebeurt nog niets'],
@@ -523,12 +543,16 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover']
   ]);
   let gaten = 0, poorten = 0;
-  loop(path.join(ROOT, 'server/routes/member'), /\.js$/, f => {
+  loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');
     const bron = fs.readFileSync(f, 'utf8');
-    for (const m of bron.matchAll(/app\.post\('(\/api\/[^']+)'/g)) {
+    for (const m of bron.matchAll(/app\.post\('(\/api\/[^']+)'([^\n]*)/g)) {
       const pad = m[1];
       if (!DERDE.test(pad) || KIJKEN.test(pad)) continue;
+      // alleen de leden-poort: achter supplierAuth/officeAuth zit een zaak of
+      // RTG-personeel, en daar is de handeling zelf al van de derde partij.
+      if (!/,\s*auth\s*[,)]/.test(m[2])) continue;
+      if (NIET_DERDE.some(([p]) => pad.startsWith(p))) continue;
       if (MAG_ZONDER.has(pad)) continue;
       // de body loopt tot de volgende route in hetzelfde bestand
       const volgende = bron.indexOf("app.post('", m.index + 5);
@@ -560,6 +584,73 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     }
   });
   if (!onbekend) ok('elke soort die een route noemt staat in NODIG (' + Object.keys(NODIG).join(', ') + ')');
+}
+
+/* 17) een scherm dat door de poort kan, kan het gesprek ook voeren.
+
+   Regel 16 bewaakt de serverkant: een handeling met een derde partij wordt
+   tegengehouden met 428 en zegt wat er mist. Dat is de halve belofte. De andere
+   helft staat in de app: Rahul vraagt het in beeld en daarna gaat de handeling
+   vanzelf door (public/shared/poortgesprek.js).
+
+   Zonder die module gebeurt er iets ergers dan een foutmelding: het lid krijgt
+   "dat vraag ik even" te zien en er wordt vervolgens niets gevraagd. Een melding
+   die liegt is slechter dan een die dat niet doet, en dat is precies wat er hier
+   stond -- de poort was er wel, het gesprek nergens.
+
+   Dus: kan een pagina bij een pad dat achter de poort staat, dan laadt ze de
+   module. De lijst met poortpaden komt uit de code zelf (elke route met
+   gegevensStop), niet uit een lijst hier -- zo blijft de keuring vanzelf gelijk
+   lopen met wat er echt achter de poort staat. */
+console.log('\n17) een scherm dat door de poort kan, kan het gesprek ook voeren');
+{
+  // welke paden staan achter de poort? uit de routes zelf halen.
+  const poortPaden = new Set();
+  loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const m of bron.matchAll(/app\.post\('(\/api\/[^']+)'/g)) {
+      const volgende = bron.indexOf("app.post('", m.index + 5);
+      const body = bron.slice(m.index, volgende < 0 ? bron.length : volgende);
+      if (/gegevensStop\s*\(/.test(body)) poortPaden.add(m[1]);
+    }
+  });
+  /* De client noemt een pad soms zonder /api-prefix (API.call('/order')), dus we
+     zoeken op beide vormen -- als quoted string, zodat '/order' niet matcht op
+     een los woord in een zin. */
+  const vormen = [...poortPaden].flatMap(p => ["'" + p + "'", "'" + p.replace(/^\/api/, '') + "'"]);
+  const raakt = (bron) => vormen.some(v => bron.includes(v));
+
+  const { bundels } = require('./bundel');
+  const delenVan = new Map();      // 'apps/app-main.js' -> ['apps/app-main/app-main-01.js', ...]
+  for (const [bundel, map] of Object.entries(bundels)) {
+    const dir = path.join(ROOT, 'public', map);
+    if (!fs.existsSync(dir)) continue;
+    delenVan.set(bundel, fs.readdirSync(dir).filter(n => n.endsWith('.js')).sort().map(n => map + '/' + n));
+  }
+
+  let mist = 0, gedekt = 0;
+  loop(path.join(ROOT, 'public'), /\.html$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    const bron = fs.readFileSync(f, 'utf8');
+    const map = path.posix.dirname(rel.replace(/^public\//, ''));
+    // alles wat deze pagina bereikt: zijzelf, haar scripts, en de delen van een bundel
+    const bereik = [bron];
+    for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) {
+      const src = m[1].split('?')[0];
+      const doel = src.startsWith('/') ? src.slice(1) : path.posix.normalize(path.posix.join(map, src));
+      for (const p of [doel, ...(delenVan.get(doel) || [])]) {
+        const vol = path.join(ROOT, 'public', p);
+        if (fs.existsSync(vol)) { try { bereik.push(fs.readFileSync(vol, 'utf8')); } catch (e) {} }
+      }
+    }
+    if (!bereik.some(raakt)) return;
+    if (/<script[^>]*\ssrc="\/shared\/poortgesprek\.js"/.test(bron)) { gedekt++; return; }
+    mist++;
+    fout('poortpad zonder gegevensgesprek: ' + rel +
+      ' -- deze pagina kan een 428 krijgen; laad /shared/poortgesprek.js erbij');
+  });
+  if (!mist) ok(gedekt + ' pagina\'s die achter de poort kunnen komen laden het gesprek (' + poortPaden.size + ' poortpaden)');
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

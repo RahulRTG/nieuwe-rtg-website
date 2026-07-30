@@ -74,6 +74,13 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
   await post('/api/favoriet', { code: 'DEMO', aan: true }, token);
   await post('/api/agenda/voeg', { titel: 'afspraak', wanneer: '2026-09-01T10:00' }, token);
   await post('/api/live/deel', { lat: 52.1, lon: 4.3 }, token);
+  /* En praten met Rahul. Dat stond hier niet, en juist daarom bleef zijn
+     geheugen na het verwijderen gewoon staan: de bezem hieronder veegt door de
+     hele database, maar een tak die nooit is aangemaakt kan hij niet vinden.
+     Wat er in staat is precies wat art. 17 bedoelt -- de weetjes die het lid
+     zelf deelde en de laatste beurten van het gesprek. */
+  await post('/api/fluister', { q: 'plan mijn dag' }, token);
+  await post('/api/fluister', { q: 'onthoud dat ik graag bij het raam zit' }, token);
   await wacht(400); // de opslag even laten landen
 });
 

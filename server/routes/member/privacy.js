@@ -72,6 +72,19 @@ module.exports = (kern) => {
     }
     // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
     if (db.data.notifications[key]) db.data.notifications[key] = [];
+    /* En wat Rahul van u weet. Dit stond hier niet, en dat viel niemand op: de
+       bezem in test/vergeten.test.js veegt wel door de hele database, maar het
+       proeflid praatte nooit met Rahul, dus die tak werd nooit aangemaakt.
+       Wat er in staat is precies het soort ding waarvoor art. 17 bestaat: de
+       weetjes die u zelf deelde, de laatste beurten van uw gesprek en waar u
+       het meest mee werkt. "vergeet alles" in de chat wiste het al; verwijderen
+       hoort minstens net zo grondig te zijn als dat. */
+    if (db.data.fluister) delete db.data.fluister[key];
+    /* En de respect-teller van de pestgrens. Die stond er om dezelfde reden nog:
+       niemand had het proeflid ooit met Rahul laten praten. Het is een kleine
+       tak (drie getallen), maar hij hangt aan de sleutel, en juist die sleutel
+       is wat een verwijderd lid weer vindbaar maakt. */
+    if (db.data.rahulRespect) delete db.data.rahulRespect[key];
     /* Uit de ledengids. Dit is de laatste plek waar de sleutel aan de codenaam
        vastzit; bleef hij staan, dan was het lid na "verwijderen" nog gewoon op
        codenaam te vinden en te bellen -- en dan is verwijderd een halve

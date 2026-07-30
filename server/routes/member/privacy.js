@@ -7,7 +7,7 @@ const inzagelog = require('../../inzagelog');
 
 module.exports = (kern) => {
   const { app, auth, db, save, stateFor, myApplications, ordersVanKlant, accounts,
-    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg } = kern;
+    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg, liveCodename } = kern;
 
   app.post('/api/privacy/export', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -79,12 +79,46 @@ module.exports = (kern) => {
        weetjes die u zelf deelde, de laatste beurten van uw gesprek en waar u
        het meest mee werkt. "vergeet alles" in de chat wiste het al; verwijderen
        hoort minstens net zo grondig te zijn als dat. */
-    if (db.data.fluister) delete db.data.fluister[key];
-    /* En de respect-teller van de pestgrens. Die stond er om dezelfde reden nog:
-       niemand had het proeflid ooit met Rahul laten praten. Het is een kleine
-       tak (drie getallen), maar hij hangt aan de sleutel, en juist die sleutel
-       is wat een verwijderd lid weer vindbaar maakt. */
-    if (db.data.rahulRespect) delete db.data.rahulRespect[key];
+    /* Alles wat rechtstreeks onder de sleutel van dit lid staat. Als lijst, niet
+       als losse regels: zo is in een oogopslag te zien welke takken meegaan, en
+       is er een plek om er een bij te zetten. Elke naam hier is een tak die
+       ALLEEN over dit lid gaat -- zijn voorkeuren, zijn spullen, zijn geheugen.
+       De bezem in test/vergeten.test.js bewaakt dat de lijst compleet blijft. */
+    for (const tak of [
+      'fluister',           // wat Rahul van u weet: weetjes, gesprek, gebruik
+      'rahulRespect',       // de teller van de pestgrens
+      'favorieten',         // uw adressen
+      'zorgProfielen',      // allergieen en dieet: bijzondere persoonsgegevens
+      'memberTaal',         // uw taalkeuze
+      'wallet',             // uw passen, tickets en sleutels
+      'punten',             // uw spaarsaldo (zonder account niet meer te besteden)
+      'appInstallaties', 'reisInstallaties', 'rijksInstallaties',  // wat u installeerde
+      'clipsVolg',          // wie u volgt
+      'lifestyle',          // uw rechterhand-voorkeuren
+      'ontmoetVoorkeur', 'ontmoetPosities',   // Salon-ontmoetingen en uw positie daarin
+      'accountRollen'       // uw koppelingen aan werkplekken
+    ]) { if (db.data[tak]) delete db.data[tak][key]; }
+    /* De bel van de zaak. Daar staat na een bestelling of een cadeaukaart een
+       regel als "<codenaam> kocht ...", en die codenaam is precies waarmee dit
+       lid weer terug te vinden is. De zaak mag haar eigen administratie houden,
+       dus we halen de regel niet weg maar de PERSOON eruit -- net zoals dat
+       hierboven met sollicitaties gebeurt. */
+    const cn = (function () { try { return liveCodename && liveCodename(req.session); } catch (e) { return null; } })();
+    /* Cadeaukaarten zijn een geval apart: daar zit geld in dat de zaak nog moet
+       honoreren, dus die vernietigen zou iets weggooien wat niet van ons is. De
+       kaart blijft dus geldig; alleen de KOPER verdwijnt eruit. */
+    for (const g of db.data.giftcards || []) {
+      if (g.customerKey === key) { g.customerKey = null; g.kocht = '(verwijderd)'; }
+    }
+    if (cn && db.data.supplierNotifications) {
+      for (const lijst of Object.values(db.data.supplierNotifications)) {
+        for (const n of lijst || []) {
+          for (const veld of ['title', 'body']) {
+            if (typeof n[veld] === 'string' && n[veld].includes(cn)) n[veld] = n[veld].split(cn).join('(verwijderd)');
+          }
+        }
+      }
+    }
     /* Uit de ledengids. Dit is de laatste plek waar de sleutel aan de codenaam
        vastzit; bleef hij staan, dan was het lid na "verwijderen" nog gewoon op
        codenaam te vinden en te bellen -- en dan is verwijderd een halve

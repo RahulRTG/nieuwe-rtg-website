@@ -109,15 +109,12 @@ fn unpad_klaar(padded: &[u8]) -> Option<Vec<u8>> {
 }
 
 /* Niet-omkeerbare vingerafdruk van de ACTIEVE sleutel voor de status (nooit de
-   sleutel zelf). Een simpele, niet-cryptografische mix -- genoeg om "dezelfde
-   sleutel?" te zien zonder iets te lekken. */
-fn vingerafdruk(sleutel: &[u8]) -> String {
-    let mut h: u64 = 0xcbf29ce484222325;
-    for &b in sleutel {
-        h ^= b as u64;
-        h = h.wrapping_mul(0x100000001b3);
-    }
-    format!("{:016x}", h)
+   sleutel zelf). Dit gaat via aead::sleutel_afdruk (een ChaCha20-blok onder een
+   vaste nonce), niet via een FNV-mix: de afdruk staat in /api/kluis/status en in
+   het opstartlog, dus hij moet echt niets over de sleutel prijsgeven. Genoeg om
+   "draaien we nog op dezelfde sleutel?" te zien. */
+fn vingerafdruk(sleutel: &[u8; SLEUTEL_LEN]) -> String {
+    naar_hex(&aead::sleutel_afdruk(sleutel))
 }
 
 /* Schrijf de keyring atomair naar schijf: alle sleutels als hex, één per regel,
@@ -164,8 +161,14 @@ fn schrijf_keyring(pad: &Path, sleutels: &[[u8; SLEUTEL_LEN]], generatie: u64) -
    Onherkenbare regels worden overgeslagen; als er geen enkele geldige sleutel is
    maken we een verse keyring. */
 fn laad_of_maak_keyring(pad: &Path) -> io::Result<(Vec<[u8; SLEUTEL_LEN]>, u64)> {
+    /* De keyring krijgt direct zijn maximale capaciteit. Dat is geen
+       micro-optimalisatie maar hygiene: zou de Vec later hergroeien (bij
+       `roteer_sleutel`), dan kopieert hij zijn inhoud naar een nieuwe buffer en
+       geeft de OUDE ongewist vrij -- met alle sleutels er nog in. Drop wist
+       alleen de buffer die de Vec op dat moment vasthoudt. Met de capaciteit
+       vooraf gebeurt die hergroei nooit. 255 x 32 byte is 8 KB, verwaarloosbaar. */
     if let Ok(tekst) = fs::read_to_string(pad) {
-        let mut ring = Vec::new();
+        let mut ring = Vec::with_capacity(MAX_SLEUTELS);
         let mut generatie: u64 = 0;
         for regel in tekst.lines() {
             let regel = regel.trim();
@@ -177,7 +180,7 @@ fn laad_of_maak_keyring(pad: &Path) -> io::Result<(Vec<[u8; SLEUTEL_LEN]>, u64)>
                 continue;
             }
             if let Some(b) = van_hex(regel) {
-                if b.len() == SLEUTEL_LEN {
+                if b.len() == SLEUTEL_LEN && ring.len() < MAX_SLEUTELS {
                     let mut k = [0u8; SLEUTEL_LEN];
                     k.copy_from_slice(&b);
                     ring.push(k);
@@ -190,7 +193,8 @@ fn laad_of_maak_keyring(pad: &Path) -> io::Result<(Vec<[u8; SLEUTEL_LEN]>, u64)>
     }
     let mut k = [0u8; SLEUTEL_LEN];
     aead::os_random(&mut k)?;
-    let ring = vec![k];
+    let mut ring = Vec::with_capacity(MAX_SLEUTELS);
+    ring.push(k);
     schrijf_keyring(pad, &ring, 0)?;
     Ok((ring, 0))
 }
@@ -236,11 +240,42 @@ impl Kluis {
                 None => { k.geknoeid = true; }
             }
         }
+        /* Bewuste ontsnapping voor de operator: na onderzoek (of bij een bekende,
+           verklaarde afwijking) kan de kluis weer schrijfbaar worden gezet. Dit
+           is expliciet en luid, niet stil -- en het is de enige weg terug. */
+        if k.geknoeid && std::env::var("RTG_KLUIS_NEGEER_GEKNOEID").as_deref() == Ok("1") {
+            eprintln!("[kluis] LET OP: manifest klopt niet, maar RTG_KLUIS_NEGEER_GEKNOEID=1 -- schrijven blijft toegestaan.");
+            k.geknoeid = false;
+        }
         Ok(k)
     }
 
     fn actieve_versie(&self) -> usize {
         self.sleutels.len() - 1
+    }
+
+    /* Het schrijfslot. Zodra het manifest niet klopt (record gewist, toegevoegd,
+       of de datafile teruggerold) gaat de kluis op read-only.
+
+       Waarom dat moet: `momentopname` bumpt de generatie en zegelt een VERS
+       manifest over de huidige recordset. Zonder dit slot zou de eerste flush na
+       een manipulatie dus een geldig manifest over de gemanipuleerde stand
+       schrijven -- de detectie wist dan haar eigen bewijs uit en de kluis meldt
+       weer "ok". Lezen blijft wel gewoon werken: een valse melding mag het
+       platform niet stilleggen, en `onthul` verandert niets op schijf.
+
+       Vrijgeven doet een operator bewust, met RTG_KLUIS_NEGEER_GEKNOEID=1 (dat
+       zet `geknoeid` bij het openen niet). */
+    fn schrijfslot(&self) -> Result<(), String> {
+        if self.geknoeid {
+            return Err("Kluis staat op GEKNOEID (manifest klopt niet): schrijven geweigerd om het bewijs te bewaren. Onderzoek de datafile; zet RTG_KLUIS_NEGEER_GEKNOEID=1 om bewust door te gaan.".into());
+        }
+        Ok(())
+    }
+
+    /// Mag er naar schijf geschreven worden? De flusher vraagt dit voor hij zegelt.
+    pub fn mag_schrijven(&self) -> bool {
+        !self.geknoeid
     }
 
     // Canonieke manifest-bytes: generatie (8 LE) || gesorteerde recordsleutels
@@ -308,6 +343,9 @@ impl Kluis {
        versleuteld met de ACTIEVE sleutel en gebonden aan de codenaam (AAD). De
        klaartekst raakt de schijf nooit onversleuteld. */
     pub fn bewaar(&mut self, key: &str, klaartekst: &str) -> Result<(), String> {
+        if let Err(e) = self.schrijfslot() {
+            return Err(e);
+        }
         if key.is_empty() {
             return Err("Geen sleutel.".into());
         }
@@ -376,6 +414,7 @@ impl Kluis {
        of onder een verdwenen versie) laten we ongemoeid op hun oude blob staan:
        rotatie mag nooit data vernietigen. */
     pub fn roteer_sleutel(&mut self) -> Result<usize, String> {
+        self.schrijfslot()?;
         if self.sleutels.len() >= MAX_SLEUTELS {
             return Err(format!(
                 "Keyring vol ({} sleutels); versie past in 1 byte. Comprimeer eerst.",
@@ -413,7 +452,11 @@ impl Kluis {
         Ok(hersleuteld)
     }
 
+    /// Wis een record. Weigert (false) zolang de kluis op geknoeid staat.
     pub fn wis(&mut self, key: &str) -> bool {
+        if self.geknoeid {
+            return false;
+        }
         let weg = self.store.remove(key).is_some();
         if weg {
             self.vuil = true;
@@ -490,7 +533,8 @@ mod tests {
     use super::*;
 
     fn tmp() -> PathBuf {
-        let d = std::env::temp_dir().join(format!("kluis-test-{}-{}", std::process::id(), super::vingerafdruk(&[rand_byte(), rand_byte(), rand_byte(), rand_byte()])));
+        let suffix = super::naar_hex(&[rand_byte(), rand_byte(), rand_byte(), rand_byte()]);
+        let d = std::env::temp_dir().join(format!("kluis-test-{}-{}", std::process::id(), suffix));
         std::fs::create_dir_all(&d).unwrap();
         d
     }
@@ -702,6 +746,71 @@ mod tests {
         std::fs::write(&dp, oud_bestand).unwrap();
         let k2 = Kluis::open(&kp, &dp).unwrap();
         assert!(k2.geknoeid, "een teruggerolde datafile moet als geknoeid opvallen");
+        std::fs::remove_dir_all(&d).ok();
+    }
+
+    /* Sleutel-hygiene: de keyring mag nooit hergroeien, want dan blijft de oude
+       buffer met alle sleutels ongewist in de vrijgegeven heap achter (Drop wist
+       alleen de huidige buffer). Na een reeks rotaties moet de capaciteit dus nog
+       steeds de oorspronkelijke zijn, en moet elke sleutel nog werken. */
+    #[test]
+    fn keyring_hergroeit_nooit_bij_rotatie() {
+        let d = tmp();
+        let mut k = Kluis::open(&d.join("secret.key"), &d.join("kluis.json")).unwrap();
+        let cap_begin = k.sleutels.capacity();
+        assert!(cap_begin >= MAX_SLEUTELS, "keyring start met volle capaciteit");
+        k.bewaar("NEVEL", "geheim").unwrap();
+        for _ in 0..12 {
+            k.roteer_sleutel().unwrap();
+        }
+        assert_eq!(k.sleutels.capacity(), cap_begin, "de buffer mag niet zijn verhuisd");
+        assert_eq!(k.sleutelversies(), 13);
+        assert_eq!(k.onthul("NEVEL").unwrap(), "geheim", "record blijft leesbaar na rotaties");
+        std::fs::remove_dir_all(&d).ok();
+    }
+
+    /* Een geknoeide kluis gaat op read-only. Zonder dat slot zou de eerstvolgende
+       momentopname een GELDIG manifest over de gemanipuleerde recordset zegelen:
+       de detectie wist dan haar eigen bewijs uit en na een herstart meldt de
+       kluis weer "ok" -- met de wissing van de aanvaller er stilletjes in
+       gebakken. Lezen moet wel blijven werken. */
+    #[test]
+    fn geknoeide_kluis_is_read_only_en_wist_geen_bewijs() {
+        let d = tmp();
+        let kp = d.join("secret.key");
+        let dp = d.join("kluis.json");
+        {
+            let mut k = Kluis::open(&kp, &dp).unwrap();
+            k.bewaar("NEVEL", "een").unwrap();
+            k.bewaar("SPOOK", "twee").unwrap();
+            std::fs::write(&dp, k.momentopname().dump()).unwrap();
+            k.anker().unwrap();
+        }
+        // aanvaller met schijftoegang wist SPOOK uit de datafile
+        let tekst = std::fs::read_to_string(&dp).unwrap();
+        if let Ok(Json::Obj(mut m)) = crate::json::parse(&tekst) {
+            m.remove("SPOOK");
+            let mut o = Json::obj();
+            if let Json::Obj(nw) = &mut o { *nw = m; }
+            std::fs::write(&dp, o.dump()).unwrap();
+        }
+
+        let mut k2 = Kluis::open(&kp, &dp).unwrap();
+        assert!(k2.geknoeid, "de wissing moet opvallen");
+        assert!(!k2.mag_schrijven(), "een geknoeide kluis mag niet meer schrijven");
+
+        // lezen blijft werken (een valse melding mag het platform niet stilleggen)
+        assert_eq!(k2.onthul("NEVEL").unwrap(), "een");
+
+        // en elke schrijfweg is dicht
+        assert!(k2.bewaar("NIEUW", "x").is_err(), "bewaar moet geweigerd worden");
+        assert!(!k2.wis("NEVEL"), "wissen moet geweigerd worden");
+        assert!(k2.roteer_sleutel().is_err(), "roteren moet geweigerd worden");
+        assert!(k2.onthul("NEVEL").is_some(), "het record staat er nog");
+
+        // heropenen blijft geknoeid melden: het bewijs is niet weggepoetst
+        drop(k2);
+        assert!(Kluis::open(&kp, &dp).unwrap().geknoeid, "na heropenen nog steeds geknoeid");
         std::fs::remove_dir_all(&d).ok();
     }
 

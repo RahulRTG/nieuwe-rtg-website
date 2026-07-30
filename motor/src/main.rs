@@ -8,9 +8,17 @@
      RTG_MOTOR_DATA     snapshot-bestand (standaard ./motor-data/state.json)
      RTG_MOTOR_SALDI    =1 opent /api/motor/saldi zodat de gepaarde server zijn
                         spiegel uit de motor-snapshot kan reconcilen (cutover)
+     RTG_MOTOR_TOKEN    gedeeld geheim; is het gezet, dan moet ELK verzoek het
+                        meesturen (X-RTG-Motor-Token of Authorization: Bearer).
+                        Zonder token luistert de motor alleen op loopback.
 
-   Let op: authenticatie/rol-scheiding zit in de Node-poort ervoor; de motor is
-   het grootboek. Codenaam/supplier komen als velden mee in de body. */
+   Rol-scheiding (welk lid mag wat) zit in de Node-poort ervoor; de motor is het
+   grootboek en krijgt codenaam/supplier als velden in de body. Maar dat maakt de
+   motor zelf geen open deur: wie hem rechtstreeks bereikt, kan zonder token
+   /api/kluis/onthul lezen en met /api/pay/boek rauw boeken. Vandaar de
+   poortwacht hieronder -- een tweede slot naast de Node-poort, zodat een SSRF of
+   een willekeurig lokaal proces niet meteen bij het geld en de identiteiten kan.
+   /api/leeft blijft altijd open, maar geeft niets anders dan {"ok":true}. */
 use rtg_motor::http::{self, Request, Response};
 use rtg_motor::json::{self, Json};
 use rtg_motor::ledengids::{self, Gids};
@@ -27,6 +35,47 @@ fn env(key: &str, standaard: &str) -> String {
 
 fn data_pad() -> PathBuf {
     PathBuf::from(env("RTG_MOTOR_DATA", "motor-data/state.json"))
+}
+
+/* Luistert dit adres alleen op de eigen machine? Zonder token is dat de enige
+   plek waar de motor mag staan.
+
+   Eerst het hele adres als SocketAddr proberen -- dat dekt "127.0.0.1:3100" en
+   "[::1]:3100" in een keer -- dan als los IP, en pas daarna met de hand de host
+   afsplitsen (voor "localhost:3100"). Onbekende namen gelden NIET als loopback:
+   bij twijfel dicht. */
+fn is_loopback(addr: &str) -> bool {
+    use std::net::{IpAddr, SocketAddr};
+    if let Ok(sa) = addr.parse::<SocketAddr>() {
+        return sa.ip().is_loopback();
+    }
+    if let Ok(ip) = addr.parse::<IpAddr>() {
+        return ip.is_loopback();
+    }
+    let host = match addr.rfind(':') {
+        Some(i) => &addr[..i],
+        None => addr,
+    };
+    if host.eq_ignore_ascii_case("localhost") {
+        return true;
+    }
+    match host.parse::<IpAddr>() {
+        Ok(ip) => ip.is_loopback(),
+        Err(_) => false,
+    }
+}
+
+/* De poortwacht: is er een token geconfigureerd, dan moet elk verzoek het
+   meesturen. Constant-time vergeleken, zodat de tijd niet verraadt hoeveel
+   tekens al klopten. /api/leeft is de enige uitzondering (kale liveness). */
+fn mag_erdoor(token_verwacht: &str, req: &Request) -> bool {
+    if token_verwacht.is_empty() {
+        return true; // geen token geconfigureerd: alleen loopback, zie main()
+    }
+    if req.path == "/api/leeft" {
+        return true;
+    }
+    rtg_motor::aead::ct_eq(req.token.as_bytes(), token_verwacht.as_bytes())
 }
 
 fn gids_pad() -> PathBuf {
@@ -53,6 +102,14 @@ fn start_kluis_flusher(kluis: Arc<std::sync::Mutex<rtg_motor::kluis::Kluis>>) {
         let (pad, tekst) = {
             let mut k = kluis.lock().unwrap();
             if !k.vuil {
+                continue;
+            }
+            /* Staat de kluis op geknoeid, dan NIET zegelen: een verse
+               momentopname zou een geldig manifest over de gemanipuleerde stand
+               schrijven en zo het bewijs uitwissen. */
+            if !k.mag_schrijven() {
+                k.vuil = false;
+                eprintln!("[motor] kluis GEKNOEID: flush overgeslagen, datafile blijft ongemoeid voor onderzoek.");
                 continue;
             }
             k.vuil = false;
@@ -256,6 +313,25 @@ fn main() {
     let addr = env("RTG_MOTOR_ADDR", "127.0.0.1:3100");
     let maxconn: usize = env("RTG_MOTOR_MAXCONN", "1024").parse().unwrap_or(1024);
 
+    /* Startguard: naar buiten luisteren mag alleen met een token. Anders staat
+       de kluis (onthul/wis) en het rauwe boeken open voor iedereen die het
+       adres kan bereiken. Liever niet starten dan stil open staan. */
+    let token = env("RTG_MOTOR_TOKEN", "");
+    if token.is_empty() && !is_loopback(&addr) {
+        eprintln!("[motor] WEIGER TE STARTEN: {} is geen loopback-adres en RTG_MOTOR_TOKEN is niet gezet.", addr);
+        eprintln!("[motor] Zonder token staan /api/kluis/onthul en /api/pay/boek open voor elke bereiker.");
+        eprintln!("[motor] Zet RTG_MOTOR_TOKEN, of luister op 127.0.0.1.");
+        std::process::exit(1);
+    }
+    if token.is_empty() {
+        eprintln!("[motor] let op: geen RTG_MOTOR_TOKEN gezet; alleen loopback, geen tweede slot.");
+    } else if token.len() < 16 {
+        eprintln!("[motor] WEIGER TE STARTEN: RTG_MOTOR_TOKEN is te kort ({} tekens, minimaal 16).", token.len());
+        std::process::exit(1);
+    } else {
+        eprintln!("[motor] poortwacht actief: elk verzoek behalve /api/leeft heeft een geldig token nodig.");
+    }
+
     let state = Arc::new(RwLock::new(State::new()));
     laad_snapshot(&state);
     start_flusher(Arc::clone(&state));
@@ -290,6 +366,15 @@ fn main() {
     let router_state = Arc::clone(&state);
     let router_gids = Arc::clone(&gids);
     let resultaat = http::serve(&addr, maxconn, move |req: &Request| {
+        // kale liveness: altijd open, verraadt niets over geld of leden
+        if req.path == "/api/leeft" {
+            let mut b = Json::obj();
+            b.set("ok", Json::Bool(true));
+            return Response { status: 200, body: b.dump() };
+        }
+        if !mag_erdoor(&token, req) {
+            return fout(403, "Geen geldig motor-token.");
+        }
         if req.path.starts_with("/api/gids/") {
             return gids_route(&router_gids, req);
         }
@@ -379,6 +464,41 @@ fn gids_route(gids: &RwLock<Option<Gids>>, req: &Request) -> Response {
             Response { status: 200, body: b.dump() }
         }
         _ => fout(404, "Onbekende route."),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn req(path: &str, token: &str) -> Request {
+        Request { method: "POST".into(), path: path.into(), body: "{}".into(), token: token.into() }
+    }
+
+    #[test]
+    fn loopback_herkenning() {
+        for a in ["127.0.0.1:3100", "localhost:3100", "[::1]:3100", "127.5.5.5:80", "::1"] {
+            assert!(is_loopback(a), "{} is loopback", a);
+        }
+        for a in ["0.0.0.0:3100", "10.0.0.5:3100", "[2001:db8::1]:3100", "motor.intern:3100", "192.168.1.9:3100"] {
+            assert!(!is_loopback(a), "{} is GEEN loopback", a);
+        }
+    }
+
+    /* Met een token moet elk verzoek hem meesturen; zonder token laat de
+       poortwacht alles door (dan staat de motor per startguard op loopback). */
+    #[test]
+    fn poortwacht_eist_token() {
+        let t = "een-heel-lang-geheim-token";
+        assert!(mag_erdoor(t, &req("/api/kluis/onthul", t)), "juist token mag erdoor");
+        assert!(!mag_erdoor(t, &req("/api/kluis/onthul", "")), "geen token: weigeren");
+        assert!(!mag_erdoor(t, &req("/api/kluis/onthul", "fout")), "fout token: weigeren");
+        assert!(!mag_erdoor(t, &req("/api/pay/boek", "een-heel-lang-geheim-toke")), "bijna goed is niet goed");
+        // liveness blijft open, de rest niet
+        assert!(mag_erdoor(t, &req("/api/leeft", "")), "liveness is altijd open");
+        assert!(!mag_erdoor(t, &req("/api/ready", "")), "status hoort achter het token");
+        // zonder geconfigureerd token: geen slot (loopback-only, zie startguard)
+        assert!(mag_erdoor("", &req("/api/kluis/onthul", "")));
     }
 }
 

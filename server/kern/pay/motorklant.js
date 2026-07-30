@@ -15,6 +15,15 @@ module.exports = function maakMotorklant() {
   const aan = modus === 'motor';
   const URL = (process.env.RTG_MOTOR_GELD_URL || process.env.RTG_MOTOR_SHADOW || '').replace(/\/$/, '');
   const TIMEOUT_MS = Number(process.env.RTG_MOTOR_GELD_TIMEOUT || 5000);
+  /* Het gedeelde geheim van de motor-poortwacht. Staat het daar gezet, dan
+     weigert de motor elk verzoek zonder geldig token -- dus moet de client hem
+     meesturen. Leeg laten is prima zolang de motor op loopback staat. */
+  const TOKEN = process.env.RTG_MOTOR_TOKEN || '';
+  const koppen = () => {
+    const h = { 'content-type': 'application/json' };
+    if (TOKEN) h['x-rtg-motor-token'] = TOKEN;
+    return h;
+  };
 
   if (aan && !URL) {
     // Fail-closed: motor-modus zonder motor-URL is een misconfiguratie. Beter nu
@@ -27,7 +36,7 @@ module.exports = function maakMotorklant() {
     const t = setTimeout(() => af.abort(), TIMEOUT_MS);
     try {
       const r = await fetch(URL + pad, {
-        method: 'POST', headers: { 'content-type': 'application/json' },
+        method: 'POST', headers: koppen(),
         body: JSON.stringify(body || {}), signal: af.signal,
       });
       const j = await r.json().catch(() => ({}));
@@ -61,7 +70,7 @@ module.exports = function maakMotorklant() {
       const af = new AbortController();
       const t = setTimeout(() => af.abort(), TIMEOUT_MS);
       try {
-        const r = await fetch(URL + '/api/motor/saldi', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', signal: af.signal });
+        const r = await fetch(URL + '/api/motor/saldi', { method: 'POST', headers: koppen(), body: '{}', signal: af.signal });
         if (r.status >= 300) return { error: 'Motor gaf ' + r.status + ' op /api/motor/saldi (staat RTG_MOTOR_SALDI=1 aan?).', status: r.status };
         const j = await r.json().catch(() => null);
         if (!j || typeof j !== 'object') return { error: 'Motor gaf geen saldi terug.', status: 502 };

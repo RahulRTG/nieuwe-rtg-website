@@ -18,7 +18,7 @@ function call(path, body) {
     const data = Buffer.from(JSON.stringify(body || {}));
     const req = http.request(
       { host: u.hostname, port: u.port, path: u.pathname, method: path === '/api/motor/saldi' ? 'GET' : 'POST', agent,
-        headers: { 'content-type': 'application/json', 'content-length': data.length } },
+        headers: { 'content-type': 'application/json', 'content-length': data.length, ...(process.env.RTG_MOTOR_TOKEN ? { 'x-rtg-motor-token': process.env.RTG_MOTOR_TOKEN } : {}) } },
       (res) => { let b = ''; res.on('data', (d) => (b += d)); res.on('end', () => resolve({ status: res.statusCode, json: (() => { try { return JSON.parse(b || '{}'); } catch (e) { return {}; } })() })); }
     );
     req.on('error', () => resolve({ status: -1, json: {} }));

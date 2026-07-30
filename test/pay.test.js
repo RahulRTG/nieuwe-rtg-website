@@ -168,3 +168,38 @@ test('het grootboek sluit op de cent en gasten komen er niet in', async () => {
   assert.ok(o.body.geschiedenis.some(h => h.centen === -2500 && /zaak /.test(h.tegen)), 'de kassabetaling staat erin');
   assert.ok(o.body.geschiedenis.some(h => h.centen === 5000 && h.tegen === 'opgeladen'), 'het opladen staat erin');
 });
+
+/* Idempotentie is aan het VERZOEK gebonden, niet alleen aan de sleutel. De apps
+   bouwen hun idem-sleutel uit Date.now(), dus twee verschillende acties in
+   dezelfde milliseconde krijgen echt dezelfde sleutel. Zonder binding kreeg de
+   tweede stil het antwoord van de eerste terug: "gelukt" voor een overboeking
+   die nooit is geboekt. Nu is dat een zichtbare 409. */
+test('dezelfde idem-sleutel met een ander verzoek geeft een conflict, geen valse "gelukt"', async () => {
+  const voor = (await api('pay/overzicht', {}, lidB.token)).body.saldo;
+  const sleutel = 'bind-' + Date.now();
+
+  // A stuurt 111 cent naar B
+  const eerste = await api('pay/stuur', { aan: lidB.codenaam, centen: 111, oms: 'eerste', idem: sleutel }, lidA.token);
+  assert.equal(eerste.status, 200, 'de eerste boeking lukt');
+  const naEerste = (await api('pay/overzicht', {}, lidB.token)).body.saldo;
+  assert.equal(naEerste, voor + 111, 'B kreeg 111 cent');
+
+  // exact hetzelfde verzoek nog eens: herhaling, niet dubbel boeken
+  const herhaal = await api('pay/stuur', { aan: lidB.codenaam, centen: 111, oms: 'eerste', idem: sleutel }, lidA.token);
+  assert.equal(herhaal.status, 200, 'identiek verzoek mag herhalen');
+  assert.equal(herhaal.body.herhaald, true, 'en is als herhaling gemarkeerd');
+  assert.equal((await api('pay/overzicht', {}, lidB.token)).body.saldo, voor + 111, 'niet dubbel geboekt');
+
+  // ander bedrag onder dezelfde sleutel: conflict, en er beweegt geen cent
+  const anderBedrag = await api('pay/stuur', { aan: lidB.codenaam, centen: 99999, oms: 'eerste', idem: sleutel }, lidA.token);
+  assert.equal(anderBedrag.status, 409, 'ander bedrag onder dezelfde sleutel is een conflict');
+  assert.equal((await api('pay/overzicht', {}, lidB.token)).body.saldo, voor + 111, 'saldo onveranderd na het conflict');
+
+  // alleen een andere omschrijving is GEEN ander verzoek: vrije tekst telt niet mee
+  const andereOms = await api('pay/stuur', { aan: lidB.codenaam, centen: 111, oms: 'heel andere tekst', idem: sleutel }, lidA.token);
+  assert.equal(andereOms.status, 200, 'andere omschrijving blijft een herhaling');
+  assert.equal(andereOms.body.herhaald, true);
+
+  // en het grootboek sluit nog steeds
+  assert.equal((await (await fetch(base + '/api/pay/gezond')).json()).klopt, true, 'grootboek sluit');
+});

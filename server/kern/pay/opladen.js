@@ -13,7 +13,7 @@ function maakOpladen(basis) {
   async function laadOp({ codenaam, centen, idem, oms }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < OPLAAD_MIN || c > MAX_CENTEN) return { status: 400, error: 'Opladen kan van 1 tot 5000 euro.' };
-    return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, async () => {
+    return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, 'oplaad|' + codenaam + '|' + c, async () => {
       let betaling;
       try {
         betaling = await betaal.maakBetaling({

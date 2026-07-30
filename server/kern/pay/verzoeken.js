@@ -12,7 +12,9 @@ module.exports = (ctx) => {
     const aan = schoon(aanCodenaam, 40);
     if (!aan || aan === van) return { status: 400, error: 'Kies aan wie je het stuurt.' };
     if (!(await bestaatLid(aan))) return { status: 404, error: 'Die codenaam kennen we niet.' };
-    return metIdem(idem ? 'stuur:' + van + ':' + idem : null, async () => {
+    // oms blijft buiten de afdruk: vrije tekst mag geen 409 veroorzaken
+    const afdruk = 'stuur|' + van + '|' + aan + '|' + Math.round(Number(centen)) + '|' + (soort || 'p2p');
+    return metIdem(idem ? 'stuur:' + van + ':' + idem : null, afdruk, async () => {
       const z = await zorgSaldo({ codenaam: van, centen, idem });
       if (z.error) return z;
       const b = await boekAsync({ van: rekLid(van), naar: rekLid(aan), centen, soort: soort || 'p2p', oms: oms || 'Zomaar' });
@@ -58,7 +60,8 @@ module.exports = (ctx) => {
     const v = klompjes().find(x => x.id === verzoekId && x.aan === codenaam);
     if (!v) return { status: 404, error: 'Dit verzoek staat niet voor jou open.' };
     if (v.status !== 'open') return { status: 409, error: 'Dit verzoek is al afgehandeld.' };
-    return metIdem(idem ? 'klompje:' + codenaam + ':' + idem : null, async () => {
+    return metIdem(idem ? 'klompje:' + codenaam + ':' + idem : null,
+      'klompje|' + codenaam + '|' + v.id + '|' + v.centen, async () => {
       const z = await zorgSaldo({ codenaam, centen: v.centen, idem });
       if (z.error) return z;
       const b = await boekAsync({ van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'klompje', oms: v.oms, ref: v.id });

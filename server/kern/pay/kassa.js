@@ -23,7 +23,9 @@ module.exports = (ctx) => {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN) return { status: 400, error: 'Vul het bedrag in.' };
     if (c > k.maxCenten) return { status: 402, error: 'Boven het maximum van deze code (' + (k.maxCenten / 100).toFixed(2) + ' euro).' };
-    return metIdem(idem ? 'kas:' + supplierCode + ':' + idem : null, async () => {
+    // de code hoort in de afdruk: hergebruik met een ANDERE code is een ander verzoek
+    return metIdem(idem ? 'kas:' + supplierCode + ':' + idem : null,
+      'kas|' + supplierCode + '|' + k.code + '|' + c, async () => {
       const z = await zorgSaldo({ codenaam: k.codenaam, centen: c, idem });
       if (z.error) return z;
       const b = await boekAsync({ van: rekLid(k.codenaam), naar: rekPartner(supplierCode), centen: c, soort: 'kassa', oms: oms || 'Kassa', ref: k.code });
@@ -62,7 +64,10 @@ module.exports = (ctx) => {
     const rek = rekPartner(supplierCode);
     const c = saldoVan(rek);
     if (c <= 0) return { status: 400, error: 'Er staat niets om uit te betalen.' };
-    return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null, async () => {
+    /* Een uitbetaling heeft geen parameters buiten de partner zelf (het gaat
+       altijd om het volle saldo), dus de afdruk is de partner. Het bedrag
+       bewust NIET meenemen: dat verschilt legitiem per moment. */
+    return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null, 'uit|' + supplierCode, async () => {
       try {
         await betaal.maakUitbetaling({
           bedrag: c, referentie: 'pay-uit-' + supplierCode + '-' + nu(),

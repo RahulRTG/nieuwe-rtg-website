@@ -10,7 +10,7 @@
     "gateway": "node server/poort.js",
     "vloot": "node server/vloot.js",
     "sleutels": "node scripts/sleutels.js",
-    "kluisbinding": "node --experimental-sqlite scripts/kluisbinding.js",
+    "kluisbeheer": "node --experimental-sqlite scripts/kluisbeheer.js",
     "outbox": "node scripts/outbox.js",
     "golive": "node scripts/golive.js",
     "poortwacht": "node scripts/poortwacht.js",

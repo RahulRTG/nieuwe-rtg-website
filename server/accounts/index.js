@@ -37,6 +37,7 @@ const DATA_DIR = process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'rtg.db');
 const SECRET_FILE = path.join(DATA_DIR, 'secret.key');   // ondertekent sessietokens
 const VAULT_FILE = path.join(DATA_DIR, 'vault.key');     // versleutelt de identiteitskluis
+const RING_FILE = path.join(DATA_DIR, 'vault.ring');     // extra kluissleutels na een rotatie
 
 /* Sleutels laden. Bij meerdere instances MOETEN de identiteitskluis (VAULT) en
    de token-ondertekening (SECRET) op elke instance gelijk zijn, anders kan de ene
@@ -50,6 +51,27 @@ function loadKey(file, envName) {
   const k = crypto.randomBytes(32);
   try { fs.writeFileSync(file, k); } catch (e) {}
   return k;
+}
+
+/* De keyring voor de VERSLEUTELING laden: extra sleutels die bij een rotatie zijn
+   bijgezet, nieuwste eerst. De oorspronkelijke VAULT-sleutel komt er altijd achter
+   -- die blijft nodig om blobs van voor de rotatie te lezen, en hij is bovendien
+   de gepinde sleutel van de zoek-hashes (zie ./state).
+
+   Zonder rotatie bestaat het ringbestand niet en is de ring simpelweg [VAULT]:
+   dan verandert er niets ten opzichte van een installatie zonder rotatie. Bij
+   meerdere instances moet de ring, net als VAULT zelf, op elke instance gelijk
+   zijn; vandaar ook hier eerst de omgeving (RTG_VAULT_RING, komma-gescheiden hex,
+   nieuwste eerst) en pas dan het bestand. */
+function loadRing(file, vault) {
+  const uit = [];
+  const zieHex = (s) => { const t = String(s).trim(); if (/^[0-9a-fA-F]{64}$/.test(t)) uit.push(Buffer.from(t, 'hex')); };
+  const env = process.env.RTG_VAULT_RING || '';
+  if (env) env.split(',').forEach(zieHex);
+  else if (fs.existsSync(file)) { try { fs.readFileSync(file, 'utf8').split('\n').forEach(zieHex); } catch (e) {} }
+  // de oorspronkelijke sleutel sluit de rij; nooit dubbel
+  if (!uit.some(k => k.equals(vault))) uit.push(vault);
+  return uit;
 }
 
 function init() {
@@ -76,6 +98,7 @@ function init() {
 
   S.SECRET = loadKey(SECRET_FILE, 'RTG_SECRET_KEY');
   S.VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');
+  S.RING = loadRing(RING_FILE, S.VAULT);
 }
 
 /* De WAL van rtg.db leegdrukken in het hoofdbestand.
@@ -92,8 +115,22 @@ function checkpoint() {
   catch (e) { return false; }
 }
 
+/* De keyring duurzaam wegschrijven: nieuwste sleutel eerst, hex per regel, rechten
+   600. Eerst een temp-bestand met fsync en dan een rename, zodat de ring nooit half
+   op schijf staat -- de rotatie leunt erop dat dit KLAAR is voordat er ook maar een
+   rij is hersleuteld (zie ./onderhoud roteer). Woont hier omdat dit deel de paden
+   kent. */
+function schrijfKluisRing(ring) {
+  const tekst = ring.map(k => Buffer.from(k).toString('hex')).join('\n') + '\n';
+  const tmp = RING_FILE + '.tmp';
+  const fd = fs.openSync(tmp, 'w', 0o600);
+  try { fs.writeFileSync(fd, tekst); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
+  fs.renameSync(tmp, RING_FILE);
+  try { fs.chmodSync(RING_FILE, 0o600); } catch (e) {}
+}
+
 module.exports = {
-  init, checkpoint,
+  init, checkpoint, schrijfKluisRing, RING_FILE,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   ...users,

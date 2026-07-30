@@ -26,6 +26,7 @@ accounts.init();
 const S = require('../server/accounts/state');
 const kluis = require('../server/accounts/kluis');
 const gebonden = require('../server/accounts/gebonden');
+const onderhoud = require('../server/accounts/onderhoud');
 
 test.after(() => { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
@@ -113,10 +114,10 @@ test('migreren bindt de oude rijen, en daarna is verplaatsen ook daar dicht', as
   zetRuw('enc_name', u.id, kluis.enc('Ferdi Fransen'));
   zetRuw('member_state', u.id, '{"plat":true}');
 
-  const voor = gebonden.stand(S.db);
+  const voor = onderhoud.stand(S.db);
   assert.ok(voor.ongebonden >= 1, 'er staat minstens een ongebonden rij');
 
-  const uitslag = gebonden.migreer(S.db);
+  const uitslag = onderhoud.migreer(S.db);
   assert.ok(uitslag.rijen >= 1 && uitslag.kolommen >= 2, 'de migratie heeft werk gedaan: ' + JSON.stringify(uitslag));
 
   const r = rij(u.id);
@@ -131,7 +132,7 @@ test('migreren bindt de oude rijen, en daarna is verplaatsen ook daar dicht', as
   assert.notEqual(accounts.realNameOf(rij(ander.id)), 'Ferdi Fransen', 'na migratie niet meer te verplaatsen');
 
   // migreren is veilig om nog eens te draaien
-  assert.equal(gebonden.migreer(S.db).rijen, 0, 'een tweede migratie heeft niets te doen');
+  assert.equal(onderhoud.migreer(S.db).rijen, 0, 'een tweede migratie heeft niets te doen');
 });
 
 test('een naamswijziging schrijft meteen gebonden weg', async () => {
@@ -157,8 +158,8 @@ test('member_state gaat gebonden de kolom in en is niet te verplaatsen', async (
 });
 
 test('de stand laat zien of de binding rond is', async () => {
-  gebonden.migreer(S.db);
-  const s = gebonden.stand(S.db);
+  onderhoud.migreer(S.db);
+  const s = onderhoud.stand(S.db);
   assert.equal(s.ongebonden, 0, 'na migreren staat alles gebonden: ' + JSON.stringify(s));
   assert.ok(s.gebonden >= 1);
   assert.ok(s.rijen >= s.gebonden);

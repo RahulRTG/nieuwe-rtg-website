@@ -45,7 +45,7 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
     const info = S.db.prepare(`INSERT INTO users (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
     newId = info.lastInsertRowid;
   }
-  gebonden.herzegel(S.db, newId); // id is nu bekend: de kluiskolommen eraan binden
+  require('./onderhoud').herzegel(S.db, newId); // id is nu bekend: kolommen eraan binden
   mirror.markUser(newId);
   return getUserById(newId);
 }

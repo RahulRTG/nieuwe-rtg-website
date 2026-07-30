@@ -24,9 +24,11 @@
      platte tekst  nooit versleuteld geweest      [oudste member_state]
 
    Een RTGV2-waarde MOET met de juiste AAD opengaan; lukt dat niet, dan is er iets
-   verplaatst en geven we niets terug. De oudere vormen gaan ongebonden open
-   zolang ze nog niet zijn herzegeld -- `herzegel` doet dat per rij, en gebeurt
-   ook automatisch bij de eerstvolgende schrijfactie. */
+   verplaatst en geven we niets terug. De oudere vormen gaan ongebonden open zolang
+   ze nog niet zijn herzegeld.
+
+   Het beheer (herzegelen, migreren, de stand, de sleutelrotatie) staat in
+   ./onderhoud.js; dit bestand is alleen de crypto. */
 const crypto = require('crypto');
 const S = require('./state');
 
@@ -44,23 +46,52 @@ function aadVan(kolom, id) {
   return Buffer.from('rtg-kluis-v2|' + TABEL + '|' + kolom + '|' + String(id), 'utf8');
 }
 
-/* Open een kaal base64-blob. null als de authenticatie faalt -- ook bij een
-   verkeerde AAD, en dat is precies waar het hier om gaat. */
-function open(b64, aad) {
+/* De keyring: nieuwste sleutel eerst, de oorspronkelijke VAULT-sleutel achteraan.
+   S.RING wordt bij init gezet; valt hij weg (oude aanroepvorm, een test die alleen
+   state zet), dan is de ring simpelweg [VAULT]. */
+function ring() {
+  return (S.RING && S.RING.length) ? S.RING : [S.VAULT];
+}
+
+function openMet(sleutel, b64, aad) {
   try {
     const buf = Buffer.from(b64, 'base64');
-    const d = crypto.createDecipheriv('aes-256-gcm', S.VAULT, buf.subarray(0, 12));
+    const d = crypto.createDecipheriv('aes-256-gcm', sleutel, buf.subarray(0, 12));
     if (aad) d.setAAD(aad);
     d.setAuthTag(buf.subarray(12, 28));
     return Buffer.concat([d.update(buf.subarray(28)), d.final()]).toString('utf8');
   } catch (e) { return null; }
 }
 
-/* Versleutel, gebonden aan (kolom, rij-id). Levert een RTGV2-waarde. */
+/* Open een kaal base64-blob met de keyring. Geeft { tekst, idx } terug, waarbij
+   idx de plek in de ring is: 0 = de actieve sleutel. null als geen sleutel de
+   authenticatie haalt -- ook bij een verkeerde AAD, en dat is precies waar het
+   hier om gaat.
+
+   Proberen op volgorde in plaats van een versienummer in het blob: de AEAD zegt
+   zelf of een sleutel klopt, dus een versiebyte zou alleen sneller zijn, geen
+   veiliger. En het scheelt een derde blobformaat plus de migratie ernaartoe. */
+function openRing(b64, aad) {
+  const r = ring();
+  for (let i = 0; i < r.length; i++) {
+    const tekst = openMet(r[i], b64, aad);
+    if (tekst != null) return { tekst, idx: i };
+  }
+  return null;
+}
+
+// alleen de tekst; voor de plekken die de sleutelversie niet hoeven te weten
+function open(b64, aad) {
+  const r = openRing(b64, aad);
+  return r ? r.tekst : null;
+}
+
+/* Versleutel, gebonden aan (kolom, rij-id), met de ACTIEVE sleutel. Levert een
+   RTGV2-waarde. */
 function zegel(kolom, id, tekst) {
   if (tekst == null) return null;
   const iv = crypto.randomBytes(12);
-  const c = crypto.createCipheriv('aes-256-gcm', S.VAULT, iv);
+  const c = crypto.createCipheriv('aes-256-gcm', ring()[0], iv);
   c.setAAD(aadVan(kolom, id));
   const ct = Buffer.concat([c.update(String(tekst), 'utf8'), c.final()]);
   return MERK2 + Buffer.concat([iv, c.getAuthTag(), ct]).toString('base64');
@@ -69,80 +100,31 @@ function zegel(kolom, id, tekst) {
 /* Lees een kluiskolom uit een rij. `rij` MOET het id bevatten, want dat is de
    helft van de context: selecteer id altijd mee. */
 function lees(kolom, rij) {
+  const r = leesMet(kolom, rij);
+  return r ? r.tekst : null;
+}
+
+/* Zelfde als lees(), maar meldt ook HOE de waarde erin staat: `idx` is de plek in
+   de keyring (0 = actieve sleutel, -1 = niet versleuteld) en `gebonden` of hij aan
+   zijn rij vastzit. Herzegelen gebruikt dat om te zien wat er nog werk nodig heeft:
+   ongebonden, of gebonden-maar-op-een-oude-sleutel. */
+function leesMet(kolom, rij) {
   if (!rij) return null;
   const waarde = rij[kolom];
   if (waarde == null) return null;
   const s = String(waarde);
-  if (s.startsWith(MERK2)) return open(s.slice(MERK2.length), aadVan(kolom, rij.id));
-  if (s.startsWith(MERK1)) return open(s.slice(MERK1.length), null);
-  const oud = open(s, null);
-  if (oud != null) return oud;
-  return kolom.startsWith('enc_') ? null : s; // enc_: onleesbaar; anders platte tekst
-}
-
-/* Herzegel alle kluiskolommen van een rij, gebonden aan haar id. Twee rollen:
-
-   1. na een INSERT, want dan is het id pas bekend (SQLite deelt het uit). Tussen
-      de INSERT en dit moment staat de rij er ongebonden -- versleuteld, dus geen
-      leesbare gegevens -- en een crash ertussen laat een leesbare rij achter die
-      bij de eerstvolgende schrijfactie alsnog gebonden raakt. De terugvalweg voor
-      oude vormen is hier dus ook de crash-veiligheid.
-   2. als migratie voor bestaande rijen, zonder dat er iets hoeft te wijzigen.
-
-   Een kolom die niet opengaat laten we met opzet staan: herzegelen mag nooit
-   gegevens vernietigen (dezelfde regel als de sleutelrotatie in de Rust-kluis).
-   Geeft het aantal herzegelde kolommen terug. */
-function herzegel(db, id) {
-  const rij = db.prepare('SELECT id, ' + KOLOMMEN.join(', ') + ' FROM ' + TABEL + ' WHERE id = ?').get(id);
-  if (!rij) return 0;
-  const zet = [], vals = [];
-  for (const kolom of KOLOMMEN) {
-    if (rij[kolom] == null) continue;
-    if (String(rij[kolom]).startsWith(MERK2)) continue;  // al gebonden
-    const klaar = lees(kolom, rij);
-    if (klaar == null) continue;                         // onleesbaar: niet aanraken
-    zet.push(kolom + ' = ?');
-    vals.push(zegel(kolom, id, klaar));
+  if (s.startsWith(MERK2)) {
+    const r = openRing(s.slice(MERK2.length), aadVan(kolom, rij.id));
+    return r ? { tekst: r.tekst, idx: r.idx, gebonden: true } : null;
   }
-  if (!zet.length) return 0;
-  db.prepare('UPDATE ' + TABEL + ' SET ' + zet.join(', ') + ' WHERE id = ?').run(...vals, id);
-  return zet.length;
-}
-
-/* Migreer de hele tabel: herzegel elke rij die nog niet gebonden is. Bedoeld om
-   een bestaande installatie in een keer om te zetten, en veilig om vaker te
-   draaien (een al gebonden rij slaat hij over).
-
-   `markeer` is optioneel en krijgt elk gewijzigd id. In Postgres-modus hoort daar
-   mirror.markUser in, anders blijft de spiegel op de oude blobs staan: die zijn
-   nog wel leesbaar (ongebonden vormen blijven dat), maar dan is de binding daar
-   niet rond en dat is precies wat je na een migratie wilt kunnen aantonen. */
-function migreer(db, markeer) {
-  const ids = db.prepare('SELECT id FROM ' + TABEL).all().map(r => r.id);
-  let rijen = 0, kolommen = 0;
-  for (const id of ids) {
-    const n = herzegel(db, id);
-    if (n) {
-      rijen++; kolommen += n;
-      if (typeof markeer === 'function') markeer(id);
-    }
+  if (s.startsWith(MERK1)) {
+    const r = openRing(s.slice(MERK1.length), null);
+    return r ? { tekst: r.tekst, idx: r.idx, gebonden: false } : null;
   }
-  return { rijen, kolommen };
-}
-
-/* Hoeveel rijen zijn al gebonden? Voor het techniekbord en om na een migratie te
-   kunnen zien dat de binding echt rond is. Rijen zonder enkele kluiswaarde tellen
-   niet mee -- daar valt niets te binden. */
-function stand(db) {
-  const rijen = db.prepare('SELECT id, ' + KOLOMMEN.join(', ') + ' FROM ' + TABEL).all();
-  let gebonden = 0, ongebonden = 0;
-  for (const r of rijen) {
-    const gevuld = KOLOMMEN.filter(k => r[k] != null);
-    if (!gevuld.length) continue;
-    if (gevuld.every(k => String(r[k]).startsWith(MERK2))) gebonden++;
-    else ongebonden++;
-  }
-  return { rijen: rijen.length, gebonden, ongebonden };
+  const r = openRing(s, null);
+  if (r) return { tekst: r.tekst, idx: r.idx, gebonden: false };
+  // enc_: onleesbaar; anders nooit-versleutelde platte tekst
+  return kolom.startsWith('enc_') ? null : { tekst: s, idx: -1, gebonden: false };
 }
 
 /* De identiteitslezers. Ze horen hier omdat ze niets anders doen dan de kluis
@@ -156,6 +138,6 @@ function emailOf(u) { return u ? lees('enc_email', u) : null; }
 function phoneOf(u) { return u ? lees('enc_phone', u) : null; }
 
 module.exports = {
-  zegel, lees, herzegel, migreer, stand, KOLOMMEN, MERK2,
+  zegel, lees, leesMet, KOLOMMEN, MERK1, MERK2, TABEL, ring,
   realNameOf, emailOf, phoneOf
 };

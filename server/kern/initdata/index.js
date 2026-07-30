@@ -12,4 +12,8 @@ module.exports = function initRealtime(ctx) {
   require('./deel7-salon')(ctx);
   require('./deel8-bouw')(ctx);
   require('./deel9-vakken')(ctx);
+  require('./deel10-genres')(ctx);
+  /* Nog een keer de Salon-profielen: deel8 en deel9 zetten hun zaken pas na
+     deel7 neer, en zonder bio en foto is een zaak voor leden onzichtbaar. */
+  if (typeof ctx.salonProfielen === 'function') ctx.salonProfielen();
 };

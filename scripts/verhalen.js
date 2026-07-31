@@ -173,6 +173,8 @@ const KAART = [{ id: 'verhaal-ramen', name: 'Tonkotsu Ramen', price: 22, cat: 'W
    betaalmoment. Een echte (piepkleine) PNG, want de verificatie kijkt naar het
    beeld en niet naar de belofte dat er een beeld is. */
 const KYC_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+// de standen waarmee RTG Pay opengaat (kern/onboarding/lid.js, payGate)
+const GEVERIFIEERD = ['pending', 'approved', 'geverifieerd', 'verified'];
 
 /* Het decor: de partner waar besteld wordt, met een gerecht dat wij zelf op de
    kaart zetten zodat het bedrag voorspelbaar is, en een vervoerspartner uit de
@@ -206,6 +208,14 @@ async function bouwPodium(vraag) {
   for (const naam of ['klant', 'gast', 'beursA', 'beursB']) {
     ploeg[naam] = await nieuwLid(wb);
     await wb.stap('paspoort tonen', 'POST', '/api/verify/upload', ploeg[naam].token, { image: KYC_PNG });
+    /* En meteen nakijken of het ook AANKWAM. Een upload die 200 teruggeeft maar
+       niet blijft staan, laat het geld-verhaal even verderop stuklopen op een
+       403 die dan uit de lucht lijkt te vallen -- dat is precies gebeurd, en ik
+       heb er een half uur naar zitten raden. Een podium hoort zijn eigen
+       voorwaarde te bewijzen, niet aan te nemen. */
+    const st = await wb.stap('paspoortstand', 'POST', '/api/verify/status', ploeg[naam].token, {});
+    wb.eis('paspoortstand', GEVERIFIEERD.includes(st.data.status),
+      'het paspoort van ' + naam + ' staat na de upload op "' + st.data.status + '" in plaats van "pending"');
   }
   return { supToken: sup, supCode: code, vervoerCode: vervoer ? vervoer.code : null, prijs: 22, ploeg };
 }
@@ -351,6 +361,15 @@ const VERHALEN = [
          getoond -- zonder die stap zou dit verhaal de KYC-poort toetsen in
          plaats van het geld, en dan slaagt het op 0 -> 0 vanzelf. */
       const a = p.ploeg.beursA, b = p.ploeg.beursB;
+      /* De poort van RTG Pay staat of valt met deze stand. Hem hier nog een keer
+         aflezen kost een verzoek en scheelt straks een raadsel: een 403 verderop
+         betekent dan "het paspoort is ONDERWEG kwijtgeraakt" en niet "er is iets
+         met het geld". */
+      for (const [naam, lid] of [['A', a], ['B', b]]) {
+        const st = await wb.stap('paspoortstand', 'POST', '/api/verify/status', lid.token, {});
+        wb.eis('paspoortstand', GEVERIFIEERD.includes(st.data.status),
+          'het paspoort van ' + naam + ' staat op "' + st.data.status + '"; RTG Pay laat dan niets toe');
+      }
       const saldo = async t => (await wb.stap('saldo', 'POST', '/api/pay/overzicht', t, {})).data;
       const bOverzicht = await saldo(b.token);
       wb.eis('de portemonnee', typeof bOverzicht.saldo === 'number' && bOverzicht.codenaam,

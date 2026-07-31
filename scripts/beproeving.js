@@ -370,7 +370,17 @@ async function tokens() {
   // kantoorcode blijft de office-rol in de gauntlet (en hoort daar 403 te
   // krijgen op boardroom-paden). De eigenaar doet bewust NIET mee aan de
   // rol-scheidingstest: dat account is echt lid en kantoor tegelijk.
-  const baas = (await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran', pasApp: 'business' })).data.token;
+  const baasLid = (await post('/api/auth/login', { login: process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran', pasApp: 'business' })).data.token;
+  /* EN DAARNA DE KANTOOR-ROL AANZETTEN. Dit ontbrak, en het kostte twee volle
+     runs aan zeggingskracht: het LEDEN-token van de eigenaar ging rechtstreeks
+     naar een boardroom-pad, maar sinds de boardroom-poort komt daar alleen een
+     KANTOOR-sessie in. Zonder deze stap viel de schakelkast terug op de
+     anonieme kantoorcode, kreeg terecht 403, en stond er een regel
+     'schakelkast "alles aan" -> status 403' in het rapport die eruitzag als een
+     mededeling in plaats van als een probleem. Elke fase daarna draaide tegen
+     de standaard-functiestand terwijl er stond dat alles aanstond. */
+  const baasKantoor = baasLid ? (await post('/api/account/start', { rol: 'kantoor' }, baasLid)).data.token : null;
+  const baas = baasKantoor || baasLid;
   return {
     member: [mLid, mBus].filter(Boolean), supplier: [sup].filter(Boolean),
     office: [office].filter(Boolean), open: [null], _lid: mLid, _office: office, _baas: baas || office
@@ -557,8 +567,14 @@ async function misbruikBeproeving(tok) {
   const tok = await tokens();
   const tokVoor = { member: tok.member, supplier: tok.supplier, office: tok.office, open: tok.open };
   rij('tokens', 'member ' + tok.member.length + ' - supplier ' + tok.supplier.length + ' - office ' + tok.office.length);
+  /* De grote hendel MOET overgaan. Ging hij niet over, dan draait alles hierna
+     tegen de standaard-functiestand en meet deze beproeving minder dan ze
+     beweert -- en dat is erger dan een gezakte drempel, want het ziet er groen
+     uit. Dit is dus geen mededeling maar een oordeel (zie SCHAKELKAST). */
   const aan = await allesAan(tok._baas);
-  rij('schakelkast "alles aan"', aan === 200 ? 'ja (elke functie beschikbaar)' : 'status ' + aan);
+  const kastOpen = aan === 200;
+  rij('schakelkast "alles aan"', kastOpen ? 'ja (elke functie beschikbaar)'
+    : '\x1b[31mNEE (status ' + aan + ') - alles hierna draait tegen de standaardstand\x1b[0m');
 
   // ---------- FASE B: GELD (vaste asserties op schone staat) ----------
   kop('FASE B: GELD - RTG Pay op de cent, idempotent, bestand tegen onzin');
@@ -754,6 +770,12 @@ async function misbruikBeproeving(tok) {
   kop('HET OORDEEL (drempels; faalt er een, dan exitcode 1)');
   const verdicten = [];
   const v = (naam, ok, detail) => { verdicten.push(ok); console.log('  ' + (ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m') + '  ' + naam.padEnd(16) + ' \x1b[2m' + detail + '\x1b[0m'); };
+  /* SCHAKELKAST. Deze staat bewust bovenaan: zakt hij, dan zijn alle oordelen
+     eronder minder waard dan ze lijken, want dan is de helft van de functies
+     nooit aangeraakt. Een meting die stilletjes minder doet dan ze zegt is
+     gevaarlijker dan een meting die zakt. */
+  v('SCHAKELKAST', kastOpen, kastOpen ? 'elke functie stond aan tijdens de hele run'
+    : 'de hendel ging niet over (status ' + aan + '): de run draaide tegen de standaardstand');
   v('ROBUUSTHEID', buckets.s5xx === 0, buckets.s5xx + ' onverwachte serverfouten');
   v('ROL-SCHEIDING', rolLek.length === 0, rolLek.length ? rolLek.slice(0, 8).join(', ') : 'geen verkeerd-rol token kreeg 2xx');
   v('DEKKING', onbereikt.length === 0, onbereikt.length + ' endpoints te weinig geraakt' + (onbereikt.length ? ': ' + onbereikt.slice(0, 6).map(e => e[0]).join(', ') : ''));

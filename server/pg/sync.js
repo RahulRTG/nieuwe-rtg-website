@@ -6,6 +6,30 @@
    de gedeelde staat-maps komen via de context binnen. */
 const KANAAL = 'rtg_kv';
 
+/* DE SNELLE RIJSTROOK: collecties die nooit achter tientallen megabytes mogen
+   wachten. Dit zijn de idempotentie-boeken van RTG Pay en RTG Bank.
+
+   Waarom uitgerekend deze. De uitstelregel hierboven redeneert dat een late
+   schrijf geen duurzaamheid kost, "want elk nieuw item staat al DIRECT als
+   eigen rij in het transactie-grootboek (tx_ledger)". Dat klopt voor orders en
+   boekingen. Het klopt NIET voor payIdem: die heeft geen rij-voor-rij
+   grootboek achter zich en bestaat alleen als kv-blob. Uitstel is daar dus wel
+   degelijk duurzaamheidsverlies.
+
+   Gemeten op 100M leden: na een overboeking duurde het ~35 seconden voordat de
+   idem-sleutel in Postgres stond, omdat elke flush-ronde eerst de grote blobs
+   (directBetalingen 25 MB, betaalVerzoeken 13 MB, boekingen 10 MB) wegschrijft
+   en een volgende ronde daarop wacht. Herstart de server binnen dat venster --
+   in De Beproeving gebeurt dat, en in het echt heet het "deploy" -- dan is de
+   sleutel weg en boekt een client die opnieuw probeert VOOR DE TWEEDE KEER.
+
+   Deze sleutels zijn klein (tientallen kB's) en gaan daarom in een eigen,
+   losse flush die niet achter de grote blobs aansluit. Elke schrijf is een
+   eigen transactie met een advisory lock per collectie, dus twee flushes over
+   verschillende sleutels zitten elkaar niet in de weg. */
+const VOORRANG = new Set(['payIdem', 'payIdemAfdruk', 'bankIdem', 'bankIdemAfdruk',
+  'paySaldi', 'betaalIdem', 'muntIdem']);
+
 module.exports = (ctx) => {
   const { pool, merge3, uitStore, naarStore, vlag,
     toegepast, laatsteJson, laatsteGrootte, laatsteLengte, laatsteCheck } = ctx;
@@ -36,12 +60,15 @@ module.exports = (ctx) => {
   const GROOT_FLUSH_MS = Number(process.env.PG_GROOT_FLUSH_MS || 5000);
   const laatsteSchrijf = new Map(); // collectie -> tijdstip van de laatste echte schrijf
   const lengteVan = v => Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : 0);
-  async function flush(dataNu, force) {
+  async function flush(dataNu, force, alleen) {
     let geschreven = 0;
     const gewijzigd = [];
     const nu = Date.now();
-    vlag.uitgesteld = false;
+    if (!alleen) vlag.uitgesteld = false;
     for (const k of Object.keys(dataNu)) {
+      // `alleen`: de snelle rijstrook schrijft uitsluitend haar eigen sleutels,
+      // de gewone flush slaat die juist over (die zijn dan al weg)
+      if (alleen ? !alleen.has(k) : VOORRANG.has(k)) continue;
       const groot = (laatsteGrootte.get(k) || 0) > GROOT_BYTES;
       if (groot && !force && nu - (laatsteSchrijf.get(k) || 0) < GROOT_FLUSH_MS) { vlag.uitgesteld = true; continue; }
       if (groot && lengteVan(dataNu[k]) === laatsteLengte.get(k) && nu - (laatsteCheck.get(k) || 0) < GROOT_MS) continue;
@@ -136,5 +163,5 @@ module.exports = (ctx) => {
     return rows.length;
   }
 
-  return { flush, haalNieuwer };
+  return { flush, haalNieuwer, VOORRANG };
 };

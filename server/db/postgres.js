@@ -17,8 +17,34 @@ const { STORE, DATABASE_URL, schrijfLokaleSnapshotStil } = opslag;
 let pg = null, pgKlaar = false, pgVuil = false, pgFlushBezig = false, pgFlushTimer = null, pgPoll = null, pgVeilig = null;
 const pgLog = { warn: (m, v) => console.warn('[pg]', m, v || '') };
 
+/* De snelle rijstrook. De idempotentie-boeken van RTG Pay en RTG Bank hebben
+   geen rij-voor-rij grootboek achter zich (anders dan orders en boekingen) en
+   bestaan alleen als kv-blob. Wachten ze achter de grote blobs, dan is een
+   herstart binnen dat venster een DUBBELE BOEKING voor wie het opnieuw probeert;
+   op 100M leden gemeten liep dat op tot ~35 seconden. Ze krijgen daarom een
+   eigen, korte flush die niet achter de grote schrijfronde aansluit. Eigen
+   bezig-vlag, zodat de trage ronde deze niet blokkeert; de schrijfkant werkt per
+   collectie met een advisory lock, dus twee flushes over verschillende sleutels
+   zitten elkaar niet in de weg. Zie server/pg/sync.js (VOORRANG). */
+let snelVuil = false, snelBezig = false, snelTimer = null;
+function planSnel() {
+  snelVuil = true;
+  if (snelTimer || !pgKlaar) return;
+  snelTimer = setTimeout(snelNu, Number(process.env.PG_SNEL_MS || 60));
+  if (snelTimer.unref) snelTimer.unref();
+}
+async function snelNu() {
+  snelTimer = null;
+  if (!pg || !pgKlaar || snelBezig || !db.writable || !snelVuil || !pg.flushVoorrang) return;
+  snelVuil = false; snelBezig = true;
+  try { await pg.flushVoorrang(db.data); }
+  catch (e) { snelVuil = true; console.warn('[pg] voorrang-flush mislukt:', e.message); }
+  finally { snelBezig = false; if (snelVuil && pgKlaar) planSnel(); }
+}
+
 function planFlush() {
   pgVuil = true;
+  planSnel();               // de geld-sleutels gaan meteen, los van de grote ronde
   if (pgFlushTimer || !pgKlaar) return;
   pgFlushTimer = setTimeout(flushNu, Number(process.env.PG_FLUSH_MS || 150));
   if (pgFlushTimer.unref) pgFlushTimer.unref();
@@ -89,6 +115,12 @@ async function startPostgres() {
 // De pg-only laatste flush bij het afsluiten (de snapshot doet index erbovenop).
 async function flushBijAfsluiten() {
   if (STORE !== 'postgres' || !pg || !db.writable) return;
+  /* EERST DE GELD-SLEUTELS. De gewone flush slaat de voorrang-sleutels over
+     (die rijden hun eigen strook), dus zonder deze regel zou een afsluiting ze
+     juist NIET wegschrijven -- precies de bug die deze strook moest oplossen.
+     En ze gaan vooraan omdat een afsluit-flush op mega-schaal door het
+     grace-venster kan worden afgekapt: wat als eerste weg is, is veilig. */
+  try { if (pg.flushVoorrang) await pg.flushVoorrang(db.data); } catch (e) {}
   try { await pg.flush(db.data, true); } catch (e) {} // force: ook de door pacing uitgestelde grote collecties
 }
 

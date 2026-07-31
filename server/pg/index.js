@@ -87,8 +87,10 @@ function maakPg({ merge3, kluis, log, url }) {
   }
 
   // de write-behind flush en het inlezen van andermans wijzigingen (zie ./sync)
-  const { flush, haalNieuwer } = require('./sync')({ pool, merge3, uitStore, naarStore, vlag,
+  const { flush, haalNieuwer, VOORRANG } = require('./sync')({ pool, merge3, uitStore, naarStore, vlag,
     toegepast, laatsteJson, laatsteGrootte, laatsteLengte, laatsteCheck });
+  // de snelle rijstrook voor de idempotentie-boeken (zie ./sync.js)
+  const flushVoorrang = (dataNu) => flush(dataNu, false, VOORRANG);
 
   // Luister op NOTIFY zodat wijzigingen van andere instances vrijwel direct
   // binnenkomen (geen puur pollen). De aparte client blijft open staan.
@@ -110,7 +112,7 @@ function maakPg({ merge3, kluis, log, url }) {
   function poolStatus() {
     return { totaal: pool.totalCount, inactief: pool.idleCount, wachtend: pool.waitingCount, max: pool.options.max };
   }
-  return { schema, laadAlles, flush, haalNieuwer, luister, sluit, pool, poolStatus,
+  return { schema, laadAlles, flush, flushVoorrang, haalNieuwer, luister, sluit, pool, poolStatus,
     heeftUitgesteld: () => vlag.uitgesteld,
     _staat: { toegepast, laatsteJson } };
 }

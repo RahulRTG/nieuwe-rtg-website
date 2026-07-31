@@ -83,11 +83,15 @@ app.post('/api/supplier/vak/ai', supplierAuth, async (req, res) => {
 });
 // beschikbaarheid: werkdagen en openingstijden lezen en zetten (alleen de eigenaar)
 app.post('/api/supplier/vak/uren', supplierAuth, (req, res) => {
+  // dezelfde deur als de rest van de pro-laag (zie eisVak in supplier/vakpro.js)
+  if (!kern.vakwerk.isVak(req.supplier)) return res.status(403).json({ error: 'Alleen voor dienstverlenende zaken.' });
   const r = kern.vakwerk.uren(req.supplier.code);
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
 app.post('/api/supplier/vak/uren-zet', supplierAuth, (req, res) => {
+  // dezelfde deur als de rest van de pro-laag (zie eisVak in supplier/vakpro.js)
+  if (!kern.vakwerk.isVak(req.supplier)) return res.status(403).json({ error: 'Alleen voor dienstverlenende zaken.' });
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor de eigenaar.' });
   const r = kern.vakwerk.urenZet(req.supplier.code, req.body || {});
   if (r.error) return res.status(r.status || 400).json({ error: r.error });

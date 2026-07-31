@@ -27,15 +27,19 @@
    - EEN HERINNERING IS EEN VRIENDELIJKHEID, GEEN CAMPAGNE. Een keer per
      dertig dagen, en alleen aan wie echt in de onderhoudslijst staat.
 
-   WAT ME OPVIEL EN WAT IK NIET ZELF BESLIS
+   WAT HIER IS GELIJKGETROKKEN
 
-   Alleen vak/pro en vak/capaciteit hebben een expliciete isVak-controle; de
-   overige pro-routes leunen erop dat alles op supplierCode wordt GEFILTERD.
-   Een zaak die geen vakzaak is vindt daardoor niets, en krijgt 404 in plaats
-   van 403. Voor de veiligheid maakt dat niets uit -- er valt niets te raken --
-   maar het antwoord zegt "dat bestaat niet" waar het elders in dit huis "u
-   hoort hier niet" zegt. Of dat gelijkgetrokken moet worden is een keuze voor
-   RTG; de toets legt vast wat er nu gebeurt.
+   Alleen vak/pro en vak/capaciteit hadden een expliciete isVak-controle; de
+   overige pro-routes leunden erop dat alles op supplierCode wordt GEFILTERD.
+   Veilig was dat wel -- een restaurant vond niets -- maar het antwoord zei
+   "dat bestaat niet" waar dit huis elders "u hoort hier niet" zegt, en dat
+   verschil hoorde niet van route tot route te wisselen.
+
+   Er staat nu een gedeelde eisVak() in supplier/vakpro.js, op alle elf de
+   pro-routes plus vak/uren en vak/uren-zet in supplier/boekingen.js. Zelfde
+   controle, zelfde 403, zelfde zin. Toets 6 hieronder loopt ze allemaal
+   langs, zodat een gat in die deur niet op een enkele route onopgemerkt
+   blijft.
 
    Draai los: node --experimental-sqlite --test test/vakwerk-pro.test.js
    ========================================================================== */
@@ -113,14 +117,8 @@ test('2. een aanvraag afwijzen doet de eigenaar, en maar een keer', async () => 
   assert.equal((await api('/api/vak/offerte/vraag', { supplierCode: 'KIKUNOI', omschrijving: 'Iets langers dan tien tekens.' }, lid)).status, 404,
     'een restaurant neemt geen offerte-aanvragen aan');
 
-  /* 404 en niet 403, en dat verschil zegt iets over hoe deze laag beveiligd
-     is. Alleen vak/pro en vak/capaciteit hebben een expliciete isVak-controle;
-     de andere routes leunen op het feit dat alles op supplierCode is
-     GEFILTERD. Een restaurant vindt daardoor niets in plaats van te horen dat
-     het er niet bij hoort. Voor de veiligheid maakt dat niets uit -- er valt
-     niets te raken -- en de toets legt daarom vast wat er echt gebeurt. */
-  assert.equal((await api('/api/supplier/vak/offerte/weiger', { id: offerteId }, resto)).status, 404,
-    'een andere zaak vindt deze aanvraag niet eens');
+  assert.equal((await api('/api/supplier/vak/offerte/weiger', { id: offerteId }, resto)).status, 403,
+    'een restaurant komt niet bij de pro-laag van een vakzaak');
   assert.equal((await api('/api/supplier/vak/offerte/weiger', { id: 'bestaatniet' }, vakBaas)).status, 404);
 
   const nee = await api('/api/supplier/vak/offerte/weiger', { id: offerteId }, vakBaas);
@@ -145,8 +143,8 @@ test('3. een uitnodiging van de wachtlijst is een seintje, geen boeking', async 
   wachtId = (bord.body.wachtlijst || [])[0] && bord.body.wachtlijst[0].id;
   assert.ok(wachtId, 'de wachtende staat op het bord van de zaak');
 
-  assert.equal((await api('/api/supplier/vak/wachtlijst/uitnodig', { id: wachtId }, resto)).status, 404,
-    'de wachtende van een andere zaak bestaat hier niet');
+  assert.equal((await api('/api/supplier/vak/wachtlijst/uitnodig', { id: wachtId }, resto)).status, 403,
+    'een restaurant heeft geen wachtlijst');
   assert.equal((await api('/api/supplier/vak/wachtlijst/uitnodig', { id: 'bestaatniet' }, vakBaas)).status, 404);
 
   const uit = await api('/api/supplier/vak/wachtlijst/uitnodig', { id: wachtId }, vakBaas);
@@ -170,11 +168,13 @@ test('4. een vast ritme stopt de zaak of het lid, en daarna is het gestopt', asy
        geldt voor beide kanten. */
     assert.equal((await api('/api/supplier/vak/ritme/stop', { id: 'bestaatniet' }, vakBaas)).status, 404);
     assert.equal((await api('/api/vak/ritme/stop', { id: 'bestaatniet' }, lid)).status, 404);
+    assert.equal((await api('/api/supplier/vak/ritme/stop', { id: 'bestaatniet' }, resto)).status, 403,
+      'en een restaurant komt er sowieso niet bij');
     return;
   }
   const ritmeId = (start.body.ritme || {}).id;
-  assert.equal((await api('/api/supplier/vak/ritme/stop', { id: ritmeId }, resto)).status, 404,
-    'het ritme van een andere zaak bestaat hier niet');
+  assert.equal((await api('/api/supplier/vak/ritme/stop', { id: ritmeId }, resto)).status, 403,
+    'een restaurant kent geen vaste afspraken van een vakzaak');
   assert.equal((await api('/api/supplier/vak/ritme/stop', { id: ritmeId }, vakBaas)).status, 200);
   assert.equal((await api('/api/supplier/vak/ritme/stop', { id: ritmeId }, vakBaas)).status, 404,
     'een gestopt ritme is niet nog eens te stoppen');
@@ -192,10 +192,29 @@ test('5. een onderhoudsherinnering is een vriendelijkheid, geen campagne', async
 
   assert.equal((await api('/api/supplier/vak/onderhoud/herinner', {}, vakBaas)).status, 404,
     'zonder codenaam valt er niemand te herinneren');
-  /* Ook hier 404 in plaats van 403: de route filtert op de eigen zaakcode en
-     kent geen isVak-controle. Het restaurant vindt dus niemand, wat op
-     hetzelfde neerkomt -- alleen zegt het antwoord "die staat er niet" in
-     plaats van "u hoort hier niet". */
-  assert.equal((await api('/api/supplier/vak/onderhoud/herinner', { codenaam: 'x', dienstId: 'y' }, resto)).status, 404,
-    'een restaurant vindt in zijn eigen onderhoudslijst niemand');
+  assert.equal((await api('/api/supplier/vak/onderhoud/herinner', { codenaam: 'x', dienstId: 'y' }, resto)).status, 403,
+    'en een restaurant heeft deze route helemaal niet');
+});
+
+test('6. de hele pro-laag heeft dezelfde deur', async () => {
+  /* Elke pro-route van een vakzaak weigert een zaak die er geen is, met
+     dezelfde 403 en dezelfde zin. Ze hier allemaal langslopen is geen
+     herhaling: eisVak staat op elf plekken los aangeroepen, en een regel die
+     bij een nieuwe route wordt vergeten is precies het soort gat dat je pas
+     merkt als iemand ernaar zoekt. */
+  const routes = [
+    ['pro', {}], ['ritme/stop', { id: 'x' }], ['wachtlijst/uitnodig', { id: 'x' }],
+    ['capaciteit', { capaciteit: 5 }], ['offerte/antwoord', { id: 'x', prijs: 100 }],
+    ['offerte/weiger', { id: 'x' }], ['werkbon', { ref: 'x' }], ['klantnotitie', { codenaam: 'x', tekst: 'y' }],
+    ['dienst/herhaal', { dienstId: 'x' }], ['onderhoud/herinner', { codenaam: 'x', dienstId: 'y' }],
+    ['uren', {}], ['uren-zet', { capaciteit: 3 }]
+  ];
+  for (const [pad, body] of routes) {
+    const r = await api('/api/supplier/vak/' + pad, body, resto);
+    assert.equal(r.status, 403, 'vak/' + pad + ' hoort dicht te zijn voor een restaurant (kreeg ' + r.status + ')');
+    assert.match(r.body.error, /dienstverlenende zaken/i, 'vak/' + pad + ' met dezelfde zin');
+  }
+  // en voor de vakzaak zelf staat diezelfde deur gewoon open
+  assert.equal((await api('/api/supplier/vak/pro', {}, vakBaas)).status, 200);
+  assert.equal((await api('/api/supplier/vak/uren', {}, vakBaas)).status, 200);
 });

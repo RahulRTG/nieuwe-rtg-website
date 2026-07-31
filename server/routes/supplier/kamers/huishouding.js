@@ -74,7 +74,13 @@ app.post('/api/supplier/ticket/add', supplierAuth, (req, res) => {
 app.post('/api/supplier/ticket/status', supplierAuth, (req, res) => {
   const t = (db.data.tickets[req.supplier.code] || []).find(x => x.id === req.body.id);
   if (!t) return res.status(404).json({ error: 'Klus niet gevonden.' });
-  const status = ['open', 'bezig', 'klaar'].includes(req.body.status) ? req.body.status : 'open';
+  /* Een status die we niet kennen wordt geweigerd, niet vertaald. Dit stond er
+     eerst als "... : 'open'", en dat betekende dat een tikfout op een AFGERONDE
+     klus hem terugzette op de lijst -- met de naam van wie hem afrondde er nog
+     onder. Elders in dit huis is de afspraak duidelijker (kern/markt.js
+     zetStatus: "Onbekende status.", 400); die geldt nu ook hier. */
+  const status = String(req.body.status || '');
+  if (!['open', 'bezig', 'klaar'].includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
   t.status = status;
   if (status === 'bezig') { t.by = req.actor.name; }
   if (status === 'klaar') { t.doneBy = req.actor.name; t.doneAt = new Date().toISOString(); }

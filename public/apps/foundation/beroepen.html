@@ -59,6 +59,7 @@
   <div class="blader" id="bbBlader"></div>
 </div>
 
+<script src="/shared/glyf.js"></script>
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -96,7 +97,7 @@ let zt; $('#bbZoek').addEventListener('input', () => { clearTimeout(zt); zt = se
 $('#bbMijn').addEventListener('click', () => { ST.mijn = !ST.mijn; ST.pagina = 1; teken(); });
 
 function kaart(a, heeft){
-  return '<div class="kaart app"><span class="cat">'+a.icon+' '+esc(a.beroep)+' · '+esc(a.niveau)+'</span>'+
+  return '<div class="kaart app"><span class="cat">'+RTGGlyf.tekst(a.icon)+' '+esc(a.beroep)+' · '+esc(a.niveau)+'</span>'+
     '<b>'+esc(a.naam)+'</b>'+
     '<small>'+esc(a.soort)+' · v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+'</small>'+
     '<div class="rij"><s>€ '+(a.winkelwaardeCenten/100).toFixed(2).replace('.',',')+'</s><span class="gratis">Gratis</span>'+

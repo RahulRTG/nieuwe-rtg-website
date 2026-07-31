@@ -29,7 +29,7 @@
       map = '<div class="gmap">'+pts.map(p=>{
         const x=((p.lng-minLng)/dLng)*100, y=(1-(p.lat-minLat)/dLat)*100;
         return '<div class="mk" style="left:'+x.toFixed(1)+'%;top:'+y.toFixed(1)+'%;">'+
-          (p.me?'<div>'+S.icon+'</div>':'<div class="gpin"></div>')+
+          (p.me?'<div>'+RTGGlyf.tekst(S.icon)+'</div>':'<div class="gpin"></div>')+
           '<div class="lbl">'+(p.me?S.name.split(' ')[0]:p.name)+'</div></div>';
       }).join('')+'</div>';
     }

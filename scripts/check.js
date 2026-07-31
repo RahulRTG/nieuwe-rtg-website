@@ -894,5 +894,61 @@ console.log('\n21) geen pagina leest een css-token dat nergens gezet wordt');
   if (!losseTokens) ok(bekeken + ' pagina(s) lezen alleen tokens die ergens gezet worden');
 }
 
+/* 22) EEN GLYFNAAM IS BEELD, GEEN WOORD.
+
+   De server bewaart bij een categorie of een kaart geen teken maar een NAAM:
+   icon: 'paneel', icon: 'stad', icon: 'logboek'. Dat is met opzet -- regel 3b
+   hierboven verbiedt emoji in de bron omdat het beeld uit shared/glyf.js komt
+   en niet uit de emoji-font van het toestel.
+
+   Een scherm dat zo'n veld rechtstreeks in zijn HTML plakt, zet dus het WOORD
+   op het scherm. Zo stond er letterlijk "paneel Apparaten" op de hardware-PDA
+   en "stad Chalet Aurelia" bij de architect, op 38 plekken verdeeld over acht
+   schermen. Niemand ziet dat in de code; je ziet het pas als je het scherm
+   ingelogd met data opent, en dan nog denk je een halve seconde dat het bij de
+   naam hoort.
+
+   Wie zo'n veld toont, doet dat via RTGGlyf.tekst(): die maakt er een
+   pictogram van als de naam bestaat, en laat anders staan wat er stond. */
+console.log('\n22) een glyfnaam wordt getoond als beeld, niet als woord');
+{
+  const MAG_TEKST = new Map([
+    // ['public/apps/x.html', 'reden waarom dit veld hier geen glyfnaam draagt']
+  ]);
+  // de namen die glyf.js kent, uit de bron (glyf.js zelf is een bundel)
+  const glyfBron = fs.readFileSync(path.join(ROOT, 'public', 'shared', 'glyf.js'), 'utf8');
+  const namen = new Set();
+  for (const m of glyfBron.matchAll(/(?:^|[{,])\s*'?([a-zA-Z0-9_-]+)'?\s*:\s*'</gm)) namen.add(m[1]);
+
+  /* Dragen de icon-velden in de server echt glyfnamen? Zo ja, dan is elk
+     scherm dat ze als tekst plakt per definitie fout. Dit is geen aanname
+     maar een telling. */
+  let dragend = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const m of bron.matchAll(/\bicon:\s*'([a-zA-Z0-9_-]+)'/g)) if (namen.has(m[1])) dragend++;
+  });
+
+  let plak = 0, plekken = 0;
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || MAG_TEKST.has(rel)) return;
+    // de bundels zijn bouwuitvoer; de bron staat in de losse delen ernaast
+    let isBundel = false;
+    try { isBundel = new Set(Object.keys(require('./bundel').bundels).map(k => 'public/' + k)).has(rel); } catch (e) { /* geen bundellijst */ }
+    if (isBundel) return;
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const treffers = [...bron.matchAll(/\+\s*(?:esc\()?\s*(\w+)\.icon\b\)?\s*\+/g)];
+    if (!treffers.length) return;
+    plekken += treffers.length;
+    plak++;
+    fout(rel + ': ' + treffers.length + ' plek(ken) plakken een icon-veld rechtstreeks in de HTML' +
+      ' -- gebruik RTGGlyf.tekst(x.icon), anders staat de glyfNAAM als woord op het scherm');
+  });
+  if (!plak) ok('geen enkel scherm plakt een glyfnaam als tekst (' + namen.size + ' namen, ' +
+    dragend + ' icon-velden in de server dragen er een; ' + MAG_TEKST.size + ' benoemd als uitzondering)');
+  void plekken;
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

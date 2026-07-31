@@ -51,6 +51,7 @@
   <div class="blader" id="sbBlader"></div>
 </div>
 
+<script src="/shared/glyf.js"></script>
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -73,7 +74,7 @@ async function start(){
     GROEPEN = d.groepen;
     $('#sbIntro').textContent = d.totaal.toLocaleString('nl-NL') + ' school-apps (' + d.perGroep.toLocaleString('nl-NL') + ' per leeftijdsgroep), van kleuter tot universiteit en van vmbo tot vwo. Winkelwaarde samen ' + euro(d.totaleWinkelwaardeCenten) + '; hier altijd gratis.';
     $('#sbNiveau').innerHTML = '<option value="">Alle niveaus (voor jou)</option>' +
-      d.groepen.map(g => '<option value="'+g.id+'">'+g.icon+' '+esc(g.label)+'</option>').join('');
+      d.groepen.map(g => '<option value="'+g.id+'">'+esc(g.label)+'</option>').join('');
   } catch (e) { $('#sbGrid').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   vulVakken(); teken();
 }
@@ -84,7 +85,7 @@ function vulVakken(){
 }
 function kaart(a, vanMij){
   return '<div class="kaart app">'+
-    '<span class="cat">'+a.icon+' '+esc(a.groepLabel)+' · '+esc(a.vak)+'</span>'+
+    '<span class="cat">'+RTGGlyf.tekst(a.icon)+' '+esc(a.groepLabel)+' · '+esc(a.vak)+'</span>'+
     '<b>'+esc(a.naam)+'</b>'+
     '<small>'+a.sterren.toFixed(1)+' · versie '+esc(a.versie)+'</small>'+
     '<div class="rij"><s>'+euro(a.winkelwaardeCenten)+'</s><span class="gratis">Gratis</span>'+

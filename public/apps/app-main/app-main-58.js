@@ -116,7 +116,7 @@
   function ontmoetActBtns(voorstelId){
     return (ontmoetState.activiteiten || []).map(a =>
       '<button class="js-oa" data-v="' + voorstelId + '" data-a="' + a.id + '" style="flex:1;min-width:5.5rem;background:none;border:1px solid var(--gold);border-radius:12px;padding:0.6rem 0.4rem;color:var(--txt);font-family:inherit;cursor:pointer;text-align:center;">' +
-      '<span style="font-size:1.3rem;display:block;">' + a.icon + '</span><b style="font-size:0.78rem;">' + escT(a.label) + '</b>' +
+      '<span style="font-size:1.3rem;display:block;">' +RTGGlyf.tekst(a.icon)+ '</span><b style="font-size:0.78rem;">' + escT(a.label) + '</b>' +
       '<span style="display:block;font-size:0.6rem;color:var(--muted);">' + escT(a.tekst) + '</span></button>').join('');
   }
   function renderOntmoet(){

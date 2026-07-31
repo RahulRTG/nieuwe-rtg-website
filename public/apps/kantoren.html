@@ -1826,7 +1826,7 @@ function renderIdeeen(){
   const d = IDEEEN; if (!d) return;
   const bureauOpts = d.bureaus;
   $('#iLijst').innerHTML = d.ideeen.length ? d.ideeen.map(o => {
-    const spinKnoppen = bureauOpts.map(b => '<button class="knop stil iSpin" data-o="'+o.id+'" data-b="'+b.id+'" style="font-size:.72rem;padding:.2rem .5rem;">'+b.icon+' → '+esc(b.label.replace('RTG ',''))+'</button>').join(' ');
+    const spinKnoppen = bureauOpts.map(b => '<button class="knop stil iSpin" data-o="'+o.id+'" data-b="'+b.id+'" style="font-size:.72rem;padding:.2rem .5rem;">'+RTGGlyf.tekst(b.icon)+' → '+esc(b.label.replace('RTG ',''))+'</button>').join(' ');
     return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
         '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.titel)+'</h2>'+

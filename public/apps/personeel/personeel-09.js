@@ -26,7 +26,7 @@
     return '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.dorp','Afdelingen')+
       '<button class="abtn ghost" id="pkDorpChat" style="font-size:0.66rem;">'+T('pd.dorp.chat','Teamchat')+'</button></div>'+
       '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.4rem;">'+pkDorp.afdelingen.map(a =>
-        '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+a.icon+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
+        '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+RTGGlyf.tekst(a.icon)+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
       '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+RTGGlyf.tekst(afd.icon)+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
       pkToolsHtml()+
       (afd.open.length ? afd.open.map(p => {

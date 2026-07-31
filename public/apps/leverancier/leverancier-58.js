@@ -57,7 +57,7 @@
     if (openRes) todos.push({ icon:'', txt: openRes + ' ' + T('todo.res','open reservering(en) om te bevestigen'), tab:'orders' });
     extra += '<div class="card"><div class="tt-h">' + T('todo.h','Vandaag nog doen') + '</div>' +
       (todos.length ? todos.map(t =>
-        '<button class="todo-row" data-goto="' + t.tab + '"><span>' + t.icon + '</span><b>' + t.txt + '</b><i>›</i></button>'
+        '<button class="todo-row" data-goto="' + t.tab + '"><span>' +RTGGlyf.tekst(t.icon)+ '</span><b>' + t.txt + '</b><i>›</i></button>'
       ).join('') : '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--green);">✓ ' + T('todo.none','Alles is bij. Geen openstaande acties.') + '</div>') +
       '</div>';
 

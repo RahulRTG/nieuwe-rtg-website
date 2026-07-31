@@ -89,7 +89,16 @@ test('1. een bekendmaking is openbaar, en dat hoort zo', async () => {
 });
 
 test('2. de KvK-inschrijving is van de eigen onderneming', async () => {
+  /* Eerst allebei de zaken echt laten inschrijven. Zonder die opzet zijn de
+     twee lijsten allebei leeg, en dan slaagt "de buurzaak heeft zijn eigen
+     inschrijvingen" ook als de route de code uit de BODY zou lezen -- wat de
+     mutatie ook aantoonde. Zesde keer deze reeks dat een lege lijst een
+     bewering van tanden beroofde. */
+  assert.equal((await api('/api/supplier/overheid/kvk/zorg', {}, resto)).status, 200, 'het restaurant staat ingeschreven');
+  assert.equal((await api('/api/supplier/overheid/kvk/zorg', {}, buurbaas)).status, 200, 'het hotel ook');
+
   const mijn = await api('/api/supplier/overheid/kvk/mijn', {}, resto);
+  assert.ok(mijn.body.inschrijvingen.length, 'er staat een eigen inschrijving');
   assert.equal(mijn.status, 200);
   assert.ok(Array.isArray(mijn.body.inschrijvingen), 'er komt een lijst terug, ook als hij leeg is');
 
@@ -102,9 +111,15 @@ test('2. de KvK-inschrijving is van de eigen onderneming', async () => {
     'meesturen van een andere code verandert niets aan het antwoord');
 
   const buur = await api('/api/supplier/overheid/kvk/mijn', {}, buurbaas);
-  assert.equal(buur.status, 200);
+  assert.ok(buur.body.inschrijvingen.length, 'de buurzaak heeft er ook een');
+  /* Vergelijken op kvkNummer en niet op id: een publieke inschrijving heeft
+     geen id-veld, en undefined === undefined had deze bewering stilzwijgend
+     laten slagen. */
+  assert.ok(buur.body.inschrijvingen.every(k => k.kvkNummer), 'elke inschrijving draagt een kvk-nummer');
   for (const k of buur.body.inschrijvingen)
-    assert.ok(!mijn.body.inschrijvingen.some(m => m.id === k.id), 'de buurzaak heeft zijn eigen inschrijvingen');
+    assert.ok(!mijn.body.inschrijvingen.some(m => m.kvkNummer === k.kvkNummer), 'en het zijn niet dezelfde');
+  assert.notEqual(mijn.body.inschrijvingen[0].naam, buur.body.inschrijvingen[0].naam,
+    'elke zaak staat op zijn eigen naam ingeschreven');
 });
 
 test('3. een dossier heeft twee standen en niet meer', async () => {

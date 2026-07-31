@@ -90,6 +90,68 @@ test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voort
   }
 });
 
+/* De pauzeknop hoort op het scherm te staan waar hij gebruikt wordt: op de PDA,
+   naast de klok. De route /api/staff/pauze bestond al en werd afgerekend in
+   test/werkbeleid-dienst.test.js; een route zonder knop is voor de medewerker
+   nog steeds geen pauze. Wat deze test ook vastlegt: op dat scherm staat een
+   MINUTENteller en geen woord over wat er in die minuten gebeurde. */
+test('PDA in de browser: pauze staat naast de klok, en telt minuten en niets anders',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const roster = await api(base, '/api/supplier/roster', { code: 'KIKUNOI' });
+    const staff = roster.staff.find(x => x.role !== 'manager');
+    const login = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: staff.id, pin: '5678' });
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const paginaFouten = [];
+    page.on('pageerror', e => paginaFouten.push(e.message));
+    await page.addInitScript(([tok, code]) => {
+      localStorage.setItem('rtg_pda_token', tok);
+      localStorage.setItem('rtg_pda_code', code);
+      localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, [login.token, 'KIKUNOI']);
+    await page.goto(base + '/apps/personeel.html', { waitUntil: 'load' });
+
+    // uitgeklokt is er geen pauze te nemen: de knop hoort er dan niet te staan
+    await page.waitForSelector('#klokBtn', { timeout: 12000 });
+    assert.equal(await page.locator('#pauzeBtn').count(), 0, 'zonder dienst geen pauzeknop');
+
+    await page.click('#klokBtn');
+    await page.waitForSelector('#pauzeBtn', { timeout: 15000 });
+    const voor = await page.textContent('#todayWrap');
+    assert.match(voor, /45\/45 min/, 'het hele budget staat er nog');
+
+    await page.click('#pauzeBtn');
+    await page.waitForFunction(() => {
+      const b = document.getElementById('pauzeBtn');
+      return b && /klaar/i.test(b.textContent);
+    }, undefined, { timeout: 20000 });
+
+    /* Wat er op het scherm staat gaat over TIJD. Zou hier staan wat er in de
+       pauze gebeurde, dan hield dit scherm bij hoeveel minuten iemand op De
+       Salon zat -- precies de meting waar het werkbeleid tegen beschermt. */
+    const tijdens = await page.textContent('#todayWrap');
+    assert.match(tijdens, /min/, 'de teller loopt op minuten');
+    assert.doesNotMatch(tijdens, /Salon|bekeken|schermtijd/i, 'en zegt niets over wat er in die minuten gebeurde');
+
+    await page.click('#pauzeBtn');
+    await page.waitForFunction(() => {
+      const b = document.getElementById('pauzeBtn');
+      return b && !/klaar/i.test(b.textContent);
+    }, undefined, { timeout: 20000 });
+
+    assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens het scherm');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Vandaag en handelt het af',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   const TMP = verseDataDir();

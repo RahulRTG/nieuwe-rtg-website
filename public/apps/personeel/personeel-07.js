@@ -8,6 +8,18 @@
         renderToday();
       } catch(e){ toast(e.message); kb.disabled = false; }
     });
+    const pb = document.getElementById('pauzeBtn');
+    if (pb) pb.addEventListener('click', async () => {
+      pb.disabled = true;
+      try {
+        const d = await API.call('/staff/pauze', {});
+        if (zaken) zaken.pauze = d.pauze;
+        toast(d.actie === 'in'
+          ? T('pd.p.start','Pauze. Nog ') + d.pauze.restMinuten + T('pd.p.min',' minuten deze dienst.')
+          : T('pd.p.stop','Weer aan het werk.'));
+        renderToday();
+      } catch(e){ toast(e.message); pb.disabled = false; }
+    });
     // geaccrediteerd wisselen: wie ook bij een verbonden zaak op het rooster
     // staat, stapt met een tik over, zonder opnieuw een PIN in te voeren
     if (wisselOpties.length){

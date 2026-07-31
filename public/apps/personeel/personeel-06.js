@@ -82,6 +82,25 @@
     API.call('/staff/voorspel', {}).then(d => { vwPda = d; renderToday(); })
       .catch(() => {}).finally(() => { vwPdaBezig = false; });
   }
+  /* DE PAUZEKNOP. Zolang u ingeklokt staat mag uw werkgever functies op uw pas
+     dichthouden (Salon, AI, paspoort delen). In uw pauze niet -- daarvoor staat
+     er drie kwartier per dienst, rookpauze en grote pauze uit dezelfde pot.
+
+     Wat hier staat is een MINUTENTELLER en verder niets. Er is geen veld dat
+     zegt wat u in die minuten deed, en dat is geen omissie: een teller op uw
+     Salon-gebruik zou precies de meting zijn waar dit beleid tegen beschermt. */
+  function pauzeBlok(){
+    const p = zaken && zaken.pauze;
+    if (!p || !p.ingeklokt) return '';
+    const rest = p.restMinuten;
+    const op = rest <= 0;
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid var(--line);">'+
+      '<span style="font-size:0.76rem;color:var(--soft);">'+T('pd.p.rest','Pauze')+' <b style="color:'+(op?'var(--soft)':'var(--txt)')+';">'+rest+'/'+p.budget+' min</b>'+
+      (p.pauze && !p.binnenBudget ? ' · '+T('pd.p.over','uw pauze loopt door, het beleid geldt weer') : '')+'</span>'+
+      '<button class="abtn'+(p.pauze?'':' ghost')+'" id="pauzeBtn">'+
+      (p.pauze ? T('pd.p.uit','Pauze klaar') : T('pd.p.in','Pauze'))+'</button></div>';
+  }
+
   function renderToday(){
     const shift = myShift(0);
     const tasks = taskList();
@@ -92,6 +111,7 @@
       (klok ? '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.7rem;padding-top:0.7rem;border-top:1px solid var(--line);">'+
         '<span style="font-size:0.76rem;color:var(--soft);">'+T('pd.k.vandaag','Vandaag')+' <b style="color:var(--txt);">'+klok.vandaagUren+' u</b> · '+T('pd.k.week','deze week')+' <b style="color:var(--txt);">'+klok.weekUren+' u</b></span>'+
         '<button class="abtn'+(klok.open?'':' ghost')+'" id="klokBtn">'+(klok.open?''+T('pd.k.uit','Klok uit'):'▶ '+T('pd.k.in','Klok in'))+'</button></div>' : '')+
+      pauzeBlok()+
       '</div>'+
       '<div class="card"><div class="k">'+T('pd.tasksnow','Nu aandacht nodig')+' ('+tasks.length+')</div>'+
       (tasks.length ? tasks.slice(0,6).map(t=>'<div class="task"><span class="ic">'+RTGGlyf.tekst(t.icon)+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div></div>').join('')

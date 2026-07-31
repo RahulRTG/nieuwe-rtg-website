@@ -82,6 +82,8 @@ function maakLidboard({ db, save }) {
     werkbeleid: werk.werkbeleid,
     werkbeleidZet: werk.werkbeleidZet,
     werkbeleidOverzicht: werk.werkbeleidOverzicht,
+    werkbeleidPauzeStand: werk.werkbeleidPauzeStand,
+    WERKBELEID_PAUZE_MINUTEN: werk.WERKBELEID_PAUZE_MINUTEN,
     werkgeversVan: werk.werkgeversVan
   };
 }

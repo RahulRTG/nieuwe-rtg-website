@@ -3,12 +3,14 @@
 module.exports = (kern) => {
   const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
     fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
+    werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
     oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht } = kern;
 
   /* De collega-, dienst- en ooglaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const actx = { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
     fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
+    werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
     oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht };
   require('./staff/collega')(actx);
   require('./staff/dienst')(actx);

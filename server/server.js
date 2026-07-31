@@ -1677,7 +1677,8 @@ const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarket
    van zijn beschermde kind bij (de route bewaakt het gezinsverband). */
 const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
   lidBoardVersie, lidPadFunctie, lidBoardUit, lidBoardLog, lidBoardLogWis,
-  werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan } = maakLidboard({ db, save });
+  werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan,
+  werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = maakLidboard({ db, save });
 
 /* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
    autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,
@@ -2145,8 +2146,10 @@ const kern = {
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
   LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
   lidBoardVersie, lidBoardLog, lidBoardLogWis,
-  // het werkgeversbeleid op de boardroom van het lid (alleen dichtzetten)
+  // het werkgeversbeleid op de boardroom van het lid (alleen dichtzetten,
+  // alleen tijdens de dienst, en niet in de pauze-armslag)
   werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan,
+  werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
   // de autoverkoop-laag (kern/autoverkoop.js)
   AUTOVERKOOP_BRANDSTOF, avMagVerkopen, avZetAan, avZetAuto, avVerwijderAuto, avShowroom,
   avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox,

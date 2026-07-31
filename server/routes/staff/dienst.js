@@ -4,7 +4,8 @@
    bij het opstarten vanuit routes/staff.js. */
 module.exports = (actx) => {
   const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
-    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus } = actx;
+    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
+    werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = actx;
 /* Fluister voor de vloer: dezelfde persoonlijke assistent, met een eigen
    geheugen per personeelslid (nooit gedeeld met de werkgever). */
 const staffKey = req => 'staff:' + req.supplier.code + ':' + req.actor.staffId;
@@ -56,11 +57,40 @@ app.post('/api/staff/clock', supplierAuth, (req, res) => {
   res.json({ ok: true, actie, klok: klokVan(req.supplier.code, req.actor.staffId) });
 });
 
+/* PAUZE. Zolang je ingeklokt staat houdt het werkbeleid van je werkgever
+   functies dicht (kern/lidboard/werkbeleid.js). In je pauze niet: dan is je
+   pas weer van jou. De armslag is 45 minuten per dienst, samen voor alle
+   pauzes -- de rookpauze en de grote pauze komen uit dezelfde pot.
+
+   Wat hier NIET gebeurt: meten wat je in die minuten doet. De teller loopt op
+   pauzeminuten, punt. Zou hij op je gebruik van De Salon lopen, dan hield dit
+   systeem precies bij hoeveel minuten je op sociale media zat, en dat is de
+   meting waar dat hele beleid tegen beschermt.
+
+   Pauze nemen mag altijd, ook als de 45 minuten op zijn: je pauzerecht is niet
+   van RTG. Wat er dan gebeurt is alleen dat het beleid weer geldt. */
+app.post('/api/staff/pauze', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
+  const lijst = db.data.klok[req.supplier.code] = db.data.klok[req.supplier.code] || [];
+  const dienst = Array.isArray(lijst) ? lijst.find(e => e.staffId === req.actor.staffId && e.in && !e.out) : null;
+  if (!dienst) return res.status(409).json({ error: 'Je staat niet ingeklokt; een pauze hoort bij een dienst.' });
+  dienst.pauzes = dienst.pauzes || [];
+  const open = dienst.pauzes.find(p => p && p.in && !p.uit);
+  let actie;
+  if (open) { open.uit = new Date().toISOString(); actie = 'uit'; }
+  else { dienst.pauzes.push({ in: new Date().toISOString(), uit: null }); actie = 'in'; }
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
+  const stand = werkbeleidPauzeStand(req.supplier.code, req.actor.staffId);
+  res.json({ ok: true, actie, pauze: stand, budgetMinuten: WERKBELEID_PAUZE_MINUTEN });
+});
+
 app.post('/api/staff/mine', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
   res.json({
     klok: klokVan(req.supplier.code, req.actor.staffId),
     verlof: (db.data.verlof[req.supplier.code] || []).filter(v => v.staffId === req.actor.staffId).slice(0, 10),
+    pauze: werkbeleidPauzeStand(req.supplier.code, req.actor.staffId),
     trust: trustVan(req.supplier.code, req.actor.staffId)
   });
 });

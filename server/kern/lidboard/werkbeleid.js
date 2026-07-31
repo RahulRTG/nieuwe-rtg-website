@@ -13,6 +13,24 @@
 
        EEN WERKGEVER KAN ALLEEN DICHTZETTEN, NOOIT OPENZETTEN.
 
+   En sinds deze ronde een tweede regel, die net zo hard is:
+
+       ALLEEN TIJDENS JE DIENST, EN NIET IN JE PAUZE.
+
+   Het beleid gold hiervoor VIERENTWINTIG UUR PER DAG: dichtVoor() keek alleen
+   of je een werkkoppeling met die zaak had, niet of je aan het werk was. Dat
+   betekende dat je baas je pas ook op zondag dichthield. Nu geldt het beleid
+   alleen zolang je INGEKLOKT staat, en daarbinnen heb je 45 minuten pauze
+   waarin het even niet geldt -- de rookpauze, de grote pauze.
+
+   Wat we daarvoor NIET doen: meten wanneer je kijkt. Zou het budget aftellen
+   op je gebruik van De Salon, dan zou dit systeem precies bijhouden hoeveel
+   minuten je op sociale media zat, en dat is exact de meting waar deze module
+   tegen beschermt. De teller loopt dus op PAUZEMINUTEN en niet op wat je in
+   die minuten doet. Pauze nemen mag altijd; is het budget op, dan geldt het
+   beleid weer -- RTG gaat niet over je pauzerecht, alleen over wanneer de
+   werkgever iets te zeggen heeft.
+
    Het beleid is dus een lijst van functies die DICHT staan, en verder niets.
    Er is geen "verplicht aan". Wat dat oplevert:
 
@@ -37,6 +55,10 @@
    Opslag: db.data.werkbeleid[<zaakcode>] = { uit:[id,...], at, door }. */
 
 const { OP_ID } = require('./catalogus');
+
+/* De pauze-armslag per dienst. Een getal op een plek; de route en het bord
+   lezen het hier, zodat er nooit twee waarheden over kunnen ontstaan. */
+const PAUZE_MINUTEN = 45;
 
 function maakWerkbeleid({ db, save }) {
   function store() {
@@ -100,24 +122,82 @@ function maakWerkbeleid({ db, save }) {
       if (r.rol !== 'personeel' && r.rol !== 'zaak') continue;
       const code = norm(r.code);
       if (uit.some(x => x.code === code)) continue;
-      uit.push({ code, naam: r.zaakNaam || r.naam || code });
+      uit.push({ code, naam: r.zaakNaam || r.naam || code, staffId: r.staffId != null ? r.staffId : null });
     }
     return uit;
+  }
+
+  /* Draait deze persoon op dit moment een dienst bij die zaak? Dat is de open
+     regel op de prikklok: een in-tijd zonder uit-tijd.
+
+     db.data.klok draagt twee soorten bewoners: onder een ZAAKCODE staat de
+     prikklok (een lijst), onder 'lid:<key>' het wekkertje van een lid (een
+     object met wekkers en timers). Vandaar de Array-controle -- zonder die
+     regel zou een lid met een wekker hier een uitzondering opleveren. */
+  function dienstNu(zaakcode, staffId) {
+    if (staffId == null) return null;
+    const lijst = (db.data.klok && db.data.klok[norm(zaakcode)]) || null;
+    if (!Array.isArray(lijst)) return null;
+    return lijst.find(e => e && e.staffId === staffId && e.in && !e.out) || null;
+  }
+
+  const minuten = (van, tot) => Math.max(0, (new Date(tot) - new Date(van)) / 60000);
+
+  /* Hoeveel pauzeminuten zijn er in deze dienst al gebruikt, de lopende pauze
+     meegerekend? Alleen minuten; nooit waar ze aan besteed zijn. */
+  function pauzeGebruikt(dienst, nu) {
+    const nuMs = nu || new Date().toISOString();
+    return ((dienst && dienst.pauzes) || []).reduce(
+      (n, p) => n + (p && p.in ? minuten(p.in, p.uit || nuMs) : 0), 0);
+  }
+
+  /* Staat deze dienst NU in een pauze die nog binnen het budget valt? Is het
+     budget op, dan blijft de pauze gewoon lopen -- die is van de medewerker --
+     maar geldt het beleid weer. */
+  function pauzeNu(dienst) {
+    const p = ((dienst && dienst.pauzes) || []).find(x => x && x.in && !x.uit);
+    if (!p) return null;
+    return pauzeGebruikt(dienst) <= PAUZE_MINUTEN ? p : null;
+  }
+
+  /* De stand voor een medewerker: loopt er een dienst, staat hij in pauze, en
+     hoeveel armslag is er nog? Voor het scherm en voor de route. */
+  function pauzeStand(zaakcode, staffId) {
+    const d = dienstNu(zaakcode, staffId);
+    if (!d) return { ingeklokt: false, pauze: false, restMinuten: PAUZE_MINUTEN, budget: PAUZE_MINUTEN };
+    const gebruikt = pauzeGebruikt(d);
+    return {
+      ingeklokt: true,
+      pauze: !!((d.pauzes || []).find(x => x && x.in && !x.uit)),
+      binnenBudget: !!pauzeNu(d),
+      gebruikteMinuten: Math.round(gebruikt),
+      restMinuten: Math.max(0, Math.round(PAUZE_MINUTEN - gebruikt)),
+      budget: PAUZE_MINUTEN
+    };
   }
 
   /* Zet een werkgever deze functie dicht voor dit lid? Geeft de zaak terug die
      hem dichthoudt (voor de uitleg op het bord), of null. Werk je voor twee
      bedrijven, dan wint de eerste die hem dichtzet: samen opgeteld is dat de
-     strengste stand. */
+     strengste stand.
+
+     Twee redenen om hem juist NIET dicht te houden, allebei nieuw: je staat
+     niet ingeklokt (dan gaat je werkgever niet over je pas), of je staat in
+     een pauze die nog binnen de armslag valt. */
   function dichtVoor(key, id) {
     for (const w of werkgeversVan(key)) {
-      if (beleid(w.code).uit.indexOf(id) >= 0) return w;
+      if (beleid(w.code).uit.indexOf(id) < 0) continue;
+      const dienst = dienstNu(w.code, w.staffId);
+      if (!dienst) continue;
+      if (pauzeNu(dienst)) continue;
+      return w;
     }
     return null;
   }
 
   return { werkbeleid: beleid, werkbeleidZet: zet, werkbeleidOverzicht: overzicht,
-    werkgeversVan, werkbeleidDicht: dichtVoor };
+    werkgeversVan, werkbeleidDicht: dichtVoor,
+    werkbeleidPauzeStand: pauzeStand, WERKBELEID_PAUZE_MINUTEN: PAUZE_MINUTEN };
 }
 
 module.exports = { maakWerkbeleid };

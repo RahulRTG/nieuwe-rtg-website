@@ -85,11 +85,25 @@ test('2. de excursie: gps alleen met toestemming en alleen tijdens het uitje; el
   assert.equal((await kind('/school/excursie/gps', { lat: 52.3, lng: 4.9 })).status, 403);
   await api('/school/excursie/toestemming', { code: g.code, token: g.token, klasCode: klas.code, excursieId: e.id, profielId, akkoord: true });
   assert.equal((await kind('/school/excursie/gps', { lat: 52.366, lng: 4.916 })).status, 200);
+  /* Het bord van de begeleider: welke excursies lopen er, hoeveel ouders gaven
+     toestemming, en hoe vaak is er op de kaart gekeken. Dat laatste getal is
+     geen statistiek maar een tegenwicht -- wie een kind kan volgen, hoort zelf
+     ook zichtbaar te zijn. */
+  const bord = await json(await lr(klas, '/school/excursie/lijst', {}));
+  const rij = (bord.excursies || []).find(x => x.id === e.id);
+  assert.ok(rij, 'de excursie staat op het bord van de begeleider');
+  assert.equal(rij.titel, 'Artis');
+  assert.equal(rij.toestemmingen, 1, 'een ouder gaf toestemming');
+  assert.equal(rij.leerlingen, 1, 'en de klas heeft een leerling');
+  assert.equal(rij.kijkbeurten, 0, 'er is nog niet op de kaart gekeken');
+
   // de begeleider geeft ook de eigen plek door en kijkt op de kaart
   await lr(klas, '/school/excursie/gps', { excursieId: e.id, lat: 52.365, lng: 4.915 });
   const kaart = await json(await lr(klas, '/school/excursie/kaart', { excursieId: e.id }));
   assert.equal(kaart.plekken.length, 2, 'de app heeft alle locaties van iedereen');
   // het gezin leest de kijklog mee: wie keek, en wanneer
+  assert.equal(((await json(await lr(klas, '/school/excursie/lijst', {}))).excursies.find(x => x.id === e.id) || {}).kijkbeurten, 1,
+    'en na dat kijken staat de teller op een: de begeleider is zelf ook zichtbaar');
   const mijn = await json(await api('/school/excursie/mijn', { code: g.code, token: g.token, klasCode: klas.code }));
   const ex = mijn.excursies.find(x => x.id === e.id);
   assert.equal(ex.kijklog[0].naam, 'Juf Uitje', 'kijken wordt gelogd, op naam');

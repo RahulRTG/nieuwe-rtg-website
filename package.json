@@ -16,6 +16,7 @@
     "poortwacht": "node scripts/poortwacht.js",
     "rand": "node scripts/rand.js",
     "beproeving": "node --experimental-sqlite scripts/beproeving.js",
+    "tandeloos": "node scripts/tandeloos.js",
     "beproeving:streng": "STRENG=1 node --experimental-sqlite scripts/beproeving.js",
     "beproeving:mega": "node --max-old-space-size=8192 scripts/beproeving.js",
     "slotsuite": "node --experimental-sqlite scripts/slotsuite.js",

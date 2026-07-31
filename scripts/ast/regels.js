@@ -36,6 +36,101 @@ function doelNaamBoven(pad) {
   return null;
 }
 
+/* ---- hulpjes voor regel 'index-zonder-grens' (zie de regel zelf) ---- */
+// req.body.x / req.query.x / body.x  ->  true
+function uitVerzoek(node) {
+  let n = node;
+  while (n && n.type === 'MemberExpression') {
+    const o = n.object;
+    if (o && o.type === 'Identifier' && /^(req|request)$/.test(o.name)) return true;
+    if (o && o.type === 'MemberExpression' && o.object && o.object.type === 'Identifier'
+        && /^(req|request)$/.test(o.object.name)) return true;
+    n = o;
+  }
+  return false;
+}
+/* Number(req.body.x) / parseInt(req.body.x) / +req.body.x -> true.
+
+   Let op de eis GETALSDWANG. Een kale req.body.x als index is bijna altijd
+   een MAPLOOKUP -- db.data.notifications[req.session.key] -- en daar is niets
+   mis mee: een sleutel die niet bestaat geeft undefined, geen verkeerd
+   element. Zonder dat onderscheid meldde deze regel 156 plekken, waarvan de
+   overgrote meerderheid gewone objecttoegang was, en dan is hij waardeloos.
+
+   Het gevaar zit uitsluitend bij een index die tot een GETAL is gedwongen:
+   dan wordt null een 0 en NaN een 0, en wijst hij het eerste element aan. */
+function getalUitVerzoek(node) {
+  if (!node) return false;
+  if (node.type === 'CallExpression' && node.callee && node.callee.type === 'Identifier'
+      && /^(Number|parseInt|parseFloat)$/.test(node.callee.name))
+    return node.arguments.some(a => a && a.type === 'MemberExpression' && uitVerzoek(a));
+  if (node.type === 'UnaryExpression' && node.operator === '+')
+    return node.argument && node.argument.type === 'MemberExpression' && uitVerzoek(node.argument);
+  return false;
+}
+// voor splice() telt ook een kale waarde uit het verzoek: die wordt sowieso een getal
+function ruweBuitenwaarde(node) {
+  if (!node) return false;
+  if (node.type === 'MemberExpression') return uitVerzoek(node);
+  return getalUitVerzoek(node);
+}
+// dichtstbijzijnde functie boven een knoop
+function functieBoven(pad) {
+  for (let i = pad.length - 1; i >= 0; i--) {
+    const t = pad[i].type;
+    if (t === 'FunctionDeclaration' || t === 'FunctionExpression' || t === 'ArrowFunctionExpression') return pad[i];
+  }
+  return null;
+}
+// alle knopen onder een knoop (kleine eigen wandeling, zonder walk.js te hoeven kennen)
+function* onder(node) {
+  if (!node || typeof node !== 'object') return;
+  yield node;
+  for (const k of Object.keys(node)) {
+    if (k === 'type' || k === 'lijn') continue;
+    const v = node[k];
+    if (Array.isArray(v)) { for (const x of v) yield* onder(x); }
+    else if (v && typeof v === 'object' && v.type) yield* onder(v);
+  }
+}
+/* Komt deze naam in deze functie uit een ruwe buitenwaarde? */
+function naamUitBuiten(fn, naam) {
+  for (const n of onder(fn.body)) {
+    if (n.type === 'VariableDeclarator' && n.id && n.id.name === naam && getalUitVerzoek(n.init)) return true;
+    if (n.type === 'AssignmentExpression' && n.left && n.left.name === naam && getalUitVerzoek(n.right)) return true;
+  }
+  return false;
+}
+/* Staat er ergens in deze functie een grens op die naam? */
+function heeftGrens(fn, naam) {
+  for (const n of onder(fn.body)) {
+    if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
+        && n.callee.property && /^(isInteger|isSafeInteger|isFinite)$/.test(n.callee.property.name)
+        && n.arguments.some(a => a && a.type === 'Identifier' && a.name === naam)) return true;
+    if (n.type === 'BinaryExpression' && ['<', '>', '<=', '>='].includes(n.operator)) {
+      const raakt = s => s && ((s.type === 'Identifier' && s.name === naam)
+        || (s.type === 'MemberExpression' && s.property && s.property.name === 'length'));
+      if (raakt(n.left) && raakt(n.right)) return true;
+      if ((raakt(n.left) || raakt(n.right))
+          && ((n.left.type === 'Identifier' && n.left.name === naam) || (n.right.type === 'Identifier' && n.right.name === naam))) return true;
+    }
+  }
+  /* En de derde vorm van een grens: kijken of het ELEMENT bestaat.
+       if (!p.poll.opties[i]) return 400;
+     Dat is een volwaardige controle -- lijst[NaN] en lijst[-1] zijn undefined,
+     dus die aanroep valt er netjes op stuk. Zonder deze herkenning zou de
+     regel een correcte route aanwijzen, en een regel die goed werk afkeurt
+     wordt uitgezet. */
+  for (const n of onder(fn.body)) {
+    if (n.type === 'UnaryExpression' && n.operator === '!' && n.argument
+        && n.argument.type === 'MemberExpression' && n.argument.computed
+        && n.argument.property && n.argument.property.type === 'Identifier'
+        && n.argument.property.name === naam) return true;
+  }
+  return false;
+}
+
+
 const REGELS = [
   {
     id: 'verboden-pakket', ernst: 'fout',
@@ -96,6 +191,30 @@ const REGELS = [
         gezien.set(naam, soort);
       }
       return uit.length ? uit : null;
+    }
+  },
+  {
+    id: 'index-zonder-grens', ernst: 'fout',
+    keur(node, pad) {
+      let index = null, waar = null;
+      if (node.type === 'CallExpression' && node.callee && node.callee.type === 'MemberExpression'
+          && node.callee.property && node.callee.property.name === 'splice') { index = node.arguments[0]; waar = 'splice()'; }
+      else if (node.type === 'MemberExpression' && node.computed) { index = node.property; waar = 'een array-index'; }
+      if (!index) return null;
+  
+      const riskant = waar === 'splice()' ? ruweBuitenwaarde(index) : getalUitVerzoek(index);
+      if (riskant)
+        return [waar + ' krijgt een index rechtstreeks uit het verzoek. Number(null) is 0 en NaN wordt 0, '
+          + 'dus een ontbrekende of onleesbare waarde wijst stilzwijgend het eerste element aan (en -1 het laatste). '
+          + 'Controleer eerst op een geheel getal binnen bereik.'];
+  
+      if (index.type === 'Identifier') {
+        const fn = functieBoven(pad);
+        if (fn && naamUitBuiten(fn, index.name) && !heeftGrens(fn, index.name))
+          return [waar + ' gebruikt "' + index.name + '", die uit het verzoek komt, zonder ergens een grens. '
+            + 'Controleer op een geheel getal binnen bereik voordat je hem als index gebruikt.'];
+      }
+      return null;
     }
   }
 ];

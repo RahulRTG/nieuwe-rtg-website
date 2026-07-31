@@ -133,13 +133,32 @@ test('3. het verjaardagsboek: wie iemand toevoegde haalt hem weg, of een ouder',
   const boek = await haal('/verjaardagen', G.code, G.token);
   assert.ok(!(boek.mensen || []).some(m => m.id === persoonId), 'de persoon is weg');
 
-  /* De route ruimt ook de wensen van die persoon op (v.wensen wordt gefilterd).
-     Dat is goed -- een wenslijst zonder eigenaar blijft anders voor altijd in
-     de gegevens hangen -- maar het is van BUITENAF NIET TE ZIEN: het overzicht
-     toont wensen alleen onder een persoon, dus een wees-wens is sowieso
-     onzichtbaar. Mijn eerste versie beweerde het toch, en die bewering bleef
-     staan toen ik het opruimen eruit sloopte: een toets die niet kan falen.
-     Hij staat er daarom niet meer. Wat wel te zien is, staat hierboven. */
+  /* De route ruimt ook de wensen van die persoon op. Dat is van BUITENAF niet
+     te zien -- het overzicht toont wensen alleen onder een persoon, dus een
+     wees-wens is sowieso onzichtbaar. Mijn eerste versie beweerde het toch, en
+     die bewering bleef staan toen ik het opruimen eruit sloopte: een toets die
+     niet kan falen. Wat er hieronder WEL staat is de losse wens-verwijderroute,
+     want die is gewoon te zien. */
+  const tweede = await api('/gezin/verjaardag/persoon', { code: G.code, token: G.token, naam: 'Tante Rosa', dag: 3, maand: 9, jaar: 1962 });
+  assert.equal(tweede.status, 200, JSON.stringify(tweede.body));
+  const rosaId = ((await haal('/verjaardagen', G.code, G.token)).mensen.find(m => m.naam === 'Tante Rosa') || {}).id;
+  assert.ok(rosaId, 'Tante Rosa staat in het boek');
+
+  assert.equal((await api('/gezin/verjaardag/wens', { code: G.code, token: G.kind.token, voorId: rosaId, tekst: 'Een goed boek' })).status, 200);
+  const metWens = (await haal('/verjaardagen', G.code, G.token)).mensen.find(m => m.id === rosaId);
+  const wensId = ((metWens.wensen || [])[0] || {}).id;
+  assert.ok(wensId, 'de wens staat onder haar naam: ' + JSON.stringify(metWens).slice(0, 200));
+
+  /* Een gast haalt niets uit het verjaardagsboek: dat is een privezaak van het
+     gezin, net als de agenda hierboven. */
+  assert.equal((await api('/gezin/verjaardag/wens/verwijder', { code: G.code, token: G.gast.token, wensId })).status, 403);
+
+  assert.equal((await api('/gezin/verjaardag/wens/verwijder', { code: G.code, token: G.kind.token, wensId })).status, 200,
+    'wie de wens opschreef haalt hem ook weg');
+  const na2 = (await haal('/verjaardagen', G.code, G.token)).mensen.find(m => m.id === rosaId);
+  assert.ok(!(na2.wensen || []).some(w => w.id === wensId), 'en hij staat niet meer onder haar naam');
+  assert.equal((await api('/gezin/verjaardag/wens/verwijder', { code: G.code, token: G.token, wensId: 'bestaatniet' })).status, 200,
+    'een wens die er niet is weghalen is geen fout');
 
   assert.equal((await api('/gezin/verjaardag/persoon/verwijder', { code: G.code, token: G.token, persoonId: 'bestaatniet' })).status, 404);
 });

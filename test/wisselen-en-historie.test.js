@@ -129,10 +129,23 @@ test('3. de rithistorie is van de eigen zaak, met een zoekveld en paginas', asyn
   const terug = await api('/api/supplier/ride/history', { page: -5 }, taxi);
   assert.equal(terug.body.page, 1, 'en te ver terug op de eerste');
 
-  // een zoekterm die niets kan opleveren geeft een lege lijst, geen fout
-  const zoek = await api('/api/supplier/ride/history', { q: 'zzzzgeenenkelerit' }, taxi);
-  assert.equal(zoek.status, 200);
-  assert.equal(zoek.body.items.length, 0);
+  /* Een zoekterm die niets kan opleveren geeft een lege lijst en geen fout.
+     Dat bewijst alleen iets als de historie ZONDER zoekterm wel gevuld is --
+     anders is nul het antwoord op elke vraag. scripts/tandeloos.js wees deze
+     regel van mij aan, en terecht: ik stelde nergens vast dat deze zaak
+     uberhaupt ritten heeft. */
+  if (h.body.items.length) {
+    const zoek = await api('/api/supplier/ride/history', { q: 'zzzzgeenenkelerit' }, taxi);
+    assert.equal(zoek.status, 200);
+    assert.equal(zoek.body.items.length, 0, 'de zoekterm filtert echt: zonder hem staan er wel ritten');
+    const alles = await api('/api/supplier/ride/history', { q: '' }, taxi);
+    assert.ok(alles.body.items.length > 0, 'en zonder zoekterm komt de historie gewoon terug');
+  } else {
+    /* Deze zaak heeft geen afgeronde ritten in de seed. Dan valt er over het
+       zoekveld niets te bewijzen, en dat opschrijven is eerlijker dan een
+       bewering die op nul altijd slaagt. */
+    assert.equal(h.body.total, 0, 'deze zaak heeft geen afgeronde ritten; over het zoekveld valt hier niets te bewijzen');
+  }
 
   // en een restaurant heeft zijn eigen (lege) historie, niet die van de taxi
   const resto = await api('/api/supplier/ride/history', {}, baas);

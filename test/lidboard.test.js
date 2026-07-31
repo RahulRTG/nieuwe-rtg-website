@@ -344,7 +344,17 @@ test('het bord komt in de taal van de lezer; de namen staan op de server', async
    en de route is er een dunne schil omheen -- dus toetsen we de kern. */
 test('een werkgever kan functies dichtzetten voor zijn mensen, en nooit openzetten', async () => {
   const { maakWerkbeleid } = require('../server/kern/lidboard/werkbeleid');
-  const db = { data: { accountRollen: { lid1: [{ rol: 'personeel', code: 'ACME', zaakNaam: 'Acme BV' }] } } };
+  /* Sinds "Werkbeleid geldt tijdens je dienst" hangt het beleid aan de PRIKKLOK
+     en niet meer alleen aan de werkkoppeling. Deze medewerker staat dus echt
+     ingeklokt: een open regel (een in-tijd zonder out). Zonder die regel zou
+     alles hieronder "niet dicht" opleveren -- niet omdat het beleid stuk is,
+     maar omdat het dan zondag is. Deze toets stond hier maandenlang rood op
+     precies dat verschil. */
+  const uren = u => new Date(Date.now() - u * 3600e3).toISOString();
+  const db = { data: {
+    accountRollen: { lid1: [{ rol: 'personeel', code: 'ACME', zaakNaam: 'Acme BV', staffId: 7 }] },
+    klok: { ACME: [{ staffId: 7, in: uren(3), out: null, pauzes: [] }] }
+  } };
   const wb = maakWerkbeleid({ db, save: () => {} });
 
   // dichtzetten mag
@@ -368,11 +378,32 @@ test('een werkgever kan functies dichtzetten voor zijn mensen, en nooit openzett
 
   // een lid zonder werkgever raakt het beleid niet
   assert.equal(wb.werkbeleidDicht('lid-zonder-werk', 'salon'), null);
+
+  /* EN DE TWEEDE REGEL, DIE NET ZO HARD IS. In de pauze en na de dienst gaat de
+     werkgever niet over de pas. Dat is geen detail van de vorm: zonder deze
+     drie beweringen zou een terugval naar "vierentwintig uur per dag" hier
+     groen blijven staan, want de dicht-kant hierboven blijft dan gewoon waar. */
+  const dienst = db.data.klok.ACME[0];
+  dienst.pauzes = [{ in: new Date(Date.now() - 10 * 60000).toISOString(), uit: null }];
+  assert.equal(wb.werkbeleidDicht('lid1', 'salon'), null, 'in de pauze geldt het beleid niet');
+
+  // is de armslag van 45 minuten op, dan geldt het beleid weer -- de pauze zelf
+  // blijft lopen, want die is van de medewerker en niet van RTG
+  dienst.pauzes = [{ in: new Date(Date.now() - 70 * 60000).toISOString(), uit: null }];
+  assert.ok(wb.werkbeleidDicht('lid1', 'salon'), 'na 45 minuten pauze geldt het beleid weer');
+
+  dienst.pauzes = [];
+  dienst.out = new Date().toISOString();
+  assert.equal(wb.werkbeleidDicht('lid1', 'salon'), null, 'uitgeklokt is het beleid van tafel');
 });
 
 test('wat de werkgever dichtzet, staat op het bord met zijn naam en gaat ook echt dicht', async () => {
   const { maakLidboard } = require('../server/kern/lidboard');
-  const db = { data: { accountRollen: { w1: [{ rol: 'personeel', code: 'ACME', zaakNaam: 'Acme BV' }] } } };
+  // ook hier: het bord toont het beleid alleen als de medewerker aan het werk is
+  const db = { data: {
+    accountRollen: { w1: [{ rol: 'personeel', code: 'ACME', zaakNaam: 'Acme BV', staffId: 7 }] },
+    klok: { ACME: [{ staffId: 7, in: new Date(Date.now() - 3600e3).toISOString(), out: null, pauzes: [] }] }
+  } };
   const lb = maakLidboard({ db, save: () => {} });
   lb.werkbeleidZet('ACME', ['salon'], 'HR');
 

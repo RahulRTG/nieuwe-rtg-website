@@ -8,6 +8,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
+<script src="/shared/glyf.js"></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
@@ -54,13 +55,18 @@
     </div>
     <input class="veld" id="pNaam" placeholder="Naam van het concept" maxlength="100" style="margin-bottom:.5rem;">
     <input class="veld" id="pBrief" placeholder="Brief: ligging, sfeer, gebruik" maxlength="600" style="margin-bottom:.5rem;">
-    <button class="knop" id="pMaak" style="width:100%;">Concept + AI</button>
+    <button class="knop prim" id="pMaak" style="width:100%;">Concept + AI</button>
   </div>
   <div class="chips" id="pFilters"></div>
   <div id="pLijst"><div class="leeg">Laden...</div></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
 <script>
+/* De server bewaart een glyfNAAM ('paneel', 'stad', 'logboek'), niet een
+   teken -- zo staat het in de huisregels: het beeld komt uit glyf.js en niet
+   uit de emoji-font van het toestel. Deze pagina drukte die naam af, dus er
+   stond letterlijk "paneel Apparaten" op het scherm. */
+const ico = n => (window.RTGGlyf && RTGGlyf.svgHTML(n, { klasse: 'gl-inline' })) || '';
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
@@ -76,21 +82,21 @@ let DATA = null, filter = '';
 async function laad(){
   try { DATA = await api('architect'); } catch(e){ $('#pLijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const sel = $('#pCat');
-  if (!sel.options.length) sel.innerHTML = DATA.disciplines.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  if (!sel.options.length) sel.innerHTML = DATA.disciplines.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   render();
 }
 function statusPil(s){ const g = s==='realisatie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span class="pil" style="color:'+g+';">'+esc(s)+'</span>'; }
 function volgende(s){ const i = DATA.statussen.indexOf(s); return (i>=0 && i < DATA.statussen.length-1) ? DATA.statussen[i+1] : null; }
 function render(){
   $('#pFilters').innerHTML = '<button class="chip'+(filter===''?' aan':'')+'" data-f="">Alle</button>' +
-    DATA.disciplines.map(c => '<button class="chip'+(filter===c.id?' aan':'')+'" data-f="'+c.id+'">'+c.icon+' '+esc(c.label)+(c.aantal?' ('+c.aantal+')':'')+'</button>').join('');
+    DATA.disciplines.map(c => '<button class="chip'+(filter===c.id?' aan':'')+'" data-f="'+c.id+'">'+ico(c.icon)+' '+esc(c.label)+(c.aantal?' ('+c.aantal+')':'')+'</button>').join('');
   $('#pFilters').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; render(); }));
   const lijst = DATA.ontwerpen.filter(o => !filter || o.discipline === filter);
   $('#pLijst').innerHTML = lijst.length ? lijst.map(o => {
     const c = o.concept; const nx = volgende(o.status);
     return '<div class="kaart" style="margin-bottom:.7rem;">'+
       '<div class="rij" style="justify-content:space-between;">'+
-        '<h2 style="font-size:1.02rem;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+statusPil(o.status)+'</div>'+
+        '<h2 style="font-size:1.02rem;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+statusPil(o.status)+'</div>'+
       '<div style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem;">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+'</div>'+
       (c ? '<div class="rij" style="margin-bottom:.4rem;">'+(c.kleuren||[]).map(k => '<span class="swatch" title="'+esc(k.naam)+'" style="background:'+esc(k.hex)+';"></span>').join('')+'</div>'+
         '<div style="font-size:.82rem;line-height:1.55;"><b>'+esc(c.typologie)+'</b> · '+esc(c.constructie)+'</div>'

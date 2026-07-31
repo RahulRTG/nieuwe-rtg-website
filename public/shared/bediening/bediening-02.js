@@ -95,9 +95,9 @@
   }
 
   function vulUitleg() {
-    if (!w.RTGUitleg || !w.RTGUitleg.open) return;
+    if (!w.RTGGids || !w.RTGGids.open) return;
     var doe = rij(T('bdn.uitleg', 'Uitleg over dit scherm'), T('bdn.uitleg.sub', 'Wat u hier kunt doen, in gewone taal.'));
-    doe.appendChild(knopje(T('bdn.open', 'Openen'), false, function () { sluit(); w.RTGUitleg.open(); }));
+    doe.appendChild(knopje(T('bdn.open', 'Openen'), false, function () { sluit(); w.RTGGids.open(); }));
   }
 
   /* ---- het paneel ---- */

@@ -691,5 +691,57 @@ console.log('\n18) de kantoordeur staat maar op een plek nagebouwd');
   if (!eigen) ok(viaGesprek + ' plek(ken) doen de kantoor-inlog via het gesprek (' + MAG_ZELF.size + ' benoemd met een eigen veld)');
 }
 
+/* 19) TWEE GEDEELDE MODULES DIE DEZELFDE WINDOW-NAAM OPEISEN.
+
+   Dit is de duurste fout van deze maand, twee keer op rij. Twee sessies kozen
+   los van elkaar de naam window.RTGPoort -- de een voor de inlogpoort met
+   .gesprek(), de ander voor de gegevenspoort met .vang(). Op een pagina waar
+   allebei laadden won er een, en de aanroeper riep een functie aan die op dat
+   object niet bestond. Geen foutmelding in beeld: de aanroep sneuvelde in een
+   async afhandeling en de poort ging simpelweg nooit open.
+
+   Dezelfde vorm zat er nog een tweede keer in, ongemerkt: shared/uitleg.js
+   gaf RTGUitleg = { knop, toon, sluit, init } en shared/basis.js gaf er
+   RTGUitleg = { open, sluit } overheen. Op apps/spelen.html laden ze allebei.
+   Wie netjes vroeg of .knop bestond (shared/osmenu.js doet dat) kreeg nee en
+   liet het knopje weg. Een verdwenen knop meldt zichzelf nooit.
+
+   Alleen public/shared/ telt: dat zijn de modules die bedoeld zijn om vrij
+   samen geladen te worden. De vorm `X = X || {}` is geen claim maar een
+   uitbreiding van een afgesproken naamruimte (RTGRahul, SPart, I18N doen dat
+   met opzet) en telt dus niet mee. Bundels blijven buiten beschouwing: dat is
+   bouwuitvoer, de bron staat in de losse delen ernaast. */
+console.log('\n19) geen twee gedeelde modules die dezelfde window-naam opeisen');
+{
+  const MAG_SAMEN = new Map([
+    // ['public/shared/x.js', 'reden waarom deze naam wel gedeeld mag worden']
+  ]);
+  const { bundels } = require('./bundel');
+  const bundelPaden = new Set(Object.keys(bundels).map(k => 'public/' + k));
+  const claims = new Map();   // naam -> Set(bestand)
+  loop(path.join(ROOT, 'public', 'shared'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (bundelPaden.has(rel) || MAG_SAMEN.has(rel)) return;
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const re = /\b(?:w|window|globalThis|self)\.([A-Z][A-Za-z0-9_]{2,})\s*=(?!=)([^\n;]*)/g;
+    let m;
+    while ((m = re.exec(bron))) {
+      const naam = m[1];
+      // `X = X || {}` en `X = Object.assign(X, ...)`: uitbreiden, niet opeisen
+      if (new RegExp('\\b' + naam + '\\b').test(m[2])) continue;
+      if (!claims.has(naam)) claims.set(naam, new Set());
+      claims.get(naam).add(rel);
+    }
+  });
+  let bots = 0;
+  for (const [naam, waar] of claims) {
+    if (waar.size < 2) continue;
+    bots++;
+    fout('window.' + naam + ' wordt opgeeist door ' + waar.size + ' modules: ' + [...waar].join(', ') +
+      ' -- geef ze namen die zeggen wat ze zijn, of noem er een in MAG_SAMEN');
+  }
+  if (!bots) ok(claims.size + ' gedeelde window-namen, elk van precies een module (' + MAG_SAMEN.size + ' benoemd als gedeeld)');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

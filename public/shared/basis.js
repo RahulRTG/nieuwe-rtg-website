@@ -8,7 +8,7 @@
    3. begrenzing: zet een maxlength-vangnet op tekstvelden die er geen hebben
       (de server begrenst altijd al; dit voorkomt stil afgekapte invoer)
    4. leren: de app-gids (wat is dit, wat kun je hier, een leerzame tip) via
-      /api/gids/app; te openen vanuit het bedieningspaneel via RTGUitleg.open()
+      /api/gids/app; te openen vanuit het bedieningspaneel via RTGGids.open()
    5. sfeer: laadt het lopende werk bij (shared/uurwerk.js), de gangreserve
       van het huis die als een stil verhaal over alle pagina's doorloopt
    6. kaart: laadt de kaart-uitwijk bij (shared/kaart.js), die geo:-links op
@@ -111,7 +111,13 @@
        Dit was een zwevend vraagteken linksonder, precies onder de themakiezer
        en de taalknop: drie losse knopjes op dezelfde vierkante centimeter. De
        gids zelf blijft ongewijzigd; alleen de ingang verhuisde naar het
-       bedieningspaneel (shared/bediening.js), dat RTGUitleg.open() aanroept. */
+       bedieningspaneel (shared/bediening.js), dat RTGGids.open() aanroept.
+
+       HIJ HEET RTGGids EN NIET RTGUitleg. Die naam is van shared/uitleg.js --
+       het uitlegknopje bij een besturing, met een heel andere vorm (.knop()).
+       Op apps/spelen.html laadden ze allebei, uitleg.js eerst, en dan won deze
+       en was .knop() weg. Geen foutmelding: shared/osmenu.js kijkt keurig of
+       .knop bestaat, ziet van niet, en laat het knopje gewoon weg. */
     var sheet = null;
     function sluit() { if (sheet) { sheet.remove(); sheet = null; } }
     function openGids() {
@@ -137,7 +143,7 @@
         })
         .catch(function () { if (sheet) sheet.querySelector('.bss-wat').textContent = 'De uitleg is er zo weer; probeer het straks opnieuw.'; });
     }
-    window.RTGUitleg = { open: openGids, sluit: sluit };
+    window.RTGGids = { open: openGids, sluit: sluit };
     document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') sluit(); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

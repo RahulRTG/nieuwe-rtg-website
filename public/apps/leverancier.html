@@ -524,16 +524,23 @@
   #station .tkc-items{font-size:1.2rem;line-height:1.45;gap:0.35rem;}
   #station .tkc-items b{font-size:1.2rem;font-variant-numeric:tabular-nums;}
   #station .tkc-alg{font-size:0.92rem;}
-  /* De keukenhulp is advies, geen bon. Hij stond bovenaan en duwde het echte
-     werk naar de onderste helft van het scherm; als grid-item gaat hij met
-     een enkele regel naar achteren. Terugdraaien is die regel weghalen. */
-  #station #coachBox{order:1;}
   /* De sectiekop haalde het contrast niet. keukenlicht.js zet overdag
      --soft op rgba(36,26,30,0.52); op de ivoren dagachtergrond komt dat op
      ongeveer 2,6:1 uit en dat is onder elke grens. Op een scherm aan de muur
      is een kop die je moet zoeken geen kop. Vandaar --muted, iets groter en
      zwaarder: hetzelfde ingetogen register, wel leesbaar. */
   #station .st-sec{color:var(--muted);font-size:0.78rem;font-weight:700;letter-spacing:0.14em;margin-top:0.9rem;}
+  /* De keuzelijsten stonden pikzwart op het ivoren dagscherm. Oorzaak: in
+     shared/rtg-ui.css staat `body.rtg-stijl select{background:var(--rtg-card2)}`,
+     en die selector is specifieker dan .st-in EN leest een andere variabele --
+     de globale, die keukenlicht.js niet omzet. Het werkscherm heeft zijn eigen
+     licht; zijn invoervelden horen daarin mee te kleuren. */
+  #station select, #station input, #station textarea{
+    background:var(--card2);color:var(--txt);border-color:var(--line);}
+  /* Hulpmiddelen zijn geen werk. De spoedbon, "op de pas over" en de
+     keukenhulp stonden boven de bonnen; op een werkscherm hoort het werk
+     bovenaan en het gereedschap eronder. Terugdraaien is deze regel weghalen. */
+  #station .st-hulp, #station #coachBox{order:1;}
   .tkc-who{font-size:0.7rem;color:var(--soft);}
   .tkc-items{display:flex;flex-direction:column;gap:0.3rem;font-size:0.98rem;line-height:1.4;}
   .tkc-items b{color:var(--gold);margin-right:0.45rem;}
@@ -547,7 +554,7 @@
   .tkc-act button:active{transform:scale(0.97);}
   .tkc-start{background:var(--card2);color:var(--txt);border:1px solid var(--line) !important;}
   .tkc-ready{background:#2E7D5B;color:#fff;}
-  .tkc-serve{background:var(--gold);color:#0C0C0B;}
+  .tkc-serve{background:var(--gold);color:var(--goldop,#0C0C0B);}
   .st-badges{display:flex;gap:0.4rem;flex-wrap:wrap;}
   .st-badge{font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.55rem;color:var(--muted);}
   .st-badge.klaar{color:#7BC79B;border-color:rgba(76,154,117,0.5);}

@@ -28,7 +28,7 @@
       }).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
       // de spoedbon: een enkel gerecht komt als gewone bon op de lijn en telt
       // gewoon mee in de maak-nu- en all-day-tellingen; geen bel, geen flits
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
+      html += '<div class="tkc st-hulp" style="grid-column:1/-1;"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
         '<div class="tkc-who">'+T('spoed.deck','Gerecht gevallen of vergeten? Zet het als gewone bon op de lijn; de keuken ziet gewoon een bon erbij.')+'</div>'+
         '<div class="row-gap"><select class="st-in" id="spGerecht" style="flex:2;">'+
           (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+

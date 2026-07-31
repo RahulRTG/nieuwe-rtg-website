@@ -15,12 +15,18 @@
   var NACHT = {
     bg:'#0C0C0B', card:'#151312', card2:'#1B1817', line:'rgba(255,255,255,0.09)',
     txt:'#F4F1EC', muted:'rgba(244,241,236,0.70)', soft:'rgba(244,241,236,0.62)',
-    gold:'#A98F1C', green:'#4C9A75', amber:'#C99A2E'
+    gold:'#A98F1C', green:'#4C9A75', amber:'#C99A2E',
+    /* de tekstkleur OP een gouden vlak. 's Nachts is het goud licht genoeg
+       voor zwarte letters; overdag wordt het juist donkerder gezet zodat het
+       als TEKST leesbaar blijft, en dan is zwart erop bijna onleesbaar
+       (rond 1,9:1). Een knop met een gouden vlak hoort dat mee te draaien. */
+    goldop:'#0C0C0B'
   };
   var DAG = {
     bg:'#ECE6DD', card:'#F7F3EC', card2:'#FCFAF5', line:'rgba(30,20,24,0.12)',
     txt:'#241A1E', muted:'rgba(36,26,30,0.68)', soft:'rgba(36,26,30,0.52)',
-    gold:'#7C6A0C', green:'#2F7256', amber:'#9C6C14'
+    gold:'#7C6A0C', green:'#2F7256', amber:'#9C6C14',
+    goldop:'#FFFFFF'
   };
 
   function parse(c){
@@ -78,7 +84,7 @@
   }
 
   function wis(st){
-    ['bg','card','card2','line','txt','muted','soft','gold','green','amber'].forEach(function(k){
+    ['bg','card','card2','line','txt','muted','soft','gold','goldop','green','amber'].forEach(function(k){
       st.style.removeProperty('--'+k);
     });
     st.style.removeProperty('background');

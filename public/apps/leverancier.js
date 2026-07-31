@@ -860,7 +860,7 @@
   // de melder voor de pas-schermen: is over, gebruikt of afschrijven
   function overschotBlok(){
     const l = overschotLijst();
-    return '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('over.h','Op de pas over')+'</h3>'+
+    return '<div class="tkc st-hulp" style="grid-column:1/-1;"><h3>'+T('over.h','Op de pas over')+'</h3>'+
       '<div class="tkc-who">'+T('over.deck','Te veel gemaakt? Meld het hier; elk scherm telt het van de maaklijst af en de coach zegt: gebruik eerst wat er ligt.')+'</div>'+
       '<div class="row-gap"><select class="st-in" id="ovGerecht" style="flex:2;">'+
         (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
@@ -931,7 +931,11 @@
       '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+(o.paid?'':' \u00b7 '+T('st.unpaid','onbetaald'))+'</div>'+
       '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+MTX(it.name)+'</span>').join('')+'</div>'+
       (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
-      (o.leeftijdOk?'<div class="tkc-alg" style="background:rgba(45,140,80,0.14);color:#2d8c50;">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
+      /* De leeftijdscontrole hoort bij wie schenkt en wie uitserveert, niet bij
+         wie kookt. Op het keukenscherm nam die regel de plek in van een
+         gerechtregel zonder dat de kok er iets mee kan; bij de bar staat er
+         alcohol op de bon en daar telt hij wel. */
+      (o.leeftijdOk && st !== 'keuken'?'<div class="tkc-alg" style="background:rgba(45,140,80,0.14);color:#2d8c50;">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
       ((st==='keuken'||st==='bar')&&!opts.dim?(function(){
         const vp = vuurplan(o);
         const kanten = Object.keys(vp.plan);
@@ -1043,7 +1047,7 @@
       }).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
       // de spoedbon: een enkel gerecht komt als gewone bon op de lijn en telt
       // gewoon mee in de maak-nu- en all-day-tellingen; geen bel, geen flits
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
+      html += '<div class="tkc st-hulp" style="grid-column:1/-1;"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
         '<div class="tkc-who">'+T('spoed.deck','Gerecht gevallen of vergeten? Zet het als gewone bon op de lijn; de keuken ziet gewoon een bon erbij.')+'</div>'+
         '<div class="row-gap"><select class="st-in" id="spGerecht" style="flex:2;">'+
           (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+

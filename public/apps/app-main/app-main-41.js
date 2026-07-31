@@ -63,27 +63,7 @@
   }
   $('#glowCode').addEventListener('click', () => $('#glowCode').classList.remove('open'));
 
-  /* ---------- home + codenaam ---------- */
-
-  function qrSvg(seed){
-    let s = seed, cells = '';
-    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-    for (let y = 0; y < 13; y++) for (let x = 0; x < 13; x++){
-      const corner = (x < 4 && y < 4) || (x > 8 && y < 4) || (x < 4 && y > 8);
-      const on = corner
-        ? ((x % 12 < 1 || x % 12 > 2 ? 1 : 0) || (y % 12 < 1 || y % 12 > 2 ? 1 : 0)) &&
-          !((x % 12 === 1 || x % 12 === 2) && (y % 12 === 1 || y % 12 === 2)) || (x===1&&y===1)||(x===2&&y===2)||(x===11&&y===1)||(x===1&&y===11)
-        : rnd() > 0.5;
-      if (on) cells += '<rect x="' + x + '" y="' + y + '" width="1" height="1"/>';
-    }
-    return '<svg viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg" fill="#0C0C0B">' + cells + '</svg>';
-  }
-
-  function toggleWhy(forceOpen){
-    const why = document.querySelector('.codecard .why');
-    if (!why) return;
-    why.classList.toggle('open', forceOpen === true ? true : !why.classList.contains('open'));
-  }
+  /* ---------- home ---------- */
 
   function renderVerifyBanner(){
     const el = $('#verifyBanner');

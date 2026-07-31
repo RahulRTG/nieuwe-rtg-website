@@ -4,10 +4,13 @@
    sollicitaties worden geanonimiseerd en alle sessies uitgelogd.
    Gemount vanuit routes/member.js. */
 const inzagelog = require('../../inzagelog');
+const maakVergeten = require('../../kern/vergeten');
 
 module.exports = (kern) => {
   const { app, auth, db, save, stateFor, myApplications, ordersVanKlant, accounts,
-    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg } = kern;
+    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg, liveCodename,
+    lidBoard, lidBoardLog } = kern;
+  const { wisLid } = maakVergeten(kern);
 
   app.post('/api/privacy/export', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -31,6 +34,14 @@ module.exports = (kern) => {
       guestChats: chats,
       likedPosts: likes,
       notifications: db.data.notifications[key] || [],
+      /* Uw boardroom hoort in dit dossier. Die knoppen bepalen of uw locatie
+         gedeeld wordt, of uw paspoort opvraagbaar is en of u vindbaar bent:
+         dat is niet zomaar een voorkeur, dat is de instelling waarmee u uw
+         eigen gegevensdeling regelt. Het journaal erbij, want anders zou een
+         export wel de huidige stand tonen maar niet wie hem heeft gezet -- en
+         bij een kind is dat een ouder. */
+      boardroom: typeof lidBoard === 'function' ? lidBoard(key) : null,
+      boardroomLogboek: typeof lidBoardLog === 'function' ? lidBoardLog(key, 200) : [],
       // wie er in uw identiteitsdossier heeft gekeken, en waarom
       inzageInUwDossier: req.session.account ? inzagelog.voorBetrokkene(req.session.account.id) : []
     });
@@ -54,46 +65,11 @@ module.exports = (kern) => {
     });
   });
 
+  /* Definitief verwijderen. Het beleid (welke takken weg, wat wordt
+     geanonimiseerd, wat blijft met grond) woont in kern/vergeten.js. */
   app.post('/api/privacy/delete', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-    const key = req.session.key;
-    // cv en live-locatie weg, chats weg, likes weg
-    delete db.data.cvs[key];
-    delete db.data.live[key];
-    for (const k of Object.keys(db.data.guestChats || {})) if (k.split('|')[1] === key) delete db.data.guestChats[k];
-    for (const p of db.data.posts) if (p.likedBy) delete p.likedBy[key];
-    // sollicitaties anonimiseren: het bedrijf houdt zijn administratie,
-    // maar zonder iets dat naar deze persoon herleidbaar is
-    for (const list of Object.values(db.data.applications || {})) {
-      for (const a of list) if (a.key === key) {
-        a.name = '(op verzoek verwijderd)'; a.contact = ''; a.note = '';
-        a.cv = null; a.codename = null; a.key = null;
-      }
-    }
-    // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
-    if (db.data.notifications[key]) db.data.notifications[key] = [];
-    /* Uit de ledengids. Dit is de laatste plek waar de sleutel aan de codenaam
-       vastzit; bleef hij staan, dan was het lid na "verwijderen" nog gewoon op
-       codenaam te vinden en te bellen -- en dan is verwijderd een halve
-       waarheid. test/vergeten.test.js veegt na afloop door de hele database om
-       te controleren dat er geen enkele tak meer overblijft. */
-    if (typeof gidsWeg === 'function') gidsWeg(key);
-    // echt account: verwijder het account zelf, inclusief documentupload
-    if (req.session.account) {
-      const doc = accounts.deleteUser(req.session.account.id);
-      if (doc) { try { fs.unlinkSync(path.join(UPLOAD_DIR, path.basename(doc))); } catch (e) {} }
-    }
-    /* Het inzagejournaal blijft staan, bewust. Het bevat geen naam en geen
-       e-mailadres -- alleen een account-id dat na deze regel nergens meer op
-       slaat, plus wie er keek en waarom. Zou het wel worden gewist, dan kon
-       iemand zijn eigen sporen uitvegen door een account te verwijderen, en dat
-       is precies waarvoor een auditlog niet bedoeld is (AVG art. 17 lid 3
-       laat bewaren toe waar dat voor een rechtsvordering of wettelijke plicht
-       nodig is). Wat overblijft is de-geidentificeerd. */
-    // alle sessies van dit lid uitloggen
-    for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
-    save();
-    broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+    wisLid(req.session);
     res.json({ ok: true });
   });
 };

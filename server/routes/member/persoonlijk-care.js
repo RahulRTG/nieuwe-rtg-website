@@ -7,10 +7,11 @@
 module.exports = (kern) => {
   const { app, auth, liveCodename, verdienPunten,
     careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, careIntakeDeel, careIntakeStop,
-    carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn } = kern;
+    carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn, gegevensStop } = kern;
 
   app.post('/api/care', auth, (req, res) => res.json(careOverzicht(req.session.key)));
   app.post('/api/care/boek', auth, (req, res) => {
+    if (gegevensStop(req, res, 'reservering')) return;
     const r = careBoek(req.session, liveCodename(req.session), req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
@@ -42,6 +43,7 @@ module.exports = (kern) => {
      als een pakket met een prijs. De behandeling boekt gewoon in de agenda. */
   app.post('/api/care/pakketten', auth, (req, res) => res.json(carePakketOverzicht()));
   app.post('/api/care/pakket/boek', auth, (req, res) => {
+    if (gegevensStop(req, res, 'reservering')) return;
     const r = carePakketBoek(req.session, liveCodename(req.session), req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);

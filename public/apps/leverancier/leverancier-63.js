@@ -101,7 +101,7 @@
         const body = { room: b.dataset.room, method: b.dataset.method };
         if (body.method === 'rtgpay'){
           body.payCode = await vraagPayCode(); if (!body.payCode) return;
-          body.idem = 'co' + Date.now();
+          body.idem = RTGIdem('co');
         }
         const d = await API.call('/supplier/pos/checkout', body);
         toast(T('pos.checkedout','Uitgecheckt:')+' '+b.dataset.room+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')');

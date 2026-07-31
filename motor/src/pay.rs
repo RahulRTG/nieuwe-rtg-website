@@ -56,17 +56,11 @@ struct Kascode { code: String, codenaam: String, max_centen: i64, geldig_tot: u6
 struct Tikcode { code: String, codenaam: String, geldig_tot: u64 }
 
 /* Constant-time vergelijk voor betaalcodes: geen vroeg-stoppen per teken, zodat
-   de tijd niet verraadt hoeveel tekens al klopten (timing-lek op geldcodes). */
+   de tijd niet verraadt hoeveel tekens al klopten (timing-lek op geldcodes).
+   Leunt op de ene geauditeerde implementatie in aead.rs -- die heeft de
+   optimalisatie-barriere (black_box) die een eigen kopie hier eerder miste. */
 fn ct_eq(a: &str, b: &str) -> bool {
-    let (a, b) = (a.as_bytes(), b.as_bytes());
-    if a.len() != b.len() {
-        return false;
-    }
-    let mut diff = 0u8;
-    for i in 0..a.len() {
-        diff |= a[i] ^ b[i];
-    }
-    diff == 0
+    crate::aead::ct_eq(a.as_bytes(), b.as_bytes())
 }
 
 pub struct State {
@@ -74,6 +68,13 @@ pub struct State {
     pub bank: Ledger, // tweede grootboek (RTG Bank), cutover stap 3
     leden: HashSet<String>,
     idem: HashMap<String, Json>,
+    /* Per idem-sleutel een afdruk van het VERZOEK waarvoor hij is gebruikt.
+       Zonder die binding geeft dezelfde sleutel met een ander verzoek stil het
+       oude antwoord terug: de client krijgt "gelukt" voor iets wat nooit is
+       geboekt. Clients bouwen hun sleutel bovendien uit Date.now(), dus twee
+       verschillende acties in dezelfde milliseconde botsen echt. Wijkt de afdruk
+       af, dan is dat een 409 in plaats van een verkeerde 200. */
+    idem_afdruk: HashMap<String, String>,
     idem_volgorde: Vec<String>,
     kascodes: Vec<Kascode>,
     tikcodes: Vec<Tikcode>,
@@ -88,6 +89,7 @@ impl State {
             bank: Ledger::new(),
             leden: HashSet::new(),
             idem: HashMap::new(),
+            idem_afdruk: HashMap::new(),
             idem_volgorde: Vec::new(),
             kascodes: Vec::new(),
             tikcodes: Vec::new(),
@@ -114,12 +116,21 @@ impl State {
     pub fn ledental(&self) -> usize { self.leden.len() }
 
     // ---------- idempotentie ----------
-    fn met_idem<F: FnOnce(&mut State) -> Resp>(&mut self, sleutel: Option<String>, werk: F) -> Resp {
+    /* `afdruk` beschrijft het verzoek waarvoor de idem-sleutel geldt: alleen de
+       geld-bepalende velden, geen vrije tekst, zodat een cosmetisch verschil geen
+       409 oplevert. Een bewaarde sleutel zonder afdruk komt uit een oudere
+       snapshot en telt als "onbekend" -- die laten we door zoals voorheen. */
+    fn met_idem<F: FnOnce(&mut State) -> Resp>(&mut self, sleutel: Option<String>, afdruk: String, werk: F) -> Resp {
         let key = match sleutel {
             None => return werk(self),
             Some(k) => k,
         };
         if let Some(bewaard) = self.idem.get(&key) {
+            if let Some(oud) = self.idem_afdruk.get(&key) {
+                if !crate::aead::ct_eq(oud.as_bytes(), afdruk.as_bytes()) {
+                    return err(409, "Deze idem-sleutel is al gebruikt voor een ander verzoek.");
+                }
+            }
             let mut body = bewaard.clone();
             body.set("herhaald", Json::Bool(true));
             return Resp { status: 200, body };
@@ -127,10 +138,14 @@ impl State {
         let r = werk(self);
         if r.status < 300 {
             self.idem.insert(key.clone(), r.body.clone());
+            self.idem_afdruk.insert(key.clone(), afdruk);
             self.idem_volgorde.push(key);
             if self.idem_volgorde.len() > 20_000 {
                 let weg: Vec<String> = self.idem_volgorde.drain(0..self.idem_volgorde.len() - 20_000).collect();
-                for k in weg { self.idem.remove(&k); }
+                for k in weg {
+                    self.idem.remove(&k);
+                    self.idem_afdruk.remove(&k);
+                }
             }
             self.markeer();
         }
@@ -144,8 +159,9 @@ impl State {
             return err(400, "Opladen kan van 1 tot 5000 euro.");
         }
         let sleutel = idem.map(|i| format!("oplaad:{}:{}", codenaam, i));
+        let afdruk = format!("oplaad|{}|{}", codenaam, c);
         let cn = codenaam.to_string();
-        self.met_idem(sleutel, move |s| {
+        self.met_idem(sleutel, afdruk, move |s| {
             let rek = format!("lid:{}", cn);
             match s.grb.boek(BoekArgs { van: "extern:oplaad", naar: &rek, centen: c, soort: "oplaad", oms: "Opladen", ref_: None }) {
                 Ok(_) => {
@@ -190,11 +206,13 @@ impl State {
             return err(400, "Dat bedrag kan niet.");
         }
         let sleutel = idem.map(|i| format!("stuur:{}:{}", van, i));
+        // oms blijft buiten de afdruk: vrije tekst mag geen 409 veroorzaken
+        let afdruk = format!("stuur|{}|{}|{}|{}", van, aan, c, soort);
         let van_s = van.to_string();
         let oms_s = oms.unwrap_or("Zomaar").to_string();
         let soort_s = soort.to_string();
         let idem_s = idem.map(|s| s.to_string());
-        self.met_idem(sleutel, move |s| {
+        self.met_idem(sleutel, afdruk, move |s| {
             let bijgeladen = match s.zorg_saldo(&van_s, c, idem_s.as_deref()) {
                 Ok(b) => b,
                 Err(e) => return e,
@@ -221,7 +239,11 @@ impl State {
         for k in self.tikcodes.iter_mut() {
             if k.codenaam == codenaam { k.geldig_tot = 0; }
         }
-        let code = rng::code(6);
+        // geldcode: onvoorspelbaar of niet -- geen zwakke terugval
+        let code = match rng::code(6) {
+            Ok(c) => c,
+            Err(_) => return err(500, "Kon geen veilige code maken; probeer het opnieuw."),
+        };
         let geldig = nu + KASCODE_MS;
         self.tikcodes.insert(0, Tikcode { code: code.clone(), codenaam: codenaam.to_string(), geldig_tot: geldig });
         if self.tikcodes.len() > 2000 { self.tikcodes.truncate(2000); }
@@ -258,7 +280,11 @@ impl State {
         for k in self.kascodes.iter_mut() {
             if k.codenaam == codenaam && !k.gebruikt { k.gebruikt = true; }
         }
-        let code = rng::code(6);
+        // geldcode: onvoorspelbaar of niet -- geen zwakke terugval
+        let code = match rng::code(6) {
+            Ok(c) => c,
+            Err(_) => return err(500, "Kon geen veilige code maken; probeer het opnieuw."),
+        };
         let geldig = nu + KASCODE_MS;
         self.kascodes.insert(0, Kascode { code: code.clone(), codenaam: codenaam.to_string(), max_centen: max, geldig_tot: geldig, gebruikt: false });
         if self.kascodes.len() > 1000 { self.kascodes.truncate(1000); }
@@ -288,14 +314,17 @@ impl State {
         let codenaam = self.kascodes[pos].codenaam.clone();
         let refcode = self.kascodes[pos].code.clone();
         let sleutel = idem.map(|i| format!("kas:{}:{}", supplier, i));
+        // de code hoort in de afdruk: hergebruik met een ANDERE code is een ander verzoek
+        let afdruk = format!("kas|{}|{}|{}", supplier, refcode, c);
         let sup = supplier.to_string();
         let oms_s = oms.unwrap_or("Kassa").to_string();
         let idem_s = idem.map(|s| s.to_string());
         let promille = self.betaaldienst_promille;
-        let r = self.met_idem(sleutel, move |s| {
+        let r = self.met_idem(sleutel, afdruk, move |s| {
             if let Err(e) = s.zorg_saldo(&codenaam, c, idem_s.as_deref()) {
                 return e;
             }
+            // (de code wordt aan het eind van DEZE sectie verbruikt, zie onder)
             let rlid = format!("lid:{}", codenaam);
             let rpartner = format!("partner:{}", sup);
             if let Err((st, m)) = s.grb.boek(BoekArgs { van: &rlid, naar: &rpartner, centen: c, soort: "kassa", oms: &oms_s, ref_: Some(refcode.clone()) }) {
@@ -311,6 +340,21 @@ impl State {
                     }
                 }
             }
+            /* De code verbruiken hoort BINNEN de idempotente sectie, precies
+               zoals server/kern/pay/kassa.js het doet. Stond dit erbuiten, dan
+               verbruikte een herhaalde idem-sleutel (die het gecachte antwoord
+               teruggeeft zonder te boeken) alsnog de code die nu wordt
+               aangeboden -- en dat kan een verse, geldige code van een ANDER
+               lid zijn, die dan ongeldig raakt zonder dat er een cent is
+               geboekt. */
+            /* De code verbruiken hoort BINNEN de idempotente sectie, precies
+               zoals server/kern/pay/kassa.js het doet. Stond dit erbuiten, dan
+               verbruikte een herhaalde idem-sleutel (die het gecachte antwoord
+               teruggeeft zonder te boeken) alsnog de code die nu wordt
+               aangeboden -- en dat kan een verse, geldige code van een ANDER
+               lid zijn, die dan ongeldig raakt zonder dat er een cent is
+               geboekt. */
+            s.kascodes[pos].gebruikt = true;
             s.markeer();
             let mut b = Json::obj();
             b.set("centen", Json::Num(c as f64));
@@ -318,10 +362,6 @@ impl State {
             b.set("kosten", Json::Num(kosten as f64));
             ok(b)
         });
-        if r.status < 300 {
-            self.kascodes[pos].gebruikt = true;
-            self.markeer();
-        }
         r
     }
 
@@ -343,7 +383,12 @@ impl State {
             return err(400, "Er staat niets om uit te betalen.");
         }
         let sleutel = idem.map(|i| format!("uit:{}:{}", supplier, i));
-        self.met_idem(sleutel, move |s| {
+        /* Een uitbetaling heeft geen parameters buiten de partner zelf (het gaat
+           altijd om het volle saldo), dus de afdruk is de partner. Het bedrag
+           bewust NIET meenemen: dat verschilt legitiem per moment en zou een
+           gewone herhaling in een 409 veranderen. */
+        let afdruk = format!("uit|{}", supplier);
+        self.met_idem(sleutel, afdruk, move |s| {
             match s.grb.boek(BoekArgs { van: &rek, naar: "extern:uitbetaald", centen: c, soort: "uitbetaling", oms: "Uitbetaald naar de bank", ref_: None }) {
                 Ok(_) => {
                     s.markeer();
@@ -490,6 +535,12 @@ impl State {
             }
         }
         let idem_volgorde: Vec<Json> = self.idem_volgorde.iter().cloned().map(Json::Str).collect();
+        let mut idem_afdruk = Json::obj();
+        if let Json::Obj(m) = &mut idem_afdruk {
+            for (k, v) in &self.idem_afdruk {
+                m.insert(k.clone(), Json::Str(v.clone()));
+            }
+        }
         // Het bank-grootboek (cutover stap 3): eigen saldi + boekingen.
         let mut bank_saldi = Json::obj();
         if let Json::Obj(m) = &mut bank_saldi {
@@ -501,6 +552,7 @@ impl State {
             .set("boekingen", Json::Arr(boekingen))
             .set("leden", Json::Arr(leden))
             .set("idem", idem)
+            .set("idemAfdruk", idem_afdruk)
             .set("idemVolgorde", Json::Arr(idem_volgorde))
             .set("bankSaldi", bank_saldi)
             .set("bankBoekingen", Json::Arr(bank_boekingen));
@@ -539,6 +591,13 @@ impl State {
         }
         if let Some(Json::Obj(m)) = snap.get("idem") {
             for (k, v) in m { self.idem.insert(k.clone(), v.clone()); }
+        }
+        /* Ontbreekt idemAfdruk (snapshot van voor de contentbinding), dan blijven
+           die sleutels zonder afdruk staan en gedragen ze zich als voorheen. */
+        if let Some(Json::Obj(m)) = snap.get("idemAfdruk") {
+            for (k, v) in m {
+                if let Some(s) = v.as_str() { self.idem_afdruk.insert(k.clone(), s.to_string()); }
+            }
         }
         if let Some(Json::Arr(a)) = snap.get("idemVolgorde") {
             for n in a {
@@ -682,6 +741,126 @@ mod tests {
         let r2 = s.kas_int("PART1", &code_str, i(12000), Some("Diner"), Some("k2"));
         assert_eq!(r2.status, 404);
         assert!(s.gezond().0);
+    }
+
+    /* Regressie: een herhaalde idem-sleutel mag GEEN verse code van een ander
+       lid opbranden. Eerder werd `gebruikt` buiten de idempotente sectie gezet,
+       dus de tweede aanroep (die alleen het gecachte antwoord teruggeeft)
+       verbruikte de code die op dat moment werd aangeboden. */
+    #[test]
+    fn herhaalde_idem_brandt_code_van_ander_lid_niet_op() {
+        let mut s = State::new();
+        s.registreer_lid("GAST");
+        s.registreer_lid("ANDER");
+        s.laad_op("GAST", i(100000), Some("op1"));
+        s.laad_op("ANDER", i(100000), Some("op2"));
+
+        // GAST rekent af bij PART1 met idem "x"
+        let code_gast = s.kas_code("GAST", i(50000)).body.str_at("code").unwrap().to_string();
+        let r1 = s.kas_int("PART1", &code_gast, i(12000), Some("Diner"), Some("x"));
+        assert_eq!(r1.status, 200);
+        assert_eq!(s.grb.saldo_van("partner:PART1"), 12000);
+
+        // ANDER maakt een verse code aan
+        let code_ander = s.kas_code("ANDER", i(50000)).body.str_at("code").unwrap().to_string();
+
+        /* Dezelfde partner hergebruikt per ongeluk idem "x", nu met de code van
+           ANDER. Dat is een ander verzoek onder dezelfde sleutel, dus een 409 --
+           geen stille "gelukt" met het oude antwoord. */
+        let r2 = s.kas_int("PART1", &code_ander, i(12000), Some("Diner"), Some("x"));
+        assert_eq!(r2.status, 409, "andere code onder dezelfde idem-sleutel is een conflict");
+        assert_eq!(s.grb.saldo_van("partner:PART1"), 12000, "er mag niets extra geboekt zijn");
+
+        // ...en de code van ANDER moet nog GELDIG zijn: hij is niet opgebrand.
+        let r3 = s.kas_int("PART2", &code_ander, i(3000), Some("Koffie"), Some("y"));
+        assert_eq!(r3.status, 200, "de code van ANDER moet nog bruikbaar zijn");
+        assert_eq!(s.grb.saldo_van("partner:PART2"), 3000);
+        assert_eq!(s.grb.saldo_van("lid:ANDER"), 100000 - 3000);
+        assert!(s.gezond().0, "grootboek sluit");
+    }
+
+    /* Contentbinding: dezelfde idem-sleutel met een ANDER verzoek mag nooit stil
+       het oude antwoord opleveren. Clients bouwen hun sleutel uit Date.now(), dus
+       twee acties in dezelfde milliseconde krijgen echt dezelfde sleutel -- dan
+       hoort er een zichtbaar conflict te komen, geen valse "gelukt". */
+    #[test]
+    fn idem_sleutel_is_aan_het_verzoek_gebonden() {
+        let mut s = State::new();
+        s.registreer_lid("A");
+        s.registreer_lid("B");
+        s.registreer_lid("C");
+        s.laad_op("A", i(100000), Some("op"));
+
+        // A stuurt 100 naar B met sleutel "k"
+        let r1 = s.stuur("A", "B", i(100), Some("x"), Some("k"), "p2p");
+        assert_eq!(r1.status, 200);
+        assert_eq!(s.grb.saldo_van("lid:B"), 100);
+
+        // exact hetzelfde verzoek nogmaals: gewone herhaling, niet dubbel boeken
+        let herhaal = s.stuur("A", "B", i(100), Some("x"), Some("k"), "p2p");
+        assert_eq!(herhaal.status, 200);
+        assert_eq!(herhaal.body.bool_at("herhaald"), true, "identiek verzoek is een herhaling");
+        assert_eq!(s.grb.saldo_van("lid:B"), 100, "niet dubbel geboekt");
+
+        // ander bedrag onder dezelfde sleutel -> conflict, en er beweegt niets
+        let ander_bedrag = s.stuur("A", "B", i(50000), Some("x"), Some("k"), "p2p");
+        assert_eq!(ander_bedrag.status, 409, "ander bedrag is een ander verzoek");
+        assert_eq!(s.grb.saldo_van("lid:B"), 100);
+
+        // andere ontvanger onder dezelfde sleutel -> conflict; C krijgt niets
+        let andere_aan = s.stuur("A", "C", i(100), Some("x"), Some("k"), "p2p");
+        assert_eq!(andere_aan.status, 409, "andere ontvanger is een ander verzoek");
+        assert_eq!(s.grb.saldo_van("lid:C"), 0, "C mag niets krijgen");
+
+        // vrije tekst telt NIET mee: alleen de omschrijving anders blijft een herhaling
+        let andere_oms = s.stuur("A", "B", i(100), Some("heel andere tekst"), Some("k"), "p2p");
+        assert_eq!(andere_oms.status, 200, "alleen andere omschrijving is geen ander verzoek");
+        assert_eq!(andere_oms.body.bool_at("herhaald"), true);
+
+        assert!(s.gezond().0, "grootboek sluit");
+    }
+
+    /* De binding moet een herstart overleven: na snapshot -> laad blijft een
+       hergebruikte sleutel met ander verzoek een conflict. */
+    #[test]
+    fn idem_binding_overleeft_herstart() {
+        let mut s = State::new();
+        s.registreer_lid("A");
+        s.registreer_lid("B");
+        s.registreer_lid("C");
+        s.laad_op("A", i(100000), Some("op"));
+        s.stuur("A", "B", i(100), Some("x"), Some("k"), "p2p");
+
+        let mut s2 = State::new();
+        s2.laad(&s.snapshot());
+        assert_eq!(s2.stuur("A", "C", i(100), Some("x"), Some("k"), "p2p").status, 409,
+            "na herstart moet de afdruk nog bekend zijn");
+        // en het identieke verzoek blijft een gewone herhaling
+        assert_eq!(s2.stuur("A", "B", i(100), Some("x"), Some("k"), "p2p").body.bool_at("herhaald"), true);
+    }
+
+    /* Een snapshot van VOOR de contentbinding heeft geen idemAfdruk. Die sleutels
+       moeten zich gedragen als voorheen (herhaling), niet plots als conflict --
+       anders zou een upgrade lopende idem-sleutels breken. */
+    #[test]
+    fn oude_snapshot_zonder_afdruk_blijft_werken() {
+        let mut s = State::new();
+        s.registreer_lid("A");
+        s.registreer_lid("B");
+        s.registreer_lid("C");
+        s.laad_op("A", i(100000), Some("op"));
+        s.stuur("A", "B", i(100), Some("x"), Some("k"), "p2p");
+
+        // simuleer een oude snapshot: gooi idemAfdruk eruit
+        let mut snap = s.snapshot();
+        snap.set("idemAfdruk", Json::obj());
+        let mut s2 = State::new();
+        s2.laad(&snap);
+
+        let r = s2.stuur("A", "C", i(100), Some("x"), Some("k"), "p2p");
+        assert_eq!(r.status, 200, "zonder bekende afdruk geldt het oude gedrag");
+        assert_eq!(r.body.bool_at("herhaald"), true);
+        assert_eq!(s2.grb.saldo_van("lid:C"), 0);
     }
 
     #[test]

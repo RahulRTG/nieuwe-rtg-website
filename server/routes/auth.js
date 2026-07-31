@@ -88,7 +88,13 @@ app.post('/api/auth/login', async (req, res) => {
   if (!pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
   const token = accounts.issueToken(user.id);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
-  res.json({ token, state: stateFor(sess, req.body.lang) });
+  /* Een account voor alles: heeft dit lid een werkplek, dan komt die hier meteen
+     mee. Geen tweede inlog en geen pincode -- je bent al wie je bent. Het
+     werkvenster van de werkgever bepaalt of de plek open is; een dichte plek komt
+     zonder token mee, met de reden erbij, zodat de app hem wel kan tonen. */
+  let werk = [];
+  try { werk = kern.werkplekkenBijLogin ? kern.werkplekkenBijLogin(user.id, sess.key, req) : []; } catch (e) { werk = []; }
+  res.json({ token, state: stateFor(sess, req.body.lang), ...(werk.length ? { werk } : {}) });
 });
 
 app.post('/api/auth/me', auth, (req, res) => {

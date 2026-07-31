@@ -14,6 +14,14 @@ module.exports = function maakSchaduw() {
   const URL = process.env.RTG_MOTOR_SHADOW;
   if (!URL) return { aan: false, spiegel() {}, async stand() { return null; } };
 
+  /* token van de motor-poortwacht; meesturen als hij daar gezet is */
+  const TOKEN = process.env.RTG_MOTOR_TOKEN || '';
+  const koppen = () => {
+    const h = { 'content-type': 'application/json' };
+    if (TOKEN) h['x-rtg-motor-token'] = TOKEN;
+    return h;
+  };
+
   const BATCH = 500;
   const MAX_QUEUE = 100000; // plafond tegen geheugengroei als de motor wegvalt
   const rij = [];
@@ -28,7 +36,7 @@ module.exports = function maakSchaduw() {
         try {
           await fetch(URL.replace(/\/$/, '') + '/api/pay/boekbatch', {
             method: 'POST',
-            headers: { 'content-type': 'application/json' },
+            headers: koppen(),
             body: JSON.stringify({ boekingen: stuk }),
           });
         } catch (e) {
@@ -66,7 +74,7 @@ module.exports = function maakSchaduw() {
       const af = new AbortController();
       const t = setTimeout(() => af.abort(), 2000);
       try {
-        const r = await fetch(URL.replace(/\/$/, '') + '/api/motor/status', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', signal: af.signal });
+        const r = await fetch(URL.replace(/\/$/, '') + '/api/motor/status', { method: 'POST', headers: koppen(), body: '{}', signal: af.signal });
         const j = await r.json();
         const motorAfdruk = j.vingerafdruk || null;
         return {

@@ -7,8 +7,9 @@
 <link rel="icon" href="/icons/pas-rtg.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,.1);--txt:#F4F1EC;--muted:rgba(244,241,236,.68);--soft:rgba(244,241,236,.5);--gold:#A98F1C;}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--gold:#A98F1C;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
@@ -50,7 +51,7 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
-<body>
+<body class="rtg-stijl">
 <header>
   <a class="terug" href="/apps/index.html">← Apps</a>
   <div><div class="ey">Uw huis, één bediening</div><h1 style="font-size:1.35rem;">RTG Home Kit</h1></div>

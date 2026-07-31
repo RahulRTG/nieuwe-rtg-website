@@ -7,7 +7,7 @@
    - Leden: het sportbord (EEN app met alle uitslagen en standen), tickets
      kopen op de plattegrond, mijn tickets en sponsor-interesse. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, officeAuth, liveCodename, sport } = kern;
+  const { app, auth, supplierAuth, officeAuth, liveCodename, sport, gegevensStop } = kern;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   function poort(req, res, next) {
     if (!sport.isSportclub(req.supplier)) return res.status(403).json({ error: 'Alleen voor de sportclub.' });
@@ -61,7 +61,7 @@ module.exports = (kern) => {
   app.post('/api/member/sport/plattegrond', auth, (req, res) => res.json(sport.plattegrond(String(req.body.club || 'FCRTG'))));
   app.post('/api/member/sport/stand', auth, (req, res) => res.json(sport.stand(String(req.body.club || 'FCRTG'), String(req.body.teamId || ''))));
   app.post('/api/member/sport/momenten', auth, (req, res) => res.json(sport.momenten(String(req.body.club || 'FCRTG'))));
-  app.post('/api/member/sport/ticket/koop', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, sport.ticketKoop(String(req.body.club || 'FCRTG'), req.session, liveCodename(req.session), req.body || {})); });
+  app.post('/api/member/sport/ticket/koop', auth, (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'reservering')) return; stuur(res, sport.ticketKoop(String(req.body.club || 'FCRTG'), req.session, liveCodename(req.session), req.body || {})); });
   app.post('/api/member/sport/tickets', auth, (req, res) => res.json(sport.mijnTickets(req.session.key)));
   app.post('/api/member/sport/sponsors', auth, (req, res) => {
     const r = sport.sponsors(String(req.body.club || 'FCRTG'));

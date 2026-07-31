@@ -10,8 +10,9 @@
 <link href="/shared/rosthema.css" rel="stylesheet">
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,.1);--txt:#F4F1EC;--muted:rgba(244,241,236,.68);--soft:rgba(244,241,236,.5);--gold:#A98F1C;--groen:#4C9A75;}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--gold:#A98F1C;--groen:#4C9A75;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
@@ -44,20 +45,20 @@
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/kantoorgesprek.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
-<body>
+<body class="rtg-stijl">
 <header>
   <a class="terug" href="/apps/index.html">← Apps</a>
   <div><div class="ey">Het RTG Kantoor</div><h1 style="font-size:1.35rem;">De RTG AI</h1></div>
 </header>
 <main id="main" role="main">
   <section id="vLogin" class="kaart" hidden>
-    <h2 style="font-size:1.05rem;">Kantoor-inlog</h2>
-    <p class="stil" style="margin:.4rem 0 .6rem;">Het RTG Kantoor is alleen voor het kantoor zelf.</p>
-    <div class="rij"><input class="veld" id="lCode" maxlength="40" placeholder="Kantoorcode" style="flex:1;min-width:10rem;"><button class="knop" id="lGo">Binnen</button></div>
-    <p class="stil" id="lFout" role="alert" style="color:#E39AA2;margin-top:.5rem;"></p>
+    <!-- de kop komt uit shared/kantoorgesprek.js; twee keer "Kantoor-inlog"
+         onder elkaar was precies wat er stond toen die module erbij kwam -->
+    <div id="lGesprek"></div>
   </section>
 
   <section id="vAi" hidden>
@@ -125,14 +126,10 @@ function start(){
   $('#vAi').hidden = !TOKEN;
   if (TOKEN) { ververs(); verversO(); }
 }
-$('#lGo').addEventListener('click', async () => {
-  $('#lFout').textContent = '';
-  try {
-    const r = await fetch('/api/office/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code: $('#lCode').value.trim() }) }).then(x => x.json());
-    if (!r.token) throw new Error(r.error || 'Onbekende kantoorcode.');
-    TOKEN = r.token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch(e){}
-    start();
-  } catch(e){ $('#lFout').textContent = e.message; }
+// de inlog is een gesprek met Rahul (shared/kantoorgesprek.js), geen codeveld
+RTGKantoorGesprek.toon($('#lGesprek'), (token) => {
+  TOKEN = token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch(e){}
+  start();
 });
 
 let S = null;

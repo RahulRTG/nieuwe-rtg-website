@@ -73,6 +73,8 @@
     bank: '<path d="M4 9.5l8-5 8 5M5 9.5v8M9 9.5v8M15 9.5v8M19 9.5v8M3.5 20.5h17"/>',
     slot: '<rect x="5" y="10.5" width="14" height="9" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><circle cx="12" cy="15" r="1.2"/>',
     pas: '<rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 9.5h18M6.5 14h5"/><circle cx="16.5" cy="14" r="1.6"/>',
+    // de wallet: een portefeuille met een kaart die er net bovenuit steekt
+    wallet: '<path d="M3.5 8.2a2 2 0 0 1 2-2H16v2"/><rect x="3.5" y="8.2" width="17" height="11.3" rx="2.2"/><path d="M20.5 12.4h-3.7a1.6 1.6 0 0 0 0 3.2h3.7"/>',
     gebouw: '<path d="M6 21V4.6A1.6 1.6 0 0 1 7.6 3h5.8A1.6 1.6 0 0 1 15 4.6V21M15 9.5h2.4A1.6 1.6 0 0 1 19 11.1V21M4 21h16M9 7h3M9 11h3M9 15h3"/>',
     gps: '<path d="M12 21c-4.5-5-6.6-8-6.6-11.2a6.6 6.6 0 0 1 13.2 0C18.6 13 16.5 16 12 21z"/><circle cx="12" cy="9.8" r="2.4"/>',
     wifi: '<path d="M2.6 9.1a15 15 0 0 1 18.8 0M5.6 12.6a10 10 0 0 1 12.8 0M8.6 16.1a5 5 0 0 1 6.8 0"/><circle cx="12" cy="19.2" r="1"/>',

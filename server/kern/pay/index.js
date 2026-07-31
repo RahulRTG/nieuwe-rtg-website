@@ -60,26 +60,10 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   const id = p => (p || 'P') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
   /* Idempotentie die een herstart overleeft: dezelfde knop twee keer indrukken
-     (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en
-     boekt nooit dubbel. */
-  function idemStore() {
-    if (!d().payIdem || typeof d().payIdem !== 'object') d().payIdem = { _keys: [] };
-    if (!Array.isArray(d().payIdem._keys)) d().payIdem._keys = [];
-    return d().payIdem;
-  }
-  async function metIdem(sleutel, werk) {
-    if (!sleutel) return werk();
-    const s = idemStore();
-    if (sleutel in s && sleutel !== '_keys') return Object.assign({}, s[sleutel], { herhaald: true });
-    const r = await werk();
-    if (r && r.ok) {
-      s._keys.push(sleutel);
-      if (s._keys.length > 20000) for (const weg of s._keys.splice(0, s._keys.length - 20000)) delete s[weg];
-      s[sleutel] = r;
-      save();
-    }
-    return r;
-  }
+     (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
+     nooit dubbel -- en dezelfde sleutel met een ANDER verzoek geeft een 409 in
+     plaats van stil het oude antwoord. Zie ../../lib/idem.js. */
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem' });
 
   /* ---------- het grootboek zelf ----------
      `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek

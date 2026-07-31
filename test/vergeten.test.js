@@ -74,6 +74,49 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
   await post('/api/favoriet', { code: 'DEMO', aan: true }, token);
   await post('/api/agenda/voeg', { titel: 'afspraak', wanneer: '2026-09-01T10:00' }, token);
   await post('/api/live/deel', { lat: 52.1, lon: 4.3 }, token);
+  /* En praten met Rahul. Dat stond hier niet, en juist daarom bleef zijn
+     geheugen na het verwijderen gewoon staan: de bezem hieronder veegt door de
+     hele database, maar een tak die nooit is aangemaakt kan hij niet vinden.
+     Wat er in staat is precies wat art. 17 bedoelt -- de weetjes die het lid
+     zelf deelde en de laatste beurten van het gesprek. */
+  await post('/api/fluister', { q: 'plan mijn dag' }, token);
+  await post('/api/fluister', { q: 'onthoud dat ik graag bij het raam zit' }, token);
+
+  /* En dan BREED. De bezem hieronder is zo goed als de wandeling hierboven: een
+     tak die dit lid nooit aanraakt, kan hij niet vinden. Precies zo bleef Rahuls
+     geheugen staan. Daarom loopt Wilma nu langs de takken die aan haar SLEUTEL
+     hangen -- dat is het lijstje waarmee ze weer terug te vinden zou zijn.
+
+     Per stap wordt afgedwongen dat de actie ook echt landde (zie hieronder):
+     een aanroep die stilletjes 404't voegt geen dekking toe maar suggereert die
+     wel, en dat is erger dan hem weglaten. */
+  const partners = (await (await post('/api/suppliers', {}, token)).json()).suppliers || [];
+  const zaak = partners.find(p => (p.menu || []).length) || partners[0];
+  assert.ok(zaak && zaak.code, 'er is een partner om sporen bij achter te laten');
+  const talen = (await (await post('/api/member/taal', {}, token)).json()).talen || [];
+
+  const sporen = [
+    ['/api/zorgprofiel/zet', { allergenen: ['noten'], deel: true }],
+    ['/api/member/taal/zet', { code: (talen[0] && (talen[0].code || talen[0])) || 'nl' }],
+    ['/api/favoriet', { supplierCode: zaak.code }],
+    ['/api/wallet/voeg', { soort: 'klantenkaart', titel: 'Kaart van Wilma', code: 'WIL-1234' }],
+    ['/api/bestanden/upload', { naam: 'wilma.txt', dataUrl: 'data:text/plain;base64,' + Buffer.from('van Wilma').toString('base64') }],
+    ['/api/order', { supplierCode: zaak.code, items: ((zaak.menu || [])[0] ? [{ id: zaak.menu[0].id, qty: 1 }] : []) }],
+    ['/api/verify/upload', { image: 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).toString('base64') }],
+    ['/api/giftcard/buy', { supplierCode: zaak.code, bedrag: 25 }],
+    ['/api/splits', { ref: 'x', metKeys: [] }],
+    ['/api/review', { soort: 'order', ref: 'x', score: 5 }]
+  ];
+  const geland = [];
+  for (const [pad, lijf] of sporen) {
+    const r = await post(pad, lijf, token);
+    if (r.status === 200) geland.push(pad);
+  }
+  /* Minstens zes moeten echt raak zijn, anders is deze wandeling in stilte
+     leeggelopen (een endpoint dat hernoemd wordt, valt hier op) en zou de bezem
+     hieronder groen staan zonder iets te hebben geveegd. */
+  assert.ok(geland.length >= 6, 'te weinig sporen geland (' + geland.length + '): ' + geland.join(', '));
+
   await wacht(400); // de opslag even laten landen
 });
 

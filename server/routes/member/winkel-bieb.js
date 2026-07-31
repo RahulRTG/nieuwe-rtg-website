@@ -3,7 +3,7 @@
    RTF-Bibliotheek). Apart gehouden zodat winkel.js klein blijft; alleen routes,
    de logica woont in de kern-modules. */
 module.exports = (kern) => {
-  const { app, auth, foodcourt, mall, appbieb, reisbieb, rtfbieb } = kern;
+  const { app, auth, foodcourt, mall, appbieb, reisbieb, rtfbieb, gegevensStop } = kern;
 
   /* Het toegangsmodel van de echte RTG Bibliotheek: BLADEREN is voor iedereen
      zichtbaar (ook de aangemelde gratis gast). Installeren uit de
@@ -30,6 +30,7 @@ module.exports = (kern) => {
   app.post('/api/mall/eigen', auth, (req, res) => res.json(mall.eigenCatalogus()));
   // een lid bestelt een eigen-merk-product direct in de app
   app.post('/api/mall/bestel', auth, (req, res) => {
+    if (gegevensStop(req, res, 'bestelling')) return;
     const r = mall.memberBestel(req.body || {});
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
@@ -42,6 +43,7 @@ module.exports = (kern) => {
   });
   // een lid bestelt een boerderijproduct direct; de voorraad daalt
   app.post('/api/mall/land-bestel', auth, (req, res) => {
+    if (gegevensStop(req, res, 'bestelling')) return;
     const r = mall.memberBestelFarm(req.body || {});
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);

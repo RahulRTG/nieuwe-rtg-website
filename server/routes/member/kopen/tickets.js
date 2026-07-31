@@ -8,7 +8,7 @@ module.exports = (kern) => {
     liveCodename, notifySupplier, pickupCode, publicPartner, save,
     schoon, sseToOffice, sseToSupplier, salonZichtbaar, zorgVoor,
     koopTicketVoor, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek,
-    orderMetRef, ordersVoegToe } = kern;
+    orderMetRef, ordersVoegToe, gegevensStop } = kern;
 /* ================== tickets: activiteiten, tours en musea ==================
    Tijdsloten met capaciteit; betalen vooraf via de bestaande boekingstroom
    (/api/booking/pay). Het ticket krijgt een entreecode die het personeel aan
@@ -21,6 +21,8 @@ app.post('/api/tickets/aanbod', auth, (req, res) => {
 });
 
 app.post('/api/ticket/koop', auth, (req, res) => {
+  // een ticket staat op naam en wordt aan de deur afgevinkt
+  if (gegevensStop(req, res, 'reservering')) return;
   const r = koopTicketVoor(req.session, req.body);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);

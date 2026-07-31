@@ -74,3 +74,70 @@ De beveiliging wordt in de CI en de testsuite continu bewaakt:
 
 Zet daarnaast in de repo-instellingen GitHub's eigen **Secret scanning** en
 **Push protection** aan; die vullen de bovenstaande lagen aan.
+
+### De identiteitskluis is aan zijn rij gebonden
+
+Persoonsgegevens (naam, e-mail, telefoon en het ledendossier) staan versleuteld in
+de kluis, met een sleutel die los van de database leeft. Versleuteling alleen is
+daar niet genoeg: een versleuteld veld zegt niets over waar het thuishoort, dus wie
+de database kan bewerken zou een blob kunnen **verplaatsen** — de versleutelde naam
+van het ene lid naar de naamkolom van het andere. De AEAD merkt daar niets van (het
+blob is ongeschonden) en het huis leest daarna een echte naam bij de verkeerde
+codenaam. Dat holt de scheiding tussen codenaam en kluis uit.
+
+Daarom gaat de identiteit van de **plek** (tabel, kolom, rij-id) als additional
+authenticated data mee in de authenticatie (`server/accounts/gebonden.js`).
+Verplaatst iemand een blob naar een andere rij of kolom, dan klopt die context niet
+meer, faalt de authenticatie en komt er niets uit. De Rust-kluis
+(`motor/src/kluis.rs`) doet hetzelfde met de codenaam als context.
+
+Bestaande installaties blijven leesbaar en migreren per rij mee bij de
+eerstvolgende schrijfactie. Actief migreren en de stand aantonen:
+
+```
+npm run kluisbeheer               # stand opnemen, verandert niets
+npm run kluisbeheer -- --migreer  # herzegel alles wat nog werk nodig heeft
+```
+
+Een rij die niet opengaat wordt met opzet niet aangeraakt: migreren mag nooit
+gegevens vernietigen. `test/kluis-binding.test.js` valt de verplaatsing met rauwe
+SQL aan en bewaakt tegelijk dat de oudere vormen leesbaar blijven.
+
+### Opgeslagen bestanden zijn aan hun naam gebonden
+
+Hetzelfde geldt voor de bestandsopslag (`server/kluis.js`). De versleuteling
+beschermde de inhoud van een KYC-document, maar zei niet welk document het was —
+dus kon wie bij de opslag kan twee blobs **omwisselen**, waarna de backoffice het
+verkeerde identiteitsbewijs bij een goedkeuring te zien krijgt. Daarom gaat nu de
+bestandsnaam als additional authenticated data mee, voor alle drie de
+opslagplaatsen (`uploads`, `media`, `bestanden`): ze verwijzen allemaal met de kale
+naam naar hun bestanden, en die naam is bij schrijven én lezen bekend.
+
+Bestaande bestanden blijven leesbaar (`RTGENC1`, ongebonden) en nieuwe
+schrijfacties zijn gebonden (`RTGENC2`). `test/bestand-binding.test.js` wisselt
+twee blobs om en eist dat er niets opengaat.
+
+### De kluissleutel is te roteren
+
+Een gecompromitteerde sleutel moet te vervangen zijn zonder de gegevens te
+verliezen en zonder downtime. De kluis houdt daarom een **keyring**: zegelen gaat
+met de nieuwste sleutel, lezen probeert ze op volgorde. Roteren zet een verse
+sleutel vooraan, schrijft de ring **eerst** duurzaam naar schijf en hersleutelt
+daarna rij voor rij — dezelfde ordening als `motor/src/kluis.rs`, zodat elk blob
+altijd naar een sleutel wijst die op schijf staat. Valt het proces er middenin om,
+dan staat een deel op de nieuwe en een deel op de oude sleutel; dat leest gewoon
+door en opnieuw draaien maakt het af.
+
+```
+npm run kluisbeheer -- --roteer   # verse sleutel erbij en alles hersleutelen
+```
+
+Wat **niet** meeroteert zijn de zoek-hashes op e-mail en telefoon. Die zijn een
+HMAC met de oorspronkelijke sleutel en staan als opzoeksleutel in de database —
+zouden ze meebewegen, dan kon niemand meer op zijn e-mailadres inloggen, en
+halverwege een rotatie zou de helft van de leden buitenstaan. Die sleutel blijft
+dus gepind. `test/kluis-rotatie.test.js` bewaakt precies dat: met een meeroterende
+zoek-hash faalt de inlogtest.
+
+Bij meerdere instances moet de ring, net als de sleutel zelf, op elke instance
+gelijk zijn (`RTG_VAULT_RING`).

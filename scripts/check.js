@@ -316,7 +316,8 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
-    'server/accounts/users.js',
+    // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
+    // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',
     'server/kern/pay/index.js',
     'server/kern/werkplaats.js',
@@ -401,6 +402,293 @@ console.log('\n14) zero dependencies: geen externe modules, package.json klopt')
     if (pakketten.length) fout('package-lock.json bevat ' + pakketten.length + ' pakket(ten): ' + pakketten.slice(0, 5).join(', '));
     else ok('package-lock.json is leeg (alleen het project zelf)');
   }
+}
+
+/* 15) id's in de client komen uit de CSPRNG, niet uit de klok of Math.random.
+
+   Een id hoort UNIEK te zijn, want de app gebruikt hem als opzoeksleutel. Twee
+   dingen met hetzelfde id zijn voor de app EEN ding, en dan gaat er stil iets
+   fout: bij een idem-sleutel houdt de server de tweede geld-actie voor een
+   herhaling van de eerste en antwoordt "gelukt" zonder te boeken; bij een
+   menu-item of een kanban-kaart bewerk je er ineens twee tegelijk.
+
+   Date.now() is milliseconde-grof (twee acties in dezelfde ms krijgen hetzelfde
+   id) en Math.random().toString(36).slice(...) levert een handvol bits, waar de
+   botsingskans bij honderden id's al merkbaar is. Gebruik RTGId('voorvoegsel')
+   uit shared/basis.js; die staat op elke app-pagina (zie regel 10).
+
+   Twee signaturen zijn hier hard, want die bestaan ALLEEN om een id te maken:
+   `Math.random().toString(` en `Date.now().toString(36)`. Cosmetische willekeur
+   (ruis in een audiobuffer, een sterrenveld, jitter op een grafiekpunt) matcht
+   daar niet op en blijft dus gewoon Math.random gebruiken -- dat hoort ook.
+
+   Uitgezonderd: id's die BEWUST vastliggen aan iets wat al uniek is (een
+   betaalverzoek-ref). Die horen deterministisch te zijn, anders wordt een
+   dubbeltik een tweede betaling in plaats van een herhaling. Ze staan hieronder
+   met naam, want ze zijn een keuze en geen vergissing. */
+console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.random');
+{
+  const MAG_VAST = new Map([
+    ["idem: 'bv-' + v.ref", 'vast aan de betaalverzoek-ref: een dubbeltik moet een herhaling zijn, geen tweede betaling']
+  ]);
+  const vast = [...MAG_VAST.keys()];
+  let zwak = 0;
+  const gebruikers = new Set();   // bestanden die RTGId/RTGIdem aanroepen
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || rel === 'public/shared/id.js') return;
+    const bron = fs.readFileSync(f, 'utf8');
+    if (/\bRTGId(em)?\s*\(/.test(bron)) gebruikers.add(rel.replace(/^public\//, ''));
+    bron.split('\n').forEach((regel, i) => {
+      if (/RTGId\b|RTGIdem\b/.test(regel)) return;          // gebruikt de CSPRNG-helper al
+      if (vast.some(k => regel.includes(k))) return;         // benoemde vaste sleutel
+      const idemZwak = /\bidem\b\s*[:=]/.test(regel) && /Date\.now|Math\.random/.test(regel);
+      const idVorm = /Math\.random\(\)\.toString\(|Date\.now\(\)\.toString\(36\)/.test(regel);
+      if (!idemZwak && !idVorm) return;
+      zwak++;
+      fout('zwak id: ' + rel + ':' + (i + 1) + " -- gebruik RTGId('voorvoegsel')");
+    });
+  });
+  if (!zwak) ok('geen id uit de klok of Math.random (' + MAG_VAST.size + ' benoemde vaste sleutel)');
+
+  /* En de andere helft: wie RTGId gebruikt, moet shared/id.js ook inladen. Dat is
+     geen formaliteit -- de helper zat eerst in shared/basis.js, dat deferred laadt,
+     terwijl de documenteditors hun eerste blokken al TIJDENS het parsen aanmaken.
+     Die kregen daardoor een ReferenceError op een pad dat geen test raakte. Deze
+     controle sluit dat gat: per pagina kijken we of zij (of een script dat zij
+     laadt) RTGId gebruikt, en zo ja of /shared/id.js erin staat. */
+  let mist = 0, pag = 0;
+  loop(path.join(ROOT, 'public'), /\.html$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    const bron = fs.readFileSync(f, 'utf8');
+    const eigen = rel.replace(/^public\//, '');
+    const map = path.posix.dirname(eigen);
+    let nodig = gebruikers.has(eigen);
+    for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) {
+      const src = m[1];
+      const doel = src.startsWith('/') ? src.slice(1) : path.posix.normalize(path.posix.join(map, src));
+      if (gebruikers.has(doel)) nodig = true;
+    }
+    if (!nodig) return;
+    pag++;
+    if (!/<script[^>]*\ssrc="\/shared\/id\.js"/.test(bron)) {
+      mist++;
+      fout('RTGId zonder /shared/id.js: ' + rel + ' -- laad hem in (zonder defer, vooraan)');
+    } else if (/<script[^>]*\ssrc="\/shared\/id\.js"[^>]*\sdefer/.test(bron)) {
+      mist++;
+      fout('id.js met defer: ' + rel + ' -- dan is RTGId er nog niet tijdens het parsen');
+    }
+  });
+  if (!mist) ok(pag + ' pagina\'s die RTGId gebruiken laden shared/id.js (zonder defer)');
+}
+
+/* 16) een pad met een DERDE PARTIJ gaat langs de gegevenspoort.
+
+   De afspraak: een gratis RTG-account vraagt vier dingen (naam, geboortedatum,
+   e-mail, wachtwoord). Wie alleen rondkijkt hoeft nooit meer te geven. Maar zodra
+   er een zaak, een koerier of een professional in beeld komt, moet die iemand
+   kunnen bereiken -- en dan vraagt Rahul de rest, in een gesprek
+   (kern/gegevenspoort.js + kern/gegevensgesprek.js).
+
+   Die afspraak leeft in een regel per route: `if (gegevensStop(req, res, ...))
+   return;`. Een regel die je moet ONTHOUDEN wordt vroeg of laat vergeten, en dan
+   staat er ineens een koerier voor de deur van een lid van wie we geen
+   telefoonnummer hebben -- of erger: dan vraagt een nieuw pad wel alles vast,
+   "voor de zekerheid", en is de belofte weg.
+
+   Daarom kijkt de keuring mee. Elke route achter de leden-poort (`auth`) die in
+   zijn pad een handeling met een derde noemt -- bestellen, boeken, reserveren,
+   bezorgen, huren, kopen -- heeft die regel, of staat hieronder met naam en
+   reden. De namenlijst is het punt: een NIEUW pad staat er per definitie niet in
+   en valt dus op, en wie er een in zet, zet zijn reden erbij.
+
+   De scan kijkt naar HEEL server/routes, niet alleen naar routes/member. Dat is
+   met schade geleerd: vluchten boeken, een clubticket kopen en een verblijf
+   boeken staan in luchthaven.js, sportclub.js en thuis.js, en die gleden er
+   allemaal langs toen de regel alleen naar routes/member keek.
+
+   Uitgezonderd is niet hetzelfde als vergeten: kijken kost niets, en een
+   vervolgstap binnen iets wat al loopt (de deur van je eigen hotelkamer, een
+   foto bij de huurauto die voor je klaarstaat) vraagt niet opnieuw.
+
+   En de regel leest namen, dus hij ziet wat er als een handeling KLINKT. Twee
+   kanten daarvan staan hieronder: /api/boeken/* is de bibliotheek (boeken zijn
+   daar dingen met bladzijden) en gaat op de prefix-lijst, en omgekeerd zegt
+   /api/member/vluchten/charter niets over bestellen of boeken terwijl er wel
+   degelijk een derde partij aan te pas komt -- die heeft zijn poort omdat een
+   mens ernaar keek. Een namenlijst haalt de vergeetachtigheid eruit, niet het
+   nadenken. */
+console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoort');
+{
+  const DERDE = /bestel|order|reserve|boek|booking|bezorg|leveri|koerier|courier|afhaal|ophaal|verblijf|proefrit|koop|huur|ticket|vervoer|taxi|\brit\b/i;
+  // alleen kijken/opvragen: geen handeling, dus niets te vragen
+  const KIJKEN = /\/(mijn|mine|status|volg|slots|annuleer|betaal|pay|partners|overzicht|lijst|list|historie|history|zoek|markt|advies|check|info)\b/i;
+  /* Hele domeinen waar het woord toevallig valt maar geen derde partij staat:
+     de bibliotheek (boeken = boeken) en de eigen bank. */
+  const NIET_DERDE = [
+    ['/api/boeken/', 'de RTG-bibliotheek: "boeken" zijn hier dingen met bladzijden'],
+    ['/api/bank/', 'de eigen bank van RTG; een overboeking gaat niet langs een derde']
+  ];
+  const MAG_ZONDER = new Map([
+    ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
+    ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
+    ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    ['/api/verhuur/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    ['/api/verkoop/showroom', 'de showroom bekijken; er gebeurt nog niets'],
+    ['/api/verblijf/deur', 'je bent al ingecheckt: dit opent je eigen kamerdeur'],
+    ['/api/huur/foto', 'vervolgstap in een lopende huur'],
+    ['/api/huur/locatie', 'vervolgstap in een lopende huur (vrijwillige positie)'],
+    ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
+    ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
+    ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover']
+  ]);
+  let gaten = 0, poorten = 0;
+  loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const m of bron.matchAll(/app\.post\('(\/api\/[^']+)'([^\n]*)/g)) {
+      const pad = m[1];
+      if (!DERDE.test(pad) || KIJKEN.test(pad)) continue;
+      // alleen de leden-poort: achter supplierAuth/officeAuth zit een zaak of
+      // RTG-personeel, en daar is de handeling zelf al van de derde partij.
+      if (!/,\s*auth\s*[,)]/.test(m[2])) continue;
+      if (NIET_DERDE.some(([p]) => pad.startsWith(p))) continue;
+      if (MAG_ZONDER.has(pad)) continue;
+      // de body loopt tot de volgende route in hetzelfde bestand
+      const volgende = bron.indexOf("app.post('", m.index + 5);
+      const body = bron.slice(m.index, volgende < 0 ? bron.length : volgende);
+      const regel = bron.slice(0, m.index).split('\n').length;
+      if (/gegevensStop\s*\(|gegevensPoort\s*\(/.test(body)) { poorten++; continue; }
+      gaten++;
+      fout('derde partij zonder gegevenspoort: ' + pad + ' (' + rel + ':' + regel + ')'
+        + " -- zet er `if (gegevensStop(req, res, 'bestelling')) return;` bij, of noem hem in MAG_ZONDER");
+    }
+  });
+  if (!gaten) ok(poorten + ' leden-paden met een derde partij gaan langs de poort (' + MAG_ZONDER.size + ' benoemd zonder)');
+
+  /* En de andere kant: de poort moet ook echt iets kunnen vragen. Staat er een
+     soort in een route die de poort niet kent, dan valt hij stil terug op "niets
+     nodig" en denkt iedereen dat het geregeld is. */
+  const NODIG = require(path.join(ROOT, 'server/kern/gegevenspoort')).NODIG;
+  let onbekend = 0;
+  loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const m of bron.matchAll(/gegevensStop\s*\(([^)]*)\)/g)) {
+      // ook een keuze in de aanroep (`? 'bezorging' : 'bestelling'`) telt mee
+      for (const s of m[1].matchAll(/'([a-z]+)'/g)) {
+        if (NODIG[s[1]]) continue;
+        onbekend++;
+        fout('onbekende soort in de gegevenspoort: \'' + s[1] + '\' in ' + path.relative(ROOT, f)
+          + ' -- die staat niet in NODIG, dus de poort vraagt niets');
+      }
+    }
+  });
+  if (!onbekend) ok('elke soort die een route noemt staat in NODIG (' + Object.keys(NODIG).join(', ') + ')');
+}
+
+/* 17) een scherm dat door de poort kan, kan het gesprek ook voeren.
+
+   Regel 16 bewaakt de serverkant: een handeling met een derde partij wordt
+   tegengehouden met 428 en zegt wat er mist. Dat is de halve belofte. De andere
+   helft staat in de app: Rahul vraagt het in beeld en daarna gaat de handeling
+   vanzelf door (public/shared/poortgesprek.js).
+
+   Zonder die module gebeurt er iets ergers dan een foutmelding: het lid krijgt
+   "dat vraag ik even" te zien en er wordt vervolgens niets gevraagd. Een melding
+   die liegt is slechter dan een die dat niet doet, en dat is precies wat er hier
+   stond -- de poort was er wel, het gesprek nergens.
+
+   Dus: kan een pagina bij een pad dat achter de poort staat, dan laadt ze de
+   module. De lijst met poortpaden komt uit de code zelf (elke route met
+   gegevensStop), niet uit een lijst hier -- zo blijft de keuring vanzelf gelijk
+   lopen met wat er echt achter de poort staat. */
+console.log('\n17) een scherm dat door de poort kan, kan het gesprek ook voeren');
+{
+  // welke paden staan achter de poort? uit de routes zelf halen.
+  const poortPaden = new Set();
+  loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const m of bron.matchAll(/app\.post\('(\/api\/[^']+)'/g)) {
+      const volgende = bron.indexOf("app.post('", m.index + 5);
+      const body = bron.slice(m.index, volgende < 0 ? bron.length : volgende);
+      if (/gegevensStop\s*\(/.test(body)) poortPaden.add(m[1]);
+    }
+  });
+  /* De client noemt een pad soms zonder /api-prefix (API.call('/order')), dus we
+     zoeken op beide vormen -- als quoted string, zodat '/order' niet matcht op
+     een los woord in een zin. */
+  const vormen = [...poortPaden].flatMap(p => ["'" + p + "'", "'" + p.replace(/^\/api/, '') + "'"]);
+  const raakt = (bron) => vormen.some(v => bron.includes(v));
+
+  const { bundels } = require('./bundel');
+  const delenVan = new Map();      // 'apps/app-main.js' -> ['apps/app-main/app-main-01.js', ...]
+  for (const [bundel, map] of Object.entries(bundels)) {
+    const dir = path.join(ROOT, 'public', map);
+    if (!fs.existsSync(dir)) continue;
+    delenVan.set(bundel, fs.readdirSync(dir).filter(n => n.endsWith('.js')).sort().map(n => map + '/' + n));
+  }
+
+  let mist = 0, gedekt = 0;
+  loop(path.join(ROOT, 'public'), /\.html$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    const bron = fs.readFileSync(f, 'utf8');
+    const map = path.posix.dirname(rel.replace(/^public\//, ''));
+    // alles wat deze pagina bereikt: zijzelf, haar scripts, en de delen van een bundel
+    const bereik = [bron];
+    for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) {
+      const src = m[1].split('?')[0];
+      const doel = src.startsWith('/') ? src.slice(1) : path.posix.normalize(path.posix.join(map, src));
+      for (const p of [doel, ...(delenVan.get(doel) || [])]) {
+        const vol = path.join(ROOT, 'public', p);
+        if (fs.existsSync(vol)) { try { bereik.push(fs.readFileSync(vol, 'utf8')); } catch (e) {} }
+      }
+    }
+    if (!bereik.some(raakt)) return;
+    if (/<script[^>]*\ssrc="\/shared\/poortgesprek\.js"/.test(bron)) { gedekt++; return; }
+    mist++;
+    fout('poortpad zonder gegevensgesprek: ' + rel +
+      ' -- deze pagina kan een 428 krijgen; laad /shared/poortgesprek.js erbij');
+  });
+  if (!mist) ok(gedekt + ' pagina\'s die achter de poort kunnen komen laden het gesprek (' + poortPaden.size + ' poortpaden)');
+}
+
+/* 18) de kantoordeur staat maar op een plek nagebouwd.
+
+   Dit is met schade geleerd. /api/office/login was op vijf schermen los
+   nagebouwd, en toen de backoffice een tweede factor kreeg, kreeg maar EEN van
+   die vijf een veld om die code in te typen. De andere vier liepen vast op een
+   vraag die ze niet konden stellen: "Tweede factor vereist" zonder plek om hem
+   te geven. Niemand had iets verkeerd gedaan; het was gewoon vier keer hetzelfde
+   scherm dat niet meebewoog.
+
+   Dus: een pagina praat met de kantoordeur via het gesprek
+   (shared/kantoorgesprek.js), of ze staat hieronder met naam en reden. Zo kan er
+   geen zesde kopie bijkomen die stilletjes achterloopt.
+
+   personeel is de benoemde uitzondering: dat is de werk-app waar het ene
+   RTG-account zijn rollen koppelt, en die heeft de code EN de tweede factor
+   allebei al als veld. Daar is de deur dus compleet. */
+console.log('\n18) de kantoordeur staat maar op een plek nagebouwd');
+{
+  const MAG_ZELF = new Map([
+    ['public/apps/personeel.js', 'de werk-app koppelt rollen aan het ene account; heeft code en tweede factor allebei'],
+    ['public/apps/personeel/personeel-05.js', 'de bron-slice van dezelfde werk-app']
+  ]);
+  let eigen = 0, viaGesprek = 0;
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || rel === 'public/shared/kantoorgesprek.js') return;
+    const bron = fs.readFileSync(f, 'utf8');
+    if (/RTGKantoorGesprek/.test(bron)) viaGesprek++;
+    if (!/['"]\/api\/office\/login['"]/.test(bron)) return;
+    if (MAG_ZELF.has(rel)) return;
+    eigen++;
+    fout('eigen kantoor-inlog: ' + rel +
+      ' -- praat met de deur via RTGKantoorGesprek.toon(), of noem hem in MAG_ZELF');
+  });
+  if (!eigen) ok(viaGesprek + ' plek(ken) doen de kantoor-inlog via het gesprek (' + MAG_ZELF.size + ' benoemd met een eigen veld)');
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

@@ -2,6 +2,8 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
+<script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Bord</title>
 <meta name="theme-color" content="#0C0C0B">
@@ -10,6 +12,7 @@
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
 <script src="palet.js"></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   body{height:100vh;overflow:hidden;}
   .app{display:grid;grid-template-columns:1fr 20rem;grid-template-rows:auto 1fr;height:100vh;gap:.7rem;padding:.7rem;}
@@ -55,7 +58,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
-<body>
+<body class="rtg-stijl">
 <div class="app" id="app" role="main">
   <div class="top">
     <div class="brand"><span class="merkvlak">RT<b>Foundation</b></span></div>

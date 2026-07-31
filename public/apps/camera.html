@@ -11,9 +11,10 @@
 <link href="/apps/rtg-protect.css" rel="stylesheet">
 <script src="/apps/rtg-protect.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
-    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#4C9A75;}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
+    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#4C9A75;}
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;}
   body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;overflow:hidden;}
@@ -110,7 +111,7 @@
   .aknop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 </style>
 </head>
-<body>
+<body class="rtg-stijl">
 <h1 class="vis-verborgen">RTG Camera</h1>
 
 <div class="zoeker" id="zoeker" role="main">

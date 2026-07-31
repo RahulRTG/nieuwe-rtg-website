@@ -53,6 +53,14 @@ function leesLagen(lagen, voorvoegsel) {
   return uit;
 }
 
+/* ---------- meekijken welke routes er matchen ----------
+   Eén optionele haak, gezet door wie dat wil weten (server/routelog.js voor de
+   dekkingsmeting). Bewust hier en niet als middleware op 'finish': een route is
+   aangeraakt zodra hij matcht, ook als het antwoord daarna nooit aankomt.
+   Zonder haak kost dit niets, en deze module weet niet wie er meekijkt. */
+let patroonHaak = null;
+function opPatroon(fn) { patroonHaak = typeof fn === 'function' ? fn : null; }
+
 /* ---------- een router (ook de app is er een) ---------- */
 function maakRouter() {
   const lagen = [];
@@ -105,8 +113,16 @@ function maakRouter() {
          het er een per gebruiker-id -- en dan legt de monitoring zichzelf om.
          Alleen bij een echte route (laag.method gezet), niet bij middleware,
          want die matcht op alles en zou het patroon overschrijven. */
-      if (laag.method && typeof laag.pad === 'string')
+      if (laag.method && typeof laag.pad === 'string') {
         req.routePatroon = ((req.routeVoorvoegsel || '') + laag.pad).replace(/\/+$/, '') || '/';
+        /* Wie wil weten WELKE routes er geraakt zijn, hoort dat hier: op het
+           moment dat de route matcht. Niet bij 'finish' van het antwoord --
+           dat is een ander moment, en het kan er nooit komen (een afgebroken
+           verbinding, een proces dat gestopt wordt). De route is dan wel
+           degelijk aangeraakt. De haak is optioneel; zonder haak kost dit
+           een null-check. */
+        if (patroonHaak) { try { patroonHaak(req.method, req.routePatroon); } catch (e) { /* nooit het verzoek raken */ } }
+      }
       try {
         if (laag.fout) return laag.fn(err, req, res, next);
         return laag.fn(req, res, next);
@@ -142,4 +158,4 @@ function maakRouter() {
 }
 
 
-module.exports = { maakRouter, padNaar, leesLagen };
+module.exports = { maakRouter, padNaar, leesLagen, opPatroon };

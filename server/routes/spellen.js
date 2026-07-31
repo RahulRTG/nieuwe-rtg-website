@@ -2,6 +2,8 @@
    Sneek-scorebord, op de vriendenlaag. Twee ingangen naar dezelfde motor:
    de RTG-leden-app (Bearer-token) en de RTFoundation (gezinscode + token),
    zodat alle leden tegen elkaar spelen. */
+const { log } = require('../log');
+
 module.exports = (kern) => {
   const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
@@ -40,20 +42,29 @@ module.exports = (kern) => {
     'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),
     'arcade-bord': (mij, b) => arcadeBord(mij, String(b.spel || ''), vriendenVan(mij))
   };
-  // vangnet: Express 4 vangt async-fouten niet zelf, dus zonder try/catch
-  // blijft een request eeuwig hangen als een actie onverwacht gooit
-  async function veilig(res, werk) {
+  /* vangnet: Express 4 vangt async-fouten niet zelf, dus zonder try/catch
+     blijft een request eeuwig hangen als een actie onverwacht gooit.
+
+     De exceptie MOET hier gelogd worden. Werd hij weggegooid, dan bleef er van
+     een echte fout in een van deze acties niets over dan een kale 500: geen
+     stack, geen actie, geen id -- terwijl de fout-aggregatie op het techniekbord
+     er juist voor is. Zo was een 500 uit spelAntwoord onder parallelle belasting
+     niet te herleiden. */
+  async function veilig(res, werk, naam, req) {
     try { stuur(res, await werk()); }
-    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+    catch (e) {
+      log.uitzondering(e, { id: req && req.id, p: req && req.path, actie: naam });
+      res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
+    }
   }
   for (const [naam, doe] of Object.entries(ACTIES)) {
     app.post('/api/member/spel/' + naam, auth, (req, res) => {
       if (geenGast(req, res)) return;
-      veilig(res, () => doe(req.session.key, req.body || {}, 'rtg'));
+      veilig(res, () => doe(req.session.key, req.body || {}, 'rtg'), naam, req);
     });
     app.post('/api/rtf/spel/' + naam, (req, res) => {
       const mij = rtfSpeler(req, res); if (!mij) return;
-      veilig(res, () => doe(mij, req.body || {}, 'rtf'));
+      veilig(res, () => doe(mij, req.body || {}, 'rtf'), naam, req);
     });
   }
 };

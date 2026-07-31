@@ -11,6 +11,11 @@ pub struct Request {
     pub method: String,
     pub path: String,
     pub body: String,
+    /* Het meegegeven motor-token, uit `X-RTG-Motor-Token` of uit
+       `Authorization: Bearer <token>`. Leeg als de client niets meestuurde. De
+       poortwacht in main.rs vergelijkt het constant-time; de HTTP-laag zelf
+       oordeelt niet. */
+    pub token: String,
 }
 
 // Harde grenzen tegen geheugen-DoS: een kwaadwillende client mag ons niet laten
@@ -18,12 +23,19 @@ pub struct Request {
 const MAX_BODY: usize = 256 * 1024;   // 256 KB body is ruim voor elke pay-call
 const MAX_LIJN: usize = 8 * 1024;      // start-lijn / header-lijn
 const MAX_HEADERS: usize = 100;
+/* Totale tijd om EEN verzoek binnen te lezen, geteld vanaf de eerste byte. De
+   lees-timeout hieronder geldt per leesactie en is dus geen rem op een client
+   die elke 29 seconden precies een byte stuurt: zo houdt hij zijn slot eeuwig
+   bezet (slowloris) en met genoeg van die verbindingen zit het plafond vol.
+   Deze deadline kapt dat af, ongeacht hoe traag de bytes druppelen. */
+const MAX_VERZOEK_MS: u128 = 15_000;
 
 enum Lees {
     Klaar(Request),
     Dicht,
     TeGroot,
     Slecht, // dubbelzinnig/gevaarlijk verzoek (request smuggling) -> 400 + sluiten
+    TeLang, // verzoek druppelde te lang door (slowloris) -> 408 + sluiten
 }
 
 pub struct Response {
@@ -110,6 +122,16 @@ where
                 let _ = writer.write_all(tekst.as_bytes());
                 break;
             }
+            Ok(Lees::TeLang) => {
+                // slowloris: het verzoek kwam te langzaam binnen -> slot vrijgeven
+                let body = "{\"error\":\"Verzoek duurde te lang.\"}";
+                let tekst = format!(
+                    "HTTP/1.1 408 Request Timeout\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                    body.len(), body
+                );
+                let _ = writer.write_all(tekst.as_bytes());
+                break;
+            }
             Ok(Lees::Slecht) => {
                 // dubbelzinnig verzoek (Transfer-Encoding of botsende Content-Length):
                 // 400 en de verbinding HARD sluiten -- nooit doorgaan met een body
@@ -138,9 +160,47 @@ where
     Ok(())
 }
 
+/* De deadline-klok voor EEN verzoek. Hij start lui: pas bij de eerste byte die
+   binnenkomt, niet al bij het wachten daarop. Zo houdt een keep-alive-client die
+   minuten stil is (volkomen normaal) zijn verbinding, terwijl een client die
+   bytes gaat druppelen wel aan de klok hangt. Per verbinding is er precies een
+   thread, dus een Cell is hier genoeg. */
+struct Klok {
+    start: std::cell::Cell<Option<std::time::Instant>>,
+}
+impl Klok {
+    fn nieuw() -> Klok {
+        Klok { start: std::cell::Cell::new(None) }
+    }
+    /// Meld of de deadline verstreken is; de eerste aanroep start de klok.
+    fn verstreken(&self) -> bool {
+        match self.start.get() {
+            None => {
+                self.start.set(Some(std::time::Instant::now()));
+                false
+            }
+            Some(t) => t.elapsed().as_millis() > MAX_VERZOEK_MS,
+        }
+    }
+}
+
+/* Waarom een regel niet bruikbaar was. */
+enum LijnFout {
+    TeGroot,
+    BareCr,  // losse CR midden in de regel: dubbelzinnig, zie hieronder
+    TeLang,  // de totale deadline voor dit verzoek is verstreken
+}
+
 /* Lees een enkele regel met een harde bovengrens; een oneindige regel mag ons
-   niet laten groeien. Geeft None bij EOF, TeGroot bij overschrijding. */
-fn lees_lijn_begrensd<R: BufRead>(reader: &mut R, max: usize) -> std::io::Result<Option<Result<String, ()>>> {
+   niet laten groeien. Geeft None bij EOF.
+
+   Alleen een CR die DIRECT voor de LF staat is de regelafsluiter. Een losse CR
+   ergens midden in de regel weigeren we: eerder werd elke CR simpelweg
+   weggegooid, waardoor "Content-Length: 5\r5" als "Content-Length: 55" werd
+   gelezen. Een tussenproxy die de bare CR anders interpreteert dan wij knipt de
+   body dan op een andere plek -- precies de desync die de rest van deze laag
+   (Transfer-Encoding, botsende Content-Length) juist afweert. */
+fn lees_lijn_begrensd<R: BufRead>(reader: &mut R, max: usize, klok: &Klok) -> std::io::Result<Option<Result<String, LijnFout>>> {
     let mut buf = Vec::new();
     loop {
         let mut byte = [0u8; 1];
@@ -149,23 +209,35 @@ fn lees_lijn_begrensd<R: BufRead>(reader: &mut R, max: usize) -> std::io::Result
             if buf.is_empty() { return Ok(None); } // EOF
             break;
         }
+        if klok.verstreken() {
+            return Ok(Some(Err(LijnFout::TeLang)));
+        }
         if byte[0] == b'\n' {
             break;
         }
-        if byte[0] != b'\r' {
-            buf.push(byte[0]);
-        }
+        buf.push(byte[0]);
         if buf.len() > max {
-            return Ok(Some(Err(())));
+            return Ok(Some(Err(LijnFout::TeGroot)));
         }
+    }
+    // de afsluitende CR van CRLF hoort er niet bij
+    if buf.last() == Some(&b'\r') {
+        buf.pop();
+    }
+    // wat er dan nog aan CR in zit, is een bare CR: dubbelzinnig -> weigeren
+    if buf.contains(&b'\r') {
+        return Ok(Some(Err(LijnFout::BareCr)));
     }
     Ok(Some(Ok(String::from_utf8_lossy(&buf).into_owned())))
 }
 
 fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Lees> {
-    let startlijn = match lees_lijn_begrensd(reader, MAX_LIJN)? {
+    let klok = Klok::nieuw();
+    let startlijn = match lees_lijn_begrensd(reader, MAX_LIJN, &klok)? {
         None => return Ok(Lees::Dicht),
-        Some(Err(())) => return Ok(Lees::TeGroot),
+        Some(Err(LijnFout::TeGroot)) => return Ok(Lees::TeGroot),
+        Some(Err(LijnFout::BareCr)) => return Ok(Lees::Slecht),
+        Some(Err(LijnFout::TeLang)) => return Ok(Lees::TeLang),
         Some(Ok(s)) => s,
     };
     let mut delen = startlijn.split_whitespace();
@@ -178,10 +250,13 @@ fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Lees> {
     let mut content_length: Option<usize> = None;
     let mut heeft_transfer_encoding = false;
     let mut header_teller = 0usize;
+    let mut token = String::new();
     loop {
-        let lijn = match lees_lijn_begrensd(reader, MAX_LIJN)? {
+        let lijn = match lees_lijn_begrensd(reader, MAX_LIJN, &klok)? {
             None => break,
-            Some(Err(())) => return Ok(Lees::TeGroot),
+            Some(Err(LijnFout::TeGroot)) => return Ok(Lees::TeGroot),
+            Some(Err(LijnFout::BareCr)) => return Ok(Lees::Slecht),
+            Some(Err(LijnFout::TeLang)) => return Ok(Lees::TeLang),
             Some(Ok(s)) => s,
         };
         if lijn.is_empty() {
@@ -198,6 +273,14 @@ fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Lees> {
                 // dé klassieke smuggling-vector (TE.CL / CL.TE desync): weiger hem
                 // categorisch i.p.v. de body verkeerd te knippen.
                 heeft_transfer_encoding = true;
+            } else if naam.eq_ignore_ascii_case("x-rtg-motor-token") {
+                token = v.1.trim().to_string();
+            } else if naam.eq_ignore_ascii_case("authorization") {
+                // `Bearer <token>`; iets anders negeren we stil (dan blijft het leeg)
+                let w = v.1.trim();
+                if let Some(rest) = w.strip_prefix("Bearer ").or_else(|| w.strip_prefix("bearer ")) {
+                    token = rest.trim().to_string();
+                }
             } else if naam.eq_ignore_ascii_case("content-length") {
                 let rauw = v.1.trim();
                 // strikt: alleen cijfers (geen "+10", "0x10", "10 ", dubbele waarden
@@ -228,14 +311,27 @@ fn lees_verzoek<R: BufRead>(reader: &mut R) -> std::io::Result<Lees> {
         return Ok(Lees::TeGroot);
     }
 
+    /* De body in stukken lezen met de deadline erbij: read_exact zou een client
+       die de body byte-voor-byte druppelt eindeloos laten doorgaan zolang elke
+       losse leesactie binnen de lees-timeout valt. */
     let mut body = String::new();
     if content_length > 0 {
         let mut buf = vec![0u8; content_length];
-        reader.read_exact(&mut buf)?;
+        let mut gelezen = 0usize;
+        while gelezen < content_length {
+            let n = reader.read(&mut buf[gelezen..])?;
+            if n == 0 {
+                return Ok(Lees::Dicht); // client sloot midden in de body
+            }
+            gelezen += n;
+            if klok.verstreken() {
+                return Ok(Lees::TeLang);
+            }
+        }
         body = String::from_utf8_lossy(&buf).into_owned();
     }
 
-    Ok(Lees::Klaar(Request { method, path, body }))
+    Ok(Lees::Klaar(Request { method, path, body, token }))
 }
 
 #[cfg(test)]
@@ -270,6 +366,47 @@ mod tests {
     #[test]
     fn dubbele_gelijke_content_length_ok() {
         assert!(matches!(lees(b"POST /x HTTP/1.1\r\nContent-Length: 2\r\nContent-Length: 2\r\n\r\nhi"), Lees::Klaar(_)));
+    }
+
+    /* Een losse CR midden in een header is dubbelzinnig: eerder werd elke CR
+       weggegooid, waardoor "Content-Length: 5\r5" als lengte 55 werd gelezen.
+       Een tussenproxy die hem anders leest, knipt de body elders -> desync. */
+    #[test]
+    fn bare_cr_in_header_geweigerd() {
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nContent-Length: 5\r5\r\n\r\nhello"), Lees::Slecht));
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nX-Iets: a\rb\r\nContent-Length: 2\r\n\r\nhi"), Lees::Slecht));
+        // en in de startlijn
+        assert!(matches!(lees(b"POST /x\rHTTP/1.1\r\nContent-Length: 2\r\n\r\nhi"), Lees::Slecht));
+        // een gewone CRLF blijft natuurlijk goed
+        assert!(matches!(lees(b"POST /x HTTP/1.1\r\nContent-Length: 2\r\n\r\nhi"), Lees::Klaar(_)));
+    }
+
+    /* Het token wordt uit beide koppen opgepikt; de poortwacht in main.rs
+       beslist er daarna over. */
+    #[test]
+    fn token_uit_beide_koppen() {
+        match lees(b"POST /x HTTP/1.1\r\nX-RTG-Motor-Token: geheim123\r\nContent-Length: 2\r\n\r\n{}") {
+            Lees::Klaar(r) => assert_eq!(r.token, "geheim123"),
+            _ => panic!("verwacht Klaar"),
+        }
+        match lees(b"POST /x HTTP/1.1\r\nAuthorization: Bearer geheim456\r\nContent-Length: 2\r\n\r\n{}") {
+            Lees::Klaar(r) => assert_eq!(r.token, "geheim456"),
+            _ => panic!("verwacht Klaar"),
+        }
+        // hoofdletterongevoelig in de headernaam, en zonder kop is het token leeg
+        match lees(b"POST /x HTTP/1.1\r\nx-rtg-motor-token: abc\r\nContent-Length: 2\r\n\r\n{}") {
+            Lees::Klaar(r) => assert_eq!(r.token, "abc"),
+            _ => panic!("verwacht Klaar"),
+        }
+        match lees(b"POST /x HTTP/1.1\r\nContent-Length: 2\r\n\r\n{}") {
+            Lees::Klaar(r) => assert_eq!(r.token, ""),
+            _ => panic!("verwacht Klaar"),
+        }
+        // een Authorization-kop die geen Bearer is, levert geen token op
+        match lees(b"POST /x HTTP/1.1\r\nAuthorization: Basic eGY6eQ==\r\nContent-Length: 2\r\n\r\n{}") {
+            Lees::Klaar(r) => assert_eq!(r.token, ""),
+            _ => panic!("verwacht Klaar"),
+        }
     }
 
     #[test]

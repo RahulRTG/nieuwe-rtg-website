@@ -13,7 +13,7 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   };
-  var rid = function () { return Math.random().toString(36).slice(2, 9); };
+  var rid = function () { return RTGId('k'); };   // CSPRNG: id's zijn opzoeksleutels
   var LABELS = [['geen', 'transparent'], ['bordeaux', '#7F1634'], ['goud', '#A98F1C'], ['grijs', '#8A8680']];
 
   function maak(opts) {

@@ -2,15 +2,18 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
+<script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Bank</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   :root{
-    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
-    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
     --burgundy:#C23A5E; --gold:#A98F1C;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -67,7 +70,7 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
-<body>
+<body class="rtg-stijl">
 <header>
   <button class="terug" id="terug">←</button>
   <div><div class="ey">RTG · Eigen bank</div><h1>RTG Bank</h1></div>
@@ -199,7 +202,7 @@ function bindBank(reks){
   });
   document.querySelectorAll('[data-stort]').forEach(b => b.addEventListener('click', async () => {
     const euroS = prompt('Hoeveel storten op deze rekening? (euro)'); if (euroS == null) return;
-    try { const r = await api('bank/storten', { iban: b.dataset.stort, centen: Math.round(Number(euroS)*100), idem: 'm'+Date.now() }); alert('Gestort via ' + r.via + '. Saldo: ' + euro(r.saldoCenten)); await herlaad(); } catch (e) { alert(e.message); }
+    try { const r = await api('bank/storten', { iban: b.dataset.stort, centen: Math.round(Number(euroS)*100), idem: RTGIdem('stort') }); alert('Gestort via ' + r.via + '. Saldo: ' + euro(r.saldoCenten)); await herlaad(); } catch (e) { alert(e.message); }
   }));
   document.querySelectorAll('[data-nwallet]').forEach(b => b.addEventListener('click', async () => {
     const euroS = prompt('Hoeveel naar je RTG Pay-wallet? (euro)'); if (euroS == null) return;

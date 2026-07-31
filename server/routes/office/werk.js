@@ -113,7 +113,7 @@ app.get('/api/office/doc', (req, res) => {
   if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return res.status(404).end();
   // het identiteitsbewijs staat (met RTG_ENC_KEY) versleuteld op schijf: hier ontsleutelen
   let buf;
-  try { buf = require('../../kluis').ontsleutelBuf(fs.readFileSync(full)); } catch (e) { return res.status(500).end(); }
+  try { buf = require('../../kluis').ontsleutelBestand(fs.readFileSync(full), file); } catch (e) { return res.status(500).end(); }
   const ext = (file.split('.').pop() || '').toLowerCase();
   res.type(ext === 'jpg' ? 'jpeg' : ext).end(buf);
 });

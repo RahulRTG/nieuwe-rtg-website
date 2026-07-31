@@ -6,6 +6,7 @@
 const crypto = require('crypto');
 const S = require('./state');
 const kluis = require('./kluis');
+const gebonden = require('./gebonden'); // kluis, gebonden aan (kolom, rij-id)
 const mirror = require('./mirror');
 
 /* createUser is asynchroon (scrypt in de threadpool); createUserSync bestaat
@@ -44,6 +45,7 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
     const info = S.db.prepare(`INSERT INTO users (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
     newId = info.lastInsertRowid;
   }
+  require('./onderhoud').herzegel(S.db, newId); // id is nu bekend: kolommen eraan binden
   mirror.markUser(newId);
   return getUserById(newId);
 }
@@ -57,6 +59,19 @@ function findByLogin(login) {
 }
 function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().c; }
 
+/* Het telefoonnummer bijzetten. Dat gebeurt niet meer bij de aanmelding maar pas
+   wanneer er iets geregeld moet worden waar een derde partij bij komt (zie
+   kern/gegevenspoort.js). Het nummer gaat gebonden de kluis in en de zoek-hash
+   gaat mee, zodat herstel op telefoonnummer blijft werken. */
+function setPhone(id, phone) {
+  const nummer = String(phone || '').trim().slice(0, 30);
+  if (!nummer) return null;
+  S.db.prepare('UPDATE users SET enc_phone = ?, phone_hash = ? WHERE id = ?')
+    .run(gebonden.zegel('enc_phone', id, nummer), kluis.phoneHash(nummer), id);
+  mirror.markUser(id);
+  return getUserById(id);
+}
+
 /* Naamswijziging door het huis zelf (opstart-seed van het eigenaarsaccount):
    inlognaam en echte naam in een keer, de kluis blijft de bron. Geef je ook een
    e-mailadres mee, dan verhuist het account daarheen: de zoekhash en de
@@ -64,10 +79,10 @@ function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().
 function renameUser(id, { username, realName, email }) {
   if (email === undefined) {
     S.db.prepare('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
-      .run(username, kluis.enc(realName), id);
+      .run(username, gebonden.zegel('enc_name', id, realName), id);
   } else {
     S.db.prepare('UPDATE users SET username = ?, enc_name = ?, email_hash = ?, enc_email = ? WHERE id = ?')
-      .run(username, kluis.enc(realName), kluis.emailHash(email), kluis.enc(email), id);
+      .run(username, gebonden.zegel('enc_name', id, realName), kluis.emailHash(email), gebonden.zegel('enc_email', id, email), id);
   }
   mirror.markUser(id);
   return getUserById(id);
@@ -112,9 +127,7 @@ function setPasswordSync(userId, password) {
 }
 
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
-function realNameOf(u) { return u ? (kluis.dec(u.enc_name) || u.username || 'Lid') : null; }
-function emailOf(u) { return u ? kluis.dec(u.enc_email) : null; }
-function phoneOf(u) { return u ? kluis.dec(u.enc_phone) : null; }
+const { realNameOf, emailOf, phoneOf } = gebonden; // lezen zit bij de binding
 
 /* De staatloze tokens, de e-mailbevestiging en het wachtwoord-herstel staan
    in ./tokens.js; ze krijgen getUserById mee en verhuizen mee in de export,
@@ -139,72 +152,15 @@ function publicUser(u) {
   };
 }
 
-/* ---------- ledeninhoud per persoon (eigen boekingen/betalingen) ---------- */
-function getMemberState(userId) {
-  const row = S.db.prepare('SELECT member_state FROM users WHERE id = ?').get(userId);
-  if (!row || !row.member_state) return null;
-  try { return JSON.parse(kluis.decVeld(row.member_state)); } catch (e) { return null; }
-}
-/* Het ledendossier gaat versleuteld de kolom in. Dat is geen luxe: hier staan
-   de gesprekken met Rahul, de boekingen, de facturen en de geboortedatum, en
-   ze staan in DEZELFDE rij als de identiteit. Bleef dit platte tekst, dan zou
-   wie de accountdatabase in handen krijgt het hele dossier kunnen lezen, terwijl
-   de naam ernaast wel versleuteld is. Dat maakt het codenaam-ontwerp waardeloos.
-   De Postgres-spiegel kopieert de kolom ongewijzigd en erft de bescherming. */
-function saveMemberState(userId, obj) {
-  S.db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(kluis.encVeld(JSON.stringify(obj)), userId);
-  mirror.markUser(userId);
-}
-
-/* ---------- identiteitsverificatie ---------- */
-function setVerification(userId, status, docFilename) {
-  if (docFilename !== undefined) S.db.prepare('UPDATE users SET verified = ?, id_doc = ? WHERE id = ?').run(status, docFilename, userId);
-  else S.db.prepare('UPDATE users SET verified = ? WHERE id = ?').run(status, userId);
-  mirror.markUser(userId);
-  return getUserById(userId);
-}
-function listByVerification(status) {
-  return S.db.prepare('SELECT * FROM users WHERE verified = ? ORDER BY created_at DESC').all(status);
-}
-
-/* Gesprekken in de app per account, voor de concierge-inbox. */
-function conversations() {
-  const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users WHERE member_state IS NOT NULL').all();
-  return rows.map(r => {
-    let md = {}; try { md = JSON.parse(kluis.decVeld(r.member_state)) || {}; } catch (e) {}
-    return { id: r.id, tier: r.tier, codename: r.codename, conversation: md.conversation || [], needsConcierge: !!md.needsConcierge };
-  }).filter(x => x.conversation.length);
-}
-
-/* De leden voor het ledenregister (kantoor): codenaam, pas en de facetten
-   (geslacht v/m/x, land) uit de member_state. Nooit de echte naam -- die blijft
-   in de kluis. Begrensd (de boardroom leest een venster, geen miljoenen rijen);
-   met een echt grootboek (Postgres) zou dit aggregatie-per-facet worden. */
-function ledenRegisterRijen(limit) {
-  const n = Math.max(1, Math.min(Number(limit) || 5000, 20000));
-  const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users ORDER BY codename ASC LIMIT ?').all(n);
-  return rows.map(r => {
-    let md = {}; try { md = r.member_state ? (JSON.parse(kluis.decVeld(r.member_state)) || {}) : {}; } catch (e) {}
-    const gs = String(md.geslacht || '').toLowerCase();
-    return { id: r.id, key: 'user-' + r.id, tier: r.tier || 'rtg', codename: r.codename || null,
-      geslacht: (gs === 'v' || gs === 'm' || gs === 'x') ? gs : null, land: md.land || null };
-  });
-}
-
-/* AVG-vergetelheid: verwijdert het account definitief. Geeft de bestandsnaam
-   van een eventueel geupload identiteitsdocument terug, zodat de server die
-   ook van schijf kan wissen. */
-function deleteUser(id) {
-  const u = getUserById(id);
-  if (!u) return null;
-  S.db.prepare('DELETE FROM users WHERE id = ?').run(id);
-  mirror.markDelete(id);
-  return u.id_doc || null;
-}
+/* Het ledendossier, de verificatie, de kantoorlijsten en de AVG-vergetelheid
+   staan in ./dossier.js; ook dat deel krijgt getUserById mee en verhuist mee in
+   de export, zodat aanroepers niets merken. */
+const { getMemberState, saveMemberState, setVerification, listByVerification,
+  conversations, ledenRegisterRijen, deleteUser } = require('./dossier').maakDossier(getUserById);
 
 module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
-  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf,
+  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone,
   issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser

@@ -16,6 +16,16 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+/* Zie test/vakken.test.js: een zaak is standaard maandag t/m vrijdag open, dus
+   blind "morgen" boeken zakt elke vrijdag en zaterdag aan niets anders dan de
+   kalender. Deze test wil boeken bij Castell toetsen, niet boeken op zaterdag. */
+const eerstvolgendeWerkdag = () => {
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(Date.now() + i * 86400000);
+    if (d.getDay() >= 1 && d.getDay() <= 5) return d.toISOString().slice(0, 10);
+  }
+  return morgen();
+};
 
 let srv, base, lid, zaak;
 test.before(async () => {
@@ -72,11 +82,11 @@ test('3. de gids geeft ELK leverancier-genre een plek in de Mall', async () => {
 });
 
 test('4. een lid boekt een klus op codenaam; de zaak ziet nooit de echte naam', async () => {
-  const slots = await api(base, '/api/booking/slots', { supplierCode: 'CASTELL', serviceId: 'b1', date: morgen() }, lid.token);
+  const slots = await api(base, '/api/booking/slots', { supplierCode: 'CASTELL', serviceId: 'b1', date: eerstvolgendeWerkdag() }, lid.token);
   assert.equal(slots.status, 200);
   assert.ok((slots.body.tijden || []).length > 0, 'er zijn vrije tijdvakken');
   const r = await api(base, '/api/booking/request', { supplierCode: 'CASTELL', serviceId: 'b1',
-    date: morgen(), time: slots.body.tijden[0], note: 'Kastdeur hangt scheef' }, lid.token);
+    date: eerstvolgendeWerkdag(), time: slots.body.tijden[0], note: 'Kastdeur hangt scheef' }, lid.token);
   assert.equal(r.status, 200);
   const b = r.body.boeking;
   assert.ok(b.ref && b.supplierCode === 'CASTELL', 'de boeking landt bij Castell');

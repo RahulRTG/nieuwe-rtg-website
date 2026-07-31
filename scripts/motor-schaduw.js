@@ -29,7 +29,7 @@ function maakJsEngine() {
 function motorGet(path) {
   return new Promise((resolve) => {
     const u = new URL(path, MOTOR);
-    const req = http.request({ host: u.hostname, port: u.port, path: u.pathname, method: 'GET', headers: { 'content-length': 0 } },
+    const req = http.request({ host: u.hostname, port: u.port, path: u.pathname, method: 'GET', headers: { 'content-length': 0, ...(process.env.RTG_MOTOR_TOKEN ? { 'x-rtg-motor-token': process.env.RTG_MOTOR_TOKEN } : {}) } },
       (res) => { let b = ''; res.on('data', (d) => (b += d)); res.on('end', () => { try { resolve(JSON.parse(b || '{}')); } catch (e) { resolve({}); } }); });
     req.on('error', () => resolve({}));
     req.end();

@@ -7,7 +7,27 @@
   function itemNaam(item) {
     return item.startsWith('tab:') ? tabNaam(item.slice(4)) : (itemDef(item) || {}).naam || item;
   }
-  function itemZichtbaar(item) { return item.startsWith('tab:') ? tabZichtbaar(item.slice(4)) : !!itemDef(item); }
+  /* Zichtbaar is een app als hij bestaat, bij jouw pas hoort, en als de functie
+     erachter in je boardroom aan staat (isAan, 25-os-04b.js). Ook de functierij
+     onder de klok volgt dat: zet je "Directe berichten" uit, dan verdwijnt de
+     tegel Berichten. Een tegel die je wel kunt openen maar die daarna 403 geeft
+     is erger dan geen tegel.
+
+     Wat NIET uit kan, bepaalt de boardroom zelf (vast:true op de server, zoals
+     je wallet met de ledenpas) -- niet dit scherm. Zo staat de regel op een
+     plek in plaats van op twee. */
+  function itemZichtbaar(item) {
+    if (!item || typeof item !== 'string') return false;
+    if (gast() && LEDEN_ONLY.has(item)) return false;
+    if (item.startsWith('tab:')) return tabZichtbaar(item.slice(4)) && isAan(item);
+    if (item.startsWith('link:') && PREMIUM.has(item.slice(5)) && !premiumPas) return false;
+    if (!itemDef(item)) return false;
+    return isAan(item);
+  }
+  // een gratis account (zonder pas) heeft geen wallet en geen Rahul; de kern
+  // zet daarvoor de klasse os-gast op #app (00-kern-05.js)
+  const gast = () => app.classList.contains('os-gast');
+  const LEDEN_ONLY = new Set(['link:wallet']);
   function openItem(item) {
     if (wiebel) return; // in wiebel-modus opent er niets, net als op een telefoon
     telGebruik(item);
@@ -35,8 +55,6 @@
   function openOsApp(naam) {
     const app = OSAPPS[naam]; if (!app || !belScrim) return;
     sluitScrims();
-    // App Store: de eigen winkel-overlay (25-os-04b.js)
-    if (naam === 'store') { openWinkel(); return; }
     // Werk: de eigen kiezer met gekoppelde werkplekken en de algemene pin
     if (naam === 'werk') { openWerkKiezer(); return; }
     belTitel.textContent = app.naam;
@@ -94,16 +112,17 @@
     belScrim.classList.add('open');
   }
 
-  /* Rahuls signatuurmond als de AI-knop in het dock. Eén gedeeld canvas dat we
-     bij elke herbouw opnieuw in de bol hangen (de mond-lus hervat vanzelf zodra
-     hij weer in beeld is); de tekenlaag (shared/mond.js) laden we er zelf bij. */
-  var aiMondCv = null, aiMondBezig = false;
+  /* Rahuls signatuurmond in de balk onderaan het beginscherm. Eén gedeeld
+     canvas (de mond-lus hervat vanzelf zodra hij weer in beeld is); de
+     tekenlaag (shared/mond.js) laden we er zelf bij. */
+  var aiMondCv = null, aiMondBezig = false, aiOrbMond = null;
   function aiMond() {
     if (!aiMondCv) {
       aiMondCv = document.createElement('canvas');
       aiMondCv.width = 440; aiMondCv.height = 200;
       aiMondCv.className = 'os-ai-mond'; aiMondCv.setAttribute('aria-hidden', 'true');
-      var mount = function () { if (window.RTGMond) RTGMond.maak(aiMondCv); };
+      // de handle bewaren: als Rahul in de draad iets zegt, beweegt de mond mee
+      var mount = function () { if (window.RTGMond) aiOrbMond = RTGMond.maak(aiMondCv); };
       if (window.RTGMond) mount();
       else if (!aiMondBezig) {
         aiMondBezig = true;
@@ -114,21 +133,19 @@
     return aiMondCv;
   }
 
-  function maakAppIcoon(item, inDock) {
+  function maakAppIcoon(item) {
     const el = document.createElement('button');
     el.className = 'os-app'; el.dataset.sleutel = item;
     if (item.startsWith('tab:')) el.dataset.tab = item.slice(4);
     el.setAttribute('aria-label', itemNaam(item));
     const tegel = document.createElement('span'); tegel.className = 'os-tegel';
-    // de AI-knop in het dock IS Rahul: zijn signatuurmond (bewegende lichtpuntjes)
-    if (item === 'tab:ai' && inDock) tegel.appendChild(aiMond());
-    else tegel.appendChild(tegelInhoud(item));
+    tegel.appendChild(tegelInhoud(item));
     if (item.startsWith('tab:')) {
       const dot = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('span[id$="Dot"]');
       if (dot && dot.style.display !== 'none') { const b = document.createElement('span'); b.className = 'os-badge'; tegel.appendChild(b); }
     }
     el.appendChild(tegel);
-    if (!inDock) { const n = document.createElement('span'); n.className = 'os-naam'; n.textContent = itemNaam(item); el.appendChild(n); }
+    const n = document.createElement('span'); n.className = 'os-naam'; n.textContent = itemNaam(item); el.appendChild(n);
     el.addEventListener('click', () => openItem(item));
     return el;
   }
@@ -151,18 +168,17 @@
     return el;
   }
 
+  /* Het beginscherm tekenen: de mappen bovenaan, de functies onder de klok.
+     Een lege map (alles erin uitgezet of niet van toepassing op deze pas)
+     laten we weg -- geen tegels die nergens heen gaan. */
   function bouw() {
-    // pagina 2 toont wat je in de App Store hebt geïnstalleerd (25-os-04b.js)
-    INDELING[1] = geinstalleerdeItems();
-    grids.forEach((grid, p) => {
-      grid.textContent = '';
+    rijen.forEach((rij, p) => {
+      rij.textContent = '';
       for (const it of gesorteerd(p)) {
-        if (typeof it === 'string') { if (itemZichtbaar(it)) grid.appendChild(maakAppIcoon(it, false)); }
-        else if (it.items.some(itemZichtbaar)) grid.appendChild(maakMapIcoon(it));
+        if (typeof it === 'string') { if (itemZichtbaar(it)) rij.appendChild(maakAppIcoon(it)); }
+        else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
       }
     });
-    dock.textContent = '';
-    for (const t of DOCK) if (tabZichtbaar(t)) dock.appendChild(maakAppIcoon('tab:' + t, true));
     sync();
   }
 
@@ -172,7 +188,7 @@
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     for (const item of map.items.filter(itemZichtbaar)) {
-      const el = maakAppIcoon(item, false);
+      const el = maakAppIcoon(item);
       // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
       el.addEventListener('click', () => mapScrim.classList.remove('open'));
       mapGrid.appendChild(el);

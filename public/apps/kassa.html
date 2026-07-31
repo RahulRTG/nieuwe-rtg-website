@@ -2,12 +2,15 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
+<script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>De Kassa · RTG</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;--muted:rgba(244,241,236,0.68);--soft:rgba(244,241,236,0.55);--burgundy:#C23A5E;--gold:#A98F1C;}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.15rem;}
@@ -39,7 +42,7 @@
   .hint{font-size:.74rem;color:var(--soft);line-height:1.5;}
 </style>
 </head>
-<body>
+<body class="rtg-stijl">
 <header>
   <div><div class="ey">RTG · werkplek</div><h1>De Kassa</h1></div>
   <span class="pil" id="zaakNaam">...</span>
@@ -224,7 +227,7 @@ async function rekenAf(method, extra){
       kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined,
       korting: KORTING || undefined,
       desc: 'De Kassa (' + modus().naam + ')' + (badge ? ' · ' + badge : ''),
-      codenaam: badge || undefined, idem: 'kassa-' + Date.now()
+      codenaam: badge || undefined, idem: RTGIdem('kassa')
     }, extra || {}));
     LAATSTE = r.sale;
     $('#uitkomst').textContent = 'Afgerekend: ' + eur(r.sale.total) + ' (' + method + (r.betaler ? ', ' + r.betaler : '') + '), bon ' + r.sale.bon + (r.sale.kassa ? ' op ' + r.sale.kassa : '') + '.';

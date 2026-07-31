@@ -2,6 +2,8 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
+<script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Website-maker · RTG</title>
 <link rel="icon" href="/icon.svg">
@@ -11,9 +13,10 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/webblok.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
-    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
@@ -95,7 +98,7 @@
   .tip b{color:var(--gold);font-weight:600;}
 </style>
 </head>
-<body>
+<body class="rtg-stijl">
 <header>
   <a class="terug" href="/apps/app.html">← Apps</a>
   <div><div class="ey">RTG · voor ondernemers</div><h1>Website-maker</h1></div>
@@ -177,7 +180,7 @@ const BLOKTYPES=[
   {t:'galerij',n:'Galerij',k:'meerdere beelden'},{t:'citaat',n:'Citaat',k:'uitspraak'},{t:'ruimte',n:'Ruimte',k:'witruimte'},{t:'voettekst',n:'Voettekst',k:'onderaan'}
 ];
 function nieuwBlok(t){
-  const id='b'+Math.random().toString(36).slice(2,8);
+  const id=RTGId('b');
   if(t==='hero')return{id,type:t,kop:'Welkom bij mijn bedrijf',sub:'Vertel in één zin wat je doet en voor wie.',knop:'Neem contact op'};
   if(t==='kop')return{id,type:t,tekst:'Een sectiekop'};
   if(t==='tekst')return{id,type:t,tekst:'Schrijf hier over je bedrijf, je aanbod of je verhaal. Klik en typ; het past zich vanzelf aan.'};
@@ -317,7 +320,7 @@ function herorden(vanP,naarP){
   render();
 }
 function dupliceer(blok){
-  const kopie=JSON.parse(JSON.stringify(blok)); kopie.id='b'+Math.random().toString(36).slice(2,8);
+  const kopie=JSON.parse(JSON.stringify(blok)); kopie.id=RTGId('b');
   const bi=DESIGN.blokken.indexOf(blok); DESIGN.blokken.splice(bi+1,0,kopie);
   if(DESIGN.volgorde) Object.keys(DESIGN.volgorde).forEach(k=>{const arr=DESIGN.volgorde[k];const ix=arr.indexOf(blok.id);if(ix>=0)arr.splice(ix+1,0,kopie.id);else arr.push(kopie.id);});
   render();

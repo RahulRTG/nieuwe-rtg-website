@@ -9,7 +9,7 @@ module.exports = (vctx) => {
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
     avTeken, avMijnDeals, zorgVoor, zorgContact, media,
-    boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn } = vctx;
+    boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn, gegevensStop } = vctx;
 /* ================== autoverkoop: de exclusieve showroom ==================
    Leden bekijken de showroom, vragen een proefrit aan, doen een bod (optioneel
    met inruil en concierge-aflevering) en tekenen het digitale koopcontract. */
@@ -18,12 +18,14 @@ app.post('/api/verkoop/showroom', auth, (req, res) => {
     aanbevolen: avAanbevolen(req.session.key) });
 });
 app.post('/api/verkoop/proefrit', auth, (req, res) => {
+  if (gegevensStop(req, res, 'reservering')) return;
   const r = avProefrit(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), String(req.body.autoId || ''), req.body.wens);
   if (r.error) return res.status(r.status).json({ error: r.error });
   openLijn(findSupplier(req.body.supplierCode), req);
   res.json({ ok: true, deal: r.deal });
 });
 app.post('/api/verkoop/koop', auth, (req, res) => {
+  if (gegevensStop(req, res, 'bestelling')) return;
   const r = avKoop(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), String(req.body.autoId || ''),
     { bod: req.body.bod, inruil: req.body.inruil, concierge: req.body.concierge === true, adres: req.body.adres });
   if (r.error) return res.status(r.status).json({ error: r.error });
@@ -31,6 +33,7 @@ app.post('/api/verkoop/koop', auth, (req, res) => {
   res.json({ ok: true, deal: r.deal });
 });
 app.post('/api/verkoop/inruil', auth, (req, res) => {
+  if (gegevensStop(req, res, 'reservering')) return;
   const r = avInruil(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), String(req.body.autoId || ''), req.body.inruil);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, deal: r.deal });

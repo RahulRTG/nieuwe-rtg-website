@@ -125,10 +125,19 @@ function dekking() {
      en geen suite hoeft te draaien -- maar hij is de indicatie, niet het bewijs. */
   function gedekt(route) {
     if (testTekst.includes(route)) return true;
+    /* Ook de vorm MET leidende slash maar ZONDER /api-prefix. Dat is hoe een
+       test hem schrijft als haar helper de prefix zelf plakt:
+       `l.call('/member/boardroom/zetveel')`. Die endpoints werden geteld als
+       ongedekt terwijl de test ze wel degelijk aanroept -- de teller keek naar
+       de verkeerde vorm. Een indicatie die de goede gevallen mist, stuurt je
+       naar werk dat al gedaan is. */
     const staart = route.slice(5);          // zonder '/api/'
-    return testTekst.includes("'" + staart + "'") ||
-           testTekst.includes('"' + staart + '"') ||
-           testTekst.includes('`' + staart + '`');
+    for (const vorm of [staart, '/' + staart]) {
+      if (testTekst.includes("'" + vorm + "'") ||
+          testTekst.includes('"' + vorm + '"') ||
+          testTekst.includes('`' + vorm + '`')) return true;
+    }
+    return false;
   }
   const ongedekt = apiRoutes.filter(r => !gedekt(r));
   const pct = apiRoutes.length ? Math.round((apiRoutes.length - ongedekt.length) / apiRoutes.length * 100) : 100;

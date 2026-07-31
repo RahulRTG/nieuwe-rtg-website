@@ -43,7 +43,7 @@ function motorCall(path, body) {
     const data = Buffer.from(JSON.stringify(body || {}));
     const req = http.request(
       { host: u.hostname, port: u.port, path: u.pathname, method: path === '/api/motor/saldi' ? 'GET' : 'POST',
-        headers: { 'content-type': 'application/json', 'content-length': data.length } },
+        headers: { 'content-type': 'application/json', 'content-length': data.length, ...(process.env.RTG_MOTOR_TOKEN ? { 'x-rtg-motor-token': process.env.RTG_MOTOR_TOKEN } : {}) } },
       (res) => { let b = ''; res.on('data', (d) => (b += d)); res.on('end', () => { try { resolve({ status: res.statusCode, json: JSON.parse(b || '{}') }); } catch (e) { resolve({ status: res.statusCode, json: {} }); } }); }
     );
     req.on('error', reject);

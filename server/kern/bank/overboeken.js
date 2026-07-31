@@ -11,15 +11,8 @@ module.exports = (ctx) => {
 
   /* Idempotentie die een herstart overleeft: dezelfde sleutel geeft exact
      hetzelfde antwoord terug en clearet nooit twee keer. */
-  function idemStore() { if (!d().bankIdem || typeof d().bankIdem !== 'object') d().bankIdem = { _keys: [] }; if (!Array.isArray(d().bankIdem._keys)) d().bankIdem._keys = []; return d().bankIdem; }
-  async function metIdem(sleutel, werk) {
-    if (!sleutel) return werk();
-    const s = idemStore();
-    if (sleutel in s && sleutel !== '_keys') return Object.assign({}, s[sleutel], { herhaald: true });
-    const r = await werk();
-    if (r && r.ok) { s._keys.push(sleutel); if (s._keys.length > 20000) for (const weg of s._keys.splice(0, s._keys.length - 20000)) delete s[weg]; s[sleutel] = r; save(); }
-    return r;
-  }
+  // met verzoek-binding; dezelfde module als RTG Pay, zie ../../lib/idem.js
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem' });
 
   /* Storten: extern geld op een rekening zetten. De knop bepaalt hoe het clearet:
      - partner/hybride: via de kaart-naad (Apple Pay/kaart), tegenrekening extern:kaart;
@@ -34,7 +27,7 @@ module.exports = (ctx) => {
     if (via === 'auto') via = cl.eigen ? 'eigen' : 'kaart';
     if (via === 'eigen' && !cl.eigen) return { status: 409, error: 'De eigen bank clearet nu niet; zet de knop verder.' };
     if (via === 'kaart' && !cl.kaart) return { status: 409, error: 'De kaart-rails staan uit; de eigen bank clearet.' };
-    return metIdem(idem ? 'stort:' + iban + ':' + idem : null, async () => {
+    return metIdem(idem ? 'stort:' + iban + ':' + idem : null, 'stort|' + iban + '|' + c + '|' + via, async () => {
       let ref = 'eigen';
       if (via === 'kaart') {
         let betaling;
@@ -120,7 +113,7 @@ module.exports = (ctx) => {
     const dest = String(naarIban || '').replace(/\s/g, '').toUpperCase();
     if (!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(dest)) return { status: 400, error: 'Vul een geldig IBAN in.' };
     const fooi = bankregie.bankTarief('sepaUitCenten');
-    return metIdem(idem ? 'sepa:' + iban + ':' + idem : null, async () => {
+    return metIdem(idem ? 'sepa:' + iban + ':' + idem : null, 'sepa|' + iban + '|' + c + '|' + dest, async () => {
       const b = await boekAsync({ van: iban, naar: 'extern:sepa', centen: c, soort: 'sepa-uit', oms: oms || ('SEPA naar ' + dest), ref: dest });
       if (b.error) return b;
       if (fooi > 0) await boekAsync({ van: iban, naar: 'rtg:reserve', centen: fooi, soort: 'tarief', oms: 'SEPA-tarief' });

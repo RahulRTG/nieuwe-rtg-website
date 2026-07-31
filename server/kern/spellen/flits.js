@@ -5,12 +5,21 @@
    keer bij het opstarten vanuit kern/spellen.js. */
 module.exports = (ctx) => {
   const { save, crypto, codenaamVan, nudge } = ctx;
-  const R = (a, b) => crypto.randomInt(a, b + 1);
+  /* crypto.randomInt eist max > min. Een BEREKENDE bovengrens kan onder de
+     ondergrens duiken, en dan gooit hij -- midden in het opzetten van een
+     potje, waardoor het hele duel omviel met "Er ging iets mis". Dat gebeurde
+     ook echt: zie de plus-som hieronder. Een klemmende R kan dat niet meer.
+     Valt de grens samen, dan is er precies een geldige waarde en geven we die. */
+  const R = (a, b) => (b <= a ? a : crypto.randomInt(a, b + 1));
   // een opgave op tiener-niveau: plus en min tot 100, tafels tot 12x19 en
   // deelsommen die precies uitkomen; het antwoord blijft op de server
   function opgave() {
     const soort = R(0, 3);
-    if (soort === 0) { const a = R(12, 89), b = R(11, 99 - a); return { t: a + ' + ' + b, a: a + b }; }
+    /* De eerste term loopt tot 88, niet tot 89. Bij a=89 blijft er namelijk
+       geen geldige tweede term over (b begint bij 11, en 89+11 is 100), en dan
+       vroeg de oude code een getal uit een leeg bereik. Ongeveer drie op de
+       honderd potjes vielen daardoor om bij het starten. */
+    if (soort === 0) { const a = R(12, 88), b = R(11, 99 - a); return { t: a + ' + ' + b, a: a + b }; }
     if (soort === 1) { const b = R(11, 78), a = R(b + 11, 99); return { t: a + ' - ' + b, a: a - b }; }
     if (soort === 2) { const a = R(3, 12), b = R(4, 19); return { t: a + ' x ' + b, a: a * b }; }
     const b = R(3, 12), u = R(4, 19);

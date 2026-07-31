@@ -22,7 +22,7 @@ const URL = 'http://' + ADDR;
 
 function wacht(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function motorStatus() {
-  const r = await fetch(URL + '/api/motor/status', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+  const r = await fetch(URL + '/api/motor/status', { method: 'POST', headers: { 'content-type': 'application/json', ...(process.env.RTG_MOTOR_TOKEN ? { 'x-rtg-motor-token': process.env.RTG_MOTOR_TOKEN } : {}) }, body: '{}' });
   return r.json();
 }
 
@@ -129,7 +129,7 @@ async function motorStatus() {
   //        EEN slaagt;
   //      - HERSTART-RECONCILE herstelt de bank-spiegel byte-voor-byte uit de motor.
   async function bankStatus() {
-    const r = await fetch(URL + '/api/bank/status', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+    const r = await fetch(URL + '/api/bank/status', { method: 'POST', headers: { 'content-type': 'application/json', ...(process.env.RTG_MOTOR_TOKEN ? { 'x-rtg-motor-token': process.env.RTG_MOTOR_TOKEN } : {}) }, body: '{}' });
     return r.json();
   }
   const dbB = { data: {} };

@@ -45,7 +45,7 @@
     const ktM = el.querySelector('#ktMAdd'); if (ktM) ktM.addEventListener('click', async () => {
       const name = el.querySelector('#ktMn').value.trim(), price = Number(el.querySelector('#ktMp').value);
       if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
-      const item = { id: 'm'+Date.now().toString(36), cat: el.querySelector('#ktMc').value.trim()||T('menu.other','Overig'), name, desc:'', price, allergens:[], station: kantoorSec };
+      const item = { id: RTGId('m'), cat: el.querySelector('#ktMc').value.trim()||T('menu.other','Overig'), name, desc:'', price, allergens:[], station: kantoorSec };
       try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); await refresh(); } catch(e){ toast(e.message); }
     });
     // de AI-bedrijfsagent: koppelen, inkoop voorstellen, goedkeuren/aanpassen/afwijzen, rooster

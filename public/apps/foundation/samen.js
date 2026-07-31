@@ -11,7 +11,11 @@
   if (!s || !s.token) return;
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
-  var css = '.rsm-knop{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--paneel,#151312);color:var(--txt,#eee);border:1px solid var(--goud,#857007);border-radius:999px;padding:.6rem 1rem;font:600 .83rem Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+  /* De knop staat IN de balk bovenaan, niet zwevend over de bladzijde. Hij hing
+     als pil rechtsonder en dekte precies af waar je aan het lezen was; twee
+     pillen boven elkaar (Samen en Rahul) namen een hoek van het scherm in
+     beslag. In de balk is hij even goed te vinden en staat hij nergens voor. */
+  var css = '.rsm-knop{background:var(--paneel,#151312);color:var(--txt,#eee);border:1px solid var(--goud,#857007);border-radius:999px;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
     '.rsm-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
     '.rsm-sheet[hidden]{display:none;}.rsm-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;}' +
     '.rsm-x{background:transparent;border:1px solid #444;border-radius:8px;color:inherit;padding:.15rem .5rem;cursor:pointer;}' +
@@ -21,6 +25,8 @@
     '.rsm-stil{background:transparent;color:inherit;border:1px solid #444;border-radius:10px;padding:.5rem .8rem;font:inherit;font-size:.82rem;cursor:pointer;}' +
     '.rsm-chat{font-size:.82rem;color:var(--zacht,#bbb);max-height:24vh;overflow-y:auto;line-height:1.5;}' +
     '.rsm-code{font-family:ui-monospace,monospace;letter-spacing:.2em;color:var(--goud2,#c7ab2b);font-weight:700;}' +
+    // de balk draagt er nu twee knoppen bij; op een smal scherm mag hij wikkelen
+    '.sb-balk{flex-wrap:wrap;row-gap:.4rem;}' +
     '.rsm-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:4rem;z-index:37;background:var(--paneel2,#0C0C0B);border:1px solid var(--goud,#857007);border-radius:12px;padding:.6rem .9rem;font:400 .84rem Inter,system-ui,sans-serif;color:var(--txt,#eee);display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (h) { var d = document.createElement('div'); d.innerHTML = h; return d.firstChild; };
@@ -37,7 +43,28 @@
 
   var knop = maakEl('<button class="rsm-knop" type="button" aria-label="Samen">Samen</button>');
   var sheet = maakEl('<section class="rsm-sheet" aria-label="Samen" hidden><div class="rsm-kop"><span>Samen</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div><div class="rsm-vak"></div></section>');
-  document.body.appendChild(knop); document.body.appendChild(sheet);
+  /* De balk van sessie.js wordt na ons opgebouwd, dus we wachten er even op.
+     Komt hij niet (een pagina zonder balk), dan zetten we de knop gewoon
+     bovenaan de inhoud -- ook dan hangt hij nergens overheen. */
+  window.rtfDok = window.rtfDok || function (el) {
+    var balk = document.querySelector('.sb-balk');
+    if (!balk) return false;
+    // voor het belletje: het belletje duwt zichzelf met margin-left:auto naar
+    // rechts, dus alles ervoor blijft netjes links bij "Alle hulp" staan
+    var bel = balk.querySelector('.sb-bel');
+    if (bel) balk.insertBefore(el, bel); else balk.appendChild(el);
+    return true;
+  };
+  (function dok() {
+    if (window.rtfDok(knop)) return;
+    var n = 0, tik = setInterval(function () {
+      if (window.rtfDok(knop) || ++n > 20) {
+        clearInterval(tik);
+        if (!knop.parentNode) { var m = document.querySelector('main, .wrap') || document.body; m.insertBefore(knop, m.firstChild); }
+      }
+    }, 150);
+  })();
+  document.body.appendChild(sheet);
   var vak = sheet.querySelector('.rsm-vak');
   knop.addEventListener('click', function () { sheet.hidden = false; knop.hidden = true; teken(); });
   sheet.querySelector('.rsm-x').addEventListener('click', function () { sheet.hidden = true; knop.hidden = false; });
@@ -115,7 +142,8 @@
      Praat op het niveau van je leeftijdsgroep, belooft nooit iets dat geld
      kost (alles hier is gratis) en wijst bij zware onderwerpen liefdevol
      naar een vertrouwde grote. ---- */
-  var rCss = '.rsm-rahul{position:fixed;right:1rem;bottom:3.6rem;z-index:35;background:var(--goud,#857007);color:#000;border:none;border-radius:999px;padding:.6rem 1rem;font:600 .83rem Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+  /* Ook Rahul staat in de balk, niet zwevend in de hoek. Zie samen-01.js. */
+  var rCss = '.rsm-rahul{background:var(--goud,#857007);color:#000;border:none;border-radius:999px;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
     '.rsm-rsheet{position:fixed;right:1rem;bottom:3.6rem;z-index:37;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
     '.rsm-rsheet[hidden]{display:none;}.rsm-ruit{font-size:.84rem;color:var(--zacht,#bbb);line-height:1.55;max-height:38vh;overflow-y:auto;white-space:pre-wrap;}';
   var rSt = document.createElement('style'); rSt.textContent = rCss; document.head.appendChild(rSt);
@@ -124,7 +152,16 @@
     '<div class="rsm-kop"><span>✶ Vraag het Rahul</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="rsm-ruit" aria-live="polite"></div>' +
     '<form class="rsm-rij"><input placeholder="Wat wil je weten?" maxlength="300" autocomplete="off" aria-label="Je vraag"><button class="rsm-go" type="submit" aria-label="Versturen">→</button></form></section>');
-  document.body.appendChild(rFab); document.body.appendChild(rSheet);
+  (function dokR() {
+    if (window.rtfDok && window.rtfDok(rFab)) return;
+    var n = 0, tik = setInterval(function () {
+      if ((window.rtfDok && window.rtfDok(rFab)) || ++n > 20) {
+        clearInterval(tik);
+        if (!rFab.parentNode) { var m = document.querySelector('main, .wrap') || document.body; m.insertBefore(rFab, m.firstChild); }
+      }
+    }, 150);
+  })();
+  document.body.appendChild(rSheet);
   var rUit = rSheet.querySelector('.rsm-ruit'), rForm = rSheet.querySelector('form'), rInp = rForm.querySelector('input');
   rFab.addEventListener('click', function () {
     rSheet.hidden = false; rFab.hidden = true; rInp.focus();

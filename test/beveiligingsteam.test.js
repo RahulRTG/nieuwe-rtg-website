@@ -18,6 +18,16 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 function morgen() { return new Date(Date.now() + 86400000).toISOString().slice(0, 10); }
+/* Het budget telt per KALENDERMAAND (kern/beveiliging/rooster/planning.js:
+   d.datum.slice(0,7) === deze maand). Op de laatste dag van een maand valt
+   morgen() dus buiten de telling en komt de budgettoets op nul uit -- niet
+   omdat het budget kapot is, maar omdat de toets op een dag plande die niet
+   meetelt. Vandaar een dag die gegarandeerd in deze maand ligt: morgen als
+   dat kan, anders vandaag. planAuto accepteert vandaag net zo goed. */
+function dagInDezeMaand() {
+  const m = morgen();
+  return m.slice(0, 7) === new Date().toISOString().slice(0, 7) ? m : new Date().toISOString().slice(0, 10);
+}
 
 let srv, base, mgr, guards = [], guardTok;
 
@@ -43,7 +53,7 @@ test('1. het commandocentrum toont team, posten, budget en veel functies', async
 });
 
 test('2. de AI neemt het rooster over en vult open diensten in (met rust)', async () => {
-  const r = await api(base, '/api/supplier/beveiliging/planauto', { datum: morgen() }, mgr);
+  const r = await api(base, '/api/supplier/beveiliging/planauto', { datum: dagInDezeMaand() }, mgr);
   assert.equal(r.status, 200);
   assert.ok(r.body.gemaakt.length >= 1, 'de AI plande diensten in');
   const seen = new Set();

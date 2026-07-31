@@ -1,6 +1,14 @@
 /* Een compacte, correcte JSON-laag — alleen std. Genoeg voor de RTG-API:
    objecten, arrays, strings, getallen (als f64, met exacte i64-uitlezing),
-   bool en null. Geen externe crate; alles hier te auditen. */
+   bool en null. Geen externe crate; alles hier te auditen.
+
+   Diepte-grens: de parser is recursief, dus een nestings-bom ("[[[[..." tot
+   de body-limiet) zou de stack laten overlopen. Een stack-overflow is in Rust
+   geen te vangen paniek maar een harde abort -- en met panic=abort neemt die
+   het HELE proces mee: money-engine en kluis tegelijk. Daarom kappen we net
+   als server/lib/rtgjson.js op MAX_DIEPTE niveaus, VOORDAT er een boom van
+   gebouwd wordt. Zelfde grens als de JS-kant, zodat beide parsers dezelfde
+   bodies accepteren en weigeren. */
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
 
@@ -110,10 +118,13 @@ fn write_json_str(s: &str, out: &mut String) {
 }
 
 /* ---------- parser ---------- */
+/// Maximale nestingsdiepte; gelijk aan MAX_DIEPTE in server/lib/rtgjson.js.
+pub const MAX_DIEPTE: usize = 64;
+
 pub fn parse(input: &str) -> Result<Json, String> {
     let mut p = Parser { b: input.as_bytes(), i: 0 };
     p.ws();
-    let v = p.value()?;
+    let v = p.value(0)?;
     p.ws();
     if p.i != p.b.len() { return Err("rommel na de waarde".into()); }
     Ok(v)
@@ -128,11 +139,14 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn value(&mut self) -> Result<Json, String> {
+    fn value(&mut self, diepte: usize) -> Result<Json, String> {
+        if diepte > MAX_DIEPTE {
+            return Err(format!("te diep genest (meer dan {} niveaus)", MAX_DIEPTE));
+        }
         if self.i >= self.b.len() { return Err("leeg".into()); }
         match self.b[self.i] {
-            b'{' => self.object(),
-            b'[' => self.array(),
+            b'{' => self.object(diepte),
+            b'[' => self.array(diepte),
             b'"' => Ok(Json::Str(self.string()?)),
             b't' => self.lit("true", Json::Bool(true)),
             b'f' => self.lit("false", Json::Bool(false)),
@@ -148,7 +162,7 @@ impl<'a> Parser<'a> {
         } else { Err(format!("verwacht {}", word)) }
     }
 
-    fn object(&mut self) -> Result<Json, String> {
+    fn object(&mut self, diepte: usize) -> Result<Json, String> {
         self.i += 1; // {
         let mut m = BTreeMap::new();
         self.ws();
@@ -161,7 +175,7 @@ impl<'a> Parser<'a> {
             if self.i >= self.b.len() || self.b[self.i] != b':' { return Err("':' verwacht".into()); }
             self.i += 1;
             self.ws();
-            let v = self.value()?;
+            let v = self.value(diepte + 1)?;
             m.insert(k, v);
             self.ws();
             match self.b.get(self.i) {
@@ -173,14 +187,14 @@ impl<'a> Parser<'a> {
         Ok(Json::Obj(m))
     }
 
-    fn array(&mut self) -> Result<Json, String> {
+    fn array(&mut self, diepte: usize) -> Result<Json, String> {
         self.i += 1; // [
         let mut a = Vec::new();
         self.ws();
         if self.i < self.b.len() && self.b[self.i] == b']' { self.i += 1; return Ok(Json::Arr(a)); }
         loop {
             self.ws();
-            a.push(self.value()?);
+            a.push(self.value(diepte + 1)?);
             self.ws();
             match self.b.get(self.i) {
                 Some(b',') => { self.i += 1; }
@@ -276,5 +290,32 @@ mod tests {
     fn utf8_en_escapes() {
         let v = parse(r#"{"n":"café \"x\"\n"}"#).unwrap();
         assert_eq!(v.str_at("n"), Some("café \"x\"\n"));
+    }
+
+    /* Nestings-bom: een body vol open blokjes mag NOOIT de stack laten
+       overlopen (dat is met panic=abort het einde van het hele proces, dus van
+       de money-engine EN de kluis tegelijk). Hij moet een gewone parse-fout
+       geven. 100_000 niveaus past ruim binnen MAX_BODY van de HTTP-laag; dit
+       is precies de payload die de motor eerder liet aborten. */
+    #[test]
+    fn nestingsbom_geeft_fout_en_crasht_niet() {
+        for n in [MAX_DIEPTE + 1, 1_000, 100_000] {
+            let bom = "[".repeat(n);
+            assert!(parse(&bom).is_err(), "diepte {} moet geweigerd worden", n);
+            let objbom = "{\"a\":".repeat(n);
+            assert!(parse(&objbom).is_err(), "object-diepte {} moet geweigerd worden", n);
+        }
+    }
+
+    /* De grens zelf: tot en met MAX_DIEPTE niveaus blijft geldige JSON gewoon
+       werken, één niveau daarboven niet. Zo weten we dat de grens niet per
+       ongeluk normale bodies afkapt. */
+    #[test]
+    fn diepte_grens_precies() {
+        let diep = |n: usize| format!("{}{}{}", "[".repeat(n), "1", "]".repeat(n));
+        assert!(parse(&diep(MAX_DIEPTE)).is_ok(), "MAX_DIEPTE niveaus moet nog mogen");
+        assert!(parse(&diep(MAX_DIEPTE + 1)).is_err(), "een niveau te diep moet falen");
+        // en een normale pay-body (2 niveaus) blijft uiteraard werken
+        assert!(parse(r#"{"boekingen":[{"van":"lid:A","naar":"lid:B","centen":1}]}"#).is_ok());
     }
 }

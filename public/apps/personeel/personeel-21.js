@@ -22,7 +22,7 @@
           code = c.trim().toUpperCase();
         }
         body.payCode = code;
-        body.idem = 'deur-' + Date.now();
+        body.idem = RTGIdem('deur');
       }
       try {
         const r = await API.call('/supplier/ticket/deurverkoop', body);

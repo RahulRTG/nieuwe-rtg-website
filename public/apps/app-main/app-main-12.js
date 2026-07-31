@@ -31,7 +31,9 @@
 
   document.querySelectorAll('.tabbar button').forEach(b =>
     b.addEventListener('click', () => openTab(b.dataset.tab, true)));
-  $('#codeChip').addEventListener('click', () => { openTab('home'); toggleWhy(true); });
+  // de codenaam in de statusbalk is de korte weg naar je pas: die ligt sinds
+  // het OS-beginscherm in je wallet, niet meer op de home
+  $('#codeChip').addEventListener('click', () => { location.href = '/apps/wallet.html'; });
 
   function openTab(tab, focusView){
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));
@@ -54,7 +56,12 @@
     // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
     const guest = user.tier === 'guest';
     ['reizen','betalen','ai','assets','zorg'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
+    // van Rahul, want allebei zijn ze voor leden
+    document.getElementById('app').classList.toggle('os-gast', guest);
     renderHome();
+    // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
+    if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent();
     if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); renderFluister(); }
     renderSalon();
     renderTerPlaatse();

@@ -8,12 +8,23 @@
    server schrijft zelf op wat hij heeft afgehandeld.
 
    Een meting die je vertrouwt, hoort zelf ook getoetst te zijn. Deze test
-   bewijst de vier eigenschappen waar scripts/dekking.js op leunt:
+   bewijst de eigenschappen waar scripts/dekking.js op leunt:
 
      1. uit tenzij RTG_ROUTELOG staat (het hoort in de testrun, niet in productie)
      2. het schrijft het PATROON, niet het pad met waarden erin
      3. het overleeft een SIGKILL -- de tests stoppen hun servers zo
      4. een 4xx telt mee: "aangeraakt" is niet hetzelfde als "ging goed"
+     5. er wordt genoteerd op het MATCHMOMENT, niet als het antwoord klaar is.
+        Dat laatste kwam er namelijk niet altijd: fetch() geeft zijn Response
+        zodra de KOPPEN binnen zijn, dus een test kon zijn server al met
+        SIGKILL stoppen voordat de server 'finish' had uitgezonden -- en dan
+        miste het journaal een route die wel degelijk was aangeroepen. Onder
+        belasting viel toets 4 daardoor af en toe om. Toets 6 pint de nieuwe
+        garantie vast op de router zelf: een handler die nooit antwoordt, en
+        het patroon staat er toch.
+     6. en de haak raakt het verzoek nooit, ook niet als hij stukgaat. Een
+        meetinstrument dat het gemetene kan slopen is erger dan geen
+        meetinstrument (toets 7).
 
    Draai los: node --experimental-sqlite --test test/routelog.test.js
    ========================================================================== */
@@ -61,18 +72,23 @@ test('4. een echte server schrijft patronen weg en overleeft een SIGKILL', async
   fs.writeFileSync(f, '');
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: path.join(TMP, 'data'), RTG_ROUTELOG: f } });
   try {
-    // een geslaagd verzoek
+    /* De antwoorden ook UITLEZEN, niet alleen de status bekijken. fetch() geeft
+       zijn Response al zodra de koppen binnen zijn; het lichaam kan dan nog
+       onderweg zijn. Zonder dit is deze toets een wedloop met zijn eigen
+       server -- en dat was hij ook: onder belasting viel hij af en toe om. */
     const reg = await fetch(srv.base + '/api/auth/register', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'Journaal Lid', email: 'rl' + Date.now() + '@x.nl',
         phone: '0612345678', password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg' })
     });
     assert.equal(reg.status, 200);
+    await reg.text();
     // en een geweigerd verzoek: dat endpoint is even goed aangeraakt
     const dicht = await fetch(srv.base + '/api/member/rechterhand/cellier', {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer onzin' }, body: '{}'
     });
     assert.equal(dicht.status, 401);
+    await dicht.text();
   } finally { stop(srv && srv.child); }
 
   /* Met opzet NA de SIGKILL lezen. Een journaal dat pas bij het afsluiten zou
@@ -100,4 +116,44 @@ test('5. het journaal noteert het patroon, niet de ingevulde waarde', async () =
   assert.ok(gezien.includes('GET /api/foundation/bord/:code'),
     'het patroon met :code, met het mount-voorvoegsel erbij: ' + gezien.join(', '));
   assert.equal(gezien.some(r => /ZZ99|YY11/.test(r)), false, 'geen ingevulde waarden');
+});
+
+test('6. er wordt genoteerd zodra de route MATCHT, niet als het antwoord klaar is', () => {
+  /* Dit is de eigenschap waar toets 4 stilzwijgend op leunde en die er niet
+     was. Het journaal hing op 'finish' van het antwoord; kwam dat er niet
+     (verbinding weg, proces gestopt met SIGKILL), dan miste het patroon --
+     terwijl de route wel degelijk was aangeroepen. fetch() geeft zijn Response
+     al zodra de KOPPEN binnen zijn, dus dat venster was echt, en onder
+     belasting groot genoeg om toets 4 af en toe te laten omvallen.
+
+     We toetsen het op de router zelf, niet met een echte server: dan hangt het
+     bewijs niet op timing maar op de volgorde in de code. De handler doet met
+     opzet NIETS met het antwoord -- geen res.end(), dus nooit een 'finish' --
+     en toch hoort het patroon dan al genoteerd te zijn. */
+  const { maakRouter, opPatroon } = require('../server/web/routing');
+  const gezien = [];
+  opPatroon((m, p2) => gezien.push(m + ' ' + p2));
+  try {
+    const r = maakRouter();
+    let handlerLiep = false;
+    r.post('/api/leden/:id', (req, res, next) => { handlerLiep = true; /* geen antwoord */ });
+    r({ method: 'POST', url: '/api/leden/A7?x=1', params: {} }, {}, () => {});
+    assert.equal(handlerLiep, true, 'de handler is aangeroepen');
+    assert.deepEqual(gezien, ['POST /api/leden/:id'],
+      'het patroon staat genoteerd terwijl er nog geen antwoord is gestuurd');
+  } finally { opPatroon(null); }
+});
+
+test('7. de haak raakt het verzoek nooit, ook niet als hij stukgaat', () => {
+  /* Het journaal is een meetinstrument. Een meetinstrument dat het gemetene
+     kan slopen, is erger dan geen meetinstrument. */
+  const { maakRouter, opPatroon } = require('../server/web/routing');
+  opPatroon(() => { throw new Error('journaal stuk'); });
+  try {
+    const r = maakRouter();
+    let geland = false;
+    r.get('/api/iets', (req, res, next) => { geland = true; });
+    assert.doesNotThrow(() => r({ method: 'GET', url: '/api/iets', params: {} }, {}, () => {}));
+    assert.equal(geland, true, 'de route draait gewoon door');
+  } finally { opPatroon(null); }
 });

@@ -1,8 +1,19 @@
 /* Het aanmeld-pad van het aanmeldgesprek (kern/aanmeldgesprek.js): de stappen
-   nadat Rahul heeft ontdekt dat iemand nieuw is, van "hoe gaat het" tot het
-   wachtwoord. Aan het eind levert het precies de velden op die de ENE
-   registratieroute al kent. De motor (aanmeldgesprek.js) roept dit aan voor
-   alle niet-inlog-stappen; ctx bundelt de gedeelde hulp. */
+   nadat Rahul heeft ontdekt dat iemand nieuw is. Aan het eind levert het precies
+   de velden op die de ENE registratieroute al kent. De motor (aanmeldgesprek.js)
+   roept dit aan voor alle niet-inlog-stappen; ctx bundelt de gedeelde hulp.
+
+   Een gratis RTG-account vraagt VIER dingen: volledige naam, geboortedatum (de
+   leeftijd bepaalt wat er opengaat), e-mailadres en een wachtwoord. Verder niets.
+   Telefoonnummer, adres en paspoortgegevens horen hier NIET: die vraagt Rahul pas
+   op het moment dat er iets geregeld moet worden waar een derde partij bij komt --
+   een bestelling, een reservering, een bezorging. Wie alleen rondkijkt hoeft ze
+   nooit te geven.
+
+   Rahul spreekt hier kort. Aan de poort staat iemand die binnen wil, niet iemand
+   die een gesprek zoekt: een zin per stap, geen uitweidingen. Op "waarom?" volgt
+   het eerlijke antwoord uit WAAROM (./aanmeldgesprek-hulp.js); daar mag het iets
+   langer, want dan is er om uitleg gevraagd. */
 
 module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
   const { schoon, leeftijdVan, toon, gesprekken } = ctx;
@@ -10,51 +21,27 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
     case 'hallo': {
       g.stap = 'naam';
       const somber = /\b(slecht|niet zo|moe|druk|stress|rot)\b/i.test(tekst);
-      const opening = somber
-        ? 'Dank dat je dat gewoon zegt; dat hoeft hier niet mooier dan het is. '
-        : toon(g, 'Goed om te horen. ', 'Mooi zo! ');
-      return { tekst: opening + 'Hoe mag ik je noemen? Je volledige naam graag, zoals in je paspoort; in de app krijg je gewoon een codenaam.' };
+      const opening = somber ? 'Dank dat je het zegt. ' : toon(g, 'Mooi. ', 'Mooi zo! ');
+      return { tekst: opening + 'Je volledige naam?' };
     }
     case 'naam': {
       const naam = schoon(tekst.replace(/^(ik ben|ik heet|mijn naam is)\s+/i, ''), 80);
-      if (naam.length < 2 || !/[A-Za-zÀ-ÿ]/.test(naam)) return { tekst: 'Die naam kan ik niet goed lezen; hoe staat hij in je paspoort?' };
+      if (naam.length < 2 || !/[A-Za-zÀ-ÿ]/.test(naam)) return { tekst: 'Die naam lees ik niet goed. Hoe schrijf je hem?' };
       g.velden.name = naam;
       g.stap = 'email';
-      const voornaam = naam.split(' ')[0];
-      return { tekst: 'Aangenaam, ' + voornaam + (g.velden.woonplaats ? '. En ' + g.velden.woonplaats + ', mooie plek' : '') + '. Waar mag ik je bevestiging naartoe sturen? Een e-mailadres is genoeg.' };
+      /* Noemde iemand zijn woonplaats terloops, dan laat Rahul kort merken dat hij
+         luisterde. Twee woorden is genoeg -- hij vraagt er nooit zelf om (een adres
+         hoort bij een bestelling, niet bij de poort), maar wat je vertelt onthoudt
+         hij wel. */
+      const plek = g.velden.woonplaats ? g.velden.woonplaats + ', mooi. ' : '';
+      return { tekst: 'Aangenaam, ' + naam.split(' ')[0] + '. ' + plek + 'Je e-mailadres?' };
     }
     case 'email': {
       const m = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
-      if (!m) return { tekst: 'Ik zie er geen e-mailadres in; typ hem even voluit (met @).' };
+      if (!m) return { tekst: 'Daar zie ik geen e-mailadres in. Voluit, met @?' };
       g.velden.email = m[0].toLowerCase();
-      g.stap = 'telefoon';
-      return { tekst: toon(g, 'Genoteerd. ', 'Staat erin! ') + 'En een mobiel nummer? Dat is voor herstel en belangrijke seintjes, niet voor spam.' };
-    }
-    case 'telefoon': {
-      const cijfers = tekst.replace(/\D/g, '');
-      if (cijfers.length < 8) return { tekst: 'Dat lijkt me te kort voor een mobiel nummer; typ hem even helemaal.' };
-      g.velden.phone = tekst.replace(/[^\d+ ]/g, '').trim().slice(0, 30);
-      // de woonplaats: het liefst kwam hij al terloops voorbij; zo niet,
-      // dan een keer subtiel vragen, met de reden erbij, en overslaan mag
-      if (!g.velden.woonplaats) {
-        g.stap = 'woonplaats';
-        return { tekst: toon(g, 'Dank je. ', 'Top. ') + 'En waar woon je zoal? Alleen de plaats; dat helpt me straks met reistijden en aanraders in de buurt. Liever niet zeggen is ook gewoon goed.' };
-      }
       g.stap = 'geboren';
-      return { tekst: 'Dan de enige echt formele vraag: wanneer ben je geboren, precies zoals in je paspoort? (Vraag gerust waarom.)' };
-    }
-    case 'woonplaats': {
-      const slaatOver = /\b(overslaan|liever niet|zeg ik (liever )?niet|priv[eé]|gaat je niks aan|skip)\b/i.test(tekst);
-      if (!slaatOver && !g.velden.woonplaats) {
-        // een kale plaatsnaam is ook een antwoord ("Ibiza", "Den Haag")
-        const kaal = schoon(tekst.replace(/^(in|uit|ik woon in|gewoon)\s+/i, '').replace(/[.,!?].*$/, ''), 40);
-        if (/^[A-Za-zÀ-ÿ' -]{2,40}$/.test(kaal)) g.velden.woonplaats = kaal;
-      }
-      g.stap = 'geboren';
-      const dank = slaatOver || !g.velden.woonplaats
-        ? 'Helemaal goed, hoort er niet per se bij. '
-        : (g.velden.woonplaats + ', mooi. ');
-      return { tekst: dank + 'Dan de enige echt formele vraag: wanneer ben je geboren, precies zoals in je paspoort? (Vraag gerust waarom.)' };
+      return { tekst: 'Genoteerd. Je geboortedatum? Die bepaalt wat er voor je opengaat.' };
     }
     case 'geboren': {
       let d = null;
@@ -62,30 +49,32 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       if (m) d = m[1] + '-' + m[2] + '-' + m[3];
       else if ((m = /(\d{1,2})[-/](\d{1,2})[-/](\d{4})/.exec(tekst))) d = m[3] + '-' + String(m[2]).padStart(2, '0') + '-' + String(m[1]).padStart(2, '0');
       const lft = d ? leeftijdVan(d) : null;
-      if (lft == null || lft > 120) return { tekst: 'Die datum kan ik niet plaatsen; schrijf hem als dag-maand-jaar, bijvoorbeeld 14-03-1992.' };
-      if (lft < 15) return { tekst: 'Eerlijk is eerlijk: het RTG-lidmaatschap kan vanaf 15 jaar. Tot die tijd is er de RTFoundation-wereld; die is er juist voor jou.' };
+      if (lft == null || lft > 120) return { tekst: 'Die datum kan ik niet plaatsen. Als dag-maand-jaar, bijvoorbeeld 14-03-1992?' };
+      if (lft < 15) return { tekst: 'RTG kan vanaf 15 jaar. Tot die tijd is er de RTFoundation-wereld; die is er juist voor jou.' };
       g.velden.geboortedatum = d;
       g.stap = 'wachtwoord';
-      return { tekst: (lft < 18 ? 'Dank je. Voor jouw leeftijd gelden beschermende regels; die regel ik automatisch goed. ' : 'Dank je. ') + 'Kies tot slot een wachtwoord van minstens 6 tekens. Het gaat versleuteld de kluis in; ik kan het zelf niet teruglezen.' };
+      const jong = lft < 18 ? 'Voor jouw leeftijd gelden beschermende regels; die regel ik. ' : '';
+      return { tekst: jong + 'Tot slot een wachtwoord, minstens 6 tekens. Het gaat versleuteld de kluis in.' };
     }
     case 'wachtwoord': {
-      if (tekst.length < 6) return { tekst: 'Net te kort; minstens 6 tekens. Een zinnetje werkt vaak het best.' };
+      if (tekst.length < 6) return { tekst: 'Net te kort; minstens 6 tekens.' };
       g.velden.password = String(ruwTekst).slice(0, 200);
       g.stap = 'klaar';
       g.velden.tier = 'rtg';
       const interesse = g.velden.interesse === 'business'
-        ? ' Je noemde je bedrijf: de Business Pass gaat op uitnodiging of na menselijke goedkeuring, dus die kan en wil ik je niet beloven; ik noteer je interesse eerlijk en dan hoor je ervan.'
+        ? ' Je noemde je bedrijf: de Business Pass gaat op uitnodiging; ik noteer je interesse, beloven kan ik niets.'
         : (g.velden.interesse === 'lifestyle' ? ' De Lifestyle Pass gaat op uitnodiging; ik noteer je interesse, beloven kan ik niets.' : '');
-      const werk = g.werkgever
-        ? ' En je zei dat je bij ' + g.werkgever.naam + ' werkt: na je aanmelding koppel ik je personeelstoegang, met je eigen pincode als bewijs.'
-        : '';
-      const velden = { name: g.velden.name, email: g.velden.email, phone: g.velden.phone, geboortedatum: g.velden.geboortedatum, password: g.velden.password, tier: 'rtg' };
-      const uit = { tekst: 'Dat was alles; geen formulier aan te pas gekomen. Ik zet je aanmelding door voor de RTG Pass; welk type account je nodig had, heb ik onderweg gewoon voor je bepaald.' + interesse + werk,
+      // eerlijk: de werkgever wordt herkend en genoteerd, niet meer dan dat
+      const werk = g.werkgever ? ' Je werkt bij ' + g.werkgever.naam + '; dat noteer ik.' : '';
+      /* Alleen de vier velden. `phone` gaat hier NIET mee: dat vraagt Rahul pas
+         wanneer er iets bezorgd of gereserveerd moet worden. */
+      const velden = { name: g.velden.name, email: g.velden.email, geboortedatum: g.velden.geboortedatum, password: g.velden.password, tier: 'rtg' };
+      const uit = { tekst: 'Klaar. Je RTG Pass staat op je naam.' + interesse + werk,
         klaar: true, velden, werkgever: g.werkgever, woonplaats: g.velden.woonplaats || null };
       gesprekken.delete(id);
       return uit;
     }
     default:
-      return { tekst: 'Zullen we opnieuw beginnen? Dat praat makkelijker.' };
+      return { tekst: 'Laten we opnieuw beginnen.' };
   }
 };

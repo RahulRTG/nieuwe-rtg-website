@@ -223,26 +223,26 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
            niets te scheiden; de poortwachter is genoeg. */
   const GEDULD = {
     // (a) de code is de sleutel
-    'server/routes/lesmaker.js:35': 'klaslokaal: leraarToken is de sleutel, geen account',
-    'server/routes/lesmaker.js:36': 'klaslokaal: leraarToken is de sleutel',
-    'server/routes/lesmaker.js:37': 'klaslokaal: leraarToken is de sleutel',
-    'server/routes/lesmaker.js:40': 'klas-PDA: klascode + naam, kinderen zonder account',
-    'server/routes/lesmaker.js:41': 'klas-PDA: deelnemerToken is de sleutel',
-    'server/routes/lesmaker.js:42': 'klas-PDA: deelnemerToken is de sleutel',
-    'server/routes/member/kopen/bezorg.js:12': 'partnercode opzoeken: openbaar partnerprofiel',
-    'server/routes/member/partnerkanaal.js:18': 'partnerkanaal: boeken zonder RTG-account, de reis-id is openbaar',
-    'server/routes/rtfkantoor.js:42': 'clubportaal: de clubcode is de sleutel van het eigen dossier',
-    'server/routes/rtfkantoor.js:43': 'clubportaal: de clubcode is de sleutel',
-    'server/routes/rtfkantoor.js:75': 'stadsraad-portaal: de partnercode is de sleutel',
-    'server/routes/supplier/toegang.js:102': 'openbaar rooster van een zaak op zaakcode',
-    'server/routes/supplier/werving/sollicitaties.js:16': 'solliciteren kan zonder account: de vacaturecode is openbaar',
+    'server/routes/lesmaker.js POST /api/les/leraar': 'klaslokaal: leraarToken is de sleutel, geen account',
+    'server/routes/lesmaker.js POST /api/les/volgende': 'klaslokaal: leraarToken is de sleutel',
+    'server/routes/lesmaker.js POST /api/les/sluit': 'klaslokaal: leraarToken is de sleutel',
+    'server/routes/lesmaker.js POST /api/les/mee': 'klas-PDA: klascode + naam, kinderen zonder account',
+    'server/routes/lesmaker.js POST /api/les/kijk': 'klas-PDA: deelnemerToken is de sleutel',
+    'server/routes/lesmaker.js POST /api/les/antwoord': 'klas-PDA: deelnemerToken is de sleutel',
+    'server/routes/member/kopen/bezorg.js POST /api/partner': 'partnercode opzoeken: openbaar partnerprofiel',
+    'server/routes/member/partnerkanaal.js POST /api/book': 'partnerkanaal: boeken zonder RTG-account, de reis-id is openbaar',
+    'server/routes/rtfkantoor.js POST /api/rtf/club/portaal': 'clubportaal: de clubcode is de sleutel van het eigen dossier',
+    'server/routes/rtfkantoor.js POST /api/rtf/club/bericht': 'clubportaal: de clubcode is de sleutel',
+    'server/routes/rtfkantoor.js POST /api/rtf/partner/raad': 'stadsraad-portaal: de partnercode is de sleutel',
+    'server/routes/supplier/toegang.js POST /api/supplier/roster': 'openbaar rooster van een zaak op zaakcode',
+    'server/routes/supplier/werving/sollicitaties.js POST /api/supplier/apply': 'solliciteren kan zonder account: de vacaturecode is openbaar',
     // (b) openbare inhoud achter een inlog
-    'server/routes/luchthaven.js:48': 'boarding pass die de gast zelf toont aan de balie',
-    'server/routes/member/winkel-bieb.js:21': 'vrije tijdsloten van een restaurant: openbare beschikbaarheid',
-    'server/routes/member/winkel-bieb.js:38': 'catalogus van een boerderij: openbaar aanbod',
-    'server/routes/member/winkel-bieb.js:78': 'reisgids lezen: openbare bibliotheekinhoud',
-    'server/routes/thuis.js:13': 'detail van een advertentie: openbaar aanbod',
-    'server/routes/thuis.js:14': 'reviews bij een advertentie: openbaar',
+    'server/routes/luchthaven.js POST /api/supplier/lucht/pass': 'boarding pass die de gast zelf toont aan de balie',
+    'server/routes/member/winkel-bieb.js POST /api/foodcourt/tijden': 'vrije tijdsloten van een restaurant: openbare beschikbaarheid',
+    'server/routes/member/winkel-bieb.js POST /api/mall/land': 'catalogus van een boerderij: openbaar aanbod',
+    'server/routes/member/winkel-bieb.js POST /api/mall/reis/lees': 'reisgids lezen: openbare bibliotheekinhoud',
+    'server/routes/thuis.js POST /api/thuis/detail': 'detail van een advertentie: openbaar aanbod',
+    'server/routes/thuis.js POST /api/thuis/reviews': 'reviews bij een advertentie: openbaar',
     /* (c) de terugkeer van een identiteitsprovider. Hier IS er per definitie nog
        geen sessie: de provider stuurt de browser van de bezoeker hierheen met
        een code, en pas daarna wordt er ingelogd. De poort is de `state`: die is
@@ -250,7 +250,7 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
        niemand anders kan er een maken of hem wijzigen. Uit die state komt de
        koppeling, de nonce en de PKCE-verifier; klopt hij niet, dan gebeurt er
        niets. Een auth-middleware ervoor zetten zou inloggen onmogelijk maken. */
-    'server/routes/sso.js:78': 'terugkeer van de identiteitsprovider: de versleutelde state IS de poort'
+    'server/routes/sso.js GET /api/sso/terug': 'terugkeer van de identiteitsprovider: de versleutelde state IS de poort'
   };
   const verdacht = [];
 
@@ -274,7 +274,14 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
   function keur(rel, regel, blok) {
     const tekst = blok.join('\n');
     if (!VRAAGID.test(tekst)) return;        // geen id uit het verzoek: niets te scheiden
-    const plek = rel + ':' + (regel + 1);
+    /* De sleutel is het ROUTEPAD, niet het regelnummer. Dat was het wel, en dat
+       brak toen er hierboven regels bijkwamen: de nummers schoven op en de test
+       viel op iets wat niemand had aangeraakt. Erger is de andere
+       kant -- er kan een ANDERE handler op zo'n nummer schuiven, en die wordt
+       dan stilletjes vrijgepleit door een uitzondering die niet voor hem
+       bedoeld was. Een pad schuift niet op. */
+    const route = (blok[0].match(/app\.(get|post|put|delete|patch)\s*\(\s*'([^']+)'/) || []);
+    const plek = route[2] ? rel + ' ' + route[1].toUpperCase() + ' ' + route[2] : rel + ':' + (regel + 1);
     if (GEDULD[plek]) return;                 // beoordeeld en verantwoord, zie GEDULD
     if (POORT_IN_BODY.test(tekst)) return;    // de poort staat in de handler zelf
     if (!POORT.test(blok[0])) { verdacht.push(plek + ' (geen poortwachter)'); return; }

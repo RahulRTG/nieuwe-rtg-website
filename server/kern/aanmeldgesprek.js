@@ -46,7 +46,7 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
     const id = 'ag' + nu().toString(36) + Math.random().toString(36).slice(2, 8);
     const g = { stap: 'doel', velden: {}, warmte: 0, beurten: 0, at: nu(), werkgever: null };
     gesprekken.set(id, g);
-    return { id, tekst: 'Hoi, ik ben Rahul. Wat kan ik voor je doen? Ik kan je aanmelden, inloggen, of eerst even uitleggen wat RTG is.' };
+    return { id, tekst: 'Ik ben Rahul. Aanmelden, inloggen, of eerst uitleg?' };
   }
 
   function intakeZeg(id, ruwTekst) {
@@ -55,7 +55,7 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
     if (++g.beurten > MAX_BEURTEN) { gesprekken.delete(id); return { status: 429, error: 'Dit gesprek werd wel erg lang; begin even opnieuw.' }; }
     g.at = nu();
     const tekst = schoon(String(ruwTekst || ''), 280);
-    if (!tekst) return { tekst: 'Zeg maar gewoon wat je denkt; ik luister.' };
+    if (!tekst) return { tekst: 'Zeg het maar.' };
     g.warmte = warmteVan(tekst, g.warmte);
     // de opportunistische pikkers horen bij het aanmeld-pad; tijdens inloggen en
     // de sleutelwoorden laten we ze rusten (een sleutelwoord is geen woonplaats)
@@ -73,15 +73,15 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
         if (wilIn && !wilNieuw) {
           if (mail) return naarWoordInlog(g, mail[0].toLowerCase());
           g.stap = 'login-naam';
-          return { tekst: 'Ha, welkom terug. Even kijken: welk e-mailadres of welke gebruikersnaam gebruik je hier?' };
+          return { tekst: 'Welkom terug. Je e-mailadres of gebruikersnaam?' };
         }
         if (wilNieuw && !wilIn) {
           g.stap = 'hallo';
-          return { tekst: toon(g, 'Leuk je te ontmoeten; dan regelen wij je aanmelding gewoon in dit gesprek. ', 'Wat leuk! Dan regelen we het hier samen. ') + 'Maar eerst: hoe gaat het vandaag?' };
+          return { tekst: toon(g, 'Dan regelen we dat hier. ', 'Leuk! Dan regelen we dat hier. ') + 'Hoe gaat het vandaag?' };
         }
         // een los e-mailadres als eerste zin = vrijwel zeker een terugkerend lid
         if (mail) return naarWoordInlog(g, mail[0].toLowerCase());
-        return { tekst: 'Allebei goed hoor. Zeg het maar: kom je inloggen, word je vandaag lid, of wil je eerst uitleg?' };
+        return { tekst: 'Kom je inloggen, word je lid, of wil je uitleg?' };
       }
       default: {
         // de login-/sw-/vergeten-stappen lopen via het inlog-pad; geeft dat

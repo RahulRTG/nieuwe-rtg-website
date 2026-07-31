@@ -6,7 +6,7 @@ module.exports = (kern) => {
     voorkeurVan, zetVoorkeur, retailCatalogus, wishlistToggle,
     mijnApart, mijnStyling, vraagPaskamer, retailIsRetail, PASPOORT_NIVEAUS,
     paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn,
-    reisbureau, logies, uitgaan } = kern;
+    reisbureau, logies, uitgaan, gegevensStop } = kern;
 
 // de koop- en bibliotheek-ingangen van de Mall staan apart (winkel klein houden)
 require('./winkel-bieb')(kern);
@@ -27,6 +27,7 @@ app.post('/api/reisbureau', auth, (req, res) => res.json(reisbureau.overzicht())
 // een lid vraagt een reis aan (aangevraagd; een reisadviseur bevestigt)
 app.post('/api/reisbureau/boek', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  if (gegevensStop(req, res, 'reservering')) return;
   const r = reisbureau.boek(req.session, liveCodename(req.session), req.body || {});
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   // wie ergens naartoe gaat, krijgt meteen ALLE regels van dat land mee

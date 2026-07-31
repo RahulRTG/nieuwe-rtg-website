@@ -306,7 +306,7 @@ app.use(require('./meting').middleware());
 /* Het routejournaal staat ernaast en doet alleen iets met RTG_ROUTELOG gezet
    (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
    een tekstzoektocht door de tests -- zie server/routelog.js. */
-app.use(require('./routelog').middleware());
+require('./routelog');   // zet de haak in de router (alleen met RTG_ROUTELOG)
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.
 // (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het
@@ -1091,7 +1091,7 @@ function leesUploadDataUrl(fname) {
     const file = path.basename(String(fname || ''));
     const full = path.join(UPLOAD_DIR, file);
     if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return null;
-    const buf = require('./kluis').ontsleutelBuf(fs.readFileSync(full));
+    const buf = require('./kluis').ontsleutelBestand(fs.readFileSync(full), file);
     const ext = (file.split('.').pop() || 'jpg').toLowerCase();
     const mime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
     return 'data:' + mime + ';base64,' + buf.toString('base64');
@@ -1675,7 +1675,9 @@ const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarket
 /* De eigen boardroom per lid (kern/lidboard.js): elk lid zet zijn eigen
    functies aan/uit; een ouder/beheerder stuurt via dezelfde motor de boardroom
    van zijn beschermde kind bij (de route bewaakt het gezinsverband). */
-const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardAan, lidPadFunctie, lidBoardUit } = maakLidboard({ db, save });
+const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
+  lidBoardVersie, lidPadFunctie, lidBoardUit, lidBoardLog, lidBoardLogWis,
+  werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan } = maakLidboard({ db, save });
 
 /* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
    autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,
@@ -2141,7 +2143,10 @@ const kern = {
   mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
-  LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardAan,
+  LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
+  lidBoardVersie, lidBoardLog, lidBoardLogWis,
+  // het werkgeversbeleid op de boardroom van het lid (alleen dichtzetten)
+  werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan,
   // de autoverkoop-laag (kern/autoverkoop.js)
   AUTOVERKOOP_BRANDSTOF, avMagVerkopen, avZetAan, avZetAuto, avVerwijderAuto, avShowroom,
   avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox,
@@ -2684,7 +2689,13 @@ Object.assign(kern, require('./kern/fluister')({
   // de reislaag van Rahul: een hele reis op een vraag, kleding apart
   // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen
   verblijfBoek: (session, body) => kern.verblijfBoek(session, liveCodename(session), body),
-  retailLegApart: legApart, retailKlantProfiel: klantProfiel
+  retailLegApart: legApart, retailKlantProfiel: klantProfiel,
+  /* Het gegevensgesprek komt verderop pas op de kern, dus we pakken het hier
+     laat op. Rahul doet zijn acties buiten de routes om -- en zou zonder dit de
+     enige zijn die ongemerkt langs de gegevenspoort kan. Hij voert hetzelfde
+     gesprek als de app, want de vraag hoort niet af te hangen van het kanaal. */
+  gegevensStart: (sessie, soort) => (kern.gegevensStart ? kern.gegevensStart(sessie, soort) : null),
+  gegevensZeg: (sessie, id, tekst) => (kern.gegevensZeg ? kern.gegevensZeg(sessie, id, tekst) : { status: 404, error: 'Dat gesprek ken ik niet meer.' })
 }));
 // nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
 // elk half uur, bouwt een index (een datapass voor alle gebruikers) en
@@ -2820,6 +2831,39 @@ Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
   logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken,
   pinInfo: kern.pinInfo, pinCheck: kern.pinCheck
 }));
+/* Het kantoorgesprek (kern/kantoorgesprek.js): de backoffice binnenkomen door
+   met Rahul te praten in plaats van een codeveld in te vullen. Zelfde slot als
+   de kantoordeur zelf (bucket 'office:<ip>'), zodat de vriendelijkere weg geen
+   zwakkere weg is; wat er ingetypt wordt gaat nergens heen. */
+Object.assign(kern, require('./kern/kantoorgesprek').maakKantoorgesprek({
+  OFFICE_CODE: kern.OFFICE_CODE, veiligGelijk: kern.veiligGelijk, totpOk: kern.totpOk,
+  crypto, rememberSession, officeState: kern.officeState, logInlog: kern.logInlog,
+  loginFails, noteFailedTry
+}));
+
+/* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
+   account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
+   koerier) vraagt Rahul in een gesprek precies wat die handeling nodig heeft. */
+{
+  const poort = require('./kern/gegevenspoort').maakGegevenspoort({
+    accounts, getMemberState: accounts.getMemberState
+  });
+  const gesprek = require('./kern/gegevensgesprek').maakGegevensgesprek({
+    accounts, gegevenspoort: poort, saveMemberState: accounts.saveMemberState,
+    getMemberState: accounts.getMemberState, schoon
+  });
+  Object.assign(kern, {
+    gegevensPoort: poort.poort, gegevensNodig: poort.ontbreekt, gegevensStop: poort.stop,
+    gegevensStart: gesprek.gegevensStart, gegevensZeg: gesprek.gegevensZeg
+  });
+}
+/* Werk bij het inloggen (kern/werkbijlogin.js): wie een werkplek heeft, krijgt
+   die er bij het inloggen meteen bij -- geen tweede inlog en geen pincode. Het
+   werkvenster van de werkgever bepaalt of hij open of dicht is. */
+Object.assign(kern, require('./kern/werkbijlogin').maakWerkBijLogin({
+  accounts, crypto, findSupplier, magWerken: kern.magWerken, rememberSession,
+  logInlog: kern.logInlog, logActivity, supplierState
+}));
 /* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
    (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een
    match automatisch een tafel bij een partner rond het midden van de twee
@@ -2911,6 +2955,7 @@ for (const naam of gekozenDomeinen) {
 // leveranciers; net als de infra-endpoints draait dit altijd mee.
 require('./routes/onboarding')(kern);
 require('./routes/aanmeldgesprek')(kern);
+require('./routes/kantoorgesprek')(kern);
 /* SSO staat naast de auth-routes en niet erin: het is een tweede weg naar
    binnen, met een eigen levensloop (koppelingen, providers), en het moet ook
    draaien als het auth-domein apart is opgestart. */
@@ -2920,6 +2965,7 @@ require('./routes/sso')(kern);
 require('./routes/scim')(kern);
 require('./routes/meting')(kern);
 require('./routes/algpin')(kern);
+require('./routes/werkbeleid')(kern);
 require('./routes/sleutelwoorden')(kern);
 require('./routes/agenda')(kern);
 require('./routes/notities')(kern);

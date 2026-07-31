@@ -38,7 +38,7 @@ smaak maar een eis.
 
 ```sh
 cd motor
-cargo test --release        # 11 kern-tests (grootboek, idempotentie, kassa, JSON)
+cargo test --release        # kern-tests: grootboek, idempotentie, kassa, JSON, AEAD-testvectoren, kluis, poortwacht
 cargo build --release        # -> target/release/rtg-motor
 RTG_MOTOR_ADDR=127.0.0.1:3100 ./target/release/rtg-motor
 ```
@@ -50,6 +50,28 @@ Omgeving:
 | `RTG_MOTOR_ADDR`   | `127.0.0.1:3100`       | luisteradres                      |
 | `RTG_MOTOR_MAXCONN`| `1024`                 | plafond gelijktijdige verbindingen|
 | `RTG_MOTOR_DATA`   | `motor-data/state.json`| snapshot-bestand (durability)     |
+| `RTG_MOTOR_TOKEN`  | *(leeg)*               | gedeeld geheim voor de poortwacht (min. 16 tekens) |
+| `RTG_KLUIS_NEGEER_GEKNOEID` | *(leeg)*      | `1` = schrijven toestaan ondanks een niet-kloppend kluis-manifest |
+
+### De poortwacht
+
+Rol-scheiding (welk lid mag wat) zit in de Node-poort ervoor. Maar de motor zelf
+is daarmee geen open deur: wie hem rechtstreeks bereikt kan zonder slot
+`/api/kluis/onthul` lezen en met `/api/pay/boek` rauw boeken. Daarom:
+
+- **`RTG_MOTOR_TOKEN` gezet** → elk verzoek moet het token meesturen, in
+  `X-RTG-Motor-Token` of als `Authorization: Bearer <token>`. Constant-time
+  vergeleken. Fout of afwezig = `403`. Minimaal 16 tekens, anders start hij niet.
+- **Niet gezet** → de motor start alleen op een loopback-adres. Luisteren op
+  bijvoorbeeld `0.0.0.0` zonder token is een harde weigering, geen waarschuwing.
+- **`/api/leeft`** blijft altijd open voor liveness-probes en geeft niets anders
+  dan `{"ok":true}`. Gebruik die voor healthchecks; `/api/ready` en
+  `/api/motor/status` zitten wél achter het token (die tonen som, saldi-afdruk en
+  ledental).
+
+De Node-kant (`server/kern/pay/motorklant.js`, `bank/motorklant.js`,
+`pay/schaduw.js`) en de `scripts/motor-*.js` sturen het token automatisch mee als
+`RTG_MOTOR_TOKEN` in hun omgeving staat.
 
 ## Endpoints (identiek aan `server/routes/pay.js`)
 

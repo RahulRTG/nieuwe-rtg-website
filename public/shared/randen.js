@@ -42,22 +42,23 @@
     return !!((w.RTGBediening && w.RTGBediening.aanwezig) || d.getElementById('osCcBtn'));
   }
 
-  /* Zes pagina's (mall, hotels, uitgaan, reisbureau, gemeente, overheid) hebben
-     hun eigen Rahul: een knop #rahulFab met een blad #rahulSheet ernaast, elk
-     met dezelfde inline code. Die knop zweefde permanent rechtsonder. We bouwen
-     hem niet na en we knippen die zes scripts niet stuk -- we nemen het paar
-     over: de knop gaat weg (met !important, zodat het eigen script hem niet
-     terugzet bij sluiten) en zijn klik wordt wat de onderrand aanroept.
-     Alleen de losse knop van die pagina's, nooit de chatbalk van
-     shared/rahul-mond.js -- die deelt de id maar is geen .rahulfab. */
+  /* Negen pagina's hebben hun eigen Rahul: #rahulFab met #rahulSheet ernaast,
+     elk met dezelfde inline code. Die knop zweefde permanent rechtsonder. We
+     nemen het paar over: de knop gaat weg (met !important, zodat het eigen
+     script hem niet terugzet) en zijn klik wordt wat de onderrand aanroept.
+     Alleen die losse knop, nooit de chatbalk van shared/rahul-mond.js -- die
+     deelt de id maar is geen .rahulfab.
+     Weghalen doen we ALTIJD, ook als een ander al Rahul levert; anders bleef de
+     pil hangen zodra er ook een metgezel op de pagina stond. */
   function adopteerEigen() {
     var fab = d.querySelector('button#rahulFab.rahulfab');
-    if (!fab || (w.RTGRahul && w.RTGRahul.open)) return null;
+    if (!fab) return null;
     if (!d.getElementById('rndFabWeg')) {
       var s = d.createElement('style'); s.id = 'rndFabWeg';
       s.textContent = 'button#rahulFab.rahulfab{display:none !important;}';
       (d.head || d.documentElement).appendChild(s);
     }
+    if (w.RTGRahul && w.RTGRahul.open) return null;   // een ander levert Rahul al
     w.RTGRahul = w.RTGRahul || {};
     w.RTGRahul.open = function () { fab.click(); };
     w.RTGRahul.sluit = function () { var x = d.getElementById('rahulSluit'); if (x) x.click(); };
@@ -72,8 +73,11 @@
     if (over) return over;
     // de gedeelde chatbalk (shared/metgezel.js) staat op bijna elke pagina
     if (w.RTGRahul && w.RTGRahul.open) return w.RTGRahul.open;
-    // het leden-OS: Rahul is daar een eigen app in het dock
-    var tab = d.querySelector('.os-dock [data-tab="ai"], .tabbar button[data-tab="ai"]');
+    // het leden-OS: Rahul heeft daar zijn eigen balk onderaan het beginscherm;
+    // is die er niet, dan doet de (verborgen) tab-knop hetzelfde
+    var balk = d.getElementById('osAiIn');
+    if (balk) return function () { balk.focus(); };
+    var tab = d.querySelector('.tabbar button[data-tab="ai"]');
     if (tab) return function () { tab.click(); };
     return null;
   }

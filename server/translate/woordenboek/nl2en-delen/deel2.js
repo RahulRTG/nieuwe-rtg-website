@@ -39,13 +39,13 @@ module.exports = {
   'Aeroport dEivissa': 'Eivissa Airport', 'Dalt Vila, Ibiza': 'Dalt Vila, Ibiza', 'Ibiza-stad, haven': 'Ibiza town, harbour',
   'Schiphol Business Aviation': 'Schiphol Business Aviation', 'Live positie': 'Live position',
   // Rahul aan de poort (aanmeldgesprek): vaste zinnen, netjes vertaald i.p.v. woord-voor-woord
-  'Hoi, ik ben Rahul. Wat kan ik voor je doen? Ik kan je aanmelden, inloggen, of eerst even uitleggen wat RTG is.':
-    "Hi, I'm Rahul. What can I do for you? I can sign you up, log you in, or first explain what RTG is.",
-  'Zeg maar gewoon wat je denkt; ik luister.': "Just say what's on your mind; I'm listening.",
-  'Allebei goed hoor. Zeg het maar: kom je inloggen, word je vandaag lid, of wil je eerst uitleg?':
-    'Either is fine. Just tell me: are you here to log in, becoming a member today, or would you like an explanation first?',
-  'Ha, welkom terug. Even kijken: welk e-mailadres of welke gebruikersnaam gebruik je hier?':
-    'Ah, welcome back. Let me see: which email address or username do you use here?',
+  'Ik ben Rahul. Aanmelden, inloggen, of eerst uitleg?':
+    "I'm Rahul. Sign up, log in, or an explanation first?",
+  'Zeg het maar.': 'Go ahead.',
+  'Kom je inloggen, word je lid, of wil je uitleg?':
+    'Are you here to log in, to become a member, or would you like an explanation?',
+  'Welkom terug. Je e-mailadres of gebruikersnaam?':
+    'Welcome back. Your email address or username?',
   'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.':
     'Welcome back. Type your password below; it goes straight into the vault, not through this conversation.',
   'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek. (Heb je sleutelwoorden ingesteld? Zeg "sleutelwoorden".)':

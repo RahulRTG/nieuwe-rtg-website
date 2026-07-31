@@ -27,7 +27,8 @@ module.exports = (kern) => {
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
     avTeken, avMijnDeals, zorgVoor, zorgContact, media, overheid: kern.overheid,
-    boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn };
+    boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn,
+    gegevensStop: kern.gegevensStop };
   require('./voertuigen/huur')(vctx);
   require('./voertuigen/charter')(vctx);
   require('./voertuigen/ontmoeten')(vctx);

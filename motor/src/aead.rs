@@ -42,6 +42,19 @@ fn chacha20_blok(sleutel: &[u8; 32], teller: u32, nonce: &[u8; 12], uit: &mut [u
 }
 
 fn chacha20_xor(sleutel: &[u8; 32], teller_start: u32, nonce: &[u8; 12], data: &mut [u8]) {
+    /* RFC 8439 heeft een 32-bit blokteller: per (sleutel, nonce) is er dus
+       hoogstens 2^32 - 1 blokken van 64 byte = ~256 GB keystream. Liet je de
+       teller stil doorrollen, dan begon je opnieuw bij hetzelfde keystream-blok
+       en dat is fataal voor een stroomcijfer: twee klaartekstenXOR liggen dan
+       open. Onbereikbaar met onze recordgroottes, maar `seal` is publiek, dus
+       hier hard stoppen in plaats van stil hergebruiken. */
+    let blokken = (data.len() as u64 + 63) / 64;
+    let ruimte = (u32::MAX as u64) + 1 - (teller_start as u64);
+    assert!(
+        blokken <= ruimte,
+        "ChaCha20: {} blokken gevraagd maar nog {} tot de tellerwrap; keystream-hergebruik geweigerd",
+        blokken, ruimte
+    );
     let mut blok = [0u8; 64];
     let mut teller = teller_start;
     let mut off = 0;
@@ -143,8 +156,11 @@ fn poly1305(sleutel: &[u8; 32], bericht: &[u8]) -> [u8; 16] {
     tag
 }
 
-// ---------- constant-time vergelijk ----------
-fn ct_eq(a: &[u8], b: &[u8]) -> bool {
+/* ---------- constant-time vergelijk ----------
+   Publiek, want dit is DE vergelijking voor alles wat geheim is: AEAD-tags,
+   betaalcodes en het motor-token. Eén geauditeerde implementatie is beter dan
+   een kopie per module (die kopieën missen dan net de black_box). */
+pub fn ct_eq(a: &[u8], b: &[u8]) -> bool {
     if a.len() != b.len() {
         return false;
     }
@@ -240,6 +256,21 @@ pub fn xseal(sleutel: &[u8; 32], nonce24: &[u8; 24], aad: &[u8], klaartekst: &[u
 pub fn xopen(sleutel: &[u8; 32], nonce24: &[u8; 24], aad: &[u8], ct_en_tag: &[u8]) -> Option<Vec<u8>> {
     let (sub, cn) = x_naar_sub(sleutel, nonce24);
     open(&sub, &cn, aad, ct_en_tag)
+}
+
+/* Niet-omkeerbare afdruk van sleutelmateriaal, voor statusweergave ("draaien we
+   nog op dezelfde sleutel?"). Dit is het eerste ChaCha20-blok onder een vaste,
+   gedomeinscheiden nonce: zonder ChaCha20 te breken valt er niets over de
+   sleutel uit af te leiden. Een FNV-mix over de sleutel is daarvoor het
+   verkeerde gereedschap -- die is als niet-cryptografische hash nooit ontworpen
+   om sleutelmateriaal te verbergen. */
+pub fn sleutel_afdruk(sleutel: &[u8; 32]) -> [u8; 8] {
+    let nonce: [u8; 12] = *b"rtg-afdr-uk1";
+    let mut blok = [0u8; 64];
+    chacha20_blok(sleutel, 0, &nonce, &mut blok);
+    let mut uit = [0u8; 8];
+    uit.copy_from_slice(&blok[..8]);
+    uit
 }
 
 /// Willekeurige bytes uit de OS-CSPRNG (/dev/urandom). Zero-dependency.

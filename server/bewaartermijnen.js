@@ -44,6 +44,14 @@ const BELEID = [
     vorm: 'lijst', datum: 'date', waarom: 'fiscale bewaarplicht (7 jaar, art. 52 AWR)' },
   { tak: 'klok', label: 'gewerkte uren (loonadministratie)', dagen: 7 * JAAR / DAG, grond: 'wettelijk',
     vorm: 'mapVanLijsten', datum: 'at', waarom: 'loonadministratie, fiscale bewaarplicht (7 jaar)' },
+  /* De maandtermijnen van een lidmaatschap, met de 30%-split naar de
+     RTFoundation. Dit is administratie: hij blijft staan als een lid zich laat
+     verwijderen, want de fiscale bewaarplicht gaat voor het wisrecht (AVG art.
+     17 lid 3 sub b). Dat het hier STAAT is het punt -- een uitzondering die
+     alleen in een test als "mag blijven" is afgevinkt, is een uitzondering die
+     niemand kan navertellen. */
+  { tak: 'lidmaatschapBetalingen', label: 'lidmaatschapstermijnen', dagen: 7 * JAAR / DAG, grond: 'wettelijk',
+    vorm: 'lijst', datum: 'at', waarom: 'fiscale bewaarplicht (7 jaar, art. 52 AWR); ook de foundation-split moet navolgbaar blijven' },
 
   // --- audit: lang genoeg om een incident te kunnen navertellen ---
   { tak: 'inzageLog', label: 'inzagejournaal identiteitskluis', dagen: 2 * JAAR / DAG, grond: 'audit',

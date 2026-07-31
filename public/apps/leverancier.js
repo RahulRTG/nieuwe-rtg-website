@@ -289,6 +289,32 @@
       e.preventDefault();
       login({ username: document.getElementById('liUser').value, password: document.getElementById('liPass').value }, true);
     });
+    /* De poort is een gesprek met Rahul, net als in de leden-app: hij vraagt de
+       gebruikersnaam, dan het wachtwoord, en belt daarna aan bij dezelfde route
+       als het formulier hiernaast (/api/supplier/login). Er gaat niets van dit
+       gesprek naar een taalmodel en Rahul beslist niets -- de server zegt ja of
+       nee. Het formulier blijft in de pagina staan als vangnet: is de poort er
+       niet, dan is er gewoon het oude blok. */
+    if (lf && window.RTGPoort && window.RTGPoort.gesprek){
+      const doos = document.createElement('div');
+      lf.parentNode.insertBefore(doos, lf);
+      lf.style.display = 'none';   // .login-form staat op display:flex, dus [hidden] alleen is niet genoeg
+      window.RTGPoort.gesprek(doos, {
+        groet: () => T('gate.rp.groet','Welkom terug.'),
+        wacht: () => T('gate.rp.wacht','Een ogenblik, ik kijk het na.'),
+        stuurLabel: T('gate.rp.stuur','Stuur'),
+        stappen: [
+          { sleutel:'username', vraag: () => T('gate.rp.wie','Met wie heb ik het genoegen?'),
+            plho: () => T('gate.user','Gebruikersnaam'), type:'text', autocomplete:'username' },
+          { sleutel:'password', vraag: () => T('gate.rp.pass','Dank u. En uw wachtwoord?'),
+            plho: () => T('gate.pass','Wachtwoord'), type:'password', autocomplete:'current-password' }
+        ],
+        klaar: async (a) => {
+          const ok = await login({ username: a.username, password: a.password }, true, true);
+          if (!ok) throw new Error(T('login.bad','Onjuiste gebruikersnaam of wachtwoord.'));
+        }
+      });
+    }
     const tog = document.getElementById('enrollToggle'), ef = document.getElementById('enrollForm');
     if (tog && ef) tog.addEventListener('click', () => {
       const open = ef.hasAttribute('hidden');
@@ -2872,7 +2898,7 @@
     const ktM = el.querySelector('#ktMAdd'); if (ktM) ktM.addEventListener('click', async () => {
       const name = el.querySelector('#ktMn').value.trim(), price = Number(el.querySelector('#ktMp').value);
       if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
-      const item = { id: 'm'+Date.now().toString(36), cat: el.querySelector('#ktMc').value.trim()||T('menu.other','Overig'), name, desc:'', price, allergens:[], station: kantoorSec };
+      const item = { id: RTGId('m'), cat: el.querySelector('#ktMc').value.trim()||T('menu.other','Overig'), name, desc:'', price, allergens:[], station: kantoorSec };
       try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); await refresh(); } catch(e){ toast(e.message); }
     });
     // de AI-bedrijfsagent: koppelen, inkoop voorstellen, goedkeuren/aanpassen/afwijzen, rooster
@@ -5429,6 +5455,29 @@
           '<button class="js-zbnaar" data-tab="boerderij" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-size:0.75rem;font-family:inherit;margin-bottom:1rem;">'+T('zb.naarboer','Naar de boerderij ›')+'</button>';
       }
     }
+    /* ---- Werkbeleid: wat staat er dicht op de passen van uw mensen? ----
+       Een bedrijf dat passen voor zijn mensen neemt, moet kunnen zeggen welke
+       functies daarop dicht staan. Eén regel maakt dat veilig, en die staat er
+       met zoveel woorden bij: u kunt alleen DICHTzetten, nooit openzetten.
+       Verplicht aanzetten van locatie, GPS of paspoort delen bestaat hier
+       bewust niet -- dat zou geen beleid zijn maar een afluisterknop.
+
+       De chips lezen als de rest van dit scherm: groen = de medewerker beslist
+       zelf, rood = wij hebben hem dicht gezet. */
+    let wb = null; try { wb = await API.call('/supplier/werkbeleid'); } catch(e){}
+    if (wb && wb.beleid){
+      const fns = (wb.beleid.functies||[]);
+      const wbChips = '<div class="sub" style="margin:0 0 0.5rem;">'+T('wb.regel','U kunt functies alleen dichtzetten, nooit openzetten. Verplicht aanzetten van locatie, GPS of paspoort delen bestaat hier bewust niet.')+'</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
+        fns.map(f => '<button class="js-wbf" data-id="'+f.id+'" data-dicht="'+f.dicht+'" title="'+esc(f.uitleg||'')+'" style="border:1px solid '+(f.dicht?'var(--rood)':'#1f5637')+';background:'+(f.dicht?'#3a1420':'#12321f')+';color:'+(f.dicht?'#F4B8C6':'#7EE0A3')+';border-radius:999px;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.dicht?'○ ':'● ')+esc(f.naam)+'</button>').join('')+
+        '</div>'+
+        (wb.beleid.gewijzigd ? '<div class="sub" style="margin-top:0.5rem;font-size:0.7rem;">'+T('wb.laatst','Laatst gewijzigd')+': '+esc(String(wb.beleid.gewijzigd).slice(0,10))+(wb.beleid.door?' · '+esc(wb.beleid.door):'')+'</div>' : '');
+      // het blok telt hoeveel er VRIJ zijn, zodat de kop leest als de andere
+      const alsFuncties = fns.map(f => ({ id:f.id, naam:f.naam, aan: !f.dicht }));
+      h += '<div class="st-sec">'+T('wb.kop','Werkbeleid op de passen van uw mensen')+'</div>'+
+        funcBlok(T('wb.functies','Vrij voor de medewerker'), alsFuncties, wbChips);
+    }
+
     // de belastingtool van de zaak: dezelfde motor als de Business Pass
     h += '<div class="st-sec">'+T('zb.bel','Belastingtool')+'</div>'+
       '<div class="sub" style="margin-bottom:0.4rem;">'+T('zb.bel.s','Vul de verwachte jaarwinst in voor een indicatie van de belasting, de nettowinst en wat u maandelijks opzij zet. Het land van de zaak is het vertrekpunt.')+'</div>'+
@@ -5456,6 +5505,18 @@
     wireFuncBlok(el);
     el.querySelectorAll('.js-zbf').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/zaak/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); await refresh(); renderZaakBoard(); } catch(e){ toast(e.message); }
+    }));
+    /* Een chip omzetten stuurt de VOLLEDIGE dicht-lijst terug, niet een los
+       aan/uit: dan kan een half mislukt verzoek nooit een beleid achterlaten
+       dat niemand zo bedoeld heeft. */
+    el.querySelectorAll('.js-wbf').forEach(b => b.addEventListener('click', async () => {
+      const dicht = [];
+      el.querySelectorAll('.js-wbf').forEach(x => {
+        const nu = x === b ? x.dataset.dicht !== 'true' : x.dataset.dicht === 'true';
+        if (nu) dicht.push(x.dataset.id);
+      });
+      try { await API.call('/supplier/werkbeleid/zet', { uit: dicht }); renderZaakBoard(); }
+      catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-zbnaar').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
     const bvSend = $('#bvSend');
@@ -5864,7 +5925,7 @@
           const body = Object.assign({ room: el.dataset.tafelrek }, extra);
           if (body.method === 'rtgpay'){
             body.payCode = await vraagPayCode(); if (!body.payCode) return;
-            body.idem = 'trek' + Date.now();
+            body.idem = RTGIdem('trek');
           }
           const d = await API.call('/supplier/pos/checkout', body);
           let boodschap = T('res.rekklaar','Rekening afgerekend:')+' '+el.dataset.tafelrek+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')';
@@ -6002,7 +6063,7 @@
     const add = $('#mnAdd'); if (add) add.addEventListener('click', async () => {
       const name = $('#mnName').value.trim(), price = Number($('#mnPrice').value);
       if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
-      const item = { id: 'm'+Date.now().toString(36), cat: $('#mnCat').value.trim()||T('menu.other','Overig'), name, desc: $('#mnDesc').value.trim(), price, allergens: $('#mnAlg').value.split(',').map(a=>a.trim().toLowerCase()).filter(Boolean), station: $('#mnStation') ? $('#mnStation').value : 'keuken' };
+      const item = { id: RTGId('m'), cat: $('#mnCat').value.trim()||T('menu.other','Overig'), name, desc: $('#mnDesc').value.trim(), price, allergens: $('#mnAlg').value.split(',').map(a=>a.trim().toLowerCase()).filter(Boolean), station: $('#mnStation') ? $('#mnStation').value : 'keuken' };
       try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); toast(T('menu.added','Staat op de kaart, gasten zien het direct.')); await refresh(); openTab('menu'); } catch(e){ toast(e.message); }
     });
   }
@@ -6286,7 +6347,7 @@
         const body = { room: b.dataset.room, method: b.dataset.method };
         if (body.method === 'rtgpay'){
           body.payCode = await vraagPayCode(); if (!body.payCode) return;
-          body.idem = 'co' + Date.now();
+          body.idem = RTGIdem('co');
         }
         const d = await API.call('/supplier/pos/checkout', body);
         toast(T('pos.checkedout','Uitgecheckt:')+' '+b.dataset.room+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')');
@@ -6335,7 +6396,7 @@
     }
     if (method === 'rtgpay'){
       body.payCode = await vraagPayCode(); if (!body.payCode) return;
-      body.idem = 'pos' + Date.now();
+      body.idem = RTGIdem('pos');
     }
     try {
       const d = await API.call('/supplier/pos/sale', body);

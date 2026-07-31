@@ -10,10 +10,11 @@
 <link href="/shared/rosthema.css" rel="stylesheet">
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   :root{
-    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
-    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.55);
+    --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
     --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -40,7 +41,7 @@
   .melding{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
 </style>
 </head>
-<body>
+<body class="rtg-stijl">
 <header>
   <div class="ey">RTG Hardwarelab</div>
   <h1>Hardware PDA</h1>

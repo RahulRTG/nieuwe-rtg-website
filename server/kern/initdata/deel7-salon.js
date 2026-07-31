@@ -58,11 +58,21 @@ module.exports = (ctx) => {
       '<text x="160" y="160" font-family="Arial,sans-serif" font-size="16" fill="#ffffff" text-anchor="middle" opacity="0.7">' + (t.label || '') + '</text></svg>';
     return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
   };
-  for (const s of db.data.suppliers) {
-    if (!s.salon) s.salon = { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
-    if (!s.salon.bio) s.salon.bio = SALON_BIO[s.type] || 'RTG-partner. Volg ons op De Salon voor aanbod en folders.';
-    if (!s.salon.foto && !(s.photos && s.photos.length)) s.salon.foto = salonFotoVoor(s);
-  }
+  /* Elke zaak een Salon-profiel. Dit staat apart en wordt door index.js OOK NA
+     het laatste zaai-deel nog een keer gedraaid, en dat is geen netheid maar een
+     reparatie: deel8 en deel9 zetten hun zaken pas hierna neer, dus die kregen
+     nooit een bio en een foto. En zonder die twee is een zaak voor leden
+     onzichtbaar (salonZichtbaar in server.js) -- ze stonden dus wel in de
+     database maar in geen enkele lijst, niet te vinden en niet te boeken.
+     Zeventien genres leken daardoor leeg terwijl de partners er gewoon waren. */
+  ctx.salonProfielen = function salonProfielen() {
+    for (const s of db.data.suppliers) {
+      if (!s.salon) s.salon = { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
+      if (!s.salon.bio) s.salon.bio = SALON_BIO[s.type] || 'RTG-partner. Volg ons op De Salon voor aanbod en folders.';
+      if (!s.salon.foto && !(s.photos && s.photos.length)) s.salon.foto = salonFotoVoor(s);
+    }
+  };
+  ctx.salonProfielen();
 
   /* Livegang-schoonmaak: in productie (zonder RTG_DEMO) horen de demozaken
      niet in de catalogus, ook niet als de database ooit als demo begon. De
@@ -75,7 +85,8 @@ module.exports = (ctx) => {
       'VORA', 'BRISA', 'FUEGO', 'LUNARA', 'MOTOISLA', 'FESTA', 'SERENA', 'ORODOR', 'LIENZO',
       'GUARDIA', 'BOMBERS', 'URGENCIA', 'CANMISSES', 'CONSULTA', 'FALCO',
       'FARMACIA', 'CARDIO', 'ESTETICA', 'GARNIZOEN', 'CASTELL',
-      'TALLER', 'BRILLA', 'VERDIA', 'LAVANDA', 'ESCOLA', 'FAUNA', 'DENTAL', 'LUZ', 'MUDANZA', 'DIGITAL'];
+      'TALLER', 'BRILLA', 'VERDIA', 'LAVANDA', 'ESCOLA', 'FAUNA', 'DENTAL', 'LUZ', 'MUDANZA', 'DIGITAL',
+      'SOMBRA', 'IVORA', 'ISLATR', 'CUIDADO', 'RUTA', 'VAKISLA'];
     const voor = db.data.suppliers.length;
     db.data.suppliers = db.data.suppliers.filter(s => !DEMO_ZAKEN.includes(s.code));
     // en de bijbehorende voorbeeldposts uit De Salon (de zes geseede verhalen)

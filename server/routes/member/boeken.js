@@ -8,10 +8,12 @@ module.exports = (kern) => {
     optieAan, zorgVoor, boekingenVoegToe, boekingenVanKlant, betaalBoekingVoor,
     notifySupplier, sseToSupplier, sseToOffice, gcCode, PERSONAS, publicSupplier,
     isFavoriet, salonZichtbaar, plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, ordersVanKlant,
-    txLedgerActief, txLedgerVanKlant, txLedgerTel } = kern;
+    txLedgerActief, txLedgerVanKlant, txLedgerTel , gegevensStop} = kern;
 
   app.post('/api/booking/request', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    // een reservering staat op naam bij een derde: die moet je kunnen bereiken
+    if (gegevensStop(req, res, 'reservering')) return;
     const s = findSupplier(req.body.supplierCode);
     const caps = s ? (db.capsVan(s)) : [];
     if (!s || !caps.includes('services')) return res.status(404).json({ error: 'Geen zelfstandige professional gevonden.' });
@@ -103,6 +105,11 @@ module.exports = (kern) => {
   });
 
   app.post('/api/order', auth, (req, res) => {
+    /* Hier komt een DERDE PARTIJ in beeld: de zaak moet je kunnen bereiken als er
+       iets misgaat met je bestelling. Ontbreekt dat nog, dan is dit geen weigering
+       maar een 428 met wat er mist -- de app opent daarmee het gesprek met Rahul
+       en doet daarna gewoon opnieuw wat je wilde. */
+    if (gegevensStop(req, res, req.body.bezorgen ? 'bezorging' : 'bestelling')) return;
     const r = plaatsOrderVoor(req.session, req.body);
     // bij een allergiebotsing reizen de botsende gerechten mee, zodat de app
     // bewust kan laten bevestigen (allergieAkkoord) in plaats van blind te falen

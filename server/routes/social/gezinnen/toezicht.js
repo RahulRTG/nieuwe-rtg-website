@@ -3,7 +3,7 @@
    Gemount vanuit routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding, lidBoard, lidBoardZet } = kern;
+  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardLog } = kern;
 /* Live-kanaal voor de RTF-vriendenlaag: net als /api/stream, maar op gezin-token.
    De verbinding staat in dezelfde sseClients-lijst, met de handle als sleutel, zodat
    dm-, snap-, verzoek- en belsignalen de RTF-app net zo bereiken als de RTG-app.
@@ -62,20 +62,45 @@ app.post('/api/rtf/social/kind/verwijder', (req, res) => {
 /* Ouderlijk beheer: de beheerder bekijkt en stuurt de boardroom van zijn
    beschermde kind bij. Dezelfde functie-motor als het lid zelf gebruikt, met de
    RTF-handle van het kind als sleutel. De voogd-check bewaakt dat het echt zijn
-   kind is; kind:true laat de functies weg die niet bij een kind horen. */
+   kind is; kind:true laat de functies weg die niet bij een kind horen.
+
+   Wat een ouder omzet, komt in het journaal van het kind te staan met door:
+   'ouder'. Een kind dat later vraagt "waarom kan ik dit niet?" hoort dat te
+   kunnen zien; een instelling die van buitenaf is gezet zonder spoor is precies
+   het soort stille voogdij dat we niet willen bouwen. */
+const kindOpts = (req) => ({ kind: true, door: 'ouder', bron: 'ouderlijk beheer', versie: req.body.versie });
+
 app.post('/api/rtf/social/kind/boardroom', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan de boardroom van een kind beheren.' });
   const kindHandle = String(req.body.kindHandle || '');
   if (!isKindVanGezin(s.g.code, kindHandle)) return res.status(403).json({ error: 'Dit is geen kind van jouw gezin.' });
-  res.json({ bord: lidBoard(kindHandle, { kind: true }) });
+  res.json({ bord: lidBoard(kindHandle, { kind: true }), logboek: lidBoardLog(kindHandle, 20) });
 });
 app.post('/api/rtf/social/kind/boardroom/zet', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan dit.' });
   const kindHandle = String(req.body.kindHandle || '');
   if (!isKindVanGezin(s.g.code, kindHandle)) return res.status(403).json({ error: 'Dit is geen kind van jouw gezin.' });
-  const r = lidBoardZet(kindHandle, String(req.body.id || ''), req.body.aan !== false, { kind: true });
+  const r = lidBoardZet(kindHandle, String(req.body.id || ''), req.body.aan !== false, kindOpts(req));
+  res.status(r.status).json(r);
+});
+// Een set in een keer, en terug naar de standaard: dezelfde motor, dezelfde
+// voogd-check. Zonder deze twee moet een ouder twintig verzoeken doen.
+app.post('/api/rtf/social/kind/boardroom/zetveel', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan dit.' });
+  const kindHandle = String(req.body.kindHandle || '');
+  if (!isKindVanGezin(s.g.code, kindHandle)) return res.status(403).json({ error: 'Dit is geen kind van jouw gezin.' });
+  const r = lidBoardZetVeel(kindHandle, req.body.standen, kindOpts(req));
+  res.status(r.status).json(r);
+});
+app.post('/api/rtf/social/kind/boardroom/herstel', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan dit.' });
+  const kindHandle = String(req.body.kindHandle || '');
+  if (!isKindVanGezin(s.g.code, kindHandle)) return res.status(403).json({ error: 'Dit is geen kind van jouw gezin.' });
+  const r = lidBoardHerstel(kindHandle, kindOpts(req));
   res.status(r.status).json(r);
 });
 };

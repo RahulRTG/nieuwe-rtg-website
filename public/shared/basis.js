@@ -1,5 +1,5 @@
 /* De gedeelde basis-laag: het vangnet dat elke app-pagina op 9+-niveau houdt.
-   Eén klein script, vier stille taken:
+   Eén klein script, vier stille taken (RTGId woont in shared/id.js):
    1. offline: registreert de juiste service worker (leden-OS of RTFoundation),
       zodat elke pagina ook zonder bereik opent, en meldt rustig als de
       verbinding wegvalt of terugkomt
@@ -22,6 +22,7 @@
   'use strict';
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
+
 
   /* ---- 1. offline: de service worker + een rustig verbindingsseintje ---- */
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

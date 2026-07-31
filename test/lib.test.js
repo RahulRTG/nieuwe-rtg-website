@@ -84,3 +84,61 @@ test('kluis: versleuteling-at-rest is omkeerbaar, merkt geknoei, en laat plainte
   assert.equal(res.knoeiGemerkt, true, 'aangepaste cijfertekst wordt geweigerd');
   assert.equal(res.bufRondrit, true, 'binaire versleuteling (KYC) is omkeerbaar');
 });
+
+/* lib/idem: idempotentie met verzoek-binding, gedeeld door RTG Pay en RTG Bank.
+   Een idem-sleutel voorkomt dubbel boeken bij een dubbeltik of retry, maar mag
+   NOOIT stil "gelukt" antwoorden op een ander verzoek onder dezelfde sleutel --
+   de apps bouwden hun sleutel uit Date.now(), dus die botsing is echt. */
+test('lib/idem: herhaalt bij hetzelfde verzoek en conflicteert bij een ander', async () => {
+  const maakIdem = require('../server/lib/idem');
+  const data = {};
+  let bewaard = 0;
+  const metIdem = maakIdem({ d: () => data, save: () => { bewaard++; }, naam: 'payIdem' });
+
+  let keer = 0;
+  const werk = () => { keer++; return Promise.resolve({ ok: true, boeking: 'B' + keer }); };
+
+  // eerste keer: het werk draait en wordt bewaard
+  const a = await metIdem('stuur:A:k1', 'stuur|A|B|100|p2p', werk);
+  assert.deepEqual(a, { ok: true, boeking: 'B1' });
+  assert.equal(keer, 1);
+  assert.ok(bewaard > 0, 'de sleutel is weggeschreven');
+
+  // zelfde sleutel, zelfde afdruk: herhaling, het werk draait NIET opnieuw
+  const b = await metIdem('stuur:A:k1', 'stuur|A|B|100|p2p', werk);
+  assert.equal(b.herhaald, true);
+  assert.equal(b.boeking, 'B1', 'exact hetzelfde antwoord');
+  assert.equal(keer, 1, 'het werk mag niet nog eens draaien');
+
+  // zelfde sleutel, ANDERE afdruk: conflict, en het werk draait niet
+  const c = await metIdem('stuur:A:k1', 'stuur|A|C|99999|p2p', werk);
+  assert.equal(c.status, 409);
+  assert.ok(/ander verzoek/.test(c.error));
+  assert.equal(keer, 1, 'bij een conflict mag er niets gebeuren');
+
+  // zonder sleutel: altijd gewoon uitvoeren
+  const d2 = await metIdem(null, 'x', werk);
+  assert.equal(d2.boeking, 'B2');
+});
+
+test('lib/idem: mislukt werk wordt niet bewaard, en sleutels zonder afdruk blijven werken', async () => {
+  const maakIdem = require('../server/lib/idem');
+  const data = {};
+  const metIdem = maakIdem({ d: () => data, save: () => {}, naam: 'bankIdem' });
+
+  // een fout antwoord (geen .ok) mag de sleutel niet vastzetten
+  const mis = await metIdem('sepa:NL1:k', 'sepa|NL1|100|NL2', () => Promise.resolve({ status: 402, error: 'te weinig' }));
+  assert.equal(mis.status, 402);
+  const opnieuw = await metIdem('sepa:NL1:k', 'sepa|NL1|100|NL2', () => Promise.resolve({ ok: true, n: 1 }));
+  assert.equal(opnieuw.ok, true, 'na een mislukking mag het opnieuw');
+  assert.equal(opnieuw.herhaald, undefined);
+
+  /* Een database van VOOR de binding heeft wel de sleutel maar geen afdruk. Die
+     moet zich gedragen als voorheen (herhaling), niet plots als conflict --
+     anders breekt een upgrade lopende idem-sleutels. */
+  data.bankIdem = { _keys: ['oud:1'], 'oud:1': { ok: true, oud: true } };
+  delete data.bankIdemAfdruk;
+  const oud = await metIdem('oud:1', 'heel|andere|afdruk', () => Promise.resolve({ ok: true, nieuw: true }));
+  assert.equal(oud.herhaald, true, 'zonder bekende afdruk geldt het oude gedrag');
+  assert.equal(oud.oud, true);
+});

@@ -9,7 +9,25 @@ module.exports = (ctx) => {
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
     rahulExtra, voerReisUit, voerKledingUit } = ctx;
 
+  /* De gegevenspoort geldt ook hier. Rahul doet dit met exact dezelfde functies
+     als de app-knoppen, maar hij komt NIET langs de routes -- en daar zit de
+     poort. Zonder deze regel zou hij als enige om de afspraak heen kunnen: een
+     bestelling bij een zaak plaatsen van een lid dat niemand kan bereiken.
+
+     En hij verwijst er niet voor naar de app: hij zit in een gesprek, dus hij
+     vraagt het gewoon zelf (./gegevens.js) en doet de handeling daarna alsnog. */
+  const POORT_SOORT = {
+    bestelling: 'bestelling', ticket: 'reservering', behandeling: 'reservering',
+    rit: 'reservering', reisplan: 'reservering'
+  };
+  const poort = require('./gegevens')(ctx);
+
   async function voerUit(key, codenaam, w, sess) {
+    const soortP = POORT_SOORT[w && w.soort];
+    if (soortP && sess) {
+      const vraag = poort.poortVraag(key, sess, soortP, { soort: 'voorstel', w });
+      if (vraag) return { tekst: vraag, vraagt: true };
+    }
     // bestellen: plaatsen en direct afrekenen via exact dezelfde functies
     // als de app-knoppen (ledenprijs, 86, leeftijd, zorgprofiel incluis)
     if (w.soort === 'bestelling' && sess && acties && acties.plaatsOrder) {

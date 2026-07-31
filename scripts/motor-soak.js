@@ -27,7 +27,7 @@ function maakJsEngine() {
 function motorSom() {
   return new Promise((resolve) => {
     const u = new URL('/api/motor/status', MOTOR);
-    const req = http.request({ host: u.hostname, port: u.port, path: u.pathname, method: 'POST', headers: { 'content-type': 'application/json', 'content-length': 2 } },
+    const req = http.request({ host: u.hostname, port: u.port, path: u.pathname, method: 'POST', headers: { 'content-type': 'application/json', 'content-length': 2, ...(process.env.RTG_MOTOR_TOKEN ? { 'x-rtg-motor-token': process.env.RTG_MOTOR_TOKEN } : {}) } },
       (res) => { let b = ''; res.on('data', (d) => (b += d)); res.on('end', () => { try { const j = JSON.parse(b); resolve({ som: Number(j.som), klopt: j.klopt }); } catch (e) { resolve({ fout: true }); } }); });
     req.on('error', () => resolve({ fout: true }));
     req.end('{}');

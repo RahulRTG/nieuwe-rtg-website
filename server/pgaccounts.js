@@ -73,18 +73,43 @@ function maakPgAccounts({ url, log }) {
   const upUserSQL = () => upsertSQL('users', USER_COLS);
   const upStaffSQL = () => upsertSQL('supplier_staff', STAFF_COLS);
 
+  /* WIE HET BERICHT STUURDE. Elk proces zet zijn eigen kenmerk achter de melding,
+     zodat het zijn EIGEN melding kan overslaan.
+
+     Zonder dit trok een instance zijn eigen schrijfactie terug. De volgorde:
+     de spiegel leest de lokale rij, duwt hem naar Postgres en stuurt een NOTIFY;
+     valt er in dat gaatje een tweede lokale schrijfactie op dezelfde rij, dan
+     komt de eigen melding daarna binnen, haalt de OUDE rij uit Postgres en zet
+     die met INSERT OR REPLACE over de nieuwe heen.
+
+     Dat is geen theorie. Met 100 miljoen leden in de gids is het in acht
+     pogingen een keer gereproduceerd: een lid uploadt zijn paspoort, de stand
+     gaat naar "pending", en een tel later leest hij "unverified" -- waarna RTG
+     Pay hem netjes 403 geeft met "we hebben je paspoort nodig", voor een
+     paspoort dat hij net heeft laten zien. De volgende spoelronde zette het
+     weer goed, dus in de database is niets kapot; het is een venster waarin het
+     systeem zijn eigen schrijfactie niet ziet. Elke kolom van een lid kan erin
+     vallen -- de pas, de e-mailbevestiging, de codenaam.
+
+     Een instance moet zijn eigen melding niet volgen: hij HEEFT de nieuwste
+     stand al, dat is precies waarom hij hem stuurde. Meldingen van een andere
+     instance blijven gewoon werken; daar is de melding voor. */
+  const BRON = require('crypto').randomBytes(6).toString('hex');
+
   async function upsertUser(row) {
     await pool.query(upUserSQL(), USER_COLS.map(c => row[c] === undefined ? null : row[c]));
-    await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + row.id]);
+    await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + row.id + ':' + BRON]);
   }
   async function upsertStaff(row) {
     await pool.query(upStaffSQL(), STAFF_COLS.map(c => row[c] === undefined ? null : row[c]));
-    await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'staff:' + row.id]);
+    await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'staff:' + row.id + ':' + BRON]);
   }
   async function deleteUser(id) {
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
-    await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + id]);
+    await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + id + ':' + BRON]);
   }
+  // voor de spiegel: is deze melding van onszelf?
+  const vanMij = payload => String(payload || '').split(':')[2] === BRON;
 
   async function luister(onWijziging) {
     luisterClient = await pool.connect();
@@ -98,7 +123,7 @@ function maakPgAccounts({ url, log }) {
     try { await pool.end(); } catch (e) {}
   }
 
-  return { schema, reserveerBlok, pullAlles, upsertUser, upsertStaff, deleteUser, luister, sluit, pool, USER_COLS, STAFF_COLS };
+  return { schema, reserveerBlok, pullAlles, upsertUser, upsertStaff, deleteUser, luister, sluit, pool, vanMij, BRON, USER_COLS, STAFF_COLS };
 }
 
 module.exports = { maakPgAccounts };

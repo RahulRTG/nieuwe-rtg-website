@@ -60,6 +60,19 @@ function upsertLocalStaff(r) {
 }
 async function pullEen(payload) {
   try {
+    /* Onze eigen melding overslaan. Volgt dit proces zijn eigen NOTIFY, dan
+       haalt het de rij op zoals die op DAT moment in Postgres staat en zet die
+       met INSERT OR REPLACE over de lokale heen. Is er in de tussentijd lokaal
+       nog iets aan diezelfde rij geschreven -- en dat gaatje is precies een
+       Postgres-heen-en-weer breed -- dan gaat die schrijfactie verloren tot de
+       volgende spoelronde. Zie server/pgaccounts.js voor de meting: op 100M
+       leden reverteerde een net geuploade paspoortstand zichtbaar naar
+       "unverified", waarna RTG Pay om een paspoort vroeg dat er al lag.
+
+       Wij hebben de nieuwste stand al -- dat is waarom we de melding stuurden.
+       Meldingen van een ANDERE instance blijven gewoon binnenkomen; daar is het
+       hele kanaal voor. */
+    if (pg && pg.vanMij && pg.vanMij(payload)) return;
     const [soort, idStr] = String(payload).split(':'); const id = Number(idStr);
     if (soort === 'user') {
       const { rows } = await pg.pool.query('SELECT * FROM users WHERE id = $1', [id]);

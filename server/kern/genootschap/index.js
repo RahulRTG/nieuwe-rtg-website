@@ -41,7 +41,7 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
     return g;
   }
 
-  const groepMet = (id) => { const g = S(); return g.groepen.find(x => String(x.id) === String(id)) || null; };
+  const groepMet = id => { const g = S(); return g.groepen.find(x => String(x.id) === String(id)) || null; };
   const lidRegel = (gr, key) => (gr.leden || []).find(l => l.key === key) || null;
   const isLid = (gr, key) => !!lidRegel(gr, key);
   const isBeheer = (gr, key) => { const l = lidRegel(gr, key); return !!(l && l.rol === 'beheerder'); };
@@ -96,25 +96,11 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
       if (veld === 'naam' && !t) return { error: 'Een genootschap zonder naam kan niet.' };
       gr[veld] = t;
     }
-    /* DE ZICHTBAARHEID KAN ALLEEN DICHTER, NOOIT OPENER.
-
-       SOORTEN staat op volgorde van open naar dicht (openbaar, besloten,
-       geheim), dus "dichter" is simpelweg een hogere plek in die lijst.
-
-       Waarom deze kant op eenrichtingsverkeer is: wie zich bij een GEHEIM
-       genootschap aansluit, doet dat onder die beslotenheid. Kon het bestuur
-       daarna op "openbaar" klikken, dan staat diezelfde persoon opeens in een
-       lijst die iedereen kan doorzoeken -- zonder dat hem iets gevraagd is, en
-       zonder dat hij het merkt. Dat is precies het soort stille verschuiving
-       waar het codenaam-ontwerp van dit huis tegen bedoeld is.
-
-       Andersom is er geen bezwaar: een groep dichttrekken neemt niemand iets
-       af. Wil een bestuur echt naar buiten, dan richten ze een openbaar
-       genootschap op en nodigen ze hun leden uit -- dan zegt ieder zelf ja. */
+    // Alleen DICHTER, nooit opener; zie test/genootschap-beheer.test.js.
     if (v.soort !== undefined && SOORTEN.includes(v.soort)) {
-      const nu = SOORTEN.indexOf(gr.soort) < 0 ? SOORTEN.indexOf('besloten') : SOORTEN.indexOf(gr.soort);
-      if (SOORTEN.indexOf(v.soort) < nu)
-        return { error: 'Een genootschap kan alleen beslotener worden, niet opener. Wie zich onder beslotenheid aansloot, wordt niet achteraf zichtbaar.' };
+      const staat = SOORTEN.indexOf(gr.soort) < 0 ? 1 : SOORTEN.indexOf(gr.soort);
+      if (SOORTEN.indexOf(v.soort) < staat)
+        return { error: 'Een genootschap kan alleen beslotener worden, niet opener: wie onder beslotenheid instapte wordt niet achteraf zichtbaar.' };
       gr.soort = v.soort;
     }
     save();

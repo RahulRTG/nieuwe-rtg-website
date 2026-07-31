@@ -97,14 +97,34 @@ async function ledenGidsExact(codename) {
     return { key: r.rows[0].key, codename: r.rows[0].codename, tier: r.rows[0].tier };
   } catch (e) { return null; }
 }
-// Zoeken op (deel van) een codenaam, geindexeerd en begrensd.
+/* Zoeken op (deel van) een codenaam, geindexeerd en begrensd.
+
+   DE LIMIT MAAKTE DE TRIGRAM-INDEX ONBRUIKBAAR. Op 100M leden gemeten:
+   LIKE '%...%' LIMIT 20 gaf een Seq Scan over 100M rijen (29.821 ms); dezelfde
+   vraag met de index 0,3 ms. De schatting is de dader: Postgres kent voor
+   LIKE '%...%' geen selectiviteit, gokt op 10.000 treffers, en met LIMIT 20
+   lijkt een seq scan dan al na 0,2% klaar. Het waren er twee.
+
+   OFFSET 0 als hek werkt niet (PG16 vlakt het uit); een CTE met MATERIALIZED
+   wel. De ruil: een veelvoorkomende term gaat van 0,3 naar 600 ms. Goede kant
+   op -- 600 ms is te doen, 30 seconden is stuk.
+
+   EN DE EXACTE WEG EERST: een VOLLEDIGE codenaam hoort niet in een
+   deelzoektocht. Dat is 4 ms op de btree. */
 async function ledenGidsZoek(qLower, limit) {
   if (!ledenPool) return [];
+  const q = String(qLower || '').trim();
+  const max = limit || 20;
+  // 1. de exacte weg: O(log n) op de btree, en meteen klaar bij een volle codenaam
+  const precies = q ? await ledenGidsExact(q) : null;
   try {
-    const r = await ledenPool.query('SELECT key, codename, tier FROM member_dir WHERE codename_lower LIKE $1 LIMIT $2', ['%' + String(qLower || '') + '%', limit || 20]);
-    // De gevonden leden meteen in de per-sleutel cache warmen: wie iemand net via
-    // de zoekindex vond en daarna op de sleutel opzoekt (codeExists bij verbinden
-    // of bellen) moet die synchroon terugvinden, niet op een koude cache stuiten.
+    // 2. de deelzoektocht, met het hek eromheen zodat de LIMIT de planner niet
+    //    langs de index stuurt (PG11 en ouder kent MATERIALIZED niet: zie catch)
+    const r = await ledenPool.query(
+      'WITH treffers AS MATERIALIZED (SELECT key, codename, tier FROM member_dir WHERE codename_lower LIKE $1) '
+      + 'SELECT key, codename, tier FROM treffers LIMIT $2', ['%' + q + '%', max]);
+    // gevonden leden meteen in de per-sleutel cache warmen: wie iemand net vond
+    // en daarna op sleutel opzoekt (verbinden, bellen) mag geen koude cache zien
     if (ledenCache.size > 100000) ledenCache.clear();
     for (const row of r.rows) ledenCache.set(row.key, { codename: row.codename, tier: row.tier });
     const uit = r.rows.map(row => ({ key: row.key, codename: row.codename, tier: row.tier }));
@@ -113,12 +133,25 @@ async function ledenGidsZoek(qLower, limit) {
     // net gebeurd), voeg die dan toe. Zo vindt een exacte opzoeking (p2p-betaling,
     // uitnodiging, bellen) een zojuist actief lid meteen, zonder op de index te
     // wachten. Substring-zoeken over miljoenen blijft volledig Postgres-gedekt.
-    const rev = ledenRev.get(String(qLower || '').trim());
+    const rev = ledenRev.get(q);
     if (rev && !uit.some(x => x.key === rev.key)) uit.push({ key: rev.key, codename: rev.codename, tier: rev.tier });
-    return uit;
+    // de exacte treffer hoort vooraan, en maar een keer
+    if (precies && !uit.some(x => x.key === precies.key)) uit.unshift(precies);
+    return uit.slice(0, max);
   } catch (e) {
-    const rev = ledenRev.get(String(qLower || '').trim());
-    return rev ? [{ key: rev.key, codename: rev.codename, tier: rev.tier }] : [];
+    // Kent deze Postgres MATERIALIZED niet: dezelfde vraag zonder hek. Trager,
+    // maar waar -- stilletjes leeg teruggeven is erger dan traag.
+    try {
+      const r2 = await ledenPool.query('SELECT key, codename, tier FROM member_dir WHERE codename_lower LIKE $1 LIMIT $2', ['%' + q + '%', max]);
+      const uit2 = r2.rows.map(row => ({ key: row.key, codename: row.codename, tier: row.tier }));
+      if (precies && !uit2.some(x => x.key === precies.key)) uit2.unshift(precies);
+      return uit2.slice(0, max);
+    } catch (e2) {
+      const rev = ledenRev.get(q);
+      const uit3 = rev ? [{ key: rev.key, codename: rev.codename, tier: rev.tier }] : [];
+      if (precies && !uit3.some(x => x.key === precies.key)) uit3.unshift(precies);
+      return uit3;
+    }
   }
 }
 

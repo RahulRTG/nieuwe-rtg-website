@@ -60,9 +60,12 @@ const PUB = path.join(__dirname, '..', 'public');
 const BEWUSTE_STOP = /(^|: )geen sessie$/;
 
 /* Pagina's die vandaag nog een echte fout gooien, met de reden erbij. */
-const MAG_STUK = {
-  '/apps/rtgschool.html': 'fout uit apps/rtgschool/leer.js terwijl start() uitgelogd niet hoort te draaien; oorzaak nog niet gevonden'
-};
+/* LEEG, en dat hoort zo. De laatste bewoner was /apps/rtgschool.html: uitgelogd
+   vervangt dat scherm zijn hele #main door de inlogkaart, en leer.js hing zijn
+   luisteraar op #oefenOpties BUITEN start() -- op een element dat er dan niet
+   meer is. Dat het "in start()" leek te gebeuren was juist de misleiding; de
+   luisteraar staat nu waar de andere twaalf al stonden. */
+const MAG_STUK = {};
 
 function laadBrowser() {
   for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {

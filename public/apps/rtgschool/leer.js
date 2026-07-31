@@ -123,12 +123,6 @@
     } catch (e) { meld(e.message); }
   }
 
-  // de opties worden per vraag opnieuw getekend; een luisteraar op de
-  // container vangt ze allemaal, zonder per knop opnieuw te binden
-  document.getElementById('oefenOpties').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-antw]');
-    if (b) oefenAntwoord(b.dataset.antw);
-  });
 
   async function laadPaspoort() {
     MIJN = await api('/api/onderwijs/mijn');
@@ -141,6 +135,19 @@
       vulKiezers();
       await laadPaspoort();
     } catch (e) { meld(e.message); }
+    /* De opties worden per vraag opnieuw getekend; een luisteraar op de
+       container vangt ze allemaal, zonder per knop opnieuw te binden.
+
+       Hij stond hierboven, BUITEN start(), en dat was de fout waar de
+       paginascan al een ronde over klaagde. Uitgelogd vervangt het scherm
+       zijn hele #main door de inlogkaart -- #oefenOpties bestaat dan niet
+       meer, en een getElementById op niets kreeg alsnog een addEventListener.
+       Dat is geen fout van start(): die draaide helemaal niet. Alles wat aan
+       de DOM hangt hoort binnen start(), zoals in examen.js en bijles.js. */
+    document.getElementById('oefenOpties').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-antw]');
+      if (b) oefenAntwoord(b.dataset.antw);
+    });
     document.getElementById('inschrijfKnop').addEventListener('click', async function () {
       var f = document.getElementById('ladderKies').value;
       if (!f) { meld('Kies eerst een fase op de ladder.'); return; }

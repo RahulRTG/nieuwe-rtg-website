@@ -492,6 +492,48 @@
   .vp.bezig{color:var(--gold);border-color:rgba(169,143,28,0.5);}
   .vp.warm{color:#FF8589;border-color:rgba(229,72,77,0.55);}
   .vp.pas{color:#7BC79B;border-color:rgba(46,125,91,0.55);}
+  /* ------------------------------------------------------------------
+     HET WERKSCHERM VAN DE KEUKEN LEEST OP DRIE METER, NIET OP DERTIG CENTIMETER.
+
+     Een KDS hangt aan de muur boven de pas. Wie ernaar kijkt heeft zijn
+     handen vol, kijkt een halve seconde en moet dan weten: welke bon, hoe
+     lang staat hij, wat moet erop. Alles wat die halve seconde kost, kost
+     hem twee keer -- een keer bij het lezen en een keer bij het terugkijken.
+
+     Daarom hier, en alleen hier binnen #station, een grotere maatvoering:
+
+     - De boncode is de sterkste regel op de kaart, in Inter met tabelcijfers
+       in plaats van Bodoni Moda. Dat is geen breuk met de huisregels maar de
+       toepassing ervan: Bodoni is voor koppen en display, Inter voor
+       functionele tekst. Een boncode die iemand moet overroepen naar de
+       bediening is functionele tekst. Cijfers met vaste breedte staan stil
+       als de klok doortelt.
+     - De wachttijd is het tweede getal dat telt en stond op 0.78rem; die
+       leest op afstand niet.
+     - De gerechtregels dragen het eigenlijke werk en gaan mee omhoog.
+     - De tijdband op de kaartrand wordt dikker: dat is de enige kleur die
+       vanaf de andere kant van de keuken nog telt.
+     ------------------------------------------------------------------ */
+  #station .tkc{padding:1.05rem 1.1rem;gap:0.6rem;}
+  #station .tkc.ok{border-top-width:6px;}
+  #station .tkc.warn{border-top-width:6px;}
+  #station .tkc.late{border-top-width:6px;}
+  #station .tkc-code{font-family:Inter,system-ui,sans-serif;font-size:2.1rem;font-weight:700;
+    letter-spacing:0.02em;line-height:1.05;font-variant-numeric:tabular-nums;color:var(--txt);}
+  #station .tkc-age{font-size:1.05rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:8px;}
+  #station .tkc-items{font-size:1.2rem;line-height:1.45;gap:0.35rem;}
+  #station .tkc-items b{font-size:1.2rem;font-variant-numeric:tabular-nums;}
+  #station .tkc-alg{font-size:0.92rem;}
+  /* De keukenhulp is advies, geen bon. Hij stond bovenaan en duwde het echte
+     werk naar de onderste helft van het scherm; als grid-item gaat hij met
+     een enkele regel naar achteren. Terugdraaien is die regel weghalen. */
+  #station #coachBox{order:1;}
+  /* De sectiekop haalde het contrast niet. keukenlicht.js zet overdag
+     --soft op rgba(36,26,30,0.52); op de ivoren dagachtergrond komt dat op
+     ongeveer 2,6:1 uit en dat is onder elke grens. Op een scherm aan de muur
+     is een kop die je moet zoeken geen kop. Vandaar --muted, iets groter en
+     zwaarder: hetzelfde ingetogen register, wel leesbaar. */
+  #station .st-sec{color:var(--muted);font-size:0.78rem;font-weight:700;letter-spacing:0.14em;margin-top:0.9rem;}
   .tkc-who{font-size:0.7rem;color:var(--soft);}
   .tkc-items{display:flex;flex-direction:column;gap:0.3rem;font-size:0.98rem;line-height:1.4;}
   .tkc-items b{color:var(--gold);margin-right:0.45rem;}

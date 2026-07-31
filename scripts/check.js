@@ -743,5 +743,90 @@ console.log('\n19) geen twee gedeelde modules die dezelfde window-naam opeisen')
   if (!bots) ok(claims.size + ' gedeelde window-namen, elk van precies een module (' + MAG_SAMEN.size + ' benoemd als gedeeld)');
 }
 
+/* 20) EEN PLAATSELIJK PALET MOET DE GLOBALE SCHILDERREGELS BEANTWOORDEN.
+
+   Sommige schermen verven zichzelf om. shared/keukenlicht.js doet dat met het
+   werkplekscherm: overdag een licht, functioneel palet, 's nachts een donker,
+   en het zet die kleuren als tokens (--bg, --card2, --txt, ...) rechtstreeks
+   op #station.
+
+   Dat werkt voor alles wat die tokens leest -- maar niet voor wat er OVERHEEN
+   geschilderd wordt door een globale regel die een ANDER token leest. In
+   shared/rtg-ui.css staat `body.rtg-stijl select{background:var(--rtg-card2)}`.
+   Die selector is specifieker dan de eigen `.st-in` van het scherm, en
+   --rtg-card2 is de globale, donkere waarde die keukenlicht.js niet omzet.
+   Gevolg: pikzwarte keuzelijsten op een ivoren scherm. Precies dezelfde vorm
+   als de naambotsing van regel 19, alleen in CSS: het plaatselijke wint niet
+   van het globale, en niemand ziet het tot iemand ernaar kijkt.
+
+   Deze regel eist daarom: elk vlak met een eigen palet moet voor elk GEWOON
+   element dat globaal geschilderd wordt (input, select, textarea, button) een
+   eigen regel hebben die uit het eigen palet leest. Klassen tellen niet mee --
+   die staan in de opmaak en zijn dus een keuze; een <select> komt er vanzelf
+   in zodra iemand een formulier neerzet. */
+console.log('\n20) een plaatselijk palet beantwoordt de globale schilderregels');
+{
+  const MAG_GLOBAAL = new Map([
+    // ['#station button', 'reden waarom dit vlak deze soort niet zelf hoeft te zetten']
+  ]);
+  const ELEMENTEN = ['input', 'select', 'textarea', 'button'];
+  const TOKENS = ['bg', 'card', 'card2', 'line', 'txt', 'muted', 'soft'];
+
+  // 1. welke vlakken verven zichzelf om? (een gedeelde module die minstens
+  //    drie van de oppervlakte-tokens op een eigen selector zet)
+  const vlakken = [];
+  loop(path.join(ROOT, 'public', 'shared'), /\.js$/, f => {
+    const bron = fs.readFileSync(f, 'utf8');
+    const gezet = TOKENS.filter(t => bron.includes("'--' + k") || bron.includes("setProperty('--" + t));
+    if (!bron.includes("setProperty('--")) return;
+    const noemt = TOKENS.filter(t => new RegExp("['\"]" + t + "['\"]").test(bron)).length;
+    if (noemt < 3) return;
+    const m = bron.match(/var\s+SEL\s*=\s*'([^']+)'/) || bron.match(/querySelector\('(#[a-zA-Z0-9_-]+)'\)/);
+    if (m) vlakken.push({ sel: m[1], bestand: path.relative(ROOT, f).replace(/\\/g, '/') });
+    void gezet;
+  });
+
+  // 2. welke gewone elementen worden globaal geschilderd uit een --rtg-token?
+  const globaal = new Set();
+  loop(path.join(ROOT, 'public', 'shared'), /\.css$/, f => {
+    const css = fs.readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, ' ');
+    const re = /([^{}]+)\{([^}]*)\}/g;
+    let m;
+    while ((m = re.exec(css))) {
+      const body = m[2].replace(/\s+/g, ' ');
+      if (!/(background|color|border-color)\s*:[^;]*var\(--rtg-/.test(body)) continue;
+      for (let deel of m[1].split(',')) {
+        deel = deel.trim().replace(/\s+/g, ' ');
+        const blad = deel.replace(/^body\.rtg-stijl\s+/, '');
+        if (blad === deel) continue;                   // niet globaal geworteld
+        const naam = (blad.match(/^([a-z]+)(?::|::|\[|$)/) || [])[1];
+        if (naam && ELEMENTEN.includes(naam)) globaal.add(naam);
+      }
+    }
+  });
+
+  // 3. beantwoordt elk vlak ze allemaal?
+  let alleCss = '';
+  loop(path.join(ROOT, 'public'), /\.(css|html)$/, f => {
+    if (path.relative(ROOT, f).replace(/\\/g, '/').startsWith('public/dist/')) return;
+    alleCss += fs.readFileSync(f, 'utf8');
+  });
+  let open = 0;
+  for (const v of vlakken) {
+    for (const el of globaal) {
+      const sleutel = v.sel + ' ' + el;
+      if (MAG_GLOBAAL.has(sleutel)) continue;
+      const patroon = new RegExp(v.sel.replace('#', '#') + '\\s+' + el + '\\b');
+      if (patroon.test(alleCss)) continue;
+      open++;
+      fout('het vlak ' + v.sel + ' (' + v.bestand + ') verft zichzelf om, maar <' + el + '> wordt globaal' +
+        ' geschilderd uit een --rtg-token en krijgt daar geen eigen regel -- zet "' + sleutel + '{...}"' +
+        ' met de eigen tokens, of noem het in MAG_GLOBAAL');
+    }
+  }
+  if (!open) ok(vlakken.length + ' vlak(ken) met een eigen palet beantwoorden elk ' + globaal.size +
+    ' globaal geschilderd element (' + MAG_GLOBAAL.size + ' benoemd als uitzondering)');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

@@ -242,6 +242,17 @@ body.rtg-stijl .knop:hover{border-color:color-mix(in srgb,var(--rtg-acc) 55%,var
 body.rtg-stijl .knop:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;}
 body.rtg-stijl .knop[disabled]{opacity:.45;cursor:not-allowed;}
 body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+/* .prim is de variant die de pagina's zelf al jaren schrijven voor "dit is de
+   handeling waar het om gaat": publiceren, versturen, vastleggen. Die eigen
+   regel verloor het van `body.rtg-stijl .knop` hierboven -- die is specifieker --
+   en dus zag de belangrijkste knop op het scherm er precies zo uit als de knop
+   ernaast. Op de verslaggevers-PDA stonden "Publiceer nu" en "Bewaar als
+   concept" niet te onderscheiden.
+
+   Hier hoort hij, in de kit, op dezelfde hoogte als de regel die hem overschreef,
+   met het accent uit het palet in plaats van een kleur per pagina. */
+body.rtg-stijl .knop.prim{background:var(--rtg-acc);border-color:var(--rtg-acc);color:#fff;font-weight:700;}
+body.rtg-stijl .knop.prim:hover{filter:brightness(1.07);}
 body.rtg-stijl .knop.vol:hover{filter:brightness(1.07);}
 body.rtg-stijl .knop.weg{color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
 /* .klein is de derde maat uit de woordenschat van het huis, naast .vol en .weg:

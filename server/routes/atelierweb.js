@@ -14,7 +14,13 @@ module.exports = (kern) => {
   app.post('/api/office/atelierweb/fotos', officeAuth, (req, res) => res.json({ fotos: atelierweb.fotos() }));
   app.post('/api/office/atelierweb/foto', officeAuth, async (req, res) => {
     const dataUrl = String((req.body || {}).dataUrl || '');
-    if (!/^data:image\/(jpeg|png|webp|gif);base64,/.test(dataUrl)) return res.status(400).json({ error: 'Kies een afbeelding (jpg, png, webp of gif).' });
+    /* jpeg, png en webp, en met opzet geen gif: server/media.js slaat alleen
+       die drie op en /media serveert alleen die drie. Stond gif hier wel
+       toegestaan, dan kwam het bestand door deze deur en door de
+       Ontsmetter heen om daarna te stranden op "kon niet worden
+       opgeslagen" -- een onbegrijpelijke fout voor iets wat de app zelf
+       zei aan te nemen. */
+    if (!/^data:image\/(jpeg|png|webp);base64,/.test(dataUrl)) return res.status(400).json({ error: 'Kies een afbeelding (jpg, png of webp).' });
     if (dataUrl.length > FOTO_MAX_BYTES * 1.4) return res.status(400).json({ error: 'De foto is te groot (max ~2 MB).' });
     // eerst door de Ontsmetter: besmette bestanden komen er niet in
     const veilig = antivirus && antivirus.veiligeFoto ? antivirus.veiligeFoto(dataUrl, { bron: 'atelier-foto' }) : { ok: true };

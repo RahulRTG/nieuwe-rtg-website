@@ -3,6 +3,7 @@
    het lid in (snelle check-in), en ziet wie er aan boord is. De zaak tekent zelf
    lijnen en haltes op de kaart (routetekenaar) en heeft een live vloot-/omzetoverzicht.
    Krijgt de gedeelde ctx van kern/ov/index.js. */
+const { coord } = require('../util');
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, ensureOv, lijnVan, versVoertuig, ritStart, codes, SOORTEN } = ctx;
 
@@ -25,7 +26,7 @@ module.exports = (ctx) => {
     const vid = 'v-' + s.code + '-' + (actor && actor.staffId || 'pda');
     const v = db.data.ovVoertuigen.find(x => x.id === vid);
     if (!v) return { status: 409, error: 'Start eerst een dienst.' };
-    const lat = Number(data.lat), lng = Number(data.lng);
+    const lat = coord(data.lat, 90), lng = coord(data.lng, 180);
     if (Number.isFinite(lat) && Number.isFinite(lng)) { v.lat = lat; v.lng = lng; }
     v.at = nu(); save();
     return { status: 200, ok: true };

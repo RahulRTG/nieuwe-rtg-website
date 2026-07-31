@@ -4,6 +4,7 @@
    en werkt de status bij. Plus de AI-triage die categorie en ploeg voorstelt
    (Claude met een deterministische regel-fallback). Krijgt de gedeelde ctx van
    kern/gemeente/index.js. */
+const { coord } = require('../util');
 module.exports = (ctx) => {
   const { db, save, anthropic, nu, id, ref, schoon, seed, deGemeente, publiekeMelding,
     notify, notifySupplier, sseToSupplier, CATS, PLOEG, MELD_STATUS } = ctx;
@@ -19,7 +20,7 @@ module.exports = (ctx) => {
       id: id(), ref: ref('M'), gemeente: g ? g.code : 'GEMEENTE',
       categorie, categorieLabel: CATS[categorie], tekst,
       locatie: schoon(data.locatie, 120) || null,
-      lat: Number(data.lat) || null, lng: Number(data.lng) || null,
+      lat: coord(data.lat, 90) || null, lng: coord(data.lng, 180) || null,
       melderKey: sess.key, melder: codenaam,
       status: 'nieuw', ploeg: PLOEG[categorie], updates: [], at: nu()
     };

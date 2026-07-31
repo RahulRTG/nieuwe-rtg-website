@@ -14,6 +14,31 @@ function schoon(v, n) {
   return String(v).replace(/[<>]/g, '').slice(0, n || 120).trim();
 }
 
+/* EEN COORDINAAT, OF NIETS.
+
+   Number(null) is 0, en JSON maakt van een NaN, een undefined of een
+   ontbrekend veld precies null. Een controle met alleen Number.isFinite() --
+   of met een bereikcontrole, want 0 ligt netjes binnen elk bereik -- liet een
+   half verstuurde positie er dus als 0,0 doorheen: Null Island in de Golf van
+   Guinee. Op een SOS-route betekent dat iemand in nood met een positie aan de
+   andere kant van de wereld.
+
+   Vandaar deze ene plek. coord() geeft NaN terug voor alles wat geen echt
+   getal is, en controleert meteen of het op aarde ligt. 0,0 blijft gewoon
+   geldig: wie daar echt vaart mag zijn positie delen.
+
+   Keuringsregel 24 bewaakt dat niemand het opnieuw met de hand doet. */
+function coord(v, max) {
+  if (typeof v !== 'number' && !(typeof v === 'string' && v.trim() !== '')) return NaN;
+  const n = Number(v);
+  if (!Number.isFinite(n) || Math.abs(n) > (max || 180)) return NaN;
+  return n;
+}
+const coordPaar = (a, b) => {
+  const lat = coord(a, 90), lng = coord(b, 180);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+};
+
 // Ledenprijsgarantie: reken nooit meer dan de publieke prijs.
 function ledenPrijs(publiek, ledenprijs) {
   const p = Math.max(0, Number(publiek) || 0);
@@ -56,4 +81,4 @@ function eigenVeld(obj, sleutel) {
   return Object.prototype.hasOwnProperty.call(obj, k) ? obj[k] : undefined;
 }
 
-module.exports = { schoon, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };
+module.exports = { schoon, coord, coordPaar, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };

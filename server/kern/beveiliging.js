@@ -15,6 +15,7 @@
 
    Elk team zet zijn eigen functies aan en uit (liever te veel dan te weinig).
    maakBeveiliging(state) volgt het vaste kern-patroon. */
+const { coord } = require('./util');
 
 // De functies die een beveiligingsteam zelf aan/uit zet. Standaard alles aan.
 const BEV_FUNCTIES = [
@@ -94,8 +95,8 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
     p.naam = naam;
     p.adres = schoon(data.adres, 120) || p.adres || '';
     p.klant = schoon(data.klant, 80) || p.klant || '';
-    p.lat = Number.isFinite(Number(data.lat)) ? Number(data.lat) : (p.lat != null ? p.lat : null);
-    p.lng = Number.isFinite(Number(data.lng)) ? Number(data.lng) : (p.lng != null ? p.lng : null);
+    p.lat = Number.isFinite(coord(data.lat, 90)) ? coord(data.lat, 90) : (p.lat != null ? p.lat : null);
+    p.lng = Number.isFinite(coord(data.lng, 180)) ? coord(data.lng, 180) : (p.lng != null ? p.lng : null);
     p.minMan = getal(data.minMan, 1, 50, p.minMan || 1);
     p.shifts = Array.isArray(data.shifts) ? data.shifts.filter(x => shiftVan(x)) : (p.shifts || BEV_SHIFTS.map(x => x.id));
     p.orders = schoon(data.orders, 400) || p.orders || '';   // standing orders / briefing per post

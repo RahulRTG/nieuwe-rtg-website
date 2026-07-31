@@ -1,6 +1,7 @@
 /* Member-voertuigen (deelmodule): autoverhuur: eerlijk huren met fotostaat, SOS en live locatie.
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    routes/member/voertuigen.js. */
+const { coord } = require('../../../kern/util');
 module.exports = (vctx) => {
   const { app, auth, crypto, db, eisAccount, overheid,
     express, findSupplier, geborenVan, leeftijdVan, liveCodename,
@@ -133,7 +134,7 @@ app.post('/api/huur/sos', auth, (req, res) => {
   const h = mijnHuur(req, res); if (!h) return;
   if (HUUR_KLAAR[h.status]) return res.status(409).json({ error: 'Deze huur is al afgerond.' });
   const sos = { bericht: schoon(req.body.bericht, 200) || 'Noodsignaal', at: new Date().toISOString() };
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
   if (Number.isFinite(lat) && Number.isFinite(lng)) { sos.lat = lat; sos.lng = lng; }
   h.sos = h.sos || [];
   h.sos.push(sos);
@@ -151,7 +152,7 @@ app.post('/api/huur/locatie', auth, (req, res) => {
   if (HUUR_KLAAR[h.status]) return res.status(409).json({ error: 'Deze huur is al afgerond.' });
   const L = db.data.huurLocaties[h.ref] = db.data.huurLocaties[h.ref] || { aan: false };
   if (req.body.aan != null) L.aan = !!req.body.aan;
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
   if (L.aan && Number.isFinite(lat) && Number.isFinite(lng)) { L.lat = lat; L.lng = lng; L.at = new Date().toISOString(); }
   if (!L.aan) { delete L.lat; delete L.lng; } // uit = weg: geen spoor achterlaten
   save();

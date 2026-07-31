@@ -12,6 +12,7 @@
    maakVonk(state) volgt het vaste kern-patroon. Dit is de orkestrator: de
    poort, het profiel/de wensen en de dagselectie wonen hier; de like/match,
    het betalen, de chat en het blokkeren/melden in ./match. */
+const { coord } = require('../util');
 
 const MIN_LEEFTIJD = 18;
 const DAG_MAX = 6;            // de eindige dagselectie
@@ -59,7 +60,7 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     if (Array.isArray(data.interesses)) p.interesses = data.interesses.map(x => schoon(x, 24)).filter(Boolean).slice(0, 8);
     p.interesses = p.interesses || [];
     p.stad = schoon(data.stad, 40) || p.stad || '';
-    if (isFinite(data.lat) && isFinite(data.lng)) { p.lat = Number(data.lat); p.lng = Number(data.lng); }
+    if (isFinite(data.lat) && isFinite(data.lng)) { p.lat = coord(data.lat, 90); p.lng = coord(data.lng, 180); }
     p.blokkade = p.blokkade || [];
     p.actief = data.actief === false ? false : true;
     p.leeftijd = poort.leeftijd;

@@ -1,5 +1,6 @@
 /* Domein "supplier" (deelmodule): vervoer (live locatie, ritten aannemen en
    toewijzen, rithistorie/CSV en de vloot). Draait op de gedeelde kern. */
+const { coord } = require('../../kern/util');
 module.exports = (kern) => {
   const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
@@ -12,7 +13,8 @@ module.exports = (kern) => {
     fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
 
 app.post('/api/supplier/location', supplierAuth, (req, res) => {
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  // coord() en niet Number(): zie de uitleg bij coord() in kern/util.js
+  const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
   if (Number.isFinite(lat) && Number.isFinite(lng)) {
     req.supplier.loc = { lat, lng, label: String(req.body.label || req.supplier.loc.label || '').slice(0, 80) };
     save();

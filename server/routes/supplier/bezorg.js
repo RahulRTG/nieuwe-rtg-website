@@ -1,4 +1,5 @@
 /* Domein "supplier" (deelmodule): bezorg. Draait op de gedeelde kern. */
+const { coord } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, crypto, db, logActivity, magBezorgen, haversine, etaMinutes, managerOnly, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, orderMetRef, ordersVanZaak } = kern;
 
@@ -126,7 +127,7 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
 /* GPS van de bezorger: vluchtig (geen save), de klant krijgt positie en
    verwachte aankomsttijd live via SSE. */
 app.post('/api/supplier/bezorg/gps', supplierAuth, (req, res) => {
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return res.status(400).json({ error: 'Geen geldige positie.' });
   const s = req.supplier;
   const B = db.data.bezorgers = db.data.bezorgers || {};

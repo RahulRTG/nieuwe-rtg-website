@@ -22,6 +22,7 @@
      de toegang is van de werkgever, de keuze is van de mens.
 
    maakWerkvenster(state) volgt het vaste kern-patroon. */
+const { coord } = require('./util');
 
 const DAGEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
 const STANDEN = ['zaak', 'altijd', 'nooit', 'eigen'];
@@ -59,7 +60,7 @@ function maakWerkvenster({ db, save, klokVan, zorgVan, haversine }) {
     // de werkplek-zone: een punt met straal, of null om hem weg te halen
     if (body.plek === null) delete w.plek;
     if (body.plek && typeof body.plek === 'object') {
-      const lat = Number(body.plek.lat), lng = Number(body.plek.lng);
+      const lat = coord(body.plek.lat, 90), lng = coord(body.plek.lng, 180);
       const radiusM = Math.round(Number(body.plek.radiusM));
       if (Number.isFinite(lat) && lat >= -90 && lat <= 90 &&
           Number.isFinite(lng) && lng >= -180 && lng <= 180 &&

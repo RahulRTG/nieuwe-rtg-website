@@ -4,6 +4,7 @@
    (met vier-ogen-regel bij twee volwassenen). locatiePubliek/oppasinfoPubliek
    gaan op de context voor het gastoverzicht (foundation/gasten.js).
    Gemount vanuit foundation.js op de gedeelde context. */
+const { coord } = require('../kern/util');
 module.exports = (ctx) => {
   const { router, G, save, nu, schoon, encS, decS, sessieVan, gezinVan, profielVan, checkPin } = ctx;
 
@@ -16,7 +17,7 @@ router.post('/gezin/locatie', (req, res) => {
   const status = STATUSSEN.includes(req.body.status) ? req.body.status : schoon(req.body.status, 40) || 'onderweg';
   const rec = { pid: s.p.id, naam: s.p.naam, avatar: s.p.avatar, kleur: s.p.kleur, status, at: nu() };
   if (req.body.lat != null && req.body.lon != null) {
-    const lat = Number(req.body.lat), lon = Number(req.body.lon);
+    const lat = coord(req.body.lat, 90), lon = coord(req.body.lon, 180);
     if (isFinite(lat) && isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
       // de precieze GPS-plek ligt versleuteld op schijf
       rec.plek = encS((Math.round(lat * 1e5) / 1e5) + ',' + (Math.round(lon * 1e5) / 1e5));

@@ -1010,5 +1010,44 @@ console.log('\n23) een merkkleur heeft een spelling');
   }
 }
 
+/* ---------------------------------------------------------------------------
+   24) EEN COORDINAAT KOMT NOOIT UIT EEN KALE Number().
+
+   Number(null) is 0, en JSON maakt van een NaN, een undefined of een
+   ontbrekend veld precies null. Vijftien plekken in de server lazen een
+   positie met Number(req.body.lat) en controleerden hem daarna met
+   Number.isFinite() of met een bereikcontrole -- en 0 komt door allebei
+   heen. Een half verstuurde positie kwam er dus als 0,0 doorheen: Null
+   Island, in de Golf van Guinee.
+
+   Op een bezorgadres is dat vervelend. Op de SOS-routes van charter.js en
+   huur.js is het iets anders: dan meldt iemand in nood een positie aan de
+   andere kant van de wereld, en niets in het systeem merkt het.
+
+   coord() in kern/util.js doet het in een keer goed en op een plek. Deze
+   regel bewaakt dat niemand het opnieuw met de hand doet. 0,0 blijft gewoon
+   geldig -- wie daar echt vaart mag zijn positie delen; het gaat erom dat
+   NIETS niet stilletjes 0 wordt. */
+console.log('\n24) een coordinaat komt nooit uit een kale Number()');
+{
+  const MAG_KAAL = new Map([
+    // ['server/routes/x.js', 'reden waarom hier geen coord() gebruikt wordt']
+  ]);
+  const PAT = /\bNumber\s*\(\s*(?:req|body|data|opt|v)\??\.[\w.]*\b(lat|lng|lon|latitude|longitude)\b/g;
+  let kaal = 0, plekken = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (MAG_KAAL.has(rel)) return;
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const treffers = [...bron.matchAll(PAT)];
+    if (!treffers.length) return;
+    kaal++; plekken += treffers.length;
+    fout(rel + ': ' + treffers.length + ' keer een coordinaat uit een kale Number() -- gebruik coord() uit kern/util.js,' +
+      ' anders wordt een ontbrekende positie stilletjes 0,0');
+  });
+  if (!kaal) ok('geen enkele route leest een coordinaat met een kale Number() (' + MAG_KAAL.size + ' benoemd als uitzondering)');
+  void plekken;
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

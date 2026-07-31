@@ -1,6 +1,7 @@
 /* Member-submodule: onderweg. De live reis (start, positie-updates met
    automatische aankomst, stop, stand opvragen) en ritten aanvragen/betalen.
    Gemount vanuit routes/member.js. */
+const { coord } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, notifySupplier, notify, pushLive,
     liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor } = kern;
@@ -33,7 +34,7 @@ module.exports = (kern) => {
     const key = req.session.key;
     const L = db.data.live[key];
     if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
-    const lat = Number(req.body.lat), lng = Number(req.body.lng);
+    const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
     if (Number.isFinite(lat) && Number.isFinite(lng)) { L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); }
     // automatische aankomst binnen ~150 m van de bestemming
     const dest = L.destCode ? findSupplier(L.destCode) : null;

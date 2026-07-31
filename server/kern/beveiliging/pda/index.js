@@ -7,6 +7,7 @@
    commandocentrum wonen hier; de dienst en de patrouilleronde staan in
    ./patrouille, die rondePubliek meelevert zodat het commandocentrum de lopende
    rondes kan tonen. */
+const { coord } = require('../../util');
 module.exports = (ctx) => {
   const { db, save, findSupplier, notifySupplier, sseToSupplier, sseToOffice, logActivity,
     BEV_ERNST, id, nu, vandaag, schoon, isBeveiliging, defaults, functieAan,
@@ -33,7 +34,7 @@ module.exports = (ctx) => {
       id: id('i'), supplierCode: s.code, postId: p ? p.id : null, postNaam: p ? p.naam : (schoon(data.post, 60) || 'Onbekend'),
       guardId: gid, guardNaam: guardNaam(s, gid), soort: schoon(data.soort, 40) || 'melding',
       ernst: BEV_ERNST.includes(data.ernst) ? data.ernst : 'midden', tekst, foto,
-      lat: Number.isFinite(Number(data.lat)) ? Number(data.lat) : null, lng: Number.isFinite(Number(data.lng)) ? Number(data.lng) : null,
+      lat: Number.isFinite(coord(data.lat, 90)) ? coord(data.lat, 90) : null, lng: Number.isFinite(coord(data.lng, 180)) ? coord(data.lng, 180) : null,
       sos: false, status: 'open', at: nu()
     };
     incidenten().unshift(x);

@@ -19,6 +19,7 @@
      officiele feed in via dezelfde lijstfunctie.
 
    maakFlits(state) volgt het vaste kern-patroon. */
+const { coord } = require('./util');
 
 const SOORTEN = {
   flitser: { naam: 'Flitser', icoon: '\u{1F4F8}', ttlMin: 480 },
@@ -60,7 +61,7 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
   function meld(key, codenaam, data) {
     const soort = SOORTEN[data.soort] ? data.soort : null;
     if (!soort) return { status: 400, error: 'Onbekende soort melding.' };
-    const lat = Number(data.lat), lng = Number(data.lng);
+    const lat = coord(data.lat, 90), lng = coord(data.lng, 180);
     if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180)
       return { status: 400, error: 'Geen geldige plek.' };
     if (soort === 'flitser' && flitsVerbodenIn(data.land))

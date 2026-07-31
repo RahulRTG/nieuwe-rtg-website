@@ -2,6 +2,7 @@
    en verlofbesluiten.
    Verbatim afgesplitst uit routes/supplier.js; alleen de routes, de helpers
    komen via het kern-object binnen. */
+const { coord } = require('../../kern/util');
 module.exports = (kern) => {
   const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
@@ -78,7 +79,7 @@ app.post('/api/supplier/team/buzz', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/security', supplierAuth, (req, res) => {
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
   const loc = (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng }
     : (req.supplier.loc ? { lat: req.supplier.loc.lat, lng: req.supplier.loc.lng } : null);
   const alarm = {

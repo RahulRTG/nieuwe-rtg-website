@@ -8,6 +8,7 @@
    Dat is ook de reden dat dit los staat van het paspoortgedeelte. Wat er in
    je paspoort staat en hoe je genoemd wilt worden zijn twee verschillende
    dingen, en het tweede telt hier. */
+const { coord } = require('../kern/util');
 module.exports = (kern) => {
   const { app, auth, schoon, accounts, geloof } = kern;
 
@@ -114,7 +115,7 @@ module.exports = (kern) => {
   app.post('/api/ik/vandaag', auth, (req, res) => {
     const id = uid(req);
     if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
-    const lat = Number(req.body.lat), lon = Number(req.body.lon);
+    const lat = coord(req.body.lat, 90), lon = coord(req.body.lon, 180);
     const plek = (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180)
       ? { lat, lon } : null;
     const d = geloof.vandaagVoor(id, plek);

@@ -2,6 +2,7 @@
    bezorgpartners, bestellen (ophalen of bezorgen) en live volgen. Krijgt
    de gedeelde kern een keer bij het opstarten vanuit
    routes/member/kopen.js. */
+const { coord } = require('../../../kern/util');
 module.exports = (kern) => {
   const { PERSONAS, app, auth, betaal, centen,
     crypto, db, findPartner, findSupplier, magBezorgen,
@@ -55,7 +56,7 @@ app.post('/api/bezorg/bestel', auth, (req, res) => {
   if (levering === 'bezorgen') {
     adres = schoon(req.body.adres, 120);
     if (!adres) return res.status(400).json({ error: 'Vul een bezorgadres in.' });
-    const lat = Number(req.body.lat), lng = Number(req.body.lng);
+    const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
     if (Number.isFinite(lat) && Number.isFinite(lng)) geo = { lat, lng };
   }
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;

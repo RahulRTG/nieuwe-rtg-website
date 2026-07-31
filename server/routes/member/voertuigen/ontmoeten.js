@@ -1,6 +1,7 @@
 /* Member-voertuigen (deelmodule): de Salon-ontmoetingen: aan/uit, plek, keuze, date en SOS.
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    routes/member/voertuigen.js. */
+const { coord } = require('../../../kern/util');
 module.exports = (vctx) => {
   const { app, auth, crypto, db, eisAccount,
     express, findSupplier, geborenVan, leeftijdVan, liveCodename,
@@ -24,7 +25,7 @@ app.post('/api/ontmoeten/aan', auth, (req, res) => {
 });
 app.post('/api/ontmoeten/hier', auth, (req, res) => {
   const key = ontmoetKey(req, res); if (!key) return;
-  const r = ontmoetPos(key, Number(req.body.lat), Number(req.body.lng));
+  const r = ontmoetPos(key, coord(req.body.lat, 90), coord(req.body.lng, 180));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, nieuwe: r.nieuwe, state: ontmoetMijnState(key) });
 });
@@ -42,7 +43,7 @@ app.post('/api/ontmoeten/teken', auth, (req, res) => {
 });
 app.post('/api/ontmoeten/hier-date', auth, (req, res) => {
   const key = ontmoetKey(req, res); if (!key) return;
-  const r = ontmoetHier(key, String(req.body.dateId || ''), Number(req.body.lat), Number(req.body.lng));
+  const r = ontmoetHier(key, String(req.body.dateId || ''), coord(req.body.lat, 90), coord(req.body.lng, 180));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
 });
@@ -54,7 +55,7 @@ app.post('/api/ontmoeten/stop', auth, (req, res) => {
 });
 app.post('/api/ontmoeten/sos', auth, (req, res) => {
   const key = ontmoetKey(req, res); if (!key) return;
-  const r = ontmoetSos(key, String(req.body.dateId || ''), req.body.bericht, Number(req.body.lat), Number(req.body.lng));
+  const r = ontmoetSos(key, String(req.body.dateId || ''), req.body.bericht, coord(req.body.lat, 90), coord(req.body.lng, 180));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, sosId: r.sosId });
 });

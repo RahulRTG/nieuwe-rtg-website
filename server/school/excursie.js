@@ -5,6 +5,7 @@
      meteen gewist: bewaren duurt precies zo lang als het uitje.
    - Elke blik van de leraar of de directie op de kaart wordt gelogd, en het
      gezin leest die log mee. Kijken mag, stiekem kijken bestaat niet. */
+const { coord } = require('../kern/util');
 module.exports = (sctx) => {
   const { router, save, rid, nu, schoon, K, S, eigenVeld, klasVan, gezinSessie, leerlingVan } = sctx;
 
@@ -71,7 +72,7 @@ module.exports = (sctx) => {
   // een plek doorgeven: een begeleider (personeel), of het kind zelf met
   // toestemming van de ouder; ieder toestel geeft alleen de eigen plek door
   router.post('/school/excursie/gps', (req, res) => {
-    const lat = Number(req.body.lat), lng = Number(req.body.lng);
+    const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
     if (!(lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180))
       return res.status(400).json({ error: 'Geen geldige locatie.' });
     const tok = String(req.body.leraarToken || req.body.personeelToken || req.body.beheerToken || '');

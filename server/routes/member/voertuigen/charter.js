@@ -1,6 +1,7 @@
 /* Member-voertuigen (deelmodule): boten en jachten (charter) met dezelfde eerlijke waarborgen.
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    routes/member/voertuigen.js. */
+const { coord } = require('../../../kern/util');
 module.exports = (vctx) => {
   const { app, auth, crypto, db, eisAccount,
     express, findSupplier, geborenVan, leeftijdVan, liveCodename,
@@ -124,7 +125,7 @@ app.post('/api/charter/sos', auth, (req, res) => {
   const c = mijnCharter(req, res); if (!c) return;
   if (CHARTER_KLAAR[c.status]) return res.status(409).json({ error: 'Deze charter is al afgerond.' });
   const sos = { bericht: schoon(req.body.bericht, 200) || 'Noodsignaal op zee', at: new Date().toISOString() };
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
   if (Number.isFinite(lat) && Number.isFinite(lng)) { sos.lat = lat; sos.lng = lng; }
   c.sos = c.sos || [];
   c.sos.push(sos);
@@ -141,7 +142,7 @@ app.post('/api/charter/locatie', auth, (req, res) => {
   if (CHARTER_KLAAR[c.status]) return res.status(409).json({ error: 'Deze charter is al afgerond.' });
   const L = db.data.charterLocaties[c.ref] = db.data.charterLocaties[c.ref] || { aan: false };
   if (req.body.aan != null) L.aan = !!req.body.aan;
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
   if (L.aan && Number.isFinite(lat) && Number.isFinite(lng)) { L.lat = lat; L.lng = lng; L.at = new Date().toISOString(); }
   if (!L.aan) { delete L.lat; delete L.lng; }
   save();

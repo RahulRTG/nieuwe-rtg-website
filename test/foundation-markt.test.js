@@ -63,6 +63,11 @@ test.after(() => {
 });
 
 test('1. een advertentie plaatsen is voor volwassenen; kijken mag het kind wel', async () => {
+  /* Plaatsen zit achter TWEE sloten: de routecontrole (marktVolwassen) en de
+     motor zelf (magVerkopen === false). Van buitenaf zien we alleen dat het
+     dicht is, niet welk slot het deed -- en dat is hier geen bezwaar, want
+     allebei moeten ze blijven staan. Toets 3 rekent de routelaag apart af op
+     een aanroep waar de motor niet naar leeftijd kijkt. */
   const kind = await api('/markt/plaats', { code: verkoper.code, token: verkoper.kindToken,
     titel: 'Mijn oude step', beschrijving: 'Bijna niet gebruikt, staat mooi.', prijs: 20, akkoord: true });
   assert.equal(kind.status, 403, 'een kinderprofiel plaatst niets');
@@ -106,9 +111,16 @@ test('3. een gesprek is van de koper en de verkoper, en van niemand anders', asy
     'en schrijft er al helemaal niet in');
   assert.equal((await api('/markt/chat', zet({ chatId: 'bestaatniet' }, koper))).status, 404);
 
-  // een kind van het kopende gezin mag niet in de handel stappen
-  assert.equal((await api('/markt/antwoord', { code: koper.code, token: koper.kindToken, chatId, tekst: 'hoi' })).status, 403,
-    'chatten over een koop is voor volwassenen');
+  /* Een kind mag niet in de handel stappen. Let op WELKE aanroep dit toetst:
+     via /markt/antwoord zou het kind sowieso 403 krijgen omdat het geen partij
+     is in dit gesprek -- die bewering slaagt dus ook als de leeftijdsgrens weg
+     is, en bewijst niets. Mijn eerste versie deed precies dat. Via /markt/
+     reageer is de routecontrole (marktVolwassen) wel de enige die het
+     tegenhoudt: de motor zelf kijkt daar niet naar leeftijd. */
+  const kindReageert = await api('/markt/reageer', { code: koper.code, token: koper.kindToken,
+    id: adId, tekst: 'Mag ik hem hebben?' });
+  assert.equal(kindReageert.status, 403, 'een kind begint geen koopgesprek');
+  assert.match(kindReageert.body.error, /kinderveiligheid|volwassenen/i);
 
   assert.equal((await api('/markt/antwoord', zet({ chatId, tekst: 'Ja hoor, hij staat klaar.' }, verkoper))).status, 200);
   const na = await api('/markt/chat', zet({ chatId }, koper));

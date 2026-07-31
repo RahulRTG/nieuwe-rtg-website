@@ -17,7 +17,13 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/wensen/klaar', supplierAuth, (req, res) => {
     const lijst = bak(req.supplier.code);
-    const w = lijst[Number(req.body.index)];
+    /* Een index, en niets anders. Number(null) is 0 en JSON maakt van een
+       ontbrekend veld precies null -- dus een aanroep ZONDER index vinkte
+       stilzwijgend de eerste wens van de lijst af. Zelfde familie als de
+       coordinaten van keuringsregel 24 en de foto-index van photo/remove:
+       JavaScript geeft een bruikbaar antwoord op iets wat geen invoer is. */
+    const i = typeof req.body.index === 'number' ? req.body.index : NaN;
+    const w = Number.isInteger(i) && i >= 0 ? lijst[i] : null;
     if (!w) return res.status(404).json({ error: 'Deze wens staat niet op de lijst.' });
     w.status = w.status === 'klaar' ? 'open' : 'klaar';
     save();

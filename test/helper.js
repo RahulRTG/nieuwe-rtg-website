@@ -126,6 +126,28 @@ async function startEens(opts) {
 
 function stop(child) { if (child) try { child.kill('SIGKILL'); } catch (e) {} }
 
+/* Een NETTE stop: SIGTERM, en wachten tot het proces echt weg is.
+
+   Het verschil met stop() is geen detail. SIGKILL is een stroomstoring: de
+   server krijgt geen kans zijn write-behind te spoelen. SIGTERM is een DEPLOY:
+   hij hoort zijn laatste staat weg te schrijven voordat hij afsluit. Wie het
+   verschil niet maakt, toetst met een stroomstoring een garantie die alleen
+   over herstarts gaat -- of andersom, en dan slaagt de toets om de verkeerde
+   reden.
+
+   Wacht ten hoogste `ms` en pakt daarna alsnog door met SIGKILL, zodat een
+   hangende afsluiting de suite niet laat staan. */
+function stopNet(child, ms) {
+  return new Promise(resolve => {
+    if (!child || child.exitCode != null) return resolve();
+    let klaar = false;
+    const af = () => { if (!klaar) { klaar = true; resolve(); } };
+    child.on('exit', af);
+    try { child.kill('SIGTERM'); } catch (e) { return af(); }
+    setTimeout(() => { try { child.kill('SIGKILL'); } catch (e) {} af(); }, ms || 15000).unref();
+  });
+}
+
 /* Een lid optillen naar Lifestyle/Business langs de ENIGE geldige weg: zelf
    registreren geeft altijd hooguit RTG, dus dienen we met het ledentoken een
    aanvraag in (dat koppelt het account) en laten RTG-personeel die accepteren.
@@ -169,6 +191,6 @@ function letOpFouten(page, bak) {
   return bak;
 }
 
-module.exports = { vrijePoort, startServer, stop, elevateTier, letOpFouten,
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, letOpFouten,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

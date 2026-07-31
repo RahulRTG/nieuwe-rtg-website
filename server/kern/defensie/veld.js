@@ -20,6 +20,12 @@ module.exports = (ctx) => {
   function gewondeZet(code, id, status) {
     const g = bak(code).gewonden.find(x => x.id === id);
     if (!g) return { status: 404, error: 'Deze gewonde staat niet op het bord.' };
+    /* Geevacueerd is het eindpunt van dit bord. gewondeEvac() weigert een
+       tweede evacuatie al met 409, dus dat idee bestond -- het stond alleen
+       hier niet, en daardoor kon iemand die in een ziekenhuis lag terug op
+       'in-behandeling' in het veld. Dan zeggen twee borden iets anders over
+       dezelfde persoon, en gaat de meldkamer af op het bord dat ernaast zit. */
+    if (g.status === 'geevacueerd') return { status: 409, error: 'Deze gewonde is geevacueerd; het veldbord verandert daar niets meer aan.' };
     if (!['in-behandeling', 'stabiel', 'ontslagen'].includes(status)) return { status: 400, error: 'Kies in-behandeling, stabiel of ontslagen.' };
     g.status = status;
     save();

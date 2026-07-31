@@ -21,10 +21,25 @@ module.exports = (ctx) => {
     if (!Array.isArray(h.metingen)) h.metingen = [];
     return h;
   }
-  // het doel-profiel: standaard jezelf; iedereen in het gezin mag elkaar helpen
+  /* Het doel-profiel: standaard jezelf. Een ouder of de beheerder mag de kaart
+     van een gezinslid beheren -- dat is het hele punt van een gezinskaart, want
+     een kind van zes houdt zijn eigen medicijnen niet bij.
+
+     De omgekeerde weg stond hier eerst wel open, en dat was een gat: er werd
+     alleen gecontroleerd of het doel geen GAST was, dus een kind kon met "voor"
+     de kaart van zijn ouder aanwijzen en er doktersafspraken en groeimetingen
+     uit wissen. Datzelfde kind mocht het ochtendritme van die ouder niet
+     aanraken -- de gevoeligste kaart van de module had dus de zwakste
+     controle. De regel hieronder is letterlijk die van ochtend.js; hij was al
+     bedacht, hij stond alleen niet hier. */
+  function magBeheren(s, pid) {
+    if (pid === s.p.id) return true;
+    return ['beheerder', 'ouder'].includes(s.p.rol);
+  }
   function doelVan(s, req, res) {
     const pid = req.body.voor && s.g.profielen[req.body.voor] ? req.body.voor : s.p.id;
     if (isGast(s.g.profielen[pid])) { res.status(400).json({ error: 'Een gast heeft geen gezondheidskaart.' }); return null; }
+    if (!magBeheren(s, pid)) { res.status(403).json({ error: 'Je kunt alleen je eigen gezondheidskaart bijhouden.' }); return null; }
     return pid;
   }
 

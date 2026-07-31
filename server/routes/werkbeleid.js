@@ -13,7 +13,7 @@
    het bedrijf hier dichtzet, staat bij de medewerker op zijn eigen bord met de
    bedrijfsnaam erbij: stille voogdij bestaat hier niet. */
 module.exports = (kern) => {
-  const { app, express, supplierAuth, werkbeleidOverzicht, werkbeleidZet } = kern;
+  const { app, express, supplierAuth, managerOnly, werkbeleidOverzicht, werkbeleidZet } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; r.error ? res.status(status || 400).json({ error: r.error }) : res.status(200).json(rest); };
 
   // Het beleid van deze zaak: alle schakelbare functies, met per functie of het
@@ -27,6 +27,12 @@ module.exports = (kern) => {
      los aan/uit per functie -- dan zou een half mislukt verzoek een beleid
      achterlaten dat niemand bedoeld heeft. */
   app.post('/api/supplier/werkbeleid/zet', express.json({ limit: '16kb' }), supplierAuth, (req, res) => {
+    /* Van het management, en niet van iedereen met een zaak-inlog. Deze route
+       was de enige van zijn familie zonder die controle, en dat is hier het
+       zwaarst: wie hem kan zetten, zet in een keer voor ELKE medewerker van
+       de zaak Salon, AI en het delen van het paspoort uit. LEZEN mag het hele
+       team wel -- je hoort te weten wie je knop vasthoudt. */
+    if (!managerOnly(req, res)) return;
     const door = (req.body && req.body.door) || (req.supplier && req.supplier.name) || null;
     stuur(res, werkbeleidZet(req.supplier.code, (req.body && req.body.uit) || [], door));
   });

@@ -147,7 +147,20 @@ const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '
 // database), dan krijgt het hier de juiste naam; de kluis blijft de bron.
 // Sync-varianten: de seed draait voor 'listen', dus blokkeren kan geen kwaad
 // en zodra de poort opengaat bestaan de accounts gegarandeerd (geen race in tests).
-if (DEMO) {
+/* Waarom dit een FUNCTIE is en niet gewoon een blok.
+
+   In Postgres-modus is deze bootstrap tweemaal nodig. Hij draait hier, bij het
+   laden -- en daarna haalt accounts.startPostgres() de gedeelde users-tabel op
+   en zet die er met "Postgres wint" overheen. Dat is de juiste regel voor echte
+   data, maar hij draaide zo ook de demo-bootstrap terug. Gevolg: de eigenaar kon
+   op een gedeelde database niet inloggen met het demo-wachtwoord, de boardroom
+   bleef dicht, en De Beproeving kon haar schakelkast niet op "alles aan" zetten.
+   Twee volledige 100M-runs hebben daardoor tegen de standaard-functiestand
+   gemeten terwijl er "alles aan" in het rapport stond.
+
+   Het commentaar hierboven redeneerde over de volgorde ten opzichte van
+   'listen'. Dat klopte -- tot de Postgres-spiegel eronder kwam. */
+function zetEigenaarsAccount() {
   const DEMO_WACHTWOORD = process.env.DEMO_PASS || 'Imran';
   let u = accounts.findByLogin(eigenaar.OWNER_EMAIL);
   if (!u) {
@@ -165,8 +178,16 @@ if (DEMO) {
       accounts.saveMemberState(u.id, memberTemplate());
       accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
     }
-  } else if (accounts.realNameOf(u) !== 'Rahul Imran Ismail') {
-    u = accounts.renameUser(u.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
+  } else {
+    if (accounts.realNameOf(u) !== 'Rahul Imran Ismail') u = accounts.renameUser(u.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
+    /* EN HET WACHTWOORD OOK ALS HET ACCOUNT AL BESTOND. Dat gebeurde niet, en
+       daarmee was de demo-stand een garantie die alleen gold op een verse
+       database -- precies wanneer je hem niet nodig hebt. Op een gedeelde
+       Postgres kwam de rij ergens anders vandaan en was het wachtwoord
+       onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
+       Dit staat achter DEMO en draait dus nooit in productie. */
+    accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
+    accounts.setVerification(u.id, 'verified');
   }
   /* De sleutelbos van de eigenaar: alles zien en alles doen met het ene
      account. De kantoor- en zaak-rol staan er standaard aan gekoppeld, dus
@@ -184,6 +205,8 @@ if (DEMO) {
     save();
   }
 }
+// bij het laden; in Postgres-modus nogmaals na de gedeelde pull (zie onder)
+if (DEMO) zetEigenaarsAccount();
 
 /* Het demopersoneel per leverancier staat als pure data in een kern-module. */
 const STAFF_SEED = Object.assign({}, require('./kern/staffseed').STAFF_SEED, require('./kern/staffseed2').STAFF_SEED);
@@ -3232,7 +3255,13 @@ startSqliteSync();
 startPostgres().catch(e => log.uitzondering(e instanceof Error ? e : new Error(String(e)), { bron: 'startPostgres' }));
 // Accounts eveneens delen via PostgreSQL (zodat een registratie op instance A ook
 // op instance B werkt); zonder DATABASE_URL blijft dit inert.
-accounts.startPostgres().catch(e => log.uitzondering(e instanceof Error ? e : new Error(String(e)), { bron: 'accounts.startPostgres' }));
+accounts.startPostgres()
+  /* NOGMAALS de eigenaars-bootstrap. startPostgres() trekt de gedeelde
+     users-tabel binnen met "Postgres wint" -- terecht voor echte data, maar het
+     draaide de demo-bootstrap hierboven terug en liet de eigenaar buiten staan.
+     Alleen in demostand; in productie draait dit nooit. */
+  .then(() => { if (DEMO) { try { zetEigenaarsAccount(); } catch (e) { log.warn && log.warn('[demo] eigenaars-bootstrap na de pull mislukt: ' + e.message); } } })
+  .catch(e => log.uitzondering(e instanceof Error ? e : new Error(String(e)), { bron: 'accounts.startPostgres' }));
 // Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
 // opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke bezoekers.
 setInterval(() => {

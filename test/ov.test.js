@@ -158,10 +158,18 @@ test('7. de routetekenaar: de manager zet zelf een lijn op de kaart en leden zie
   assert.equal(weg.status, 200);
   const over = await api('/api/supplier/ov/overzicht', {}, baas);
   assert.ok(!over.body.voertuigen.some(v => /Bus 9/.test(v.naam)), 'het voertuig van de lijn is mee opgeruimd');
-  /* Bus 4 rijdt op een andere lijn en hoort er gewoon nog te staan. Zonder deze
-     regel zou een overzicht dat in zijn geheel leeg terugkomt hier groen
-     blijven, en dan is niet dat ene voertuig opgeruimd maar de hele vloot. */
-  assert.ok(over.body.voertuigen.some(v => /Bus 4/.test(v.naam)), 'de rest van de vloot rijdt door');
+  /* En het weghalen raakte alleen DIE lijn. Zonder zo'n regel zou "Bus 9 staat
+     er niet meer" ook slagen als het hele overzicht leeg terugkomt.
+
+     Let op WELKE lijst hier getuigt. Niet de voertuigen: het overzicht toont
+     alleen LIVE voertuigen (kern/ov/index.js, versVoertuig -- een positie
+     jonger dan de TTL), dus een bus die even niet meldt verdwijnt er vanzelf
+     uit. Ik had er eerst Bus 4 op afgerekend en die zakte, terecht: een
+     tijdgefilterde lijst kan niet bewijzen dat er niets is weggegooid. De
+     lijnenlijst is dat wel, want die staat er los van de tijd. */
+  const naWeg = (await api('/api/staff/ov/lijnen', {}, baas)).body.lijnen;
+  assert.equal(naWeg.length, na.length - 1, 'er ging precies een lijn af, niet de hele dienstregeling');
+  assert.ok(naWeg.length, 'en er rijden nog lijnen');
   const kaart2 = await api('/api/ov/kaart', STAD, lidB);
   assert.ok(!kaart2.body.lijnen.some(l => /Lijn 9/.test(l.naam)), 'de lijn is uit de leden-app');
 });

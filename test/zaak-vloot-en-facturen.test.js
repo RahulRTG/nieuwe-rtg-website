@@ -184,9 +184,28 @@ test('5. verbinden met een gast kan alleen als die gast live onderweg is', async
   /* De zaak verbindt met een gast die NU onderweg is, zodat de aankomst
      klaargezet kan worden. Een codenaam van iemand die niet live is bestaat
      hier dus niet -- en dat is geen technisch detail: het voorkomt dat een
-     zaak zich aan een willekeurig lid kan koppelen. */
+     zaak zich aan een willekeurig lid kan koppelen.
+
+     Deze toets ZET DAAROM EEN ECHTE LIVE GAST NEER. Zonder die opzet is
+     db.data.live leeg, en dan geeft elke verkeerde opzoeking ook netjes 404 --
+     de bewering kon dan niet falen, wat de mutatie ook aantoonde. */
   assert.equal((await api('/api/supplier/guest/connect', { codename: lidCode }, resto)).status, 404,
-    'dit lid is nu niet live onderweg');
-  assert.equal((await api('/api/supplier/guest/connect', { codename: 'BestaatNiet999' }, resto)).status, 404);
+    'zolang niemand onderweg is, valt er niemand te verbinden');
+
+  const start = await api('/api/live/start', { destCode: 'KIKUNOI', mode: 'driving' }, lid);
+  assert.equal(start.status, 200, 'het lid gaat live onderweg: ' + JSON.stringify(start.body).slice(0, 160));
+
+  assert.equal((await api('/api/supplier/guest/connect', { codename: 'BestaatNiet999' }, resto)).status, 404,
+    'een codenaam die niemand draagt, ook nu er wel iemand live is');
   assert.equal((await api('/api/supplier/guest/connect', {}, resto)).status, 404, 'zonder codenaam al helemaal niet');
+
+  const ok = await api('/api/supplier/guest/connect', { codename: lidCode }, resto);
+  assert.equal(ok.status, 200, 'met de juiste codenaam verbindt de zaak wel: ' + JSON.stringify(ok.body).slice(0, 160));
+
+  /* En de buurzaak verbindt met dezelfde gast op zijn eigen naam -- de
+     koppeling is een lijst per gast, geen exclusief slot. Wel moet elke zaak
+     de codenaam kennen; niemand komt erbij door alleen te vragen "wie is er
+     onderweg". */
+  const buur = await api('/api/supplier/guest/connect', { codename: 'BestaatNiet999' }, verhuur);
+  assert.equal(buur.status, 404, 'raden werkt niet');
 });

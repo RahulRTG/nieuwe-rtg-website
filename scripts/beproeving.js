@@ -547,6 +547,23 @@ async function misbruikBeproeving(tok) {
   if (MODE === 'postgres') rij('psql', PSQL);
   await poortVrij(); // nooit per ongeluk een oude, achtergebleven server toetsen
 
+  /* IS DE DATABASE ER UBERHAUPT? Zonder deze controle zag een onbereikbare
+     Postgres eruit als "server stopte, code 1" -- een melding waar niets in
+     staat, terwijl de oorzaak in het serverlog van een tijdelijke map lag.
+     Dat kostte een uur zoeken nadat Postgres tijdens een eerdere run door
+     geheugendruk was omgevallen. Een harnas dat de helft van zijn eigen
+     foutmeldingen niet verklaart, is zelf een blinde vlek. */
+  if (MODE === 'postgres') {
+    try { psql('SELECT 1'); }
+    catch (e) {
+      console.error('\n\x1b[31mPostgres is niet bereikbaar op de DATABASE_URL.\x1b[0m');
+      console.error('  ' + String(e.message || e).split('\n')[0]);
+      console.error('  \x1b[2mDraait hij nog? Een postmaster die door geheugendruk is omgevallen laat een\n'
+        + '  logbestand achter dat eindigt zonder afsluitregel.\x1b[0m\n');
+      process.exit(1);
+    }
+  }
+
   // ---------- FASE A: VOLUME ----------
   kop('FASE A: VOLUME (' + MODE + ')');
   if (MODE === 'postgres') {

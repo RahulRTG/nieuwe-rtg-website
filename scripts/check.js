@@ -828,5 +828,71 @@ console.log('\n20) een plaatselijk palet beantwoordt de globale schilderregels')
     ' globaal geschilderd element (' + MAG_GLOBAAL.size + ' benoemd als uitzondering)');
 }
 
+/* 21) EEN PAGINA MAG GEEN CSS-TOKEN LEZEN DAT NERGENS GEZET WORDT.
+
+   `color: var(--tekst)` waar het huis --txt heet: de browser gooit de hele
+   declaratie weg en gaat verder alsof er niets stond. Geen foutmelding, geen
+   rode regel in de console -- de hover-kleur verandert alleen nooit. Zo stonden
+   er negen van op vijf schermen, jarenlang, en niemand kon het zien.
+
+   Deze regel kijkt per pagina naar de tokens die in haar EIGEN <style> gelezen
+   worden, en telt als "gezet" alles wat de pagina zelf, haar stylesheets of
+   haar meegeladen scripts neerzetten (ook via setProperty, want zo werkt
+   shared/keukenlicht.js). Een var() MET terugval is per definitie in orde:
+   `var(--goldop, #0C0C0B)` zegt precies wat er moet gebeuren als het token er
+   niet is. */
+console.log('\n21) geen pagina leest een css-token dat nergens gezet wordt');
+{
+  const PUB = path.join(ROOT, 'public');
+  const leesVeilig = p2 => { try { return fs.readFileSync(p2, 'utf8'); } catch (e) { return ''; } };
+  const zonderCss = t => String(t).replace(/\/\*[\s\S]*?\*\//g, ' ');
+  function gezetteTokens(bron) {
+    const uit = new Set();
+    for (const m of bron.matchAll(/(--[a-zA-Z0-9_-]+)\s*:/g)) uit.add(m[1]);
+    for (const m of bron.matchAll(/setProperty\(\s*['"](--[a-zA-Z0-9_-]+)['"]/g)) uit.add(m[1]);
+    /* De vorm setProperty('--' + k) uit een tabel met namen: dan staan de
+       tokennamen als sleutels in een object ernaast (shared/keukenlicht.js). */
+    if (/setProperty\(\s*['"]--['"]\s*\+/.test(bron)) {
+      for (const m of bron.matchAll(/\[([^\]]*)\]\.forEach/g))
+        for (const n of m[1].matchAll(/'([a-zA-Z0-9_-]+)'/g)) uit.add('--' + n[1]);
+      for (const m of bron.matchAll(/^\s*([a-z][a-zA-Z0-9_]*)\s*:\s*['"#]/gm)) uit.add('--' + m[1]);
+    }
+    return uit;
+  }
+  let losseTokens = 0, bekeken = 0;
+  loop(PUB, /\.html$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    bekeken++;
+    const html = leesVeilig(f);
+    const def = gezetteTokens(html);
+    for (const m of html.matchAll(/<link[^>]+href="([^"]+\.css)"/gi)) {
+      const p2 = m[1].startsWith('/') ? path.join(PUB, m[1]) : path.join(path.dirname(f), m[1]);
+      for (const t of gezetteTokens(zonderCss(leesVeilig(p2)))) def.add(t);
+    }
+    for (const m of html.matchAll(/<script[^>]+src="([^"]+\.js)"/gi)) {
+      const p2 = m[1].startsWith('/') ? path.join(PUB, m[1]) : path.join(path.dirname(f), m[1]);
+      for (const t of gezetteTokens(leesVeilig(p2))) def.add(t);
+      const map = p2.replace(/\.js$/, '');
+      try {
+        if (fs.statSync(map).isDirectory())
+          for (const d of fs.readdirSync(map)) for (const t of gezetteTokens(leesVeilig(path.join(map, d)))) def.add(t);
+      } catch (e) { /* geen losse delen */ }
+    }
+    const eigenCss = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map(m => m[1]).join('\n');
+    const mist = new Set();
+    for (const m of zonderCss(eigenCss).matchAll(/var\(\s*(--[a-zA-Z0-9_-]+)\s*([,)])/g)) {
+      if (m[2] === ',') continue;               // heeft een terugval
+      if (!def.has(m[1])) mist.add(m[1]);
+    }
+    if (mist.size) {
+      losseTokens += mist.size;
+      fout(rel + ' leest ' + [...mist].join(', ') + ' maar niets zet dat -- de browser gooit die regel weg' +
+        ' zonder iets te melden; gebruik het juiste token of geef een terugval mee');
+    }
+  });
+  if (!losseTokens) ok(bekeken + ' pagina(s) lezen alleen tokens die ergens gezet worden');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

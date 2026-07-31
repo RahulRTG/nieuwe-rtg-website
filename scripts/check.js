@@ -950,5 +950,65 @@ console.log('\n22) een glyfnaam wordt getoond als beeld, niet als woord');
   void plekken;
 }
 
+/* ---------------------------------------------------------------------------
+   23) EEN MERKKLEUR HEEFT EEN SPELLING.
+
+   De merkkleuren komen exact uit het logo en staan in CLAUDE.md. Het bordeaux
+   is #7F1634. Op twintig plekken in de code stond #7F1734: een groen kanaal
+   een stap hoger. Dat verschil is met het blote oog niet te zien -- en juist
+   daarom kan niemand het ooit betrapt hebben. Het is een typefout die zich via
+   knippen en plakken over vijftien bestanden verspreidde.
+
+   Deze regel kijkt alleen naar een afstand van HOOGSTENS EEN over de drie
+   kanalen samen. Dat is de grens tussen een vergissing en een keuze: op een
+   stap van vier of vijf kiest iemand bewust een iets lichter zwart voor een
+   paneel (public/apps/office.html doet dat, met uitleg erboven). Op een stap
+   van een kiest niemand iets. Ruimer meten zou echte designkeuzes gaan
+   afkeuren, en dan is dit het soort toets dat mensen uitzetten.
+
+   Wilt u toch een kleur die er een haar naast ligt: zet hem met reden in
+   MAG_NAAST. Een uitzondering die je moet opschrijven wordt gelezen. */
+console.log('\n23) een merkkleur heeft een spelling');
+{
+  const MAG_NAAST = new Map([
+    // ['#7F1734', 'reden waarom deze bijna-merkkleur hier wel mag']
+  ]);
+  const MERK = {
+    '#FFFFFF': 'wit', '#0C0C0B': 'zwart', '#7F1634': 'bordeaux',
+    '#9E1C40': 'bordeaux-bright', '#C23A5E': 'bordeaux-op-donker', '#857007': 'goud',
+    '#DEDBD5': 'lijn', '#4D4A45': 'grijs', '#8A8680': 'grijs-zacht'
+  };
+  const kanalen = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const afstand = (a, b) => kanalen(a).reduce((n, v, i) => n + Math.abs(v - kanalen(b)[i]), 0);
+
+  const naast = new Map();   // '#XXXXXX' -> { merk, naam, plekken: [] }
+  const kijk = (map, wortel) => loop(wortel, /\.(js|css|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    for (const m of fs.readFileSync(f, 'utf8').matchAll(/#[0-9A-Fa-f]{6}\b/g)) {
+      const h = '#' + m[0].slice(1).toUpperCase();
+      if (MERK[h] || MAG_NAAST.has(h)) continue;
+      for (const [merk, naam] of Object.entries(MERK)) {
+        if (afstand(h, merk) > 1) continue;
+        if (!naast.has(h)) naast.set(h, { merk, naam, plekken: [] });
+        if (naast.get(h).plekken.indexOf(rel) < 0) naast.get(h).plekken.push(rel);
+      }
+    }
+    void map;
+  });
+  kijk(null, path.join(ROOT, 'public'));
+  kijk(null, path.join(ROOT, 'server'));
+
+  if (naast.size) {
+    for (const [h, x] of naast)
+      fout(h + ' ligt een stap naast ' + x.merk + ' (' + x.naam + ') in ' + x.plekken.length +
+        ' bestand(en), o.a. ' + x.plekken.slice(0, 3).join(', ') +
+        ' -- dat verschil ziet niemand, dus het is een typefout en geen keuze');
+  } else {
+    ok('geen enkele kleur ligt een haar naast een merkkleur (' + Object.keys(MERK).length +
+      ' merkkleuren; ' + MAG_NAAST.size + ' benoemd als uitzondering)');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

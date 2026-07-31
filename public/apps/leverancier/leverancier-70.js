@@ -4,7 +4,7 @@
         '<span style="width:96px;flex-shrink:0;font-size:0.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px;">'+esc(k.name)+'</span>'+
         '<span style="display:flex;gap:2px;overflow:hidden;">'+k.dagen.map(d =>
           '<span title="'+d.datum+(d.codenaam?', '+esc(d.codenaam):'')+'" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;border:1px solid var(--line);background:'+
-          (d.status==='ingecheckt'?'#7F1734':d.status==='bevestigd'?'#A98F1C':'transparent')+';"></span>').join('')+'</span>'+
+          (d.status==='ingecheckt'?'#7F1634':d.status==='bevestigd'?'#A98F1C':'transparent')+';"></span>').join('')+'</span>'+
       '</div>').join('')+
       '<div class="softline" style="margin-top:0.45rem;">'+T('rc.plan.s','Goud is bevestigd, rood slaapt er nu; leeg is vrij om te verkopen.')+'</div></div>';
   }

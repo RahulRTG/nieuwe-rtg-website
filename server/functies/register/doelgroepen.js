@@ -25,7 +25,7 @@ const DOELGROEPEN = [
   { id: 'leverancier', naam: 'Leveranciers', emoji: 'cercle', kleur: '#D6A32E', uitleg: 'Partners en hun personeel in de partner-app.',       synoniemen: ['leverancier', 'leveranciers', 'partner', 'partners', 'zaak', 'zaken'] },
   { id: 'personeel',   naam: 'Personeel',    emoji: 'cercle', kleur: '#B07B4E', uitleg: 'Medewerkers in de personeels-app (PDA).',            synoniemen: ['personeel', 'medewerker', 'medewerkers', 'pda', 'staff'] },
   { id: 'foundation',  naam: 'Foundation',   emoji: 'diploma', kleur: '#5AB4C9', uitleg: 'Gezinnen, leerlingen en scholen in de RTF-app.',     synoniemen: ['foundation', 'rtf', 'rtfoundation', 'school', 'scholen', 'onderwijs', 'gezin', 'gezinnen', 'leerling'] },
-  { id: 'intern',      naam: 'RTG intern',   emoji: 'cercle', kleur: '#8A8681', uitleg: 'De RTG-backoffice en integraties (intern).',         synoniemen: ['intern', 'backoffice', 'kantoor', 'rtg zelf'] }
+  { id: 'intern',      naam: 'RTG intern',   emoji: 'cercle', kleur: '#8A8680', uitleg: 'De RTG-backoffice en integraties (intern).',         synoniemen: ['intern', 'backoffice', 'kantoor', 'rtg zelf'] }
 ];
 const DOELGROEP_IDS = DOELGROEPEN.map(d => d.id);
 const DOELGROEP_OP_ID = Object.fromEntries(DOELGROEPEN.map(d => [d.id, d]));

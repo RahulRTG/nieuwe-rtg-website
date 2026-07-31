@@ -145,6 +145,10 @@ async function laadMijn(){
     try { await api('/api/reisbureau/annuleer', { ref: b.dataset.ref }); meld('Aanvraag ingetrokken.'); laadMijn(); } catch(e){ meld(e.message); }
   }));
 }
+/* Vanaf hier hoort er een ingelogd lid te zijn. Zonder token heeft de tak
+   hierboven de opmaak al vervangen, dus deze elementen bestaan niet meer en
+   liep het script hier stuk -- zonder dat iemand het zag. */
+if (TOKEN) {
 $('#adviesGo').addEventListener('click', async () => {
   const wens = $('#adviesIn').value.trim();
   if (!wens){ meld('Vertel eerst waar je zin in hebt.'); return; }
@@ -208,6 +212,7 @@ $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('ope
 $('#rMin').addEventListener('click', () => { AANTAL = Math.max(1, AANTAL-1); $('#rAantal').textContent = AANTAL; herbereken(); });
 $('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $('#rAantal').textContent = AANTAL; herbereken(); });
 $('#rBoek').addEventListener('click', boek);
+}
 </script>
 <button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>

@@ -323,6 +323,11 @@ function toonUit(u, host){
     '<div class="bedrag '+(t?'terug':(u.saldo>0?'bij':''))+'">€ '+Math.abs(u.saldo)+'</div>'+
     '<div class="meta">Belastbaar € '+u.belastbaar+' · belasting € '+u.belasting+' · heffingskorting € '+u.heffingskorting+' · ingehouden € '+u.ingehouden+'</div>';
 }
+/* Vanaf hier hoort er een ingelogd lid te zijn. De uitgelogde tak hierboven
+   vervangt #main door het RTG iD-scherm (met zijn eigen knop, die daar wel
+   gebonden wordt); de elementen van het loket zelf bestaan dan niet meer en
+   het script liep hier stuk -- zonder dat iemand het zag. */
+if (TOKEN) {
 $('#ibAiGo').addEventListener('click', async () => {
   const tekst = $('#ibAi').value.trim();
   if (tekst.length < 6){ meld('Vertel Rahul kort over je inkomen.'); return; }
@@ -509,6 +514,7 @@ async function laadBekend(){
    TOESLAGEN en VORMEN, en die worden met const pas hierboven gemaakt. Een
    const aanraken voordat hij bestaat gooit, dus bleef het scherm leeg. */
 if (TOKEN) start();
+}
 </script>
 <button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>

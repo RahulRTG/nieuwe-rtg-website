@@ -175,6 +175,10 @@ function tekenScenes(){
     try { await api('/api/home/scene/weg', { id: b.dataset.id }); laad(); } catch(e){ meld(e.message); }
   }));
 }
+/* Vanaf hier hoort er een ingelogd lid te zijn. Zonder token heeft de tak
+   hierboven #main al leeggemaakt, dus deze elementen bestaan niet meer en
+   liep het script hier stuk -- zonder dat iemand het zag. */
+if (TOKEN) {
 $('#allesUit').addEventListener('click', async () => {
   try { const r = await api('/api/home/alles-uit'); meld(r.uitgezet + ' apparaten uitgezet; sloten en de laadpaal bleven met rust.'); laad(); } catch(e){ meld(e.message); }
 });
@@ -195,6 +199,7 @@ $('#maak').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
   $('#maak').disabled = false;
 });
+}
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

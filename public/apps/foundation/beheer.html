@@ -140,7 +140,7 @@ const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
 let dAv='', dKl=KLEUREN[0], bewerkId=null, naarWie='allen';
 
 const s = Sessie.huidig();
-if (!s || !s.token){ location.href='index.html'; }
+if (!s || !s.token){ location.href='index.html'; throw new Error('geen sessie'); }
 
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid',gast:'Oppas of familie'}[p.rol]||''); }

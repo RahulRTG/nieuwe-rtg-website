@@ -73,7 +73,7 @@
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) {}
+if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
 Sessie.balk($('#balk'), { terug: 'index.html' });
 
 const LIEDJES = [

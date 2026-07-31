@@ -166,7 +166,7 @@
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisFamilie()) {}
+if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

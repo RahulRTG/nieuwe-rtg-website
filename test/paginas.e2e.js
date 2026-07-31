@@ -21,18 +21,29 @@
    schermtest -- hij vangt de categorie "deze pagina is stukgegaan en niemand
    keek", en dat is de categorie waar de rest van de suite blind voor is.
 
+   EEN BEWUSTE STOP IS GEEN FOUT
+
+   Veertig RTF-tool-pagina's beginnen met dezelfde regel:
+
+       if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+
+   eisProfiel() stuurt door naar de inlog en geeft false; de throw stopt de
+   rest van het bestand. Dat is bedoeld gedrag en het staat op 40 plekken, dus
+   die ene melding telt hier niet als fout. Alles wat anders luidt wel.
+
    DE BASISLIJN
 
-   Zestien pagina's gooien vandaag een fout. Die staan hieronder met naam en
-   reden in MAG_STUK, precies zoals de uitzonderingen in scripts/check.js: een
-   uitzondering die je moet opschrijven wordt gelezen, een stilzwijgende niet.
+   Twee pagina's gooien vandaag nog een echte fout. Die staan hieronder met
+   naam en reden in MAG_STUK, precies zoals de uitzonderingen in
+   scripts/check.js: een uitzondering die je moet opschrijven wordt gelezen,
+   een stilzwijgende niet.
 
    EEN SCHOON GEWORDEN PAGINA MELDT HIJ, MAAR LAAT HEM NIET ZAKKEN. Dat is
    geen slordigheid maar de eerlijke grens van deze scan: sommige fouten komen
-   uit een api-aanroep die NA de load binnenkomt (apps/payroll.html is er zo
-   een). Hoe lang je ook wacht, dat blijft een wedloop. Zou een schone pagina
-   de toets laten zakken, dan zakt hij vroeg of laat op de klok in plaats van
-   op de code -- en dat is precies het soort toets dat mensen uitzetten.
+   uit een api-aanroep die NA de load binnenkomt. Hoe lang je ook wacht, dat
+   blijft een wedloop. Zou een schone pagina de toets laten zakken, dan zakt
+   hij vroeg of laat op de klok in plaats van op de code -- en dat is precies
+   het soort toets dat mensen uitzetten.
 
    Draai los: node --experimental-sqlite --test test/paginas.e2e.js
    ========================================================================== */
@@ -45,28 +56,12 @@ const { startServer, stop } = require('./helper');
 
 const PUB = path.join(__dirname, '..', 'public');
 
-/* Pagina's die vandaag een onafgevangen fout gooien, met de reden erbij.
-   Alle vijftien hebben dezelfde vorm: de pagina wist bij "niet ingelogd" zijn
-   eigen opmaak (innerHTML op de hoofdcontainer) en bindt daarna alsnog een
-   luisteraar aan een element dat daarmee net verdwenen is. Het scherm dat de
-   bezoeker ziet klopt; het script stopt alleen eerder dan het denkt. */
+/* De bewuste stop van de RTF-tools: geen fout, zie de kop van dit bestand. */
+const BEWUSTE_STOP = /(^|: )geen sessie$/;
+
+/* Pagina's die vandaag nog een echte fout gooien, met de reden erbij. */
 const MAG_STUK = {
-  '/apps/foundation/beheer.html': 'leest de gezinscode uit een sessie die er uitgelogd niet is',
-  '/apps/foundation/beroepen.html': 'werpt "geen sessie" zonder gezinsprofiel',
-  '/apps/foundation/bieb.html': 'werpt "geen sessie" zonder gezinsprofiel',
-  '/apps/foundation/contact.html': 'leest de gezinscode uit een sessie die er uitgelogd niet is',
-  '/apps/foundation/geloofbieb.html': 'werpt "geen sessie" zonder gezinsprofiel',
-  '/apps/foundation/projecten.html': 'leest het profiel uit een sessie die er uitgelogd niet is',
-  '/apps/foundation/schoolbieb.html': 'werpt "geen sessie" zonder gezinsprofiel',
-  '/apps/foundation/schrijven.html': 'leest het profiel uit een sessie die er uitgelogd niet is',
-  '/apps/foundation/steun.html': 'leest het profiel uit een sessie die er uitgelogd niet is',
-  '/apps/foundation/toetsen.html': 'leest de gezinscode uit een sessie die er uitgelogd niet is',
-  '/apps/foundation/zakgeld.html': 'leest de gezinscode uit een sessie die er uitgelogd niet is',
-  '/apps/home.html': 'bindt #allesUit nadat de uitgelogde tak #main heeft leeggemaakt',
-  '/apps/overheid.html': 'bindt #idStart nadat de uitgelogde tak de opmaak heeft leeggemaakt',
-  '/apps/payroll.html': 'werpt "Geen backoffice-sessie" uit een api-aanroep die na de load binnenkomt',
-  '/apps/reisbureau.html': 'bindt #adviesGo nadat de uitgelogde tak de opmaak heeft leeggemaakt',
-  '/apps/rtgschool.html': 'bindt een luisteraar nadat de uitgelogde tak de opmaak heeft leeggemaakt'
+  '/apps/rtgschool.html': 'fout uit apps/rtgschool/leer.js terwijl start() uitgelogd niet hoort te draaien; oorzaak nog niet gevonden'
 };
 
 function laadBrowser() {
@@ -130,9 +125,10 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
         } catch (e) {
           fouten.push('LAADFOUT: ' + e.message);
         }
+        const echt = fouten.filter(m => !BEWUSTE_STOP.test(String(m)));
         const bekend = Object.prototype.hasOwnProperty.call(MAG_STUK, p);
-        if (fouten.length && !bekend) stuk.push(p + '  ->  ' + fouten[0]);
-        if (!fouten.length && bekend) genezen.push(p);
+        if (echt.length && !bekend) stuk.push(p + '  ->  ' + echt[0]);
+        if (!echt.length && bekend) genezen.push(p);
         if (probe && (!probe.titel || !probe.taal || probe.kinderen === 0)) {
           kaal.push(p + '  ->  titel=' + JSON.stringify(probe.titel) + ' lang=' + JSON.stringify(probe.taal) + ' kinderen=' + probe.kinderen);
         }

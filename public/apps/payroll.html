@@ -132,8 +132,16 @@ document.querySelectorAll('nav [data-tab]').forEach(b => b.addEventListener('cli
   $('#tabMatch').hidden = b.dataset.tab !== 'match';
   if (b.dataset.tab === 'match') laadMatch();
 }));
-$('#lrPeriode').value = new Date().toISOString().slice(0, 7);
-laadOverzicht();
+/* Pas beginnen als er een kantoorsessie is. Zonder token stuurt uitgelogd()
+   hierboven al door, maar de navigatie is niet meteen klaar en intussen liep
+   deze aanroep gewoon door -- die kwam terug met "Geen backoffice-sessie" en
+   sneuvelde als onafgevangen belofte. */
+if (TOKEN) {
+  $('#lrPeriode').value = new Date().toISOString().slice(0, 7);
+  /* Vangen hoort erbij: bij een verlopen token stuurt api() via uitgelogd()
+     door, en de belofte die daarbij sneuvelt heeft dan geen eigenaar meer. */
+  laadOverzicht().catch(e => { $('#top').innerHTML = '<p class="leeg">' + esc(e.message) + '</p>'; });
+}
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

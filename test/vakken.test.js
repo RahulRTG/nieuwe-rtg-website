@@ -20,6 +20,19 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+/* De eerstvolgende dag dat een zaak met standaard-openingstijden OPEN is.
+   Blind "morgen" nemen leek onschuldig, maar een zaak is standaard maandag t/m
+   vrijdag open (kern/vakwerk/agenda.js): op donderdag is morgen vrijdag en gaat
+   het goed, op vrijdag is morgen zaterdag en zijn er nul tijdvakken. Deze test
+   zakte dus elke vrijdag en zaterdag, aan niets anders dan de kalender. Wat hij
+   wil toetsen is boeken bij de garage, niet boeken op een zaterdag. */
+const eerstvolgendeWerkdag = () => {
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(Date.now() + i * 86400000);
+    if (d.getDay() >= 1 && d.getDay() <= 5) return d.toISOString().slice(0, 10);
+  }
+  return morgen();
+};
 
 let srv, base, lid;
 test.before(async () => {
@@ -68,11 +81,11 @@ test('3. de slotenmaker hoort bij het bouw-genre (Castell)', async () => {
 });
 
 test('4. boeken bij de garage: tijdvakken, codenaam en het vandaag-bord', async () => {
-  const slots = await api(base, '/api/booking/slots', { supplierCode: 'TALLER', serviceId: 'g1', date: morgen() }, lid.token);
+  const slots = await api(base, '/api/booking/slots', { supplierCode: 'TALLER', serviceId: 'g1', date: eerstvolgendeWerkdag() }, lid.token);
   assert.equal(slots.status, 200);
   assert.ok((slots.body.tijden || []).length > 0, 'de garage heeft vrije tijdvakken');
   const r = await api(base, '/api/booking/request', { supplierCode: 'TALLER', serviceId: 'g1',
-    date: morgen(), time: slots.body.tijden[0], note: 'APK graag' }, lid.token);
+    date: eerstvolgendeWerkdag(), time: slots.body.tijden[0], note: 'APK graag' }, lid.token);
   assert.equal(r.status, 200);
   assert.ok(r.body.boeking.customerCodename && !JSON.stringify(r.body.boeking).includes('Vakkentest'),
     'de boeking draait op de codenaam, nooit de echte naam');

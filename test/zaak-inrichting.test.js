@@ -94,8 +94,17 @@ test('1. een kamer weghalen raakt alleen de eigen zaak', async () => {
 });
 
 test('2. een foto gaat op index weg, en een index buiten bereik doet niets', async () => {
-  const voor = ((await staat(hotel)).supplier || {}).photos || (await staat(hotel)).photos || [];
-  const aantal = voor.length;
+  /* Eerst twee foto's neerzetten. Zonder die opzet had deze toets geen tanden:
+     het hotel heeft er in de seed nul, en dan slaagt "een negatieve index
+     haalt niets weg" ook als splice(-1) wel degelijk zou toeslaan -- er is
+     immers niets om weg te halen. De mutatie liep er dwars doorheen, en dat
+     was de derde keer deze week dat een bewering van mij niet kon falen. */
+  const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  const een = await api('/api/supplier/photo/add', { image: png }, hotel);
+  assert.equal(een.status, 200, 'de eerste foto staat op de pagina: ' + JSON.stringify(een.body));
+  const twee = await api('/api/supplier/photo/add', { image: png }, hotel);
+  const aantal = twee.body.count;
+  assert.ok(aantal >= 2, 'er staan nu minstens twee foto\'s (' + aantal + ')');
 
   const raar = await api('/api/supplier/photo/remove', { index: 999 }, hotel);
   assert.equal(raar.status, 200);
@@ -109,10 +118,8 @@ test('2. een foto gaat op index weg, en een index buiten bereik doet niets', asy
   assert.equal((await api('/api/supplier/photo/remove', { index: 'twee' }, hotel)).body.count, aantal,
     'en een index die geen getal is ook niet');
 
-  if (aantal > 0) {
-    const weg = await api('/api/supplier/photo/remove', { index: 0 }, hotel);
-    assert.equal(weg.body.count, aantal - 1, 'de eerste foto gaat er wel af');
-  }
+  const weg = await api('/api/supplier/photo/remove', { index: 0 }, hotel);
+  assert.equal(weg.body.count, aantal - 1, 'de eerste foto gaat er wel af');
 });
 
 test('3. diensten toevoegen en weghalen doet de eigenaar', async () => {

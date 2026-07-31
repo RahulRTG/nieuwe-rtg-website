@@ -83,6 +83,10 @@ test('5. reacties en melden; kantoor ziet de melding en kan de kaart weghalen', 
   assert.ok(lijst.body.meldingen.some(m => m.clipId === clipId), 'de melding ligt bij kantoor');
   // weghalen door een ander lid kan niet; door kantoor wel
   assert.equal((await api('/api/clips/weg', { id: clipId }, kijker)).status, 404);
+  // eerst vaststellen dat de kaart er stond -- op een lege feed is "hij is weg"
+  // vanzelf waar, en dan zegt de toets niets over het weghalen
+  assert.ok((await api('/api/clips/feed', {}, kijker)).body.clips.some(x => x.id === clipId),
+    'de kaart staat in de feed voordat kantoor hem weghaalt');
   assert.equal((await api('/api/office/clips/verwijder', { id: clipId }, office)).status, 200);
   const na = await api('/api/clips/feed', {}, kijker);
   assert.ok(!na.body.clips.some(x => x.id === clipId), 'de kaart is weg; het beeld stond toch al alleen bij de maker');

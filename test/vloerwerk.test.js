@@ -35,6 +35,10 @@ const { startServer, stop } = require('./helper');
 
 let srv, base, baas, ober, hotelBaas, hotelKamermeisje, lid;
 let tafelId = null, artikelId = null, bonRef = null;
+/* De lengte van de lijst vlak NA het aanmaken. Er is geen leesendpoint voor de
+   tafels en de minibar -- de lijst komt alleen terug op de mutatie -- dus is dit
+   de enige eerlijke ijkwaarde voor "er ging er precies een af" in toets 6. */
+let tafelsNa = 0, minibarNa = 0;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vloerwerk-'));
 
 function api(pad, body, token) {
@@ -76,6 +80,7 @@ test('1. tafels: erbij zetten is van de baas, de status zetten doet de bediening
   assert.equal(bij.status, 200);
   const t = bij.body.tables.find(x => x.name === 'Terras 7');
   tafelId = t.id;
+  tafelsNa = bij.body.tables.length;
   assert.equal(t.seats, 20, 'meer dan twintig stoelen aan een tafel bestaat niet');
   assert.equal(t.status, 'vrij', 'een nieuwe tafel staat vrij');
   assert.equal((await api('/api/supplier/table/add', { name: 'Stiekem', seats: 2 }, ober)).status, 403, 'de bediening zet er geen tafels bij');
@@ -132,6 +137,7 @@ test('4. de minibar-catalogus is van het management', async () => {
   const bij = await api('/api/supplier/minibar/item/add', { name: 'Cava split', price: 12 }, hotelBaas);
   assert.equal(bij.status, 200);
   artikelId = bij.body.minibar.find(x => x.name === 'Cava split').id;
+  minibarNa = bij.body.minibar.length;
   assert.equal((await api('/api/supplier/minibar/item/add', { name: 'Eigen voorraadje', price: 5 }, hotelKamermeisje)).status, 403,
     'wie de kamers doet, verandert de prijslijst niet');
   assert.equal((await api('/api/supplier/minibar/item/remove', { id: artikelId }, hotelKamermeisje)).status, 403);
@@ -167,10 +173,18 @@ test('5. de minibar tellen is geld: nul telt nul, en onbekend telt niet mee', as
 });
 
 test('6. opruimen: het artikel en de tafel gaan er weer af', async () => {
+  /* Twee keer hetzelfde patroon, en twee keer dezelfde valkuil: "hij staat er
+     niet meer in" slaagt ook op een catalogus of een tafelplan dat in zijn
+     geheel leeg terugkomt. Er is voor geen van beide een leesendpoint -- de
+     lijst komt alleen terug op de mutatie zelf -- dus rekenen we het af op de
+     LENGTE, die bij het aanmaken is onthouden. Precies een korter, en niet
+     "toevallig nul". */
   const weg = await api('/api/supplier/minibar/item/remove', { id: artikelId }, hotelBaas);
   assert.ok(!weg.body.minibar.some(x => x.id === artikelId), 'het artikel is uit de catalogus');
+  assert.equal(weg.body.minibar.length, minibarNa - 1, 'er ging er precies een af, de rest van de catalogus staat er nog');
 
   const tw = await api('/api/supplier/table/remove', { id: tafelId }, baas);
   assert.ok(!tw.body.tables.some(x => x.id === tafelId), 'de tafel is weg');
+  assert.equal(tw.body.tables.length, tafelsNa - 1, 'en precies die ene: het tafelplan is niet in zijn geheel leeg');
   assert.equal((await api('/api/supplier/table/remove', { id: tafelId }, ober)).status, 403, 'tafels weghalen is van de baas');
 });

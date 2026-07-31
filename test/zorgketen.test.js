@@ -66,6 +66,11 @@ test('2. de eerste hulp: triagekleuren sorteren de rij, rood gaat voor', async (
   assert.equal(op.status, 200);
   const na = await api('/api/supplier/zorg/overzicht', {}, tokens.CANMISSES);
   assert.ok(!na.body.seh.some(p => p.id === eerste.id), 'opgenomen is uit de rij');
+  /* En de tweede patient staat er nog. Een SEH-rij die in zijn geheel leeg
+     terugkomt zou de regel hierboven ook laten slagen, en dat is precies de
+     verkeerde reden om groen te staan: dan is niet de opgenomen patient weg
+     maar de hele wachtrij. */
+  assert.ok(na.body.seh.some(p => p.triage === 'oranje'), 'de rest van de rij staat er nog');
   assert.equal((await api('/api/supplier/zorg/seh/binnen', { klacht: 'x', triage: 'paars' }, tokens.CANMISSES)).status, 400, 'alleen echte triagekleuren');
   assert.equal((await api('/api/supplier/zorg/seh/binnen', { klacht: 'x', triage: 'rood' }, tokens.CONSULTA)).status, 403, 'alleen het ziekenhuis heeft een SEH');
 });

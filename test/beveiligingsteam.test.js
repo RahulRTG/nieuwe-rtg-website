@@ -233,7 +233,14 @@ test('12. een incident afhandelen en weer openzetten', async () => {
 });
 
 test('13. de post opruimen: hij verdwijnt uit het rooster', async () => {
+  const voor = await api(base, '/api/supplier/beveiliging/rooster', { van: overVijfDagen(), dagen: 1 }, mgr);
+  assert.ok(voor.body.dagen[0].posten.some(p => p.postId === losPost), 'de post staat er nog voordat we hem weghalen');
+
   assert.equal((await api(base, '/api/supplier/beveiliging/post/weg', { id: losPost }, mgr)).status, 200);
   const r = await api(base, '/api/supplier/beveiliging/rooster', { van: overVijfDagen(), dagen: 1 }, mgr);
   assert.ok(!r.body.dagen[0].posten.some(p => p.postId === losPost), 'de post staat niet meer in het rooster');
+  /* En de rest van het rooster staat er nog. Zonder deze regel zou een rooster
+     dat plotseling helemaal leeg terugkomt hier groen blijven -- "hij staat er
+     niet meer" is dan waar om de verkeerde reden. */
+  assert.ok(r.body.dagen[0].posten.length, 'de andere posten staan er nog: het rooster is niet in zijn geheel leeg');
 });

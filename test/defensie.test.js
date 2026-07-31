@@ -68,6 +68,13 @@ test('3. bevoorrading: aanvragen en door de keten heen zetten (alleen het comman
   assert.equal((await api('/api/supplier/def/bevoorrading/zet', { id: v.body.verzoek.id, status: 'goedgekeurd' }, log)).status, 403);
   const g = await api('/api/supplier/def/bevoorrading/zet', { id: v.body.verzoek.id, status: 'goedgekeurd' }, cmd);
   assert.equal(g.body.verzoek.status, 'goedgekeurd');
+  /* EERST OP HET BORD. "Geleverd verdwijnt van het open bord" bewijst niets als
+     dat bord ook zonder levering leeg is -- dan slaagt de bewering op een lege
+     lijst en staat er groen boven een bord dat helemaal niets toont. */
+  const open = await api('/api/supplier/def/overzicht', {}, cmd);
+  assert.ok(open.body.bevoorrading.some(x => x.id === v.body.verzoek.id),
+    'een goedgekeurd verzoek staat op het open bord');
+
   const gl = await api('/api/supplier/def/bevoorrading/zet', { id: v.body.verzoek.id, status: 'geleverd' }, cmd);
   assert.equal(gl.body.verzoek.status, 'geleverd');
   const na = await api('/api/supplier/def/overzicht', {}, cmd);
@@ -105,6 +112,11 @@ test('6. verplaatsingen: transport over land, water of lucht plannen en door de 
   // een gewone rol plant geen verplaatsing (manager-actie)
   assert.equal((await api('/api/supplier/def/verplaatsing/maak', { van: 'a', naar: 'b', soort: 'land', lading: 'troepen' }, log)).status, 403);
   assert.equal((await api('/api/supplier/def/verplaatsing/maak', { van: 'a', naar: 'b', soort: 'ruimte', lading: 'troepen' }, cmd)).status, 400);
+  // ook hier eerst vaststellen dat hij er stond; anders is "hij is weg" gratis
+  const open = await api('/api/supplier/def/overzicht', {}, cmd);
+  assert.ok(open.body.verplaatsingen.some(x => x.id === v.body.verplaatsing.id),
+    'een geplande verplaatsing staat op het open bord');
+
   const aan = await api('/api/supplier/def/verplaatsing/zet', { id: v.body.verplaatsing.id, status: 'aangekomen' }, cmd);
   assert.equal(aan.body.verplaatsing.status, 'aangekomen');
   const na = await api('/api/supplier/def/overzicht', {}, cmd);

@@ -20,13 +20,17 @@
      geen AI aan te pas kwam. Doen alsof een vaste tekst een AI-recept is, is
      precies het soort belofte dat dit huis niet doet.
 
-   WAT HIER NIET VERANDERD IS, EN WAAROM
-   room/remove en photo/remove hebben geen managercontrole, terwijl service
-   en verkoop/auto/weg die wel hebben. Een kamer weghalen is inrichting en
-   geen dagelijks werk, dus dat verschil is opvallend -- maar room/ADD staat
-   net zo open, en alleen het weghalen dichtzetten maakt het rijtje niet
-   consistenter. Wie in een hotel een kamer uit de inventaris mag halen is een
-   bedrijfsbesluit; de toets legt hieronder alleen vast wat het nu doet.
+   WAT HIER WEL VERANDERD IS
+   room/add en room/remove stonden open voor elke ingelogde medewerker, terwijl
+   service en verkoop/auto/weg wel een managercontrole hadden. Dat was een
+   bedrijfsbesluit en geen technische vraag, en het antwoord is: de INRICHTING
+   van het huis is van het management. Wat er te boeken valt en wat het kost is
+   geen baliehandeling -- een kamer die verdwijnt, verdwijnt uit de boekbaarheid
+   van het hotel. De huishouding blijft wel gewoon de STATUS van een kamer
+   zetten (room/toggle, hk); dat is juist het werk van de vloer.
+
+   photo/remove staat nog open. Een foto terugzetten kan; een kamer terugzetten
+   met dezelfde id niet.
 
    Draai los: node --experimental-sqlite --test test/zaak-inrichting.test.js
    ========================================================================== */
@@ -76,6 +80,16 @@ test('1. een kamer weghalen raakt alleen de eigen zaak', async () => {
   const buur = (await staat(buurhotel)).rooms || [];
   assert.ok(buur.length, 'de buren ook');
   buurKamerId = buur[0].id;
+
+  /* DE INRICHTING IS VAN HET MANAGEMENT. Wie achter de balie staat kan geen
+     kamer uit de inventaris halen en er ook geen bij zetten -- dat verandert
+     wat er te boeken valt en wat het kost. */
+  assert.equal((await api('/api/supplier/room/remove', { id: kamerId }, hotelWerker)).status, 403,
+    'een medewerker haalt geen kamer weg');
+  assert.equal((await api('/api/supplier/room/add', { name: 'Stiekeme suite', price: 400 }, hotelWerker)).status, 403,
+    'en zet er ook geen bij');
+  assert.ok(((await staat(hotel)).rooms || []).some(r => r.id === kamerId),
+    'de kamer staat er dus gewoon nog');
 
   /* Een id van de buren: 200, en er hoort niets te gebeuren. Dat "200" is het
      antwoord waarbij niemand meer kijkt, dus kijken we bij de buren zelf. */

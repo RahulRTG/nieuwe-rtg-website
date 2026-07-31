@@ -192,21 +192,51 @@ test('9. de krantsite: blokken worden geschoond en de volgorde opgeschoond', asy
   assert.equal((await api('/api/krant/open', { code: 'BODE' })).body.site.blokken.length, 3);
 });
 
-test('10. de redactie van de een is niet die van de ander', async () => {
+test('10. een krant beginnen is een werkvorm, geen algemene knop', async () => {
   const mk = await red('artikel/bewaar', { titel: 'Interne notitie', inhoud: 'Bronnen en telefoonnummers.' }, bode);
   const id = mk.body.artikel.id;
 
-  // een restaurant met een geldige zaak-inlog komt niet bij het stuk van de krant
-  assert.equal((await red('artikel/haal', { id }, ander)).status, 404, 'een andere zaak kan het stuk niet openen');
-  assert.ok(!(await red('artikelen', {}, ander)).body.lijst.some(x => x.id === id), 'en ziet het ook niet in zijn lijst');
+  /* TOT DEZE RONDE kon ELKE zaak met een leverancier-inlog een krant beginnen:
+     een taxibedrijf, een hotel, een kapper. Dat wijkt af van elke andere
+     zakelijke module in dit huis (retail, zorg, vervoer), die allemaal achter
+     hun capability zitten. En het is niet vrijblijvend: dit is de enige module
+     waarmee een zaak zonder tussenkomst iets NAAR BUITEN brengt, onder haar
+     eigen naam, op /api/krant/*.
 
-  /* Verwijderen bij de buren mag niets doen. Deze aanroep antwoordt ok --
-     hij filtert in de EIGEN redactie en vindt daar niets -- en dat is precies
-     waarom het stuk daarna nog bij de eigenaar moet staan. */
-  await red('artikel/verwijder', { id }, ander);
-  assert.equal((await red('artikel/haal', { id }, bode)).status, 200, 'bij de eigenaar staat het er nog gewoon');
+     De redactie zit nu achter de capability 'redactie' (werkvorm
+     journalistiek). Een restaurant komt niet meer bij een enkele deur -- dus
+     ook niet bij de deuren waar het vroeger een nette 404 op kreeg. Die 409
+     is de sterkere scheiding: hij zegt niet "dat stuk bestaat niet" maar "deze
+     zaak heeft hier niets te zoeken". */
+  for (const pad of ['staat', 'artikelen', 'artikel/haal', 'artikel/bewaar', 'artikel/verwijder',
+    'snel', 'rubriek/bewaar', 'rubriek/verwijder', 'huisstijl', 'site/bewaar', 'assist']) {
+    const r = await red(pad, { id, titel: 'Van de buren', naam: 'Iets', inhoud: 'x' }, ander);
+    assert.equal(r.status, 409, pad + ' hoort dicht te zijn voor een restaurant (kreeg ' + r.status + ')');
+    assert.match(r.body.error || '', /redactie|journalistiek/i, pad + ' zegt ook waarom');
+  }
+  assert.equal((await red('artikel/haal', { id }, bode)).status, 200, 'en bij de krant zelf staat het stuk er nog gewoon');
 
   const weg = await red('artikel/verwijder', { id }, bode);
   assert.equal(weg.status, 200);
   assert.equal((await red('artikel/haal', { id }, bode)).status, 404, 'de eigenaar kan het wel weghalen');
+});
+
+/* De scheiding TUSSEN TWEE KRANTEN is met die deur niet meer over HTTP te
+   bereiken: er staat maar een zaak met de werkvorm journalistiek in de seed, en
+   een restaurant komt niet meer binnen. De regel zelf staat in de kern --
+   artikelVol() zoekt in de ruimte van EEN code -- en die toetsen we daarom
+   rechtstreeks. Anders zou deze scheiding stilletjes onbewaakt raken doordat we
+   er een deur voor hebben gezet. */
+test('11. een stuk hoort bij een redactie, en niet bij de redactie ernaast', async () => {
+  const maak = require('../server/kern/journalistiek');
+  const db = { data: {} };
+  const j = maak({ db, save: () => {}, crypto: require('crypto'), schoon: (s, n) => String(s || '').slice(0, n),
+    findSupplier: code => ({ code, name: 'Krant ' + code }), claude: null });
+
+  const a = j.bewaarArtikel('EEN', { titel: 'Van krant EEN', inhoud: 'Eigen bronnen.' }, { name: 'Redacteur' });
+  const id = a.artikel.id;
+  assert.ok(j.artikelVol('EEN', id), 'bij de eigen krant is het stuk te vinden');
+  assert.equal(j.artikelVol('TWEE', id), null, 'bij de krant ernaast niet');
+  j.verwijderArtikel('TWEE', id);
+  assert.ok(j.artikelVol('EEN', id), 'en de buren kunnen het ook niet weggooien');
 });

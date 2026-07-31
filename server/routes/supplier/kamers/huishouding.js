@@ -13,6 +13,12 @@ module.exports = (kern) => {
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
     fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
 app.post('/api/supplier/room/add', supplierAuth, (req, res) => {
+  /* De inrichting van het huis is van het management, net als de dienstenlijst
+     (supplier/service) en het weghalen van een auto uit de showroom. Wat er te
+     boeken valt en wat het kost, is geen baliehandeling. De huishouding blijft
+     wel gewoon de STATUS van een kamer zetten (room/toggle, hk) -- dat is juist
+     het werk van de vloer. */
+  if (!managerOnly(req, res)) return;
   if (!Array.isArray(req.supplier.rooms)) return res.status(400).json({ error: 'Kamers zijn er alleen voor hotels en appartementen.' });
   const name = schoon(req.body.name, 60);
   const price = Math.max(0, Number(req.body.price) || 0);

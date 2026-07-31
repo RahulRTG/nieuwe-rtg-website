@@ -158,6 +158,11 @@ test('6. de AI-hulp van de zaak draait ook zonder sleutel', async () => {
 });
 
 test('7. opruimen: de eigenaar haalt zijn advertentie weg', async () => {
+  // eerst vaststellen dat hij er nog staat: op een leeg overzicht slaagt
+  // "hij is weg" ook als er nooit iets is weggehaald
+  assert.ok((await zk('mijn', {}, zaak)).body.ads.some(a => a.id === adId),
+    'de advertentie staat er nog voordat we hem weghalen');
+
   assert.equal((await zk('verwijder', { id: adId }, zaak)).status, 200);
   const mijn = await zk('mijn', {}, zaak);
   assert.ok(!mijn.body.ads.some(a => a.id === adId), 'de advertentie is uit het overzicht');

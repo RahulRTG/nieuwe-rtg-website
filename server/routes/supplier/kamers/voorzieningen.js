@@ -13,6 +13,8 @@ module.exports = (kern) => {
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
     fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
 app.post('/api/supplier/room/remove', supplierAuth, (req, res) => {
+  // zie room/add: de inrichting van het huis is van het management
+  if (!managerOnly(req, res)) return;
   const i = (req.supplier.rooms || []).findIndex(r => r.id === req.body.id);
   if (i >= 0) {
     logActivity(req.supplier.code, req.actor, 'verwijderde kamer "' + req.supplier.rooms[i].name + '"');

@@ -112,9 +112,32 @@ test('2. de soort is te wijzigen door het bestuur -- ook van geheim naar openbaa
   const na = await api('/genootschap/zoek', { zoek: 'stille' }, buiten.token);
   assert.ok(!na.body.groepen.some(g => g.id === id), 'en dus is hij nog steeds geheim');
 
-  assert.ok((await api('/genootschap/pas-aan', { groep: id, soort: 'openbaar' }, baas.token)).body.ok);
-  assert.ok((await api('/genootschap/zoek', { zoek: 'stille' }, buiten.token)).body.groepen.some(g => g.id === id),
-    'na het openen staat hij wel in de lijst -- dit is de huidige werking');
+  /* EN OPENZETTEN KAN NIET. Dit was tot deze ronde wel zo, en dat is een
+     stille verschuiving van de ergste soort: wie zich bij een GEHEIM
+     genootschap aansluit doet dat onder die beslotenheid, en met een klik van
+     het bestuur stond hij in een lijst die iedereen kan doorzoeken -- zonder
+     dat hem iets gevraagd was en zonder dat hij het merkte.
+
+     De zichtbaarheid kan sindsdien alleen DICHTER. Beslotener mag altijd; dat
+     neemt niemand iets af. Wil een bestuur echt naar buiten, dan richten ze een
+     openbaar genootschap op en nodigen ze hun leden uit -- dan zegt ieder zelf
+     ja. */
+  const open = await api('/genootschap/pas-aan', { groep: id, soort: 'openbaar' }, baas.token);
+  assert.ok(!open.body.ok, 'een geheim genootschap gaat niet open');
+  assert.match(open.body.error || '', /beslotener|opener/i, 'en zegt waarom: ' + JSON.stringify(open.body));
+  assert.ok(!(await api('/genootschap/zoek', { zoek: 'stille' }, buiten.token)).body.groepen.some(g => g.id === id),
+    'hij staat dus nog steeds in geen enkele lijst');
+
+  /* De andere kant op mag wel. Een openbaar genootschap dat besloten wordt,
+     sluit een deur -- daar wordt niemand zichtbaar van. */
+  const opb = await api('/genootschap/richt-op', { naam: 'Het Open Portaal', soort: 'openbaar' }, baas.token);
+  const oid = opb.body.groep.id;
+  assert.ok((await api('/genootschap/zoek', { zoek: 'portaal' }, buiten.token)).body.groepen.some(g => g.id === oid),
+    'openbaar is vindbaar');
+  assert.ok((await api('/genootschap/pas-aan', { groep: oid, soort: 'geheim' }, baas.token)).body.ok,
+    'en mag geheim worden');
+  assert.ok(!(await api('/genootschap/zoek', { zoek: 'portaal' }, buiten.token)).body.groepen.some(g => g.id === oid),
+    'daarna is hij weg uit de lijst');
 });
 
 test('3. een reactie wis je als hij van jou is, of als jij het bestuur bent', async () => {

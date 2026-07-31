@@ -160,7 +160,15 @@ const BEOORDEELD = new Map([
   ['boardroom-poort.test.js::weg.body.lijst',
     'de echte bewering staat eronder: na het intrekken geeft de boardroom 403. Die zakt wel als het intrekken niets doet'],
   ['eigen-website.test.js::leeg.body.fotos',
-    'de bibliotheek van de buurman hoort leeg te zijn -- dat is de scheiding zelf, en de eigen kant staat ernaast op 1']
+    'de bibliotheek van de buurman hoort leeg te zijn -- dat is de scheiding zelf, en de eigen kant staat ernaast op 1'],
+  ['galerij.test.js::gb.body.beelden',
+    'de galerij van B hoort leeg te zijn: beelden zijn van het lid zelf. De leegte IS hier de bewering, en de kant van A staat ernaast met een find()'],
+  ['synergie.test.js::p.body.pakketten',
+    '"zolang niet iedereen tekende is er geen pakket" -- nul is precies wat er getoetst wordt; de gevulde kant staat in het volgende blok'],
+  ['regie.test.js::apps.body.uit',
+    'de standaardindeling zet niets uit, dus een lege uit-lijst is de bewering zelf'],
+  ['webauthn.test.js::lijst.body.sleutels',
+    'hier IS de leegte de bewering: er staat geen sleutel tot de browser-ceremonie er een zet, en die kan een toets niet doen']
 ]);
 
 /* ZELFTOETS. Dit script bestaat om vacuum-beweringen te vinden, en het is zelf

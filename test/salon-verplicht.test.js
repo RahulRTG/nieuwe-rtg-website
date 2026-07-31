@@ -49,6 +49,10 @@ test('2. een partner zonder profiel wordt niet getoond en kan niet publiceren', 
   // niet meer in de directory
   const dir = await api(base, '/api/suppliers', { city: 'Ibiza' }, lid);
   assert.ok(!dir.body.suppliers.some(s => s.code === 'KIKUNOI'), 'onvolledige partner is verborgen');
+  /* En de rest staat er nog. Zonder deze regel slaagt "hij is verborgen" ook
+     wanneer de hele directory leeg terugkomt -- en dan is niet die ene partner
+     verborgen maar zijn ze het allemaal. */
+  assert.ok(dir.body.suppliers.length, 'de andere partners staan er nog: de directory is niet in zijn geheel leeg');
   // publiceren mag niet
   const post = await api(base, '/api/supplier/salon/post', { text: 'Marketingbericht' }, brand);
   assert.equal(post.status, 409, 'publiceren zonder profiel wordt geweigerd');

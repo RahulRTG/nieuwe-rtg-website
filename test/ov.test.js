@@ -158,6 +158,10 @@ test('7. de routetekenaar: de manager zet zelf een lijn op de kaart en leden zie
   assert.equal(weg.status, 200);
   const over = await api('/api/supplier/ov/overzicht', {}, baas);
   assert.ok(!over.body.voertuigen.some(v => /Bus 9/.test(v.naam)), 'het voertuig van de lijn is mee opgeruimd');
+  /* Bus 4 rijdt op een andere lijn en hoort er gewoon nog te staan. Zonder deze
+     regel zou een overzicht dat in zijn geheel leeg terugkomt hier groen
+     blijven, en dan is niet dat ene voertuig opgeruimd maar de hele vloot. */
+  assert.ok(over.body.voertuigen.some(v => /Bus 4/.test(v.naam)), 'de rest van de vloot rijdt door');
   const kaart2 = await api('/api/ov/kaart', STAD, lidB);
   assert.ok(!kaart2.body.lijnen.some(l => /Lijn 9/.test(l.naam)), 'de lijn is uit de leden-app');
 });

@@ -126,6 +126,14 @@ test('4. een stuk schrijven: het blijft concept, en een onbekende rubriek valt t
 test('5. een concept blijft binnen de redactie: de krant toont het niet', async () => {
   const mk = await red('artikel/bewaar', { titel: 'Nog niet af', inhoud: 'Een half stuk over een raadslid.' }, bode);
   const id = mk.body.artikel.id;
+  /* Eerst de andere kant: in de REDACTIE staat het stuk wel. Zonder die regel
+     zou "het staat niet in de krant" ook slagen als het stuk nergens is
+     aangekomen -- en op dit punt in het bestand is er nog niets gepubliceerd,
+     dus de krant is sowieso leeg. De bewering die telt is het VERSCHIL tussen
+     de twee lijsten, en dat verschil bewijst zich alleen als het stuk aan de
+     ene kant aantoonbaar bestaat. */
+  assert.ok((await red('artikelen', {}, bode)).body.lijst.some(x => x.id === id),
+    'het concept staat wel in de redactie');
   const krant = await api('/api/krant/open', { code: 'BODE' });
   assert.equal(krant.status, 200);
   assert.ok(!krant.body.artikelen.some(x => x.id === id), 'het concept staat niet in de krant');

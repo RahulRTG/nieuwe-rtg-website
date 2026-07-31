@@ -58,7 +58,15 @@ app.post('/api/supplier/pand/foto', express.json({ limit: '1.5mb' }), supplierAu
   const foto = String(req.body.foto || '');
   if (!/^data:image\/(jpeg|png|webp);base64,/.test(foto) || foto.length > 500000) return res.status(400).json({ error: 'Stuur een foto (tot ~400 kB).' });
   p.fotos = p.fotos || [];
-  if (req.body.weg != null) { p.fotos.splice(Number(req.body.weg), 1); }
+  if (req.body.weg != null) {
+    /* Op index, dus met een grens eromheen -- precies zoals photo/remove die
+       wel had en deze route niet. splice(-1) haalt de LAATSTE foto weg en
+       splice(NaN) de eerste, dus een tikfout in het scherm haalde zomaar een
+       andere foto van het pand af dan de bedoeling was. */
+    const i = Number(req.body.weg);
+    if (!Number.isInteger(i) || i < 0 || i >= p.fotos.length) return res.status(400).json({ error: 'Deze foto staat er niet bij.' });
+    p.fotos.splice(i, 1);
+  }
   else {
     if (p.fotos.length >= 12) return res.status(400).json({ error: 'Tot 12 foto\'s per pand.' });
     // De foto naar de mediastore; in db.data komt alleen de /media-verwijzing.

@@ -48,6 +48,11 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, auto: a };
   }
   function verwijderAuto(s, autoId) {
+    /* Dezelfde controle als bij zetAan en zetAuto hierboven; als enige van de
+       drie stond hij hier niet. Zonder die regel groeit ver(s) een lege
+       verkoop-structuur op een zaak die helemaal geen showroom heeft -- en
+       antwoordt het huis 200 op een handeling die nergens over gaat. */
+    if (!isVerkoopBedrijf(s)) return { status: 409, error: 'Autoverkoop hoort bij een verhuur/autobedrijf.' };
     const v = ver(s);
     const a = v.showroom.find(x => x.id === autoId);
     if (a) a.status = 'verkocht';        // nooit hard weg: lopende deals verwijzen ernaar

@@ -1033,7 +1033,11 @@ console.log('\n24) een coordinaat komt nooit uit een kale Number()');
   const MAG_KAAL = new Map([
     // ['server/routes/x.js', 'reden waarom hier geen coord() gebruikt wordt']
   ]);
-  const PAT = /\bNumber\s*\(\s*(?:req|body|data|opt|v)\??\.[\w.]*\b(lat|lng|lon|latitude|longitude)\b/g;
+  /* Number(x) EN de unaire plus (+x). Die tweede vorm zat in twee routes en
+     glipte langs mijn eerste versie van deze regel: +null is net zo goed 0.
+     Een regel die maar een van de twee schrijfwijzen kent, geeft rust die er
+     niet is. */
+  const PAT = /(?:\bNumber\s*\(\s*|\+\s*)(?:req|body|data|opt|v)\??\.[\w.]*\b(lat|lng|lon|latitude|longitude)\b/g;
   let kaal = 0, plekken = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');

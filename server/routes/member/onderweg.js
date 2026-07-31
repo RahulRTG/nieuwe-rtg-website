@@ -1,7 +1,7 @@
 /* Member-submodule: onderweg. De live reis (start, positie-updates met
    automatische aankomst, stop, stand opvragen) en ritten aanvragen/betalen.
    Gemount vanuit routes/member.js. */
-const { coord } = require('../../kern/util');
+const { coord, coordPaar } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, notifySupplier, notify, pushLive,
     liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor } = kern;
@@ -15,7 +15,7 @@ module.exports = (kern) => {
     const dest = destCode ? findSupplier(destCode) : null;
     const mode = ['walking', 'driving', 'flying'].includes(req.body.mode) ? req.body.mode : 'driving';
     // Startpositie: meegegeven, anders het hotel op de bestemming, anders vlakbij de bestemming.
-    let start = (Number.isFinite(+req.body.lat) && Number.isFinite(+req.body.lng)) ? { lat: +req.body.lat, lng: +req.body.lng } : null;
+    let start = coordPaar(req.body.lat, req.body.lng);
     if (!start) { const hotel = db.data.suppliers.find(s => s.type === 'hotel' && s.city === db.data.trip.dest); if (hotel && hotel.loc) start = { lat: hotel.loc.lat, lng: hotel.loc.lng }; }
     if (!start && dest && dest.loc) start = { lat: dest.loc.lat + 0.012, lng: dest.loc.lng - 0.014 };
     db.data.live[key] = {

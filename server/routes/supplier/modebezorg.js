@@ -3,7 +3,7 @@
    - de koerier (personeel) krijgt de kortste route, neemt een bezorging aan,
      deelt live zijn positie en rondt veilig af met bezorgcode + foto (en ID bij
      dure stukken), of neemt het aan de deur retour. Draait op kern/modebezorg. */
-const { coord } = require('../../kern/util');
+const { coord, coordPaar } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, express, supplierAuth, managerOnly,
     mbSetup, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour } = kern;
@@ -23,7 +23,7 @@ module.exports = (kern) => {
 
   // De koerier: de open bezorgingen op de kortste route (dichtstbijzijnde eerst).
   app.post('/api/supplier/mode/bezorg/route', supplierAuth, (req, res) => {
-    const pos = (Number.isFinite(+req.body.lat) && Number.isFinite(+req.body.lng)) ? { lat: +req.body.lat, lng: +req.body.lng } : null;
+    const pos = coordPaar(req.body.lat, req.body.lng);
     res.json({ route: mbRoute(req.supplier.code, pos) });
   });
 

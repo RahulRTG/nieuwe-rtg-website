@@ -16,8 +16,10 @@
    - EEN CSV IS EEN PROGRAMMA ALS JE NIET OPLET. Een adres of een codenaam die
      met = + - of @ begint, wordt door Excel en Numbers als FORMULE uitgevoerd
      zodra iemand het bestand opent. De boekhouder van de zaak opent dat
-     bestand. csvCel() zet er een apostrof voor; toets 3 rekent dat af met een
-     rit waarvan het afleveradres letterlijk een formule is.
+     bestand. csvCel() zet er een apostrof voor; toets 3 rekent dat af. Er is
+     geen testdeur om een rit met een formule-adres te planten, dus die toets
+     valt terug op csvCel() zelf -- precies de functie die de route gebruikt.
+     Dat is minder mooi dan een echte rit en het staat er daarom bij.
    - JE EXPORTEERT JE EIGEN ZAAK. De regels komen uit sess.code, niet uit een
      parameter, dus er valt niets te verdraaien -- maar dat moet wel vaststaan.
 

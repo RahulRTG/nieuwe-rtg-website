@@ -34,7 +34,11 @@
                      ELK endpoint uit de bron, juiste rol + elke verkeerde rol
                      (rol-scheiding), met rommel-invoer (emoji, gigastrings,
                      XSS/SQL/JNDI, diep genest). Percentielen, 5xx per endpoint,
-                     dekking.
+                     dekking. EN ERNAAST: de goede verhalen (scripts/verhalen.js)
+                     -- gewone mensen die gewone dingen doen, eerst een keer in
+                     rust als ijking en daarna onafgebroken middenin de storm.
+                     Want een server die op alles "400 nee" antwoordt haalt een
+                     chaostest met vlag en wimpel en is volledig kapot.
      F  GEHEUGEN     lek-vloer over identieke lees-rondes (geen groei = geen lek).
 
    DE OORDELEN (elk een harde drempel; faalt er één, dan exitcode 1):
@@ -46,6 +50,9 @@
      DUURZAAMHEID  geld en idempotentie overleven de herstart.
      GEHEUGEN      de RAM-vloer stijgt niet over identieke rondes.
      LATENTIE      p99 onder de (met machine-ruis geschaalde) SLO.
+     VERHALEN      de goede verhalen lopen in rust EN tijdens de storm, en er
+                   lukt er tijdens de storm ook echt minstens een -- anders is
+                   "nul gefaald" vanzelf waar zodra De Wacht alles afwijst.
 
    Draai (standaard, overal):   node --experimental-sqlite scripts/beproeving.js
    Draai (mega, 100M Postgres):  DATABASE_URL=postgres://... \
@@ -59,6 +66,12 @@
 const { spawn, execFileSync } = require('child_process');
 const fs = require('fs'), os = require('os'), path = require('path');
 const http = require('http');
+/* De goede verhalen (scripts/verhalen.js). De gauntlet bewijst dat er niets
+   BREEKT; die bewijst niets over of het huis nog WERKT -- een server die op
+   alles "400 nee" antwoordt haalt een chaostest met vlag en wimpel. Daarom
+   lopen er tijdens de storm volledige, logische verhalen van echte mensen mee,
+   met harde beweringen over geld, status en aankomst. */
+const verhalen = require('./verhalen');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -635,10 +648,34 @@ async function misbruikBeproeving(tok) {
     for (let ronde = 0; ronde < SLO_DEKKING; ronde++) for (const r of mijnDeel) { if (Date.now() >= stormEind) break; await raak(r, false); }
     while (Date.now() < stormEind) await raak(routes[rint(routes.length)], true);
   }
+  /* ---- de goede verhalen: eerst in rust, daarna middenin de storm ----
+     De ijking is niet optioneel. Een verhaal dat tijdens de storm faalt bewijst
+     alleen iets als datzelfde verhaal in RUST wel loopt; zonder die kalme ronde
+     weet je niet of je een regressie ziet of een kapotte test. */
+  const verhaalDeur = verhalen.maakDeur({ host: '127.0.0.1', port: PORT });
+  let podium = null, rustRapport = null, stormRapport = null, podiumFout = null;
+  try { podium = await verhalen.bouwPodium(verhaalDeur); }
+  catch (e) { podiumFout = e.message; }
+  if (podium) {
+    rustRapport = verhalen.versRapport();
+    await verhalen.draaiRonde(verhaalDeur, podium, rustRapport);
+    stormRapport = verhalen.versRapport();
+  }
+
   const vloerVers = await heapNaGc(child.pid);
   const mon = setInterval(() => { const m = rssMB(child.pid); if (m) rssReeks.push(m); }, 3000);
   stormEind = Date.now() + SOAK_MS;
-  await Promise.all(Array.from({ length: WERKERS }, (_, ix) => werker(ix)));
+  /* De verhalenloper draait NAAST de werkers, in hetzelfde tijdvenster: ronde na
+     ronde zolang de storm duurt. Hij telt niet mee in de latentie- en
+     dekkingscijfers van de gauntlet -- dat is een andere meting met een ander
+     doel, en ze door elkaar husselen maakt allebei onleesbaar. */
+  async function verhaalLoper() {
+    while (Date.now() < stormEind) await verhalen.draaiRonde(verhaalDeur, podium, stormRapport);
+  }
+  await Promise.all([
+    ...Array.from({ length: WERKERS }, (_, ix) => werker(ix)),
+    ...(podium ? [verhaalLoper()] : [])
+  ]);
   clearInterval(mon);
   // de storm kan functies hebben uitgezet; voor de lek-meting weer alles aan
   await allesAan((await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token);
@@ -683,6 +720,36 @@ async function misbruikBeproeving(tok) {
   const onbereikt = [...dekking.entries()].filter(([, n]) => n < SLO_DEKKING);
   rij('endpoints < ' + SLO_DEKKING + 'x geraakt', nl(onbereikt.length) + ' / ' + nl(routes.length));
 
+  /* ---- de goede verhalen ---- */
+  let rustSom = null, stormSom = null;
+  if (podiumFout) {
+    rij('goede verhalen', '\x1b[31mhet podium kwam niet klaar: ' + podiumFout.slice(0, 90) + '\x1b[0m');
+  } else {
+    rustSom = verhalen.schrijfRapport(rustRapport, 'GOEDE VERHALEN - IJKING IN RUST (voor de storm)');
+    stormSom = verhalen.schrijfRapport(stormRapport, 'GOEDE VERHALEN - MIDDENIN DE STORM');
+    const pogingen = stormSom.gelukt + stormSom.afgewezen + stormSom.gefaald;
+    rij('verhalen in rust', rustSom.gelukt + ' gelukt / ' + rustSom.afgewezen + ' afgewezen / ' + rustSom.gefaald + ' gefaald');
+    rij('verhalen tijdens de storm', stormSom.gelukt + ' gelukt / ' + stormSom.afgewezen + ' afgewezen / ' + stormSom.gefaald + ' gefaald');
+    rij('  waarvan afgewezen op', stormSom.af429 + 'x snelheidslimiet (429), ' + stormSom.af503 + 'x dicht (503: De Wacht, functie uit of zekering)');
+    rij('  doorkomstpercentage', pogingen ? (100 * stormSom.gelukt / pogingen).toFixed(1) + '% van de verhalen kwam er tijdens de storm doorheen' : 'n.v.t.');
+    /* WAAROM de deur dichtging, met de woorden van de server zelf. Dit cijfer
+       zonder die reden is misleidend: een lage doorkomst omdat De Wacht last
+       afwerpt is iets heel anders dan een lage doorkomst omdat de automatische
+       noodrem de registratiezekering eruit heeft gehaald -- en dat laatste is
+       geen storing maar de beveiliging die precies doet wat hij hoort te doen,
+       want een storm die met rommel op de inlogpaden beukt IS brute force.
+       En bij de snelheidslimiet hoort er nog een kanttekening bij: die telt per
+       IP, en hier komen de storm en de verhalen van hetzelfde adres. */
+    const alleRedenen = new Map();
+    for (const r of stormRapport.values())
+      for (const [t, n] of r.redenen) alleRedenen.set(t, (alleRedenen.get(t) || 0) + n);
+    for (const [t, n] of [...alleRedenen.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3))
+      rij('  de server zei', '"' + t.slice(0, 70) + '" (' + nl(n) + 'x)');
+    if (stormSom.af429 > stormSom.af503)
+      console.log('  \x1b[2m' + 'vooral snelheidslimiet, en die telt per IP: storm en verhalen komen hier van'
+        + '\n  hetzelfde adres en delen dus een emmer. Dat is de opstelling, niet productie.\x1b[0m');
+  }
+
   // ---------- HET OORDEEL ----------
   kop('HET OORDEEL (drempels; faalt er een, dan exitcode 1)');
   const verdicten = [];
@@ -697,11 +764,22 @@ async function misbruikBeproeving(tok) {
   v('GEHEUGEN', lekHelling <= SLO_VLOER, 'vloer-helling ' + lekHelling.toFixed(1) + ' MB/min (drempel ' + SLO_VLOER + ')');
   const sloEff = Math.round(SLO_P99_MS * machineFactor);
   v('LATENTIE', pctMs(0.99) <= sloEff, 'p99 = ' + pct(0.99) + ' ms (drempel ' + sloEff + (machineFactor > 1 ? ' = SLO x ' + machineFactor.toFixed(2) : '') + ')');
+  /* VERHALEN. Drie eisen, en de derde is de belangrijkste: er moet tijdens de
+     storm ook echt iets GELUKT zijn. Zonder die eis is "nul gefaald" waar zodra
+     De Wacht alles afwijst -- en dan staat er een groene regel boven een
+     platform waar geen klant meer binnenkomt. Een bewering over een lege
+     verzameling is vanzelf waar; die val is in dit huis vaak genoeg dichtgeslagen. */
+  v('VERHALEN',
+    !podiumFout && rustSom.gefaald === 0 && stormSom.gefaald === 0 && stormSom.gelukt > 0,
+    podiumFout ? 'podium kwam niet klaar: ' + podiumFout.slice(0, 80)
+      : 'in rust ' + rustSom.gefaald + ' gefaald; tijdens de storm ' + stormSom.gelukt + ' gelukt, '
+        + stormSom.afgewezen + ' afgewezen aan een dichte deur, ' + stormSom.gefaald + ' gefaald');
 
   kop('WAT DEZE TEST NIET BEWIJST (eerlijk)');
   for (const l of [
     'Eén node, ' + (MODE === 'postgres' ? 'één Postgres, fsync uit (laadsnelheid/gedrag, geen duurzaamheidsgarantie op schijf)' : 'sqlite in een tijdelijke map (geen echte productie-opslag)') + '.',
     'De activiteit is rechtstreeks gezaaid, niet via de echte schrijfpaden; chaos toetst robuustheid, geen functionele juistheid.',
+    'De goede verhalen zijn een dwarsdoorsnede (lid worden, bestellen, betalen, rit, onderweg, verbinden, geld) -- zeven verhalen, geen functionele dekking van ' + nl(routes.length) + ' endpoints.',
     'De misbruik-beproeving dekt de zwaarste morele regels af, niet elke denkbare misbruikvorm.',
     'Latentie/doorvoer gelden voor DEZE machine en dit werkpunt; geen capaciteitsgarantie.',
     MODE === 'sqlite' ? 'Dit is de sqlite-standaard; de volle mega-schaal (100M) draai je met DATABASE_URL.' : 'Dit is de mega-schaal; de morele lat is identiek aan de sqlite-standaard.'

@@ -39,6 +39,10 @@ test('Gezinsagenda: maandraster, punt zetten, bewerken en de verjaardag-snelknop
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, { code: g.code, token: g.token, profiel: { naam: 'Papa', beheerder: true } });
+    /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
+       zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
+       begint bij het ingelogde bezoek hieronder. */
+    fouten.length = 0;
     await page.goto(base + '/apps/foundation/agenda.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.mgrid', { timeout: 15000 });
 

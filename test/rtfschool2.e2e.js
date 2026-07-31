@@ -59,6 +59,10 @@ test('Vandaag leren op school.html en de schoolpunten alleen-lezen op de gezinsa
     }, { code: g.code, token: kindToken, profiel: { naam: 'Roos', beheerder: false } });
 
     /* ---- school.html: het Vandaag leren-blok, met direct afvinken ---- */
+    /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
+       zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
+       begint bij het ingelogde bezoek hieronder. */
+    fouten.length = 0;
     await page.goto(base + '/apps/foundation/school.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /Vandaag leren/.test((document.querySelector('#vandaagLeren') || {}).textContent || ''),
       null, { timeout: 15000 });

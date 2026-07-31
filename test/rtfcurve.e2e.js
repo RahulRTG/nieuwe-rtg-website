@@ -43,6 +43,10 @@ test('Vandaag herhalen: dagstapel, fout komt vandaag terug, en daarna eerlijk le
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, { code: g.code, token: kindToken, profiel: { naam: 'Isa', groep: 'tiener' } });
+    /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
+       zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
+       begint bij het ingelogde bezoek hieronder. */
+    fouten.length = 0;
     await page.goto(base + '/apps/foundation/overhoren.html', { waitUntil: 'domcontentloaded' });
 
     // het blok zegt eerlijk wat er vandaag klaarstaat

@@ -37,6 +37,10 @@ test('Hulpwijzer: Meike praat via de gedeelde coach-laag en de privacyregel staa
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.setItem('rtf_sessie', JSON.stringify(sess));
     }, { code: g.code, token: g.token, profiel: { naam: 'Mam', beheerder: true } });
+    /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
+       zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
+       begint bij het ingelogde bezoek hieronder. */
+    fouten.length = 0;
     await page.goto(base + '/apps/foundation/hulpwijzer.html', { waitUntil: 'domcontentloaded' });
 
     /* de privacyregel staat onder de chat */

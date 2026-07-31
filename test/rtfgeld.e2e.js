@@ -45,6 +45,10 @@ test('Geldschool: ouder zet weekgeld en verzilvert sterren; het kind ziet het in
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, { code: g.code, token: g.token, profiel: { naam: 'Pap', beheerder: true } });
+    /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
+       zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
+       begint bij het ingelogde bezoek hieronder. */
+    fouten.length = 0;
     await page.goto(base + '/apps/foundation/klusjes.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /Mila/.test((document.querySelector('#geldKinderen') || {}).textContent || ''),
       null, { timeout: 15000 });

@@ -48,6 +48,10 @@ test('Gezinsalbum: maandgroepen, hartje + filter, kijker, terugblik en de jarige
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, { code: g.code, token: g.token, profiel: { naam: 'Mam', beheerder: true } });
+    /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
+       zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
+       begint bij het ingelogde bezoek hieronder. */
+    fouten.length = 0;
     await page.goto(base + '/apps/foundation/babyboek.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !document.querySelector('#vBoek').hidden &&
       /Eerste stapjes/.test(document.querySelector('#boek').textContent), null, { timeout: 15000 });

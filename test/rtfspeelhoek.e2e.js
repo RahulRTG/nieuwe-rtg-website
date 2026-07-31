@@ -39,6 +39,10 @@ test('Speelhoek: pakken, welke is anders, samen memorie en de napraatvraag',
     }, { code: g.code, token: g.token, profiel: { naam: 'Juno', groep: 'mini' } });
 
     /* tellen: het Pakken-spel -- het getal komt eerst, de hoeveelheid pak je zelf */
+    /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
+       zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
+       begint bij het ingelogde bezoek hieronder. */
+    fouten.length = 0;
     await page.goto(base + '/apps/foundation/tellen.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => { document.querySelector('[data-m="pak"]').click(); });
     await page.waitForFunction(() => /Pak er precies/.test(document.querySelector('#vraag').textContent), null, { timeout: 8000 });

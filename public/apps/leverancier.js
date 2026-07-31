@@ -6993,13 +6993,13 @@
       }
       if (renderDorp.buurt.length) buurtBlok = '<div style="margin-top:0.7rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('dorp.buurt','In de buurt')+'</div>'+
         '<div class="pos-chips" style="margin-top:0.35rem;">'+renderDorp.buurt.map(b =>
-          '<span><button class="obtn js-dbuurt" data-naam="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'" style="padding:0.15rem 0.5rem;">'+b.icon+' '+esc(b.naam)+' · '+b.km+' km</button></span>').join('')+'</div>'+
+          '<span><button class="obtn js-dbuurt" data-naam="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'" style="padding:0.15rem 0.5rem;">'+RTGGlyf.tekst(b.icon)+' '+esc(b.naam)+' · '+b.km+' km</button></span>').join('')+'</div>'+
         '<div class="softline" style="margin-top:0.3rem;">'+T('dorp.buurt.s','Een tik zet de naam alvast in de wens.')+'</div>';
     }
     el.innerHTML =
       '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+d.afdelingen.map(a =>
-        '<button class="obtn'+(a.key===dorpKant?' primary':'')+'" data-dkant="'+a.key+'">'+a.icon+' '+esc(a.label)+(a.openAantal?' · '+a.openAantal:'')+'</button>').join('')+'</div>'+
-      '<div class="card"><div class="tt-h">'+afd.icon+' '+esc(afd.label)+' <span class="sub">('+afd.keten.join(' · ')+')</span></div>'+
+        '<button class="obtn'+(a.key===dorpKant?' primary':'')+'" data-dkant="'+a.key+'">'+RTGGlyf.tekst(a.icon)+' '+esc(a.label)+(a.openAantal?' · '+a.openAantal:'')+'</button>').join('')+'</div>'+
+      '<div class="card"><div class="tt-h">'+RTGGlyf.tekst(afd.icon)+' '+esc(afd.label)+' <span class="sub">('+afd.keten.join(' · ')+')</span></div>'+
         toolsBlok+
         (afd.open.length ? afd.open.map(rij).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
         buurtBlok+

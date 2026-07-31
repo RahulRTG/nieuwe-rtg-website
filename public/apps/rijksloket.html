@@ -8,6 +8,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
+<script src="/shared/glyf.js"></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
@@ -187,7 +188,7 @@ async function laadBieb(){
       '<p class="meta" style="margin:.2rem 0 .6rem;">'+d.totaal.toLocaleString('nl-NL')+' werk-apps · 10.000 per afdeling · voor rijksambtenaren inbegrepen</p>'+
       '<div class="rij" style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;">'+
         '<select class="veld" id="rbAfd" aria-label="Afdeling" style="max-width:15rem;"><option value="">Alle afdelingen</option>'+
-          d.afdelingen.map(a => '<option value="'+esc(a.id)+'">'+a.icon+' '+esc(a.label)+' ('+a.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
+          d.afdelingen.map(a => '<option value="'+esc(a.id)+'">'+RTGGlyf.tekst(a.icon)+' '+esc(a.label)+' ('+a.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
         '<input class="veld" id="rbZoek" maxlength="60" placeholder="Zoek een taak (bijv. dossierscan)" aria-label="Zoeken" style="flex:1;min-width:10rem;">'+
         '<button class="tab" id="rbMijn" type="button">Mijn werk-apps</button>'+
       '</div><div id="rbGrid"></div><div id="rbBlader" style="display:flex;gap:.5rem;justify-content:center;align-items:center;padding:.6rem 0;"></div>';
@@ -199,7 +200,7 @@ async function laadBieb(){
   tekenBieb();
 }
 function biebKaart(a, heeft){
-  return '<div class="item"><h4>'+a.icon+' '+esc(a.naam)+'</h4>'+
+  return '<div class="item"><h4>'+RTGGlyf.tekst(a.icon)+' '+esc(a.naam)+'</h4>'+
     '<div class="meta">'+esc(a.afdelingLabel)+' · '+esc(a.taak)+' · v'+esc(a.versie)+' · '+a.grootteMB+' MB ·  '+a.sterren.toFixed(1)+
     ' · <s>€ '+(a.winkelwaardeCenten/100).toLocaleString('nl-NL')+'</s> <b style="color:var(--gold);">inbegrepen</b></div>'+
     (heeft ? '<button class="tab rbweg" data-id="'+esc(a.id)+'">Verwijder</button>'

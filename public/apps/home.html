@@ -50,6 +50,7 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
+<script src="/shared/glyf.js"></script>
 </head>
 <body class="rtg-stijl">
 <header>
@@ -100,7 +101,7 @@ async function laad(){
 }
 function tekenMerken(){
   $('#merken').innerHTML = MERKEN.length ? MERKEN.map(m =>
-    '<div class="scene"'+(m.verbonden?' style="border-color:var(--gold);"':'')+'><b>'+m.icon+' '+esc(m.naam)+
+    '<div class="scene"'+(m.verbonden?' style="border-color:var(--gold);"':'')+'><b>'+RTGGlyf.tekst(m.icon)+' '+esc(m.naam)+
     (m.partner?' <small style="color:var(--gold);">partner</small>':'')+'</b>'+
     '<small>'+esc(m.soort)+' · '+m.aantal+' apparaten · '+esc(m.uitleg)+'</small>'+
     '<div class="rij" style="margin-top:.3rem;">'+
@@ -138,7 +139,7 @@ function tekenKamers(){
       if (a.soort === 'slot') knop = '<button class="wissel'+(s.opSlot?'':' aan')+'" data-id="'+esc(a.id)+'" data-slot="1" aria-label="'+(s.opSlot?'Slot openen':'Op slot doen')+'" role="switch" aria-checked="'+(!s.opSlot)+'"></button>';
       else if ('open' in s) knop = '<button class="wissel'+(s.open?' aan':'')+'" data-id="'+esc(a.id)+'" data-open="1" aria-label="'+esc(a.naam)+' openen of sluiten" role="switch" aria-checked="'+s.open+'"></button>';
       else knop = '<button class="wissel'+(s.aan?' aan':'')+'" data-id="'+esc(a.id)+'" aria-label="'+esc(a.naam)+' aan of uit" role="switch" aria-checked="'+!!s.aan+'"></button>';
-      return '<div class="ap'+(actief?' actief':'')+'"><span class="naam">'+a.icon+' '+esc(a.naam)+knop+'</span>'+
+      return '<div class="ap'+(actief?' actief':'')+'"><span class="naam">'+RTGGlyf.tekst(a.icon)+' '+esc(a.naam)+knop+'</span>'+
         '<span class="staat">'+staatTekst(a)+'</span>'+extra+'</div>';
     }).join('')+'</div>').join('');
   $('#kamers').querySelectorAll('.wissel').forEach(b => b.addEventListener('click', async () => {

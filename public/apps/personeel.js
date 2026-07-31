@@ -999,7 +999,7 @@
       '<button class="abtn ghost" id="pkDorpChat" style="font-size:0.66rem;">'+T('pd.dorp.chat','Teamchat')+'</button></div>'+
       '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.4rem;">'+pkDorp.afdelingen.map(a =>
         '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+a.icon+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
-      '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+afd.icon+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
+      '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+RTGGlyf.tekst(afd.icon)+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
       pkToolsHtml()+
       (afd.open.length ? afd.open.map(p => {
         const i = afd.keten.indexOf(p.status);
@@ -1012,7 +1012,7 @@
       (pkDorpKant === 'concierge' && pkBuurt && pkBuurt.length
         ? '<div style="margin-top:0.5rem;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('pd.dorp.buurt','In de buurt')+'</div>'+
           '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+pkBuurt.map(b =>
-            '<button class="abtn ghost" data-pkdbuurt="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'">'+b.icon+' '+esc(b.naam)+' · '+b.km+' km</button>').join('')+'</div>'
+            '<button class="abtn ghost" data-pkdbuurt="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'">'+RTGGlyf.tekst(b.icon)+' '+esc(b.naam)+' · '+b.km+' km</button>').join('')+'</div>'
         : '')+
       '<button class="abtn ghost" data-pkdnieuw style="width:100%;margin-top:0.5rem;">+ '+T('pd.dorp.nieuw','Zet iets op de lijst')+'</button></div>';
   }

@@ -55,7 +55,7 @@
         '<button class="vbtn" data-sosaf="'+dt.id+'" data-sosid="'+s.id+'">'+T('bo.ontsosaf','SOS afgehandeld')+'</button>'+
         '</div></div>').join('');
       return '<div class="vrow" style="'+(nood?'border:1px solid #c62828;border-radius:12px;':'')+'"><div class="vi" style="width:100%;">'+
-        '<div class="nm">'+dt.icon+' '+escHtml(dt.activiteitLabel)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+namen+'</span></div>'+
+        '<div class="nm">'+RTGGlyf.tekst(dt.icon)+' '+escHtml(dt.activiteitLabel)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+namen+'</span></div>'+
         '<div class="sub">'+status+' · '+pos+'</div>'+ sosBlok +'</div></div>';
     }).join('');
     el.querySelectorAll('[data-sosaf]').forEach(b => b.addEventListener('click', async () => {

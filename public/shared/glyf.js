@@ -179,5 +179,23 @@
     return el;
   }
 
-  window.RTGGlyf = { svg: svg, svgHTML: svgHTML, heeft: function (n) { return !!P[n]; } };
+  /* Een glyfNAAM die uit de server komt ('paneel', 'stad', 'logboek') hoort een
+     pictogram te worden en geen woord in de tekst. Schermen die hun lijsten met
+     stringplakwerk opbouwen hadden daar een eigen hulpje voor nodig, en dat ging
+     twee keer mis: de app-bundels zijn BYTE-plakken van een bestand en geen losse
+     scopes, dus een functie boven in plak 06 bestaat niet in plak 07. En dit
+     bestand is zelf ook een bundel, dus een reparatie in glyf.js werd door de
+     eerstvolgende build weer overschreven. Vandaar hier, in de bron, een keer.
+
+     Onbekende naam? Dan blijft staan wat er stond, netjes ontsmet. Zo kan deze
+     omzetting nooit iets weghalen dat het wel deed. */
+  function tekst(naam) {
+    var n = naam == null ? '' : String(naam);
+    if (P[n]) return svgHTML(n, { klasse: 'gl-inline' });
+    return n.replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  window.RTGGlyf = { svg: svg, svgHTML: svgHTML, tekst: tekst, heeft: function (n) { return !!P[n]; } };
 })();

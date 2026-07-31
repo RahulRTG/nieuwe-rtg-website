@@ -793,7 +793,11 @@ async function binnen(){
 }
 
 /* huisstijl-glyf voor een kamer (valt stil terug als de glyf ontbreekt) */
-function ico(naam){ return (window.RTGGlyf && RTGGlyf.heeft(naam)) ? RTGGlyf.svgHTML(naam, { klasse:'gl-inline' }) : ''; }
+/* Bij een onbekende naam bleef hier NIETS staan. Sinds ook de lijsten hier
+   door ico() gaan, zou dat tekst weghalen die het wel deed; vandaar de
+   terugval op de tekst zelf. */
+function ico(naam){ return (window.RTGGlyf && RTGGlyf.heeft(naam))
+  ? RTGGlyf.svgHTML(naam, { klasse:'gl-inline' }) : esc(naam == null ? '' : naam); }
 
 /* ---------- het kamergrid ---------- */
 async function laadKamers(){
@@ -1081,7 +1085,7 @@ async function openAtelier(){
   zetKamerUrl('atelier');
   toon('vAtelier');
   const sel = $('#aCat');
-  if (!sel.options.length) sel.innerHTML = d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  if (!sel.options.length) sel.innerHTML = d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   renderAtelier();
 }
 function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+g+';border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;">'+esc(s)+'</span>'; }
@@ -1095,7 +1099,7 @@ function renderAtelier(){
     ['Maisons', d.kpi.huizen], ['Collecties', d.collecties.length]
   ].map(x => '<div class="kaart kpi-tegel"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
   $('#aFilters').innerHTML = '<button class="knop stil aFilterKnop'+(aFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
-    d.categorieen.filter(c => c.aantal).map(c => '<button class="knop stil aFilterKnop'+(aFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ') +
+    d.categorieen.filter(c => c.aantal).map(c => '<button class="knop stil aFilterKnop'+(aFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+ico(c.icon)+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ') +
     ' <span style="color:var(--line);margin:0 .2rem;">|</span> ' +
     ['', ...d.statussen].map(s => '<button class="knop stil aStatusKnop'+(aStatus===s?' aan':'')+'" data-s="'+s+'" style="padding:.15rem .6rem;font-size:.7rem;">'+(s || 'elke status')+'</button>').join(' ');
   $('#aFilters').querySelectorAll('.aFilterKnop').forEach(b => b.addEventListener('click', () => { aFilter = b.dataset.f; renderAtelier(); }));
@@ -1106,7 +1110,7 @@ function renderAtelier(){
     const c = o.concept;
     return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
-        '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div><h2 style="font-size:1.05rem;margin:0;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.categorieLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
         '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
         '<select class="veld aStatus" data-o="'+o.id+'" style="max-width:8.5rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
@@ -1260,7 +1264,7 @@ async function openStudio(){
   zetKamerUrl('studio');
   toon('vStudio');
   const sel = $('#sCat');
-  if (!sel.options.length) sel.innerHTML = d.disciplines.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  if (!sel.options.length) sel.innerHTML = d.disciplines.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   renderStudio();
 }
 function renderStudio(){
@@ -1279,7 +1283,7 @@ function renderStudio(){
   ).join('') : '<div class="leeg" style="color:var(--muted);font-size:.82rem;">Nog geen programma. Maak er een aan en wijs concepten toe.</div>';
   $('#sProg').querySelectorAll('.sLook').forEach(b => b.addEventListener('click', () => exportLookbook(b.dataset.naam)));
   $('#sFilters').innerHTML = '<button class="knop stil sFilterKnop'+(sFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
-    d.disciplines.filter(c => c.aantal).map(c => '<button class="knop stil sFilterKnop'+(sFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
+    d.disciplines.filter(c => c.aantal).map(c => '<button class="knop stil sFilterKnop'+(sFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+ico(c.icon)+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
   $('#sFilters').querySelectorAll('.sFilterKnop').forEach(b => b.addEventListener('click', () => { sFilter = b.dataset.f; renderStudio(); }));
   const lijst = d.ontwerpen.filter(o => !sFilter || o.discipline === sFilter);
   const opts = d.statussen.map(s => '<option value="'+s+'">'+s+'</option>').join('');
@@ -1288,7 +1292,7 @@ function renderStudio(){
     const c = o.concept;
     return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
-        '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div><h2 style="font-size:1.05rem;margin:0;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
         '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
         '<select class="veld sStatus" data-o="'+o.id+'" style="max-width:8.5rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
@@ -1371,7 +1375,7 @@ async function exportLookbook(naam){
     const c = o.concept, sp = o.specsheet;
     return '<article>'+
       '<header><span class="nr">'+String(i+1).padStart(2,'0')+'</span>'+
-        '<div><h2>'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div><h2>'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<div class="meta">'+esc(o.disciplineLabel)+(o.huis?' &middot; '+esc(o.huis):'')+' &middot; '+esc(o.status)+'</div></div></header>'+
       (c ? '<div class="swrij">'+swatchStrook(c.kleuren)+'</div>'+
         '<p class="lead"><b>'+esc(c.silhouet)+'</b> &middot; '+esc(c.aandrijving)+'</p>'+
@@ -1434,7 +1438,7 @@ async function openHardware(){
   zetKamerUrl('hardware');
   toon('vHardware');
   const sel = $('#hCat');
-  if (!sel.options.length) sel.innerHTML = d.disciplines.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  if (!sel.options.length) sel.innerHTML = d.disciplines.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   renderHardware();
 }
 function renderHardware(){
@@ -1452,7 +1456,7 @@ function renderHardware(){
   ).join('') : '<div class="leeg" style="color:var(--muted);font-size:.82rem;">Nog geen serie. Maak er een aan en wijs concepten toe.</div>';
   $('#hSerie').querySelectorAll('.hProd').forEach(b => b.addEventListener('click', () => exportProductblad(b.dataset.naam)));
   $('#hFilters').innerHTML = '<button class="knop stil hFilterKnop'+(hFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
-    d.disciplines.filter(c => c.aantal).map(c => '<button class="knop stil hFilterKnop'+(hFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
+    d.disciplines.filter(c => c.aantal).map(c => '<button class="knop stil hFilterKnop'+(hFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+ico(c.icon)+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
   $('#hFilters').querySelectorAll('.hFilterKnop').forEach(b => b.addEventListener('click', () => { hFilter = b.dataset.f; renderHardware(); }));
   const lijst = d.ontwerpen.filter(o => !hFilter || o.discipline === hFilter);
   const opts = d.statussen.map(s => '<option value="'+s+'">'+s+'</option>').join('');
@@ -1461,7 +1465,7 @@ function renderHardware(){
     const c = o.concept;
     return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
-        '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div><h2 style="font-size:1.05rem;margin:0;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
         '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
         '<select class="veld hStatus" data-o="'+o.id+'" style="max-width:8.5rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
@@ -1563,7 +1567,7 @@ async function exportProductblad(naam){
     const c = o.concept, sp = o.stuklijst;
     return '<article>'+
       '<header><span class="nr">'+String(i+1).padStart(2,'0')+'</span>'+
-        '<div><h2>'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div><h2>'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<div class="meta">'+esc(o.disciplineLabel)+(o.huis?' &middot; '+esc(o.huis):'')+' &middot; '+esc(o.status)+'</div></div></header>'+
       (c ? '<div class="swrij">'+swatchStrook(c.kleuren)+'</div>'+
         '<p class="lead"><b>'+esc(c.behuizing)+'</b> &middot; '+esc(c.chip)+'</p>'+
@@ -1626,7 +1630,7 @@ async function openArchitect(){
   zetKamerUrl('architect');
   toon('vArchitect');
   const sel = $('#gCat');
-  if (!sel.options.length) sel.innerHTML = d.disciplines.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  if (!sel.options.length) sel.innerHTML = d.disciplines.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   renderArchitect();
 }
 function renderArchitect(){
@@ -1644,7 +1648,7 @@ function renderArchitect(){
   ).join('') : '<div class="leeg" style="color:var(--muted);font-size:.82rem;">Nog geen project. Maak er een aan en wijs concepten toe.</div>';
   $('#gProj').querySelectorAll('.gPort').forEach(b => b.addEventListener('click', () => exportPortfolio(b.dataset.naam)));
   $('#gFilters').innerHTML = '<button class="knop stil gFilterKnop'+(gFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
-    d.disciplines.filter(c => c.aantal).map(c => '<button class="knop stil gFilterKnop'+(gFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
+    d.disciplines.filter(c => c.aantal).map(c => '<button class="knop stil gFilterKnop'+(gFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+ico(c.icon)+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
   $('#gFilters').querySelectorAll('.gFilterKnop').forEach(b => b.addEventListener('click', () => { gFilter = b.dataset.f; renderArchitect(); }));
   const lijst = d.ontwerpen.filter(o => !gFilter || o.discipline === gFilter);
   const opts = d.statussen.map(s => '<option value="'+s+'">'+s+'</option>').join('');
@@ -1653,7 +1657,7 @@ function renderArchitect(){
     const c = o.concept;
     return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
-        '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div><h2 style="font-size:1.05rem;margin:0;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
         '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
         '<select class="veld gStatus" data-o="'+o.id+'" style="max-width:9rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
@@ -1736,7 +1740,7 @@ async function exportPortfolio(naam){
     const c = o.concept, sp = o.bouwstaat;
     return '<article>'+
       '<header><span class="nr">'+String(i+1).padStart(2,'0')+'</span>'+
-        '<div><h2>'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div><h2>'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<div class="meta">'+esc(o.disciplineLabel)+(o.huis?' &middot; '+esc(o.huis):'')+' &middot; '+esc(o.status)+'</div></div></header>'+
       (c ? '<div class="swrij">'+swatchStrook(c.kleuren)+'</div>'+
         '<p class="lead"><b>'+esc(c.typologie)+'</b> &middot; '+esc(c.constructie)+'</p>'+
@@ -1811,7 +1815,7 @@ async function openIdeeen(){
   zetKamerUrl('ideeen');
   toon('vIdeeen');
   $('#iBureaus').innerHTML = d.bureaus.map(b =>
-    '<button class="knop stil iBureauKnop'+(iKeuze.includes(b.id)?' aan':'')+'" data-b="'+b.id+'" style="font-size:.76rem;padding:.3rem .6rem;">'+b.icon+' '+esc(b.label)+'</button>').join('');
+    '<button class="knop stil iBureauKnop'+(iKeuze.includes(b.id)?' aan':'')+'" data-b="'+b.id+'" style="font-size:.76rem;padding:.3rem .6rem;">'+ico(b.icon)+' '+esc(b.label)+'</button>').join('');
   $('#iBureaus').querySelectorAll('.iBureauKnop').forEach(x => x.addEventListener('click', () => {
     const b = x.dataset.b; iKeuze = iKeuze.includes(b) ? iKeuze.filter(y => y !== b) : iKeuze.concat(b);
     x.classList.toggle('aan', iKeuze.includes(b));
@@ -1831,7 +1835,7 @@ function renderIdeeen(){
       (o.brief?'<p style="font-size:.82rem;color:var(--muted);line-height:1.6;margin:.4rem 0 0;">'+esc(o.brief)+'</p>':'')+
       (o.uitwerking ? '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
         '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Brief per bureau</div>'+
-        Object.keys(o.uitwerking).map(k => { const b = bureauOpts.find(x => x.id === k) || { icon:'•', label:k }; return '<div style="font-size:.8rem;line-height:1.55;margin-bottom:.2rem;"><b>'+b.icon+' '+esc(b.label.replace('RTG ',''))+':</b> '+esc(o.uitwerking[k])+'</div>'; }).join('')+'</div>' : '')+
+        Object.keys(o.uitwerking).map(k => { const b = bureauOpts.find(x => x.id === k) || { icon:'•', label:k }; return '<div style="font-size:.8rem;line-height:1.55;margin-bottom:.2rem;"><b>'+ico(b.icon)+' '+esc(b.label.replace('RTG ',''))+':</b> '+esc(o.uitwerking[k])+'</div>'; }).join('')+'</div>' : '')+
       (o.spinoffs && o.spinoffs.length ? '<div style="font-size:.76rem;color:var(--gold);margin-top:.45rem;">Als concept: '+o.spinoffs.map(s => esc(s.bureauLabel.replace('RTG ',''))).join(', ')+'</div>' : '')+
       (o.reacties && o.reacties.length ? '<div style="margin-top:.5rem;border-left:2px solid var(--line);padding-left:.7rem;">'+o.reacties.slice(-4).map(r => '<div style="font-size:.8rem;line-height:1.5;"><b>'+esc(r.door)+':</b> '+esc(r.tekst)+'</div>').join('')+'</div>' : '')+
       '<div class="rij" style="margin-top:.55rem;gap:.4rem;">'+

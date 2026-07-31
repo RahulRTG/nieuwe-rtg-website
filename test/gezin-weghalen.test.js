@@ -130,13 +130,16 @@ test('3. het verjaardagsboek: wie iemand toevoegde haalt hem weg, of een ouder',
   assert.equal((await api('/gezin/verjaardag/persoon/verwijder', { code: G.code, token: G.ouder2.token, persoonId })).status, 200,
     'een ouder mag ook weghalen wat een kind toevoegde');
 
-  /* De wensen van die persoon gaan mee. Een wenslijst voor iemand die niet meer
-     in het boek staat is een lijst zonder eigenaar, en die blijft anders voor
-     altijd in de gegevens hangen. */
   const boek = await haal('/verjaardagen', G.code, G.token);
   assert.ok(!(boek.mensen || []).some(m => m.id === persoonId), 'de persoon is weg');
-  assert.ok(!(boek.mensen || []).some(m => (m.wensen || []).some(w => w.tekst === 'Een nieuwe hengel')),
-    'en zijn wensen zijn meegegaan');
+
+  /* De route ruimt ook de wensen van die persoon op (v.wensen wordt gefilterd).
+     Dat is goed -- een wenslijst zonder eigenaar blijft anders voor altijd in
+     de gegevens hangen -- maar het is van BUITENAF NIET TE ZIEN: het overzicht
+     toont wensen alleen onder een persoon, dus een wees-wens is sowieso
+     onzichtbaar. Mijn eerste versie beweerde het toch, en die bewering bleef
+     staan toen ik het opruimen eruit sloopte: een toets die niet kan falen.
+     Hij staat er daarom niet meer. Wat wel te zien is, staat hierboven. */
 
   assert.equal((await api('/gezin/verjaardag/persoon/verwijder', { code: G.code, token: G.token, persoonId: 'bestaatniet' })).status, 404);
 });

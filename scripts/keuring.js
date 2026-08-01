@@ -23,6 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { zonderCommentaar } = require('./lib/bron');
 
 const WORTEL = path.join(__dirname, '..');
 const bevindingen = [];
@@ -88,7 +89,18 @@ function dekking() {
     meld('beter', 'dekking', 'De routekaart kon niet worden gelezen, dus de dekking is niet gemeten.', 'scripts/routekaart.js', String(e.message || e).slice(0, 120));
     return { routes: 0, gedekt: 0 };
   }
-  const testTekst = testJs.map(lees).join('\n');
+  /* COMMENTAAR TELT NIET MEE. Hieronder stond `testJs.map(lees).join('\n')`, dus
+     de rauwe tekst inclusief uitleg. Een pad in een commentaarregel telde daarmee
+     als dekking, en dat is precies het gat dat de uitleg hieronder zelf al
+     benoemde: "het cijfer is met een zoek-en-vervang op te poetsen zonder ook
+     maar een test te schrijven".
+
+     Dat is erger dan een onnauwkeurige meter, want deze twee getallen zijn
+     RATELTANDEN: endpointsZonderTest en dekkingPct staan in NORM.json en mogen
+     alleen de goede kant op. Een tand die je met een zoek-en-vervang kunt
+     bijvijlen, houdt niets tegen -- en erger, hij gaat klagen als iemand een
+     commentaarregel opruimt. Nu telt alleen nog wat er in de CODE staat. */
+  const testTekst = testJs.map(p => zonderCommentaar(lees(p))).join('\n');
   const apiRoutes = routes.filter(r => r.startsWith('/api/'));
 
   /* EEN ROUTE HEET IN EEN TEST NIET ALTIJD ZOALS HIJ IN DE ROUTEKAART HEET.

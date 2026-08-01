@@ -15,10 +15,9 @@ const ok = m => console.log('  ✓ ' + m);
 
 /* Commentaar eruit halen (regel- en blokcommentaar), zodat een uitleg als
    "// require('x') -> 'x'" niet als echte require wordt gelezen. Strings blijven
-   staan; voor deze keuringen is dat genoeg. */
-function zonderCommentaar(bron) {
-  return String(bron).replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
-}
+   staan; voor deze keuringen is dat genoeg. Staat in scripts/lib/bron.js omdat
+   scripts/keuring.js hem ook gebruikt. */
+const { zonderCommentaar } = require('./lib/bron');
 
 function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {

@@ -128,13 +128,34 @@ test('4. verhalen: plaatsen, zien en bekijken binnen de vriendenlaag', async () 
   const zet = await soc('/story/post', { code: A.code, token: A.kid, foto, tekst: 'Vandaag' });
   assert.equal(zet.status, 200, 'het verhaal staat er: ' + JSON.stringify(zet.body).slice(0, 140));
 
+  /* HIER STOND EEN TOETS DIE NIET KON ZAKKEN. De lijst mocht leeg zijn, het id
+     werd dan 'bestaatniet', en het bekijken werd afgerekend met
+     `[200, 403, 404].includes(status)` -- dus "B ziet het verhaal", "B mag er
+     niet bij" en "het verhaal bestaat niet" gaven alle drie een groen vinkje.
+     Terwijl A en B aan het eind van toets 2 juist weer vrienden zijn: het
+     verhaal HOORT er te staan en B HOORT het te mogen openen. Dat is nu de
+     bewering. */
   const lijst = await soc('/stories', { code: B.code, token: B.kid });
   assert.equal(lijst.status, 200);
-  assert.ok(Array.isArray(lijst.body.stories), 'de verhalenlijst is een lijst, ook als hij leeg is');
+  assert.ok(Array.isArray(lijst.body.stories), 'de verhalenlijst is een lijst');
 
   const eerste = lijst.body.stories[0];
-  const kijk = await soc('/story/view', { code: B.code, token: B.kid, id: eerste ? eerste.id : 'bestaatniet' });
-  assert.ok([200, 403, 404].includes(kijk.status), 'bekijken antwoordt netjes: ' + kijk.status);
+  assert.ok(eerste && eerste.id, 'het verhaal van A staat in de lijst van B: de vriendenlaag draagt het door');
+  const kijk = await soc('/story/view', { code: B.code, token: B.kid, id: eerste.id });
+  assert.equal(kijk.status, 200, 'en B mag het openen: ' + kijk.status + ' ' + JSON.stringify(kijk.body).slice(0, 120));
+  assert.equal(kijk.body.tekst, 'Vandaag', 'met de inhoud die A erin zette');
+
+  /* DE TEGENPROEF, want zonder deze bewijst het bovenstaande alleen dat de deur
+     opengaat en niet dat hij ergens dichtzit. Een derde gezin dat met niemand
+     verbonden is, ziet het verhaal niet en kan het ook niet openen. */
+  const C = await gezin('Gamma');
+  const vreemd = await soc('/stories', { code: C.code, token: C.kid });
+  assert.equal(vreemd.status, 200);
+  assert.equal((vreemd.body.stories || []).some(s => s.id === eerste.id), false,
+    'een gezin buiten de vriendenlaag ziet het verhaal niet staan');
+  const stiekem = await soc('/story/view', { code: C.code, token: C.kid, id: eerste.id });
+  assert.ok([403, 404].includes(stiekem.status),
+    'en het id kennen is niet genoeg om het te openen (kreeg ' + stiekem.status + ')');
 
   // en zonder gezinstoken kom je er sowieso niet in
   assert.equal((await soc('/stories', { code: A.code, token: 'verzonnen' })).status, 403);

@@ -241,25 +241,33 @@ test('6. de SSO-startroutes weigeren een onbekende organisatie en een open redir
 /* ================= 5. de meting ================= */
 
 test('7. /api/metrics staat niet zomaar open, en bevat geen persoonsgegevens', async () => {
-  /* Zonder RTG_METRICS_TOKEN mag alleen een intern adres erbij. De testclient
-     komt via 127.0.0.1 binnen, dus die telt als intern -- precies de opzet die
-     in productie achter een reverse proxy zit. Wat er NIET in mag staan is
-     belangrijker dan of hij open is: een scrape-endpoint wordt doorgaans minder
-     streng bewaakt dan de database. */
-  const m = await get('/api/metrics');
-  assert.ok([200, 404].includes(m.status), '/api/metrics geeft 200 (intern) of 404 (geweigerd): ' + m.status);
-  if (m.status === 200) {
-    assert.ok(m.tekst.includes('rtg_verzoeken_totaal'), 'het Prometheus-formaat staat erin');
-    assert.equal(/roellie|@x\.nl|Gewoon Lid/i.test(m.tekst), false, 'geen namen of adressen in de meting');
-    /* En geen route met een ingevulde waarde erin: dan zou elke gebruiker een
-       eigen tijdreeks krijgen en legt de monitoring zichzelf om. */
-    assert.equal(/route="[^"]*\/(user-\d+|NL\d\d[A-Z]{4})/.test(m.tekst), false,
-      'de labels dragen het routePATROON, geen ingevulde ids');
-  }
-  const kort = await get('/api/metrics/kort');
-  assert.ok([200, 404].includes(kort.status), '/api/metrics/kort: ' + kort.status);
+  /* WAT HIER STOND EN WAAROM HET NIETS BEWEES. Drie keer
+     `assert.ok([200, 404].includes(status))`, met het hele lichaam achter
+     `if (m.status === 200)`. Open en dicht gaven allebei groen, en zat de deur
+     dicht dan werd er helemaal niets meer nagekeken -- terwijl dit de enige
+     plek in de suite was die /api/metrics uberhaupt aanraakte. De reparatie die
+     deze deur achter een poortwachter dichtzette, had daarmee geen enkele toets
+     die kon zakken.
 
-  // een verzonnen intern-verklaring in een kop mag niets openen dat dicht was
+     De deur zelf staat nu in test/metingpoort.test.js, van drie kanten (kaal,
+     achter een poortwachter, met token). Hier blijft over waar dit bestand over
+     gaat: het techniekbord van een echte installatie. Deze server draait kaal en
+     de testclient belt vanaf 127.0.0.1, dus de uitkomst ligt vast -- geen lijstje
+     toegestane statussen meer, maar een getal. */
+  const m = await get('/api/metrics');
+  assert.equal(m.status, 200, 'kaal en van dichtbij: de meting is op te halen (' + m.status + ')');
+  assert.ok(m.tekst.includes('rtg_verzoeken_totaal'), 'het Prometheus-formaat staat erin');
+  assert.equal(/roellie|@x\.nl|Gewoon Lid/i.test(m.tekst), false, 'geen namen of adressen in de meting');
+  /* En geen route met een ingevulde waarde erin: dan zou elke gebruiker een
+     eigen tijdreeks krijgen en legt de monitoring zichzelf om. */
+  assert.equal(/route="[^"]*\/(user-\d+|NL\d\d[A-Z]{4})/.test(m.tekst), false,
+    'de labels dragen het routePATROON, geen ingevulde ids');
+
+  assert.equal((await get('/api/metrics/kort')).status, 200, 'de korte versie deelt dezelfde deur');
+
+  /* Een verzonnen intern-verklaring in een kop mag het oordeel niet veranderen.
+     De oude vorm accepteerde ook hier allebei de uitkomsten en kon dus niet zien
+     of de kop werd geloofd; het gaat erom dat het antwoord GELIJK blijft. */
   const nep = await get('/api/metrics', undefined, { 'X-Forwarded-For': '10.0.0.1' });
-  assert.ok([200, 404].includes(nep.status), 'een kop verandert de beoordeling niet in een fout');
+  assert.equal(nep.status, m.status, 'het socketadres beslist, niet de kop');
 });

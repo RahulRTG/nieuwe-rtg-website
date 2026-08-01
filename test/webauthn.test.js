@@ -1,7 +1,15 @@
-/* Passkeys (WebAuthn): de servermechanieken. De echte ceremonie (browser +
-   authenticator) staat in de browser-E2E met een virtuele authenticator; hier
-   testen we de randen: opties-vorm, anti-enumeratie, poorten, remmen en
-   beheer. Draai los: node --experimental-sqlite --test test/webauthn.test.js */
+/* Passkeys (WebAuthn): de servermechanieken. Dit bestand toetst de RANDEN --
+   opties-vorm, anti-enumeratie, poorten, remmen en beheer.
+
+   Hier stond dat de echte ceremonie "in de browser-E2E met een virtuele
+   authenticator" staat. Dat klopte, maar de E2E draait niet mee in npm test, dus
+   in de praktijk werd registreren en inloggen met een passkey nooit getoetst.
+   Alleen weigeren is geen bewijs: een deur die altijd dicht zit haalt elke toets
+   hieronder moeiteloos. Die ceremonie staat nu in
+   test/webauthn-ceremonie.test.js, met een nagespeelde authenticator
+   (test/webauthn-authenticator.js) en over de echte routes.
+
+   Draai los: node --experimental-sqlite --test test/webauthn.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -9,7 +17,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 
-let srv, base, lid;
+let srv, base, lid, lidEmail;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-webauthn-'));
 
 function api(pad, body, token) {
@@ -23,7 +31,8 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  const reg = await api('/api/auth/register', { name: 'Lid P', email: 'pk' + u + '@x.nl', phone: '06' + u,
+  lidEmail = 'pk' + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: 'Lid P', email: lidEmail, phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
 });
@@ -67,7 +76,7 @@ test('4. inloggen met een valse passkey faalt en de rem op de deur telt mee', as
   assert.ok(!r.body.token, 'en zeker geen token');
 });
 
-test('5. beheer: de lijst is leeg tot de browser-ceremonie er een toevoegt; weghalen bestaat', async () => {
+test('5. beheer: de lijst is leeg tot de ceremonie er een toevoegt; weghalen bestaat', async () => {
   const lijst = await api('/api/webauthn/lijst', {}, lid);
   assert.equal(lijst.status, 200);
   assert.deepEqual(lijst.body.sleutels, []);

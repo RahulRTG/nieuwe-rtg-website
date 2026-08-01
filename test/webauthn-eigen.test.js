@@ -3,54 +3,21 @@
    node:crypto: bouwen zelf een authenticatorData + attestationObject (CBOR),
    ondertekenen de assertion, en controleren dat de eigen laag de registratie en
    login accepteert -- en rommel/verkeerde origin/kapotte handtekening weigert.
-   Zo is de crypto geborgd zonder een browser. Los: node --test test/webauthn-eigen.test.js */
+   Zo is de crypto geborgd zonder een browser.
+
+   DE AUTHENTICATOR ZELF STAAT NIET MEER HIER. Hij is verhuisd naar
+   test/webauthn-authenticator.js, want test/webauthn.test.js speelt dezelfde
+   ceremonie nu ook af op de ECHTE ROUTES. Dit bestand toetst server/webauthn.js
+   rechtstreeks en geeft de verwachte origin en rpID met de hand mee -- precies
+   zoals de kern-toets bij het pasbesluit dat deed, en daar zat de fout in de
+   route. Twee lagen, een authenticator.
+
+   Los: node --test test/webauthn-eigen.test.js */
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 const wa = require('../server/webauthn');
-
-const b64u = b => Buffer.from(b).toString('base64url');
-
-/* ---- piepkleine CBOR-encoder, alleen voor de testvectoren ---- */
-function head(mj, len) {
-  const mt = mj << 5;
-  if (len < 24) return Buffer.from([mt | len]);
-  if (len < 256) return Buffer.from([mt | 24, len]);
-  const b = Buffer.alloc(3); b[0] = mt | 25; b.writeUInt16BE(len, 1); return b;
-}
-const cU = n => head(0, n), cN = n => head(1, -1 - n), cB = b => Buffer.concat([head(2, b.length), b]);
-const cT = s => { const b = Buffer.from(s, 'utf8'); return Buffer.concat([head(3, b.length), b]); };
-function cVal(v) {
-  if (Buffer.isBuffer(v)) return cB(v);
-  if (typeof v === 'string') return cT(v);
-  if (typeof v === 'number') return v < 0 ? cN(v) : cU(v);
-  if (v instanceof Map) return cMap(v);
-  throw new Error('cVal?');
-}
-function cMap(m) {
-  const p = [head(5, m.size)];
-  for (const [k, v] of m) { p.push(typeof k === 'number' ? (k < 0 ? cN(k) : cU(k)) : cT(k)); p.push(cVal(v)); }
-  return Buffer.concat(p);
-}
-
-/* ---- een authenticator naspelen ---- */
-function maakAuthenticator(rpID) {
-  const { publicKey, privateKey } = crypto.generateKeyPairSync('ec', { namedCurve: 'P-256' });
-  const jwk = publicKey.export({ format: 'jwk' });
-  const cose = cMap(new Map([[1, 2], [3, -7], [-1, 1],
-    [-2, Buffer.from(jwk.x, 'base64url')], [-3, Buffer.from(jwk.y, 'base64url')]]));
-  const credId = crypto.randomBytes(20);
-  const rpIdHash = crypto.createHash('sha256').update(rpID).digest();
-  const authData = (flags, count, withCred) => {
-    const fl = Buffer.from([flags]); const sc = Buffer.alloc(4); sc.writeUInt32BE(count);
-    if (!withCred) return Buffer.concat([rpIdHash, fl, sc]);
-    const idLen = Buffer.alloc(2); idLen.writeUInt16BE(credId.length);
-    return Buffer.concat([rpIdHash, fl, sc, Buffer.alloc(16), idLen, credId, cose]);
-  };
-  return { privateKey, credId, authData };
-}
-const clientData = (type, challenge, origin) =>
-  b64u(Buffer.from(JSON.stringify({ type, challenge, origin, crossOrigin: false })));
+const { maakAuthenticator, clientData, b64u, cMap } = require('./webauthn-authenticator');
 
 const RP = 'localhost', ORIGIN = 'https://localhost';
 

@@ -1,12 +1,12 @@
 {
   "vastgelegd": "2026-08-01",
   "meters": {
-    "endpointsZonderTest": 633,
+    "endpointsZonderTest": 634,
     "dekkingPct": 75,
     "keuringStuk": 0,
     "keuringScheef": 0,
     "dependencies": 0,
-    "testbestanden": 466,
+    "testbestanden": 472,
     "dekkingWaargenomenPct": 94,
     "zelfpoortendeToetsen": 68,
     "e2eBestanden": 42,
@@ -15,6 +15,12 @@
     "keuringDekkingAdvies": 8
   },
   "notities": [
+    {
+      "datum": "2026-08-01",
+      "meter": "endpointsZonderTest 633 -> 634",
+      "reden": "Met de hand verhoogd, en dat is het verlagen van de lat. De aanleiding: scripts/keuring.js telde een route als gedekt zodra het pad ergens in de TEKST van een testbestand stond, dus ook in een commentaarregel. De uitleg in dat bestand gaf dat zelf toe (het cijfer was op te poetsen met een zoek-en-vervang) terwijl deze meter een ratelttand is. Nu telt alleen nog wat er in de CODE staat: de testbron gaat eerst door zonderCommentaar().",
+      "eerlijkheidshalve": "De verwachting was dat het cijfer door die verscherping zou stijgen. Dat gebeurde NIET: met en zonder commentaar komt de lijst op exact dezelfde 634 endpoints uit, dus geen enkele route werd in de praktijk door een commentaarregel gedekt. Het gat was theoretisch. De 634 blijkt van eerder te komen: ook op commit 076c8d1 en 3d7a5a0 staat de teller op 634, terwijl de norm op 633 stond. Er is dus een route bijgekomen zonder toets in een commit waarna npm run norm niet is gedraaid. De ratel deed precies wat hij moest doen, alleen een paar commits te laat. Wie de tand terug wil op 633 schrijft een toets voor een van de endpoints uit de lijst; ze staan in scripts/keuring.js --json onder cijfers.dekking.ongedekt."
+    },
     {
       "datum": "2026-08-01",
       "meter": "keuringBeter -> keuringOmvang / keuringDubbeling / keuringDekkingAdvies",

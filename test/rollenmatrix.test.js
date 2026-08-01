@@ -246,27 +246,31 @@ test('9. een medisch dossier wissen kan alleen de eigenaar ervan', async () => {
      lid B kan het dossier van lid A niet wissen, en na zijn poging staat het er
      bij A nog. De status zegt hier weer weinig -- de weg-functies filteren
      binnen het eigen dossier -- dus we kijken naar wat er overblijft. */
+  /* DE TWEE ALS-EN DIE HIER STONDEN. Het aanmaken werd geaccepteerd met
+     [200, 400], en de hele poging van lid B zat daarna in `if (dossier bevat
+     MERK)` en `if (id && id.id)`. Alle drie klopten ze altijd -- gzDossier()
+     weigert alleen een LEGE titel -- maar dat is precies het probleem: brak het
+     aanmaken, dan viel de IDOR-controle er geruisloos uit en bleef de toets
+     groen. De grendel die hier bewaakt wordt was dan niet zwakker geworden;
+     alleen de bewaking. Nu is elke stap een bewering. */
   const MERK = 'DOSSIER-' + Math.random().toString(36).slice(2, 8);
   const maak = await api('member/lifestyle/gezondheid/dossier', { titel: MERK, soort: 'uitslag', tekst: 'vertrouwelijk' }, lid.token);
-  assert.ok([200, 400].includes(maak.status), 'dossier aanmaken: ' + maak.status + ' ' + maak.tekst.slice(0, 150));
+  assert.equal(maak.status, 200, 'dossier aanmaken: ' + maak.status + ' ' + maak.tekst.slice(0, 150));
 
   const mijn = await api('member/lifestyle/gezondheid', {}, lid.token);
   assert.equal(mijn.status, 200, 'de gezondheidskaart is op te vragen');
-  const dossier = JSON.stringify(mijn.body);
-  if (dossier.includes(MERK)) {
-    const id = (mijn.body.dossiers || mijn.body.dossier || []).find(d => (d.titel || '').includes(MERK));
-    if (id && id.id) {
-      // lid B probeert het te wissen
-      await api('member/lifestyle/gezondheid/dossier/weg', { id: id.id }, lidB.token);
-      const na = await api('member/lifestyle/gezondheid', {}, lid.token);
-      assert.ok(JSON.stringify(na.body).includes(MERK),
-        'het dossier van lid A staat er nog na de poging van lid B');
-      // en de eigenaar wist het wel
-      assert.equal((await api('member/lifestyle/gezondheid/dossier/weg', { id: id.id }, lid.token)).status, 200);
-      const weg = await api('member/lifestyle/gezondheid', {}, lid.token);
-      assert.equal(JSON.stringify(weg.body).includes(MERK), false, 'en daarna is het echt weg');
-    }
-  }
+  const notitie = (mijn.body.dossiers || mijn.body.dossier || []).find(d => (d.titel || '').includes(MERK));
+  assert.ok(notitie && notitie.id, 'het verse dossier staat in de kaart van lid A: ' + JSON.stringify(mijn.body).slice(0, 160));
+
+  // lid B probeert het te wissen
+  await api('member/lifestyle/gezondheid/dossier/weg', { id: notitie.id }, lidB.token);
+  const na = await api('member/lifestyle/gezondheid', {}, lid.token);
+  assert.ok(JSON.stringify(na.body).includes(MERK),
+    'het dossier van lid A staat er nog na de poging van lid B');
+  // en de eigenaar wist het wel
+  assert.equal((await api('member/lifestyle/gezondheid/dossier/weg', { id: notitie.id }, lid.token)).status, 200);
+  const weg = await api('member/lifestyle/gezondheid', {}, lid.token);
+  assert.equal(JSON.stringify(weg.body).includes(MERK), false, 'en daarna is het echt weg');
   // niets van lid A staat in de kaart van lid B
   const kaartB = await api('member/lifestyle/gezondheid', {}, lidB.token);
   assert.equal(JSON.stringify(kaartB.body).includes(MERK), false,

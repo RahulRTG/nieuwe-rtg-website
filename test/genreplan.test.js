@@ -4,6 +4,20 @@
    advies), dat vinkjes per dag bewaard en omkeerbaar zijn, dat
    /api/supplier/puls/blik zeven dagen vooruitkijkt op echte agenda-data,
    en dat genres met een eigen plus-laag niets krijgen.
+
+   DE STEIGER DIE BLEEF STAAN. Dit bestand is geschreven voordat de routes waren
+   aangesloten, en had daarvoor een vlag: een proefaanroep in test.before zette
+   `gewired` op false bij een 404, en alle zeven toetsen begonnen met
+   `if (!gewired) return t.skip('wiring volgt')`. De wiring-commit is er allang
+   (server/routes/supplier/genreplan.js hangt /api/supplier/puls/plan op), dus de
+   vlag stond permanent op true en deed niets meer -- behalve het enige wat hij
+   nog KON doen: zeven toetsen stil uitzetten op het moment dat iemand de
+   routekoppeling breekt. Dan is er geen fout en geen rode toets, alleen zeven
+   regels "skipped" die niemand leest. Dat is LAT.md regel 3 en 9 in een.
+
+   De proefaanroep staat er nog, maar als BEWERING: is de motor niet aangesloten,
+   dan zakt deze toets en gaat de rest gewoon door met falen.
+
    Draai los: node --experimental-sqlite --test test/genreplan.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -13,7 +27,6 @@ const path = require('path');
 const { startServer, stop } = require('./helper');
 
 let srv, base, haven, opvang, golf, resto;
-let gewired = true; // deel 1: de routes worden in de wiring-commit aangesloten
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-plan-'));
 
 const api = (pad, body, t) => fetch(base + '/api/' + pad, {
@@ -37,7 +50,9 @@ test.before(async () => {
   assert.ok(haven && opvang && golf && resto, 'de vier zaken zijn binnen');
   // bewust NIET voorseeden via de genre-routes: het draaiboek en het
   // weekblik wekken de genre-motor zelf, en dat bewijzen deze tests
-  gewired = (await api('supplier/puls/plan', {}, haven)).status !== 404;
+  const proef = await api('supplier/puls/plan', {}, haven);
+  assert.notEqual(proef.status, 404,
+    'de genre-motor is aangesloten; zonder die koppeling heeft geen van de toetsen hieronder nog betekenis');
 });
 test.after(() => {
   stop(srv && srv.child);
@@ -45,7 +60,6 @@ test.after(() => {
 });
 
 test('1. het marina-draaiboek: vertrek als NU-taak, service en concierge als dagtaken', async t => {
-  if (!gewired) return t.skip('wiring volgt');
   const r = await api('supplier/puls/plan', {}, haven);
   assert.equal(r.status, 200);
   const plan = r.body.plan;
@@ -59,7 +73,6 @@ test('1. het marina-draaiboek: vertrek als NU-taak, service en concierge als dag
 });
 
 test('2. afvinken: het vinkje blijft staan, het advies schuift door, en het is omkeerbaar', async t => {
-  if (!gewired) return t.skip('wiring volgt');
   const voor = (await api('supplier/puls/plan', {}, haven)).body.plan;
   const eerste = voor.taken[0];
   const vink = await api('supplier/puls/plan/klaar', { taakId: eerste.id }, haven);
@@ -74,7 +87,6 @@ test('2. afvinken: het vinkje blijft staan, het advies schuift door, en het is o
 });
 
 test('3. de opvang plant slim: nanny-aanvraag wordt een taak en telt mee in de week', async t => {
-  if (!gewired) return t.skip('wiring volgt');
   const d = new Date().toISOString().slice(0, 10);
   const vraag = await api('supplier/opvang/nanny', { gezin: 'Fam. Leeuwenberg', datum: d, van: '09:00', tot: '12:00', wens: 'Twee kinderen thuis.' }, opvang);
   assert.equal(vraag.status, 200);
@@ -87,7 +99,6 @@ test('3. de opvang plant slim: nanny-aanvraag wordt een taak en telt mee in de w
 });
 
 test('4. de golfclub kijkt vooruit: de wedstrijd staat in draaiboek en weekblik', async t => {
-  if (!gewired) return t.skip('wiring volgt');
   const plan = (await api('supplier/puls/plan', {}, golf)).body.plan;
   assert.ok(plan.taken.some(t => t.id.indexOf('wed-') === 0 && t.tekst.indexOf('Maandbeker') >= 0), 'de Maandbeker staat als voorbereidingstaak');
   const blik = (await api('supplier/puls/blik', {}, golf)).body.blik;
@@ -96,19 +107,16 @@ test('4. de golfclub kijkt vooruit: de wedstrijd staat in draaiboek en weekblik'
 });
 
 test('5. een genre met een eigen plus-laag krijgt geen draaiboek of weekblik', async t => {
-  if (!gewired) return t.skip('wiring volgt');
   assert.equal((await api('supplier/puls/plan', {}, resto)).body.plan, null);
   assert.equal((await api('supplier/puls/blik', {}, resto)).body.blik, null);
 });
 
 test('6. zonder inlog blijven draaiboek en weekblik dicht', async t => {
-  if (!gewired) return t.skip('wiring volgt');
   assert.equal((await api('supplier/puls/plan', {})).status, 401);
   assert.equal((await api('supplier/puls/blik', {})).status, 401);
 });
 
 test('7. De Ibiza Bode heeft een redactie: ook de laatste demo-zaak kan inloggen', async t => {
-  if (!gewired) return t.skip('wiring volgt');
   const roster = await api('supplier/roster', { code: 'BODE' });
   const mgr = (roster.body.staff || []).find(x => x.role === 'manager');
   assert.ok(mgr, 'de hoofdredactie staat op het rooster');

@@ -66,8 +66,16 @@ const LAGEN = [
     // spawn kent geen shell die een * voor ons uitvouwt
     ['test/*.test.js', [NODE, ['--experimental-sqlite', '--test', '--test-reporter=dot'].concat(testBestanden())]]
   ] },
+  /* A11Y_STRICT=1, en dat is hier geen detail. scripts/a11y.js slaat zichzelf
+     over met exitcode 0 als er geen browser staat -- terecht, want op een kale
+     CI wil je daar niet op stuklopen. Maar DIT is de slotsuite: de laatste poort
+     voor go-live, waar deze laag als `hard` staat aangemerkt. Een harde laag die
+     zonder browser stilletjes "staat" meldt, is een laag die niet kan zakken, en
+     dan zegt een groene slotsuite iets wat niet gemeten is. Ontbreekt de
+     browser hier, dan hoort dat een gezakte poort te zijn en geen voetnoot.
+     (LAT.md regel 3: een meter zakt als zijn invoer ontbreekt.) */
   { id: 'a11y', naam: 'DE TOEGANKELIJKHEID', hard: true, stappen: [
-    ['a11y-scan', [NODE, ['scripts/a11y.js']]]
+    ['a11y-scan', [NODE, ['scripts/a11y.js'], { A11Y_STRICT: '1' }]]
   ] },
   { id: 'beproeving', naam: 'DE BEPROEVING', hard: true, overslaanBijSnel: true, stappen: [
     ['de storm', [NODE, ['--experimental-sqlite', 'scripts/beproeving.js']]]
@@ -75,9 +83,10 @@ const LAGEN = [
   { id: 'keuring', naam: 'DE KEURING', hard: false, intern: true }
 ];
 
-function draai(cmd, args) {
+function draai(cmd, args, extraEnv) {
   const t0 = Date.now();
-  const r = spawnSync(cmd, args, { cwd: WORTEL, encoding: 'utf8', timeout: 90 * 60 * 1000, maxBuffer: 256 * 1024 * 1024 });
+  const r = spawnSync(cmd, args, { cwd: WORTEL, encoding: 'utf8', timeout: 90 * 60 * 1000, maxBuffer: 256 * 1024 * 1024,
+    env: extraEnv ? { ...process.env, ...extraEnv } : process.env });
   const uit = String(r.stdout || '') + String(r.stderr || '');
   return { ok: r.status === 0, code: r.status, uit, ms: Date.now() - t0 };
 }
@@ -281,9 +290,9 @@ function suite() {
 
     let laagOk = true, laagMs = 0;
     const toel = [];
-    for (const [naam, [cmd, args]] of laag.stappen) {
+    for (const [naam, [cmd, args, env]] of laag.stappen) {
       process.stdout.write('  ' + naam.padEnd(22));
-      const r = draai(cmd, args);
+      const r = draai(cmd, args, env);
       laagMs += r.ms;
       console.log((r.ok ? K.groen + 'staat' : K.rood + 'GEZAKT (exit ' + r.code + ')') + K.uit + K.dim + '  ' + duur(r.ms) + K.uit);
       if (!r.ok) {

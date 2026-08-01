@@ -51,8 +51,20 @@ exitcode 2. `scripts/pgtoetsen.js` gaf zonder database exitcode 0, met de tekst
 "de Postgres-toetsen worden overgeslagen" erboven. Acht toetsbestanden hebben
 daardoor maanden bestaan zonder ooit te draaien.
 
+*Tweede voorbeeld, van later dezelfde dag:* `test/genreplan.test.js` had zeven
+toetsen die begonnen met `if (!gewired) return t.skip('wiring volgt')`, waarbij
+`gewired` uit een 404-proef kwam. De routes zijn allang aangesloten, dus de vlag
+stond permanent op true en deed niets -- behalve het enige wat hij nog kon: zeven
+toetsen stil uitzetten zodra iemand de routekoppeling breekt. De proef is nu een
+bewering. In dezelfde ronde: `scripts/a11y.js` geeft zonder browser exitcode 0,
+en de slotsuite draaide hem zo, terwijl die laag daar als `hard` staat. Nu met
+`A11Y_STRICT=1`, want in de laatste poort voor go-live is "niet gemeten" geen
+groen.
+
 **Handhaver:** `scripts/check.js` regel 25 (elk zelf-poortend toetsbestand staat
-in de draaier) en de exitcodes van de draaiers zelf.
+in de draaier), de exitcodes van de draaiers zelf, en de meter
+`zelfpoortendeToetsen` in `NORM.json`. Voor een zelfgebouwde vlag als `gewired`
+bestaat geen handhaver; dat is regel 2 en mensenwerk.
 
 ### 4. Nooit twee plekken die een waarheid vasthouden
 
@@ -137,8 +149,19 @@ kan zijn, beide kanten van een vergelijking uit dezelfde aanroep, `assert.ok` op
 iets dat altijd waar is, een statuscontrole die een hele klasse toelaat, en een
 404 die als "geweigerd" telt terwijl de route gewoon niet bestaat.
 
+*Vier gevallen die hier echt zijn gevonden, met wat de reparatie was:*
+
+| wat er stond | waarom het niets bewees | wat het nu is |
+|---|---|---|
+| `assert.ok([200,404].includes(m.status))` op `/api/metrics`, met het lichaam achter `if (status===200)` | open en dicht gaven allebei groen, en bij dicht werd er niets meer nagekeken; de deur die net was dichtgezet had geen enkele toets die kon zakken | `test/metingpoort.test.js`: drie servers, drie standen, exacte statussen |
+| `assert.ok([200,403,404].includes(kijk.status))` op een verhaal in de vriendenlaag | "hij ziet het", "hij mag er niet bij" en "het bestaat niet" waren alle drie goed | het verhaal MOET er staan, B MOET het mogen openen, en een derde gezin mag het juist niet |
+| `for (const w of r.body.waarschuwingen)` | op een rustige dag draait de lus nul keer en controleert de toets niets | de leegte is gekoppeld aan het `rustig`-vlaggetje en aan het uurbeeld: twee langs verschillende weg berekende getallen tegen elkaar aan |
+| een IDOR-poging binnen `if (dossier bevat MERK)` en `if (id && id.id)` | brak het aanmaken, dan viel de hele controle geruisloos weg | elke stap is een bewering |
+
 **Handhaver:** regel 2 (mutatie) en de meter `zelfpoortendeToetsen` in
-`NORM.json`. Voor de rest: mensenwerk.
+`NORM.json`. Voor de rest: mensenwerk. Een `assert.ok([a, b].includes(status))`
+is de vorm om op te letten -- soms terecht, vaak een toets die zijn eigen vraag
+niet durft te stellen.
 
 ---
 

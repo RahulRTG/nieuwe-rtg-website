@@ -48,8 +48,26 @@ test('1. de voorspelling staat op echte bouwstenen: knooppunten van de stad en d
 
 test('2. elke waarschuwing draagt kans, oorzaken, vlootadvies en een simulatie zonder/met', async () => {
   const r = await api('/api/supplier/ghost', {}, sup);
+
+  /* EERST: MAG DEZE LIJST LEEG ZIJN? De voorspelling hangt aan de dag waarop je
+     hem draait, dus op een rustige dag komt er terecht geen enkele
+     waarschuwing. Zonder de twee beweringen hieronder zou de lus daaronder dan
+     nul keer draaien en zou deze toets groen staan zonder ook maar iets te
+     hebben gecontroleerd -- de vorm uit LAT.md regel 9. Nu koppelen we de
+     leegte aan een narekenbare oorzaak: de server zegt zelf of het rustig is,
+     en dat moet kloppen met het uurbeeld. Twee getallen die langs verschillende
+     weg zijn uitgerekend, tegen elkaar aan gelegd. */
+  assert.equal(r.body.rustig, r.body.waarschuwingen.length === 0,
+    'het rustig-vlaggetje en de waarschuwingenlijst zeggen hetzelfde');
+  assert.equal(r.body.uurbeeld.some(u => u.kans >= r.body.drempel), r.body.waarschuwingen.length > 0,
+    'er staat een waarschuwing precies dan als een uur de drempel (' + r.body.drempel + '%) haalt');
+
   for (const w of r.body.waarschuwingen) {
-    assert.ok(w.kans >= 60 && w.kans <= 97, 'de kans is een begrensd percentage');
+    /* De ondergrens komt uit het antwoord en staat hier niet nog eens ingetikt:
+       60 stond hier hard, terwijl de server zijn drempel gewoon meestuurt. Twee
+       plekken met dezelfde waarheid lopen uiteen zodra iemand DREMPEL verzet
+       (LAT.md regel 4) -- en dat is precies wat een mutatie hier liet zien. */
+    assert.ok(w.kans >= r.body.drempel && w.kans <= 97, 'de kans ligt tussen de drempel en het plafond');
     assert.ok(/^\d{2}:00$/.test(w.tijd), 'de waarschuwing noemt het uur');
     assert.ok(w.knooppunt, 'de waarschuwing noemt het knooppunt');
     assert.ok(/Stuur .+ (voor|ruim)/.test(w.advies) && /route B/.test(w.advies), 'het advies zegt wat er nu moet gebeuren');

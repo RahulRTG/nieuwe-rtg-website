@@ -74,6 +74,21 @@ test('1. een lid aanmaken en de backup laten draaien', async () => {
   assert.ok(codenaam, 'het lid heeft een codenaam');
   await stop(kind);
 
+  /* Drie dingen die NIET in de backup zaten en er alle drie in horen. Zonder
+     ze hier neer te zetten bewijst de assertie hieronder niets:
+     - grootboek.db is een EIGEN sqlite-bestand (db/tx/sqliteachter.js), niet
+       store.db; daar liggen in de standaardopslag de bestellingen en boekingen;
+     - archief/ is alles wat buiten het RAM-venster is geveegd -- juist de
+       oudste gegevens, die je nergens anders meer vandaan haalt;
+     - papieren.json is het datalek-belschema en de AVG-antwoorden. Dat staat
+       bewust buiten de database EN in .gitignore, dus een backup was de enige
+       plek waar het kon overleven. Sinds de eigenaar het in de boardroom
+       invult, is dat geen theorie meer. */
+  fs.mkdirSync(path.join(TMP, 'archief'), { recursive: true });
+  fs.writeFileSync(path.join(TMP, 'archief', '2026-01.jsonl'), '{"ref":"OUD-1","soort":"order"}\n');
+  fs.writeFileSync(path.join(TMP, 'papieren.json'),
+    JSON.stringify({ antwoorden: { privacycontact: { waarde: 'Iemand, privacy@rtg.example', at: new Date().toISOString() } } }, null, 2));
+
   /* De backup draait bij het opstarten. Door nu opnieuw te starten maken we
      er een MET dit lid erin -- precies zoals de dagelijkse backup dat 's
      nachts zou doen. */
@@ -86,6 +101,11 @@ test('1. een lid aanmaken en de backup laten draaien', async () => {
   assert.ok(dagen.length >= 1, 'er staat minstens een dagbackup');
   const inhoud = fs.readdirSync(path.join(bdir, dagen[dagen.length - 1]));
   assert.ok(inhoud.includes('rtg.db'), 'de identiteitskluis zit in de backup');
+  assert.ok(inhoud.includes('grootboek.db'), 'en het transactiegrootboek, dat een eigen bestand is');
+  assert.ok(inhoud.includes('papieren.json'), 'en het papierwerk, dat nergens anders staat');
+  assert.ok(inhoud.includes('archief'), 'en de archiefmap');
+  assert.ok(fs.existsSync(path.join(bdir, dagen[dagen.length - 1], 'archief', '2026-01.jsonl')),
+    'met de inhoud van het archief erin, niet alleen een lege map');
   // en de sleutel juist NIET -- sleutel en slot horen niet in dezelfde doos
   assert.ok(!inhoud.includes('vault.key'), 'de kluissleutel zit NIET in de backup, en dat hoort zo');
   assert.ok(!inhoud.includes('secret.key'), 'de tokensleutel ook niet');
@@ -94,7 +114,21 @@ test('1. een lid aanmaken en de backup laten draaien', async () => {
 test('2. datamap wissen, terugzetten uit de backup, en alles is er nog', async () => {
   const bdir = path.join(TMP, 'backups');
   const laatste = path.join(bdir, fs.readdirSync(bdir).sort().pop());
-  const bewaard = fs.readdirSync(laatste).map(f => [f, fs.readFileSync(path.join(laatste, f))]);
+  /* Een echt herstel kopieert een MAP terug, geen platte lijst bestanden. Deze
+     proef las alles met readFileSync, en dat viel om zodra er een submap in de
+     backup zat -- precies wat er nu in hoort te zitten (archief/). Een
+     herstelproef die alleen platte bestanden aankan, beproeft niet het herstel
+     dat je op een slechte dag doet. */
+  const lees = (map) => fs.readdirSync(map, { withFileTypes: true }).map(d =>
+    d.isDirectory() ? [d.name, lees(path.join(map, d.name))] : [d.name, fs.readFileSync(path.join(map, d.name))]);
+  const schrijf = (map, rijen) => {
+    fs.mkdirSync(map, { recursive: true });
+    for (const [naam, inhoud] of rijen) {
+      if (Array.isArray(inhoud)) schrijf(path.join(map, naam), inhoud);
+      else fs.writeFileSync(path.join(map, naam), inhoud);
+    }
+  };
+  const bewaard = lees(laatste);
 
   /* De ramp: de hele datamap weg. Zo ziet het eruit als de schijf sneuvelt of
      als iemand de verkeerde map verwijdert. */
@@ -103,8 +137,19 @@ test('2. datamap wissen, terugzetten uit de backup, en alles is er nog', async (
 
   // Het herstel, precies zoals een beheerder het zou doen: de bestanden terug,
   // en de sleutels uit de kluis (hier: de omgevingsvariabelen).
-  for (const [naam, inhoud] of bewaard) fs.writeFileSync(path.join(TMP, naam), inhoud);
+  schrijf(TMP, bewaard);
   fs.writeFileSync(path.join(KLUIS, 'bewijs'), 'sleutels komen hiervandaan, niet uit de backup');
+
+  /* En dan de drie die er tot vandaag niet in zaten. Deze assertie is het punt
+     van de hele wijziging: niet DAT de backup ze noemt, maar dat ze de ronde
+     overleven en er na het terugzetten weer staan. */
+  assert.ok(fs.existsSync(path.join(TMP, 'grootboek.db')), 'het transactiegrootboek is terug');
+  assert.ok(fs.existsSync(path.join(TMP, 'papieren.json')), 'het papierwerk is terug');
+  const pap = JSON.parse(fs.readFileSync(path.join(TMP, 'papieren.json'), 'utf8'));
+  assert.match(pap.antwoorden.privacycontact.waarde, /privacy@rtg\.example/, 'met het antwoord er nog in');
+  const oudBestand = path.join(TMP, 'archief', '2026-01.jsonl');
+  assert.ok(fs.existsSync(oudBestand), 'en het archief, met zijn inhoud');
+  assert.match(fs.readFileSync(oudBestand, 'utf8'), /OUD-1/, 'de weggeveegde boeking staat er nog in');
 
   const kind = await start(BASIS + 1);
   try {

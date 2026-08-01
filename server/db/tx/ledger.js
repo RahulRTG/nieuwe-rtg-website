@@ -37,6 +37,8 @@ const TX_KOP = Number(process.env.TX_KOP || 500);        // hete kop die elke ro
 const txBekend = { orders: new Set(), boekingen: new Set() }; // refs waarvan we weten dat ze in het grootboek staan
 let txVeegTimer = null, txVeegBezig = false;
 function txLedgerActief() { return !!achter; }
+// de WAL van het grootboek platslaan voor een backup; zonder achterkant inert
+function checkpointGrootboek() { try { return !!(achter && achter.checkpoint && achter.checkpoint()); } catch (e) { return false; } }
 const txDedup = items => { const gezien = new Set(); const uit = []; for (const t of items) { if (!t || t.ref == null || gezien.has(t.ref)) continue; gezien.add(t.ref); uit.push(t); } return uit; };
 // Een ticket naar een grootboekrij. Hier gebeurt het versleutelen, precies een keer.
 const rijVan = (naam, t) => ({
@@ -157,7 +159,7 @@ async function vensterTopUp(log) {
   }
 }
 
-module.exports = {
+module.exports = { checkpointGrootboek,
   /* Welke collecties een rij-voor-rij grootboek achter zich hebben. Dit is de
      ENIGE plek waar dat staat; de opslaglaag leidt er zijn afsluit-volgorde uit
      af (server/pg/sync.js). Zou die er een eigen lijstje van maken, dan lopen

@@ -174,6 +174,7 @@ module.exports = {
   txStaartNa: tx.txStaartNa, txVerwijder: tx.txVerwijder,
   txLedgerActief: tx.txLedgerActief, txLedgerVanKlant: tx.txLedgerVanKlant, txLedgerVanZaak: tx.txLedgerVanZaak,
   txLedgerTel: tx.txLedgerTel, txLedgerAantal: tx.txLedgerAantal, txVeegNu: tx.txVeegNu,
+  checkpointGrootboek: tx.checkpointGrootboek,
   // de WAL in het hoofdbestand vouwen voor de backup kopieert
   checkpointSqlite: sqlite.checkpointSqlite
 };

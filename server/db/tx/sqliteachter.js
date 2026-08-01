@@ -40,6 +40,16 @@ module.exports = function maakSqliteAchter(opslag) {
 
   return {
     naam: 'sqlite',
+    /* De WAL in het hoofdbestand vouwen, zodat een backup die grootboek.db
+       kopieert ook de recentste boekingen meeneemt. Zonder dit staat verse
+       data alleen in grootboek.db-wal -- precies de val die de backup van
+       store.db en rtg.db al een keer leeg heeft laten lopen (zie de kop van
+       db/sqlite.js checkpointSqlite). Faalt het omdat een ander proces nog
+       leest, dan vangt de meegekopieerde -wal het op. */
+    checkpoint() {
+      if (!sdb) return false;
+      try { sdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); return true; } catch (e) { return false; }
+    },
     async schema() {
       verbind();
       // `at` is een ISO-tijdstempel als tekst: die sorteert lexicografisch gelijk

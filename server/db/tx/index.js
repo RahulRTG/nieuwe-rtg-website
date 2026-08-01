@@ -91,5 +91,6 @@ module.exports = {
   txStaartNa, txVerwijder,
   txLedgerActief: ledger.txLedgerActief, txLedgerVanKlant: ledger.txLedgerVanKlant,
   txLedgerVanZaak: ledger.txLedgerVanZaak, txLedgerTel: ledger.txLedgerTel,
-  txLedgerAantal: ledger.txLedgerAantal, txVeegNu: ledger.txVeegNu
+  txLedgerAantal: ledger.txLedgerAantal, txVeegNu: ledger.txVeegNu,
+  checkpointGrootboek: ledger.checkpointGrootboek
 };

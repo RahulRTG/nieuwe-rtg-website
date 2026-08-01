@@ -36,7 +36,7 @@ const { db, load, save, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, checkpointSqlite } = require('./db');
+  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, checkpointSqlite, checkpointGrootboek } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
@@ -1213,6 +1213,12 @@ app.post('/api/cluster/:actie', (req, res) => {
       return res.status(500).json({ error: 'Data laden mislukte: ' + e.message });
     }
     console.log('[cluster] server ' + nr + ' neemt over en is nu actief');
+    /* En meteen een backup. backupData() slaat standby-servers over (die maken
+       er terecht geen), en draait verder alleen op de dagteller. In de
+       trio-opstelling start ELKE server als standby, dus tot deze regel was er
+       na een overname tot 24 uur lang geen verse backup -- juist in het uur
+       waarin er net iets is omgevallen. */
+    try { backupData(); } catch (e) { console.warn('[cluster] backup na overname mislukt:', e.message); }
   } else if (req.params.actie === 'demote') {
     db.writable = false;
     console.log('[cluster] server ' + nr + ' gaat terug naar standby');
@@ -3344,6 +3350,46 @@ app.use((err, req, res, next) => {
 /* ---------- dagelijkse back-up van de data ---------- */
 
 const BACKUP_DIR = path.join(DATA_DIR, 'backups');
+/* WAT ER IN EEN BACKUP HOORT -- OP EEN PLEK.
+
+   Deze opsomming stond twee keer letterlijk in backupData (een keer voor de
+   lokale kopie, een keer voor RTG_BACKUP_DIR), en er ontbraken drie dingen die
+   er alle drie in horen:
+
+   - grootboek.db: het transactiegrootboek (db/tx/sqliteachter.js) is een EIGEN
+     sqlite-bestand, niet store.db. In de standaardopslag liggen daar de
+     bestellingen en boekingen in. Die stonden dus in geen enkele backup.
+   - archief/: alles wat buiten het RAM-venster is geveegd (archief.js). Juist
+     de oudste gegevens -- de enige die je niet meer uit het geheugen kunt
+     halen -- werden niet bewaard.
+   - papieren.json: het datalek-belschema en de AVG-antwoorden. Dat bestand
+     staat bewust buiten de database EN in .gitignore, dus een backup was de
+     enige plek waar het kon overleven. Sinds de eigenaar het in de boardroom
+     invult, is dat geen theorie meer.
+
+   Twee lijsten van hetzelfde lopen uiteen zodra iemand er een aanraakt; dat is
+   precies hoe grootboek.db erbuiten kon vallen. Vandaar een. */
+const BACKUP_BESTANDEN = ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal',
+  'grootboek.db', 'grootboek.db-wal', 'papieren.json'];
+const BACKUP_MAPPEN = ['archief'];
+
+/* Een map kopieren, plat en zonder verrassingen: alleen gewone bestanden, een
+   niveau diep per submap. Het archief is een map met maandbestanden, geen boom
+   van symlinks, dus dit is genoeg -- en het weigert netjes wat het niet kent
+   in plaats van er iets van te maken. */
+function kopieerMap(van, naar) {
+  let namen;
+  try { namen = fs.readdirSync(van, { withFileTypes: true }); } catch (e) { return; }
+  try { fs.mkdirSync(naar, { recursive: true, mode: 0o700 }); } catch (e) {}
+  for (const d of namen) {
+    const bron = path.join(van, d.name), doel = path.join(naar, d.name);
+    try {
+      if (d.isDirectory()) kopieerMap(bron, doel);
+      else if (d.isFile()) { fs.copyFileSync(bron, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
+    } catch (e) { /* een enkel bestand mag de rest van de backup niet ophouden */ }
+  }
+}
+
 function backupData() {
   if (!db.writable) return; // standby-servers maken geen backups, dat doet de actieve
   try {
@@ -3358,6 +3404,8 @@ function backupData() {
        test/herstelproef.test.js, die de hele ronde echt doorloopt. */
     try { accounts.checkpoint(); } catch (e) {}
     try { checkpointSqlite(); } catch (e) {}
+    // en het transactiegrootboek, dat een EIGEN sqlite-bestand met eigen WAL is
+    try { checkpointGrootboek(); } catch (e) {}
 
     const day = new Date().toISOString().slice(0, 10);
     const dir = path.join(BACKUP_DIR, day);
@@ -3366,10 +3414,11 @@ function backupData() {
     /* De -wal-bestanden gaan mee als vangnet: lukt het checkpointen niet omdat
        een ander proces nog leest, dan is de kopie samen met zijn WAL alsnog
        compleet. SQLite leest een database met bijbehorende -wal gewoon uit. */
-    for (const f of ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal']) {
+    for (const f of BACKUP_BESTANDEN) {
       const from = path.join(DATA_DIR, f);
       if (fs.existsSync(from)) { const doel = path.join(dir, f); fs.copyFileSync(from, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
     }
+    for (const m of BACKUP_MAPPEN) kopieerMap(path.join(DATA_DIR, m), path.join(dir, m));
     // hooguit 14 dagen bewaren
     const days = fs.readdirSync(BACKUP_DIR).sort();
     for (const d of days.slice(0, Math.max(0, days.length - 14)))
@@ -3379,10 +3428,11 @@ function backupData() {
     if (process.env.RTG_BACKUP_DIR) {
       const off = path.join(process.env.RTG_BACKUP_DIR, day);
       fs.mkdirSync(off, { recursive: true });
-      for (const f of ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal']) {
+      for (const f of BACKUP_BESTANDEN) {
         const from = path.join(DATA_DIR, f);
         if (fs.existsSync(from)) fs.copyFileSync(from, path.join(off, f));
       }
+      for (const m of BACKUP_MAPPEN) kopieerMap(path.join(DATA_DIR, m), path.join(off, m));
     }
   } catch (e) { console.warn('[backup] mislukt:', e.message); }
 }

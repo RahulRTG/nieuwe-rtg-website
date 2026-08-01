@@ -27,8 +27,29 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vergeten-'));
 const SERVER = path.join(__dirname, '..', 'server', 'server.js');
 
 let kind, token = null, codenaam = null, sleutel = null;
+let bestandenVoor = [], bestandenVanWilma = [];
 const NAAM = 'Wilma Wegduiker';
 const MAIL = 'wilma@vergeten.test';
+
+/* Een piepklein maar geldig PNG (1x1, transparant). Groot genoeg om door de
+   Ontsmetter en de mediastore te komen, klein genoeg om hier te staan. */
+const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+
+/* Wat staat er op SCHIJF? De bezem hieronder leest db.json, maar de zwaarste
+   persoonsgegevens staan daar niet in -- daar staat alleen een verwijzing naar
+   een los, versleuteld bestand in DATA_DIR/media (Salon-foto's, snaps,
+   site-beelden) of DATA_DIR/bestanden (de kluis). Die twee mappen waren nooit
+   onderdeel van deze test, en precies daar bleef alles staan. */
+function opSchijf() {
+  const uit = [];
+  for (const map of ['media', 'bestanden']) {
+    const p = path.join(TMP, map);
+    let namen = [];
+    try { namen = fs.readdirSync(p); } catch (e) { namen = []; }
+    for (const n of namen) uit.push(path.join(p, n));
+  }
+  return uit;
+}
 
 const wacht = (ms) => new Promise(r => setTimeout(r, ms));
 function post(pad, body, tok) {
@@ -65,6 +86,8 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
   codenaam = staat.user && staat.user.codename;
   sleutel = 'user-' + (staat.user && staat.user.id);
   assert.ok(codenaam, 'het lid heeft een codenaam: ' + codenaam);
+  // wat er al op schijf stond voordat Wilma iets deed (seed-beeld e.d.)
+  bestandenVoor = opSchijf();
 
   /* Nu sporen achterlaten in verschillende hoeken. Niet uitputtend -- dat kan
      ook niet met 157 takken -- maar wel in de soorten die er in de praktijk
@@ -117,7 +140,25 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
      hieronder groen staan zonder iets te hebben geveegd. */
   assert.ok(geland.length >= 6, 'te weinig sporen geland (' + geland.length + '): ' + geland.join(', '));
 
+  /* EN NU DE SPOREN DIE NIET IN db.json STAAN. Drie plekken die alle drie
+     alleen een verwijzing in de database achterlaten en de echte inhoud op
+     schijf zetten: een Salon-post met foto, een foto in de eigen
+     site-bibliotheek, en het kluisbestand hierboven. Deze drie stonden nooit in
+     deze test, en daardoor bleef de bezem groen terwijl alles er nog lag. */
+  const salon = await post('/api/salon/plaats', { tekst: 'Wilma met beeld', media: [{ beeld: PNG, alt: 'stipje' }] }, token);
+  assert.equal(salon.status, 200, 'de Salon-post met foto landt: ' + (await salon.text()).slice(0, 160));
+  const siteFoto = await post('/api/site/foto', { dataUrl: PNG }, token);
+  assert.equal(siteFoto.status, 200, 'de site-foto landt: ' + (await siteFoto.text()).slice(0, 160));
+
   await wacht(400); // de opslag even laten landen
+
+  const na = opSchijf();
+  bestandenVanWilma = na.filter(p => !bestandenVoor.includes(p));
+  /* Drie is de ondergrens: de kluisupload, de Salon-foto en de site-foto. Blijft
+     dit onder de drie, dan is de wandeling hierboven in stilte leeggelopen en
+     bewijst de controle na het verwijderen niets. */
+  assert.ok(bestandenVanWilma.length >= 3,
+    'te weinig bestanden op schijf van Wilma (' + bestandenVanWilma.length + '): ' + bestandenVanWilma.join(', '));
 });
 
 test('na verwijderen is het account echt weg', async () => {
@@ -147,12 +188,24 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
      sollicitatie mag blijven -- maar de SLEUTEL en de CODENAAM zijn precies de
      twee dingen die er niet meer horen te zijn: daarmee is de persoon weer
      terug te vinden. */
+  /* DE SLEUTELMATCH HAD EEN GAT, EN DAAR PASTE DE HELE KLUIS DOORHEEN.
+
+     Er stond `tekst.includes('"' + sleutel + '"')`: de sleutel MET aanhalings-
+     tekens aan beide kanten. RTG Bestanden bewaart zijn borden onder de naam
+     "lid:user-5" -- die begint niet met een aanhalingsteken voor de sleutel, dus
+     die matchte niet. De hele kluis van het lid, mappen en al, kon blijven staan
+     zonder dat deze test iets zei.
+
+     Nu op een woordgrens in plaats van op aanhalingstekens: user-5 mag niet
+     gevolgd worden door een cijfer (anders is user-50 een valse treffer), maar
+     wat eraan VOORAF gaat maakt niet uit. */
+  const sleutelRe = sleutel ? new RegExp(sleutel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![0-9])') : null;
   const raak = [];
   for (const [tak, waarde] of Object.entries(data)) {
     const tekst = JSON.stringify(waarde == null ? null : waarde);
     if (!tekst) continue;
     const wat = [];
-    if (sleutel && tekst.includes('"' + sleutel + '"')) wat.push('sleutel');
+    if (sleutelRe && sleutelRe.test(tekst)) wat.push('sleutel');
     if (codenaam && tekst.includes(codenaam)) wat.push('codenaam');
     if (tekst.includes(NAAM) || tekst.includes(MAIL)) wat.push('NAAM/E-MAIL');
     if (wat.length) raak.push(tak + ' (' + wat.join(' + ') + ')');
@@ -161,6 +214,22 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
   assert.deepEqual(raak, [],
     'na verwijderen staat dit lid nog in deze takken; elke tak hier is een plek ' +
     'waar het recht op vergetelheid niet is nagekomen:\n  ' + raak.join('\n  '));
+});
+
+/* EN DE BEZEM OVER DE SCHIJF. Dit was de blinde vlek van de test hierboven: die
+   leest db.json, en juist de zwaarste gegevens staan daar niet in. De foto's uit
+   De Salon, de beelden van een eigen site en de bestanden uit RTG Bestanden
+   liggen als losse, met ONZE sleutel versleutelde bestanden in DATA_DIR. Een
+   verwijderde verwijzing met een blijvend bestand is geen vergetelheid maar een
+   wees die wij nog gewoon kunnen openen -- en bij de kluis gaat dat over
+   paspoortscans, contracten en medische brieven. */
+test('en de bezem over de schijf: geen weesbestanden van dit lid', async () => {
+  await wacht(600);
+  assert.ok(bestandenVanWilma.length >= 3, 'de vorige test heeft bestanden vastgelegd om op te controleren');
+  const blijven = bestandenVanWilma.filter(p => fs.existsSync(p));
+  assert.deepEqual(blijven, [],
+    'na verwijderen staan deze bestanden van het lid nog op schijf; elk bestand hier ' +
+    'is inhoud die wij kunnen openen van iemand die gevraagd heeft vergeten te worden:\n  ' + blijven.join('\n  '));
 });
 
 test('de echte naam stond sowieso nooit in de gedeelde database', () => {

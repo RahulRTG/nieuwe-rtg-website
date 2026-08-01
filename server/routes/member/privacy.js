@@ -67,9 +67,11 @@ module.exports = (kern) => {
 
   /* Definitief verwijderen. Het beleid (welke takken weg, wat wordt
      geanonimiseerd, wat blijft met grond) woont in kern/vergeten.js. */
-  app.post('/api/privacy/delete', auth, (req, res) => {
+  app.post('/api/privacy/delete', auth, async (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-    wisLid(req.session);
+    // await: sinds de bytes (mediastore, kluis) meegaan is dit ook I/O, en de
+    // bevestiging hoort pas te komen als het echt gebeurd is
+    await wisLid(req.session);
     res.json({ ok: true });
   });
 };

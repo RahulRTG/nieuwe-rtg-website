@@ -168,8 +168,10 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
   // grote bestanden komen in stukken binnen (bestanden-stukken.js) en lopen
   // aan het eind gewoon door dezelfde upload-weg, met quotum en al
   const stukken = require('./bestanden-stukken').maakStukken(basis, upload, delen.bestandenVersieNieuw);
+  // vergetelheid (AVG art. 17) raakt ook de bytes; zie ./bestanden-vergeten.js
+  const vergeten = require('./bestanden-vergeten')({ borden, wisItem, codenaamVan });
   return Object.assign({ bestandenLijst: lijst, bestandenMapNieuw: mapNieuw, bestandenMapWijzig: mapWijzig,
-    bestandenUpload: upload, bestandenWijzig: wijzig }, delen, stukken);
+    bestandenUpload: upload, bestandenWijzig: wijzig }, delen, stukken, vergeten);
 }
 
 module.exports = { maakBestanden };

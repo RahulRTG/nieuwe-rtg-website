@@ -5,27 +5,46 @@
    met een reden mag blijven staan -- dat hoort als een leesbaar geheel bij
    elkaar, niet verspreid tussen het afhandelen van een verzoek.
 
-   De drie soorten die je hieronder tegenkomt:
+   De vier soorten:
 
    1. WEG. Alles wat alleen over dit lid gaat: zijn voorkeuren, zijn spullen,
-      zijn geheugen, zijn eigen Salon-posts.
+      zijn geheugen, zijn eigen Salon-posts. Dat staat hieronder.
    2. DE PERSOON ERUIT, DE REST BLIJFT. Waar zijn spoor in het werk van een
       ander zit: een reactie in andermans draad, een DM die de helft van
       iemands gesprek is, de bel van een zaak, een cadeaukaart met geld erin.
+      Dat staat in ./vergeten/anoniem.js.
    3. BLIJFT, MET GROND. De fiscale administratie en het inzagejournaal. Die
       staan met termijn en al in server/bewaartermijnen.js; een uitzondering die
       alleen in een test is afgevinkt, kan niemand navertellen.
+   4. DE BYTES BUITEN DE DATABASE, en die soort ontbrak. Foto's, snaps,
+      verhalen, site-beelden en kluisbestanden liggen als losse versleutelde
+      bestanden op schijf of in de objectopslag; in db.data staat alleen het
+      pad. Dit beleid haalde het pad weg en liet het bestand staan -- een wees
+      die wij nog gewoon kunnen openen, en bij RTG Bestanden gaat dat over
+      paspoortscans, contracten en medische brieven. Dat staat nu in
+      ./vergeten/bytes.js.
 
    test/vergeten.test.js en test/vergeten-gezelschap.test.js vegen na afloop door
    de HELE database en rekenen af wat er nog van het lid in staat -- voor elke
    pas apart, want een Lifestyle-lid heeft takken die een RTG-lid niet heeft. */
 module.exports = function maakVergeten(kern) {
   const { db, save, accounts, sessions, forgetSession, fs, path, UPLOAD_DIR,
-    broadcastSync, gidsWeg, liveCodename, lidBoardLogWis } = kern;
+    broadcastSync, gidsWeg, liveCodename, lidBoardLogWis, media, bestanden } = kern;
+  /* De vierde soort, en die stond hier niet: WAT ALLEEN ALS VERWIJZING IN
+     db.data STAAT. De foto's, snaps, verhalen, site-beelden en kluisbestanden
+     liggen als losse versleutelde bestanden op schijf; hier stond alleen het
+     pad. Dat beleid staat in ./vergeten/bytes.js, met de uitleg erbij. Het
+     werkt met een Set die hieronder wordt gevuld en aan het eind geleegd --
+     verzamelen VOOR het weggooien, want daarna is de link weg. */
+  const bytes = require('./vergeten/bytes')({ db, media, bestanden });
+  const anoniem = require('./vergeten/anoniem')({ db, accounts });
 
-  /* Wist dit lid definitief. Geeft niets terug; de aanroeper antwoordt. */
-  function wisLid(sessie) {
+  /* Wist dit lid definitief. Async omdat de mediastore ook een objectopslag op
+     afstand kan zijn (S3); de aanroeper wacht erop voordat hij antwoordt --
+     anders meldt het scherm "verwijderd" terwijl de foto's nog gaan. */
+  async function wisLid(sessie) {
     const key = sessie.key;
+    const teWissen = new Set();
     // cv en live-locatie weg, chats weg, likes weg
     delete db.data.cvs[key];
     delete db.data.live[key];
@@ -37,22 +56,10 @@ module.exports = function maakVergeten(kern) {
        betaald: een post laten staan met "(verwijderd)" erboven bewaart nog
        steeds wat iemand schreef toen hij nog niet weg wilde. */
     if (Array.isArray(db.data.posts)) {
+      // eerst de beelden van die posts noteren, anders zijn ze na de filter
+      // niet meer terug te vinden en blijven ze als wees op schijf staan
+      bytes.noteerPostBeelden(key, teWissen);
       db.data.posts = db.data.posts.filter(p => p.authorKey !== key);
-    }
-    /* Zijn REACTIES onder posts van anderen liggen anders: dat is de draad van
-       iemand anders. Daar gaat alleen de persoon uit, niet het gesprek. */
-    for (const p of db.data.posts || []) {
-      for (const c of p.comments || []) {
-        if (c.key === key) { c.key = null; c.who = '(verwijderd)'; }
-      }
-    }
-    // sollicitaties anonimiseren: het bedrijf houdt zijn administratie,
-    // maar zonder iets dat naar deze persoon herleidbaar is
-    for (const list of Object.values(db.data.applications || {})) {
-      for (const a of list) if (a.key === key) {
-        a.name = '(op verzoek verwijderd)'; a.contact = ''; a.note = '';
-        a.cv = null; a.codename = null; a.key = null;
-      }
     }
     // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
     if (db.data.notifications[key]) db.data.notifications[key] = [];
@@ -82,57 +89,18 @@ module.exports = function maakVergeten(kern) {
        staan na "verwijder mijn gegevens", dan houden we een spoor van iemand
        die er niet meer is. */
     if (typeof lidBoardLogWis === 'function') lidBoardLogWis(key);
-    /* De bel van de zaak. Daar staat na een bestelling of een cadeaukaart een
-       regel als "<codenaam> kocht ...", en die codenaam is precies waarmee dit
-       lid weer terug te vinden is. De zaak mag haar eigen administratie houden,
-       dus we halen de regel niet weg maar de PERSOON eruit -- net zoals dat
-       hierboven met sollicitaties gebeurt. */
+    /* En dan de tweede soort: alles waar het spoor van dit lid in het werk van
+       een ANDER zit -- reacties onder andermans post, sollicitaties, DM's, het
+       aanmeldingsdossier, cadeaukaarten, de bel van de zaak. Daar gaat de
+       persoon eruit en blijft de rest staan. Het oordeel per geval staat bij
+       dat geval in ./vergeten/anoniem.js. */
     const cn = (function () { try { return liveCodename && liveCodename(sessie); } catch (e) { return null; } })();
-    /* Het contactboek tussen de pas-niveaus (kern/lid.js): puur boekhouding,
-       twee codenamen en verder niets. Daar valt niets aan te bewaren voor een
-       ander, dus dat gaat gewoon weg. */
-    if (cn && Array.isArray(db.data.contacts)) {
-      db.data.contacts = db.data.contacts.filter(c => c.higher !== cn && c.rtg !== cn);
-    }
-    /* Een DM is de helft van andermans gesprek. Die ander mag zijn eigen verkeer
-       houden; hij hoeft alleen niet meer te weten met wie. Dus blijft het
-       bericht staan en verdwijnt de naam aan beide kanten. */
-    if (cn && Array.isArray(db.data.dms)) {
-      for (const d of db.data.dms) {
-        if (d.from === cn) d.from = '(verwijderd)';
-        if (d.to === cn) d.to = '(verwijderd)';
-      }
-    }
-    /* En zijn reacties met alleen een codenaam (de oudere vorm zonder sleutel). */
-    if (cn) {
-      for (const p of db.data.posts || []) {
-        for (const c of p.comments || []) if (c.who === cn) c.who = '(verwijderd)';
-      }
-    }
-    /* Het aanmeldingsdossier: RTG houdt het besluit (wie zei ja tegen welke pas,
-       en wanneer), want dat is haar eigen administratie van een menselijke
-       beslissing. De AANVRAGER gaat eruit, net als bij sollicitaties. */
-    for (const a of db.data.aanmeldingen || []) {
-      const raakt = (a.userId != null && key === 'user-' + a.userId) ||
-        (cn && a.codenaam === cn) || (a.contact && sessie.account &&
-          String(a.contact).toLowerCase() === String(accounts.emailOf(sessie.account) || '').toLowerCase());
-      if (raakt) { a.naam = '(op verzoek verwijderd)'; a.contact = ''; a.codenaam = null; a.userId = null; }
-    }
-    /* Cadeaukaarten zijn een geval apart: daar zit geld in dat de zaak nog moet
-       honoreren, dus die vernietigen zou iets weggooien wat niet van ons is. De
-       kaart blijft dus geldig; alleen de KOPER verdwijnt eruit. */
-    for (const g of db.data.giftcards || []) {
-      if (g.customerKey === key) { g.customerKey = null; g.kocht = '(verwijderd)'; }
-    }
-    if (cn && db.data.supplierNotifications) {
-      for (const lijst of Object.values(db.data.supplierNotifications)) {
-        for (const n of lijst || []) {
-          for (const veld of ['title', 'body']) {
-            if (typeof n[veld] === 'string' && n[veld].includes(cn)) n[veld] = n[veld].split(cn).join('(verwijderd)');
-          }
-        }
-      }
-    }
+    anoniem.anonimiseer(key, cn, sessie);
+    /* De snaps en verhalen, de eigen sites, en de kluis. Alle drie dragen bytes
+       buiten db.data; het waarom staat bij elk van hen in ./vergeten/bytes.js. */
+    bytes.wisSnapsEnVerhalen(key, teWissen);
+    bytes.wisSites(key, teWissen);
+    bytes.wisKluis(key);
     /* Uit de ledengids. Dit is de laatste plek waar de sleutel aan de codenaam
        vastzit; bleef hij staan, dan was het lid na "verwijderen" nog gewoon op
        codenaam te vinden en te bellen -- en dan is verwijderd een halve
@@ -155,6 +123,11 @@ module.exports = function maakVergeten(kern) {
     for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
     save();
     broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+    /* En dan pas de bytes. Ná save(), zodat een fout in de opslag (S3 even
+       onbereikbaar) de administratieve wissing niet terugdraait: het lid is dan
+       hoe dan ook weg uit de database, en wat er op de opslag achterblijft is
+       een wees zonder verwijzing in plaats van een half verwijderd lid. */
+    await bytes.wisMedia(teWissen);
   }
 
   return { wisLid };

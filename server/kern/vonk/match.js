@@ -61,7 +61,15 @@ module.exports = (ctx) => {
     const r1 = await pay.boekAsync({ van: 'lid:' + codenaam, naar: 'extern:vonk-rtg', centen: RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, deel RTG', ref: m.id });
     if (r1 && r1.error) return { status: 402, error: r1.error };
     const r2 = await pay.boekAsync({ van: 'lid:' + codenaam, naar: 'partner:' + m.tafel.supplierCode, centen: PRIJS_CENTEN - RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, aanbetaling zaak', ref: m.id });
-    if (r2 && r2.error) return { status: 402, error: r2.error };
+    /* Faalt de tweede poot, dan moet de eerste terug. Zonder die compensatie is
+       het lid de EUR 5 van het RTG-deel kwijt terwijl m.betaald leeg blijft:
+       de date staat niet, er is geen tafel, en een volgende poging schrijft er
+       weer vijf euro af. Dit is exact wat bank/overboeken.js wel doet bij zijn
+       twee-poten-overboeking; alleen hier ontbrak het. */
+    if (r2 && r2.error) {
+      await pay.boekAsync({ van: 'extern:vonk-rtg', naar: 'lid:' + codenaam, centen: RTG_CENTEN, soort: 'terug', oms: 'Vonk-date niet doorgegaan, teruggeboekt', ref: m.id });
+      return { status: 402, error: r2.error };
+    }
     m.betaald[key] = nu();
     const ander = m.a === key ? m.b : m.a;
     if (m.betaald[ander]) {

@@ -19,6 +19,15 @@ module.exports = (ctx) => {
     const p = eigenVeld(g.profielen, profielId);
     if (!p) return { error: 'Dit profiel bestaat niet meer.', status: 404 };
     if (p.rol !== 'gast') return { error: 'Alleen een oppas- of familieprofiel kan aan een RTG-pas gekoppeld worden.', status: 403 };
+    /* Een al gekoppeld profiel niet stilzwijgend overschrijven. De functie kende
+       het begrip wel -- gastProfielen() geeft per profiel `gekoppeld` terug,
+       puur zodat de app het kan tonen -- maar de server dwong er niets mee af.
+       Wie de gezinscode kende, kon zo de koppeling van een ander lid overnemen,
+       en daarmee de oppasinfo (noodnummers, allergieen, huisregels), de
+       gezinsagenda en de LIVE gps-locaties van alle gezinsleden. Opnieuw
+       koppelen op je eigen account blijft gewoon werken. */
+    if (p.koppel && p.koppel.userId && p.koppel.userId !== userId)
+      return { error: 'Dit profiel is al aan een RTG-pas gekoppeld. Laat het gezin het eerst loskoppelen in de RTF-app.', status: 409 };
     p.koppel = { userId, tier, tierNaam: TIERNAAM[tier] || 'RTG Pass', codenaam: codenaam || 'lid', at: nu() };
     save();
     return { ok: true, gezinNaam: g.naam, profielNaam: p.naam, tierNaam: p.koppel.tierNaam };

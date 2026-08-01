@@ -27,7 +27,7 @@
     }));
     // ritgeschiedenis: bladeren, zoeken en de volledige export van de server
     const ktCsv = el.querySelector('#ktCsv'); if (ktCsv) ktCsv.addEventListener('click', () => {
-      window.open('/api/supplier/rides.csv?token=' + encodeURIComponent(API.token), '_blank');
+      API.download('/supplier/rides.csv', {}, 'ritten-' + new Date().toISOString().slice(0, 10) + '.csv').catch(() => {});
     });
     el.querySelectorAll('[data-khist]').forEach(b => b.addEventListener('click', () => {
       histPage = Math.max(1, histPage + Number(b.dataset.khist));

@@ -58,7 +58,7 @@ module.exports = (ctx) => {
     if (t) { t.status = 'uitgestapt'; t.uitstap = { waarde: v.waarde, at: nu(), soort: 'terugkoop' }; }
     kasAdd(v.assetId, -v.waarde * 100);
     save();
-    try { await pay.stuur({ van: 'RTG Treasury', aanCodenaam: v.codenaam, centen: v.waarde * 100, oms: 'Terugkoop ' + v.assetNaam + ' (RTG Asset)', idem: 'terugkoop-' + v.id, soort: 'tik' }); } catch (e) {}
+    try { await pay.huisUit({ aanCodenaam: v.codenaam, centen: v.waarde * 100, oms: 'Terugkoop ' + v.assetNaam + ' (RTG Asset)', idem: 'terugkoop-' + v.id }); } catch (e) {}
     notify(v.key, { icon: 'betalen', title: 'Terugkoop uitbetaald: ' + v.assetNaam, body: 'De Tik van € ' + v.waarde + ' staat in uw tegoed. Het ticket is terug in de pool.', scope: 'assets' });
     return { ok: true, waarde: v.waarde, verzoek: v };
   }
@@ -66,21 +66,31 @@ module.exports = (ctx) => {
   async function assetFeesInnen(wie) {
     lijsten();
     const jaar = new Date().getFullYear();
-    let geind = 0, totaal = 0;
+    let geind = 0, totaal = 0, mislukt = 0;
+    let reden = null;
     for (const t of db.data.assetTickets) {
       if (t.status !== 'actief' || t.feeJaar === jaar) continue;
       const a = objectVan(t.assetId);
       if (!a) continue;
       const fee = serviceFeeVan(a);
-      try {
-        await pay.stuur({ van: t.codenaam, aanCodenaam: 'RTG Treasury', centen: fee * 100, oms: 'Servicefee ' + jaar + ' ' + a.naam, idem: 'fee-' + t.id + '-' + jaar, soort: 'tik' });
-        t.feeJaar = jaar;
-        kasAdd(a.id, fee * 100);
-        geind++; totaal += fee;
-      } catch (e) { /* volgende ronde opnieuw */ }
+      /* De uitkomst BEKIJKEN, niet alleen op een uitzondering wachten. De
+         betaalkant gooit niet bij een zakelijke fout -- hij geeft { status,
+         error } terug (404 onbekende ontvanger, 402 te weinig saldo). De
+         try/catch eronder verantwoordde zich met "volgende ronde opnieuw",
+         maar ving iets dat nooit gegooid werd: feeJaar werd gezet en de kas
+         opgehoogd terwijl er geen cent verhuisde, en geind/totaal telden op.
+         Alleen een echte overboeking telt nu als geind; de rest komt volgende
+         ronde terug en staat in het antwoord. */
+      let r = null;
+      try { r = await pay.huisIn({ vanCodenaam: t.codenaam, centen: fee * 100, oms: 'Servicefee ' + jaar + ' ' + a.naam, idem: 'fee-' + t.id + '-' + jaar }); }
+      catch (e) { r = { error: e.message }; }
+      if (!r || !r.ok) { mislukt++; if (!reden && r && r.error) reden = r.error; continue; }
+      t.feeJaar = jaar;
+      kasAdd(a.id, fee * 100);
+      geind++; totaal += fee;
     }
     save();
-    return { ok: true, geind, totaal, door: schoon(wie, 40) || 'RTG-kantoor' };
+    return { ok: true, geind, totaal, mislukt, reden, door: schoon(wie, 40) || 'RTG-kantoor' };
   }
 
   return { assetHertaxeer, assetKantoor, assetTerugkoopUit, assetFeesInnen };

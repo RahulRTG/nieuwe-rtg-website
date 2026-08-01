@@ -7,6 +7,26 @@ const S = require('./state');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
 
+/* DE ENE VORM VAN EEN TOKEN.
+
+   Een token dat wij uitgeven is `<base64url>.<32 hex>`, en niets anders. Dat
+   klonk als een detail tot deze trad naar buiten kwam:
+
+     Buffer.from(x, 'base64url') NEGEERT elk teken dat niet in het alfabet zit.
+     ' <b64>' decodeert dus naar precies hetzelfde als '<b64>', en de handtekening
+     klopt gewoon. Maar de INTREKLIJST hieronder bewaart kluis.sign(<de rauwe
+     string>), en die is wel byte-exact. Uitloggen, en daarna hetzelfde token met
+     een spatie ervoor opsturen: de lijst herkent hem niet meer en verifyToken
+     zegt "prima". Uitloggen was dus met een enkel teken te omzeilen -- precies
+     de fout die de intreklijst hierboven kwam repareren, een laag dieper.
+
+   De oplossing is niet nog een normalisatie erbij (dan blijven er vormen over
+   die de een wel en de ander niet ziet), maar EEN strikte vorm: wat er niet
+   exact uitziet zoals wij hem uitgeven, is geen token. Fail-closed, en iedereen
+   -- verifieren, intrekken, opzoeken -- kijkt naar dezelfde bytes. */
+const TOKENVORM = /^[A-Za-z0-9_-]+\.[a-f0-9]{32}$/;
+const strikt = (t) => (typeof t === 'string' && TOKENVORM.test(t) ? t : null);
+
 function maakTokens(getUserById) {
   /* ---------- staatloze ondertekende tokens ---------- */
   function issueToken(userId, days = 30) {
@@ -29,6 +49,8 @@ function maakTokens(getUserById) {
      We ruimen luk-raak op tijdens het intrekken zelf, zodat er geen timer bij
      hoeft. */
   function trekIn(token) {
+    token = strikt(token);
+    if (!token) return false;
     let exp = 0;
     try {
       const body = Buffer.from(String(token).split('.')[0], 'base64url').toString();
@@ -56,6 +78,8 @@ function maakTokens(getUserById) {
      Zonder intrekken zou dat bewijs die hele minuut opnieuw te gebruiken zijn --
      en het staat in een URL, dus het staat ook in de browsergeschiedenis. */
   function trekInActie(token, doel) {
+    token = strikt(token);
+    if (!token) return false;
     let exp = 0;
     try {
       const body = Buffer.from(String(token).split('.')[0], 'base64url').toString();
@@ -72,6 +96,8 @@ function maakTokens(getUserById) {
     } catch (e) { return false; }
   }
   function isIngetrokken(token) {
+    token = strikt(token);
+    if (!token) return true; // geen geldige vorm: behandel als ongeldig
     try {
       const r = S.db.prepare('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
         .get(kluis.sign(String(token)));
@@ -80,6 +106,8 @@ function maakTokens(getUserById) {
   }
 
   function verifyToken(token) {
+    token = strikt(token);
+    if (!token) return null;
     try {
       const [b64, sig] = String(token).split('.');
       if (!b64 || !sig) return null;
@@ -102,6 +130,8 @@ function maakTokens(getUserById) {
     return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
   }
   function verifyActionToken(token, purpose) {
+    token = strikt(token);   // zelfde strikte vorm als een sessietoken
+    if (!token) return null;
     try {
       const [b64, sig] = String(token).split('.');
       if (!b64 || !sig || kluis.sign(Buffer.from(b64, 'base64url').toString()) !== sig) return null;

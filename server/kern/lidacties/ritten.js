@@ -16,10 +16,17 @@ function vraagRitVoor(session, body) {
   // activiteitenzaken rijden alleen hun eigen transfers: die regel je via je ticket
   if (s.type === 'activiteit') return { status: 409, error: 'De transfer van ' + s.name + ' regel je via je ticket (Ter plaatse, Mijn tickets).' };
   if (!optieAan(s, 'ritten')) return { status: 409, error: s.name + ' neemt op dit moment geen ritaanvragen aan.' };
-  // leeftijd uit het paspoort: privejets en helikopters boek je vanaf 18 jaar
+  /* Leeftijd uit het paspoort: privejets en helikopters boek je vanaf 18 jaar.
+     Hier stond `lftR != null &&` voor, en dat maakte de grens fail-open:
+     leeftijdVan geeft null zodra de geboortedatum ontbreekt of niet klopt, dus
+     een onbekende leeftijd telde als volwassen. De broer-route in dezelfde map
+     beslist dezelfde vraag andersom en schrijft dat ook op (bestellen.js: "een
+     onbekende of ongeverifieerde leeftijd telt dus als te jong"). Een grens die
+     bij twijfel doorlaat is geen grens. */
   const lftR = leeftijdVan(geborenVan(session));
-  if ((s.type === 'jet' || s.type === 'helikopter') && lftR != null && lftR < 18)
-    return { status: 403, error: (s.type === 'helikopter' ? 'Helikoptervluchten' : 'Privejets') + ' boek je vanaf 18 jaar. Een taxi regelen we graag voor je.' };
+  const volwassen = lftR >= 18;
+  if ((s.type === 'jet' || s.type === 'helikopter') && !volwassen)
+    return { status: 403, error: (s.type === 'helikopter' ? 'Helikoptervluchten' : 'Privejets') + ' boek je vanaf 18 jaar' + (lftR == null ? '; vul eerst je geboortedatum in je paspoort in.' : '. Een taxi regelen we graag voor je.') };
   const dest = body.toCode ? findSupplier(body.toCode) : null;
   const codename = liveCodename(session);
   // slimme offerte: afstand uit de live-locatie en de bestemming, anders een
@@ -56,8 +63,9 @@ function vraagRitVoor(session, body) {
     driver: null, vehicle: null,
     // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf;
     // jeugdleden (15-17) betalen altijd vooraf
-    betaalMoment: (optieAan(s, 'betaalVooraf') || (lftR != null && lftR < 18)) ? 'vooraf' : 'achteraf',
-    status: (optieAan(s, 'betaalVooraf') || (lftR != null && lftR < 18)) && quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
+    // ook hier fail-closed: onbekende leeftijd telt als jeugdlid, dus vooraf betalen
+    betaalMoment: (optieAan(s, 'betaalVooraf') || !volwassen) ? 'vooraf' : 'achteraf',
+    status: (optieAan(s, 'betaalVooraf') || !volwassen) && quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
     paid: quote === 0, at: new Date().toISOString()
   };
   if (ride.plannedFor) ride.when = 'Gepland: ' + ride.plannedFor.slice(0, 16).replace('T', ' ');

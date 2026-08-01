@@ -88,8 +88,8 @@ module.exports = (ctx) => {
       t.akkoord = nu(); t.at = nu(); // nieuwe eigenaar, nieuwe bedenktijd
       kasAdd(a.id, fee * 100);
       save();
-      try { await pay.stuur({ van: koper.codenaam, aanCodenaam: 'RTG Treasury', centen: (waarde + fee) * 100, oms: 'Overname Asset-ticket ' + a.naam + ' (incl. ' + Math.round(OVERDRACHT_FEE_PCT * 100) + '% overdracht)', idem: 'overname-' + t.id + '-' + koper.id, soort: 'tik' }); } catch (e) {}
-      try { await pay.stuur({ van: 'RTG Treasury', aanCodenaam: codenaam, centen: waarde * 100, oms: 'Verkoop Asset-ticket ' + a.naam + ' via de wachtlijst', idem: 'uitstap-' + t.id + '-' + koper.id, soort: 'tik' }); } catch (e) {}
+      try { await pay.huisIn({ vanCodenaam: koper.codenaam, centen: (waarde + fee) * 100, oms: 'Overname Asset-ticket ' + a.naam + ' (incl. ' + Math.round(OVERDRACHT_FEE_PCT * 100) + '% overdracht)', idem: 'overname-' + t.id + '-' + koper.id }); } catch (e) {}
+      try { await pay.huisUit({ aanCodenaam: codenaam, centen: waarde * 100, oms: 'Verkoop Asset-ticket ' + a.naam + ' via de wachtlijst', idem: 'uitstap-' + t.id + '-' + koper.id }); } catch (e) {}
       notify(sess.key, { icon: 'betalen', title: 'Verkocht via de wachtlijst', body: a.naam + ': de Tik van € ' + waarde + ' staat in uw tegoed.', scope: 'assets' });
       notify(koper.key, { icon: a.icon, title: 'U bent aan de beurt: ' + a.naam, body: 'Het Asset-ticket is van u (€ ' + waarde + ' + € ' + fee + ' overdracht). Restlooptijd tot ' + t.vervaltOp + '.', scope: 'assets' });
       return { ok: true, soort: 'overdracht', waarde, naar: koper.codenaam };

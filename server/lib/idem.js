@@ -39,6 +39,21 @@ module.exports = function maakIdem({ d, save, naam }) {
     return d()[k];
   }
 
+  /* IN VLUCHT: de sleutels die op DIT moment nog draaien.
+
+     De bewaarde sleutel hierboven is een grendel die pas NA het werk dichtvalt.
+     Tussen de controle en die vastlegging staat `await werk()`, en daar passen
+     twee gelijktijdige verzoeken doorheen: allebei zien een lege store, allebei
+     voeren het werk uit, allebei boeken echt. Het venster gaat pas open zodra
+     werk() ECHTE I/O doet -- Postgres, de Rust-motor, Stripe -- en dat is precies
+     het productiepad, niet het pad van de toetsen.
+
+     Een tweede verzoek met dezelfde sleutel wacht daarom op het eerste en krijgt
+     diens antwoord, net als een herhaling na afloop. Mislukt het werk, dan wordt
+     er niets bewaard en mag een volgende poging het gewoon opnieuw doen -- dat
+     blijft zoals het was. */
+  const inVlucht = new Map();
+
   return async function metIdem(sleutel, afdruk, werk) {
     if (!sleutel) return werk();
     const s = store();
@@ -49,8 +64,23 @@ module.exports = function maakIdem({ d, save, naam }) {
       }
       return Object.assign({}, s[sleutel], { herhaald: true });
     }
-    const r = await werk();
-    if (r && r.ok) {
+    const bezig = inVlucht.get(sleutel);
+    if (bezig) {
+      if (afdruk && bezig.afdruk && bezig.afdruk !== afdruk) {
+        return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
+      }
+      const eerder = await bezig.belofte;
+      return (eerder && typeof eerder === 'object') ? Object.assign({}, eerder, { herhaald: true }) : eerder;
+    }
+    let klaar;
+    inVlucht.set(sleutel, { afdruk: afdruk || '', belofte: new Promise(res => { klaar = res; }) });
+    let r = null, fout = null;
+    try { r = await werk(); }
+    catch (e) { fout = e; }
+    /* Vastleggen en pas daarna de vlucht sluiten. Er staat geen await tussen, dus
+       een derde verzoek ziet altijd of de bewaarde sleutel of de vlucht -- nooit
+       het gat ertussen. */
+    if (!fout && r && r.ok) {
       s._keys.push(sleutel);
       if (s._keys.length > MAX) {
         for (const weg of s._keys.splice(0, s._keys.length - MAX)) { delete s[weg]; delete a[weg]; }
@@ -59,6 +89,9 @@ module.exports = function maakIdem({ d, save, naam }) {
       if (afdruk) a[sleutel] = afdruk;
       save();
     }
+    inVlucht.delete(sleutel);
+    klaar(fout ? { status: 500, error: 'De vorige poging met deze sleutel mislukte.' } : r);
+    if (fout) throw fout;
     return r;
   };
 };

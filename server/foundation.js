@@ -84,4 +84,6 @@ router.get('/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claude
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
 require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto });
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr };
+// magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
+// de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd };

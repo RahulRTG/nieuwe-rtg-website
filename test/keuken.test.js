@@ -166,12 +166,22 @@ test('de dagafsluiting: Z-rapport met btw-splitsing en de boekhoudexport als CSV
   assert.ok(r.body.btw.length >= 1 && r.body.btw[0].btw > 0, 'de btw is gesplitst uit de omzet');
   assert.ok(r.body.betaalwijzen.contant >= 2 * menuItem.price, 'de contante bon staat onder de betaalwijzen');
   assert.ok(r.body.betaalwijzen.app >= menuItem.price, 'de app-bestelling ook');
-  const csv = await fetch(base + '/api/supplier/dagrapport.csv?token=' + token);
+  /* De export gaat via POST met het token in de Authorization-header. Hij stond
+     op GET met het token in de querystring, en dat is precies hetzelfde token
+     dat elke schrijfroute van de zaak opent -- in een URL belandt het in
+     serverlogs, proxylogs, de Referer en de browsergeschiedenis. De backoffice
+     was daar al van afgestapt; deze en rides.csv zijn gevolgd. */
+  const haal = (tok) => fetch(base + '/api/supplier/dagrapport.csv', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}'
+  });
+  const csv = await haal(token);
   assert.equal(csv.status, 200);
   const tekst = await csv.text();
   assert.match(tekst, /Omzet /);
   assert.match(tekst, /btw-tarief/);
-  assert.equal((await fetch(base + '/api/supplier/dagrapport.csv?token=fout')).status, 401, 'zonder geldige sessie geen export');
+  assert.equal((await haal('fout')).status, 401, 'zonder geldige sessie geen export');
+  assert.equal((await fetch(base + '/api/supplier/dagrapport.csv?token=' + token)).status, 404,
+    'en het token in de URL opent niets meer');
 });
 
 test('menu-engineering: volume maal marge, met een kwadrant en advies per gerecht', async () => {

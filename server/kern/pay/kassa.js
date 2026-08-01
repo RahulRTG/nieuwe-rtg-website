@@ -4,7 +4,7 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, betaal, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
-    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, MIN_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
+    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
 
   /* ---------- de kassacode: contactloos bij de partner ---------- */
   function kasCode({ codenaam, maxCenten }) {
@@ -26,10 +26,20 @@ module.exports = (ctx) => {
     // de code hoort in de afdruk: hergebruik met een ANDERE code is een ander verzoek
     return metIdem(idem ? 'kas:' + supplierCode + ':' + idem : null,
       'kas|' + supplierCode + '|' + k.code + '|' + c, async () => {
+      /* De code HIER consumeren, voor de awaits. Hij stond onderaan, na het
+         bijladen en de boeking, en daar zit echte I/O tussen. Twee inningen met
+         verschillende idem-sleutels zijn voor metIdem legitiem twee verzoeken --
+         alleen deze vlag houdt hergebruik van dezelfde eenmalige code tegen, en
+         die hoorde dus aan deze kant van de awaits. Nog een keer kijken is nodig
+         omdat de controle hierboven buiten metIdem staat; mislukt het daarna,
+         dan geven we de code terug zodat het lid opnieuw kan afrekenen. */
+      if (k.gebruikt || k.geldigTot < nu()) return { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
+      k.gebruikt = true; save();
+      const terug = (r) => { k.gebruikt = false; save(); return r; };
       const z = await zorgSaldo({ codenaam: k.codenaam, centen: c, idem });
-      if (z.error) return z;
+      if (z.error) return terug(z);
       const b = await boekAsync({ van: rekLid(k.codenaam), naar: rekPartner(supplierCode), centen: c, soort: 'kassa', oms: oms || 'Kassa', ref: k.code });
-      if (b.error) return b;
+      if (b.error) return terug(b);
       /* De kosten van de betaaldienst gaan DIRECT naar de ondernemer: per
          transactie meteen verrekend op de partnerrekening, als eigen regel in
          het grootboek naast de ontvangst -- geen verzamelfactuur achteraf.
@@ -41,7 +51,6 @@ module.exports = (ctx) => {
           soort: 'betaaldienstkosten', oms: 'Betaaldienstkosten, direct verrekend', ref: k.code });
         if (kb.error) kosten = 0;
       }
-      k.gebruikt = true;
       save();
       seintje(k.codenaam);
       return { ok: true, centen: c, van: k.codenaam, kosten };
@@ -62,22 +71,43 @@ module.exports = (ctx) => {
   }
   async function partnerUitbetaal({ supplierCode, idem }) {
     const rek = rekPartner(supplierCode);
-    const c = saldoVan(rek);
-    if (c <= 0) return { status: 400, error: 'Er staat niets om uit te betalen.' };
+    if (saldoVan(rek) <= 0) return { status: 400, error: 'Er staat niets om uit te betalen.' };
     /* Een uitbetaling heeft geen parameters buiten de partner zelf (het gaat
-       altijd om het volle saldo), dus de afdruk is de partner. Het bedrag
-       bewust NIET meenemen: dat verschilt legitiem per moment. */
+       altijd om het saldo), dus de afdruk is de partner. Het bedrag bewust NIET
+       meenemen: dat verschilt legitiem per moment. */
     return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null, 'uit|' + supplierCode, async () => {
+      /* Het saldo PAS hier lezen, en begrensd op de boekingsgrens van het
+         grootboek. Twee dingen gingen hier mis en ze versterkten elkaar.
+
+         Het saldo werd buiten metIdem gelezen, dus twee gelijktijdige verzoeken
+         lazen allebei het volle bedrag -- de afboeking hieronder had toen nog
+         niets gedaan.
+
+         En er was geen bovengrens, terwijl het grootboek er wel een heeft
+         (MAX_CENTEN). Bij een partnersaldo boven de EUR 5.000 werd de uitbetaling
+         dus eerst bij de betaaldienst vastgelegd en daarna de boeking geweigerd
+         met "Dat bedrag kan niet". Het saldo bleef staan, de partner kon NOOIT
+         uitbetaald krijgen, en elke nieuwe poging legde er weer een vast. Boven
+         de grens betalen we in delen uit; wat overblijft, blijft staan. */
+      const c = Math.min(saldoVan(rek), MAX_CENTEN);
+      if (c <= 0) return { status: 400, error: 'Er staat niets om uit te betalen.' };
+      /* Eerst afboeken, dan pas uitbetalen -- het stond andersom, dus de
+         uitbetaling lag al vast terwijl de boeking nog kon weigeren. Lukt de
+         uitbetaling niet, dan draaien we de afboeking terug, dezelfde compensatie
+         als bank/overboeken.js. */
+      const b = await boekAsync({ van: rek, naar: 'extern:uitbetaald', centen: c, soort: 'uitbetaling', oms: 'Uitbetaald naar de bank' });
+      if (b.error) return b;
       try {
         await betaal.maakUitbetaling({
           bedrag: c, referentie: 'pay-uit-' + supplierCode + '-' + nu(),
           idempotentieSleutel: idem ? 'pay-uit:' + supplierCode + ':' + idem : undefined,
           begunstigde: supplierCode, omschrijving: 'RTG Pay uitbetaling'
         });
-      } catch (e) { return { status: 502, error: 'De uitbetaling lukte niet: ' + e.message }; }
-      const b = await boekAsync({ van: rek, naar: 'extern:uitbetaald', centen: c, soort: 'uitbetaling', oms: 'Uitbetaald naar de bank' });
-      if (b.error) return b;
-      return { ok: true, uitbetaald: c };
+      } catch (e) {
+        await boekAsync({ van: 'extern:uitbetaald', naar: rek, centen: c, soort: 'terug', oms: 'Uitbetaling mislukt, teruggeboekt' });
+        return { status: 502, error: 'De uitbetaling lukte niet: ' + e.message };
+      }
+      return { ok: true, uitbetaald: c, restant: saldoVan(rek) };
     });
   }
 

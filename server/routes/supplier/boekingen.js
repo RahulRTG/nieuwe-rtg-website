@@ -22,9 +22,16 @@ app.post('/api/supplier/booking/status', supplierAuth, (req, res) => {
   const status = String(req.body.status || '');
   if (status !== 'geweigerd') {
     if (!BOEK_KETEN.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+    /* Staat de HUIDIGE status buiten de keten, dan is indexOf(b.status) -1 en
+       laat de vergelijking hieronder alles door: 0 <= -1 is onwaar, 1 <= -1 ook.
+       Precies die situatie ontstaat bij 'geweigerd' en 'terugbetaald' -- de
+       status na een annulering. Een al geannuleerde en terugbetaalde boeking
+       kon zo terug naar 'bevestigd', met een bevestigingsbericht aan het lid
+       voor een afspraak die niet meer bestaat en waarvan het geld al retour is. */
+    if (!BOEK_KETEN.includes(b.status)) return res.status(409).json({ error: 'Deze boeking is ' + b.status + ' en kan niet verder in de keten.' });
     if (BOEK_KETEN.indexOf(status) <= BOEK_KETEN.indexOf(b.status)) return res.status(409).json({ error: 'Deze boeking is al ' + b.status + '.' });
-  } else if (b.status === 'afgerond') {
-    return res.status(409).json({ error: 'Deze boeking is al afgerond.' });
+  } else if (b.status === 'afgerond' || !BOEK_KETEN.includes(b.status)) {
+    return res.status(409).json({ error: 'Deze boeking is al ' + b.status + '.' });
   }
   b.status = status;
   if (status === 'afgerond') b.finishedAt = new Date().toISOString();

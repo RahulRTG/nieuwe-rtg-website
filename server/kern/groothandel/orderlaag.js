@@ -21,17 +21,30 @@ module.exports = (ctx) => {
     const g = defaults(s);
     const regels = [];
     let subtotaal = 0;
+    /* EERST nakijken, PAS DAARNA afboeken. De aftrek stond in de lus met een
+       bodem (Math.max(0, voorraad - aantal)) en zonder te kijken of het paste;
+       annuleren zette daarna de VOLLE hoeveelheid terug, dus elke rondgang blies
+       de voorraad op met het verschil. Heen en terug horen elkaars omgekeerde te
+       zijn. Per product optellen: twee regels moeten ook samen passen. */
+    const nodig = new Map();
     for (const r of (Array.isArray(regelsIn) ? regelsIn : [])) {
       const p = g.producten.find(x => x.id === r.productId && x.actief);
       if (!p) continue;
       const aantal = Math.max(0, Math.round(Number(r.aantal) || 0));
       if (aantal <= 0) continue;
       const prijs = prijsVoor(p, soort);
+      const som = (nodig.get(p.id) || 0) + aantal;
+      if (typeof p.voorraad === 'number' && p.voorraad < som)
+        return { status: 409, error: 'Van ' + p.naam + ' ligt er nog ' + p.voorraad + ' ' + (p.eenheid || 'stuks') + '; pas de hoeveelheid aan.' };
+      nodig.set(p.id, som);
       regels.push({ productId: p.id, naam: p.naam, eenheid: p.eenheid, aantal, prijs });
       subtotaal += prijs * aantal;
-      if (typeof p.voorraad === 'number') p.voorraad = Math.max(0, p.voorraad - aantal);
     }
     if (!regels.length) return { status: 400, error: 'Kies minstens een product.' };
+    for (const [pid, aantal] of nodig) {
+      const p = g.producten.find(x => x.id === pid);
+      if (p && typeof p.voorraad === 'number') p.voorraad -= aantal;
+    }
     const order = {
       ref: id('GH').toUpperCase(), groothandelCode: s.code, groothandelNaam: s.name,
       klant: { soort, id: koper.id, naam: koper.naam || 'Klant' },
@@ -48,11 +61,25 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, order: publiekeOrder(order, 'klant') };
   }
 
+  // De gereserveerde voorraad terug op de plank. Een order valt maar een keer uit
+  // de keten (geannuleerd of geweigerd staan allebei in GH_KLAAR), dus dubbel kan niet.
+  function voorraadTerug(o) {
+    const s = findSupplier(o.groothandelCode);
+    if (!s) return;
+    const g = defaults(s);
+    for (const r of o.regels) {
+      const p = g.producten.find(x => x.id === r.productId);
+      if (p && typeof p.voorraad === 'number') p.voorraad += r.aantal;
+    }
+  }
+
   function orderVerder(groothandelCode, ref, actie, actor) {
     const o = orders().find(x => x.ref === ref && x.groothandelCode === groothandelCode);
     if (!o) return { status: 404, error: 'Bestelling niet gevonden.' };
     if (GH_KLAAR[o.status]) return { status: 409, error: 'Deze bestelling is al afgerond.' };
-    if (actie === 'weiger') { o.status = 'geweigerd'; }
+    // weigeren is ook een niet-doorgegane bestelling: voorraad terug. Dat gebeurde
+    // alleen bij annuleren, dus een geweigerde order bleef als verkocht afgeboekt.
+    if (actie === 'weiger') { o.status = 'geweigerd'; voorraadTerug(o); }
     else if (actie === 'verder') { const volgende = GH_KETEN[o.status]; if (!volgende) return { status: 409, error: 'Geen volgende stap.' }; o.status = volgende; }
     else return { status: 400, error: 'Onbekende actie.' };
     o.stappen.push({ status: o.status, at: nu(), door: (actor && actor.name) || null });
@@ -73,9 +100,7 @@ module.exports = (ctx) => {
     if (!o) return { status: 404, error: 'Bestelling niet gevonden.' };
     if (o.status !== 'aangevraagd') return { status: 409, error: 'Alleen een nog niet bevestigde bestelling kan geannuleerd worden.' };
     o.status = 'geannuleerd'; o.stappen.push({ status: 'geannuleerd', at: nu() });
-    // voorraad terug
-    const s = findSupplier(o.groothandelCode);
-    if (s) { const g = defaults(s); for (const r of o.regels) { const p = g.producten.find(x => x.id === r.productId); if (p && typeof p.voorraad === 'number') p.voorraad += r.aantal; } }
+    voorraadTerug(o);
     save();
     sseToSupplier(o.groothandelCode, 'sync', { scope: 'groothandel' });
     return { status: 200, ok: true };
@@ -102,54 +127,10 @@ module.exports = (ctx) => {
     };
   }
 
-  /* ---- AI-bijbestellen voor de horeca ----
-     Kijkt naar wat de zaak de afgelopen 14 dagen verkocht (gast-bestellingen)
-     en naar de laatste mise-en-place, schat het verbruik en matcht dat op de
-     producten van de groothandel. Zet een concept-bestelling klaar. */
-  function verbruikVan(partner) {
-    const sinds = Date.now() - 14 * 86400000;
-    const teller = new Map(); // woord -> aantal verkocht
-    for (const o of (db.data.orders || [])) {
-      if (o.supplierCode !== partner.code) continue;
-      if (o.at && new Date(o.at).getTime() < sinds) continue;
-      for (const it of (o.items || [])) {
-        for (const w of woorden(it.name || it.naam)) teller.set(w, (teller.get(w) || 0) + (Number(it.qty) || 1));
-      }
-    }
-    // mise-en-place van de laatste dagen telt mee als verbruik-signaal
-    const mep = partner.dailyMeps || {};
-    for (const k of Object.keys(mep)) {
-      for (const t of ((mep[k] && mep[k].tasks) || [])) for (const w of woorden(t.text || t)) teller.set(w, (teller.get(w) || 0) + 2);
-    }
-    return teller;
-  }
-  function woorden(tekst) {
-    return String(tekst || '').toLowerCase().replace(/[^\p{L}\s]/gu, ' ').split(/\s+/).filter(w => w.length >= 4);
-  }
-  function bijbestelVoorstel(partner, groothandelCode) {
-    const s = findSupplier(groothandelCode);
-    if (!isGroothandel(s)) return { status: 404, error: 'Groothandel niet gevonden.' };
-    if (!functieAan(s, 'aiBijbestel')) return { status: 409, error: 'Deze groothandel biedt geen AI-bijbestellen.' };
-    if (!functieAan(s, 'b2b')) return { status: 409, error: 'Deze groothandel levert niet aan horeca.' };
-    const teller = verbruikVan(partner);
-    const g = defaults(s);
-    const regels = [];
-    for (const p of g.producten.filter(x => x.actief)) {
-      const sleutels = woorden(p.naam);
-      let score = 0;
-      for (const w of sleutels) for (const [k, v] of teller) if (k.includes(w) || w.includes(k)) score += v;
-      if (score <= 0) continue;
-      // voorgestelde hoeveelheid: het geschatte verbruik, minstens de minimale bestelhoeveelheid
-      const aantal = Math.max(p.minBestel || 1, Math.ceil(score / 3));
-      regels.push({ productId: p.id, naam: p.naam, eenheid: p.eenheid, aantal, prijs: prijsVoor(p, 'partner'), reden: score + ' keer in verkoop/mise-en-place' });
-    }
-    regels.sort((a, b) => b.aantal * b.prijs - a.aantal * a.prijs);
-    const totaal = Math.round(regels.reduce((n, r) => n + r.aantal * r.prijs, 0) * 100) / 100;
-    const uitleg = regels.length
-      ? 'Op basis van de verkoop en mise-en-place van de afgelopen 14 dagen: ' + regels.length + ' product(en), samen € ' + totaal + '. Controleer en bevestig.'
-      : 'Nog te weinig verkoopdata om iets voor te stellen. Plaats eerst wat bestellingen of bestel handmatig.';
-    return { status: 200, ok: true, groothandelCode: s.code, groothandelNaam: s.name, regels: regels.slice(0, 40), totaal, uitleg };
-  }
+  /* Het slimme bijbestelvoorstel is een eigen onderwerp (verkoopdata lezen,
+     schatten, matchen) en woont daarom in ./bijbestel; deze laag gaat over de
+     orderketen zelf. Afgesplitst toen dit bestand de 10 KB passeerde. */
+  const { bijbestelVoorstel } = require('./bijbestel')({ db, findSupplier, isGroothandel, defaults, functieAan, prijsVoor });
 
   return { plaatsBestelling, orderVerder, annuleer, mijnBestellingen, inkomend, bijbestelVoorstel };
 };

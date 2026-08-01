@@ -23,6 +23,47 @@ module.exports = (ctx) => {
       return { ok: true, saldo: saldoVan(rekLid(van)), bijgeladen: z.bijgeladen, boeking: b.boeking.id };
     });
   }
+  /* ---------- de huisrekening van RTG ----------
+     RTG Assets rekent af met "RTG Treasury": servicefees en overnames komen
+     binnen, terugkopen en herroepingen gaan eruit. Dat liep via stuur() met de
+     codenaam 'RTG Treasury' -- en stuur weigert een onbekende codenaam met een
+     404, want de huisrekening staat niet in de ledengids en kan daar ook niet in
+     staan (die is voor leden). Alle vijf de aanroepen stonden in een lege catch,
+     dus die 404 was onzichtbaar en de fee-ronde meldde toch dat er geind was.
+
+     Een huisrekening hoort rechtstreeks in het grootboek, precies zoals
+     'extern:vonk-rtg' (het RTG-deel van een Vonk-date) en 'extern:uitbetaald':
+     buiten de gesloten wallet, want geld dat naar RTG gaat verlaat het stelsel
+     en geld dat RTG bijlegt komt van buiten. */
+  const REK_HUIS = 'extern:treasury';
+  async function huisIn({ vanCodenaam, centen, oms, idem }) {
+    const c = Math.round(Number(centen));
+    if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
+    const van = schoon(vanCodenaam, 40);
+    if (!van) return { status: 400, error: 'Van wie komt het?' };
+    return metIdem(idem ? 'huisin:' + van + ':' + idem : null, 'huisin|' + van + '|' + c, async () => {
+      const z = await zorgSaldo({ codenaam: van, centen: c, idem });
+      if (z.error) return z;
+      const b = await boekAsync({ van: rekLid(van), naar: REK_HUIS, centen: c, soort: 'huis', oms: oms || 'RTG Treasury' });
+      if (b.error) return b;
+      seintje(van);
+      return { ok: true, centen: c, bijgeladen: z.bijgeladen, boeking: b.boeking.id };
+    });
+  }
+  async function huisUit({ aanCodenaam, centen, oms, idem }) {
+    const c = Math.round(Number(centen));
+    if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
+    const aan = schoon(aanCodenaam, 40);
+    if (!aan) return { status: 400, error: 'Aan wie gaat het?' };
+    if (!(await bestaatLid(aan))) return { status: 404, error: 'Die codenaam kennen we niet.' };
+    return metIdem(idem ? 'huisuit:' + aan + ':' + idem : null, 'huisuit|' + aan + '|' + c, async () => {
+      const b = await boekAsync({ van: REK_HUIS, naar: rekLid(aan), centen: c, soort: 'huis', oms: oms || 'RTG Treasury' });
+      if (b.error) return b;
+      seintje(aan);
+      return { ok: true, centen: c, boeking: b.boeking.id };
+    });
+  }
+
   /* Een Klompje (goudklompje, het RTG-eigen betaalverzoek): vraag een bedrag aan een of meer vrienden. Met splitsMetMij
      deelt het totaal door de hele groep inclusief jezelf (jouw deel heb je
      immers al betaald aan de zaak); anders krijgt ieder het hele bedrag. */
@@ -125,5 +166,5 @@ module.exports = (ctx) => {
     return { ok: true, codenaam, saldo: saldoVan(rek), geschiedenis: rijen, aanMij: v.aanMij, vanMij: v.vanMij };
   }
 
-  return { stuur, verzoekMaak, verzoekenVoor, verzoekBetaal, verzoekIntrek, tikCode, tikBetaal, tikFeed, overzicht };
+  return { stuur, huisIn, huisUit, verzoekMaak, verzoekenVoor, verzoekBetaal, verzoekIntrek, tikCode, tikBetaal, tikFeed, overzicht };
 };

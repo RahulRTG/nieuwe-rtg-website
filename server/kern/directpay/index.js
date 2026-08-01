@@ -14,8 +14,8 @@
    Veilig: bedrag begrensd, leverancier moet echt bestaan, idempotent (twee keer
    tikken of een herhaald verzoek schrijft nooit dubbel af), en de betaalstatus
    komt uit de betaal-naad, niet van de client. Dit is de orkestrator: het
-   grootboek, de idempotentie, de tempolimiet en het rechtstreeks betalen wonen
-   hier; de betaalverzoeken en de ontvangsten-teller in ./verzoek. */
+   grootboek, de idempotentie-index en de tempolimiet wonen hier; het afrekenen
+   zelf in ./betalen, de betaalverzoeken en de ontvangsten-teller in ./verzoek. */
 
 const MIN_CENTEN = 50;          // € 0,50 ondergrens
 const MAX_CENTEN = 5000000;     // € 50.000 bovengrens per transactie
@@ -85,81 +85,6 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
       omschrijving: b.omschrijving, bron: b.bron, codename: b.codename, betaalwijze: b.betaalwijze || 'kaart', at: b.at };
   }
 
-  /* Het lid betaalt een leverancier rechtstreeks. `idem` is een client-token dat
-     dubbel afschrijven bij dubbeltik/herhaling voorkomt. */
-  async function betaalDirect({ key, codename, supplierCode, bedragCenten, omschrijving, bron, idem }) {
-    ensure();
-    const s = findSupplier(supplierCode);
-    if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
-    const cent = centenVan(bedragCenten);
-    if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
-    if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog voor een directe betaling.' };
-    // idempotentie tegen dubbeltik: zelfde lid + zelfde idem = zelfde betaling
-    const idemSleutel = idem ? ('dp:' + key + ':' + String(idem).slice(0, 60)) : null;
-    if (idemSleutel) {
-      const al = idemZoek(idemSleutel);
-      if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
-    }
-    // tempolimiet NA de idempotentie-check: retries blijven altijd mogelijk
-    if (!tempoOk(key)) return { status: 429, error: 'Even rustig aan: te veel betalingen kort na elkaar. Probeer het over een minuut opnieuw.' };
-    let prov;
-    try {
-      prov = await betaal.maakBetaling({
-        bedrag: cent, valuta: 'eur',
-        referentie: 'DP-' + (idem || crypto.randomUUID()),
-        idempotentieSleutel: idemSleutel || undefined,
-        omschrijving: (s.name + ' · ' + (omschrijving || 'Directe betaling')).slice(0, 120),
-        // productie: bestemming = connected account van de leverancier (destination charge)
-        bestemming: s.stripeAccount || undefined
-      });
-    } catch (e) { return { status: 502, error: 'Betaling kon niet gestart worden: ' + e.message }; }
-    if (prov.status && !['betaald', 'succeeded', 'processing', 'requires_capture'].includes(prov.status))
-      return { status: 402, error: 'De betaling is niet bevestigd.' };
-    const b = {
-      ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
-      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling',
-      bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app',
-      providerId: prov.id || null, aanbieder: prov.aanbieder || 'demo', idem: idemSleutel || null, at: nu()
-    };
-    db.data.directBetalingen.unshift(b);
-    db.data.directBetalingen = db.data.directBetalingen.slice(0, 200000);
-    idemBewaar(b);
-    const L = ledger(s.code); L.som += cent; L.aantal += 1;
-    save();
-    try { notifySupplier(s.code, { icon: 'betalen', title: 'Rechtstreeks betaald', body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
-    try { logActivity(s.code, { name: b.codename }, 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2)); } catch (e) {}
-    try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
-    try { sseToCustomer(key, 'sync', { scope: 'betalingen' }); } catch (e) {}
-    try { sseToOffice('sync', { scope: 'ontvangsten' }); } catch (e) {}
-    return { status: 200, ok: true, betaling: publiek(b) };
-  }
-
-  /* Een met munten (crypto) betaalde directe betaling vastleggen. Het geld is al
-     binnen en door de munt-aanbieder omgezet naar euro; hier alleen registreren
-     en de leverancier crediteren, zonder kaartafschrijving. */
-  function registreerMuntBetaling({ key, codename, supplierCode, bedragCenten, omschrijving }) {
-    ensure();
-    const s = findSupplier(supplierCode);
-    if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
-    const cent = centenVan(bedragCenten);
-    if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Bedrag te laag.' };
-    const b = {
-      ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
-      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling (munten)',
-      bron: 'app', providerId: null, aanbieder: 'munt', betaalwijze: 'munt', idem: null, at: nu()
-    };
-    db.data.directBetalingen.unshift(b);
-    db.data.directBetalingen = db.data.directBetalingen.slice(0, 200000);
-    const L = ledger(s.code); L.som += cent; L.aantal += 1;
-    save();
-    try { notifySupplier(s.code, { icon: 'betalen', title: 'Rechtstreeks betaald (munten)', body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
-    try { logActivity(s.code, { name: b.codename }, 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2) + ' met munten'); } catch (e) {}
-    try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
-    try { sseToCustomer(key, 'sync', { scope: 'betalingen' }); } catch (e) {}
-    try { sseToOffice('sync', { scope: 'ontvangsten' }); } catch (e) {}
-    return { status: 200, ok: true, betaling: publiek(b) };
-  }
-
   function mijnBetalingen(key) {
     ensure();
     // nieuwste-eerst met early exit: nooit verder scannen dan de 100 die we tonen
@@ -167,8 +92,13 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, ensure, centenVan, id, schoon, nu, verzamel, ledger, publiek, betaalDirect,
-    findSupplier, sseToSupplier, MIN_CENTEN, MAX_CENTEN };
+  const ctx = { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, verzamel, ledger, publiek,
+    idemZoek, idemBewaar, tempoOk, findSupplier, notify, notifySupplier, logActivity,
+    sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN };
+  // het afrekenen zelf staat in ./betalen; ctx.betaalDirect erbij omdat ./verzoek
+  // een goedgekeurd betaalverzoek langs dezelfde weg afrekent
+  const { betaalDirect, registreerMuntBetaling } = require('./betalen')(ctx);
+  ctx.betaalDirect = betaalDirect;
   const api = {
     DP_MIN_CENTEN: MIN_CENTEN, DP_MAX_CENTEN: MAX_CENTEN,
     dpBetaalDirect: betaalDirect, dpMijnBetalingen: mijnBetalingen, dpRegistreerMunt: registreerMuntBetaling

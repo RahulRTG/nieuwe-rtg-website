@@ -56,9 +56,12 @@ app.post('/api/huur/boek', auth, (req, res) => {
   const dagen = Math.round((new Date(tot) - new Date(van)) / 86400000);
   if (dagen > 30) return res.status(400).json({ error: 'Huren kan tot 30 dagen aaneen.' });
   // minimumleeftijd van de auto: uit het paspoort geverifieerd, geen zelfrapportage
+  // fail-closed: een onbekende leeftijd haalt de minimumleeftijd niet. Stond
+  // hier `lftH != null &&`, waardoor juist een sessie zonder geverifieerde
+  // geboortedatum overal langs mocht -- zie ook charter.js en ritten.js.
   const lftH = leeftijdVan(geborenVan(req.session));
-  if (auto.minLeeftijd && lftH != null && lftH < auto.minLeeftijd)
-    return res.status(403).json({ error: auto.name + ' verhuren we vanaf ' + auto.minLeeftijd + ' jaar; uw leeftijd is via uw paspoort geverifieerd.' });
+  if (auto.minLeeftijd && !(lftH >= auto.minLeeftijd))
+    return res.status(403).json({ error: auto.name + ' verhuren we vanaf ' + auto.minLeeftijd + ' jaar; uw leeftijd wordt via uw paspoort geverifieerd.' });
   // dubbele boekingen: de auto is van een gast, niet van twee
   const nu = Date.now();
   const bezet = boekingenVanZaak(s.code).some(b => b.kind === 'huur' && b.autoId === auto.id &&

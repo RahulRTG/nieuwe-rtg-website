@@ -48,15 +48,30 @@ module.exports = (wctx) => {
     const sess = rtf.verifieerProfiel(b.code, b.token);
     if (!sess) { noteFailedTry(bucket); return res.status(403).json({ error: 'Log opnieuw in bij je gezin om te solliciteren.' }); }
     if (sess.gast) return res.status(403).json({ error: 'Als oppas of familielid solliciteer je niet namens het gezin.' });
-    const lft = parseInt(b.leeftijd, 10);
-    if (!Number.isFinite(lft) || lft < 16)
+    /* De leeftijd komt uit het PROFIEL, niet uit het verzoek. Hier stond
+       `parseInt(b.leeftijd, 10)` -- een getal dat de client zelf meestuurde, en
+       waar zowel de ondergrens van 16 als de vacature-eis aan hing. De server
+       had het antwoord gewoon bij de hand: sess.p.groep, met rtf.magSolliciteren
+       en rtf.groepLeeftijd ernaast, functies die precies hiervoor bestaan. Die
+       gingen alleen naar de CLIENT (pubProfiel) om daar een tegel te verbergen.
+       De broer-route voor RTG-leden leest de leeftijd wel van de server.
+       Onbekende groep = niet solliciteren: fail-closed, zoals overal waar
+       leeftijd een grens is. */
+    if (!rtf.magSolliciteren(sess.p.groep))
       return res.status(403).json({ error: 'Solliciteren kan vanaf 16 jaar. Jongere gezinsleden vinden in de app juist leer- en groeitips.' });
+    const lft = rtf.groepLeeftijd(sess.p.groep);
     const s = findSupplier(b.supplierCode);
     if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
     const vac = (db.data.vacatures[s.code] || []).find(v => v.id === b.vacatureId && v.open);
     if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
-    if (lft < vac.minLeeftijd)
-      return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn.' });
+    /* De server kent de leeftijdsGROEP, niet het exacte jaartal; groepLeeftijd
+       geeft de ondergrens ervan. Een vacature met een hogere eis dan die
+       ondergrens gaat dus niet door, ook al is de sollicitant misschien oud
+       genoeg. Dat is bewust de veilige kant: een gezinslid dat een specifieke
+       leeftijd wil aantonen, doet dat via het profiel (groep) en niet door een
+       getal mee te sturen. */
+    if (!(lft >= vac.minLeeftijd))
+      return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn. Staat je leeftijdsgroep goed in je gezinsprofiel?' });
     if (rtf.alGesolliciteerd(b.code, sess.p.id, vac.id))
       return res.status(409).json({ error: 'Je hebt al op deze vacature gesolliciteerd. Je ziet de status bij "Mijn sollicitaties".' });
     const cv = b.cv || {};

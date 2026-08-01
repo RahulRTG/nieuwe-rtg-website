@@ -80,12 +80,12 @@ module.exports = (kern) => {
     res.json(shiftSamenvatting(req.supplier, req.body.datum));
   });
   // dezelfde cijfers als journaalregels voor de boekhouding (CSV-download)
-  app.get('/api/supplier/dagrapport.csv', (req, res) => {
-    const sess = sessionFor(String(req.query.token || ''));
-    if (!sess || sess.role !== 'supplier') return res.status(401).end();
-    const s = findSupplier(sess.code);
-    if (!s) return res.status(404).end();
-    const r = dagrapport(s, req.query.datum);
+  // POST met het token in de Authorization-header; een token in een GET-querystring
+  // lekt via logs, proxies en de browsergeschiedenis, en dit is hetzelfde token dat
+  // elke schrijfroute van de zaak opent. Zelfde keuze als /api/office/export.csv.
+  app.post('/api/supplier/dagrapport.csv', supplierAuth, (req, res) => {
+    const s = req.supplier;
+    const r = dagrapport(s, req.body.datum || req.query.datum);
     const geld = n => (Number(n) || 0).toFixed(2).replace('.', ',');
     const cel = require('../../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
     const rij = arr => arr.map(cel).join(';') + '\n';

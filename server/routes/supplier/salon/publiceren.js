@@ -12,6 +12,12 @@ module.exports = (kern, eisSalonProfiel) => {
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
     fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak , salon} = kern;
 app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAuth, async (req, res) => {
+  /* Publiceren namens de zaak is management-werk, net als de vijf andere
+     Salon-routes (deal, poll, bio, folder, stats). Deze was de enige zonder die
+     poort en tegelijk de zwaarste: 600 tekens vrije tekst plus een foto, onder
+     de naam van de zaak, naar alle volgers. eisSalonProfiel controleert of de
+     Salon aan staat en het profiel compleet is -- niet WIE er publiceert. */
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
   if (!eisSalonProfiel(req, res)) return;
   const text = String(req.body.text || '').trim().slice(0, 600);
   if (!text) return res.status(400).json({ error: 'Schrijf eerst een tekst.' });

@@ -80,8 +80,17 @@ function socialVerbind(mij, naar, doorOuder) {
    kanaal waarlangs een beschermd profiel nieuwe vrienden krijgt. De andere kant
    moet nog wel zelf accepteren (of, als die ook beschermd is, diens ouder). */
 async function ouderVerbind(gezinCode, kidHandle, doel) {
-  const sp = rtf.socialProfielen().find(x => x.handle === kidHandle && x.gezinCode === gezinCode);
-  if (!sp) return { status: 403, error: 'Dit is geen profiel van jouw gezin.' };
+  /* `&& x.beschermd` stond hier niet, en dat is precies het verschil met de drie
+     broer-functies die met dezelfde ouder-bevoegdheid werken (kindContacten,
+     kindVerwijder, socialGoedkeur -- die controleren het alle drie wel).
+     socialProfielen() levert ALLE niet-gastprofielen van een gezin, dus ook
+     volwassenen: een beheerder kon zijn eigen volwassen handle in het kind-slot
+     zetten. Dat slot geeft doorOuder=true door aan socialVerbind, en doorOuder
+     zet daar juist de twee beschermingen uit die een beschermd kind (t/m 15)
+     onbenaderbaar maken. Deze route is er voor kinderen; een volwassene verbindt
+     zichzelf via de gewone weg. */
+  const sp = rtf.socialProfielen().find(x => x.handle === kidHandle && x.gezinCode === gezinCode && x.beschermd);
+  if (!sp) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
   // doel mag een handle zijn of een exacte codenaam (zo typt een ouder gewoon de codenaam over)
   let naar = String(doel || '').trim();
   if (!codeExists(naar)) {

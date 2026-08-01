@@ -34,8 +34,25 @@ module.exports = (ctx) => {
     if (!o) return { status: 404, error: 'Deze opname staat niet op uw bord.' };
     if (!['opgenomen', 'ontslagen', 'geweigerd'].includes(status)) return { status: 400, error: 'Kies opgenomen, ontslagen of geweigerd.' };
     const bed = bak().bedden[code] = bak().bedden[code] || { totaal: 0, bezet: 0 };
-    if (status === 'opgenomen' && o.status !== 'opgenomen') bed.bezet = Math.min(bed.totaal || 9999, bed.bezet + 1);
-    if (status === 'ontslagen' && o.status === 'opgenomen') bed.bezet = Math.max(0, bed.bezet - 1);
+    /* Het beddenbord telde de statusovergang na, maar dekte er maar twee van de
+       zes. 'opgenomen' -> 'geweigerd' telde nooit af, dus dat bed bleef voorgoed
+       bezet; ging de opname daarna terug naar 'opgenomen', dan kwam er nog een
+       bij en stal een patient permanent bedden. En de optelling werd afgeknepen
+       op het totaal terwijl de aftrek dat niet was: wie in een vol huis werd
+       opgenomen kreeg geen bed erbij maar gaf er bij ontslag wel een terug.
+
+       Nu is er een waarheid: bezet een bed zolang de status 'opgenomen' is, en
+       geen enkele andere status doet dat. Elke overgang volgt daaruit. De
+       afknijping blijft (het bord kan niet boven zijn totaal uitkomen), maar dan
+       onthoudt de opname zelf of hij een bed HOUDT. Anders blijft optellen en
+       aftrekken alsnog scheef: in een vol huis werd de optelling weggeknepen en
+       gaf het ontslag daarna toch een bed terug. */
+    const wil = status === 'opgenomen';
+    if (wil && !o.bedBezet) {
+      if (!bed.totaal || bed.bezet < bed.totaal) { bed.bezet++; o.bedBezet = true; }
+    } else if (!wil && o.bedBezet) {
+      bed.bezet = Math.max(0, bed.bezet - 1); o.bedBezet = false;
+    }
     o.status = status;
     save();
     return { ok: true, opname: o, bedden: bed };

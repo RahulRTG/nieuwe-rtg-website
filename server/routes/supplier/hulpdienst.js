@@ -19,7 +19,7 @@ module.exports = (kern) => {
     if (!isKorps(req.supplier, res)) return;
     stuur(res, hulpdienst.overzicht(req.supplier));
   });
-  // eenheden beheren (manager): opvoeren en vrij/buiten-dienst zetten
+  // eenheden opvoeren doet de leiding; vrij/buiten-dienst melden doet wie het weet
   app.post('/api/supplier/hulp/eenheid/maak', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
     const s = req.supplier; if (!isKorps(s, res)) return;
@@ -27,6 +27,12 @@ module.exports = (kern) => {
     if (!r.error) { logActivity(s.code, req.actor, 'zette eenheid ' + r.eenheid.naam + ' op het bord'); sync(s); }
     stuur(res, r);
   });
+  /* Bewust GEEN managerOnly, anders dan bij eenheid/maak hierboven: buiten dienst
+     melden doet wie het weet -- degene die bij het voertuig staat, niet de
+     leiding. Dat staat zo in test/hulpdiensten-bord.test.js en het is de juiste
+     keuze; het commentaar boven het paar suggereerde ten onrechte dat beide
+     manager-werk zijn. Wat hier WEL bij hoorde staat in de kern: een eenheid die
+     op een lopende melding is ingezet, is niet met de hand vrij te zetten. */
   app.post('/api/supplier/hulp/eenheid/zet', supplierAuth, (req, res) => {
     const s = req.supplier; if (!isKorps(s, res)) return;
     const r = hulpdienst.eenheidZet(s.code, String(req.body.id || ''), String(req.body.status || ''));

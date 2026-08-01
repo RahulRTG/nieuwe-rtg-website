@@ -22,8 +22,11 @@ module.exports = (kern) => {
     if (!dienst) return res.status(404).json({ error: 'Deze dienst bestaat niet (meer).' });
     const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
     // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak
+    // onbekende leeftijd telt als jeugdlid: dan altijd vooraf betalen. Dat is de
+    // veilige kant en kost niets; andersom (fail-open) liet juist een sessie
+    // zonder geverifieerde leeftijd achteraf betalen.
     const lftB = leeftijdVan(geborenVan(req.session));
-    const vooraf = optieAan(s, 'betaalVooraf') || (lftB != null && lftB < 18);
+    const vooraf = optieAan(s, 'betaalVooraf') || !(lftB >= 18);
     const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
     const wanneer = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d + (/^\d{2}:\d{2}$/.test(u) ? ' ' + u : '') : null;
     const boeking = {

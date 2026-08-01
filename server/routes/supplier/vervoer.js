@@ -102,9 +102,11 @@ app.post('/api/supplier/ride/history', supplierAuth, (req, res) => {
   });
 });
 
-app.get('/api/supplier/rides.csv', (req, res) => {
-  const sess = sessionFor(String(req.query.token || ''));
-  if (!sess || sess.role !== 'supplier') return res.status(401).end();
+/* POST met het token in de header, niet GET in de querystring: dit is hetzelfde
+   token dat ELKE schrijfroute van de zaak opent, en in een URL belandt het in
+   logs, proxies en de browsergeschiedenis. Zoals /api/office/export.csv. */
+app.post('/api/supplier/rides.csv', supplierAuth, (req, res) => {
+  const sess = { code: req.supplier.code };
   const alle = db.data.rides
     .filter(r => r.supplierCode === sess.code && (r.status === 'afgerond' || r.status === 'gearriveerd'))
     .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));

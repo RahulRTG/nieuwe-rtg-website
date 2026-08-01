@@ -773,9 +773,15 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   const zonderToken = await raw('/rtf/solliciteer', { supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'X', contact: 'x@v.test', skills: ['x'] } });
   assert.equal(zonderToken.status, 403, 'zonder gezin-token geen sollicitatie');
 
-  // onder de 16 kan niet solliciteren (met geldig token)
-  const teJong = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 14, cv: { name: 'Jon', contact: 'j@v.test', skills: ['netjes'] } });
-  assert.equal(teJong.status, 403);
+  /* Onder de 16 kan niet solliciteren -- en de leeftijd komt uit het PROFIEL,
+     niet uit het verzoek. Hier stond een sollicitatie met `leeftijd: 14` in de
+     body, en die werd geweigerd; dat leek een leeftijdsgrens maar was er geen:
+     wie 25 meestuurde kwam er net zo makkelijk langs. De server heeft de
+     leeftijdsgroep gewoon bij de hand (sess.p.groep). */
+  const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Jon', rol: 'kind', groep: 'tiener' }));
+  const kindTok = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const teJong = await raw('/rtf/solliciteer', { code: g.code, token: kindTok, supplierCode: supCode, vacatureId: vacId, leeftijd: 25, cv: { name: 'Jon', contact: 'j@v.test', skills: ['netjes'] } });
+  assert.equal(teJong.status, 403, 'een tiener komt er niet langs, ook niet door 25 mee te sturen');
 
   // zonder afgerond cv lukt het niet
   const geenCv = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam' } });

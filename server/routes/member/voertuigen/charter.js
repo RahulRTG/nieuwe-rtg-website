@@ -45,8 +45,11 @@ app.post('/api/charter/boek', auth, (req, res) => {
   const dagen = Math.round((new Date(tot) - new Date(van)) / 86400000);
   if (dagen > 21) return res.status(400).json({ error: 'Charteren kan tot 21 dagen aaneen.' });
   // een boot huren doet u vanaf 18 jaar (paspoort geverifieerd, geen zelfrapportage)
+  // `lftC != null &&` stond hier voor, en dat maakte de grens fail-open: een
+  // sessie zonder geverifieerde geboortedatum telde als volwassen. Dezelfde fout
+  // als bij de privejet-grens (kern/lidacties/ritten.js). Bij twijfel dicht.
   const lftC = leeftijdVan(geborenVan(req.session));
-  if (lftC != null && lftC < 18) return res.status(403).json({ error: 'Een vaartuig charteren kan vanaf 18 jaar; uw leeftijd is via uw paspoort geverifieerd.' });
+  if (!(lftC >= 18)) return res.status(403).json({ error: 'Een vaartuig charteren kan vanaf 18 jaar; uw leeftijd wordt via uw paspoort geverifieerd.' });
   const gasten = Math.max(1, Math.min(boot.gasten || 12, parseInt(req.body.gasten, 10) || 1));
   // schipper: verplicht op sommige vaartuigen; anders vaart u bareboat met vaarbewijs
   const metSkipper = boot.skipperVerplicht ? true : (req.body.metSkipper === true);

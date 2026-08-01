@@ -108,7 +108,14 @@ function maakNotities({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, s
   function vink(key, id, index, af) {
     const { n } = vind(key, id);
     if (!n) return { status: 404, error: 'Lijst niet gevonden.' };
-    const item = (n.items || [])[Math.round(Number(index))];
+    /* De index moet echt een getal zijn. Number(null), Number(''), Number([]) en
+       Number(false) zijn allemaal 0, dus een verzoek zonder bruikbare index
+       vinkte stilzwijgend het EERSTE punt van de lijst af -- en de controle
+       hieronder ving dat niet, want dat item bestaat. Alleen een weggelaten veld
+       gaf NaN en dus netjes een 404. */
+    const i = (typeof index === 'number' || (typeof index === 'string' && index.trim() !== '')) ? Number(index) : NaN;
+    if (!Number.isInteger(i) || i < 0) return { status: 400, error: 'Welk punt bedoelt u?' };
+    const item = (n.items || [])[i];
     if (!item) return { status: 404, error: 'Dit punt staat niet (meer) op de lijst.' };
     item.af = af !== false;
     n.gewijzigd = nu();

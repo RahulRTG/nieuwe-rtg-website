@@ -38,6 +38,22 @@
         // de HTTP-status gaat mee op de fout, zodat aanroepers erop kunnen sturen.
         if (!res.ok) throw Object.assign(new Error(data.error || foutTekst), { status: res.status, data: data });
         return data;
+      },
+      /* Een bestand downloaden dat achter de inlog zit. Nooit via
+         window.open('...?token=...'): dat token opent elke schrijfroute van de
+         app en belandt in serverlogs, proxylogs, de Referer en de
+         browsergeschiedenis. Dus POST met de Authorization-header en dan een
+         blob-download, precies zoals de backoffice zijn export doet. */
+      async download(pad, body, bestandsnaam) {
+        var headers = { 'Content-Type': 'application/json' };
+        if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
+        var res = await fetch(prefix + pad, { method: 'POST', headers: headers, body: JSON.stringify(body || {}) });
+        if (!res.ok) throw Object.assign(new Error(foutTekst), { status: res.status });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(await res.blob());
+        a.download = bestandsnaam || 'download.csv';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
       }
     };
   }

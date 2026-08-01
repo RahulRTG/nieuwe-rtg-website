@@ -3146,7 +3146,7 @@
     }));
     // ritgeschiedenis: bladeren, zoeken en de volledige export van de server
     const ktCsv = el.querySelector('#ktCsv'); if (ktCsv) ktCsv.addEventListener('click', () => {
-      window.open('/api/supplier/rides.csv?token=' + encodeURIComponent(API.token), '_blank');
+      API.download('/supplier/rides.csv', {}, 'ritten-' + new Date().toISOString().slice(0, 10) + '.csv').catch(() => {});
     });
     el.querySelectorAll('[data-khist]').forEach(b => b.addEventListener('click', () => {
       histPage = Math.max(1, histPage + Number(b.dataset.khist));
@@ -6208,7 +6208,7 @@
       '<button class="bigbtn" id="zCsv" style="margin-top:0.5rem;">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
       '<div class="softline" style="margin-top:0.3rem;">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
     const k = el.querySelector('#zCsv');
-    if (k) k.addEventListener('click', () => { window.open('/api/supplier/dagrapport.csv?token='+encodeURIComponent(API.token)+'&datum='+r.datum, '_blank'); });
+    if (k) k.addEventListener('click', () => { API.download('/supplier/dagrapport.csv', { datum: r.datum }, 'dagrapport-' + r.datum + '.csv').catch(() => {}); });
   }
 
   // horeca: tik gerechten aan, bon loopt op, afrekenen met PIN of contant

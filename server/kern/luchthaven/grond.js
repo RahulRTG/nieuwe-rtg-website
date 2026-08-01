@@ -54,6 +54,14 @@ module.exports = (ctx) => {
     }
     if (k.status === 'vermist' && status === 'op-band') { k.status = 'op-band'; save(); return { ok: true, koffer: { tag: k.tag, status: k.status }, gevonden: true }; }
     if (!KOFFER_KETEN.includes(status)) return { status: 400, error: 'Onbekende kofferstatus.' };
+    /* 'vermist' staat bewust BUITEN de keten, dus indexOf geeft -1 en dan laten
+       allebei de grendels hieronder los: 'ingecheckt' (naar = 0) haalt zowel
+       `0 <= -1` als `0 > -1 + 1` niet. Een vermiste koffer sprong zo terug naar
+       het begin van de keten en verdween uit de vermisttelling -- het probleem
+       weg van het bord in plaats van van de band. De enige bedoelde terugweg
+       staat een regel hierboven: vermist -> op-band, met gevonden:true. */
+    if (!KOFFER_KETEN.includes(k.status))
+      return { status: 409, error: 'Deze koffer staat als ' + k.status + ' geregistreerd; die kan alleen terug via de band als hij gevonden is.' };
     const van = KOFFER_KETEN.indexOf(k.status), naar = KOFFER_KETEN.indexOf(status);
     if (naar <= van) return { status: 409, error: 'De bagageketen draait niet achteruit.' };
     if (naar > van + 1) return { status: 409, error: 'Stap voor stap: na ' + k.status + ' komt ' + KOFFER_KETEN[van + 1] + '.' };

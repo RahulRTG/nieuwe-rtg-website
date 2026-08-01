@@ -108,6 +108,16 @@ function betaalOrderVoor(session, body) {
   const o = orderMetRef(body.ref);
   if (!o || (o.customerKey || o.customerTier) !== session.key) return { status: 404, error: 'Bestelling niet gevonden.' };
   if (o.paid) return { status: 409, error: 'Al betaald.' };
+  /* Een terugbetaalde of geannuleerde bon mag NIET opnieuw betaald worden.
+     `o.paid` was de enige poort, en juist de annulering zet die weer op false
+     (ervaring/leden/annuleren.js: paid=false, refunded=true, status
+     'terugbetaald'). Daarmee viel de grendel weg en kon dezelfde retour-bon nog
+     een keer betalen: punten er nog eens bij, de ingredienten nog eens afgeboekt
+     en de zaak kreeg 'Nieuwe bestelling (betaald)' voor iets wat al retour was.
+     De verloopgrens hieronder ving dat niet, want die geldt alleen bij
+     'wacht-op-betaling'. */
+  if (o.refunded || ['terugbetaald', 'geweigerd', 'geannuleerd'].includes(o.status))
+    return { status: 409, error: 'Deze bestelling is geannuleerd (' + o.status + ') en kan niet opnieuw betaald worden.' };
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
   if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return { status: 410, error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' };
   // fooi (gaat naar het team), punten-tegoed (RTG legt bij) en spaarpunten

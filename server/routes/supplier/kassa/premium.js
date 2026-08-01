@@ -17,6 +17,12 @@ module.exports = (kern) => {
     .map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
     .filter(i => i.name);
 
+  /* De retourgrens komt uit ./modus.js (daar staat ook de instelling waarmee de
+     manager hem zet). Die module wordt eerder gemount dan deze; ontbreekt hij
+     toch, dan gaat de deur dicht in plaats van open -- een grens die stil
+     wegvalt is geen grens. */
+  const retourGrens = (s) => (kern.kassaRetourGrens ? kern.kassaRetourGrens(s) : 0);
+
   /* Derving: wat weg is zonder verkoop, met een reden en op naam. De
      keukenvoorraad wordt afgeboekt, want die croissant is echt weg. */
   app.post('/api/supplier/kassa/derving', supplierAuth, (req, res) => {
@@ -39,12 +45,31 @@ module.exports = (kern) => {
   });
 
   /* Retour: de teruggave als minbon in dezelfde kassastroom, zodat het
-     dagoverzicht en de kasopmaak vanzelf kloppen. */
+     dagoverzicht en de kasopmaak vanzelf kloppen.
+
+     EEN RETOUR IS GELD UIT DE LADE, EN HIJ WAS ONBEGRENSD.
+
+     De bon wordt vrij samengesteld -- naam, aantal en prijs komen alle drie uit
+     het verzoek -- en er hoeft geen oorspronkelijke verkoop tegenover te staan.
+     Elke medewerker met een pincode kon dus een retour van een willekeurig
+     bedrag boeken en dat contant uit de kassa nemen; de kasopmaak klopte
+     daarna keurig, want de minbon stond er netjes bij. Dit is de klassieke
+     kassafraude, en elk kassasysteem lost hem hetzelfde op: onder een grens
+     doet de medewerker het zelf, daarboven komt de manager erbij.
+
+     RETOUR_ZELF is de standaard; de zaak kan hem verlagen of verhogen met
+     kassa.retourGrens (manager-instelling, zie ./modus.js). Nul betekent:
+     altijd de manager. De manager zelf heeft geen grens -- die IS de grens. */
   app.post('/api/supplier/kassa/retour', supplierAuth, (req, res) => {
     const items = leesItems(req.body);
     if (!items.length) return res.status(400).json({ error: 'Zet eerst op de bon wat er terugkomt.' });
     const bedrag = Math.round(items.reduce((s, i) => s + i.price * i.qty, 0) * 100) / 100;
     if (!(bedrag > 0)) return res.status(400).json({ error: 'Een retour heeft een bedrag nodig.' });
+    const grens = retourGrens(req.supplier);
+    if (!req.actor.manager && bedrag > grens) {
+      return res.status(403).json({ error: 'Een retour boven € ' + grens.toFixed(2).replace('.', ',')
+        + ' boekt een manager. Vraag of iemand met managerrechten even meekijkt.', managerNodig: true, grens });
+    }
     const sale = { id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
       kassa: req.body.kassa ? String(req.body.kassa).slice(0, 40) : null,
       desc: 'Retour' + (req.body.reden ? ': ' + schoon(req.body.reden, 120) : ''),

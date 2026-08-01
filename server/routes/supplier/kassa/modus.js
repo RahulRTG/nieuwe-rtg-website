@@ -28,6 +28,18 @@ module.exports = (kern) => {
     return s.kassa;
   };
 
+  /* Tot dit bedrag boekt een medewerker zelf een retour; daarboven komt de
+     manager erbij (./premium.js doet de controle, hier staat de instelling).
+     Een gewone teruggave aan de kassa valt er ruim onder, een lade leegtrekken
+     niet. EEN plek voor de standaard: twee bestanden met allebei hun eigen 50
+     lopen ooit uiteen, en dan klopt wat de kassa toont niet met wat hij doet. */
+  const RETOUR_ZELF = 50;
+  const retourGrens = (s) => {
+    const g = s.kassa && s.kassa.retourGrens;
+    return (typeof g === 'number' && Number.isFinite(g) && g >= 0) ? g : RETOUR_ZELF;
+  };
+  kern.kassaRetourGrens = retourGrens;
+
   /* Alles wat De Kassa nodig heeft in een antwoord: de modus, de modi-lijst,
      het eigen assortiment plus de menukaart en het bezorg-assortiment als
      sneltoetsen, en de tafels voor de restaurantmodus. Gebruikt de zaak
@@ -47,6 +59,19 @@ module.exports = (kern) => {
       logActivity(s.code, req.actor, 'zette ' + (scherm ? 'kassa "' + scherm.naam + '"' : 'De Kassa') + ' in de modus "' + req.body.modus + '"');
       sseToSupplier(s.code, 'sync', { scope: 'pos' });
     }
+    /* Tot welk bedrag mag een medewerker zelf een retour boeken? Daarboven komt
+       de manager erbij (zie ./premium.js). Nul betekent: altijd de manager.
+       Dit is bewust een manager-instelling: wie hem zelf mocht zetten, zette
+       hem op oneindig en dan is de grens er niet. */
+    if (req.body.retourGrens !== undefined) {
+      if (!managerOnly(req, res)) return;
+      const g = Number(req.body.retourGrens);
+      if (!Number.isFinite(g) || g < 0 || g > 100000) return res.status(400).json({ error: 'Kies een bedrag tussen 0 en 100.000.' });
+      k.retourGrens = Math.round(g * 100) / 100;
+      save();
+      logActivity(s.code, req.actor, 'zette de retourgrens op € ' + k.retourGrens.toFixed(2));
+      sseToSupplier(s.code, 'sync', { scope: 'pos' });
+    }
     const snel = [];
     for (const m of (s.menu || []).slice(0, 80)) snel.push({ id: 'menu:' + m.id, naam: m.name, prijs: m.price, bron: 'menukaart', station: m.station || null });
     for (const p of ((s.bezorg && s.bezorg.producten) || []).slice(0, 60)) snel.push({ id: 'bezorg:' + p.id, naam: p.name, prijs: p.price, bron: 'bezorg' });
@@ -56,6 +81,9 @@ module.exports = (kern) => {
       schermen: k.schermen,
       artikelen: k.artikelen, sneltoetsen: snel,
       tafels: (s.tables || []).map(t => t.name),
+      // de kassa toont de grens bij de retourknop, zodat niemand er tegenaan loopt
+      retourGrens: retourGrens(s),
+      manager: !!req.actor.manager,
       naam: s.name, type: s.type
     });
   });

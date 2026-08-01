@@ -92,3 +92,48 @@ test('de kasopmaak: geteld tegen het verwachte contant van vandaag', async () =>
   assert.equal(r.opmaak.verschil, -0.5);
   assert.equal((await api('/api/supplier/kassa/kasopmaak', { geteld: -1 }, stafToken)).status, 400);
 });
+
+/* EEN RETOUR IS GELD UIT DE LADE, EN HIJ WAS ONBEGRENSD.
+
+   De bon wordt vrij samengesteld -- naam, aantal en prijs komen alle drie uit
+   het verzoek -- en er hoeft geen oorspronkelijke verkoop tegenover te staan.
+   Elke medewerker met een pincode kon dus een retour van een willekeurig
+   bedrag boeken en dat contant uit de kassa nemen; de kasopmaak klopte daarna
+   keurig, want de minbon stond er netjes bij. Dit is de klassieke
+   kassafraude. Onder de grens doet de medewerker het zelf, daarboven komt de
+   manager erbij -- en de grens zelf is een managerinstelling, want wie hem
+   zelf mocht zetten zette hem op oneindig. */
+test('de retourgrens: onder de grens boekt de medewerker zelf, daarboven de manager', async () => {
+  const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));
+  const mgr = roster.staff.find(x => x.role === 'manager');
+  const mgrToken = (await json(await api('/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' }))).token;
+  assert.ok(mgrToken, 'de manager is ingelogd');
+
+  const groot = [{ name: 'Menu compleet', qty: 10, price: 95 }]; // EUR 950
+  const geweigerd = await api('/api/supplier/kassa/retour', { items: groot, reden: 'zogenaamd geannuleerd' }, stafToken);
+  assert.equal(geweigerd.status, 403, 'een medewerker boekt geen retour van EUR 950');
+  const uitleg = await json(geweigerd);
+  assert.equal(uitleg.managerNodig, true, 'en de kassa weet WAAROM, zodat hij het kan zeggen');
+  assert.equal(uitleg.grens, 50, 'de standaardgrens');
+
+  // de manager kan het wel
+  const mgrRetour = await json(await api('/api/supplier/kassa/retour', { items: groot, reden: 'echt geannuleerd' }, mgrToken));
+  assert.equal(mgrRetour.sale.total, -950, 'de manager heeft geen grens -- die IS de grens');
+
+  // en de zaak mag de grens zelf zetten; alleen de manager
+  assert.equal((await api('/api/supplier/kassa/instel', { retourGrens: 1000 }, stafToken)).status, 403,
+    'de grens verzetten is niet iets wat je onder je eigen grens uit doet');
+  const gezet = await json(await api('/api/supplier/kassa/instel', { retourGrens: 1000 }, mgrToken));
+  assert.equal(gezet.retourGrens, 1000, 'de manager zet hem op EUR 1.000');
+  const nu = await json(await api('/api/supplier/kassa/retour', { items: groot, reden: 'binnen de nieuwe grens' }, stafToken));
+  assert.equal(nu.sale.total, -950, 'en dan mag de medewerker het wel');
+
+  // nul betekent: altijd de manager
+  await api('/api/supplier/kassa/instel', { retourGrens: 0 }, mgrToken);
+  const klein = [{ name: 'Koffie', qty: 1, price: 3 }];
+  assert.equal((await api('/api/supplier/kassa/retour', { items: klein, reden: 'koud' }, stafToken)).status, 403,
+    'op nul komt de manager er bij elk bedrag bij');
+  assert.equal((await json(await api('/api/supplier/kassa/retour', { items: klein, reden: 'koud' }, mgrToken))).sale.total, -3);
+  // en netjes terug, zodat een volgende test niet op deze stand landt
+  await api('/api/supplier/kassa/instel', { retourGrens: 50 }, mgrToken);
+});

@@ -284,6 +284,14 @@ $('#pWacht').addEventListener('click', async () => {
 });
 $('#pRetour').addEventListener('click', async () => {
   if (!BON.length) { $('#uitkomst').textContent = 'Zet eerst op de bon wat er terugkomt.'; return; }
+  /* Boven de retourgrens komt de manager erbij (de server weigert het ook, dit
+     is alleen zodat je dat ziet vóórdat je de klant iets belooft). */
+  const grens = INSTEL && typeof INSTEL.retourGrens === 'number' ? INSTEL.retourGrens : null;
+  const totaal = subtotaal(); // zelfde afronding als de server, anders wijkt de grens een cent af
+  if (grens !== null && !(INSTEL && INSTEL.manager) && totaal > grens) {
+    $('#uitkomst').textContent = 'Retour van ' + eur(totaal) + ': boven ' + eur(grens) + ' boekt een manager dit. Vraag of iemand met managerrechten meekijkt.';
+    return;
+  }
   const reden = await vraag('Retour', 'Waarom komt dit terug? (bv. verkeerd gerecht, klacht)', '');
   if (reden === null) return;
   try {

@@ -4,7 +4,7 @@
    client stuurt bij elke knop een idem-sleutel mee, dubbeltikken kan nooit
    dubbel boeken. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, liveCodename, pay, onboarding, sseToOffice } = kern;
+  const { app, auth, supplierAuth, managerOnly, liveCodename, pay, onboarding, sseToOffice } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Pay is voor leden.' }); return true; }
@@ -88,7 +88,20 @@ module.exports = (kern) => {
   app.post('/api/supplier/pay/overzicht', supplierAuth, (req, res) => {
     res.json(pay.partnerOverzicht(req.supplier.code));
   });
+  /* UITBETALEN IS GEEN WERKHANDELING MAAR EEN GELDHANDELING.
+
+     Deze route stuurt het hele RTG Pay-saldo van de zaak naar de bank en roept
+     daarvoor de echte betaaldienst aan. Hij stond op supplierAuth, en dat is
+     ELKE ingelogde medewerker: de afwasser met een pincode kon het saldo van de
+     zaak leegtrekken. Dat het geld naar de rekening van de zaak zelf gaat maakt
+     het niet ongevaarlijk -- het is onomkeerbaar, het haalt geld uit de kas op
+     een moment dat de eigenaar niet koos, en het is een prima manier om een
+     zaak op een druk moment plat te leggen.
+
+     Innen (pay/in) en het saldo bekijken (pay/overzicht) blijven voor iedereen:
+     dat is het werk. Weghalen is van de manager. */
   app.post('/api/supplier/pay/uitbetaal', supplierAuth, async (req, res) => {
+    if (!managerOnly(req, res)) return;
     stuur(res, await pay.partnerUitbetaal({ supplierCode: req.supplier.code, idem: req.body.idem }));
   });
 

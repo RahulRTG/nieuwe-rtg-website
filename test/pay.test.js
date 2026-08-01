@@ -203,3 +203,33 @@ test('dezelfde idem-sleutel met een ander verzoek geeft een conflict, geen valse
   // en het grootboek sluit nog steeds
   assert.equal((await (await fetch(base + '/api/pay/gezond')).json()).klopt, true, 'grootboek sluit');
 });
+
+/* UITBETALEN IS EEN GELDHANDELING, GEEN WERKHANDELING.
+
+   /api/supplier/pay/uitbetaal stuurt het hele RTG Pay-saldo van de zaak naar
+   de bank en roept daarvoor de echte betaaldienst aan. Hij stond op
+   supplierAuth, en dat is ELKE ingelogde medewerker: de afwasser met een
+   pincode kon de kas van de zaak leegtrekken. Innen en het saldo bekijken
+   blijven van iedereen -- dat is het werk. */
+test('het saldo van de zaak uitbetalen is van de manager, innen en kijken van iedereen', async () => {
+  const roster = await (await fetch(base + '/api/supplier/roster', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: supCode })
+  })).json();
+  const staf = (roster.staff || []).find(x => x.role !== 'manager');
+  assert.ok(staf, 'de zaak heeft personeel zonder managerrechten');
+  const inlog = await (await fetch(base + '/api/supplier/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: supCode, staffId: staf.id, pin: '5678' })
+  })).json();
+  assert.ok(inlog.token, 'het personeelslid is ingelogd');
+
+  // kijken mag: het saldo zien hoort bij het werk aan de kassa
+  assert.equal((await api('supplier/pay/overzicht', {}, inlog.token)).status, 200, 'het saldo bekijken blijft van iedereen');
+  // innen mag: dat IS het werk
+  assert.equal((await api('supplier/pay/in', { code: 'BESTAATNIET', centen: 100 }, inlog.token)).status, 404,
+    'innen komt gewoon door de deur (en struikelt pas op de onbekende code)');
+  // weghalen niet
+  const uit = await api('supplier/pay/uitbetaal', { idem: 'staf-probeert-1' }, inlog.token);
+  assert.equal(uit.status, 403, 'een medewerker zonder managerrechten betaalt niets uit');
+  assert.match(uit.body.error, /manager/i);
+});

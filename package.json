@@ -17,6 +17,7 @@
     "rand": "node scripts/rand.js",
     "beproeving": "node --experimental-sqlite scripts/beproeving.js",
     "tandeloos": "node scripts/tandeloos.js",
+    "ladder": "node scripts/ladder.js",
     "verhalen": "node scripts/verhalen.js",
     "papierwerk": "node scripts/papierwerk.js",
     "beproeving:streng": "STRENG=1 node --experimental-sqlite scripts/beproeving.js",

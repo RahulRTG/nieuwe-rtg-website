@@ -158,6 +158,12 @@ async function vensterTopUp(log) {
 }
 
 module.exports = {
+  /* Welke collecties een rij-voor-rij grootboek achter zich hebben. Dit is de
+     ENIGE plek waar dat staat; de opslaglaag leidt er zijn afsluit-volgorde uit
+     af (server/pg/sync.js). Zou die er een eigen lijstje van maken, dan lopen
+     de twee vroeg of laat uit elkaar -- en dat is precies hoe de uitstelregel
+     ooit collecties is gaan dekken die er nooit in stonden. */
+  TX_SOORT,
   wire, actief: txLedgerActief, zet: txLedgerZet,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, txVeegNu,
   initLedger, initLedgerSqlite, afrondLedger, vensterTopUp

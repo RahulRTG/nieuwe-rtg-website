@@ -30,6 +30,20 @@ const KANAAL = 'rtg_kv';
 const VOORRANG = new Set(['payIdem', 'payIdemAfdruk', 'bankIdem', 'bankIdemAfdruk',
   'paySaldi', 'betaalIdem', 'muntIdem']);
 
+/* Is deze collectie bij een herstart opnieuw op te bouwen? Alleen wat een
+   rij-voor-rij grootboek achter zich heeft (vensterTopUp vult die bij). De
+   lijst komt uit het grootboek zelf, zodat er maar een waarheid is. Lukt de
+   require niet, dan noemen we niets herstelbaar -- dan schrijft de afsluiting
+   alles in de oude volgorde weg, wat hooguit trager is en nooit onveiliger. */
+let GEDEKT = null;
+function herstelbaar(k) {
+  if (GEDEKT === null) {
+    try { GEDEKT = new Set(Object.keys(require('../db/tx/ledger').TX_SOORT || {})); }
+    catch (e) { GEDEKT = new Set(); }
+  }
+  return GEDEKT.has(k);
+}
+
 module.exports = (ctx) => {
   const { pool, merge3, uitStore, naarStore, vlag,
     toegepast, laatsteJson, laatsteGrootte, laatsteLengte, laatsteCheck } = ctx;
@@ -48,14 +62,23 @@ module.exports = (ctx) => {
   // opgepikt; een wijziging-op-zijn-plaats (statuswissel) wordt bij de volgende
   // volledige check binnen GROOT_MS alsnog weggeschreven. In-memory blijft de
   // waarheid (write-behind), dus die kleine persist-vertraging is acceptabel.
-  // Grote collecties bovendien hooguit eens per GROOT_FLUSH_MS wegschrijven: de
-  // stringify van een venster van tienduizenden orders (~10 MB) bij elke
-  // flush-cyclus van 150 ms blokkeert de event-loop structureel. De kv-blob is
-  // voor die collecties enkel een grof snapshot -- elk nieuw item staat al
-  // DIRECT als eigen rij in het transactie-grootboek (tx_ledger), dus dit
-  // uitstel kost geen duurzaamheid. Wat uitgesteld is, meldt heeftUitgesteld()
-  // zodat de schrijver vuil blijft en het na de pauze alsnog weggaat; de
-  // afsluit-flush forceert alles.
+  /* Grote collecties bovendien hooguit eens per GROOT_FLUSH_MS wegschrijven: de
+     stringify van een venster van tienduizenden orders (~10 MB) bij elke
+     flush-cyclus van 150 ms blokkeert de event-loop structureel.
+
+     HIER STOND EEN VERANTWOORDING DIE TE RUIM WAS. Er stond dat uitstel geen
+     duurzaamheid kost, "want elk nieuw item staat al DIRECT als eigen rij in
+     het transactie-grootboek". Dat geldt voor ORDERS en BOEKINGEN -- de enige
+     twee die het grootboek kent (db/tx/ledger.js, TX_SOORT). Onder dezelfde
+     regel vielen ook directBetalingen (25 MB), betaalVerzoeken (13 MB),
+     notifications en reviews: samen 55 MB zonder enig grootboek erachter,
+     waarvan 38 MB betalingen.
+
+     Uitstel kost daar dus WEL duurzaamheid. Zolang de server doorloopt is dat
+     onzichtbaar (in-memory is de waarheid); het venster gaat pas open bij een
+     herstart. Daarom sorteert de afsluit-flush hieronder op herstelbaarheid en
+     niet op grootte. Wat uitgesteld is, meldt heeftUitgesteld() zodat de
+     schrijver vuil blijft en het na de pauze alsnog weggaat. */
   const GROOT_BYTES = 512 * 1024, GROOT_MS = 2000;
   const GROOT_FLUSH_MS = Number(process.env.PG_GROOT_FLUSH_MS || 5000);
   const laatsteSchrijf = new Map(); // collectie -> tijdstip van de laatste echte schrijf
@@ -76,13 +99,31 @@ module.exports = (ctx) => {
       laatsteCheck.set(k, nu); laatsteGrootte.set(k, j.length); laatsteLengte.set(k, lengteVan(dataNu[k]));
       if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
     }
-    // Klein-eerst: de kleine, gezaghebbende collecties (paySaldi, saldi -- geld!)
-    // wegschrijven vóór de grote venster-blobs (orders/boekingen, tientallen MB).
-    // Zo landt geld altijd binnen de eerste milliseconden van een flush, ook als
-    // een afsluit-flush op mega-schaal door een korte grace-window wordt afgekapt.
-    // De grote blobs zijn slechts een cache: bij een herstart vult vensterTopUp ze
-    // opnieuw uit het tx_ledger-grootboek, dus daar verliezen we niets duurzaams.
-    gewijzigd.sort((a, b) => a[1].length - b[1].length);
+    /* DE VOLGORDE. Normaal klein-eerst: de kleine, gezaghebbende collecties
+       landen dan binnen de eerste milliseconden.
+
+       BIJ HET AFSLUITEN (force) telt iets anders zwaarder dan grootte:
+       HERSTELBAARHEID. Een afsluit-flush van tientallen megabytes haalt het
+       grace-venster niet -- De Beproeving kapt na acht seconden af, en een
+       deploy wacht ook niet. Wat er dan nog in de rij staat, is weg.
+
+       Dus gaat eerst wat NIET terug te halen is, en pas daarna wat wel uit het
+       transactie-grootboek wordt bijgevuld (vensterTopUp). Op klein-eerst
+       gesorteerd stond directBetalingen met zijn 25 MB juist achteraan -- de
+       plek die als eerste sneuvelt. Achtendertig megabyte aan betalingen en
+       betaalverzoeken had geen enkel grootboek achter zich en stond op de
+       slechtste plaats in de rij.
+
+       De dekkingslijst komt uit db/tx/ledger.js zelf. Hem hier overschrijven
+       zou een tweede waarheid maken, en dat is precies hoe de uitstelregel ooit
+       collecties is gaan verantwoorden die er nooit in stonden. */
+    gewijzigd.sort((a, b) => {
+      if (force) {
+        const ha = herstelbaar(a[0]) ? 1 : 0, hb = herstelbaar(b[0]) ? 1 : 0;
+        if (ha !== hb) return ha - hb;
+      }
+      return a[1].length - b[1].length;
+    });
     for (const [k, jOns] of gewijzigd) {
       const client = await pool.connect();
       try {

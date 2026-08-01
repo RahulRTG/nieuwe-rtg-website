@@ -93,6 +93,11 @@ function werkbank(vraag, rollen, kiezer) {
     paden: rollen.paden,
     raak: (wat, hoe) => meldingen.push({ soort: 'raak', wat, hoe }),
     afgeslagen: () => meldingen.push({ soort: 'af' }),
+    /* De begane grond kent een vierde stand. De aanval-treden melden
+       "afgeslagen" als de deur dichtbleef; de gewone gast meldt "gelukt" als
+       een normale handeling gewoon werkte. Twee kanten van dezelfde deur: een
+       muur die alles weigert haalt elke aanval-trede, en is toch kapot. */
+    gelukt: () => meldingen.push({ soort: 'gelukt' }),
     nietGeprobeerd: (waarom) => meldingen.push({ soort: 'niet', waarom }),
     _meldingen: meldingen
   };
@@ -173,7 +178,7 @@ async function main() {
   const treden = TREDEN.filter(t => !ALLEEN.length || ALLEEN.includes(t.id));
   const rapport = [];
   for (const trede of treden) {
-    const telt = { raak: [], af: 0, niet: [] };
+    const telt = { raak: [], af: 0, gelukt: 0, niet: [] };
     for (let ronde = 0; ronde < RONDES; ronde++) {
       const w = werkbank(vraag, rollen, maakKiezer(SEED + ronde * 101));
       try { await trede.doe(w); }
@@ -181,12 +186,20 @@ async function main() {
       for (const m of w._meldingen) {
         if (m.soort === 'raak') telt.raak.push(m);
         else if (m.soort === 'af') telt.af++;
+        else if (m.soort === 'gelukt') telt.gelukt++;
         else telt.niet.push(m.waarom);
       }
     }
-    const merk = telt.raak.length ? K.rood + 'RAAK     ' : (telt.af ? K.groen + 'STANDVAST' : K.geel + 'LEEG     ');
+    // WERKT voor de begane grond (normale dingen lukten), STANDVAST voor de
+    // aanval-treden (chaos werd afgeslagen), LEEG als er niets gebeurde.
+    const merk = telt.raak.length ? K.rood + 'RAAK     '
+      : (telt.gelukt ? K.groen + 'WERKT    ' : (telt.af ? K.groen + 'STANDVAST' : K.geel + 'LEEG     '));
     console.log('  ' + merk + K.reset + '  ' + K.vet + trede.naam + K.reset + K.grijs + ' -- ' + trede.wie + K.reset);
-    console.log('      ' + K.grijs + telt.af + ' afgeslagen, ' + telt.raak.length + ' raak, ' + telt.niet.length + ' niet geprobeerd' + K.reset);
+    const stukjes = [];
+    if (telt.gelukt) stukjes.push(telt.gelukt + ' gelukt');
+    if (telt.af) stukjes.push(telt.af + ' afgeslagen');
+    stukjes.push(telt.raak.length + ' raak'); stukjes.push(telt.niet.length + ' niet geprobeerd');
+    console.log('      ' + K.grijs + stukjes.join(', ') + K.reset);
     for (const r of telt.raak) console.log('      ' + K.rood + '! ' + r.wat + (r.hoe ? ' -- ' + r.hoe : '') + K.reset);
     for (const n of [...new Set(telt.niet)]) console.log('      ' + K.grijs + '~ niet geprobeerd: ' + n + K.reset);
     rapport.push({ trede: trede.id, naam: trede.naam, ...telt });
@@ -194,10 +207,12 @@ async function main() {
 
   const raak = rapport.reduce((n, r) => n + r.raak.length, 0);
   const af = rapport.reduce((n, r) => n + r.af, 0);
+  const gelukt = rapport.reduce((n, r) => n + r.gelukt, 0);
   const niet = rapport.reduce((n, r) => n + r.niet.length, 0);
-  const leeg = rapport.filter(r => !r.af && !r.raak.length);
+  const leeg = rapport.filter(r => !r.af && !r.gelukt && !r.raak.length);
   console.log('\n' + K.vet + 'DE UITKOMST' + K.reset);
-  console.log('  ' + af + ' afgeslagen, ' + (raak ? K.rood + raak + ' RAAK' + K.reset : '0 raak') + ', ' + niet + ' niet geprobeerd, over ' + treden.length + ' treden');
+  console.log('  ' + gelukt + ' normale dingen gelukt, ' + af + ' aanvallen afgeslagen, '
+    + (raak ? K.rood + raak + ' RAAK' + K.reset : '0 raak') + ', ' + niet + ' niet geprobeerd, over ' + treden.length + ' treden');
   if (leeg.length) console.log('  ' + K.geel + leeg.length + ' trede(n) probeerden NIETS' + K.reset + K.grijs + ' -- ' + leeg.map(r => r.naam).join(', ') + ' (voorwaarde kwam niet rond)' + K.reset);
   console.log('  ' + K.grijs + 'Een schone uitkomst betekent: niets van wat WIJ konden bedenken kwam erdoor. Niet: veilig.' + K.reset + '\n');
 

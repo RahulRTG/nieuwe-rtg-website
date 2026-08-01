@@ -84,6 +84,19 @@ module.exports = (ctx) => {
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Bedrag te laag.' };
+    /* DEZELFDE BOVENGRENS ALS betaalDirect, en die stond hier niet.
+
+       betaalDirect weigert boven MAX_CENTEN; deze tweeling controleerde alleen de
+       ondergrens. Het bedrag komt hier uit de munt-webhook, dus de aanbieder --
+       of wie zijn bericht kan zetten -- bepaalde zelf hoeveel er bij de
+       ontvangstenteller van de leverancier bij kwam. De doorlichting zag
+       EUR 10.000.000 bijgeschreven op een verzoek van EUR 0,50.
+
+       Pijnlijk detail: deze functie is vanmiddag door mij uit index.js gehaald.
+       De asymmetrie is meeverhuisd zonder dat ik hem zag -- twee functies naast
+       elkaar met verschillende grenzen leest als opzet zolang niemand ze naast
+       elkaar legt. */
+    if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog voor een directe betaling.' };
     const b = {
       ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
       bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling (munten)',

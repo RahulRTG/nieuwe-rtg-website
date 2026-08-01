@@ -70,6 +70,17 @@ function maakMunten(state) {
     if (entry.status === 'ontvangen') return Object.assign({}, entry, { herhaald: true });
     entry.status = 'ontvangen';
     entry.settledEuroCenten = Number.isFinite(euroCenten) && euroCenten > 0 ? Math.round(euroCenten) : entry.euroCenten;
+    /* HOEVEEL ER GEVRAAGD WAS TEGENOVER HOEVEEL ER KWAM.
+
+       `euroCenten` komt uit het webhook-bericht van de aanbieder; `entry.euroCenten`
+       is wat er bij het aanmaken van de ontvangst is vastgelegd. Die twee werden
+       nergens vergeleken, en de settlement erachter zette de factuur onvoorwaardelijk
+       op 'paid'. Eén cent sloot dus een factuur van EUR 78,65.
+
+       De vergelijking hoort HIER, bij de bron, en niet pas bij de aanroeper: dan
+       staat er maar een waarheid over "is dit volledig", en elke settlement (factuur,
+       rechtstreekse betaling, wat er later bijkomt) leest dezelfde vlag. */
+    entry.volledig = entry.settledEuroCenten >= (entry.euroCenten || 0);
     entry.ontvangenAt = new Date().toISOString();
     save();
     return entry;

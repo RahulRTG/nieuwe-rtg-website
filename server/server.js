@@ -1825,6 +1825,26 @@ async function settleMuntFactuur(entry) {
   if (!md) return;
   const inv = (md.invoices || []).find(i => i.id === ctx.invoiceId);
   if (!inv || inv.status === 'paid') return;
+  /* BETAALD MAG ALLEEN BETAALD HETEN ALS HET HELE BEDRAG ER IS.
+
+     Hier stond `inv.status = 'paid'` onvoorwaardelijk, met alleen de vraag OF er
+     een bevestiging was -- niet voor hoeveel. Het bedrag komt uit het bericht van
+     de aanbieder (kern/munten.js bevestig), dus een bevestiging van een cent
+     sloot een factuur van EUR 78,65. De handtekening beschermt tegen een vreemde
+     afzender; tegen een te laag bedrag beschermde niets.
+
+     Wat er te weinig binnenkomt gooien we NIET weg -- het is echt geld van een
+     lid. Het wordt geboekt als deelbetaling, de factuur blijft open, en zodra de
+     som het gevraagde dekt gaat hij alsnog dicht. */
+  const gevraagd = Math.round((inv.bijdrage || 0) * 100);
+  const binnen = Math.round(entry.settledEuroCenten || entry.euroCenten || 0);
+  inv.deelbetaald = Math.round((inv.deelbetaald || 0) + binnen);
+  if (gevraagd > 0 && inv.deelbetaald < gevraagd) {
+    log.warn('munt-settlement: te weinig ontvangen, factuur blijft open',
+      { factuur: inv.id, gevraagd, binnen, totaal: inv.deelbetaald, betaalId: entry.id });
+    if (ctx.own) accounts.saveMemberState(ctx.accountId, md); else save();
+    return;
+  }
   inv.status = 'paid';
   inv.date = 'Betaald met ' + String(entry.munt || '').toUpperCase();
   inv.betaalId = entry.id;

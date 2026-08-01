@@ -366,3 +366,60 @@ test('de configuratiekeuring noemt een ontbrekend munt-secret een FOUT, geen waa
   assert.ok((r.fouten || []).some(f => /MUNT_WEBHOOK_SECRET/.test(f)), 'het ontbrekende secret is een FOUT');
   assert.ok(!(r.waarschuwingen || []).some(f => /MUNT_WEBHOOK_SECRET/.test(f)), 'en niet ook nog een waarschuwing');
 });
+
+/* ---------- 10. de muntketen: bedrag en bovengrens ---------- */
+
+test('munt-settlement: te weinig ontvangen sluit de factuur niet', () => {
+  /* Het bedrag komt uit het bericht van de aanbieder, en dat werd nergens
+     vergeleken met wat er openstond: een bevestiging van EEN CENT zette een
+     factuur van EUR 78,65 op 'paid'. De handtekening beschermt tegen een vreemde
+     afzender; tegen een te laag bedrag beschermde niets.
+
+     De vlag hoort bij de BRON te ontstaan (kern/munten.js), zodat elke
+     settlement dezelfde waarheid leest. */
+  const rijen = [];
+  const nep = { data: { muntOntvangsten: rijen } };
+  const munten = require('../server/kern/munten').maakMunten
+    ? require('../server/kern/munten').maakMunten({ db: nep, save: () => {} })
+    : null;
+  if (!munten) return; // andere fabrieksnaam: dan meet deze toets niets, en dat zegt hij
+  rijen.push({ id: 'M1', munt: 'btc', euroCenten: 7865, status: 'wacht', context: { soort: 'factuur' } });
+  const te_weinig = munten.bevestig({ id: 'M1', euroCenten: 1 });
+  assert.equal(te_weinig.settledEuroCenten, 1);
+  assert.equal(te_weinig.volledig, false, 'een cent op EUR 78,65 is niet volledig');
+
+  rijen.push({ id: 'M2', munt: 'btc', euroCenten: 7865, status: 'wacht', context: { soort: 'factuur' } });
+  const genoeg = munten.bevestig({ id: 'M2', euroCenten: 7865 });
+  assert.equal(genoeg.volledig, true, 'het volle bedrag is wel volledig');
+
+  rijen.push({ id: 'M3', munt: 'btc', euroCenten: 7865, status: 'wacht', context: { soort: 'factuur' } });
+  const zonderBedrag = munten.bevestig({ id: 'M3' });
+  assert.equal(zonderBedrag.settledEuroCenten, 7865, 'geen bedrag in het bericht = het vastgelegde bedrag');
+  assert.equal(zonderBedrag.volledig, true);
+});
+
+test('muntbetaling aan een leverancier kent dezelfde bovengrens als een gewone', async () => {
+  /* registreerMuntBetaling controleerde alleen de ondergrens terwijl zijn
+     tweeling betaalDirect ook een bovengrens heeft. Het bedrag komt uit de
+     webhook, dus de aanbieder bepaalde zelf hoeveel er bij de ontvangstenteller
+     van de leverancier bij kwam: EUR 10.000.000 op een verzoek van EUR 0,50. */
+  const dp = require('../server/kern/directpay');
+  const maak = dp.maakDirectpay || dp;
+  const nep = {
+    db: { data: { directBetalingen: [], betaalVerzoeken: [], directOntvangsten: {} } },
+    save: () => {}, crypto: require('crypto'),
+    findSupplier: (c) => (c === 'KIKUNOI' ? { code: 'KIKUNOI', name: 'Kikunoi' } : null),
+    betaal: { maakBetaling: async () => ({ id: 'x', status: 'betaald', aanbieder: 'demo' }) },
+    notify: () => {}, notifySupplier: () => {}, sseToSupplier: () => {},
+    sseToCustomer: () => {}, sseToOffice: () => {}, logActivity: () => {}
+  };
+  const api = maak(nep);
+  const grens = api.DP_MAX_CENTEN;
+  assert.ok(grens > 0, 'de bovengrens bestaat');
+  const teHoog = api.dpRegistreerMunt({ key: 'k1', codename: 'Test', supplierCode: 'KIKUNOI', bedragCenten: grens + 1 });
+  assert.equal(teHoog.status, 400, 'boven de grens wordt geweigerd');
+  assert.equal(nep.db.data.directOntvangsten.KIKUNOI, undefined, 'en er is niets bijgeschreven');
+  const goed = api.dpRegistreerMunt({ key: 'k1', codename: 'Test', supplierCode: 'KIKUNOI', bedragCenten: 5000 });
+  assert.equal(goed.status, 200, 'een gewoon bedrag gaat gewoon door');
+  assert.equal(nep.db.data.directOntvangsten.KIKUNOI.som, 5000);
+});

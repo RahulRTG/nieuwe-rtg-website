@@ -14,6 +14,8 @@ process.env.PG_URL = '';
 process.env.RTG_ENC_KEY = 'toets-sleutel-voor-de-grootboek-rit';
 process.env.TX_RAM_ORDERS = '10';
 process.env.TX_RAM_BOEKINGEN = '8';
+process.env.TX_RAM_DIRECTBETALINGEN = '5';
+process.env.TX_RAM_BETAALVERZOEKEN = '4';
 process.env.TX_KOP = '3';
 process.env.TX_KAP = '1000';
 
@@ -25,18 +27,30 @@ const walTekst = p => fs.existsSync(p + '-wal') ? fs.readFileSync(p + '-wal', 'l
 (async () => {
   const dbmod = require('../server/db');
   const { db, load, save, startSqliteSync, ordersVoegToe, orderMetRef, boekingenVoegToe,
+    directBetalingenVoegToe, betaalVerzoekenVoegToe,
     txLedgerTel, txLedgerVanKlant, txLedgerVanZaak, txVeegNu, txLedgerActief } = dbmod;
   load();
   startSqliteSync();          // zet de kruisproces-sync EN het grootboek aan
   for (let i = 0; i < 40 && !txLedgerActief() && process.env.TX_LEDGER_SQLITE !== '0'; i++) await slaap(25);
 
   db.data.orders = []; db.data.boekingen = [];
+  db.data.directBetalingen = []; db.data.betaalVerzoeken = [];
   const BASIS = Date.parse('2026-01-01T00:00:00Z');
   const maakOrder = i => ({ ref: 'RTG-O-SQ' + i, supplierCode: 'KIKUNOI', customerKey: 'user-1', customerTier: 'rtg',
     total: 10 + i, paid: true, status: 'geserveerd', at: new Date(BASIS + i * 1000).toISOString() });
   for (let i = 0; i < 30; i++) ordersVoegToe(maakOrder(i));
   for (let i = 0; i < 15; i++) boekingenVoegToe({ ref: 'RTG-B-SQ' + i, kind: 'ticket', supplierCode: 'PONTO',
     customerKey: 'user-2', price: 40, paid: true, status: 'bevestigd', at: new Date(BASIS + i * 1000).toISOString() });
+  /* De twee geldcollecties. Ze hebben ANDERE veldnamen dan een order (key in
+     plaats van customerKey, bedrag in plaats van total), en juist daar zou een
+     grootboek stilletjes nullen en lege klanten opleveren. Daarom worden ze
+     hieronder ook echt teruggezocht op klant en op codenaam. */
+  for (let i = 0; i < 12; i++) directBetalingenVoegToe({ ref: 'DP-SQ' + i, key: 'user-9', codename: 'ALK',
+    supplierCode: 'PONTO', supplierName: 'Ponto', bedrag: 500 + i, betaalwijze: 'kaart',
+    at: new Date(BASIS + i * 1000).toISOString() });
+  for (let i = 0; i < 6; i++) betaalVerzoekenVoegToe({ ref: 'BV-SQ' + i, supplierCode: 'PONTO',
+    supplierName: 'Ponto', naarCodename: 'Alk', bedrag: 700 + i, status: 'open',
+    at: new Date(BASIS + i * 1000).toISOString() });
   save();
 
   // hoe groot is de kv-rij `orders` VOORDAT het venster gekapt is?
@@ -55,6 +69,13 @@ const walTekst = p => fs.existsSync(p + '-wal') ? fs.readFileSync(p + '-wal', 'l
   const ledgerOrders = await txLedgerTel('orders');
   const ledgerBoekingen = await txLedgerTel('boekingen');
   const historie = await txLedgerVanKlant('orders', 'user-1', 25, 10);
+  const ramBetalingen = db.data.directBetalingen.length;
+  const ramVerzoeken = db.data.betaalVerzoeken.length;
+  const ledgerBetalingen = await txLedgerTel('directBetalingen');
+  const ledgerVerzoeken = await txLedgerTel('betaalVerzoeken');
+  // op de EIGEN sleutels teruglezen: een betaling op key, een verzoek op codenaam
+  const betalingenVanLid = await txLedgerVanKlant('directBetalingen', 'user-9', 50, 0);
+  const verzoekenVanCodenaam = await txLedgerVanKlant('betaalVerzoeken', 'alk', 50, 0);
 
   // statuswissel op een venster-item: de volgende veegronde neemt hem mee (hete kop)
   const kop = db.data.orders[0];
@@ -75,6 +96,11 @@ const walTekst = p => fs.existsSync(p + '-wal') ? fs.readFileSync(p + '-wal', 'l
     historieN: historie.length,
     historieIsOud: historie.every(o => !db.data.orders.some(r => r.ref === o.ref)),
     mutatieStatus: naMutatie && naMutatie.status,
+    ramBetalingen, ramVerzoeken, ledgerBetalingen, ledgerVerzoeken,
+    betalingenVanLid: betalingenVanLid.length,
+    verzoekenVanCodenaam: verzoekenVanCodenaam.length,
+    // klopt het BEDRAG in de rij, of staat er een 0 omdat de veldnaam niet paste?
+    betalingBedragOk: betalingenVanLid.every(b => b.bedrag >= 500),
     vensterNogVindbaar: !!orderMetRef(kop.ref),
     opRefUitVenster: !!orderMetRef(db.data.orders[1] && db.data.orders[1].ref),
     blobOrders, blobBytesVoor, blobBytesNa: ruweBlob.length,

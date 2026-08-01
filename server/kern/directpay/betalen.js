@@ -9,7 +9,8 @@
 module.exports = (ctx) => {
   const { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, ledger, publiek,
     idemZoek, idemBewaar, tempoOk, findSupplier, notifySupplier, logActivity,
-    sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN } = ctx;
+    sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
+    directBetalingenVoegToe } = ctx;
 
   /* De betalingen die op DIT moment bij de provider liggen. De idempotentie-
      controle hieronder en het vastleggen in voerUit staan aan weerszijden van
@@ -111,8 +112,11 @@ module.exports = (ctx) => {
      betaalwijzen deden dit woord voor woord hetzelfde; de teller mag maar op
      een plek opgehoogd worden, anders loopt hij ooit uiteen. */
   function vastleggen(b, cent, key, kop, log) {
-    db.data.directBetalingen.unshift(b);
-    db.data.directBetalingen = db.data.directBetalingen.slice(0, 200000);
+    /* Ging met unshift + slice(0, 200000). Die slice kopieerde bij elke betaling
+       de hele array, en wat erbuiten viel verdween zonder spoor -- boeking
+       50.001, maar dan met geld. Nu via de transactie-index: geindexeerd, en de
+       staart gaat naar het grootboek of anders eerst naar het archief. */
+    directBetalingenVoegToe(b);
     const L = ledger(b.supplierCode); L.som += cent; L.aantal += 1;
     try { notifySupplier(b.supplierCode, { icon: 'betalen', title: kop, body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
     try { logActivity(b.supplierCode, { name: b.codename }, log); } catch (e) {}

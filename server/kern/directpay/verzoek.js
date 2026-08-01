@@ -4,8 +4,10 @@
    er rechtstreeks binnenkwam plus de openstaande verzoeken. Krijgt de gedeelde ctx van
    kern/directpay/index.js. */
 module.exports = (ctx) => {
-  const { db, save, ensure, centenVan, id, schoon, nu, verzamel, ledger, publiek, betaalDirect,
-    findSupplier, sseToSupplier, MIN_CENTEN, MAX_CENTEN } = ctx;
+  const { db, save, ensure, centenVan, id, schoon, nu, ledger, publiek, betaalDirect,
+    findSupplier, sseToSupplier, MIN_CENTEN, MAX_CENTEN,
+    directBetalingMetRef, directBetalingenVanZaak,
+    betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe } = ctx;
 
   /* De leverancier stuurt een betaalverzoek op codenaam (of open aan wie het
      bekijkt). Het lid rekent het met Face ID af. */
@@ -22,8 +24,10 @@ module.exports = (ctx) => {
       bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Betaalverzoek',
       status: 'open', door: schoon(actorName, 60) || 'Beheer', betaaldDoor: null, betaaldRef: null, at: nu()
     };
-    db.data.betaalVerzoeken.unshift(v);
-    db.data.betaalVerzoeken = db.data.betaalVerzoeken.slice(0, 100000);
+    /* Ging met unshift + slice(0, 100000): een kopie van de hele array bij elk
+       verzoek, en de staart eraf zonder dat er iets bewaard werd. Nu via de
+       transactie-index, net als de betalingen zelf. */
+    betaalVerzoekenVoegToe(v);
     save();
     try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
     return { status: 200, ok: true, verzoek: verzoekPubliek(v) };
@@ -37,15 +41,17 @@ module.exports = (ctx) => {
     ensure();
     if (!codename) return [];
     const wie = String(codename).toLowerCase();
-    return verzamel(db.data.betaalVerzoeken,
-      v => v.status === 'open' && v.naarCodename && v.naarCodename.toLowerCase() === wie,
-      40, verzoekPubliek);
+    /* Geindexeerd op de codenaam in kleine letters (zie COLLECTIES in
+       db/tx/ledger.js), zodat dit geen scan meer is over honderdduizend
+       verzoeken om er veertig te tonen. De statusfilter blijft: de index gaat
+       over de ontvanger, niet over de status -- die verandert namelijk wel. */
+    return betaalVerzoekenVoorCodenaam(wie).filter(v => v.status === 'open').slice(0, 40).map(verzoekPubliek);
   }
   async function betaalVerzoek({ key, codename, ref, idem }) {
     ensure();
-    const v = db.data.betaalVerzoeken.find(x => x.ref === ref);
+    const v = betaalVerzoekMetRef(ref);
     if (!v) return { status: 404, error: 'Betaalverzoek niet gevonden.' };
-    if (v.status === 'betaald') { const b = db.data.directBetalingen.find(x => x.ref === v.betaaldRef); return { status: 200, ok: true, betaling: b ? publiek(b) : null, herhaald: true }; }
+    if (v.status === 'betaald') { const b = directBetalingMetRef(v.betaaldRef); return { status: 200, ok: true, betaling: b ? publiek(b) : null, herhaald: true }; }
     if (v.status !== 'open') return { status: 409, error: 'Dit betaalverzoek is niet meer open.' };
     if (v.naarCodename && codename && v.naarCodename.toLowerCase() !== String(codename).toLowerCase())
       return { status: 403, error: 'Dit betaalverzoek staat op naam van iemand anders.' };
@@ -59,8 +65,12 @@ module.exports = (ctx) => {
   }
   function verzoekIntrek(supplierCode, ref) {
     ensure();
-    const v = db.data.betaalVerzoeken.find(x => x.ref === ref && x.supplierCode === supplierCode);
-    if (!v) return { status: 404, error: 'Betaalverzoek niet gevonden.' };
+    /* Op ref via de index, en DAARNA pas kijken of het verzoek van deze zaak is.
+       De oude .find() deed beide voorwaarden in een: haal je ze uit elkaar, dan
+       moet de tweede blijven staan, anders trekt de ene leverancier het verzoek
+       van de andere in. */
+    const v = betaalVerzoekMetRef(ref);
+    if (!v || v.supplierCode !== supplierCode) return { status: 404, error: 'Betaalverzoek niet gevonden.' };
     if (v.status !== 'open') return { status: 409, error: 'Alleen een open verzoek kan ingetrokken worden.' };
     v.status = 'ingetrokken';
     save();
@@ -71,8 +81,8 @@ module.exports = (ctx) => {
   function ontvangsten(supplierCode) {
     ensure();
     const L = ledger(supplierCode);
-    const betalingen = verzamel(db.data.directBetalingen, b => b.supplierCode === supplierCode, 60, publiek);
-    const verzoeken = verzamel(db.data.betaalVerzoeken, v => v.supplierCode === supplierCode, 40, verzoekPubliek);
+    const betalingen = directBetalingenVanZaak(supplierCode).slice(0, 60).map(publiek);
+    const verzoeken = betaalVerzoekenVanZaak(supplierCode).slice(0, 40).map(verzoekPubliek);
     return {
       som: L.som, aantal: L.aantal, uitbetaald: L.uitbetaald, saldo: L.som - L.uitbetaald,
       betalingen, openVerzoeken: verzoeken.filter(v => v.status === 'open'), verzoeken

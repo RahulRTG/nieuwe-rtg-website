@@ -38,6 +38,20 @@ test('grootboek op sqlite: RAM-venster, verlies-vrij vegen, historie en doorstro
   assert.equal(r.historieIsOud, true, 'de historie-pagina bevat alleen items die niet meer in het RAM staan');
   // een statuswissel op een venster-item stroomt via de hete kop door
   assert.equal(r.mutatieStatus, 'terugbetaald', 'statuswissel doorgestroomd naar het grootboek');
+
+  /* DE TWEE GELDCOLLECTIES, sinds vandaag ook in het grootboek. Ze hebben andere
+     veldnamen dan een order (key in plaats van customerKey, bedrag in plaats van
+     total), en dat is precies waar dit stil fout gaat: de rij wordt gewoon
+     geschreven, alleen met een lege klant en een bedrag van 0. Daarom telt hier
+     niet alleen HOEVEEL rijen er staan, maar of ze op hun eigen sleutel terug te
+     vinden zijn en of het bedrag klopt. */
+  assert.equal(r.ramBetalingen, 5, 'betalingen-venster gekapt op TX_RAM_DIRECTBETALINGEN');
+  assert.equal(r.ramVerzoeken, 4, 'verzoeken-venster gekapt op TX_RAM_BETAALVERZOEKEN');
+  assert.equal(r.ledgerBetalingen, 12, 'alle 12 betalingen in het grootboek, niets stilletjes weg');
+  assert.equal(r.ledgerVerzoeken, 6, 'en alle 6 betaalverzoeken');
+  assert.equal(r.betalingenVanLid, 12, 'de betalingen zijn terug te vinden op de sleutel van het lid (key)');
+  assert.equal(r.verzoekenVanCodenaam, 6, 'en de verzoeken op de codenaam in kleine letters');
+  assert.equal(r.betalingBedragOk, true, 'met het echte bedrag in de rij, niet 0');
   assert.equal(r.vensterNogVindbaar, true, 'het venster-item blijft op ref vindbaar');
   // de bestaande index blijft de waarheid voor het venster
   assert.equal(r.opRefUitVenster, true, 'orderMetRef vindt een venster-item');

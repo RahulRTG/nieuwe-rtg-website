@@ -68,17 +68,17 @@ module.exports = (ctx) => {
 
      HIER STOND EEN VERANTWOORDING DIE TE RUIM WAS. Er stond dat uitstel geen
      duurzaamheid kost, "want elk nieuw item staat al DIRECT als eigen rij in
-     het transactie-grootboek". Dat geldt voor ORDERS en BOEKINGEN -- de enige
-     twee die het grootboek kent (db/tx/ledger.js, TX_SOORT). Onder dezelfde
-     regel vielen ook directBetalingen (25 MB), betaalVerzoeken (13 MB),
+     het transactie-grootboek". Dat gold voor ORDERS en BOEKINGEN, en onder
+     dezelfde regel vielen directBetalingen (25 MB), betaalVerzoeken (13 MB),
      notifications en reviews: samen 55 MB zonder enig grootboek erachter,
      waarvan 38 MB betalingen.
 
-     Uitstel kost daar dus WEL duurzaamheid. Zolang de server doorloopt is dat
-     onzichtbaar (in-memory is de waarheid); het venster gaat pas open bij een
-     herstart. Daarom sorteert de afsluit-flush hieronder op herstelbaarheid en
-     niet op grootte. Wat uitgesteld is, meldt heeftUitgesteld() zodat de
-     schrijver vuil blijft en het na de pauze alsnog weggaat. */
+     De twee betaalcollecties staan er inmiddels wel in (db/tx/collecties.js) en
+     gaan bij aanmaak als eigen rij mee; voor hen klopt de verantwoording nu.
+     Voor notifications en reviews niet, en uitstel kost daar dus echt
+     duurzaamheid. Daarom sorteert de afsluit-flush op herstelbaarheid en niet op
+     grootte, en leidt hij die AF uit het grootboek in plaats van uit een eigen
+     lijstje. Wat uitgesteld is, meldt heeftUitgesteld(). */
   const GROOT_BYTES = 512 * 1024, GROOT_MS = 2000;
   const GROOT_FLUSH_MS = Number(process.env.PG_GROOT_FLUSH_MS || 5000);
   const laatsteSchrijf = new Map(); // collectie -> tijdstip van de laatste echte schrijf

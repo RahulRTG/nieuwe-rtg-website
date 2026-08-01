@@ -24,6 +24,15 @@ nu eerst duurzaam naar `archief/`, en dat is beter dan verlies. Maar de oorzaak
 is dat het transactie-grootboek alleen in de sqlite- en postgres-stand actief is.
 Zolang dat zo is, is die code een pleister en staat hij als zodanig genoteerd.
 
+*Wat er sindsdien van af is, en wat niet.* Dezelfde `unshift` + `slice` stond ook
+onder `directBetalingen` en `betaalVerzoeken` -- 38 MB betalingen zonder enig
+grootboek erachter, terwijl `server/pg/sync.js` ze wel als herstelbaar behandelde.
+Die twee staan nu in `server/db/tx/collecties.js` en gaan bij aanmaak als eigen
+rij mee. In de sqlite- en de postgres-stand is dat dus geen pleister meer maar een
+oorzaak-reparatie. In de json- en geheugen-stand blijft `bewaarStaart` het vangnet,
+want daar is nog steeds geen grootboek. Dat zijn de ontwikkel- en toetsstanden en
+niet de productiestand, maar de pleister is daarmee kleiner geworden en niet weg.
+
 **Handhaver:** mensenwerk, zichtbaar gemaakt in het commit-bericht en de
 takenlijst. Geen machine.
 

@@ -20,7 +20,9 @@
 const MIN_CENTEN = 50;          // € 0,50 ondergrens
 const MAX_CENTEN = 5000000;     // € 50.000 bovengrens per transactie
 
-function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity }) {
+function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
+  directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
+  betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe }) {
   const nu = () => new Date().toISOString();
   const id = (p) => (p || 'x') + crypto.randomBytes(5).toString('hex').toUpperCase();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
@@ -66,13 +68,6 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     return true;
   }
 
-  // early-exit verzamelaar: nieuwste-eerst lijsten hoeven nooit verder dan max
-  function verzamel(arr, test, max, map) {
-    const uit = [];
-    for (const x of arr) { if (test(x)) { uit.push(map ? map(x) : x); if (uit.length >= max) break; } }
-    return uit;
-  }
-
   // de payout-teller van een leverancier: wat er rechtstreeks binnenkwam
   function ledger(code) {
     ensure();
@@ -85,16 +80,24 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
       omschrijving: b.omschrijving, bron: b.bron, codename: b.codename, betaalwijze: b.betaalwijze || 'kaart', at: b.at };
   }
 
+  /* HIER STOND EEN SCAN. `verzamel(db.data.directBetalingen, b => b.key === key,
+     100, publiek)` loopt de array van voren af aan door tot hij honderd treffers
+     heeft. Voor een lid met veel betalingen valt dat mee; voor een lid met twee
+     betalingen tussen tweehonderdduizend andere loopt hij de hele collectie
+     door -- en dat is precies het geval dat je in productie het vaakst hebt. De
+     early exit hielp alleen de drukke gebruiker.
+     De index geeft de betalingen van dit lid meteen, nieuwste eerst. */
   function mijnBetalingen(key) {
     ensure();
-    // nieuwste-eerst met early exit: nooit verder scannen dan de 100 die we tonen
-    return verzamel(db.data.directBetalingen, b => b.key === key, 100, publiek);
+    return directBetalingenVanKlant(key).slice(0, 100).map(publiek);
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, verzamel, ledger, publiek,
+  const ctx = { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, ledger, publiek,
     idemZoek, idemBewaar, tempoOk, findSupplier, notify, notifySupplier, logActivity,
-    sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN };
+    sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
+    directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
+    betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe };
   // het afrekenen zelf staat in ./betalen; ctx.betaalDirect erbij omdat ./verzoek
   // een goedgekeurd betaalverzoek langs dezelfde weg afrekent
   const { betaalDirect, registreerMuntBetaling } = require('./betalen')(ctx);

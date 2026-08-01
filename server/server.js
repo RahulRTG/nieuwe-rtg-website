@@ -36,6 +36,8 @@ const { db, load, save, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
+  betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, checkpointSqlite, checkpointGrootboek } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
@@ -1939,7 +1941,12 @@ betaal.koppelStore({
 const {
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten, dpRegistreerMunt
-} = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity });
+} = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
+  /* De transactie-index voor de twee geldcollecties. Ze werden hier met
+     unshift+slice bijgehouden, dus zonder index (O(N) zoeken) en met een
+     stille kap op de staart. Nu langs dezelfde weg als orders en boekingen. */
+  directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
+  betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe });
 
 /* De RTFoundation-afdracht (kern/fonds.js): van elke bevestigde maandbetaling
    van een klant gaat automatisch 30% (ex btw) naar de foundation. De afdracht

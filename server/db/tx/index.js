@@ -24,15 +24,22 @@ const db = state.db;
 // grootboek, en levert het RAM-venster aan de veegronde.
 function wire(saveFn) { ledger.wire({ txStaartNa, txVerwijder, save: saveFn }); }
 
-const txStaat = { orders: null, boekingen: null };
-const txKlantVan = t => t.customerKey || t.customerTier;
+/* De klantsleutel komt uit ./collecties, en dat is geen omweg maar de reparatie
+   van een duplicaat: hier stond `const txKlantVan = t => t.customerKey ||
+   t.customerTier;` en in ledger.js stond exact dezelfde regel nog een keer.
+   Zolang alleen orders en boekingen meededen viel dat niet op -- die dragen
+   allebei customerKey. Een directe betaling draagt `key`, en dan wijst de ene
+   kopie een klant aan waar de andere er geen ziet: de RAM-index vindt de
+   betaling wel en het grootboek niet, of andersom. */
+const { NAMEN, klantVan: txKlantVan } = require('./collecties');
+const txStaat = Object.fromEntries(NAMEN.map(n => [n, null]));
 function txBouw(naam) {
   const arr = db.data[naam] || [];
   const st = { arr, len: arr.length, byRef: new Map(), byKlant: new Map(), byZaak: new Map() };
   for (const t of arr) {
     if (!t) continue;
     if (t.ref != null && !st.byRef.has(t.ref)) st.byRef.set(t.ref, t); // .find-semantiek: de eerste (nieuwste) wint
-    const k = txKlantVan(t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); l.push(t); }
+    const k = txKlantVan(naam, t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); l.push(t); }
     const z = t.supplierCode; if (z != null) { let l = st.byZaak.get(z); if (!l) st.byZaak.set(z, l = []); l.push(t); }
   }
   txStaat[naam] = st;
@@ -51,7 +58,7 @@ function txVoegToe(naam, t, opties) {
   if (achteraan) st.arr.push(t); else st.arr.unshift(t);
   st.len++;
   if (t.ref != null && (achteraan ? !st.byRef.has(t.ref) : true)) st.byRef.set(t.ref, t);
-  const k = txKlantVan(t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); if (achteraan) l.push(t); else l.unshift(t); }
+  const k = txKlantVan(naam, t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); if (achteraan) l.push(t); else l.unshift(t); }
   const z = t.supplierCode; if (z != null) { let l = st.byZaak.get(z); if (!l) st.byZaak.set(z, l = []); if (achteraan) l.push(t); else l.unshift(t); }
   // Nieuw item ook meteen (best-effort) naar het grootboek als dat actief is;
   // de veegronde is het vangnet voor gemiste schrijfacties en statuswissels.
@@ -123,11 +130,40 @@ const boekingenVanZaak = code => txVanZaak('boekingen', code);
 const BOEK_CAP = Math.max(1, Number(process.env.TX_BOEKINGEN_CAP || 50000));
 const boekingenVoegToe = b => txVoegToe('boekingen', b, { cap: BOEK_CAP });
 
+/* ---- de twee geldcollecties, sinds vandaag langs dezelfde weg ----
+
+   directBetalingen en betaalVerzoeken werden bijgehouden met
+   `db.data.X.unshift(item); db.data.X = db.data.X.slice(0, N);`. Drie dingen
+   gingen daar mis, en het derde is het ergste:
+
+   1. De slice maakte bij ELKE betaling een kopie van de hele array (tot 200.000
+      items). Dat is werk in het warme pad van een betaalverzoek.
+   2. Zoeken ging met .find() over diezelfde array: O(N) per aanvraag.
+   3. En wat er buiten de grens viel, verdween. Geen regel in de log, geen kopie.
+      Dat is boeking 50.001 nog een keer, nu met betalingen.
+
+   Via txVoegToe krijgen ze de index (O(1) op ref/klant/zaak), gaat de staart bij
+   een actief grootboek daarheen, en gaat hij ANDERS eerst naar het archief --
+   kappen zonder bewaren gebeurt niet meer. */
+const DP_CAP = Math.max(1, Number(process.env.TX_DIRECTBETALINGEN_CAP || 200000));
+const BV_CAP = Math.max(1, Number(process.env.TX_BETAALVERZOEKEN_CAP || 100000));
+const directBetalingMetRef = ref => txMetRef('directBetalingen', ref);
+const directBetalingenVanKlant = key => txVanKlant('directBetalingen', key);
+const directBetalingenVanZaak = code => txVanZaak('directBetalingen', code);
+const directBetalingenVoegToe = b => txVoegToe('directBetalingen', b, { cap: DP_CAP });
+const betaalVerzoekMetRef = ref => txMetRef('betaalVerzoeken', ref);
+// op codenaam, in kleine letters -- zie de reden bij COLLECTIES in ./ledger.js
+const betaalVerzoekenVoorCodenaam = naam => txVanKlant('betaalVerzoeken', String(naam || '').toLowerCase());
+const betaalVerzoekenVanZaak = code => txVanZaak('betaalVerzoeken', code);
+const betaalVerzoekenVoegToe = v => txVoegToe('betaalVerzoeken', v, { cap: BV_CAP });
+
 module.exports = {
   wire, initLedger: ledger.initLedger, initLedgerSqlite: ledger.initLedgerSqlite,
   afrondLedger: ledger.afrondLedger, vensterTopUp: ledger.vensterTopUp,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
+  betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe,
   txStaartNa, txVerwijder,
   txLedgerActief: ledger.txLedgerActief, txLedgerVanKlant: ledger.txLedgerVanKlant,
   txLedgerVanZaak: ledger.txLedgerVanZaak, txLedgerTel: ledger.txLedgerTel,

@@ -21,7 +21,8 @@ const kluis = require('../../kluis');
 const state = require('../state');
 const db = state.db;
 
-const txKlantVan = t => t.customerKey || t.customerTier;
+// welke collecties er zijn en hoe ze eruitzien: ./collecties (een plek)
+const { COLLECTIES, NAMEN, TX_SOORT, klantVan } = require('./collecties');
 
 // het RAM-venster + de snapshot-trigger komen uit tx/index (injectie voorkomt
 // een circulaire require: index gebruikt onze zet(), wij gebruiken hun venster)
@@ -29,12 +30,10 @@ let venster = { txStaartNa: () => [], txVerwijder: () => {}, save: () => {} };
 function wire(v) { venster = Object.assign(venster, v); }
 
 let achter = null;
-const TX_RAM_MAX = { orders: Number(process.env.TX_RAM_ORDERS || 30000), boekingen: Number(process.env.TX_RAM_BOEKINGEN || 50000) };
-const TX_SOORT = { orders: 'order', boekingen: 'boeking' };
 const TX_VEEG_MS = Number(process.env.TX_VEEG_MS || 30000);
 const TX_KAP = Number(process.env.TX_KAP || 20000);      // max staart-items per veegronde (tegen event-loop-stalls)
 const TX_KOP = Number(process.env.TX_KOP || 500);        // hete kop die elke ronde opnieuw meegaat (statuswissels)
-const txBekend = { orders: new Set(), boekingen: new Set() }; // refs waarvan we weten dat ze in het grootboek staan
+const txBekend = Object.fromEntries(NAMEN.map(n => [n, new Set()])); // refs waarvan we weten dat ze in het grootboek staan
 let txVeegTimer = null, txVeegBezig = false;
 function txLedgerActief() { return !!achter; }
 // de WAL van het grootboek platslaan voor een backup; zonder achterkant inert
@@ -42,8 +41,8 @@ function checkpointGrootboek() { try { return !!(achter && achter.checkpoint && 
 const txDedup = items => { const gezien = new Set(); const uit = []; for (const t of items) { if (!t || t.ref == null || gezien.has(t.ref)) continue; gezien.add(t.ref); uit.push(t); } return uit; };
 // Een ticket naar een grootboekrij. Hier gebeurt het versleutelen, precies een keer.
 const rijVan = (naam, t) => ({
-  soort: TX_SOORT[naam], ref: String(t.ref), klant: txKlantVan(t) || null, zaak: t.supplierCode || null,
-  paid: !!t.paid, status: t.status || null, totaal: Number(t.total != null ? t.total : t.price) || 0,
+  soort: TX_SOORT[naam], ref: String(t.ref), klant: klantVan(naam, t) || null, zaak: t.supplierCode || null,
+  paid: !!t.paid, status: t.status || null, totaal: Number(COLLECTIES[naam].totaal(t)) || 0,
   at: t.at || new Date().toISOString(), data: kluis.versleutel(JSON.stringify(t))
 });
 const lees = rijen => rijen.map(d => JSON.parse(kluis.ontsleutel(d)));
@@ -81,12 +80,12 @@ async function txLedgerTel(naam, klant) {
 }
 // Synchrone, gecachete totalen (zelfde patroon als ledenGidsAantal): de
 // KPI-lezers blijven synchroon en krijgen een teller die hooguit ~10 s achterloopt.
-const txN = { orders: 0, boekingen: 0 };
+const txN = Object.fromEntries(NAMEN.map(n => [n, 0]));
 let txNAt = 0;
 function txLedgerAantal(naam) {
   if (achter && Date.now() - txNAt > 10000) {
     txNAt = Date.now();
-    (async () => { try { txN.orders = await txLedgerTel('orders'); txN.boekingen = await txLedgerTel('boekingen'); } catch (e) {} })();
+    (async () => { try { for (const n of NAMEN) txN[n] = await txLedgerTel(n); } catch (e) {} })();
   }
   return txN[naam] || 0;
 }
@@ -99,13 +98,13 @@ async function txVeegNu() {
   if (!achter || txVeegBezig || !db.writable) return;
   txVeegBezig = true;
   try {
-    for (const naam of ['orders', 'boekingen']) {
+    for (const naam of NAMEN) {
       const arr = db.data[naam] || [];
       const onbekend = arr.filter(t => t && t.ref != null && !txBekend[naam].has(t.ref)).slice(0, TX_KAP);
       if (onbekend.length) await txLedgerBulk(naam, onbekend);
       if (arr.length) await txLedgerBulk(naam, arr.slice(0, TX_KOP));
-      if (arr.length > TX_RAM_MAX[naam]) {
-        const staart = venster.txStaartNa(naam, TX_RAM_MAX[naam]).slice(-TX_KAP).filter(t => t && t.ref != null);
+      if (arr.length > COLLECTIES[naam].ramMax) {
+        const staart = venster.txStaartNa(naam, COLLECTIES[naam].ramMax).slice(-TX_KAP).filter(t => t && t.ref != null);
         if (staart.length) {
           await txLedgerBulk(naam, staart);   // eerst duurzaam in het grootboek...
           venster.txVerwijder(naam, staart);  // ...dan pas uit het venster
@@ -143,7 +142,7 @@ function afrondLedger() { if (achter && achter.afronden) achter.afronden(); }
 async function vensterTopUp(log) {
   const warn = m => { if (log && log.warn) log.warn(m); };
   if (!achter || !db.data) return;
-  for (const naam of ['orders', 'boekingen']) {
+  for (const naam of NAMEN) {
     try {
       const rijen = await achter.recent(TX_SOORT[naam], 500);
       const arr = Array.isArray(db.data[naam]) ? db.data[naam] : (db.data[naam] = []);
@@ -165,7 +164,7 @@ module.exports = { checkpointGrootboek,
      af (server/pg/sync.js). Zou die er een eigen lijstje van maken, dan lopen
      de twee vroeg of laat uit elkaar -- en dat is precies hoe de uitstelregel
      ooit collecties is gaan dekken die er nooit in stonden. */
-  TX_SOORT,
+  TX_SOORT, COLLECTIES,
   wire, actief: txLedgerActief, zet: txLedgerZet,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, txVeegNu,
   initLedger, initLedgerSqlite, afrondLedger, vensterTopUp

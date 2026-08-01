@@ -101,7 +101,14 @@ async function startEens(opts) {
      hoort in de melding te staan en niet in het hoofd van wie hem leest. */
   const kernen = Math.max(1, os.cpus().length);
   const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
-  const extra = Math.min(4, Math.max(1, Math.round(druk)));    // hooguit vier keer zo geduldig
+  /* De eerste versie van deze schaling deed Math.round(druk), en dat was te
+     grof: bij een genormaliseerde belasting van 0,7 tot 0,9 -- een machine die
+     bijna vol staat -- rondde dat af op 1 en bleef het geduld op 25 seconden.
+     Zeventig toetsen zakten daarop, allemaal met een LEVEND kindproces. Een
+     server die opstart doet echt werk (SQLite, seed, sleutels), dus "bijna vol"
+     is al genoeg om hem over de grens te duwen. Vandaar 1 + druk: elke bezette
+     kern telt meteen mee in plaats van pas bij een hele. */
+  const extra = Math.min(5, Math.max(1, Math.ceil(1 + druk)));
   const pogingen = opts.pogingen || 250 * extra;
   const gestart = Date.now();
   const port = await vrijePoort();
@@ -145,7 +152,12 @@ async function startEens(opts) {
   throw new Error('server werd niet gezond op ' + base
     + ' na ' + seconden + 's; het kindproces ' + (leefde ? 'LEEFDE nog' : 'was al gestopt')
     + ', belasting ' + nu1 + 'x de kernen'
-    + (leefde && Number(nu1) > 1
+    /* De grens voor "dit is drukte" ligt bewust LAAG (0,6 van de kernen) en niet
+       op 1. Een machine hoeft niet vol te staan om een opstartende server over
+       de 25 seconden te duwen; bij 0,7 gebeurde het al zeventig keer. Liever een
+       keer ten onrechte "drukte" suggereren dan iemand een uur laten zoeken naar
+       een defect dat er niet is -- dat is hier al twee keer gebeurd. */
+    + (leefde && Number(nu1) > 0.6
       ? ' -- dit ziet eruit als DRUKTE, niet als een defect: draai deze toets los om het te bevestigen.'
       : ''));
 }

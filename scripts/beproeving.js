@@ -978,7 +978,26 @@ async function misbruikBeproeving(tok) {
     const p99Lus = Math.max(...lusMonsters.map(v => v.p99 || 0));
     rij('event-loop-vertraging tijdens de storm', 'p99 ' + p99Lus.toFixed(1) + ' ms, max ' + maxLus.toFixed(1) + ' ms  \x1b[2m(' + lusMonsters.length + ' monsters)\x1b[0m');
   } else rij('event-loop-vertraging tijdens de storm', 'niet gelezen (metrics-deur dicht?)');
-  if (lusNaStorm) rij('event-loop na de storm', 'p99 ' + lusNaStorm.p99 + ' ms, max ' + lusNaStorm.max + ' ms');
+  /* NA DE STORM: ALLEEN DE VRAAG DIE DEZE METER KAN BEANTWOORDEN.
+     Hier stond 'p99 X ms, max Y ms' en dat las als een herstelcijfer. Dat kan
+     het niet zijn: de histogram in server/meting-lus.js is CUMULATIEF sinds de
+     start en wordt tussen de fasen niet gewist, dus de p99 "na de storm" is de
+     p99 VAN de storm. Twee regels die per constructie bijna hetzelfde getal
+     tonen, en de tweede suggereert dat de lus nog vol staat terwijl hij leeg is.
+     Percentielen uit een cumulatieve histogram zijn niet af te trekken.
+
+     Wat je er WEL uit haalt: de max is monotoon. Blijft hij na de storm gelijk
+     aan de max TIJDENS de storm, dan is er daarna geen nieuwe piek bij gekomen
+     -- en dat is precies de vraag ("blijft er iets hangen als de last weg is").
+     Het echte hersteloordeel komt van de gewone aanroep hierboven (fase E2). */
+  if (lusNaStorm && lusMonsters.length) {
+    const maxTijdens = Math.max(...lusMonsters.map(v => v.max || 0));
+    const nieuwePiek = lusNaStorm.max > maxTijdens + 1;
+    rij('event-loop na de storm', nieuwePiek
+      ? '\x1b[31mNIEUWE piek\x1b[0m: max liep door van ' + maxTijdens.toFixed(1) + ' naar ' + lusNaStorm.max + ' ms'
+      : 'geen nieuwe piek (max staat nog op ' + lusNaStorm.max + ' ms van tijdens de storm)');
+    rij('  \x1b[2mlet op\x1b[0m', '\x1b[2mde lus-meter is cumulatief sinds de start; het hersteloordeel komt van de gewone aanroep hierboven\x1b[0m');
+  }
   const dbNa = belasting.dbBelasting(TMP, MODE === 'postgres' ? (process.env.DATABASE_URL || process.env.PG_URL) : null);
   rij('database (' + dbNa.stand + ')', dbNa.schijfKB != null ? nl(dbNa.schijfKB) + ' kB op schijf' : 'niet te meten');
   if (dbNa.verbindingen != null) rij('  verbindingen', dbNa.verbindingen + ' van ' + dbNa.maxVerbindingen + ' (commits ' + nl(dbNa.commits) + ', rollbacks ' + nl(dbNa.rollbacks) + ')');

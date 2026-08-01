@@ -8,6 +8,8 @@ Website + ledenportaal + app (PWA) voor Rahul Travel Group (RTG) — een members
 
 **`README.md` is de actuele technische documentatie** (structuur, starten, API-overzicht, PWA, partnerkanaal) — lees die eerst bij technische vragen. Dit CLAUDE.md bevat vooral de merkregels en afspraken die niet uit de code af te leiden zijn.
 
+**`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
+
 ## Structuur en starten (kort)
 
 - `public/` — de webroot: `index.html` (homepage), `site/` (marketingpagina's), `apps/` (portaal, PWA-app, leverancier, backoffice), `shared/` (i18n, realtime), `sw.js` + `manifest.webmanifest` (PWA)

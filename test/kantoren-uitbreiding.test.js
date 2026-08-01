@@ -82,7 +82,10 @@ test('3. de kantine zet de kaart van vandaag en iedereen leest hem terug', async
 test('4. de identiteitskluis: kamers met inzagerecht zien de naam, andere niet, en alles komt in het auditlog', async () => {
   // zonder kantoor-token: dicht
   assert.equal((await api('/api/office/inzage', { kamer: 'klantenservice', codenaam: lidCodenaam })).status, 401);
-  // klantenservice mag (naamInzage), en krijgt de echte naam uit de kluis
+  /* klantenservice mag (naamInzage), en krijgt de echte naam uit de kluis.
+     `naam: 'Noor'` is hier een VERVALSINGSPOGING: dat veld bepaalde vroeger wie
+     er onder de inzage in het auditlog kwam te staan. Het moet nu genegeerd
+     worden -- zie de assertie onderaan deze test. */
   const ok = await api('/api/office/inzage', { kamer: 'klantenservice', codenaam: lidCodenaam, naam: 'Noor' }, office);
   assert.equal(ok.status, 200);
   assert.equal(ok.body.inzage.naam, 'Kluis Testlid');
@@ -103,7 +106,19 @@ test('4. de identiteitskluis: kamers met inzagerecht zien de naam, andere niet, 
   const kluisRegels = board.body.audit.filter(a => /Identiteitskluis/.test(a.wat));
   assert.ok(kluisRegels.length >= 3, 'de opvragingen staan in het auditlog (nu: ' + kluisRegels.length + ')');
   assert.ok(kluisRegels.some(a => /geen treffer/.test(a.wat)), 'ook de misgreep is gelogd');
-  assert.ok(board.body.audit.some(a => a.wie === 'Noor'), 'met wie er keek');
+  /* HET AUDITSPOOR IS NIET IN TE VULLEN DOOR WIE ERIN STAAT.
+     De eerste opvraging hierboven stuurde `naam: 'Noor'` mee. Kwam die waarde
+     in het log, dan kon iedereen met de gedeelde kantoorcode de zwaarste
+     handeling van dit huis -- de echte naam achter een codenaam -- onder de
+     naam van een collega zetten. De actor komt nu uit de sessie: hier logt de
+     eigenaar met zijn eigen account in, dus staat er zijn identiteitssleutel
+     (user-N); met alleen de gedeelde code staat er dat het de gedeelde code
+     was. Nooit iets uit de body. */
+  assert.ok(!kluisRegels.some(a => a.wie === 'Noor'), 'de naam uit de body komt NIET in het auditlog');
+  assert.ok(kluisRegels.every(a => /^user-\d+$/.test(a.wie) || a.wie === 'backoffice (gedeelde code)'),
+    'de actor komt uit de sessie (nu: ' + kluisRegels.map(a => a.wie).join(', ') + ')');
+  assert.ok(kluisRegels.some(a => /^user-\d+$/.test(a.wie)),
+    'wie met een eigen account inlogt, staat met zijn identiteit in het log');
 });
 
 test('5. de kamer vertelt de app of de kluis er hoort: wel bij support, niet bij marketing', async () => {

@@ -236,25 +236,49 @@ test('6. spaarrente en tarieven kennen grenzen', async () => {
   assert.equal((await api('office/bank/instellingen', { spaarrenteBp: 150 }, office)).body.spaarrenteBp, 150);
 });
 
-test('7. de bank operationeel zetten vraagt om een tweede persoon, en dat is in te trekken', async () => {
-  /* Opschalen is vier-ogen: één persoon vraagt aan, een tweede bevestigt. De
-     aanvraag zelf mag dus NIET al de stand wijzigen -- anders is het vier-ogen
-     alleen een schermpje. */
-  const aan = await api('office/bank/operationeel', { aan: true, naam: 'Eerste' }, office);
-  assert.equal(aan.status, 200, JSON.stringify(aan.body));
+test('7. opschalen is ECHT vier-ogen: twee ingelogde accounts, niet twee tekstvelden', async () => {
+  /* HIER STOND EEN TOETS DIE HET THEATER BEVESTIGDE. Hij vroeg de opschaling aan
+     met de gedeelde kantoorcode en `naam: 'Eerste'`, en concludeerde uit
+     needsAuth dat het vier-ogen-principe werkte. Dat deed het niet: aanvrager en
+     bevestiger kwamen allebei uit req.body.naam, dus een sessie kon beide rollen
+     spelen -- en zonder naamveld viel hij terug op 'boardroom', wat ook ongelijk
+     is aan 'Eerste'. Twee HTTP-calls, en de clearing van het hele huis lag om.
 
-  if (aan.body.needsAuth) {
-    const status = await api('office/bank', {}, office);
-    assert.equal(status.status, 200);
-    const annuleer = await api('office/bank/autoriseer/annuleer', { naam: 'Eerste' }, office);
-    assert.equal(annuleer.status, 200, 'de aanvraag is in te trekken: ' + JSON.stringify(annuleer.body));
-    // en na intrekken is er niets meer om te bevestigen
-    const nogmaals = await api('office/bank/autoriseer/annuleer', { naam: 'Eerste' }, office);
-    assert.notEqual(nogmaals.status, 500, 'twee keer intrekken valt niet om');
-  } else {
-    // afschalen mag direct; dan hoort het antwoord dat gewoon te melden
+     De oorzaak zat in de BRON: officeAuth hangt aan een gedeelde code, niet aan
+     een persoon. Opschalen staat daarom nu achter de boardroom-poort, en de
+     identiteit komt uit de sessie. Deze toets meet alle vier de kanten. */
+
+  // 1. met alleen de gedeelde kantoorcode kan er helemaal niet meer opgeschaald worden
+  const metCode = await api('office/bank/operationeel', { aan: true, naam: 'Eerste' }, office);
+  assert.equal(metCode.status, 403, 'de gedeelde code is geen persoon: ' + JSON.stringify(metCode.body));
+
+  // 2. de eigenaar logt in op zijn EIGEN account en komt wel door de boardroomdeur
+  const baas = (await api('auth/login', { login: process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com',
+    password: process.env.DEMO_PASS || 'Imran', pasApp: 'business' })).body.token;
+  assert.ok(baas, 'de eigenaar is ingelogd');
+  const kantoor1 = (await api('account/start', { rol: 'kantoor' }, baas)).body.token;
+  assert.ok(kantoor1, 'en staat in de backoffice met zijn eigen account');
+
+  const aan = await api('office/bank/operationeel', { aan: true }, kantoor1);
+  assert.equal(aan.status, 200, JSON.stringify(aan.body));
+  if (!aan.body.needsAuth) {
+    // al operationeel: dan is er niets op te schalen en meet de rest niets
     assert.ok(aan.body.ok || aan.body.ongewijzigd, JSON.stringify(aan.body));
+    return;
   }
+
+  // 3. DEZELFDE persoon mag zijn eigen aanvraag niet bevestigen
+  const zelf = await api('office/bank/autoriseer/bevestig', { id: aan.body.autorisatie.id }, kantoor1);
+  assert.equal(zelf.status, 403, 'je bent je eigen tweede persoon niet: ' + JSON.stringify(zelf.body));
+
+  // 4. en zonder naamveld ook niet -- dat was juist de makkelijke weg eromheen
+  const zonderNaam = await api('office/bank/autoriseer/bevestig', { id: aan.body.autorisatie.id, naam: '' }, kantoor1);
+  assert.equal(zonderNaam.status, 403, 'de terugval op "boardroom" is weg');
+
+  // en intrekken kan gewoon, ook twee keer achter elkaar
+  const annuleer = await api('office/bank/autoriseer/annuleer', {}, kantoor1);
+  assert.equal(annuleer.status, 200, JSON.stringify(annuleer.body));
+  assert.notEqual((await api('office/bank/autoriseer/annuleer', {}, kantoor1)).status, 500, 'twee keer intrekken valt niet om');
 });
 
 /* ================= 6. de overige kantoorschermen ================= */

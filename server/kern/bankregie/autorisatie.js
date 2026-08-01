@@ -11,6 +11,13 @@ module.exports = (ctx) => {
 
   const pub = a => a && { id: a.id, actie: a.actie, modus: a.modus || null, door: a.door, at: a.at, verlooptOverMs: Math.max(0, AUTORISATIE_MS - (Date.now() - a.at)) };
 
+  /* Is dit een ECHTE persoon? De boardroom-poort levert een accountsleutel
+     ('user-<id>'); de gedeelde backoffice-code levert dat per definitie niet --
+     daar zit geen persoon achter, alleen een code die meerdere mensen kennen.
+     Zonder deze controle is de vergelijking in bevestig() een vergelijking van
+     twee tekstvelden, en dat is geen vier-ogen-principe. */
+  const identiteit = wie => typeof wie === 'string' && /^user-\d+$/.test(wie);
+
   /* Vraag een schakeling aan. Afschaling of geen-wijziging voert direct uit; een
      opschaling zet een openstaande autorisatie klaar die een tweede persoon
      moet bevestigen. */
@@ -28,7 +35,9 @@ module.exports = (ctx) => {
       if (next === b.modus) return { ok: true, direct: true, ongewijzigd: true, modus: b.modus };
       doelActie = 'modus'; doelModus = next;
     } else return { status: 400, error: 'Onbekende actie.' };
-    // hier: een opschaling -> vier-ogen
+    // hier: een opschaling -> vier-ogen. De AANVRAGER moet ook een echte
+    // identiteit zijn, anders is de vergelijking bij bevestig() zinloos.
+    if (!identiteit(wie)) return { status: 403, error: 'Opschalen kan alleen met een eigen RTG-account, niet met de gedeelde backoffice-code.' };
     b.autorisatie = { id: kenmerk(), actie: doelActie, modus: doelModus || null, door: wie, at: Date.now() };
     save();
     return { ok: true, needsAuth: true, autorisatie: pub(b.autorisatie) };
@@ -38,6 +47,14 @@ module.exports = (ctx) => {
     const b = d(), a = b.autorisatie, wie = door || 'boardroom';
     if (!a || a.id !== id) return { status: 404, error: 'Er staat geen autorisatie met dit kenmerk open.' };
     if (Date.now() - a.at > AUTORISATIE_MS) { b.autorisatie = null; save(); return { status: 410, error: 'De autorisatie is verlopen; vraag hem opnieuw aan.' }; }
+    /* GEEN ANONIEME BEVESTIGING. De vergelijking hieronder is het hele
+       vier-ogen-principe, en hij is alleen iets waard als beide kanten een ECHTE
+       identiteit zijn. Zolang `wie` uit een tekstveld kon komen (of terugviel op
+       de vaste string 'boardroom') was dit theater: aanvragen als de een,
+       bevestigen als de ander, met een sessie. De routes staan nu achter de
+       boardroom-poort en leveren req.boardroomKey; wat daar niet uitkomt, is
+       geen tweede persoon. */
+    if (!identiteit(wie)) return { status: 403, error: 'De tweede persoon moet met een eigen RTG-account zijn ingelogd.' };
     if (a.door === wie) return { status: 403, error: 'De tweede persoon moet iemand anders zijn dan de aanvrager.' };
     let res;
     if (a.actie === 'operationeel-aan') res = _operationeelZet(true, wie);

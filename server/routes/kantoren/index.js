@@ -24,8 +24,19 @@ module.exports = (kern) => {
   /* De identiteitskluis-inzage: kamers met naamInzage (en de boardroom)
      vragen de echte naam bij een codenaam op; elke opvraging komt in het
      auditlog, ook zonder treffer. */
+  /* WIE KIJKT ER? Uit de sessie, niet uit de body. Hier ging `req.body.naam`
+     ongecontroleerd het auditspoor in, dus je schreef de naam van een ander
+     onder je eigen inzage in de identiteitskluis -- het zwaarste dat de
+     backoffice kan: de echte naam achter een codenaam. Een auditspoor dat je
+     zelf kunt invullen is geen auditspoor.
+
+     Kwam iemand via zijn eigen RTG-account binnen, dan is er een echte
+     identiteit (req.boardroomKey ontstaat pas achter boardroomAuth, maar de
+     sessie draagt de lidKey al). Anders is het de gedeelde code, en dan zeggen
+     we dat -- precies wat routes/office/werk.js met wieKijkt() al deed. */
   app.post('/api/office/inzage', officeAuth, async (req, res) => {
-    try { stuur(res, await afdelingen.naamInzage(String(req.body.kamer || ''), req.body.codenaam, req.body.naam ? String(req.body.naam) : null)); }
+    const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
+    try { stuur(res, await afdelingen.naamInzage(String(req.body.kamer || ''), req.body.codenaam, wie)); }
     catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
   // de kantine: de kaart van vandaag lezen en zetten

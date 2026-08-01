@@ -74,13 +74,20 @@ test('het lid meldt zich aan met bedrijfsnaam + kassacode + RTG-inlog en kan daa
   const r = await json(await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: global.__code, login: 'nova@x.nl', password: 'geheim123', pin: '2468' }));
   assert.ok(r.ok && r.code === 'KIKUNOI' && r.staffId, 'aangemeld en gekoppeld aan het bedrijf');
   global.__sid = r.staffId;
-  // het lid staat nu in de roster als teamlid-lid
+  // het lid staat nu in de namenlijst van het inlogscherm
   const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));
   const ik = roster.staff.find(x => x.id === r.staffId);
-  assert.ok(ik && ik.lid === true, 'het teamlid is herkenbaar als RTG-lid');
+  assert.ok(ik && ik.name, 'het teamlid staat in de kiezer van het inlogscherm');
+  /* Of iemand OOK RTG-lid is, staat er bewust NIET bij. Deze route is publiek --
+     het inlogscherm heeft de namen nodig voordat er iets is om op in te loggen --
+     en dan hoort er niet meer in te staan dan de kiezer toont. De koppeling
+     controleren we hieronder, achter de inlog. */
+  assert.equal('lid' in ik, false, 'de publieke kiezer verklapt niet wie er ook RTG-lid is');
   // dagelijkse inlog met naam + gekozen pincode werkt
   const login = await json(await api('/api/supplier/login', { code: 'KIKUNOI', staffId: r.staffId, pin: '2468' }));
   assert.ok(login.token && login.state, 'de medewerker kan inloggen en de app gebruiken');
+  const inTeam = (login.state.staff || []).find(x => x.id === r.staffId);
+  assert.ok(inTeam && inTeam.lid === true, 'achter de inlog is het teamlid herkenbaar als RTG-lid');
 });
 
 test('een kassacode is eenmalig: dezelfde code werkt geen tweede keer', async () => {

@@ -2,17 +2,28 @@
    WAT EEN ZAAK EXPORTEERT -- 2 endpoints uit de supplier-groep.
 
    rides.csv en dagrapport.csv stonden als nooit aangeroepen in de waargenomen
-   dekkingsmeting. Ze vallen op tussen alle andere supplier-routes: het zijn
-   de enige twee die met GET werken en hun token uit de QUERYSTRING halen. Dat
-   is geen slordigheid maar noodzaak -- een downloadlink in een browser kan
-   geen Authorization-kop meesturen -- en juist daarom horen ze beproefd te
-   zijn.
+   dekkingsmeting. Ze vielen op tussen alle andere supplier-routes: het waren de
+   enige twee die met GET werkten en hun token uit de QUERYSTRING haalden.
+
+   HIER STOND EEN VERANTWOORDING DIE NIET KLOPTE. Er stond dat dat "geen
+   slordigheid maar noodzaak" was, want "een downloadlink in een browser kan
+   geen Authorization-kop meesturen". Dat is waar voor een <a href>, maar de
+   backoffice deed het toen al anders: fetch met de kop, en dan een
+   blob-download. De redenering was dus niet fout maar VEROUDERD -- precies de
+   vorm waar dit huis vandaag vaker op stuitte. Het token in die URL was
+   bovendien geen leestoken: het is exact het token dat supplierAuth accepteert
+   voor elke SCHRIJFroute van de zaak (kassa, personeel, prijzen, deuren), en in
+   een URL belandt dat in serverlogs, proxylogs, de Referer en de
+   browsergeschiedenis. Beide exports zijn nu POST met de kop, net als
+   /api/office/export.csv, en de leverancier-app downloadt ze via API.download().
 
    WAT ER OP HET SPEL STAAT
 
-   - EEN DOWNLOADLINK IS NOG STEEDS EEN DEUR. Zonder token, met een verzonnen
-     token, of met het token van een LID in plaats van een zaak: 401. Anders
-     is de boekhouding van een zaak te downloaden door wie de URL raadt.
+   - EEN DOWNLOAD IS NOG STEEDS EEN DEUR. Zonder token, met een verzonnen token,
+     of met het token van een LID in plaats van een zaak: 401. Anders is de
+     boekhouding van een zaak op te halen door wie de weg weet. En de oude GET
+     mag niet meer bestaan, want een route die blijft staan is een route die
+     gebruikt wordt.
    - EEN CSV IS EEN PROGRAMMA ALS JE NIET OPLET. Een adres of een codenaam die
      met = + - of @ begint, wordt door Excel en Numbers als FORMULE uitgevoerd
      zodra iemand het bestand opent. De boekhouder van de zaak opent dat
@@ -42,6 +53,12 @@ function api(pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 const haal = (pad) => fetch(base + pad).then(async r => ({ status: r.status, tekst: await r.text().catch(() => '') }));
+// een export ophalen zoals de app het doet: POST met het token in de kop
+const exporteer = (pad, token, body) => fetch(base + pad, {
+  method: 'POST',
+  headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+  body: JSON.stringify(body || {})
+});
 async function inlog(code, rol) {
   const roster = await api('/api/supplier/roster', { code });
   const wie = (roster.body.staff || []).find(x => x.role === rol);
@@ -62,19 +79,23 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('1. een downloadlink is nog steeds een deur', async () => {
+test('1. een download is nog steeds een deur', async () => {
   for (const pad of ['/api/supplier/rides.csv', '/api/supplier/dagrapport.csv']) {
-    assert.equal((await haal(pad)).status, 401, pad + ' zonder token');
-    assert.equal((await haal(pad + '?token=verzonnen')).status, 401, pad + ' met een verzonnen token');
+    assert.equal((await exporteer(pad, null)).status, 401, pad + ' zonder token');
+    assert.equal((await exporteer(pad, 'verzonnen')).status, 401, pad + ' met een verzonnen token');
     /* Een LID heeft een geldig token -- alleen niet van een zaak. Zonder de
        rolcontrole zou elk ingelogd lid de boekhouding van een partner kunnen
-       ophalen door de link in te tikken. */
-    assert.equal((await haal(pad + '?token=' + lid)).status, 401, pad + ' met het token van een lid');
+       ophalen. */
+    assert.equal((await exporteer(pad, lid)).status, 401, pad + ' met het token van een lid');
+    /* En de oude weg moet DICHT zijn, niet alleen ongebruikt. Zolang de GET
+       bestaat, bestaat het lek: iemand plakt de link in een chat, een proxy
+       logt hem, of een oude bundel roept hem nog aan. 404 = de route is weg. */
+    assert.equal((await haal(pad + '?token=' + taxi)).status, 404, pad + ' als GET met het token in de URL');
   }
 });
 
 test('2. de export bevat de eigen zaak, met een kop en een bestandsnaam', async () => {
-  const r = await fetch(base + '/api/supplier/rides.csv?token=' + taxi);
+  const r = await exporteer('/api/supplier/rides.csv', taxi);
   assert.equal(r.status, 200);
   assert.match(r.headers.get('content-type') || '', /text\/csv/);
   assert.match(r.headers.get('content-disposition') || '', /attachment; filename="ritten-mkkx-/,
@@ -84,19 +105,19 @@ test('2. de export bevat de eigen zaak, met een kop en een bestandsnaam', async 
      de gedecodeerde tekst ziet hem dus nooit, ook niet als hij er staat. Zonder
      die BOM leest Excel het bestand als Latin-1 en staat er "Sant Josep" met
      een kapot accent in de boekhouding. */
-  const bytes = new Uint8Array(await (await fetch(base + '/api/supplier/rides.csv?token=' + taxi)).arrayBuffer());
+  const bytes = new Uint8Array(await (await exporteer('/api/supplier/rides.csv', taxi)).arrayBuffer());
   assert.deepEqual([bytes[0], bytes[1], bytes[2]], [0xEF, 0xBB, 0xBF], 'het bestand begint met een UTF-8 BOM');
 
   const tekst = await r.text();
   assert.match(tekst.split('\n')[0], /referentie;gast/, 'en een kopregel');
 
-  const d = await fetch(base + '/api/supplier/dagrapport.csv?token=' + resto);
+  const d = await exporteer('/api/supplier/dagrapport.csv', resto);
   assert.equal(d.status, 200);
   assert.match(d.headers.get('content-disposition') || '', /dagrapport-kikunoi-/);
   assert.match(await d.text(), /btw/i, 'het dagrapport gaat over omzet en btw');
 
   // ook de bediening mag exporteren: dit is geen managementroute
-  if (taxiWerker) assert.equal((await haal('/api/supplier/rides.csv?token=' + taxiWerker)).status, 200);
+  if (taxiWerker) assert.equal((await exporteer('/api/supplier/rides.csv', taxiWerker)).status, 200);
 });
 
 test('3. een csv is een programma als je niet oplet', async () => {
@@ -138,8 +159,7 @@ test('3. een csv is een programma als je niet oplet', async () => {
     assert.equal(csvCel('Zei "hallo"'), '"Zei ""hallo"""', 'en een aanhalingsteken verdubbeld');
     return;
   }
-  const tekst = (await fetch(base + '/api/supplier/rides.csv?token=' + taxi)).text
-    ? await (await fetch(base + '/api/supplier/rides.csv?token=' + taxi)).text() : '';
+  const tekst = await (await exporteer('/api/supplier/rides.csv', taxi)).text();
   assert.ok(!/(^|;)=HYPERLINK/m.test(tekst), 'geen enkele cel begint kaal met een formule: ' + tekst.slice(0, 300));
   assert.match(tekst, /'=HYPERLINK|"'=HYPERLINK/, 'de formule staat onschadelijk gemaakt in het bestand');
 });

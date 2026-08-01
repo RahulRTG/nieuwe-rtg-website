@@ -161,9 +161,30 @@ test('7. SOS zet een alarm bij RTG-kantoor; kantoor handelt het af', async () =>
   assert.equal(d.status, 'noodgeval');
   assert.ok(d.sos.length >= 1, 'de SOS staat bij kantoor');
   // kantoor handelt af
+  /* HET MEEKIJK-KANAAL GAAT ALLEEN OPEN BIJ EEN SOS.
+
+     Dat stond in het commentaar en nergens in de code: er werd alleen
+     gecontroleerd dat de afspraak van de beller was. Elk lid met een
+     willekeurige afspraak kon dus op elk moment een zelfgekozen payload het
+     kantoorscherm op duwen -- een open kanaal naar de meldkamer zonder dat er
+     iets aan de hand was, en precies het scherm waar men op moet kunnen
+     vertrouwen als er wél iets is. */
+  const tijdens = await api(base, '/api/ontmoeten/signaal', { dateId, payload: { type: 'offer', sdp: 'v=0' } }, vrouw.token);
+  assert.equal(tijdens.status, 200, 'tijdens een lopende SOS mag het meekijken: ' + JSON.stringify(tijdens.body).slice(0, 140));
+
+  // kantoor handelt af
   const af = await api(base, '/api/office/ontmoeting/sos-af', { dateId, sosId: d.sos[0].id }, office);
   assert.equal(af.status, 200);
   assert.equal((af.body.ontmoetingen.dates.find(x => x.id === dateId) || {}).sos.length, 0, 'geen open SOS meer');
+
+  // en daarna valt het kanaal dicht: er is niets meer om mee te kijken
+  const erna = await api(base, '/api/ontmoeten/signaal', { dateId, payload: { type: 'offer', sdp: 'v=0' } }, vrouw.token);
+  assert.equal(erna.status, 409, 'zonder lopende SOS geen kanaal naar de meldkamer');
+
+  // en een payload zonder bovengrens zou elk open kantoorscherm kunnen vollopen
+  await api(base, '/api/ontmoeten/sos', { dateId, bericht: 'nogmaals', lat: 38.91, lng: 1.43 }, vrouw.token);
+  const groot = await api(base, '/api/ontmoeten/signaal', { dateId, payload: { sdp: 'x'.repeat(80000) } }, vrouw.token);
+  assert.equal(groot.status, 413, 'een te groot signaal wordt geweigerd');
 });
 
 test('8. de functie uitzetten laat openstaande voorstellen vervallen', async () => {

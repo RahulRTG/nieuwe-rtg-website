@@ -60,8 +60,23 @@ module.exports = (ctx) => {
 
   /* De gezamenlijke beslissing: de leden stemmen, de scheidsrechter bewaakt de
      grenzen en breekt een gelijke stand. Toegekend geld gaat uit de pot. */
-  function beslis(voorstelId) {
+  /* WIE MAG DE STEMMING SLUITEN? Deze functie kreeg de beller helemaal niet
+     mee -- als enige van de hele module -- dus kon iedereen met een sessie elk
+     voorstel op elk moment afhameren. Het bedrag is een toezegging en geen echt
+     geld (zie de kop van kern/labfonds.js), dus er verdwijnt geen euro; wat er
+     wel gebeurt is dat een buitenstaander het besluit van een ander groepje
+     neemt, en het moment kiest waarop de stand hem uitkomt.
+
+     De indiener sluit zijn eigen voorstel. Dat is de smalste regel die het gat
+     dicht en niets nieuws verzint. Blijft over: de indiener kan nog steeds het
+     moment kiezen. Dat is een echte beperking, maar wel een tussen mensen die
+     samen inzamelen -- en de scheidsrechter en de meerderheid staan er nog
+     tussen. Een stemtermijn zou dat oplossen; dat is een productbesluit en geen
+     bugfix, dus dat laat ik aan RTG. */
+  function beslis(voorstelId, doorKey) {
     const v = vindV(voorstelId); if (!v) return { status: 404, error: 'Dit voorstel bestaat niet.' };
+    if (!doorKey || v.doorKey !== doorKey)
+      return { status: 403, error: 'Alleen wie dit voorstel indiende, sluit de stemming.' };
     if (v.status !== 'open') return { status: 409, error: 'Over dit voorstel is al beslist.' };
     const l = loc(v.locId); if (!l) return { status: 404, error: 'Deze locatie bestaat niet.' };
     const sc = weegAf(v, l); v.scheids = sc;

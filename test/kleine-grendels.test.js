@@ -151,3 +151,36 @@ test('4. het veiligheidsbord draagt de identiteitssleutel, niet de echte naam', 
     'maar zonder de echte naam erin -- die staat in de kluis en hoort daar te blijven');
   assert.match(meldingen, /user-\d+/, 'wel met de identiteitssleutel, zodat de eigenaar hem via /api/office/inzage kan opvragen');
 });
+
+/* Het Lab-fonds weigerde met "Log in met je RTG-account om mee in te zamelen"
+   zodra er geen lidKey was. Maar een anonieme gastsessie HEEFT een key
+   ('guest-xxxx'), dus die kwam er gewoon langs. Iedereen kon zonder account
+   het fondsgrootboek besturen. Er verdwijnt geen euro (het is een
+   toezeggingen-grootboek, zie de kop van kern/labfonds.js) maar een gedeeld
+   register dat door willekeurige voorbijgangers gevuld wordt is geen register.
+   De tekst stond er al; nu doet de code wat hij zegt. */
+test('5. het Lab-fonds vraagt een echt account, niet alleen een sessie', async () => {
+  const gastTok = (await api('/api/login', { tier: 'guest', pasApp: 'rtg' })).body.token;
+  assert.ok(gastTok, 'een anonieme gastsessie is zo gemaakt');
+
+  const loc = (await api('/api/labfonds/overzicht', {}, gastTok)).body;
+  assert.ok(loc.locaties && loc.locaties.length, 'kijken mag: het fonds is openbaar');
+  const locId = loc.locaties[0].id;
+
+  for (const [pad, lijf] of [
+    ['/api/labfonds/doneer', { locId, bedrag: 25 }],
+    ['/api/labfonds/voorstel/maak', { locId, titel: 'Iets', doel: 'Een plan voor de hele omgeving hier.', bedrag: 10 }],
+    ['/api/labfonds/stem', { id: 'x', keuze: 'voor' }],
+    ['/api/labfonds/beslis', { id: 'x' }]
+  ]) {
+    const r = await api(pad, lijf, gastTok);
+    assert.equal(r.status, 403, pad + ' vraagt een echt account (kreeg ' + r.status + ')');
+  }
+
+  // en met een echt account mag het gewoon
+  const u = Date.now().toString().slice(-8);
+  const lid = (await api('/api/auth/register', { name: 'Fondslid', email: 'fo' + u + '@x.nl', phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const gift = await api('/api/labfonds/doneer', { locId, bedrag: 25 }, lid);
+  assert.equal(gift.status, 200, 'een lid zamelt gewoon in: ' + JSON.stringify(gift.body).slice(0, 140));
+});

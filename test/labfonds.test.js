@@ -25,7 +25,13 @@ test('inzamelen per locatie + voorstel met steun van de scheidsrechter + gezamen
   assert.equal(v.voorstel.scheids.oordeel, 'steun');
 
   lf.stem('lid2', v.voorstel.id, 'voor');
-  const b = lf.beslis(v.voorstel.id);
+  /* WIE MAG DE STEMMING SLUITEN? Deze functie kreeg de beller helemaal niet
+     mee -- als enige van de module -- dus kon iedereen met een sessie elk
+     voorstel op elk moment afhameren, op het moment dat de stand hem uitkwam.
+     De indiener sluit nu zijn eigen voorstel. */
+  assert.equal(lf.beslis(v.voorstel.id, 'lid2').status, 403, 'een ander sluit jouw stemming niet');
+  assert.equal(lf.beslis(v.voorstel.id).status, 403, 'en zonder beller al helemaal niet');
+  const b = lf.beslis(v.voorstel.id, 'lid1');
   assert.equal(b.voorstel.status, 'toegekend');
   assert.equal(b.locatie.pot, 600);
   assert.equal(b.locatie.uitgekeerd, 400);
@@ -36,7 +42,7 @@ test('de scheidsrechter raadt privaat gewin af', () => {
   lf.doneer('a', 'A', 'amsterdam', 100);
   const v = lf.voorstelMaak('a', 'A', 'amsterdam', 'Iets voor mezelf', 'Ik wil dit prive voor mezelf gebruiken.', 50);
   assert.equal(v.voorstel.scheids.oordeel, 'afraden');
-  assert.equal(lf.beslis(v.voorstel.id).voorstel.status, 'afgewezen');
+  assert.equal(lf.beslis(v.voorstel.id, 'a').voorstel.status, 'afgewezen');
 });
 
 test('meer dan de pot kan niet', () => {
@@ -44,7 +50,7 @@ test('meer dan de pot kan niet', () => {
   lf.doneer('l', 'L', 'rotterdam', 10);
   const v = lf.voorstelMaak('l', 'L', 'rotterdam', 'Groot buurtplan', 'Een mooi plan voor het hele park en de omgeving.', 999);
   assert.equal(v.voorstel.scheids.oordeel, 'afraden');
-  assert.equal(lf.beslis(v.voorstel.id).voorstel.status, 'afgewezen');
+  assert.equal(lf.beslis(v.voorstel.id, 'l').voorstel.status, 'afgewezen');
 });
 
 test('boardroom ziet het hele fonds', () => {

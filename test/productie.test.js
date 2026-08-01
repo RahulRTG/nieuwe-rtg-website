@@ -34,12 +34,37 @@ test('config: veilige productie is foutloos', () => {
        want dan komt de "is er betaald"-melding onondertekend binnen en kan wie
        het adres kent zelf "betaald" roepen. Een veilige productie heeft ze dus
        allebei -- deze opsomming is precies dat: hoe veilig eruitziet. */
-    REDIS_URL: 'r', SENTRY_DSN: 's', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
+    /* HIER STOND SENTRY_DSN, en dat maakte van deze toets een bevestiging van
+       een fictie. Die variabele wordt door niets gelezen: er is geen
+       Sentry-koppeling (zero dependencies) en server/foutmelder.js doet het werk
+       op ERR_WEBHOOK_URL. Een "veilige productie" die SENTRY_DSN zet en
+       ERR_WEBHOOK_URL niet, heeft in werkelijkheid GEEN externe alarmering --
+       en deze toets zei dat dat foutloos was. */
+    REDIS_URL: 'r', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
     RTF_IBAN: 'NL11FOUND0000000001', RTG_MEDIA_BACKEND: 's3',
     OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
   assert.equal(r.fouten.length, 0);
-  assert.equal(r.waarschuwingen.length, 0);
+  assert.equal(r.waarschuwingen.length, 0, 'geen enkele waarschuwing: ' + JSON.stringify(r.waarschuwingen));
+});
+
+/* De twee kanten van de dode variabele, apart vastgelegd. Zonder deze toets kan
+   iemand SENTRY_DSN in de keuring terugzetten zonder dat er iets klaagt, en dan
+   staat de val er weer: een beheerder die de checklist volgt zet hem, vinkt af,
+   en gaat live zonder alarmering. */
+test('config: de alarmering wijst naar de variabele die het werk doet', () => {
+  const zonder = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
+    RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
+  assert.ok(zonder.waarschuwingen.some(w => /ERR_WEBHOOK_URL/.test(w)),
+    'zonder webhook waarschuwt de keuring over ERR_WEBHOOK_URL: ' + JSON.stringify(zonder.waarschuwingen));
+  assert.ok(!zonder.waarschuwingen.some(w => /^SENTRY_DSN niet gezet/.test(w)),
+    'en stuurt niemand meer naar SENTRY_DSN');
+
+  // wie hem tOch zet, hoort te horen dat het niets doet
+  const misleid = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
+    RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', SENTRY_DSN: 'https://sleutel@sentry.example/1' });
+  assert.ok(misleid.waarschuwingen.some(w => /SENTRY_DSN.*door niets gelezen/.test(w)),
+    'SENTRY_DSN zetten levert een waarschuwing dat hij niets doet: ' + JSON.stringify(misleid.waarschuwingen));
 });
 
 test('config: het voorbeeld-eigenaarsadres blokkeert de productiestart', () => {

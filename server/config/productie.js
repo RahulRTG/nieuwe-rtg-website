@@ -11,6 +11,8 @@
    bij elke doorlichting groeit. */
 'use strict';
 
+const { keurGeld } = require('./productie-geld');
+
 function keur(env, fouten, waarschuwingen) {
     // 1. Demo-modus mag nooit aan in productie: dat opent de demo-inlog en het
     //    account Rahul/Imran.
@@ -84,7 +86,13 @@ function keur(env, fouten, waarschuwingen) {
     // volume) nodig zodat elke server dezelfde foto's ziet.
     if (env.DATABASE_URL && (env.RTG_MEDIA_BACKEND || '').toLowerCase() !== 's3')
       waarschuwingen.push('RTG_MEDIA_BACKEND niet op "s3": Salon-foto\'s en snaps staan op de lokale schijf en worden niet tussen instances gedeeld. Zet S3-compatibele opslag (RTG_MEDIA_S3_*) of gebruik een gedeeld volume.');
-    if (!env.SENTRY_DSN) waarschuwingen.push('SENTRY_DSN niet gezet: geen EXTERNE fout-tracking (de eigen in-memory fout-aggregatie op het techniekbord draait altijd).');
+    /* HIER STOND SENTRY_DSN. Niets in deze codebase leest die variabele -- het
+       pakket @sentry/node is er nooit gekomen (zero dependencies) en
+       server/foutmelder.js nam zijn plaats in, op ERR_WEBHOOK_URL. De
+       waarschuwing stuurde de beheerder dus naar een knop die nergens op zit.
+       Zie test/alarmweg.test.js en check.js regel 27. */
+    if (!env.ERR_WEBHOOK_URL) waarschuwingen.push('ERR_WEBHOOK_URL niet gezet: geen EXTERNE alarmering. De eigen fout-aggregatie op het techniekbord draait altijd, maar die zie je alleen als je zelf kijkt -- en niet als de doos plat ligt. Zet een webhook (Slack/Discord/eigen endpoint) en beproef hem met de zelfproef op het techniekbord.');
+    if (env.SENTRY_DSN && !env.ERR_WEBHOOK_URL) waarschuwingen.push('SENTRY_DSN is gezet maar wordt door niets gelezen: deze codebase heeft geen Sentry-koppeling (zero dependencies). De externe alarmering loopt via ERR_WEBHOOK_URL.');
     /* RTG_OWNER_BOOTSTRAP staat BEWUST niet in deze lijst. De eenmalige sleutel
        waarmee de eerste eigenaar zijn account claimt hoort weg zodra dat account
        bestaat -- dat is de normale eindstand. Hier waarschuwen zodra hij ontbreekt
@@ -95,32 +103,8 @@ function keur(env, fouten, waarschuwingen) {
        server.js, na load(), waar hij het antwoord echt weet. */
     if (!env.OFFICE_TOTP_SECRET) waarschuwingen.push('OFFICE_TOTP_SECRET niet gezet: de backoffice heeft geen tweede factor (2FA). Sterk aangeraden: zet een base32-geheim en koppel een authenticator-app.');
     if (!env.SMTP_URL && !env.SMTP_HOST) waarschuwingen.push('Geen SMTP ingesteld: e-mail (herstel-links, bevestigingen) wordt niet echt verstuurd.');
-    /* FOUT en geen waarschuwing: zonder sleutel draait de demo-provider, die
-       ELKE betaling zelf bevestigt. Facturen gaan op 'paid' zonder afschrijving,
-       terwijl de 30%-afdracht aan de RTFoundation wel gewoon wordt geboekt --
-       geld eruit, niets erin. Dat is geen mededeling maar een storing. Wie
-       bewust zonder betalingen draait, zegt dat met STRIPE_DEMO_BEWUST=1. */
-    if (!env.STRIPE_SECRET_KEY && env.STRIPE_DEMO_BEWUST !== '1')
-      fouten.push('STRIPE_SECRET_KEY ontbreekt in productie: dan draait de demo-provider, die ELKE betaling zelf bevestigt. Facturen gaan op betaald zonder dat er is afgerekend, terwijl de RTF-afdracht wel wordt geboekt. Zet de sleutel -- of, als deze installatie bewust zonder betalingen draait, zet STRIPE_DEMO_BEWUST=1.');
-    if (!env.STRIPE_SECRET_KEY && env.STRIPE_DEMO_BEWUST === '1')
-      waarschuwingen.push('STRIPE_DEMO_BEWUST=1: de demo-betaalprovider bevestigt elke betaling zelf. Dat is hier een bewuste keuze; er gaat geen echt geld om en facturen kloppen niet.');
-    /* Een betaalsleutel zonder webhook-secret is gevaarlijker dan geen van
-       beide: er gaat echt geld om, en de webhook die vertelt of er betaald is
-       zou dan onondertekend binnenkomen. Wie het adres kent roept "betaald". */
-    if (env.STRIPE_SECRET_KEY && !env.STRIPE_WEBHOOK_SECRET)
-      fouten.push('STRIPE_SECRET_KEY gezet zonder STRIPE_WEBHOOK_SECRET: de betaal-webhook zou onondertekende berichten als waarheid aannemen. Zet het webhook-secret uit het Stripe-dashboard.');
-    if (!env.RTF_IBAN) waarschuwingen.push('RTF_IBAN niet gezet: de 30%-afdracht aan de RTFoundation wordt wel per betaling geboekt en gereserveerd (status "te_storten"), maar nog niet uitbetaald. Vul het foundation-IBAN zodra het bekend is.');
-    if (env.MUNT_AAN === '1' && !env.MUNT_PROVIDER_KEY)
-      fouten.push('MUNT_AAN=1 zonder MUNT_PROVIDER_KEY: crypto-acceptatie zou aanstaan zonder vergunninghoudende aanbieder om te ontvangen en om te zetten. Zet de provider, of laat MUNT_AAN uit.');
-    /* Even hard als de Stripe-regel hierboven, en om dezelfde reden: de
-       munt-webhook zet bij "ontvangen" een factuur op betaald of crediteert een
-       leverancier rechtstreeks. Dit stond als WAARSCHUWING terwijl de
-       Stripe-tweeling een FOUT was, en dat verschil was er geen: allebei
-       vertellen ze de server dat er geld binnen is. Sinds muntbetaal.js in
-       productie zonder secret weigert, zou een waarschuwing bovendien liegen --
-       de acceptatie werkt dan gewoon niet meer. Liever nu luid dan straks stil. */
-    if (env.MUNT_AAN === '1' && !env.MUNT_WEBHOOK_SECRET)
-      fouten.push('MUNT_AAN=1 zonder MUNT_WEBHOOK_SECRET: de munt-webhook zou onondertekende berichten als waarheid aannemen (en zet een factuur op betaald). Zet een secret, of laat MUNT_AAN uit.');
+    // De geldkant (Stripe, munt, RTF-afdracht) staat in ./productie-geld.js
+    keurGeld(env, fouten, waarschuwingen);
 }
 
 module.exports = { keur };

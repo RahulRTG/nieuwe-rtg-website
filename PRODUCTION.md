@@ -83,7 +83,7 @@ logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
 | `RTG_TLS=1` | De app termineert **zelf** TLS/HTTPS op Node's tls-stack (HTTP/2 + HTTP/1.1-terugval via ALPN, TLS 1.2 als vloer, harde ciphers) — een aparte reverse proxy voor TLS is dan niet meer nodig. Zonder cert maakt ze een self-signed voor local |
 | `RTG_ACME=1` + `RTG_TLS_DOMAIN` + `RTG_TLS_EMAIL` | Met `RTG_TLS=1`: de app haalt en vernieuwt **zelf** een echt Let's Encrypt-certificaat (eigen ACME-client, HTTP-01 op poort 80, live cert-herlaad zonder herstart). `RTG_ACME_STAGING=1` om eerst tegen de staging-CA te oefenen |
 
-Aanbevolen: `SENTRY_DSN` (fouttracking), SMTP (`SMTP_URL`), `STRIPE_SECRET_KEY`
+Aanbevolen: `ERR_WEBHOOK_URL` (externe alarmering), SMTP (`SMTP_URL`), `STRIPE_SECRET_KEY`
 + `STRIPE_WEBHOOK_SECRET` (echte betalingen), `ANTHROPIC_API_KEY` (AI).
 
 Volledige lijst met uitleg: `.env.example`.
@@ -211,7 +211,10 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
 - **Observability** — gestructureerde JSON-logs (`server/log.js`), per verzoek
   een correlatie-id (`X-Request-Id`), duur en status; centrale foutafhandeling
   met stack; een eigen in-memory fout-aggregatie op het techniekbord (ERR-01 +
-  de storingslijst); optionele Sentry-koppeling erbovenop via `SENTRY_DSN`.
+  de storingslijst); optionele EXTERNE alarmering erbovenop via
+  `ERR_WEBHOOK_URL` (een webhook-POST naar Slack/Discord/eigen endpoint, met
+  SSRF-keuring op het doel en tempering per vingerafdruk). Geen Sentry: dit huis
+  heeft geen externe pakketten, dus `SENTRY_DSN` wordt door niets gelezen.
 - **Fail-fast configuratie** — `server/config.js` stopt de start bij een
   onveilige productie-instelling.
 - **Opslag** — zowel de gedeelde data als de **accounts** draaien op
@@ -358,7 +361,11 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
 - [ ] TLS geregeld: óf een reverse proxy/load balancer vóór de app met `trust proxy` aan, óf native in de app (`RTG_TLS=1`, evt. `RTG_ACME=1` voor een automatisch Let's Encrypt-certificaat) — poort 80 + 443 bereikbaar
 - [ ] Redis draait en `REDIS_URL` is gezet (bij >1 instance)
-- [ ] `SENTRY_DSN` gezet en er komt een testfout binnen
+- [ ] `ERR_WEBHOOK_URL` gezet, en de **zelfproef** op het techniekbord komt
+      echt aan (`POST /api/techniek/alarm/proef`, alleen de eigenaar). Dit
+      vinkje was niet af te vinken zolang het naar `SENTRY_DSN` wees: die
+      variabele wordt door niets gelezen, dus er kwam nooit een testfout
+      binnen. Vink dit pas af als de proef `ok: true` teruggeeft.
 - [ ] SMTP getest (herstel-link komt echt aan)
 - [ ] Stripe live-keys + webhook-endpoint (`/api/betaal/webhook`) geregistreerd en getest
 - [ ] Back-up-volume gemount; herstel-uit-back-up één keer geoefend

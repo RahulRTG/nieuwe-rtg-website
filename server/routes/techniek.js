@@ -96,7 +96,30 @@ module.exports = (kern) => {
      tussen de knoppen die het bord bedienen. */
   require('./techniek/bord')({ techniek, functies, eigenaar, inzagelog, log,
     accounts, archief, beveilig, db, app, ctx, staat, isEigenaar, techAuth,
-    bewaren: () => bewaarDeel });
+    bewaren: () => bewaarDeel, foutmelder: kern.foutmelder });
+
+  /* DE ZELFPROEF VAN DE ALARMWEG.
+
+     Op de go-live-lijst stond "er komt een testfout binnen" als vinkje. Dat is
+     niet af te vinken zonder met de hand een echte storing te veroorzaken, dus
+     werd het afgevinkt op vertrouwen -- en juist die regel wees naar
+     SENTRY_DSN, een variabele die niets leest. Een alarm dat je niet kunt
+     beproeven is geen alarm.
+
+     Deze knop stuurt een echte POST naar de ingestelde webhook, met soort
+     "zelfproef" zodat de ontvanger weet dat het geen storing is, en WACHT op
+     het antwoord. Je krijgt terug of het adres klopt, in plaats van te hopen.
+
+     Alleen de eigenaar: het adres van de alarmweg is bedrijfsgevoelig, en een
+     knop die verkeer naar buiten stuurt hoort niet bij iedereen met toegang
+     tot het techniekbord te liggen. */
+  app.post('/api/techniek/alarm/proef', techAuth, eigenaarAlleen, async (req, res) => {
+    const melder = kern.foutmelder;
+    if (!melder) return res.status(503).json({ ok: false, reden: 'de fout-melder is niet bedraad.' });
+    const wie = (() => { try { return req.techUser ? accounts.realNameOf(req.techUser) : 'eigenaar'; } catch (e) { return 'eigenaar'; } })();
+    const r = await melder.zelfproef(wie);
+    res.json(Object.assign({ ok: !!r.ok }, r, { stand: melder.stand() }));
+  });
 
   // Zekering resetten ("er weer in doen") of met de hand uitschakelen.
   app.post('/api/techniek/zekering', techAuth, eigenaarAlleen, (req, res) => {

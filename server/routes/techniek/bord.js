@@ -14,7 +14,7 @@
    nog niet klaar. Een getter haalt hem op het moment dat hij nodig is. */
 module.exports = (bctx) => {
   const { techniek, functies, eigenaar, inzagelog, log, accounts, archief, beveilig,
-    db, app, ctx, staat, isEigenaar, techAuth, bewaren } = bctx;
+    db, app, ctx, staat, isEigenaar, techAuth, bewaren, foutmelder } = bctx;
 
   // Het statusbord: alle checks + zekeringen. Eigenaar ziet ook de toegangslijst.
   app.get('/api/techniek/status', techAuth, async (req, res) => {
@@ -38,6 +38,13 @@ module.exports = (bctx) => {
       beveiliging: beveilig ? beveilig.samenvatting() : { open: 0, kritiek: 0, waarschuwing: 0, recent: [] },
       // eigen fout-aggregatie: totalen + de recentste storingsgroepen
       fouten: log.foutenSamenvatting(),
+      /* DE ALARMWEG NAAR BUITEN. De aggregatie hierboven zie je alleen als je
+         zelf kijkt; dit is het kanaal dat je bereikt als de doos plat ligt.
+         Staat er `actief: false`, dan is er GEEN externe alarmering -- en dat
+         hoort op het bord te staan in plaats van te ontbreken. Bezorgfouten
+         worden geteld, want een webhook met een typefout deed tot nu toe
+         precies hetzelfde als een werkende: niets zichtbaars. */
+      alarm: foutmelder ? foutmelder.stand() : { actief: false, reden: 'niet bedraad' },
       samenvatting: {
         ok: checks.filter(c => c.status === 'ok').length,
         waarschuwing: checks.filter(c => c.status === 'waarschuwing').length,

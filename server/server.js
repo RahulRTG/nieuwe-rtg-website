@@ -80,14 +80,23 @@ const { maakOntmoeting } = require('./kern/ontmoeting');
    Daarbovenop kan optioneel EXTERNE bezorging via de eigen fout-melder
    (server/foutmelder.js): een dunne webhook-POST, aan te zetten met
    ERR_WEBHOOK_URL. Zonder blijft de eigen aggregatie gewoon draaien. */
-if (process.env.ERR_WEBHOOK_URL) {
-  try {
-    const melder = require('./foutmelder').maakFoutmelder({ url: process.env.ERR_WEBHOOK_URL });
-    log.onError((err, ctx) => melder.melden(err, ctx));
-    log.info('Fout-tracker: eigen webhook-melder actief.');
-  } catch (e) {
-    log.warn('ERR_WEBHOOK_URL gezet maar de fout-melder kon niet starten (' + (e && e.message) + ').');
+/* ALTIJD MAKEN, OOK ZONDER WEBHOOK. Hier stond dit hele blok achter
+   `if (process.env.ERR_WEBHOOK_URL)`, en dan bestond er zonder die variabele
+   geen melder-object -- dus kon het techniekbord ook niet TONEN dat er geen
+   externe alarmering is. Een ontbrekend alarm hoort zichtbaar te zijn, niet
+   afwezig. Zonder url is de melder inert (actief:false) en zegt de zelfproef
+   precies wat eraan ontbreekt. */
+const foutmelder = (() => {
+  try { return require('./foutmelder').maakFoutmelder({ url: process.env.ERR_WEBHOOK_URL || '' }); }
+  catch (e) {
+    log.warn('de fout-melder kon niet starten (' + (e && e.message) + ').');
+    return { melden() {}, async zelfproef() { return { ok: false, reden: 'de fout-melder kon niet starten' }; },
+      stand: () => ({ actief: false, geprobeerd: 0, bezorgd: 0, mislukt: 0, laatsteFout: 'niet gestart' }), actief: false };
   }
+})();
+if (foutmelder.actief) {
+  log.onError((err, ctx) => foutmelder.melden(err, ctx));
+  log.info('Fout-tracker: eigen webhook-melder actief.');
 }
 
 // Vangnet: een niet-afgevangen belofte-afwijzing (bijv. een externe AI- of
@@ -2275,7 +2284,7 @@ const kern = {
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
-  crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat,
+  crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,

@@ -1257,5 +1257,77 @@ console.log('\n26) bedradings-contract: elke naam die je uit een module haalt, b
     overgeslagen + ' overgeslagen: fabriek, spread of anderszins niet statisch te bepalen)');
 }
 
+/* 27) geen dode configuratie: een variabele die je aanraadt, moet iets DOEN.
+
+   DE FOUT DIE DIT VANGT, EN DIE ECHT IS GEBEURD. De productie-keuring drong aan
+   op SENTRY_DSN "voor externe fout-tracking". PRODUCTION.md noemde hem drie
+   keer, docker-compose gaf hem door aan de container, en op de go-live-lijst
+   stond "SENTRY_DSN gezet en er komt een testfout binnen". Niets in deze
+   codebase las die variabele: het pakket @sentry/node is er nooit gekomen (zero
+   dependencies) en server/foutmelder.js nam zijn plaats in, met een eigen
+   webhook op ERR_WEBHOOK_URL -- die in geen enkele documentatie stond.
+
+   Wie de checklist netjes afliep zette dus de verkeerde variabele, vinkte een
+   regel af die niet af te vinken was, en ging live zonder alarmering. Ooit
+   klopte die tekst; niemand keek hem na toen de laag eronder veranderde.
+
+   DE TRUC IN DEZE REGEL. De productie-keuring zelf telt NIET mee als "leest
+   hem". Anders is elke waarschuwing zijn eigen bewijs: `if (!env.SENTRY_DSN)
+   waarschuw(...)` is een leesactie, en dan blijft precies deze fout onzichtbaar.
+   Wat telt is of er ergens ANDERS in server/ of scripts/ iets mee gebeurt.
+
+   Er is een categorie die dan onterecht opvalt: vlaggen die BIJ de keuring
+   horen ("ik weet het, start toch"). Die staan hieronder met een reden. Dat is
+   bewust handwerk: het verschil tussen "bevestigingsvlag" en "dode belofte" is
+   niet machinaal te zien, en wie een nieuwe naam op deze lijst zet moet er een
+   eerlijke zin bij kunnen schrijven. */
+console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergens gelezen');
+{
+  const MAG_DOOD = new Map([
+    ['POSTGRES_DB', 'gelezen door de postgres-container zelf, niet door onze code'],
+    ['POSTGRES_USER', 'idem'],
+    ['POSTGRES_PASSWORD', 'idem'],
+    ['RTG_ALLOW_PLAINTEXT', 'bevestigingsvlag VOOR de keuring: "ik weet dat er geen sleutel is, start toch"'],
+    ['STRIPE_DEMO_BEWUST', 'bevestigingsvlag VOOR de keuring: "deze installatie draait bewust zonder betalingen"'],
+    ['SENTRY_DSN', 'bewust genoemd om te WAARSCHUWEN dat hij niets doet; de echte alarmweg is ERR_WEBHOOK_URL']
+  ]);
+  // De hele keuringsmap telt als belofte-bron EN wordt uitgesloten van "leest
+  // hem": anders is elke waarschuwing haar eigen bewijs. Sinds de geldkant is
+  // afgesplitst zijn dat twee bestanden, en een derde hoort er vanzelf bij.
+  const KEURMAP = 'server/config/';
+  let dood = 0;
+  try {
+    const gelezen = new Set();
+    for (const map of ['server', 'scripts']) {
+      loop(path.join(ROOT, map), /\.(js|mjs|cjs)$/, f => {
+        const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+        if (rel.startsWith(KEURMAP)) return;         // de keuring is niet haar eigen bewijs
+        const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+        for (const m of bron.matchAll(/process\.env\.([A-Z_][A-Z0-9_]*)/g)) gelezen.add(m[1]);
+        for (const m of bron.matchAll(/\benv\.([A-Z_][A-Z0-9_]*)/g)) gelezen.add(m[1]);
+      });
+    }
+    const genoemd = new Map();                        // naam -> waar hij beloofd wordt
+    for (const n of fs.readdirSync(path.join(ROOT, KEURMAP)).filter(x => x.endsWith('.js'))) {
+      const rel = KEURMAP + n;
+      const bron = zonderCommentaar(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
+      for (const m of bron.matchAll(/env\.([A-Z_][A-Z0-9_]*)/g)) if (!genoemd.has(m[1])) genoemd.set(m[1], rel);
+    }
+    const dc = path.join(ROOT, 'docker-compose.yml');
+    if (fs.existsSync(dc)) {
+      for (const m of fs.readFileSync(dc, 'utf8').matchAll(/^ {6}([A-Z_][A-Z0-9_]*):/gm))
+        if (!genoemd.has(m[1])) genoemd.set(m[1], 'docker-compose.yml');
+    }
+    for (const [naam, waar] of genoemd) {
+      if (gelezen.has(naam) || MAG_DOOD.has(naam)) continue;
+      dood++;
+      fout(waar + ' belooft ' + naam + ', maar niets in server/ of scripts/ leest die variabele' +
+        ' -- zet hem aan het werk, haal hem weg, of zet hem met een reden in MAG_DOOD');
+    }
+    if (!dood) ok(genoemd.size + ' beloofde omgevingsvariabelen doen ook echt iets (' +
+      MAG_DOOD.size + ' benoemd als uitzondering)');
+  } catch (e) { fout('kon de configuratie niet nalopen: ' + e.message); }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

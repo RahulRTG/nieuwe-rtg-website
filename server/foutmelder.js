@@ -38,10 +38,64 @@ function maakFoutmelder(opts) {
   const venster = opts.vensterMs || 60000;        // per vingerafdruk max 1x per minuut
   const gezien = new Map();                        // vingerafdruk -> laatste verzending (ms)
 
+  /* EEN ALARM DAT JE NIET KUNT ZIEN AANKOMEN, IS GEEN ALARM.
+
+     Hieronder staat `req.on('error', () => {})`, en dat hoort ook zo: een
+     fout-melder mag de app nooit ophouden of zelf omvallen. Maar het gevolg was
+     dat een webhook met een typefout, een verlopen Slack-adres of een host die
+     niet meer bestaat PRECIES hetzelfde deed als een werkende: niets zichtbaars.
+     Je merkt het pas op de dag dat je het alarm nodig hebt.
+
+     Daarom een kleine boekhouding: hoeveel is er geprobeerd, hoeveel is er
+     aangekomen (2xx), en wat was de laatste fout. Die staat op het techniekbord
+     en in de zelfproef hieronder. Stil blijven mag; onzichtbaar zijn niet. */
+  const staat = { geprobeerd: 0, bezorgd: 0, mislukt: 0, laatsteFout: null, laatsteFoutAt: null, laatsteOkAt: null };
+  function misging(reden) {
+    staat.mislukt++;
+    staat.laatsteFout = String(reden || 'onbekend').slice(0, 200);
+    staat.laatsteFoutAt = new Date().toISOString();
+  }
+
   function vinger(err, ctx) {
     const m = (err && err.message) || String(err);
     const p = (ctx && (ctx.p || ctx.plaats)) || '';
     return (m + '|' + p).slice(0, 200);
+  }
+
+  /* Een enkele POST. `soort` staat in het lijf zodat de ontvanger een echte
+     storing van een zelfproef kan onderscheiden. Geeft een belofte terug die
+     ALTIJD slaagt (met ok true/false); de aanroeper mag hem negeren -- melden()
+     doet dat, de zelfproef niet. */
+  function post(lijf, soort) {
+    return new Promise((klaar) => {
+      staat.geprobeerd++;
+      try {
+        const payload = Buffer.from(JSON.stringify(Object.assign({ app, soort: soort || 'fout' }, lijf)));
+        const u = new URL(url);
+        const mod = u.protocol === 'http:' ? http : https;
+        const req = mod.request({
+          method: 'POST', hostname: u.hostname, port: u.port || undefined, path: u.pathname + u.search,
+          headers: { 'content-type': 'application/json', 'content-length': payload.length, 'user-agent': 'rtg-foutmelder/1' }
+        });
+        req.on('response', (res) => {
+          res.resume();                               // lijf weggooien, verbinding vrijgeven
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            staat.bezorgd++; staat.laatsteOkAt = new Date().toISOString();
+            klaar({ ok: true, status: res.statusCode });
+          } else {
+            misging('ontvanger antwoordde ' + res.statusCode);
+            klaar({ ok: false, status: res.statusCode, reden: 'ontvanger antwoordde ' + res.statusCode });
+          }
+        });
+        // een fout-melder mag nooit zelf een fout opwerpen -- wel meetellen
+        req.on('error', (e) => { misging(e && e.message); klaar({ ok: false, reden: (e && e.message) || 'netwerkfout' }); });
+        req.setTimeout(timeout, () => { misging('geen antwoord binnen ' + timeout + ' ms'); req.destroy(); });
+        req.write(payload); req.end();
+      } catch (e) {
+        misging(e && e.message);
+        klaar({ ok: false, reden: (e && e.message) || 'kon niet versturen' });
+      }
+    });
   }
 
   function melden(err, ctx) {
@@ -54,25 +108,33 @@ function maakFoutmelder(opts) {
       gezien.set(vf, nu);
       if (gezien.size > 2000) for (const [k, t] of gezien) if (nu - t > venster) gezien.delete(k);
 
-      const payload = Buffer.from(JSON.stringify({
-        app, tijd: new Date(nu).toISOString(),
+      post({
+        tijd: new Date(nu).toISOString(),
         fout: (err && err.message) || String(err),
         stack: (err && err.stack) ? String(err.stack).slice(0, 4000) : undefined,
         context: ctx || undefined
-      }));
-      const u = new URL(url);
-      const mod = u.protocol === 'http:' ? http : https;
-      const req = mod.request({
-        method: 'POST', hostname: u.hostname, port: u.port || undefined, path: u.pathname + u.search,
-        headers: { 'content-type': 'application/json', 'content-length': payload.length, 'user-agent': 'rtg-foutmelder/1' }
-      });
-      req.on('error', () => {});                      // een fout-melder mag nooit zelf een fout opwerpen
-      req.setTimeout(timeout, () => req.destroy());
-      req.write(payload); req.end();
+      }, 'fout');
     } catch (e) { /* bewust stil: bezorging faalt liever dan de app te raken */ }
   }
 
-  return { melden, actief: !!url };
+  /* DE ZELFPROEF. Het go-live-vinkje luidde "er komt een testfout binnen" en
+     dat was niet af te vinken zonder met de hand een echte storing te maken.
+     Dit stuurt er een, met soort "zelfproef" zodat de ontvanger weet dat het
+     geen echte storing is, en WACHT op het antwoord. Zo weet je of het adres
+     klopt in plaats van het te hopen. */
+  async function zelfproef(door) {
+    if (!url) return { ok: false, reden: 'ERR_WEBHOOK_URL is niet gezet; er is geen externe alarmering.' };
+    const r = await post({
+      tijd: new Date().toISOString(),
+      fout: 'Zelfproef van de RTG-foutmelder: dit is GEEN storing.',
+      context: { door: door || 'onbekend', waarom: 'controleren of de alarmweg werkt' }
+    }, 'zelfproef');
+    return r;
+  }
+
+  const stand = () => Object.assign({ actief: !!url }, staat);
+
+  return { melden, zelfproef, stand, actief: !!url };
 }
 
 module.exports = { maakFoutmelder };

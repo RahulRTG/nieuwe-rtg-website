@@ -24,7 +24,9 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
-      SENTRY_DSN: ${SENTRY_DSN:-}
+      # Externe alarmering: een webhook-POST bij elke uitzondering. SENTRY_DSN
+      # stond hier, maar wordt door niets gelezen (geen externe pakketten).
+      ERR_WEBHOOK_URL: ${ERR_WEBHOOK_URL:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
       - rtg-data:/app/server/data

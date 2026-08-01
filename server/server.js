@@ -1077,6 +1077,10 @@ function resolveSession(token) {
   return null;
 }
 
+/* De AI-poort deelt resolveSession met auth hieronder: een vertaalverzoek en een
+   gewone API-aanroep horen dezelfde sessies te herkennen. */
+const aiPoort = require('./kern/aipoort').maakAiPoort({ resolveSession });
+
 function auth(req, res, next) {
   const header = req.get('authorization') || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
@@ -1485,7 +1489,10 @@ app.post('/api/translate', require('./rem')({ windowMs: 60000, limit: 30 }), asy
   const text = String(req.body.text || '').slice(0, 1500);
   const to = talen.taalVan(req.body.to); // elke actieve wereldtaal mag als doel
   const from = req.body.from || undefined; // translate valideert tegen het register
-  const ingelogd = /^Bearer\s+\S/i.test(req.get('authorization') || '');
+  // De beslissing staat in kern/aipoort.js, zodat hij beproefd kan worden zonder
+  // server en zonder AI-sleutel. Hier stond een regex op de HEADER, en die keurde
+  // "Bearer x" goed: een doorgeefluik naar de aanbieder zonder enig account.
+  const ingelogd = aiPoort.magAi(req);
   try {
     const out = await i18n.translate(text, to, from, { ai: ingelogd });
     res.json(out);

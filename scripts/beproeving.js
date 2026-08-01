@@ -899,7 +899,14 @@ async function misbruikBeproeving(tok) {
   for (const [naam, r] of [...perRol.entries()].sort((a, b) => b[1].n - a[1].n)) {
     const p = (x) => (100 * x / r.n).toFixed(1) + '%';
     rij('  ' + naam, p(r.ok) + ' / ' + p(r.c4xx) + ' / ' +       (r.c5xx ? '\x1b[31m' + p(r.c5xx) + '\x1b[0m' : p(r.c5xx)) + ' / ' + p(r.r429) + ' / ' + p(r.r503) + '  (' + nl(r.n) + ')');
+    const top = [...r.codes.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+    rij('    codes', top.map(([c, n]) => c + ': ' + p(n)).join('  '));
   }
+  /* De duiding hoort erbij, want dit is de regel waar je anders naar zit te
+     staren. 400 = invoer geweigerd (dat is de bedoeling van een fuzztest),
+     403 = rechten (de rol-scheiding werkt), 401 = niet ingelogd -- en dat
+     laatste hoort bij een levend token bijna nul te zijn. */
+  console.log('  \x1b[2m400 = rommel geweigerd (gezond) - 403 = rechten (gezond) - 401 = token dood (meetfout)\x1b[0m');
 
   /* ---- CPU, EVENT-LOOP, DATABASE ---- */
   const cpuUit = cpu.lees();

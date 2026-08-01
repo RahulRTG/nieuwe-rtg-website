@@ -711,7 +711,13 @@ async function misbruikBeproeving(tok) {
     else if (s === 503) { buckets.r503++; pe.r503++; pr.r503++; }
     else if (s === 429) { buckets.r429++; pe.r429++; pr.r429++; }
     else if (s >= 500) { buckets.s5xx++; pe.c5xx++; pr.c5xx++; vijfxx.set(r.pad, (vijfxx.get(r.pad) || 0) + 1); }
-    else if (s >= 400) { buckets.herleid4xx++; pe.c4xx++; pr.c4xx++; }
+    else if (s >= 400) {
+      buckets.herleid4xx++; pe.c4xx++; pr.c4xx++;
+      /* 401 bij de EIGEN rol betekent dat ons token is ingetrokken (de storm
+         kwam langs /api/logout). Bij een KRUIS is 401 juist het goede antwoord
+         en verversen we niets -- dan zouden we de rol-scheiding wegpoetsen. */
+      if (s === 401 && !kruis && rol !== 'open') versNu(rol);
+    }
     else { buckets.ok++; pe.ok++; pr.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.method + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
     await new Promise(res => setTimeout(res, 1 + rint(4)));
   }
@@ -767,6 +773,27 @@ async function misbruikBeproeving(tok) {
      Uitzonderen van /api/logout zou de test verzwakken (juist die route hoort
      gefuzzt te worden). Daarom worden de tokens tijdens de storm ververst. */
   let tokenVersingen = 0;
+  /* ---- VERVERSEN OP HET MOMENT DAT HET NODIG IS ----
+     De verversing per tien seconden hierboven was te traag: de codes lieten zien
+     dat member nog steeds 65% 401 kreeg, terwijl supplier (andere inlogroute,
+     andere sessie) er vrijwel geen had. Met twaalf werkers komt er binnen tien
+     seconden alweer iemand langs /api/logout, dus tussen twee verversingen ligt
+     de rol grotendeels plat.
+
+     Sneller pollen lost dat niet op, het verkleint alleen het gat. Dit wel: zodra
+     een rol een 401 krijgt, wordt hij METEEN ververst. De vlag voorkomt dat
+     twaalf werkers tegelijk gaan inloggen -- die stormloop zou de rem op de
+     inlogpaden raken en het probleem verergeren. */
+  const versBezig = new Set();
+  async function versNu(rol) {
+    if (versBezig.has(rol)) return;
+    versBezig.add(rol);
+    try {
+      const t = await tokens();
+      if (t[rol] && t[rol].length) { tokVoor[rol] = t[rol]; tokenVersingen++; }
+    } catch (e) { /* volgende 401 probeert het opnieuw */ }
+    finally { versBezig.delete(rol); }
+  }
   async function tokenVerser() {
     while (Date.now() < stormEind) {
       await new Promise(r => setTimeout(r, TOKEN_VERS_MS));

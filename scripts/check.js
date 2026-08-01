@@ -1329,5 +1329,159 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
   } catch (e) { fout('kon de configuratie niet nalopen: ' + e.message); }
 }
 
+/* 28) elke API-route heeft een poort, of staat met een reden op de publieke lijst.
+
+   DE KLASSE DIE DIT VANGT is de onzichtbaarste die er is: een route die je
+   vergeet te poorten geeft GEEN fout, geen log en geen kapotte pagina. Hij doet
+   het perfect, alleen ook voor mensen voor wie hij niet bedoeld is. Er is niets
+   dat er ooit over klaagt.
+
+   Een route telt als gepoort wanneer een van deze drie geldt:
+   1. er staat poort-middleware voor de handler (auth, supplierAuth, ...);
+   2. de handler roept zelf een poort-hulpje aan (profiel(req,res), rtfSociaal,
+      resolveSession, ...) -- dat patroon staat door de hele rtf-laag;
+   3. de handler kan zelf 401 of 403 antwoorden, en doet dus zijn eigen controle.
+
+   Punt 3 is een vormsignaal en dus zwakker dan de andere twee. Dat mag hier,
+   want dit is een AUDIT en geen autorisatie: het ergste wat een gemist signaal
+   doet, is een route onterecht op de publieke lijst laten belanden -- en die
+   lijst wordt door een mens gelezen. Het omgekeerde (een echte gat-route die
+   ongemerkt doorglipt) is wat we tegenhouden.
+
+   DRIE KEER MIS GEWEEST TIJDENS HET BOUWEN, en dat staat hier omdat het iets
+   zegt over hoe je zo'n lijst maakt:
+   - `express.json`, `rem` en `talenCache` staan ook voor een handler maar zijn
+     GEEN poort. Een regel die "er staat iets voor de handler" als bewijs neemt,
+     keurt 37 routes ten onrechte goed.
+   - `...lid` (een spread van `[auth, geenGast]`) werd gemist zolang ik alleen
+     naar kale namen keek.
+   - een handler als `teamOp((s, b) => ...)` heeft geen (req, res)-signatuur, en
+     mijn eerste knip zocht daarop -- dan viel `auth` buiten beeld.
+   Elke ronde werd de lijst kleiner. Wie hem uitbreidt: meten, niet gokken. */
+console.log('\n28) elke API-route heeft een poort (of staat met reden op de publieke lijst)');
+{
+  const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
+    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen']);
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess)\s*\(/;
+
+  /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
+     regel toevoegt schrijft er een reden bij die klopt; kun je dat niet, dan is
+     de route waarschijnlijk gewoon een gat. */
+  const PUBLIEK = new Map([
+    // ---- de deuren zelf: hier kan per definitie nog geen sessie zijn ----
+    ['/api/auth/register', 'registreren kan alleen zonder account'],
+    ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
+    ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
+    ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
+    ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],
+    ['/api/rtgid/start', 'de identiteitsstroom begint voordat er een sessie is'],
+    ['/api/sso/waarheen', 'de SSO-heenweg draagt zijn eigen ondertekende staat'],
+    ['/api/sso/start', 'idem; 404 op een onbekende of uitgezette koppeling'],
+    ['/api/kantoor/gesprek/start', 'het kantoorgesprek begint voor er een account is'],
+    ['/api/kantoor/gesprek/zeg', 'loopt verder op het gespreks-id dat bij de start is uitgegeven'],
+
+    // ---- publieke informatie: staat ook gewoon op de site ----
+    ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
+    ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
+    ['/api/gids/app', 'de app-gids is openbaar'],
+    ['/api/krant/gids', 'de krant is openbaar; er is een toets die dat vastlegt'],
+    ['/api/krant/open', 'idem'],
+    ['/api/krant/artikel', 'idem'],
+    ['/api/partner', 'het partnerkanaal is bedoeld voor niet-leden'],
+    ['/api/partnertrips', 'idem: het aanbod van het partnerkanaal'],
+    ['/api/book', 'idem: boeken via het partnerkanaal is de hele opzet'],
+    ['/api/talen', 'de talenlijst voedt de kiezer op het inlogscherm'],
+    ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
+    ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
+    ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
+    ['/api/zegel/sleutel', 'idem: de publieke helft van het zegel'],
+    ['/api/zegel/controleer', 'controleert een handtekening; het bewijs zit in het verzoek'],
+    ['/api/ice', 'ijs-servers voor WebRTC; geen gegevens, wel een rem'],
+    /* Bewust, en met een gemeten grens: de PDA-inlog toont eerst de namenlijst
+       zodat personeel zichzelf kan aanwijzen. Zie de rem in toegang.js: dertig
+       zaken per kwartier per ip, ruim voor wie van bedrijf wisselt en te weinig
+       om alle partners leeg te trekken. */
+    ['/api/supplier/roster', 'de PDA-inlog toont de namenlijst voor de pincode; met een eigen rem'],
+
+    // ---- machine naar machine, met een eigen bewijs in het verzoek ----
+    ['/api/betaal/webhook', 'ondertekend door de betaalprovider; een sessie bestaat hier niet'],
+    ['/api/munt/webhook', 'idem, met een eigen webhook-secret'],
+    ['/api/cluster/:actie', 'de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet'],
+    ['/api/werkmail/bezorg', 'inkomende post van de mailserver, met een eigen venster-rem per minuut'],
+    ['/api/stad/doos/hartslag', 'de stadsdoos stuurt zijn apparaatsleutel mee'],
+    ['/api/stad/doos/meting', 'idem'],
+    ['/api/rtgid/status', 'RTG iD draagt zijn bewijs als idToken in het LIJF, niet als sessie'],
+    ['/api/rtgid/wie', 'idem; de kluis geeft alleen attributen op een geldig idToken'],
+    ['/api/vracht/volg', 'volgen op een meegestuurde vrachtcode, zoals elke track-and-trace'],
+
+    // ---- gezondheid: moet juist bereikbaar zijn als de rest dat niet is ----
+    ['/api/health', 'de gezondheidscheck'],
+    ['/api/ready', 'de load balancer moet dit kunnen lezen terwijl de opslagpoort dicht staat'],
+    ['/api/pay/gezond', 'idem voor de betaallaag'],
+
+    // ---- de lesmaker: werkt op een meegestuurd profiel, niet op een sessie ----
+    ['/api/les/maak', 'de lesmaker werkt op een meegestuurd profiel'],
+    ['/api/les/leraar', 'idem'], ['/api/les/apps', 'idem'], ['/api/les/volgende', 'idem'],
+    ['/api/les/sluit', 'idem'], ['/api/les/mee', 'idem'], ['/api/les/kijk', 'idem'],
+    ['/api/les/antwoord', 'idem'],
+
+    // ---- bestaan alleen in NODE_ENV=test ----
+    ['/api/test/bug', 'alleen geregistreerd als NODE_ENV=test; bestaat in productie niet'],
+    ['/api/test/crash', 'idem']
+  ]);
+
+  let gaten = 0, viaMw = 0, viaBinnen = 0, totaal = 0;
+  /* DE STAART NIET MEE-MATCHEN. Hier stond ([\s\S]{0,800}) in het patroon zelf,
+     en dat CONSUMEERT die 800 tekens: exec() zoekt daarna verder voorbij de
+     staart en slaat elke route over die er binnen valt. Uitkomst: 709 van de
+     ~1900 routes bekeken, en netjes "alles in orde" gemeld. Een regel die een
+     fractie ziet en volledigheid suggereert is precies wat deze regel moet
+     tegenhouden -- gevonden doordat een mutatie NIET beet (LAT.md regel 2). */
+  const RE = /app\.(get|post|put|delete|patch)\(\s*['"](\/api\/[^'"]*)['"]\s*,/g;
+  const gezien = new Set();        // publieke paden die de lijst echt nodig hadden
+  const bestaat = new Set();       // alle /api-paden die we tegenkwamen
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    let m;
+    while ((m = RE.exec(bron))) {
+      totaal++;
+      const pad = m[2];
+      const staart = bron.slice(m.index + m[0].length, m.index + m[0].length + 800);
+      bestaat.add(pad);
+      const knip = staart.search(/=>|function\s*\(/);
+      const voor = knip > 0 ? staart.slice(0, knip) : staart.slice(0, 80);
+      if ([...voor.matchAll(/([A-Za-z_$][\w$]*)/g)].some(x => POORT_MW.has(x[1]))) { viaMw++; continue; }
+      /* EERST TE SLIM GEWEEST. Hier stond ook een heuristiek op "staat er
+         idToken/token/sleutel/code in het lijf" als bewijs van een poort. Dat
+         keurde meteen een handvol routes goed die alleen een BEDRIJFSCODE uit
+         de body lezen -- en dat is geen geloofsbrief. Valse goedkeuring is de
+         gevaarlijke richting bij deze regel: een gemiste melding is stil.
+         Routes die hun bewijs echt in het lijf dragen (RTG iD met een idToken)
+         staan nu bij naam op de publieke lijst, met die reden erbij. */
+      if (POORT_BINNEN.test(staart) || /\b(401|403)\b/.test(staart)) { viaBinnen++; continue; }
+      if (PUBLIEK.has(pad)) { gezien.add(pad); continue; }
+      gaten++;
+      fout(path.relative(ROOT, f) + ': ' + pad + ' heeft geen poort en staat niet op de publieke lijst' +
+        ' -- zet er een poortwachter voor, of neem hem met een REDEN op in PUBLIEK (check.js regel 28)');
+    }
+  });
+  /* Een publieke lijst die namen bevat die niet meer bestaan, groeit stil vol en
+     verliest zijn betekenis. Dit is dezelfde controle als regel 25b. */
+  for (const pad of PUBLIEK.keys()) {
+    if (gezien.has(pad)) continue;
+    gaten++;
+    /* Twee heel verschillende gevallen, en ze verwarren zou de lijst juist
+       stiller maken. Bestaat de route nog wel, dan heeft hij inmiddels een
+       eigen poort en is de uitzondering overbodig geworden -- dat is goed
+       nieuws, maar de regel hoort weg. Bestaat hij niet meer, dan groeit de
+       lijst vol met namen die niets meer betekenen. */
+    fout(bestaat.has(pad)
+      ? 'check.js regel 28: ' + pad + ' staat op de publieke lijst maar heeft inmiddels een eigen poort -- haal de uitzondering weg'
+      : 'check.js regel 28: ' + pad + ' staat op de publieke lijst maar bestaat niet (meer) als route');
+  }
+  if (!gaten) ok(totaal + ' API-routes: ' + viaMw + ' via een poortwachter, ' + viaBinnen +
+    ' met een poort in de handler, ' + PUBLIEK.size + ' bewust publiek met een reden');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

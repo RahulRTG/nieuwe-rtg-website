@@ -6,42 +6,10 @@ module.exports = (actx) => {
   const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
     fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
     werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = actx;
-/* Fluister voor de vloer: dezelfde persoonlijke assistent, met een eigen
-   geheugen per personeelslid (nooit gedeeld met de werkgever). */
-const staffKey = req => 'staff:' + req.supplier.code + ':' + req.actor.staffId;
-app.post('/api/staff/fluister', supplierAuth, async (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const r = await fluisterZeg(staffKey(req), req.actor.name, req.body.q);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  /* Rahul aan het stuur op de PDA: pakten de eigen regels het gesprek niet
-     op (pakte=false), dan mag hij het alsnog echt doen; alles wat dit
-     personeelslid zelf op de PDA kan, met dezelfde inlog. Zonder
-     AI-sleutel verandert er niets. */
-  if (stuurLus && !r.pakte) {
-    const lus = await stuurLus(req, {
-      vraag: req.body.q,
-      filter: p => p.startsWith('/api/staff'),
-      systeem: require('../../kern/rahul').RAHUL_LEAD +
-        'Je helpt ' + req.actor.name + ' (personeel, PDA) bij ' + req.supplier.name + ' (' + req.supplier.type + ').'
-    });
-    if (lus && lus.tekst) return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
-  }
-  res.json(r);
-});
-app.post('/api/staff/fluister/profiel', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  res.json(fluisterProfiel(staffKey(req)));
-});
-app.post('/api/staff/fluister/vergeet', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const r = fluisterVergeet(staffKey(req), req.body.wat);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-app.post('/api/staff/fluister/focus', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  res.json(fluisterFocus(staffKey(req), req.body.scores));
-});
+/* Fluister voor de vloer staat in ./dienst-fluister.js: dat stuk praat met een
+   modelaanbieder en de rest van deze laag niet, dus de vraag wat er naar buiten
+   gaat hoort daar bij elkaar. */
+require('./dienst-fluister')({ app, accounts, supplierAuth, fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus });
 
 app.post('/api/staff/clock', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });

@@ -44,9 +44,27 @@ module.exports = (ctx) => {
       ...(geloofRegel ? [geloofRegel(key)].filter(Boolean) : []),
       ...(omgang ? [omgang] : []),
       'Je bent de frictieloze rechterhand van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay), verwijs daarnaar, vraag nooit om betaalgegevens.',
-      'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig je kort dat het geregeld is en noem je wat je vervolgens in de gaten houdt.',
+      /* HIER STOND EEN INSTRUCTIE OM TE LIEGEN.
+
+         Er stond letterlijk: 'dan bevestig je kort dat het geregeld is'. Op een
+         kale "ja" gebeurt er niets -- de prompt is een gesprek, geen uitvoering
+         -- dus dit droeg Rahul op te melden dat iets verwerkt was terwijl er
+         geen boeking, geen betaling en geen bericht de deur uit ging. Dat is
+         precies wat de merkregel verbiedt: nooit claimen dat een boeking
+         daadwerkelijk verwerkt is. Een lid dat daarop vertrouwt staat straks
+         voor een gesloten deur, en het is onze zin die hem daar bracht.
+
+         Wat blijft: een "ja" hoort een KORT en CONCREET vervolg te krijgen.
+         Alleen niet de mededeling dat het al klaar is. */
+      'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig je kort wat je NU in gang zet en waar het daarna ligt. Zeg nooit dat iets al geregeld, geboekt, bevestigd of betaald is: alleen wat je zelf hebt uitgevoerd en teruggekregen mag je als gedaan melden. Alles wat bij een mens, een partner of een betaling ligt, noem je als doorgezet, met wie of wat het oppakt en wanneer het lid iets hoort.',
       'Je helpt het lid met reisvoorbereiding: paklijsten, documenten en visa, weer, dagplanning, restaurants en wijzigingen aan geboekte diensten. ' + taalRegel,
-      `Het lid: ${persona.full} (${tier === 'rtg' ? 'RTG Pass' : tier === 'lifestyle' ? 'Lifestyle Pass' : 'Business Pass'}), lid sinds ${persona.since}.`,
+      /* De CODENAAM, niet de volledige naam. Klantdata draait in dit huis op
+         codenamen; de echte naam ligt in de gescheiden kluis. Deze regel gaat
+         woordelijk naar de modelaanbieder, dus dit is precies de plek waar dat
+         ontwerp telt. /api/fluister doet het aan de ledenkant al goed
+         (routes/member/persoonlijk.js geeft liveCodename mee); hier stond nog
+         persona.full. Dezelfde tabel draagt de codenaam al. */
+      `Het lid: ${persona.codename || persona.name} (${tier === 'rtg' ? 'RTG Pass' : tier === 'lifestyle' ? 'Lifestyle Pass' : 'Business Pass'}), lid sinds ${persona.since}.`,
       `Komende reis: ${trip.dest}, ${trip.dates} (over ${trip.days} dagen). Geboekte diensten: ${trip.items.map(i => `${i.title} [${i.label}]`).join('; ')}.`,
       openInvoices.length
         ? `Openstaande betalingen: ${openInvoices.map(i => `${i.desc} (€ ${i.netto + i.bijdrage})`).join('; ')}. Wijs daar alleen op als het relevant is.`

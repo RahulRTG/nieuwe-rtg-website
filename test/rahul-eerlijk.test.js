@@ -17,6 +17,10 @@ const aiVerhaal = () => lees('server/kern/ai/prompt.js') + '\n' + lees('server/k
 // eigenlijke Claude-lus (met het doctrine-prompt) in de submodule stuur/lus.js.
 // We lezen beide, zodat de bewaking klopt waar de doctrine ook precies leeft.
 const stuurLus = () => lees('server/kern/stuur.js') + '\n' + lees('server/kern/stuur/lus.js');
+/* Alleen de CODE, zonder het commentaar eromheen. Dit huis legt in commentaar
+   uit wat er vroeger fout stond -- dat hoort er te staan -- maar een bewaking
+   die op de uitleg aanslaat meet de verkeerde helft. */
+const codeVan = p => lees(p).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 test('het gedeelde karakter draagt de doctrine, met de concrete gedragsregels', () => {
   const { RAHUL_LEAD } = require('../server/kern/rahul');
@@ -95,7 +99,72 @@ test('de vertrouwelijkheid: de AI maakt nooit bedrijfsgeheimen openbaar, in elke
 test('elke gespreks-assistent begint met het gedeelde karakter (RAHUL_LEAD)', () => {
   // rahulLeadVoor IS het gedeelde karakter, aangevuld met de omgangsvormen
   // voor het lid (kern/rahul.js); beide vormen dragen dezelfde vaste kern.
+  /* De personeelskant stond in routes/staff/dienst.js en is verhuisd naar
+     ./dienst-fluister.js toen dat bestand de 10 KB passeerde. Deze test viel
+     daar terecht over -- een pad dat niet meer klopt is precies wat hij hoort
+     te merken. Let op de keerzijde: was het naar een bestand verhuisd waar de
+     tekst toevallig al in stond, dan was hij stil blijven slagen. */
   for (const p of ['server/routes/supplier/ai/index.js', 'server/routes/member/persoonlijk.js',
-    'server/routes/staff/dienst.js', 'server/routes/techniek/boardroom/ai.js', 'server/kern/fluister/gesprek.js'])
+    'server/routes/staff/dienst-fluister.js', 'server/routes/techniek/boardroom/ai.js', 'server/kern/fluister/gesprek.js'])
     assert.match(lees(p), /RAHUL_LEAD|rahulLeadVoor/, p + ' gebruikt het gedeelde karakter');
+});
+
+/* ============================================================================
+   DE PROMPT DROEG RAHUL OP OM TE LIEGEN.
+
+   Er stond letterlijk: 'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig
+   je kort dat het geregeld is'. Op een kale "ja" gebeurt er niets -- een gesprek
+   is geen uitvoering -- dus deze zin liet Rahul melden dat iets verwerkt was
+   terwijl er geen boeking, geen betaling en geen bericht de deur uit ging.
+
+   Dat is niet een ongelukkige formulering maar een schending van de merkregel
+   die letterlijk zegt: nooit claimen dat een boeking daadwerkelijk verwerkt is.
+   Wrang detail: de doctrine hierboven ("belooft niets wat je niet zeker weet")
+   stond er al, en werd door de instructie zelf tegengesproken. De hele bewaking
+   in dit bestand keek naar het karakter en niet naar de opdrachten eronder.
+   ========================================================================== */
+test('de prompt draagt Rahul nooit op te zeggen dat iets al geregeld is', () => {
+  const p = lees('server/kern/ai/prompt.js');
+  // de zinnen die de AI aansturen, zonder het commentaar eromheen
+  const instructies = p.split('\n').filter(r => /^\s*'/.test(r) || /^\s*`/.test(r)).join('\n');
+  assert.doesNotMatch(instructies, /bevestig je kort dat het geregeld is/i,
+    'de oude instructie is weg');
+  assert.match(instructies, /Zeg nooit dat iets al geregeld, geboekt, bevestigd of betaald is/i,
+    'en er staat expliciet dat hij dat NIET mag zeggen');
+  assert.match(instructies, /alleen wat je zelf hebt uitgevoerd en teruggekregen/i,
+    'met de grens erbij: alleen wat echt is uitgevoerd telt als gedaan');
+});
+
+/* Klantdata draait op codenamen; de echte naam ligt in de gescheiden kluis. De
+   system prompt gaat woordelijk naar de modelaanbieder, dus dat is precies de
+   plek waar dat ontwerp telt -- en juist daar stond persona.full. */
+test('de leden-prompt noemt de codenaam, niet de volledige naam', () => {
+  const p = codeVan('server/kern/ai/prompt.js');
+  assert.doesNotMatch(p, /\$\{persona\.full\}/, 'de volledige naam gaat niet meer de prompt in');
+  assert.match(p, /persona\.codename/, 'de codenaam wel');
+});
+
+/* De personeelskant deed hetzelfde met req.actor.name -- en die naam komt bij
+   de zelfaanmelding uit accounts.realNameOf(), dus rechtstreeks uit de kluis. */
+test('de personeels-assistent noemt een werk-aanduiding, niet de naam', () => {
+  const p = codeVan('server/routes/staff/dienst-fluister.js');
+  assert.doesNotMatch(p, /req\.actor\.name/, 'de persoonsnaam gaat niet naar de modelaanbieder');
+  assert.match(p, /werkNaam\(req\)/, 'er gaat een werk-aanduiding mee');
+});
+
+/* Lifestyle en Business komen uitsluitend na een menselijke beoordeling; de AI
+   mag toegang nooit zelf verlenen. Het stuur hangt aan de sessie van de beller,
+   en officeAuth laat de eigenaar met zijn eigen accountlogin door -- dus zonder
+   deze regel kende "Rahul, keur de wachtrij even goed" passen toe zonder dat
+   iemand per geval had gekeken. */
+test('het AI-stuur komt niet bij het pas-besluit', () => {
+  const { VERBODEN } = require('../server/kern/stuur');
+  const lijst = VERBODEN || require('../server/kern/stuur').VERBODEN;
+  if (lijst) {
+    assert.ok(lijst.some(re => re.test('/api/aanmelding/beslis')), 'aanmelding/beslis staat op de verbodslijst');
+  } else {
+    // de lijst is niet geexporteerd; dan toetsen we de bron
+    assert.match(lees('server/kern/stuur.js'), /\/\^\\\/api\\\/aanmelding\\\//,
+      'aanmelding staat op de VERBODEN-lijst in kern/stuur.js');
+  }
 });

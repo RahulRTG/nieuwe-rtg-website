@@ -26,6 +26,18 @@ const VERBODEN = [
   /^\/api\/boardroom\//,   // idem: de eigenaarskast
   /^\/api\/doos\//,        // de zaakdoos (lokale sleutels)
   /^\/api\/office\/login$/,
+  /* HET PAS-BESLUIT IS MENSENWERK, EN DAT IS EEN MERKREGEL.
+
+     Lifestyle en Business komen uitsluitend na een menselijke beoordeling; de
+     AI mag toegang nooit zelf beloven of verlenen. /api/aanmelding/beslis zit
+     achter officeAuth, en het stuur hangt aan auth en supplierAuth -- een lid
+     of een medewerker kwam er dus al niet bij. Maar officeAuth laat ook de
+     EIGENAAR met zijn eigen accountlogin door, en /api/member/doe draait op
+     precies dat token. "Rahul, keur de wachtrij even goed" kende dus passen
+     toe zonder dat een mens per geval had gekeken -- en dat een mens de zin
+     uitsprak is niet hetzelfde als dat een mens de aanvraag beoordeelde. Dat
+     verschil IS de regel. */
+  /^\/api\/aanmelding\//,
   /\/doe$/                 // het stuur zelf: geen rondzingen
 ];
 // paden die over geld gaan: eerst een voorstel, dan pas doen (na bevestiging).

@@ -104,7 +104,14 @@ process.on('unhandledRejection', reason => {
 process.on('uncaughtException', err => {
   log.uitzondering(err, { bron: 'uncaughtException', fataal: true });
   try { save(); } catch (e) {}
-  setTimeout(() => process.exit(1), 200).unref();
+  /* De 200 ms zijn er zodat het log nog wegkomt. Deze timer stond .unref(), en
+     dat is het tegenovergestelde van wat hier moet gebeuren: een unref'd timer
+     houdt het proces niet wakker. In de praktijk viel dat nooit op, want een
+     draaiende server heeft handles zat -- maar het is een val die openligt: was
+     dit ooit de laatste handle, dan viel het proces ervoor al om, met exitcode
+     0, en een crash die zich voordoet als een nette afsluiting wordt door geen
+     enkele proces-manager herstart. Hij houdt het proces nu die 200 ms vast. */
+  setTimeout(() => process.exit(1), 200);
 });
 
 function appUrl(req) {
@@ -3369,6 +3376,28 @@ if (PRODUCTION) {
   if (DEMO) console.warn('[start] LET OP: de demo-inlog (universeel account) is AAN in productie (RTG_DEMO=1). Zet hem uit voor een echte lancering.');
   if (!process.env.SMTP_URL) console.warn('[start] LET OP: geen SMTP_URL; e-mail gaat naar de outbox in plaats van naar klanten.');
   if (!process.env.ANTHROPIC_API_KEY) console.warn('[start] Info: geen ANTHROPIC_API_KEY; AI en chatvertaling draaien in demo-stand.');
+  /* HET EIGENAARSACCOUNT: alleen zeggen als het ECHT ergens over gaat.
+
+     Sinds de registratie op het eigenaarsadres een eenmalige sleutel vraagt
+     (RTG_OWNER_BOOTSTRAP, zie routes/auth/account.js) is er een stand waarin
+     niemand ooit nog eigenaar kan worden: geen account op dat adres én geen
+     sleutel gezet. Dan hoort er iets te staan.
+
+     Ik had die controle eerst in config.valideer() gezet, en dat was fout:
+     die kent alleen de omgeving, niet de database. Hij waarschuwde dus zodra
+     de sleutel ontbrak -- terwijl de normale eindstand juist IS dat hij weg
+     is (dat staat in dezelfde waarschuwing). Een melding die in het gewone
+     geval afgaat leert iedereen hem weg te kijken. Hier kunnen we de vraag
+     wél beantwoorden, want de accounts zijn geladen. */
+  try {
+    const oAdres = eigenaar.eigenaarEmail();
+    const oBestaat = !!accounts.findByLogin(oAdres);
+    if (!oBestaat && !process.env.RTG_OWNER_BOOTSTRAP)
+      console.warn('[start] LET OP: er is nog geen account op het eigenaarsadres (' + oAdres +
+        ') en RTG_OWNER_BOOTSTRAP is niet gezet. Niemand kan zich nu als eigenaar registreren. Zet de sleutel, registreer een keer, en haal hem daarna weg.');
+    if (oBestaat && process.env.RTG_OWNER_BOOTSTRAP)
+      console.warn('[start] LET OP: RTG_OWNER_BOOTSTRAP staat nog gezet terwijl het eigenaarsaccount al bestaat. Haal hem uit de omgeving; hij heeft geen doel meer.');
+  } catch (e) {}
 }
 
 const PORT = process.env.PORT || 3000;
@@ -3403,6 +3432,40 @@ function gestart() {
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 }
 const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
+/* EEN BEZETTE POORT IS EEN STARTFOUT, GEEN SERVERFOUT.
+
+   app.listen meldt een mislukking (EADDRINUSE als de poort bezet is, EACCES
+   onder 1024 zonder rechten) via een 'error'-gebeurtenis op de server. Er
+   luisterde niemand, dus viel hij door naar het uncaughtException-vangnet.
+
+   Het proces STOPTE daar wel netjes op, met exitcode 1 -- ik had eerst
+   opgeschreven dat het bleef hangen, en dat was niet waar; nagemeten doet de
+   oude code precies wat hij hoort te doen. Wat er wel misging zit in de
+   BENOEMING. De regel die er dan in het log verschijnt draagt
+   "bron":"uncaughtException" en "fataal":true, en test/helper.js rekent
+   uitgerekend dat patroon af als een serverfout die de hele testrun laat
+   falen. De helper legt in zijn eigen commentaar uit dat een poort-race
+   voorkomt en dat hij daarom opnieuw probeert -- maar de geslaagde herkansing
+   nam de valse "server-uitzondering" niet meer weg. Een testrun kon zo rood
+   worden door een poortbotsing die keurig was opgevangen.
+
+   Een startfout hoort ook een startfout te heten. Deze luisteraar noemt hem bij
+   naam ("poort ... is al in gebruik") onder bron "listen", en stopt meteen met
+   een foutcode zodat een proces-manager ons herstart.
+
+   Meegenomen in hetzelfde stuk: de exit-timer in het uncaughtException-vangnet
+   stond .unref() -- zie de uitleg daar. */
+server.on('error', (err) => {
+  const waar = (HOST || '0.0.0.0') + ':' + PORT;
+  const uitleg = err && err.code === 'EADDRINUSE'
+    ? 'poort ' + waar + ' is al in gebruik -- draait er al een RTG-server?'
+    : (err && err.code === 'EACCES'
+      ? 'geen rechten om op ' + waar + ' te luisteren (poorten onder 1024 vragen root of CAP_NET_BIND_SERVICE)'
+      : 'kon niet op ' + waar + ' luisteren: ' + (err && err.message));
+  console.error('[start] ' + uitleg);
+  try { log.uitzondering(err instanceof Error ? err : new Error(String(err)), { bron: 'listen', fataal: true }); } catch (e) {}
+  process.exit(1);
+});
 // Eigen STUN-server (RFC 5389) voor (video)bellen: geen leun meer op de publieke
 // STUN van Google. Draait op UDP (STUN_PORT, standaard 3478); STUN_UIT=1 zet uit.
 // De socket is unref'd, dus dit houdt het afsluiten nooit tegen.

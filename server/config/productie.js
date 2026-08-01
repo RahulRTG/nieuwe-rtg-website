@@ -85,10 +85,14 @@ function keur(env, fouten, waarschuwingen) {
     if (env.DATABASE_URL && (env.RTG_MEDIA_BACKEND || '').toLowerCase() !== 's3')
       waarschuwingen.push('RTG_MEDIA_BACKEND niet op "s3": Salon-foto\'s en snaps staan op de lokale schijf en worden niet tussen instances gedeeld. Zet S3-compatibele opslag (RTG_MEDIA_S3_*) of gebruik een gedeeld volume.');
     if (!env.SENTRY_DSN) waarschuwingen.push('SENTRY_DSN niet gezet: geen EXTERNE fout-tracking (de eigen in-memory fout-aggregatie op het techniekbord draait altijd).');
-    // Eenmalige sleutel waarmee de EERSTE eigenaar zijn account claimt; zonder hem
-    // weigert de registratie dat adres. Bestaat het account al, dan hoort hij weg.
-    if (!env.RTG_OWNER_BOOTSTRAP)
-      waarschuwingen.push('RTG_OWNER_BOOTSTRAP niet gezet: als er nog GEEN account op het eigenaarsadres bestaat, is er geen manier meer om er een te maken. Bestaat het account al, dan hoort deze sleutel juist weg.');
+    /* RTG_OWNER_BOOTSTRAP staat BEWUST niet in deze lijst. De eenmalige sleutel
+       waarmee de eerste eigenaar zijn account claimt hoort weg zodra dat account
+       bestaat -- dat is de normale eindstand. Hier waarschuwen zodra hij ontbreekt
+       betekende dus: waarschuwen bij elke gezonde productiestart, en een melding
+       die altijd afgaat leert iedereen hem weg te kijken. De vraag die er wél toe
+       doet (bestaat dat account al?) valt hier ook niet te beantwoorden: deze
+       functie kent alleen de omgeving, niet de database. Die controle staat nu in
+       server.js, na load(), waar hij het antwoord echt weet. */
     if (!env.OFFICE_TOTP_SECRET) waarschuwingen.push('OFFICE_TOTP_SECRET niet gezet: de backoffice heeft geen tweede factor (2FA). Sterk aangeraden: zet een base32-geheim en koppel een authenticator-app.');
     if (!env.SMTP_URL && !env.SMTP_HOST) waarschuwingen.push('Geen SMTP ingesteld: e-mail (herstel-links, bevestigingen) wordt niet echt verstuurd.');
     /* FOUT en geen waarschuwing: zonder sleutel draait de demo-provider, die

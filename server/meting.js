@@ -41,6 +41,9 @@ const staat = {
   open: 0
 };
 
+// de event-loop-vertraging: eigen bestand, zie de kop daar waarom
+const { lusVertraging, lusWis } = require('./meting-lus');
+
 /* Onbekende paden vallen samen op een enkele noemer. Zonder dit zou een
    scanner die duizend niet-bestaande adressen probeert, duizend tijdreeksen
    aanmaken -- precies de aanval waar punt 1 hierboven over gaat. */
@@ -98,6 +101,18 @@ function tekst() {
   r.push('# HELP rtg_verzoeken_open Verzoeken die nu in behandeling zijn.');
   r.push('# TYPE rtg_verzoeken_open gauge');
   r.push('rtg_verzoeken_open ' + staat.open);
+  /* De event-loop-vertraging. Staat hier BEWUST als aparte reeks en niet
+     verstopt in de duur-histogrammen: een route die traag lijkt omdat de lus
+     vaststaat, is een heel ander probleem dan een route die zelf traag is, en
+     op het bord horen die uit elkaar te blijven. Ontbreekt de meter, dan staat
+     er niets -- geen nul, want nul zou een meetwaarde zijn. */
+  const lv = lusVertraging();
+  if (lv) {
+    r.push('# HELP rtg_eventloop_vertraging_seconden Hoeveel later de event-loop draaide dan afgesproken.');
+    r.push('# TYPE rtg_eventloop_vertraging_seconden gauge');
+    for (const [naam, waarde] of [['gemiddeld', lv.gemiddeld], ['p50', lv.p50], ['p99', lv.p99], ['max', lv.max]])
+      r.push('rtg_eventloop_vertraging_seconden{soort="' + naam + '"} ' + (waarde / 1000).toFixed(6));
+  }
 
   r.push('# HELP rtg_verzoeken_totaal Afgehandelde verzoeken per route en statusklasse.');
   r.push('# TYPE rtg_verzoeken_totaal counter');
@@ -146,7 +161,9 @@ function samenvatting() {
     foutpercentage: totaal ? Number((fout5xx / totaal * 100).toFixed(3)) : 0,
     gemiddeldeDuurMs: aantal ? Number((som / aantal * 1000).toFixed(2)) : 0,
     reeksen: staat.verzoeken.size + staat.duur.size,
-    open: staat.open
+    open: staat.open,
+    // null als er niet gemeten kan worden; zie lusVertraging()
+    eventLoopMs: lusVertraging()
   };
 }
 
@@ -155,4 +172,5 @@ function wis() {
   staat.open = 0; staat.gestart = Date.now();
 }
 
-module.exports = { middleware, telVerzoek, telFout, tekst, samenvatting, wis, EMMERS, statusKlasse };
+module.exports = { middleware, telVerzoek, telFout, tekst, samenvatting, wis, EMMERS, statusKlasse,
+  lusVertraging, lusWis };

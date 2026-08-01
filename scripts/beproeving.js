@@ -75,6 +75,9 @@ const verhalen = require('./verhalen');
 /* CPU, event-loop, database en het herstel na de storm. Eigen module: dit
    harnas stond al op 58 kB en die meters hebben elk hun eigen uitleg nodig. */
 const belasting = require('./lib/belasting');
+/* De hardere rol-scheidingsproef: lekkende weigeringen en half uitgevoerde
+   schrijfacties. Zie de kop daar waarom "geen 2xx" niet genoeg is. */
+const rolproef = require('./lib/rolproef');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -867,6 +870,30 @@ async function misbruikBeproeving(tok) {
   if (herstel.statussen && herstel.statussen.length)
     rij('  antwoorden tijdens het herstel', herstel.statussen.map(([st, n]) => st + ' x' + n).join(', '));
 
+  /* ---------- FASE E3: ROL-SCHEIDING, HARDER ----------
+     "0% verkeerde-rol-2xx" is een ondergrens en geen bewijs. Zie de kop van
+     ./lib/rolproef.js: een 4xx kan gegevens meegeven, een handler kan schrijven
+     voordat hij de rechten controleert, en rommel-invoer wordt door de validatie
+     geweigerd VOORDAT de autorisatie aan de beurt is. Deze proef stuurt daarom
+     plausibele invoer en kijkt naar het lijf en naar de blijvende toestand. */
+  kop('FASE E3: ROL-SCHEIDING - lekt de weigering, en blijft de toestand echt gelijk?');
+  const rp = await rolproef.draaiRolproef({
+    post: (pad, lijf, tk) => verzoek('POST', pad, tk, lijf),
+    routes, tokensVoor: () => ({
+      member: rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office),
+      supplier: rkeuze(tokVoor.supplier.length ? tokVoor.supplier : tokVoor.office),
+      office: rkeuze(tokVoor.office.length ? tokVoor.office : tokVoor.member)
+    }),
+    maxPerRol: Number(process.env.ROLPROEF_MAX || 900)
+  });
+  rij('schrijfpogingen met een verkeerde rol', nl(rp.pogingen) + ' \x1b[2m(plausibele invoer, niet de rommel uit de gauntlet)\x1b[0m');
+  rij('  daarvan 2xx (mag nooit)', rp.bevindingen.tweexx.length ? '\x1b[31m' + rp.bevindingen.tweexx.length + '\x1b[0m' : '\x1b[32m0\x1b[0m');
+  for (const t of rp.bevindingen.tweexx.slice(0, 6)) rij('    ' + t, '');
+  rij('  weigeringen die gegevens meegaven', rp.bevindingen.lekken.length ? '\x1b[31m' + rp.bevindingen.lekken.length + '\x1b[0m' : '\x1b[32m0\x1b[0m');
+  for (const l of rp.bevindingen.lekken.slice(0, 6)) rij('    ' + l.slice(0, 100), '');
+  rij('  blijvende wijzigingen na afloop', rp.bevindingen.gewijzigd.length ? '\x1b[31m' + rp.bevindingen.gewijzigd.join(', ') + '\x1b[0m' : '\x1b[32mgeen\x1b[0m');
+  rij('  gemeten toestand', JSON.stringify(rp.voor));
+
   // ---------- FASE F: GEHEUGEN (lek-vloer over identieke lees-rondes) ----------
   kop('FASE F: GEHEUGEN - lek-vloer over identieke lees-rondes');
   const leesPaden = [
@@ -1004,6 +1031,10 @@ async function misbruikBeproeving(tok) {
   v('SCHAKELKAST', kastOpen, kastOpen ? 'elke functie stond aan tijdens de hele run'
     : 'de hendel ging niet over (status ' + aan + '): de run draaide tegen de standaardstand');
   v('ROBUUSTHEID', buckets.s5xx === 0, buckets.s5xx + ' onverwachte serverfouten');
+  v('ROL-LEK', rp.bevindingen.lekken.length === 0 && rp.bevindingen.gewijzigd.length === 0 && rp.bevindingen.tweexx.length === 0,
+    rp.bevindingen.lekken.length || rp.bevindingen.gewijzigd.length || rp.bevindingen.tweexx.length
+      ? rp.bevindingen.tweexx.length + ' x 2xx, ' + rp.bevindingen.lekken.length + ' lekkende weigering(en), ' + rp.bevindingen.gewijzigd.length + ' blijvende wijziging(en)'
+      : nl(rp.pogingen) + ' schrijfpogingen met een verkeerde rol: geen 2xx, geen gegevens in de weigering, geen blijvende wijziging');
   v('ROL-SCHEIDING', rolLek.length === 0, rolLek.length ? rolLek.slice(0, 8).join(', ') : 'geen verkeerd-rol token kreeg 2xx');
   v('DEKKING', onbereikt.length === 0, onbereikt.length + ' endpoints te weinig geraakt' + (onbereikt.length ? ': ' + onbereikt.slice(0, 6).map(e => e[0]).join(', ') : ''));
   v('GELD', geld.fouten.length === 0, geld.fouten.length ? geld.fouten.join(' | ') : 'op de cent, idempotent, onzin geweigerd');

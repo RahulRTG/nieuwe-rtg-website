@@ -423,3 +423,84 @@ test('muntbetaling aan een leverancier kent dezelfde bovengrens als een gewone',
   assert.equal(goed.status, 200, 'een gewoon bedrag gaat gewoon door');
   assert.equal(nep.db.data.directOntvangsten.KIKUNOI.som, 5000);
 });
+
+/* ---------- 11. de technische pagina: rem en gelijk antwoord ---------- */
+test('techniek-inlog: een juist wachtwoord zonder rechten geeft hetzelfde antwoord als een fout wachtwoord', async () => {
+  /* Er stond 401 "Onjuiste inloggegevens" bij een fout wachtwoord en 403 met een
+     eigen tekst bij een JUIST wachtwoord zonder recht op deze pagina. Dat verschil
+     is een orakel: wie het ziet weet dat het wachtwoord klopte -- en dat wachtwoord
+     opent elders in het huis wel deuren. */
+  const u = Date.now().toString(36) + 'tq';
+  const wachtwoord = 'geheim123';
+  const reg = await api('/api/auth/register', { name: 'Techniek Proef', email: 'tq' + u + '@x.nl',
+    phone: '067' + u.slice(0, 7), password: wachtwoord, geboortedatum: '1990-02-02', tier: 'rtg', pasApp: 'rtg' });
+  assert.ok(reg.body.token, 'het proefaccount bestaat');
+
+  const fout = await api('/api/techniek/inloggen', { login: 'tq' + u + '@x.nl', wachtwoord: 'ditisfout' });
+  const goed = await api('/api/techniek/inloggen', { login: 'tq' + u + '@x.nl', wachtwoord });
+  assert.equal(fout.status, 401);
+  assert.equal(goed.status, fout.status, 'zelfde status, ongeacht of het wachtwoord klopte');
+  assert.equal(goed.body.error, fout.body.error, 'en exact dezelfde tekst');
+  assert.ok(!/geen toegang|geen recht/i.test(goed.body.error || ''), 'het antwoord verklapt niet dat het wachtwoord klopte');
+});
+
+test('techniek-inlog: raden loopt vast op de rem', async () => {
+  const u = Date.now().toString(36) + 'tr';
+  let laatste = 0;
+  for (let i = 0; i < 14; i++) {
+    const r = await api('/api/techniek/inloggen', { login: 'onbekend' + u + '@x.nl', wachtwoord: 'poging' + i });
+    laatste = r.status;
+    if (laatste === 429) break;
+  }
+  assert.equal(laatste, 429, 'na een handvol pogingen gaat de deur op slot (elke andere inlog doet dit al)');
+});
+
+/* ---------- 12. het eigenaarsaccount ---------- */
+test('het eigenaarsadres is niet via de openbare registratie te claimen', async () => {
+  /* De technische pagina bepaalt de eigenaar met eigenaarUser(): staat er nog
+     geen eigenaarId, dan zoekt hij het account op het eigenaarsadres op en PINT
+     dat vast. Op een verse productie-installatie werd daarmee wie dat adres als
+     eerste registreerde de eigenaar van het platform -- de technische pagina, de
+     hoofdzekering, de boardroom. Het adres is niet geheim (het staat in de
+     omgevingsvariabelen), dus geheimhouding was nooit de bescherming.
+
+     DEZE TOETS MOET BUITEN DEMOSTAND DRAAIEN, en dat is geen detail. In demo
+     maakt de opstart dat account zelf aan, en dan vangt de gewone
+     "bestaat al"-controle het verzoek af -- de toets slaagt dan ook zonder de
+     reparatie. Een mutatie liet dat meteen zien: de grendel eruit, en de toets
+     bleef groen. Vandaar een eigen server met NODE_ENV=production, waar niets
+     het eigenaarsaccount aanmaakt en het gat dus echt open zou staan. */
+  const TMP2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-eig-'));
+  const sleutel = (c) => c.repeat(64);
+  const eigen = await startServer({ env: {
+    SMTP_URL: '', RTG_DATA_DIR: TMP2,
+    NODE_ENV: 'production', RTG_DEMO: '',
+    // productie weigert te starten zonder deze; dat is bewust en het hoort zo
+    RTG_ENC_KEY: sleutel('x'), RTG_VAULT_KEY: sleutel('a'), RTG_SECRET_KEY: sleutel('b'),
+    RTG_OWNER_EMAIL: 'eigenaar-proef@voorbeeld.test',
+    OFFICE_CODE: 'PROEFCODE1234', SESSION_SECRET: sleutel('y')
+  } });
+  /* X-Forwarded-Proto: https, want in productie staat er een afdwinging op --
+     zonder die kop stuurt de server een omleiding en mislukt de fetch. Dezelfde
+     kop die test/helper.js voor zijn gezondheidscheck gebruikt. */
+  const post = (pad, body) => fetch(eigen.base + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-Proto': 'https' },
+    body: JSON.stringify(body || {}), redirect: 'manual'
+  }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  try {
+    const adres = 'eigenaar-proef@voorbeeld.test';
+    const u = Date.now().toString(36) + 'eig';
+    const kaap = await post('/api/auth/register', { name: 'Kaper', email: adres,
+      phone: '068' + u.slice(0, 7), password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' });
+    assert.equal(kaap.status, 409, 'het eigenaarsadres komt niet door de openbare voordeur');
+    assert.ok(!kaap.body.token, 'en er komt zeker geen token uit');
+    // een gewoon adres mag gewoon: de deur zit niet op slot voor iedereen
+    const gewoon = await post('/api/auth/register', { name: 'Gewoon Lid', email: 'gw' + u + '@x.nl',
+      phone: '069' + u.slice(0, 7), password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' });
+    assert.equal(gewoon.status, 200, JSON.stringify(gewoon.body).slice(0, 160));
+    assert.ok(gewoon.body.token);
+  } finally {
+    stop(eigen && eigen.child);
+    try { fs.rmSync(TMP2, { recursive: true, force: true }); } catch (e) {}
+  }
+});

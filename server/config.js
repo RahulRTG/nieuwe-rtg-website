@@ -73,9 +73,9 @@ function valideer(env) {
        iets anders dan het voorbeeldadres, maar allebei blokkeren ze de start. */
     const eigenaarEnv = String(env.RTG_OWNER_EMAIL || '').trim().toLowerCase();
     if (eigenaarEnv === 'rahul@rtg.example')
-      fouten.push('RTG_OWNER_EMAIL staat op het voorbeeldadres: wie dat adres registreert zou eigenaar van de technische pagina worden. Zet het echte e-mailadres van de eigenaar.');
+      fouten.push('RTG_OWNER_EMAIL staat op het voorbeeldadres. Zet het echte e-mailadres van de eigenaar.');
     else if (!eigenaarEnv)
-      fouten.push('RTG_OWNER_EMAIL ontbreekt. In productie geldt de ingebouwde standaard uit server/eigenaar.js niet: zet het echte e-mailadres van de eigenaar, en zorg dat daar al een RTG-account bij hoort.');
+      fouten.push('RTG_OWNER_EMAIL ontbreekt. In productie geldt de ingebouwde standaard uit server/eigenaar.js niet: zet het echte e-mailadres van de eigenaar.');
     if (env.OFFICE_CODE && env.OFFICE_CODE.length < 8)
       fouten.push('OFFICE_CODE is te kort; gebruik minstens 8 tekens (of laat hem weg voor een willekeurige code).');
 
@@ -92,6 +92,10 @@ function valideer(env) {
     if (env.DATABASE_URL && (env.RTG_MEDIA_BACKEND || '').toLowerCase() !== 's3')
       waarschuwingen.push('RTG_MEDIA_BACKEND niet op "s3": Salon-foto\'s en snaps staan op de lokale schijf en worden niet tussen instances gedeeld. Zet S3-compatibele opslag (RTG_MEDIA_S3_*) of gebruik een gedeeld volume.');
     if (!env.SENTRY_DSN) waarschuwingen.push('SENTRY_DSN niet gezet: geen EXTERNE fout-tracking (de eigen in-memory fout-aggregatie op het techniekbord draait altijd).');
+    // Eenmalige sleutel waarmee de EERSTE eigenaar zijn account claimt; zonder hem
+    // weigert de registratie dat adres. Bestaat het account al, dan hoort hij weg.
+    if (!env.RTG_OWNER_BOOTSTRAP)
+      waarschuwingen.push('RTG_OWNER_BOOTSTRAP niet gezet: als er nog GEEN account op het eigenaarsadres bestaat, is er geen manier meer om er een te maken. Bestaat het account al, dan hoort deze sleutel juist weg.');
     if (!env.OFFICE_TOTP_SECRET) waarschuwingen.push('OFFICE_TOTP_SECRET niet gezet: de backoffice heeft geen tweede factor (2FA). Sterk aangeraden: zet een base32-geheim en koppel een authenticator-app.');
     if (!env.SMTP_URL && !env.SMTP_HOST) waarschuwingen.push('Geen SMTP ingesteld: e-mail (herstel-links, bevestigingen) wordt niet echt verstuurd.');
     if (!env.STRIPE_SECRET_KEY) waarschuwingen.push('STRIPE_SECRET_KEY niet gezet: betalingen draaien in demo-stand (geen echt geld).');

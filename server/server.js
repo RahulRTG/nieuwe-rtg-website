@@ -207,6 +207,25 @@ function zetEigenaarsAccount() {
 }
 // bij het laden; in Postgres-modus nogmaals na de gedeelde pull (zie onder)
 if (DEMO) zetEigenaarsAccount();
+/* GEEN EIGENAAR IN PRODUCTIE: ZEG HET, EN ZEG HET LUID.
+
+   Buiten demostand maakt niets dit account aan. Zolang het er niet is, staat de
+   technische pagina voor niemand open -- dat is de veilige kant. Maar het is
+   ook een half afgemaakte installatie, en dat hoort de beheerder te WETEN in
+   plaats van er tegenaan te lopen.
+
+   Tot vandaag was er nog een tweede reden: de registratieroute kon dat account
+   maken, dus wie het eigenaarsadres als eerste registreerde kreeg het platform.
+   Die route is nu dicht (routes/auth/account.js). Deze melding blijft, want een
+   installatie zonder eigenaar is nog steeds een installatie die af moet. */
+if (!DEMO) {
+  try {
+    if (!accounts.findByLogin(eigenaar.eigenaarEmail()))
+      log.warn('Er is nog GEEN eigenaarsaccount (' + eigenaar.eigenaarEmail() + '). '
+        + 'De technische pagina en de boardroom blijven dicht tot het bestaat. '
+        + 'Maak het bewust aan; via de openbare registratie kan het niet meer.');
+  } catch (e) { /* accounts nog niet klaar: dan meldt de golive-keuring het */ }
+}
 
 /* Het demopersoneel per leverancier staat als pure data in een kern-module. */
 const STAFF_SEED = Object.assign({}, require('./kern/staffseed').STAFF_SEED, require('./kern/staffseed2').STAFF_SEED);

@@ -109,9 +109,15 @@ test('beveiliging: mislukte tech-login wordt gemeld; een kritieke melding komt i
   assert.ok(st.beveiliging.open >= 1, 'de mislukte login staat op het bord');
   assert.ok(st.beveiliging.recent.some(m => m.type === 'tech-login-mislukt'));
 
-  // een echt account dat correct inlogt maar geen recht heeft = kritiek
+  /* Een echt account dat correct inlogt maar geen recht heeft = kritiek OP HET
+     BORD, maar naar buiten toe exact hetzelfde antwoord als een fout wachtwoord.
+     Hier stond 403 met een eigen tekst, en dat was een orakel: wie het verschil
+     zag wist dat het wachtwoord klopte -- en dat wachtwoord opent elders in het
+     huis wel deuren. De melding is voor ons, niet voor wie aanklopt. */
   await post('/api/auth/register', { name: 'Nieuwsgierig Lid', email: 'lid@x.nl', phone: '0611112222', password: 'welkom123', geboortedatum: '1995-05-05' });
-  assert.equal((await post('/api/techniek/inloggen', { login: 'lid@x.nl', wachtwoord: 'welkom123' })).status, 403);
+  const zonderRecht = await post('/api/techniek/inloggen', { login: 'lid@x.nl', wachtwoord: 'welkom123' });
+  assert.equal(zonderRecht.status, 401, 'zelfde status als bij een fout wachtwoord');
+  assert.equal((await zonderRecht.json()).error, 'Onjuiste inloggegevens.', 'en exact dezelfde tekst');
   st = await (await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })).json();
   assert.ok(st.beveiliging.kritiek >= 1, 'een geldig account zonder recht is een kritieke melding');
 

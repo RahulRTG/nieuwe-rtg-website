@@ -21,6 +21,12 @@ const PROD_ENV = {
   RTG_ENC_KEY: 'e'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
   RTG_CLUSTER_KEY: 'c'.repeat(32), OFFICE_CODE: 'KEURING-CODE-12', DEMO_PASS: 'x'.repeat(16),
   RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', APP_URL: 'https://rtg.example.com',
+  /* De eenmalige sleutel waarmee de eerste eigenaar zijn account claimt. Zonder
+     deze komt het eigenaarsadres niet door de openbare registratie -- anders werd
+     wie het adres als eerste intikte de eigenaar van het platform, en het adres
+     is niet geheim. De beheerder zet hem bij de eerste start en haalt hem daarna
+     weg. Zie server/routes/auth/account.js. */
+  RTG_OWNER_BOOTSTRAP: 'proef-eenmalige-eigenaarssleutel',
   SMTP_URL: '', DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
 };
 
@@ -97,9 +103,22 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
   assert.ok(forgot.ok && forgot.tweestaps);
   assert.ok(!forgot.devResetUrl && !forgot.devCode, 'productie lekt geen herstel-link of telefooncode');
 
-  // de eigenaar registreert zijn echte adres en komt op de technische pagina
+  /* Het eigenaarsadres komt ALLEEN binnen met de eenmalige sleutel. Zonder die
+     sleutel is dit precies het gat dat hier stond: wie het adres als eerste
+     registreerde werd eigenaar van het platform -- technische pagina,
+     hoofdzekering, boardroom. Allebei de kanten staan hier, zodat geen van
+     beide stilletjes kan omslaan. */
+  const zonderSleutel = await post('/api/auth/register', { name: 'Kaper', email: 'eigenaar@echtdomein.nl', phone: '0611111111',
+    password: 'kaper12345', geboortedatum: '1980-01-01', tier: 'business', pasApp: 'business' });
+  assert.equal(zonderSleutel.status, 409, 'zonder de eenmalige sleutel komt het eigenaarsadres er niet in');
+  const verkeerd = await post('/api/auth/register', { name: 'Kaper', email: 'eigenaar@echtdomein.nl', phone: '0611111111',
+    password: 'kaper12345', geboortedatum: '1980-01-01', tier: 'business', pasApp: 'business', eigenaarSleutel: 'x'.repeat(31) });
+  assert.equal(verkeerd.status, 409, 'en met een verkeerde sleutel ook niet');
+
+  // de eigenaar registreert zijn echte adres MET de sleutel en komt op de technische pagina
   await post('/api/auth/register', { name: 'De Eigenaar', email: 'eigenaar@echtdomein.nl', phone: '0687654321',
-    password: 'eigenaar123', geboortedatum: '1980-01-01', tier: 'business', pasApp: 'business' });
+    password: 'eigenaar123', geboortedatum: '1980-01-01', tier: 'business', pasApp: 'business',
+    eigenaarSleutel: 'proef-eenmalige-eigenaarssleutel' });
   const tech = await (await post('/api/techniek/inloggen', { login: 'eigenaar@echtdomein.nl', wachtwoord: 'eigenaar123' })).json();
   assert.equal(tech.eigenaar, true, 'de echte eigenaar heeft de technische pagina');
   // en de backoffice draait op de eigen (niet-demo) code

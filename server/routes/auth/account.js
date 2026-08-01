@@ -1,6 +1,7 @@
 /* Auth (deelmodule): het account: registreren, de
    e-mailbevestiging en het opnieuw sturen van de bevestigingslink. Krijgt
    de gedeelde context een keer bij het opstarten vanuit routes/auth.js. */
+const eigenaar = require('../../eigenaar'); // een bron van waarheid over wie de eigenaar is
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering } = actx;
@@ -34,6 +35,39 @@ app.post('/api/auth/register', async (req, res) => {
   if (lftNieuw < 15) return res.status(400).json({ error: 'Het RTG-lidmaatschap kan vanaf 15 jaar.' });
   if (lftNieuw > 120) return res.status(400).json({ error: 'Controleer uw geboortedatum.' });
   if (accounts.findByLogin(email)) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
+  /* HET EIGENAARSACCOUNT ONTSTAAT UIT EEN BEWUSTE HANDELING, NIET UIT EEN FORMULIER.
+
+     De technische pagina bepaalt de eigenaar met eigenaarUser(): staat er nog
+     geen eigenaarId, dan zoekt hij het account op het eigenaarsadres op en PINT
+     dat vast. Dat is prima zolang alleen een bewuste handeling zo'n account kan
+     maken -- maar deze route kon het ook. Op een verse productie-installatie
+     werd daarmee wie het eigenaarsadres als eerste registreerde de eigenaar van
+     het platform: de technische pagina, de hoofdzekering, de boardroom. Het
+     adres is niet geheim -- het staat in de omgevingsvariabelen en in de
+     documentatie -- dus geheimhouding was nooit de bescherming.
+
+     De deur helemaal dichtdoen kon niet: in productie is dit de ENIGE weg om
+     een eerste eigenaar te krijgen (de overdracht vanuit de boardroom vereist
+     dat er er al een is). Daarom een eenmalige sleutel: RTG_OWNER_BOOTSTRAP.
+     Staat die gezet, dan mag de registratie op het eigenaarsadres door mits ze
+     hem meestuurt; staat hij niet gezet, dan gaat het adres niet meer door de
+     voordeur. De beheerder zet hem bij de eerste start naast de andere
+     sleutels, registreert een keer, en haalt hem weg.
+
+     In demostand maakt de opstart het account rechtstreeks aan (createUserSync,
+     niet via deze route), dus daar verandert er niets. Een OPVOLGER registreert
+     gewoon zijn eigen adres en krijgt het eigenaarschap daarna overgedragen.
+
+     Het antwoord bij een ontbrekende of verkeerde sleutel is bewust hetzelfde
+     409 als bij een bestaand account: of dat adres al een account heeft, gaat
+     een buitenstaander niet aan. */
+  if (email === eigenaar.eigenaarEmail()) {
+    const verwacht = String(process.env.RTG_OWNER_BOOTSTRAP || '');
+    const gegeven = String(req.body.eigenaarSleutel || '');
+    const goed = verwacht.length >= 16 && gegeven.length === verwacht.length
+      && crypto.timingSafeEqual(Buffer.from(gegeven), Buffer.from(verwacht));
+    if (!goed) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
+  }
   /* De poort van het merk: zelf-registreren levert ALTIJD hooguit een RTG Pass
      (of de gratis gast-laag). Lifestyle en Business komen -- per merkregel --
      uitsluitend na een menselijk besluit (kern/aanmeldingen.js beslis, dat

@@ -34,6 +34,7 @@ const regels = [
   ['OFFICE_TOTP_SECRET', totp, 'tweede factor (2FA) van de backoffice; scan de otpauth-regel hieronder'],
   ['DEMO_PASS', hex(12), 'vervangt het demo-wachtwoord (demo staat in productie sowieso uit)'],
   ['RTG_OWNER_EMAIL', 'VUL-IN@JOUW-DOMEIN.NL', 'HANDMATIG: het echte e-mailadres van de eigenaar (technische pagina)'],
+  ['RTG_OWNER_BOOTSTRAP', hex(16), 'EENMALIG: hiermee claimt de eigenaar zijn account bij de eerste start; daarna weghalen'],
   ['APP_URL', 'https://VUL-IN.NL', 'HANDMATIG: het publieke adres (links in e-mails)'],
   ['DATABASE_URL', 'postgresql://VUL-IN', 'HANDMATIG: PostgreSQL (verplicht bij meerdere instances/vloot)'],
   ['REDIS_URL', 'redis://VUL-IN', 'HANDMATIG: realtime over meerdere instances'],

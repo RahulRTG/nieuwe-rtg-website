@@ -14,7 +14,9 @@ const { log } = require('../log');
 
 module.exports = (kern) => {
   const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal, talen, onboarding,
-    geldPasprijsZet, geldKortingZet, geldCommissieZet } = kern;
+    geldPasprijsZet, geldKortingZet, geldCommissieZet,
+    // de gedeelde inlogrem: dezelfde teller en dezelfde vijf minuten als elders
+    tooManyTries, noteFailedTry, loginFails } = kern;
   const OWNER_EMAIL = eigenaar.OWNER_EMAIL;
 
   function staat() {
@@ -76,26 +78,6 @@ module.exports = (kern) => {
       fouten: () => log.foutenSamenvatting()
     };
   }
-
-  // Inloggen op de technische pagina: gewone accountgegevens, maar de toegang
-  // wordt hier meteen gecontroleerd (anders 403, ook met geldig wachtwoord).
-  app.post('/api/techniek/inloggen', async (req, res) => {
-    const user = accounts.findByLogin(req.body.login);
-    if (!user || !await accounts.verifyPassword(String(req.body.wachtwoord || ''), user.password_hash)) {
-      if (beveilig) beveilig.meld('tech-login-mislukt', 'waarschuwing',
-        'Mislukte inlogpoging op de technische pagina (login: ' + String(req.body.login || '').slice(0, 40) + ').',
-        { bron: req.ip });
-      return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
-    }
-    if (!magInzien(user)) {
-      // juist wachtwoord, maar geen recht op de technische pagina: hoog signaal
-      if (beveilig) beveilig.meld('tech-login-zonder-recht', 'kritiek',
-        'Account "' + accounts.realNameOf(user) + '" logde correct in maar heeft geen recht op de technische pagina.',
-        { bron: 'user:' + user.id });
-      return res.status(403).json({ error: 'Dit account heeft geen toegang tot de technische pagina.' });
-    }
-    res.json({ token: accounts.issueToken(user.id, 1), eigenaar: isEigenaar(user), naam: accounts.realNameOf(user) });
-  });
 
   // Het statusbord: alle checks + zekeringen. Eigenaar ziet ook de toegangslijst.
   app.get('/api/techniek/status', techAuth, async (req, res) => {
@@ -172,7 +154,8 @@ module.exports = (kern) => {
      (een keer bij het opstarten gemount, geen kosten per verzoek). */
   const tctx = { app, accounts, anthropic, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser,
     LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
-    geldPasprijsZet, geldKortingZet, geldCommissieZet };
+    geldPasprijsZet, geldKortingZet, geldCommissieZet, tooManyTries, noteFailedTry, loginFails };
+  require('./techniek/inlog')(tctx);   // de inlog op deze pagina, met rem en gelijk antwoord
   const bewaarDeel = require('./techniek/bewaren')(tctx);
   require('./techniek/functie')(tctx);
   require('./techniek/boardroom')(tctx);

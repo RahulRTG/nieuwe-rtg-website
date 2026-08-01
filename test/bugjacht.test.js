@@ -548,9 +548,14 @@ test('een betaal-webhook voor een onbekende betaling verandert niets en valt nie
    ongemak maar het bewijs dat de rem er staat. */
 test('de betaal-webhooks staan achter een rem en achter de opslagpoort', async () => {
   /* Ze moeten VOOR de JSON-parser staan (de handtekening gaat over de ruwe
-     bytes), en stonden daardoor ook voor de rem, de opslagpoort en de
-     hoofdzekering. De doorlichting kreeg er 400 verzoeken per minuut ongeremd
-     doorheen. Ze hebben nu hun eigen twee poortwachters. */
+     bytes) en stonden daardoor ook voor de opslagpoort en de hoofdzekering.
+
+     De doorlichting meldde erbij dat er "400 verzoeken per minuut ongeremd
+     doorheen kwamen". Dat klopte niet: het schild (kern/schild.js) staat wel
+     degelijk voor deze routes, maar laat 127.0.0.1 bewust door -- en de
+     doorlichting klopte van binnenuit aan. Deze eigen rem is strenger dan het
+     schild en de globale rem, en dus een verbetering; hij repareert geen gat.
+     Dat deze toets vanaf localhost een 429 ziet, komt dus door DEZE rem. */
   let geremd = 0, laatste = 0;
   for (let i = 0; i < 160; i++) {
     const r = await fetch(base + '/api/betaal/webhook', {

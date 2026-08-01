@@ -486,13 +486,22 @@ app.use((req, res, next) => {
    bytes berekend, dus zodra express de body heeft geparsed en weer geserialiseerd
    klopt hij niet meer. Die volgorde is dus geen slordigheid.
 
-   Het gevolg was wel dat ze ook voor de rem, de opslagpoort en de hoofdzekering
-   stonden -- alle drie geregistreerd rond regel 575. De doorlichting kreeg er
-   vierhonderd verzoeken per minuut ongeremd doorheen. Ze krijgen daarom hier hun
-   eigen twee poortwachters:
+   Het gevolg was wel dat ze ook voor de opslagpoort en de hoofdzekering stonden.
+   Ze krijgen daarom hier hun eigen twee poortwachters:
 
      de rem        een webhook-provider stuurt bursts bij een retry-storm, maar
                    nooit honderden per minuut; wie dat wel doet is geen provider.
+
+                   LET OP WAT HIER EERST STOND. De doorlichting meldde dat er
+                   "vierhonderd verzoeken per minuut ongeremd doorheen kwamen",
+                   en dat KLOPTE NIET: het schild (kern/schild.js, gemount op
+                   regel 398 en dus wel degelijk voor deze routes) staat op 400
+                   per 10 seconden per IP, en de globale rem op 300 per minuut.
+                   De meting was een artefact -- het schild laat 127.0.0.1
+                   bewust door (schild.js:35,46), en de doorlichting klopte van
+                   binnenuit aan. Deze eigen rem is strenger dan beide en dus
+                   een verbetering, maar hij repareert geen gat: hij begrenst
+                   een route die al begrensd was.
      de opslagpoort laadt de server zijn gegevens nog, dan kunnen we een betaling
                    niet vastleggen. Dan is 503 het juiste antwoord: elke serieuze
                    provider probeert het opnieuw. Accepteren wat we niet kunnen

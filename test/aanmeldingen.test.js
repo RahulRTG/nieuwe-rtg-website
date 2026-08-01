@@ -39,14 +39,38 @@ test('alleen een mens (met naam) beslist; de AI kan Lifestyle/Business nooit toe
   assert.equal(a.magAutomatischToekennen('rtg'), false);
 
   const life = a.aanvraag({ pas: 'lifestyle', naam: 'Gast' }).aanmelding;
-  // zonder naam geen besluit
-  assert.equal(a.beslis(life.id, 'geaccepteerd', '').status, 400);
+  /* ZONDER HERLEIDBAAR PERSOON GEEN LIFESTYLE- OF BUSINESS-BESLUIT.
+
+     Dit stond op 400 (ontbrekend veld). Het is 403 geworden, en dat is de
+     juistere code: de beller IS ingelogd op de backoffice, hij is alleen niet
+     herleidbaar -- hij gebruikt de gedeelde kantoorcode, en die is geen mens.
+     De merkregel zegt dat deze twee passen uitsluitend na MENSELIJKE
+     goedkeuring ontstaan, en achteraf moet te zeggen zijn wie dat was.
+
+     Waarom dit ertoe deed: de route gaf tot vandaag altijd 'RTG-personeel' mee,
+     want officeAuth zet req.session niet. Deze grendel stond er dus wel en werd
+     verslagen door een terugval die altijd slaagde. */
+  const geweigerd = a.beslis(life.id, 'geaccepteerd', '');
+  assert.equal(geweigerd.status, 403, JSON.stringify(geweigerd));
+  assert.match(geweigerd.error, /herleidbaar persoon/, 'en het zegt hoe je het wel doet: ' + geweigerd.error);
   // met naam wel
   const ok = a.beslis(life.id, 'geaccepteerd', 'Rahul Imran Ismail', 'Op uitnodiging');
   assert.equal(ok.aanmelding.status, 'geaccepteerd');
   assert.equal(ok.aanmelding.besluit.door, 'Rahul Imran Ismail');
   // en niet twee keer
   assert.equal(a.beslis(life.id, 'afgewezen', 'Iemand').status, 409);
+
+  /* DE RTG PASS LIGT ANDERS. Die staat na de AI-intake voor iedereen open, dus
+     daar is een herleidbaar persoon te zwaar. Wel wordt eerlijk genoteerd dat
+     het via de gedeelde code ging: beter een spoor dat zegt "we weten het niet"
+     dan een spoor dat een persoon verzint. */
+  const rtg = a.aanvraag({ pas: 'rtg', naam: 'Gast' }).aanmelding;
+  const viaCode = a.beslis(rtg.id, 'geaccepteerd', '');
+  assert.equal(viaCode.aanmelding.status, 'geaccepteerd', JSON.stringify(viaCode).slice(0, 140));
+  assert.equal(viaCode.aanmelding.besluit.door, 'backoffice (gedeelde code)',
+    'geen verzonnen naam, maar de eerlijke vermelding dat het niet te herleiden is');
+  assert.doesNotMatch(viaCode.aanmelding.besluit.door, /RTG-personeel/,
+    'en zeker niet de oude verzonnen naam die elk besluit droeg');
 });
 
 test('na accepteren loopt de betaling 12 maanden automatisch met de 30%-split', () => {

@@ -3,9 +3,26 @@
    de hele reis. De wachtrij en de ENE menselijke handeling -- accepteren of
    afwijzen -- zitten achter de office-inlog (RTG-personeel). */
 module.exports = (kern) => {
-  const { app, officeAuth, aanmeldingen, accounts, tooManyTries } = kern;
+  const { app, officeAuth, aanmeldingen, accounts, tooManyTries, boardroomWie } = kern;
   const veilig = (res, werk) => { try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); } catch (e) { console.error('[aanmeldingen]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
-  const wie = req => { const s = req.session || {}; return s.codename || (s.account && s.account.codename) || s.naam || 'RTG-personeel'; };
+  /* WIE HEEFT DIT BESLOTEN?
+
+     Hier stond `req.session.codename || ... || 'RTG-personeel'`. Deze routes
+     staan achter officeAuth, en die zet req.session HELEMAAL NIET -- dus viel
+     hij niet soms maar ALTIJD terug op 'RTG-personeel'. Elk pasbesluit ooit
+     genomen draagt die naam, en dat is geen naam.
+
+     Het wrange is dat de kern het al eist: beslis() weigert een `door` van
+     minder dan twee tekens met "een besluit draagt altijd de naam van de mens
+     die beslist". Die grendel stond er dus, en werd verslagen door een terugval
+     die altijd slaagt.
+
+     boardroomWie geeft de sleutel van wie er echt achter zit: het lid-account
+     dat aan de backoffice gekoppeld is, of de eigenaar met zijn eigen inlog.
+     Bij de kale gedeelde kantoorcode is er niemand aan te wijzen, en dan is
+     null het eerlijke antwoord -- de kern beslist wat daarmee mag, want die
+     kent de pas waar het over gaat. Zelfde patroon als bij RTG Bank. */
+  const wie = req => boardroomWie(req) || null;
   // Is er een geldig leden-token meegestuurd? Dan koppelen we dat account aan de
   // aanvraag (server-side, nooit uit de body), zodat een menselijk akkoord op een
   // Lifestyle/Business-aanvraag dat account kan optillen.

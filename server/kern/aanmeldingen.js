@@ -133,32 +133,10 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   /* De ENE menselijke handeling: accepteren of afwijzen. Vereist een naam (wie
      beslist), zodat een besluit nooit anoniem is -- en zodat de AI dit pad niet
      kan nabootsen. Toegang tot Lifestyle/Business ontstaat UITSLUITEND hier. */
-  function beslis(id, besluit, door, notitie) {
-    const a = vind(id); if (!a) return { status: 404, error: 'Deze aanmelding bestaat niet.' };
-    if (a.status !== 'in behandeling') return { status: 409, error: 'Over deze aanmelding is al beslist (' + a.status + ').' };
-    if (!['geaccepteerd', 'afgewezen'].includes(besluit)) return { status: 400, error: 'Kies accepteren of afwijzen.' };
-    const wie = kap(door, 60);
-    if (wie.length < 2) return { status: 400, error: 'Een besluit draagt altijd de naam van de mens die beslist.' };
-    a.status = besluit;
-    a.besluit = { besluit, door: wie, notitie: kap(notitie, 300), at: nu() };
-    a.bijgewerkt = nu();
-    if (besluit === 'geaccepteerd') {
-      // na een akkoord loopt de betaling automatisch: 12 maanden, met de 30%-split
-      startBetalingen(a);
-      // De poort van het merk: een Lifestyle-/Business Pass ontstaat hier, door dit
-      // menselijke besluit, en nergens anders (zelf-registreren geeft ze niet).
-      // Is er een account gekoppeld, dan tillen we het nu op via setTier.
-      if ((a.pas === 'lifestyle' || a.pas === 'business') && a.accountId && accounts && accounts.setTier) {
-        const opgetild = accounts.setTier(a.accountId, a.pas);
-        a.besluit.optillen = opgetild ? { naar: a.pas } : { mislukt: true };
-      }
-    }
-    save();
-    return { ok: true, aanmelding: beeld(a), betaalschema: besluit === 'geaccepteerd' };
-  }
+  // Het menselijke besluit (accepteren/afwijzen, en het optillen van de pas)
+  // staat in ./aanmeldingen/besluit.js; zie de kop daar waarom apart.
+  const { beslis } = require('./aanmeldingen/besluit')({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSEN });
 
-  /* Seam voor de AI-laag: mag deze pas automatisch worden toegekend? Nooit voor
-     Lifestyle/Business. Zo kan geen enkele assistent per ongeluk toegang beloven. */
   function magAutomatischToekennen(pas) { return false; }
 
   /* Een termijn aftekenen als voldaan (administratieve bevestiging door een

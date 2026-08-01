@@ -90,6 +90,27 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
   const rollen = ['member', 'supplier', 'office'];
   const voor = await vingerafdruk(post, tokensVoor());
 
+  /* ---- DE METER MOET WERKEN VOORDAT HIJ IETS MAG ZEGGEN ----
+     Dit ging bij de eerste run mis, en precies op de manier waar deze hele
+     codebase jacht op maakt. De aanroeper gaf een `post` mee die alleen de
+     STATUS teruggeeft en het antwoordlijf weggooit. Gevolg: de vingerafdruk
+     stond vijf keer op null en de lekscan kreeg een lege string. Twee van de
+     drie beweringen waren daarmee leeg -- "geen wijzigingen" was null === null,
+     en "geen lekken" was "er viel niets te scannen". Het oordeel stond op PASS.
+
+     Een proef die niet kan zakken is slechter dan geen proef (LAT.md regel 9),
+     en een meter zonder invoer hoort te falen in plaats van groen te blijven
+     (regel 3). Vandaar deze grendel: kan de toestand helemaal niet worden
+     vastgesteld, dan is dat een FOUT en geen stilte. */
+  const gemeten = Object.values(voor).filter(v => v != null).length;
+  if (gemeten === 0) {
+    return {
+      bevindingen: { tweexx: [], lekken: [], gewijzigd: [],
+        meterStuk: 'de toestand kon niet worden vastgesteld (alle velden null) -- geeft de meegegeven post() wel het antwoordLIJF terug, of alleen de status?' },
+      pogingen: 0, voor, na: voor
+    };
+  }
+
   let gedaan = 0;
   for (const r of routes) {
     if (r.method === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties

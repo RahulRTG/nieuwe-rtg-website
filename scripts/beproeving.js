@@ -878,7 +878,10 @@ async function misbruikBeproeving(tok) {
      plausibele invoer en kijkt naar het lijf en naar de blijvende toestand. */
   kop('FASE E3: ROL-SCHEIDING - lekt de weigering, en blijft de toestand echt gelijk?');
   const rp = await rolproef.draaiRolproef({
-    post: (pad, lijf, tk) => verzoek('POST', pad, tk, lijf),
+    /* post (= haal) en NIET verzoek: die laatste gooit het antwoordlijf weg en
+       geeft alleen de status terug. Daarmee stonden de lekscan en de
+       toestandsvergelijking leeg te draaien. */
+    post,
     routes, tokensVoor: () => ({
       member: rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office),
       supplier: rkeuze(tokVoor.supplier.length ? tokVoor.supplier : tokVoor.office),
@@ -1031,8 +1034,9 @@ async function misbruikBeproeving(tok) {
   v('SCHAKELKAST', kastOpen, kastOpen ? 'elke functie stond aan tijdens de hele run'
     : 'de hendel ging niet over (status ' + aan + '): de run draaide tegen de standaardstand');
   v('ROBUUSTHEID', buckets.s5xx === 0, buckets.s5xx + ' onverwachte serverfouten');
-  v('ROL-LEK', rp.bevindingen.lekken.length === 0 && rp.bevindingen.gewijzigd.length === 0 && rp.bevindingen.tweexx.length === 0,
-    rp.bevindingen.lekken.length || rp.bevindingen.gewijzigd.length || rp.bevindingen.tweexx.length
+  v('ROL-LEK', !rp.bevindingen.meterStuk && rp.bevindingen.lekken.length === 0 && rp.bevindingen.gewijzigd.length === 0 && rp.bevindingen.tweexx.length === 0,
+    rp.bevindingen.meterStuk ? 'DE METER ZELF IS STUK: ' + rp.bevindingen.meterStuk
+    : rp.bevindingen.lekken.length || rp.bevindingen.gewijzigd.length || rp.bevindingen.tweexx.length
       ? rp.bevindingen.tweexx.length + ' x 2xx, ' + rp.bevindingen.lekken.length + ' lekkende weigering(en), ' + rp.bevindingen.gewijzigd.length + ' blijvende wijziging(en)'
       : nl(rp.pogingen) + ' schrijfpogingen met een verkeerde rol: geen 2xx, geen gegevens in de weigering, geen blijvende wijziging');
   v('ROL-SCHEIDING', rolLek.length === 0, rolLek.length ? rolLek.slice(0, 8).join(', ') : 'geen verkeerd-rol token kreeg 2xx');

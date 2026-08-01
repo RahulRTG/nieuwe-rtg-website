@@ -34,12 +34,16 @@ const MAX_TOKENS = 16;          // zoveel woorden uit een zin wegen we hoogstens
 const SLOT_NA = 5;              // vijf fouten
 const SLOT_MS = 60000;          // = een minuut op slot
 
-function maakSleutelwoorden({ db, save, crypto, accounts }) {
+function maakSleutelwoorden({ db, save, crypto, accounts, slot }) {
   const rij = () => {
     if (!db.data.sleutelwoorden || typeof db.data.sleutelwoorden !== 'object') db.data.sleutelwoorden = {};
     return db.data.sleutelwoorden;
   };
-  const fouten = new Map();        // userId -> { n, tot }
+  /* Het slot is gedeeld (server/pinslot.js); hier stond een eigen kopie van
+     dezelfde teller zonder opruimronde. Zie de kop van dat bestand. */
+  if (!slot || typeof slot.dicht !== 'function')
+    throw new Error('sleutelwoorden: het gedeelde slot ontbreekt; zonder rem zijn vier woorden af te lopen.');
+  const doel = userId => 'sleutelwoord:' + userId;
   const uitdagingen = new Map();   // id -> { userId, volgorde, stap, at, n, openOk }
   const DUMMY_ZOUT = crypto.randomBytes(16); // voor gelijkmatig rekenwerk bij een lokvink
 
@@ -56,16 +60,8 @@ function maakSleutelwoorden({ db, save, crypto, accounts }) {
   }
   const hash = (w, zout) => crypto.scryptSync(w, zout, 32, { N: 16384, r: 8, p: 1 }).toString('base64');
 
-  function teVaak(userId) {
-    const f = fouten.get(userId);
-    return !!(f && f.tot > Date.now());
-  }
-  function fout(userId) {
-    const f = fouten.get(userId) || { n: 0, tot: 0 };
-    f.n++;
-    if (f.n >= SLOT_NA) { f.n = 0; f.tot = Date.now() + SLOT_MS; }
-    fouten.set(userId, f);
-  }
+  const teVaak = userId => slot.dicht(doel(userId));
+  const fout = userId => slot.fout(doel(userId), 'de sleutelwoorden van ' + userId);
 
   // vind in de zin het woord dat op deze positie hoort; geef het herkende woord
   // terug (uit de zin van de gebruiker zelf) of null. Bij een lokvink draait er
@@ -143,7 +139,7 @@ function maakSleutelwoorden({ db, save, crypto, accounts }) {
     const derde = herken(c.userId, c.volgorde[2], tekst);
     const goed = c.openOk && !!derde && c.userId != null;
     uitdagingen.delete(id);
-    if (goed) { fouten.delete(c.userId); return { ok: true, userId: c.userId }; }
+    if (goed) { slot.goed(doel(c.userId)); return { ok: true, userId: c.userId }; }
     if (c.userId != null) fout(c.userId);
     return { status: 401, error: 'Dat klopte net niet helemaal.' };
   }

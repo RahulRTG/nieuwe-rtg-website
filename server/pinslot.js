@@ -29,7 +29,28 @@
    een slot dat bij een herstart WEG is, is nog altijd oneindig veel beter dan
    vijf tellers die elkaar niet kennen. Bij meerdere instances telt elke
    instance apart; dat is een bekende beperking van elke in-memory rem in dit
-   huis (loginFails doet het net zo) en hoort bij de gedeelde-opslag-stap. */
+   huis (loginFails doet het net zo) en hoort bij de gedeelde-opslag-stap.
+
+   ---------------------------------------------------------------------------
+   SINDSDIEN: DIT IS HET SLOT VOOR ELKE DEUR, NIET ALLEEN VOOR EEN PIN.
+
+   De keuring meldde "de functie teVaak staat in 3 kernmodules". Dat las als een
+   opmerking over netheid, maar dat was het niet. Drie modules -- algpin,
+   sleutelwoorden en eenaccount/koppelen -- hadden elk hun eigen kopie van deze
+   teller, met precies dezelfde grenzen (vijf pogingen, dan een minuut dicht) en
+   met een verschil dat ertoe deed: GEEN VAN DRIEEN RUIMDE OOIT OP. Hun Map
+   groeide met elke sleutel die ooit een misgreep had en kromp nooit meer. Dit
+   bestand heeft `opruimen()` en die hangt in de onderhoudsronde van server.js;
+   de kopieen hadden dat niet.
+
+   Zo werkt de vorm die deze codebase blijft opleveren: een kopie erft de logica
+   van het origineel, maar niet de latere reparaties. Daarom draaien alle vier
+   de deuren nu op DIT slot.
+
+   Sleutels dragen hun soort voorop ('staff:', 'algpin:', 'sleutelwoord:',
+   'koppel:'), zodat twee deuren met toevallig dezelfde sleutelwaarde niet
+   elkaars teller vullen. `personeel()` bouwt de personeelspin-sleutel; de
+   andere drie zijn zo kort dat ze bij hun eigen module staan. */
 
 const MAX_POGINGEN = 5;      // zoveel misgrepen mag een doel hebben...
 const STRAF_MS = 60000;      // ...daarna gaat het een minuut dicht

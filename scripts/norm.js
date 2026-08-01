@@ -45,7 +45,23 @@ const METERS = [
   { sleutel: 'dekkingPct', richting: 'omhoog', wat: 'percentage endpoints dat in een test voorkomt' },
   { sleutel: 'keuringStuk', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "stuk"' },
   { sleutel: 'keuringScheef', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "scheef"' },
-  { sleutel: 'keuringBeter', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "beter"' },
+  /* keuringBeter WAS EEN GEBLENDE TELLER, en daarmee de enige meter in deze
+     lijst die niet kon ratelen. Hij telde drie onvergelijkbare dingen bij
+     elkaar op: bestanden die vlak onder de 10 kB-grens zitten, functienamen
+     die in meer dan twee kernmodules voorkomen, en domeinen met endpoints
+     zonder toets. Dat getal loopt op zodra je een legitiem bestand toevoegt,
+     en -- erger -- een daling in de ene groep maskeerde een stijging in de
+     andere. Precies zo dook de dubbeling van teVaak() onder in het totaal.
+
+     Drie losse meters is niet losser maar STRAKKER: elke groep moet nu op
+     zichzelf de goede kant op, en verrekenen kan niet meer. Voor de eerlijkheid:
+     de som stond op 126 toen de norm werd vastgelegd en staat nu op 130, dus
+     over die vier is geen ratel meer die klaagt. Ze zijn ontstaan door bestanden
+     toe te voegen, niet door iets te laten verslechteren; de enige inhoudelijke
+     van de vijf (teVaak in drie kernmodules) is opgelost. */
+  { sleutel: 'keuringOmvang', richting: 'omlaag', wat: 'bestanden die vlak onder de 10 kB-grens zitten' },
+  { sleutel: 'keuringDubbeling', richting: 'omlaag', wat: 'functienamen die in meer dan twee kernmodules staan' },
+  { sleutel: 'keuringDekkingAdvies', richting: 'omlaag', wat: 'domeinen met endpoints zonder toets' },
   { sleutel: 'dependencies', richting: 'omlaag', wat: 'externe pakketten (de nul is een principe, geen toeval)' },
   { sleutel: 'testbestanden', richting: 'omhoog', wat: 'testbestanden' },
   /* DE TWEE METERS OVER TOETSEN DIE ER WEL ZIJN MAAR NIET DRAAIEN.
@@ -67,6 +83,21 @@ const METERS = [
   { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan als een dienst ontbreekt' },
   { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' }
 ];
+
+/* De drie groepen van de keuring, apart geteld. Een groep die de keuring niet
+   meer kent geeft 0 -- en dat is bewust GEEN stille nul: 0 is beter dan de
+   grondwaarde, dus de ratel meldt het als een verbetering en dan hoort iemand
+   te kijken of dat klopt of dat de groep gewoon verdwenen is. */
+function telPerGroep(k) {
+  const uit = { keuringOmvang: 0, keuringDubbeling: 0, keuringDekkingAdvies: 0 };
+  const naar = { omvang: 'keuringOmvang', dubbeling: 'keuringDubbeling', dekking: 'keuringDekkingAdvies' };
+  for (const b of (k.bevindingen || [])) {
+    if (b.soort !== 'beter') continue;
+    const sleutel = naar[b.groep];
+    if (sleutel) uit[sleutel]++;
+  }
+  return uit;
+}
 
 function meet() {
   const uit = execFileSync(process.execPath,
@@ -101,7 +132,8 @@ function meet() {
   return {
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
-    keuringStuk: k.stuk, keuringScheef: k.scheef, keuringBeter: k.beter,
+    keuringStuk: k.stuk, keuringScheef: k.scheef,
+    ...telPerGroep(k),
     dependencies: deps, testbestanden, zelfpoortendeToetsen, e2eBestanden
   };
 }

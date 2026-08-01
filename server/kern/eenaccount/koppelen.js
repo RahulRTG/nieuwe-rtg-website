@@ -29,17 +29,13 @@ module.exports = (kctx) => {
   const { accounts, findSupplier, checkCred, hasCred, DEMO, DEMO_SUPPLIER, OFFICE_CODE,
     veiligGelijk, totpOk, logInlog, pinSlot, nu } = kctx;
 
-  const pogingen = new Map();
-  function teVaak(key) {
-    const p = pogingen.get(key) || { n: 0, tot: 0 };
-    return p.tot > Date.now();
-  }
-  function fout(key) {
-    const p = pogingen.get(key) || { n: 0, tot: 0 };
-    p.n++;
-    if (p.n >= MAX_POGING) { p.n = 0; p.tot = Date.now() + 60000; }
-    pogingen.set(key, p);
-  }
+  /* De koppel-teller draait op HETZELFDE slot als de personeelspin hieronder.
+     Hij had een eigen Map met dezelfde grenzen en zonder opruimronde -- en dat
+     is extra scheef in juist dit bestand, want de kop hierboven legt uit dat
+     losse tellers de reden waren dat de pin te raden viel. */
+  const doel = key => 'koppel:' + key;
+  const teVaak = key => pinSlot.dicht(doel(key));
+  const fout = key => pinSlot.fout(doel(key), 'het koppelen van sleutelbos ' + key);
 
   /* Levert de rol op die aan de sleutelbos mag, of een foutobject. Het
      wegschrijven zelf doet de aanroeper: die kent de sleutelbos. */

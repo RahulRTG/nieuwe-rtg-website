@@ -11,12 +11,16 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const { maakSleutelwoorden } = require('../server/kern/sleutelwoorden');
+/* Het ECHTE gedeelde slot, niet een nepje: sinds de vier tellers zijn
+   samengevoegd is dit het slot dat in productie ook draait, en een toets die
+   hem vervangt zou juist het samengevoegde gedrag niet meer raken. */
+const { maakPinSlot } = require('../server/pinslot');
 
 // een nep-kluis + nep-accounts, zodat we de kern los kunnen beproeven
 function opstelling(users) {
   const db = { data: {} };
   const accounts = { findByLogin: (login) => users[String(login || '').toLowerCase()] || null };
-  const sw = maakSleutelwoorden({ db, save: () => {}, crypto, accounts });
+  const sw = maakSleutelwoorden({ db, save: () => {}, crypto, accounts, slot: maakPinSlot() });
   return sw;
 }
 

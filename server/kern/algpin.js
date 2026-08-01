@@ -11,27 +11,30 @@
 
    maakAlgPin(state) volgt het vaste kern-patroon. */
 
-function maakAlgPin({ db, save, crypto }) {
+function maakAlgPin({ db, save, crypto, slot }) {
   const rij = () => {
     if (!db.data.algPin || typeof db.data.algPin !== 'object') db.data.algPin = {};
     return db.data.algPin;
   };
-  const fouten = new Map(); // key -> { n, tot }
+  /* Het slot komt van buiten (server/pinslot.js) en wordt gedeeld met de
+     personeelspin, de sleutelwoorden en het koppelen. Hier stond een eigen
+     kopie van dezelfde teller, met dezelfde grenzen -- maar zonder de
+     opruimronde die het gedeelde slot wel heeft, dus die Map groeide met elke
+     sleutel die ooit een misgreep had en kromp nooit meer. De sleutel draagt
+     zijn soort voorop, zodat twee deuren met dezelfde sleutelwaarde niet
+     elkaars teller vullen. */
+  /* Meteen bij het opstarten, niet pas bij de eerste misgreep: een ontbrekend
+     slot is stil een ongeremde pincode. Liever een server die niet start. */
+  if (!slot || typeof slot.dicht !== 'function')
+    throw new Error('algpin: het gedeelde slot ontbreekt; zonder rem is een pincode van vier cijfers zo geraden.');
+  const doel = key => 'algpin:' + key;
   const PIN_RE = /^\d{4,8}$/;
 
   function hash(pin, zout) {
     return crypto.scryptSync(String(pin), zout, 32, { N: 16384, r: 8, p: 1 }).toString('base64');
   }
-  function teVaak(key) {
-    const f = fouten.get(key);
-    return !!(f && f.tot > Date.now());
-  }
-  function fout(key) {
-    const f = fouten.get(key) || { n: 0, tot: 0 };
-    f.n++;
-    if (f.n >= 5) { f.n = 0; f.tot = Date.now() + 60000; }
-    fouten.set(key, f);
-  }
+  const teVaak = key => slot.dicht(doel(key));
+  const fout = key => slot.fout(doel(key), 'de algemene pincode van ' + key);
   function klopt(key, pin) {
     const p = rij()[key];
     if (!p || !PIN_RE.test(String(pin || ''))) return false;
@@ -59,7 +62,7 @@ function maakAlgPin({ db, save, crypto }) {
     if (!rij()[key]) return { ok: true, gezet: false }; // geen pin gezet = niets te bewijzen
     if (teVaak(key)) return { status: 429, error: 'Te veel foute pogingen. Wacht een minuut.' };
     if (!klopt(key, pin)) { fout(key); return { status: 401, error: 'Onjuiste pincode.' }; }
-    fouten.delete(key);
+    slot.goed(doel(key));
     return { ok: true, gezet: true };
   }
 

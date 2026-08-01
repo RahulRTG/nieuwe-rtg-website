@@ -2980,12 +2980,12 @@ Object.assign(kern, require('./kern/wbw').maakWbw({
 /* Sleutelwoorden (kern/sleutelwoorden.js): inloggen door een gesprek met
    Rahul en vier onthouden woorden, drie per keer (roterend, scrypt, met een
    slot). Moet VOOR het aanmeldgesprek staan, want dat gebruikt swStart/swZeg. */
-Object.assign(kern, require('./kern/sleutelwoorden').maakSleutelwoorden({ db, save, crypto, accounts }));
+Object.assign(kern, require('./kern/sleutelwoorden').maakSleutelwoorden({ db, save, crypto, accounts, slot: pinSlot }));
 Object.assign(kern, require('./kern/aanmeldgesprek').maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart: kern.swStart, swZeg: kern.swZeg }));
 /* De algemene pin (kern/algpin.js): een pincode van het lid die de
    privacygevoelige apps op het OS beschermt en waarmee de werk-apps openen
    (het ene account = bevoegdheid, de pin = bewijs). */
-Object.assign(kern, require('./kern/algpin').maakAlgPin({ db, save, crypto }));
+Object.assign(kern, require('./kern/algpin').maakAlgPin({ db, save, crypto, slot: pinSlot }));
 /* Het werkvenster (kern/werkvenster.js): de werkgever bepaalt wanneer
    personeel op de werkpagina en de PDA mag; de server dwingt dat af bij elke
    ingang naar een personeelssessie. Rahul adviseert los daarvan (agenda,

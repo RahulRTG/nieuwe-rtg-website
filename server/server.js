@@ -986,7 +986,6 @@ const { werkmail } = require('./kern/werkmail')({ db, save, crypto, rtmail, mail
 const atelierweb = require('./kern/atelierweb')({ db, save, crypto, schoon });
 // de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
 const naamlaag = require('./kern/naamlaag')({ db, save, schoon });
-const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon });
 // het welkom-draaiboek ook voor nieuwe RTF-profielen (foundation, eigen router)
 try { rtf.setAutomatisering(automatisering); } catch (e) {}
 {
@@ -1206,6 +1205,10 @@ const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
    klein, hoeveel er ook gepost wordt. De publieke Salon-foto's worden via de
    /media-route uitgeserveerd; snaps komen alleen eenmalig als data-URL terug. */
 const media = require('./media').maakMedia({ dir: DATA_DIR });
+/* RTG Webmaker (kern/webmaker.js): de eigen site van een lid. Staat hier en
+   niet eerder omdat hij de mediastore nodig heeft: een foto die uit de
+   bibliotheek valt of wordt weggehaald, moet ook van schijf. */
+const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media });
 app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
 // Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de
 // mediastore, zodat ook oude data het geheugen niet meer belast. Alleen de
@@ -1335,7 +1338,9 @@ const notities = require('./kern/notities').maakNotities({
 /* RTG Bestanden (kern/bestanden.js): de kluis. Bytes versleuteld op schijf
    (zelfde aanpak als media.js), alleen verwijzingen in de database. */
 const bestanden = require('./kern/bestanden').maakBestanden({
-  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR });
+  // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
+  // langs het scan-net, dus die scant zichzelf zodra het bestand compleet is
+  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR, antivirus });
 /* RTG Meet (kern/meet.js): vergaderkamers op codenaam; de server geeft
    alleen WebRTC-seinen door, beeld en geluid lopen peer-to-peer. */
 const meet = require('./kern/meet').maakMeet({

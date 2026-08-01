@@ -2,10 +2,16 @@
    werken), de versiegeschiedenis en de prullenbak. De basis (opslag, mappen,
    quotum) staat in ./bestanden.js en geeft zijn helpers hier door. */
 
+/* MIME-types die in een browser uit zichzelf iets kunnen doen. Ze mogen de
+   kluis in -- het is de kluis van het lid -- maar komen er als kale bytes weer
+   uit, zodat een gedeeld bestand nooit als uitvoerbare pagina opengaat. */
+const ACTIEF = /^(text\/html|application\/xhtml\+xml|image\/svg\+xml|text\/xml|application\/xml|.*javascript.*)$/i;
+const ONSCHULDIG = (m) => (ACTIEF.test(String(m || '')) ? 'application/octet-stream' : String(m || 'application/octet-stream'));
+
 function maakBestandenDelen(basis) {
   const { save, keyVanCodenaam, codenaamVan, sseToCustomer,
     bord, vind, magErbij, schrijfBytes, leesBytes, wisBytes, wisItem, gebruik, nu,
-    QUOTUM, MAX_BESTAND, MAX_VERSIES } = basis;
+    QUOTUM, MAX_BESTAND, MAX_VERSIES, scanOk } = basis;
 
   /* ---- delen op codenaam: de ander kijkt, haalt op en zet nieuwe versies ---- */
   async function deel(key, bid, codenaam, aan) {
@@ -42,6 +48,9 @@ function maakBestandenDelen(basis) {
     if (buf.length > MAX_BESTAND) return { status: 413, error: 'Een bestand mag hooguit 15 MB zijn.' };
     // het quotum is van de eigenaar, ook als een gedeelde de versie plaatst
     if (gebruik(v.eigenaar) + buf.length > QUOTUM) return { status: 413, error: 'De kluis van de eigenaar is vol.' };
+    // een nieuwe versie is een vers bestand: dezelfde poort als een upload
+    const besmet = scanOk ? scanOk(key, dataUrl) : null;
+    if (besmet) return besmet;
     it.versies = it.versies || [];
     it.versies.unshift({ ref: it.ref, bytes: it.bytes, op: it.gewijzigd || it.op, door: it.door || null });
     // meer dan MAX_VERSIES bewaren we niet: de oudste valt eraf, inclusief de bytes
@@ -83,8 +92,24 @@ function maakBestandenDelen(basis) {
     if (!bron) return { status: 404, error: 'Die versie bestaat niet.' };
     const buf = leesBytes(bron.ref);
     if (!buf) return { status: 410, error: 'De inhoud is niet meer terug te lezen.' };
-    return { naam: it.naam, mime: it.mime, bytes: buf.length,
-      dataUrl: 'data:' + it.mime + ';base64,' + buf.toString('base64') };
+    /* WAT ER IN MAG, MAG ER NIET ALS ZICHZELF UIT.
+
+       De kluis neemt elk MIME-type aan, en dat hoort ook: het is de kluis van
+       het lid, geen fotoalbum -- een contract, een zip, een exportbestand. Maar
+       de kluis is ook DEELBAAR (gedeeldMet), en de teruggave is een data-URL
+       waar het MIME-type letterlijk uit het verzoek van de uploader in staat.
+       Een data:text/html of data:image/svg+xml die een ander opent, draait
+       script; dat is dan wel een null-origin, maar het is een gratis stukje
+       vertrouwde-omgeving dat we niemand hoeven te geven. De huidige schermen
+       zetten het in een <img> of <audio> en dan gebeurt er niets, maar dat is
+       een eigenschap van de schermen van vandaag en geen grendel.
+
+       Het bestand blijft dus precies wat het was; alleen het etiket op de
+       terugweg wordt onschadelijk gemaakt voor de types die uit zichzelf iets
+       kunnen doen. Downloaden en opslaan werkt gewoon. */
+    const mime = ONSCHULDIG(it.mime);
+    return { naam: it.naam, mime, bytes: buf.length,
+      dataUrl: 'data:' + mime + ';base64,' + buf.toString('base64') };
   }
 
   /* ---- de prullenbak: een zichtbare la met een klok erop, geen zwart gat ---- */

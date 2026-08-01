@@ -50,7 +50,36 @@ function maakStukken(basis, upload, versieNieuw) {
     if (!u || u.key !== key) return { status: 404, error: 'Die upload loopt niet (meer); begin opnieuw.' };
     lopend.delete(String(uploadId));
     const dataUrl = 'data:' + u.mime + ';base64,' + u.stukken.join('');
-    // dezelfde weg als een kleine upload: alle grenzen en het quotum gelden gewoon
+
+    /* DE ONTSMETTER ZAT HIER NIET, EN DEZE WEG LIEP ER OMHEEN.
+
+       Het scan-net in server.js loopt door elke verzoek-body en scant wat eruit
+       ziet als een complete data-URL ("data:<mime>;base64,<...>"). Dat dekt alle
+       gewone upload-plekken in een klap. Maar een STUK is geen data-URL: het is
+       een kale base64-tekst zonder kop, en dus zag het net er niets in. Het
+       geheel ontstaat pas hier, op de server, in een variabele -- en er is geen
+       verzoek-body meer waar het net doorheen kan lopen.
+
+       Wie een besmet bestand kwijt wilde, hoefde het dus alleen in stukken te
+       sturen. Geen truc, geen kennis van het systeem nodig: de app doet dat
+       vanzelf zodra een bestand boven de 8 MB uitkomt. Daarom hier, op het
+       moment dat het bestand voor het eerst compleet is, dezelfde scan. */
+    /* GEEN EIGEN SCAN HIER, EN DAT IS EEN BESLUIT.
+
+       Het scan-net in server.js ziet deze weg niet: een los stuk is kale
+       base64 zonder kop, dus geen data-URL, en het geheel ontstaat pas hier op
+       de server. Ik heb er daarom eerst een scan bij gezet -- en toen bleek de
+       mutatie niet te bijten. Terecht: de regels hieronder lopen door upload()
+       en versieNieuw(), en die halen sinds deze ronde allebei dezelfde poort
+       (./bestanden-poort.js) langs. Een tweede kopie van dezelfde regel is
+       precies hoe twee plekken later uit elkaar gaan lopen.
+
+       Wat hier dus WEL moet blijven staan: deze weg mag nooit langs upload() of
+       versieNieuw() heen gaan schrijven. Zolang dat zo is, is de poort gedekt.
+       test/upload-poort.test.js bewaakt dat van buitenaf. */
+
+    // dezelfde weg als een kleine upload: alle grenzen, het quotum en de
+    // Ontsmetter gelden gewoon
     return u.bid ? versieNieuw(key, u.bid, dataUrl)
       : upload(key, { naam: u.naam, map: u.map, dataUrl });
   }

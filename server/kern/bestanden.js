@@ -15,7 +15,7 @@ const MAX_VERSIES = 10;                 // per bestand; de oudste valt eraf
 const PRULLENBAK_DAGEN = 30;
 const MAX_NAAM = 120;
 
-function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir }) {
+function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir, antivirus }) {
   const OPSLAG = path.join(dir, 'bestanden');
   const id = () => 'b' + crypto.randomBytes(6).toString('hex');
   const nu = () => new Date().toISOString();
@@ -97,6 +97,13 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
     return { ok: true };
   }
 
+  /* De Ontsmetter aan de deur van de kluis. Twee plekken maken hier van bytes
+     een bestand -- upload() hieronder en versieNieuw() in ./bestanden-delen.js
+     -- en die halen allebei dezelfde poort langs. De gestukte upload loopt via
+     die twee en heeft er dus geen eigen kopie van nodig; het waarom van dat
+     alles staat in ./bestanden-poort.js. */
+  const { scanOk } = require('./bestanden-poort')({ antivirus });
+
   /* ---- uploaden: een data-URL in, een verwijzing terug ---- */
   function upload(key, { naam, map, dataUrl }) {
     const b = bord(key);
@@ -107,6 +114,8 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
     if (!buf.length) return { status: 400, error: 'Het bestand is leeg.' };
     if (buf.length > MAX_BESTAND) return { status: 413, error: 'Een bestand mag hooguit 15 MB zijn.' };
     if (gebruik(key) + buf.length > QUOTUM) return { status: 413, error: 'Uw kluis van 200 MB is vol; ruim eerst op (de prullenbak telt mee).' };
+    const besmet = scanOk(key, dataUrl);
+    if (besmet) return besmet;
     naam = schoonNaam(naam);
     if (!naam) return { status: 400, error: 'Geef het bestand een naam.' };
     map = String(map || '') || null;
@@ -163,7 +172,7 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
 
   const basis = { db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer,
     bord, borden, vind, magErbij, schrijfBytes, leesBytes, wisBytes, wisItem, gebruik, nu,
-    QUOTUM, MAX_BESTAND, MAX_VERSIES };
+    QUOTUM, MAX_BESTAND, MAX_VERSIES, antivirus, scanOk };
   const delen = maakBestandenDelen(basis);
   // grote bestanden komen in stukken binnen (bestanden-stukken.js) en lopen
   // aan het eind gewoon door dezelfde upload-weg, met quotum en al

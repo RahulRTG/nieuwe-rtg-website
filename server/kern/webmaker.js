@@ -8,34 +8,24 @@
 
    Alles wordt geschoond en begrensd; beeld verwijst naar eigen RTG-campagne of
    Salon, we bewaren alleen de verwijzing. */
-module.exports = ({ db, save, crypto, schoon }) => {
+module.exports = ({ db, save, crypto, schoon, media }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst'];
   const VERSIES = ['telefoon', 'tablet', 'desktop'];
   const PER_LID = 12;         // hoeveel sites een lid mag hebben
   const TOTAAL = 20000;       // harde bovengrens op de opslag
 
-  const FOTO_MAX = 24;        // hoeveel eigen foto's een lid in zijn bibliotheek houdt
   function store() {
     if (!db.data.ledenSites || !Array.isArray(db.data.ledenSites.lijst)) db.data.ledenSites = { lijst: [] };
     if (!db.data.ledenSites.fotos || typeof db.data.ledenSites.fotos !== 'object') db.data.ledenSites.fotos = {};
     return db.data.ledenSites;
   }
-  // De eigen fotobibliotheek van een lid: alleen veilige /media-verwijzingen (het
-  // scannen en opslaan gebeurt in de route, hier bewaren we alleen de url).
-  function fotos(key) { const s = store(); return Array.isArray(s.fotos[key]) ? s.fotos[key].slice() : []; }
-  function fotoBewaar(key, url) {
-    if (!/^\/media\/[A-Za-z0-9._-]+$/.test(String(url || ''))) return { error: 'Ongeldige foto.', status: 400 };
-    const s = store(); const lijst = Array.isArray(s.fotos[key]) ? s.fotos[key] : (s.fotos[key] = []);
-    if (!lijst.includes(url)) lijst.unshift(url);
-    if (lijst.length > FOTO_MAX) lijst.length = FOTO_MAX;
-    save();
-    return { ok: true, url, fotos: lijst.slice() };
-  }
-  function fotoWeg(key, url) {
-    const s = store(); if (Array.isArray(s.fotos[key])) s.fotos[key] = s.fotos[key].filter(u => u !== url); save();
-    return { ok: true, fotos: fotos(key) };
-  }
+  /* De fotobibliotheek staat in ./webmaker-fotos.js: die kant raakt de
+     mediastore (een foto die eraf valt of wordt weggehaald, moet ook van
+     schijf) en dat is een ander soort werk dan het bouwen van een pagina. */
+  const fotolaag = require('./webmaker-fotos')({ store, save, media });
+  const { fotos, fotoBewaar, fotoWeg } = fotolaag;
+
   function slug(v) {
     return String(v == null ? '' : v).toLowerCase().trim()
       .replace(/^rtg:\/\//, '').replace(/\.rtg$/, '')   // "rtg://naam" of "naam.rtg" mag ook

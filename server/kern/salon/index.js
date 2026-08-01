@@ -22,6 +22,10 @@
 const { keur } = require('../veilig');
 
 module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcastSync }) => {
+  /* Valt een post uit het venster, of haalt de auteur hem weg, dan gaan zijn
+     foto's mee. Dat gebeurde niet: de verwijzing verdween, het bestand bleef --
+     zie kern/mediaopruim.js voor wat dat op drie plekken tegelijk aanrichtte. */
+  const opruim = require('../mediaopruim')(media);
   const MAX_POSTS = Number(process.env.SALON_MAX || 2000);
   const MAX_MEDIA = 6;              // foto's per post (de karrousel)
   const PAGINA = 20;                // posts per bladzijde
@@ -99,8 +103,9 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
       meldingen: []
     };
     db.data.posts.unshift(post);
-    // begrensd venster: de oudste vallen af, maar niet meer bij 60
-    if (db.data.posts.length > MAX_POSTS) db.data.posts.length = MAX_POSTS;
+    // begrensd venster: de oudste vallen af, maar niet meer bij 60 -- en hun
+    // foto's vallen mee af, anders groeit de mediastore ongelimiteerd door
+    kap();
     save();
     if (broadcastSync) broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
     return { ok: true, post: publiek(post, sess) };
@@ -111,8 +116,10 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     const i = db.data.posts.findIndex(p => String(p.id) === String(postId));
     if (i < 0) return { error: 'Deze post bestaat niet.' };
     if (db.data.posts[i].authorKey !== sess.key) return { error: 'Dit is niet jouw post.' };
-    db.data.posts.splice(i, 1);
+    const [weg] = db.data.posts.splice(i, 1);
     save();
+    // en de foto's van die post; anders blijft de /media-url gewoon opvraagbaar
+    opruim.wis(opruim.refsVanPosts([weg]));
     return { ok: true };
   }
 
@@ -198,7 +205,10 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
      verschillen en er maar een getal is om te verzetten. */
   function kap() {
     S();
-    if (db.data.posts.length > MAX_POSTS) db.data.posts.length = MAX_POSTS;
+    if (db.data.posts.length <= MAX_POSTS) return;
+    const eraf = db.data.posts.slice(MAX_POSTS);
+    db.data.posts.length = MAX_POSTS;
+    opruim.wis(opruim.refsVanPosts(eraf));
   }
 
   return { plaats, verwijder, feed, publiek, onderwerpen, onderwerpenUit, postMet, kap, S, MAX_POSTS, MAX_MEDIA };

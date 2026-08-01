@@ -311,6 +311,27 @@
       <div id="bToegangLijst" style="margin-top:.6rem;font-size:.82rem;"></div>
     </div>
 
+    <!-- Het papierwerk: de achttien dingen die alleen een mens kan invullen.
+         Alleen voor de eigenaar: hier staan het KvK-nummer, het prive-nummer
+         van de jurist en de afspraak wie er 's nachts gebeld wordt. -->
+    <h3 class="sec" id="bPapKop" hidden>Het papierwerk</h3>
+    <div class="kaart" id="bPapieren" hidden>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;line-height:1.6;">
+        Achttien dingen die geen enkel systeem kan verzinnen: onder welke naam RTG draait, wie het privacy-aanspreekpunt is,
+        hoe lang een paspoortscan bewaard blijft, en wie er bij een datalek om drie uur 's nachts gebeld wordt.
+        Vul in, wijzig later gerust, en weet je iets nog niet, park het dan; dan blijft het zichtbaar openstaan
+        in plaats van weg te vallen.</p>
+      <div id="bPapStand" style="font-size:.82rem;margin:0 0 .8rem;"></div>
+      <div id="bPapLijst"></div>
+      <h4 style="margin:1.2rem 0 .4rem;font-size:.9rem;">De documenten</h4>
+      <p class="stil" style="font-size:.76rem;color:var(--soft);margin:0 0 .5rem;">Het ingevulde papier om te lezen of af te drukken. Wat nog openstaat blijft er zichtbaar in staan: een register dat zijn eigen gaten verbergt is gevaarlijker dan een register met gaten.</p>
+      <div id="bPapDocs" class="taakrij" style="flex-wrap:wrap;gap:.5rem;"></div>
+      <pre id="bPapDoc" hidden style="white-space:pre-wrap;font-size:.78rem;line-height:1.55;background:var(--paneel,#111);padding:1rem;overflow-x:auto;margin:.8rem 0 0;"></pre>
+      <h4 style="margin:1.2rem 0 .4rem;font-size:.9rem;">Wat er is gewijzigd</h4>
+      <p class="stil" style="font-size:.76rem;color:var(--soft);margin:0 0 .5rem;">Wie en wanneer, bewust zonder de oude waarde, want dit dossier bevat prive-nummers, en een historie zou die verdubbelen.</p>
+      <div id="bPapSpoor" style="font-size:.8rem;"></div>
+    </div>
+
     <h3 class="sec">De wereld (groen = oke, oranje = uit, rood = storing)</h3>
     <div id="bWereld"></div>
 
@@ -2537,6 +2558,80 @@ $('#bToegangGeef').addEventListener('click', async () => {
   try { await api('boardroom/toegang/geef', { codenaam: c }); $('#bToegangCode').value = ''; meld('Toegang gegeven.'); laadToegang(true); }
   catch (e) { meld(e.message); }
 });
+/* HET PAPIERWERK. Achttien vragen die alleen een mens kan beantwoorden; de
+   server verzint hier nooit iets (zie server/papieren/vragen.js). Invullen,
+   wijzigen en parkeren zijn dezelfde handeling: het antwoord op vraag X is
+   voortaan dit. Alleen zichtbaar voor de eigenaar. */
+async function laadPapieren(baas){
+  $('#bPapKop').hidden = $('#bPapieren').hidden = !baas;
+  if (!baas) return;
+  let d;
+  try { d = await api('papieren'); } catch (e) { $('#bPapStand').textContent = e.message; return; }
+
+  $('#bPapStand').innerHTML = d.klaar
+    ? '<span style="color:var(--gold);">Alle achttien zijn ingevuld.</span>'
+    : '<b>' + d.open + '</b> van de ' + d.totaal + ' staan nog open.' +
+      (d.bijgewerkt ? ' <span style="color:var(--soft);">Laatst bijgewerkt ' + new Date(d.bijgewerkt).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) + '.</span>' : '');
+
+  // per groep, in de volgorde waarin de vragen staan
+  const groepen = [];
+  for (const r of d.regels) {
+    let g = groepen.find(x => x.naam === r.groep);
+    if (!g) groepen.push(g = { naam: r.groep, regels: [] });
+    g.regels.push(r);
+  }
+  const kleur = st => st === 'ingevuld' ? 'var(--gold)' : (st === 'geparkeerd' ? 'var(--soft)' : 'var(--burgundy-on-dark,#C23A5E)');
+  const label = st => st === 'ingevuld' ? 'ingevuld' : (st === 'geparkeerd' ? 'geparkeerd' : 'open');
+  $('#bPapLijst').innerHTML = groepen.map(g =>
+    '<h4 style="margin:1rem 0 .4rem;font-size:.88rem;">' + esc(g.naam) + '</h4>' +
+    g.regels.map(r =>
+      '<div class="kaart" style="margin:0 0 .5rem;padding:.7rem .8rem;">' +
+        '<div style="display:flex;gap:.6rem;align-items:baseline;">' +
+          '<span style="flex:1;font-size:.84rem;">' + esc(r.vraag) + '</span>' +
+          '<span style="font-size:.72rem;color:' + kleur(r.status) + ';">' + label(r.status) + '</span>' +
+        '</div>' +
+        (r.waarde ? '<div style="font-size:.8rem;margin:.35rem 0 0;">' + esc(r.waarde) + '</div>' : '') +
+        (r.at ? '<div style="font-size:.7rem;color:var(--soft);margin:.2rem 0 0;">' + (r.door ? esc(r.door) + ' · ' : '') +
+          new Date(r.at).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) + '</div>' : '') +
+        '<div class="taakrij" style="margin-top:.45rem;">' +
+          '<input class="veld" data-papveld="' + esc(r.id) + '" style="flex:1;" maxlength="400" placeholder="' +
+            (r.status === 'ingevuld' ? 'Wijzig het antwoord' : 'Typ het antwoord') + '">' +
+          '<button class="knop stil" data-papzet="' + esc(r.id) + '" type="button" style="padding:.25rem .8rem;font-size:.75rem;">Bewaar</button>' +
+          '<button class="knop stil" data-pappark="' + esc(r.id) + '" type="button" style="padding:.25rem .8rem;font-size:.75rem;">Weet ik nog niet</button>' +
+        '</div>' +
+      '</div>').join('')).join('');
+
+  const zet = async (id, parkeer) => {
+    const veld = $('#bPapLijst').querySelector('[data-papveld="' + id + '"]');
+    try {
+      await api('papieren/antwoord', { id: id, waarde: veld ? veld.value : '', parkeer: !!parkeer });
+      meld(parkeer ? 'Genoteerd als nog niet bekend; dit punt blijft openstaan.' : 'Vastgelegd.');
+      laadPapieren(true);
+    } catch (e) { meld(e.message); }
+  };
+  $('#bPapLijst').querySelectorAll('[data-papzet]').forEach(b => b.addEventListener('click', () => zet(b.dataset.papzet, false)));
+  $('#bPapLijst').querySelectorAll('[data-pappark]').forEach(b => b.addEventListener('click', () => zet(b.dataset.pappark, true)));
+
+  $('#bPapSpoor').innerHTML = (d.spoor && d.spoor.length) ? d.spoor.map(x =>
+    '<div class="witem"><span class="wnm" style="color:var(--gold);">' + esc(x.door || 'onbekend') + '</span>' +
+    '<span class="wdt">' + esc(x.actie) + ': ' + esc(x.id) + '</span>' +
+    '<span style="color:var(--soft);font-size:.72rem;">' + new Date(x.at).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) + '</span></div>').join('')
+    : '<div class="leeg">Nog niets gewijzigd.</div>';
+
+  try {
+    const dl = await api('papieren/documenten');
+    $('#bPapDocs').innerHTML = (dl.documenten || []).map(x =>
+      '<button class="knop stil" data-papdoc="' + esc(x.naam) + '" type="button" style="padding:.25rem .8rem;font-size:.75rem;">' + esc(x.naam) + '</button>').join('');
+    $('#bPapDocs').querySelectorAll('[data-papdoc]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const doc = await api('papieren/document', { naam: b.dataset.papdoc });
+        $('#bPapDoc').hidden = false;
+        $('#bPapDoc').textContent = doc.tekst + (doc.gaten ? '\n\n(' + doc.gaten + ' plek(ken) staan nog open.)' : '');
+      } catch (e) { meld(e.message); }
+    }));
+  } catch (e) {}
+}
+
 async function openBoard(){
   zetKamerUrl('boardroom');
   let d;
@@ -2545,6 +2640,7 @@ async function openBoard(){
   toon('vBoard');
   boardDeur(false);
   laadToegang(!!d.baas);
+  laadPapieren(!!d.baas);
   laadGeld();
   laadRahul();
   laadDoosRegie();

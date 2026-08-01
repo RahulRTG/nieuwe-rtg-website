@@ -12,6 +12,27 @@ module.exports = (ctx) => {
      kantoor blijft op de gewone office-inlog werken. */
   app.post('/api/office/boardroom', boardroomAuth, (req, res) => veilig(res, () => ({ status: 200, ...afdelingen.boardroom(), baas: !!req.boardroomBaas })));
 
+  /* HET PAPIERWERK, IN DE BOARDROOM.
+
+     De 18 vragen (KvK, aanspreekpunt, FG, bewaartermijnen, verwerkers, wie er
+     bij een datalek gebeld wordt) hingen alleen aan de technische pagina. Dat
+     is de verkeerde plek: dit is bestuurswerk, geen systeembeheer, en het is de
+     eigenaar die het moet inleveren, bijwerken en bijstellen.
+
+     De handlers staan in ../papieren-deur.js en zijn dezelfde als op het
+     techniekbord -- een tweede implementatie zou uiteenlopen zodra iemand er
+     een aanraakt. Alleen de poort verschilt: hier de boardroomdeur, en
+     daarbovenop req.boardroomBaas, want boardroom-toegang is niet hetzelfde
+     als eigenaar zijn. Wie de sleutel van de kamer kreeg, hoeft nog niet het
+     privenummer van de jurist te zien. */
+  require('../papieren-deur')({
+    app,
+    prefix: '/api/office',
+    poort: boardroomAuth,
+    isBaas: (req) => !!req.boardroomBaas,
+    wie: (req) => req.boardroomKey || null
+  });
+
   /* De sleutel van de kamer: de eigenaar geeft toegang op codenaam en trekt
      hem ook weer in. De lijst toont alleen codenamen; namen blijven in de kluis. */
   app.post('/api/office/boardroom/toegang', boardroomAuth, (req, res) => veilig(res, () =>

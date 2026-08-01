@@ -54,6 +54,27 @@ const WEET_NIET = /^(geen idee|weet ik niet|weet niet|nvt|n\.v\.t\.|\?+|onbekend
 
 /* Een antwoord vastleggen. Geeft { ok } of { fout } terug; nooit een verzinsel.
    parkeer: true legt vast dat het nog niet bekend is (blijft open tellen). */
+/* HET SPOOR: WIE HEEFT WAT WANNEER GEWIJZIGD -- EN BEWUST NIET WAT HET WAS.
+
+   Deze antwoorden zijn te bewerken, en dat hoort ook: een KvK-adres verandert,
+   een jurist vertrekt, een bewaartermijn wordt aangescherpt. Maar bij
+   compliance-antwoorden hoort zichtbaar te zijn DAT er iets veranderd is en
+   door wie -- anders staat er straks een register waarvan niemand meer weet
+   wanneer het is bijgesteld.
+
+   De oude waarde bewaren we NIET. Dit bestand bevat het privenummer van de
+   jurist en de afspraak wie er 's nachts gebeld wordt; een historie zou precies
+   die gegevens verdubbelen, en dan is "verwijderen" bij de volgende wijziging
+   ineens een halve waarheid. Wie, wanneer, welke vraag, en of het invullen,
+   bijwerken of parkeren was. Dezelfde lijn als het inzagejournaal: het spoor
+   zegt dat er gekeken is, niet wat er stond. */
+const SPOOR_MAX = 500;
+function noteer(s, id, actie, door) {
+  if (!Array.isArray(s.spoor)) s.spoor = [];
+  s.spoor.push({ id, actie, door: schoon(door) || null, at: new Date().toISOString() });
+  if (s.spoor.length > SPOOR_MAX) s.spoor = s.spoor.slice(-SPOOR_MAX);
+}
+
 function antwoord(id, waarde, opties) {
   const o = opties || {};
   const v = OP_ID.get(String(id || ''));
@@ -67,6 +88,7 @@ function antwoord(id, waarde, opties) {
     s.antwoorden[v.id] = { parkeer: true, waarde: null, notitie: tekst || null,
       door: schoon(o.door) || null, at: new Date().toISOString() };
     s.bijgewerkt = s.antwoorden[v.id].at;
+    noteer(s, v.id, 'geparkeerd', o.door);
     opslag.bewaar(s);
     return { ok: true, geparkeerd: true,
       terug: 'Genoteerd als nog niet bekend. Ik vraag het later opnieuw; zo lang blijft dit punt openstaan en gaat de keuring er niet overheen.' };
@@ -82,8 +104,10 @@ function antwoord(id, waarde, opties) {
     return { fout: 'Dat is wel erg kort voor dit veld. ' + (v.voorbeeld ? 'Zoiets als: ' + v.voorbeeld : '') };
   }
 
+  const eerder = s.antwoorden[v.id];
   s.antwoorden[v.id] = { waarde: tekst, parkeer: false, door: schoon(o.door) || null, at: new Date().toISOString() };
   s.bijgewerkt = s.antwoorden[v.id].at;
+  noteer(s, v.id, eerder ? 'bijgewerkt' : 'ingevuld', o.door);
   opslag.bewaar(s);
   return { ok: true, terug: 'Genoteerd.' };
 }
@@ -122,7 +146,10 @@ function overzicht() {
       door: g ? g.door : null, at: g ? g.at : null };
   });
   const open = regels.filter(r => r.status !== 'ingevuld').length;
-  return { totaal: VRAGEN.length, open, klaar: open === 0, bijgewerkt: s.bijgewerkt, regels };
+  // het spoor omgekeerd: het laatst gewijzigde bovenaan, en begrensd -- het bord
+  // toont een geschiedenis, geen archief
+  const spoor = (Array.isArray(s.spoor) ? s.spoor : []).slice(-40).reverse();
+  return { totaal: VRAGEN.length, open, klaar: open === 0, bijgewerkt: s.bijgewerkt, regels, spoor };
 }
 
 const klaar = () => openVragen().length === 0;

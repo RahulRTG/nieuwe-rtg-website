@@ -37,6 +37,8 @@ module.exports = function maakVergeten(kern) {
      werkt met een Set die hieronder wordt gevuld en aan het eind geleegd --
      verzamelen VOOR het weggooien, want daarna is de link weg. */
   const bytes = require('./vergeten/bytes')({ db, media, bestanden });
+  // de identiteitsmap (paspoortscans en selfies): zie ../identiteitsmap.js
+  const identiteitsmap = require('../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR);
   const anoniem = require('./vergeten/anoniem')({ db, accounts });
 
   /* Wist dit lid definitief. Async omdat de mediastore ook een objectopslag op
@@ -107,10 +109,32 @@ module.exports = function maakVergeten(kern) {
        waarheid. test/vergeten.test.js veegt na afloop door de hele database om
        te controleren dat er geen enkele tak meer overblijft. */
     if (typeof gidsWeg === 'function') gidsWeg(key);
-    // echt account: verwijder het account zelf, inclusief documentupload
+    /* Echt account: het account zelf weg, met de HELE identiteitsmap erbij.
+
+       Hier stond `deleteUser` gevolgd door het unlinken van het ENE bestand dat
+       de database nog onthield. Dat dekte de werkelijkheid niet:
+
+       - elke upload schreef een nieuw bestand met een tijdstempel, terwijl
+         id_doc telkens overschreven werd -- dus alle eerdere pogingen bleven
+         als wees staan (en de afwijzingsmail raadt letterlijk aan het opnieuw
+         te proberen met een duidelijkere foto, dus dat gebeurt);
+       - de SELFIE stond in member_state, en die rij verdwijnt mee met het
+         account -- dus na deleteUser was de naam niet meer te lezen en werd hij
+         nooit gewist. Niet die ene, geen enkele.
+
+       Het lid kreeg intussen "ok: true", en niets faalde. Precies de wees waar
+       de kop van dit bestand en ./vergeten/bytes.js over gaan; voor de
+       mediastore en de kluis is dat gat gedicht en voor de identiteitsmap
+       overgeslagen.
+
+       De map is nu zelf de administratie: alles wat <id>- heet gaat weg, wat de
+       database er ook nog van weet. Vóór deleteUser, want daarna is het id nog
+       wel bekend maar de rest niet meer -- en de volgorde kost niets: mislukt de
+       verwijdering van het account, dan is een gewiste scan geen verlies maar
+       precies wat het lid vroeg. */
     if (sessie.account) {
-      const doc = accounts.deleteUser(sessie.account.id);
-      if (doc) { try { fs.unlinkSync(path.join(UPLOAD_DIR, path.basename(doc))); } catch (e) {} }
+      try { identiteitsmap.wisAllesVan(sessie.account.id); } catch (e) {}
+      accounts.deleteUser(sessie.account.id);
     }
     /* Het inzagejournaal blijft staan, bewust. Het bevat geen naam en geen
        e-mailadres -- alleen een account-id dat na deze regel nergens meer op

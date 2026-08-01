@@ -4,6 +4,8 @@
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, antivirus } = actx;
+  // de opruiming van de identiteitsmap (wezen, en alles bij vergetelheid)
+  const identiteitsmap = require('../../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR);
 
   /* De Ontsmetter over elke geuploade buffer voordat hij de schijf raakt.
      Besmet -> weigeren (422) en melden; verdacht mag door (de mens beoordeelt
@@ -33,6 +35,14 @@ app.post('/api/verify/upload', express.json({ limit: '6mb' }), auth, (req, res) 
   // met RTG_ENC_KEY wordt het identiteitsbewijs versleuteld op schijf gezet
   fs.writeFileSync(path.join(UPLOAD_DIR, fname), require('../../kluis').versleutelBestand(buf, fname), { mode: 0o600 });
   accounts.setVerification(req.session.account.id, 'pending', fname);
+  /* En het VORIGE bewijs weg. Elke upload schreef een nieuw bestand met een
+     tijdstempel, maar de database onthoudt er maar een (id_doc wordt
+     overschreven) -- dus bleven eerdere pogingen als wees achter, voorgoed en
+     gewoon opvraagbaar via /api/office/doc. Juist hier stapelt dat op: de
+     afwijzingsmail raadt letterlijk aan het opnieuw te proberen met een
+     duidelijkere foto. Na het schrijven, zodat een mislukte schrijfactie niet
+     ook het oude bewijs kost. Zie server/identiteitsmap.js. */
+  identiteitsmap.houdAlleenBewijs(req.session.account.id, fname);
   res.json({ ok: true, status: 'pending' });
 });
 
@@ -58,6 +68,7 @@ app.post('/api/verify/selfie', express.json({ limit: '6mb' }), auth, (req, res) 
   const md = accounts.getMemberState(req.session.account.id) || {};
   md.selfie = fname;
   accounts.saveMemberState(req.session.account.id, md);
+  identiteitsmap.houdAlleenSelfie(req.session.account.id, fname);  // idem als hierboven
   res.json({ ok: true });
 });
 };

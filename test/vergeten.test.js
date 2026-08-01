@@ -38,11 +38,19 @@ const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJA
 /* Wat staat er op SCHIJF? De bezem hieronder leest db.json, maar de zwaarste
    persoonsgegevens staan daar niet in -- daar staat alleen een verwijzing naar
    een los, versleuteld bestand in DATA_DIR/media (Salon-foto's, snaps,
-   site-beelden) of DATA_DIR/bestanden (de kluis). Die twee mappen waren nooit
-   onderdeel van deze test, en precies daar bleef alles staan. */
+   site-beelden), DATA_DIR/bestanden (de kluis) of DATA_DIR/uploads (de
+   paspoortscans en selfies). Die mappen waren nooit onderdeel van deze test, en
+   precies daar bleef alles staan.
+
+   'uploads' is er als laatste bij gekomen, en dat was de ergste: elke upload
+   schreef een NIEUW bestand met een tijdstempel terwijl de database er maar EEN
+   onthield, en de selfienaam stond in member_state -- die rij verdwijnt mee met
+   het account, dus na deleteUser was hij niet eens meer te lezen. Een lid dat
+   drie keer een scherpere foto probeerde (wat de afwijzingsmail letterlijk
+   aanraadt) liet twee paspoortscans en een selfie achter, en kreeg "ok: true". */
 function opSchijf() {
   const uit = [];
-  for (const map of ['media', 'bestanden']) {
+  for (const map of ['media', 'bestanden', 'uploads']) {
     const p = path.join(TMP, map);
     let namen = [];
     try { namen = fs.readdirSync(p); } catch (e) { namen = []; }
@@ -150,14 +158,44 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
   const siteFoto = await post('/api/site/foto', { dataUrl: PNG }, token);
   assert.equal(siteFoto.status, 200, 'de site-foto landt: ' + (await siteFoto.text()).slice(0, 160));
 
+  /* EN DE IDENTITEITSMAP, want dat was het ergste gat. De wandeling hierboven
+     deed EEN paspoort-upload; het probleem ontstaat pas bij de TWEEDE. Elke
+     upload schreef een nieuw bestand met een tijdstempel terwijl de database er
+     maar een onthield, dus de eerste bleef als wees achter -- en dat gebeurt in
+     de praktijk, want de afwijzingsmail raadt letterlijk aan het opnieuw te
+     proberen met een duidelijkere foto. De selfie was nog erger: zijn naam
+     stond in member_state, en die rij verdwijnt mee met het account, dus na
+     deleteUser was hij niet eens meer te lezen om te wissen. */
+  const tweede = await post('/api/verify/upload', { image: PNG }, token);
+  assert.equal(tweede.status, 200, 'een tweede paspoortpoging landt: ' + (await tweede.text()).slice(0, 160));
+  const selfie = await post('/api/verify/selfie', { image: PNG }, token);
+  assert.equal(selfie.status, 200, 'de selfie landt: ' + (await selfie.text()).slice(0, 160));
+
+  /* En meteen de andere helft van hetzelfde gat, want die valt buiten de bezem
+     hieronder: die kijkt na het VERWIJDEREN, en daar wordt inmiddels alles van
+     dit account gewist. Voor een lid dat nooit verwijdert -- de meesten -- is de
+     vraag of de map überhaupt begrensd is. Twee paspoortpogingen horen EEN
+     bestand op te leveren, niet twee. Zonder die grens is er geen plafond, geen
+     bewaartermijn en geen opruimtaak, en gaat er 5 MB per verzoek in. */
+  const id = String(sleutel).replace('user-', '');
+  let inMap = [];
+  try { inMap = fs.readdirSync(path.join(TMP, 'uploads')); } catch (e) {}
+  const bewijzen = inMap.filter(n => new RegExp('^' + id + '-\\d+\\.').test(n));
+  const selfies = inMap.filter(n => new RegExp('^' + id + '-selfie-\\d+\\.').test(n));
+  assert.equal(bewijzen.length, 1,
+    'na twee paspoortpogingen staat er precies EEN bewijs op schijf (nu: ' + bewijzen.join(', ') + ')');
+  assert.equal(selfies.length, 1, 'en precies een selfie (nu: ' + selfies.join(', ') + ')');
+
   await wacht(400); // de opslag even laten landen
 
   const na = opSchijf();
   bestandenVanWilma = na.filter(p => !bestandenVoor.includes(p));
-  /* Drie is de ondergrens: de kluisupload, de Salon-foto en de site-foto. Blijft
-     dit onder de drie, dan is de wandeling hierboven in stilte leeggelopen en
-     bewijst de controle na het verwijderen niets. */
-  assert.ok(bestandenVanWilma.length >= 3,
+  /* Vijf is de ondergrens: de kluisupload, de Salon-foto, de site-foto, het
+     paspoort en de selfie. Blijft dit eronder, dan is de wandeling hierboven in
+     stilte leeggelopen en bewijst de controle na het verwijderen niets. */
+  assert.ok(bestandenVanWilma.some(p => p.includes('/uploads/')),
+    'er staat een identiteitsbewijs op schijf om over te controleren: ' + bestandenVanWilma.join(', '));
+  assert.ok(bestandenVanWilma.length >= 5,
     'te weinig bestanden op schijf van Wilma (' + bestandenVanWilma.length + '): ' + bestandenVanWilma.join(', '));
 });
 
@@ -225,7 +263,7 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
    paspoortscans, contracten en medische brieven. */
 test('en de bezem over de schijf: geen weesbestanden van dit lid', async () => {
   await wacht(600);
-  assert.ok(bestandenVanWilma.length >= 3, 'de vorige test heeft bestanden vastgelegd om op te controleren');
+  assert.ok(bestandenVanWilma.length >= 5, 'de vorige test heeft bestanden vastgelegd om op te controleren');
   const blijven = bestandenVanWilma.filter(p => fs.existsSync(p));
   assert.deepEqual(blijven, [],
     'na verwijderen staan deze bestanden van het lid nog op schijf; elk bestand hier ' +

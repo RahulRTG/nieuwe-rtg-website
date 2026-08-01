@@ -47,7 +47,25 @@ const METERS = [
   { sleutel: 'keuringScheef', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "scheef"' },
   { sleutel: 'keuringBeter', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "beter"' },
   { sleutel: 'dependencies', richting: 'omlaag', wat: 'externe pakketten (de nul is een principe, geen toeval)' },
-  { sleutel: 'testbestanden', richting: 'omhoog', wat: 'testbestanden' }
+  { sleutel: 'testbestanden', richting: 'omhoog', wat: 'testbestanden' },
+  /* DE TWEE METERS OVER TOETSEN DIE ER WEL ZIJN MAAR NIET DRAAIEN.
+
+     Aanleiding: acht Postgres-toetsbestanden poortten zichzelf op DATABASE_URL,
+     `npm test` geeft die bewust niet mee, en de enige draaier die dat wel deed
+     had een handgeschreven lijst waar ze niet in stonden. Ze telden maandenlang
+     mee als dekking zonder ooit uitgevoerd te zijn.
+
+     `zelfpoortendeToetsen` telt de toetsen die zichzelf kunnen overslaan. Elke
+     nieuwe is een toets die op de standaardmachine NIET draait, dus dit getal
+     mag alleen omlaag. Het staat niet op nul en dat hoeft ook niet -- een toets
+     die een echte database vraagt hoort zich over te slaan als die er niet is.
+     Wat niet mag, is dat het er stilletjes meer worden.
+
+     `e2eBestanden` telt de schermtoetsen. Die draaien niet mee in `npm test`
+     (eigen glob, eigen CI-baan) en zijn daardoor het makkelijkst te vergeten
+     hoekje van de suite: verdwijnt er een, dan merkt de hoofdsuite niets. */
+  { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan als een dienst ontbreekt' },
+  { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' }
 ];
 
 function meet() {
@@ -61,13 +79,30 @@ function meet() {
   const pkg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8'));
   const deps = Object.keys(pkg.dependencies || {}).length + Object.keys(pkg.devDependencies || {}).length;
 
-  const testbestanden = fs.readdirSync(path.join(WORTEL, 'test')).filter(f => f.endsWith('.test.js')).length;
+  const testMap = path.join(WORTEL, 'test');
+  const inMap = fs.readdirSync(testMap);
+  const testbestanden = inMap.filter(f => f.endsWith('.test.js')).length;
+  const e2eBestanden = inMap.filter(f => f.endsWith('.e2e.js')).length;
+
+  /* Tel de toetsen die zichzelf kunnen overslaan. We tellen de AANROEP, niet
+     het bestand: een bestand met acht toetsen achter een poort is acht toetsen
+     die niet draaien. Zowel `{ skip: X }` als `{ skip: X ? .. : .. }` telt mee,
+     en `skip: false` juist niet -- dat is een poort die openstaat. */
+  let zelfpoortendeToetsen = 0;
+  for (const f of inMap.filter(n => /\.(test|e2e)\.js$/.test(n))) {
+    const bron = fs.readFileSync(path.join(testMap, f), 'utf8');
+    for (const m of bron.matchAll(/\{\s*skip\s*:\s*([^}]+)\}/g)) {
+      if (!/^false\s*$/.test(m[1])) zelfpoortendeToetsen++;
+    }
+    // test.skip(...) / it.skip(...): de harde vorm, altijd overgeslagen
+    zelfpoortendeToetsen += (bron.match(/\b(?:test|it)\.skip\s*\(/g) || []).length;
+  }
 
   return {
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
     keuringStuk: k.stuk, keuringScheef: k.scheef, keuringBeter: k.beter,
-    dependencies: deps, testbestanden
+    dependencies: deps, testbestanden, zelfpoortendeToetsen, e2eBestanden
   };
 }
 
@@ -97,10 +132,16 @@ function main() {
   }
 
   console.log('\n\x1b[1mDE NORM\x1b[0m\x1b[2m -- vastgelegd op ' + (norm.vastgelegd || '?') + '\x1b[0m\n');
-  const slechter = [], beterDan = [];
+  const slechter = [], beterDan = [], nieuw = [];
   for (const m of METERS) {
     const n = norm.meters[m.sleutel];
-    if (n === undefined) continue;                 // nieuwe meter: pas bij het vastleggen erbij
+    /* HIER STOND EEN STIL `continue`. Een meter die je toevoegt maar nog niet
+       vastlegt, deed dus helemaal niets en zei er ook niets over -- precies de
+       vorm die deze hele ratel moet vangen. Nu staat hij er, elke run, tot
+       iemand hem met --vastleggen een grondwaarde geeft. Zakken doet hij niet:
+       zonder grondwaarde valt er niets te vergelijken, en een meter die faalt
+       omdat hij nieuw is leert je niets. */
+    if (n === undefined) { nieuw.push({ m, nu: nu[m.sleutel] }); continue; }
     const v = nu[m.sleutel];
     const o = oordeel(m, v, n);
     const merk = o === 'slechter' ? '\x1b[31mSLECHTER\x1b[0m' : o === 'beter' ? '\x1b[32mbeter   \x1b[0m' : '\x1b[2mgelijk  \x1b[0m';
@@ -109,6 +150,10 @@ function main() {
     if (o === 'slechter') slechter.push({ m, nu: v, norm: n });
     if (o === 'beter') beterDan.push({ m, nu: v, norm: n });
   }
+
+  for (const n of nieuw)
+    console.log('  \x1b[36mNIEUW   \x1b[0m  ' + n.m.sleutel.padEnd(22) + String(n.nu).padStart(6) +
+      '\x1b[2m  (nog geen grondwaarde -- leg vast met npm run norm:vast)\x1b[0m');
 
   if (slechter.length) {
     console.log('\n\x1b[31m  DE NORM IS NIET GEHAALD.\x1b[0m\n');
@@ -120,21 +165,36 @@ function main() {
     return 1;
   }
 
-  if (beterDan.length && !vastleggen) {
-    console.log('\n\x1b[32m  De norm is gehaald\x1b[0m, en op ' + beterDan.length + ' punt(en) ruim.');
+  if ((beterDan.length || nieuw.length) && !vastleggen) {
+    console.log('\n\x1b[32m  De norm is gehaald\x1b[0m' +
+      (beterDan.length ? ', en op ' + beterDan.length + ' punt(en) ruim' : '') +
+      (nieuw.length ? '; ' + nieuw.length + ' meter(s) wachten nog op een grondwaarde' : '') + '.');
     console.log('  \x1b[2mLeg dat vast met: node --experimental-sqlite scripts/norm.js --vastleggen\x1b[0m\n');
     return 0;
   }
-  if (beterDan.length && vastleggen) {
+  /* HIER STOND `if (beterDan.length && vastleggen)`. Een meter die je toevoegt
+     terwijl er verder niets verbeterde, viel dus door naar "de norm is gehaald"
+     en werd NOOIT vastgelegd -- hij bleef eeuwig zonder grondwaarde en dus
+     eeuwig tandeloos. Nieuwe meters zijn nu op zichzelf reden om te schrijven. */
+  if (beterDan.length || nieuw.length) {
     /* Alleen de verbeterde meters opschuiven. Een meter die gelijk bleef of
        (onmogelijk, want dan waren we hierboven al gestopt) slechter werd, raken
-       we niet aan. */
-    const nieuw = { vastgelegd: new Date().toISOString().slice(0, 10), meters: { ...norm.meters } };
-    for (const b of beterDan) nieuw.meters[b.m.sleutel] = b.nu;
-    for (const m of METERS) if (nieuw.meters[m.sleutel] === undefined) nieuw.meters[m.sleutel] = nu[m.sleutel];
-    fs.writeFileSync(NORMBESTAND, JSON.stringify(nieuw, null, 2) + '\n');
-    console.log('\n  \x1b[32mNorm strakker gezet op ' + beterDan.length + ' punt(en).\x1b[0m');
-    for (const b of beterDan) console.log('    ' + b.m.sleutel + ': ' + b.norm + ' -> ' + b.nu);
+       we niet aan.
+       De overige velden van NORM.json blijven staan: `notities` draagt de reden
+       van een met de hand verlaagde norm, en die mag niet bij de eerstvolgende
+       --vastleggen stilzwijgend verdwijnen. */
+    const uit = { ...norm, vastgelegd: new Date().toISOString().slice(0, 10), meters: { ...norm.meters } };
+    for (const b of beterDan) uit.meters[b.m.sleutel] = b.nu;
+    for (const m of METERS) if (uit.meters[m.sleutel] === undefined) uit.meters[m.sleutel] = nu[m.sleutel];
+    fs.writeFileSync(NORMBESTAND, JSON.stringify(uit, null, 2) + '\n');
+    if (beterDan.length) {
+      console.log('\n  \x1b[32mNorm strakker gezet op ' + beterDan.length + ' punt(en).\x1b[0m');
+      for (const b of beterDan) console.log('    ' + b.m.sleutel + ': ' + b.norm + ' -> ' + b.nu);
+    }
+    if (nieuw.length) {
+      console.log('  \x1b[36m' + nieuw.length + ' nieuwe meter(s) vastgelegd.\x1b[0m');
+      for (const n of nieuw) console.log('    ' + n.m.sleutel + ': ' + n.nu);
+    }
     console.log('');
     return 0;
   }

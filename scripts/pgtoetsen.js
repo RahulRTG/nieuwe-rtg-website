@@ -54,10 +54,36 @@ const TOETSEN = [
   'test/sloophamer.pg.test.js'
 ];
 
+/* NUL TOETSEN IS GEEN GROEN.
+
+   Hier stond `process.exit(0)` als er geen DATABASE_URL was. De tekst eronder
+   was eerlijk -- er stond letterlijk dat alles werd overgeslagen -- maar de
+   exitcode zei "goed". Wie dit in een pijplijn hangt of alleen naar het vinkje
+   kijkt, ziet dekking die er niet is. Zo hebben acht bestanden maandenlang
+   bestaan zonder ooit te draaien.
+
+   Een meter moet ZAKKEN als zijn invoer ontbreekt, niet stilvallen. Dat doet
+   scripts/dekking.js al goed (leeg journaal -> exitcode 2); hier deed hij het
+   niet. Vanaf nu is niets-gedraaid een fout, en wie op een machine zonder
+   database werkt spreekt dat een keer uit met --mag-overslaan.
+
+   Datzelfde geldt verderop voor een bestand dat WEL draaide maar nul toetsen
+   uitvoerde (bijvoorbeeld omdat het naast Postgres ook een REDIS_URL wil). */
+const MAG_OVERSLAAN = process.argv.includes('--mag-overslaan');
+
 const BRON = process.env.DATABASE_URL || process.env.PG_URL || '';  // niet URL: dat is de globale constructor
 if (!BRON) {
-  console.log('\n  ' + K.grijs + 'Geen DATABASE_URL: de Postgres-toetsen worden overgeslagen (net als in de bestanden zelf).' + K.reset + '\n');
-  process.exit(0);
+  if (MAG_OVERSLAAN) {
+    console.log('\n  ' + K.grijs + 'Geen DATABASE_URL, en --mag-overslaan staat aan: ' + TOETSEN.length +
+      ' bestanden zijn NIET gedraaid.' + K.reset + '\n');
+    process.exit(0);
+  }
+  console.error('\n  ' + K.rood + 'GEEN DATABASE_URL: ' + TOETSEN.length + ' toetsbestanden zijn niet gedraaid.' + K.reset +
+    '\n\n  ' + K.grijs + 'Dat is geen geslaagde run maar een overgeslagen run. Deze bestanden dekken de\n' +
+    '  gedeelde opslag, de idempotentie van geld over een herstart heen en het\n' +
+    '  transactie-grootboek; zonder database is daar niets van beproefd.\n\n' +
+    '  Zet DATABASE_URL, of geef --mag-overslaan mee als je bewust zonder wilt draaien.' + K.reset + '\n');
+  process.exit(1);
 }
 
 /* De beheer-URL: dezelfde server, maar op de standaarddatabase. CREATE DATABASE
@@ -124,9 +150,12 @@ async function beheer(sql) {
   console.log('\n  ' + (stuk.length
     ? K.rood + stuk.length + ' van de ' + uitslag.length + ' zakt' + K.reset
     : K.groen + 'alle ' + uitslag.length + ' bestanden geslaagd' + K.reset));
-  if (leeg.length) console.log('  ' + K.geel + leeg.length + ' bestand(en) draaiden GEEN enkele toets' + K.reset
+  if (leeg.length) console.log('  ' + (MAG_OVERSLAAN ? K.geel : K.rood) + leeg.length + ' bestand(en) draaiden GEEN enkele toets' + K.reset
     + K.grijs + ' -- ' + leeg.map(x => path.basename(x.bestand)).join(', ')
     + '\n  (die vragen naast Postgres ook een REDIS_URL; zonder die slaan ze zichzelf over)' + K.reset);
+  if (leeg.length && !MAG_OVERSLAAN) console.log('  ' + K.grijs +
+    'Zet REDIS_URL, of geef --mag-overslaan mee als je bewust zonder wilt draaien.' + K.reset);
   console.log('');
-  process.exit(stuk.length ? 1 : 0);
+  // Een bestand dat nul toetsen draaide telt als niet-gedraaid, niet als geslaagd.
+  process.exit(stuk.length || (leeg.length && !MAG_OVERSLAAN) ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });

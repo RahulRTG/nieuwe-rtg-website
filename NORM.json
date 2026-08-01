@@ -1,13 +1,25 @@
 {
-  "vastgelegd": "2026-07-30",
+  "vastgelegd": "2026-08-01",
   "meters": {
-    "endpointsZonderTest": 767,
-    "dekkingPct": 70,
+    "endpointsZonderTest": 649,
+    "dekkingPct": 74,
     "keuringStuk": 0,
     "keuringScheef": 0,
-    "keuringBeter": 126,
+    "keuringBeter": 131,
     "dependencies": 0,
-    "testbestanden": 426,
-    "dekkingWaargenomenPct": 94
-  }
+    "testbestanden": 465,
+    "dekkingWaargenomenPct": 94,
+    "zelfpoortendeToetsen": 68,
+    "e2eBestanden": 42
+  },
+  "notities": [
+    {
+      "datum": "2026-08-01",
+      "meter": "keuringBeter",
+      "van": 126,
+      "naar": 131,
+      "reden": "Met de hand verhoogd, dus bewust en niet stilzwijgend. keuringBeter telt ADVIEZEN, geen defecten: 66 bestanden die vlak onder de 10 kB-grens zitten, 57 functienamen die in meer dan twee kernmodules voorkomen, en 8 domeinen met endpoints zonder toets. Dat getal loopt op zodra er legitieme nieuwe bestanden bij komen, en dat is de afgelopen twee dagen gebeurd (db/geheugen-kluis.js, routes/papieren-deur.js, identiteitsmap.js, pinslot.js, kern/vergeten/*, config/productie.js). Een van de vijf is echt inhoudelijk: teVaak() staat nu in drie kernmodules in plaats van twee.",
+      "openstaand": "Dit is een meter met de verkeerde vorm voor een ratel: hij straft groei af. Hem herschrijven om dit rood weg te krijgen zou de ratel uithollen, dus dat is bewust NIET gedaan. De vraag of keuringBeter een absoluut aantal moet blijven of een verhouding (adviezen per bestand) hoort, ligt bij de eigenaar."
+    }
+  ]
 }

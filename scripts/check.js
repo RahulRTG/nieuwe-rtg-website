@@ -1053,5 +1053,74 @@ console.log('\n24) een coordinaat komt nooit uit een kale Number()');
   void plekken;
 }
 
+/* 25) een toets die een externe dienst nodig heeft, staat ook in de draaier.
+
+   DE FOUT DIE DIT VANGT. Toetsbestanden die een echte PostgreSQL of Redis nodig
+   hebben, poorten zichzelf op DATABASE_URL / REDIS_URL en slaan zich anders
+   netjes over. Dat is goed. Maar `npm test` geeft die variabelen bewust NIET
+   mee (die bestanden maken en droppen dezelfde tabellen en zouden elkaar bij
+   parallel draaien wissen), dus ze draaien uitsluitend via
+   scripts/pgtoetsen.js -- en die heeft een met de hand bijgehouden LIJST.
+
+   Twee plekken die een waarheid vasthouden. Wie een nieuw pg-toetsbestand
+   schrijft en vergeet het aan die lijst toe te voegen, heeft een bestand dat
+   NERGENS draait: niet in de hoofdsuite (poort dicht) en niet in de runner
+   (staat er niet in). Het ziet eruit als dekking en is het niet. Precies zo
+   hebben er acht maandenlang gestaan zonder ooit uitgevoerd te zijn.
+
+   Andersom telt ook: een bestand dat in de lijst staat maar niet meer bestaat
+   laat de runner op een ontbrekend pad draaien. */
+console.log('\n25) elk toetsbestand dat een database of Redis vraagt, staat in de pg-draaier');
+{
+  const POORT = /process\.env\.(DATABASE_URL|PG_URL|REDIS_URL)/;
+  /* Bestanden die de variabele wel NOEMEN maar er niet op poorten: ze zetten
+     hem juist LEEG om zeker te weten dat ze op de lokale opslag draaien. Die
+     horen niet in de runner, en dat is geen omissie maar het punt. */
+  const MAG_ERBUITEN = new Map([
+    ['test/opslag-voorcheck.test.js', 'zet DATABASE_URL juist leeg: deze toets gaat over de SQLite-opslag'],
+    ['test/multi-instance-sqlite.test.js', 'idem: nadrukkelijk de SQLite-stand'],
+    ['test/duurzaamheid-kill.test.js', 'draait op de standaardopslag; noemt de variabele alleen om hem uit te zetten'],
+    ['test/geld-conservatie-last.test.js', 'idem'],
+    ['test/golive.test.js', 'keurt de productie-instellingen, draait zelf geen database']
+  ]);
+  let contract = 0;
+  try {
+    const runner = fs.readFileSync(path.join(ROOT, 'scripts/pgtoetsen.js'), 'utf8');
+    // de expliciete lijst uit de runner: alles tussen TOETSEN = [ en ]
+    const blok = (runner.match(/const TOETSEN\s*=\s*\[([\s\S]*?)\]/) || [])[1] || '';
+    const inLijst = new Set([...blok.matchAll(/'([^']+)'/g)].map(m => m[1]));
+    if (!inLijst.size) { contract++; fout('kon de TOETSEN-lijst in scripts/pgtoetsen.js niet lezen'); }
+
+    // 25a) staat elk zelf-poortend bestand in de lijst?
+    const testMap = path.join(ROOT, 'test');
+    for (const naam of fs.readdirSync(testMap).filter(n => /\.test\.js$/.test(n)).sort()) {
+      const rel = 'test/' + naam;
+      const bron = fs.readFileSync(path.join(testMap, naam), 'utf8');
+      /* Alleen bestanden die er ECHT op poorten: de variabele moet in dezelfde
+         regel staan als de skip-beslissing of de constante die hem draagt.
+         Alleen "noemt de naam ergens" zou elk bestand met een uitleg in het
+         commentaar meetellen. */
+      const poort = zonderCommentaar(bron).split('\n').some(r =>
+        POORT.test(r) && /\b(OVERSLAAN|HEEFT_PG|HEEFT_REDIS|skip|BRON|URL)\b/.test(r));
+      if (!poort) continue;
+      if (MAG_ERBUITEN.has(rel)) continue;
+      if (!inLijst.has(rel)) {
+        contract++;
+        fout(rel + ' poort zichzelf op een externe dienst maar staat niet in de TOETSEN-lijst van' +
+          ' scripts/pgtoetsen.js -- dan draait hij NERGENS (npm test geeft die variabele bewust niet mee)');
+      }
+    }
+    // 25b) en verwijst de lijst alleen naar bestanden die bestaan?
+    for (const rel of inLijst) {
+      if (!fs.existsSync(path.join(ROOT, rel))) {
+        contract++;
+        fout('scripts/pgtoetsen.js noemt ' + rel + ', maar dat bestand bestaat niet');
+      }
+    }
+    if (!contract) ok(inLijst.size + ' bestanden in de pg-draaier, en elk zelf-poortend toetsbestand staat erin (' +
+      MAG_ERBUITEN.size + ' benoemd als uitzondering)');
+  } catch (e) { fout('kon het draaier-contract niet controleren: ' + e.message); }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

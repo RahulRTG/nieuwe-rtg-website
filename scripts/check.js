@@ -1122,5 +1122,140 @@ console.log('\n25) elk toetsbestand dat een database of Redis vraagt, staat in d
   } catch (e) { fout('kon het draaier-contract niet controleren: ' + e.message); }
 }
 
+/* 26) bedradings-contract, breed: wat je uit een module PAKT, moet erin zitten.
+
+   DE FOUT DIE DIT VANGT, EN DIE ECHT IS GEBEURD.
+
+     const { ..., ledenGidsWeg, ... } = <require van ./db>;
+
+   `ledenGidsWeg` stond NIET in de exportlijst van db/index.js, terwijl
+   ledengids.js hem exporteerde en gidsen.js hem doorreikte. Een ontbrekende
+   regel in een lijst, en niets dat erover klaagde: de naam werd stilzwijgend
+   `undefined`, en in kern/gids.js sloeg `if (ledenGidsWeg)` daar overheen --
+   inclusief de `return` erachter, zodat OOK het lokale pad werd overgeslagen.
+   Uitkomst: in Postgres-stand haalde het recht op vergetelheid (AVG art. 17)
+   het lid nergens uit de gids.
+
+   Regel 11 hierboven vangt precies deze klasse, maar alleen voor `accounts.`.
+   Deze regel doet hetzelfde voor ELKE lokaal gerequirede module, en dan aan de
+   kant waar het misging: de destructurering.
+
+   BEWUST CONSERVATIEF, net als de kruis-slice-scan. We lezen de exportlijst
+   STATISCH (geen require, want dat zou tweehonderd modules met bijwerkingen
+   uitvoeren tijdens een keuring). Kunnen we de export-verzameling niet met
+   zekerheid bepalen -- een fabrieksfunctie, een spread, een Object.assign, een
+   berekende sleutel -- dan slaan we die module over. Liever een gemist geval
+   dan vals alarm in de pijplijn. Het aantal overgeslagen modules staat in de
+   uitslag, zodat de dekking van deze regel zelf zichtbaar is en niet als
+   volledigheid overkomt. */
+console.log('\n26) bedradings-contract: elke naam die je uit een module haalt, bestaat daar');
+{
+  /* Exportnamen statisch uit een bestand halen. Geeft null als we het niet
+     zeker weten -- dat is een OVERSLAAN, geen fout. */
+  function exportNamen(bestand) {
+    let bron;
+    try { bron = zonderCommentaar(fs.readFileSync(bestand, 'utf8')); } catch (e) { return null; }
+    const namen = new Set();
+    // module.exports.foo = ... en exports.foo = ...
+    for (const m of bron.matchAll(/(?:^|[^.\w$])(?:module\.)?exports\.([A-Za-z_$][\w$]*)\s*=/g)) namen.add(m[1]);
+    // Object.assign(module.exports, ...) -> onbekend
+    if (/Object\.assign\s*\(\s*(?:module\.)?exports\b/.test(bron)) return null;
+    const i = bron.search(/(?:^|[^.\w$])module\.exports\s*=/m);
+    if (i < 0) return namen.size ? namen : null;
+    const na = bron.slice(bron.indexOf('=', i) + 1);
+    const eerste = na.match(/^\s*(\S)/);
+    if (!eerste) return null;
+    // module.exports = <iets anders dan een objectliteraal>: fabriek, klasse,
+    // functie, doorgeefluik. Dan zegt de destructurering ons niets.
+    if (eerste[1] !== '{') return namen.size ? namen : null;
+    // het objectliteraal uithappen op brace-balans
+    const start = na.indexOf('{');
+    let diepte = 0, eind = -1;
+    for (let k = start; k < na.length; k++) {
+      if (na[k] === '{') diepte++;
+      else if (na[k] === '}') { diepte--; if (!diepte) { eind = k; break; } }
+    }
+    if (eind < 0) return null;
+    const lijf = na.slice(start + 1, eind);
+    if (/\.\.\./.test(lijf)) return null;          // spread: onbekend
+    // sleutels op diepte 0 van dit literaal
+    let d = 0, stuk = '';
+    const stukken = [];
+    for (const ch of lijf) {
+      if ('{[('.includes(ch)) d++;
+      else if ('}])'.includes(ch)) d--;
+      if (ch === ',' && d === 0) { stukken.push(stuk); stuk = ''; } else stuk += ch;
+    }
+    stukken.push(stuk);
+    for (const s of stukken) {
+      const t = s.trim();
+      if (!t) continue;
+      if (t.startsWith('[')) return null;          // berekende sleutel: onbekend
+      const m = t.match(/^(?:'([^']+)'|"([^"]+)"|([A-Za-z_$][\w$]*))\s*(?::|\(|$)/);
+      if (!m) return null;                          // iets wat we niet herkennen
+      namen.add(m[1] || m[2] || m[3]);
+    }
+    return namen;
+  }
+
+  const cache = new Map();
+  const haal = (p) => { if (!cache.has(p)) cache.set(p, exportNamen(p)); return cache.get(p); };
+  function los(vanaf, spec) {
+    const basis = path.resolve(path.dirname(vanaf), spec);
+    for (const kand of [basis, basis + '.js', path.join(basis, 'index.js')]) {
+      try { if (fs.statSync(kand).isFile()) return kand; } catch (e) {}
+    }
+    return null;
+  }
+
+  let gecontroleerd = 0, overgeslagen = 0, mis = 0;
+  const bestanden = [];
+  loop(path.join(ROOT, 'server'), /\.js$/, f => bestanden.push(f));
+  /* `const {  ...  } = require('./iets')`, ook over meerdere regels.
+
+     De vooruitblik op het eind is niet cosmetisch. Zonder hem las de eerste
+     versie van deze regel ook
+
+         const { a, b } = <require van ./tokens>.maakTokens(getUserById);
+
+     als een kale require, en meldde dan dat tokens.js die namen niet
+     exporteert -- terwijl ze uit de AANROEP komen. Dat leverde 1767 valse
+     meldingen: een regel die alles aanwijst, wijst niets aan. De require moet
+     dus het HELE rechterlid zijn, niet het begin ervan.
+
+     En de inhoud mag geen accolade of puntkomma bevatten. Met een luie
+     [\s\S]*? sprong het patroon over statements heen: begon het bij een
+     `const { a } = ctx;` zonder require, dan liep het door tot de EERSTVOLGENDE
+     `} = require(..)` verderop in het bestand en las het alles daartussen als
+     namen. Zo kwam server/kern/pay/index.js "namen halen" uit een buurbestand
+     dat het nooit destructureert. */
+  const RE = /(?:const|let|var)\s*\{([^{};]*?)\}\s*=\s*require\(\s*'(\.[^']*)'\s*\)(?=\s*[;\n])/g;
+  for (const f of bestanden) {
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    for (const m of bron.matchAll(RE)) {
+      const doel = los(f, m[2]);
+      if (!doel) continue;                          // pad-fouten vangt regel 1/8 al
+      const bekend = haal(doel);
+      if (!bekend) { overgeslagen++; continue; }
+      gecontroleerd++;
+      for (const deel of m[1].split(',')) {
+        const t = deel.trim();
+        if (!t) continue;
+        if (t.includes('=')) continue;              // standaardwaarde: afwezigheid is voorzien
+        if (t.startsWith('...')) continue;          // rest: pakt wat er is
+        const naam = (t.split(':')[0] || '').trim();
+        if (!/^[A-Za-z_$][\w$]*$/.test(naam)) continue;
+        if (!bekend.has(naam)) {
+          mis++;
+          fout(path.relative(ROOT, f) + ' haalt "' + naam + '" uit ' + path.relative(ROOT, doel) +
+            ', maar dat exporteert die naam niet -- hij wordt stilzwijgend undefined');
+        }
+      }
+    }
+  }
+  if (!mis) ok(gecontroleerd + ' destructureringen nagekeken tegen de exportlijst van hun module (' +
+    overgeslagen + ' overgeslagen: fabriek, spread of anderszins niet statisch te bepalen)');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

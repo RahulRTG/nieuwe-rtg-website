@@ -754,6 +754,15 @@ async function misbruikBeproeving(tok) {
   clearInterval(mon);
   const stormDuurMs = Date.now() - stormStart;
 
+  /* De schakelkast eerst terug aan. De gauntlet FUZZT die kast, dus na de storm
+     kan er een functie uitstaan -- en dan meet de herstelfase hieronder niet of
+     de server bijkomt, maar of de test zichzelf heeft uitgezet. Dat is een
+     artefact van het harnas en geen productiescenario: in het echt zit er geen
+     robot met een kantoortoken willekeurig hendels om te gooien. Mijn eerste
+     versie stond hierna, en meldde daardoor zestig seconden lang "afgewezen"
+     zonder te kunnen zeggen waarom. */
+  await allesAan((await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token);
+
   /* ---------- HERSTEL NA DE STORM ----------
      Dit ontbrak volledig: de meting stopte precies wanneer de last stopte. Maar
      overleven is de halve vraag. Een server die de aanval doorstaat en er daarna
@@ -773,7 +782,7 @@ async function misbruikBeproeving(tok) {
   const gewoonToken = () => rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office);
   async function gewoneAanroep() {
     const st = await verzoek('POST', '/api/state', gewoonToken(), {});
-    return (st.status >= 200 && st.status < 300) ? st.ms : Infinity;
+    return { ms: (st.status >= 200 && st.status < 300) ? st.ms : Infinity, status: st.status };
   }
   const herstel = await belasting.herstelNaStorm({
     meet: gewoneAanroep, basisMs: Math.max(5, herstelBasisMs), factor: 2,
@@ -786,10 +795,9 @@ async function misbruikBeproeving(tok) {
     ? '\x1b[32mja, na ' + herstel.naSeconden + ' s\x1b[0m (grens ' + herstel.grensMs + ' ms)'
     : '\x1b[31mNEE\x1b[0m binnen ' + (Number(process.env.HERSTEL_VENSTER_MS || 60000) / 1000) + ' s (grens ' + herstel.grensMs + ' ms)');
   if (herstel.verloop.length)
-    rij('  verloop (s: ms)', herstel.verloop.slice(0, 8).map(v => v.tSec + 's:' + (v.ms === Infinity ? 'afgewezen' : Math.round(v.ms))).join('  '));
-
-  // de storm kan functies hebben uitgezet; voor de lek-meting weer alles aan
-  await allesAan((await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token);
+    rij('  verloop (s: ms)', herstel.verloop.slice(0, 8).map(v => v.tSec + 's:' + (v.ms === Infinity ? String(v.status) : Math.round(v.ms))).join('  '));
+  if (herstel.statussen && herstel.statussen.length)
+    rij('  antwoorden tijdens het herstel', herstel.statussen.map(([st, n]) => st + ' x' + n).join(', '));
 
   // ---------- FASE F: GEHEUGEN (lek-vloer over identieke lees-rondes) ----------
   kop('FASE F: GEHEUGEN - lek-vloer over identieke lees-rondes');

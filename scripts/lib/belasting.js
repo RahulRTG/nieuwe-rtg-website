@@ -139,9 +139,12 @@ function dbBelasting(dataDir, pgUrl) {
    pool die niet vrijgeeft) en dat merk je in productie pas op het slechtste
    moment.
 
-   `meet` is een functie die een enkele gewone aanroep doet en de duur in ms
-   teruggeeft. Die komt van de aanroeper, want alleen die weet welk verzoek
-   "gewoon" is. */
+   `meet` doet een enkele gewone aanroep en geeft { ms, status } terug. De STATUS
+   hoort erbij: mijn eerste versie gaf alleen de duur en meldde bij een afwijzing
+   "afgewezen" zonder meer. Toen de eerste run niet herstelde, kon ik dus niet
+   zien of dat een 429 was (last afwerpen), een 503 (functie uit) of een 401 (het
+   token was verlopen) -- drie totaal verschillende conclusies. Een meter die een
+   probleem aanwijst maar niet welk, dwingt je tot gokken. */
 async function herstelNaStorm({ meet, basisMs, factor, venesterMs, stapMs }) {
   const grens = basisMs * (factor || 2);
   const venster = venesterMs || 60000;
@@ -149,9 +152,11 @@ async function herstelNaStorm({ meet, basisMs, factor, venesterMs, stapMs }) {
   const begin = Date.now();
   const verloop = [];
   let hersteldNa = null;
+  const statussen = new Map();
   while (Date.now() - begin < venster) {
-    const ms = await meet();
-    verloop.push({ tSec: Math.round((Date.now() - begin) / 1000), ms });
+    const { ms, status } = await meet();
+    statussen.set(status, (statussen.get(status) || 0) + 1);
+    verloop.push({ tSec: Math.round((Date.now() - begin) / 1000), ms, status });
     /* TWEE metingen achter elkaar onder de grens. Met een enkele zou een
        toevallig snelle aanroep midden in een trage periode al "hersteld"
        melden. */
@@ -163,6 +168,9 @@ async function herstelNaStorm({ meet, basisMs, factor, venesterMs, stapMs }) {
     hersteld: hersteldNa != null,
     naSeconden: hersteldNa != null ? Number((hersteldNa / 1000).toFixed(1)) : null,
     grensMs: Number(grens.toFixed(1)),
+    // welke antwoorden er kwamen, aflopend: dat is het verschil tussen
+    // "de server werpt last af" en "de server is stuk"
+    statussen: [...statussen.entries()].sort((a, b) => b[1] - a[1]),
     verloop
   };
 }

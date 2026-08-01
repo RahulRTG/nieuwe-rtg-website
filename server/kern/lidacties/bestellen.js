@@ -3,6 +3,8 @@
    betaalmoment) en betaalOrderVoor (fooi, puntentegoed, spaarpunten).
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/lidacties.js. */
+const { servicekostenVoor } = require('../servicekosten');
+
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
     leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
@@ -68,11 +70,19 @@ function plaatsOrderVoor(session, body) {
   const jeugd = lft == null || lft < 18; // onbekend/ongeverifieerd = standaard onder de 18
   const naarKassa = !!body.naarKassa && !jeugd;
   const vooraf = jeugd || (!naarKassa && optieAan(s, 'betaalVooraf'));
-  // servicekosten voor niet-leden: een gratis account betaalt EUR 2,50 ex btw
-  // per etensbestelling (EUR 3,03 incl. 21% btw); leden betalen dit nooit.
+  /* Servicekosten voor niet-leden: een gratis account betaalt EUR 2,50 ex btw
+     per etensbestelling; leden betalen dit nooit.
+
+     Het bedrag stond hier DRIE keer: exBtw 2.5, inBtw 3.03 (met de hand
+     uitgerekend), en nog eens als tekst in de app -- "(incl. EUR 2,50
+     servicekosten ex btw voor niet-leden)". Wie het tarief wijzigde, kreeg een
+     bevestigingsscherm dat het oude bedrag noemde bij een nieuw totaal. Nu
+     staat het er een keer en volgt de rest eruit; de app leest het uit deze
+     velden in plaats van het te herhalen. */
   let servicekosten;
   if (session.tier === 'guest') {
-    servicekosten = { exBtw: 2.5, btwPct: 21, inBtw: 3.03 };
+    const exBtw = 2.5, btwPct = 21;
+    servicekosten = { exBtw, btwPct, inBtw: Math.round(exBtw * (1 + btwPct / 100) * 100) / 100 };
     total = Math.round((total + servicekosten.inBtw) * 100) / 100;
   }
   const order = {
@@ -80,7 +90,9 @@ function plaatsOrderVoor(session, body) {
     pickup: pickupCode(),
     supplierCode: s.code, supplierName: s.name, type: s.type,
     customerTier: session.tier, customerKey: session.key, customerCodename: codename,
-    items, total, servicekosten,
+    items, total,
+    // alleen als er echt iets te melden is: een lid krijgt geen veld, geen nul
+    ...(servicekosten ? { servicekosten } : {}),
     table: schoon(body.table, 24),
     allergyNote: schoon(body.allergyNote, 200),
     // het zorgprofiel reist automatisch mee naar de keuken (alleen met toestemming)

@@ -52,10 +52,51 @@ test('servicekosten: de gast betaalt EUR 2,50 ex btw bovenop het eten; het lid n
   assert.equal(gastB.order.servicekosten.exBtw, 2.5);
   assert.equal(gastB.order.servicekosten.btwPct, 21);
   assert.equal(gastB.order.total, 27.03, 'EUR 24 eten + EUR 3,03 servicekosten incl. btw');
+  /* HET BEDRAG STOND DRIE KEER. exBtw 2.5, inBtw 3.03 met de hand uitgerekend,
+     en nog eens als tekst in de app ("incl. EUR 2,50 servicekosten"). Wie het
+     tarief wijzigde, kreeg een bevestigingsscherm met het oude bedrag bij een
+     nieuw totaal. Deze bewering vergelijkt twee dingen die de server los van
+     elkaar meldt: loopt inBtw weg van exBtw + btwPct, dan zakt hij. */
+  const sk = gastB.order.servicekosten;
+  assert.equal(sk.inBtw, Math.round(sk.exBtw * (1 + sk.btwPct / 100) * 100) / 100,
+    'het bedrag inclusief btw volgt uit tarief en percentage, het staat er niet los ingetikt');
   const lidB = await json(await api('/api/bezorg/bestel', { supplierCode: 'KIKUNOI', levering: 'ophalen',
     items: [{ id: prodId, qty: 1 }] }, lidToken));
   assert.equal(lidB.order.servicekosten, undefined, 'leden betalen geen servicekosten');
   assert.equal(lidB.order.total, 24);
+});
+
+/* DE TWEEDE BESTELWEG, EN WAAROM DIE HIER STAAT.
+
+   Het tarief stond twee keer los ingetikt: in kern/lidacties/bestellen.js
+   (afhalen en aan tafel) en in routes/member/kopen/bezorg.js (thuisbezorgd).
+   Dat bleef verborgen omdat de toets hierboven alleen de BEZORGweg raakt: ik
+   zette het tarief in bestellen.js op 3,50 en deze toets bleef vrolijk groen.
+
+   Twee wegen die hetzelfde tarief los intikken lopen uiteen zodra iemand er een
+   aanpast, en dan betaalt dezelfde gast een ander bedrag afhankelijk van of hij
+   afhaalt of laat bezorgen. Deze toets vergelijkt de twee wegen daarom
+   RECHTSTREEKS met elkaar, in plaats van allebei met een getal: zo zakt hij ook
+   als iemand het tarief netjes op beide plekken wijzigt maar op een ervan een
+   typefout maakt. */
+test('afhalen en bezorgen rekenen hetzelfde tarief -- twee wegen, een bedrag', async () => {
+  const bezorgd = await json(await api('/api/bezorg/bestel', { supplierCode: 'KIKUNOI', levering: 'bezorgen',
+    adres: 'Teststraat 1', items: [{ id: prodId, qty: 1 }] }, gastToken));
+  /* De twee wegen matchen op VERSCHILLENDE catalogi: de bezorgweg op
+     s.bezorg.producten, de afhaalweg op s.menu. Vandaar hier een eigen id;
+     precies dat verschil is ook de reden dat de dubbeling zo lang onzichtbaar
+     bleef -- geen toets liep over allebei. */
+  const kaart = await json(await api('/api/supplier/menu/get', { code: 'KIKUNOI' }, gastToken));
+  const menuItem = ((kaart.menu || []).find(x => !x.uitverkocht && x.station !== 'bar') || (kaart.menu || [])[0] || {}).id;
+  assert.ok(menuItem, 'er is een gerecht op de kaart om mee te bestellen');
+  const afgehaald = await json(await api('/api/order', { supplierCode: 'KIKUNOI',
+    items: [{ id: menuItem, qty: 1 }] }, gastToken));
+
+  assert.ok(bezorgd.order && bezorgd.order.servicekosten, 'de bezorgweg rekent servicekosten');
+  assert.ok(afgehaald.order && afgehaald.order.servicekosten,
+    'en de afhaalweg ook: ' + JSON.stringify(afgehaald).slice(0, 160));
+  assert.deepEqual(afgehaald.order.servicekosten, bezorgd.order.servicekosten,
+    'allebei exact hetzelfde tarief, tot en met het bedrag inclusief btw');
 });
 
 test('reserveren: dicht tot het ID geverifieerd is, daarna open; bestellen kon al die tijd al', async () => {

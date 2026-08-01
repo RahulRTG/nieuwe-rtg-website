@@ -58,6 +58,37 @@ function planFlush() {
 // (Bij het afsluiten schrijft flushBijAfsluiten sowieso nog een verse snapshot.)
 let laatsteLokaleSnap = 0;
 const PG_SNAP_MS = Number(process.env.PG_SNAP_MS || 300000);
+
+/* DE REM ZAT MAAR OP EEN VAN DE TWEE PADEN, EN OP HET DRUKSTE NIET.
+
+   Het commentaar hierboven belooft "ten hoogste eens per PG_SNAP_MS", en in
+   flushNu stond die controle ook. Maar de LISTEN/NOTIFY-luisteraar hieronder
+   deed `.then(schrijfLokaleSnapshotStil)` -- onvoorwaardelijk, bij elke
+   melding, zonder enige rem. En meldingen komen per weggeschreven collectie
+   per flush-ronde (elke 150 ms, voor de geld-sleutels elke 60), ook van je
+   eigen instance: de luisteraar hangt aan een aparte verbinding en hoort dus
+   zijn eigen NOTIFY's.
+
+   Wat er dan gebeurt is precies wat het commentaar zegt te voorkomen: een
+   volledige JSON.stringify van de HELE datastore, versleuteld, met een fsync
+   op bestand en map -- synchroon, op de event-loop, meerdere keren per seconde
+   in plaats van eens per vijf minuten. De p99 van elk verzoek hangt daaraan,
+   inloggen en betalen inbegrepen.
+
+   Dat het poll-vangnet een regel lager (pgPoll) hetzelfde leeswerk doet ZONDER
+   snapshot, is het bewijs dat die .then de uitzondering was en niet het
+   ontwerp.
+
+   Nu een gedeelde poort: beide paden vragen hem, beide respecteren dezelfde
+   teller. En alleen als er echt iets is toegepast -- haalNieuwer geeft het
+   aantal rijen terug, en nul rijen is geen reden om de hele kast weg te
+   schrijven. */
+function snapshotAlsHetMag() {
+  if (Date.now() - laatsteLokaleSnap < PG_SNAP_MS) return false;
+  laatsteLokaleSnap = Date.now();
+  schrijfLokaleSnapshotStil();
+  return true;
+}
 async function flushNu() {
   pgFlushTimer = null;
   if (!pg || !pgKlaar || pgFlushBezig || !db.writable || !pgVuil) return;
@@ -67,7 +98,7 @@ async function flushNu() {
     // grote collecties die door de flush-pacing zijn uitgesteld: vuil blijven,
     // zodat de her-geplande flush ze na de pauze alsnog wegschrijft
     if (pg.heeftUitgesteld && pg.heeftUitgesteld()) pgVuil = true;
-    if (Date.now() - laatsteLokaleSnap >= PG_SNAP_MS) { schrijfLokaleSnapshotStil(); laatsteLokaleSnap = Date.now(); }
+    snapshotAlsHetMag();
   }
   catch (e) { pgVuil = true; console.warn('[pg] flush mislukt:', e.message); }
   finally { pgFlushBezig = false; if (pgVuil && pgKlaar) planFlush(); }
@@ -103,7 +134,11 @@ async function startPostgres() {
   // maar nog niet in de blob, komen hier terug in het venster.
   await tx.vensterTopUp(pgLog);
   pgKlaar = true;
-  await pg.luister(() => { pg.haalNieuwer(db.data, state.getExternCb()).then(schrijfLokaleSnapshotStil).catch(() => {}); });
+  await pg.luister(() => {
+    pg.haalNieuwer(db.data, state.getExternCb())
+      .then(aantal => { if (aantal) snapshotAlsHetMag(); })   // gerembd, en alleen bij echte wijzigingen
+      .catch(() => {});
+  });
   pgPoll = setInterval(() => pg.haalNieuwer(db.data, state.getExternCb()).catch(() => {}), Number(process.env.RTG_POLL_MS || 2000));
   if (pgPoll.unref) pgPoll.unref();
   pgVeilig = setInterval(() => { if (pgVuil) flushNu(); }, 1000);

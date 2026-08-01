@@ -21,10 +21,8 @@
      Kan de nieuwste generatie toch niet volledig gelezen worden, dan rolt de motor
      terug naar de vorige, volledig consistente generatie (nooit een mengsel).
    - PRIVACY by design : versleuteld-at-rest is hier ALTIJD aan, ook zonder
-     RTG_ENC_KEY. De sleutel komt uit RTG_ENC_KEY als die er is (ops houdt de
-     regie), anders uit een zelf aangemaakte 32-byte sleutel in de datamap
-     (geheugen.key, 0600, staat in .gitignore). Niets komt ooit als platte tekst
-     op schijf.
+     RTG_ENC_KEY. Niets komt ooit als platte tekst op schijf. De sleutel en het
+     blokformaat staan in ./geheugen-kluis.
 
    Aanzetten met RTG_STORE=geheugen. De rest van de app merkt er niets van: die
    praat alleen met db.data en save(), net als bij json/sqlite/postgres.
@@ -34,43 +32,12 @@ const rtgjson = require('../lib/rtgjson');
 const path = require('path');
 const crypto = require('crypto');
 const state = require('./state');
-const { DATA_DIR, beslotenMap, besloten, schrijfDuurzaam } = require('./opslag');
+const { DATA_DIR, beslotenMap, schrijfDuurzaam } = require('./opslag');
+const { versleutel, ontsleutel } = require('./geheugen-kluis');
 
 const db = state.db;
 const GDIR = path.join(DATA_DIR, 'geheugen');
 const MANIFEST = path.join(GDIR, 'manifest.rtgm');
-const MAGIC = Buffer.from('RTGMEM1');
-
-/* ---------- sleutel: RTG_ENC_KEY, anders een eigen sleutel in de datamap ---------- */
-function laadSleutel() {
-  const ruw = process.env.RTG_ENC_KEY || '';
-  if (ruw) return /^[0-9a-fA-F]{64}$/.test(ruw) ? Buffer.from(ruw, 'hex') : crypto.createHash('sha256').update(ruw).digest();
-  const kf = path.join(DATA_DIR, 'geheugen.key');
-  try {
-    if (fs.existsSync(kf)) { const b = Buffer.from(fs.readFileSync(kf, 'utf8').trim(), 'hex'); if (b.length === 32) return b; }
-  } catch (e) {}
-  const sleutel = crypto.randomBytes(32);
-  try { beslotenMap(DATA_DIR); fs.writeFileSync(kf, sleutel.toString('hex'), { mode: 0o600 }); besloten(kf); }
-  catch (e) { console.warn('[geheugen] kon de sleutel niet bewaren (' + e.message + '); draai door met een sessiesleutel.'); }
-  return sleutel;
-}
-let KEY = null;
-function sleutel() { if (!KEY) KEY = laadSleutel(); return KEY; }
-
-// tekst -> binair blok (magic|iv|tag|ciphertext) en terug (authenticated)
-function versleutel(tekst) {
-  const iv = crypto.randomBytes(12);
-  const c = crypto.createCipheriv('aes-256-gcm', sleutel(), iv);
-  const enc = Buffer.concat([c.update(Buffer.from(tekst, 'utf8')), c.final()]);
-  return Buffer.concat([MAGIC, iv, c.getAuthTag(), enc]);
-}
-function ontsleutel(buf) {
-  if (!buf || buf.length < MAGIC.length + 28 || !buf.subarray(0, MAGIC.length).equals(MAGIC)) throw new Error('geen geldig geheugen-blok');
-  const p = MAGIC.length;
-  const d = crypto.createDecipheriv('aes-256-gcm', sleutel(), buf.subarray(p, p + 12));
-  d.setAuthTag(buf.subarray(p + 12, p + 28));
-  return Buffer.concat([d.update(buf.subarray(p + 28)), d.final()]).toString('utf8');
-}
 
 const sha = s => crypto.createHash('sha256').update(s).digest('hex');
 const brokBestand = key => path.join(GDIR, 'k-' + crypto.createHash('sha1').update(String(key)).digest('hex').slice(0, 20) + '.rtgm');
@@ -103,11 +70,17 @@ function assembleer(man) {
   }
   return uit;
 }
-// Laad de nieuwste consistente generatie; val zo nodig terug op de vorige.
+/* Laad de nieuwste consistente generatie; val zo nodig terug op de vorige.
+   Geen manifest EN geen .bak is vers; geen manifest MET een .bak is een
+   onderbroken schrijfactie (hernoemd, nog niet herschreven) en dan is
+   terugrollen het antwoord -- niet seeden. Zie test/geheugen.test.js. */
 function laadGeheugen() {
-  if (!fs.existsSync(MANIFEST)) return null;     // verse installatie
-  const man = leesManifest(MANIFEST);
+  const heeftMan = fs.existsSync(MANIFEST);
+  const heeftBak = fs.existsSync(MANIFEST + '.bak');
+  if (!heeftMan && !heeftBak) return null;       // echt een verse installatie
+  const man = heeftMan ? leesManifest(MANIFEST) : null;
   if (man) { const d = assembleer(man); if (d) { generatie = man.generatie || 0; herbouwSha(man, d); return d; } }
+  if (!heeftMan) console.warn('[geheugen] het manifest ontbreekt (onderbroken schrijfactie); ik val terug op de vorige generatie.');
   const bak = leesManifest(MANIFEST + '.bak');
   if (bak) { const d = assembleer(bak); if (d) { console.warn('[geheugen] nieuwste generatie onvolledig; teruggerold naar de vorige.'); generatie = bak.generatie || 0; herbouwSha(bak, d); return d; } }
   console.warn('[geheugen] geen leesbare generatie gevonden; de opslag start opnieuw op.');

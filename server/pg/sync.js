@@ -92,9 +92,15 @@ module.exports = (ctx) => {
       // `alleen`: de snelle rijstrook schrijft uitsluitend haar eigen sleutels,
       // de gewone flush slaat die juist over (die zijn dan al weg)
       if (alleen ? !alleen.has(k) : VOORRANG.has(k)) continue;
+      /* `!alleen`: de SNELLE RIJSTROOK kent geen uitstel. Die bestaat omdat de
+         idempotentie-sleutels van geld nu weg moeten -- nog niet gedeeld is het
+         verschil tussen een keer en twee keer afschrijven. De twee remmen
+         hieronder keken alleen naar GROOTTE, dus zodra payIdem over 512 kB
+         groeide stelde de snelle rijstrook zichzelf uit: juist onder de drukte
+         waarvoor hij bedoeld is. De gewone flush blijft ongewijzigd. */
       const groot = (laatsteGrootte.get(k) || 0) > GROOT_BYTES;
-      if (groot && !force && nu - (laatsteSchrijf.get(k) || 0) < GROOT_FLUSH_MS) { vlag.uitgesteld = true; continue; }
-      if (groot && lengteVan(dataNu[k]) === laatsteLengte.get(k) && nu - (laatsteCheck.get(k) || 0) < GROOT_MS) continue;
+      if (groot && !force && !alleen && nu - (laatsteSchrijf.get(k) || 0) < GROOT_FLUSH_MS) { vlag.uitgesteld = true; continue; }
+      if (groot && !alleen && lengteVan(dataNu[k]) === laatsteLengte.get(k) && nu - (laatsteCheck.get(k) || 0) < GROOT_MS) continue;
       const j = JSON.stringify(dataNu[k]);
       laatsteCheck.set(k, nu); laatsteGrootte.set(k, j.length); laatsteLengte.set(k, lengteVan(dataNu[k]));
       if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);

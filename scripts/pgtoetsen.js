@@ -48,6 +48,8 @@ const TOETSEN = [
   'test/chaos.pg.test.js',
   'test/leden-gids-pg.test.js',
   'test/txledger.pg.test.js',
+  'test/pg-snapshot.test.js',
+  'test/pg-wachten.test.js',
   'test/grand-integratie.pg.test.js',
   'test/sloophamer.pg.test.js'
 ];

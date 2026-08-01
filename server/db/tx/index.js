@@ -13,8 +13,11 @@
 
    Het Postgres-grootboek (RAM-venster + gepagineerde historie) staat in ./ledger;
    hier de index en de gemaksnamen waar de app mee leest/schrijft. */
+const fs = require('fs');
+const path = require('path');
 const state = require('../state');
 const ledger = require('./ledger');
+const opslag = require('../opslag');
 const db = state.db;
 
 // index injecteert save() (venster-verhuis vraagt een snapshot) door naar het
@@ -58,7 +61,40 @@ function txVoegToe(naam, t, opties) {
   // Met een actief grootboek kapt de veegronde (die de staart eerst veilig
   // wegschrijft) -- dan verdwijnt er niets meer stilletjes.
   const cap = opties && opties.cap;
-  if (cap && !ledger.actief() && st.arr.length > cap) { st.arr.length = cap; txBouw(naam); }
+  if (cap && !ledger.actief() && st.arr.length > cap) {
+    const weg = st.arr.slice(cap);
+    if (bewaarStaart(naam, weg)) { st.arr.length = cap; txBouw(naam); }
+  }
+}
+/* HIER VERDWEEN BOEKING 50.001. Zonder grootboek (de json- en geheugen-standen)
+   was dit de enige plek waar de staart uit het RAM ging: `st.arr.length = cap`,
+   geen regel in de log, geen kopie ergens. De grens zelf is terecht -- een
+   ongebonden collectie loopt in die standen op den duur tegen de maximale
+   stringlengte aan -- maar een bevestigde boeking hoort niet weg te vallen
+   omdat er een nieuwere bij kwam.
+   De staart gaat daarom eerst duurzaam (fsync) naar dezelfde archiefmap die
+   archief.js gebruikt en die de backup al meeneemt. Lukt dat schrijven niet,
+   dan kappen we NIET: liever een te grote collectie dan een boeking die
+   nergens meer staat. Faalt het bij volle schijf, dan zou elke volgende
+   boeking het opnieuw proberen, dus geldt er een minuut rust tussen pogingen. */
+let kapPauzeTot = 0;
+function bewaarStaart(naam, weg) {
+  if (Date.now() < kapPauzeTot) return false;
+  try {
+    const map = path.join(opslag.DATA_DIR, 'archief');
+    fs.mkdirSync(map, { recursive: true, mode: 0o700 });
+    const fd = fs.openSync(path.join(map, naam + '-afgekapt.jsonl'), 'a', 0o600);
+    try { fs.writeSync(fd, weg.map(t => JSON.stringify(t)).join('\n') + '\n'); fs.fsyncSync(fd); }
+    finally { fs.closeSync(fd); }
+    console.warn('[tx] ' + naam + ': ' + weg.length + ' item(s) buiten de grens weggeschreven naar archief/' +
+      naam + '-afgekapt.jsonl en uit het werkgeheugen gehaald.');
+    return true;
+  } catch (e) {
+    kapPauzeTot = Date.now() + 60000;
+    console.error('[tx] ' + naam + ': de af te kappen staart kon niet weggeschreven worden (' +
+      e.message + '); niets gekapt, de collectie blijft groter dan de grens.');
+    return false;
+  }
 }
 // De staart voorbij `max` (voor het RAM-venster van Fase B: eerst veilig naar
 // het grootboek, daarna pas verwijderen). Verwijderen gaat op identiteit, zodat
@@ -81,7 +117,11 @@ const ordersVoegToe = (o, opties) => txVoegToe('orders', o, opties);
 const boekingMetRef = ref => txMetRef('boekingen', ref);
 const boekingenVanKlant = key => txVanKlant('boekingen', key);
 const boekingenVanZaak = code => txVanZaak('boekingen', code);
-const boekingenVoegToe = b => txVoegToe('boekingen', b, { cap: 50000 });
+// De grens op de levende boekingen-collectie. Instelbaar zoals TX_RAM_* en
+// TX_KAP; de standaard blijft 50000. Wat erbuiten valt gaat naar het archief
+// (zie bewaarStaart), of naar het grootboek als dat actief is.
+const BOEK_CAP = Math.max(1, Number(process.env.TX_BOEKINGEN_CAP || 50000));
+const boekingenVoegToe = b => txVoegToe('boekingen', b, { cap: BOEK_CAP });
 
 module.exports = {
   wire, initLedger: ledger.initLedger, initLedgerSqlite: ledger.initLedgerSqlite,

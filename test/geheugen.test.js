@@ -112,3 +112,38 @@ test('manifest kapot: valt terug op de manifest-backup', () => {
   const geladen = eng.laadGeheugen();
   assert.ok(geladen && geladen.alpha, 'moet uit de manifest-backup kunnen laden');
 });
+
+/* HET CRASH-VENSTER WAARIN DE HELE DATABASE LEEG STARTTE.
+
+   De test hierboven KNOEIT het manifest; deze laat het VERDWIJNEN, en dat is
+   een ander geval met een heel andere afloop. Het schrijven eindigt met:
+   manifest hernoemen naar .bak, dan het nieuwe manifest wegschrijven. Tussen
+   die twee stappen bestaat manifest.rtgm niet. Een stroomstoring precies daar
+   liet de oude opzet `null` teruggeven -- met het commentaar "verse
+   installatie" -- en null betekent verderop: begin met de seed.
+
+   Dus niet een verloren generatie maar ALLES, terwijl de vorige generatie
+   compleet en leesbaar in .bak stond, een regel verderop netjes ingelezen maar
+   nooit bereikt. Niets faalde; de server startte gewoon op, leeg. */
+test('manifest WEG (crash tussen hernoemen en schrijven): rolt terug, seedt niet', () => {
+  state.db.data = { beta: { b: 1 }, __schema: 1 };
+  eng.schrijfGeheugenNu();                 // generatie 1
+  state.db.data.beta = { b: 2 };
+  eng.schrijfGeheugenNu();                 // generatie 2 -> .bak = gen1
+  const manifest = path.join(GDIR, 'manifest.rtgm');
+  assert.ok(fs.existsSync(manifest + '.bak'), 'er staat een vorige generatie klaar');
+  fs.unlinkSync(manifest);                 // de crash: hernoemd, nog niet herschreven
+
+  const geladen = eng.laadGeheugen();
+  assert.ok(geladen, 'er komt data terug in plaats van null (null = de seed, en dat is alles kwijt)');
+  assert.ok(geladen.beta, 'en het is de vorige generatie, niet een lege kast');
+});
+
+/* En de andere kant, zodat de fix niet doorslaat: ECHT niets op schijf hoort
+   nog steeds null te geven, want dan moet de app wel seeden. */
+test('echt verse map (geen manifest en geen backup) geeft nog steeds null', () => {
+  const manifest = path.join(GDIR, 'manifest.rtgm');
+  try { fs.unlinkSync(manifest); } catch (e) {}
+  try { fs.unlinkSync(manifest + '.bak'); } catch (e) {}
+  assert.strictEqual(eng.laadGeheugen(), null, 'zonder enige generatie: seeden');
+});

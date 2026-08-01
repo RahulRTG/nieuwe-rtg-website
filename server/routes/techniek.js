@@ -51,8 +51,20 @@ module.exports = (kern) => {
     if (!magInzien(user)) {
       // een GELDIG account dat toch de technische pagina probeert te openen: dit
       // is een mogelijke rechten-escalatie -> meteen een kritieke melding
+      /* GEEN ECHTE NAAM OP HET VEILIGHEIDSBORD.
+
+         Dit haalde de naam uit de identiteitskluis en zette hem in een melding
+         die daarna gewoon in db.data blijft staan. Twee dingen mis: de naam
+         lekt uit de kluis naar de gedeelde database (het hele codenaam-ontwerp
+         is dat hij daar NIET staat), en de opvraging ging langs het
+         inzagejournaal heen -- terwijl elke andere weg naar die naam er wel in
+         komt. Een uitzondering die niemand aanvroeg.
+
+         De melding draagt nu de identiteitssleutel. Wie wil weten wie dat is,
+         vraagt het op via /api/office/inzage, en dan staat die opvraging
+         netjes in het journaal. Precies zoals het hoort. */
       if (beveilig) beveilig.meld('tech-toegang-geweigerd', 'kritiek',
-        'Account "' + accounts.realNameOf(user) + '" probeerde de technische pagina te openen zonder recht.',
+        'Account user-' + user.id + ' probeerde de technische pagina te openen zonder recht.',
         { bron: 'user:' + user.id });
       return res.status(403).json({ error: 'Geen toegang tot de technische pagina.' });
     }
@@ -79,69 +91,32 @@ module.exports = (kern) => {
     };
   }
 
-  // Het statusbord: alle checks + zekeringen. Eigenaar ziet ook de toegangslijst.
-  app.get('/api/techniek/status', techAuth, async (req, res) => {
-    const checks = await techniek.draaiChecks(ctx());
-    const t = staat();
-    const zeker = Object.keys(t.zekeringen).map(id => ({ id, ...t.zekeringen[id] }));
-    const cat = functies.catalogus(t.functies);
-    const verzoeken = t.functieVerzoeken || [];
-    const uit = {
-      eigenaar: isEigenaar(req.techUser), naam: accounts.realNameOf(req.techUser),
-      checks, zekeringen: zeker,
-      functies: cat,
-      doelgroepen: functies.DOELGROEPEN,
-      functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),
-      // extra beperkingen die alleen voor bepaalde doelgroepen gelden (functie
-      // staat globaal aan, maar voor >=1 doelgroep uit)
-      doelgroepUit: cat.reduce((n, g) => n + g.functies.reduce((m, f) => m + (f.aan ? f.doelgroepen.filter(d => !d.aan).length : 0), 0), 0),
-      // open aanvragen bovenaan, daarna de laatst behandelde (audit-spoor)
-      verzoeken: verzoeken.filter(v => v.status === 'wacht')
-        .concat(verzoeken.filter(v => v.status !== 'wacht').slice(-8).reverse()),
-      beveiliging: beveilig ? beveilig.samenvatting() : { open: 0, kritiek: 0, waarschuwing: 0, recent: [] },
-      // eigen fout-aggregatie: totalen + de recentste storingsgroepen
-      fouten: log.foutenSamenvatting(),
-      samenvatting: {
-        ok: checks.filter(c => c.status === 'ok').length,
-        waarschuwing: checks.filter(c => c.status === 'waarschuwing').length,
-        fout: checks.filter(c => c.status === 'fout').length
-      }
-    };
-    if (isEigenaar(req.techUser)) {
-      uit.toegang = t.toegang.map(id => { const u = accounts.getUserById(id); return { id, naam: u ? accounts.realNameOf(u) : '?', email: u ? accounts.emailOf(u) : null }; });
-      // de juridische grenzen: waar zelfs de eigenaar bewust GEEN inzage heeft
-      uit.grenzen = eigenaar.GRENZEN;
-      /* Wie is op dit moment eigenaar, en waar komt dat vandaan? Dat laatste
-         is de nuttige helft: een adres uit de code is iets anders dan een
-         adres dat op de server is gezet of bewust is overgedragen. */
-      uit.eigenaarschap = {
-        email: eigenaar.eigenaarEmail(),
-        herkomst: t.eigenaarEmail ? 'overgedragen in de boardroom'
-          : (process.env.RTG_OWNER_EMAIL ? 'ingesteld op de server (RTG_OWNER_EMAIL)' : 'ingebouwde standaard'),
-        overdrachten: (t.eigenaarLog || []).slice(0, 5)
-      };
-      // de archiefkast: instelbare live-vensterbreedte en de huidige verdeling
-      uit.archief = archief ? { dagen: archief.dagen(), levend: (db.data.orders || []).length, gearchiveerd: archief.stat().aantal } : null;
-      // de moderniseringsverzoeken die de eigenaar zelf via de AI heeft gevraagd
-      uit.moderniseringen = (t.moderniseringen || []).slice(-8).reverse();
-      // het inzagejournaal: hoe vaak is er in de identiteitskluis gekeken, en
-      // hoe vaak zonder opgegeven reden (dat tweede getal is het interessantste)
-      uit.inzage = inzagelog.samenvatting();
-      uit.bewaren = bewaarDeel ? bewaarDeel.statusDeel() : null;  // zie ./techniek/bewaren.js
-    }
-    res.json(uit);
-  });
+  /* Het statusbord staat in ./techniek/bord.js: het is een groot antwoord dat
+     uit tien bronnen wordt samengesteld, en dat leest beter als een geheel dan
+     tussen de knoppen die het bord bedienen. */
+  require('./techniek/bord')({ techniek, functies, eigenaar, inzagelog, log,
+    accounts, archief, beveilig, db, app, ctx, staat, isEigenaar, techAuth,
+    bewaren: () => bewaarDeel });
 
   // Zekering resetten ("er weer in doen") of met de hand uitschakelen.
   app.post('/api/techniek/zekering', techAuth, eigenaarAlleen, (req, res) => {
     const t = staat();
-    const z = t.zekeringen[req.body.id];
+    /* hasOwnProperty, geen kale indexering: met id "__proto__" leverde
+       t.zekeringen[id] het prototype van Object op. Dat is truthy, dus de
+       controle hieronder liet hem door, en de regels erna zetten .aan en
+       .reden op Object.prototype -- vanaf dat moment heeft ELK object in dit
+       proces die velden. Dat is niet alleen rommel: code die ergens
+       `if (x.aan === false)` doet, verandert dan stil van gedrag. Alleen de
+       eigenaar komt hier, maar een grendel die op vertrouwen leunt is geen
+       grendel. */
+    const zid = String(req.body.id || '');
+    const z = Object.prototype.hasOwnProperty.call(t.zekeringen, zid) ? t.zekeringen[zid] : null;
     if (!z) return res.status(404).json({ error: 'Onbekende zekering.' });
     if (req.body.actie === 'reset') { z.aan = true; z.reden = null; z.sindsGesprongen = null; }
     else if (req.body.actie === 'spring') { z.aan = false; z.reden = String(req.body.reden || 'handmatig uitgeschakeld').slice(0, 120); z.sindsGesprongen = Date.now(); }
     else return res.status(400).json({ error: 'Actie moet reset of spring zijn.' });
     save();
-    res.json({ ok: true, id: req.body.id, aan: z.aan });
+    res.json({ ok: true, id: zid, aan: z.aan });
   });
 
   // De storingslijst (eigen fout-aggregatie) wissen: tellers terug naar nul.

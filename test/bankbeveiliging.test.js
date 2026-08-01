@@ -18,11 +18,36 @@ test('totp: RFC 6238-codes, venster van een stap, en rommel wordt geweigerd', ()
   const code = totpCode(SECRET, t, 30);
   assert.match(code, /^\d{6}$/);
   assert.equal(totpOk(SECRET, code, t), true);
-  assert.equal(totpOk(SECRET, code, t + 30000), true, 'een stap drift mag');
-  assert.equal(totpOk(SECRET, code, t + 90000), false, 'daarbuiten niet');
-  assert.equal(totpOk(SECRET, '000000', t), totpCode(SECRET, t, 30) === '000000');
+
+  /* EEN AANGENOMEN CODE IS OP. Deze test deed hier vroeger dezelfde code nog
+     eens, om de klokdrift te bewijzen -- en dat SLAAGDE, want een code was
+     binnen zijn venster onbeperkt herbruikbaar. Wie hem een keer zag (over een
+     schouder, in een screenshot, via een phishing-pagina die hem doorspeelde)
+     kon er zelf mee naar binnen. Dan is de tweede factor iets wat je WEET in
+     plaats van iets wat je HEBT. RFC 6238 zegt met zoveel woorden dat het niet
+     mag. */
+  assert.equal(totpOk(SECRET, code, t), false, 'dezelfde code een tweede keer: nee');
+
+  /* De klokdrift bewijzen we nu met een VERSE code op een ander geheim, zodat
+     de eenmaligheid hierboven de meting niet in de weg zit. Een toestel dat een
+     halve minuut voorloopt of achterloopt moet gewoon binnenkomen. */
+  const ANDER = 'KRSXG5CTMVRXEZLU';
+  const c2 = totpCode(ANDER, t, 30);
+  assert.equal(totpOk(ANDER, c2, t + 30000), true, 'een stap drift mag');
+  const c3 = totpCode(ANDER, t + 300000, 30);
+  assert.equal(totpOk(ANDER, c3, t + 300000 + 90000), false, 'daarbuiten niet');
+
   assert.equal(totpOk(SECRET, 'abcdef', t), false);
   assert.equal(totpOk(SECRET, '', t), false);
+
+  /* En een FOUTE code onthouden we niet: anders kon een aanvaller die de code
+     van een ander raadt of afkijkt hem alvast "opbranden" voordat de eigenaar
+     hem gebruikt -- een weigeringsaanval op de tweede factor. */
+  const DERDE = 'MFRGGZDFMZTWQ2LK';
+  const c4 = totpCode(DERDE, t, 30);
+  const fout = c4 === '111111' ? '222222' : '111111';
+  assert.equal(totpOk(DERDE, fout, t), false, 'een foute code wordt geweigerd');
+  assert.equal(totpOk(DERDE, c4, t), true, 'en heeft de goede code niet opgebrand');
 });
 
 test('veiligGelijk: klopt inhoudelijk en accepteert elke lengte', () => {

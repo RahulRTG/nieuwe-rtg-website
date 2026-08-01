@@ -114,8 +114,43 @@ process.on('uncaughtException', err => {
   setTimeout(() => process.exit(1), 200);
 });
 
+/* HET ADRES VAN DE LINK IN EEN E-MAIL KOMT NIET UIT HET VERZOEK.
+
+   appUrl() bouwt de links die in onze uitgaande e-mail terechtkomen: de
+   bevestigingslink en -- ernstiger -- de wachtwoord-herstellink met een geldig
+   token erin. Hij nam daarvoor de Origin- of Host-header over, en die zet de
+   aanvrager zelf.
+
+   Dat is een werkende overname. Iemand POST /api/auth/forgot met het adres van
+   een ander en `Origin: https://kwaadaardig.example`. Het slachtoffer krijgt een
+   ECHTE mail van RTG, van ons adres, met onze tekst -- en een link naar de
+   server van de aanvaller, met daarin het echte hersteltoken. Er is geen
+   phishing-pagina nodig die op ons lijkt; de mail is van ons.
+
+   In productie mag dat dus niet meer. De volgorde is nu:
+   1. APP_URL, als die gezet is. Dat is het antwoord van de beheerder en die
+      wint altijd.
+   2. Anders, in productie: het eerste domein uit RTG_DOMAINS (dat weet de
+      vloot toch al) -- ook uit de omgeving, dus ook niet te sturen.
+   3. Anders, in productie: WEIGEREN we te gokken. Liever een link naar
+      https://localhost die zichtbaar niet werkt dan een link naar een domein
+      dat de aanvrager koos. Dat valt op en wordt gerepareerd; het andere niet.
+   4. Buiten productie: gewoon de header, want daar draait het op wisselende
+      poorten en is dit precies wat je wilt.
+
+   De config-controle waarschuwt al als APP_URL in productie ontbreekt; deze
+   functie zorgt dat die waarschuwing ook gevolgen heeft. */
+const APP_URL_VAST = (() => {
+  const gezet = String(process.env.APP_URL || '').trim();
+  if (gezet) return gezet.replace(/\/+$/, '');
+  const eerste = String(process.env.RTG_DOMAINS || '').split(',')[0].trim();
+  if (eerste) return 'https://' + eerste.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  return null;
+})();
 function appUrl(req) {
-  return process.env.APP_URL || req.headers.origin || (req.protocol + '://' + req.get('host'));
+  if (APP_URL_VAST) return APP_URL_VAST;
+  if (PRODUCTION) return 'https://localhost';
+  return (req && req.headers && req.headers.origin) || (req ? req.protocol + '://' + req.get('host') : '');
 }
 
 // Fail-fast: weiger te starten als productie onveilig is ingesteld (demo aan,
@@ -1160,7 +1195,13 @@ app.get('/api/ready', (req, res) => {
    draait de server los (zonder sleutel), dan bestaan ze feitelijk niet. */
 const CLUSTER_KEY = process.env.RTG_CLUSTER_KEY || null;
 app.post('/api/cluster/:actie', (req, res) => {
-  if (!CLUSTER_KEY || req.get('x-rtg-cluster') !== CLUSTER_KEY) return res.status(404).json({ error: 'Onbekend.' });
+  /* veiligGelijk en geen !==: dit is de sleutel waarmee een server actief wordt
+     gemaakt of teruggezet naar standby, en een gewone vergelijking stopt bij het
+     eerste verschillende teken. Op een netwerk waar je duizenden pogingen kunt
+     doen is dat een meetbaar verschil per positie. Overal elders in dit huis
+     staat al veiligGelijk; uitgerekend de zwaarste knop van het cluster stond
+     nog op de kale vergelijking. */
+  if (!CLUSTER_KEY || !veiligGelijk(String(req.get('x-rtg-cluster') || ''), CLUSTER_KEY)) return res.status(404).json({ error: 'Onbekend.' });
   const nr = process.env.RTG_SERVER || '1';
   if (req.params.actie === 'promote') {
     // Eerst schrijfrecht, dan de verse data van schijf laden (bestaat er nog

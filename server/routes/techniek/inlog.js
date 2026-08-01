@@ -43,8 +43,12 @@ module.exports = (tctx) => {
       // telt WEL mee voor de rem: anders is een account zonder rechten een
       // gratis orakel om onbeperkt wachtwoorden op te proberen
       noteFailedTry(bucket);
+      /* De identiteitssleutel, niet de echte naam: die staat in de kluis en
+         hoort niet via een melding in de gedeelde database te belanden (en de
+         opvraging ging bovendien langs het inzagejournaal heen). Zie de
+         uitgebreidere uitleg bij dezelfde melding in ../techniek.js. */
       if (beveilig) beveilig.meld('tech-login-zonder-recht', 'kritiek',
-        'Account "' + accounts.realNameOf(user) + '" logde correct in maar heeft geen recht op de technische pagina.',
+        'Account user-' + user.id + ' logde correct in maar heeft geen recht op de technische pagina.',
         { bron: 'user:' + user.id });
       return zelfde();
     }

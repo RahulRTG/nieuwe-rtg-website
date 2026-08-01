@@ -27,6 +27,11 @@ const PROD_ENV = {
      is niet geheim. De beheerder zet hem bij de eerste start en haalt hem daarna
      weg. Zie server/routes/auth/account.js. */
   RTG_OWNER_BOOTSTRAP: 'proef-eenmalige-eigenaarssleutel',
+  /* Zonder betaalsleutel weigert productie te starten: de demo-provider bevestigt
+     anders ELKE betaling zelf, dus facturen gaan op betaald zonder dat er is
+     afgerekend -- terwijl de RTF-afdracht wel gewoon wordt geboekt. Deze toets
+     draait de stand waarin dat bewust is: geen echte betalingen, wel eerlijk. */
+  STRIPE_DEMO_BEWUST: '1',
   SMTP_URL: '', DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
 };
 

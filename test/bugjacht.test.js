@@ -478,6 +478,9 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     // productie weigert te starten zonder deze; dat is bewust en het hoort zo
     RTG_ENC_KEY: sleutel('x'), RTG_VAULT_KEY: sleutel('a'), RTG_SECRET_KEY: sleutel('b'),
     RTG_OWNER_EMAIL: 'eigenaar-proef@voorbeeld.test',
+    // deze proef gaat niet over betalen; zonder deze vlag weigert productie te
+    // starten omdat de demo-provider anders elke betaling zelf zou bevestigen
+    STRIPE_DEMO_BEWUST: '1',
     OFFICE_CODE: 'PROEFCODE1234', SESSION_SECRET: sleutel('y')
   } });
   /* X-Forwarded-Proto: https, want in productie staat er een afdwinging op --
@@ -503,4 +506,106 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     stop(eigen && eigen.child);
     try { fs.rmSync(TMP2, { recursive: true, force: true }); } catch (e) {}
   }
+});
+
+/* ---------- 13. het Stripe-blok ---------- */
+test('productie zonder betaalsleutel is een FOUT, tenzij het bewust is', () => {
+  /* Zonder sleutel draait de demo-provider, en die BEVESTIGT ELKE BETALING ZELF:
+     facturen gaan op 'paid' zonder dat er ooit is afgeschreven. En het is niet
+     eens symmetrisch onschuldig -- de 30%-afdracht aan de RTFoundation wordt wel
+     gewoon geboekt, dus er gaat aan de ene kant geld weg terwijl er aan de andere
+     kant niets binnenkomt. Dat stond als WAARSCHUWING, en een waarschuwing is
+     iets wat je wegklikt. */
+  const { valideer } = require('../server/config');
+  const basis = {
+    NODE_ENV: 'production', RTG_ENC_KEY: 'x'.repeat(64), RTG_VAULT_KEY: 'a'.repeat(64),
+    RTG_SECRET_KEY: 'b'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echt.nl', OFFICE_CODE: 'ABCDEFGHIJKL'
+  };
+  const zonder = valideer(basis);
+  assert.ok((zonder.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'zonder sleutel: fout, geen waarschuwing');
+
+  const bewust = valideer(Object.assign({}, basis, { STRIPE_DEMO_BEWUST: '1' }));
+  assert.ok(!(bewust.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'bewust zonder betalingen mag');
+  assert.ok((bewust.waarschuwingen || []).some(f => /STRIPE_DEMO_BEWUST/.test(f)), 'maar het blijft zichtbaar');
+
+  const met = valideer(Object.assign({}, basis, { STRIPE_SECRET_KEY: 'sk_live_x', STRIPE_WEBHOOK_SECRET: 'whsec_x' }));
+  assert.ok(!(met.fouten || []).some(f => /STRIPE/.test(f)), 'met sleutel en webhook-secret is er niets aan de hand');
+});
+
+test('een betaal-webhook voor een onbekende betaling verandert niets en valt niet om', async () => {
+  const evt = { id: 'evt_1', type: 'payment_intent.succeeded', data: { object: { id: 'pi_bestaatniet', amount_received: 999999 } } };
+  const r = await fetch(base + '/api/betaal/webhook', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(evt)
+  });
+  assert.equal(r.status, 200, 'de provider krijgt netjes 200 (anders blijft hij het herhalen)');
+  const na = await fetch(base + '/api/ready');
+  assert.equal(na.status, 200, 'en de server leeft gewoon door');
+});
+
+/* LET OP DE VOLGORDE: de rem-toets hieronder verbrandt het quotum van deze
+   bron (dezelfde IP, hetzelfde venster van een minuut). Alles wat een ECHT
+   antwoord van de webhook wil zien, moet er dus VOOR staan. Dat is geen
+   ongemak maar het bewijs dat de rem er staat. */
+test('de betaal-webhooks staan achter een rem en achter de opslagpoort', async () => {
+  /* Ze moeten VOOR de JSON-parser staan (de handtekening gaat over de ruwe
+     bytes), en stonden daardoor ook voor de rem, de opslagpoort en de
+     hoofdzekering. De doorlichting kreeg er 400 verzoeken per minuut ongeremd
+     doorheen. Ze hebben nu hun eigen twee poortwachters. */
+  let geremd = 0, laatste = 0;
+  for (let i = 0; i < 160; i++) {
+    const r = await fetch(base + '/api/betaal/webhook', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+    });
+    laatste = r.status;
+    if (r.status === 429) { geremd++; break; }
+  }
+  assert.equal(laatste, 429, 'een stortvloed loopt vast op de rem (was: onbeperkt)');
+  assert.ok(geremd > 0);
+});
+
+test('de afwikkeling werkt voor de kaart net zo als voor munten', async () => {
+  /* De kaartkant werd NOOIT afgewikkeld: /api/betaal/webhook verifieerde de
+     handtekening en logde de gebeurtenis, meer niet. In demostand viel dat niet
+     op omdat de demo-provider meteen 'betaald' antwoordt; met een echte
+     Stripe-sleutel niet, en dan werd geen enkele factuur ooit betaald.
+
+     De afwikkeling zat middenin server.js en was daardoor niet los te toetsen --
+     precies waar de fout kon blijven zitten. Hij staat nu in kern/settlement.js
+     met zijn afhankelijkheden via de fabriek. */
+  const { maakSettlement } = require('../server/kern/settlement');
+  const maak = (bijdrage) => ({ id: 'INV1', bijdrage, desc: 'RTG Pass', status: 'open' });
+
+  const bouw = (inv) => {
+    const db = { data: { invoices: [inv] } };
+    const geboekt = [];
+    const settle = maakSettlement({
+      db, save: () => {}, accounts: {}, log: { warn: () => {} },
+      fonds: { isAbonnement: () => true, boekAfdracht: async (a) => { geboekt.push(a); } },
+      dpRegistreerMunt: () => {}
+    });
+    return { settle, geboekt, inv };
+  };
+
+  // te weinig: blijft open, maar het geld is geboekt als deelbetaling
+  const a = bouw(maak(78.65));
+  await a.settle({ soort: 'factuur', invoiceId: 'INV1', own: false }, { id: 'pi_1', centen: 1, hoe: 'Betaald per kaart' });
+  assert.equal(a.inv.status, 'open', 'een cent sluit een factuur van EUR 78,65 niet');
+  assert.equal(a.inv.deelbetaald, 1, 'maar het geld is wel geboekt');
+  assert.equal(a.geboekt.length, 0, 'en er is geen afdracht op een onbetaalde factuur');
+
+  // de rest komt erbij: nu wel dicht, en de afdracht volgt
+  await a.settle({ soort: 'factuur', invoiceId: 'INV1', own: false }, { id: 'pi_2', centen: 7864, hoe: 'Betaald per kaart' });
+  assert.equal(a.inv.status, 'paid', 'zodra de som het gevraagde dekt gaat hij dicht');
+  assert.equal(a.inv.date, 'Betaald per kaart');
+  assert.equal(a.geboekt.length, 1, 'en dan pas de RTF-afdracht');
+
+  // in een keer het volle bedrag: gewoon betaald
+  const b = bouw(maak(78.65));
+  await b.settle({ soort: 'factuur', invoiceId: 'INV1', own: false }, { id: 'pi_3', centen: 7865, hoe: 'Betaald per kaart' });
+  assert.equal(b.inv.status, 'paid');
+  assert.equal(b.geboekt.length, 1);
+
+  // een tweede webhook voor dezelfde factuur doet niets meer
+  await b.settle({ soort: 'factuur', invoiceId: 'INV1', own: false }, { id: 'pi_4', centen: 7865, hoe: 'Betaald per kaart' });
+  assert.equal(b.geboekt.length, 1, 'een herhaalde bevestiging boekt niet nog een afdracht');
 });

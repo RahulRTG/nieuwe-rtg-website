@@ -24,6 +24,8 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+// de strenge poort mag de stderr van onze eigen server meelezen
+const { bewaakKind } = require('./helper');
 
 const BASIS = 4900 + Math.floor(Math.random() * 60);
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-herstel-'));
@@ -43,8 +45,10 @@ async function start(poort, extra) {
       ...process.env, NODE_ENV: 'test', PORT: String(poort), RTG_DATA_DIR: TMP,
       SMTP_URL: '', RTG_DEMO: '0', RTG_VAULT_KEY: VAULT, RTG_SECRET_KEY: SECRET, ...extra
     },
-    stdio: 'ignore'
+    // stderr naar 'pipe' zodat de strenge poort meeleest (zie helper.bewaakKind)
+    stdio: ['ignore', 'ignore', 'pipe']
   });
+  bewaakKind(kind);
   for (let i = 0; i < 150; i++) {
     try { if ((await fetch('http://127.0.0.1:' + poort + '/api/health')).ok) return kind; } catch (e) {}
     await wacht(200);

@@ -191,6 +191,17 @@ function stopNet(child, ms) {
    aanvraag in (dat koppelt het account) en laten RTG-personeel die accepteren.
    `approverToken` is een office- of eigenaars-token (beide komen door officeAuth).
    Handig voor tests die een echt Business/Lifestyle-lid nodig hebben. */
+/* Een lid naar Lifestyle of Business tillen, zoals het in het echt gaat: een
+   aanvraag, en daarna het menselijke besluit.
+
+   DE APPROVER MOET EEN PERSOON ZIJN. Veertien toetsbestanden gebruiken dit
+   hulpje, en ze gaven er allemaal de GEDEELDE kantoorcode aan mee. Sinds die
+   twee passen alleen nog door een herleidbaar persoon worden toegekend (de
+   merkregel: uitsluitend na menselijke goedkeuring, en een gedeelde code is
+   geen mens) levert dat een 403. Kreeg dit hulpje geen bruikbare approver, dan
+   haalt hij hier zelf de eigenaar erbij -- dat is wie het in productie ook zou
+   doen, en het houdt veertien toetsbestanden op een echt scenario in plaats van
+   op een omweg. */
 async function elevateTier(base, memberToken, pas, approverToken) {
   const post = (pad, body, tok) => fetch(base + pad, {
     method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
@@ -198,7 +209,13 @@ async function elevateTier(base, memberToken, pas, approverToken) {
   const aanvraag = await post('/api/aanmelding/aanvraag', { pas, naam: 'Test ' + pas, contact: pas + '@test.example' }, memberToken);
   const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
   if (!id) throw new Error('elevateTier: aanvraag mislukt (' + JSON.stringify(aanvraag).slice(0, 120) + ')');
-  const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, approverToken);
+  let goedkeurder = approverToken;
+  if (pas === 'lifestyle' || pas === 'business') {
+    const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+    const kantoor = eig.token && await post('/api/account/start', { rol: 'kantoor' }, eig.token);
+    if (kantoor && kantoor.token) goedkeurder = kantoor.token;
+  }
+  const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, goedkeurder);
   if (!besluit.aanmelding || besluit.aanmelding.status !== 'geaccepteerd')
     throw new Error('elevateTier: beslis mislukt (' + JSON.stringify(besluit).slice(0, 120) + ')');
   return besluit;
@@ -229,6 +246,13 @@ function letOpFouten(page, bak) {
   return bak;
 }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, letOpFouten,
+/* Voor toetsen die hun server om goede redenen ZELF starten (eigen poort, eigen
+   sleutels, een tweede instance): geef het kindproces hier af en de strenge poort
+   leest zijn stderr alsnog mee. Zonder dit valt zo'n server buiten de bewaking en
+   telt een crash niet als fout -- in scheiding.test.js gold een 500 daardoor
+   zelfs als een geslaagde weigering. Spawn dan wel met stderr op 'pipe'. */
+function bewaakKind(kind) { if (kind && kind.stderr) luisterOpFouten(kind); return kind; }
+
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, letOpFouten, bewaakKind,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

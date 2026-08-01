@@ -138,9 +138,23 @@ function meet() {
   };
 }
 
+/* ONTBREEKT HIJ, OF IS HIJ KAPOT? DAT IS NIET HETZELFDE.
+
+   Deze functie gaf voor allebei `null`, en de aanroeper maakte daar "nog niet
+   vastgelegd" van: hij schreef een verse NORM.json weg op basis van waar de code
+   NU staat, en gaf exitcode 0. Eén onleesbaar bestand -- een half geschreven
+   commit, een verkeerde merge, een afgekapte schrijfactie -- en de hele lat was
+   weg. Stilzwijgend, en met een groen vinkje.
+
+   Dat is precies LAT.md regel 3 (een meter zakt als zijn invoer ontbreekt), in
+   de ratel die daar zelf over gaat. Nu: ontbreken mag (dat is de eerste keer),
+   maar onleesbaar is een fout en die overschrijft niets. */
 function leesNorm() {
-  if (!fs.existsSync(NORMBESTAND)) return null;
-  try { return JSON.parse(fs.readFileSync(NORMBESTAND, 'utf8')); } catch (e) { return null; }
+  if (!fs.existsSync(NORMBESTAND)) return null;                 // eerste keer: mag
+  const ruw = fs.readFileSync(NORMBESTAND, 'utf8');
+  try { return JSON.parse(ruw); }
+  catch (e) { throw new Error('NORM.json staat er wel maar is onleesbaar (' + e.message +
+    '). Herstel hem uit de git-historie; ik overschrijf de lat niet met de huidige stand.'); }
 }
 
 /* Beweegt de meter de goede kant op, de verkeerde kant op, of staat hij stil? */
@@ -152,7 +166,9 @@ function oordeel(m, nu, norm) {
 
 function main() {
   const nu = meet();
-  const norm = leesNorm();
+  let norm;
+  try { norm = leesNorm(); }
+  catch (e) { console.error('\n  \x1b[31m' + e.message + '\x1b[0m\n'); return 2; }
   const vastleggen = process.argv.includes('--vastleggen');
 
   if (!norm) {

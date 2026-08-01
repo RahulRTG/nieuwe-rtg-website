@@ -80,10 +80,20 @@ test('2. nieuwsbrief met 7-dagenrem, en de rolgrens voor de hele kamer', async (
     assert.equal(r.body.nieuwsbrief.magWeer, false);
     assert.equal(r.body.nieuwsbrief.laatste.onderwerp, 'Nieuws van het huis');
 
-    // de rolgrens: een medewerker komt de PR-kamer niet in
+    /* DE ROLGRENS, EN WAAROM DIT NIET `>= 400` MAG ZIJN.
+
+       De manager heeft hierboven net een nieuwsbrief verstuurd, en daarop staat
+       een rem van zeven dagen. Een medewerker die /nieuwsbrief aanriep kreeg dus
+       een 429 van die rem -- ook als de managerOnly-poort helemaal weg zou zijn.
+       De toets slaagde op het verkeerde antwoord.
+
+       Nu eisen we 401 of 403: de POORT moet weigeren, niet de rem. Een 429 is
+       hier een fout, want die zegt "je mag wel, maar niet nu". */
     for (const pad of ['/api/supplier/pr/overzicht', '/api/supplier/pr/plan', '/api/supplier/pr/nieuwsbrief']) {
       r = await api(base, pad, { onderwerp: 'x', tekst: 'x', publiceerOp: new Date(Date.now() + 3600000).toISOString() }, supW);
-      assert.ok(r.status >= 400, pad + ' alleen voor management');
+      assert.ok(r.status === 401 || r.status === 403,
+        pad + ' hoort de medewerker op de POORT te weigeren (401/403), niet met ' + r.status +
+        ' -- een 429 komt van de zevendagenrem en bewijst niets over de rol');
     }
   } finally {
     stop(child);

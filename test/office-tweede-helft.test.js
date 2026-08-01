@@ -302,11 +302,27 @@ test('9. de boardroom deelt zijn eigen sleutels uit', async () => {
   assert.equal(metBaas.status, 200);
   assert.equal(metBaas.body.baas, true);
   assert.ok(Array.isArray(metBaas.body.lijst), 'de eigenaar ziet wie er sleutels heeft');
+  /* DEZE LUS DRAAIDE NOOIT. De lijst is in deze toets altijd leeg, dus de
+     privacy-controle eronder werd nul keer uitgevoerd en slaagde altijd. Eerst
+     dus echt een sleutel uitgeven, en pas dan kijken wat erin staat -- anders
+     is dit een bewering over een lege verzameling. */
+  const u = Date.now().toString(36);
+  const reg = await post('/api/auth/register', { name: 'Sleutelhouder', email: 'sh' + u + '@voorbeeld.test',
+    phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
+    geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  const cn = (await post('/api/state', {}, reg.body.token)).body.state.user.codename;
+  assert.equal((await post('/api/office/boardroom/toegang/geef', { codenaam: cn }, eigenaar)).status, 200,
+    'de eigenaar geeft een sleutel uit');
+
+  const naGeven = await post('/api/office/boardroom/toegang', {}, eigenaar);
+  assert.ok(naGeven.body.lijst.length >= 1, 'er staat nu echt iemand op de lijst');
   // privacy by design: de lijst draait op codenamen, de echte naam blijft in de kluis
-  for (const t of metBaas.body.lijst) {
+  for (const t of naGeven.body.lijst) {
     assert.deepEqual(Object.keys(t).sort(), ['codenaam', 'sinds'],
       'er staat niets anders in dan een codenaam en een datum');
   }
+  assert.doesNotMatch(JSON.stringify(naGeven.body.lijst), /Sleutelhouder/,
+    'en de echte naam staat er niet bij -- die blijft in de kluis');
 
   assert.equal((await post('/api/office/boardroom/toegang', {}, lid)).status, 401,
     'een lid komt niet eens door de kantoordeur');

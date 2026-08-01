@@ -76,8 +76,24 @@ module.exports = (ctx) => {
   /* Demo-antwoorden wanneer er geen Claude API-key is. */
   function cannedAnswer(q) {
     const l = q.toLowerCase().trim();
+    /* DIT ANTWOORD BEGON MET "GEREGELD." EN DAT WAS NIET WAAR.
+
+       Het gaat uit zodra een lid ja zegt op een aanbod ("ja", "graag", "doe
+       maar", "regel het") en het beweerde dat de paklijst klaarstond en het
+       dagplan was INGEPLAND, tot en met een boot van 10:00 en een tafel om
+       21:00. Er wordt hier niets geboekt: dit is het vaste antwoord voor een
+       installatie zonder API-sleutel, en dat is elke demo en de hele suite.
+
+       De merkregel is dat de AI nooit bevestigt dat iets geregeld is. De prompt
+       draagt die regel sinds de vorige ronde, en juist dit antwoord ontsnapte:
+       de toets die erop let filtert regels die met een quote beginnen, en deze
+       begint met `return`. De grendel stond er dus, en keek langs de enige
+       tekst die in de praktijk verstuurd wordt.
+
+       Nu zegt hij wat er echt gebeurt: het staat als voorstel klaar, RTG vraagt
+       het aan, en niets is bevestigd tot de partner ja zegt. */
     if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
-      return 'Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte kleding, zwemkleding, zonnebescherming, een lichte trui voor de avond) en het dagplan voor 20 juli is ingepland: 10:00 privéboot naar Formentera, lunch aan boord, en om 21:00 uw tafel bij Sal de Mar.\n\nVolgende dat ik in de gaten houd: de bevestiging van Sal de Mar. U hoeft niets te doen.';
+      return 'Ik zet het voor u in gang. De paklijst staat als voorstel in uw reisoverzicht, en voor 20 juli leg ik dit voor: 10:00 privéboot naar Formentera, lunch aan boord, en om 21:00 een tafel bij Sal de Mar.\n\nNog niets is bevestigd: de boot en de tafel gaan als aanvraag naar de partners en ik laat het u weten zodra zij ja zeggen. Wilt u dat ik het zo aanvraag?';
     if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer'))
       return 'Voor Ibiza in juli (25-31°C, zonnig):\n• Lichte kleding + zwemkleding\n• Zonnebrand en een hoed\n• Nette outfit voor Sal de Mar\n• Een lichte trui voor de avonden aan zee\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
     if (l.includes('visum') || l.includes('paspoort') || l.includes('document'))

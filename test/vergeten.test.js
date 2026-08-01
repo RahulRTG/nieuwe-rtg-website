@@ -20,6 +20,8 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+// de strenge poort mag de stderr van onze eigen server meelezen
+const { bewaakKind } = require('./helper');
 
 const PORT = 4700 + Math.floor(Math.random() * 80);
 const BASE = 'http://127.0.0.1:' + PORT;
@@ -75,8 +77,10 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
   kind = spawn(process.execPath, ['--experimental-sqlite', SERVER], {
     env: { ...process.env, NODE_ENV: 'test', PORT: String(PORT), RTG_DATA_DIR: TMP,
       SMTP_URL: '', RTG_DEMO: '0', RTG_STORE: 'json' },
-    stdio: 'ignore'
+    // stderr naar 'pipe' zodat de strenge poort meeleest (zie helper.bewaakKind)
+    stdio: ['ignore', 'ignore', 'pipe']
   });
+  bewaakKind(kind);
   for (let i = 0; i < 120; i++) {
     try { if ((await fetch(BASE + '/api/health')).ok) break; } catch (e) {}
     await wacht(200);

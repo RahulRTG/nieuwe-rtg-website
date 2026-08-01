@@ -135,6 +135,54 @@ test('de prompt draagt Rahul nooit op te zeggen dat iets al geregeld is', () => 
     'met de grens erbij: alleen wat echt is uitgevoerd telt als gedaan');
 });
 
+/* ============================================================================
+   EN NU HET ANTWOORD DAT ECHT UITGAAT.
+
+   De toets hierboven leest de BRONTEKST van de prompt, en filtert op regels die
+   met een quote beginnen. cannedAnswer() -- het vaste antwoord voor elke
+   installatie zonder API-sleutel, dus elke demo en deze hele suite -- begint met
+   `return '...'` en viel daar dus buiten. Het eerste antwoord luidde letterlijk:
+
+     "Geregeld. De paklijst staat klaar in uw reisoverzicht en het dagplan voor
+      20 juli is ingepland: 10:00 privéboot naar Formentera ... 21:00 uw tafel
+      bij Sal de Mar."
+
+   Er wordt niets geboekt. De grendel stond er en keek langs de enige tekst die
+   in de praktijk verstuurd wordt. Deze toets roept de functie AAN in plaats van
+   naar zijn bron te kijken -- dat is het verschil dat het hem doet.
+   ========================================================================== */
+test('geen enkel vast antwoord beweert dat iets al geregeld is', () => {
+  const { cannedAnswer } = require('../server/kern/ai/prompt')({
+    db: { data: { trip: null } }, PERSONAS: {}, AI_TONE: {},
+    naamEn: () => '', dagContext: () => '', stemmingVoor: () => '', geloofRegel: () => ''
+  });
+
+  /* De vragen die een lid echt stelt, inclusief het instemmen met een aanbod --
+     precies de trigger waar het misging. */
+  const vragen = ['ja', 'graag', 'doe maar', 'regel het', 'ja, regel het', 'prima',
+    'wat moet ik inpakken?', 'heb ik een visum nodig?', 'wat voor weer wordt het?',
+    'maak een dagplan', 'welk restaurant?', 'iets heel anders'];
+
+  /* Woorden die een VOLTOOIDE handeling beweren. "in aanvraag", "voorstel" en
+     "zal ik" mogen juist wel: dat is precies de eerlijke vorm. */
+  const beweert = /(geregeld|geboekt|bevestigd|betaald|is ingepland|staat vast|afgerond)/i;
+
+  const gezien = [];
+  for (const v of vragen) {
+    const a = cannedAnswer(v);
+    assert.ok(a && a.length > 20, 'er komt een echt antwoord op "' + v + '"');
+    gezien.push(v);
+    assert.doesNotMatch(a, beweert,
+      'het vaste antwoord op "' + v + '" beweert dat iets al gedaan is: ' + a.slice(0, 140));
+  }
+  assert.equal(gezien.length, vragen.length, 'alle vragen zijn echt langsgekomen');
+
+  // en de tegenproef: het instem-antwoord zegt WEL wat de bedoeling is
+  const jaZeker = cannedAnswer('ja, regel het');
+  assert.match(jaZeker, /niets is bevestigd|aanvraag/i,
+    'en het zegt eerlijk dat er nog niets vaststaat: ' + jaZeker.slice(0, 120));
+});
+
 /* Klantdata draait op codenamen; de echte naam ligt in de gescheiden kluis. De
    system prompt gaat woordelijk naar de modelaanbieder, dus dat is precies de
    plek waar dat ontwerp telt -- en juist daar stond persona.full. */

@@ -28,9 +28,13 @@
    In CI draait de suite toch al: die stap krijgt RTG_ROUTELOG mee en deze stap
    leest het journaal met --lees. Dat kost dus niets extra's.
 
-   DE VLOER staat in NORM.json onder meters.dekkingWaargenomenPct en wordt HIER
-   bewaakt (niet in scripts/norm.js -- die meet zonder de suite te draaien en
-   kan dit cijfer niet zelf vaststellen).
+   TWEE METERS, allebei in NORM.json en allebei HIER bewaakt (niet in
+   scripts/norm.js -- die meet zonder de suite te draaien en kan deze cijfers
+   niet zelf vaststellen): dekkingWaargenomenPct als vloer, en
+   endpointsNooitAangeraakt als plafond. Die tweede is de scherpe: een afgerond
+   percentage dekt bij 2530 routes tot een stuk of twaalf endpoints die nooit
+   zijn aangeraakt, en de run die dit op 100% zette had er nog twee liggen --
+   waaronder de knop waarmee je bewijst dat je alarmering werkt.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -41,6 +45,9 @@ const { execFileSync, spawnSync } = require('child_process');
 const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
 const METER = 'dekkingWaargenomenPct';
+// een AANTAL en geen percentage: staat hij op 0, dan valt een nieuw endpoint
+// zonder toets niet meer weg in een afronding (zie de kop)
+const METER_N = 'endpointsNooitAangeraakt';
 const jsonUit = process.argv.includes('--json');
 const vastleggen = process.argv.includes('--vastleggen');
 const leesIdx = process.argv.indexOf('--lees');
@@ -118,10 +125,12 @@ function main() {
 
   const norm = fs.existsSync(NORMBESTAND) ? JSON.parse(fs.readFileSync(NORMBESTAND, 'utf8')) : null;
   const vloer = norm && norm.meters ? norm.meters[METER] : undefined;
+  const plafond = norm && norm.meters ? norm.meters[METER_N] : undefined;
 
   if (jsonUit) {
     process.stdout.write(JSON.stringify({ routes: routes.length, geraakt: routes.length - ongeraakt.length,
-      pct, vloer: vloer === undefined ? null : vloer, ongeraakt, vreemd,
+      pct, vloer: vloer === undefined ? null : vloer,
+      nooitAangeraakt: ongeraakt.length, plafond: plafond === undefined ? null : plafond, ongeraakt, vreemd,
       suiteStatus: suite ? suite.status : null }) + '\n');
   } else {
     console.log('\n\x1b[1mWAARGENOMEN DEKKING\x1b[0m \x1b[2m(uit het routejournaal, niet uit de tekst van de tests)\x1b[0m\n');
@@ -148,11 +157,29 @@ function main() {
       console.error('\n  Weigering: ' + pct + '% is lager dan de vastgelegde ' + oud + '%. De norm gaat alleen omhoog.\n');
       return 1;
     }
+    const oudN = nieuw.meters[METER_N];
+    if (oudN !== undefined && ongeraakt.length > oudN) {
+      console.error('\n  Weigering: ' + ongeraakt.length + ' nooit-geraakte endpoints is meer dan de vastgelegde ' + oudN + '. Deze teller gaat alleen omlaag.\n');
+      return 1;
+    }
     nieuw.meters[METER] = pct;
+    nieuw.meters[METER_N] = ongeraakt.length;
     nieuw.vastgelegd = new Date().toISOString().slice(0, 10);
     fs.writeFileSync(NORMBESTAND, JSON.stringify(nieuw, null, 2) + '\n');
-    if (!jsonUit) console.log('\n  \x1b[32m' + METER + ' vastgelegd op ' + pct + '%.\x1b[0m\n');
+    if (!jsonUit) console.log('\n  \x1b[32m' + METER + ' vastgelegd op ' + pct + '%, ' + METER_N + ' op ' + ongeraakt.length + '.\x1b[0m\n');
     return 0;
+  }
+
+  /* De exacte teller eerst: hij is scherper dan het percentage en zijn melding
+     wijst de endpoints aan in plaats van een cijfer te noemen. */
+  if (plafond !== undefined && ongeraakt.length > plafond) {
+    console.error('\n  \x1b[31mDE NORM IS NIET GEHAALD.\x1b[0m ' + ongeraakt.length +
+      ' endpoint(s) zijn tijdens de hele suite geen enkele keer aangeroepen; de norm is ' + plafond + '.');
+    for (const r of ongeraakt.slice(0, 20)) console.error('    ' + r);
+    if (ongeraakt.length > 20) console.error('    ... en nog ' + (ongeraakt.length - 20));
+    console.error('\n  Schrijf er een toets voor, of verhoog ' + METER_N + ' met de hand in NORM.json --');
+    console.error('  dan staat het als bewuste keuze in de historie in plaats van als sluipende erosie.\n');
+    return 1;
   }
 
   if (vloer !== undefined && pct < vloer) {
@@ -161,7 +188,9 @@ function main() {
     console.error('  als bewuste keuze in de historie in plaats van als sluipende erosie.\n');
     return 1;
   }
-  if (!jsonUit && vloer !== undefined) console.log('\n  \x1b[32mDe vloer (' + vloer + '%) is gehaald.\x1b[0m\n');
+  if (!jsonUit && vloer !== undefined)
+    console.log('\n  \x1b[32mDe vloer (' + vloer + '%) is gehaald' +
+      (plafond !== undefined ? ', en ' + ongeraakt.length + ' nooit-geraakte endpoint(s) tegen een norm van ' + plafond : '') + '.\x1b[0m\n');
   return 0;
 }
 

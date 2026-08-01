@@ -274,4 +274,134 @@ const BEVEILIGING = [
   }
 ];
 
+/* ---------------------------------------------------------------------------
+   DE DWALER -- klopt op ELKE deur, zonder sleutel.
+
+   De drie treden hierboven kiezen hun doelen: iemand heeft bedacht wat het
+   proberen waard is. Dat is hun kracht en meteen hun grens -- ze vinden nooit
+   de route waar niemand aan dacht. En die bestaan: scripts/onbetreden.js telt
+   er ruim honderd die nergens in een toets of in de chaos voorkomen.
+
+   Deze trede kiest niet. Hij leest de routetabel uit de bron en klopt op alles
+   aan zonder token. De regel is kort: een route die zonder inlog een 2xx geeft,
+   is publiek. Dat mag -- maar dan hoort hij hieronder te staan, MET REDEN. Wat
+   er niet staat en toch opengaat, is een bevinding.
+
+   De lijst is dus geen onderdrukking maar een besluit-per-route. Hij hoort
+   te groeien met de app en zelden te krimpen. Een nieuwe route die per ongeluk
+   publiek is, valt hier meteen op. */
+const PUBLIEK = new Map([
+  // de voordeur zelf: zonder deze routes kan niemand ooit inloggen
+  ['POST /api/auth/register', 'aanmelden kan per definitie niet ingelogd'],
+  ['POST /api/auth/login', 'inloggen'],
+  ['POST /api/auth/forgot', 'wachtwoord vergeten; antwoordt bewust hetzelfde voor bekend en onbekend'],
+  ['POST /api/auth/reset', 'herstel met een bewijs uit de e-mail'],
+  ['POST /api/auth/verify-email', 'bevestigen met een bewijs uit de e-mail'],
+  ['POST /api/login', 'de demo-pas: kiest een persona zonder account'],
+  ['POST /api/supplier/login', 'de zaak logt in'],
+  ['POST /api/supplier/roster', 'de namenlijst van het inlogscherm; getemperd en beperkt tot wat de kiezer toont'],
+  ['POST /api/supplier/staff/join', 'aanmelden met een kassacode van de werkgever'],
+  ['POST /api/sso/wissel', 'het overdrachtsbewijs inruilen; eenmalig en ondertekend'],
+  ['POST /api/sso/waarheen', 'zegt alleen OF er sso is voor een domein'],
+  // gesprekken die juist bedoeld zijn voor wie nog niet binnen is
+  ['POST /api/aanmeld/start', 'de ballotage: Rahul vraagt wie je bent'],
+  ['POST /api/aanmeld/zeg', 'idem'],
+  ['POST /api/kantoor/gesprek/start', 'de kantoordeur loopt via het gesprek'],
+  ['POST /api/kantoor/gesprek/zeg', 'idem'],
+  ['POST /api/aanmelding/aanvraag', 'een partner meldt zich aan'],
+  // openbare etalage
+  ['POST /api/talen', 'de talenlijst'],
+  ['POST /api/pasprijzen', 'de prijzen van de passen staan op de site'],
+  ['GET /api/pasprijzen', 'idem'],
+  ['POST /api/partnertrips', 'het partnerkanaal is voor niet-leden'],
+  ['POST /api/book', 'het partnerkanaal boekt zonder pas'],
+  ['POST /api/krant/gids', 'de krant is openbaar'],
+  ['POST /api/krant/open', 'idem'],
+  ['POST /api/krant/artikel', 'idem'],
+  ['POST /api/rtf/vacatures', 'vacatures bekijken mag zonder pas'],
+  ['POST /api/les/apps', 'de lesmaker-etalage'],
+  ['POST /api/munt/opties', 'welke munten en tegen welke koers; geen gegevens'],
+  ['POST /api/gids/app', 'de app-gids'],
+  // techniek die van buiten moet kunnen
+  ['GET /api/health', 'levendheid, voor de toezichthouder'],
+  ['GET /api/ready', 'gereedheid, voor de load balancer'],
+  ['GET /api/sat/ping', 'de satelliet-ping van de zaakdoos'],
+  ['GET /api/ice', 'de STUN-servers voor bellen'],
+  ['GET /api/push/key', 'de publieke web-push-sleutel; publiek is de bedoeling'],
+  ['GET /api/pay/gezond', 'de sluitcontrole: klopt de som, ja of nee'],
+  ['POST /api/betaal/webhook', 'de betaalprovider; beveiligd met een handtekening, niet met een sessie'],
+  ['POST /api/munt/webhook', 'de munt-aanbieder; idem'],
+  ['GET /api/doos/status', 'elke app pollt dit om te weten of er een doos is en of die lokaal draait; zonder doos zegt hij {doos:false}'],
+  ['GET /api/zegel/sleutel', 'de PUBLIEKE sleutel waarmee een partner-app een zegel offline verifieert'],
+  ['POST /api/zegel/controleer', 'een zegel verifieren hoort te kunnen zonder account; dat is het hele idee'],
+  ['POST /api/webauthn/opties', 'passkey-inlog; geeft bewust hetzelfde antwoord voor een bekende en een onbekende login'],
+  ['POST /api/translate', 'de site vertaalt ook voor een uitgelogde bezoeker; getemperd, en de AI gaat pas aan met een inlog'],
+  ['POST /api/vertaal/ui', 'idem, voor de knoppen'],
+  /* Deze twee zijn WEL bewaakt -- maar met een slot dat de dwaler niet kan
+     voelen: RTG_METRICS_TOKEN, of anders alleen vanaf een intern adres. De
+     ladder klopt vanaf 127.0.0.1 en telt dus als intern. Dat staat hier zodat
+     niemand denkt dat ze open zijn; het betekent alleen dat DEZE trede er niets
+     over kan zeggen. */
+  ['GET /api/metrics', 'bewaakt met een token of een intern adres; de dwaler klopt van binnenuit en komt er daarom langs'],
+  ['GET /api/metrics/kort', 'idem'],
+  // alleen in de testomgeving; de trede bewijst hieronder dat ze in productie weg zijn
+  ['POST /api/test/bug', 'opzettelijke storing, alleen bij NODE_ENV=test'],
+  ['POST /api/test/crash', 'opzettelijke storing, alleen bij NODE_ENV=test']
+]);
+
+/* Routes die we NIET aankloppen. Bewust kort, en elk met een reden -- een
+   overslaan-lijst die groeit is een blinde vlek die groeit. */
+const NIET_KLOPPEN = [
+  [/^\/api\/(sse|stream|live-)/, 'een openblijvende stroom; die hangt de klopper op'],
+  [/^\/api\/test\//, 'de opzettelijke storingen; /api/test/crash zou de server doden'],
+  [/^\/api\/cluster\//, 'stuurt andere instances aan; in een chaostest niet gepast'],
+  [/^\/api\/doos\/update/, 'zet een update in gang op de zaakdoos']
+];
+
+BEVEILIGING.push({
+  id: 'dwaler',
+  naam: 'de dwaler',
+  wie: 'klopt op ELKE deur zonder sleutel, ook die waar niemand aan dacht',
+  async doe(w) {
+    let routes;
+    try { routes = require('../lib/routes').alleRoutes(); }
+    catch (e) { return w.nietGeprobeerd('de routetabel is niet te lezen: ' + e.message); }
+    // alleen de eigen API, en geen router-paden (die staan onder een mount die
+    // hier niet bekend is -- de dwaler zou dan op een niet-bestaand pad kloppen)
+    const doelen = routes.filter(r => r.pad.startsWith('/api/') && !r.viaRouter
+      && !NIET_KLOPPEN.some(([re]) => re.test(r.pad)));
+    if (!doelen.length) return w.nietGeprobeerd('geen routes gevonden om aan te kloppen');
+
+    let open = 0;
+    for (const r of doelen) {
+      const pad = r.pad.replace(/:[A-Za-z_]+/g, 'x');   // een parameter invullen met iets onschuldigs
+      const res = await w.vraag(r.methode === 'GET' ? 'GET' : r.methode, pad, null,
+        r.methode === 'GET' ? null : {}, { timeout: 8000 });
+      if (res.status === 0) continue;                    // niet bereikbaar/afgekapt: geen oordeel
+      const sleutel = r.methode + ' ' + r.pad;
+      if (res.status >= 500) {
+        w.raak('een verzoek zonder token gaf een serverfout', sleutel + ' -> ' + res.status + '  (' + r.bestand + ':' + r.regel + ')');
+      } else if (res.status >= 200 && res.status < 300) {
+        if (PUBLIEK.has(sleutel)) { open++; w.afgeslagen(); }
+        else w.raak('een route gaf zonder inlog een geslaagd antwoord', sleutel + '  (' + r.bestand + ':' + r.regel + ')');
+      } else w.afgeslagen();
+    }
+    /* De publieke lijst hoort ook te KLOPPEN. Staat er iets op dat allang dicht
+       is, dan wekt de lijst een valse indruk van openheid en verbergt hij de
+       volgende die er per ongeluk bij komt. */
+    if (!open) w.raak('geen enkele route uit de publieke lijst gaf 200', 'de lijst is verouderd of de server is stuk');
+    else w.gelukt();
+
+    /* En de opzettelijke storingen horen in productie NIET te bestaan. Ze staan
+       achter NODE_ENV === 'test'; de ladder draait met NODE_ENV=test, dus we
+       kunnen hier alleen bewijzen dat de grendel er in de BRON staat. Dat is
+       weinig, en daarom staat er wat het is. */
+    const bron = require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'server', 'server.js'), 'utf8');
+    const blok = bron.indexOf("app.post('/api/test/crash'");
+    const grendel = blok > 0 && bron.slice(Math.max(0, blok - 400), blok).includes("NODE_ENV === 'test'");
+    if (!grendel) w.raak('/api/test/crash staat niet achter NODE_ENV=test', 'een anonieme POST zou de server doden');
+    else w.afgeslagen();
+  }
+});
+
 module.exports = { BEVEILIGING };

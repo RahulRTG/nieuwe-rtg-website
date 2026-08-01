@@ -332,3 +332,37 @@ test('een terugbetaalde rit en boeking zijn niet opnieuw te betalen', async () =
   assert.equal(nogmaals.status, 409, 'een terugbetaalde rit kan niet opnieuw betaald worden');
   assert.match(nogmaals.body.error || '', /geannuleerd/);
 });
+
+test('munt-webhook: zonder secret in productie wordt niets geloofd', () => {
+  /* De betaal-webhook had deze grendel al; zijn munt-tweeling niet. En hier
+     hangt er meer aan: de aanroeper doet bij status 'ontvangen' meteen
+     munten.bevestig() en settleMuntFactuur(), en dat zet een factuur op 'paid'
+     of crediteert een leverancier rechtstreeks. Zonder secret viel de code door
+     naar JSON.parse en gaf een ONONDERTEKEND bericht terug als geverifieerde
+     waarheid: wie het adres kent, roept zelf "de munten zijn binnen".
+
+     Buiten productie blijft de doorval bestaan; daar draait alles op demo-geld
+     en zou een verplicht secret elke lokale start blokkeren. Deze toets meet
+     allebei de kanten, in een apart proces zodat NODE_ENV van de suite niet
+     wordt aangeraakt. */
+  const { execFileSync } = require('child_process');
+  const proef = (env) => execFileSync(process.execPath, ['-e',
+    'const m = require("' + path.join(__dirname, '..', 'server', 'muntbetaal.js').replace(/\\/g, '/') + '");'
+    + 'try { m.verifieerWebhook(Buffer.from(JSON.stringify({status:"ontvangen",id:"x",euroCenten:100000})), ""); console.log("DOOR"); }'
+    + 'catch (e) { console.log("GEWEIGERD"); }'],
+  { env: Object.assign({}, process.env, env, { MUNT_WEBHOOK_SECRET: '' }), encoding: 'utf8' }).trim();
+
+  assert.equal(proef({ NODE_ENV: 'production' }), 'GEWEIGERD', 'in productie zonder secret: niets geloven');
+  assert.equal(proef({ NODE_ENV: 'test' }), 'DOOR', 'lokaal blijft de demo gewoon werken');
+});
+
+test('de configuratiekeuring noemt een ontbrekend munt-secret een FOUT, geen waarschuwing', () => {
+  /* Hij stond als waarschuwing terwijl de Stripe-tweeling een fout was, en dat
+     verschil was er geen: allebei vertellen ze de server dat er geld binnen is.
+     Sinds muntbetaal.js in productie weigert zou een waarschuwing bovendien
+     liegen -- de acceptatie werkt dan gewoon niet meer. */
+  const { valideer } = require('../server/config');
+  const r = valideer({ NODE_ENV: 'production', MUNT_AAN: '1', MUNT_PROVIDER_KEY: 'k', MUNT_WEBHOOK_SECRET: '' });
+  assert.ok((r.fouten || []).some(f => /MUNT_WEBHOOK_SECRET/.test(f)), 'het ontbrekende secret is een FOUT');
+  assert.ok(!(r.waarschuwingen || []).some(f => /MUNT_WEBHOOK_SECRET/.test(f)), 'en niet ook nog een waarschuwing');
+});

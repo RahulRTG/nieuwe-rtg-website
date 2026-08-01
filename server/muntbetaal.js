@@ -110,6 +110,21 @@ async function maakOntvangst(opdracht) {
    altijd een secret zetten. */
 function verifieerWebhook(ruweBody, handtekening) {
   const buf = Buffer.isBuffer(ruweBody) ? ruweBody : Buffer.from(String(ruweBody));
+  /* ZONDER SECRET IN PRODUCTIE: WEIGEREN.
+
+     Precies dezelfde grendel als in server/betaal.js -- en die stond daar al
+     WEL. Deze broer had hem niet, en hier hangt er meer aan: de aanroeper van
+     deze functie (server.js, /api/munt/webhook) doet bij `status: 'ontvangen'`
+     meteen munten.bevestig() en settleMuntFactuur(), en dat zet een factuur op
+     'paid' of crediteert een leverancier rechtstreeks. Zonder secret viel de
+     code door naar JSON.parse en gaf een ONONDERTEKEND bericht terug als
+     geverifieerde waarheid: wie het adres kent, kan zelf "de munten zijn binnen"
+     roepen en zo een factuur laten afboeken zonder ooit te betalen.
+
+     Buiten productie blijft de doorval bestaan -- daar draait alles op
+     demo-geld en zou een verplicht secret elke lokale start blokkeren. */
+  if (!WEBHOOK_SECRET && process.env.NODE_ENV === 'production')
+    throw new Error('Munt-webhook geweigerd: er is geen webhook-secret ingesteld, dus dit bericht is niet te vertrouwen.');
   if (WEBHOOK_SECRET) {
     const verwacht = crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
     const gegeven = Buffer.from(String(handtekening || ''), 'utf8');

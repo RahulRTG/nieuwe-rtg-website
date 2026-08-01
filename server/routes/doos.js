@@ -1,7 +1,17 @@
 /* De Zaakdoos-vloot: de sleutelwacht en de /api/doos/-eindpunten (kloon,
    status, meting, buurmelding, rapport) plus de satelliet-ping. De proxy- en
-   journaal-lagen die elke aanvraag omhullen blijven in server.js; hier staan
-   alleen de losse routes achter de gedeelde sleutel. Altijd-aan gemount. */
+   journaal-lagen die elke aanvraag omhullen blijven in server.js.
+
+   NIET ELKE ROUTE ZIT ACHTER DE SLEUTEL, en de kop beweerde eerder van wel.
+   Per route, met reden:
+     kloon, meting, buurmelding   altijd achter RTG_DOOS_SLEUTEL
+     status                       bewust open: elke app pollt hem om te weten of
+                                  er een doos is en of die lokaal draait; zonder
+                                  doos antwoordt hij {doos:false}
+     rapport                      open OP EEN DOOS (het statuspaneel in de zaak),
+                                  achter de sleutel op een server die geen doos
+                                  is -- daar is het alleen verkenningswerk:
+                                  pings, uitvalminuten, cachegrootte */
 module.exports = (kern) => {
   const { app, db, save, crypto, beveilig, zaakdoos } = kern;
 
@@ -156,6 +166,11 @@ module.exports = (kern) => {
     save();
     res.json({ ok: true });
   });
-  // het dagrapport van deze doos zelf (lokaal, voor het zaak-scherm en de tests)
-  app.get('/api/doos/rapport', (req, res) => res.json(zaakdoos.dagrapport()));
+  /* Het dagrapport van deze doos zelf (lokaal, voor het zaak-scherm en de tests).
+     Op een server die GEEN doos is valt er niets nuttigs te tonen en is dit
+     alleen verkenningswerk; daar geldt dus de sleutel. Zie de kop. */
+  app.get('/api/doos/rapport', (req, res) => {
+    if (!zaakdoos.status().doos && !doosSleutelOk(req, res)) return;
+    res.json(zaakdoos.dagrapport());
+  });
 };

@@ -55,24 +55,12 @@ function loop(map, filter, doe) {
 }
 
 /* ---------- 1. elke route die de server aanbiedt ---------- */
-const ROUTE_RE = /\b(?:app|router)\.(post|get|put|delete|patch)\(\s*'([^']+)'/g;
-const routes = new Map(); // pad -> { methode, bestand, regel }
-loop(path.join(WORTEL, 'server'), /\.js$/, f => {
-  const tekst = fs.readFileSync(f, 'utf8');
-  const regels = tekst.split('\n');
-  let m;
-  while ((m = ROUTE_RE.exec(tekst))) {
-    const pad = m[2];
-    if (!pad.startsWith('/')) continue;
-    const regel = tekst.slice(0, m.index).split('\n').length;
-    // routers worden ergens gemount; het gemounte voorvoegsel zoeken we hieronder op
-    const sleutel = pad;
-    if (!routes.has(sleutel)) routes.set(sleutel, {
-      methode: m[1].toUpperCase(), bestand: path.relative(WORTEL, f).replace(/\\/g, '/'), regel,
-      viaRouter: /^\s*router\./.test(regels[regel - 1] || '')
-    });
-  }
-});
+/* De scanner staat in scripts/lib/routes.js, want de trede "de dwaler" in de
+   ladder heeft precies dezelfde lijst nodig. Twee scanners zouden op den duur
+   uiteenlopen en dan meet de een iets anders dan de ander. */
+const { alleRoutes } = require('./lib/routes');
+const routes = new Map();
+for (const r of alleRoutes()) if (!routes.has(r.pad)) routes.set(r.pad, r);
 
 /* ---------- 2. waar wordt een pad genoemd ---------- */
 const bronnen = [];

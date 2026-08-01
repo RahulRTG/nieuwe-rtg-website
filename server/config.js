@@ -103,8 +103,15 @@ function valideer(env) {
     if (!env.RTF_IBAN) waarschuwingen.push('RTF_IBAN niet gezet: de 30%-afdracht aan de RTFoundation wordt wel per betaling geboekt en gereserveerd (status "te_storten"), maar nog niet uitbetaald. Vul het foundation-IBAN zodra het bekend is.');
     if (env.MUNT_AAN === '1' && !env.MUNT_PROVIDER_KEY)
       fouten.push('MUNT_AAN=1 zonder MUNT_PROVIDER_KEY: crypto-acceptatie zou aanstaan zonder vergunninghoudende aanbieder om te ontvangen en om te zetten. Zet de provider, of laat MUNT_AAN uit.');
+    /* Even hard als de Stripe-regel hierboven, en om dezelfde reden: de
+       munt-webhook zet bij "ontvangen" een factuur op betaald of crediteert een
+       leverancier rechtstreeks. Dit stond als WAARSCHUWING terwijl de
+       Stripe-tweeling een FOUT was, en dat verschil was er geen: allebei
+       vertellen ze de server dat er geld binnen is. Sinds muntbetaal.js in
+       productie zonder secret weigert, zou een waarschuwing bovendien liegen --
+       de acceptatie werkt dan gewoon niet meer. Liever nu luid dan straks stil. */
     if (env.MUNT_AAN === '1' && !env.MUNT_WEBHOOK_SECRET)
-      waarschuwingen.push('MUNT_WEBHOOK_SECRET niet gezet terwijl munt-acceptatie aanstaat: de munt-webhook is dan niet te vertrouwen. Zet een secret.');
+      fouten.push('MUNT_AAN=1 zonder MUNT_WEBHOOK_SECRET: de munt-webhook zou onondertekende berichten als waarheid aannemen (en zet een factuur op betaald). Zet een secret, of laat MUNT_AAN uit.');
   } else {
     // Buiten productie: alleen zachte hints, nooit blokkeren.
     if (!env.RTG_ENC_KEY) waarschuwingen.push('RTG_ENC_KEY niet gezet: versleuteling-at-rest is uit (prima voor lokaal, niet voor productie).');

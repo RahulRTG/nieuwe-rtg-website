@@ -405,15 +405,40 @@ test('muntbetaling aan een leverancier kent dezelfde bovengrens als een gewone',
      van de leverancier bij kwam: EUR 10.000.000 op een verzoek van EUR 0,50. */
   const dp = require('../server/kern/directpay');
   const maak = dp.maakDirectpay || dp;
+  /* DE TX-HULPJES HOREN ER ECHT IN. Deze ctx gaf ze niet mee, en zolang
+     directpay met unshift+slice werkte viel dat niet op. Sinds de betalingen via
+     de transactie-index lopen viel deze toets om met "directBetalingenVoegToe is
+     not a function" -- middenin vastleggen(), dus pas bij de eerste betaling.
+     Directpay weigert zich nu te laten bouwen zonder die hulpjes, en hier staan
+     ze als een kleine echte index: dat houdt deze toets bij het onderwerp
+     (de bovengrens) zonder de opslagweg weg te doen alsof. */
+  const bak = { directBetalingen: [], betaalVerzoeken: [], directOntvangsten: {} };
+  const voegToe = (naam) => (x) => { bak[naam].unshift(x); };
+  const opRef = (naam) => (ref) => bak[naam].find(x => x.ref === ref);
+  const opVeld = (naam, veld) => (w) => bak[naam].filter(x => x[veld] === w);
   const nep = {
-    db: { data: { directBetalingen: [], betaalVerzoeken: [], directOntvangsten: {} } },
+    db: { data: bak },
     save: () => {}, crypto: require('crypto'),
     findSupplier: (c) => (c === 'KIKUNOI' ? { code: 'KIKUNOI', name: 'Kikunoi' } : null),
     betaal: { maakBetaling: async () => ({ id: 'x', status: 'betaald', aanbieder: 'demo' }) },
     notify: () => {}, notifySupplier: () => {}, sseToSupplier: () => {},
-    sseToCustomer: () => {}, sseToOffice: () => {}, logActivity: () => {}
+    sseToCustomer: () => {}, sseToOffice: () => {}, logActivity: () => {},
+    directBetalingMetRef: opRef('directBetalingen'),
+    directBetalingenVanKlant: opVeld('directBetalingen', 'key'),
+    directBetalingenVanZaak: opVeld('directBetalingen', 'supplierCode'),
+    directBetalingenVoegToe: voegToe('directBetalingen'),
+    betaalVerzoekMetRef: opRef('betaalVerzoeken'),
+    betaalVerzoekenVoorCodenaam: opVeld('betaalVerzoeken', 'naarCodename'),
+    betaalVerzoekenVanZaak: opVeld('betaalVerzoeken', 'supplierCode'),
+    betaalVerzoekenVoegToe: voegToe('betaalVerzoeken')
   };
   const api = maak(nep);
+
+  /* En de bewering die het gat dichthoudt: zonder die hulpjes komt er geen
+     betaalmodule uit, in plaats van een die pas bij de eerste klant omvalt. */
+  assert.throws(() => maak({ ...nep, directBetalingenVoegToe: undefined }), /transactie-index ontbreekt/,
+    'directpay laat zich niet bouwen zonder de weg waarlangs betalingen worden opgeslagen');
+
   const grens = api.DP_MAX_CENTEN;
   assert.ok(grens > 0, 'de bovengrens bestaat');
   const teHoog = api.dpRegistreerMunt({ key: 'k1', codename: 'Test', supplierCode: 'KIKUNOI', bedragCenten: grens + 1 });

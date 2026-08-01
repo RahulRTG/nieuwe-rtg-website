@@ -123,7 +123,11 @@ function onExternalChange(cb) { state.setExternCb(cb); }
 const dbLog = { warn: (m) => console.warn('[db]', m) };
 function startSqliteSync() {
   sqlite.startSqliteSync();
-  if (STORE !== 'sqlite' || process.env.TX_LEDGER_SQLITE === '0') return;
+  /* Alleen de sqlite-stand start hier een grootboek (postgres doet dat in
+     ./postgres). Of die stand er een DRAAGT, vraagt hij aan dezelfde functie die
+     de productiekeuring gebruikt -- anders kan de keuring iets goedkeuren wat
+     hier niet gebeurt, en dat is precies de vorm die je nooit ziet. */
+  if (STORE !== 'sqlite' || !opslag.heeftGrootboek(process.env, STORE)) return;
   tx.initLedgerSqlite(opslag, dbLog)
     .then(() => tx.vensterTopUp(dbLog))
     .catch(e => console.warn('[db] tx-grootboek (sqlite) start mislukt:', e.message));

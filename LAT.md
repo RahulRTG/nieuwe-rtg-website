@@ -28,10 +28,21 @@ Zolang dat zo is, is die code een pleister en staat hij als zodanig genoteerd.
 onder `directBetalingen` en `betaalVerzoeken` -- 38 MB betalingen zonder enig
 grootboek erachter, terwijl `server/pg/sync.js` ze wel als herstelbaar behandelde.
 Die twee staan nu in `server/db/tx/collecties.js` en gaan bij aanmaak als eigen
-rij mee. In de sqlite- en de postgres-stand is dat dus geen pleister meer maar een
+rij mee. In de sqlite- en de postgres-stand is dat geen pleister meer maar een
 oorzaak-reparatie. In de json- en geheugen-stand blijft `bewaarStaart` het vangnet,
-want daar is nog steeds geen grootboek. Dat zijn de ontwikkel- en toetsstanden en
-niet de productiestand, maar de pleister is daarmee kleiner geworden en niet weg.
+want daar is nog steeds geen grootboek.
+
+*En een fout in de vorige alinea, die er zelf een regel-6-geval van maakte.* Hier
+stond dat json en geheugen "de ontwikkel- en toetsstanden zijn en niet de
+productiestand". Dat was aangenomen en niet nagetrokken. `server/db/keuze.js`
+(toen nog een regel in `opslag.js`) kiest json zodra er een `db.json` ligt en er
+geen `DATABASE_URL` is -- ook in productie -- en `productie.js` gaf daar alleen
+een waarschuwing over, op een voorwaarde die er bovendien aan twee kanten naast
+zat: hij blokkeerde een verse installatie die juist sqlite krijgt, en liet de
+installatie lopen die ooit met json begon en later zijn `DATABASE_URL` kwijtraakte.
+Sinds `server/config/productie-opslag.js` is het een blokkerende fout, gesteld met
+dezelfde functie waarmee de opslag zijn stand kiest. De zin hierboven is nu waar
+omdat een machine hem handhaaft, en niet omdat ik hem opschreef.
 
 **Handhaver:** mensenwerk, zichtbaar gemaakt in het commit-bericht en de
 takenlijst. Geen machine.
@@ -215,6 +226,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |
 | geen geslaagde toets met een serverfout eronder | `test/helper.js` (strenge poort) |
+| geen productiestart op een opslag zonder grootboek | `server/config/productie-opslag.js` |
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
 | de pijplijn die dit alles draait | `.github/workflows/ci.yml` |

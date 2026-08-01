@@ -12,6 +12,7 @@
 'use strict';
 
 const { keurGeld } = require('./productie-geld');
+const { keurOpslag } = require('./productie-opslag');
 
 function keur(env, fouten, waarschuwingen) {
     // 1. Demo-modus mag nooit aan in productie: dat opent de demo-inlog en het
@@ -74,9 +75,11 @@ function keur(env, fouten, waarschuwingen) {
     if (env.OFFICE_CODE && env.OFFICE_CODE.length < 8)
       fouten.push('OFFICE_CODE is te kort; gebruik minstens 8 tekens (of laat hem weg voor een willekeurige code).');
 
+    // 3b. Geen grootboek, geen productie. Zie ./productie-opslag.js.
+    keurOpslag(env, fouten, waarschuwingen);
+
     // 4. Aanbevolen, maar niet blokkerend.
     if (!env.APP_URL) waarschuwingen.push('APP_URL niet gezet: links in e-mails vallen terug op de Host-header.');
-    if (!env.DATABASE_URL && env.RTG_STORE !== 'sqlite') waarschuwingen.push('DATABASE_URL niet gezet: de gedeelde data draait op een lokaal bestand. Voor productie/meerdere instances wordt PostgreSQL aangeraden.');
     /* RTG_VAULT_KEY en RTG_SECRET_KEY stonden hier vroeger als waarschuwing.
        Ze zijn nu blokkerende fouten (punt 2b hierboven) -- twee keer melden zou
        de lijst alleen langer maken zonder iets toe te voegen. */

@@ -15,8 +15,11 @@ const DATABASE_URL = process.env.DATABASE_URL || process.env.PG_URL || null;
 const REDIS_URL = process.env.REDIS_URL;
 /* De opslagkeuze: Postgres zodra er een DATABASE_URL is; anders houdt een
    bestaande installatie zijn db.json (niets verandert onder je voeten), en
-   krijgt een VERSE installatie de SQLite-motor. RTG_STORE blijft altijd de baas. */
-const STORE = process.env.RTG_STORE || (DATABASE_URL ? 'postgres' : (fs.existsSync(DB_FILE) ? 'json' : 'sqlite'));
+   krijgt een VERSE installatie de SQLite-motor. RTG_STORE blijft altijd de baas.
+   De regel zelf staat in ./keuze, want de configuratiekeuring moet hem ook
+   kunnen stellen -- en die had er een eigen, net andere benadering van. */
+const { kiesStore, heeftGrootboek } = require('./keuze');
+const STORE = kiesStore(process.env, fs.existsSync(DB_FILE));
 
 // Privacy op schijf: de datamap en de databestanden bevatten chats, sessies en
 // (tijdelijk) snaps. Alleen de eigenaar mag ze lezen (map 0700, bestanden 0600).
@@ -81,7 +84,7 @@ function schrijfLokaleSnapshot() {
 function schrijfLokaleSnapshotStil() { try { schrijfLokaleSnapshot(); } catch (e) {} }
 
 module.exports = {
-  DATA_DIR, DB_FILE, DATABASE_URL, REDIS_URL, STORE,
+  DATA_DIR, DB_FILE, DATABASE_URL, REDIS_URL, STORE, kiesStore, heeftGrootboek,
   besloten, beslotenMap, schrijfDuurzaam, laadUitBackup, leesLokaleSnapshot,
   schrijfLokaleSnapshot, schrijfLokaleSnapshotStil
 };

@@ -20,9 +20,33 @@
 const MIN_CENTEN = 50;          // € 0,50 ondergrens
 const MAX_CENTEN = 5000000;     // € 50.000 bovengrens per transactie
 
-function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
-  directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
-  betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe }) {
+/* De transactie-hulpjes die deze module NODIG heeft. Ze staan hier als lijst en
+   niet alleen in de handtekening, zodat ze te controleren zijn. */
+const TX_NODIG = ['directBetalingMetRef', 'directBetalingenVanKlant', 'directBetalingenVanZaak', 'directBetalingenVoegToe',
+  'betaalVerzoekMetRef', 'betaalVerzoekenVoorCodenaam', 'betaalVerzoekenVanZaak', 'betaalVerzoekenVoegToe'];
+
+function maakDirectpay(ctxIn) {
+  /* WEIGEREN BIJ HET BOUWEN, NIET OMVALLEN BIJ DE EERSTE BETALING.
+
+     Toen deze module op de transactie-index werd aangesloten, bleef er een
+     aanroeper achter die de hulpjes niet meegaf (een toets met een eigen ctx).
+     Het gevolg kwam pas naar buiten toen er echt betaald werd:
+     "directBetalingenVoegToe is not a function", middenin vastleggen(). Dat is
+     de verkeerde plek en het verkeerde moment -- een betaalmodule die zich laat
+     bouwen zonder de weg waarlangs betalingen worden opgeslagen, belooft iets
+     wat ze niet kan waarmaken.
+
+     Zelfde vorm als kern/aipoort.js, dat bij het bouwen weigert zonder
+     resolveSession. Wie een afhankelijkheid vergeet, hoort dat te horen bij het
+     opstarten van de server en niet bij de eerste klant. */
+  const ontbreekt = TX_NODIG.filter(n => typeof ctxIn[n] !== 'function');
+  if (ontbreekt.length)
+    throw new Error('directpay: de transactie-index ontbreekt (' + ontbreekt.join(', ') +
+      '). Zonder die hulpjes worden betalingen niet geindexeerd en valt de staart stil weg.');
+
+  const { db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
+    directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
+    betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe } = ctxIn;
   const nu = () => new Date().toISOString();
   const id = (p) => (p || 'x') + crypto.randomBytes(5).toString('hex').toUpperCase();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);

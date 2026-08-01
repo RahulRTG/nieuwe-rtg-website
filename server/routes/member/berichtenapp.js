@@ -8,9 +8,11 @@
    gebeuren: een goede route IS de AI-koppeling. Wat de AI hier NIET kan, is
    iets versturen; opstellen mag, versturen doet de mens.
    Gemount vanuit routes/member.js. */
+const { veiligeFout } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, geenGast, berichten } = kern;
-  const fout = (res, e) => res.status(400).json({ error: (e && e.message) || 'Er ging iets mis.' });
+  // veiligeFout: laat de melding staan, haalt er alleen ons bestandssysteem uit
+  const fout = (res, e) => res.status(400).json({ error: veiligeFout(e) });
 
   // Zoeken over prive-gesprekken, RTMAIL, sollicitatie-chats en de Berichtenbox.
   app.post('/api/member/berichten/zoek', auth, (req, res) => {

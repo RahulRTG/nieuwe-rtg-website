@@ -15,7 +15,29 @@ function herstel2fa() {
 }
 const codeHash = (c) => crypto.createHash('sha256').update(String(c)).digest('hex');
 
+/* HETZELFDE ANTWOORD, MAAR NIET IN DEZELFDE TIJD.
+
+   Deze route geeft bewust altijd hetzelfde antwoord terug: of een adres bij ons
+   een account heeft, gaat een buitenstaander niet aan. Dat klopte -- in WOORDEN.
+   De DUUR verschilde: bestond het account, dan werd er een hersteltoken
+   aangemaakt, een code gehasht, de database weggeschreven en twee berichten
+   ingepland; bestond het niet, dan keerde de route meteen terug. Dat verschil is
+   over een reeks verzoeken gewoon te meten, en dan is dit alsnog een
+   ledenlijst-controle -- precies wat het gelijke antwoord moest voorkomen.
+
+   Vandaar een vloer onder de antwoordtijd: elk verzoek doet er minstens
+   MIN_MS over, hoe kort het echte werk ook was. Een vloer en geen ruis, want
+   ruis middelt weg als je vaak genoeg meet. Een aanvaller ziet nu een vlakke
+   lijn; een gewone gebruiker merkt een kwart seconde niet. */
+const MIN_MS = 250;
+
 app.post('/api/auth/forgot', (req, res) => {
+  const begon = Date.now();
+  const antwoord = (lijf) => {
+    const over = MIN_MS - (Date.now() - begon);
+    if (over > 0) setTimeout(() => res.json(lijf), over);
+    else res.json(lijf);
+  };
   const email = String(req.body.email || '').trim();
   const u = email ? accounts.findByLogin(email) : null;
   let devResetUrl, devCode;
@@ -34,8 +56,8 @@ app.post('/api/auth/forgot', (req, res) => {
       'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
     if (DEV_VELDEN) { devResetUrl = url; devCode = code; }
   }
-  // Altijd hetzelfde antwoord: niet verklappen of een e-mailadres bestaat.
-  res.json({ ok: true, tweestaps: true, ...(devResetUrl ? { devResetUrl, devCode } : {}) });
+  // Altijd hetzelfde antwoord, en sinds deze ronde ook in dezelfde tijd.
+  antwoord({ ok: true, tweestaps: true, ...(devResetUrl ? { devResetUrl, devCode } : {}) });
 });
 
 app.post('/api/auth/reset', async (req, res) => {

@@ -5,6 +5,7 @@
    De euro-kant (kaart, facturen) staat in ./betalen.js. Afgesplitst toen dat
    bestand de 10 KB passeerde; het zijn ook echt twee onderwerpen, met elk een
    eigen aanbieder en een eigen webhook. */
+const { veiligeFout } = require('../../kern/util');
 module.exports = (mctx) => {
   const { app, auth, db, save, accounts, memberTemplate, betaal, fonds, munten, factuur,
     broadcastSync, stateFor, findSupplier, liveCodename } = mctx;
@@ -28,7 +29,7 @@ module.exports = (mctx) => {
         context: { soort: 'factuur', wie, invoiceId: inv.id, own, accountId: own ? req.session.account.id : null }
       });
       res.json({ ok: true, verzoek });
-    } catch (e) { res.status(400).json({ error: e.message || 'Kon geen munt-adres maken.' }); }
+    } catch (e) { res.status(400).json({ error: veiligeFout(e, 'Kon geen munt-adres maken.') }); }
   });
 
   /* Rechtstreeks een partner betalen met munten. Zelfde afhandeling als een gewone
@@ -50,7 +51,7 @@ module.exports = (mctx) => {
         context: { soort: 'direct', key, codename, supplierCode: s.code, omschrijving: String(req.body.omschrijving || '').slice(0, 120) }
       });
       res.json({ ok: true, verzoek, supplier: { code: s.code, name: s.name } });
-    } catch (e) { res.status(400).json({ error: e.message || 'Kon geen munt-adres maken.' }); }
+    } catch (e) { res.status(400).json({ error: veiligeFout(e, 'Kon geen munt-adres maken.') }); }
   });
 
   /* Facturen downloaden. Elk lid kan zijn eigen factuur als PDF ophalen, en een

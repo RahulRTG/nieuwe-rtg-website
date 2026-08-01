@@ -8,9 +8,11 @@
      hoort een mens zelf te doen, met de knop in de hand.
    - /zaak/naam is de werkgeverskant en loopt op de leveranciers-auth.
    Gemount vanuit routes/member.js. */
+const { veiligeFout } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, supplierAuth, geenGast, metier, metierBewijs, metierNetwerk, metierAI, metierLoon } = kern;
-  const fout = (res, e) => res.status(400).json({ error: (e && e.message) || 'Er ging iets mis.' });
+  // veiligeFout: laat de melding staan, haalt er alleen ons bestandssysteem uit
+  const fout = (res, e) => res.status(400).json({ error: veiligeFout(e) });
   const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
 
   // ---- het eigen profiel ----

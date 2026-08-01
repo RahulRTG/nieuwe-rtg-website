@@ -21,6 +21,7 @@ const jwks = require('../../sso/jwks');
 const scim = require('../../scim');
 const { log } = require('../../log');
 
+const { veiligeFout } = require('../../kern/util');
 module.exports = (tctx) => {
   const { app, accounts, techAuth, eigenaarAlleen } = tctx;
 
@@ -55,7 +56,7 @@ module.exports = (tctx) => {
       log.info('sso.koppeling gezet', { org: k.org, door: wie(req), domeinen: k.domeinen.length });
       res.json({ ok: true, koppeling: k });
     } catch (e) {
-      res.status(400).json({ error: e.message });
+      res.status(400).json({ error: veiligeFout(e) });
     }
   });
 
@@ -122,7 +123,7 @@ module.exports = (tctx) => {
         algoritmen: (doc.id_token_signing_alg_values_supported || []).filter(a => a === 'RS256' || a === 'ES256')
       });
     } catch (e) {
-      res.status(502).json({ ok: false, error: e.message });
+      res.status(502).json({ ok: false, error: veiligeFout(e) });
     }
   });
 };

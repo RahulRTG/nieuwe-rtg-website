@@ -126,3 +126,52 @@ test('e2e: rechtstreeks een partner betalen met munten crediteert de leverancier
   const na = (await api(base, '/api/supplier/ontvangsten', {}, winkel)).body.som || 0;
   assert.equal(na - voor, 4500, 'de leverancier is met het euro-bedrag gecrediteerd');
 });
+
+/* DE KOERS WAS GELOCKT, EN DE LOCK LIEP NOOIT AF.
+
+   Bij het aanmaken van een ontvangst wordt `vervalt` vastgelegd: de tijd
+   waarin deze koers geldt. Dat veld werd nergens gelezen. De terugval bij een
+   bevestiging -- "weet de aanbieder het euro-bedrag niet, neem dan het
+   vastgelegde" -- gold dus ook nog een half jaar later, tegen de koers van
+   toen. Bij een munt die intussen gehalveerd is, schrijven we het oude bedrag
+   bij en is het verschil ons verlies. Dat is precies het soort verschil dat
+   iemand met geduld kan uitzoeken.
+
+   Deze test draait op de kern-module zelf: hij zet een ontvangst neer die
+   gisteren al verlopen was en kijkt wat er gebeurt.
+
+   Draai los: node --experimental-sqlite --test test/munten.test.js */
+test('een verlopen munt-ontvangst valt niet meer terug op de oude koers', () => {
+  const db = { data: { muntOntvangsten: [] } };
+  const { maakMunten } = require('../server/kern/munten');
+  const munten = maakMunten({ db, save: () => {}, muntbetaal });
+
+  const gisteren = new Date(Date.now() - 25 * 3600000).toISOString();
+  const morgen = new Date(Date.now() + 3600000).toISOString();
+  db.data.muntOntvangsten.push(
+    { id: 'oud', munt: 'usdc', euroCenten: 5000, status: 'wacht', vervalt: gisteren },
+    { id: 'oud2', munt: 'usdc', euroCenten: 5000, status: 'wacht', vervalt: gisteren },
+    { id: 'vers', munt: 'usdc', euroCenten: 5000, status: 'wacht', vervalt: morgen }
+  );
+
+  /* Verlopen EN de aanbieder zegt niet wat het waard was: dan weten we het
+     niet, en schrijven we niets bij. Wel geregistreerd, zodat het kantoor het
+     ziet in plaats van dat het stil verdwijnt. */
+  const oud = munten.bevestig({ id: 'oud' });
+  assert.equal(oud.verlopen, true, 'hij is als verlopen gemarkeerd');
+  assert.equal(oud.settledEuroCenten, 0, 'en de oude koers wordt NIET meer toegepast');
+  assert.equal(oud.volledig, false, 'dus zeker niet volledig betaald');
+
+  /* Verlopen maar de aanbieder MELDT het werkelijke bedrag: dan boeken we dat.
+     Het geld is er echt; alleen de koers van toen telt niet meer. */
+  const oud2 = munten.bevestig({ id: 'oud2', euroCenten: 2500 });
+  assert.equal(oud2.verlopen, true);
+  assert.equal(oud2.settledEuroCenten, 2500, 'het werkelijk ontvangen bedrag telt gewoon');
+  assert.equal(oud2.volledig, false, 'en dat is niet genoeg voor de hele factuur');
+
+  // en binnen de looptijd verandert er niets: de lock doet gewoon zijn werk
+  const vers = munten.bevestig({ id: 'vers' });
+  assert.ok(!vers.verlopen, 'deze is niet verlopen');
+  assert.equal(vers.settledEuroCenten, 5000, 'de gelockte koers geldt gewoon');
+  assert.equal(vers.volledig, true);
+});

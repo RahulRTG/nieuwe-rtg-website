@@ -69,7 +69,26 @@ function maakMunten(state) {
     if (!entry) return null;
     if (entry.status === 'ontvangen') return Object.assign({}, entry, { herhaald: true });
     entry.status = 'ontvangen';
-    entry.settledEuroCenten = Number.isFinite(euroCenten) && euroCenten > 0 ? Math.round(euroCenten) : entry.euroCenten;
+    /* DE KOERS WAS GELOCKT, EN DE LOCK LIEP NOOIT AF.
+
+       Bij het aanmaken wordt `vervalt` vastgelegd -- de tijd waarin deze koers
+       geldt. Dat veld werd nergens gelezen. De terugval hieronder ("weet de
+       aanbieder het euro-bedrag niet, neem dan het vastgelegde") gold dus ook
+       nog een half jaar later, tegen de koers van toen. Bij een munt die
+       intussen gehalveerd is, schrijven we het oude bedrag bij en is het
+       verschil ons verlies -- en dat is precies het soort verschil dat iemand
+       met geduld kan uitzoeken.
+
+       Na de vervaldatum vervalt daarom de TERUGVAL, niet de ontvangst zelf: is
+       het geld er echt, dan hoort het geboekt te worden, maar alleen voor wat
+       de aanbieder werkelijk heeft omgezet. Zonder dat getal weten we niet wat
+       het waard is, en dan schrijven we niets bij. Het staat wel geregistreerd
+       (verlopen: true), zodat het kantoor het ziet in plaats van dat het stil
+       verdwijnt. */
+    const verlopen = !!(entry.vervalt && Date.parse(entry.vervalt) < Date.now());
+    const echt = Number.isFinite(euroCenten) && euroCenten > 0 ? Math.round(euroCenten) : null;
+    if (verlopen) entry.verlopen = true;
+    entry.settledEuroCenten = echt != null ? echt : (verlopen ? 0 : entry.euroCenten);
     /* HOEVEEL ER GEVRAAGD WAS TEGENOVER HOEVEEL ER KWAM.
 
        `euroCenten` komt uit het webhook-bericht van de aanbieder; `entry.euroCenten`

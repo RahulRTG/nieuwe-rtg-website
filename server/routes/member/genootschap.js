@@ -5,10 +5,12 @@
    iemand eruit zetten en van rol wisselen staan hieronder wel als route, maar de
    AI-taken in kern/genootschap/ai.js raken ze niet aan; die schrijven alleen
    tekst. Gemount vanuit routes/member.js. */
+const { veiligeFout } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, geenGast, genootschap, genootschapBeheer, prikbord, bijeenkomst, genootschapAI,
     genootschapInzicht, genootschapUitvoer } = kern;
-  const fout = (res, e) => res.status(400).json({ error: (e && e.message) || 'Er ging iets mis.' });
+  // veiligeFout: laat de melding staan, haalt er alleen ons bestandssysteem uit
+  const fout = (res, e) => res.status(400).json({ error: veiligeFout(e) });
   const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
   const id = (req) => req.body.groep;
 

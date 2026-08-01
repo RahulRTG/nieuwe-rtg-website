@@ -15,10 +15,12 @@
    Gemount vanuit routes/member.js. */
 const salonviraal = require('../../kern/salonviraal');
 
+const { veiligeFout } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, express, auth, geenGast, db, findSupplier, zijnVrienden,
     salon, salonProfiel, salonReacties, salonAI, salonInzicht } = kern;
-  const fout = (res, e) => res.status(400).json({ error: (e && e.message) || 'Er ging iets mis.' });
+  // veiligeFout: laat de melding staan, haalt er alleen ons bestandssysteem uit
+  const fout = (res, e) => res.status(400).json({ error: veiligeFout(e) });
   const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
 
   /* De kijker: waarom mag ik deze post zien? Partner-volgen (bestond al),

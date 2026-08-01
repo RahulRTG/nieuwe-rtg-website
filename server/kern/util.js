@@ -81,4 +81,25 @@ function eigenVeld(obj, sleutel) {
   return Object.prototype.hasOwnProperty.call(obj, k) ? obj[k] : undefined;
 }
 
-module.exports = { schoon, coord, coordPaar, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };
+
+/* De foutmelding die NAAR BUITEN gaat, zonder ons bestandssysteem erin.
+
+   Verschillende routes geven `e.message` rechtstreeks terug. Voor de eigen
+   validatiemeldingen van een module ("Schrijf iets, of kies een foto") is dat
+   precies goed: dat is de tekst die de gebruiker moet lezen. Maar zodra er een
+   ONVERWACHTE fout doorheen glipt, staat er iets als
+   "ENOENT: no such file or directory, open '/home/rtg/app/server/data/db.json'",
+   en dan vertelt de foutmelding een buitenstaander waar onze server draait, hoe
+   hij is uitgerold en hoe de mappen heten. Dat is geen ramp op zichzelf, maar
+   het is gratis verkenning voor wie verder wil.
+
+   Deze functie laat de tekst intact en haalt er alleen de paden uit. Zo blijft
+   een nette melding een nette melding, en wordt een gelekt pad een <pad>. */
+const PAD_RE = /(?:[A-Za-z]:)?[\/\\][\w.@ +-]+(?:[\/\\][\w.@ +-]+){2,}/g;
+function veiligeFout(e, standaard) {
+  const ruw = (e && e.message) || '';
+  const schoongemaakt = String(ruw).replace(PAD_RE, '<pad>').trim();
+  return schoongemaakt || standaard || 'Er ging iets mis.';
+}
+
+module.exports = { schoon, veiligeFout, coord, coordPaar, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };

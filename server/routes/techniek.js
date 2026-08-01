@@ -121,8 +121,17 @@ module.exports = (kern) => {
 
   // De storingslijst (eigen fout-aggregatie) wissen: tellers terug naar nul.
   app.post('/api/techniek/fouten/wis', techAuth, eigenaarAlleen, (req, res) => {
+    /* Wissen mag -- het is de storingslijst van de eigenaar -- maar niet
+       spoorloos. Deze lijst is het enige wat vertelt dat er iets mis is
+       geweest; een knop die hem leegt zonder een regel achter te laten is een
+       knop om een incident te laten verdwijnen. Het aantal gaat mee, want juist
+       "er stonden er 400 en nu nul" is wat je later wilt kunnen teruglezen. */
+    const hoeveel = (log.foutenSamenvatting() || {}).totaal || 0;
     log.foutenReset();
-    res.json({ ok: true });
+    if (beveilig) beveilig.meld('fouten-gewist', 'waarschuwing',
+      'De storingslijst is gewist (' + hoeveel + ' geteld) door user-' + (req.techUser && req.techUser.id) + '.',
+      { bron: 'user:' + (req.techUser && req.techUser.id) });
+    res.json({ ok: true, gewist: hoeveel });
   });
 
   /* De overige domeinen draaien als submodules op dezelfde gedeelde context

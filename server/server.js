@@ -564,6 +564,24 @@ app.use(schakelaars({ db, accounts, functies,
   findSupplier: c => findSupplier(c) }));
 app.use(jsonGzip());
 
+/* DE PLEK VAN HET SCAN-NET, en waarom hij hier staat en niet waar hij gebouwd wordt.
+
+   Verderop (zoek op "Universeel scan-net") staat een middleware die elke
+   schrijf-aanvraag door De Ontsmetter haalt, met de belofte dat ALLE
+   upload-plekken "in een klap gedekt" zijn. Die belofte klopte niet: express
+   draait middleware in REGISTRATIEVOLGORDE, en de RTFoundation-router hieronder
+   wordt eerder gemount. Een verzoek dat die router afhandelt roept next() nooit
+   aan en bereikt de scanner dus nooit -- inclusief de fotokant van het
+   leerlingenschrift, dat een eigen express.json({limit:'4mb'}) heeft. De hele
+   /api/foundation-tak stond buiten het "universele" net.
+
+   De scanner zelf kan hier nog niet gebouwd worden: hij heeft `beveilig` en
+   `wacht` nodig en die komen later in de bedrading. Daarom staat hier een dun
+   doorgeefluik dat hem aanroept zodra hij er is. Tijdens het opstarten is er
+   nog geen luisterende poort, dus er glipt niets doorheen. */
+let scanNet = null;
+app.use((req, res, next) => (scanNet ? scanNet(req, res, next) : next()));
+
 // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
 // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
 // draait mee op dezelfde database en failover.
@@ -898,8 +916,12 @@ const antivirus = require('./kern/antivirus')({ db, save, beveilig, wacht });
    ook), dan weigeren we hem hier -- zo zijn ALLE upload-plekken (snaps, De Salon,
    markt, clips, en alles wat later bijkomt) in één klap gedekt zonder elke route
    apart aan te raken. Verdacht mag door (staat wel op het bord). /api/verify/*
-   scant al expliciet; /api/techniek/* en health blijven ongemoeid. */
-app.use((req, res, next) => {
+   scant al expliciet; /api/techniek/* en health blijven ongemoeid.
+
+   Hij wordt hier GEBOUWD maar veel eerder INGEHANGEN (zie het doorgeefluik bij
+   app.use(jsonGzip())), want een middleware die na een router staat ziet de
+   verzoeken van die router nooit. */
+scanNet = (req, res, next) => {
   const m = req.method;
   if (m !== 'POST' && m !== 'PUT' && m !== 'PATCH') return next();
   const p = req.path || '';
@@ -910,7 +932,7 @@ app.use((req, res, next) => {
     if (raak) return res.status(422).json({ error: 'Dit bestand is geweigerd door de beveiliging (mogelijke malware).' });
   } catch (e) { /* een scanfout mag nooit een verzoek breken */ }
   next();
-});
+};
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */

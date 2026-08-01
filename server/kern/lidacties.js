@@ -60,6 +60,12 @@ function betaalBoekingVoor(session, body) {
   const b = boekingMetRef(body.ref);
   if (!b || (b.customerKey || b.customerTier) !== session.key) return { status: 404, error: 'Boeking niet gevonden.' };
   if (b.paid) return { status: 409, error: 'Al betaald.' };
+  /* Een geannuleerde boeking blijft geannuleerd. Zonder deze regel valt de enige
+     poort weg zodra er is terugbetaald -- de annulering zet paid weer op false --
+     en kan dezelfde retour-boeking opnieuw afgerekend worden. Zelfde vorm als bij
+     de bestelling en de rit; alle drie stonden ze op alleen `paid`. */
+  if (b.refunded || ['geweigerd', 'terugbetaald', 'geannuleerd'].includes(b.status))
+    return { status: 409, error: 'Deze boeking is geannuleerd (' + b.status + ') en kan niet opnieuw betaald worden.' };
   if (b.status === 'wacht-op-betaling' && Date.now() - new Date(b.at) > 30 * 60000)
     return { status: 410, error: 'Deze aanvraag is verlopen. Boek opnieuw.' };
   // punten-tegoed (RTG legt bij) en spaarpunten

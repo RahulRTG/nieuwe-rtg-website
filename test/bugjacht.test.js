@@ -259,3 +259,76 @@ test('notities: afvinken zonder index vinkt niet stiekem het eerste punt af', as
   const goed = await api('/api/notities/vink', { id, index: 1, af: true }, lid);
   assert.equal(goed.status, 200, 'een echte index werkt gewoon');
 });
+
+/* ---------- 9. wat de tweede doorlichting opleverde ---------- */
+
+test('vergetelheid: ledenGidsWeg is echt bedraad, en een gat valt luid', () => {
+  /* De gids is de laatste plek waar de sleutel aan de codenaam vastzit. In
+     Postgres-modus liep het verwijderen via ledenGidsWeg -- maar die stond niet
+     in de exportlijst van db/index.js, dus server.js kreeg undefined, en in
+     kern/gids.js sloeg `if (ledenGidsWeg)` daar stilzwijgend op over. Inclusief
+     de return erachter, zodat OOK het lokale pad werd overgeslagen: het recht op
+     vergetelheid (AVG art. 17) haalde het lid nergens uit de gids terwijl het
+     commentaar erboven belooft dat beide opslagvormen gedekt zijn.
+
+     Een ontbrekende regel in een exportlijst, en niets dat erover klaagde. Deze
+     toets kijkt naar de bedrading zelf, want dat is wat er brak. */
+  const opslag = require('../server/db');
+  assert.equal(typeof opslag.ledenGidsWeg, 'function', 'db exporteert ledenGidsWeg');
+
+  // en zonder bedrading hoort het LUID te falen, niet stil over te slaan
+  const gids = require('../server/kern/gids')({
+    db: { data: { memberDir: {} } }, save: () => {}, liveCodename: () => 'x',
+    ledenGidsActief: () => true, ledenGidsHaal: () => null, ledenGidsZet: () => {},
+    ledenGidsWeg: undefined, ledenGidsExact: async () => null,
+    ledenGidsZoek: async () => [], ledenGidsAantal: () => 0
+  });
+  assert.throws(() => gids.gidsWeg('user-1'), /niet bedraad/,
+    'een niet-bedrade verwijdering klaagt in plaats van stil niets te doen');
+});
+
+test('het scan-net dekt ook de RTFoundation-tak', async () => {
+  /* "Zo zijn ALLE upload-plekken in een klap gedekt", stond erbij. Express
+     draait middleware in registratievolgorde, en de foundation-router werd
+     eerder gemount dan de scanner -- die tak kwam er dus nooit langs, inclusief
+     de fotokant van het leerlingenschrift. De scanner hangt nu voor de routers. */
+  const EICAR = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
+  const besmet = 'data:image/png;base64,' + Buffer.from(EICAR).toString('base64');
+  const r = await api('/api/foundation/gezin/inloggen', { code: 'XXXX', bijlage: besmet });
+  assert.equal(r.status, 422, 'de besmette data-URL wordt geweigerd voordat de router hem ziet');
+  // en een schone body loopt gewoon door naar de route (die hem afwijst op de code)
+  const schoon = await api('/api/foundation/gezin/inloggen', { code: 'XXXX', bijlage: 'gewone tekst' });
+  assert.notEqual(schoon.status, 422, 'een schone body wordt niet tegengehouden');
+});
+
+test('voorcheck: elke collectie met centen erin wordt exact nagekeken', () => {
+  /* De overslaan-regel kijkt naar de LENGTE van een collectie. Een nieuwe order
+     verandert die en wordt opgepikt; `L.som += cent` op een leverancier die er
+     al in staat verandert hem NIET. Een wijziging-op-zijn-plaats is de enige
+     vorm die hier echt verloren kan gaan, en geld is nou juist wat op zijn
+     plaats verandert. directOntvangsten en wallet vielen door zowel de vaste
+     lijst als het naam-vangnet. */
+  const { exactNodig } = require('../server/db/voorcheck');
+  for (const k of ['directOntvangsten', 'wallet', 'paySaldi', 'payIdem', 'directBetalingen',
+    'muntOntvangsten', 'bankBoekingen', 'assetTickets'])
+    assert.equal(exactNodig(k), true, k + ' hoort altijd exact nagekeken te worden');
+  // en niet breder dan geld: De Salon heeft geen cent en mag de goedkope weg
+  for (const k of ['posts', 'notifications', 'reviews', 'live'])
+    assert.equal(exactNodig(k), false, k + ' hoeft niet elke save volledig geserialiseerd');
+});
+
+test('een terugbetaalde rit en boeking zijn niet opnieuw te betalen', async () => {
+  /* Dezelfde vorm als bij de bestelling: `paid` was de enige poort, en juist de
+     annulering zet die weer op false (paid=false, refunded=true,
+     status 'geweigerd'). Alle drie de betaalwegen stonden erop; alleen die van
+     de bestelling was gedicht. */
+  const rit = await api('/api/ride/request', { supplierCode: 'MKKX', toCode: 'KIKUNOI', passengers: 1 }, lid);
+  assert.equal(rit.status, 200, JSON.stringify(rit.body).slice(0, 200));
+  const ref = rit.body.ride.ref;
+  assert.equal((await api('/api/ride/pay', { ref }, lid)).status, 200, 'eerst gewoon betalen');
+  const annu = await api('/api/annuleer', { soort: 'ride', ref }, lid);
+  assert.equal(annu.status, 200, 'en dan annuleren met terugbetaling');
+  const nogmaals = await api('/api/ride/pay', { ref }, lid);
+  assert.equal(nogmaals.status, 409, 'een terugbetaalde rit kan niet opnieuw betaald worden');
+  assert.match(nogmaals.body.error || '', /geannuleerd/);
+});

@@ -84,6 +84,15 @@ function betaalRitVoor(session, body) {
   const r = db.data.rides.find(x => x.ref === body.ref && (x.customerKey || x.customerTier) === session.key);
   if (!r) return { status: 404, error: 'Rit niet gevonden.' };
   if (r.paid) return { status: 409, error: 'Al betaald.' };
+  /* Dezelfde grendel als bij een bestelling, en om dezelfde reden: de annulering
+     zet `paid` juist weer op false (ervaring/leden/annuleren.js: paid=false,
+     refunded=true, status 'geweigerd'), zodat de poort hierboven wegvalt en een
+     al terugbetaalde rit opnieuw betaald kon worden -- punten er nog eens bij en
+     de vervoerder kreeg opnieuw "Nieuwe ritaanvraag (betaald)" voor een rit die
+     niet meer bestaat. De verloopgrens hieronder ving dat niet: die geldt alleen
+     bij 'wacht-op-betaling'. */
+  if (r.refunded || ['geweigerd', 'terugbetaald', 'geannuleerd'].includes(r.status))
+    return { status: 409, error: 'Deze rit is geannuleerd (' + r.status + ') en kan niet opnieuw betaald worden.' };
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
   if (r.status === 'wacht-op-betaling' && Date.now() - new Date(r.at) > 30 * 60000) return { status: 410, error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' };
   // fooi voor de chauffeur, punten-tegoed (RTG legt bij) en spaarpunten

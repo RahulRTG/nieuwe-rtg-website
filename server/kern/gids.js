@@ -102,7 +102,18 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
      verschil dat je pas ontdekt als iemand erover klaagt. */
   function gidsWeg(key) {
     if (!key) return;
-    if (ledenGidsActief()) { if (ledenGidsWeg) ledenGidsWeg(key).catch(() => {}); return; }
+    if (ledenGidsActief()) {
+      /* LUID FALEN, niet stil overslaan. Hier stond `if (ledenGidsWeg) ...; return;`
+         -- een vangnet dat een ontbrekende bedrading in een lege huls veranderde.
+         En dat gebeurde ook: ledenGidsWeg ontbrak in de exportlijst van db/index.js,
+         dus de verwijdering deed niets EN de return sloeg het lokale pad ook over.
+         Bij een AVG-verwijdering is stil overslaan de slechtste uitkomst die er
+         is: de gebruiker krijgt "verwijderd" te horen en staat er nog. */
+      if (typeof ledenGidsWeg !== 'function')
+        throw new Error('gidsWeg: de ledengids is actief maar ledenGidsWeg is niet bedraad -- een verwijdering zou stil niets doen.');
+      ledenGidsWeg(key).catch(() => {});
+      return;
+    }
     if (db.data.memberDir && db.data.memberDir[key]) {
       delete db.data.memberDir[key];
       if (ledenAantalCache != null && ledenAantalCache > 0) ledenAantalCache--;

@@ -162,7 +162,30 @@ function zonderBeleid(db) {
     const n = Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : 0);
     if (n > 0) uit.push({ tak, items: n });
   }
-  return uit.sort((a, b) => b.items - a.items);
+  /* DE KLUIS TELT NIET MEE, EN DAT WAS ONZICHTBAAR.
+
+     Deze lus loopt over db.data, en dat is precies de helft van de gegevens.
+     Van een ECHT account staat het ledendossier niet in db.data maar versleuteld
+     in de kolom member_state (accounts/dossier.js): facturen, de reis, het
+     creator-tegoed en de gesprekken met Rahul. perItem() hierboven leest ook
+     alleen data[tak], dus rapport() telt van een echt account nul items en
+     veeg() raakt er niets. Voor de seed-persona's ziet alles er dus keurig uit,
+     terwijl juist de echte leden buiten het beleid vallen.
+
+     Dat botst met de belofte bovenaan dit bestand: "een bewaarbeleid dat doet
+     alsof het compleet is terwijl het dertig categorieen overslaat, is
+     misleidender dan geen beleid." Daarom staat de kluis nu ALS GAT in de lijst,
+     ook al kunnen we hem hier nog niet vegen -- zichtbaar is beter dan stil.
+
+     Waarom nog niet gerepareerd en niet alleen gemeld: vegen in de kluis vraagt
+     eerst een BESLUIT dat RTG moet nemen (hoe lang bewaren we facturen, een reis,
+     een gesprek met Rahul?). Die vraag staat in server/papieren/vragen.js en is
+     nog niet beantwoord. Een termijn verzinnen zou hier het ergste van twee
+     werelden zijn: gegevens weggooien op een grond die niemand heeft vastgesteld. */
+  uit.push({ tak: 'kluis: ledendossier (member_state)', items: null,
+    reden: 'facturen, reis, creator-tegoed en Rahul-gesprekken van echte accounts staan versleuteld buiten db.data; '
+      + 'het beleid kan er pas overheen zodra de bewaartermijnen zijn vastgesteld (zie papieren/vragen.js)' });
+  return uit.sort((a, b) => (b.items || 0) - (a.items || 0));
 }
 
 module.exports = { BELEID, rapport, veeg, zonderBeleid };

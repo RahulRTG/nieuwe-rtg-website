@@ -35,15 +35,38 @@ const GROOT_BYTES = Number(process.env.RTG_SQLITE_GROOT_BYTES || 512 * 1024);
 const GROOT_MS = Number(process.env.RTG_SQLITE_GROOT_MS || 2000);
 const ALTIJD_EXACT = new Set(['paySaldi', 'saldi', 'payTikken', 'muntOntvangsten', 'directBetalingen',
   'giftcards', 'orders', 'boekingen', 'posSales', 'invoices', 'facturen', 'bank', 'bankBoekingen',
-  'winkelBestellingen', 'assets', 'assetTickets', 'fonds']);
+  'winkelBestellingen', 'assets', 'assetTickets', 'fonds',
+  /* Deze twee ontbraken, en het gat is precies de vorm waar de voorcheck blind
+     voor is. Zie de uitleg bij GELD_NAAM hieronder. */
+  'directOntvangsten', 'wallet']);
 /* Vangnet op de naam: alles wat naar centen ruikt, wordt altijd exact nagekeken.
 
    Let op de valkuil van zo'n regel: hij mag niet BREDER zijn dan geld. `\bpos`
    stond hier voor de kassa (posSales), maar dat ving ook `posts` -- De Salon,
    waar geen cent in staat. Die collectie werd daardoor bij elke save volledig
    geserialiseerd, precies het werk dat de voorcheck wil vermijden. posSales
-   staat gewoon op de lijst hierboven, dus de regel kan weg. */
-const GELD_NAAM = /sald|cent|bedrag|betaal|betaling|\bpay|munt|factu|invoice|order|boeking|bank|kas\b|gift|tegoed|uitbetaal|payout|grootboek|ledger|fonds|asset|winkel|abonnement|tik(ken)?$/i;
+   staat gewoon op de lijst hierboven, dus de regel kan weg.
+
+   MAAR HIJ WAS OOK TE SMAL, en dat is de gevaarlijke kant. De belofte bovenaan
+   dit bestand luidt: "Geld gaat hier nooit door ... en dat gaat niet alleen op
+   een vaste namenlijst maar ook op de NAAM zelf, zodat een collectie die er
+   later bijkomt automatisch onder de strenge regel valt." Twee collecties met
+   geld erin vielen door beide mazen:
+
+     directOntvangsten  de payout-teller per leverancier ({ som, aantal,
+                        uitbetaald }); dpOntvangsten leest daar `saldo` uit.
+     wallet             per lid onder meer feestmunten MET EEN SALDO.
+
+   En let op WAAROM juist die twee gevaarlijk zijn -- daar zit de eigenlijke
+   les. De overslaan-regel kijkt naar de LENGTE van een collectie. Een nieuwe
+   order verandert die lengte en wordt dus altijd opgepikt. Maar `L.som += cent`
+   op een leverancier die er al in staat verandert de lengte NIET: het bedrag
+   groeit, het aantal sleutels blijft gelijk, en de dure vergelijking wordt
+   overgeslagen. Een wijziging-op-zijn-plaats in een grote collectie is de enige
+   vorm die hier echt verloren kan gaan, en geld is nou juist wat op zijn plaats
+   verandert. Een collectie waar centen in staan hoort daarom nooit op de
+   lengte te worden beoordeeld -- ongeacht hoe hij heet. */
+const GELD_NAAM = /sald|cent|bedrag|betaal|betaling|\bpay|munt|factu|invoice|order|boeking|bank|kas\b|gift|tegoed|uitbetaal|payout|ontvangst|grootboek|ledger|fonds|asset|winkel|abonnement|tik(ken)?$/i;
 const exactNodig = k => ALTIJD_EXACT.has(k) || GELD_NAAM.test(k);
 
 const laatsteGrootte = new Map(); // collectie -> bytes van de laatst gemeten JSON

@@ -160,6 +160,15 @@ module.exports = {
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,
   ledenGidsActief: gidsen.ledenGidsActief, ledenGidsHaal: gidsen.ledenGidsHaal, ledenGidsAantal: gidsen.ledenGidsAantal,
   ledenGidsZet: gidsen.ledenGidsZet, ledenGidsExact: gidsen.ledenGidsExact, ledenGidsZoek: gidsen.ledenGidsZoek,
+  /* ledenGidsWeg stond hier NIET, terwijl ledengids.js hem exporteert, gidsen.js
+     hem doorreikt en server.js hem uit deze module haalt. Hij was dus undefined,
+     en in kern/gids.js sloeg `if (ledenGidsWeg)` daar stilzwijgend op over --
+     inclusief de `return` erachter, zodat OOK het lokale pad werd overgeslagen.
+     Uitkomst: in Postgres-modus haalde het recht op vergetelheid (AVG art. 17)
+     het lid nergens uit de gids, terwijl het commentaar boven gidsWeg letterlijk
+     belooft dat het allebei de opslagvormen dekt. Een ontbrekende regel in een
+     exportlijst, en niets dat erover klaagde. */
+  ledenGidsWeg: gidsen.ledenGidsWeg,
   orderMetRef: tx.orderMetRef, ordersVanKlant: tx.ordersVanKlant, ordersVanZaak: tx.ordersVanZaak, ordersVoegToe: tx.ordersVoegToe,
   boekingMetRef: tx.boekingMetRef, boekingenVanKlant: tx.boekingenVanKlant, boekingenVanZaak: tx.boekingenVanZaak, boekingenVoegToe: tx.boekingenVoegToe,
   txStaartNa: tx.txStaartNa, txVerwijder: tx.txVerwijder,

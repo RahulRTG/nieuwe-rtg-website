@@ -61,24 +61,61 @@ function plausibelLijf(pad) {
 
 /* De momentopname. Bewust GETALLEN en geen hele JSON-blobs: een tijdstempel of
    een teller die uit zichzelf loopt zou elke vergelijking laten mislukken, en
-   een proef die altijd rood staat wordt binnen een week uitgezet. Wat hier staat
-   verandert alleen als er echt iets is geschreven. */
+   een proef die altijd rood staat wordt binnen een week uitgezet.
+
+   DE VELDEN ZIJN GEMETEN, NIET GERADEN. Mijn eerste versie gokte namen
+   (boekingen, items, lijst, aantalLeden) en zat er bijna overal naast -- vier van
+   de vijf velden bleven null en /api/boekingen/mijn bestaat niet eens (404). Dit
+   is wat de endpoints werkelijk teruggeven:
+
+     /api/pay/overzicht      saldo, geschiedenis[], aanMij[], vanMij[]
+     /api/verkoop/mijn       deals[]
+     /api/supplier/backoffice stats, week[7], toppers[], alerts[]
+
+   Maar de echte borging is niet deze lijst -- die kan morgen weer verschuiven.
+   Dat is ijkVingerafdruk() hieronder. */
 async function vingerafdruk(post, tok) {
-  const tel = (d, ...paden) => {
-    for (const p of paden) {
-      const v = p.split('.').reduce((o, k) => (o == null ? o : o[k]), d);
-      if (Array.isArray(v)) return v.length;
-      if (typeof v === 'number') return v;
-    }
-    return null;
-  };
+  const lengte = (v) => (Array.isArray(v) ? v.length : (typeof v === 'number' ? v : null));
   const uit = {};
-  try { const r = await post('/api/pay/overzicht', {}, tok.member); uit.saldo = tel(r.data, 'saldo'); } catch (e) {}
-  try { const r = await post('/api/boekingen/mijn', {}, tok.member); uit.boekingen = tel(r.data, 'boekingen', 'items', 'lijst'); } catch (e) {}
-  try { const r = await post('/api/verkoop/mijn', {}, tok.member); uit.verkoop = tel(r.data, 'items', 'verkopen', 'lijst'); } catch (e) {}
-  try { const r = await post('/api/office/state', {}, tok.office); uit.officeLeden = tel(r.data, 'state.leden', 'leden', 'aantalLeden'); } catch (e) {}
-  try { const r = await post('/api/supplier/backoffice', {}, tok.supplier); uit.supplierOrders = tel(r.data, 'orders', 'state.orders'); } catch (e) {}
+  try {
+    const r = await post('/api/pay/overzicht', {}, tok.member);
+    uit.saldo = lengte(r.data && r.data.saldo);
+    uit.geschiedenis = lengte(r.data && r.data.geschiedenis);
+    uit.aanMij = lengte(r.data && r.data.aanMij);
+    uit.vanMij = lengte(r.data && r.data.vanMij);
+  } catch (e) {}
+  try { const r = await post('/api/verkoop/mijn', {}, tok.member); uit.deals = lengte(r.data && r.data.deals); } catch (e) {}
+  try {
+    const r = await post('/api/supplier/backoffice', {}, tok.supplier);
+    uit.toppers = lengte(r.data && r.data.toppers);
+    uit.alerts = lengte(r.data && r.data.alerts);
+  } catch (e) {}
   return uit;
+}
+
+/* ---- DE IJKING: KAN DEZE VINGERAFDRUK EIGENLIJK IETS ZIEN? ----
+
+   Dit is het stuk dat ontbrak, en het is belangrijker dan de veldenlijst
+   hierboven. Een vingerafdruk van velden die toevallig niet bestaan geeft twee
+   identieke momentopnames, en "geen wijzigingen" is dan waar zonder iets te
+   betekenen. Precies zo stond deze proef een uur lang op PASS.
+
+   Daarom eerst een LEGITIEME wijziging met de JUISTE rol -- een kleine oplading
+   op het eigen saldo -- en dan kijken of de vingerafdruk beweegt. Beweegt hij
+   niet, dan is hij blind en zeggen we dat, in plaats van hem te laten oordelen.
+
+   Dit is regel 2 (elke bewering met een mutatie natrekken) toegepast op het
+   meetinstrument zelf: ik heb de meter zien uitslaan voordat ik hem geloof. */
+async function ijkVingerafdruk(post, tok) {
+  const voor = await vingerafdruk(post, tok);
+  let gelukt = false;
+  try {
+    const r = await post('/api/pay/oplaad', { centen: 137, idem: 'ijk-' + Math.random().toString(36).slice(2, 10) }, tok.member);
+    gelukt = r.status >= 200 && r.status < 300;
+  } catch (e) {}
+  const na = await vingerafdruk(post, tok);
+  const bewogen = Object.keys(na).filter(k => voor[k] !== na[k]);
+  return { gelukt, bewogen, voor, na, gevoelig: bewogen.length > 0 };
 }
 
 /* De proef zelf. `routes` zijn de schrijfroutes uit de routekaart; `rolVan` geeft
@@ -88,29 +125,24 @@ async function vingerafdruk(post, tok) {
 async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
   const bevindingen = { tweexx: [], lekken: [], gewijzigd: [] };
   const rollen = ['member', 'supplier', 'office'];
-  const voor = await vingerafdruk(post, tokensVoor());
 
-  /* ---- DE METER MOET WERKEN VOORDAT HIJ IETS MAG ZEGGEN ----
-     Dit ging bij de eerste run mis, en precies op de manier waar deze hele
-     codebase jacht op maakt. De aanroeper gaf een `post` mee die alleen de
-     STATUS teruggeeft en het antwoordlijf weggooit. Gevolg: de vingerafdruk
-     stond vijf keer op null en de lekscan kreeg een lege string. Twee van de
-     drie beweringen waren daarmee leeg -- "geen wijzigingen" was null === null,
-     en "geen lekken" was "er viel niets te scannen". Het oordeel stond op PASS.
-
-     Een proef die niet kan zakken is slechter dan geen proef (LAT.md regel 9),
-     en een meter zonder invoer hoort te falen in plaats van groen te blijven
-     (regel 3). Vandaar deze grendel: kan de toestand helemaal niet worden
-     vastgesteld, dan is dat een FOUT en geen stilte. */
-  const gemeten = Object.values(voor).filter(v => v != null).length;
-  if (gemeten === 0) {
+  /* EERST IJKEN, DAN PAS OORDELEN. Zie ijkVingerafdruk(): als een legitieme
+     wijziging met de juiste rol de vingerafdruk niet laat bewegen, is hij blind
+     en mag hij niets beweren. Dat is regel 2 op het meetinstrument zelf, en het
+     is er gekomen omdat deze proef een uur lang op PASS stond terwijl hij vijf
+     keer null met vijf keer null vergeleek. */
+  const ijk = await ijkVingerafdruk(post, tokensVoor());
+  if (!ijk.gevoelig) {
     return {
       bevindingen: { tweexx: [], lekken: [], gewijzigd: [],
-        meterStuk: 'de toestand kon niet worden vastgesteld (alle velden null) -- geeft de meegegeven post() wel het antwoordLIJF terug, of alleen de status?' },
-      pogingen: 0, voor, na: voor
+        meterStuk: 'de vingerafdruk zag een LEGITIEME wijziging niet' +
+          (ijk.gelukt ? '' : ' (en de ijk-oplading zelf lukte ook niet)') +
+          '; hij kan dus ook een ongeoorloofde wijziging niet zien. Gemeten: ' + JSON.stringify(ijk.voor) },
+      pogingen: 0, voor: ijk.voor, na: ijk.na, ijk
     };
   }
 
+  const voor = await vingerafdruk(post, tokensVoor());
   let gedaan = 0;
   for (const r of routes) {
     if (r.method === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties
@@ -143,7 +175,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
     if (voor[k] == null && na[k] == null) continue;
     if (voor[k] !== na[k]) bevindingen.gewijzigd.push(k + ': ' + voor[k] + ' -> ' + na[k]);
   }
-  return { bevindingen, pogingen: gedaan, voor, na };
+  return { bevindingen, pogingen: gedaan, voor, na, ijk };
 }
 
-module.exports = { draaiRolproef, vingerafdruk, plausibelLijf, LEKMERKERS };
+module.exports = { draaiRolproef, vingerafdruk, ijkVingerafdruk, plausibelLijf, LEKMERKERS };

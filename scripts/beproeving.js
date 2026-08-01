@@ -896,6 +896,9 @@ async function misbruikBeproeving(tok) {
   for (const l of rp.bevindingen.lekken.slice(0, 6)) rij('    ' + l.slice(0, 100), '');
   rij('  blijvende wijzigingen na afloop', rp.bevindingen.gewijzigd.length ? '\x1b[31m' + rp.bevindingen.gewijzigd.join(', ') + '\x1b[0m' : '\x1b[32mgeen\x1b[0m');
   rij('  gemeten toestand', JSON.stringify(rp.voor));
+  if (rp.ijk) rij('  ijking van de vingerafdruk', rp.ijk.gevoelig
+    ? '\x1b[32mhij ziet een legitieme wijziging\x1b[0m (' + rp.ijk.bewogen.join(', ') + ')'
+    : '\x1b[31mBLIND\x1b[0m -- hij zag een legitieme wijziging niet');
 
   // ---------- FASE F: GEHEUGEN (lek-vloer over identieke lees-rondes) ----------
   kop('FASE F: GEHEUGEN - lek-vloer over identieke lees-rondes');

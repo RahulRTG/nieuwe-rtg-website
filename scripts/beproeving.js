@@ -682,7 +682,12 @@ async function misbruikBeproeving(tok) {
      GOEDE antwoord, dus die twee worden apart geteld -- ze door elkaar husselen
      maakt "foutpercentage" een getal zonder betekenis. */
   const perRol = new Map();
-  const rolTel = (naam) => { let r = perRol.get(naam); if (!r) perRol.set(naam, r = { n: 0, ok: 0, c4xx: 0, c5xx: 0, r429: 0, r503: 0, stuk: 0 }); return r; };
+  /* En de EXACTE code erbij, niet alleen de klasse. "99,7% 4xx" is een hoop
+     waarin drie totaal verschillende dingen zitten: 400 is rommel-invoer die
+     terecht wordt geweigerd (gezond), 401 is een dood token (een meetfout), en
+     403 is de rol-scheiding die werkt (ook gezond). Zonder deze splitsing is een
+     laag 2xx-percentage niet te duiden en blijf je gissen. */
+  const rolTel = (naam) => { let r = perRol.get(naam); if (!r) perRol.set(naam, r = { n: 0, ok: 0, c4xx: 0, c5xx: 0, r429: 0, r503: 0, stuk: 0, codes: new Map() }); return r; };
   const cpu = belasting.cpuMeter(child.pid);
   const lusMonsters = [];
   let totaal = 0; const rssReeks = [];
@@ -699,6 +704,7 @@ async function misbruikBeproeving(tok) {
     const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0, ok: 0, c4xx: 0, c5xx: 0, r429: 0, r503: 0, stuk: 0 };
     pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
     const pr = rolTel(kruis ? r.rol + ' (verkeerde rol)' : r.rol); pr.n++;
+    pr.codes.set(st.status, (pr.codes.get(st.status) || 0) + 1);
     if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
     const s = st.status;
     if (s === 0) { buckets.stuk++; pe.stuk++; pr.stuk++; }

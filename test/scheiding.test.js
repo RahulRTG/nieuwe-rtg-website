@@ -24,35 +24,30 @@
    Draai los: node --experimental-sqlite --test test/scheiding.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+/* DE SERVER KOMT UIT test/helper.js, en dat is geen kosmetiek. Dit bestand
+   spawnde er zelf een met stdio:'ignore', waardoor de STRENGE POORT de stderr
+   van deze server niet meelas. Gevolg: een 500 uit een crash telde hieronder
+   als "status >= 400" en dus als een geslaagde weigering. Een toets die een
+   serverfout voor een grendel aanziet, is precies andersom als je hem bedoelt. */
+const { startServer, stop } = require('./helper');
 
-const PORT = 4500 + Math.floor(Math.random() * 80);
-const BASE = 'http://127.0.0.1:' + PORT;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scheiding-'));
 const WORTEL = path.join(__dirname, '..');
-const SERVER = path.join(WORTEL, 'server', 'server.js');
 
-let kind, tokenA = null, tokenB = null;
+let srv, BASE, tokenA = null, tokenB = null, codenaamA = null;
 
 function post(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
   if (token) h.Authorization = 'Bearer ' + token;
   return fetch(BASE + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
 }
-const wacht = (ms) => new Promise(r => setTimeout(r, ms));
 
 test('server starten en twee losse leden aanmaken', async () => {
-  kind = spawn(process.execPath, ['--experimental-sqlite', SERVER], {
-    env: { ...process.env, NODE_ENV: 'test', PORT: String(PORT), RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_DEMO: '0' },
-    stdio: 'ignore'
-  });
-  for (let i = 0; i < 100; i++) {
-    try { if ((await fetch(BASE + '/api/health')).ok) break; } catch (e) {}
-    await wacht(200);
-  }
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '0' } });
+  BASE = srv.base;
   const maak = async (naam, mail) => {
     const r = await post('/api/auth/register', {
       name: naam, email: mail, phone: '0600000000', password: 'geheim12345',
@@ -66,6 +61,9 @@ test('server starten en twee losse leden aanmaken', async () => {
   tokenA = await maak('Anna Aardenburg', 'a@scheiding.test');
   tokenB = await maak('Bram Bergsma', 'b@scheiding.test');
   assert.notEqual(tokenA, tokenB);
+  // de codenaam is wat records van A ECHT dragen; op de naam zoeken bewijst niets
+  codenaamA = (await (await post('/api/state', {}, tokenA)).json()).state.user.codename;
+  assert.ok(codenaamA, 'A heeft een codenaam');
 });
 
 test('B komt met zijn eigen geldige token niet bij de records van A', async () => {
@@ -79,14 +77,33 @@ test('B komt met zijn eigen geldige token niet bij de records van A', async () =
   const cv = await post('/api/cv/save', { cv: { headline: 'Geheim van Anna', skills: ['zeilen'] } }, tokenA);
   if (cv.ok) refs.push({ wat: 'cv' });
 
-  // 2. een bestelling bij een demo-zaak: levert een ref op die B zou kunnen raden
-  const zaken = await (await fetch(BASE + '/api/suppliers')).json();
-  const zaak = (zaken.suppliers || zaken || [])[0];
-  let orderRef = null;
-  if (zaak && zaak.code) {
-    const o = await post('/api/order', { supplierCode: zaak.code, items: [{ name: 'iets', price: 10, qty: 1 }] }, tokenA);
-    if (o.ok) { const d = await o.json(); orderRef = d.ref || (d.order && d.order.ref); }
+  /* 2. een ECHTE bestelling van A: levert een ref op die B zou kunnen raden.
+
+     HIER STOND EEN OPZET DIE NOOIT LIEP. Er werd `GET /api/suppliers` gedaan
+     terwijl alleen `POST` bestaat (met auth), dus kwam er een 404 terug, was
+     `zaak` undefined en werd het hele blok hieronder overgeslagen. En zelfs met
+     een zaak was het mis: plaatsOrderVoor matcht items op `id` uit de menukaart
+     en er werd `{ name, price, qty }` zonder id gestuurd -- goed voor een 400.
+     orderRef bleef dus hoe dan ook null, en de lus die de kern van deze toets
+     is draaide geen enkele keer. Daarom staat er nu een harde assert op: liever
+     een toets die klaagt over zijn eigen opzet dan een die stilletjes niets
+     doet. */
+  const zaken = await (await post('/api/suppliers', {}, tokenA)).json();
+  const lijst = zaken.suppliers || zaken || [];
+  assert.ok(lijst.length, 'er zijn zaken: ' + JSON.stringify(zaken).slice(0, 120));
+  // niet blind de eerste pakken: een hotel heeft geen menukaart, en dan liep de
+  // opzet stuk op iets anders dan wat deze toets wil aantonen
+  let zaak = null, gerecht = null;
+  for (const kandidaat of lijst.slice(0, 12)) {
+    const kaart = await (await post('/api/supplier/menu/get', { code: kandidaat.code }, tokenA)).json();
+    const m = (kaart.menu || []).find(x => !x.uitverkocht);
+    if (m) { zaak = kandidaat; gerecht = m.id; break; }
   }
+  assert.ok(zaak && gerecht, 'er is een zaak met een gerecht op de kaart om mee te bestellen');
+  const o = await post('/api/order', { supplierCode: zaak.code, items: [{ id: gerecht, qty: 1 }] }, tokenA);
+  const od = await o.json();
+  const orderRef = od.ref || (od.order && od.order.ref);
+  assert.ok(orderRef, 'A heeft echt een bestelling geplaatst: ' + JSON.stringify(od).slice(0, 160));
 
   /* Nu B. Voor elk endpoint geldt dezelfde eis: het antwoord mag geen gegevens
      van A bevatten. Een 4xx is goed, een lege lijst is ook goed -- alleen de
@@ -98,16 +115,34 @@ test('B komt met zijn eigen geldige token niet bij de records van A', async () =
   assert.ok(!/Anna Aardenburg/.test(bStaat), 'de echte naam van A staat nergens in het antwoord van B');
   if (orderRef) assert.ok(!bStaat.includes(orderRef), 'de bestelling van A staat niet in de staat van B');
 
-  if (orderRef) {
-    // B noemt de referentie van A expliciet, op de plekken die een ref aannemen
-    for (const pad of ['/api/order/annuleer', '/api/betaalverzoek', '/api/factuur']) {
-      const r = await post(pad, { ref: orderRef }, tokenB);
-      if (r.status === 404 && !(await r.clone().text()).length) continue; // route bestaat niet
-      const tekst = await r.text();
-      assert.ok(r.status >= 400 || !/Anna|Aardenburg/.test(tekst),
-        pad + ' geeft B geen toegang tot de bestelling van A (status ' + r.status + ')');
-    }
+  /* B noemt de referentie van A expliciet, op de plekken die een ref aannemen.
+
+     DRIE DINGEN STONDEN HIER FOUT. (1) Twee van de drie paden bestaan niet --
+     /api/order/annuleer en /api/betaalverzoek. Ze gaven een 404 MET een lijf,
+     dus de "route bestaat niet"-uitweg sloeg niet aan en de bewering slaagde op
+     die 404. De echte paden zijn /api/annuleer (met soort) en /api/factuur (met
+     invoiceId). (2) Er werd gezocht naar de NAAM 'Anna', maar een order draagt
+     een codenaam -- codenamen zijn hier juist het ontwerp -- dus een volledig
+     lek van A's bestelling aan B zou geslaagd zijn. (3) `status >= 400` dekt ook
+     500: een crash telde als weigering. */
+  const geprobeerd = [];
+  for (const [pad, lijf] of [
+    // 'order', niet 'bestelling': de kern kent order/ride/boeking. Met een
+    // onbekende soort valt de aanroep door alle takken heen en bewijst hij niets.
+    ['/api/annuleer', { soort: 'order', ref: orderRef }],
+    ['/api/factuur', { invoiceId: orderRef, ref: orderRef }]
+  ]) {
+    const r = await post(pad, lijf, tokenB);
+    const tekst = await r.text();
+    geprobeerd.push(pad);
+    assert.ok(r.status >= 400 && r.status < 500,
+      pad + ' hoort B te weigeren met een 4xx, niet met ' + r.status + ' (een 5xx is een crash, geen grendel): ' + tekst.slice(0, 120));
+    assert.ok(!tekst.includes(orderRef),
+      pad + ' geeft de referentie van A niet terug aan B');
+    assert.ok(!tekst.includes(codenaamA),
+      pad + ' lekt de codenaam van A niet -- DAT is wat een order draagt, niet de echte naam');
   }
+  assert.equal(geprobeerd.length, 2, 'beide paden zijn echt beproefd; loopt deze lus leeg dan bewijst hij niets');
 
   // 3. de identiteitskluis: nergens in een leden-antwoord hoort een echte naam
   const zoek = await post('/api/salon/feed', {}, tokenB);
@@ -135,8 +170,7 @@ test('zonder token komt niemand ergens binnen', async () => {
 });
 
 test.after(async () => {
-  if (kind) kind.kill();
-  await wacht(200);
+  stop(srv && srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 

@@ -130,21 +130,49 @@ test('3. zonder ERR_WEBHOOK_URL zegt de proef eerlijk dat er geen alarmweg is', 
 });
 
 /* Het tweede endpoint: welke papieren-documenten er zijn, zodat het scherm die
-   lijst niet zelf hoeft te kennen. Klein, maar het hoort bij de eigenaar en
-   nergens anders -- het papierwerk van de zaak is niets voor personeel. */
-test('4. de documentenlijst van het papierwerk komt uit de server, niet uit het scherm', async () => {
-  const r = await api('/api/office/papieren/documenten', {}, tech);
-  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
-  assert.ok(Array.isArray(r.body.documenten) && r.body.documenten.length > 0, 'er staat een lijst');
-  for (const d of r.body.documenten) {
-    assert.ok(d.naam, 'elk document heeft een naam');
-    assert.ok(d.waarvoor, 'en zegt waarvoor het dient (' + d.naam + ')');
+   lijst niet zelf hoeft te kennen.
+
+   DEZELFDE DEUR HANGT OP TWEE VOORVOEGSELS, en daar ging ik eerst de mist in.
+   server/routes/papieren-deur.js wordt twee keer gemonteerd: op /api/techniek
+   (techAuth + eigenaarAlleen) en op /api/office (boardroomAuth). Het journaal
+   wees /api/techniek/papieren/documenten aan als nooit geraakt; ik las het te
+   snel en toetste de office-variant, die allang gedekt was. Het gat bleef dus
+   staan -- en werd bij de volgende meting gewoon opnieuw gemeld. Precies waar
+   een exacte teller voor is: een afgerond percentage had dit weggemoffeld.
+
+   Allebei staan ze er nu, want het zijn twee verschillende poorten voor
+   hetzelfde antwoord. Dat ze zich hetzelfde horen te gedragen is de bewering. */
+const PAPIERDEUREN = ['/api/techniek/papieren/documenten', '/api/office/papieren/documenten'];
+
+test('4. de documentenlijst komt uit de server, op allebei de deuren gelijk', async () => {
+  const lijsten = [];
+  for (const pad of PAPIERDEUREN) {
+    const r = await api(pad, {}, tech);
+    assert.equal(r.status, 200, pad + ': ' + JSON.stringify(r.body).slice(0, 160));
+    assert.ok(Array.isArray(r.body.documenten) && r.body.documenten.length > 0, pad + ': er staat een lijst');
+    for (const d of r.body.documenten) {
+      assert.ok(d.naam, 'elk document heeft een naam');
+      assert.ok(d.waarvoor, 'en zegt waarvoor het dient (' + d.naam + ')');
+    }
+    lijsten.push(r.body.documenten.map(d => d.naam).sort());
   }
+  assert.deepEqual(lijsten[0], lijsten[1],
+    'dezelfde deur op twee voorvoegsels geeft dezelfde lijst; lopen ze uiteen, dan is er een kopie ontstaan');
 });
 
-test('5. en die lijst is niet voor iedereen', async () => {
-  const zonder = await api('/api/office/papieren/documenten', {}, null);
-  assert.ok([401, 403].includes(zonder.status), 'zonder inlog dicht: ' + zonder.status);
+/* De tegenproef, en die is hier de hele reden dat het endpoint bestaat: het
+   papierwerk van de zaak (KvK, adres, de jurist) is niets voor personeel. */
+test('5. die lijst is niet voor iedereen', async () => {
+  const u = Date.now().toString(36);
+  const lid = await api('/api/auth/register', { name: 'Gewoon Lid', email: 'pap' + u + '@x.nl',
+    phone: '0612345678', password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  assert.ok(lid.body.token, 'het proeflid staat er');
+  for (const pad of PAPIERDEUREN) {
+    const zonder = await api(pad, {}, null);
+    assert.ok([401, 403].includes(zonder.status), pad + ' zonder inlog dicht: ' + zonder.status);
+    const gewoon = await api(pad, {}, lid.body.token);
+    assert.ok([401, 403].includes(gewoon.status), pad + ' met een gewoon lid dicht: ' + gewoon.status);
+  }
 });
 
 /* DE GRENDEL DIE IK BIJ HET SCHRIJVEN VAN TOETS 1 TEGENKWAM, en die zelf geen

@@ -147,7 +147,8 @@ function maakLid(deps) {
         state.foundation = { gekoppeld: rtf.gekoppeldeGezinnen(sess.account.id), meldingen: md.foundationMeldingen || [] };
       }
       // leeftijd uit het paspoort: het lid ziet de eigen groep; partners nooit
-      const lft = leeftijdVan(geborenVan(sess));
+      // (geborenVan las member_state hier een tweede keer; `md` heeft het al)
+      const lft = leeftijdVan(sess.account ? (md.geboren || null) : geborenVan(sess));
       if (lft != null) { state.user.leeftijd = lft; state.user.leeftijdsgroep = leeftijdsgroepVan(lft); }
     }
     return state;

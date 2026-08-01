@@ -30,7 +30,12 @@ const AANTAL = 4;               // je onthoudt er vier
 const PER_KEER = 3;             // per inlog gebruik je er drie
 const UITDAAG_TTL = 3 * 60000;  // een uitdaging leeft drie minuten
 const MAX_BEURTEN = 6;          // en hooguit zes beurten
-const MAX_TOKENS = 16;          // zoveel woorden uit een zin wegen we hoogstens
+/* Hoogstens zoveel woorden uit een zin. Stond op 16, en dat is de hefboom op de
+   rekening: elk woord kost 40 ms scrypt en de open-beurt weegt twee posities,
+   dus 16 woorden = 32 hashes = 1,3 s rekentijd die de AANVALLER aanlevert en de
+   server betaalt. Acht is ruim voor een gewone zin; wie langer typt verliest
+   alleen de staart, en daar zet een aanvaller juist zijn ballast neer. */
+const MAX_TOKENS = 8;
 const SLOT_NA = 5;              // vijf fouten
 const SLOT_MS = 60000;          // = een minuut op slot
 

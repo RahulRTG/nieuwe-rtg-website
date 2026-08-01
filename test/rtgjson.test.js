@@ -66,6 +66,39 @@ test('3. differentiele fuzz: 5000 willekeurige documenten, beide kanten op ident
   }
 });
 
+/* De SNELLE WEG in strEsc. Verreweg de meeste tekst hoeft niet ge-escaped en
+   krijgt sinds taak 17 alleen nog een regex-test in plaats van een lus per
+   teken (3,7x sneller; stringify was 12% van de warme rekentijd). Zo'n voorwacht
+   is precies het soort optimalisatie dat een STIL verschil kan opleveren: een
+   teken dat de detector mist gaat rauw de uitvoer in en dat merk je pas als een
+   ander systeem de JSON weigert.
+
+   Daarom uitputtend en niet steekproefsgewijs: elk teken van 0x00 tot 0x2FFF op
+   drie posities, elk los surrogaat, en een raster van complete paren.
+
+   MUTATIE-BEWIJS: haal 0x00-0x1f uit BIJZONDER en deze toets zakt op teken 0
+   (een rauw stuurteken in de uitvoer); haal de surrogaten eruit en hij zakt op
+   het eerste losse surrogaat. */
+test('3b. de snelle weg escapeert precies wat de ingebouwde escapeert', () => {
+  for (let i = 0; i <= 0x2fff; i++) {
+    const c = String.fromCharCode(i);
+    for (const s of [c, 'x' + c, 'x' + c + 'y']) {
+      assert.equal(rtgjson.stringify(s), JSON.stringify(s), 'teken 0x' + i.toString(16));
+    }
+    assert.equal(rtgjson.stringify({ [c]: 1 }), JSON.stringify({ [c]: 1 }), 'als SLEUTEL, teken 0x' + i.toString(16));
+  }
+  for (let h = 0xd800; h <= 0xdfff; h++) {
+    const s = 'a' + String.fromCharCode(h) + 'b';
+    assert.equal(rtgjson.stringify(s), JSON.stringify(s), 'los surrogaat 0x' + h.toString(16));
+  }
+  for (let h = 0xd800; h <= 0xdbff; h += 7) {
+    for (let l = 0xdc00; l <= 0xdfff; l += 13) {
+      const s = String.fromCharCode(h) + String.fromCharCode(l);
+      assert.equal(rtgjson.stringify(s), JSON.stringify(s), 'compleet paar ' + h + '/' + l);
+    }
+  }
+});
+
 test('4. de schilden: __proto__ bestaat niet eens, en nestings-bommen ketsen af', () => {
   const g = rtgjson.parse('{"__proto__":{"besmet":1},"constructor":{"prototype":{"besmet":1}},"a":2}');
   assert.equal({}.besmet, undefined, 'het wereldwijde prototype is schoon');

@@ -13,8 +13,8 @@ const pgLog = { warn: (m, v) => console.warn('[pgaccounts]', m, v || '') };
 const vuileUsers = new Set(), vuileStaff = new Set(), verwijderdeUsers = new Set();
 let mirrorTimer = null;
 
-function rawUser(id) { return S.db.prepare('SELECT * FROM users WHERE id = ?').get(id) || null; }
-function rawStaff(id) { return S.db.prepare('SELECT * FROM supplier_staff WHERE id = ?').get(id) || null; }
+function rawUser(id) { return S.zin('SELECT * FROM users WHERE id = ?').get(id) || null; }
+function rawStaff(id) { return S.zin('SELECT * FROM supplier_staff WHERE id = ?').get(id) || null; }
 
 function nieuwId() {
   if (!PGMODE || !idBlok) return null;              // buiten PG of vóór reservering: SQLite-autoincrement
@@ -50,12 +50,12 @@ function markDelete(id) { if (PGMODE && id != null) { verwijderdeUsers.add(Numbe
 // Trek een enkele, door NOTIFY gemelde rij van een ander proces in de lokale cache.
 function upsertLocalUser(r) {
   const cols = pg.USER_COLS;
-  S.db.prepare(`INSERT OR REPLACE INTO users (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`)
+  S.zin(`INSERT OR REPLACE INTO users (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`)
     .run(...cols.map(c => r[c] === undefined ? null : r[c]));
 }
 function upsertLocalStaff(r) {
   const cols = pg.STAFF_COLS;
-  S.db.prepare(`INSERT OR REPLACE INTO supplier_staff (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`)
+  S.zin(`INSERT OR REPLACE INTO supplier_staff (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`)
     .run(...cols.map(c => r[c] === undefined ? null : r[c]));
 }
 async function pullEen(payload) {
@@ -76,7 +76,7 @@ async function pullEen(payload) {
     const [soort, idStr] = String(payload).split(':'); const id = Number(idStr);
     if (soort === 'user') {
       const { rows } = await pg.pool.query('SELECT * FROM users WHERE id = $1', [id]);
-      if (rows.length) upsertLocalUser(rows[0]); else S.db.prepare('DELETE FROM users WHERE id = ?').run(id);
+      if (rows.length) upsertLocalUser(rows[0]); else S.zin('DELETE FROM users WHERE id = ?').run(id);
       if (externCb) externCb();
     } else if (soort === 'staff') {
       const { rows } = await pg.pool.query('SELECT * FROM supplier_staff WHERE id = $1', [id]);
@@ -98,8 +98,8 @@ async function startPostgres() {
   // Lokale rijen die (nog) niet in Postgres staan: eenmalig erheen duwen.
   const pgUserIds = new Set(users.map(r => Number(r.id)));
   const pgStaffIds = new Set(staff.map(r => Number(r.id)));
-  for (const r of S.db.prepare('SELECT id FROM users').all()) if (!pgUserIds.has(Number(r.id))) markUser(r.id);
-  for (const r of S.db.prepare('SELECT id FROM supplier_staff').all()) if (!pgStaffIds.has(Number(r.id))) markStaff(r.id);
+  for (const r of S.zin('SELECT id FROM users').all()) if (!pgUserIds.has(Number(r.id))) markUser(r.id);
+  for (const r of S.zin('SELECT id FROM supplier_staff').all()) if (!pgStaffIds.has(Number(r.id))) markStaff(r.id);
   idBlok = await pg.reserveerBlok();
   pgKlaar = true;
   planMirror(); // duw eventuele lokaal-only rijen nu weg

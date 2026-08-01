@@ -59,8 +59,8 @@ function maakTokens(getUserById) {
     if (!exp || exp < Date.now()) return true; // al verlopen: niets te onthouden
     try {
       // meteen opruimen wat toch al verlopen was: geen aparte taak nodig
-      S.db.prepare('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(Date.now());
-      S.db.prepare('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
+      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(Date.now());
+      S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
         .run(kluis.sign(String(token)), exp);
       return true;
     } catch (e) { return false; }
@@ -89,8 +89,8 @@ function maakTokens(getUserById) {
     } catch (e) { return false; }
     if (!exp || exp < Date.now()) return true; // al verlopen: niets te onthouden
     try {
-      S.db.prepare('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(Date.now());
-      S.db.prepare('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
+      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(Date.now());
+      S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
         .run(kluis.sign(String(token)), exp);
       return true;
     } catch (e) { return false; }
@@ -99,7 +99,7 @@ function maakTokens(getUserById) {
     token = strikt(token);
     if (!token) return true; // geen geldige vorm: behandel als ongeldig
     try {
-      const r = S.db.prepare('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
+      const r = S.zin('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
         .get(kluis.sign(String(token)));
       return !!r && Number(r.verloopt) >= Date.now();
     } catch (e) { return false; }
@@ -147,25 +147,25 @@ function maakTokens(getUserById) {
 
   /* ---------- e-mailbevestiging & wachtwoord-herstel ---------- */
   function setEmailVerified(userId) {
-    S.db.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').run(userId);
+    S.zin('UPDATE users SET email_verified = 1 WHERE id = ?').run(userId);
     mirror.markUser(userId);
     return getUserById(userId);
   }
   function createReset(userId, ttlMs = 3600000) {
     const token = crypto.randomBytes(24).toString('hex');
     const hash = crypto.createHash('sha256').update(token).digest('hex');
-    S.db.prepare('UPDATE users SET reset_hash = ?, reset_expires = ? WHERE id = ?').run(hash, Date.now() + ttlMs, userId);
+    S.zin('UPDATE users SET reset_hash = ?, reset_expires = ? WHERE id = ?').run(hash, Date.now() + ttlMs, userId);
     mirror.markUser(userId);
     return token;
   }
   function findByReset(token) {
     const hash = crypto.createHash('sha256').update(String(token || '')).digest('hex');
-    const u = S.db.prepare('SELECT * FROM users WHERE reset_hash = ?').get(hash);
+    const u = S.zin('SELECT * FROM users WHERE reset_hash = ?').get(hash);
     if (!u || !u.reset_expires || u.reset_expires < Date.now()) return null;
     return u;
   }
   async function setPassword(userId, password) {
-    S.db.prepare('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
+    S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
       .run(await kluis.hashPassword(password), userId);
     mirror.markUser(userId);
     return getUserById(userId);

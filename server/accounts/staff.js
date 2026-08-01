@@ -21,30 +21,30 @@ function schrijfStaff({ supplierCode, name, role, func, memberId, memberTier }, 
   const id = mirror.nieuwId();
   let newId;
   if (id != null) {
-    S.db.prepare(`INSERT INTO supplier_staff (id, ${kolommen}) VALUES (?, ${vals.map(() => '?').join(', ')})`).run(id, ...vals);
+    S.zin(`INSERT INTO supplier_staff (id, ${kolommen}) VALUES (?, ${vals.map(() => '?').join(', ')})`).run(id, ...vals);
     newId = id;
   } else {
-    const info = S.db.prepare(`INSERT INTO supplier_staff (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
+    const info = S.zin(`INSERT INTO supplier_staff (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
     newId = info.lastInsertRowid;
   }
   mirror.markStaff(newId);
   return getStaffById(newId);
 }
-function getStaffById(id) { return S.db.prepare('SELECT * FROM supplier_staff WHERE id = ? AND active = 1').get(id) || null; }
-function listStaff(code) { return S.db.prepare('SELECT * FROM supplier_staff WHERE supplier_code = ? AND active = 1 ORDER BY (role=\'manager\') DESC, id').all(String(code || '').toUpperCase()); }
-function countStaff(code) { return S.db.prepare('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
+function getStaffById(id) { return S.zin('SELECT * FROM supplier_staff WHERE id = ? AND active = 1').get(id) || null; }
+function listStaff(code) { return S.zin('SELECT * FROM supplier_staff WHERE supplier_code = ? AND active = 1 ORDER BY (role=\'manager\') DESC, id').all(String(code || '').toUpperCase()); }
+function countStaff(code) { return S.zin('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
 async function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && await kluis.verifyPassword(String(pin), s.pin_hash)) ? s : null; }
 // Manager reset: geef een teamlid een nieuwe pincode (bij vergeten of misbruik).
 async function setStaffPin(id, pin) {
-  S.db.prepare('UPDATE supplier_staff SET pin_hash = ? WHERE id = ?').run(await kluis.hashPassword(String(pin)), id);
+  S.zin('UPDATE supplier_staff SET pin_hash = ? WHERE id = ?').run(await kluis.hashPassword(String(pin)), id);
   mirror.markStaff(id);
   return getStaffById(id);
 }
-function deactivateStaff(id) { S.db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); mirror.markStaff(id); }
+function deactivateStaff(id) { S.zin('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); mirror.markStaff(id); }
 // Actief personeelsaccount van een lid binnen een bedrijf (voorkomt dubbel aanmelden).
 function staffByMember(supplierCode, memberId) {
   if (memberId == null) return null;
-  return S.db.prepare('SELECT * FROM supplier_staff WHERE supplier_code = ? AND member_id = ? AND active = 1')
+  return S.zin('SELECT * FROM supplier_staff WHERE supplier_code = ? AND member_id = ? AND active = 1')
     .get(String(supplierCode || '').toUpperCase(), Number(memberId)) || null;
 }
 // Alle actieve personeelsplekken van één RTG-lid, over alle bedrijven heen.
@@ -52,13 +52,13 @@ function staffByMember(supplierCode, memberId) {
 // juiste bedrijf; wie bij meer bedrijven werkt, ziet die allemaal als opties.
 function staffPositions(memberId) {
   if (memberId == null) return [];
-  return S.db.prepare('SELECT * FROM supplier_staff WHERE member_id = ? AND active = 1 ORDER BY supplier_code')
+  return S.zin('SELECT * FROM supplier_staff WHERE member_id = ? AND active = 1 ORDER BY supplier_code')
     .all(Number(memberId));
 }
 // Koppel een bestaand personeelsaccount aan een RTG-lid (voor de demo-seed en
 // voor het achteraf verbinden van een naam-account met een echt RTG-account).
 function setStaffMember(id, memberId, memberTier) {
-  S.db.prepare('UPDATE supplier_staff SET member_id = ?, member_tier = ? WHERE id = ?')
+  S.zin('UPDATE supplier_staff SET member_id = ?, member_tier = ? WHERE id = ?')
     .run(memberId != null ? Number(memberId) : null, memberTier ? String(memberTier).slice(0, 20) : null, id);
   mirror.markStaff(id);
   return getStaffById(id);

@@ -39,25 +39,25 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
   const id = mirror.nieuwId();
   let newId;
   if (id != null) {
-    S.db.prepare(`INSERT INTO users (id, ${kolommen}) VALUES (?, ${vals.map(() => '?').join(', ')})`).run(id, ...vals);
+    S.zin(`INSERT INTO users (id, ${kolommen}) VALUES (?, ${vals.map(() => '?').join(', ')})`).run(id, ...vals);
     newId = id;
   } else {
-    const info = S.db.prepare(`INSERT INTO users (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
+    const info = S.zin(`INSERT INTO users (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
     newId = info.lastInsertRowid;
   }
   require('./onderhoud').herzegel(S.db, newId); // id is nu bekend: kolommen eraan binden
   mirror.markUser(newId);
   return getUserById(newId);
 }
-function getUserById(id) { return S.db.prepare('SELECT * FROM users WHERE id = ?').get(id) || null; }
+function getUserById(id) { return S.zin('SELECT * FROM users WHERE id = ?').get(id) || null; }
 function findByLogin(login) {
   const v = String(login || '').trim();
   if (!v) return null;
-  const byEmail = S.db.prepare('SELECT * FROM users WHERE email_hash = ?').get(kluis.emailHash(v));
+  const byEmail = S.zin('SELECT * FROM users WHERE email_hash = ?').get(kluis.emailHash(v));
   if (byEmail) return byEmail;
-  return S.db.prepare('SELECT * FROM users WHERE lower(username) = lower(?)').get(v) || null;
+  return S.zin('SELECT * FROM users WHERE lower(username) = lower(?)').get(v) || null;
 }
-function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().c; }
+function count() { return S.zin('SELECT COUNT(*) AS c FROM users').get().c; }
 
 /* Het telefoonnummer bijzetten. Dat gebeurt niet meer bij de aanmelding maar pas
    wanneer er iets geregeld moet worden waar een derde partij bij komt (zie
@@ -66,7 +66,7 @@ function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().
 function setPhone(id, phone) {
   const nummer = String(phone || '').trim().slice(0, 30);
   if (!nummer) return null;
-  S.db.prepare('UPDATE users SET enc_phone = ?, phone_hash = ? WHERE id = ?')
+  S.zin('UPDATE users SET enc_phone = ?, phone_hash = ? WHERE id = ?')
     .run(gebonden.zegel('enc_phone', id, nummer), kluis.phoneHash(nummer), id);
   mirror.markUser(id);
   return getUserById(id);
@@ -78,10 +78,10 @@ function setPhone(id, phone) {
    versleutelde waarde gaan samen mee, anders zou het account onvindbaar worden. */
 function renameUser(id, { username, realName, email }) {
   if (email === undefined) {
-    S.db.prepare('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
+    S.zin('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
       .run(username, gebonden.zegel('enc_name', id, realName), id);
   } else {
-    S.db.prepare('UPDATE users SET username = ?, enc_name = ?, email_hash = ?, enc_email = ? WHERE id = ?')
+    S.zin('UPDATE users SET username = ?, enc_name = ?, email_hash = ?, enc_email = ? WHERE id = ?')
       .run(username, gebonden.zegel('enc_name', id, realName), kluis.emailHash(email), gebonden.zegel('enc_email', id, email), id);
   }
   mirror.markUser(id);
@@ -97,7 +97,7 @@ function setTier(id, tier) {
   if (!['rtg', 'lifestyle', 'business', 'guest'].includes(tier)) return null;
   const u = getUserById(id);
   if (!u) return null;
-  S.db.prepare('UPDATE users SET tier = ? WHERE id = ?').run(tier, id);
+  S.zin('UPDATE users SET tier = ? WHERE id = ?').run(tier, id);
   mirror.markUser(id);
   return getUserById(id);
 }
@@ -111,7 +111,7 @@ function setTier(id, tier) {
 function zetActief(id, aan) {
   const u = getUserById(id);
   if (!u) return null;
-  S.db.prepare('UPDATE users SET actief = ? WHERE id = ?').run(aan ? 1 : 0, id);
+  S.zin('UPDATE users SET actief = ? WHERE id = ?').run(aan ? 1 : 0, id);
   mirror.markUser(id);
   return getUserById(id);
 }
@@ -120,7 +120,7 @@ const isActief = (u) => !!u && u.actief !== 0;
 /* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
    setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
 function setPasswordSync(userId, password) {
-  S.db.prepare('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
+  S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
     .run(kluis.hashPasswordSync(password), userId);
   mirror.markUser(userId);
   return getUserById(userId);

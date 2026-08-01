@@ -19,7 +19,7 @@ const mirror = require('./mirror');
 function maakDossier(getUserById) {
   /* ---------- ledeninhoud per persoon (eigen boekingen/betalingen) ---------- */
   function getMemberState(userId) {
-    const row = S.db.prepare('SELECT id, member_state FROM users WHERE id = ?').get(userId);
+    const row = S.zin('SELECT id, member_state FROM users WHERE id = ?').get(userId);
     if (!row || !row.member_state) return null;
     try { return JSON.parse(gebonden.lees('member_state', row)); } catch (e) { return null; }
   }
@@ -30,24 +30,24 @@ function maakDossier(getUserById) {
      de naam ernaast wel versleuteld is. Dat maakt het codenaam-ontwerp waardeloos.
      De Postgres-spiegel kopieert de kolom ongewijzigd en erft de bescherming. */
   function saveMemberState(userId, obj) {
-    S.db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(gebonden.zegel('member_state', userId, JSON.stringify(obj)), userId);
+    S.zin('UPDATE users SET member_state = ? WHERE id = ?').run(gebonden.zegel('member_state', userId, JSON.stringify(obj)), userId);
     mirror.markUser(userId);
   }
 
   /* ---------- identiteitsverificatie ---------- */
   function setVerification(userId, status, docFilename) {
-    if (docFilename !== undefined) S.db.prepare('UPDATE users SET verified = ?, id_doc = ? WHERE id = ?').run(status, docFilename, userId);
-    else S.db.prepare('UPDATE users SET verified = ? WHERE id = ?').run(status, userId);
+    if (docFilename !== undefined) S.zin('UPDATE users SET verified = ?, id_doc = ? WHERE id = ?').run(status, docFilename, userId);
+    else S.zin('UPDATE users SET verified = ? WHERE id = ?').run(status, userId);
     mirror.markUser(userId);
     return getUserById(userId);
   }
   function listByVerification(status) {
-    return S.db.prepare('SELECT * FROM users WHERE verified = ? ORDER BY created_at DESC').all(status);
+    return S.zin('SELECT * FROM users WHERE verified = ? ORDER BY created_at DESC').all(status);
   }
 
   /* Gesprekken in de app per account, voor de concierge-inbox. */
   function conversations() {
-    const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users WHERE member_state IS NOT NULL').all();
+    const rows = S.zin('SELECT id, tier, codename, member_state FROM users WHERE member_state IS NOT NULL').all();
     return rows.map(r => {
       let md = {}; try { md = JSON.parse(gebonden.lees('member_state', r)) || {}; } catch (e) {}
       return { id: r.id, tier: r.tier, codename: r.codename, conversation: md.conversation || [], needsConcierge: !!md.needsConcierge };
@@ -60,7 +60,7 @@ function maakDossier(getUserById) {
      met een echt grootboek (Postgres) zou dit aggregatie-per-facet worden. */
   function ledenRegisterRijen(limit) {
     const n = Math.max(1, Math.min(Number(limit) || 5000, 20000));
-    const rows = S.db.prepare('SELECT id, tier, codename, member_state FROM users ORDER BY codename ASC LIMIT ?').all(n);
+    const rows = S.zin('SELECT id, tier, codename, member_state FROM users ORDER BY codename ASC LIMIT ?').all(n);
     return rows.map(r => {
       let md = {}; try { md = r.member_state ? (JSON.parse(gebonden.lees('member_state', r)) || {}) : {}; } catch (e) {}
       const gs = String(md.geslacht || '').toLowerCase();
@@ -75,7 +75,7 @@ function maakDossier(getUserById) {
   function deleteUser(id) {
     const u = getUserById(id);
     if (!u) return null;
-    S.db.prepare('DELETE FROM users WHERE id = ?').run(id);
+    S.zin('DELETE FROM users WHERE id = ?').run(id);
     mirror.markDelete(id);
     return u.id_doc || null;
   }

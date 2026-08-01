@@ -13,6 +13,22 @@ const g = require('./gebonden');
 const TABEL = g.TABEL;
 const KOLOMMEN = g.KOLOMMEN;
 
+/* WAAROM HIER GEEN S.zin() STAAT.
+   De rest van de accounts-laag haalt zijn statements uit de zinnencache in
+   ./state, omdat prepare op het warme pad bijna een tiende van de rekentijd
+   kostte. Dit bestand doet daar bewust niet aan mee, om twee redenen:
+
+   1. de SQL wordt hier SAMENGESTELD. Regel 47 bouwt de SET-lijst uit de kolommen
+      die deze rij toevallig nodig heeft: dat zijn 2^n verschillende zinnen. Een
+      cache op de tekst zou daar ongemerkt vol mee lopen, en een cache die groeit
+      met je gegevens is een lek met een nette naam.
+   2. dit is geen warm pad. Migreren, de stand opnemen en roteren gebeuren met de
+      hand of bij het opstarten, een keer per rij, niet per verzoek. Er valt hier
+      niets te winnen dat de eerste reden waard is.
+
+   De statements die WEL constant zijn (regel 59: 'SELECT id FROM ' + TABEL)
+   zouden veilig te cachen zijn, maar dan zou dit bestand twee regels volgen in
+   plaats van een, en dat is de duurdere fout. */
 function haalRij(db, id) {
   return db.prepare('SELECT id, ' + KOLOMMEN.join(', ') + ' FROM ' + TABEL + ' WHERE id = ?').get(id);
 }

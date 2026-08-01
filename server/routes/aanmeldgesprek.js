@@ -47,7 +47,7 @@ module.exports = (kern) => {
   app.post('/api/aanmeld/zeg', async (req, res) => {
     if (teSnel(req.ip)) return res.status(429).json({ error: 'Rustig aan; probeer het over een minuut opnieuw.' });
     const lang = (req.body || {}).lang;
-    const r = intakeZeg(String((req.body || {}).id || ''), (req.body || {}).tekst);
+    const r = await intakeZeg(String((req.body || {}).id || ''), (req.body || {}).tekst);
     if (r.error) return res.status(r.status || 400).json({ error: await naarTaal(r.error, lang) });
     // de sleutelwoorden-inlog is server-side geverifieerd; hier munten we de
     // echte sessie (dezelfde token als /api/auth/login zou geven). Het

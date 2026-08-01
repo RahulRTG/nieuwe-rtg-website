@@ -29,7 +29,7 @@ module.exports = function maakInlog({ swStart, swZeg, ord, schoon, gesprekken })
 
   // de login-/sw-/vergeten-stappen; geeft null terug voor elke andere stap,
   // zodat de motor kan doorschakelen naar het aanmeld-pad.
-  function inlogStap(g, tekst, id) {
+  async function inlogStap(g, tekst, id) {
     switch (g.stap) {
       case 'login-naam': {
         if (/\bvergeten\b/i.test(tekst)) {
@@ -44,7 +44,7 @@ module.exports = function maakInlog({ swStart, swZeg, ord, schoon, gesprekken })
       case 'sw-open': {
         if (/\bwachtwoord\b/i.test(tekst)) { g.stap = 'login-af'; g.sw = null; return { tekst: 'Ook goed. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.', login: g.login || null }; }
         if (/\bopnieuw\b/i.test(tekst)) { g.stap = 'doel'; g.login = null; g.sw = null; return { tekst: 'Prima, we beginnen opnieuw. Inloggen, aanmelden, of wil je uitleg?' }; }
-        const r = swZeg((g.sw || {}).id || '', tekst);
+        const r = await swZeg((g.sw || {}).id || '', tekst);
         if (r.error) { g.stap = 'login-naam'; g.sw = null; return { tekst: r.error + ' Met welk e-mailadres of welke gebruikersnaam ken ik je? (Of zeg "wachtwoord".)' }; }
         g.stap = 'sw-sluit';
         const echo = r.echo ? ' Ik hoor je "' + r.echo + '" terug.' : '';
@@ -52,7 +52,7 @@ module.exports = function maakInlog({ swStart, swZeg, ord, schoon, gesprekken })
       }
       case 'sw-sluit': {
         if (/\bwachtwoord\b/i.test(tekst)) { g.stap = 'login-af'; g.sw = null; return { tekst: 'Ook goed. Typ je wachtwoord hieronder.', login: g.login || null }; }
-        const r = swZeg((g.sw || {}).id || '', tekst);
+        const r = await swZeg((g.sw || {}).id || '', tekst);
         g.sw = null;
         if (r.ok) { gesprekken.delete(id); return { inlog: { userId: r.userId }, tekst: 'Daar ben je weer. Welkom terug.' }; }
         g.stap = 'login-naam';

@@ -49,7 +49,7 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
     return { id, tekst: 'Ik ben Rahul. Aanmelden, inloggen, of eerst uitleg?' };
   }
 
-  function intakeZeg(id, ruwTekst) {
+  async function intakeZeg(id, ruwTekst) {
     const g = gesprekken.get(id);
     if (!g) return { status: 404, error: 'Dit gesprek ken ik niet (meer). Begin gerust opnieuw.' };
     if (++g.beurten > MAX_BEURTEN) { gesprekken.delete(id); return { status: 429, error: 'Dit gesprek werd wel erg lang; begin even opnieuw.' }; }
@@ -86,7 +86,7 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
       default: {
         // de login-/sw-/vergeten-stappen lopen via het inlog-pad; geeft dat
         // null terug, dan is het een aanmeld-stap (hallo t/m wachtwoord)
-        const inlog = inlogStap(g, tekst, id);
+        const inlog = await inlogStap(g, tekst, id);
         if (inlog) return inlog;
         return aanmeldStap(g, tekst, ruwTekst, id, { schoon, leeftijdVan, toon, gesprekken });
       }

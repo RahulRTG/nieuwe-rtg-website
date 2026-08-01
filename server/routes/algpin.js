@@ -18,12 +18,12 @@ module.exports = (kern) => {
     if (!echtAccount(req, res)) return;
     res.json(pinInfo(req.session.key));
   });
-  app.post('/api/pin/zet', auth, (req, res) => {
+  app.post('/api/pin/zet', auth, async (req, res) => {
     if (!echtAccount(req, res)) return;
-    stuur(res, pinZet(req.session.key, req.body || {}));
+    stuur(res, await pinZet(req.session.key, req.body || {}));
   });
-  app.post('/api/pin/check', auth, (req, res) => {
+  app.post('/api/pin/check', auth, async (req, res) => {
     if (!echtAccount(req, res)) return;
-    stuur(res, pinCheck(req.session.key, (req.body || {}).pin));
+    stuur(res, await pinCheck(req.session.key, (req.body || {}).pin));
   });
 };

@@ -26,9 +26,9 @@ module.exports = (kern) => {
     if (!echtAccount(req, res)) return;
     stuur(res, await accKoppel(req.session.key, req.body || {}, req));
   });
-  app.post('/api/account/start', auth, (req, res) => {
+  app.post('/api/account/start', auth, async (req, res) => {
     if (!echtAccount(req, res)) return;
-    stuur(res, accStart(req.session.key, req.body || {}, req));
+    stuur(res, await accStart(req.session.key, req.body || {}, req));
   });
   app.post('/api/account/ontkoppel', auth, (req, res) => {
     if (!echtAccount(req, res)) return;

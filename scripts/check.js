@@ -1379,6 +1379,26 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/kantoor/gesprek/start', 'het kantoorgesprek begint voor er een account is'],
     ['/api/kantoor/gesprek/zeg', 'loopt verder op het gespreks-id dat bij de start is uitgegeven'],
 
+    /* ---- DE ACHT DIE OP HUN BUURMAN LEUNDEN ----
+       Deze stonden hier niet, en ze kwamen ook nergens door een poort: ze
+       kwamen door omdat het venster van 800 tekens de code van de VOLGENDE
+       route meelas en daar een 401 vond. Sinds die knip (zie hieronder bij
+       `staart`) staan ze hier met een eigen reden -- of ze zijn geen gat. */
+    ['/api/aanmeld/start', 'het aanmeldgesprek begint voor er een account is; rem van 40 berichten per minuut per ip'],
+    ['/api/webauthn/opties', 'de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login'],
+    ['/api/auth/verify-email', 'de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400'],
+
+    // ---- publiek, maar met een code in het lijf als geloofsbrief ----
+    /* Dezelfde familie als metPartner hiernaast: clubs en stadspartners hebben
+       geen RTG-account, hun code is de sleutel en het portaal toont uitsluitend
+       het dossier dat bij die ene code hoort. Waard om te weten: op deze drie
+       zit GEEN eigen rem, dus de sterkte hangt volledig aan de lengte van de
+       code. Dat is een open punt voor de externe toets (taak 22), geen gat dat
+       ik hier stil dichtplak. */
+    ['/api/rtf/club/portaal', 'de clubcode is de geloofsbrief (vindCode); alleen het eigen clubdossier'],
+    ['/api/rtf/club/bericht', 'idem: schrijft alleen in het logboek van die ene clubcode'],
+    ['/api/rtf/partner/raad', 'de raadcode is de geloofsbrief (vindCode); alleen de eigen partnerkant'],
+
     // ---- publieke informatie: staat ook gewoon op de site ----
     ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
     ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
@@ -1396,6 +1416,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/zegel/sleutel', 'idem: de publieke helft van het zegel'],
     ['/api/zegel/controleer', 'controleert een handtekening; het bewijs zit in het verzoek'],
     ['/api/ice', 'ijs-servers voor WebRTC; geen gegevens, wel een rem'],
+    ['/api/munt/opties', 'welke munten er aan staan is prijslijst-informatie, net als /api/pasprijzen'],
+    /* Bedrijfsstatus van de doos zelf (modus, journaalstand, versie, wifi,
+       stroom) -- geen zaakdata en geen ledengegevens. Wel eerlijk vermelden:
+       het is infrastructuurinformatie, en die hoort op het LAN van de zaak te
+       blijven. Hangt een doos ooit rechtstreeks aan het internet, dan is dit
+       de eerste route om alsnog achter een poort te zetten. */
+    ['/api/doos/status', 'de doos vertelt hoe hij erbij staat; geen zaakdata (zie de opmerking hierboven)'],
     /* Bewust, en met een gemeten grens: de PDA-inlog toont eerst de namenlijst
        zodat personeel zichzelf kan aanwijzen. Zie de rem in toegang.js: dertig
        zaken per kwartier per ip, ruim voor wie van bedrijf wisselt en te weinig
@@ -1445,7 +1472,17 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     while ((m = RE.exec(bron))) {
       totaal++;
       const pad = m[2];
-      const staart = bron.slice(m.index + m[0].length, m.index + m[0].length + 800);
+      /* HET VENSTER STOPT BIJ DE VOLGENDE ROUTE. Zonder die knip keek deze
+         regel 800 tekens vooruit en liep daarmee de BUURMAN in: een route zonder
+         poort werd goedgekeurd omdat de route eronder ergens een 401 teruggaf.
+         Precies dat gebeurde bij /api/aanmeld/start, en het kwam pas aan het
+         licht doordat een `await` van zes tekens de 401 van de buurman net
+         buiten het venster duwde -- een groene regel die aan een toevallige
+         tekstafstand hing. Valse goedkeuring is bij deze regel de gevaarlijke
+         richting; een venster dat over de grens kijkt is er een bron van. */
+      const ruw = bron.slice(m.index + m[0].length, m.index + m[0].length + 800);
+      const volgende = ruw.search(/app\.(get|post|put|delete|patch)\(\s*['"]/);
+      const staart = volgende > 0 ? ruw.slice(0, volgende) : ruw;
       bestaat.add(pad);
       const knip = staart.search(/=>|function\s*\(/);
       const voor = knip > 0 ? staart.slice(0, knip) : staart.slice(0, 80);

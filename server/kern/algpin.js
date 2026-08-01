@@ -30,38 +30,42 @@ function maakAlgPin({ db, save, crypto, slot }) {
   const doel = key => 'algpin:' + key;
   const PIN_RE = /^\d{4,8}$/;
 
-  function hash(pin, zout) {
-    return crypto.scryptSync(String(pin), zout, 32, { N: 16384, r: 8, p: 1 }).toString('base64');
-  }
+  /* Asynchroon, en om dezelfde reden als bij de sleutelwoorden: scryptSync is
+     hier 40 ms gemeten, en 40 ms synchroon rekenen is 40 ms waarin de server
+     NIEMAND anders antwoordt. De threadpool rekent even zwaar, alleen naast de
+     lus in plaats van erin. Zie kern/sleutelwoorden.js voor de meting. */
+  const hash = (pin, zout) => new Promise((klaar, mis) =>
+    crypto.scrypt(String(pin), zout, 32, { N: 16384, r: 8, p: 1 }, (e, k) => e ? mis(e) : klaar(k.toString('base64'))));
+
   const teVaak = key => slot.dicht(doel(key));
   const fout = key => slot.fout(doel(key), 'de algemene pincode van ' + key);
-  function klopt(key, pin) {
+  async function klopt(key, pin) {
     const p = rij()[key];
     if (!p || !PIN_RE.test(String(pin || ''))) return false;
-    const a = Buffer.from(hash(pin, Buffer.from(p.zout, 'base64')));
+    const a = Buffer.from(await hash(pin, Buffer.from(p.zout, 'base64')));
     const b = Buffer.from(p.hash);
     return a.length === b.length && crypto.timingSafeEqual(a, b);
   }
 
   function pinInfo(key) { return { gezet: !!rij()[key] }; }
 
-  function pinZet(key, body) {
+  async function pinZet(key, body) {
     const pin = String((body || {}).pin || '');
     if (!PIN_RE.test(pin)) return { status: 400, error: 'Kies een pincode van 4 tot 8 cijfers.' };
     if (rij()[key]) {
       if (teVaak(key)) return { status: 429, error: 'Te veel foute pogingen. Wacht een minuut.' };
-      if (!klopt(key, (body || {}).oud)) { fout(key); return { status: 401, error: 'De huidige pincode klopt niet.' }; }
+      if (!await klopt(key, (body || {}).oud)) { fout(key); return { status: 401, error: 'De huidige pincode klopt niet.' }; }
     }
     const zout = crypto.randomBytes(16);
-    rij()[key] = { zout: zout.toString('base64'), hash: hash(pin, zout), at: new Date().toISOString() };
+    rij()[key] = { zout: zout.toString('base64'), hash: await hash(pin, zout), at: new Date().toISOString() };
     save();
     return { ok: true, gezet: true };
   }
 
-  function pinCheck(key, pin) {
+  async function pinCheck(key, pin) {
     if (!rij()[key]) return { ok: true, gezet: false }; // geen pin gezet = niets te bewijzen
     if (teVaak(key)) return { status: 429, error: 'Te veel foute pogingen. Wacht een minuut.' };
-    if (!klopt(key, pin)) { fout(key); return { status: 401, error: 'Onjuiste pincode.' }; }
+    if (!await klopt(key, pin)) { fout(key); return { status: 401, error: 'Onjuiste pincode.' }; }
     slot.goed(doel(key));
     return { ok: true, gezet: true };
   }

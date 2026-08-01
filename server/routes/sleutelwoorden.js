@@ -20,9 +20,9 @@ module.exports = (kern) => {
     const id = echtId(req, res); if (id == null) return;
     res.json(swInfo(id));
   });
-  app.post('/api/sleutelwoorden/zet', auth, (req, res) => {
+  app.post('/api/sleutelwoorden/zet', auth, async (req, res) => {
     const id = echtId(req, res); if (id == null) return;
-    stuur(res, swZet(id, (req.body || {}).woorden));
+    stuur(res, await swZet(id, (req.body || {}).woorden));
   });
   app.post('/api/sleutelwoorden/weg', auth, (req, res) => {
     const id = echtId(req, res); if (id == null) return;

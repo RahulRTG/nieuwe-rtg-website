@@ -58,7 +58,30 @@ function maakSleutelwoorden({ db, save, crypto, accounts, slot }) {
     }
     return uit;
   }
-  const hash = (w, zout) => crypto.scryptSync(w, zout, 32, { N: 16384, r: 8, p: 1 }).toString('base64');
+  /* SCRYPT HOORT NIET OP DE EVENT-LOOP. Dit was crypto.scryptSync, en dat is
+     gemeten wat het kostte:
+
+       een enkele hash (N=16384, r=8, p=1)             40 ms
+       een open-beurt (2 posities x 16 woorden)        32 hashes = 1298 ms
+       een sluit-beurt (1 positie x 16 woorden)        16 hashes =  696 ms
+
+     Die 1298 ms stond de HELE server stil: een hartslag (GET /api/health) die
+     in rust 2 ms duurt, duurde tijdens een enkel inlogbericht 1301 ms. Acht
+     tegelijk liepen keurig achter elkaar op -- 1,3 / 2,6 / 3,9 ... tot 10,9 s --
+     want synchroon rekenwerk kent geen gelijktijdigheid. En dit pad ligt VOOR
+     de inlog: een lokvink (onbekend account) kost exact evenveel, want dat is
+     juist de bedoeling tegen account-enumeratie.
+
+     De asynchrone variant rekent in de threadpool naast de lus. Even zwaar --
+     dat is de bescherming en die blijft -- maar de server blijft ondertussen
+     antwoorden. Zelfde parameters, zelfde uitkomst, alleen niet meer op de lus.
+
+     BEWUST NIET met Promise.all: dan claimt een enkel inlogverzoek de hele
+     threadpool (vier threads) en staan andere verzoeken die crypto of bestanden
+     nodig hebben alsnog te wachten. Op volgorde is per verzoek even snel als
+     voorheen en veel eerlijker tegenover de rest. */
+  const hash = (w, zout) => new Promise((klaar, mis) =>
+    crypto.scrypt(w, zout, 32, { N: 16384, r: 8, p: 1 }, (e, k) => e ? mis(e) : klaar(k.toString('base64'))));
 
   const teVaak = userId => slot.dicht(doel(userId));
   const fout = userId => slot.fout(doel(userId), 'de sleutelwoorden van ' + userId);
@@ -66,31 +89,34 @@ function maakSleutelwoorden({ db, save, crypto, accounts, slot }) {
   // vind in de zin het woord dat op deze positie hoort; geef het herkende woord
   // terug (uit de zin van de gebruiker zelf) of null. Bij een lokvink draait er
   // gelijkwaardig rekenwerk zodat de duur niets verklapt.
-  function herken(userId, positie, tekst) {
+  async function herken(userId, positie, tekst) {
     const w = userId != null && rij()[userId] && rij()[userId].woorden[positie];
     const tokens = woordenUit(tekst);
-    if (!w) { for (const t of tokens) hash(t, DUMMY_ZOUT); return null; }
+    if (!w) { for (const t of tokens) await hash(t, DUMMY_ZOUT); return null; }
     const zout = Buffer.from(w.zout, 'base64');
     const doel = Buffer.from(w.hash, 'base64');
+    let raak = null;
     for (const t of tokens) {
-      const h = Buffer.from(hash(t, zout), 'base64');
-      if (h.length === doel.length && crypto.timingSafeEqual(h, doel)) return t;
+      const h = Buffer.from(await hash(t, zout), 'base64');
+      /* NIET vroegtijdig stoppen: wie het goede woord vooraan zet zou dan
+         sneller antwoord krijgen dan wie het achteraan zet, en dat verschil is
+         te meten. Alle woorden wegen, dan pas oordelen. */
+      if (raak == null && h.length === doel.length && crypto.timingSafeEqual(h, doel)) raak = t;
     }
-    return null;
+    return raak;
   }
 
   /* ---- instellen (achter de leden-inlog): precies vier verschillende woorden ---- */
   function swInfo(userId) { return { gezet: !!rij()[userId] }; }
-  function swZet(userId, woorden) {
+  async function swZet(userId, woorden) {
     const schoon = (Array.isArray(woorden) ? woorden : []).map(w => String(w || '').trim());
     const genorm = schoon.map(norm);
     if (genorm.length !== AANTAL || genorm.some(w => !w)) return { status: 400, error: 'Kies precies vier sleutelwoorden.' };
     if (genorm.some(w => w.length < 3)) return { status: 400, error: 'Elk sleutelwoord is minstens drie letters.' };
     if (new Set(genorm).size !== AANTAL) return { status: 400, error: 'Kies vier verschillende woorden.' };
-    rij()[userId] = {
-      woorden: genorm.map(w => { const z = crypto.randomBytes(16); return { zout: z.toString('base64'), hash: hash(w, z) }; }),
-      at: new Date().toISOString()
-    };
+    const gehasht = [];
+    for (const w of genorm) { const z = crypto.randomBytes(16); gehasht.push({ zout: z.toString('base64'), hash: await hash(w, z) }); }
+    rij()[userId] = { woorden: gehasht, at: new Date().toISOString() };
     save();
     return { ok: true, gezet: true };
   }
@@ -123,20 +149,20 @@ function maakSleutelwoorden({ db, save, crypto, accounts, slot }) {
   }
   // een beurt in de uitdaging. Stap 'open' verwacht de eerste twee woorden in
   // een zin; stap 'sluit' het derde. Succes geeft { ok, userId }.
-  function swZeg(id, tekst) {
+  async function swZeg(id, tekst) {
     const c = uitdagingen.get(id);
     if (!c) return { status: 410, error: 'Deze inlogpoging ken ik niet meer; begin gerust opnieuw.' };
     if (Date.now() - c.at > UITDAAG_TTL) { uitdagingen.delete(id); return { status: 410, error: 'De inlogpoging verliep; begin opnieuw.' }; }
     if (++c.n > MAX_BEURTEN) { uitdagingen.delete(id); return { status: 429, error: 'Te veel heen en weer; begin even opnieuw.' }; }
     if (c.stap === 'open') {
-      const a = herken(c.userId, c.volgorde[0], tekst);
-      const b = herken(c.userId, c.volgorde[1], tekst);
+      const a = await herken(c.userId, c.volgorde[0], tekst);
+      const b = await herken(c.userId, c.volgorde[1], tekst);
       c.openOk = !!(c.userId != null && a && b);
       c.stap = 'sluit';
       return { stap: 'sluit', echo: c.openOk ? b : null, posSluit: c.volgorde[2] };
     }
     // stap 'sluit'
-    const derde = herken(c.userId, c.volgorde[2], tekst);
+    const derde = await herken(c.userId, c.volgorde[2], tekst);
     const goed = c.openOk && !!derde && c.userId != null;
     uitdagingen.delete(id);
     if (goed) { slot.goed(doel(c.userId)); return { ok: true, userId: c.userId }; }

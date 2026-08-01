@@ -56,7 +56,7 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
 
   /* ---- met het ene account een werk-sessie starten (zelfde munt als de
      losse inlog: rememberSession met exact dezelfde velden en logs) ---- */
-  function accStart(key, body, req) {
+  async function accStart(key, body, req) {
     const wens = { rol: String((body || {}).rol || ''), code: body && body.code ? String(body.code).toUpperCase() : '',
       staffId: body && body.staffId != null ? Number(body.staffId) : null };
     const r = lijst(key).find(x => x.rol === wens.rol && (!wens.code || x.code === wens.code)
@@ -67,7 +67,7 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     // het verzoek vragen we er netjes om, zonder een foutpoging te tellen.
     if (pinInfo && pinCheck && pinInfo(key).gezet) {
       if (!(body || {}).pin) return { status: 401, error: 'Voer uw algemene pin in.', pinNodig: true };
-      const p = pinCheck(key, body.pin);
+      const p = await pinCheck(key, body.pin);
       if (p.error) return { status: p.status || 401, error: p.error, pinNodig: true };
     }
     if (r.rol === 'kantoor') {

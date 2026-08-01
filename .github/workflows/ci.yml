@@ -21,6 +21,16 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 10s
           --health-timeout 5s --health-retries 5
+      # Redis is geen luxe: twee toetsbestanden (grand-integratie, sloophamer)
+      # slaan ZICHZELF over zonder REDIS_URL. Ze stonden er dus wel, maar
+      # draaiden nooit -- vijftien toetsen die eruitzagen als dekking.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s
+          --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -49,9 +59,14 @@ jobs:
       # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
       # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
       # kv-tabel en zouden elkaar bij parallel draaien resetten.
-      - name: PostgreSQL-integratietests (opslag + accounts + chaos)
-        run: node --test --test-concurrency=1 test/pg.test.js test/pgaccounts.test.js test/chaos.pg.test.js
+      # Elk bestand in een EIGEN database (scripts/pgtoetsen.js). Serieel draaien
+      # was niet genoeg: deze toetsen maken en droppen dezelfde tabellen, dus
+      # begon nummer vijf op wat nummer vier had achtergelaten. Daardoor stonden
+      # hier drie van de acht bestanden -- de andere vijf draaiden nooit.
+      - name: PostgreSQL-integratietests (elk in een eigen database)
+        run: node scripts/pgtoetsen.js
         env:
+          REDIS_URL: redis://localhost:6379
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210

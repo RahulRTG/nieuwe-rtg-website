@@ -1,9 +1,9 @@
-/* PostgreSQL-opslag, deel "sync": de write-behind flush naar Postgres en het
-   inlezen van wijzigingen van andere instances. Dit is de kern van de
-   gelijktijdigheid: per collectie een transactie met advisory lock + row-lock en
-   dezelfde 3-weg-merge (merge3) als de SQLite-opslag, zodat twee instances elkaar
-   niet overschrijven. Afgesplitst uit pg/index.js; de pool, de kluis-helpers en
-   de gedeelde staat-maps komen via de context binnen. */
+/* PostgreSQL-opslag, deel "sync": de SCHRIJFKANT, de write-behind flush naar
+   Postgres. Per collectie een transactie met advisory lock + row-lock en
+   dezelfde 3-weg-merge (merge3) als de SQLite-opslag, zodat twee instances
+   elkaar niet overschrijven. De leeskant (wijzigingen van andere instances
+   ophalen) staat in ./inlezen.js. Afgesplitst uit pg/index.js; de pool, de
+   kluis-helpers en de gedeelde staat-maps komen via de context binnen. */
 const KANAAL = 'rtg_kv';
 
 /* DE SNELLE RIJSTROOK: collecties die nooit achter tientallen megabytes mogen
@@ -165,44 +165,5 @@ module.exports = (ctx) => {
     return geschreven;
   }
 
-  /* Haal collecties op die een ander proces sinds onze laagst-toegepaste versie
-     schreef en werk db.data bij (met merge als wij lokaal iets openstaan hebben).
-     Wordt getriggerd door NOTIFY en als vangnet ook periodiek. */
-  async function haalNieuwer(dataNu, opSessieWijziging) {
-    let laagst = 0;
-    for (const v of toegepast.values()) if (v < laagst || laagst === 0) laagst = v;
-    // Eerst alleen key+ver: de drempel is de LAAGSTE toegepaste versie over alle
-    // collecties, dus deze lijst bevat ook collecties die we allang hebben. Met
-    // "val" erbij zou elke poll (elke 2 s) de volledige blobs van alle sinds de
-    // start herschreven collecties (op mega-schaal tientallen MB's) over de lijn
-    // trekken om ze hieronder meestal over te slaan; dat vrat geheugen en band-
-    // breedte. Nu halen we de blob alleen op voor wat echt nieuw voor ons is.
-    const { rows } = await pool.query('SELECT key, ver FROM kv WHERE ver > $1', [laagst]);
-    let sessie = false;
-    for (const r of rows) {
-      if (Number(r.ver) <= (toegepast.get(r.key) || 0)) continue;
-      // De blob apart ophalen, MET zijn eigen versienummer: tussen de lijst-query
-      // en deze fetch kan een ander proces alweer geschreven hebben, en dan zou
-      // het lijst-versienummer achterlopen op de inhoud die we toepassen.
-      const vr = await pool.query('SELECT val, ver FROM kv WHERE key = $1', [r.key]);
-      if (!vr.rows.length) continue;
-      const ver = Number(vr.rows[0].ver);
-      if (ver <= (toegepast.get(r.key) || 0)) continue;
-      const baseJson = laatsteJson.get(r.key);
-      const hunJson = uitStore(vr.rows[0].val);
-      const lokaalOpen = baseJson !== undefined && JSON.stringify(dataNu[r.key]) !== baseJson;
-      if (lokaalOpen) {
-        dataNu[r.key] = merge3(JSON.parse(baseJson), dataNu[r.key], JSON.parse(hunJson));
-      } else {
-        dataNu[r.key] = JSON.parse(hunJson);
-        laatsteJson.set(r.key, hunJson);
-      }
-      toegepast.set(r.key, ver);
-      if (r.key === 'sessions') sessie = true;
-    }
-    if (sessie && opSessieWijziging) opSessieWijziging();
-    return rows.length;
-  }
-
-  return { flush, haalNieuwer, VOORRANG };
+  return { flush, VOORRANG };
 };

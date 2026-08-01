@@ -87,8 +87,10 @@ function maakPg({ merge3, kluis, log, url }) {
   }
 
   // de write-behind flush en het inlezen van andermans wijzigingen (zie ./sync)
-  const { flush, haalNieuwer, VOORRANG } = require('./sync')({ pool, merge3, uitStore, naarStore, vlag,
-    toegepast, laatsteJson, laatsteGrootte, laatsteLengte, laatsteCheck });
+  const ctx = { pool, merge3, uitStore, naarStore, vlag,
+    toegepast, laatsteJson, laatsteGrootte, laatsteLengte, laatsteCheck };
+  const { flush, VOORRANG } = require('./sync')(ctx);        // schrijfkant
+  const { haalNieuwer } = require('./inlezen')(ctx);          // leeskant
   // de snelle rijstrook voor de idempotentie-boeken (zie ./sync.js)
   const flushVoorrang = (dataNu) => flush(dataNu, false, VOORRANG);
 

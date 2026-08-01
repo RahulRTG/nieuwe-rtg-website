@@ -66,7 +66,9 @@ boardroom en nog een keer hard in `kern/lid.js`. De rate limiter `teVaak` stond
 in drie kernmodules, en geen van de kopieen had de opruimronde van het origineel.
 
 **Handhaver:** `check.js` regel 26 (elke naam die je uit een module haalt bestaat
-daar), regel 25, regel 27, en `scripts/kruisscan.js`.
+daar), regel 25, regel 27, regel 28 (de publieke-routelijst mag geen namen
+bevatten die niet meer bestaan of die inmiddels een eigen poort hebben), en
+`scripts/kruisscan.js`.
 
 ### 5. Niets slaat stil over
 
@@ -80,7 +82,9 @@ een webhook met een typefout precies hetzelfde deed als een werkende: niets
 zichtbaars. Nu worden bezorgfouten geteld en staan ze op het techniekbord.
 
 **Handhaver:** de strenge poort in `test/helper.js` (een geslaagde toets mag geen
-uncaughtException of 5xx opleveren) en `scripts/ast-scan.js`.
+uncaughtException of 5xx opleveren), `scripts/ast-scan.js`, en `check.js` regel
+28: een route die je vergeet te poorten geeft geen fout en geen log, en is
+daarmee de stilste vorm die er is.
 
 ### 6. Een belofte in tekst is een belofte in code
 
@@ -117,8 +121,14 @@ Authorization-kop en zette daarmee de weg naar de AI-aanbieder open. Wie
 `Bearer x` meestuurt had geen account nodig. Het commentaar erboven beloofde
 letterlijk het tegendeel.
 
-**Handhaver:** geen. Voornemen, en een reden om bij elke poort te vragen: wat
-wordt hier precies bewezen?
+**Handhaver:** `check.js` regel 29. Elke plek die de Authorization-kop leest
+moet het token binnen twaalf regels door een echte verifier halen; wie de kop
+alleen betast, wordt aangewezen. Twee uitzonderingen staan er met een reden bij
+(een extractor en een doorgeefluik naar een interne dienst).
+
+Voor het bredere geval blijft dit een voornemen: een `typeof`, een naam die
+vergeleken wordt, een rol uit `req.body` -- die vormen kent geen enkele scan.
+Blijf dus bij elke poort vragen wat er precies bewezen wordt.
 
 ### 9. Een toets die niet kan zakken is slechter dan geen toets
 
@@ -168,7 +178,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 | wat | waar |
 |---|---|
-| 27 codeafspraken, binair | `scripts/check.js` |
+| 29 codeafspraken, binair | `scripts/check.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |

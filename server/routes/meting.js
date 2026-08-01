@@ -21,6 +21,7 @@
    ========================================================================== */
 const meting = require('../meting');
 const rem = require('../rem');
+const { veiligGelijk } = require('../kern/util');
 
 /* Zelfde vorm als in web/verrijk.js en sso/haal.js: wat niet op het open
    internet hoort. */
@@ -38,9 +39,14 @@ module.exports = (kern) => {
     if (TOKEN) {
       const kop = req.get('authorization') || '';
       const aangeboden = kop.startsWith('Bearer ') ? kop.slice(7).trim() : '';
-      // vaste lengte-vergelijking is hier niet nodig: het token wordt niet
-      // geraden maar meegegeven door onze eigen scraper. Wel gelijk-lang eisen.
-      return !!aangeboden && aangeboden.length === TOKEN.length && aangeboden === TOKEN;
+      /* HIER STOND `aangeboden === TOKEN` met de redenering dat een vaste
+         lengte-vergelijking niet nodig is "want het token wordt niet geraden
+         maar meegegeven door onze eigen scraper". Dat beschrijft het gelukkige
+         pad en niet de aanvaller: wie dit endpoint vindt kan het token wel
+         degelijk proberen te raden, en === stopt bij het eerste verschillende
+         teken. Overal elders in dit huis staat veiligGelijk; vanochtend zat
+         dezelfde fout op de clustersleutel. Nu ook hier. */
+      return !!aangeboden && veiligGelijk(aangeboden, TOKEN);
     }
     /* Zonder token: alleen van dichtbij. Let op dat we het SOCKETADRES gebruiken
        en niet req.ip -- die kan van een X-Forwarded-For komen, en dan zou een

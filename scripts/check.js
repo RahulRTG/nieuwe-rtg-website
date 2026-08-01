@@ -1483,5 +1483,73 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ' met een poort in de handler, ' + PUBLIEK.size + ' bewust publiek met een reden');
 }
 
+/* 29) de Authorization-kop wordt gelezen om een token te HALEN, niet om te oordelen.
+
+   Dit is de handhaver voor LAT.md regel 8, die tot nu toe alleen een voornemen
+   was: een controle op VORM is geen controle.
+
+   Het geval dat hem opleverde stond in /api/translate:
+
+       const ingelogd = <regex op Bearer>.test(req.get('authorization') || '');
+
+   Een regex op een header. Wie "Bearer x" meestuurde zette daarmee de weg naar
+   de betaalde AI-aanbieder open, zonder account en zonder rekening. Het
+   commentaar erboven beloofde precies het tegenovergestelde, dus lezen hielp
+   niet, en de bijbehorende toets gaf de vlag zelf mee, dus toetsen ook niet.
+
+   De regel: elke plek die de kop leest, moet binnen twaalf regels het eruit
+   gehaalde token door een echte verifier halen (verifyToken, resolveSession,
+   sessionFor, veiligGelijk, ...). Wie de kop alleen betast, wordt aangewezen.
+
+   LET OP HET STRIPPEN, want daar ging het twee keer mis. Deze regel meldt een
+   REGELNUMMER en zoekt naar een STRING, en de twee bestaande strippers kunnen
+   elk maar een van die twee:
+   - zonderCommentaar (hierboven) vervangt een blokcommentaar door EEN spatie en
+     plet daarmee elk regelnummer erna; mijn eerste meting wees zo vier
+     onschuldige plekken aan;
+   - kruisscan.strip houdt de regels heel maar haalt ook STRINGS weg, dus
+     req.get('authorization') werd req.get(...) en het patroon matchte nog maar
+     een van de zeventien plekken -- opnieuw een scan die bijna niets ziet en
+     vrolijk groen meldt.
+   Vandaar hieronder een derde variant die allebei doet: commentaar weg, strings
+   en newlines heel. Dat is bewust GEEN vierde kopie van de andere twee: hij
+   lost een eis op die geen van beide dekt, en dat staat hier zodat de volgende
+   niet opnieuw de verkeerde pakt. */
+console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, niet om te oordelen');
+{
+  /* commentaar weg, strings en regelnummers heel */
+  const stripRegels = (b) => String(b)
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+  const KOP = /req\.get\(\s*['"]authorization['"]\s*\)|req\.headers\s*\[\s*['"]authorization['"]\s*\]|req\.headers\.authorization/i;
+  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
+  const VENSTER = 12;   // regels waarbinnen de verificatie moet volgen
+  /* Plekken die de kop bewust lezen zonder te verifieren. Vandaag leeg, en dat
+     hoort zo te blijven: wie hier iets toevoegt legt uit waarom betasten hier
+     genoeg is. Kun je dat niet, dan is het waarschijnlijk gewoon een gat. */
+  const MAG_BETASTEN = new Map([
+    ['server/foundation/basis.js:131', 'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het. Een extractor is geen beslissing.'],
+    ['server/kern/stuur.js:110', 'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.']
+  ]);
+  let los = 0, gekeurd = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const regels = stripRegels(fs.readFileSync(f, 'utf8')).split('\n');
+    regels.forEach((r, i) => {
+      if (!KOP.test(r)) return;
+      gekeurd++;
+      const plek = rel + ':' + (i + 1);
+      if (MAG_BETASTEN.has(plek)) return;
+      if (VERIFIER.test(regels.slice(i, i + VENSTER).join('\n'))) return;
+      los++;
+      fout(plek + ' leest de Authorization-kop maar haalt het token binnen ' + VENSTER +
+        ' regels niet door een verifier -- een controle op de VORM van een header is geen' +
+        ' authenticatie (LAT.md regel 8)');
+    });
+  });
+  if (!los) ok(gekeurd + ' plekken lezen de Authorization-kop, en elk daarvan verifieert het token (' +
+    MAG_BETASTEN.size + ' benoemd als uitzondering)');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

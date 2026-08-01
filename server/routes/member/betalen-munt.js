@@ -8,7 +8,7 @@
 const { veiligeFout } = require('../../kern/util');
 module.exports = (mctx) => {
   const { app, auth, db, save, accounts, memberTemplate, betaal, fonds, munten, factuur,
-    broadcastSync, stateFor, findSupplier, liveCodename } = mctx;
+    broadcastSync, stateFor, findSupplier, liveCodename, ledenStaat } = mctx;
 
   app.post('/api/munt/opties', (req, res) => res.json(munten.opties()));
 
@@ -16,7 +16,7 @@ module.exports = (mctx) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     if (!munten.aan()) return res.status(503).json({ error: 'Betalen met munten is niet beschikbaar.' });
     const own = !!req.session.account;
-    const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;
+    const md = ledenStaat(req);
     const inv = (md.invoices || []).find(i => i.id === req.body.invoiceId);
     if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
     if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
@@ -53,13 +53,5 @@ module.exports = (mctx) => {
       res.json({ ok: true, verzoek, supplier: { code: s.code, name: s.name } });
     } catch (e) { res.status(400).json({ error: veiligeFout(e, 'Kon geen munt-adres maken.') }); }
   });
-
-  /* Facturen downloaden. Elk lid kan zijn eigen factuur als PDF ophalen, en een
-     jaaroverzicht van alle facturen. Zelf gebouwd, zonder externe pakketten. */
-  function ledenInvoices(req) {
-    const own = !!req.session.account;
-    const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;
-    return md.invoices || [];
-  }
 
 };

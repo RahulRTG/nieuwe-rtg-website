@@ -14,14 +14,27 @@ const path = require('path');
 const { startServer, stop } = require('./helper');
 
 let srv, base, lid, office;
+/* De vier-ogen op het OPSCHALEN vraagt twee ECHTE personen. Vroeger stonden hier
+   twee verzonnen namen in de body ('Aïsha' vraagt aan, 'Bram' bevestigt) op een
+   en dezelfde gedeelde kantoorcode -- en dat was precies het theater dat de
+   securityronde heeft opgeruimd: aanvrager en bevestiger kwamen allebei uit
+   req.body.naam, dus een sessie kon beide rollen spelen. Opschalen zit nu achter
+   de boardroomdeur en de identiteit komt uit de sessie. Deze twee tokens zijn
+   dus geen testdecor maar de kern van wat de knop beschermt. */
+let baas, tweede;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bank-'));
 
 const api = (pad, body, token) => fetch(base + '/api/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-// kantoor-aanroep (/api/office/...) met een naam erbij (voor de vier-ogen: aanvrager vs bevestiger)
+// kantoor-aanroep (/api/office/...): de gewone bankschermen draaien op de
+// gedeelde kantoorcode; dat mag, want kijken en beheren is kantoorwerk.
 const oapi = (pad, body, nm) => api('office/' + pad, { ...(body || {}), naam: nm || 'boardroom' }, office.token);
+/* Maar OPSCHALEN niet. Die vijf routes (draai, modus, operationeel en de twee
+   autoriseer-knoppen) zitten achter de boardroomdeur en lezen de identiteit uit
+   de sessie. Vandaar een aparte helper met een persoonstoken. */
+const bapi = (pad, body, token) => api('office/' + pad, body || {}, token);
 
 function ibanGeldig(iban) {
   const her = iban.slice(4) + iban.slice(0, 4);
@@ -40,17 +53,42 @@ test.before(async () => {
   const o = await (await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'KANTOOR-BANK-1' }) })).json();
   office = { token: o.token };
   assert.ok(office.token, 'het kantoor logt in');
+
+  /* En nu twee personen voor de vier-ogen. De eerste is de eigenaar: hij logt in
+     op zijn EIGEN account en stapt daarmee de backoffice in, dus zijn sessie
+     draagt een identiteit (user-N) in plaats van een gedeelde code. */
+  const eig = await (await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' }) })).json();
+  assert.ok(eig.token, 'de eigenaar logt in op zijn eigen account');
+  baas = (await api('account/start', { rol: 'kantoor' }, eig.token)).body.token;
+  assert.ok(baas, 'en staat met dat account in de backoffice');
+
+  /* De tweede is een ander mens: een gewoon lid dat van de eigenaar
+     boardroom-toegang krijgt. Dat is de enige manier om aan een tweede
+     identiteit te komen -- en dat is precies de bedoeling van de deur. */
+  const u = Date.now().toString().slice(-8);
+  const reg = await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Tweede Paar Ogen', email: 'ogen' + u + '@x.nl', phone: '06' + u,
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
+  assert.ok(reg.token, 'het tweede lid is geregistreerd');
+  const cn = (await api('state', {}, reg.token)).body.state.user.codename;
+  const geef = await bapi('boardroom/toegang/geef', { codenaam: cn }, baas);
+  assert.equal(geef.status, 200, 'de eigenaar geeft boardroom-toegang: ' + JSON.stringify(geef.body).slice(0, 140));
+  const kop = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, reg.token);
+  assert.equal(kop.status, 200, 'het tweede lid koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
+  tweede = (await api('account/start', { rol: 'kantoor' }, reg.token)).body.token;
+  assert.ok(tweede, 'en staat als tweede persoon in de backoffice');
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 // zet de bank in de eigen-stand via de vier-ogen-flow (aanvraag + bevestiging)
 async function naarEigen() {
-  let r = await oapi('bank/draai', {}, 'Aïsha');            // partner -> (auth) hybride
-  if (r.body.needsAuth) await oapi('bank/autoriseer/bevestig', { id: r.body.autorisatie.id }, 'Bram');
-  r = await oapi('bank/draai', {}, 'Aïsha');                // hybride -> (auth) eigen
-  if (r.body.needsAuth) await oapi('bank/autoriseer/bevestig', { id: r.body.autorisatie.id }, 'Bram');
+  let r = await bapi('bank/draai', {}, baas);              // partner -> (auth) hybride
+  if (r.body.needsAuth) await bapi('bank/autoriseer/bevestig', { id: r.body.autorisatie.id }, tweede);
+  r = await bapi('bank/draai', {}, baas);                  // hybride -> (auth) eigen
+  if (r.body.needsAuth) await bapi('bank/autoriseer/bevestig', { id: r.body.autorisatie.id }, tweede);
 }
-async function naarPartner() { await oapi('bank/modus', { modus: 'partner' }, 'Aïsha'); } // afschalen mag direct
+async function naarPartner() { await bapi('bank/modus', { modus: 'partner' }, baas); } // afschalen mag direct
 
 test('leden-bank: dicht tot de boardroom hem live zet; akkoord (opt-in) opent de eerste rekening', async () => {
   const dicht = await api('bank/overzicht', {}, lid.token);
@@ -78,17 +116,21 @@ test('een rekening openen levert een geldig IBAN; storten clearet in partner-sta
 });
 
 test('de knop schakelt via VIER OGEN op het opschalen; afschalen mag direct', async () => {
-  const aanvraag = await oapi('bank/draai', {}, 'Aïsha');
+  /* De gedeelde kantoorcode komt er niet eens in: die is geen persoon, en met
+     een aanvrager zonder identiteit is vier ogen een woord en geen regel. */
+  assert.equal((await oapi('bank/draai', {}, 'Aïsha')).status, 403, 'de gedeelde code schaalt niets op');
+
+  const aanvraag = await bapi('bank/draai', {}, baas);
   assert.equal(aanvraag.body.needsAuth, true, 'opschalen wacht op een tweede persoon');
   const id = aanvraag.body.autorisatie.id;
-  assert.equal((await oapi('bank/autoriseer/bevestig', { id }, 'Aïsha')).status, 403, 'dezelfde persoon mag niet bevestigen');
-  const bevest = await oapi('bank/autoriseer/bevestig', { id }, 'Bram');
+  assert.equal((await bapi('bank/autoriseer/bevestig', { id }, baas)).status, 403, 'dezelfde persoon mag niet bevestigen');
+  const bevest = await bapi('bank/autoriseer/bevestig', { id }, tweede);
   assert.equal(bevest.body.operationeel, true);
   assert.equal(bevest.body.modus, 'hybride', 'na bevestiging staat de knop een slag verder');
   await naarEigen(); // door naar eigen
   const stort = await api('bank/storten', { iban: lid.iban, centen: 10000, idem: 's2' }, lid.token);
   assert.equal(stort.body.via, 'eigen', 'in de eigen-stand emitteert de bank zelf');
-  assert.equal((await oapi('bank/modus', { modus: 'partner' }, 'Aïsha')).body.modus, 'partner', 'terug naar partner mag direct (afschalen)');
+  assert.equal((await bapi('bank/modus', { modus: 'partner' }, baas)).body.modus, 'partner', 'terug naar partner mag direct (afschalen)');
 });
 
 test('nood-fallback: noodstop laat alles weer via de kaart clearen; drie mislukkingen tript automatisch', async () => {

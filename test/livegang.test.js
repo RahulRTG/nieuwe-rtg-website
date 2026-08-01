@@ -29,7 +29,16 @@ test.before(async () => {
     OFFICE_CODE: 'GEHEIME-CODE-123',
     // sinds de sleutel-hardening (config fail-fast) eist een productiestart de
     // gedeelde kluis- en tokensleutel; zonder deze weigert de server te starten.
-    RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64)
+    RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
+    /* En sinds de betaal-ronde eist productie ook een STRIPE_SECRET_KEY. Reden:
+       zonder sleutel draait de demo-provider, en die bevestigt ELKE betaling
+       zelf -- facturen gaan op 'paid' zonder afschrijving terwijl de
+       30%-afdracht aan de RTFoundation wel geboekt wordt. Geld eruit, niets
+       erin. Deze test gaat niet over betalen maar over de livegang-grendels,
+       dus een testsleutel volstaat; STRIPE_DEMO_BEWUST=1 zou hier ook mogen,
+       maar dan zou de test de demo-provider meenemen in "productie start
+       schoon" en dat is precies niet wat hij wil aantonen. */
+    STRIPE_SECRET_KEY: 'sk_test_livegang', STRIPE_WEBHOOK_SECRET: 'whsec_livegang'
   } }));
 });
 test.after(() => {

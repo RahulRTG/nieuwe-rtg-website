@@ -6,13 +6,26 @@ module.exports = (kern) => {
   const { app, auth, db, save, accounts, memberTemplate, betaal, fonds, munten, factuur,
     broadcastSync, stateFor, findSupplier, liveCodename } = kern;
 
+  /* Het dossier van dit lid: een echt account heeft een eigen ledenstaat, een
+     demo-sessie deelt de gedeelde demo. Deze twee regels stonden op DRIE
+     plekken -- hier, en twee keer in ./betalen-munt.js -- en dat is precies hoe
+     ledenInvoices bij de laatste splitsing kon achterblijven in het ene bestand
+     terwijl het andere hem nog aanriep: /api/factuur gaf een 500 en een lid kon
+     zijn factuur niet meer downloaden. Nu een keer, hier, en doorgegeven. */
+  function ledenStaat(req) {
+    return req.session.account
+      ? (accounts.getMemberState(req.session.account.id) || memberTemplate())
+      : db.data;
+  }
+  const ledenInvoices = (req) => ledenStaat(req).invoices || [];
+
   app.post('/api/pay', auth, async (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const zPay = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.betalingen;
     if (zPay && zPay.aan === false) return res.status(503).json({ error: 'Betalen is tijdelijk uitgeschakeld.' });
     // Echte accounts betalen hun eigen facturen; demo-sessies de gedeelde demo.
     const own = !!req.session.account;
-    const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;
+    const md = ledenStaat(req);
     const invoices = md.invoices || [];
     let targets;
     if (req.body.all) {
@@ -91,7 +104,7 @@ module.exports = (kern) => {
   /* De muntkant (opties, ontvangstverzoek, rechtstreeks met munten betalen)
      staat in ./betalen-munt: een eigen onderwerp met een eigen aanbieder, en
      samen met de kaartkant paste het niet meer onder de 10 KB. */
-  require('./betalen-munt')(kern);
+  require('./betalen-munt')(Object.assign({}, kern, { ledenStaat, ledenInvoices }));
 
   app.post('/api/factuur', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });

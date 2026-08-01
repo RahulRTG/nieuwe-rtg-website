@@ -18,6 +18,8 @@ const PAS_VOLGORDE = ['gratis', 'rtg', 'lifestyle', 'business'];
 const PAS_NAAM = { gratis: 'Gratis app', rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
 const GESLACHT_NAAM = { v: 'Vrouw', m: 'Man', x: 'X' };
 
+const { maandCentenVoor } = require('./pasprijs');
+
 module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
   const eur = c => Math.round(c) / 100;
 
@@ -72,8 +74,14 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
     ).filter(m => m.codenaam).slice(0, 500);
 
     // de omzet per pas en de 30%-foundationsplit (20% lokaal, 10% RTF)
-    const prijzen = (geldPasprijzen && geldPasprijzen().passen) || {};
-    const maandCenten = { gratis: 0, rtg: (prijzen.rtg || {}).maandCenten || 0, lifestyle: (prijzen.lifestyle || {}).maandCenten || 0 };
+    /* Uit ../pasprijs.js, net als het betaalschema en de ledenfacturen. Hier
+       stond `|| 0` als terugval, en dat is stiller dan het lijkt: op een verse
+       installatie (nog niets ingesteld in de boardroom) toonde de omzetstaat dan
+       NUL euro per lid, terwijl het betaalschema wel 65 euro in rekening bracht.
+       Twee kopieen, twee antwoorden op dezelfde vraag. */
+    const prijslijst = (() => { try { const p = geldPasprijzen && geldPasprijzen(); return (p && p.passen) || null; } catch (e) { return null; } })();
+    const maandCenten = { gratis: 0,
+      rtg: maandCentenVoor(prijslijst, 'rtg'), lifestyle: maandCentenVoor(prijslijst, 'lifestyle') };
     const omzet = PAS_VOLGORDE.map(pas => {
       const aantal = passen[pas] || 0;
       const opMaat = pas === 'business';

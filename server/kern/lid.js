@@ -8,6 +8,9 @@
    met andere RTG-leden, tenzij een hoger lid het contact eerst legde. */
 
 const salonviraal = require('./salonviraal');
+// Wat een pas per maand kost: een antwoord, gedeeld met het betaalschema en
+// het ledenregister. Zie de kop van ./pasprijs.js.
+const { maandCentenUit } = require('./pasprijs');
 
 function maakLid(deps) {
   const { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan } = deps;
@@ -89,23 +92,34 @@ function maakLid(deps) {
       // Echte accounts hebben hun eigen boekingen/betalingen; demo-sessies delen
       // de vaste demo-inhoud.
       const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate()) : db.data;
-      // Elke factuur krijgt een afboekcode (grootboeksuggestie) en de btw die in
-      // de ledenbijdrage is begrepen. Business-leden zien de volledige specificatie.
-      // De maandbijdrage volgt het prijsmodel per pas: 65 (RTG) of 20.000
-      // (Lifestyle) ex 21% btw; Business is prijs op maat (demo-bedrag hieronder).
-      const MAANDBIJDRAGE_EX = { rtg: 65, lifestyle: 20000, business: 7500 };
+      /* Elke factuur krijgt een afboekcode (grootboeksuggestie) en de btw die in
+         de ledenbijdrage is begrepen. Business-leden zien de volledige specificatie.
+
+         HIER STOND DE PRIJS EEN TWEEDE KEER. `{ rtg: 65, lifestyle: 20000,
+         business: 7500 }`, hard in euro's, terwijl de eigenaar de pasprijs in de
+         boardroom zet (kern/geldregie.js). Wie daar de prijs veranderde, kreeg
+         een lid te zien met de OUDE prijs op zijn factuur -- en het betaalschema
+         van de aanmelding rekende ondertussen wel met de nieuwe. Twee plekken,
+         een waarheid, en de factuur trok aan het kortste eind.
+
+         Erger nog was de Business Pass. Die is volgens de regie nadrukkelijk
+         `opMaat: true` en heeft dus GEEN maandprijs; hier stond 7500, en dat
+         werd 7500 x 1,21 = 9.075 euro op de factuur van een lid. Een bedrag dat
+         nergens is afgesproken. maandCentenVoor geeft voor business null, en
+         null is hier een antwoord: dan blijft staan wat er stond en verzinnen we
+         niets. */
       const PASNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
+      const bijdrageCenten = maandCentenUit(deps.geldPasprijzen, sess.tier);
       state.invoices = (md.invoices || []).map(inv => {
         const contrib = /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(inv.desc);
-        if (contrib && MAANDBIJDRAGE_EX[sess.tier]) {
-          const ex = MAANDBIJDRAGE_EX[sess.tier];
+        if (contrib && PASNAAM[sess.tier]) {
           inv = {
             ...inv,
             desc: (lang === 'en' ? 'Monthly contribution ' : 'Maandbijdrage ') + PASNAAM[sess.tier] +
-                  (sess.tier === 'business' ? (lang === 'en' ? ' (bespoke)' : ' (prijs op maat)') : '') +
+                  (bijdrageCenten == null ? (lang === 'en' ? ' (bespoke)' : ' (prijs op maat)') : '') +
                   (lang === 'en' ? ' · July 2026' : ' · juli 2026'),
-            netto: 0,
-            bijdrage: Math.round(ex * 1.21 * 100) / 100
+            // alleen invullen als er echt een prijs IS; anders het bedrag laten staan
+            ...(bijdrageCenten == null ? {} : { netto: 0, bijdrage: Math.round(bijdrageCenten * 1.21) / 100 })
           };
         }
         return {

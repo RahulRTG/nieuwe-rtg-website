@@ -6,16 +6,15 @@
    Draait op de gedeelde context die kern/aanmeldingen.js opbouwt. */
 module.exports = (ctx) => {
   const { B, geldPasprijzen, rid, nu, eur, PASSEN } = ctx;
+  const { maandCentenUit } = require('../pasprijs');
 
   // de maandbijdrage van een pas in centen, uit de geld-regie. Business is op maat
   // (null: het bedrag spreekt RTG per klant af); gratis is 0.
   function maandCentenVan(pas) {
-    let p = null; try { p = geldPasprijzen ? geldPasprijzen() : null; } catch (e) { p = null; }
-    const passen = (p && p.passen) || {};
-    if (pas === 'business') return null;         // op maat
-    if (pas === 'rtg') return (passen.rtg || {}).maandCenten != null ? passen.rtg.maandCenten : 6500;
-    if (pas === 'lifestyle') return (passen.lifestyle || {}).maandCenten != null ? passen.lifestyle.maandCenten : 2000000;
-    return 0;
+    // Een antwoord, uit ../pasprijs.js. Hier stond een eigen kopie met eigen
+    // terugvalwaarden; ledenregister.js had er nog een, en lid.js had er geen
+    // en verzon zijn eigen bedragen. Zie de kop van dat bestand.
+    return maandCentenUit(geldPasprijzen, pas);
   }
   // een maand erbij op een ISO-datum (voor het 12-maands-schema)
   function plusMaanden(iso, n) { const d = new Date(iso); d.setMonth(d.getMonth() + n); return d.toISOString(); }

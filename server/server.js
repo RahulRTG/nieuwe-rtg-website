@@ -1122,7 +1122,11 @@ const talen = maakTalen({ db, save });
 // De leden-kern wordt vóór de sociale laag gebouwd; deps.zijnVrienden wordt
 // hieronder laat-gebonden gevuld zodra de vriendenlaag bestaat (voor de
 // Salon-zichtbaarheid: van een vriend zie je een bericht altijd).
-const lidDeps = { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan };
+/* geldPasprijzen laat gebonden, net als bij de aanmeldingen: de geld-regie wordt
+   verderop gemount, en de ledenfacturen worden pas op request-tijd opgebouwd.
+   Zonder deze regel viel lid.js terug op eigen, hard ingetikte bedragen. */
+const lidDeps = { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan,
+  geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null) };
 const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications } =
   maakLid(lidDeps);
 

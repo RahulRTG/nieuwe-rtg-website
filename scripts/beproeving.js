@@ -96,6 +96,7 @@ const N_REVIEW = Number(process.env.MEGA_REVIEW || (MODE === 'postgres' ? 60000 
    schaalt de latentie-lat nog steeds mee, zodat het een echte, haalbare lat
    blijft die regressies vangt in plaats van een onmogelijke muur. */
 const STRENG = process.env.STRENG === '1';
+const TOKEN_VERS_MS = Number(process.env.TOKEN_VERS_MS || 10000);
 const SOAK_MS = Number(process.env.SOAK_MIN || (MODE === 'postgres' ? 20 : 3)) * 60000;
 const WERKERS = Number(process.env.STORM_WERKERS || (MODE === 'postgres' ? (STRENG ? 48 : 24) : (STRENG ? 24 : 12)));
 /* De 10x-strenge latentie-lat (200 ms) geldt voor de in-memory sqlite-standaard
@@ -747,9 +748,36 @@ async function misbruikBeproeving(tok) {
   async function verhaalLoper() {
     while (Date.now() < stormEind) await verhalen.draaiRonde(verhaalDeur, podium, stormRapport);
   }
+
+  /* ---- DE STORM LOGT ZICHZELF UIT ----
+     De gauntlet bestookt ELK endpoint met een geldig token, en /api/logout is
+     een endpoint. Dat trekt het token in -- terecht, dat is ooit expres zo
+     gerepareerd. Gevolg: vanaf de eerste keer dat een werker daar langskomt,
+     krijgt die rol alleen nog 401. In de eerste run met de rol-tabel was dat
+     zichtbaar als member 0,3% 2xx tegen office 32,1%, en het DEKKING-oordeel
+     bleef groen omdat dat hits telt en geen zinvolle antwoorden. Dekking die
+     geen dekking is, nu in het stormharnas zelf.
+
+     Uitzonderen van /api/logout zou de test verzwakken (juist die route hoort
+     gefuzzt te worden). Daarom worden de tokens tijdens de storm ververst. */
+  let tokenVersingen = 0;
+  async function tokenVerser() {
+    while (Date.now() < stormEind) {
+      await new Promise(r => setTimeout(r, TOKEN_VERS_MS));
+      if (Date.now() >= stormEind) break;
+      try {
+        const t = await tokens();
+        if (t.member && t.member.length) tokVoor.member = t.member;
+        if (t.supplier && t.supplier.length) tokVoor.supplier = t.supplier;
+        if (t.office && t.office.length) tokVoor.office = t.office;
+        tokenVersingen++;
+      } catch (e) { /* een mislukte verversing is geen reden de storm te stoppen */ }
+    }
+  }
   await Promise.all([
     ...Array.from({ length: WERKERS }, (_, ix) => werker(ix)),
-    ...(podium ? [verhaalLoper()] : [])
+    ...(podium ? [verhaalLoper()] : []),
+    tokenVerser()
   ]);
   clearInterval(mon);
   const stormDuurMs = Date.now() - stormStart;
@@ -779,6 +807,13 @@ async function misbruikBeproeving(tok) {
      De basislijn komt uit dezelfde aanroep VOOR de storm, dus de drempel schaalt
      mee met de machine in plaats van een verzonnen vast getal te zijn. */
   kop('FASE E2: HERSTEL - komt de gewone gebruiker terug op zijn oude snelheid?');
+  /* EEN VERS TOKEN, en dat is geen valsspelen. De storm heeft zichzelf uitgelogd
+     (zie de tokenVerser hierboven); dat token is met opzet ingetrokken. De vraag
+     hier is of een GEWONE gebruiker zijn snelheid terugkrijgt, en die stond niet
+     met /api/logout te fuzzen. Meten met een moedwillig ingetrokken token zou
+     altijd 401 opleveren en nooit iets over herstel zeggen. */
+  const versTok = await tokens();
+  if (versTok.member && versTok.member.length) tokVoor.member = versTok.member;
   const gewoonToken = () => rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office);
   async function gewoneAanroep() {
     const st = await verzoek('POST', '/api/state', gewoonToken(), {});
@@ -820,6 +855,7 @@ async function misbruikBeproeving(tok) {
 
   // ---------- METING ----------
   kop('METING');
+  rij('tokens ververst tijdens de storm', tokenVersingen + 'x \x1b[2m(de storm bestookt ook /api/logout en trekt zo zijn eigen token in)\x1b[0m');
   rij('stormduur (gemeten)', (stormDuurMs / 1000).toFixed(1) + ' s  \x1b[2m(ingesteld: ' + (SOAK_MS / 1000) + ' s)\x1b[0m');
   rij('afgehandelde calls (gauntlet)', nl(totaal) + '  (~' + Math.round(totaal / (stormDuurMs / 1000)) + '/s)');
   rij('  2xx / herleide 4xx', nl(buckets.ok) + ' / ' + nl(buckets.herleid4xx));

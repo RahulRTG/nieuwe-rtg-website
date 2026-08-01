@@ -28,9 +28,15 @@
 
    Gebruik:
      const { bouwGezelschap } = require('./gezelschap');
-     const g = await bouwGezelschap(base, officeToken);
+     const g = await bouwGezelschap(base);
+
+   Er gaat GEEN kantoortoken meer in. Dat was er toen een gedeelde code nog een
+   pas kon toekennen; sindsdien haalt dit bestand zelf een backoffice-sessie op
+   die aan een persoon hangt. Een meegegeven token zou dus niets meer doen, en
+   een parameter die niets doet is een belofte die niet klopt.
 */
 const assert = require('node:assert/strict');
+const { kantoorAlsPersoon } = require('./helper');
 
 /* De genres zoals de aanmeldingen-kern ze kent. Deze lijst is hier alleen om te
    kunnen MELDEN wat er nog niet bezet is; het publiek zelf wordt gebouwd op wat
@@ -52,7 +58,13 @@ const uniek = () => (Date.now().toString(36) + (teller++).toString(36)).slice(-9
 /* opties.genres = false laat het genre-deel weg. Dat is voor toetsen die het
    publiek nodig hebben maar niet de breedte: zeventig leden aanmaken om er drie
    te verwijderen kost een minuut per run en levert niets extra's op. */
-async function bouwGezelschap(base, officeToken, opties) {
+async function bouwGezelschap(base, opties) {
+  /* Wie hier nog het oude kantoortoken meegeeft, krijgt dat te horen. Zonder deze
+     regel zou zo'n string stil als optiesobject doorgaan en zou `genres: false`
+     in de derde positie verdwijnen -- een toets die dan zeventig leden aanmaakt
+     in plaats van vier, en niemand die het merkt. */
+  if (typeof opties === 'string')
+    throw new Error('bouwGezelschap(base, opties): het kantoortoken is vervallen, geef alleen de opties mee.');
   const post = maakPost(base);
   const metGenres = !opties || opties.genres !== false;
 
@@ -75,14 +87,25 @@ async function bouwGezelschap(base, officeToken, opties) {
   }
 
   /* Optillen naar Lifestyle of Business: aanvragen met je eigen token en dan
-     een MENS in de backoffice die ja zegt. Er is met opzet geen kortere weg. */
+     een MENS in de backoffice die ja zegt. Er is met opzet geen kortere weg.
+
+     EN DIE MENS MOET EEN NAAM HEBBEN. Dit hulpje gaf hier de GEDEELDE
+     kantoorcode mee, en die wijst niemand aan. Sinds beslis() voor deze twee
+     passen een herleidbaar persoon eist, levert dat een 403 en staat er geen
+     Lifestyle- of Business-lid in het proefpubliek. Dat is geen last van de
+     regel maar de bedoeling ervan: het publiek loopt nu dezelfde weg als
+     personeel in productie. */
+  const persoonlijkKantoor = await kantoorAlsPersoon(base);
+  assert.ok(persoonlijkKantoor,
+    'een personeelslid komt met zijn eigen account de backoffice in; zonder dat kan niemand een pas toekennen');
+
   async function tilOp(l, pas) {
     const aanvraag = await post('/api/aanmelding/aanvraag',
       { pas, naam: l.naam, contact: l.email }, l.token);
     assert.equal(aanvraag.status, 200, 'aanvraag lukt: ' + JSON.stringify(aanvraag.body));
     assert.equal(aanvraag.body.aanmelding.gekoppeld, true, 'de aanvraag hangt aan het account');
     const besluit = await post('/api/aanmelding/beslis',
-      { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'proefpubliek' }, officeToken);
+      { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'proefpubliek' }, persoonlijkKantoor);
     assert.equal(besluit.status, 200, 'het menselijke besluit lukt: ' + JSON.stringify(besluit.body));
     l.pas = pas;
     return l;

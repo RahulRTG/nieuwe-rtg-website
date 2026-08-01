@@ -137,6 +137,14 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   // staat in ./aanmeldingen/besluit.js; zie de kop daar waarom apart.
   const { beslis } = require('./aanmeldingen/besluit')({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSEN });
 
+  /* Seam voor de AI-laag: mag deze pas automatisch worden toegekend? Nooit, voor
+     geen enkele pas. Zo kan geen enkele assistent per ongeluk toegang beloven.
+     De parameter staat er om de vraag te kunnen stellen, niet om hem te
+     beantwoorden -- wie hier ooit een pas wil vrijgeven, moet dat expliciet
+     opschrijven en langs de merkregel verantwoorden.
+     (Deze uitleg stond in ./aanmeldingen/besluit.js; die splitsing nam wel de
+     beslis-functie mee maar liet dit commentaar bij een functie achter die er
+     niet meer stond.) */
   function magAutomatischToekennen(pas) { return false; }
 
   /* Een termijn aftekenen als voldaan (administratieve bevestiging door een

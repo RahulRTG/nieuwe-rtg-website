@@ -35,7 +35,7 @@ test('het hele gezelschap staat er, en iedereen bereikt iedereen', async () => {
       .then(r => r.json());
     assert.ok(office.token, 'het kantoor kan binnen');
 
-    const g = await bouwGezelschap(base, office.token);
+    const g = await bouwGezelschap(base);
     const post = g.post;
 
     // ---- de passen, en hoe ze ontstonden ----

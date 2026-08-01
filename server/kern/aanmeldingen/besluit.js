@@ -55,8 +55,5 @@ module.exports = ({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSE
     return { ok: true, aanmelding: beeld(a), betaalschema: besluit === 'geaccepteerd' };
   }
 
-  /* Seam voor de AI-laag: mag deze pas automatisch worden toegekend? Nooit voor
-     Lifestyle/Business. Zo kan geen enkele assistent per ongeluk toegang beloven. */
-
   return { beslis };
 };

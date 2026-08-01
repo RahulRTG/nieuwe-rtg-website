@@ -186,11 +186,32 @@ function stopNet(child, ms) {
   });
 }
 
-/* Een lid optillen naar Lifestyle/Business langs de ENIGE geldige weg: zelf
-   registreren geeft altijd hooguit RTG, dus dienen we met het ledentoken een
-   aanvraag in (dat koppelt het account) en laten RTG-personeel die accepteren.
-   `approverToken` is een office- of eigenaars-token (beide komen door officeAuth).
-   Handig voor tests die een echt Business/Lifestyle-lid nodig hebben. */
+function postJson(base) {
+  return (pad, body, tok) => fetch(base + pad, {
+    method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    body: JSON.stringify(body || {}) }).then(r => r.json());
+}
+
+/* EEN BACKOFFICE-SESSIE MET EEN NAAM ERAAN.
+
+   De gedeelde kantoorcode wijst niemand aan. Sinds een Lifestyle- of Business
+   Pass uitsluitend door een herleidbaar persoon wordt toegekend, is die code
+   voor die twee passen niet meer genoeg (403). Dit hulpje loopt de weg die een
+   personeelslid in productie ook loopt: inloggen op zijn EIGEN RTG-account en
+   daarmee de backoffice in.
+
+   Dit staat hier los omdat twee plekken hem nodig hebben (elevateTier en het
+   proefpubliek in gezelschap.js). Twee kopieen van dezelfde weg lopen uiteen
+   zodra de inlog verandert -- LAT.md regel 4. Geeft null als het niet lukt, zodat
+   de aanroeper zelf kan besluiten wat dat betekent. */
+async function kantoorAlsPersoon(base) {
+  const post = postJson(base);
+  const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+  if (!eig || !eig.token) return null;
+  const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
+  return (kantoor && kantoor.token) || null;
+}
+
 /* Een lid naar Lifestyle of Business tillen, zoals het in het echt gaat: een
    aanvraag, en daarna het menselijke besluit.
 
@@ -203,18 +224,12 @@ function stopNet(child, ms) {
    doen, en het houdt veertien toetsbestanden op een echt scenario in plaats van
    op een omweg. */
 async function elevateTier(base, memberToken, pas, approverToken) {
-  const post = (pad, body, tok) => fetch(base + pad, {
-    method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
-    body: JSON.stringify(body || {}) }).then(r => r.json());
+  const post = postJson(base);
   const aanvraag = await post('/api/aanmelding/aanvraag', { pas, naam: 'Test ' + pas, contact: pas + '@test.example' }, memberToken);
   const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
   if (!id) throw new Error('elevateTier: aanvraag mislukt (' + JSON.stringify(aanvraag).slice(0, 120) + ')');
   let goedkeurder = approverToken;
-  if (pas === 'lifestyle' || pas === 'business') {
-    const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
-    const kantoor = eig.token && await post('/api/account/start', { rol: 'kantoor' }, eig.token);
-    if (kantoor && kantoor.token) goedkeurder = kantoor.token;
-  }
+  if (pas === 'lifestyle' || pas === 'business') goedkeurder = (await kantoorAlsPersoon(base)) || approverToken;
   const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, goedkeurder);
   if (!besluit.aanmelding || besluit.aanmelding.status !== 'geaccepteerd')
     throw new Error('elevateTier: beslis mislukt (' + JSON.stringify(besluit).slice(0, 120) + ')');
@@ -253,6 +268,6 @@ function letOpFouten(page, bak) {
    zelfs als een geslaagde weigering. Spawn dan wel met stderr op 'pipe'. */
 function bewaakKind(kind) { if (kind && kind.stderr) luisterOpFouten(kind); return kind; }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, letOpFouten, bewaakKind,
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

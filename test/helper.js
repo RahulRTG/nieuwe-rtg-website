@@ -4,6 +4,7 @@
    sporadische "fetch failed"), en kan de suite weer met concurrency draaien. */
 const { spawn } = require('node:child_process');
 const net = require('node:net');
+const os = require('node:os');
 const path = require('node:path');
 
 // Een vrije poort van het besturingssysteem: bind op 0, lees de toegewezen
@@ -82,10 +83,27 @@ async function startEens(opts) {
   // geladen is (belangrijk in Postgres-modus), en een test die meteen na
   // "gezond" een API aanroept zou daarop stranden.
   const wachtPad = opts.wachtPad || '/api/ready';
-  // 250 x 100ms = 25s: als de hele suite parallel draait boot een server soms
-  // ruim boven de 15s die hier eerst stond (twee keer zo gezien in een verder
-  // groene run); dit is alleen geduld op het foutpad, een snelle boot blijft snel
-  const pogingen = opts.pogingen || 250;
+  /* HOE LANG WACHTEN WE, EN WAT ZEGGEN WE ALS HET NIET LUKT.
+
+     Deze grens is al twee keer opgehoogd (15s -> 25s) en werd allebei de keren
+     opgehoogd om dezelfde reden: onder volle belasting boot een server trager
+     dan de teller toestond. Dat is geen defect maar drukte, en toch stond er dan
+     "server werd niet gezond" -- een zin die leest als "de server is stuk". Die
+     ene zin heeft in deze codebase inmiddels meer dan een uur zoekwerk gekost
+     naar een fout die er niet was.
+
+     Twee dingen zijn daarom veranderd. Het geduld schaalt nu mee met de
+     belasting van de machine: op een rustige machine blijft het 25 seconden, op
+     een machine die al vol staat wordt het ruimer. En als het dan alsnog niet
+     lukt, ZEGT de fout wat er aan de hand was -- leefde het kindproces nog, hoe
+     lang is er gewacht, en hoe zwaar stond de machine. Een levend kind plus een
+     hoge belasting is drukte; een gestopt kind is een echt defect. Dat verschil
+     hoort in de melding te staan en niet in het hoofd van wie hem leest. */
+  const kernen = Math.max(1, os.cpus().length);
+  const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
+  const extra = Math.min(4, Math.max(1, Math.round(druk)));    // hooguit vier keer zo geduldig
+  const pogingen = opts.pogingen || 250 * extra;
+  const gestart = Date.now();
   const port = await vrijePoort();
   const base = 'http://127.0.0.1:' + port;
   // Zonder eigen stderr-optie vangen we de stderr op (pipe) om de strenge poort te
@@ -120,8 +138,16 @@ async function startEens(opts) {
     } catch (e) { /* nog niet op; opnieuw proberen */ }
     await new Promise(r => setTimeout(r, 100));
   }
+  const leefde = child.exitCode == null;
+  const seconden = Math.round((Date.now() - gestart) / 1000);
+  const nu1 = (os.loadavg()[0] / kernen).toFixed(1);
   try { child.kill('SIGKILL'); } catch (e) {}
-  throw new Error('server werd niet gezond op ' + base);
+  throw new Error('server werd niet gezond op ' + base
+    + ' na ' + seconden + 's; het kindproces ' + (leefde ? 'LEEFDE nog' : 'was al gestopt')
+    + ', belasting ' + nu1 + 'x de kernen'
+    + (leefde && Number(nu1) > 1
+      ? ' -- dit ziet eruit als DRUKTE, niet als een defect: draai deze toets los om het te bevestigen.'
+      : ''));
 }
 
 function stop(child) { if (child) try { child.kill('SIGKILL'); } catch (e) {} }

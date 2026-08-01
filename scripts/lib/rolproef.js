@@ -126,12 +126,29 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
   const bevindingen = { tweexx: [], lekken: [], gewijzigd: [] };
   const rollen = ['member', 'supplier', 'office'];
 
+  /* ---- EEN VAST TOKEN PER ROL, VOOR DE HELE PROEF ----
+     Dit ging mis en het kostte een run. De aanroeper levert tokensVoor() met een
+     WILLEKEURIGE keuze uit de beschikbare tokens, en deze proef riep hem vier
+     keer los aan: een keer voor de ijking, een keer voor de voormeting, per
+     schrijfpoging, en een keer voor de nameting. Daardoor laadde de ijking 137
+     cent op persona A, las de voormeting persona B en de nameting persona C.
+
+     Het rapport meldde toen "blijvende wijziging: saldo 137 -> 0" en dat zag
+     eruit als een ernstige bevinding: een verkeerde rol die een saldo leegtrekt.
+     Het waren drie verschillende gebruikers. Een proef die appels met peren
+     vergelijkt geeft geen vals-negatief maar een VALS ALARM, en dat is op termijn
+     net zo schadelijk: na drie keer loos alarm zet iemand de proef uit.
+
+     Daarom hier een keer kiezen en dat vasthouden. */
+  const vast = tokensVoor();
+  const vastVoor = () => vast;
+
   /* EERST IJKEN, DAN PAS OORDELEN. Zie ijkVingerafdruk(): als een legitieme
      wijziging met de juiste rol de vingerafdruk niet laat bewegen, is hij blind
      en mag hij niets beweren. Dat is regel 2 op het meetinstrument zelf, en het
      is er gekomen omdat deze proef een uur lang op PASS stond terwijl hij vijf
      keer null met vijf keer null vergeleek. */
-  const ijk = await ijkVingerafdruk(post, tokensVoor());
+  const ijk = await ijkVingerafdruk(post, vastVoor());
   if (!ijk.gevoelig) {
     return {
       bevindingen: { tweexx: [], lekken: [], gewijzigd: [],
@@ -142,7 +159,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
     };
   }
 
-  const voor = await vingerafdruk(post, tokensVoor());
+  const voor = await vingerafdruk(post, vastVoor());
   let gedaan = 0;
   for (const r of routes) {
     if (r.method === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties
@@ -151,7 +168,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
     for (const rol of rollen) {
       if (rol === r.rol) continue;                    // alleen de VERKEERDE rollen
       if (maxPerRol && gedaan >= maxPerRol) break;
-      const tk = tokensVoor()[rol];
+      const tk = vastVoor()[rol];
       if (!tk) continue;
       const st = await post(r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);
       gedaan++;
@@ -170,7 +187,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
     }
   }
 
-  const na = await vingerafdruk(post, tokensVoor());
+  const na = await vingerafdruk(post, vastVoor());
   for (const k of new Set([...Object.keys(voor), ...Object.keys(na)])) {
     if (voor[k] == null && na[k] == null) continue;
     if (voor[k] !== na[k]) bevindingen.gewijzigd.push(k + ': ' + voor[k] + ' -> ' + na[k]);

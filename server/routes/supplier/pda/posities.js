@@ -7,17 +7,40 @@ module.exports = (kctx) => {
   const { netState, netPaar, netLink } = kctx;
 
 /* Ingeklokt en geaccrediteerd: een personeelslid dat OOK op het rooster van een
-   verbonden zaak staat (zelfde naam), wisselt van afdeling zonder nieuwe PIN.
-   De PIN is bij het inloggen al bewezen; de accreditatie is dubbel: de zaken
-   zijn verbonden in het personeelsnetwerk EN de manager van de andere zaak
-   heeft de persoon zelf in het team gezet. */
-function wisselDoelen(code, staffId) {
+   verbonden zaak staat, wisselt van afdeling zonder nieuwe PIN. De PIN is bij
+   het inloggen al bewezen; de accreditatie is dubbel: de zaken zijn verbonden
+   in het personeelsnetwerk EN de manager van de andere zaak heeft de persoon
+   zelf in het team gezet.
+
+   "DEZELFDE PERSOON" WAS HIER "DEZELFDE WEERGAVENAAM", EN DAT IS GEEN IDENTITEIT.
+
+   De naam op een personeelskaart is vrije tekst die de manager van die zaak
+   zelf intikt. Stond er bij een verbonden zaak een manager met dezelfde naam,
+   dan wisselde je daarheen en kreeg je zijn rol -- inclusief manager: true.
+   Erger nog: de manager van de EIGEN zaak mag namen aanpassen, dus die kon een
+   medewerker hernoemen naar de naam van een manager bij de buren en hem zo aan
+   rechten helpen die hij daar niet heeft. En zonder enige kwade wil botsen
+   twee Jan de Vries'en bij twee verbonden zaken gewoon met elkaar.
+
+   De echte identiteit ligt er al: member_id, de koppeling aan het ene
+   RTG-account (dezelfde die staffPositions gebruikt voor "1x aanmelden"
+   hieronder). Daarop matchen we nu.
+
+   Personeel ZONDER gekoppeld RTG-account kan dus niet meer wisselen. Dat is
+   geen verlies maar de kern: zonder identiteit valt niet te bewijzen dat het
+   dezelfde persoon is, en dan hoort er geen sessie bij een andere zaak uit te
+   komen. Zo iemand logt gewoon met zijn eigen PIN in bij de andere zaak. */
+function ikBij(code, staffId) {
   const ik = accounts.listStaff(code).find(m => m.id === staffId);
+  return (ik && ik.member_id != null) ? ik : null;
+}
+function wisselDoelen(code, staffId) {
+  const ik = ikBij(code, staffId);
   if (!ik) return [];
   return netState().links
     .filter(l => l.status === 'akkoord' && (l.a === code || l.b === code))
     .map(l => (l.a === code ? l.b : l.a))
-    .filter(ander => accounts.listStaff(ander).some(m => m.name === ik.name));
+    .filter(ander => accounts.listStaff(ander).some(m => m.member_id === ik.member_id));
 }
 app.post('/api/supplier/wissel/opties', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.json({ opties: [] });
@@ -34,8 +57,12 @@ app.post('/api/supplier/wissel', supplierAuth, (req, res) => {
   if (!wisselDoelen(req.supplier.code, req.actor.staffId).includes(doel.code)) {
     return res.status(403).json({ error: 'U bent daar niet geaccrediteerd: de zaken moeten verbonden zijn en de manager moet u in het team hebben gezet.' });
   }
-  const ik = accounts.listStaff(req.supplier.code).find(m => m.id === req.actor.staffId);
-  const daar = accounts.listStaff(doel.code).find(m => m.name === ik.name);
+  const ik = ikBij(req.supplier.code, req.actor.staffId);
+  // wisselDoelen hierboven heeft dit al bewezen; deze twee regels zijn de
+  // vangnetten voor het geval iemand ooit een derde weg naar hier maakt
+  if (!ik) return res.status(403).json({ error: 'Wisselen vraagt een personeelskaart die aan uw RTG-account gekoppeld is.' });
+  const daar = accounts.listStaff(doel.code).find(m => m.member_id === ik.member_id);
+  if (!daar) return res.status(403).json({ error: 'U staat daar niet op het rooster.' });
   const token = crypto.randomBytes(24).toString('hex');
   rememberSession(token, { role: 'supplier', code: doel.code, actor: daar.name, staffId: daar.id, staffRole: daar.role, manager: daar.role === 'manager' });
   logActivity(doel.code, { name: daar.name }, daar.name + ' wisselde van afdeling (vanuit ' + req.supplier.name + ')');

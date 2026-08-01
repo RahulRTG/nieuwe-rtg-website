@@ -152,3 +152,84 @@ test('3. de rithistorie is van de eigen zaak, met een zoekveld en paginas', asyn
   assert.equal(resto.status, 200);
   for (const r of resto.body.items) assert.notEqual(r.supplierCode, 'MKKX', 'geen ritten van de buren');
 });
+
+/* ============================================================================
+   "DEZELFDE PERSOON" WAS "DEZELFDE WEERGAVENAAM".
+
+   De hele accreditatie hing op `m.name === ik.name`. De naam op een
+   personeelskaart is vrije tekst die de manager van die zaak zelf intikt, dus
+   dat is geen identiteit maar een etiket:
+
+   - stond er bij de verbonden zaak een MANAGER met dezelfde naam, dan
+     wisselde je daarheen en kreeg je zijn rol mee (manager: true);
+   - de manager van je EIGEN zaak mag namen aanpassen, dus die kon een
+     medewerker hernoemen naar de naam van een manager bij de buren;
+   - en zonder enige kwade wil botsen twee Jan de Vries'en gewoon.
+
+   Deze situatie was in de seed niet te maken (geen verbonden zaken, geen
+   personeel met een gekoppeld account), dus stond de test hierboven met
+   `if (opties.length)` altijd op nul: hij bewees niets over het geval dat
+   ertoe deed. Deze test bouwt de situatie daarom zelf op.
+   ========================================================================== */
+test('4. wisselen kijkt naar het RTG-account, niet naar de naam op de kaart', async () => {
+  // de twee zaken verbinden (allebei een manager, dus een echte tweezijdige link)
+  await api('/api/supplier/net/verzoek', { code: 'HOSHI' }, baas);
+  const akkoord = await api('/api/supplier/net/beslis', { code: 'KIKUNOI', actie: 'akkoord' }, buurbaas);
+  assert.equal(akkoord.body.status, 'akkoord', 'KIKUNOI en HOSHI zijn verbonden');
+
+  // wie ben ik bij KIKUNOI?
+  const roster = await api('/api/supplier/roster', { code: 'KIKUNOI' });
+  const ik = (roster.body.staff || []).find(x => x.role !== 'manager');
+  assert.ok(ik, 'ik werk bij KIKUNOI en ben geen manager');
+
+  /* DE AANVAL: de buurzaak krijgt iemand met MIJN naam -- en met de rol
+     manager. Vroeger was dat genoeg: gelijke naam = gelijke persoon = wissel,
+     met de rol van de kaart daar. */
+  const dubbel = await api('/api/supplier/staff/add', { name: ik.name, role: 'manager' }, buurbaas);
+  assert.equal(dubbel.status, 200, 'de buurzaak heeft nu een manager met dezelfde naam: ' + JSON.stringify(dubbel.body).slice(0, 120));
+
+  const opties = (await api('/api/supplier/wissel/opties', {}, werker)).body.opties || [];
+  assert.ok(!opties.some(o => o.code === 'HOSHI'),
+    'een gelijke naam bij de buren is GEEN werkplek van mij (kreeg: ' + JSON.stringify(opties) + ')');
+  const poging = await api('/api/supplier/wissel', { code: 'HOSHI' }, werker);
+  assert.equal(poging.status, 403, 'en wisselen lukt dus niet');
+  assert.ok(!poging.body.token, 'zeker geen token voor de buren, al helemaal geen manager-token');
+});
+
+/* En de andere kant: met een ECHT gedeeld RTG-account werkt het wel. Anders
+   had ik de functie gewoon uitgezet in plaats van hem juist gemaakt. */
+test('5. met hetzelfde RTG-account achter beide kaarten wisselt het wel', async () => {
+  const u = Date.now().toString().slice(-8);
+  const email = 'wissel' + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: 'Wisselwerker', email, phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1992-02-02', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, 'een RTG-account als identiteit');
+
+  /* De aanmeldroute zoekt de zaak op BEDRIJFSNAAM, niet op code -- de
+     medewerker krijgt van zijn werkgever "Sal de Mar", niet "KIKUNOI". De
+     uitnodiging geeft die naam zelf terug, dus die nemen we over in plaats van
+     hem hier nog eens op te schrijven. */
+  const PIN = '4321'; // zelfgekozen; de server geeft een gegenereerde pin nooit terug
+  const aanmelden = async (mgrToken, waar) => {
+    const inv = await api('/api/supplier/staff/invite', { name: 'Wisselwerker', role: 'staff' }, mgrToken);
+    assert.equal(inv.status, 200, 'uitnodiging bij ' + waar);
+    const join = await api('/api/supplier/staff/join', { bedrijf: inv.body.bedrijf,
+      kassacode: inv.body.invite.kassacode, login: email, password: 'geheim123', pin: PIN });
+    assert.equal(join.status, 200, 'aangemeld bij ' + inv.body.bedrijf + ': ' + JSON.stringify(join.body).slice(0, 160));
+    return join.body;
+  };
+  const bijKik = await aanmelden(baas, 'KIKUNOI');
+  await aanmelden(buurbaas, 'HOSHI');
+
+  // inloggen op de KIKUNOI-kaart en dan wisselen
+  assert.ok(bijKik.staffId, 'de aanmelding levert een kaart: ' + JSON.stringify(bijKik).slice(0, 160));
+  const tok = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: bijKik.staffId, pin: PIN })).body.token;
+  assert.ok(tok, 'ingelogd op de eigen kaart');
+
+  const opties = (await api('/api/supplier/wissel/opties', {}, tok)).body.opties || [];
+  assert.ok(opties.some(o => o.code === 'HOSHI'), 'HOSHI is nu wel een werkplek van mij: ' + JSON.stringify(opties));
+  const w = await api('/api/supplier/wissel', { code: 'HOSHI' }, tok);
+  assert.equal(w.status, 200, JSON.stringify(w.body).slice(0, 160));
+  const daar = await api('/api/supplier/state', {}, w.body.token);
+  assert.equal(daar.body.state.supplier.code, 'HOSHI', 'en het token werkt echt bij de buren');
+});

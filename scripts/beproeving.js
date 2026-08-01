@@ -72,6 +72,9 @@ const http = require('http');
    lopen er tijdens de storm volledige, logische verhalen van echte mensen mee,
    met harde beweringen over geld, status en aankomst. */
 const verhalen = require('./verhalen');
+/* CPU, event-loop, database en het herstel na de storm. Eigen module: dit
+   harnas stond al op 58 kB en die meters hebben elk hun eigen uitleg nodig. */
+const belasting = require('./lib/belasting');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -650,10 +653,37 @@ async function misbruikBeproeving(tok) {
   const machineFactor = process.env.RUIS_UIT === '1' ? 1 : Math.min(3, kal.factor);
   rij('machine-kalibratie (rust)', 'basis ' + kal.basis.toFixed(1) + ' ms - p99 ' + kal.p99.toFixed(1) + ' ms - ruisfactor ' + kal.factor.toFixed(2));
 
+  /* De basislijn voor het HERSTEL-oordeel: hoe snel is een gewone aanroep als er
+     niets aan de hand is. Hier gemeten en niet achteraf geschat, want achteraf
+     is de server niet meer in rust en zou de drempel meebewegen met de schade
+     die we juist willen meten. */
+  let herstelBasisMs = 0, herstelBasisN = 0;
+  {
+    const metingen = [];
+    for (let i = 0; i < 12; i++) {
+      const tk = rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office);
+      const st = await verzoek('POST', '/api/state', tk, {});
+      if (st.status >= 200 && st.status < 300) metingen.push(st.ms);
+      await new Promise(r => setTimeout(r, 40));
+    }
+    metingen.sort((a, b) => a - b);
+    herstelBasisN = metingen.length;
+    herstelBasisMs = metingen.length ? metingen[Math.floor(metingen.length / 2)] : 50;   // mediaan
+  }
+
   // ---------- FASE E: GAUNTLET (vernietigende storm, komt NA de asserties) ----------
   kop('FASE E: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');
   const buckets = { ok: 0, herleid4xx: 0, r429: 0, r503: 0, s5xx: 0, stuk: 0 };
   const vijfxx = new Map(); const perEnd = new Map(); const rolLek = [];
+  /* PER ROL, en niet alleen per endpoint. Een totaalpercentage verbergt dat een
+     hele rol eruit ligt: honderd kapotte kantoor-endpoints verdwijnen in de ruis
+     van duizend werkende lid-endpoints. Bij een verkeerde rol (kruis) is 4xx het
+     GOEDE antwoord, dus die twee worden apart geteld -- ze door elkaar husselen
+     maakt "foutpercentage" een getal zonder betekenis. */
+  const perRol = new Map();
+  const rolTel = (naam) => { let r = perRol.get(naam); if (!r) perRol.set(naam, r = { n: 0, ok: 0, c4xx: 0, c5xx: 0, r429: 0, r503: 0, stuk: 0 }); return r; };
+  const cpu = belasting.cpuMeter(child.pid);
+  const lusMonsters = [];
   let totaal = 0; const rssReeks = [];
   let stormEind = Date.now() + SOAK_MS;
   async function raak(r, magKruisen) {
@@ -665,15 +695,17 @@ async function misbruikBeproeving(tok) {
     const body = r.method === 'GET' ? null : (r.schakel ? { aan: true } : chaosBody(0));
     const st = await verzoek(r.method, r.pad, tk, body);
     totaal++; noteerLat(st.ms);
-    const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0 }; pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
+    const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0, ok: 0, c4xx: 0, c5xx: 0, r429: 0, r503: 0, stuk: 0 };
+    pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
+    const pr = rolTel(kruis ? r.rol + ' (verkeerde rol)' : r.rol); pr.n++;
     if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
     const s = st.status;
-    if (s === 0) buckets.stuk++;
-    else if (s === 503) buckets.r503++;
-    else if (s === 429) buckets.r429++;
-    else if (s >= 500) { buckets.s5xx++; vijfxx.set(r.pad, (vijfxx.get(r.pad) || 0) + 1); }
-    else if (s >= 400) buckets.herleid4xx++;
-    else { buckets.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.method + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
+    if (s === 0) { buckets.stuk++; pe.stuk++; pr.stuk++; }
+    else if (s === 503) { buckets.r503++; pe.r503++; pr.r503++; }
+    else if (s === 429) { buckets.r429++; pe.r429++; pr.r429++; }
+    else if (s >= 500) { buckets.s5xx++; pe.c5xx++; pr.c5xx++; vijfxx.set(r.pad, (vijfxx.get(r.pad) || 0) + 1); }
+    else if (s >= 400) { buckets.herleid4xx++; pe.c4xx++; pr.c4xx++; }
+    else { buckets.ok++; pe.ok++; pr.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.method + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
     await new Promise(res => setTimeout(res, 1 + rint(4)));
   }
   async function werker(ix) {
@@ -696,7 +728,17 @@ async function misbruikBeproeving(tok) {
   }
 
   const vloerVers = await heapNaGc(child.pid);
-  const mon = setInterval(() => { const m = rssMB(child.pid); if (m) rssReeks.push(m); }, 3000);
+  cpu.start();
+  const mon = setInterval(() => {
+    const m = rssMB(child.pid); if (m) rssReeks.push(m);
+    cpu.monster();
+    /* De event-loop uit de server zelf, TIJDENS de storm. Van buiten gemeten
+       zeggen onze eigen latenties niets over of de lus vaststaat: een verzoek
+       dat 90 ms duurt omdat de lus 80 ms bezet was, ziet er van hier precies zo
+       uit als een verzoek dat zelf 90 ms werk deed. */
+    belasting.lusVanServer('127.0.0.1', PORT).then(v => { if (v) lusMonsters.push(v); }).catch(() => {});
+  }, 3000);
+  const stormStart = Date.now();
   stormEind = Date.now() + SOAK_MS;
   /* De verhalenloper draait NAAST de werkers, in hetzelfde tijdvenster: ronde na
      ronde zolang de storm duurt. Hij telt niet mee in de latentie- en
@@ -710,6 +752,42 @@ async function misbruikBeproeving(tok) {
     ...(podium ? [verhaalLoper()] : [])
   ]);
   clearInterval(mon);
+  const stormDuurMs = Date.now() - stormStart;
+
+  /* ---------- HERSTEL NA DE STORM ----------
+     Dit ontbrak volledig: de meting stopte precies wanneer de last stopte. Maar
+     overleven is de halve vraag. Een server die de aanval doorstaat en er daarna
+     niet meer uitkomt -- een wachtrij die vol blijft, een pool die niet
+     vrijgeeft, geheugen dat blijft staan -- is in productie net zo stuk, en je
+     merkt het pas op het slechtste moment.
+
+     We meten wat een GEWONE gebruiker ervaart: POST /api/state met een
+     ledentoken, de meest gewone aanroep die de app doet. Een antwoord dat geen
+     2xx is telt als niet-hersteld en niet als "snel", want een gebruiker die
+     wordt afgewezen is niet geholpen -- dat is precies het geval dat een
+     latentiegemiddelde mooi maakt en de gebruiker niets oplevert.
+
+     De basislijn komt uit dezelfde aanroep VOOR de storm, dus de drempel schaalt
+     mee met de machine in plaats van een verzonnen vast getal te zijn. */
+  kop('FASE E2: HERSTEL - komt de gewone gebruiker terug op zijn oude snelheid?');
+  const gewoonToken = () => rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office);
+  async function gewoneAanroep() {
+    const st = await verzoek('POST', '/api/state', gewoonToken(), {});
+    return (st.status >= 200 && st.status < 300) ? st.ms : Infinity;
+  }
+  const herstel = await belasting.herstelNaStorm({
+    meet: gewoneAanroep, basisMs: Math.max(5, herstelBasisMs), factor: 2,
+    venesterMs: Number(process.env.HERSTEL_VENSTER_MS || 60000), stapMs: 1000
+  });
+  const rssNaStorm = rssMB(child.pid);
+  const lusNaStorm = await belasting.lusVanServer('127.0.0.1', PORT);
+  rij('basislijn voor de storm', herstelBasisMs.toFixed(1) + ' ms (gewone aanroep, ' + herstelBasisN + 'x)');
+  rij('hersteld binnen het venster', herstel.hersteld
+    ? '\x1b[32mja, na ' + herstel.naSeconden + ' s\x1b[0m (grens ' + herstel.grensMs + ' ms)'
+    : '\x1b[31mNEE\x1b[0m binnen ' + (Number(process.env.HERSTEL_VENSTER_MS || 60000) / 1000) + ' s (grens ' + herstel.grensMs + ' ms)');
+  if (herstel.verloop.length)
+    rij('  verloop (s: ms)', herstel.verloop.slice(0, 8).map(v => v.tSec + 's:' + (v.ms === Infinity ? 'afgewezen' : Math.round(v.ms))).join('  '));
+
   // de storm kan functies hebben uitgezet; voor de lek-meting weer alles aan
   await allesAan((await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token);
 
@@ -734,7 +812,8 @@ async function misbruikBeproeving(tok) {
 
   // ---------- METING ----------
   kop('METING');
-  rij('afgehandelde calls (gauntlet)', nl(totaal) + '  (~' + Math.round(totaal / (SOAK_MS / 1000)) + '/s)');
+  rij('stormduur (gemeten)', (stormDuurMs / 1000).toFixed(1) + ' s  \x1b[2m(ingesteld: ' + (SOAK_MS / 1000) + ' s)\x1b[0m');
+  rij('afgehandelde calls (gauntlet)', nl(totaal) + '  (~' + Math.round(totaal / (stormDuurMs / 1000)) + '/s)');
   rij('  2xx / herleide 4xx', nl(buckets.ok) + ' / ' + nl(buckets.herleid4xx));
   rij('  429 / 503 (rate-limit / feature-uit)', nl(buckets.r429) + ' / ' + nl(buckets.r503));
   rij('  timeout/afgekapt', nl(buckets.stuk));
@@ -746,6 +825,47 @@ async function misbruikBeproeving(tok) {
   // structureel traag pad. Dit is de kaart voor de volgende latentie-ronde.
   const traagste = [...perEnd.entries()].filter(([, e]) => e.n >= 3).sort((a, b) => b[1].max - a[1].max).slice(0, 8);
   if (traagste.length) { rij('traagste endpoints', 'piek / gemiddeld (aantal)'); for (const [pad, e] of traagste) rij('  ' + pad, e.max + ' / ' + Math.round(e.som / e.n) + ' ms  (' + nl(e.n) + 'x)'); }
+
+  /* ---- FOUTEN PER ENDPOINT ----
+     Een totaalpercentage verbergt dat een handjevol routes helemaal stuk is. Een
+     5xx is altijd fout; een 4xx tijdens deze storm is meestal GOED (de invoer
+     was rommel), dus die staan apart en 4xx wordt alleen gemeld waar hij
+     opvallend hoog is bij een route die met de JUISTE rol wordt aangeroepen. */
+  const met5xx = [...perEnd.entries()].filter(([, e]) => e.c5xx > 0).sort((a, b) => b[1].c5xx - a[1].c5xx).slice(0, 10);
+  rij('endpoints met serverfouten (5xx)', met5xx.length ? nl(met5xx.length) + ' -- hieronder' : '\x1b[32mgeen\x1b[0m');
+  for (const [pad, e] of met5xx)
+    rij('  ' + pad, e.c5xx + ' van ' + nl(e.n) + ' (' + (100 * e.c5xx / e.n).toFixed(1) + '%)');
+  const afgewezen = [...perEnd.entries()].filter(([, e]) => e.n >= 10 && e.ok === 0)
+    .sort((a, b) => b[1].n - a[1].n).slice(0, 8);
+  rij('endpoints die NOOIT 2xx gaven', afgewezen.length ? nl(afgewezen.length) + ' (>=10 pogingen)' : '\x1b[32mgeen\x1b[0m');
+  for (const [pad, e] of afgewezen)
+    rij('  ' + pad, nl(e.n) + 'x, alles ' + (e.c4xx ? '4xx' : e.r503 ? '503' : e.r429 ? '429' : 'geweigerd'));
+
+  /* ---- FOUTEN PER ROL ----
+     Bij een VERKEERDE rol is 4xx het goede antwoord; die regel meet dus of de
+     rol-scheiding werkt, niet of er iets stuk is. Ze door elkaar husselen maakt
+     "foutpercentage" een getal zonder betekenis, en daarom staan ze los. */
+  rij('per rol', '2xx / 4xx / 5xx / 429 / 503  (aantal)');
+  for (const [naam, r] of [...perRol.entries()].sort((a, b) => b[1].n - a[1].n)) {
+    const p = (x) => (100 * x / r.n).toFixed(1) + '%';
+    rij('  ' + naam, p(r.ok) + ' / ' + p(r.c4xx) + ' / ' +       (r.c5xx ? '\x1b[31m' + p(r.c5xx) + '\x1b[0m' : p(r.c5xx)) + ' / ' + p(r.r429) + ' / ' + p(r.r503) + '  (' + nl(r.n) + ')');
+  }
+
+  /* ---- CPU, EVENT-LOOP, DATABASE ---- */
+  const cpuUit = cpu.lees();
+  rij('CPU van de server tijdens de storm', cpuUit
+    ? cpuUit.gemiddeld + '% gemiddeld, piek ' + cpuUit.piek + '% \x1b[2m(100% = een volle kern van ' + os.cpus().length + ')\x1b[0m'
+    : 'niet te meten');
+  if (lusMonsters.length) {
+    const maxLus = Math.max(...lusMonsters.map(v => v.max || 0));
+    const p99Lus = Math.max(...lusMonsters.map(v => v.p99 || 0));
+    rij('event-loop-vertraging tijdens de storm', 'p99 ' + p99Lus.toFixed(1) + ' ms, max ' + maxLus.toFixed(1) + ' ms  \x1b[2m(' + lusMonsters.length + ' monsters)\x1b[0m');
+  } else rij('event-loop-vertraging tijdens de storm', 'niet gelezen (metrics-deur dicht?)');
+  if (lusNaStorm) rij('event-loop na de storm', 'p99 ' + lusNaStorm.p99 + ' ms, max ' + lusNaStorm.max + ' ms');
+  const dbNa = belasting.dbBelasting(TMP, MODE === 'postgres' ? (process.env.DATABASE_URL || process.env.PG_URL) : null);
+  rij('database (' + dbNa.stand + ')', dbNa.schijfKB != null ? nl(dbNa.schijfKB) + ' kB op schijf' : 'niet te meten');
+  if (dbNa.verbindingen != null) rij('  verbindingen', dbNa.verbindingen + ' van ' + dbNa.maxVerbindingen + ' (commits ' + nl(dbNa.commits) + ', rollbacks ' + nl(dbNa.rollbacks) + ')');
+  if (rssNaStorm != null) rij('RAM na de storm', rssNaStorm + ' MB \x1b[2m(piek onder last was ' + Math.max(...rssReeks, 0) + ' MB)\x1b[0m');
   const dal = rssReeks.length ? Math.min(...rssReeks) : rssNa, piek = rssReeks.length ? Math.max(...rssReeks) : rssNa;
   rij('RAM (RSS) dal/piek onder last', dal + ' / ' + piek + ' MB');
   rij('heapUsed vers -> opgewarmd (na GC)', vloerVers + ' -> ' + vloers[0] + ' MB');
@@ -761,8 +881,14 @@ async function misbruikBeproeving(tok) {
     rustSom = verhalen.schrijfRapport(rustRapport, 'GOEDE VERHALEN - IJKING IN RUST (voor de storm)');
     stormSom = verhalen.schrijfRapport(stormRapport, 'GOEDE VERHALEN - MIDDENIN DE STORM');
     const pogingen = stormSom.gelukt + stormSom.afgewezen + stormSom.gefaald;
-    rij('verhalen in rust', rustSom.gelukt + ' gelukt / ' + rustSom.afgewezen + ' afgewezen / ' + rustSom.gefaald + ' gefaald');
-    rij('verhalen tijdens de storm', stormSom.gelukt + ' gelukt / ' + stormSom.afgewezen + ' afgewezen / ' + stormSom.gefaald + ' gefaald');
+    /* SLAAGPERCENTAGE, want de aantallen alleen zeggen niets over de prijs van
+       de aanval. "99,8% in rust tegen 83% in de storm" is een kwaliteitsmaat;
+       "1771 gelukt" is een getal waar je niets mee kunt zonder de noemer. */
+    const slaag = (som) => { const n = som.gelukt + som.afgewezen + som.gefaald; return n ? (100 * som.gelukt / n) : 0; };
+    const rustPct = slaag(rustSom), stormPct = slaag(stormSom);
+    rij('verhalen in rust', rustSom.gelukt + ' gelukt / ' + rustSom.afgewezen + ' afgewezen / ' + rustSom.gefaald + ' gefaald  \x1b[1m(' + rustPct.toFixed(1) + '% slaagt)\x1b[0m');
+    rij('verhalen tijdens de storm', stormSom.gelukt + ' gelukt / ' + stormSom.afgewezen + ' afgewezen / ' + stormSom.gefaald + ' gefaald  \x1b[1m(' + stormPct.toFixed(1) + '% slaagt)\x1b[0m');
+    rij('  wat de aanval kost aan bruikbaarheid', (rustPct - stormPct).toFixed(1) + ' procentpunt \x1b[2m(' + rustPct.toFixed(1) + '% -> ' + stormPct.toFixed(1) + '%)\x1b[0m');
     rij('  waarvan afgewezen op', stormSom.af429 + 'x snelheidslimiet (429), ' + stormSom.af503 + 'x dicht (503: De Wacht, functie uit of zekering)');
     rij('  doorkomstpercentage', pogingen ? (100 * stormSom.gelukt / pogingen).toFixed(1) + '% van de verhalen kwam er tijdens de storm doorheen' : 'n.v.t.');
     /* WAAROM de deur dichtging, met de woorden van de server zelf. Dit cijfer
@@ -808,6 +934,13 @@ async function misbruikBeproeving(tok) {
      De Wacht alles afwijst -- en dan staat er een groene regel boven een
      platform waar geen klant meer binnenkomt. Een bewering over een lege
      verzameling is vanzelf waar; die val is in dit huis vaak genoeg dichtgeslagen. */
+  /* HERSTEL. Overleven is de halve vraag; eruit komen is de andere helft. Zonder
+     dit oordeel is de herstelmeting een mooi lijstje zonder gevolgen -- precies
+     het soort meter dat niet kan zakken. */
+  v('HERSTEL', herstel.hersteld,
+    herstel.hersteld
+      ? 'gewone aanroep terug op ' + herstel.grensMs + ' ms binnen ' + herstel.naSeconden + ' s (basislijn ' + herstelBasisMs.toFixed(1) + ' ms)'
+      : 'NIET hersteld binnen het venster; de gewone gebruiker bleef traag of afgewezen na de storm');
   v('VERHALEN',
     !podiumFout && rustSom.gefaald === 0 && stormSom.gefaald === 0 && stormSom.gelukt > 0,
     podiumFout ? 'podium kwam niet klaar: ' + podiumFout.slice(0, 80)

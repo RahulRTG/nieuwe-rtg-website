@@ -12,13 +12,13 @@
    andere regels. Koppelen bewijst altijd eerst de bestaande werk-inlog; het
    ene account wordt zo een sleutelbos, geen achterdeur.
 
-   maakEenAccount(state) volgt het vaste kern-patroon. */
-
-const MAX_POGING = 5; // koppel-pogingen per account per minuut
+   maakEenAccount(state) volgt het vaste kern-patroon. Het BEWIJZEN zelf (de
+   drie soorten, met de twee remmen) staat in ./eenaccount/koppelen.js; hier de
+   sleutelbos en het munten van de sessie. */
 
 function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, hasCred, DEMO,
   DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, rememberSession, logInlog, logActivity,
-  supplierState, officeState, magWerken, pinInfo, pinCheck }) {
+  supplierState, officeState, magWerken, pinInfo, pinCheck, pinSlot }) {
   const nu = () => new Date().toISOString();
   function lijst(key) {
     if (!db.data.accountRollen || typeof db.data.accountRollen !== 'object') db.data.accountRollen = {};
@@ -27,19 +27,13 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
   }
   const zelfde = (a, b) => a.rol === b.rol && (a.code || '') === (b.code || '') && (a.staffId || null) === (b.staffId || null);
 
-  // een klein slot tegen brute-force op het koppelen (per account)
-  const pogingen = new Map();
-  function teVaak(key) {
-    const p = pogingen.get(key) || { n: 0, tot: 0 };
-    if (p.tot > Date.now()) return true;
-    return false;
-  }
-  function fout(key) {
-    const p = pogingen.get(key) || { n: 0, tot: 0 };
-    p.n++;
-    if (p.n >= MAX_POGING) { p.n = 0; p.tot = Date.now() + 60000; }
-    pogingen.set(key, p);
-  }
+  /* Meteen bij het opstarten, niet pas bij de eerste poging: een ontbrekend
+     doel-slot is stil een gat, en zo'n stille terugval is precies hoe dit gat
+     is ontstaan. Liever een server die niet start. */
+  if (!pinSlot || typeof pinSlot.personeel !== 'function')
+    throw new Error('eenaccount: pinSlot ontbreekt; zonder gedeeld doel-slot is /api/account/koppel een tweede, ongeremde deur naar de personeelspin.');
+  const koppelen = require('./eenaccount/koppelen')({ accounts, findSupplier, checkCred, hasCred,
+    DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu });
 
   /* ---- de sleutelbos van dit account ---- */
   function accRollen(key) {
@@ -49,41 +43,9 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
 
   /* ---- een rol koppelen: altijd eerst de bestaande werk-inlog bewijzen ---- */
   async function accKoppel(key, body, req) {
-    if (teVaak(key)) return { status: 429, error: 'Te veel koppel-pogingen. Wacht een minuut.' };
-    const soort = String((body || {}).soort || '');
-    let rol = null;
-    if (soort === 'personeel') {
-      const s = findSupplier(body.code);
-      if (!s) return { status: 404, error: 'Deze zaak-code kennen we niet.' };
-      const staff = await accounts.verifyStaffPin(Number(body.staffId), body.pin);
-      if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) {
-        fout(key);
-        logInlog('koppel', false, s.code + '#' + body.staffId, req);
-        return { status: 401, error: 'Onjuiste PIN.' };
-      }
-      rol = { rol: 'personeel', code: s.code, zaakNaam: s.name, staffId: staff.id, naam: staff.name, staffRole: staff.role, at: nu() };
-    } else if (soort === 'zaak') {
-      if (!DEMO) return { status: 403, error: 'De bedrijfsinlog is uitgeschakeld; koppel uw persoonlijke personeelslogin.' };
-      if (!hasCred(body) || !checkCred(body.username, body.password)) {
-        fout(key);
-        logInlog('koppel', false, 'zaak', req);
-        return { status: 401, error: 'Onjuiste gebruikersnaam of wachtwoord.' };
-      }
-      const s = findSupplier(DEMO_SUPPLIER);
-      if (!s) return { status: 404, error: 'De zaak is niet gevonden.' };
-      rol = { rol: 'zaak', code: s.code, zaakNaam: s.name, naam: 'Beheer', at: nu() };
-    } else if (soort === 'kantoor') {
-      if (!veiligGelijk(String(body.code || '').trim().toUpperCase(), OFFICE_CODE)) {
-        fout(key);
-        logInlog('koppel', false, 'kantoor', req);
-        return { status: 401, error: 'Onjuiste backoffice-code.' };
-      }
-      if (process.env.OFFICE_TOTP_SECRET && !totpOk(process.env.OFFICE_TOTP_SECRET, body.totp))
-        return { status: 401, error: 'Tweede factor vereist: voer de authenticator-code in.' };
-      rol = { rol: 'kantoor', at: nu() };
-    } else {
-      return { status: 400, error: 'Kies wat u koppelt: personeel, zaak of kantoor.' };
-    }
+    const uitslag = await koppelen.bewijs(key, body, req);
+    if (uitslag.error) return uitslag;
+    const rol = uitslag.rol;
     const rij = lijst(key).filter(r => !zelfde(r, rol));
     rij.push(rol);
     db.data.accountRollen[key] = rij.slice(-10);

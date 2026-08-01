@@ -7,7 +7,7 @@ module.exports = (kern) => {
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
+    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinSlot, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
@@ -31,18 +31,19 @@ app.post('/api/supplier/login', async (req, res) => {
     // Persoonlijke personeelslogin met PIN, binnen het bedrijfsaccount.
     s = findSupplier(req.body.code);
     if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
-    const fk = s.code + ':' + req.body.staffId;
-    const fail = pinFails.get(fk);
-    if (fail && fail.until > Date.now())
+    /* Het slot hangt aan het DOEL en wordt GEDEELD met /api/account/koppel:
+       die route komt op precies dezelfde verifyStaffPin uit en had een eigen
+       teller, per aanvrager. Zie server/pinslot.js. */
+    const fk = pinSlot.personeel(s.code, req.body.staffId);
+    if (pinSlot.dicht(fk))
       return res.status(429).json({ error: 'Te veel foute pogingen. Wacht een minuut en probeer het opnieuw.' });
     const staff = await accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
     if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) {
-      const n = ((fail && fail.n) || 0) + 1;
-      pinFails.set(fk, n >= 5 ? { n: 0, until: Date.now() + 60000 } : { n, until: 0 });
+      pinSlot.fout(fk, 'de personeelspin van ' + s.code + '#' + Number(req.body.staffId));
       logInlog('zaak', false, s.code + '#' + req.body.staffId, req);
       return res.status(401).json({ error: 'Onjuiste PIN.' });
     }
-    pinFails.delete(fk);
+    pinSlot.goed(fk);
     // het werkvenster van de werkgever: buiten het venster geen sessie
     // (de manager valt er nooit onder; vrijstellingen stelt de zaak zelf in)
     const wv = magWerken(s, { staffId: staff.id, manager: staff.role === 'manager' }, null, req.body.positie);

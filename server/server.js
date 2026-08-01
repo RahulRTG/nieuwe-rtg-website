@@ -1620,8 +1620,11 @@ function logActivity(code, actor, text) {
 
 // ---- leverancier: inloggen, live-stream, dashboard ----
 
-// Bescherming tegen PIN-raden: na 5 foute pogingen een minuut wachten.
-const pinFails = new Map(); // 'CODE:staffId' -> { n, until }
+/* Bescherming tegen PIN-raden: na 5 foute pogingen een minuut wachten. De
+   teller hangt aan het DOEL (deze pin) en wordt gedeeld door elke deur die op
+   die pin uitkomt -- /api/supplier/login en /api/account/koppel allebei. Zie
+   ./pinslot.js voor waarom dat een samenvoeging was en geen extra laag. */
+const pinSlot = require('./pinslot').maakPinSlot({ beveilig });
 
 // Roster van het bedrijf (voor het personeel-inlogscherm; geen PINs).
 
@@ -2220,7 +2223,7 @@ const kern = {
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
-  entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
+  entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
@@ -2940,7 +2943,9 @@ Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
   DEMO: kern.DEMO, DEMO_SUPPLIER: kern.DEMO_SUPPLIER, OFFICE_CODE: kern.OFFICE_CODE,
   veiligGelijk: kern.veiligGelijk, totpOk: kern.totpOk, rememberSession, logInlog: kern.logInlog,
   logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken,
-  pinInfo: kern.pinInfo, pinCheck: kern.pinCheck
+  pinInfo: kern.pinInfo, pinCheck: kern.pinCheck,
+  // hetzelfde doel-slot als /api/supplier/login: een pin, een teller
+  pinSlot
 }));
 /* Het kantoorgesprek (kern/kantoorgesprek.js): de backoffice binnenkomen door
    met Rahul te praten in plaats van een codeveld in te vullen. Zelfde slot als
@@ -3352,7 +3357,7 @@ accounts.startPostgres()
 setInterval(() => {
   const nu = Date.now();
   for (const [k, f] of loginFails) if (f.until < nu) loginFails.delete(k);
-  for (const [k, f] of pinFails) if (f.until < nu) pinFails.delete(k);
+  pinSlot.opruimen(); // ruimt alleen op wat niets meer tegenhoudt EN niets meer telt
   ruimBuffer();
 }, 5 * 60 * 1000).unref();
 backupData();

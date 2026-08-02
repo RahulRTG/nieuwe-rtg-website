@@ -112,8 +112,20 @@ function tabel() {
       bewaker: ['scripts/check.js', 'test'],
       wat: 'elke servermodule wordt door de toetsen echt uitgevoerd (uit dekkingsdata, niet uit namen)',
       dingen: () => {
-        const bron = path.join(WORTEL, 'DEKKING-LCOV.info');
-        if (!fs.existsSync(bron)) return null;   // niet te meten is geen nul
+        /* AANWEZIG IS NIET HETZELFDE ALS BRUIKBAAR.
+
+           Eerst stond hier alleen fs.existsSync(). Terwijl de dekkingsrun nog
+           bezig was lag er een HALF geschreven bestand, en de census meldde
+           prompt 1109 onbewaakte modules -- een getal dat nergens op sloeg,
+           geproduceerd door precies de meter die over samenhang gaat. Dat is
+           LAT.md regel 3 in het gereedschap dat die regel bewaakt.
+
+           Een lcov-bestand is af als het records bevat EN op end_of_record
+           eindigt. Alles daaronder is een run die nog loopt of is afgebroken,
+           en dan is "niet gemeten" het enige eerlijke antwoord. */
+        const lcov = lees('DEKKING-LCOV.info');
+        const records = (lcov.match(/^SF:/gm) || []).length;
+        if (records < 50 || !/end_of_record\s*$/.test(lcov)) return null;
         return loop(path.join(WORTEL, 'server'), n => n.endsWith('.js'));
       },
       bewaakt: p => {

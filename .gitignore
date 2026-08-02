@@ -24,3 +24,8 @@ public/dist/
 # het routejournaal van de laatste suite-run: invoer voor scripts/dekking.js,
 # geen bron. Wordt bij elke `npm test` opnieuw geschreven.
 .routejournaal
+
+# dekkingsdata van de laatste run: invoer voor scripts/samenhang.js, geen bron.
+# Twintig minuten om te maken, dus niet in de repo -- de census meldt netjes
+# NIET GEMETEN als hij er niet is.
+DEKKING-LCOV.info

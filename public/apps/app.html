@@ -913,7 +913,8 @@
     background:var(--knop);color:var(--knop-txt);
     font-size:0.78rem;font-weight:500;
     padding:0.75rem 1.25rem;border-radius:999px;
-    opacity:0;pointer-events:none;transition:all 0.3s ease;
+    opacity:0;pointer-events:none;
+    transition:opacity var(--rtg-tempo) var(--rtg-ease), transform var(--rtg-tempo) var(--rtg-ease);
     z-index:70;max-width:86%;text-align:center;
   }
   #toast.show{opacity:1;transform:translate(-50%, 0);}
@@ -1019,7 +1020,7 @@
     background:linear-gradient(160deg, var(--card2), var(--card));
     border:1px solid var(--line);
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.10), 0 6px 16px rgba(0,0,0,0.35);
-    transition:transform 0.13s cubic-bezier(0.22,0.7,0.3,1), border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), box-shadow 0.13s cubic-bezier(0.22,0.7,0.3,1);
+    transition:transform var(--rtg-vlot) var(--rtg-ease), border-color var(--rtg-vlot) var(--rtg-ease), box-shadow var(--rtg-vlot) var(--rtg-ease);
   }
   @media (hover:hover){
     .os-app:hover .os-tegel{
@@ -1090,13 +1091,16 @@
 
   /* app-opening: iOS-achtige zoom vanaf het grid */
   @media (prefers-reduced-motion: no-preference){
-    #app.os-open .view.active{animation:osOpen 0.3s cubic-bezier(0.32,0.72,0.36,1);}
-    .view[data-view="home"].active{animation:osThuis 0.26s ease-out;}
-    @keyframes osOpen{from{transform:scale(0.88) translateY(26px);opacity:0.4;}to{transform:none;opacity:1;}}
-    @keyframes osThuis{from{transform:scale(1.05);opacity:0.5;}to{transform:none;opacity:1;}}
+    /* Een app opent zoals op een telefoon: hij groeit uit het scherm naar je
+       toe. Opacity klimt sneller dan de schaal, zodat de beweging afgerond
+       oogt voordat hij klaar is -- dat leest als snel zonder gehaast te zijn. */
+    #app.os-open .view.active{animation:osOpen var(--rtg-royaal) var(--rtg-ease);}
+    .view[data-view="home"].active{animation:osThuis var(--rtg-tempo) var(--rtg-ease);}
+    @keyframes osOpen{from{transform:scale(0.88) translateY(26px);opacity:0;}45%{opacity:1;}to{transform:none;opacity:1;}}
+    @keyframes osThuis{from{transform:scale(1.04);opacity:0.4;}to{transform:none;opacity:1;}}
     /* omhoog vegen op de pill: de app krimpt onder de vinger weg of veert terug */
-    #content.os-veeg-terug{transition:transform 0.22s cubic-bezier(0.32,0.72,0.36,1),opacity 0.22s ease;}
-    #content.os-veeg-weg{transition:transform 0.18s ease-in,opacity 0.18s ease-in;transform:scale(0.85) translateY(-10vh);opacity:0;}
+    #content.os-veeg-terug{transition:transform var(--rtg-tempo) var(--rtg-ease),opacity var(--rtg-tempo) var(--rtg-ease);}
+    #content.os-veeg-weg{transition:transform var(--rtg-tempo) var(--rtg-ease-uit),opacity var(--rtg-tempo) var(--rtg-ease-uit);transform:scale(0.85) translateY(-10vh);opacity:0;}
   }
 
   /* ================= HET BEGINSCHERM: VIER LAGEN =================
@@ -1107,12 +1111,28 @@
      op een telefoon net zo goed als op de tablet. */
   #content.os-thuis{padding:0;overflow:hidden;display:flex;flex-direction:column;}
   .view[data-view="home"].active{display:flex;flex-direction:column;flex:1;min-height:0;}
-  /* Eén RTG-beweging: dezelfde rustige easing voor het hele OS, zachte
-     scroll, en geen browser-tikflitsen; dat maakt het geheel high-end. */
-  :root{--rtg-ease:cubic-bezier(0.22, 0.61, 0.21, 1);}
+  /* ============ HET RTG-BEWEGINGSSYSTEEM ============
+     Eén familie, drie tempo's -- naar Apple's voorbeeld (alles decelereert
+     naar zijn eindstand, niets veert door), maar met het RTG-lakje: een
+     fractie onhaastiger, want dit huis rent nergens heen.
+       --rtg-ease      binnenkomen en bewegen: snel vertrekken, zacht landen
+       --rtg-ease-uit  verdwijnen: rustig loskomen, vlot weg
+       --rtg-vlot      140ms  directe reactie op de vinger (indrukken)
+       --rtg-tempo     340ms  panelen, kaarten, kleine overgangen
+       --rtg-royaal    560ms  schermen en sheets, de grote gebaren
+     Nieuwe animaties horen deze tokens te gebruiken; geen eigen curves meer. */
+  :root{
+    --rtg-ease:cubic-bezier(0.32, 0.72, 0, 1);
+    --rtg-ease-uit:cubic-bezier(0.4, 0.14, 1, 1);
+    --rtg-vlot:140ms; --rtg-tempo:340ms; --rtg-royaal:560ms;
+  }
   #app, .os-home{-webkit-tap-highlight-color:transparent;}
+  /* De browser mag verticaal scrollen meteen zelf afhandelen, zonder eerst af
+     te wachten of wij het gebaar opeisen. Dat is het verschil tussen scrollen
+     dat direct meegeeft en scrollen dat "plakt". */
+  .os-app{touch-action:pan-y;}
   .os-app .os-tegel, .tabbar button, .card{transition-timing-function:var(--rtg-ease);}
-  .os-app:active .os-tegel{transform:scale(0.92);transition:transform 0.16s var(--rtg-ease);}
+  .os-app:active .os-tegel{transform:scale(0.96);transition:transform var(--rtg-vlot) var(--rtg-ease);}
   @media (prefers-reduced-motion: reduce){ .os-app:active .os-tegel{transform:none;} }
 
   .os-thuisscherm{
@@ -1327,7 +1347,7 @@
     display:flex;align-items:center;gap:0.7rem;text-align:left;
     padding:0.6rem 0.8rem;border-radius:12px;border:1px solid var(--line);
     background:color-mix(in srgb, var(--card) 70%, transparent);color:var(--txt);font-size:0.85rem;
-    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1);
+    transition:border-color var(--rtg-vlot) var(--rtg-ease);
   }
   @media (hover:hover){#osZoekLijst button:hover,#osBelLijst button:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}}
   #osZoekLijst .zi,#osBelLijst .zi{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--card2);}
@@ -1371,7 +1391,7 @@
   .os-cc-knoppen button{
     flex:1;padding:0.55rem 0;border-radius:10px;border:1px solid var(--line);
     background:var(--card2);color:var(--txt);font-size:0.72rem;
-    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), color 0.13s cubic-bezier(0.22,0.7,0.3,1);
+    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease);
   }
   .os-cc-knoppen button.actief{border-color:var(--gold);color:var(--gold);}
   .os-cc-thema button{display:flex;align-items:center;justify-content:center;gap:0.4rem;}
@@ -1384,7 +1404,7 @@
     display:flex;flex-direction:column;align-items:center;gap:0.3rem;
     padding:0.65rem 0;border-radius:12px;border:1px solid var(--line);
     background:var(--card2);color:var(--txt);font-size:0.6rem;
-    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), color 0.13s cubic-bezier(0.22,0.7,0.3,1);
+    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease);
   }
   .os-cc-tegels button b{font-size:1.05rem;font-weight:400;display:inline-flex;align-items:center;justify-content:center;height:20px;}
   .os-cc-tegels button b svg{display:block;}
@@ -1445,7 +1465,7 @@
     -webkit-backdrop-filter:blur(24px) saturate(1.5);
     border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,0.45);
     color:var(--txt);text-align:left;cursor:pointer;
-    transition:transform 0.35s cubic-bezier(0.32,0.72,0.36,1);
+    transition:transform var(--rtg-royaal) var(--rtg-ease);
   }
   .os-banner.open{transform:translate(-50%,0);}
   .os-banner .ob-ic{font-size:1.25rem;flex-shrink:0;}

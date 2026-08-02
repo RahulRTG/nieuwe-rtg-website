@@ -477,57 +477,14 @@
        die om de paar seconden door de lippen trekt. De onderlip beweegt mee
        als Rahul praat. Wie minder beweging wil, krijgt een stilstaand beeld. */
     const mond = doos.querySelector('#agMond');
-    const mctx = mond.getContext('2d');
-    const RUSTIG = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const PUNTEN = [];
-    (function zaai(){
-      // de lipvormen als functies: de middellijn met cupidoboog, de boog van
-      // de bovenlip en de boog van de onderlip (mondhoeken op x=50 en x=170)
-      const midden = x => 52 - 6 * Math.exp(-Math.pow(x - 110, 2) / 98);
-      const boven = x => { const t = (x - 110) / 60; return 52 - 24 * Math.pow(Math.max(0, 1 - t * t), 0.8) + 7 * Math.exp(-Math.pow(x - 110, 2) / 72); };
-      const onder = x => { const t = (x - 110) / 60; return 52 + 27 * Math.pow(Math.max(0, 1 - t * t), 0.9); };
-      for (let i = 0; i < 2400; i++){
-        const lip = Math.random() < 0.45 ? 'b' : 'o';
-        const x = 50 + Math.random() * 120;
-        const y1 = lip === 'b' ? boven(x) : midden(x), y2 = lip === 'b' ? midden(x) : onder(x);
-        if (y2 - y1 < 0.8) continue;
-        const r = Math.random();
-        PUNTEN.push({ x, y: y1 + Math.random() * (y2 - y1), lip,
-          fase: Math.random() * Math.PI * 2, maat: 0.5 + Math.random() * 0.9,
-          kleur: r < 0.62 ? '#9E1C40' : (r < 0.9 ? '#C9A24B' : '#FFFFFF'),
-          diep: (y2 - y1) > 0 ? ((y1 + (y2 - y1) / 2) - y1) / (y2 - y1) : 0 });
-      }
-      // de gouden middellijn loopt door tot voorbij de mondhoeken en vervaagt
-      for (let i = 0; i < 420; i++){
-        const x = 14 + Math.random() * 192;
-        PUNTEN.push({ x, y: midden(Math.min(170, Math.max(50, x))) + (Math.random() - 0.5) * 1.6,
-          lip: 'm', fase: Math.random() * Math.PI * 2, maat: 0.4 + Math.random() * 0.7,
-          kleur: '#C9A24B', rand: Math.min(1, Math.min(x - 14, 206 - x) / 55), diep: 0 });
-      }
-    })();
-    let praatTot = 0;
-    const praat = ms => { praatTot = performance.now() + ms; };
-    function verfMond(t){
-      mctx.clearRect(0, 0, 440, 200);
-      mctx.save();
-      mctx.scale(2, 2);
-      const golf = ((t / 4200) % 1) * 260 - 20; // de lichtshow: een gouden golf
-      const spreek = t < praatTot ? Math.sin(t / 1000 * Math.PI * 4.4) : 0;
-      for (const p of PUNTEN){
-        const gloed = Math.exp(-Math.pow(p.x - golf, 2) / 420);
-        const twinkel = 0.45 + 0.4 * Math.sin(p.fase + t / 700);
-        mctx.globalAlpha = Math.min(1, twinkel * (p.rand == null ? 1 : p.rand) + gloed * 0.9);
-        mctx.fillStyle = gloed > 0.45 ? '#F5E6B8' : p.kleur;
-        mctx.fillRect(p.x, p.lip === 'o' ? p.y + spreek * 4 * p.diep : p.y, p.maat, p.maat);
-      }
-      mctx.restore();
-    }
-    if (RUSTIG) verfMond(0);
-    else (function lus(){
-      // alleen verven zolang de poort in beeld is; daarna zuinig wachten
-      if (mond.offsetParent) { verfMond(performance.now()); requestAnimationFrame(lus); }
-      else setTimeout(lus, 600);
-    })();
+    /* EEN mond voor het hele systeem: shared/mond.js. Hier stond een eigen,
+       tweede kopie van dezelfde puntenwolk -- met een eigen tekenlus die na
+       het inloggen eeuwig bleef pollen (het canvas en 2820 objecten werden
+       nooit vrijgegeven) en met een sinus in plaats van echte spraak. Die
+       kopie is weg; de gedeelde motor doet kaak, spreiding en tuit, en stopt
+       vanzelf zodra de poort uit beeld is. */
+    const mondje = (window.RTGMond && mond) ? RTGMond.maak(mond) : { praat: function(){} };
+    const praat = ms => mondje.praat(ms);
 
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
@@ -3224,6 +3181,24 @@
   /* Het beginscherm tekenen: de mappen bovenaan, de functies onder de klok.
      Een lege map (alles erin uitgezet of niet van toepassing op deze pas)
      laten we weg -- geen tegels die nergens heen gaan. */
+  /* De afdruk van het beginscherm: precies datgene wat bouw() zou tekenen, als
+     een tekenreeks -- welke tegels, in welke volgorde, met welke mapnaam EN
+     met welk meldingsbolletje. Dat laatste hoort erbij: een badge die opkomt
+     is een echte verandering en moet wel doortekenen. Zo kunnen we zien of
+     opnieuw tekenen ergens toe leidt. */
+  let vorigeAfdruk = null;
+  const badgeVan = item => {
+    if (!item.startsWith('tab:')) return '';
+    const knop = tabKnop(item.slice(4));
+    const dot = knop && knop.querySelector('span[id$="Dot"]');
+    return (dot && dot.style.display !== 'none') ? '!' : '';
+  };
+  const afdruk = () => rijen.map((_, p) => gesorteerd(p).map(it =>
+    typeof it === 'string'
+      ? (itemZichtbaar(it) ? it + badgeVan(it) : '')
+      : (it.items.some(itemZichtbaar) ? it.sleutel + ':' + mapNaam(it) + ':' + it.items.filter(itemZichtbaar).slice(0, 9).join('+') : '')
+  ).join(',')).join('|');
+
   function bouw() {
     rijen.forEach((rij, p) => {
       rij.textContent = '';
@@ -3232,6 +3207,8 @@
         else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
       }
     });
+    // wat er nu staat is per definitie bij; de waarnemer hoeft er niet overheen
+    vorigeAfdruk = afdruk();
     sync();
   }
 
@@ -3428,7 +3405,7 @@
   }
 
   /* ---------- wiebel-modus: herschikken met een lange druk ---------- */
-  let wiebel = false, drukTimer = null, sleepEl = null, wiebelStart = 0;
+  let wiebel = false, drukTimer = null, sleepEl = null, wiebelStart = 0, drukX = 0, drukY = 0;
   const klaarKnop = $('#osKlaar');
   function zetWiebel(aan) {
     wiebel = aan;
@@ -3441,11 +3418,16 @@
   rijen.forEach(grid => {
     grid.addEventListener('pointerdown', e => {
       const el = e.target.closest('.os-app'); if (!el) return;
+      // waar de vinger begon: movementX/Y is bij touch in Safari altijd 0, dus
+      // daarop afgaan betekende dat wegvegen de lange-druk NIET afbrak en de
+      // wiebel-modus zomaar aansprong tijdens het scrollen. Nu meten we de
+      // afstand zelf, en dat werkt op elk toestel gelijk.
+      drukX = e.clientX; drukY = e.clientY;
       drukTimer = setTimeout(() => { zetWiebel(true); }, 550);
       if (wiebel) { sleepEl = el; el.classList.add('os-sleep'); el.setPointerCapture && el.setPointerCapture(e.pointerId); }
     });
     grid.addEventListener('pointermove', e => {
-      if (drukTimer && (Math.abs(e.movementX) > 3 || Math.abs(e.movementY) > 3) && !wiebel) { clearTimeout(drukTimer); drukTimer = null; }
+      if (drukTimer && !wiebel && Math.hypot(e.clientX - drukX, e.clientY - drukY) > 10) { clearTimeout(drukTimer); drukTimer = null; }
       if (!wiebel || !sleepEl) return;
       const onder = document.elementFromPoint(e.clientX, e.clientY);
       const doel = onder && onder.closest && onder.closest('.os-app');
@@ -3472,11 +3454,24 @@
     if (brand) brand.style.display = open ? 'none' : '';
     if (titel) titel.textContent = open ? tabNaam(tab) : '';
   }
+  /* Het springboard spiegelt de tabbar, dus we kijken mee -- maar alleen naar
+     wat het beeld echt verandert.
+
+     Hier stond 'class' in de filter, en dat was duur op de verkeerde momenten:
+     openTab() zet bij ELKE schermwissel class="active" om op elke tabknop, dus
+     bij elke tik werden alle mappen en tegels weggegooid en opnieuw getekend
+     (inclusief hun SVG-iconen). Dat is het schokkerige gevoel bij navigeren,
+     en het brak een lopende sleep-actie halverwege af.
+
+     Zichtbaarheid en badges lopen via style.display (zie tabZichtbaar), nooit
+     via een klasse -- 'style' volstaat dus. En voor de zekerheid daarbovenop
+     een inhoudscontrole: verandert de uitkomst niet, dan tekenen we niet. */
   let gepland = null;
+  const bouwAlsAnders = () => { if (afdruk() !== vorigeAfdruk) bouw(); };
   new MutationObserver(() => {
     if (gepland) return;
-    gepland = requestAnimationFrame(() => { gepland = null; bouw(); });
-  }).observe(tabbar, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style', 'class'] });
+    gepland = requestAnimationFrame(() => { gepland = null; bouwAlsAnders(); });
+  }).observe(tabbar, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
   // de gate/app-wissel (inloggen, uitloggen) stuurt de schermvaste modus
   new MutationObserver(sync).observe(app, { attributes: true, attributeFilter: ['style', 'class'] });
 

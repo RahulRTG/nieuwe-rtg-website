@@ -53,3 +53,59 @@ test('5. reproduceerbaar met dezelfde random-bron', () => {
   assert.deepEqual(a[0], b[0]);
   assert.deepEqual(a[a.length - 1], b[b.length - 1]);
 });
+
+/* ---- de spraakmotor: beweegt de mond als een mond, niet als een scharnier ----
+   Deze vijf toetsen leggen vast wat "realistisch" hier betekent, zodat een
+   latere verfraaiing het niet stilletjes terugdraait naar een sinus. */
+
+test('6. stil is stil: buiten het praten staat alles op nul', () => {
+  for (const t of [0, 500, 5000, 123456]) {
+    const s = Mond.mondStand(t, 0);
+    assert.deepEqual(s, { kaak: 0, breed: 0, duw: 0, scheef: 0 }, 'in rust op t=' + t);
+  }
+});
+
+test('7. de mond gaat echt open en valt echt dicht (lettergrepen, geen malen)', () => {
+  let open = 0, dicht = 0, max = 0, n = 0;
+  for (let t = 0; t < 8000; t += 16) {
+    const s = Mond.mondStand(t, 8000);
+    n++; max = Math.max(max, s.kaak);
+    if (s.kaak > 0.5) open++;
+    if (s.kaak < 0.02) dicht++;
+  }
+  assert.ok(max > 0.8, 'de mond gaat ver genoeg open (max ' + max.toFixed(2) + ')');
+  assert.ok(dicht / n > 0.1, 'er zit stilte tussen de lettergrepen (' + Math.round(dicht / n * 100) + '%)');
+  assert.ok(open / n > 0.1, 'en hij is ook echt vaak open (' + Math.round(open / n * 100) + '%)');
+});
+
+test('8. spreiden en tuiten zijn onafhankelijke standen (ie vs oe)', () => {
+  let gespreid = false, getuit = false, duwBijTuit = true;
+  for (let t = 0; t < 12000; t += 16) {
+    const s = Mond.mondStand(t, 12000);
+    if (s.breed > 0.3) gespreid = true;
+    if (s.breed < -0.3) { getuit = true; if (s.duw <= 0) duwBijTuit = false; }
+  }
+  assert.ok(gespreid, 'de mond spreidt (breed > 0)');
+  assert.ok(getuit, 'de mond tuit (breed < 0)');
+  assert.ok(duwBijTuit, 'tuiten duwt de lippen naar voren');
+});
+
+test('9. geen herkenbaar patroon: de stand herhaalt zich niet per seconde', () => {
+  const a = [], b = [];
+  for (let t = 0; t < 1000; t += 20) { a.push(Mond.mondStand(t, 20000).kaak); b.push(Mond.mondStand(t + 1000, 20000).kaak); }
+  const verschil = a.reduce((som, v, i) => som + Math.abs(v - b[i]), 0) / a.length;
+  assert.ok(verschil > 0.05, 'een seconde later staat de mond anders (verschil ' + verschil.toFixed(3) + ')');
+});
+
+test('10. een zin eindigt gesloten, en alle waarden blijven binnen bereik', () => {
+  const eind = Mond.mondStand(5000, 5000);
+  assert.equal(eind.kaak, 0, 'aan het eind van de zin is de mond dicht');
+  for (let t = 0; t < 20000; t += 7) {
+    const s = Mond.mondStand(t, 20000);
+    assert.ok(Number.isFinite(s.kaak + s.breed + s.duw + s.scheef), 'geen NaN op t=' + t);
+    assert.ok(s.kaak >= 0 && s.kaak <= 1.05, 'kaak binnen bereik: ' + s.kaak);
+    assert.ok(s.breed >= -1.05 && s.breed <= 1.05, 'breed binnen bereik: ' + s.breed);
+    assert.ok(s.duw >= 0 && s.duw <= 1.05, 'duw binnen bereik: ' + s.duw);
+    assert.ok(Math.abs(s.scheef) < 0.25, 'de asymmetrie blijft subtiel: ' + s.scheef);
+  }
+});

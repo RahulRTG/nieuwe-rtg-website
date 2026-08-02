@@ -10,6 +10,7 @@
    Nederlandse origineel (nooit een kapot scherm). Het begrijpen van niet-
    Nederlandse invoer blijft aan de motor zelf. */
 const vertaler = require('../translate');
+const { NL2EN } = require('../translate/woordenboek');
 
 module.exports = (kern) => {
   const { app, intakeStart, intakeZeg, accounts, stateFor } = kern;
@@ -26,11 +27,27 @@ module.exports = (kern) => {
     return t.n > 40;
   }
 
+  /* Rahuls zin naar het Engels, met de zorg die de poort verdient: eerst de
+     hele tekst exact in het woordenboek (de vaste ballotage- en entreezinnen
+     staan daar verzorgd in), anders per zin -- zo blijft in een
+     gepersonaliseerde regel ('Aangenaam, Edward. Je e-mailadres?') het vaste
+     deel woordenboek-Engels en gaat alleen het naamdeel door de vertaler. */
+  async function naarEngels(tekst) {
+    if (NL2EN[tekst]) return NL2EN[tekst];
+    const delen = String(tekst).split(/(?<=[.!?])\s+/);
+    if (delen.length > 1 && delen.some(z => NL2EN[z])) {
+      const uit = [];
+      for (const z of delen) uit.push(NL2EN[z] || (await vertaler.translate(z, 'en', 'nl')).text);
+      return uit.join(' ');
+    }
+    return (await vertaler.translate(tekst, 'en', 'nl')).text;
+  }
+
   // Rahuls Nederlandse zin naar de toesteltaal; anders Engels, anders NL.
   async function naarTaal(tekst, lang) {
     if (!tekst || !lang || lang === 'nl') return tekst;
     try {
-      const en = (await vertaler.translate(tekst, 'en', 'nl')).text;
+      const en = await naarEngels(tekst);
       if (lang === 'en') return en;
       const loc = await vertaler.translate(tekst, lang, 'nl');
       return loc.translated ? loc.text : en; // toesteltaal, anders Engels

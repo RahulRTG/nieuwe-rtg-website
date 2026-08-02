@@ -65,15 +65,21 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
     switch (g.stap) {
       case 'doel': {
         // Rahul ontdekt zelf of iemand komt inloggen, aanmelden, of uitleg wil
-        const wilUitleg = /\b(uitleg|leg .*uit|wat is (dit|rtg)|wat doen jullie|vertel (me )?meer|meer weten|hoe werkt|wat kan (ik|je)|informatie|wat voor)\b/i.test(tekst);
-        const wilIn = /\b(inloggen|log in|al lid|al een account|ik ben lid|ken(t|nen)? (je )?m(e|ij)|welkom terug|terugkerend|bestaand account|weer hier)\b/i.test(tekst);
-        const wilNieuw = /\b(eerste keer|voor het eerst|nieuw|aanmelden|lid worden|registreren|nog geen|account maken|nog niet)\b/i.test(tekst);
+        /* De drie wegen, herkend in het Nederlands EN het Engels: een
+           internationale gast die "sign up" typt hoort niet in een lus van
+           dezelfde wedervraag te belanden. (De vragen zelf reizen daarna
+           gewoon mee met de taal van het toestel.) */
+        const wilUitleg = /\b(uitleg|leg .*uit|wat is (dit|rtg)|wat doen jullie|vertel (me )?meer|meer weten|hoe werkt|wat kan (ik|je)|informatie|wat voor|explain|what is (this|rtg)|tell me more|how does (this|it) work|more info)\b/i.test(tekst);
+        const wilIn = /\b(inloggen|log ?in|sign in|al lid|al een account|ik ben lid|ken(t|nen)? (je )?m(e|ij)|welkom terug|terugkerend|bestaand account|weer hier|already (a )?member|existing account|welcome back)\b/i.test(tekst);
+        const wilNieuw = /\b(eerste keer|voor het eerst|nieuw|aanmelden|lid worden|registreren|nog geen|account maken|nog niet|sign ?up|register|new here|become a member|first time|join|create an account)\b/i.test(tekst);
         const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
         if (wilUitleg && !wilIn && !wilNieuw) return { tekst: UITLEG };
         if (wilIn && !wilNieuw) {
           if (mail) return naarWoordInlog(g, mail[0].toLowerCase());
           g.stap = 'login-naam';
-          return { tekst: 'Welkom terug. Je e-mailadres of gebruikersnaam?' };
+          // entree: het inlogpad draagt zijn eigen kopregel in de poort,
+          // zoals de ballotage dat voor nieuwe leden doet
+          return { entree: true, tekst: 'Welkom terug. Je e-mailadres of gebruikersnaam?' };
         }
         if (wilNieuw && !wilIn) {
           g.stap = 'hallo';

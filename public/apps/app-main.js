@@ -452,6 +452,7 @@
       '.ag-kop::before,.ag-kop::after{content:"";flex:0 0 2.2rem;height:1px;' +
         'background:color-mix(in srgb, var(--gold,#857007) 45%, transparent);}' +
       '.ag-doos.ag-ballotage .ag-kop{display:flex;opacity:1;}' +
+      '.ag-stappen:empty{display:none !important;}' +
       ".ag-stappen{display:none;justify-content:center;gap:1.6rem;margin:1.05rem 0 0;font-family:'Bodoni Moda',serif;" +
         'font-size:0.8rem;color:var(--soft);opacity:0;transition:opacity var(--rtg-royaal,560ms) var(--rtg-ease,ease);}' +
       '.ag-doos.ag-ballotage .ag-stappen{display:flex;opacity:1;}' +
@@ -538,6 +539,7 @@
     const ROMEINS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
     function toonVoortgang(d){
       const v = d && d.voortgang;
+      const entree = d && (d.entree || d.login) && !d.ingelogd;
       if (v && v.nr && !d.klaar){
         if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
         if (stappenEl){
@@ -551,11 +553,19 @@
           }
         }
         doos.classList.add('ag-ballotage');
+      } else if (entree){
+        // het spiegelbeeld voor wie al lid is: dezelfde kopregel-taal,
+        // zonder stappen (thuiskomen is geen procedure)
+        if (kopEl) kopEl.textContent = T('ag.entree','De entree');
+        if (stappenEl) stappenEl.textContent = '';
+        doos.classList.add('ag-ballotage');
       } else {
         doos.classList.remove('ag-ballotage');
       }
-      if (kluisEl && d && d.vertrouwelijk && !d.klaar){
-        kluisEl.textContent = T('ag.kluis','Versleuteld · rechtstreeks de kluis in');
+      const kluisTekst = d && d.login ? T('ag.kluisdirect','Rechtstreeks naar de kluis — niet door dit gesprek')
+        : (d && d.vertrouwelijk ? T('ag.kluis','Versleuteld · rechtstreeks de kluis in') : null);
+      if (kluisEl && kluisTekst && !d.klaar){
+        kluisEl.textContent = kluisTekst;
         doos.classList.add('ag-kluis-aan');
       } else {
         doos.classList.remove('ag-kluis-aan');
@@ -678,7 +688,8 @@
         if (loginU && !commando){
           try {
             await login('rtg', { u: loginU, p: tekst });
-            zeg('rahul', T('ag.welkom','Daar ben je weer. Welkom terug.'));
+            zeg('rahul', T('ag.welkom','Daar ben je weer — welkom terug in het huis.'));
+            toonVoortgang({});
           } catch(e){
             zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.wwmis','Probeer het nog eens, zeg "opnieuw", of zeg "wachtwoord vergeten" en dan regel ik een herstel-link.'));
           }

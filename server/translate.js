@@ -56,7 +56,9 @@ function wordLevel(text, to) {
   if (!dict) return null;
   let hit = false;
   const out = String(text).split(/(\s+)/).map(tok => {
-    const m = tok.match(/^([\wÀ-ÿ']+)(.*)$/);
+    // het koppelteken hoort bij het woord: anders valt 'e-mailadres' uiteen
+    // in 'e' + '-mailadres' en mist het woordenboek hem altijd
+    const m = tok.match(/^([\wÀ-ÿ'-]+)(.*)$/);
     if (!m) return tok;
     const w = m[1].toLowerCase();
     if (dict[w]) { hit = true; const r = dict[w]; return (m[1][0] === m[1][0].toUpperCase() ? r[0].toUpperCase() + r.slice(1) : r) + m[2]; }

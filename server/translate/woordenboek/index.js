@@ -16,7 +16,11 @@ const WORDS_NL_EN = {
   'strand':'beach','zon':'sun','weer':'weather','vraag':'question','antwoord':'answer','bericht':'message','groeten':'regards',
   'zie':'see','ik zie':'I see','morgen':'tomorrow','vandaag':'today','avond':'evening','ochtend':'morning',
   'restaurant':'restaurant','tafel':'table','fles':'bottle','wijn':'wine','koffie':'coffee','thee':'tea',
-  'is':'is','ben':'am','was':'was','zijn':'are','heb':'have','heeft':'has','kan':'can','kunnen':'can','wil':'want','willen':'want'
+  'is':'is','ben':'am','was':'was','zijn':'are','heb':'have','heeft':'has','kan':'can','kunnen':'can','wil':'want','willen':'want',
+  // de poort: woorden uit de gepersonaliseerde ballotagezinnen (die kunnen
+  // niet als vaste zin in nl2en staan, want er staat een naam in)
+  'aangenaam':'a pleasure','e-mailadres':'email address','emailadres':'email address','gebruikersnaam':'username',
+  'wachtwoord':'password','geboortedatum':'date of birth','sleutelwoord':'keyword','sleutelwoorden':'keywords'
 };
 const WORDS_EN_NL = Object.fromEntries(Object.entries(WORDS_NL_EN).map(([k, v]) => [v, k]));
 

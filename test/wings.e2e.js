@@ -63,6 +63,20 @@ async function meet(pwBrowser, base, token, breed, hoog) {
   const page = await ctx.newPage();
   const fouten = [];
   page.on('pageerror', e => fouten.push(String(e.message)));
+  /* EEN GECONTROLEERD BETAALOVERZICHT.
+
+     Een vers lid heeft geen geschiedenis (en opladen vraagt eerst KYC), dus
+     zonder dit blijft de tweede regel van de Payments-widget leeg en zou deze
+     toets nooit kunnen zakken op de velden. De VORM hieronder is niet verzonnen
+     maar overgenomen uit server/kern/pay/verzoeken.js (overzicht): rijen met
+     `oms`, `centen`, `soort`, `tegen`. Mijn eerste versie las `omschrijving` en
+     `wat` -- geraden, en dus stil leeg. */
+  await page.route('**/api/pay/overzicht', route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ ok: true, codenaam: 'PROEF', saldo: 2550,
+      geschiedenis: [{ id: 'x1', at: new Date().toISOString(), oms: 'Opgeladen', soort: 'oplaad', centen: 2550, tegen: 'opgeladen' }],
+      aanMij: [], vanMij: [] })
+  }));
   await page.addInitScript(t => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, token);
   await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
   await page.evaluate(() => { const a = document.getElementById('app'); if (a) a.classList.add('active'); });
@@ -80,6 +94,10 @@ async function meet(pwBrowser, base, token, breed, hoog) {
         .map(x => x.querySelector('.wing-naam').textContent.trim() + ' = ' + x.querySelector('.wing-lijf').textContent.trim()),
       leegLijfZichtbaar: [...document.querySelectorAll('.wing-widget:not(.heeft-waarde)')]
         .some(x => { const l = x.querySelector('.wing-lijf'); return l && getComputedStyle(l).display !== 'none'; }),
+      onder: [...document.querySelectorAll('.wing-widget.heeft-onder')].map(x => x.querySelector('.wing-onder').textContent.trim()),
+      acties: [...document.querySelectorAll('.wing-widget')].filter(x => x.querySelector('.wing-acties'))
+        .map(x => x.querySelector('.wing-naam').textContent.trim() + ': ' + [...x.querySelectorAll('.wing-actie')].map(b => b.textContent.trim()).join('/')),
+      knopInKnop: !!document.querySelector('button button'),
       shell: Math.round(document.getElementById('shell').getBoundingClientRect().width)
     };
   });
@@ -124,6 +142,14 @@ test('wings: weg op de iPad, gevuld op de computer, en aanpasbaar', { skip: pw ?
       assert.equal(uit.leegLijfZichtbaar, false, 'een widget zonder bron toont geen leeg lijf');
       assert.ok(uit.metWaarde.some(w => w.startsWith('Balans')), 'de Balans-widget hoort een echt advies te tonen, kreeg: ' + JSON.stringify(uit.metWaarde));
       assert.ok(uit.metWaarde.some(w => /€/.test(w)), 'een geld-widget hoort een echt bedrag te tonen, kreeg: ' + JSON.stringify(uit.metWaarde));
+      assert.ok(uit.metWaarde.some(w => /25,50|25\.50/.test(w)), 'het saldo hoort uit de bron te komen (25,50), kreeg: ' + JSON.stringify(uit.metWaarde));
+      /* De tweede regel: de laatste mutatie. Dit pint de VELDNAMEN vast (oms,
+         centen). Leest iemand hier ooit weer `omschrijving`, dan zakt dit. */
+      assert.ok(uit.onder.some(o => /Opgeladen/.test(o)), 'de laatste mutatie hoort onder het saldo te staan, kreeg: ' + JSON.stringify(uit.onder));
+      /* IN DE FLANK BRUIKBAAR: de Balans-widget heeft een actieknop die Rahul
+         met de meegeleverde vraag opent, zonder de console te verlaten. */
+      assert.ok(uit.acties.some(a => a.startsWith('Balans')), 'Balans hoort een actie in de flank te hebben, kreeg: ' + JSON.stringify(uit.acties));
+      assert.equal(uit.knopInKnop, false, 'een knop in een knop is ongeldige HTML en niet te bedienen met het toetsenbord');
       assert.deepEqual(uit.fouten, [], 'geen JS-fouten');
 
       // 3) aanpassen: de eerste app links uitzetten en dat moet blijven staan

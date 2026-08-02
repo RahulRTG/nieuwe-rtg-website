@@ -175,12 +175,32 @@
        alleen gevuld wordt als er een echte bron is. Zonder waarde blijft het
        lijf leeg en is de kaart gewoon een nette deur -- geen lege belofte. */
     .wing-widget{
-      display:flex;flex-direction:column;gap:calc(var(--wing-e) * 0.35);width:100%;max-width:214px;
+      display:flex;flex-direction:column;width:100%;max-width:214px;
       background:color-mix(in srgb, var(--card) 62%, transparent);
-      border:1px solid var(--line);padding:calc(var(--wing-e) * 0.7) calc(var(--wing-e) * 0.8);
-      border-radius:16px;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;
+      border:1px solid var(--line);border-radius:16px;color:var(--txt);
       transition:background 140ms ease, border-color 140ms ease;
     }
+    /* de deur: kop + lijf zijn samen de knop die de app opent */
+    .wing-open{
+      display:flex;flex-direction:column;gap:calc(var(--wing-e) * 0.35);width:100%;
+      background:none;border:none;padding:calc(var(--wing-e) * 0.7) calc(var(--wing-e) * 0.8);
+      cursor:pointer;text-align:left;color:inherit;font-family:inherit;border-radius:16px;
+    }
+    /* de acties: hier doe je iets ZONDER de console te verlaten */
+    .wing-acties{
+      display:flex;flex-wrap:wrap;gap:0.3rem;
+      padding:0 calc(var(--wing-e) * 0.8) calc(var(--wing-e) * 0.7);
+    }
+    .wing-actie{
+      background:none;border:1px solid var(--line);border-radius:999px;
+      padding:0.22rem 0.6rem;font-size:calc(var(--wing-e) * 0.78);color:var(--muted);
+      font-family:inherit;cursor:pointer;transition:border-color 140ms ease, color 140ms ease;
+    }
+    .wing-actie:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));color:var(--gold);}
+    .wing-actie:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+    /* de tweede regel: een detail bij de waarde (bv. de laatste mutatie) */
+    .wing-onder{font-size:calc(var(--wing-e) * 0.8);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .wing-widget:not(.heeft-onder) .wing-onder{display:none;}
     .wing-kop{display:flex;align-items:center;gap:0.6rem;}
     .wing-widget .os-tegel{width:calc(var(--wing-e) * 2.2);height:calc(var(--wing-e) * 2.2);flex-shrink:0;}
     .wing-naam{font-size:calc(var(--wing-e) * 0.9);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
@@ -194,7 +214,7 @@
     .wing-widget:hover{background:color-mix(in srgb, var(--card) 88%, transparent);border-color:color-mix(in srgb, var(--gold) 40%, var(--line));}
     .wing-widget:hover .wing-naam{color:var(--txt);}
     .wing-widget:hover .wing-vol{opacity:1;}
-    .wing-widget:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+    .wing-open:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     .wing-instel{
       align-self:center;margin-top:0.6rem;background:none;border:none;cursor:pointer;
       color:var(--muted);font-family:inherit;font-size:calc(var(--wing-e) * 0.82);

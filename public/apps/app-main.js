@@ -4117,10 +4117,57 @@
      De bronnen zijn de endpoints die het lid toch al aanroept; een widget voegt
      geen nieuw verkeer toe dat er niet al was. */
   const WIDGETBRON = {
-    'link:balans': { pad: '/balans', lees: d => (d && d.adviezen && d.adviezen[0] && d.adviezen[0].tekst) || null },
-    'tab:betalen': { pad: '/pay/overzicht', lees: d => (d && typeof d.saldo === 'number') ? eur(d.saldo / 100) : null },
+    'link:balans': {
+      pad: '/balans',
+      lees: d => (d && d.adviezen && d.adviezen[0] && d.adviezen[0].tekst) || null,
+      /* IN DE FLANK BRUIKBAAR, NIET ALLEEN TE OPENEN. De balans-bron levert
+         kant-en-klare vragen mee (vraagRust/vraagKoken/vraagBewegen). Een tik
+         opent Rahul MET die vraag: je doet iets echts zonder de console te
+         verlaten, en de widget belooft zelf niets -- hij stelt de vraag, Rahul
+         antwoordt. */
+      acties: d => (d && d.vraagRust) ? [
+        { label: T('wings.rust', 'plan rust'), doe: () => vraagRahul(d.vraagRust) }
+      ] : []
+    },
+    'tab:betalen': {
+      pad: '/pay/overzicht',
+      lees: d => (d && typeof d.saldo === 'number') ? eur(d.saldo / 100) : null,
+      /* De laatste mutatie erbij: dat is wat je van een saldo echt wilt weten,
+         en het staat al in dezelfde bron -- geen extra aanroep. */
+      /* De velden heten `oms` en `centen` -- dat is NAGEKEKEN in
+         server/kern/pay/verzoeken.js en niet geraden. Mijn eerste versie gokte
+         `omschrijving`/`wat` en toonde daardoor niets: precies de stille manier
+         waarop een widget leeg blijft zonder dat iemand het merkt. */
+      onder: d => {
+        const g = d && d.geschiedenis && d.geschiedenis[0];
+        if (!g) return null;
+        const bedrag = typeof g.centen === 'number' ? eur(Math.abs(g.centen) / 100) : '';
+        return [String(g.oms || '').slice(0, 34), bedrag].filter(Boolean).join(' - ') || null;
+      }
+    },
     'link:wallet': { pad: '/pay/overzicht', lees: d => (d && typeof d.saldo === 'number') ? eur(d.saldo / 100) : null }
   };
+  /* RAHUL OPENEN MET EEN VRAAG.
+
+     Hier stond eerst `if (typeof ask === 'function') ask(vraag)`, overgenomen
+     van twee bestaande plekken in deze app. Toen bleek: `ask` BESTAAT NIET. Die
+     twee guards bewaken een functie die er nooit is geweest, dus die knoppen
+     openen Rahul wel en vullen de vraag nooit in -- stil, want de guard vangt
+     het af. Dat staat als losse bevinding genoteerd.
+
+     Wat er wel is: de AI-tegel, het invoerveld #askInput en de knop #askBtn.
+     Dat is de weg die de gebruiker zelf ook loopt. */
+  function vraagRahul(vraag) {
+    const tegel = document.querySelector('.os-app[data-tab="ai"]');
+    if (tegel) tegel.click();
+    const inp = document.querySelector('#askInput'), knop = document.querySelector('#askBtn');
+    if (!inp || !knop) return false;
+    inp.value = vraag;
+    inp.dispatchEvent(new Event('input', { bubbles: true }));
+    knop.click();
+    return true;
+  }
+
   const widgetCache = new Map();   // pad -> belofte, zodat twee widgets op dezelfde bron er samen een ophalen
 
   function widgetHaal(pad) {
@@ -4128,15 +4175,20 @@
     return widgetCache.get(pad);
   }
 
-  /* De widget. Kop met glyf en naam, een lijf dat gevuld wordt als er een bron
-     is, en een uitklap-knop die de app opent. De hele kaart is aanklikbaar --
-     een widget die je alleen via een klein knopje kunt openen, is een raadsel. */
+  /* De widget. Een KAART (geen knop), met daarin een open-knop voor de kop en
+     het lijf, en eventueel losse actieknoppen eronder.
+
+     Waarom geen knop-in-een-knop: dat is ongeldige HTML en het maakt de
+     actieknoppen onbereikbaar met het toetsenbord. De kaart is een groep, de
+     kop is de deur, de acties staan ernaast. */
   function wingWidget(item) {
     const naamVan = it => it.startsWith('tab:') ? tabNaam(it.slice(4)) : ((itemDef(it) || {}).naam || it);
-    const el = document.createElement('button');
-    el.type = 'button'; el.className = 'wing-widget'; el.dataset.sleutel = item;
-    el.setAttribute('aria-label', T('wings.open', 'Open') + ' ' + naamVan(item));
+    const kaart = document.createElement('div');
+    kaart.className = 'wing-widget'; kaart.dataset.sleutel = item;
 
+    const open = document.createElement('button');
+    open.type = 'button'; open.className = 'wing-open';
+    open.setAttribute('aria-label', T('wings.open', 'Open') + ' ' + naamVan(item));
     const kop = document.createElement('span'); kop.className = 'wing-kop';
     const vak = document.createElement('span'); vak.className = 'os-tegel';
     const inhoud = tegelInhoud(item);
@@ -4144,24 +4196,38 @@
     const naam = document.createElement('span'); naam.className = 'wing-naam';
     naam.textContent = naamVan(item);
     const vol = document.createElement('span'); vol.className = 'wing-vol';
-    vol.textContent = '↗';                       // de uitklap-pijl: full screen = de app
-    vol.setAttribute('aria-hidden', 'true');
+    vol.textContent = '\u2197'; vol.setAttribute('aria-hidden', 'true');   // uitklappen = de app
     kop.appendChild(vak); kop.appendChild(naam); kop.appendChild(vol);
-    el.appendChild(kop);
+    open.appendChild(kop);
+    open.addEventListener('click', () => openItem(item));
+    kaart.appendChild(open);
 
     const bron = WIDGETBRON[item];
     if (bron) {
       const lijf = document.createElement('span'); lijf.className = 'wing-lijf';
-      lijf.textContent = ' ';                    // ruimte reserveren, geen tekst beweren
-      el.appendChild(lijf);
+      open.appendChild(lijf);
+      const onder = document.createElement('span'); onder.className = 'wing-onder';
+      open.appendChild(onder);
       widgetHaal(bron.pad).then(d => {
         const w = d ? bron.lees(d) : null;
-        // niets gevonden of bron stuk: het lijf blijft leeg. Zie regel 3.
-        if (w != null) { lijf.textContent = String(w); el.classList.add('heeft-waarde'); }
+        // niets gevonden of bron stuk: het lijf blijft leeg en onzichtbaar
+        if (w != null) { lijf.textContent = String(w); kaart.classList.add('heeft-waarde'); }
+        const o = (d && bron.onder) ? bron.onder(d) : null;
+        if (o != null) { onder.textContent = String(o); kaart.classList.add('heeft-onder'); }
+        const acties = (d && bron.acties) ? bron.acties(d) : [];
+        if (acties.length) {
+          const rij = document.createElement('div'); rij.className = 'wing-acties';
+          for (const a of acties) {
+            const b = document.createElement('button');
+            b.type = 'button'; b.className = 'wing-actie'; b.textContent = a.label;
+            b.addEventListener('click', a.doe);
+            rij.appendChild(b);
+          }
+          kaart.appendChild(rij);
+        }
       });
     }
-    el.addEventListener('click', () => openItem(item));
-    return el;
+    return kaart;
   }
 
   function wingVul(kolom, items) {

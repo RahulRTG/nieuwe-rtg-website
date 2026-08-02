@@ -125,6 +125,34 @@
     .notif-scrim{position:absolute;}
   }
 
+  /* ---------- het derde niveau: de computer ----------
+
+     Telefoon -> iPad groeit al mee: --e hangt aan de shell (container-query),
+     niet aan het venster, dus het beeld is overal hetzelfde en alleen groter.
+     Op de computer stopte dat te vroeg, en het plafond van 1040px was een rond
+     getal en geen gemeten grens.
+
+     GEMETEN WAAR DE GROEI OPHOUDT. --e is min(clamp(11px, 3.85cqi, 19.5px),
+     1.48cqh), dus hij loopt tegen zijn eigen plafond van 19,5px aan bij:
+
+         breedte   3.85cqi  = 19,5px  ->  shell  507px breed
+         hoogte    1.48cqh  = 19,5px  ->  shell 1318px hoog
+
+     De breedte zat daar met 820px allang voorbij; de HOOGTE niet. Bij 1040px is
+     --e 15,4px terwijl er 19,5px in zit -- de computer kreeg dus een kleinere
+     app dan het toestel aankon. Vandaar 1320px: precies het punt waar de eigen
+     maat verzadigt. Hoger heeft geen zin, want dan wordt het kader groter en de
+     inhoud niet, en dat is precies de uitgerekte tablet die we niet willen.
+
+     De verhouding blijft die van de iPad (786:1001). Wat er links en rechts
+     overblijft is voor de wings; die vullen de breedte, niet het kader. */
+  @media (min-width:1100px){
+    #shell{
+      height:min(94vh, 1320px);
+      max-width:min(1040px, calc(100% - 4rem));
+    }
+  }
+
   /* ---------- login ---------- */
 
   #gate{

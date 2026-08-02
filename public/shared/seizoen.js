@@ -69,15 +69,28 @@
       var v = getComputedStyle(wortel).getPropertyValue('--dag-kleur').trim();
       basis = /^#[0-9A-Fa-f]{6}$/.test(v) ? naarHsl(v) : null;
     };
+    /* Een ademtocht duurt hier tientallen seconden; vijf stapjes per seconde
+       is dan al ruim onzichtbaar glad. De lus liep eerst op elke beeldframe
+       (60x/s) en elke setProperty op <html> laat de browser de stijl van het
+       HELE document herrekenen -- dat is 60 documentbrede herrekeningen per
+       seconde voor een kleur die per frame 0,001 graad verschuift. Nu: om de
+       200ms kijken, en alleen schrijven als de afgeronde kleur echt anders is
+       (h op 0,1 graad, l op 0,05%). Zelfde adem, een tweehonderdste van de
+       rekening. rAF blijft de klok: die pauzeert vanzelf in een verborgen
+       tabblad, precies zoals we willen. */
+    var vorigeStap = 0, vorigeKleur = '';
     var adem = function (t) {
+      w.requestAnimationFrame(adem);
+      if (t - vorigeStap < 200) return;
+      vorigeStap = t;
       var nu = wortel.getAttribute('data-seizoen') + '/' + wortel.getAttribute('data-dagdeel');
       if (nu !== sleutel) { sleutel = nu; lees(); }
       if (basis) {
         var h = basis.h + 4 * Math.sin(t / 21000) + 2 * Math.sin(t / 8700);
         var l = basis.l + 1.5 * Math.sin(t / 13000);
-        wortel.style.setProperty('--dag-kleur', 'hsl(' + h.toFixed(3) + ' ' + basis.s.toFixed(2) + '% ' + l.toFixed(3) + '%)');
+        var kleur = 'hsl(' + (Math.round(h * 10) / 10) + ' ' + basis.s.toFixed(2) + '% ' + (Math.round(l * 20) / 20) + '%)';
+        if (kleur !== vorigeKleur) { vorigeKleur = kleur; wortel.style.setProperty('--dag-kleur', kleur); }
       }
-      w.requestAnimationFrame(adem);
     };
     w.requestAnimationFrame(adem);
   }

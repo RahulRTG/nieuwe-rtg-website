@@ -90,7 +90,15 @@
     st.textContent = '#rtgGanglijn{position:fixed;top:0;left:0;height:2px;z-index:9991;pointer-events:none;opacity:0.55;' +
       'background:linear-gradient(90deg,transparent,color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent));}' +
       '#rtgGanglijn i{position:absolute;right:-2px;top:-1.5px;width:5px;height:5px;border-radius:50%;' +
-      'background:var(--gold,#C9A24B);box-shadow:0 0 6px var(--gold,#C9A24B);}';
+      'background:var(--gold,#C9A24B);box-shadow:0 0 6px var(--gold,#C9A24B);' +
+      // de klop als CSS-animatie: de browser componeert hem zelf (en pauzeert
+      // hem buiten beeld), JavaScript hoeft er niet 60x/s voor wakker te zijn
+      'animation:rtgKlop 0.333s ease-in-out infinite;}' +
+      '#rtgGanglijn i.actief{animation-duration:0.222s;}' +
+      '@keyframes rtgKlop{0%,100%{opacity:0.55;transform:scale(0.8);}50%{opacity:1;transform:scale(1.3);}}' +
+      // wie minder beweging wil ziet een stilstaand puntje (expliciet, want de
+      // globale reduced-motion-regel zou een infinite-animatie laten flikkeren)
+      '@media (prefers-reduced-motion: reduce){#rtgGanglijn i{animation:none;}}';
     document.head.appendChild(st);
     lijn = document.createElement('div');
     lijn.id = 'rtgGanglijn';
@@ -99,19 +107,29 @@
     lijn.appendChild(punt);
     document.body.appendChild(lijn);
   }
-  function teken(nu, actief) {
+  var vorigeBreedte = '', vorigeKlop = null;
+  function teken(actief) {
     if (!lijn) return;
-    lijn.style.width = (p * 100).toFixed(2) + '%';
+    // de veer beweegt glaciaal (42 uur voor een volle lengte): alleen
+    // schrijven als er op het scherm echt een andere breedte staat
+    var b = (p * 100).toFixed(2) + '%';
+    if (b !== vorigeBreedte) { vorigeBreedte = b; lijn.style.width = b; }
     if (RUSTIG || !punt) return;
-    var hz = actief ? 4.5 : 3; // de onrust klopt sneller zodra er leven is
-    var f = 0.55 + 0.45 * Math.abs(Math.sin(nu / 1000 * Math.PI * hz));
-    punt.style.opacity = f.toFixed(2);
-    punt.style.transform = 'scale(' + (0.8 + 0.5 * f).toFixed(2) + ')';
+    // de klop zelf is CSS (rtgKlop); hier alleen het ritme kiezen
+    if (actief !== vorigeKlop) { vorigeKlop = actief; punt.classList.toggle('actief', actief); }
   }
 
-  /* ---- de gang: winden, leeglopen, versnellen; een tel per beeldje ---- */
+  /* ---- de gang: winden, leeglopen, versnellen ----
+     Dit liep als requestAnimationFrame-lus op 60 tellen per seconde, op elke
+     pagina van het huis (188 stuks laden dit script) -- voor een veer die er
+     42 uur over doet om leeg te lopen. De fysica is een integratie over dt en
+     maalt dus niet om de tiklengte: vier tikken per seconde geven exact
+     dezelfde veer. Het kloppende puntje, het enige dat echt vloeiend moest,
+     is naar een CSS-animatie verhuisd. In een verborgen tabblad slaat de tik
+     alleen de boekhouding over die er dan niet toe doet. */
   var vorige = 0;
-  function gang(nu) {
+  function gang() {
+    var nu = performance.now();
     var dt = Math.min(0.25, Math.max(0, (nu - vorige) / 1000));
     vorige = nu;
     var actief = nu < actiefTot;
@@ -121,13 +139,15 @@
     var doel = (!RUSTIG && opKroon && actief) ? 5 : 1; // het speelse versnellen bij aanraking
     tempo += (doel - tempo) * Math.min(1, dt * 3);
     if (nu - bewaardOp > 5000) bewaar(nu);
-    teken(nu, actief);
-    requestAnimationFrame(gang);
+    if (!document.hidden) teken(actief);
   }
   function start() {
     bouwTaal();
     bouwLijn();
-    requestAnimationFrame(function (t) { vorige = t; requestAnimationFrame(gang); });
+    vorige = performance.now();
+    gang();
+    var tik = setInterval(gang, 250);
+    if (tik && tik.unref) tik.unref();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();

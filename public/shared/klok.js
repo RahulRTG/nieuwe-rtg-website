@@ -37,21 +37,20 @@
     '.rtg-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16rem;height:16rem;max-width:74vw;max-height:74vw;' +
       '--klok-goud:var(--gold,#C9A24B);' +
       '--klok-sfeer:var(--dag-kleur,var(--s-accent-hel,var(--s-accent,#7F1634)));}' +
-    // De klok hangt niet lós voor de achtergrond. Drie zwarte schaduwen zetten
-    // hem in de ruimte: een korte contactschaduw die de kast gewicht geeft, een
-    // lange zachte eronder, en een brede halo die de achtergrond vlak om de kast
-    // dempt -- daardoor loopt de gouden rand over in het donker in plaats van
-    // eruit geknipt te staan. Bewust géén gekleurde gloed: die leest als neon.
-    // Het zit op een pseudo-element (dus één keer berekend) en niet op een filter
-    // over de bewegende wijzers; die zou elke seconde opnieuw moeten renderen.
-    // De twee gerichte schaduwen wijken naar rechtsonder, met dezelfde
-    // verhouding (x = 0.82 * y) als de wijzerschaduwen: één lichtbron van
-    // linksboven voor de kast én de wijzers, anders staan ze elkaar tegen te
-    // spreken. De brede halo blijft gecentreerd -- dat is omgevingslicht dat
-    // van alle kanten komt, geen slagschaduw, en heeft dus geen richting.
+    // De klok hangt niet lós voor de achtergrond: een korte contactschaduw
+    // geeft de kast gewicht, een zachte gerichte schaduw zet hem in de ruimte.
+    // Die twee wijken naar rechtsonder met dezelfde verhouding (x = 0.82 * y)
+    // als de wijzerschaduwen: één lichtbron voor kast én wijzers.
+    //
+    // Hier stond ook een brede zwarte halo (4.5rem, 0.55) en stonden beide
+    // schaduwen op halve dekking. Op een zwarte achtergrond viel dat weg, maar
+    // het beginscherm ademt tegenwoordig in de dagkleur (warm bordeaux) -- en
+    // daarop smolten die drie samen tot een groot donker ei rond de klok. Een
+    // schaduw hoort de achtergrond te verdiepen, niet te vervangen: dus de
+    // halo weg, de dekking terug naar wat een echt horloge op een tafel doet.
+    // Het zit op een pseudo-element (één keer berekend), niet op een filter.
     '.rtg-ring::before{content:"";position:absolute;inset:1.5%;border-radius:50%;pointer-events:none;' +
-      'box-shadow:0.25rem 0.3rem 0.9rem rgba(0,0,0,0.5), 1.2rem 1.5rem 3rem rgba(0,0,0,0.5),' +
-      '0 0 4.5rem rgba(0,0,0,0.55);}' +
+      'box-shadow:0.18rem 0.22rem 0.7rem rgba(0,0,0,0.34), 0.7rem 0.85rem 2.2rem rgba(0,0,0,0.22);}' +
     '.rtg-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}' +
     // fijne randen: een gouden haarlijn buiten, een witte lichtlijn, een
     // paletkleurige accent-flens
@@ -153,21 +152,15 @@
         '<stop offset="0%" stop-color="rgba(255,251,240,0.11)"/>' +
         '<stop offset="52%" stop-color="rgba(255,251,240,0.015)"/>' +
         '<stop offset="100%" stop-color="rgba(255,251,240,0)"/></radialGradient>' +
-      // Drie schaduwen, want de wijzers liggen niet op één hoogte boven de plaat:
-      // de uurwijzer onderop werpt een korte, harde schaduw, de minutenwijzer
-      // ligt daarboven, de secondewijzer bovenop en werpt de langste en zachtste.
-      // Juist dat hoogteverschil maakt van drie platte vormen een gestapeld
-      // uurwerk. De richting volgt het glashoogsel (rr-glans, linksboven), dus
-      // alles valt naar rechtsonder -- één lichtbron voor de hele wijzerplaat.
-      // filterUnits="userSpaceOnUse": met een gebied op de objectBoundingBox is
-      // 25% van een haardunne secondewijzer een fractie van een eenheid, en
-      // knipt de wijzer zijn eigen schaduw weg.
-      '<filter id="rr-schaduw' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
-        '<feDropShadow dx="0.5" dy="0.6" stdDeviation="0.5" flood-color="#000" flood-opacity="0.55"/></filter>' +
-      '<filter id="rr-schaduwm' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
-        '<feDropShadow dx="0.9" dy="1.1" stdDeviation="0.8" flood-color="#000" flood-opacity="0.5"/></filter>' +
-      '<filter id="rr-schaduws' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
-        '<feDropShadow dx="1.4" dy="1.7" stdDeviation="1.15" flood-color="#000" flood-opacity="0.42"/></filter>';
+      '';
+    /* De wijzerschaduwen zaten hier als drie feDropShadow-filters. Dat was
+       correct licht, maar een SVG-filter wordt bij ELKE verandering binnen
+       zijn gebied opnieuw gerasterd -- en er verandert 60 keer per seconde
+       iets (de secondewijzer veegt). Drie filters van 200x200 herrasteren,
+       elk beeldje, alleen voor een schaduwtje: dat is waar de klok zijn
+       stroom aan opstookte. De schaduwen bestaan nog steeds, maar nu als
+       gewone zwarte kopieën van de wijzer in een verschoven groep (zie
+       wijzer() hieronder): zelfde lichtval, geen filter, geen herrasteren. */
     svg.appendChild(defs);
 
     // de plaat + een fijne guilloché-golfstructuur (Seamaster-taal) + randvignet
@@ -305,16 +298,30 @@
     const wijzers = maak('g', {});
     /* Elke wijzer krijgt zijn eigen schaduw, maar die moet blijven vallen waar
        het licht hem laat vallen -- niet meedraaien met de wijzer. Vandaar de
-       omhulsel-groep: die staat stil en draagt het filter, de wijzer zelf draait
-       daarbinnen. Zet je het filter op de draaiende groep, dan zwiept de schaduw
-       met de secondewijzer mee rond de plaat. */
-    function schaduwhuls(filterId) {
+       omhulsel-groep: die staat stil en is alleen VERSCHOVEN in de lichtrichting
+       (rechtsonder, zoals het glashoogsel linksboven zit); daarbinnen draait een
+       zwarte kopie van de wijzer synchroon mee. Hoe hoger de wijzer boven de
+       plaat, hoe verder de schaduw verschuift en hoe lichter hij wordt -- dat
+       hoogteverschil maakt van drie platte vormen een gestapeld uurwerk.
+       Zonder blur: op deze schaal (een 200-tellige wijzerplaat) leest een
+       strakke schaduw als scherpte, en het spaart de SVG-filters uit die
+       anders elk beeldje opnieuw gerasterd zouden worden. */
+    function schaduwhuls(dx, dy, alpha) {
       const huls = document.createElementNS(NS, 'g');
-      huls.setAttribute('filter', 'url(#' + filterId + klokNr + ')');
+      huls.setAttribute('transform', 'translate(' + dx + ' ' + dy + ')');
+      huls.setAttribute('opacity', alpha);
       wijzers.appendChild(huls);
-      return huls;
+      const draaier = document.createElementNS(NS, 'g');
+      huls.appendChild(draaier);
+      return draaier;
     }
-    function wijzer(len, tail, w, filterId) {
+    /* Een wijzer is voortaan een paar: de schaduwkopie in zijn verschoven huls,
+       en de echte wijzer erbovenop. draai() zet beide in dezelfde stand. */
+    function wijzer(len, tail, w, dx, dy, alpha) {
+      const schaduw = document.createElementNS(NS, 'path');
+      schaduw.setAttribute('d', baton(len, tail, w)); schaduw.setAttribute('fill', '#000');
+      const sHuls = schaduwhuls(dx, dy, alpha);
+      sHuls.appendChild(schaduw);
       const g = document.createElementNS(NS, 'g');
       const body = document.createElementNS(NS, 'path');
       body.setAttribute('d', baton(len, tail, w)); body.setAttribute('fill', goud);
@@ -325,14 +332,37 @@
       lume.setAttribute('stroke', '#E7E2CC'); lume.setAttribute('stroke-width', (w * 0.4).toFixed(2));
       lume.setAttribute('stroke-linecap', 'round');
       g.append(body, lume);
-      schaduwhuls(filterId).appendChild(g);
-      return g;
+      wijzers.appendChild(g);
+      let vorige = null;
+      return { draai: graden => {
+        const r = 'rotate(' + graden + ' 100 100)';
+        if (r === vorige) return;
+        vorige = r;
+        sHuls.setAttribute('transform', r);
+        g.setAttribute('transform', r);
+      } };
     }
     // van onder naar boven: uur, minuut, seconde -- elk een stap hoger boven de
-    // plaat, en dus een langere en zachtere schaduw
-    const uurW = wijzer(45, 10, 3.6, 'rr-schaduw');
-    const minW = wijzer(71, 13, 2.7, 'rr-schaduwm');
-    // de secondewijzer: dun, met lollipop en tegengewicht
+    // plaat, en dus een verder verschoven en lichtere schaduw
+    const uurW = wijzer(45, 10, 3.6, 0.7, 0.85, 0.4);
+    const minW = wijzer(71, 13, 2.7, 1.1, 1.35, 0.34);
+    // de secondewijzer: dun, met lollipop en tegengewicht. De schaduw is een
+    // zwarte kopie van lijn, ring en tegengewicht (de lume-kern werpt er geen:
+    // die ligt verzonken in de ring).
+    const secSchaduw = document.createElementNS(NS, 'g');
+    {
+      const sl = document.createElementNS(NS, 'line');
+      sl.setAttribute('x1', 100); sl.setAttribute('y1', 116); sl.setAttribute('x2', 100); sl.setAttribute('y2', 14);
+      sl.setAttribute('stroke', '#000'); sl.setAttribute('stroke-width', 0.9);
+      const so = document.createElementNS(NS, 'circle');
+      so.setAttribute('cx', 100); so.setAttribute('cy', 30); so.setAttribute('r', 2.3);
+      so.setAttribute('fill', 'none'); so.setAttribute('stroke', '#000'); so.setAttribute('stroke-width', 1);
+      const sc = document.createElementNS(NS, 'circle');
+      sc.setAttribute('cx', 100); sc.setAttribute('cy', 116); sc.setAttribute('r', 1.9); sc.setAttribute('fill', '#000');
+      secSchaduw.append(sl, so, sc);
+    }
+    const secSchaduwHuls = schaduwhuls(1.6, 1.95, 0.26);
+    secSchaduwHuls.appendChild(secSchaduw);
     const secG = document.createElementNS(NS, 'g');
     const secL = document.createElementNS(NS, 'line');
     secL.setAttribute('x1', 100); secL.setAttribute('y1', 116); secL.setAttribute('x2', 100); secL.setAttribute('y2', 14);
@@ -344,7 +374,7 @@
     const secCw = document.createElementNS(NS, 'circle');
     secCw.setAttribute('cx', 100); secCw.setAttribute('cy', 116); secCw.setAttribute('r', 1.9); secCw.setAttribute('class', 'rr-seccw');
     secG.append(secL, secLol, secLolK, secCw);
-    schaduwhuls('rr-schaduws').appendChild(secG);
+    wijzers.appendChild(secG);
     // de centrale kap
     maak('circle', { cx: 100, cy: 100, r: 2.9, fill: goud, stroke: '#3E2E0C', 'stroke-width': 0.2 });
     maak('circle', { cx: 100, cy: 100, r: 0.95, fill: '#191309' });
@@ -364,9 +394,11 @@
       const s = d.getSeconds() + ms / 1000;
       const m = d.getMinutes() + s / 60;
       const h = (d.getHours() % 12) + m / 60;
-      uurW.setAttribute('transform', 'rotate(' + (h * 30).toFixed(3) + ' 100 100)');
-      minW.setAttribute('transform', 'rotate(' + (m * 6).toFixed(3) + ' 100 100)');
-      secG.setAttribute('transform', 'rotate(' + (s * 6).toFixed(3) + ' 100 100)');
+      uurW.draai((h * 30).toFixed(3));
+      minW.draai((m * 6).toFixed(3));
+      const secR = 'rotate(' + (s * 6).toFixed(3) + ' 100 100)';
+      secSchaduw.setAttribute('transform', secR);
+      secG.setAttribute('transform', secR);
       /* de datum verspringt niet stilletjes: precies om 00:00 rolt de schijf
          om. De eerste keer (en na een taalwissel) staat hij er direct. */
       const dagNr = String(d.getDate());
@@ -392,15 +424,35 @@
     };
   }
 
-  /* ---- de klok: compacte cijfers, of de ring (data-rtg-klok="ring") ---- */
+  /* ---- de klok: compacte cijfers, of de ring (data-rtg-klok="ring") ----
+     De lus liep hier onvoorwaardelijk op 60 beeldjes per seconde door -- ook
+     als de klok in een verborgen view stond of het tabblad op de achtergrond.
+     Nu: uit beeld (IntersectionObserver) of tabblad verborgen = stil, en bij
+     terugkeer loopt hij meteen weer (de wijzers staan dan direct goed, want
+     elke stap rekent uit de echte tijd). In de rustige stand (prefers-reduced-
+     motion) tikt hij per seconde, dus volstaat vier keer per seconde kijken. */
   function maakKlok(el) {
     if (!el || el.dataset.rtgKlokActief) return;
     el.dataset.rtgKlokActief = '1';
     const verf = el.dataset.rtgKlok === 'ring' ? maakRing(el) : maakCijfers(el);
-    (function stap() {
+    let inBeeld = true, loopt = false;
+    function stap() {
+      loopt = true;
+      if (!inBeeld || document.hidden) { loopt = false; return; }
       verf(new Date());
-      requestAnimationFrame(stap);
-    })();
+      if (RUSTIG) setTimeout(stap, 250);
+      else requestAnimationFrame(stap);
+    }
+    function wek() { if (!loopt && inBeeld && !document.hidden) stap(); }
+    if (window.IntersectionObserver) {
+      inBeeld = false;
+      new IntersectionObserver(rijen => {
+        inBeeld = rijen.some(r => r.isIntersecting);
+        wek();
+      }, { threshold: 0.01 }).observe(el);
+    }
+    document.addEventListener('visibilitychange', wek);
+    stap();
   }
 
   /* ---- de lange datum eronder, in de taal van de pagina ---- */

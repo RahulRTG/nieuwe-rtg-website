@@ -79,7 +79,16 @@ async function meet(pwBrowser, base, token, breed, hoog) {
   }));
   await page.addInitScript(t => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, token);
   await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
-  await page.evaluate(() => { const a = document.getElementById('app'); if (a) a.classList.add('active'); });
+  await page.evaluate(() => {
+    const a = document.getElementById('app'); if (a) a.classList.add('active');
+    /* Het onboarding-dialoog (#onbGate) ligt modaal over alles heen zolang de
+       intake niet af is. Dat is correct gedrag -- en het maakt de flanken
+       onaanklikbaar, wat deze toets als een timeout te zien kreeg. We halen hem
+       weg om de WINGS te kunnen beproeven, net zoals we hierboven de OS-stand
+       forceren. Wat we hier dus NIET toetsen is of de onboarding zelf klopt;
+       daar zijn de aanmeldtoetsen voor. */
+    const gate = document.getElementById('onbGate'); if (gate) gate.remove();
+  });
   await page.waitForTimeout(2500);   // de widgets halen hun bron op
   const uit = await page.evaluate(() => {
     const L = document.getElementById('wingL'), R = document.getElementById('wingR');
@@ -142,7 +151,7 @@ test('wings: weg op de iPad, gevuld op de computer, en aanpasbaar', { skip: pw ?
       assert.equal(uit.leegLijfZichtbaar, false, 'een widget zonder bron toont geen leeg lijf');
       assert.ok(uit.metWaarde.some(w => w.startsWith('Balans')), 'de Balans-widget hoort een echt advies te tonen, kreeg: ' + JSON.stringify(uit.metWaarde));
       assert.ok(uit.metWaarde.some(w => /€/.test(w)), 'een geld-widget hoort een echt bedrag te tonen, kreeg: ' + JSON.stringify(uit.metWaarde));
-      assert.ok(uit.metWaarde.some(w => /25,50|25\.50/.test(w)), 'het saldo hoort uit de bron te komen (25,50), kreeg: ' + JSON.stringify(uit.metWaarde));
+      assert.ok(uit.metWaarde.some(w => /25[.,]50/.test(w)), 'het saldo hoort uit de bron te komen (25,50), kreeg: ' + JSON.stringify(uit.metWaarde));
       /* De tweede regel: de laatste mutatie. Dit pint de VELDNAMEN vast (oms,
          centen). Leest iemand hier ooit weer `omschrijving`, dan zakt dit. */
       assert.ok(uit.onder.some(o => /Opgeladen/.test(o)), 'de laatste mutatie hoort onder het saldo te staan, kreeg: ' + JSON.stringify(uit.onder));
@@ -154,6 +163,12 @@ test('wings: weg op de iPad, gevuld op de computer, en aanpasbaar', { skip: pw ?
 
       // 3) aanpassen: de eerste app links uitzetten en dat moet blijven staan
       const eerste = uit.links[0];
+      /* De onboarding-deur wordt opnieuw opgebouwd nadat de pagina is geladen,
+         dus een keer weghalen is niet genoeg: vlak voor de klik nog eens. Dit
+         is een echte muisklik en geen JS-aanroep -- of de knop BEREIKBAAR is,
+         hoort deze toets te controleren. */
+      const gateWeg = () => page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.remove(); });
+      await gateWeg();
       await page.click('.wing-instel');
       await page.waitForSelector('.wing-kaart');
       await page.evaluate(naam => {
@@ -165,7 +180,16 @@ test('wings: weg op de iPad, gevuld op de computer, en aanpasbaar', { skip: pw ?
       assert.ok(!na.includes(eerste), '"' + eerste + '" hoort na uitzetten weg te zijn');
 
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.evaluate(() => { const a = document.getElementById('app'); if (a) a.classList.add('active'); });
+      await page.evaluate(() => {
+    const a = document.getElementById('app'); if (a) a.classList.add('active');
+    /* Het onboarding-dialoog (#onbGate) ligt modaal over alles heen zolang de
+       intake niet af is. Dat is correct gedrag -- en het maakt de flanken
+       onaanklikbaar, wat deze toets als een timeout te zien kreeg. We halen hem
+       weg om de WINGS te kunnen beproeven, net zoals we hierboven de OS-stand
+       forceren. Wat we hier dus NIET toetsen is of de onboarding zelf klopt;
+       daar zijn de aanmeldtoetsen voor. */
+    const gate = document.getElementById('onbGate'); if (gate) gate.remove();
+  });
       await page.waitForTimeout(700);
       const naHerlaad = await page.evaluate(() => [...document.querySelectorAll('#wingL .wing-naam')].map(n => n.textContent.trim()));
       assert.ok(!naHerlaad.includes(eerste), 'de keuze hoort een herlaadbeurt te overleven');
@@ -173,7 +197,7 @@ test('wings: weg op de iPad, gevuld op de computer, en aanpasbaar', { skip: pw ?
     }
   } finally {
     await browser.close();
-    await stop(srv);
+    await stop(srv.child);   // stop() wil het KINDPROCES; srv meegeven doet stil niets
     try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
   }
 });

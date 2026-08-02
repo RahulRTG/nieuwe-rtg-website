@@ -65,9 +65,23 @@
       knop.addEventListener('click', () => wingAanpassen(teken));
       wingR.appendChild(knop);
     }
-    // op het slotscherm horen er geen werk-apps naast te staan
+    /* ALLEEN HERTEKENEN ALS ER IETS VERANDERT.
+
+       Hier stond een onvoorwaardelijke hertekening bij elke klassewijziging op
+       #app. Die klassen wisselen vaker dan alleen bij in- en uitloggen (thema,
+       wallpaper, gast-modus), dus de flanken werden voortdurend opnieuw
+       opgebouwd: geflikker, en elke widget haalde zijn bron opnieuw op.
+
+       Gevonden doordat test/wings.e2e.js niet op de aanpasknop kon klikken --
+       Playwright wacht tot een element STABIEL is, en dat werd hij nooit. Een
+       toets die op een timeout zakt, wijst hier dus naar een echte fout en niet
+       naar een trage machine. */
+    let laatsteStand = null;
     function misschien() {
-      if (app.classList.contains('active')) teken();
+      const aan = breed.matches && app.classList.contains('active');
+      if (aan === laatsteStand) return;
+      laatsteStand = aan;
+      if (aan) teken();
       else { wingL.textContent = ''; wingR.textContent = ''; }
     }
     breed.addEventListener('change', misschien);

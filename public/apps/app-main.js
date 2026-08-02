@@ -4131,7 +4131,7 @@
     },
     'tab:betalen': {
       pad: '/pay/overzicht',
-      lees: d => (d && typeof d.saldo === 'number') ? eur(d.saldo / 100) : null,
+      lees: d => (d && typeof d.saldo === 'number') ? eurCenten(d.saldo) : null,
       /* De laatste mutatie erbij: dat is wat je van een saldo echt wilt weten,
          en het staat al in dezelfde bron -- geen extra aanroep. */
       /* De velden heten `oms` en `centen` -- dat is NAGEKEKEN in
@@ -4141,11 +4141,11 @@
       onder: d => {
         const g = d && d.geschiedenis && d.geschiedenis[0];
         if (!g) return null;
-        const bedrag = typeof g.centen === 'number' ? eur(Math.abs(g.centen) / 100) : '';
+        const bedrag = typeof g.centen === 'number' ? eurCenten(Math.abs(g.centen)) : '';
         return [String(g.oms || '').slice(0, 34), bedrag].filter(Boolean).join(' - ') || null;
       }
     },
-    'link:wallet': { pad: '/pay/overzicht', lees: d => (d && typeof d.saldo === 'number') ? eur(d.saldo / 100) : null }
+    'link:wallet': { pad: '/pay/overzicht', lees: d => (d && typeof d.saldo === 'number') ? eurCenten(d.saldo) : null }
   };
   /* RAHUL OPENEN MET EEN VRAAG.
 
@@ -4167,6 +4167,16 @@
     knop.click();
     return true;
   }
+
+  /* GELD IN EEN WIDGET HEEFT TWEE DECIMALEN.
+
+     Hier stond eur(saldo/100), en dat gaf "EUR 25.5" voor 2550 centen: nfmt()
+     gebruikt toLocaleString zonder minimumFractionDigits, dus de laatste nul
+     valt weg. Een bedrag met een halve decimaal leest als een fout in de
+     boekhouding, ook als het klopt. De gedeelde eur() laat ik met rust -- die
+     wordt overal gebruikt en dit is een presentatiekeuze van de flank. */
+  const eurCenten = c => '\u20AC ' + (Number(c) / 100).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL',
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const widgetCache = new Map();   // pad -> belofte, zodat twee widgets op dezelfde bron er samen een ophalen
 
@@ -4304,9 +4314,23 @@
       knop.addEventListener('click', () => wingAanpassen(teken));
       wingR.appendChild(knop);
     }
-    // op het slotscherm horen er geen werk-apps naast te staan
+    /* ALLEEN HERTEKENEN ALS ER IETS VERANDERT.
+
+       Hier stond een onvoorwaardelijke hertekening bij elke klassewijziging op
+       #app. Die klassen wisselen vaker dan alleen bij in- en uitloggen (thema,
+       wallpaper, gast-modus), dus de flanken werden voortdurend opnieuw
+       opgebouwd: geflikker, en elke widget haalde zijn bron opnieuw op.
+
+       Gevonden doordat test/wings.e2e.js niet op de aanpasknop kon klikken --
+       Playwright wacht tot een element STABIEL is, en dat werd hij nooit. Een
+       toets die op een timeout zakt, wijst hier dus naar een echte fout en niet
+       naar een trage machine. */
+    let laatsteStand = null;
     function misschien() {
-      if (app.classList.contains('active')) teken();
+      const aan = breed.matches && app.classList.contains('active');
+      if (aan === laatsteStand) return;
+      laatsteStand = aan;
+      if (aan) teken();
       else { wingL.textContent = ''; wingR.textContent = ''; }
     }
     breed.addEventListener('change', misschien);

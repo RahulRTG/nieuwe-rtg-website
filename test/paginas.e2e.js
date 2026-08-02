@@ -97,6 +97,7 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
   const stuk = [];       // pagina's met een fout die er niet hoort
   const genezen = [];    // pagina's op de basislijn die het niet meer nodig hebben
   const kaal = [];       // pagina's zonder titel, taal of inhoud
+  const ontbreekt = [];  // pagina's die een eigen bestand niet kunnen ophalen
   try {
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     /* Vier tabbladen naast elkaar. Bijna alle tijd is wachten (900 ms per
@@ -111,8 +112,27 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
       const page = await browser.newPage();
       const fouten = [];
       page.on('pageerror', e => fouten.push(e.message));
+      /* EEN 404 OP EEN EIGEN BESTAND GEEFT GEEN JS-FOUT.
+
+         Een vergeten <script> of stylesheet levert geen uitzondering op: de
+         pagina heeft nog steeds een titel, een taal en kinderen, dus hij kwam
+         hier vrolijk doorheen. Dat is dezelfde stille categorie waar deze scan
+         voor bestaat, alleen een verdieping lager. /api/ blijft erbuiten (een
+         401 op een uitgelogde pagina is normaal) en favicons ook. Vandaag
+         staat de teller op nul; deze regel houdt dat zo. */
+      const missend = [];
+      page.on('response', r => {
+        try {
+          const u = new URL(r.url());
+          if (r.status() >= 400 && u.origin === new URL(base).origin
+              && !/^\/api\//.test(u.pathname) && !/favicon|apple-touch/.test(u.pathname)) {
+            missend.push(r.status() + ' ' + u.pathname);
+          }
+        } catch (e) { /* geen bruikbare url */ }
+      });
       for (const p of lijst) {
         fouten.length = 0;
+        missend.length = 0;
         let probe = null;
         try {
           await page.goto(base + p, { waitUntil: 'load' });
@@ -132,6 +152,7 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
         const bekend = Object.prototype.hasOwnProperty.call(MAG_STUK, p);
         if (echt.length && !bekend) stuk.push(p + '  ->  ' + echt[0]);
         if (!echt.length && bekend) genezen.push(p);
+        if (missend.length) ontbreekt.push(p + '  ->  ' + [...new Set(missend)].join(', '));
         if (probe && (!probe.titel || !probe.taal || probe.kinderen === 0)) {
           kaal.push(p + '  ->  titel=' + JSON.stringify(probe.titel) + ' lang=' + JSON.stringify(probe.taal) + ' kinderen=' + probe.kinderen);
         }
@@ -147,6 +168,8 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
     'deze pagina(s) gooien een onafgevangen fout en staan niet op de basislijn:\n  ' + stuk.join('\n  '));
   assert.equal(kaal.length, 0,
     'deze pagina(s) missen een titel, een taal of tonen niets:\n  ' + kaal.join('\n  '));
+  assert.equal(ontbreekt.length, 0,
+    'deze pagina(s) vragen een eigen bestand dat er niet is (geen JS-fout, wel stuk):\n  ' + ontbreekt.join('\n  '));
   // advisering, geen poort: zie de kop van dit bestand
   if (genezen.length) console.log('  # deze pagina(s) waren schoon en mogen misschien uit MAG_STUK:\n  #   ' + genezen.join('\n  #   '));
 });

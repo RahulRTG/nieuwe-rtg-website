@@ -162,7 +162,26 @@ async function startEens(opts) {
       : ''));
 }
 
-function stop(child) { if (child) try { child.kill('SIGKILL'); } catch (e) {} }
+/* EEN STOP DIE STIL NIETS DOET, IS GEEN STOP.
+
+   Hier stond `if (child) try { child.kill('SIGKILL'); } catch (e) {}`. Wie het
+   hele resultaat van startServer meegaf -- `stop(srv)` in plaats van
+   `stop(srv.child)` -- raakte een object zonder .kill: de TypeError verdween in
+   de catch en de server bleef gewoon draaien. De testrunner wacht dan op een
+   kindproces dat niemand doodt, en de toets "hangt" zonder dat er iets stuk is.
+   Dat is me met test/wings.e2e.js precies overkomen en het kostte twee runs van
+   een kwartier voordat ik doorhad dat het aan de aanroep lag.
+
+   Nu accepteert hij beide vormen (het kind of het hele resultaat), en een
+   argument waar niets mee te stoppen valt is een FOUT in plaats van stilte. De
+   catch blijft alleen om een proces dat al weg is, en dat is geen probleem. */
+function stop(watDanOok) {
+  if (!watDanOok) return;
+  const kind = typeof watDanOok.kill === 'function' ? watDanOok
+    : (watDanOok.child && typeof watDanOok.child.kill === 'function' ? watDanOok.child : null);
+  if (!kind) throw new TypeError('stop() kreeg iets zonder .kill: geef het kindproces mee (of het resultaat van startServer).');
+  try { kind.kill('SIGKILL'); } catch (e) { /* al weg: prima */ }
+}
 
 /* Een NETTE stop: SIGTERM, en wachten tot het proces echt weg is.
 

@@ -738,7 +738,14 @@ rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch 
 bureaublad(app);
 app.use(cspNonce(PUBLIC_DIR, CSP_NONCE));
 app.get(/\.(?:js|css|svg|json|webmanifest)$/, statischGzip(PUBLIC_DIR));
-app.use(express.static(PUBLIC_DIR));
+/* Zelfde cache-regel als statischGzip (zie compressie.js): script en stijl
+   altijd laten navragen (ETag/304), anders serveert een tussenlaag na een
+   update urenlang oud script naast nieuwe html en breekt de app stil. */
+app.use(express.static(PUBLIC_DIR, {
+  setHeaders: (res, p) => {
+    if (/\.(?:js|css|json|webmanifest|svg)$/.test(p)) res.setHeader('Cache-Control', 'no-cache');
+  }
+}));
 
 /* ---------- Claude API (optioneel) ---------- */
 

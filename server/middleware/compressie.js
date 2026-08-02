@@ -83,10 +83,19 @@ function statischGzip(publicDir) {
       if (cache.size > 300) cache.clear();
       cache.set(bestand, hit);
     }
+    /* Geen max-age meer: met een vaste levensduur bleef na een update overal
+       (browser en Cloudflare-edge) tot uren lang een OUD script hangen naast
+       de NIEUWE html, en die mix brak de app zonder foutmelding (leeg
+       beginscherm). "no-cache" betekent: bewaren mag, maar eerst even
+       navragen -- dat navragen is met de ETag hieronder een 304 van een paar
+       bytes, en Cloudflare cachet zulke antwoorden niet aan de rand. */
+    const etag = 'W/"' + st.size.toString(16) + '-' + Math.round(st.mtimeMs).toString(16) + (minMtimeMs ? '-m' + Math.round(minMtimeMs).toString(16) : '') + '"';
+    res.setHeader('ETag', etag);
+    res.setHeader('Cache-Control', 'no-cache');
+    if (req.headers['if-none-match'] === etag) { res.statusCode = 304; return res.end(); }
     res.setHeader('Content-Type', type);
     res.setHeader('Content-Encoding', 'gzip');
     res.setHeader('Vary', 'Accept-Encoding');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
     res.end(hit.gz);
   };
 }

@@ -74,7 +74,13 @@ class Gemini {
     this.messages = { async create(params) {
       const model = kiesModel(params.model);
       const body = { contents: naarGemini(params), generationConfig: { maxOutputTokens: params.max_tokens || 1024 } };
-      if (params.system) body.system_instruction = { parts: [{ text: String(params.system) }] };
+      if (params.system) {
+        // ook een blokken-lijst (Claude-vorm) netjes terugvouwen tot tekst
+        const sysTekst = Array.isArray(params.system)
+          ? params.system.map(b => (b && b.text) || '').filter(Boolean).join('\n')
+          : String(params.system);
+        if (sysTekst) body.system_instruction = { parts: [{ text: sysTekst }] };
+      }
       if (params.tools) body.tools = toolsNaarGemini(params.tools);
       const r = await http.vraag({
         url: zelf.baseURL + '/v1beta/models/' + encodeURIComponent(model) + ':generateContent',

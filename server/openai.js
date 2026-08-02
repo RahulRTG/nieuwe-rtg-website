@@ -20,10 +20,24 @@ function kiesModel(claudeModel) {
   return 'gpt-4o';
 }
 
-// Claude-berichten -> OpenAI-berichten
+/* Claude-berichten -> OpenAI-berichten.
+
+   Prompt caching hoeft hier niets extra's: OpenAI cachet automatisch elke
+   prompt vanaf ~1024 tokens op voorwaarde dat het vaste deel VOORAAN staat --
+   en dat doet deze vertaling al (system eerst, dan de geschiedenis in
+   volgorde). De cache_control-markeringen van de Claude-kant bestaan bij
+   OpenAI niet; de uitwijkketen geeft ons het ongemarkeerde origineel (de
+   verrijking gebeurt pas ín server/anthropic.js, op een kopie). Een
+   systeemprompt kan behalve een tekst ook een lijst blokken zijn; die
+   vouwen we hier terug tot tekst. */
 function naarOpenAI(params) {
   const uit = [];
-  if (params.system) uit.push({ role: 'system', content: String(params.system) });
+  if (params.system) {
+    const sys = Array.isArray(params.system)
+      ? params.system.map(b => (b && b.text) || '').filter(Boolean).join('\n')
+      : String(params.system);
+    if (sys) uit.push({ role: 'system', content: sys });
+  }
   for (const b of params.messages || []) {
     if (typeof b.content === 'string') { uit.push({ role: b.role, content: b.content }); continue; }
     if (b.role === 'assistant') {
@@ -61,7 +75,10 @@ function naarClaude(data) {
   return {
     content: content.length ? content : [{ type: 'text', text: '' }],
     stop_reason: heeftTool ? 'tool_use' : (keuze.finish_reason === 'length' ? 'max_tokens' : 'end_turn'),
-    usage: { input_tokens: (data.usage || {}).prompt_tokens || 0, output_tokens: (data.usage || {}).completion_tokens || 0 },
+    usage: { input_tokens: (data.usage || {}).prompt_tokens || 0, output_tokens: (data.usage || {}).completion_tokens || 0,
+      // OpenAI cachet automatisch; dit maakt de treffers zichtbaar in dezelfde
+      // Claude-vormige usage (cache_read_input_tokens) als bij de andere aanbieders
+      cache_read_input_tokens: (((data.usage || {}).prompt_tokens_details || {}).cached_tokens) || 0 },
     model: data.model, _via: 'openai'
   };
 }

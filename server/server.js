@@ -3547,7 +3547,19 @@ setInterval(backupData, 24 * 60 * 60 * 1000);
    afgewezen bewijs als vangnet). Draait elk uur en een keer bij de start. */
 const bewaarveger = require('./bewaarveger').maakBewaarveger({
   db, save, accounts, log,
-  identiteitsmap: require('./identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR)
+  identiteitsmap: require('./identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR),
+  /* de laatst voldane lidmaatschapstermijn van dit account: zolang er
+     verlengd wordt, blijft het ID-bewijs in de kluis (de klok volgt de pas) */
+  laatsteVerlenging: (uId) => {
+    let max = 0;
+    const vanLid = new Set((db.data.aanmeldingen || []).filter(a => a.accountId === uId).map(a => a.id));
+    for (const r of (db.data.lidmaatschapBetalingen || [])) {
+      if (!vanLid.has(r.aanmeldingId)) continue;
+      for (const t of (r.termijnen || []))
+        if (t.voldaan && t.voldaan.at) max = Math.max(max, Date.parse(t.voldaan.at) || 0);
+    }
+    return max;
+  }
 });
 try { bewaarveger.veeg(); } catch (e) { log.warn && log.warn('[bewaarveger] eerste ronde: ' + e.message); }
 bewaarveger.start();

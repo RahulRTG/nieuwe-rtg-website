@@ -25,9 +25,10 @@
    bevestiging: dit zijn de regels die de eigenaar al bevestigd HEEFT. */
 const DAG = 86400000;
 
-function maakBewaarveger({ db, save, accounts, identiteitsmap, log, nu, instel }) {
+function maakBewaarveger({ db, save, accounts, identiteitsmap, laatsteVerlenging, log, nu, instel }) {
   const I = Object.assign({ locatieDagen: 7, idDagen: 365 }, instel || {});
   const klok = nu || (() => Date.now());
+  const verlengd = laatsteVerlenging || (() => 0);
 
   function wisDossier(u, md) {
     try { identiteitsmap.wisAllesVan(u.id); } catch (e) { /* map al leeg: prima */ }
@@ -56,7 +57,16 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, log, nu, instel }
         klokGestart++;
         continue;
       }
-      if (t - Date.parse(md.geverifieerdOp) > I.idDagen * DAG && (u.id_doc || md.selfie)) {
+      /* DE KLOK VOLGT HET LIDMAATSCHAP. Een pas is een jaarcontract; wie
+         verlengt, blijft lid, en zolang iemand lid is blijft het bewijs in de
+         kluis (besluit van de eigenaar, 2 augustus 2026: "als ze hun pas
+         verlengen met een jaar, dan weer een jaar"). Het anker is daarom het
+         JONGSTE van de goedkeuringsdatum en de laatst voldane
+         lidmaatschapstermijn -- pas een jaar nadat er voor het laatst is
+         verlengd (of goedgekeurd, als er nooit een termijn was) gaat het
+         bewijs de kluis uit. */
+      const anker = Math.max(Date.parse(md.geverifieerdOp) || 0, verlengd(u.id) || 0);
+      if (t - anker > I.idDagen * DAG && (u.id_doc || md.selfie)) {
         wisDossier(u, md);
         dossiers++;
       }

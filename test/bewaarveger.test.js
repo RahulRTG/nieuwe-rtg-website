@@ -15,6 +15,7 @@ function bouw() {
   const gewist = [];
   const users = new Map();     // id -> { id, verified, id_doc }
   const states = new Map();    // id -> md
+  const verlengingen = new Map(); // id -> ms van de laatst voldane termijn
   const accounts = {
     listByVerification: (st) => [...users.values()].filter(u => u.verified === st),
     getMemberState: (id) => states.get(id) || {},
@@ -25,9 +26,10 @@ function bouw() {
   const v = maakBewaarveger({
     db, save: () => saves++, accounts,
     identiteitsmap: { wisAllesVan: (id) => gewist.push(id) },
+    laatsteVerlenging: (id) => verlengingen.get(id) || 0,
     nu: () => tijd
   });
-  return { db, v, users, states, gewist, tik: (ms) => { tijd += ms; }, savesGedaan: () => saves };
+  return { db, v, users, states, gewist, verlengingen, tik: (ms) => { tijd += ms; }, savesGedaan: () => saves };
 }
 
 test('locatie: een spoor van acht dagen oud gaat weg, een vers spoor blijft', () => {
@@ -85,6 +87,21 @@ test('klok-backfill: wie voor deze regel is goedgekeurd krijgt de datum van vand
   tik(366 * DAG);
   assert.equal(v.veeg().dossiers, 1, 'een jaar na de klokstart gaat het bewijs alsnog netjes weg');
   assert.deepEqual(gewist, [3]);
+});
+
+test('verlengen verlengt: zolang de pas doorloopt blijft het bewijs, de klok volgt de laatste termijn', () => {
+  const { v, users, states, gewist, verlengingen, tik } = bouw();
+  users.set(5, { id: 5, verified: 'verified', id_doc: '5-pas.bin' });
+  states.set(5, { geverifieerdOp: new Date(T0).toISOString() });
+  // twee jaar na de goedkeuring, maar een half jaar geleden nog een termijn voldaan
+  verlengingen.set(5, T0 + 550 * DAG);
+  tik(2 * 366 * DAG);
+  assert.equal(v.veeg().dossiers, 0, 'wie blijft verlengen, blijft zijn bewijs houden');
+  assert.deepEqual(gewist, []);
+  // en pas een jaar na de LAATSTE verlenging gaat het alsnog weg
+  tik(200 * DAG); // nu ruim een jaar voorbij de laatste termijn
+  assert.equal(v.veeg().dossiers, 1, 'een jaar na de laatste verlenging is het lidmaatschap echt voorbij');
+  assert.deepEqual(gewist, [5]);
 });
 
 test('afgewezen: het vangnet veegt restanten van een afwijzing, ongeacht leeftijd', () => {

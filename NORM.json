@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-08-01",
+  "vastgelegd": "2026-08-02",
   "meters": {
     "endpointsZonderTest": 634,
     "dekkingPct": 75,
@@ -7,12 +7,13 @@
     "keuringScheef": 0,
     "dependencies": 0,
     "testbestanden": 472,
-    "dekkingWaargenomenPct": 94,
+    "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 68,
     "e2eBestanden": 42,
     "keuringOmvang": 66,
     "keuringDubbeling": 56,
-    "keuringDekkingAdvies": 8
+    "keuringDekkingAdvies": 8,
+    "endpointsNooitAangeraakt": 0
   },
   "notities": [
     {

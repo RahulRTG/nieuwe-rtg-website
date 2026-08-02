@@ -153,6 +153,52 @@
     }
   }
 
+  /* ---------- de wings ----------
+     Onder 1100px bestaan ze niet en vult de OS-laag ze ook niet. Ze hangen NIET
+     aan de shell maar staan ernaast in dezelfde flexrij: het kader houdt zijn
+     iPad-verhouding, de flanken nemen de breedte die het kader per definitie
+     niet kan gebruiken. */
+  .wing{display:none;}
+  @media (min-width:1100px){
+    body{flex-direction:row;gap:clamp(1rem, 2.2vw, 2.4rem);}
+    .wing{
+      display:flex;flex-direction:column;gap:calc(var(--wing-e) * 0.9);
+      flex:1 1 0;max-width:230px;min-width:0;justify-content:center;
+      /* de eigen maat van de flank: kleiner dan die van de console, want dit is
+         de tweede rang in de compositie en hoort dat ook te zijn */
+      --wing-e:clamp(10px, 1.1vw, 15px);
+      padding:1.5rem 0;max-height:94vh;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;
+    }
+    #wingL{align-items:flex-end;}
+    #wingR{align-items:flex-start;}
+    .wing-tegel{
+      display:flex;align-items:center;gap:0.7rem;width:100%;max-width:210px;
+      background:none;border:none;padding:0.42rem 0.5rem;border-radius:14px;
+      cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;transition:background 140ms ease;
+    }
+    .wing-tegel .os-tegel{width:calc(var(--wing-e) * 2.6);height:calc(var(--wing-e) * 2.6);flex-shrink:0;}
+    .wing-naam{font-size:calc(var(--wing-e) * 0.92);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .wing-tegel:hover{background:rgba(255,255,255,0.045);}
+    .wing-tegel:hover .wing-naam{color:var(--txt);}
+    .wing-tegel:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+    .wing-instel{
+      align-self:center;margin-top:0.6rem;background:none;border:none;cursor:pointer;
+      color:var(--muted);font-family:inherit;font-size:calc(var(--wing-e) * 0.82);
+      letter-spacing:0.08em;padding:0.4rem 0.6rem;border-radius:999px;
+    }
+    .wing-instel:hover{color:var(--gold);}
+  }
+  @media (prefers-reduced-motion: reduce){ .wing-tegel{transition:none;} }
+  .wing-scrim{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.62);padding:1.5rem;}
+  .wing-kaart{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:1.6rem 1.5rem 1.2rem;width:min(420px, 100%);max-height:80vh;overflow:auto;}
+  .wing-kaart h2{font-family:'Bodoni Moda',serif;font-size:1.15rem;font-weight:600;margin-bottom:0.35rem;}
+  .wing-uitleg{font-size:0.78rem;color:var(--muted);line-height:1.5;margin-bottom:1.1rem;}
+  .wing-rij{display:flex;align-items:center;justify-content:space-between;gap:0.8rem;padding:0.45rem 0;border-top:1px solid var(--line);font-size:0.86rem;}
+  .wing-standen{display:flex;gap:0.25rem;flex-shrink:0;}
+  .wing-stand{background:none;border:1px solid var(--line);border-radius:999px;padding:0.24rem 0.62rem;font-size:0.7rem;color:var(--muted);font-family:inherit;cursor:pointer;}
+  .wing-stand.aan{border-color:var(--gold);color:var(--gold);}
+  .wing-klaar{display:block;width:100%;margin-top:1.2rem;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.85rem;font-size:0.86rem;font-weight:600;font-family:inherit;cursor:pointer;}
+
   /* ---------- login ---------- */
 
   #gate{
@@ -1377,6 +1423,10 @@
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#content">Naar de inhoud</a>
+<!-- De wings: gevuld door de OS-laag (app-main-31.js, einde OS-IIFE) en alleen
+     op een breed scherm. Leeg zijn ze onzichtbaar, dus telefoon en iPad merken
+     hier niets van. -->
+<aside id="wingL" class="wing" aria-label="Werkbank"></aside>
 <div id="shell" data-levendegrond>
 
   <!-- login -->
@@ -1958,6 +2008,7 @@
 <script src="/shared/spraak.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/apps/util.js"></script>
+<aside id="wingR" class="wing" aria-label="Administratie"></aside>
 <script src="/shared/appshell.js"></script>
 <script src="/shared/borden.js"></script>
 <script src="/shared/accounts-os.js"></script>

@@ -42,6 +42,12 @@
       b.classList.toggle('active', on);
       if (on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); // schermlezer meldt de actieve tab
     });
+    /* Onthouden waar je bent: op een telefoon wordt de app voortdurend door
+       het systeem gedood en herstart (iOS doet dat al na een paar minuten
+       achtergrond), en elke herstart betekende terug-naar-home -- midden in
+       de Salon of een bestelling. Dat voelt als een app die je plek kwijt-
+       raakt. renderAll() leest dit terug en zet je waar je was. */
+    try { localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab, t: Date.now() })); } catch(e){}
     $('#content').scrollTop = 0;
     // Alleen bij een echte klik de focus naar de nieuwe weergave verplaatsen, zodat
     // toetsenbord- en schermlezergebruikers meelopen (niet bij programmatische wissels).
@@ -77,7 +83,18 @@
     loadCv();
     loadVacatures();
     laadOntmoet();
-    openTab('home');
+    /* Terug waar je was: binnen een half uur na de laatste activiteit herstelt
+       de app de tab waar je zat (zie openTab). Ouder dan dat -- of een tab die
+       voor deze pas niet zichtbaar is -- dan gewoon het beginscherm. */
+    let beginTab = 'home';
+    try {
+      const b = JSON.parse(localStorage.getItem('rtg_actieve_tab') || 'null');
+      if (b && b.tab && Date.now() - (b.t || 0) < 30 * 60000){
+        const knop = document.querySelector('.tabbar button[data-tab="' + b.tab + '"]');
+        if (knop && knop.style.display !== 'none') beginTab = b.tab;
+      }
+    } catch(e){}
+    openTab(beginTab);
     if ((rtf.gekoppeld || []).length) ensurePush(false); // stil vernieuwen als het al aan staat
   }
 

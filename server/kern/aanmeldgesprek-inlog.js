@@ -58,7 +58,7 @@ module.exports = function maakInlog({ swStart, swZeg, ord, schoon, gesprekken })
         if (/\bwachtwoord\b/i.test(tekst)) { g.stap = 'login-af'; g.sw = null; return { entree: true, tekst: 'Ook goed. Typ je wachtwoord hieronder.', login: g.login || null }; }
         const r = await swZeg((g.sw || {}).id || '', tekst);
         g.sw = null;
-        if (r.ok) { gesprekken.delete(id); return { inlog: { userId: r.userId }, tekst: 'Daar ben je weer — welkom terug in het huis.' }; }
+        if (r.ok) { gesprekken.delete(id); return { inlog: { userId: r.userId }, tekst: 'Daar ben je weer: welkom terug in het huis.' }; }
         g.stap = 'login-naam';
         return { entree: true, tekst: (r.error || 'Dat klopte net niet helemaal.') + ' Zullen we het opnieuw proberen? Met welk e-mailadres of welke gebruikersnaam ken ik je? (Of zeg "wachtwoord".)' };
       }

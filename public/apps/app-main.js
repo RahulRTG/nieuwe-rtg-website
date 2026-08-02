@@ -563,7 +563,7 @@
       } else {
         doos.classList.remove('ag-ballotage');
       }
-      const kluisTekst = d && d.login ? T('ag.kluisdirect','Rechtstreeks naar de kluis — niet door dit gesprek')
+      const kluisTekst = d && d.login ? T('ag.kluisdirect','Rechtstreeks naar de kluis, niet door dit gesprek')
         : (d && d.vertrouwelijk ? T('ag.kluis','Versleuteld · rechtstreeks de kluis in') : null);
       if (kluisEl && kluisTekst && !d.klaar){
         kluisEl.textContent = kluisTekst;
@@ -689,7 +689,7 @@
         if (loginU && !commando){
           try {
             await login('rtg', { u: loginU, p: tekst });
-            zeg('rahul', T('ag.welkom','Daar ben je weer — welkom terug in het huis.'));
+            zeg('rahul', T('ag.welkom','Daar ben je weer: welkom terug in het huis.'));
             toonVoortgang({});
           } catch(e){
             zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.wwmis','Probeer het nog eens, zeg "opnieuw", of zeg "wachtwoord vergeten" en dan regel ik een herstel-link.'));

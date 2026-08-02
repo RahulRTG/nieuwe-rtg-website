@@ -14,13 +14,15 @@
         if (loginU && !commando){
           try {
             await login('rtg', { u: loginU, p: tekst });
-            zeg('rahul', T('ag.welkom','Daar ben je weer. Welkom terug.'));
+            zeg('rahul', T('ag.welkom','Daar ben je weer: welkom terug in het huis.'));
+            toonVoortgang({});
           } catch(e){
             zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.wwmis','Probeer het nog eens, zeg "opnieuw", of zeg "wachtwoord vergeten" en dan regel ik een herstel-link.'));
           }
         } else {
           const d = await API.call('/aanmeld/zeg', { id: gesprek, tekst, lang: document.documentElement.lang || 'nl' });
           zeg('rahul', d.tekst);
+          toonVoortgang(d);
           // ingelogd via de sleutelwoorden: de server heeft server-side
           // geverifieerd en een echte token gemunt; wij bewaren hem en
           // herstellen de sessie precies zoals na een gewone inlog

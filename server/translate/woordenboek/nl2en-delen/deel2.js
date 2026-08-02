@@ -61,12 +61,12 @@ module.exports = {
      niet afhangt van de machinevertaling. De openingsvarianten staan er
      alle drie in; de zinnen met een naam of werkgever erin blijven voor de
      vertaler (die zijn per persoon anders). */
-  'Mooi. Dan open ik de ballotage — vier vragen, meer is het niet. Je volledige naam?':
-    "Good. Then I'll open the ballotage — four questions, nothing more. Your full name?",
-  'Mooi zo! Dan open ik de ballotage — vier vragen, meer is het niet. Je volledige naam?':
-    "Splendid. Then I'll open the ballotage — four questions, nothing more. Your full name?",
-  'Dank dat je het zegt. Dan open ik de ballotage — vier vragen, meer is het niet. Je volledige naam?':
-    "Thank you for saying so. Then I'll open the ballotage — four questions, nothing more. Your full name?",
+  'Mooi. Dan open ik de ballotage: vier vragen, meer is het niet. Je volledige naam?':
+    "Good. Then I'll open the ballotage: four questions, nothing more. Your full name?",
+  'Mooi zo! Dan open ik de ballotage: vier vragen, meer is het niet. Je volledige naam?':
+    "Splendid. Then I'll open the ballotage: four questions, nothing more. Your full name?",
+  'Dank dat je het zegt. Dan open ik de ballotage: vier vragen, meer is het niet. Je volledige naam?':
+    "Thank you for saying so. Then I'll open the ballotage: four questions, nothing more. Your full name?",
   'Die naam lees ik niet goed. Hoe schrijf je hem?':
     "I can't quite read that name. How do you spell it?",
   'Daar zie ik geen e-mailadres in. Voluit, met @?':
@@ -77,18 +77,18 @@ module.exports = {
     "I can't place that date. As day-month-year, for instance 14-03-1992?",
   'RTG kan vanaf 15 jaar. Tot die tijd is er de RTFoundation-wereld; die is er juist voor jou.':
     'RTG begins at fifteen. Until then there is the RTFoundation world; it exists precisely for you.',
-  'De laatste vraag: kies een wachtwoord, minstens zes tekens. Het gaat versleuteld de kluis in — niemand bij RTG kan het inzien.':
-    'The final question: choose a password, at least six characters. It goes encrypted into the vault — no one at RTG can see it.',
-  'Voor jouw leeftijd gelden beschermende regels; die regel ik. De laatste vraag: kies een wachtwoord, minstens zes tekens. Het gaat versleuteld de kluis in — niemand bij RTG kan het inzien.':
-    "Protective rules apply at your age; I'll see to them. The final question: choose a password, at least six characters. It goes encrypted into the vault — no one at RTG can see it.",
-  'Net te kort — minstens zes tekens.':
-    'Just short — at least six characters.',
-  'Dat is rond — welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam.':
-    'That completes it — welcome to the house. Your RTG Pass is in your name as of this moment.',
-  'Dat is rond — welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam. Je noemde je bedrijf: de Business Pass gaat op uitnodiging; ik noteer je interesse, beloven kan ik niets.':
-    "That completes it — welcome to the house. Your RTG Pass is in your name as of this moment. You mentioned your company: the Business Pass is by invitation; I'll note your interest — promise anything, I cannot.",
-  'Dat is rond — welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam. De Lifestyle Pass gaat op uitnodiging; ik noteer je interesse, beloven kan ik niets.':
-    "That completes it — welcome to the house. Your RTG Pass is in your name as of this moment. The Lifestyle Pass is by invitation; I'll note your interest — promise anything, I cannot.",
+  'De laatste vraag: kies een wachtwoord, minstens zes tekens. Het gaat versleuteld de kluis in; niemand bij RTG kan het inzien.':
+    'The final question: choose a password, at least six characters. It goes encrypted into the vault; no one at RTG can see it.',
+  'Voor jouw leeftijd gelden beschermende regels; die regel ik. De laatste vraag: kies een wachtwoord, minstens zes tekens. Het gaat versleuteld de kluis in; niemand bij RTG kan het inzien.':
+    "Protective rules apply at your age; I'll see to them. The final question: choose a password, at least six characters. It goes encrypted into the vault; no one at RTG can see it.",
+  'Net te kort; minstens zes tekens.':
+    'Just short; at least six characters.',
+  'Dat is rond: welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam.':
+    'That completes it: welcome to the house. Your RTG Pass is in your name as of this moment.',
+  'Dat is rond: welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam. Je noemde je bedrijf: de Business Pass gaat op uitnodiging; ik noteer je interesse, beloven kan ik niets.':
+    "That completes it: welcome to the house. Your RTG Pass is in your name as of this moment. You mentioned your company: the Business Pass is by invitation; I'll note your interest; promise anything, I cannot.",
+  'Dat is rond: welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam. De Lifestyle Pass gaat op uitnodiging; ik noteer je interesse, beloven kan ik niets.':
+    "That completes it: welcome to the house. Your RTG Pass is in your name as of this moment. The Lifestyle Pass is by invitation; I'll note your interest; promise anything, I cannot.",
   'Dan regelen we dat hier. Hoe gaat het vandaag?':
     "We'll arrange that right here. How are you today?",
   'Leuk! Dan regelen we dat hier. Hoe gaat het vandaag?':
@@ -97,8 +97,8 @@ module.exports = {
   'Je e-mailadres?': 'Your email address?',
   'Je volledige naam?': 'Your full name?',
   // de entree (het inlogpad)
-  'Daar ben je weer — welkom terug in het huis.':
-    'There you are — welcome back to the house.',
+  'Daar ben je weer: welkom terug in het huis.':
+    'There you are: welcome back to the house.',
   'Typ je wachtwoord gewoon hieronder, dan ben je zo binnen. Kom je er niet uit: zeg "opnieuw" of "wachtwoord vergeten".':
     'Simply type your password below and you\'re in. Stuck? Say "opnieuw" or "wachtwoord vergeten".'
 };

@@ -30,7 +30,7 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       g.stap = 'naam';
       const somber = /\b(slecht|niet zo|moe|druk|stress|rot)\b/i.test(tekst);
       const opening = somber ? 'Dank dat je het zegt. ' : toon(g, 'Mooi. ', 'Mooi zo! ');
-      return stap(1, { tekst: opening + 'Dan open ik de ballotage — vier vragen, meer is het niet. Je volledige naam?' });
+      return stap(1, { tekst: opening + 'Dan open ik de ballotage: vier vragen, meer is het niet. Je volledige naam?' });
     }
     case 'naam': {
       const naam = schoon(tekst.replace(/^(ik ben|ik heet|mijn naam is)\s+/i, ''), 80);
@@ -62,10 +62,10 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       g.velden.geboortedatum = d;
       g.stap = 'wachtwoord';
       const jong = lft < 18 ? 'Voor jouw leeftijd gelden beschermende regels; die regel ik. ' : '';
-      return stap(4, { vertrouwelijk: true, tekst: jong + 'De laatste vraag: kies een wachtwoord, minstens zes tekens. Het gaat versleuteld de kluis in — niemand bij RTG kan het inzien.' });
+      return stap(4, { vertrouwelijk: true, tekst: jong + 'De laatste vraag: kies een wachtwoord, minstens zes tekens. Het gaat versleuteld de kluis in; niemand bij RTG kan het inzien.' });
     }
     case 'wachtwoord': {
-      if (tekst.length < 6) return stap(4, { vertrouwelijk: true, tekst: 'Net te kort — minstens zes tekens.' });
+      if (tekst.length < 6) return stap(4, { vertrouwelijk: true, tekst: 'Net te kort; minstens zes tekens.' });
       g.velden.password = String(ruwTekst).slice(0, 200);
       g.stap = 'klaar';
       g.velden.tier = 'rtg';
@@ -77,7 +77,7 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       /* Alleen de vier velden. `phone` gaat hier NIET mee: dat vraagt Rahul pas
          wanneer er iets bezorgd of gereserveerd moet worden. */
       const velden = { name: g.velden.name, email: g.velden.email, geboortedatum: g.velden.geboortedatum, password: g.velden.password, tier: 'rtg' };
-      const uit = { tekst: 'Dat is rond — welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam.' + interesse + werk,
+      const uit = { tekst: 'Dat is rond: welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam.' + interesse + werk,
         klaar: true, velden, werkgever: g.werkgever, woonplaats: g.velden.woonplaats || null };
       gesprekken.delete(id);
       return uit;

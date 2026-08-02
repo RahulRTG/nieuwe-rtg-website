@@ -307,7 +307,8 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
-    ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund']
+    ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
+    ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
   ]);
   /* NOG TE DOEN. Deze staan net boven de grens en moeten opgeknipt worden, maar
      dat is bij een servermodule geen byte-knip: het vraagt echte bedrading

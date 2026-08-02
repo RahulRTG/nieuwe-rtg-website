@@ -1,19 +1,9 @@
-/* De eigenaarszetel in de boardroom.
-
-   De eigenaars-API (/api/boardroom/*) bestond al volledig -- schakelkast,
-   wereldtalen, AI-regie, storingswachter -- maar had geen enkel scherm: de
-   boardroom-tegel opende voor iedereen alleen het leden-schakelbord, ook
-   voor de eigenaar. "Ik ben niet gemachtigd" was dus geen rechtenprobleem
-   maar een ontbrekende deur.
-
-   Dit script klopt bij het laden stil aan op /api/boardroom/status met de
-   gewone leden-sessie (techAuth herkent de eigenaar aan zijn account). Wie
-   geen eigenaar is merkt niets; de eigenaar krijgt boven het gewone bord
-   zijn zetel: de platformschakelkast, de wereldtalen, de AI-regie en het
-   logboek van de storingswachter. */
+/* De eigenaarszetel: de deur naar de eigenaars-API (/api/boardroom/*), die
+   volledig bestond maar geen scherm had. Klopt stil aan op /status met de
+   leden-sessie; alleen de eigenaar ziet de zetel (server-side afgedwongen). */
 (function () {
   'use strict';
-  var T = function (k, s) { return (window.RTGi18n && RTGi18n.t) ? RTGi18n.t(k, s) : s; };
+  var T = function (k, s) { return (window.RTGi18n && RTGi18n.t) ? RTGi18n.t(k, s) : s; }; // taalkiezer
   function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
   function api(pad, body) {
     return fetch(pad, {
@@ -41,30 +31,30 @@
   var stijl = document.createElement('style');
   stijl.textContent =
     '.ez{margin:0 0 1.6rem;}' +
-    '.ez-kop{display:flex;align-items:center;gap:0.8rem;justify-content:center;margin:0.4rem 0 0.2rem;' +
-      "font-family:Inter,sans-serif;font-size:0.62rem;font-weight:500;letter-spacing:0.34em;text-transform:uppercase;color:var(--gold,#857007);}" +
+    '.ez-kop{display:flex;align-items:center;gap:.8rem;justify-content:center;margin:.4rem 0 .2rem;' +
+      "font-family:Inter,sans-serif;font-size:.62rem;font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:var(--gold,#857007);}" +
     '.ez-kop::before,.ez-kop::after{content:"";flex:0 0 2.2rem;height:1px;background:color-mix(in srgb, var(--gold,#857007) 45%, transparent);}' +
-    ".ez-naam{font-family:'Bodoni Moda',serif;font-size:1.25rem;text-align:center;margin:0.35rem 0 1.1rem;}" +
-    '.ez details{border:1px solid var(--line,#DEDBD5);border-radius:14px;margin:0.6rem 0;background:var(--card,rgba(255,255,255,0.03));}' +
-    ".ez summary{cursor:pointer;padding:0.85rem 1rem;font-family:'Bodoni Moda',serif;font-size:1.02rem;list-style:none;}" +
+    ".ez-naam{font-family:'Bodoni Moda',serif;font-size:1.25rem;text-align:center;margin:.35rem 0 1.1rem;}" +
+    '.ez details{border:1px solid var(--line,#DEDBD5);border-radius:14px;margin:.6rem 0;background:var(--card,rgba(255,255,255,.03));}' +
+    ".ez summary{cursor:pointer;padding:.85rem 1rem;font-family:'Bodoni Moda',serif;font-size:1.02rem;list-style:none;}" +
     '.ez summary::-webkit-details-marker{display:none;}' +
-    '.ez summary::after{content:"▾";float:right;color:var(--gold,#857007);opacity:0.7;}' +
-    '.ez .ez-body{padding:0 1rem 0.9rem;}' +
-    '.ez-fn{display:flex;align-items:center;gap:0.7rem;padding:0.5rem 0;border-top:1px solid color-mix(in srgb, var(--line,#DEDBD5) 45%, transparent);}' +
+    '.ez summary::after{content:"▾";float:right;color:var(--gold,#857007);opacity:.7;}' +
+    '.ez .ez-body{padding:0 1rem .9rem;}' +
+    '.ez-fn{display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-top:1px solid color-mix(in srgb, var(--line,#DEDBD5) 45%, transparent);}' +
     '.ez-fn:first-child{border-top:none;}' +
     '.ez-stip{flex:0 0 8px;width:8px;height:8px;border-radius:50%;}' +
-    '.ez-fn small{display:block;color:var(--muted,#8A8680);font-size:0.72rem;line-height:1.45;}' +
-    '.ez-fn>div{flex:1;min-width:0;font-size:0.86rem;}' +
+    '.ez-fn small{display:block;color:var(--muted,#8A8680);font-size:.72rem;line-height:1.45;}' +
+    '.ez-fn>div{flex:1;min-width:0;font-size:.86rem;}' +
     '.ez-knop{background:none;border:1px solid var(--line,#DEDBD5);border-radius:999px;color:inherit;' +
-      'font:inherit;font-size:0.72rem;padding:0.3rem 0.8rem;cursor:pointer;white-space:nowrap;}' +
+      'font:inherit;font-size:.72rem;padding:.3rem .8rem;cursor:pointer;white-space:nowrap;}' +
     '.ez-knop.aan{border-color:color-mix(in srgb, var(--gold,#857007) 65%, transparent);color:var(--gold,#857007);}' +
-    '.ez-cat{margin:0.7rem 0 0.2rem;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold,#857007);}' +
-    '.ez-taal{display:inline-block;margin:0.2rem 0.3rem 0.2rem 0;}' +
+    '.ez-cat{margin:.7rem 0 .2rem;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold,#857007);}' +
+    '.ez-taal{display:inline-block;margin:.2rem .3rem .2rem 0;}' +
     '.ez-ai textarea{width:100%;box-sizing:border-box;background:none;border:1px solid var(--line,#DEDBD5);border-radius:10px;' +
-      'color:inherit;font:inherit;font-size:0.86rem;padding:0.6rem;min-height:3.2rem;resize:vertical;}' +
-    '.ez-ai .ez-antwoord{margin:0.7rem 0;font-size:0.84rem;line-height:1.55;color:var(--muted,#8A8680);white-space:pre-wrap;}' +
-    '.ez-log{font-size:0.76rem;color:var(--muted,#8A8680);line-height:1.6;}' +
-    '.ez-melding{margin:0.5rem 0;font-size:0.8rem;color:var(--gold,#857007);min-height:1.1rem;}';
+      'color:inherit;font:inherit;font-size:.86rem;padding:.6rem;min-height:3.2rem;resize:vertical;}' +
+    '.ez-ai .ez-antwoord{margin:.7rem 0;font-size:.84rem;line-height:1.55;color:var(--muted,#8A8680);white-space:pre-wrap;}' +
+    '.ez-log{font-size:.76rem;color:var(--muted,#8A8680);line-height:1.6;}' +
+    '.ez-melding{margin:.5rem 0;font-size:.8rem;color:var(--gold,#857007);min-height:1.1rem;}';
   document.head.appendChild(stijl);
 
   var wrap = null, meldEl = null;
@@ -160,7 +150,7 @@
     var regels = d.wachterLog || [];
     if (!regels.length) body.textContent = T('ez.geenlog', 'De storingswachter heeft nog niets hoeven doen.');
     regels.slice(0, 10).forEach(function (r) {
-      body.appendChild(el('div', { text: (r.t ? new Date(r.t).toLocaleString() + ' — ' : '') + (r.tekst || r.bericht || JSON.stringify(r)) }));
+      body.appendChild(el('div', { text: (r.t ? new Date(r.t).toLocaleString() + ' · ' : '') + (r.tekst || r.bericht || JSON.stringify(r)) }));
     });
     return body;
   }

@@ -10,6 +10,48 @@
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));
     }
+    /* De ballotage-regalia volgen de metadata van de server: `voortgang`
+       {nr, van} toont de kop en de Romeinse plaatsbepaling, `vertrouwelijk`
+       de kluisregel. Geen metadata (het open gesprek, de inlog, het einde) =
+       alles weer stil. De teksten lopen via T() mee met de taalkiezer. */
+    const kopEl = doos.querySelector('#agKop');
+    const stappenEl = doos.querySelector('#agStappen');
+    const kluisEl = doos.querySelector('#agKluis');
+    const ROMEINS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+    function toonVoortgang(d){
+      const v = d && d.voortgang;
+      const entree = d && (d.entree || d.login) && !d.ingelogd;
+      if (v && v.nr && !d.klaar){
+        if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
+        if (stappenEl){
+          stappenEl.textContent = '';
+          for (let i = 1; i <= (v.van || 4); i++){
+            const s = document.createElement('span');
+            s.textContent = ROMEINS[i - 1] || String(i);
+            if (i === v.nr) s.className = 'nu';
+            else if (i < v.nr) s.className = 'gehad';
+            stappenEl.appendChild(s);
+          }
+        }
+        doos.classList.add('ag-ballotage');
+      } else if (entree){
+        // het spiegelbeeld voor wie al lid is: dezelfde kopregel-taal,
+        // zonder stappen (thuiskomen is geen procedure)
+        if (kopEl) kopEl.textContent = T('ag.entree','De entree');
+        if (stappenEl) stappenEl.textContent = '';
+        doos.classList.add('ag-ballotage');
+      } else {
+        doos.classList.remove('ag-ballotage');
+      }
+      const kluisTekst = d && d.login ? T('ag.kluisdirect','Rechtstreeks naar de kluis, niet door dit gesprek')
+        : (d && d.vertrouwelijk ? T('ag.kluis','Versleuteld · rechtstreeks de kluis in') : null);
+      if (kluisEl && kluisTekst && !d.klaar){
+        kluisEl.textContent = kluisTekst;
+        doos.classList.add('ag-kluis-aan');
+      } else {
+        doos.classList.remove('ag-kluis-aan');
+      }
+    }
     const pkKnop = doos.querySelector('#agPasskey');
     function toonPasskey(aan){
       if (!pkKnop) return;

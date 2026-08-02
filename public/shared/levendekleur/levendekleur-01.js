@@ -76,9 +76,16 @@
      per toestel onthouden en gedeeld door al je RTG-schermen. */
   var BKEY = 'rtg_beweging';
   var RUSTIG = false; try { RUSTIG = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  /* De voorkeur wordt gecachet: localStorage.getItem is een synchrone gang naar
+     de opslag en dit werd per beeldframe gelezen. De cache vervalt alleen als
+     de waarde echt kan zijn veranderd: bij bZet() hier, of via het
+     storage-event als een ander tabblad de schuif verzet. */
+  var bCache = null;
+  try { w.addEventListener('storage', function (ev) { if (ev.key === BKEY) { bCache = null; vorige = ''; } }); } catch (e) {}
   function bWaarde() {
-    try { var v = localStorage.getItem(BKEY); if (v != null && v !== '') return Math.max(0, Math.min(100, +v)); } catch (e) {}
-    return RUSTIG ? 12 : 35; // standaard rustig/ontspannen (niet te wild); op te draaien tot Levendig
+    if (bCache != null) return bCache;
+    try { var v = localStorage.getItem(BKEY); if (v != null && v !== '') return (bCache = Math.max(0, Math.min(100, +v))); } catch (e) {}
+    return (bCache = (RUSTIG ? 12 : 35)); // standaard rustig/ontspannen; op te draaien tot Levendig
   }
   function bFactor() { return bWaarde() / 60; } // 60 -> 1.0, bereik 0 .. 1.67
   function bNiveau() { var v = bWaarde(); return v < 8 ? 'stil' : v < 40 ? 'rustig' : v < 82 ? 'normaal' : 'levendig'; }
@@ -88,16 +95,20 @@
   }
   function bZet(v) {
     try { localStorage.setItem(BKEY, String(Math.max(0, Math.min(100, +v)))); } catch (e) {}
+    bCache = Math.max(0, Math.min(100, +v));
     bPas(); vorige = ''; bMerk();
     try { w.dispatchEvent(new Event('rtg-beweging')); } catch (e) {}
   }
 
+  // de zoekbalk-parameters veranderen niet zolang de pagina staat: één keer
+  // ontleden, niet per beeldframe opnieuw (dit zat in het hete pad van verf())
+  var VASTE_Q = null; try { VASTE_Q = new URLSearchParams(w.location.search); } catch (e) {}
   function palet(familie, nu, beweeg, sh) {
     if (beweeg == null) beweeg = 1;
     if (sh == null) sh = 0;
     var F = FAMILIES[familie] || FAMILIES.donker;
     nu = nu || new Date();
-    var q = null; try { q = new URLSearchParams(w.location.search); } catch (e) {}
+    var q = VASTE_Q;
     var uur = q && q.get('uur') != null ? parseFloat(q.get('uur')) : nu.getHours() + nu.getMinutes() / 60 + nu.getSeconds() / 3600;
     var dag = q && q.get('dag') != null ? parseInt(q.get('dag'), 10) : dagVanJaar(nu);
     var seiz = (q && q.get('seizoen')) || seizoenVan(nu.getMonth());

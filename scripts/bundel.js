@@ -90,14 +90,18 @@ function schrijfBundels() {
 }
 
 // Faalt als een uitgecheckte bundel niet gelijk is aan de som van zijn delen.
+// Alle afwijkingen in een keer: wie bij de eerste stopt, meldt "1 probleem"
+// terwijl er vier zijn, en dat getal wordt overgeschreven als feit.
 function controleer() {
+  const scheef = [];
   for (const uit of Object.keys(bundels)) {
     const inhoud = bundel(uit);
     const doel = path.join(PUB, uit);
     const oud = fs.readFileSync(doel);
-    if (!oud.equals(inhoud)) {
-      throw new Error(uit + ' wijkt af van de losse delen in ' + bundels[uit] + '/. Draai `npm run build` en bewerk de delen, niet de bundel.');
-    }
+    if (!oud.equals(inhoud)) scheef.push(uit + ' (bundel ' + oud.length + ', delen ' + inhoud.length + ' bytes)');
+  }
+  if (scheef.length) {
+    throw new Error(scheef.length + ' bundel(s) wijken af van hun losse delen: ' + scheef.join(', ') + '. Draai `npm run build` en bewerk de delen, niet de bundel.');
   }
 }
 

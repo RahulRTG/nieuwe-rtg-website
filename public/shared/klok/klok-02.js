@@ -24,21 +24,15 @@
         '<stop offset="0%" stop-color="rgba(255,251,240,0.11)"/>' +
         '<stop offset="52%" stop-color="rgba(255,251,240,0.015)"/>' +
         '<stop offset="100%" stop-color="rgba(255,251,240,0)"/></radialGradient>' +
-      // Drie schaduwen, want de wijzers liggen niet op één hoogte boven de plaat:
-      // de uurwijzer onderop werpt een korte, harde schaduw, de minutenwijzer
-      // ligt daarboven, de secondewijzer bovenop en werpt de langste en zachtste.
-      // Juist dat hoogteverschil maakt van drie platte vormen een gestapeld
-      // uurwerk. De richting volgt het glashoogsel (rr-glans, linksboven), dus
-      // alles valt naar rechtsonder -- één lichtbron voor de hele wijzerplaat.
-      // filterUnits="userSpaceOnUse": met een gebied op de objectBoundingBox is
-      // 25% van een haardunne secondewijzer een fractie van een eenheid, en
-      // knipt de wijzer zijn eigen schaduw weg.
-      '<filter id="rr-schaduw' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
-        '<feDropShadow dx="0.5" dy="0.6" stdDeviation="0.5" flood-color="#000" flood-opacity="0.55"/></filter>' +
-      '<filter id="rr-schaduwm' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
-        '<feDropShadow dx="0.9" dy="1.1" stdDeviation="0.8" flood-color="#000" flood-opacity="0.5"/></filter>' +
-      '<filter id="rr-schaduws' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
-        '<feDropShadow dx="1.4" dy="1.7" stdDeviation="1.15" flood-color="#000" flood-opacity="0.42"/></filter>';
+      '';
+    /* De wijzerschaduwen zaten hier als drie feDropShadow-filters. Dat was
+       correct licht, maar een SVG-filter wordt bij ELKE verandering binnen
+       zijn gebied opnieuw gerasterd -- en er verandert 60 keer per seconde
+       iets (de secondewijzer veegt). Drie filters van 200x200 herrasteren,
+       elk beeldje, alleen voor een schaduwtje: dat is waar de klok zijn
+       stroom aan opstookte. De schaduwen bestaan nog steeds, maar nu als
+       gewone zwarte kopieën van de wijzer in een verschoven groep (zie
+       wijzer() hieronder): zelfde lichtval, geen filter, geen herrasteren. */
     svg.appendChild(defs);
 
     // de plaat + een fijne guilloché-golfstructuur (Seamaster-taal) + randvignet

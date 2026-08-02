@@ -1,9 +1,3 @@
-    if (RUSTIG) verfMond(0);
-    else (function lus(){
-      // alleen verven zolang de poort in beeld is; daarna zuinig wachten
-      if (mond.offsetParent) { verfMond(performance.now()); requestAnimationFrame(lus); }
-      else setTimeout(lus, 600);
-    })();
 
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){

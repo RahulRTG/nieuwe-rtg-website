@@ -18,5 +18,6 @@ module.exports = (kern) => {
   require('./office/partners')(octx);
   require('./office/toegang')(octx);
   require('./office/werk')(octx);
+  require('./office/bewaarverzoek')(octx);
   require('./office/concierge')(octx);
 };

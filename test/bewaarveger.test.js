@@ -15,7 +15,7 @@ function bouw() {
   const gewist = [];
   const users = new Map();     // id -> { id, verified, id_doc }
   const states = new Map();    // id -> md
-  const verlengingen = new Map(); // id -> ms van de laatst voldane termijn
+  const tot = new Map();       // id -> ms tot wanneer het lidmaatschap betaald is
   const accounts = {
     listByVerification: (st) => [...users.values()].filter(u => u.verified === st),
     getMemberState: (id) => states.get(id) || {},
@@ -26,10 +26,10 @@ function bouw() {
   const v = maakBewaarveger({
     db, save: () => saves++, accounts,
     identiteitsmap: { wisAllesVan: (id) => gewist.push(id) },
-    laatsteVerlenging: (id) => verlengingen.get(id) || 0,
+    lidmaatschapTot: (id) => tot.get(id) || 0,
     nu: () => tijd
   });
-  return { db, v, users, states, gewist, verlengingen, tik: (ms) => { tijd += ms; }, savesGedaan: () => saves };
+  return { db, v, users, states, gewist, tot, tik: (ms) => { tijd += ms; }, savesGedaan: () => saves };
 }
 
 test('locatie: een spoor van acht dagen oud gaat weg, een vers spoor blijft', () => {
@@ -52,7 +52,7 @@ test('locatie: op dag zes blijft alles staan (de termijn is 7 dagen, geen 5)', (
   assert.ok(db.data.live['user-1']);
 });
 
-test('id-bewijs: een jaar na goedkeuring gaan scan en selfie de kluis uit, de uitkomst blijft', () => {
+test('gratis app (nooit een termijn): de jaartermijn na de goedkeuring geldt, dan weg', () => {
   const { v, users, states, gewist, tik } = bouw();
   users.set(7, { id: 7, verified: 'verified', id_doc: '7-pas.bin' });
   states.set(7, { selfie: '7-selfie.bin', nationaliteit: 'Nederlandse', geverifieerdOp: new Date(T0).toISOString() });
@@ -89,19 +89,41 @@ test('klok-backfill: wie voor deze regel is goedgekeurd krijgt de datum van vand
   assert.deepEqual(gewist, [3]);
 });
 
-test('verlengen verlengt: zolang de pas doorloopt blijft het bewijs, de klok volgt de laatste termijn', () => {
-  const { v, users, states, gewist, verlengingen, tik } = bouw();
+test('verlengen verlengt: zolang de pas betaald doorloopt blijft het bewijs staan', () => {
+  const { v, users, states, gewist, tot, tik } = bouw();
   users.set(5, { id: 5, verified: 'verified', id_doc: '5-pas.bin' });
   states.set(5, { geverifieerdOp: new Date(T0).toISOString() });
-  // twee jaar na de goedkeuring, maar een half jaar geleden nog een termijn voldaan
-  verlengingen.set(5, T0 + 550 * DAG);
+  // twee jaar na de goedkeuring, maar de betaling dekt nog tot over een maand
+  tot.set(5, T0 + 760 * DAG);
   tik(2 * 366 * DAG);
   assert.equal(v.veeg().dossiers, 0, 'wie blijft verlengen, blijft zijn bewijs houden');
   assert.deepEqual(gewist, []);
-  // en pas een jaar na de LAATSTE verlenging gaat het alsnog weg
-  tik(200 * DAG); // nu ruim een jaar voorbij de laatste termijn
-  assert.equal(v.veeg().dossiers, 1, 'een jaar na de laatste verlenging is het lidmaatschap echt voorbij');
-  assert.deepEqual(gewist, [5]);
+});
+
+test('relatie voorbij zonder verzoek: DIRECT wissen, geen jaar wachten', () => {
+  const { v, users, states, gewist, tot, tik } = bouw();
+  users.set(6, { id: 6, verified: 'verified', id_doc: '6-pas.bin' });
+  states.set(6, { geverifieerdOp: new Date(T0).toISOString() });
+  tot.set(6, T0 + 30 * DAG);          // betaald tot over een maand
+  tik(29 * DAG);
+  assert.equal(v.veeg().dossiers, 0, 'zolang de dekking loopt: blijven staan');
+  tik(2 * DAG);                        // de dekking is net voorbij
+  assert.equal(v.veeg().dossiers, 1, 'de dag na het einde is het bewijs weg');
+  assert.deepEqual(gewist, [6]);
+});
+
+test('relatie voorbij MET vastgelegd verzoek: nog een jaar, en dan alsnog weg', () => {
+  const { v, users, states, gewist, tot, tik } = bouw();
+  users.set(8, { id: 8, verified: 'verified', id_doc: '8-pas.bin' });
+  states.set(8, { geverifieerdOp: new Date(T0).toISOString(),
+    bewaarVerzoek: { at: new Date(T0).toISOString(), reden: 'lopend geschil over een boeking', door: 'eigenaar' } });
+  tot.set(8, T0 + 30 * DAG);
+  tik(200 * DAG);                      // ruim na het einde, binnen het extra jaar
+  assert.equal(v.veeg().dossiers, 0, 'het verzoek houdt het dossier een jaar langer');
+  assert.deepEqual(gewist, []);
+  tik(200 * DAG);                      // nu voorbij einde + een jaar
+  assert.equal(v.veeg().dossiers, 1, 'ook een verzoek loopt af');
+  assert.deepEqual(gewist, [8]);
 });
 
 test('afgewezen: het vangnet veegt restanten van een afwijzing, ongeacht leeftijd', () => {

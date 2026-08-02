@@ -1,4 +1,5 @@
-/* Backoffice (deelmodule): nudge, dagbriefing, verificaties, incidenten, documenten en het conciergepostvak.
+/* Backoffice (deelmodule): nudge, dagbriefing, incidenten, documenten en het conciergepostvak.
+   De identiteitsverificaties staan in ./verificaties.js.
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
@@ -18,6 +19,11 @@ function wieKijkt(req) {
   } catch (e) {}
   return { naam: 'backoffice (gedeelde code)' };
 }
+
+/* De verificatie-routes wonen in ./verificaties.js (afgesplitst voor de 10 KB
+   van keuringsregel 13); wieKijkt gaat mee, want een tweede kopie van "wie
+   kijkt er in de kluis" is precies de dubbeling van LAT.md regel 4. */
+require('./verificaties')(octx, { wieKijkt });
 
 app.post('/api/office/nudge', officeAuth, (req, res) => {
   const kind = req.body.kind === 'ride' ? 'ride' : 'order';
@@ -66,48 +72,6 @@ app.post('/api/office/briefing', officeAuth, (req, res) => {
   res.json({ briefing: zinnen.join(' ') });
 });
 
-app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications(wieKijkt(req)) }));
-
-app.post('/api/office/verify', officeAuth, (req, res) => {
-  const user = accounts.getUserById(Number(req.body.userId));
-  if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
-  const status = req.body.decision === 'approve' ? 'verified' : 'rejected';
-  accounts.setVerification(user.id, status);
-  // gezichtscontrole (selfie x paspoort) en nationaliteit vastleggen bij goedkeuren:
-  // zo weten we dat het paspoort bij de codenaam en de persoon hoort (eis 5)
-  if (status === 'verified') {
-    const md = accounts.getMemberState(user.id) || {};
-    if (req.body.faceMatch !== undefined) md.faceMatch = req.body.faceMatch === true;
-    if (req.body.nationaliteit) md.nationaliteit = String(req.body.nationaliteit).slice(0, 40);
-    // geslacht uit het paspoort vastleggen (v/m/x); stuurt de "naar de vrouw"-regel bij ontmoetingen
-    const g = String(req.body.geslacht || '').toLowerCase();
-    if (g === 'v' || g === 'm' || g === 'x') md.geslacht = g;
-    /* De klok van de bewaartermijn: een jaar na DEZE datum wist de
-       bewaarveger de scan en de selfie (besluit van de eigenaar in het
-       papierwerkregister, 2 augustus 2026). */
-    md.geverifieerdOp = new Date().toISOString();
-    accounts.saveMemberState(user.id, md);
-  } else {
-    /* Afgewezen = direct wissen. De afwijzingsmail vraagt om een nieuwe,
-       scherpere foto; het oude bewijs heeft dan geen doel meer en blijft
-       zonder deze regel eeuwig als restant in de kluis staan. */
-    const md = accounts.getMemberState(user.id) || {};
-    try { require('../../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR).wisAllesVan(user.id); } catch (e) {}
-    accounts.setVerification(user.id, status, null);
-    if (md.selfie) { delete md.selfie; accounts.saveMemberState(user.id, md); }
-  }
-  mail.send(accounts.emailOf(user), status === 'verified' ? 'Uw identiteit is geverifieerd' : 'Uw verificatie is afgewezen',
-    'Beste ' + accounts.realNameOf(user) + ',\n\n' +
-    (status === 'verified' ? 'Uw identiteit is geverifieerd. U kunt nu in een tik boeken.' :
-     'We konden uw document niet goedkeuren. Probeer het opnieuw met een duidelijkere foto.') +
-    '\n\nRahul Travel Group');
-  notify(user.tier, { icon: status === 'verified' ? 'pas' : 'meldingen',
-    title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
-    body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
-  res.json({ ok: true, status, pending: pendingVerifications(wieKijkt(req)) });
-});
-
-/* ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ---- */
 app.post('/api/office/incidenten', officeAuth, (req, res) => {
   res.json({ incidenten: paspoortIncidenten(req.body.alleen === 'open' ? 'open' : 'alle') });
 });

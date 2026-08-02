@@ -92,6 +92,11 @@
         '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
+        /* Langer bewaren dan de regel: het bewijs verdwijnt zodra de
+           klantrelatie voorbij is, tenzij hier een verzoek MET reden ligt.
+           De knop staat naast de beslissing omdat dit hetzelfde dossier is,
+           en hij noemt zichzelf een verzoek en geen instelling. */
+        '<button class="vbtn" data-bewaar title="'+T('bo.keep.help','Dit dossier na afloop van het lidmaatschap nog een jaar bewaren, met reden')+'">'+T('bo.keep','Bewaren met reden')+'</button>' +
       '</div>').join('') : '<div class="empty">'+T('bo.noverify','Geen openstaande verificaties.')+'</div>';
     $('#verify').querySelectorAll('.vrow').forEach(row => {
       const id = Number(row.dataset.id);
@@ -101,50 +106,20 @@
       });
       row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve', row.querySelector('[data-face]').checked));
       row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject', false));
+      row.querySelector('[data-bewaar]').addEventListener('click', () => bewaarVerzoek(id));
     });
+  }
+  /* Het bewaarverzoek. De reden is verplicht aan de serverkant; hier vragen we
+     hem gewoon, en een lege invoer stuurt niets -- een knop die een 400
+     oplevert leert niemand iets. */
+  async function bewaarVerzoek(userId){
+    const reden = prompt(T('bo.keep.ask','Waarom moet dit identiteitsdossier na afloop van het lidmaatschap nog een jaar blijven staan? (bijvoorbeeld: lopend geschil, verzoek van een toezichthouder)'));
+    if (reden === null) return;
+    if (!reden.trim()) { alert(T('bo.keep.need','Zonder reden leggen we niets vast; dat is de hele bedoeling van het verzoek.')); return; }
+    try { await call('/office/bewaarverzoek', { userId, reden: reden.trim() }); alert(T('bo.keep.ok','Vastgelegd. Het dossier blijft tot een jaar na het einde van het lidmaatschap; daarna wist de bewaarveger het alsnog.')); }
+    catch(e){ alert(e.message); }
   }
   async function decide(userId, decision, faceMatch){
     try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch }); } catch(e){ alert(e.message); return; }
     loadVerify();
   }
-
-  // ---- aanmeldingen per pas: de AI deed alles, alleen ja/nee is aan het personeel ----
-  async function loadAanmeldingen(){
-    const el = document.getElementById('aanmeldingen'); if (!el) return;
-    let lijst = [];
-    try { lijst = (await call('/aanmelding/lijst', { status: 'in behandeling' })).aanmeldingen || []; } catch(e){ return; }
-    el.innerHTML = lijst.length ? lijst.map(a => {
-      const gedaan = (a.reis || []).map(s => s.naam).join(' · ');
-      const uitnod = a.viaUitnodiging ? ' <span style="color:var(--gold);font-size:0.7rem;">op uitnodiging</span>' : '';
-      return '<div class="vrow" data-id="'+a.id+'">' +
-        '<div class="vi"><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(a.pasNaam)+'</span>'+uitnod+'</div>' +
-          '<div class="sub">'+escHtml(a.contact||'')+'</div>' +
-          '<div class="sub" style="color:var(--soft);">'+T('bo.aanmklaar','AI klaar')+': '+escHtml(gedaan)+'</div></div>' +
-        '<button class="vbtn ok" data-ok>'+T('bo.accept','Accepteren')+'</button>' +
-        '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
-      '</div>';
-    }).join('') : '<div class="empty">'+T('bo.noaanm','Geen openstaande aanmeldingen.')+'</div>';
-    el.querySelectorAll('.vrow').forEach(row => {
-      const id = row.dataset.id;
-      row.querySelector('[data-ok]').addEventListener('click', () => beslisAanm(id, 'geaccepteerd'));
-      row.querySelector('[data-no]').addEventListener('click', () => beslisAanm(id, 'afgewezen'));
-    });
-    // de lopende lidmaatschapsbetalingen: na een akkoord loopt de bijdrage 12
-    // maanden automatisch, met de 30%-foundationsplit (20% lokaal, 10% RTF).
-    try {
-      const b = await call('/aanmelding/betalingen', {});
-      const eur = n => '€ ' + (Math.round(Number(n))).toLocaleString('nl-NL');
-      if (b && b.aantalLeden) {
-        el.insertAdjacentHTML('beforeend',
-          '<div style="margin-top:.7rem;border-top:1px solid var(--line,#2a2a2a);padding-top:.6rem;font-size:0.8rem;color:var(--soft);line-height:1.7;">' +
-          '<b style="color:var(--txt);">'+b.aantalLeden+'</b> '+T('bo.aanmlopend','lopende lidmaatschap(pen), 12 maanden automatisch.')+'<br>' +
-          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b style="color:var(--gold);">'+eur(b.totaal.foundation)+'</b> ('+
-          T('bo.aanmlokaal','20% lokaal')+' '+eur(b.totaal.lokaal)+' &middot; '+T('bo.aanmrtf','10% RTF')+' '+eur(b.totaal.rtf)+')</div>');
-      }
-    } catch(e){}
-  }
-  async function beslisAanm(id, besluit){
-    try { await call('/aanmelding/beslis', { id, besluit }); } catch(e){ alert(e.message); return; }
-    loadAanmeldingen();
-  }
-

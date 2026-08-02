@@ -3,15 +3,29 @@
    groepen leden. Pure config; de catalogus (./cat-*) leunt op de leden-groepen
    en de motor (functies/toegang.js) op de doelgroepen. Afgesplitst uit
    register.js zodat de catalogus en de validatie dun blijven. */
+/* De categorieen waarin het bord de functies groepeert.
+
+   LET OP, EN DIT IS EEN GELEERDE LES: het bord toont ALLEEN functies waarvan
+   de categorie in deze lijst staat. Toen cat-domeinen.js met eigen categorieen
+   werd toegevoegd, stonden er 91 functies in de kast en toonde het bord er 56
+   -- geen fout, geen melding, gewoon vijfendertig schakelaars die niemand zag.
+   register/index.js faalt daarom nu bij het opstarten op een categorie die
+   hier niet staat. */
 const CATEGORIEEN = [
   'Leden (RTG-app)',
+  'Diensten (leden)',
   'Genres & diensten',
+  'Cultuur en gezelschap',
   'Sociaal (De Salon)',
   'Eigen apps',
+  'Winkel en media',
   'Partners (leveranciers)',
+  'Werk (zaken en personeel)',
   'RTG-Backoffice',
   'RTFoundation',
+  'Identiteit en veiligheid',
   'Betalen & verificatie',
+  'Geld',
   'Personeel & integraties'
 ];
 

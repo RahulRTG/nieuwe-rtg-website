@@ -80,6 +80,12 @@ const METERS = [
      `e2eBestanden` telt de schermtoetsen. Die draaien niet mee in `npm test`
      (eigen glob, eigen CI-baan) en zijn daardoor het makkelijkst te vergeten
      hoekje van de suite: verdwijnt er een, dan merkt de hoofdsuite niets. */
+  /* Staat elke functie in de boardroom? Een route die door geen enkele functie
+     wordt bewaakt is vanuit de schakelkast onzichtbaar: niet uit te zetten,
+     niet per stad te sluiten, en de storingswachter komt er nooit aan. Dat gat
+     groeit vanzelf (routes schrijven is stap een, de catalogus bijwerken stap
+     twee), dus het hoort aan een ratel. scripts/schakelbaar.js meet het. */
+  { sleutel: 'routesNietSchakelbaar', richting: 'omlaag', wat: 'API-routes die niet vanuit de boardroom te schakelen zijn' },
   { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan als een dienst ontbreekt' },
   { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' }
 ];
@@ -175,7 +181,14 @@ function meet() {
     zelfpoortendeToetsen += (bron.match(/\b(?:test|it)\.skip\s*\(/g) || []).length;
   }
 
+  /* De schakelbaarheid uit dezelfde bron als het losse script: een tweede
+     implementatie zou binnen een week uiteenlopen (regel 4). */
+  let routesNietSchakelbaar = 0;
+  try { routesNietSchakelbaar = require('./schakelbaar').meet().ongedekt.length; }
+  catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
+
   return {
+    routesNietSchakelbaar,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
     keuringStuk: k.stuk, keuringScheef: k.scheef,

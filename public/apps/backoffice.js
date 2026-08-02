@@ -92,6 +92,11 @@
         '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
+        /* Langer bewaren dan de regel: het bewijs verdwijnt zodra de
+           klantrelatie voorbij is, tenzij hier een verzoek MET reden ligt.
+           De knop staat naast de beslissing omdat dit hetzelfde dossier is,
+           en hij noemt zichzelf een verzoek en geen instelling. */
+        '<button class="vbtn" data-bewaar title="'+T('bo.keep.help','Dit dossier na afloop van het lidmaatschap nog een jaar bewaren, met reden')+'">'+T('bo.keep','Bewaren met reden')+'</button>' +
       '</div>').join('') : '<div class="empty">'+T('bo.noverify','Geen openstaande verificaties.')+'</div>';
     $('#verify').querySelectorAll('.vrow').forEach(row => {
       const id = Number(row.dataset.id);
@@ -101,13 +106,28 @@
       });
       row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve', row.querySelector('[data-face]').checked));
       row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject', false));
+      row.querySelector('[data-bewaar]').addEventListener('click', () => bewaarVerzoek(id));
     });
+  }
+  /* Het bewaarverzoek. De reden is verplicht aan de serverkant; hier vragen we
+     hem gewoon, en een lege invoer stuurt niets -- een knop die een 400
+     oplevert leert niemand iets. */
+  async function bewaarVerzoek(userId){
+    const reden = prompt(T('bo.keep.ask','Waarom moet dit identiteitsdossier na afloop van het lidmaatschap nog een jaar blijven staan? (bijvoorbeeld: lopend geschil, verzoek van een toezichthouder)'));
+    if (reden === null) return;
+    if (!reden.trim()) { alert(T('bo.keep.need','Zonder reden leggen we niets vast; dat is de hele bedoeling van het verzoek.')); return; }
+    try { await call('/office/bewaarverzoek', { userId, reden: reden.trim() }); alert(T('bo.keep.ok','Vastgelegd. Het dossier blijft tot een jaar na het einde van het lidmaatschap; daarna wist de bewaarveger het alsnog.')); }
+    catch(e){ alert(e.message); }
   }
   async function decide(userId, decision, faceMatch){
     try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch }); } catch(e){ alert(e.message); return; }
     loadVerify();
   }
-
+  /* ---- backoffice, vervolg van deel 01 ----
+     Geknipt op een TOP-NIVEAU grens binnen dezelfde IIFE: de delen worden
+     achter elkaar geplakt, dus het resultaat is letter voor letter hetzelfde
+     bestand. Geknipt omdat deel 01 door de 10 KB van keuringsregel 13 ging
+     nadat de bewaarverzoek-knop erbij kwam. */
   // ---- aanmeldingen per pas: de AI deed alles, alleen ja/nee is aan het personeel ----
   async function loadAanmeldingen(){
     const el = document.getElementById('aanmeldingen'); if (!el) return;

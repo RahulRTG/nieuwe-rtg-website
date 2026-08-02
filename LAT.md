@@ -273,6 +273,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
+| staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |
+| de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
 | een omgeving die schermtoetsen belooft, heeft ook een browser | `test/browserpoort.e2e.js` |

@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 0,
     "dependencies": 0,
-    "testbestanden": 479,
+    "testbestanden": 486,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 70,
     "e2eBestanden": 45,
@@ -14,7 +14,8 @@
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
     "endpointsNooitAangeraakt": 0,
-    "onbewaakt": 0
+    "onbewaakt": 0,
+    "routesNietSchakelbaar": 172
   },
   "notities": [
     {

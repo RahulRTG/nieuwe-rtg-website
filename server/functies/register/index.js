@@ -14,9 +14,23 @@ const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_R
 const FUNCTIES = [].concat(
   require('./cat-leden'),
   require('./cat-apps'),
-  require('./cat-partners'));
+  require('./cat-partners'),
+  require('./cat-domeinen'),
+  require('./cat-domeinen2'));
 
 const OP_ID = Object.fromEntries(FUNCTIES.map(f => [f.id, f]));
+/* FAIL-FAST OP EEN ONBEKENDE CATEGORIE. Het bord groepeert per categorie en
+   laat alles vallen wat in geen enkele groep past. Dat is precies een keer
+   gebeurd: 91 functies in de kast, 56 op het bord, geen enkele melding. Een
+   functie die je niet ziet kun je niet schakelen, en dan is de kast een
+   belofte in plaats van een bedieningspaneel. */
+{
+  const bekend = new Set(CATEGORIEEN);
+  const vreemd = [...new Set(FUNCTIES.filter(f => !bekend.has(f.categorie)).map(f => f.categorie))];
+  if (vreemd.length) throw new Error('functie-catalogus: onbekende categorie(en): ' + vreemd.join(', ') +
+    ' -- zet ze in CATEGORIEEN (functies/register/doelgroepen.js), anders vallen die functies van het bord');
+}
+
 // fail-fast: een dubbele id zou stil de laatste laten winnen in OP_ID en de
 // schakelkast op de verkeerde functie laten werken; dat is eerder misgegaan
 if (Object.keys(OP_ID).length !== FUNCTIES.length) {

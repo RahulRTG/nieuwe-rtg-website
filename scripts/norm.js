@@ -84,6 +84,40 @@ const METERS = [
   { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' }
 ];
 
+/* ============================================================================
+   DE PRESTATIEMETERS -- de tweede helft van de ratel.
+
+   De meters hierboven komen uit de keuring: ze zijn statisch en altijd te
+   berekenen. Prestatie is dat niet. p99, doorvoer, event-loopvertraging en
+   hersteltijd komen uit De Beproeving, die een kwartier draait -- die kun je
+   niet bij elke `npm run norm` opnieuw meten.
+
+   Daarom schrijft scripts/beproeving.js zijn cijfers naar BEPROEVING.json en
+   leest deze ratel ze daar. Drie dingen die daarbij misgaan als je er niet op
+   let, en die hier alle drie zijn dichtgezet:
+
+   1. HET BESTAND ONTBREEKT. Zonder maatregel zou de ratel dan vrolijk groen
+      geven: geen invoer, geen oordeel, geen probleem. Dat is LAT.md regel 3.
+      Staat er een grondwaarde in NORM.json, dan is een ontbrekend BEPROEVING.json
+      een FOUT -- je hebt een lat gezet en die moet je blijven meten.
+   2. EEN ANDERE MACHINE. 144 ms p99 op vier kernen is een ander getal dan
+      144 ms op zestien; ze vergelijken zou de lat laten dansen op de vraag op
+      welke laptop iemand toevallig draaide. Verschilt de vingerafdruk, dan
+      vergelijkt de ratel NIET en zegt hij dat hardop -- en hij legt ook niets
+      vast, want een grondwaarde van een andere machine is geen grondwaarde.
+   3. EEN ANDERE MODUS. sqlite en Postgres meten niet hetzelfde platform.
+      Zelfde behandeling.
+   ========================================================================== */
+const PRESTATIEBESTAND = path.join(WORTEL, 'BEPROEVING.json');
+const PRESTATIEMETERS = [
+  { sleutel: 'p99Ms', richting: 'omlaag', wat: 'latentie p99 onder de storm (ms)' },
+  { sleutel: 'doorvoerPerSec', richting: 'omhoog', wat: 'afgehandelde verzoeken per seconde onder de storm' },
+  { sleutel: 'eventLoopP99Ms', richting: 'omlaag', wat: 'event-loopvertraging p99 onder de storm (ms)' },
+  { sleutel: 'herstelSeconden', richting: 'omlaag', wat: 'seconden tot een gewone aanroep weer normaal was' },
+  { sleutel: 'verhalenSlaagPctStorm', richting: 'omhoog', wat: 'percentage goede verhalen dat de storm doorkwam' },
+  { sleutel: 'geheugenHellingMBPerMin', richting: 'omlaag', wat: 'geheugengroei per minuut onder herhaalde last' }
+];
+
 /* De drie groepen van de keuring, apart geteld. Een groep die de keuring niet
    meer kent geeft 0 -- en dat is bewust GEEN stille nul: 0 is beter dan de
    grondwaarde, dus de ratel meldt het als een verbetering en dan hoort iemand
@@ -157,6 +191,30 @@ function leesNorm() {
     '). Herstel hem uit de git-historie; ik overschrijf de lat niet met de huidige stand.'); }
 }
 
+/* De vingerafdruk waar een prestatiecijfer alleen binnen geldig is. Bewust grof:
+   kernen, geheugen, platform en modus. De node-versie zit er NIET in -- die
+   wisselt vaker dan de machine en zou de lat elke upgrade wissen, terwijl het
+   effect op deze cijfers klein is vergeleken met het aantal kernen. */
+function bron(c) {
+  if (!c || !c.machine) return null;
+  return c.machine.kernen + 'k/' + c.machine.geheugenGB + 'g/' + c.machine.platform + '/' + (c.modus || '?');
+}
+
+/* Geeft altijd hetzelfde soort antwoord: { cijfers, bron, reden }. `reden`
+   ingevuld = niet bruikbaar, en dan zegt de aanroeper WAAROM. Nooit stil null. */
+function leesPrestatie(bestand) {
+  const pad = bestand || PRESTATIEBESTAND;   // parameter zodat een toets hem echt kan beproeven
+  if (!fs.existsSync(pad)) return { reden: 'BEPROEVING.json ontbreekt (draai: npm run beproeving)' };
+  let c;
+  try { c = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { return { reden: 'BEPROEVING.json is onleesbaar (' + e.message + ')' }; }
+  if (!c || !c.meters) return { reden: 'BEPROEVING.json heeft geen meters' };
+  /* Een GEZAKTE ronde levert geen grondwaarde. De cijfers van een run die zijn
+     eigen drempels niet haalde zijn geen norm om aan vast te houden. */
+  if (c.oordeel !== 'PASS') return { reden: 'de laatste beproeving is GEZAKT (' + c.gezakteDrempels + ' drempel(s)); die cijfers zijn geen lat' };
+  return { cijfers: c.meters, bron: bron(c), gedraaid: c.gedraaid };
+}
+
 /* Beweegt de meter de goede kant op, de verkeerde kant op, of staat hij stil? */
 function oordeel(m, nu, norm) {
   if (nu === norm) return 'gelijk';
@@ -203,6 +261,49 @@ function main() {
     console.log('  \x1b[36mNIEUW   \x1b[0m  ' + n.m.sleutel.padEnd(22) + String(n.nu).padStart(6) +
       '\x1b[2m  (nog geen grondwaarde -- leg vast met npm run norm:vast)\x1b[0m');
 
+  /* ---------- de prestatiehelft ---------- */
+  const pres = leesPrestatie();
+  const presNorm = norm.prestatie || {};
+  const heeftGrond = Object.keys(presNorm).length > 0;
+  const presNieuw = [], presBeter = [];
+  let presFout = null;
+
+  console.log('\n  \x1b[1mprestatie\x1b[0m \x1b[2m(uit BEPROEVING.json)\x1b[0m');
+  if (pres.reden) {
+    /* Ontbrekende invoer terwijl er een lat staat: dat is een fout en geen
+       stilte. Staat er nog geen lat, dan is het een mededeling. */
+    if (heeftGrond) { presFout = pres.reden; console.log('  \x1b[31mGEEN CIJFERS\x1b[0m ' + pres.reden); }
+    else console.log('  \x1b[2m' + pres.reden + ' -- nog geen prestatielat gezet\x1b[0m');
+  } else if (heeftGrond && norm.prestatieBron && norm.prestatieBron !== pres.bron) {
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: deze ronde draaide op ' + pres.bron
+      + ', de lat staat op ' + norm.prestatieBron + '.');
+    console.log('  \x1b[2mEen p99 van een andere machine of modus is geen betere of slechtere p99, maar een andere.\x1b[0m');
+  } else {
+    for (const m of PRESTATIEMETERS) {
+      const v = pres.cijfers[m.sleutel];
+      if (v == null) { console.log('  \x1b[2mniet gemeten\x1b[0m ' + m.sleutel); continue; }
+      const n = presNorm[m.sleutel];
+      if (n === undefined) { presNieuw.push({ m, nu: v }); continue; }
+      const o = oordeel(m, v, n);
+      const merk = o === 'slechter' ? '\x1b[31mSLECHTER\x1b[0m' : o === 'beter' ? '\x1b[32mbeter   \x1b[0m' : '\x1b[2mgelijk  \x1b[0m';
+      console.log('  ' + merk + '  ' + m.sleutel.padEnd(22) + String(v).padStart(6) + '\x1b[2m  (norm: ' + n + ')\x1b[0m');
+      if (o === 'slechter') slechter.push({ m, nu: v, norm: n });
+      if (o === 'beter') presBeter.push({ m, nu: v, norm: n });
+    }
+    for (const n of presNieuw)
+      console.log('  \x1b[36mNIEUW   \x1b[0m  ' + n.m.sleutel.padEnd(22) + String(n.nu).padStart(6) +
+        '\x1b[2m  (nog geen grondwaarde)\x1b[0m');
+    console.log('  \x1b[2mgemeten op ' + (pres.gedraaid || '?').slice(0, 16).replace('T', ' ') + ' op ' + pres.bron + '\x1b[0m');
+  }
+
+  if (presFout) {
+    console.log('\n\x1b[31m  DE PRESTATIELAT KAN NIET WORDEN GECONTROLEERD.\x1b[0m\n');
+    console.log('    ' + presFout);
+    console.log('\n  Er staat een prestatielat in NORM.json, dus deze cijfers horen er te zijn.');
+    console.log('  Een ratel zonder invoer is geen ratel; hij zwijgt dan precies wanneer het ertoe doet.\n');
+    return 1;
+  }
+
   if (slechter.length) {
     console.log('\n\x1b[31m  DE NORM IS NIET GEHAALD.\x1b[0m\n');
     for (const s of slechter)
@@ -213,10 +314,11 @@ function main() {
     return 1;
   }
 
-  if ((beterDan.length || nieuw.length) && !vastleggen) {
+  const teSchrijven = beterDan.length + nieuw.length + presBeter.length + presNieuw.length;
+  if (teSchrijven && !vastleggen) {
     console.log('\n\x1b[32m  De norm is gehaald\x1b[0m' +
-      (beterDan.length ? ', en op ' + beterDan.length + ' punt(en) ruim' : '') +
-      (nieuw.length ? '; ' + nieuw.length + ' meter(s) wachten nog op een grondwaarde' : '') + '.');
+      (beterDan.length + presBeter.length ? ', en op ' + (beterDan.length + presBeter.length) + ' punt(en) ruim' : '') +
+      (nieuw.length + presNieuw.length ? '; ' + (nieuw.length + presNieuw.length) + ' meter(s) wachten nog op een grondwaarde' : '') + '.');
     console.log('  \x1b[2mLeg dat vast met: node --experimental-sqlite scripts/norm.js --vastleggen\x1b[0m\n');
     return 0;
   }
@@ -224,7 +326,7 @@ function main() {
      terwijl er verder niets verbeterde, viel dus door naar "de norm is gehaald"
      en werd NOOIT vastgelegd -- hij bleef eeuwig zonder grondwaarde en dus
      eeuwig tandeloos. Nieuwe meters zijn nu op zichzelf reden om te schrijven. */
-  if (beterDan.length || nieuw.length) {
+  if (teSchrijven) {
     /* Alleen de verbeterde meters opschuiven. Een meter die gelijk bleef of
        (onmogelijk, want dan waren we hierboven al gestopt) slechter werd, raken
        we niet aan.
@@ -234,6 +336,16 @@ function main() {
     const uit = { ...norm, vastgelegd: new Date().toISOString().slice(0, 10), meters: { ...norm.meters } };
     for (const b of beterDan) uit.meters[b.m.sleutel] = b.nu;
     for (const m of METERS) if (uit.meters[m.sleutel] === undefined) uit.meters[m.sleutel] = nu[m.sleutel];
+    /* De prestatielat schrijven we alleen als er cijfers ZIJN en ze van dezelfde
+       machine en modus komen. Anders zou een ronde op een andere machine de lat
+       stilletjes verzetten -- omhoog of omlaag, allebei fout. */
+    if (presBeter.length || presNieuw.length) {
+      uit.prestatie = { ...(norm.prestatie || {}) };
+      for (const b of presBeter) uit.prestatie[b.m.sleutel] = b.nu;
+      for (const n of presNieuw) uit.prestatie[n.m.sleutel] = n.nu;
+      uit.prestatieBron = pres.bron;
+      uit.prestatieGemeten = pres.gedraaid;
+    }
     fs.writeFileSync(NORMBESTAND, JSON.stringify(uit, null, 2) + '\n');
     if (beterDan.length) {
       console.log('\n  \x1b[32mNorm strakker gezet op ' + beterDan.length + ' punt(en).\x1b[0m');
@@ -242,6 +354,14 @@ function main() {
     if (nieuw.length) {
       console.log('  \x1b[36m' + nieuw.length + ' nieuwe meter(s) vastgelegd.\x1b[0m');
       for (const n of nieuw) console.log('    ' + n.m.sleutel + ': ' + n.nu);
+    }
+    if (presBeter.length) {
+      console.log('  \x1b[32mPrestatielat strakker gezet op ' + presBeter.length + ' punt(en).\x1b[0m');
+      for (const b of presBeter) console.log('    ' + b.m.sleutel + ': ' + b.norm + ' -> ' + b.nu);
+    }
+    if (presNieuw.length) {
+      console.log('  \x1b[36m' + presNieuw.length + ' prestatiemeter(s) vastgelegd\x1b[0m \x1b[2m(geldig op ' + pres.bron + ')\x1b[0m');
+      for (const n of presNieuw) console.log('    ' + n.m.sleutel + ': ' + n.nu);
     }
     console.log('');
     return 0;
@@ -252,4 +372,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel };
+module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND };

@@ -1106,6 +1106,54 @@ async function misbruikBeproeving(tok) {
   const gezakt = verdicten.filter(x => !x).length;
   rij('OORDEEL', gezakt === 0 ? '\x1b[32mALLES PASS - de code doorstaat De Beproeving\x1b[0m' : '\x1b[31m' + gezakt + ' DREMPEL(S) GEZAKT\x1b[0m');
 
+  /* ---------- DE CIJFERS NAAR SCHIJF, ZODAT DE VOLGENDE RONDE KAN VERGELIJKEN ----------
+
+     Tot nu toe stonden deze getallen alleen in de uitvoer van deze ene run. Wie
+     wilde weten of de p99 was weggezakt sinds vorige maand, moest een oude
+     terminal terugvinden. Daarmee is dit een rapport en geen ratel: het meldt,
+     maar het bewaakt niets.
+
+     BEPROEVING.json is de brug naar scripts/norm.js. En met de vingerafdruk van
+     de machine erbij, want dat is het verschil tussen een vergelijking en een
+     misverstand: 144 ms p99 op vier kernen is een ander getal dan 144 ms op
+     zestien. Verschilt de vingerafdruk, dan vergelijkt de ratel niet en zegt hij
+     dat -- liever geen oordeel dan een oordeel dat nergens over gaat.
+
+     Ook de MODUS staat erin. Een sqlite-ronde en een Postgres-ronde meten niet
+     hetzelfde platform; die naast elkaar leggen zou de lat laten dansen op de
+     vraag welke stand er toevallig draaide. */
+  const cijfers = {
+    gedraaid: new Date().toISOString(),
+    modus: MODE,
+    machine: { kernen: os.cpus().length, geheugenGB: Math.round(os.totalmem() / 1e9), platform: process.platform, node: process.version },
+    oordeel: gezakt === 0 ? 'PASS' : 'GEZAKT',
+    gezakteDrempels: gezakt,
+    meters: {
+      p50Ms: pctMs(0.50), p95Ms: pctMs(0.95), p99Ms: pctMs(0.99), maxMs: latMax,
+      doorvoerPerSec: Math.round(totaal / (stormDuurMs / 1000)),
+      stormDuurSec: Number((stormDuurMs / 1000).toFixed(1)),
+      serverfouten5xx: buckets.s5xx,
+      eventLoopP99Ms: lusMonsters.length ? Number(Math.max(...lusMonsters.map(x => x.p99 || 0)).toFixed(1)) : null,
+      eventLoopMaxMs: lusMonsters.length ? Number(Math.max(...lusMonsters.map(x => x.max || 0)).toFixed(1)) : null,
+      cpuGemiddeldPct: cpuUit ? cpuUit.gemiddeld : null,
+      cpuPiekPct: cpuUit ? cpuUit.piek : null,
+      ramPiekMB: piek,
+      geheugenHellingMBPerMin: Number(lekHelling.toFixed(2)),
+      herstelSeconden: herstel.hersteld ? herstel.naSeconden : null,
+      verhalenSlaagPctStorm: stormSom.gelukt + stormSom.afgewezen + stormSom.gefaald > 0
+        ? Number((100 * stormSom.gelukt / (stormSom.gelukt + stormSom.afgewezen + stormSom.gefaald)).toFixed(1)) : null,
+      verhalenGefaaldStorm: stormSom.gefaald,
+      endpointsOnbereikt: onbereikt.length,
+      endpointsBestookt: routes.length
+    }
+  };
+  try {
+    fs.writeFileSync(path.join(__dirname, '..', 'BEPROEVING.json'), JSON.stringify(cijfers, null, 2) + '\n');
+    console.log('\n  \x1b[2mcijfers weggeschreven naar BEPROEVING.json (scripts/norm.js vergelijkt ze met de vorige ronde)\x1b[0m');
+  } catch (e) {
+    console.log('\n  \x1b[31mBEPROEVING.json kon niet worden geschreven: ' + e.message + '\x1b[0m');
+  }
+
   await stop();
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   process.exitCode = gezakt === 0 ? 0 : 1;

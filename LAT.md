@@ -11,7 +11,7 @@ hetzelfde en doen alsof van wel is de eerste manier om hem te verliezen.
 
 ---
 
-## De negen regels
+## De tien regels
 
 ### 1. Repareer de oorzaak, niet het symptoom
 
@@ -183,13 +183,56 @@ iets dat altijd waar is, een statuscontrole die een hele klasse toelaat, en een
 is de vorm om op te letten -- soms terecht, vaak een toets die zijn eigen vraag
 niet durft te stellen.
 
+### 10. Een meter die je niet hebt zien uitslaan, meet niets
+
+Regel 9 gaat over toetsen. Deze gaat over het gereedschap waarmee je meet, en hij
+is er gekomen omdat op één dag **zeven** meters bleken te liegen -- en geen enkele
+daarvan zat in de RTG-code. Ze zaten allemaal in de instrumenten die moesten
+bewijzen dat de code deugde.
+
+Dat is het gevaarlijke eraan. Een kapotte toets zakt of slaagt ten onrechte, en
+dat is nog te merken. Een kapotte meter geeft een getal. Getallen ogen als feiten,
+worden overgeschreven in een rapport, en niemand vraagt ooit of de meter zelf ooit
+heeft uitgeslagen.
+
+*De zeven, met wat er per stuk misging:*
+
+| de meter | wat hij zei | wat er werkelijk gebeurde |
+|---|---|---|
+| endpoint-dekking | "94% gedekt" | telde treffers in plaats van endpoints; de echte dekking was 2 van 634 |
+| herstel na de storm | "niet hersteld" | zonder statuscode, dus 429, 503 en 401 waren niet uit elkaar te houden -- drie totaal verschillende conclusies |
+| rol-scheiding | "0% verkeerde-rol 2xx" | de storm logt zichzelf uit; 85% van die antwoorden was een 401 op een dood token, geen rechtenbesluit |
+| de rolproef | een uur lang PASS | kreeg een functie die alleen `{status, ms}` teruggaf, dus hij vergeleek vijf keer `null` met vijf keer `null` |
+| dezelfde rolproef | "saldo 137 -> 0, blijvende wijziging!" | vergeleek drie verschillende personas: het token werd bij elke aanroep opnieuw willekeurig gekozen |
+| de scrypt-teller | "0 scrypts, 0 ms CPU" | kende alleen `scryptSync`; na de reparatie naar de asynchrone vorm meldde hij een wonder in plaats van een verplaatsing |
+| event-loop na de storm | "p99 nog 74 ms" | de histogram is cumulatief en werd nooit gewist, dus dat was de p99 VAN de storm |
+
+*Wat de regel praktisch betekent.* Voordat een meter een oordeel mag dragen, moet
+je hem één keer hebben zien uitslaan op iets waarvan je weet dat het fout is. Voor
+de vingerafdruk in de rolproef is dat nu ingebouwd: `ijkVingerafdruk()` doet eerst
+een legitieme wijziging met de juiste rol, en beweert niets als de meter die niet
+ziet -- dan meldt hij `meterStuk` en zakt het oordeel. Dat is regel 2 (elke
+bewering met een mutatie natrekken) toegepast op het meetinstrument zelf.
+
+En de tegenhanger, want de val heeft twee kanten: een meter die zijn eigen invoer
+niet vindt, moet zakken en niet zwijgen. De prestatielat in `scripts/norm.js`
+faalt hard als `BEPROEVING.json` ontbreekt terwijl er wel een lat staat, weigert
+de cijfers van een GEZAKTE ronde als grondwaarde, en vergelijkt niet tussen
+machines of opslagstanden -- 144 ms op vier kernen is geen betere 144 ms dan op
+zestien, het is een andere.
+
+**Handhaver:** `test/normprestatie.test.js` (acht toetsen, alle vier de mutaties
+zagen we zakken) en de ijking in `scripts/lib/rolproef.js`. Voor de rest: regel 2
+en mensenwerk. De vorm om op te letten is een meter die nog nooit iets anders
+heeft gezegd dan "in orde".
+
 ---
 
 ## Wat de lat betekent per tijdvak
 
 ### De toekomst
 
-Bindend. Nieuw werk voldoet aan alle negen, en waar een machine kan handhaven
+Bindend. Nieuw werk voldoet aan alle tien, en waar een machine kan handhaven
 handhaaft hij. Wie een regel toevoegt aan `check.js` beproeft hem met een mutatie
 voordat hij hem inlevert (regel 2 geldt ook voor regels).
 
@@ -228,6 +271,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | geen geslaagde toets met een serverfout eronder | `test/helper.js` (strenge poort) |
 | geen productiestart op een opslag zonder grootboek | `server/config/productie-opslag.js` |
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
+| de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
 | de pijplijn die dit alles draait | `.github/workflows/ci.yml` |
 

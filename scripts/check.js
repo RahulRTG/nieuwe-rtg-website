@@ -733,5 +733,90 @@ console.log('\n20) tekst wordt niet in een kader geperst');
   if (!geperst) ok('geen tekst die met spacingAndGlyphs vervormd wordt');
 }
 
+/* 21) elke AI-ingang draagt de toegangsregel, of staat erkend op de lijst.
+
+   CLAUDE.md stelt een harde regel: de AI belooft nooit zelf toegang tot de
+   Lifestyle- of Business Pass, bevestigt nooit een boeking als verwerkt, en
+   voert geen echte hotel-/luchtvaartmerken op als partner. Die regel woont in de
+   gedeelde promptbasis (RAHUL_BASIS -> RAHUL_LEAD / rahulLeadVoor, en de per-pas
+   aiSystemPrompt): "je belooft niets wat je niet zeker kunt waarmaken (geen
+   toegang, geen goedkeuring...)".
+
+   Er zijn 78 plekken die het model aanroepen; de meeste dragen die basis. De
+   rest doet dat bewust niet -- JSON-uitvoer zonder vrije tekst, begrensde
+   eenmalige opdrachten, of werk-/leverancier-/techniekgereedschap zonder
+   pasgesprek -- en staat hieronder met naam en reden. Deze poort dwingt niets
+   te herschrijven; hij zorgt dat er geen ONGEZIENE AI-ingang zonder de regel kan
+   bijkomen. Wie een nieuwe bouwt, gebruikt de gedeelde basis (rahulLeadVoor /
+   RAHUL_LEAD / aiSystemPrompt) of zet hem hieronder met een reden.
+
+   De lijst wordt ook de andere kant op bewaakt: een naam die de regel intussen
+   zelf draagt of het model niet meer aanroept, moet er weer uit -- zo blijft de
+   lijst een eerlijke weergave en geen groeiende dooie hoek. */
+console.log('\n21) elke AI-ingang draagt de toegangsregel, of staat erkend op de lijst');
+{
+  const { scan } = require('./ai-oproepen');
+  // bestand (relatief aan server/) -> reden waarom het de gedeelde basis niet gebruikt
+  const AI_BUITEN_BASIS = new Map([
+    ['foundation/buddy.js', 'RTF-onderwijs: leermaatje voor kinderen, geen pasgesprek'],
+    ['foundation/onderwijs/schrift.js', 'RTF-onderwijs: leerling-schrift, geen pasgesprek'],
+    ['kern/agenda.js', 'JSON-uitvoer: agenda-structuur, geen vrije tekst naar een lid'],
+    ['kern/baby.js', 'JSON-uitvoer: geen vrije tekst naar een lid'],
+    ['kern/bijles.js', 'RTF-onderwijs: bijles, geen pasgesprek'],
+    ['kern/gemeente/meldingen.js', 'JSON-uitvoer: meldingsvelden, geen vrije tekst naar een lid'],
+    ['kern/homekit.js', 'JSON-uitvoer: scene-definitie, geen vrije tekst naar een lid'],
+    ['kern/kijken.js', 'begrensd: beeldherkenning met eigen harde grenzen, geen pasgesprek'],
+    ['kern/kletspraat/gesprek.js', 'kletsspel met eigen opdracht + taalregels, geen pasgesprek'],
+    ['kern/leren/overhoren/lijsten.js', 'RTF-onderwijs: overhoorlijsten, geen pasgesprek'],
+    ['kern/leren/projecten.js', 'RTF-onderwijs: projecten voor kinderen en gezinnen, geen pasgesprek'],
+    ['kern/leren/schrijven.js', 'RTF-onderwijs: schrijfcoach, geen pasgesprek'],
+    ['kern/lesmaker.js', 'RTF-onderwijs: lesontwerper, geen pasgesprek'],
+    ['kern/markt/toezicht.js', 'begrensd: advertentietekst schrijven'],
+    ['kern/office/delen.js', 'RTG Office werk-tool met vaste opdrachtenlijst, geen pasgesprek'],
+    ['kern/onboarding/beheer.js', 'JSON-config voor een beheerder (intakevelden/contract), geen lid-gesprek'],
+    ['kern/overheid/belasting.js', 'JSON-uitvoer: belastingberekening, geen vrije tekst naar een lid'],
+    ['kern/pakketten.js', 'begrensd: advies op basis van uitsluitend het meegegeven pakket'],
+    ['kern/reisbureau.js', 'JSON-uitvoer + eigen boekingsregel (nooit "al geboekt")'],
+    ['kern/rtgonderzoeker.js', 'begrensd: analyse van aangeleverde bevindingen, "de mens beslist"'],
+    ['kern/werkplaats-ai.js', 'JSON-uitvoer, geen vrije tekst naar een lid'],
+    ['routes/huis.js', 'lid-gericht maar begrensd: vat een MEEGEGEVEN reisdossier samen'],
+    ['routes/member/zakelijk.js', 'lid-gericht maar begrensd: boekhouder voor wie de Business Pass al heeft'],
+    ['routes/muziek.js', 'JSON-uitvoer: muzikaal patroon, geen vrije tekst naar een lid'],
+    ['routes/supplier/events/catering.js', 'JSON-uitvoer, leverancier-gereedschap'],
+    ['routes/supplier/events/keuken/coach.js', 'JSON-uitvoer, leverancier-gereedschap'],
+    ['routes/supplier/events/keuken/recepten.js', 'begrensd: werkinstructie voor een keukenkracht (leverancier)'],
+    ['routes/supplier/events/mep.js', 'JSON-uitvoer, leverancier-gereedschap'],
+    ['routes/supplier/events/planning.js', 'JSON-uitvoer, leverancier-gereedschap'],
+    ['routes/supplier/tools.js', 'begrensd: reactie namens een leverancier'],
+    ['routes/techniek/beheer.js', 'techniek/eigenaar-gereedschap, geen lid-gesprek'],
+    ['routes/techniek/diagnose.js', 'techniek/eigenaar-gereedschap (diagnose/herstel), geen lid-gesprek'],
+    ['routes/techniek/functie.js', 'techniek/eigenaar-gereedschap, geen lid-gesprek'],
+    ['translate.js', 'vertaalmachine, geen gesprek'],
+  ]);
+  const sites = scan(ROOT);
+  const buiten = new Set(sites.filter(s => !s.draagtRegel).map(s => s.bestand));
+  let mis = 0;
+  // nieuwe AI-ingang zonder de regel en niet op de lijst
+  for (const b of buiten) {
+    if (!AI_BUITEN_BASIS.has(b)) {
+      mis++;
+      fout('AI-ingang zonder de toegangsregel: ' + b +
+        ' -- gebruik de gedeelde basis (rahulLeadVoor / RAHUL_LEAD / aiSystemPrompt), of zet hem in AI_BUITEN_BASIS met een reden');
+    }
+  }
+  // stale: staat op de lijst maar draagt de regel nu zelf, of roept het model niet meer aan
+  for (const b of AI_BUITEN_BASIS.keys()) {
+    if (!buiten.has(b)) {
+      mis++;
+      fout('overbodige uitzondering: ' + b +
+        ' -- draagt de regel nu zelf of roept het model niet meer aan; haal hem uit AI_BUITEN_BASIS');
+    }
+  }
+  if (!mis) {
+    const draagt = sites.length - buiten.size;
+    ok(draagt + ' AI-ingang(en) dragen de toegangsregel; ' + buiten.size + ' erkend op de lijst (van ' + sites.length + ' totaal)');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

@@ -30,6 +30,7 @@ open http://$(hostname -s).local:3000
 De drie bestanden in de repo zelf:
 
 - `installeer.sh` zet alles klaar en laadt de dienst.
+- `bijwerken.sh` zet een nieuwe versie live en draait terug als die niet opkomt.
 - `rtg-start.sh` is de wikkel die launchd aanroept: leest de geheimen, zoekt
   node en start `server/trio.js`.
 - `nl.rtg.server.plist.sjabloon` is het sjabloon voor het plist.
@@ -81,7 +82,34 @@ sudo launchctl bootout system/nl.rtg.server            # stoppen
 sudo launchctl bootstrap system /Library/LaunchDaemons/nl.rtg.server.plist  # starten
 ```
 
-Na `git pull` in de repo: `sudo launchctl kickstart -k system/nl.rtg.server`.
+## Bijwerken naar een nieuwe versie
+
+```bash
+sudo scripts/mac/bijwerken.sh
+```
+
+Dat is `git pull` plus alles wat je eromheen zou moeten onthouden: hij weigert
+te beginnen als er lokale wijzigingen in de weg staan, keurt de nieuwe versie
+**voordat** hij herstart, en kijkt daarna of `/api/health` ook echt antwoordt.
+Doet hij dat niet, dan zet het script de vorige versie terug en start die weer
+op, zodat je nooit met een halve installatie en een dode site achterblijft.
+
+Heb je nog een **oude kopie van de site** op de machine staan, dan kan die er in
+dezelfde beweging uit:
+
+```bash
+sudo scripts/mac/bijwerken.sh --oude-map=~/oude-map-naam
+```
+
+De oude kopie wordt **naar de prullenmand verplaatst, niet verwijderd**, en
+alleen nadat de nieuwe versie heeft geantwoord. Staat er een `server/data` in
+die oude map en heeft de draaiende repo er zelf geen, dan stopt het script:
+dat is dan de enige kopie van de database en de sleutels, en die staan niet in
+git. Het zegt er ook bij hoe je hem overzet.
+
+Liever met de hand? `git pull` in de repo, daarna
+`sudo launchctl kickstart -k system/nl.rtg.server`. Dan doe je zelf de
+controle of hij ook echt antwoordt.
 
 ## Energie-instellingen
 

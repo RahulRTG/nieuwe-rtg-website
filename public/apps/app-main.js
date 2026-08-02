@@ -441,6 +441,26 @@
         'display:flex;align-items:center;gap:0.4rem;}' +
       '.ag-passkey[hidden]{display:none;}' +
       '.ag-passkey svg{width:15px;height:15px;stroke:currentColor;fill:none;}' +
+      /* De ballotage-regalia: pas zichtbaar zodra de vier vragen beginnen.
+         Een stille kopregel met haarlijnen (de horlogetaal van het huis), en
+         daaronder vier Romeinse cijfers als plaatsbepaling -- een uitnodiging,
+         geen formulierbalk. Bij vertrouwelijke vragen (geboortedatum,
+         wachtwoord) verschijnt een gedempte kluisregel onder het veld. */
+      '.ag-kop{display:none;align-items:center;gap:0.8rem;justify-content:center;margin:0 0 0.35rem;' +
+        "font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:500;letter-spacing:0.34em;" +
+        'text-transform:uppercase;color:var(--gold,#857007);opacity:0;transition:opacity var(--rtg-royaal,560ms) var(--rtg-ease,ease);}' +
+      '.ag-kop::before,.ag-kop::after{content:"";flex:0 0 2.2rem;height:1px;' +
+        'background:color-mix(in srgb, var(--gold,#857007) 45%, transparent);}' +
+      '.ag-doos.ag-ballotage .ag-kop{display:flex;opacity:1;}' +
+      ".ag-stappen{display:none;justify-content:center;gap:1.6rem;margin:1.05rem 0 0;font-family:'Bodoni Moda',serif;" +
+        'font-size:0.8rem;color:var(--soft);opacity:0;transition:opacity var(--rtg-royaal,560ms) var(--rtg-ease,ease);}' +
+      '.ag-doos.ag-ballotage .ag-stappen{display:flex;opacity:1;}' +
+      '.ag-stappen span{transition:color var(--rtg-tempo,340ms) var(--rtg-ease,ease);}' +
+      '.ag-stappen span.nu{color:var(--gold,#857007);}' +
+      '.ag-stappen span.gehad{color:color-mix(in srgb, var(--gold,#857007) 55%, var(--soft));}' +
+      ".ag-kluis{display:none;justify-content:center;margin:0.7rem 0 0;font-family:'Inter',sans-serif;" +
+        'font-size:0.68rem;letter-spacing:0.06em;color:var(--soft);opacity:0;transition:opacity var(--rtg-tempo,340ms) var(--rtg-ease,ease);}' +
+      '.ag-doos.ag-kluis-aan .ag-kluis{display:flex;opacity:1;}' +
       // de sterrenhemel gaat achter alles; de poort-inhoud eroverheen
       '#gate > *:not(canvas){position:relative;z-index:1;}';
     document.head.appendChild(st);
@@ -456,10 +476,13 @@
     const doos = document.createElement('div');
     doos.className = 'ag-doos';
     doos.innerHTML =
+      '<div class="ag-kop" id="agKop" aria-hidden="true"></div>' +
       '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
       '<div class="ag-rij"><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
+      '<div class="ag-stappen" id="agStappen" aria-hidden="true"></div>' +
+      '<div class="ag-kluis" id="agKluis"></div>' +
       '<button type="button" class="ag-passkey" id="agPasskey" hidden>' +
         '<svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5"/><path d="M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5"/><path d="M12 13c0 3-.6 5.6-1.6 7.7"/><path d="M5.5 8a7 7 0 0 1 12 3c0 3.4-.5 6.4-1.5 9"/></svg>' +
         '<span>' + T('ag.pk.knop','Face ID of passkey') + '</span></button>';
@@ -483,7 +506,15 @@
        nooit vrijgegeven) en met een sinus in plaats van echte spraak. Die
        kopie is weg; de gedeelde motor doet kaak, spreiding en tuit, en stopt
        vanzelf zodra de poort uit beeld is. */
-    const mondje = (window.RTGMond && mond) ? RTGMond.maak(mond) : { praat: function(){} };
+    /* mond.js laadt met defer en is er dus nog NIET wanneer de poort bouwt:
+       meteen aanhaken zou een stille mond geven. Vandaar de na-lading op
+       DOMContentLoaded (uitgestelde scripts draaien daarvoor al). */
+    let mondje = { praat: function(){} };
+    function mondStart(){
+      if (window.RTGMond && mond && !mond.dataset.rtgMondActief) mondje = RTGMond.maak(mond);
+    }
+    mondStart();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mondStart);
     const praat = ms => mondje.praat(ms);
 
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
@@ -496,6 +527,39 @@
       zin.style.animation = '';
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));
+    }
+    /* De ballotage-regalia volgen de metadata van de server: `voortgang`
+       {nr, van} toont de kop en de Romeinse plaatsbepaling, `vertrouwelijk`
+       de kluisregel. Geen metadata (het open gesprek, de inlog, het einde) =
+       alles weer stil. De teksten lopen via T() mee met de taalkiezer. */
+    const kopEl = doos.querySelector('#agKop');
+    const stappenEl = doos.querySelector('#agStappen');
+    const kluisEl = doos.querySelector('#agKluis');
+    const ROMEINS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+    function toonVoortgang(d){
+      const v = d && d.voortgang;
+      if (v && v.nr && !d.klaar){
+        if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
+        if (stappenEl){
+          stappenEl.textContent = '';
+          for (let i = 1; i <= (v.van || 4); i++){
+            const s = document.createElement('span');
+            s.textContent = ROMEINS[i - 1] || String(i);
+            if (i === v.nr) s.className = 'nu';
+            else if (i < v.nr) s.className = 'gehad';
+            stappenEl.appendChild(s);
+          }
+        }
+        doos.classList.add('ag-ballotage');
+      } else {
+        doos.classList.remove('ag-ballotage');
+      }
+      if (kluisEl && d && d.vertrouwelijk && !d.klaar){
+        kluisEl.textContent = T('ag.kluis','Versleuteld · rechtstreeks de kluis in');
+        doos.classList.add('ag-kluis-aan');
+      } else {
+        doos.classList.remove('ag-kluis-aan');
+      }
     }
     const pkKnop = doos.querySelector('#agPasskey');
     function toonPasskey(aan){
@@ -621,6 +685,7 @@
         } else {
           const d = await API.call('/aanmeld/zeg', { id: gesprek, tekst, lang: document.documentElement.lang || 'nl' });
           zeg('rahul', d.tekst);
+          toonVoortgang(d);
           // ingelogd via de sleutelwoorden: de server heeft server-side
           // geverifieerd en een echte token gemunt; wij bewaren hem en
           // herstellen de sessie precies zoals na een gewone inlog

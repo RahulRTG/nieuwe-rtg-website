@@ -17,16 +17,24 @@
 
 module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
   const { schoon, leeftijdVan, toon, gesprekken } = ctx;
+  /* De ballotage kent vier vragen, en wie aanklopt mag weten waar hij staat:
+     elke stap draagt zijn plaats (voortgang) mee, zodat de poort een stille
+     stappenmarkering kan tonen -- I tot IV, zoals op een uitnodiging, niet
+     als een formulierbalk. `vertrouwelijk` markeert de vragen waarvan het
+     antwoord rechtstreeks de kluis in gaat; de poort toont daar een
+     geruststellende regel bij. Retourvragen (een datum die niet leest)
+     houden dezelfde plaats: een vergissing is geen stap terug. */
+  const stap = (nr, extra) => Object.assign({ voortgang: { nr, van: 4 } }, extra || {});
   switch (g.stap) {
     case 'hallo': {
       g.stap = 'naam';
       const somber = /\b(slecht|niet zo|moe|druk|stress|rot)\b/i.test(tekst);
       const opening = somber ? 'Dank dat je het zegt. ' : toon(g, 'Mooi. ', 'Mooi zo! ');
-      return { tekst: opening + 'Je volledige naam?' };
+      return stap(1, { tekst: opening + 'Dan open ik de ballotage — vier vragen, meer is het niet. Je volledige naam?' });
     }
     case 'naam': {
       const naam = schoon(tekst.replace(/^(ik ben|ik heet|mijn naam is)\s+/i, ''), 80);
-      if (naam.length < 2 || !/[A-Za-zÀ-ÿ]/.test(naam)) return { tekst: 'Die naam lees ik niet goed. Hoe schrijf je hem?' };
+      if (naam.length < 2 || !/[A-Za-zÀ-ÿ]/.test(naam)) return stap(1, { tekst: 'Die naam lees ik niet goed. Hoe schrijf je hem?' });
       g.velden.name = naam;
       g.stap = 'email';
       /* Noemde iemand zijn woonplaats terloops, dan laat Rahul kort merken dat hij
@@ -34,14 +42,14 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
          hoort bij een bestelling, niet bij de poort), maar wat je vertelt onthoudt
          hij wel. */
       const plek = g.velden.woonplaats ? g.velden.woonplaats + ', mooi. ' : '';
-      return { tekst: 'Aangenaam, ' + naam.split(' ')[0] + '. ' + plek + 'Je e-mailadres?' };
+      return stap(2, { tekst: 'Aangenaam, ' + naam.split(' ')[0] + '. ' + plek + 'Je e-mailadres?' });
     }
     case 'email': {
       const m = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
-      if (!m) return { tekst: 'Daar zie ik geen e-mailadres in. Voluit, met @?' };
+      if (!m) return stap(2, { tekst: 'Daar zie ik geen e-mailadres in. Voluit, met @?' });
       g.velden.email = m[0].toLowerCase();
       g.stap = 'geboren';
-      return { tekst: 'Genoteerd. Je geboortedatum? Die bepaalt wat er voor je opengaat.' };
+      return stap(3, { vertrouwelijk: true, tekst: 'Genoteerd. Je geboortedatum? Die bepaalt wat er voor je opengaat.' });
     }
     case 'geboren': {
       let d = null;
@@ -49,15 +57,15 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       if (m) d = m[1] + '-' + m[2] + '-' + m[3];
       else if ((m = /(\d{1,2})[-/](\d{1,2})[-/](\d{4})/.exec(tekst))) d = m[3] + '-' + String(m[2]).padStart(2, '0') + '-' + String(m[1]).padStart(2, '0');
       const lft = d ? leeftijdVan(d) : null;
-      if (lft == null || lft > 120) return { tekst: 'Die datum kan ik niet plaatsen. Als dag-maand-jaar, bijvoorbeeld 14-03-1992?' };
+      if (lft == null || lft > 120) return stap(3, { vertrouwelijk: true, tekst: 'Die datum kan ik niet plaatsen. Als dag-maand-jaar, bijvoorbeeld 14-03-1992?' });
       if (lft < 15) return { tekst: 'RTG kan vanaf 15 jaar. Tot die tijd is er de RTFoundation-wereld; die is er juist voor jou.' };
       g.velden.geboortedatum = d;
       g.stap = 'wachtwoord';
       const jong = lft < 18 ? 'Voor jouw leeftijd gelden beschermende regels; die regel ik. ' : '';
-      return { tekst: jong + 'Tot slot een wachtwoord, minstens 6 tekens. Het gaat versleuteld de kluis in.' };
+      return stap(4, { vertrouwelijk: true, tekst: jong + 'De laatste vraag: kies een wachtwoord, minstens zes tekens. Het gaat versleuteld de kluis in — niemand bij RTG kan het inzien.' });
     }
     case 'wachtwoord': {
-      if (tekst.length < 6) return { tekst: 'Net te kort; minstens 6 tekens.' };
+      if (tekst.length < 6) return stap(4, { vertrouwelijk: true, tekst: 'Net te kort — minstens zes tekens.' });
       g.velden.password = String(ruwTekst).slice(0, 200);
       g.stap = 'klaar';
       g.velden.tier = 'rtg';
@@ -69,7 +77,7 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       /* Alleen de vier velden. `phone` gaat hier NIET mee: dat vraagt Rahul pas
          wanneer er iets bezorgd of gereserveerd moet worden. */
       const velden = { name: g.velden.name, email: g.velden.email, geboortedatum: g.velden.geboortedatum, password: g.velden.password, tier: 'rtg' };
-      const uit = { tekst: 'Klaar. Je RTG Pass staat op je naam.' + interesse + werk,
+      const uit = { tekst: 'Dat is rond — welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam.' + interesse + werk,
         klaar: true, velden, werkgever: g.werkgever, woonplaats: g.velden.woonplaats || null };
       gesprekken.delete(id);
       return uit;

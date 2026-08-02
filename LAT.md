@@ -273,6 +273,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
+| elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
 | de pijplijn die dit alles draait | `.github/workflows/ci.yml` |
 

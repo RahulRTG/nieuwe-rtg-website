@@ -125,11 +125,11 @@ function tabel() {
     },
     {
       soort: 'schermen (public/**/*.html)',
-      bewaker: ['test/paginas.e2e.js'],
-      wat: 'de paginascan opent ze allemaal; zijn lijst komt uit public/, dus nieuw is meteen gedekt',
+      bewaker: ['test/paginas.e2e.js', 'test/leven.e2e.js'],
+      wat: 'ze gaan allemaal open ZONDER fout (paginascan) en geven allemaal een teken van LEVEN (levenstoets)',
       dingen: () => loop(path.join(WORTEL, 'public'), n => n.endsWith('.html')),
-      // de scan somt de map zelf op: alles wat erin staat is per constructie gedekt
-      bewaakt: () => bestaat('test/paginas.e2e.js')
+      // beide scans sommen de map zelf op: wat erin staat is per constructie gedekt
+      bewaakt: () => bestaat('test/paginas.e2e.js') && bestaat('test/leven.e2e.js')
     },
     {
       soort: 'app-delen (public/apps/*/**.js)',
@@ -148,7 +148,7 @@ function tabel() {
          deel dat midden in een functie belandt, staat keurig in de bundel en
          gebeurt nooit. Statisch is dat niet te zien; het hoort in een toets die
          kijkt of er echt iets gebeurt. */
-      kanttekening: 'het contract bewijst dat een deel IN de bundel staat, niet dat het DRAAIT'
+      kanttekening: 'het contract bewijst dat een deel IN de bundel staat, niet dat het DRAAIT -- dat vangt test/leven.e2e.js, per scherm'
     },
     {
       soort: 'API-routes',

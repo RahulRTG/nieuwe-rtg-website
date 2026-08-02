@@ -12,6 +12,7 @@ function catalogus(staat) {
     functies: FUNCTIES.filter(f => f.categorie === cat).map(f => {
       const s = (staat && staat[f.id]) || {};
       const perLand = s.perLand || {};
+      const perPlaats = s.perPlaats || {};
       const perPersoon = s.perPersoon || {};
       return {
         id: f.id, naam: f.naam, uitleg: f.uitleg, standaard: f.standaard, aan: functieAan(f.id, staat),
@@ -20,9 +21,15 @@ function catalogus(staat) {
           const meta = DOELGROEP_OP_ID[dg] || { id: dg, naam: dg, emoji: '•' };
           return { id: dg, naam: meta.naam, emoji: meta.emoji, aan: functieAanVoor(f.id, dg, staat) };
         }),
-        // actieve beperkingen per land en per persoon (alleen wat expliciet uit staat)
+        // actieve beperkingen per land, plaats en persoon (alleen wat expliciet uit staat)
         landUit: Object.keys(perLand).filter(k => perLand[k] === false),
-        persoonUit: Object.keys(perPersoon).filter(k => perPersoon[k] === false)
+        plaatsUit: Object.keys(perPlaats).filter(k => perPlaats[k] === false),
+        persoonUit: Object.keys(perPersoon).filter(k => perPersoon[k] === false),
+        // de automaat: bewaakt de storingswachter deze functie, en heeft hij
+        // hem nu vast (dicht of op proef open)?
+        wachter: s.wachter !== false,
+        automaat: s.automaat ? { ronde: s.automaat.ronde,
+          stand: (s.aan === false ? 'dicht' : 'proef') } : null
       };
     })
   })).filter(g => g.functies.length);

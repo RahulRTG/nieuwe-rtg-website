@@ -25,6 +25,9 @@ module.exports = (ctx) => {
     if (!functies.OP_ID[id]) return { status: 404, error: 'Onbekende functie.' };
     const st = functiesStand();
     if (!st[id]) st[id] = {};
+    // de hand wint van de automaat: een bewuste schakeling wist het
+    // automaat-merk, zodat de storingswachter deze stand met rust laat
+    delete st[id].automaat;
     if (doelgroep) {
       if (!functies.DOELGROEP_IDS.includes(doelgroep)) return { status: 400, error: 'Onbekende doelgroep.' };
       if (!st[id].perDoelgroep) st[id].perDoelgroep = {};
@@ -113,5 +116,30 @@ module.exports = (ctx) => {
     return { ok: true, aan: aan === true, aantal: n };
   }
 
-  return { functiesStand, volgKoppels, schakel, schakelGenre, genreRegels, genreStandaard, schakelFase, schakelAlles };
+  /* De fijne assen vanuit de boardroom: een functie gericht dicht (of weer
+     open) voor EEN plaats, land of persoon. aan=true verwijdert de beperking;
+     er is geen "expliciet aan" op een fijne as -- open is de standaard, en
+     twee soorten waarheid op een as maakt de kast onleesbaar. De persoon komt
+     hier al herleid binnen (user-sleutel); het herleiden op codenaam of
+     e-mail hoort bij de route, want daar wonen de opzoekhulpen. */
+  function schakelFijn(id, as, sleutel, aan, wie) {
+    if (!functies.OP_ID[id]) return { status: 404, error: 'Onbekende functie.' };
+    const VELD = { plaats: 'perPlaats', land: 'perLand', persoon: 'perPersoon' };
+    const veld = VELD[as];
+    if (!veld) return { status: 400, error: 'Onbekende as (plaats, land of persoon).' };
+    const s = as === 'plaats' ? functies.plaatsNorm(sleutel)
+      : as === 'land' ? (String(sleutel || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2) || null)
+      : (/^user-\d+$/.test(String(sleutel || '')) ? String(sleutel) : null);
+    if (!s || (as === 'land' && s.length !== 2)) return { status: 400, error: 'Geef een geldige ' + as + '.' };
+    const st = functiesStand();
+    if (!st[id]) st[id] = {};
+    delete st[id].automaat; // de hand wint van de automaat
+    st[id][veld] = st[id][veld] || {};
+    if (aan === true) delete st[id][veld][s]; else st[id][veld][s] = false;
+    save();
+    audit(wie || 'boardroom', 'Functie ' + id + ' voor ' + as + ' "' + s + '" ' + (aan === true ? 'weer AAN (beperking weg)' : 'UIT') + ' gezet');
+    return { ok: true, functie: id, as, sleutel: s, aan: aan === true };
+  }
+
+  return { functiesStand, volgKoppels, schakel, schakelFijn, schakelGenre, genreRegels, genreStandaard, schakelFase, schakelAlles };
 };

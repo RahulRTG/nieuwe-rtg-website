@@ -34,15 +34,23 @@ const ZIN = {
   globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
   pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
   land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
+  plaats: 'Deze functie is in jouw woonplaats uitgeschakeld door de beheerder.',
   persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.',
   genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.'
 };
 
-function schakelaars({ db, accounts, functies, sessionFor, findSupplier }) {
+function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter }) {
   return (req, res, next) => {
     const p = req.path;
     if (!p.startsWith('/api/')) return next();
     if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
+    /* De meetlijn van de storingswachter: elke afgeronde API-respons meldt
+       zijn status. BOVEN de vroege return hieronder, want de wachter moet ook
+       meten als er nog nooit iets geschakeld is -- anders bewaakt hij alleen
+       installaties waar al een keer een hand aan de kast zat. Dat de kast
+       zelf hierlangs 503's produceert is veilig: meet() telt een 503 bewust
+       nooit mee (dat is de taal van "bewust dicht", geen storing). */
+    if (wachter) res.on('finish', () => { try { wachter.meet(p, res.statusCode); } catch (e) {} });
     const staat = db.data && db.data.techniek && db.data.techniek.functies;
     if (!staat) return next(); // niets uitgezet: alles staat aan
 
@@ -69,16 +77,23 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier }) {
       } catch (e) {}
     }
 
-    // land en persoonssleutel (voor per-persoon uitschakelen)
-    let land = null, persoon = null;
+    // land, woonplaats en persoonssleutel (voor de fijne assen); de opzoeking
+    // gebeurt alleen als er ook echt regels van dat soort staan
+    let land = null, plaats = null, persoon = null;
     if (user) {
       persoon = 'user-' + user.id;
-      if (functies.heeftLandRegels(staat)) {
-        try { const md = accounts.getMemberState(user.id) || {}; land = md.land || natieNaarLand(md.nationaliteit) || null; } catch (e) {}
+      const wilLand = functies.heeftLandRegels(staat);
+      const wilPlaats = functies.heeftPlaatsRegels(staat);
+      if (wilLand || wilPlaats) {
+        try {
+          const md = accounts.getMemberState(user.id) || {};
+          if (wilLand) land = md.land || natieNaarLand(md.nationaliteit) || null;
+          if (wilPlaats) plaats = functies.plaatsNorm(md.plaats);
+        } catch (e) {}
       }
     }
 
-    const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, persoon, genre: zaakGenre });
+    const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, plaats, persoon, genre: zaakGenre });
     if (dicht) {
       return res.status(503).json({
         error: ZIN[dicht.reden] || ZIN.globaal,

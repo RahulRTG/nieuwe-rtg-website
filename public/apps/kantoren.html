@@ -506,6 +506,38 @@
       <div class="stil" id="dStatussen" style="font-size:.78rem;margin-top:.5rem;line-height:1.6;"></div>
     </div>
 
+    <h3 class="sec">Gericht schakelen: per stad of dorp, land of persoon</h3>
+    <div class="kaart" id="bFijn">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);">Een functie gericht sluiten voor één plaats (stad of dorp), één land of één persoon, of die beperking weer weghalen. De plaats is de woonplaats van het lid; een persoon mag u op codenaam of e-mail intikken. Wat hier dicht staat ziet u als chips onder de functie op het schakelbord.</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.6rem;">
+        <span style="flex:1.4;min-width:12rem;">
+          <label for="fjFunctie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Functie</label>
+          <select id="fjFunctie"></select>
+        </span>
+        <span style="min-width:8rem;">
+          <label for="fjAs" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">As</label>
+          <select id="fjAs">
+            <option value="plaats">Plaats (stad/dorp)</option>
+            <option value="land">Land (2 letters)</option>
+            <option value="persoon">Persoon</option>
+          </select>
+        </span>
+        <span style="flex:1;min-width:10rem;">
+          <label for="fjSleutel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Plaats, landcode of codenaam</label>
+          <input class="veld" id="fjSleutel" maxlength="60" placeholder="bijv. Zaandam, ES of een codenaam">
+        </span>
+        <button class="knop stil" id="fjUit" type="button" style="border-color:var(--burgundy);">Sluit gericht</button>
+        <button class="knop stil" id="fjAan" type="button">Haal beperking weg</button>
+      </div>
+      <div id="fjRegels" class="stil" style="margin-top:.7rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
+    </div>
+
+    <h3 class="sec">De storingswachter: de automaat van de kast</h3>
+    <div class="kaart" id="bWachter">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);">Gaat een functie echt stuk (een golf serverfouten), dan gooit de wachter hem vanzelf dicht en probeert hij hem na een pauze weer op proef te openen, steeds geduldiger als het blijft misgaan. Uw hand wint altijd: wat u zelf schakelt laat de automaat met rust. Hieronder elke greep die hij deed.</p>
+      <div id="bWachterLog" class="stil" style="margin-top:.7rem;font-size:.78rem;line-height:1.7;"><div class="leeg">Nog geen enkele greep, zo hoort het.</div></div>
+    </div>
+
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
     <div class="kaart" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
       <span style="font-size:.82rem;color:var(--soft);flex:1;min-width:14rem;">De grote hendel: alles bij iedereen beschikbaar zetten, of alles in een keer sluiten. De interne backoffice-functies blijven altijd open, zodat u de hendel kunt terugzetten.</span>
@@ -2671,6 +2703,30 @@ async function openBoard(){
   $('#lrGenre').innerHTML = (d.genres || []).map(g => '<option value="'+esc(g.id)+'">'+esc(g.label||g.id)+'</option>').join('');
   if (lrF) $('#lrFunctie').value = lrF;
   if (lrG) $('#lrGenre').value = lrG;
+  // gericht schakelen (plaats/land/persoon): alle functies, keuze overleeft het hertekenen
+  const alleF = d.functies.flatMap(g => g.functies);
+  const fjF = $('#fjFunctie').value;
+  $('#fjFunctie').innerHTML = alleF.map(f => '<option value="'+esc(f.id)+'">'+esc(f.naam)+'</option>').join('');
+  if (fjF) $('#fjFunctie').value = fjF;
+  const fijnRegels = alleF.flatMap(f => []
+    .concat((f.plaatsUit || []).map(p => ({ f, as: 'plaats', s: p, toon: 'plaats ' + p })))
+    .concat((f.landUit || []).map(l => ({ f, as: 'land', s: l, toon: 'land ' + l })))
+    .concat((f.persoonUit || []).map(p => ({ f, as: 'persoon', s: (p && p.key) || p, toon: 'persoon ' + ((p && p.label) || p) }))));
+  $('#fjRegels').innerHTML = fijnRegels.length
+    ? 'Gericht dicht: ' + fijnRegels.map(r =>
+        '<button type="button" class="knop stil" data-fjweg-f="'+esc(r.f.id)+'" data-fjweg-as="'+esc(r.as)+'" data-fjweg-s="'+esc(r.s)+'"'+
+        ' style="padding:.1rem .55rem;font-size:.74rem;" title="Klik om deze beperking weg te halen">'+esc(r.f.naam)+' · '+esc(r.toon)+' ✕</button>').join(' ')
+    : 'Niets gericht dicht; elke functie volgt zijn gewone stand.';
+  $('#fjRegels').querySelectorAll('[data-fjweg-f]').forEach(k => k.addEventListener('click', async () => {
+    try { await api('boardroom/schakel-fijn', { functie: k.dataset.fjwegF, as: k.dataset.fjwegAs, sleutel: k.dataset.fjwegS, aan: true }); meld('Beperking weggehaald.'); openBoard(); }
+    catch (e) { meld(e.message); }
+  }));
+  // het logboek van de storingswachter, nieuwste bovenaan
+  const WACHTER_WAT = { dicht: 'automatisch DICHT', proefopen: 'op proef weer open', hersteld: 'hersteld; rondes vergeten' };
+  $('#bWachterLog').innerHTML = (d.wachterLog && d.wachterLog.length)
+    ? d.wachterLog.map(w => '<div>'+new Date(w.at).toLocaleString('nl-NL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+
+        ' · <b>'+esc(w.id)+'</b> '+esc(WACHTER_WAT[w.wat] || w.wat)+(w.fouten ? ' ('+w.fouten+' serverfouten'+(w.ronde ? ', ronde '+w.ronde : '')+')' : (w.ronde ? ' (ronde '+w.ronde+')' : ''))+'</div>').join('')
+    : '<div class="leeg">Nog geen enkele greep, zo hoort het.</div>';
   const dichtRegels = (d.genreRegels || []).filter(r => r.soort !== 'uitzondering');
   const uitzonderingen = (d.genreRegels || []).filter(r => r.soort === 'uitzondering');
   $('#lrRegels').innerHTML =
@@ -2699,9 +2755,19 @@ async function openBoard(){
       d.koppels.map(k => '<div class="fx"><div class="nm">' + esc(k.aNaam) + ' ⇄ ' + esc(k.bNaam) +
         '<small>' + esc(k.uitleg) + '</small></div></div>').join('') + '</div>'
     : '';
+  // de fijne beperkingen en de automaat-stand als bijschrift op de rij zelf
+  const fijnBij = f => {
+    const delen = []
+      .concat((f.plaatsUit || []).map(p => 'plaats ' + p))
+      .concat((f.landUit || []).map(l => 'land ' + l))
+      .concat((f.persoonUit || []).map(p => 'persoon ' + ((p && p.label) || p)));
+    const automaat = f.automaat ? ('wachter: ' + (f.automaat.stand === 'dicht' ? 'automatisch dicht' : 'op proef open') + ' (ronde ' + f.automaat.ronde + ')') : '';
+    const s = delen.concat(automaat ? [automaat] : []).join(' · ');
+    return s ? '<br><span style="color:var(--gold);">' + esc(s) + '</span>' : '';
+  };
   $('#bSchakels').innerHTML = koppelKaart + d.functies.map(g =>
     '<div class="kaart cat"><h4>'+esc(g.categorie)+'</h4>'+g.functies.map(f =>
-      '<div class="fx"><div class="nm">'+esc(f.naam)+(f.storing ? ' ⚠' : '')+'<small>'+esc(f.uitleg || '')+'</small></div>'+
+      '<div class="fx"><div class="nm">'+esc(f.naam)+(f.storing ? ' ⚠' : '')+'<small>'+esc(f.uitleg || '')+fijnBij(f)+'</small></div>'+
       '<div class="dgchips">'+(f.doelgroepen || []).map(dg =>
         '<button type="button" class="dg'+(dg.aan ? '' : ' uit')+'" data-fx="'+f.id+'" data-dg="'+dg.id+'" data-aan="'+dg.aan+'" title="'+esc(dg.naam)+' aan of uit">'+esc(dg.naam)+'</button>').join('')+'</div>'+
       '<button type="button" class="wip" role="switch" aria-checked="'+(f.aan ? 'true' : 'false')+'" data-schakel="'+f.id+'" aria-label="'+esc(f.naam)+' aan of uit"></button></div>').join('')+'</div>').join('');
@@ -2953,6 +3019,17 @@ async function lrZet(aan){
 }
 $('#lrUit').addEventListener('click', () => lrZet(false));
 $('#lrAan').addEventListener('click', () => lrZet(true));
+
+/* gericht schakelen: per plaats (stad/dorp), land of persoon */
+async function fjZet(aan){
+  const sleutel = $('#fjSleutel').value.trim();
+  if (!sleutel) { meld('Vul eerst een plaats, landcode of codenaam in.'); return; }
+  try { await api('boardroom/schakel-fijn', { functie: $('#fjFunctie').value, as: $('#fjAs').value, sleutel, aan });
+    meld(aan ? 'Beperking weggehaald.' : 'Gericht gesloten.'); openBoard(); }
+  catch (e) { meld(e.message); }
+}
+$('#fjUit').addEventListener('click', () => fjZet(false));
+$('#fjAan').addEventListener('click', () => fjZet(true));
 
 /* de grote hendel: alles bij iedereen aan of uit (intern blijft altijd open) */
 $('#bAllesAan').addEventListener('click', async () => {

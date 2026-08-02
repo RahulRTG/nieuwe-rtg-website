@@ -694,9 +694,19 @@ app.use(hoofdzekering({ db, accounts, eigenaar }));
 // sessionFor en findSupplier staan verderop in dit bestand; ze worden pas bij
 // een echt verzoek geraadpleegd, dus geven we ze lui door in plaats van hier
 // hun waarde te lezen (die er op dit punt nog niet is).
+/* De storingswachter: de automaat van de schakelkast. Meet elke API-respons
+   via de schakelaars-middleware, gooit een functie dicht bij een golf echte
+   serverfouten en opent hem op proef weer (server/functies/wachter.js). De
+   sseToOffice is hoisted en bestaat pas bij het eerste verzoek; vandaar lui. */
+const functiewachter = require('./functies/wachter').maakWachter({
+  db, save, log,
+  sseToOffice: (ev, data) => sseToOffice(ev, data)
+});
+functiewachter.start();
 app.use(schakelaars({ db, accounts, functies,
   sessionFor: t => sessionFor(t),
-  findSupplier: c => findSupplier(c) }));
+  findSupplier: c => findSupplier(c),
+  wachter: functiewachter }));
 app.use(jsonGzip());
 
 /* DE PLEK VAN HET SCAN-NET, en waarom hij hier staat en niet waar hij gebouwd wordt.

@@ -66,6 +66,8 @@ module.exports = (tctx) => {
       eigenaar: isEigenaar(req.techUser), naam: accounts.realNameOf(req.techUser),
       functies: cat, doelgroepen: functies.DOELGROEPEN, landen: landenLijst(),
       samenvatting: boardroomTelling(cat),
+      // het logboek van de storingswachter: elke automatische greep, nieuwste eerst
+      wachterLog: (db.data.techniek && db.data.techniek.wachterLog || []).slice(0, 40),
       aiBeschikbaar: !!anthropic,
       aiAan: !(t.zekeringen.ai && t.zekeringen.ai.aan === false)
     });

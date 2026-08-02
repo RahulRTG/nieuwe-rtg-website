@@ -9,8 +9,9 @@ module.exports = (b) => {
   const { app, techAuth, eigenaarAlleen, staat, save, herleidPersoon, boardroomTelling,
     geldPasprijsZet, geldKortingZet, geldCommissieZet } = b;
 
-  /* Directe schakelaar (alleen de eigenaar). Vier assen, meest specifiek wint:
+  /* Directe schakelaar (alleen de eigenaar). Vijf assen, meest specifiek wint:
      - { id, persoon, aan }   -> per persoon (e-mail/codenaam/sleutel)
+     - { id, plaats, aan }    -> per woonplaats (stad of dorp, vrije naam)
      - { id, land, aan }      -> per land (2-letter code)
      - { id, doelgroep, aan } -> per pas/doelgroep
      - { id, aan }            -> globaal
@@ -21,11 +22,20 @@ module.exports = (b) => {
     if (!f) return res.status(404).json({ error: 'Onbekende functie.' });
     const aan = req.body.aan !== false && req.body.aan !== 'false';
     const cur = t.functies[f.id] = t.functies[f.id] || {};
+    /* De hand wint van de automaat: elke greep van de eigenaar wist het
+       automaat-merk, zodat de storingswachter deze stand nooit meer als de
+       zijne behandelt (en dus niet stiekem terugschakelt). */
+    delete cur.automaat;
     if (req.body.persoon) {
       const p = await herleidPersoon(req.body.persoon);
       if (!p) return res.status(404).json({ error: 'Geen account gevonden op die codenaam of e-mail.' });
       cur.perPersoon = cur.perPersoon || {};
       if (aan) delete cur.perPersoon[p.key]; else cur.perPersoon[p.key] = false;
+    } else if (req.body.plaats) {
+      const plaats = functies.plaatsNorm(req.body.plaats);
+      if (!plaats) return res.status(400).json({ error: 'Geef een plaatsnaam (stad of dorp).' });
+      cur.perPlaats = cur.perPlaats || {};
+      if (aan) delete cur.perPlaats[plaats]; else cur.perPlaats[plaats] = false;
     } else if (req.body.land) {
       const land = String(req.body.land).toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
       if (land.length !== 2) return res.status(400).json({ error: 'Geef een geldige landcode (2 letters).' });
@@ -44,6 +54,21 @@ module.exports = (b) => {
     save();
     res.json({ ok: true, id: f.id, status: functies.functieStatus(f.id, t.functies),
       ookGeschakeld: ookGeschakeld.length ? ookGeschakeld : undefined });
+  });
+
+  /* De automaat per functie aan of uit: { id, wachter:bool }. Uit betekent:
+     de storingswachter mag deze functie nooit zelf dichtgooien of heropenen;
+     elke schakeling is dan mensenwerk. Voor geld-functies bijvoorbeeld een
+     redelijke keuze. */
+  app.post('/api/boardroom/wachter', techAuth, eigenaarAlleen, (req, res) => {
+    const t = staat();
+    const f = functies.OP_ID[req.body.id];
+    if (!f) return res.status(404).json({ error: 'Onbekende functie.' });
+    const cur = t.functies[f.id] = t.functies[f.id] || {};
+    if (req.body.wachter === false || req.body.wachter === 'false') cur.wachter = false;
+    else { delete cur.wachter; delete cur.automaat; }
+    save();
+    res.json({ ok: true, id: f.id, wachter: cur.wachter !== false });
   });
 
   // Storing melden of herstellen (oranje aan/uit): { id, storing:bool, reden }.

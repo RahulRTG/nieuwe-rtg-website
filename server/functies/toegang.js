@@ -64,6 +64,9 @@ function blokkadeReden(id, staat, ctx) {
   if (s) {
     if (c.doelgroep && s.perDoelgroep && s.perDoelgroep[c.doelgroep] === false) return 'pas';
     if (c.land && s.perLand && s.perLand[c.land] === false) return 'land';
+    // per PLAATS (stad of dorp): fijner dan het land, grover dan de persoon.
+    // De sleutel is de genormaliseerde woonplaats van het lid (plaatsNorm).
+    if (c.plaats && s.perPlaats && s.perPlaats[c.plaats] === false) return 'plaats';
     if (c.persoon && s.perPersoon && s.perPersoon[c.persoon] === false) return 'persoon';
     // de leveranciers-regie: een functie kan per GENRE zaken dicht (bijv. RTG
     // Eye niet voor horeca); het genre komt uit de zaak achter het verzoek
@@ -86,6 +89,23 @@ const HEEFT_GENRE_STANDAARD = FUNCTIES.some(f => Array.isArray(f.alleenGenres));
 function heeftLandRegels(staat) {
   if (!staat) return false;
   for (const id of Object.keys(staat)) { const pl = staat[id] && staat[id].perLand; if (pl && Object.keys(pl).length) return true; }
+  return false;
+}
+/* Een plaatsnaam als schakelsleutel. Een plaats heeft, anders dan een land,
+   geen codetabel: mensen schrijven "Den Haag", "den haag" en "'s-Gravenhage".
+   Wij normaliseren spelling (kleine letters, een spatie, accenten weg) maar
+   verzinnen GEEN gelijkstellingen -- dat zou stil twee plaatsen samenvoegen.
+   Dezelfde functie draait aan de schakelkant en aan de meetkant, dus wat de
+   eigenaar intikt matcht wat het lid invulde, hoe ze ook typten. */
+function plaatsNorm(v) {
+  return String(v || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z' -]/g, '').replace(/\s+/g, ' ').trim().slice(0, 40) || null;
+}
+// Staan er ergens plaats-regels? Zo niet, dan hoeft de middleware de
+// woonplaats van het lid niet op te zoeken.
+function heeftPlaatsRegels(staat) {
+  if (!staat) return false;
+  for (const id of Object.keys(staat)) { const pp = staat[id] && staat[id].perPlaats; if (pp && Object.keys(pp).length) return true; }
   return false;
 }
 // Staan er ergens genre-regels? Zo niet, dan hoeft de middleware de zaak
@@ -155,5 +175,5 @@ function doelgroepVanVerzoek(pad, user) {
 // bord). Elke functie toont de globale stand plus haar doelgroepen met eigen stand.
 
 module.exports = { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
-  heeftLandRegels, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd,
+  heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd,
   doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels };

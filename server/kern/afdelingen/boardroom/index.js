@@ -97,6 +97,8 @@ module.exports = (ctx) => {
       genreStandaard: genreStandaard(),
       genres: Object.entries(d().supplierTypes || {}).map(([id, t]) => ({ id, label: t.label, icon: t.icon })),
       functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),
+      // het logboek van de storingswachter: elke automatische greep, nieuwste eerst
+      wachterLog: ((d().techniek || {}).wachterLog || []).slice(0, 25),
       verbeterkamer: voorstellen(false),
       paniek: paniekRij().filter(v => v.status === 'open').slice(0, 20),
       audit: auditRij().slice(0, 12)
@@ -141,7 +143,8 @@ module.exports = (ctx) => {
   }
 
   return { taken, taakMaak, taakZet, kamer, kamers,
-    functiesStand: sch.functiesStand, schakel: sch.schakel, schakelAlles: sch.schakelAlles,
+    functiesStand: sch.functiesStand, schakel: sch.schakel, schakelFijn: sch.schakelFijn,
+    schakelAlles: sch.schakelAlles,
     schakelGenre: sch.schakelGenre, schakelFase: sch.schakelFase,
     bouwVoorstellen, voorstellen, boardroom, platformStats };
 };

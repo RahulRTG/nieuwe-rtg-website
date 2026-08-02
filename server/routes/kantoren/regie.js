@@ -68,6 +68,25 @@ module.exports = (ctx) => {
     if (r.ok) sseToOffice('sync', { scope: 'boardroom' });
     return r;
   }));
+  /* De fijne assen: een functie gericht dicht (of weer open) voor EEN plaats,
+     land of persoon. De persoon mag als codenaam binnenkomen; die herleiden we
+     hier naar de user-sleutel -- de boardroom denkt in codenamen, de kast in
+     sleutels. aan=true haalt de beperking weg. */
+  app.post('/api/office/boardroom/schakel-fijn', boardroomAuth, async (req, res) => {
+    try {
+      let sleutel = String(req.body.sleutel || '');
+      const as = String(req.body.as || '');
+      if (as === 'persoon' && !/^user-\d+$/.test(sleutel)) {
+        const t = await keyVanCodenaam(sleutel);
+        if (!t) return res.status(404).json({ error: 'Deze codenaam kennen we niet.' });
+        sleutel = t.key || t;
+      }
+      const r = afdelingen.schakelFijn(String(req.body.functie || ''), as, sleutel,
+        req.body.aan === true, req.body.naam ? String(req.body.naam) : 'boardroom');
+      if (r.ok) sseToOffice('sync', { scope: 'boardroom' });
+      stuur(res, r);
+    } catch (e) { console.error('[boardroom]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
   app.post('/api/office/boardroom/verbeter', boardroomAuth, (req, res) => veilig(res, () => ({ ok: true, verbeterkamer: afdelingen.voorstellen(true) })));
   // Rahul kijkt over het hele huis: adviserend, uit de verbeterkamer-signalen en de drukte per kamer
   app.post('/api/office/boardroom/ai', boardroomAuth, async (req, res) => {

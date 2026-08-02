@@ -108,6 +108,10 @@ app.post('/api/auth/register', async (req, res) => {
     // land (2-letter code) van het lid: stuurt o.a. de Boardroom "per land"-regels
     const ln = String(req.body.land || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
     if (ln.length === 2) mdNieuw.land = ln;
+    // woonplaats (stad of dorp, vrije naam): stuurt de "per plaats"-regels van
+    // de schakelkast; genormaliseerd zodat "Den  HAAG" en "den haag" een zijn
+    const pl = require('../../functies').plaatsNorm(req.body.plaats);
+    if (pl) mdNieuw.plaats = pl;
     accounts.saveMemberState(user.id, mdNieuw);
     // welkom-draaiboek: een automatisch bericht in het eigen RTMAIL-postvak
     try { if (automatisering) automatisering.welkomLid({ codename: user.codename, wereld: 'RTG' }); } catch (e) {}

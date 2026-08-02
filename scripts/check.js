@@ -742,7 +742,8 @@ console.log('\n20) tekst wordt niet in een kader geperst');
    aiSystemPrompt): "je belooft niets wat je niet zeker kunt waarmaken (geen
    toegang, geen goedkeuring...)".
 
-   Er zijn 78 plekken die het model aanroepen; de meeste dragen die basis. De
+   Er zijn 74 plekken die het model aanroepen (naast de transportlaag); de
+   meeste dragen die basis. De
    rest doet dat bewust niet -- JSON-uitvoer zonder vrije tekst, begrensde
    eenmalige opdrachten, of werk-/leverancier-/techniekgereedschap zonder
    pasgesprek -- en staat hieronder met naam en reden. Deze poort dwingt niets
@@ -779,8 +780,6 @@ console.log('\n21) elke AI-ingang draagt de toegangsregel, of staat erkend op de
     ['kern/reisbureau.js', 'JSON-uitvoer + eigen boekingsregel (nooit "al geboekt")'],
     ['kern/rtgonderzoeker.js', 'begrensd: analyse van aangeleverde bevindingen, "de mens beslist"'],
     ['kern/werkplaats-ai.js', 'JSON-uitvoer, geen vrije tekst naar een lid'],
-    ['routes/huis.js', 'lid-gericht maar begrensd: vat een MEEGEGEVEN reisdossier samen'],
-    ['routes/member/zakelijk.js', 'lid-gericht maar begrensd: boekhouder voor wie de Business Pass al heeft'],
     ['routes/muziek.js', 'JSON-uitvoer: muzikaal patroon, geen vrije tekst naar een lid'],
     ['routes/supplier/events/catering.js', 'JSON-uitvoer, leverancier-gereedschap'],
     ['routes/supplier/events/keuken/coach.js', 'JSON-uitvoer, leverancier-gereedschap'],

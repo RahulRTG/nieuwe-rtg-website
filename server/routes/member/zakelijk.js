@@ -41,7 +41,9 @@ module.exports = (kern) => {
             'Aftrekregels daar: horeca: ' + zak.horeca + ' logies: ' + zak.logies + ' vervoer: ' + zak.vervoer + ' jet: ' + zak.jet + ' ' +
             'Voor zelfstandigen geldt daar het regime ' + zzpR.regime + ': ' + zzpR.regels.join(' ') + ' Er is een zzp-rekentool in de app voor een indicatie van belasting en nettowinst. ' +
             'Uitgaven via RTG: horeca € ' + horeca + ', vervoer € ' + vervoer + '. Facturen staan boekhoudklaar in het portaal met afboekcode en btw-specificatie. ' +
-            'Antwoord in het Nederlands, maximaal 120 woorden, praktisch. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
+            'Antwoord in het Nederlands, maximaal 120 woorden, praktisch, in de u-vorm. ' +
+            'Beloof nooit iets namens RTG: geen toegang tot een pas of dienst, geen goedkeuring, en bevestig ' +
+            'nooit dat iets al geboekt of verwerkt is. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
           messages: [{ role: 'user', content: vraag }]
         });
         answer = msg.content[0].text;

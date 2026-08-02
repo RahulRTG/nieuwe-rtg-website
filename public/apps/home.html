@@ -175,10 +175,16 @@ function tekenScenes(){
     try { await api('/api/home/scene/weg', { id: b.dataset.id }); laad(); } catch(e){ meld(e.message); }
   }));
 }
-$('#allesUit').addEventListener('click', async () => {
+/* Bij een uitgelogde bezoeker is #main hierboven vervangen door de
+   inlog-uitnodiging, en bestaan deze knoppen dus niet. Rechtstreeks binden gooit
+   dan een TypeError die de rest van dit script afbreekt -- en alles wat hier
+   later bij komt is stilletjes dood, alleen als je uitgelogd bent. Daarom: bind
+   wat er staat. */
+const bindKlik = (kies, fn) => { const el = $(kies); if (el) el.addEventListener('click', fn); };
+bindKlik('#allesUit', async () => {
   try { const r = await api('/api/home/alles-uit'); meld(r.uitgezet + ' apparaten uitgezet; sloten en de laadpaal bleven met rust.'); laad(); } catch(e){ meld(e.message); }
 });
-$('#maak').addEventListener('click', async () => {
+bindKlik('#maak', async () => {
   $('#maak').disabled = true;
   try {
     const r = await api('/api/home/scene/ai', { wens: $('#wens').value });

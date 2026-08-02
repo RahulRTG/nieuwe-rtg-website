@@ -14,6 +14,7 @@
 const CATEGORIEEN = [
   'Leden (RTG-app)',
   'Diensten (leden)',
+  'Toegang en identiteit',
   'Genres & diensten',
   'Cultuur en gezelschap',
   'Sociaal (De Salon)',

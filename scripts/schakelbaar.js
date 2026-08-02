@@ -22,7 +22,10 @@
    DE BESTUURSLAAG HOORT ER BEWUST NIET IN. /api/techniek en /api/boardroom
    zijn de knoppen zelf; die achter een schakelaar zetten is een deur met het
    slot aan de binnenkant. /api/health en /api/ready moeten altijd antwoorden,
-   anders ziet een monitor een gezonde server als dood.
+   anders ziet een monitor een gezonde server als dood. En /api/privacy staat
+   er om een heel andere reden buiten: inzage, export en verwijdering zijn
+   WETTELIJKE RECHTEN, en een knop waarmee RTG die kan uitzetten hoort niet te
+   bestaan.
 
    Draai: node --experimental-sqlite scripts/schakelbaar.js [--json]
    ========================================================================== */
@@ -40,7 +43,17 @@ const BUITEN = new Map([
   ['/api/techniek', 'het techniekbord zelf: de knoppen mogen niet achter een knop'],
   ['/api/boardroom', 'de schakelkast zelf: anders sluit de eigenaar zichzelf buiten'],
   ['/api/health', 'de gezondheidscheck moet altijd antwoorden, anders leest een monitor gezond als dood'],
-  ['/api/ready', 'idem: de startsignalering van de load balancer']
+  ['/api/ready', 'idem: de startsignalering van de load balancer'],
+  /* DE AVG-RECHTEN ZIJN GEEN FUNCTIE. Inzage, export en verwijdering zijn
+     wettelijke rechten van de betrokkene; een knop waarmee RTG die kan
+     uitzetten hoort niet te bestaan, ook niet met de beste bedoelingen. Dit is
+     de enige regel in deze lijst die er staat omdat schakelbaarheid ZELF
+     verkeerd zou zijn, en niet omdat de deur technisch open moet blijven. */
+  ['/api/privacy', 'inzage, export en verwijdering zijn AVG-rechten; die mag niemand kunnen uitzetten'],
+  ['/api/metrics', 'de meetlijn voor monitoring: dicht betekent blind, en blind lijkt van buiten op gezond'],
+  ['/api/cluster', 'de clusterlaag stuurt de instances aan; die hoort niet aan een schakelaar van een instance'],
+  ['/api/sat', 'de satellietping waarmee een zaakdoos de wolk zoekt; zonder antwoord denkt de doos dat hij offline is'],
+  ['/api/test', 'de opzettelijke bug- en crashhaak: bestaat alleen in demostand en is geen dienst om te schakelen']
 ]);
 
 const zonderCommentaar = (b) => String(b)

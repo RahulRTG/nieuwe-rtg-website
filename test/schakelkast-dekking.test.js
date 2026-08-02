@@ -26,14 +26,16 @@ const { startServer, stop } = require('./helper');
 const { meet, BUITEN } = require('../scripts/schakelbaar');
 const functies = require('../server/functies');
 
-test('de meting vindt echt routes, en het gat is kleiner dan de helft', () => {
+test('elke route staat in de kast: nul buiten, en de scanner vindt ze echt', () => {
   const r = meet();
   /* Een meting die niets vindt is geen schone lei maar een kapotte scanner
-     (LAT.md regel 3). Zonder deze regel zou een veranderde routevorm netjes
-     "nul ongedekt" melden en zou de ratel voorgoed tevreden zijn. */
+     (LAT.md regel 3). Deze twee regels staan er dus VOOR de nul: zonder hen
+     zou een veranderde routevorm netjes "nul ongedekt" melden en zou de ratel
+     voorgoed tevreden zijn -- juist nu de nul gehaald is, is dat het gevaar. */
   assert.ok(r.totaal > 1500, 'de scanner vindt de routes (' + r.totaal + ')');
-  assert.ok(r.gedekt.length > 1500, 'het merendeel staat in de kast (' + r.gedekt.length + ')');
-  assert.ok(r.ongedekt.length < r.gedekt.length, 'er staat meer in de kast dan erbuiten');
+  assert.ok(r.gedekt.length > 1500, 'en ze staan in de kast (' + r.gedekt.length + ')');
+  assert.deepEqual(r.ongedekt, [],
+    'deze routes zijn vanuit de boardroom niet te schakelen:\n  ' + r.ongedekt.slice(0, 20).join('\n  '));
 });
 
 test('de bestuurslaag staat er met reden buiten, en die reden is opgeschreven', () => {

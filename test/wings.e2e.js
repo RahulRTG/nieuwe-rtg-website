@@ -66,7 +66,7 @@ async function meet(pwBrowser, base, token, breed, hoog) {
   await page.addInitScript(t => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, token);
   await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
   await page.evaluate(() => { const a = document.getElementById('app'); if (a) a.classList.add('active'); });
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(2500);   // de widgets halen hun bron op
   const uit = await page.evaluate(() => {
     const L = document.getElementById('wingL'), R = document.getElementById('wingR');
     const namen = el => [...el.querySelectorAll('.wing-naam')].map(n => n.textContent.trim());
@@ -74,6 +74,12 @@ async function meet(pwBrowser, base, token, breed, hoog) {
       display: L ? getComputedStyle(L).display : null,
       links: L ? namen(L) : [], rechts: R ? namen(R) : [],
       instel: !!document.querySelector('.wing-instel'),
+      widgets: document.querySelectorAll('.wing-widget').length,
+      pijlen: document.querySelectorAll('.wing-vol').length,
+      metWaarde: [...document.querySelectorAll('.wing-widget.heeft-waarde')]
+        .map(x => x.querySelector('.wing-naam').textContent.trim() + ' = ' + x.querySelector('.wing-lijf').textContent.trim()),
+      leegLijfZichtbaar: [...document.querySelectorAll('.wing-widget:not(.heeft-waarde)')]
+        .some(x => { const l = x.querySelector('.wing-lijf'); return l && getComputedStyle(l).display !== 'none'; }),
       shell: Math.round(document.getElementById('shell').getBoundingClientRect().width)
     };
   });
@@ -110,6 +116,14 @@ test('wings: weg op de iPad, gevuld op de computer, en aanpasbaar', { skip: pw ?
       for (const n of [...uit.links, ...uit.rechts]) {
         assert.ok(!/^(tab|link|os):/.test(n), 'een ruwe sleutel als label: ' + n);
       }
+      /* WIDGETS, GEEN TEGELS. Elke kaart heeft een uitklappijl (full screen =
+         de app), en een kaart ZONDER bron toont geen leeg lijf -- want een lege
+         regel leest als "u heeft niets" en dat is een bewering. */
+      assert.equal(uit.widgets, uit.links.length + uit.rechts.length, 'elke flank-app hoort een widget te zijn');
+      assert.equal(uit.pijlen, uit.widgets, 'elke widget heeft een uitklappijl naar de app');
+      assert.equal(uit.leegLijfZichtbaar, false, 'een widget zonder bron toont geen leeg lijf');
+      assert.ok(uit.metWaarde.some(w => w.startsWith('Balans')), 'de Balans-widget hoort een echt advies te tonen, kreeg: ' + JSON.stringify(uit.metWaarde));
+      assert.ok(uit.metWaarde.some(w => /€/.test(w)), 'een geld-widget hoort een echt bedrag te tonen, kreeg: ' + JSON.stringify(uit.metWaarde));
       assert.deepEqual(uit.fouten, [], 'geen JS-fouten');
 
       // 3) aanpassen: de eerste app links uitzetten en dat moet blijven staan

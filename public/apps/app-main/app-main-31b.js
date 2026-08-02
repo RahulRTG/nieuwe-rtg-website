@@ -54,30 +54,79 @@
   }
   function wingBewaar(st) { try { localStorage.setItem(WING_KEY(), JSON.stringify(st)); } catch (e) {} }
 
-  /* Een tegel in de flank: hetzelfde vak als op het springboard (tegelInhoud +
-     openItem), zodat een app er hier niet anders uitziet en niet anders opent. */
-  function wingTegel(item) {
-    /* De naam. Een tab-app staat NIET in de registry -- itemDef geeft daar
-       undefined en dan stond de ruwe sleutel ("tab:bestellen") als label in de
-       flank. De tabbar is voor die apps de bron, net als op het springboard. */
+  /* ---------- VAN TEGEL NAAR WIDGET ----------
+
+     Een tegel toont een naam; een widget toont IETS. Het verschil doet ertoe op
+     een bureaublad: daar heb je de ruimte om te kijken zonder te klikken.
+
+     DRIE REGELS, EN DE EERSTE IS DE BELANGRIJKSTE.
+
+     1. EEN WIDGET VERZINT NIETS. Hij toont wat een echt endpoint teruggeeft, of
+        hij toont niets. Geen voorbeeldsaldo, geen "3 documenten" die nergens
+        vandaan komt. Een app zonder bron blijft gewoon een nette kaart met zijn
+        naam -- dat is eerlijk en het is nog steeds een deur.
+     2. FULL SCREEN IS DE APP. Elke widget heeft dezelfde beweging: uitklappen
+        opent het echte ding via openItem(), met alle bestaande regels (de
+        algemene pin voor prive-apps, de vensterlaag op een breed scherm). De
+        widget is dus geen kopie van de app maar zijn voorkant.
+     3. EEN BRON DIE STUK IS, ZEGT DAT. Geen lege kaart die eruitziet als "u
+        heeft niets", want dat is een bewering. Bij een fout blijft de kaart
+        staan zonder cijfer, en dat leest als "nog niet bekend".
+
+     De bronnen zijn de endpoints die het lid toch al aanroept; een widget voegt
+     geen nieuw verkeer toe dat er niet al was. */
+  const WIDGETBRON = {
+    'link:balans': { pad: '/balans', lees: d => (d && d.adviezen && d.adviezen[0] && d.adviezen[0].tekst) || null },
+    'tab:betalen': { pad: '/pay/overzicht', lees: d => (d && typeof d.saldo === 'number') ? eur(d.saldo / 100) : null },
+    'link:wallet': { pad: '/pay/overzicht', lees: d => (d && typeof d.saldo === 'number') ? eur(d.saldo / 100) : null }
+  };
+  const widgetCache = new Map();   // pad -> belofte, zodat twee widgets op dezelfde bron er samen een ophalen
+
+  function widgetHaal(pad) {
+    if (!widgetCache.has(pad)) widgetCache.set(pad, API.call(pad, {}).catch(() => null));
+    return widgetCache.get(pad);
+  }
+
+  /* De widget. Kop met glyf en naam, een lijf dat gevuld wordt als er een bron
+     is, en een uitklap-knop die de app opent. De hele kaart is aanklikbaar --
+     een widget die je alleen via een klein knopje kunt openen, is een raadsel. */
+  function wingWidget(item) {
     const naamVan = it => it.startsWith('tab:') ? tabNaam(it.slice(4)) : ((itemDef(it) || {}).naam || it);
     const el = document.createElement('button');
-    el.type = 'button'; el.className = 'wing-tegel'; el.dataset.sleutel = item;
-    const vak = document.createElement('span');
-    vak.className = 'os-tegel';
+    el.type = 'button'; el.className = 'wing-widget'; el.dataset.sleutel = item;
+    el.setAttribute('aria-label', T('wings.open', 'Open') + ' ' + naamVan(item));
+
+    const kop = document.createElement('span'); kop.className = 'wing-kop';
+    const vak = document.createElement('span'); vak.className = 'os-tegel';
     const inhoud = tegelInhoud(item);
     if (inhoud) vak.appendChild(inhoud);
-    const naam = document.createElement('span');
-    naam.className = 'wing-naam';
+    const naam = document.createElement('span'); naam.className = 'wing-naam';
     naam.textContent = naamVan(item);
-    el.appendChild(vak); el.appendChild(naam);
+    const vol = document.createElement('span'); vol.className = 'wing-vol';
+    vol.textContent = '↗';                       // de uitklap-pijl: full screen = de app
+    vol.setAttribute('aria-hidden', 'true');
+    kop.appendChild(vak); kop.appendChild(naam); kop.appendChild(vol);
+    el.appendChild(kop);
+
+    const bron = WIDGETBRON[item];
+    if (bron) {
+      const lijf = document.createElement('span'); lijf.className = 'wing-lijf';
+      lijf.textContent = ' ';                    // ruimte reserveren, geen tekst beweren
+      el.appendChild(lijf);
+      widgetHaal(bron.pad).then(d => {
+        const w = d ? bron.lees(d) : null;
+        // niets gevonden of bron stuk: het lijf blijft leeg. Zie regel 3.
+        if (w != null) { lijf.textContent = String(w); el.classList.add('heeft-waarde'); }
+      });
+    }
     el.addEventListener('click', () => openItem(item));
     return el;
   }
+
   function wingVul(kolom, items) {
     kolom.textContent = '';
     for (const item of items) {
       if (!itemZichtbaar(item)) continue;   // uit in de boardroom, of niet voor deze pas
-      kolom.appendChild(wingTegel(item));
+      kolom.appendChild(wingWidget(item));
     }
   }

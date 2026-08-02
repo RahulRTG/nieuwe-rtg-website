@@ -3310,6 +3310,11 @@
     if (inp && knop && q) { inp.value = q; setTimeout(() => knop.click(), 150); }
     else if (inp) inp.focus();
   }
+  /* Ook buiten deze laag bruikbaar. Twee plekken in de buitenste IIFE deden
+     `if (typeof ask === 'function') ask(vraag)` -- en `ask` bestaat nergens, dus
+     die knoppen openden Rahul wel en vulden de vraag NOOIT in. De guard ving het
+     stil af. Eén functie, hier, en daar aangeroepen: geen tweede kopie. */
+  window.RTGVraag = vraagRahul;
   function zoekSectie(tekst) {
     const d = document.createElement('div'); d.className = 'os-zoek-sectie'; d.textContent = tekst;
     zoekLijst.appendChild(d);
@@ -4147,34 +4152,24 @@
     },
     'link:wallet': { pad: '/pay/overzicht', lees: d => (d && typeof d.saldo === 'number') ? eurCenten(d.saldo) : null }
   };
-  /* RAHUL OPENEN MET EEN VRAAG.
-
-     Hier stond eerst `if (typeof ask === 'function') ask(vraag)`, overgenomen
-     van twee bestaande plekken in deze app. Toen bleek: `ask` BESTAAT NIET. Die
-     twee guards bewaken een functie die er nooit is geweest, dus die knoppen
-     openen Rahul wel en vullen de vraag nooit in -- stil, want de guard vangt
-     het af. Dat staat als losse bevinding genoteerd.
-
-     Wat er wel is: de AI-tegel, het invoerveld #askInput en de knop #askBtn.
-     Dat is de weg die de gebruiker zelf ook loopt. */
-  function vraagRahul(vraag) {
-    const tegel = document.querySelector('.os-app[data-tab="ai"]');
-    if (tegel) tegel.click();
-    const inp = document.querySelector('#askInput'), knop = document.querySelector('#askBtn');
-    if (!inp || !knop) return false;
-    inp.value = vraag;
-    inp.dispatchEvent(new Event('input', { bubbles: true }));
-    knop.click();
-    return true;
-  }
+  /* Rahul openen met een vraag doet vraagRahul() uit app-main-27.js -- die
+     bestond al en doet het beter dan wat ik ernaast had gezet: hij sluit eerst
+     de scrims, gebruikt tabKnop('ai') in plaats van een selector op de tegel,
+     wacht 150 ms voordat hij verstuurt en valt terug op focus als er geen vraag
+     is. Mijn kopie stond in dezelfde scope en overschreef hem dus overal --
+     regel 4, twee plekken met een waarheid, en de tweede was de slechtste. */
 
   /* GELD IN EEN WIDGET HEEFT TWEE DECIMALEN.
 
-     Hier stond eur(saldo/100), en dat gaf "EUR 25.5" voor 2550 centen: nfmt()
-     gebruikt toLocaleString zonder minimumFractionDigits, dus de laatste nul
-     valt weg. Een bedrag met een halve decimaal leest als een fout in de
-     boekhouding, ook als het klopt. De gedeelde eur() laat ik met rust -- die
-     wordt overal gebruikt en dit is een presentatiekeuze van de flank. */
+     eur() gebruikt toLocaleString zonder minimumFractionDigits, dus 2550 centen
+     werd "EUR 25.5". Een bedrag met een halve decimaal leest als een fout in de
+     boekhouding, ook als het klopt. De gedeelde eur() laat ik met rust: die
+     wordt overal gebruikt en dit is een presentatiekeuze van de flank.
+
+     (Deze regel is een keer meegesneuveld bij het opruimen van een dubbele
+     helper hierboven. Dat brak niets zichtbaars -- de widget toonde alleen
+     niets meer -- en test/wings.e2e.js ving het, omdat die op een ECHT bedrag
+     met euroteken staat te wachten.) */
   const eurCenten = c => '\u20AC ' + (Number(c) / 100).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL',
     { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -4552,7 +4547,8 @@
     }));
     el.querySelectorAll('.js-vsdoe').forEach(b => b.addEventListener('click', () => {
       const tegel = document.querySelector('.os-app[data-tab="ai"]'); if (tegel) tegel.click();
-      if (typeof ask === 'function') ask(v.vraag);
+      // `ask` bestond nooit; RTGVraag is de echte helper (app-main-27.js)
+      if (window.RTGVraag) RTGVraag(v.vraag);
     }));
     bindSparBlok(el);
     el.querySelectorAll('.js-pkboek').forEach(b => b.addEventListener('click', async () => {
@@ -5403,7 +5399,8 @@
     // nu erover praten, of het onderwerp als besproken/weg zetten
     el.querySelectorAll('.js-sparchat').forEach(b => b.addEventListener('click', () => {
       const tegel = document.querySelector('.os-app[data-tab="ai"]'); if (tegel) tegel.click();
-      if (typeof ask === 'function') ask(T('spar.over','Spar met me over') + ': ' + b.dataset.t);
+      // idem: `ask` bestond nooit, dus dit vulde de vraag nooit in
+      if (window.RTGVraag) RTGVraag(T('spar.over','Spar met me over') + ': ' + b.dataset.t);
     }));
     el.querySelectorAll('.js-spardone').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/spar/status', { id: b.dataset.id, status: 'besproken' }); renderFluister(); } catch(e){ toast(e.message); }

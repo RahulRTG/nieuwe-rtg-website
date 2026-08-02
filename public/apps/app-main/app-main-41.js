@@ -29,7 +29,8 @@
     // nu erover praten, of het onderwerp als besproken/weg zetten
     el.querySelectorAll('.js-sparchat').forEach(b => b.addEventListener('click', () => {
       const tegel = document.querySelector('.os-app[data-tab="ai"]'); if (tegel) tegel.click();
-      if (typeof ask === 'function') ask(T('spar.over','Spar met me over') + ': ' + b.dataset.t);
+      // idem: `ask` bestond nooit, dus dit vulde de vraag nooit in
+      if (window.RTGVraag) RTGVraag(T('spar.over','Spar met me over') + ': ' + b.dataset.t);
     }));
     el.querySelectorAll('.js-spardone').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/spar/status', { id: b.dataset.id, status: 'besproken' }); renderFluister(); } catch(e){ toast(e.message); }

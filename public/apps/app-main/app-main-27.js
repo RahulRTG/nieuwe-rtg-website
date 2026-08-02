@@ -50,6 +50,11 @@
     if (inp && knop && q) { inp.value = q; setTimeout(() => knop.click(), 150); }
     else if (inp) inp.focus();
   }
+  /* Ook buiten deze laag bruikbaar. Twee plekken in de buitenste IIFE deden
+     `if (typeof ask === 'function') ask(vraag)` -- en `ask` bestaat nergens, dus
+     die knoppen openden Rahul wel en vulden de vraag NOOIT in. De guard ving het
+     stil af. Eén functie, hier, en daar aangeroepen: geen tweede kopie. */
+  window.RTGVraag = vraagRahul;
   function zoekSectie(tekst) {
     const d = document.createElement('div'); d.className = 'os-zoek-sectie'; d.textContent = tekst;
     zoekLijst.appendChild(d);

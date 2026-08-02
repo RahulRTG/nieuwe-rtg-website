@@ -94,7 +94,8 @@
     }));
     el.querySelectorAll('.js-vsdoe').forEach(b => b.addEventListener('click', () => {
       const tegel = document.querySelector('.os-app[data-tab="ai"]'); if (tegel) tegel.click();
-      if (typeof ask === 'function') ask(v.vraag);
+      // `ask` bestond nooit; RTGVraag is de echte helper (app-main-27.js)
+      if (window.RTGVraag) RTGVraag(v.vraag);
     }));
     bindSparBlok(el);
     el.querySelectorAll('.js-pkboek').forEach(b => b.addEventListener('click', async () => {

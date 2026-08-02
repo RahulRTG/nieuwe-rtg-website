@@ -59,7 +59,13 @@ const LAGEN = [
   { id: 'poorten', naam: 'DE POORTEN', hard: true, stappen: [
     ['huisregels', [NODE, ['scripts/check.js']]],
     ['AST-scan', [NODE, ['scripts/ast-scan.js']]],
-    ['geheimen', [NODE, ['scripts/geheimen.js']]]
+    ['geheimen', [NODE, ['scripts/geheimen.js']]],
+    /* DE SAMENHANG hoort bij de poorten en niet bij de keuring, want hij is
+       goedkoop en hij stelt een andere vraag dan alle stappen hieronder: niet
+       "zakt er iets" maar "kijkt er iemand". Een soort ding zonder handhaver is
+       precies het gat dat de rest van deze suite per definitie niet ziet -- zij
+       draait immers alleen de handhavers die er WEL zijn. */
+    ['samenhang', [NODE, ['--experimental-sqlite', 'scripts/samenhang.js']]]
   ] },
   { id: 'tests', naam: 'DE TESTSUITE', hard: true, stappen: [
     // de bestanden zelf opsommen: node --test wil paden naar bestanden, en

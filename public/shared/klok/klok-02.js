@@ -108,10 +108,31 @@
       const t = document.createElementNS(NS, 'text');
       // exact verticaal centreren met dominant-baseline (niet met de hand raden)
       const at = { x: cx, y: cy, class: tekstKlasse, 'text-anchor': 'middle', 'dominant-baseline': 'central' };
-      if (tl) { at.textLength = tl; at.lengthAdjust = 'spacingAndGlyphs'; }
       for (const [k, v] of Object.entries(at)) t.setAttribute(k, v);
+      // tl is een BOVENGRENS, geen streefbreedte: zie pasInKastje
+      if (tl) t.dataset.max = tl;
       g.appendChild(t);
       return t;
+    }
+    /* Tekst die past, laten we met rust. Hiervoor stond er een vaste textLength
+       op de weekdag, met lengthAdjust="spacingAndGlyphs": elke dag werd naar
+       exact dezelfde breedte getrokken. "Zondag" ging daardoor 71% uit elkaar
+       staan en "Friday" 96% -- en spacingAndGlyphs vervormt de letters zelf,
+       wat je bij een display-serif als Bodoni nooit wilt. Bovendien kreeg elke
+       dag een andere rekfactor, dus de spatiëring sprong dagelijks rond.
+       Nu meten we: past het, dan blijft de tekst zoals de letterontwerper hem
+       bedoelde. Alleen wat écht te breed is voor het kastje wordt ingehouden,
+       en dan met lengthAdjust="spacing" -- letters dichter op elkaar, de vormen
+       zelf onaangetast. */
+    function pasInKastje(t) {
+      const max = +(t.dataset.max || 0);
+      if (!max) return;
+      t.removeAttribute('textLength');
+      t.removeAttribute('lengthAdjust');
+      let breed = 0;
+      try { breed = t.getComputedTextLength(); } catch (e) { return; }
+      if (!breed) return;           // nog niet getekend: niets te meten
+      if (breed > max) { t.setAttribute('textLength', max); t.setAttribute('lengthAdjust', 'spacing'); }
     }
     // twee kastjes met dezelfde hoogte en verhouding: de weekdag onder twaalf
     // uur (breed, tekst past zich aan de taal aan), de datum op drie uur

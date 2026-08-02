@@ -24,6 +24,11 @@
 
     el.textContent = '';
     el.append(svg);
+    /* De eerste meting kan vallen voordat Bodoni binnen is, en dan meet je de
+       terugval-serif. Zodra het echte lettertype er is, nog een keer passen. */
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => pasInKastje(dag)).catch(() => {});
+    }
 
     let vorigeDag = '', vorigeDatum = '', vorigeKalenderdag = '';
     return d => {
@@ -51,6 +56,9 @@
       if (cap !== vorigeDag) {
         if (vorigeDag && kalenderdag !== vorigeKalenderdag) slaOm(dag, cap, 10);
         else dag.textContent = cap;
+        // alleen hier meten, niet elk beeldje: getComputedTextLength dwingt een
+        // layout af, en de weekdag verandert hooguit een keer per dag
+        pasInKastje(dag);
         vorigeDag = cap;
       }
       vorigeKalenderdag = kalenderdag;

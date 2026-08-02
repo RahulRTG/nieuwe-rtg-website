@@ -1,12 +1,12 @@
 {
   "vastgelegd": "2026-08-02",
   "meters": {
-    "endpointsZonderTest": 634,
+    "endpointsZonderTest": 632,
     "dekkingPct": 75,
     "keuringStuk": 0,
     "keuringScheef": 0,
     "dependencies": 0,
-    "testbestanden": 472,
+    "testbestanden": 478,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 68,
     "e2eBestanden": 42,
@@ -28,5 +28,15 @@
       "reden": "keuringBeter was een geblende teller van drie onvergelijkbare dingen en kon daardoor niet ratelen: een daling in de ene groep maskeerde een stijging in de andere, en het getal liep sowieso op zodra er een legitiem bestand bij kwam. Precies zo dook de dubbeling van teVaak() (drie kopieen van dezelfde rate limiter, waarvan er geen enkele werd opgeruimd) onder in het totaal. Vervangen door drie losse meters, elk met een eigen richting; verrekenen tussen groepen kan niet meer.",
       "eerlijkheidshalve": "De som stond op 126 toen de norm werd vastgelegd en op 130 toen hij werd gesplitst. Over die vier is geen ratel meer die klaagt. Ze zijn ontstaan door bestanden toe te voegen, niet door iets te laten verslechteren, en de enige inhoudelijke van de vijf (teVaak) is opgelost door de vier rate limiters op server/pinslot.js samen te voegen. Wie de oude, strengere som terug wil: zet keuringBeter terug in scripts/norm.js met grondwaarde 126 en knip vier bestanden op die vlak onder de 10 kB-grens zitten."
     }
-  ]
+  ],
+  "prestatie": {
+    "p99Ms": 144,
+    "doorvoerPerSec": 399,
+    "eventLoopP99Ms": 74.5,
+    "herstelSeconden": 1,
+    "verhalenSlaagPctStorm": 76.3,
+    "geheugenHellingMBPerMin": 0
+  },
+  "prestatieBron": "4k/17g/linux/sqlite",
+  "prestatieGemeten": "2026-08-02T05:23:43.375Z"
 }

@@ -8,9 +8,6 @@
    met andere RTG-leden, tenzij een hoger lid het contact eerst legde. */
 
 const salonviraal = require('./salonviraal');
-// Wat een pas per maand kost: een antwoord, gedeeld met het betaalschema en
-// het ledenregister. Zie de kop van ./pasprijs.js.
-const { maandCentenUit } = require('./pasprijs');
 
 function maakLid(deps) {
   const { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan } = deps;
@@ -20,6 +17,7 @@ function maakLid(deps) {
   const zijnVriendenVan = (a, b) => { try { return typeof deps.zijnVrienden === 'function' ? !!deps.zijnVrienden(a, b) : false; } catch (e) { return false; } };
   const { hasContact, addContact, canEngage, engageError, registerContact } =
     require('./lid/contact')({ db, PERSONAS });
+  const { facturenVoor, reisVoor } = require('./lid/facturen')({ i18n, deps });
 
   /* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
      -facturen, zodat elk lid zijn eigen boekingen/betalingen heeft. */
@@ -92,54 +90,11 @@ function maakLid(deps) {
       // Echte accounts hebben hun eigen boekingen/betalingen; demo-sessies delen
       // de vaste demo-inhoud.
       const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate()) : db.data;
-      /* Elke factuur krijgt een afboekcode (grootboeksuggestie) en de btw die in
-         de ledenbijdrage is begrepen. Business-leden zien de volledige specificatie.
-
-         HIER STOND DE PRIJS EEN TWEEDE KEER. `{ rtg: 65, lifestyle: 20000,
-         business: 7500 }`, hard in euro's, terwijl de eigenaar de pasprijs in de
-         boardroom zet (kern/geldregie.js). Wie daar de prijs veranderde, kreeg
-         een lid te zien met de OUDE prijs op zijn factuur -- en het betaalschema
-         van de aanmelding rekende ondertussen wel met de nieuwe. Twee plekken,
-         een waarheid, en de factuur trok aan het kortste eind.
-
-         Erger nog was de Business Pass. Die is volgens de regie nadrukkelijk
-         `opMaat: true` en heeft dus GEEN maandprijs; hier stond 7500, en dat
-         werd 7500 x 1,21 = 9.075 euro op de factuur van een lid. Een bedrag dat
-         nergens is afgesproken. maandCentenVoor geeft voor business null, en
-         null is hier een antwoord: dan blijft staan wat er stond en verzinnen we
-         niets. */
-      const PASNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
-      const bijdrageCenten = maandCentenUit(deps.geldPasprijzen, sess.tier);
-      state.invoices = (md.invoices || []).map(inv => {
-        const contrib = /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(inv.desc);
-        if (contrib && PASNAAM[sess.tier]) {
-          inv = {
-            ...inv,
-            desc: (lang === 'en' ? 'Monthly contribution ' : 'Maandbijdrage ') + PASNAAM[sess.tier] +
-                  (bijdrageCenten == null ? (lang === 'en' ? ' (bespoke)' : ' (prijs op maat)') : '') +
-                  (lang === 'en' ? ' · July 2026' : ' · juli 2026'),
-            // alleen invullen als er echt een prijs IS; anders het bedrag laten staan
-            ...(bijdrageCenten == null ? {} : { netto: 0, bijdrage: Math.round(bijdrageCenten * 1.21) / 100 })
-          };
-        }
-        return {
-          ...inv, desc: contrib ? inv.desc : i18n.localize(inv.desc, lang), date: i18n.localize(inv.date, lang),
-          afboekcode: contrib ? '4560' : '4510',
-          afboeklabel: lang === 'en'
-            ? (contrib ? 'subscriptions and memberships' : 'travel and lodging expenses')
-            : (contrib ? 'contributies en abonnementen' : 'reis- en verblijfkosten'),
-          btw: Math.round((inv.bijdrage - inv.bijdrage / 1.21) * 100) / 100
-        };
-      });
-      if (md.trip) {
-        state.trip = {
-          ...md.trip,
-          dates: i18n.localize(md.trip.dates, lang),
-          items: (md.trip.items || []).map(it => ({
-            ...it, when: i18n.localize(it.when, lang), title: i18n.localize(it.title, lang), sub: i18n.localize(it.sub, lang)
-          }))
-        };
-      }
+      // facturen (afboekcode, btw, pasprijs uit de boardroom) en de reis staan in
+      // ./lid/facturen.js -- inclusief waarom de prijs daar NIET hard staat
+      state.invoices = facturenVoor(md, sess.tier, lang);
+      const reis = reisVoor(md, lang);
+      if (reis) state.trip = reis;
       state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
       state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
       // RTFoundation: gezinnen die dit lid als oppas/familie koppelde + hun meldingen

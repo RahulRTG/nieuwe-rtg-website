@@ -1133,6 +1133,14 @@ async function misbruikBeproeving(tok) {
       doorvoerPerSec: Math.round(totaal / (stormDuurMs / 1000)),
       stormDuurSec: Number((stormDuurMs / 1000).toFixed(1)),
       serverfouten5xx: buckets.s5xx,
+      /* WELKE routes, en niet alleen HOEVEEL. Dit ontbrak, en het kostte meteen
+         een bevinding: een ronde meldde 1 serverfout op ~75.000 aanroepen, de
+         route stond wel in de uitvoer maar die was afgekapt, en de herhaalrun
+         gaf 0 -- dus de enige aanwijzing was weg. Een 5xx die je een keer ziet
+         en daarna niet meer is juist het soort fout dat in productie op het
+         slechtste moment terugkomt; hem kwijtraken aan een terminalvenster is
+         onnodig. Nu staat hij duurzaam in dit bestand, ook als niemand keek. */
+      serverfouten5xxPaden: [...vijfxx.entries()].sort((a, b) => b[1] - a[1]).map(([pad, n]) => pad + ' (' + n + 'x)'),
       eventLoopP99Ms: lusMonsters.length ? Number(Math.max(...lusMonsters.map(x => x.p99 || 0)).toFixed(1)) : null,
       eventLoopMaxMs: lusMonsters.length ? Number(Math.max(...lusMonsters.map(x => x.max || 0)).toFixed(1)) : null,
       cpuGemiddeldPct: cpuUit ? cpuUit.gemiddeld : null,

@@ -27,17 +27,19 @@
    maakSleutelwoorden(state) volgt het vaste kern-patroon. */
 
 const AANTAL = 4;               // je onthoudt er vier
-const PER_KEER = 3;             // per inlog gebruik je er drie
-const UITDAAG_TTL = 3 * 60000;  // een uitdaging leeft drie minuten
-const MAX_BEURTEN = 6;          // en hooguit zes beurten
 /* Hoogstens zoveel woorden uit een zin. Stond op 16, en dat is de hefboom op de
    rekening: elk woord kost 40 ms scrypt en de open-beurt weegt twee posities,
    dus 16 woorden = 32 hashes = 1,3 s rekentijd die de AANVALLER aanlevert en de
    server betaalt. Acht is ruim voor een gewone zin; wie langer typt verliest
    alleen de staart, en daar zet een aanvaller juist zijn ballast neer. */
 const MAX_TOKENS = 8;
-const SLOT_NA = 5;              // vijf fouten
-const SLOT_MS = 60000;          // = een minuut op slot
+/* Hier stonden SLOT_NA = 5 en SLOT_MS = 60000. Ze werden nergens gelezen: sinds
+   de vier losse tellers zijn samengevoegd komt de grens uit server/pinslot.js.
+   Twee constanten die een instelling beloven die ze niet bepalen -- wie ze zou
+   wijzigen, verandert niets en denkt van wel. Weg, en de waarheid staat op de
+   ene plek waar hij hoort (LAT.md regel 4 en 6). */
+
+const { maakUitdaging } = require('./sleutelwoorden-uitdaging');
 
 function maakSleutelwoorden({ db, save, crypto, accounts, slot }) {
   const rij = () => {
@@ -49,7 +51,6 @@ function maakSleutelwoorden({ db, save, crypto, accounts, slot }) {
   if (!slot || typeof slot.dicht !== 'function')
     throw new Error('sleutelwoorden: het gedeelde slot ontbreekt; zonder rem zijn vier woorden af te lopen.');
   const doel = userId => 'sleutelwoord:' + userId;
-  const uitdagingen = new Map();   // id -> { userId, volgorde, stap, at, n, openOk }
   const DUMMY_ZOUT = crypto.randomBytes(16); // voor gelijkmatig rekenwerk bij een lokvink
 
   // woorden normaliseren: kleine letters, accenten en leestekens eraf, zodat
@@ -127,53 +128,12 @@ function maakSleutelwoorden({ db, save, crypto, accounts, slot }) {
   }
   function swWeg(userId) { if (rij()[userId]) { delete rij()[userId]; save(); } return { ok: true, gezet: false }; }
 
-  /* ---- de inlog-uitdaging: kies drie van de vier posities, in willekeurige volgorde ---- */
-  function kiesDrie() {
-    const p = [0, 1, 2, 3];
-    for (let i = p.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
-    return p.slice(0, PER_KEER);
-  }
-  function opruim() {
-    if (uitdagingen.size < 500) return;
-    const nu = Date.now();
-    for (const [id, c] of uitdagingen) if (nu - c.at > UITDAAG_TTL) uitdagingen.delete(id);
-    while (uitdagingen.size >= 500) uitdagingen.delete(uitdagingen.keys().next().value);
-  }
-  // begint een uitdaging voor dit login; geeft altijd een id + de gevraagde
-  // posities terug (ook voor een onbekend account: een lokvink die straks faalt)
-  function swStart(login) {
-    opruim();
-    let user = null;
-    try { user = accounts.findByLogin(login); } catch (e) { user = null; }
-    const heeft = !!(user && rij()[user.id]);
-    if (heeft && teVaak(user.id)) return { status: 429, error: 'Even te vaak geprobeerd; wacht een minuutje en begin opnieuw.' };
-    const id = 'sw' + crypto.randomBytes(9).toString('hex');
-    uitdagingen.set(id, { userId: heeft ? user.id : null, volgorde: kiesDrie(), stap: 'open', at: Date.now(), n: 0, openOk: false });
-    const c = uitdagingen.get(id);
-    return { id, posA: c.volgorde[0], posB: c.volgorde[1] };
-  }
-  // een beurt in de uitdaging. Stap 'open' verwacht de eerste twee woorden in
-  // een zin; stap 'sluit' het derde. Succes geeft { ok, userId }.
-  async function swZeg(id, tekst) {
-    const c = uitdagingen.get(id);
-    if (!c) return { status: 410, error: 'Deze inlogpoging ken ik niet meer; begin gerust opnieuw.' };
-    if (Date.now() - c.at > UITDAAG_TTL) { uitdagingen.delete(id); return { status: 410, error: 'De inlogpoging verliep; begin opnieuw.' }; }
-    if (++c.n > MAX_BEURTEN) { uitdagingen.delete(id); return { status: 429, error: 'Te veel heen en weer; begin even opnieuw.' }; }
-    if (c.stap === 'open') {
-      const a = await herken(c.userId, c.volgorde[0], tekst);
-      const b = await herken(c.userId, c.volgorde[1], tekst);
-      c.openOk = !!(c.userId != null && a && b);
-      c.stap = 'sluit';
-      return { stap: 'sluit', echo: c.openOk ? b : null, posSluit: c.volgorde[2] };
-    }
-    // stap 'sluit'
-    const derde = await herken(c.userId, c.volgorde[2], tekst);
-    const goed = c.openOk && !!derde && c.userId != null;
-    uitdagingen.delete(id);
-    if (goed) { slot.goed(doel(c.userId)); return { ok: true, userId: c.userId }; }
-    if (c.userId != null) fout(c.userId);
-    return { status: 401, error: 'Dat klopte net niet helemaal.' };
-  }
+  /* De inlog-uitdaging zelf staat in ./sleutelwoorden-uitdaging.js: het roteren
+     van de posities, de lokvink en het opruimen van lopende pogingen. Dit deel
+     levert alleen wat die nodig heeft en weet verder niets van uitdagingen. */
+  const { swStart, swZeg } = maakUitdaging({
+    crypto, accounts, rij, herken, teVaak, fout, slotGoed: k => slot.goed(k), doel
+  });
 
   return { swInfo, swZet, swWeg, swStart, swZeg };
 }

@@ -37,6 +37,21 @@
     '.rtg-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16rem;height:16rem;max-width:74vw;max-height:74vw;' +
       '--klok-goud:var(--gold,#C9A24B);' +
       '--klok-sfeer:var(--dag-kleur,var(--s-accent-hel,var(--s-accent,#7F1634)));}' +
+    // De klok hangt niet lós voor de achtergrond. Drie zwarte schaduwen zetten
+    // hem in de ruimte: een korte contactschaduw die de kast gewicht geeft, een
+    // lange zachte eronder, en een brede halo die de achtergrond vlak om de kast
+    // dempt -- daardoor loopt de gouden rand over in het donker in plaats van
+    // eruit geknipt te staan. Bewust géén gekleurde gloed: die leest als neon.
+    // Het zit op een pseudo-element (dus één keer berekend) en niet op een filter
+    // over de bewegende wijzers; die zou elke seconde opnieuw moeten renderen.
+    // De twee gerichte schaduwen wijken naar rechtsonder, met dezelfde
+    // verhouding (x = 0.82 * y) als de wijzerschaduwen: één lichtbron van
+    // linksboven voor de kast én de wijzers, anders staan ze elkaar tegen te
+    // spreken. De brede halo blijft gecentreerd -- dat is omgevingslicht dat
+    // van alle kanten komt, geen slagschaduw, en heeft dus geen richting.
+    '.rtg-ring::before{content:"";position:absolute;inset:1.5%;border-radius:50%;pointer-events:none;' +
+      'box-shadow:0.25rem 0.3rem 0.9rem rgba(0,0,0,0.5), 1.2rem 1.5rem 3rem rgba(0,0,0,0.5),' +
+      '0 0 4.5rem rgba(0,0,0,0.55);}' +
     '.rtg-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}' +
     // fijne randen: een gouden haarlijn buiten, een witte lichtlijn, een
     // paletkleurige accent-flens

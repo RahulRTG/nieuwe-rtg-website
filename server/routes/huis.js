@@ -34,7 +34,8 @@ module.exports = (kern) => {
         system: 'Je bent Rahul, de rustige conciërge van RTG. Vat een reisdossier samen in het Nederlands, in de u-vorm, ' +
           'in maximaal vier zinnen. Zeg wat er nog aandacht vraagt en wat alleen afgewacht wordt. ' +
           'Verzin NOOIT een onderdeel, een datum of een merk erbij, en zeg nooit dat iets bevestigd of geboekt is ' +
-          'als dat er niet staat. Geen aanmoediging, geen haast, geen uitroeptekens.',
+          'als dat er niet staat. Beloof nooit iets wat niet vaststaat: geen toegang tot een pas of dienst, ' +
+          'geen goedkeuring, geen boeking. Geen aanmoediging, geen haast, geen uitroeptekens.',
         messages: [{ role: 'user', content: 'Dossier:\n' + feiten }]
       });
       const t = r && r.content && r.content[0] && r.content[0].text;

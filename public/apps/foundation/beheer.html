@@ -140,6 +140,8 @@ const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
 let dAv='', dKl=KLEUREN[0], bewerkId=null, naarWie='allen';
 
 const s = Sessie.huidig();
+// location.href stopt dit script niet: de omleiding gebeurt pas na deze beurt.
+// Zonder de throw draait laad() alsnog en leest s.code van null.
 if (!s || !s.token){ location.href='index.html'; throw new Error('geen sessie'); }
 
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }

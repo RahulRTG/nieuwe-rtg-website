@@ -264,7 +264,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 | wat | waar |
 |---|---|
-| 31 codeafspraken, binair | `scripts/check.js` |
+| 34 codeafspraken, binair | `scripts/check.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |

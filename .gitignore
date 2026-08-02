@@ -20,3 +20,7 @@ motor-data/
 .env.*
 .vercel
 public/dist/
+
+# het routejournaal van de laatste suite-run: invoer voor scripts/dekking.js,
+# geen bron. Wordt bij elke `npm test` opnieuw geschreven.
+.routejournaal

@@ -75,14 +75,53 @@ function routekaart() {
   return (JSON.parse(uit).routes || []).map(r => r.pad).filter(p => p && p.startsWith('/api/'));
 }
 
+/* ---- IS HET JOURNAAL VAN DE LAATSTE SUITE NOG BRUIKBAAR? ----
+
+   Sinds `npm test` het journaal standaard naar .routejournaal schrijft, ligt er
+   na elke suite een verse meting klaar. Die opnieuw verdienen door de hele suite
+   nog een keer te draaien is twintig minuten weggooien -- dat is precies wat hier
+   vandaag is gebeurd.
+
+   Maar een OUD journaal is erger dan geen journaal: het geeft een cijfer over
+   code die er niet meer zo staat, en dat leest als een meting. Daarom de enige
+   controle die telt: is het journaal jonger dan alles onder server/ en test/?
+   Zo niet, dan draaien we gewoon de suite en zeggen we waarom.
+
+   Bewust GEEN tijdvenster ("niet ouder dan een uur"). De vraag is niet hoe oud
+   het journaal is maar of de code eronder is veranderd; een journaal van gisteren
+   op onveranderde code is prima, en een van vijf minuten geleden op gewijzigde
+   code is waardeloos. */
+function jongerDanDeCode(journaal) {
+  let jn;
+  try { jn = fs.statSync(journaal).mtimeMs; } catch (e) { return { ok: false, reden: 'bestaat niet' }; }
+  let nieuwste = 0, nieuwsteNaam = '';
+  const loop = (d) => {
+    for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, f.name);
+      if (f.isDirectory()) { if (f.name !== 'data' && f.name !== 'node_modules') loop(p); continue; }
+      if (!f.name.endsWith('.js')) continue;
+      const m = fs.statSync(p).mtimeMs;
+      if (m > nieuwste) { nieuwste = m; nieuwsteNaam = path.relative(WORTEL, p); }
+    }
+  };
+  try { loop(path.join(WORTEL, 'server')); loop(path.join(WORTEL, 'test')); }
+  catch (e) { return { ok: false, reden: 'kon de bronmappen niet lezen' }; }
+  if (nieuwste > jn) return { ok: false, reden: nieuwsteNaam + ' is gewijzigd na de laatste suite-run' };
+  return { ok: true };
+}
+
 function main() {
   let journaal, suite = null;
+  const staand = path.join(WORTEL, '.routejournaal');
   if (leesIdx !== -1) {
     journaal = process.argv[leesIdx + 1];
     if (!journaal || !fs.existsSync(journaal)) {
       console.error('Het routejournaal "' + journaal + '" bestaat niet. Draaide de suite met RTG_ROUTELOG gezet?');
       return 2;
     }
+  } else if (!process.argv.includes('--vers') && (() => { const v = jongerDanDeCode(staand); if (!v.ok && !jsonUit && fs.existsSync(staand)) console.log('Het staande journaal is niet bruikbaar: ' + v.reden + '.\n'); return v.ok; })()) {
+    journaal = staand;
+    if (!jsonUit) console.log('Het journaal van de laatste `npm test` is nog vers; die gebruiken we.\n\x1b[2m(--vers dwingt een nieuwe suite af)\x1b[0m\n');
   } else {
     journaal = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dekking-')), 'routes.log');
     fs.writeFileSync(journaal, '');

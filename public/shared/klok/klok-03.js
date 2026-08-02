@@ -1,8 +1,10 @@
-      wijzers.appendChild(g);
+      schaduwhuls(filterId).appendChild(g);
       return g;
     }
-    const uurW = wijzer(45, 10, 3.6);
-    const minW = wijzer(71, 13, 2.7);
+    // van onder naar boven: uur, minuut, seconde -- elk een stap hoger boven de
+    // plaat, en dus een langere en zachtere schaduw
+    const uurW = wijzer(45, 10, 3.6, 'rr-schaduw');
+    const minW = wijzer(71, 13, 2.7, 'rr-schaduwm');
     // de secondewijzer: dun, met lollipop en tegengewicht
     const secG = document.createElementNS(NS, 'g');
     const secL = document.createElementNS(NS, 'line');
@@ -15,7 +17,7 @@
     const secCw = document.createElementNS(NS, 'circle');
     secCw.setAttribute('cx', 100); secCw.setAttribute('cy', 116); secCw.setAttribute('r', 1.9); secCw.setAttribute('class', 'rr-seccw');
     secG.append(secL, secLol, secLolK, secCw);
-    wijzers.appendChild(secG);
+    schaduwhuls('rr-schaduws').appendChild(secG);
     // de centrale kap
     maak('circle', { cx: 100, cy: 100, r: 2.9, fill: goud, stroke: '#3E2E0C', 'stroke-width': 0.2 });
     maak('circle', { cx: 100, cy: 100, r: 0.95, fill: '#191309' });

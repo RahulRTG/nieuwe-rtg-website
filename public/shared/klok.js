@@ -148,8 +148,21 @@
         '<stop offset="0%" stop-color="rgba(255,251,240,0.11)"/>' +
         '<stop offset="52%" stop-color="rgba(255,251,240,0.015)"/>' +
         '<stop offset="100%" stop-color="rgba(255,251,240,0)"/></radialGradient>' +
-      '<filter id="rr-schaduw' + klokNr + '" x="-25%" y="-25%" width="150%" height="150%">' +
-        '<feDropShadow dx="0" dy="0.55" stdDeviation="0.6" flood-color="#000" flood-opacity="0.45"/></filter>';
+      // Drie schaduwen, want de wijzers liggen niet op één hoogte boven de plaat:
+      // de uurwijzer onderop werpt een korte, harde schaduw, de minutenwijzer
+      // ligt daarboven, de secondewijzer bovenop en werpt de langste en zachtste.
+      // Juist dat hoogteverschil maakt van drie platte vormen een gestapeld
+      // uurwerk. De richting volgt het glashoogsel (rr-glans, linksboven), dus
+      // alles valt naar rechtsonder -- één lichtbron voor de hele wijzerplaat.
+      // filterUnits="userSpaceOnUse": met een gebied op de objectBoundingBox is
+      // 25% van een haardunne secondewijzer een fractie van een eenheid, en
+      // knipt de wijzer zijn eigen schaduw weg.
+      '<filter id="rr-schaduw' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
+        '<feDropShadow dx="0.5" dy="0.6" stdDeviation="0.5" flood-color="#000" flood-opacity="0.55"/></filter>' +
+      '<filter id="rr-schaduwm' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
+        '<feDropShadow dx="0.9" dy="1.1" stdDeviation="0.8" flood-color="#000" flood-opacity="0.5"/></filter>' +
+      '<filter id="rr-schaduws' + klokNr + '" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">' +
+        '<feDropShadow dx="1.4" dy="1.7" stdDeviation="1.15" flood-color="#000" flood-opacity="0.42"/></filter>';
     svg.appendChild(defs);
 
     // de plaat + een fijne guilloché-golfstructuur (Seamaster-taal) + randvignet
@@ -263,8 +276,19 @@
         ' L' + (100 + b * 0.85) + ' ' + (100 + tail) +
         ' L' + (100 - b * 0.85) + ' ' + (100 + tail) + ' Z';
     }
-    const wijzers = maak('g', { filter: 'url(#rr-schaduw' + klokNr + ')' });
-    function wijzer(len, tail, w) {
+    const wijzers = maak('g', {});
+    /* Elke wijzer krijgt zijn eigen schaduw, maar die moet blijven vallen waar
+       het licht hem laat vallen -- niet meedraaien met de wijzer. Vandaar de
+       omhulsel-groep: die staat stil en draagt het filter, de wijzer zelf draait
+       daarbinnen. Zet je het filter op de draaiende groep, dan zwiept de schaduw
+       met de secondewijzer mee rond de plaat. */
+    function schaduwhuls(filterId) {
+      const huls = document.createElementNS(NS, 'g');
+      huls.setAttribute('filter', 'url(#' + filterId + klokNr + ')');
+      wijzers.appendChild(huls);
+      return huls;
+    }
+    function wijzer(len, tail, w, filterId) {
       const g = document.createElementNS(NS, 'g');
       const body = document.createElementNS(NS, 'path');
       body.setAttribute('d', baton(len, tail, w)); body.setAttribute('fill', goud);
@@ -275,11 +299,13 @@
       lume.setAttribute('stroke', '#E7E2CC'); lume.setAttribute('stroke-width', (w * 0.4).toFixed(2));
       lume.setAttribute('stroke-linecap', 'round');
       g.append(body, lume);
-      wijzers.appendChild(g);
+      schaduwhuls(filterId).appendChild(g);
       return g;
     }
-    const uurW = wijzer(45, 10, 3.6);
-    const minW = wijzer(71, 13, 2.7);
+    // van onder naar boven: uur, minuut, seconde -- elk een stap hoger boven de
+    // plaat, en dus een langere en zachtere schaduw
+    const uurW = wijzer(45, 10, 3.6, 'rr-schaduw');
+    const minW = wijzer(71, 13, 2.7, 'rr-schaduwm');
     // de secondewijzer: dun, met lollipop en tegengewicht
     const secG = document.createElementNS(NS, 'g');
     const secL = document.createElementNS(NS, 'line');
@@ -292,7 +318,7 @@
     const secCw = document.createElementNS(NS, 'circle');
     secCw.setAttribute('cx', 100); secCw.setAttribute('cy', 116); secCw.setAttribute('r', 1.9); secCw.setAttribute('class', 'rr-seccw');
     secG.append(secL, secLol, secLolK, secCw);
-    wijzers.appendChild(secG);
+    schaduwhuls('rr-schaduws').appendChild(secG);
     // de centrale kap
     maak('circle', { cx: 100, cy: 100, r: 2.9, fill: goud, stroke: '#3E2E0C', 'stroke-width': 0.2 });
     maak('circle', { cx: 100, cy: 100, r: 0.95, fill: '#191309' });

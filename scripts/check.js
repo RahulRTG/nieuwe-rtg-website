@@ -691,5 +691,47 @@ console.log('\n18) de kantoordeur staat maar op een plek nagebouwd');
   if (!eigen) ok(viaGesprek + ' plek(ken) doen de kantoor-inlog via het gesprek (' + MAG_ZELF.size + ' benoemd met een eigen veld)');
 }
 
+/* 19) elk SVG-pad is te tekenen.
+
+   Een pad dat de browser niet kan parsen verdwijnt zonder te klagen: geen
+   foutmelding op het scherm, geen kapotte pagina, alleen een vorm die er niet
+   is. Het vingerafdruk-icoon op de passkey-knop stond daardoor met drie in
+   plaats van vier ribbels -- het laatste pad eindigde op "c0 1", een curve met
+   twee van de zes getallen. Zoiets vind je nooit door de code te lezen; wel
+   door de paden na te rekenen. De grammatica staat in scripts/svgpaden.js. */
+console.log('\n19) elk SVG-pad is te tekenen');
+{
+  const { scan } = require('./svgpaden');
+  const kapot = scan(ROOT, ['public', 'server', 'scripts', 'test']);
+  for (const t of kapot) {
+    fout('ontekenbaar pad: ' + t.bestand + ':' + t.regel + ' -- ' + t.fout + '\n      d="' +
+      (t.d.length > 70 ? t.d.slice(0, 70) + '...' : t.d) + '"');
+  }
+  if (!kapot.length) ok('alle SVG-paden in de bron zijn te tekenen');
+}
+
+/* 20) tekst wordt niet in een kader geperst.
+
+   lengthAdjust="spacingAndGlyphs" rekt niet alleen de spaties op maar de
+   letters zelf. Op de weekdag van de klok stond een vaste textLength met dat
+   attribuut: "Zondag" ging 71% uit elkaar staan, "Friday" 96%, en elke dag
+   kreeg een andere rekfactor. Bij een display-serif als Bodoni is dat precies
+   wat je niet doet. Wie tekst moet laten passen: meet eerst, en houd alleen in
+   wat echt te breed is -- met lengthAdjust="spacing", dat de vormen heel laat.
+   Zie pasInKastje() in public/shared/klok/klok-02.js. */
+console.log('\n20) tekst wordt niet in een kader geperst');
+{
+  let geperst = 0;
+  loop(path.join(ROOT, 'public'), /\.(js|html|svg)$/, f => {
+    // commentaar eruit: een uitleg WAAROM dit niet mag, mag zelf geen alarm geven
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8')).replace(/<!--[\s\S]*?-->/g, ' ');
+    if (!/spacingAndGlyphs/.test(bron)) return;
+    geperst++;
+    fout('spacingAndGlyphs in ' + path.relative(ROOT, f) +
+      ' -- dat vervormt de letters zelf; meet de tekst en gebruik lengthAdjust="spacing"');
+  });
+  if (!geperst) ok('geen tekst die met spacingAndGlyphs vervormd wordt');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

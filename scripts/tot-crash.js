@@ -21,6 +21,15 @@
    immuunreactie van De Wacht (kern/wacht.js), die onder een flood bewust load
    afwerpt; die telt apart mee als een gezond signaal, niet als kandidaat-bug.
 
+   EN HET WEET WANNEER HET ZICHZELF MEET. Werkers verdubbelen loopt een keer
+   dood op de client: duizenden sockets in EEN Node-proces leveren minder druk op
+   dan honderd, en van buiten ziet dat er identiek uit aan een server die het
+   niet meer trekt. Dit harnas heeft daar op gelogen -- "24 / 24 rondes gehaald,
+   geen crash t/m 4.000 werkers", terwijl er in die rondes tien verzoeken per
+   twaalf seconden aankwamen. Sinds ronde-oordeel scripts/lib/verzadiging.js
+   erbij zit, telt alleen een ronde mee waarin er ECHT druk stond, en stopt hij
+   met de mededeling zodra hij zijn eigen client meet in plaats van de server.
+
    Deterministisch (seeded), zonder externe database (sqlite), draait overal.
    Draai: node scripts/tot-crash.js   (env: TOTCRASH_RONDES, TOTCRASH_RONDE_MS,
    TOTCRASH_WERKERS, TOTCRASH_MAX_WERKERS, TOTCRASH_SEED, TOTCRASH_PORT). */
@@ -28,6 +37,7 @@
 const { spawn } = require('child_process');
 const fs = require('fs'), os = require('os'), path = require('path');
 const http = require('http');
+const { beoordeelRonde } = require('./lib/verzadiging');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.TOTCRASH_PORT || 4091);
@@ -154,14 +164,35 @@ function boot() {
 }
 function stop() { return new Promise(r => { if (!child) return r(); child.removeAllListeners('exit'); child.on('exit', () => r()); try { child.kill('SIGKILL'); } catch (e) {} child = null; }); }
 function rssMB() { try { const m = fs.readFileSync('/proc/' + child.pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/); return m ? Math.round(m[1] / 1024) : null; } catch (e) { return null; } }
-async function heapNaGc() {
-  let laag = Infinity;
+/* Meet het serverproces van binnenuit: heap-na-GC (het lek) en de piek van de
+   event-loop-stilstand (de rem). De loopmeting hoort bij de EERSTE dump: die
+   dekt de ronde die net voorbij is, de twee dumps erna dekken alleen de
+   milliseconden ertussen.
+
+   De loopwaarde van de EERSTE ronde dekt ook het opstarten en het zaaien van de
+   database, en staat daarom altijd hoog (seconden). Dat is geen meetfout maar
+   een venster dat nu eenmaal bij het opstarten begint; ronde 1 kan sowieso niet
+   verzadigd zijn, want er is dan nog geen piek om tegen af te zetten. */
+async function meetServer() {
+  let laag = Infinity, lus = null;
   for (let i = 0; i < 3; i++) {
     let voor = 0; try { voor = fs.statSync(GC_OUT).mtimeMs; } catch (e) {}
     try { process.kill(child.pid, 'SIGUSR2'); } catch (e) {}
-    for (let w = 0; w < 40; w++) { await new Promise(r => setTimeout(r, 100)); try { const st = fs.statSync(GC_OUT); if (st.mtimeMs > voor) { const mb = Math.round(JSON.parse(fs.readFileSync(GC_OUT, 'utf8')).heapUsed / 1048576); if (mb < laag) laag = mb; break; } } catch (e) {} }
+    for (let w = 0; w < 40; w++) {
+      await new Promise(r => setTimeout(r, 100));
+      try {
+        const st = fs.statSync(GC_OUT);
+        if (st.mtimeMs > voor) {
+          const d = JSON.parse(fs.readFileSync(GC_OUT, 'utf8'));
+          const mb = Math.round(d.heapUsed / 1048576);
+          if (mb < laag) laag = mb;
+          if (i === 0 && typeof d.lusMs === 'number') lus = d.lusMs;
+          break;
+        }
+      } catch (e) {}
+    }
   }
-  return laag === Infinity ? null : laag;
+  return { heap: laag === Infinity ? null : laag, lusMs: lus };
 }
 // nieuwe onafgevangen fouten in het serverlog sinds de vorige ronde
 function nieuweFouten() {
@@ -210,10 +241,16 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
 
   const ooit5xx = new Map(); // pad -> { n, sample }  (ECHTE serverfouten: 500/502/504)
   let heapBasis = null, totaalReq = 0, breuk = null, piekWerkers = 0, totaalShed = 0;
+  /* De verzadigingspoort. piekReq is de hoogste doorvoer die dit harnas ooit
+     heeft gehaald; zakt een ronde daar ver onder terwijl de server aantoonbaar
+     rustig is, dan meet het harnas zichzelf. Zie scripts/lib/verzadiging.js. */
+  let piekReq = 0, vorigeWerkers = null, drukRondes = 0, piekDrukWerkers = 0, drukReq = 0;
+  let zonderDruk = 0, verzadiging = null, gedraaid = 0;
+  const NIET_DRUK_OP_RIJ = 2; // twee rondes op rij zonder druk: doorgaan is zinloos
 
   for (let r = 0; r < RONDES && !breuk; r++) {
     const werkers = Math.min(MAX_WERKERS, BASIS * Math.pow(2, r));
-    piekWerkers = werkers;
+    piekWerkers = werkers; gedraaid = r + 1;
     const eind = Date.now() + RONDE_MS;
     let req = 0, fault = 0, shed = 0, geen = 0;
     async function werker() {
@@ -243,16 +280,41 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
     if (fout.length) { breuk = { wat: 'ONAFGEVANGEN FOUT in het serverlog', ronde: r, log: fout }; break; }
     const geld = await geldKlopt(office);
     if (!geld.ok) { breuk = { wat: 'GELD KLOPT NIET MEER: ' + geld.wat, ronde: r }; break; }
-    const heap = await heapNaGc(); if (heapBasis == null) heapBasis = heap;
+    const { heap, lusMs } = await meetServer(); if (heapBasis == null) heapBasis = heap;
     // lek: heap-na-GC ruim boven de startvloer terwijl de druk terugviel naar rust
     if (heap != null && heapBasis != null && heap > heapBasis * 3 && heap > heapBasis + 400) { breuk = { wat: 'GEHEUGENLEK: heap-na-GC ' + heap + ' MB (start ' + heapBasis + ' MB) -- klimt richting OOM', ronde: r }; break; }
 
-    rij('ronde ' + (r + 1) + '  ' + nl(werkers) + ' werkers', nl(req) + ' req (' + Math.round(req / (RONDE_MS / 1000)) + '/s) | serverfout ' + fault + ' | 503-afworp ' + shed + ' | geen-antw ' + geen + ' | heap ' + heap + ' MB | rss ' + rssMB() + ' MB');
+    /* --- meet ik de server nog, of mezelf? --- */
+    const oordeel = beoordeelRonde({ werkers, req, shed, fault, heap, lusMs }, { piekReq, heapBasis, vorigeWerkers });
+    vorigeWerkers = werkers;
+    if (oordeel.oordeel === 'druk') {
+      drukRondes++; drukReq += req; piekDrukWerkers = Math.max(piekDrukWerkers, werkers); zonderDruk = 0;
+      if (req > piekReq) piekReq = req;
+    } else {
+      zonderDruk++;
+      if (!verzadiging) verzadiging = { ronde: r, oordeel: oordeel.oordeel, reden: oordeel.reden };
+    }
+
+    const merk = oordeel.oordeel === 'druk' ? ''
+      : (oordeel.oordeel === 'verzadigd' ? ' \x1b[33m<- CLIENT VERZADIGD, deze ronde meet de client\x1b[36m'
+        : ' \x1b[33m<- ONZEKER, niet vast te stellen wie de rem was\x1b[36m');
+    rij('ronde ' + (r + 1) + '  ' + nl(werkers) + ' werkers', nl(req) + ' req (' + Math.round(req / (RONDE_MS / 1000)) + '/s) | serverfout ' + fault + ' | 503-afworp ' + shed + ' | geen-antw ' + geen + ' | heap ' + heap + ' MB | loop ' + (lusMs == null ? '?' : lusMs + ' ms') + ' | rss ' + rssMB() + ' MB' + merk);
+
+    /* Twee rondes op rij zonder echte druk: verder tellen is liegen. Stoppen en
+       het zeggen is de enige eerlijke uitkomst -- meer werkers helpen niet, want
+       de werkers zijn juist het probleem. */
+    if (zonderDruk >= NIET_DRUK_OP_RIJ) { verzadiging.gestopt = true; break; }
   }
 
   kop('UITKOMST');
-  rij('rondes gehaald', (breuk ? breuk.ronde : RONDES) + ' / ' + RONDES);
-  rij('piek-werkers', nl(piekWerkers)); rij('verzoeken totaal', nl(totaalReq));
+  rij('rondes gedraaid', gedraaid + ' / ' + RONDES);
+  /* HET GETAL DAT ERTOE DOET. "Rondes gedraaid" zegt hoe vaak de lus rondging;
+     alleen dit zegt hoe vaak er ECHT druk op de server stond. Die twee liepen
+     uit elkaar en het harnas meldde jarenlang het verkeerde van de twee. */
+  rij('rondes met ECHTE druk', drukRondes + ' / ' + RONDES + (drukRondes < RONDES ? '  (de rest mat de client, niet de server)' : ''));
+  rij('piek-werkers gevraagd', nl(piekWerkers));
+  rij('piek-werkers die AANKWAMEN', nl(piekDrukWerkers) + (piekDrukWerkers < piekWerkers ? '  <- dit is de druk die de server werkelijk heeft gezien' : ''));
+  rij('verzoeken totaal', nl(totaalReq) + (drukReq < totaalReq ? ', waarvan ' + nl(drukReq) + ' onder echte druk' : ''));
   // 503-afworp is geen bug maar de immuunreactie (De Wacht) die onder de flood
   // bewust load afwerpt -- apart gerapporteerd als een GEZOND signaal.
   if (totaalShed) rij('503-lastafworp (De Wacht)', nl(totaalShed) + ' verzoeken afgeworpen onder de storm -- correct, geen bug');
@@ -274,6 +336,21 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
     console.log('  Fix deze en draai opnieuw -- dan vindt hij de volgende.');
     process.exit(1);
   }
-  console.log('\n\x1b[1;32m[tot-crash] GEEN harde crash t/m ' + nl(piekWerkers) + ' werkers en ' + nl(totaalReq) + ' verzoeken. Draai zwaarder met TOTCRASH_RONDES / TOTCRASH_MAX_WERKERS voor meer druk.\x1b[0m');
+  /* DE SLOTREGEL MAG NOOIT MEER MEER BEWEREN DAN ER GEMETEN IS. Hij noemde het
+     aantal GEVRAAGDE werkers ("geen crash t/m 4.000 werkers") terwijl er in die
+     rondes tien verzoeken per twaalf seconden aankwamen. Wat er staat is nu wat
+     de server heeft gezien, en niet wat het harnas had bedoeld. */
+  console.log('\n\x1b[1;32m[tot-crash] GEEN harde crash t/m ' + nl(piekDrukWerkers) + ' werkers en ' + nl(drukReq) + ' verzoeken onder echte druk.\x1b[0m');
+  if (verzadiging && verzadiging.gestopt) {
+    console.log('\x1b[1;33m[tot-crash] GESTOPT IN RONDE ' + (verzadiging.ronde + 1) + ': vanaf daar meet dit harnas zijn eigen client, niet de server.\x1b[0m');
+    console.log('  \x1b[33m' + verzadiging.reden + '\x1b[0m');
+    console.log('  \x1b[2mMeer werkers helpen hier niet: de werkers ZIJN de rem. Wil je verder omhoog,');
+    console.log('  dan moet de druk per socket omhoog (hergebruik, minder sockets, meer verzoeken');
+    console.log('  per socket) of moet de storm vanaf meerdere machines komen.\x1b[0m');
+  } else if (verzadiging) {
+    console.log('  \x1b[2mLet op: ronde ' + (verzadiging.ronde + 1) + ' telde niet als druk (' + verzadiging.oordeel + ') en is uit de tellingen gehouden.\x1b[0m');
+  } else {
+    console.log('  \x1b[2mDraai zwaarder met TOTCRASH_RONDES / TOTCRASH_MAX_WERKERS voor meer druk.\x1b[0m');
+  }
   process.exit(0);
 })().catch(async e => { console.error('\n[tot-crash] uitzondering:', e && e.message); try { await stop(); } catch (x) {} process.exit(2); });

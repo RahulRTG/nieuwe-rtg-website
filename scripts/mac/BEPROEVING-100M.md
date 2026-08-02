@@ -64,6 +64,14 @@ cd ~/rtg
 node --experimental-sqlite scripts/tot-crash.js 2>&1 | tee ~/crashtest.log
 ```
 
+**Lees in de uitslag "rondes met ECHTE druk", niet "rondes gedraaid".** Werkers
+verdubbelen loopt een keer dood op de client zelf: duizenden sockets in een
+Node-proces leveren minder verzoeken op dan honderd. Het harnas merkt dat nu
+(het vergelijkt de doorvoer met de piek en kijkt naar de event-loop van de
+server) en stopt met de mededeling *"vanaf hier meet ik mijn eigen client, niet
+de server"*. Staat die regel er, dan is meer werkers zinloos -- dan moet de druk
+van meerdere machines komen, of per socket omhoog.
+
 ## Wat je terugstuurt
 
 Het enige dat ik nodig heb om de uitslag te kunnen lezen en er iets mee te

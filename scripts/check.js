@@ -1391,10 +1391,14 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     // ---- publiek, maar met een code in het lijf als geloofsbrief ----
     /* Dezelfde familie als metPartner hiernaast: clubs en stadspartners hebben
        geen RTG-account, hun code is de sleutel en het portaal toont uitsluitend
-       het dossier dat bij die ene code hoort. Waard om te weten: op deze drie
-       zit GEEN eigen rem, dus de sterkte hangt volledig aan de lengte van de
-       code. Dat is een open punt voor de externe toets (taak 22), geen gat dat
-       ik hier stil dichtplak. */
+       het dossier dat bij die ene code hoort.
+
+       Hier stond eerst de kanttekening dat er GEEN rem op zat en dat de sterkte
+       dus volledig aan de lengte van de code hing. Die staat er nu wel: twee
+       remmen in server/routes/rtfkantoor/codedeuren.js (20/min per bron tegen het afgrazen,
+       60/min per code tegen veel bronnen op een code), vastgelegd in
+       test/rtfcoderem.test.js. Wat blijft staan voor de externe toets (taak 22):
+       codes zonder vervaldatum en zonder intrekknop. */
     ['/api/rtf/club/portaal', 'de clubcode is de geloofsbrief (vindCode); alleen het eigen clubdossier'],
     ['/api/rtf/club/bericht', 'idem: schrijft alleen in het logboek van die ene clubcode'],
     ['/api/rtf/partner/raad', 'de raadcode is de geloofsbrief (vindCode); alleen de eigen partnerkant'],
@@ -1585,6 +1589,92 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
   });
   if (!los) ok(gekeurd + ' plekken lezen de Authorization-kop, en elk daarvan verifieert het token (' +
     MAG_BETASTEN.size + ' benoemd als uitzondering)');
+}
+
+/* 30) een schermtoets luistert naar paginafouten via het gedeelde hulpje.
+
+   test/helper.js heeft letOpFouten(page, bak): dat zet de luisteraar EN filtert
+   het ene bericht dat niet van ons is -- "Transition was skipped", de afwijzing
+   die de browser zelf maakt als hij een navigatie-overgang overslaat
+   (@view-transition in shared/rtg-uniform.css). Niemand van ons maakt die
+   promise, dus niemand kan hem opvangen.
+
+   Het hulpje stond er al en werd door drie van de drieenveertig bestanden
+   gebruikt. De andere veertig hadden hun eigen regel, en die telde de ruis
+   gewoon mee. Dat viel pas op toen wings.e2e.js erop zakte -- in CI, niet hier,
+   want het is een race. Een hulpje dat niemand aanroept is geen reparatie.
+
+   Deze regel bewaakt dus niet de smaak maar de ruis: wie zijn eigen luisteraar
+   zet, krijgt vroeg of laat een toets die valt op iets wat geen fout is. */
+console.log('\n30) schermtoetsen luisteren naar paginafouten via het gedeelde hulpje');
+{
+  const testMap = path.join(ROOT, 'test');
+  const EIGEN = /\.on\(\s*['"]pageerror['"]/;
+  let eigen = 0, gebruikt = 0;
+  for (const naam of fs.readdirSync(testMap).filter(n => /\.e2e\.js$/.test(n))) {
+    const bron = fs.readFileSync(path.join(testMap, naam), 'utf8');
+    if (bron.includes('letOpFouten(')) gebruikt++;
+    if (naam === 'helper.js') continue;
+    for (const [i, r] of bron.split('\n').entries()) {
+      if (!EIGEN.test(r)) continue;
+      eigen++;
+      fout('test/' + naam + ':' + (i + 1) + ' zet zelf een pageerror-luisteraar' +
+        ' -- gebruik letOpFouten(page, bak) uit test/helper.js, anders telt de browserruis mee');
+    }
+  }
+  /* Nul gebruikers is geen "alles goed" maar een kapotte meting: dan is het
+     hulpje hernoemd of verdwenen en let deze regel nergens meer op. */
+  if (!gebruikt) fout('geen enkel e2e-bestand roept letOpFouten() aan -- is het hulpje hernoemd? Dan bewaakt regel 30 niets meer');
+  else if (!eigen) ok(gebruikt + ' schermtoetsbestanden luisteren via letOpFouten, geen enkele met een eigen luisteraar');
+}
+
+/* 31) geen route die twee keer wordt geregistreerd.
+
+   DEZE REGEL KOMT UIT EEN COMMIT VAN VANDAAG, en het lelijke eraan is dat er
+   niets aan de code mankeerde -- alleen aan de manier waarop hij werd
+   vastgelegd. server/routes/rtfkantoor.js werd met `git mv` verplaatst naar
+   rtfkantoor/index.js en daarna aangepast (zes routes eruit, naar
+   ./codedeuren.js). De verplaatsing stond klaar in de index, de AANPASSING
+   niet. Wat er werd vastgelegd was dus: het oude bestand op de nieuwe plek,
+   MET de zes oude routes, PLUS een nieuw bestand dat dezelfde zes registreert.
+
+   Het gevolg is stiller dan een botsing: de router pakt de EERSTE laag die
+   past, dus de oude, remloze route wint en de nieuwe met zijn twee remmen
+   staat erachter te wachten. Geen fout bij het opstarten, geen dubbele
+   melding, geen enkele toets die zakt -- want die draaiden hier op de
+   werkmap, waar het wel goed stond.
+
+   Een dubbele registratie is nooit expres. Dit is een van de weinige regels
+   waarbij een uitzonderingenlijst niet nodig hoort te zijn, en zolang die
+   leeg blijft is dat een gezond teken. */
+console.log('\n31) geen enkele route wordt twee keer geregistreerd');
+{
+  const stripRegels = (b) => String(b)
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+  const zien = new Map();   // "POST /pad" -> [plek, plek]
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    stripRegels(fs.readFileSync(f, 'utf8')).split('\n').forEach((r, i) => {
+      const re = /app\.(get|post|put|delete|patch|all)\(\s*['"]([^'"]+)['"]/g;
+      let m;
+      while ((m = re.exec(r))) {
+        const sleutel = m[1].toUpperCase() + ' ' + m[2];
+        if (!zien.has(sleutel)) zien.set(sleutel, []);
+        zien.get(sleutel).push(rel + ':' + (i + 1));
+      }
+    });
+  });
+  /* Nul gevonden routes is geen schone lei maar een kapotte meting: dan is de
+     vorm van de registratie veranderd en kijkt deze regel nergens meer naar. */
+  if (zien.size < 500) fout('regel 31 vindt maar ' + zien.size + ' routes -- dat is te weinig om te kloppen; de scanner past niet meer op de bron');
+  else {
+    const dubbel = [...zien].filter(([, plekken]) => plekken.length > 1);
+    for (const [sleutel, plekken] of dubbel)
+      fout(sleutel + ' wordt ' + plekken.length + ' keer geregistreerd (' + plekken.join(', ') +
+        ') -- de eerste wint stil, de rest is dode code');
+    if (!dubbel.length) ok(zien.size + ' routes, elk precies een keer geregistreerd');
+  }
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

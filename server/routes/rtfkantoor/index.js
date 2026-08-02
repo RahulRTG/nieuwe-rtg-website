@@ -1,8 +1,9 @@
 /* Domein "RTF-kantoor": het eigen kantoor van de RTFoundation (een spiegel van
    de RTG-kantoorstructuur), de Clubs & steden-afdeling en het Onderzoekslab.
-   Alles achter de office-inlog (RTG- en RTF-personeel delen die deur), behalve
-   het clubportaal: dat opent op de eigen clubcode en toont uitsluitend het
-   eigen clubdossier. */
+   Alles achter de office-inlog (RTG- en RTF-personeel delen die deur). De zes
+   publieke deuren die op een CODE opengaan -- het clubportaal, de clubberichten
+   en de vier stadsraad-routes van de partner -- staan met hun remmen in
+   ./codedeuren.js. Afgesplitst toen dit bestand de 10 KB passeerde. */
 module.exports = (kern) => {
   const { app, officeAuth, boardroomWie, magBoardroom, rtfkantoor, rtfclubs, lab, stadsraad } = kern;
   // de kijker in het lab: bedrijfsgeheimen zijn besloten, dus wie het lab opent
@@ -38,10 +39,6 @@ module.exports = (kern) => {
   app.post('/api/rtfkantoor/club/afspraak-zet', officeAuth, (req, res) => veilig(res, () => rtfclubs.afspraakZet(String(req.body.id || ''), String(req.body.afspraakId || ''), req.body.af)));
   app.post('/api/rtfkantoor/club/bericht', officeAuth, (req, res) => veilig(res, () => rtfclubs.berichtRtf(String(req.body.id || ''), req.body.naam, req.body.tekst)));
 
-  // het clubportaal: de club zelf, op de eigen clubcode (alleen het eigen dossier)
-  app.post('/api/rtf/club/portaal', (req, res) => veilig(res, () => rtfclubs.portaal(req.body.code)));
-  app.post('/api/rtf/club/bericht', (req, res) => veilig(res, () => rtfclubs.berichtClub(req.body.code, req.body.naam, req.body.tekst)));
-
   // het Onderzoekslab: projecten, de fase-keten, de toets, kennis en de coach.
   // Het overzicht is besloten: iedereen ziet alleen zijn eigen teamprojecten,
   // de boardroom ziet alles. Wie een project start, staat meteen op het team.
@@ -66,18 +63,11 @@ module.exports = (kern) => {
   app.post('/api/rtfkantoor/stadsraad/stem', officeAuth, (req, res) => veilig(res, () => stadsraad.stem(String(req.body.besluitId || ''), 'rtg', req.body.naam || boardroomWie(req), req.body.voor === true)));
   app.post('/api/rtfkantoor/stadsraad/besluit-sluit', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
 
-  // het partnerportaal: op raadcode; de partner stemt namens zijn stad
-  const metPartner = (req, res, werk) => {
-    const p = stadsraad.vindCode(req.body.code);
-    if (!p) return res.status(404).json({ error: 'Deze raadcode kennen we niet. Vraag het RTF-kantoor om de code.' });
-    veilig(res, () => werk(p));
-  };
-  app.post('/api/rtf/partner/raad', (req, res) => veilig(res, () => stadsraad.portaal(req.body.code)));
-  app.post('/api/rtf/partner/besluit-start', (req, res) => metPartner(req, res, p => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, p.naam + ' (' + p.stad + ')', 'partner')));
-  app.post('/api/rtf/partner/stem', (req, res) => metPartner(req, res, p => stadsraad.stem(String(req.body.besluitId || ''), 'partner', p.naam + ' (' + p.stad + ')', req.body.voor === true)));
-  app.post('/api/rtf/partner/besluit-sluit', (req, res) => metPartner(req, res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
   app.post('/api/lab/ai', officeAuth, async (req, res) => {
     try { const r = await lab.labAI(req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
     catch (e) { console.error('[lab]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+
+  // de publieke code-deuren, met hun eigen twee remmen
+  require('./codedeuren')({ app, veilig, rtfclubs, stadsraad });
 };

@@ -168,7 +168,7 @@
   }
 
   /* ---------- wiebel-modus: herschikken met een lange druk ---------- */
-  let wiebel = false, drukTimer = null, sleepEl = null, wiebelStart = 0;
+  let wiebel = false, drukTimer = null, sleepEl = null, wiebelStart = 0, drukX = 0, drukY = 0;
   const klaarKnop = $('#osKlaar');
   function zetWiebel(aan) {
     wiebel = aan;

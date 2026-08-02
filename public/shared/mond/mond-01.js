@@ -57,107 +57,48 @@
     return PUNTEN;
   }
 
-  var api = { puntenVeld: puntenVeld };
-  if (typeof module !== 'undefined' && module.exports) { module.exports = api; return; }
+  /* ---- de spraakmotor: hoe een echte mond beweegt ----
 
-  /* ---- vanaf hier: alleen in de browser ---- */
-  if (root.RTGMond) return;
-  var RUSTIG = root.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+     Een sinus op de onderlip leest als een pratende brievenbus. Een echte mond
+     doet drie dingen tegelijk, en juist de combinatie maakt het levend:
 
-  function hex(h) { return [parseInt(h.substr(1, 2), 16) / 255, parseInt(h.substr(3, 2), 16) / 255, parseInt(h.substr(5, 2), 16) / 255]; }
+       kaak     de onderlip zakt met de kaak mee -- traag, want een kaak heeft
+                massa. Dit is de grootste beweging en loopt achter op de rest.
+       spreiding een "ie" trekt de mondhoeken breed en maakt de lippen dun; een
+                "oe" duwt ze samen en vooruit. Dat is een aparte spier en dus
+                een aparte, snellere golf.
+       ronding  de tuit: lippen naar voren, mondhoeken naar binnen.
 
-  /* ---- 3D: de puntenwolk als levend beeld met diepte + parallax ---- */
-  var VERT =
-    'attribute vec3 aPos; attribute vec3 aKleur; attribute vec4 aExtra; attribute float aRand;' +
-    'uniform float uTijd, uGolf, uSpreek, uYaw, uPitch, uDpr;' +
-    'varying vec3 vKleur; varying float vAlpha;' +
-    'void main(){' +
-    ' float maat=aExtra.x, fase=aExtra.y, lip=aExtra.z, diep=aExtra.w;' +
-    ' vec3 p=aPos;' +
-    ' if(lip>0.5){ p.y -= uSpreek*diep*0.32; p.z += uSpreek*0.12; }' +   // de onderlip zakt en puilt bij het praten
-    ' float cy=cos(uYaw), sy=sin(uYaw), cx=cos(uPitch), sx=sin(uPitch);' +
-    ' vec3 a=vec3(cy*p.x+sy*p.z, p.y, -sy*p.x+cy*p.z);' +
-    ' vec3 b=vec3(a.x, cx*a.y-sx*a.z, sx*a.y+cx*a.z);' +
-    ' float persp=1.7/(1.7-b.z*0.6);' +
-    ' gl_Position=vec4(b.x*persp, b.y*persp, 0.0, 1.0);' +
-    ' gl_PointSize=maat*persp*4.2*uDpr;' +
-    ' float mx=aPos.x*110.0+110.0;' +                                    // terug naar mond-x voor de golf
-    ' float dg=mx-uGolf; float golf=exp(-(dg*dg)/420.0);' +              // geen pow() met mogelijk negatieve basis (undefined in GLSL)
-    ' float twinkel=0.45+0.4*sin(fase+uTijd/700.0);' +
-    ' vAlpha=min(1.0, twinkel*aRand + golf*0.9);' +
-    ' vKleur=mix(aKleur, vec3(0.96,0.90,0.72), clamp(golf*1.3,0.0,0.85));' +
-    '}';
-  var FRAG =
-    'precision mediump float; varying vec3 vKleur; varying float vAlpha;' +
-    'void main(){ vec2 d=gl_PointCoord-0.5; float r=length(d); if(r>0.5) discard;' +
-    // zacht rond puntje; premultiplied kleur (rgb*a) voor additieve gloed op een doorzichtig canvas
-    ' float a=vAlpha*(1.0-r*1.9); if(a<=0.0) discard; gl_FragColor=vec4(vKleur*a, a); }';
+     Die drie samen zijn in de praktijk wat animators visemen noemen. We wekken
+     ze met drie trage ruisgolven van verschillende snelheid, zodat er nooit een
+     herkenbaar patroon ontstaat -- spraak is onregelmatig, en precies dat
+     onregelmatige overtuigt. Er zit ook stilte in: tussen twee lettergrepen valt
+     de mond even bijna dicht, en aan het eind van een zin sluit hij helemaal.
 
-  function schaduw(gl, type, bron) { var s = gl.createShader(type); gl.shaderSource(s, bron); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; }
-
-  function maak3D(canvas, PUNTEN) {
-    var gl = null;
-    // premultiplied (standaard) voor nette gloed; preserveDrawingBuffer houdt het
-    // laatste beeld staan als de rAF-lus even pauzeert (geen flikkering)
-    try { gl = canvas.getContext('webgl', { alpha: true, antialias: true, preserveDrawingBuffer: true }); } catch (e) { gl = null; }
-    if (!gl) return null;
-    var vs = schaduw(gl, gl.VERTEX_SHADER, VERT), fs = schaduw(gl, gl.FRAGMENT_SHADER, FRAG);
-    if (!vs || !fs) return null;
-    var prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
-    gl.useProgram(prog);
-    // buffers vullen (normaliseer x,y naar [-1,1]-achtig; z is al klein)
-    var n = PUNTEN.length;
-    var pos = new Float32Array(n * 3), kol = new Float32Array(n * 3), ext = new Float32Array(n * 4), rnd = new Float32Array(n);
-    for (var i = 0; i < n; i++) {
-      var p = PUNTEN[i];
-      pos[i * 3] = (p.x - 110) / 110; pos[i * 3 + 1] = -(p.y - 52) / 60; pos[i * 3 + 2] = p.z;
-      var c = hex(p.kleur); kol[i * 3] = c[0]; kol[i * 3 + 1] = c[1]; kol[i * 3 + 2] = c[2];
-      ext[i * 4] = p.maat; ext[i * 4 + 1] = p.fase; ext[i * 4 + 2] = p.lip === 'o' ? 1 : 0; ext[i * 4 + 3] = p.diep || 0;
-      rnd[i] = p.rand == null ? 1 : p.rand;
-    }
-    function buf(data, comp, naam) {
-      var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-      var loc = gl.getAttribLocation(prog, naam); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, comp, gl.FLOAT, false, 0, 0);
-    }
-    buf(pos, 3, 'aPos'); buf(kol, 3, 'aKleur'); buf(ext, 4, 'aExtra'); buf(rnd, 1, 'aRand');
-    var U = {}; ['uTijd', 'uGolf', 'uSpreek', 'uYaw', 'uPitch', 'uDpr'].forEach(function (u) { U[u] = gl.getUniformLocation(prog, u); });
-    gl.disable(gl.DEPTH_TEST);
-    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);   // additief (premultiplied): de puntjes gloeien op, ook doorzichtig
-    var dpr = Math.min(2, root.devicePixelRatio || 1);
-    // muis/kanteling voor de parallax
-    var muisX = 0, muisY = 0;
-    canvas.addEventListener('pointermove', function (e) { var r = canvas.getBoundingClientRect(); muisX = (e.clientX - r.left) / r.width - 0.5; muisY = (e.clientY - r.top) / r.height - 0.5; });
-    if (root.DeviceOrientationEvent) root.addEventListener('deviceorientation', function (e) { if (e.gamma != null) { muisX = Math.max(-0.5, Math.min(0.5, e.gamma / 45)); muisY = Math.max(-0.5, Math.min(0.5, (e.beta - 40) / 45)); } }, true);
-    return {
-      teken: function (t, praatTot) {
-        gl.viewport(0, 0, canvas.width, canvas.height);
-        gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
-        var golf = ((t / 4200) % 1) * 260 - 20;
-        var spreek = t < praatTot ? Math.abs(Math.sin(t / 1000 * Math.PI * 4.4)) : 0;
-        var yaw = Math.sin(t / 2600) * 0.18 + muisX * 0.5;
-        var pitch = Math.sin(t / 3400) * 0.06 + muisY * 0.3;
-        gl.uniform1f(U.uTijd, t); gl.uniform1f(U.uGolf, golf); gl.uniform1f(U.uSpreek, spreek);
-        gl.uniform1f(U.uYaw, yaw); gl.uniform1f(U.uPitch, pitch); gl.uniform1f(U.uDpr, dpr);
-        gl.drawArrays(gl.POINTS, 0, n);
-      }
-    };
+     Alles is een pure functie van de tijd, dus zowel WebGL als 2D gebruiken hem
+     en hij is in Node te toetsen. */
+  function golfje(t, snelheid, zaad) {   // vloeiende pseudo-ruis, [0,1]
+    var x = t * snelheid + zaad;
+    return 0.5 + 0.5 * (Math.sin(x) * 0.6 + Math.sin(x * 1.7 + 1.3) * 0.3 + Math.sin(x * 2.9 + 2.7) * 0.1);
+  }
+  /* De stand van de mond op tijdstip t, gegeven hoe lang er nog gepraat wordt.
+     Geeft: kaak (0..1 open), breed (-1 getuit .. +1 gespreid), duw (0..1 naar
+     voren), scheef (kleine asymmetrie: geen mens is symmetrisch). */
+  function mondStand(t, praatTot) {
+    var over = praatTot - t;
+    if (over <= 0) return { kaak: 0, breed: 0, duw: 0, scheef: 0 };
+    // in- en uitloop: een zin begint en eindigt niet met een klap
+    var aan = Math.min(1, Math.max(0, over / 180));                  // laatste 180ms: dichtvallen
+    var lettergreep = golfje(t, 0.011, 0);                           // ~2,5 per seconde: het ritme
+    var stilte = Math.max(0, 1 - Math.pow(Math.max(0, lettergreep - 0.28) / 0.72, 0.7));
+    var kaak = Math.max(0, lettergreep - 0.26) / 0.74;               // onder de drempel is de mond dicht
+    kaak = Math.pow(kaak, 1.35) * (1 - stilte * 0.55) * aan;         // niet-lineair: dicht blijft dicht
+    var breed = (golfje(t, 0.0072, 11.3) - 0.5) * 2 * (0.35 + 0.65 * kaak) * aan;
+    var duw = Math.max(0, -breed) * 0.8 * aan;                       // getuit = naar voren
+    var scheef = (golfje(t, 0.0041, 27.1) - 0.5) * 0.22 * aan;
+    return { kaak: kaak, breed: breed, duw: duw, scheef: scheef };
   }
 
-  function maak(canvas) {
-    if (!canvas || canvas.dataset.rtgMondActief) return { praat: function () {} };
-    canvas.dataset.rtgMondActief = '1';
-    var PUNTEN = puntenVeld();
-    var praatTot = 0;
-    var praat = function (ms) { praatTot = performance.now() + ms; };
-
-    // de levende 3D-mond waar het kan; anders het vertrouwde 2D-beeld
-    var d3 = RUSTIG ? null : maak3D(canvas, PUNTEN);
-    if (d3) {
-      (function lus() {
-        if (canvas.offsetParent) { d3.teken(performance.now(), praatTot); requestAnimationFrame(lus); }
-        else setTimeout(lus, 600);
-      })();
-      return { praat: praat };
-    }
+  var api = { puntenVeld: puntenVeld, mondStand: mondStand };
+  if (typeof module !== 'undefined' && module.exports) { module.exports = api; return; }
 

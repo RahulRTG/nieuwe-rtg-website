@@ -1,10 +1,15 @@
     grid.addEventListener('pointerdown', e => {
       const el = e.target.closest('.os-app'); if (!el) return;
+      // waar de vinger begon: movementX/Y is bij touch in Safari altijd 0, dus
+      // daarop afgaan betekende dat wegvegen de lange-druk NIET afbrak en de
+      // wiebel-modus zomaar aansprong tijdens het scrollen. Nu meten we de
+      // afstand zelf, en dat werkt op elk toestel gelijk.
+      drukX = e.clientX; drukY = e.clientY;
       drukTimer = setTimeout(() => { zetWiebel(true); }, 550);
       if (wiebel) { sleepEl = el; el.classList.add('os-sleep'); el.setPointerCapture && el.setPointerCapture(e.pointerId); }
     });
     grid.addEventListener('pointermove', e => {
-      if (drukTimer && (Math.abs(e.movementX) > 3 || Math.abs(e.movementY) > 3) && !wiebel) { clearTimeout(drukTimer); drukTimer = null; }
+      if (drukTimer && !wiebel && Math.hypot(e.clientX - drukX, e.clientY - drukY) > 10) { clearTimeout(drukTimer); drukTimer = null; }
       if (!wiebel || !sleepEl) return;
       const onder = document.elementFromPoint(e.clientX, e.clientY);
       const doel = onder && onder.closest && onder.closest('.os-app');
@@ -31,11 +36,24 @@
     if (brand) brand.style.display = open ? 'none' : '';
     if (titel) titel.textContent = open ? tabNaam(tab) : '';
   }
+  /* Het springboard spiegelt de tabbar, dus we kijken mee -- maar alleen naar
+     wat het beeld echt verandert.
+
+     Hier stond 'class' in de filter, en dat was duur op de verkeerde momenten:
+     openTab() zet bij ELKE schermwissel class="active" om op elke tabknop, dus
+     bij elke tik werden alle mappen en tegels weggegooid en opnieuw getekend
+     (inclusief hun SVG-iconen). Dat is het schokkerige gevoel bij navigeren,
+     en het brak een lopende sleep-actie halverwege af.
+
+     Zichtbaarheid en badges lopen via style.display (zie tabZichtbaar), nooit
+     via een klasse -- 'style' volstaat dus. En voor de zekerheid daarbovenop
+     een inhoudscontrole: verandert de uitkomst niet, dan tekenen we niet. */
   let gepland = null;
+  const bouwAlsAnders = () => { if (afdruk() !== vorigeAfdruk) bouw(); };
   new MutationObserver(() => {
     if (gepland) return;
-    gepland = requestAnimationFrame(() => { gepland = null; bouw(); });
-  }).observe(tabbar, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style', 'class'] });
+    gepland = requestAnimationFrame(() => { gepland = null; bouwAlsAnders(); });
+  }).observe(tabbar, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
   // de gate/app-wissel (inloggen, uitloggen) stuurt de schermvaste modus
   new MutationObserver(sync).observe(app, { attributes: true, attributeFilter: ['style', 'class'] });
 

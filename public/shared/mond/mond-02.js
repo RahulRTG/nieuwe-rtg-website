@@ -1,28 +1,73 @@
-    // ---- 2D-terugval: exact het bestaande beeld ----
+    /* ---- 2D-terugval: hetzelfde gezicht, dezelfde spraak, zonder WebGL ----
+       Ook hier is de tekenlus opnieuw opgezet: kleuren worden gegroepeerd
+       getekend (één fillStyle per kleur in plaats van per puntje) en de alpha
+       gaat in vier stappen. Dat scheelt duizenden statewissels per frame --
+       precies wat een oudere telefoon liet stotteren. */
     var mctx = canvas.getContext('2d');
     if (!mctx) return { praat: praat };
+    var dpr2 = Math.min(2, root.devicePixelRatio || 1);
+    canvas.width = 440 * (dpr2 / 2) * 2; canvas.height = 200 * (dpr2 / 2) * 2;
+    var GROEP = {};                              // kleur -> [punten], alpha in 4 banden
+    for (var gi = 0; gi < PUNTEN.length; gi++) { var gp = PUNTEN[gi]; (GROEP[gp.kleur] = GROEP[gp.kleur] || []).push(gp); }
+    var kleuren = Object.keys(GROEP);
+    var k2 = 0, kv2 = 0, br2 = 0, du2 = 0, sc2 = 0, vorig2 = 0;
     function verf(t) {
-      mctx.clearRect(0, 0, 440, 200);
-      mctx.save();
-      mctx.scale(2, 2);
+      var dt = vorig2 ? Math.min(0.05, (t - vorig2) / 1000) : 0.016; vorig2 = t;
+      var doel = mondStand(t, praatTot);
+      kv2 += (doel.kaak - k2) * 260 * dt - kv2 * 26 * dt; k2 += kv2 * dt;
+      var volg = Math.min(1, dt * 14);
+      br2 += (doel.breed - br2) * volg; du2 += (doel.duw - du2) * volg; sc2 += (doel.scheef - sc2) * volg;
+      mctx.setTransform(1, 0, 0, 1, 0, 0);
+      mctx.clearRect(0, 0, canvas.width, canvas.height);
+      mctx.scale(canvas.width / 220, canvas.height / 100);
       var golf = ((t / 4200) % 1) * 260 - 20;
-      var spreek = t < praatTot ? Math.sin(t / 1000 * Math.PI * 4.4) : 0;
-      for (var i = 0; i < PUNTEN.length; i++) {
-        var p = PUNTEN[i];
-        var gloed = Math.exp(-Math.pow(p.x - golf, 2) / 420);
-        var twinkel = 0.45 + 0.4 * Math.sin(p.fase + t / 700);
-        mctx.globalAlpha = Math.min(1, twinkel * (p.rand == null ? 1 : p.rand) + gloed * 0.9);
-        mctx.fillStyle = gloed > 0.45 ? '#F5E6B8' : p.kleur;
-        mctx.fillRect(p.x, p.lip === 'o' ? p.y + spreek * 4 * p.diep : p.y, p.maat, p.maat);
+      for (var ki = 0; ki < kleuren.length; ki++) {
+        var lijst = GROEP[kleuren[ki]];
+        for (var band = 0; band < 4; band++) {
+          mctx.globalAlpha = 0.25 + band * 0.25;
+          mctx.fillStyle = kleuren[ki];
+          var begonnen = false;
+          for (var i = 0; i < lijst.length; i++) {
+            var p = lijst[i];
+            var gloed = Math.exp(-Math.pow(p.x - golf, 2) / 420);
+            if (gloed > 0.45) continue;                       // die zitten in de gloed-pas hieronder
+            var a = Math.min(1, (0.45 + 0.4 * Math.sin(p.fase + t / 700)) * (p.rand == null ? 1 : p.rand) + gloed * 0.9);
+            if (Math.min(3, Math.floor(a * 4)) !== band) continue;
+            var hoek = 1 - Math.min(1, Math.abs(p.x - 110) / 60), mid = hoek * hoek * (3 - 2 * hoek);
+            var open = k2 * mid;
+            var x = 110 + (p.x - 110) * (1 + br2 * 0.12 * (1 - mid * 0.4));
+            var y = 52 + (p.y - 52) * (1 - br2 * 0.13 * mid) + sc2 * mid * 6 * (p.x > 110 ? 1 : 0.2);
+            if (p.lip === 'o') y += open * (16 + 18 * p.diep);
+            mctx.fillRect(x, y, p.maat, p.maat);
+            begonnen = true;
+          }
+          if (!begonnen) continue;
+        }
       }
-      mctx.restore();
+      // de gouden lichtgolf als aparte, korte pas (weinig punten, dus goedkoop)
+      mctx.globalAlpha = 1; mctx.fillStyle = '#F5E6B8';
+      for (var j = 0; j < PUNTEN.length; j++) {
+        var q = PUNTEN[j];
+        if (Math.exp(-Math.pow(q.x - golf, 2) / 420) <= 0.45) continue;
+        var h2 = 1 - Math.min(1, Math.abs(q.x - 110) / 60), m2 = h2 * h2 * (3 - 2 * h2);
+        var qy = 52 + (q.y - 52) * (1 - br2 * 0.13 * m2);
+        if (q.lip === 'o') qy += k2 * m2 * (16 + 18 * q.diep);
+        mctx.fillRect(110 + (q.x - 110) * (1 + br2 * 0.12 * (1 - m2 * 0.4)), qy, q.maat, q.maat);
+      }
+      mctx.globalAlpha = 1;
     }
-    if (RUSTIG) verf(0);
-    else (function lus() {
-      if (canvas.offsetParent) { verf(performance.now()); requestAnimationFrame(lus); }
-      else setTimeout(lus, 600);
-    })();
-    return { praat: praat };
+    if (RUSTIG) { verf(0); return { praat: praat }; }
+    var lus2 = function () {
+      loopt = true;
+      if (!inBeeld || document.hidden) { loopt = false; return; }
+      var t = performance.now();
+      verf(t);
+      if (t > praatTot && k2 < 0.004 && Math.abs(kv2) < 0.02) { loopt = false; return; }
+      requestAnimationFrame(lus2);
+    };
+    wek = function () { if (!loopt && inBeeld && !document.hidden) requestAnimationFrame(lus2); };
+    requestAnimationFrame(lus2);
+    return { praat: function (ms) { praat(ms); wek(); } };
   }
 
   /* De mond als knop-icoon: HET vaste gezicht van Rahul, overal hetzelfde. Geef
@@ -40,5 +85,5 @@
     return maak(c);
   }
 
-  root.RTGMond = { maak: maak, fab: fab, puntenVeld: puntenVeld };
+  root.RTGMond = { maak: maak, fab: fab, puntenVeld: puntenVeld, mondStand: mondStand };
 })(typeof self !== 'undefined' ? self : this);

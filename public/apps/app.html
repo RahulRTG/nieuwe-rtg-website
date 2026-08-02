@@ -1241,8 +1241,12 @@
   }
   .os-aibalk button svg{width:calc(var(--e) * 1.05);height:calc(var(--e) * 1.05);stroke:#1C1608;}
   .os-aibalk button:active{opacity:0.85;}
-  /* zonder pas is er geen Rahul: de balk hoort er dan niet te staan */
+  /* de vaste AI-melding onder de balk: klein en rustig, maar altijd zichtbaar
+     zolang de balk er staat -- weten dat je met een AI praat is geen detail */
+  .os-aiwet{font-size:calc(var(--e) * 0.62);color:var(--soft);text-align:center;margin:calc(var(--e) * 0.3) 0 0;letter-spacing:0.02em;}
+  /* zonder pas is er geen Rahul: de balk hoort er dan niet te staan, en de melding ook niet */
   #app.os-gast .os-aibalk{display:none;}
+  #app.os-gast .os-aiwet{display:none;}
 
   /* -------- overlays: map, zoeken, bedieningspaneel -------- */
   .os-scrim{
@@ -1595,6 +1599,11 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M12 6l6 6-6 6"/></svg>
             </button>
           </form>
+          <!-- De vaste AI-melding (AI-verordening art. 50): wie met Rahul praat
+               hoort dat te WETEN, niet pas te horen als hij ernaar vraagt. En de
+               tweede helft is de merkregel die ook in de voorwaarden staat: over
+               passen, goedkeuringen en boekingen beslist altijd een mens. -->
+          <p class="os-aiwet" id="osAiWet">Rahul is een AI · over passen en boekingen beslist altijd een mens</p>
         </div>
       </div>
 

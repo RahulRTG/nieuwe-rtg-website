@@ -323,7 +323,11 @@ function toonUit(u, host){
     '<div class="bedrag '+(t?'terug':(u.saldo>0?'bij':''))+'">€ '+Math.abs(u.saldo)+'</div>'+
     '<div class="meta">Belastbaar € '+u.belastbaar+' · belasting € '+u.belasting+' · heffingskorting € '+u.heffingskorting+' · ingehouden € '+u.ingehouden+'</div>';
 }
-$('#ibAiGo').addEventListener('click', async () => {
+/* De knoppen hieronder staan in #main, en die is bij een uitgelogde bezoeker
+   vervangen door de inlog-uitnodiging. Binden op iets dat er niet staat gooit
+   een TypeError die de rest van dit script afbreekt. Vandaar: bind wat er is. */
+const bind = (kies, soort, fn) => { const el = $(kies); if (el) el.addEventListener(soort, fn); };
+bind('#ibAiGo', 'click', async () => {
   const tekst = $('#ibAi').value.trim();
   if (tekst.length < 6){ meld('Vertel Rahul kort over je inkomen.'); return; }
   const btn = $('#ibAiGo'); btn.disabled = true; btn.textContent = 'Rahul leest mee…';
@@ -335,11 +339,11 @@ $('#ibAiGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
   btn.disabled = false; btn.textContent = 'Rahul vult de velden in';
 });
-$('#ibBereken').addEventListener('click', async () => {
+bind('#ibBereken', 'click', async () => {
   try { const d = await api('/api/overheid/belasting/bereken', { inkomen: $('#ibInkomen').value, aftrek: $('#ibAftrek').value, ingehouden: $('#ibIngehouden').value }); toonUit(d.uitkomst, '#ibUit'); }
   catch(e){ meld(e.message); }
 });
-$('#ibGo').addEventListener('click', async () => {
+bind('#ibGo', 'click', async () => {
   if (!(parseInt($('#ibInkomen').value,10) > 0)){ meld('Vul je bruto jaarinkomen in.'); return; }
   try { const d = await api('/api/overheid/aangifte', { inkomen: $('#ibInkomen').value, aftrek: $('#ibAftrek').value, ingehouden: $('#ibIngehouden').value });
     toonUit(d.aanslag, '#ibUit'); meld('Aangifte ingediend. Zie je Berichtenbox.'); laadAanslagen(); vernieuwBadge();
@@ -357,7 +361,7 @@ async function laadAanslagen(){
     try { await api('/api/overheid/aanslag/betaal', { ref: b.dataset.bet }); meld('Betaald. Bedankt.'); laadAanslagen(); vernieuwBadge(); } catch(e){ meld(e.message); }
   }));
 }
-$('#tsGo').addEventListener('click', async () => {
+bind('#tsGo', 'click', async () => {
   try { const d = await api('/api/overheid/toeslag', { soort: tsSoort, inkomen: $('#tsInkomen').value });
     meld(d.toeslag.maandbedrag>0 ? 'Aangevraagd: € '+d.toeslag.maandbedrag+' per maand (voorlopig).' : 'Op dit inkomen is er geen recht.'); laadToeslagen(); vernieuwBadge();
   } catch(e){ meld(e.message); }
@@ -376,10 +380,10 @@ async function laadRijbewijs(){
   const r = d.rijbewijs || {};
   $('#rbInfo').textContent = 'Categorieën: ' + (r.categorieen||[]).join(', ') + ' · geldig tot ' + (r.geldigTot||'·');
 }
-$('#rbVerleng').addEventListener('click', async () => {
+bind('#rbVerleng', 'click', async () => {
   try { const d = await api('/api/overheid/rijbewijs/verleng'); meld('Verlengd tot ' + d.rijbewijs.geldigTot + '.'); laadRijbewijs(); vernieuwBadge(); } catch(e){ meld(e.message); }
 });
-$('#vtGo').addEventListener('click', async () => {
+bind('#vtGo', 'click', async () => {
   if ($('#vtKenteken').value.trim().length < 4){ meld('Vul een geldig kenteken in.'); return; }
   try { await api('/api/overheid/voertuig/meld', { kenteken: $('#vtKenteken').value, merk: $('#vtMerk').value });
     $('#vtKenteken').value=''; $('#vtMerk').value=''; meld('Voertuig op je naam gezet.'); laadVoertuigen();
@@ -395,7 +399,7 @@ async function laadVoertuigen(){
   }));
 }
 
-$('#chkGo').addEventListener('click', async () => {
+bind('#chkGo', 'click', async () => {
   if ($('#chkKenteken').value.trim().length < 4){ meld('Vul een kenteken in.'); return; }
   try { const d = await api('/api/overheid/rdw/check', { kenteken: $('#chkKenteken').value });
     $('#chkUit').innerHTML = d.bekend
@@ -405,7 +409,7 @@ $('#chkGo').addEventListener('click', async () => {
 });
 
 // KVK
-$('#kvGo').addEventListener('click', async () => {
+bind('#kvGo', 'click', async () => {
   if ($('#kvNaam').value.trim().length < 2){ meld('Vul een bedrijfsnaam in.'); return; }
   try { const d = await api('/api/overheid/kvk/inschrijven', { naam: $('#kvNaam').value, rechtsvorm: kvVorm, sbi: $('#kvSbi').value });
     $('#kvNaam').value=''; meld('Ingeschreven onder KVK ' + d.inschrijving.kvkNummer + '.'); laadKvk(); vernieuwBadge();
@@ -418,7 +422,7 @@ async function laadKvk(){
 }
 
 // Sociaal
-$('#szGo').addEventListener('click', async () => {
+bind('#szGo', 'click', async () => {
   try { await api('/api/overheid/uitkering', { soort: szSoort, toelichting: $('#szToe').value });
     $('#szToe').value=''; meld('Aanvraag ingediend.'); laadUitkeringen(); vernieuwBadge();
   } catch(e){ meld(e.message); }
@@ -429,7 +433,7 @@ async function laadUitkeringen(){
   $('#szMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn aanvragen</h3>'+l.map(u =>
     '<div class="item"><h4>'+esc(u.soortLabel)+'</h4><span class="status '+(u.status==='toegekend'?'op':u.status==='afgewezen'?'af':'')+'">'+esc(u.status)+'</span></div>').join('') : '';
 }
-$('#bzGo').addEventListener('click', async () => {
+bind('#bzGo', 'click', async () => {
   if ($('#bzTegen').value.trim().length < 3 || $('#bzReden').value.trim().length < 6){ meld('Vul in waartegen en waarom.'); return; }
   try { await api('/api/overheid/bezwaar', { tegen: $('#bzTegen').value, reden: $('#bzReden').value });
     $('#bzTegen').value=''; $('#bzReden').value=''; meld('Bezwaar ingediend.'); laadBezwaren(); vernieuwBadge();
@@ -443,7 +447,7 @@ async function laadBezwaren(){
 }
 
 // Provincie (subsidies)
-$('#sbGo').addEventListener('click', async () => {
+bind('#sbGo', 'click', async () => {
   if ($('#sbProject').value.trim().length < 6){ meld('Omschrijf je project.'); return; }
   try { const d = await api('/api/overheid/subsidie', { regeling: sbReg, project: $('#sbProject').value, bedrag: $('#sbBedrag').value });
     $('#sbProject').value=''; $('#sbBedrag').value=''; meld('Aangevraagd: € '+d.subsidie.gevraagd+'.'); laadSubsidies(); vernieuwBadge();
@@ -469,7 +473,7 @@ async function laadWaterbelasting(){
     try { await api('/api/overheid/waterschap/betaal', { ref: b.dataset.bet }); meld('Betaald. Bedankt.'); laadWaterbelasting(); vernieuwBadge(); } catch(e){ meld(e.message); }
   }));
 }
-$('#wmGo').addEventListener('click', async () => {
+bind('#wmGo', 'click', async () => {
   if ($('#wmTekst').value.trim().length < 4){ meld('Omschrijf kort wat er is.'); return; }
   try { await api('/api/overheid/water/meld', { soort: wmSoort, tekst: $('#wmTekst').value, locatie: $('#wmLoc').value });
     $('#wmTekst').value=''; $('#wmLoc').value=''; meld('Melding verstuurd.'); laadWaterMeldingen();

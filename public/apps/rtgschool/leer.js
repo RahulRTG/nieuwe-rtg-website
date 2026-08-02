@@ -3,6 +3,10 @@
    vijf opgaven. Antwoorden blijven op de server; hier staat alleen de stroom.
    Bewust geen scores buiten de sessie, geen reeksen, geen ranglijsten. */
 (function () {
+  /* Bij een uitgelogde bezoeker heeft de pagina #main al vervangen door de
+     inlog-uitnodiging, terwijl dit bestand onvoorwaardelijk geladen wordt. Binden
+     op een verdwenen element gooit een TypeError die de rest afbreekt. */
+  function bindId(id, soort, fn) { var el = document.getElementById(id); if (el) el.addEventListener(soort, fn); }
   'use strict';
   var LADDER = null, MIJN = null;
 
@@ -125,7 +129,7 @@
 
   // de opties worden per vraag opnieuw getekend; een luisteraar op de
   // container vangt ze allemaal, zonder per knop opnieuw te binden
-  document.getElementById('oefenOpties').addEventListener('click', function (e) {
+  bindId('oefenOpties', 'click', function (e) {
     var b = e.target.closest('[data-antw]');
     if (b) oefenAntwoord(b.dataset.antw);
   });
@@ -141,24 +145,24 @@
       vulKiezers();
       await laadPaspoort();
     } catch (e) { meld(e.message); }
-    document.getElementById('inschrijfKnop').addEventListener('click', async function () {
+    bindId('inschrijfKnop', 'click', async function () {
       var f = document.getElementById('ladderKies').value;
       if (!f) { meld('Kies eerst een fase op de ladder.'); return; }
       try { await api('/api/onderwijs/inschrijf', { fase: f }); meld('Ingeschreven; je paspoort loopt vanaf hier mee.'); laadPaspoort(); }
       catch (e) { meld(e.message); }
     });
-    document.getElementById('jaarKnop').addEventListener('click', async function () {
+    bindId('jaarKnop', 'click', async function () {
       try { await api('/api/onderwijs/jaar-over', {}); meld('Een leerjaar erbij.'); laadPaspoort(); }
       catch (e) { meld(e.message); }
     });
-    document.getElementById('leerGroep').addEventListener('change', function () {
+    bindId('leerGroep', 'change', function () {
       if (this.value) { document.getElementById('leerFase').value = ''; toonVakken({ groep: this.value }); }
     });
-    document.getElementById('leerFase').addEventListener('change', function () {
+    bindId('leerFase', 'change', function () {
       if (this.value) { document.getElementById('leerGroep').value = ''; toonVakken({ fase: this.value }); }
     });
-    document.getElementById('oefenStuur').addEventListener('click', function () { oefenAntwoord(document.getElementById('oefenIn').value); });
-    document.getElementById('oefenIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') oefenAntwoord(this.value); });
+    bindId('oefenStuur', 'click', function () { oefenAntwoord(document.getElementById('oefenIn').value); });
+    bindId('oefenIn', 'keydown', function (e) { if (e.key === 'Enter') oefenAntwoord(this.value); });
     if (window.RTGSchoolMeer) RTGSchoolMeer.start();
   }
 

@@ -145,7 +145,11 @@ async function laadMijn(){
     try { await api('/api/reisbureau/annuleer', { ref: b.dataset.ref }); meld('Aanvraag ingetrokken.'); laadMijn(); } catch(e){ meld(e.message); }
   }));
 }
-$('#adviesGo').addEventListener('click', async () => {
+/* De knoppen hieronder staan in #main, en die is bij een uitgelogde bezoeker
+   vervangen door de inlog-uitnodiging. Binden op iets dat er niet staat gooit
+   een TypeError die de rest van dit script afbreekt. Vandaar: bind wat er is. */
+const bind = (kies, soort, fn) => { const el = $(kies); if (el) el.addEventListener(soort, fn); };
+bind('#adviesGo', 'click', async () => {
   const wens = $('#adviesIn').value.trim();
   if (!wens){ meld('Vertel eerst waar je zin in hebt.'); return; }
   $('#adviesUit').textContent = 'Rahul denkt mee...';
@@ -204,10 +208,10 @@ async function boek(){
       (d.reiswijzer ? ' Je hebt alle regels van ' + d.reiswijzer.naam + ' meegekregen' + (d.reiswijzer.visum.soort !== 'geen' ? ' -- let op: ' + d.reiswijzer.visum.label.toLowerCase() + '.' : '.') : ''));
   } catch(e){ meld(e.message); }
 }
-$('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
-$('#rMin').addEventListener('click', () => { AANTAL = Math.max(1, AANTAL-1); $('#rAantal').textContent = AANTAL; herbereken(); });
-$('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $('#rAantal').textContent = AANTAL; herbereken(); });
-$('#rBoek').addEventListener('click', boek);
+bind('#bladTerug', 'click', () => $('#blad').classList.remove('open'));
+bind('#rMin', 'click', () => { AANTAL = Math.max(1, AANTAL-1); $('#rAantal').textContent = AANTAL; herbereken(); });
+bind('#rPlus', 'click', () => { AANTAL = Math.min(20, AANTAL+1); $('#rAantal').textContent = AANTAL; herbereken(); });
+bind('#rBoek', 'click', boek);
 </script>
 <button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>

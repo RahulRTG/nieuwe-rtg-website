@@ -203,7 +203,7 @@
 <script src="/apps/translate.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisFamilie()) {}
+if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
 // gedeelde, veilige helpers uit /apps/util.js

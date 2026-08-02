@@ -3,7 +3,7 @@
    en de prullenbak met herstel. Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -38,7 +38,7 @@ test('Bestanden: uploaden, delen, een versie van de ander en de prullenbak',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     const als = async (token) => {
       await page.goto(base + '/apps/bestanden.html', { waitUntil: 'domcontentloaded' });
       await page.evaluate((tok) => {

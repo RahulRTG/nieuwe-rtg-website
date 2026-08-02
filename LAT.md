@@ -264,7 +264,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 | wat | waar |
 |---|---|
-| 29 codeafspraken, binair | `scripts/check.js` |
+| 31 codeafspraken, binair | `scripts/check.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |
@@ -275,7 +275,9 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
 | elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
-| de pijplijn die dit alles draait | `.github/workflows/ci.yml` |
+| een omgeving die schermtoetsen belooft, heeft ook een browser | `test/browserpoort.e2e.js` |
+| de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |
+| de zware rondes (beproeving, dekking) draaien vanzelf, wekelijks | `.github/workflows/ronde.yml` |
 
 Wat hier niet in staat, wordt niet gehandhaafd. Dat is geen tekortkoming van de
 lijst maar informatie: het zegt precies waar je op mensen vertrouwt.

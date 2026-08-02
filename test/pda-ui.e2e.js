@@ -7,7 +7,7 @@
    Draai: npm run e2e  (of node --experimental-sqlite --test test/pda-ui.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -47,7 +47,7 @@ test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voort
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const paginaFouten = [];
-    page.on('pageerror', e => paginaFouten.push(e.message));
+    letOpFouten(page, paginaFouten);
     await page.addInitScript(([tok, code]) => {
       localStorage.setItem('rtg_pda_token', tok);
       localStorage.setItem('rtg_pda_code', code);
@@ -108,7 +108,7 @@ test('PDA in de browser: pauze staat naast de klok, en telt minuten en niets and
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const paginaFouten = [];
-    page.on('pageerror', e => paginaFouten.push(e.message));
+    letOpFouten(page, paginaFouten);
     await page.addInitScript(([tok, code]) => {
       localStorage.setItem('rtg_pda_token', tok);
       localStorage.setItem('rtg_pda_code', code);
@@ -177,7 +177,7 @@ test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Van
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const paginaFouten = [];
-    page.on('pageerror', e => paginaFouten.push(e.message));
+    letOpFouten(page, paginaFouten);
     await page.addInitScript(([tok, code]) => {
       localStorage.setItem('rtg_pda_token', tok);
       localStorage.setItem('rtg_pda_code', code);

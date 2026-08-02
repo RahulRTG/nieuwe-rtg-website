@@ -3,7 +3,7 @@
    Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -37,7 +37,7 @@ test('Geldschool: ouder zet weekgeld en verzilvert sterren; het kind ziet het in
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
 
     /* ---- de ouder op klusjes.html: weekgeld zetten en verzilveren ---- */
     await page.goto(base + '/apps/foundation/klusjes.html', { waitUntil: 'domcontentloaded' });

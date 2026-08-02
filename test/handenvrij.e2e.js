@@ -15,7 +15,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -47,7 +47,7 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.addInitScript((tok) => {
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl');

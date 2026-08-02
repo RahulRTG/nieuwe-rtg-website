@@ -4,7 +4,7 @@
    Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -34,7 +34,7 @@ test('Gevoelsdagboek: aantikken is vluchtig, bewaren is een keuze, herzien kan',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.goto(base + '/apps/foundation/gevoel.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate((sessie) => {
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));

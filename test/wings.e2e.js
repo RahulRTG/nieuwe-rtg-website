@@ -28,7 +28,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -62,7 +62,7 @@ async function meet(pwBrowser, base, token, breed, hoog) {
   const ctx = await pwBrowser.newContext({ viewport: { width: breed, height: hoog }, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const fouten = [];
-  page.on('pageerror', e => fouten.push(String(e.message)));
+  letOpFouten(page, fouten);
   /* EEN GECONTROLEERD BETAALOVERZICHT.
 
      Een vers lid heeft geen geschiedenis (en opladen vraagt eerst KYC), dus

@@ -152,10 +152,22 @@ function meet() {
   /* Tel de toetsen die zichzelf kunnen overslaan. We tellen de AANROEP, niet
      het bestand: een bestand met acht toetsen achter een poort is acht toetsen
      die niet draaien. Zowel `{ skip: X }` als `{ skip: X ? .. : .. }` telt mee,
-     en `skip: false` juist niet -- dat is een poort die openstaat. */
+     en `skip: false` juist niet -- dat is een poort die openstaat.
+
+     COMMENTAAR TELT NIET MEE, en dat is hier een geleerde les en geen detail.
+     Deze teller las de RUWE bron, dus een toets die in zijn kop uitlegt hoe die
+     skip-regel eruitziet, telde als een extra overgeslagen toets. Precies dat
+     gebeurde bij test/browserpoort.e2e.js -- een bestand dat juist bestaat OM
+     die poort te bewaken en zichzelf nooit overslaat. Dezelfde fout is op
+     2026-08-01 al een keer uit scripts/keuring.js gehaald (zie de eerste
+     notitie in NORM.json); een meter die tekst leest in plaats van code komt
+     kennelijk twee keer terug. Nu gaat de bron eerst door de wringer. */
+  const zonderCommentaar = (b) => String(b)
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
   let zelfpoortendeToetsen = 0;
   for (const f of inMap.filter(n => /\.(test|e2e)\.js$/.test(n))) {
-    const bron = fs.readFileSync(path.join(testMap, f), 'utf8');
+    const bron = zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8'));
     for (const m of bron.matchAll(/\{\s*skip\s*:\s*([^}]+)\}/g)) {
       if (!/^false\s*$/.test(m[1])) zelfpoortendeToetsen++;
     }

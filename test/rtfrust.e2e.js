@@ -4,7 +4,7 @@
    Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -27,7 +27,7 @@ test('Even rust: de ademteller loopt, de fasen wisselen en het stiltemoment vult
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.goto(base + '/apps/foundation/rust.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
 

@@ -273,6 +273,11 @@ async function elevateTier(base, memberToken, pas, approverToken) {
    onverkort mee -- dit filter noemt precies een bericht, geen patroon. */
 const BROWSERRUIS = ['Transition was skipped'];
 function letOpFouten(page, bak) {
+  /* De eigen browserdriver (server/lib/browser.js) heeft geen .on. Vroeger stond
+     bij elke aanroeper `if (page.on)` ervoor; nu staat die vraag hier, op een
+     plek. Zonder dit zou de omzetting naar dit hulpje die toetsen laten vallen
+     op precies de driver waar ze het soepelst mee moesten omgaan. */
+  if (!page || typeof page.on !== 'function') return bak;
   page.on('pageerror', (e) => {
     const bericht = String((e && e.message) || e);
     if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);

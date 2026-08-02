@@ -10,7 +10,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -55,7 +55,7 @@ test('de vier veiligheidsapps staan echt', { skip: pw ? false : 'geen browser be
       await t.test(titel, async () => {
         const page = await ctx.newPage();
         const fouten = [];
-        page.on('pageerror', (e) => fouten.push(String(e && e.message || e)));
+        letOpFouten(page, fouten);
         page.on('console', (m) => { if (m.type() === 'error') fouten.push('console: ' + m.text()); });
 
         await page.goto(srv.base + pad, { waitUntil: 'domcontentloaded' });

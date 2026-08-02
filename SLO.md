@@ -70,10 +70,10 @@ eigen gaten verzwijgt, erger is dan geen SLO-document.
 
 | Leden | RTO (schijf weg -> lid ingelogd) | RPO |
 |---|---|---|
-| 25.000 | 9,8 s | tot 24 uur |
-| 250.000 | 13,1 s | tot 24 uur |
+| 25.000 | 7,7 s | tot 24 uur |
+| 250.000 | 8,9 s | tot 24 uur |
 
-Gemeten op 29 juli 2026 met `scripts/hersteltijd.js`; zie `PRODUCTION.md` voor
+Gemeten op 2 augustus 2026 met `scripts/hersteltijd.js`; zie `PRODUCTION.md` voor
 de voorbehouden (lokale schijf, en de tijd tot het BESLUIT om te herstellen zit
 er niet in -- dat is meestal het langste deel).
 

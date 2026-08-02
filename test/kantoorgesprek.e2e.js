@@ -12,7 +12,7 @@
    Draai los: node --experimental-sqlite --test test/kantoorgesprek.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function laadBrowser() {
@@ -34,7 +34,7 @@ test('de kantoor-inlog is een gesprek, en je code staat niet in beeld',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.goto(base + '/apps/rtgkantoor.html', { waitUntil: 'domcontentloaded' });
 
     // 1) Rahul vraagt het, en het veld is gemaskeerd

@@ -52,7 +52,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 
 const PUB = path.join(__dirname, '..', 'public');
 
@@ -111,7 +111,7 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
     await Promise.all(werk.map(async (lijst) => {
       const page = await browser.newPage();
       const fouten = [];
-      page.on('pageerror', e => fouten.push(e.message));
+      letOpFouten(page, fouten);
       /* EEN 404 OP EEN EIGEN BESTAND GEEFT GEEN JS-FOUT.
 
          Een vergeten <script> of stylesheet levert geen uitzondering op: de

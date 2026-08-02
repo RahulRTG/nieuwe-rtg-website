@@ -13,7 +13,7 @@
    Draai los: node --experimental-sqlite --test test/poortgesprek.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function laadBrowser() {
@@ -41,7 +41,7 @@ test('Rahul vraagt het in beeld, en daarna gaat de handeling vanzelf door',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.goto(base + '/apps/foodcourt.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => {
       localStorage.setItem('rtg_member_token', t);

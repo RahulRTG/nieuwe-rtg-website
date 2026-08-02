@@ -124,5 +124,13 @@ jobs:
         run: node scripts/a11y.js
         env:
           A11Y_STRICT: '1'
+      # RTG_E2E_STRICT=1 zegt: deze omgeving BELOOFT schermtoetsen te draaien.
+      # test/browserpoort.e2e.js zakt dan als er geen browser is. Zonder die
+      # vlag slaan drieenveertig e2e-bestanden zichzelf stil over als Chromium
+      # ontbreekt, en meldt de stap "0 fail" -- groen zonder iets gezien te
+      # hebben. De stap hierboven installeert de browser; deze vlag controleert
+      # dat dat ook echt gelukt is.
       - name: Scherm-tests (PDA in de browser)
         run: npm run e2e
+        env:
+          RTG_E2E_STRICT: '1'

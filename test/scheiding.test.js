@@ -265,9 +265,9 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
     'server/routes/lesmaker.js POST /api/les/antwoord': 'klas-PDA: deelnemerToken is de sleutel',
     'server/routes/member/kopen/bezorg.js POST /api/partner': 'partnercode opzoeken: openbaar partnerprofiel',
     'server/routes/member/partnerkanaal.js POST /api/book': 'partnerkanaal: boeken zonder RTG-account, de reis-id is openbaar',
-    'server/routes/rtfkantoor.js POST /api/rtf/club/portaal': 'clubportaal: de clubcode is de sleutel van het eigen dossier',
-    'server/routes/rtfkantoor.js POST /api/rtf/club/bericht': 'clubportaal: de clubcode is de sleutel',
-    'server/routes/rtfkantoor.js POST /api/rtf/partner/raad': 'stadsraad-portaal: de partnercode is de sleutel',
+    'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/club/portaal': 'clubportaal: de clubcode is de sleutel van het eigen dossier',
+    'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/club/bericht': 'clubportaal: de clubcode is de sleutel',
+    'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/partner/raad': 'stadsraad-portaal: de partnercode is de sleutel',
     'server/routes/supplier/toegang.js POST /api/supplier/roster': 'openbaar rooster van een zaak op zaakcode',
     'server/routes/supplier/werving/sollicitaties.js POST /api/supplier/apply': 'solliciteren kan zonder account: de vacaturecode is openbaar',
     // (b) openbare inhoud achter een inlog

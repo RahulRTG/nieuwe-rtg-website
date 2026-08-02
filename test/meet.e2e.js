@@ -4,7 +4,7 @@
    beide leden hun eigen inlog hebben. Draait alleen met een browser. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -41,7 +41,7 @@ test('Meet: kamer maken, binnenkomen op code, echt verbinden en de hand opsteken
     const open = async (token) => {
       const ctx = await browser.newContext({ permissions: ['camera', 'microphone'] });
       const page = await ctx.newPage();
-      page.on('pageerror', e => fouten.push(e.message));
+      letOpFouten(page, fouten);
       await page.goto(base + '/apps/meet.html', { waitUntil: 'domcontentloaded' });
       await page.evaluate((tok) => {
         localStorage.setItem('rtg_member_token', tok);

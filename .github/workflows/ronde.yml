@@ -1,0 +1,126 @@
+### DE RONDE -- de zware metingen draaien vanzelf, niet als iemand eraan denkt.
+#
+# CI (ci.yml) draait bij elke push en moet daarom snel blijven. De Beproeving
+# duurt een kwartier en de dekkingsronde nog eens twintig minuten; die passen
+# daar niet in, en zijn dus tot nu toe alleen gedraaid als iemand ze met de
+# hand startte. Dat is precies de vorm waarin een ratel verslapt: NORM.json
+# staat vol tanden die alleen bewegen als er een mens langskomt.
+#
+# Deze workflow draait ze wekelijks. Wat hij WEL en NIET afdwingt is bewust
+# verschillend, en dat verschil is het hele punt:
+#
+#   MACHINE-ONAFHANKELIJK -> harde poort.
+#     De Beproeving heeft eigen drempels (nul onverwachte 5xx, rol-scheiding,
+#     geld op de cent, misbruik geweigerd, dekking). Die gaan niet over hoe
+#     snel de runner is, dus als er een zakt, zakt deze workflow.
+#
+#   MACHINE-AFHANKELIJK -> meten en tonen, niet oordelen.
+#     p99, doorvoer en event-loopvertraging op een GitHub-runner zijn andere
+#     getallen dan op de ontwikkelmachine. scripts/norm.js weet dat: hij
+#     vergelijkt alleen binnen dezelfde vingerafdruk (kernen/geheugen/platform/
+#     modus) en meldt anders "NIET VERGELEKEN". Die cijfers komen hier dus in
+#     de samenvatting en in een artefact terecht, en niet in een oordeel. Een
+#     p99 van een andere machine is geen slechtere p99 maar een andere.
+#
+# Wie hem tussendoor wil draaien: de Actions-tab, "Run workflow".
+
+name: De ronde (wekelijks)
+
+on:
+  schedule:
+    # zondagnacht 03:17 UTC. Een oneven minuut met opzet: precies op het uur
+    # staat de wachtrij van GitHub vol en wachten runs onnodig lang.
+    - cron: '17 3 * * 0'
+  workflow_dispatch:
+
+# Twee rondes tegelijk hebben geen zin: de tweede meet dezelfde bron op een
+# machine die al bezet is. Een lopende ronde afbreken doen we NIET -- een halve
+# beproeving is geen meting.
+concurrency:
+  group: ronde
+  cancel-in-progress: false
+
+jobs:
+  beproeving:
+    name: De Beproeving (storm, geld, misbruik, herstel)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      # De beproeving zakt zelf (exitcode 1) zodra een van zijn drempels breekt.
+      # `tee` zodat de volledige uitvoer ook bij een zak in het artefact staat:
+      # bij een eerdere ronde ging de aanleiding verloren omdat alleen de staart
+      # in beeld was, en dan weet je wel DAT hij zakte en niet waarop.
+      - name: De Beproeving (sqlite-schaal)
+        run: npm run beproeving 2>&1 | tee beproeving.log
+      # Ook als de stap hierboven zakt willen we de cijfers hebben.
+      - name: De norm (structureel hard, prestatie alleen gemeten)
+        if: always()
+        run: npm run norm
+      - name: Samenvatting in beeld
+        if: always()
+        run: |
+          {
+            echo '## De Beproeving'
+            echo ''
+            if [ -f BEPROEVING.json ]; then
+              echo '```json'
+              cat BEPROEVING.json
+              echo '```'
+            else
+              echo '_BEPROEVING.json is niet geschreven; zie het artefact voor de uitvoer._'
+            fi
+            echo ''
+            echo '> De prestatiecijfers hierboven zijn op een GitHub-runner gemeten.'
+            echo '> `scripts/norm.js` vergelijkt ze niet met de lat op de ontwikkelmachine:'
+            echo '> een p99 van een andere machine is geen slechtere p99 maar een andere.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: De uitvoer bewaren
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beproeving
+          path: |
+            beproeving.log
+            BEPROEVING.json
+          retention-days: 30
+
+  dekking:
+    name: Waargenomen endpoint-dekking en de samenhang
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      # De hele suite draait hier met het routejournaal aan. Wat daarin staat is
+      # ECHT aangeroepen -- geen tekstzoektocht door de tests, die telt ook een
+      # routenaam in een commentaarregel mee.
+      - name: De hele suite, met routejournaal
+        run: npm test
+        env:
+          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+      # Deze poort is wel hard: dekking is machine-onafhankelijk. De vloer staat
+      # in NORM.json (dekkingWaargenomenPct, endpointsNooitAangeraakt).
+      - name: Waargenomen endpoint-dekking (uit het journaal)
+        run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+      # De census: welke handhaver bewaakt welke categorie. Hij zakt als een
+      # categorie zonder bewaker komt te staan.
+      - name: De samenhang (wie bewaakt wat)
+        if: always()
+        run: npm run samenhang
+      - name: Het journaal bewaren
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: routejournaal
+          path: routejournaal.log
+          retention-days: 30

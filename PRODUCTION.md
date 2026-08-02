@@ -136,18 +136,25 @@ je iets aan de opslag verandert.
 database van een opgegeven omvang. Draai: `node --experimental-sqlite
 scripts/hersteltijd.js 250000`.
 
-Gemeten op **29 juli 2026**, op de ontwikkelmachine:
+Gemeten op **2 augustus 2026**, op de ontwikkelmachine:
 
 | Leden | Back-up | Terugzetten | Server op | **RTO** |
 |---|---|---|---|---|
-| 25.000 (13,9 MB) | 27 ms | 51 ms | 9,6 s | **9,8 s** |
-| 250.000 (144,2 MB) | 394 ms | 1,4 s | 11,6 s | **13,1 s** |
+| 25.000 (13,8 MB) | 14 ms | 14 ms | 7,6 s | **7,7 s** |
+| 250.000 (144,1 MB) | 210 ms | 166 ms | 8,7 s | **8,9 s** |
 
 RTO = van "de schijf is weg" tot "een lid is ingelogd en zijn naam is weer
-leesbaar". Tienmaal zoveel leden kost maar drie seconden extra, omdat het
+leesbaar". Tienmaal zoveel leden kost maar ruim een seconde extra, omdat het
 grootste deel de serverstart is en niet de gegevens -- dat is goed nieuws voor
 de schaalbaarheid en slecht nieuws als je de RTO omlaag wilt: dan moet de
 opstarttijd omlaag, niet de back-up.
+
+<sub>Ter vergelijking, dezelfde meting op 29 juli 2026: 9,8 s (25.000) en 13,1 s
+(250.000). Het verschil zit vrijwel helemaal in de serverstart en in het
+kopieren; de winst op het kopieren komt van het werk aan de opslaglaag van deze
+week. De rij van 250.000 werd 4,2 seconden sneller. Oude cijfers blijven hier
+staan omdat een RTO zonder trend niet te beoordelen is: een enkel getal kan een
+toevallig rustige machine zijn.</sub>
 
 **Twee dingen die deze cijfers NIET zeggen.** Ze zijn gemeten op een lokale
 schijf; een back-up van een tweede locatie ophalen telt daar de overdracht bij

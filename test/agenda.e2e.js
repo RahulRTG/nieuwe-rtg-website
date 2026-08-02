@@ -6,7 +6,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -42,7 +42,7 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     const als = async (token) => {
       await page.goto(base + '/apps/agenda.html', { waitUntil: 'domcontentloaded' });
       await page.evaluate((tok) => {

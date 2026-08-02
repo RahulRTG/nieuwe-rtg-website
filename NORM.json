@@ -1,15 +1,15 @@
 {
   "vastgelegd": "2026-08-02",
   "meters": {
-    "endpointsZonderTest": 632,
+    "endpointsZonderTest": 631,
     "dekkingPct": 75,
     "keuringStuk": 0,
     "keuringScheef": 0,
     "dependencies": 0,
-    "testbestanden": 478,
+    "testbestanden": 479,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 68,
-    "e2eBestanden": 42,
+    "zelfpoortendeToetsen": 70,
+    "e2eBestanden": 45,
     "keuringOmvang": 66,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
@@ -28,6 +28,12 @@
       "meter": "keuringBeter -> keuringOmvang / keuringDubbeling / keuringDekkingAdvies",
       "reden": "keuringBeter was een geblende teller van drie onvergelijkbare dingen en kon daardoor niet ratelen: een daling in de ene groep maskeerde een stijging in de andere, en het getal liep sowieso op zodra er een legitiem bestand bij kwam. Precies zo dook de dubbeling van teVaak() (drie kopieen van dezelfde rate limiter, waarvan er geen enkele werd opgeruimd) onder in het totaal. Vervangen door drie losse meters, elk met een eigen richting; verrekenen tussen groepen kan niet meer.",
       "eerlijkheidshalve": "De som stond op 126 toen de norm werd vastgelegd en op 130 toen hij werd gesplitst. Over die vier is geen ratel meer die klaagt. Ze zijn ontstaan door bestanden toe te voegen, niet door iets te laten verslechteren, en de enige inhoudelijke van de vijf (teVaak) is opgelost door de vier rate limiters op server/pinslot.js samen te voegen. Wie de oude, strengere som terug wil: zet keuringBeter terug in scripts/norm.js met grondwaarde 126 en knip vier bestanden op die vlak onder de 10 kB-grens zitten."
+    },
+    {
+      "datum": "2026-08-02",
+      "meter": "zelfpoortendeToetsen 68 -> 70",
+      "reden": "Met de hand VERHOOGD, en dat is het verlagen van de lat. De aanleiding zijn twee nieuwe schermtoetsen (test/wings.e2e.js en test/leven.e2e.js) die net als de eenenveertig andere e2e-bestanden achter `{ skip: pw ? false : 'geen browser beschikbaar' }` staan. Die poort is een keuze: wie de suite draait zonder Playwright hoort niet op een muur rood te stuiten voor iets wat niet zijn schuld is.",
+      "eerlijkheidshalve": "Deze meter telt toetsen die zichzelf kunnen overslaan, en dat is precies het risico dat hier groeit: draait ergens een suite zonder browser, dan slaan drieenveertig bestanden zichzelf over en meldt de uitvoer 0 fail. De tand mocht daarom alleen omhoog MET een tegenwicht, en dat is er nu: test/browserpoort.e2e.js zakt hard als RTG_E2E_STRICT=1 staat en er geen browser gevonden wordt, en die vlag staat in .github/workflows/ci.yml op de e2e-stap. De poort blijft dus bestaan, maar hij kan niet meer stil openstaan waar het ertoe doet. Wie de tand terug wil op 68: dat kan alleen door twee schermtoetsen weg te halen, en dat is geen verbetering. Nog iets uit dezelfde ronde: de teller las de RUWE testbron, dus de skip-regel die in de KOP van test/browserpoort.e2e.js wordt uitgelegd telde mee -- het bestand dat zichzelf juist nooit overslaat gold als overgeslagen toets. Dat is dezelfde fout als de eerste notitie hierboven, nu in scripts/norm.js in plaats van scripts/keuring.js. De bron gaat daar nu eerst door zonderCommentaar(); zonder die reparatie had hier 71 gestaan."
     }
   ],
   "prestatie": {

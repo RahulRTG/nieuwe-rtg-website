@@ -14,7 +14,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -47,7 +47,7 @@ test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: pw ? fal
 
     const page = await ctx.newPage();
     const fouten = [];
-    page.on('pageerror', (e) => fouten.push(String(e && e.message || e)));
+    letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/berichten.html', { waitUntil: 'domcontentloaded' });
     /* de balk en het paneel horen er te komen zonder dat er iets geopend wordt.
        Let op 'attached', niet zichtbaar: sinds "Losse knoppen weg" staat er geen

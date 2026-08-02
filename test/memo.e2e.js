@@ -5,7 +5,7 @@
    Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -40,7 +40,7 @@ test('Memo: de lijst leest de kluis en de samenvatting is eerlijk over het trans
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.goto(base + '/apps/memo.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(s => {
       localStorage.setItem('rtg_member_token', s.token);

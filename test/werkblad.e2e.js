@@ -13,7 +13,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -56,7 +56,7 @@ test('kantoren: heel scherm, werkblad en een verplaatsbare console', { skip: pw 
     }, { lid: reg.token, kantoor: kantoor.token });
     const page = await ctx.newPage();
     const fouten = [];
-    page.on('pageerror', (e) => fouten.push(String(e && e.message || e)));
+    letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/kantoren.html', { waitUntil: 'domcontentloaded' });
     /* Wachten tot de PAGINA zich heeft aangemeld, niet tot het script bestaat.
        window.RTGWerkblad staat er zodra shared/werkblad.js is ingelezen, maar

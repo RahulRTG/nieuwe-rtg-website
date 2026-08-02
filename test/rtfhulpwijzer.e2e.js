@@ -4,7 +4,7 @@
    zelf een chat te forceren. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -31,7 +31,7 @@ test('Hulpwijzer: Meike praat via de gedeelde coach-laag en de privacyregel staa
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
-    if (page.on) page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.goto(base + '/apps/foundation/hulpwijzer.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(sess => {
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');

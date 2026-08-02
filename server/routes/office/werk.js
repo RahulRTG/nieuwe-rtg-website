@@ -82,7 +82,19 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
     // geslacht uit het paspoort vastleggen (v/m/x); stuurt de "naar de vrouw"-regel bij ontmoetingen
     const g = String(req.body.geslacht || '').toLowerCase();
     if (g === 'v' || g === 'm' || g === 'x') md.geslacht = g;
+    /* De klok van de bewaartermijn: een jaar na DEZE datum wist de
+       bewaarveger de scan en de selfie (besluit van de eigenaar in het
+       papierwerkregister, 2 augustus 2026). */
+    md.geverifieerdOp = new Date().toISOString();
     accounts.saveMemberState(user.id, md);
+  } else {
+    /* Afgewezen = direct wissen. De afwijzingsmail vraagt om een nieuwe,
+       scherpere foto; het oude bewijs heeft dan geen doel meer en blijft
+       zonder deze regel eeuwig als restant in de kluis staan. */
+    const md = accounts.getMemberState(user.id) || {};
+    try { require('../../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR).wisAllesVan(user.id); } catch (e) {}
+    accounts.setVerification(user.id, status, null);
+    if (md.selfie) { delete md.selfie; accounts.saveMemberState(user.id, md); }
   }
   mail.send(accounts.emailOf(user), status === 'verified' ? 'Uw identiteit is geverifieerd' : 'Uw verificatie is afgewezen',
     'Beste ' + accounts.realNameOf(user) + ',\n\n' +

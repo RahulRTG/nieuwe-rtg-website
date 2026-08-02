@@ -3542,6 +3542,15 @@ setInterval(() => {
 }, 5 * 60 * 1000).unref();
 backupData();
 setInterval(backupData, 24 * 60 * 60 * 1000);
+/* De bewaarveger: de wisregels die de eigenaar in het papierwerkregister
+   heeft gekozen (locatiesporen 7 dagen, ID-bewijs 1 jaar na goedkeuring,
+   afgewezen bewijs als vangnet). Draait elk uur en een keer bij de start. */
+const bewaarveger = require('./bewaarveger').maakBewaarveger({
+  db, save, accounts, log,
+  identiteitsmap: require('./identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR)
+});
+try { bewaarveger.veeg(); } catch (e) { log.warn && log.warn('[bewaarveger] eerste ronde: ' + e.message); }
+bewaarveger.start();
 
 // Eerlijke opstartcontrole: waarschuw als demo-instellingen mee naar productie gaan.
 if (PRODUCTION) {

@@ -13,7 +13,8 @@
     "keuringOmvang": 66,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
-    "endpointsNooitAangeraakt": 0
+    "endpointsNooitAangeraakt": 0,
+    "onbewaakt": 0
   },
   "notities": [
     {

@@ -272,8 +272,22 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | geen productiestart op een opslag zonder grootboek | `server/config/productie-opslag.js` |
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
+| wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
 | de pijplijn die dit alles draait | `.github/workflows/ci.yml` |
 
 Wat hier niet in staat, wordt niet gehandhaafd. Dat is geen tekortkoming van de
 lijst maar informatie: het zegt precies waar je op mensen vertrouwt.
+
+En sinds `scripts/samenhang.js` is die lijst niet langer alleen een belofte in
+tekst (regel 6). Die census draait de vraag om: niet "zakt er iets" maar "kijkt
+er iemand". Hij houdt per soort ding bij welke handhaver ernaar kijkt, meldt met
+naam wat niemand bewaakt, en zakt zodra een soort een handhaver noemt die niet
+bestaat. Nieuw werk valt vanzelf in een soort; valt het in geen enkele soort,
+dan is dat zelf de melding.
+
+Wat hij NIET kan: bewijzen dat een handhaver iets zinnigs beweert. Dat blijft
+regel 2 en regel 10. Zijn eerste versie telde of een bestandsnaam ergens in een
+toets voorkwam en meldde 849 valse gevallen -- die maatstaf is weggegooid en
+vervangen door echte dekkingsdata, want een census die je moet wegstrepen wordt
+binnen een week genegeerd.

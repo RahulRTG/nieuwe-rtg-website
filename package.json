@@ -42,6 +42,8 @@
     "norm": "node --experimental-sqlite scripts/norm.js",
     "norm:vast": "node --experimental-sqlite scripts/norm.js --vastleggen",
     "dekking": "node --experimental-sqlite scripts/dekking.js",
-    "dekking:vast": "node --experimental-sqlite scripts/dekking.js --vastleggen"
+    "dekking:vast": "node --experimental-sqlite scripts/dekking.js --vastleggen",
+    "samenhang": "node --experimental-sqlite scripts/samenhang.js",
+    "samenhang:vast": "node --experimental-sqlite scripts/samenhang.js --vastleggen"
   }
 }

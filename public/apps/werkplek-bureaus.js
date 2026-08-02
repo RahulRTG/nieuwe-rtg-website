@@ -18,7 +18,7 @@
 
   /* Wat elk bureau maakt en wat je ermee kunt. "blad" is het technische stuk
      (tech pack, specsheet, stuklijst, bouwstaat); dat werkt ook zonder
-     AI-sleutel, want de bureaus vallen dan terug op hun eigen bank. */
+     AI-sleutel, want de bureaus vallen dan terug op hun eigen voorbeeldenbank. */
   var B = {
     atelier: { naam: 'Atelier', glyf: 'mode', wat: 'Mode en alles wat u aan het lijf draagt',
       lijst: 'ontwerpen', titel: 'naam', tekst: 'brief', maak: '/maak',

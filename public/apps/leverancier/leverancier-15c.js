@@ -19,7 +19,7 @@
           '<div class="st-row"><span>'+T('th.ink','Inkomsten (afgeronde verblijven)')+'</span><b style="color:var(--gold);">'+eur(bord.inkomstenTotaal)+'</b></div>'+
           '<div class="st-row"><span>'+T('th.bez','Bezetting komende 30 dagen')+'</span><b>'+bord.bezettingPct+'%</b></div>'+
           '<div class="st-row"><span>Superhost</span><b>'+(bord.superhost ? '★ '+T('th.ja','ja') : T('th.nog','nog niet (3 verblijven, gemiddeld 4,8+)'))+'</b></div>'+
-          '<div class="tkc-who">'+T('th.uitbet','Uitbetalingen staan gepland naar de zakelijke RTG Bank-rekening; RTG houdt 0% in. Gasten zien uw zaaknaam als host.')+'</div></div>';
+          '<div class="tkc-who">'+T('th.uitbet','Uitbetalingen staan gepland naar de zakelijke RTG Rekening; RTG houdt 0% in. Gasten zien uw zaaknaam als host.')+'</div></div>';
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.aanvragen','Aanvragen')+' ('+bord.aanvragen.length+')</h3>'+
           (bord.aanvragen.length ? bord.aanvragen.map(function(a){
             return '<div class="st-row"><span><b>'+escT(a.titel)+'</b> · '+escT(a.van)+' → '+escT(a.tot)+' · '+a.gasten+' '+T('th.gasten','gasten')+

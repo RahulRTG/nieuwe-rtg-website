@@ -90,12 +90,17 @@ verkocht wordt; de keuring dekt de vlaggenschip-schermen, niet alle 189.
 partner is merchant of record, staat zo in de voorwaarden); Stripe als rail;
 productie weigert te starten zonder betaalconfiguratie.
 
+**Deze ronde:** het product heet nu **RTG Rekening**. Elke zichtbare
+zelfaanduiding als "bank" is vervangen (schermen, app-gids, backoffice,
+EN-vertalingen, bron-labels op afschriften); over de banken van derden mag
+gewoon worden geschreven. De pin in test/eu-naleving.test.js loopt alle
+uitgeleverde schermen langs en zakt zodra de naam terugkomt.
+
 **Niet in code op te lossen, en met stip het urgentst:**
-1. **"RTG Bank" als naam schendt Wft artikel 3:7** (het woord "bank" zonder
-   bankvergunning; zie MARKT.md met bron). Hernoemen is een merkbesluit van
-   de eigenaar -- 41 bestanden verwijzen naar de naam, de hernoeming zelf is
-   een dag werk zodra de nieuwe naam er is. Ook "sparen en krediet" in de
-   app-gids moet dan mee.
+1. **De ACTIVITEIT blijft de vraag** (Wft/EMD2): rekeningen, tegoedrente en
+   krediet aanbieden is vergunningplichtig werk, hoe het ook heet. De
+   hernoeming haalt de naamsovertreding (Wft 3:7) weg, niet de
+   activiteitsvraag; dat is en blijft taak 23.
 2. **RTG Pay-saldi zijn elektronisch geld.** Route om klein te beginnen: de
    DNB-vrijstelling (tot 5M uitstaand, max 150 euro per rekening,
    registratie + jaarrapportage). Zie MARKT.md; dit is taak 23.

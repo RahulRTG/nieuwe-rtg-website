@@ -56,3 +56,28 @@ test('AI-verordening art. 50 lid 2: campagnebeeld is als AI-gegenereerd benoemd'
 test('DSA: er is een benoemd contactpunt voor meldingen en toezichthouders', () => {
   assert.match(lees('public/apps/juridisch/privacy.html'), /contactpunt/, 'het contactpunt staat in het beleid');
 });
+
+test('Wft 3:7: het platform noemt zichzelf nergens meer "bank"', () => {
+  /* Het woord "bank" in eigen naam of bedrijfsvoering vraagt een
+     bankvergunning (Wft 3:7). Het product heet nu RTG Rekening. Deze pin
+     loopt ALLE uitgeleverde schermen en de app-gids langs; hij kijkt naar de
+     eigennaam ("RTG Bank") en naar de zelfaanduiding ("eigen bank"), niet
+     naar het losse woord -- over de banken van anderen (kinderrechten-les,
+     een bankpas van een lid) mag gewoon worden geschreven. */
+  const wortel = path.join(__dirname, '..');
+  const fouten = [];
+  const loop = (map) => {
+    for (const naam of fs.readdirSync(map)) {
+      const vol = path.join(map, naam);
+      if (fs.statSync(vol).isDirectory()) { if (!/dist$/.test(vol)) loop(vol); continue; }
+      if (!/\.(html|js|webmanifest)$/.test(naam)) continue;
+      const b = fs.readFileSync(vol, 'utf8');
+      if (/RTG Bank/.test(b) || /[Ee]igen bank\b/.test(b))
+        fouten.push(path.relative(wortel, vol));
+    }
+  };
+  loop(path.join(wortel, 'public'));
+  const gids = lees('server/kern/appgids-data/deel1.js');
+  if (/RTG Bank/.test(gids)) fouten.push('server/kern/appgids-data/deel1.js');
+  assert.deepEqual(fouten, [], 'deze bestanden noemen het platform nog "bank":\n  ' + fouten.join('\n  '));
+});

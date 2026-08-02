@@ -5,7 +5,7 @@
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Bank</title>
+<title>RTG Rekening</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
@@ -73,7 +73,7 @@
 <body class="rtg-stijl">
 <header>
   <button class="terug" id="terug">←</button>
-  <div><div class="ey">RTG · Eigen bank</div><h1>RTG Bank</h1></div>
+  <div><div class="ey">RTG · Eigen rekening</div><h1>RTG Rekening</h1></div>
 </header>
 <main id="app"><div class="leeg">Laden…</div></main>
 
@@ -96,13 +96,13 @@ async function laad(){
 
 function render(){
   if (!OV.online) {
-    $('#app').innerHTML = '<div class="banner"><h2>Binnenkort</h2><p>De RTG Bank opent hier zodra RTG hem live zet. Je RTG Pay-wallet werkt gewoon door.</p></div>';
+    $('#app').innerHTML = '<div class="banner"><h2>Binnenkort</h2><p>RTG Rekening opent hier zodra RTG hem live zet. Je RTG Pay-wallet werkt gewoon door.</p></div>';
     return;
   }
   if (!OV.akkoord) {
     $('#app').innerHTML =
-      '<div class="banner"><h2>Open je RTG Bank-rekening</h2>' +
-      '<p>Je eigen bank binnen RTG: een rekening met een echt IBAN, sparen tegen ' + (OV.spaarrentePct) + '% rente, passen en meer. Gebouwd op hetzelfde grootboek als RTG Pay. Alle premium functies zijn inbegrepen -- gratis. Heb je de Business Pass, dan komt je zakelijke rekening er automatisch bij. Ga je akkoord, dan openen we meteen je betaalrekening.</p>' +
+      '<div class="banner"><h2>Open je RTG Rekening</h2>' +
+      '<p>Je eigen rekening binnen RTG: een echt IBAN, met tegoedrente van ' + (OV.spaarrentePct) + '% rente, passen en meer. Gebouwd op hetzelfde grootboek als RTG Pay. Alle premium functies zijn inbegrepen -- gratis. Heb je de Business Pass, dan komt je zakelijke rekening er automatisch bij. Ga je akkoord, dan openen we meteen je betaalrekening.</p>' +
       '<div style="margin-top:1rem;"><button class="knop" id="akk">Ik ga akkoord en open mijn rekening</button></div></div>';
     $('#akk').addEventListener('click', async () => {
       try { await api('bank/akkoord'); OV = await api('bank/overzicht'); render(); ai(); }
@@ -152,7 +152,7 @@ async function hartLaad(){
     const h = await api('bank/hart', { limit: 25 });
     $('#hart').innerHTML = (h.regels && h.regels.length) ? h.regels.map(r =>
       '<div class="hrow"><div><span class="oms">' + esc(r.oms || r.soort) + '</span>' +
-        '<span class="pil' + (r.bron === 'RTG Bank' || r.bron === 'RTG Pay' ? ' rtg' : '') + '">' + esc(r.bron) + '</span>' +
+        '<span class="pil' + (r.bron === 'RTG Rekening' || r.bron === 'RTG Pay' ? ' rtg' : '') + '">' + esc(r.bron) + '</span>' +
         '<div class="sub">' + new Date(r.at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ' · ' + esc(r.tegen) + '</div></div>' +
       '<div class="bed">' + (r.af ? '−' : '+') + ' ' + euro(r.centen) + '</div></div>').join('')
       : '<div class="leeg">Nog geen boekingen.</div>';

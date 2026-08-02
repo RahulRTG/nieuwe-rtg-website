@@ -56,7 +56,7 @@ module.exports = {
   '/apps/wbw.html': G('Wie betaalt wat: groepsuitgaven bijhouden met een live balans.',
     ['Maak een groep en zet uitgaven erin', 'Zie live wie wat voorschoot', 'Verreken in één keer via RTG Pay'],
     'Direct na de vakantie verrekenen voorkomt het eeuwige "dat komt nog wel".'),
-  '/apps/bank.html': G('RTG Bank: je rekening, sparen en krediet in de vertrouwde RTG-stijl.',
+  '/apps/bank.html': G('RTG Rekening: je saldo, afschriften en betalingen in de vertrouwde RTG-stijl.',
     ['Bekijk je saldo en afschriften', 'Zet spaardoelen en volg ze', 'Vraag krediet aan; een mens beoordeelt'],
     'De AI adviseert, een mens beslist; zeker bij geld houden we die volgorde altijd aan.'),
   '/apps/balans.html': G('RTG Balans: je financiële overzicht en de boekhoudhulp.',

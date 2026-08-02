@@ -91,7 +91,7 @@ test('het hart-afschrift: alles op een afschrift, extern geld herkenbaar aan het
   assert.equal(hart.body.provider, 'Kaartnaad (demo)', 'zonder echte provider heet de naad eerlijk demo');
   const bronnen = new Set(hart.body.regels.map(r => r.bron));
   assert.ok(bronnen.has('Kaartnaad (demo)'), 'de storting via de derde partij draagt het providerlabel');
-  assert.ok(bronnen.has('RTG Bank'), 'de eigen overboeking staat er gewoon tussen');
+  assert.ok(bronnen.has('RTG Rekening'), 'de eigen overboeking staat er gewoon tussen (het label heet sinds de Wft 3:7-hernoeming RTG Rekening)');
   for (const r of hart.body.regels) assert.ok(r.at && Number.isFinite(r.centen) && r.bron, 'elke regel heeft tijd, bedrag en bron');
 });
 

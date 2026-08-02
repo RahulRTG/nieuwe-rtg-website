@@ -54,14 +54,14 @@
           '<button class="obtn" id="gcRedeem">'+T('fn.gcredeem','In te wisselen')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('fn.regels','Regels in ')+f.landNaam+'</h3>'+
           f.regels.map(r => '<div class="tkc-who" style="line-height:1.5;">• '+r+'</div>').join('')+'</div>';
-        // de zakelijke rekening van de zaak bij RTG Bank: opent zichzelf bij het
+        // de zakelijke rekening van de zaak bij RTG Rekening: opent zichzelf bij het
         // eerste bezoek van de manager (gratis, hoort bij het financiele hart)
         if (!zakData && !zakBusy){
           zakBusy = true;
           API.call('/supplier/bank/zakelijk', {}).then(d => { zakData = d; zakBusy = false; renderStation(); })
             .catch(e => { zakData = { error: e.message }; zakBusy = false; renderStation(); });
         }
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.zak','Zakelijke rekening (RTG Bank)')+'</h3>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.zak','Zakelijke rekening (RTG Rekening)')+'</h3>'+
           (!zakData ? '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>'
            : zakData.error ? '<div class="tkc-who">'+zakData.error+'</div>'
            : '<div class="st-row"><span>'+escT(zakData.rekening.naam)+'<span class="sub">'+escT(zakData.rekening.iban)+'</span></span>'+

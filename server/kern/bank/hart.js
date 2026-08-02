@@ -29,7 +29,7 @@ module.exports = (ctx) => {
       if (!af && !bij) continue;
       const extern = String(r.van).startsWith('extern:') || String(r.naar).startsWith('extern:');
       uit.push({ at: r.at, af: af && !bij, centen: r.centen, soort: r.soort, oms: r.oms || '',
-        tegen: af && !bij ? r.naar : r.van, bron: extern ? providerLabel() : 'RTG Bank' });
+        tegen: af && !bij ? r.naar : r.van, bron: extern ? providerLabel() : 'RTG Rekening' });
       if (uit.length >= 400) break;
     }
     const wallet = 'lid:' + c;

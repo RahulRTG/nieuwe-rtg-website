@@ -729,15 +729,15 @@
     <div id="iLijst"><div class="leeg">Nog geen ideeën.</div></div>
   </section>
 
-  <!-- RTG Bank -->
+  <!-- RTG Rekening -->
   <section id="vBank" hidden>
     <div class="kop">
       <button class="terug" id="bankTerug">← alle kamers</button>
-      <h1>RTG Bank</h1>
+      <h1>RTG Rekening</h1>
     </div>
-    <p class="deck">De eigen bank van RTG, gebouwd op het RTG Pay-grootboek met dubbele boekhouding. De knop met drie standen schakelt de clearing van de externe kaart-rails (partner), via beide naast elkaar (hybride), naar uitsluitend de eigen bank (eigen). Zo staat RTG met één druk klaar voor het eigen betaalsysteem.</p>
+    <p class="deck">De eigen rekeninglaag van RTG, gebouwd op het RTG Pay-grootboek met dubbele boekhouding. De knop met drie standen schakelt de clearing van de externe kaart-rails (partner), via beide naast elkaar (hybride), naar uitsluitend het eigen huis (eigen). Zo staat RTG met één druk klaar voor het eigen betaalsysteem.</p>
 
-    <h3 class="sec">De knop: van de kaart-rails naar de eigen bank</h3>
+    <h3 class="sec">De knop: van de kaart-rails naar het eigen huis</h3>
     <div class="kaart" id="bankKnop"></div>
 
     <h3 class="sec">Bank-gezondheid</h3>
@@ -858,7 +858,7 @@ async function laadKamers(){
   const d = await api('kamers');
   toon('vKamers');
   const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">'+ico('balans')+'</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
-    '<button class="kaart kamer board" data-kamer="bank"><span class="ic">'+ico('bank')+'</span><h2>RTG Bank</h2><p>De eigen bank op het Pay-grootboek. Eén knop van de kaart-rails naar de eigen bank.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="bank"><span class="ic">'+ico('bank')+'</span><h2>RTG Rekening</h2><p>De eigen rekeninglaag op het Pay-grootboek. Eén knop van de kaart-rails naar het eigen huis.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
     '<button class="kaart kamer board" data-kamer="stad"><span class="ic">'+ico('stad')+'</span><h2>RTG Stad</h2><p>De hele stad slimmer op eigen hardware en software: Stadsdozen meten, één knop zet de stand.</p><span class="kpi">De stadsinfrastructuur →</span></button>' +
     '<button class="kaart kamer board" data-kamer="redactie"><span class="ic">'+ico('nieuws')+'</span><h2>RTG Redactie</h2><p>Krant, magazine en drukkerij in eigen huis; de nieuwstips komen uit het hele platform.</p><span class="kpi">Naar het perskantoor →</span></button>' +
     '<button class="kaart kamer board" data-kamer="techniek"><span class="ic">'+ico('schild')+'</span><h2>Techniek &amp; De Wacht</h2><p>De motor onder de motorkap: sluiten beide grootboeken op de cent, draait de Rust-motor mee, en werpt De Wacht netjes load af onder druk?</p><span class="kpi">De controlekamer →</span></button>' +
@@ -2125,9 +2125,9 @@ async function openPaniek(){
   }));
 }
 
-/* ---------- RTG Bank ---------- */
+/* ---------- RTG Rekening ---------- */
 const bkEuro = c => '€ ' + ((Number(c) || 0) / 100).toFixed(2);
-const BK_MODUS = { partner: 'Partner · kaart-rails', hybride: 'Hybride · beide', eigen: 'Eigen bank' };
+const BK_MODUS = { partner: 'Partner · kaart-rails', hybride: 'Hybride · beide', eigen: 'Eigen rekeninghuis' };
 const bkLijn = 'border-bottom:1px solid rgba(255,255,255,.08);';
 let bankGewired = false;
 async function openBank(){
@@ -2186,7 +2186,7 @@ function bankRenderKnop(r){
       '<label style="font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankLeden"' + (r.ledenAan ? ' checked' : '') + '> Live voor leden</label>' +
       '<button class="knop stil" id="bankNood" style="margin-left:auto;border-color:var(--burgundy);">Noodstop</button>' +
     '</div>' + nood + aut +
-    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--gold);">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen bank is operationeel.' : 'De eigen bank staat nog uit.') + ' Opschalen vraagt een tweede persoon; afschalen (terug naar partner) mag direct.</p>' +
+    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--gold);">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen rekeninglaag is operationeel.' : 'De eigen rekeninglaag staat nog uit.') + ' Opschalen vraagt een tweede persoon; afschalen (terug naar partner) mag direct.</p>' +
     '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">' + seg +
       ' <button class="knop" id="bankDraai" style="padding:.45rem 1rem;">Eén slag verder →</button>' +
       '<label style="margin-left:auto;font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankOper"' + (r.operationeel ? ' checked' : '') + '> Bank operationeel</label>' +
@@ -2201,7 +2201,7 @@ function bankRenderKnop(r){
   if ($('#bankIntrek')) $('#bankIntrek').addEventListener('click', async () => { try { await api('bank/autoriseer/annuleer', {}); meld('Ingetrokken.'); bankVervers(); } catch (err) { meld(err.message); } });
 }
 function bankRenderGezond(g){
-  const tegels = [['Deposito', bkEuro(g.depositoCenten)], ['In omloop (eigen bank)', bkEuro(g.inOmloopCenten)], ['Krediet uit', bkEuro(g.kredietCenten)], ['Rente betaald', bkEuro(g.renteBetaaldCenten)], ['Reserve', bkEuro(g.reserveCenten)], ['Naar de foundation', bkEuro(g.foundationCenten)], ['Rekeningen', String(g.aantalRekeningen)], ['Sluitcontrole', g.sluit.klopt ? '✓ klopt' : '✗ ' + g.sluit.som]];
+  const tegels = [['Deposito', bkEuro(g.depositoCenten)], ['In omloop (eigen huis)', bkEuro(g.inOmloopCenten)], ['Krediet uit', bkEuro(g.kredietCenten)], ['Rente betaald', bkEuro(g.renteBetaaldCenten)], ['Reserve', bkEuro(g.reserveCenten)], ['Naar de foundation', bkEuro(g.foundationCenten)], ['Rekeningen', String(g.aantalRekeningen)], ['Sluitcontrole', g.sluit.klopt ? '✓ klopt' : '✗ ' + g.sluit.som]];
   $('#bankGezond').innerHTML = tegels.map(([l, v], i) =>
     '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + ((i === tegels.length - 1 && !g.sluit.klopt) ? 'border-color:var(--burgundy);' : '') + '"><div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div><div style="font-size:1.05rem;color:var(--gold);margin-top:.25rem;">' + esc(v) + '</div></div>').join('');
 }
@@ -2355,7 +2355,7 @@ async function techVervers(){
   const payKlopt = gb.pay ? gb.pay.klopt : null, bankKlopt = gb.bank ? gb.bank.klopt : null;
   $('#techGrootboek').innerHTML =
     kpi(gb.pay ? techPill(payKlopt, 'Sluit ✓', 'DRIFT!') : '-', 'RTG Pay-grootboek' + (gb.pay ? ' · som '+gb.pay.som+'c' : '')) +
-    kpi(gb.bank ? techPill(bankKlopt, 'Sluit ✓', 'DRIFT!') : '-', 'RTG Bank-grootboek' + (gb.bank ? ' · som '+gb.bank.som+'c' : '')) +
+    kpi(gb.bank ? techPill(bankKlopt, 'Sluit ✓', 'DRIFT!') : '-', 'RTG Rekening-grootboek' + (gb.bank ? ' · som '+gb.bank.som+'c' : '')) +
     (gb.bank ? kpi(eur(gb.bank.depositoCenten), 'Deposito in de bank') : '') +
     (gb.bank ? kpi(eur(gb.bank.kredietCenten), 'Uitstaand krediet') : '');
   // --- motor ---
@@ -2370,7 +2370,7 @@ async function techVervers(){
         '<br><span class="leeg" style="display:inline;font-size:.72rem;">JS '+esc(String(s.jsVingerafdruk||'-'))+' · motor '+esc(String(s.motorVingerafdruk||'-'))+'</span></div>';
     };
     $('#techMotor').innerHTML = '<p style="margin:0 0 .5rem;">De motor is het autoritatieve grootboek; de JS-engine spiegelt en de drift-detector vergelijkt beide vingerafdrukken (modus <code>'+esc(m.modus)+'</code>).</p>'+
-      '<div style="display:flex;gap:1rem;flex-wrap:wrap;">'+stand('RTG Pay', m.pay)+stand('RTG Bank', m.bank)+'</div>';
+      '<div style="display:flex;gap:1rem;flex-wrap:wrap;">'+stand('RTG Pay', m.pay)+stand('RTG Rekening', m.bank)+'</div>';
   }
   // --- De Wacht ---
   const w = d.wacht;

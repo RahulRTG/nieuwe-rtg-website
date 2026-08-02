@@ -176,3 +176,12 @@ en de omgevingslezer plus de configuratiekeuring zijn echt gedraaid (inclusief
 een regel met `$(...)` erin, die letterlijk werd doorgegeven). **`launchctl`
 zelf is niet gedraaid**: dat kan alleen op macOS. De eerste echte
 `bootstrap` doe je op de Mac mini.
+
+Van `bijwerken.sh` geldt hetzelfde, en iets scherper: de weigeringen die je
+zonder macOS kunt uitlokken zijn gedraaid (geen macOS, onbekende optie), maar
+**het terugdraaien is nog nooit echt gebeurd**. Dat pad gaat door `git reset
+--hard` naar de vorige commit en een tweede `kickstart`, en dat kan alleen op de
+machine zelf worden bewezen. Wil je het zien werken voordat je het nodig hebt:
+draai het script een keer met een tak die opzettelijk niet start, bijvoorbeeld
+door tijdelijk een verplichte sleutel uit `rtg.env` te halen. Dan hoor je de
+site binnen een minuut weer te horen antwoorden op de oude versie.

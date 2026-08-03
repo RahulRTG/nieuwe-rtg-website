@@ -82,6 +82,7 @@
 </div>
 
 <script src="sessie.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -129,6 +130,22 @@ const URENREGELS = {
 };
 
 let leeftijd = 15, onderwerp = 'alles';
+
+/* Meenemen: de pagina kent zijn eigen model, dus geeft hij dat door in
+   plaats van de gedeelde laag naar het scherm te laten kijken. Wat je
+   meeneemt is precies wat er staat: de regels van het gekozen onderwerp,
+   met de leeftijdsgrens en of hij nu al voor jou geldt. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  const labels = {};
+  for (const o of ONDERWERPEN) labels[o.id] = o.label;
+  const zicht = REGELS.filter(r => onderwerp === 'alles' || r.o === onderwerp).sort((a, b) => a.v - b.v);
+  if (!zicht.length) return null;
+  return {
+    naam: 'leeftijdsregels',
+    kolommen: ['onderwerp', 'regel', 'vanaf', 'geldt voor jou', 'uitleg'],
+    rijen: zicht.map(r => [labels[r.o] || r.o, r.t, r.v + ' jaar', leeftijd >= r.v ? 'ja' : 'nee', r.u])
+  };
+});
 
 function urenSleutel(l) {
   if (l >= 18) return 18;
@@ -215,5 +232,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

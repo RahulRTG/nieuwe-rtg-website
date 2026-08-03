@@ -144,6 +144,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
@@ -158,9 +160,26 @@ const api = (actie, body) => fetch('/api/rtf/leren/' + actie, {
 
 function toon(v){ ['vLijsten','vHerhaal','vOverhoor','vSamen','vDuel'].forEach(x => $('#'+x).hidden = (x!==v)); }
 
+/* Meenemen (shared/uitvoer.js): wat er nu op het scherm staat. Ben je een
+   lijst aan het overhoren, dan zijn dat de paren zelf (vraag en antwoord);
+   anders het overzicht van je lijsten met hun omvang en je beste score. */
+let LIJSTEN = [];
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (O && O.paren && O.paren.length && !$('#vOverhoor').hidden) {
+    return { naam: 'overhoorlijst', kolommen: ['vraag', 'antwoord'],
+      rijen: O.paren.map(function (p) { return [p.v, p.a]; }) };
+  }
+  if (!LIJSTEN.length) return null;
+  return { naam: 'overhoorlijsten', kolommen: ['lijst', 'vragen', 'beste goed', 'beste totaal'],
+    rijen: LIJSTEN.map(function (l) {
+      return [l.naam, l.aantal, l.beste ? l.beste.goed : '', l.beste ? l.beste.totaal : ''];
+    }) };
+});
+
 /* ---------- overzicht ---------- */
 async function laadLijsten(){
   const [dl, ds] = await Promise.all([api('lijsten'), api('sessies')]);
+  LIJSTEN = dl.lijsten || [];
   $('#lijsten').innerHTML = dl.lijsten.length ? dl.lijsten.map(l =>
     '<div class="kaart rij"><div class="nm">'+esc(l.naam)+'<small>'+l.aantal+' vragen'+(l.beste ? ' · beste: '+l.beste.goed+' van '+l.beste.totaal : '')+'</small></div>'+
     '<button class="knop klein" data-oefen="'+l.id+'">Overhoren</button>'+
@@ -378,5 +397,6 @@ if (s) {
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

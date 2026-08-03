@@ -120,9 +120,25 @@ const api = (actie, body) => fetch('/api/rtf/leren/' + actie, {
 
 function toon(v){ ['vLijst','vProject'].forEach(x => $('#'+x).hidden = (x!==v)); if (v!=='vProject') clearInterval(poll); }
 
+/* Meenemen (shared/uitvoer.js): wat er nu op het scherm staat. Staat een
+   project open, dan zijn dat de taken met wie hem pakte en of hij af is;
+   anders het overzicht van de projecten met hun leden en hun voortgang. */
+let LIJST = [];
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (P && P.taken && !$('#vProject').hidden) {
+    if (!P.taken.length) return null;
+    return { naam: 'taken', kolommen: ['taak', 'wie', 'af'],
+      rijen: P.taken.map(function (t) { return [t.tekst, t.wie || '', t.af ? 'ja' : 'nee']; }) };
+  }
+  if (!LIJST.length) return null;
+  return { naam: 'projecten', kolommen: ['project', 'leden', 'taken af', 'taken totaal'],
+    rijen: LIJST.map(function (p) { return [p.titel, (p.leden || []).join(', '), p.af, p.taken]; }) };
+});
+
 /* ---------- overzicht ---------- */
 async function laadOverzicht(){
   const d = await api('projecten');
+  LIJST = d.projecten || [];
   $('#uitnodigingen').innerHTML = d.uitnodigingen.length ? '<h2 class="sec">Uitnodigingen</h2>' + d.uitnodigingen.map(u =>
     '<div class="kaart rij"><div class="nm">'+esc(u.titel)+'<small>van '+esc(u.van)+'</small></div>'+
     '<button class="knop klein" data-ja="'+u.id+'">Doe mee</button><button class="mini" data-nee="'+u.id+'">✕</button></div>').join('') : '';
@@ -156,7 +172,7 @@ async function openProject(id){
 }
 async function ververs(){
   let d; try { d = await api('project-staat', { id: P.id }); } catch (e) { toon('vLijst'); laadOverzicht(); return; }
-  const p = d.project; P.mijn = p.mijnCodenaam;
+  const p = d.project; P.mijn = p.mijnCodenaam; P.taken = p.taken;
   $('#pTitel').textContent = '' + p.titel;
   $('#pWat').textContent = p.wat || '';
   $('#pLeden').textContent = 'Samen met: ' + p.leden.join(', ') + (p.wachtOp ? ' · wacht op ' + p.wachtOp + ' uitnodiging(en)' : '');
@@ -233,5 +249,6 @@ if (qs.get('project')) openProject(qs.get('project'));
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -57,6 +57,9 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- de gedeelde uitvoerlaag; deze pagina meldt geen eigen bron aan (advies en
+     een gesprek zijn geen rijen), dus "Meenemen" blijft hier stil -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');

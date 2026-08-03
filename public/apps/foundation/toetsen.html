@@ -60,6 +60,7 @@
   <div id="toetsen"><div class="leeg">Nog geen toetsen gepland. Lekker rustig, of tijd om er een in te zetten?</div></div>
 </div>
 
+<script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -73,6 +74,24 @@ const api = (actie, body) => fetch('/api/rtf/tiener/' + actie, {
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 let VANDAAG = '';
+let TOETSEN = [];
+
+/* Meenemen (shared/uitvoer.js): de planner is het enige plekje waar deze
+   toetsen staan. Wie ze op papier of in een andere agenda wil, neemt ze mee
+   zoals de planner ze kent: vak, datum, wat, en hoe ver het leren is. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!TOETSEN.length) return null;
+  return {
+    naam: 'toetsen',
+    kolommen: ['vak', 'datum', 'wat', 'stappen', 'afgerond'],
+    rijen: TOETSEN.map(function (t) {
+      var plan = t.plan || [];
+      return [t.vak, t.datum, t.wat || '', plan.length,
+        plan.filter(function (p) { return p.af; }).length];
+    })
+  };
+});
+
 function dagLabel(d){
   if (d === VANDAAG) return 'vandaag';
   return new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -80,6 +99,7 @@ function dagLabel(d){
 async function laad(){
   const d = await api('toetsen');
   VANDAAG = d.vandaag;
+  TOETSEN = d.toetsen || [];
   $('#toetsen').innerHTML = d.toetsen.length ? d.toetsen.map(t => {
     const af = t.plan.filter(x => x.af).length;
     const wanneer = t.dagenTot === 0 ? 'vandaag!' : t.dagenTot === 1 ? 'morgen' : t.dagenTot > 1 ? 'over ' + t.dagenTot + ' dagen' : 'geweest';
@@ -116,5 +136,6 @@ laad();
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

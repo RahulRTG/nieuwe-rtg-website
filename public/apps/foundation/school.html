@@ -124,6 +124,7 @@
 
 <script src="/apps/util.js"></script>
 <script src="sessie.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const E = Util.el, vervang = Util.vervang, esc = Util.escapeHTML;
@@ -149,7 +150,24 @@ $('#naarLeraar').addEventListener('click', ()=>{
 $('#terugGezin').addEventListener('click', ()=> { toon('gezin'); });
 
 /* ---------- gezinsweergave ---------- */
-let ouder = false;
+let ouder = false, gezinStand = [];
+
+/* Meenemen: het cijferboek is van het gezin, dus geeft de app zijn eigen
+   model door in plaats van de gedeelde laag de kaarten te laten uitlezen.
+   Per cijfer: welk kind, welke klas, welk vak, het cijfer zelf en waar het
+   voor stond -- precies de velden die de kaart ook toont. */
+const dag10 = v => { const d = new Date(v); return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10); };
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  const rijen = [];
+  for (const x of gezinStand) for (const c of (x.cijfers || [])) {
+    rijen.push([dag10(c.at), x.kind.naam, x.klas.naam, c.vak || '',
+      String(c.cijfer), String(c.weging || 1), c.omschrijving || '']);
+  }
+  if (!rijen.length) return null;
+  return { naam: 'cijfers',
+    kolommen: ['datum', 'kind', 'klas', 'vak', 'cijfer', 'weging', 'omschrijving'], rijen };
+});
+
 async function laadGezin(){
   if (!s || !s.token){ toon('leraar'); return; }
   toon('gezin');
@@ -168,6 +186,7 @@ async function laadGezin(){
   toonUitnodigingen(d.uitnodigingen || []);
   laadPlanner();
   const lijst = d.school || [];
+  gezinStand = lijst;
   if (!lijst.length){
     vervang($('#schoolLijst'), E('div',{class:'kaart blok'},
       E('b', null, 'Nog geen klas gekoppeld'),
@@ -615,5 +634,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

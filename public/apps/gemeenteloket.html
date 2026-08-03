@@ -115,6 +115,8 @@
 .rahulsug{display:flex;gap:.35rem;flex-wrap:wrap;}
 .rahulsug button{background:var(--bg);border:1px solid var(--gold);color:var(--txt);border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
 </style>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -165,6 +167,43 @@ $('#loginGo').addEventListener('click', async () => {
 
 const TABS = [['meld','Meldingen'],['afs','Afspraken'],['verg','Vergunningen'],['bek','Bekendmakingen']];
 let HUIDIG = 'meld';
+
+/* Meenemen (shared/uitvoer.js): de werkvoorraad van de balie. Elk tabblad is
+   een eigen register met eigen velden, dus de uitvoer geeft het deel waar je
+   staat -- meldingen, afspraken, aanvragen of bekendmakingen. */
+let werkMeld = [], werkAfspr = [], werkVerg = [], werkBek = [], werkDatum = '';
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (HUIDIG === 'afs' && werkAfspr.length) return {
+    naam: 'afspraken',
+    kolommen: ['datum', 'tijd', 'soort', 'codenaam', 'status', 'nieuw adres', 'kenmerk'],
+    rijen: werkAfspr.map(function (a) {
+      return [werkDatum, a.tijd || '', a.soortLabel || a.soort || '', a.codenaam || '',
+        a.status, a.nieuwAdres || '', a.ref];
+    })
+  };
+  if (HUIDIG === 'verg' && werkVerg.length) return {
+    naam: 'vergunningen',
+    kolommen: ['datum', 'soort', 'omschrijving', 'locatie', 'aanvrager', 'status', 'kenmerk'],
+    rijen: werkVerg.map(function (v) {
+      return [String(v.at || '').slice(0, 10), v.soortLabel || v.soort || '', v.omschrijving || '',
+        v.locatie || '', v.aanvrager || '', v.status, v.ref];
+    })
+  };
+  if (HUIDIG === 'bek' && werkBek.length) return {
+    naam: 'bekendmakingen',
+    kolommen: ['datum', 'soort', 'titel', 'tekst'],
+    rijen: werkBek.map(function (b) { return [String(b.at || '').slice(0, 10), b.soort || '', b.titel, b.tekst]; })
+  };
+  if (HUIDIG !== 'meld' || !werkMeld.length) return null;
+  return {
+    naam: 'meldingen',
+    kolommen: ['datum', 'categorie', 'melding', 'locatie', 'ploeg', 'status', 'melder', 'kenmerk'],
+    rijen: werkMeld.map(function (m) {
+      return [String(m.at || '').slice(0, 10), m.categorieLabel || m.categorie || '', m.tekst,
+        m.locatie || '', m.ploeg || '', m.status, m.melder || '', m.ref];
+    })
+  };
+});
 function toon(t){
   HUIDIG = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
@@ -211,7 +250,7 @@ async function laadRegie(){
 const MELD_ST = ['nieuw','in behandeling','gepland','opgelost','afgewezen'];
 async function laadMeldingen(){
   let d; try { d = await api('/api/gemeente/meldingen'); } catch(e){ return; }
-  const l = d.meldingen || [];
+  const l = werkMeld = d.meldingen || [];
   $('#p-meld').innerHTML = l.length ? l.map(m =>
     '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.categorieLabel)+' · '+esc(m.ploeg)+'</h4>'+
     '<div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+' · melder '+esc(m.melder)+'</div>'+
@@ -226,14 +265,15 @@ async function laadMeldingen(){
 }
 async function laadAfspraken(){
   let d; try { d = await api('/api/gemeente/afspraken', {}); } catch(e){ return; }
-  const l = d.afspraken || [];
+  werkDatum = d.datum || '';
+  const l = werkAfspr = d.afspraken || [];
   $('#p-afs').innerHTML = '<div class="lbl">Afspraken op '+esc(d.datum)+' (en openstaande verhuizingen)</div>' + (l.length ? l.map(a =>
     '<div class="item"><h4>'+esc(a.soortLabel)+(a.tijd?' · '+esc(a.tijd):'')+'</h4><div class="meta">'+esc(a.codenaam)+(a.nieuwAdres?' · nieuw adres: '+esc(a.nieuwAdres):'')+'</div><span class="status">'+esc(a.status)+'</span></div>').join('') : '<div class="leeg">Geen afspraken vandaag.</div>');
 }
 const VG_ST = { verleend:'Verlenen', geweigerd:'Weigeren', 'in behandeling':'In behandeling nemen' };
 async function laadVergunningen(){
   let d; try { d = await api('/api/gemeente/vergunningen'); } catch(e){ return; }
-  const l = d.vergunningen || [];
+  const l = werkVerg = d.vergunningen || [];
   $('#p-verg').innerHTML = l.length ? l.map(v =>
     '<div class="item" data-ref="'+esc(v.ref)+'"><h4>'+esc(v.soortLabel)+'</h4><div class="meta">'+esc(v.omschrijving)+(v.locatie?' · '+esc(v.locatie):'')+' · '+esc(v.aanvrager||'')+'</div>'+
     '<span class="status">'+esc(v.status)+'</span>'+
@@ -256,7 +296,7 @@ $('#bekGo').addEventListener('click', async () => {
 });
 async function laadBekend(){
   let d; try { d = await api('/api/supplier/gemeente/bekendmakingen'); } catch(e){ return; }
-  const l = d.bekendmakingen || [];
+  const l = werkBek = d.bekendmakingen || [];
   $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Nog geen bekendmakingen.</div>';
 }
 
@@ -270,5 +310,6 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

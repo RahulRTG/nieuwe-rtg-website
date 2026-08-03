@@ -89,11 +89,28 @@
 <header><div><div class="ey">Postvak van de zaak</div><h1>RTMAIL</h1></div>
   <span class="tel" id="tel" hidden></span></header>
 <main id="main"><div class="leeg">Laden…</div></main>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_sup_token'); }catch(e){}
 let LIJST=[], MAP='inbox', ADRES=null;
+
+/* Meenemen (shared/uitvoer.js): het postvak zoals het openstaat -- ontvangen
+   of verzonden, met de tegenpartij, het onderwerp, de dag en of de afzender
+   geverifieerd was. Dat laatste is hier geen sierlabel maar het verschil
+   tussen een link die opengaat en een die op slot blijft, dus het hoort in
+   de uitvoer. Alleen de kop van elk bericht, niet de hele tekst. */
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!LIJST.length) return null;
+  var uit = MAP==='verzonden';
+  return { naam: uit?'verzonden':'ontvangen',
+    kolommen: [uit?'aan':'van','onderwerp','datum','geverifieerd'],
+    rijen: LIJST.map(function(m){
+      return [ (uit?m.naar:m.van)||'', m.onderwerp||'', String(m.at||'').slice(0,10),
+        uit ? '' : (m.vertrouwd?'ja':'nee') ];
+    }) };
+});
 const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(), dag=86400000;
   if(nu-d<dag && d.getDate()===nu.getDate()) return d.toTimeString().slice(0,5);
   if(nu-d<7*dag) return ['zo','ma','di','wo','do','vr','za'][d.getDay()];
@@ -155,7 +172,7 @@ async function apiW(pad, body){
 }
 const ROLNAAM={eigenaar:'eigenaar',management:'management',rahul:'AI van het huis',personeel:'personeel'};
 async function wmLaad(){
-  MAP='werkmail'; $('#tel').hidden=true;
+  MAP='werkmail'; LIJST=[]; $('#tel').hidden=true;   // het adressenscherm is geen postvak
   let d; try{ d=await apiW('overzicht'); }catch(e){ $('#main').innerHTML=schakelBalk()+'<div class="leeg">'+esc(e.message)+'</div>'; bindBalk(); return; }
   $('#main').innerHTML = schakelBalk()+
     '<div class="kaart" style="margin-bottom:.8rem;"><h2>'+esc(d.domein)+'</h2>'+
@@ -190,6 +207,7 @@ async function wmSlot(adres, aan){
 async function wmInbox(adres){
   let d; try{ d=await apiW('inbox',{adres}); }catch(e){ wmLaad(); return; }
   const lijst=d.berichten||[];
+  LIJST=lijst;
   $('#main').innerHTML='<button class="terug" id="terug">← alle adressen</button>'+
     '<div class="noot" style="text-align:left;margin:0 0 .8rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--gold);cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
     (lijst.length?lijst.map((m,i)=>'<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+esc((m.van||'@').slice(0,4).toUpperCase())+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>').join('')
@@ -306,6 +324,7 @@ async function verstuur(){
 laad();
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !$('#terug') && !$('#verstuur')) laad(); });
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

@@ -15,6 +15,20 @@
   var TOKEN = null;
   try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) { TOKEN = null; }
 
+  // wat er nu ter beslissing ligt; haal() vult dit
+  var AANVRAGEN = [];
+  /* Meenemen: de openstaande aanvragen, op codenaam -- echte namen staan in de
+     kluis en horen ook in een uitvoer niet mee. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!AANVRAGEN.length) return null;
+    return { naam: 'naamaanvragen', kolommen: ['uitgave', 'aangevraagd', 'makers', 'toelichting'],
+      rijen: AANVRAGEN.map(function (u) {
+        return [u.naam, String(u.at || '').slice(0, 10),
+          (u.makers || []).map(function (m) { return m.codenaam + ' (' + m.rol + ')'; }).join(', '),
+          u.toelichting || ''];
+      }) };
+  });
+
   function api(pad, body) {
     return fetch('/api/office/' + pad, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
@@ -53,6 +67,7 @@
       vlak.textContent = '';
       if (d.error) { vlak.appendChild(el('p', 'stil', d.error)); return; }
       var rij = d.aanvragen || [];
+      AANVRAGEN = rij;
       if (!rij.length) {
         vlak.appendChild(el('p', 'stil', 'Geen openstaande aanvragen. Er is niets te beslissen, ' +
           'en dat is een prima toestand.'));

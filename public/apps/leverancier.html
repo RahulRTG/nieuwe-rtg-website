@@ -1039,6 +1039,9 @@
      leverancier.js zijn inlogscherm opbouwt, vandaar hierboven en zonder defer -->
 <script src="/shared/mond.js"></script>
 <script src="/shared/rahulpoort.js"></script>
+<!-- uitvoer.js zonder defer en voor leverancier.js: dat script meldt zijn
+     eigen model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
+<script src="/shared/uitvoer.js"></script>
 <script src="/apps/leverancier.js"></script>
 <script>
 window.I18N = { en: {
@@ -1719,6 +1722,7 @@ window.I18N = { en: {
 <script src="/apps/translate.js"></script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/verbinding.js"></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/ondernemerpoort.js" defer></script>
 <script src="/shared/rahul-mond.js" defer></script>

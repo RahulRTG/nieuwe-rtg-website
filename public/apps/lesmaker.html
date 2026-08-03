@@ -95,6 +95,8 @@
     </div>
   </section>
 </main>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -102,6 +104,13 @@ const api = (pad, body) => fetch(pad, { method:'POST', headers:{'Content-Type':'
   .then(async r => { const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; });
 
 let CODE = null, TOKEN = null, LES = null, gekozenApp = '';
+/* Meenemen: de stand van de klas zoals de les hem bijhoudt -- de leraar
+   houdt zijn eigen uitslag, niet alleen een scherm dat straks weg is. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!LES || !(LES.stand || []).length) return null;
+  return { naam: 'klasstand', kolommen: ['plaats', 'naam', 'punten'],
+    rijen: LES.stand.map(function (x, i) { return [i + 1, x.naam, x.score]; }) };
+});
 
 /* app-zoeker over de bibliotheken */
 let zt; $('#mAppZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(async () => {
@@ -165,6 +174,7 @@ $('#lSluit').addEventListener('click', async () => {
   try { LES = (await api('/api/les/sluit', { code: CODE, leraarToken: TOKEN })).les; teken(); } catch(e){}
 });
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

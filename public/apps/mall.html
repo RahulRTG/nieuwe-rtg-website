@@ -119,6 +119,7 @@
 </section>
 
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -411,10 +412,28 @@ async function tekenReis(){
   } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
+/* Meenemen (shared/uitvoer.js): de adressenlijst van de mall zelf -- per
+   etage welke boutique er staat, in welke stad, hoeveel er in de kast ligt
+   en vanaf welke prijs. Dat is wat deze pagina bezit; de bibliotheken en
+   het Dienstenplein hebben elk hun eigen pagina en hun eigen lijst. */
+let MALL = null;
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!MALL || !MALL.etages) return null;
+  const rijen = [];
+  MALL.etages.forEach(function(e){
+    (e.boutieks || []).forEach(function(b){
+      rijen.push([e.label, b.naam, b.stad || '', b.aantal, b.vanaf == null ? '' : b.vanaf,
+        (b.categorieen || []).join(', ')]);
+    });
+  });
+  return rijen.length ? { naam: 'boutieks', kolommen: ['etage','zaak','stad','aanbod','vanaf','categorieen'], rijen: rijen } : null;
+});
+
 async function laad(){
   let d;
   try { d = await api('/api/mall'); } catch(e){ $('#etages').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   if (!d.etages || !d.etages.length){ $('#etages').innerHTML = '<div class="leeg">De mall wordt ingericht. Kom snel terug.</div>'; return; }
+  MALL = d;
   $('#etages').innerHTML = d.etages.map(e =>
     '<div class="etage"><div class="etage-kop"><h2>'+(window.RTGGlyf?RTGGlyf.svgHTML(e.icon,{klasse:'kop-glyf'}):'')+esc(e.label)+'</h2><span class="n">'+e.boutieks.length+' '+(e.boutieks.length===1?'boutique':'boutieks')+'</span></div>'+
     '<div class="boutieks">'+e.boutieks.map(b =>
@@ -812,6 +831,7 @@ $('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('o
 })();</script>
 
 <script src="/shared/glyf.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

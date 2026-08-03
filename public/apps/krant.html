@@ -65,12 +65,27 @@
   <div style="flex:1;min-width:0;"><div class="ey">RTG Krant</div><div class="titel" id="kop">Nieuws</div></div>
 </header>
 <main id="hoofd"></main>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const api=(pad,body)=>fetch('/api/krant/'+pad,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
 let ZAAK=(new URLSearchParams(location.search).get('zaak')||'').toUpperCase();
-let KRANT=null, RUBRIEK='alle';
+let KRANT=null, RUBRIEK='alle', GIDS=[];
+/* Meenemen: wat er open ligt. Staat er een krant open, dan de artikelen van
+   die krant; staat de gids open, dan de titels die er online staan. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (KRANT && (KRANT.artikelen||[]).length) {
+    return { naam:'krant-artikelen', kolommen:['titel','rubriek','auteur','gelezen'],
+      rijen:KRANT.artikelen.map(function(a){ return [a.titel, a.rubriek, a.auteur||'Redactie', a.gelezen||0]; }) };
+  }
+  if (GIDS.length) {
+    return { naam:'kranten', kolommen:['krant','payoff','artikelen'],
+      rijen:GIDS.map(function(k){ return [k.naam, k.payoff||'', k.artikelen]; }) };
+  }
+  return null;
+});
 
 $('#terug').addEventListener('click',()=>{ if(location.hash){ location.hash=''; } if(document.body.dataset.view==='artikel'){ toonKrant(); } else { ZAAK=''; gids(); } });
 
@@ -143,7 +158,7 @@ async function lees(id){
 async function gids(){
   document.body.dataset.view='gids'; $('#kop').textContent='RTG Krant';
   const h=$('#hoofd'); h.innerHTML='<div class="gids"><h1>RTG Krant</h1><p class="lead2">De kranten die nieuwsbedrijven binnen RTG uitgeven. Kies een titel om te lezen.</p><div class="grid" id="krantgrid"><div class="leeg">Laden…</div></div></div>';
-  try{ const d=await api('gids'); const g=$('#krantgrid'); g.innerHTML='';
+  try{ const d=await api('gids'); GIDS=d.lijst||[]; const g=$('#krantgrid'); g.innerHTML='';
     if(!(d.lijst||[]).length){ g.innerHTML='<div class="leeg">Nog geen kranten online.</div>'; return; }
     d.lijst.forEach(k=>{ const b=document.createElement('button'); b.className='krantkaart'; b.style.borderLeftColor=k.accent||'#7F1634';
       b.innerHTML='<div class="nm">'+esc(k.naam)+'</div><div class="po">'+esc(k.payoff||'')+'</div><div class="mt">'+k.artikelen+' artikel'+(k.artikelen===1?'':'en')+'</div>';
@@ -154,6 +169,7 @@ async function gids(){
 
 if(ZAAK) toonKrant(); else gids();
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>

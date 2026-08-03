@@ -59,6 +59,7 @@
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
 <script src="/shared/deur.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -71,9 +72,21 @@ const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '
 const AIBOX=app=>'<div class="kaart"><h2>Vraag de vlootbeheerder</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 let open=null;
+/* Meenemen (shared/uitvoer.js): het register van objecten zoals het logboek
+   het bijhoudt -- naam, soort, merk, bouwjaar, registratie, hoeveel regels
+   eronder hangen en wat er tot nu toe in omging. De detailregels per object
+   staan in het scherm eronder; dit is het register zelf. */
+let STAND=null;
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!STAND || !STAND.objecten || !STAND.objecten.length) return null;
+  return { naam:'objecten', kolommen:['naam','soort','merk','bouwjaar','registratie','regels','kosten'],
+    rijen: STAND.objecten.map(function(o){
+      return [o.naam, o.soort||'', o.merk||'', o.bouwjaar||'', o.registratie||'', o.regelAantal||0, o.kosten||0]; }) };
+});
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
   let d; try{ d=await api('logboek'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het logboek niet laden.</div>'; return; }
+  STAND=d;
   if(open){ const o=d.objecten.find(x=>x.id===open); if(o) return detail(d,o); open=null; }
   let h='';
   if(d.attenties.length){ h+='<div class="deel">Aandacht</div><div class="attn"><h2>Vraagt aandacht</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.object)+'</b> · '+esc(a.wat)+' · '+(a.verlopen?'verlopen':'vóór')+' '+dt(a.volgende)+'</div>').join('')+'</div>'; }
@@ -100,6 +113,7 @@ function detail(d,o){
 laad();
 </script>
 <script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

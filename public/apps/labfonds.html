@@ -119,6 +119,8 @@
   </div>
 </main>
 
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
@@ -134,6 +136,15 @@ async function api(pad, body){
 }
 
 let LOCS = [];
+/* Meenemen: de potten per locatie zoals het fonds ze bijhoudt. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!LOCS.length) return null;
+  return { naam: 'labfonds-locaties',
+    kolommen: ['locatie', 'land', 'in de pot', 'opgehaald', 'uitgekeerd', 'mijn bijdrage', 'open voorstellen'],
+    rijen: LOCS.map(function (l) {
+      return [l.naam, l.land || '', l.pot, l.opgehaald, l.uitgekeerd || 0, l.mijnBijdrage, l.open];
+    }) };
+});
 async function laad(){
   if (!TOKEN){ $('#anon').style.display='block'; return; }
   let d;
@@ -218,6 +229,7 @@ laad();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 </script>
 <script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>

@@ -820,6 +820,8 @@
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -870,9 +872,19 @@ function ico(naam){ return (window.RTGGlyf && RTGGlyf.heeft(naam))
   ? RTGGlyf.svgHTML(naam, { klasse:'gl-inline' }) : esc(naam == null ? '' : naam); }
 
 /* ---------- het kamergrid ---------- */
+let KAMERS = [];
+/* Meenemen: de kamers met hun missie, hun eigen maat en wat er openstaat. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!KAMERS.length) return null;
+  return { naam: 'kamers', kolommen: ['kamer', 'missie', 'maatstaf', 'waarde', 'open taken'],
+    rijen: KAMERS.map(function (k) {
+      return [k.naam, k.missie, (k.kpi || [])[0] || '', String((k.kpi || [])[1] == null ? '' : k.kpi[1]), k.takenOpen || 0];
+    }) };
+});
 async function laadKamers(){
   zetKamerUrl('');
   const d = await api('kamers');
+  KAMERS = d.kamers || [];
   toon('vKamers');
   const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">'+ico('balans')+'</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
     '<button class="kaart kamer board" data-kamer="bank"><span class="ic">'+ico('bank')+'</span><h2>RTG Rekening</h2><p>De eigen rekeninglaag op het Pay-grootboek. Eén knop van de kaart-rails naar het eigen huis.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
@@ -3121,6 +3133,7 @@ else uitgelogd();
 <script src="/apps/kantoren-atelier3d.js"></script>
 <script src="/apps/kantoren-collectieboek.js"></script>
 <script src="/shared/glyf.js"></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 <script src="/shared/werkblad.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

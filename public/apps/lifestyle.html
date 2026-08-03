@@ -80,6 +80,7 @@
 <div class="melding" id="melding"></div>
 
 <script src="/shared/deur.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -94,6 +95,15 @@ function datum(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return Number(
 
 let tab='overzicht';
 const TABS=[['overzicht','Overzicht'],['concierge','Concierge'],['bezit','Bezittingen'],['gezondheid','Gezondheid']];
+
+/* Meenemen (shared/uitvoer.js): De Rechterhand houdt per tabblad een andere
+   lijst vast -- attentiepunten, verzoeken, het bezittingenregister, de
+   afspraken. Elk paneel meldt zijn eigen model aan als het klaar is met
+   tekenen, zodat wat u meeneemt hetzelfde is als wat u ziet. Het
+   prive-dossier blijft erbuiten: dat zijn losse aantekeningen, geen register. */
+let UIT=null;
+function zetUit(naam, kolommen, rijen){ UIT = rijen.length ? { naam:naam, kolommen:kolommen, rijen:rijen } : null; }
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT; });
 
 async function start(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Rechterhand is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
@@ -130,6 +140,7 @@ async function vOverzicht(){
     + '<div class="chat"><div class="chatbox" id="aiA">Tot uw dienst. Zeg mij waarmee ik u kan helpen.</div></div></div>';
   $('#aiK').onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v) return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } };
   $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#aiK').click(); });
+  zetUit('attentiepunten',['object','soort','datum','verlopen'],att.map(a=>[a.naam,a.soort,a.datum||'',a.verlopen?'ja':'nee']));
 }
 const stat=(n,l)=>'<div class="stat"><div class="n">'+esc(n)+'</div><div class="l">'+esc(l)+'</div></div>';
 
@@ -162,6 +173,7 @@ function cLijst(v){
     + (x.status!=='afgerond'&&x.status!=='ingetrokken'?'<button class="weg" data-intrek="'+x.id+'" title="Intrekken">×</button>':'')+'</div>'
   ).join('') : '<div class="leeg">U heeft nog geen lopende verzoeken.</div>';
   $('#cLijst').querySelectorAll('[data-intrek]').forEach(b=> b.onclick=async()=>{ try{ await api('concierge/intrek',{id:b.dataset.intrek}); vConcierge(); }catch(e){ meld(e.message); } });
+  zetUit('verzoeken',['titel','categorie','status','ingediend'],v.map(x=>[x.titel,x.categorie,x.status,String(x.at||'').slice(0,10)]));
 }
 
 /* ---------- Bezittingenregister ---------- */
@@ -191,6 +203,8 @@ function bLijst(b){
     return '<div class="item"><div class="body"><b>'+esc(x.naam)+' <span class="status">'+esc(x.soort)+'</span></b><div class="meta">'+euro(x.waarde)+(info?' · '+info:'')+(x.notitie?'<br>'+esc(x.notitie):'')+'</div></div><button class="weg" data-weg="'+x.id+'" title="Verwijderen">×</button></div>';
   }).join('') : '<div class="leeg">Uw register is nog leeg.</div>';
   $('#bLijst').querySelectorAll('[data-weg]').forEach(b2=> b2.onclick=async()=>{ if(!confirm('Uit het register halen?')) return; try{ await api('bezit/weg',{id:b2.dataset.weg}); vBezit(); }catch(e){ meld(e.message); } });
+  zetUit('bezittingen',['naam','soort','waarde','verzekeraar','verzekerd-tot','taxatie-op','onderhoud-op'],
+    b.map(x=>[x.naam,x.soort,x.waarde||0,x.verzekeraar||'',x.verzekerdTot||'',x.taxatieOp||'',x.onderhoudOp||'']));
 }
 
 /* ---------- Gezondheid & welzijn ---------- */
@@ -224,6 +238,8 @@ function gLijst(a){
     + '<button class="weg" data-gweg="'+x.id+'" title="Verwijderen">×</button></div>'
   ).join('') : '<div class="leeg">Geen afspraken gepland.</div>';
   $('#gLijst').querySelectorAll('[data-gweg]').forEach(b=> b.onclick=async()=>{ try{ await api('gezondheid/afspraak/weg',{id:b.dataset.gweg}); vGezondheid(); }catch(e){ meld(e.message); } });
+  zetUit('afspraken',['wat','datum','tijd','specialist','waar'],
+    komend.map(x=>[x.wat,x.datum||'',x.tijd||'',x.specialist||'',x.waar||'']));
 }
 function nLijst(n){
   $('#nLijst').innerHTML = n.length ? n.map(x=>
@@ -234,6 +250,7 @@ function nLijst(n){
 
 start();
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

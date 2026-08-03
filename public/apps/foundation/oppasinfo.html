@@ -43,9 +43,12 @@
 <body class="rtg-stijl">
 <div id="balk"></div>
 <div class="wrap" role="main">
-  <h1>Belangrijke info</h1>
-  <div class="intro" id="intro">Alles wat een oppas, opa/oma of familielid moet weten om goed voor de kinderen te zorgen.</div>
-  <div class="bijgewerkt" id="bijgewerkt"></div>
+  <!-- rtgdeel-vast: de titel, de intro en de bewerkkant horen bij geen enkel
+       deel. Daardoor blijft #lezen als enige laag over en deelt het menu de
+       vier infokaarten daarbinnen op. -->
+  <h1 class="rtgdeel-vast">Belangrijke info</h1>
+  <div class="intro rtgdeel-vast" id="intro">Alles wat een oppas, opa/oma of familielid moet weten om goed voor de kinderen te zorgen.</div>
+  <div class="bijgewerkt rtgdeel-vast" id="bijgewerkt"></div>
 
   <!-- LEZEN -->
   <div id="lezen">
@@ -68,11 +71,11 @@
       <h2>Huisregels en bijzonderheden</h2>
       <div class="tekstblok" id="vHuisregels"><span class="leeg">Nog niets ingevuld.</span></div>
     </div>
-    <div class="knoprij"><button class="knop" id="naarBewerk" hidden>Info aanpassen</button></div>
+    <div class="knoprij rtgdeel-vast"><button class="knop" id="naarBewerk" hidden>Info aanpassen</button></div>
   </div>
 
   <!-- BEWERKEN (alleen ouder/beheerder) -->
-  <div id="bewerk">
+  <div id="bewerk" class="rtgdeel-vast">
     <div class="kaart blok">
       <h2>Noodnummers</h2>
       <div id="contactVelden"></div>
@@ -162,6 +165,7 @@ $('#bewaar').onclick = async ()=>{
 laad();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

@@ -76,9 +76,10 @@ async function laad(){
   if(open){ const r=d.relaties.find(x=>x.id===open); if(r) return detail(d,r); open=null; }
   let h='';
   if(d.aankomend.length){ h+='<div class="attn"><h2>Binnenkort</h2>'+d.aankomend.map(a=>'<div class="r"><b>'+esc(a.naam)+'</b> · '+esc(a.soort)+' '+tel(a.dagenTot)+'</div>').join('')+'</div>'; }
-  h+='<div class="kaart"><h2>Relatie toevoegen</h2><div class="rij"><input class="veld" id="rN" placeholder="naam"><select class="veld" id="rB">'+d.banden.map(b=>'<option>'+b+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="rV" type="date" title="verjaardag"><input class="veld" id="rJ" type="date" title="jubileum"></div><div class="rij"><input class="veld" id="rVo" placeholder="voorkeuren (bijv. houdt van boeken)"></div><div style="margin-top:.6rem;"><button class="knop" id="rAdd">+ relatie</button></div></div>';
+  h+='<div class="deel">Relatie toevoegen</div><div class="kaart"><h2>Relatie toevoegen</h2><div class="rij"><input class="veld" id="rN" placeholder="naam"><select class="veld" id="rB">'+d.banden.map(b=>'<option>'+b+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="rV" type="date" title="verjaardag"><input class="veld" id="rJ" type="date" title="jubileum"></div><div class="rij"><input class="veld" id="rVo" placeholder="voorkeuren (bijv. houdt van boeken)"></div><div style="margin-top:.6rem;"><button class="knop" id="rAdd">+ relatie</button></div></div>';
+  h+='<div class="deel">Uw relaties</div>';
   h+= d.relaties.length ? d.relaties.map(r=>'<div class="kaart rel" data-id="'+r.id+'"><div class="b"><div class="nm">'+esc(r.naam)+'</div><div class="meta">'+[r.band,r.verjaardag?'jarig '+md(r.verjaardag):''].filter(Boolean).join(' · ')+'</div></div>'+(r.dagenTot!=null?'<span class="tel'+(r.dagenTot<=30?' snel':'')+'">'+r.volgendeSoort+' '+tel(r.dagenTot)+'</span>':'')+'</div>').join('') : '<div class="kaart"><div class="leeg">Nog geen relaties.</div></div>';
-  h+=AIBOX('Bijv. wat geef ik mijn mentor voor zijn jubileum?');
+  h+='<div class="deel">Relatiesecretaris</div>'+AIBOX('Bijv. wat geef ik mijn mentor voor zijn jubileum?');
   $('#main').innerHTML=h;
   bindAi('attenties');
   $('#rAdd').onclick=async()=>{ const naam=$('#rN').value.trim(); if(!naam) return meld('Naam?'); try{ await api('attenties/relatie',{naam,band:$('#rB').value,verjaardag:$('#rV').value,jubileum:$('#rJ').value,voorkeuren:$('#rVo').value}); laad(); }catch(e){ meld(e.message); } };
@@ -96,6 +97,7 @@ function detail(d,r){
 }
 laad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

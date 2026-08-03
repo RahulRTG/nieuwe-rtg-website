@@ -149,13 +149,17 @@
      toonTaken(), dus wat u meeneemt is wat er op het scherm staat. De bezetting
      blijft erbuiten: dat zijn de codenamen van anderen. */
   var TAKEN = [], HUISNAAM = '';
+  /* De server zet "at" als GETAL (Date.now()); tekst afknippen gaf hier eerst
+     1785776577 in de kolom datum. Dus dezelfde weg als elk ander scherm: via
+     new Date(), en bij twijfel niets. */
+  var dag = function (w) { var d = new Date(w); return isNaN(d) ? '' : d.toISOString().slice(0, 10); };
   if (window.RTGUitvoer) RTGUitvoer.bron(function () {
     if (!TAKEN.length) return null;
     return {
       naam: 'taken-' + (HUISNAAM || 'werkplek').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       kolommen: ['datum', 'taak', 'status'],
       rijen: TAKEN.map(function (t) {
-        return [String(t.at || '').slice(0, 10), t.tekst, t.af ? 'af' : 'open'];
+        return [dag(t.at), t.tekst, t.af ? 'af' : 'open'];
       })
     };
   });

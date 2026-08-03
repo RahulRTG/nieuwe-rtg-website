@@ -41,6 +41,12 @@ const NORMBESTAND = path.join(WORTEL, 'NORM.json');
 /* Elke meter met de richting waarin hij mag bewegen. `omlaag` betekent: een
    lager getal is beter (minder ongedekte endpoints). `omhoog`: hoger is beter. */
 const METERS = [
+  /* De ratel op regel 10 zelf. check.js regel 35 eist dat ELKE meter in de
+     registratie van test/meterijk.test.js staat; deze meter telt hoeveel er
+     daar met alleen een REDEN staan in plaats van een proef. Dat is het
+     eerlijke gat: meters die we niet hebben zien uitslaan. Hij mag alleen
+     omlaag, dus het gat kan niet groeien en wordt over de tijd kleiner. */
+  { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' },
   { sleutel: 'endpointsZonderTest', richting: 'omlaag', wat: 'endpoints die in geen enkele test voorkomen' },
   { sleutel: 'dekkingPct', richting: 'omhoog', wat: 'percentage endpoints dat in een test voorkomt' },
   { sleutel: 'keuringStuk', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "stuk"' },
@@ -139,6 +145,33 @@ function telPerGroep(k) {
   return uit;
 }
 
+/* Hoeveel van ONZE meters staan in de ijk-registratie met alleen een reden?
+
+   Losse functie met de bron als invoer, en niet een leesactie diep in meet():
+   zo kan deze meter zelf geijkt worden (test/meterijk.test.js voert hem een
+   verzonnen registratie met een bekend aantal redenen). Een meter die zijn
+   eigen bron leest en nergens te voeden is, zou precies het soort meter zijn
+   waar regel 10 over gaat.
+
+   Hij telt alleen sleutels die ECHT in METERS of PRESTATIEMETERS staan. Een
+   eerdere versie telde elke `reden:` in het bestand en kwam op 16 waar
+   check.js op 13 uitkwam -- twee tellingen van hetzelfde ding die uiteenlopen
+   is hoe een meter begint te liegen. */
+function telOngeijkt(ijkBron) {
+  const sleutels = METERS.concat(PRESTATIEMETERS).map(m => m.sleutel);
+  const blok = /const IJKINGEN = \{([\s\S]*?)\n\};/.exec(ijkBron);
+  if (!blok) throw new Error('de IJKINGEN-registratie is niet te lezen; een meter zonder invoer is geen meter');
+  /* Een regel staat op EEN regel ({ reden: '...' }) of over meerdere; het
+     patroon mag dus geen regeleinde eisen. Een eerdere versie deed dat wel en
+     telde nul, terwijl er dertien stonden -- een meter die nul teruggeeft
+     omdat zijn patroon niet past, is precies de vorm waar deze meter over
+     gaat. Redenen bevatten nooit geneste accolades, dus [^{}] volstaat. */
+  return sleutels.filter(s => {
+    const m = new RegExp('(^|[^a-zA-Z0-9])' + s + '\\s*:\\s*\\{([^{}]*)\\}').exec(blok[1]);
+    return m && /reden:/.test(m[2]);
+  }).length;
+}
+
 function meet() {
   const uit = execFileSync(process.execPath,
     ['--experimental-sqlite', path.join(__dirname, 'keuring.js'), '--json'],
@@ -171,9 +204,19 @@ function meet() {
   const zonderCommentaar = (b) => String(b)
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
     .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+  /* En de derde keer was een tekenreeks. test/meterijk.test.js zet als ijking
+     een toets-met-skip in een TIJDELIJK bestand, en die regel staat dus als
+     letterlijke tekst in de ijking zelf -- waarop deze meter hem meetelde als
+     een echte zelfpoortende toets. Dezelfde fout als hierboven, een laag
+     dieper: commentaar ging al door de wringer, tekst nog niet. Een toets die
+     zichzelf werkelijk overslaat schrijft `{ skip: ... }` nooit binnen
+     aanhalingstekens, dus dit kost geen enkele echte melding (nagemeten over
+     de hele testmap: alleen meterijk.test.js verandert, 78 -> 77). */
+  const zonderTekst = (b) => String(b)
+    .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
   let zelfpoortendeToetsen = 0;
   for (const f of inMap.filter(n => /\.(test|e2e)\.js$/.test(n))) {
-    const bron = zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8'));
+    const bron = zonderTekst(zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8')));
     for (const m of bron.matchAll(/\{\s*skip\s*:\s*([^}]+)\}/g)) {
       if (!/^false\s*$/.test(m[1])) zelfpoortendeToetsen++;
     }
@@ -187,7 +230,19 @@ function meet() {
   try { routesNietSchakelbaar = require('./schakelbaar').meet().ongedekt.length; }
   catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
 
+  /* Hoeveel meters staan er in de ijk-registratie met alleen een REDEN? Die
+     hebben we dus NIET zien uitslaan. De teller leest het registratiebestand
+     zelf, want een getal dat je hier hardcodeert is precies het soort meter
+     waar regel 10 over gaat. Ontbreekt het bestand, dan is niets geijkt en
+     hoort deze meter dat te zeggen in plaats van stil nul te geven. */
+  const ijkPad = path.join(WORTEL, 'test/meterijk.test.js');
+  if (!fs.existsSync(ijkPad)) {
+    throw new Error('test/meterijk.test.js ontbreekt; dan is geen enkele meter geijkt en kan deze meter niet meten');
+  }
+  const metersOngeijkt = telOngeijkt(fs.readFileSync(ijkPad, 'utf8'));
+
   return {
+    metersOngeijkt,
     routesNietSchakelbaar,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
@@ -397,4 +452,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND };
+module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt };

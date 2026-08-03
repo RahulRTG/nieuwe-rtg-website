@@ -15,9 +15,16 @@
     "keuringDekkingAdvies": 8,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
-    "routesNietSchakelbaar": 0
+    "routesNietSchakelbaar": 0,
+    "metersOngeijkt": 13
   },
   "notities": [
+    {
+      "datum": "2026-08-03",
+      "meter": "metersOngeijkt (nieuw, nulmeting 13)",
+      "reden": "Regel 10 van LAT.md stond opgeschreven maar werd nergens afgedwongen: 'een meter die je niet hebt zien uitslaan, meet niets.' Nu wel, met drie tanden. test/meterijk.test.js voert elke geijkte meter een bekend-FOUTE invoer en eist dat hij die ziet; scripts/check.js regel 35 eist dat ELKE meter uit norm.js in die registratie voorkomt, met een proef of met een opgeschreven reden; en deze meter telt de redenen, richting omlaag. Zo kan een nieuwe meter niet ongemerkt ongeijkt meeliften, en is het gat een getal dat kleiner moet worden in plaats van een voornemen.",
+      "eerlijkheidshalve": "En meteen een vondst die precies dit punt maakt: `zelfpoortendeToetsen` sloeg uit op de ijking ZELF. Die zet als bekend-foute invoer een toets-met-skip in een tijdelijk bestand, dus staat die regel als letterlijke TEKST in test/meterijk.test.js -- waarop de meter hem meetelde als een echte zelfpoortende toets, en 78 meldde waar er 77 zijn. Commentaar ging in die meter al door de wringer (dat was op 2026-08-01 al een keer gerepareerd, met de opmerking dat een meter die tekst leest in plaats van code kennelijk terugkomt); tekst nog niet. Nu wel, en over de hele testmap verandert er precies een bestand: dat van de ijking. De verleiding was om de tekst op te knippen zodat de meter hem niet ziet -- dat is de meter bedriegen in plaats van repareren, en dat is de fout die deze hele ronde probeert uit te bannen. Dertien van de negentien meters dragen nog een reden en geen proef: zes prestatiecijfers (die komen uit een echte beproeving van een half uur op een echte machine) en zeven die een repo-brede staat vragen in plaats van een invoer die je in een toets neerzet. Dat is geen vrijbrief, dat is de open schuld, en hij staat nu op de teller. Alle zes proeven zijn met een mutatie nagetrokken: norm.js blind maken liet telkens precies de bijbehorende bewering zakken. De meter die de ongeijkte meters telt is zelf geijkt -- daarom neemt telOngeijkt() zijn bron als parameter in plaats van hem zelf te lezen; anders had juist de bewaker van het ijken zich aan het ijken onttrokken."
+    },
     {
       "datum": "2026-08-03",
       "meter": "zelfpoortendeToetsen 75 -> 77",

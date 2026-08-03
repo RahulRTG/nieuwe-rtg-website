@@ -1803,5 +1803,53 @@ console.log('\n34) elke AI-ingang draagt de toegangsregel, of staat erkend op de
   }
 }
 
+/* 35) Elke meter is geijkt, of zegt met naam waarom niet.
+
+   LAT-regel 10: "een meter die je niet hebt zien uitslaan, meet niets." Die
+   regel stond opgeschreven en werd door mensen bewaakt -- en juist daar zijn
+   op een dag zeven liegende meters gevonden. Deze regel maakt hem machinaal:
+   elke sleutel uit de METERS-lijst van scripts/norm.js moet voorkomen in de
+   registratie van test/meterijk.test.js, met OF een proef die hem op een
+   bekend-foute invoer laat uitslaan, OF een reden waarom dat in een toets
+   niet eerlijk kan.
+
+   Wat deze regel NIET doet: bewijzen dat de proef zinnig is. Dat blijft
+   regel 2 (natrekken met een mutatie). Wat hij wel doet: voorkomen dat een
+   NIEUWE meter ongemerkt ongeijkt meelift -- en dat was precies hoe de zeven
+   erin kwamen. */
+console.log('\n35) elke meter uit norm.js is geijkt of noemt zijn reden');
+{
+  const normBron = fs.readFileSync(path.join(ROOT, 'scripts/norm.js'), 'utf8');
+  const ijkPad = path.join(ROOT, 'test/meterijk.test.js');
+  if (!fs.existsSync(ijkPad)) {
+    fout('test/meterijk.test.js ontbreekt: zonder registratie is geen enkele meter geijkt');
+  } else {
+    const ijkBron = fs.readFileSync(ijkPad, 'utf8');
+    // alleen de sleutels uit de METERS-lijst, niet elke 'sleutel:' in het bestand
+    const lijst = /const METERS = \[([\s\S]*?)\n\];/.exec(normBron);
+    const prest = /const PRESTATIEMETERS = \[([\s\S]*?)\n\];/.exec(normBron);
+    const sleutels = [...(lijst ? lijst[1] : ''), ...(prest ? prest[1] : '')].length
+      ? [...((lijst ? lijst[1] : '') + (prest ? prest[1] : '')).matchAll(/sleutel:\s*'([a-zA-Z0-9]+)'/g)].map(m => m[1])
+      : [];
+    if (!sleutels.length) {
+      fout('geen enkele meter gevonden in scripts/norm.js -- deze regel meet dan zelf niets');
+    } else {
+      const mist = sleutels.filter(s => !new RegExp('(^|[^a-zA-Z0-9])' + s + '\\s*:\\s*\\{').test(ijkBron));
+      for (const s of mist) {
+        fout('meter "' + s + '" staat niet in de registratie van test/meterijk.test.js -- ' +
+          'voeg een proef toe die hem op een foute invoer laat uitslaan, of een reden waarom dat niet kan');
+      }
+      if (!mist.length) {
+        const metReden = sleutels.filter(s => {
+          const m = new RegExp(s + '\\s*:\\s*\\{([\\s\\S]{0,300}?)\\}').exec(ijkBron);
+          return m && /reden:/.test(m[1]);
+        }).length;
+        ok(sleutels.length + ' meters staan in de registratie (' + (sleutels.length - metReden) +
+          ' met een proef, ' + metReden + ' met een reden)');
+      }
+    }
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

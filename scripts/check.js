@@ -1862,5 +1862,77 @@ console.log('\n35) elke meter met een norm is geijkt of noemt zijn reden');
   }
 }
 
+
+/* ============================================================================
+   36) GEEN PROEFRESTANT IN DE GESCHIEDENIS
+
+   Dit is twee keer misgegaan, op precies dezelfde manier. Een ijking of een
+   mutatieproef verandert kortstondig een echt bestand -- dat MOET ook, want een
+   proef die de bron niet aanraakt bewijst niets -- en zet het daarna in een
+   `finally` weer terug. Committen gebeurt in dat venster van een paar seconden,
+   en dan staat het restant in de geschiedenis terwijl de werkboom er schoon
+   uitziet.
+
+   TAKEN 6.4 loste dat de eerste keer op met "sindsdien gaat elke tussenstand
+   eerst langs de diff". Dat is een voornemen, en LAT.md zegt precies wat een
+   voornemen waard is: het ging opnieuw mis, met een nep-dependency die npm
+   install bij de volgende ophaler zou laten struikelen.
+
+   Deze regel kijkt daarom niet naar de WERKBOOM maar naar wat er in de commit
+   staat. Dat is het hele punt: bij het geval van vandaag was de werkboom schoon
+   en HEAD vervuild, dus elke controle op de werkboom had groen gegeven.
+
+   WAAROM DE PATRONEN HIERONDER ZIJN OPGEKNIPT. De eerste versie schreef ze
+   voluit, en klaagde prompt over zijn eigen uitleg -- het bestand dat de marker
+   beschrijft bevat de marker. De verleiding is dan om check.js op een
+   uitzonderingslijst te zetten, maar dat maakt uitgerekend de handhaver zelf
+   het enige bestand waar een restant ongezien blijft. Opknippen kost een regel
+   leesbaarheid en houdt iedereen onder toezicht.
+   ========================================================================== */
+console.log('\n36) geen proefrestant in de laatste commit');
+{
+  const git = (...a) => cp.spawnSync('git', a, { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+
+  /* Zonder git valt er niets vast te stellen, en dan hoort deze regel te ZAKKEN
+     en niet stilzwijgend te slagen (LAT.md regel 3: een meter zakt als zijn
+     invoer ontbreekt). Anders is de handhaver weg zodra de map geen repo is. */
+  const kop = git('rev-parse', 'HEAD');
+  if (kop.status !== 0) {
+    fout('kan HEAD niet lezen, dus dit is niet vast te stellen: ' + String(kop.stderr || '').trim());
+  } else {
+    /* Twee soorten restant, elk met hun eigen vorm.
+
+       De IJKINGEN gebruiken allemaal dezelfde tijdelijke naam. Alleen het
+       bestand dat die proeven definieert (test/meterijk.test.js) mag hem
+       noemen, want daar wordt hij gemaakt.
+
+       Een MUTATIERESTANT herken je aan de marker als staartcommentaar ACHTER
+       code, niet aan het begin van een commentaarregel. Een blokcommentaar dat
+       over een mutatie schrijft -- daar staan er een paar van in de bron, en
+       die horen te mogen -- heeft die vorm niet. */
+    const soorten = [
+      { naam: 'ijkrestant', patroon: 'zz' + '-ijk-tijdelijk', mag: /^test\/meterijk\.test\.js$/,
+        uitleg: 'een ijking heeft dit bestand aangeraakt terwijl er gecommit werd' },
+      { naam: 'mutatierestant', patroon: '//[[:space:]]*' + 'MUTA' + 'TIE', mag: /^$/,
+        uitleg: 'een mutatieproef is blijven staan; de bron is niet teruggezet' }
+    ];
+    let gevonden = 0;
+    for (const s of soorten) {
+      const r = git('grep', '-n', '-E', s.patroon, 'HEAD', '--', '*.js', '*.json', '*.html', '*.css');
+      /* Exitcode 1 = niets gevonden, en dat is hier het goede antwoord. Alles
+         daarboven is een echte fout en mag niet als "schoon" gelezen worden. */
+      if (r.status > 1) { fout('git grep faalde voor ' + s.naam + ': ' + String(r.stderr || '').trim()); continue; }
+      for (const regel of String(r.stdout || '').split('\n').filter(Boolean)) {
+        const pad = regel.replace(/^HEAD:/, '').split(':')[0];
+        if (s.mag.test(pad)) continue;
+        gevonden++;
+        fout(s.naam + ' in de commit: ' + regel.replace(/^HEAD:/, '').slice(0, 160) +
+          '\n    ' + s.uitleg + ' -- zet het bestand terug en commit opnieuw (git commit --amend)');
+      }
+    }
+    if (!gevonden) ok('de laatste commit draagt geen ijk- of mutatierestant');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

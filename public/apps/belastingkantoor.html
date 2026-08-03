@@ -72,6 +72,7 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
+<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <header>
@@ -171,6 +172,33 @@ $('#loginGo').addEventListener('click', async () => {
 
 const TABS = [['sig','Signalen'],['aan','Aanslagen'],['btw','Btw-beeld']];
 let HUIDIG = 'sig';
+let SIGNALEN = null, AANSLAGEN = null, BTW = null;
+/* Meenemen (shared/uitvoer.js): dit kantoor houdt drie registers vast en toont
+   er altijd een. Wat u meeneemt is dus het tabblad dat OPEN staat, met de
+   velden los -- niet de regel "Inkomen € 42.000 · aftrek € 3.100 · open" die
+   op het scherm staat. De inwoner staat er met zijn codenaam in, precies zoals
+   in het scherm; een echte naam kent dit kantoor niet. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (HUIDIG === 'aan' && AANSLAGEN) return {
+    naam: 'aanslagen',
+    kolommen: ['kenmerk','codenaam','jaar','inkomen','aftrek','saldo','betaald','kwijtgescholden','dagen open','regeling maanden','regeling per maand'],
+    rijen: AANSLAGEN.map(a => [a.ref||'', a.wie||'', a.jaar||'', a.inkomen||0, a.aftrek||0, a.saldo||0,
+      a.betaald?'ja':'nee', a.kwijtgescholden?'ja':'nee', a.dagenOpen||0,
+      a.regeling?a.regeling.maanden:'', a.regeling?a.regeling.per:''])
+  };
+  if (HUIDIG === 'btw' && BTW) return {
+    naam: 'btw-beeld',
+    kolommen: ['zaak','code','jaar','facturen','omzet','btw','in het handelsregister'],
+    rijen: (BTW.zaken||[]).map(z => [z.naam||'', z.code||'', BTW.jaar||'', z.facturen||0,
+      z.omzet||0, z.btw||0, z.ingeschreven?'ja':'nee'])
+  };
+  if (HUIDIG === 'sig' && SIGNALEN) return {
+    naam: 'signalen',
+    kolommen: ['soort','kenmerk','wie','toelichting'],
+    rijen: SIGNALEN.map(s => [s.soort||'', s.ref||'', s.wie||'', s.tekst||''])
+  };
+  return null;
+});
 function toon(t){
   HUIDIG = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
@@ -188,6 +216,7 @@ function start(){
 async function laadCockpit(){
   try {
     const c = await api('/api/overheid/bd/cockpit');
+    SIGNALEN = c.signalen || [];
     $('#kpis').innerHTML =
       '<div class="kpi goud"><b>'+euro(c.ontvangen)+'</b><span>Ontvangen</span></div>'+
       '<div class="kpi"><b>'+euro(c.teOntvangen)+'</b><span>Te ontvangen · '+c.openstaand+' open</span></div>'+
@@ -206,6 +235,7 @@ async function laadCockpit(){
 async function laadAanslagen(){
   try {
     const r = await api('/api/overheid/bd/aanslagen', { stand: $('#stand').value });
+    AANSLAGEN = r.aanslagen || [];
     $('#aanLijst').innerHTML = r.aanslagen.length ? r.aanslagen.map(a => {
       const st = a.kwijtgescholden ? '<span class="status ok">kwijtgescholden</span>'
         : a.betaald ? '<span class="status ok">betaald</span>'
@@ -234,6 +264,7 @@ $('#stand').addEventListener('change', laadAanslagen);
 async function laadBtw(){
   try {
     const r = await api('/api/overheid/bd/btw');
+    BTW = r;
     $('#p-btw').innerHTML = '<div class="item"><h4>Btw-beeld '+r.jaar+'</h4><div class="meta">Rechtstreeks uit de facturatiemotor van het platform, gekoppeld aan het KVK-handelsregister: '+euro(r.totaalBtw)+' btw over '+euro(r.totaalOmzet)+' omzet.</div></div>'+
       (r.zaken.length ? r.zaken.map(z => '<div class="item"><h4>'+esc(z.naam)+' <small style="color:var(--soft);font-family:Inter;">'+esc(z.code)+'</small></h4><div class="meta">'+z.facturen+' facturen · omzet '+euro(z.omzet)+' · btw '+euro(z.btw)+' · '+(z.ingeschreven?'<span class="status ok">KVK ingeschreven</span>':'<span class="status open">niet in het register</span>')+'</div></div>').join('')
       : '<div class="leeg">Nog geen facturen dit jaar.</div>');
@@ -288,5 +319,6 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

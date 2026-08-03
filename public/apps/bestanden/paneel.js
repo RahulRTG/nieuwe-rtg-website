@@ -151,5 +151,32 @@
   function dicht() { $('#bkScrim').classList.remove('open'); open = null; }
   $('#bkDicht').addEventListener('click', dicht);
 
+  /* Meenemen: de kluis geeft zijn EIGEN model mee (naam, map, grootte, soort,
+     datum, versies) in plaats van de gedeelde laag naar het scherm te laten
+     raden. De inhoud van de bestanden gaat niet mee -- daarvoor is de
+     Download-knop hierboven. Hij staat in dit tweede script omdat het bord
+     (app.js) al tegen de bestandsgrens aan zit; het model is hetzelfde, want
+     het komt via RTGBestanden.stand() uit dezelfde plek. */
+  if (window.RTGUitvoer) {
+    RTGUitvoer.bron(function () {
+      var s = B() && B().stand();
+      if (!s) return null;
+      var map = function (id) {
+        var m = (s.mappen || []).find(function (x) { return x.id === id; });
+        return m ? m.naam : '';
+      };
+      return {
+        naam: 'bestanden',
+        kolommen: ['naam', 'map', 'grootte', 'soort', 'gewijzigd', 'versies', 'ster', 'prullenbak', 'herkomst'],
+        rijen: (s.items || []).concat(s.gedeeld || []).map(function (it) {
+          return [it.naam || '', map(it.map), it.bytes || 0, it.mime || '',
+            String(it.gewijzigd || '').slice(0, 10), it.versies || 0,
+            it.ster ? 'ja' : 'nee', it.weg ? 'ja' : 'nee',
+            it.vanMij ? 'van mij' : 'gedeeld met mij'];
+        })
+      };
+    });
+  }
+
   window.RTGBestandenPaneel = { open: toon };
 })();

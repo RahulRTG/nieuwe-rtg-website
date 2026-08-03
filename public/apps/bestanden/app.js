@@ -45,31 +45,6 @@
       teken();
     });
   }
-
-  /* Meenemen: de kluis kent zijn eigen model, dus geeft hij de velden die op
-     de regel staan (naam, map, grootte, soort, datum, versies) in plaats van de
-     gedeelde laag naar het scherm te laten raden. De inhoud van de bestanden
-     gaat niet mee -- daar is de Download-knop in het paneel voor. */
-  if (window.RTGUitvoer) {
-    RTGUitvoer.bron(function () {
-      if (!stand) return null;
-      var mapNaam = function (id) {
-        var m = (stand.mappen || []).find(function (x) { return x.id === id; });
-        return m ? m.naam : '';
-      };
-      var alle = (stand.items || []).concat(stand.gedeeld || []);
-      return {
-        naam: 'bestanden',
-        kolommen: ['naam', 'map', 'grootte', 'soort', 'gewijzigd', 'versies', 'ster', 'prullenbak', 'herkomst'],
-        rijen: alle.map(function (it) {
-          return [it.naam || '', mapNaam(it.map), it.bytes || 0, it.mime || '',
-            String(it.gewijzigd || '').slice(0, 10), it.versies || 0,
-            it.ster ? 'ja' : 'nee', it.weg ? 'ja' : 'nee',
-            it.vanMij ? 'van mij' : 'gedeeld met mij'];
-        })
-      };
-    });
-  }
   function pad() {
     var stap = [], m = (stand.mappen || []).find(function (x) { return x.id === hier; });
     while (m) { stap.unshift(m); m = (stand.mappen || []).find(function (x) { return x.id === m.ouder; }); }

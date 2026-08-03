@@ -16,9 +16,16 @@
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
-    "metersOngeijkt": 13
+    "metersOngeijkt": 16
   },
   "notities": [
+    {
+      "datum": "2026-08-03",
+      "meter": "metersOngeijkt 13 -> 16 (verbreding, geen terugval)",
+      "reden": "Met de hand verhoogd omdat de meter er drie ZIET die hij eerst niet zag. Niet elke meter woont in scripts/norm.js: wie een journaal nodig heeft (dekkingWaargenomenPct, endpointsNooitAangeraakt, onbewaakt) meet in een eigen script met zijn sleutel in een METER-constante, en die stonden buiten regel 35 en buiten deze teller. Dat is precies het gat waar een ongeijkte meter doorheen glipt, dus lezen check.js en norm.js ze nu allebei mee -- met dezelfde vindwijze, zodat de twee tellingen niet uiteen kunnen lopen. Er is geen enkele meter slechter geworden; er waren er drie onzichtbaar. De vierde nieuwe (schermenZonderToets) draagt een proef en telt dus niet mee.",
+      "eerlijkheidshalve": "Een verbreding die het getal omhoog duwt is de vervelende soort: hij lijkt op een terugval en de verleiding is om hem stil te houden of de norm gewoon op 13 te laten staan met een smaller bereik. Dat zou de meter laten liegen over zijn eigen dekking -- precies waar deze hele ronde over gaat. Zestien is het eerlijke getal.",
+      "eerderVastgelegd": "metersOngeijkt (nieuw, nulmeting 13)"
+    },
     {
       "datum": "2026-08-03",
       "meter": "metersOngeijkt (nieuw, nulmeting 13)",

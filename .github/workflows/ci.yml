@@ -134,3 +134,11 @@ jobs:
         run: npm run e2e
         env:
           RTG_E2E_STRICT: '1'
+      # "Af" is geen bewering meer. De stap hierboven schrijft .schermjournaal
+      # (RTG_ROUTELOG staat in het e2e-script), en de server noteert daarin elk
+      # scherm dat hij werkelijk heeft geserveerd. Deze stap telt de apps die
+      # geen enkele toets ooit heeft geopend en zakt als dat er meer worden.
+      # Bewust NA de e2e-stap en zonder `if: always()`: zonder journaal is er
+      # geen oordeel, en dan moet de e2e-fout de melding zijn en niet deze.
+      - name: Schermdekking (welke apps heeft een toets echt geopend)
+        run: node scripts/schermen.js

@@ -50,6 +50,18 @@ function bureaublad(app) {
   app.get('/apps/bureau.html', naarBureaublad);
 }
 
+/* ---------- meekijken welke SCHERMEN er geopend worden ----------
+   Dezelfde vorm als de patroonhaak in web/routing.js. Deze laag serveert ELKE
+   pagina zelf (hij zet er een nonce in), dus een .html komt hier langs en niet
+   bij de routematcher -- daarom stond er in het routejournaal nooit iets over
+   schermen, en kon niemand natrekken of een schermtoets een app ooit had
+   geopend. Staat de nonce-laag uit, dan doet de statische laag het werk; die
+   heeft dezelfde haak, en het journaal ontdubbelt.
+
+   Zonder haak kost dit niets, en deze module weet niet wie er meekijkt. */
+let paginaHaak = null;
+function opPagina(fn) { paginaHaak = typeof fn === 'function' ? fn : null; }
+
 function cspNonce(publicDir, aan) {
   return (req, res, next) => {
     if (!aan || req.method !== 'GET') return next();
@@ -60,6 +72,7 @@ function cspNonce(publicDir, aan) {
     if (!bestand.startsWith(publicDir + path.sep)) return next(); // geen path traversal
     fs.readFile(bestand, 'utf8', (err, html) => {
       if (err) return next(); // bestaat niet: laat de statische laag/404 het doen
+      if (paginaHaak) { try { paginaHaak(rel); } catch (e) {} }
       const nonce = crypto.randomBytes(16).toString('base64');
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       res.set('Content-Security-Policy', CSP(nonce));
@@ -75,4 +88,4 @@ function cspNonce(publicDir, aan) {
   };
 }
 
-module.exports = { bureaublad, cspNonce, herschrijf, CSP };
+module.exports = { bureaublad, cspNonce, herschrijf, CSP, opPagina };

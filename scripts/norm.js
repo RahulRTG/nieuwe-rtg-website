@@ -157,8 +157,14 @@ function telPerGroep(k) {
    eerdere versie telde elke `reden:` in het bestand en kwam op 16 waar
    check.js op 13 uitkwam -- twee tellingen van hetzelfde ding die uiteenlopen
    is hoe een meter begint te liegen. */
-function telOngeijkt(ijkBron) {
-  const sleutels = METERS.concat(PRESTATIEMETERS).map(m => m.sleutel);
+function telOngeijkt(ijkBron, extraSleutels) {
+  /* De meters die een JOURNAAL nodig hebben (waargenomen dekking, schermdekking,
+     samenhang) wonen niet hier maar in hun eigen script, met hun sleutel in een
+     METER-constante. Ze horen wel bij dit gat, dus meet() geeft ze mee -- en
+     omdat ze binnenkomen als parameter blijft deze functie te voeden met een
+     verzonnen registratie, en dus zelf te ijken. */
+  const sleutels = METERS.concat(PRESTATIEMETERS).map(m => m.sleutel)
+    .concat(Array.isArray(extraSleutels) ? extraSleutels : []);
   const blok = /const IJKINGEN = \{([\s\S]*?)\n\};/.exec(ijkBron);
   if (!blok) throw new Error('de IJKINGEN-registratie is niet te lezen; een meter zonder invoer is geen meter');
   /* Een regel staat op EEN regel ({ reden: '...' }) of over meerdere; het
@@ -239,7 +245,16 @@ function meet() {
   if (!fs.existsSync(ijkPad)) {
     throw new Error('test/meterijk.test.js ontbreekt; dan is geen enkele meter geijkt en kan deze meter niet meten');
   }
-  const metersOngeijkt = telOngeijkt(fs.readFileSync(ijkPad, 'utf8'));
+  /* Ook de meters die in een eigen script wonen tellen mee (zie telOngeijkt).
+     Zelfde vindwijze als check.js regel 35, zodat de twee tellingen niet
+     uiteen kunnen lopen -- dat is eerder gebeurd en zo begint een meter te
+     liegen. */
+  const losseSleutels = [];
+  for (const b of fs.readdirSync(path.join(WORTEL, 'scripts')).filter(f => f.endsWith('.js') && f !== 'norm.js')) {
+    const bron = fs.readFileSync(path.join(WORTEL, 'scripts', b), 'utf8');
+    for (const m of bron.matchAll(/^const METER[A-Z_]*\s*=\s*'([a-zA-Z0-9]+)'/gm)) losseSleutels.push(m[1]);
+  }
+  const metersOngeijkt = telOngeijkt(fs.readFileSync(ijkPad, 'utf8'), losseSleutels);
 
   return {
     metersOngeijkt,

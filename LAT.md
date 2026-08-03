@@ -57,8 +57,14 @@ Vier uitkomsten, niet twee: RAAK (de mutatie bijt), AFGESLAGEN (hij bijt niet en
 dat is een bevinding op zich), GELUKT, NIET GEPROBEERD. Een mutatie die ALLES
 laat zakken bewijst niets: dan is de mutatie te grof.
 
-**Handhaver:** mensenwerk. Het commit-bericht noemt welke mutatie is gedaan en
-welke toets ervan zakte.
+**Handhaver:** voor de METERS machinaal: `test/meterijk.test.js` voert elke
+geijkte meter een bekend-foute invoer en eist dat hij uitslaat, en
+`scripts/check.js` regel 35 eist dat elke meter daar staat -- met een proef of
+met een opgeschreven reden, geteld door `metersOngeijkt` in `NORM.json`, die
+alleen omlaag mag. Voor de SCHERMEN: `scripts/schermen.js` telt de apps die
+geen enkele toets ooit heeft geopend, uit het journaal van een echte e2e-ronde
+en niet uit een tekstzoektocht. Voor de rest: mensenwerk, en het commit-bericht
+noemt welke mutatie is gedaan en welke toets ervan zakte.
 
 ### 3. Een meter zakt als zijn invoer ontbreekt
 
@@ -221,10 +227,25 @@ de cijfers van een GEZAKTE ronde als grondwaarde, en vergelijkt niet tussen
 machines of opslagstanden -- 144 ms op vier kernen is geen betere 144 ms dan op
 zestien, het is een andere.
 
-**Handhaver:** `test/normprestatie.test.js` (acht toetsen, alle vier de mutaties
-zagen we zakken) en de ijking in `scripts/lib/rolproef.js`. Voor de rest: regel 2
-en mensenwerk. De vorm om op te letten is een meter die nog nooit iets anders
-heeft gezegd dan "in orde".
+**Handhaver:** sinds deze ronde machinaal, en niet meer alleen als voornemen.
+`test/meterijk.test.js` houdt een registratie waarin ELKE meter staat: met een
+proef die hem op een bekend-foute invoer laat uitslaan, of met een opgeschreven
+reden waarom dat in een toets niet eerlijk kan. `scripts/check.js` regel 35
+zakt zodra een meter daar ontbreekt -- ook de meters die in een eigen script
+wonen (`dekking.js`, `schermen.js`, `samenhang.js`), want juist die stonden er
+eerst buiten. En `metersOngeijkt` in `NORM.json` telt de redenen en mag alleen
+omlaag, zodat het gat kleiner wordt in plaats van vergeten.
+
+De ijking sloeg meteen op zichzelf aan: `zelfpoortendeToetsen` telde de
+skip-regel die als TEKST in het ijkbestand staat mee als een echte
+zelfpoortende toets. Derde keer dat een meter hier tekst voor code aanzag.
+Gerepareerd door tekst door dezelfde wringer te halen als commentaar -- niet
+door de tekst op te knippen zodat de meter hem niet ziet, want dat is de meter
+bedriegen in plaats van repareren.
+
+Daarnaast: `test/normprestatie.test.js` (acht toetsen, alle vier de mutaties
+zagen we zakken) en de ijking in `scripts/lib/rolproef.js`. De vorm om op te
+letten blijft een meter die nog nooit iets anders heeft gezegd dan "in orde".
 
 ---
 
@@ -264,13 +285,15 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 | wat | waar |
 |---|---|
-| 34 codeafspraken, binair | `scripts/check.js` |
+| 35 codeafspraken, binair | `scripts/check.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |
 | geen geslaagde toets met een serverfout eronder | `test/helper.js` (strenge poort) |
 | geen productiestart op een opslag zonder grootboek | `server/config/productie-opslag.js` |
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
+| welke apps een toets ECHT heeft geopend ("af" is geen bewering) | `scripts/schermen.js` + `NORM.json` |
+| elke meter een keer zien uitslaan voor hij een oordeel draagt | `test/meterijk.test.js` + `check.js` regel 35 |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |

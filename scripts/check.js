@@ -1817,7 +1817,7 @@ console.log('\n34) elke AI-ingang draagt de toegangsregel, of staat erkend op de
    regel 2 (natrekken met een mutatie). Wat hij wel doet: voorkomen dat een
    NIEUWE meter ongemerkt ongeijkt meelift -- en dat was precies hoe de zeven
    erin kwamen. */
-console.log('\n35) elke meter uit norm.js is geijkt of noemt zijn reden');
+console.log('\n35) elke meter met een norm is geijkt of noemt zijn reden');
 {
   const normBron = fs.readFileSync(path.join(ROOT, 'scripts/norm.js'), 'utf8');
   const ijkPad = path.join(ROOT, 'test/meterijk.test.js');
@@ -1831,6 +1831,17 @@ console.log('\n35) elke meter uit norm.js is geijkt of noemt zijn reden');
     const sleutels = [...(lijst ? lijst[1] : ''), ...(prest ? prest[1] : '')].length
       ? [...((lijst ? lijst[1] : '') + (prest ? prest[1] : '')).matchAll(/sleutel:\s*'([a-zA-Z0-9]+)'/g)].map(m => m[1])
       : [];
+    /* Niet elke meter woont in norm.js. Wie een journaal nodig heeft (de
+       waargenomen dekking, de schermdekking, de samenhang) meet in een eigen
+       script en zet zijn sleutel daar in een METER-constante. Die ontsnapten
+       aan deze regel -- en dat is precies het gat waar een ongeijkte meter
+       doorheen glipt, dus lezen we ze er hier bij. */
+    for (const bestand of fs.readdirSync(path.join(ROOT, 'scripts')).filter(f => f.endsWith('.js') && f !== 'norm.js')) {
+      const bron = fs.readFileSync(path.join(ROOT, 'scripts', bestand), 'utf8');
+      for (const m of bron.matchAll(/^const METER[A-Z_]*\s*=\s*'([a-zA-Z0-9]+)'/gm)) {
+        if (!sleutels.includes(m[1])) sleutels.push(m[1]);
+      }
+    }
     if (!sleutels.length) {
       fout('geen enkele meter gevonden in scripts/norm.js -- deze regel meet dan zelf niets');
     } else {

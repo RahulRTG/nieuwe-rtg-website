@@ -81,6 +81,37 @@ const IJKINGEN = {
       } finally { fs.writeFileSync(p, oud); }
     }
   },
+  schermenZonderToets: {
+    /* De meter achter LAT-regel 2 voor de schermkant: "af" is pas af als een
+       toets de hele weg heeft afgelegd. Het journaal komt uit een echte
+       e2e-ronde en is hier niet te maken, maar de INVENTARIS wel -- en dat is
+       precies de kant waarlangs een nieuw scherm binnenkomt: iemand zet een
+       app neer, niemand opent hem, en het getal hoort meteen op te lopen. */
+    proef: () => {
+      const schermen = require('../scripts/schermen.js');
+
+      /* Eerst de scherpte van de meter zelf: een scherm dat ALLEEN door een
+         veegtoets is aangeraakt mag niet als getoetst tellen. Dat is precies
+         waar de eerste versie van deze meter op stukliep -- hij gaf 188 van
+         188 omdat leven.e2e.js alles even aantikt. */
+      const veegJournaal = new Map();
+      for (let i = 0; i < 50; i++) veegJournaal.set('/apps/z' + i + '.html', new Set(['leven.e2e.js']));
+      veegJournaal.get('/apps/z0.html').add('eigen.e2e.js');
+      const vegers = schermen.veegToetsen(veegJournaal, 50);
+      assert.ok(vegers.has('leven.e2e.js'), 'een toets die alle schermen aantikt geldt als veegtoets');
+      assert.ok(!vegers.has('eigen.e2e.js'), 'een toets die er een aantikt geldt niet als veegtoets');
+
+      /* En dan de inventaris: een NIEUW scherm dat niemand opent hoort meteen
+         mee te tellen. Dat is de kant waarlangs dit gat in de praktijk groeit:
+         iemand zet een app neer en niemand komt er ooit. */
+      const journaal = new Set(schermen.alleSchermen());        // alsof alles geopend is
+      const tel = () => schermen.alleSchermen().filter(s => !journaal.has(s)).length;
+      const voor = tel();
+      assert.equal(voor, 0, 'met een journaal dat alles bevat staat de meter op nul');
+      return metTijdelijkBestand('public/apps/zz-ijk-tijdelijk.html',
+        '<!doctype html>\n<title>ijk</title>\n', () => tel() - voor);
+    }
+  },
   metersOngeijkt: {
     /* De meter die de ongeijkte meters telt, moet zelf uitslaan -- anders
        bewaakt een ongeijkte meter het ijken. Hij krijgt twee verzonnen
@@ -137,17 +168,27 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
 
 test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
-    'server/kern/zz-ijk-tijdelijk.js']) {
+    'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html']) {
     assert.equal(fs.existsSync(path.join(WORTEL, naam)), false, naam + ' is blijven staan');
   }
   const pkg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8'));
   assert.equal(Object.keys(pkg.dependencies || {}).length, 0, 'package.json heeft weer nul dependencies');
 });
 
-test('elke meter uit scripts/norm.js staat in de registratie', () => {
+test('elke meter met een norm staat in de registratie', () => {
   const bron = fs.readFileSync(path.join(WORTEL, 'scripts/norm.js'), 'utf8');
   const sleutels = [...bron.matchAll(/sleutel:\s*'([a-zA-Z0-9]+)'/g)].map(m => m[1]);
-  assert.ok(sleutels.length >= 15, 'de meters zijn gevonden in norm.js (' + sleutels.length + ')');
+  /* Niet elke meter woont in norm.js: wie een journaal nodig heeft (dekking,
+     schermen, samenhang) meet in een eigen script met zijn sleutel in een
+     METER-constante. Die stonden hier eerst buiten, en juist zo glipt een
+     ongeijkte meter erdoor. Zelfde vindwijze als check.js regel 35. */
+  for (const b of fs.readdirSync(path.join(WORTEL, 'scripts')).filter(f => f.endsWith('.js') && f !== 'norm.js')) {
+    const s = fs.readFileSync(path.join(WORTEL, 'scripts', b), 'utf8');
+    for (const m of s.matchAll(/^const METER[A-Z_]*\s*=\s*'([a-zA-Z0-9]+)'/gm)) {
+      if (!sleutels.includes(m[1])) sleutels.push(m[1]);
+    }
+  }
+  assert.ok(sleutels.length >= 15, 'de meters zijn gevonden (' + sleutels.length + ')');
   const ontbreekt = sleutels.filter(s => !IJKINGEN[s]);
   assert.deepEqual(ontbreekt, [],
     'deze meters hebben geen ijking en geen reden: ' + ontbreekt.join(', ') +

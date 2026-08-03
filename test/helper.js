@@ -118,7 +118,18 @@ async function startEens(opts) {
   // het gedrag ongewijzigd.
   const eigenStderr = opts.stderr && opts.stderr !== 'inherit';
   const child = spawn(process.execPath, ['--experimental-sqlite', script], {
-    env: { ...process.env, NODE_ENV: 'test', ...(opts.env || {}), PORT: String(port) },
+    /* RTG_TOETS: welke toets deze server start. De server schrijft dat mee in
+       het schermjournaal, zodat scripts/schermen.js een VEEGTOETS (een die
+       honderd schermen even aantikt) kan onderscheiden van een toets die de
+       weg van een app werkelijk aflegt. Zonder die naam zag dat journaal
+       alleen "geopend", en dan staat de meter na de eerste veegronde op nul en
+       zegt hij voorgoed "in orde" -- precies de vorm waar LAT-regel 10 voor
+       waarschuwt. */
+    env: {
+      ...process.env, NODE_ENV: 'test',
+      RTG_TOETS: path.basename(String(process.argv[1] || 'onbekend')),
+      ...(opts.env || {}), PORT: String(port)
+    },
     stdio: ['ignore', 'ignore', eigenStderr ? opts.stderr : 'pipe']
   });
   if (!eigenStderr) luisterOpFouten(child);

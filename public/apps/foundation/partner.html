@@ -73,7 +73,8 @@ async function laad(){
     '<div class="noot" style="margin-top:.4rem;">Een besluit valt pas als beide kanten gestemd hebben: uw stem namens de stad en die van het RTG-personeel. Het besloten RTG-bedrijfswerk staat nooit op deze tafel.</div></div>' +
     '<div class="kaart"><div class="sec">Lab-uitslagen op de raadstafel</div>' + uitslagen + '</div>' +
     '<div class="kaart"><div class="sec">Besluiten</div>' + besluiten + '</div>' +
-    '<div class="kaart rij"><button class="knop stil" id="weg">Uitloggen</button><span class="noot">De raadcode blijft alleen op dit toestel bewaard.</span></div>';
+    // rtgdeel-vast: uitloggen hoort bij geen enkel deel en blijft altijd staan
+    '<div class="kaart rij rtgdeel-vast"><button class="knop stil" id="weg">Uitloggen</button><span class="noot">De raadcode blijft alleen op dit toestel bewaard.</span></div>';
   document.querySelectorAll('[data-voorstel]').forEach(b => b.addEventListener('click', async () => {
     const v = prompt('Wat stelt u namens ' + d.partner.stad + ' voor met deze uitslag?'); if (!v) return;
     try { await api('besluit-start', { projectId: b.dataset.voorstel, voorstel: v }); laad(); } catch (e) { alert(e.message); }
@@ -93,6 +94,7 @@ $('#open').addEventListener('click', () => { CODE = $('#code').value.trim().toUp
 $('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#open').click(); });
 if (CODE) { $('#code').value = CODE; laad(); }
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

@@ -29,15 +29,12 @@
 </head>
 <body data-osbar="Boardroom" data-oswereld="lid" data-osterug="apps/app.html" class="rtg-stijl">
 <main class="rtg-wrap" id="hoofd">
-  <!-- rtgdeel-vast: de terugweg, de uitleg en de melder horen bij geen enkel
-       deel en blijven op elke stand van het deelmenu staan -- een melding als
-       "die functie staat nu uit" mag nooit achter een menuknop verdwijnen. -->
-  <a class="rtg-terug rtgdeel-vast" href="/apps/app.html" data-i18n="bo.terug">← naar de app</a>
-  <div class="rtg-intro rtgdeel-vast">
+  <a class="rtg-terug" href="/apps/app.html" data-i18n="bo.terug">← naar de app</a>
+  <div class="rtg-intro">
     <h1 data-i18n="bo.h">Jouw boardroom</h1>
     <p data-i18n="bo.sub">Zet zelf aan wat je gebruikt en uit wat je niet wilt. Gevoelige deel-functies staan bewust standaard uit. Je keuzes reizen mee naar al je toestellen, en wat je hier uitzet gaat ook echt dicht.</p>
   </div>
-  <div class="rtg-melder rtgdeel-vast" id="melder" role="status" aria-live="polite"></div>
+  <div class="rtg-melder" id="melder" role="status" aria-live="polite"></div>
   <div id="bord"><p class="rtg-leeg" id="melding" data-i18n="bo.laden">Boardroom laden&hellip;</p></div>
 </main>
 
@@ -78,7 +75,6 @@ window.I18N = { en: {
 <script src="/shared/osbar.js" defer></script>
 <script src="/shared/osmenu.js" defer></script>
 <script src="/apps/boardroom.js" defer></script>
-<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

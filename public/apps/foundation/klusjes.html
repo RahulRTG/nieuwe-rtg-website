@@ -45,7 +45,9 @@
   <h1>Klusjes en sterren</h1>
   <div class="intro" id="intro">Help mee in huis en verdien sterren. Samen zorgen we voor elkaar, en jij wordt er sterker en trotser van.</div>
 
-  <div class="kaart blok" id="rangBlok">
+  <!-- rtgdeel-vast: de sterrenstand is de eer van het gezin en blijft op elk
+       deel staan, zoals een saldobalk. De rest van de pagina deelt het menu op. -->
+  <div class="kaart blok rtgdeel-vast" id="rangBlok">
     <h2>Sterren van het gezin</h2>
     <div class="ranglijst" id="ranglijst"><div class="leeg">Nog geen sterren verdiend.</div></div>
   </div>
@@ -180,6 +182,7 @@ $('#kDoe').onclick = async ()=>{
 })();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

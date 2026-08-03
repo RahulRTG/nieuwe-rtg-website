@@ -35,6 +35,7 @@
   .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
   .chip.aan{border-color:var(--goud);color:var(--goud2);}
   .ledenregel{color:var(--zacht);font-size:.85rem;margin:.2rem 0 .8rem;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
@@ -63,6 +64,9 @@
     <div class="intro" id="pWat"></div>
     <div class="ledenregel" id="pLeden"></div>
 
+    <!-- de andere twee koppen zijn kaal en gelden zelf als deelmarkering;
+         deze draagt een hint in een <small>, dus krijgt hij er een naast zich -->
+    <div class="deel">Taken</div>
     <h2 class="sec">Taken <small style="text-transform:none;letter-spacing:0;">(tik  om een taak te pakken)</small></h2>
     <div class="kaart blok">
       <div id="pTaken"></div>
@@ -92,7 +96,7 @@
       <div class="fout" id="uFout"></div>
     </div>
 
-    <div style="display:flex;gap:.5rem;">
+    <div class="rtgdeel-vast" style="display:flex;gap:.5rem;">
       <button class="knop grijs" id="pTerug" style="flex:1;">← terug</button>
       <button class="knop rood" id="pWeg" style="flex:0 1 auto;" hidden>Project opruimen</button>
     </div>
@@ -217,6 +221,7 @@ laadOverzicht();
 const qs = new URLSearchParams(location.search);
 if (qs.get('project')) openProject(qs.get('project'));
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

@@ -33,6 +33,7 @@
   .taak.af span{opacity:.45;text-decoration:line-through;}
   .leeg{color:var(--muted);font-size:.85rem;padding:.5rem 0;}
   ul{list-style:none;} li{font-size:.82rem;line-height:1.6;color:var(--muted);}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   .stat{flex:1;min-width:7rem;text-align:center;} .stat b{font-size:1.2rem;display:block;}
   .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
 </style>
@@ -45,13 +46,19 @@
   <a href="/apps/lab.html">Onderzoekslab</a>
 </header>
 <main id="main">
+  <div class="deel">Overzicht</div>
   <div class="kaart"><div class="sec">Het huis in een oogopslag</div><div class="rij" id="top"><div class="leeg">Laden...</div></div></div>
+  <div class="deel">Kamers</div>
   <div class="grid" id="grid"></div>
+  <div class="deel">Stadsraad</div>
   <div class="kaart" id="raadKaart">
     <div class="sec">De Stadsraad -- samen met de stadspartners beslissen over lab-uitslagen</div>
     <div id="raadIn"><div class="leeg">Laden...</div></div>
   </div>
-  <div id="kamer" hidden>
+  <!-- rtgdeel-vast: het kamerdetail hoort bij geen enkel deel. De pagina zet
+       het zelf open en dicht bij het rooster hierboven; zo blijft dat werken
+       met het menu erbij. -->
+  <div id="kamer" class="rtgdeel-vast" hidden>
     <div class="kaart">
       <div class="rij" style="justify-content:space-between;"><h2 id="kNaam" style="font-size:1.1rem;"></h2><button class="knop stil" id="terug">← Alle kamers</button></div>
       <div class="kpi" id="kMissie" style="margin:.3rem 0 .6rem;"></div>
@@ -173,6 +180,7 @@ $('#tMaak').addEventListener('click', async () => {
 laad().catch(e => { $('#top').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
 raadLaad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

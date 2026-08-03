@@ -61,7 +61,7 @@ Geen blokkade, wel een risico dat je bewust moet nemen.
 
 | # | Wat | Klaar als |
 |---|---|---|
-| 4.1 | **De pas-toekenning is nooit doorlopen.** Drie pogingen om via `/api/aanmelding/beslis` een Lifestyle Pass te verlenen liepen op 400/403 (terecht: het eist een herleidbaar mens in de backoffice). Daarmee is de kernflow van een membership-platform niet beproefd | een mens keurt in de backoffice een proefaanvraag goed en de veertien Lifestyle-apps openen; het liefst als e2e-toets met een geseed personeelsaccount |
+| ~~4.1~~ | ~~**De pas-toekenning is nooit doorlopen.**~~ Opgelost in `test/ledenladder.test.js`: aanvraag ingelogd, geen besluit zonder backoffice-mens, besluit door `kantoorAlsPersoon`, opnieuw inloggen, tier `lifestyle`, en dan alle twaalf apps plus de adviseur open en werkend. Wat de drie eerdere pogingen misten: de aanvraag moet MET de sessie van het lid binnenkomen, anders heeft hij geen `accountId` en tilt `setTier` niemand op. Beide dragende beweringen (de poort `eis()` en `accounts.setTier`) zijn met een mutatie RAAK bevonden | — |
 | 4.2 | `test/leven.e2e.js` is rood: 13 schermen geven "geen teken van leven". Bestaand, niet van vandaag; de nulmeting gaf er 20 | de toets is groen, of de schermen die legitiem geen API aanroepen (kaart, camera, feed, juridische tekst) staan met reden op de uitzonderingslijst |
 | 4.3 | 631 endpoints (25%) zonder toets. Gerangschikt naar risico; 28 daarvan raken geld, toegang of identiteit | `endpointsZonderTest` in `NORM.json` daalt, te beginnen bij die 28 |
 | 4.4 | `docs/apps-volwaardig.md` is gebouwd op een kapotte meting: hij telt letterlijke `/api/`-paden en mist elke aanroep via een hulpje (`api('cercle')`). Daardoor staan er 35 "schillen" waar er 4 zijn, en 1 volwaardige app waar er 20 zijn | het document is herschreven met de meting die ook hulproepen telt |
@@ -90,5 +90,5 @@ ze voor bewezen aanziet.
 |---|---|
 | 6.1 | `test/klankwerk.e2e.js` is geschreven door een uitrol-agent. Hij draait groen, maar ik heb zijn beweringen niet met een eigen mutatie natrokken (LAT-regel 2). Staat ook zo in `NORM.json` |
 | 6.2 | Bij de subtree-wacht van `shared/deelmenu.js` sloeg de mutatie AF: de toets bleef groen omdat `desktopframe.js` toevallig `main` aanraakt en de wacht zo alsnog wekt. De reparatie staat er terecht, maar deze toets bewijst dat punt niet |
-| 6.3 | Ik heb nooit achter de Lifestyle-poort gekeken (zie 4.1). Dat er echte functionaliteit achter zit weet ik uit de code (973 regels in `server/kern/rechterhand/`), niet uit het scherm |
+| ~~6.3~~ | ~~Ik heb nooit achter de Lifestyle-poort gekeken (zie 4.1).~~ Opgelost: `test/ledenladder.test.js` loopt de ladder af en schrijft in alle twaalf apps een regel die daarna ook echt teruggelezen wordt. Wat er nog steeds niet is: dezelfde weg door het SCHERM (de twaalf app-pagina's zelf), alleen door de API |
 | 6.4 | Een tussenstand-commit tijdens een lopende agent-ronde nam een mutatie-restant mee (`if (1) return null; // MUTATIE` in `foundation/geld.html`), waardoor die ene app stil zijn gegevens niet kon meenemen. Opgelost in `c0ed900`; sindsdien gaat elke tussenstand eerst langs de diff |

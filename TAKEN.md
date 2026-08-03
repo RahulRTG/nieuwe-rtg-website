@@ -75,7 +75,7 @@ Geen blokkade, wel een risico dat je bewust moet nemen.
 
 | # | Wat | Stand |
 |---|---|---|
-| 5.1 | Premium-laag (meenemen + sneltoetsen) over alle apps | **170 van de 188 schermen** dragen hem (gemeten op de boom, niet uit het geheugen van de uitrol). De 18 zonder: negen RTF-kinderapps (arena, speelhal, speeltuin, verhaaltje, tellen, rust, reis, societeit, studie), vier juridische tekstpagina's plus `juridisch.html`, en `index.html` als startscherm -- daar valt niets mee te nemen en dat is terecht. Blijven over als echt onaangeraakt: horloge, kantoorpda, uitzicht en zorgbalie. De uitrol loopt nog en werkt die lijst af |
+| 5.1 | Premium-laag (meenemen + sneltoetsen) over alle apps | **Afgerond: 170 van de 188 schermen**, gemeten op de boom. De 18 zonder zijn alle 18 bewust zonder, met reden: negen RTF-kinderapps en `index.html` (spel en startscherm, geen register om mee te nemen), vier juridische tekstpagina's plus `juridisch.html` (lopende tekst), `horloge.html` en `uitzicht.html` (vaste opmaak, geen lijst en geen zoekveld, dus beide lagen zouden niets vinden), en `kantoorpda.html` plus `zorgbalie.html` -- dat zijn geen apps maar doorverwijsstubs met een meta-refresh naar `personeel.html` (zie 5.5) |
 | 5.2 | Deelmenu over alle apps | 69 apps met menu, 85 bewust zonder (spellen, camera, feeds, chats), afgerond |
 | 5.3 | De deur voor gesloten apps | 58 apps afgerond (14 pas, 3 personeel, 41 gezin) |
 | 5.4 | 35 apps stonden bij de deelmenu-uitrol als "kandidaat vervolg" omdat ze hun scherm pas na een fetch bouwen; het component kan dat inmiddels | opnieuw langslopen nadat 5.1 klaar is |

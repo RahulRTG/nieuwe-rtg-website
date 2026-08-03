@@ -42,6 +42,9 @@
   .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.8rem;height:1.8rem;cursor:pointer;flex-shrink:0;}
   .weg:hover{border-color:var(--gold);color:var(--txt);}
   .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
+  /* de .deel-markers delen het hoofdscherm in voor het deelmenu; met het menu
+     erbij zijn ze weg, zonder menu blijven ze een rustige sectiekop */
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:1.6rem 0 .5rem;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .inlog{text-align:center;padding:2.5rem 1rem;}
 </style>
@@ -72,10 +75,11 @@ async function laad(){
   let d; try{ d=await api('logboek'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Logboek is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het logboek niet laden.</div>'; return; }
   if(open){ const o=d.objecten.find(x=>x.id===open); if(o) return detail(d,o); open=null; }
   let h='';
-  if(d.attenties.length){ h+='<div class="attn"><h2>Vraagt aandacht</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.object)+'</b> · '+esc(a.wat)+' · '+(a.verlopen?'verlopen':'vóór')+' '+dt(a.volgende)+'</div>').join('')+'</div>'; }
-  h+='<div class="kaart"><h2>Object toevoegen</h2><div class="rij"><input class="veld" id="oN" placeholder="naam"><select class="veld" id="oS">'+d.soorten.map(s=>'<option>'+s+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="oM" placeholder="merk"><input class="veld" id="oB" type="number" placeholder="bouwjaar"><input class="veld" id="oR" placeholder="registratie"></div><div style="margin-top:.6rem;"><button class="knop" id="oAdd">+ object</button></div></div>';
+  if(d.attenties.length){ h+='<div class="deel">Aandacht</div><div class="attn"><h2>Vraagt aandacht</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.object)+'</b> · '+esc(a.wat)+' · '+(a.verlopen?'verlopen':'vóór')+' '+dt(a.volgende)+'</div>').join('')+'</div>'; }
+  h+='<div class="deel">Toevoegen</div><div class="kaart"><h2>Object toevoegen</h2><div class="rij"><input class="veld" id="oN" placeholder="naam"><select class="veld" id="oS">'+d.soorten.map(s=>'<option>'+s+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="oM" placeholder="merk"><input class="veld" id="oB" type="number" placeholder="bouwjaar"><input class="veld" id="oR" placeholder="registratie"></div><div style="margin-top:.6rem;"><button class="knop" id="oAdd">+ object</button></div></div>';
+  h+='<div class="deel">Objecten</div>';
   h+= d.objecten.length ? d.objecten.map(o=>'<div class="kaart obj" data-id="'+o.id+'"><div class="nm">'+esc(o.naam)+'</div><div class="meta">'+[o.soort,o.merk,o.bouwjaar,o.regelAantal+' regels',euro(o.kosten)].filter(Boolean).join(' · ')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen objecten in het logboek.</div></div>';
-  h+=AIBOX('Bijv. wat staat er dit kwartaal op de planning?');
+  h+='<div class="deel">Vlootbeheerder</div>'+AIBOX('Bijv. wat staat er dit kwartaal op de planning?');
   $('#main').innerHTML=h;
   bindAi('logboek');
   $('#oAdd').onclick=async()=>{ const naam=$('#oN').value.trim(); if(!naam) return meld('Naam?'); try{ await api('logboek/object',{naam,soort:$('#oS').value,merk:$('#oM').value,bouwjaar:$('#oB').value,registratie:$('#oR').value}); laad(); }catch(e){ meld(e.message); } };
@@ -94,6 +98,7 @@ function detail(d,o){
 }
 laad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

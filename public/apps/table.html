@@ -65,9 +65,10 @@ async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
   let d; try{ d=await api('table'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Table is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
   if(open){ const e=d.events.find(x=>x.id===open); if(e) return detail(e); open=null; }
-  let h='<div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij" style="margin-top:.4rem;"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div style="margin-top:.6rem;"><button class="knop" id="nDoe">Aanmaken</button></div></div>';
+  let h='<div class="deel">Nieuwe gelegenheid</div><div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij" style="margin-top:.4rem;"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div style="margin-top:.6rem;"><button class="knop" id="nDoe">Aanmaken</button></div></div>';
+  h+='<div class="deel">Gelegenheden</div>';
   h+= d.events.length ? d.events.map(e=>'<div class="kaart ev" data-id="'+e.id+'"><div class="nm">'+esc(e.naam)+'</div><div class="meta">'+[e.datum?dt(e.datum):'',esc(e.tijd),esc(e.locatie),e.gastenAantal+' gasten'].filter(Boolean).join(' · ')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen gelegenheden.</div></div>';
-  h+=AIBOX('Bijv. stel een menu voor zes gasten voor');
+  h+='<div class="deel">De maître</div>'+AIBOX('Bijv. stel een menu voor zes gasten voor');
   $('#main').innerHTML=h;
   $('#nDoe').onclick=async()=>{ const naam=$('#nN').value.trim(); if(!naam) return meld('Geef de gelegenheid een naam.'); try{ await api('table/zet',{naam,datum:$('#nD').value,tijd:$('#nT').value,locatie:$('#nL').value}); laad(); }catch(e){ meld(e.message); } };
   document.querySelectorAll('.ev').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
@@ -89,6 +90,7 @@ function detail(e){
 }
 laad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

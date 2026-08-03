@@ -8,8 +8,8 @@
     "dependencies": 0,
     "testbestanden": 507,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 80,
-    "e2eBestanden": 50,
+    "zelfpoortendeToetsen": 84,
+    "e2eBestanden": 52,
     "keuringOmvang": 67,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
@@ -17,9 +17,16 @@
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 16,
-    "schermenZonderToets": 104
+    "schermenZonderToets": 90
   },
   "notities": [
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 80 -> 84",
+      "reden": "Met de hand verhoogd voor de vier schermtoetsen van deze ronde: test/lifestyleschermen.e2e.js (twee) en test/identiteitschermen.e2e.js (twee). Ze poorten zichzelf op `pw ? false : 'geen browser beschikbaar'`, net als de achtenveertig schermtoetsen die er al stonden -- zonder browser valt er niets te bekijken, en een schermtoets die dan hard zakt maakt de suite onbruikbaar op een machine zonder Chromium. Dit is dus geen verslechtering van de discipline maar de prijs van veertien schermen erbij: schermenZonderToets ging van 104 naar 90, gemeten op een volledige e2e-run.",
+      "eerlijkheidshalve": "De ratel klaagt hier terecht, en dat is precies waarom hij bestaat: het aantal toetsen dat zichzelf kan overslaan groeit, en op een machine zonder browser slaan er nu vier meer over dan gisteren. Dat is een echt risico -- in CI moet Chromium er dus zijn, anders is de winst van deze ronde op papier. Wat de winst wel echt maakt: alle vier de toetsen zijn met een mutatie beproefd en alle vier RAAK. De poort-uitleg uit shared/deur.js weghalen liet de eerste zakken; de kelderwaarde op het cellier-scherm vast op 0 zetten (terwijl de API 1.080 bleef teruggeven) de tweede -- precies het geval van een kloppende API met een liegend scherm, waar deze hele meter over gaat; de belofte 'de geheime helft verlaat uw apparaat' uit passkeys.html halen de derde; en een streakteller op balans.html binnensmokkelen de vierde. Die laatste is geen verzonnen fout: een reeksteller op een welzijnsscherm voelt als een verbetering en gaat lijnrecht in tegen de merkregel die op dat scherm zelf staat afgedrukt.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 77 -> 80"
+    },
     {
       "datum": "2026-08-03",
       "meter": "zelfpoortendeToetsen 77 -> 80",

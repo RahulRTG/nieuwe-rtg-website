@@ -31,9 +31,21 @@
   select.veld{color-scheme:dark;}
   .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
-  .chips{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem;}
-  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
-  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* De disciplinerij is de eigen schakelaar van deze app -- het filteren blijft
+     van de pagina -- maar draagt de stijl van het deelmenu (shared/deelmenu.js):
+     geen pil met een randje, maar een rustige balk met kleine kapitalen en een
+     gouden streep onder de actieve. De body.rtg-stijl-voorvoegsels zijn nodig
+     omdat de gedeelde pilrij in rtg-ui.css (body.rtg-stijl .chip) anders
+     zwaarder weegt. */
+  body.rtg-stijl .chips{display:flex;gap:.15rem;overflow-x:auto;margin:0 0 .2rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);scrollbar-width:none;}
+  body.rtg-stijl .chips::-webkit-scrollbar{display:none;}
+  body.rtg-stijl .chip{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;
+    font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    cursor:pointer;}
+  body.rtg-stijl .chip:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
   .swatch{width:1.6rem;height:1.6rem;border-radius:7px;border:1px solid var(--line);}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}

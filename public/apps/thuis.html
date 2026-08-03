@@ -54,9 +54,20 @@
   .r .k{color:var(--soft);}
   .chip{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:.15rem .6rem;font-size:.74rem;color:var(--muted);margin:.15rem .2rem 0 0;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:92%;z-index:40;}
-  .tabs{display:flex;gap:.4rem;margin-top:1rem;}
-  .tabs button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:.55rem;font:inherit;font-size:.84rem;cursor:pointer;}
-  .tabs button.aan{border-color:var(--gold);color:var(--gold);}
+  /* De tabbladenrij (Zoeken / Mijn reizen / Host) is de eigen schakelaar van
+     deze app -- het wisselen blijft van de pagina -- maar draagt de stijl van
+     het deelmenu (shared/deelmenu.js): geen vakjes met een randje, maar een
+     rustige balk met kleine kapitalen en een gouden streep onder de actieve.
+     De body.rtg-stijl-voorvoegsels zijn nodig omdat de gedeelde pilrij in
+     rtg-ui.css (body.rtg-stijl .tabs > button) anders zwaarder weegt. */
+  body.rtg-stijl .tabs{display:flex;gap:.15rem;flex-wrap:wrap;margin:1rem 0 0;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > button{flex:0 0 auto;background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;
+    font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    white-space:nowrap;cursor:pointer;}
+  body.rtg-stijl .tabs > button:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .tabs > button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .boeking{border-bottom:1px solid var(--line);padding:.7rem 0;font-size:.86rem;}
   .boeking:last-child{border-bottom:none;}
   .st{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}

@@ -166,6 +166,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
@@ -240,6 +242,19 @@ function toonBoek(d, t){
   }));
   toonMomenten(d.momenten);
 }
+/* Meenemen (shared/uitvoer.js): vlak[] is precies het boekje dat nu open ligt
+   -- met de favorietenfilter aan dus alleen de hartjes. De foto's zelf gaan
+   niet mee in een tabel; wel of er een bij het momentje hoort. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!vlak.length) return null;
+  return {
+    naam: 'babyboek',
+    kolommen: ['datum', 'momentje', 'van', 'hartjes', 'foto'],
+    rijen: vlak.map(function (e) {
+      return [e.dag, e.tekst || '', e.van || '', String(e.fav || 0), e.foto ? 'ja' : 'nee'];
+    })
+  };
+});
 $('#fAlles').addEventListener('click', () => { filterFavs = false; $('#fAlles').classList.add('aan'); $('#fFavs').classList.remove('aan'); laad(); });
 $('#fFavs').addEventListener('click', () => { filterFavs = true; $('#fFavs').classList.add('aan'); $('#fAlles').classList.remove('aan'); laad(); });
 
@@ -369,5 +384,6 @@ laadJarigen();
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

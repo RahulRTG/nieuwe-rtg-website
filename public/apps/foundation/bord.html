@@ -122,6 +122,8 @@
 
 <script src="tekenen.js"></script>
 <script src="realtime.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -160,7 +162,22 @@ function toonAgenda(list){
   $('#agLijst').querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{ const d=await api('/agenda/verwijder',{ itemId:b.dataset.del }); toonAgenda(d.agenda); }));
 }
 
+let LEERLINGEN = [];
+/* Meenemen (shared/uitvoer.js): de klassenlijst zoals hij in het zijpaneel
+   staat -- wie er nu meekijkt en hoeveel er is ingeleverd. Het bord zelf is een
+   tekening, geen tabel; die gaat hier dus niet in mee. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!LEERLINGEN.length) return null;
+  return {
+    naam: 'klassenlijst',
+    kolommen: ['leerling','online','ingeleverd'],
+    rijen: LEERLINGEN.map(function(l){
+      return [l.naam, l.online ? 'ja' : 'nee', String(l.ingeleverd || 0)];
+    })
+  };
+});
 function toonLeerlingen(lijst){
+  LEERLINGEN = lijst;
   $('#llAantal').textContent = lijst.length;
   const online = lijst.filter(l=>l.online).length;
   $('#onAantal').textContent = online; $('#onDot').classList.toggle('aan', online>0);
@@ -199,5 +216,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

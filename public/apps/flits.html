@@ -65,6 +65,7 @@
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 </style>
+<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <header class="kop">
@@ -124,6 +125,19 @@
   const LAND = 'ES';                        // demo: Ibiza; in productie uit de live-locatie
   let hier = { lat: 38.9089, lng: 1.4330 }; // demo-startpunt tot de gps spreekt
   let rond = null, alarmMelding = null, gesproken = {};
+
+  /* Meenemen (shared/uitvoer.js): de meldingen die het netwerk rond u heeft
+     staan, met de velden die de lijst ook toont. De vooruitblik is een
+     berekening en geen melding; die blijft op het scherm. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!rond) return null;
+    return {
+      naam: 'meldingen',
+      kolommen: ['soort', 'melding', 'afstand (km)', 'gemeld door', 'bevestigingen', 'datum'],
+      rijen: (rond.meldingen || []).map(m => [m.soort, m.naam, m.afstandKm, m.door,
+        m.bevestigingen, String(m.at || '').slice(0, 10)])
+    };
+  });
 
   /* ---- gps: snelheid en positie ---- */
   // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
@@ -229,5 +243,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -15,9 +15,23 @@
   .wrap{max-width:64rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
-  .stuur{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;}
+  .stuur{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;
+    padding-bottom:0;border-bottom:1px solid var(--lijn);}
   .stuur .knop{padding:.4rem .75rem;font-size:.82rem;}
   .stuur .knop.aan{border-color:var(--goud);color:var(--goud);}
+  /* De gezinsagenda houdt zijn eigen weergave-schakelaar (maand / week / lijst),
+     maar draagt hem in de stijl van het deelmenu: geen randje om een knop, maar
+     een rustige tab met kleine kapitalen en een gouden streep onder de actieve.
+     Zo is het huis er een. De pijlen, "Vandaag" en "+ Nieuw" blijven
+     handelingen, en dus echte knoppen. De selector moet dieper dan `.knop`: de
+     kit tekent die als een pil en die regel is specifieker dan een kale klasse
+     hier. */
+  .stuur .knop[data-zicht]{background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;align-self:flex-end;margin-bottom:-1px;padding:.55rem .8rem .6rem;
+    font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--zacht);}
+  .stuur .knop[data-zicht]:hover{color:var(--txt);border-bottom-color:transparent;}
+  .stuur .knop[data-zicht].aan{color:var(--txt);background:none;border-bottom-color:var(--goud);}
   #periode{font-family:var(--serif);font-size:1.05rem;margin:0 .3rem;}
   .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
 

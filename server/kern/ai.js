@@ -46,7 +46,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
         if (reply) return { text: schrob(reply), lang };
       } catch (e) { console.error('Claude-fout (rahul):', e.message); }
     }
-    const canned = schrob(cannedAnswer(last));
+    const canned = schrob(cannedAnswer(last, tier));
     if (lang !== 'nl' && i18n) {
       try {
         const t = await i18n.translate(canned, lang, 'nl');

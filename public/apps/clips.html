@@ -371,6 +371,12 @@
   let stroom = null, recorder = null, brokken = [], opnameBlob = null, opnameT = null, opnameStart = 0;
   $('#studioOpen').addEventListener('click', async () => {
     $('#studio').classList.add('open');
+    // buiten een beveiligde context bestaat mediaDevices niet; zonder deze
+    // controle kwam hier een rauwe TypeError in beeld te staan
+    if (!window.isSecureContext || !navigator.mediaDevices) {
+      $('#studioStatus').textContent = 'Opnemen kan hier niet: dit adres is onbeveiligd (http), en een browser geeft de camera alleen vrij op een beveiligd (https-)adres.';
+      return;
+    }
     try {
       stroom = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
       $('#studioDoek').srcObject = stroom;

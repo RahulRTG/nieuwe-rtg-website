@@ -59,6 +59,7 @@ const bundels = {
   'apps/meldkamer.js': 'apps/meldkamer',
   'apps/foundation/gezin-rt.js': 'apps/foundation/gezin-rt',
   'apps/foundation/sessie.js': 'apps/foundation/sessie',
+  'shared/basis.js': 'shared/basis',
   'shared/i18n.js': 'shared/i18n',
   'shared/borden.js': 'shared/borden',
   'shared/werkos.js': 'shared/werkos',

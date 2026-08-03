@@ -109,6 +109,10 @@
      laatste, zodat uw kring iets heeft als uw telefoon straks uitvalt. */
   V.plekDoorgeven = function () {
     return new Promise(function (klaar) {
+      // de GPS-schakelaar in het OS-menu (rtg_os_gps) wint van het levensteken:
+      // wie hem op "uit" zet, wordt niet elke twee minuten om een positie
+      // gevraagd -- de kring krijgt dan geen plek, en dat is de keuze
+      try { if (localStorage.getItem('rtg_os_gps') === '0') return klaar(false); } catch (e) {}
       if (!navigator.geolocation) return klaar(false);
       navigator.geolocation.getCurrentPosition(function (p) {
         var body = { lat: p.coords.latitude, lon: p.coords.longitude, nauwkeurig: p.coords.accuracy };

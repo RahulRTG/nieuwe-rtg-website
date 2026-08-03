@@ -126,7 +126,11 @@
   let rond = null, alarmMelding = null, gesproken = {};
 
   /* ---- gps: snelheid en positie ---- */
-  if ('geolocation' in navigator) {
+  // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
+  // (rtg_os_gps) wint; zonder plek blijft het demo-startpunt staan
+  let gpsUit = false;
+  try { gpsUit = localStorage.getItem('rtg_os_gps') === '0'; } catch (e) {}
+  if (!gpsUit && 'geolocation' in navigator) {
     navigator.geolocation.watchPosition(p => {
       hier = { lat: p.coords.latitude, lng: p.coords.longitude };
       const kmu = p.coords.speed != null ? Math.max(0, Math.round(p.coords.speed * 3.6)) : null;

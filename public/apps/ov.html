@@ -137,7 +137,11 @@
   const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
 
   let hier = { lat: 38.908, lng: 1.432 };   // demo-startpunt tot de gps spreekt
-  if ('geolocation' in navigator)
+  // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
+  // (rtg_os_gps) wint; zonder plek blijft het demo-startpunt staan
+  let gpsUit = false;
+  try { gpsUit = localStorage.getItem('rtg_os_gps') === '0'; } catch (e) {}
+  if (!gpsUit && 'geolocation' in navigator)
     navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
 
   async function ververs() {

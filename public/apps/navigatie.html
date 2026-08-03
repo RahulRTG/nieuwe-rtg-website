@@ -442,7 +442,11 @@
   }
 
   /* ---- gps: jouw echte positie (blijft op het toestel) ---- */
-  if ('geolocation' in navigator && window.isSecureContext) {
+  // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
+  // (rtg_os_gps) wint; de kaart werkt gewoon zonder eigen positie
+  let gpsUit = false;
+  try { gpsUit = localStorage.getItem('rtg_os_gps') === '0'; } catch (e) {}
+  if (!gpsUit && 'geolocation' in navigator && window.isSecureContext) {
     navigator.geolocation.watchPosition(p => {
       hier = { lat: p.coords.latitude, lng: p.coords.longitude };
       if (kaartData) bouwPinnen();

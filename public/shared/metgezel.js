@@ -351,4 +351,20 @@
   }
   // bij het openen van een pagina: laat de kamer weten waar je bent
   if (kamerCode) meldHier();
+
+  /* Onbeveiligd adres: een keer per sessie eerlijk zeggen wat er dan NIET
+     werkt. Buiten https (of localhost) bestaat mediaDevices niet en blokkeert
+     de browser de locatie; zestien apps (camera, clips, bellen, scanner,
+     paspoortscan, theater, ...) faalden elk met een eigen, vaak misleidende
+     melding ("geef toegang") terwijl er niets toe te staan valt. De oorzaak
+     is het adres, dus de melding hangt op de laag die op elke app-pagina
+     staat, in plaats van in zestien schermen apart. */
+  if (!window.isSecureContext) {
+    var alGemeld = false;
+    try { alGemeld = sessionStorage.getItem('rtg_http_melding') === '1'; } catch (e) {}
+    if (!alGemeld) {
+      try { sessionStorage.setItem('rtg_http_melding', '1'); } catch (e) {}
+      banner('Dit adres is onbeveiligd (http): camera, microfoon en locatie blijven dan uit. Open de app via het beveiligde (https-)adres.', null);
+    }
+  }
 })();

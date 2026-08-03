@@ -7256,6 +7256,13 @@
   }
   function ontmoetPositie(){
     return new Promise(res => {
+      // De GPS-schakelaar in het OS-menu (rtg_os_gps, gezet in shared/osmenu)
+      // wint van deze lus. Zonder deze poort vroeg de tick elke twintig
+      // seconden om een positie -- op een toestel met toestemming op "vraag
+      // elke keer" is dat een systeemprompt per tick, ook op het beginscherm,
+      // terwijl de schakelaar in de app op "uit" stond. De server kan al
+      // zonder positie (pos || {} hieronder), dus uit is gewoon: geen plek.
+      try { if (localStorage.getItem('rtg_os_gps') === '0') return res(null); } catch (e) {}
       if (!navigator.geolocation) return res(null);
       navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude }), () => res(null), { maximumAge: 15000, timeout: 8000 });
     });

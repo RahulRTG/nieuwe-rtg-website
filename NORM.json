@@ -8,7 +8,7 @@
     "dependencies": 0,
     "testbestanden": 487,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 74,
+    "zelfpoortendeToetsen": 75,
     "e2eBestanden": 45,
     "keuringOmvang": 67,
     "keuringDubbeling": 56,
@@ -20,9 +20,9 @@
   "notities": [
     {
       "datum": "2026-08-03",
-      "meter": "zelfpoortendeToetsen 73 -> 74",
+      "meter": "zelfpoortendeToetsen 73 -> 75",
       "reden": "Met de hand verhoogd voor test/deur.e2e.js: de schermtoets op de gedeelde deur (shared/deur.js), die veertien gesloten apps van een kale zin naar een echte poort brengt. Hij eist dat de deur toont wat erachter zit (uit de app-gids), de echte weg naar binnen noemt met een link die bestaat, en -- de merkregel -- NOOIT toegang belooft.",
-      "eerlijkheidshalve": "Zelfde tegenwicht als de vier tanden hiervoor (browserpoort + RTG_E2E_STRICT=1 in ci.yml). Drie mutaties gedaan en alle drie RAAK gezien: een deur die wel toegang belooft, een deur zonder gids-inhoud, en een deur zonder link naar de toegangsregels lieten elk de juiste bewering zakken. Dit is de eerste keer dat een merkregel (de AI belooft nooit zelf toegang) door een machine wordt bewaakt in plaats van alleen door CLAUDE.md."
+      "eerlijkheidshalve": "Twee tanden in een: het bestand draagt twee zelfpoortende toetsen (de leden-deur en de RTF-gezinsdeur), en deze meter telt toetsen en niet bestanden. Zelfde tegenwicht als de vier tanden hiervoor (browserpoort + RTG_E2E_STRICT=1 in ci.yml). Vier mutaties gedaan en alle vier RAAK gezien: een deur die wel toegang belooft, een deur zonder gids-inhoud, een deur zonder link naar de toegangsregels, en de RTF-poort terug op location.href='index.html' -- elk liet de juiste bewering zakken. Dit is de eerste keer dat een merkregel (de AI belooft nooit zelf toegang) door een machine wordt bewaakt in plaats van alleen door CLAUDE.md."
     },
     {
       "datum": "2026-08-03",

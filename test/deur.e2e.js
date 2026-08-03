@@ -89,3 +89,40 @@ test('poort: toont wat erachter zit, de weg naar binnen, en belooft nooit toegan
     child.kill();
   }
 });
+
+/* De RTFoundation-kant, en de ergste vorm van de oude poort: daar werd je
+   zonder een woord naar de voorpagina GEGOOID (location.href = index.html
+   in Sessie.eisProfiel). Je verloor dus ook nog waar je heen wilde. Deze
+   toets legt vast dat je blijft staan waar je was, met een deur die
+   vertelt wat de app is en hoe je binnenkomt. */
+test('deur: een RTF-app zonder gezinssessie gooit je niet weg maar legt het uit',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    await page.goto(base + '/apps/foundation/klusjes.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.rtgdeur', { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelectorAll('.rtgdeur li').length >= 2, null, { timeout: 10000 });
+
+    const p = await page.evaluate(() => {
+      const el = document.querySelector('.rtgdeur');
+      return { pad: location.pathname, tekst: el.innerText,
+        links: [...el.querySelectorAll('a')].map(a => a.getAttribute('href')) };
+    });
+
+    // 1. je blijft op de app die je koos -- dit is de kern van de reparatie
+    assert.match(p.pad, /klusjes\.html$/, 'je blijft op de app staan, kreeg: ' + p.pad);
+    // 2. met de inhoud van DEZE app uit zijn eigen gids
+    assert.ok(/klusje|sterren/i.test(p.tekst), 'de deur vertelt over deze app: ' + p.tekst.slice(0, 120));
+    // 3. en een weg naar binnen die bestaat
+    assert.ok(p.links.some(h => /foundation\/index\.html/.test(h)),
+      'met een weg naar het gezin, kreeg: ' + p.links.join(', '));
+    const r = await fetch(base + '/apps/foundation/index.html');
+    assert.equal(r.status, 200, 'en die pagina bestaat');
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});

@@ -46,5 +46,8 @@
     "dekking:vast": "node --experimental-sqlite scripts/dekking.js --vastleggen",
     "samenhang": "node --experimental-sqlite scripts/samenhang.js",
     "samenhang:vast": "node --experimental-sqlite scripts/samenhang.js --vastleggen"
+  },
+  "dependencies": {
+    "zz-ijk-tijdelijk": "^1.0.0"
   }
 }

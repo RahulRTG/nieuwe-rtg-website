@@ -51,6 +51,7 @@
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
 <script src="/shared/deur.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -61,9 +62,20 @@ const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov',
 const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; };
 const AIBOX=app=>'<div class="kaart"><h2>Vraag de reissecretaris</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
+/* Meenemen (shared/uitvoer.js): het gezelschap zoals het op de kaart staat --
+   naam, band en de reisgegevens die u zelf heeft ingevuld. Dit is een lijst die
+   men anders met de hand bijhoudt; hij hoort dus mee te kunnen. */
+let GEZELSCHAP=[];
+if(window.RTGUitvoer) RTGUitvoer.bron(()=>({
+  naam:'gezelschap',
+  kolommen:['naam','band','telefoon','dieet','voorkeuren','documenten'],
+  rijen:GEZELSCHAP.map(p=>[p.naam, p.band, p.telefoon||'', p.dieet||'', p.voorkeuren||'',
+    (p.documenten||[]).map(x=>x.soort+' tot '+x.tot).join(' | ')])
+}));
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
   let d; try{ d=await api('entourage'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het gezelschap niet laden.</div>'; return; }
+  GEZELSCHAP=d.gezelschap||[];
   let h='';
   if(d.attenties.length){ h+='<div class="attn"><h2>Documenten die aandacht vragen</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.naam)+'</b> · '+esc(a.soort)+' '+(a.verlopen?'verlopen':'geldig tot')+' '+dt(a.tot)+'</div>').join('')+'<small style="display:block;margin-top:.4rem;opacity:.75;">'+esc(d.bron)+'</small></div>'; }
   h+='<div class="kaart"><h2>Iemand toevoegen</h2><div class="rij"><input class="veld" id="pN" placeholder="naam"><select class="veld" id="pB">'+d.banden.map(b=>'<option>'+b+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="pT" placeholder="telefoon"><input class="veld" id="pDi" placeholder="dieet"></div><div class="rij"><input class="veld" id="pP" type="date" title="paspoort geldig tot"><input class="veld" id="pV" placeholder="voorkeuren"></div><div style="margin-top:.6rem;"><button class="knop" id="pAdd">+ toevoegen</button></div><div style="font-size:.72rem;color:var(--soft);margin-top:.35rem;">De datum is de geldigheid van het paspoort.</div></div>';
@@ -100,5 +112,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

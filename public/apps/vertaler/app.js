@@ -131,6 +131,16 @@
   var hist = [], vast = [];
   try { hist = JSON.parse(localStorage.getItem('rtg_vertaal_hist') || '[]'); } catch (e) {}
   try { vast = JSON.parse(localStorage.getItem('rtg_vertaal_vast') || '[]'); } catch (e) {}
+  /* Meenemen (shared/uitvoer.js): wat deze app ECHT bezit staat op dit toestel
+     -- de bewaarde zinnen en de laatste vertalingen. Twee velden per regel (de
+     tekst en de vertaling), plus waar hij vandaan komt; een taalcode wordt per
+     regel niet bewaard, dus die staat er ook niet bij. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    var rijen = vast.map(function (h) { return ['bewaard', h.van, h.naar]; })
+      .concat(hist.map(function (h) { return ['onlangs vertaald', h.van, h.naar]; }));
+    if (!rijen.length) return null;
+    return { naam: 'vertalingen', kolommen: ['soort', 'brontekst', 'vertaling'], rijen: rijen };
+  });
   function histBij(van, naar) {
     if (hist.length && hist[0].van === van) return;
     hist.unshift({ van: van, naar: naar });

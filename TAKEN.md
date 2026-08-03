@@ -75,7 +75,7 @@ Geen blokkade, wel een risico dat je bewust moet nemen.
 
 | # | Wat | Stand |
 |---|---|---|
-| 5.1 | Premium-laag (meenemen + sneltoetsen) over alle apps | 51 van 186 apps; workflow draait |
+| 5.1 | Premium-laag (meenemen + sneltoetsen) over alle apps | **162 van de 188 schermen** dragen hem (gemeten op de boom, niet uit het geheugen van de uitrol). De 26 zonder: negen RTF-kinderapps (arena, speelhal, speeltuin, verhaaltje, tellen, rust, reis, societeit, studie), vier juridische tekstpagina's plus `juridisch.html`, en `index.html` -- daar valt niets mee te nemen en dat is terecht. Blijven over als echt onaangeraakt: horloge, kantoorpda, uitzicht, vertaler, vitaal, vluchten, vonk, wbw, websitestudio, werkplek, zaal en zorgbalie |
 | 5.2 | Deelmenu over alle apps | 69 apps met menu, 85 bewust zonder (spellen, camera, feeds, chats), afgerond |
 | 5.3 | De deur voor gesloten apps | 58 apps afgerond (14 pas, 3 personeel, 41 gezin) |
 | 5.4 | 35 apps stonden bij de deelmenu-uitrol als "kandidaat vervolg" omdat ze hun scherm pas na een fetch bouwen; het component kan dat inmiddels | opnieuw langslopen nadat 5.1 klaar is |

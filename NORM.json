@@ -8,7 +8,7 @@
     "dependencies": 0,
     "testbestanden": 487,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 71,
+    "zelfpoortendeToetsen": 72,
     "e2eBestanden": 45,
     "keuringOmvang": 66,
     "keuringDubbeling": 56,
@@ -18,6 +18,12 @@
     "routesNietSchakelbaar": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 71 -> 72",
+      "reden": "Met de hand VERHOOGD voor test/deelmenu.e2e.js: de schermtoets op het nieuwe deelmenu (shared/deelmenu.js), dat een app met veel delen als menu met een deel tegelijk toont. De toets eist de balk, precies een zichtbaar deel, de wissel met hash, en de deep-link.",
+      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de twee tanden hiervoor: browserpoort + RTG_E2E_STRICT=1 in ci.yml dekken ook dit bestand. De mutatie is gedaan en beet raak: met de wissel gesaboteerd (rtgdeel-weg werd nooit gezet) zakte de toets op precies de bewering 'het toetsing-deel is dan echt weg'."
+    },
     {
       "datum": "2026-08-03",
       "meter": "zelfpoortendeToetsen 70 -> 71",

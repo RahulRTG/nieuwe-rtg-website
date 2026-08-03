@@ -83,6 +83,7 @@
     border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--goud,#C9A24B);outline-offset:2px;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
@@ -94,9 +95,11 @@
   <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam.</div>
   <div class="mijncn" id="mijncn"></div>
 
+  <div class="deel">Verhalen</div>
   <div id="opdrachtKaart"></div>
   <div class="stories" id="stories"></div>
 
+  <div class="deel">Toevoegen</div>
   <div id="zoekBlok">
     <div class="sec">Vriend toevoegen</div>
     <div class="zoekrij">
@@ -129,6 +132,7 @@
     <div class="lijst" id="meekijk"></div>
   </div>
 
+  <div class="deel">Mijn vrienden</div>
   <div class="sec">Mijn vrienden</div>
   <div class="lijst" id="vrienden"><div class="leeg">Laden...</div></div>
 </main>
@@ -642,6 +646,7 @@ startStream();
 setInterval(()=>{ if(!document.querySelector('.ov.open')) laad(); }, 12000);
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/accounts-os.js" defer></script>
 <script src="/shared/osbar.js" defer></script>
 <script src="/shared/uitleg.js" defer></script>

@@ -44,6 +44,7 @@
   .doelrij{display:flex;gap:.4rem;align-items:center;}
   .doelrij .veld{width:7rem;}
   .tip{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;margin-top:.8rem;color:var(--zacht);}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
@@ -59,6 +60,7 @@
     <div class="mini" id="week" style="display:none;margin-top:.4rem;"></div>
   </div>
 
+  <div class="deel">Boeken</div>
   <div class="kaart blok">
     <div class="rij2">
       <input class="veld" id="bBedrag" inputmode="decimal" placeholder="Bedrag (bijv. 5 of 2,50)">
@@ -71,6 +73,7 @@
     <div class="fout" id="bFout"></div>
   </div>
 
+  <div class="deel">Spaardoelen</div>
   <h2 class="sec">Spaardoelen</h2>
   <div id="doelen"><div class="leeg">Nog geen spaardoel. Waar droom je van?</div></div>
   <div class="kaart blok">
@@ -83,6 +86,7 @@
   </div>
   <div class="tip" id="tip"></div>
 
+  <div class="deel">Bewegingen</div>
   <h2 class="sec">Laatste bewegingen</h2>
   <div class="kaart blok" id="txs"><div class="leeg">Nog niets geboekt.</div></div>
 </div>
@@ -158,6 +162,7 @@ $('#dDoe').addEventListener('click', async () => {
 });
 api('potje').then(toon).catch(() => {});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

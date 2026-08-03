@@ -92,7 +92,6 @@ let DOELEN = [];
    bijdragen blijven erbuiten: die zeggen wie hoeveel gaf. */
 if (window.RTGUitvoer) RTGUitvoer.bron(function () {
   if (!DOELEN.length) return null;
-  if (1) return null; // MUTATIE
   return { naam: 'spaardoelen', kolommen: ['doel', 'gespaard', 'streefbedrag', 'stand', 'sinds'],
     rijen: DOELEN.map(x => [x.naam, String(x.nu), String(x.doel),
       x.klaar ? 'gehaald' : 'loopt', String(x.at || '').slice(0, 10)]) };

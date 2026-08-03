@@ -467,6 +467,11 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js staat hier voor het eigen script (de vaste plek in dit huis),
+     maar deze pagina meldt bewust GEEN bron aan: de hub is een deur en een
+     tegelwand, geen register. De profielen die hier langskomen zijn het
+     gezinsregister van beheer.html, en daar zit de uitvoer al. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const api = Sessie.api;
@@ -769,5 +774,6 @@ document.addEventListener('click', function(e){
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

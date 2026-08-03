@@ -104,6 +104,19 @@ const CATS = [
     ['Deze app','De cv-maker en het lesbord in de RTFoundation-app helpen je verder met leren en werk zoeken.']
   ]}
 ];
+/* Meenemen (shared/uitvoer.js): de hele wegwijzer, ook de categorieen die
+   dichtgeklapt staan. Wie hulp zoekt heeft er iets aan de lijst op papier of
+   op een ander toestel te hebben; het gesprek met Meike gaat er bewust NIET
+   in, want dat wordt hier ook niet bewaard. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  var rijen = [];
+  CATS.forEach(function(c){
+    c.items.forEach(function(it){ rijen.push([c.titel, it[0], it[1]]); });
+  });
+  if (!rijen.length) return null;
+  return { naam:'hulpwijzer', kolommen:['categorie','instantie','toelichting'], rijen:rijen };
+});
+
 $('#cats').innerHTML = CATS.map(c=>
   '<details class="kaart cat"><summary><span class="ic">'+c.ic+'</span>'+esc(c.titel)+'<span class="pijl">›</span></summary>'+
   '<div class="body">'+c.items.map(([t,d])=>'<div class="hulp"><b>'+esc(t)+'</b><p>'+esc(d)+'</p></div>').join('')+'</div></details>'
@@ -121,5 +134,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

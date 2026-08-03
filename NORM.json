@@ -8,8 +8,8 @@
     "dependencies": 0,
     "testbestanden": 487,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 77,
-    "e2eBestanden": 45,
+    "zelfpoortendeToetsen": 80,
+    "e2eBestanden": 50,
     "keuringOmvang": 67,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
@@ -20,6 +20,13 @@
     "schermenZonderToets": 105
   },
   "notities": [
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 77 -> 80",
+      "reden": "Met de hand verhoogd voor test/bankscherm.e2e.js: drie schermtoetsen op de bank, de eerste app die is aangepakt uit de 105 die volgens scripts/schermen.js geen eigen toets hadden. Bewust de bank: van die 105 raken er negen geld, toegang of identiteit, en daar is 'het ziet er compleet uit' het duurst. De API was al getoetst (bank.test.js, bankdeuren.test.js, office-bank.test.js); het SCHERM niet, en dat is precies het verschil dat deze meter blootlegde.",
+      "eerlijkheidshalve": "Twee dingen die hierbij horen. Ten eerste toetst dit bestand ALLEBEI de standen van de schakelaar, en de belangrijkste is de stand die vandaag verscheept wordt: bank dicht. Dan moet het scherm eerlijk zeggen dat er nog niets is en juist GEEN akkoordknop en geen IBAN tonen -- een financieel scherm dat doet alsof er een rekening is, is erger dan een scherm dat niets doet. Een toets die alleen de mooie stand beproeft toetst niet wat de klant krijgt. Ten tweede leverde het mutatiewerk een echt defect in mijn eigen toets op: de dichte-stand-toets ging uit van de standaardstand, slaagde in zijn eentje, en zakte zodra de twee live-toetsen ervoor hadden gedraaid -- want die zetten de schakelaar aan en de opslag wordt gedeeld. Een toets die van de volgorde afhangt bewijst niet wat hij beweert. Elke toets zet nu expliciet de stand die hij nodig heeft en zet hem daarna terug. Drie mutaties, alle drie RAAK en alle drie op precies hun eigen bewering: de dichte-stand-poort weghalen liet alleen de eerste zakken, centen niet door honderd delen alleen de tweede, en de datumhulp terug op een tekst-afknipping alleen de derde ('kreeg: 1785777305'). Die laatste is geen verzonnen fout: exact die stond hier eerder in de kolom datum, en dezelfde is deze week ook in werkplek.js gevonden. Een eerdere poging op die derde was te grof (het commentaarteken slikte de rest van de regel op) en liet een andere bewering zakken; die telt niet en is overgedaan.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 75 -> 77"
+    },
     {
       "datum": "2026-08-03",
       "meter": "schermenZonderToets (nieuw, nulmeting 105 van 188)",

@@ -38,7 +38,9 @@
     font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
     text-transform:uppercase;color:var(--muted);white-space:nowrap;}
   body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
-  body.rtg-stijl .tabs > .tab.aan{color:var(--txt);border-bottom-color:var(--gold);}
+  /* het gevulde pilletje van de kit uitzetten: `body.rtg-stijl .tabs > button.aan`
+     is specifieker dan een kale `.tab`, dus de vulling moet hier weg */
+  body.rtg-stijl .tabs > .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   section.paneel{display:none;} section.paneel.aan{display:block;}
   .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}

@@ -23,9 +23,18 @@
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:760px;margin:0 auto;}
-  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
-  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
-  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* het tabmenu van het loket houdt zijn eigen werking, maar draagt de stijl
+     van het deelmenu: een balk met een gouden streep onder het open deel.
+     De selectors staan bewust op body.rtg-stijl .tabs > .tab: de gedeelde
+     rtg-ui.css maakt van .tabs > button pilknoppen, en die regel weegt
+     zwaarder dan een kale .tab hier. */
+  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;
+    padding:0 0 .1rem;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > .tab{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;
+    font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-color:transparent;border-bottom-color:var(--line);}
+  body.rtg-stijl .tabs > .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   section.paneel{display:none;}
   section.paneel.aan{display:block;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:.8rem;}

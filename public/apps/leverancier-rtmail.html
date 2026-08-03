@@ -23,9 +23,15 @@
   header h1{font-size:1.35rem;}
   header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:999px;padding:.15rem .6rem;}
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
-  .schakel{display:flex;gap:.4rem;margin-bottom:1rem;}
-  .schakel button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--muted);font:inherit;font-size:.82rem;font-weight:600;border-radius:10px;padding:.5rem;cursor:pointer;}
-  .schakel button.aan{background:var(--card2);border-color:var(--gold);color:var(--txt);}
+  /* De mapbalk draagt dezelfde stijl als het deelmenu elders in het huis:
+     kale knoppen op een dunne lijn, de actieve map met een gouden streep
+     eronder. Het schakelen zelf blijft van deze pagina. */
+  .schakel{display:flex;flex-wrap:wrap;gap:.15rem;margin:0 0 1rem;padding:0 0 .1rem;border-bottom:1px solid var(--line);}
+  .schakel button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    color:var(--muted);font-family:Inter,system-ui,sans-serif;font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;padding:.55rem .8rem .6rem;cursor:pointer;}
+  .schakel button:hover{color:var(--txt);}
+  .schakel button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .rij{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;color:inherit;font:inherit;}
   .rij:hover{border-color:var(--gold);}
   .rij .ic{width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex-shrink:0;font-size:.72rem;font-weight:600;}

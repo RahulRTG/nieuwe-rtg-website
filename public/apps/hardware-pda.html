@@ -44,7 +44,9 @@
     font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
     text-transform:uppercase;color:var(--muted);white-space:nowrap;}
   body.rtg-stijl .chips > .chip:hover{color:var(--txt);border-bottom-color:transparent;}
-  body.rtg-stijl .chips > .chip.aan{color:var(--txt);border-bottom-color:var(--gold);}
+  /* het gevulde pilletje van de kit uitzetten: `body.rtg-stijl .chips > button.aan`
+     is specifieker dan een kale `.chip`, dus de vulling moet hier weg */
+  body.rtg-stijl .chips > .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
   .swatch{width:1.6rem;height:1.6rem;border-radius:7px;border:1px solid var(--line);}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}

@@ -22,11 +22,17 @@
   .kop .zaak{color:var(--gold);font-size:0.95rem;}
   .kop .rek{flex:1;}
   .kop .klok{font-variant-numeric:tabular-nums;font-size:1.4rem;font-weight:600;letter-spacing:0.04em;}
-  .kies{display:flex;gap:0.5rem;flex-wrap:wrap;}
-  .kies button{background:var(--card);border:1px solid var(--line);border-radius:999px;color:var(--soft);
-    font-size:0.85rem;padding:0.45rem 1rem;}
-  .kies button.aan{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
-  .kies button.spiegel.aan{background:var(--groen);border-color:var(--groen);}
+  /* De werkplekkeuze draagt de stijl van het deelmenu (shared/deelmenu.js):
+     stille hoofdletters, de open werkplek op een gouden streep. De keuze zelf
+     verandert niet; alleen de vorm, zodat het huis er een is. De balk krijgt
+     geen eigen lijn: de onderrand van de kop is die lijn al. */
+  .kies{display:flex;gap:0.15rem;flex-wrap:wrap;align-items:center;}
+  .kies button{background:none;border:0;border-bottom:2px solid transparent;color:var(--soft);
+    font-family:Inter,system-ui,sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.12em;
+    text-transform:uppercase;padding:0.5rem 0.8rem 0.45rem;white-space:nowrap;}
+  .kies button:hover{color:var(--txt);}
+  .kies button.aan{color:var(--txt);border-bottom-color:var(--gold);}
+  .kies button.spiegel.aan{border-bottom-color:var(--groen);}
   main{flex:1;min-height:0;overflow-y:auto;padding:1.4rem 1.6rem 2rem;}
   .vol{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.2rem;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.15rem 1.25rem;}

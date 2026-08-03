@@ -15,9 +15,19 @@
   header{padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;flex-wrap:wrap;}
   header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
   header h1{font-size:1.25rem;margin-top:.1rem;}
-  nav{display:flex;gap:.4rem;margin-left:auto;flex-wrap:wrap;}
-  nav button{background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:inherit;font-size:.78rem;padding:.3rem .8rem;cursor:pointer;}
-  nav button.aan{color:var(--txt);border-color:var(--gold);}
+  /* De tabs in de kop (Wie werkt waar / Loonrun / Matching) zijn de eigen
+     schakelaar van dit loonkantoor: EEN sectie tegelijk, precies wat het
+     deelmenu elders doet. Het mechanisme blijft ongemoeid; alleen de vorm gaat
+     mee met het huis -- een rustige balk met kleine kapitalen en een gouden
+     streep onder het deel waar je staat, in plaats van een rij pillen. De rij
+     zakt met een negatieve ondermarge op de onderrand van de kop, zodat er EEN
+     lijn staat en niet twee. */
+  nav{display:flex;gap:.15rem;margin-left:auto;margin-bottom:-.6rem;flex-wrap:wrap;}
+  nav button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;
+    color:var(--muted);font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;padding:.5rem .7rem .55rem;cursor:pointer;}
+  nav button:hover{color:var(--txt);}
+  nav button.aan{color:var(--txt);border-bottom-color:var(--gold);}
   main{padding:1rem;max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;}
   .sec{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}

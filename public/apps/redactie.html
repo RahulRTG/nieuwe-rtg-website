@@ -28,9 +28,21 @@
   header h1{font-size:1.1rem;}
   .sp{flex:1 1 auto;}
   .snelbtn{background:var(--burgundy);border:1px solid var(--burgundy);color:#fff;font:inherit;font-weight:700;border-radius:999px;padding:.5rem 1.1rem;cursor:pointer;box-shadow:0 8px 24px rgba(194,58,94,.35);}
-  nav.tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.6rem;}
-  nav.tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);font:inherit;font-size:.85rem;font-weight:600;padding:.5rem .3rem;cursor:pointer;}
-  nav.tabs button.aan{color:var(--txt);border-color:var(--gold);}
+  /* De tabs in de kop (Vandaag / Artikelen / Huisstijl-site / Cijfers) zijn de
+     eigen schakelaar van deze redactie: EEN deel tegelijk, precies wat het
+     deelmenu elders doet. main wordt bij elke wissel opnieuw getekend, dus het
+     mechanisme blijft staan waar het staat; alleen de vorm gaat mee met het
+     huis -- kleine kapitalen en een gouden streep onder het deel waar je staat.
+     De rij zakt met een negatieve ondermarge op de onderrand van de kop, zodat
+     er EEN lijn staat en niet twee. De selector moet dieper dan `.tabs > button`:
+     de kit tekent die rij zelf al met `body.rtg-stijl .tabs > button`. */
+  body.rtg-stijl nav.tabs{display:flex;gap:.15rem;flex-wrap:wrap;margin:.6rem 0 -.2rem;padding:0;}
+  body.rtg-stijl nav.tabs > button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    border-radius:0;cursor:pointer;padding:.5rem .7rem .55rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl nav.tabs > button:hover{color:var(--txt);}
+  body.rtg-stijl nav.tabs > button.aan{background:none;border-width:0 0 2px;color:var(--txt);border-bottom-color:var(--gold);}
   main{padding:1.3rem 1.1rem 4rem;max-width:1180px;margin:0 auto;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:1rem;}
   .veld,textarea,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}

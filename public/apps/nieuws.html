@@ -22,10 +22,16 @@
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.5rem;}
   main{padding:1.1rem;max-width:680px;margin:0 auto;}
-  .rubrieken{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.8rem;scrollbar-width:none;}
+  /* de rubriekenrij is de eigen schakelaar van deze app; hij houdt zijn eigen
+     werking, maar draagt de stijl van het deelmenu -- een balk, geen pillen */
+  .rubrieken{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);scrollbar-width:none;}
   .rubrieken::-webkit-scrollbar{display:none;}
-  .rub{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem;font-size:.8rem;color:var(--muted);cursor:pointer;text-transform:capitalize;}
-  .rub.aan{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;}
+  .rub{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;}
+  .rub:hover{color:var(--txt);}
+  .rub.aan{color:var(--txt);border-bottom-color:var(--gold);}
   .art{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.8rem;cursor:pointer;transition:border-color .15s;}
   .art:hover{border-color:var(--gold);}
   .art .rlbl{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);}

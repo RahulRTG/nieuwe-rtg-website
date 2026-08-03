@@ -30,9 +30,18 @@
   .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.45rem .9rem;border-radius:0 0 10px 10px;text-decoration:none;font-size:.8rem;}
   .skip:focus{top:0;}
   label{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin:.7rem 0 .25rem;}
-  .tabs{display:flex;gap:.4rem;margin-top:.7rem;overflow-x:auto;}
-  .tabs button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .85rem;font-size:.78rem;white-space:nowrap;cursor:pointer;}
-  .tabs button[aria-pressed="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  /* De onderdelenbalk draagt dezelfde stijl als het deelmenu elders in het
+     huis: kale knoppen op de scheidingslijn van de kop, de actieve met een
+     gouden streep eronder. Het schakelen zelf blijft van deze pagina.
+     De body.rtg-stijl-voorvoegsels zijn nodig omdat de gedeelde pilrij in
+     rtg-ui.css (body.rtg-stijl .tabs > button) anders zwaarder weegt -- die
+     won hier ook van de oude regels, waardoor de actieve tab niets liet zien. */
+  body.rtg-stijl .tabs{display:flex;gap:.15rem;margin:.7rem -1.1rem -.7rem;padding:0 1.1rem;overflow-x:auto;flex-wrap:nowrap;}
+  body.rtg-stijl .tabs > button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+    margin-bottom:-1px;color:var(--muted);padding:.55rem .8rem .6rem;font-family:Inter,system-ui,sans-serif;
+    font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}
+  body.rtg-stijl .tabs > button:hover{color:var(--txt);}
+  body.rtg-stijl .tabs > button[aria-pressed="true"]{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   main{padding:1.1rem;max-width:660px;margin:0 auto;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin-bottom:.8rem;}
   .kaart h2{font-size:1rem;margin-bottom:.4rem;}

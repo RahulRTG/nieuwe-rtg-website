@@ -35,6 +35,16 @@
   input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
     color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
   .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  /* de moduswissel (Schouw/Werkvloer) is de eigen schakelaar van deze app; de
+     werking blijft, de knoppenrij draagt de stijl van het deelmenu */
+  #vOog > .rij[role="group"]{gap:0.15rem;margin:0.6rem 0 0;padding:0 0 0.1rem;
+    border-bottom:1px solid var(--line);}
+  #vOog > .rij[role="group"] .knop{background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;margin-bottom:-1px;padding:0.55rem 0.8rem 0.6rem;font-size:0.72rem;font-weight:600;
+    letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
+  #vOog > .rij[role="group"] .knop:hover{color:var(--txt);}
+  #vOog > .rij[role="group"] .knop[aria-pressed="true"]{color:var(--txt);border-color:transparent;
+    border-bottom-color:var(--gold);}
   .rij input,.rij select{flex:1;min-width:9rem;width:auto;}
   .scherm{position:relative;background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:4/3;}
   .scherm video{width:100%;height:100%;object-fit:cover;display:block;}

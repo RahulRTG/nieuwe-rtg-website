@@ -155,7 +155,6 @@
   <div class="wrap" id="hoofd">
     <div class="stat" id="stat"></div>
     <div class="zoekbar"><input id="zoekInp" placeholder="Zoek op gast, partner, referentie of plaats…" data-i18n-ph="bo.zoekph" autocomplete="off"></div>
-    <div class="deel">Vandaag</div>
     <div class="panel" style="margin-bottom:1.5rem;">
       <h2 class="ph"><span><span data-i18n="panel.actie">Actiecentrum</span></span><button class="hbtn" id="briefBtn"><span data-i18n="bo.brief">Dagbriefing</span></button></h2>
       <div class="brief" id="briefBox"></div>
@@ -165,7 +164,6 @@
       <h2><span class="livedot"></span> <span data-i18n="panel.live">Live onderweg</span> <span id="liveTot" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--soft);"></span></h2>
       <div class="rows" id="liveList"></div>
     </div>
-    <div class="deel">Handel</div>
     <div class="cols" style="margin-bottom:1.5rem;">
       <div class="panel">
         <h2 data-i18n="panel.perf">Partnerprestaties</h2>
@@ -191,7 +189,6 @@
         </div>
       </div>
     </div>
-    <div class="deel">Leden</div>
     <div class="cols" style="margin-top:1.5rem;">
       <div class="panel">
         <h2 data-i18n="panel.aanmeldingen">Aanmeldingen per pas</h2>
@@ -207,7 +204,6 @@
         <div class="rows" id="concierge"></div>
       </div>
     </div>
-    <div class="deel">Veiligheid</div>
     <div class="cols" style="margin-top:1.5rem;">
       <div class="panel">
         <h2 data-i18n="panel.incidenten">Paspoort-incidenten</h2>
@@ -229,7 +225,7 @@
       <h2><span data-i18n="panel.trust">Vertrouwenslijn</span></h2>
       <div class="rows" id="trustList"></div>
     </div>
-    <div id="ontLiveScrim" class="scrim rtgdeel-vast" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;align-items:center;justify-content:center;">
+    <div id="ontLiveScrim" class="scrim" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;align-items:center;justify-content:center;">
       <div style="width:min(94vw,640px);background:#111;border:1px solid var(--gold);border-radius:16px;padding:1rem;">
         <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;">
           <b style="flex:1;font-size:0.95rem;"><span id="ontLiveNaam">SOS</span></b>
@@ -240,7 +236,6 @@
         <div id="ontLiveStatus" style="font-size:0.75rem;color:var(--soft);margin-top:0.5rem;">Verbinden met de camera van het lid…</div>
       </div>
     </div>
-    <div class="deel">Partners</div>
     <div class="cols" style="margin-top:1.5rem;">
       <div class="panel">
         <h2 data-i18n="panel.apps">Sollicitaties bij partners</h2>
@@ -259,9 +254,8 @@
       </div>
     </div>
   </div>
-  <!-- rtgdeel-vast: schermvullende overlays horen bij geen enkel deel -->
-  <div class="doc-scrim rtgdeel-vast" id="docScrim"><img id="docImg" alt="Document"></div>
-  <div class="doc-scrim conv-scrim rtgdeel-vast" id="convScrim">
+  <div class="doc-scrim" id="docScrim"><img id="docImg" alt="Document"></div>
+  <div class="doc-scrim conv-scrim" id="convScrim">
     <div class="conv-card" data-stop>
       <div class="conv-head"><b id="convWho"></b><button id="convClose" class="vbtn">✕</button></div>
       <div class="conv-body" id="convBody"></div>
@@ -279,7 +273,6 @@
 <script src="/shared/accounts-os.js"></script>
 <script src="/shared/accounts-brug.js" data-wereld="kantoor"></script>
 <script src="/apps/backoffice.js"></script>
-<script src="/shared/deelmenu.js" defer></script>
 <script>
 window.I18N = { en: {
   'gate.h':'Sign in',

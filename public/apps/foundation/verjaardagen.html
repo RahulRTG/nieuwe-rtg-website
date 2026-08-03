@@ -78,6 +78,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -93,10 +95,13 @@ function wanneer(p){
   return p.dag+' '+MAAND[p.maand];
 }
 
+let stand = null;
+
 async function laad(){
   try{
     const d = await fetch('/api/foundation/gezin/'+s.code+'/verjaardagen?token='+encodeURIComponent(s.token)).then(r=>r.json());
     if (d.error) throw new Error(d.error);
+    stand = d;
     if (!d.mensen.length){ $('#mensen').innerHTML = '<div class="kaart blok"><div class="leeg">Nog niemand in het boek. Zet hieronder de eerste verjaardag erbij.</div></div>'; }
     else $('#mensen').innerHTML = d.mensen.map(kaartHtml).join('');
     d.mensen.forEach(bindPersoon);
@@ -107,6 +112,22 @@ async function laad(){
     });
   }catch(e){ $('#mensen').innerHTML = '<div class="kaart blok"><div class="leeg">Kon de verjaardagen niet laden.</div></div>'; }
 }
+
+/* Meenemen (shared/uitvoer.js): het verjaardagenboek zoals het gezin het
+   invult -- naam, de eerstvolgende datum, wat er nog te gaan is, de leeftijd
+   die iemand wordt, hoeveel wensen er staan en wat er in het potje zit. Het
+   potje ontbreekt bij de jarige zelf, precies zoals op het scherm. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!stand || !stand.mensen || !stand.mensen.length) return null;
+  return {
+    naam: 'verjaardagen',
+    kolommen: ['naam', 'datum', 'dagen te gaan', 'wordt', 'wensen', 'potje'],
+    rijen: stand.mensen.map(function (p) {
+      return [p.naam, p.opDatum, p.dagenTot, p.wordt == null ? '' : p.wordt,
+        (p.wensen || []).length, p.pot ? p.pot.totaal : ''];
+    })
+  };
+});
 
 function kaartHtml(p){
   const leeftijd = p.wordt!=null ? ' <span class="kleiner">wordt '+p.wordt+'</span>' : '';
@@ -194,5 +215,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -81,6 +81,7 @@
   </form>
 </div>
 <script src="/shared/basis.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script src="/shared/aibalk.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
@@ -228,11 +229,33 @@
       });
   }
 
+  /* Meenemen (shared/uitvoer.js): deze app houdt twee registers vast die van het
+     lid zelf zijn -- de genootschappen waar hij in zit, en de bijeenkomsten die
+     eraan komen. Je neemt mee wat je voor je hebt: staat je in de agenda, dan is
+     dat de agenda; anders de lijst genootschappen. De eigen knoppen "Neem mijn
+     inbreng mee" en "Neem alles mee" blijven wat ze waren: die halen het hele
+     prikbord bij de server op. */
+  var MIJN = null, AGENDA = null;
+  if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+    if (TAB === 'agenda' && AGENDA && (AGENDA.komt||[]).length) {
+      return { naam:'bijeenkomsten', kolommen:['datum','tijd','wat','genootschap','waar','mijn antwoord'],
+        rijen: AGENDA.komt.map(function(x){
+          return [x.datum||'', x.tijd||'', x.wat||'', x.groep||'', x.waar||'', x.mijnAntwoord||'nog niets']; }) };
+    }
+    if (MIJN && (MIJN.groepen||[]).length) {
+      return { naam:'genootschappen', kolommen:['naam','soort','mijn rol','leden','waarover'],
+        rijen: MIJN.groepen.map(function(g){
+          return [g.naam||'', SOORT[g.soort]||g.soort||'', g.mijnRol||'lid', g.leden, g.over||'']; }) };
+    }
+    return null;
+  });
+
   function laad(){
     tekenTabs();
-    if (TAB === 'mijn') { api('/genootschap/mijn').then(function(d){ if(d.error) return toon('<div class="leeg">'+esc(d.error)+'</div>'); tekenMijn(d); }); return; }
+    if (TAB === 'mijn') { api('/genootschap/mijn').then(function(d){ if(d.error) return toon('<div class="leeg">'+esc(d.error)+'</div>'); MIJN = d; tekenMijn(d); }); return; }
     if (TAB === 'agenda') {
       api('/genootschap/mijn-agenda').then(function(d){
+        AGENDA = d;
         toon('<div class="kaart"><h2>Wat er aankomt</h2>'+
           ((d.komt||[]).length ? d.komt.map(function(x){
             return '<div class="rij"><div class="tx"><b>'+esc(x.wat)+'</b><span class="merk">'+esc(x.groep)+'</span>'+
@@ -372,5 +395,6 @@
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

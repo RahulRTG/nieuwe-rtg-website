@@ -30,6 +30,26 @@
   var stand = null, weergave = 'tijdlijn', openAlbum = null;
   var sleutel = function (b) { return b.bron + ':' + b.id; };
 
+  /* Meenemen (shared/uitvoer.js): de tijdlijn als lijst -- per beeld de datum,
+     de naam die het draagt, waar het vandaan komt, of het favoriet is en in
+     welke albums het zit. Alleen verwijzingen, net als de albums zelf; de
+     beelden blijven waar ze staan. */
+  if (window.RTGUitvoer) window.RTGUitvoer.bron(function () {
+    if (!stand || !(stand.beelden || []).length) return null;
+    var albums = stand.albums || [];
+    return {
+      naam: 'galerij',
+      kolommen: ['datum', 'naam', 'bron', 'favoriet', 'albums'],
+      rijen: stand.beelden.map(function (b) {
+        var in_ = albums.filter(function (a) {
+          return (a.items || []).some(function (v) { return v.bron === b.bron && String(v.id) === String(b.id); });
+        }).map(function (a) { return a.naam; });
+        return [String(b.op || '').slice(0, 10), b.naam || '', b.uit || b.bron,
+          b.favoriet ? 'ja' : 'nee', in_.join(', ')];
+      })
+    };
+  });
+
   /* ---- beelden uit Bestanden lui laden, met cache ---- */
   var cache = {};
   var kijkt = new IntersectionObserver(function (waarnemingen) {

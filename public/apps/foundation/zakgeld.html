@@ -92,6 +92,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
@@ -116,7 +118,26 @@ const TIPS = [
 ];
 $('#tip').textContent = '' + TIPS[Math.floor(Date.now() / 86400000) % TIPS.length];
 
+let potje = null;
+
+/* Meenemen (shared/uitvoer.js): de bewegingen uit het potje, met dezelfde
+   velden als in de lijst -- de datum, waarvoor het was, het bedrag in euro's
+   en of het erbij kwam of eraf ging. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var tx = potje && potje.transacties;
+  if (!tx || !tx.length) return null;
+  return {
+    naam: 'zakgeld',
+    kolommen: ['datum', 'wat', 'bedrag', 'af of bij'],
+    rijen: tx.map(function (t) {
+      return [new Date(t.at).toISOString().slice(0, 10), t.wat || '',
+        (Math.abs(t.centen) / 100).toFixed(2), t.centen > 0 ? 'bij' : 'af'];
+    })
+  };
+});
+
 function toon(d){
+  potje = d;
   $('#saldo').textContent = euro(d.saldoCenten);
   // weekgeld (de geldschool): komt er elke week vanzelf bij, zonder timer-fratsen
   $('#week').style.display = d.weekgeldCenten ? '' : 'none';
@@ -172,5 +193,6 @@ api('potje').then(toon).catch(() => {});
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

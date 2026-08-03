@@ -12,6 +12,7 @@
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<script src="/shared/uitvoer.js"></script>
 <style>
   :root{
     --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
@@ -87,6 +88,24 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2400); }
 
 let DATA = null, filter = '';
+/* Meenemen (shared/uitvoer.js): de conceptenlijst is het register van dit lab.
+   De filterkeuze telt mee -- wat je voor je hebt is wat je meeneemt -- en de
+   velden gaan los mee: de behuizing en de chip komen uit het concept, de datum
+   uit o.at als YYYY-MM-DD. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!DATA || !(DATA.ontwerpen||[]).length) return null;
+  const l = DATA.ontwerpen.filter(o => !filter || o.discipline === filter);
+  if (!l.length) return null;
+  return {
+    naam: 'concepten',
+    kolommen: ['datum','naam','discipline','status','huis','behuizing','chip'],
+    rijen: l.map(function(o){
+      const c = o.concept || {};
+      return [String(o.at||'').slice(0,10), o.naam||'', o.disciplineLabel||'', o.status||'',
+        o.huis||'', c.behuizing||'', c.chip||''];
+    })
+  };
+});
 async function laad(){
   try { DATA = await api('hardware'); } catch(e){ $('#pLijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const sel = $('#pCat');
@@ -150,5 +169,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

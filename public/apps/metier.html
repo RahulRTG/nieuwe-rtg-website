@@ -86,10 +86,11 @@
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 (function(){
   var TOKEN = localStorage.getItem('rtg_member_token') || '';
-  var TAB = 'ik', IK = null, BEKEKEN = null;
+  var TAB = 'ik', IK = null, BEKEKEN = null, REGISTER = null, LOON = null;
   var TABS = [['ik','Mijn profiel'],['naam','Mijn naam'],['register','Beroepsregister'],['loon','Loonspiegel'],['coach','Rahul coacht']];
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
   function $(s){ return document.querySelector(s); }
@@ -181,6 +182,7 @@
 
   /* ---- het beroepsregister ---- */
   function tekenRegister(d){
+    REGISTER = d;
     var l = (d && d.leden) || [];
     toon('<div class="kaart"><label for="zveld">Zoek in het beroepsregister</label>'+
       '<input id="zveld" type="search" placeholder="Vak, vaardigheid of taal">'+
@@ -233,6 +235,7 @@
       ' · ± € '+r.maand.midden+' bruto per maand · '+r.zaken+' zaken</small></div></div>';
   }
   function tekenLoon(d){
+    LOON = d;
     toon('<div class="kaart"><h2>Wat betaalt dit vak?</h2>'+
       '<p style="color:var(--soft);font-size:.82rem;line-height:1.5;">'+esc(d.uitleg||'')+
       (d.wet?' Wettelijk minimumuurloon in '+esc(d.wet.land)+': € '+d.wet.minimum+'.':'')+'</p>'+
@@ -274,6 +277,35 @@
   }
 
   var OEFEN = { rol:'', vraag:'' };
+
+  /* Meenemen (shared/uitvoer.js): Metier heeft drie schermen met echte rijen,
+     en wat u meeneemt is het scherm waar u staat -- uw eigen werk, wat u in
+     het register vond, of de loonspiegel. De coach-tab levert tekst van Rahul
+     en geen gegevens, dus daar valt niets te halen. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+    if (TAB === 'register' && REGISTER) {
+      return { naam:'beroepsregister', kolommen:['codenaam','beroepskop','plaats','open voor werk','bevestigd','vaardigheden'],
+        rijen:(REGISTER.leden||[]).map(function(m){
+          return [m.codenaam||'', m.kop||'', m.plaats||'', m.open?'ja':'nee', m.bewezen||0,
+            (m.vaardigheden||[]).join(', ')];
+        }) };
+    }
+    if (TAB === 'loon' && LOON) {
+      return { naam:'loonspiegel', kolommen:['vak','uur-laag','uur-midden','uur-hoog','maand-midden','zaken'],
+        rijen:(LOON.vakken||[]).map(function(r){
+          return [r.vakNaam||'', r.uur.laag, r.uur.midden, r.uur.hoog, r.maand.midden, r.zaken];
+        }) };
+    }
+    if (IK && IK.profiel) {
+      var p = IK.profiel, alle = (p.bewezen||[]).concat(p.rollen||[]);
+      return { naam:'mijn-werk', kolommen:['wat','waar','van','tot','sinds','bevestiging'],
+        rijen:alle.map(function(r){
+          return [r.wat||'', r.waar||'', r.van||'', r.tot||'', String(r.sinds||'').slice(0,10),
+            r.bevestigd?'bevestigd door RTG':'zelf opgegeven'];
+        }) };
+    }
+    return null;
+  });
 
   function laad(){
     tekenTabs();
@@ -379,5 +411,6 @@
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

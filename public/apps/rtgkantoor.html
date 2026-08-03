@@ -120,6 +120,7 @@
     </div>
   </section>
 </main>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -139,6 +140,18 @@ RTGKantoorGesprek.toon($('#lGesprek'), (token) => {
 });
 
 let S = null;
+/* Meenemen: het journaal van de AI is het register van dit scherm -- wat hij
+   deed, wanneer, en van welke soort. De app kent dat model zelf, dus geeft hij
+   het door in plaats van de gedeelde laag het scherm te laten raden. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!S || !S.journaal || !S.journaal.length) return null;
+  return { naam: 'rtgai-journaal',
+    kolommen: ['datum', 'tijd', 'soort', 'gebeurtenis'],
+    rijen: S.journaal.map(j => {
+      const t = new Date(j.at).toISOString();
+      return [t.slice(0, 10), t.slice(11, 16), j.soort, j.tekst];
+    }) };
+});
 async function ververs(){
   try { S = await api('rtgai'); } catch(e){ return; }
   const f = $('#fase');
@@ -207,5 +220,6 @@ start();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -86,6 +86,7 @@
   <div id="inhoud"><div class="leeg">Laden…</div></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -98,6 +99,21 @@ const api=(pad,body,herkans)=>fetch('/api/member/sport'+pad,{method:'POST',heade
   if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
 const eur=c=>'€ '+(Number(c||0)/100).toFixed(2);
 let TAB='bord', CLUB='FCRTG', VAK=null;
+/* Meenemen (shared/uitvoer.js): het eigen model van het tabblad waar u staat.
+   Het bord en uw tickets zijn lijsten van deze app; ze gaan mee met de velden
+   LOS in plaats van de regel "FC RTG - Es Vedra 2-1" die op de kaart staat.
+   De stand is een echte tabel op het scherm -- die haalt de laag zelf op, dus
+   daar meldt deze app niets aan. */
+let BORD=null, TICKETS=null;
+if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
+  if(TAB==='bord'&&BORD&&BORD.length) return { naam:'wedstrijden',
+    kolommen:['datum','tijd','club','tegenstander','team','competitie','thuis of uit','uitslag'],
+    rijen:BORD.map(w=>[w.datum||'',w.tijd||'',w.club||'',w.tegen||'',w.team||'',w.competitie||'',w.thuis?'thuis':'uit',w.uitslag||'']) };
+  if(TAB==='mijn'&&TICKETS&&TICKETS.length) return { naam:'mijn-tickets',
+    kolommen:['datum','tijd','wedstrijd','vak','aantal','prijs','code','status'],
+    rijen:TICKETS.map(t=>[t.datum||'',t.tijd||'',t.wedstrijd||'',t.vak||'',t.aantal||'',(Number(t.prijsCenten||0)/100).toFixed(2),t.code||'',t.status||'']) };
+  return null;
+});
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x===b)); laad(); });
 
 async function laad(){
@@ -108,6 +124,7 @@ async function laad(){
 async function laadBord(){
   let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   CLUB = (d.clubs[0]||{}).code || CLUB;
+  BORD = d.wedstrijden||[];
   const komend = d.wedstrijden.filter(w=>!w.uitslag).reverse();
   const gespeeld = d.wedstrijden.filter(w=>w.uitslag);
   const kaart = w => '<div class="item"><h4>'+(w.thuis?esc(w.club)+' - '+esc(w.tegen):esc(w.tegen)+' - '+esc(w.club))+' '+
@@ -159,6 +176,7 @@ async function laadTickets(voorWedstrijd){
 
 async function laadMijn(){
   let d; try{ d=await api('/tickets'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  TICKETS=d.tickets||[];
   $('#inhoud').innerHTML=d.tickets.length?d.tickets.map(t=>
     '<div class="pass"><div class="regel"><span>Wedstrijd</span><b>'+esc(t.wedstrijd)+'</b></div>'+
     '<div class="regel"><span>Wanneer</span><b>'+esc(t.datum)+' · '+esc(t.tijd)+'</b></div>'+
@@ -198,5 +216,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

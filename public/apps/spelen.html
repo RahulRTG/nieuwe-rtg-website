@@ -273,6 +273,10 @@
 </main>
 <div class="melding" id="melding"></div>
 
+<!-- Meenemen (shared/uitvoer.js) staat hier voor de sneltoetsen, maar deze app
+     meldt geen eigen bron aan: een spel heeft potjes en standen, geen lijst die
+     je als gegevens mee naar buiten neemt. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1173,5 +1177,6 @@ if (qs.get('potje')) openPotje(qs.get('potje'));
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

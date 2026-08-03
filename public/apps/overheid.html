@@ -221,6 +221,9 @@
 </main>
 
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -273,6 +276,14 @@ if (!TOKEN) {
   });
 }
 
+/* Meenemen: elk loket heeft zijn eigen register, dus vult elke laad-functie
+   hieronder zijn eigen model in UITVOER. U neemt mee wat u open hebt staan --
+   de gedeelde laag zou hier de tekst van een kaartje meegeven, dit zijn de
+   velden zelf. */
+const UITVOER = {};
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){ return UITVOER[document.body.dataset.tab] || null; });
+const jaNee = v => v ? 'ja' : 'nee';
+
 const TABS =[['box','Berichtenbox'],['belasting','Belasting'],['rdw','RDW'],['kvk','Onderneming'],['sociaal','Sociaal'],['prov','Provincie'],['water','Waterschap'],['stem','Stemmen']];
 const TOESLAGEN = { zorgtoeslag:'Zorgtoeslag', huurtoeslag:'Huurtoeslag', kindgebonden:'Kindgebonden budget' };
 const VORMEN = { eenmanszaak:'Eenmanszaak', vof:'V.O.F.', bv:'Besloten vennootschap', stichting:'Stichting' };
@@ -317,6 +328,8 @@ async function vernieuwBadge(){
 async function laadBox(){
   let d; try { d = await api('/api/overheid/berichten'); } catch(e){ return; }
   const l = d.berichten || [];
+  UITVOER.box = { naam: 'berichtenbox', kolommen: ['titel','van','gelezen'],
+    rijen: l.map(b => [b.titel || '', b.van || '', jaNee(b.gelezen)]) };
   $('#boxLijst').innerHTML = l.length ? l.map(b =>
     '<div class="item'+(b.gelezen?'':' onge')+'" data-id="'+esc(b.id)+'"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.van)+'</div>'+
     '<div style="font-size:.86rem;color:var(--muted);margin-top:.3rem;line-height:1.5;">'+esc(b.tekst)+'</div></div>').join('') : '<div class="leeg">Nog geen berichten.</div>';
@@ -362,6 +375,8 @@ $('#ibGo').addEventListener('click', async () => {
 async function laadAanslagen(){
   let d; try { d = await api('/api/overheid/aanslagen/mijn'); } catch(e){ return; }
   const l = d.aanslagen || [];
+  UITVOER.belasting = { naam: 'aanslagen', kolommen: ['jaar','inkomen','saldo','betaald'],
+    rijen: l.map(a => [a.jaar, a.inkomen, a.saldo, jaNee(a.betaald)]) };
   $('#ibMijn').innerHTML = l.length ? l.map(a => '<div class="item"><h4>Aanslag IB '+esc(a.jaar)+'</h4>'+
     '<div class="meta">'+(a.saldo<0?'Teruggaaf € '+Math.abs(a.saldo):a.saldo>0?'Te betalen € '+a.saldo:'Nul')+' · inkomen € '+esc(a.inkomen)+'</div>'+
     '<span class="status '+(a.betaald?'op':'')+'">'+(a.saldo>0?(a.betaald?'betaald':'openstaand'):'niets te betalen')+'</span>'+
@@ -402,6 +417,8 @@ $('#vtGo').addEventListener('click', async () => {
 async function laadVoertuigen(){
   let d; try { d = await api('/api/overheid/voertuigen'); } catch(e){ return; }
   const l = d.voertuigen || [];
+  UITVOER.rdw = { naam: 'voertuigen', kolommen: ['kenteken','merk','bouwjaar','apk_tot','geschorst'],
+    rijen: l.map(v => [v.kenteken || '', v.merk || '', v.bouwjaar, v.apkTot || '', jaNee(v.geschorst)]) };
   $('#vtMijn').innerHTML = l.length ? l.map(v => '<div class="item"><h4>'+esc(v.kenteken)+'</h4><div class="meta">'+esc(v.merk)+' · bouwjaar '+esc(v.bouwjaar)+' · APK tot '+esc(v.apkTot)+'</div>'+
     '<span class="status'+(v.geschorst?' af':'')+'">'+(v.geschorst?'geschorst':'actief')+'</span> <button class="knop stil" data-sch="'+esc(v.id)+'" data-nu="'+(v.geschorst?'0':'1')+'" style="padding:.2rem .6rem;font-size:.76rem;">'+(v.geschorst?'Schorsing opheffen':'Schorsen')+'</button></div>').join('') : '<div class="leeg">Nog geen voertuigen.</div>';
   $('#vtMijn').querySelectorAll('button[data-sch]').forEach(b => b.addEventListener('click', async () => {
@@ -428,6 +445,8 @@ $('#kvGo').addEventListener('click', async () => {
 async function laadKvk(){
   let d; try { d = await api('/api/overheid/kvk/mijn'); } catch(e){ return; }
   const l = d.inschrijvingen || [];
+  UITVOER.kvk = { naam: 'handelsregister', kolommen: ['naam','kvknummer','rechtsvorm','sbi','vestiging'],
+    rijen: l.map(k => [k.naam || '', k.kvkNummer || '', k.rechtsvormLabel || '', k.sbi || '', k.vestiging || '']) };
   $('#kvMijn').innerHTML = l.length ? l.map(k => '<div class="item"><h4>'+esc(k.naam)+'</h4><div class="meta">KVK '+esc(k.kvkNummer)+' · '+esc(k.rechtsvormLabel)+' · SBI '+esc(k.sbi)+' · '+esc(k.vestiging)+'</div></div>').join('') : '<div class="leeg">Nog geen inschrijving.</div>';
 }
 
@@ -440,6 +459,8 @@ $('#szGo').addEventListener('click', async () => {
 async function laadUitkeringen(){
   let d; try { d = await api('/api/overheid/uitkeringen/mijn'); } catch(e){ return; }
   const l = d.uitkeringen || [];
+  UITVOER.sociaal = { naam: 'uitkeringen', kolommen: ['soort','status'],
+    rijen: l.map(u => [u.soortLabel || '', u.status || '']) };
   $('#szMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn aanvragen</h3>'+l.map(u =>
     '<div class="item"><h4>'+esc(u.soortLabel)+'</h4><span class="status '+(u.status==='toegekend'?'op':u.status==='afgewezen'?'af':'')+'">'+esc(u.status)+'</span></div>').join('') : '';
 }
@@ -466,6 +487,8 @@ $('#sbGo').addEventListener('click', async () => {
 async function laadSubsidies(){
   let d; try { d = await api('/api/overheid/subsidies/mijn'); } catch(e){ return; }
   const l = d.subsidies || [];
+  UITVOER.prov = { naam: 'subsidies', kolommen: ['regeling','project','gevraagd','toegekend','status'],
+    rijen: l.map(x => [x.regelingLabel || '', x.project || '', x.gevraagd, x.toegekend || '', x.status || '']) };
   $('#sbMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn aanvragen</h3>'+l.map(s =>
     '<div class="item"><h4>'+esc(s.regelingLabel)+'</h4><div class="meta">'+esc(s.project)+' · gevraagd € '+esc(s.gevraagd)+(s.toegekend?' · toegekend € '+esc(s.toegekend):'')+'</div>'+
     '<span class="status '+(s.status==='toegekend'?'op':s.status==='afgewezen'?'af':'')+'">'+esc(s.status)+'</span></div>').join('') : '';
@@ -475,6 +498,8 @@ async function laadSubsidies(){
 async function laadWaterbelasting(){
   let d; try { d = await api('/api/overheid/waterschap/mijn'); } catch(e){ return; }
   const l = d.aanslagen || [];
+  UITVOER.water = { naam: 'waterschapsbelasting', kolommen: ['soort','jaar','bedrag','betaald'],
+    rijen: l.map(a => [a.soort || '', a.jaar, a.bedrag, jaNee(a.betaald)]) };
   $('#wbMijn').innerHTML = l.length ? l.map(a => '<div class="item"><h4>'+esc(a.soort)+' '+esc(a.jaar)+'</h4><div class="meta">€ '+esc(a.bedrag)+'</div>'+
     '<span class="status '+(a.betaald?'op':'')+'">'+(a.betaald?'betaald':'openstaand')+'</span>'+
     (a.betaald?'':' <button class="knop stil" data-bet="'+esc(a.ref)+'" style="padding:.2rem .6rem;font-size:.76rem;">Betalen</button>')+'</div>').join('') : '<div class="leeg">Geen aanslagen.</div>';
@@ -515,6 +540,8 @@ async function laadStem(){
 async function laadBekend(){
   let d; try { d = await api('/api/overheid/bekendmakingen'); } catch(e){ return; }
   const l = d.bekendmakingen || [];
+  UITVOER.stem = { naam: 'bekendmakingen', kolommen: ['soort','titel','tekst'],
+    rijen: l.map(b => [b.soort || '', b.titel || '', b.tekst || '']) };
   $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Geen bekendmakingen.</div>';
 }
 
@@ -583,5 +610,6 @@ if (TOKEN) start();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

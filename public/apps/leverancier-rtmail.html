@@ -103,13 +103,11 @@ let LIJST=[], MAP='inbox', ADRES=null;
    de uitvoer. Alleen de kop van elk bericht, niet de hele tekst. */
 if(window.RTGUitvoer) RTGUitvoer.bron(function(){
   if(!LIJST.length) return null;
-  var uit = MAP==='verzonden';
-  return { naam: uit?'verzonden':'ontvangen',
-    kolommen: [uit?'aan':'van','onderwerp','datum','geverifieerd'],
+  if(MAP==='verzonden') return { naam:'verzonden', kolommen:['aan','onderwerp','datum'],
+    rijen: LIJST.map(function(m){ return [m.naar||'', m.onderwerp||'', String(m.at||'').slice(0,10)]; }) };
+  return { naam:'ontvangen', kolommen:['van','onderwerp','datum','geverifieerd'],
     rijen: LIJST.map(function(m){
-      return [ (uit?m.naar:m.van)||'', m.onderwerp||'', String(m.at||'').slice(0,10),
-        uit ? '' : (m.vertrouwd?'ja':'nee') ];
-    }) };
+      return [m.van||'', m.onderwerp||'', String(m.at||'').slice(0,10), m.vertrouwd?'ja':'nee']; }) };
 });
 const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(), dag=86400000;
   if(nu-d<dag && d.getDate()===nu.getDate()) return d.toTimeString().slice(0,5);

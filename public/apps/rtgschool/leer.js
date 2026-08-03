@@ -75,11 +75,18 @@
   }
 
   /* ---- de leerlijn: vakken en doelen, met wat je al behaald hebt ---- */
+  /* Het paspoort bewaart per behaald leerdoel alleen een id; de naam en het vak
+     staan in de leerlijn. Wat de app opvraagt, onthoudt hij hier -- alleen dat,
+     zodat de uitvoer leesbare namen kan geven zonder er iets bij te verzinnen. */
+  var DOELINFO = {};
   async function toonVakken(vraag) {
     var el = document.getElementById('vakken');
     el.innerHTML = '<div class="leeg">De leerlijn wordt gehaald...</div>';
     try {
       var d = await api('/api/leerstof/vakken', vraag);
+      (d.vakken || []).forEach(function (v) {
+        (v.doelen || []).forEach(function (doel) { DOELINFO[doel.id] = { naam: doel.naam, vak: v.vak }; });
+      });
       el.innerHTML = (d.vakken || []).map(function (v) {
         return '<div class="vakkop">' + esc(v.vak) + '</div>' + v.doelen.map(function (doel) {
           return '<div class="doel"><span>' + (doel.behaald ? '<span class="pil ok">behaald</span> ' : '') + esc(doel.naam) +
@@ -155,6 +162,25 @@
     MIJN = await api('/api/onderwijs/mijn');
     toonPaspoort();
   }
+
+  /* Meenemen: het leerpaspoort is van de leerling en gaat een leven lang mee,
+     dus hoort het ook het huis uit te kunnen. De app kent zijn eigen model, dus
+     geeft hij dat door in plaats van de gedeelde laag het scherm te laten
+     raden: per behaald leerdoel de naam, het vak, de fase en de dag. Geen
+     scores en geen rangorde -- die houdt deze app bewust ook niet bij. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    var ids = MIJN && MIJN.doelen ? Object.keys(MIJN.doelen) : [];
+    if (!ids.length) return null;
+    return {
+      naam: 'leerpaspoort',
+      kolommen: ['leerdoel', 'vak', 'fase', 'datum'],
+      rijen: ids.map(function (id) {
+        var w = MIJN.doelen[id] || {}, i = DOELINFO[id] || {};
+        return [i.naam || id, i.vak || '',
+          w.fase ? (LADDER ? faseNaam(w.fase) : w.fase) : '', String(w.op || '').slice(0, 10)];
+      })
+    };
+  });
 
   async function start() {
     try {

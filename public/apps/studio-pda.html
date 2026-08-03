@@ -75,6 +75,7 @@
   <div id="pLijst"><div class="leeg">Laden...</div></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -94,6 +95,22 @@ async function laad(){
   if (!sel.options.length) sel.innerHTML = DATA.disciplines.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   render();
 }
+/* Meenemen (shared/uitvoer.js): het ontwerpregister uit het eigen model, veld
+   voor veld -- niet de kaarttekst van het scherm. De discipline volgt het
+   actieve filter, zodat u meeneemt wat u ziet. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!DATA || !DATA.ontwerpen) return null;
+  const lijst = DATA.ontwerpen.filter(o => !filter || o.discipline === filter);
+  return {
+    naam: 'ontwerpen',
+    kolommen: ['naam','discipline','status','huis','collectie','silhouet','aandrijving','kleuren','kritiek','aangemaakt','bijgewerkt'],
+    rijen: lijst.map(o => [o.naam || '', o.disciplineLabel || o.discipline || '', o.status || '',
+      o.huis || '', o.collectie || '',
+      o.concept ? o.concept.silhouet : '', o.concept ? o.concept.aandrijving : '',
+      o.concept ? (o.concept.kleuren || []).map(k => k.naam).join(', ') : '',
+      o.kritiek || '', (o.at || '').slice(0, 10), (o.updatedAt || '').slice(0, 10)])
+  };
+});
 function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span class="pil" style="color:'+g+';">'+esc(s)+'</span>'; }
 function volgende(s){ const i = DATA.statussen.indexOf(s); return (i>=0 && i < DATA.statussen.length-1) ? DATA.statussen[i+1] : null; }
 function render(){
@@ -151,5 +168,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

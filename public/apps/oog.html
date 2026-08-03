@@ -118,6 +118,9 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
+<script src="/shared/uitvoer.js"></script>
 <script src="/shared/deur.js"></script>
 <script>
 (() => {
@@ -211,6 +214,23 @@
 
   /* ================= de app er omheen ================= */
   let modus = 'schouw', voertuigen = [], spullen = [], stabiel = null, stabielN = 0, koel = {};
+  // de twee journaals die deze app bijhoudt, zoals ze hieronder in beeld komen
+  let schouwLog = null, vloerLog = null;
+  const dag = s => { const m = /^\d{4}-\d{2}-\d{2}/.exec(String(s || '')); return m ? m[0] : ''; };
+  /* Meenemen: het journaal van het deel dat u open hebt (schouw of werkvloer).
+     De gedeelde laag zou de regeltekst meenemen; dit zijn de velden zelf. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (modus === 'vloer') {
+      if (!vloerLog) return null;
+      return { naam: 'uitgifteregister', kolommen: ['datum', 'tijd', 'item', 'richting', 'door'],
+        rijen: vloerLog.map(u => [dag(u.at), String(u.at).slice(11, 16), u.itemNaam || '',
+          u.richting === 'mee' ? 'meegenomen' : 'teruggebracht', u.door || '']) };
+    }
+    if (!schouwLog) return null;
+    return { naam: 'schouwen', kolommen: ['datum', 'tijd', 'voertuig', 'door', 'oordeel', 'afwijkingen'],
+      rijen: schouwLog.map(x => [dag(x.at), String(x.at).slice(11, 16), x.voertuigNaam || '', x.door || '',
+        x.oordeel || '', x.afwijkingen]) };
+  });
   const video = $('#cam');
   function tekenRooster(zones) {
     const c = $('#rooster'); const w = c.width = c.clientWidth; const h = c.height = c.clientHeight;
@@ -237,6 +257,7 @@
     const r = await api('/schouwen', {});
     const el = $('#logSchouw');
     const rijen = r.body.schouwen || [];
+    schouwLog = rijen.slice(0, 12);
     el.innerHTML = rijen.length ? '' : '<p class="stil">Nog geen schouwen.</p>';
     for (const s of rijen.slice(0, 12)) {
       const d = document.createElement('div'); d.className = 'r';
@@ -250,6 +271,7 @@
     const r = await fetch('/api/supplier/oog/overzicht', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' }).then(x => x.json()).catch(() => ({}));
     const el = $('#logVloer');
     const rijen = r.uitgifte || [];
+    vloerLog = rijen.slice(0, 12);
     el.innerHTML = rijen.length ? '' : '<p class="stil">Nog geen bewegingen.</p>';
     for (const u of rijen.slice(0, 12)) {
       const d = document.createElement('div'); d.className = 'r';
@@ -343,5 +365,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

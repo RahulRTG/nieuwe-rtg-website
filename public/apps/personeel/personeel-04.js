@@ -10,6 +10,24 @@
     week = await API.call('/supplier/schedule', {}).catch(()=>null);
     enter();
   }
+
+  /* Meenemen (shared/uitvoer.js): het weekrooster dat onder Rooster op het
+     scherm staat, met de velden LOS -- datum, dag, naam, rol en dienst -- in
+     plaats van de regel "Carla Vidal 09:00-17:00" die er staat. Dit is precies
+     wat /supplier/schedule teruggeeft; er wordt niets bij verzonnen, en er
+     staat niemand in die niet ook op het rooster te zien is. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+    if (!week || !(week.days || []).length) return null;
+    const rijen = [];
+    week.days.forEach(function(dag){
+      (dag.staff || []).forEach(function(m){
+        rijen.push([dag.date, dag.label, m.name || '', m.role || '', m.shift || '']);
+      });
+    });
+    if (!rijen.length) return null;
+    return { naam: 'rooster', kolommen: ['datum','dag','naam','rol','dienst'], rijen: rijen };
+  });
+
   function stepSector(){
     kantoorStop();
     $('#gateStep').innerHTML = '<div class="glist">' + SECTORS.map(s =>

@@ -89,6 +89,7 @@
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -109,9 +110,23 @@ const wie = () => $('#vNaam').value.trim();
 const KLUS_IC = { onderhoud: '', lucht: '', afval: '', geluid: '', energie: '', water: '', licht: '', verkeer: '', parkeer: '' };
 const tijd = ms => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : Math.round(m / 60) + ' u geleden'; };
 
+/* Meenemen (shared/uitvoer.js): het eigen register van deze app is de vloot
+   -- elke Stadsdoos met zijn serienummer, zone, sensoren en het laatste
+   contact. Dat is wat een veldploeg mee naar buiten neemt; de regel op het
+   scherm plakt die velden aan elkaar, hier staan ze los. */
+let VLOOT = null;
+const dag = ms => { const d = new Date(ms); return isNaN(d) ? '' : d.toISOString().slice(0, 10); };
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!VLOOT || !VLOOT.length) return null;
+  return { naam: 'stadsdozen', kolommen: ['doos', 'zone', 'serienummer', 'sensoren', 'online', 'laatste contact'],
+    rijen: VLOOT.map(n => [n.naam || '', n.zone || '', n.serial || '', (n.sensoren || []).join(' '),
+      n.online ? 'ja' : 'nee', n.laatsteContact ? dag(n.laatsteContact) : 'nooit gezien']) };
+});
+
 async function laad(){
   try {
     const [w, b] = await Promise.all([api('stad/werk'), api('stad')]);
+    VLOOT = b.nodes || [];
     // de werklijst die de stad zelf voorschrijft
     $('#wTel').textContent = w.klussen.length + ' open';
     $('#wLijst').innerHTML = w.klussen.length ? w.klussen.map(k =>
@@ -186,5 +201,6 @@ live();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

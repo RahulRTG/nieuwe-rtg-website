@@ -4,8 +4,13 @@
       .catch(function(e){ toast(e.message); });
   });
 
+  /* De laatste stand van het statusbord, zodat "meenemen" uit het EIGEN model
+     leest en niet uit de kaartjes op het scherm. */
+  var STAND = null;
+
   function laad(){
     return api('/api/techniek/status').then(function(d){
+      STAND = d;
       eigenaar = d.eigenaar;
       $('#wieSub').textContent = (d.naam||'') + (d.eigenaar?' · eigenaar':' · toegelaten');
       var bev = d.beveiliging || { open:0, kritiek:0, recent:[] };
@@ -93,6 +98,20 @@
       else toast(e.message);
     });
   }
+
+  /* Meenemen (shared/uitvoer.js): het statusbord is een register van controles,
+     en dat neemt een beheerder mee naar een rapportage. Veld voor veld uit
+     d.checks -- niet de regels die op het scherm staan. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+    if (!STAND || !STAND.checks) return null;
+    return {
+      naam: 'techniek',
+      kolommen: ['controle','code','categorie','status','toelichting'],
+      rijen: STAND.checks.map(function(c){
+        return [c.naam||'', c.code||'', c.categorie||'', c.status||'', c.detail||''];
+      })
+    };
+  });
 
   /* HET PAPIERWERK: Rahul vraagt het AVG-register en het datalek-draaiboek uit.
      Eerder stond in die documenten een rij [VUL IN]-plekken. Een invullijst

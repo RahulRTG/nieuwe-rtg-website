@@ -77,6 +77,8 @@
 </header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -91,6 +93,21 @@ function inlog(){
   });
 }
 let TAB='schrijf', D=null;
+/* Meenemen (shared/uitvoer.js): dit kantoor houdt twee registers vast en toont
+   er een tegelijk. Wat u meeneemt is dus het tabblad dat OPEN staat, met de
+   velden los -- niet de regel "[rubriek] door auteur" die op het scherm staat.
+   De nieuwstips zijn geen register van dit huis maar signalen van elders, dus
+   daar valt niets mee te nemen. */
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!D) return null;
+  if(TAB==='schrijf') return { naam:'artikelen', kolommen:['kop','rubriek','auteur','status','aangemaakt'],
+    rijen:(D.artikelen||[]).map(function(a){
+      return [a.kop||'', a.rubriek||'', a.auteur||'', a.status||'', String(a.at||'').slice(0,10)]; }) };
+  if(TAB==='druk') return { naam:'edities', kolommen:['titel','soort','datum','stukken','oplage','status'],
+    rijen:(D.edities||[]).map(function(e){
+      return [e.titel||'', e.soort||'', e.datum||'', (e.artikelIds||[]).length, e.oplage||0, e.status||'']; }) };
+  return null;
+});
 async function laad(){
   try{ D=await api('redactie'); }catch(e){ if(e.status===401){ TOKEN=null; return inlog(); } $('#main').innerHTML='<div class="leeg">Kon de redactie niet laden.</div>'; return; }
   const ps=D.perStatus||{};
@@ -169,5 +186,6 @@ TOKEN?laad():inlog();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

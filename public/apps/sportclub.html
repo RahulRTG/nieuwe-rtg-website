@@ -81,6 +81,7 @@
   <div id="app" hidden></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -91,6 +92,14 @@ const api = (pad, body) => fetch(pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (r.status === 401 && TOKEN) afgemeld(); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 const eur = c => '€ ' + (Number(c||0)/100).toFixed(2);
+
+/* Meenemen (shared/uitvoer.js): het clubkantoor heeft per afdeling een eigen
+   lijst -- het programma, de teams, de velden. Wat meegaat is de lijst van de
+   afdeling waar je STAAT, met de velden los in plaats van de regel die op de
+   kaart staat. Op het kantoorscherm zelf staan alleen tellers; daar valt niets
+   mee te nemen, dus daar zetten we de bron weer leeg. */
+let UIT = null;
+if (window.RTGUitvoer) RTGUitvoer.bron(() => UIT);
 
 const CODE = 'FCRTG';
 /* Altijd aangemeld op de werkvloer: de dienst blijft op dit toestel staan.
@@ -131,6 +140,7 @@ $('#loginGo').addEventListener('click', async () => {
 });
 
 async function kiesScherm(){
+  UIT = null;
   try { C = await api('/api/sport/cockpit'); } catch(e){ meld(e.message); return; }
   $('#app').innerHTML =
     '<div class="kpis">'+
@@ -207,6 +217,9 @@ async function schermWedstrijden(){
 async function laadProgramma(){
   try {
     const bord = (await api('/api/sport/programma')).wedstrijden;
+    UIT = bord.length ? { naam: 'programma',
+      kolommen: ['datum', 'tijd', 'team', 'tegenstander', 'competitie', 'thuis of uit', 'uitslag'],
+      rijen: bord.map(w => [w.datum || '', w.tijd || '', w.team || '', w.tegen || '', w.competitie || '', w.thuis ? 'thuis' : 'uit', w.uitslag || '']) } : null;
     $('#wLijst').innerHTML = bord.length ? bord.map(w =>
       '<div class="item"><h4>'+(w.thuis?'RTG - '+esc(w.tegen):esc(w.tegen)+' - RTG')+' '+
       (w.uitslag ? '<span class="uitslag">'+esc(w.uitslag)+'</span>' : '<span class="status goud">'+esc(w.datum)+' · '+esc(w.tijd)+'</span>')+'</h4>'+
@@ -269,6 +282,9 @@ async function schermPlattegrond(){
 /* ---- teams & jeugd ---- */
 async function schermTeams(){
   let t; try { t = await api('/api/sport/teams'); } catch(e){ meld(e.message); return; }
+  UIT = (t.teams || []).length ? { naam: 'teams',
+    kolommen: ['team', 'categorie', 'competitie', 'trainer', 'spelers'],
+    rijen: t.teams.map(x => [x.naam || '', x.categorie || '', x.competitie || '', x.trainer || '', x.spelers]) } : null;
   $('#app').innerHTML = kopStuk('Teams & jeugd')+
     '<div id="tmLijst">'+t.teams.map(x =>
       '<div class="item"><h4>'+esc(x.naam)+' <span class="status '+(x.categorie==='jeugd'?'goud':'')+'">'+esc(x.categorie)+'</span></h4>'+
@@ -294,6 +310,9 @@ async function schermTeams(){
 /* ---- veldbeheer ---- */
 async function schermVelden(){
   let v; try { v = await api('/api/sport/velden'); } catch(e){ meld(e.message); return; }
+  UIT = (v.velden || []).length ? { naam: 'velden',
+    kolommen: ['veld', 'soort', 'status', 'notitie'],
+    rijen: v.velden.map(x => [x.naam || '', x.soort || '', x.status || '', x.notitie || '']) } : null;
   $('#app').innerHTML = kopStuk('Veldbeheer')+
     '<div class="item" style="background:var(--card2);"><div class="meta">Elke keuring en elk onderhoud legt de veldbeheerder hier vast. Een thuiswedstrijd op een afgekeurd veld geeft meteen een signaal in de cockpit.</div></div>'+
     v.velden.map(x =>
@@ -394,5 +413,6 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); k
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

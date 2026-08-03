@@ -141,6 +141,7 @@
 </section>
 
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -153,10 +154,39 @@ const api = (pad, body) => fetch('/api/thuis/' + pad, {
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 const TABS = { tabZoek: 'secZoek', tabReizen: 'secReizen', tabHost: 'secHost' };
+let TAB = 'secZoek', AANBOD = null, REIZEN = null, MIJNHUIZEN = null;
 for (const [t, s] of Object.entries(TABS)) $('#'+t).addEventListener('click', () => {
   for (const [t2, s2] of Object.entries(TABS)) { $('#'+t2).classList.toggle('aan', t2===t); $('#'+s2).hidden = s2 !== s; }
+  TAB = s;
   if (s === 'secReizen') { laadReizen(); laadWens(); }
   if (s === 'secHost') { laadBord(); laadHuizen(); }
+});
+
+/* Meenemen (shared/uitvoer.js): drie registers, een per tabblad -- het aanbod
+   dat u zocht, uw eigen boekingen, en uw huizen als host. Veld voor veld uit
+   het eigen model; host en gast staan er met hun codenaam in, net als op het
+   scherm. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (TAB === 'secReizen' && REIZEN) return {
+    naam: 'reizen',
+    kolommen: ['kenmerk','huis','plaats','aankomst','vertrek','gasten','status','host','totaal'],
+    rijen: REIZEN.map(b => [b.ref||'', b.titel||'', b.plaats||'', b.van||'', b.tot||'',
+      b.gasten||0, b.status||'', b.host||'', (b.prijsopbouw&&b.prijsopbouw.totaal)||0])
+  };
+  if (TAB === 'secHost' && MIJNHUIZEN) return {
+    naam: 'huizen',
+    kolommen: ['titel','plaats','type','prijs per nacht','schoonmaak','max gasten','slaapkamers','instant','keyless','live','sterren'],
+    rijen: MIJNHUIZEN.map(h => [h.titel||'', h.plaats||'', h.type||'', h.prijs||0, h.schoonmaak||0,
+      h.maxGasten||0, h.slaapkamers||0, h.instant?'ja':'nee', h.keyless?'ja':'nee',
+      h.live?'ja':'nee', (h.rating&&h.rating.sterren)||''])
+  };
+  if (TAB === 'secZoek' && AANBOD) return {
+    naam: 'aanbod',
+    kolommen: ['titel','plaats','type','host','prijs per nacht','max gasten','sterren','superhost','instant'],
+    rijen: AANBOD.map(h => [h.titel||'', h.plaats||'', h.typeLabel||'', h.host||'', h.prijs||0,
+      h.maxGasten||0, (h.rating&&h.rating.sterren)||'', h.superhost?'ja':'nee', h.instant?'ja':'nee'])
+  };
+  return null;
 });
 
 /* ---------- zoeken ---------- */
@@ -172,6 +202,7 @@ async function zoek(){
   try {
     const d = await api('zoek', { plaats: $('#zPlaats').value, van: $('#zVan').value || undefined, tot: $('#zTot').value || undefined,
       gasten: Number($('#zGasten').value)||1, instant: $('#zInstant').checked || undefined });
+    AANBOD = d.huizen;
     $('#zUit').innerHTML = d.huizen.length ? d.huizen.map(huisKaart).join('') : '<div class="leeg">Niets gevonden; probeer een andere plaats of periode.</div>';
     $('#zUit').querySelectorAll('.huis').forEach(b => b.addEventListener('click', () => openHuis(b.dataset.id)));
   } catch(e){ meld(e.message); }
@@ -253,6 +284,7 @@ $('#bWens').addEventListener('click', async () => { if (!HUIDIG) return; try { a
 async function laadReizen(){
   try {
     const d = await api('mijn');
+    REIZEN = d.reizen;
     $('#rUit').innerHTML = d.reizen.length ? d.reizen.map(b =>
       '<div class="boeking"><div class="st">'+esc(b.status)+'</div><b>'+esc(b.titel)+'</b> · '+esc(b.plaats)+'<br>'+
       '<span style="color:var(--soft);">'+esc(b.van)+' tot '+esc(b.tot)+' · '+b.gasten+' gasten · '+euro(b.prijsopbouw.totaal)+' · host '+esc(b.host)+'</span>'+
@@ -311,6 +343,7 @@ async function laadBord(){
 async function laadHuizen(){
   try {
     const d = await api('huizen');
+    MIJNHUIZEN = d.huizen;
     $('#hHuizen').innerHTML = d.huizen.length ? d.huizen.map(h =>
       '<div class="boeking"><b>'+esc(h.titel)+'</b> · '+esc(h.plaats)+' · '+euro(h.prijs)+'/nacht'+(h.rating.sterren?' · ★ '+h.rating.sterren:'')+
       '<div class="rij" style="margin-top:.4rem;">'+
@@ -357,5 +390,6 @@ if (_diep) openHuis(_diep);
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

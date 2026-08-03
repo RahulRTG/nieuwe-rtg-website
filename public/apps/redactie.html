@@ -152,6 +152,8 @@
 
 <div class="melding" id="melding" role="status"></div>
 
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -168,7 +170,19 @@ async function laad(){ try{ STAAT=await api('staat'); $('#krantNaam').textConten
 function vulRubrieken(){ const s=$('#snRubriek'); if(s){ s.innerHTML=(STAAT.rubrieken||[]).map(r=>'<option>'+esc(r)+'</option>').join(''); } }
 
 let HUIDIG='vandaag';
-function toon(t){ HUIDIG=t; document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('aan',b.dataset.t===t));
+/* Meenemen (shared/uitvoer.js): de redactie neemt de artikelen mee die NU op
+   het scherm staan -- de dagstapel, de gefilterde lijst of de best gelezen --
+   met de velden los, niet de regel "Rubriek · Redactie · 12 gelezen". LIJST
+   staat op null zodra er geen lijst in beeld is (huisstijl, de editor), want
+   een uitvoer die iets anders geeft dan wat u ziet is geen uitvoer. */
+let LIJST=null;
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!LIJST||!LIJST.length) return null;
+  return { naam:'artikelen', kolommen:['kop','rubriek','auteur','status','gelezen','bijgewerkt'],
+    rijen:LIJST.map(function(a){
+      return [a.titel||'', a.rubriek||'', a.auteur||'Redactie', a.status||'', a.gelezen||0, String(a.bij||'').slice(0,10)]; }) };
+});
+function toon(t){ HUIDIG=t; LIJST=null; document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('aan',b.dataset.t===t));
   if(t==='vandaag')vandaag(); else if(t==='artikelen')artikelenTab(); else if(t==='huisstijl')huisstijlTab(); else cijfersTab();
 }
 function vandaag(){
@@ -176,7 +190,7 @@ function vandaag(){
   $('#hoofd').innerHTML='<div class="kpis"><div class="kpi"><b>'+(T.live||0)+'</b><span>live</span></div><div class="kpi"><b>'+(T.concept||0)+'</b><span>concept</span></div><div class="kpi"><b>'+(T.gelezen||0)+'</b><span>gelezen</span></div></div>'+
     '<div class="kaart"><div class="rij"><h3 style="flex:1;">Vandaag op de redactie</h3><button class="knop prim" id="v_snel">Snel nieuws</button></div><div id="recent" style="margin-top:.5rem;"></div></div>';
   $('#v_snel').addEventListener('click',openSnel);
-  const r=$('#recent'); const lijst=STAAT.recent||[];
+  const r=$('#recent'); const lijst=STAAT.recent||[]; LIJST=lijst;
   if(!lijst.length){ r.innerHTML='<div class="hint">Nog geen artikelen. Klik op "Snel nieuws" om te beginnen.</div>'; return; }
   r.innerHTML=''; lijst.forEach(a=>r.appendChild(artRij(a)));
 }
@@ -201,12 +215,13 @@ async function artikelenTab(){
 }
 async function laadArtikelen(status){
   document.querySelectorAll('#filters .chip').forEach(c=>c.classList.toggle('aan',c.dataset.s===status));
-  try{ const d=await api('artikelen',status==='alle'?{}:{status}); const l=$('#artlijst'); l.innerHTML='';
+  try{ const d=await api('artikelen',status==='alle'?{}:{status}); const l=$('#artlijst'); l.innerHTML=''; LIJST=d.lijst||[];
     if(!(d.lijst||[]).length){ l.innerHTML='<div class="hint">Geen artikelen.</div>'; return; }
     d.lijst.forEach(a=>l.appendChild(artRij(a)));
   }catch(e){ meld(e.message); }
 }
 async function editArtikel(id){
+  LIJST=null;   // in de editor staat er geen lijst in beeld
   let a={titel:'',chapo:'',inhoud:'',rubriek:(STAAT.rubrieken[0]||'Voorpagina'),beeld:''};
   if(id){ try{ const d=await api('artikel/haal',{id}); a=d.artikel; }catch(e){ meld(e.message); return; } }
   const rubOpts=(STAAT.rubrieken||[]).map(r=>'<option'+(r===a.rubriek?' selected':'')+'>'+esc(r)+'</option>').join('');
@@ -228,6 +243,7 @@ async function editArtikel(id){
 }
 function cijfersTab(){
   const T=STAAT.tellers||{}; const top=(STAAT.recent||[]).filter(a=>a.status==='live').sort((a,b)=>(b.gelezen||0)-(a.gelezen||0)).slice(0,8);
+  LIJST=top;
   $('#hoofd').innerHTML='<div class="kpis"><div class="kpi"><b>'+(T.live||0)+'</b><span>live artikelen</span></div><div class="kpi"><b>'+(T.gelezen||0)+'</b><span>keer gelezen</span></div><div class="kpi"><b>'+(STAAT.rubrieken||[]).length+'</b><span>rubrieken</span></div></div>'+
     '<div class="kaart"><h3>Best gelezen</h3><div id="top" style="margin-top:.5rem;"></div></div>';
   const t=$('#top'); if(!top.length){ t.innerHTML='<div class="hint">Nog geen gelezen artikelen.</div>'; return; }
@@ -299,6 +315,7 @@ function dupliceer(b){const k=JSON.parse(JSON.stringify(b));k.id=RTGId('b');cons
 function verwijder(b){DESIGN.blokken=DESIGN.blokken.filter(x=>x!==b);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>{DESIGN.volgorde[k]=DESIGN.volgorde[k].filter(x=>x!==b.id);});teken();}
 function kiesBeeld(doel){beeldDoel=doel;$('#beeldSheet').classList.add('open');}
 function huisstijlTab(){
+  LIJST=null;   // de bouwer toont geen artikelenlijst
   DESIGN=STAAT.site&&STAAT.site.blokken?JSON.parse(JSON.stringify(STAAT.site)):{blokken:[],volgorde:null}; DESIGN.volgorde=DESIGN.volgorde||null;
   const H=STAAT.huisstijl;
   $('#hoofd').innerHTML='<div class="kaart"><h3>Huisstijl</h3>'+
@@ -336,5 +353,6 @@ else {
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

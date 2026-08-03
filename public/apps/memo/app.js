@@ -121,11 +121,27 @@
       '<button class="knop" data-weg="' + esc(it.id) + '" type="button">Weg</button></div>' +
       '<div class="stil vat" data-uit="' + esc(it.id) + '" style="margin-top:.4rem;white-space:pre-wrap;"></div></div>';
   }
+  /* Meenemen (shared/uitvoer.js): de audio zit in je kluis, maar de LIJST is
+     ook van jou -- welke memo's er zijn, wanneer je ze insprak, hoe groot ze
+     zijn en of er een transcript bij hoort. Het transcript zelf staat op dit
+     toestel en gaat hier niet in mee. */
+  var LIJST = [];
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!LIJST.length) return null;
+    return { naam: 'memos', kolommen: ['naam', 'datum', 'tijd', 'grootte-kb', 'transcript'],
+      rijen: LIJST.map(function (it) {
+        var d = new Date(it.op);
+        return [String(it.naam || '').replace(/\.webm$/, ''), d.toISOString().slice(0, 10),
+          d.toTimeString().slice(0, 5), Math.max(1, Math.round(it.bytes / 1024)),
+          TX[it.id] ? 'ja' : 'nee'];
+      }) };
+  });
   function laad() {
     api('/api/bestanden/mijn').then(function (r) {
       if (r.body.error) return meld(r.body.error);
       var memos = (r.body.items || []).filter(function (x) { return x.map === mapId && !x.weg; })
         .sort(function (a, b) { return b.op - a.op; });
+      LIJST = memos;
       $('#lijst').innerHTML = memos.length ? memos.map(rij).join('')
         : '<p class="stil">Nog geen memo\'s. Druk op Neem op en spreek in; stoppen is bewaren.</p>';
       Array.prototype.forEach.call(document.querySelectorAll('[data-audio]'), function (el) {

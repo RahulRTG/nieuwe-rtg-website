@@ -157,6 +157,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script src="/shared/drie.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   'use strict';
@@ -172,6 +173,23 @@
   let hier = { lat: 38.9089, lng: 1.4330 };     // demo-startpunt tot de gps spreekt
   let kaartData = null, modus = 'auto', route = null, naar = null;
   const actief = { leverancier: true, ov: true, laad: true, tank: false, civic: false, flits: true };
+  /* Meenemen (shared/uitvoer.js): staat er een route, dan is dat wat je mee
+     wilt nemen -- de stappen met hun afstand, precies zoals ze in het paneel
+     staan. Zonder route neem je de plekken van de kaart mee: naam, soort en
+     hoe ver ze van je vandaan liggen. Coordinaten horen bij een plek, dus die
+     gaan mee; de 3D-meshes zijn tekenwerk en geen gegevens. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (route && route.stappen) {
+      return { naam: 'route', kolommen: ['stap', 'instructie', 'richting', 'afstand-m'],
+        rijen: route.stappen.map((s, i) => [i + 1, s.instructie || '', s.bocht || '', s.afstandM || 0]) };
+    }
+    if (kaartData && (kaartData.plekken || []).length) {
+      return { naam: 'plekken', kolommen: ['naam', 'soort', 'laag', 'afstand-m', 'lat', 'lng'],
+        rijen: kaartData.plekken.map(p => [p.naam || '', p.soort || '', p.laag || '',
+          p.afstandM == null ? '' : p.afstandM, p.lat, p.lng]) };
+    }
+    return null;
+  });
   const RUSTIG = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---- kleuren per laag (CSS + 3D) ---- */
@@ -473,6 +491,7 @@
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

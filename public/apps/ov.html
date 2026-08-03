@@ -124,6 +124,9 @@
   <button class="knop" id="codeDicht" type="button">Sluiten</button>
 </div>
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -144,6 +147,20 @@
   if (!gpsUit && 'geolocation' in navigator)
     navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
 
+  // wat er in de buurt rijdt, zoals het hieronder op het scherm komt
+  let nabij = null;
+  /* Meenemen: de app kent de velden van een lijn (halte, afstand, wachttijd),
+     dus geeft hij die door in plaats van de gedeelde laag de rijen te laten
+     lezen -- daar staat "over ~7 min" als tekst, hier staat het getal. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!nabij) return null;
+    return { naam: 'ov-in-de-buurt',
+      kolommen: ['lijn', 'halte', 'afstand_m', 'over_min', 'frequentie_min'],
+      rijen: nabij.map(l => [l.naam || '', (l.halte && l.halte.naam) || '',
+        l.halte && l.halte.afstandM != null ? Math.round(l.halte.afstandM) : '',
+        l.overMin, l.frequentieMin]) };
+  });
+
   async function ververs() {
     const r = await api('kaart', hier);
     if (r.status !== 200) { $('#vPoort').classList.remove('weg'); $('#vOv').classList.add('weg'); return; }
@@ -159,7 +176,8 @@
     // de lijnen dichtbij
     const el = $('#lijnen'); el.innerHTML = '';
     if (!(r.body.lijnen || []).length) el.innerHTML = '<p class="stil">Geen lijnen in de buurt.</p>';
-    for (const l of (r.body.lijnen || []).slice(0, 8)) {
+    nabij = (r.body.lijnen || []).slice(0, 8);
+    for (const l of nabij) {
       const d = document.createElement('div'); d.className = 'lijn';
       const afst = l.halte && l.halte.afstandM != null
         ? (l.halte.afstandM < 1000 ? Math.round(l.halte.afstandM) + ' m' : (Math.round(l.halte.afstandM / 100) / 10) + ' km') : '';
@@ -220,5 +238,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

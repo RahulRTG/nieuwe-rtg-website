@@ -58,6 +58,9 @@
 <header><div class="ey">Van RTG Redactie</div><h1>RTG Nieuws</h1></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -66,11 +69,21 @@ function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; c
 const api=(pad,body)=>fetch('/api/member/nieuws'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
 const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 const tijd=s=>{ if(!s)return ''; const d=new Date(s); return d.getDate()+' '+MND[d.getMonth()+1]+' '+d.getFullYear(); };
-let RUB='', OPEN=null;
+let RUB='', OPEN=null, ARTIKELEN=null;
+/* Meenemen: de app kent zijn eigen model (rubriek, kop, auteur, datum), dus
+   geeft hij dat door in plaats van de gedeelde laag de kaarten te laten lezen.
+   U neemt precies de rubriek mee die u open hebt staan. */
+const dag=s=>{ const m=/^\d{4}-\d{2}-\d{2}/.exec(String(s||'')); return m?m[0]:''; };
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!ARTIKELEN) return null;
+  return { naam:'nieuws', kolommen:['datum','rubriek','kop','auteur'],
+    rijen: ARTIKELEN.map(a=>[dag(a.at), a.rubriek||'', a.kop||'', a.auteur||'']) };
+});
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="leeg">Log eerst in via de RTG-app; daarna leest het nieuws hier.</div>'; return; }
   if(OPEN) return lees(OPEN);
   let d; try{ d=await api('',{rubriek:RUB}); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  ARTIKELEN=d.artikelen||[];
   let h='<div class="rubrieken"><button class="rub'+(RUB===''?' aan':'')+'" data-r="">alles</button>'+d.rubrieken.map(r=>'<button class="rub'+(RUB===r?' aan':'')+'" data-r="'+r+'">'+r+'</button>').join('')+'</div>';
   h+= d.artikelen.length ? d.artikelen.map(a=>'<article class="art" data-id="'+a.id+'"><div class="rlbl">'+esc(a.rubriek)+'</div><h2>'+esc(a.kop)+'</h2><div class="intro">'+esc(a.intro||'')+'</div><div class="meta">door '+esc(a.auteur)+' · '+tijd(a.at)+'</div></article>').join('')
     : '<div class="leeg">Nog geen nieuws in deze rubriek.<br>De redactie is aan het schrijven.</div>';
@@ -102,5 +115,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

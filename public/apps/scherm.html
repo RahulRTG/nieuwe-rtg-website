@@ -71,6 +71,7 @@
 </header>
 <main id="doek"><div class="leeg" id="poort">Log eerst in op de leverancier-app op dit toestel; open dit tweede scherm daarna vanuit "Meer → Tweede scherm".</div></main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -104,6 +105,35 @@
       teken();
     } catch (e) {}
   }
+  /* Meenemen (shared/uitvoer.js): het eigen model van dit scherm, met de
+     velden LOS in plaats van de regel die op de kaart staat. De uitvoer
+     volgt de gekozen werkplek: wat je ziet is wat je meeneemt. Kassa toont
+     alleen totalen (geen lijst), dus daar valt niets mee te nemen. */
+  function uitvoerModel(){
+    if (!state) return null;
+    if (modus === 'gasten'){
+      const rs = state.reserveringen || [];
+      return rs.length ? { naam: 'reserveringen', kolommen: ['tijd', 'gast', 'personen', 'status', 'notitie'],
+        rijen: rs.map(r => [r.tijd || '', r.codenaam || r.codename || '', r.personen || r.people || '', r.status || '', r.notitie || '']) } : null;
+    }
+    if (modus === 'kamers'){
+      const ks = state.rooms || [];
+      return ks.length ? { naam: 'kamers', kolommen: ['kamer', 'status', 'gast'],
+        rijen: ks.map(k => [k.naam || k.name || k.nr || '', k.status || '', k.gast || k.guest || '']) } : null;
+    }
+    if (modus === 'kassa') return null;
+    // keuken en bar zien alleen hun eigen regels; de uitvoer knipt net zo
+    const rijen = (modus === 'serveren' ? (state.orders || []).filter(o => o.status === 'klaar') : lopende())
+      .map(o => {
+        const items = (modus === 'keuken' || modus === 'bar')
+          ? (o.items || []).filter(it => menuStation(it.id) === modus) : (o.items || []);
+        return items.length ? [o.pickup || o.ref || '', o.table || '', o.status || '', minSinds(o.at),
+          items.map(it => it.qty + 'x ' + it.name).join(', ')] : null;
+      }).filter(Boolean);
+    return rijen.length ? { naam: 'bestellingen', kolommen: ['bon', 'tafel', 'status', 'minuten', 'regels'], rijen: rijen } : null;
+  }
+  if (window.RTGUitvoer) RTGUitvoer.bron(uitvoerModel);
+
   function passendWerk(){
     const caps = (state && state.supplier && state.supplier.caps) || [];
     return Object.entries(WERK).filter(([k, w]) => !w.caps.length || w.caps.some(c => caps.includes(c)));
@@ -193,5 +223,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

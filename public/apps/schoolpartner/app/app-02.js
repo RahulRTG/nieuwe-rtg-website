@@ -19,6 +19,16 @@
     kl('/school/klas').then(function (r) {
       if (r.body.error) return meld(r.body.error);
       var k = r.body;
+      /* Meenemen (shared/uitvoer.js): het cijferboek van de klas, met de velden
+         los in plaats van de regel "Toets 3 (SO) 7.5 weging 2" op het scherm.
+         Datum als YYYY-MM-DD; de leerlingnaam blijft hier weg, net als in het
+         boek zelf -- wat de werkbank niet toont, gaat ook niet mee. */
+      if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+        var cs = k.cijfers || [];
+        if (!cs.length) return null;
+        return { naam: 'cijferboek', kolommen: ['datum', 'vak', 'omschrijving', 'cijfer', 'weging'],
+          rijen: cs.map(function (c) { return [String(c.at || '').slice(0, 10), c.vak || '', c.omschrijving || '', c.cijfer, c.weging]; }) };
+      });
       var open = (k.huiswerk || []).filter(function (h) { return (h.afNamen || []).length < (k.leerlingen || []).length; }).length;
       $('#lKpis').innerHTML = [['Leerlingen', (k.leerlingen || []).length], ['Klasgemiddelde', k.klasGemiddelde || '-'],
         ['Huiswerk open', open], ['Toetsen', (k.toetsen || []).length || 0]]

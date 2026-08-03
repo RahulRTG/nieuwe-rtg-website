@@ -54,6 +54,8 @@
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
 <script src="/shared/deur.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -64,11 +66,24 @@ const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov',
 const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]; };
 const AIBOX=app=>'<div class="kaart"><h2>Vraag Rahul</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
-let open=null;
+let open=null, BOEK=null;
+/* Meenemen (shared/uitvoer.js): het reisboek is van het lid, dus het gaat mee
+   met de velden los -- reis, bestemming, van, tot en de omvang van het
+   draaiboek -- en niet als de regel "Ibiza · 3 legs · 2 documenten" die op het
+   scherm staat. Het boek zelf is het register; het detailscherm is er een rij
+   uit, dus daar gaat hetzelfde boek mee. */
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!BOEK||!BOEK.reizen) return null;
+  return { naam:'reizen', kolommen:['reis','bestemming','van','tot','legs','verblijven','documenten'],
+    rijen:BOEK.reizen.map(function(x){
+      return [x.naam||'', x.bestemming||'', x.van||'', x.tot||'',
+        (x.legs||[]).length, (x.verblijven||[]).length, (x.documenten||[]).length]; }) };
+});
 
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;">Open de app en log in met uw RTG-account.</p></div>'; return; }
   let d; try{ d=await api('reisboek'); }catch(e){ if(e.status===403){ gate(); return; } $('#main').innerHTML='<div class="leeg">Kon het reisboek niet laden.</div>'; return; }
+  BOEK=d;
   if(open){ const r=d.reizen.find(x=>x.id===open); if(r){ return detail(r); } open=null; }
   let h='';
   if(d.attenties.length) h+='<div class="att"><div class="lbl" style="margin-top:0;color:var(--gold);">Documenten die aandacht vragen</div>'+d.attenties.map(a=>'<div class="r">'+(a.verlopen?'':'• ')+esc(a.soort)+(a.houder?' ('+esc(a.houder)+')':'')+' - '+(a.verlopen?'verlopen ':'geldig tot ')+dt(a.geldigTot)+' · '+esc(a.reis)+'</div>').join('')+'</div>';
@@ -112,5 +127,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

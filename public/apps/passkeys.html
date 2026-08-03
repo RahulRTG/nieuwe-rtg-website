@@ -92,6 +92,9 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -168,7 +171,22 @@
   }
 
   /* ---- beheer ---- */
+  let SLEUTELS = [];
+  /* Meenemen (shared/uitvoer.js): het register van uw eigen passkeys, met de
+     velden los in plaats van de regel "sleutel · sinds ... · laatst ..." die op
+     het scherm staat. Alleen wat de lijst zelf teruggeeft; de sleutels zelf
+     staan hier niet in en horen er ook niet in -- die verlaten uw apparaat nooit. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!SLEUTELS.length) return null;
+    return {
+      naam: 'passkeys',
+      kolommen: ['naam', 'aangemaakt', 'laatst gebruikt'],
+      rijen: SLEUTELS.map(s => [s.naam || '', String(s.at || '').slice(0, 10),
+        s.laatstGebruikt ? String(s.laatstGebruikt).slice(0, 10) : ''])
+    };
+  });
   function toonSleutels(rijen) {
+    SLEUTELS = rijen || [];
     const el = $('#sleutels'); el.innerHTML = '';
     if (!(rijen || []).length) { el.innerHTML = '<p class="stil">Nog geen passkeys.</p>'; return; }
     for (const s of rijen) {
@@ -205,5 +223,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

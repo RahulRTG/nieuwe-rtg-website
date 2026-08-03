@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
+<!-- uitvoer.js zonder defer en VOOR het eigen script: dat meldt zijn model aan -->
+<script src="/shared/uitvoer.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Website-studio · RTG Atelier</title>
 <link rel="icon" href="/icon.svg">
@@ -376,8 +378,19 @@ async function bewaar(){
   try{ const d=await api('bewaar',{design:DESIGN}); DESIGN.id=d.design.id; meld('Opgeslagen.'); }
   catch(e){ meld(e.message); }
 }
+/* Meenemen (shared/uitvoer.js): het ONTWERP zelf gaat mee als losstaande
+   pagina (de knop Exporteren hieronder). Wat daarnaast een lijst is, is het
+   register van uw opgeslagen sjablonen: titel, wanneer voor het laatst bewaard
+   en hoeveel blokken erin zitten. Dat register komt binnen in openen(); zolang
+   u het niet hebt opgehaald, valt er ook niets mee te nemen. */
+let SJABLONEN=[];
+if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
+  if(!SJABLONEN.length) return null;
+  return { naam:'sjablonen', kolommen:['titel','gewijzigd','blokken'],
+    rijen:SJABLONEN.map(it=>[it.titel||'', String(it.bij||'').slice(0,10), it.blokken]) };
+});
 async function openen(){
-  try{ const d=await api('lijst'); const l=$('#openlijst'); l.textContent='';
+  try{ const d=await api('lijst'); SJABLONEN=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
     if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen opgeslagen sjablonen.</div>'; }
     (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+it.blokken+' blok'+(it.blokken===1?'':'ken')+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
@@ -456,6 +469,7 @@ else {
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

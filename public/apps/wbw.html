@@ -68,6 +68,8 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
+<!-- uitvoer.js zonder defer en VOOR het eigen script: dat meldt zijn model aan -->
+<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <header class="kop">
@@ -136,11 +138,34 @@
   const eur = c => (c < 0 ? '− ' : '') + '€ ' + (Math.abs(c) / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
   const idem = () => RTGIdem('wbw');
   let groep = null;
+  let lijstjes = [];   // het overzicht; komt binnen in laadLijstjes()
+
+  /* Meenemen (shared/uitvoer.js): dit is een kasboek, dus dat neemt u mee. Staat
+     er een lijstje open, dan zijn het de regels van dat lijstje (wie, wat, voor
+     hoeveel mensen, hoeveel); anders het overzicht van uw lijstjes met uw saldo.
+     Bedragen in euro's met een punt, want de centen staan in het model en de
+     regel "− € 37,00" van het scherm is geen gegeven maar een opmaak. */
+  const euroUit = c => ((Number(c) || 0) / 100).toFixed(2);
+  const dag = t => String(t || '').slice(0, 10);
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (groep && !$('#vGroep').classList.contains('weg')) {
+      const rijen = (groep.regels || []).map(r => [dag(r.at), r.soort, r.door,
+        r.soort === 'uitgave' ? r.oms : '', r.soort === 'uitgave' ? '' : (r.aan || ''),
+        r.soort === 'uitgave' ? r.voor : '', euroUit(r.centen)]);
+      return rijen.length ? { naam: 'wie-betaalt-wat',
+        kolommen: ['datum', 'soort', 'door', 'omschrijving', 'aan', 'voor personen', 'bedrag'],
+        rijen } : null;
+    }
+    const rijen = lijstjes.map(g => [dag(g.at), g.naam, g.leden, euroUit(g.mijnSaldo)]);
+    return rijen.length ? { naam: 'mijn-lijstjes',
+      kolommen: ['datum', 'lijstje', 'personen', 'mijn saldo'], rijen } : null;
+  });
 
   /* ---------- mijn lijstjes ---------- */
   async function laadLijstjes() {
     const r = await api('wbw/mijn');
     if (r.status !== 200) { toon('vPoort'); return; }
+    lijstjes = r.body.groepen || [];
     const el = $('#lijstjes'); el.innerHTML = '';
     if (!(r.body.groepen || []).length) el.innerHTML = '<p class="stil">Nog geen lijstjes. Begin er een met uw vrienden.</p>';
     for (const g of r.body.groepen || []) {
@@ -253,6 +278,7 @@
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

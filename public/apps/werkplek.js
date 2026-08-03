@@ -69,6 +69,7 @@
   function openHuis(code) {
     api('overzicht', { bedrijf: code }).then(function (d) {
       HUIDIG = code;
+      HUISNAAM = d.naam || code;
       $('#kiezer').hidden = true;
       $('#huis').hidden = false;
       $('#huis').innerHTML =
@@ -143,8 +144,25 @@
     });
   }
 
+  /* Meenemen (shared/uitvoer.js): de takenlijst van het huis waar u binnen bent
+     -- de tekst, of hij af is, en van wanneer hij is. TAKEN wordt bijgehouden in
+     toonTaken(), dus wat u meeneemt is wat er op het scherm staat. De bezetting
+     blijft erbuiten: dat zijn de codenamen van anderen. */
+  var TAKEN = [], HUISNAAM = '';
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!TAKEN.length) return null;
+    return {
+      naam: 'taken-' + (HUISNAAM || 'werkplek').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      kolommen: ['datum', 'taak', 'status'],
+      rijen: TAKEN.map(function (t) {
+        return [String(t.at || '').slice(0, 10), t.tekst, t.af ? 'af' : 'open'];
+      })
+    };
+  });
+
   function toonTaken(taken) {
     taken = taken || [];
+    TAKEN = taken;
     $('#taken').innerHTML = taken.length ? taken.map(function (t) {
       return '<label class="taak' + (t.af ? ' af' : '') + '"><input type="checkbox" data-taak="' + esc(t.id) + '"' +
         (t.af ? ' checked' : '') + '><span>' + esc(t.tekst) + '</span></label>';

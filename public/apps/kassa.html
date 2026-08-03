@@ -131,6 +131,8 @@
   <div class="rij"><input class="veld" id="payCode" placeholder="Betaalcode" style="flex:1;" autocomplete="off"></div>
   <div class="rij" style="margin-top:.6rem;"><button class="knop" id="payOk">Innen</button><button class="knop stil" id="payWeg">Annuleer</button></div>
 </dialog>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -150,6 +152,13 @@ let LAATSTE = null;      // de laatste bon (voor Repro/herdruk)
 let SCHERM = null;       // het scherm-id van DIT toestel (elke kassa een eigen naam)
 try { SCHERM = localStorage.getItem('rtg_kassa_scherm'); } catch (e) {}
 const modus = () => (INSTEL && INSTEL.modi.find(m => m.id === INSTEL.modus)) || { naam: '...' };
+/* Meenemen: het assortiment achter de knoppen, met echte velden. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!INSTEL) return null;
+  const rijen = (INSTEL.artikelen || []).map(a => [a.naam, a.prijs, a.perKg ? 'kg' : 'stuk', 'kassa'])
+    .concat((INSTEL.sneltoetsen || []).map(x => [x.naam, x.prijs, 'stuk', 'menukaart']));
+  return { naam: 'assortiment', kolommen: ['artikel', 'prijs', 'eenheid', 'herkomst'], rijen };
+});
 
 async function laad(zet){
   try { INSTEL = await api('kassa/instel', Object.assign({ scherm: SCHERM || undefined }, zet || {})); }
@@ -397,6 +406,7 @@ $('#schermMaak').addEventListener('click', async () => {
 $('#schermDicht').addEventListener('click', () => $('#dlgScherm').close());
 laad();
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

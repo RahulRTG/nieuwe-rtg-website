@@ -77,6 +77,7 @@ Geen blokkade, wel een risico dat je bewust moet nemen.
 | 5.2 | Deelmenu over alle apps | 69 apps met menu, 85 bewust zonder (spellen, camera, feeds, chats), afgerond |
 | 5.3 | De deur voor gesloten apps | 58 apps afgerond (14 pas, 3 personeel, 41 gezin) |
 | 5.4 | 35 apps stonden bij de deelmenu-uitrol als "kandidaat vervolg" omdat ze hun scherm pas na een fetch bouwen; het component kan dat inmiddels | opnieuw langslopen nadat 5.1 klaar is |
+| 5.5 | **Tien kantoor-apps sturen uitgelogd weg** naar `personeel.html?kantoor=1` in plaats van de deur te tonen (lab, kantoren, architect-pda, hardware-pda, kantoorpda en vijf andere). Dat is hetzelfde patroon dat bij de eenenveertig RTF-gezinsapps al is opgelost: je verliest waar je heen wilde. Gevonden doordat het verificatieharnas op lab.html bleef hangen | de deur toont zich op de app zelf, met de weg naar de personeels-inlog erin; net als bij `Sessie.deur('gezin')` |
 
 ## 6. Eerlijkheidspunten
 

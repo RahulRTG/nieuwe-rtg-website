@@ -73,6 +73,7 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
@@ -128,8 +129,22 @@ if (!TOKEN) {
     '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
-let ALLE = [], soort = '';
+let ALLE = [], soort = '', MIJN = [];
 const SOORTEN = [['','Alle'],['hotel','Hotels'],['apartment','Appartementen'],['villa',"Villa's"]];
+/* Meenemen (shared/uitvoer.js): eerst uw eigen verblijven, want dat is de lijst
+   die van u is; staan die er niet, dan de adressen zoals ze nu op het scherm
+   staan (dezelfde categorie die u gekozen heeft). Allebei uit het model van
+   deze pagina -- geen schermtekst. Datums komen als YYYY-MM-DD uit de server. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => MIJN.length ? {
+  naam: 'verblijven',
+  kolommen: ['referentie','adres','kamer','aankomst','vertrek','nachten','personen','totaal','status'],
+  rijen: MIJN.map(v => [v.ref, v.supplierName, v.roomName, v.aankomst, v.vertrek, v.nachten, v.personen, v.totaal, v.status])
+} : {
+  naam: 'adressen',
+  kolommen: ['naam','soort','stad','vanaf per nacht'],
+  rijen: ALLE.filter(h => !soort || h.soort === soort)
+    .map(h => [h.naam, h.soortLabel, h.stad || '', h.vanaf == null ? '' : h.vanaf])
+});
 async function laad(){
   let d;
   try { d = await api('/api/hotels'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
@@ -142,6 +157,7 @@ async function laad(){
 async function laadMijn(){
   let d; try { d = await api('/api/verblijf/mijn'); } catch(e){ return; }
   const open = (d.verblijven||[]).filter(v => ['aangevraagd','bevestigd'].includes(v.status));
+  MIJN = open;
   if (!open.length){ $('#mijnWrap').innerHTML = ''; return; }
   $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn verblijven</h2>'+
     open.map(v => '<div class="resto" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;">'+
@@ -243,6 +259,7 @@ $('#rBoek').addEventListener('click', boek);
   });
 })();</script>
 
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

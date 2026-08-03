@@ -93,6 +93,7 @@
   </div>
 </main>
 <script src="/shared/drie.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script src="/apps/lab3d.js"></script>
 <script src="/apps/lab-dossier.js"></script>
 <script src="/apps/lab-pro.js"></script>
@@ -105,6 +106,16 @@ if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/lab/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 let D = null, filter = '', KB = [];
+/* Meenemen: de projecten zoals het lab ze kent -- echte velden, geen schermtekst. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!D || !D.projecten) return null;
+  return { naam: 'onderzoeksprojecten',
+    kolommen: ['titel', 'veld', 'fase', 'voor wie', 'veiligheidstoets', 'doel', 'gestart'],
+    rijen: D.projecten.map(function (p) {
+      return [p.titel, p.veldNaam || p.veld, p.fase, p.voorWie,
+        (p.veiligheid || {}).status || '', p.doel || '', String(p.at || '').slice(0, 10)];
+    }) };
+});
 async function laad(){
   D = await api('overzicht');
   const kb = await api('kennisbank');
@@ -174,6 +185,7 @@ $('#aiStuur').addEventListener('click', async () => {
 laad().catch(e => { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
 </script>
 <script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

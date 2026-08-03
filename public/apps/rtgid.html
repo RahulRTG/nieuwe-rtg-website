@@ -38,6 +38,7 @@
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:30;
     background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;opacity:0;transition:opacity .25s;}
   .melding.zien{opacity:1;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -53,6 +54,7 @@
 <main>
   <p class="stil">Uw digitale identiteit, op de kluis van RTG. U logt bij diensten in met een tik, deelt nooit meer gegevens dan gevraagd, en ziet hier precies wie wat over u opvroeg.</p>
 
+  <div class="deel">Inloggen</div>
   <h2>Inloggen bij een dienst</h2>
   <div class="kaart">
     <p class="stil">Staat er een koppelcode op het scherm van een dienst? Voer die hier in. U ziet eerst welke dienst het is en welke gegevens die vraagt; pas na uw bevestiging gebeurt er iets.</p>
@@ -71,9 +73,11 @@
     </div>
   </div>
 
+  <div class="deel">Toegang</div>
   <h2>Actieve toegang</h2>
   <div class="kaart"><div id="sessies" class="stil">…</div></div>
 
+  <div class="deel">Machtigingen</div>
   <h2>Machtigingen</h2>
   <div class="kaart">
     <p class="stil">Laat iemand tijdelijk namens u inloggen bij een dienst (bijvoorbeeld mantelzorg). Op codenaam, per dienst, en op elk moment in te trekken; elke inlog namens u staat in uw log.</p>
@@ -86,6 +90,7 @@
     <div id="machtigingen" style="margin-top:0.5rem;"></div>
   </div>
 
+  <div class="deel">Inzagelog</div>
   <h2>Inzagelog</h2>
   <div class="kaart"><div id="log" class="stil">…</div></div>
 </main>
@@ -170,6 +175,7 @@
   if (!token) zeg('Log eerst in op de leden-app.'); else laad();
 })();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

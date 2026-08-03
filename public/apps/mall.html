@@ -72,6 +72,7 @@
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
@@ -86,13 +87,18 @@
 </header>
 <main id="main">
   <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Alles wat je bij RTG koopt, op één plek. Het eigen-merk bestel je direct; bij de mode-boutieks gelden ledenprijzen en leg je een stuk apart of laat je een maat naar de paskamer brengen. Prijzen in euro.</p>
+  <div class="deel">Bibliotheek</div>
   <div id="biebKop"></div>
   <div id="appbieb"></div>
   <div id="reisbieb"></div>
   <div id="rtfbieb"></div>
+  <div class="deel">Boutieks</div>
   <div id="etages"></div>
+  <div class="deel">RTG Thuis</div>
   <div id="thuisWrap"></div>
+  <div class="deel">Dienstenplein</div>
   <div id="dienstenWrap"></div>
+  <div class="deel">Leveranciers</div>
   <div id="gidsWrap"></div>
 </main>
 
@@ -806,6 +812,7 @@ $('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('o
 })();</script>
 
 <script src="/shared/glyf.js" defer></script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

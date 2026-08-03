@@ -22,10 +22,17 @@
   .view{flex:1;overflow:hidden;position:relative;}
   .tab{position:absolute;inset:0;display:none;flex-direction:column;padding:.7rem;gap:.6rem;overflow:auto;}
   .tab.aan{display:flex;}
+  /* Het schrift houdt zijn eigen schakelaar (Bord / Schrift / Opgaven / Agenda /
+     buddy), maar draagt hem in de stijl van het deelmenu: kleine kapitalen in
+     Inter, rustig zacht, en een gouden streep bij het deel waar je staat. De
+     streep staat bovenaan omdat deze balk onderaan hangt -- gespiegeld, verder
+     dezelfde taal als de menubalk en als de tabbalken van het leden-OS. */
   .tabbar{display:flex;border-top:1px solid var(--lijn);background:var(--paneel2);}
-  .tabbar button{flex:1;background:none;color:var(--zacht);padding:.5rem 0 .6rem;font-size:.7rem;display:flex;flex-direction:column;align-items:center;gap:.15rem;}
-  .tabbar button .ic{font-size:1.2rem;}
-  .tabbar button.aan{color:var(--goud);}
+  .tabbar button{flex:1;background:none;border:0;border-top:2px solid transparent;margin-top:-1px;
+    color:var(--zacht);padding:.5rem 0 .6rem;font-family:var(--sans);font-size:.62rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:.15rem;}
+  .tabbar button .ic{font-size:1.2rem;letter-spacing:0;}
+  .tabbar button.aan{color:var(--txt);border-top-color:var(--goud);}
   .boardbox{flex:1;background:var(--bord);border:1px solid var(--lijn);border-radius:var(--radius);position:relative;overflow:hidden;min-height:0;}
   .boardbox canvas{position:absolute;inset:0;width:100%;height:100%;}
   .wachtbord{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--zacht);font-size:.9rem;text-align:center;padding:2rem;}

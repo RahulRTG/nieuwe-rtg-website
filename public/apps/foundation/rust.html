@@ -18,9 +18,17 @@
   .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
   .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--goud);}
   .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
-  .seg{display:flex;gap:.4rem;justify-content:center;padding:.7rem;}
-  .seg button{background:#1c1a16;color:var(--zacht);border-radius:999px;padding:.45rem 1rem;font-size:.85rem;}
-  .seg button.aan{background:var(--goud);color:#1a1710;font-weight:700;}
+  /* Even rust houdt zijn eigen schakelaar (Adem / Stiltemoment / Teken /
+     Bemoediging) -- die toont al een deel tegelijk. Alleen de balk draagt de
+     stijl van het deelmenu: geen pil, maar een rustige tab met kleine
+     kapitalen en een gouden streep onder de actieve. Zo is het huis er een. */
+  .seg{display:flex;flex-wrap:wrap;gap:.15rem;justify-content:center;padding:0 .7rem;
+    border-bottom:1px solid var(--lijn);}
+  .seg button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;margin-bottom:-1px;
+    color:var(--zacht);padding:.55rem .8rem .6rem;font-family:var(--sans);font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;}
+  .seg button:hover{color:var(--txt);}
+  .seg button.aan{color:var(--txt);border-bottom-color:var(--goud);}
   .view{flex:1;position:relative;overflow:hidden;}
   .tab{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1.2rem;gap:1rem;overflow:auto;}
   .tab.aan{display:flex;}

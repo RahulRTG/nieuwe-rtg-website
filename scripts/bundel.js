@@ -61,6 +61,7 @@ const bundels = {
   'apps/foundation/sessie.js': 'apps/foundation/sessie',
   'shared/basis.js': 'shared/basis',
   'shared/deelmenu.js': 'shared/deelmenu',
+  'apps/notities/app.js': 'apps/notities/app',
   'apps/rtgschool/leer.js': 'apps/rtgschool/leer',
   'apps/schoolpartner/app.js': 'apps/schoolpartner/app',
   'shared/i18n.js': 'shared/i18n',

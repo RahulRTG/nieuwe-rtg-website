@@ -8,7 +8,7 @@
     "dependencies": 0,
     "testbestanden": 487,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 75,
+    "zelfpoortendeToetsen": 77,
     "e2eBestanden": 45,
     "keuringOmvang": 67,
     "keuringDubbeling": 56,
@@ -18,6 +18,13 @@
     "routesNietSchakelbaar": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 75 -> 77",
+      "reden": "Met de hand verhoogd voor test/premium.e2e.js: twee schermtoetsen op de premium-laag (meenemen en sneltoetsen). Aanleiding was een meting over de app-catalogus: sneltoetsen 65% bij de volwaardige apps tegen 28% bij de rest, uitvoer 25% tegen 5%.",
+      "eerlijkheidshalve": "Zelfde tegenwicht als de tanden hiervoor (browserpoort + RTG_E2E_STRICT=1 in ci.yml). Over de mutaties valt hier iets te leren en dat hoort erbij: de eerste twee pogingen om de weigering-bewering te laten zakken sloegen AF, en allebei om een echte reden. De eerste mutatie kwam niet eens aan (verkeerd anker in mijn zoek-vervang, achteraf met grep vastgesteld); de tweede kwam wel aan maar kon niet bijten omdat de toets toen twee notities zaaide en een schermschraper er minstens drie nodig heeft. De toets zaait er nu vier, en met de afgekeurde schraper terug zakt hij op precies de juiste bewering. Zonder dat natrekken had hier een groene toets gestaan die zijn eigen vraag niet stelde.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 73 -> 75"
+    },
     {
       "datum": "2026-08-03",
       "meter": "zelfpoortendeToetsen 73 -> 75",

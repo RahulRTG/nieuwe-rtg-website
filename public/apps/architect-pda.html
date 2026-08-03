@@ -9,6 +9,7 @@
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
 <script src="/shared/glyf.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
@@ -80,6 +81,22 @@ async function laad(){
   if (!sel.options.length) sel.innerHTML = DATA.disciplines.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   render();
 }
+/* Meenemen: het ontwerpregister kent zijn eigen velden, dus geeft de app die
+   door in plaats van de gedeelde laag de kaarten van het scherm te laten
+   plukken -- daar staat een swatch en een afgeknipte regel, hier staan
+   discipline, status en typologie als losse kolommen. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!DATA || !DATA.ontwerpen) return null;
+  return {
+    naam: 'ontwerpen',
+    kolommen: ['naam','discipline','project','huis','status','typologie','constructie','aangemaakt'],
+    rijen: DATA.ontwerpen.map(function(o){
+      const c = o.concept || {};
+      return [o.naam||'', o.disciplineLabel||o.discipline||'', o.collectie||'', o.huis||'',
+        o.status||'', c.typologie||'', c.constructie||'', String(o.at||'').slice(0,10)];
+    })
+  };
+});
 function statusPil(s){ const g = s==='realisatie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span class="pil" style="color:'+g+';">'+esc(s)+'</span>'; }
 function volgende(s){ const i = DATA.statussen.indexOf(s); return (i>=0 && i < DATA.statussen.length-1) ? DATA.statussen[i+1] : null; }
 function render(){
@@ -137,5 +154,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

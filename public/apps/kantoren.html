@@ -92,6 +92,23 @@
   .kpi-tegel b{display:block;font-family:'Bodoni Moda',serif;font-size:1.6rem;font-weight:500;font-variant-numeric:tabular-nums;}
   .kpi-tegel span{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);}
   h3.sec{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.4rem 0 .6rem;}
+  /* De tabbalk van een kamer draagt dezelfde balk als het deelmenu van het
+     huis: een haarlijn met kale knoppen, de open tab met een gouden streep.
+     Het schakelen blijft van kamerTab(); dit is alleen de stijl. */
+  #kTabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.8rem 0 0;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);}
+  #kTabs [data-tab]{background:none;border:0;border-radius:0;cursor:pointer;
+    padding:.55rem .8rem .6rem;margin-bottom:-1px;font-family:'Inter',sans-serif;font-size:.72rem;
+    font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    border-bottom:2px solid transparent;white-space:nowrap;}
+  #kTabs [data-tab]:hover{background:none;color:var(--txt);}
+  /* Welke tab openstaat, staat al in het paneel zelf (hidden of niet); zo hoeft
+     de schakelaar niet te veranderen om te laten zien waar u bent. */
+  #vKamer:has(#tabOverzicht:not([hidden])) [data-tab="overzicht"],
+  #vKamer:has(#tabStats:not([hidden])) [data-tab="stats"],
+  #vKamer:has(#tabChat:not([hidden])) [data-tab="chat"],
+  #vKamer:has(#tabOnboarding:not([hidden])) [data-tab="onboarding"],
+  #vKamer:has(#tabWereld:not([hidden])) [data-tab="wereld"]{color:var(--txt);border-bottom-color:var(--gold);}
   .lijst{padding:1rem 1.2rem;margin-bottom:.8rem;}
   .lijst h4{font-size:.9rem;margin-bottom:.4rem;}
   .lijst ul{list-style:none;}
@@ -164,12 +181,12 @@
       <h1 id="kNaam"></h1>
       <span class="deck" id="kMissie" style="margin:0;"></span>
     </div>
-    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.8rem;" role="tablist" id="kTabs">
-      <button class="knop stil" data-tab="overzicht" style="padding:.35rem 1rem;font-size:.8rem;">Overzicht</button>
-      <button class="knop stil" data-tab="stats" style="padding:.35rem 1rem;font-size:.8rem;">Platform-statistieken</button>
-      <button class="knop stil" data-tab="chat" style="padding:.35rem 1rem;font-size:.8rem;">Chat & snap</button>
-      <button class="knop stil" data-tab="onboarding" style="padding:.35rem 1rem;font-size:.8rem;">Onboarding</button>
-      <button class="knop stil" data-tab="wereld" id="kTabWereld" style="padding:.35rem 1rem;font-size:.8rem;" hidden>De wereld</button>
+    <div role="tablist" id="kTabs">
+      <button class="knop stil" data-tab="overzicht">Overzicht</button>
+      <button class="knop stil" data-tab="stats">Platform-statistieken</button>
+      <button class="knop stil" data-tab="chat">Chat & snap</button>
+      <button class="knop stil" data-tab="onboarding">Onboarding</button>
+      <button class="knop stil" data-tab="wereld" id="kTabWereld" hidden>De wereld</button>
     </div>
     <div id="tabOverzicht">
     <div class="kpis" id="kKpis"></div>

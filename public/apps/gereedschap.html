@@ -38,6 +38,18 @@
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
   .paneel{display:none;}
   .paneel.open{display:block;}
+  /* Het gereedschap houdt zijn eigen schakelaar in de kop (Rekenmachine / Wekker
+     en timer / Stopwatch en wereld): een paneel tegelijk, precies wat het deelmenu
+     elders doet. Alleen de vorm gaat mee met het huis -- geen randje om een knop,
+     maar een rustige tab met een gouden streep onder het deel waar je staat. De
+     balklijn is hier de onderrand van de kop zelf; een tweede streep erboven zou
+     alleen maar drukte zijn. De selector moet dieper dan `.knop`: de kit tekent
+     die knop al met `body.rtg-stijl .knop`, en die is specifieker. */
+  body.rtg-stijl header nav .knop{background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;padding:.45rem .55rem .5rem;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl header nav .knop:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl header nav .knop.aan{color:var(--txt);border-bottom-color:var(--gold);}
 
   /* de rekenmachine */
   #rkScherm{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;

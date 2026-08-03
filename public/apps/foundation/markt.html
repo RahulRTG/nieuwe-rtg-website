@@ -176,6 +176,7 @@
   <div id="vChat" hidden></div>
 </div>
 
+<script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
 (function () {
@@ -222,6 +223,23 @@
 
   /* ---------- ontdekken / lijst ---------- */
   let categorieen = [];
+  /* Wat de server het laatst gaf. Meenemen geeft mee wat je op dat moment
+     open hebt staan: je eigen spullen bij "Mijn spullen", anders het aanbod
+     zoals je het nu gefilterd hebt. */
+  let aanbod = [], mijnAds = [];
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    const dag = a => (a.at ? String(a.at).slice(0, 10) : '');
+    if (!$('#vMijn').hidden && mijnAds.length) {
+      return { naam: 'mijn-spullen',
+        kolommen: ['titel', 'prijs', 'status', 'categorie', 'staat', 'plaats', 'geplaatst'],
+        rijen: mijnAds.map(a => [a.titel, a.prijs, a.status, catNaam(a.categorie), a.staat, a.plaats || '', dag(a)]) };
+    }
+    if (!aanbod.length) return null;
+    return { naam: 'aanbod',
+      kolommen: ['titel', 'prijs', 'categorie', 'staat', 'plaats', 'levering', 'geplaatst'],
+      rijen: aanbod.map(a => [a.titel, a.prijs, catNaam(a.categorie), a.staat, a.plaats || '',
+        (a.levering || []).join(' '), dag(a)]) };
+  });
   function vulCategorien() {
     const opts = '<option value="">Alles</option>' + categorieen.map(c => '<option value="' + c + '">' + catNaam(c) + '</option>').join('');
     $('#fcat').innerHTML = opts;
@@ -236,6 +254,7 @@
     const max = $('#fmax').value.trim(); if (max) body.max = Number(max);
     rapi('/lijst', body).then(d => {
       if (!categorieen.length && d.categorieen) { categorieen = d.categorieen; vulCategorien(); }
+      aanbod = d.ads || [];
       const r = $('#rooster');
       if (!d.ads || !d.ads.length) { r.innerHTML = '<div class="leeg">Nog niets gevonden. Verruim je zoekopdracht, of plaats zelf iets moois.</div>'; return; }
       r.innerHTML = d.ads.map(a =>
@@ -372,6 +391,7 @@
   /* ---------- mijn spullen ---------- */
   function laadMijn() {
     rapi('/mijn', {}).then(d => {
+      mijnAds = d.ads || [];
       const el = $('#mijnLijst');
       if (!d.ads || !d.ads.length) { el.innerHTML = '<div class="leeg">Je hebt nog niets geplaatst. Ga naar "Plaatsen" om te beginnen.</div>'; return; }
       el.innerHTML = d.ads.map(a =>
@@ -512,5 +532,6 @@
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

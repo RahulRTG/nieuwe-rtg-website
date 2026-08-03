@@ -100,6 +100,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -109,6 +111,17 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 const telHref = t => 'tel:' + String(t||'').replace(/[^0-9+]/g,'');
 let magBewerken = false, huidig = { noodcontacten:[], allergie:'', eten:'', huisregels:'' };
+
+/* Meenemen (shared/uitvoer.js): de noodnummers zoals ze op het scherm staan,
+   met dezelfde drie velden als de kaartjes. De vrije tekstblokken (allergie,
+   eten, huisregels) zijn geen rijen en gaan dus niet mee -- die aan elkaar
+   plakken zou precies de dichtgeplakte schermtekst opleveren. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var c = (huidig && huidig.noodcontacten) || [];
+  if (!c.length) return null;
+  return { naam: 'noodnummers', kolommen: ['naam', 'wie', 'telefoon'],
+    rijen: c.map(function (x) { return [x.naam || '', x.wie || '', x.telefoon || '']; }) };
+});
 
 async function laad(){
   try{
@@ -175,5 +188,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

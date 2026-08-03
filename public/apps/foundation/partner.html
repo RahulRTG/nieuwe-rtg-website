@@ -40,6 +40,8 @@
   </div>
   <div id="raad" hidden></div>
 </main>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -47,10 +49,23 @@ let CODE = null; try { CODE = localStorage.getItem('rtf_raadcode'); } catch (e) 
 const api = (pad, body) => fetch('/api/rtf/partner/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(Object.assign({ code: CODE }, body || {})) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+let RAAD = null;
+/* Meenemen (shared/uitvoer.js): het besluitenregister van deze raadstafel,
+   met dezelfde velden als de kaartjes -- titel, voorstel, wie het indiende,
+   de status en de uitslag. Een stadspartner die zijn eigen besluiten wil
+   naslaan of aan zijn bestuur laten zien, neemt ze zo mee. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var b = (RAAD && RAAD.besluiten) || [];
+  if (!b.length) return null;
+  return { naam: 'besluiten', kolommen: ['titel', 'voorstel', 'door', 'status', 'uitslag'],
+    rijen: b.map(function (x) { return [x.titel, x.voorstel, x.door, x.status, x.uitslag || '']; }) };
+});
+
 async function laad(){
   let d;
   try { d = await api('raad'); }
   catch (e) { $('#fout').textContent = e.message; $('#fout').hidden = false; $('#raad').hidden = true; return; }
+  RAAD = d;
   try { localStorage.setItem('rtf_raadcode', CODE); } catch (e) {}
   $('#poort').hidden = true;
   const uitslagen = (d.uitslagen || []).map(u =>
@@ -102,5 +117,6 @@ if (CODE) { $('#code').value = CODE; laad(); }
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

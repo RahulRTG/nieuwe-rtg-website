@@ -78,6 +78,7 @@
   </div>
 </div>
 
+<script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -138,10 +139,21 @@ const LIEDJES = [
 const SOORTLABEL = { zing: 'om te zingen', hand: 'met de handjes', slaap: 'voor het slapen' };
 let filter = 'alles';
 
+function zichtbareLiedjes() { return LIEDJES.filter(l => filter === 'alles' || l.soort === filter); }
+
+/* meenemen: het liedjesboek zoals je het nu gefilterd hebt, met de tekst
+   erbij -- zodat je hem ook kunt printen of naast het bed kunt leggen. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  const zicht = zichtbareLiedjes();
+  if (!zicht.length) return null;
+  return { naam: 'liedjes', kolommen: ['titel', 'soort', 'kenmerk', 'tekst', 'erbij te doen'],
+    rijen: zicht.map(function (l) { return [l.titel, SOORTLABEL[l.soort], l.meta, l.tekst, l.doen]; }) };
+});
+
 function tekenLijst() {
   const doos = $('#lijst');
   doos.innerHTML = '';
-  const zicht = LIEDJES.filter(l => filter === 'alles' || l.soort === filter);
+  const zicht = zichtbareLiedjes();
   for (const l of zicht) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -186,5 +198,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

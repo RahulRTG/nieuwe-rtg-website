@@ -81,6 +81,7 @@
   </div>
 </div>
 
+<script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -90,10 +91,23 @@ const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 
+/* wat de server het laatst gaf: mijn ritme van vandaag en het gezinsbord.
+   Meenemen geeft je eigen lijstje mee -- het lijstje zelf is van jou, het
+   bord is een blik op het gezin. */
+let stand = null;
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  const stappen = stand && stand.mijn && stand.mijn.stappen;
+  if (!stappen || !stappen.length) return null;
+  const dag = new Date().toISOString().slice(0, 10);
+  return { naam: 'ochtendritme', kolommen: ['datum', 'stap', 'af'],
+    rijen: stappen.map(function (x) { return [dag, x.tekst, x.af ? 'ja' : 'nee']; }) };
+});
+
 async function laad(){
   try{
     const d = await fetch('/api/foundation/gezin/'+s.code+'/ochtend?token='+encodeURIComponent(s.token)).then(r=>r.json());
     if (d.error) throw new Error(d.error);
+    stand = d;
     // de zachte weektelling: hoeveel ochtenden waren er de laatste zeven dagen rond
     $('#mijnReeks').innerHTML = d.mijn.week > 0
       ? 'deze week <b>'+d.mijn.week+'</b> '+(d.mijn.week===1?'ochtend':'ochtenden')+' rond'
@@ -182,5 +196,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

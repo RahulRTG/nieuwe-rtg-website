@@ -71,6 +71,11 @@
     for (var i = 0; i < main.children.length; i++) {
       var el = main.children[i];
       if (el.classList && el.classList.contains('rtgdeel-balk')) continue;
+      /* rtgdeel-vast: hoort bij geen enkel deel en blijft altijd staan. Voor
+         wat op elke stand zichtbaar MOET zijn -- de eerlijke grens van de
+         veiligheidsapps ("dit is geen alarmcentrale") mag nooit achter een
+         menuknop verdwijnen. De greep van het desktopframe idem. */
+      if (el.classList && (el.classList.contains('rtgdeel-vast') || el.classList.contains('rtg-greep'))) continue;
       var kop = kopVan(el);
       if (kop) {
         huidig = { naam: kop, id: slug(kop), leden: [el], kopEl: el.matches('.deel') ? el : null };

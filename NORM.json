@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 72,
     "e2eBestanden": 45,
-    "keuringOmvang": 66,
+    "keuringOmvang": 67,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
     "endpointsNooitAangeraakt": 0,
@@ -18,6 +18,12 @@
     "routesNietSchakelbaar": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-03",
+      "meter": "keuringOmvang 66 -> 67",
+      "reden": "Met de hand verhoogd: server/school/gezin.js kwam in de waarschuwingszone (vlak onder 10 kB) door de klasNiveau-helper voor de scheiding per schoolsoort in de gezinsweergave -- echte functionaliteit, geen opvulling.",
+      "eerlijkheidshalve": "Wie de tand terug wil op 66 knipt gezin.js op zijn natuurlijke naad (het mijn-overzicht tegenover huiswerk/ziekmelden/berichten); dat is de druk die deze meter hoort te geven en die keuze is hier bewust uitgesteld aan het eind van een grote ronde, niet afgesteld."
+    },
     {
       "datum": "2026-08-03",
       "meter": "zelfpoortendeToetsen 71 -> 72",

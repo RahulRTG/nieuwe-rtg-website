@@ -82,6 +82,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
@@ -101,10 +103,21 @@ function kaartHtml(d){
       ((d.vanMij||Sessie.isBeheerder()) ? '<button class="mini" data-del="'+d.id+'">Weg</button>' : '')+
     '</div></div>';
 }
+let DROMEN = [];
+/* Meenemen (shared/uitvoer.js): het dromenbord van het gezin -- per droom van
+   wie hij is, hoeveel aanmoedigingen hij kreeg en of hij al gehaald is. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!DROMEN.length) return null;
+  return { naam: 'dromen', kolommen: ['droom', 'van', 'aanmoedigingen', 'stand', 'sinds'],
+    rijen: DROMEN.map(d => [d.tekst, d.vanNaam, String(d.aantal),
+      d.behaald ? 'gehaald' : 'loopt', String(d.at || '').slice(0, 10)]) };
+});
+
 async function laad(){
   try{
     const d = await fetch('/api/foundation/gezin/'+s.code+'/dromen?token='+encodeURIComponent(s.token)).then(r=>r.json());
-    const dromen = d.dromen || [];
+    DROMEN = d.dromen || [];
+    const dromen = DROMEN;
     const open = dromen.filter(x=>!x.behaald), klaar = dromen.filter(x=>x.behaald);
     $('#open').innerHTML = open.length ? open.map(kaartHtml).join('') : '<div class="leeg">Nog geen dromen. Wees de eerste; klein mag ook.</div>';
     $('#behaaldSec').hidden = !klaar.length;
@@ -144,5 +157,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

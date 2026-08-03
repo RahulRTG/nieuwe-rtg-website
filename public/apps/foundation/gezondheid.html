@@ -73,6 +73,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -97,6 +99,31 @@ async function laad(){
     toon();
   }catch(e){ $('#paneel').innerHTML = '<div class="kaart blok"><div class="leeg">Kon het gezondheidsmaatje niet laden.</div></div>'; }
 }
+
+/* Meenemen (shared/uitvoer.js): de kaart van het hele gezin, want dat is wat
+   de kiezer hierboven laat zien -- per gezinslid de medicijnen, de afspraken
+   die er nog aan komen (voorbije staan ook niet op het scherm) en de metingen
+   uit de groeicurve. Datums zoals de server ze geeft: YYYY-MM-DD. Dit is de
+   enige weg naar buiten, bijvoorbeeld naar de huisarts. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!data || !data.personen) return null;
+  var rijen = [];
+  data.personen.forEach(function(p){
+    (p.medicijnen||[]).forEach(function(m){
+      rijen.push([p.naam, 'medicijn', m.naam, '', m.tijd||'', '', m.dosis||'']);
+    });
+    (p.afspraken||[]).filter(function(a){ return !a.voorbij; }).forEach(function(a){
+      rijen.push([p.naam, 'afspraak', a.wat, a.datum, a.tijd||'', a.waar||'', '']);
+    });
+    (p.metingen||[]).forEach(function(m){
+      if (m.gewicht != null) rijen.push([p.naam, 'meting', 'gewicht', m.datum, '', '', m.gewicht + ' kg']);
+      if (m.lengte != null) rijen.push([p.naam, 'meting', 'lengte', m.datum, '', '', m.lengte + ' cm']);
+    });
+  });
+  if (!rijen.length) return null;
+  return { naam:'gezondheidsmaatje',
+    kolommen:['gezinslid','soort','wat','datum','wanneer','waar','waarde'], rijen:rijen };
+});
 
 function toon(){
   const p = data.personen.find(x=>x.pid===gekozen);
@@ -189,5 +216,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

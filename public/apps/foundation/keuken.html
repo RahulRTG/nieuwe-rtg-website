@@ -77,6 +77,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -84,7 +86,23 @@ const api = Sessie.api;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
-let koks = [];
+let koks = [], stand = null;
+
+/* Meenemen (shared/uitvoer.js): de keuken in een tabel -- het weekmenu met de
+   datum en wie kookt, de boodschappenlijst met wie hem erop zette, en het
+   vaste rijtje. Datums komen als YYYY-MM-DD van de server. Handig als je met
+   de lijst de winkel in gaat zonder dat het toestel meegaat. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!stand) return null;
+  var rijen = (stand.dagen||[]).filter(function(d){ return d.gerecht; })
+    .map(function(d){ return ['weekmenu', d.datum, d.gerecht, d.kokNaam||'', '']; });
+  (stand.lijst||[]).forEach(function(it){
+    rijen.push(['boodschap', '', it.wat, it.door||'', it.af ? 'afgevinkt' : 'open']);
+  });
+  (stand.vast||[]).forEach(function(v){ rijen.push(['vaste boodschap', '', v, '', '']); });
+  if (!rijen.length) return null;
+  return { naam:'gezinskeuken', kolommen:['soort','datum','wat','wie','status'], rijen:rijen };
+});
 
 function kokOpties(gekozen){
   return '<option value="">wie kookt?</option>' + koks.map(k=>
@@ -96,6 +114,7 @@ async function laad(){
     const d = await fetch('/api/foundation/gezin/'+s.code+'/keuken?token='+encodeURIComponent(s.token)).then(r=>r.json());
     if (d.error) throw new Error(d.error);
     koks = d.koks || [];
+    stand = d;
     // weekmenu
     $('#menu').innerHTML = d.dagen.map(dag =>
       '<div class="dag'+(dag.vandaag?' nu':'')+'" data-datum="'+dag.datum+'">'
@@ -182,5 +201,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

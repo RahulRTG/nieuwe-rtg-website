@@ -128,6 +128,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -139,6 +141,20 @@ const _pnaam = (window.Sessie && Sessie.naam && Sessie.naam()) || '';
 if (_pnaam && !cv.velden.naam) cv.velden.naam = _pnaam;
 
 function bewaar(){ try{ localStorage.setItem(KEY, JSON.stringify(cv)); }catch(e){} }
+
+/* Meenemen (shared/uitvoer.js): je eigen loopbaan uit dit cv, werk en
+   opleiding als losse velden. Het cv zelf print je; dit is de lijst die je in
+   een sollicitatieformulier of een andere app kunt overnemen. Alleen de
+   blokken, niet je naam en contactgegevens: die staan bovenaan het papier en
+   horen niet in een los bestand. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  const rijen = cv.werk.filter(w => w.functie || w.bedrijf || w.beschrijving)
+      .map(w => ['werk', w.functie || '', w.bedrijf || '', w.periode || '', w.beschrijving || ''])
+    .concat(cv.opleiding.filter(o => o.opleiding || o.school)
+      .map(o => ['opleiding', o.opleiding || '', o.school || '', o.periode || '', '']));
+  if (!rijen.length) return null;
+  return { naam: 'cv', kolommen: ['soort', 'wat', 'waar', 'periode', 'toelichting'], rijen };
+});
 
 /* ---- velden ---- */
 document.querySelectorAll('[data-f]').forEach(inp=>{
@@ -225,5 +241,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

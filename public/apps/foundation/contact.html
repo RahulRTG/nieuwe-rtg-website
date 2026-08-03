@@ -61,6 +61,11 @@
 <script src="sessie.js"></script>
 <script src="gezin-rt.js"></script>
 <script src="/apps/translate.js"></script>
+<!-- uitvoer.js staat hier voor het eigen script (de vaste plek in dit huis),
+     maar deze pagina meldt bewust GEEN bron aan: wat hier staat is een gesprek
+     tussen gezinsleden, geen register. Berichten van je gezin in een bestand
+     dat rondgaat is precies wat je hier niet wilt. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -137,5 +142,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

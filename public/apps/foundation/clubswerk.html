@@ -53,6 +53,8 @@
   </div>
   <div id="lijst"><div class="leeg">Laden...</div></div>
 </main>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -62,6 +64,21 @@ if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/rtfkantoor/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 let D = null;
+/* Meenemen (shared/uitvoer.js): het clubregister zoals het hier staat, per
+   club de stad, de sport, de stand en hoeveel er loopt. De clubcode gaat NIET
+   mee: dat is de sleutel van het clubportaal, en die hoort niet in een
+   bestand dat rondgaat. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!D || !D.steden) return null;
+  const rijen = [];
+  D.steden.forEach(s => (s.clubs || []).forEach(c => rijen.push([
+    c.naam, c.stad, c.sport, c.status,
+    String((c.programmas || []).length), String((c.afspraken || []).length),
+    String(c.at || '').slice(0, 10)])));
+  if (!rijen.length) return null;
+  return { naam: 'clubs',
+    kolommen: ['club', 'stad', 'sport', 'stand', 'programmas', 'afspraken', 'sinds'], rijen };
+});
 async function laad(){
   D = await api('clubs');
   $('#lijst').innerHTML = D.steden.length ? D.steden.map(s => '<div class="stad">' + esc(s.stad) + '</div>' + s.clubs.map(kaart).join('')).join('')
@@ -116,5 +133,6 @@ setTimeout(() => { if (D) document.getElementById('ideeen').innerHTML = D.ideeen
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

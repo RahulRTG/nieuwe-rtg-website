@@ -81,6 +81,8 @@
   </div>
 </main>
 <script src="/shared/glyf.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -95,9 +97,29 @@ function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' +
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/rtfkantoor/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
-let KAMER = null;
+let KAMER = null, KAMERS = null, KAMERIN = null;
+
+/* Meenemen (shared/uitvoer.js): wat er op dit moment op tafel ligt. Staat het
+   rooster open, dan zijn dat de kamers met hun missie, hun eerste meter en hun
+   openstaande taken; staat een kamer open, dan zijn het de taken van die
+   kamer. Zo neemt u mee wat u ziet. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (KAMERIN && !$('#kamer').hidden) {
+    var t = (KAMERIN.taken||[]).map(function(x){
+      return [KAMERIN.naam, x.tekst, x.af ? 'af' : 'open'];
+    });
+    if (t.length) return { naam:'kamertaken', kolommen:['kamer','taak','status'], rijen:t };
+  }
+  if (!KAMERS || !KAMERS.length) return null;
+  return { naam:'rtf-kamers', kolommen:['kamer','missie','taken open','meter','stand'],
+    rijen: KAMERS.map(function(x){
+      return [x.naam, x.missie, x.takenOpen, x.kpi ? x.kpi[0] : '', x.kpi ? x.kpi[1] : ''];
+    }) };
+});
+
 async function laad(){
   const [o, k] = await Promise.all([api('overzicht'), api('kamers')]);
+  KAMERS = k.kamers || []; KAMERIN = null;
   $('#top').innerHTML =
     '<div class="stat"><b>' + o.kamers + '</b><i>kamers</i></div>' +
     '<div class="stat"><b>€ ' + esc(o.opgehaald) + '</b><i>30%-stroom</i></div>' +
@@ -114,6 +136,7 @@ async function laad(){
 async function open(id){
   KAMER = id;
   const d = await api('kamer', { id });
+  KAMERIN = d;
   $('#grid').hidden = true; $('#kamer').hidden = false;
   $('#kNaam').innerHTML = glyf(d.icoon) + esc(d.naam);
   $('#kMissie').textContent = d.missie;
@@ -123,6 +146,7 @@ async function open(id){
   toonTaken(d.taken);
 }
 function toonTaken(taken){
+  if (KAMERIN) KAMERIN.taken = taken;   // het meenemen volgt wat er getekend wordt
   $('#kTaken').innerHTML = taken.length ? taken.map(t => '<label class="taak' + (t.af ? ' af' : '') + '"><input type="checkbox" data-id="' + t.id + '"' + (t.af ? ' checked' : '') + '><span>' + esc(t.tekst) + '</span></label>').join('') : '<div class="leeg">Nog geen taken.</div>';
   document.querySelectorAll('#kTaken input').forEach(c => c.addEventListener('change', async () => {
     await api('kamer/taak-zet', { id: KAMER, taakId: c.dataset.id, af: c.checked }); open(KAMER);
@@ -188,5 +212,6 @@ raadLaad();
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

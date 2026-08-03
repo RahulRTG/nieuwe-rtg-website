@@ -38,6 +38,19 @@
   });
   $('#lPin').addEventListener('keydown', e => { if (e.key === 'Enter') $('#lIn').click(); });
 
+  /* Meenemen (shared/uitvoer.js): het eenhedenbord met de velden waaruit het
+     paraatheidsbeeld wordt opgeteld. STAND wordt gevuld in laad() (deel 02);
+     zonder aanmelding op het bord valt er niets mee te nemen. */
+  let STAND = null;
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!STAND) return null;
+    return {
+      naam: 'eenheden',
+      kolommen: ['naam', 'soort', 'sterkte', 'paraatheid', 'reden'],
+      rijen: (STAND.eenheden || []).map(e => [e.naam, e.soort, e.sterkte || 0, e.paraat, e.reden || ''])
+    };
+  });
+
   const PARAAT_PILL = { gevechtsgereed: 'g', beperkt: 'b', 'in-onderhoud': 'b', 'niet-inzetbaar': 'r' };
   const MAT_PILL = { inzetbaar: 'g', 'in-onderhoud': 'b', defect: 'r' };
   const PARAAT_OPTS = ['gevechtsgereed', 'beperkt', 'in-onderhoud', 'niet-inzetbaar'];
@@ -46,6 +59,7 @@
 
   async function laad() {
     const d = await api('def/overzicht');
+    STAND = d;
     $('#titel').textContent = '' + d.naam;
     const p = d.paraatheid;
     $('#paraatheid').innerHTML =

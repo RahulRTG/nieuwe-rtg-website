@@ -77,6 +77,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -84,7 +86,23 @@ const api = Sessie.api;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
-let magBeheren=false, mijnId='';
+let magBeheren=false, mijnId='', stand=null;
+
+/* Meenemen (shared/uitvoer.js): precies de klusjes die op dit scherm staan --
+   een kind ziet zijn eigen rijtje, een ouder alles. De sterrenstand gaat mee
+   als eigen soort, want dat is de eer van het gezin. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!stand) return null;
+  var rijen = (stand.klussen||[]).map(function(k){
+    return ['klusje', k.titel, k.voorNaam||'', k.sterren, k.status, k.door||''];
+  });
+  (stand.sterren||[]).forEach(function(x){
+    rijen.push(['sterrenstand', '', x.naam, x.sterren, '', '']);
+  });
+  if (!rijen.length) return null;
+  return { naam:'klusjes-en-sterren',
+    kolommen:['soort','klusje','voor wie','sterren','status','gedaan door'], rijen:rijen };
+});
 
 for (let i=1;i<=10;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i+' '; $('#kSterren').appendChild(o); }
 
@@ -101,6 +119,7 @@ async function laad(){
     // klussen
     const box = $('#klussen');
     const zichtbaar = (d.klussen||[]).filter(k=> magBeheren || k.voor==='iedereen' || k.voor===mijnId || k.door);
+    stand = { klussen: zichtbaar, sterren: d.sterren || [] };
     if (!zichtbaar.length){ box.innerHTML = '<div class="leeg">'+(magBeheren?'Nog geen klusjes. Zet er hierboven een klaar.':'Nog geen klusjes voor jou. Kom straks terug!')+'</div>'; return; }
     box.innerHTML = zichtbaar.map(k=>{
       let acties='';
@@ -192,5 +211,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

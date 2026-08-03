@@ -8,7 +8,7 @@
     "dependencies": 0,
     "testbestanden": 487,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 72,
+    "zelfpoortendeToetsen": 73,
     "e2eBestanden": 45,
     "keuringOmvang": 67,
     "keuringDubbeling": 56,
@@ -18,6 +18,12 @@
     "routesNietSchakelbaar": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 72 -> 73",
+      "reden": "Met de hand verhoogd voor test/klankwerk.e2e.js: een schermtoets die tijdens de deelmenu-uitrol is bijgeschreven omdat klankwerk.html alleen een server-toets had. Hij opent een stuk, zet een stap en een noot, vraagt een voorstel en meet offline na dat de klankmotor er echt geluid van maakt.",
+      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de drie tanden hiervoor: het bestand staat achter de browserpoort en kan zichzelf overslaan, maar test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml. Deze toets is geschreven door een uitrol-agent, niet door mij; ik heb hem gedraaid (groen) maar zijn beweringen NIET met een eigen mutatie nagetrokken -- dat is regel 2 en staat hier open."
+    },
     {
       "datum": "2026-08-03",
       "meter": "keuringOmvang 66 -> 67",

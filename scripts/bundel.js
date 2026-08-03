@@ -60,6 +60,8 @@ const bundels = {
   'apps/foundation/gezin-rt.js': 'apps/foundation/gezin-rt',
   'apps/foundation/sessie.js': 'apps/foundation/sessie',
   'shared/basis.js': 'shared/basis',
+  'apps/rtgschool/leer.js': 'apps/rtgschool/leer',
+  'apps/schoolpartner/app.js': 'apps/schoolpartner/app',
   'shared/i18n.js': 'shared/i18n',
   'shared/borden.js': 'shared/borden',
   'shared/werkos.js': 'shared/werkos',

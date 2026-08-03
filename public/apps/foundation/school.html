@@ -437,18 +437,37 @@ async function laadPersoneel(code, token){
       E('div',{class:'knoprij'}, uitlog)));
     return;
   }
+  /* Nieuwe klas: naam plus niveau van de ladder, in plaats van een kale
+     prompt. Het niveau (bijv. Groep 7, of Havo) komt uit d.ladder -- de
+     server stuurt de fasen per schoolsoort mee, dus dit scherm verzint
+     zelf geen lijst. De keuze is per schoolsoort geordend. */
+  const nkNaam = E('input',{class:'veld', placeholder:'Naam van de klas (bijv. 7B)', maxlength:'60', style:{flex:'1 1 9rem'}});
+  const nkFase = E('select',{class:'veld', 'aria-label':'Niveau van de klas, per schoolsoort geordend', style:{flex:'1 1 11rem'}});
+  {
+    const trapNaam = {}; ((d.ladder && d.ladder.trappen) || []).forEach(t => { trapNaam[t.id] = t.naam; });
+    const perTrap = {};
+    ((d.ladder && d.ladder.fasen) || []).forEach(f => { (perTrap[f.trap] = perTrap[f.trap] || []).push(f); });
+    nkFase.innerHTML = '<option value="">Kies het niveau...</option>' +
+      Object.keys(perTrap).map(t => '<optgroup label="' + esc(trapNaam[t] || t) + '">' +
+        perTrap[t].map(f => '<option value="' + esc(f.id) + '">' + esc(f.naam) + '</option>').join('') + '</optgroup>').join('');
+  }
+  const nkVorm = E('div',{class:'rij', style:{display:'none', gap:'.4rem', flexWrap:'wrap', marginTop:'.5rem'}},
+    nkNaam, nkFase,
+    E('button',{class:'knop klein', onclick:async()=>{
+      const naam = nkNaam.value.trim(); if (!naam) { alert('Geef de klas een naam.'); return; }
+      if (!nkFase.value) { alert('Kies het niveau van de klas.'); return; }
+      try{ const r = await api('/school/leraar/klas/maak', { schoolCode: code, personeelToken: token, naam, fase: nkFase.value });
+        alert('Klas aangemaakt. Klascode voor de ouders: ' + r.code); laadPersoneel(code, token); }
+      catch(e){ alert(e.message); }
+    }}, 'Maak de klas'));
   vervang(ov,
     E('div',{class:'kaart blok'},
       E('div',{class:'kop'}, E('b', null, d.naam + ' · ' + d.school.naam), E('span',{class:'sub'}, d.klassen.length + ' klas(sen)')),
       E('div',{class:'knoprij'},
-        E('button',{class:'knop klein', onclick:async()=>{
-          const naam = prompt('Naam van de nieuwe klas (bijv. Groep 7):', ''); if (!naam) return;
-          try{ const r = await api('/school/leraar/klas/maak', { schoolCode: code, personeelToken: token, naam });
-            alert('Klas aangemaakt. Klascode voor de ouders: ' + r.code); laadPersoneel(code, token); }
-          catch(e){ alert(e.message); }
-        }}, 'Nieuwe klas'), uitlog)),
+        E('button',{class:'knop klein', onclick:()=>{ nkVorm.style.display = nkVorm.style.display === 'none' ? 'flex' : 'none'; if (nkVorm.style.display !== 'none') nkNaam.focus(); }}, 'Nieuwe klas'), uitlog),
+      nkVorm),
     d.klassen.length ? d.klassen.map(k => E('div',{class:'kaart blok'},
-      E('div',{class:'kop'}, E('b', null, k.naam), E('span',{class:'sub'}, 'code ' + k.code)),
+      E('div',{class:'kop'}, E('b', null, k.naam + (k.niveau ? ' · ' + k.niveau : '')), E('span',{class:'sub'}, 'code ' + k.code)),
       E('div',{class:'mini', style:{margin:'.3rem 0 .5rem'}},
         k.leerlingen + ' leerling(en) · ' + k.huiswerk + ' huiswerk · ' + k.berichten + ' bericht(en)' + (k.openAbsenties ? ' · ' : ''),
         k.openAbsenties ? E('b',{style:{color:'var(--rood)'}}, k.openAbsenties + ' open ziekmelding(en)') : null),

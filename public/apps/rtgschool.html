@@ -42,6 +42,11 @@
   .doel:last-child{border-bottom:none;}
   .doel button{white-space:nowrap;}
   .vakkop{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin:.7rem 0 .2rem;}
+  /* de delen van de pagina: een rustige, zakelijke kop boven elke groep
+     kaarten, zelfde vorm als .vakkop maar met lucht eromheen -- vier vaste
+     delen (paspoort, leren, toetsing, bijles), geen nieuw visueel apparaat */
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:2.2rem 0 .6rem;padding-bottom:.35rem;border-bottom:1px solid var(--line);}
+  .deel:first-of-type{margin-top:1rem;}
   .vraagblok{font-size:1.02rem;line-height:1.6;margin:.5rem 0;}
   .opties{display:flex;flex-direction:column;gap:.4rem;margin:.4rem 0;}
   .opties .knop{text-align:left;}
@@ -65,6 +70,7 @@
 <main id="main">
   <div class="kpis" id="schoolKpi"></div>
 
+  <div class="deel" id="deelPaspoort">Het paspoort</div>
   <div class="kaart">
     <div class="sec">Mijn leerpaspoort</div>
     <div id="paspoort" class="leeg">Laden...</div>
@@ -76,17 +82,15 @@
     <p class="eerlijk" id="eerlijk" style="margin-top:.6rem;"></p>
   </div>
 
+  <div class="deel" id="deelLeren">Leren en oefenen</div>
   <div class="kaart">
     <div class="sec">De leerlijn: lessen en oefenen</div>
     <div class="rij">
-      <select class="veld" id="leerGroep" aria-label="Kies een groep (basisschool)">
-        <option value="">Groep (1 t/m 8)...</option>
-      </select>
-      <select class="veld" id="leerFase" aria-label="Kies een fase (voortgezet en vervolg)">
-        <option value="">Of een fase van de ladder...</option>
+      <select class="veld" id="leerKies" aria-label="Kies je fase; de lijst is per schoolsoort geordend">
+        <option value="">Kies je fase...</option>
       </select>
     </div>
-    <div id="vakken" class="leeg">Kies een groep of fase; dan staat hier de hele leerlijn met wat je al behaald hebt.</div>
+    <div id="vakken" class="leeg">Kies je fase; dan staat hier de hele leerlijn met wat je al behaald hebt.</div>
   </div>
 
   <div class="kaart" id="lesKaart" hidden>
@@ -102,6 +106,7 @@
     <div class="uitslag" id="oefenUit"></div>
   </div>
 
+  <div class="deel" id="deelToetsing">Toetsing en advies</div>
   <div class="kaart">
     <div class="sec">Examentraining</div>
     <p class="leeg">Tien vragen achter elkaar, zoals een echt examen: de terugblik komt pas aan het eind. Oefenen mag zo vaak je wilt.</p>
@@ -125,6 +130,7 @@
     <div class="uitslag" id="adviesUit"></div>
   </div>
 
+  <div class="deel" id="deelBijles">Bijles</div>
   <div class="kaart">
     <div class="sec">Rahul Bijles: jouw eigen bijlesleraar</div>
     <div class="chat" id="bijlesLog"><div class="leeg">Rahul kent je niveau uit je leerpaspoort en legt uit op jouw tempo. Stel je vraag.</div></div>

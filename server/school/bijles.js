@@ -4,6 +4,7 @@
    De toon en de vaste regels (geduldig, positief, eerlijk) staan in
    kern/bijles.js -- een motor, twee werelden. */
 const { maakBijles } = require('../kern/bijles');
+const { FASEN } = require('../kern/onderwijs-ladder');
 
 module.exports = (sctx) => {
   const { router, F, save, schoon, eigenVeld, K, gezinSessie, leerlingVan } = sctx;
@@ -20,7 +21,11 @@ module.exports = (sctx) => {
     const doelen = l ? (k.huiswerk || [])
       .filter(h => h.doel && !(h.afDoor || []).includes(l.sleutel))
       .map(h => h.titel).slice(0, 5) : [];
-    return { niveau: l ? k.naam : null, doelen, taal: (l && l.taal) || null };
+    /* Het niveau komt van de ladder als de klas die kent; de vrije klasnaam
+       ("3B", "Meester Jan") is een naam en geen niveau, en ging hier eerder
+       rechtstreeks de AI-systeemprompt in. */
+    const f = k && k.fase ? FASEN.find(x => x.id === k.fase) : null;
+    return { niveau: l ? (f ? f.naam : k.naam) : null, doelen, taal: (l && l.taal) || null };
   }
 
   router.post('/school/bijles/vraag', async (req, res) => {

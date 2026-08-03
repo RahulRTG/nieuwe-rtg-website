@@ -15,6 +15,9 @@
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.6rem 0 .3rem;}
   .intro{color:var(--zacht);font-size:.92rem;line-height:1.5;margin-bottom:1.1rem;}
   .sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.6rem 0 .7rem;}
+  /* de schoolsoort-kop boven een groep klassen: serif, met een dunne lijn --
+     elk niveau zijn eigen deel van de pagina */
+  .soort{font-family:var(--serif);font-size:1.25rem;margin:1.8rem 0 .6rem;padding-bottom:.4rem;border-bottom:1px solid var(--lijn);}
   .kaart.blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
   .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;flex-wrap:wrap;}
   .kop b{font-size:1.05rem;}
@@ -173,7 +176,27 @@ async function laadGezin(){
         : 'Vraag de klascode aan je leraar en sluit jezelf hieronder aan.')));
     return;
   }
-  vervang($('#schoolLijst'), lijst.map(kaartVoor));
+  /* Elke schoolsoort is een eigen deel: de basisschoolklas van het ene kind
+     staat niet meer tussen de havo-vakken van het andere. De volgorde en de
+     namen komen van de ladder (via /school/mijn), dus dit scherm verzint
+     zelf geen indeling. Klassen zonder niveau (van voor het niveauveld)
+     staan bij elkaar onder hun eigen kop -- en zolang er maar een soort is,
+     is een kop alleen maar drukte en blijft hij weg. */
+  const soorten = [];
+  for (const x of lijst){
+    const sleutel = x.klas.trap || 'zonder';
+    let g = soorten.find(v => v.sleutel === sleutel);
+    if (!g){ g = { sleutel, naam: x.klas.schoolsoort || 'Klassen', volgorde: x.klas.volgorde || 99, items: [] }; soorten.push(g); }
+    g.items.push(x);
+  }
+  soorten.sort((a, b) => a.volgorde - b.volgorde);
+  // vervang() verwacht een platte rij elementen (geen geneste arrays)
+  const uitLijst = [];
+  for (const g of soorten){
+    if (soorten.length > 1) uitLijst.push(E('div',{class:'soort'}, g.naam));
+    for (const x of g.items) uitLijst.push(kaartVoor(x));
+  }
+  vervang($('#schoolLijst'), uitLijst);
 }
 /* open uitnodigingen: het kind beslist zelf; de ouder ziet wat er nog wacht */
 function toonUitnodigingen(lijst){
@@ -242,7 +265,7 @@ function kaartVoor(x){
   const open = (x.huiswerk||[]).filter(h => !h.af);
   const kaart = E('div',{class:'kaart blok'},
     E('div',{class:'kop'},
-      E('b', null, x.klas.naam + ' · ' + x.kind.naam),
+      E('b', null, x.klas.naam + (x.klas.niveau ? ' · ' + x.klas.niveau : '') + ' · ' + x.kind.naam),
       E('span',{class:'sub'}, (x.klas.school ? x.klas.school + ' · ' : '') + x.klas.leraar)),
     // vandaag
     E('div',{class:'sec', style:{margin:'0.8rem 0 0.3rem'}}, 'Vandaag'),

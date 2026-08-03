@@ -37,6 +37,7 @@
   .kaartblok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .kaartblok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;}
   .praat{font-family:var(--serif);font-size:1.25rem;line-height:1.4;min-height:2.4em;display:flex;align-items:center;justify-content:center;padding:.4rem 0;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
@@ -45,6 +46,7 @@
 <div class="wrap" role="main">
   <h1>Onze dromen</h1>
 
+  <div class="deel">Dromen</div>
   <div class="kaart maak">
     <div class="rijveld">
       <textarea class="veld" id="nTekst" rows="1" placeholder="Mijn droom of doel is..." maxlength="240"></textarea>
@@ -59,6 +61,7 @@
     <div id="behaald"></div>
   </div>
 
+  <div class="deel">Gesprekskaart</div>
   <div class="kaart kaartblok">
     <h2>Gesprekskaart voor aan tafel</h2>
     <div class="h">Even samen praten? Trek een kaart en beantwoord hem om de beurt.</div>
@@ -66,6 +69,7 @@
     <button class="knop grijs klein" id="nogKaart" style="margin-top:.6rem;">Nieuwe kaart</button>
   </div>
 
+  <div class="deel">Vertel je droom</div>
   <div class="kaart kaartblok">
     <h2>Vertel je droom</h2>
     <div class="chat" id="chat"><div class="b ai">Wat zou jij later willen? Grote en kleine dromen zijn hier allebei welkom.</div></div>
@@ -130,6 +134,7 @@ laad(); kaart();
 Sessie.coach({ kind: 'dromen', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

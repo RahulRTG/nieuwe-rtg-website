@@ -40,6 +40,7 @@
   .tabelwrap{overflow-x:auto;}
   .klein{font-size:.84rem;color:var(--zacht);line-height:1.6;}
   .klein b{color:var(--txt);}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
@@ -55,11 +56,13 @@
     <div class="klein" id="samenvatting"></div>
   </div>
 
+  <div class="deel">Regels</div>
   <div class="kaart blok">
     <div class="toon" id="onderwerpen" role="group" aria-label="Onderwerp"></div>
     <div id="regels"></div>
   </div>
 
+  <div class="deel">Werkuren</div>
   <div class="kaart blok" id="urenblok">
     <h2>Hoeveel je mag werken</h2>
     <div class="klein" id="urenuitleg"></div>
@@ -71,6 +74,7 @@
     </div>
   </div>
 
+  <div class="deel">Lees dit erbij</div>
   <div class="kaart blok">
     <h2>Lees dit erbij</h2>
     <p class="klein">Dit is <b>algemene informatie over de Nederlandse regels, geen juridisch advies</b>, en regels veranderen. Bedragen zoals het minimumjeugdloon worden elk halfjaar aangepast; kijk voor het actuele bedrag op rijksoverheid.nl. Voor je eigen situatie geldt daarnaast wat er in je contract, je cao of je schoolreglement staat, en dat kan strenger zijn. Twijfel je of iets klopt wat een werkgever of iemand anders je vertelt, vraag het dan na bij een ouder, je mentor, of het Juridisch Loket. Ben je in een ander land dan Nederland, dan gelden daar andere leeftijdsgrenzen.</p>
@@ -202,6 +206,7 @@ tekenOnderwerpen();
 teken();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

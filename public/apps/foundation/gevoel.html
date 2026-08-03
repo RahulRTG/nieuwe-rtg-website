@@ -35,6 +35,7 @@
   @media(prefers-reduced-motion:reduce){ .bol{transition:none;} }
   .onderrij{display:flex;gap:.6rem;justify-content:center;margin-top:.9rem;flex-wrap:wrap;}
   .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
@@ -44,6 +45,7 @@
   <h1>Hoe voel je je?</h1>
   <div class="intro">Tik het gezichtje aan dat lijkt op hoe jij je nu voelt. Er is geen goed of fout: alle gevoelens mogen er zijn.</div>
 
+  <div class="deel">Gevoelens</div>
   <div class="kaart blok">
     <div class="koppen" id="koppen"></div>
     <div class="antwoord" id="antwoord" aria-live="polite"></div>
@@ -64,6 +66,7 @@
       <a href="hulpwijzer.html" style="color:var(--goud2);">hulpwijzer</a>.</div>
   </div>
 
+  <div class="deel">Ademen</div>
   <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Rustig ademen</h2>
     <p style="color:var(--zacht);line-height:1.55;margin-bottom:.9rem;">Wordt de bol groot, dan adem je in. Wordt hij klein, dan adem je uit. Doe gewoon mee met de bol.</p>
@@ -73,6 +76,7 @@
     </div>
   </div>
 
+  <div class="deel">Praten</div>
   <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Even praten?</h2>
     <div class="chat" id="chat"><div class="b ai">Hoi. Alles wat je voelt mag er zijn. Wil je vertellen hoe het met je is?</div></div>
@@ -83,6 +87,7 @@
     <div class="mini" style="padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
   </div>
 
+  <div class="deel">Voor ouders</div>
   <div class="kaart blok">
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Voor de grote mee-voeler</h2>
     <p class="ouder">Deze app stuurt niets door en legt uit zichzelf niets vast: wat het kind aantikt blijft op dit scherm. Alleen als het kind zelf op "bewaar in mijn dagboekje" tikt, wordt dat ene gevoel bewaard -- en dat dagboekje kan uitsluitend het kind zelf inzien, u niet. Dat is met opzet: een kind dat weet dat niemand meeleest, durft eerlijk te zijn. Benoem wat u ziet ("je kijkt boos") en wacht daarna even; kinderen hebben eerst erkenning nodig en pas daarna een oplossing. Blijft een kind langere tijd bang of verdrietig, dan is dit spel geen vervanging voor een gesprek met de huisarts of de school.</p>
@@ -232,6 +237,7 @@ teken();
 Sessie.coach({ kind: 'gevoel', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

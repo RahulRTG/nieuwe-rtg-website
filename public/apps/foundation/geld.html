@@ -142,6 +142,7 @@ $('#vraag').addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){
 laadDoelen(); tip();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

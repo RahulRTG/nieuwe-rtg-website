@@ -60,6 +60,10 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
     assert.equal(await page.evaluate((s) => document.querySelector(s).getAttribute('aria-pressed'), eerste), 'false',
       'en gaat weer uit');
 
+    /* Het werkvlak is een deelmenu: EEN deel tegelijk. Dus eerst navigeren
+       zoals een gebruiker dat doet, en daarna pas klikken. */
+    await page.evaluate(() => window.RTGDeel.open('de-notenrol'));
+
     // de notenrol hoort bij een melodisch kanaal en draagt echte nootnamen
     await page.waitForSelector('#rol .rrij', { timeout: 8000 });
     const labels = await page.evaluate(() =>
@@ -99,6 +103,7 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
     assert.ok(meting.piek > 3000, 'er zit hoorbaar signaal in (piek ' + meting.piek + ' van 32767)');
 
     // Rahul zet iets neer, en het landt pas als je het plaatst
+    await page.evaluate(() => window.RTGDeel.open('rahul-zet-iets-neer'));
     await page.fill('#rVraag', 'een rustige lounge rond 90 bpm');
     await page.click('#rVraagKnop');
     await page.waitForSelector('#rZet', { timeout: 15000 });

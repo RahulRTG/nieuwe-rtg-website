@@ -30,9 +30,20 @@
   .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;display:block;}
   .kpi span{font-size:.7rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;}
   .kpi.goud{border-color:rgba(169,143,7,.4);} .kpi.goud b{color:var(--gold);}
-  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
-  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
-  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* Het kantoor houdt zijn eigen schakelaar (Signalen / Aanslagen / Btw-beeld),
+     maar draagt hem in de stijl van het deelmenu: een rustige balk met kleine
+     kapitalen en een gouden streep onder het deel waar u staat. Zo is het huis
+     er een, ook waar de app zijn tabs zelf regelt.
+     De selector moet dieper dan `.tab`: de kit tekent .tabs/.tab als een rij
+     pillen, mede via `body.rtg-stijl .tabs > button`, en die is specifieker. */
+  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > .tab{white-space:nowrap;background:none;border:0;
+    border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;cursor:pointer;
+    padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .tabs > .tab.aan{color:var(--txt);background:none;border-bottom-color:var(--gold);}
   section.paneel{display:none;} section.paneel.aan{display:block;}
   .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}

@@ -66,9 +66,22 @@
   .badge.uit{background:#3a1420;color:#F4B8C6;}
   .muted{color:var(--soft);font-size:.8rem;}
   .toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
-  .tabs{display:flex;gap:.4rem;margin-bottom:1.2rem;border-bottom:1px solid var(--line);}
-  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--soft);padding:.6rem .9rem;font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;}
-  .tab[aria-selected="true"]{color:var(--txt);border-bottom-color:var(--gold);}
+  /* Techniek houdt zijn eigen schakelaar (Statusbord / De Wacht / Controlekamer),
+     maar draagt hem in de stijl van het deelmenu: een rustige balk met kleine
+     kapitalen en een gouden streep onder het deel waar u staat. Zo is het huis
+     er een, ook waar de app zijn tabs zelf regelt.
+     De selector moet wel dieper dan `.tab`: de kit tekent .tabs/.tab als een rij
+     pillen en doet dat mede via `body.rtg-stijl .tabs > button`, en die is
+     specifieker. Vandaar `body.rtg-stijl .tabs > .tab` -- anders erft de tab de
+     pilvorm en houdt hij alleen de kapitalen over. */
+  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > .tab{background:none;border:0;border-bottom:2px solid transparent;
+    margin-bottom:-1px;border-radius:0;cursor:pointer;padding:.55rem .8rem .6rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .tabs > .tab[aria-selected="true"]{color:var(--txt);border-bottom-color:var(--gold);}
   .catkop{display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap;margin:1.4rem 0 .5rem;}
   .catkop h2{font-size:.95rem;font-weight:600;}
   /* Inklapbare categoriekop (zelfde rustige beeld als de Boardroom): een categorie

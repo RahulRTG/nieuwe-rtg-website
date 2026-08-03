@@ -26,9 +26,18 @@
   select,input,textarea{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.85rem;padding:.5rem .7rem;}
   input:focus-visible,textarea:focus-visible,button:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   #zoekveld{width:100%;margin-top:.7rem;}
-  .filters{display:flex;gap:.4rem;margin-top:.6rem;overflow-x:auto;padding-bottom:.15rem;}
-  .filters button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .8rem;font:inherit;font-size:.76rem;white-space:nowrap;cursor:pointer;}
-  .filters button[aria-pressed="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  /* De filterrij is de eigen schakelaar van deze app: hij toont een soort
+     tegelijk (mensen, werk, officieel, archief). Hij draagt daarom de stijl van
+     het deelmenu -- kleine kapitalen, een gouden streep onder het deel waar je
+     staat -- zodat het huis er een is. Het mechanisme blijft van de app zelf.
+     Geen eigen rail eronder: de kopbalk heeft er al een, en twee hairlines
+     onder elkaar op elf pixels is een streep te veel. */
+  .filters{display:flex;gap:.15rem;margin-top:.6rem;overflow-x:auto;padding-bottom:0;}
+  .filters button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+    color:var(--muted);padding:.45rem .5rem .4rem;font:inherit;font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}
+  .filters button:hover{color:var(--txt);}
+  .filters button[aria-pressed="true"]{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   /* Deze kopbalk draagt drie regels: titel, zoekveld en filters. Hij blijft
      bovenaan plakken, dus elke millimeter gaat af van de gesprekken eronder.
      De kit rekent .kop als een royale PAGINAkop; hier is het een balk. We

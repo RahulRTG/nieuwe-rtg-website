@@ -36,6 +36,18 @@
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
 
+  /* De agenda houdt zijn eigen weergave-schakelaar (maand / week / lijst), maar
+     draagt hem in de stijl van het deelmenu: geen randje om een knop, maar een
+     rustige tab met kleine kapitalen en een gouden streep onder de actieve. Zo
+     is het huis er een. De pijlen en "Vandaag" blijven handelingen, en dus
+     echte knoppen. Op id, want de kit tekent .knop als een pil en die regel is
+     specifieker dan een kale klasse hier. */
+  #wMaand,#wWeek,#wLijst{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+    padding:.5rem .45rem .4rem;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);}
+  #wMaand:hover,#wWeek:hover,#wLijst:hover{color:var(--txt);border-bottom-color:transparent;}
+  #wMaand.aan,#wWeek.aan,#wLijst.aan{color:var(--txt);border-bottom-color:var(--gold);}
+
   /* de balk boven de kalender: maand, pijlen, weergave */
   .stuur{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;}
   .stuur h2{font-size:1.25rem;min-width:11rem;}

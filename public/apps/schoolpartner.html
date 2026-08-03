@@ -50,6 +50,9 @@
     border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw;}
   .melding.zie{opacity:1;}
+  /* markeringen voor het deelmenu: ze bundelen de kaarten van de werkbank tot
+     zes delen. Staat het menu er, dan zijn ze weg; anders blijft het een kop. */
+  .deel{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 .5rem;}
   [hidden]{display:none !important;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
@@ -100,12 +103,15 @@
 
   <!-- leraar-werkbank -->
   <div id="vLeraar" hidden>
-    <div class="kaart" id="lKlassenKaart">
+    <!-- rtgdeel-vast: de klassenkiezer blijft in elk deel van het menu staan;
+         zonder klas heeft de werkbank eronder geen betekenis -->
+    <div class="kaart rtgdeel-vast" id="lKlassenKaart">
       <div class="kop">Mijn klassen</div>
       <div id="lKlassen"></div>
     </div>
     <div id="lWerk" hidden>
       <div class="kpis" id="lKpis" aria-live="polite"></div>
+      <div class="deel">Vandaag</div>
       <div class="kaart">
         <div class="kop">Vandaag</div>
         <div class="rij">
@@ -123,6 +129,7 @@
           </div>
         </div>
       </div>
+      <div class="deel">Toetsen</div>
       <div class="kaart">
         <div class="kop">Toets uit de leerlijn</div>
         <p class="stil">Vink leerdoelen aan, kies de vorm, klaar. Elke leerling krijgt verse opgaven; de motor kijkt na en het cijfervoorstel blijft een advies.</p>
@@ -144,11 +151,13 @@
         <div class="kop">Toetsen en uitslagen</div>
         <div id="tLijst"></div>
       </div>
+      <div class="deel">Hulplijn</div>
       <div class="kaart">
         <div class="kop">De hulplijn</div>
         <p class="stil">De ene knop van het kind zelf. Acuut staat bovenaan; vertrouwelijke meldingen ziet alleen jij (de vertrouwenspersoon-route), gewone meldingen lezen de ouders mee. Pak op met een korte notitie; het kind ziet dat het gezien is.</p>
         <div id="hulpLijst"></div>
       </div>
+      <div class="deel">Excursies</div>
       <div class="kaart">
         <div class="kop">Excursies</div>
         <p class="stil">Locaties bestaan alleen tijdens een actieve excursie (met toestemming van de ouders) en worden bij de stop gewist. Elke blik op de kaart wordt gelogd en is zichtbaar voor de gezinnen.</p>
@@ -160,6 +169,7 @@
         <div id="exLijst"></div>
         <div id="exUit"></div>
       </div>
+      <div class="deel">Ouders</div>
       <div class="kaart">
         <div class="kop">Ouderbijdrage</div>
         <p class="stil">De ouderbijdrage is vrijwillig; een kind wordt nooit uitgesloten als er niet betaald is.</p>
@@ -180,6 +190,7 @@
         </div>
         <div id="boomLijst"></div>
       </div>
+      <div class="deel">Cijferboek</div>
       <div class="kaart">
         <div class="kop">Cijferboek</div>
         <div id="cBoek" class="stil"></div>
@@ -194,6 +205,7 @@
 <script src="/apps/schoolpartner/excursie.js"></script>
 <script src="/apps/schoolpartner/directie.js"></script>
 <script src="/apps/schoolpartner/app.js"></script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

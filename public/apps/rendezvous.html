@@ -68,6 +68,7 @@
 <div class="tabs" id="tabs"></div>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -86,7 +87,7 @@ async function laad(){
     if(TAB==='profiel') return await profiel();
     if(TAB==='ontdek') return await ontdek();
     return await matches();
-  }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Rendez-vous is de besloten datingdienst van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon Rendez-vous niet laden.</div>'; }
+  }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Rendez-vous niet laden.</div>'; }
 }
 
 async function profiel(){

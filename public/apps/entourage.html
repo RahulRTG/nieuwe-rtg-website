@@ -50,6 +50,7 @@
 <header><div><div class="ey">Lifestyle Pass</div><h1>Entourage</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -62,7 +63,7 @@ const AIBOX=app=>'<div class="kaart"><h2>Vraag de reissecretaris</h2><div style=
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('entourage'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Entourage is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het gezelschap niet laden.</div>'; return; }
+  let d; try{ d=await api('entourage'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het gezelschap niet laden.</div>'; return; }
   let h='';
   if(d.attenties.length){ h+='<div class="attn"><h2>Documenten die aandacht vragen</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.naam)+'</b> · '+esc(a.soort)+' '+(a.verlopen?'verlopen':'geldig tot')+' '+dt(a.tot)+'</div>').join('')+'<small style="display:block;margin-top:.4rem;opacity:.75;">'+esc(d.bron)+'</small></div>'; }
   h+='<div class="kaart"><h2>Iemand toevoegen</h2><div class="rij"><input class="veld" id="pN" placeholder="naam"><select class="veld" id="pB">'+d.banden.map(b=>'<option>'+b+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="pT" placeholder="telefoon"><input class="veld" id="pDi" placeholder="dieet"></div><div class="rij"><input class="veld" id="pP" type="date" title="paspoort geldig tot"><input class="veld" id="pV" placeholder="voorkeuren"></div><div style="margin-top:.6rem;"><button class="knop" id="pAdd">+ toevoegen</button></div><div style="font-size:.72rem;color:var(--soft);margin-top:.35rem;">De datum is de geldigheid van het paspoort.</div></div>';

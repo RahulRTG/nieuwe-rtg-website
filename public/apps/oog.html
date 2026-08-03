@@ -118,6 +118,7 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -224,7 +225,7 @@
   }
   async function laadStand() {
     const r = await api('', {});
-    if (r.status !== 200) { $('#poortReden').textContent = (r.body.error || 'Log eerst in op de personeels-app.'); $('#vPoort').classList.remove('weg'); return false; }
+    if (r.status !== 200) { try { RTGDeur.toon(document.querySelector('#vPoort .kaart'), { soort:'personeel', naar:'/apps/personeel.html' }); } catch(e) { $('#poortReden').textContent = (r.body.error || 'Log eerst in op de personeels-app.'); } $('#vPoort').classList.remove('weg'); return false; }
     voertuigen = r.body.voertuigen || []; spullen = r.body.spullen || [];
     const sel = $('#voertuig'); sel.innerHTML = '';
     for (const v of voertuigen) { const o = document.createElement('option'); o.value = v.id; o.textContent = v.naam + (v.nulmeting ? '' : ' · nog geen nulmeting'); sel.appendChild(o); }

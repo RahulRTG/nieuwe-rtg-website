@@ -107,6 +107,7 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -133,7 +134,7 @@
     const r = await fetch('/api/supplier/ov/overzicht', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
       .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
-    if (r.status !== 200) { $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.'; $('#vPoort').classList.remove('weg'); return; }
+    if (r.status !== 200) { try { RTGDeur.toon(document.querySelector('#vPoort .kaart'), { soort:'personeel', naar:'/apps/personeel.html' }); } catch(e) { $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.'; } $('#vPoort').classList.remove('weg'); return; }
     const sel = $('#dLijn'); sel.innerHTML = '';
     for (const l of r.body.lijnen || []) { const o = document.createElement('option'); o.value = l.id; o.textContent = l.icoon + ' ' + l.naam; sel.appendChild(o); }
     $('#vDienst').classList.remove('weg');

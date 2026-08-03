@@ -79,6 +79,7 @@
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
 
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -97,7 +98,7 @@ const TABS=[['overzicht','Overzicht'],['concierge','Concierge'],['bezit','Bezitt
 async function start(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Rechterhand is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
   try{ await api('overzicht'); }catch(e){
-    if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Rechterhand is uw persoonlijke chef de bureau - inbegrepen bij de Lifestyle Pass. Neem contact op om uw pas te upgraden, dan zetten wij alles voor u klaar.</p></div>'; return; }
+    if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; }
     $('#main').innerHTML='<div class="leeg">Kon De Rechterhand niet laden.</div>'; return;
   }
   teken();

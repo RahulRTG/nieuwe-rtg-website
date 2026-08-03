@@ -53,6 +53,7 @@
 <header><div><div class="ey">Lifestyle Pass</div><h1>Reisboek</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -79,7 +80,7 @@ async function laad(){
   document.querySelectorAll('.reis').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
   bindAi('reisboek');
 }
-function gate(){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Het Reisboek is onderdeel van de Lifestyle Pass.</p></div>'; }
+function gate(){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); }
 
 function detail(r){
   const sect=(titel,lijst,items,rij)=>'<div class="kaart"><h2>'+titel+'</h2>'+(items.length?items.map(rij).join(''):'<div class="leeg">Nog niets.</div>')+form(lijst)+'</div>';

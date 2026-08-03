@@ -58,6 +58,7 @@
 <header><div><div class="ey">Lifestyle Pass</div><h1>Logboek</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -72,7 +73,7 @@ function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ cons
 let open=null;
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('logboek'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Logboek is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het logboek niet laden.</div>'; return; }
+  let d; try{ d=await api('logboek'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het logboek niet laden.</div>'; return; }
   if(open){ const o=d.objecten.find(x=>x.id===open); if(o) return detail(d,o); open=null; }
   let h='';
   if(d.attenties.length){ h+='<div class="deel">Aandacht</div><div class="attn"><h2>Vraagt aandacht</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.object)+'</b> · '+esc(a.wat)+' · '+(a.verlopen?'verlopen':'vóór')+' '+dt(a.volgende)+'</div>').join('')+'</div>'; }

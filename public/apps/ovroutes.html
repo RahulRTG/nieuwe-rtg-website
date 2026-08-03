@@ -108,6 +108,7 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -261,7 +262,7 @@
     if (!token) { $('#vPoort').classList.remove('weg'); return; }
     const r = await api('lijnen');
     if (r.status !== 200) {
-      $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.';
+      try { RTGDeur.toon(document.querySelector('#vPoort .kaart'), { soort:'personeel', naar:'/apps/personeel.html' }); } catch(e) { $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.'; }
       $('#vPoort').classList.remove('weg'); $('#vBeheer').classList.add('weg'); return;
     }
     beheer = r.body;

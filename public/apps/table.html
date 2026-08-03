@@ -53,6 +53,7 @@
 <header><div><div class="ey">Lifestyle Pass</div><h1>Table</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -66,7 +67,7 @@ function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ cons
 let open=null;
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('table'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Table is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
+  let d; try{ d=await api('table'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
   if(open){ const e=d.events.find(x=>x.id===open); if(e) return detail(e); open=null; }
   let h='<div class="deel">Nieuwe gelegenheid</div><div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij" style="margin-top:.4rem;"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div style="margin-top:.6rem;"><button class="knop" id="nDoe">Aanmaken</button></div></div>';
   h+='<div class="deel">Gelegenheden</div>';

@@ -26,16 +26,19 @@
      van de pagina -- maar draagt de stijl van het deelmenu (shared/deelmenu.js):
      geen pil met een randje, maar een rustige balk met kleine kapitalen en een
      gouden streep onder de actieve. Zo is het huis er een. De
-     body.rtg-stijl-voorvoegsels zijn nodig omdat de gedeelde pilrij in
-     rtg-ui.css (body.rtg-stijl .tab) anders zwaarder weegt. */
+     voorvoegsels zijn nodig omdat de gedeelde pilrij in rtg-ui.css anders
+     zwaarder weegt: die rij staat er als `body.rtg-stijl .tabs > button` en
+     dat telt een klasse en een element MEER dan een kale `.tab`. Zonder de
+     `.tabs >` ervoor stond deze regel er wel, maar deed hij niets -- gemeten
+     in de browser, niet gehoopt. */
   body.rtg-stijl .tabs{display:flex;gap:.15rem;flex-wrap:wrap;margin:.2rem 0 1.1rem;padding:0 0 .1rem;
     border-bottom:1px solid var(--line);}
-  body.rtg-stijl .tab{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+  body.rtg-stijl .tabs > .tab{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
     margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;font-size:.72rem;
     font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
     white-space:nowrap;cursor:pointer;}
-  body.rtg-stijl .tab:hover{color:var(--txt);border-bottom-color:transparent;}
-  body.rtg-stijl .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .tabs > .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .item{border:1px solid var(--line);border-radius:14px;padding:.8rem .95rem;margin-bottom:.6rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.02rem;}
   .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.55;}

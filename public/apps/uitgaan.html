@@ -29,17 +29,20 @@
      van deze app -- het filteren blijft van de pagina -- maar draagt de stijl
      van het deelmenu (shared/deelmenu.js): geen pil met een randje, maar een
      rustige balk met kleine kapitalen en een gouden streep onder de actieve.
-     De body.rtg-stijl-voorvoegsels zijn nodig omdat de gedeelde pilrij in
-     rtg-ui.css (body.rtg-stijl .chip) anders zwaarder weegt. */
+     De voorvoegsels zijn nodig omdat de gedeelde pilrij in rtg-ui.css anders
+     zwaarder weegt: die rij staat er als `body.rtg-stijl .chips > button` en
+     dat telt een klasse en een element MEER dan een kale `.chip`. Zonder de
+     `.chips >` ervoor stond deze regel er wel, maar deed hij niets -- gemeten
+     in de browser, niet gehoopt. */
   body.rtg-stijl .chips{display:flex;gap:.15rem;overflow-x:auto;margin:.6rem 0 .2rem;padding:0 0 .1rem;
     border-bottom:1px solid var(--line);scrollbar-width:none;}
   body.rtg-stijl .chips::-webkit-scrollbar{display:none;}
-  body.rtg-stijl .chip{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;
+  body.rtg-stijl .chips > .chip{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;
     border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;
     font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
     cursor:pointer;}
-  body.rtg-stijl .chip:hover{color:var(--txt);border-bottom-color:transparent;}
-  body.rtg-stijl .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
+  body.rtg-stijl .chips > .chip:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .chips > .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .lijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.9rem;margin-top:.6rem;}
   .resto{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.3rem;text-align:left;}
   .resto:hover{border-color:var(--gold);transform:translateY(-2px);}

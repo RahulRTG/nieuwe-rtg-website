@@ -33,6 +33,23 @@
   .knop.aan{border-color:var(--gold);color:var(--gold);}
   .knop:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  /* De weergaverij (Alles / Onder de RTG-naam / Van mij) is de eigen schakelaar
+     van deze app -- het filteren blijft van klankwerk/zaal.js -- maar draagt de
+     stijl van het deelmenu (shared/deelmenu.js): geen knopjes met een randje,
+     maar een rustige balk met kleine kapitalen en een gouden streep onder de
+     actieve. Zo is het huis er een. De body.rtg-stijl-voorvoegsels zijn nodig
+     omdat de gedeelde knop in rtg-ui.css (body.rtg-stijl .knop) anders zwaarder
+     weegt; de rij zelf wordt aangewezen via de knop die erin staat, zodat er
+     geen enkele klasse of id hoeft te veranderen. */
+  body.rtg-stijl .rij:has(> #fAlles){gap:.15rem;padding:0 0 .1rem;border-bottom:1px solid var(--line);}
+  body.rtg-stijl #fAlles,body.rtg-stijl #fRtg,body.rtg-stijl #fMij{background:none;border:0;
+    border-bottom:2px solid transparent;border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;cursor:pointer;}
+  body.rtg-stijl #fAlles:hover,body.rtg-stijl #fRtg:hover,body.rtg-stijl #fMij:hover{color:var(--txt);
+    border-color:transparent;}
+  body.rtg-stijl #fAlles.aan,body.rtg-stijl #fRtg.aan,body.rtg-stijl #fMij.aan{background:none;
+    color:var(--txt);border-bottom-color:var(--gold);}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.3rem 0 .5rem;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.05rem;

@@ -36,6 +36,18 @@
   .veld,select.veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
+  /* De situatierij (Begroeten / Restaurant / Onderweg / Hulp) is de eigen
+     schakelaar van deze app -- het wisselen blijft van vertaler/app.js -- maar
+     draagt de stijl van het deelmenu (shared/deelmenu.js): geen pil met een
+     randje, maar een rustige balk met kleine kapitalen en een gouden streep
+     onder de actieve. Op id, want die knoppen delen de klasse .knop met de
+     handelingen eronder (Lees voor, Kopieer) en die blijven wel pillen. */
+  #reisTabs{gap:.15rem;margin:.2rem 0 .8rem;padding:0 0 .1rem;border-bottom:1px solid var(--line);}
+  #reisTabs .knop{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+    margin-bottom:-1px;padding:.55rem .8rem .6rem;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  #reisTabs .knop:hover{color:var(--txt);border-bottom-color:transparent;}
+  #reisTabs .knop.aan{color:var(--txt);border-bottom-color:var(--gold);}
   textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;
     color:var(--txt);font:inherit;font-size:1rem;line-height:1.6;padding:.8rem .9rem;resize:vertical;}
   #uitPaneel{background:var(--card);border:1px solid var(--line);border-radius:12px;

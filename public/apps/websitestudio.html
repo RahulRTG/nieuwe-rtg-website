@@ -38,10 +38,18 @@
   .kleurbalk label{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.52rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);cursor:pointer;}
   .kleurbalk input[type=color]{width:1.7rem;height:1.4rem;border:1px solid var(--line);border-radius:6px;background:none;padding:0;cursor:pointer;}
   .kleurbalk .knop{padding:.3rem .55rem;font-size:.7rem;}
-  /* toestelkiezer: telefoon / tablet / desktop -- schaalt het doek naar die versie */
-  .apparaten{display:flex;gap:.15rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.15rem;}
-  .apparaten button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:.72rem;font-weight:600;padding:.3rem .55rem;border-radius:7px;cursor:pointer;white-space:nowrap;}
-  .apparaten button.aan{background:var(--bg);color:var(--gold);}
+  /* toestelkiezer: telefoon / tablet / desktop -- schaalt het doek naar die
+     versie. Het schakelen blijft van zetApparaat(); de rij draagt alleen de
+     stijl van het deelmenu (shared/deelmenu.js): een haarlijn met kale knoppen
+     in kleine kapitalen en een gouden streep onder de open versie, zodat de
+     schakelaars in het hele huis er hetzelfde uitzien. */
+  .apparaten{display:flex;gap:.15rem;padding:0 0 .1rem;border-bottom:1px solid var(--line);}
+  .apparaten button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+    margin-bottom:-1px;color:var(--muted);font-family:'Inter',system-ui,sans-serif;font-size:.72rem;
+    font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.55rem .8rem .6rem;
+    cursor:pointer;white-space:nowrap;}
+  .apparaten button:hover{color:var(--txt);}
+  .apparaten button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   /* het doek (de website die je bouwt) -- een container, zodat de blokken
      meebuigen met de DOEK-breedte (de gekozen versie), niet met het venster */
   main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;}

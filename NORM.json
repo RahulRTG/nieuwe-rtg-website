@@ -8,8 +8,8 @@
     "dependencies": 0,
     "testbestanden": 509,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 102,
-    "e2eBestanden": 59,
+    "zelfpoortendeToetsen": 107,
+    "e2eBestanden": 61,
     "keuringOmvang": 67,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
@@ -129,6 +129,12 @@
       "meter": "zelfpoortendeToetsen 68 -> 70",
       "reden": "Met de hand VERHOOGD, en dat is het verlagen van de lat. De aanleiding zijn twee nieuwe schermtoetsen (test/wings.e2e.js en test/leven.e2e.js) die net als de eenenveertig andere e2e-bestanden achter `{ skip: pw ? false : 'geen browser beschikbaar' }` staan. Die poort is een keuze: wie de suite draait zonder Playwright hoort niet op een muur rood te stuiten voor iets wat niet zijn schuld is.",
       "eerlijkheidshalve": "Deze meter telt toetsen die zichzelf kunnen overslaan, en dat is precies het risico dat hier groeit: draait ergens een suite zonder browser, dan slaan drieenveertig bestanden zichzelf over en meldt de uitvoer 0 fail. De tand mocht daarom alleen omhoog MET een tegenwicht, en dat is er nu: test/browserpoort.e2e.js zakt hard als RTG_E2E_STRICT=1 staat en er geen browser gevonden wordt, en die vlag staat in .github/workflows/ci.yml op de e2e-stap. De poort blijft dus bestaan, maar hij kan niet meer stil openstaan waar het ertoe doet. Wie de tand terug wil op 68: dat kan alleen door twee schermtoetsen weg te halen, en dat is geen verbetering. Nog iets uit dezelfde ronde: de teller las de RUWE testbron, dus de skip-regel die in de KOP van test/browserpoort.e2e.js wordt uitgelegd telde mee -- het bestand dat zichzelf juist nooit overslaat gold als overgeslagen toets. Dat is dezelfde fout als de eerste notitie hierboven, nu in scripts/norm.js in plaats van scripts/keuring.js. De bron gaat daar nu eerst door zonderCommentaar(); zonder die reparatie had hier 71 gestaan."
+    },
+    {
+      "datum": "2026-08-04",
+      "meter": "zelfpoortendeToetsen 102 -> 107",
+      "reden": "Met de hand verhoogd voor vijf toetsen uit dezelfde ronde: drie in test/eigensessieschermen.e2e.js (de twaalf schermen die op een ANDERE sleutel draaien dan de ledenpas -- kantoorcode, zaak-inlog, clubcode, raadcode -- plus de twee doorverwijsstubs) en twee in test/deelmenuwacht.e2e.js (de MutationObserver van shared/deelmenu.js, op een pagina waar verder niets gebeurt).",
+      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de tanden hiervoor: alle vijf staan achter de browserpoort en slaan zichzelf over zonder browser, maar test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml. Beide bestanden zijn met mutaties natrokken: bij eigensessieschermen drie (clubswerk weer laten wegsturen, de zorgbalie kantoor=1 laten vragen, het clubportaal zijn clubcode niet laten noemen), alle drie RAAK. Bij deelmenuwacht is het juist de mutatie die op 2026-08-03 AFsloeg: subtree terug op false. Die zakt nu wel, en daarmee is eerlijkheidspunt 6.2 gesloten. Kanttekening bij die tweede toets: zijn TWEEDE helft (minder dan drie delen krijgt geen menu) blijft onder diezelfde mutatie groen -- terecht, want hij toetst afwezigheid, maar als losse toets zou hij niets bewijzen. Hij staat er als tegenwicht bij de eerste, niet als bewijs op zichzelf."
     }
   ],
   "prestatie": {

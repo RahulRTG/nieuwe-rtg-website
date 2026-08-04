@@ -97,6 +97,10 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/rtfkantoor')(kern);
   /* De twee werkplekken RTG en RTF (kern staat al hierboven). */
   require('../routes/werkplek')(kern);
+  /* Het RTG Werk OS: de werkplek van een hele organisatie (server/bedrijf/).
+     Staat naast werkplek.js en niet erin: dat is het beeld van RTG en RTF zelf,
+     dit is een werkruimte die ook aan een andere organisatie te geven is. */
+  require('../routes/bedrijf')(kern);
   require('../routes/labfonds')(kern);
   require('../routes/aanmeldingen')(kern);
   require('../routes/ledenregister')(kern);

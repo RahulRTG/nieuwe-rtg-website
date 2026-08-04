@@ -554,6 +554,79 @@ het derde bewust maar half:
   Zolang die grens niet is gehaald, staat er nog steeds `null` op het dashboard
   met de reden erbij.
 
+### RTG Horeca OS (de horecatoren)
+
+Het huis had al een kassa (`routes/supplier/kassa/`), tafels en tafelstatussen,
+reserveringen, een keukenbrein met recepturen en voorraad (`kern/keuken.js`),
+hotelkamers met check-in en housekeeping, eventdraaiboeken en een bezorgrit met
+gps. Wat er niet was, is de laag die daar een besturingssysteem van maakt: een
+REKENING die blijft leven, keukenschermen met tijden, bezorgzones, een club, de
+gastrekening van het hotel en de zakelijke kant van een event.
+
+Die laag staat in `server/kern/horeca.js` (de rekenlaag) plus veertien
+deelmodules in `server/routes/supplier/horeca/`, allemaal onder
+`/api/supplier/horeca/...` en dus binnen de bestaande partner-functie van de
+schakelkast.
+
+| deel | modules | wat erin zit |
+|---|---|---|
+| **Hospitality Core** | `rekening.js`, `schuif.js`, `betalen.js`, `bonnen.js` | rekening openen op dertien kanalen (tafel, bar, club, terras, afhaal, bezorging, roomservice, hotelrestaurant, foodtruck, event, kiosk, QR, online), gangen vrijgeven, verplaatsen, samenvoegen, splitsen per persoon of per product, korting met reden, fooi, deelbetalingen met meerdere methoden, cadeaubon en tegoed, happy hour, arrangementen, en een offline-wachtrij |
+| **Kitchen** | `keuken.js`, `keuken-regie.js` | stationsborden, de standen besteld → gestart → bereid → klaar → uitgegeven, bereidingstijden per gerecht, het regiescherm van de chef met staat-koud per tafel, en een drukterem in keukenminuten |
+| **Delivery** | `bezorging.js`, `bezorgrit.js` | bezorgzones op postcode of straal met kosten, minimum en gratis-vanaf, tijdsloten met capaciteit in keukenminuten, een gecombineerde route en het afleverbewijs met leeftijdscontrole |
+| **Club & Bar** | `club.js` | polsbandtegoed, minimum spend per VIP-tafel, gastenlijst met promotercodes, en een deurteller met herbetreding en capaciteit |
+| **Hotel** | `folio.js` | een gastrekening waarop kamer, ontbijt, restaurant, minibar, spa, roomservice, parkeren, wasserij en schade samenkomen; de nachtrun, de toeristenbelasting en de borg |
+| **Events** | `event.js` | offerte, akkoord met naam, versiebeheer, aanbetaling en nacalculatie met marge |
+| **Inventory & HACCP** | `haccp.js` (+ het bestaande `kern/keuken.js`) | temperatuurmetingen met verplichte actie bij een afwijking, batches met THT, en controlelijsten |
+| **Workforce & CRM** | `personeel.js` | de fooienpot, loonkosten tegenover omzet, en het gastprofiel met voorkeuren en punten |
+| **Analytics** | `dashboard.js` | het dagbeeld per kanaal en per betaalwijze, en de signalen |
+
+**De regels die deze laag anders maken dan een kassasysteem.** Ze staan in code
+en `test/horeca-rekening.test.js`, `horeca-keuken.test.js`,
+`horeca-bezorg-club.test.js`, `horeca-hotel-event.test.js` en
+`horeca-vloer.test.js` (38 toetsen) laten ze zakken zodra ze niet meer waar zijn:
+
+1. **Splitsen en samenvoegen zijn verplaatsingen.** `controleerSom()` vergelijkt
+   de netto waarde voor en na, tot op de cent; klopt het niet, dan gebeurt er
+   niets. 10,00 door drie is 3,34 + 3,33 + 3,33, en een percentagekorting gaat
+   evenredig mee in plaats van te verdampen.
+2. **Een bestelde prijs verandert nooit meer.** Happy hour rekent op het moment
+   van bestellen; de lijstprijs blijft naast de kortingsprijs staan.
+3. **Fooi is geen omzet** — niet op de rekening, niet in het loonpercentage, en
+   nooit voorgevuld. De fooienpot wordt verdeeld over gewerkte uren inclusief
+   keuken en afwas, en telt exact op tot de pot.
+4. **Wat niet betaald wordt, verdwijnt niet**: oninbaar mét reden, zichtbaar in
+   het dagbeeld. Te veel betalen bestaat niet.
+5. **De keuken begint niet aan een gang die de zaal niet heeft vrijgegeven**, en
+   de allergie staat in een eigen veld dat op elk scherm meegaat.
+6. **Tijd is een feit, geen kleurtje**: elke bon draagt zijn looptijd naast zijn
+   norm, en de drukterem waarschuwt met zijn rekensom in plaats van zelf de
+   bestellingen dicht te zetten.
+7. **Een weigering noemt zijn reden**: buiten de bezorgzone, een vol tijdslot
+   (met het eerstvolgende erbij), een lege polsband, een volle deur.
+8. **Geld van gasten blijft van gasten**: een polsband kan niet onder nul en het
+   restsaldo gaat terug; een borg is een aantekening en blokkeert niets bij de
+   bank (`geblokkeerdBijBank: false`).
+9. **Op de kamer boeken kan alleen als daar een open gastrekening staat**, en de
+   nachtrun is idempotent op de datum.
+10. **Een offerte wordt pas een opdracht na een akkoord met naam**; posten
+    wijzigen daarna maakt een nieuwe versie die opnieuw bevestigd moet worden.
+11. **Een afwijking zonder actie bestaat niet** (HACCP), een meting corrigeren
+    laat de oude waarde staan, en een controlelijst is niet in een keer af te
+    vinken.
+12. **Elk gemiddelde noemt zijn noemer**, en er wordt niets voorspeld wat we
+    niet meten: het dagbeeld toont wat er nu open staat en wat er vandaag
+    binnenkwam, geen omzetprognose.
+
+Wat deze laag bewust **niet** doet: hij bouwt de kassa, de voorraad, de
+recepturen, de tafelstatussen, de reserveringen, de hotelkamers en het
+eventdraaiboek niet opnieuw. Een betaalde horecarekening boekt zijn
+ingredienten af via het bestaande `kern/keuken.js`, met een logregel op naam van
+de rekening. Er is dus geen tweede voorraadadministratie -- en dat is precies de
+bedoeling (LAT-regel 4).
+
+Nog geen schermen: deze golf is de API-laag met zijn toetsen. De bediening, de
+keukenschermen en het managementbeeld staan als volgend werk in `TAKEN.md`.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.

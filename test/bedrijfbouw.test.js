@@ -175,3 +175,47 @@ test('een apparaat op naam blokkeert de uitdienststap, en het proces sluit niet 
   const geenUitdienst = await api('/uitdienst/stap', Object.assign({ lidId: IT.id, stap: 'apparaten terug' }, IT));
   assert.equal(geenUitdienst.status, 409, 'bij iemand die gewoon werkt valt er niets af te ronden');
 });
+
+test('de inventaris telt wat er uitstaat, en een risico zonder maatregel bestaat niet', async () => {
+  const lijst = (await api('/apparaten', IT)).body;
+  assert.ok(lijst.aantal >= 2, 'beide apparaten staan in de inventaris');
+  assert.equal(lijst.uitgegeven, 0, 'de laptop is ingenomen, de pas is nooit uitgegeven');
+  assert.ok(lijst.onversleuteld.some(a => a.nummer === 'P-118'),
+    'de onversleutelde toegangspas staat apart genoemd, niet verstopt in een totaal');
+
+  const lic = (await api('/licenties', IT)).body;
+  const rij = lic.licenties.find(l => l.product === 'Ontwerppakket');
+  assert.equal(rij.gekocht, 1);
+  assert.equal(rij.inGebruik, 1, 'na het losmaken staat er nog een toewijzing');
+  assert.equal(rij.overschrijding, 0);
+  assert.equal(lic.kostenPerJaarCenten, 60000, 'de jaarkosten tellen op');
+
+  const opNaam = (await api('/apparaten', Object.assign({ lidId: IT.id }, IT))).body;
+  assert.equal(opNaam.aantal, 0, 'filteren op een lid dat niets heeft, geeft niets');
+});
+
+test('een project draagt zijn mijlpalen en risicos, en een risico zonder maatregel bestaat niet', async () => {
+  const p = (await api('/project/maak', Object.assign({ naam: 'Migratie', werkvorm: 'software' }, DEV))).body.project;
+
+  const half = await api('/project/mijlpaal', Object.assign({ projectId: p.id, naam: 'Oplevering' }, DEV));
+  assert.equal(half.status, 400, 'een mijlpaal zonder datum is een wens');
+
+  const m = (await api('/project/mijlpaal', Object.assign({ projectId: p.id, naam: 'Oplevering',
+    datum: dag(60) }, DEV))).body;
+  assert.equal(m.mijlpalen[0].gehaald, false, 'een nieuwe mijlpaal staat niet vast op gehaald');
+
+  const zonder = await api('/project/risico', Object.assign({ projectId: p.id,
+    wat: 'De leverancier levert te laat' }, DEV));
+  assert.equal(zonder.status, 400);
+  assert.match(zonder.body.error, /zorg, geen risico dat je beheerst/i);
+
+  const r = (await api('/project/risico', Object.assign({ projectId: p.id,
+    wat: 'De leverancier levert te laat', maatregel: 'wekelijks nabellen, tweede leverancier klaar',
+    kans: 'hoog' }, DEV))).body;
+  assert.equal(r.risicos[0].kans, 'hoog');
+  assert.equal(r.risicos[0].eigenaar, 'Dirk', 'zonder opgegeven eigenaar is het de mens die hem noteert');
+
+  const weg = await api('/project/risico', Object.assign({ projectId: 'bestaatniet',
+    wat: 'x', maatregel: 'y' }, DEV));
+  assert.equal(weg.status, 404);
+});

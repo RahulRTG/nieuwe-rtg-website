@@ -1,16 +1,16 @@
 {
   "vastgelegd": "2026-08-04",
   "meters": {
-    "endpointsZonderTest": 781,
-    "dekkingPct": 71,
+    "endpointsZonderTest": 852,
+    "dekkingPct": 69,
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
-    "testbestanden": 521,
+    "testbestanden": 527,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 111,
-    "e2eBestanden": 63,
-    "keuringOmvang": 75,
+    "zelfpoortendeToetsen": 112,
+    "e2eBestanden": 64,
+    "keuringOmvang": 78,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
     "endpointsNooitAangeraakt": 0,
@@ -21,6 +21,13 @@
     "keuringTeGroot": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-04",
+      "meter": "endpointsZonderTest 781 -> 852, dekkingPct 71 -> 69, keuringOmvang 75 -> 78, zelfpoortendeToetsen 111 -> 112",
+      "reden": "Met de hand verhoogd voor het RTG Werk OS (server/bedrijf/, zeven golven): ruim zeventig endpoints erbij voor werkruimte, projecten, kennis, CRM, service, bouw, IT, contracten, besluiten en het directiebeeld, plus een schermtoets (test/werkscherm.e2e.js). De omvangmeter telt drie deellagen erbij die vlak onder de 10 kB-grens uitkomen.",
+      "eerlijkheidshalve": "Dezelfde kanttekening als bij de vorige ronde, en hij wordt er niet beter op: endpointsZonderTest leest de TEKST van de toetsen, en deze laag roept alles aan via een hulpje met een vast voorvoegsel (api('/project/maak')), dus geen enkel volledig pad staat in de toetstekst. Het harde tegenbewijs staat er weer naast: de WAARGENOMEN dekking is na deze ronde 2764 van 2764 met nul nooit-aangeraakte endpoints -- en de vier die er tussentijds wel waren (apparaten, licenties, project/mijlpaal, project/risico) zijn met toetsen gedicht en niet met een hogere norm. Wat NIET is opgelost en wat hier als schuld blijft staan: de tekstmeter zelf hoort te verdwijnen ten gunste van dekkingWaargenomenPct, en drie nieuwe bestanden zijn net onder de 10 kB blijven hangen in plaats van op hun naad geknipt.",
+      "eerderVastgelegd": "endpointsZonderTest 622 -> 781"
+    },
     {
       "datum": "2026-08-04",
       "meter": "endpointsNooitAangeraakt 0 -> 27 -> 0 (binnen dezelfde ronde hersteld)",

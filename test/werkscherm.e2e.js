@@ -197,3 +197,83 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
     try { fs.rmSync(TMP2, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('de handelingen staan op het scherm, en een weigering komt voluit in beeld',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const TMP3 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkactie-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP3 } });
+  let browser;
+  try {
+    const inlog = await fetch(base + '/api/auth/login', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran' }) })
+      .then(r => r.json());
+    assert.ok(inlog.token, 'de eigenaar kan inloggen');
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const page = await ctx.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+
+    await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(t => {
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      localStorage.removeItem('rtg_werk_sessie');
+      localStorage.setItem('rtg_member_token', t);
+    }, inlog.token);
+    await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1400);
+    await page.click('#tabModules');
+    await page.waitForTimeout(800);
+
+    /* ---- een project maken vanaf het scherm ---- */
+    await page.fill('#a_h0_naam', 'Uitrol Den Haag');
+    await page.selectOption('#a_h0_werkvorm', 'stadsuitrol');
+    await page.click('[data-doe="0"]');
+    await page.waitForTimeout(900);
+    let tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
+    assert.match(tekst, /Uitrol Den Haag/, 'het project staat na de handeling in de lijst');
+    assert.match(tekst, /nog geen taken/, 'en zonder taken staat er geen percentage');
+
+    /* ---- een besluit sluiten zonder stemmen: de weigering hoort VOLUIT op
+       het scherm te komen, niet als een rood kruisje ---- */
+    await page.selectOption('#mKeuze', 'besluit');
+    await page.waitForTimeout(700);
+    await page.fill('#a_h0_titel', 'Kantoor sluiten op vrijdag');
+    await page.fill('#a_h0_onderbouwing', 'Bijna niemand komt naar kantoor op vrijdag.');
+    await page.click('[data-doe="0"]');
+    await page.waitForTimeout(900);
+    tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
+    assert.match(tekst, /Kantoor sluiten op vrijdag/, 'het voorstel staat in de lijst');
+    assert.match(tekst, /advies/, 'en het staat op advies');
+
+    const besluitId = await page.evaluate(async (s) => {
+      const r = await fetch('/api/bedrijf/besluiten', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(s) });
+      const d = await r.json();
+      return (d.besluiten.find(b => b.titel === 'Kantoor sluiten op vrijdag') || {}).id;
+    }, await page.evaluate(() => JSON.parse(localStorage.getItem('rtg_werk_sessie'))));
+    assert.ok(besluitId, 'het besluit is te vinden');
+
+    // stemronde openen (handeling 2), daarna sluiten zonder stemmen (handeling 4)
+    await page.fill('#a_h2_besluitId', besluitId);
+    await page.click('[data-doe="2"]');
+    await page.waitForTimeout(700);
+    await page.fill('#a_h4_besluitId', besluitId);
+    await page.fill('#a_h4_evalueerOp', new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10));
+    await page.click('[data-doe="4"]');
+    await page.waitForTimeout(800);
+    const melding = await page.evaluate(() => document.getElementById('melding').textContent);
+    assert.match(melding, /niet gestemd|geen besluit/i,
+      'de weigering van de server komt voluit in beeld: ' + melding);
+    assert.match(melding, /automaat neemt het hier niet over/i,
+      'inclusief de zin die uitlegt waarom -- die zin is het halve product');
+
+    assert.deepEqual(fouten, [], 'geen paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) try { await browser.close(); } catch (e) {}
+    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    try { fs.rmSync(TMP3, { recursive: true, force: true }); } catch (e) {}
+  }
+});

@@ -6,7 +6,8 @@
    ziet zijn lijst en de twee handelingen die er het meest toe doen. Alles wat
    de server WEIGERT (een besluit zonder stemmen, een taak die nog wacht, een
    contract dat te laat wordt opgezegd) komt hier gewoon als melding in beeld;
-   dat is de hele waarde van die weigeringen. */
+   dat is de hele waarde van die weigeringen. De handelingen zelf staan in
+   werk/acties.js; deze module toont en die module doet. */
 (function () {
   'use strict';
   var K = window.RTGWerk;
@@ -183,6 +184,7 @@
     $('mZoekRij').hidden = id !== 'kennis';
     $('mLet').textContent = '';
     $('mExtra').innerHTML = '';
+    if (window.RTGWerkActies) window.RTGWerkActies.toon(id);
     m.laad();
   }
 

@@ -38,6 +38,42 @@ function metTijdelijkBestand(relPad, inhoud, doe) {
   try { return doe(); } finally { try { fs.unlinkSync(vol); } catch (e) {} }
 }
 
+/* Een journaal met alle routes op een na, en wat scripts/dekking.js daarvan
+   maakt. Eenmaal gemeten en daarna bewaard: de routekaart starten kost een
+   halve minuut en beide journaalmeters hebben aan dezelfde meting genoeg. */
+const _gaten = new Map();
+function journaalMetGat(weglaten) {
+  const n = weglaten || 1;
+  if (_gaten.has(n)) return _gaten.get(n);
+  const os = require('os');
+  const { execFileSync, spawnSync } = require('child_process');
+  const kaart = JSON.parse(execFileSync(process.execPath,
+    ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
+    { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 }));
+  const routes = (kaart.routes || []).filter(r => r && r.pad && r.pad.startsWith('/api/'));
+  assert.ok(routes.length > 100, 'de routekaart geeft routes (' + routes.length + ')');
+
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ijk-journaal-'));
+  const bestand = path.join(map, 'journaal.txt');
+  try {
+    // alles behalve de laatste n; die horen straks als "nooit aangeraakt" te tellen
+    const regels = routes.slice(0, routes.length - n).map(r => (r.methode || 'POST').toUpperCase() + ' ' + r.pad);
+    fs.writeFileSync(bestand, regels.join('\n') + '\n');
+    const r = spawnSync(process.execPath,
+      ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'dekking.js'), '--lees', bestand, '--json'],
+      { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 });
+    let d = null;
+    try { d = JSON.parse(r.stdout); } catch (e) { d = null; }
+    assert.ok(d, 'dekking.js gaf een leesbaar rapport: ' +
+      String(r.stderr || r.stdout || '').trim().split('\n').slice(0, 3).join(' | ').slice(0, 240));
+    const uit = { nooit: Number(d.nooitAangeraakt), pct: Number(d.pct), totaal: routes.length };
+    assert.ok(Number.isFinite(uit.nooit) && Number.isFinite(uit.pct),
+      'dekking.js gaf de twee cijfers terug: ' + JSON.stringify(d).slice(0, 160));
+    _gaten.set(n, uit);
+    return uit;
+  } finally { try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {} }
+}
+
 /* De registratie. Elke meter uit scripts/norm.js staat hier, met OF een
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
@@ -137,14 +173,73 @@ const IJKINGEN = {
      staat erbij en telt mee in `metersOngeijkt`, die alleen omlaag mag. */
   endpointsZonderTest: { reden: 'vraagt een nieuwe route EN het uitblijven van een toets erop; dat is een repo-brede staat, geen invoer die je in een toets neerzet' },
   dekkingPct: { reden: 'zelfde bron als endpointsZonderTest' },
-  keuringStuk: { reden: 'een "stuk"-bevinding vraagt een echte kapotte belofte (een env-variabele die nergens gelezen wordt); dat raakt bestanden buiten deze toets' },
-  keuringScheef: { reden: 'zelfde soort bron als keuringStuk' },
+  keuringStuk: {
+    /* Een route die een ECHTE naam meestuurt in zijn antwoord. Dat is de
+       zwaarste bevinding die de keuring kent, en niet toevallig: dit huis
+       draait op codenamen en de echte naam hoort in de kluis. De proef zet
+       precies dat neer -- en meet daarmee ook dat de keuring die vorm nog
+       herkent. */
+    proef: (voor) => metTijdelijkBestand('server/routes/zz-ijk-tijdelijk.js',
+      'module.exports = (kern) => {\n' +
+      '  const { app } = kern;\n' +
+      '  app.post(\'/api/zz-ijk/proef\', (req, res) => res.json({ realName: \'Jan Jansen\' }));\n' +
+      '};\n',
+      () => norm.meet().keuringStuk - voor.keuringStuk)
+  },
+  keuringScheef: {
+    /* Een tekst die zegt dat een boeking bevestigd is. Dat mag dit huis nooit
+       beweren (CLAUDE.md), en de keuring hoort die zin te vinden waar hij ook
+       staat. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      /* De zin moet in een STRING staan en niet in losse HTML-tekst: de keuring
+         kijkt naar wat een gebruiker echt te zien krijgt, en dat is tekst
+         tussen aanhalingstekens op een regel die geen commentaar is. Een eerste
+         poging met een <p> in een htmlbestand sloeg daarom niet aan -- de
+         reden hier stond ("zelfde soort bron als keuringStuk") was te vaag om
+         dat te zien. */
+      '/* tijdelijk ijkbestand */\n' +
+      'module.exports = () => ({ melding: \'Uw boeking is bevestigd en staat klaar.\' });\n',
+      () => norm.meet().keuringScheef - voor.keuringScheef)
+  },
   keuringDubbeling: { reden: 'vraagt dezelfde functienaam in drie kernmodules; dat is een verplaatsing van productcode, geen tijdelijk bestand' },
   keuringDekkingAdvies: { reden: 'zelfde bron als endpointsZonderTest' },
-  routesNietSchakelbaar: { reden: 'vraagt een nieuwe route die niet in de boardroom staat; die moet je echt monteren' },
+  routesNietSchakelbaar: {
+    /* Een route die nergens in het schakelbord staat. Dat is precies wat deze
+       meter telt, en het blijkt met een tijdelijk routebestand gewoon te
+       voeden -- de reden die hier stond ("die moet je echt monteren") klopte
+       niet: server/routes/ wordt automatisch geladen. */
+    proef: (voor) => metTijdelijkBestand('server/routes/zz-ijk-tijdelijk.js',
+      'module.exports = (kern) => {\n' +
+      '  const { app } = kern;\n' +
+      '  app.post(\'/api/zz-ijk/proef\', (req, res) => res.json({ ok: true }));\n' +
+      '};\n',
+      () => norm.meet().routesNietSchakelbaar - voor.routesNietSchakelbaar)
+  },
   onbewaakt: { reden: 'komt uit scripts/samenhang.js, die over soorten dingen gaat en niet over een enkel bestand' },
-  endpointsNooitAangeraakt: { reden: 'komt uit het routejournaal van een hele testronde' },
-  dekkingWaargenomenPct: { reden: 'komt uit het routejournaal van een hele testronde' },
+  endpointsNooitAangeraakt: {
+    /* HET JOURNAAL MET EEN GAT ERIN. De reden die hier stond ("komt uit het
+       routejournaal van een hele testronde") klopte half: het cijfer komt
+       daaruit, maar scripts/dekking.js leest met --lees elk journaal dat je
+       hem geeft. Dus bouwen we er zelf een: alle routes van de routekaart,
+       precies EEN weggelaten. De meter hoort die ene te missen.
+
+       Een kleiner journaal kan niet: dekking.js weigert er zelf een met te
+       weinig patronen, met de melding dat dat geen meting is maar een kapotte
+       opstelling. Dat is dezelfde LAT-regel 3 die deze ijking bewaakt, en het
+       is precies goed dat hij hier in de weg zit. */
+    proef: () => journaalMetGat(1).nooit
+  },
+  dekkingWaargenomenPct: {
+    /* HET PERCENTAGE IS GROVER DAN ZIJN BUURMAN, en dat is hier zwart op wit te
+       zien: met EEN weggelaten route van ruim tweeduizend rondt hij nog gewoon
+       op honderd af. Precies wat de kop van scripts/dekking.js waarschuwt --
+       "een afgerond percentage dekt bij 2530 routes tot een stuk of twaalf
+       endpoints die nooit zijn aangeraakt". Deze proef laat er daarom vijftig
+       weg. Dat hij dan pas uitslaat is geen tekortkoming van de ijking maar de
+       eigenschap van de meter, en de reden dat endpointsNooitAangeraakt
+       ernaast staat als de scherpe van de twee. */
+    proef: () => 100 - journaalMetGat(50).pct
+  },
   p99Ms: { reden: 'prestatiecijfer uit een echte beproeving op een echte machine' },
   doorvoerPerSec: { reden: 'prestatiecijfer uit een echte beproeving' },
   eventLoopP99Ms: { reden: 'prestatiecijfer uit een echte beproeving' },

@@ -33,7 +33,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { execFileSync, spawnSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
@@ -179,10 +179,26 @@ function telOngeijkt(ijkBron, extraSleutels) {
 }
 
 function meet() {
-  const uit = execFileSync(process.execPath,
+  /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
+     werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
+     moment dat er iets te meten viel -- de meetketen brak als de meting niet
+     nul was. Dat kwam aan het licht bij het ijken van keuringStuk: een
+     tijdelijk bestand met een echte fout erin gaf geen hoger cijfer maar een
+     onleesbare stapel.
+
+     Daarom lezen we de uitvoer en niet de exitcode. Een keuring die IETS
+     teruggeeft is geslaagd; een keuring die niets teruggeeft (of onleesbaars)
+     is een echte storing en die gooit alsnog, met de eerste regels van zijn
+     eigen foutstroom erbij -- LAT-regel 3: een meter zonder invoer zakt. */
+  const r = spawnSync(process.execPath,
     ['--experimental-sqlite', path.join(__dirname, 'keuring.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
-  const k = JSON.parse(uit);
+  let k = null;
+  try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
+  if (!k || !k.cijfers) {
+    throw new Error('de keuring gaf geen leesbaar rapport (exit ' + r.status + '): ' +
+      String(r.stderr || r.stdout || '').trim().split('\n').slice(0, 3).join(' | ').slice(0, 300));
+  }
 
   /* De dependencies tellen we uit package.json zelf en niet uit een rapport:
      dit is de meter waar je bij twijfel de bron van wilt zien. */

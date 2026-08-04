@@ -27,6 +27,54 @@ module.exports = (kern) => {
      woorden dat het origineel er NOG STAAT en dat weghalen uw eigen,
      onomkeerbare handeling is. Doen alsof een redactie het origineel opruimt,
      is de gevaarlijkste leugen die deze laag zou kunnen vertellen. */
+  /* Samenvoegen en splitsen. Ook hier komt het resultaat als NIEUW bestand
+     binnen: de bronnen blijven staan. Dat is bij een splitsing geen detail --
+     wie een deel van een dossier deelt, wil het geheel houden. */
+  const pdfBytes = (key, id) => {
+    const bron = bestanden.bestandenHaal(key, String(id || ''), null);
+    if (bron.error) return bron;
+    const m = /^data:([^;]+);base64,(.*)$/.exec(String(bron.dataUrl || ''));
+    if (!m) return { status: 422, error: 'Dat bestand is niet terug te lezen.' };
+    const buf = Buffer.from(m[2], 'base64');
+    if (!buf.slice(0, 5).equals(Buffer.from('%PDF-'))) return { status: 422, error: '"' + bron.naam + '" is geen PDF.' };
+    return { buf, naam: bron.naam };
+  };
+  const bewaar = (req, res, naam, buf, extra) => {
+    const nieuw = bestanden.bestandenUpload(req.session.key, { naam, map: (req.body || {}).map || null,
+      dataUrl: 'data:application/pdf;base64,' + buf.toString('base64') });
+    if (nieuw.error) return stuur(res, nieuw);
+    res.json(Object.assign({ ok: true, bestand: nieuw, naam }, extra));
+  };
+
+  app.post('/api/bestanden/pdf/samenvoegen', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const ids = (Array.isArray((req.body || {}).ids) ? req.body.ids : []).map(String).slice(0, 20);
+    if (ids.length < 2) return res.status(400).json({ error: 'Kies minstens twee PDF-bestanden om samen te voegen.' });
+    const bufs = [];
+    for (const id of ids) {
+      const b = pdfBytes(req.session.key, id);
+      if (b.error) return stuur(res, b);
+      bufs.push(b.buf);
+    }
+    const uit = require('../kern/pdf-bouw').voegSamen(bufs);
+    if (!uit.ok) return res.status(422).json({ error: uit.waarom });
+    bewaar(req, res, 'Samengevoegd (' + uit.paginas + ' pagina\'s).pdf',
+      uit.bestand, { paginas: uit.paginas, documenten: uit.documenten, let: uit.let });
+  });
+
+  app.post('/api/bestanden/pdf/splitsen', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    const bron = pdfBytes(req.session.key, b.id);
+    if (bron.error) return stuur(res, bron);
+    const uit = require('../kern/pdf-bouw').splits(bron.buf, b.van, b.tot);
+    if (!uit.ok) return res.status(422).json({ error: uit.waarom });
+    const naam = String(bron.naam || 'document.pdf').replace(/(\.pdf)?$/i, '') +
+      ' (pagina ' + uit.van + (uit.tot > uit.van ? '-' + uit.tot : '') + ').pdf';
+    bewaar(req, res, naam, uit.bestand, { paginas: uit.paginas, van: uit.van, tot: uit.tot,
+      let: uit.let + ' Het bronbestand blijft staan; wie een deel van een dossier deelt, wil het geheel houden.' });
+  });
+
   app.post('/api/bestanden/pdf/redigeer', auth, (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};

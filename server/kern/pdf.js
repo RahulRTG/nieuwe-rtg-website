@@ -128,4 +128,42 @@ function tekstVan(buf) {
   return { ok: true, tekst: stukken.join(' '), stukken };
 }
 
-module.exports = { lees, tekstVan, objecten, kopVan, streamVan, pakUit, isFlate };
+/* De tekst PER PAGINA, in de volgorde van de paginaboom. Dit is iets anders
+   dan tekstVan(): die veegt alle stromen op en zegt niets over waar iets
+   staat. Deze functie loopt de OBJECTGRAAF af -- van de catalogus naar
+   /Pages, langs /Kids, en per pagina naar zijn /Contents.
+
+   Dat verschil is niet academisch. Een samenvoeging die vergeet de
+   verwijzingen te hernummeren, levert een bestand op waarin alle tekst nog
+   aanwezig is (tekstVan ziet hem gewoon) maar waarin de pagina's naar de
+   verkeerde inhoud wijzen. Alleen wie de graaf afloopt, ziet dat. */
+function perPagina(buf) {
+  const d = lees(buf);
+  if (!d.ok) return d;
+  const opNummer = new Map(d.objecten.map(o => [o.nummer, o]));
+  const wortel = d.wortel ? opNummer.get(Number(d.wortel.split(' ')[0])) : null;
+  const boomRef = wortel ? /\/Pages\s+(\d+)\s+\d+\s+R/.exec(kopVan(wortel.lijf)) : null;
+  const boom = boomRef ? opNummer.get(Number(boomRef[1])) : null;
+  if (!boom) return { ok: false, waarom: 'de paginaboom is niet te vinden vanaf de catalogus' };
+  const kids = /\/Kids\s*\[([^\]]*)\]/.exec(kopVan(boom.lijf));
+  if (!kids) return { ok: false, waarom: 'de paginaboom heeft geen /Kids' };
+
+  const uit = [];
+  for (const m of kids[1].matchAll(/(\d+)\s+\d+\s+R/g)) {
+    const pagina = opNummer.get(Number(m[1]));
+    if (!pagina) { uit.push({ ok: false, waarom: 'pagina-object ' + m[1] + ' bestaat niet' }); continue; }
+    const c = /\/Contents\s+(\d+)\s+\d+\s+R/.exec(kopVan(pagina.lijf));
+    const stroom = c ? opNummer.get(Number(c[1])) : null;
+    if (!stroom) { uit.push({ ok: false, waarom: 'de inhoud van deze pagina is niet te vinden' }); continue; }
+    const st = streamVan(buf, stroom);
+    const p = st ? pakUit(kopVan(stroom.lijf), st.bytes) : { ok: false };
+    if (!p.ok) { uit.push({ ok: false, waarom: 'de inhoudsstroom is niet uit te pakken' }); continue; }
+    const inhoud = p.data.toString('latin1');
+    const stukken = [];
+    for (const t of inhoud.matchAll(/\(((?:\\.|[^\\()])*)\)/g)) stukken.push(t[1].replace(/\\([()\\])/g, '$1'));
+    uit.push({ ok: true, tekst: stukken.join(' ') });
+  }
+  return { ok: true, paginas: uit };
+}
+
+module.exports = { lees, tekstVan, perPagina, objecten, kopVan, streamVan, pakUit, isFlate };

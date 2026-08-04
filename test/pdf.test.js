@@ -21,6 +21,7 @@ const zlib = require('zlib');
 const { startServer } = require('./helper');
 const pdf = require('../server/kern/pdf');
 const { redigeer } = require('../server/kern/pdf-redactie');
+const { voegSamen, splits } = require('../server/kern/pdf-bouw');
 
 /* Een minimale, geldige PDF met een tekstlaag. `comprimeer` zet de
    inhoudsstroom in FlateDecode, zodat beide wegen worden afgelegd. */
@@ -43,6 +44,34 @@ function maakPdf(regels, comprimeer) {
   uit += 'xref\n0 ' + (objs.length + 1) + '\n0000000000 65535 f \n' +
     pos.map(p => String(p).padStart(10, '0') + ' 00000 n \n').join('') +
     'trailer\n<< /Size ' + (objs.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + x + '\n%%EOF\n';
+  return Buffer.from(uit, 'latin1');
+}
+
+/* Een PDF met meer pagina's, elk met een eigen inhoudsstroom en eigen font.
+   Dat laatste is niet overdreven: juist doordat elke pagina zijn EIGEN
+   objecten heeft, kan een splitsing bewijzen dat wat niet meegaat, ook echt
+   niet meegaat. */
+function maakPdfN(paginas) {
+  const objs = []; const kids = []; let nr = 3;
+  for (const regels of paginas) {
+    const inhoud = 'BT /F1 12 Tf 72 720 Td\n' +
+      regels.map(r => '(' + r.replace(/([()\\])/g, '\\$1') + ') Tj 0 -16 Td').join('\n') + '\nET\n';
+    const paginaNr = nr++, stroomNr = nr++, fontNr = nr++;
+    kids.push(paginaNr);
+    objs.push([paginaNr, paginaNr + ' 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents ' +
+      stroomNr + ' 0 R /Resources << /Font << /F1 ' + fontNr + ' 0 R >> >> >>\nendobj\n']);
+    objs.push([stroomNr, stroomNr + ' 0 obj\n<< /Length ' + inhoud.length + ' >>\nstream\n' + inhoud + '\nendstream\nendobj\n']);
+    objs.push([fontNr, fontNr + ' 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n']);
+  }
+  const alles = [[1, '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n'],
+    [2, '2 0 obj\n<< /Type /Pages /Kids [' + kids.map(k => k + ' 0 R').join(' ') + '] /Count ' + kids.length + ' >>\nendobj\n']]
+    .concat(objs).sort((a, b) => a[0] - b[0]);
+  let uit = '%PDF-1.4\n'; const pos = new Map();
+  for (const [n, t] of alles) { pos.set(n, uit.length); uit += t; }
+  const x = uit.length; const hoog = alles[alles.length - 1][0];
+  let tab = 'xref\n0 ' + (hoog + 1) + '\n0000000000 65535 f \n';
+  for (let i = 1; i <= hoog; i++) tab += String(pos.get(i) || 0).padStart(10, '0') + ' 00000 n \n';
+  uit += tab + 'trailer\n<< /Size ' + (hoog + 1) + ' /Root 1 0 R >>\nstartxref\n' + x + '\n%%EOF\n';
   return Buffer.from(uit, 'latin1');
 }
 
@@ -187,6 +216,34 @@ test('via de kluis: een geredigeerde kopie, en het origineel blijft staan met ee
     assert.match(pdf.tekstVan(origBytes).tekst, /Jan de Vries/,
       'het origineel staat er nog mét de naam -- precies zoals het antwoord zegt');
 
+    /* samenvoegen en splitsen via dezelfde kluis */
+    const p1 = (await api('/api/bestanden/upload', { naam: 'deel-een.pdf',
+      dataUrl: 'data:application/pdf;base64,' + maakPdfN([['Deel een']]).toString('base64') })).body;
+    const p2 = (await api('/api/bestanden/upload', { naam: 'deel-twee.pdf',
+      dataUrl: 'data:application/pdf;base64,' + maakPdfN([['Deel twee'], ['Deel drie']]).toString('base64') })).body;
+
+    const alleen = await api('/api/bestanden/pdf/samenvoegen', { ids: [p1.id] });
+    assert.equal(alleen.status, 400, 'samenvoegen vraagt er minstens twee');
+
+    const samen = (await api('/api/bestanden/pdf/samenvoegen', { ids: [p1.id, p2.id] })).body;
+    assert.equal(samen.paginas, 3);
+    assert.match(samen.naam, /Samengevoegd/);
+    const samenBytes = Buffer.from(String((await api('/api/bestanden/haal', { id: samen.bestand.id })).body.dataUrl).split(',')[1], 'base64');
+    assert.deepEqual(pdf.perPagina(samenBytes).paginas.map(x => x.tekst), ['Deel een', 'Deel twee', 'Deel drie'],
+      'de paginas staan in volgorde en dragen elk hun eigen inhoud');
+
+    const gesplitst = (await api('/api/bestanden/pdf/splitsen', { id: p2.id, van: 2, tot: 2 })).body;
+    assert.equal(gesplitst.paginas, 1);
+    assert.match(gesplitst.naam, /pagina 2/);
+    assert.match(gesplitst.let, /bronbestand blijft staan/i);
+    const deelBytes = Buffer.from(String((await api('/api/bestanden/haal', { id: gesplitst.bestand.id })).body.dataUrl).split(',')[1], 'base64');
+    assert.deepEqual(pdf.perPagina(deelBytes).paginas.map(x => x.tekst), ['Deel drie']);
+    assert.ok(deelBytes.toString('latin1').indexOf('Deel twee') < 0, 'de niet-gekozen pagina reist niet mee');
+
+    const buiten = await api('/api/bestanden/pdf/splitsen', { id: p1.id, van: 5, tot: 5 });
+    assert.equal(buiten.status, 422);
+    assert.match(buiten.body.error, /pagina 5 bestaat niet/i);
+
     const geenPdf = (await api('/api/bestanden/upload', { naam: 'notitie.txt',
       dataUrl: 'data:text/plain;base64,' + Buffer.from('gewoon tekst').toString('base64') })).body;
     const fout = await api('/api/bestanden/pdf/redigeer', { id: geenPdf.id, woorden: ['x'] });
@@ -196,4 +253,97 @@ test('via de kluis: een geredigeerde kopie, en het origineel blijft staan met ee
     if (child) try { child.kill('SIGKILL'); } catch (e) {}
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
+});
+
+test('samenvoegen: de paginas tellen op en elk object houdt zijn eigen inhoud', () => {
+  const a = maakPdfN([['Offerte Alpha', 'Bedrag: 12.000']]);
+  const b = maakPdfN([['Bijlage Beta een'], ['Bijlage Beta twee']]);
+  assert.equal(pdf.lees(a).paginas, 1);
+  assert.equal(pdf.lees(b).paginas, 2);
+
+  const uit = voegSamen([a, b]);
+  assert.equal(uit.ok, true);
+  assert.equal(uit.paginas, 3, 'een plus twee is drie');
+  assert.equal(uit.documenten, 2);
+
+  const d = pdf.lees(uit.bestand);
+  assert.equal(d.ok, true, 'het resultaat is een leesbare PDF');
+  assert.equal(d.paginas, 3, 'en de paginaboom klopt met wat erin zit');
+  assert.equal(d.wortel, '1 0', 'met een verse catalogus');
+
+  /* NIET alleen "staat de tekst erin" -- dat blijft namelijk waar als de
+     verwijzingen NIET zijn hernummerd; tekstVan veegt gewoon alle stromen op.
+     Deze toets liep daar in eerste opzet zelf in: de mutatie die het
+     hernummeren uitzette, beet niet. Daarom loopt hij nu de OBJECTGRAAF af:
+     per pagina, via /Contents, in de volgorde van de paginaboom. */
+  const perPagina = pdf.perPagina(uit.bestand);
+  assert.equal(perPagina.ok, true, 'de paginaboom is te volgen vanaf de catalogus');
+  assert.equal(perPagina.paginas.length, 3);
+  assert.ok(perPagina.paginas.every(p => p.ok), 'elke pagina wijst naar bestaande inhoud: ' +
+    JSON.stringify(perPagina.paginas.filter(p => !p.ok)));
+  assert.match(perPagina.paginas[0].tekst, /Offerte Alpha/, 'pagina 1 draagt de inhoud van het eerste document');
+  assert.match(perPagina.paginas[0].tekst, /Bedrag: 12\.000/);
+  assert.match(perPagina.paginas[1].tekst, /Bijlage Beta een/, 'pagina 2 die van het tweede');
+  assert.match(perPagina.paginas[2].tekst, /Bijlage Beta twee/, 'en pagina 3 de laatste');
+  assert.ok(perPagina.paginas[1].tekst.indexOf('Offerte Alpha') < 0,
+    'en geen enkele pagina wijst naar de inhoud van een andere');
+  // elke pagina wijst naar de nieuwe boom, niet naar die van zijn oude document
+  const rauw = uit.bestand.toString('latin1');
+  const ouders = rauw.match(/\/Parent\s+(\d+)\s+0\s+R/g) || [];
+  assert.equal(ouders.length, 3, "drie paginas met een ouder");
+  assert.ok(ouders.every(o => /\/Parent\s+2\s+0\s+R/.test(o)), 'en alle drie naar de nieuwe paginaboom');
+});
+
+test('samenvoegen weigert wat het niet kan of niet mag', () => {
+  const a = maakPdfN([['Een']]);
+  assert.match(voegSamen([a]).waarom, /minstens twee/i);
+  assert.match(voegSamen([]).waarom, /minstens twee/i);
+
+  const versleuteld = Buffer.from('%PDF-1.4\n1 0 obj\n<< >>\nendobj\ntrailer\n<< /Encrypt 9 0 R >>\n', 'latin1');
+  const r = voegSamen([a, versleuteld]);
+  assert.equal(r.ok, false);
+  assert.match(r.waarom, /document 2/, 'de weigering noemt WELK document het is');
+  assert.match(r.waarom, /versleuteld/i, 'met de reden van de leeslaag erbij');
+});
+
+test('splitsen neemt alleen mee wat bereikbaar is: de rest reist niet stiekem mee', () => {
+  const doc = maakPdfN([['Geheim van pagina een'], ['Openbaar pagina twee'], ['Openbaar pagina drie']]);
+  assert.match(pdf.tekstVan(doc).tekst, /Geheim van pagina een/, 'vooraf staat alles erin');
+
+  const uit = splits(doc, 2, 3);
+  assert.equal(uit.ok, true);
+  assert.equal(uit.paginas, 2);
+  assert.equal(uit.uitTotaal, 3);
+
+  const d = pdf.lees(uit.bestand);
+  assert.equal(d.paginas, 2, "twee paginas in het resultaat");
+  const per = pdf.perPagina(uit.bestand);
+  assert.equal(per.ok, true);
+  assert.deepEqual(per.paginas.map(p => p.tekst), ['Openbaar pagina twee', 'Openbaar pagina drie'],
+    'de twee gekozen paginas dragen hun eigen inhoud, in volgorde');
+  const t = pdf.tekstVan(uit.bestand).tekst;
+  assert.ok(t.indexOf('Geheim van pagina een') < 0, 'de niet-gekozen pagina staat niet in de tekstlaag');
+
+  // DE BEWERING DIE ERTOE DOET: ook niet in de ruwe bytes
+  assert.ok(uit.bestand.toString('latin1').indexOf('Geheim van pagina een') < 0,
+    'en ook niet in de ruwe bytes -- alles meenemen zou hem gewoon laten meereizen');
+  assert.match(uit.let, /precies verkeerd/i);
+});
+
+test('splitsen telt zoals een mens telt, en weigert wat niet bestaat', () => {
+  const doc = maakPdfN([['Een'], ['Twee'], ['Drie']]);
+  const een = splits(doc, 1, 1);
+  assert.equal(een.paginas, 1);
+  assert.match(pdf.tekstVan(een.bestand).tekst, /Een/, "pagina 1 is de eerste, niet de nulde");
+  assert.ok(pdf.tekstVan(een.bestand).tekst.indexOf('Twee') < 0);
+
+  const alles = splits(doc, 1, 99);
+  assert.equal(alles.paginas, 3, 'een te hoge bovengrens knipt af op wat er is');
+  assert.equal(alles.tot, 3);
+
+  assert.match(splits(doc, 3, 1).waarom, /ligt na de laatste/i);
+  assert.match(splits(doc, 9, 9).waarom, /pagina 9 bestaat niet/i);
+
+  const versleuteld = Buffer.from('%PDF-1.4\n1 0 obj\n<< >>\nendobj\ntrailer\n<< /Encrypt 9 0 R >>\n', 'latin1');
+  assert.equal(splits(versleuteld, 1, 1).ok, false);
 });

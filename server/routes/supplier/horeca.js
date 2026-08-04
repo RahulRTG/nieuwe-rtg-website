@@ -29,4 +29,7 @@ module.exports = (kern) => {
   require('./horeca/club')(ctx);       // polsbandtegoed, minimum spend, gastenlijst, de deur
   require('./horeca/folio')(ctx);      // de gastrekening van het hotel: nachtrun, borg, afrekenen
   require('./horeca/event')(ctx);      // offerte, akkoord, aanbetaling, nacalculatie
+  require('./horeca/haccp')(ctx);      // temperaturen, batches en THT, controlelijsten
+  require('./horeca/personeel')(ctx);  // fooienpot, loonkosten tegenover omzet, gastprofiel
+  require('./horeca/dashboard')(ctx);  // dagbeeld per kanaal en de signalen
 };

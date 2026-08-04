@@ -86,7 +86,18 @@ module.exports = (kern) => {
     }
     r.betalingen.push(betaling);
     const rest = openstaand(r);
-    if (rest <= 0) { r.status = 'betaald'; r.geslotenAt = nu(); }
+    if (rest <= 0) {
+      r.status = 'betaald'; r.geslotenAt = nu();
+      /* De voorraad loopt via het BESTAANDE keukenbrein (kern/keuken.js), dat
+         de recepturen al kent en de ingredienten afboekt met een logregel. Er
+         komt hier dus geen tweede voorraadadministratie naast (LAT-regel 4).
+         Een verkoop wordt nooit geblokkeerd door de voorraadstand -- de gast
+         gaat voor -- en de telling zet de stand later recht. */
+      if (kern.keuken && kern.keuken.boekVerkoopAf && !r.voorraadGeboekt) {
+        r.voorraadGeboekt = kern.keuken.boekVerkoopAf(req.supplier,
+          (r.regels || []).map(x => ({ name: x.naam, qty: x.aantal })), 'horeca ' + (r.tafel || r.kanaal)) || 0;
+      }
+    }
     save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'horeca' });
     res.json({ ok: true, betaling, openstaand: rest, gesloten: r.status === 'betaald',

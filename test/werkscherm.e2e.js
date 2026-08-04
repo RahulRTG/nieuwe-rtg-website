@@ -169,6 +169,19 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
     assert.match(stand.tekst, /Rahul Travel Group/, 'in zijn eigen werkruimte');
     assert.match(stand.tekst, /directie/, 'met de directie-rol');
 
+    /* En hij is te VINDEN: een tegel op het bureaublad. Dat was de tweede
+       helft van de melding -- een app die alleen bestaat als je het adres
+       kent, bestaat voor een gebruiker niet. */
+    await page.goto(base + '/apps/index.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+    const tegels = await page.evaluate(() => Array.from(document.querySelectorAll('a.app'))
+      .map(a => a.getAttribute('href')));
+    assert.ok(tegels.includes('/apps/werk.html'), 'de werkplek heeft een tegel op het bureaublad');
+    assert.ok(tegels.includes('/apps/office.html'), 'en RTG Office ook; die had er nooit een');
+
+    await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(900);
+
     // en de werkplek staat ook gewoon in de app-bibliotheek
     const inBieb = await page.evaluate(async () => {
       const r = await fetch('/api/gids/app', { method: 'POST',

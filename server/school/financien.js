@@ -15,7 +15,7 @@
    De tweede regel: bedragen staan in CENTEN. Een euro als kommagetal is de
    klassieke manier om er twee cent naast te zitten. */
 module.exports = (sctx) => {
-  const { router, save, rid, nu, schoon, eigenVeld, poort, log, leerlingLijst } = sctx;
+  const { router, save, rid, nu, schoon, eigenVeld, poort, log, meld, leerlingLijst, machtigingActief } = sctx;
 
   const FAC = (sch) => { if (!sch.facturen) sch.facturen = []; return sch.facturen; };
   const BUD = (sch) => { if (!sch.budgetten) sch.budgetten = {}; return sch.budgetten; };
@@ -49,7 +49,16 @@ module.exports = (sctx) => {
     FAC(g.sch).unshift(f); g.sch.facturen = FAC(g.sch).slice(0, 20000);
     log(g.sch, g.p, 'factuur-gemaakt', l.id, soort + ' ' + (bedrag / 100).toFixed(2));
     save();
+    meld(g.sch, 'factuur.gemaakt', { factuurId: f.id, nummer: f.nummer, soort: f.soort, centen: f.centen, vervalt: f.vervalt });
+    /* De incasso-vlag betekent precies een ding: er MAG geïncasseerd worden
+       als er een getekende machtiging ligt. Er wordt hier niets geïnd, en het
+       antwoord zegt dat zelf -- anders leest een koppelend systeem "incasso"
+       als "geregeld". */
+    const m = f.incasso ? machtigingActief(g.sch, l.id) : null;
     res.json(Object.assign({ ok: true, factuur: f }, NOOIT,
+      f.incasso ? { incasseerbaar: !!m, machtiging: m ? m.kenmerk : null, geindNu: false,
+        let: m ? 'Er ligt een geldige machtiging (' + m.kenmerk + '). Innen doet uw bank of betaaldienst; RTG School schrijft niets af.'
+          : 'Er ligt GEEN geldige machtiging voor deze leerling, dus incasseren mag niet. Leg de machtiging eerst vast.' } : {},
       f.vrijwillig ? { let: 'De ouderbijdrage is vrijwillig; dat staat ook in de factuur zelf.' } : {}));
   });
 
@@ -72,6 +81,7 @@ module.exports = (sctx) => {
     f.status = open(f) === 0 ? 'voldaan' : 'open';
     log(g.sch, g.p, terug ? 'terugbetaling' : 'betaling', f.leerlingId, f.nummer);
     save();
+    if (!terug && f.status === 'voldaan') meld(g.sch, 'factuur.betaald', { factuurId: f.id, nummer: f.nummer, centen: f.centen });
     res.json(Object.assign({ ok: true, factuur: { id: f.id, nummer: f.nummer, open: open(f), status: f.status } }, NOOIT));
   });
 
@@ -84,6 +94,7 @@ module.exports = (sctx) => {
     const rijen = FAC(g.sch).filter(f => open(f) > 0).map(f => ({
       id: f.id, nummer: f.nummer, naam: f.naam, leerlingId: f.leerlingId, soort: f.soort, vrijwillig: !!f.vrijwillig,
       open: open(f), vervalt: f.vervalt, teLaat: !!(f.vervalt && f.vervalt < vandaag),
+      incasso: !!f.incasso, machtiging: f.incasso ? !!machtigingActief(g.sch, f.leerlingId) : null,
       herinneringen: (f.herinneringen || []).length }));
     res.json(Object.assign({ ok: true, aantal: rijen.length,
       openTotaal: rijen.reduce((n, r) => n + r.open, 0),

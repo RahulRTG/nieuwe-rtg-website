@@ -21,7 +21,7 @@
       enterprise-pakket op het dashboard; RTG School meet het nergens, dus komt
       er `null` terug met de reden erbij in plaats van een mooi cijfer. */
 module.exports = (sctx) => {
-  const { router, K, poort, leerlingLijst, presentieLijst, gemiddelde } = sctx;
+  const { router, K, poort, leerlingLijst, presentieLijst, gemiddelde, peilingBeeld } = sctx;
 
   const MIN_LESSEN = 10; // onder deze grens is verzuim ruis, geen signaal
   const dagen = (d) => new Date(Date.now() - d * 86400000).toISOString().slice(0, 10);
@@ -101,8 +101,10 @@ module.exports = (sctx) => {
         : null,
       incidenten: { laatste30: (g.sch.incidenten || []).filter(i => i.at >= dagen(30) + 'T').length,
         let: 'Alleen het aantal; de inhoud staat achter de incidentenpoort.' },
-      tevredenheid: null,
-      tevredenheidUitleg: 'RTG School meet tevredenheid nergens, dus staat hier geen cijfer. Een verzonnen tevredenheidscijfer is erger dan een leeg vakje.',
+      tevredenheid: peilingBeeld(g.sch),
+      tevredenheidUitleg: peilingBeeld(g.sch)
+        ? 'Uit de anonieme peiling, op een schaal van 1 tot 5. Geen scores per medewerker: de stellingen gaan over de school.'
+        : 'Geen cijfer: er is nog geen peiling met genoeg antwoorden. Een verzonnen tevredenheidscijfer is erger dan een leeg vakje.',
       waarschuwingen: waarschuwingen(g.sch),
       let: 'Geen ranglijsten: klassen staan op naam, niet op prestatie.' });
   });

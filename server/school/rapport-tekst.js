@@ -11,7 +11,7 @@ const { maakAI, tekst: aiTekst } = require('../ai');
 
 module.exports = (sctx) => {
   const { router, save, nu, schoon, K, S, eigenVeld, poort, log, gezinSessie,
-    rapporten: R, perVak, gemiddelde, leerlingLijst } = sctx;
+    rapporten: R, perVak, gemiddelde, leerlingLijst, meld } = sctx;
   const gem = (cijfers) => gemiddelde(cijfers);
 
   /* ---------- de conceptteksten ----------
@@ -82,6 +82,7 @@ module.exports = (sctx) => {
     for (const rij of rap.leerlingen) rij.tekstConcept = false;
     log(g.sch, g.p, 'rapport-vastgesteld', rap.id, rap.klas + ' ' + rap.periode);
     save();
+    meld(g.sch, 'rapport.vastgesteld', { rapportId: rap.id, klasCode: rap.klasCode, periode: rap.periode });
     res.json({ ok: true, rapport: { id: rap.id, vastgesteld: true, vastgesteldDoor: rap.vastgesteldDoor },
       uitleg: 'Vanaf nu zichtbaar voor de gezinnen van deze klas.' });
   });

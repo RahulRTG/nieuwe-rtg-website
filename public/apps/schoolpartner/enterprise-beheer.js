@@ -20,9 +20,10 @@
 
   function teken() {
     Promise.all([
-      A('/school/rollen', sleutels()), A('/school/koppelingen', sleutels()), A('/school/journaal', sleutels({ limiet: 8 }))
+      A('/school/rollen', sleutels()), A('/school/koppelingen', sleutels()), A('/school/journaal', sleutels({ limiet: 8 })),
+      A('/school/webhook/lijst', sleutels()), A('/school/peiling/uitslag', sleutels())
     ]).then(function (r) {
-      var rollen = r[0].body, kop = r[1].body, journaal = r[2].body;
+      var rollen = r[0].body, kop = r[1].body, journaal = r[2].body, haken = r[3].body, peilingen = r[4].body;
       if (rollen.error) { wortel.innerHTML = ''; return; }
       var rolIds = (rollen.rollen || []).map(function (x) { return x.id; }).filter(function (x) { return x !== 'directie'; });
       var h = '<div class="deel">Rollen en rechten</div>';
@@ -43,6 +44,28 @@
       }).join('') || '<p class="stil">Geen koppelingen aan.</p>',
       'Nooit mee, in geen enkele koppeling: ' + (kop.nooit || []).map(esc).join(', ') + '.');
 
+      h += kaart('Webhooks', (haken.webhooks || []).map(function (w) {
+        return '<div class="item"><span>' + esc(w.url) + ' <span class="stil">· ' + (w.gebeurtenissen || []).map(esc).join(', ') + '</span></span>' +
+          '<span class="rij"><span class="stil">' + esc(w.status) + ' · ' + (w.geleverd || 0) + ' geleverd' +
+          (w.mislukt ? ' · ' + w.mislukt + ' mislukt' : '') + '</span>' +
+          '<button class="knop" data-haak="proef" data-id="' + esc(w.id) + '">Proef</button>' +
+          (w.status === 'stil' ? '<button class="knop" data-haak="wek" data-id="' + esc(w.id) + '">Wek</button>' : '') + '</span></div>';
+      }).join('') || '<p class="stil">Geen webhooks ingesteld.</p>',
+      'Elke levering draagt een handtekening (X-RTG-Handtekening) en meldt alleen DAT er iets gebeurde, met ids -- geen namen. Na tien mislukkingen op rij valt een webhook stil.');
+
+      h += '<div class="deel">Tevredenheid</div>';
+      h += kaart('Anonieme peiling',
+        '<div class="rij"><input class="veld" id="enPTitel" maxlength="100" placeholder="Titel van de peiling" aria-label="Titel van de peiling">' +
+        '<input class="veld" id="enPStelling" maxlength="160" placeholder="Stelling (antwoord 1 t/m 5)" aria-label="Stelling">' +
+        '<select class="veld" id="enPDoel" aria-label="Doelgroep" style="flex:0 1 9rem;">' +
+        '<option value="ouders">Ouders</option><option value="leerlingen">Leerlingen</option><option value="personeel">Personeel</option></select>' +
+        '<button class="knop p" id="enPMaak" type="button">Zet uit</button></div>' +
+        (peilingen.peilingen || []).map(function (p) {
+          return rij(esc(p.titel) + ' <span class="stil">· ' + esc(p.doelgroep) + '</span>',
+            p.antwoorden + ' antwoorden' + (p.genoeg ? '' : ' · nog geen uitslag'));
+        }).join(''),
+        'Alleen scores, geen vrije tekst, geen cijfer per medewerker, en pas vanaf vijf antwoorden een uitslag.');
+
       h += kaart('Laatste inzage', (journaal.rijen || []).map(function (j) {
         return rij(esc(j.wat) + ' <span class="stil">· ' + esc(j.rol) + '</span>',
           esc(j.reden || '') + ' · ' + esc(String(j.at).slice(0, 16).replace('T', ' ')));
@@ -50,6 +73,25 @@
       'Het journaal legt vast dát er is gekeken, door wie en waarom -- nooit wat er stond.');
 
       wortel.innerHTML = h;
+      document.getElementById('enPMaak').addEventListener('click', function () {
+        var titel = document.getElementById('enPTitel').value.trim();
+        var stelling = document.getElementById('enPStelling').value.trim();
+        if (!titel || !stelling) return meld('Geef de peiling een titel en een stelling.');
+        A('/school/peiling/maak', sleutels({ titel: titel, stellingen: [stelling],
+          doelgroep: document.getElementById('enPDoel').value })).then(function (r2) {
+          meld(r2.body.error || 'De peiling staat uit.');
+          if (!r2.body.error) teken();
+        });
+      });
+      Array.prototype.forEach.call(wortel.querySelectorAll('[data-haak]'), function (b) {
+        b.addEventListener('click', function () {
+          var pad = b.dataset.haak === 'proef' ? '/school/webhook/proef' : '/school/webhook/wek';
+          A(pad, sleutels({ webhookId: b.dataset.id })).then(function (r2) {
+            meld(r2.body.error || (r2.body.ok ? 'Afgeleverd (' + (r2.body.status || 'ok') + ').' : 'Niet afgeleverd: ' + (r2.body.fout || 'onbekend')));
+            teken();
+          });
+        });
+      });
       Array.prototype.forEach.call(wortel.querySelectorAll('[data-rol]'), function (b) {
         b.addEventListener('click', function () {
           var vak = wortel.querySelector('[data-rolrij="' + b.dataset.rol + '"]');

@@ -130,13 +130,16 @@ module.exports = (ctx) => {
      smaak: dossier en organisatie halen leerlingLijst() uit de context die
      inschrijving.js daar neerzet. */
   Object.assign(sctx, require('./school/rollen')(sctx)); // rollen, rechten, inzagejournaal
+  Object.assign(sctx, require('./school/webhook')(sctx)); // de bezorger; zet sctx.meld voor de lagen hieronder
   require('./school/inschrijving')(sctx); // aanmelding, wachtlijst, plaatsing, uitschrijving, overstap
   Object.assign(sctx, require('./school/dossier')(sctx)); // dossier, contact, documenten, zorg
   require('./school/organisatie')(sctx); // vestigingen, opleidingen, schooljaarovergang
   require('./school/inschrijving-mutatie')(sctx); // uitschrijven en overstappen
-  require('./school/aanwezigheid')(sctx); // presentie per les, te laat, verlof
+  Object.assign(sctx, require('./school/aanwezigheid')(sctx)); // presentie per les, te laat, verzuimbeeld
+  require('./school/verlof')(sctx); // verlofaanvraag van het gezin, besluit van de school
   Object.assign(sctx, require('./school/veiligheid')(sctx)); // toegangspassen en bezoekers
   require('./school/veiligheid-incident')(sctx); // incidenten, ontruimingslijst, calamiteit
+  Object.assign(sctx, require('./school/machtiging')(sctx)); // het machtigingenregister (geen incasso-run)
   Object.assign(sctx, require('./school/financien')(sctx)); // facturen, betalingen, debiteuren
   require('./school/financien-beheer')(sctx); // kantine, budgetten, subsidies, rapportage
   Object.assign(sctx, require('./school/hr')(sctx)); // personeelsdossier, contract, bevoegdheden
@@ -144,6 +147,8 @@ module.exports = (ctx) => {
   require('./school/omroep')(sctx); // nieuwsbrief, automatische herinneringen, vakgroep
   Object.assign(sctx, require('./school/rapport')(sctx)); // rapporten, vastgesteld door een mens
   require('./school/rapport-tekst')(sctx); // conceptteksten (AI = advies) en studievoortgang
+  Object.assign(sctx, require('./school/peiling')(sctx)); // de anonieme peiling (zet sctx.peilingBeeld)
+  require('./school/peiling-antwoord')(sctx); // meedoen: gezin en personeel
   Object.assign(sctx, require('./school/analyse')(sctx)); // dashboard en waarschuwingen
   require('./school/analyse-signalen')(sctx); // de signalen rond een leerling
   require('./school/koppelingen')(sctx); // integraties, webhooks, export

@@ -1,4 +1,6 @@
-/* School (deelmodule): aanwezigheid en verlof.
+/* School (deelmodule): aanwezigheid -- de presentielijst per les en het
+   verzuimbeeld. Verlof (aanvraag en besluit) staat in school/verlof.js, dat de
+   reeks hieronder via de context meekrijgt.
 
    De presentielijst is het gevoeligste gewone ding in een schoolsysteem: hij
    wordt elke les gezet, hij gaat over kinderen, en hij wordt later gebruikt om
@@ -14,11 +16,12 @@
    3. HET GEZIN ZIET WAT ER OVER HEM STAAT. Dezelfde registratie die de school
       gebruikt, is voor de ouder opvraagbaar -- inclusief wie hem zette. */
 module.exports = (sctx) => {
-  const { router, save, rid, nu, schoon, K, S, eigenVeld, poort, log, gezinSessie, leerlingLijst, leerlingSleutel } = sctx;
+  const { router, save, rid, nu, schoon, K, eigenVeld, poort, meld, leerlingLijst } = sctx;
 
   const STANDEN = ['aanwezig', 'telaat', 'afwezig', 'ziek', 'verlof'];
   const P = (sch) => { if (!sch.presentie) sch.presentie = []; return sch.presentie; };
   const VL = (sch) => { if (!sch.verlof) sch.verlof = []; return sch.verlof; };
+  sctx.verlofLijst = VL;
   const dag = () => new Date().toISOString().slice(0, 10);
   sctx.presentieLijst = P;
 
@@ -46,6 +49,7 @@ module.exports = (sctx) => {
     P(g.sch).unshift(les);
     g.sch.presentie = P(g.sch).slice(0, 20000);
     save();
+    meld(g.sch, 'aanwezigheid.gezet', { klasCode: les.klasCode, datum: les.datum, uur: les.uur, regels: les.regels.length });
     res.json({ ok: true, les: { id: les.id, datum: les.datum, uur: les.uur, gecorrigeerd: !!les.correctieVan },
       telling: STANDEN.reduce((o, s) => Object.assign(o, { [s]: les.regels.filter(r => r.stand === s).length }), {}) });
   });
@@ -74,67 +78,6 @@ module.exports = (sctx) => {
       laatste: lessen.slice(0, 10).map(l => ({ id: l.id, datum: l.datum, uur: l.uur, vak: l.vak, door: l.door })) });
   });
 
-  /* ---------- verlof aanvragen (het gezin) ---------- */
-  router.post('/school/verlof/aanvraag', (req, res) => {
-    const s = gezinSessie(req, res); if (!s) return;
-    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
-    if (!k) return res.status(404).json({ error: 'Die klas kennen we niet.' });
-    // de school komt uit de klas en niet uit het verzoek: een gezin hoort geen
-    // schoolcode te hoeven weten, en zo kan het er ook geen andere kiezen
-    const sch = eigenVeld(S(), k.schoolCode || '');
-    if (!sch) return res.status(404).json({ error: 'Deze klas hangt nog niet aan een school.' });
-    const profielId = String(req.body.profielId || s.p.id);
-    const sleutel = leerlingSleutel(s.g.code, profielId);
-    if (!(k.leerlingen || []).some(l => l.sleutel === sleutel)) return res.status(403).json({ error: 'Dit kind zit niet in die klas.' });
-    const van = schoon(req.body.van, 10), tot = schoon(req.body.tot, 10) || schoon(req.body.van, 10);
-    const reden = schoon(req.body.reden, 300);
-    if (!van || !reden) return res.status(400).json({ error: 'Geef de datum en de reden van het verlof.' });
-    const v = { id: rid(5), klasCode: k.code, sleutel, naam: ((k.leerlingen || []).find(l => l.sleutel === sleutel) || {}).naam || null,
-      van, tot, reden, soort: schoon(req.body.soort, 30) || 'bijzonder verlof',
-      aanvrager: schoon(s.p.naam, 60), status: 'ingediend', at: nu() };
-    VL(sch).unshift(v); sch.verlof = VL(sch).slice(0, 5000);
-    save();
-    res.json({ ok: true, verlof: { id: v.id, status: v.status, van: v.van, tot: v.tot },
-      uitleg: 'De aanvraag staat bij de school. Een mens beslist erover; u krijgt het besluit met de reden erbij.' });
-  });
-
-  // het gezin ziet zijn eigen aanvragen terug, met besluit en reden
-  router.post('/school/verlof/mijn', (req, res) => {
-    const s = gezinSessie(req, res); if (!s) return;
-    const uit = [];
-    for (const sch of Object.values(S())) for (const v of VL(sch)) {
-      if (!v.sleutel.startsWith(s.g.code + ':')) continue;
-      uit.push({ id: v.id, naam: v.naam, van: v.van, tot: v.tot, reden: v.reden, soort: v.soort,
-        status: v.status, besluitReden: v.besluitReden || null, besluitAt: v.besluitAt || null, school: sch.naam });
-    }
-    res.json({ ok: true, aanvragen: uit.sort((a, b) => String(b.van).localeCompare(String(a.van))).slice(0, 50) });
-  });
-
-  /* ---------- de school beslist ----------
-     Toekennen of afwijzen, altijd met een reden. Een afwijzing zonder reden is
-     bij leerplicht het begin van een conflict dat niemand wil. */
-  router.post('/school/verlof/besluit', (req, res) => {
-    const g = poort(req, res, 'aanwezigheid'); if (!g) return;
-    const v = VL(g.sch).find(x => x.id === String(req.body.verlofId || ''));
-    if (!v) return res.status(404).json({ error: 'Die aanvraag kennen we niet.' });
-    const besluit = String(req.body.besluit || '');
-    if (!['toegekend', 'afgewezen'].includes(besluit)) return res.status(400).json({ error: 'Kies toegekend of afgewezen.' });
-    const reden = schoon(req.body.reden, 300);
-    if (!reden) return res.status(400).json({ error: 'Noteer de reden van het besluit; het gezin ziet die.' });
-    v.status = besluit; v.besluitReden = reden; v.besluitDoor = g.p.naam; v.besluitAt = nu();
-    log(g.sch, g.p, 'verlofbesluit', v.id, besluit + ': ' + reden);
-    save();
-    res.json({ ok: true, verlof: { id: v.id, status: v.status } });
-  });
-
-  // de openstaande en afgehandelde aanvragen voor de school
-  router.post('/school/verlof/lijst', (req, res) => {
-    const g = poort(req, res, 'aanwezigheid'); if (!g) return;
-    const status = schoon(req.body.status, 20);
-    const rijen = VL(g.sch).filter(v => !status || v.status === status).slice(0, 200);
-    res.json({ ok: true, open: VL(g.sch).filter(v => v.status === 'ingediend').length, aanvragen: rijen });
-  });
-
   /* ---------- verzuimbeeld voor een leerling ----------
      Voor de mentor en het gezin dezelfde cijfers uit dezelfde bron. */
   router.post('/school/aanwezigheid/leerling', (req, res) => {
@@ -149,4 +92,6 @@ module.exports = (sctx) => {
     res.json({ ok: true, sleutel, naam: l ? l.naam : (regels[0] || {}).naam || null, telling: tel,
       lessen: regels.length, regels: regels.slice(0, 200) });
   });
+
+  return { verlofLijst: VL };
 };

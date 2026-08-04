@@ -82,9 +82,10 @@ test('de verzuimwaarschuwing noemt zijn eigen rekensom, en zwijgt bij te weinig 
   assert.match(w.tekst, /hoger dan normaal/);
   assert.ok(w.meting.lessen >= 10, 'de meting noemt hoeveel lessen eronder liggen');
   assert.ok(w.meting.nu > w.meting.eerder);
-  // en het dashboard verzint geen tevredenheidscijfer
+  // en zonder peiling met genoeg antwoorden verzint het dashboard geen
+  // tevredenheidscijfer (de peiling zelf staat in test/schoolkoppel.test.js)
   assert.equal(d.tevredenheid, null);
-  assert.match(d.tevredenheidUitleg, /meet tevredenheid nergens/);
+  assert.match(d.tevredenheidUitleg, /nog geen peiling met genoeg antwoorden/);
 });
 
 test('signalen rond een leerling zijn factoren, geen score en geen ranglijst', async () => {

@@ -18,7 +18,7 @@
      echt weg mag, hoort bij de bewaartermijnen (server/bewaartermijnen.js) en
      niet bij een knop in de administratie. */
 module.exports = (sctx) => {
-  const { router, save, rid, nu, schoon, K, eigenVeld, poort, log, leerlingSleutel } = sctx;
+  const { router, save, rid, nu, schoon, K, eigenVeld, poort, log, meld, leerlingSleutel } = sctx;
 
   const STATUS = ['aanmelding', 'wachtlijst', 'ingeschreven', 'uitgeschreven', 'afgewezen'];
   function L(sch) { if (!sch.leerlingen) sch.leerlingen = {}; return sch.leerlingen; }
@@ -100,6 +100,7 @@ module.exports = (sctx) => {
     }
     log(g.sch, g.p, 'leerling-geplaatst', l.id, 'plaatsing' + (k ? ' in klas ' + k.code : ''));
     save();
+    meld(g.sch, 'leerling.ingeschreven', { leerlingId: l.id, klasCode: l.klasCode, opleiding: l.opleiding });
     res.json({ ok: true, leerling: kort(l), inKlas: k ? k.naam : null });
   });
 

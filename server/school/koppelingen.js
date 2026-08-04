@@ -19,11 +19,11 @@
    De webhook-URL gaat langs de bestaande SSRF-afweer (kern/ssrf.js): een
    webhook naar een intern adres is een aanvaller die onze server laat bellen.
 
-   EERLIJK OVER WAT ER (NOG) NIET IS: dit bestand REGISTREERT webhooks, het
-   bezorgt ze niet. Er gaat vandaag dus geen enkel bericht de deur uit. Dat
-   staat ook in het antwoord van /school/webhook/zet en als openstaand punt in
-   de README, want een lijst met abonnementen die niemand aflevert is precies
-   het soort belofte waar LAT-regel 6 over gaat. */
+   Dit bestand REGISTREERT de webhooks; het bezorgen doet school/webhook.js
+   (ondertekend, met herhalingen en een teller die niet stil blijft). Tot deze
+   ronde leverde niemand ze af -- dat stond als openstaand punt in TAKEN.md,
+   precies het soort belofte waar LAT-regel 6 over gaat, en het is nu waar
+   gemaakt in plaats van weggeschreven. */
 const { veiligeWebhookUrl } = require('../kern/ssrf');
 
 const SOORTEN = {
@@ -81,7 +81,12 @@ module.exports = (sctx) => {
   router.post('/school/webhook/zet', (req, res) => {
     const g = poort(req, res, 'koppeling'); if (!g) return;
     const url = String(req.body.url || '').trim();
-    const keuring = veiligeWebhookUrl(url);
+    /* Dezelfde schakelaar als bij het bezorgen (school/webhook.js) en bij de
+       fout-melder: standaard weigeren we interne adressen, en met
+       RTG_SCHOOL_WEBHOOK_INTERN=1 mag een bewuste interne collector erdoor --
+       het metadata-adres blijft ook dan dicht. Registratie en bezorging moeten
+       dezelfde regel lezen, anders neem je iets aan dat later wordt geweigerd. */
+    const keuring = veiligeWebhookUrl(url, { intern: String(process.env.RTG_SCHOOL_WEBHOOK_INTERN || '') === '1' });
     if (!keuring.ok) return res.status(400).json({ error: 'Deze webhook-URL kan niet: ' + keuring.reden + '.' });
     const gebeurtenissen = [...new Set((Array.isArray(req.body.gebeurtenissen) ? req.body.gebeurtenissen : []).map(String))]
       .filter(e => GEBEURTENISSEN.includes(e));
@@ -90,15 +95,16 @@ module.exports = (sctx) => {
     WH(g.sch).unshift(w); g.sch.webhooks = WH(g.sch).slice(0, 50);
     log(g.sch, g.p, 'webhook-gezet', w.id, gebeurtenissen.join(','));
     save();
-    res.json({ ok: true, webhook: w, bezorgtNu: false,
-      uitleg: 'Geregistreerd. Let op: RTG School bezorgt deze gebeurtenissen nog niet -- de aflevering is nog niet gebouwd. Het geheim wordt nu een keer getoond en is straks de handtekening op elke levering.' });
+    res.json({ ok: true, webhook: w, bezorgtNu: true,
+      uitleg: 'Geregistreerd. Het geheim wordt nu EEN keer getoond: elke levering draagt er een HMAC-SHA256 mee in de kop X-RTG-Handtekening. Probeer hem met /school/webhook/proef.' });
   });
 
   router.post('/school/webhook/lijst', (req, res) => {
     const g = poort(req, res, 'koppeling'); if (!g) return;
     res.json({ ok: true, gebeurtenissen: GEBEURTENISSEN,
-      bezorgtNu: false,
-      webhooks: WH(g.sch).map(w => ({ id: w.id, url: w.url, gebeurtenissen: w.gebeurtenissen, status: w.status, at: w.at })) });
+      bezorgtNu: true,
+      webhooks: WH(g.sch).map(w => ({ id: w.id, url: w.url, gebeurtenissen: w.gebeurtenissen, status: w.status, at: w.at,
+        geleverd: w.geleverd || 0, mislukt: w.mislukt || 0, laatsteFout: w.laatsteFout || null, laatsteAt: w.laatsteAt || null })) });
   });
 
   router.post('/school/webhook/weg', (req, res) => {

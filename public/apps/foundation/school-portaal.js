@@ -23,11 +23,16 @@
 
   async function laad() {
     if (typeof gezinApi !== 'function' || !wortel) return;
-    var d;
+    var d, mach = null, peil = null;
     try { d = await gezinApi('/school/portaal'); } catch (e) { return; }
     if (!d || !d.ok) return;
+    try { mach = await gezinApi('/school/machtiging/mijn'); } catch (e) {}
+    try { peil = await gezinApi('/school/peiling/mijn'); } catch (e) {}
+    var machtigingen = (mach && mach.machtigingen) || [];
+    var peilingen = ((peil && peil.peilingen) || []).filter(function (p) { return !p.alGeantwoord; });
     var leeg = !(d.facturen.length || d.aanwezigheid.length || d.rapporten.length
-      || d.toestemmingen.length || d.afspraken.length || d.verlof.length);
+      || d.toestemmingen.length || d.afspraken.length || d.verlof.length
+      || machtigingen.length || peilingen.length);
     if (leeg) { wortel.innerHTML = ''; return; }
     var h = '';
 
@@ -80,11 +85,45 @@
       }).join(''));
     }
 
+    if (machtigingen.length) {
+      h += kaart('Machtigingen', machtigingen.map(function (m) {
+        return regel('<b>' + esc(m.kenmerk) + '</b> · ' + esc(m.houder) + ' · rekening op ...' + esc(m.ibanEinde) +
+          ' · max ' + euro(m.maxCenten) + ' · ' + esc(m.frequentie) + ' · ' + (m.actief ? 'actief' : 'gestopt') +
+          (m.actief ? ' <button class="knop mini" data-mstop="' + esc(m.id) + '">Stop deze machtiging</button>' : ''));
+      }).join('') + regel('Er wordt hier niets geïnd; dit legt vast wat u hebt getekend. Stoppen kan altijd en werkt meteen.'));
+    }
+
+    if (peilingen.length) {
+      h += kaart('Peiling', peilingen.map(function (p) {
+        return regel('<b>' + esc(p.titel) + '</b>') + p.stellingen.map(function (s, i) {
+          return regel(esc(s) + ' <select class="veld mini" data-score="' + esc(p.id) + '-' + i + '" aria-label="' + esc(s) + '">' +
+            '<option value="">-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>');
+        }).join('') + regel('<button class="knop mini" data-peil="' + esc(p.id) + '" data-n="' + p.stellingen.length + '">Verstuur anoniem</button>');
+      }).join('') + regel('1 = helemaal niet, 5 = helemaal wel. Alleen uw scores worden bewaard, niet wie u bent.'));
+    }
+
     wortel.innerHTML = h;
     bind();
   }
 
   function bind() {
+    Array.prototype.forEach.call(wortel.querySelectorAll('[data-mstop]'), function (b) {
+      b.addEventListener('click', async function () {
+        try { await gezinApi('/school/machtiging/stop', { machtigingId: b.dataset.mstop }); laad(); }
+        catch (e) { b.insertAdjacentHTML('afterend', ' <span class="mini">' + esc(e.message) + '</span>'); }
+      });
+    });
+    Array.prototype.forEach.call(wortel.querySelectorAll('[data-peil]'), function (b) {
+      b.addEventListener('click', async function () {
+        var scores = [];
+        for (var i = 0; i < Number(b.dataset.n); i++) {
+          var veld = wortel.querySelector('[data-score="' + b.dataset.peil + '-' + i + '"]');
+          scores.push(veld && veld.value ? Number(veld.value) : null);
+        }
+        try { await gezinApi('/school/peiling/antwoord', { peilingId: b.dataset.peil, scores: scores }); laad(); }
+        catch (e) { b.insertAdjacentHTML('afterend', ' <span class="mini">' + esc(e.message) + '</span>'); }
+      });
+    });
     Array.prototype.forEach.call(wortel.querySelectorAll('[data-tst]'), function (b) {
       b.addEventListener('click', async function () {
         var ja = b.dataset.ja;

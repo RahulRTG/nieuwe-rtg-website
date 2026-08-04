@@ -12,7 +12,7 @@
    is precies wat een school later nodig heeft en wat in de meeste systemen
    verdwijnt zodra iemand een veld overschrijft. */
 module.exports = (sctx) => {
-  const { router, save, nu, schoon, K, eigenVeld, poort, log, leerlingLijst: L, leerlingKort: kort, leerlingSleutel } = sctx;
+  const { router, save, nu, schoon, K, eigenVeld, poort, log, meld, leerlingLijst: L, leerlingKort: kort, leerlingSleutel } = sctx;
 
   /* ---------- uitschrijven ----------
      Uit de klas, toegang dicht, dossier blijft. De reden is verplicht: een
@@ -28,6 +28,7 @@ module.exports = (sctx) => {
     l.status = 'uitgeschreven'; l.uitgeschrevenAt = nu(); l.reden = reden; l.klasCode = null; l.toegang = 'gesloten';
     log(g.sch, g.p, 'leerling-uitgeschreven', l.id, reden);
     save();
+    meld(g.sch, 'leerling.uitgeschreven', { leerlingId: l.id });
     res.json({ ok: true, leerling: kort(l),
       uitleg: 'De toegang is gesloten en de leerling staat uit de klas. Het dossier blijft bewaard volgens de bewaartermijnen; het wordt hier niet gewist.' });
   });
@@ -58,6 +59,7 @@ module.exports = (sctx) => {
     l.overstappen = (l.overstappen || []).concat([{ at: nu(), van, naar: { klas: l.klasCode, vestiging: l.vestiging }, reden: schoon(req.body.reden, 160) || null }]).slice(-30);
     log(g.sch, g.p, 'leerling-overstap', l.id, 'van ' + (van.klas || '-') + ' naar ' + (l.klasCode || '-'));
     save();
+    meld(g.sch, 'leerling.overstap', { leerlingId: l.id, van: van.klas || null, naar: l.klasCode || null });
     res.json({ ok: true, leerling: kort(l), overstappen: l.overstappen });
   });
 };

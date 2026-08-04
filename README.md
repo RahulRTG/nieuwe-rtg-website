@@ -483,7 +483,7 @@ personeel-token met de juiste rol accepteert.
 | **Finance** | `financien.js`, `financien-beheer.js` | schoolgeld en ouderbijdragen als factuur, betaallink, terugbetaling, kantinesaldo, budgetten, subsidies, debiteuren, rapportage en boekhoudexport |
 | **HR** | `hr.js`, `hr-verlof.js` | personeelsdossier, contract, bevoegdheden en trainingen, verlof en ziekte, vervanging, urenregistratie, gesprekken |
 | **AI & Analytics** | `analyse.js`, `analyse-signalen.js` | directiedashboard, waarschuwingen met hun eigen rekensom, signalen rond een leerling |
-| **Koppelingen & portaal** | `koppelingen.js`, `ouderportaal.js`, `ouderportaal-mijn.js` | integratieregister met veldkeuze, webhookregistratie, export, toestemmingsformulieren, gespreksafspraken, het gezinsoverzicht |
+| **Koppelingen & portaal** | `koppelingen.js`, `webhook.js`, `machtiging.js`, `peiling(-antwoord).js`, `ouderportaal(-mijn).js` | integratieregister met veldkeuze, ondertekende webhookbezorging, machtigingenregister, anonieme tevredenheidspeiling, export, toestemmingsformulieren, gespreksafspraken, het gezinsoverzicht |
 
 Schermen: de directiepanelen staan in `/apps/schoolpartner.html`
 (`schoolpartner/enterprise.js` + `enterprise-beheer.js`), de ouder- en
@@ -526,11 +526,33 @@ zijn:
 8. **Toestemming is intrekbaar, en geen antwoord is geen toestemming.** Dat
    laatste staat ook zo in het overzicht van de school.
 
-Wat er (nog) **niet** is, om dezelfde reden dat de rest hier staat: de
-webhook-laag registreert abonnementen maar **bezorgt nog niets** (het antwoord
-zegt dat zelf met `bezorgtNu: false`), er is geen automatische incasso-run (een
-factuur draagt wel de vlag), en tevredenheid staat als `null` op het dashboard
-omdat RTG School het nergens meet.
+Drie dingen die in de eerste ronde nog openstonden, zijn daarna gebouwd -- en
+het derde bewust maar half:
+
+- **De webhooks bezorgen nu echt** (`school/webhook.js`). Elke levering draagt
+  een HMAC-SHA256 over het exacte lijf in `X-RTG-Handtekening`, wordt bij een
+  fout twee keer opnieuw geprobeerd, en telt mislukkingen op de webhook zelf
+  met een waarschuwing in het log; na tien op rij valt hij stil tot de school
+  hem wekt (`/school/webhook/wek`). Het lijf meldt **dat** er iets is gebeurd
+  met ids -- geen namen, geen cijfers, geen zorg. Wie de inhoud wil, haalt hem
+  daarna op met zijn eigen recht, zodat een webhook nooit een sluiproute om de
+  rechtenmatrix wordt. `/school/webhook/proef` stuurt een proeflevering en zegt
+  precies wat eruit kwam. Een intern adres kan alleen met
+  `RTG_SCHOOL_WEBHOOK_INTERN=1` (zelfde schakelaar als bij de fout-melder); het
+  cloud-metadata-adres blijft ook dan dicht.
+- **Machtigingen worden vastgelegd** (`school/machtiging.js`), maar er is nog
+  steeds **geen incasso-run** -- en dat is een besluit. Het register weet wie
+  heeft getekend, voor welk maximum, wanneer en via welk kanaal; het volledige
+  rekeningnummer staat er niet in (alleen de laatste vier tekens), want er
+  wordt niets geïnd. Elk antwoord draagt `geindNu: false`, en een factuur met
+  de incasso-vlag zegt of er een geldige machtiging ligt. Intrekken kan altijd,
+  ook door het gezin zelf, zonder reden en per direct.
+- **Tevredenheid wordt gemeten** (`school/peiling.js`), anoniem: alleen scores
+  van 1 tot 5, een hash met het schoolgeheim tegen dubbel stemmen die los staat
+  van het antwoord, geen vrije tekst (die maakt een kleine groep herleidbaar),
+  geen cijfer per medewerker, en **geen uitslag onder de vijf antwoorden**.
+  Zolang die grens niet is gehaald, staat er nog steeds `null` op het dashboard
+  met de reden erbij.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 

@@ -24,4 +24,7 @@ module.exports = (kern) => {
   require('./horeca/bonnen')(ctx);     // cadeaubon en tegoed, offline-sync, happy hour
   require('./horeca/keuken')(ctx);     // het keukenscherm: stations en standen
   require('./horeca/keuken-regie')(ctx); // het regiescherm van de chef en de drukterem
+  require('./horeca/bezorging')(ctx);  // bezorgzones en tijdsloten
+  require('./horeca/bezorgrit')(ctx);  // gecombineerde route en afleverbewijs
+  require('./horeca/club')(ctx);       // polsbandtegoed, minimum spend, gastenlijst, de deur
 };

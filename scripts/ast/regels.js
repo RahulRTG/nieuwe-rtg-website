@@ -82,19 +82,101 @@ function functieBoven(pad) {
   }
   return null;
 }
-// alle knopen onder een knoop (kleine eigen wandeling, zonder walk.js te hoeven kennen)
+/* Alle knopen onder een knoop (kleine eigen wandeling, zonder walk.js te hoeven
+   kennen).
+
+   WAAROM DIT MET EEN STAPEL GAAT EN NIET MET RECURSIE. Hier stond een
+   recursieve generator met `yield*`. Dat leest prettig en het is een valkuil:
+   bij `yield*` gaat elke knoop door de HELE delegatieketen terug naar boven,
+   dus een knoop op diepte D kost D stappen. Bij een diep geneste expressie --
+   een lange keten van string-concatenaties, en daar staan er hier veel -- loopt
+   dat op tot N x D.
+
+   Zichtbaar effect: de scan van server/ kwam in negen minuten niet rond terwijl
+   scripts/ (57 bestanden) in ruim een seconde klaar was. Het was niet de
+   grootte: server.js van 212 kilobyte deed 38 milliseconde, en een bestand van
+   vier kilobyte met een diepe expressie bijna twee seconden. In vonk/index.js
+   kostte EEN knoop 2285 van de 2156 milliseconde van het hele bestand.
+
+   Een stapel doet hetzelfde werk in N stappen. De volgorde blijft pre-order
+   (knoop voor zijn kinderen, kinderen op volgorde), zodat geen enkele regel
+   hierdoor een ander oordeel geeft. */
 function* onder(node) {
   if (!node || typeof node !== 'object') return;
-  yield node;
-  for (const k of Object.keys(node)) {
-    if (k === 'type' || k === 'lijn') continue;
-    const v = node[k];
-    if (Array.isArray(v)) { for (const x of v) yield* onder(x); }
-    else if (v && typeof v === 'object' && v.type) yield* onder(v);
+  const stapel = [node];
+  while (stapel.length) {
+    const n = stapel.pop();
+    yield n;
+    const kinderen = [];
+    for (const k of Object.keys(n)) {
+      if (k === 'type' || k === 'lijn') continue;
+      const v = n[k];
+      if (Array.isArray(v)) { for (const x of v) if (x && typeof x === 'object' && x.type) kinderen.push(x); }
+      else if (v && typeof v === 'object' && v.type) kinderen.push(v);
+    }
+    // omgekeerd op de stapel, zodat ze er in de oorspronkelijke volgorde afkomen
+    for (let i = kinderen.length - 1; i >= 0; i--) stapel.push(kinderen[i]);
   }
 }
 /* Komt deze naam in deze functie uit een ruwe buitenwaarde? */
-function naamUitBuiten(fn, naam) {
+/* EEN DOORLOOP PER FUNCTIE, NIET EEN PER NAAM.
+
+   naamUitBuiten() en heeftGrens() liepen allebei de HELE functie-body af, en ze
+   werden aangeroepen voor ELKE array-index in die functie. Bij N knopen en M
+   verschillende indexnamen is dat N x M werk, en dat liep volledig uit de hand:
+   de scan van server/ kwam in negen minuten niet rond terwijl scripts/ (57
+   bestanden) in ruim een seconde klaar was. Een bestand van vier kilobyte kostte
+   anderhalve seconde; server.js van 212 kilobyte deed er 164 milliseconde over.
+   Niet de grootte was het probleem maar het aantal indexeringen per functie.
+
+   Cachen per (functie, naam) hielp maar half -- bij veel verschillende namen
+   loop je nog steeds even vaak. Daarom nu EEN doorloop per functie die meteen
+   twee verzamelingen oplevert: welke namen uit het verzoek komen, en welke
+   namen ergens een grens hebben. Daarna is elke vraag een lookup.
+
+   De WeakMap hangt aan de functieknoop zelf, dus hij verdwijnt met de boom en er
+   blijft niets staan tussen bestanden. Geen enkel oordeel verandert hierdoor --
+   alleen hoe vaak we hetzelfde uitrekenen. */
+const _perFunctie = new WeakMap();
+function analyse(fn) {
+  let a = _perFunctie.get(fn);
+  if (a) return a;
+  a = { uitVerzoek: new Set(), metGrens: new Set(), elementCheck: new Set() };
+  for (const n of onder(fn.body)) {
+    // welke namen krijgen een tot getal gedwongen waarde uit het verzoek
+    if (n.type === 'VariableDeclarator' && n.id && n.id.name && getalUitVerzoek(n.init)) a.uitVerzoek.add(n.id.name);
+    if (n.type === 'AssignmentExpression' && n.left && n.left.name && getalUitVerzoek(n.right)) a.uitVerzoek.add(n.left.name);
+
+    // en welke namen ergens een grens krijgen
+    if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
+        && n.callee.property && /^(isInteger|isSafeInteger|isFinite)$/.test(n.callee.property.name)) {
+      for (const arg of (n.arguments || [])) if (arg && arg.type === 'Identifier') a.metGrens.add(arg.name);
+    }
+    if (n.type === 'BinaryExpression' && ['<', '>', '<=', '>='].includes(n.operator)) {
+      for (const zij of [n.left, n.right]) if (zij && zij.type === 'Identifier') a.metGrens.add(zij.name);
+    }
+    /* De derde vorm van een grens: kijken of het ELEMENT bestaat.
+         if (!p.poll.opties[i]) return 400;
+       Dat is een volwaardige controle -- lijst[NaN] en lijst[-1] zijn undefined,
+       dus die aanroep valt er netjes op stuk. Zonder deze herkenning wijst de
+       regel correcte routes aan, en een regel die goed werk afkeurt wordt
+       uitgezet. Bij de eerste herschrijving stond hier per ongeluk ELKE
+       computed member; dat is te breed om iets te betekenen en tegelijk werd de
+       verzameling niet gebruikt, waardoor de scan twee correcte routes
+       afkeurde. */
+    if (n.type === 'UnaryExpression' && n.operator === '!' && n.argument
+        && n.argument.type === 'MemberExpression' && n.argument.computed
+        && n.argument.property && n.argument.property.type === 'Identifier') {
+      a.elementCheck.add(n.argument.property.name);
+    }
+  }
+  _perFunctie.set(fn, a);
+  return a;
+}
+
+function naamUitBuiten(fn, naam) { return analyse(fn).uitVerzoek.has(naam); }
+
+function naamUitBuiten_(fn, naam) {
   for (const n of onder(fn.body)) {
     if (n.type === 'VariableDeclarator' && n.id && n.id.name === naam && getalUitVerzoek(n.init)) return true;
     if (n.type === 'AssignmentExpression' && n.left && n.left.name === naam && getalUitVerzoek(n.right)) return true;
@@ -103,16 +185,34 @@ function naamUitBuiten(fn, naam) {
 }
 /* Staat er ergens in deze functie een grens op die naam? */
 function heeftGrens(fn, naam) {
+  const a = analyse(fn);
+  return a.metGrens.has(naam) || a.elementCheck.has(naam);
+}
+
+/* De oude, uitputtende variant. Hij wordt niet meer aangeroepen -- analyse()
+   hierboven doet hetzelfde in een doorloop -- maar hij blijft staan als de
+   nauwkeurige beschrijving van wat "een grens" betekent, en test/ast-scan.test.js
+   vergelijkt de twee zodat ze niet uiteen kunnen lopen. */
+function heeftGrens_(fn, naam) {
   for (const n of onder(fn.body)) {
     if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
         && n.callee.property && /^(isInteger|isSafeInteger|isFinite)$/.test(n.callee.property.name)
         && n.arguments.some(a => a && a.type === 'Identifier' && a.name === naam)) return true;
+    /* EEN GAT DAT HIER JAREN HEEFT GEZETEN. De eerste tak was
+         if (raakt(n.left) && raakt(n.right)) return true;
+       met een `raakt` die OOK waar is voor elke `x.length`. Bij een vergelijking
+       als `kand.regels.length > basis.regels.length` -- en die staat er echt,
+       in server/kern/agent.js -- zijn beide zijden dus "raak" zonder dat de
+       gevraagde naam er ook maar in voorkomt. Gevolg: EEN zo'n vergelijking
+       ergens in een functie zette de hele index-controle voor die functie uit.
+
+       Gevonden door de snelle variant hiernaast ertegenaan te houden
+       (test/ast-grens.test.js): die was op 23 van de 1980 gevallen STRENGER, en
+       dat bleek geen fout in de nieuwe maar een gat in de oude. De naam moet er
+       gewoon in staan. */
     if (n.type === 'BinaryExpression' && ['<', '>', '<=', '>='].includes(n.operator)) {
-      const raakt = s => s && ((s.type === 'Identifier' && s.name === naam)
-        || (s.type === 'MemberExpression' && s.property && s.property.name === 'length'));
-      if (raakt(n.left) && raakt(n.right)) return true;
-      if ((raakt(n.left) || raakt(n.right))
-          && ((n.left.type === 'Identifier' && n.left.name === naam) || (n.right.type === 'Identifier' && n.right.name === naam))) return true;
+      const isNaam = z => z && z.type === 'Identifier' && z.name === naam;
+      if (isNaam(n.left) || isNaam(n.right)) return true;
     }
   }
   /* En de derde vorm van een grens: kijken of het ELEMENT bestaat.
@@ -219,4 +319,7 @@ const REGELS = [
   }
 ];
 
-module.exports = { REGELS, VERBODEN, GEHEIM };
+/* heeftGrens_ en analyse gaan mee naar buiten zodat test/ast-grens.test.js de
+   snelle en de uitputtende variant op de ECHTE boom tegen elkaar kan houden.
+   Een optimalisatie is pas te vertrouwen als vastligt dat hij hetzelfde zegt. */
+module.exports = { REGELS, VERBODEN, GEHEIM, heeftGrens, heeftGrens_, naamUitBuiten, analyse, onder };

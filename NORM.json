@@ -8,7 +8,7 @@
     "dependencies": 0,
     "testbestanden": 527,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 112,
+    "zelfpoortendeToetsen": 114,
     "e2eBestanden": 64,
     "keuringOmvang": 78,
     "keuringDubbeling": 56,
@@ -21,6 +21,13 @@
     "keuringTeGroot": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-04",
+      "meter": "zelfpoortendeToetsen 112 -> 114",
+      "reden": "Met de hand verhoogd voor twee schermtoetsen erbij in test/werkscherm.e2e.js: de eigenaar die zonder token binnenkomt in zijn eigen werkruimte, en de handelingen op het werkscherm (een project maken, en een besluit sluiten zonder stemmen). Zelfde browserpoort als de honderdtwaalf die er al stonden.",
+      "eerlijkheidshalve": "Zelfde tegenwicht als altijd: test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml, dus deze poort kan niet stil openstaan waar het ertoe doet. Beide toetsen zijn met een mutatie nagetrokken en allebei RAAK: het scherm de weg via het ledenaccount niet laten proberen (dan blijft de eigenaar buiten staan), en de foutzin van de server vervangen door 'Er ging iets mis' (dan verdwijnt precies de uitleg waar deze hele laag het van moet hebben). De Office-tegel op het bureaublad is met een derde mutatie beproefd en ook RAAK. Wat hier NIET mee is opgelost: de meter telt toetsen die zichzelf kunnen overslaan, en dat aantal groeit met elk scherm. De schuld blijft dus staan; het tegenwicht is dat CI zonder browser hard zakt.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 111 -> 112"
+    },
     {
       "datum": "2026-08-04",
       "meter": "endpointsZonderTest 781 -> 852, dekkingPct 71 -> 69, keuringOmvang 75 -> 78, zelfpoortendeToetsen 111 -> 112",

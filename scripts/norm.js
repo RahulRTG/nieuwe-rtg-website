@@ -66,6 +66,16 @@ const METERS = [
      toe te voegen, niet door iets te laten verslechteren; de enige inhoudelijke
      van de vijf (teVaak in drie kernmodules) is opgelost. */
   { sleutel: 'keuringOmvang', richting: 'omlaag', wat: 'bestanden die vlak onder de 10 kB-grens zitten' },
+  /* DE TAND DIE ER NOOIT WAS. De omvangregel in scripts/keuring.js meldde
+     alleen bestanden VLAK ONDER de grens, en alles erboven viel stilzwijgend
+     buiten de keuring -- server/server.js van 212 kB voorop. Er was dus een
+     meter voor de bijna-overtreders en geen voor de overtreders.
+
+     Apart van keuringOmvang en niet erbij opgeteld: dan zou een bestand dat
+     over de grens gaat kunnen wegvallen tegen een bestand dat er net onder
+     duikt, en dat is precies de verrekening waar de drie losse keuringmeters
+     hierboven al een keer voor zijn gesplitst. */
+  { sleutel: 'keuringTeGroot', richting: 'omlaag', wat: 'servermodules die ECHT over de 10 kB-grens zijn' },
   { sleutel: 'keuringDubbeling', richting: 'omlaag', wat: 'functienamen die in meer dan twee kernmodules staan' },
   { sleutel: 'keuringDekkingAdvies', richting: 'omlaag', wat: 'domeinen met endpoints zonder toets' },
   { sleutel: 'dependencies', richting: 'omlaag', wat: 'externe pakketten (de nul is een principe, geen toeval)' },
@@ -298,6 +308,7 @@ function meet() {
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
     keuringStuk: k.stuk, keuringScheef: k.scheef,
+    keuringTeGroot: (k.cijfers.uitschieters || {}).teGroot || 0,
     ...telPerGroep(k),
     dependencies: deps, testbestanden, zelfpoortendeToetsen, e2eBestanden
   };

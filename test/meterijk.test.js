@@ -154,6 +154,20 @@ const IJKINGEN = {
       '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(9900) + '";\nmodule.exports = { x };\n',
       () => norm.meet().keuringOmvang - voor.keuringOmvang)
   },
+  keuringTeGroot: {
+    /* HETZELFDE BESTAND, MAAR DAN ECHT TE GROOT. En dat is niet zomaar een
+       tweede proef: tot vandaag zou deze ijking NIETS hebben gemeten, want de
+       omvangregel keek alleen naar de band 9400-10240 en liet alles erboven
+       lopen. Een bestand van twaalf kilobyte was voor de keuring onzichtbaar,
+       net als server/server.js van tweehonderdtwaalf.
+
+       De twee proeven staan bewust naast elkaar: samen laten ze zien dat de
+       grens nu aan BEIDE kanten iets zegt, en dat de ene telling niet in de
+       andere wegvalt. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(12000) + '";\nmodule.exports = { x };\n',
+      () => norm.meet().keuringTeGroot - voor.keuringTeGroot)
+  },
   dependencies: {
     /* De enige meter waarvan de bron een bestand is dat we ook echt even
        veranderen. Terugzetten gebeurt uit de tekst die we vooraf lazen, niet

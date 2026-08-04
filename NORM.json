@@ -4,7 +4,7 @@
     "endpointsZonderTest": 622,
     "dekkingPct": 75,
     "keuringStuk": 0,
-    "keuringScheef": 0,
+    "keuringScheef": 1,
     "dependencies": 0,
     "testbestanden": 509,
     "dekkingWaargenomenPct": 100,
@@ -17,7 +17,8 @@
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 7,
-    "schermenZonderToets": 3
+    "schermenZonderToets": 3,
+    "keuringTeGroot": 1
   },
   "notities": [
     {
@@ -135,6 +136,12 @@
       "meter": "zelfpoortendeToetsen 102 -> 107",
       "reden": "Met de hand verhoogd voor vijf toetsen uit dezelfde ronde: drie in test/eigensessieschermen.e2e.js (de twaalf schermen die op een ANDERE sleutel draaien dan de ledenpas -- kantoorcode, zaak-inlog, clubcode, raadcode -- plus de twee doorverwijsstubs) en twee in test/deelmenuwacht.e2e.js (de MutationObserver van shared/deelmenu.js, op een pagina waar verder niets gebeurt).",
       "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de tanden hiervoor: alle vijf staan achter de browserpoort en slaan zichzelf over zonder browser, maar test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml. Beide bestanden zijn met mutaties natrokken: bij eigensessieschermen drie (clubswerk weer laten wegsturen, de zorgbalie kantoor=1 laten vragen, het clubportaal zijn clubcode niet laten noemen), alle drie RAAK. Bij deelmenuwacht is het juist de mutatie die op 2026-08-03 AFsloeg: subtree terug op false. Die zakt nu wel, en daarmee is eerlijkheidspunt 6.2 gesloten. Kanttekening bij die tweede toets: zijn TWEEDE helft (minder dan drie delen krijgt geen menu) blijft onder diezelfde mutatie groen -- terecht, want hij toetst afwezigheid, maar als losse toets zou hij niets bewijzen. Hij staat er als tegenwicht bij de eerste, niet als bewijs op zichzelf."
+    },
+    {
+      "datum": "2026-08-04",
+      "meter": "keuringScheef 0 -> 1",
+      "reden": "Met de hand verhoogd omdat de omvangregel in scripts/keuring.js iets ZIET wat hij eerder oversloeg. Die regel meldde alleen bestanden in de band 9400-10240 bytes; alles ECHT boven de grens viel er stilzwijgend buiten. Drie bestanden stonden zo buiten de keuring: server/kern/appgids-data/deel4.js (11.636), deel5.js (11.011) en server/server.js (216.881). De eerste twee zijn in dezelfde ronde geknipt; server.js blijft over.",
+      "eerlijkheidshalve": "Dit is GEEN verslechtering van de code maar het einde van een blinde vlek: het grootste bestand van dit huis, twintig keer de grens, kwam in de eigen keuring nooit voor terwijl een module van 9,5 kB er elke ronde in stond. Een grens die de overtreders overslaat en alleen de bijna-overtreders noemt, is een aanmoediging om er net onder te blijven -- en dat verklaart ook de 67 in die band van 840 bytes. De tand hoort terug naar 0 zodra server/server.js is opgeknipt; tot die tijd staat hij hier als openstaande rekening en niet als nieuwe normaal. De nieuwe meter keuringTeGroot (grondwaarde 1) is de handgreep om dat te sturen."
     }
   ],
   "prestatie": {

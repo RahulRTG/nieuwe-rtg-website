@@ -38,7 +38,18 @@ process.env.STUN_UIT = '1';
 
 /* De app schrijft bij het opstarten van alles naar de console. Dat hoort niet
    in de uitvoer van een gereedschap dat JSON teruggeeft, dus we houden het
-   even tegen -- en we zetten het terug voordat we zelf iets zeggen. */
+   tegen.
+
+   EN WEL VOOR DE HELE RIT. Hier stond `Object.assign(console, echt)` meteen na
+   het laden, "voordat we zelf iets zeggen". Maar een deel van het opstarten is
+   ASYNCHROON: de listen-callback meldt "Live updates (SSE) actief" pas als de
+   poort openstaat, en dat is na de herstelregel. Die zin belandde dus achter de
+   JSON, en een lezer kreeg "Unexpected non-whitespace character after JSON".
+
+   Dat viel jarenlang niet op omdat process.exit(0) er direct achteraan kwam en
+   die regels afkapte -- twee fouten die elkaar toedekten. Nu zwijgt de console
+   in JSON-stand tot het eind, en gaat onze eigen uitvoer via
+   process.stdout.write eromheen. */
 const stil = () => {};
 const echt = { log: console.log, warn: console.warn, info: console.info, error: console.error };
 if (jsonUit) { console.log = stil; console.warn = stil; console.info = stil; }
@@ -51,7 +62,7 @@ try {
   console.error('kon de server niet laden: ' + (e && e.message));
   process.exit(2);
 }
-Object.assign(console, echt);
+if (!jsonUit) Object.assign(console, echt);
 
 const routes = (app && typeof app._routes === 'function' ? app._routes() : [])
   .filter(r => r.pad && r.pad !== '/');
@@ -65,11 +76,39 @@ for (const r of routes) {
 const lijst = [...perPad].sort((a, b) => a[0] < b[0] ? -1 : 1)
   .map(([pad, m]) => ({ pad, methoden: [...m].sort() }));
 
+/* AFSLUITEN MAG PAS ALS DE UITVOER DE DEUR UIT IS.
+
+   Hier stond `process.exit(0)` direct achter de write, en dat is stil kapot: naar
+   een PIJP schrijft Node asynchroon, en process.exit() gooit weg wat er nog in
+   de wachtrij staat. Naar een terminal gaat het wel goed -- daar is de write
+   synchroon -- dus met de hand zag je er nooit iets van.
+
+   Zo kwam het aan het licht: tijdens het ijken van endpointsZonderTest werden er
+   honderd routes bijgeplakt. De kaart groeide van 143 naar 146 kilobyte, en
+   scripts/keuring.js kreeg "Unexpected end of JSON input" terug. Die vangt dat
+   netjes op met "de dekking is niet gemeten" -- en dan staan endpointsZonderTest
+   en dekkingPct op NUL. Nul is voor allebei de mooiste stand die er is.
+
+   Dus: twee RATELTANDEN sloegen om in hun beste waarde omdat een pijp vol liep.
+   Dat had bij de volgende paar honderd routes vanzelf gebeurd, zonder ijking en
+   zonder dat iemand het zag. De write-callback vuurt pas als alles is
+   weggeschreven; de vangnet-timer is voor het geval de lezer niets ophaalt.
+
+   EN DE CALLBACK MOET AAN DE ECHTE WRITE HANGEN. De eerste reparatie zette er
+   een lege `write('', stoppen)` achteraan als vaandeldrager; die callback vuurt
+   meteen, want een lege brok wordt niet in de wachtrij gezet. Het cijfer bleef
+   nul. Dus gaat ALLE uitvoer nu door een enkele write, en die write draagt de
+   callback zelf. */
+function schrijfEnStop(tekst, code) {
+  const stoppen = () => process.exit(code);
+  setTimeout(stoppen, 10000).unref();
+  process.stdout.write(tekst, stoppen);
+}
+
 if (jsonUit) {
-  process.stdout.write(JSON.stringify({ aantal: lijst.length, routes: lijst }) + '\n');
+  schrijfEnStop(JSON.stringify({ aantal: lijst.length, routes: lijst }) + '\n', 0);
 } else {
   const api = lijst.filter(r => r.pad.startsWith('/api/'));
-  console.log('Routes totaal: ' + lijst.length + ', waarvan onder /api: ' + api.length);
-  for (const r of api) console.log('  ' + r.methoden.join(',').padEnd(12) + r.pad);
+  schrijfEnStop('Routes totaal: ' + lijst.length + ', waarvan onder /api: ' + api.length + '\n' +
+    api.map(r => '  ' + r.methoden.join(',').padEnd(12) + r.pad).join('\n') + '\n', 0);
 }
-process.exit(0);

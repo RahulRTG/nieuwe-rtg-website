@@ -219,6 +219,14 @@ function meet() {
   return uit;
 }
 
+/* Het CIJFER dat als meter `onbewaakt` in NORM.json staat. Aparte functie en
+   niet een optelling middenin main(), zodat test/meterijk.test.js exact hetzelfde
+   telt als wat hier op het scherm komt. Een ijking die zijn eigen optelling maakt,
+   ijkt zijn eigen optelling en niet de meter. */
+function totaalOnbewaakt(rijen) {
+  return rijen.filter(r => !r.nietTeMeten && r.onbewaakt).reduce((n, r) => n + r.onbewaakt.length, 0);
+}
+
 function main() {
   let rijen;
   try { rijen = meet(); }
@@ -227,7 +235,8 @@ function main() {
   if (jsonUit) { console.log(JSON.stringify({ rijen }, null, 2)); return 0; }
 
   console.log('\n\x1b[1mDE SAMENHANG\x1b[0m \x1b[2m-- wie bewaakt wat\x1b[0m\n');
-  let totaalOnbewaakt = 0, stuk = 0;
+  const totaal = totaalOnbewaakt(rijen);
+  let stuk = 0;
   for (const r of rijen) {
     if (r.ontbrekendeBewaker.length) {
       stuk++;
@@ -239,7 +248,6 @@ function main() {
       console.log('  \x1b[33mNIET GEMETEN\x1b[0m  ' + r.soort + '  \x1b[2m(' + r.bewaker.join(', ') + ')\x1b[0m');
       continue;
     }
-    totaalOnbewaakt += r.onbewaakt.length;
     const merk = r.onbewaakt.length ? '\x1b[33m' + String(r.onbewaakt.length).padStart(4) + ' los\x1b[0m' : '\x1b[32m   alles\x1b[0m';
     console.log('  ' + merk + '  ' + String(r.totaal).padStart(5) + '  ' + r.soort);
     console.log('             \x1b[2m' + r.wat + '  [' + r.bewaker.join(', ') + ']\x1b[0m');
@@ -250,19 +258,19 @@ function main() {
 
   const norm = JSON.parse(lees('NORM.json') || '{}');
   const plafond = norm.meters ? norm.meters[METER] : undefined;
-  console.log('\n  onbewaakt totaal: ' + totaalOnbewaakt +
+  console.log('\n  onbewaakt totaal: ' + totaal +
     (plafond === undefined ? '  \x1b[2m(nog geen norm; leg vast met --vastleggen)\x1b[0m' : '  \x1b[2m(norm: ' + plafond + ')\x1b[0m'));
 
   if (process.argv.includes('--vastleggen')) {
     norm.meters = norm.meters || {};
-    norm.meters[METER] = totaalOnbewaakt;
+    norm.meters[METER] = totaal;
     fs.writeFileSync(NORMBESTAND, JSON.stringify(norm, null, 2) + '\n');
-    console.log('  \x1b[32m' + METER + ' vastgelegd op ' + totaalOnbewaakt + '.\x1b[0m\n');
+    console.log('  \x1b[32m' + METER + ' vastgelegd op ' + totaal + '.\x1b[0m\n');
     return stuk ? 1 : 0;
   }
   if (stuk) { console.log('\n  \x1b[31mEen soort heeft geen bestaande bewaker.\x1b[0m\n'); return 1; }
-  if (plafond !== undefined && totaalOnbewaakt > plafond) {
-    console.log('\n  \x1b[31mEr is iets onbewaakts bijgekomen\x1b[0m (' + totaalOnbewaakt + ' tegen een norm van ' + plafond + ').');
+  if (plafond !== undefined && totaal > plafond) {
+    console.log('\n  \x1b[31mEr is iets onbewaakts bijgekomen\x1b[0m (' + totaal + ' tegen een norm van ' + plafond + ').');
     console.log('  \x1b[2mSchrijf er een toets voor, of verhoog de norm met de hand -- dan staat het als keuze in de historie.\x1b[0m\n');
     return 1;
   }
@@ -271,4 +279,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, tabel };
+module.exports = { meet, tabel, totaalOnbewaakt };

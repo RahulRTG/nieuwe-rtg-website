@@ -38,6 +38,58 @@ function metTijdelijkBestand(relPad, inhoud, doe) {
   try { return doe(); } finally { try { fs.unlinkSync(vol); } catch (e) {} }
 }
 
+/* De tegenhanger: iets tijdelijk AANBOUWEN aan een bestaand bestand. Sommige
+   meters lezen een bestand dat er al is (LAT.md) of een module die de server
+   echt moet ophangen, en dan helpt een nieuw bestand niet. Terugzetten gebeurt
+   uit de tekst die we vooraf lazen, precies zoals bij package.json: dan blijft
+   de opmaak byte voor byte zoals hij was. */
+function metAanbouw(relPad, extra, doe) {
+  const vol = path.join(WORTEL, relPad);
+  assert.equal(fs.existsSync(vol), true, 'de ijking bouwt alleen aan iets dat bestaat: ' + relPad);
+  const oud = fs.readFileSync(vol, 'utf8');
+  try { fs.writeFileSync(vol, oud + extra); return doe(); }
+  finally { fs.writeFileSync(vol, oud); }
+}
+
+/* WAAROM DE ROUTE-IJKING AAN klok.js HANGT EN NIET IN EEN LOSS BESTAND STAAT.
+
+   Eerst probeerde ik server/routes/zz-ijk-tijdelijk.js, want dat werkt voor
+   routesNietSchakelbaar en keuringStuk. Er bewoog niets: 622 met en 622 zonder.
+   De reden is dat server/routes/ NIET automatisch geladen wordt -- server.js
+   heeft een uitgeschreven lijst van require('./routes/...'), dus een nieuw
+   bestand hangt er wel, maar niemand roept het aan. De twee ijkingen die wel
+   werkten, werken omdat ze de BRONTEKST scannen; deze twee vragen om routes die
+   de draaiende server echt registreert (scripts/routekaart.js start hem).
+
+   Dus bouwen we aan een bestaande, altijd gemounte routemodule. De aanbouw
+   raakt de body niet: hij pakt de bestaande export in.
+
+   HONDERD ROUTES EN NIET EEN. endpointsZonderTest slaat al bij een uit, maar
+   dekkingPct is een AFGEROND percentage over ruim tweeduizend routes -- een
+   enkele erbij verdwijnt in de afronding, precies zoals bij
+   dekkingWaargenomenPct. Met honderd zakt hij zichtbaar. Dat is geen ruimere
+   proef maar dezelfde eigenschap, twee keer aangetoond.
+
+   HET PAD MAG HIER NERGENS LETTERLIJK STAAN. scripts/keuring.js noemt een route
+   gedekt zodra zijn pad ergens in de code van een testbestand voorkomt -- dit
+   bestand is er daar een van. Stond het pad hieronder voluit, dan telde de
+   keuring de ijkroutes als getest en bewoog de meter niet. Vandaar het plakwerk. */
+const IJKSTAM = '/api/' + 'zzijk' + 'proef/';
+let _routeGat = null;
+function metIjkRoutes(voor) {
+  if (_routeGat) return _routeGat;
+  let extra = '\n/* tijdelijke ijk-aanbouw */\nconst _ijkOrig = module.exports;\n' +
+    'module.exports = (kern) => {\n  _ijkOrig(kern);\n';
+  for (let i = 0; i < 100; i++) {
+    extra += "  kern.app.post('" + IJKSTAM + 'n' + i + "', (req, res) => res.json({ ok: true }));\n";
+  }
+  extra += '};\n';
+  const na = metAanbouw('server/routes/klok.js', extra, () => norm.meet());
+  _routeGat = { zonderTest: na.endpointsZonderTest - voor.endpointsZonderTest,
+    pctVal: voor.dekkingPct - na.dekkingPct };
+  return _routeGat;
+}
+
 /* Een journaal met alle routes op een na, en wat scripts/dekking.js daarvan
    maakt. Eenmaal gemeten en daarna bewaard: de routekaart starten kost een
    halve minuut en beide journaalmeters hebben aan dezelfde meting genoeg. */
@@ -169,10 +221,22 @@ const IJKINGEN = {
     }
   },
 
-  /* Hieronder: meters die je in een toets niet eerlijk kunt voeden. De reden
-     staat erbij en telt mee in `metersOngeijkt`, die alleen omlaag mag. */
-  endpointsZonderTest: { reden: 'vraagt een nieuwe route EN het uitblijven van een toets erop; dat is een repo-brede staat, geen invoer die je in een toets neerzet' },
-  dekkingPct: { reden: 'zelfde bron als endpointsZonderTest' },
+  endpointsZonderTest: {
+    /* HONDERD ROUTES DIE NERGENS IN EEN TOETS VOORKOMEN. De reden die hier
+       stond ("dat is een repo-brede staat, geen invoer die je in een toets
+       neerzet") klopte niet, en de manier waarop hij niet klopte is leerzaam:
+       een tijdelijk bestand in server/routes/ bewoog de meter inderdaad niet,
+       maar niet omdat de meter repo-breed is -- server.js laadt die map niet
+       automatisch. Zie de uitleg bij metIjkRoutes(). */
+    proef: (voor) => metIjkRoutes(voor).zonderTest
+  },
+  dekkingPct: {
+    /* Dezelfde aanbouw, en hij laat meteen zien hoe grof dit cijfer is: bij
+       2533 routes verdwijnt een handvol ongedekte endpoints in de afronding.
+       Precies de reden dat endpointsZonderTest ernaast staat als de scherpe
+       van de twee -- net als bij het paar in het routejournaal. */
+    proef: (voor) => metIjkRoutes(voor).pctVal
+  },
   keuringStuk: {
     /* Een route die een ECHTE naam meestuurt in zijn antwoord. Dat is de
        zwaarste bevinding die de keuring kent, en niet toevallig: dit huis
@@ -201,13 +265,41 @@ const IJKINGEN = {
       'module.exports = () => ({ melding: \'Uw boeking is bevestigd en staat klaar.\' });\n',
       () => norm.meet().keuringScheef - voor.keuringScheef)
   },
-  keuringDubbeling: { reden: 'vraagt dezelfde functienaam in drie kernmodules; dat is een verplaatsing van productcode, geen tijdelijk bestand' },
-  keuringDekkingAdvies: { reden: 'zelfde bron als endpointsZonderTest' },
+  keuringDubbeling: {
+    /* DRIE KERNMODULES MET DEZELFDE FUNCTIENAAM. De reden die hier stond
+       ("dat is een verplaatsing van productcode") ging uit van een verplaatsing,
+       terwijl de keuring alleen telt hoe vaak een naam voorkomt: drie tijdelijke
+       bestandjes doen precies hetzelfde. Drie en niet twee, want de keuring zegt
+       zelf dat twee keer toeval kan zijn en drie keer een patroon. */
+    proef: (voor) => {
+      const paden = ['a', 'b', 'c'].map(x => 'server/kern/zz-ijk-tijdelijk-' + x + '.js');
+      const inhoud = '/* tijdelijk ijkbestand */\n' +
+        'function zzIjkTijdelijkeNaam(x) { return x; }\n' +
+        'module.exports = { zzIjkTijdelijkeNaam };\n';
+      const ga = (i) => i === paden.length
+        ? norm.meet().keuringDubbeling - voor.keuringDubbeling
+        : metTijdelijkBestand(paden[i], inhoud, () => ga(i + 1));
+      return ga(0);
+    }
+  },
+
+  /* Hieronder: meters die je in een toets niet eerlijk kunt voeden. De reden
+     staat erbij en telt mee in `metersOngeijkt`, die alleen omlaag mag. */
+  keuringDekkingAdvies: { reden: 'zit op zijn plafond: scripts/keuring.js meldt met .slice(0, 8) hooguit acht domeinen en er zijn er acht, dus omhoog kan hij niet en omlaag alleen door echte gaten te dichten' },
   routesNietSchakelbaar: {
     /* Een route die nergens in het schakelbord staat. Dat is precies wat deze
        meter telt, en het blijkt met een tijdelijk routebestand gewoon te
        voeden -- de reden die hier stond ("die moet je echt monteren") klopte
-       niet: server/routes/ wordt automatisch geladen. */
+       niet.
+
+       WAAROM DIT WERKT EN endpointsZonderTest NIET. Hier stond eerst als
+       verklaring "server/routes/ wordt automatisch geladen", en dat is gewoon
+       onwaar: server.js heeft een uitgeschreven lijst van require-regels, dus
+       dit bestand wordt nooit aangeroepen. Deze meter en keuringStuk lezen de
+       BRONTEKST en zien het bestand daarom toch. De meters die een DRAAIENDE
+       server aflezen zien het niet, en dat kostte een halve middag omdat de
+       verklaring hier plausibel klonk. Een reden die niet klopt is net zo
+       schadelijk als een meter die niet uitslaat. */
     proef: (voor) => metTijdelijkBestand('server/routes/zz-ijk-tijdelijk.js',
       'module.exports = (kern) => {\n' +
       '  const { app } = kern;\n' +
@@ -215,7 +307,33 @@ const IJKINGEN = {
       '};\n',
       () => norm.meet().routesNietSchakelbaar - voor.routesNietSchakelbaar)
   },
-  onbewaakt: { reden: 'komt uit scripts/samenhang.js, die over soorten dingen gaat en niet over een enkel bestand' },
+  onbewaakt: {
+    /* EEN REGEL IN LAT.md ZONDER HANDHAVER. De reden die hier stond ("gaat over
+       soorten dingen en niet over een enkel bestand") klopte voor de helft van
+       de tabel: bij schermen, app-delen en API-routes is `bewaakt` een simpele
+       bestaat-de-bewaker-nog vraag, en die beweegt inderdaad voor geen enkel
+       tijdelijk bestand -- drie pogingen daartoe deden niets. Maar twee soorten
+       kijken wel degelijk per ding: de meters in NORM.json en de regels in
+       LAT.md.
+
+       Die laatste is de eerlijkste om te voeden, want hij gaat over precies dit
+       onderwerp: LAT.md eist dat elke regel zijn eigen handhaver noemt, en een
+       regel zonder die zin is een voornemen. Zet er zo een neer, en de census
+       hoort hem te zien.
+
+       En let op WELK getal er gemeten wordt: samenhang.totaalOnbewaakt() is
+       dezelfde optelling die het script op het scherm zet en in NORM.json
+       vastlegt. Een eigen sommetje hier zou zijn eigen sommetje ijken. */
+    proef: () => {
+      const samenhang = require('../scripts/samenhang.js');
+      const tel = () => samenhang.totaalOnbewaakt(samenhang.meet());
+      const voor = tel();
+      return metAanbouw('LAT.md',
+        '\n### 99. Een tijdelijke ijkregel, met opzet zonder handhaver\n\n' +
+        'Staat hier alleen tijdens test/meterijk.test.js.\n',
+        () => tel() - voor);
+    }
+  },
   endpointsNooitAangeraakt: {
     /* HET JOURNAAL MET EEN GAT ERIN. De reden die hier stond ("komt uit het
        routejournaal van een hele testronde") klopte half: het cijfer komt
@@ -263,11 +381,25 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
 
 test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
-    'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html']) {
+    'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html',
+    'server/kern/zz-ijk-tijdelijk-a.js', 'server/kern/zz-ijk-tijdelijk-b.js',
+    'server/kern/zz-ijk-tijdelijk-c.js']) {
     assert.equal(fs.existsSync(path.join(WORTEL, naam)), false, naam + ' is blijven staan');
   }
   const pkg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8'));
   assert.equal(Object.keys(pkg.dependencies || {}).length, 0, 'package.json heeft weer nul dependencies');
+
+  /* DE TWEE AANBOUWEN ZIJN GEVAARLIJKER DAN DE LOSSE BESTANDEN, want een
+     achtergebleven bestand valt op en een achtergebleven regel in een bestaand
+     bestand niet. Een ijkroute die in productie blijft hangen is een open
+     endpoint; een ijkregel in LAT.md is een regel die niemand geschreven heeft.
+     Vandaar dat ze hier apart genoemd worden en niet op bestaan maar op INHOUD
+     gecontroleerd. */
+  const klok = fs.readFileSync(path.join(WORTEL, 'server/routes/klok.js'), 'utf8');
+  assert.equal(klok.includes('_ijkOrig'), false, 'server/routes/klok.js draagt nog een ijk-aanbouw');
+  assert.equal(klok.includes(IJKSTAM), false, 'server/routes/klok.js draagt nog ijkroutes');
+  const lat = fs.readFileSync(path.join(WORTEL, 'LAT.md'), 'utf8');
+  assert.equal(/^### 99\./m.test(lat), false, 'LAT.md draagt nog de tijdelijke ijkregel');
 });
 
 test('elke meter met een norm staat in de registratie', () => {

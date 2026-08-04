@@ -272,6 +272,26 @@ function meet() {
   }
   const metersOngeijkt = telOngeijkt(fs.readFileSync(ijkPad, 'utf8'), losseSleutels);
 
+  /* EEN MISLUKTE METING IS GEEN NUL, en hier was dat de duurste vorm ervan.
+
+     scripts/keuring.js start scripts/routekaart.js om de routes te krijgen.
+     Lukt dat niet, dan meldt hij dat netjes en geeft `{ routes: 0, gedekt: 0 }`
+     terug -- zonder `ongedekt`. En dan wordt endpointsZonderTest 0 en dekkingPct
+     0. Voor de eerste is nul de allerbeste stand die er is, dus de ratel juicht;
+     voor de tweede is nul de allerslechtste, dus de ratel klaagt. Twee tanden
+     die tegengesteld reageren op DEZELFDE storing, en geen van beide zegt wat er
+     werkelijk aan de hand is.
+
+     Dat is niet theoretisch: de routekaart kapte tot vandaag zijn eigen uitvoer
+     af zodra hij door een pijp ging (zie de kop van scripts/routekaart.js), en
+     dat gebeurde vanzelf toen de kaart over de 146 kilobyte kwam. LAT.md regel 3
+     zegt wat er dan hoort te gebeuren: een meter zakt als zijn invoer ontbreekt.
+     Dus zakt hij, net als hierboven bij een ontbrekende ijkregistratie. */
+  if (!k.cijfers.dekking || !k.cijfers.dekking.routes) {
+    throw new Error('de routekaart gaf geen routes; dan zijn endpointsZonderTest en dekkingPct niet gemeten ' +
+      '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
+  }
+
   return {
     metersOngeijkt,
     routesNietSchakelbaar,

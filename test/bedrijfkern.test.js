@@ -170,8 +170,10 @@ test('het startscherm volgt de rollen en noemt wat het niet meet', async () => {
   assert.ok(!acties.includes('Verlof beoordelen'), 'en geen verlof beoordelen');
 
   const blokken = s.nietGemeten.map(x => x.blok);
-  assert.ok(blokken.includes('projecten') && blokken.includes('kpi'),
+  assert.ok(blokken.includes('kpi') && blokken.includes('goedkeuringen'),
     'blokken zonder bron staan als niet gemeten: ' + JSON.stringify(s.nietGemeten).slice(0, 200));
+  assert.ok(Object.prototype.hasOwnProperty.call(s.blokken, 'projecten'),
+    'en een blok dat WEL een bron heeft, staat er gewoon');
   assert.ok(s.nietGemeten.every(x => x.reden), 'elk met een reden erbij');
   assert.ok(!Object.prototype.hasOwnProperty.call(s.blokken, 'kpi'),
     'en een blok zonder bron is er niet als lege doos');

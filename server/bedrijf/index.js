@@ -158,8 +158,12 @@ module.exports = (kern) => {
       wacht: Object.values(w.leden).filter(l => l.status === 'wacht').length });
   });
 
-  // de deellagen; de volgorde is gedrag (rollen zet de poort die de rest gebruikt)
+  // de deellagen; de volgorde is gedrag (rollen zet de poort die de rest
+  // gebruikt, en start zet de blokkenregistratie waar de rest zich op meldt)
   Object.assign(sctx, require('./rollen')(sctx));
   require('./start')(sctx);
+  Object.assign(sctx, require('./project')(sctx));
+  Object.assign(sctx, require('./taak')(sctx));
+  Object.assign(sctx, require('./kennis')(sctx));
   return sctx;
 };

@@ -133,12 +133,28 @@
 </dialog>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur = n => '€ ' + Number(n).toFixed(2).replace('.', ',');
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
-if (!TOKEN) location.replace('/apps/personeel.html?terug=' + encodeURIComponent(location.pathname));
+/* De deur op de kassa zelf in plaats van wegsturen (TAKEN 5.5). Wie hier
+   uitgelogd komt verloor met een location.replace() waar hij heen wilde. */
+function uitgelogd(){
+  var naar = '/apps/personeel.html?terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
+     bindt daarna nog listeners aan knoppen binnen #main -- die zijn dan weg en
+     dat gaf een reeks "Cannot read properties of null". De listeners hangen nu
+     netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
+     zodra de pagina klaar is met opbouwen. */
+  setTimeout(function () {
+    var el = document.getElementById('main') || document.body;
+    RTGDeur.toon(el, { soort: 'personeel', naar: naar });
+  }, 0);
+}
+if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/supplier/' + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
   body: JSON.stringify(body || {}) })
@@ -404,7 +420,8 @@ $('#schermMaak').addEventListener('click', async () => {
   } catch (e) { $('#uitkomst').textContent = e.message; $('#dlgScherm').close(); }
 });
 $('#schermDicht').addEventListener('click', () => $('#dlgScherm').close());
-laad();
+/* Zonder kassasessie staat de deur er al; doorstarten levert alleen fouten op. */
+if (TOKEN) laad();
 </script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

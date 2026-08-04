@@ -195,12 +195,23 @@
   <button class="neon" data-terug type="button">Terug naar het menu</button>
 </div>
 
+<script src="/shared/deur.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
   let sess = null;
   try { sess = JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); } catch (e) {}
-  if (!sess || !sess.token) { location.href = '/apps/foundation/index.html'; return; }
+  /* De deur op de Arena zelf in plaats van wegsturen (TAKEN 5.5, dezelfde
+     kwaal als bij de acht kantoor-apps). Wie hier zonder gezinssessie komt
+     landde op de RTF-startpagina en zag niet meer waar hij heen wilde. */
+  if (!sess || !sess.token) {
+    var naarHuis = '/apps/foundation/index.html';
+    if (!window.RTGDeur) { location.href = naarHuis; return; }
+    setTimeout(function () {
+      RTGDeur.toon(document.getElementById('main') || document.body, { soort: 'gezin' });
+    }, 0);
+    return;
+  }
 
   /* ---------- de sterrenhemel op de achtergrond ---------- */
   const doek = $('#doek'), ctx = doek.getContext('2d');

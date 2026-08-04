@@ -822,6 +822,7 @@
 
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -837,7 +838,17 @@ function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechn
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
 function uitgelogd(){
   TOKEN = null; try { localStorage.removeItem('rtg_office_token'); } catch (e) {}
-  location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search));
+  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
+     bindt daarna nog listeners aan knoppen binnen #main -- die zijn dan weg en
+     dat gaf een reeks "Cannot read properties of null". De listeners hangen nu
+     netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
+     zodra de pagina klaar is met opbouwen. */
+  setTimeout(function () {
+    var el = document.getElementById('main') || document.body;
+    RTGDeur.toon(el, { soort: 'personeel', naar: naar });
+  }, 0);
 }
 
 /* Dezelfde een-ingang-gedachte als de andere apps: een inlog (of bewaarde

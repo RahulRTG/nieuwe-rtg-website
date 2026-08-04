@@ -86,12 +86,31 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
      zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur = n => '€ ' + Number(n).toFixed(2).replace('.', ',');
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+/* De deur op de app zelf, in plaats van wegsturen. Wie hier uitgelogd komt
+   verloor met een location.replace() waar hij heen wilde: je landde op de
+   personeels-app zonder te zien welke app je had geopend (TAKEN 5.5). De
+   gedeelde poort toont wat deze app is en waar de inlog zit, met de weg terug
+   in de link. Laadt de poort onverhoopt niet, dan doen we alsnog wat we eerst
+   deden -- een dichte app zonder uitleg is erger dan een omweg. */
+function uitgelogd(){
+  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
+     bindt daarna nog listeners aan knoppen binnen #main -- die zijn dan weg en
+     dat gaf een reeks "Cannot read properties of null". De listeners hangen nu
+     netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
+     zodra de pagina klaar is met opbouwen. */
+  setTimeout(function () {
+    var el = document.getElementById('main') || document.body;
+    RTGDeur.toon(el, { soort: 'personeel', naar: naar });
+  }, 0);
+}
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/office/payroll/' + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })

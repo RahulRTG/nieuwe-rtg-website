@@ -55,6 +55,26 @@
           });
         });
     },
+    /* De weg naar binnen zonder token overtypen: wie als RTG-lid is ingelogd,
+       vraagt zijn eigen werkruimtes op. De eigenaar krijgt de zijne daarbij
+       aangemaakt als hij er nog geen had -- dat was de ontbrekende deur. */
+    viaLid: function () {
+      var lid = null;
+      try { lid = localStorage.getItem('rtg_member_token'); } catch (e) {}
+      if (!lid || sessie) return Promise.resolve(false);
+      return fetch('/api/bedrijf/mijn', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lid },
+        body: '{}' })
+        .then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (d) {
+          var w = (d.werkruimtes || [])[0];
+          if (!w) return false;
+          window.RTGWerk.bewaar({ werkruimte: w.werkruimte, lidToken: w.lidToken });
+          window.RTGWerk._welkom = w;
+          return true;
+        })
+        .catch(function () { return false; });
+    },
     poort: function () {
       var kaart = document.getElementById('inlog');
       var inhoud = document.getElementById('inhoud');

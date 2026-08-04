@@ -175,6 +175,7 @@ module.exports = (kern) => {
   Object.assign(sctx, require('./contract')(sctx));
   Object.assign(sctx, require('./besluit')(sctx));
   require('./aansluiting')(sctx);
+  require('./mijn')(sctx);
   Object.assign(sctx, require('./beeld')(sctx));
   return sctx;
 };

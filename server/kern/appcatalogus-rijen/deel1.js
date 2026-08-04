@@ -43,6 +43,7 @@ module.exports = [
   ['podium', 'Podium', 'media', '/apps/podium.html', 'Je eigen live-kanaal (18+), met chat, RTG Pay-cadeaus en abonnementen.'],
   ['sitemaker', 'Website-maker', 'media', '/apps/sitemaker.html', 'Bouw met blokken je eigen RTG-site, met eigen foto\'s en beeld uit De Salon.'],
   ['browser', 'RTG Browser', 'media', '/apps/browser.html', 'Blader door de sites die leden in het RTG-web publiceren.'],
+  ['werk', 'RTG Werk OS', 'media', '/apps/werk.html', 'De werkplek van een hele organisatie: startscherm per rol, projecten, kennisbank, klanten, servicedesk, bouw, apparaten, contracten en besluiten. Wat niet gemeten wordt, staat er als niet gemeten en niet als nul.'],
   ['office', 'RTG Office', 'media', '/apps/office.html', 'Tekst en rekenblad met autosave, delen op codenaam en export.'],
   ['agenda', 'Agenda', 'media', '/apps/agenda.html', 'Maand, week en lijst; uitnodigen op codenaam, herinneringen, en je RTG-boekingen staan er vanzelf in.'],
   ['notities', 'Notities & Taken', 'media', '/apps/notities.html', 'Notities en lijstjes met vinkjes; delen op codenaam is samen werken, en een datum wordt vanzelf een agenda-afspraak.'],

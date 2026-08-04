@@ -9,7 +9,11 @@
    2. HET STARTSCHERM VOLGT DE ROLLEN EN LIEGT NIET: wat geen bron heeft staat
       er als NIET GEMETEN met de reden erbij, en de snelle acties komen van de
       server.
-   3. DE WEIGERINGEN VAN DE SERVER KOMEN OP HET SCHERM. Een taak die nog wacht
+   3. DE EIGENAAR KOMT BINNEN ZONDER TOKEN OVER TE TYPEN. Wie als RTG-lid is
+      ingelogd en de eigenaar IS, opent deze pagina en staat meteen in zijn
+      eigen werkruimte -- dat was de melding die dit bestand uitbreidde: "ik
+      zie geen werkplek in mijn account".
+   4. DE WEIGERINGEN VAN DE SERVER KOMEN OP HET SCHERM. Een taak die nog wacht
       gaat niet af, en het scherm zegt waarop hij wacht. Dat is de hele waarde
       van die weigering: een gebruiker die hem niet ziet, klikt gewoon door.
 
@@ -127,5 +131,56 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     if (browser) try { await browser.close(); } catch (e) {}
     if (child) try { child.kill('SIGKILL'); } catch (e) {}
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over te typen',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const TMP2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkeig-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP2 } });
+  let browser;
+  try {
+    const inlog = await fetch(base + '/api/auth/login', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran' }) })
+      .then(r => r.json());
+    assert.ok(inlog.token, 'de eigenaar kan inloggen: ' + JSON.stringify(inlog).slice(0, 120));
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const page = await ctx.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+
+    await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(t => {
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      localStorage.removeItem('rtg_werk_sessie');
+      localStorage.setItem('rtg_member_token', t);
+    }, inlog.token);
+    await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1400);
+
+    const stand = await page.evaluate(() => ({ kaart: !document.getElementById('inlog').hidden,
+      inhoud: !document.getElementById('inhoud').hidden,
+      tekst: document.body.innerText.replace(/\s+/g, ' ') }));
+    assert.equal(stand.kaart, false, 'de inlogkaart blijft dicht: er was al een weg naar binnen');
+    assert.equal(stand.inhoud, true, 'en de werkplek staat open');
+    assert.match(stand.tekst, /Rahul Travel Group/, 'in zijn eigen werkruimte');
+    assert.match(stand.tekst, /directie/, 'met de directie-rol');
+
+    // en de werkplek staat ook gewoon in de app-bibliotheek
+    const inBieb = await page.evaluate(async () => {
+      const r = await fetch('/api/gids/app', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pad: '/apps/werk.html' }) });
+      return r.status;
+    });
+    assert.equal(inBieb, 200, 'de app-gids kent de werkplek');
+
+    assert.deepEqual(fouten, [], 'geen paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) try { await browser.close(); } catch (e) {}
+    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    try { fs.rmSync(TMP2, { recursive: true, force: true }); } catch (e) {}
   }
 });

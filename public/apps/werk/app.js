@@ -40,6 +40,16 @@
   $('mZoekGa').addEventListener('click', function () { window.RTGWerkModules.laad(); });
   $('ververs').addEventListener('click', function () { toon($('vStart').hidden ? 'modules' : 'start'); });
 
+  /* Eerst kijken of er al een weg naar binnen is via het ledenaccount; pas
+     als die er niet is, komt de inlogkaart in beeld. */
   K.poort();
-  if (K.sessie()) toon('start');
+  if (K.sessie()) { toon('start'); } else {
+    K.viaLid().then(function (gelukt) {
+      K.poort();
+      if (!gelukt) return;
+      var w = K._welkom;
+      if (w) K.meld('Welkom in ' + w.naam + (w.eigenaarsRuimte ? ' (uw eigen werkruimte)' : '') + '.');
+      toon('start');
+    });
+  }
 })();

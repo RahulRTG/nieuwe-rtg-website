@@ -168,5 +168,9 @@ module.exports = (kern) => {
   Object.assign(sctx, require('./klant')(sctx));
   Object.assign(sctx, require('./service')(sctx));
   Object.assign(sctx, require('./storing')(sctx));
+  Object.assign(sctx, require('./bouw')(sctx));
+  require('./vlag')(sctx);
+  Object.assign(sctx, require('./it')(sctx));
+  require('./uitdienst')(sctx);
   return sctx;
 };

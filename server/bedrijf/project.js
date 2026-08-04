@@ -116,5 +116,9 @@ module.exports = (sctx) => {
     res.json({ ok: true, aantal: rijen.length, projecten: rijen, werkvormen: WERKVORMEN });
   });
 
-  return { WERKVORMEN, KOLOMMEN, PRIORITEITEN, voortgang, P, T, takenVan };
+  /* Onder eigen namen naar de gedeelde context. Kort exporteren als P en T
+     botste met de tickets van de servicedesk, en dan hangt het van de
+     mountvolgorde af welke van de twee je krijgt -- precies het soort
+     verborgen draad waar dit huis eerder op is gestruikeld. */
+  return { WERKVORMEN, KOLOMMEN, PRIORITEITEN, voortgang, PROJECTEN: P, TAKEN: T, takenVan };
 };

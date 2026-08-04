@@ -18,7 +18,7 @@
 'use strict';
 
 module.exports = (sctx) => {
-  const { app, save, schoon, nu, rid, dag, werkPoort, eigenVeld, KOLOMMEN, PRIORITEITEN, voortgang, P, T } = sctx;
+  const { app, save, schoon, nu, rid, dag, werkPoort, eigenVeld, KOLOMMEN, PRIORITEITEN, voortgang, PROJECTEN: P, TAKEN: T } = sctx;
 
   app.post('/api/bedrijf/taak/maak', (req, res) => {
     const g = werkPoort(req, res, 'project'); if (!g) return;

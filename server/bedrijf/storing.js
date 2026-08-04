@@ -17,7 +17,7 @@
 'use strict';
 
 module.exports = (sctx) => {
-  const { app, save, schoon, nu, rid, werkPoort, log, eigenVeld, PRIO, sla, MIN_ANTWOORDEN, T, S, minuten } = sctx;
+  const { app, save, schoon, nu, rid, werkPoort, log, eigenVeld, PRIO, sla, MIN_ANTWOORDEN, TICKETS: T, STORINGEN: S, minuten } = sctx;
 
   /* ---------- storingen ---------- */
   app.post('/api/bedrijf/storing/meld', (req, res) => {

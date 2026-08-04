@@ -172,5 +172,5 @@ module.exports = (sctx) => {
       kansen: mijn.slice(0, 8).map(k => ({ id: k.id, titel: k.titel, klant: k.klant, fase: k.fase })) };
   });
 
-  return { FASEN, PRODUCTEN, K, KA };
+  return { FASEN, PRODUCTEN, KLANTEN: K, KANSEN: KA };
 };

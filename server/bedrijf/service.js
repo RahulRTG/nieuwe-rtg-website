@@ -106,5 +106,5 @@ module.exports = (sctx) => {
       buitenNorm: mijn.filter(t => { const s = sla(t); return s.reactieOverschreden || s.oplosOverschreden; }).length };
   });
 
-  return { PRIO, sla, MIN_ANTWOORDEN, T, S, minuten };
+  return { PRIO, sla, MIN_ANTWOORDEN, TICKETS: T, STORINGEN: S, minuten };
 };

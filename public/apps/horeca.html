@@ -9,50 +9,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; --goed:#69B891; --laat:#C2703A; }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
-  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));
-    backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
-    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
-  header h1{font-size:1.15rem;}
-  header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
-  main{padding:1rem 1.1rem;max-width:920px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .5rem;}
-  .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
-    font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}
-  .knop{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
-    font:inherit;font-size:.8rem;font-weight:600;padding:.5rem .85rem;cursor:pointer;}
-  .knop.p{background:var(--burgundy);border-color:transparent;color:#fff;}
-  .knop:hover{border-color:var(--gold);}
-  .knop:focus-visible,.veld:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .tabs{display:flex;gap:.4rem;margin-bottom:.9rem;}
-  .tabs button{flex:1;}
-  .tabs button[aria-selected="true"]{border-color:var(--gold);color:#fff;}
-  .item{display:flex;gap:.6rem;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:.55rem 0;flex-wrap:wrap;}
-  .item:first-of-type{border-top:0;}
-  .tag{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;color:var(--muted);}
-  .tag.aan{color:var(--goed);border-color:var(--goed);}
-  .tag.laat{color:var(--laat);border-color:var(--laat);}
-  .bon{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;margin-bottom:.5rem;}
-  .bon b{font-size:.95rem;}
-  .bon .allergie{display:inline-block;border:1px solid var(--laat);color:var(--laat);border-radius:6px;
-    padding:.05rem .4rem;font-size:.72rem;font-weight:700;margin-left:.3rem;}
-  .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
-    opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw;}
-  .melding.zie{opacity:1;}
-  [hidden]{display:none !important;}
-  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
-</style>
+<link href="/apps/horeca/scherm.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/glyf.js" defer></script>
@@ -70,6 +27,16 @@
     <button class="knop" id="tabZaal" role="tab" aria-selected="true" type="button">Zaal</button>
     <button class="knop" id="tabKeuken" role="tab" aria-selected="false" type="button">Keuken</button>
   </div>
+
+  <nav class="rij" aria-label="De rest van het Horeca OS" style="margin-bottom:.9rem;">
+    <a class="knop" href="/apps/horeca-expeditie.html">Expeditie</a>
+    <a class="knop" href="/apps/horeca-bezorg.html">Bezorging</a>
+    <a class="knop" href="/apps/horeca-hotel.html">Hotel</a>
+    <a class="knop" href="/apps/horeca-events.html">Events</a>
+    <a class="knop" href="/apps/horeca-club.html">Club</a>
+    <a class="knop" href="/apps/horeca-haccp.html">HACCP</a>
+    <a class="knop" href="/apps/horeca-beheer.html">Beheer</a>
+  </nav>
 
   <section id="vZaal" aria-label="De zaal">
     <div class="kaart">
@@ -131,6 +98,7 @@
 </main>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/zaal.js"></script>
 <script src="/apps/horeca/keuken.js"></script>
 <script src="/apps/horeca/app.js"></script>

@@ -627,13 +627,28 @@ bedoeling (LAT-regel 4).
 Schermen: `/apps/horeca.html` is de dienst zelf -- de zaal (rekening openen,
 bestellen met de allergie in een eigen veld, een gang vrijgeven, splitsen,
 afrekenen) en de keuken (het stationsbord met looptijd naast de norm, de standen
-en het regiescherm). Die twee dragen de spits; het beheer (bezorgzones, club,
-folio, events, HACCP, fooienpot, dagbeeld) draait op de API en hoort thuis in de
-leverancier-app -- dat staat als volgend werk in `TAKEN.md`.
-`test/horecascherm.e2e.js` doet het na in een echte browser, inclusief de
-bewering die er het meest toe doet: een gang die de zaal niet heeft vrijgegeven
-staat NIET op het keukenscherm, en zodra hij er wel staat, staat de allergie
-erbij.
+en het regiescherm). Daarnaast staan er zeven werkschermen, bereikbaar vanaf die
+pagina:
+
+| Scherm | Waarvoor |
+| --- | --- |
+| `/apps/horeca-expeditie.html` | de pas: per tafel en gang wat er klaar is en hoe lang het eerste bord al koud staat, uitgeven met de hand, en de drukterem met zijn rekensom |
+| `/apps/horeca-bezorg.html` | zones, adrescheck, tijdsloten in keukenminuten, de ritvolgorde, en de rit zelf van inpakken tot afleverbewijs |
+| `/apps/horeca-hotel.html` | de gastrekening (folio), de nachtrun, de borg, en roomservice die op de kamer wordt geboekt |
+| `/apps/horeca-events.html` | offerte, akkoord met naam, aanbetaling, kosten en nacalculatie |
+| `/apps/horeca-club.html` | polsbandtegoed, minimum spend per tafel, de deurteller en de gastenlijst per promoter |
+| `/apps/horeca-haccp.html` | temperatuurlogboek met verplichte actie bij een afwijking, batches met houdbaarheid, controlelijsten |
+| `/apps/horeca-beheer.html` | de dag over alle kanalen, de fooienpot, loon tegenover omzet, gastprofielen en de signalen |
+
+De bedrading (zaak-sessie, API-aanroep, meldbalk, de deur voor wie uitgelogd
+komt) staat een keer in `public/apps/horeca/kern.js` en de vormtaal een keer in
+`public/apps/horeca/scherm.css` -- niet acht keer gekopieerd.
+`test/horecascherm.e2e.js` en `test/horecaschermen.e2e.js` doen het na in een
+echte browser, inclusief de beweringen die er het meest toe doen: een gang die
+de zaal niet heeft vrijgegeven staat NIET op het keukenscherm (en met vrijgave
+staat de allergie erbij), wat is uitgegeven verdwijnt van de pas, en roomservice
+die op de kamer wordt geboekt komt op de gastrekening van diezelfde kamer
+terecht.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 

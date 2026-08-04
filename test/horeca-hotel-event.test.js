@@ -167,3 +167,47 @@ test('een nacalculatie zonder kosten toont geen marge van honderd procent', asyn
   assert.equal(uit.gewerkteUren, 16);
   assert.equal(uit.perGast, 650);
 });
+
+test('de eventlijst toont de stand per event, en filtert op status', async () => {
+  const e = (await H('/event/offerte', { naam: 'Personeelsfeest Atlas', datum: '2026-12-19', gasten: 80,
+    posten: [{ omschrijving: 'Walking dinner', aantal: 80, prijs: 39.5 }] })).body.event;
+
+  const alles = (await H('/event/lijst', {})).body;
+  const rij = alles.events.find(x => x.id === e.id);
+  assert.ok(rij, 'het event staat in de lijst');
+  assert.equal(rij.status, 'offerte');
+  assert.equal(rij.totaalCenten, 316000, '80 x 39,50');
+  assert.equal(rij.aanbetaald, 0);
+
+  await H('/event/akkoord', { eventId: e.id, door: 'H. Atlas', kanaal: 'getekend' });
+  await H('/event/aanbetaling', { eventId: e.id, bedrag: 1000 });
+
+  const bevestigd = (await H('/event/lijst', { status: 'bevestigd' })).body;
+  const na = bevestigd.events.find(x => x.id === e.id);
+  assert.ok(na, 'na het akkoord staat hij onder bevestigd');
+  assert.equal(na.aanbetaald, 100000, 'en de aanbetaling telt mee in de lijst');
+  assert.ok(!(await H('/event/lijst', { status: 'afgerond' })).body.events.some(x => x.id === e.id),
+    'een filter dat niets hoort te vinden, vindt ook niets');
+});
+
+test('op de folio boeken kan per soort, en niet op een kamer zonder gastrekening', async () => {
+  await H('/folio/open', { kamer: '404', gastnaam: 'Mevrouw Devries', gasten: 1, nachtprijs: 120 });
+
+  const raar = await H('/folio/boek', { kamer: '404', soort: 'wasserij', omschrijving: 'Overhemden', bedrag: 0 });
+  assert.equal(raar.status, 400, 'een boeking zonder bedrag doet niets');
+
+  const leeg = await H('/folio/boek', { kamer: '900', soort: 'minibar', omschrijving: 'Water', bedrag: 3 });
+  assert.equal(leeg.status, 404, 'op een lege kamer boekt niemand iets');
+
+  const spa = (await H('/folio/boek', { kamer: '404', soort: 'spa', omschrijving: 'Massage 50 min', bedrag: 89 })).body;
+  assert.equal(spa.regel.soort, 'spa');
+  assert.equal(spa.folio.totaal, 8900);
+
+  // een onbekende soort belandt bewust op "overig" in plaats van te verdwijnen
+  const gek = (await H('/folio/boek', { kamer: '404', soort: 'helikopter', omschrijving: 'Transfer', bedrag: 250 })).body;
+  assert.equal(gek.regel.soort, 'overig');
+  assert.equal(gek.folio.totaal, 33900);
+  assert.equal(gek.folio.openstaand, 33900, 'er is nog niets betaald');
+  assert.ok(gek.soorten.includes('toeristenbelasting'), 'de soortenlijst reist mee voor het scherm');
+});
+

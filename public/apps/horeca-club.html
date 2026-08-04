@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Horeca: club</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/apps/horeca/scherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey">RTG Horeca</span><h1>Clubtegoed, tafels en de deur</h1></span>
+  <span style="flex:1;"></span>
+</header>
+<main id="main">
+  <div class="kpis">
+    <div class="kpi"><b id="dBinnen">-</b><span>binnen</span></div>
+    <div class="kpi"><b id="dVrij">-</b><span>nog vrij</span></div>
+    <div class="kpi"><b id="dVerwacht">-</b><span>verwacht van de lijst</span></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Polsband</div>
+    <div class="rij">
+      <input class="veld" id="cNummer" maxlength="40" placeholder="Bandnummer" aria-label="Bandnummer" style="flex:0 1 10rem;">
+      <input class="veld" id="cBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag" style="flex:0 1 8rem;">
+      <button class="knop p" id="cBandOp" type="button">Opwaarderen</button>
+      <button class="knop" id="cBandBetaal" type="button">Afboeken</button>
+      <button class="knop" id="cBandTerug" type="button">Restsaldo terug</button>
+    </div>
+    <p class="stil" id="cBandUit" style="margin-top:.4rem;"></p>
+    <p class="stil">Op een band staat een nummer en een saldo, geen naam. Restsaldo hoort terug naar de gast; het is geen omzet van de club.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Tafels met minimum spend</div>
+    <div id="cTafels"></div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="cTafel" maxlength="30" placeholder="Tafel" aria-label="Tafel" style="flex:0 1 8rem;">
+      <input class="veld" id="cTafelGast" maxlength="60" placeholder="Op naam van" aria-label="Naam van de gast">
+      <input class="veld" id="cTafelPersonen" type="number" min="1" max="60" value="6" aria-label="Aantal personen" style="flex:0 1 5rem;">
+      <input class="veld" id="cTafelMin" type="number" min="0" step="0.01" placeholder="Minimum" aria-label="Minimumbedrag" style="flex:0 1 8rem;">
+      <input class="veld" id="cTafelRek" maxlength="40" placeholder="Rekeningnummer" aria-label="Rekeningnummer" style="flex:0 1 10rem;">
+      <button class="knop p" id="cTafelZet" type="button">Vastleggen</button>
+      <button class="knop" id="cTafelToon" type="button">Toon</button>
+    </div>
+    <p class="stil" id="cTafelLet" style="margin-top:.4rem;"></p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">De deur</div>
+    <div class="rij">
+      <input class="veld" id="dCapaciteit" type="number" min="1" max="20000" value="300" aria-label="Capaciteit" style="flex:0 1 7rem;">
+      <input class="veld" id="dPersonen" type="number" min="1" max="50" value="1" aria-label="Aantal personen" style="flex:0 1 5rem;">
+      <label class="stil"><input type="checkbox" id="dLeeftijd" checked> Leeftijd gecontroleerd</label>
+      <button class="knop p" id="dIn" type="button">Naar binnen</button>
+      <button class="knop" id="dUit" type="button">Naar buiten</button>
+      <button class="knop" id="dTerug" type="button">Herbetreding</button>
+      <button class="knop" id="dStand" type="button">Stand</button>
+    </div>
+    <p class="stil" id="dDeurUit" style="margin-top:.4rem;"></p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Gastenlijst en promoters</div>
+    <div class="rij">
+      <input class="veld" id="dDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum" style="flex:0 1 11rem;">
+      <input class="veld" id="dPromoter" maxlength="40" placeholder="Promoter" aria-label="Promoter" style="flex:0 1 9rem;">
+      <input class="veld" id="dGastPersonen" type="number" min="1" max="20" value="1" aria-label="Personen per naam" style="flex:0 1 5rem;">
+      <input class="veld" id="dKorting" maxlength="40" placeholder="Korting" aria-label="Korting" style="flex:0 1 8rem;">
+      <button class="knop" id="dGastToon" type="button">Toon</button>
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="dNamen" maxlength="400" placeholder="Namen, komma's ertussen" aria-label="Namen voor de gastenlijst">
+      <button class="knop p" id="dGastZet" type="button">Op de lijst</button>
+    </div>
+    <div id="dLijst" style="margin-top:.6rem;"></div>
+    <div class="kop" style="margin-top:.8rem;">Per promoter</div>
+    <div id="dPromoters"></div>
+    <p class="stil" style="margin-top:.4rem;">Per promoter telt wat er is aangemeld EN wat er echt binnen is. Alleen dat eerste zegt niets.</p>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/club-band.js"></script>
+<script src="/apps/horeca/club-deur.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

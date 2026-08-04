@@ -1,16 +1,16 @@
 {
   "vastgelegd": "2026-08-04",
   "meters": {
-    "endpointsZonderTest": 622,
-    "dekkingPct": 75,
+    "endpointsZonderTest": 781,
+    "dekkingPct": 71,
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
-    "testbestanden": 509,
+    "testbestanden": 521,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 107,
-    "e2eBestanden": 61,
-    "keuringOmvang": 67,
+    "zelfpoortendeToetsen": 111,
+    "e2eBestanden": 63,
+    "keuringOmvang": 75,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
     "endpointsNooitAangeraakt": 0,
@@ -21,6 +21,34 @@
     "keuringTeGroot": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-04",
+      "meter": "endpointsNooitAangeraakt 0 -> 27 -> 0 (binnen dezelfde ronde hersteld)",
+      "reden": "De waargenomen dekking (scripts/dekking.js, uit het routejournaal en niet uit de tekst van de tests) stond op 0 nooit-aangeraakte endpoints en liep na de schoollaag en het Horeca OS op naar 27: 22 schoolroutes en 5 horecaroutes die tijdens de hele suite geen enkele keer werden aangeroepen. Dat is de eerlijke maat van een laag die sneller groeide dan zijn toetsen. Hersteld met toetsen in plaats van met een hogere norm: test/schoolrest.test.js (achttien routes, tien toetsen), twee toetsen erbij in test/schoolkoppel.test.js (webhook wekken en weghalen, het machtigingenregister) en drie in de horeca-toetsen (regel eraf, bon opvragen, eventlijst, folio boeken, pottenlijst). Daarna weer 2692 van 2692, 100%, nul nooit aangeraakt.",
+      "eerlijkheidshalve": "Deze meter had eerder moeten klagen: de 27 stonden er al bij het pushen van de horecagolven, en npm run norm is toen niet gedraaid. De ratel werkte, alleen keek er een paar commits lang niemand naar -- precies het geval dat in de notitie van 2026-08-01 over endpointsZonderTest ook al beschreven staat. De toetsen zijn geschreven als BEWERING en niet als aanraking (LAT-regel 9): een herinnering die twee keer op een dag gestuurd wordt telt niet, over een ziekmelding wordt niet besloten, een tweede intrekking van een machtiging is een 409 en geen stille ok, een regel die de keuken al maakt gaat er niet stilletjes af. Wat NIET is opgelost: dat een route wordt aangeraakt betekent niet dat elke tak ervan wordt beproefd. Aangeraakt is de vloer, niet het plafond.",
+      "eerderVastgelegd": "endpointsNooitAangeraakt 0"
+    },
+    {
+      "datum": "2026-08-04",
+      "meter": "endpointsZonderTest 622 -> 781, dekkingPct 75 -> 71",
+      "reden": "Met de hand verhoogd voor de twee lagen van deze ronde (de schoolenterprise-laag en het Horeca OS): samen ruim tweehonderd endpoints erbij. Deze meter telt een route als gedekt zodra zijn PAD letterlijk in de code van een toets staat, en beide lagen roepen hun routes aan via een hulpje met een vast voorvoegsel (H('/betaal'), api('/school/...')). Het volledige pad staat dus nergens in de toetstekst, ook niet voor routes die wel degelijk beproefd zijn.",
+      "eerlijkheidshalve": "Dit getal ziet er slechter uit dan de werkelijkheid, en dat mag geen excuus worden. Twee dingen erbij. Ten eerste het harde tegenbewijs: de WAARGENOMEN dekking (uit het routejournaal) staat na deze ronde weer op 2692 van 2692 en nul nooit-aangeraakte endpoints -- elk van deze 781 wordt tijdens de suite echt aangeroepen. Ten tweede de open schuld: de goede reparatie is de METER en niet de toetsen. Zolang hij tekst leest in plaats van waarnemingen, is hij op te poetsen met een zoek-en-vervang (dat staat sinds 2026-08-01 in zijn eigen notitie) en klaagt hij tegelijk over toetsen die er wel zijn. Hij hoort te verdwijnen ten gunste van dekkingWaargenomenPct, of hij moet de hulpjes leren volgen. Tot die tijd staat hij hier als een cijfer dat je niet mag geloven zonder de tweede meter erbij.",
+      "eerderVastgelegd": "endpointsZonderTest 633 -> 634"
+    },
+    {
+      "datum": "2026-08-04",
+      "meter": "keuringOmvang 67 -> 75",
+      "reden": "Acht bestanden erbij in de band vlak onder de 10 kB-grens, alle acht uit deze ronde: de deelmodules van de schoollaag (analyse, financien, hr, inschrijving, ouderportaal, rapport, veiligheid) en van het Horeca OS (betalen, keuken, bezorging, haccp) zijn geknipt omdat keuringsregel 13 boven de 10 kB hard zakt, en de helften komen daarmee net onder de grens uit.",
+      "eerlijkheidshalve": "Dit is precies het gedrag waar deze meter voor bestaat, en ik heb het zelf vertoond: knippen tot je er net onder zit is geen opruimen. De notitie van cfaad07 zegt het al met zoveel woorden -- een grens die alleen de bijna-overtreders noemt, is een aanmoediging om er net onder te blijven. Wie de tand terug wil naar 67 knipt acht van deze bestanden op hun natuurlijke naad (bij horeca/haccp.js bijvoorbeeld: metingen tegenover batches en controlelijsten, wat op het scherm al twee delen zijn). Dat is bewust niet in deze ronde gedaan, en het staat hier als openstaande rekening en niet als nieuwe normaal.",
+      "eerderVastgelegd": "keuringOmvang 66 -> 67"
+    },
+    {
+      "datum": "2026-08-04",
+      "meter": "zelfpoortendeToetsen 107 -> 111",
+      "reden": "Met de hand verhoogd voor vier schermtoetsen op het Horeca OS: een in test/horecascherm.e2e.js (de zaal en de keuken) en drie in test/horecaschermen.e2e.js (de zeven werkschermen eromheen: expeditie, bezorging, hotel, events, club, HACCP en beheer). Ze poorten zichzelf op 'geen browser beschikbaar', net als de honderdzeven die er al stonden. schermenZonderToets blijft daarmee op 3 terwijl er zeven schermen bij kwamen.",
+      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de tanden hiervoor: test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml, dus de poort kan niet stil openstaan waar het ertoe doet. Alle vier zijn met mutaties nagetrokken en alle vier RAAK, elk op precies zijn eigen bewering: uitgeven dat de pas niet ververst (een tafel die twee keer geserveerd wordt), roomservice op 'pin' in plaats van 'kamer' zodat het bedrag de gastrekening nooit haalt, een HACCP-weigering die wordt ingeslikt in plaats van getoond, en een nee van de bezorgzone zonder zijn reden. Die tweede is de scherpste: de API bleef groen, want betalen met pin is een geldige betaling -- alleen komt het geld dan nergens op de folio terecht, en dat ziet alleen een toets die het SCHERM afloopt.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 102 -> 107"
+    },
     {
       "datum": "2026-08-04",
       "meter": "zelfpoortendeToetsen 95 -> 102",

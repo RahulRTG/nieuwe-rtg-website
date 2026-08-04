@@ -238,3 +238,50 @@ test('peiling: vanaf vijf antwoorden een uitslag, zonder weg terug naar een gezi
   assert.equal(dash.tevredenheid.aantal, 5);
   assert.match(dash.tevredenheidUitleg, /Geen scores per medewerker/);
 });
+
+test('een stilgevallen webhook is weer te wekken, en weghalen kan maar een keer', async () => {
+  weiger = true;
+  const w = (await api('/school/webhook/zet', Object.assign({
+    url: 'http://127.0.0.1:' + ontvangerPoort + '/wek', gebeurtenissen: ['calamiteit'] }, D))).body.webhook;
+  await api('/school/webhook/proef', Object.assign({ webhookId: w.id }, D));
+  weiger = false;
+
+  const gewekt = (await api('/school/webhook/wek', Object.assign({ webhookId: w.id }, D))).body;
+  assert.equal(gewekt.webhook.status, 'aan');
+  const rij = (await api('/school/webhook/lijst', D)).body.webhooks.find(x => x.id === w.id);
+  assert.equal(rij.mislukt, 0, 'wekken zet de teller terug; anders valt hij meteen weer stil');
+  assert.equal(rij.laatsteFout, null);
+
+  const onbekend = await api('/school/webhook/wek', Object.assign({ webhookId: 'bestaat-niet' }, D));
+  assert.equal(onbekend.status, 404);
+
+  assert.equal((await api('/school/webhook/weg', Object.assign({ webhookId: w.id }, D))).status, 200);
+  assert.ok(!(await api('/school/webhook/lijst', D)).body.webhooks.some(x => x.id === w.id),
+    'hij staat niet meer in de lijst');
+  assert.equal((await api('/school/webhook/weg', Object.assign({ webhookId: w.id }, D))).status, 404,
+    'twee keer weghalen is een fout en geen stille ok');
+});
+
+test('het machtigingenregister: de lijst toont wat er getekend is, en intrekken kan maar een keer', async () => {
+  const m = (await api('/school/machtiging/zet', Object.assign({ leerlingId: leerling.id, houder: 'B. Schakel',
+    ibanEinde: '9911', max: 30, frequentie: 'per periode' }, D))).body.machtiging;
+
+  const lijst = (await api('/school/machtiging/lijst', D)).body;
+  assert.equal(lijst.geindNu, false, 'ook de lijst zegt dat er nergens geind wordt');
+  assert.ok(lijst.machtigingen.some(x => x.id === m.id));
+  const plat = JSON.stringify(lijst);
+  assert.ok(plat.indexOf('geheim') < 0 && !/NL\d\d[A-Z]{4}/.test(plat), 'geen volledige rekeningnummers in het register');
+
+  const actief = (await api('/school/machtiging/lijst', Object.assign({ actief: true }, D))).body;
+  assert.equal(actief.machtigingen.length, actief.actief, 'gefilterd op actief telt de lijst zijn eigen kop na');
+
+  const in1 = (await api('/school/machtiging/intrek', Object.assign({ machtigingId: m.id }, D))).body;
+  assert.equal(in1.machtiging.actief, false);
+  assert.ok(in1.machtiging.ingetrokkenAt);
+
+  const in2 = await api('/school/machtiging/intrek', Object.assign({ machtigingId: m.id }, D));
+  assert.equal(in2.status, 409, 'een tweede intrekking is een fout en geen stille ok');
+
+  const weg = await api('/school/machtiging/intrek', Object.assign({ machtigingId: 'bestaat-niet' }, D));
+  assert.equal(weg.status, 404);
+});

@@ -1,0 +1,41 @@
+/* App-gids data, deel10: de zeven werkschermen van het Horeca OS naast
+   /apps/horeca.html (dat in deel8 staat). Zie ../appgids.js voor de uitleg. */
+const G = (wat, doe, tip) => ({ wat, doe, tip });
+
+module.exports = {
+  '/apps/horeca-expeditie.html': G('Expeditie en keukenregie: de pas, waar een tafel compleet de deur uit gaat.',
+    ['Zie per tafel en gang hoeveel borden klaar zijn en hoe lang het eerste al koud staat',
+      'Geef zelf uit; er wordt niets automatisch afgevinkt',
+      'Lees de drukterem: openstaande bereidingsminuten gedeeld door het aantal koks'],
+    'Staat-koud is het getal dat telt: vier borden die na elkaar de deur uit gaan, zijn vier keer half warm.'),
+  '/apps/horeca-bezorg.html': G('Bezorgdispatch en de rit: zones, tijdsloten, volgorde en het afleverbewijs.',
+    ['Check een adres: het antwoord noemt de zone, de kosten en anders de reden waarom het niet kan',
+      'Vul de tijdsloten in keukenminuten; tien pizza\'s zijn geen tien diners',
+      'Loop de rit af van inpakken tot aftekenen; vertrekken kan pas als beide vinkjes staan'],
+    'Er wordt geen foto van een mens of een deur bewaard: het bewijs legt vast wat een geschil later beslecht.'),
+  '/apps/horeca-hotel.html': G('Gastrekening en roomservice: alles van het verblijf op een rekening.',
+    ['Open een gastrekening op een kamer en boek ontbijt, minibar, spa of restaurant erop',
+      'Draai de nachtrun; twee keer drukken boekt geen twee nachten',
+      'Neem roomservice op, geef hem vrij naar de keuken en boek hem op de kamer'],
+    'De toeristenbelasting staat als eigen regel en niet in de kamerprijs: een gast hoort te zien wat hij aan wie betaalt.'),
+  '/apps/horeca-events.html': G('Events: offerte, akkoord, verbruik en nacalculatie.',
+    ['Zet de posten op een offerte en leg het akkoord vast met een naam erbij',
+      'Boek de aanbetaling en later de werkelijke kosten en uren',
+      'Draai de nacalculatie: opbrengst, kosten, marge en de opbrengst per gast'],
+    'Posten wijzigen na een akkoord maakt een nieuwe versie die opnieuw bevestigd moet worden; de vorige blijft bewaard.'),
+  '/apps/horeca-club.html': G('Club: polsbandtegoed, minimum spend en de deurteller.',
+    ['Waardeer een polsband op, boek erop af en betaal het restsaldo terug',
+      'Zie per VIP-tafel wat er van de minimum spend nog te gaan is',
+      'Tel aan de deur in, uit en herbetreding, met de gastenlijst per promoter erbij'],
+    'Op een band staat een nummer en een saldo, geen naam: wie hem verliest, verliest zijn tegoed en niet zijn identiteit.'),
+  '/apps/horeca-haccp.html': G('HACCP-registratie: temperatuurlogboek, batches en controlelijsten.',
+    ['Leg meetpunten met hun grenzen vast en noteer de metingen',
+      'Zie welke batches over de datum zijn en boek ze af met een reden',
+      'Vink een controlelijst af, punt voor punt'],
+    'Wat vandaag nog niet gemeten is, staat er als gemist bij; een leeg logboek ziet er anders precies zo uit als een goed logboek.'),
+  '/apps/horeca-beheer.html': G('Beheer: de dag over alle kanalen, de fooienpot, de loonkosten en de signalen.',
+    ['Lees de omzet per kanaal en per betaalwijze, met fooi en oninbaar apart',
+      'Verdeel de fooienpot over gewerkte uren; de som van de delen is exact de pot',
+      'Zet het loon tegenover de omzet zonder fooi en bekijk de signalen'],
+    'Er staat geen omzetprognose op dit scherm: wat er staat is wat er nu open staat en wat er vandaag is binnengekomen.')
+};

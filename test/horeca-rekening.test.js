@@ -224,3 +224,43 @@ test('happy hour rekent op het moment van bestellen, niet bij het afrekenen', as
   const na = (await H('/rekening', { rekeningId: r.id })).body.rekening;
   assert.equal(na.regels[0].centen, 300, 'een bestelde prijs verandert nooit meer');
 });
+
+test('een regel eraf kan zolang de keuken er niet aan begonnen is, en een bon is op te vragen', async () => {
+  const r = await rekening('Tafel 61', [{ naam: 'Oesters', prijs: 3.5, aantal: 6, gang: 1 }, { naam: 'Brood', prijs: 4, gang: 1 }]);
+  const brood = r.regels.find(x => x.naam === 'Brood');
+
+  const raar = await H('/rekening/regel/weg', { rekeningId: r.id, regelId: 'bestaat-niet' });
+  assert.equal(raar.status, 404);
+
+  const weg = (await H('/rekening/regel/weg', { rekeningId: r.id, regelId: brood.id })).body;
+  assert.equal(weg.rekening.regels.length, 1, 'het brood staat er niet meer op');
+  assert.equal(weg.rekening.totalen.netto, 2100, 'en telt ook niet meer mee (6 x 3,50)');
+
+  // zodra de zaal de gang vrijgeeft en de keuken begint, kan het niet meer stilletjes
+  const oesters = weg.rekening.regels[0];
+  await H('/gang/vrij', { rekeningId: r.id, gang: 1 });
+  await H('/keuken/stand', { rekeningId: r.id, regelId: oesters.id, stand: 'gestart' });
+  const laat = await H('/rekening/regel/weg', { rekeningId: r.id, regelId: oesters.id });
+  assert.equal(laat.status, 409);
+  assert.match(laat.body.error, /derving/, 'wat de keuken al maakt, verdwijnt alleen met een reden');
+});
+
+test('een cadeaubon is op te vragen zonder hem te verzilveren, en een onbekende code bestaat niet', async () => {
+  const bon = (await H('/bon/maak', { soort: 'cadeaubon', bedrag: 50, naam: 'Voor Sanne' })).body.bon;
+  assert.equal(bon.saldo, 5000);
+
+  const leeg = await H('/bon/maak', { bedrag: 0 });
+  assert.equal(leeg.status, 400, 'een bon zonder bedrag is geen bon');
+
+  const gezien = (await H('/bon', { bonCode: bon.code.toLowerCase() })).body;
+  assert.equal(gezien.bon.saldo, 5000, 'de code is hoofdletterongevoelig');
+  assert.equal(gezien.bon.soort, 'cadeaubon');
+  assert.ok(!('geheim' in gezien.bon), 'opvragen verzilvert niets en geeft niets extra prijs');
+
+  const onbekend = await H('/bon', { bonCode: 'BESTAATNIET' });
+  assert.equal(onbekend.status, 404);
+
+  // opvragen verandert het saldo niet
+  const nogmaals = (await H('/bon', { bonCode: bon.code })).body;
+  assert.equal(nogmaals.bon.saldo, 5000);
+});

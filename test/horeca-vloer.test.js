@@ -195,3 +195,25 @@ test('een gastprofiel bewaart voorkeuren, geen waarde-per-gast', async () => {
   const lijst = (await H('/gasten', {})).body;
   assert.equal(lijst.metAllergie, 1);
 });
+
+test('de pottenlijst bewaart wat er is verdeeld, met de nieuwste bovenaan', async () => {
+  const eerder = '2026-01-05';
+  const r = (await H('/rekening/open', { kanaal: 'bar', tafel: 'Bar 3' })).body.rekening;
+  await H('/rekening/regel', { rekeningId: r.id, naam: 'Cocktails', prijs: 30 });
+  await H('/fooi', { rekeningId: r.id, bedrag: 4 });
+  await H('/betaal', { rekeningId: r.id, wijze: 'contant' });
+
+  // een pot van een oudere datum, uitsluitend uit contante fooi
+  const oud = (await H('/fooienpot', { datum: eerder, extra: 20,
+    deelnemers: [{ naam: 'Joost', uren: 6 }] })).body;
+  assert.equal(oud.potCenten, 2000, 'op die dag is er geen rekening gesloten; alleen de contante fooi telt');
+
+  const lijst = (await H('/fooienpot/lijst', {})).body;
+  assert.ok(lijst.potten.length >= 2, 'beide potten staan erin');
+  assert.equal(lijst.potten[0].datum >= lijst.potten[1].datum, true, 'de nieuwste staat bovenaan');
+  assert.equal(lijst.totaal, lijst.potten.reduce((t, p) => t + p.potCenten, 0), 'het totaal telt de potten na');
+  const oudeRij = lijst.potten.find(p => p.datum === eerder);
+  assert.equal(oudeRij.verdeling.length, 1);
+  assert.equal(oudeRij.verdeling[0].centen, 2000, 'een deelnemer krijgt de hele pot, tot op de cent');
+});
+

@@ -624,8 +624,16 @@ ingredienten af via het bestaande `kern/keuken.js`, met een logregel op naam van
 de rekening. Er is dus geen tweede voorraadadministratie -- en dat is precies de
 bedoeling (LAT-regel 4).
 
-Nog geen schermen: deze golf is de API-laag met zijn toetsen. De bediening, de
-keukenschermen en het managementbeeld staan als volgend werk in `TAKEN.md`.
+Schermen: `/apps/horeca.html` is de dienst zelf -- de zaal (rekening openen,
+bestellen met de allergie in een eigen veld, een gang vrijgeven, splitsen,
+afrekenen) en de keuken (het stationsbord met looptijd naast de norm, de standen
+en het regiescherm). Die twee dragen de spits; het beheer (bezorgzones, club,
+folio, events, HACCP, fooienpot, dagbeeld) draait op de API en hoort thuis in de
+leverancier-app -- dat staat als volgend werk in `TAKEN.md`.
+`test/horecascherm.e2e.js` doet het na in een echte browser, inclusief de
+bewering die er het meest toe doet: een gang die de zaal niet heeft vrijgegeven
+staat NIET op het keukenscherm, en zodra hij er wel staat, staat de allergie
+erbij.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 

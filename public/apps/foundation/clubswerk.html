@@ -55,11 +55,23 @@
 </main>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+/* De deur op de app zelf in plaats van wegsturen (TAKEN 5.5, dezelfde kwaal
+   als bij de acht kantoor-apps, de Arena, het RTF-kantoor en de Societeit --
+   dit was de laatste van die familie). */
+function uitgelogd(){
+  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  /* Op de volgende tick: de deur vervangt #main en dit script bindt daarna nog
+     listeners aan knoppen daarbinnen. */
+  setTimeout(function () {
+    RTGDeur.toon(document.getElementById('main') || document.body, { soort: 'personeel', naar: naar });
+  }, 0);
+}
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/rtfkantoor/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
@@ -122,7 +134,10 @@ $('#cMaak').addEventListener('click', async () => {
     $('#cNaam').value = ''; $('#cStad').value = ''; $('#cSport').value = ''; laad();
   } catch (e) { alert(e.message); }
 });
-laad().catch(e => { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+/* Alleen laden met een sessie. Zonder omleiding stuurde deze lus anders een
+   401 achterna en overschreef hij de deur met een foutmelding -- de tweede les
+   uit TAKEN 5.5. */
+if (TOKEN) laad().catch(e => { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
 document.body.insertAdjacentHTML('beforeend', '<datalist id="ideeen"></datalist>');
 setTimeout(() => { if (D) document.getElementById('ideeen').innerHTML = D.ideeen.map(i => '<option value="' + esc(i) + '">').join(''); }, 800);
 </script>

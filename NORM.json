@@ -8,8 +8,8 @@
     "dependencies": 0,
     "testbestanden": 507,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 90,
-    "e2eBestanden": 55,
+    "zelfpoortendeToetsen": 95,
+    "e2eBestanden": 57,
     "keuringOmvang": 67,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
@@ -17,9 +17,16 @@
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 11,
-    "schermenZonderToets": 71
+    "schermenZonderToets": 48
   },
   "notities": [
+    {
+      "datum": "2026-08-04",
+      "meter": "zelfpoortendeToetsen 90 -> 95",
+      "reden": "Vijf schermtoetsen erbij: test/overheidschermen.e2e.js (twee) en test/reisschermen.e2e.js (drie). Zelfde poort als de negenenvijftig die er al stonden: zonder browser valt er niets te bekijken. schermenZonderToets ging in dezelfde ronde van 71 naar 48.",
+      "eerlijkheidshalve": "Alle vijf met een mutatie beproefd. De scherpste twee raken dingen die van buiten onzichtbaar misgaan: een dossierregel met een BSN op het rechtbankscherm zonder ambtenarensessie (gevangen), en een echt hotelmerk als partner op de boekingspagina (gevangen). Een derde mutatie sloeg eerst AF en dat was leerzaam: ik haalde de zin over het geverifieerde paspoort op EEN plek weg, maar hij staat er drie keer, dus de toets bleef terecht groen. Pas toen de hele leeftijdspoort verdween zakte hij. De toets was niet fout; mijn mutatie was te klein.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 84 -> 90"
+    },
     {
       "datum": "2026-08-03",
       "meter": "zelfpoortendeToetsen 84 -> 90",

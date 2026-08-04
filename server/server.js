@@ -3200,95 +3200,13 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
 });
 
-/* ---------- dagelijkse back-up van de data ---------- */
-
-const BACKUP_DIR = path.join(DATA_DIR, 'backups');
-/* WAT ER IN EEN BACKUP HOORT -- OP EEN PLEK.
-
-   Deze opsomming stond twee keer letterlijk in backupData (een keer voor de
-   lokale kopie, een keer voor RTG_BACKUP_DIR), en er ontbraken drie dingen die
-   er alle drie in horen:
-
-   - grootboek.db: het transactiegrootboek (db/tx/sqliteachter.js) is een EIGEN
-     sqlite-bestand, niet store.db. In de standaardopslag liggen daar de
-     bestellingen en boekingen in. Die stonden dus in geen enkele backup.
-   - archief/: alles wat buiten het RAM-venster is geveegd (archief.js). Juist
-     de oudste gegevens -- de enige die je niet meer uit het geheugen kunt
-     halen -- werden niet bewaard.
-   - papieren.json: het datalek-belschema en de AVG-antwoorden. Dat bestand
-     staat bewust buiten de database EN in .gitignore, dus een backup was de
-     enige plek waar het kon overleven. Sinds de eigenaar het in de boardroom
-     invult, is dat geen theorie meer.
-
-   Twee lijsten van hetzelfde lopen uiteen zodra iemand er een aanraakt; dat is
-   precies hoe grootboek.db erbuiten kon vallen. Vandaar een. */
-const BACKUP_BESTANDEN = ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal',
-  'grootboek.db', 'grootboek.db-wal', 'papieren.json'];
-const BACKUP_MAPPEN = ['archief'];
-
-/* Een map kopieren, plat en zonder verrassingen: alleen gewone bestanden, een
-   niveau diep per submap. Het archief is een map met maandbestanden, geen boom
-   van symlinks, dus dit is genoeg -- en het weigert netjes wat het niet kent
-   in plaats van er iets van te maken. */
-function kopieerMap(van, naar) {
-  let namen;
-  try { namen = fs.readdirSync(van, { withFileTypes: true }); } catch (e) { return; }
-  try { fs.mkdirSync(naar, { recursive: true, mode: 0o700 }); } catch (e) {}
-  for (const d of namen) {
-    const bron = path.join(van, d.name), doel = path.join(naar, d.name);
-    try {
-      if (d.isDirectory()) kopieerMap(bron, doel);
-      else if (d.isFile()) { fs.copyFileSync(bron, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
-    } catch (e) { /* een enkel bestand mag de rest van de backup niet ophouden */ }
-  }
-}
-
-function backupData() {
-  if (!db.writable) return; // standby-servers maken geen backups, dat doet de actieve
-  try {
-    /* EERST de WAL leegdrukken, dan pas kopieren.
-
-       SQLite draait hier in WAL-modus: verse gegevens staan NIET in rtg.db of
-       store.db maar in het bijbehorende -wal-bestand, tot een checkpoint ze
-       overhevelt. Zonder deze twee regels kopieerde de backup dus bestanden
-       zonder de recentste data -- en op een verse installatie letterlijk twee
-       lege bestanden van 4 KB, terwijl alles in een WAL van megabytes stond.
-       De backup zag er elke nacht keurig uit en was leeg. Gevonden met
-       test/herstelproef.test.js, die de hele ronde echt doorloopt. */
-    try { accounts.checkpoint(); } catch (e) {}
-    try { checkpointSqlite(); } catch (e) {}
-    // en het transactiegrootboek, dat een EIGEN sqlite-bestand met eigen WAL is
-    try { checkpointGrootboek(); } catch (e) {}
-
-    const day = new Date().toISOString().slice(0, 10);
-    const dir = path.join(BACKUP_DIR, day);
-    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-    try { fs.chmodSync(dir, 0o700); } catch (e) {}
-    /* De -wal-bestanden gaan mee als vangnet: lukt het checkpointen niet omdat
-       een ander proces nog leest, dan is de kopie samen met zijn WAL alsnog
-       compleet. SQLite leest een database met bijbehorende -wal gewoon uit. */
-    for (const f of BACKUP_BESTANDEN) {
-      const from = path.join(DATA_DIR, f);
-      if (fs.existsSync(from)) { const doel = path.join(dir, f); fs.copyFileSync(from, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
-    }
-    for (const m of BACKUP_MAPPEN) kopieerMap(path.join(DATA_DIR, m), path.join(dir, m));
-    // hooguit 14 dagen bewaren
-    const days = fs.readdirSync(BACKUP_DIR).sort();
-    for (const d of days.slice(0, Math.max(0, days.length - 14)))
-      fs.rmSync(path.join(BACKUP_DIR, d), { recursive: true, force: true });
-    // extra kopie naar een tweede schijf/mount (RTG_BACKUP_DIR), zodat een
-    // backup ook een crash van de app-schijf overleeft.
-    if (process.env.RTG_BACKUP_DIR) {
-      const off = path.join(process.env.RTG_BACKUP_DIR, day);
-      fs.mkdirSync(off, { recursive: true });
-      for (const f of BACKUP_BESTANDEN) {
-        const from = path.join(DATA_DIR, f);
-        if (fs.existsSync(from)) fs.copyFileSync(from, path.join(off, f));
-      }
-      for (const m of BACKUP_MAPPEN) kopieerMap(path.join(DATA_DIR, m), path.join(off, m));
-    }
-  } catch (e) { console.warn('[backup] mislukt:', e.message); }
-}
+/* De dagelijkse back-up staat in ./opzet/backup.js: wat erin hoort, hoe lang
+   hij bewaard blijft en de kopie naar RTG_BACKUP_DIR. Hier alleen nog de
+   aansluiting -- de aanroepen staan onder "start" hieronder, en de
+   cluster-route roept hem aan na een overname. */
+const { backupData } = require('./opzet/backup')({
+  fs, path, DATA_DIR, db, accounts, checkpointSqlite, checkpointGrootboek
+});
 
 /* ---------- start ---------- */
 
@@ -3358,34 +3276,10 @@ setInterval(() => {
 }, 5 * 60 * 1000).unref();
 backupData();
 setInterval(backupData, 24 * 60 * 60 * 1000);
-/* De bewaarveger: de wisregels die de eigenaar in het papierwerkregister
-   heeft gekozen (locatiesporen 7 dagen, ID-bewijs 1 jaar na goedkeuring,
-   afgewezen bewijs als vangnet). Draait elk uur en een keer bij de start. */
-const bewaarveger = require('./bewaarveger').maakBewaarveger({
-  db, save, accounts, log,
-  identiteitsmap: require('./identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR),
-  /* TOT WANNEER IS DIT LIDMAATSCHAP BETAALD? Elke maandtermijn draagt zijn
-     eigen vervaldatum (het begin van de maand die hij dekt), dus de dekking
-     loopt tot de laatste VOLDANE termijn plus een maand. Verlengen betekent
-     nieuwe voldane termijnen en schuift dat einde dus vanzelf op. 0 = er is
-     nooit een termijn voldaan (de gratis app); de veger valt dan terug op de
-     jaartermijn na de goedkeuring. */
-  lidmaatschapTot: (uId) => {
-    let laatst = 0;
-    const vanLid = new Set((db.data.aanmeldingen || []).filter(a => a.accountId === uId).map(a => a.id));
-    for (const r of (db.data.lidmaatschapBetalingen || [])) {
-      if (!vanLid.has(r.aanmeldingId)) continue;
-      for (const t of (r.termijnen || []))
-        if (t.status === 'voldaan') laatst = Math.max(laatst, Date.parse(t.vervalt) || 0);
-    }
-    if (!laatst) return 0;
-    const d = new Date(laatst);
-    d.setMonth(d.getMonth() + 1);
-    return d.getTime();
-  }
-});
-try { bewaarveger.veeg(); } catch (e) { log.warn && log.warn('[bewaarveger] eerste ronde: ' + e.message); }
-bewaarveger.start();
+/* De bewaarveger en de regel eronder (tot wanneer iemand lid is) staan in
+   ./opzet/bewaarveger.js. Die regel gaat over iemands gegevens en hoorde niet
+   middenin een opstartblok te staan. */
+require('./opzet/bewaarveger')({ db, save, accounts, log, UPLOAD_DIR });
 
 // Eerlijke opstartcontrole: waarschuw als demo-instellingen mee naar productie gaan.
 if (PRODUCTION) {

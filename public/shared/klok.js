@@ -49,6 +49,15 @@
     // schaduw hoort de achtergrond te verdiepen, niet te vervangen: dus de
     // halo weg, de dekking terug naar wat een echt horloge op een tafel doet.
     // Het zit op een pseudo-element (één keer berekend), niet op een filter.
+    //
+    // LET OP, en dit was de echte oorzaak van het ei: border-radius:50% maakt
+    // hier alleen een CIRKEL zolang het vak van .rtg-ring vierkant is. Wordt
+    // dat vak uitgerekt, dan wordt deze schaduw een ellips die ver boven en
+    // onder de wijzerplaat uitloopt -- en de wijzerplaat verraadt dat niet,
+    // want de SVG houdt zijn eigen verhouding en blijft rond. Wie de klok
+    // ergens een maat geeft: houd breedte en hoogte gelijk (zie de twee
+    // gelijke bovengrenzen bij .os-klokvak in apps/app.html, en de toets
+    // "het vak van de klok op het beginscherm is vierkant").
     '.rtg-ring::before{content:"";position:absolute;inset:1.5%;border-radius:50%;pointer-events:none;' +
       'box-shadow:0.18rem 0.22rem 0.7rem rgba(0,0,0,0.34), 0.7rem 0.85rem 2.2rem rgba(0,0,0,0.22);}' +
     '.rtg-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}' +

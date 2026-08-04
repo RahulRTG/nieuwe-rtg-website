@@ -1169,8 +1169,20 @@
     width:auto;height:100%;aspect-ratio:1;
     /* zo groot als de overgebleven ruimte toelaat, maar nooit breder dan de
        kolom: op een telefoon vult hij het midden, op de tablet blijft hij een
-       horloge en wordt hij geen schotel */
-    max-width:min(100%, calc(var(--e) * 19));max-height:100%;
+       horloge en wordt hij geen schotel.
+
+       De twee grenzen moeten DEZELFDE zijn, en dat is geen schoonheidsfoutje.
+       Met height:100% en aspect-ratio:1 rekent de browser de breedte uit de
+       hoogte; knijpt max-width die breedte daarna af, dan blijft de hoogte
+       gewoon staan en is het vak niet langer vierkant (gemeten op een telefoon:
+       228 breed, 384 hoog). De wijzerplaat zelf blijft rond, want de SVG houdt
+       zijn verhouding -- maar de schaduw in .rtg-ring::before krijgt
+       border-radius:50% op dat uitgerekte vak en werd zo een ellips van 384
+       hoog: het donkere ei rond de klok, dat niemand aan de schaduwkleur kon
+       wijten. Dezelfde bovengrens op de hoogte houdt het vak vierkant, en de
+       schaduw dus rond om de kast. */
+    max-width:min(100%, calc(var(--e) * 19));
+    max-height:min(100%, calc(var(--e) * 19));
   }
 
   /* 3. de functies, onder de klok */

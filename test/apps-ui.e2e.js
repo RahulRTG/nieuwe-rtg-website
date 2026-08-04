@@ -375,3 +375,53 @@ test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
     }
   });
 });
+
+/* De klok op het beginscherm is rond, en zijn vak hoort dat ook te zijn.
+
+   Waarom dit een toets verdient. De schaduw van de klok zit op een
+   pseudo-element met border-radius:50% over het VAK van .rtg-ring. Zolang dat
+   vak vierkant is, is die schaduw een cirkel om de kast. Werd het vak
+   uitgerekt, dan werd de schaduw een ellips die ver boven en onder de
+   wijzerplaat uitliep: het donkere ei dat maandenlang voor een verkeerd
+   gekozen schaduwkleur werd aangezien, terwijl de kleur er niets mee te maken
+   had. De wijzerplaat zelf verraadt het niet, want de SVG houdt zijn
+   verhouding en blijft netjes rond.
+
+   Zo raakte het vak uitgerekt: height:100% met aspect-ratio:1 rekent de
+   breedte uit de hoogte, en als max-width die breedte daarna afknijpt, laat de
+   browser de hoogte staan. Beide bovengrenzen moeten dus gelijk zijn. Deze
+   toets meet het vak, niet de CSS-regel: hij zakt bij elke manier waarop het
+   vak alsnog scheef wordt getrokken. */
+test('Leden-app: het vak van de klok op het beginscherm is vierkant, dus de schaduw is rond',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const reg = await api(base, '/api/auth/register', { name: 'Klok Lid', email: 'klokvak@x.nl', phone: '0612345702',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    assert.ok(reg.token, 'lid-registratie geeft een token');
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    // een smalle, hoge telefoon: juist daar knijpt max-width de breedte af
+    const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
+    await ctx.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); }, reg.token);
+    const page = await ctx.newPage();
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+
+    await page.waitForSelector('.os-home-klok.rtg-ring svg', { timeout: 15000 });
+    const vak = await page.evaluate(() => {
+      const k = document.querySelector('.os-home-klok.rtg-ring');
+      const b = k.getBoundingClientRect();
+      return { breed: Math.round(b.width), hoog: Math.round(b.height) };
+    });
+    assert.ok(vak.breed > 0 && vak.hoog > 0, 'de klok staat op het scherm');
+    // een pixel speling voor afronding; het ei was 228 tegen 384
+    assert.ok(Math.abs(vak.breed - vak.hoog) <= 1,
+      'het vak van de klok is vierkant (gemeten ' + vak.breed + ' bij ' + vak.hoog + '), anders wordt de schaduw een ellips');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

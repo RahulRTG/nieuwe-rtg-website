@@ -71,6 +71,19 @@ module.exports = (kern) => {
       valuta: schoon(req.body.valuta, 3) || 'EUR', koers: req.body.koers ? Number(req.body.koers) : null,
       bon: bonUit ? bonUit.bon : null, kamer: wijze === 'kamer' ? (r.kamer || schoon(req.body.kamer, 20)) : null };
     if (wijze === 'kamer' && !betaling.kamer) return res.status(400).json({ error: 'Op welke kamer moet dit geboekt worden?' });
+    /* Op de kamer boeken kan alleen als daar een open gastrekening staat. Zo
+       verdwijnt een rekening nooit in een kamer die leegstaat -- dat merkt
+       niemand tot de dagafsluiting. De folio-laag wordt na deze module gemount,
+       dus de verwijzing loopt via de kern (late binding). */
+    if (wijze === 'kamer') {
+      if (!kern.horecaFolioBoek) return res.status(409).json({ error: 'De hotellaag staat niet aan; op de kamer boeken kan hier niet.' });
+      const opFolio = kern.horecaFolioBoek(req.supplier.code, betaling.kamer, {
+        soort: r.kanaal === 'roomservice' ? 'roomservice' : 'restaurant',
+        omschrijving: (r.tafel || r.kanaal) + ' · rekening ' + r.id, centen: bedrag,
+        door: req.actor.name, bron: r.id });
+      if (opFolio.error) return res.status(opFolio.status || 400).json({ error: opFolio.error });
+      betaling.folioRegel = opFolio.regel.id;
+    }
     r.betalingen.push(betaling);
     const rest = openstaand(r);
     if (rest <= 0) { r.status = 'betaald'; r.geslotenAt = nu(); }

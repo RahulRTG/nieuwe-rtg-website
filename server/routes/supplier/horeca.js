@@ -27,4 +27,6 @@ module.exports = (kern) => {
   require('./horeca/bezorging')(ctx);  // bezorgzones en tijdsloten
   require('./horeca/bezorgrit')(ctx);  // gecombineerde route en afleverbewijs
   require('./horeca/club')(ctx);       // polsbandtegoed, minimum spend, gastenlijst, de deur
+  require('./horeca/folio')(ctx);      // de gastrekening van het hotel: nachtrun, borg, afrekenen
+  require('./horeca/event')(ctx);      // offerte, akkoord, aanbetaling, nacalculatie
 };

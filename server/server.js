@@ -770,274 +770,33 @@ function logInlog(kanaal, ok, wie, req) {
   save();
 }
 
-/* ---------- live updates (SSE) + notificaties + web-push ----------
-   Elk open scherm (website-portaal of app) houdt een SSE-verbinding open.
-   Bij elke wijziging sturen we:
-   - 'sync'   → betrokken schermen herladen hun data zonder page-refresh
-   - 'notify' → een notificatie voor de eigenaar van een post/betaling,
-     ook als web-push wanneer het scherm dicht is. */
-
-// Onze eigen web-push (server/webpush.js): VAPID + RFC 8291-payloadversleuteling
-// op Node's crypto, i.p.v. het pakket `web-push`. Zelfde API, geen dependency.
-let webpush = null;
-try { webpush = require('./webpush'); } catch (e) { /* zonder push: alleen SSE */ }
-
-// welke persona hoort bij een auteursnaam (voor gerichte notificaties)
-const AUTHOR_TIER = {
-  'Katja Kiss': 'rtg',
-  'Fleur Johanna': 'lifestyle',
-  'Rahul Imran': 'business'
-};
-
-/* Realtime-bus: zonder REDIS_URL in-proces (huidig gedrag), met REDIS_URL via
-   Redis pub/sub zodat live-events ook gebruikers op een ander domeinproces
-   bereiken. Elke sseTo*-functie publiceert; elk proces levert de events af aan
-   zijn eigen open verbindingen. */
-const bus = require('./bus').maakBus();
-
-/* De realtime-afleverlaag (open verbindingen + terugspeelbuffer + id-teller)
-   zit in een maak…(state)-fabriek; de fabriek abonneert leverSse zelf op de bus
-   en geeft dezelfde clients-array/buffer-Map terug, zodat de routes en het
-   onderhoudslus er ongewijzigd op werken. */
-const { maakSse } = require('./kern/sse');
-const { sseClients, sseBuffer, nextSseId, bufferEvent, speelOpnieuw, leverSse, sseSend, ruimBuffer, SSE_BUFFER_TTL } =
-  maakSse({ bus });
-
-// Geo-rekenhulp zit in een eigen, zuivere module (server/lib/geo.js).
-const geo = require('./lib/geo');
-const toRad = geo.toRad;
-const haversine = geo.haversine;
-const etaMinutes = geo.etaMinutes;
-
-/* De live-/geo-laag (sseToCustomer, liveCodename, connectedSupplierCodes,
-   pushLive, liveStateFor, guestsFor) staat in server/kern/live.js. Vroeg
-   opgezet omdat de sociale kern hieronder al sseToCustomer nodig heeft. De
-   functies dragen db, de bus, de SSE-routers, geo-helpers en i18n;
-   sseToSupplier, sseToOffice en findSupplier zijn hoisted functies. */
-const { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveStateFor, guestsFor } =
-  maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n, ordersVanKlant });
-/* De ledengids (sleutel -> codenaam + pas) staat in server/kern/gids.js:
-   dirTouch, ledental, opzoeken en zoeken op codenaam, met of zonder Postgres. */
-const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam, gidsWeg } =
-  require('./kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal });
-// Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
-// vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
-onExternalChange(() => {
-  ledenAantalVerversen(); // externe wijziging: ledental opnieuw bepalen
-  if (!db.data || !db.data.sessions) return;
-  for (const [t, s] of Object.entries(db.data.sessions)) sessions.set(t, s);
+/* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
+   die daarop leunen (archief, beveiliging, de Wacht, RTmail, naamlaag, antivirus)
+   plus de poortwachters resolveSession en auth -- staat in ./opzet/diensten.js.
+   De in- en uitgangslijsten zijn uitgerekend met scripts/blokscan.js, niet met
+   de hand bijgehouden. */
+const {
+  AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
+  beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
+  ensureSupplierDefaults, etaMinutes, gidsHaal, gidsWeg, gidsZoekCodenaam, guestsFor, 
+  haversine, initRealtime, keyVanCodenaam, ledenAantal, leverSse, liveCodename, liveStateFor, 
+  naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam, 
+  ruimBuffer, salonItemsVan, salonProfielCompleet, salonZichtbaar, sendPush, sendPushToUser, 
+  speelOpnieuw, sseBuffer, sseClients, sseSend, sseToCustomer, toRad, webpush, werkmail
+  , scanNet: scanNetGebouwd, wacht: wachtGebouwd
+} = require('./opzet/diensten')({
+  DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n, 
+  ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsWeg, ledenGidsZet, 
+  ledenGidsZoek, ledenPrijs, maakLive, mail, onExternalChange, 
+  ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, sseToOffice, sseToSupplier, 
+  tokenHash,
+  // pas verderop in dit bestand gebouwd; zie de uitleg in diensten.js
+  lidBoardUitVan: () => lidBoardUit, lidPadFunctieVan: () => lidPadFunctie
 });
-
-/* Alles wat elk partnerbedrijf standaard nodig heeft; wordt gebruikt voor
-   bestaande bedrijven (migratie bij opstarten) en voor nieuwe partners die
-   via de onboarding worden goedgekeurd. */
-/* Ledenprijsgarantie (partnervoorwaarden): een lid betaalt bij een partner nooit
-   meer dan de eigen publieke prijs van die partner. De publieke prijs is de
-   referentie (het plafond); de ledenprijs wordt daar altijd op afgekapt. Dit
-   wordt op drie plekken afgedwongen: bij het normaliseren van een menukaart,
-   bij het opslaan ervan, en nog eens bij het plaatsen van een bestelling. */
-
-const ensureSupplierDefaults = require('./kern/supplierdefaults')({ db, ledenPrijs });
-
-/* ---- De Salon is verplicht: elke partner doet zijn marketing, producten en
-   folders via De Salon (niet in de leden-app). Een partner met een onvolledig
-   Salon-profiel wordt NIET aan leden getoond en kan niets publiceren. Compleet =
-   een bio en minstens een profielfoto (of een foto op de bedrijfspagina). */
-function salonProfielCompleet(s) {
-  const bio = ((s.salon && s.salon.bio) || '').trim();
-  const heeftFoto = !!(s.salon && s.salon.foto) || (Array.isArray(s.photos) && s.photos.length > 0);
-  return bio.length >= 15 && heeftFoto;
-}
-// De ondernemer-poort: de klaar-checklist en de online-schakelaar per zaak. Een
-// zaak is pas zichtbaar/boekbaar voor leden als de Salon-pagina compleet is EN
-// de zaak online staat (bestaande zaken zijn online tenzij expliciet uitgezet).
-const ondernemerpoort = require('./kern/ondernemerpoort')({ salonProfielCompleet });
-function salonZichtbaar(s) { return salonProfielCompleet(s) && s.online !== false; }
-// hoeveel Salon-items (posts/folders/deals/polls) deze partner al plaatste
-function salonItemsVan(code) { return db.data.posts.filter(p => p.partnerCode === code).length; }
-
-function initRealtime() {
-  require('./kern/initdata')({ db, save, crypto, sessions, tokenHash, ensureSupplierDefaults, webpush, DEMO, PERSONAS, GIDS_SEED_TIERS });
-}
-
-// stuur een sync-signaal naar één of meer tiers (open schermen herladen data)
-function broadcastSync(tiers, scope) {
-  bus.publish('sse', { doel: 'tier', match: [...tiers], event: 'sync', data: { scope } });
-}
-
-// notificeer één tier: opslaan, naar open schermen sturen én web-push
-function notify(tier, note) {
-  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
-  // meldingsvoorkeuren (kern/ervaring.js): een uitgezette scope wordt niet
-  // opgeslagen en niet gepusht; zonder voorkeur staat alles aan
-  const vk = (db.data.meldingVoorkeur || {})[tier];
-  if (n.scope && vk && vk[n.scope] === false) return n;
-  db.data.notifications[tier] = (db.data.notifications[tier] || []);
-  db.data.notifications[tier].unshift(n);
-  db.data.notifications[tier] = db.data.notifications[tier].slice(0, 40);
-  save();
-  bus.publish('sse', { doel: 'tier', match: [tier], event: 'notify', data: n });
-  sendPush(tier, n);
-  return n;
-}
-
-// push naar één specifiek account (voor persoonlijke meldingen, bijv. van de RTFoundation)
-function sendPushToUser(userId, note) {
-  if (!webpush || userId == null) return;
-  const subs = (db.data.pushSubsUser[userId] || []).slice();
-  if (!subs.length) return;
-  const payload = JSON.stringify({ title: note.title, body: note.body, icon: '/icon.svg', tag: note.tag });
-  for (const sub of subs) {
-    webpush.sendNotification(sub, payload).catch(err => {
-      if (err && (err.statusCode === 404 || err.statusCode === 410)) {
-        db.data.pushSubsUser[userId] = (db.data.pushSubsUser[userId] || []).filter(s => s.endpoint !== sub.endpoint);
-        save();
-      }
-    });
-  }
-}
-
-function sendPush(tier, note) {
-  if (!webpush) return;
-  const subs = db.data.pushSubs[tier] || [];
-  const payload = JSON.stringify({ title: note.title, body: note.body, icon: '/icon.svg', tag: note.id });
-  for (const sub of subs.slice()) {
-    webpush.sendNotification(sub, payload).catch(err => {
-      // verlopen/ongeldige subscription opruimen
-      if (err && (err.statusCode === 404 || err.statusCode === 410)) {
-        db.data.pushSubs[tier] = (db.data.pushSubs[tier] || []).filter(s => s.endpoint !== sub.endpoint);
-        save();
-      }
-    });
-  }
-}
-
-/* Beveiligingsmeldingen (inbraakdetectie) voor het technische bord. Een kritieke
-   melding gaat meteen naar de eigenaar: web-push op zijn telefoon en een e-mail. */
-function eigenaarAccount() {
-  // Hetzelfde adres als de boardroom- en kantoorpoort gebruiken (kern/eigenaar.js).
-  // Stond hier eerder een eigen voorbeeldadres, waardoor de meldingen bij een
-  // ander account uitkwamen dan de poort als eigenaar herkende.
-  try { return accounts.findByLogin(eigenaar.eigenaarEmail()); } catch (e) { return null; }
-}
-/* De archiefkast: houdt de levende kast klein door afgeronde tickets ouder
-   dan een afgesloten kwartaal naar append-only maandbestanden te verhuizen. */
-const archief = require('./archief')({ db, save, DATA_DIR });
-
-const beveilig = require('./beveiliging')({
-  db, save,
-  notifyOwner: (note) => {
-    const o = eigenaarAccount();
-    if (!o) return;
-    try { sendPushToUser(o.id, { title: note.title, body: note.body, tag: 'beveiliging' }); } catch (e) {}
-    try { mail.send(accounts.emailOf(o), note.title,
-      'Beste ' + accounts.realNameOf(o) + ',\n\n' + note.body +
-      '\n\nOpen de technische pagina (Beveiliging) om te zien wat er speelt.\n\nRahul Travel Group'); } catch (e) {}
-  }
-});
-
-/* De Wacht (kern/wacht.js): het immuunsysteem + de raadkamer. Leest zijn meters
-   uit het schild (verzoeken, bans, actieve IP's, aanvalstreffers) en uit de
-   beveiligingsmeldingen; de quarantaine wordt door het schild afgedwongen. Elke
-   ~10 s een momentopname voor de grafiek. `wacht` is hierboven al gedeclareerd
-   (het schild raadpleegt hem voor de quarantaine). */
-wacht = require('./kern/wacht')({ db, save, beveilig, lees: schild.signalen });
-// RTMAIL: het interne postsysteem (de rail voor de automatiseringen)
-const rtmail = require('./kern/rtmail')({ db, save, crypto });
-/* Teams: een adres dat meerderen samen lezen (receptie@partner.rtg). Krijgt de
-   codenaam-lijst en het zaakregister mee om te toetsen of een adres nog vrij
-   is -- een team mag nooit het postvak van een persoon of zaak kapen. */
-const rtmailTeam = require('./kern/rtmail-team')({ db, save, crypto, rtmail, findSupplier,
-  CODENAMES: require('./accounts/kluis').CODENAMES });
-// De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
-const automatisering = require('./kern/automatisering')({ rtmail });
-// Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
-// eigenaar- en managementadressen, rahul@<domein>, de buitenpost en -poort)
-const { werkmail } = require('./kern/werkmail')({ db, save, crypto, rtmail, mail, accounts });
-const atelierweb = require('./kern/atelierweb')({ db, save, crypto, schoon });
-// de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
-const naamlaag = require('./kern/naamlaag')({ db, save, schoon });
-// het welkom-draaiboek ook voor nieuwe RTF-profielen (foundation, eigen router)
-try { rtf.setAutomatisering(automatisering); } catch (e) {}
-{
-  const t = setInterval(() => { try { wacht.meet(); } catch (e) {} }, 10000);
-  if (t.unref) t.unref();
-}
-
-/* De Ontsmetter (kern/antivirus.js): de platform-malware-scanner. Elk bestand
-   dat RTG binnenkomt wordt gescand (handtekeningen + heuristiek + entropie);
-   besmette inhoud wordt geweigerd, gemeld op het bord, en de bron wordt via De
-   Wacht ter afsnijding voorgesteld. */
-const antivirus = require('./kern/antivirus')({ db, save, beveilig, wacht });
-
-/* Universeel scan-net: elke schrijf-aanvraag wordt door De Ontsmetter gehaald.
-   Zit er een BESMETTE beeld-/PDF-data-URL in de body (waar dan ook, hoe diep
-   ook), dan weigeren we hem hier -- zo zijn ALLE upload-plekken (snaps, De Salon,
-   markt, clips, en alles wat later bijkomt) in één klap gedekt zonder elke route
-   apart aan te raken. Verdacht mag door (staat wel op het bord). /api/verify/*
-   scant al expliciet; /api/techniek/* en health blijven ongemoeid.
-
-   Hij wordt hier GEBOUWD maar veel eerder INGEHANGEN (zie het doorgeefluik bij
-   app.use(jsonGzip())), want een middleware die na een router staat ziet de
-   verzoeken van die router nooit. */
-scanNet = (req, res, next) => {
-  const m = req.method;
-  if (m !== 'POST' && m !== 'PUT' && m !== 'PATCH') return next();
-  const p = req.path || '';
-  if (p.startsWith('/api/techniek') || p.startsWith('/api/verify') || p === '/api/health' || p === '/api/ready') return next();
-  if (!req.body || (typeof req.body !== 'object' && typeof req.body !== 'string')) return next();
-  try {
-    const raak = antivirus.scanBody(req.body, { bron: req.ip, naam: p });
-    if (raak) return res.status(422).json({ error: 'Dit bestand is geweigerd door de beveiliging (mogelijke malware).' });
-  } catch (e) { /* een scanfout mag nooit een verzoek breken */ }
-  next();
-};
-
-/* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
-   (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
-function resolveSession(token) {
-  if (!token) return null;
-  const demo = sessionFor(token);
-  if (demo) return demo;
-  const user = accounts.verifyToken(token);
-  if (user) return { tier: user.tier, key: 'user-' + user.id, account: user };
-  return null;
-}
-
-/* De AI-poort deelt resolveSession met auth hieronder: een vertaalverzoek en een
-   gewone API-aanroep horen dezelfde sessies te herkennen. */
-const aiPoort = require('./kern/aipoort').maakAiPoort({ resolveSession });
-
-function auth(req, res, next) {
-  const header = req.get('authorization') || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-  const sess = resolveSession(token);
-  if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
-  // Alleen leden-sessies horen hier: een echt account, of een demo-pas met een
-  // bekende persona-tier. Leverancier- en kantoor-sessies (met een eigen auth
-  // en zonder tier) worden geweigerd i.p.v. verderop de ledengids te laten
-  // crashen op een ontbrekende codenaam.
-  if (!sess.account && !PERSONAS[sess.tier]) return res.status(401).json({ error: 'Niet ingelogd als lid.' });
-  req.session = sess;
-  // Handhaving van de eigen boardroom: heeft het lid (of, via de kind-sleutel,
-  // de ouder) deze functie uitgezet, dan gaat de API ook echt dicht. Alles staat
-  // standaard aan, dus dit raakt pas iets zodra iemand bewust iets omzet.
-  const _fid = lidPadFunctie(req.path);
-  if (_fid && sess.key && lidBoardUit(sess.key, _fid)) {
-    return res.status(403).json({ error: 'Deze functie staat uit in je boardroom.', functieUit: _fid });
-  }
-  dirTouch(sess);
-  next();
-}
-
-/* Schoonmaakhulp voor vrije tekstvelden: knipt op lengte en haalt < en >
-   weg, zodat door gebruikers ingevoerde namen en berichten nooit als
-   opmaak in andermans scherm kunnen belanden. */
-
-/* De ledengids (dirTouch, ledenAantal, gidsHaal, gidsZoekCodenaam,
-   keyVanCodenaam) staat in server/kern/gids.js en is hierboven, direct na de
-   live-laag, opgezet. */
-
+/* De twee draden terug, hier gezet en niet daar (zie de kop van diensten.js):
+   beide staan hierboven als een `let` omdat middleware ze per verzoek leest. */
+scanNet = scanNetGebouwd;
+wacht = wachtGebouwd;
 /* ---------- Salon-rechten (server-side afgedwongen) ----------
    gast: alleen liken; RTG: reageren/dm'en met RTG-leden;
    Lifestyle & Business: volledige interactie met alle leden.

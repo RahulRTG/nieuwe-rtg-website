@@ -47,7 +47,6 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
-<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -160,6 +159,9 @@
     </div>
   </section>
 </main>
+<!-- uitvoer.js met defer en VOOR defensie.js: defer-scripts draaien in
+     documentvolgorde, dus de laag staat er als dat script zijn model aanmeldt -->
+<script src="/shared/uitvoer.js" defer></script>
 <script src="/apps/defensie.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

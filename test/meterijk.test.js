@@ -23,6 +23,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
@@ -203,15 +204,51 @@ const IJKINGEN = {
       assert.ok(vegers.has('leven.e2e.js'), 'een toets die alle schermen aantikt geldt als veegtoets');
       assert.ok(!vegers.has('eigen.e2e.js'), 'een toets die er een aantikt geldt niet als veegtoets');
 
-      /* En dan de inventaris: een NIEUW scherm dat niemand opent hoort meteen
-         mee te tellen. Dat is de kant waarlangs dit gat in de praktijk groeit:
-         iemand zet een app neer en niemand komt er ooit. */
-      const journaal = new Set(schermen.alleSchermen());        // alsof alles geopend is
-      const tel = () => schermen.alleSchermen().filter(s => !journaal.has(s)).length;
-      const voor = tel();
-      assert.equal(voor, 0, 'met een journaal dat alles bevat staat de meter op nul');
-      return metTijdelijkBestand('public/apps/zz-ijk-tijdelijk.html',
-        '<!doctype html>\n<title>ijk</title>\n', () => tel() - voor);
+      /* EN DAN DE HELE METER, VAN JOURNAALREGEL TOT GETAL.
+
+         Hier stond een eigen sommetje (`alleSchermen().filter(s => !journaal
+         .has(s))`), en dat ijkte zijn eigen aftrekking: de meter werd nooit
+         aangeroepen. De opvolger riep wel zonderEigenToets() aan, maar voerde
+         er een met de hand gebouwde Map in -- daarmee bleef de PARSER buiten
+         de ijking, en juist daar zit het onderscheid waar deze meter sinds
+         deze ronde om draait. Gemeten met een mutatie in
+         scripts/schermen.js (`const doel = afgelegd;`, oftewel: een
+         voorophaling telt weer als bezoek): de meteruitkomst verschoof
+         42 -> 43 en geen enkele toets zakte. Daarom leest deze ijking nu een
+         ECHT journaalbestand, in de vorm die de server schrijft.
+
+         Het proefjournaal is met opzet zo gebouwd dat alle drie de clausules
+         van zonderEigenToets() eraan hangen, en niet alleen `!t`:
+           - alle schermen op een na hebben hun eigen navigatie -> tellen niet;
+           - leven.e2e.js tikt ALLES aan en is dus een veegtoets, zodat het
+             eerste scherm alleen een veeg heeft -> telt WEL mee (de veeg-
+             clausule; haal je die weg, dan zakt de proef);
+           - datzelfde eerste scherm is bovendien VOOROPGEHAALD -> dat mag er
+             geen bezoek van maken (de parser-clausule; laat je nevenverzoek
+             weer als navigatie tellen, dan zakt de proef).
+         Zo hangt het getal aan de meter zelf en niet aan een sommetje
+         ernaast (LAT-regel 10). */
+      const alle = schermen.alleSchermen();
+      const regels = [];
+      for (const [i, s] of alle.entries()) {
+        regels.push('SCHERM ' + s + ' leven.e2e.js navigatie');
+        if (i > 0) regels.push('SCHERM ' + s + ' eigen' + i + '.e2e.js navigatie');
+      }
+      regels.push('SCHERM ' + alle[0] + ' voorop.e2e.js nevenverzoek');
+      const ijkmap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-schermijk-'));
+      try {
+        const pad = path.join(ijkmap, 'schermjournaal');
+        fs.writeFileSync(pad, regels.join('\n') + '\n');
+        const journaal = schermen.geopendeSchermen(pad);
+        assert.equal(journaal.zonderSoort, 0, 'de parser leest deze regels als volwaardig');
+        const tel = () => schermen.zonderEigenToets(journaal.afgelegd, schermen.alleSchermen()).length;
+        const voor = tel();
+        assert.deepEqual(schermen.zonderEigenToets(journaal.afgelegd, alle), [alle[0]],
+          'een scherm dat alleen een veeg en een voorophaling heeft, telt als ongetoetst');
+        assert.equal(voor, 1, 'de rest heeft een eigen navigatie en telt dus niet mee');
+        return metTijdelijkBestand('public/apps/zz-ijk-tijdelijk.html',
+          '<!doctype html>\n<title>ijk</title>\n', () => tel() - voor);
+      } finally { fs.rmSync(ijkmap, { recursive: true, force: true }); }
     }
   },
   metersOngeijkt: {

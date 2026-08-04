@@ -63,8 +63,6 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
-<!-- uitvoer.js zonder defer en VOOR het eigen script: dat meldt zijn model aan -->
-<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <header><div class="ey">RTG Airport</div><h1>Vluchten</h1></header>
@@ -76,6 +74,10 @@
   <div id="inhoud"><div class="leeg">Laden…</div></div>
 </main>
 <div class="melding" id="melding"></div>
+<!-- uitvoer.js zonder defer en vlak voor het eigen script: dat meldt zijn
+     model aan met RTGUitvoer.bron(). In de <head> hield hij het parsen op
+     zonder dat het iets won. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

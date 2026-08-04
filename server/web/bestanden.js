@@ -83,7 +83,9 @@ function statisch(root, opts) {
        niets over of een toets een app heeft geopend. */
     if (bestandHaak && (req.method === 'GET' || req.method === 'HEAD')) {
       const kaal = String(req.url || '').split('?')[0].split('#')[0];
-      if (/\.html?$/i.test(kaal)) { try { bestandHaak(kaal); } catch (e) {} }
+      // het verzoek gaat mee: alleen daaraan is te zien of dit een bezoek was
+      // of een voorophaling van een service worker (zie server/routelog.js)
+      if (/\.html?$/i.test(kaal)) { try { bestandHaak(kaal, req); } catch (e) {} }
     }
     return bedien(req, res, next);
   };

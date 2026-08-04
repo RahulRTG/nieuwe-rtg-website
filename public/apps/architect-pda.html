@@ -9,7 +9,6 @@
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
 <script src="/shared/glyf.js"></script>
-<script src="/shared/uitvoer.js"></script>
 <script src="/shared/deur.js"></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
@@ -63,6 +62,7 @@
   <div id="pLijst"><div class="leeg">Laden...</div></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

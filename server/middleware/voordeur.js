@@ -72,7 +72,9 @@ function cspNonce(publicDir, aan) {
     if (!bestand.startsWith(publicDir + path.sep)) return next(); // geen path traversal
     fs.readFile(bestand, 'utf8', (err, html) => {
       if (err) return next(); // bestaat niet: laat de statische laag/404 het doen
-      if (paginaHaak) { try { paginaHaak(rel); } catch (e) {} }
+      // het verzoek gaat mee: alleen daaraan is te zien of dit een bezoek was
+      // of een voorophaling van een service worker (zie server/routelog.js)
+      if (paginaHaak) { try { paginaHaak(rel, req); } catch (e) {} }
       const nonce = crypto.randomBytes(16).toString('base64');
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       res.set('Content-Security-Policy', CSP(nonce));

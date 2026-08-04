@@ -13,9 +13,6 @@
 <link href="/apps/rtg-protect.css" rel="stylesheet">
 <script src="/apps/rtg-protect.js" defer></script>
 <script src="/shared/schermrust.js" defer></script>
-<!-- uitvoer.js zonder defer en voor het eigen script van de zaal: dat script
-     meldt zijn eigen model aan met RTGUitvoer.bron() en moet de laag al vinden. -->
-<script src="/shared/uitvoer.js"></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
@@ -159,6 +156,10 @@
 
 </main>
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en vlak voor het eigen script van de zaal: dat
+     script meldt zijn model aan met RTGUitvoer.bron() en moet de laag al
+     vinden. In de <head> hield hij het parsen op zonder dat het iets won. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);

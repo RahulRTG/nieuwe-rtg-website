@@ -17,10 +17,17 @@
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 7,
-    "schermenZonderToets": 3,
+    "schermenZonderToets": 42,
     "keuringTeGroot": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-04",
+      "meter": "schermenZonderToets 3 -> 42 (opnieuw gemeten, met de hand verhoogd)",
+      "reden": "De meter achter de grondwaarde 3 deelde schermen gratis uit. Een service worker haalt bij zijn install zijn hele schil op (cache.addAll); dat zijn echte GET's op echte .html-paden, en ze stonden in het schermjournaal alsof een toets die pagina's had geopend. Gemeten met een echte Chromium op de echte server: EEN bezoek aan /apps/foundation/rust.html leverde 45 SCHERM-regels op, alle 45 op naam van dezelfde toets. Sinds deze ronde schrijft server/routelog.js per scherm mee OF het verzoek een navigatie was (Sec-Fetch-Mode: navigate) of een nevenverzoek, en scripts/schermen.js telt alleen navigaties. Daarmee is 3 geen meting meer maar het cijfer van een kapot instrument, en moest het opnieuw worden vastgesteld.",
+      "eerlijkheidshalve": "Hier stond eerst dat het nieuwe getal niet te meten was omdat deze machine geen Chromium heeft. Dat was onwaar, en in een norm is dat de ergste soort fout: de browser staat er wel, en server/lib/cdp.js vindt hem via RTG_CHROMIUM. Nu echt gemeten, twee volledige e2e-rondes met die browser (rm -f .schermjournaal; RTG_ROUTELOG=.schermjournaal RTG_E2E_STRICT=1 node --experimental-sqlite --test test/*.e2e.js). Ronde 1 (standaard concurrency, 92 toetsen, 63 geslaagd, 28 gezakt) en ronde 2 (--test-concurrency=3, 92 toetsen, 62 geslaagd, 29 gezakt) gaven allebei 42, en de LIJST van 42 schermen was in beide rondes byte voor byte dezelfde. Van die 42 zijn er 33 wel opgehaald door een service worker en door geen enkele toets bezocht: dat is precies het gat dat de oude meter dichtpleisterde (3 + 33 is niet toevallig ongeveer de sprong). Wat er NIET aan klopt en wat je moet weten: die twee rondes waren op deze machine niet groen. 20 van de 29 fouten zijn TypeErrors op onze eigen driver (page.selectOption, ctx.addInitScript, page.reload, page.$, page.$$, page.press, page.setInputFiles bestaan niet in server/lib/browser-page.js), en die zakken ook op de onveranderde tak: met deze wijziging gestasht gaven test/agenda.e2e.js en test/bankscherm.e2e.js dezelfde drie TypeErrors. Ze staan dus los van deze reparatie. Een groenere ronde kan dit cijfer alleen VERLAGEN en nooit verhogen, want een toets die halverwege omvalt heeft hoogstens minder schermen afgelegd. 42 is daarmee een eerlijk gemeten bovengrens, en de ratel laat hem alleen omlaag. Verder: journalen van voor deze ronde worden nu geweigerd (exitcode 2) in plaats van als bezoek gelezen, want een oud journaal zegt niet HOE een scherm werd opgevraagd en daar valt niets uit te tellen.",
+      "eerderVastgelegd": "schermenZonderToets (nieuw, nulmeting 105 van 188)"
+    },
     {
       "datum": "2026-08-04",
       "meter": "zelfpoortendeToetsen 95 -> 102",

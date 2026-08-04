@@ -25,6 +25,10 @@
      6. en de haak raakt het verzoek nooit, ook niet als hij stukgaat. Een
         meetinstrument dat het gemetene kan slopen is erger dan geen
         meetinstrument (toets 7).
+     7. een scherm dat alleen wordt VOOROPGEHAALD telt niet als een bezoek
+        (toets 8). Zonder dat onderscheid leverde een enkele bezoeker van
+        /apps/foundation/rust.html 45 "geopende" schermen op, want de service
+        worker daar haalt zijn hele schil op.
 
    Draai los: node --experimental-sqlite --test test/routelog.test.js
    ========================================================================== */
@@ -156,4 +160,43 @@ test('7. de haak raakt het verzoek nooit, ook niet als hij stukgaat', () => {
     assert.doesNotThrow(() => r({ method: 'GET', url: '/api/iets', params: {} }, {}, () => {}));
     assert.equal(geland, true, 'de route draait gewoon door');
   } finally { opPatroon(null); }
+});
+
+test('8. een scherm dat wordt VOOROPGEHAALD telt niet als een bezoek', async () => {
+  /* DE VIJFENVEERTIG GRATIS SCHERMEN. Een service worker haalt bij zijn install
+     zijn hele schil op (cache.addAll). Dat zijn echte GET's op echte .html-
+     paden, en zonder onderscheid staan ze hier alsof de toets die pagina's had
+     geopend: eenmaal /apps/foundation/rust.html bezoeken leverde 45 SCHERM-
+     regels op, en scripts/schermen.js rekende er 44 als afgelegd. Een meter
+     die je met een cache kunt opblazen telt niet wat hij belooft.
+
+     De browser zegt zelf wat voor verzoek het is, dus toetsen we precies dat:
+     dezelfde server, twee GET's, alleen de Sec-Fetch-Mode verschilt.
+
+     EN NIET ALLEBEI MET fetch(). Die eerste poging zakte, en leerzaam: Node
+     zet Sec-Fetch-Mode zelf op cors en laat hem niet overschrijven, dus beide
+     verzoeken kwamen als nevenverzoek binnen. Het bezoek gaat daarom over de
+     kale http-module, en de voorophaling juist met fetch() -- want zo staat
+     het aan beide kanten dicht bij wat er in het echt gebeurt. */
+  const f = path.join(TMP, 'schermsoort.log');
+  fs.writeFileSync(f, '');
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: path.join(TMP, 'data3'), RTG_ROUTELOG: f } });
+  try {
+    await new Promise((klaar, mis) => {
+      const v = require('http').get(srv.base + '/apps/app.html',
+        { headers: { 'Sec-Fetch-Mode': 'navigate' } }, (res) => { res.resume(); res.on('end', klaar); });
+      v.on('error', mis);
+    });
+    const voorop = await fetch(srv.base + '/apps/foundation/leren.html');   // Node stuurt hier cors
+    await voorop.text();
+  } finally { stop(srv && srv.child); }
+
+  const regels = [...routelog.lees(f)].filter(r => r.startsWith('SCHERM '));
+  const soortVan = (scherm) => {
+    const r = regels.find(x => x.split(' ')[1] === scherm);
+    return r ? r.split(' ').pop() : 'niet genoteerd';
+  };
+  assert.equal(soortVan('/apps/app.html'), 'navigatie', 'een navigatie is een bezoek: ' + regels.join(' | '));
+  assert.equal(soortVan('/apps/foundation/leren.html'), 'nevenverzoek',
+    'een fetch uit een service worker is geen bezoek: ' + regels.join(' | '));
 });

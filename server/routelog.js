@@ -74,7 +74,7 @@ function noteer(methode, patroon) {
    een toets dit scherm ooit geopend" had geen bron. Nu wel, met dezelfde
    ontdubbeling en hetzelfde bestand. De regel krijgt SCHERM als methode zodat
    scripts/dekking.js (die op "METHODE patroon" leest) er geen endpoint in ziet. */
-function noteerScherm(url) {
+function noteerScherm(url, req) {
   /* De naam van de toets erachter. Die komt uit RTG_TOETS, gezet door
      test/helper.js bij het starten van deze server. Hij hoort erbij omdat
      "geopend" op zichzelf niets zegt: test/leven.e2e.js tikt ALLE schermen
@@ -82,7 +82,36 @@ function noteerScherm(url) {
      nul en zegt hij voorgoed "in orde". Met de naam erbij is te zien welke
      app alleen door een veegtoets is aangeraakt en door geen enkele toets die
      zijn eigen weg aflegt. */
-  noteer('SCHERM', url + ' ' + (process.env.RTG_TOETS || 'onbekend'));
+  noteer('SCHERM', url + ' ' + (process.env.RTG_TOETS || 'onbekend') + ' ' + soortVan(req));
+}
+
+/* WAS DIT EEN BEZOEK, OF HAALDE ER IETS VOOROP?
+
+   Een service worker haalt bij zijn install zijn hele schil op (cache.addAll).
+   Dat zijn echte GET-verzoeken op echte .html-paden, en ze kwamen hier binnen
+   alsof de toets die pagina's had geopend. Gemeten: een browser die eenmaal
+   /apps/foundation/rust.html bezoekt levert 45 SCHERM-regels op, alle 45 op
+   naam van dezelfde toets, terwijl die over 44 ervan niets beweert. Een meter
+   die je met een voorophaling kunt opblazen telt niet wat hij belooft.
+
+   De browser zegt zelf wat voor verzoek het is: een navigatie draagt
+   Sec-Fetch-Mode: navigate, een fetch uit een service worker draagt cors of
+   no-cors. Alleen die eerste telt hier als een bezoek, en de omkering is met
+   opzet streng: niet "alles behalve een voorophaling", maar "alleen wat zegt
+   dat het een navigatie is".
+
+   Dat raakt ook de fetch() uit een toets, die in Node altijd cors meestuurt en
+   dat niet laat overschrijven. Terecht: de twee die er in deze suite staan
+   (test/deur.e2e.js) halen een pagina op om te zien of hij 200 geeft. Dat is
+   een goede bewering over de LINK die ernaartoe wijst, maar het is niet de weg
+   van die app afleggen, en precies zulke gratis punten moet deze meter niet
+   uitdelen.
+
+   Het onderscheid staat hier en niet in de twee haken, zodat er een plek is
+   waar het antwoord op "was dit een bezoek" vandaan komt. */
+function soortVan(req) {
+  const modus = req && req.headers ? req.headers['sec-fetch-mode'] : null;
+  return modus === 'navigate' ? 'navigatie' : 'nevenverzoek';
 }
 
 /* Een 4xx of 5xx telt ook mee. De vraag die dit journaal beantwoordt is "is dit

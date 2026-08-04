@@ -11,7 +11,6 @@
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
-<script src="/shared/uitvoer.js"></script>
 <style>
   :root{
     --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
@@ -98,6 +97,7 @@
 .rahulsug{display:flex;gap:.35rem;flex-wrap:wrap;}
 .rahulsug button{background:var(--bg);border:1px solid var(--gold);color:var(--txt);border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
 </style>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

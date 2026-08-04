@@ -92,10 +92,13 @@ app.post('/api/bezorg/volg', auth, (req, res) => {
   if (!o || (o.customerKey || o.customerTier) !== req.session.key || !o.levering) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   const B = db.data.bezorgers || {};
   const pos = o.bezorger ? B[o.supplierCode + ':' + (o.bezorger.staffId || 'beheer')] : null;
-  /* Het volgscherm: dezelfde vier stappen die de zaak intern doorloopt, in de
-     taal van de klant, met wat er gebeurt en hoe lang het nog duurt. Tussen
-     "betaald" en "onderweg" zat hier eerst niets, en dat is juist de tijd
-     waarin iemand zich afvraagt of zijn bestelling wel is aangekomen. */
+  /* Het volgscherm: dezelfde stappen die de zaak intern doorloopt, in de taal
+     van de klant, met wat er gebeurt en hoe lang het nog duurt. Hoeveel het er
+     zijn en hoe ze heten bepaalt kern/bezorgvolg.js per leveringswijze (een
+     afhaalbon vertrekt nooit) -- hier stond een aantal genoemd, en dat liep
+     stilletjes achter op de keten. Tussen "betaald" en "onderweg" zat hier
+     eerst niets, en dat is juist de tijd waarin iemand zich afvraagt of zijn
+     bestelling wel is aangekomen. */
   const positie = o.status === 'onderweg' && pos ? { lat: pos.lat, lng: pos.lng, at: pos.at } : null;
   const zaak = findSupplier(o.supplierCode);
   const beeld = bezorgvolg.volgBeeld({

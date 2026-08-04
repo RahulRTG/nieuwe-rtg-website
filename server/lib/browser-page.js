@@ -4,6 +4,10 @@
    onderscheppen van verzoeken (route). Werkt via CDP op de meegegeven sessie.
    Afgesplitst uit browser.js zodat elk deel klein blijft. */
 'use strict';
+// het toetsenbord staat apart, in ./browser-toetsen.js (10 KB-lat)
+const { Keyboard } = require('./browser-toetsen');
+// de grepen ($, $$, press, reload, selectOption, setInputFiles) in ./browser-grepen.js
+const { rustUit } = require('./browser-grepen');
 
 const S = (v) => JSON.stringify(v);
 const slaap = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -29,6 +33,7 @@ class Locator {
 class Page {
   constructor(conn, sessionId, targetId, context) {
     this.conn = conn; this.sessionId = sessionId; this.targetId = targetId; this.context = context;
+    this.keyboard = new Keyboard(this);
     this._errCbs = [];
     this._routes = [];
     this._fetchAan = false;
@@ -43,6 +48,13 @@ class Page {
     });
   }
   on(gebeurtenis, cb) { if (gebeurtenis === 'pageerror') this._errCbs.push(cb); return this; }
+  /* Wie een luisteraar aanzet moet hem ook kunnen afzetten. Zonder off()
+     struikelde test/leven.e2e.js -- de wachter over ALLE schermen -- meteen op
+     een TypeError in plaats van op een bewering. */
+  off(gebeurtenis, cb) {
+    if (gebeurtenis === 'pageerror') this._errCbs = this._errCbs.filter((f) => f !== cb);
+    return this;
+  }
   // Roep een CONSTANTE functie aan in de pagina met de waarden als echte CDP-
   // argumenten (Runtime.callFunctionOn). Zo wordt er nooit een waarde in de uit
   // te voeren code geplakt (geen code-injectie); het gedrag blijft identiek.
@@ -84,13 +96,28 @@ class Page {
   async goto(url, opts) {
     const waitUntil = (opts && opts.waitUntil) || 'load';
     const gebeurtenis = waitUntil === 'domcontentloaded' ? 'Page.domContentEventFired' : 'Page.loadEventFired';
+    /* De noodrem van 30 seconden werd nooit opgeruimd zodra de pagina wel
+       gewoon laadde. Een geslaagde goto liet dus een levende timer achter, en
+       die houdt het proces in de lucht: elke toetsronde bleef na de laatste
+       navigatie nog een halve minuut stilstaan zonder dat er iets gebeurde.
+       Nu wist de gebeurtenis zijn eigen wachter. */
     const klaar = new Promise((res) => {
-      const h = (m) => { if (m.method === gebeurtenis) { this.conn.off('sessie:' + this.sessionId, h); res(); } };
+      let rem = null;
+      const h = (m) => {
+        if (m.method === gebeurtenis) { this.conn.off('sessie:' + this.sessionId, h); clearTimeout(rem); res(); }
+      };
       this.conn.on('sessie:' + this.sessionId, h);
-      setTimeout(() => { this.conn.off('sessie:' + this.sessionId, h); res(); }, 30000);
+      rem = setTimeout(() => { this.conn.off('sessie:' + this.sessionId, h); res(); }, 30000);
     });
     await this.conn.stuur('Page.navigate', { url }, this.sessionId);
     await klaar;
+  }
+  /* De maat van het scherm. Zonder deze methode sloeg elke toetsstap achter een
+     `if (page.setViewportSize)` stil over: een meting op telefoonmaat die nooit
+     gebeurde, en dat is precies de vorm die LAT regel 3 verbiedt. */
+  async setViewportSize({ width, height }) {
+    await this.conn.stuur('Emulation.setDeviceMetricsOverride',
+      { width, height, deviceScaleFactor: 1, mobile: false }, this.sessionId);
   }
   async waitForSelector(sel, opts = {}) {
     const state = opts.state || 'visible';
@@ -107,6 +134,16 @@ class Page {
     else await this._wachtRoep('function(s){return eval(s);}', [String(fn)], opts.timeout || 15000);
   }
   async waitForTimeout(ms) { await slaap(ms); }
+  /* De kop van dit bestand belooft "precies de methoden die onze scherm-tests
+     gebruiken". Dat was niet waar: test/deelmenu.e2e.js en test/premium.e2e.js
+     roepen $$eval aan, en op deze driver liepen die toetsen dus stuk op
+     "page.$$eval is not a function" -- geen bewering, alleen een TypeError.
+     De bron van de meegegeven functie gaat als code mee (net als evaluate),
+     de waarden blijven CDP-argumenten. */
+  async $$eval(sel, fn, arg) {
+    const decl = 'function(sel,a){return (' + fn.toString() + ')([].slice.call(__rtgdrv.zoekAlle(sel)),a);}';
+    return this._roep(decl, [sel, arg]);
+  }
   locator(sel) { return new Locator(this, sel); }
   async click(sel) { await this._roep('function(sel){var el=__rtgdrv.zoek(sel);if(!el)throw new Error("klik: niet gevonden "+sel);__rtgdrv.klik(el);return true;}', [sel]); }
   async fill(sel, waarde) { await this._roep('function(sel,w){var el=__rtgdrv.zoek(sel);if(!el)throw new Error("vul: niet gevonden "+sel);__rtgdrv.vul(el,w);return true;}', [sel, waarde]); }
@@ -141,5 +178,7 @@ class Page {
     }, this.sessionId);
   }
 }
+
+rustUit(Page);
 
 module.exports = { Page, Locator };

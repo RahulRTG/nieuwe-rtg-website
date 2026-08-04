@@ -35,6 +35,20 @@
       'color:var(--gold,var(--goud,#857007));}' +
     '.rtgsnel-kaart dd{margin:0;color:var(--muted,var(--zacht,#8A8680));}';
 
+  /* De rij voor "n" draagt het LABEL van de nieuw-knop, en dat label komt uit
+     de pagina -- soms door een ander getypt. Veel schoonmakers hier gooien <
+     en > eruit, maar niet allemaal: kern/metier/index.js laat een vaardigheid
+     door als String(w).slice(0,40).trim(), en metier.html zet die als knoplabel
+     neer. Een label dat via esc() als &lt; op het scherm staat, geeft via
+     textContent gewoon weer < terug. Dus schermen we af waar het de HTML in
+     gaat, net als shared/deur.js -- en niet per bron, want die zijn met 170
+     schermen niet te overzien. */
+  function esc(t) {
+    return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
   function zichtbaar(el) { return el && !el.hidden && el.offsetParent !== null; }
   function eerste(kies) {
     var l = document.querySelectorAll(kies);
@@ -65,12 +79,14 @@
       blad.className = 'rtgsnel';
       blad.hidden = true;
       blad.setAttribute('role', 'dialog');
+      // ook dit blad dekt het scherm af, dus het valt onder vensterOpen()
+      blad.setAttribute('aria-modal', 'true');
       blad.setAttribute('aria-label', 'Sneltoetsen');
       blad.addEventListener('click', function () { blad.hidden = true; });
       document.body.appendChild(blad);
     }
     blad.innerHTML = '<div class="rtgsnel-kaart"><h2>Sneltoetsen</h2><dl>' +
-      rijen.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') +
+      rijen.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') +
       '</dl></div>';
     blad.hidden = false;
   }
@@ -81,6 +97,18 @@
     return /^(input|textarea|select)$/i.test(el.tagName);
   }
 
+  /* Staat er een venster open, dan zijn de toetsen van dat venster en niet van
+     het scherm eronder. inVeld() dekt dat niet: in zo'n venster staat de focus
+     meestal op een KNOP, en dan drukte "n" gewoon de nieuw-knop achter de
+     dialoog in en wisselde een cijfer van deel achter de dialoog.
+     offsetParent kan hier niet als zichtbaarheidstoets dienen: een overlay
+     staat position:fixed en heeft er per definitie geen. */
+  function vensterOpen() {
+    var l = document.querySelectorAll('[aria-modal="true"]');
+    for (var i = 0; i < l.length; i++) if (!l[i].hidden && l[i].offsetWidth > 0) return true;
+    return false;
+  }
+
   function start() {
     document.addEventListener('keydown', function (e) {
       if (e.ctrlKey || e.metaKey || e.altKey) return;      // dan is de toets van de browser
@@ -89,6 +117,7 @@
         return;
       }
       if (inVeld(document.activeElement)) return;          // typen gaat voor
+      if (vensterOpen()) return;                           // het venster is aan zet
 
       var z, n;
       if (e.key === '/') { z = zoekVeld(); if (z) { z.focus(); e.preventDefault(); } return; }
@@ -98,9 +127,13 @@
         return;
       }
       if (/^[1-9]$/.test(e.key)) {
-        var knoppen = document.querySelectorAll('.rtgdeel-balk button');
-        var k = knoppen[Number(e.key) - 1];
-        if (k) { k.click(); e.preventDefault(); }
+        /* De delen komen van het deelmenu zelf, niet uit "elke knop in de
+           balk". Die aanname stond er wel, en dan verschuift een knop die GEEN
+           deel is de hele nummering die het overzicht hieronder belooft --
+           stil, want niets klaagt over een cijfer dat het verkeerde opent. */
+        var ids = window.RTGDeel && RTGDeel.delen ? RTGDeel.delen() : [];
+        var id = ids[Number(e.key) - 1];
+        if (id) { RTGDeel.open(id); e.preventDefault(); }
         return;
       }
       if (e.key === '?') {
@@ -108,7 +141,7 @@
         if (zoekVeld()) rijen.push(['/', 'naar het zoekveld']);
         if (nieuwKnop()) rijen.push(['n', 'nieuw: ' + (nieuwKnop().textContent || '').trim()]);
         if (window.RTGUitvoer && RTGUitvoer.beschikbaar()) rijen.push(['e', 'meenemen als CSV']);
-        if (document.querySelector('.rtgdeel-balk button')) rijen.push(['1-9', 'naar dat deel van de app']);
+        if (window.RTGDeel && RTGDeel.delen && RTGDeel.delen().length) rijen.push(['1-9', 'naar dat deel van de app']);
         rijen.push(['Esc', 'sluiten']);
         overzicht(rijen);
         e.preventDefault();

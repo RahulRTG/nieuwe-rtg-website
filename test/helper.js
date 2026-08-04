@@ -6,6 +6,7 @@ const { spawn } = require('node:child_process');
 const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
+const fs = require('node:fs');
 
 // Een vrije poort van het besturingssysteem: bind op 0, lees de toegewezen
 // poort, laat hem meteen weer los en geef hem door aan de kindserver.
@@ -117,6 +118,26 @@ async function startEens(opts) {
   // voeden; met een expliciete optie (een test die stderr zelf inspecteert) blijft
   // het gedrag ongewijzigd.
   const eigenStderr = opts.stderr && opts.stderr !== 'inherit';
+  /* ISOLATIE IS DE STANDAARD, GEEN AFSPRAAK.
+
+     Elke toets hoorde zelf een verse RTG_DATA_DIR mee te geven, en dat deden er
+     acht niet. Die acht draaiden dus op server/data/ -- de ECHTE datamap van de
+     ontwikkelinstallatie. Twee gevolgen, allebei stil: de toets vervuilt de
+     installatie (aannames, sollicitaties, leden), en de installatie vervuilt de
+     toets. Zo zakte test/menselijkebanen.test.js op "KIKUNOI: 3 mensen terwijl
+     de seed er 2 belooft" -- de derde was een aanname die een EERDERE testronde
+     in de echte datamap had achtergelaten. Vijf commits terug gezocht naar een
+     oorzaak die in geen enkele commit zat.
+
+     Een regel die alleen werkt als iedereen hem onthoudt, is een voornemen
+     (LAT.md). Dus krijgt elke kindserver nu STANDAARD een eigen verse map, en
+     wordt die bij het einde van het kind opgeruimd. Wie juist WIL delen -- een
+     herstart-toets, een multi-instance-toets -- geeft RTG_DATA_DIR expliciet
+     mee, precies zoals die toetsen altijd al deden; en staat hij in de
+     omgeving van de aanroeper (een losse run met RTG_DATA_DIR=...), dan wint
+     die ook. */
+  const eigenMap = (opts.env && ('RTG_DATA_DIR' in opts.env)) || process.env.RTG_DATA_DIR
+    ? null : fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-toets-'));
   const child = spawn(process.execPath, ['--experimental-sqlite', script], {
     /* RTG_TOETS: welke toets deze server start. De server schrijft dat mee in
        het schermjournaal, zodat scripts/schermen.js een VEEGTOETS (een die
@@ -128,11 +149,18 @@ async function startEens(opts) {
     env: {
       ...process.env, NODE_ENV: 'test',
       RTG_TOETS: path.basename(String(process.argv[1] || 'onbekend')),
+      ...(eigenMap ? { RTG_DATA_DIR: eigenMap } : {}),
       ...(opts.env || {}), PORT: String(port)
     },
     stdio: ['ignore', 'ignore', eigenStderr ? opts.stderr : 'pipe']
   });
   if (!eigenStderr) luisterOpFouten(child);
+  /* De eigen map gaat weg zodra het kind weg is -- ook bij SIGKILL, want 'exit'
+     vuurt altijd. Alleen wat de helper zelf aanmaakte; een meegegeven map is
+     van de toets en blijft van de toets. */
+  if (eigenMap) child.on('exit', () => {
+    try { fs.rmSync(eigenMap, { recursive: true, force: true }); } catch (e) { /* al weg */ }
+  });
   for (let i = 0; i < pogingen; i++) {
     if (child.exitCode != null) throw new Error('server stopte tijdens opstarten (exit ' + child.exitCode + ')');
     try {

@@ -35,6 +35,25 @@
     if (state.foundation) rtf = state.foundation;
   }
 
+  /* Meenemen: de app kent zijn eigen model, dus geeft hij dat door in plaats
+     van de gedeelde laag naar het scherm te laten raden. Facturen zijn hier het
+     ding dat een lid meeneemt naar zijn eigen boekhouding: nummer, bedrag, btw
+     en afboekcode staan al op het scherm, dus staan ze ook in het bestand.
+     'termijn' heet geen datum, want dat is het niet: het model houdt hier een
+     zin bij ("Vervalt 1 augustus 2026"), en er wordt geen datum verzonnen die
+     de app niet heeft. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!invoices || !invoices.length) return null;
+    return {
+      naam: 'facturen',
+      kolommen: ['factuurnummer', 'omschrijving', 'netto', 'bijdrage', 'btw', 'totaal', 'status', 'termijn', 'afboekcode'],
+      rijen: invoices.map(function (i) {
+        return [i.id || '', i.desc || '', i.netto || 0, i.bijdrage || 0, i.btw || 0,
+          (i.netto || 0) + (i.bijdrage || 0), i.status || '', i.date || '', i.afboekcode || ''];
+      })
+    };
+  });
+
   // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
   async function refreshState(){
     try { applyState((await API.call('/state')).state); } catch(e){}

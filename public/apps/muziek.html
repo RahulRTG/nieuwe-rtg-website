@@ -138,6 +138,13 @@
 <script src="/shared/spraak.js" defer></script>
 <script src="/shared/speler.js"></script>
 <script src="/shared/geluid.js"></script>
+<!-- Sneltoetsen (onderaan): "/" springt naar het zoekveld boven de stations,
+     "n" start een sessie samen luisteren. De uitvoerlaag staat er als paar
+     bij, maar RTG Sound meldt bewust GEEN eigen model aan: hij houdt geen
+     register bij. De stations komen uit shared/geluid.js en de wachtrij wordt
+     per track opnieuw gemaakt -- er is hier niets van u om mee te nemen, en
+     dan hoort de "e"-toets ook niets te doen. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 /* ============================== RTG Sound ==============================
    Muziek uit eigen huis: elk station is een kleine studio die live
@@ -350,6 +357,7 @@
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

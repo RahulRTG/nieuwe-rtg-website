@@ -40,7 +40,11 @@ module.exports = (kern) => {
         console.error('Claude API-fout, val terug op demo-antwoord:', e.message);
       }
     }
-    res.json({ reply: cannedAnswer(history[history.length - 1].content), source: 'demo' });
+    /* De PAS gaat mee, want het register hangt eraan (AI_TONE in kern/ai.js:
+       RTG tutoyeert, Lifestyle en Business spreken met u). Deze regel gaf hem
+       eerst niet mee, en dit is de aanroep die zonder API-sleutel ALTIJD loopt
+       -- dus in elke demo en de hele suite kreeg een RTG Pass-lid de u-vorm. */
+    res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier), source: 'demo' });
   });
 
   app.post('/api/chat/history', auth, (req, res) => {

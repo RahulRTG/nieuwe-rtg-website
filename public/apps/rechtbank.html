@@ -27,9 +27,24 @@
   .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;display:block;}
   .kpi span{font-size:.7rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;}
   .kpi.goud{border-color:rgba(169,143,7,.4);} .kpi.goud b{color:var(--gold);}
-  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
-  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
-  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* De tabbladen (Zittingsrol / Zaken / Beroepen / Signalen) zijn de eigen
+     schakelaar van de griffie: EEN paneel tegelijk, precies wat het deelmenu
+     elders doet. Het mechanisme blijft ongemoeid; alleen de vorm gaat mee met
+     het huis -- een rustige balk met kleine kapitalen en een gouden streep
+     onder het deel waar je staat, in plaats van een rij pillen. De selector
+     moet dieper dan `.tab`: de kit tekent die rij zelf al met
+     `body.rtg-stijl .tab`, en die is specifieker dan een kale `.tab`. */
+  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.2rem 0 1rem;padding:0 0 .1rem;
+    overflow:visible;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > .tab{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    border-radius:0;cursor:pointer;padding:.55rem .7rem .6rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
+  /* ook `background` en de randen hier herhalen: de kit heeft een eigen
+     `.tab.aan` met een gouden vulling, en die is net zo specifiek als de regel
+     hierboven -- alleen deze diepere selector wint er zeker van. */
+  body.rtg-stijl .tabs > .tab.aan{background:none;border-width:0 0 2px;color:var(--txt);border-bottom-color:var(--gold);}
   section.paneel{display:none;} section.paneel.aan{display:block;}
   .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
@@ -118,6 +133,9 @@
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -167,7 +185,33 @@ $('#loginGo').addEventListener('click', async () => {
 });
 
 const TABS = [['rol','Zittingsrol'],['zaken','Zaken'],['beroep','Beroepen'],['sig','Signalen']];
+
+/* Meenemen (shared/uitvoer.js): de griffie houdt twee registers vast en toont er
+   altijd een. Wat je meeneemt is dus het tabblad dat OPEN staat -- de rol van de
+   dag of de zaken in de gekozen selectie -- met de velden LOS, en niet de regel
+   "Huurgeschil · KOBALT tegen ... · wacht op zitting · 12d" die op het scherm
+   staat. Alles uit /api/overheid/rb; de partijen staan er met de aanduiding die
+   de zaak zelf draagt, precies zoals het scherm ze toont. */
+let HUIDIG = 'rol', ZAKEN = [], ROL = null;
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (HUIDIG === 'rol' && ROL && (ROL.rol || []).length) return {
+    naam: 'zittingsrol',
+    kolommen: ['datum','tijd','zaal','kenmerk','zaak','eiser','verweerder','rechter','zaal klaargezet'],
+    rijen: ROL.rol.map(z => [(z.zitting && z.zitting.datum) || ROL.datum || '', (z.zitting && z.zitting.tijd) || '',
+      (z.zitting && z.zitting.zaal) || '', z.ref || '', z.titel || '', z.eiser || '', z.verweerder || '',
+      (z.zitting && z.zitting.rechter) || '', (z.zitting && z.zitting.klaargezet) ? 'ja' : 'nee'])
+  };
+  if (HUIDIG === 'zaken' && ZAKEN.length) return {
+    naam: 'zaken',
+    kolommen: ['kenmerk','titel','soort','eiser','verweerder','status','zittingsdatum','beslissing','dagen open'],
+    rijen: ZAKEN.map(z => [z.ref || '', z.titel || '', z.typeLabel || '', z.eiser || '', z.verweerder || '',
+      z.status || '', (z.zitting && z.zitting.datum) || '', (z.uitspraak && z.uitspraak.beslissing) || '', z.dagen || 0])
+  };
+  return null;
+});
+
 function toon(t){
+  HUIDIG = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
   ['rol','zaken','beroep','sig'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'rol') laadRol();
@@ -232,6 +276,7 @@ function koppelZaakKnoppen(wortel){
 async function laadZaken(){
   try {
     const r = await api('/api/overheid/rb/zaken', { status: $('#zFilter').value });
+    ZAKEN = r.zaken || [];
     $('#zakenLijst').innerHTML = r.zaken.length ? r.zaken.map(zaakKaart).join('') : '<div class="leeg">Geen zaken in deze selectie.</div>';
     koppelZaakKnoppen($('#zakenLijst'));
   } catch(e){ meld(e.message); }
@@ -246,6 +291,7 @@ $('#zMaak').addEventListener('click', async () => {
 async function laadRol(){
   try {
     const r = await api('/api/overheid/rb/rol', { datum: $('#rolDatum').value });
+    ROL = r;
     $('#rolLijst').innerHTML = '<div class="item" style="background:var(--card2);"><h4>De rol van '+esc(r.datum)+'</h4><div class="meta">Per zaal, op tijd. De bode ziet dezelfde rol op de Overheids-PDA en zet de zalen klaar.</div></div>'+
       (r.rol.length ? r.rol.map(z => '<div class="item"><h4>'+esc(z.zitting.tijd)+' · '+esc(z.zitting.zaal)+'</h4>'+
         '<div class="meta">'+esc(z.titel)+' ('+esc(z.ref)+') · '+esc(z.eiser)+' tegen '+esc(z.verweerder)+' · '+esc(z.zitting.rechter)+' · '+
@@ -289,5 +335,6 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

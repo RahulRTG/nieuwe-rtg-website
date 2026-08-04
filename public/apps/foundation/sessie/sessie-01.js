@@ -25,11 +25,37 @@
     wisProfiel: function () { var s = lees(); if (s) { delete s.token; delete s.profiel; localStorage.setItem(KEY, JSON.stringify(s)); } },
     uitloggen: function () { localStorage.removeItem(KEY); },
     naam: function () { var s = lees(); return (s && s.profiel && s.profiel.naam) || ''; },
-    // gebruik boven aan een tool-pagina: geen sessie -> terug naar de inlog
-    eisProfiel: function () { if (!Sessie.actief()) { location.href = 'index.html'; return false; } return true; },
-    // privezaken van het gezin: gasten (oppas/opa/oma/familie) worden teruggestuurd
+    /* De deur van de RTFoundation.
+
+       Hier stond `location.href = 'index.html'`: wie zonder gezinssessie een
+       app opende, werd zonder een woord naar de voorpagina gegooid. Dat is
+       erger dan een dichte deur -- je verliest ook waar je heen wilde, en
+       veertig apps voelden daardoor leeg. Nu blijft u staan waar u was en
+       vertelt de gedeelde deur (shared/deur.js) wat deze app is, wat u er
+       straks doet (uit de app-gids die de pagina al heeft) en hoe u
+       binnenkomt. De weg terug staat in de deur zelf, dus niemand raakt
+       opgesloten.
+
+       De pagina's roepen dit aan als `if (!Sessie.eisProfiel()) throw ...`;
+       die worp blijft staan en stopt de rest van de pagina zoals altijd. */
+    deur: function (soort) {
+      var doel = document.querySelector('main') || document.querySelector('[role="main"]') || document.body;
+      function toon() {
+        try { window.RTGDeur.toon(doel, { soort: soort || 'gezin' }); } catch (e) { location.href = 'index.html'; }
+      }
+      if (window.RTGDeur) return toon();
+      // de deur wordt zelden gebruikt, dus pas laden als hij nodig is
+      var s = document.createElement('script');
+      s.src = '/shared/deur.js';
+      s.onload = toon;
+      s.onerror = function () { location.href = 'index.html'; };
+      document.head.appendChild(s);
+    },
+    // gebruik boven aan een tool-pagina: geen sessie -> de deur, met de weg erin
+    eisProfiel: function () { if (!Sessie.actief()) { Sessie.deur('gezin'); return false; } return true; },
+    // privezaken van het gezin: gasten (oppas/opa/oma/familie) zien de deur
     isGast: function () { var s = lees(); return !!(s && s.profiel && s.profiel.gast); },
-    eisFamilie: function () { if (!Sessie.actief() || Sessie.isGast()) { location.href = 'index.html'; return false; } return true; },
+    eisFamilie: function () { if (!Sessie.actief() || Sessie.isGast()) { Sessie.deur('gezin'); return false; } return true; },
     isBeheerder: function () { var s = lees(); return !!(s && s.profiel && s.profiel.beheerder); },
     // controleer bij de server of het token nog klopt; geeft { gezin, profiel, profielen, ongelezen } of null
     ophalen: function () {

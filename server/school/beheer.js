@@ -4,6 +4,7 @@
 module.exports = (sctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
+  const { FASEN, TRAPPEN } = require('../kern/onderwijs-ladder');
   // "mijn klas" = ik heb hem gemaakt OF ik sta vast op het lerarenteam
   const vanLeraar = (k, p) => k.leraarId === p.id || (k.leraren || []).some(x => x.id === p.id);
   router.post('/school/school/maak', (req, res) => {
@@ -40,13 +41,22 @@ module.exports = (sctx) => {
       ? Object.values(K()).filter(k => k.schoolCode === sch.code && vanLeraar(k, p)).map(klasSamenvatting)
       : [];
     res.json({ ok: true, naam: p.naam, rol: p.rol, status: p.status,
-      school: { naam: sch.naam, plaats: sch.plaats, code: sch.code, status: sch.status || 'actief' }, klassen });
+      school: { naam: sch.naam, plaats: sch.plaats, code: sch.code, status: sch.status || 'actief' }, klassen,
+      // de ladder voor het klas-maakformulier: per schoolsoort de fasen, zodat
+      // het scherm nooit zelf een niveaulijst hoeft te verzinnen (een waarheid)
+      ladder: {
+        trappen: Object.entries(TRAPPEN).sort((a, b) => a[1].volgorde - b[1].volgorde).map(([id, t]) => ({ id, naam: t.naam })),
+        fasen: FASEN.map(f => ({ id: f.id, naam: f.naam, trap: f.trap }))
+      } });
   });
 
   /* ---------- directie: overzicht en personeelsbesluiten ---------- */
   function klasSamenvatting(k) {
+    const f = k.fase ? FASEN.find(x => x.id === k.fase) : null;
     return {
       code: k.code, naam: k.naam, leraar: k.leraar,
+      fase: k.fase || null, trap: k.trap || null,
+      niveau: f ? f.naam + ' (' + ((TRAPPEN[f.trap] || {}).naam || f.trap) + ')' : null,
       leerlingen: (k.leerlingen || []).length,
       openAbsenties: (k.absenties || []).filter(a => !a.afgehandeld).length,
       huiswerk: (k.huiswerk || []).length,
@@ -84,11 +94,22 @@ module.exports = (sctx) => {
     if (p.rol !== 'leraar') return res.status(403).json({ error: 'Alleen een leraar maakt klassen.' });
     const naam = schoon(req.body.naam, 60);
     if (!naam) return res.status(400).json({ error: 'Geef de klas een naam.' });
+    /* Het niveau van de klas komt van de officiele ladder, niet uit de vrije
+       naam. Zonder dit veld voerde de bijles de klasnaam ("3B", "Meester
+       Jan") als niveau aan de AI, en kon de toets-bibliotheek een
+       basisschoolleraar academisch schrijven aanbieden. De fase is optioneel
+       (bestaande klassen hebben er geen); de trap volgt uit de fase. */
+    let fase = null, trap = null;
+    if (req.body.fase != null && String(req.body.fase).trim()) {
+      const f = FASEN.find(x => x.id === String(req.body.fase).trim());
+      if (!f) return res.status(400).json({ error: 'Dat niveau staat niet op de ladder.' });
+      fase = f.id; trap = f.trap;
+    }
     const code = klasCode();
-    K()[code] = { code, naam, leraar: p.naam, school: sch.naam, schoolCode: sch.code, leraarId: p.id, token: rid(16), at: nu(),
+    K()[code] = { code, naam, fase, trap, leraar: p.naam, school: sch.naam, schoolCode: sch.code, leraarId: p.id, token: rid(16), at: nu(),
       leerlingen: [], rooster: [], huiswerk: [], cijfers: [], mededelingen: [], absenties: [], berichten: {}, berichtenOuders: {} };
     save();
-    res.json({ ok: true, code, naam });
+    res.json({ ok: true, code, naam, fase, trap });
   });
 
   // de klassen van deze leraar (het multi-klas-dashboard)

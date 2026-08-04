@@ -68,6 +68,23 @@ function noteer(methode, patroon) {
   schrijf(k);
 }
 
+/* Een scherm is geen route: een pagina komt langs de statische laag en niet
+   bij de routematcher, dus stond er in dit journaal nooit iets over. Daardoor
+   was "deze app is af" een bewering die niemand kon natrekken -- de vraag "heeft
+   een toets dit scherm ooit geopend" had geen bron. Nu wel, met dezelfde
+   ontdubbeling en hetzelfde bestand. De regel krijgt SCHERM als methode zodat
+   scripts/dekking.js (die op "METHODE patroon" leest) er geen endpoint in ziet. */
+function noteerScherm(url) {
+  /* De naam van de toets erachter. Die komt uit RTG_TOETS, gezet door
+     test/helper.js bij het starten van deze server. Hij hoort erbij omdat
+     "geopend" op zichzelf niets zegt: test/leven.e2e.js tikt ALLE schermen
+     even aan, dus zonder deze naam staat de schermmeter na een veegronde op
+     nul en zegt hij voorgoed "in orde". Met de naam erbij is te zien welke
+     app alleen door een veegtoets is aangeraakt en door geen enkele toets die
+     zijn eigen weg aflegt. */
+  noteer('SCHERM', url + ' ' + (process.env.RTG_TOETS || 'onbekend'));
+}
+
 /* Een 4xx of 5xx telt ook mee. De vraag die dit journaal beantwoordt is "is dit
    endpoint aangeraakt", niet "ging het goed" -- een test die bewijst dat een
    vreemde er 403 krijgt, heeft dat endpoint wel degelijk beproefd. Dat gaat
@@ -88,6 +105,8 @@ function begin(pad) {
   // aan de router hangen we onszelf alleen als er echt een journaal is: staat
   // het uit, dan is er geen haak en kost dit de router helemaal niets
   try { require('./web/routing').opPatroon(bestand ? noteer : null); } catch (e) { /* zonder router ook goed */ }
+  try { require('./web/bestanden').opBestand(bestand ? noteerScherm : null); } catch (e) { /* zonder statische laag ook goed */ }
+  try { require('./middleware/voordeur').opPagina(bestand ? noteerScherm : null); } catch (e) { /* zonder nonce-laag ook goed */ }
   return !!bestand;
 }
 begin(process.env.RTG_ROUTELOG);
@@ -105,4 +124,4 @@ function lees(pad) {
   return uit;
 }
 
-module.exports = { noteer, begin, lees, aan: () => !!bestand };
+module.exports = { noteer, noteerScherm, begin, lees, aan: () => !!bestand };

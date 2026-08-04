@@ -56,6 +56,7 @@
 </div>
 
 <script src="sessie.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
@@ -75,7 +76,7 @@ async function laadOpdracht(anders){
 }
 $('#anders').addEventListener('click', () => laadOpdracht(true));
 $('#tekst').addEventListener('input', () => {
-  const n = $('#tekst').value.split(/\s+/).filter(Boolean).length;
+  const n = woorden($('#tekst').value);
   $('#teller').textContent = n + (n === 1 ? ' woord' : ' woorden');
 });
 $('#lees').addEventListener('click', async () => {
@@ -93,12 +94,29 @@ $('#bewaar').addEventListener('click', async () => {
   try { await api('schrijf-bewaar', { opdracht: $('#opdracht').textContent, tekst: $('#tekst').value, feedback: laatsteFeedback }); $('#fout').textContent = 'Bewaard!'; laadSchrijfsels(); }
   catch (e) { $('#fout').textContent = e.message; }
 });
+let bewaarde = [];   // de stukken die nu onder "Jouw bewaarde stukken" staan
+const woorden = t => String(t == null ? '' : t).split(/\s+/).filter(Boolean).length;
+const dag = v => { const d = new Date(v); return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10); };
+
+/* Meenemen: wat je zelf hebt geschreven is van jou, dus geeft de app zijn
+   eigen model door in plaats van de gedeelde laag de rijtjes te laten
+   uitlezen: per stuk de datum, de opdracht, het aantal woorden en de tekst. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!bewaarde.length) return null;
+  return {
+    naam: 'schrijfsels',
+    kolommen: ['datum', 'opdracht', 'woorden', 'tekst'],
+    rijen: bewaarde.map(x => [dag(x.at), x.opdracht || 'Vrij geschreven', String(woorden(x.tekst)), x.tekst || ''])
+  };
+});
+
 async function laadSchrijfsels(){
   try {
     const d = await api('schrijfsels');
+    bewaarde = d.schrijfsels || [];
     $('#schrijfsels').innerHTML = d.schrijfsels.length ? d.schrijfsels.map(x =>
       '<div class="kaart rij" data-id="'+x.id+'"><div class="nm">'+esc(x.opdracht || 'Vrij geschreven')+
-      '<small>'+new Date(x.at).toLocaleDateString('nl-NL',{day:'numeric',month:'long'})+' · '+x.tekst.split(/\s+/).filter(Boolean).length+' woorden</small></div><span>→</span></div>').join('')
+      '<small>'+new Date(x.at).toLocaleDateString('nl-NL',{day:'numeric',month:'long'})+' · '+woorden(x.tekst)+' woorden</small></div><span>→</span></div>').join('')
       : '<div class="leeg">Nog niets bewaard.</div>';
     $('#schrijfsels').querySelectorAll('[data-id]').forEach(r => r.addEventListener('click', () => {
       const x = d.schrijfsels.find(y => y.id === r.dataset.id);
@@ -124,5 +142,6 @@ laadSchrijfsels();
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

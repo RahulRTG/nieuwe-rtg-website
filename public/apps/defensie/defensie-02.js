@@ -1,5 +1,6 @@
   async function laad() {
     const d = await api('def/overzicht');
+    STAND = d;
     $('#titel').textContent = '' + d.naam;
     const p = d.paraatheid;
     $('#paraatheid').innerHTML =

@@ -40,6 +40,8 @@
   </div>
   <div id="raad" hidden></div>
 </main>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -47,10 +49,23 @@ let CODE = null; try { CODE = localStorage.getItem('rtf_raadcode'); } catch (e) 
 const api = (pad, body) => fetch('/api/rtf/partner/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(Object.assign({ code: CODE }, body || {})) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+let RAAD = null;
+/* Meenemen (shared/uitvoer.js): het besluitenregister van deze raadstafel,
+   met dezelfde velden als de kaartjes -- titel, voorstel, wie het indiende,
+   de status en de uitslag. Een stadspartner die zijn eigen besluiten wil
+   naslaan of aan zijn bestuur laten zien, neemt ze zo mee. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var b = (RAAD && RAAD.besluiten) || [];
+  if (!b.length) return null;
+  return { naam: 'besluiten', kolommen: ['titel', 'voorstel', 'door', 'status', 'uitslag'],
+    rijen: b.map(function (x) { return [x.titel, x.voorstel, x.door, x.status, x.uitslag || '']; }) };
+});
+
 async function laad(){
   let d;
   try { d = await api('raad'); }
   catch (e) { $('#fout').textContent = e.message; $('#fout').hidden = false; $('#raad').hidden = true; return; }
+  RAAD = d;
   try { localStorage.setItem('rtf_raadcode', CODE); } catch (e) {}
   $('#poort').hidden = true;
   const uitslagen = (d.uitslagen || []).map(u =>
@@ -73,7 +88,8 @@ async function laad(){
     '<div class="noot" style="margin-top:.4rem;">Een besluit valt pas als beide kanten gestemd hebben: uw stem namens de stad en die van het RTG-personeel. Het besloten RTG-bedrijfswerk staat nooit op deze tafel.</div></div>' +
     '<div class="kaart"><div class="sec">Lab-uitslagen op de raadstafel</div>' + uitslagen + '</div>' +
     '<div class="kaart"><div class="sec">Besluiten</div>' + besluiten + '</div>' +
-    '<div class="kaart rij"><button class="knop stil" id="weg">Uitloggen</button><span class="noot">De raadcode blijft alleen op dit toestel bewaard.</span></div>';
+    // rtgdeel-vast: uitloggen hoort bij geen enkel deel en blijft altijd staan
+    '<div class="kaart rij rtgdeel-vast"><button class="knop stil" id="weg">Uitloggen</button><span class="noot">De raadcode blijft alleen op dit toestel bewaard.</span></div>';
   document.querySelectorAll('[data-voorstel]').forEach(b => b.addEventListener('click', async () => {
     const v = prompt('Wat stelt u namens ' + d.partner.stad + ' voor met deze uitslag?'); if (!v) return;
     try { await api('besluit-start', { projectId: b.dataset.voorstel, voorstel: v }); laad(); } catch (e) { alert(e.message); }
@@ -93,6 +109,7 @@ $('#open').addEventListener('click', () => { CODE = $('#code').value.trim().toUp
 $('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#open').click(); });
 if (CODE) { $('#code').value = CODE; laad(); }
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
@@ -100,5 +117,6 @@ if (CODE) { $('#code').value = CODE; laad(); }
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

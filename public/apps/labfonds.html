@@ -31,6 +31,8 @@
   .som .c .n{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
   .som .c .v{font-family:'Bodoni Moda',serif;font-size:1.3rem;margin-top:.25rem;color:var(--lab);}
   h2.sec{font-size:1.1rem;border-bottom:1px solid var(--line);padding-bottom:.5rem;margin:1.8rem 0 1rem;}
+  /* markering voor het deelmenu; met menu is hij weg, zonder menu een rustige kop */
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:1.8rem 0 .5rem;}
   .locs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.9rem;}
   .loc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;display:flex;flex-direction:column;gap:.5rem;}
   .loc .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;}
@@ -86,7 +88,7 @@
   </div>
 </header>
 <main role="main">
-  <p class="intro">Leden zamelen samen in voor het RTF Onderzoekslab. Het geld wordt <b>per locatie</b> verdeeld, zodat elke plek zelf in de eigen omgeving kan investeren. Wat er met de pot van een locatie gebeurt, beslissen de leden <b>gezamenlijk</b> &mdash; met een AI-scheidsrechter die let op eerlijkheid en of het echt de omgeving dient.</p>
+  <p class="intro rtgdeel-vast">Leden zamelen samen in voor het RTF Onderzoekslab. Het geld wordt <b>per locatie</b> verdeeld, zodat elke plek zelf in de eigen omgeving kan investeren. Wat er met de pot van een locatie gebeurt, beslissen de leden <b>gezamenlijk</b> &mdash; met een AI-scheidsrechter die let op eerlijkheid en of het echt de omgeving dient.</p>
 
   <div id="anon" class="anon" style="display:none">Log in met je RTG-account om mee in te zamelen, voor te stellen en te stemmen.</div>
 
@@ -104,6 +106,7 @@
     <div id="fout" class="fout"></div>
     <div id="voorstellen"><div class="leeg">Laden&hellip;</div></div>
 
+    <div class="deel">Voorstel doen</div>
     <div class="nieuw">
       <h3>Een voorstel doen</h3>
       <div class="h">Wat zou de pot van een locatie in de omgeving kunnen betekenen? De scheidsrechter geeft meteen een eerste oordeel; de leden stemmen.</div>
@@ -116,6 +119,8 @@
   </div>
 </main>
 
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
@@ -131,6 +136,15 @@ async function api(pad, body){
 }
 
 let LOCS = [];
+/* Meenemen: de potten per locatie zoals het fonds ze bijhoudt. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!LOCS.length) return null;
+  return { naam: 'labfonds-locaties',
+    kolommen: ['locatie', 'land', 'in de pot', 'opgehaald', 'uitgekeerd', 'mijn bijdrage', 'open voorstellen'],
+    rijen: LOCS.map(function (l) {
+      return [l.naam, l.land || '', l.pot, l.opgehaald, l.uitgekeerd || 0, l.mijnBijdrage, l.open];
+    }) };
+});
 async function laad(){
   if (!TOKEN){ $('#anon').style.display='block'; return; }
   let d;
@@ -214,6 +228,8 @@ $('#nMaak').onclick = async () => {
 laad();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>

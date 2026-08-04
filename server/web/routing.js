@@ -77,20 +77,35 @@ function maakRouter() {
     let i = 0;
     const startUrl = req.url;
     const buitenParams = req.params || {};
+    /* HET OVERSLAAN IS EEN LUS, HET AANROEPEN BLIJFT RECURSIE.
+
+       Elke laag die niet past werd overgeslagen met `return next(err)` -- een
+       nieuwe stapelframe per laag. Met een paar duizend geregistreerde routes
+       (2535 vandaag) viel het proces daardoor om op een verzoek dat nergens op
+       matcht: RangeError: Maximum call stack size exceeded, uncaughtException,
+       server weg. Een POST naar een niet-bestaand pad was genoeg, zonder inlog.
+
+       Het overslaan gaat nu met `continue` in deze lus, dus zonder stapel. Een
+       laag die WEL past wordt onveranderd aangeroepen met `next` als vervolg:
+       roept die synchroon next() aan, dan loopt dat precies zoals eerst (de
+       rest van de keten draait binnen die aanroep). Zo blijft het gedrag van
+       elke middleware gelijk en groeit de stapel alleen nog met het aantal
+       lagen dat echt matcht -- een handvol, geen paar duizend. */
     function next(err) {
+      for (;;) {
       if (i >= lagen.length) { req.url = startUrl; return klaar(err); }
       const laag = lagen[i++];
       // fout-middleware draait alleen bij een fout; gewone middleware alleen zonder.
-      if (err && !laag.fout) return next(err);
-      if (!err && laag.fout) return next();
+      if (err && !laag.fout) continue;
+      if (!err && laag.fout) continue;
       const methodeOk = !laag.method || laag.method === req.method ||
         (laag.method === 'GET' && req.method === 'HEAD');
-      if (laag.method && !methodeOk) return next(err);
+      if (laag.method && !methodeOk) continue;
       const pn = padNaar(req.url);
 
       if (laag.mount) {
         const mm = mountMatch(laag.prefix, pn);
-        if (!mm) return next(err);
+        if (!mm) continue;
         req.params = { ...buitenParams };
         const oudUrl = req.url;
         req.url = mm.len ? req.url.slice(mm.len) || '/' : req.url;
@@ -106,7 +121,7 @@ function maakRouter() {
       }
 
       const params = padMatch(laag, pn);
-      if (params === null) return next(err);
+      if (params === null) continue;
       req.params = { ...buitenParams, ...params };
       /* Het PATROON onthouden, niet het pad. De meting (server/meting.js) telt
          hierop: op het patroon zijn het een paar duizend waarden, op het pad is
@@ -126,7 +141,8 @@ function maakRouter() {
       try {
         if (laag.fout) return laag.fn(err, req, res, next);
         return laag.fn(req, res, next);
-      } catch (e) { return next(e); }
+      } catch (e) { err = e; continue; }
+      }
     }
     next();
   }

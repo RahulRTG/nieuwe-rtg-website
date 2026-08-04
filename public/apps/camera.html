@@ -9,6 +9,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/apps/rtg-protect.css" rel="stylesheet">
+<script src="/shared/uitvoer.js"></script>
 <script src="/apps/rtg-protect.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
@@ -121,7 +122,7 @@
   <div class="foodring" id="foodring" aria-hidden="true"></div>
   <div class="geen-cam" id="geenCam">
     <b>De camera is hier niet beschikbaar</b>
-    <span>Geef de browser toegang tot de camera, of open de app op een telefoon. Rahul&#39;s fototips werken ondertussen gewoon.</span>
+    <span id="geenCamTekst">Geef de browser toegang tot de camera, of open de app op een telefoon. Rahul&#39;s fototips werken ondertussen gewoon.</span>
   </div>
 </div>
 <div class="flits-anim" id="flitsAnim" aria-hidden="true"></div>
@@ -453,6 +454,14 @@ window.Studio = (function () {
   /* ---------- de camera: hoogste kwaliteit die het toestel geeft ---------- */
   let stroom = null, kant = 'environment', spoor = null;
   async function start() {
+    /* Buiten een beveiligde context (https of localhost) BESTAAT
+       navigator.mediaDevices niet; "geef toegang" is dan een misleidende
+       raad, want er valt niets toe te staan. Eerst de echte oorzaak. */
+    if (!window.isSecureContext || !navigator.mediaDevices) {
+      $('#geenCamTekst').textContent = 'Dit adres is onbeveiligd (http), en een browser geeft de camera alleen vrij op een beveiligd adres. Open de app via het https-adres; Rahul’s fototips werken ondertussen gewoon.';
+      $('#geenCam').classList.add('aan');
+      return;
+    }
     if (stroom) stroom.getTracks().forEach(t => t.stop());
     try {
       stroom = await navigator.mediaDevices.getUserMedia({ audio: false, video: {
@@ -580,5 +589,6 @@ window.Studio = (function () {
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

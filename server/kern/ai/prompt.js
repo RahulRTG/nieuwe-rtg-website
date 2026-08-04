@@ -6,6 +6,7 @@
 const RAHUL_KARAKTER = require('./karakter');
 const { TAALREGELS } = require('../rahul/taal');
 const { TWIJFELREGELS } = require('../rahul/twijfel');
+const { cannedAnswer } = require('./demoantwoorden');
 module.exports = (ctx) => {
   const { db, PERSONAS, AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel } = ctx;
   function aiSystemPrompt(tier, lang, key) {
@@ -73,38 +74,5 @@ module.exports = (ctx) => {
     ].join('\n');
   }
 
-  /* Demo-antwoorden wanneer er geen Claude API-key is. */
-  function cannedAnswer(q) {
-    const l = q.toLowerCase().trim();
-    /* DIT ANTWOORD BEGON MET "GEREGELD." EN DAT WAS NIET WAAR.
-
-       Het gaat uit zodra een lid ja zegt op een aanbod ("ja", "graag", "doe
-       maar", "regel het") en het beweerde dat de paklijst klaarstond en het
-       dagplan was INGEPLAND, tot en met een boot van 10:00 en een tafel om
-       21:00. Er wordt hier niets geboekt: dit is het vaste antwoord voor een
-       installatie zonder API-sleutel, en dat is elke demo en de hele suite.
-
-       De merkregel is dat de AI nooit bevestigt dat iets geregeld is. De prompt
-       draagt die regel sinds de vorige ronde, en juist dit antwoord ontsnapte:
-       de toets die erop let filtert regels die met een quote beginnen, en deze
-       begint met `return`. De grendel stond er dus, en keek langs de enige
-       tekst die in de praktijk verstuurd wordt.
-
-       Nu zegt hij wat er echt gebeurt: het staat als voorstel klaar, RTG vraagt
-       het aan, en niets is bevestigd tot de partner ja zegt. */
-    if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
-      return 'Ik zet het voor u in gang. De paklijst staat als voorstel in uw reisoverzicht, en voor 20 juli leg ik dit voor: 10:00 privéboot naar Formentera, lunch aan boord, en om 21:00 een tafel bij Sal de Mar.\n\nNog niets is bevestigd: de boot en de tafel gaan als aanvraag naar de partners en ik laat het u weten zodra zij ja zeggen. Wilt u dat ik het zo aanvraag?';
-    if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer'))
-      return 'Voor Ibiza in juli (25-31°C, zonnig):\n• Lichte kleding + zwemkleding\n• Zonnebrand en een hoed\n• Nette outfit voor Sal de Mar\n• Een lichte trui voor de avonden aan zee\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
-    if (l.includes('visum') || l.includes('paspoort') || l.includes('document'))
-      return 'Voor Ibiza (Spanje, EU) heeft u als Nederlander geen visum nodig; een geldige ID-kaart of paspoort volstaat. Ik zet uw boekingsbevestigingen alvast klaar in de app, mocht ernaar gevraagd worden.';
-    if (l.includes('weer'))
-      return 'Ibiza medio juli: gemiddeld 25-31°C, veel zon en warme avonden. De beste tijd voor de boot naar Formentera is vroeg in de ochtend, vóór de drukte; zal ik het vertrek op 10:00 laten aanhouden?';
-    if (l.includes('plan') || l.includes('dag') || l.includes('doen'))
-      return 'Voorstel voor 20 juli:\n• 10:00 privéboot naar Formentera\n• 13:00 lunch aan boord of op het strand\n• 18:00 terug, borrel bij Sunset Ibiza\n• 21:00 diner bij Sal de Mar (staat in aanvraag)\n\nZal ik de strandlunch laten reserveren?';
-    if (l.includes('restaurant') || l.includes('eten') || l.includes('diner'))
-      return 'Uw tafel bij Sal de Mar (19 jul, 21:00) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan een strandrestaurant in Cala Jondal of een adres in Marina Botafoch, beide via ons netwerk tegen normale prijs.';
-    return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Ibiza kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.';
-  }
   return { aiSystemPrompt, cannedAnswer };
 };

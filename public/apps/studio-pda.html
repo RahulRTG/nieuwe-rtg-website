@@ -31,9 +31,23 @@
   select.veld{color-scheme:dark;}
   .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
-  .chips{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem;}
-  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
-  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* De disciplinerij is de eigen schakelaar van deze app -- het filteren blijft
+     van de pagina -- maar draagt de stijl van het deelmenu (shared/deelmenu.js):
+     geen pil met een randje, maar een rustige balk met kleine kapitalen en een
+     gouden streep onder de actieve. De voorvoegsels zijn nodig omdat de
+     gedeelde pilrij in rtg-ui.css anders zwaarder weegt: die rij staat er als
+     `body.rtg-stijl .chips > button` en dat telt een klasse en een element
+     MEER dan een kale `.chip`. Zonder de `.chips >` ervoor stond deze regel er
+     wel, maar deed hij niets -- gemeten in de browser, niet gehoopt. */
+  body.rtg-stijl .chips{display:flex;gap:.15rem;overflow-x:auto;margin:0 0 .2rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);scrollbar-width:none;}
+  body.rtg-stijl .chips::-webkit-scrollbar{display:none;}
+  body.rtg-stijl .chips > .chip{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;
+    font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    cursor:pointer;}
+  body.rtg-stijl .chips > .chip:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .chips > .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
   .swatch{width:1.6rem;height:1.6rem;border-radius:7px;border:1px solid var(--line);}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
@@ -61,11 +75,31 @@
   <div id="pLijst"><div class="leeg">Laden...</div></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+/* De deur op de app zelf, in plaats van wegsturen. Wie hier uitgelogd komt
+   verloor met een location.replace() waar hij heen wilde: je landde op de
+   personeels-app zonder te zien welke app je had geopend (TAKEN 5.5). De
+   gedeelde poort toont wat deze app is en waar de inlog zit, met de weg terug
+   in de link. Laadt de poort onverhoopt niet, dan doen we alsnog wat we eerst
+   deden -- een dichte app zonder uitleg is erger dan een omweg. */
+function uitgelogd(){
+  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
+     bindt daarna nog listeners aan knoppen binnen #main -- die zijn dan weg en
+     dat gaf een reeks "Cannot read properties of null". De listeners hangen nu
+     netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
+     zodra de pagina klaar is met opbouwen. */
+  setTimeout(function () {
+    var el = document.getElementById('main') || document.body;
+    RTGDeur.toon(el, { soort: 'personeel', naar: naar });
+  }, 0);
+}
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/office/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
@@ -80,6 +114,22 @@ async function laad(){
   if (!sel.options.length) sel.innerHTML = DATA.disciplines.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   render();
 }
+/* Meenemen (shared/uitvoer.js): het ontwerpregister uit het eigen model, veld
+   voor veld -- niet de kaarttekst van het scherm. De discipline volgt het
+   actieve filter, zodat u meeneemt wat u ziet. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!DATA || !DATA.ontwerpen) return null;
+  const lijst = DATA.ontwerpen.filter(o => !filter || o.discipline === filter);
+  return {
+    naam: 'ontwerpen',
+    kolommen: ['naam','discipline','status','huis','collectie','silhouet','aandrijving','kleuren','kritiek','aangemaakt','bijgewerkt'],
+    rijen: lijst.map(o => [o.naam || '', o.disciplineLabel || o.discipline || '', o.status || '',
+      o.huis || '', o.collectie || '',
+      o.concept ? o.concept.silhouet : '', o.concept ? o.concept.aandrijving : '',
+      o.concept ? (o.concept.kleuren || []).map(k => k.naam).join(', ') : '',
+      o.kritiek || '', (o.at || '').slice(0, 10), (o.updatedAt || '').slice(0, 10)])
+  };
+});
 function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span class="pil" style="color:'+g+';">'+esc(s)+'</span>'; }
 function volgende(s){ const i = DATA.statussen.indexOf(s); return (i>=0 && i < DATA.statussen.length-1) ? DATA.statussen[i+1] : null; }
 function render(){
@@ -129,7 +179,11 @@ $('#pMaak').addEventListener('click', async () => {
     meld('Concept aangemaakt; de chef-ontwerper tekent het uit.');
   } catch(e){ meld(e.message); }
 });
-laad();
+/* Zonder kantoorsessie staat de deur er al; doorstarten levert dan
+   alleen 401-en op die de poort weer zouden overschrijven. */
+if (TOKEN) {
+  laad();
+}
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -137,5 +191,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

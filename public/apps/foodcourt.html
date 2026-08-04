@@ -25,9 +25,20 @@
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:900px;margin:0 auto;}
-  .chips{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .6rem;}
-  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
-  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* De Food Court houdt zijn eigen keukenkiezer, maar draagt hem in de stijl
+     van het deelmenu: een rustige balk met kleine kapitalen en een gouden
+     streep onder de gekozen keuken, geen losse pillen. Zo is het huis er een,
+     ook waar de app zijn schakelaar zelf regelt. De selector moet dieper dan
+     `.chip`: de kit tekent .chips/.chip als een rij pillen, mede via
+     `body.rtg-stijl .chips > button`, en die is specifieker. */
+  body.rtg-stijl .chips{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;
+    padding:0 0 .1rem;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .chips > .chip{white-space:nowrap;background:none;border:0;
+    border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;cursor:pointer;
+    padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;font-size:.72rem;
+    font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  body.rtg-stijl .chips > .chip:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .chips > .chip.aan{color:var(--txt);background:none;border-bottom-color:var(--gold);}
   .lijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.9rem;margin-top:.6rem;}
   .resto{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.3rem;text-align:left;}
   .resto:hover{border-color:var(--gold);transform:translateY(-2px);}
@@ -59,6 +70,7 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
@@ -112,6 +124,13 @@ if (!TOKEN) {
 } else { laad(); }
 
 let ALLE = [], keuken = '';
+/* Meenemen (shared/uitvoer.js): de restaurantlijst met de velden die de kaart
+   toont. Wie een tafel zoekt, wil die lijst ook naast zich kunnen leggen. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => ({
+  naam: 'restaurants',
+  kolommen: ['naam', 'keuken', 'prijs', 'stad', 'aanbod', 'reserveren mogelijk'],
+  rijen: ALLE.map(r => [r.naam, r.keuken, r.prijs, r.stad || '', r.deal || '', r.open ? 'ja' : 'nee'])
+}));
 async function laad(){
   let d;
   try { d = await api('/api/foodcourt'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
@@ -178,5 +197,6 @@ $('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -25,6 +25,9 @@
   .ev .nm{font-weight:600;font-size:1.05rem;}
   .ev .meta{font-size:.82rem;color:var(--soft);margin-top:.2rem;}
   .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.5rem 0 .25rem;display:block;}
+  /* markeringen voor het deelmenu: staat het menu er, dan haalt het ze weg;
+     staat het er (nog) niet, dan blijft er een rustige sectiekop staan */
+  .deel{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.2rem 0 .5rem;}
   .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;}
   .rij>*{flex:1;min-width:6rem;}
@@ -50,6 +53,8 @@
 <header><div><div class="ey">Lifestyle Pass</div><h1>Table</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -60,14 +65,30 @@ const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov',
 const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; };
 const AIBOX=app=>'<div class="kaart"><h2>Vraag de maître</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
-let open=null;
+let open=null, DATA=null;
+/* Meenemen (shared/uitvoer.js): uit het eigen model, veld voor veld. Staat er
+   een gelegenheid open, dan neemt u die gastenlijst mee -- anders het
+   overzicht van de gelegenheden. Wat u ziet is wat u meeneemt. */
+if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
+  if(!DATA||!DATA.events) return null;
+  const e=open?DATA.events.find(x=>x.id===open):null;
+  if(e) return { naam:'gasten',
+    kolommen:['gelegenheid','datum','gast','tafel','dieet','notitie'],
+    rijen:(e.gasten||[]).map(g=>[e.naam||'', e.datum||'', g.naam||'', g.tafel||'', g.dieet||'', g.notitie||'']) };
+  return { naam:'gelegenheden',
+    kolommen:['naam','datum','tijd','locatie','gasten','gangen','notitie'],
+    rijen:DATA.events.map(x=>[x.naam||'', x.datum||'', x.tijd||'', x.locatie||'',
+      x.gastenAantal||0, (x.menu||[]).length, x.notitie||'']) };
+});
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('table'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Table is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
+  let d; try{ d=await api('table'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
+  DATA=d;
   if(open){ const e=d.events.find(x=>x.id===open); if(e) return detail(e); open=null; }
-  let h='<div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij" style="margin-top:.4rem;"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div style="margin-top:.6rem;"><button class="knop" id="nDoe">Aanmaken</button></div></div>';
+  let h='<div class="deel">Nieuwe gelegenheid</div><div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij" style="margin-top:.4rem;"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div style="margin-top:.6rem;"><button class="knop" id="nDoe">Aanmaken</button></div></div>';
+  h+='<div class="deel">Gelegenheden</div>';
   h+= d.events.length ? d.events.map(e=>'<div class="kaart ev" data-id="'+e.id+'"><div class="nm">'+esc(e.naam)+'</div><div class="meta">'+[e.datum?dt(e.datum):'',esc(e.tijd),esc(e.locatie),e.gastenAantal+' gasten'].filter(Boolean).join(' · ')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen gelegenheden.</div></div>';
-  h+=AIBOX('Bijv. stel een menu voor zes gasten voor');
+  h+='<div class="deel">De maître</div>'+AIBOX('Bijv. stel een menu voor zes gasten voor');
   $('#main').innerHTML=h;
   $('#nDoe').onclick=async()=>{ const naam=$('#nN').value.trim(); if(!naam) return meld('Geef de gelegenheid een naam.'); try{ await api('table/zet',{naam,datum:$('#nD').value,tijd:$('#nT').value,locatie:$('#nL').value}); laad(); }catch(e){ meld(e.message); } };
   document.querySelectorAll('.ev').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
@@ -89,6 +110,7 @@ function detail(e){
 }
 laad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -96,5 +118,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -160,6 +160,10 @@
 <div class="melding" id="melding" role="status"></div>
 <div id="poort"></div>
 </main>
+<!-- uitvoer.js zonder defer en voor het eigen script; de Residence meldt geen
+     eigen model aan (een zaal met potjes en gesprek is geen register), maar de
+     laag hoort er te zijn zodat de sneltoetsen hetzelfde werken als elders -->
+<script src="/shared/uitvoer.js"></script>
 <script src="/apps/residentie.js" defer></script>
 <script src="/shared/glyf.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
@@ -168,5 +172,7 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/deelmenu.js" defer></script>
 </body>
 </html>

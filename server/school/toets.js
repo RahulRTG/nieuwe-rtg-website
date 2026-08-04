@@ -157,14 +157,5 @@ module.exports = (sctx) => {
     res.json(uit);
   });
 
-  /* de leerdoelen-bibliotheek voor het maak-scherm van de leraar */
-  router.post('/school/toets/bibliotheek', (req, res) => {
-    const k = klasVan(req, res); if (!k) return;
-    const perGroep = {};
-    for (const d of Object.values(DOELEN)) {
-      perGroep[d.groep] = perGroep[d.groep] || [];
-      perGroep[d.groep].push({ id: d.id, vak: d.vak, naam: d.naam, ref: d.ref || null });
-    }
-    res.json({ ok: true, groepen: Object.entries(perGroep).map(([groep, doelen]) => ({ groep: Number(groep), doelen })) });
-  });
+  // de leerdoelen-bibliotheek voor het maak-scherm woont in ./toetsbieb.js
 };

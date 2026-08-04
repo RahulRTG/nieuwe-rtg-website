@@ -46,6 +46,8 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
+<!-- uitvoer.js zonder defer en VOOR het eigen script: dat meldt zijn model aan -->
+<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -100,6 +102,23 @@
     clearTimeout(mt); mt = setTimeout(() => m.classList.remove('zien'), 3200); };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  let MATCHES = [];   // wat er binnenkomt van /api/vonk/mijn
+  /* Meenemen (shared/uitvoer.js): uw matches met de tafel die erbij hoort --
+     wie, sinds wanneer, waar en wanneer, en hoe het ervoor staat. Alleen
+     codenamen, precies zoals het scherm ze toont; de chat blijft in de app. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!MATCHES.length) return null;
+    return {
+      naam: 'vonk-matches',
+      kolommen: ['codenaam', 'match sinds', 'zaak', 'plek', 'datum', 'tijd', 'status'],
+      rijen: MATCHES.map(x => {
+        const t = x.tafel || {};
+        return [x.met, String(x.at || '').slice(0, 10), t.supplierName || '', t.plek || '',
+          t.datum || '', t.tijd || '', x.status || ''];
+      })
+    };
+  });
+
   async function laad() {
     try {
       const s = await api('selectie');
@@ -117,6 +136,7 @@
         '<p class="stil">' + esc(s.uitleg || 'Vandaag niemand nieuw; morgen weer.') + '</p>';
       koppel();
       const m = await api('mijn');
+      MATCHES = m.matches || [];
       $('#matches').innerHTML = (m.matches || []).map(x =>
         '<div class="kaart"><div class="naam">' + esc(x.met) + '</div>' +
         (x.tafel ? '<div class="sub">Tafel: ' + esc(x.tafel.supplierName) + ' (' + esc(x.tafel.plek) + '), ' + esc(x.tafel.datum) + ' ' + esc(x.tafel.tijd) +
@@ -158,11 +178,13 @@
   laad();
 })();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

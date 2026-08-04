@@ -485,6 +485,24 @@
   $('#tlPrev').addEventListener('click', () => { if (tlPage > 1){ tlPage--; laadTimeline(); } });
   $('#tlNext').addEventListener('click', () => { if (tl && tlPage < tl.pages){ tlPage++; laadTimeline(); } });
 
+  /* Meenemen (shared/uitvoer.js): de tijdlijn kent zijn eigen velden, dus geeft
+     het kantoor die door in plaats van de gedeelde laag de rijen van het scherm
+     te laten plukken -- daar staat "hotel 2 item(s) · 3 u geleden" in een regel,
+     hier staan partner, gast, bedrag en status als losse kolommen. Dit is de
+     pagina die u OPEN hebt (25 regels, uw zoekterm); de knop CSV hiernaast
+     blijft wat hij was: de hele historie, door de server gebouwd. De gast staat
+     er met zijn codenaam in, precies zoals op het scherm. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+    if (!tl || !tl.items || !tl.items.length) return null;
+    return {
+      naam: 'tijdlijn',
+      kolommen: ['datum','referentie','soort','partner','gast','omschrijving','bedrag','betaald','status'],
+      rijen: tl.items.map(x => [String(x.at || '').slice(0, 10), x.ref || '', x.soort || '',
+        x.supplierName || '', x.customerCodename || '', x.sub || '', x.bedrag || 0,
+        x.paid ? 'ja' : 'nee', x.status || ''])
+    };
+  });
+
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }

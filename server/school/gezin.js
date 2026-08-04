@@ -5,6 +5,16 @@ module.exports = (sctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
   const { gemiddelde } = sctx;
+  const { FASEN, TRAPPEN } = require('../kern/onderwijs-ladder');
+  // het niveau van een klas in mensentaal, voor de gezinsweergave: de fase
+  // ("Groep 7", "Havo") en de schoolsoort ("Basisschool"), van de ladder
+  const klasNiveau = (k) => {
+    const f = k.fase ? FASEN.find(x => x.id === k.fase) : null;
+    return { fase: k.fase || null, trap: k.trap || null,
+      niveau: f ? f.naam : null,
+      schoolsoort: k.trap ? ((TRAPPEN[k.trap] || {}).naam || k.trap) : null,
+      volgorde: k.trap ? ((TRAPPEN[k.trap] || {}).volgorde || 99) : 99 };
+  };
   router.post('/school/mijn', async (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
     // een ouder ziet alle gekoppelde kinderen; een kind alleen zichzelf
@@ -18,7 +28,7 @@ module.exports = (sctx) => {
           // de thuistaal van deze klasgenoot + de tweetalige laag (NL blijft staan)
           taal: l.taal || null,
           vertaling: l.taal && sctx.tweetalig ? await sctx.tweetalig(k, l) : undefined,
-          klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school },
+          klas: Object.assign({ code: k.code, naam: k.naam, leraar: k.leraar, school: k.school }, klasNiveau(k)),
           kind: { profielId: l.profielId, naam: l.naam, sleutel: l.sleutel },
           // thuiswerken: staat de online les aan, dan reist de kamercode mee
           onlineLes: k.onlineLes || null,

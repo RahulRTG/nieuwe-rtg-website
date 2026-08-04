@@ -95,6 +95,22 @@
       tekenLijst();
     });
   }
+  /* Meenemen: de drive kent zijn eigen model, dus geeft hij dat door in plaats
+     van de gedeelde laag de documentregels te laten lezen -- daar staat
+     "Rekenblad · 3 versies" als een stuk tekst, hier staan de velden. Eigen en
+     gedeelde documenten samen, met de kolom "van" erbij. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!stand) return null;
+    var dag = function (s) { var m = /^\d{4}-\d{2}-\d{2}/.exec(String(s || '')); return m ? m[0] : ''; };
+    var rij = function (d, eigen) {
+      return [d.titel || '', NAAM_SOORT[d.soort] || 'Document', dag(d.gemaakt), dag(d.gewijzigd),
+        d.omvang || '', d.versies || 0, eigen ? 'van mij' : (d.door || 'gedeeld')];
+    };
+    return { naam: 'documenten',
+      kolommen: ['titel', 'soort', 'gemaakt', 'gewijzigd', 'omvang', 'versies', 'van'],
+      rijen: (stand.docs || []).map(function (d) { return rij(d, true); })
+        .concat((stand.gedeeld || []).map(function (d) { return rij(d, false); })) };
+  });
   function tekenSjablonen(lijst) {
     var groepen = {};
     lijst.forEach(function (s) { (groepen[s.groep || 'Algemeen'] = groepen[s.groep || 'Algemeen'] || []).push(s); });

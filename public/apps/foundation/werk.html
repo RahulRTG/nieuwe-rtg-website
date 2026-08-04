@@ -76,6 +76,8 @@
 <script src="sessie.js"></script>
 <script src="/apps/geo.js"></script>
 <script src="/apps/translate.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
@@ -131,6 +133,23 @@ function toonCvStatus(){
 
 let vacatures = [];
 let mijnPlek = Geo.laatste(); // {lat,lng} of null
+
+/* Meenemen (shared/uitvoer.js): de vacatures die nu voor deze leeftijd en dit
+   land open staan, met de velden die op de kaart staan -- en of dit toestel er
+   al op gesolliciteerd heeft. Zo kun je buiten de app verder zoeken. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!vacatures.length) return null;
+  var verz = verzonden();
+  return {
+    naam: 'vacatures',
+    kolommen: ['functie', 'bedrijf', 'soort', 'vanaf leeftijd', 'land', 'plaats', 'uren', 'gesolliciteerd'],
+    rijen: vacatures.map(function (v) {
+      return [v.func, v.bedrijf, SOORT[v.soort] || v.soort, v.minLeeftijd,
+        v.landNaam || '', v.plaats || v.stad || '', v.uren || '',
+        verz.indexOf(v.id) >= 0 ? 'ja' : 'nee'];
+    })
+  };
+});
 function vulLanden(landen){
   const sel = $('#land'); const huidig = sel.value;
   sel.innerHTML = '<option value="">Overal</option>' +
@@ -297,5 +316,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

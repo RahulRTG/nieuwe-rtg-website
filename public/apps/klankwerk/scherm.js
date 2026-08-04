@@ -36,6 +36,18 @@
      een stuk mag worden -- en die lopen vroeg of laat uit elkaar. */
   var track = null, instrumenten = {}, raster = null, vuil = false, grens = { maten: 8 };
 
+  // de stukken van dit lid, zoals de lijst ze binnenkrijgt
+  var STUKKEN = [];
+  /* Meenemen: het register van uw stukken. Het geluid gaat als WAV mee (zie
+     wav.js); dit is de lijst zelf, met echte velden. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!STUKKEN.length) return null;
+    return { naam: 'mijn-stukken', kolommen: ['naam', 'tempo', 'maten', 'kanalen', 'klaar'],
+      rijen: STUKKEN.map(function (t) {
+        return [t.naam, t.bpm, t.maten, t.kanalen, t.klaar ? 'ja' : 'nee'];
+      }) };
+  });
+
   if (!TOKEN) {
     $('#lijstVlak').innerHTML = '<div class="kaart"><h2>Log eerst in</h2>' +
       '<p class="stil" style="margin-top:.5rem;">Open de RTG-app en log in; daarna staan uw stukken hier.</p></div>';
@@ -51,7 +63,8 @@
       if (d.maxMaten) { grens.maten = d.maxMaten; $('#tMaten').max = String(d.maxMaten); }
       vulInstrumenten();
       var v = $('#lijstVlak'); v.hidden = false;
-      var rijen = (d.tracks || []).map(function (t) {
+      STUKKEN = d.tracks || [];
+      var rijen = STUKKEN.map(function (t) {
         return '<button class="stuk" data-id="' + esc(t.id) + '">' +
           '<span><span class="nm">' + esc(t.naam) + (t.klaar ? '<span class="merk">klaar</span>' : '') + '</span>' +
           '<span class="mt">' + t.bpm + ' slagen · ' + t.maten + ' ' + (t.maten === 1 ? 'maat' : 'maten') +

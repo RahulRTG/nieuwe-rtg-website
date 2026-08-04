@@ -53,6 +53,8 @@
 <header><div><div class="ey">Lifestyle Pass</div><h1>Cellier</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -62,9 +64,23 @@ const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',header
 const euro=c=>'€ '+Number(c||0).toLocaleString('nl-NL');
 const AIBOX=app=>'<div class="kaart"><h2>Vraag de sommelier</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
+let STAND=null;
+/* Meenemen: de kelder is een register en geen scherm -- per fles het domein, de
+   kleur, de jaargang, hoeveel er ligt, wat hij waard is en wanneer hij op dronk
+   is. Precies de velden die u zelf invulde. */
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!STAND||!(STAND.flessen||[]).length) return null;
+  return { naam:'cellier',
+    kolommen:['wijn','domein','kleur','jaargang','aantal','waarde per fles','drink vanaf','drink tot','staat'],
+    rijen:STAND.flessen.map(function(f){
+      return [f.naam||'', f.domein||'', f.kleur||'', f.jaargang||'', f.aantal||0, f.waarde||0,
+        f.drinkVan||'', f.drinkTot||'', f.staat||''];
+    }) };
+});
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('cellier'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Cellier is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon de kelder niet laden.</div>'; return; }
+  let d; try{ d=await api('cellier'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon de kelder niet laden.</div>'; return; }
+  STAND=d;
   const kl=d.kleuren;
   let h='<div class="grid"><div class="stat"><div class="n">'+d.totaalFlessen+'</div><div class="l">Flessen</div></div><div class="stat"><div class="n">'+euro(d.kelderwaarde)+'</div><div class="l">Kelderwaarde</div></div><div class="stat"><div class="n">'+d.opDronk+'</div><div class="l">Nu op dronk</div></div></div>';
   h+='<div class="kaart"><h2>Fles toevoegen</h2><div class="rij"><input class="veld" id="cN" placeholder="Wijn"><input class="veld" id="cD" placeholder="Domein/producent"></div><div class="rij" style="margin-top:.4rem;"><select class="veld" id="cK">'+kl.map(k=>'<option>'+k+'</option>').join('')+'</select><input class="veld" id="cJ" type="number" placeholder="jaargang"><input class="veld" id="cA" type="number" placeholder="aantal" value="1"><input class="veld" id="cW" type="number" placeholder="€/fles"></div><div class="rij" style="margin-top:.4rem;"><input class="veld" id="cV" type="number" placeholder="drink vanaf"><input class="veld" id="cT" type="number" placeholder="drink tot"></div><div style="margin-top:.6rem;"><button class="knop" id="cDoe">In de kelder</button></div></div>';
@@ -83,6 +99,7 @@ async function laad(){
 }
 laad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -90,5 +107,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -21,7 +21,7 @@
   var $ = function (s) { return document.querySelector(s); };
   var TOKEN = null;
   try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) { TOKEN = null; }
-  var filter = 'alles', speelt = null;
+  var filter = 'alles', speelt = null, stand = null;
 
   function api(pad, body) {
     return fetch('/api/muziek/' + pad, {
@@ -58,6 +58,7 @@
     api('zaal', { alleenRtg: filter === 'rtg', vanMij: filter === 'mij' }).then(teken);
   }
   function teken(d) {
+    stand = d;
     var vlak = $('#zaal');
     vlak.textContent = '';
     if (d.error) { vlak.appendChild(el('p', 'stil', d.error)); return; }
@@ -74,6 +75,24 @@
     vlak.appendChild(el('p', 'bodem', d.einde));
     vlak.appendChild(el('p', 'stil', d.uitleg));
   }
+
+  /* Meenemen (shared/uitvoer.js). De zaal is een lijst, en een lijst hoort mee
+     te kunnen: wat hier staat is wat er op het scherm staat, met dezelfde
+     filterkeuze. Velden uit het model, niet uit de kaart -- de datum als
+     YYYY-MM-DD, en verder alleen wat de kaart zelf al toont. Namen blijven
+     codenamen, precies zoals de zaal ze laat zien. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!stand) return null;
+    return {
+      naam: 'zaal',
+      kolommen: ['naam', 'onder', 'slagen', 'maten', 'mooi', 'reacties', 'makers', 'datum'],
+      rijen: (stand.uitgaven || []).map(function (u) {
+        return [u.naam, u.naamOnder, u.bpm, u.maten, u.mooi, u.reacties,
+          (u.makers || []).map(function (m) { return m.codenaam + ' (' + m.rol + ')'; }).join(', '),
+          String(u.at || '').slice(0, 10)];
+      })
+    };
+  });
 
   function kaart(u) {
     var k = el('div', 'kaart');

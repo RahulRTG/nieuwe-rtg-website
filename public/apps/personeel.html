@@ -403,6 +403,9 @@
      zijn inlogscherm opbouwt, vandaar hierboven en zonder defer -->
 <script src="/shared/mond.js"></script>
 <script src="/shared/rahulpoort.js"></script>
+<!-- uitvoer.js zonder defer en voor personeel.js: dat script meldt zijn eigen
+     model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
+<script src="/shared/uitvoer.js"></script>
 <script src="/apps/personeel.js"></script>
 <script>
 window.I18N = { en: {
@@ -587,5 +590,6 @@ window.I18N = { en: {
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

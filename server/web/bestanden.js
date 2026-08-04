@@ -61,10 +61,34 @@ function stuurBestand(req, res, fp, st, next) {
   fs.createReadStream(fp).on('error', () => res.destroy()).pipe(res);
 }
 
+/* ---------- meekijken welke SCHERMEN er geserveerd worden ----------
+   Dezelfde vorm als de patroonhaak in web/routing.js, en om dezelfde reden:
+   het routejournaal beantwoordt "is dit endpoint aangeraakt", maar een scherm
+   is geen route -- een pagina komt hier langs en niet bij de routematcher.
+   Daardoor kon niemand vaststellen of een schermtoets een app ooit had
+   GEOPEND, en werd "af" een bewering in plaats van een waarneming.
+
+   Zonder haak kost dit niets, en deze module weet niet wie er meekijkt. */
+let bestandHaak = null;
+function opBestand(fn) { bestandHaak = typeof fn === 'function' ? fn : null; }
+
 function statisch(root, opts) {
   root = path.resolve(root);
   const index = (opts && opts.index) || 'index.html';
   return function (req, res, next) {
+    /* Noteren op het moment dat we het verzoek aannemen, niet als het bestand
+       de deur uit is: net als bij de routes is de vraag "is dit scherm
+       opgevraagd", en een verbinding die halverwege wegvalt heeft het scherm
+       even goed opgevraagd. Alleen pagina's; losse scripts en plaatjes zeggen
+       niets over of een toets een app heeft geopend. */
+    if (bestandHaak && (req.method === 'GET' || req.method === 'HEAD')) {
+      const kaal = String(req.url || '').split('?')[0].split('#')[0];
+      if (/\.html?$/i.test(kaal)) { try { bestandHaak(kaal); } catch (e) {} }
+    }
+    return bedien(req, res, next);
+  };
+
+  function bedien(req, res, next) {
     if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     let pn; try { pn = decodeURIComponent(padNaar(req.url)); } catch (e) { return next(); }
     if (pn.indexOf('\0') !== -1) return next();
@@ -79,8 +103,8 @@ function statisch(root, opts) {
       if (!st.isFile()) return next();
       stuurBestand(req, res, fp, st, next);
     });
-  };
+  }
 }
 
 
-module.exports = { MIME, mimeVan, etagVan, stuurBestand, statisch };
+module.exports = { MIME, mimeVan, etagVan, stuurBestand, statisch, opBestand };

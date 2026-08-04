@@ -94,6 +94,9 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 (function () {
   'use strict';
@@ -108,7 +111,22 @@
   }
   if (!tok) { typenEl.innerHTML = '<p class="leeg">Meld je eerst aan bij Rahul; dan zet ik de pakketten voor je klaar.</p>'; return; }
 
-  var gekozen = null;
+  var gekozen = null, PAKKET = null;
+
+  /* Meenemen (shared/uitvoer.js): het pakket dat op het scherm staat, met de
+     onderdelen LOS -- werkplek, werk-app, techniek en het kantoor dat erbij
+     hoort -- en niet de zin die eromheen staat. Dit komt regelrecht uit
+     /api/pakket/advies; er wordt niets bij verzonnen. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!PAKKET) return null;
+    var rijen = [];
+    (PAKKET.werkplekken || []).forEach(function (w) { rijen.push([PAKKET.naam, 'werkplek', w.naam, w.wat || '']); });
+    (PAKKET.apps || []).forEach(function (a) { rijen.push([PAKKET.naam, 'werk-app', a.naam, '']); });
+    (PAKKET.technieken || []).forEach(function (t) { rijen.push([PAKKET.naam, 'techniek', t.naam, t.wat || '']); });
+    if (PAKKET.huur) rijen.push([PAKKET.naam, 'kantoor', PAKKET.huur.kantoor || '', PAKKET.huur.wat || '']);
+    return { naam: 'pakket', kolommen: ['pakket', 'soort', 'onderdeel', 'omschrijving'], rijen: rijen };
+  });
+
   api('/api/pakket/typen', {}).then(function(d){
     typenEl.innerHTML = (d.typen||[]).map(function(t){
       return '<button class="type" type="button" data-id="'+esc(t.id)+'"><b>'+esc(t.naam)+'</b><span>'+esc(t.kort)+'</span></button>';
@@ -143,6 +161,7 @@
     return '<div class="plek"><div class="vloer">'+kamers+'</div></div>';
   }
   function render(a){
+    PAKKET = a;
     pakEl.innerHTML =
       '<div class="kop">Jouw pakket</div>' +
       '<div class="kaart"><h3>'+esc(a.naam)+'</h3><p class="intro">'+esc(a.kort)+'</p>' +
@@ -177,5 +196,6 @@
   }
 })();
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

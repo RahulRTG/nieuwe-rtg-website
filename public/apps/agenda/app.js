@@ -48,6 +48,7 @@
       alles.sort(function (a, b) {
         return a.datum.localeCompare(b.datum) || String(a.tijd || '').localeCompare(String(b.tijd || ''));
       });
+      stand.items = alles;
       var acties = {
         item: function (x) { paneel.toon(x); },
         dag: function (dag) { paneel.toon({ datum: dag }); }
@@ -56,6 +57,24 @@
       ['wMaand', 'wWeek', 'wLijst'].forEach(function (id) {
         $('#' + id).classList.toggle('aan', id.slice(1).toLowerCase() === stand.weergave);
       });
+    });
+  }
+
+  /* Meenemen: de agenda kent zijn eigen model, dus geeft hij dat door in
+     plaats van de gedeelde laag naar het scherm te laten raden -- daar staan
+     chips met een afgeknipte titel in, hier staan de velden. Wat u meeneemt
+     is precies het venster dat u open hebt (maand, week of lijst). */
+  if (window.RTGUitvoer) {
+    RTGUitvoer.bron(function () {
+      if (!stand.items) return null;
+      return {
+        naam: 'agenda',
+        kolommen: ['datum', 'van', 'tot', 'titel', 'plek', 'bron', 'status'],
+        rijen: stand.items.map(function (x) {
+          return [x.datum || '', x.tijd || '', x.eind || '', x.titel || '', x.plek || '',
+            x.bron || 'agenda', x.status || ''];
+        })
+      };
     });
   }
 

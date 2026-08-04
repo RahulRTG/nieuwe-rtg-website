@@ -37,9 +37,22 @@
   }
 
   /* ---- de lobby ---- */
+  /* Meenemen (shared/uitvoer.js): de kamerlijst is een register met eigen
+     velden -- titel, code, hoe hij open staat, wie er nu binnen is. Die
+     velden gaan mee, niet de tekst van de kaart. */
+  var kamers = [];
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!kamers.length) return null;
+    return { naam: 'kamers', kolommen: ['titel', 'code', 'toegang', 'aanwezig'],
+      rijen: kamers.map(function (k) {
+        return [k.titel || '', k.code || '', k.besloten ? 'besloten' : 'open op code',
+          (k.aanwezig || []).join(', ')];
+      }) };
+  });
   function laad() {
     return api('mijn').then(function (r) {
       if (r.status !== 200) return meld(r.body.error || 'Log eerst in op de leden-app.');
+      kamers = r.body.kamers || [];
       $('#kamers').innerHTML = (r.body.kamers || []).map(function (k) {
         return '<div class="kaart"><span style="flex:1;"><b>' + esc(k.titel) + '</b>' +
           ' <span class="code">' + esc(k.code) + '</span></span>' +

@@ -11,6 +11,7 @@
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<script src="/shared/uitvoer.js"></script>
 <style>
   :root{
     --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
@@ -24,9 +25,22 @@
   header .ey{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.2rem;}
   main{padding:.9rem 1rem;}
-  .chips{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .7rem;}
-  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .85rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
-  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* De ploegkiezer is de eigen schakelaar van dit werkscherm: je ziet de werklijst
+     van EEN ploeg tegelijk, precies wat het deelmenu elders doet. Alleen de vorm
+     gaat mee met het huis -- een rustige balk met kleine kapitalen en een gouden
+     streep onder de ploeg waar je staat, in plaats van een rij pillen. De selector
+     moet dieper dan `.chip`: de kit tekent die rij zelf al met
+     `body.rtg-stijl .chip`, en die is specifieker dan een kale `.chip`. */
+  body.rtg-stijl .chips{display:flex;flex-wrap:wrap;gap:.15rem;margin:.2rem 0 .9rem;padding:0 0 .1rem;
+    overflow:visible;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .chips > .chip{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    border-radius:0;cursor:pointer;padding:.55rem .7rem .6rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl .chips > .chip:hover{color:var(--txt);border-bottom-color:transparent;}
+  /* het gevulde pilletje van de kit uitzetten: `body.rtg-stijl .chips > button.aan`
+     is specifieker dan een kale `.chip`, dus de vulling moet hier weg */
+  body.rtg-stijl .chips > .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .item{border:1px solid var(--line);border-radius:14px;padding:.85rem;margin-bottom:.7rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.02rem;}
   .item .meta{font-size:.8rem;color:var(--muted);margin-top:.25rem;line-height:1.5;}
@@ -155,10 +169,27 @@ document.getElementById('rahulFab').addEventListener('click',function(){ $('#rah
 document.getElementById('rahulSluit').addEventListener('click',function(){ $('#rahulSheet').hidden=true; $('#rahulFab').style.display=''; });
 document.getElementById('rahulForm').addEventListener('submit',function(ev){ ev.preventDefault(); var q=$('#rahulIn').value.trim(); if(q) rahulVraag(q); });
 $('#ververs').addEventListener('click', laad);
+/* Meenemen (shared/uitvoer.js): de werklijst van deze ploeg is het register dat
+   deze PDA echt bezit. Op het scherm staat een melding als een zin ("kapotte
+   lantaarn · Havenkade · melder Blauwe Reiger"); hier gaan de velden los mee,
+   met de datum uit m.at als YYYY-MM-DD. */
+let MELDINGEN = [];
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!MELDINGEN.length) return null;
+  return {
+    naam: 'meldingen',
+    kolommen: ['datum','kenmerk','categorie','omschrijving','locatie','ploeg','status','melder'],
+    rijen: MELDINGEN.map(function(m){
+      return [String(m.at || '').slice(0,10), m.ref || '', m.categorieLabel || '', m.tekst || '',
+        m.locatie || '', m.ploeg || '', m.status || '', m.melder || ''];
+    })
+  };
+});
 async function laad(){
   $('#lijst').innerHTML = '<div class="leeg">Laden...</div>';
-  let d; try { d = await api('/api/gemeente/meldingen', { ploeg }); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try { d = await api('/api/gemeente/meldingen', { ploeg }); } catch(e){ MELDINGEN = []; $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const l = d.meldingen || [];
+  MELDINGEN = l;
   $('#lijst').innerHTML = l.length ? l.map(m => {
     const maps = (m.lat && m.lng) ? '<a class="loc" href="geo:'+m.lat+','+m.lng+'?q='+m.lat+','+m.lng+'" target="_blank" rel="noopener">Kaart openen</a>' : (m.locatie ? '<span class="loc" style="border:none;color:var(--soft);">'+esc(m.locatie)+'</span>' : '');
     return '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.categorieLabel)+'</h4>'+
@@ -184,5 +215,6 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); $
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

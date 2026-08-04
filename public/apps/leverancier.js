@@ -218,6 +218,28 @@
   let notifs = [];
   let source = null;
 
+  /* Meenemen (shared/uitvoer.js): de zaakstatus komt binnen via applyState()
+     en daar hangt per soort zaak een andere werklijst onder -- bonnen bij de
+     horeca, boekingen bij een hotel of een vakman, ritten bij vervoer. We
+     geven de lijst die deze zaak ECHT heeft, met de velden los in plaats van
+     de regel die op de kaart staat. De gast blijft op codenaam, net als op
+     het scherm; de echte naam zit in de kluis en hoort daar te blijven. */
+  const uitDag = w => String(w == null ? '' : w).slice(0, 10);
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!state) return null;
+    const orders = state.orders || [];
+    if (orders.length) return { naam: 'bonnen', kolommen: ['bon', 'gast', 'status', 'datum', 'bedrag', 'betaald', 'tafel'],
+      rijen: orders.map(o => [o.ref, o.customerCodename, o.status, uitDag(o.at), o.total == null ? '' : o.total,
+        o.paid ? 'ja' : 'nee', o.table || '']) };
+    const boekingen = state.boekingen || [];
+    if (boekingen.length) return { naam: 'boekingen', kolommen: ['boeking', 'gast', 'status', 'aangevraagd', 'wanneer'],
+      rijen: boekingen.map(b => [b.ref, b.customerCodename, b.status, uitDag(b.at), b.wanneer || '']) };
+    const ritten = state.rides || [];
+    if (ritten.length) return { naam: 'ritten', kolommen: ['rit', 'gast', 'status', 'datum', 'van', 'naar'],
+      rijen: ritten.map(r => [r.ref, r.customerCodename, r.status, uitDag(r.at), r.from || '', r.to || '']) };
+    return null;
+  });
+
   let toastTimer;
   function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3000); }
 

@@ -97,6 +97,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -114,6 +116,20 @@ const DELEN = [
 ];
 
 const invoer = {};
+
+/* Meenemen (shared/uitvoer.js): je opbouw zoals hij op het scherm staat --
+   per onderdeel de naam, het aantal seconden dat erbij hoort bij de gekozen
+   spreektijd, en je eigen steekwoorden. Zolang er nergens iets staat valt er
+   niets mee te nemen. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var min = Math.max(1, Math.min(60, Number($('#minuten').value) || 5));
+  var iets = DELEN.some(function (d) { return (invoer[d.id] || '').trim(); });
+  if (!iets) return null;
+  return { naam: 'opbouw', kolommen: ['onderdeel', 'seconden', 'steekwoorden'],
+    rijen: DELEN.map(function (d) {
+      return [d.naam, Math.round(d.deel * min * 60), (invoer[d.id] || '').trim()];
+    }) };
+});
 
 function tekenDelen() {
   const doos = $('#delen');
@@ -247,6 +263,7 @@ $('#minuten').addEventListener('input', tekenTijd);
 tekenDelen();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
@@ -255,5 +272,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

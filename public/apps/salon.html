@@ -25,9 +25,22 @@
   input,textarea,select,button{font:inherit;}
   input,textarea,select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:.85rem;padding:.5rem .7rem;width:100%;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .tabs{display:flex;gap:.4rem;margin-top:.7rem;overflow-x:auto;}
-  .tabs button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .85rem;font-size:.78rem;white-space:nowrap;cursor:pointer;}
-  .tabs button[aria-pressed="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  /* De Salon houdt haar eigen tabbladen (Feed / Ontdekken / Plaatsen / Bewaard /
+     Inzicht / Mijn profiel): een scherm tegelijk, precies wat het deelmenu
+     elders doet. Alleen de vorm gaat mee met het huis -- een rustige balk met
+     kleine kapitalen en een gouden streep onder het deel waar je staat, in
+     plaats van een rij pillen. De balk zakt met een negatieve ondermarge op de
+     onderrand van de kop, zodat er EEN lijn staat en niet twee. De selector
+     moet dieper dan `.tabs button`: de kit tekent die rij al met
+     `body.rtg-stijl .tabs > button`, en die is specifieker. */
+  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.7rem 0 -.7rem;padding:0;
+    overflow:visible;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    border-radius:0;cursor:pointer;padding:.5rem .7rem .55rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl .tabs > button:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .tabs > button[aria-pressed="true"]{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
   .post{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:1rem;overflow:hidden;}
   .post .top{display:flex;align-items:center;gap:.6rem;padding:.8rem .9rem .5rem;}
@@ -92,6 +105,7 @@
     <button type="submit">Rahul</button>
   </form>
 </div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 /* De Salon. Vier schermen: de feed, plaatsen, een profiel en een post met zijn
    reacties. De AI-balk staat er altijd onder.
@@ -181,6 +195,18 @@ async function tekenFeed(){
   try{ d=await api('/api/salon/feed',{na:NA,onderwerp:ONDERWERP,zoek:ZOEK,bewaard:TAB==='bewaard',archief:ARCHIEF}); }
   catch(e){ toon('<div class="leeg">'+esc(e.message)+'</div>'); return; }
   POSTS = NA ? POSTS.concat(d.posts) : d.posts;
+  /* Meenemen: wat je nu voor je hebt -- je feed, je archief of wat je
+     bewaarde. De app kent zijn eigen model, dus geeft hij dat door in plaats
+     van de gedeelde laag het scherm te laten raden: een post is een moment,
+     een codenaam, een plek, een tekst en zijn onderwerpen. Alleen wat de app
+     ook toont; nooit een sleutel, altijd de codenaam. */
+  if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
+    if(!POSTS.length) return null;
+    return { naam:'salon',
+      kolommen:['datum','auteur','plaats','tekst','onderwerpen','mooi','reacties'],
+      rijen:POSTS.map(p=>[String(p.at||'').slice(0,10), p.author, p.place||'', p.text||'',
+        (p.onderwerpen||[]).join(' '), p.likes, p.reacties]) };
+  });
   const kop = ARCHIEF ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Je archief</h2>'
     : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Wat je bewaarde</h2>'
     : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--gold);cursor:pointer;">wissen</button></div>' : '';
@@ -391,5 +417,6 @@ if(!TOKEN){
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

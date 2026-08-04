@@ -47,6 +47,7 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
+<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -75,6 +76,7 @@
   </section>
 
   <section id="vBord" hidden>
+    <div class="deel">Paraatheid</div>
     <div class="kaart">
       <h2 style="margin-top:0;">Paraatheid</h2>
       <div class="kpis" id="paraatheid"></div>
@@ -89,6 +91,7 @@
         <button class="knop klein" id="eMaak" type="button">Voeg toe</button>
       </div>
     </div>
+    <div class="deel">Materieel</div>
     <div class="kaart">
       <h2 style="margin-top:0;">Materieel & onderhoud</h2>
       <div id="materieel"></div>
@@ -98,6 +101,7 @@
         <button class="knop klein" id="mMaak" type="button">Voeg toe</button>
       </div>
     </div>
+    <div class="deel">Bevoorrading</div>
     <div class="kaart">
       <h2 style="margin-top:0;">Bevoorrading</h2>
       <div id="bevoorrading"></div>
@@ -109,6 +113,7 @@
         <button class="knop klein" id="bMaak" type="button">Vraag aan</button>
       </div>
     </div>
+    <div class="deel">Oefeningen</div>
     <div class="kaart">
       <h2 style="margin-top:0;">Oefeningen</h2>
       <div id="oefeningen"></div>
@@ -119,6 +124,7 @@
         <button class="knop klein" id="oMaak" type="button">Plan</button>
       </div>
     </div>
+    <div class="deel">Veldhospitaal</div>
     <div class="kaart">
       <h2 style="margin-top:0;">Veldhospitaal (gewondenopvang met triage)</h2>
       <div id="gewonden"></div>
@@ -129,6 +135,7 @@
         <button class="knop klein" id="gMaak" type="button">Opnemen</button>
       </div>
     </div>
+    <div class="deel">Verplaatsingen</div>
     <div class="kaart">
       <h2 style="margin-top:0;">Verplaatsingen (transport over land, water en lucht)</h2>
       <div id="verplaatsingen"></div>
@@ -141,6 +148,7 @@
         <button class="knop klein" id="vpMaak" type="button">Plan</button>
       </div>
     </div>
+    <div class="deel">Staf-AI</div>
     <div class="kaart">
       <h2 style="margin-top:0;">De staf-AI (logistiek en planning)</h2>
       <p class="stil" style="margin-bottom:0.5rem;">Vraag over paraatheid, materieel, onderhoud, bevoorrading en oefeningen. De AI is geen wapensysteem en weigert vragen over wapeninzet of doelbestrijding.</p>
@@ -153,11 +161,13 @@
   </section>
 </main>
 <script src="/apps/defensie.js" defer></script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

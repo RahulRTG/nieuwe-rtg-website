@@ -25,9 +25,22 @@
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:900px;margin:0 auto;}
-  .chips{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .6rem;}
-  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
-  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* De soortkiezer (Alle / Hotels / Appartementen / Villa's) is de eigen
+     schakelaar van deze pagina: je ziet een categorie tegelijk, precies wat het
+     deelmenu elders doet. Alleen de vorm gaat mee met het huis -- een rustige balk
+     met kleine kapitalen en een gouden streep onder de categorie waar je staat, in
+     plaats van een rij pillen. De selector moet dieper dan `.chip`: de kit tekent
+     die rij zelf al met `body.rtg-stijl .chip`, en die is specifieker. */
+  body.rtg-stijl .chips{display:flex;flex-wrap:wrap;gap:.15rem;margin:.9rem 0 .2rem;padding:0 0 .1rem;
+    overflow:visible;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .chips > .chip{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    border-radius:0;cursor:pointer;padding:.55rem .8rem .6rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl .chips > .chip:hover{color:var(--txt);border-bottom-color:transparent;}
+  /* het gevulde pilletje van de kit uitzetten: `body.rtg-stijl .chips > button.aan`
+     is specifieker dan een kale `.chip`, dus de vulling moet hier weg */
+  body.rtg-stijl .chips > .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .lijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.9rem;margin-top:.6rem;}
   .resto{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.3rem;text-align:left;}
   .resto:hover{border-color:var(--gold);transform:translateY(-2px);}
@@ -60,6 +73,7 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
@@ -115,8 +129,22 @@ if (!TOKEN) {
     '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
-let ALLE = [], soort = '';
+let ALLE = [], soort = '', MIJN = [];
 const SOORTEN = [['','Alle'],['hotel','Hotels'],['apartment','Appartementen'],['villa',"Villa's"]];
+/* Meenemen (shared/uitvoer.js): eerst uw eigen verblijven, want dat is de lijst
+   die van u is; staan die er niet, dan de adressen zoals ze nu op het scherm
+   staan (dezelfde categorie die u gekozen heeft). Allebei uit het model van
+   deze pagina -- geen schermtekst. Datums komen als YYYY-MM-DD uit de server. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => MIJN.length ? {
+  naam: 'verblijven',
+  kolommen: ['referentie','adres','kamer','aankomst','vertrek','nachten','personen','totaal','status'],
+  rijen: MIJN.map(v => [v.ref, v.supplierName, v.roomName, v.aankomst, v.vertrek, v.nachten, v.personen, v.totaal, v.status])
+} : {
+  naam: 'adressen',
+  kolommen: ['naam','soort','stad','vanaf per nacht'],
+  rijen: ALLE.filter(h => !soort || h.soort === soort)
+    .map(h => [h.naam, h.soortLabel, h.stad || '', h.vanaf == null ? '' : h.vanaf])
+});
 async function laad(){
   let d;
   try { d = await api('/api/hotels'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
@@ -129,6 +157,7 @@ async function laad(){
 async function laadMijn(){
   let d; try { d = await api('/api/verblijf/mijn'); } catch(e){ return; }
   const open = (d.verblijven||[]).filter(v => ['aangevraagd','bevestigd'].includes(v.status));
+  MIJN = open;
   if (!open.length){ $('#mijnWrap').innerHTML = ''; return; }
   $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn verblijven</h2>'+
     open.map(v => '<div class="resto" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;">'+
@@ -230,6 +259,7 @@ $('#rBoek').addEventListener('click', boek);
   });
 })();</script>
 
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

@@ -34,6 +34,29 @@
       teken();
     });
   }
+
+  /* Meenemen: de app kent zijn eigen model, dus geeft hij dat door in plaats
+     van de gedeelde laag naar het scherm te laten raden -- een notitie is
+     een titel plus tekst of een lijst met vinkjes, en zo hoort hij ook in
+     het bestand te staan. */
+  if (window.RTGUitvoer) {
+    RTGUitvoer.bron(function () {
+      if (!stand) return null;
+      var alle = (stand.eigen || []).concat(stand.gedeeld || []);
+      return {
+        naam: 'notities',
+        kolommen: ['soort', 'titel', 'inhoud', 'gewijzigd', 'van mij', 'gedeeld met'],
+        rijen: alle.map(function (n) {
+          var inhoud = n.soort === 'lijst'
+            ? (n.items || []).map(function (i) { return (i.af ? '[x] ' : '[ ] ') + (i.tekst || ''); }).join(' / ')
+            : (n.tekst || '');
+          return [n.soort || 'notitie', n.titel || '', inhoud,
+            (n.gewijzigd || '').slice(0, 10), n.vanMij ? 'ja' : 'nee',
+            (n.gedeeldMet || []).join(', ')];
+        })
+      };
+    });
+  }
   function kaart(n) {
     var lijf = n.soort === 'lijst'
       ? (n.items || []).slice(0, 6).map(function (x, i) {

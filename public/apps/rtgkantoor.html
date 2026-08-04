@@ -42,6 +42,9 @@
   .journaal .klaar{color:var(--gold);}
   .journaal .roer{color:#9CCB9C;}
   .regel{font-size:.8rem;color:var(--soft);border-left:2px solid var(--gold);padding-left:.7rem;line-height:1.6;margin-top:.8rem;}
+  /* markering voor het deelmenu; met het menu erbij is hij weg, zonder menu
+     blijft er een rustige sectiekop staan */
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
@@ -64,6 +67,7 @@
   <section id="vAi" hidden>
     <p class="stil">Dit is de eigen RTG AI: hij doet eerst niets, hij leest alleen mee met alles wat er in het systeem gebeurt en traint zichzelf. Vindt hij zichzelf er klaar voor, dan meldt hij dat hier en vraagt hij om het roer. <b>Overnemen doet hij nooit zelf</b>: de AI adviseert, u drukt op de knop. Daarna draait hij het routinewerk automatisch en vlekkeloos door, tot u het roer terugneemt.</p>
 
+    <div class="deel">Gereedheid</div>
     <div class="kaart">
       <div class="rij" style="justify-content:space-between;">
         <span class="fase meelezen" id="fase">…</span>
@@ -88,11 +92,13 @@
       <p class="regel">Vaste regel: de RTG AI kan het roer alleen via deze knop krijgen, doet aan het roer uitsluitend het veilige routinewerk (opruimen, bescherm-scan) en blijft meelezen. Upgrades, reparaties en alles met geld blijven altijd menselijke knoppen.</p>
     </div>
 
+    <div class="deel">Het journaal</div>
     <div class="kaart">
       <h2 style="font-size:1.05rem;">Het journaal van de AI</h2>
       <div class="journaal" id="journaal"><div>Laden…</div></div>
     </div>
 
+    <div class="deel">De Onderzoeker</div>
     <div class="kaart">
       <div class="rij" style="justify-content:space-between;">
         <h2 style="font-size:1.05rem;">De Onderzoeker · de tweede AI</h2>
@@ -114,6 +120,7 @@
     </div>
   </section>
 </main>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -133,6 +140,18 @@ RTGKantoorGesprek.toon($('#lGesprek'), (token) => {
 });
 
 let S = null;
+/* Meenemen: het journaal van de AI is het register van dit scherm -- wat hij
+   deed, wanneer, en van welke soort. De app kent dat model zelf, dus geeft hij
+   het door in plaats van de gedeelde laag het scherm te laten raden. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!S || !S.journaal || !S.journaal.length) return null;
+  return { naam: 'rtgai-journaal',
+    kolommen: ['datum', 'tijd', 'soort', 'gebeurtenis'],
+    rijen: S.journaal.map(j => {
+      const t = new Date(j.at).toISOString();
+      return [t.slice(0, 10), t.slice(11, 16), j.soort, j.tekst];
+    }) };
+});
 async function ververs(){
   try { S = await api('rtgai'); } catch(e){ return; }
   const f = $('#fase');
@@ -193,6 +212,7 @@ setInterval(() => { if (TOKEN) ververs(); }, 3000);
 setInterval(() => { if (TOKEN) verversO(); }, 6000);
 start();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -200,5 +220,6 @@ start();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

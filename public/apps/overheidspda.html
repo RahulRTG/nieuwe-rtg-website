@@ -71,6 +71,9 @@
   <div id="app" hidden></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -81,6 +84,13 @@ const api = (pad, body) => fetch(pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (r.status === 401 && TOKEN) afgemeld(); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 const tijd = s => s ? new Date(s).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) : '';
+const dag = s => { const m = /^\d{4}-\d{2}-\d{2}/.exec(String(s || '')); return m ? m[0] : ''; };
+
+/* Meenemen: elke rol heeft zijn eigen lijst, dus vult elke laad-functie
+   hieronder zijn eigen model in UITVOER. U neemt mee wat op uw scherm staat --
+   de gedeelde laag zou de regeltekst meegeven, dit zijn de velden zelf. */
+const UITVOER = {};
+if (window.RTGUitvoer) RTGUitvoer.bron(() => UITVOER[ROL] || null);
 
 const CODE = 'RIJK';
 /* Altijd aangemeld op de werkvloer: de dienst blijft op dit toestel staan.
@@ -181,6 +191,8 @@ async function schermReceptie(){
 async function laadBezoekers(){
   try {
     const r = await api('/api/overheid/pda/bezoekers', { locatie: LOC });
+    UITVOER.receptie = { naam: 'bezoekers', kolommen: ['datum','badge','naam','voor','binnen','uit'],
+      rijen: r.bezoekers.map(b => [dag(b.at), b.badge || '', b.naam || '', b.voor || '', tijd(b.at), tijd(b.uit)]) };
     $('#bLijst').innerHTML = r.bezoekers.length ? r.bezoekers.map(b =>
       '<div class="item"><h4><span class="badge">'+esc(b.badge)+'</span> · '+esc(b.naam)+'</h4>'+
       '<div class="meta">'+esc(b.voor)+' · binnen '+tijd(b.at)+(b.uit ? ' · <span class="status ok">uit '+tijd(b.uit)+'</span>' : ' · <span class="status goud">nog binnen</span>')+'</div>'+
@@ -217,6 +229,9 @@ async function schermSecurity(){
 async function laadIncidenten(){
   try {
     const r = await api('/api/overheid/pda/incidenten', { locatie: LOC });
+    UITVOER.security = { naam: 'incidenten', kolommen: ['datum','tijd','soort','ruimte','ernst','wat','door','status'],
+      rijen: r.incidenten.map(i => [dag(i.at), tijd(i.at), i.soort || '', i.ruimte || '', i.ernst,
+        i.tekst || '', i.door || '', i.gesloten ? 'gesloten' : 'open']) };
     if ($('#iSoort') && !$('#iSoort').options.length) $('#iSoort').innerHTML = r.soorten.map(s => '<option>'+esc(s)+'</option>').join('');
     $('#iLijst').innerHTML = r.incidenten.length ? r.incidenten.map(i =>
       '<div class="item"><h4>'+esc(i.soort)+' · '+esc(i.ruimte)+' <span class="status '+(i.gesloten?'ok':'open')+'">'+(i.gesloten?'gesloten':'ernst '+i.ernst)+'</span></h4>'+
@@ -246,6 +261,9 @@ async function schermSchoonmaak(){
 async function laadTaken(){
   try {
     const r = await api('/api/overheid/pda/taken', { locatie: LOC });
+    UITVOER.schoonmaak = { naam: 'dagtaken', kolommen: ['ruimte','taak','extra','status','klaar_om'],
+      rijen: r.taken.map(t => [t.ruimte || '', t.tekst || '', t.extra ? 'ja' : 'nee',
+        t.klaar ? 'klaar' : 'open', t.klaar ? tijd(t.klaar.at) : '']) };
     $('#tLijst').innerHTML = r.taken.length ? r.taken.map(t =>
       '<div class="item"><h4>'+esc(t.ruimte)+(t.extra?' <span class="status goud">extra</span>':'')+' '+(t.klaar?'<span class="status ok">klaar '+tijd(t.klaar.at)+'</span>':'<span class="status open">open</span>')+'</h4>'+
       '<div class="meta">'+esc(t.tekst)+'</div>'+
@@ -267,6 +285,9 @@ async function schermBode(){
 async function laadZittingen(){
   try {
     const r = await api('/api/overheid/pda/zittingen');
+    UITVOER.bode = { naam: 'zittingsrol', kolommen: ['datum','tijd','zaal','zaak','kenmerk','rechter','klaargezet'],
+      rijen: r.zittingen.map(z => [dag(z.datum), z.tijd || '', z.zaal || '', z.titel || '', z.ref || '',
+        z.rechter || '', z.klaargezet ? 'ja' : 'nee']) };
     $('#zLijst').innerHTML = r.zittingen.length ? r.zittingen.map(z =>
       '<div class="item"><h4>'+esc(z.tijd)+' · '+esc(z.zaal)+(z.vandaag?' <span class="status goud">vandaag</span>':' <span class="status">'+esc(z.datum)+'</span>')+'</h4>'+
       '<div class="meta">'+esc(z.titel)+' ('+esc(z.ref)+') · '+esc(z.rechter)+' · '+(z.klaargezet?'<span class="status ok">klaargezet</span>':'<span class="status open">nog klaarzetten</span>')+'</div>'+
@@ -288,5 +309,6 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); L
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

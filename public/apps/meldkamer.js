@@ -456,6 +456,23 @@
     });
   })();
 
+  /* Meenemen (shared/uitvoer.js): het bord is een lijst meldingen met eigen
+     velden -- prioriteit, wat er gemeld is, waar, en waar hij nu staat. Die
+     kolommen gaan mee; de knoppenrij eronder is bediening, geen gegeven. Een
+     bijstandsverzoek van een ander korps staat er als zodanig bij, want op
+     het bord staat het ook zo. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!korps) return null;
+    const rij = [...(korps.bijstand || []).map(m => ({ ...m, bij: true })), ...(korps.meldingen || [])];
+    if (!rij.length) return null;
+    return {
+      naam: 'meldingen',
+      kolommen: ['prioriteit', 'melding', 'plek', 'status', 'herkomst'],
+      rijen: rij.map(m => ['P' + m.prio, m.tekst || '', m.plek || '', m.status || '',
+        m.bij ? 'bijstandsverzoek' : 'eigen meldkamer'])
+    };
+  });
+
   setInterval(() => { if (!$('#vBord').hidden && !document.hidden) laad().catch(() => {}); }, 20000);
   if (token) start();
 })();

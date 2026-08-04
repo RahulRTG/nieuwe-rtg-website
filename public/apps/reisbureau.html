@@ -96,6 +96,8 @@
 </section>
 
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -118,6 +120,16 @@ if (!TOKEN) {
 } else { laad(); }
 
 let ALLE = [], AANTAL = 2, HUIDIG = null;
+/* Meenemen (shared/uitvoer.js): de reizen die klaarstaan gaan mee met de velden
+   los -- reis, bestemming, periode en de nettoprijs per persoon -- en niet als
+   de regel "Ibiza · 7 dagen · vanaf € 2200" die op de kaart staat. Wie zijn
+   eigen aanvragen wil, ziet die onder "Mijn aanvragen"; die staan hier niet in,
+   want dit is de etalage. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!ALLE.length) return null;
+  return { naam: 'reizen', kolommen: ['reis', 'bestemming', 'periode', 'prijs per persoon'],
+    rijen: ALLE.map(function (r) { return [r.titel || '', r.bestemming || '', r.dates || '', r.prijs || 0]; }) };
+});
 async function laad(){
   let d;
   try { d = await api('/api/reisbureau'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
@@ -252,5 +264,6 @@ $('#rBoek').addEventListener('click', boek);
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

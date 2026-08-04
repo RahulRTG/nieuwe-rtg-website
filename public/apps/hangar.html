@@ -44,17 +44,20 @@
   .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .inlog{text-align:center;padding:2.5rem 1rem;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
+<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <header><div><div class="ey">Lifestyle Pass</div><h1>Hangar</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -66,15 +69,40 @@ const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '
 const AIBOX=app=>'<div class="kaart"><h2>Vraag de vluchtcoördinator</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 let open=null;
+/* Meenemen (shared/uitvoer.js): de hangar houdt twee registers vast -- de vloot
+   en het vluchtlogboek. Je neemt mee wat je voor je hebt: staat er een toestel
+   open, dan zijn dat zijn vluchten; anders de vloot. Datums komen als
+   YYYY-MM-DD uit de server, dus die gaan door zoals ze zijn (het scherm kort ze
+   af tot "4 mrt"). */
+let STAND=null;
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!STAND) return null;
+  if(open){
+    const vl=(STAND.vluchten||[]).filter(v=>v.toestelId===open);
+    if(vl.length) return { naam:'vluchtlogboek',
+      kolommen:['datum','tijd','toestel','van','naar','uren','bemanning'],
+      rijen: vl.map(v=>[v.datum||'', v.tijd||'', v.toestel||'', v.van||'', v.naar||'', v.uren, v.bemanning||'']) };
+  }
+  if(!(STAND.toestellen||[]).length) return null;
+  return { naam:'vloot',
+    kolommen:['naam','type','registratie','thuishaven','stoelen','vlieguren','positie','vluchten'],
+    rijen: STAND.toestellen.map(t=>[t.naam||'', t.type||'', t.registratie||'', t.basis||'',
+      t.stoelen||'', t.uren, t.positie||'', t.vluchtAantal]) };
+});
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('hangar'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Hangar is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon de hangar niet laden.</div>'; return; }
+  let d; try{ d=await api('hangar'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon de hangar niet laden.</div>'; return; }
+  STAND=d;
   if(open){ const t=d.toestellen.find(x=>x.id===open); if(t) return detail(d,t); open=null; }
-  let h='<div class="grid"><div class="stat"><div class="n">'+d.toestellen.length+'</div><div class="l">Toestellen</div></div><div class="stat"><div class="n">'+d.totaalUren+'</div><div class="l">Vlieguren</div></div><div class="stat"><div class="n">'+(d.komend?dt(d.komend.datum):'-')+'</div><div class="l">Volgende vlucht</div></div></div>';
+  /* De .deel-markers hieronder delen de lijstweergave in drieen voor het
+     deelmenu (overzicht, vloot, coordinator). Zonder markers zou de vloot
+     onder de kop van de invoerkaart vallen en zou het derde deel alleen
+     bestaan als er een vlucht gepland staat. */
+  let h='<div class="deel">Overzicht</div><div class="grid"><div class="stat"><div class="n">'+d.toestellen.length+'</div><div class="l">Toestellen</div></div><div class="stat"><div class="n">'+d.totaalUren+'</div><div class="l">Vlieguren</div></div><div class="stat"><div class="n">'+(d.komend?dt(d.komend.datum):'-')+'</div><div class="l">Volgende vlucht</div></div></div>';
   if(d.komend){ h+='<div class="kaart" style="border-color:rgba(169,143,7,.3);"><h2>Eerstvolgende vlucht</h2><div style="font-size:.92rem;color:var(--muted);">'+esc(d.komend.toestel)+': '+esc(d.komend.van)+' → '+esc(d.komend.naar)+' '+[dt(d.komend.datum),esc(d.komend.tijd)].filter(Boolean).join(' ')+'</div></div>'; }
-  h+='<div class="kaart"><h2>Toestel toevoegen</h2><div class="rij"><input class="veld" id="tN" placeholder="naam/roepnaam"><select class="veld" id="tT">'+d.types.map(x=>'<option>'+x+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="tR" placeholder="registratie"><input class="veld" id="tB" placeholder="thuishaven"><input class="veld" id="tS" type="number" placeholder="stoelen"></div><div style="margin-top:.6rem;"><button class="knop" id="tAdd">+ toestel</button></div></div>';
+  h+='<div class="deel">Vloot</div><div class="kaart"><h2>Toestel toevoegen</h2><div class="rij"><input class="veld" id="tN" placeholder="naam/roepnaam"><select class="veld" id="tT">'+d.types.map(x=>'<option>'+x+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="tR" placeholder="registratie"><input class="veld" id="tB" placeholder="thuishaven"><input class="veld" id="tS" type="number" placeholder="stoelen"></div><div style="margin-top:.6rem;"><button class="knop" id="tAdd">+ toestel</button></div></div>';
   h+= d.toestellen.length ? d.toestellen.map(t=>'<div class="kaart tstl" data-id="'+t.id+'"><div class="nm">'+esc(t.naam)+'</div><div class="meta">'+[t.type,t.registratie,t.stoelen?t.stoelen+' stoelen':'',t.uren+' uur'].filter(Boolean).join(' · ')+'</div><div class="pos">'+(esc(t.positie)||'positie onbekend')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen toestellen.</div></div>';
-  h+=AIBOX('Bijv. waar staat de jet nu?');
+  h+='<div class="deel">Vluchtcoördinator</div>'+AIBOX('Bijv. waar staat de jet nu?');
   $('#main').innerHTML=h;
   bindAi('hangar');
   $('#tAdd').onclick=async()=>{ const naam=$('#tN').value.trim(); if(!naam) return meld('Naam?'); try{ await api('hangar/toestel',{naam,type:$('#tT').value,registratie:$('#tR').value,basis:$('#tB').value,stoelen:$('#tS').value}); laad(); }catch(e){ meld(e.message); } };
@@ -93,6 +121,7 @@ function detail(d,t){
 }
 laad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -100,5 +129,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

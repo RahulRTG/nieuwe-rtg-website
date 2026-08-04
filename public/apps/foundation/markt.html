@@ -15,9 +15,19 @@
   .wrap{max-width:46rem;margin:0 auto;padding:1.1rem 1.1rem 4rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:.9rem;}
-  .tabs{display:flex;gap:.4rem;margin:.2rem 0 1rem;overflow-x:auto;}
-  .tabs button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;padding:.5rem .95rem;font-size:.86rem;font-weight:600;white-space:nowrap;}
-  .tabs button.aan{background:var(--goud);color:#1a1710;border-color:var(--goud);}
+  /* Koopje houdt zijn eigen tabbladen (Ontdekken / Plaatsen / Mijn spullen /
+     Berichten) -- het mechanisme toont al een deel tegelijk. Alleen de balk
+     draagt de stijl van het deelmenu: geen pil met een randje, maar een
+     rustige tab met kleine kapitalen en een gouden streep onder de actieve.
+     Zo is het huis er een. De selector moet even diep als die van de kit
+     (body.rtg-stijl .tabs > button): die tekent de rij anders als pillen. */
+  .tabs,body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.2rem 0 1rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--lijn);}
+  .tabs > button,body.rtg-stijl .tabs > button{background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;margin-bottom:-1px;color:var(--zacht);padding:.55rem .8rem .6rem;font-family:var(--sans);
+    font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;}
+  .tabs > button:hover,body.rtg-stijl .tabs > button:hover{color:var(--txt);border-bottom-color:transparent;}
+  .tabs > button.aan,body.rtg-stijl .tabs > button.aan{background:none;color:var(--txt);border-bottom-color:var(--goud);}
   .veiligbalk{display:flex;gap:.6rem;align-items:flex-start;background:#181510;border:1px solid #3a3320;border-radius:12px;padding:.7rem .85rem;margin-bottom:1rem;font-size:.85rem;line-height:1.5;color:var(--zacht);}
   .veiligbalk b{color:var(--goud2);}
   .filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
@@ -166,6 +176,7 @@
   <div id="vChat" hidden></div>
 </div>
 
+<script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
 (function () {
@@ -212,6 +223,23 @@
 
   /* ---------- ontdekken / lijst ---------- */
   let categorieen = [];
+  /* Wat de server het laatst gaf. Meenemen geeft mee wat je op dat moment
+     open hebt staan: je eigen spullen bij "Mijn spullen", anders het aanbod
+     zoals je het nu gefilterd hebt. */
+  let aanbod = [], mijnAds = [];
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    const dag = a => (a.at ? String(a.at).slice(0, 10) : '');
+    if (!$('#vMijn').hidden && mijnAds.length) {
+      return { naam: 'mijn-spullen',
+        kolommen: ['titel', 'prijs', 'status', 'categorie', 'staat', 'plaats', 'geplaatst'],
+        rijen: mijnAds.map(a => [a.titel, a.prijs, a.status, catNaam(a.categorie), a.staat, a.plaats || '', dag(a)]) };
+    }
+    if (!aanbod.length) return null;
+    return { naam: 'aanbod',
+      kolommen: ['titel', 'prijs', 'categorie', 'staat', 'plaats', 'levering', 'geplaatst'],
+      rijen: aanbod.map(a => [a.titel, a.prijs, catNaam(a.categorie), a.staat, a.plaats || '',
+        (a.levering || []).join(' '), dag(a)]) };
+  });
   function vulCategorien() {
     const opts = '<option value="">Alles</option>' + categorieen.map(c => '<option value="' + c + '">' + catNaam(c) + '</option>').join('');
     $('#fcat').innerHTML = opts;
@@ -226,6 +254,7 @@
     const max = $('#fmax').value.trim(); if (max) body.max = Number(max);
     rapi('/lijst', body).then(d => {
       if (!categorieen.length && d.categorieen) { categorieen = d.categorieen; vulCategorien(); }
+      aanbod = d.ads || [];
       const r = $('#rooster');
       if (!d.ads || !d.ads.length) { r.innerHTML = '<div class="leeg">Nog niets gevonden. Verruim je zoekopdracht, of plaats zelf iets moois.</div>'; return; }
       r.innerHTML = d.ads.map(a =>
@@ -362,6 +391,7 @@
   /* ---------- mijn spullen ---------- */
   function laadMijn() {
     rapi('/mijn', {}).then(d => {
+      mijnAds = d.ads || [];
       const el = $('#mijnLijst');
       if (!d.ads || !d.ads.length) { el.innerHTML = '<div class="leeg">Je hebt nog niets geplaatst. Ga naar "Plaatsen" om te beginnen.</div>'; return; }
       el.innerHTML = d.ads.map(a =>
@@ -502,5 +532,6 @@
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

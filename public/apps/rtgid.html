@@ -38,6 +38,7 @@
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:30;
     background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;opacity:0;transition:opacity .25s;}
   .melding.zien{opacity:1;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -53,6 +54,7 @@
 <main>
   <p class="stil">Uw digitale identiteit, op de kluis van RTG. U logt bij diensten in met een tik, deelt nooit meer gegevens dan gevraagd, en ziet hier precies wie wat over u opvroeg.</p>
 
+  <div class="deel">Inloggen</div>
   <h2>Inloggen bij een dienst</h2>
   <div class="kaart">
     <p class="stil">Staat er een koppelcode op het scherm van een dienst? Voer die hier in. U ziet eerst welke dienst het is en welke gegevens die vraagt; pas na uw bevestiging gebeurt er iets.</p>
@@ -71,9 +73,11 @@
     </div>
   </div>
 
+  <div class="deel">Toegang</div>
   <h2>Actieve toegang</h2>
   <div class="kaart"><div id="sessies" class="stil">…</div></div>
 
+  <div class="deel">Machtigingen</div>
   <h2>Machtigingen</h2>
   <div class="kaart">
     <p class="stil">Laat iemand tijdelijk namens u inloggen bij een dienst (bijvoorbeeld mantelzorg). Op codenaam, per dienst, en op elk moment in te trekken; elke inlog namens u staat in uw log.</p>
@@ -86,10 +90,12 @@
     <div id="machtigingen" style="margin-top:0.5rem;"></div>
   </div>
 
+  <div class="deel">Inzagelog</div>
   <h2>Inzagelog</h2>
   <div class="kaart"><div id="log" class="stil">…</div></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -135,10 +141,12 @@
   });
 
   /* ---- inzage: log, actieve sessies met intrekken, machtigingen ---- */
+  let STAND = null;
   async function laad(){
     const r = await api('inzage');
     if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
     const d = r.body;
+    STAND = d;
     $('#sessies').innerHTML = d.sessies.length ? d.sessies.map(s =>
       '<div class="item"><span class="rek">' + esc(s.dienst) + (s.namens ? ' <small>via gemachtigde ' + esc(s.namens) + '</small>' : '') +
       '<small>tot ' + new Date(s.verloopt).toLocaleTimeString('nl-NL').slice(0,5) + ' · ' + s.attributen.map(esc).join(', ') + '</small></span>' +
@@ -160,6 +168,18 @@
       await api('machtig/intrek', { id: b.dataset.mweg }); zeg('Machtiging ingetrokken.'); laad();
     }));
   }
+  /* Meenemen: het inzagelog is het register van deze app -- wie vroeg wat, en
+     wanneer. De app kent dat model zelf, dus geeft hij het door in plaats van
+     de gedeelde laag het scherm te laten raden. Datum en tijd staan los, zodat
+     een rij ook buiten deze app te sorteren is. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!STAND || !STAND.log || !STAND.log.length) return null;
+    return { naam: 'inzagelog',
+      kolommen: ['datum', 'tijd', 'dienst', 'soort', 'gedeelde gegevens'],
+      rijen: STAND.log.map(l => [String(l.om).slice(0, 10), String(l.om).slice(11, 16),
+        l.dienst, l.soort, (l.attributen || []).join(', ')]) };
+  });
+
   $('#mGeef').addEventListener('click', async () => {
     const r = await api('machtig', { codenaam: $('#mCode').value, dienst: $('#mDienst').value, dagen: $('#mDagen').value });
     if (r.status !== 200) return zeg(r.body.error || 'Machtigen lukte niet.');
@@ -170,11 +190,13 @@
   if (!token) zeg('Log eerst in op de leden-app.'); else laad();
 })();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

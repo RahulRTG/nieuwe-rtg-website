@@ -51,6 +51,7 @@
 </header>
 <main id="app"><div class="leeg">Laden…</div></main>
 <div class="toast" id="toast" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -70,6 +71,16 @@ async function laad(){
   try { B = await api('stad/bewoner'); render(); }
   catch (e) { $('#app').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
 }
+/* Meenemen (shared/uitvoer.js): het eigen model van deze app is de lijst
+   meldingen die JIJ hebt gedaan -- met de velden los in plaats van de regel
+   "lantaarn bij de brug doet het niet · Centrum · 3 u geleden" die op het
+   scherm staat. De stadsstanden zijn meters, geen lijst; die blijven hier. */
+const dag = ms => { const d = new Date(ms); return isNaN(d) ? '' : d.toISOString().slice(0, 10); };
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!B || !(B.mijnMeldingen || []).length) return null;
+  return { naam: 'mijn-meldingen', kolommen: ['datum', 'zone', 'soort', 'melding', 'status'],
+    rijen: B.mijnMeldingen.map(m => [dag(m.at), m.zone || '', (B.soorten && B.soorten[m.soort]) || m.soort || '', m.tekst || '', m.status || '']) };
+});
 function render(){
   $('#app').innerHTML =
     '<div class="kaart"><h2 style="font-size:1.1rem;">' + esc(B.scenario.label) + '</h2>' +
@@ -121,11 +132,13 @@ function live(){
 laad();
 live();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

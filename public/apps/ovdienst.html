@@ -107,6 +107,12 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer, voor het eigen script. Deze PDA meldt geen eigen
+     model aan: hij houdt alleen een lijnkeuze en twee tellers van de lopende
+     dienst vast. Het lijnenregister zelf staat in ovroutes.html en wordt daar
+     meegegeven. -->
+<script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -119,7 +125,11 @@
     clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
 
   let hier = { lat: 38.908, lng: 1.432 };
-  if ('geolocation' in navigator)
+  // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
+  // (rtg_os_gps) wint; zonder plek blijft het demo-startpunt staan
+  let gpsUit = false;
+  try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
+  if (!gpsUit && 'geolocation' in navigator)
     navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
 
   let posTimer = null, standTimer = null;
@@ -129,7 +139,7 @@
     const r = await fetch('/api/supplier/ov/overzicht', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
       .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
-    if (r.status !== 200) { $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.'; $('#vPoort').classList.remove('weg'); return; }
+    if (r.status !== 200) { try { RTGDeur.toon(document.querySelector('#vPoort .kaart'), { soort:'personeel', naar:'/apps/personeel.html' }); } catch(e) { $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.'; } $('#vPoort').classList.remove('weg'); return; }
     const sel = $('#dLijn'); sel.innerHTML = '';
     for (const l of r.body.lijnen || []) { const o = document.createElement('option'); o.value = l.id; o.textContent = l.icoon + ' ' + l.naam; sel.appendChild(o); }
     $('#vDienst').classList.remove('weg');
@@ -177,5 +187,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

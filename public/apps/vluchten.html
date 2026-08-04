@@ -22,9 +22,22 @@
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.5rem;}
   main{padding:1.1rem;max-width:620px;margin:0 auto;}
-  .tabs{display:flex;gap:.4rem;padding-bottom:.8rem;}
-  .tab{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
-  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* De tabbladenrij (Het bord / Mijn reizen) is de eigen schakelaar van deze
+     app -- het wisselen blijft van de pagina -- maar draagt de stijl van het
+     deelmenu (shared/deelmenu.js): geen pil met een randje, maar een rustige
+     balk met kleine kapitalen en een gouden streep onder de actieve. Zo is het
+     huis er een. De knopregels wijzen de knop aan via zijn rij
+     (body.rtg-stijl .tabs > .tab): de gedeelde pilrij in rtg-ui.css schrijft
+     body.rtg-stijl .tabs > button, en die weegt zwaarder dan .tab alleen --
+     zonder die rij in het pad bleef de pil gewoon staan. */
+  body.rtg-stijl .tabs{display:flex;gap:.15rem;flex-wrap:wrap;margin:.2rem 0 1.1rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > .tab{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+    margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:'Inter',system-ui,sans-serif;font-size:.72rem;
+    font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    white-space:nowrap;cursor:pointer;}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .tabs > .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .item{border:1px solid var(--line);border-radius:14px;padding:.8rem .95rem;margin-bottom:.6rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.02rem;}
   .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.55;}
@@ -50,6 +63,8 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
+<!-- uitvoer.js zonder defer en VOOR het eigen script: dat meldt zijn model aan -->
+<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <header><div class="ey">RTG Airport</div><h1>Vluchten</h1></header>
@@ -68,6 +83,22 @@ let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
 const api=(pad,body)=>fetch('/api/member/vluchten'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
 let TAB='bord';
+let BORD=null, MIJN=null;   // wat er binnenkwam; waaruit dit scherm tekent
+/* Meenemen (shared/uitvoer.js): allebei de tabbladen zijn een echte lijst, dus
+   u neemt mee wat u aankijkt -- het bord met de vluchten, of uw eigen
+   boekingen. De velden los, zoals de app ze van de server krijgt. */
+if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
+  if(TAB==='mijn'){
+    const r=(MIJN&&MIJN.boekingen||[]).map(b=>[b.vlucht.datum,b.vlucht.tijd,b.vlucht.nummer,
+      b.vlucht.bestemming,b.code,b.stoel||'',b.status]);
+    return r.length?{naam:'mijn-reizen',
+      kolommen:['datum','tijd','vluchtnummer','bestemming','boeking','stoel','status'],rijen:r}:null;
+  }
+  const r=(BORD&&BORD.vluchten||[]).map(v=>[v.datum,v.tijd,v.nummer,v.bestemming,v.soort,v.gate,
+    v.geannuleerd?'geannuleerd':v.status]);
+  return r.length?{naam:'vluchtenbord',
+    kolommen:['datum','tijd','vluchtnummer','bestemming','soort','gate','status'],rijen:r}:null;
+});
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x===b)); laad(); });
 
 async function laad(){
@@ -76,6 +107,7 @@ async function laad(){
 }
 async function laadBord(){
   let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  BORD=d;
   const sec=d.security.filter(f=>f.open).map(f=>esc(f.naam)+': '+f.wachtMinuten+' min').join(' · ');
   let h='<div class="sec">Security nu · '+(sec||'geen filter open')+'</div>';
   h+= d.vluchten.length ? d.vluchten.map(v=>{
@@ -96,6 +128,7 @@ async function laadBord(){
 }
 async function laadMijn(){
   let d; try{ d=await api('/mijn'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  MIJN=d;
   const charterBlok='<div class="item" style="border-color:rgba(169,143,7,.4);"><h4>Charter aanvragen</h4>'+
     '<div class="meta">Een privejet of helikopter op uw moment. Operations bevestigt persoonlijk; daarna staat de vlucht in uw reizen.</div>'+
     '<div class="rij"><select class="veld" id="chSoort"><option value="privejet">Privejet</option><option value="helikopter">Helikopter</option></select>'+
@@ -137,6 +170,7 @@ laad();
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
    is en offline opent. API-verkeer gaat altijd naar het netwerk.
    Pagina's en scripts zijn network-first: een update op de server komt
    direct door, de cache is alleen het vangnet zonder verbinding. */
-const CACHE = 'rtg-app-7d333ab3';
+const CACHE = 'rtg-app-a006f047';
 const SHELL = ['/apps/app.html', '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -31,11 +31,24 @@ self.addEventListener('fetch', e => {
             return res;
           }))
       : fetch(e.request).then(res => {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, copy));
+          // alleen goede antwoorden bewaren: een 503 van een failover die hier
+          // belandt, wordt anders voor altijd het "vangnet" van deze URL
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, copy));
+          }
           return res;
         }).catch(() =>
-          caches.match(e.request).then(hit => hit || caches.match('/apps/app.html'))
+          caches.match(e.request).then(hit => {
+            if (hit) return hit;
+            // Alleen een echte pagina-navigatie mag op het beginscherm
+            // terugvallen. Elke andere mislukte GET (een script, een fetch
+            // vanuit een app) kreeg hier ook app.html terug: de app "viel
+            // terug naar het beginscherm" bij elke netwerkhapering, en een
+            // script-URL kreeg HTML als JavaScript.
+            if (e.request.mode === 'navigate') return caches.match('/apps/app.html');
+            return Response.error();
+          })
         )
   );
 });

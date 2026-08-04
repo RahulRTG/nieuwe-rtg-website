@@ -102,7 +102,7 @@
   if (!opBureau) {
     var pil = el('button', 'os-thuis-pill');
     pil.type = 'button';
-    pil.setAttribute('aria-label', 'Naar het bureaublad; omhoog vegen sluit de app');
+    pil.setAttribute('aria-label', 'Omhoog vegen gaat naar het bureaublad');
     body.appendChild(pil);
 
     var rustig = false;
@@ -142,9 +142,14 @@
     }
     pil.addEventListener('pointerup', los);
     pil.addEventListener('pointercancel', los);
-    pil.addEventListener('click', function () {
+    pil.addEventListener('click', function (e) {
       if (veegde) { veegde = false; return; } // de veeg is al afgehandeld
-      naarBureau();
+      /* Een losse tik doet niets meer. De pil ligt precies waar de duim rust,
+         en een enkele aanraking gooide de app dicht -- dat was het "steeds
+         terug naar het beginscherm". Net als de home-indicator op een
+         telefoon: alleen de veeg navigeert. Een toetsenbord of hulpmiddel
+         activeert met detail 0 (Enter/spatie); die houdt de knopfunctie. */
+      if (e.detail === 0) naarBureau();
     });
   }
 

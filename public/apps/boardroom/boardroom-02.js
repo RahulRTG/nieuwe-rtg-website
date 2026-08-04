@@ -74,6 +74,27 @@
     }).catch(function () { $('melding').textContent = T('bo.nietgeladen', 'Kon de boardroom niet laden.'); });
   }
 
+  /* Meenemen: het bord is een register -- welke functie staat aan, in welke
+     groep, en wie houdt hem vast. Dit scherm zegt zelf dat dit spoor van het lid
+     is en meegaat in zijn gegevens; dan hoort het ook hier op te halen te zijn.
+     De namen komen van de server in de taal van de lezer, dus wat u meeneemt is
+     wat er staat. */
+  if (window.RTGUitvoer) {
+    RTGUitvoer.bron(function () {
+      if (!bordNu) return null;
+      var rijen = [];
+      (bordNu.categorieen || []).forEach(function (cat) {
+        (cat.functies || []).forEach(function (fn) {
+          rijen.push([cat.naam || '', fn.naam || '', fn.aan ? 'aan' : 'uit',
+            fn.beheerd ? (fn.beheerdDoor === 'werkgever' ? (fn.beheerder || 'werkgever') : 'RTG') : '',
+            fn.vast ? 'ja' : 'nee']);
+        });
+      });
+      if (!rijen.length) return null;
+      return { naam: 'boardroom', kolommen: ['groep', 'functie', 'stand', 'beheerd door', 'altijd aan'], rijen: rijen };
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', laad);
   /* Wisselt de lezer van taal, dan halen we het bord opnieuw op: de namen van
      de functies komen van de server, dus alleen de pagina hertalen is niet

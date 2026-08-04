@@ -45,6 +45,14 @@
     api('/school/school/overzicht', { schoolCode: S.code, beheerToken: S.token }).then(function (r) {
       if (r.body.error) return meld(r.body.error);
       var d = r.body, wacht = d.personeel.filter(function (p) { return p.status === 'wacht'; });
+      /* Meenemen (shared/uitvoer.js): voor de directie is het personeelsregister
+         de lijst die deze werkbank echt bezit -- naam, rol, id en status los,
+         in plaats van de regel "Naam · leraar · id 3" die op het scherm staat. */
+      if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+        if (!d.personeel.length) return null;
+        return { naam: 'personeel', kolommen: ['naam', 'rol', 'id', 'status'],
+          rijen: d.personeel.map(function (p) { return [p.naam, p.rol, p.id, p.status]; }) };
+      });
       var leerlingen = d.klassen.reduce(function (n, k) { return n + (k.leerlingen || 0); }, 0);
       $('#dKpis').innerHTML = [['Klassen', d.klassen.length], ['Leerlingen', leerlingen],
         ['Personeel actief', d.personeel.length - wacht.length], ['Wacht op akkoord', wacht.length]]
@@ -91,6 +99,16 @@
     kl('/school/klas').then(function (r) {
       if (r.body.error) return meld(r.body.error);
       var k = r.body;
+      /* Meenemen (shared/uitvoer.js): het cijferboek van de klas, met de velden
+         los in plaats van de regel "Toets 3 (SO) 7.5 weging 2" op het scherm.
+         Datum als YYYY-MM-DD; de leerlingnaam blijft hier weg, net als in het
+         boek zelf -- wat de werkbank niet toont, gaat ook niet mee. */
+      if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+        var cs = k.cijfers || [];
+        if (!cs.length) return null;
+        return { naam: 'cijferboek', kolommen: ['datum', 'vak', 'omschrijving', 'cijfer', 'weging'],
+          rijen: cs.map(function (c) { return [String(c.at || '').slice(0, 10), c.vak || '', c.omschrijving || '', c.cijfer, c.weging]; }) };
+      });
       var open = (k.huiswerk || []).filter(function (h) { return (h.afNamen || []).length < (k.leerlingen || []).length; }).length;
       $('#lKpis').innerHTML = [['Leerlingen', (k.leerlingen || []).length], ['Klasgemiddelde', k.klasGemiddelde || '-'],
         ['Huiswerk open', open], ['Toetsen', (k.toetsen || []).length || 0]]
@@ -110,15 +128,34 @@
     if (window.SPart.hulplijn) window.SPart.hulplijn();
     if (window.SPart.excursie) window.SPart.excursie(KLAS);
     if (!BIEB) kl('/school/toets/bibliotheek').then(function (r) {
-      BIEB = r.body.groepen || [];
-      $('#tGroep').innerHTML = BIEB.map(function (g) { return '<option value="' + g.groep + '">Groep ' + g.groep + '</option>'; }).join('');
-      $('#tGroep').value = '3';
+      /* De bibliotheek komt nu in twee lijsten: basisschoolgroepen en fasen
+         van de ladder. Hier stond een platte lijst op groep-nummer, en de
+         vo/mbo/hbo/wo-doelen (zonder groep) vielen samen in een "Groep null".
+         De kiezer is per schoolsoort geordend; kent de klas zijn niveau, dan
+         stuurt de server alleen het eigen deel. */
+      BIEB = { groepen: r.body.groepen || [], fasen: r.body.fasen || [] };
+      var po = BIEB.groepen.length
+        ? '<optgroup label="Basisschool">' + BIEB.groepen.map(function (g) {
+            return '<option value="' + g.groep + '">Groep ' + g.groep + '</option>';
+          }).join('') + '</optgroup>' : '';
+      var perTrap = {};
+      BIEB.fasen.forEach(function (f) { (perTrap[f.trapNaam] = perTrap[f.trapNaam] || []).push(f); });
+      var rest = Object.keys(perTrap).map(function (t) {
+        return '<optgroup label="' + esc(t) + '">' + perTrap[t].map(function (f) {
+          return '<option value="' + esc(f.fase) + '">' + esc(f.naam) + '</option>';
+        }).join('') + '</optgroup>';
+      }).join('');
+      $('#tGroep').innerHTML = po + rest;
+      $('#tGroep').value = BIEB.groepen.length ? '3' : (BIEB.fasen[0] ? BIEB.fasen[0].fase : '');
       doelkies();
     });
   }
   function doelkies() {
-    var g = (BIEB || []).find(function (x) { return String(x.groep) === $('#tGroep').value; });
-    $('#tDoelen').innerHTML = ((g && g.doelen) || []).map(function (d) {
+    var v = $('#tGroep').value;
+    var bak = /^\d+$/.test(v)
+      ? (BIEB.groepen || []).find(function (x) { return String(x.groep) === v; })
+      : (BIEB.fasen || []).find(function (x) { return x.fase === v; });
+    $('#tDoelen').innerHTML = ((bak && bak.doelen) || []).map(function (d) {
       return '<label><input type="checkbox" value="' + esc(d.id) + '"> ' + esc(d.naam) + ' <span class="stil">' + esc(d.vak) + '</span></label>';
     }).join('');
   }

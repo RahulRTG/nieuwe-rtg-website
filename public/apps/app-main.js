@@ -153,6 +153,25 @@
     if (state.foundation) rtf = state.foundation;
   }
 
+  /* Meenemen: de app kent zijn eigen model, dus geeft hij dat door in plaats
+     van de gedeelde laag naar het scherm te laten raden. Facturen zijn hier het
+     ding dat een lid meeneemt naar zijn eigen boekhouding: nummer, bedrag, btw
+     en afboekcode staan al op het scherm, dus staan ze ook in het bestand.
+     'termijn' heet geen datum, want dat is het niet: het model houdt hier een
+     zin bij ("Vervalt 1 augustus 2026"), en er wordt geen datum verzonnen die
+     de app niet heeft. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!invoices || !invoices.length) return null;
+    return {
+      naam: 'facturen',
+      kolommen: ['factuurnummer', 'omschrijving', 'netto', 'bijdrage', 'btw', 'totaal', 'status', 'termijn', 'afboekcode'],
+      rijen: invoices.map(function (i) {
+        return [i.id || '', i.desc || '', i.netto || 0, i.bijdrage || 0, i.btw || 0,
+          (i.netto || 0) + (i.bijdrage || 0), i.status || '', i.date || '', i.afboekcode || ''];
+      })
+    };
+  });
+
   // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
   async function refreshState(){
     try { applyState((await API.call('/state')).state); } catch(e){}
@@ -7350,6 +7369,13 @@
   }
   function ontmoetPositie(){
     return new Promise(res => {
+      // De GPS-schakelaar in het OS-menu (rtg_os_gps, gezet in shared/osmenu)
+      // wint van deze lus. Zonder deze poort vroeg de tick elke twintig
+      // seconden om een positie -- op een toestel met toestemming op "vraag
+      // elke keer" is dat een systeemprompt per tick, ook op het beginscherm,
+      // terwijl de schakelaar in de app op "uit" stond. De server kan al
+      // zonder positie (pos || {} hieronder), dus uit is gewoon: geen plek.
+      try { if (localStorage.getItem('rtg_os_gps') !== '1') return res(null); } catch (e) {}
       if (!navigator.geolocation) return res(null);
       navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude }), () => res(null), { maximumAge: 15000, timeout: 8000 });
     });

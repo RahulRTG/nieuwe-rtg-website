@@ -105,6 +105,7 @@
   $('#kleiner').addEventListener('click', function () { maat = Math.max(0, maat - 1); zetMaat(); });
   $('#groter').addEventListener('click', function () { maat = Math.min(MATEN.length - 1, maat + 1); zetMaat(); });
 
+  var bieb = [], eigen = [];
   function start() {
     Promise.all([api('/api/boeken/bieb'), api('/api/boeken/voortgang'), api('/api/bestanden/mijn')])
       .then(function (rs) {
@@ -113,9 +114,32 @@
         var kluis = ((rs[2].body && rs[2].body.items) || []).filter(function (x) {
           return x.mime === 'text/plain' && !x.weg;
         });
-        tekenPlank(rs[0].body.boeken, kluis);
+        bieb = rs[0].body.boeken || [];
+        eigen = kluis;
+        tekenPlank(bieb, kluis);
       })
       .catch(function (e) { $('#plank').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; });
+  }
+
+  /* Meenemen: de plank zoals hij hier staat -- welk boek, van wie, en hoe ver
+     je erin bent. De tekst van de boeken gaat niet mee; die is van de
+     huisbibliotheek, je leesplek is van jou. */
+  if (window.RTGUitvoer) {
+    RTGUitvoer.bron(function () {
+      if (!bieb.length && !eigen.length) return null;
+      var pct = function (id) { return voortgang[id] ? Math.round(voortgang[id].plek * 100) : 0; };
+      return {
+        naam: 'boeken',
+        kolommen: ['titel', 'auteur', 'uitgave', 'onderwerp', 'woorden', 'gelezen (%)', 'plank'],
+        rijen: bieb.map(function (b) {
+          return [b.titel || '', b.auteur || '', b.jaar || '', b.over || '', b.woorden || 0,
+            pct(b.id), 'huisbibliotheek'];
+        }).concat(eigen.map(function (f) {
+          return [String(f.naam || '').replace(/\.txt$/, ''), '', '', '', '',
+            pct('kluis:' + f.id), 'uit je kluis'];
+        }))
+      };
+    });
   }
 
   if (!token) {

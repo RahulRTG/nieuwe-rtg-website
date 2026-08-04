@@ -36,6 +36,7 @@
   .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;}
   .log{font-size:.8rem;color:var(--muted);line-height:1.5;padding:.2rem 0;border-bottom:1px solid var(--line);}
   .ai{border-left:2px solid var(--gold);padding-left:.6rem;font-size:.84rem;line-height:1.55;margin-top:.4rem;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
@@ -50,6 +51,7 @@
 </header>
 <main id="main">
   <div class="labkpis" id="labKpi"></div>
+  <div class="deel">Nieuw project</div>
   <div class="kaart">
     <div class="sec">Nieuw project</div>
     <div class="rij">
@@ -63,11 +65,13 @@
     </div>
     <div class="leeg">Vaste keten: idee → onderzoek → prototype → proef → uitrol. Voor proef en uitrol tekent altijd een mens de veiligheids- en ethiektoets; de kennisbank vergeet nooit iets.</div>
   </div>
+  <div class="deel">Onderzoekscoach</div>
   <div class="kaart">
     <div class="sec">Vraag de onderzoekscoach (Rahul)</div>
     <div class="rij"><input class="veld" id="aiVraag" placeholder="Bijv. hoe zet ik een eerlijke nulmeting op?" maxlength="400"><button class="knop stil" id="aiStuur">Vraag</button></div>
     <div class="ai" id="aiUit" hidden></div>
   </div>
+  <div class="deel">Prototypehal</div>
   <div class="kaart" id="lab3dKaart">
     <div class="rij" style="justify-content:space-between;align-items:center;">
       <div class="sec" style="margin:0;">De Prototypehal (3D)</div>
@@ -76,8 +80,10 @@
     <canvas id="lab3d" style="display:block;width:100%;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibare 3D-hal waarin elk onderzoeksproject een blok is: de hoogte toont hoe ver het in de keten is, de kleur het onderzoeksveld, en een gouden pin markeert het nieuwste project."></canvas>
     <div class="leeg" id="lab3dUitleg"></div>
   </div>
+  <div class="deel">Projecten</div>
   <div class="chips" id="filters"></div>
   <div id="lijst"><div class="leeg">Laden...</div></div>
+  <div class="deel">Kennisbank</div>
   <div class="kaart">
     <div class="rij" style="justify-content:space-between;align-items:center;gap:.6rem;">
       <div class="sec" style="margin:0;">Kennisbank (<span id="kbTel">0</span> bevindingen, ook uit het archief)</div>
@@ -87,6 +93,8 @@
   </div>
 </main>
 <script src="/shared/drie.js"></script>
+<script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script src="/apps/lab3d.js"></script>
 <script src="/apps/lab-dossier.js"></script>
 <script src="/apps/lab-pro.js"></script>
@@ -94,11 +102,39 @@
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+/* De deur op de app zelf, in plaats van wegsturen. Wie hier uitgelogd komt
+   verloor met een location.replace() waar hij heen wilde: je landde op de
+   personeels-app zonder te zien welke app je had geopend (TAKEN 5.5). De
+   gedeelde poort toont wat deze app is en waar de inlog zit, met de weg terug
+   in de link. Laadt de poort onverhoopt niet, dan doen we alsnog wat we eerst
+   deden -- een dichte app zonder uitleg is erger dan een omweg. */
+function uitgelogd(){
+  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
+     bindt daarna nog listeners aan knoppen binnen #main -- die zijn dan weg en
+     dat gaf een reeks "Cannot read properties of null". De listeners hangen nu
+     netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
+     zodra de pagina klaar is met opbouwen. */
+  setTimeout(function () {
+    var el = document.getElementById('main') || document.body;
+    RTGDeur.toon(el, { soort: 'personeel', naar: naar });
+  }, 0);
+}
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/lab/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 let D = null, filter = '', KB = [];
+/* Meenemen: de projecten zoals het lab ze kent -- echte velden, geen schermtekst. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!D || !D.projecten) return null;
+  return { naam: 'onderzoeksprojecten',
+    kolommen: ['titel', 'veld', 'fase', 'voor wie', 'veiligheidstoets', 'doel', 'gestart'],
+    rijen: D.projecten.map(function (p) {
+      return [p.titel, p.veldNaam || p.veld, p.fase, p.voorWie,
+        (p.veiligheid || {}).status || '', p.doel || '', String(p.at || '').slice(0, 10)];
+    }) };
+});
 async function laad(){
   D = await api('overzicht');
   const kb = await api('kennisbank');
@@ -165,8 +201,14 @@ $('#aiStuur').addEventListener('click', async () => {
   $('#aiUit').hidden = false; $('#aiUit').textContent = 'Rahul denkt mee...';
   try { $('#aiUit').textContent = (await api('ai', { q })).antwoord; } catch (e) { $('#aiUit').textContent = e.message; }
 });
-laad().catch(e => { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+/* Zonder kantoorsessie staat de deur er al; doorstarten levert dan
+   alleen 401-en op die de poort weer zouden overschrijven. */
+if (TOKEN) {
+  laad().catch(e => { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+}
 </script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

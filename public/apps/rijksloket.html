@@ -32,6 +32,22 @@
   .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
   .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
   .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* Het loket houdt zijn eigen schakelaar (negen loketten, een tegelijk): dat
+     is precies wat het deelmenu elders doet. Alleen de vorm gaat mee met het
+     huis -- een rustige balk met kleine kapitalen en een gouden streep onder
+     het loket waar je staat, in plaats van een rij pillen die zijwaarts rolt.
+     Alleen de balk zelf: de losse `.tab`-knoppen in de bibliotheek (installeer,
+     bladeren) houden hun pilvorm, want dat zijn knoppen en geen loketten.
+     De selector moet dieper dan `.tab`: de kit tekent die rij al met
+     `body.rtg-stijl .tab`, en die is specifieker dan een kale `.tab`. */
+  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.2rem 0 1.1rem;padding:0 0 .1rem;
+    overflow:visible;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > .tab{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    border-radius:0;cursor:pointer;padding:.55rem .8rem .6rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
+  body.rtg-stijl .tabs > .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   section.paneel{display:none;} section.paneel.aan{display:block;}
   .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
@@ -114,6 +130,8 @@
 .rahulsug{display:flex;gap:.35rem;flex-wrap:wrap;}
 .rahulsug button{background:var(--bg);border:1px solid var(--gold);color:var(--txt);border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
 </style>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -164,8 +182,19 @@ $('#loginGo').addEventListener('click', async () => {
 
 const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['sub','Subsidies'],['wm','Watermeldingen'],['kvk','Handelsregister'],['stem','Stemming'],['bek','Bekendmakingen'],['bieb','Bibliotheek']];
 let HUIDIG = 'tos';
+/* Meenemen (shared/uitvoer.js): dit loket houdt negen registers en toont er een
+   tegelijk. Wat u meeneemt is dus het loket dat OPEN staat, met de velden los --
+   kenmerk, soort, bedrag, status -- en niet de regel "Huurtoeslag · € 240/mnd"
+   die op het scherm staat. De aanvrager staat er met zijn codenaam in, precies
+   zoals in het scherm; een echte naam kent dit loket niet. UIT wordt gezet door
+   het loket dat net geladen is, en staat op null waar geen register in beeld is
+   (de stemming, de bibliotheek). */
+let UIT = null;
+const uitZet = (naam, kolommen, rijen) => { UIT = { naam, kolommen, rijen }; };
+if (window.RTGUitvoer) RTGUitvoer.bron(() => UIT && UIT.rijen.length ? UIT : null);
 function toon(t){
   HUIDIG = t;
+  UIT = null;   // eerst leeg: laadt het loket niet, dan valt er ook niets mee te nemen
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
   ['tos','uit','bez','sub','wm','kvk','stem','bek','bieb'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'tos') laadToeslagen();
@@ -214,10 +243,14 @@ async function tekenBieb(){
     try { mijnIds = ((await api('/api/overheid/bieb/mijn')).apps || []).map(a => a.id); } catch(e){}
     if (RB.mijn){
       const mijn = (await api('/api/overheid/bieb/mijn')).apps || [];
+      uitZet('mijn werk-apps', ['naam','afdeling','taak','versie','grootte MB','sterren'],
+        mijn.map(a => [a.naam||'', a.afdelingLabel||'', a.taak||'', a.versie||'', a.grootteMB||0, a.sterren||0]));
       grid.innerHTML = mijn.length ? mijn.map(a => biebKaart(a, true)).join('') : '<div class="leeg">Nog geen werk-apps geïnstalleerd.</div>';
       blader.innerHTML = '';
     } else {
       const d = await api('/api/overheid/bieb/catalogus', { afdeling: RB.afdeling, zoek: RB.zoek, pagina: RB.pagina });
+      uitZet('werk-apps', ['naam','afdeling','taak','versie','grootte MB','sterren'],
+        (d.items||[]).map(a => [a.naam||'', a.afdelingLabel||'', a.taak||'', a.versie||'', a.grootteMB||0, a.sterren||0]));
       grid.innerHTML = d.items.length ? d.items.map(a => biebKaart(a, mijnIds.includes(a.id))).join('')
         : '<div class="leeg">'+esc(d.hint || 'Niets gevonden.')+'</div>';
       blader.innerHTML = d.paginas > 1
@@ -281,6 +314,8 @@ async function laadRegie(){
 async function laadToeslagen(){
   let d; try { d = await api('/api/overheid/toeslagen'); } catch(e){ return; }
   const l = d.toeslagen || [];
+  uitZet('toeslagen', ['kenmerk','soort','maandbedrag','inkomen','aanvrager','status','aangevraagd'],
+    l.map(t => [t.ref||'', t.soortLabel||'', t.maandbedrag||0, t.inkomen||0, t.aanvrager||'', t.status||'', String(t.at||'').slice(0,10)]));
   $('#p-tos').innerHTML = l.length ? l.map(t =>
     '<div class="item" data-ref="'+esc(t.ref)+'"><h4>'+esc(t.soortLabel)+' · € '+esc(t.maandbedrag)+'/mnd</h4>'+
     '<div class="meta">inkomen € '+esc(t.inkomen)+' · aanvrager '+esc(t.aanvrager||'')+'</div>'+
@@ -293,6 +328,8 @@ async function laadToeslagen(){
 async function laadUitkeringen(){
   let d; try { d = await api('/api/overheid/uitkeringen'); } catch(e){ return; }
   const l = d.uitkeringen || [];
+  uitZet('uitkeringen', ['kenmerk','soort','aanvrager','toelichting','status','aangevraagd'],
+    l.map(u => [u.ref||'', u.soortLabel||'', u.aanvrager||'', u.toelichting||'', u.status||'', String(u.at||'').slice(0,10)]));
   $('#p-uit').innerHTML = l.length ? l.map(u =>
     '<div class="item" data-ref="'+esc(u.ref)+'"><h4>'+esc(u.soortLabel)+'</h4>'+
     '<div class="meta">'+esc(u.aanvrager||'')+(u.toelichting?' · '+esc(u.toelichting):'')+'</div><span class="status">'+esc(u.status)+'</span>'+
@@ -306,6 +343,8 @@ async function laadUitkeringen(){
 async function laadBezwaren(){
   let d; try { d = await api('/api/overheid/bezwaren'); } catch(e){ return; }
   const l = d.bezwaren || [];
+  uitZet('bezwaren', ['kenmerk','tegen','reden','aanvrager','status','ingediend'],
+    l.map(b => [b.ref||'', b.tegen||'', b.reden||'', b.aanvrager||'', b.status||'', String(b.at||'').slice(0,10)]));
   $('#p-bez').innerHTML = l.length ? l.map(b =>
     '<div class="item" data-ref="'+esc(b.ref)+'"><h4>'+esc(b.tegen)+'</h4><div class="meta">'+esc(b.reden)+' · '+esc(b.aanvrager||'')+'</div><span class="status">'+esc(b.status)+'</span>'+
     '<div class="rij"><button class="knop bes" data-b="gegrond">Gegrond</button>'+
@@ -317,6 +356,8 @@ async function laadBezwaren(){
 async function laadSubsidies(){
   let d; try { d = await api('/api/overheid/subsidies/lijst'); } catch(e){ return; }
   const l = d.subsidies || [];
+  uitZet('subsidies', ['kenmerk','regeling','project','gevraagd','toegekend','aanvrager','status','aangevraagd'],
+    l.map(s => [s.ref||'', s.regelingLabel||'', s.project||'', s.gevraagd||0, s.toegekend||0, s.aanvrager||'', s.status||'', String(s.at||'').slice(0,10)]));
   $('#p-sub').innerHTML = l.length ? l.map(s =>
     '<div class="item" data-ref="'+esc(s.ref)+'"><h4>'+esc(s.regelingLabel)+' · gevraagd € '+esc(s.gevraagd)+'</h4>'+
     '<div class="meta">'+esc(s.project)+' · aanvrager '+esc(s.aanvrager||'')+'</div>'+
@@ -334,6 +375,8 @@ const WM_ST = ['nieuw','in behandeling','opgelost','afgewezen'];
 async function laadWaterMeldingen(){
   let d; try { d = await api('/api/overheid/water/meldingen'); } catch(e){ return; }
   const l = d.meldingen || [];
+  uitZet('watermeldingen', ['kenmerk','soort','melding','locatie','melder','status','gemeld'],
+    l.map(m => [m.ref||'', m.soortLabel||'', m.tekst||'', m.locatie||'', m.melder||'', m.status||'', String(m.at||'').slice(0,10)]));
   $('#p-wm').innerHTML = l.length ? l.map(m =>
     '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.soortLabel)+'</h4>'+
     '<div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+' · melder '+esc(m.melder||'')+'</div>'+
@@ -349,6 +392,8 @@ async function laadWaterMeldingen(){
 async function laadKvk(){
   let d; try { d = await api('/api/overheid/kvk/lijst'); } catch(e){ return; }
   const l = d.inschrijvingen || [];
+  uitZet('handelsregister', ['kvk-nummer','naam','rechtsvorm','sbi','vestiging','houder','ingeschreven'],
+    l.map(k => [k.kvkNummer||'', k.naam||'', k.rechtsvormLabel||'', k.sbi||'', k.vestiging||'', k.houder||'', String(k.at||'').slice(0,10)]));
   $('#p-kvk').innerHTML = l.length ? l.map(k =>
     '<div class="item"><h4>'+esc(k.naam)+' · KVK '+esc(k.kvkNummer)+'</h4>'+
     '<div class="meta">'+esc(k.rechtsvormLabel)+' · SBI '+esc(k.sbi)+' · '+esc(k.vestiging)+(k.houder?' · '+esc(k.houder):'')+'</div>'+
@@ -357,7 +402,9 @@ async function laadKvk(){
 async function laadStem(){
   let d; try { d = await api('/api/overheid/verkiezing'); } catch(e){ return; }
   const v = d.verkiezing;
+  UIT = null;
   if (!v){ $('#p-stem').innerHTML = '<div class="leeg">Er is geen stemming.</div>'; return; }
+  uitZet('stemming', ['optie','stemmen','percentage'], (v.opties||[]).map(o => [o.label||'', o.stemmen||0, o.pct||0]));
   $('#p-stem').innerHTML = '<div class="item"><h4>'+esc(v.titel)+'</h4>'+
     v.opties.map(o => '<div class="meta">'+esc(o.label)+': '+o.stemmen+' ('+o.pct+'%)</div>').join('')+
     '<div class="meta" style="margin-top:.3rem;">Totaal '+v.totaal+' · status: '+(v.open?'open':'gesloten')+'</div>'+
@@ -376,6 +423,8 @@ $('#bekGo').addEventListener('click', async () => {
 async function laadBekend(){
   let d; try { d = await api('/api/supplier/overheid/bekendmakingen'); } catch(e){ return; }
   const l = d.bekendmakingen || [];
+  uitZet('bekendmakingen', ['titel','soort','tekst','geplaatst'],
+    l.map(b => [b.titel||'', b.soort||'', b.tekst||'', String(b.at||'').slice(0,10)]));
   $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Nog geen bekendmakingen.</div>';
 }
 
@@ -389,5 +438,6 @@ if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); s
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

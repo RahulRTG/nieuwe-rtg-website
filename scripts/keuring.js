@@ -306,8 +306,35 @@ function ongebruikt() {
     while ((m = re.exec(lees(p)))) dynamisch.add(path.resolve(path.dirname(p), m[1]));
   }
 
-  const kandidaten = serverJs.filter(p => p.includes('/kern/') && !p.endsWith('index.js') &&
-    !dynamisch.has(path.dirname(p)));
+  /* DE STARTPUNTEN. Een bestand dat je met `node ...` aanroept wordt per
+     definitie door niemand gerequired, en is daarom nooit dode code. Ze komen
+     uit package.json en niet uit een lijst hier: zet iemand er morgen een bij,
+     dan weet deze keuring dat vanzelf. Zonder dit zou de verbreding hieronder
+     server/trio.js (npm start!) als dood aanwijzen -- dat is precies de valse
+     melding waar de vorige versie van scripts/dekking.js op stukliep. */
+  const startpunten = new Set();
+  try {
+    const pkg = JSON.parse(lees(path.join(WORTEL, 'package.json')));
+    for (const cmd of Object.values(pkg.scripts || {})) {
+      const re = /(?:^|\s)((?:server|scripts)\/[A-Za-z0-9_/-]+\.js)/g;
+      let m;
+      while ((m = re.exec(String(cmd)))) startpunten.add(path.join(WORTEL, m[1]));
+    }
+  } catch (e) { /* geen package.json: dan is elk bestand verdacht, en dat mag */ }
+
+  /* WAAROM DIT NIET MEER ALLEEN server/kern/ IS.
+
+     Hier stond `p.includes('/kern/')`. Dat dekt ruim driehonderd modules, maar
+     laat de rest van server/ -- routes, db, foundation, school, web -- volledig
+     ongemoeid. Een route-bestand dat uit de require-lijst van server.js valt,
+     blijft dan gewoon staan en niemand die het merkt. De keuring die over dode
+     code gaat, keek naar een derde van de server.
+
+     Nu heel server/, met drie uitzonderingen die geen dode code KUNNEN zijn:
+     een index.js (dat is de naam van zijn map), een map die in zijn geheel
+     dynamisch geladen wordt, en een startpunt uit package.json. */
+  const kandidaten = serverJs.filter(p => !p.endsWith('index.js') &&
+    !dynamisch.has(path.dirname(p)) && !startpunten.has(p));
   let n = 0;
   for (const p of kandidaten) {
     const naam = path.basename(p, '.js');
@@ -348,17 +375,42 @@ function i18n() {
 /* ====================== 8. UITSCHIETERS ======================
    Bestanden die tegen de grens van 10 KB aan zitten gaan er de volgende
    ronde overheen. Beter nu opknippen dan straks onder tijdsdruk. */
+/* ====================== 8. OMVANG ======================
+   DE GRENS BEWAAKTE ALLEEN ZICHZELF, EN NIET WAT ERBOVEN LAG.
+
+   Hier stond een enkele voorwaarde: `b > 9400 && b <= 10240`. Dus alleen de
+   bestanden VLAK ONDER de grens werden gemeld, en alles wat er echt overheen
+   ging viel er stilzwijgend buiten. server/server.js van 212 kilobyte -- het
+   grootste bestand van dit huis, twintig keer de grens -- kwam in deze keuring
+   dus nooit voor, terwijl een module van 9.5 kB er elke ronde in stond.
+
+   Een grens die de overtreders overslaat en alleen de bijna-overtreders noemt,
+   is geen grens maar een aanmoediging om er net onder te blijven. Dat verklaart
+   ook het getal: zevenenzestig bestanden in een band van 840 bytes is geen
+   toeval, dat is schrijven naar de limiet.
+
+   Nu twee tellingen, met opzet apart:
+     - te groot  : boven de grens. Dat is de echte bevinding.
+     - bijna     : de waarschuwingsband eronder. Dat is de vroege waarschuwing.
+   Ze staan als twee meters in NORM.json, want ze zeggen iets anders en een
+   optelling zou de ene achter de andere kunnen verbergen. */
+const GRENS = 10240;
+
 function uitschieters() {
-  let n = 0;
+  let bijna = 0, teGroot = 0;
   for (const p of serverJs) {
     const b = fs.statSync(p).size;
-    if (b > 9400 && b <= 10240) {
-      n++;
-      meld('beter', 'omvang', 'Dit bestand zit met ' + b + ' bytes vlak onder de grens van 10.240.', kort(p),
+    if (b > GRENS) {
+      teGroot++;
+      meld('scheef', 'omvang', 'Dit bestand is met ' + b + ' bytes over de grens van ' + GRENS + '.', kort(p),
+        'Knip het op zijn natuurlijke naad; een bestand dat je niet in een keer kunt lezen, kun je ook niet in een keer nakijken.');
+    } else if (b > 9400) {
+      bijna++;
+      meld('beter', 'omvang', 'Dit bestand zit met ' + b + ' bytes vlak onder de grens van ' + GRENS + '.', kort(p),
         'Knip er een deelbestand af zolang het rustig kan.');
     }
   }
-  return { bijnaTeGroot: n };
+  return { bijnaTeGroot: bijna, teGroot };
 }
 
 /* ---------- alles keuren ---------- */
@@ -375,7 +427,21 @@ function keur() {
 
 if (require.main === module) {
   const r = keur();
-  if (process.argv.includes('--json')) { console.log(JSON.stringify(r, null, 2)); process.exit(r.stuk ? 1 : 0); }
+  /* De JSON door EEN write met een callback, en pas in die callback stoppen.
+     console.log + process.exit() is een race: naar een pijp schrijft Node
+     asynchroon, en process.exit() gooit weg wat er nog in de wachtrij staat.
+     Zolang dit rapport onder de 64 kB pijpbuffer bleef viel dat niet op; sinds
+     de dekkingsmeting de volledige ongedekt-lijst meestuurt is het rapport
+     groter, en kreeg scripts/norm.js (die dit met spawnSync door een pijp
+     leest) een afgekapte JSON terug -- de norm-meter viel om, in de CI-poort
+     ook. Dezelfde reparatie als in scripts/routekaart.js. */
+  if (process.argv.includes('--json')) {
+    const code = r.stuk ? 1 : 0;
+    const stoppen = () => process.exit(code);
+    setTimeout(stoppen, 10000).unref();
+    process.stdout.write(JSON.stringify(r, null, 2) + '\n', stoppen);
+    return;
+  }
   console.log('\nDE KEURING -- het logica-oordeel\n');
   console.log('  endpoints in een test : ' + (r.cijfers.dekking.gedekt || 0) + ' van ' + (r.cijfers.dekking.routes || 0) +
     (r.cijfers.dekking.pct != null ? ' (' + r.cijfers.dekking.pct + '%)' : ''));

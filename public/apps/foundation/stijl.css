@@ -1,9 +1,11 @@
+/* de huisletters, zelf gehost (CSP staat geen vreemde servers toe) */
+@import url('/fonts/fonts.css');
 :root{
   --bg:#0C0C0B; --paneel:#151412; --paneel2:#100F0E; --lijn:#2A2724;
   --txt:#F7F5F1; --zacht:#A79F92; --goud:#C9A24B; --goud2:#e0bd6b;
   --groen:#5FA56A; --rood:#B4574E; --bord:#12110F;
-  --radius:16px; --serif:Georgia,'Times New Roman',serif;
-  --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  --radius:16px; --serif:'Bodoni Moda',Georgia,'Times New Roman',serif;
+  --sans:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;}
@@ -77,3 +79,23 @@ input,textarea,select{font-family:inherit;}
 :root[data-dagdeel] body{ transition:background-color .8s ease; }
 :root[data-dagdeel] .kaart,
 :root[data-dagdeel] .tile{ transition:background-color .8s ease,border-color .12s; }
+
+/* --- Vanaf de middelbare school kleurt het huis mee met RTG -------------
+   De jonge groepen (mini, kind) houden hun warme pastelwas en het goud:
+   dat is de RTFoundation voor kinderen. Vanaf tiener verschuift het beeld
+   naar de RTG-signatuur: neutraal zwart als grond, het accent in bordeaux
+   (de op-zwart-variant uit de merkset, dezelfde spelling als overal), en
+   een veel vlakkere was. Zelfde schermen, twee leeftijden van een huis.
+   De letters (Bodoni Moda/Inter) zijn voor iedereen dezelfde: premium is
+   geen leeftijd. */
+:root[data-rtf-groep="tiener"], :root[data-rtf-groep="jong"], :root[data-rtf-groep="volw"]{
+  --goud:#C23A5E; --goud2:#C23A5E;
+  --rtf-g1:#0C0C0B; --rtf-g2:#151412; --rtf-g3:#100F0E; --rtf-k:8%;
+}
+/* op bordeaux hoort witte tekst; het donkerbruin was op goud gerekend */
+:root[data-rtf-groep="tiener"] .knop, :root[data-rtf-groep="jong"] .knop, :root[data-rtf-groep="volw"] .knop{ color:#fff; }
+:root[data-rtf-groep="tiener"] .knop.grijs, :root[data-rtf-groep="jong"] .knop.grijs, :root[data-rtf-groep="volw"] .knop.grijs{ color:var(--txt); }
+:root[data-rtf-groep="tiener"] .chat .b.ik, :root[data-rtf-groep="jong"] .chat .b.ik, :root[data-rtf-groep="volw"] .chat .b.ik{ color:#fff; }
+:root[data-rtf-groep="tiener"] .badge, :root[data-rtf-groep="jong"] .badge, :root[data-rtf-groep="volw"] .badge{
+  background:color-mix(in oklab, var(--goud) 14%, #0C0C0B);
+}

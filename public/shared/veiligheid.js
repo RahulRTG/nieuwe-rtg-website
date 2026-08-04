@@ -109,6 +109,15 @@
      laatste, zodat uw kring iets heeft als uw telefoon straks uitvalt. */
   V.plekDoorgeven = function () {
     return new Promise(function (klaar) {
+      /* De GPS-schakelaar in het OS-menu (rtg_os_gps) wint van het levensteken,
+         en de STAND VAN DE SCHAKELAAR IS DE WAARHEID. Hier stond een controle op
+         de waarde "0", terwijl de schakelaar zelf op "1" toetst (osmenu.js). Bij
+         een sleutel die er nog niet is -- elk vers profiel, elk toestel waar het
+         vinkje nooit is aangeraakt -- stond het vinkje dus op UIT terwijl de
+         positie gewoon werd opgehaald en elke twee minuten verstuurd. Nu geldt:
+         alleen een uitdrukkelijke "1" geeft de locatie vrij. De kring krijgt
+         dan geen plek, en dat is precies wat het scherm belooft. */
+      try { if (localStorage.getItem('rtg_os_gps') !== '1') return klaar(false); } catch (e) {}
       if (!navigator.geolocation) return klaar(false);
       navigator.geolocation.getCurrentPosition(function (p) {
         var body = { lat: p.coords.latitude, lon: p.coords.longitude, nauwkeurig: p.coords.accuracy };

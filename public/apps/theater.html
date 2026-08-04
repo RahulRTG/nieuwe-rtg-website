@@ -115,6 +115,7 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -161,6 +162,23 @@
     tekenMijn();
     toon('vZaal');
   }
+
+  /* Meenemen (shared/uitvoer.js): de zaal is een catalogus, en die neemt een
+     lid mee. Veld voor veld uit het eigen model -- de maker staat er met zijn
+     codenaam in, precies zoals op het scherm; een echte naam kent het Theater
+     niet. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!zaal) return null;
+    const alles = (zaal.abonnementen || []).map(v => ['abonnement', v])
+      .concat((zaal.nieuw || []).map(v => ['zaal', v]));
+    return {
+      naam: 'theater',
+      kolommen: ['titel','kanaal','maker','lijst','duur','mb','bewaring','reacties','geplaatst'],
+      rijen: alles.map(p => [p[1].titel || '', p[1].kanaal || '', p[1].codenaam || '', p[0],
+        duur(p[1].duurS) || '', p[1].mb || 0, p[1].bewaring || 'rtg', p[1].reacties || 0,
+        String(p[1].at || '').slice(0, 10)])
+    };
+  });
 
   /* ---------- mijn kanaal: aanmelden, opnemen in topkwaliteit, uploaden ---------- */
   let stream = null, rec = null, brokken = [], opnameStart = 0;
@@ -445,5 +463,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

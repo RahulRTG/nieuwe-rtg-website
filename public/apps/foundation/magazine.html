@@ -194,6 +194,7 @@
   </div>
 </main>
 
+<script src="/shared/uitvoer.js"></script>
 <script>
   document.getElementById('terug').onclick = function(){ if (history.length > 1) history.back(); else location.href = 'index.html'; };
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(function(){});
@@ -204,5 +205,6 @@
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -15,9 +15,23 @@
   .wrap{max-width:64rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
-  .stuur{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;}
+  .stuur{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;
+    border-bottom:1px solid var(--lijn);}
   .stuur .knop{padding:.4rem .75rem;font-size:.82rem;}
   .stuur .knop.aan{border-color:var(--goud);color:var(--goud);}
+  /* De gezinsagenda houdt zijn eigen weergave-schakelaar (maand / week / lijst),
+     maar draagt hem in de stijl van het deelmenu: geen randje om een knop, maar
+     een rustige tab met kleine kapitalen en een gouden streep onder de actieve.
+     Zo is het huis er een. De pijlen, "Vandaag" en "+ Nieuw" blijven
+     handelingen, en dus echte knoppen. De selector moet dieper dan `.knop`: de
+     kit tekent die als een pil en die regel is specifieker dan een kale klasse
+     hier. */
+  .stuur .knop[data-zicht]{background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;align-self:flex-end;margin-bottom:-1px;padding:.55rem .8rem .6rem;
+    font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--zacht);}
+  .stuur .knop[data-zicht]:hover{color:var(--txt);border-bottom-color:transparent;}
+  .stuur .knop[data-zicht].aan{color:var(--txt);background:none;border-bottom-color:var(--goud);}
   #periode{font-family:var(--serif);font-size:1.05rem;margin:0 .3rem;}
   .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
 
@@ -119,6 +133,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script src="/apps/agenda/kalender.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -152,6 +168,21 @@ async function laad() {
     teken();
   } catch (e) { $('#bord').innerHTML = '<div class="stil">Kon de agenda niet laden.</div>'; }
 }
+/* Meenemen (shared/uitvoer.js): de agendapunten van het venster dat nu op het
+   scherm staat, met de velden die het gezin zelf invult. Schoolpunten lezen
+   mee en houden hun bron, zodat je in het bestand ziet waar ze vandaan komen. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!items.length) return null;
+  return {
+    naam: 'gezinsagenda',
+    kolommen: ['datum', 'tijd', 'wat', 'voor wie', 'herhaling', 'bron', 'notitie'],
+    rijen: items.map(function (i) {
+      var r = i._r;
+      return [r.datum, r.tijd || '', r.titel, r.wieNaam || 'het hele gezin',
+        r.herhaal && r.herhaal !== 'geen' ? r.herhaal : '', r.bron || 'gezin', r.notitie || ''];
+    })
+  };
+});
 function teken() {
   const opDag = {
     item: x => toon(x._r),
@@ -236,5 +267,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -7,12 +7,19 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 /* De teksten zelf staan per deel in ./appgids-data/ (elk 5-10 KB);
-   dit bestand voegt ze samen en houdt de opzoekfunctie. */
+   dit bestand voegt ze samen en houdt de opzoekfunctie.
+
+   Deel 8 en 9 zijn de staarten van deel 4 en 5. Die twee waren over de grens
+   gegroeid (11,6 en 11,0 KB) terwijl de regel hierboven "elk 5-10 KB" zegt --
+   en de keuring merkte dat niet, want die keek alleen naar bestanden VLAK
+   ONDER de grens en liet alles erboven lopen. Geknipt op een entry-grens; de
+   samengevoegde gids is er niet door veranderd. */
 const GIDS = Object.assign({},
   require('./appgids-data/deel1'), require('./appgids-data/deel2'),
   require('./appgids-data/deel3'), require('./appgids-data/deel4'),
   require('./appgids-data/deel5'), require('./appgids-data/deel6'),
-  require('./appgids-data/deel7'));
+  require('./appgids-data/deel7'), require('./appgids-data/deel8'),
+  require('./appgids-data/deel9'));
 
 
 // de terugvaluitleg: ook een onbekende of nieuwe pagina krijgt nette hulp

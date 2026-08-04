@@ -16,10 +16,18 @@
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
   .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
-  .toon{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;}
-  .toon button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;
-    padding:.4rem .9rem;font-size:.85rem;cursor:pointer;}
-  .toon button.aan{border-color:var(--goud);color:var(--goud2);}
+  /* De liedjeslijst houdt zijn eigen weergaveknoppen (alles / zingen /
+     handjes / voor het slapen) -- die tonen al een soort tegelijk. Alleen de
+     rij draagt de stijl van het deelmenu: geen pil met een randje, maar een
+     rustige tab met kleine kapitalen en een gouden streep onder de actieve.
+     Zo is het huis er een. */
+  .toon{display:flex;flex-wrap:wrap;gap:.15rem;margin:-.2rem 0 1rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--lijn);}
+  .toon button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;margin-bottom:-1px;
+    color:var(--zacht);padding:.55rem .8rem .6rem;font-family:var(--sans);font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}
+  .toon button:hover{color:var(--txt);}
+  .toon button.aan{color:var(--txt);border-bottom-color:var(--goud);}
   .lijst{display:grid;gap:.6rem;}
   .titelknop{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.8rem 1rem;
     cursor:pointer;text-align:left;color:var(--txt);}
@@ -70,6 +78,7 @@
   </div>
 </div>
 
+<script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -130,10 +139,21 @@ const LIEDJES = [
 const SOORTLABEL = { zing: 'om te zingen', hand: 'met de handjes', slaap: 'voor het slapen' };
 let filter = 'alles';
 
+function zichtbareLiedjes() { return LIEDJES.filter(l => filter === 'alles' || l.soort === filter); }
+
+/* meenemen: het liedjesboek zoals je het nu gefilterd hebt, met de tekst
+   erbij -- zodat je hem ook kunt printen of naast het bed kunt leggen. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  const zicht = zichtbareLiedjes();
+  if (!zicht.length) return null;
+  return { naam: 'liedjes', kolommen: ['titel', 'soort', 'kenmerk', 'tekst', 'erbij te doen'],
+    rijen: zicht.map(function (l) { return [l.titel, SOORTLABEL[l.soort], l.meta, l.tekst, l.doen]; }) };
+});
+
 function tekenLijst() {
   const doos = $('#lijst');
   doos.innerHTML = '';
-  const zicht = LIEDJES.filter(l => filter === 'alles' || l.soort === filter);
+  const zicht = zichtbareLiedjes();
   for (const l of zicht) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -178,5 +198,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

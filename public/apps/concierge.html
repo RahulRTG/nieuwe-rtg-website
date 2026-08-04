@@ -43,6 +43,7 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/kantoorgesprek.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 </head>
@@ -69,9 +70,20 @@ function inlog(){
   });
 }
 
+/* Meenemen (shared/uitvoer.js): de open verzoeken op het bureau, met de velden
+   die op de kaart staan. Het lid heet hier zoals het scherm hem noemt (codenaam
+   uit de kluis), en de notitievelden zijn invoer, geen gegevens. */
+let VERZOEKEN=[];
+if(window.RTGUitvoer) RTGUitvoer.bron(()=>({
+  naam:'verzoeken',
+  kolommen:['datum','titel','categorie','lid','status','laatste stap','details'],
+  rijen:VERZOEKEN.map(v=>[String(v.at||'').slice(0,10), v.titel, v.categorie, v.codenaam||'lid',
+    v.status, v.laatste||'', v.details||''])
+}));
 async function laad(){
   let d; try{ d = await api('concierge'); }catch(e){ if(e.status===401){ TOKEN=null; return inlog(); } $('#main').innerHTML='<div class="leeg">Kon het bureau niet laden.</div>'; return; }
   STATUS = d.statussen||[];
+  VERZOEKEN = d.verzoeken||[];
   if(!d.verzoeken.length){ $('#main').innerHTML='<div class="leeg">Geen open verzoeken. Alles is voor de leden geregeld.</div>'; return; }
   $('#main').innerHTML = d.verzoeken.map(kaart).join('');
   d.verzoeken.forEach(bind);
@@ -107,5 +119,6 @@ if(TOKEN) laad(); else inlog();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

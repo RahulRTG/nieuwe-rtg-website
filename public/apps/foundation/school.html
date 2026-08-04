@@ -15,6 +15,9 @@
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.6rem 0 .3rem;}
   .intro{color:var(--zacht);font-size:.92rem;line-height:1.5;margin-bottom:1.1rem;}
   .sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.6rem 0 .7rem;}
+  /* de schoolsoort-kop boven een groep klassen: serif, met een dunne lijn --
+     elk niveau zijn eigen deel van de pagina */
+  .soort{font-family:var(--serif);font-size:1.25rem;margin:1.8rem 0 .6rem;padding-bottom:.4rem;border-bottom:1px solid var(--lijn);}
   .kaart.blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
   .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;flex-wrap:wrap;}
   .kop b{font-size:1.05rem;}
@@ -121,6 +124,7 @@
 
 <script src="/apps/util.js"></script>
 <script src="sessie.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const E = Util.el, vervang = Util.vervang, esc = Util.escapeHTML;
@@ -146,7 +150,24 @@ $('#naarLeraar').addEventListener('click', ()=>{
 $('#terugGezin').addEventListener('click', ()=> { toon('gezin'); });
 
 /* ---------- gezinsweergave ---------- */
-let ouder = false;
+let ouder = false, gezinStand = [];
+
+/* Meenemen: het cijferboek is van het gezin, dus geeft de app zijn eigen
+   model door in plaats van de gedeelde laag de kaarten te laten uitlezen.
+   Per cijfer: welk kind, welke klas, welk vak, het cijfer zelf en waar het
+   voor stond -- precies de velden die de kaart ook toont. */
+const dag10 = v => { const d = new Date(v); return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10); };
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  const rijen = [];
+  for (const x of gezinStand) for (const c of (x.cijfers || [])) {
+    rijen.push([dag10(c.at), x.kind.naam, x.klas.naam, c.vak || '',
+      String(c.cijfer), String(c.weging || 1), c.omschrijving || '']);
+  }
+  if (!rijen.length) return null;
+  return { naam: 'cijfers',
+    kolommen: ['datum', 'kind', 'klas', 'vak', 'cijfer', 'weging', 'omschrijving'], rijen };
+});
+
 async function laadGezin(){
   if (!s || !s.token){ toon('leraar'); return; }
   toon('gezin');
@@ -165,6 +186,7 @@ async function laadGezin(){
   toonUitnodigingen(d.uitnodigingen || []);
   laadPlanner();
   const lijst = d.school || [];
+  gezinStand = lijst;
   if (!lijst.length){
     vervang($('#schoolLijst'), E('div',{class:'kaart blok'},
       E('b', null, 'Nog geen klas gekoppeld'),
@@ -173,7 +195,27 @@ async function laadGezin(){
         : 'Vraag de klascode aan je leraar en sluit jezelf hieronder aan.')));
     return;
   }
-  vervang($('#schoolLijst'), lijst.map(kaartVoor));
+  /* Elke schoolsoort is een eigen deel: de basisschoolklas van het ene kind
+     staat niet meer tussen de havo-vakken van het andere. De volgorde en de
+     namen komen van de ladder (via /school/mijn), dus dit scherm verzint
+     zelf geen indeling. Klassen zonder niveau (van voor het niveauveld)
+     staan bij elkaar onder hun eigen kop -- en zolang er maar een soort is,
+     is een kop alleen maar drukte en blijft hij weg. */
+  const soorten = [];
+  for (const x of lijst){
+    const sleutel = x.klas.trap || 'zonder';
+    let g = soorten.find(v => v.sleutel === sleutel);
+    if (!g){ g = { sleutel, naam: x.klas.schoolsoort || 'Klassen', volgorde: x.klas.volgorde || 99, items: [] }; soorten.push(g); }
+    g.items.push(x);
+  }
+  soorten.sort((a, b) => a.volgorde - b.volgorde);
+  // vervang() verwacht een platte rij elementen (geen geneste arrays)
+  const uitLijst = [];
+  for (const g of soorten){
+    if (soorten.length > 1) uitLijst.push(E('div',{class:'soort'}, g.naam));
+    for (const x of g.items) uitLijst.push(kaartVoor(x));
+  }
+  vervang($('#schoolLijst'), uitLijst);
 }
 /* open uitnodigingen: het kind beslist zelf; de ouder ziet wat er nog wacht */
 function toonUitnodigingen(lijst){
@@ -242,7 +284,7 @@ function kaartVoor(x){
   const open = (x.huiswerk||[]).filter(h => !h.af);
   const kaart = E('div',{class:'kaart blok'},
     E('div',{class:'kop'},
-      E('b', null, x.klas.naam + ' · ' + x.kind.naam),
+      E('b', null, x.klas.naam + (x.klas.niveau ? ' · ' + x.klas.niveau : '') + ' · ' + x.kind.naam),
       E('span',{class:'sub'}, (x.klas.school ? x.klas.school + ' · ' : '') + x.klas.leraar)),
     // vandaag
     E('div',{class:'sec', style:{margin:'0.8rem 0 0.3rem'}}, 'Vandaag'),
@@ -437,18 +479,37 @@ async function laadPersoneel(code, token){
       E('div',{class:'knoprij'}, uitlog)));
     return;
   }
+  /* Nieuwe klas: naam plus niveau van de ladder, in plaats van een kale
+     prompt. Het niveau (bijv. Groep 7, of Havo) komt uit d.ladder -- de
+     server stuurt de fasen per schoolsoort mee, dus dit scherm verzint
+     zelf geen lijst. De keuze is per schoolsoort geordend. */
+  const nkNaam = E('input',{class:'veld', placeholder:'Naam van de klas (bijv. 7B)', maxlength:'60', style:{flex:'1 1 9rem'}});
+  const nkFase = E('select',{class:'veld', 'aria-label':'Niveau van de klas, per schoolsoort geordend', style:{flex:'1 1 11rem'}});
+  {
+    const trapNaam = {}; ((d.ladder && d.ladder.trappen) || []).forEach(t => { trapNaam[t.id] = t.naam; });
+    const perTrap = {};
+    ((d.ladder && d.ladder.fasen) || []).forEach(f => { (perTrap[f.trap] = perTrap[f.trap] || []).push(f); });
+    nkFase.innerHTML = '<option value="">Kies het niveau...</option>' +
+      Object.keys(perTrap).map(t => '<optgroup label="' + esc(trapNaam[t] || t) + '">' +
+        perTrap[t].map(f => '<option value="' + esc(f.id) + '">' + esc(f.naam) + '</option>').join('') + '</optgroup>').join('');
+  }
+  const nkVorm = E('div',{class:'rij', style:{display:'none', gap:'.4rem', flexWrap:'wrap', marginTop:'.5rem'}},
+    nkNaam, nkFase,
+    E('button',{class:'knop klein', onclick:async()=>{
+      const naam = nkNaam.value.trim(); if (!naam) { alert('Geef de klas een naam.'); return; }
+      if (!nkFase.value) { alert('Kies het niveau van de klas.'); return; }
+      try{ const r = await api('/school/leraar/klas/maak', { schoolCode: code, personeelToken: token, naam, fase: nkFase.value });
+        alert('Klas aangemaakt. Klascode voor de ouders: ' + r.code); laadPersoneel(code, token); }
+      catch(e){ alert(e.message); }
+    }}, 'Maak de klas'));
   vervang(ov,
     E('div',{class:'kaart blok'},
       E('div',{class:'kop'}, E('b', null, d.naam + ' · ' + d.school.naam), E('span',{class:'sub'}, d.klassen.length + ' klas(sen)')),
       E('div',{class:'knoprij'},
-        E('button',{class:'knop klein', onclick:async()=>{
-          const naam = prompt('Naam van de nieuwe klas (bijv. Groep 7):', ''); if (!naam) return;
-          try{ const r = await api('/school/leraar/klas/maak', { schoolCode: code, personeelToken: token, naam });
-            alert('Klas aangemaakt. Klascode voor de ouders: ' + r.code); laadPersoneel(code, token); }
-          catch(e){ alert(e.message); }
-        }}, 'Nieuwe klas'), uitlog)),
+        E('button',{class:'knop klein', onclick:()=>{ nkVorm.style.display = nkVorm.style.display === 'none' ? 'flex' : 'none'; if (nkVorm.style.display !== 'none') nkNaam.focus(); }}, 'Nieuwe klas'), uitlog),
+      nkVorm),
     d.klassen.length ? d.klassen.map(k => E('div',{class:'kaart blok'},
-      E('div',{class:'kop'}, E('b', null, k.naam), E('span',{class:'sub'}, 'code ' + k.code)),
+      E('div',{class:'kop'}, E('b', null, k.naam + (k.niveau ? ' · ' + k.niveau : '')), E('span',{class:'sub'}, 'code ' + k.code)),
       E('div',{class:'mini', style:{margin:'.3rem 0 .5rem'}},
         k.leerlingen + ' leerling(en) · ' + k.huiswerk + ' huiswerk · ' + k.berichten + ' bericht(en)' + (k.openAbsenties ? ' · ' : ''),
         k.openAbsenties ? E('b',{style:{color:'var(--rood)'}}, k.openAbsenties + ' open ziekmelding(en)') : null),
@@ -573,5 +634,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

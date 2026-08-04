@@ -62,6 +62,7 @@
   <div class="form-col">
     <div class="hint" style="padding:0 1rem;">Alles wat je invult wordt automatisch op dit toestel bewaard en blijft privé. Rechts zie je je cv meteen verschijnen.</div>
 
+    <div class="deel">Wie ben je</div>
     <div class="kaart sec">
       <h3>Wie ben je</h3>
       <input class="veld" data-f="naam" placeholder="Voor- en achternaam">
@@ -76,6 +77,7 @@
       </div>
     </div>
 
+    <div class="deel">Over jou</div>
     <div class="kaart sec">
       <h3>Over jou</h3>
       <textarea class="veld" data-f="profiel" placeholder="Een paar zinnen over wie je bent en wat je goed kunt. Bijvoorbeeld: 'Ik werk hard, ben op tijd en leer snel.'"></textarea>
@@ -83,32 +85,39 @@
       <div id="hulpzinnen" style="display:flex;flex-wrap:wrap;gap:.35rem;"></div>
     </div>
 
+    <div class="deel">Werkervaring</div>
     <div class="kaart sec">
       <h3>Werkervaring <button class="add" data-add="werk">+ Toevoegen</button></h3>
       <div class="hint">Ook vrijwilligerswerk, klusjes of stages tellen mee.</div>
       <div id="werkLijst"></div>
     </div>
 
+    <div class="deel">Opleiding</div>
     <div class="kaart sec">
       <h3>Opleiding <button class="add" data-add="opleiding">+ Toevoegen</button></h3>
       <div id="opleidingLijst"></div>
     </div>
 
+    <div class="deel">Vaardigheden</div>
     <div class="kaart sec">
       <h3>Vaardigheden</h3>
       <input class="veld" data-f="skills" placeholder="Bijv. samenwerken, rijbewijs B, netjes werken (komma's ertussen)">
     </div>
+    <div class="deel">Talen</div>
     <div class="kaart sec">
       <h3>Talen</h3>
       <input class="veld" data-f="talen" placeholder="Bijv. Nederlands, Arabisch, Engels">
     </div>
+    <div class="deel">Hobby's</div>
     <div class="kaart sec">
       <h3>Hobby's (optioneel)</h3>
       <input class="veld" data-f="hobbys" placeholder="Bijv. voetbal, koken, tekenen">
     </div>
   </div>
 
-  <div class="preview-col">
+  <!-- rtgdeel-vast: het cv-voorbeeld hoort bij geen enkel deel en groeit mee
+       terwijl je invult -->
+  <div class="preview-col rtgdeel-vast">
     <div class="cvpaper" id="cvpaper"></div>
   </div>
 </div>
@@ -119,6 +128,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -130,6 +141,20 @@ const _pnaam = (window.Sessie && Sessie.naam && Sessie.naam()) || '';
 if (_pnaam && !cv.velden.naam) cv.velden.naam = _pnaam;
 
 function bewaar(){ try{ localStorage.setItem(KEY, JSON.stringify(cv)); }catch(e){} }
+
+/* Meenemen (shared/uitvoer.js): je eigen loopbaan uit dit cv, werk en
+   opleiding als losse velden. Het cv zelf print je; dit is de lijst die je in
+   een sollicitatieformulier of een andere app kunt overnemen. Alleen de
+   blokken, niet je naam en contactgegevens: die staan bovenaan het papier en
+   horen niet in een los bestand. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  const rijen = cv.werk.filter(w => w.functie || w.bedrijf || w.beschrijving)
+      .map(w => ['werk', w.functie || '', w.bedrijf || '', w.periode || '', w.beschrijving || ''])
+    .concat(cv.opleiding.filter(o => o.opleiding || o.school)
+      .map(o => ['opleiding', o.opleiding || '', o.school || '', o.periode || '', '']));
+  if (!rijen.length) return null;
+  return { naam: 'cv', kolommen: ['soort', 'wat', 'waar', 'periode', 'toelichting'], rijen };
+});
 
 /* ---- velden ---- */
 document.querySelectorAll('[data-f]').forEach(inp=>{
@@ -206,6 +231,7 @@ $('#btnBewerk') && $('#btnBewerk').addEventListener('click', ()=> $('#cvapp').cl
 tekenBlokken('werk'); tekenBlokken('opleiding'); render();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -215,5 +241,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

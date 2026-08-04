@@ -33,6 +33,7 @@
   .taak.af span{opacity:.45;text-decoration:line-through;}
   .leeg{color:var(--muted);font-size:.85rem;padding:.5rem 0;}
   ul{list-style:none;} li{font-size:.82rem;line-height:1.6;color:var(--muted);}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   .stat{flex:1;min-width:7rem;text-align:center;} .stat b{font-size:1.2rem;display:block;}
   .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
 </style>
@@ -45,13 +46,19 @@
   <a href="/apps/lab.html">Onderzoekslab</a>
 </header>
 <main id="main">
+  <div class="deel">Overzicht</div>
   <div class="kaart"><div class="sec">Het huis in een oogopslag</div><div class="rij" id="top"><div class="leeg">Laden...</div></div></div>
+  <div class="deel">Kamers</div>
   <div class="grid" id="grid"></div>
+  <div class="deel">Stadsraad</div>
   <div class="kaart" id="raadKaart">
     <div class="sec">De Stadsraad -- samen met de stadspartners beslissen over lab-uitslagen</div>
     <div id="raadIn"><div class="leeg">Laden...</div></div>
   </div>
-  <div id="kamer" hidden>
+  <!-- rtgdeel-vast: het kamerdetail hoort bij geen enkel deel. De pagina zet
+       het zelf open en dicht bij het rooster hierboven; zo blijft dat werken
+       met het menu erbij. -->
+  <div id="kamer" class="rtgdeel-vast" hidden>
     <div class="kaart">
       <div class="rij" style="justify-content:space-between;"><h2 id="kNaam" style="font-size:1.1rem;"></h2><button class="knop stil" id="terug">← Alle kamers</button></div>
       <div class="kpi" id="kMissie" style="margin:.3rem 0 .6rem;"></div>
@@ -74,6 +81,9 @@
   </div>
 </main>
 <script src="/shared/glyf.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -84,13 +94,43 @@ const glyf = naam => {
   return s ? s + ' ' : '';
 };
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+/* De deur op de app zelf in plaats van wegsturen (TAKEN 5.5, dezelfde kwaal
+   als bij de acht kantoor-apps en de Arena). */
+function uitgelogd(){
+  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  /* Op de volgende tick: de deur vervangt #main en dit script bindt daarna nog
+     listeners aan knoppen daarbinnen. */
+  setTimeout(function () {
+    RTGDeur.toon(document.getElementById('main') || document.body, { soort: 'personeel', naar: naar });
+  }, 0);
+}
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/rtfkantoor/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
-let KAMER = null;
+let KAMER = null, KAMERS = null, KAMERIN = null;
+
+/* Meenemen (shared/uitvoer.js): wat er op dit moment op tafel ligt. Staat het
+   rooster open, dan zijn dat de kamers met hun missie, hun eerste meter en hun
+   openstaande taken; staat een kamer open, dan zijn het de taken van die
+   kamer. Zo neemt u mee wat u ziet. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (KAMERIN && !$('#kamer').hidden) {
+    var t = (KAMERIN.taken||[]).map(function(x){
+      return [KAMERIN.naam, x.tekst, x.af ? 'af' : 'open'];
+    });
+    if (t.length) return { naam:'kamertaken', kolommen:['kamer','taak','status'], rijen:t };
+  }
+  if (!KAMERS || !KAMERS.length) return null;
+  return { naam:'rtf-kamers', kolommen:['kamer','missie','taken open','meter','stand'],
+    rijen: KAMERS.map(function(x){
+      return [x.naam, x.missie, x.takenOpen, x.kpi ? x.kpi[0] : '', x.kpi ? x.kpi[1] : ''];
+    }) };
+});
+
 async function laad(){
   const [o, k] = await Promise.all([api('overzicht'), api('kamers')]);
+  KAMERS = k.kamers || []; KAMERIN = null;
   $('#top').innerHTML =
     '<div class="stat"><b>' + o.kamers + '</b><i>kamers</i></div>' +
     '<div class="stat"><b>€ ' + esc(o.opgehaald) + '</b><i>30%-stroom</i></div>' +
@@ -107,6 +147,7 @@ async function laad(){
 async function open(id){
   KAMER = id;
   const d = await api('kamer', { id });
+  KAMERIN = d;
   $('#grid').hidden = true; $('#kamer').hidden = false;
   $('#kNaam').innerHTML = glyf(d.icoon) + esc(d.naam);
   $('#kMissie').textContent = d.missie;
@@ -116,6 +157,7 @@ async function open(id){
   toonTaken(d.taken);
 }
 function toonTaken(taken){
+  if (KAMERIN) KAMERIN.taken = taken;   // het meenemen volgt wat er getekend wordt
   $('#kTaken').innerHTML = taken.length ? taken.map(t => '<label class="taak' + (t.af ? ' af' : '') + '"><input type="checkbox" data-id="' + t.id + '"' + (t.af ? ' checked' : '') + '><span>' + esc(t.tekst) + '</span></label>').join('') : '<div class="leeg">Nog geen taken.</div>';
   document.querySelectorAll('#kTaken input').forEach(c => c.addEventListener('change', async () => {
     await api('kamer/taak-zet', { id: KAMER, taakId: c.dataset.id, af: c.checked }); open(KAMER);
@@ -170,9 +212,14 @@ $('#tMaak').addEventListener('click', async () => {
   const r = await api('kamer/taak', { id: KAMER, tekst: t });
   $('#tTekst').value = ''; toonTaken(r.taken);
 });
-laad().catch(e => { $('#top').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
-raadLaad();
+/* Zonder kantoorsessie staat de deur er al; doorstarten levert alleen 401-en
+   op die in elementen schrijven die de deur net heeft vervangen. */
+if (TOKEN) {
+  laad().catch(e => { const el = $('#top'); if (el) el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+  raadLaad();
+}
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
@@ -180,5 +227,6 @@ raadLaad();
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -57,6 +57,8 @@
 <header><div><div class="ey">Lifestyle Pass</div><h1>Attenties</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -69,16 +71,36 @@ const md=s=>{ if(!s)return ''; const[m,dd]=s.split('-'); return Number(dd)+' '+M
 const tel=n=>n==null?'':n===0?'vandaag':n===1?'morgen':'over '+n+' dagen';
 const AIBOX=app=>'<div class="kaart"><h2>Vraag de relatiesecretaris</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
-let open=null;
+let open=null, DATA=null;
+/* Meenemen: het relatieregister kent zijn eigen velden, dus geeft de app die
+   door in plaats van de gedeelde laag de kaarten van het scherm te laten
+   plukken. Verjaardag en jubileum staan hier als MM-DD, want zo bewaart dit
+   register ze (een verjaardag zonder jaartal); alleen de gift heeft een echte
+   datum, en die staat er dan ook als YYYY-MM-DD in. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!DATA||!DATA.relaties) return null;
+  return {
+    naam:'relaties',
+    kolommen:['naam','band','verjaardag','jubileum','voorkeuren','volgende','dagen tot','giften','laatste gift','laatste giftdatum'],
+    rijen:DATA.relaties.map(function(r){
+      const g=(r.giften||[])[0]||{};
+      return [r.naam||'', r.band||'', r.verjaardag||'', r.jubileum||'', r.voorkeuren||'',
+        r.volgendeSoort||'', r.dagenTot==null?'':r.dagenTot, (r.giften||[]).length,
+        g.wat||'', g.datum||''];
+    })
+  };
+});
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('attenties'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Attenties is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het relatiebeheer niet laden.</div>'; return; }
+  let d; try{ d=await api('attenties'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het relatiebeheer niet laden.</div>'; return; }
+  DATA=d;
   if(open){ const r=d.relaties.find(x=>x.id===open); if(r) return detail(d,r); open=null; }
   let h='';
   if(d.aankomend.length){ h+='<div class="attn"><h2>Binnenkort</h2>'+d.aankomend.map(a=>'<div class="r"><b>'+esc(a.naam)+'</b> · '+esc(a.soort)+' '+tel(a.dagenTot)+'</div>').join('')+'</div>'; }
-  h+='<div class="kaart"><h2>Relatie toevoegen</h2><div class="rij"><input class="veld" id="rN" placeholder="naam"><select class="veld" id="rB">'+d.banden.map(b=>'<option>'+b+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="rV" type="date" title="verjaardag"><input class="veld" id="rJ" type="date" title="jubileum"></div><div class="rij"><input class="veld" id="rVo" placeholder="voorkeuren (bijv. houdt van boeken)"></div><div style="margin-top:.6rem;"><button class="knop" id="rAdd">+ relatie</button></div></div>';
+  h+='<div class="deel">Relatie toevoegen</div><div class="kaart"><h2>Relatie toevoegen</h2><div class="rij"><input class="veld" id="rN" placeholder="naam"><select class="veld" id="rB">'+d.banden.map(b=>'<option>'+b+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="rV" type="date" title="verjaardag"><input class="veld" id="rJ" type="date" title="jubileum"></div><div class="rij"><input class="veld" id="rVo" placeholder="voorkeuren (bijv. houdt van boeken)"></div><div style="margin-top:.6rem;"><button class="knop" id="rAdd">+ relatie</button></div></div>';
+  h+='<div class="deel">Uw relaties</div>';
   h+= d.relaties.length ? d.relaties.map(r=>'<div class="kaart rel" data-id="'+r.id+'"><div class="b"><div class="nm">'+esc(r.naam)+'</div><div class="meta">'+[r.band,r.verjaardag?'jarig '+md(r.verjaardag):''].filter(Boolean).join(' · ')+'</div></div>'+(r.dagenTot!=null?'<span class="tel'+(r.dagenTot<=30?' snel':'')+'">'+r.volgendeSoort+' '+tel(r.dagenTot)+'</span>':'')+'</div>').join('') : '<div class="kaart"><div class="leeg">Nog geen relaties.</div></div>';
-  h+=AIBOX('Bijv. wat geef ik mijn mentor voor zijn jubileum?');
+  h+='<div class="deel">Relatiesecretaris</div>'+AIBOX('Bijv. wat geef ik mijn mentor voor zijn jubileum?');
   $('#main').innerHTML=h;
   bindAi('attenties');
   $('#rAdd').onclick=async()=>{ const naam=$('#rN').value.trim(); if(!naam) return meld('Naam?'); try{ await api('attenties/relatie',{naam,band:$('#rB').value,verjaardag:$('#rV').value,jubileum:$('#rJ').value,voorkeuren:$('#rVo').value}); laad(); }catch(e){ meld(e.message); } };
@@ -96,6 +118,7 @@ function detail(d,r){
 }
 laad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -103,5 +126,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

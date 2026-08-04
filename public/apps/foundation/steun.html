@@ -75,6 +75,7 @@
   </div>
 </div>
 
+<script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -90,11 +91,27 @@ const REACTIES = {
   1:'Dat het zwaar is, betekent dat je veel draagt. Adem even, en vraag gerust iemand om hulp; dat is sterk.',
   0:'Wat rot dat het moeilijk is. Je bent niet alleen. Praat er vandaag over met iemand die je vertrouwt, of met je huisarts.'
 };
+let LOG = [];
 function laadVerloop(){
   let log=[]; try{ log=JSON.parse(localStorage.getItem(MKEY)||'[]'); }catch(e){}
+  LOG = log;
   $('#verloop').innerHTML = log.slice(-14).map(x=>'<span title="'+String(x.d).replace(/["<>&]/g,'')+'">'+(EMO[x.m]||'')+'</span>').join('');
   $('#privaat').textContent = log.length ? ('Je hebt de laatste tijd '+log.length+' keer ingecheckt. Alleen jij ziet dit.') : '';
 }
+
+/* Meenemen (shared/uitvoer.js): je incheckjes staan alleen op dit toestel, en
+   ze zijn van jou. Wie ze wil laten zien aan de huisarts, of gewoon wil
+   bewaren, neemt ze mee zoals ze hier staan: de dag en wat je aantikte. */
+const MWOORD = {};
+$('#moods').querySelectorAll('button').forEach(b=>{ MWOORD[b.dataset.m] = (b.querySelector('.lb').textContent||'').trim(); });
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!LOG.length) return null;
+  return {
+    naam: 'stemming',
+    kolommen: ['datum', 'stemming', 'waarde'],
+    rijen: LOG.map(function (x) { return [x.d, MWOORD[x.m] || '', x.m]; })
+  };
+});
 $('#moods').querySelectorAll('button').forEach(b=>{
   b.onclick=()=>{
     const m=Number(b.dataset.m);
@@ -111,6 +128,7 @@ laadVerloop();
 Sessie.coach({ kind:'steun', chat:$('#chat'), input:$('#vraag'), knop:$('#stuur'), wacht:'Nora luistert...' });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -120,5 +138,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

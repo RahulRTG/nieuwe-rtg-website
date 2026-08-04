@@ -60,6 +60,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -83,6 +85,19 @@ const api = (pad, body) => fetch('/api/rtf/bieb' + pad, {
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 const ST = { categorie: '', zoek: '', pagina: 1, mijn: false };
+let TOON = [];
+/* Meenemen (shared/uitvoer.js): de lijst die nu op het scherm staat -- de
+   pagina uit de bibliotheek, of "Mijn apps". Dezelfde velden als op de tegel,
+   plus het adres, zodat de lijst buiten de app nog ergens heen wijst. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!TOON.length) return null;
+  return {
+    naam: ST.mijn ? 'mijn-apps' : 'app-bibliotheek',
+    kolommen: ['naam','categorie','voor wie','uitleg','adres'],
+    rijen: TOON.map(a => [a.naam, a.categorieLabel || '', a.doelgroepLabel || '',
+      a.uitleg || '', a.url || ''])
+  };
+});
 
 async function start(){
   try {
@@ -113,10 +128,12 @@ async function teken(){
     const mijn = (await api('/mijn')).apps;
     const mijnIds = mijn.map(a => a.id);
     if (ST.mijn) {
+      TOON = mijn;
       grid.innerHTML = mijn.length ? mijn.map(a => kaart(a, true)).join('') : '<div class="leeg">Nog geen apps. Blader door de bibliotheek en druk op Installeer.</div>';
       blader.innerHTML = '';
     } else {
       const d = await api('/catalogus', { categorie: ST.categorie, zoek: ST.zoek, pagina: ST.pagina });
+      TOON = d.items;
       grid.innerHTML = d.items.length ? d.items.map(a => kaart(a, mijnIds.includes(a.id))).join('') : '<div class="leeg">Niets gevonden.</div>';
       blader.innerHTML = d.paginas > 1
         ? '<button class="knop stil" id="bVorig"'+(d.pagina<=1?' disabled':'')+'>←</button>'+
@@ -148,5 +165,6 @@ start();
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

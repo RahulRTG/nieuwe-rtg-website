@@ -23,9 +23,22 @@
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:760px;margin:0 auto;}
-  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
-  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
-  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* Het loket houdt zijn eigen schakelaar (Melden / Burgerzaken / Vergunningen /
+     Afval en meer): een paneel tegelijk, precies wat het deelmenu elders doet.
+     Alleen de vorm gaat mee met het huis -- een rustige balk met kleine kapitalen
+     en een gouden streep onder het deel waar je staat, in plaats van een rij
+     pillen. De selector moet dieper dan `.tab`: de kit tekent die rij zelf al met
+     `body.rtg-stijl .tab`, en die is specifieker dan een kale `.tab`. */
+  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;padding:0 0 .1rem;
+    overflow:visible;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > .tab{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    border-radius:0;cursor:pointer;padding:.55rem .8rem .6rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
+  /* het gevulde pilletje van de kit uitzetten: `body.rtg-stijl .tabs > button.aan`
+     is specifieker dan een kale `.tab`, dus de vulling moet hier weg */
+  body.rtg-stijl .tabs > .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   section.paneel{display:none;}
   section.paneel.aan{display:block;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:.8rem;}
@@ -148,6 +161,8 @@
 </main>
 
 <div class="melding" id="melding" role="status"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -173,6 +188,43 @@ let meldCat = 'verlichting';
 const VERG = { bouw:'Bouw/omgeving', evenement:'Evenement', terras:'Terras', horeca:'Horeca', kap:'Kap', standplaats:'Standplaats' };
 let vgSoort = 'evenement';
 let bzSoort = null;
+
+/* Meenemen (shared/uitvoer.js): uw eigen zaken bij de gemeente. Elk tabblad
+   heeft zijn eigen dossier met zijn eigen velden, dus geeft de uitvoer wat er
+   nu op het scherm staat -- meldingen, afspraken, aanvragen of aanslagen. */
+let mijnMeld = [], mijnAfspr = [], mijnVerg = [], mijnAanslagen = [];
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var tab = document.body.dataset.tab;
+  if (tab === 'burger' && mijnAfspr.length) return {
+    naam: 'afspraken',
+    kolommen: ['datum', 'tijd', 'soort', 'status', 'nieuw adres', 'kenmerk'],
+    rijen: mijnAfspr.map(function (a) {
+      return [a.datum || '', a.tijd || '', a.soortLabel || a.soort || '', a.status, a.nieuwAdres || '', a.ref];
+    })
+  };
+  if (tab === 'verg' && mijnVerg.length) return {
+    naam: 'vergunningen',
+    kolommen: ['datum', 'soort', 'omschrijving', 'locatie', 'status', 'voorwaarden', 'kenmerk'],
+    rijen: mijnVerg.map(function (v) {
+      return [String(v.at || '').slice(0, 10), v.soortLabel || v.soort || '', v.omschrijving || '',
+        v.locatie || '', v.status, (v.voorwaarden || []).join('; '), v.ref];
+    })
+  };
+  if (tab === 'info' && mijnAanslagen.length) return {
+    naam: 'aanslagen',
+    kolommen: ['jaar', 'soort', 'bedrag', 'betaald'],
+    rijen: mijnAanslagen.map(function (a) { return [a.jaar, a.soort, a.bedrag, a.betaald ? 'ja' : 'nee']; })
+  };
+  if (!mijnMeld.length) return null;
+  return {
+    naam: 'meldingen',
+    kolommen: ['datum', 'categorie', 'melding', 'locatie', 'status', 'ploeg', 'kenmerk'],
+    rijen: mijnMeld.map(function (m) {
+      return [String(m.at || '').slice(0, 10), m.categorieLabel || m.categorie || '', m.tekst,
+        m.locatie || '', m.status, m.ploeg || '', m.ref];
+    })
+  };
+});
 
 function start(){
   $('#tabs').innerHTML = TABS.map(([t,l]) => '<button class="tab" data-t="'+t+'">'+esc(l)+'</button>').join('');
@@ -207,7 +259,7 @@ $('#meldGo').addEventListener('click', async () => {
 });
 async function laadMijnMeldingen(){
   let d; try { d = await api('/api/gemeente/meldingen/mijn'); } catch(e){ return; }
-  const l = d.meldingen || [];
+  const l = mijnMeld = d.meldingen || [];
   $('#meldMijn').innerHTML = l.length ? l.map(m =>
     '<div class="item"><h4>'+esc(m.categorieLabel)+'</h4><div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+'</div>'+
     '<span class="status '+(m.status==='opgelost'?'op':m.status==='afgewezen'?'af':'')+'">'+esc(m.status)+' · '+esc(m.ploeg)+'</span>'+
@@ -246,7 +298,7 @@ $('#vhGo').addEventListener('click', async () => {
 });
 async function laadMijnAfspraken(){
   let d; try { d = await api('/api/gemeente/afspraken/mijn'); } catch(e){ return; }
-  const l = (d.afspraken||[]).filter(a => a.status !== 'geannuleerd');
+  const l = mijnAfspr = (d.afspraken||[]).filter(a => a.status !== 'geannuleerd');
   $('#bzMijn').innerHTML = l.length ? l.map(a =>
     '<div class="item"><h4>'+esc(a.soortLabel)+'</h4><div class="meta">'+(a.datum?esc(a.datum)+(a.tijd?' om '+esc(a.tijd):''):esc(a.nieuwAdres||''))+'</div>'+
     '<span class="status">'+esc(a.status)+'</span> <button class="knop stil" data-ref="'+esc(a.ref)+'" style="padding:.2rem .6rem;font-size:.76rem;">Annuleer</button></div>').join('') : '<div class="leeg">Nog geen afspraken.</div>';
@@ -265,7 +317,7 @@ $('#vgGo').addEventListener('click', async () => {
 });
 async function laadMijnVerg(){
   let d; try { d = await api('/api/gemeente/vergunningen/mijn'); } catch(e){ return; }
-  const l = d.vergunningen || [];
+  const l = mijnVerg = d.vergunningen || [];
   $('#vgMijn').innerHTML = l.length ? l.map(v =>
     '<div class="item"><h4>'+esc(v.soortLabel)+'</h4><div class="meta">'+esc(v.omschrijving)+(v.locatie?' · '+esc(v.locatie):'')+'</div>'+
     '<span class="status '+(v.status==='verleend'?'op':v.status==='geweigerd'?'af':'')+'">'+esc(v.status)+'</span>'+
@@ -291,7 +343,7 @@ $('#gvGo').addEventListener('click', async () => {
 });
 async function laadBelasting(){
   let d; try { d = await api('/api/gemeente/belasting/mijn'); } catch(e){ return; }
-  const l = d.aanslagen || [];
+  const l = mijnAanslagen = d.aanslagen || [];
   $('#belMijn').innerHTML = l.length ? l.map(a => '<div class="item"><h4>'+esc(a.soort)+' '+esc(a.jaar)+'</h4><div class="meta">€ '+esc(a.bedrag)+'</div><span class="status '+(a.betaald?'op':'')+'">'+(a.betaald?'betaald':'openstaand')+'</span>'+
     (a.betaald?'':' <button class="knop stil" data-bet="'+esc(a.id)+'" style="padding:.2rem .6rem;font-size:.76rem;">Betalen</button>')+'</div>').join('') : '<div class="leeg">Geen openstaande aanslagen.</div>';
   $('#belMijn').querySelectorAll('button[data-bet]').forEach(b => b.addEventListener('click', async () => {
@@ -369,5 +421,6 @@ if (!TOKEN) {
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

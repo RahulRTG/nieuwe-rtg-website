@@ -43,6 +43,22 @@
 
   api('dossier').then(function (d) {
     if (!d || !d.ok) throw new Error('geen dossier');
+    /* Meenemen: de app kent zijn eigen model, dus geeft hij dat door in plaats
+       van de gedeelde laag het scherm te laten raden. Een reisonderdeel is een
+       moment, een titel, een toelichting, een stand en soms een factuur -- en
+       zo hoort het ook in het bestand te staan. De stand gaat mee als woord,
+       precies zoals op het scherm: een dossier waarin alles even zeker lijkt
+       is erger dan geen dossier. */
+    if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+      if (!d.reis || !d.tijdlijn || !d.tijdlijn.length) return null;
+      return {
+        naam: 'reisdossier',
+        kolommen: ['wanneer', 'onderdeel', 'toelichting', 'stand', 'factuur'],
+        rijen: d.tijdlijn.map(function (t) {
+          return [t.wanneer, t.titel, t.toelichting || '', t.label, t.factuur || ''];
+        })
+      };
+    });
     if (!d.reis) { doel.innerHTML = '<p class="mag-telling">' + esc(d.tekst) + '</p>'; return; }
     var deck = document.getElementById('dosDeck');
     if (deck) {

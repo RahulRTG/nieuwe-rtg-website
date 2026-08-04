@@ -79,10 +79,20 @@
   <div id="app" hidden></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
+
+/* Meenemen (shared/uitvoer.js): elke werkplek heeft zijn eigen register --
+   het vluchtbord, de kofferketen, de charteraanvragen, de vip-protocollen,
+   de gasten in de lounges. Het scherm dat u openzet meldt zijn eigen model
+   aan, zodat wat u meeneemt hetzelfde is als wat u ziet. De reizigers zelf
+   blijven op codenaam, net als op het scherm. */
+let UIT = null;
+function zetUit(naam, kolommen, rijen){ UIT = rijen.length ? { naam: naam, kolommen: kolommen, rijen: rijen } : null; }
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT; });
 let TOKEN = null, C = null;
 const api = (pad, body) => fetch(pad, {
   method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
@@ -138,6 +148,7 @@ const ROLLEN = [
 ];
 
 async function kiesScherm(){
+  UIT = null;   // de keuzepagina heeft zelf geen register
   try { C = await api('/api/lucht/cockpit'); } catch(e){ meld(e.message); return; }
   $('#kop').textContent = 'RTG Airport';
   $('#app').innerHTML =
@@ -170,6 +181,7 @@ function koppelBasis(){
   $('#aiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#aiK').click(); });
 }
 function rolScherm(rol){
+  UIT = null;   // elk scherm meldt hierna zijn eigen register aan
   if (rol === 'vluchtleiding') return schermVluchtleiding();
   if (rol === 'platform') return schermPlatform();
   if (rol === 'toren') return schermToren();
@@ -225,6 +237,8 @@ async function laadVluchten(){
         '</div>';
       return vluchtKaart(v, acties);
     }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
+    zetUit('vluchten', ['nummer','soort','categorie','bestemming','tijd','gate','status'],
+      r.vluchten.map(v => [v.nummer, v.soort, v.categorie, v.bestemming, v.tijd, v.gate, v.geannuleerd ? 'geannuleerd' : v.status]));
     $('#vlLijst').querySelectorAll('[data-stap]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/lucht/vlucht/status', { id: b.dataset.stap, status: b.dataset.naar }); meld('Bijgewerkt.'); laadVluchten(); } catch(e){ meld(e.message); } }));
     $('#vlLijst').querySelectorAll('[data-ver]').forEach(b => b.addEventListener('click', async () => {
@@ -303,6 +317,8 @@ async function laadBagage(){
         (k.status === 'vermist' ? '<button class="knop" data-tag="'+esc(k.tag)+'" data-naar="op-band">Gevonden → band</button>' : '')+
         '</div></div>';
     }).join('') : '<div class="leeg">Geen koffers in deze selectie.</div>';
+    zetUit('koffers', ['tag','vlucht','reiziger','status','band'],
+      r.koffers.map(k => [k.tag, k.vlucht, k.codenaam, k.status, k.band || '']));
     $('#bgLijst').querySelectorAll('[data-tag]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/lucht/bagage/zet', { tag: b.dataset.tag, status: b.dataset.naar }); meld('Bijgewerkt.'); laadBagage(); } catch(e){ meld(e.message); } }));
   } catch(e){ meld(e.message); }
@@ -363,6 +379,8 @@ async function laadCharters(){
       '<div class="item"><h4>'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' <small style="color:var(--soft);font-family:Inter;">'+esc(c.van)+' · '+esc(c.datum)+' '+esc(c.tijd)+'</small> <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+'</span></h4>'+
       (c.status === 'aangevraagd' ? '<div class="rij"><button class="knop" data-ok="'+c.id+'">Bevestig (uw besluit)</button><button class="knop rood" data-nee="'+c.id+'">Wijs af</button></div>' : '')+'</div>').join('')
       : '<div class="leeg">Geen charteraanvragen.</div>';
+    zetUit('charters', ['code','van','bestemming','datum','tijd','status'],
+      r.charters.map(c => [c.code, c.van, c.bestemming, c.datum, c.tijd, c.status]));
     $('#chLijst').querySelectorAll('[data-ok]').forEach(b => b.addEventListener('click', async () => {
       try { const r2 = await api('/api/lucht/charter/beslis', { id: b.dataset.ok, akkoord: true });
         meld('Bevestigd: '+r2.vlucht.nummer+' op '+r2.vlucht.gate+'.'); laadCharters(); } catch(e){ meld(e.message); } }));
@@ -390,6 +408,9 @@ async function laadLounge(){
     $('#lgLijst').innerHTML = r.lounges.map(l =>
       '<div class="item"><h4>'+(l.id==='royal'?'':'')+esc(l.naam)+' <span class="status '+(l.binnen>=l.capaciteit?'open':'goud')+'">'+l.binnen+' / '+l.capaciteit+'</span></h4>'+
       (l.gasten.length ? l.gasten.map(g => '<div class="meta">'+esc(g.codenaam)+' · '+esc(g.vlucht)+' '+esc(g.tijd)+' <button class="knop stil" style="padding:.15rem .5rem;font-size:.7rem;" data-uit="'+g.id+'">uitchecken</button></div>').join('') : '<div class="meta">Nog geen gasten.</div>')+'</div>').join('');
+    const gasten = [];
+    r.lounges.forEach(l => l.gasten.forEach(g => gasten.push([l.naam, g.codenaam, g.vlucht, g.tijd])));
+    zetUit('loungegasten', ['lounge','gast','vlucht','tijd'], gasten);
     $('#lgLijst').querySelectorAll('[data-uit]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/lucht/lounge/uit', { id: b.dataset.uit }); meld('Tot ziens.'); laadLounge(); } catch(e){ meld(e.message); } }));
   } catch(e){ meld(e.message); }
@@ -399,6 +420,7 @@ async function laadLounge(){
 try { TOKEN = localStorage.getItem(SLEUTEL); } catch(e){}
 if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); kiesScherm(); }
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

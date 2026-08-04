@@ -90,6 +90,10 @@
   .deel .dn{font-weight:600;font-size:.85rem;}
   .deel .dm{font-size:.72rem;color:var(--soft);}
   .deel .rechts{margin-left:auto;}
+  /* .deel is hier twee dingen: een regel in de vorm-lijst (hierboven) en de
+     markering voor het deelmenu op de kopregels van het werkvlak. Met het menu
+     erbij is die markering weg; staat hij er niet, dan blijft het een kop. */
+  .kop.deel{display:block;border-top:none;padding:0;}
   .maker{display:flex;gap:.5rem;align-items:center;border-top:1px solid var(--line);padding:.4rem 0;
     font-size:.85rem;}
   .maker:first-child{border-top:none;}
@@ -141,7 +145,7 @@
         zetten. Klaar is uw eigen oordeel, niet het onze.</p>
     </div>
 
-    <div class="kop">Het raster</div>
+    <div class="kop deel">Het raster</div>
     <div class="kaart">
       <div id="rack"></div>
       <div class="rij" style="margin-top:.7rem;">
@@ -152,10 +156,10 @@
       </div>
     </div>
 
-    <div class="kop">De notenrol</div>
+    <div class="kop deel">De notenrol</div>
     <div class="kaart"><div id="rol"></div></div>
 
-    <div class="kop">De vorm</div>
+    <div class="kop deel">De vorm</div>
     <div class="kaart">
       <p class="stil">Een lus van vier maten is een figuur; een lied heeft delen. Wat u hier benoemt
         verandert niets aan de klank &ndash; het maakt zichtbaar wat de vorm is, en dat is precies wat een
@@ -175,7 +179,7 @@
       </div>
     </div>
 
-    <div class="kop">Rahul zet iets neer</div>
+    <div class="kop deel">Rahul zet iets neer</div>
     <div class="kaart">
       <p class="stil">Wat hij maakt is een voorstel: het landt pas in uw raster als u dat zegt, en het is
         daarna gewoon te bewerken. RTG claimt niets van wat u maakt.</p>
@@ -198,7 +202,7 @@
       <div id="rUit" style="margin-top:.7rem;"></div>
     </div>
 
-    <div class="kop">Samen produceren</div>
+    <div class="kop deel">Samen produceren</div>
     <div class="kaart">
       <p class="stil">Muziek maken is zelden een eenmanszaak. Wie u erbij haalt, bewerkt het stuk volledig
         mee en staat straks in de aftiteling. Het stuk is gedeeld, de credits niet.</p>
@@ -216,7 +220,7 @@
         waarschuwing dan een valse belofte.</p>
     </div>
 
-    <div class="kop">Uitgeven</div>
+    <div class="kop deel">Uitgeven</div>
     <div class="kaart">
       <div id="uitgaveVlak"></div>
       <p class="stil" style="margin-top:.5rem;">Onder uw codenaam geeft u zelf uit, meteen: het is uw werk.
@@ -225,7 +229,7 @@
         gewoon staan onder uw codenaam.</p>
     </div>
 
-    <div class="kop">Meenemen</div>
+    <div class="kop deel">Meenemen</div>
     <div class="kaart">
       <div class="rij">
         <button class="knop" id="exportWav" type="button">Als geluidsbestand (WAV)</button>
@@ -243,6 +247,8 @@
 
 <div class="melding" id="melding" role="status"></div>
 
+<!-- uitvoer.js zonder defer en voor de eigen scripts: scherm.js meldt zijn model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script src="/apps/klankwerk/klanken.js"></script>
 <script src="/apps/klankwerk/zang.js"></script>
 <script src="/apps/klankwerk/motor.js"></script>
@@ -253,6 +259,8 @@
 <script src="/apps/klankwerk/acties.js"></script>
 <script src="/apps/klankwerk/vorm.js"></script>
 <script src="/apps/klankwerk/samen.js"></script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

@@ -23,6 +23,16 @@
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
 
+  /* In een OS-venster (same-origin iframe uit shared/vensters.js) levert de
+     vensterbeheerder de rand al: titelbalk, sluiten, minimaliseren, volledig
+     scherm. desktopframe.js zet deze class ook, maar staat maar op 91 van de
+     188 pagina's; hier staat hij overal (de 9+-keuring eist basis.js), dus
+     ook camera, clips en de RTFoundation-pagina's weten het nu. Los venster
+     (popout) en mobiel hebben geen iframe en houden hun eigen kop. */
+  if (window.self !== window.top) {
+    try { document.documentElement.classList.add('rtg-in-frame'); } catch (e) {}
+  }
+
 
   /* ---- 1. offline: de service worker + een rustig verbindingsseintje ---- */
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
@@ -41,7 +51,17 @@
     '.bss-x{background:transparent;border:1px solid #444;border-radius:8px;color:#eee;padding:.12rem .5rem;cursor:pointer;font:inherit;}' +
     '.bss-wat{font-size:.84rem;color:#ccc;line-height:1.55;}' +
     '.bss-doe{margin:0;padding-left:1.1rem;font-size:.82rem;color:#bbb;line-height:1.6;}' +
-    '.bss-tip{font-size:.8rem;color:#d7c690;line-height:1.5;border-top:1px solid rgba(255,255,255,.08);padding-top:.55rem;}';
+    '.bss-tip{font-size:.8rem;color:#d7c690;line-height:1.5;border-top:1px solid rgba(255,255,255,.08);padding-top:.55rem;}' +
+    /* In een OS-venster is de paginakop dubbelop: de venstertitelbalk toont de
+       naam al en de rode lamp sluit. De kop wordt daarom stil: geen balk meer
+       (statisch, transparant), en titel, eyebrow en terugknop gaan uit het
+       zicht maar blijven in de toegankelijkheidsboom (zelfde techniek als
+       .vis-verborgen). De ACTIEknoppen in de kop (zoeken, uploaden, nieuw)
+       blijven gewoon staan: dat is bediening, geen chrome. */
+    'html.rtg-in-frame body>header{position:static!important;background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;}' +
+    'html.rtg-in-frame body>header h1,html.rtg-in-frame body>header .ey,html.rtg-in-frame body>header .terug,' +
+    'html.rtg-in-frame body>header>a[href^="/apps/app.html"],html.rtg-in-frame body>header>a[href^="/apps/index.html"]' +
+    '{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;}';
   var st = document.createElement('style'); st.textContent = css;
   (document.head || document.documentElement).appendChild(st);
 

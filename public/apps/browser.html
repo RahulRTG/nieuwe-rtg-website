@@ -73,6 +73,7 @@
 <main id="hoofd"></main>
 <div class="melding" id="melding" role="status"></div>
 
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -97,6 +98,15 @@ $('#homeKnop').addEventListener('click',()=>ga('start'));
 $('#balk').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#adres').value); if(a.length<2){ meld('Typ een adres, bijv. jouwzaak.rtg'); return; } ga({adres:a}); });
 
 // ---- de RTG-startpagina ----
+let GIDS=[];
+/* Meenemen: de gids van RTG Start is een register -- welke site, op welk adres,
+   met hoeveel bezoeken. Staat er een site open, dan valt er niets te halen: dan
+   kijkt u naar iemands pagina en niet naar een lijst. */
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(HUIDIGE||!GIDS.length) return null;
+  return { naam:'rtg-start', kolommen:['site','adres','bezoeken'],
+    rijen:GIDS.map(function(it){ return [it.titel||'', (it.adres||'')+'.rtg', it.bezoeken||0]; }) };
+});
 async function toonStart(){
   HUIDIGE=null;
   const h=$('#hoofd');
@@ -107,9 +117,10 @@ async function toonStart(){
   $('#zoekGroot').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#zoekIn').value); if(a.length<2){meld('Typ een adres.');return;} ga({adres:a}); });
   try{
     const d=await api('gids');
+    GIDS=d.lijst||[];
     const r=$('#rooster'); r.textContent='';
-    if(!(d.lijst||[]).length){ r.innerHTML='<div class="leeg">Nog geen sites online. Wees de eerste: open de Website-maker in de App Store.</div>'; return; }
-    d.lijst.forEach(it=>{
+    if(!GIDS.length){ r.innerHTML='<div class="leeg">Nog geen sites online. Wees de eerste: open de Website-maker in de App Store.</div>'; return; }
+    GIDS.forEach(it=>{
       const b=document.createElement('button'); b.type='button'; b.className='kaart';
       b.innerHTML='<div class="nm">'+esc(it.titel)+'</div><div class="ad">'+esc(it.adres)+'.rtg</div><div class="mt">'+it.bezoeken+' bezoek'+(it.bezoeken===1?'':'en')+'</div>';
       b.addEventListener('click',()=>ga({adres:it.adres}));
@@ -192,5 +203,6 @@ else {
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

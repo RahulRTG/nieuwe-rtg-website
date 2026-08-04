@@ -132,17 +132,19 @@
 </div></dialog>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const api = Sessie.api;
 const AVATARS = ['','','','','','','','','','','','','','','','','','','',''];
 const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
-let dAv='', dKl=KLEUREN[0], bewerkId=null, naarWie='allen';
+let dAv='', dKl=KLEUREN[0], bewerkId=null, naarWie='allen', PROFIELEN=[];
 
 const s = Sessie.huidig();
 // location.href stopt dit script niet: de omleiding gebeurt pas na deze beurt.
 // Zonder de throw draait laad() alsnog en leest s.code van null.
-if (!s || !s.token){ location.href='index.html'; throw new Error('geen sessie'); }
+if (!s || !s.token){ Sessie.deur('gezin'); throw new Error('geen sessie'); }
 
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid',gast:'Oppas of familie'}[p.rol]||''); }
@@ -162,6 +164,7 @@ async function laad(){
   $('#uCode').textContent = s.code;
   $('#zin').textContent = 'Beheer het gezin "' + d.gezin.naam + '". Voeg profielen toe en houd iedereen op de hoogte.';
   // profielen
+  PROFIELEN = d.profielen;
   const pl=$('#plist'); pl.innerHTML='';
   d.profielen.forEach(p=>{
     const row=document.createElement('div'); row.className='prow';
@@ -206,6 +209,17 @@ async function laad(){
       : 'Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.';
   }
 }
+
+/* Meenemen (shared/uitvoer.js): het profielenregister van dit gezin, precies de
+   velden die in de lijst hierboven staan. Geen pincodes, alleen of er een is. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!PROFIELEN.length) return null;
+  return {
+    naam: 'gezinsprofielen',
+    kolommen: ['naam','rol','leeftijdsgroep','pincode'],
+    rijen: PROFIELEN.map(p => [p.naam, rolTekst(p), p.groepNaam || '', p.heeftPin ? 'ja' : 'nee'])
+  };
+});
 
 function bewerk(p){
   bewerkId=p.id; $('#dTitel').textContent='Profiel bewerken';
@@ -279,6 +293,7 @@ $('#wDoe').onclick=async()=>{
 laad();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -288,5 +303,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

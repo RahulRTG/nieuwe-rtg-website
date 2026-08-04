@@ -17,42 +17,76 @@
       '<div class="kpi"><b>' + (MIJN.historie || []).length + '</b><span>Stappen op de ladder</span></div>';
   }
 
+  /* De namen horen bij de ladder, niet bij de schermen: een fase-id is een
+     verwijzing voor machines, geen tekst voor mensen. */
+  function faseNaam(id) {
+    var f = (LADDER.fasen || []).find(function (x) { return x.id === id; });
+    return f ? f.naam : id;
+  }
+  function trapNaam(t) { return (LADDER.trappen && LADDER.trappen[t] && LADDER.trappen[t].naam) || t; }
+
   function toonPaspoort() {
     var el = document.getElementById('paspoort');
     if (!MIJN.fase) {
       el.innerHTML = 'Je staat nog niet op de ladder. Kies hieronder je fase; elke fase mag het begin zijn, en een stap terug is soms de beste stap.';
     } else {
       var verder = MIJN.verder || {};
-      el.innerHTML = 'Je bent ingeschreven op <b>' + esc(MIJN.fase.naam) + '</b>, leerjaar ' + MIJN.jaar +
-        (verder.volgende ? '. De normale trede hierna: ' + esc(verder.volgende) + '.' : '.') +
-        ((verder.doorstroom || []).length ? ' Vanuit hier kun je door naar: ' + verder.doorstroom.map(esc).join(', ') + '.' : '');
+      el.innerHTML = 'Je bent ingeschreven op <b>' + esc(MIJN.fase.naam) + '</b> (' + esc(trapNaam(MIJN.fase.trap)) + '), leerjaar ' + MIJN.jaar +
+        (verder.volgende ? '. De normale trede hierna: ' + esc(faseNaam(verder.volgende)) + '.' : '.') +
+        ((verder.doorstroom || []).length ? ' Vanuit hier kun je door naar: ' + verder.doorstroom.map(function (id) { return esc(faseNaam(id)); }).join(', ') + '.' : '');
     }
     document.getElementById('jaarKnop').hidden = !(MIJN.fase && MIJN.fase.jaren > MIJN.jaar);
     document.getElementById('eerlijk').textContent = MIJN.eerlijk || '';
     kpi();
   }
 
+  /* Een fasekiezer is altijd per trap geordend: eerst de schoolsoort
+     (Basisschool, Voortgezet onderwijs, Mbo, ...), daarbinnen de fasen.
+     Hier stond een platte lijst van alle zesentwintig fasen -- Groep 1 naast
+     Vwo naast Promotie -- en dat leest als een hoop, niet als een ladder.
+     De trap-indeling bestond al in de data (fase.trap + LADDER.trappen);
+     alleen het scherm gooide hem weg. */
+  function faseOpties(eersteRegel, filter) {
+    var perTrap = {};
+    (LADDER.fasen || []).filter(filter || function () { return true; }).forEach(function (f) {
+      (perTrap[f.trap] = perTrap[f.trap] || []).push(f);
+    });
+    return '<option value="">' + esc(eersteRegel) + '</option>' + Object.keys(perTrap)
+      .sort(function (a, b) {
+        return ((LADDER.trappen[a] || {}).volgorde || 99) - ((LADDER.trappen[b] || {}).volgorde || 99);
+      })
+      .map(function (t) {
+        return '<optgroup label="' + esc(trapNaam(t)) + '">' +
+          perTrap[t].map(function (f) {
+            return '<option value="' + esc(f.id) + '">' + esc(f.naam) +
+              (f.leeftijd ? ' · ' + esc(f.leeftijd) + ' jaar' : (f.jaren ? ' · ' + f.jaren + ' jaar' : '')) + '</option>';
+          }).join('') + '</optgroup>';
+      }).join('');
+  }
+
   function vulKiezers() {
-    var fasen = (LADDER.fasen || []);
-    var opties = '<option value="">Kies een fase...</option>' +
-      fasen.map(function (f) { return '<option value="' + esc(f.id) + '">' + esc(f.naam) + '</option>'; }).join('');
-    document.getElementById('ladderKies').innerHTML = opties;
-    document.getElementById('leerFase').innerHTML = '<option value="">Of een fase van de ladder...</option>' +
-      fasen.filter(function (f) { return f.trap !== 'po'; }).map(function (f) { return '<option value="' + esc(f.id) + '">' + esc(f.naam) + '</option>'; }).join('');
-    document.getElementById('examenKies').innerHTML = '<option value="">Kies je fase...</option>' +
-      fasen.filter(function (f) { return f.trap !== 'po'; }).map(function (f) { return '<option value="' + esc(f.id) + '">' + esc(f.naam) + '</option>'; }).join('');
-    var g = document.getElementById('leerGroep');
-    var gs = '<option value="">Groep (1 t/m 8)...</option>';
-    for (var i = 1; i <= 8; i++) gs += '<option value="' + i + '">Groep ' + i + '</option>';
-    g.innerHTML = gs;
+    document.getElementById('ladderKies').innerHTML = faseOpties('Kies je fase...');
+    // een kiezer voor de leerlijn: de basisschoolfasen sturen de groep-leerlijn
+    // aan, de rest de fase-leerlijn -- dat onderscheid is techniek en hoort
+    // niet als twee losse lijsten op het scherm
+    document.getElementById('leerKies').innerHTML = faseOpties('Kies je fase...');
+    document.getElementById('examenKies').innerHTML =
+      faseOpties('Kies je fase...', function (f) { return f.trap !== 'po' && f.trap !== 'leven'; });
   }
 
   /* ---- de leerlijn: vakken en doelen, met wat je al behaald hebt ---- */
+  /* Het paspoort bewaart per behaald leerdoel alleen een id; de naam en het vak
+     staan in de leerlijn. Wat de app opvraagt, onthoudt hij hier -- alleen dat,
+     zodat de uitvoer leesbare namen kan geven zonder er iets bij te verzinnen. */
+  var DOELINFO = {};
   async function toonVakken(vraag) {
     var el = document.getElementById('vakken');
     el.innerHTML = '<div class="leeg">De leerlijn wordt gehaald...</div>';
     try {
       var d = await api('/api/leerstof/vakken', vraag);
+      (d.vakken || []).forEach(function (v) {
+        (v.doelen || []).forEach(function (doel) { DOELINFO[doel.id] = { naam: doel.naam, vak: v.vak }; });
+      });
       el.innerHTML = (d.vakken || []).map(function (v) {
         return '<div class="vakkop">' + esc(v.vak) + '</div>' + v.doelen.map(function (doel) {
           return '<div class="doel"><span>' + (doel.behaald ? '<span class="pil ok">behaald</span> ' : '') + esc(doel.naam) +
@@ -129,6 +163,25 @@
     toonPaspoort();
   }
 
+  /* Meenemen: het leerpaspoort is van de leerling en gaat een leven lang mee,
+     dus hoort het ook het huis uit te kunnen. De app kent zijn eigen model, dus
+     geeft hij dat door in plaats van de gedeelde laag het scherm te laten
+     raden: per behaald leerdoel de naam, het vak, de fase en de dag. Geen
+     scores en geen rangorde -- die houdt deze app bewust ook niet bij. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    var ids = MIJN && MIJN.doelen ? Object.keys(MIJN.doelen) : [];
+    if (!ids.length) return null;
+    return {
+      naam: 'leerpaspoort',
+      kolommen: ['leerdoel', 'vak', 'fase', 'datum'],
+      rijen: ids.map(function (id) {
+        var w = MIJN.doelen[id] || {}, i = DOELINFO[id] || {};
+        return [i.naam || id, i.vak || '',
+          w.fase ? (LADDER ? faseNaam(w.fase) : w.fase) : '', String(w.op || '').slice(0, 10)];
+      })
+    };
+  });
+
   async function start() {
     try {
       LADDER = await api('/api/onderwijs/ladder');
@@ -158,11 +211,12 @@
       try { await api('/api/onderwijs/jaar-over', {}); meld('Een leerjaar erbij.'); laadPaspoort(); }
       catch (e) { meld(e.message); }
     });
-    document.getElementById('leerGroep').addEventListener('change', function () {
-      if (this.value) { document.getElementById('leerFase').value = ''; toonVakken({ groep: this.value }); }
-    });
-    document.getElementById('leerFase').addEventListener('change', function () {
-      if (this.value) { document.getElementById('leerGroep').value = ''; toonVakken({ fase: this.value }); }
+    document.getElementById('leerKies').addEventListener('change', function () {
+      if (!this.value) return;
+      // de basisschool-leerlijn hangt aan de groep (po-g3 -> groep 3), de
+      // rest aan de fase; de server kent beide vormen met hetzelfde antwoord
+      var po = /^po-g(\d)$/.exec(this.value);
+      toonVakken(po ? { groep: po[1] } : { fase: this.value });
     });
     document.getElementById('oefenStuur').addEventListener('click', function () { oefenAntwoord(document.getElementById('oefenIn').value); });
     document.getElementById('oefenIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') oefenAntwoord(this.value); });

@@ -1,23 +1,118 @@
 {
-  "vastgelegd": "2026-08-02",
+  "vastgelegd": "2026-08-04",
   "meters": {
-    "endpointsZonderTest": 631,
+    "endpointsZonderTest": 622,
     "dekkingPct": 75,
     "keuringStuk": 0,
-    "keuringScheef": 0,
+    "keuringScheef": 1,
     "dependencies": 0,
-    "testbestanden": 487,
+    "testbestanden": 509,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 70,
-    "e2eBestanden": 45,
-    "keuringOmvang": 66,
+    "zelfpoortendeToetsen": 107,
+    "e2eBestanden": 61,
+    "keuringOmvang": 67,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
-    "routesNietSchakelbaar": 0
+    "routesNietSchakelbaar": 0,
+    "metersOngeijkt": 7,
+    "schermenZonderToets": 3,
+    "keuringTeGroot": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-04",
+      "meter": "zelfpoortendeToetsen 95 -> 102",
+      "reden": "Zeven schermtoetsen erbij: test/ledenschermen.e2e.js (drie) en test/werkschermen.e2e.js (vier). Zelfde poort als de vierenzestig die er al stonden. schermenZonderToets ging in deze ronde van 71 naar 15, en de hele e2e-suite is groen: 106 toetsen, 106 geslaagd.",
+      "eerlijkheidshalve": "Zes mutaties, alle zes RAAK. De scherpste is de eerlijkheidsmelding op het bureaublad: index.html zegt dat dit een demo is EN wat er precies uit staat (betalingen, bestellingen, boardroom). Ik heb die opsomming weggehaald en 'Demo' laten staan -- de toets zakte, en dat is precies de bedoeling: een vage demo-melding laat een lid gissen of zijn bestelling is doorgegaan. Verder gevangen: daten niet meer op codenaam, techniek dat verzwijgt dat hij beveiligd is, en de Societeit die weer wegstuurt.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 90 -> 95"
+    },
+    {
+      "datum": "2026-08-04",
+      "meter": "zelfpoortendeToetsen 90 -> 95",
+      "reden": "Vijf schermtoetsen erbij: test/overheidschermen.e2e.js (twee) en test/reisschermen.e2e.js (drie). Zelfde poort als de negenenvijftig die er al stonden: zonder browser valt er niets te bekijken. schermenZonderToets ging in dezelfde ronde van 71 naar 48.",
+      "eerlijkheidshalve": "Alle vijf met een mutatie beproefd. De scherpste twee raken dingen die van buiten onzichtbaar misgaan: een dossierregel met een BSN op het rechtbankscherm zonder ambtenarensessie (gevangen), en een echt hotelmerk als partner op de boekingspagina (gevangen). Een derde mutatie sloeg eerst AF en dat was leerzaam: ik haalde de zin over het geverifieerde paspoort op EEN plek weg, maar hij staat er drie keer, dus de toets bleef terecht groen. Pas toen de hele leeftijdspoort verdween zakte hij. De toets was niet fout; mijn mutatie was te klein.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 84 -> 90"
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 84 -> 90",
+      "reden": "Zes schermtoetsen erbij in dezelfde ronde: test/kantoordeuren.e2e.js (een), test/juridischeschermen.e2e.js (een) en test/rtfkinderschermen.e2e.js (vier). Ze poorten zichzelf op 'geen browser beschikbaar', net als de vierenvijftig schermtoetsen die er al stonden. schermenZonderToets ging in deze ronde van 104 naar 80, gemeten op drie volledige e2e-runs.",
+      "eerlijkheidshalve": "Alle zes zijn met een mutatie beproefd en alle zes RAAK: een app terugzetten op location.replace (kantoordeuren), het terug-adres uit de inloglink halen (kantoordeuren), het klachtrecht bij de Autoriteit Persoonsgegevens uit de privacyverklaring halen en een echt hotelmerk in de partnervoorwaarden zetten (juridisch), de Arena weer laten wegsturen, een e-mailveld aan de klas-PDA toevoegen en een highscore in de Speeltuin zetten (rtfkinderschermen). Die laatste drie raken kinderen, en dat is niet toevallig gekozen: een extra veld en een highscore voelen allebei als een verbetering.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 80 -> 84"
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 80 -> 84",
+      "reden": "Met de hand verhoogd voor de vier schermtoetsen van deze ronde: test/lifestyleschermen.e2e.js (twee) en test/identiteitschermen.e2e.js (twee). Ze poorten zichzelf op `pw ? false : 'geen browser beschikbaar'`, net als de achtenveertig schermtoetsen die er al stonden -- zonder browser valt er niets te bekijken, en een schermtoets die dan hard zakt maakt de suite onbruikbaar op een machine zonder Chromium. Dit is dus geen verslechtering van de discipline maar de prijs van veertien schermen erbij: schermenZonderToets ging van 104 naar 90, gemeten op een volledige e2e-run.",
+      "eerlijkheidshalve": "De ratel klaagt hier terecht, en dat is precies waarom hij bestaat: het aantal toetsen dat zichzelf kan overslaan groeit, en op een machine zonder browser slaan er nu vier meer over dan gisteren. Dat is een echt risico -- in CI moet Chromium er dus zijn, anders is de winst van deze ronde op papier. Wat de winst wel echt maakt: alle vier de toetsen zijn met een mutatie beproefd en alle vier RAAK. De poort-uitleg uit shared/deur.js weghalen liet de eerste zakken; de kelderwaarde op het cellier-scherm vast op 0 zetten (terwijl de API 1.080 bleef teruggeven) de tweede -- precies het geval van een kloppende API met een liegend scherm, waar deze hele meter over gaat; de belofte 'de geheime helft verlaat uw apparaat' uit passkeys.html halen de derde; en een streakteller op balans.html binnensmokkelen de vierde. Die laatste is geen verzonnen fout: een reeksteller op een welzijnsscherm voelt als een verbetering en gaat lijnrecht in tegen de merkregel die op dat scherm zelf staat afgedrukt.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 77 -> 80"
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 77 -> 80",
+      "reden": "Met de hand verhoogd voor test/bankscherm.e2e.js: drie schermtoetsen op de bank, de eerste app die is aangepakt uit de 105 die volgens scripts/schermen.js geen eigen toets hadden. Bewust de bank: van die 105 raken er negen geld, toegang of identiteit, en daar is 'het ziet er compleet uit' het duurst. De API was al getoetst (bank.test.js, bankdeuren.test.js, office-bank.test.js); het SCHERM niet, en dat is precies het verschil dat deze meter blootlegde.",
+      "eerlijkheidshalve": "Twee dingen die hierbij horen. Ten eerste toetst dit bestand ALLEBEI de standen van de schakelaar, en de belangrijkste is de stand die vandaag verscheept wordt: bank dicht. Dan moet het scherm eerlijk zeggen dat er nog niets is en juist GEEN akkoordknop en geen IBAN tonen -- een financieel scherm dat doet alsof er een rekening is, is erger dan een scherm dat niets doet. Een toets die alleen de mooie stand beproeft toetst niet wat de klant krijgt. Ten tweede leverde het mutatiewerk een echt defect in mijn eigen toets op: de dichte-stand-toets ging uit van de standaardstand, slaagde in zijn eentje, en zakte zodra de twee live-toetsen ervoor hadden gedraaid -- want die zetten de schakelaar aan en de opslag wordt gedeeld. Een toets die van de volgorde afhangt bewijst niet wat hij beweert. Elke toets zet nu expliciet de stand die hij nodig heeft en zet hem daarna terug. Drie mutaties, alle drie RAAK en alle drie op precies hun eigen bewering: de dichte-stand-poort weghalen liet alleen de eerste zakken, centen niet door honderd delen alleen de tweede, en de datumhulp terug op een tekst-afknipping alleen de derde ('kreeg: 1785777305'). Die laatste is geen verzonnen fout: exact die stond hier eerder in de kolom datum, en dezelfde is deze week ook in werkplek.js gevonden. Een eerdere poging op die derde was te grof (het commentaarteken slikte de rest van de regel op) en liet een andere bewering zakken; die telt niet en is overgedaan.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 75 -> 77"
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "schermenZonderToets (nieuw, nulmeting 105 van 188)",
+      "reden": "De machinale kant van LAT-regel 2 voor de schermen: \"af\" was een bewering. Een app kreeg een menu, een uitvoerknop en sneltoetsen, er stond klaar in een tussenstand, en niemand kon nagaan of er ooit een browser op dat scherm had gestaan. De server noteert nu met RTG_ROUTELOG welk SCHERM hij serveert en welke toets erachter zit (haken in middleware/voordeur.js en web/bestanden.js, toetsnaam uit test/helper.js); scripts/schermen.js telt de apps waar geen enkele toets de weg werkelijk aflegt. Stap in ci.yml, direct na de e2e-stap. Honderdvijf van de honderdachtentachtig.",
+      "eerlijkheidshalve": "De eerste versie van deze meter telde alleen of een scherm was GEOPEND, en gaf bij zijn allereerste meting 188 van 188 -- een meter die meteen in orde zegt, en dat is precies de vorm waar regel 10 voor waarschuwt. De oorzaak was geen fout in de telling maar een te makkelijke vraag: test/leven.e2e.js loopt alle schermen langs voor een teken van leven, dus geopend was al waar voordat iemand iets had bewezen. Nu telt hij alleen mee wat meer doet dan langslopen; twee veegtoetsen zijn zo herkend (leven.e2e.js en paginas.e2e.js) en dat gebeurt met een maat en niet met een handmatige lijst, want zo'n lijst veroudert en wordt dan kloppend gemaakt. Het getal is met een tweede, losse methode nagerekend (een tekstzoektocht door de schermtoetsen kwam op 107) -- twee wegen die binnen twee uitkomen. De mutatie is RAAK: een inventaris die nieuwe schermen overslaat liet precies deze bewering zakken en de andere drie toetsen groen. Een eerdere poging bewees niets omdat ik het bestand terugzette terwijl de toets nog liep; die staat als NIET GEPROBEERD in de historie en niet als geslaagd. Over de versheid: de eerste meting liep terwijl de premium-uitrol doorschreef in public/apps, en de versheidscontrole van het script zei dat ook. Daarom is hij op een stilliggende boom overgedaan, en die ronde geeft exact hetzelfde: 105, nu zonder waarschuwing. Dat is niet toevallig maar te verwachten -- de uitrol voegt lagen toe aan schermen en geen toetsen die er een weg over afleggen. Twee metingen die hetzelfde zeggen is precies waarom de tweede is gedaan.",
+      "eerderVastgelegd": "geen"
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "metersOngeijkt 13 -> 16 (verbreding, geen terugval)",
+      "reden": "Met de hand verhoogd omdat de meter er drie ZIET die hij eerst niet zag. Niet elke meter woont in scripts/norm.js: wie een journaal nodig heeft (dekkingWaargenomenPct, endpointsNooitAangeraakt, onbewaakt) meet in een eigen script met zijn sleutel in een METER-constante, en die stonden buiten regel 35 en buiten deze teller. Dat is precies het gat waar een ongeijkte meter doorheen glipt, dus lezen check.js en norm.js ze nu allebei mee -- met dezelfde vindwijze, zodat de twee tellingen niet uiteen kunnen lopen. Er is geen enkele meter slechter geworden; er waren er drie onzichtbaar. De vierde nieuwe (schermenZonderToets) draagt een proef en telt dus niet mee.",
+      "eerlijkheidshalve": "Een verbreding die het getal omhoog duwt is de vervelende soort: hij lijkt op een terugval en de verleiding is om hem stil te houden of de norm gewoon op 13 te laten staan met een smaller bereik. Dat zou de meter laten liegen over zijn eigen dekking -- precies waar deze hele ronde over gaat. Zestien is het eerlijke getal.",
+      "eerderVastgelegd": "metersOngeijkt (nieuw, nulmeting 13)"
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "metersOngeijkt (nieuw, nulmeting 13)",
+      "reden": "Regel 10 van LAT.md stond opgeschreven maar werd nergens afgedwongen: 'een meter die je niet hebt zien uitslaan, meet niets.' Nu wel, met drie tanden. test/meterijk.test.js voert elke geijkte meter een bekend-FOUTE invoer en eist dat hij die ziet; scripts/check.js regel 35 eist dat ELKE meter uit norm.js in die registratie voorkomt, met een proef of met een opgeschreven reden; en deze meter telt de redenen, richting omlaag. Zo kan een nieuwe meter niet ongemerkt ongeijkt meeliften, en is het gat een getal dat kleiner moet worden in plaats van een voornemen.",
+      "eerlijkheidshalve": "En meteen een vondst die precies dit punt maakt: `zelfpoortendeToetsen` sloeg uit op de ijking ZELF. Die zet als bekend-foute invoer een toets-met-skip in een tijdelijk bestand, dus staat die regel als letterlijke TEKST in test/meterijk.test.js -- waarop de meter hem meetelde als een echte zelfpoortende toets, en 78 meldde waar er 77 zijn. Commentaar ging in die meter al door de wringer (dat was op 2026-08-01 al een keer gerepareerd, met de opmerking dat een meter die tekst leest in plaats van code kennelijk terugkomt); tekst nog niet. Nu wel, en over de hele testmap verandert er precies een bestand: dat van de ijking. De verleiding was om de tekst op te knippen zodat de meter hem niet ziet -- dat is de meter bedriegen in plaats van repareren, en dat is de fout die deze hele ronde probeert uit te bannen. Dertien van de negentien meters dragen nog een reden en geen proef: zes prestatiecijfers (die komen uit een echte beproeving van een half uur op een echte machine) en zeven die een repo-brede staat vragen in plaats van een invoer die je in een toets neerzet. Dat is geen vrijbrief, dat is de open schuld, en hij staat nu op de teller. Alle zes proeven zijn met een mutatie nagetrokken: norm.js blind maken liet telkens precies de bijbehorende bewering zakken. De meter die de ongeijkte meters telt is zelf geijkt -- daarom neemt telOngeijkt() zijn bron als parameter in plaats van hem zelf te lezen; anders had juist de bewaker van het ijken zich aan het ijken onttrokken."
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 75 -> 77",
+      "reden": "Met de hand verhoogd voor test/premium.e2e.js: twee schermtoetsen op de premium-laag (meenemen en sneltoetsen). Aanleiding was een meting over de app-catalogus: sneltoetsen 65% bij de volwaardige apps tegen 28% bij de rest, uitvoer 25% tegen 5%.",
+      "eerlijkheidshalve": "Zelfde tegenwicht als de tanden hiervoor (browserpoort + RTG_E2E_STRICT=1 in ci.yml). Over de mutaties valt hier iets te leren en dat hoort erbij: de eerste twee pogingen om de weigering-bewering te laten zakken sloegen AF, en allebei om een echte reden. De eerste mutatie kwam niet eens aan (verkeerd anker in mijn zoek-vervang, achteraf met grep vastgesteld); de tweede kwam wel aan maar kon niet bijten omdat de toets toen twee notities zaaide en een schermschraper er minstens drie nodig heeft. De toets zaait er nu vier, en met de afgekeurde schraper terug zakt hij op precies de juiste bewering. Zonder dat natrekken had hier een groene toets gestaan die zijn eigen vraag niet stelde.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 73 -> 75"
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 73 -> 75",
+      "reden": "Met de hand verhoogd voor test/deur.e2e.js: de schermtoets op de gedeelde deur (shared/deur.js), die veertien gesloten apps van een kale zin naar een echte poort brengt. Hij eist dat de deur toont wat erachter zit (uit de app-gids), de echte weg naar binnen noemt met een link die bestaat, en -- de merkregel -- NOOIT toegang belooft.",
+      "eerlijkheidshalve": "Twee tanden in een: het bestand draagt twee zelfpoortende toetsen (de leden-deur en de RTF-gezinsdeur), en deze meter telt toetsen en niet bestanden. Zelfde tegenwicht als de vier tanden hiervoor (browserpoort + RTG_E2E_STRICT=1 in ci.yml). Vier mutaties gedaan en alle vier RAAK gezien: een deur die wel toegang belooft, een deur zonder gids-inhoud, een deur zonder link naar de toegangsregels, en de RTF-poort terug op location.href='index.html' -- elk liet de juiste bewering zakken. Dit is de eerste keer dat een merkregel (de AI belooft nooit zelf toegang) door een machine wordt bewaakt in plaats van alleen door CLAUDE.md."
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 72 -> 73",
+      "reden": "Met de hand verhoogd voor test/klankwerk.e2e.js: een schermtoets die tijdens de deelmenu-uitrol is bijgeschreven omdat klankwerk.html alleen een server-toets had. Hij opent een stuk, zet een stap en een noot, vraagt een voorstel en meet offline na dat de klankmotor er echt geluid van maakt.",
+      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de drie tanden hiervoor: het bestand staat achter de browserpoort en kan zichzelf overslaan, maar test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml. Deze toets is geschreven door een uitrol-agent, niet door mij; ik heb hem gedraaid (groen) maar zijn beweringen NIET met een eigen mutatie nagetrokken -- dat is regel 2 en staat hier open. NAGEKOMEN 2026-08-04: alsnog nagetrokken met drie mutaties op de productcode, alle drie RAAK -- de klankmotor stilzetten (piek 0 van 32767), het tempo van Rahuls voorstel niet overnemen, en de noot niet in de notenrol laten landen. Daarna drie keer groen. TAKEN 6.1 is daarmee gesloten."
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "keuringOmvang 66 -> 67",
+      "reden": "Met de hand verhoogd: server/school/gezin.js kwam in de waarschuwingszone (vlak onder 10 kB) door de klasNiveau-helper voor de scheiding per schoolsoort in de gezinsweergave -- echte functionaliteit, geen opvulling.",
+      "eerlijkheidshalve": "Wie de tand terug wil op 66 knipt gezin.js op zijn natuurlijke naad (het mijn-overzicht tegenover huiswerk/ziekmelden/berichten); dat is de druk die deze meter hoort te geven en die keuze is hier bewust uitgesteld aan het eind van een grote ronde, niet afgesteld."
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 71 -> 72",
+      "reden": "Met de hand VERHOOGD voor test/deelmenu.e2e.js: de schermtoets op het nieuwe deelmenu (shared/deelmenu.js), dat een app met veel delen als menu met een deel tegelijk toont. De toets eist de balk, precies een zichtbaar deel, de wissel met hash, en de deep-link.",
+      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de twee tanden hiervoor: browserpoort + RTG_E2E_STRICT=1 in ci.yml dekken ook dit bestand. De mutatie is gedaan en beet raak: met de wissel gesaboteerd (rtgdeel-weg werd nooit gezet) zakte de toets op precies de bewering 'het toetsing-deel is dan echt weg'."
+    },
+    {
+      "datum": "2026-08-03",
+      "meter": "zelfpoortendeToetsen 70 -> 71",
+      "reden": "Met de hand VERHOOGD voor test/gpsschakelaar.e2e.js: de schermtoets die vastlegt dat de GPS-schakelaar van het OS-menu (rtg_os_gps) echt iets doet. De schakelaar werd geschreven maar door geen enkele locatie-aanroep gelezen; wie hem op uit zette kreeg alsnog om de twintig seconden een positieverzoek. De toets telt met een stub de aanrakingen van navigator.geolocation en eist beide kanten: uit is nul, aan is minstens een.",
+      "eerlijkheidshalve": "Zelfde afweging als bij 68 -> 70: het bestand staat achter de browserpoort en kan zichzelf dus overslaan, maar het tegenwicht van toen (test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1, en die vlag staat in ci.yml) geldt onverkort ook voor dit bestand. De mutatie is gedaan en zakte juist: met de poort tijdelijk uit flits.html gehaald viel de toets op precies de bewering die hem moet dragen (schakelaar op uit, maar de pagina raakte geolocation 1 keer aan)."
+    },
     {
       "datum": "2026-08-01",
       "meter": "endpointsZonderTest 633 -> 634",
@@ -35,6 +130,18 @@
       "meter": "zelfpoortendeToetsen 68 -> 70",
       "reden": "Met de hand VERHOOGD, en dat is het verlagen van de lat. De aanleiding zijn twee nieuwe schermtoetsen (test/wings.e2e.js en test/leven.e2e.js) die net als de eenenveertig andere e2e-bestanden achter `{ skip: pw ? false : 'geen browser beschikbaar' }` staan. Die poort is een keuze: wie de suite draait zonder Playwright hoort niet op een muur rood te stuiten voor iets wat niet zijn schuld is.",
       "eerlijkheidshalve": "Deze meter telt toetsen die zichzelf kunnen overslaan, en dat is precies het risico dat hier groeit: draait ergens een suite zonder browser, dan slaan drieenveertig bestanden zichzelf over en meldt de uitvoer 0 fail. De tand mocht daarom alleen omhoog MET een tegenwicht, en dat is er nu: test/browserpoort.e2e.js zakt hard als RTG_E2E_STRICT=1 staat en er geen browser gevonden wordt, en die vlag staat in .github/workflows/ci.yml op de e2e-stap. De poort blijft dus bestaan, maar hij kan niet meer stil openstaan waar het ertoe doet. Wie de tand terug wil op 68: dat kan alleen door twee schermtoetsen weg te halen, en dat is geen verbetering. Nog iets uit dezelfde ronde: de teller las de RUWE testbron, dus de skip-regel die in de KOP van test/browserpoort.e2e.js wordt uitgelegd telde mee -- het bestand dat zichzelf juist nooit overslaat gold als overgeslagen toets. Dat is dezelfde fout als de eerste notitie hierboven, nu in scripts/norm.js in plaats van scripts/keuring.js. De bron gaat daar nu eerst door zonderCommentaar(); zonder die reparatie had hier 71 gestaan."
+    },
+    {
+      "datum": "2026-08-04",
+      "meter": "zelfpoortendeToetsen 102 -> 107",
+      "reden": "Met de hand verhoogd voor vijf toetsen uit dezelfde ronde: drie in test/eigensessieschermen.e2e.js (de twaalf schermen die op een ANDERE sleutel draaien dan de ledenpas -- kantoorcode, zaak-inlog, clubcode, raadcode -- plus de twee doorverwijsstubs) en twee in test/deelmenuwacht.e2e.js (de MutationObserver van shared/deelmenu.js, op een pagina waar verder niets gebeurt).",
+      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de tanden hiervoor: alle vijf staan achter de browserpoort en slaan zichzelf over zonder browser, maar test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml. Beide bestanden zijn met mutaties natrokken: bij eigensessieschermen drie (clubswerk weer laten wegsturen, de zorgbalie kantoor=1 laten vragen, het clubportaal zijn clubcode niet laten noemen), alle drie RAAK. Bij deelmenuwacht is het juist de mutatie die op 2026-08-03 AFsloeg: subtree terug op false. Die zakt nu wel, en daarmee is eerlijkheidspunt 6.2 gesloten. Kanttekening bij die tweede toets: zijn TWEEDE helft (minder dan drie delen krijgt geen menu) blijft onder diezelfde mutatie groen -- terecht, want hij toetst afwezigheid, maar als losse toets zou hij niets bewijzen. Hij staat er als tegenwicht bij de eerste, niet als bewijs op zichzelf."
+    },
+    {
+      "datum": "2026-08-04",
+      "meter": "keuringScheef 0 -> 1",
+      "reden": "Met de hand verhoogd omdat de omvangregel in scripts/keuring.js iets ZIET wat hij eerder oversloeg. Die regel meldde alleen bestanden in de band 9400-10240 bytes; alles ECHT boven de grens viel er stilzwijgend buiten. Drie bestanden stonden zo buiten de keuring: server/kern/appgids-data/deel4.js (11.636), deel5.js (11.011) en server/server.js (216.881). De eerste twee zijn in dezelfde ronde geknipt; server.js blijft over.",
+      "eerlijkheidshalve": "Dit is GEEN verslechtering van de code maar het einde van een blinde vlek: het grootste bestand van dit huis, twintig keer de grens, kwam in de eigen keuring nooit voor terwijl een module van 9,5 kB er elke ronde in stond. Een grens die de overtreders overslaat en alleen de bijna-overtreders noemt, is een aanmoediging om er net onder te blijven -- en dat verklaart ook de 67 in die band van 840 bytes. De tand hoort terug naar 0 zodra server/server.js is opgeknipt; tot die tijd staat hij hier als openstaande rekening en niet als nieuwe normaal. De nieuwe meter keuringTeGroot (grondwaarde 1) is de handgreep om dat te sturen."
     }
   ],
   "prestatie": {

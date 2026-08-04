@@ -20,9 +20,18 @@
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;margin-left:auto;}
   main{padding:1.1rem;max-width:820px;margin:0 auto;}
-  .chips{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
-  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font:inherit;font-size:.85rem;color:var(--txt);cursor:pointer;}
-  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* De onderdelenbalk draagt dezelfde stijl als het deelmenu elders in het
+     huis: kale knoppen op een dunne lijn, de actieve met een gouden streep
+     eronder. Het schakelen zelf blijft van deze pagina.
+     De body.rtg-stijl-voorvoegsels zijn nodig omdat de gedeelde pilrij in
+     rtg-ui.css (body.rtg-stijl .chips > button.aan) anders zwaarder weegt. */
+  body.rtg-stijl .chips{display:flex;flex-wrap:nowrap;gap:.15rem;overflow-x:auto;margin:0 0 1.1rem;
+    padding:0 0 .1rem;border-bottom:1px solid var(--line);}
+  body.rtg-stijl .chips > button.chip{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;
+    border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:Inter,system-ui,sans-serif;
+    font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;}
+  body.rtg-stijl .chips > button.chip:hover{color:var(--txt);border-color:transparent;}
+  body.rtg-stijl .chips > button.chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1rem;}
   .kaart h2{font-size:1.12rem;margin-bottom:.2rem;}
   .kaart h2 + .sub{color:var(--soft);font-size:.85rem;margin-bottom:.8rem;}
@@ -70,6 +79,8 @@
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
 
+<script src="/shared/deur.js"></script>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -85,10 +96,19 @@ function datum(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return Number(
 let tab='overzicht';
 const TABS=[['overzicht','Overzicht'],['concierge','Concierge'],['bezit','Bezittingen'],['gezondheid','Gezondheid']];
 
+/* Meenemen (shared/uitvoer.js): De Rechterhand houdt per tabblad een andere
+   lijst vast -- attentiepunten, verzoeken, het bezittingenregister, de
+   afspraken. Elk paneel meldt zijn eigen model aan als het klaar is met
+   tekenen, zodat wat u meeneemt hetzelfde is als wat u ziet. Het
+   prive-dossier blijft erbuiten: dat zijn losse aantekeningen, geen register. */
+let UIT=null;
+function zetUit(naam, kolommen, rijen){ UIT = rijen.length ? { naam:naam, kolommen:kolommen, rijen:rijen } : null; }
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT; });
+
 async function start(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Rechterhand is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
   try{ await api('overzicht'); }catch(e){
-    if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Rechterhand is uw persoonlijke chef de bureau - inbegrepen bij de Lifestyle Pass. Neem contact op om uw pas te upgraden, dan zetten wij alles voor u klaar.</p></div>'; return; }
+    if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; }
     $('#main').innerHTML='<div class="leeg">Kon De Rechterhand niet laden.</div>'; return;
   }
   teken();
@@ -120,6 +140,7 @@ async function vOverzicht(){
     + '<div class="chat"><div class="chatbox" id="aiA">Tot uw dienst. Zeg mij waarmee ik u kan helpen.</div></div></div>';
   $('#aiK').onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v) return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } };
   $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#aiK').click(); });
+  zetUit('attentiepunten',['object','soort','datum','verlopen'],att.map(a=>[a.naam,a.soort,a.datum||'',a.verlopen?'ja':'nee']));
 }
 const stat=(n,l)=>'<div class="stat"><div class="n">'+esc(n)+'</div><div class="l">'+esc(l)+'</div></div>';
 
@@ -152,6 +173,7 @@ function cLijst(v){
     + (x.status!=='afgerond'&&x.status!=='ingetrokken'?'<button class="weg" data-intrek="'+x.id+'" title="Intrekken">×</button>':'')+'</div>'
   ).join('') : '<div class="leeg">U heeft nog geen lopende verzoeken.</div>';
   $('#cLijst').querySelectorAll('[data-intrek]').forEach(b=> b.onclick=async()=>{ try{ await api('concierge/intrek',{id:b.dataset.intrek}); vConcierge(); }catch(e){ meld(e.message); } });
+  zetUit('verzoeken',['titel','categorie','status','ingediend'],v.map(x=>[x.titel,x.categorie,x.status,String(x.at||'').slice(0,10)]));
 }
 
 /* ---------- Bezittingenregister ---------- */
@@ -181,6 +203,8 @@ function bLijst(b){
     return '<div class="item"><div class="body"><b>'+esc(x.naam)+' <span class="status">'+esc(x.soort)+'</span></b><div class="meta">'+euro(x.waarde)+(info?' · '+info:'')+(x.notitie?'<br>'+esc(x.notitie):'')+'</div></div><button class="weg" data-weg="'+x.id+'" title="Verwijderen">×</button></div>';
   }).join('') : '<div class="leeg">Uw register is nog leeg.</div>';
   $('#bLijst').querySelectorAll('[data-weg]').forEach(b2=> b2.onclick=async()=>{ if(!confirm('Uit het register halen?')) return; try{ await api('bezit/weg',{id:b2.dataset.weg}); vBezit(); }catch(e){ meld(e.message); } });
+  zetUit('bezittingen',['naam','soort','waarde','verzekeraar','verzekerd-tot','taxatie-op','onderhoud-op'],
+    b.map(x=>[x.naam,x.soort,x.waarde||0,x.verzekeraar||'',x.verzekerdTot||'',x.taxatieOp||'',x.onderhoudOp||'']));
 }
 
 /* ---------- Gezondheid & welzijn ---------- */
@@ -214,6 +238,8 @@ function gLijst(a){
     + '<button class="weg" data-gweg="'+x.id+'" title="Verwijderen">×</button></div>'
   ).join('') : '<div class="leeg">Geen afspraken gepland.</div>';
   $('#gLijst').querySelectorAll('[data-gweg]').forEach(b=> b.onclick=async()=>{ try{ await api('gezondheid/afspraak/weg',{id:b.dataset.gweg}); vGezondheid(); }catch(e){ meld(e.message); } });
+  zetUit('afspraken',['wat','datum','tijd','specialist','waar'],
+    komend.map(x=>[x.wat,x.datum||'',x.tijd||'',x.specialist||'',x.waar||'']));
 }
 function nLijst(n){
   $('#nLijst').innerHTML = n.length ? n.map(x=>
@@ -224,6 +250,7 @@ function nLijst(n){
 
 start();
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

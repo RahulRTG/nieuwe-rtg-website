@@ -23,9 +23,15 @@
   header h1{font-size:1.35rem;}
   header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:999px;padding:.15rem .6rem;}
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
-  .schakel{display:flex;gap:.4rem;margin-bottom:1rem;}
-  .schakel button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--muted);font:inherit;font-size:.82rem;font-weight:600;border-radius:10px;padding:.5rem;cursor:pointer;}
-  .schakel button.aan{background:var(--card2);border-color:var(--gold);color:var(--txt);}
+  /* De mapbalk draagt dezelfde stijl als het deelmenu elders in het huis:
+     kale knoppen op een dunne lijn, de actieve map met een gouden streep
+     eronder. Het schakelen zelf blijft van deze pagina. */
+  .schakel{display:flex;flex-wrap:wrap;gap:.15rem;margin:0 0 1rem;padding:0 0 .1rem;border-bottom:1px solid var(--line);}
+  .schakel button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    color:var(--muted);font-family:Inter,system-ui,sans-serif;font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;padding:.55rem .8rem .6rem;cursor:pointer;}
+  .schakel button:hover{color:var(--txt);}
+  .schakel button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .rij{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;color:inherit;font:inherit;}
   .rij:hover{border-color:var(--gold);}
   .rij .ic{width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex-shrink:0;font-size:.72rem;font-weight:600;}
@@ -83,11 +89,26 @@
 <header><div><div class="ey">Postvak van de zaak</div><h1>RTMAIL</h1></div>
   <span class="tel" id="tel" hidden></span></header>
 <main id="main"><div class="leeg">Laden…</div></main>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_sup_token'); }catch(e){}
 let LIJST=[], MAP='inbox', ADRES=null;
+
+/* Meenemen (shared/uitvoer.js): het postvak zoals het openstaat -- ontvangen
+   of verzonden, met de tegenpartij, het onderwerp, de dag en of de afzender
+   geverifieerd was. Dat laatste is hier geen sierlabel maar het verschil
+   tussen een link die opengaat en een die op slot blijft, dus het hoort in
+   de uitvoer. Alleen de kop van elk bericht, niet de hele tekst. */
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!LIJST.length) return null;
+  if(MAP==='verzonden') return { naam:'verzonden', kolommen:['aan','onderwerp','datum'],
+    rijen: LIJST.map(function(m){ return [m.naar||'', m.onderwerp||'', String(m.at||'').slice(0,10)]; }) };
+  return { naam:'ontvangen', kolommen:['van','onderwerp','datum','geverifieerd'],
+    rijen: LIJST.map(function(m){
+      return [m.van||'', m.onderwerp||'', String(m.at||'').slice(0,10), m.vertrouwd?'ja':'nee']; }) };
+});
 const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(), dag=86400000;
   if(nu-d<dag && d.getDate()===nu.getDate()) return d.toTimeString().slice(0,5);
   if(nu-d<7*dag) return ['zo','ma','di','wo','do','vr','za'][d.getDay()];
@@ -149,7 +170,7 @@ async function apiW(pad, body){
 }
 const ROLNAAM={eigenaar:'eigenaar',management:'management',rahul:'AI van het huis',personeel:'personeel'};
 async function wmLaad(){
-  MAP='werkmail'; $('#tel').hidden=true;
+  MAP='werkmail'; LIJST=[]; $('#tel').hidden=true;   // het adressenscherm is geen postvak
   let d; try{ d=await apiW('overzicht'); }catch(e){ $('#main').innerHTML=schakelBalk()+'<div class="leeg">'+esc(e.message)+'</div>'; bindBalk(); return; }
   $('#main').innerHTML = schakelBalk()+
     '<div class="kaart" style="margin-bottom:.8rem;"><h2>'+esc(d.domein)+'</h2>'+
@@ -184,6 +205,7 @@ async function wmSlot(adres, aan){
 async function wmInbox(adres){
   let d; try{ d=await apiW('inbox',{adres}); }catch(e){ wmLaad(); return; }
   const lijst=d.berichten||[];
+  LIJST=lijst;
   $('#main').innerHTML='<button class="terug" id="terug">← alle adressen</button>'+
     '<div class="noot" style="text-align:left;margin:0 0 .8rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--gold);cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
     (lijst.length?lijst.map((m,i)=>'<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+esc((m.van||'@').slice(0,4).toUpperCase())+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>').join('')
@@ -300,6 +322,7 @@ async function verstuur(){
 laad();
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !$('#terug') && !$('#verstuur')) laad(); });
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

@@ -26,9 +26,23 @@
   .teller.vol{color:var(--burgundy);}
   .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.45rem 1rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:400;font-size:.78rem;padding:.3rem .7rem;}
-  .tabs{display:flex;gap:.4rem;margin-bottom:.8rem;}
-  .tab{flex:1;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.45rem;font-size:.84rem;color:var(--muted);cursor:pointer;text-align:center;}
-  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;}
+  /* De feedkiezer (Volgend / Ontdek / Mijn plank) is de eigen schakelaar van
+     Pulse: EEN stroom tegelijk, precies wat het deelmenu elders doet. Het
+     mechanisme blijft ongemoeid; alleen de vorm gaat mee met het huis -- een
+     rustige balk met kleine kapitalen en een gouden streep onder de stroom waar
+     je staat, in plaats van een rij pillen. De selector moet dieper dan `.tab`:
+     de kit tekent die rij zelf al met `body.rtg-stijl .tab`. */
+  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:0 0 .8rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--line);}
+  body.rtg-stijl .tabs > .tab{flex:0 0 auto;background:none;border:0;border-bottom:2px solid transparent;
+    margin-bottom:-1px;border-radius:0;cursor:pointer;padding:.55rem .7rem .6rem;text-align:center;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
+  /* ook `background` en de randen hier herhalen: de kit heeft een eigen
+     `.tab.aan` met een gouden vulling, en die is net zo specifiek als de regel
+     hierboven -- alleen deze diepere selector wint er zeker van. */
+  body.rtg-stijl .tabs > .tab.aan{background:none;border-width:0 0 2px;color:var(--txt);border-bottom-color:var(--gold);}
   .trend{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.8rem;}
   .trend span{font-size:.74rem;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.22rem .6rem;}
   .post{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem 1rem;margin-bottom:.7rem;}
@@ -58,6 +72,9 @@
 <header><div><div class="ey">RTG Pulse</div><h1>Pulse</h1></div><span class="negen">9+</span></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -71,9 +88,32 @@ const mooi=t=>esc(t).replace(/#([a-z0-9_]{2,30})/gi,'<span class="tag">#$1</span
 // de wauw-laag naast de codenaam: de dag-stemming en de verjaardagsglans
 const glans=p=>(p.stemming?' '+esc(p.stemming):'')+(p.jarig?' ':'');
 let SOORT='volgend';
+
+/* Meenemen (shared/uitvoer.js): wat er nu op je scherm staat -- je plank als die
+   open is, anders de feed -- met de velden LOS. Op het scherm staat een post als
+   een blok met de codenaam, de tijd ("3u") en de knoppen eromheen; hier staan
+   datum, codenaam, bericht, hashtags, likes en het aantal reacties apart. Alles
+   uit /api/member/pulse; alleen codenamen, want een echte naam kent Pulse niet. */
+let FEED=null, PLANK=null;
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(PLANK && (PLANK.bewaard||[]).length) return {
+    naam:'plank',
+    kolommen:['map','datum','codenaam','bericht','likes'],
+    rijen:PLANK.bewaard.map(function(x){ return [x.map||'', String(x.at||'').slice(0,10), x.codenaam||'', x.tekst||'', x.likes||0]; })
+  };
+  if(FEED && (FEED.feed||[]).length) return {
+    naam:'pulse',
+    kolommen:['datum','codenaam','bericht','hashtags','likes','reacties'],
+    rijen:FEED.feed.map(function(p){ return [String(p.at||'').slice(0,10), p.codenaam||'', p.tekst||'',
+      (p.tags||[]).join(' '), p.likes||0, (p.reacties||[]).length]; })
+  };
+  return null;
+});
+
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Pulse is de ledenfeed van RTG, op codenaam.</p></div>'; return; }
   let d; try{ d=await api('feed',{soort:SOORT}); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  FEED=d; PLANK=null;
   let h='<div class="schrijf"><textarea id="nw" maxlength="280" placeholder="Wat wil je delen? (op je codenaam, 9+)"></textarea><div class="voet"><button class="knop" id="plaats">Plaatsen</button><button class="knop stil" id="stemKnop" title="Je stemming van vandaag">stemming</button><button class="knop stil" id="terugKnop">mijn week</button><span class="teller" id="teller">280</span></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden style="margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
   h+='<div class="tabs"><button class="tab'+(SOORT==='volgend'?' aan':'')+'" data-s="volgend">Volgend ('+d.volgend+')</button><button class="tab'+(SOORT==='ontdek'?' aan':'')+'" data-s="ontdek">Ontdek</button><button class="tab" id="plankKnop">Mijn plank</button></div>';
   if(d.trending.length) h+='<div class="trend">'+d.trending.map(t=>'<span>#'+esc(t.tag)+' · '+t.n+'</span>').join('')+'</div>';
@@ -132,6 +172,7 @@ async function laad(){
     try{ const r=await api('bewaar',{id:b.dataset.bewaar,map}); meld(r.bewaard?'Op je plank, in "'+r.map+'".':'Van je plank af.'); laad(); }catch(e){ meld(e.message); } });
   $('#plankKnop').onclick=async()=>{
     try{ const pl=await api('bewaard',{});
+      PLANK=pl;
       $('#main').innerHTML='<div class="post" style="padding:1rem;"><h2>Mijn plank</h2>'+
         (pl.mappen.length?'<div class="trend">'+pl.mappen.map(m=>'<span>'+esc(m.naam)+' · '+m.aantal+'</span>').join('')+'</div>':'')+
         (pl.bewaard.length?pl.bewaard.map(x=>'<div class="post"><div class="kop"><span class="wie">'+esc(x.codenaam)+'</span><span class="tijd">'+esc(x.map)+'</span></div><div class="tekst">'+mooi(x.tekst)+'</div></div>').join('')
@@ -150,5 +191,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

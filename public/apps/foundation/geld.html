@@ -75,6 +75,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const api = window.Sessie ? Sessie.api : null;
@@ -84,10 +86,22 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 const euro = n => '€ ' + (Math.round(n*100)/100).toLocaleString('nl-NL', {minimumFractionDigits:0, maximumFractionDigits:2});
 
+let DOELEN = [];
+/* Meenemen (shared/uitvoer.js): het spaarpotje van het gezin -- per doel wat
+   erin zit, waar jullie naartoe sparen en of het al gehaald is. De losse
+   bijdragen blijven erbuiten: die zeggen wie hoeveel gaf. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  if (!DOELEN.length) return null;
+  return { naam: 'spaardoelen', kolommen: ['doel', 'gespaard', 'streefbedrag', 'stand', 'sinds'],
+    rijen: DOELEN.map(x => [x.naam, String(x.nu), String(x.doel),
+      x.klaar ? 'gehaald' : 'loopt', String(x.at || '').slice(0, 10)]) };
+});
+
 async function laadDoelen(){
   try{
     const d = await fetch('/api/foundation/gezin/'+s.code+'/spaardoelen?token='+encodeURIComponent(s.token)).then(r=>r.json());
     const box = $('#doelen');
+    DOELEN = d.spaardoelen || [];
     if (!d.spaardoelen || !d.spaardoelen.length){ box.innerHTML = '<div class="leeg">Nog geen spaardoel. Begin er hieronder een; klein mag ook.</div>'; return; }
     box.innerHTML = d.spaardoelen.map(x=>{
       const pct = Math.min(100, Math.round((x.nu / x.doel) * 100));
@@ -142,6 +156,7 @@ $('#vraag').addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){
 laadDoelen(); tip();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -151,5 +166,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

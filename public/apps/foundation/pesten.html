@@ -80,6 +80,9 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- de gedeelde uitvoerlaag; deze pagina meldt geen eigen bron aan (stappen en
+     een gesprek zijn geen rijen), dus "Meenemen" blijft hier stil -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -101,6 +104,7 @@ $('#praat').onclick = async ()=>{
 Sessie.coach({ kind:'pesten', chat:$('#chat'), input:$('#vraag'), knop:$('#stuur'), wacht:'Sam luistert...' });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -110,5 +114,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

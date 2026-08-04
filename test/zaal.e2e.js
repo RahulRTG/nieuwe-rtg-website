@@ -27,6 +27,36 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
   body: JSON.stringify(body || {})
 })).json();
 
+/* NAAR HET JUISTE DEEL, ZOALS EEN GEBRUIKER DOET.
+
+   Deze toets viel om nadat het gedeelde deelmenu (shared/deelmenu.js) over alle
+   apps was uitgerold. Dat menu knipt een lang scherm in secties en toont er EEN
+   tegelijk; wie op een knop in een andere sectie klikt, klikt op een element van
+   nul bij nul. Playwright meldde dat als "element is not stable" en daarna "not
+   visible", en dat leest als flakiness terwijl er niets flakey aan is: de knop
+   staat er gewoon niet.
+
+   Het product is hier niet stuk -- een mens tikt eerst op de menuknop. Deze
+   toets deed dat niet, want hij is geschreven toen het scherm nog een lange rol
+   was. Dit hulpje doet wat de gebruiker doet, en valt terug op niets-doen als
+   het menu er (nog) niet is: dan staat alles gewoon onder elkaar. */
+async function naarDeel(page, zoek) {
+  /* Wachten tot het menu er IS. Het deelt het scherm pas in nadat de app zijn
+     inhoud heeft opgebouwd, dus een aanroep vlak na de navigatie treft nog
+     niets -- en dan blijft stilletjes het verkeerde deel open. Dat kostte hier
+     een ronde: de eerste versie riep alleen aan en keek niet of het lukte. */
+  const gelukt = await page.waitForFunction((z) => {
+    if (!window.RTGDeel || !RTGDeel.delen) return false;
+    const id = RTGDeel.delen().find(d => d.includes(z));
+    if (!id) return false;
+    RTGDeel.open(id);
+    return id;
+  }, zoek, { timeout: 10000 }).then(h => h.jsonValue()).catch(() => null);
+  assert.ok(gelukt, 'het deel "' + zoek + '" is te openen (delen: ' +
+    JSON.stringify(await page.evaluate(() => window.RTGDeel ? RTGDeel.delen() : 'geen menu')) + ')');
+  await page.waitForTimeout(150);
+}
+
 test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zaal-e2e-'));
@@ -56,6 +86,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
       null, { timeout: 8000 });
 
     /* ---- een heel lied, met een eigen zin ---- */
+    await naarDeel(page, 'rahul-zet-iets-neer');
     await page.fill('#rVraag', 'een warme lounge');
     await page.fill('#rTekst', 'de zon komt op boven de haven');
     await page.click('#rLiedKnop');
@@ -73,6 +104,8 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
       const i = t.kanalen.findIndex(k => k.instrument === 'zang');
       window.RTGKlankwerk.raster().kies(i);
     });
+    /* De zanglijn woont in de notenrol, weer een ander deel. */
+    await naarDeel(page, 'de-notenrol');
     await page.waitForSelector('.lettergrepen .lg input', { timeout: 8000 });
     const grepen = await page.evaluate(() =>
       Array.from(document.querySelectorAll('.lettergrepen .lg input')).map(e => e.value));
@@ -82,6 +115,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
       'en er staat eerlijk bij dat de stem opgewekt is');
 
     /* ---- samen produceren: op codenaam, nooit op een echte naam ---- */
+    await naarDeel(page, 'samen-produceren');
     await page.fill('#mCode', maatCode);
     await page.click('#mNodig');
     await page.waitForFunction((code) => document.querySelector('#makers').textContent.includes(code),
@@ -91,6 +125,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
 
     /* ---- uitgeven, met de RTG-naam als AANVRAAG ---- */
     await page.check('#tKlaar');
+    await naarDeel(page, 'uitgeven');
     await page.click('#bewaar');
     await page.waitForFunction(() => /Bewaard/.test(document.querySelector('#melding').textContent),
       null, { timeout: 8000 });

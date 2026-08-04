@@ -28,9 +28,21 @@
   header h1{font-size:1.1rem;}
   .sp{flex:1 1 auto;}
   .snelbtn{background:var(--burgundy);border:1px solid var(--burgundy);color:#fff;font:inherit;font-weight:700;border-radius:999px;padding:.5rem 1.1rem;cursor:pointer;box-shadow:0 8px 24px rgba(194,58,94,.35);}
-  nav.tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.6rem;}
-  nav.tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);font:inherit;font-size:.85rem;font-weight:600;padding:.5rem .3rem;cursor:pointer;}
-  nav.tabs button.aan{color:var(--txt);border-color:var(--gold);}
+  /* De tabs in de kop (Vandaag / Artikelen / Huisstijl-site / Cijfers) zijn de
+     eigen schakelaar van deze redactie: EEN deel tegelijk, precies wat het
+     deelmenu elders doet. main wordt bij elke wissel opnieuw getekend, dus het
+     mechanisme blijft staan waar het staat; alleen de vorm gaat mee met het
+     huis -- kleine kapitalen en een gouden streep onder het deel waar je staat.
+     De rij zakt met een negatieve ondermarge op de onderrand van de kop, zodat
+     er EEN lijn staat en niet twee. De selector moet dieper dan `.tabs > button`:
+     de kit tekent die rij zelf al met `body.rtg-stijl .tabs > button`. */
+  body.rtg-stijl nav.tabs{display:flex;gap:.15rem;flex-wrap:wrap;margin:.6rem 0 -.2rem;padding:0;}
+  body.rtg-stijl nav.tabs > button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    border-radius:0;cursor:pointer;padding:.5rem .7rem .55rem;
+    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  body.rtg-stijl nav.tabs > button:hover{color:var(--txt);}
+  body.rtg-stijl nav.tabs > button.aan{background:none;border-width:0 0 2px;color:var(--txt);border-bottom-color:var(--gold);}
   main{padding:1.3rem 1.1rem 4rem;max-width:1180px;margin:0 auto;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:1rem;}
   .veld,textarea,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
@@ -140,6 +152,8 @@
 
 <div class="melding" id="melding" role="status"></div>
 
+<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -156,7 +170,19 @@ async function laad(){ try{ STAAT=await api('staat'); $('#krantNaam').textConten
 function vulRubrieken(){ const s=$('#snRubriek'); if(s){ s.innerHTML=(STAAT.rubrieken||[]).map(r=>'<option>'+esc(r)+'</option>').join(''); } }
 
 let HUIDIG='vandaag';
-function toon(t){ HUIDIG=t; document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('aan',b.dataset.t===t));
+/* Meenemen (shared/uitvoer.js): de redactie neemt de artikelen mee die NU op
+   het scherm staan -- de dagstapel, de gefilterde lijst of de best gelezen --
+   met de velden los, niet de regel "Rubriek · Redactie · 12 gelezen". LIJST
+   staat op null zodra er geen lijst in beeld is (huisstijl, de editor), want
+   een uitvoer die iets anders geeft dan wat u ziet is geen uitvoer. */
+let LIJST=null;
+if(window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if(!LIJST||!LIJST.length) return null;
+  return { naam:'artikelen', kolommen:['kop','rubriek','auteur','status','gelezen','bijgewerkt'],
+    rijen:LIJST.map(function(a){
+      return [a.titel||'', a.rubriek||'', a.auteur||'Redactie', a.status||'', a.gelezen||0, String(a.bij||'').slice(0,10)]; }) };
+});
+function toon(t){ HUIDIG=t; LIJST=null; document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('aan',b.dataset.t===t));
   if(t==='vandaag')vandaag(); else if(t==='artikelen')artikelenTab(); else if(t==='huisstijl')huisstijlTab(); else cijfersTab();
 }
 function vandaag(){
@@ -164,7 +190,7 @@ function vandaag(){
   $('#hoofd').innerHTML='<div class="kpis"><div class="kpi"><b>'+(T.live||0)+'</b><span>live</span></div><div class="kpi"><b>'+(T.concept||0)+'</b><span>concept</span></div><div class="kpi"><b>'+(T.gelezen||0)+'</b><span>gelezen</span></div></div>'+
     '<div class="kaart"><div class="rij"><h3 style="flex:1;">Vandaag op de redactie</h3><button class="knop prim" id="v_snel">Snel nieuws</button></div><div id="recent" style="margin-top:.5rem;"></div></div>';
   $('#v_snel').addEventListener('click',openSnel);
-  const r=$('#recent'); const lijst=STAAT.recent||[];
+  const r=$('#recent'); const lijst=STAAT.recent||[]; LIJST=lijst;
   if(!lijst.length){ r.innerHTML='<div class="hint">Nog geen artikelen. Klik op "Snel nieuws" om te beginnen.</div>'; return; }
   r.innerHTML=''; lijst.forEach(a=>r.appendChild(artRij(a)));
 }
@@ -189,12 +215,13 @@ async function artikelenTab(){
 }
 async function laadArtikelen(status){
   document.querySelectorAll('#filters .chip').forEach(c=>c.classList.toggle('aan',c.dataset.s===status));
-  try{ const d=await api('artikelen',status==='alle'?{}:{status}); const l=$('#artlijst'); l.innerHTML='';
+  try{ const d=await api('artikelen',status==='alle'?{}:{status}); const l=$('#artlijst'); l.innerHTML=''; LIJST=d.lijst||[];
     if(!(d.lijst||[]).length){ l.innerHTML='<div class="hint">Geen artikelen.</div>'; return; }
     d.lijst.forEach(a=>l.appendChild(artRij(a)));
   }catch(e){ meld(e.message); }
 }
 async function editArtikel(id){
+  LIJST=null;   // in de editor staat er geen lijst in beeld
   let a={titel:'',chapo:'',inhoud:'',rubriek:(STAAT.rubrieken[0]||'Voorpagina'),beeld:''};
   if(id){ try{ const d=await api('artikel/haal',{id}); a=d.artikel; }catch(e){ meld(e.message); return; } }
   const rubOpts=(STAAT.rubrieken||[]).map(r=>'<option'+(r===a.rubriek?' selected':'')+'>'+esc(r)+'</option>').join('');
@@ -216,6 +243,7 @@ async function editArtikel(id){
 }
 function cijfersTab(){
   const T=STAAT.tellers||{}; const top=(STAAT.recent||[]).filter(a=>a.status==='live').sort((a,b)=>(b.gelezen||0)-(a.gelezen||0)).slice(0,8);
+  LIJST=top;
   $('#hoofd').innerHTML='<div class="kpis"><div class="kpi"><b>'+(T.live||0)+'</b><span>live artikelen</span></div><div class="kpi"><b>'+(T.gelezen||0)+'</b><span>keer gelezen</span></div><div class="kpi"><b>'+(STAAT.rubrieken||[]).length+'</b><span>rubrieken</span></div></div>'+
     '<div class="kaart"><h3>Best gelezen</h3><div id="top" style="margin-top:.5rem;"></div></div>';
   const t=$('#top'); if(!top.length){ t.innerHTML='<div class="hint">Nog geen gelezen artikelen.</div>'; return; }
@@ -287,6 +315,7 @@ function dupliceer(b){const k=JSON.parse(JSON.stringify(b));k.id=RTGId('b');cons
 function verwijder(b){DESIGN.blokken=DESIGN.blokken.filter(x=>x!==b);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>{DESIGN.volgorde[k]=DESIGN.volgorde[k].filter(x=>x!==b.id);});teken();}
 function kiesBeeld(doel){beeldDoel=doel;$('#beeldSheet').classList.add('open');}
 function huisstijlTab(){
+  LIJST=null;   // de bouwer toont geen artikelenlijst
   DESIGN=STAAT.site&&STAAT.site.blokken?JSON.parse(JSON.stringify(STAAT.site)):{blokken:[],volgorde:null}; DESIGN.volgorde=DESIGN.volgorde||null;
   const H=STAAT.huisstijl;
   $('#hoofd').innerHTML='<div class="kaart"><h3>Huisstijl</h3>'+
@@ -324,5 +353,6 @@ else {
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

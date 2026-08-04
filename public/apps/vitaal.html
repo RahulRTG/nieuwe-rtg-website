@@ -25,6 +25,8 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
+<!-- uitvoer.js zonder defer en VOOR het eigen script: dat meldt zijn model aan -->
+<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -57,12 +59,13 @@
     <div class="kaart" id="log"><p class="stil">Laden...</p></div>
   </section>
 
-  <div id="grens"></div>
+  <div id="grens" class="rtgdeel-vast"></div>
 </main>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
   let tik = null;
+  let alarmen = [];   // wat er is gebeurd; komt binnen in laad()
 
   function tekenWacht(d) {
     const w = (d.lopend || []).find(x => x.soort === 'vitaal');
@@ -148,6 +151,7 @@
     try {
       tekenWacht(await Veilig.api('/api/veiligheid/wacht'));
       const beeld = await Veilig.api('/api/veiligheid');
+      alarmen = beeld.alarmen || [];
       $('#log').innerHTML = (beeld.alarmen || []).length
         ? beeld.alarmen.map(a => '<p class="stil">' + Veilig.tijd(a.at) + ' &middot; ' +
             (a.proef ? 'proef' : Veilig.esc(a.soort)) + ' &middot; naar ' + a.naar + ' contact(en)' +
@@ -159,6 +163,20 @@
     }
   }
 
+  /* Meenemen (shared/uitvoer.js): het register dat deze app echt bijhoudt is
+     "wat er is gebeurd" -- per alarm de dag, de soort, naar hoeveel mensen het
+     ging en of het is afgesloten. De kring zelf staat er niet in: dat zijn de
+     gegevens van uw contacten, niet van dit scherm. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!alarmen.length) return null;
+    return {
+      naam: 'vitaal-geschiedenis',
+      kolommen: ['datum', 'soort', 'contacten', 'afgesloten'],
+      rijen: alarmen.map(a => [String(a.at || '').slice(0, 10), a.proef ? 'proef' : (a.soort || ''),
+        a.naar, a.afgesloten ? 'ja' : 'nee'])
+    };
+  });
+
   function start() {
     $('#grens').innerHTML = Veilig.grens();
     Veilig.kringKaart($('#kring'));
@@ -168,11 +186,13 @@
   else window.addEventListener('load', start);
 })();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 </body>
 </html>

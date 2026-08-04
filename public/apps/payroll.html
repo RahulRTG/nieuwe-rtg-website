@@ -15,9 +15,19 @@
   header{padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;flex-wrap:wrap;}
   header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
   header h1{font-size:1.25rem;margin-top:.1rem;}
-  nav{display:flex;gap:.4rem;margin-left:auto;flex-wrap:wrap;}
-  nav button{background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:inherit;font-size:.78rem;padding:.3rem .8rem;cursor:pointer;}
-  nav button.aan{color:var(--txt);border-color:var(--gold);}
+  /* De tabs in de kop (Wie werkt waar / Loonrun / Matching) zijn de eigen
+     schakelaar van dit loonkantoor: EEN sectie tegelijk, precies wat het
+     deelmenu elders doet. Het mechanisme blijft ongemoeid; alleen de vorm gaat
+     mee met het huis -- een rustige balk met kleine kapitalen en een gouden
+     streep onder het deel waar je staat, in plaats van een rij pillen. De rij
+     zakt met een negatieve ondermarge op de onderrand van de kop, zodat er EEN
+     lijn staat en niet twee. */
+  nav{display:flex;gap:.15rem;margin-left:auto;margin-bottom:-.6rem;flex-wrap:wrap;}
+  nav button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;
+    color:var(--muted);font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;padding:.5rem .7rem .55rem;cursor:pointer;}
+  nav button:hover{color:var(--txt);}
+  nav button.aan{color:var(--txt);border-bottom-color:var(--gold);}
   main{padding:1rem;max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;}
   .sec{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
@@ -73,20 +83,65 @@
     </div>
   </section>
 </main>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
+<script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur = n => '€ ' + Number(n).toFixed(2).replace('.', ',');
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+/* De deur op de app zelf, in plaats van wegsturen. Wie hier uitgelogd komt
+   verloor met een location.replace() waar hij heen wilde: je landde op de
+   personeels-app zonder te zien welke app je had geopend (TAKEN 5.5). De
+   gedeelde poort toont wat deze app is en waar de inlog zit, met de weg terug
+   in de link. Laadt de poort onverhoopt niet, dan doen we alsnog wat we eerst
+   deden -- een dichte app zonder uitleg is erger dan een omweg. */
+function uitgelogd(){
+  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
+     bindt daarna nog listeners aan knoppen binnen #main -- die zijn dan weg en
+     dat gaf een reeks "Cannot read properties of null". De listeners hangen nu
+     netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
+     zodra de pagina klaar is met opbouwen. */
+  setTimeout(function () {
+    var el = document.getElementById('main') || document.body;
+    RTGDeur.toon(el, { soort: 'personeel', naar: naar });
+  }, 0);
+}
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/office/payroll/' + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
   .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 const pastPil = p => '<span class="pil' + (p === 'overbelast' ? ' rood' : p === 'rustig' ? ' goud' : '') + '">' + esc(p) + '</span>';
 
+/* Meenemen (shared/uitvoer.js): dit loonkantoor houdt twee registers vast. Wat
+   je meeneemt is het deel dat OPEN staat: de gedraaide loonrun met de regels
+   los, of anders de mensen met hun uren en past-signaal -- niet de zin
+   "Barman · Sal de Mar · Ibiza · 38 u/w overbelast" die op het scherm staat.
+   Alles komt uit /api/office/payroll; er wordt niets bij verzonnen. */
+let STAND = null, RUN = null, TAB = 'overzicht';
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (TAB === 'loonrun' && RUN) return {
+    naam: 'loonrun',
+    kolommen: ['zaak', 'periode', 'naam', 'rol', 'uren', 'uurloon', 'bruto', 'vakantiegeld', 'loonheffing', 'netto'],
+    rijen: (RUN.regels || []).map(x => [RUN.zaak || '', RUN.periode || '', x.naam || '', x.rol || '',
+      x.uren, x.uurloon, x.bruto, x.vakantiegeld, x.loonheffing, x.netto])
+  };
+  if (STAND && (STAND.mensen || []).length) return {
+    naam: 'medewerkers',
+    kolommen: ['naam', 'rol', 'zaak', 'stad', 'uren per week', 'past', 'open voor werk'],
+    rijen: STAND.mensen.map(m => [m.naam || '', m.rol || '', m.zaak || '', m.stad || '',
+      m.weekUren, m.past || '', m.openVoorWerk ? 'ja' : 'nee'])
+  };
+  return null;
+});
+
 async function laadOverzicht(){
   const d = await api('overzicht');
+  STAND = d;
   $('#top').innerHTML =
     '<div class="stat"><b>' + d.mensen.length + '</b><i>medewerkers</i></div>' +
     '<div class="stat"><b>' + d.zaken.length + '</b><i>zaken</i></div>' +
@@ -118,6 +173,7 @@ $('#lrDraai').addEventListener('click', async () => {
   try {
     const r = await api('loonrun', { code: $('#lrZaak').value, periode: $('#lrPeriode').value.trim() });
     const run = r.run;
+    RUN = run;
     $('#lrUit').innerHTML = '<div class="sec">' + esc(run.zaak) + ' · ' + esc(run.periode) + ' · ' + esc(run.status) + '</div>' +
       run.regels.map(x => '<div class="regel"><b>' + esc(x.naam) + '</b><span class="kpi">' + esc(x.rol) + ' · ' + x.uren + ' u x ' + eur(x.uurloon) + '</span>' +
         '<span class="r">' + eur(x.netto) + ' netto<br><span class="kpi">bruto ' + eur(x.bruto) + ' + vak.geld ' + eur(x.vakantiegeld) + ' - heffing ' + eur(x.loonheffing) + '</span></span></div>').join('') +
@@ -127,6 +183,7 @@ $('#lrDraai').addEventListener('click', async () => {
 });
 document.querySelectorAll('nav [data-tab]').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('nav [data-tab]').forEach(x => x.classList.toggle('aan', x === b));
+  TAB = b.dataset.tab;
   $('#tabOverzicht').hidden = b.dataset.tab !== 'overzicht';
   $('#tabLoonrun').hidden = b.dataset.tab !== 'loonrun';
   $('#tabMatch').hidden = b.dataset.tab !== 'match';
@@ -150,5 +207,6 @@ if (TOKEN) {
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

@@ -9,6 +9,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/apps/rtg-protect.css" rel="stylesheet">
+<script src="/shared/uitvoer.js"></script>
 <script src="/apps/rtg-protect.js" defer></script>
 <script src="/shared/schermrust.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
@@ -188,6 +189,19 @@
   /* ---------- de feed: eindige dagselectie, geen oneindige scroll ---------- */
   let feedData = null, mijnIds = [];
   let alleenOndertiteld = false;
+  /* Meenemen (shared/uitvoer.js): de dagselectie zoals hij op het scherm staat,
+     als velden. Titel, maker en duur zijn wat de kaart al toont; het beeld zelf
+     blijft waar het is (dat reist rechtstreeks en staat niet bij RTG). */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!feedData) return null;
+    const alles = [...(feedData.mijn || []).slice(0, 3), ...(feedData.clips || [])];
+    return {
+      naam: 'clips',
+      kolommen: ['titel', 'maker', 'speelduur (s)', 'omvang (MB)', 'geluid', 'ondertiteld', 'reacties', 'eigen archief'],
+      rijen: alles.map(c => [c.titel, c.codenaam, c.speelduurS || c.duurS, c.mb,
+        c.geluid || 'eigen', c.ondertiteld ? 'ja' : 'nee', c.reacties, c.mijn ? 'ja' : 'nee'])
+    };
+  });
   async function laadFeed() {
     const r = await api('feed', { alleenOndertiteld });
     if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
@@ -371,6 +385,12 @@
   let stroom = null, recorder = null, brokken = [], opnameBlob = null, opnameT = null, opnameStart = 0;
   $('#studioOpen').addEventListener('click', async () => {
     $('#studio').classList.add('open');
+    // buiten een beveiligde context bestaat mediaDevices niet; zonder deze
+    // controle kwam hier een rauwe TypeError in beeld te staan
+    if (!window.isSecureContext || !navigator.mediaDevices) {
+      $('#studioStatus').textContent = 'Opnemen kan hier niet: dit adres is onbeveiligd (http), en een browser geeft de camera alleen vrij op een beveiligd (https-)adres.';
+      return;
+    }
     try {
       stroom = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
       $('#studioDoek').srcObject = stroom;
@@ -551,5 +571,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

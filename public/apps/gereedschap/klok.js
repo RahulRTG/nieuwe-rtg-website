@@ -34,6 +34,22 @@
       teken();
     });
   }
+
+  /* Meenemen (shared/uitvoer.js): de wekkers zijn het register dat dit
+     gereedschap echt bewaart -- ze staan op de server en gaan af als de app
+     dicht is. Timers lopen leeg en horen daar niet bij. Op het scherm staat
+     "07:00 sporten · ma di wo do vr"; hier gaan tijd, label, herhaling en de
+     schakelaar los mee. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+    if (!stand || !(stand.wekkers || []).length) return null;
+    return {
+      naam: 'wekkers',
+      kolommen: ['tijd', 'waarvoor', 'herhaling', 'staat'],
+      rijen: stand.wekkers.map(function (w) {
+        return [w.tijd || '', w.label || '', dagenTekst(w.dagen), w.aan ? 'aan' : 'uit'];
+      })
+    };
+  });
   function dagenTekst(d) {
     if (!d || !d.length) return 'een keer';
     if (d.length === 7) return 'elke dag';

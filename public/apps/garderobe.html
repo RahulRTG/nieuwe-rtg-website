@@ -51,6 +51,9 @@
 <header><div><div class="ey">Lifestyle Pass</div><h1>Garde-robe</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
+<script src="/shared/deur.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -59,9 +62,27 @@ function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; c
 const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
 const AIBOX=app=>'<div class="kaart"><h2>Vraag de stylist</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
 function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
+let stand=null;
+
+/* Meenemen (shared/uitvoer.js): de garderobe stuk voor stuk, met dezelfde
+   velden als op het scherm -- wat het is, in welke categorie het valt, merk,
+   kleur, maat en waar het hangt of ligt. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var st = stand && stand.stukken;
+  if (!st || !st.length) return null;
+  return {
+    naam: 'garderobe',
+    kolommen: ['stuk', 'categorie', 'merk', 'kleur', 'maat', 'waar'],
+    rijen: st.map(function (s) {
+      return [s.naam, s.categorie || '', s.merk || '', s.kleur || '', s.maat || '', s.waar || ''];
+    })
+  };
+});
+
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('garderobe'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Garde-robe is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon de garderobe niet laden.</div>'; return; }
+  let d; try{ d=await api('garderobe'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon de garderobe niet laden.</div>'; return; }
+  stand=d;
   const catOpts=d.categorieen.map(c=>'<option>'+c+'</option>').join('');
   const vakOpts=d.vakken.map(v=>'<option>'+v+'</option>').join('');
   let h='<div class="grid"><div class="stat"><div class="n">'+d.aantal+'</div><div class="l">Stuks</div></div><div class="stat"><div class="n">'+Object.keys(d.perCategorie).length+'</div><div class="l">Categorieën</div></div><div class="stat"><div class="n">'+d.vaklui.length+'</div><div class="l">Vaklui</div></div></div>';
@@ -81,6 +102,7 @@ async function laad(){
 }
 laad();
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -88,5 +110,6 @@ laad();
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

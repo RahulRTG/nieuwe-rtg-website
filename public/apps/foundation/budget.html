@@ -94,6 +94,8 @@
 </div>
 
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
@@ -110,6 +112,18 @@ let inkomsten = [{ naam: 'zakgeld', bedrag: 0 }];
 let uitgaven = [{ naam: 'telefoonabonnement', bedrag: 0, vast: true }, { naam: 'sparen', bedrag: 0, spaar: true }];
 
 const geld = n => n.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/* Meenemen (shared/uitvoer.js): de begroting blijft op dit toestel, dus dit is
+   de enige manier om hem ergens anders naartoe te krijgen. Beide lijsten in
+   een tabel; de kolom "post" houdt het onderscheid vast dat de balk tekent. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var rijen = inkomsten.map(function (p) { return ['binnen', p.naam, (p.bedrag || 0).toFixed(2), '']; })
+    .concat(uitgaven.map(function (p) {
+      return ['eruit', p.naam, (p.bedrag || 0).toFixed(2), p.spaar ? 'sparen' : p.vast ? 'vaste last' : 'vrij'];
+    }));
+  if (!rijen.length) return null;
+  return { naam: 'maandbegroting', kolommen: ['soort', 'omschrijving', 'bedrag', 'post'], rijen: rijen };
+});
 
 function tekenLijst(waar, lijst) {
   const doos = $(waar === 'in' ? '#in' : '#uit');
@@ -253,6 +267,7 @@ tekenKnoppen();
 reken();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
@@ -261,5 +276,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

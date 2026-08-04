@@ -76,9 +76,18 @@
   <div id="app" hidden></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* Meenemen (shared/uitvoer.js): elke post houdt zijn eigen register bij --
+   de passagierslijst aan de balie en het incidentenregister. Het scherm dat
+   openstaat meldt zijn model aan; reizigers blijven op codenaam, precies
+   zoals ze op het scherm staan (de echte naam zit in de kluis en hoort daar). */
+let UIT = null;
+function zetUit(naam, kolommen, rijen){ UIT = rijen.length ? { naam: naam, kolommen: kolommen, rijen: rijen } : null; }
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
 let TOKEN = null, C = null;
 const api = (pad, body) => fetch(pad, {
@@ -126,6 +135,7 @@ $('#loginGo').addEventListener('click', async () => {
 });
 
 async function kiesScherm(){
+  UIT = null;   // de postkeuze heeft zelf geen register
   try { C = await api('/api/kmar/cockpit'); } catch(e){ meld(e.message); return; }
   $('#app').innerHTML =
     '<div class="kpis">'+
@@ -182,6 +192,8 @@ async function laadGrens(){
         (p.besluit==='wacht' ? '<div class="rij"><button class="knop" data-b="'+p.boekingId+'" data-w="akkoord">Akkoord ✓</button><button class="knop rood" data-b="'+p.boekingId+'" data-w="nader-onderzoek">Nader onderzoek</button></div>'
           : p.besluit==='nader-onderzoek' ? '<div class="rij"><button class="knop" data-b="'+p.boekingId+'" data-w="vrijgegeven">Vrijgeven ✓</button></div>' : '')+'</div>').join('')
       : '<div class="leeg">Nog geen ingecheckte reizigers op deze vlucht.</div>');
+    zetUit('grenscontrole', ['vlucht','reiziger','stoel','besluit'],
+      r.passagiers.map(p => [r.vlucht.nummer, p.codenaam, p.stoel, p.besluit]));
     $('#gLijst').querySelectorAll('[data-b]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/kmar/controle/zet', { boekingId: b.dataset.b, besluit: b.dataset.w }); meld('Vastgelegd.'); laadGrens(); } catch(e){ meld(e.message); } }));
   } catch(e){ meld(e.message); }
@@ -200,6 +212,10 @@ async function schermPatrouille(){
     const inp = document.querySelector('[data-bev="'+b.dataset.zone+'"]');
     try { await api('/api/kmar/patrouille', { zone: b.dataset.zone, bevinding: inp ? inp.value : '' });
       meld('Patrouille vastgelegd.'); schermPatrouille(); } catch(e){ meld(e.message); }
+  }));
+  zetUit('patrouilles', ['zone','datum','tijd'], C.zones.map(z => {
+    const at = C.laatstePatrouille[z];
+    return [z, at ? String(at).slice(0, 10) : '', at ? tijd(at) : ''];
   }));
 }
 
@@ -228,6 +244,9 @@ async function laadIncidenten(){
       '<div class="meta">'+esc(i.tekst)+' · '+esc(i.door)+' · '+tijd(i.at)+(i.gesloten?' · afloop: '+esc(i.gesloten.afloop):'')+'</div>'+
       (!i.gesloten ? '<div class="rij"><button class="knop stil" data-sluit="'+i.id+'">Sluiten</button></div>' : '')+'</div>').join('')
       : '<div class="leeg">Geen incidenten. Zo houden we het.</div>';
+    zetUit('incidenten', ['soort','zone','wat','door','tijd','status','afloop'],
+      r.incidenten.map(i => [i.soort, i.zone, i.tekst, i.door, tijd(i.at), i.gesloten ? 'gesloten' : 'open',
+        i.gesloten ? (i.gesloten.afloop || '') : '']));
     $('#iLijst').querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', async () => {
       const afloop = prompt('Hoe is het afgelopen?', '') || '';
       try { await api('/api/kmar/incident/sluit', { id: b.dataset.sluit, afloop }); meld('Gesloten.'); laadIncidenten(); } catch(e){ meld(e.message); } }));
@@ -238,6 +257,7 @@ async function laadIncidenten(){
 try { TOKEN = localStorage.getItem(SLEUTEL); } catch(e){}
 if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); kiesScherm(); }
 </script>
+<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

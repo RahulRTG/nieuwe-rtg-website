@@ -56,9 +56,17 @@ const som = v => { const m = v.match(/^(\d+)\s*([+-])\s*(\d+)\s*=/); return m ? 
 
 test('1. SO in een tik: leerdoelen aanvinken, kind maakt met verse sommen, leraar becijfert', async () => {
   const { klas, g, kindToken, sleutel } = await opzet('Toets');
-  // de bibliotheek voor het maak-scherm staat vol leerdoelen per groep
+  // De bibliotheek voor het maak-scherm: basisschoolgroepen en ladder-fasen
+  // ELK in hun eigen lijst. De oude vorm gooide alles op d.groep, waardoor de
+  // vo/mbo/hbo/wo-doelen (zonder groep) samenvielen in een "Groep null" --
+  // en dit assert (>= 8) liet die negende emmer gewoon door. Nu exact.
   const bieb = await json(await lr(klas, '/school/toets/bibliotheek'));
-  assert.ok(bieb.groepen.length >= 8 && bieb.groepen[0].doelen.length >= 2);
+  assert.equal(bieb.groepen.length, 8, 'precies acht basisschoolgroepen, geen null-emmer');
+  assert.ok(bieb.groepen.every(g => Number.isInteger(g.groep) && g.groep >= 1 && g.groep <= 8),
+    'elke groep is een geheel getal 1 t/m 8: ' + bieb.groepen.map(g => g.groep).join(','));
+  assert.ok(bieb.groepen[0].doelen.length >= 2);
+  assert.ok(Array.isArray(bieb.fasen) && bieb.fasen.length >= 4, 'de vervolgdoelen staan in eigen fasen');
+  assert.ok(bieb.fasen.every(f => f.fase && f.naam && f.trapNaam), 'elke fase draagt naam en schoolsoort');
   // twee vinkjes = een SO van 6 vragen
   const so = await json(await lr(klas, '/school/toets/maak', { soort: 'so', naam: 'SO Rekenen week 4',
     doelen: ['rekenen.g3.optellen-tot-20', 'rekenen.g3.aftrekken-tot-20'], perDoel: 3 }));

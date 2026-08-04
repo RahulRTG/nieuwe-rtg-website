@@ -4,6 +4,7 @@
    routes/member/kopen.js. */
 const { coord } = require('../../../kern/util');
 const { servicekostenVoor } = require('../../../kern/servicekosten');
+const bezorgvolg = require('../../../kern/bezorgvolg');
 module.exports = (kern) => {
   const { PERSONAS, app, auth, betaal, centen,
     crypto, db, findPartner, findSupplier, magBezorgen,
@@ -91,11 +92,20 @@ app.post('/api/bezorg/volg', auth, (req, res) => {
   if (!o || (o.customerKey || o.customerTier) !== req.session.key || !o.levering) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   const B = db.data.bezorgers || {};
   const pos = o.bezorger ? B[o.supplierCode + ':' + (o.bezorger.staffId || 'beheer')] : null;
-  res.json({
-    order: o, bezorger: o.bezorger ? { name: o.bezorger.name } : null,
-    positie: o.status === 'onderweg' && pos ? { lat: pos.lat, lng: pos.lng, at: pos.at } : null,
-    etaMin: o.status === 'onderweg' ? (o.etaMin || null) : null
+  /* Het volgscherm: dezelfde vier stappen die de zaak intern doorloopt, in de
+     taal van de klant, met wat er gebeurt en hoe lang het nog duurt. Tussen
+     "betaald" en "onderweg" zat hier eerst niets, en dat is juist de tijd
+     waarin iemand zich afvraagt of zijn bestelling wel is aangekomen. */
+  const positie = o.status === 'onderweg' && pos ? { lat: pos.lat, lng: pos.lng, at: pos.at } : null;
+  const zaak = findSupplier(o.supplierCode);
+  const beeld = bezorgvolg.volgBeeld({
+    order: o, orders: db.data.orders || [], zaakLoc: zaak && zaak.loc,
+    positie, bezorgerNaam: o.bezorger && o.bezorger.name
   });
+  res.json(Object.assign({
+    order: o, bezorger: o.bezorger ? { name: o.bezorger.name } : null,
+    positie
+  }, beeld));
 });
 
 };

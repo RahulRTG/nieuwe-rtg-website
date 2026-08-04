@@ -95,7 +95,11 @@
     // op het zuidelijk halfrond naar het noorden -- daar staan de mooiste beelden.
     var obs = { lat: 50, lon: -(new Date().getTimezoneOffset() / 60) * 15 };
     function facing() { return obs.lat >= 0 ? 180 : 0; }
-    if (navigator.geolocation) {
+    // ongevraagd bij het openen, dus de GPS-schakelaar (rtg_os_gps) wint;
+    // zonder plek valt de kaart terug op de tijdzone-schatting hierboven
+    var gpsUit = false;
+    try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
+    if (!gpsUit && navigator.geolocation) {
       try {
         navigator.geolocation.getCurrentPosition(function (p) {
           obs = { lat: p.coords.latitude, lon: p.coords.longitude };

@@ -15,10 +15,21 @@
   .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
-  .werelden{display:flex;gap:.5rem;margin-bottom:.9rem;}
-  .wereld{flex:1;background:var(--paneel,#151312);border:2px solid var(--lijn,#333);border-radius:14px;color:inherit;font:600 .95rem Inter,sans-serif;padding:.8rem;cursor:pointer;text-align:center;}
-  .wereld.aan{border-color:var(--goud,#857007);}
-  .wereld small{display:block;font-weight:400;color:var(--zacht);font-size:.74rem;margin-top:.2rem;}
+  /* De bibliotheek houdt zijn eigen wereldkeuze, maar draagt hem in de stijl
+     van het deelmenu: een rustige balk met kleine kapitalen en een gouden
+     streep onder de wereld waar u staat, in plaats van twee grote blokken. Zo
+     is het huis er een, ook waar de app zijn schakelaar zelf regelt. Het
+     aantal blijft als onderregel staan; alleen de vorm verandert. */
+  .werelden{display:flex;gap:.15rem;flex-wrap:wrap;margin:.6rem 0 1.1rem;padding:0 0 .1rem;
+    border-bottom:1px solid var(--lijn);}
+  .wereld{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+    margin-bottom:-1px;padding:.5rem .8rem .55rem;cursor:pointer;text-align:left;
+    color:var(--zacht);font-family:Inter,sans-serif;font-size:.72rem;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;}
+  .wereld:hover{color:var(--txt);}
+  .wereld.aan{color:var(--txt);border-bottom-color:var(--goud,#857007);}
+  .wereld small{display:block;font-weight:400;color:var(--zacht);font-size:.68rem;
+    letter-spacing:.04em;text-transform:none;margin-top:.15rem;}
   .zoekrij{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
   .zoekrij .veld{flex:1;min-width:9rem;}
   .apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.6rem;}
@@ -61,6 +72,8 @@
 
 <script src="/shared/glyf.js"></script>
 <script src="sessie.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -73,7 +86,19 @@ const api = (pad, body) => fetch('/api/rtf/beroepen' + pad, {
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 const ST = { wereld: 'techniek', beroep: '', soort: '', zoek: '', pagina: 1, mijn: false };
-let OVERZICHT = null;
+let OVERZICHT = null, TOON = [];
+/* Meenemen (shared/uitvoer.js): de lijst die nu op het scherm staat -- de
+   pagina uit de catalogus, of "Mijn beroeps-apps". Dezelfde velden als op de
+   tegel: welk beroep, welk niveau, welke soort. */
+if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+  if (!TOON.length) return null;
+  return {
+    naam: ST.mijn ? 'mijn-beroeps-apps' : 'beroepen-catalogus',
+    kolommen: ['naam','beroep','niveau','soort','versie','omvang in MB','sterren'],
+    rijen: TOON.map(a => [a.naam, a.beroep, a.niveau, a.soort, a.versie,
+      String(a.grootteMB), a.sterren.toFixed(1)])
+  };
+});
 
 async function start(){
   OVERZICHT = await api('');
@@ -115,11 +140,13 @@ async function teken(){
     if (ST.mijn){
       const mijn = (await api('/mijn')).apps || [];
       if (mijnNr !== tekenNr) return;
+      TOON = mijn;
       grid.innerHTML = mijn.length ? mijn.map(a => kaart(a, true)).join('') : '<div class="leeg">Nog geen beroeps-apps. Kies een beroep en druk op Installeer.</div>';
       blader.innerHTML = '';
     } else {
       const d = await api('/catalogus', { wereld: ST.wereld, beroep: ST.beroep, soort: ST.soort, zoek: ST.zoek, pagina: ST.pagina });
       if (mijnNr !== tekenNr) return;
+      TOON = d.items;
       grid.innerHTML = d.items.length ? d.items.map(a => kaart(a, mijnIds.includes(a.id))).join('')
         : '<div class="leeg">'+esc(d.hint || 'Niets gevonden.')+'</div>';
       blader.innerHTML = d.paginas > 1
@@ -150,5 +177,6 @@ start().catch(e => { $('#bbGrid').innerHTML = '<div class="leeg">'+esc(e.message
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

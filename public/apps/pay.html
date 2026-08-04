@@ -175,6 +175,9 @@
 <div class="melding" id="melding" role="status"></div>
 
 <script src="/shared/tappay.js"></script>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
+     zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -202,8 +205,29 @@ $('#gDemo').addEventListener('click', async () => {
 
 /* ---------- de wallet ---------- */
 let LAADCENTEN = 2500;
+let STAND = null;
+
+/* Meenemen (shared/uitvoer.js): je bewegingen, met de velden los. Op het scherm
+   staat "Zomaar · KOBALT" en rechts een bedrag; hier staan datum, omschrijving,
+   soort, tegenpartij en bedrag apart, precies zoals /api/pay/overzicht ze geeft.
+   Bedragen in euro (de kern rekent in centen); alleen codenamen, want een echte
+   naam kent RTG Pay niet. De boeking draagt haar tijd als millisecondentelling
+   (nu()), dus de datum gaat eerst door Date heen -- rechtstreeks afknippen gaf
+   "1785773112" in de kolom datum. */
+const payDatum = at => { const d = new Date(at); return isNaN(d) ? '' : d.toISOString().slice(0, 10); };
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!STAND || !(STAND.geschiedenis || []).length) return null;
+  return {
+    naam: 'bewegingen',
+    kolommen: ['datum', 'omschrijving', 'soort', 'tegenpartij', 'bedrag in euro'],
+    rijen: STAND.geschiedenis.map(h => [payDatum(h.at), h.oms || '', h.soort || '',
+      h.tegen || '', (h.centen / 100).toFixed(2)])
+  };
+});
+
 async function ververs(){
   const d = await api('pay/overzicht');
+  STAND = d;
   toon('vPay');
   $('#pNaam').textContent = d.codenaam;
   $('#pSaldo').innerHTML = esc(euro(d.saldo)) + '<small> eur</small>';
@@ -406,5 +430,7 @@ if (TOKEN) start(); else toon('vGate');
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
 </body>
 </html>

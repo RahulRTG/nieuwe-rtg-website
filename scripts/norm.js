@@ -33,7 +33,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { execFileSync, spawnSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
@@ -41,6 +41,12 @@ const NORMBESTAND = path.join(WORTEL, 'NORM.json');
 /* Elke meter met de richting waarin hij mag bewegen. `omlaag` betekent: een
    lager getal is beter (minder ongedekte endpoints). `omhoog`: hoger is beter. */
 const METERS = [
+  /* De ratel op regel 10 zelf. check.js regel 35 eist dat ELKE meter in de
+     registratie van test/meterijk.test.js staat; deze meter telt hoeveel er
+     daar met alleen een REDEN staan in plaats van een proef. Dat is het
+     eerlijke gat: meters die we niet hebben zien uitslaan. Hij mag alleen
+     omlaag, dus het gat kan niet groeien en wordt over de tijd kleiner. */
+  { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' },
   { sleutel: 'endpointsZonderTest', richting: 'omlaag', wat: 'endpoints die in geen enkele test voorkomen' },
   { sleutel: 'dekkingPct', richting: 'omhoog', wat: 'percentage endpoints dat in een test voorkomt' },
   { sleutel: 'keuringStuk', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "stuk"' },
@@ -60,6 +66,16 @@ const METERS = [
      toe te voegen, niet door iets te laten verslechteren; de enige inhoudelijke
      van de vijf (teVaak in drie kernmodules) is opgelost. */
   { sleutel: 'keuringOmvang', richting: 'omlaag', wat: 'bestanden die vlak onder de 10 kB-grens zitten' },
+  /* DE TAND DIE ER NOOIT WAS. De omvangregel in scripts/keuring.js meldde
+     alleen bestanden VLAK ONDER de grens, en alles erboven viel stilzwijgend
+     buiten de keuring -- server/server.js van 212 kB voorop. Er was dus een
+     meter voor de bijna-overtreders en geen voor de overtreders.
+
+     Apart van keuringOmvang en niet erbij opgeteld: dan zou een bestand dat
+     over de grens gaat kunnen wegvallen tegen een bestand dat er net onder
+     duikt, en dat is precies de verrekening waar de drie losse keuringmeters
+     hierboven al een keer voor zijn gesplitst. */
+  { sleutel: 'keuringTeGroot', richting: 'omlaag', wat: 'servermodules die ECHT over de 10 kB-grens zijn' },
   { sleutel: 'keuringDubbeling', richting: 'omlaag', wat: 'functienamen die in meer dan twee kernmodules staan' },
   { sleutel: 'keuringDekkingAdvies', richting: 'omlaag', wat: 'domeinen met endpoints zonder toets' },
   { sleutel: 'dependencies', richting: 'omlaag', wat: 'externe pakketten (de nul is een principe, geen toeval)' },
@@ -139,11 +155,60 @@ function telPerGroep(k) {
   return uit;
 }
 
+/* Hoeveel van ONZE meters staan in de ijk-registratie met alleen een reden?
+
+   Losse functie met de bron als invoer, en niet een leesactie diep in meet():
+   zo kan deze meter zelf geijkt worden (test/meterijk.test.js voert hem een
+   verzonnen registratie met een bekend aantal redenen). Een meter die zijn
+   eigen bron leest en nergens te voeden is, zou precies het soort meter zijn
+   waar regel 10 over gaat.
+
+   Hij telt alleen sleutels die ECHT in METERS of PRESTATIEMETERS staan. Een
+   eerdere versie telde elke `reden:` in het bestand en kwam op 16 waar
+   check.js op 13 uitkwam -- twee tellingen van hetzelfde ding die uiteenlopen
+   is hoe een meter begint te liegen. */
+function telOngeijkt(ijkBron, extraSleutels) {
+  /* De meters die een JOURNAAL nodig hebben (waargenomen dekking, schermdekking,
+     samenhang) wonen niet hier maar in hun eigen script, met hun sleutel in een
+     METER-constante. Ze horen wel bij dit gat, dus meet() geeft ze mee -- en
+     omdat ze binnenkomen als parameter blijft deze functie te voeden met een
+     verzonnen registratie, en dus zelf te ijken. */
+  const sleutels = METERS.concat(PRESTATIEMETERS).map(m => m.sleutel)
+    .concat(Array.isArray(extraSleutels) ? extraSleutels : []);
+  const blok = /const IJKINGEN = \{([\s\S]*?)\n\};/.exec(ijkBron);
+  if (!blok) throw new Error('de IJKINGEN-registratie is niet te lezen; een meter zonder invoer is geen meter');
+  /* Een regel staat op EEN regel ({ reden: '...' }) of over meerdere; het
+     patroon mag dus geen regeleinde eisen. Een eerdere versie deed dat wel en
+     telde nul, terwijl er dertien stonden -- een meter die nul teruggeeft
+     omdat zijn patroon niet past, is precies de vorm waar deze meter over
+     gaat. Redenen bevatten nooit geneste accolades, dus [^{}] volstaat. */
+  return sleutels.filter(s => {
+    const m = new RegExp('(^|[^a-zA-Z0-9])' + s + '\\s*:\\s*\\{([^{}]*)\\}').exec(blok[1]);
+    return m && /reden:/.test(m[2]);
+  }).length;
+}
+
 function meet() {
-  const uit = execFileSync(process.execPath,
+  /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
+     werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
+     moment dat er iets te meten viel -- de meetketen brak als de meting niet
+     nul was. Dat kwam aan het licht bij het ijken van keuringStuk: een
+     tijdelijk bestand met een echte fout erin gaf geen hoger cijfer maar een
+     onleesbare stapel.
+
+     Daarom lezen we de uitvoer en niet de exitcode. Een keuring die IETS
+     teruggeeft is geslaagd; een keuring die niets teruggeeft (of onleesbaars)
+     is een echte storing en die gooit alsnog, met de eerste regels van zijn
+     eigen foutstroom erbij -- LAT-regel 3: een meter zonder invoer zakt. */
+  const r = spawnSync(process.execPath,
     ['--experimental-sqlite', path.join(__dirname, 'keuring.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
-  const k = JSON.parse(uit);
+  let k = null;
+  try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
+  if (!k || !k.cijfers) {
+    throw new Error('de keuring gaf geen leesbaar rapport (exit ' + r.status + '): ' +
+      String(r.stderr || r.stdout || '').trim().split('\n').slice(0, 3).join(' | ').slice(0, 300));
+  }
 
   /* De dependencies tellen we uit package.json zelf en niet uit een rapport:
      dit is de meter waar je bij twijfel de bron van wilt zien. */
@@ -171,9 +236,19 @@ function meet() {
   const zonderCommentaar = (b) => String(b)
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
     .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+  /* En de derde keer was een tekenreeks. test/meterijk.test.js zet als ijking
+     een toets-met-skip in een TIJDELIJK bestand, en die regel staat dus als
+     letterlijke tekst in de ijking zelf -- waarop deze meter hem meetelde als
+     een echte zelfpoortende toets. Dezelfde fout als hierboven, een laag
+     dieper: commentaar ging al door de wringer, tekst nog niet. Een toets die
+     zichzelf werkelijk overslaat schrijft `{ skip: ... }` nooit binnen
+     aanhalingstekens, dus dit kost geen enkele echte melding (nagemeten over
+     de hele testmap: alleen meterijk.test.js verandert, 78 -> 77). */
+  const zonderTekst = (b) => String(b)
+    .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
   let zelfpoortendeToetsen = 0;
   for (const f of inMap.filter(n => /\.(test|e2e)\.js$/.test(n))) {
-    const bron = zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8'));
+    const bron = zonderTekst(zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8')));
     for (const m of bron.matchAll(/\{\s*skip\s*:\s*([^}]+)\}/g)) {
       if (!/^false\s*$/.test(m[1])) zelfpoortendeToetsen++;
     }
@@ -187,11 +262,53 @@ function meet() {
   try { routesNietSchakelbaar = require('./schakelbaar').meet().ongedekt.length; }
   catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
 
+  /* Hoeveel meters staan er in de ijk-registratie met alleen een REDEN? Die
+     hebben we dus NIET zien uitslaan. De teller leest het registratiebestand
+     zelf, want een getal dat je hier hardcodeert is precies het soort meter
+     waar regel 10 over gaat. Ontbreekt het bestand, dan is niets geijkt en
+     hoort deze meter dat te zeggen in plaats van stil nul te geven. */
+  const ijkPad = path.join(WORTEL, 'test/meterijk.test.js');
+  if (!fs.existsSync(ijkPad)) {
+    throw new Error('test/meterijk.test.js ontbreekt; dan is geen enkele meter geijkt en kan deze meter niet meten');
+  }
+  /* Ook de meters die in een eigen script wonen tellen mee (zie telOngeijkt).
+     Zelfde vindwijze als check.js regel 35, zodat de twee tellingen niet
+     uiteen kunnen lopen -- dat is eerder gebeurd en zo begint een meter te
+     liegen. */
+  const losseSleutels = [];
+  for (const b of fs.readdirSync(path.join(WORTEL, 'scripts')).filter(f => f.endsWith('.js') && f !== 'norm.js')) {
+    const bron = fs.readFileSync(path.join(WORTEL, 'scripts', b), 'utf8');
+    for (const m of bron.matchAll(/^const METER[A-Z_]*\s*=\s*'([a-zA-Z0-9]+)'/gm)) losseSleutels.push(m[1]);
+  }
+  const metersOngeijkt = telOngeijkt(fs.readFileSync(ijkPad, 'utf8'), losseSleutels);
+
+  /* EEN MISLUKTE METING IS GEEN NUL, en hier was dat de duurste vorm ervan.
+
+     scripts/keuring.js start scripts/routekaart.js om de routes te krijgen.
+     Lukt dat niet, dan meldt hij dat netjes en geeft `{ routes: 0, gedekt: 0 }`
+     terug -- zonder `ongedekt`. En dan wordt endpointsZonderTest 0 en dekkingPct
+     0. Voor de eerste is nul de allerbeste stand die er is, dus de ratel juicht;
+     voor de tweede is nul de allerslechtste, dus de ratel klaagt. Twee tanden
+     die tegengesteld reageren op DEZELFDE storing, en geen van beide zegt wat er
+     werkelijk aan de hand is.
+
+     Dat is niet theoretisch: de routekaart kapte tot vandaag zijn eigen uitvoer
+     af zodra hij door een pijp ging (zie de kop van scripts/routekaart.js), en
+     dat gebeurde vanzelf toen de kaart over de 146 kilobyte kwam. LAT.md regel 3
+     zegt wat er dan hoort te gebeuren: een meter zakt als zijn invoer ontbreekt.
+     Dus zakt hij, net als hierboven bij een ontbrekende ijkregistratie. */
+  if (!k.cijfers.dekking || !k.cijfers.dekking.routes) {
+    throw new Error('de routekaart gaf geen routes; dan zijn endpointsZonderTest en dekkingPct niet gemeten ' +
+      '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
+  }
+
   return {
+    metersOngeijkt,
     routesNietSchakelbaar,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
     keuringStuk: k.stuk, keuringScheef: k.scheef,
+    keuringTeGroot: (k.cijfers.uitschieters || {}).teGroot || 0,
     ...telPerGroep(k),
     dependencies: deps, testbestanden, zelfpoortendeToetsen, e2eBestanden
   };
@@ -397,4 +514,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND };
+module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt };

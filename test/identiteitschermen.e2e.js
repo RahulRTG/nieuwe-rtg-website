@@ -62,7 +62,15 @@ test('RTG iD en passkeys: uitleg voor iedereen, gegevens voor niemand zonder inl
   let browser;
   try {
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
+    /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
+       dan hij denkt: de RTF-schil registreert een service worker die tientallen
+       schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
+       DEZE toets ze heeft afgelegd. Bij rtfkinderschermen liep dat op tot 55
+       schermen -- boven de veeggrens van scripts/schermen.js, waardoor de toets
+       als veegtoets telde en zijn eigen acht schermen niet meer meetelden.
+       test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -101,7 +109,15 @@ test('Balans: het welzijnsscherm belooft geen streaks, en heeft ze ook niet',
   let browser;
   try {
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
+    /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
+       dan hij denkt: de RTF-schil registreert een service worker die tientallen
+       schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
+       DEZE toets ze heeft afgelegd. Bij rtfkinderschermen liep dat op tot 55
+       schermen -- boven de veeggrens van scripts/schermen.js, waardoor de toets
+       als veegtoets telde en zijn eigen acht schermen niet meer meetelden.
+       test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
 

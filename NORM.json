@@ -92,7 +92,7 @@
       "datum": "2026-08-03",
       "meter": "zelfpoortendeToetsen 72 -> 73",
       "reden": "Met de hand verhoogd voor test/klankwerk.e2e.js: een schermtoets die tijdens de deelmenu-uitrol is bijgeschreven omdat klankwerk.html alleen een server-toets had. Hij opent een stuk, zet een stap en een noot, vraagt een voorstel en meet offline na dat de klankmotor er echt geluid van maakt.",
-      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de drie tanden hiervoor: het bestand staat achter de browserpoort en kan zichzelf overslaan, maar test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml. Deze toets is geschreven door een uitrol-agent, niet door mij; ik heb hem gedraaid (groen) maar zijn beweringen NIET met een eigen mutatie nagetrokken -- dat is regel 2 en staat hier open."
+      "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de drie tanden hiervoor: het bestand staat achter de browserpoort en kan zichzelf overslaan, maar test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml. Deze toets is geschreven door een uitrol-agent, niet door mij; ik heb hem gedraaid (groen) maar zijn beweringen NIET met een eigen mutatie nagetrokken -- dat is regel 2 en staat hier open. NAGEKOMEN 2026-08-04: alsnog nagetrokken met drie mutaties op de productcode, alle drie RAAK -- de klankmotor stilzetten (piek 0 van 32767), het tempo van Rahuls voorstel niet overnemen, en de noot niet in de notenrol laten landen. Daarna drie keer groen. TAKEN 6.1 is daarmee gesloten."
     },
     {
       "datum": "2026-08-03",

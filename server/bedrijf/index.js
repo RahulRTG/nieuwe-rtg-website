@@ -172,5 +172,7 @@ module.exports = (kern) => {
   require('./vlag')(sctx);
   Object.assign(sctx, require('./it')(sctx));
   require('./uitdienst')(sctx);
+  Object.assign(sctx, require('./contract')(sctx));
+  Object.assign(sctx, require('./besluit')(sctx));
   return sctx;
 };

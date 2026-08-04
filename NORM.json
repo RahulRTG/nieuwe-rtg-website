@@ -8,8 +8,8 @@
     "dependencies": 0,
     "testbestanden": 507,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 95,
-    "e2eBestanden": 57,
+    "zelfpoortendeToetsen": 102,
+    "e2eBestanden": 59,
     "keuringOmvang": 67,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
@@ -17,9 +17,16 @@
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 11,
-    "schermenZonderToets": 48
+    "schermenZonderToets": 15
   },
   "notities": [
+    {
+      "datum": "2026-08-04",
+      "meter": "zelfpoortendeToetsen 95 -> 102",
+      "reden": "Zeven schermtoetsen erbij: test/ledenschermen.e2e.js (drie) en test/werkschermen.e2e.js (vier). Zelfde poort als de vierenzestig die er al stonden. schermenZonderToets ging in deze ronde van 71 naar 15, en de hele e2e-suite is groen: 106 toetsen, 106 geslaagd.",
+      "eerlijkheidshalve": "Zes mutaties, alle zes RAAK. De scherpste is de eerlijkheidsmelding op het bureaublad: index.html zegt dat dit een demo is EN wat er precies uit staat (betalingen, bestellingen, boardroom). Ik heb die opsomming weggehaald en 'Demo' laten staan -- de toets zakte, en dat is precies de bedoeling: een vage demo-melding laat een lid gissen of zijn bestelling is doorgegaan. Verder gevangen: daten niet meer op codenaam, techniek dat verzwijgt dat hij beveiligd is, en de Societeit die weer wegstuurt.",
+      "eerderVastgelegd": "zelfpoortendeToetsen 90 -> 95"
+    },
     {
       "datum": "2026-08-04",
       "meter": "zelfpoortendeToetsen 90 -> 95",

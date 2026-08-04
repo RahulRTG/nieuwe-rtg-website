@@ -180,12 +180,21 @@
   <button class="neon" data-terug type="button">Terug naar het menu</button>
 </div>
 
+<script src="/shared/deur.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
   let sess = null;
   try { sess = JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); } catch (e) {}
-  if (!sess || !sess.token) { location.href = '/apps/foundation/index.html'; return; }
+  /* De deur op de Societeit zelf; wie hier zonder gezinssessie kwam landde op
+     de RTF-startpagina en zag niet meer waar hij heen wilde (TAKEN 5.5). */
+  if (!sess || !sess.token) {
+    if (!window.RTGDeur) { location.href = '/apps/foundation/index.html'; return; }
+    setTimeout(function () {
+      RTGDeur.toon(document.getElementById('main') || document.body, { soort: 'gezin' });
+    }, 0);
+    return;
+  }
 
   /* ---------- kaarslicht op de achtergrond ---------- */
   const doek = $('#doek'), ctx = doek.getContext('2d');

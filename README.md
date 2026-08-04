@@ -465,6 +465,73 @@ Een leven lang leren op een eigen motor, van kleuterklas tot universiteit en daa
 
 Vaste eerlijkheidsregels, in code en tests verankerd: RTG School is geen school of examenbureau (diploma's en examens lopen via de officiële instellingen); cijfervoorstellen zijn advies (een mens beslist); een toets verklikt niet halverwege; geen scores buiten de sessie, geen reeksen, geen ranglijsten -- leren is geen wedstrijd.
 
+#### De enterprise-laag: het hele schoolbedrijf, niet alleen de klas
+
+Bovenop het schoolkanaal draait een volledige enterprise-laag, in acht delen,
+allemaal onder `/api/foundation/school/...` en in modules van 4-9 KB
+(`server/school/`). De poort eronder is één functie: `poort(req, res, recht)`
+uit `school/rollen.js`, die het beheer-token van de school (directie) of een
+personeel-token met de juiste rol accepteert.
+
+| deel | modules | wat erin zit |
+|---|---|---|
+| **Rollen & rechten** | `rollen.js` | veertien rollen (leerling t/m systeembeheerder), een rechtenmatrix, het inzagejournaal per school |
+| **School Core** | `inschrijving.js`, `inschrijving-mutatie.js`, `dossier.js`, `organisatie.js` | aanmelding, wachtlijst, plaatsing, uitschrijving, overstap, leerlingdossier met contact- en gezinsgegevens, documenten/diploma's, zorgdeel, vestigingen, opleidingen, schooljaarovergang |
+| **Learning** | `rapport.js`, `rapport-tekst.js` | periodrapporten, conceptteksten (AI = advies), vaststellen door een mens, studievoortgang, individuele leerdoelen en remedial teaching (in het zorgdeel) |
+| **Communicatie** | `omroep.js` | nieuwsbrief (meertalig), automatische herinneringen, vakgroepgesprek; bellen en videobellen zaten al in `bellen.js` |
+| **Aanwezigheid & veiligheid** | `aanwezigheid.js`, `veiligheid.js`, `veiligheid-incident.js` | presentie per les, te laat, verlofaanvraag met besluit, toegangspassen, bezoekers, incidentregistratie, ontruimingslijst, calamiteitenmelding |
+| **Finance** | `financien.js`, `financien-beheer.js` | schoolgeld en ouderbijdragen als factuur, betaallink, terugbetaling, kantinesaldo, budgetten, subsidies, debiteuren, rapportage en boekhoudexport |
+| **HR** | `hr.js`, `hr-verlof.js` | personeelsdossier, contract, bevoegdheden en trainingen, verlof en ziekte, vervanging, urenregistratie, gesprekken |
+| **AI & Analytics** | `analyse.js`, `analyse-signalen.js` | directiedashboard, waarschuwingen met hun eigen rekensom, signalen rond een leerling |
+| **Koppelingen & portaal** | `koppelingen.js`, `ouderportaal.js`, `ouderportaal-mijn.js` | integratieregister met veldkeuze, webhookregistratie, export, toestemmingsformulieren, gespreksafspraken, het gezinsoverzicht |
+
+Schermen: de directiepanelen staan in `/apps/schoolpartner.html`
+(`schoolpartner/enterprise.js` + `enterprise-beheer.js`), de ouder- en
+leerlingkant in `/apps/foundation/school.html`
+(`foundation/school-portaal.js`).
+
+**De acht regels die deze laag anders maken dan een standaardpakket.** Ze staan
+niet in een folder maar in code, en `test/schoolenterprise.test.js`,
+`test/schoolaanwezig.test.js`, `test/schoolgeld.test.js` en
+`test/schoolbeeld.test.js` (28 toetsen) laten ze zakken zodra ze niet meer waar
+zijn:
+
+1. **Geld raakt nooit het onderwijs.** Er is geen functie die een leerling
+   afsluit wegens een openstaande post; elk financieel antwoord draagt
+   `blokkeertOnderwijs: false`. Een leeg kantinesaldo weigert geen eten (het
+   verschil wordt een factuur), en een vrijwillige ouderbijdrage wordt hooguit
+   één keer herinnerd -- vaker vragen maakt vrijwillig alsnog verplicht.
+2. **Het zorgdeel gaat alleen open met een reden.** Zorg, incidenten,
+   personeelsdossiers en de export vragen een reden en schrijven een regel in
+   het journaal: wie, wanneer, waarover en waarom -- nooit wat er stond, want
+   dan was het journaal een tweede, ongeschermde kopie van het dossier.
+3. **De systeembeheerder komt niet in dossiers.** Hij beheert koppelingen en
+   leest het journaal; leerlinggegevens, zorg en geld staan voor hem dicht.
+4. **Geen loopspoor.** Van een toegangspas wordt alleen de HUIDIGE stand
+   bewaard (binnen/buiten, sinds wanneer, welke ingang) plus een dagteller. Er
+   is dus geen endpoint dat "waar was dit kind vandaag" kan beantwoorden. De
+   ontruimingslijst valt terug op de presentie van vandaag als een school geen
+   poortjes heeft.
+5. **Een rapport stelt een mens vast.** De AI schrijft hooguit een concept (met
+   de bron erbij, en zonder sleutel een feitelijke opzet uit de cijfers); er is
+   geen route die publiceert zonder dat iemand bevestigt de teksten te hebben
+   gelezen. De gezinskant toont alleen vastgestelde rapporten.
+6. **Geen voorspelling, geen ranglijst.** De signalen rond een leerling zijn
+   factoren met een natrekbare uitleg ("6 van 16 lessen gemist in zestig
+   dagen"), zonder score en zonder volgorde op zwaarte. Een waarschuwing noemt
+   zijn eigen rekensom en zwijgt onder de tien lesregistraties.
+7. **Een koppeling noemt wat hij deelt.** Velden kies je uit een vaste lijst;
+   zorg, incidenten, de hulplijn en het journaal staan er niet in en zijn er
+   niet aan toe te voegen. Zonder veldkeuze gaat een koppeling niet aan.
+8. **Toestemming is intrekbaar, en geen antwoord is geen toestemming.** Dat
+   laatste staat ook zo in het overzicht van de school.
+
+Wat er (nog) **niet** is, om dezelfde reden dat de rest hier staat: de
+webhook-laag registreert abonnementen maar **bezorgt nog niets** (het antwoord
+zegt dat zelf met `bezorgtNu: false`), er is geen automatische incasso-run (een
+factuur draagt wel de vlag), en tevredenheid staat als `null` op het dashboard
+omdat RTG School het nergens meet.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.

@@ -22,4 +22,6 @@ module.exports = (kern) => {
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
   require('./horeca/betalen')(ctx);    // korting, fooi, betalen, oninbaar
   require('./horeca/bonnen')(ctx);     // cadeaubon en tegoed, offline-sync, happy hour
+  require('./horeca/keuken')(ctx);     // het keukenscherm: stations en standen
+  require('./horeca/keuken-regie')(ctx); // het regiescherm van de chef en de drukterem
 };

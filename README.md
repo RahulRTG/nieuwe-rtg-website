@@ -650,6 +650,41 @@ staat de allergie erbij), wat is uitgegeven verdwijnt van de pas, en roomservice
 die op de kamer wordt geboekt komt op de gastrekening van diezelfde kamer
 terecht.
 
+### RTG Werk OS (de werkplek van een organisatie)
+
+`server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**
+per organisatie (holdings met dochters eronder), met eigen leden, rollen,
+journaal en startscherm -- zodat dit ook aan een andere organisatie te geven is.
+
+| Module | Wat erin zit |
+| --- | --- |
+| Werkruimte | leden (aanmelden is niet binnen zijn), rollen met een venster van/tot, journaal, uit dienst |
+| Projecten | projecten, taken, subtaken, afhankelijkheden, kanban, uren, budget |
+| Kennis | artikelen met eigenaar, houdbaarheidsdatum, versie en afscherming |
+| Klanten | klanten met hun RTG-producten, verkoopkansen, gewogen pijplijn |
+| Service | tickets met twee SLA-klokken, storingen, evaluatie, tevredenheid |
+| Bouw | repositories, issues, releases per omgeving, feature flags |
+| IT | apparaten, licenties, het uitdienstproces in zes stappen |
+| Recht | contractbibliotheek met een uitgerekende laatste opzegdag |
+| Governance | voorstel, adviesronde, stemronde, besluit met evaluatiemoment |
+| Beeld | het directiebeeld en de geconsolideerde blik over dochters |
+
+Wat deze laag met opzet **niet** doet: geen tweede Docs, chat, agenda of
+loonrun. Die staan al in dit huis (`kern/office/` met zes documentsoorten,
+`routes/rtmail.js`, `routes/agenda.js`, `routes/payroll.js`, `kern/klok.js`,
+`kern/facturatie.js`, `routes/sso.js`, `routes/scim.js`) en worden
+**aangesloten**: een lid koppelt eenmalig zijn eigen RTG-account en ziet daarna
+zijn agenda, postvak en kluis op zijn werkstartscherm -- met tellingen en
+titels, nooit de inhoud.
+
+De regels die de laag dragen staan in de code en niet in een handleiding:
+voortgang wordt geteld en nooit ingevuld; een cirkel in de afhankelijkheden
+wordt geweigerd; naar productie gaat alleen wat groen is, met een mens die
+tekent; een feature flag zonder opruimdatum bestaat niet; de laatste opzegdag
+wordt uitgerekend uit de einddatum en de opzegtermijn; stemmen kan pas na de
+adviesronde en het beheer-token stemt niet; en wat niet gemeten wordt staat
+overal als **niet gemeten** in plaats van als nul.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.

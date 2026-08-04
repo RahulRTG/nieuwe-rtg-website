@@ -53,8 +53,37 @@ const DREMPEL = 10;          // mutaties na de load; zie de meting hierboven
    iets aan toevoegt, zet de reden erbij; een lijst die stil groeit is precies
    hoe een toets zijn tanden verliest. */
 const MAG_STIL = new Map([
-  ['/site/404.html', 'een statische foutpagina: geen JS, en dat hoort zo']
+  ['/site/404.html', 'een statische foutpagina: geen JS, en dat hoort zo'],
+  ['/apps/juridisch/privacy.html', 'lopende juridische tekst: negenduizend woorden die er gewoon staan, zonder API en zonder opbouw. Wat er WEL in moet staan bewaakt test/juridischeschermen.e2e.js'],
+  ['/apps/juridisch/partnervoorwaarden.html', 'idem: lopende tekst, bewaakt door test/juridischeschermen.e2e.js']
 ]);
+
+/* WAAROM DEZE TOETS MET EEN SESSIE MEET
+
+   Hij deed dat niet, en daar liep hij op vast: eenentwintig schermen stonden
+   als "dood" te boek terwijl ze alleen maar dicht waren. Zonder inlog KAN een
+   ledenapp niets doen -- hij toont een eerlijke melding ("Log eerst in op de
+   leden-app") en zwijgt verder. Dat is een scherm dat zijn werk doet.
+
+   Het cijfer maakte het extra broos. De kop hieronder zegt dat tussen "dood" en
+   het stilste levende scherm niets zat, met 54 als ondergrens; inmiddels bouwde
+   elk uitgelogd scherm zijn gedeelde schil op en landde daarmee rond de acht a
+   negen mutaties -- vlak onder de drempel van tien. Welke schermen zakten hing
+   dan af van de timing van die ene run: de ene keer camera.html, de andere keer
+   agenda.html en wallet.html. Een toets die per run iets anders aanwijst, wijst
+   niets aan.
+
+   Met een gewone ledensessie erin is er nog EEN scherm zonder api-aanroep
+   (/site/404.html, en dat staat met reden op MAG_STIL). De rest doet gewoon
+   zijn werk. Een tussenoplossing met een lijst van "dicht en dus vrijgesteld"
+   schermen is daarmee vervallen -- die stond hier even, en hij was overbodig
+   zodra de meting klopte. Wat de toets vangt is onveranderd: een scherm dat
+   opengaat en waarvan de JS niets doet.
+
+   Wat dit NIET dekt: apps achter een ANDERE deur (zaak, leverancier, kantoor,
+   gezin) draaien hier op een ledensessie en tonen dus hun eigen deur. Dat ze
+   dat netjes doen ligt vast in test/kantoordeuren.e2e.js en
+   test/rtfkinderschermen.e2e.js. */
 
 function laadBrowser() {
   for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
@@ -90,6 +119,20 @@ test('elk scherm geeft een teken van leven', { skip: pw ? false : 'geen browser 
   const stilste = [];    // voor het rapport: waar zit de ondergrens vandaag
   try {
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const u = Date.now().toString().slice(-8);
+    const lid = await fetch(base + '/api/auth/register', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Levenlid', email: 'lv' + u + '@x.nl', phone: '06' + u,
+        password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' }) }).then(r => r.json());
+    /* Zonder sessie meet deze toets iets anders dan hij beweert: uitgelogd doen
+       de meeste schermen terecht niets, en dan vallen er zeventien om met de
+       melding "dood" terwijl er alleen een token ontbreekt. Dat is de valse
+       uitslag waar LAT-regel 3 over gaat -- een meter hoort te zakken als zijn
+       invoer ontbreekt, maar dan MET de goede reden. Vandaar deze harde stop:
+       liever hier duidelijk klappen dan verderop zeventien schermen ten onrechte
+       beschuldigen. */
+    assert.ok(lid && lid.token, 'de ledensessie is aangemaakt -- zonder token meet deze toets de verkeerde stand: ' +
+      JSON.stringify(lid).slice(0, 160));
     const banen = 4;
     const werk = Array.from({ length: banen }, () => []);
     paginas.forEach((p, i) => werk[i % banen].push(p));
@@ -100,13 +143,14 @@ test('elk scherm geeft een teken van leven', { skip: pw ? false : 'geen browser 
       /* De teller wordt VOOR elke navigatie opnieuw gezet (addInitScript draait
          bij elke load) en begint pas bij DOMContentLoaded: wat de browser zelf
          tijdens het parsen bouwt, telt niet mee. Alleen wat de JS daarna doet. */
-      await page.addInitScript(() => {
+      await page.addInitScript((tok) => {
+        try { if (tok) localStorage.setItem('rtg_member_token', tok); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
         window.__mut = 0;
         addEventListener('DOMContentLoaded', () => {
           new MutationObserver(ms => { window.__mut += ms.length; })
             .observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
         });
-      });
+      }, lid && lid.token);
       for (const p of lijst) {
         let api = 0;
         const tel = r => { try { if (new URL(r.url()).pathname.startsWith('/api/')) api++; } catch (e) {} };

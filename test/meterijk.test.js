@@ -210,6 +210,55 @@ const IJKINGEN = {
     }
   },
 
+  /* DE DRIE GRENSMETERS. Geijkt op een VERZONNEN bron en niet op de repo: de
+     teller krijgt een stukje code te lezen dat ik zelf schrijf, dus ik weet het
+     antwoord vooraf. Een meter die alleen zijn eigen routemap kan lezen, is niet
+     te ijken -- dan meet je of hij draait en niet of hij ziet. */
+  kernBreedte: {
+    proef: () => {
+      const grenzen = require('../scripts/grenzen');
+      const een = grenzen.bereikVan('module.exports = (kern) => { const { app, db, save } = kern; };');
+      assert.deepEqual([...een].sort(), ['app', 'db', 'save'], 'een destructurering wordt geteld');
+      const twee = grenzen.bereikVan('module.exports = (kern) => { kern.app.get("/x", () => kern.db); };');
+      assert.deepEqual([...twee].sort(), ['app', 'db'], 'losse kern.x-toegang ook');
+      /* En de wringer: een naam die alleen in COMMENTAAR of in een TEKENREEKS
+         staat, telt niet mee. Precies deze fout zat al drie keer in een meter
+         van dit huis. */
+      const drie = grenzen.bereikVan('/* kern.geheim */ const s = "kern.ooknietecht";\nmodule.exports = (kern) => { const { app } = kern; };');
+      assert.deepEqual([...drie], ['app'], 'commentaar en tekst tellen niet mee: ' + [...drie].join(','));
+      return een.size;
+    }
+  },
+  kernGedeeld: {
+    /* Twee verzonnen domeinen die EEN naam delen. Dat is het hele begrip: een
+       eigenschap die meer dan een domein aanraakt is koppeling; een die maar
+       een domein aanraakt hoort in dat domein. */
+    proef: () => {
+      const grenzen = require('../scripts/grenzen');
+      const a = grenzen.bereikVan('const { app, eigenA } = kern;');
+      const b = grenzen.bereikVan('const { app, eigenB } = kern;');
+      const samen = new Map();
+      for (const [d, set] of [['a', a], ['b', b]]) for (const n of set) {
+        if (!samen.has(n)) samen.set(n, new Set());
+        samen.get(n).add(d);
+      }
+      const gedeeld = [...samen.entries()].filter(([, ds]) => ds.size > 1).map(([n]) => n);
+      assert.deepEqual(gedeeld, ['app'], 'alleen de gedeelde naam telt als koppeling');
+      return gedeeld.length;
+    }
+  },
+  kernBreedsteBestand: {
+    proef: () => {
+      const grenzen = require('../scripts/grenzen');
+      const namen = Array.from({ length: 42 }, (_, i) => 'n' + i);
+      const breed = grenzen.bereikVan('const { ' + namen.join(', ') + ' } = kern;');
+      assert.equal(breed.size, 42, 'een breed bestand wordt op zijn volle breedte geteld');
+      const smal = grenzen.bereikVan('const { app } = kern;');
+      assert.equal(smal.size, 1, 'en een smal bestand op een');
+      return breed.size - smal.size;
+    }
+  },
+
   dependencies: {
     /* De enige meter waarvan de bron een bestand is dat we ook echt even
        veranderen. Terugzetten gebeurt uit de tekst die we vooraf lazen, niet

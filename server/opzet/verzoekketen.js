@@ -120,11 +120,18 @@ module.exports = function verzoekketen(deps) {
     next();
   });
 
+  /* De liegpoort (./liegpoort.js) doet niets zonder RTG_LIEG. Staat die wel,
+     dan laat hij de gekozen endpoints een geldig maar LEEG antwoord geven --
+     zodat scripts/leugendetector.js kan meten welke endpoints kunnen liegen
+     zonder dat een toets rood wordt. Hij staat na de poortwachters (een leugen
+     achter een dichte deur zegt niets) en voor de routes. */
+  const lieg = require('./liegpoort')({ app, log });
+
   require('./lijfpoort')({ app, express, db, save, log, betaal, muntbetaal,
     opslagKlaar, zaakdoos, muntenVan, settleFactuurVan });
 
   return {
-    schild, zetWacht,
+    schild, zetWacht, lieg,
     ssrf: require('../kern/ssrf'), // SSRF-afweer voor client-bepaalde uitgaande doelen
     zetRtgai: (r) => { rtgaiMeelezer = r; }
   };

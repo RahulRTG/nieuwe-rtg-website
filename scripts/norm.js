@@ -102,6 +102,27 @@ const METERS = [
      groeit vanzelf (routes schrijven is stap een, de catalogus bijwerken stap
      twee), dus het hoort aan een ratel. scripts/schakelbaar.js meet het. */
   { sleutel: 'routesNietSchakelbaar', richting: 'omlaag', wat: 'API-routes die niet vanuit de boardroom te schakelen zijn' },
+  /* DE GRENZEN TUSSEN DE DOMEINEN (scripts/grenzen.js).
+
+     server.js geeft elke router hetzelfde object `kern` met ruim driehonderd
+     eigenschappen. Er is dus geen grens: elk domein kan bij alles van elk ander.
+     Dat is niet op te lossen door code te verplaatsen -- server.js ging van 183
+     naar 103 kB en de verstrengeling bleef exact gelijk. Wat ontbrak was een
+     getal.
+
+     Wat de meting liet zien, en waarom dit oplosbaar is: van de 951 aangeraakte
+     eigenschappen wordt 85% door PRECIES EEN domein gebruikt. Slechts 26 door
+     vijf of meer -- app, auth, supplierAuth, db, save, crypto. Dat laatste
+     lijstje is een echte interface. De zak is gedeeld, de inhoud niet.
+
+     `kernGedeeld` is de meter die telt: eigenschappen die meer dan een domein
+     aanraakt. Omlaag brengen betekent dat een domein iets van zichzelf
+     terugneemt, en dat is precies wat "een domein kan als eigen proces draaien"
+     waar moet maken. `kernBreedsteBestand` pakt de andere kant: een routebestand
+     dat honderdnegenendertig namen nodig heeft, weet niet wat het is. */
+  { sleutel: 'kernBreedte', richting: 'omlaag', wat: 'kern-eigenschappen die routes aanraken' },
+  { sleutel: 'kernGedeeld', richting: 'omlaag', wat: 'kern-eigenschappen die MEER dan een domein aanraakt (de echte koppeling)' },
+  { sleutel: 'kernBreedsteBestand', richting: 'omlaag', wat: 'namen die het breedste enkele routebestand uit kern haalt' },
   /* DEZE METER WAS EEN GEBLENDE TELLER, precies zoals keuringBeter dat was, en
      hij liep om dezelfde reden vast: hij telde twee onvergelijkbare dingen bij
      elkaar op, en de ene groep botste met een ANDERE meter in deze lijst.
@@ -358,6 +379,12 @@ function meet() {
   })(PUB);
   const inlineStijlAttributen = telInlineStijl(p => fs.readFileSync(p, 'utf8'), stijlBestanden);
 
+  /* De grenzen uit dezelfde bron als het losse script (regel 4: geen tweede
+     implementatie). Faalt hij, dan zakt de meter in plaats van stil nul te geven. */
+  let grenzen;
+  try { grenzen = require('./grenzen').meet(); }
+  catch (e) { throw new Error('de grenzen konden niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
+
   /* De schakelbaarheid uit dezelfde bron als het losse script: een tweede
      implementatie zou binnen een week uiteenlopen (regel 4). */
   let routesNietSchakelbaar = 0;
@@ -412,6 +439,8 @@ function meet() {
     keuringStuk: k.stuk, keuringScheef: k.scheef,
     keuringTeGroot: (k.cijfers.uitschieters || {}).teGroot || 0,
     ...telPerGroep(k),
+    kernBreedte: grenzen.kernBreedte, kernGedeeld: grenzen.kernGedeeld,
+    kernBreedsteBestand: grenzen.kernBreedsteBestand,
     dependencies: deps, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen
   };

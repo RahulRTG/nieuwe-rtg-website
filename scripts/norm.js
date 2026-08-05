@@ -102,7 +102,32 @@ const METERS = [
      groeit vanzelf (routes schrijven is stap een, de catalogus bijwerken stap
      twee), dus het hoort aan een ratel. scripts/schakelbaar.js meet het. */
   { sleutel: 'routesNietSchakelbaar', richting: 'omlaag', wat: 'API-routes die niet vanuit de boardroom te schakelen zijn' },
-  { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan als een dienst ontbreekt' },
+  /* DEZE METER WAS EEN GEBLENDE TELLER, precies zoals keuringBeter dat was, en
+     hij liep om dezelfde reden vast: hij telde twee onvergelijkbare dingen bij
+     elkaar op, en de ene groep botste met een ANDERE meter in deze lijst.
+
+     Een toets kan zichzelf om twee heel verschillende redenen overslaan:
+
+     1. ER MIST EEN DIENST (Postgres, Redis, openssl). Dat is het gat waar deze
+        meter voor is gemaakt: acht pg-toetsbestanden telden maandenlang mee als
+        dekking zonder ooit te draaien. Zeventien aanroepen, allemaal in
+        *.test.js, en dit getal mag alleen omlaag.
+     2. ER MIST EEN BROWSER. Elke *.e2e.js begint met `{ skip: pw ? false : ... }`.
+        Honderdeen aanroepen. Die staan er niet uit slordigheid maar zodat wie
+        de suite zonder Playwright draait geen muur van rood krijgt -- en het
+        risico dat daarbij hoort is AL gedekt: test/browserpoort.e2e.js slaat
+        zichzelf nooit over en zakt hard zodra RTG_E2E_STRICT=1 staat en er geen
+        browser is. Dat staat in CI aan.
+
+     Samen geteld werkte de ratel tegen zichzelf: een schermtoets toevoegen liet
+     e2eBestanden stijgen (goed, want die moet omhoog) EN zelfpoortendeToetsen
+     stijgen (fout, want die moet omlaag). Twee tanden die tegengesteld
+     reageren op dezelfde verbetering.
+
+     Apart geteld is dit niet losser maar STRAKKER: de dienstgroep ratelt nu op
+     17 in plaats van te mogen wegvallen tegen de honderdeen browsergevallen. */
+  { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan omdat een DIENST ontbreekt (Postgres, Redis, openssl)' },
+  { sleutel: 'browserpoortToetsen', richting: 'omhoog', wat: 'schermtoetsen achter de browserpoort (bewaakt door test/browserpoort.e2e.js)' },
   { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' },
   /* DE LAATSTE unsafe-inline IN DE CSP, geteld in plaats van beschreven.
 
@@ -232,6 +257,30 @@ function telOngeijkt(ijkBron, extraSleutels) {
   }).length;
 }
 
+/* De skips geteld en meteen in twee bakken gesorteerd. Losse functie met de
+   bestandslijst en een lezer als invoer, zodat test/meterijk.test.js hem met een
+   verzonnen bestand kan voeden -- een meter die alleen zijn eigen testmap kan
+   lezen, is niet te ijken.
+
+   De sortering gaat op BESTANDSSOORT en niet op de tekst van de reden, en dat is
+   geen luiheid: de reden staat in een tekenreeks, en die is er bij het tellen al
+   uitgewassen (zie zonderTekst hieronder -- dat moest, anders telde de ijking
+   zijn eigen voorbeeldregel mee). Nagemeten over de hele testmap: alle
+   honderdeen browsergevallen staan in *.e2e.js en alle zeventien dienstgevallen
+   in *.test.js. De grens loopt daar dus precies. */
+function telSkips(bestanden, lees) {
+  const uit = { dienst: 0, browser: 0 };
+  for (const f of bestanden) {
+    const bron = String(lees(f));
+    let n = 0;
+    for (const m of bron.matchAll(/\{\s*skip\s*:\s*([^}]+)\}/g)) if (!/^false\s*$/.test(m[1])) n++;
+    // test.skip(...) / it.skip(...): de harde vorm, altijd overgeslagen
+    n += (bron.match(/\b(?:test|it)\.skip\s*\(/g) || []).length;
+    if (f.endsWith('.e2e.js')) uit.browser += n; else uit.dienst += n;
+  }
+  return uit;
+}
+
 function meet() {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -290,15 +339,10 @@ function meet() {
      de hele testmap: alleen meterijk.test.js verandert, 78 -> 77). */
   const zonderTekst = (b) => String(b)
     .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
-  let zelfpoortendeToetsen = 0;
-  for (const f of inMap.filter(n => /\.(test|e2e)\.js$/.test(n))) {
-    const bron = zonderTekst(zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8')));
-    for (const m of bron.matchAll(/\{\s*skip\s*:\s*([^}]+)\}/g)) {
-      if (!/^false\s*$/.test(m[1])) zelfpoortendeToetsen++;
-    }
-    // test.skip(...) / it.skip(...): de harde vorm, altijd overgeslagen
-    zelfpoortendeToetsen += (bron.match(/\b(?:test|it)\.skip\s*\(/g) || []).length;
-  }
+  const skips = telSkips(inMap.filter(n => /\.(test|e2e)\.js$/.test(n)),
+    (f) => zonderTekst(zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8'))));
+  const zelfpoortendeToetsen = skips.dienst;
+  const browserpoortToetsen = skips.browser;
 
   /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
   const PUB = path.join(WORTEL, 'public');
@@ -368,7 +412,7 @@ function meet() {
     keuringStuk: k.stuk, keuringScheef: k.scheef,
     keuringTeGroot: (k.cijfers.uitschieters || {}).teGroot || 0,
     ...telPerGroep(k),
-    dependencies: deps, testbestanden, zelfpoortendeToetsen, e2eBestanden,
+    dependencies: deps, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen
   };
 }
@@ -573,4 +617,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl };
+module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };

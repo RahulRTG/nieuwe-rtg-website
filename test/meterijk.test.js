@@ -149,6 +149,24 @@ const IJKINGEN = {
       "test('ijk', { skip: aan ? false : 'geen dienst' }, () => {});\n",
       () => norm.meet().zelfpoortendeToetsen - voor.zelfpoortendeToetsen)
   },
+  browserpoortToetsen: {
+    /* DE TWEEDE HELFT VAN DEZELFDE TELLING, en de proef staat er vooral om de
+       GRENS te bewijzen: dezelfde skip-regel hoort in een *.e2e.js in de
+       browserbak te vallen en in een *.test.js in de dienstbak. Zonder deze
+       proef zou een verschuiving van die grens ongemerkt de ene meter leeghalen
+       en de andere vullen -- en dan ratelt er niets meer. */
+    proef: () => {
+      const regel = "test('ijk', { skip: pw ? false : 'geen browser' }, () => {});";
+      const alsE2e = norm.telSkips(['x.e2e.js'], () => regel);
+      const alsToets = norm.telSkips(['x.test.js'], () => regel);
+      assert.deepEqual(alsE2e, { dienst: 0, browser: 1 }, 'in een *.e2e.js telt hij als browsergepoort');
+      assert.deepEqual(alsToets, { dienst: 1, browser: 0 }, 'in een *.test.js als dienstgepoort');
+      // en skip: false is geen poort maar een open deur
+      assert.deepEqual(norm.telSkips(['y.e2e.js'], () => "test('x', { skip: false }, () => {});"),
+        { dienst: 0, browser: 0 }, 'skip: false telt niet mee');
+      return alsE2e.browser;
+    }
+  },
   keuringOmvang: {
     // een productbestand vlak onder de 10 kB-grens hoort opgemerkt te worden
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',

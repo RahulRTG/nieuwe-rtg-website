@@ -134,77 +134,12 @@ module.exports = ({ db, save, crypto, rtmail, vrij }) => {
   }
 
   /* ---------- instellingen ---------- */
-  function instellingen(adres) {
-    const i = vakInst(adres, false);
-    return { handtekening: i.handtekening || '', afwezig: i.afwezig || null, aliassen: i.aliassen || [] };
-  }
-  function zetHandtekening(adres, tekst) {
-    const i = vakInst(adres, true);
-    if (!i) return { error: 'Dit postvak is niet te bepalen.' };
-    i.handtekening = kap(tekst, 500);
-    save();
-    return { ok: true, handtekening: i.handtekening };
-  }
-  /* Afwezigheid: tekst plus een venster. Zonder tot-datum staat hij aan tot
-     iemand hem uitzet -- dat is een keuze en geen omissie, want een
-     afwezigheidsbericht dat vanzelf verloopt terwijl u nog weg bent, is erger. */
-  function zetAfwezig(adres, { aan, tekst, van, tot } = {}) {
-    const i = vakInst(adres, true);
-    if (!i) return { error: 'Dit postvak is niet te bepalen.' };
-    if (aan === false) { i.afwezig = null; save(); return { ok: true, afwezig: null }; }
-    const t = kap(tekst, 1000).trim();
-    if (!t) return { error: 'Wat moet er in het afwezigheidsbericht staan?' };
-    const dat = (x) => { if (!x) return null; const d = new Date(x); return isNaN(d.getTime()) ? undefined : d.toISOString(); };
-    const v = dat(van), o = dat(tot);
-    if (v === undefined || o === undefined) return { error: 'Dat is geen tijdstip.' };
-    if (v && o && v > o) return { error: 'De einddatum ligt voor de begindatum.' };
-    i.afwezig = { tekst: t, van: v, tot: o };
-    i.beantwoord = {};   // een nieuw venster begint met een schone lei
-    save();
-    return { ok: true, afwezig: i.afwezig };
-  }
-  function zetAlias(adres, naam, aan) {
-    const i = vakInst(adres, true);
-    if (!i) return { error: 'Dit postvak is niet te bepalen.' };
-    const lokaal = adresLaag.lokaalVan(naam);
-    if (!lokaal) return { error: 'Dit adres kan niet.' };
-    if (adresLaag.GERESERVEERD.includes(lokaal)) return { error: 'Deze naam houdt het huis zelf.' };
-    i.aliassen = (i.aliassen || []).filter(a => a !== lokaal);
-    if (aan !== false) {
-      if (i.aliassen.length >= MAX_ALIASSEN) return { error: 'Meer dan ' + MAX_ALIASSEN + ' aliassen maakt een postvak onnavolgbaar.' };
-      // een alias mag NOOIT het postvak van een ander opvangen
-      const bezet = vrij ? vrij.bezet(lokaal, adresLaag.adresVoor('rtg', lokaal)) : null;
-      if (bezet) return { error: bezet };
-      i.aliassen.push(lokaal);
-    }
-    save();
-    return { ok: true, aliassen: i.aliassen };
-  }
-
-  /* Het afwezigheidsantwoord. Draait bij BEZORGING (kern/rtmail-regels.js roept
-     hem aan) en weigert in vier gevallen: geen afwezigheid, buiten het venster,
-     afzender is het systeem, of deze afzender kreeg dit venster al een antwoord.
-     Die laatste is de lus-rem. */
-  function afwezigAntwoord(naarAdres, bericht) {
-    const i = vakInst(naarAdres, false);
-    const a = i && i.afwezig;
-    if (!a) return null;
-    const t = nu();
-    if (a.van && t < a.van) return null;
-    if (a.tot && t > a.tot) return null;
-    if (!bericht || !bericht.van) return null;
-    if (bericht.van === rtmail.SYSTEEM) return null;
-    if (bericht.soort === 'afwezig') return null;
-    const echt = vakInst(naarAdres, true);
-    if (!echt.beantwoord) echt.beantwoord = {};
-    const sleutel = busVan(bericht.van) || bericht.van;
-    if (echt.beantwoord[sleutel]) return null;
-    echt.beantwoord[sleutel] = t;
-    const m = rtmail.stuur({ van: naarAdres, naar: bericht.van, onderwerp: 'Afwezig: ' + (bericht.onderwerp || ''),
-      tekst: a.tekst, soort: 'afwezig', bron: 'lid' });
-    save();
-    return m && m.id ? m : null;
-  }
+  /* De instellingen van een postvak (handtekening, afwezig, aliassen) staan in
+     ./rtmail-inst.js. Dit bestand gaat over concepten; dat over hoe een postvak
+     zich gedraagt. De gedeelde hulpjes gaan mee naar binnen, zodat er geen
+     tweede versie van busVan of vakInst ontstaat (LAT.md regel 4). */
+  const inst = require('./rtmail-inst')({ save, rtmail, vrij, nu, busVan, vakInst, kap });
+  const { instellingen, zetHandtekening, zetAfwezig, zetAlias, afwezigAntwoord } = inst;
 
   return { bewaar, concepten, gooiWeg, verstuur, losMaken,
     instellingen, zetHandtekening, zetAfwezig, zetAlias, afwezigAntwoord, aliassenVan: (a) => instellingen(a).aliassen };

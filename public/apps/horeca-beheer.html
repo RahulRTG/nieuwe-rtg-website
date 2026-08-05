@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Horeca: beheer</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/apps/horeca/scherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey">RTG Horeca</span><h1>Dag, personeel en signalen</h1></span>
+  <span style="flex:1;"></span>
+  <button class="knop" id="mVerversNu" type="button">Ververs</button>
+</header>
+<main id="main">
+  <div class="kpis">
+    <div class="kpi"><b id="mOmzet">-</b><span>omzet</span></div>
+    <div class="kpi"><b id="mBonnen">-</b><span>bonnen</span></div>
+    <div class="kpi"><b id="mGasten">-</b><span>gasten</span></div>
+    <div class="kpi"><b id="mGemiddeld">-</b><span>per bon</span></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">De dag over alle kanalen</div>
+    <div class="rij">
+      <input class="veld" id="mDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum" style="flex:0 1 11rem;">
+      <button class="knop" id="mDagToon" type="button">Toon</button>
+    </div>
+    <div id="mKanalen" style="margin-top:.6rem;"></div>
+    <div class="kop" style="margin-top:.8rem;">Per betaalwijze</div>
+    <div id="mWijzen"></div>
+    <div class="kop" style="margin-top:.8rem;">Wat apart staat</div>
+    <div id="mApart"></div>
+    <p class="stil" id="mLet" style="margin-top:.4rem;"></p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Signalen (<span id="mSignaalTelling">-</span>)</div>
+    <div id="mSignalen"></div>
+    <p class="stil" id="mSignaalLet" style="margin-top:.4rem;"></p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Fooienpot</div>
+    <div class="rij">
+      <input class="veld" id="pDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de pot" style="flex:0 1 11rem;">
+      <input class="veld" id="pExtra" type="number" min="0" step="0.01" placeholder="Contante fooi erbij" aria-label="Contante fooi" style="flex:0 1 10rem;">
+      <button class="knop p" id="pVerdeel" type="button">Verdelen</button>
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="pNaam1" maxlength="60" placeholder="Naam" aria-label="Naam 1">
+      <input class="veld" id="pUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 1" style="flex:0 1 6rem;">
+      <input class="veld" id="pWeging1" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 1" style="flex:0 1 6rem;">
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="pNaam2" maxlength="60" placeholder="Naam" aria-label="Naam 2">
+      <input class="veld" id="pUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 2" style="flex:0 1 6rem;">
+      <input class="veld" id="pWeging2" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 2" style="flex:0 1 6rem;">
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="pNaam3" maxlength="60" placeholder="Naam" aria-label="Naam 3">
+      <input class="veld" id="pUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 3" style="flex:0 1 6rem;">
+      <input class="veld" id="pWeging3" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 3" style="flex:0 1 6rem;">
+    </div>
+    <div id="pVerdeling" style="margin-top:.6rem;"></div>
+    <p class="stil" id="pPotLet" style="margin-top:.4rem;"></p>
+    <div class="kop" style="margin-top:.8rem;">Eerdere potten</div>
+    <div id="pPotten"></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Loonkosten tegenover omzet</div>
+    <div class="rij">
+      <input class="veld" id="lDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de diensten" style="flex:0 1 11rem;">
+      <button class="knop p" id="pLoon" type="button">Berekenen</button>
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="lNaam1" maxlength="60" placeholder="Naam" aria-label="Dienst 1 naam">
+      <input class="veld" id="lUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 1 uren" style="flex:0 1 6rem;">
+      <input class="veld" id="lUurloon1" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 1 uurloon" style="flex:0 1 7rem;">
+      <select class="veld" id="lAfdeling1" aria-label="Dienst 1 afdeling" style="flex:0 1 8rem;">
+        <option value="zaal">Zaal</option><option value="keuken">Keuken</option>
+        <option value="bar">Bar</option><option value="afwas">Afwas</option>
+      </select>
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="lNaam2" maxlength="60" placeholder="Naam" aria-label="Dienst 2 naam">
+      <input class="veld" id="lUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 2 uren" style="flex:0 1 6rem;">
+      <input class="veld" id="lUurloon2" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 2 uurloon" style="flex:0 1 7rem;">
+      <select class="veld" id="lAfdeling2" aria-label="Dienst 2 afdeling" style="flex:0 1 8rem;">
+        <option value="keuken">Keuken</option><option value="zaal">Zaal</option>
+        <option value="bar">Bar</option><option value="afwas">Afwas</option>
+      </select>
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="lNaam3" maxlength="60" placeholder="Naam" aria-label="Dienst 3 naam">
+      <input class="veld" id="lUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 3 uren" style="flex:0 1 6rem;">
+      <input class="veld" id="lUurloon3" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 3 uurloon" style="flex:0 1 7rem;">
+      <select class="veld" id="lAfdeling3" aria-label="Dienst 3 afdeling" style="flex:0 1 8rem;">
+        <option value="bar">Bar</option><option value="zaal">Zaal</option>
+        <option value="keuken">Keuken</option><option value="afwas">Afwas</option>
+      </select>
+    </div>
+    <div id="lUit" style="margin-top:.6rem;"></div>
+    <p class="stil" id="lLet" style="margin-top:.4rem;"></p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Gastprofielen (<span id="gAantal">-</span>, waarvan <span id="gAllergie">-</span> met allergie)</div>
+    <div class="rij">
+      <button class="knop" id="gToon" type="button">Toon</button>
+    </div>
+    <div id="gLijst" style="margin-top:.6rem;"></div>
+    <p class="stil" style="margin-top:.4rem;">Een gastprofiel bewaart wat nodig is om iemand goed te helpen. Er staat geen waarde-per-gast-score in; die maakt van gastvrijheid een rangorde.</p>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/beheer-dag.js"></script>
+<script src="/apps/horeca/beheer-loon.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

@@ -56,5 +56,10 @@ module.exports = {
     'Bij elke boeking krijg je automatisch alle reisregels van het land mee -- visum, verkeer, alarmnummer en meer.'),
   '/apps/kassa.html': G('De Kassa: een kassa-app voor elke zaak, met een modus per sector.',
     ['Kies de modus die bij de zaak past (bakker, restaurant, discotheek, sportkantine, personeelskantine, groenteboer)', 'Tik artikelen op de bon; weeg-artikelen rekenen per kilo', 'Reken af met contant, een RTG Pay-code of parkeer de bon op een tafel'],
-    'Een kassamodus is een werkvorm, geen keurslijf: wissel gerust als de avond anders loopt dan de ochtend.')
+    'Een kassamodus is een werkvorm, geen keurslijf: wissel gerust als de avond anders loopt dan de ochtend.'),
+  '/apps/horeca.html': G('RTG Horeca: de zaal en de keuken op een scherm.',
+    ['Open een rekening op een tafel en zet de bestelling erop, met de allergie in een eigen veld',
+      'Geef een gang vrij; pas dan verschijnt hij op het keukenscherm, met de gewenste serveertijd',
+      'Splits per persoon of reken af; de som van de delen is altijd exact het geheel'],
+    'De keuken begint pas als de zaal een gang vrijgeeft: zo bepaalt de zaal het tempo van het diner en de keuken dat van de bereiding.')
 };

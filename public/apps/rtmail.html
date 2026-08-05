@@ -77,6 +77,29 @@
   .tag{display:inline-block;font-size:.66rem;letter-spacing:.04em;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.1rem .5rem;margin-right:.35rem;}
   .tag.af{color:#8FD6A6;}
   .fout{font-size:.78rem;color:#E78AA0;margin-top:.5rem;}
+  /* De mappenbalk: vier bestemmingen, en de sluimerteller ernaast. Geen
+     gekleurde vlakken -- het ritme van dit huis is zwart, wit en een accent. */
+  .mapbalk{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;margin:0 0 .6rem;}
+  .mapknp{border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-size:.76rem;font-weight:600;
+    border-radius:999px;padding:.34rem .7rem;cursor:pointer;letter-spacing:.02em;}
+  .mapknp:hover{border-color:var(--gold);color:var(--txt);}
+  .mapknp.aan{color:var(--txt);border-color:var(--gold);}
+  .mtel{margin-left:.4rem;color:var(--gold);font-variant-numeric:tabular-nums;}
+  .mslaap{font-size:.72rem;color:var(--muted);margin-left:auto;}
+  .zoekrij{display:flex;gap:.4rem;align-items:flex-start;margin:0 0 .7rem;}
+  .zoekrij .vld{margin-bottom:0;}
+  .acties{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line);}
+  .ster{color:var(--gold);}
+  .etiket{color:var(--gold);font-size:.7rem;letter-spacing:.03em;}
+  .draadje{border-top:1px solid var(--line);padding-top:.8rem;margin-top:.9rem;}
+  .draadje:first-of-type{border-top:0;padding-top:0;margin-top:.4rem;}
+  .draadje.aangewezen{outline:1px solid var(--gold);outline-offset:6px;}
+  .hulpblok{margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line);}
+  .hulprij{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);
+    color:var(--muted);font:inherit;font-size:.8rem;padding:.5rem 0;cursor:pointer;}
+  .hulprij:hover{color:var(--txt);}
+  .hulplijst{margin:.5rem 0 0;padding-left:1.1rem;font-size:.82rem;color:var(--muted);}
+  .hulplijst li.zwaar{color:var(--txt);}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
@@ -93,6 +116,10 @@ const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 let LIJST=[], TEAM=null, TEAMPOST=[];
+/* De MAP waar je naar kijkt, en de zoekvraag. Ze staan hier en niet in de
+   URL: een postvak is geen pagina om te delen, en een zoekopdracht met
+   andermans post erin zou in een geschiedenis blijven staan. */
+let MAP='in', ZOEK='';
 const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(), dag=86400000;
   if(nu-d<dag && d.getDate()===nu.getDate()) return d.toTimeString().slice(0,5);
   if(nu-d<7*dag) return ['zo','ma','di','wo','do','vr','za'][d.getDay()];
@@ -138,8 +165,10 @@ async function api(pad, body){
 }
 async function laadInbox(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Open de RTG-app en log in; daarna staat je post hier.</p></div>'; return; }
-  let d; try{ d=await api('inbox'); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try{ d = ZOEK ? await api('zoek',{vraag:ZOEK}) : await api('vak',{map:MAP}); }
+  catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   LIJST=d.berichten||[];
+  const tel=d.tellingen||{};
   /* Meenemen: je post is van jou. De app kent zijn eigen model, dus geeft hij
      dat door in plaats van de gedeelde laag het scherm te laten raden -- een
      bericht is een moment, een afzender, een onderwerp en een tekst. Of de
@@ -152,7 +181,7 @@ async function laadInbox(){
       rijen:LIJST.map(m=>[String(m.at).slice(0,10), String(m.at).slice(11,16), m.van,
         m.onderwerp, m.tekst, m.gelezen?'ja':'nee', m.vertrouwd?'ja':'nee']) };
   });
-  if(d.ongelezen){ $('#tel').textContent=d.ongelezen; $('#tel').hidden=false; } else $('#tel').hidden=true;
+  if(tel.ongelezen){ $('#tel').textContent=tel.ongelezen; $('#tel').hidden=false; } else $('#tel').hidden=true;
   /* Je eigen adres bovenaan: het draagt sinds deze ronde welk huis je hoort
      (rtgpass.rtg, lifestyle.rtg, business.rtg, rahultravelgroup.rtg,
      rahultravelfoundation.rtg, partner.rtg of gouvernement.rtg). Het linkerdeel
@@ -161,12 +190,29 @@ async function laadInbox(){
     ? '<div class="noot" style="margin:0 0 .8rem;"><b style="color:var(--txt);font-size:.95rem;">' + esc(d.adres) + '</b><br>' +
       'Dit is je RTMAIL-adres. Het volgt je lidmaatschap: verandert je pas, dan verandert het domein mee, en post aan je vorige adres komt gewoon aan.</div>'
     : '';
-  $('#main').innerHTML = kaart + (LIJST.length ? (
+  /* De mappenbalk. Sluimerende post staat met een eigen teller apart: hij is
+     uit beeld, maar niet weg -- en dat verschil hoort zichtbaar te zijn. */
+  const MAPPEN=[['in','Postvak in','in'],['archief','Archief','archief'],['prullenbak','Prullenbak','prullenbak'],['uit','Verzonden','uit']];
+  const balk = '<div class="mapbalk">'+MAPPEN.map(([id,naam,t])=>
+      '<button class="mapknp'+(MAP===id&&!ZOEK?' aan':'')+'" data-map="'+id+'">'+esc(naam)+
+      (tel[t]?'<span class="mtel">'+tel[t]+'</span>':'')+'</button>').join('')+
+    (tel.sluimert?'<span class="mslaap">'+tel.sluimert+' sluimert</span>':'')+
+    '</div>'+
+    '<div class="zoekrij"><input class="vld" id="zoekVeld" placeholder="Zoek in je eigen postvak" maxlength="120" value="'+esc(ZOEK)+'">'+
+    '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+'</div>'+
+    (ZOEK?'<div class="noot" style="margin:0 0 .8rem;text-align:left;">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
+  $('#main').innerHTML = kaart + balk + (LIJST.length ? (
     '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
     LIJST.map((m,i)=>
-      '<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+(m.van==='rtg@rtmail'?'RTG':esc((m.van||'@').replace('@rtmail','').slice(0,3).toUpperCase()))+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>'
+      '<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+(m.van==='rtg@rtmail'?'RTG':esc((m.van||'@').replace('@rtmail','').slice(0,3).toUpperCase()))+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.favoriet?'<span class="ster">&#9733;</span> ':'')+(m.labels&&m.labels.length?'<span class="etiket">'+esc(m.labels.join(' · '))+'</span> ':'')+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>'
     ).join('')+'<div class="noot">RTMAIL bezorgt en bewaart je post op je codenaam, binnen RTG. Links en bijlagen van niet-geverifieerde afzenders zijn geblokkeerd; je vindt dit ook als kanaal in de Berichten-app.</div>'
-  ) : '<div class="leeg">Je postvak is leeg.<br>Zodra RTG je iets stuurt, verschijnt het hier.</div>');
+  ) : '<div class="leeg">'+(ZOEK?'Niets gevonden.':MAP==='in'?'Je postvak is leeg.<br>Zodra RTG je iets stuurt, verschijnt het hier.':'Deze map is leeg.')+'</div>');
+  $('#main').querySelectorAll('[data-map]').forEach(b=>b.addEventListener('click',()=>{ MAP=b.dataset.map; ZOEK=''; laadInbox(); }));
+  const zv=$('#zoekVeld'), zk=$('#zoekKnp'), za=$('#zoekAf');
+  const doeZoek=()=>{ ZOEK=(zv.value||'').trim(); laadInbox(); };
+  if(zk) zk.addEventListener('click',doeZoek);
+  if(zv) zv.addEventListener('keydown',e=>{ if(e.key==='Enter') doeZoek(); });
+  if(za) za.addEventListener('click',()=>{ ZOEK=''; laadInbox(); });
   const vs=$('#vatSamen'); if(vs) vs.addEventListener('click',vatSamenNu);
   $('#main').querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>openBericht(LIJST[+b.dataset.i])));
   teamsErbij();
@@ -299,7 +345,11 @@ async function vatSamenNu(){
 }
 async function openBericht(m){
   let volledig=m;
-  try{ const d=await api('lees',{id:m.id}); if(d.bericht) volledig=d.bericht; }catch(e){}
+  /* lees() geeft het bericht terug zoals RTMAIL het kent; de MAP en de ster
+     komen uit de postvaklaag en zitten al op het object uit de lijst. Ze hier
+     overnemen voorkomt dat de knoppen "Opbergen" tonen voor iets dat al in het
+     archief ligt. */
+  try{ const d=await api('lees',{id:m.id}); if(d.bericht) volledig=Object.assign({}, d.bericht, {map:m.map, favoriet:m.favoriet, labels:m.labels}); }catch(e){}
   $('#tel').hidden=true;
   const band=bandVan(volledig);
   $('#main').innerHTML =
@@ -308,9 +358,90 @@ async function openBericht(m){
     '<h2>'+esc(volledig.onderwerp)+'</h2>'+
     '<div class="meta">Van '+esc(volledig.van)+' · '+esc(langTijd(volledig.at))+'</div>'+
     '<div class="body" id="body">'+veiligBody(volledig.tekst, !!volledig.vertrouwd)+'</div>'+
-    '<div class="bijlaag-noot">RTMAIL draagt nooit een bijlage die je kunt openen. Ontvang je een bestand? Dan is dat bewust geweigerd - vraag de afzender het via een geverifieerd kanaal te delen.</div></div>';
+    '<div class="bijlaag-noot">RTMAIL draagt nooit een bijlage die je kunt openen. Ontvang je een bestand? Dan is dat bewust geweigerd - vraag de afzender het via een geverifieerd kanaal te delen.</div>'+
+    /* De handelingen. Opbergen en weggooien zijn MAPPEN: je post is nooit weg
+       omdat je op een knop drukte. Echt vernietigen loopt via het bewaarbeleid
+       en laat een spoor na -- dat hoort niet onder een knop in een postvak. */
+    '<div class="acties">'+
+      (volledig.map!=='archief'?'<button class="knp" data-act="archief">Opbergen</button>':'<button class="knp" data-act="in">Terug naar postvak in</button>')+
+      (volledig.map!=='prullenbak'?'<button class="knp" data-act="prullenbak">Weggooien</button>':'')+
+      '<button class="knp" data-act="ster">'+(volledig.favoriet?'Ster eraf':'Ster erop')+'</button>'+
+      '<button class="knp" data-act="sluimer">Sluimeren tot morgen</button>'+
+      '<button class="knp" data-act="draad">Toon het gesprek</button>'+
+    '</div>'+
+    '<div class="fout" id="aFout" hidden></div></div>';
   bindLinks($('#body'));
   $('#terug').addEventListener('click', laadInbox);
+  $('#main').querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>handel(volledig, b.dataset.act)));
+}
+
+/* Een handeling op een bericht. Elke fout komt op het scherm te staan: een
+   knop die niets doet en niets zegt, is de reden dat mensen hun post niet
+   meer opbergen. */
+async function handel(m, wat){
+  const fout=t=>{ const f=$('#aFout'); if(f){ f.textContent=t; f.hidden=false; } };
+  try{
+    if(wat==='draad') return toonDraad(m);
+    if(wat==='ster'){ await api('ster',{id:m.id,aan:!m.favoriet}); m.favoriet=!m.favoriet; return openBericht(m); }
+    if(wat==='sluimer'){
+      const morgen=new Date(Date.now()+86400000).toISOString();
+      await api('sluimer',{id:m.id,tot:morgen});
+      return laadInbox();
+    }
+    await api('verplaats',{id:m.id,map:wat});
+    laadInbox();
+  }catch(e){ fout(e.message); }
+}
+
+/* Het gesprek. Wat er buiten beeld blijft wordt GETELD en genoemd: verzwijgen
+   dat een draad meer bevat, misleidt net zo goed als het tonen ervan. */
+async function toonDraad(m){
+  let d; try{ d=await api('draad',{id:m.id}); }catch(e){ return; }
+  $('#main').innerHTML =
+    '<button class="terug" id="terug">← alle berichten</button>'+
+    '<div class="kaart"><h2>Gesprek</h2>'+
+    '<div class="meta">'+d.berichten.length+' bericht(en), oudste eerst</div>'+
+    d.berichten.map(b=>{ const band=bandVan(b);
+      return '<div class="draadje" id="b-'+esc(b.id)+'"><div class="band '+band.cls+'">'+(band.cls==='no'?SLOT:SCHILD)+'<span>'+esc(band.t)+'</span></div>'+
+        '<div class="meta">'+esc(b.van)+' · '+esc(langTijd(b.at))+'</div>'+
+        '<div class="body">'+veiligBody(b.tekst, !!b.vertrouwd)+'</div></div>'; }).join('')+
+    (d.let?'<div class="noot" style="text-align:left;">'+esc(d.let)+'</div>':'')+
+    '<div class="acties">'+
+      '<button class="knp" data-hulp="samenvatting">Vat dit gesprek samen</button>'+
+      '<button class="knp" data-hulp="acties">Wat wordt er van mij gevraagd?</button>'+
+      '<button class="knp" data-hulp="risico">Is dit te vertrouwen?</button>'+
+    '</div><div id="hulpUit"></div></div>';
+  $('#main').querySelectorAll('.body').forEach(bindLinks);
+  $('#terug').addEventListener('click', laadInbox);
+  $('#main').querySelectorAll('[data-hulp]').forEach(b=>b.addEventListener('click',()=>hulp(m, b.dataset.hulp)));
+}
+
+/* De hulp bij een gesprek. Elke regel die terugkomt draagt het bericht waar hij
+   vandaan komt, en is aanklikbaar: een samenvatting waar je niet op terug kunt
+   springen, is een tweede versie van de waarheid. */
+async function hulp(m, wat){
+  const uit=$('#hulpUit'); if(!uit) return;
+  uit.innerHTML='<div class="noot" style="text-align:left;">Even kijken…</div>';
+  let d; try{ d=await api('hulp',{id:m.id,wat:wat}); }catch(e){ uit.innerHTML='<div class="fout">'+esc(e.message)+'</div>'; return; }
+  const naar=(id,tekst)=>'<button class="hulprij" data-spring="'+esc(id)+'">'+tekst+'</button>';
+  if(wat==='acties'){
+    uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' actiepunt(en)</b>'+
+      d.acties.map(a=>naar(a.bericht, esc(a.zin)+(a.datums.length?' <span class="etiket">'+esc(a.datums.join(', '))+'</span>':''))).join('')+
+      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+  } else if(wat==='risico'){
+    uit.innerHTML='<div class="hulpblok"><b>'+esc(d.oordeel)+'</b>'+
+      (d.redenen.length?'<ul class="hulplijst">'+d.redenen.map(r=>'<li'+(r.zwaar?' class="zwaar"':'')+'>'+esc(r.uitleg)+'</li>').join('')+'</ul>':'')+
+      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+  } else {
+    uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' bericht(en), '+esc(d.deelnemers.join(' en '))+'</b>'+
+      '<div class="meta">Aan zet: '+esc(d.aanZet)+'</div>'+
+      d.punten.map(p=>naar(p.bericht, (p.vanMij?'<span class="etiket">u</span> ':'')+esc(p.zin))).join('')+
+      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+  }
+  uit.querySelectorAll('[data-spring]').forEach(b=>b.addEventListener('click',()=>{
+    const el=$('#b-'+b.dataset.spring);
+    if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('aangewezen'); setTimeout(()=>el.classList.remove('aangewezen'),1600); }
+  }));
 }
 laadInbox();
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !$('#terug')) laadInbox(); });

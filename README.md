@@ -465,6 +465,226 @@ Een leven lang leren op een eigen motor, van kleuterklas tot universiteit en daa
 
 Vaste eerlijkheidsregels, in code en tests verankerd: RTG School is geen school of examenbureau (diploma's en examens lopen via de officiële instellingen); cijfervoorstellen zijn advies (een mens beslist); een toets verklikt niet halverwege; geen scores buiten de sessie, geen reeksen, geen ranglijsten -- leren is geen wedstrijd.
 
+#### De enterprise-laag: het hele schoolbedrijf, niet alleen de klas
+
+Bovenop het schoolkanaal draait een volledige enterprise-laag, in acht delen,
+allemaal onder `/api/foundation/school/...` en in modules van 4-9 KB
+(`server/school/`). De poort eronder is één functie: `poort(req, res, recht)`
+uit `school/rollen.js`, die het beheer-token van de school (directie) of een
+personeel-token met de juiste rol accepteert.
+
+| deel | modules | wat erin zit |
+|---|---|---|
+| **Rollen & rechten** | `rollen.js` | veertien rollen (leerling t/m systeembeheerder), een rechtenmatrix, het inzagejournaal per school |
+| **School Core** | `inschrijving.js`, `inschrijving-mutatie.js`, `dossier.js`, `organisatie.js` | aanmelding, wachtlijst, plaatsing, uitschrijving, overstap, leerlingdossier met contact- en gezinsgegevens, documenten/diploma's, zorgdeel, vestigingen, opleidingen, schooljaarovergang |
+| **Learning** | `rapport.js`, `rapport-tekst.js` | periodrapporten, conceptteksten (AI = advies), vaststellen door een mens, studievoortgang, individuele leerdoelen en remedial teaching (in het zorgdeel) |
+| **Communicatie** | `omroep.js` | nieuwsbrief (meertalig), automatische herinneringen, vakgroepgesprek; bellen en videobellen zaten al in `bellen.js` |
+| **Aanwezigheid & veiligheid** | `aanwezigheid.js`, `veiligheid.js`, `veiligheid-incident.js` | presentie per les, te laat, verlofaanvraag met besluit, toegangspassen, bezoekers, incidentregistratie, ontruimingslijst, calamiteitenmelding |
+| **Finance** | `financien.js`, `financien-beheer.js` | schoolgeld en ouderbijdragen als factuur, betaallink, terugbetaling, kantinesaldo, budgetten, subsidies, debiteuren, rapportage en boekhoudexport |
+| **HR** | `hr.js`, `hr-verlof.js` | personeelsdossier, contract, bevoegdheden en trainingen, verlof en ziekte, vervanging, urenregistratie, gesprekken |
+| **AI & Analytics** | `analyse.js`, `analyse-signalen.js` | directiedashboard, waarschuwingen met hun eigen rekensom, signalen rond een leerling |
+| **Koppelingen & portaal** | `koppelingen.js`, `webhook.js`, `machtiging.js`, `peiling(-antwoord).js`, `ouderportaal(-mijn).js` | integratieregister met veldkeuze, ondertekende webhookbezorging, machtigingenregister, anonieme tevredenheidspeiling, export, toestemmingsformulieren, gespreksafspraken, het gezinsoverzicht |
+
+Schermen: de directiepanelen staan in `/apps/schoolpartner.html`
+(`schoolpartner/enterprise.js` + `enterprise-beheer.js`), de ouder- en
+leerlingkant in `/apps/foundation/school.html`
+(`foundation/school-portaal.js`).
+
+**De acht regels die deze laag anders maken dan een standaardpakket.** Ze staan
+niet in een folder maar in code, en `test/schoolenterprise.test.js`,
+`test/schoolaanwezig.test.js`, `test/schoolgeld.test.js` en
+`test/schoolbeeld.test.js` (28 toetsen) laten ze zakken zodra ze niet meer waar
+zijn:
+
+1. **Geld raakt nooit het onderwijs.** Er is geen functie die een leerling
+   afsluit wegens een openstaande post; elk financieel antwoord draagt
+   `blokkeertOnderwijs: false`. Een leeg kantinesaldo weigert geen eten (het
+   verschil wordt een factuur), en een vrijwillige ouderbijdrage wordt hooguit
+   één keer herinnerd -- vaker vragen maakt vrijwillig alsnog verplicht.
+2. **Het zorgdeel gaat alleen open met een reden.** Zorg, incidenten,
+   personeelsdossiers en de export vragen een reden en schrijven een regel in
+   het journaal: wie, wanneer, waarover en waarom -- nooit wat er stond, want
+   dan was het journaal een tweede, ongeschermde kopie van het dossier.
+3. **De systeembeheerder komt niet in dossiers.** Hij beheert koppelingen en
+   leest het journaal; leerlinggegevens, zorg en geld staan voor hem dicht.
+4. **Geen loopspoor.** Van een toegangspas wordt alleen de HUIDIGE stand
+   bewaard (binnen/buiten, sinds wanneer, welke ingang) plus een dagteller. Er
+   is dus geen endpoint dat "waar was dit kind vandaag" kan beantwoorden. De
+   ontruimingslijst valt terug op de presentie van vandaag als een school geen
+   poortjes heeft.
+5. **Een rapport stelt een mens vast.** De AI schrijft hooguit een concept (met
+   de bron erbij, en zonder sleutel een feitelijke opzet uit de cijfers); er is
+   geen route die publiceert zonder dat iemand bevestigt de teksten te hebben
+   gelezen. De gezinskant toont alleen vastgestelde rapporten.
+6. **Geen voorspelling, geen ranglijst.** De signalen rond een leerling zijn
+   factoren met een natrekbare uitleg ("6 van 16 lessen gemist in zestig
+   dagen"), zonder score en zonder volgorde op zwaarte. Een waarschuwing noemt
+   zijn eigen rekensom en zwijgt onder de tien lesregistraties.
+7. **Een koppeling noemt wat hij deelt.** Velden kies je uit een vaste lijst;
+   zorg, incidenten, de hulplijn en het journaal staan er niet in en zijn er
+   niet aan toe te voegen. Zonder veldkeuze gaat een koppeling niet aan.
+8. **Toestemming is intrekbaar, en geen antwoord is geen toestemming.** Dat
+   laatste staat ook zo in het overzicht van de school.
+
+Drie dingen die in de eerste ronde nog openstonden, zijn daarna gebouwd -- en
+het derde bewust maar half:
+
+- **De webhooks bezorgen nu echt** (`school/webhook.js`). Elke levering draagt
+  een HMAC-SHA256 over het exacte lijf in `X-RTG-Handtekening`, wordt bij een
+  fout twee keer opnieuw geprobeerd, en telt mislukkingen op de webhook zelf
+  met een waarschuwing in het log; na tien op rij valt hij stil tot de school
+  hem wekt (`/school/webhook/wek`). Het lijf meldt **dat** er iets is gebeurd
+  met ids -- geen namen, geen cijfers, geen zorg. Wie de inhoud wil, haalt hem
+  daarna op met zijn eigen recht, zodat een webhook nooit een sluiproute om de
+  rechtenmatrix wordt. `/school/webhook/proef` stuurt een proeflevering en zegt
+  precies wat eruit kwam. Een intern adres kan alleen met
+  `RTG_SCHOOL_WEBHOOK_INTERN=1` (zelfde schakelaar als bij de fout-melder); het
+  cloud-metadata-adres blijft ook dan dicht.
+- **Machtigingen worden vastgelegd** (`school/machtiging.js`), maar er is nog
+  steeds **geen incasso-run** -- en dat is een besluit. Het register weet wie
+  heeft getekend, voor welk maximum, wanneer en via welk kanaal; het volledige
+  rekeningnummer staat er niet in (alleen de laatste vier tekens), want er
+  wordt niets geïnd. Elk antwoord draagt `geindNu: false`, en een factuur met
+  de incasso-vlag zegt of er een geldige machtiging ligt. Intrekken kan altijd,
+  ook door het gezin zelf, zonder reden en per direct.
+- **Tevredenheid wordt gemeten** (`school/peiling.js`), anoniem: alleen scores
+  van 1 tot 5, een hash met het schoolgeheim tegen dubbel stemmen die los staat
+  van het antwoord, geen vrije tekst (die maakt een kleine groep herleidbaar),
+  geen cijfer per medewerker, en **geen uitslag onder de vijf antwoorden**.
+  Zolang die grens niet is gehaald, staat er nog steeds `null` op het dashboard
+  met de reden erbij.
+
+### RTG Horeca OS (de horecatoren)
+
+Het huis had al een kassa (`routes/supplier/kassa/`), tafels en tafelstatussen,
+reserveringen, een keukenbrein met recepturen en voorraad (`kern/keuken.js`),
+hotelkamers met check-in en housekeeping, eventdraaiboeken en een bezorgrit met
+gps. Wat er niet was, is de laag die daar een besturingssysteem van maakt: een
+REKENING die blijft leven, keukenschermen met tijden, bezorgzones, een club, de
+gastrekening van het hotel en de zakelijke kant van een event.
+
+Die laag staat in `server/kern/horeca.js` (de rekenlaag) plus veertien
+deelmodules in `server/routes/supplier/horeca/`, allemaal onder
+`/api/supplier/horeca/...` en dus binnen de bestaande partner-functie van de
+schakelkast.
+
+| deel | modules | wat erin zit |
+|---|---|---|
+| **Hospitality Core** | `rekening.js`, `schuif.js`, `betalen.js`, `bonnen.js` | rekening openen op dertien kanalen (tafel, bar, club, terras, afhaal, bezorging, roomservice, hotelrestaurant, foodtruck, event, kiosk, QR, online), gangen vrijgeven, verplaatsen, samenvoegen, splitsen per persoon of per product, korting met reden, fooi, deelbetalingen met meerdere methoden, cadeaubon en tegoed, happy hour, arrangementen, en een offline-wachtrij |
+| **Kitchen** | `keuken.js`, `keuken-regie.js` | stationsborden, de standen besteld → gestart → bereid → klaar → uitgegeven, bereidingstijden per gerecht, het regiescherm van de chef met staat-koud per tafel, en een drukterem in keukenminuten |
+| **Delivery** | `bezorging.js`, `bezorgrit.js` | bezorgzones op postcode of straal met kosten, minimum en gratis-vanaf, tijdsloten met capaciteit in keukenminuten, een gecombineerde route en het afleverbewijs met leeftijdscontrole |
+| **Club & Bar** | `club.js` | polsbandtegoed, minimum spend per VIP-tafel, gastenlijst met promotercodes, en een deurteller met herbetreding en capaciteit |
+| **Hotel** | `folio.js` | een gastrekening waarop kamer, ontbijt, restaurant, minibar, spa, roomservice, parkeren, wasserij en schade samenkomen; de nachtrun, de toeristenbelasting en de borg |
+| **Events** | `event.js` | offerte, akkoord met naam, versiebeheer, aanbetaling en nacalculatie met marge |
+| **Inventory & HACCP** | `haccp.js` (+ het bestaande `kern/keuken.js`) | temperatuurmetingen met verplichte actie bij een afwijking, batches met THT, en controlelijsten |
+| **Workforce & CRM** | `personeel.js` | de fooienpot, loonkosten tegenover omzet, en het gastprofiel met voorkeuren en punten |
+| **Analytics** | `dashboard.js` | het dagbeeld per kanaal en per betaalwijze, en de signalen |
+
+**De regels die deze laag anders maken dan een kassasysteem.** Ze staan in code
+en `test/horeca-rekening.test.js`, `horeca-keuken.test.js`,
+`horeca-bezorg-club.test.js`, `horeca-hotel-event.test.js` en
+`horeca-vloer.test.js` (38 toetsen) laten ze zakken zodra ze niet meer waar zijn:
+
+1. **Splitsen en samenvoegen zijn verplaatsingen.** `controleerSom()` vergelijkt
+   de netto waarde voor en na, tot op de cent; klopt het niet, dan gebeurt er
+   niets. 10,00 door drie is 3,34 + 3,33 + 3,33, en een percentagekorting gaat
+   evenredig mee in plaats van te verdampen.
+2. **Een bestelde prijs verandert nooit meer.** Happy hour rekent op het moment
+   van bestellen; de lijstprijs blijft naast de kortingsprijs staan.
+3. **Fooi is geen omzet** — niet op de rekening, niet in het loonpercentage, en
+   nooit voorgevuld. De fooienpot wordt verdeeld over gewerkte uren inclusief
+   keuken en afwas, en telt exact op tot de pot.
+4. **Wat niet betaald wordt, verdwijnt niet**: oninbaar mét reden, zichtbaar in
+   het dagbeeld. Te veel betalen bestaat niet.
+5. **De keuken begint niet aan een gang die de zaal niet heeft vrijgegeven**, en
+   de allergie staat in een eigen veld dat op elk scherm meegaat.
+6. **Tijd is een feit, geen kleurtje**: elke bon draagt zijn looptijd naast zijn
+   norm, en de drukterem waarschuwt met zijn rekensom in plaats van zelf de
+   bestellingen dicht te zetten.
+7. **Een weigering noemt zijn reden**: buiten de bezorgzone, een vol tijdslot
+   (met het eerstvolgende erbij), een lege polsband, een volle deur.
+8. **Geld van gasten blijft van gasten**: een polsband kan niet onder nul en het
+   restsaldo gaat terug; een borg is een aantekening en blokkeert niets bij de
+   bank (`geblokkeerdBijBank: false`).
+9. **Op de kamer boeken kan alleen als daar een open gastrekening staat**, en de
+   nachtrun is idempotent op de datum.
+10. **Een offerte wordt pas een opdracht na een akkoord met naam**; posten
+    wijzigen daarna maakt een nieuwe versie die opnieuw bevestigd moet worden.
+11. **Een afwijking zonder actie bestaat niet** (HACCP), een meting corrigeren
+    laat de oude waarde staan, en een controlelijst is niet in een keer af te
+    vinken.
+12. **Elk gemiddelde noemt zijn noemer**, en er wordt niets voorspeld wat we
+    niet meten: het dagbeeld toont wat er nu open staat en wat er vandaag
+    binnenkwam, geen omzetprognose.
+
+Wat deze laag bewust **niet** doet: hij bouwt de kassa, de voorraad, de
+recepturen, de tafelstatussen, de reserveringen, de hotelkamers en het
+eventdraaiboek niet opnieuw. Een betaalde horecarekening boekt zijn
+ingredienten af via het bestaande `kern/keuken.js`, met een logregel op naam van
+de rekening. Er is dus geen tweede voorraadadministratie -- en dat is precies de
+bedoeling (LAT-regel 4).
+
+Schermen: `/apps/horeca.html` is de dienst zelf -- de zaal (rekening openen,
+bestellen met de allergie in een eigen veld, een gang vrijgeven, splitsen,
+afrekenen) en de keuken (het stationsbord met looptijd naast de norm, de standen
+en het regiescherm). Daarnaast staan er zeven werkschermen, bereikbaar vanaf die
+pagina:
+
+| Scherm | Waarvoor |
+| --- | --- |
+| `/apps/horeca-expeditie.html` | de pas: per tafel en gang wat er klaar is en hoe lang het eerste bord al koud staat, uitgeven met de hand, en de drukterem met zijn rekensom |
+| `/apps/horeca-bezorg.html` | zones, adrescheck, tijdsloten in keukenminuten, de ritvolgorde, en de rit zelf van inpakken tot afleverbewijs |
+| `/apps/horeca-hotel.html` | de gastrekening (folio), de nachtrun, de borg, en roomservice die op de kamer wordt geboekt |
+| `/apps/horeca-events.html` | offerte, akkoord met naam, aanbetaling, kosten en nacalculatie |
+| `/apps/horeca-club.html` | polsbandtegoed, minimum spend per tafel, de deurteller en de gastenlijst per promoter |
+| `/apps/horeca-haccp.html` | temperatuurlogboek met verplichte actie bij een afwijking, batches met houdbaarheid, controlelijsten |
+| `/apps/horeca-beheer.html` | de dag over alle kanalen, de fooienpot, loon tegenover omzet, gastprofielen en de signalen |
+
+De bedrading (zaak-sessie, API-aanroep, meldbalk, de deur voor wie uitgelogd
+komt) staat een keer in `public/apps/horeca/kern.js` en de vormtaal een keer in
+`public/apps/horeca/scherm.css` -- niet acht keer gekopieerd.
+`test/horecascherm.e2e.js` en `test/horecaschermen.e2e.js` doen het na in een
+echte browser, inclusief de beweringen die er het meest toe doen: een gang die
+de zaal niet heeft vrijgegeven staat NIET op het keukenscherm (en met vrijgave
+staat de allergie erbij), wat is uitgegeven verdwijnt van de pas, en roomservice
+die op de kamer wordt geboekt komt op de gastrekening van diezelfde kamer
+terecht.
+
+### RTG Werk OS (de werkplek van een organisatie)
+
+`server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**
+per organisatie (holdings met dochters eronder), met eigen leden, rollen,
+journaal en startscherm -- zodat dit ook aan een andere organisatie te geven is.
+
+| Module | Wat erin zit |
+| --- | --- |
+| Werkruimte | leden (aanmelden is niet binnen zijn), rollen met een venster van/tot, journaal, uit dienst |
+| Projecten | projecten, taken, subtaken, afhankelijkheden, kanban, uren, budget |
+| Kennis | artikelen met eigenaar, houdbaarheidsdatum, versie en afscherming |
+| Klanten | klanten met hun RTG-producten, verkoopkansen, gewogen pijplijn |
+| Service | tickets met twee SLA-klokken, storingen, evaluatie, tevredenheid |
+| Bouw | repositories, issues, releases per omgeving, feature flags |
+| IT | apparaten, licenties, het uitdienstproces in zes stappen |
+| Recht | contractbibliotheek met een uitgerekende laatste opzegdag |
+| Governance | voorstel, adviesronde, stemronde, besluit met evaluatiemoment |
+| Beeld | het directiebeeld en de geconsolideerde blik over dochters |
+
+Wat deze laag met opzet **niet** doet: geen tweede Docs, chat, agenda of
+loonrun. Die staan al in dit huis (`kern/office/` met zes documentsoorten,
+`routes/rtmail.js`, `routes/agenda.js`, `routes/payroll.js`, `kern/klok.js`,
+`kern/facturatie.js`, `routes/sso.js`, `routes/scim.js`) en worden
+**aangesloten**: een lid koppelt eenmalig zijn eigen RTG-account en ziet daarna
+zijn agenda, postvak en kluis op zijn werkstartscherm -- met tellingen en
+titels, nooit de inhoud.
+
+De regels die de laag dragen staan in de code en niet in een handleiding:
+voortgang wordt geteld en nooit ingevuld; een cirkel in de afhankelijkheden
+wordt geweigerd; naar productie gaat alleen wat groen is, met een mens die
+tekent; een feature flag zonder opruimdatum bestaat niet; de laatste opzegdag
+wordt uitgerekend uit de einddatum en de opzegtermijn; stemmen kan pas na de
+adviesronde en het beheer-token stemt niet; en wat niet gemeten wordt staat
+overal als **niet gemeten** in plaats van als nul.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.
@@ -582,8 +802,10 @@ geen documentatie maar reclame.
 - **De randcontrole: alles wat buiten de code ligt.** `npm run rand -- https://uwadres`
   meet aan een draaiende installatie wat de testsuite per definitie niet ziet:
   certificaat en TLS-versie, HSTS, de CSP zoals hij echt wordt uitgeserveerd
-  (met onderscheid tussen `script-src` en `style-src` — alleen het eerste is een
-  gat), of `http` doorstuurt, of `.env`/`.git`/`server/data` op straat liggen, en
+  (met onderscheid tussen `script-src`, `style-src` en `style-src-attr`: de
+  eerste twee draaien op een nonce zonder `unsafe-inline`, de derde houdt hem
+  nog — 8957 `style="…"`-attributen in `public/`, benoemd als openstaande post
+  in `middleware/voordeur.js`), of `http` doorstuurt, of `.env`/`.git`/`server/data` op straat liggen, en
   of een verzonnen `X-Forwarded-For` de snelheidslimiet omzeilt. Die laatste
   vond een echt gat: `trust proxy` stond vast op 1 en `verrijk.js` las het
   **linkse** adres uit de kop — het deel dat de bezoeker zelf verzint. Daarmee
@@ -617,11 +839,41 @@ geen documentatie maar reclame.
   omdat de database tijdens een datalek het ding is dat je misschien niet
   vertrouwt, moet het draaiboek daar los van leesbaar zijn.
 
+## RTG Mail
+
+Het interne postsysteem is geen inboxscherm maar een communicatielaag met e-mail als protocol. Twee helften, streng gescheiden.
+
+**De mailervaring.** Elk lid en elke zaak heeft een postvak op zijn codenaam, met een domein dat het lidmaatschap volgt (`kern/rtmail-adres.js`). Daarboven: mappen (in, archief, prullenbak, verzonden), etiketten, favorieten, sluimeren en zoeken (`kern/rtmail-vak.js`); gesprekken die op de **draad** groeperen en nooit op onderwerp (`kern/rtmail-draad.js`); concepten in een eigen lade, uitgesteld verzenden zonder wekker, handtekening, afwezigheid met lus-rem en aliassen (`kern/rtmail-schrijf.js`); en regels die bij de **bezorging** draaien en niet in de app, zodat ze ook werken voor post die 's nachts binnenkomt (`kern/rtmail-regels.js`).
+
+De toestand van een bericht hangt **per bus** en niet op het bericht. Dat is geen implementatiedetail: een bericht tussen twee postvakken van dit huis is een rij in de opslag, en zonder die scheiding zou het archiveren door de ontvanger het bericht ook uit de verzonden map van de afzender laten verdwijnen.
+
+**Gedeelde postvakken.** Een team is een adres dat meerderen samen lezen, met toewijzing en afhandeling (`kern/rtmail-team.js`, `-teampost.js`) en daarbovenop een dossier per bericht: status, prioriteit, interne notities en de koppeling aan een klant of ticket (`kern/rtmail-dossier.js`). De klok (`kern/rtmail-sla.js`) loopt tot het eerste **menselijke** antwoord; de automatische ontvangstbevestiging stopt hem niet. Wie al geantwoord heeft wordt afgeleid uit de draad in plaats van apart bijgehouden -- een tweede administratie zou vroeg of laat iets anders beweren dan de post zelf.
+
+**Post wordt werk.** `server/bedrijf/postbrug.js` maakt van een bericht een taak, ticket of kans in het Werk OS, met de herkomst (bericht-id en draad) erbij; `/api/bedrijf/post/context` zet de klant, open kansen, tickets en contracten naast een bericht en zegt eerlijk "er wordt niets geraden" als de afzender bij niemand als contactpersoon staat. De omzetting vraagt twee sleutels (RTG-sessie plus werkruimte-lidtoken) die van dezelfde persoon moeten zijn: post is van iemand.
+
+**Rechten, journaal en bewaarbeleid.** Dertien losse rechten (`kern/rtmail-recht.js`) in plaats van "mag erin": een supportmedewerker antwoordt vanuit support@ zonder te kunnen exporteren. Niemand geeft weg wat hij zelf niet heeft, vier handelingen vragen een reden **vooraf**, en elke handeling op andermans postvak landt in het journaal -- ook een geweigerde poging. `kern/rtmail-bewaar.js` is de enige plek waar post echt weggaat: bewaartermijn, juridische bewaring die altijd wint van die termijn, en aantoonbare vernietiging die het feit achterlaat en niet de inhoud.
+
+**De infrastructuur.** `kern/mailwachtrij.js` legt uitgaande post in een lade met oplopende wachttijden (1, 5, 15, 60, 240 minuten), herhaalt een permanente fout nooit, houdt een dead-letter lade bij en herkent dubbele aflevering. `kern/mailmime.js` pakt echte RFC 5322-post uit (doorgevouwen koppen, encoded-words, MIME, base64, quoted-printable, platte tekst boven HTML) en `kern/mailinkomend.js` bewaart het **origineel ongewijzigd** en stempelt de uitslag van de controles. Die drie worden nu ook echt gedaan: DKIM via `server/dkim.js`, SPF via `kern/mailspf.js` (mechanismen, include/redirect, en de tien-vragen-grens uit RFC 7208 die ook een kring van records afkapt) en DMARC via `kern/mailauth.js`, dat de **uitlijning** bepaalt -- hoort wat er geslaagd is bij het domein dat de lézer ziet? Twee regels gelden overal: geen antwoord is geen goedkeuring (geen record heet `geen`, een DNS-storing `tijdelijke fout`, nooit `gezakt`), en wij handhaven niet maar stempelen -- het beleid wordt gemeld, weigeren is een beslissing van een mens. Alles van buiten blijft onbetrouwd: links blijven onklikbaar. Bijlagen gaan door **De Ontsmetter** (`kern/antivirus`, dezelfde scanner die de bestandenkluis bewaakt -- er is er geen tweede gebouwd): wat schoon is wordt versleuteld bewaard en is te openen door wie het bericht mag lezen, wat dat niet is verdwijnt met de reden in de tekst van het bericht. Geen quarantaine-map waar iemand later "toch even" bij kan.
+
+**AI-hulp bij een gesprek** (`kern/rtmail-ai.js`): samenvatten, actiepunten herkennen en uitleggen waarom iets op phishing lijkt. Eén regel vormt dat hele bestand: **elke bewering draagt de herkomst mee** -- elk punt, elk actiepunt en elke risicomelding noemt het bericht-id waar het vandaan komt, en op het scherm springt u er met een klik naartoe. Een samenvatting zonder verwijzing is een tweede versie van de waarheid. Risico komt als *redenen*, niet als cijfer: "risico 7,4" zegt een lezer niets, "dit bericht vraagt om een wachtwoord" wel. De laag leest en vat samen; antwoorden, betalen en opbergen blijven handelingen van een mens langs de gewone poorten, en er is geen taalmodel voor nodig -- een hulp die alleen bestaat als er een sleutel in de omgeving staat, is geen hulp.
+
+**Een externe mailclient** kan erbij via IMAP (`server/imap.js` voor het gesprek, `server/imap-server.js` voor de verbinding). Dat is een **adapter en geen tweede mailbox**: de waarheid blijft in RTMAIL, en wie in Thunderbird een ster zet, zet hem in zijn postvak. INBOX/Archive/Trash/Sent vertalen naar de mappen, `\Seen` en `\Flagged` naar gelezen en favoriet; etiketten en sluimeren bestaan in IMAP niet en dat staat opgeschreven in plaats van weggemoffeld. Inloggen gaat **nooit** met het RTG-wachtwoord maar met een **apparaatsleutel** (`kern/mailsleutel.js`): één postvak, één keer te zien, los in te trekken en meteen dood. De poort staat uit tenzij `IMAP_POORT` is gezet -- een mailpoort die vanzelf openstaat, is een deur die niemand heeft besloten open te zetten. `APPEND` en `IDLE` zitten er nog niet in, en `APPEND` weigert duidelijk in plaats van stil te mislukken: een client die denkt dat zijn concept is opgeslagen, verliest werk.
+
+Wat er bewust **niet** in zit: een regel die post doorstuurt naar een ander adres (de kortste weg naar post die ongemerkt het huis verlaat, en naar lussen), een teller wie het meest afhandelt, en een prullenbak die echt wist.
+
 ## Partner worden & e-mail
 
 Bedrijven worden aangemaakt vanuit de backoffice (de losse publieke wervingspagina is met de marketingsite verwijderd; het aanvraag-endpoint blijft bestaan). Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.
 
-E-mail (verificatie, wachtwoord-herstel, sollicitatie- en partner-besluiten) is af: met `SMTP_URL` (+ optioneel `MAIL_FROM`) in de omgeving verstuurt nodemailer echte mail; zonder gaan berichten naar `server/data/outbox/` en werken alle links gewoon.
+E-mail (verificatie, wachtwoord-herstel, sollicitatie- en partner-besluiten) is af, en de verzendlaag is helemaal van onszelf -- er zit geen pakket meer onder. `server/mail.js` kent drie standen, in deze volgorde:
+
+1. **`SMTP_URL`** (+ optioneel `MAIL_FROM`): afleveren bij een ingehuurde smarthost via de eigen SMTP-client `server/smtp.js` (EHLO, STARTTLS, AUTH, MAIL/RCPT/DATA, MIME met base64 en dot-stuffing; credentials gaan nooit over een onversleutelde verbinding).
+2. **`MAIL_DIRECT=1`**: **eigen post** -- `server/smtp-direct.js` zoekt zelf het MX-record van de ontvanger op, verbindt op poort 25, pakt STARTTLS als die er is en levert af; `server/dkim.js` ondertekent het bericht (relaxed/relaxed, RSA-SHA256 uit `node:crypto`) met `DKIM_PRIVATE_KEY`, `DKIM_SELECTOR` en `MAIL_DOMEIN`. Een mislukte bezorging valt terug op de outbox, waarbij **tijdelijk (4xx)** en **permanent (5xx)** apart gemeld worden -- bij het eerste heeft opnieuw proberen zin, bij het tweede niet.
+3. **niets gezet**: berichten gaan naar `server/data/outbox/` en alle links werken gewoon.
+
+Aanzetten gaat met **`npm run eigenpost -- <domein> <ip>`**: dat meet eerst of uitgaand poort 25 op deze machine open is (en zegt "nee" als hij dicht is, in plaats van u een sleutelpaar te geven waar u niets aan hebt), maakt daarna een DKIM-sleutelpaar en drukt de drie DNS-records en de omgevingsvariabelen af. De private sleutel wordt getoond en nergens weggeschreven -- een sleutel die een script netjes in een bestand zet, staat morgen in git.
+
+Wat stand 2 *niet* kan oplossen staat hardop in de kop van `server/smtp-direct.js`, omdat een verzendlaag die dat verzwijgt post wegstuurt die nergens aankomt: uitgaand poort 25 is bij de meeste hosters dicht (`beschikbaar()` **probeert** het in plaats van het te beweren), PTR hoort bij de hosting, en SPF en DMARC zijn DNS-records -- `dkim.dnsRegels()` schrijft die drie voor u uit, publiceren is mensenwerk. `test/mail-eigen.test.js` rekent elke handtekening ook echt na met de publieke sleutel en kijkt of hij breekt zodra het lijf of een ondertekende kop wijzigt.
 
 Zie **LAUNCH.md** voor de volledige livegang-checklist (hosting, domein, betalingen, sleutels).
 

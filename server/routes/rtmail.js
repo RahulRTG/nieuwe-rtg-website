@@ -10,9 +10,10 @@ module.exports = (kern) => {
   /* Het adres draagt nu welk huis je hoort (kern/rtmail-adres.js). Een zaak
      handelt onder haar eigen code op partner.rtg. Post aan het oude "@rtmail"
      komt nog steeds aan: het postvak hangt aan het linkerdeel. */
-  const adresVan = req => rtmail.adresVoor('zaak', req.supplier.code || '');
+  const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
+  const adresVan = wie.zaakAdres;
   // het lid-adres: de codenaam van het account (privacy by design)
-  const lidCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
+  const lidCodenaam = wie.lidCodenaam;
 
   app.post('/api/supplier/rtmail/inbox', supplierAuth, (req, res) => {
     const adres = adresVan(req);
@@ -139,14 +140,8 @@ module.exports = (kern) => {
      zijn eigen domein, want dan was het adres een bewering in plaats van een
      feit. Het linkerdeel blijft de codenaam: een adres reist, en de echte naam
      hoort in de kluis te blijven (server/accounts.js). */
-  function lidSoort(req) {
-    const rollen = ((db && db.data && db.data.accountRollen) || {})[req.session.key] || [];
-    return rtmail.soortVoor({ tier: req.session.tier, rollen });
-  }
-  const lidAdres = (req) => {
-    const c = lidCodenaam(req);
-    return c ? rtmail.adresVoor(lidSoort(req), c) : null;
-  };
+  const lidSoort = wie.lidSoort;
+  const lidAdres = wie.lidAdres;
 
   app.post('/api/member/rtmail/adres', auth, (req, res) => {
     const adres = lidAdres(req);

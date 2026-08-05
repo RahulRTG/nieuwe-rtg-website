@@ -356,304 +356,38 @@ if (zaakdoos.actief) {
   console.log('[doos] zaakdoos-modus: doorgeefluik naar', process.env.RTG_DOOS_CLOUD);
 }
 
-/* ---------- foutisolatie per verzoek ----------
-   Een bug in EEN route mag nooit het proces (en dus alle andere apps) raken.
-   Express 4 vangt een gegooide fout in een async handler niet zelf op: het
-   verzoek blijft hangen en de fout wordt een unhandledRejection. Daarom
-   omhullen we elke route-handler: een (async) fout wordt netjes next(err),
-   de centrale foutafhandelaar geeft die ENE aanvraag een 500, en de rest
-   van het systeem merkt er niets van. */
-for (const methode of ['get', 'post', 'put', 'delete', 'patch', 'all']) {
-  const orig = app[methode].bind(app);
-  app[methode] = (...args) => orig(...args.map(f => {
-    if (typeof f !== 'function') return f; // paden en opties ongemoeid laten
-    return (req, res, next) => {
-      try {
-        const r = f(req, res, next);
-        if (r && typeof r.catch === 'function') r.catch(next);
-      } catch (e) { next(e); }
-    };
-  }));
-}
-app.disable('x-powered-by');
+/* ---------- de voordeurketen staat in ./opzet/verzoekketen.js ----------
+   Foutisolatie per verzoek, proxy-vertrouwen, logboek en meting, https + HSTS,
+   het schild, De Wacht, de security-headers, de betaal-webhooks (die MOETEN
+   voor express.json() staan), de dieptewacht op de body en het
+   zaakdoos-journaal. In die volgorde, en die volgorde is de inhoud.
+
+   Twee draden komen hier terug: het schild raadpleegt De Wacht, en de meelezer
+   is de RTG AI. Allebei worden verderop in dit bestand gebouwd (na de
+   database), dus ze worden laat gebonden via zetWacht/zetRtgai. */
 const PRODUCTION = process.env.NODE_ENV === 'production';
-/* Hoeveel proxy-hops staan er ECHT voor deze app?
-
-   Dit stond vast op 1. Dat klopt achter een reverse proxy, maar is gevaarlijk
-   zodra de app rechtstreeks bereikbaar is: dan IS de bezoeker de eerste hop en
-   mag hij zijn eigen X-Forwarded-For verzinnen -- waarmee elke snelheidslimiet
-   (die op req.ip telt) met één kop te omzeilen is. Zie test/proxykop.test.js.
-
-   RTG_PROXY_HOPS=0 zet het vertrouwen helemaal uit: dan telt alleen het adres
-   van de verbinding zelf. Dat is de juiste stand voor een app die zonder proxy
-   aan het internet hangt. */
-app.set('trust proxy', Number(process.env.RTG_PROXY_HOPS != null ? process.env.RTG_PROXY_HOPS : 1));
-/* WIE die proxy is. Zonder opgave vertrouwen we alleen loopback en private
-   adressen -- de gebruikelijke plek voor een reverse proxy. Een bezoeker die
-   rechtstreeks vanaf het internet binnenkomt valt daar nooit onder, dus zijn
-   X-Forwarded-For wordt genegeerd in plaats van geloofd. Staat de proxy op een
-   publiek adres, zet die dan hier (komma-gescheiden). */
-app.set('proxy ips', String(process.env.RTG_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean));
-app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
-/* De meting draait NA het logboek en VOOR de routes: hij hangt aan res.finish,
-   dus hij ziet alles wat er daarna gebeurt, inclusief de 404's. */
-app.use(require('./meting').middleware());
-/* Het routejournaal staat ernaast en doet alleen iets met RTG_ROUTELOG gezet
-   (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
-   een tekstzoektocht door de tests -- zie server/routelog.js. */
-require('./routelog');   // zet de haak in de router (alleen met RTG_ROUTELOG)
-
-// In productie: alles naar https, en HSTS zodat browsers het onthouden.
-// (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het
-// gedeelde headerblok -- daar gelden ze voor elk antwoord, ook lokaal.)
-app.use((req, res, next) => {
-  if (PRODUCTION) {
-    /* De gezondheidsprikken gaan hier NIET doorheen. De poortwachter
-       (server/trio.js) controleert zijn drie servers op /api/health over
-       gewone http op de loopback -- daar hoort geen TLS bij, en er komt dus
-       ook geen X-Forwarded-Proto mee. Kreeg die prik een 301, dan zag de
-       poortwachter nooit een 200, concludeerde hij dat geen enkele server
-       leefde, en gaf de site 503 terwijl alle drie de servers kerngezond
-       stonden te draaien. De failover-opstelling kon in productie dus nooit
-       gezond worden. Dat gebeurde op de eerste echte productiemachine, en het
-       is van buitenaf niet te zien: lsof laat drie luisterende servers zien
-       en de browser krijgt "alle servers zijn tijdelijk onbereikbaar".
-       Hetzelfde geldt voor /api/ready en voor de healthcheck in de Dockerfile. */
-    /* Hetzelfde geldt voor het hele /api/cluster-kanaal. Dat is het interne
-       gesprek tussen poortwachter en servers: promote (word actief), de
-       hartslag, het doorgeven van wie de baas is. Ook http, ook loopback.
-       Alleen /api/health vrijstellen was half werk: de prik lukte daarna wel,
-       maar promote kreeg nog een 301, er werd dus nooit iemand actief, en de
-       site bleef 503 geven. Dit kanaal is niet van buiten te misbruiken: het
-       eist de gedeelde x-rtg-cluster-sleutel en luistert alleen op 127.0.0.1
-       (zie de HOST-keuze onderaan dit bestand). */
-    const intern = req.path === '/api/health' || req.path === '/api/ready' ||
-      req.path.indexOf('/api/cluster/') === 0;
-    if (!req.secure && !intern) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
-    if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  }
-  next();
-});
-
-/* Het schild voor de voordeur (kern/schild.js): applicatie-WAF + DDoS-rem.
-   Altijd aan; localhost (health-checks, tests, poortwachter) slaat hij over.
-   Treffers en bans landen als melding op het beveiligingsbord (techniek). */
-/* De Wacht (kern/wacht.js) wordt verderop gebouwd (na db + beveilig), maar het
-   schild raadpleegt hem nu al voor de quarantaine - laat-gebonden via deze
-   verwijzing zodat een afgesneden indringer er ook echt niet meer in komt. */
-const ssrf = require('./kern/ssrf'); // SSRF-afweer voor client-bepaalde uitgaande doelen
-let wacht = null;
-const schild = require('./kern/schild').maakSchild({
-  meld: (type, ernst, tekst, meta) => { if (beveilig) beveilig.meld(type, ernst, tekst, meta); },
-  logboek: log,
-  quarantaine: (ip) => !!(wacht && wacht.inQuarantaine(ip))
-});
-app.use(schild.middleware);
-
-/* De Wacht, voordeur-reflex (laat-gebonden; `wacht` wordt verderop gebouwd):
-   1. RAND-STATUS. Komt dit verzoek via de rand (Cloudflare/edge) binnen, dan
-      draagt het CF-Ray / CF-Connecting-IP. We noteren dat als live signaal zodat
-      de boardroom ziet of de eerste linie staat -- eerlijk, want het is wat we
-      echt kunnen waarnemen, geen bevoorrechte inkijk in Cloudflare zelf.
-   2. AUTOMATISCHE LASTAFWORP. Trip De Wacht bij een L7-piek zelf een zekering,
-      dan serveren we hier 503 "kom zo terug" (met Retry-After) zolang die dicht
-      staat. Localhost slaan we over (health-checks, tests, poortwachter), net als
-      het schild. De zekering dooft vanzelf; een mens kan hem eerder opheffen. */
-app.use((req, res, next) => {
-  if (wacht) {
-    const ray = req.get('cf-ray'); const cfip = req.get('cf-connecting-ip');
-    if (ray || cfip) { try { wacht.randGezien({ ray, provider: ray ? 'cloudflare' : 'edge' }); } catch (e) {} }
-    const ip = String(req.ip || '');
-    const lokaal = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
-    if (!lokaal) {
-      try {
-        if (wacht.lastAfworpActief()) {
-          res.set('Retry-After', '30');
-          return res.status(503).json({ error: 'De Wacht heeft even de deur op een kier gezet wegens grote drukte. Kom zo terug.' });
-        }
-      } catch (e) {}
-    }
-  }
-  next();
-});
-
-/* Security-headers op elk antwoord. De CSP staat inline scripts/styles toe
-   (de apps zijn bewust self-contained), maar verbiedt elk ander extern
-   verkeer dan de Google Fonts en blokkeert framing en MIME-sniffing. */
-app.use((req, res, next) => {
-  res.set('X-Content-Type-Options', 'nosniff');
-  // SAMEORIGIN i.p.v. DENY: het RTG-bureaublad (zelfde origin) mag onze eigen
-  // apps schermvullend insluiten; andere sites kunnen ons nog steeds niet
-  // framen (clickjacking-bescherming blijft tegen derden overeind).
-  res.set('X-Frame-Options', 'SAMEORIGIN');
-  /* Referrer-Policy is hier geen formaliteit. De live-verbindingen (SSE)
-     kunnen geen Authorization-header meesturen -- EventSource kan dat niet --
-     dus daar reist het sessietoken mee als ?token= in de URL. Met deze regel
-     krijgt een externe partij hooguit onze origin te zien, nooit de hele URL,
-     en lekt dat token dus niet via de Referer-header weg.
-     Wat dit NIET oplost: een reverse proxy of CDN legt standaard de complete
-     URL vast in zijn access log. Onze eigen logger doet dat niet (die schrijft
-     req.path, zonder querystring; test/loghygiene.test.js bewaakt het), maar
-     de proxy moet apart worden ingesteld -- zie PRODUCTION.md. */
-  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  // 9+-hardening: eigen vensters delen geen proces met vreemden (COOP), onze
-  // bestanden zijn niet als bron voor andere sites bruikbaar (CORP), de
-  // browser lekt geen DNS-voorkennis, en gevoelige browser-API's staan
-  // expliciet dicht behalve wat de apps zelf nodig hebben.
-  res.set('Cross-Origin-Opener-Policy', 'same-origin');
-  res.set('Cross-Origin-Resource-Policy', 'same-origin');
-  res.set('X-DNS-Prefetch-Control', 'off');
-  res.set('X-Permitted-Cross-Domain-Policies', 'none');
-  res.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), serial=(), bluetooth=(), midi=()');
-  /* DE TERUGVAL-CSP, EN WAAROM HIER GEEN 'unsafe-inline' MEER STAAT.
-
-     HTML-pagina's krijgen hun CSP van cspNonce (middleware/voordeur.js): een
-     verse nonce per verzoek, geen unsafe-inline. Deze regel geldt voor al het
-     ANDERE -- JSON-antwoorden, statische bestanden, foutpagina's -- en gold
-     tot nu toe ook voor elke HTML-pagina die cspNonce om wat voor reden dan
-     ook niet oppakte.
-
-     Dat is geen theorie: de kop van voordeur.js beschrijft precies zo'n geval,
-     waarin "/" terugviel op deze regel en juist de meest bezochte pagina de
-     zwakste bescherming kreeg. Een terugval die stiller is dan het origineel
-     is de verkeerde kant op falen. Zonder unsafe-inline breekt zo'n pagina
-     zichtbaar in plaats van dat ze haar bescherming stilletjes verliest. */
-  res.set('Content-Security-Policy',
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
-    "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
-    "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
-  next();
-});
-
-/* De meelees-laag van de RTG AI (kern/rtgai.js): telt alleen mee met het
-   verkeer en doet verder niets; de kern wordt verderop aangesloten. */
-let rtgaiMeelezer = null;
-app.use((req, res, next) => {
-  res.on('finish', () => { try { if (rtgaiMeelezer) rtgaiMeelezer.lees(req.method, req.path, res.statusCode); } catch (e) {} });
-  next();
-});
-
-/* De twee betaal-webhooks staan in ./opzet/webhooks.js. Ze horen HIER en niet
-   in de gewone routebedrading: een handtekening wordt over de RAUWE body
-   berekend, dus ze moeten voor express.json() gemount zijn. Welke
-   poortwachters ze wel en niet krijgen -- en waarom de hoofdzekering er
-   bewust niet bij zit -- staat in de kop van dat bestand. */
-require('./opzet/webhooks')({
-  app, express, db, save, log, betaal, muntbetaal,
+const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
+  app, express, log, logboek, db, save, betaal, muntbetaal, zaakdoos, PRODUCTION,
   opslagKlaar: () => opslagKlaar(),
-  // pas verderop in dit bestand gebouwd; zie de uitleg in webhooks.js
+  // alle drie pas verderop in dit bestand gebouwd; lui doorgegeven
+  beveiligVan: () => beveilig,
   muntenVan: () => munten, settleFactuurVan: () => settleFactuur
 });
 
-app.use(express.json({ limit: '8mb' }));
-
-/* Grenswacht tegen pathologisch diep geneste invoer. Een echte API-body is
-   een handvol niveaus diep; een 20.000-diep geneste array is geen gebruiker
-   maar een aanval: elke String()/Number()-coercie erop laat de stack
-   overlopen (Array.toString -> join -> recursie). We keuren de diepte hier
-   ITERATIEF (met een eigen stack, dus zelf niet te laten overlopen) en
-   weigeren te diep met een nette 400, voordat een route de body aanraakt. */
-const MAX_DIEPTE = 40;
-function teDiep(wortel) {
-  const stapel = [[wortel, 1]];
-  while (stapel.length) {
-    const [v, d] = stapel.pop();
-    if (!v || typeof v !== 'object') continue;
-    if (d > MAX_DIEPTE) return true;
-    for (const k in v) if (Object.prototype.hasOwnProperty.call(v, k)) stapel.push([v[k], d + 1]);
-  }
-  return false;
-}
-app.use((req, res, next) => {
-  if (req.body && typeof req.body === 'object' && teDiep(req.body))
-    return res.status(400).json({ error: 'Ongeldige invoer: te diep genest.' });
-  next();
-});
-
-/* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
-   journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.
-   Inloggen en de livestream horen bij de doos zelf en spelen we niet na. */
-if (zaakdoos.actief) {
-  app.use((req, res, next) => {
-    if (zaakdoos.modusVan() !== 'lokaal' || req.method !== 'POST') return next();
-    if (!req.path.startsWith('/api/supplier/') || req.path === '/api/supplier/login' || req.path.startsWith('/api/supplier/stream')) return next();
-    const echteJson = res.json.bind(res);
-    res.json = (d) => { if (res.statusCode < 300) zaakdoos.schrijfJournaal(req.path, req.body, d); return echteJson(d); };
-    next();
-  });
-}
-
-/* ---------- de poortwachters voor de routers (server/middleware/) ----------
-   Drie remmen, de functieschakelaars, de compressie en de voordeur. Ze staan
-   in deze volgorde omdat elke laag werk bespaart voor de laag erna: eerst
-   weigeren wat we sowieso weigeren, dan pas comprimeren en serveren. */
-const { remOpDeDeur, opslagPoort, hoofdzekering } = require('./middleware/remmen');
-const { schakelaars } = require('./middleware/functieschakelaars');
-const { jsonGzip, statischGzip } = require('./middleware/compressie');
-const { bureaublad, cspNonce } = require('./middleware/voordeur');
-
+/* ---------- de poortwachters voor de routers staan in ./opzet/poortwachters.js
+   De drie remmen, de functieschakelaars met hun storingswachter, de compressie,
+   het scan-net, de RTFoundation-router en de voordeur met de statische
+   bestanden. Ook hier een late binding: het scan-net wordt pas gebouwd als
+   `beveilig` en `wacht` er zijn (zetScanNet). */
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
-const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
-const functies = require('./functies');
-
-remOpDeDeur(app, PRODUCTION || process.env.RTG_RATELIMIT === '1');
-app.use(opslagPoort(opslagKlaar));
-app.use(hoofdzekering({ db, accounts, eigenaar }));
-// sessionFor en findSupplier staan verderop in dit bestand; ze worden pas bij
-// een echt verzoek geraadpleegd, dus geven we ze lui door in plaats van hier
-// hun waarde te lezen (die er op dit punt nog niet is).
-/* De storingswachter: de automaat van de schakelkast. Meet elke API-respons
-   via de schakelaars-middleware, gooit een functie dicht bij een golf echte
-   serverfouten en opent hem op proef weer (server/functies/wachter.js). De
-   sseToOffice is hoisted en bestaat pas bij het eerste verzoek; vandaar lui. */
-const functiewachter = require('./functies/wachter').maakWachter({
-  db, save, log,
-  sseToOffice: (ev, data) => sseToOffice(ev, data)
-});
-functiewachter.start();
-app.use(schakelaars({ db, accounts, functies,
+const { rtf, CSP_NONCE, zetScanNet } = require('./opzet/poortwachters')({
+  app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar,
+  // hoisted of verderop in dit bestand; lui doorgegeven
+  sseToOffice: (ev, data) => sseToOffice(ev, data),
   sessionFor: t => sessionFor(t),
   findSupplier: c => findSupplier(c),
-  wachter: functiewachter }));
-app.use(jsonGzip());
-
-/* DE PLEK VAN HET SCAN-NET, en waarom hij hier staat en niet waar hij gebouwd wordt.
-
-   Verderop (zoek op "Universeel scan-net") staat een middleware die elke
-   schrijf-aanvraag door De Ontsmetter haalt, met de belofte dat ALLE
-   upload-plekken "in een klap gedekt" zijn. Die belofte klopte niet: express
-   draait middleware in REGISTRATIEVOLGORDE, en de RTFoundation-router hieronder
-   wordt eerder gemount. Een verzoek dat die router afhandelt roept next() nooit
-   aan en bereikt de scanner dus nooit -- inclusief de fotokant van het
-   leerlingenschrift, dat een eigen express.json({limit:'4mb'}) heeft. De hele
-   /api/foundation-tak stond buiten het "universele" net.
-
-   De scanner zelf kan hier nog niet gebouwd worden: hij heeft `beveilig` en
-   `wacht` nodig en die komen later in de bedrading. Daarom staat hier een dun
-   doorgeefluik dat hem aanroept zodra hij er is. Tijdens het opstarten is er
-   nog geen luisterende poort, dus er glipt niets doorheen. */
-let scanNet = null;
-app.use((req, res, next) => (scanNet ? scanNet(req, res, next) : next()));
-
-// RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
-// (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
-// draait mee op dezelfde database en failover.
-const rtf = require('./foundation');
-app.use('/api/foundation', rtf.router);
-// een gezinsmelding voor een gekoppelde oppas/familie ook als telefoonmelding (web-push)
-rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch (e) {} });
-
-bureaublad(app);
-app.use(cspNonce(PUBLIC_DIR, CSP_NONCE));
-app.get(/\.(?:js|css|svg|json|webmanifest)$/, statischGzip(PUBLIC_DIR));
-/* Zelfde cache-regel als statischGzip (zie compressie.js): script en stijl
-   altijd laten navragen (ETag/304), anders serveert een tussenlaag na een
-   update urenlang oud script naast nieuwe html en breekt de app stil. */
-app.use(express.static(PUBLIC_DIR, {
-  setHeaders: (res, p) => {
-    if (/\.(?:js|css|json|webmanifest|svg)$/.test(p)) res.setHeader('Cache-Control', 'no-cache');
-  }
-}));
+  sendPushToUser: (u, n) => sendPushToUser(u, n)
+});
 
 /* ---------- Claude API (optioneel) ---------- */
 
@@ -780,10 +514,11 @@ const {
   beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
   ensureSupplierDefaults, etaMinutes, gidsHaal, gidsWeg, gidsZoekCodenaam, guestsFor, 
   haversine, initRealtime, keyVanCodenaam, ledenAantal, leverSse, liveCodename, liveStateFor, 
-  naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam, 
+  mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam,
+  rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar,
   ruimBuffer, salonItemsVan, salonProfielCompleet, salonZichtbaar, sendPush, sendPushToUser, 
   speelOpnieuw, sseBuffer, sseClients, sseSend, sseToCustomer, toRad, webpush, werkmail
-  , scanNet: scanNetGebouwd, wacht: wachtGebouwd
+  , scanNet, wacht
 } = require('./opzet/diensten')({
   DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n, 
   ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsWeg, ledenGidsZet, 
@@ -794,9 +529,12 @@ const {
   lidBoardUitVan: () => lidBoardUit, lidPadFunctieVan: () => lidPadFunctie
 });
 /* De twee draden terug, hier gezet en niet daar (zie de kop van diensten.js):
-   beide staan hierboven als een `let` omdat middleware ze per verzoek leest. */
-scanNet = scanNetGebouwd;
-wacht = wachtGebouwd;
+   beide worden per verzoek gelezen door middleware die HIERBOVEN al gemount is.
+   Ze gingen eerst via een `let` die de middleware en de bedrading deelden; nu
+   via een zetter, zodat er geen variabele meer is die twee bestanden nodig
+   hebben om hem te begrijpen. */
+zetScanNet(scanNet);
+zetWacht(wacht);
 /* ---------- Salon-rechten (server-side afgedwongen) ----------
    gast: alleen liken; RTG: reageren/dm'en met RTG-leden;
    Lifestyle & Business: volledige interactie met alle leden.
@@ -1982,7 +1720,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, naamlaag,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
@@ -2837,7 +2575,7 @@ const gekozenDomeinen = require('./opzet/routes')(kern);
    toewijzing aan een binding uit een ander bestand is geen bedrading meer maar
    een verborgen draad terug. Per verzoek uitgelezen, dus dit moment is vroeg
    genoeg. */
-rtgaiMeelezer = kern.rtgai || null;
+zetRtgai(kern.rtgai || null);
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet
    alleen het office-domein dit, zodat niet twee processen tegelijk aan de
@@ -2850,243 +2588,26 @@ if (gekozenDomeinen.includes('office')) {
   if (archiefTimer.unref) archiefTimer.unref();
 }
 
-/* ---------- afsluiters: nette 404 en centrale foutafhandeling ---------- */
+/* ---------- de afsluiters en de start staan in ./opzet/start.js ----------
 
-app.use('/api', (req, res) => res.status(404).json({ error: 'Onbekend eindpunt.' }));
-app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, '..', 'public', 'site', '404.html'));
-});
-app.use((err, req, res, next) => {
-  const status = err && err.type === 'entity.too.large' ? 413 : ((err && err.status) || 500);
-  // 5xx is een ECHTE serverfout (geen client-invoerfout zoals 400/413): apart
-  // gemarkeerd zodat de strenge testpoort er hard op faalt en de productie-logs
-  // de twee soorten uit elkaar houden.
-  log.uitzondering(err instanceof Error ? err : new Error(String(err)),
-    { id: req && req.id, p: req && req.path, status, ...(status >= 500 ? { serverfout: true } : {}) });
-  if (res.headersSent) return next(err);
-  res.status(status).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
-});
+   Daar staan: de nette 404, de centrale foutafhandeling, de dagelijkse
+   back-up, het periodieke onderhoud, de opstartwaarschuwingen, het luisteren
+   op de poort, IMAP, STUN, ACME en het nette afsluiten. Alles in dat bestand
+   draait EEN keer, bij de start; geen enkele route roept er iets uit aan.
 
-/* De dagelijkse back-up staat in ./opzet/backup.js: wat erin hoort, hoe lang
-   hij bewaard blijft en de kopie naar RTG_BACKUP_DIR. Hier alleen nog de
-   aansluiting -- de aanroepen staan onder "start" hieronder, en de
-   cluster-route roept hem aan na een overname. */
-const { backupData } = require('./opzet/backup')({
-  fs, path, DATA_DIR, db, accounts, checkpointSqlite, checkpointGrootboek
-});
+   Deze aanroep hoort ONDERAAN te blijven: de 404-afsluiters worden daar
+   geregistreerd, en wie in Express eerder gaat staan vangt routes af die nog
+   moesten komen.
 
-/* ---------- start ---------- */
-
-initRealtime();
-// Gedeelde data via Redis aanzetten (JSON-opslag, lees-replica's).
-startGedeeld().catch(e => console.warn('[db] gedeelde data mislukt:', e.message));
-// Kruisproces-synchronisatie voor de SQLite-opslag (echt losse schrijvende servers).
-startSqliteSync();
-// PostgreSQL-opslag aanzetten (gedeelde, duurzame database over meerdere instances).
-/* POSTGRES BLIJVEN PROBEREN, IN PLAATS VAN VOORGOED OP 503 TE STAAN.
-
-   Hier stond een enkele aanroep met een .catch die de fout logde en verder
-   niets. In de Postgres-stand geeft opslagKlaar() dan false, en de
-   opslagpoortwachter beantwoordt ELKE API met 503 -- voorgoed. Is de database
-   bij het opstarten een halve minuut niet bereikbaar (een herstart, een
-   netwerkhikje, een container die net iets eerder start), dan is de instance
-   dood tot iemand hem met de hand herstart. Dat is geen storing van een
-   halve minuut maar een storing tot er iemand kijkt.
-
-   Nu opnieuw proberen met oplopende pauzes, tot een halve minuut. Bewust
-   ZONDER bovengrens op het aantal pogingen: een server die wacht op zijn
-   database is precies wat je wilt, en zolang hij niet klaar is laat de
-   poortwachter er ook niets door. Bij elke poging een regel in het log, zodat
-   het zichtbaar is en niet als stilte overkomt.
-
-   Dezelfde behandeling voor de accounts-spiegel eronder. Die wedgt de server
-   niet op 503, maar viel bij een mislukte eerste poging stil terug op alleen
-   de lokale kluis: een registratie op instance A kwam dan nooit op B, zonder
-   dat iets dat later nog rechtzette.
-
-   Wat hier NIET wordt opgelost: wat de server moet doen als Postgres wegvalt
-   terwijl hij DRAAIT. Doorgaan op de lokale kopie of dichtgaan is een
-   bedrijfskeuze en geen bugfix; die vraag ligt bij de eigenaar. */
-// De eerste pauze; verdubbelt tot een halve minuut. Instelbaar zodat een toets
-// niet seconden hoeft te wachten om te zien DAT er opnieuw geprobeerd wordt.
-const PG_HERKANS_MS = Math.max(50, Number(process.env.PG_HERKANS_MS || 1000));
-function blijfProberen(naam, doe, poging) {
-  poging = poging || 0;
-  Promise.resolve().then(doe).catch(e => {
-    // De stack een keer, niet bij elke herkansing: anders vult een database die
-    // een minuut wegblijft het log met twintig keer hetzelfde spoor en is de
-    // regel die er wel toe doet niet meer te vinden.
-    if (poging === 0) log.uitzondering(e instanceof Error ? e : new Error(String(e)), { bron: naam, poging: 1 });
-    const wacht = Math.min(30000, PG_HERKANS_MS * Math.pow(2, Math.min(poging, 5)));
-    console.warn('[db] ' + naam + ' nog niet gelukt (poging ' + (poging + 1) + ': ' + e.message +
-      '); opnieuw over ' + Math.round(wacht / 100) / 10 + ' s.');
-    const t = setTimeout(() => blijfProberen(naam, doe, poging + 1), wacht);
-    if (t.unref) t.unref();
-  });
-}
-blijfProberen('startPostgres', startPostgres);
-// Accounts eveneens delen via PostgreSQL (zodat een registratie op instance A ook
-// op instance B werkt); zonder DATABASE_URL blijft dit inert.
-blijfProberen('accounts.startPostgres', () => accounts.startPostgres()
-  /* NOGMAALS de eigenaars-bootstrap. startPostgres() trekt de gedeelde
-     users-tabel binnen met "Postgres wint" -- terecht voor echte data, maar het
-     draaide de demo-bootstrap hierboven terug en liet de eigenaar buiten staan.
-     Alleen in demostand; in productie draait dit nooit. */
-  .then(() => { if (DEMO) { try { zetEigenaarsAccount(); } catch (e) { log.warn && log.warn('[demo] eigenaars-bootstrap na de pull mislukt: ' + e.message); } } }));
-// Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
-// opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke bezoekers.
-setInterval(() => {
-  const nu = Date.now();
-  for (const [k, f] of loginFails) if (f.until < nu) loginFails.delete(k);
-  pinSlot.opruimen(); // ruimt alleen op wat niets meer tegenhoudt EN niets meer telt
-  ruimBuffer();
-}, 5 * 60 * 1000).unref();
-backupData();
-setInterval(backupData, 24 * 60 * 60 * 1000);
-/* De bewaarveger en de regel eronder (tot wanneer iemand lid is) staan in
-   ./opzet/bewaarveger.js. Die regel gaat over iemands gegevens en hoorde niet
-   middenin een opstartblok te staan. */
-require('./opzet/bewaarveger')({ db, save, accounts, log, UPLOAD_DIR });
-
-// Eerlijke opstartcontrole: waarschuw als demo-instellingen mee naar productie gaan.
-if (PRODUCTION) {
-  if (!process.env.OFFICE_CODE) console.warn('[start] LET OP: OFFICE_CODE staat op de demo-waarde. Zet een eigen code in de omgeving.');
-  if (DEMO) console.warn('[start] LET OP: de demo-inlog (universeel account) is AAN in productie (RTG_DEMO=1). Zet hem uit voor een echte lancering.');
-  if (!process.env.SMTP_URL) console.warn('[start] LET OP: geen SMTP_URL; e-mail gaat naar de outbox in plaats van naar klanten.');
-  if (!process.env.ANTHROPIC_API_KEY) console.warn('[start] Info: geen ANTHROPIC_API_KEY; AI en chatvertaling draaien in demo-stand.');
-  /* HET EIGENAARSACCOUNT: alleen zeggen als het ECHT ergens over gaat.
-
-     Sinds de registratie op het eigenaarsadres een eenmalige sleutel vraagt
-     (RTG_OWNER_BOOTSTRAP, zie routes/auth/account.js) is er een stand waarin
-     niemand ooit nog eigenaar kan worden: geen account op dat adres én geen
-     sleutel gezet. Dan hoort er iets te staan.
-
-     Ik had die controle eerst in config.valideer() gezet, en dat was fout:
-     die kent alleen de omgeving, niet de database. Hij waarschuwde dus zodra
-     de sleutel ontbrak -- terwijl de normale eindstand juist IS dat hij weg
-     is (dat staat in dezelfde waarschuwing). Een melding die in het gewone
-     geval afgaat leert iedereen hem weg te kijken. Hier kunnen we de vraag
-     wél beantwoorden, want de accounts zijn geladen. */
-  try {
-    const oAdres = eigenaar.eigenaarEmail();
-    const oBestaat = !!accounts.findByLogin(oAdres);
-    if (!oBestaat && !process.env.RTG_OWNER_BOOTSTRAP)
-      console.warn('[start] LET OP: er is nog geen account op het eigenaarsadres (' + oAdres +
-        ') en RTG_OWNER_BOOTSTRAP is niet gezet. Niemand kan zich nu als eigenaar registreren. Zet de sleutel, registreer een keer, en haal hem daarna weg.');
-    if (oBestaat && process.env.RTG_OWNER_BOOTSTRAP)
-      console.warn('[start] LET OP: RTG_OWNER_BOOTSTRAP staat nog gezet terwijl het eigenaarsaccount al bestaat. Haal hem uit de omgeving; hij heeft geen doel meer.');
-  } catch (e) {}
-}
-
-const PORT = process.env.PORT || 3000;
-/* Waar luisteren we? Draait deze server achter een poortwachter -- als kind
-   van server/trio.js (RTG_CLUSTER_KEY) of van de vloot (RTG_DOMAINS) -- dan
-   hoort hij ALLEEN op de loopback te staan. Twee redenen:
-
-   1. Veiligheid. Zonder host bindt node op alle interfaces. Dan staat elke
-      reserveserver open op het netwerk en kan iedereen in het pand de
-      poortwachter overslaan: geen doorstuurregels, geen X-Forwarded-For,
-      geen enkele laag ertussen. Alleen de poortwachter hoort naar buiten.
-
-   2. Bereikbaarheid, en die kostte een avond. Zonder host luistert node op
-      :: (IPv6). Op een macOS waar net.inet6.ip6.v6only aan staat komt een
-      verbinding naar 127.0.0.1 daar nooit aan. De poortwachter gebruikt
-      127.0.0.1 en concludeerde dus dat er geen enkele server leefde --
-      terwijl alle drie keurig stonden te luisteren. lsof laat ze zien op
-      *:3001 tot *:3003, en de site geeft ondertussen "alle servers zijn
-      tijdelijk onbereikbaar".
-
-   RTG_BIND overschrijft dit als iemand het bewust anders wil. Draait de
-   server los (npm run single), dan blijft hij gewoon op alle interfaces --
-   dan is hij zelf de voordeur. */
-const HOST = process.env.RTG_BIND ||
-  ((process.env.RTG_CLUSTER_KEY || process.env.RTG_DOMAINS) ? '127.0.0.1' : '');
-function gestart() {
-  if (process.env.RTG_SERVER) {
-    console.log(`klaar op poort ${PORT}, rol: ${db.writable ? 'actief' : 'standby'}`);
-  } else {
-    console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/app.html`);
-  }
-  console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
-}
-const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
-/* EEN BEZETTE POORT IS EEN STARTFOUT, GEEN SERVERFOUT.
-
-   app.listen meldt een mislukking (EADDRINUSE als de poort bezet is, EACCES
-   onder 1024 zonder rechten) via een 'error'-gebeurtenis op de server. Er
-   luisterde niemand, dus viel hij door naar het uncaughtException-vangnet.
-
-   Het proces STOPTE daar wel netjes op, met exitcode 1 -- ik had eerst
-   opgeschreven dat het bleef hangen, en dat was niet waar; nagemeten doet de
-   oude code precies wat hij hoort te doen. Wat er wel misging zit in de
-   BENOEMING. De regel die er dan in het log verschijnt draagt
-   "bron":"uncaughtException" en "fataal":true, en test/helper.js rekent
-   uitgerekend dat patroon af als een serverfout die de hele testrun laat
-   falen. De helper legt in zijn eigen commentaar uit dat een poort-race
-   voorkomt en dat hij daarom opnieuw probeert -- maar de geslaagde herkansing
-   nam de valse "server-uitzondering" niet meer weg. Een testrun kon zo rood
-   worden door een poortbotsing die keurig was opgevangen.
-
-   Een startfout hoort ook een startfout te heten. Deze luisteraar noemt hem bij
-   naam ("poort ... is al in gebruik") onder bron "listen", en stopt meteen met
-   een foutcode zodat een proces-manager ons herstart.
-
-   Meegenomen in hetzelfde stuk: de exit-timer in het uncaughtException-vangnet
-   stond .unref() -- zie de uitleg daar. */
-server.on('error', (err) => {
-  const waar = (HOST || '0.0.0.0') + ':' + PORT;
-  const uitleg = err && err.code === 'EADDRINUSE'
-    ? 'poort ' + waar + ' is al in gebruik -- draait er al een RTG-server?'
-    : (err && err.code === 'EACCES'
-      ? 'geen rechten om op ' + waar + ' te luisteren (poorten onder 1024 vragen root of CAP_NET_BIND_SERVICE)'
-      : 'kon niet op ' + waar + ' luisteren: ' + (err && err.message));
-  console.error('[start] ' + uitleg);
-  try { log.uitzondering(err instanceof Error ? err : new Error(String(err)), { bron: 'listen', fataal: true }); } catch (e) {}
-  process.exit(1);
-});
-// Eigen STUN-server (RFC 5389) voor (video)bellen: geen leun meer op de publieke
-// STUN van Google. Draait op UDP (STUN_PORT, standaard 3478); STUN_UIT=1 zet uit.
-// De socket is unref'd, dus dit houdt het afsluiten nooit tegen.
-const stunServer = require('./stun').start({ log });
-/* Satellietvriendelijk: op hoge-latency verbindingen (satelliet, traag mobiel)
-   duurt een nieuwe TLS-handshake al snel seconden. Houd bestaande verbindingen
-   daarom ruim open, dan wordt hij hergebruikt in plaats van opnieuw opgezet.
-   headersTimeout hoort boven keepAliveTimeout te blijven (Node-vereiste). */
-server.keepAliveTimeout = 75000;
-server.headersTimeout = 90000;
-
-/* Native TLS + eigen ACME: als de app zelf TLS termineert (RTG_TLS=1) EN ACME aan
-   staat (RTG_ACME=1 + RTG_TLS_DOMAIN + RTG_TLS_EMAIL), haalt en vernieuwt ze zelf
-   een echt Let's Encrypt-certificaat en laadt dat live in -- geen certbot, geen
-   reverse proxy. Volledig gated; standaard uit, en het mag de app nooit laten
-   vallen (mislukt de uitgifte, dan blijven we op het self-signed cert draaien).
-   Zet RTG_ACME_STAGING=1 om eerst tegen de staging-CA te oefenen (geen rate-limit). */
-if (process.env.RTG_TLS === '1' && process.env.RTG_ACME === '1' && server && typeof server.herlaadCert === 'function') {
-  const domeinen = String(process.env.RTG_TLS_DOMAIN || '').split(',').map(s => s.trim()).filter(Boolean);
-  const email = String(process.env.RTG_TLS_EMAIL || '').trim();
-  if (domeinen.length && email) {
-    require('./lib/tls-acme').startAcme({ server, domains: domeinen, email, dataDir: DATA_DIR, staging: process.env.RTG_ACME_STAGING === '1', log: (m) => log.info(m) })
-      .then(() => log.info('[tls] ACME actief voor ' + domeinen.join(', ')))
-      .catch((e) => log.warn('[tls] ACME-start mislukt; app draait door op het self-signed cert: ' + e.message));
-  } else {
-    log.warn('[tls] RTG_ACME=1 maar RTG_TLS_DOMAIN/RTG_TLS_EMAIL ontbreekt; ACME overgeslagen.');
-  }
-}
-
-// Netjes afsluiten: data wegschrijven, verbindingen sluiten, dan pas stoppen.
-for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
-  console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
-  try { save(); } catch (e) {}
-  // Bij Postgres: nog een laatste flush zodat niets in de write-behind hangt.
-  Promise.allSettled([Promise.resolve(flushBijAfsluiten()), Promise.resolve(accounts.flushBijAfsluiten())]).finally(() => {
-    server.close(() => process.exit(0));
-  });
-  // Vangnet als de flush hangt. Bij write-behind (Postgres) kan een laatste
-  // flush op grote schaal seconden duren; 3 s kapte hem af en verloor de laatste
-  // write-behind-staat. Ruimer nu, zodat een normale afsluit-flush kan afronden;
-  // de klein-eerst-volgorde (server/pg/sync.js) borgt dat geld sowieso als eerste
-  // landt, ook als dit vangnet toch nog vuurt.
-  setTimeout(() => process.exit(0), Number(process.env.RTG_STOP_GRACE_MS || 20000)).unref();
+   backupData komt hiervandaan en wordt HIERBOVEN al gebruikt door de
+   cluster-route (na een overname). Dat mag: die route draait pas als de server
+   luistert, en dan is deze regel allang uitgevoerd. */
+const { server, backupData } = require('./opzet/start')({
+  app, fs, path, PUBLIC_DIR, DATA_DIR, UPLOAD_DIR,
+  log, db, accounts, save, eigenaar, webpush, kern,
+  checkpointSqlite, checkpointGrootboek,
+  initRealtime, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten,
+  DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer
 });
 
 /* Naar buiten toe is dit een startscript, geen module: niets require't

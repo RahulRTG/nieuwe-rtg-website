@@ -123,7 +123,11 @@ function statischeServer() {
     // contrast is ADVISEREND (niet-fataal): tonen, niet laten falen (meetverschil met axe)
     if (res.contrast.length) {
       contrastTotaal += res.contrast.reduce((n, v) => n + v.aantal, 0);
-      for (const v of res.contrast) console.log(`  · (advies) ${v.help} (${v.aantal}x)`);
+      for (const v of res.contrast) {
+        console.log(`  · (advies) ${v.help} (${v.aantal}x)`);
+        // WAAR: zonder plaats is een contrastmelding niet te repareren.
+        for (const w of (v.waar || [])) console.log(`      ${w}`);
+      }
     }
   }
   await browser.close();

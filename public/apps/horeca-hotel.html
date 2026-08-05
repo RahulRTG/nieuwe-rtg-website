@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Horeca: hotel</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/apps/horeca/scherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey">RTG Horeca</span><h1>Gastrekening en roomservice</h1></span>
+  <span style="flex:1;"></span>
+</header>
+<main id="main">
+  <div class="kpis">
+    <div class="kpi"><b id="hAantal">-</b><span>open gastrekeningen</span></div>
+    <div class="kpi"><b id="hOpenTotaal">-</b><span>samen openstaand</span></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Open gastrekeningen</div>
+    <div id="hLijst"></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Kamer openen</div>
+    <div class="rij">
+      <input class="veld" id="hKamer" maxlength="20" placeholder="Kamer" aria-label="Kamernummer" style="flex:0 1 7rem;">
+      <input class="veld" id="hGast" maxlength="60" placeholder="Naam van de gast" aria-label="Gastnaam">
+      <input class="veld" id="hGasten" type="number" min="1" max="20" value="2" aria-label="Aantal gasten" style="flex:0 1 5rem;">
+      <input class="veld" id="hVan" maxlength="10" placeholder="Van" aria-label="Aankomstdatum" style="flex:0 1 8rem;">
+      <input class="veld" id="hTot" maxlength="10" placeholder="Tot" aria-label="Vertrekdatum" style="flex:0 1 8rem;">
+      <input class="veld" id="hNachtprijs" type="number" min="0" step="0.01" placeholder="Nachtprijs" aria-label="Nachtprijs" style="flex:0 1 8rem;">
+      <input class="veld" id="hBelasting" type="number" min="0" step="0.01" placeholder="Toeristenbelasting p.p." aria-label="Toeristenbelasting per persoon" style="flex:0 1 11rem;">
+      <button class="knop p" id="hOpen" type="button">Openen</button>
+      <button class="knop" id="hToon" type="button">Toon</button>
+    </div>
+    <p class="stil" style="margin-top:.4rem;">De toeristenbelasting is een eigen regel en zit niet in de kamerprijs: een gast hoort te zien wat hij aan wie betaalt.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">De rekening</div>
+    <div id="hDetail"><p class="stil">Kies een kamer.</p></div>
+    <div class="rij" style="margin-top:.6rem;">
+      <select class="veld" id="hSoort" aria-label="Soort boeking" style="flex:0 1 10rem;"></select>
+      <input class="veld" id="hOmschrijving" maxlength="100" placeholder="Omschrijving" aria-label="Omschrijving">
+      <input class="veld" id="hBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag" style="flex:0 1 8rem;">
+      <button class="knop p" id="hBoek" type="button">Op de rekening</button>
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <select class="veld" id="hWijze" aria-label="Betaalwijze" style="flex:0 1 8rem;">
+        <option value="pin">Pin</option><option value="contant">Contant</option>
+        <option value="online">Online</option><option value="rekening">Op rekening</option>
+      </select>
+      <button class="knop p" id="hAfrekenen" type="button">Afrekenen</button>
+    </div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Nachtrun</div>
+    <div class="rij">
+      <input class="veld" id="hNachtDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de nachtrun" style="flex:0 1 11rem;">
+      <button class="knop p" id="hNacht" type="button">Draaien</button>
+    </div>
+    <p class="stil" id="hNachtUit" style="margin-top:.4rem;"></p>
+    <p class="stil">De nachtrun is idempotent op de datum: twee keer draaien boekt niet twee nachten.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Borg</div>
+    <div class="rij">
+      <input class="veld" id="hBorgBedrag" type="number" min="0" step="0.01" placeholder="Afgesproken borg" aria-label="Borgbedrag" style="flex:0 1 10rem;">
+      <button class="knop" id="hBorg" type="button">Noteren</button>
+      <input class="veld" id="hBorgIn" type="number" min="0" step="0.01" placeholder="In te houden" aria-label="In te houden bedrag" style="flex:0 1 9rem;">
+      <input class="veld" id="hBorgReden" maxlength="160" placeholder="Reden van inhouding" aria-label="Reden van inhouding">
+      <button class="knop" id="hBorgTerug" type="button">Afhandelen</button>
+    </div>
+    <p class="stil" id="hBorgUit" style="margin-top:.4rem;"></p>
+    <p class="stil">Dit is een aantekening van de afspraak. Er wordt niets vastgezet bij de bank van de gast; dat kan alleen een betaaldienst.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop" id="sKop">Roomservice</div>
+    <div class="rij">
+      <input class="veld" id="sKamer" maxlength="20" placeholder="Kamer" aria-label="Kamer voor roomservice" style="flex:0 1 7rem;">
+      <input class="veld" id="sGasten" type="number" min="1" max="20" value="1" aria-label="Aantal personen" style="flex:0 1 5rem;">
+      <button class="knop p" id="sOpen" type="button">Bestelling openen</button>
+    </div>
+    <div id="sLijst" style="margin-top:.6rem;"></div>
+    <div id="sDetail" style="margin-top:.4rem;"></div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="sNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Gerecht">
+      <input class="veld" id="sPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs" style="flex:0 1 7rem;">
+      <input class="veld" id="sAantal" type="number" min="1" max="99" value="1" aria-label="Aantal" style="flex:0 1 5rem;">
+      <input class="veld" id="sAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie" style="flex:0 1 9rem;">
+      <button class="knop p" id="sRegel" type="button">Zet erop</button>
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="sServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Gewenste serveertijd" style="flex:0 1 8rem;">
+      <button class="knop" id="sVrij" type="button">Naar de keuken</button>
+      <button class="knop p" id="sOpKamer" type="button">Op de kamer boeken</button>
+    </div>
+    <p class="stil" style="margin-top:.4rem;">Op de kamer boeken kan alleen als daar een open gastrekening staat. Anders verdwijnt een rekening in een kamer die leegstaat, en dat merkt niemand tot de dagafsluiting.</p>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/hotel-folio.js"></script>
+<script src="/apps/horeca/hotel-roomservice.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

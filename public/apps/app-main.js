@@ -4330,6 +4330,12 @@
       open.appendChild(lijf);
       const onder = document.createElement('span'); onder.className = 'wing-onder';
       open.appendChild(onder);
+      /* KLAAR-MARKERING. Een widget die zijn bron nog ophaalt en een widget die
+         niets te melden heeft, zien er in de DOM identiek uit: een leeg lijf.
+         Zonder markering kan niemand -- ook een schermtoets niet -- het verschil
+         zien, en dan blijft alleen wachten-op-de-klok over. Die markering staat
+         hier dus niet voor de toets maar omdat de toestand echt bestaat: de
+         bron heeft geantwoord, ook als het antwoord leeg was. */
       widgetHaal(bron.pad).then(d => {
         const w = d ? bron.lees(d) : null;
         // niets gevonden of bron stuk: het lijf blijft leeg en onzichtbaar
@@ -4347,7 +4353,11 @@
           }
           kaart.appendChild(rij);
         }
-      });
+      }).catch(() => { /* een stukke bron laat het lijf leeg; dat is de bedoeling */ })
+        .then(() => kaart.classList.add('wing-klaar'));
+    } else {
+      // geen bron om op te wachten: deze kaart is meteen af
+      kaart.classList.add('wing-klaar');
     }
     return kaart;
   }

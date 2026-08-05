@@ -37,6 +37,10 @@ module.exports = [
   { id: 'werk-rtf', categorie: 'RTFoundation', naam: 'Vacatures & solliciteren (RTF)', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'De vacature- en sollicitatielaag binnen de RTFoundation-app.', paden: ['/api/rtf/apply', '/api/rtf/vacatures', '/api/rtf/solliciteer'] },
 
+  // ---- Werk OS (de werkplek van een organisatie) ----
+  { id: 'bedrijf', categorie: 'RTG-Backoffice', naam: 'Werk OS (werkruimtes)', standaard: true, doelgroepen: ['intern', 'business'],
+    uitleg: 'De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte werkt meer.', paden: ['/api/bedrijf'] },
+
   // ---- Betalen & verificatie ----
   { id: 'betalen', categorie: 'Betalen & verificatie', naam: 'Betaalverkeer', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Betalingen (demo of Stripe) en de RTG Pay-wallet. Uit = er kan tijdelijk niet betaald worden.', paden: ['/api/betaal', '/api/pay'] },

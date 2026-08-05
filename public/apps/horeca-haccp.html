@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Horeca: HACCP</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/apps/horeca/scherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey">RTG Horeca</span><h1>HACCP-registratie</h1></span>
+  <span style="flex:1;"></span>
+</header>
+<main id="main">
+  <div class="kpis">
+    <div class="kpi"><b id="aAantal">-</b><span>metingen</span></div>
+    <div class="kpi"><b id="aAfwijking">-</b><span>afwijkingen</span></div>
+    <div class="kpi"><b id="bOver">-</b><span>over de datum</span></div>
+    <div class="kpi"><b id="bBijna">-</b><span>binnen twee dagen</span></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Meetpunten</div>
+    <div class="rij">
+      <input class="veld" id="aPuntNaam" maxlength="60" placeholder="Koeling 1, vriezer, bain-marie" aria-label="Naam van het meetpunt">
+      <input class="veld" id="aMin" type="number" step="0.1" placeholder="Min" aria-label="Ondergrens" style="flex:0 1 6rem;">
+      <input class="veld" id="aMax" type="number" step="0.1" placeholder="Max" aria-label="Bovengrens" style="flex:0 1 6rem;">
+      <input class="veld" id="aFrequentie" maxlength="30" value="dagelijks" aria-label="Frequentie" style="flex:0 1 8rem;">
+      <button class="knop p" id="aPuntZet" type="button">Meetpunt erbij</button>
+    </div>
+    <p class="stil" style="margin-top:.4rem;">Zonder grens is een meting geen controle; daarom weigert de server een meetpunt zonder onder- of bovengrens.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Meting</div>
+    <div class="rij">
+      <select class="veld" id="aPunt" aria-label="Meetpunt" style="flex:0 1 14rem;"></select>
+      <input class="veld" id="aWaarde" type="number" step="0.1" placeholder="Waarde" aria-label="Gemeten waarde" style="flex:0 1 7rem;">
+      <input class="veld" id="aActie" maxlength="200" placeholder="Actie (verplicht bij een afwijking)" aria-label="Genomen actie">
+      <button class="knop p" id="aMeting" type="button">Vastleggen</button>
+    </div>
+    <p class="stil" id="aGemist" style="margin-top:.4rem;"></p>
+    <p class="stil">Een waarde buiten de grens vraagt om wat u hebt gedaan: weggegooid, teruggekoeld, monteur gebeld. Een logboek vol rode cijfers zonder actie is precies wat een inspecteur een boete waard vindt.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Logboek</div>
+    <div class="rij">
+      <input class="veld" id="aVan" maxlength="10" placeholder="Van" aria-label="Van datum" style="flex:0 1 9rem;">
+      <input class="veld" id="aTot" maxlength="10" placeholder="Tot" aria-label="Tot datum" style="flex:0 1 9rem;">
+      <button class="knop" id="aToon" type="button">Toon</button>
+    </div>
+    <div id="aLog" style="margin-top:.6rem;"></div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="aCorId" maxlength="10" placeholder="Meting" aria-label="Meting om te corrigeren" style="flex:0 1 7rem;">
+      <input class="veld" id="aCorWaarde" type="number" step="0.1" placeholder="Juiste waarde" aria-label="Juiste waarde" style="flex:0 1 9rem;">
+      <input class="veld" id="aCorReden" maxlength="160" placeholder="Waarom" aria-label="Reden van de correctie">
+      <button class="knop" id="aCorrigeer" type="button">Corrigeren</button>
+    </div>
+    <p class="stil" style="margin-top:.4rem;">Corrigeren mag; gladstrijken niet. De oude waarde blijft staan met wie hem wijzigde en waarom.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Batches en houdbaarheid</div>
+    <div id="bBatches"></div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="bNaam" maxlength="60" placeholder="Product" aria-label="Product">
+      <input class="veld" id="bTht" maxlength="10" placeholder="THT" aria-label="Houdbaarheidsdatum" style="flex:0 1 9rem;">
+      <input class="veld" id="bBatchNr" maxlength="40" placeholder="Batchnummer" aria-label="Batchnummer" style="flex:0 1 9rem;">
+      <input class="veld" id="bLeverancier" maxlength="60" placeholder="Leverancier" aria-label="Leverancier" style="flex:0 1 9rem;">
+      <input class="veld" id="bHoeveel" maxlength="20" placeholder="Hoeveelheid" aria-label="Hoeveelheid" style="flex:0 1 8rem;">
+      <button class="knop p" id="bBatchZet" type="button">Batch erbij</button>
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="bWegReden" maxlength="120" placeholder="Reden om een batch eraf te boeken" aria-label="Reden">
+    </div>
+    <p class="stil" id="bBatchLet" style="margin-top:.4rem;"></p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Controlelijsten</div>
+    <div class="rij">
+      <input class="veld" id="bLijstNaam" maxlength="60" placeholder="Naam van de lijst" aria-label="Naam van de controlelijst">
+      <select class="veld" id="bMoment" aria-label="Moment" style="flex:0 1 8rem;">
+        <option value="opening">Opening</option><option value="sluiting">Sluiting</option>
+        <option value="levering">Levering</option><option value="wekelijks">Wekelijks</option>
+      </select>
+      <button class="knop" id="bLijstZet" type="button">Lijst vastleggen</button>
+    </div>
+    <div class="rij" style="margin-top:.5rem;">
+      <textarea class="veld" id="bLijstVragen" rows="3" maxlength="1200" placeholder="Een vraag per regel" aria-label="Vragen, een per regel"></textarea>
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <select class="veld" id="bLijstKeuze" aria-label="Welke lijst afvinken" style="flex:0 1 14rem;"></select>
+      <button class="knop p" id="bAfvinken" type="button">Afvinken</button>
+    </div>
+    <div id="bVragen" style="margin-top:.5rem;"></div>
+    <p class="stil" id="bAfUit" style="margin-top:.4rem;"></p>
+    <p class="stil">Er is geen knop "alles akkoord". Elke vraag krijgt een eigen antwoord, en bij elk punt dat niet akkoord is, hoort een opmerking.</p>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/haccp-meting.js"></script>
+<script src="/apps/horeca/haccp-batch.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Werk OS</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/apps/horeca/scherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/index.html" aria-label="Terug naar het bureaublad">&#8592;</a>
+  <span><span class="ey">RTG Werk OS</span><h1>De werkplek</h1></span>
+  <span style="flex:1;"></span>
+  <button class="knop" id="ververs" type="button">Ververs</button>
+  <button class="knop" id="inlogUit" type="button">Uitloggen</button>
+</header>
+<main id="main">
+  <div class="kaart" id="inlog">
+    <div class="kop">Werkruimte</div>
+    <p class="stil">Een werkruimte heeft zijn eigen sleutel: een code en uw persoonlijke lid-token. Dat is bewust iets anders dan uw RTG-pas -- een werkplek hoort ook te werken voor iemand die geen pas heeft. Wie zijn RTG-account erbij wil (agenda, postvak, kluis), koppelt dat daarna een keer.</p>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="iWerkruimte" maxlength="8" placeholder="Werkruimtecode" aria-label="Werkruimtecode" style="flex:0 1 11rem;">
+      <input class="veld" id="iToken" type="password" maxlength="80" placeholder="Lid-token" aria-label="Lid-token">
+      <button class="knop p" id="inlogGa" type="button">Naar binnen</button>
+    </div>
+  </div>
+
+  <div id="inhoud" hidden>
+    <div class="tabs" role="tablist" aria-label="Weergave">
+      <button class="knop" id="tabStart" role="tab" aria-selected="true" type="button">Start</button>
+      <button class="knop" id="tabModules" role="tab" aria-selected="false" type="button">Modules</button>
+    </div>
+
+    <section id="vStart" aria-label="Startscherm">
+      <div class="kaart">
+        <div class="kop">Wie kijkt er</div>
+        <p><b id="wWie">-</b></p>
+        <p class="stil" id="wRuimte"></p>
+        <p class="stil" style="margin-top:.5rem;">Snelle acties: <span id="wActies"></span></p>
+      </div>
+      <div class="kpis" id="wBlokken"></div>
+      <div class="kaart">
+        <div class="kop">Waarschuwingen</div>
+        <div id="wWaarschuwingen"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Nog niet gemeten</div>
+        <div id="wNiet"></div>
+        <p class="stil" style="margin-top:.4rem;">Wat hier staat, staat er als niet gemeten en niet als nul. Een leeg vak op een dashboard leest als "rustig", en dat is precies de leugen die dit scherm niet vertelt.</p>
+      </div>
+      <div class="kaart">
+        <div class="kop">Directiebeeld</div>
+        <div id="wBeeld"></div>
+        <p class="stil" id="wBeeldLet" style="margin-top:.4rem;"></p>
+      </div>
+    </section>
+
+    <section id="vModules" aria-label="Modules" hidden>
+      <div class="kaart">
+        <div class="rij">
+          <select class="veld" id="mKeuze" aria-label="Welke module" style="flex:0 1 16rem;">
+            <option value="projecten">Projecten en taken</option>
+            <option value="kennis">Kennisbank</option>
+            <option value="klanten">Klanten en verkoop</option>
+            <option value="service">Servicedesk</option>
+            <option value="bouw">Bouw en releases</option>
+            <option value="it">Apparaten en licenties</option>
+            <option value="recht">Contracten</option>
+            <option value="besluit">Besluiten</option>
+          </select>
+        </div>
+        <div class="rij" id="mZoekRij" style="margin-top:.6rem;" hidden>
+          <input class="veld" id="mZoek" maxlength="80" placeholder="Zoek in de kennisbank" aria-label="Zoeken">
+          <button class="knop" id="mZoekGa" type="button">Zoek</button>
+        </div>
+      </div>
+      <div class="kaart">
+        <div class="kop" id="mTitel">Projecten en taken</div>
+        <div id="mLijst"></div>
+        <p class="stil" id="mLet" style="margin-top:.4rem;"></p>
+      </div>
+      <div class="kaart">
+        <div class="kop">Wat aandacht vraagt</div>
+        <div id="mExtra"></div>
+      </div>
+      <div id="mActie"></div>
+    </section>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/apps/werk/kern.js"></script>
+<script src="/apps/werk/start.js"></script>
+<script src="/apps/werk/modules.js"></script>
+<script src="/apps/werk/acties.js"></script>
+<script src="/apps/werk/app.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

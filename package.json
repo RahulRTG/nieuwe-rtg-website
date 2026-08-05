@@ -12,6 +12,7 @@
     "sleutels": "node scripts/sleutels.js",
     "kluisbeheer": "node --experimental-sqlite scripts/kluisbeheer.js",
     "outbox": "node scripts/outbox.js",
+    "eigenpost": "node scripts/eigenpost.js",
     "golive": "node scripts/golive.js",
     "poortwacht": "node scripts/poortwacht.js",
     "rand": "node scripts/rand.js",

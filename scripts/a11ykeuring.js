@@ -108,10 +108,21 @@ function achtergrond(el) {
   }
   return null;
 }
+/* WAAR staat het? Een contrastmelding zonder plaats is niet te repareren: je
+   weet dat er ergens op de pagina iets te bleek is, en dan begint het zoeken.
+   Deze regel geeft het element een adres dat een mens kan volgen -- tag, id of
+   klasse, plus de eerste woorden van de tekst zelf. */
+function adres(el) {
+  const tag = el.tagName.toLowerCase();
+  const id = el.id ? '#' + el.id : '';
+  const kl = !id && el.classList.length ? '.' + Array.prototype.slice.call(el.classList, 0, 2).join('.') : '';
+  const tekst = (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+  return tag + id + kl + (tekst ? ' "' + tekst + '"' : '');
+}
 function keurInPagina() {
   const structureel = {};
   const contrast = {};
-  const tel = (bak, id, help) => { bak[id] = bak[id] || { id: id, help: help, aantal: 0 }; bak[id].aantal++; };
+  const tel = (bak, id, help) => { bak[id] = bak[id] || { id: id, help: help, aantal: 0, waar: [] }; bak[id].aantal++; };
 
   document.querySelectorAll('img').forEach(img => { if (zichtbaar(img) && mistAlt(img)) tel(structureel, 'afbeelding-alt', 'Afbeelding zonder alt-tekst'); });
   document.querySelectorAll('button, [role="button"]').forEach(el => { if (zichtbaar(el) && mistNaam(el)) tel(structureel, 'knop-naam', 'Knop zonder toegankelijke naam'); });
@@ -130,13 +141,19 @@ function keurInPagina() {
     const fg = kleur(s.color); if (!fg || fg[3] < 1) return;
     const bg = achtergrond(el); if (!bg) return;
     const drempel = grootTekst(parseFloat(s.fontSize), s.fontWeight) ? 3 : 4.5;
-    if (ratio(fg, bg) < drempel - 0.05) tel(contrast, 'contrast', 'Te laag kleurcontrast (' + Math.round(ratio(fg, bg) * 100) / 100 + ':1)');
+    if (ratio(fg, bg) < drempel - 0.05) {
+      tel(contrast, 'contrast', 'Te laag kleurcontrast (' + Math.round(ratio(fg, bg) * 100) / 100 + ':1)');
+      // hoogstens drie voorbeelden: genoeg om het te vinden, niet genoeg om
+      // het log onleesbaar te maken
+      if (contrast.contrast.waar.length < 3)
+        contrast.contrast.waar.push(adres(el) + ' -- ' + s.color + ' op rgb(' + bg.slice(0, 3).join(', ') + ')');
+    }
   });
 
   return { overtredingen: Object.values(structureel), contrast: Object.values(contrast) };
 }
 
-const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar, achtergrond, keurInPagina]
+const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar, achtergrond, adres, keurInPagina]
   .map(f => f.toString()).join('\n\n') + '\nwindow.__a11yKeur = keurInPagina;\n';
 
 module.exports = { BRON, kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel };

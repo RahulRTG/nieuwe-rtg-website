@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Horeca: events</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/apps/horeca/scherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey">RTG Horeca</span><h1>Offerte, verbruik en nacalculatie</h1></span>
+  <span style="flex:1;"></span>
+</header>
+<main id="main">
+  <div class="kaart">
+    <div class="kop">Events</div>
+    <div id="vLijst"></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Offerte</div>
+    <div class="rij">
+      <input class="veld" id="vNaam" maxlength="80" placeholder="Naam van het event" aria-label="Naam van het event">
+      <input class="veld" id="vDatum" maxlength="10" placeholder="Datum" aria-label="Datum" style="flex:0 1 9rem;">
+      <input class="veld" id="vGasten" type="number" min="1" max="20000" value="50" aria-label="Aantal gasten" style="flex:0 1 6rem;">
+      <input class="veld" id="vContact" maxlength="80" placeholder="Contactpersoon" aria-label="Contactpersoon">
+      <input class="veld" id="vRuimte" maxlength="60" placeholder="Ruimte" aria-label="Ruimte" style="flex:0 1 9rem;">
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <input class="veld" id="vPost1" maxlength="100" placeholder="Post 1" aria-label="Post 1">
+      <input class="veld" id="vAantal1" type="number" min="1" value="50" aria-label="Aantal post 1" style="flex:0 1 6rem;">
+      <input class="veld" id="vPrijs1" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 1" style="flex:0 1 7rem;">
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="vPost2" maxlength="100" placeholder="Post 2" aria-label="Post 2">
+      <input class="veld" id="vAantal2" type="number" min="1" value="1" aria-label="Aantal post 2" style="flex:0 1 6rem;">
+      <input class="veld" id="vPrijs2" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 2" style="flex:0 1 7rem;">
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="vPost3" maxlength="100" placeholder="Post 3" aria-label="Post 3">
+      <input class="veld" id="vAantal3" type="number" min="1" value="1" aria-label="Aantal post 3" style="flex:0 1 6rem;">
+      <input class="veld" id="vPrijs3" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 3" style="flex:0 1 7rem;">
+    </div>
+    <div class="rij" style="margin-top:.6rem;">
+      <button class="knop p" id="vOfferte" type="button">Nieuwe offerte</button>
+      <button class="knop" id="vPosten" type="button">Posten wijzigen</button>
+    </div>
+    <p class="stil" style="margin-top:.4rem;">Posten wijzigen na een akkoord maakt een nieuwe versie die opnieuw bevestigd moet worden. Anders staat er aan het eind een bedrag op de factuur dat niemand heeft gezien.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Akkoord en aanbetaling</div>
+    <div class="rij">
+      <input class="veld" id="vDoor" maxlength="80" placeholder="Wie geeft akkoord" aria-label="Wie geeft akkoord">
+      <select class="veld" id="vKanaal" aria-label="Kanaal van het akkoord" style="flex:0 1 8rem;">
+        <option value="mail">Mail</option><option value="getekend">Getekend</option>
+        <option value="telefoon">Telefoon</option>
+      </select>
+      <button class="knop p" id="vAkkoord" type="button">Akkoord vastleggen</button>
+      <input class="veld" id="vAanbedrag" type="number" min="0" step="0.01" placeholder="Aanbetaling" aria-label="Aanbetaling" style="flex:0 1 8rem;">
+      <button class="knop" id="vAanbetaling" type="button">Boeken</button>
+    </div>
+    <p class="stil" style="margin-top:.4rem;">Een offerte is pas een opdracht na een akkoord met een naam erbij. Een keuken die kookt voor 350 gasten omdat iemand aan de telefoon ja zei, is precies hoe het misgaat.</p>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Verbruik en nacalculatie</div>
+    <div class="rij">
+      <select class="veld" id="vKostSoort" aria-label="Soort kosten" style="flex:0 1 8rem;">
+        <option value="inkoop">Inkoop</option><option value="uren">Uren</option>
+        <option value="materiaal">Materiaal</option><option value="derden">Derden</option>
+        <option value="overig">Overig</option>
+      </select>
+      <input class="veld" id="vKostWat" maxlength="100" placeholder="Omschrijving" aria-label="Omschrijving van de kosten">
+      <input class="veld" id="vKostBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag" style="flex:0 1 7rem;">
+      <input class="veld" id="vKostUren" type="number" min="0" step="0.5" placeholder="Uren" aria-label="Uren" style="flex:0 1 6rem;">
+      <button class="knop p" id="vKosten" type="button">Kosten erbij</button>
+      <button class="knop" id="vNa" type="button">Nacalculatie</button>
+    </div>
+    <div id="vNaUit" style="margin-top:.6rem;"></div>
+    <p class="stil" style="margin-top:.4rem;">Zonder ingevoerde kosten blijft de marge leeg in plaats van 100%. Een nacalculatie zonder kosten is geen nacalculatie.</p>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/events.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

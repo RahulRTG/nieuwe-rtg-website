@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Horeca</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/apps/horeca/scherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/desktopframe.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/index.html" aria-label="Terug naar het bureaublad">&#8592;</a>
+  <span><span class="ey">RTG Horeca</span><h1>Zaal en keuken</h1></span>
+  <span style="flex:1;"></span>
+  <button class="knop" id="ververs" type="button">Ververs</button>
+</header>
+<main id="main">
+  <div class="tabs" role="tablist" aria-label="Weergave">
+    <button class="knop" id="tabZaal" role="tab" aria-selected="true" type="button">Zaal</button>
+    <button class="knop" id="tabKeuken" role="tab" aria-selected="false" type="button">Keuken</button>
+  </div>
+
+  <nav class="rij" aria-label="De rest van het Horeca OS" style="margin-bottom:.9rem;">
+    <a class="knop" href="/apps/horeca-expeditie.html">Expeditie</a>
+    <a class="knop" href="/apps/horeca-bezorg.html">Bezorging</a>
+    <a class="knop" href="/apps/horeca-hotel.html">Hotel</a>
+    <a class="knop" href="/apps/horeca-events.html">Events</a>
+    <a class="knop" href="/apps/horeca-club.html">Club</a>
+    <a class="knop" href="/apps/horeca-haccp.html">HACCP</a>
+    <a class="knop" href="/apps/horeca-beheer.html">Beheer</a>
+  </nav>
+
+  <section id="vZaal" aria-label="De zaal">
+    <div class="kaart">
+      <div class="kop">Nieuwe rekening</div>
+      <div class="rij">
+        <input class="veld" id="zTafel" maxlength="30" placeholder="Tafel of plek" aria-label="Tafel of plek">
+        <input class="veld" id="zGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten" style="flex:0 1 6rem;">
+        <select class="veld" id="zKanaal" aria-label="Kanaal" style="flex:0 1 9rem;">
+          <option value="tafel">Tafel</option><option value="bar">Bar</option>
+          <option value="terras">Terras</option><option value="club">Club</option>
+          <option value="afhaal">Afhaal</option><option value="roomservice">Roomservice</option>
+        </select>
+        <button class="knop p" id="zOpen" type="button">Open</button>
+      </div>
+      <p class="stil" style="margin-top:.4rem;">Per tafel staat er hooguit een rekening open. Splitsen en samenvoegen verplaatsen alleen; er komt geen cent bij of af.</p>
+    </div>
+    <div class="kaart">
+      <div class="kop">Open rekeningen</div>
+      <div id="zLijst"></div>
+    </div>
+    <div class="kaart" id="zDetailKaart" hidden>
+      <div class="kop" id="zDetailKop">Rekening</div>
+      <div id="zDetail"></div>
+      <div class="rij" style="margin-top:.6rem;">
+        <input class="veld" id="zNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Product">
+        <input class="veld" id="zPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs" style="flex:0 1 7rem;">
+        <input class="veld" id="zAantal" type="number" min="1" max="99" value="1" aria-label="Aantal" style="flex:0 1 5rem;">
+        <input class="veld" id="zGang" type="number" min="0" max="9" value="1" aria-label="Gang" style="flex:0 1 5rem;">
+        <input class="veld" id="zStation" maxlength="30" placeholder="Station" aria-label="Station" style="flex:0 1 7rem;">
+        <input class="veld" id="zAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie" style="flex:0 1 9rem;">
+        <button class="knop p" id="zRegel" type="button">Zet erop</button>
+      </div>
+      <div class="rij" style="margin-top:.6rem;">
+        <input class="veld" id="zVrijGang" type="number" min="0" max="9" value="1" aria-label="Gang vrijgeven" style="flex:0 1 5rem;">
+        <input class="veld" id="zServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Serveertijd" style="flex:0 1 7rem;">
+        <button class="knop" id="zVrij" type="button">Gang vrijgeven</button>
+        <input class="veld" id="zSplits" type="number" min="2" max="20" placeholder="Splits in" aria-label="Splitsen per persoon" style="flex:0 1 6rem;">
+        <button class="knop" id="zSplitsGa" type="button">Splits per persoon</button>
+        <button class="knop p" id="zBetaal" type="button">Afrekenen (pin)</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="vKeuken" aria-label="De keuken" hidden>
+    <div class="kaart">
+      <div class="kop">Stationsbord</div>
+      <div class="rij">
+        <input class="veld" id="kStation" maxlength="30" placeholder="Station (leeg = alle)" aria-label="Station">
+        <button class="knop" id="kToon" type="button">Toon</button>
+        <span class="stil" id="kTelling"></span>
+      </div>
+    </div>
+    <div id="kBord"></div>
+    <div class="kaart">
+      <div class="kop">Regie</div>
+      <div id="kRegie"></div>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/zaal.js"></script>
+<script src="/apps/horeca/keuken.js"></script>
+<script src="/apps/horeca/app.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

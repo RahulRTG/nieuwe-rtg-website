@@ -41,18 +41,6 @@ const beveilig = require('../beveiliging')({
    ~10 s een momentopname voor de grafiek. `wacht` is hierboven al gedeclareerd
    (het schild raadpleegt hem voor de quarantaine). */
 const wacht = require('../kern/wacht')({ db, save, beveilig, lees: schild.signalen });
-// RTMAIL: het interne postsysteem (de rail voor de automatiseringen)
-const rtmail = require('../kern/rtmail')({ db, save, crypto });
-/* Teams: een adres dat meerderen samen lezen (receptie@partner.rtg). Krijgt de
-   codenaam-lijst en het zaakregister mee om te toetsen of een adres nog vrij
-   is -- een team mag nooit het postvak van een persoon of zaak kapen. */
-const rtmailTeam = require('../kern/rtmail-team')({ db, save, crypto, rtmail, findSupplier,
-  CODENAMES: require('../accounts/kluis').CODENAMES });
-// De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
-const automatisering = require('../kern/automatisering')({ rtmail });
-// Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
-// eigenaar- en managementadressen, rahul@<domein>, de buitenpost en -poort)
-const { werkmail } = require('../kern/werkmail')({ db, save, crypto, rtmail, mail, accounts });
 const atelierweb = require('../kern/atelierweb')({ db, save, crypto, schoon });
 // de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
 const naamlaag = require('../kern/naamlaag')({ db, save, schoon });
@@ -68,6 +56,25 @@ try { rtf.setAutomatisering(automatisering); } catch (e) {}
    besmette inhoud wordt geweigerd, gemeld op het bord, en de bron wordt via De
    Wacht ter afsnijding voorgesteld. */
 const antivirus = require('../kern/antivirus')({ db, save, beveilig, wacht });
+
+/* DE POSTLAAG. Elf modules die samen RTG Mail zijn: bezorgen, adressen, teams,
+   postvakken, gesprekken, schrijven, regels, dossiers, klok, rechten en
+   bewaarbeleid. Ze staan in ./postlaag.js omdat dit bestand anders over de tien
+   kilobyte gaat -- en omdat de BOUWVOLGORDE daar iets betekent: de haak na de
+   bezorging kan pas gezet worden als de regels en de klok bestaan.
+
+   STAAT HIER EN NIET HOGEROP omdat de bijlagenlaag De Ontsmetter nodig heeft.
+   Dat is geen willekeurige volgorde maar de regel zelf: zonder scanner bewaart
+   die laag geen enkele bijlage, en een postlaag die vóór de scanner wordt
+   gebouwd zou hem stilzwijgend missen. */
+const post = require('./postlaag')({ db, save, crypto, findSupplier, antivirus, DATA_DIR });
+const { mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels,
+  rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar } = post;
+// De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
+const automatisering = require('../kern/automatisering')({ rtmail });
+// Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
+// eigenaar- en managementadressen, rahul@<domein>, de buitenpost en -poort)
+const { werkmail } = require('../kern/werkmail')({ db, save, crypto, rtmail, mail, accounts });
 
 /* Universeel scan-net: elke schrijf-aanvraag wordt door De Ontsmetter gehaald.
    Zit er een BESMETTE beeld-/PDF-data-URL in de body (waar dan ook, hoe diep
@@ -139,6 +146,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, rtmail, rtmailTeam, scanNet, wacht, werkmail
+    resolveSession, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, scanNet, wacht, werkmail
   };
 };

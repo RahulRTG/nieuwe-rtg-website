@@ -58,8 +58,10 @@
         'background:var(--gold,#A98F1C);opacity:0;transition:opacity .12s,width .08s;pointer-events:none;width:44px;}' +
       '.rnd-hint.boven{top:calc(env(safe-area-inset-top,0px) + 6px);}' +
       '.rnd-hint.aan{opacity:.85;}' +
-      /* alleen zichtbaar voor wie er met Tab naartoe gaat -- zoals de skip-link */
-      '.rnd-toets{position:fixed;left:.6rem;top:-4rem;z-index:9996;background:var(--gold,#A98F1C);color:#0C0C0B;' +
+      /* Alleen zichtbaar voor wie er met Tab naartoe gaat -- zoals de skip-link.
+         Vaste kleuren, niet uit de paginavariabelen: zwart op goud haalt
+         4,02:1 (AA vraagt 4,5), wit op bordeaux 10,2. */
+      '.rnd-toets{position:fixed;left:.6rem;top:-4rem;z-index:9996;background:#7F1634;color:#FFFFFF;' +
         'border:none;border-radius:0 0 10px 10px;padding:.5rem .9rem;font:700 .8rem Inter,system-ui,sans-serif;' +
         'cursor:pointer;transition:top .15s;}' +
       '.rnd-toets:focus{top:0;}' +

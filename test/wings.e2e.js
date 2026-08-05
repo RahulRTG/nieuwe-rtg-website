@@ -78,18 +78,48 @@ async function meet(pwBrowser, base, token, breed, hoog) {
       aanMij: [], vanMij: [] })
   }));
   await page.addInitScript(t => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, token);
-  await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
-  await page.evaluate(() => {
-    const a = document.getElementById('app'); if (a) a.classList.add('active');
-    /* Het onboarding-dialoog (#onbGate) ligt modaal over alles heen zolang de
-       intake niet af is. Dat is correct gedrag -- en het maakt de flanken
-       onaanklikbaar, wat deze toets als een timeout te zien kreeg. We halen hem
-       weg om de WINGS te kunnen beproeven, net zoals we hierboven de OS-stand
-       forceren. Wat we hier dus NIET toetsen is of de onboarding zelf klopt;
-       daar zijn de aanmeldtoetsen voor. */
-    const gate = document.getElementById('onbGate'); if (gate) gate.remove();
+  /* DE OS-STAND WORDT AL TIJDENS HET LADEN GEZET, niet met een evaluate erna.
+
+     Hier stond `goto` gevolgd door `page.evaluate`, en die combinatie zakte
+     onder belasting op "Execution context was destroyed": tussen het einde van
+     domcontentloaded en de evaluate kon de pagina nog navigeren, en dan is de
+     context waarin de evaluate zou draaien verdwenen. Een waarnemer die AL
+     draait voordat de pagina bestaat, heeft dat gat niet.
+
+     Wat hier gebeurt is hetzelfde als voorheen: #app krijgt de klasse `active`
+     (de OS-laag toont zijn springboard pas dan; een verse registratie zit nog
+     in de intake), en het modale onboarding-dialoog #onbGate gaat weg omdat het
+     de flanken onaanklikbaar maakt. Wat deze toets dus NIET toetst is of de
+     onboarding zelf klopt; daar zijn de aanmeldtoetsen voor. */
+  await page.addInitScript(() => {
+    const zet = () => {
+      const a = document.getElementById('app');
+      if (a && !a.classList.contains('active')) a.classList.add('active');
+      const gate = document.getElementById('onbGate');
+      if (gate) gate.remove();
+    };
+    const start = () => { zet(); new MutationObserver(zet).observe(document.documentElement, { childList: true, subtree: true }); };
+    if (document.documentElement) start();
+    else document.addEventListener('readystatechange', start, { once: true });
   });
-  await page.waitForTimeout(2500);   // de widgets halen hun bron op
+  await page.goto(base + '/apps/app.html', { waitUntil: 'load', timeout: 45000 });
+
+  /* WACHTEN OP DE TOESTAND, NIET OP DE KLOK.
+
+     Hier stond `waitForTimeout(2500)` met de opmerking "de widgets halen hun
+     bron op". Dat is een gok: op een rustige machine te lang, onder belasting
+     te kort -- en dan zakt de toets op iets dat niets met de wings te maken
+     heeft. De widgets markeren zichzelf nu met `wing-klaar` zodra hun bron
+     geantwoord heeft (ook als het antwoord leeg was), dus is er een echte
+     toestand om op te wachten. Op smalle schermen bestaan er geen widgets; dan
+     is de toestand "de flanken zijn leeg" en die is er meteen. */
+  await page.waitForFunction(() => {
+    const L = document.getElementById('wingL');
+    if (!L) return false;
+    const kaarten = document.querySelectorAll('.wing-widget');
+    if (!kaarten.length) return getComputedStyle(L).display === 'none' || !L.children.length;
+    return [...kaarten].every(k => k.classList.contains('wing-klaar'));
+  }, { timeout: 20000 });
   const uit = await page.evaluate(() => {
     const L = document.getElementById('wingL'), R = document.getElementById('wingR');
     const namen = el => [...el.querySelectorAll('.wing-naam')].map(n => n.textContent.trim());

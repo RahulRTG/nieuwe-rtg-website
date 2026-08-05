@@ -20,6 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const { middleware, foutMiddleware, log } = require('../server/log');
+const { startServer } = require('./helper');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -127,24 +128,38 @@ test('nergens in de serverbroncode gaat een echte naam of e-mail rechtstreeks de
     'deze regels loggen persoonsgegevens; log een codenaam of een account-id:\n  ' + gevonden.join('\n  '));
 });
 
-test('de Referrer-Policy houdt het SSE-token binnenshuis, en geldt altijd', () => {
+test('de Referrer-Policy houdt het SSE-token binnenshuis, en geldt altijd', async () => {
   /* EventSource kan geen Authorization-header sturen, dus bij de
      live-verbindingen reist het sessietoken mee als ?token= in de URL. Zonder
      een Referrer-Policy stuurt de browser die hele URL als Referer naar elke
      externe bron -- en dan ligt een geldig token bij een derde partij.
      "strict-origin-when-cross-origin" geeft een vreemde partij hooguit onze
      origin. "no-referrer" en "same-origin" zijn nog strenger en dus ook goed;
-     wat NIET mag is een policy die de volledige URL cross-origin meestuurt. */
-  const bron = fs.readFileSync(path.join(WORTEL, 'server', 'server.js'), 'utf8');
-  const m = /res\.set\('Referrer-Policy',\s*'([^']+)'\)/.exec(bron);
-  assert.ok(m, 'er wordt een Referrer-Policy gezet');
-  assert.ok(['strict-origin-when-cross-origin', 'same-origin', 'no-referrer', 'strict-origin'].includes(m[1]),
-    'de policy lekt de volledige URL niet naar derden, maar is: ' + m[1]);
+     wat NIET mag is een policy die de volledige URL cross-origin meestuurt.
 
-  // en hij staat buiten een productie-tak: een header die alleen live bestaat,
-  // is een header die je nooit hebt getest
-  const voor = bron.slice(0, m.index);
-  const laatsteBlok = voor.lastIndexOf('app.use(');
-  assert.ok(!/if \(PRODUCTION\)/.test(bron.slice(laatsteBlok, m.index)),
-    'de header staat niet achter een productie-if, dus hij geldt ook lokaal');
+     DEZE TOETS LAS EERST DE BRONTEKST van server/server.js met een reguliere
+     expressie. Dat was fout op twee manieren tegelijk. Hij toetste niet wat een
+     browser krijgt maar hoe de code eruitziet, en hij brak zodra het headerblok
+     naar een eigen bestand verhuisde -- terwijl de header zelf geen millimeter
+     was veranderd. Een toets die rood wordt van een verhuizing en groen blijft
+     bij een echte fout, meet de verkeerde dingen.
+
+     Nu vraagt hij het antwoord op. Draait tegen een gewone (niet-productie)
+     server, want juist dat is de tweede belofte: de header staat niet achter
+     een productie-tak. En hij controleert BEIDE soorten antwoord -- een pagina
+     en een JSON-eindpunt -- want de header zit in de gedeelde keten en hoort
+     dus overal op te zitten. */
+  const GOED = ['strict-origin-when-cross-origin', 'same-origin', 'no-referrer', 'strict-origin'];
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  try {
+    for (const pad of ['/apps/index.html', '/api/health']) {
+      const r = await fetch(base + pad);
+      const p = r.headers.get('referrer-policy');
+      assert.ok(p, 'er komt een Referrer-Policy mee op ' + pad);
+      assert.ok(GOED.includes(p),
+        'de policy op ' + pad + ' lekt de volledige URL niet naar derden, maar is: ' + p);
+    }
+  } finally {
+    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+  }
 });

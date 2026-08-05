@@ -1362,7 +1362,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
 {
   const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
     'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen']);
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess)\s*\(/;
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
      regel toevoegt schrijft er een reden bij die klopt; kun je dat niet, dan is
@@ -1379,6 +1379,8 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/sso/start', 'idem; 404 op een onbekende of uitgezette koppeling'],
     ['/api/kantoor/gesprek/start', 'het kantoorgesprek begint voor er een account is'],
     ['/api/kantoor/gesprek/zeg', 'loopt verder op het gespreks-id dat bij de start is uitgegeven'],
+    ['/api/bedrijf/werkruimte/maak', 'een organisatie die nog geen werkruimte heeft, heeft ook nog geen sleutel; de maker krijgt het beheer-token'],
+    ['/api/bedrijf/lid/aanmeld', 'aanmelden bij een werkruimte kan zonder sleutel -- het token dat je krijgt werkt pas na toelating (test/bedrijfkern.test.js)'],
 
     /* ---- DE ACHT DIE OP HUN BUURMAN LEUNDEN ----
        Deze stonden hier niet, en ze kwamen ook nergens door een poort: ze
@@ -1439,6 +1441,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/munt/webhook', 'idem, met een eigen webhook-secret'],
     ['/api/cluster/:actie', 'de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet'],
     ['/api/werkmail/bezorg', 'inkomende post van de mailserver, met een eigen venster-rem per minuut'],
+    ['/api/mail/binnen', 'de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)'],
     ['/api/stad/doos/hartslag', 'de stadsdoos stuurt zijn apparaatsleutel mee'],
     ['/api/stad/doos/meting', 'idem'],
     ['/api/rtgid/status', 'RTG iD draagt zijn bewijs als idToken in het LIJF, niet als sessie'],

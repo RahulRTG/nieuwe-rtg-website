@@ -160,6 +160,10 @@ function proefPuur(naam, posities) {
   const diep = posities || 1;
   const bestand = path.join(TEST, naam);
   const nul = draaiToets(bestand);
+  /* Eerst de nulmeting, en een die niet AFKOMT is een eigen uitslag. Zonder deze
+     regel zou de motor negen keer vier minuten wachten op een toets die toch niet
+     te meten is, en dan draait niemand hem ooit af. */
+  if (nul.tijdout) return { soort: 'puur', staat: 'te langzaam' };
   if (nul.gezakt > 0) return { soort: 'puur', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
   if (!nul.toetsen) return { soort: 'puur', staat: 'geen toetsen gedraaid' };
   const modules = modulesVan(bestand);
@@ -204,6 +208,7 @@ function isServerToets(naam) {
 function proefServer(naam) {
   const bestand = path.join(TEST, naam);
   const nul = draaiToets(bestand);
+  if (nul.tijdout) return { soort: 'server', staat: 'te langzaam' };
   if (nul.gezakt > 0) return { soort: 'server', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
   if (!nul.toetsen) return { soort: 'server', staat: 'geen toetsen gedraaid' };
   const na = draaiToets(bestand, { RTG_LIEG: '/api/' });

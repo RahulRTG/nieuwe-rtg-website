@@ -61,6 +61,18 @@ const { spawnSync } = require('child_process');
 const WORTEL = path.join(__dirname, '..');
 const TEST = path.join(WORTEL, 'test');
 const UITSLAG = path.join(WORTEL, 'MUTATIES.json');
+/* DE VOORTGANG STAAT BUITEN DE REPO, en dat is geen detail.
+
+   Een ronde duurt uren. Schrijft de motor na elk bestand in MUTATIES.json, dan
+   staat de werkboom die hele tijd open EN loopt BEWIJS.md continu achter -- dus
+   staat keuringsregel 41 uren rood om iets wat gewoon nog bezig is. Dat leert
+   iedereen om die regel weg te kijken, en dan is hij niets meer waard.
+
+   Dus: na elk bestand naar server/data/ (staat in .gitignore, dus geen open
+   werkboom), en pas aan het EINDE van een fase naar MUTATIES.json. Afbreken kost
+   je nog steeds niets -- bij de volgende start wordt de voortgang uit de datamap
+   erbij gelezen. */
+const VOORTGANG = path.join(WORTEL, 'server', 'data', 'mutatie-voortgang.json');
 
 /* DE OPERATOREN. Mechanisch, klein, en elk met een reden waarom hij ECHT gedrag
    verandert in plaats van alleen tekst. Ze worden een voor een geprobeerd tot de
@@ -230,8 +242,10 @@ if (require.main === module) {
   console.log('\nDE MUTATIEMOTOR -- ' + puur.length + ' pure toetsen (bronmutatie), ' +
     server.length + ' servertoetsen (liegpoort)\n');
 
-  const eerder = fs.existsSync(UITSLAG) ? JSON.parse(fs.readFileSync(UITSLAG, 'utf8')) : { toetsen: {} };
-  const uitslag = eerder.toetsen || {};
+  /* De vastgelegde uitslag EN de voortgang van een afgebroken ronde. De tweede
+     wint bij een botsing: die is later. */
+  const laad = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')).toetsen || {}; } catch (e) { return {}; } };
+  const uitslag = Object.assign(laad(UITSLAG), laad(VOORTGANG));
   const opnieuw = args.includes('--opnieuw');
   /* Na ELK bestand wegschrijven, en overslaan wat er al in staat. Het serverdeel
      duurt uren; een motor die alleen aan het eind wegschrijft verliest bij een
@@ -240,11 +254,14 @@ if (require.main === module) {
      JSON.stringify: die filtert ook de sleutels van de geneste objecten weg, dus
      dan staat er wel een nette lijst met bestandsnamen en geen enkele uitslag
      erachter. Een gesorteerde kopie bouwen is de saaie en juiste manier. */
-  const bewaar = () => {
+  const schrijf = (doel) => {
     const op = {};
     for (const k of Object.keys(uitslag).sort()) op[k] = uitslag[k];
-    fs.writeFileSync(UITSLAG, JSON.stringify({ toetsen: op }, null, 2) + '\n');
+    fs.mkdirSync(path.dirname(doel), { recursive: true });
+    fs.writeFileSync(doel, JSON.stringify({ toetsen: op }, null, 2) + '\n');
   };
+  const bewaar = () => schrijf(VOORTGANG);      // na elk bestand: buiten de repo
+  const vastleggen = () => schrijf(UITSLAG);    // na een fase: in de repo
   const gedaan = (naam) => !opnieuw && uitslag[naam] && uitslag[naam].staat !== 'geen toetsen gedraaid';
 
   const doe = (lijst, proef) => {
@@ -263,6 +280,7 @@ if (require.main === module) {
   if (alleen !== 'server') {
     console.log('  --- A: pure toetsen, bronmutatie (eerste plek per operator) ---');
     doe(puur, (n) => proefPuur(n, 1));
+    vastleggen();
     /* DE DIEPE RONDE, alleen over de overlevers. Een overlever kan twee dingen
        betekenen -- de toets legt het gedrag niet vast, of de motor heeft geen code
        geraakt die deze toets aanroept -- en die twee mag je niet op een hoop
@@ -278,9 +296,14 @@ if (require.main === module) {
         console.log('        ' + naam.padEnd(42) + r.staat +
           (r.operator ? '  [' + r.operator + ' in ' + r.module + ']' : '  (' + (r.geprobeerd || 0) + ' mutaties geprobeerd)'));
       }
+      vastleggen();
     }
   }
-  if (alleen !== 'puur') { console.log('  --- B: servertoetsen, liegpoort ---'); doe(server, proefServer); }
+  if (alleen !== 'puur') {
+    console.log('  --- B: servertoetsen, liegpoort ---');
+    doe(server, proefServer);
+    vastleggen();
+  }
 
   const per = (s) => Object.values(uitslag).filter(x => x.staat === s).length;
   console.log('\n  gezakt (bewezen gevoelig)  ' + per('gezakt'));

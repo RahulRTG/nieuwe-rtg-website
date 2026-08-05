@@ -332,6 +332,79 @@
       "module": "server/kern/util.js",
       "operator": "!==->===",
       "gezakt": 1
+    },
+    "keuring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/keuring.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "kijken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kijken.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "klets.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kletspraat/namen.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "kluis-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 8,
+      "geprobeerd": 3
+    },
+    "kluis-rotatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 6,
+      "geprobeerd": 3
+    },
+    "kruisscan.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/kruisscan.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "lab-geheim.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderzoekslab.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "labfonds.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/labfonds.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "ledengids-race.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/db/gidsen.js"
+      ],
+      "geprobeerd": 1,
+      "posities": 1
     }
   }
 }

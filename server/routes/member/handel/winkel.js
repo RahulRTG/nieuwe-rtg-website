@@ -2,16 +2,9 @@
    Gemount vanuit routes/member/handel.js op de gedeelde kern. */
 module.exports = (hctx) => {
   const { kern, openLijn } = hctx;
-  const { DOOR_RELOCK_MS, app, auth, betaal, crypto,
-    db, express, findSupplier, liveCodename, logActivity,
-    notifySupplier, optieAan, save, schoon, sseToSupplier,
-    unlockDoor, reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem,
-    plaatsReview, reviewsVoor, verblijfBoek, mijnVerblijven, verblijfAnnuleer,
-    gastDeur, toggleFavoriet, favorietenVan, agendaVoor, maakSplits,
-    mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer,
-    puntenVan, verzilverPunten, salonZichtbaar, ghMarkt, ghPlaatsBestelling,
-    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact,
-    gegevensStop } = kern;
+  const { app, auth, db, express, findSupplier, liveCodename, notifySupplier, save, schoon,
+          sseToSupplier, ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn,
+          gegevensStop } = kern;
 /* ================== veilig laten bezorgen door een modewinkel ==================
    Een lid laat gekochte/apart-gelegde mode-artikelen thuisbezorgen. Veilig: een
    bezorgcode die je alleen aan de echte koerier geeft, live volgen, en bij dure

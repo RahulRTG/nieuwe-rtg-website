@@ -1934,7 +1934,31 @@ console.log('\n36) geen proefrestant in de laatste commit');
           '\n    ' + s.uitleg + ' -- zet het bestand terug en commit opnieuw (git commit --amend)');
       }
     }
-    if (!gevonden) ok('de laatste commit draagt geen ijk- of mutatierestant');
+    /* EN DE BLINDE VLEK DIE DEZE REGEL ZELF HAD, gevonden doordat hij hem miste.
+
+       Op 2026-08-05 kwamen drie ijkbestanden mee in een commit
+       (server/kern/zz-ijk-tijdelijk-a/b/c.js) en deze regel gaf groen. De reden:
+       hij grep't in de INHOUD, en de inhoud van zo'n bestand is
+       `function zzIjkTijdelijkeNaam(x)` -- camelCase, zonder streepjes. De marker
+       zat alleen in de BESTANDSNAAM, en daar keek niemand.
+
+       Dat is precies de vorm die de rest van deze lijst probeert te voorkomen: een
+       handhaver die iets net niet dekt is gevaarlijker dan geen handhaver, want
+       hij geeft groen. Dus nu ook de namenlijst van de commit. */
+    const lijst = git('ls-tree', '-r', '--name-only', 'HEAD');
+    if (lijst.status !== 0) {
+      fout('kan de bestandenlijst van HEAD niet lezen: ' + String(lijst.stderr || '').trim());
+    } else {
+      const marker = 'zz' + '-ijk-tijdelijk';
+      for (const pad of String(lijst.stdout || '').split('\n').filter(Boolean)) {
+        if (!pad.includes(marker)) continue;
+        gevonden++;
+        fout('ijkrestant als BESTAND in de commit: ' + pad +
+          '\n    een ijking maakt dit bestand en ruimt het op; hier is er gecommit tussen die twee' +
+          ' -- git rm het bestand en commit opnieuw');
+      }
+    }
+    if (!gevonden) ok('de laatste commit draagt geen ijk- of mutatierestant, in inhoud noch in naam');
   }
 }
 
@@ -2108,6 +2132,103 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
       }
     }
     if (!misDeur) ok(metDeur + ' pagina\'s gebruiken de mediapoort, en alle ' + metDeur + ' laden module en blad');
+  }
+}
+
+/* 39) een routebestand pakt uit de kern wat het GEBRUIKT, en niets meer.
+
+   DE GRENS DIE ER NIET WAS. server.js geeft elke router hetzelfde object `kern`
+   met ruim driehonderd eigenschappen, en elke router pakt eruit wat hij wil. Er
+   was dus geen grens -- maar dat was nog niet het ergste. De twaalf breedste
+   routebestanden reikten alle twaalf naar 134-139 namen, en dat waren geen
+   twaalf brede domeinen: het was EEN destructurering die twaalf keer was
+   overgenomen. server/routes/supplier/kamers.js pakte honderdvierendertig namen,
+   gebruikte er NUL van, en riep daarna twee submodules aan.
+
+   Over server/routes samen: 3929 namen gepakt en nooit gebruikt, over 62
+   bestanden. Zolang dat mag, zegt de kop van een bestand niets. Hij hoort de
+   grens te ZIJN: dit heb ik nodig, de rest niet. Na het opruimen is
+   supplier/toegang.js van 139 naar 24 namen gegaan, en nu is die kop een
+   leesbare opsomming van wat dat bestand echt doet.
+
+   HOE. Een naam heet gebruikt als hij buiten de destructurering nog ergens als
+   los woord staat, niet direct achter een punt. De meting zit in
+   scripts/grenzen.js en niet hier: dezelfde bron als de ratel-meter
+   `kernOngebruikt` in NORM.json, want twee tellers voor een waarheid lopen
+   uiteen (LAT.md regel 4).
+
+   BEWUST RUIM, en die kant is de goede. Een naam die alleen in de tekst van een
+   template-string voorkomt telt als gebruikt. Dat mist een geval; de andere kant
+   -- iemand haalt een naam weg die wel gebruikt wordt -- levert een
+   ReferenceError op die pas bij het eerste verzoek valt. */
+console.log('\n39) een routebestand pakt uit de kern alleen wat het gebruikt');
+{
+  let grenzen = null;
+  try { grenzen = require('./grenzen').meet(); }
+  catch (e) { fout('de grenzen konden niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast'); }
+  if (grenzen) {
+    const dood = grenzen.alleOngebruikt || [];
+    if (!dood.length) {
+      ok(grenzen.kernBreedte + ' kern-namen in gebruik, en geen enkel routebestand pakt er een die het niet gebruikt');
+    } else {
+      for (const d of dood.slice(0, 12)) {
+        fout(d.bestand + ' pakt ' + d.aantal + ' van de ' + d.gepakt +
+          ' namen uit kern zonder ze te gebruiken: ' + d.namen.slice(0, 6).join(', ') +
+          (d.namen.length > 6 ? ', ...' : ''));
+      }
+      if (dood.length > 12) fout('... en nog ' + (dood.length - 12) + ' bestanden (zie node scripts/grenzen.js)');
+    }
+  }
+}
+
+/* 40 + 41) DE TWEE GEGENEREERDE KAARTEN LOPEN NIET ACHTER.
+
+   WAAROM DIT ER IS. De derde kritiek op dit huis was de scherpste: de bus factor
+   is een. Niemand houdt 1253 servermodules en 2384 endpoints in zijn hoofd, en de
+   meetkast compenseert dat maar half -- die vertelt je of iets stuk is, niet waar
+   de dingen staan of wat een toets bewijst. Daar zijn twee documenten voor:
+
+     ARCHITECTUUR.md   de lagen, de domeinen, de gedeelde kern, waar de waarheid
+                       staat (scripts/kaart.js)
+     BEWIJS.md         per toetsbestand welke bewering, en of er een mutatie bij
+                       is vastgelegd (scripts/bewijs.js)
+
+   EN DE ENIGE REDEN DAT ZE IETS WAARD ZIJN, is dat ze niet kunnen verouderen. Een
+   handgeschreven architectuurdocument is binnen twee maanden onwaar, en dan is
+   het erger dan geen document: het stuurt iemand met vertrouwen de verkeerde kant
+   op. Beide bestanden komen uit de code, en deze regels genereren ze opnieuw en
+   vergelijken. Schuift de code, dan wordt de keuring rood tot iemand `npm run
+   kaart` of `npm run bewijs` draait -- bijwerken is een commando geworden en geen
+   schrijfwerk.
+
+   Ze staan met opzet NIET in het gegenereerde bestand zelf te controleren (geen
+   hash in een kop): dan zou iemand de hash kunnen bijwerken zonder de inhoud. De
+   vergelijking is de volle tekst. */
+console.log('\n40) ARCHITECTUUR.md loopt niet achter op de code');
+{
+  try {
+    const kaart = require('./kaart');
+    const opSchijf = fs.existsSync(kaart.DOEL) ? fs.readFileSync(kaart.DOEL, 'utf8') : null;
+    const verwacht = kaart.bouw();
+    if (opSchijf === null) fout('ARCHITECTUUR.md bestaat niet -- draai: npm run kaart');
+    else if (opSchijf !== verwacht) fout('ARCHITECTUUR.md loopt achter op de code -- draai: npm run kaart');
+    else ok('ARCHITECTUUR.md is gelijk aan wat de code nu zegt');
+  } catch (e) {
+    fout('de kaart kon niet worden gebouwd (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
+console.log('\n41) BEWIJS.md loopt niet achter op de toetsen');
+{
+  try {
+    const bewijs = require('./bewijs');
+    const opSchijf = fs.existsSync(bewijs.DOEL) ? fs.readFileSync(bewijs.DOEL, 'utf8') : null;
+    const verwacht = bewijs.bouw();
+    if (opSchijf === null) fout('BEWIJS.md bestaat niet -- draai: npm run bewijs');
+    else if (opSchijf !== verwacht) fout('BEWIJS.md loopt achter op de toetsen -- draai: npm run bewijs');
+    else ok('BEWIJS.md is gelijk aan wat de toetsen nu beweren');
+  } catch (e) {
+    fout('het bewijsregister kon niet worden gebouwd (' + e.message + '); dan stelt deze regel niets vast');
   }
 }
 

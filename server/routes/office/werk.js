@@ -3,7 +3,9 @@
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, talen, trChat, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, totpOk, veiligGelijk, logInlog, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
+  const { UPLOAD_DIR, accounts, app, broadcastSync, conciergeInbox, db, eigenaar, fs, notify,
+          notifySupplier, officeAuth, officeState, path, talen, trChat, save, sseToOffice, sseToSupplier,
+          paspoortIncidenten, paspoortBeoordeel } = kern;
 
 /* Wie kijkt hier in de identiteitskluis? De backoffice-code is gedeeld, dus
    een office-sessie alleen zegt "iemand van kantoor" en niet meer -- eerlijker

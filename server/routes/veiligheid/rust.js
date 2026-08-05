@@ -4,7 +4,7 @@
    meldingen met scope 'veiligheid', en alles wat uit je eigen kring komt,
    gaan er altijd doorheen. Deze routes zetten alleen de stand. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename } = kern;
+  const { app, auth } = kern;
 
   // De vriendenlaag (en dus de kring) draait op de sessiesleutel; de codenaam
   // is alleen wat mensen te zien krijgen. Die twee niet verwarren.

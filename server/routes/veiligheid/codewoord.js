@@ -11,7 +11,7 @@
    dezelfde controle aan bij elk bericht (zie server.js), zodat je je zin
    gewoon in een gesprek kunt laten vallen zonder deze app te openen. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename } = kern;
+  const { app, auth } = kern;
 
   // De vriendenlaag (en dus de kring) draait op de sessiesleutel; de codenaam
   // is alleen wat mensen te zien krijgen. Die twee niet verwarren.

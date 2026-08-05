@@ -46,6 +46,10 @@
     "dekking": "node --experimental-sqlite scripts/dekking.js",
     "dekking:vast": "node --experimental-sqlite scripts/dekking.js --vastleggen",
     "samenhang": "node --experimental-sqlite scripts/samenhang.js",
-    "samenhang:vast": "node --experimental-sqlite scripts/samenhang.js --vastleggen"
+    "samenhang:vast": "node --experimental-sqlite scripts/samenhang.js --vastleggen",
+    "kaart": "node scripts/kaart.js",
+    "bewijs": "node scripts/bewijs.js",
+    "grenzen": "node scripts/grenzen.js",
+    "leugens": "node --experimental-sqlite scripts/leugendetector.js"
   }
 }

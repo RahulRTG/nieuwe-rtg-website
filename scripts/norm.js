@@ -123,6 +123,22 @@ const METERS = [
   { sleutel: 'kernBreedte', richting: 'omlaag', wat: 'kern-eigenschappen die routes aanraken' },
   { sleutel: 'kernGedeeld', richting: 'omlaag', wat: 'kern-eigenschappen die MEER dan een domein aanraakt (de echte koppeling)' },
   { sleutel: 'kernBreedsteBestand', richting: 'omlaag', wat: 'namen die het breedste enkele routebestand uit kern haalt' },
+  /* EN TOEN BLEEK DE HELFT VAN DIE BREEDTE NEP. De twaalf breedste
+     routebestanden reikten alle twaalf naar 134-139 namen. Dat waren geen twaalf
+     brede domeinen: het was EEN destructurering die twaalf keer was overgenomen.
+     server/routes/supplier/kamers.js pakte honderdvierendertig namen uit de kern,
+     gebruikte er NUL van, en riep daarna twee submodules aan -- twintig regels
+     bestand, negen regels kop.
+
+     Over server/routes samen: 3929 namen gepakt en nergens gebruikt, over 62
+     bestanden. Zo'n kop zegt niet wat een bestand nodig heeft maar wat een
+     broertje ooit nodig had, en dan is er geen grens meer, ook niet op papier.
+     Ze zijn alle 3929 weg; wat er nu in een kop staat, wordt ook echt gebruikt.
+
+     Deze meter houdt dat vast, en regel 39 in scripts/check.js weigert een
+     nieuwe. Hij hoort op nul te blijven staan: elke stijging is een kop die
+     opnieuw breder is dan het bestand. */
+  { sleutel: 'kernOngebruikt', richting: 'omlaag', wat: 'namen die een routebestand uit kern PAKT en nergens gebruikt' },
   /* DEZE METER WAS EEN GEBLENDE TELLER, precies zoals keuringBeter dat was, en
      hij liep om dezelfde reden vast: hij telde twee onvergelijkbare dingen bij
      elkaar op, en de ene groep botste met een ANDERE meter in deze lijst.
@@ -441,6 +457,7 @@ function meet() {
     ...telPerGroep(k),
     kernBreedte: grenzen.kernBreedte, kernGedeeld: grenzen.kernGedeeld,
     kernBreedsteBestand: grenzen.kernBreedsteBestand,
+    kernOngebruikt: grenzen.kernOngebruikt,
     dependencies: deps, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen
   };

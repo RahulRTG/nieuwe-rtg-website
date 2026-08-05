@@ -258,6 +258,54 @@ const IJKINGEN = {
       return breed.size - smal.size;
     }
   },
+  kernOngebruikt: {
+    /* De scherpste van de vier, en de enige die een ECHTE fout aanwijst in plaats
+       van een maat: een naam die een bestand uit de kern pakt en nooit gebruikt.
+       Drie beweringen, en de derde is degene die telt. */
+    proef: () => {
+      const grenzen = require('../scripts/grenzen');
+      const dood = grenzen.pakVsGebruik('const { app, db, save } = kern;\napp.get("/x", () => 1);');
+      assert.deepEqual(dood.ongebruikt.sort(), ['db', 'save'],
+        'gepakt en niet gebruikt: db en save; app wordt wel gebruikt');
+
+      /* Een naam achter een PUNT is geen gebruik van die naam. Zonder deze
+         controle zou `req.save` de naam `save` levend houden en zag de meter
+         niets. */
+      /* DE SPREAD, en deze bewering staat hier omdat het echt is misgegaan. De
+         eerste versie van deze meter sloeg een naam over als er een punt voor
+         stond -- `req.save` is geen gebruik van `save`. Maar in
+         `{ ...publicSupplier(s) }` staat er ook een punt voor de naam. Dus heette
+         publicSupplier ongebruikt, is hij in server/routes/supplier/menukaart.js
+         weggehaald, en gaf /api/supplier/menu/get een 500 met "publicSupplier is
+         not defined". test/allergie.test.js vond het; deze meter had het moeten
+         vinden. Zonder de regel hieronder bijt niets. */
+      const spread = grenzen.pakVsGebruik('const { publicSupplier } = kern;\nres.json({ ...publicSupplier(s) });');
+      assert.deepEqual(spread.ongebruikt, [],
+        'een naam achter de spread-punten is WEL gebruikt: ' + spread.ongebruikt.join(','));
+
+      /* En de prijs van die reparatie, hier vastgelegd zodat niemand hem voor
+         scherpte aanziet: de meter kent geen punt-logica meer, dus `req.save`
+         houdt `save` in leven terwijl niemand hem gebruikt. Over server/routes
+         kost dat 13 van de 3924 namen. Wie deze meter ooit "slimmer" wil maken,
+         leest eerst de regel hierboven. */
+      const punt = grenzen.pakVsGebruik('const { save } = kern;\nfoo(req.save);');
+      assert.deepEqual(punt.ongebruikt, [],
+        'req.save houdt save in leven -- bewust te ruim, zie de spread hierboven');
+
+      /* EN DE KANT DIE HET GEVAARLIJKST IS. Een naam die alleen binnen een
+         template-string staat MOET als gebruikt gelden: wie hem op grond van
+         deze meter weghaalt, bouwt een ReferenceError die pas bij het eerste
+         verzoek valt. Deze bewering is de reden dat pakVsGebruik een eigen,
+         mildere wringer heeft dan de rest van scripts/grenzen.js. */
+      const sjabloon = grenzen.pakVsGebruik('const { naam } = kern;\nconst t = `hallo ${naam}`;');
+      assert.deepEqual(sjabloon.ongebruikt, [],
+        'een naam in ${...} binnen een template geldt als gebruikt');
+
+      const rename = grenzen.pakVsGebruik('const { a: b, c: d } = kern;\nb();');
+      assert.deepEqual(rename.ongebruikt, ['d'], 'bij { a: b } gaat het om de gebonden naam');
+      return dood.ongebruikt.length;
+    }
+  },
 
   dependencies: {
     /* De enige meter waarvan de bron een bestand is dat we ook echt even

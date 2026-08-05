@@ -8,10 +8,10 @@
      is geen extra slot maar hetzelfde slot als bij de passen: een mens beslist,
      de app niet en Rahul niet. */
 module.exports = (kern) => {
-  const { app, auth, officeAuth, keyVanCodenaam, codenaamVan,
-    muziekNodig, muziekMakerEruit, muziekVerlaat, muziekRolZet, muziekMakers,
-    muziekGeefUit, muziekTrekIn, muziekVraagRtg, muziekZaal, muziekLuister, muziekUitgaveVan,
-    muziekMooi, muziekReageer, muziekReacties, muziekKantoorLijst, muziekKantoorBeslis } = kern;
+  const { app, auth, officeAuth, keyVanCodenaam, muziekNodig, muziekMakerEruit, muziekVerlaat,
+          muziekRolZet, muziekMakers, muziekGeefUit, muziekTrekIn, muziekVraagRtg, muziekZaal,
+          muziekLuister, muziekUitgaveVan, muziekMooi, muziekReageer, muziekReacties, muziekKantoorLijst,
+          muziekKantoorBeslis } = kern;
   if (!muziekNodig) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {

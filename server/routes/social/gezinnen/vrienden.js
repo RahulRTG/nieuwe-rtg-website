@@ -3,7 +3,9 @@
    routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding, lidBoard, lidBoardZet } = kern;
+  const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
+          socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
+          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding } = kern;
 /* Verplichte onboarding + contract voor RTF-leden: dezelfde platform-scope 'rtg',
    maar met de RTF-handle als sleutel. RTF vraagt standaard de contactgegevens + het
    contract (geen paspoort; dat is voor de reispas). */

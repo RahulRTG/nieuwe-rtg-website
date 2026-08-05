@@ -12,7 +12,7 @@
    Het versturen zelf gaat via de bestaande routes (verhaal, snap); die kennen
    hun eigen regels en die willen we niet half nabouwen. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, kijk, zijnVrienden, socialConnecties } = kern;
+  const { app, express, auth, geenGast, kijk, socialConnecties } = kern;
 
   app.post('/api/rahul/kijk', express.json({ limit: '2mb' }), auth, async (req, res) => {
     if (geenGast(req, res)) return;

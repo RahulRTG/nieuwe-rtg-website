@@ -3,12 +3,8 @@
    ticket. Krijgt de gedeelde kern een keer bij het opstarten vanuit
    routes/member/kopen.js. */
 module.exports = (kern) => {
-  const { PERSONAS, app, auth, betaal, centen,
-    crypto, db, findPartner, findSupplier, magBezorgen,
-    liveCodename, notifySupplier, pickupCode, publicPartner, save,
-    schoon, sseToOffice, sseToSupplier, salonZichtbaar, zorgVoor,
-    koopTicketVoor, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek,
-    orderMetRef, ordersVoegToe, gegevensStop } = kern;
+  const { app, auth, crypto, db, findSupplier, liveCodename, notifySupplier, save, schoon, sseToOffice,
+          sseToSupplier, salonZichtbaar, zorgVoor, koopTicketVoor, gegevensStop } = kern;
 /* ================== tickets: activiteiten, tours en musea ==================
    Tijdsloten met capaciteit; betalen vooraf via de bestaande boekingstroom
    (/api/booking/pay). Het ticket krijgt een entreecode die het personeel aan

@@ -6,11 +6,11 @@
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
-    "testbestanden": 543,
+    "testbestanden": 544,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
-    "e2eBestanden": 67,
-    "keuringOmvang": 78,
+    "e2eBestanden": 68,
+    "keuringOmvang": 73,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
     "endpointsNooitAangeraakt": 0,
@@ -20,10 +20,11 @@
     "schermenZonderToets": 3,
     "keuringTeGroot": 1,
     "inlineStijlAttributen": 5549,
-    "browserpoortToetsen": 101,
-    "kernBreedte": 951,
-    "kernGedeeld": 145,
-    "kernBreedsteBestand": 139
+    "browserpoortToetsen": 102,
+    "kernBreedte": 944,
+    "kernGedeeld": 141,
+    "kernBreedsteBestand": 71,
+    "kernOngebruikt": 0
   },
   "notities": [
     {
@@ -237,6 +238,12 @@
       "meter": "keuringScheef 0 -> 1",
       "reden": "Met de hand verhoogd omdat de omvangregel in scripts/keuring.js iets ZIET wat hij eerder oversloeg. Die regel meldde alleen bestanden in de band 9400-10240 bytes; alles ECHT boven de grens viel er stilzwijgend buiten. Drie bestanden stonden zo buiten de keuring: server/kern/appgids-data/deel4.js (11.636), deel5.js (11.011) en server/server.js (216.881). De eerste twee zijn in dezelfde ronde geknipt; server.js blijft over.",
       "eerlijkheidshalve": "Dit is GEEN verslechtering van de code maar het einde van een blinde vlek: het grootste bestand van dit huis, twintig keer de grens, kwam in de eigen keuring nooit voor terwijl een module van 9,5 kB er elke ronde in stond. Een grens die de overtreders overslaat en alleen de bijna-overtreders noemt, is een aanmoediging om er net onder te blijven -- en dat verklaart ook de 67 in die band van 840 bytes. De tand hoort terug naar 0 zodra server/server.js is opgeknipt; tot die tijd staat hij hier als openstaande rekening en niet als nieuwe normaal. De nieuwe meter keuringTeGroot (grondwaarde 1) is de handgreep om dat te sturen."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "verhalenSlaagPctStorm: opnieuw NIET op 76,4 gezet",
+      "reden": "--vastleggen wilde hem voor de tweede keer vandaag van 76,3 naar 76,4 tillen, op basis van DEZELFDE meting uit BEPROEVING.json (14:32) als de eerste keer. Er is geen nieuwe ronde gedraaid, dus er is ook geen nieuwe informatie; met de hand teruggezet op 76,3.",
+      "eerlijkheidshalve": "Dit is de tweede keer dat ik deze hand-correctie maak, en dat is een teken. Zolang --vastleggen alles-of-niets is, tilt elke ronde die deze noisy meter aanraakt hem opnieuw op, en moet iemand het met de hand terugdraaien. Dat is een pleister op de gereedschapskist en hij staat hier met naam: een schakelaar om EEN meter over te slaan bij het vastleggen zou dit oplossen. Zolang die er niet is, hoort iemand na elke --vastleggen de diff van NORM.json te lezen -- en dat is een voornemen, met precies de waarde die LAT.md daaraan geeft."
     }
   ],
   "prestatie": {

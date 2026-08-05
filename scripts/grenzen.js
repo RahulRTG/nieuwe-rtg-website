@@ -82,6 +82,60 @@ function bereikVan(bron) {
   return uit;
 }
 
+/* GEPAKT versus GEBRUIKT -- de scherpste van de metingen hier.
+
+   De twaalf breedste routebestanden reiken alle twaalf naar 134-139 namen. Dat
+   zijn geen twaalf brede domeinen: het is EEN destructurering die is
+   overgenomen. server/routes/supplier/toegang.js pakt honderdnegenendertig
+   namen uit de kern en gebruikt er een fractie van. De kop van dat bestand zegt
+   dan niet wat het nodig heeft maar wat een broertje ooit nodig had -- en dan is
+   er geen grens meer, ook niet op papier.
+
+   WANNEER HEET EEN NAAM GEBRUIKT, en dit is de tweede versie. De eerste was
+   slimmer: een naam telde niet als hij direct achter een punt stond, want
+   `req.save` is geen gebruik van `save`. Dat leek scherper en het brak de app.
+   In `{ ...publicSupplier(s) }` staat er ook een punt voor de naam -- de spread
+   -- dus heette publicSupplier ongebruikt, werd hij in
+   server/routes/supplier/menukaart.js weggehaald, en gaf /api/supplier/menu/get
+   een 500 met "publicSupplier is not defined". test/allergie.test.js vond het.
+
+   Nu is de regel bot: de naam moet buiten de destructurering NERGENS meer als
+   los woord voorkomen. Dat mist gevallen -- een `req.save` houdt `save` in leven
+   terwijl niemand hem gebruikt -- en over server/routes kost dat 13 van de 3926
+   namen. Dertien gemiste namen tegen een klasse fouten die pas bij een verzoek
+   valt: die ruil is niet spannend. Er is nu ook geen punt-logica meer, dus de
+   spread-val kan niet opnieuw ontstaan. */
+/* Een MILDERE wringer dan hierboven, en het verschil is hier geen detail. De
+   gewone `wring` blankt ook backtick-teksten, en een naam die alleen in
+   `${save}` staat zou dan als ongebruikt gelden. Wie daarop een naam weghaalt,
+   bouwt een ReferenceError die pas bij het eerste verzoek valt. Dus: commentaar
+   en aanhalingstekens eruit, backticks laten staan. Een naam die alleen in
+   gewone tekst binnen een template voorkomt telt daarmee als gebruikt -- te
+   ruim, en dat is precies de kant waar dit hoort te falen. */
+const wringMild = (t) => t
+  .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+  .replace(/(^|[^:'"\\/])\/\/[^\n]*/g, (m, p) => p)
+  .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"/g, m => m.replace(/[^\n]/g, ' '));
+
+function pakVsGebruik(bron) {
+  const s = wringMild(bron);
+  const gepakt = [];
+  let rest = s;
+  for (const m of s.matchAll(/(?:const|let|var)\s*\{([^{}]*)\}\s*=\s*(?:kern|tctx|ctx)\b/g)) {
+    for (const stuk of m[1].split(',')) {
+      const n = stuk.includes(':') ? stuk.split(':')[1] : stuk;   // {a: b} bindt b
+      const naam = (n || '').trim().split('=')[0].trim();
+      if (/^[A-Za-z_$][\w$]*$/.test(naam)) gepakt.push(naam);
+    }
+    rest = rest.split(m[0]).join(' ');   // de kop zelf is geen gebruik
+  }
+  const ongebruikt = gepakt.filter(naam => {
+    const re = new RegExp('\\b' + naam.replace(/\$/g, '\\$') + '\\b');
+    return !re.test(rest);
+  });
+  return { gepakt, ongebruikt };
+}
+
 function meet() {
   const bestanden = [];
   (function loop(map) {
@@ -100,14 +154,21 @@ function meet() {
 
   const perBestand = new Map();
   const perDomein = new Map();
+  const dood = [];                 // gepakt uit de kern, nergens gebruikt
   for (const f of bestanden) {
-    const bereik = bereikVan(fs.readFileSync(f, 'utf8'));
+    const bron = fs.readFileSync(f, 'utf8');
+    const rel = path.relative(WORTEL, f).replace(/\\/g, '/');
+    const pv = pakVsGebruik(bron);
+    if (pv.ongebruikt.length) dood.push({ bestand: rel, aantal: pv.ongebruikt.length,
+      gepakt: pv.gepakt.length, namen: pv.ongebruikt });
+    const bereik = bereikVan(bron);
     if (!bereik.size) continue;
-    perBestand.set(path.relative(WORTEL, f), bereik);
+    perBestand.set(rel, bereik);
     const d = domeinVan(f);
     if (!perDomein.has(d)) perDomein.set(d, new Set());
     for (const n of bereik) perDomein.get(d).add(n);
   }
+  dood.sort((a, b) => b.aantal - a.aantal);
 
   // per eigenschap: welke domeinen raken hem aan?
   const domeinenPer = new Map();
@@ -123,6 +184,11 @@ function meet() {
     kernBreedte: domeinenPer.size,
     kernGedeeld: gedeeld.length,
     kernBreedsteBestand: breedste.length ? breedste[0][1].size : 0,
+    /* Namen die een bestand uit de kern PAKT en nergens gebruikt. Elk daarvan is
+       een grens die op papier breder staat dan hij in werkelijkheid is. */
+    kernOngebruikt: dood.reduce((n, d) => n + d.aantal, 0),
+    ongebruiktPerBestand: dood.slice(0, 15).map(d => ({ bestand: d.bestand, ongebruikt: d.aantal, gepakt: d.gepakt })),
+    alleOngebruikt: dood,
     /* Niet in de ratel maar wel in het rapport: waar je zou beginnen. Een
        eigenschap die maar een domein aanraakt, hoort in dat domein en niet in
        een zak die iedereen krijgt. */
@@ -152,4 +218,4 @@ if (require.main === module) {
   console.log('');
 }
 
-module.exports = { meet, bereikVan };
+module.exports = { meet, bereikVan, pakVsGebruik };

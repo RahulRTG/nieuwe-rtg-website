@@ -4,9 +4,9 @@
    de helpers komen via het kern-object binnen. Gemount vanuit routes/member.js. */
 const { eigenVeld } = require('../../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
-  const { app, auth, db, save, crypto, talen, trChat, chatStuur, applyChatVertaald, meldWerkgever,
-    rtf, LANDEN, openVacatures, tooManyTries, noteFailedTry, findSupplier, cvReady,
-    leeftijdVan, geborenVan, notifySupplier, sseToSupplier, sseToOffice, PERSONAS, automatisering } = kern;
+  const { app, auth, db, save, crypto, talen, chatStuur, applyChatVertaald, meldWerkgever, LANDEN,
+          openVacatures, findSupplier, cvReady, leeftijdVan, geborenVan, notifySupplier, sseToSupplier,
+          sseToOffice, PERSONAS, automatisering } = kern;
   app.post('/api/member/apply/chats', auth, (req, res) => {
     // ook gratis gebruikers chatten met de werkgever over hun sollicitatie
     const uit = Object.values(db.data.applyChats)

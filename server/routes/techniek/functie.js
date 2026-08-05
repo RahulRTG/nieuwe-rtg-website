@@ -3,7 +3,8 @@
    context. */
 const functies = require('../../functies');
 module.exports = (tctx) => {
-  const { app, accounts, anthropic, archief, beveilig, crypto, db, mail, save, sendPushToUser, LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx } = tctx;
+  const { app, accounts, anthropic, crypto, mail, save, sendPushToUser, staat, eigenaarUser, techAuth,
+          eigenaarAlleen } = tctx;
   /* Functieschakelaars: NIETS gaat direct om. Elke aan/uit-wijziging wordt een
      AANVRAAG die de eigenaar (Rahul) eerst moet accepteren of weigeren; hij
      krijgt er een melding van in zijn account (push + e-mail). Drie vormen:

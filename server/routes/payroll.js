@@ -2,7 +2,7 @@
    medewerker (supplierAuth: eigen loonstroken, eigen kansen en de eigen
    "open voor werk"-schakelaar). Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, officeAuth, supplierAuth, payroll, openVacatures, findSupplier, db, logActivity, schoon } = kern;
+  const { app, officeAuth, supplierAuth, payroll, openVacatures, db, logActivity, schoon } = kern;
 
   /* ---------- het payroll-kantoor (RTG-office) ---------- */
   app.post('/api/office/payroll/overzicht', officeAuth, (req, res) => {

@@ -3,15 +3,8 @@
    Krijgt de gedeelde kern een keer bij het opstarten vanuit
    routes/supplier/kamers.js. */
 module.exports = (kern) => {
-  const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
-    zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
-    legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
-    RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
-    zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
-    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
-    tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
-    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
+  const { HK_STATUSES, addTicket, app, broadcastSync, crypto, db, logActivity, managerOnly,
+          notifySupplier, save, schoon, setRoomHk, sseToSupplier, supplierAuth } = kern;
 app.post('/api/supplier/room/add', supplierAuth, (req, res) => {
   /* De inrichting van het huis is van het management, net als de dienstenlijst
      (supplier/service) en het weghalen van een auto uit de showroom. Wat er te

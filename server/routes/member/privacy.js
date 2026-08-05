@@ -7,9 +7,7 @@ const inzagelog = require('../../inzagelog');
 const maakVergeten = require('../../kern/vergeten');
 
 module.exports = (kern) => {
-  const { app, auth, db, save, stateFor, myApplications, ordersVanKlant, accounts,
-    sessions, forgetSession, fs, path, UPLOAD_DIR, broadcastSync, gidsWeg, liveCodename,
-    lidBoard, lidBoardLog } = kern;
+  const { app, auth, db, stateFor, myApplications, ordersVanKlant, lidBoard, lidBoardLog } = kern;
   const { wisLid } = maakVergeten(kern);
 
   app.post('/api/privacy/export', auth, (req, res) => {

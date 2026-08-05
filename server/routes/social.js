@@ -3,7 +3,7 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding, lidBoard, lidBoardZet } = kern;
+  const { app, db, rtf, webpush } = kern;
 
   // Hoort dit kind-handle echt bij het gezin van deze beheerder? (voogd-check)
   const isKindVanGezin = (gezinCode, kindHandle) =>

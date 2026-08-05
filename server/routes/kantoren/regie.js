@@ -4,8 +4,8 @@
    partnervergoeding, ledenvoordeel), de Mall-regie, de paniekkamer (knoppen
    worden voorstellen) en de wereldkaart. Afgesplitst uit kantoren/index.js. */
 module.exports = (ctx) => {
-  const { app, officeAuth, boardroomAuth, boardroomLijst, keyVanCodenaam, veilig, stuur, afdelingen, sseToOffice, db, save, kern,
-    geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = ctx;
+  const { app, officeAuth, boardroomAuth, boardroomLijst, keyVanCodenaam, veilig, afdelingen,
+          sseToOffice, db, save, kern } = ctx;
 
   /* De deur van de boardroom: alles hieronder loopt door de boardroom-poort
      (alleen de eigenaar, of wie van hem de sleutel kreeg). Het overige

@@ -25,6 +25,12 @@
   "notities": [
     {
       "datum": "2026-08-05",
+      "meter": "server/server.js 155 -> 103 kB (de samenstelling van de kern eruit)",
+      "reden": "De 790 regels Object.assign(kern, require(...)) staan nu in acht lagen onder server/opzet/kernlaag*.js, elk onder de 10 kB. keuringTeGroot blijft 1: server.js is met 103 kB nog steeds de enige overtreder, en staat met reden in de MAG-lijst van check.js regel 13.",
+      "eerlijkheidshalve": "GEKNIPT OP POSITIE EN NIET OP THEMA, en dat is een keuze met een reden: de bouwvolgorde doet ertoe (een module die een andere uit de kern leest moet erna staan -- dat is hier eerder misgegaan met de postlaag en de antivirus). Een thematische indeling zou die volgorde door de war gooien, dus zijn het aaneengesloten stukken in hun oude orde. Twee dingen die de knipper heeft geleerd, beide van een fout: (1) de eerste versie sneed `bankregie` af van zijn gebruik zeventig regels later en het opstarten viel om op 'is not defined' -- de knipper schuift een grens nu vooruit tot niets meer oversteekt, waardoor de stukken ongelijk van lengte zijn; (2) de eerste versie zette de uitleg zes keer in zes koppen, en dat is precies de dubbeling waar regel 4 over gaat -- de uitleg staat nu alleen in kernlaag1.js en de rest verwijst ernaar. Bij de volle schermsuite viel test/zaal.e2e.js om op een wachtgrens van 8 seconden; los slaagt hij, en met de rest van de suite op 20 seconden slaagt hij in beide. Dat is een echte kwaal van die toets (een krappe grens koopt geen snelheid, alleen een valse rode toets) en ik kan niet volledig uitsluiten dat het opstarten van acht extra modules de timing net heeft verschoven."
+    },
+    {
+      "datum": "2026-08-05",
       "meter": "verhalenSlaagPctStorm: de ratel NIET op 76,4 gezet",
       "reden": "--vastleggen wilde hem van 76,3 naar 76,4 tillen omdat de laatste ronde 76,4 gaf. Met de hand teruggezet op 76,3.",
       "eerlijkheidshalve": "Twee rustige ronden op dezelfde machine gaven 78,6 en 76,4 -- een spreiding van 2,8 procent. Een lat op 76,4 zetten omdat een van die twee ronden daar net boven kwam, is geen ratel maar een strikje: de volgende ronde wordt dan rood zonder dat er iets is veranderd, en dan leert iedereen de uitslag weg te kijken. De lat blijft op 76,3 tot er genoeg ronden zijn om te weten wat de echte spreiding is."

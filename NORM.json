@@ -1,14 +1,14 @@
 {
-  "vastgelegd": "2026-08-04",
+  "vastgelegd": "2026-08-05",
   "meters": {
     "endpointsZonderTest": 852,
     "dekkingPct": 69,
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
-    "testbestanden": 527,
+    "testbestanden": 530,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 114,
+    "zelfpoortendeToetsen": 115,
     "e2eBestanden": 64,
     "keuringOmvang": 78,
     "keuringDubbeling": 56,
@@ -21,6 +21,12 @@
     "keuringTeGroot": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-05",
+      "meter": "zelfpoortendeToetsen 114 -> 115",
+      "reden": "Met de hand verhoogd voor test/mail-eigen.test.js. Een van de achttien toetsen daarin (STARTTLS bij directe bezorging) heeft een wegwerp-certificaat nodig en slaat zichzelf over als openssl ontbreekt -- exact hetzelfde patroon en dezelfde reden als de TLS-subtoetsen in test/smtp.test.js, die al meetellen. Een sleutel en certificaat in de repo zetten zou de secret-scan terecht rood maken, en Node kan zelf geen X.509 maken.",
+      "eerlijkheidshalve": "De ZEVENTIEN andere toetsen in dat bestand poorten zichzelf NIET: DKIM-ondertekening, het naregenen met de publieke sleutel, het breken bij een gewijzigd lijf of een gewijzigde kop, de drie DNS-records, en de hele bezorging (bezorgd / 4xx tijdelijk / 5xx permanent / dot-stuffing / onbereikbare server / doorgaan naar de volgende MX) draaien altijd. Tien mutaties zijn nagetrokken en alle tien RAAK: de lijf-hash niet vergelijken, de witruimte-normalisatie uitzetten, 5xx als tijdelijk classificeren, de dot-stuffing weghalen, STARTTLS overslaan, doorgaan na een permanente weigering, de Date-kop weglaten, het onderwerp niet coderen, het lijf niet base64 maken, en beschikbaar() laten liegen over een open poort 25. Bij die laatste mutatie bleek de toets zelf niet te FALEN maar te HANGEN (een luisteraar op poort 25 die bij een zakkende assertie bleef staan); dat is met try/finally rechtgezet, want een toets die vastloopt in plaats van rood te worden verbergt precies wat hij moet laten zien."
+    },
     {
       "datum": "2026-08-04",
       "meter": "zelfpoortendeToetsen 112 -> 114",

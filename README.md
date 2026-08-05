@@ -841,7 +841,15 @@ geen documentatie maar reclame.
 
 Bedrijven worden aangemaakt vanuit de backoffice (de losse publieke wervingspagina is met de marketingsite verwijderd; het aanvraag-endpoint blijft bestaan). Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.
 
-E-mail (verificatie, wachtwoord-herstel, sollicitatie- en partner-besluiten) is af: met `SMTP_URL` (+ optioneel `MAIL_FROM`) in de omgeving verstuurt nodemailer echte mail; zonder gaan berichten naar `server/data/outbox/` en werken alle links gewoon.
+E-mail (verificatie, wachtwoord-herstel, sollicitatie- en partner-besluiten) is af, en de verzendlaag is helemaal van onszelf -- er zit geen pakket meer onder. `server/mail.js` kent drie standen, in deze volgorde:
+
+1. **`SMTP_URL`** (+ optioneel `MAIL_FROM`): afleveren bij een ingehuurde smarthost via de eigen SMTP-client `server/smtp.js` (EHLO, STARTTLS, AUTH, MAIL/RCPT/DATA, MIME met base64 en dot-stuffing; credentials gaan nooit over een onversleutelde verbinding).
+2. **`MAIL_DIRECT=1`**: **eigen post** -- `server/smtp-direct.js` zoekt zelf het MX-record van de ontvanger op, verbindt op poort 25, pakt STARTTLS als die er is en levert af; `server/dkim.js` ondertekent het bericht (relaxed/relaxed, RSA-SHA256 uit `node:crypto`) met `DKIM_PRIVATE_KEY`, `DKIM_SELECTOR` en `MAIL_DOMEIN`. Een mislukte bezorging valt terug op de outbox, waarbij **tijdelijk (4xx)** en **permanent (5xx)** apart gemeld worden -- bij het eerste heeft opnieuw proberen zin, bij het tweede niet.
+3. **niets gezet**: berichten gaan naar `server/data/outbox/` en alle links werken gewoon.
+
+Aanzetten gaat met **`npm run eigenpost -- <domein> <ip>`**: dat meet eerst of uitgaand poort 25 op deze machine open is (en zegt "nee" als hij dicht is, in plaats van u een sleutelpaar te geven waar u niets aan hebt), maakt daarna een DKIM-sleutelpaar en drukt de drie DNS-records en de omgevingsvariabelen af. De private sleutel wordt getoond en nergens weggeschreven -- een sleutel die een script netjes in een bestand zet, staat morgen in git.
+
+Wat stand 2 *niet* kan oplossen staat hardop in de kop van `server/smtp-direct.js`, omdat een verzendlaag die dat verzwijgt post wegstuurt die nergens aankomt: uitgaand poort 25 is bij de meeste hosters dicht (`beschikbaar()` **probeert** het in plaats van het te beweren), PTR hoort bij de hosting, en SPF en DMARC zijn DNS-records -- `dkim.dnsRegels()` schrijft die drie voor u uit, publiceren is mensenwerk. `test/mail-eigen.test.js` rekent elke handtekening ook echt na met de publieke sleutel en kijkt of hij breekt zodra het lijf of een ondertekende kop wijzigt.
 
 Zie **LAUNCH.md** voor de volledige livegang-checklist (hosting, domein, betalingen, sleutels).
 

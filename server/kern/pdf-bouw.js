@@ -56,8 +56,11 @@ function hernummer(buf, obj, kaart, extra) {
   return nieuw + rest;
 }
 
-/* Het bestand wegschrijven: de objecten op volgorde, dan een verse xref. */
-function schrijf(delen) {
+/* Het bestand wegschrijven: de objecten op volgorde, dan een verse xref.
+   Heet niet gewoon `schrijf`: die naam stond al in twee andere kernmodules en
+   drie keer dezelfde naam voor drie verschillende dingen is precies waar iemand
+   later de verkeerde functie leest. */
+function schrijfPdf(delen) {
   const stukken = [Buffer.from('%PDF-1.4\n', 'latin1')];
   let lengte = stukken[0].length;
   const pos = new Map();
@@ -112,7 +115,7 @@ function voegSamen(buffers) {
     }
   }
   return { ok: true, paginas: paginas.length, documenten: lijst.length,
-    bestand: schrijf(boom(paginas).concat(delen.sort((a, b) => a.nummer - b.nummer))),
+    bestand: schrijfPdf(boom(paginas).concat(delen.sort((a, b) => a.nummer - b.nummer))),
     let: 'De paginaboom is opnieuw gebouwd en elk object is hernummerd. Een oude boom aanpassen laat altijd iets staan dat naar het verleden wijst.' };
 }
 
@@ -157,7 +160,7 @@ function splits(buf, van, tot) {
     tekst: hernummer(buf, o, kaart, isPagina(o) ? (t => t.replace(/\/Parent\s+\d+\s+\d+\s+R/, '/Parent 2 0 R')) : null) }));
 
   return { ok: true, paginas: paginas.length, van: a, tot: b, uitTotaal: alle.length,
-    bestand: schrijf(boom(paginas).concat(delen)),
+    bestand: schrijfPdf(boom(paginas).concat(delen)),
     let: 'Alleen wat vanaf deze pagina\'s bereikbaar is, is meegegaan. Alles meenemen is makkelijker en precies verkeerd: dan reist de tekst van de pagina\'s die u niet deelt gewoon mee in het bestand.' };
 }
 

@@ -1,7 +1,22 @@
 /* ============================================================================
    E-mailverzending.
 
-   Twee standen:
+   DRIE standen, in deze volgorde:
+
+   1. SMTP_URL gezet -> afleveren bij een ingehuurde smarthost (server/smtp.js).
+   2. MAIL_DIRECT=1  -> ZELF bezorgen bij de mailserver van de ontvanger
+      (server/smtp-direct.js), ondertekend met DKIM (server/dkim.js). Dit is de
+      eigen post: geen provider ertussen, en dus ook niemand die de reputatie
+      voor ons regelt. Lees de kop van smtp-direct.js voordat u dit aanzet --
+      poort 25 uit is bij de meeste hosters dicht, en zonder PTR, SPF en DMARC
+      komt de post in de spammap.
+   3. anders -> de outbox, zoals hieronder beschreven.
+
+   Bij 1 en 2 valt een MISLUKTE verzending terug op de outbox, met de reden in
+   het logboek. Een tijdelijke fout (4xx) en een permanente (5xx) worden apart
+   gemeld: bij de eerste heeft opnieuw proberen zin, bij de tweede niet.
+
+   De oude tekst hieronder gold voor de eerste twee standen:
    - Met SMTP_URL in de omgeving (bijv. smtp://user:pass@smtp.provider.nl:587)
      verstuurt de eigen SMTP-client (server/smtp.js) echte e-mail. MAIL_FROM
      bepaalt de afzender.
@@ -16,6 +31,10 @@ const path = require('path');
 const OUTBOX = path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'outbox');
 const SMTP_URL = process.env.SMTP_URL || '';
 const FROM = process.env.MAIL_FROM || 'Rahul Travel Group <no-reply@rahultravelgroup.example>';
+const DIRECT = process.env.MAIL_DIRECT === '1';
+const DKIM_SLEUTEL = process.env.DKIM_PRIVATE_KEY || '';
+const DKIM_SELECTOR = process.env.DKIM_SELECTOR || 'rtg';
+const MAIL_DOMEIN = process.env.MAIL_DOMEIN || (/@([^>\s]+)/.exec(FROM) || [])[1] || '';
 
 let transporter = null;
 if (SMTP_URL) {
@@ -47,6 +66,62 @@ function toOutbox(to, subject, text) {
   console.log(`[mail] (outbox) ${kluis.AAN ? 'versleuteld opgeslagen' : 'naar ' + to}: ${subject}`);
 }
 
+/* Het bericht zoals het over de lijn gaat. Bij directe bezorging bouwen wij
+   het zelf op -- er is geen provider meer die koppen aanvult -- en dus hoort
+   alles erin te staan wat een ontvanger verwacht: een datum, een uniek
+   Message-ID, en de tekst als UTF-8. */
+function bouwBericht(to, subject, text) {
+  const crypto = require('crypto');
+  /* De opmaak-hulpjes komen uit server/smtp.js en worden hier NIET nagemaakt:
+     een onderwerp met een accent hoort in beide standen op dezelfde manier
+     gecodeerd te worden, en twee kopieen van die regel lopen ooit uiteen. */
+  const { _kopWaarde: kopWaarde, _rfcDatum: rfcDatum } = require('./smtp');
+  const id = '<' + crypto.randomBytes(12).toString('hex') + '@' + (MAIL_DOMEIN || 'localhost') + '>';
+  const koppen = {
+    From: FROM, To: to, Subject: kopWaarde(subject), Date: rfcDatum(new Date()),
+    'Message-ID': id, 'MIME-Version': '1.0',
+    'Content-Type': 'text/plain; charset=utf-8', 'Content-Transfer-Encoding': 'base64'
+  };
+  /* Base64 en niet 8bit: wij onderhandelen bij directe bezorging geen 8BITMIME,
+     en een ontvanger die dat niet aanbiedt mag hoge bytes weggooien -- dan komt
+     de mail aan met kapotte accenten. Het lost meteen het punt-aan-het-begin-
+     van-een-regel-probleem op. */
+  const lijf = Buffer.from(String(text == null ? '' : text) + '\n', 'utf8')
+    .toString('base64').replace(/(.{76})/g, '$1\r\n');
+  let dkim = null;
+  if (DKIM_SLEUTEL && MAIL_DOMEIN) {
+    try {
+      const uit = require('./dkim').onderteken({ koppen, lijf, domein: MAIL_DOMEIN,
+        selector: DKIM_SELECTOR, priveSleutel: DKIM_SLEUTEL });
+      if (uit.ok) dkim = uit.kop;
+      else console.warn('[mail] niet ondertekend:', uit.waarom);
+    } catch (e) { console.warn('[mail] DKIM mislukt:', e.message); }
+  }
+  const kop = (dkim ? dkim + '\r\n' : '') +
+    Object.keys(koppen).map(k => k + ': ' + koppen[k]).join('\r\n');
+  return { rauw: kop + '\r\n\r\n' + lijf, ondertekend: !!dkim, messageId: id };
+}
+
+/* Zelf bezorgen. Let op de meldingen: een PERMANENTE weigering (5xx) zegt dat
+   het adres niet bestaat en opnieuw proberen zinloos is; een tijdelijke zegt
+   het tegenovergestelde. Dat verschil hoort in het logboek te staan, anders
+   blijft iemand dagen bonzen op een adres dat er niet is. */
+function stuurDirect(to, subject, text) {
+  const { rauw, ondertekend } = bouwBericht(to, subject, text);
+  const van = (/<([^>]+)>/.exec(FROM) || [null, FROM])[1];
+  require('./smtp-direct').bezorg({ van, naar: to, bericht: rauw })
+    .then(uit => {
+      if (uit.ok) {
+        console.log('[mail] zelf bezorgd bij ' + uit.via + (ondertekend ? ' (ondertekend)' : ' (NIET ondertekend: zet DKIM_PRIVATE_KEY)'));
+        return;
+      }
+      console.warn('[mail] ' + uit.soort + ' niet bezorgd (' + (uit.waarom || uit.code) + '); naar de outbox' +
+        (uit.soort === 'permanent' ? ' -- opnieuw proberen heeft geen zin' : ' -- later opnieuw proberen kan wel'));
+      try { toOutbox(to, subject, text); } catch (e) {}
+    })
+    .catch(e => { console.warn('[mail] eigen bezorging mislukt:', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
+}
+
 function send(to, subject, text) {
   if (!to || !/@/.test(String(to))) return;
   if (transporter) {
@@ -55,7 +130,8 @@ function send(to, subject, text) {
       .catch(e => { console.warn('[mail] verzenden mislukt, naar outbox:', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
     return;
   }
+  if (DIRECT) return stuurDirect(to, subject, text);
   try { toOutbox(to, subject, text); } catch (e) { console.warn('[mail] mislukt:', e.message); }
 }
 
-module.exports = { send, configured: CONFIGURED };
+module.exports = { send, configured: CONFIGURED || DIRECT, direct: DIRECT, bouwBericht };

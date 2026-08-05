@@ -837,6 +837,24 @@ geen documentatie maar reclame.
   omdat de database tijdens een datalek het ding is dat je misschien niet
   vertrouwt, moet het draaiboek daar los van leesbaar zijn.
 
+## RTG Mail
+
+Het interne postsysteem is geen inboxscherm maar een communicatielaag met e-mail als protocol. Twee helften, streng gescheiden.
+
+**De mailervaring.** Elk lid en elke zaak heeft een postvak op zijn codenaam, met een domein dat het lidmaatschap volgt (`kern/rtmail-adres.js`). Daarboven: mappen (in, archief, prullenbak, verzonden), etiketten, favorieten, sluimeren en zoeken (`kern/rtmail-vak.js`); gesprekken die op de **draad** groeperen en nooit op onderwerp (`kern/rtmail-draad.js`); concepten in een eigen lade, uitgesteld verzenden zonder wekker, handtekening, afwezigheid met lus-rem en aliassen (`kern/rtmail-schrijf.js`); en regels die bij de **bezorging** draaien en niet in de app, zodat ze ook werken voor post die 's nachts binnenkomt (`kern/rtmail-regels.js`).
+
+De toestand van een bericht hangt **per bus** en niet op het bericht. Dat is geen implementatiedetail: een bericht tussen twee postvakken van dit huis is een rij in de opslag, en zonder die scheiding zou het archiveren door de ontvanger het bericht ook uit de verzonden map van de afzender laten verdwijnen.
+
+**Gedeelde postvakken.** Een team is een adres dat meerderen samen lezen, met toewijzing en afhandeling (`kern/rtmail-team.js`, `-teampost.js`) en daarbovenop een dossier per bericht: status, prioriteit, interne notities en de koppeling aan een klant of ticket (`kern/rtmail-dossier.js`). De klok (`kern/rtmail-sla.js`) loopt tot het eerste **menselijke** antwoord; de automatische ontvangstbevestiging stopt hem niet. Wie al geantwoord heeft wordt afgeleid uit de draad in plaats van apart bijgehouden -- een tweede administratie zou vroeg of laat iets anders beweren dan de post zelf.
+
+**Post wordt werk.** `server/bedrijf/postbrug.js` maakt van een bericht een taak, ticket of kans in het Werk OS, met de herkomst (bericht-id en draad) erbij; `/api/bedrijf/post/context` zet de klant, open kansen, tickets en contracten naast een bericht en zegt eerlijk "er wordt niets geraden" als de afzender bij niemand als contactpersoon staat. De omzetting vraagt twee sleutels (RTG-sessie plus werkruimte-lidtoken) die van dezelfde persoon moeten zijn: post is van iemand.
+
+**Rechten, journaal en bewaarbeleid.** Dertien losse rechten (`kern/rtmail-recht.js`) in plaats van "mag erin": een supportmedewerker antwoordt vanuit support@ zonder te kunnen exporteren. Niemand geeft weg wat hij zelf niet heeft, vier handelingen vragen een reden **vooraf**, en elke handeling op andermans postvak landt in het journaal -- ook een geweigerde poging. `kern/rtmail-bewaar.js` is de enige plek waar post echt weggaat: bewaartermijn, juridische bewaring die altijd wint van die termijn, en aantoonbare vernietiging die het feit achterlaat en niet de inhoud.
+
+**De infrastructuur.** `kern/mailwachtrij.js` legt uitgaande post in een lade met oplopende wachttijden (1, 5, 15, 60, 240 minuten), herhaalt een permanente fout nooit, houdt een dead-letter lade bij en herkent dubbele aflevering. `kern/mailinkomend.js` pakt echte RFC 5322-post uit (doorgevouwen koppen, encoded-words, MIME, base64, quoted-printable, platte tekst boven HTML), bewaart het **origineel ongewijzigd** en stempelt de uitslag van de controles -- ook als die "niet gecontroleerd" is. Alles van buiten blijft onbetrouwd: links onklikbaar, bijlagen benoemd maar nooit opgeslagen als iets dat te openen valt.
+
+Wat er bewust **niet** in zit: een regel die post doorstuurt naar een ander adres (de kortste weg naar post die ongemerkt het huis verlaat, en naar lussen), een teller wie het meest afhandelt, en een prullenbak die echt wist.
+
 ## Partner worden & e-mail
 
 Bedrijven worden aangemaakt vanuit de backoffice (de losse publieke wervingspagina is met de marketingsite verwijderd; het aanvraag-endpoint blijft bestaan). Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.

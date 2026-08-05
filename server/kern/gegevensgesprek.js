@@ -33,6 +33,13 @@ function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemb
   const vraagVan = (m) => {
     if (m.veld === 'telefoon') return 'Waar kan de zaak je bereiken? Je telefoonnummer.';
     if (m.veld === 'adres') return 'Waar mag het heen? Straat, huisnummer, postcode en plaats.';
+    /* Het reisdocument vraagt hij NIET uit in dit gesprek, en dat is geen
+       gemakzucht. De strook onderaan een paspoort bevat nummer, geldigheid,
+       nationaliteit en geboortedatum in een keer (shared/mrz.js leest hem al);
+       diezelfde vier met de hand laten intypen is trager en levert tikfouten op
+       in precies de gegevens waarop je aan de balie wordt afgerekend. Hij wijst
+       dus naar de scan, en zegt erbij van wie die eis komt. */
+    if (m.veld === 'reisdocument') return 'Voor deze vlucht wil de maatschappij je paspoortgegevens: nummer, geldigheid, nationaliteit en geboortedatum. Dat is hun eis, niet de onze. Scan je paspoort een keer, dan staat het er meteen goed.';
     return 'Hiervoor moet je identiteit geverifieerd zijn. Dat doe je met je identiteitsbewijs in je profiel; daarna kan dit gewoon.';
   };
 
@@ -48,7 +55,7 @@ function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemb
     });
     const eerste = mist[0];
     return { status: 200, id, tekst: vraagVan(eerste), veld: eerste.veld,
-      viaVerificatie: !!eerste.viaVerificatie, nog: mist.length };
+      viaVerificatie: !!eerste.viaVerificatie, viaScan: !!eerste.viaScan, nog: mist.length };
   }
 
   /* Een antwoord verwerken. Klopt het, dan gaat het de kluis in en volgt het
@@ -85,6 +92,14 @@ function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemb
       const md = getMemberState(g.userId) || {};
       md.adres = adres;
       saveMemberState(g.userId, md);
+    } else if (huidig.veld === 'reisdocument') {
+      /* Dit gesprek lost het reisdocument niet op, en dat is met opzet: getypte
+         paspoortgegevens zijn precies het soort veld waar een tikfout je aan de
+         balie laat stranden. De scan leest de vier gegevens in een keer goed.
+         viaScan zegt het scherm dat het de scanner moet openen, zoals
+         viaVerificatie dat voor de identiteitscontrole doet. */
+      return { status: 200, viaScan: true, veld: 'reisdocument',
+        tekst: 'Dit gaat met de scanner, niet met typen: houd de onderste twee regels van je paspoort voor de camera, dan staan nummer, geldigheid, nationaliteit en geboortedatum er in een keer goed.' };
     } else {
       // identiteit: dit gesprek lost dat niet op, en dat zeggen we eerlijk
       return { status: 200, viaVerificatie: true, veld: 'identiteit',
@@ -98,7 +113,7 @@ function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemb
     }
     const volgende = g.wachtrij[0];
     return { status: 200, tekst: 'Genoteerd. ' + vraagVan(volgende), veld: volgende.veld,
-      viaVerificatie: !!volgende.viaVerificatie, nog: g.wachtrij.length };
+      viaVerificatie: !!volgende.viaVerificatie, viaScan: !!volgende.viaScan, nog: g.wachtrij.length };
   }
 
   return { gegevensStart, gegevensZeg };

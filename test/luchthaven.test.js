@@ -48,6 +48,21 @@ test('2. de passagiersketen: boeken, inchecken tijdens het venster, boarding pas
   const bord = await api(base, '/api/member/vluchten/bord', {}, lid);
   const dicht = bord.body.vluchten.find(v => v.nummer === 'RT101');
   const open = bord.body.vluchten.find(v => v.nummer === 'RT205');
+
+  /* Eerst de papieren. Een vlucht is het ene geval waar de derde partij meer wil
+     dan bereikbaarheid: de maatschappij en de grens eisen nummer, geldigheid,
+     nationaliteit en geboortedatum (kern/gegevenspoort.js, soort 'vlucht').
+     Zonder die gegevens hoort boeken NIET te lukken, en dat toetsen we ook --
+     anders zou deze keten stilzwijgend om de poort heen lopen. */
+  const zonder = await api(base, '/api/member/vluchten/boek', { id: dicht.id }, lid);
+  assert.equal(zonder.status, 428, 'zonder paspoortgegevens komt er eerst een vraag');
+  assert.ok((zonder.body.ontbreekt || []).some(m => m.veld === 'reisdocument'),
+    'en die vraag gaat over het reisdocument');
+  const scan = await api(base, '/api/onboarding/paspoort', {
+    nummer: 'NX1234567', vervaldatum: '2032-01-01', nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01'
+  }, lid);
+  assert.equal(scan.status, 200, 'de scan van de strook zet ze alle vier in een keer');
+
   // boeken kan op beide, inchecken alleen als het venster open staat
   const b1 = await api(base, '/api/member/vluchten/boek', { id: dicht.id }, lid);
   assert.equal(b1.status, 200);

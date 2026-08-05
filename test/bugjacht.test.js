@@ -107,6 +107,12 @@ test('bagage: een vermiste koffer glipt niet terug naar het begin van de keten',
   const bord = (await api('/api/member/vluchten/bord', {}, lid)).body;
   const open = (bord.vluchten || []).find(v => v.nummer === 'RT205');
   assert.ok(open, 'RT205 staat open voor inchecken');
+  /* Papieren eerst: een vlucht boeken vraagt sinds kort om documentnummer,
+     geldigheid, nationaliteit en geboortedatum (kern/gegevenspoort.js, soort
+     'vlucht'), anders geeft de route een 428 en heeft deze bagagejacht geen
+     koffer om achteraan te zitten. */
+  await api('/api/onboarding/paspoort', { nummer: 'NX1234567', vervaldatum: '2032-01-01',
+    nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' }, lid);
   const boek = await api('/api/member/vluchten/boek', { id: open.id }, lid);
   assert.equal(boek.status, 200);
   const inc = await api('/api/member/vluchten/incheck', { code: boek.body.boeking.code, koffers: 1 }, lid);

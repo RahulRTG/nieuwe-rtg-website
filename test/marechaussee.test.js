@@ -35,6 +35,12 @@ test.before(async () => {
   // een reiziger checkt in op de open vlucht RT205, zodat de grensbalie werk heeft
   const bord = await api(base, '/api/member/vluchten/bord', {}, lid);
   const open = bord.body.vluchten.find(v => v.nummer === 'RT205');
+  /* Papieren voor de grens. Een vlucht boeken vraagt sinds kort om
+     documentnummer, geldigheid, nationaliteit en geboortedatum
+     (kern/gegevenspoort.js, soort 'vlucht'); zonder die scan geeft de
+     boekroute een 428 en heeft deze opzet niets om mee te toetsen. */
+  await api(base, '/api/onboarding/paspoort', { nummer: 'NX1234567', vervaldatum: '2032-01-01',
+    nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' }, lid);
   const bk = await api(base, '/api/member/vluchten/boek', { id: open.id }, lid);
   await api(base, '/api/member/vluchten/incheck', { code: bk.body.boeking.code }, lid);
 });
@@ -75,6 +81,9 @@ test('3. het grens-signaal: een kist die boardt met ongecontroleerde reizigers v
     phone: '069' + u.slice(1), password: 'geheim123', geboortedatum: '1992-08-08', tier: 'rtg', pasApp: 'rtg' })).body.token;
   const bord = await api(base, '/api/member/vluchten/bord', {}, lid2);
   const open = bord.body.vluchten.find(v => v.nummer === 'RT205');
+  // ook dit tweede lid heeft papieren nodig voor de grens
+  await api(base, '/api/onboarding/paspoort', { nummer: 'NX7654321', vervaldatum: '2032-06-01',
+    nationaliteit: 'Belgische', geboortedatum: '1988-03-03' }, lid2);
   const bk = await api(base, '/api/member/vluchten/boek', { id: open.id }, lid2);
   await api(base, '/api/member/vluchten/incheck', { code: bk.body.boeking.code }, lid2);
   // operations maakt de draai rond en start het boarden

@@ -56,6 +56,12 @@ test('2. de boarding pass aan de deur: elke partner checkt de code van de gast',
   // de reiziger boekt de open vlucht (RT205, inchecken) en checkt in
   const bord = await api(base, '/api/member/vluchten/bord', {}, lidA);
   const open = bord.body.vluchten.find(v => v.nummer === 'RT205');
+  /* Papieren voor de grens. Een vlucht boeken vraagt sinds kort om
+     documentnummer, geldigheid, nationaliteit en geboortedatum
+     (kern/gegevenspoort.js, soort 'vlucht'); zonder die scan geeft de
+     boekroute een 428 en heeft deze opzet niets om mee te toetsen. */
+  await api(base, '/api/onboarding/paspoort', { nummer: 'NX1234567', vervaldatum: '2032-01-01',
+    nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' }, lidA);
   const bk = await api(base, '/api/member/vluchten/boek', { id: open.id }, lidA);
   // voor het inchecken is de pass nog niet geldig
   const teVroeg = await api(base, '/api/supplier/lucht/pass', { code: bk.body.boeking.code }, zaak);

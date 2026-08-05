@@ -83,6 +83,11 @@ module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
      bewaard. Er is hier GEEN tweede scanner gebouwd -- wat ontbrak was de weg
      ernaartoe. */
   const mailBijlage = require('../kern/mailbijlage')({ db, save, crypto, antivirus, dir: DATA_DIR });
+  /* Apparaatsleutels voor een externe mailclient. Een client bewaart zijn
+     wachtwoord jaren op schijf, en het RTG-wachtwoord opent veel meer dan een
+     postvak -- dus krijgt hij iets anders: een sleutel per postvak, los in te
+     trekken, en maar een keer te zien. */
+  const mailSleutel = require('../kern/mailsleutel')({ db, save, crypto });
 
   /* De AI-hulp bij een gesprek: samenvatten, actiepunten, en uitleggen waarom
      iets op phishing lijkt. Leest en vat samen, meer niet -- elk gevolg blijft
@@ -91,6 +96,6 @@ module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
      geen hulp. */
   const rtmailAi = require('../kern/rtmail-ai')({ rtmail, vak: rtmailVak });
 
-  return { mailQ, mailIn, mailAuth, mailBijlage, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
+  return { mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
     rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar };
 };

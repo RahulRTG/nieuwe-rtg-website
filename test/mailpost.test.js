@@ -179,8 +179,13 @@ test('de buitenpoort pakt MIME uit, bewaart het origineel en levert onbetrouwd a
   assert.match(m.tekst, /Klopt de rekening van dinsdag/, 'de base64-tekst is uitgepakt');
   assert.equal(m.vertrouwd, false, 'alles van buiten valt in de onbetrouwde baan');
   assert.equal(m.bron, 'extern');
-  assert.deepEqual(m.bijlagen, [], 'er wordt nooit iets bewaard dat te openen valt');
-  assert.match(m.tekst, /1 bijlage\(n\): factuur\.pdf/, 'maar de bijlage wordt wel benoemd');
+  /* De bijlage staat niet OP het bericht (RTMAIL draagt er geen), maar hij
+     wordt wel benoemd in de tekst en is via de bijlagenlaag op te vragen -- na
+     de scanner. Zie test/mailbijlage.test.js voor die kant. */
+  assert.deepEqual(m.bijlagen, [], 'het berichtobject zelf draagt nooit een bijlage');
+  assert.match(m.tekst, /\[Bijlagen: factuur\.pdf\]/, 'maar hij wordt wel benoemd');
+  const bijl = await post('/api/member/rtmail/bijlagen', { id: r.id }, lidTok);
+  assert.equal(bijl.bijlagen.length, 1, 'en hij is opvraagbaar want de scanner vond hem schoon');
   assert.ok(m.links.aantal >= 1, 'de link is herkend, zodat het scherm hem onklikbaar kan tonen');
 });
 

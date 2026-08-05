@@ -68,7 +68,7 @@ const antivirus = require('../kern/antivirus')({ db, save, beveilig, wacht });
    die laag geen enkele bijlage, en een postlaag die vóór de scanner wordt
    gebouwd zou hem stilzwijgend missen. */
 const post = require('./postlaag')({ db, save, crypto, findSupplier, antivirus, DATA_DIR });
-const { mailQ, mailIn, mailAuth, mailBijlage, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels,
+const { mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels,
   rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar } = post;
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
 const automatisering = require('../kern/automatisering')({ rtmail });
@@ -146,6 +146,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, mailQ, mailIn, mailAuth, mailBijlage, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, scanNet, wacht, werkmail
+    resolveSession, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, scanNet, wacht, werkmail
   };
 };

@@ -11,7 +11,7 @@
    is, gaat de deur uit zodra iemand zijn concepten opvraagt of zijn postvak
    opent. Een wekker die een keer niet loopt, verstuurt niets en zegt niets. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, db, rtmail, rtmailSchrijf, rtmailRegels, codenaamVan } = kern;
+  const { app, auth, supplierAuth, db, rtmail, rtmailSchrijf, rtmailRegels, mailSleutel, codenaamVan } = kern;
   const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
   const body = (req) => (req && req.body) || {};
 
@@ -113,6 +113,32 @@ module.exports = (kern) => {
       if (!a) return geen(res);
       const b = body(req);
       const r = rtmailRegels.zet(a, String(b.id || ''), b.aan !== false);
+      if (r.error) return fout(res, r);
+      res.json(r);
+    });
+
+    /* APPARAATSLEUTELS voor een externe mailclient (IMAP). Ze staan hier bij de
+       instellingen van een postvak, want dat is wat ze zijn: een manier om bij
+       DIT postvak te komen. De sleutel zelf is maar EEN keer te zien. */
+    app.post(p.pad + '/imap/sleutels', p.poort, (req, res) => {
+      const a = p.adres(req);
+      if (!a) return geen(res);
+      res.json({ ok: true, adres: a, sleutels: mailSleutel.lijst(a),
+        let: 'Een apparaatsleutel opent precies dit postvak en niets anders. Trekt u hem in, dan werkt hij meteen niet meer.' });
+    });
+
+    app.post(p.pad + '/imap/sleutel', p.poort, (req, res) => {
+      const a = p.adres(req);
+      if (!a) return geen(res);
+      const r = mailSleutel.maak(a, String(body(req).naam || ''));
+      if (r.error) return fout(res, r);
+      res.json(r);
+    });
+
+    app.post(p.pad + '/imap/intrekken', p.poort, (req, res) => {
+      const a = p.adres(req);
+      if (!a) return geen(res);
+      const r = mailSleutel.trekIn(a, String(body(req).id || ''));
       if (r.error) return fout(res, r);
       res.json(r);
     });

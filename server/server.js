@@ -780,7 +780,7 @@ const {
   beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
   ensureSupplierDefaults, etaMinutes, gidsHaal, gidsWeg, gidsZoekCodenaam, guestsFor, 
   haversine, initRealtime, keyVanCodenaam, ledenAantal, leverSse, liveCodename, liveStateFor, 
-  mailQ, mailIn, mailAuth, mailBijlage, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam,
+  mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam,
   rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar,
   ruimBuffer, salonItemsVan, salonProfielCompleet, salonZichtbaar, sendPush, sendPushToUser, 
   speelOpnieuw, sseBuffer, sseClients, sseSend, sseToCustomer, toRad, webpush, werkmail
@@ -1983,7 +1983,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, naamlaag,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
@@ -3011,6 +3011,24 @@ function gestart() {
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 }
 const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
+
+/* IMAP: een externe mailclient laten meelezen (server/imap.js). Staat UIT
+   tenzij IMAP_POORT is gezet, en dat is met opzet: een mailpoort die vanzelf
+   openstaat op elke machine waar dit draait, is een deur die niemand heeft
+   besloten open te zetten. Zonder TLS-sleutel praat hij plat, en dan hoort hij
+   alleen achter een eigen doorgeefluik -- er wordt niet gedaan alsof dat
+   veilig is. */
+if (process.env.IMAP_POORT) {
+  try {
+    const fsI = require('fs');
+    const tlsOpties = process.env.IMAP_KEY && process.env.IMAP_CERT
+      ? { key: fsI.readFileSync(process.env.IMAP_KEY), cert: fsI.readFileSync(process.env.IMAP_CERT) } : null;
+    require('./imap-server')({ vak: kern.rtmailVak, rtmail: kern.rtmail, sleutels: kern.mailSleutel,
+      poort: Number(process.env.IMAP_POORT), host: process.env.IMAP_HOST || '127.0.0.1', tlsOpties })
+      .start().then(() => console.log('[imap] luistert op ' + (process.env.IMAP_HOST || '127.0.0.1') + ':' +
+        process.env.IMAP_POORT + (tlsOpties ? ' (TLS)' : ' -- PLAT, zet er een doorgeefluik met TLS voor')));
+  } catch (e) { console.warn('[imap] niet gestart:', e && e.message); }
+}
 /* EEN BEZETTE POORT IS EEN STARTFOUT, GEEN SERVERFOUT.
 
    app.listen meldt een mislukking (EADDRINUSE als de poort bezet is, EACCES

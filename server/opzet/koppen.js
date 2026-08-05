@@ -57,8 +57,8 @@ module.exports = function koppen({ app }) {
        blokkades, dus zo'n terugval valt op.
 
        style-src-attr houdt wel 'unsafe-inline' -- zie de uitleg in
-       middleware/voordeur.js: er staan 8957 style="..."-attributen in public/,
-       en CSP kent geen stempel voor een attribuut. */
+       middleware/voordeur.js: er staan nog style="..."-attributen in public/,
+       en CSP kent geen stempel voor een attribuut. NORM.json telt hoeveel. */
     res.set('Content-Security-Policy',
       "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; " +
       "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +

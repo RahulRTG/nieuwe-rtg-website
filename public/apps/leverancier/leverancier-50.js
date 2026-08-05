@@ -3,43 +3,43 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // het havenoverzicht: elke steiger een regel
-    h += '<div class="st-sec" style="margin-top:1rem;">'+esc(d.naam)+' · '+T('mr.plaatsen','de ligplaatsen')+'</div>';
+    h += '<div class="st-sec h-mt100">'+esc(d.naam)+' · '+T('mr.plaatsen','de ligplaatsen')+'</div>';
     h += d.ligplaatsen.map(p=>'<div style="display:flex;gap:0.6rem;align-items:baseline;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 3.2rem;">'+p.id+'</span><span class="sub" style="flex:0 0 6.5rem;">tot '+p.lengteMax+' m · '+eur(p.dagprijs)+'/n</span>'+
       (p.boot?'<b style="flex:1;font-size:0.85rem;">'+esc(p.boot.naam)+' ('+p.boot.lengte+' m)</b><span class="sub">'+esc(p.boot.eigenaar)+(p.vast?' · '+T('mr.vast','vaste ligger'):' · tot '+esc(p.boot.tot||''))+'</span>'+(p.vast?'':knop('data-mrweg', p.id, T('mr.vertrek','Vertrek')))
-        :'<span class="sub" style="flex:1;">'+T('mr.vrij','vrij')+'</span>')+'</div>').join('');
+        :'<span class="sub h-flex1">'+T('mr.vrij','vrij')+'</span>')+'</div>').join('');
 
     // een passant binnenmelden: de eerste passende plaats
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('mr.passant','Passant binnenmelden')+'</div>'+
-      '<div class="row-gap"><input id="mrBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" style="flex:2;"><input id="mrEig" class="st-in" placeholder="'+T('mr.eig','Eigenaar')+'" maxlength="60" style="flex:2;">'+
+    h += '<div class="st-sec h-mt100">'+T('mr.passant','Passant binnenmelden')+'</div>'+
+      '<div class="row-gap"><input id="mrBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><input id="mrEig" class="st-in" placeholder="'+T('mr.eig','Eigenaar')+'" maxlength="60" class="h-flex2">'+
       '<input id="mrLen" class="st-in" type="number" step="0.5" min="1" placeholder="m" style="flex:0 0 4.5rem;"><input id="mrNacht" class="st-in" type="number" min="1" value="1" style="flex:0 0 4.5rem;">'+
       '<button id="mrMeld" style="flex:1;'+goud+'">'+T('mr.meld','Wijs plaats toe')+'</button></div>';
 
     // de brandstofsteiger
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('mr.brandstof','De brandstofsteiger')+'</div>'+
-      '<div class="row-gap"><input id="mrBBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" style="flex:2;"><select id="mrBSoort" class="st-in" style="flex:1;"><option value="diesel">diesel</option><option value="benzine">benzine</option></select>'+
-      '<input id="mrBLiters" class="st-in" type="number" min="1" placeholder="liters" style="flex:1;"><button id="mrBVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('mr.brandstof','De brandstofsteiger')+'</div>'+
+      '<div class="row-gap"><input id="mrBBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><select id="mrBSoort" class="st-in h-flex1"><option value="diesel">diesel</option><option value="benzine">benzine</option></select>'+
+      '<input id="mrBLiters" class="st-in" type="number" min="1" placeholder="liters" class="h-flex1"><button id="mrBVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
     h += (d.brandstof||[]).filter(b=>b.status==='gevraagd').map(b=>'<div class="sub" style="padding:0.3rem 0;">'+esc(b.boot)+' · '+esc(b.soort)+' · '+b.liters+' l '+knop('data-mrbk', b.id, T('mr.getankt','Getankt'), true)+'</div>').join('');
 
     // service en de hellingbaan
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('mr.service','Service en de helling')+'</div>'+
-      '<div class="row-gap"><input id="mrSBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" style="flex:2;"><select id="mrSSoort" class="st-in" style="flex:1;">'+Object.keys(MR_SVC).map(s=>'<option value="'+s+'">'+MR_SVC[s]+'</option>').join('')+'</select>'+
+    h += '<div class="st-sec h-mt100">'+T('mr.service','Service en de helling')+'</div>'+
+      '<div class="row-gap"><input id="mrSBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><select id="mrSSoort" class="st-in h-flex1">'+Object.keys(MR_SVC).map(s=>'<option value="'+s+'">'+MR_SVC[s]+'</option>').join('')+'</select>'+
       '<input id="mrSWens" class="st-in" placeholder="'+T('mr.wens','Wat moet er gebeuren?')+'" maxlength="160" style="flex:3;"><button id="mrSVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
     h += (d.service||[]).filter(s=>s.status!=='klaar').map(s=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 7rem;">'+MR_SVC[s.soort]+'</span><b style="flex:1;font-size:0.82rem;">'+esc(s.boot)+' · '+esc(s.wens)+'</b><span class="sub">'+esc(s.status)+'</span>'+
       (s.status==='open'?knop('data-mrsb', s.id, T('mr.pak','Oppakken'), true):knop('data-mrsk', s.id, T('mr.klaar','Klaar'), true))+'</div>').join('') || '<p class="sub">'+T('mr.svc.geen','Geen open verzoeken op de werf.')+'</p>';
 
     // de marina-concierge: de jetset op het water
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('mr.concierge','De marina-concierge')+'</div>'+
-      '<div class="row-gap"><select id="mrCSoort" class="st-in" style="flex:1;">'+Object.keys(MR_CON).map(s=>'<option value="'+s+'">'+MR_CON[s]+'</option>').join('')+'</select>'+
-      '<input id="mrCVoor" class="st-in" placeholder="'+T('mr.voor','Voor wie')+'" maxlength="60" style="flex:1;"><input id="mrCWens" class="st-in" placeholder="'+T('mr.cwens','De wens (bijv. tender om 12:00 naar de baai)')+'" maxlength="160" style="flex:3;">'+
+    h += '<div class="st-sec h-mt100">'+T('mr.concierge','De marina-concierge')+'</div>'+
+      '<div class="row-gap"><select id="mrCSoort" class="st-in h-flex1">'+Object.keys(MR_CON).map(s=>'<option value="'+s+'">'+MR_CON[s]+'</option>').join('')+'</select>'+
+      '<input id="mrCVoor" class="st-in" placeholder="'+T('mr.voor','Voor wie')+'" maxlength="60" class="h-flex1"><input id="mrCWens" class="st-in" placeholder="'+T('mr.cwens','De wens (bijv. tender om 12:00 naar de baai)')+'" maxlength="160" style="flex:3;">'+
       '<button id="mrCVraag" style="flex:1;'+goud+'">'+T('mr.vraag','Vraag aan')+'</button></div>';
     h += (d.concierge||[]).map(c=>'<div style="border:1px solid '+(c.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+MR_CON[c.soort]+' · '+esc(c.voorWie)+'</b><span class="sub">'+esc(c.status)+'</span></div>'+
       '<div class="sub">'+esc(c.wens)+' · '+esc(c.moment)+(c.notitie?' · '+esc(c.notitie):'')+'</div>'+
       (c.status!=='afgerond'?'<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
         (c.status==='aangevraagd'?knop('data-mrcb', c.id, T('mr.bevestig','Bevestig'), true):'')+knop('data-mrca', c.id, T('mr.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+T('mr.regel','Een charter-transfer is een dienstverzoek aan RTG Charter; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
+    h += '<p class="sub h-mt50">'+T('mr.regel','Een charter-transfer is een dienstverzoek aan RTG Charter; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {

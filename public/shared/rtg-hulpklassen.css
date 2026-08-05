@@ -1,0 +1,56 @@
+/* ============================================================================
+   HULPKLASSEN -- om style="..."-attributen te vervangen, en om geen andere
+   reden.
+
+   WAAROM DIT BESTAAT. De CSP draait op een nonce voor script-src en style-src,
+   maar style-src-attr staat nog op 'unsafe-inline'. Dat kan pas dicht als er
+   geen style="..."-attributen meer in public/ staan; NORM.json telt ze
+   (inlineStijlAttributen) en dat getal mag alleen omlaag. Deze klassen zijn het
+   gereedschap waarmee het omlaaggaat.
+
+   WAAROM ER !important STAAT, EN WAAROM DAT HIER JUIST NETJES IS.
+
+   Een style="flex:1"-attribuut wint van ELKE gewone regel, ongeacht
+   specificiteit. Een klasse doet dat niet. Ruil je het een voor het ander, dan
+   kan een regel die eerst verloor opeens winnen -- en dan verschuift de opmaak
+   op plekken die niemand in de gaten heeft. In leverancier.html alleen al staan
+   71 regels die margin-top zetten.
+
+   Met !important gedraagt de klasse zich precies zoals het attribuut zich
+   gedroeg: hij wint van alles wat niet zelf !important is. Nagemeten in de vier
+   stijlbladen die leverancier.html laadt plus zijn eigen <style>-blok: geen
+   enkele regel gebruikt !important op flex, grid-column, margin-top of
+   flex-wrap. De ruil is daarmee niet "waarschijnlijk gelijk" maar aantoonbaar
+   gelijk.
+
+   WAT HIER NIET IN HOORT
+
+   1. Geen display:none. Dat wordt in de apps met JS aan- en uitgezet
+      (el.style.display = ''), en met een klasse eronder blijft het element
+      daarna verborgen. Negentien plekken in de leverancier-app doen dat.
+   2. Geen eigenschap die ergens met JS wordt gezet. Nagekeken voor deze vier:
+      .style.flex, .style.marginTop, .style.gridColumn en .style.flexWrap komen
+      in de leverancier-bron geen enkele keer voor.
+   3. Geen nieuwe kleuren of maten. Dit bestand voegt niets toe aan het merk;
+      het herhaalt alleen wat er al in de attributen stond.
+
+   De naam begint met h- (hulp) zodat je in de bron meteen ziet dat het geen
+   onderdeel-klasse is maar een vervangen attribuut.
+   ========================================================================== */
+
+/* verhouding in een flexrij */
+.h-flex1 { flex: 1 !important; }
+.h-flex2 { flex: 2 !important; }
+.h-wrap  { flex-wrap: wrap !important; }
+
+/* een cel die de hele rasterbreedte pakt */
+.h-volbreed { grid-column: 1 / -1 !important; }
+
+/* afstand naar boven; de naam draagt de waarde, zodat je hem niet hoeft op te
+   zoeken en er geen tweede plek ontstaat waar hij anders staat */
+.h-mt20  { margin-top: 0.2rem !important; }
+.h-mt30  { margin-top: 0.3rem !important; }
+.h-mt35  { margin-top: 0.35rem !important; }
+.h-mt40  { margin-top: 0.4rem !important; }
+.h-mt50  { margin-top: 0.5rem !important; }
+.h-mt100 { margin-top: 1rem !important; }

@@ -7,7 +7,7 @@
     if (!rows.length) return '';
     const today = new Date().toISOString().slice(0, 10);
     return '<div class="st-sec">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' & '+T('rs.mep','mise en place')+'</div>'+
-      '<div class="tkc" style="grid-column:1/-1;">'+rows.map(r =>
+      '<div class="tkc h-volbreed">'+rows.map(r =>
         '<div class="st-row'+(r.it.done?'" style="opacity:0.5;':'"')+'">'+
         '<span>'+
         '<span style="display:inline-block;min-width:5.4rem;margin-right:0.5rem;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:'+(r.due===today?'var(--burgundy)':'var(--soft)')+';">'+dueLabel(r.due, r.it.daysBefore)+'</span>'+

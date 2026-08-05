@@ -169,6 +169,29 @@ const IJKINGEN = {
       '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(12000) + '";\nmodule.exports = { x };\n',
       () => norm.meet().keuringTeGroot - voor.keuringTeGroot)
   },
+  inlineStijlAttributen: {
+    /* DE RATEL OP DE LAATSTE unsafe-inline. Twee kanten geijkt, want dit getal
+       moet twee dingen goed doen: tellen wat de CSP openhoudt, en NIET tellen
+       wat er niets mee te maken heeft.
+
+       Een style="..."-attribuut valt onder style-src-attr en telt dus mee. Een
+       CSSOM-schrijfactie (el.style.kleur = '...') gaat buiten de ontleder om,
+       wordt door CSP niet gecontroleerd, en is juist de UITWEG -- die mag het
+       getal niet omhoog duwen, anders straft de meter de oplossing af.
+
+       De proef voert de teller een verzonnen bestand, zodat hij niet afhangt
+       van wat er toevallig in public/ staat. */
+    proef: () => {
+      const drie = '<div style="a"><p style="b"></p><span style="c"></span></div>';
+      const geen = "el.style.kleur = 'rood'; el.style.breedte = '3px';";
+      const met = norm.telInlineStijl(() => drie, ['verzonnen.html']);
+      const zonder = norm.telInlineStijl(() => geen, ['verzonnen.js']);
+      assert.equal(met, 3, 'drie attributen worden er drie geteld');
+      assert.equal(zonder, 0, 'CSSOM-schrijfacties tellen niet mee -- dat is de uitweg, geen schuld');
+      return met - zonder;
+    }
+  },
+
   dependencies: {
     /* De enige meter waarvan de bron een bestand is dat we ook echt even
        veranderen. Terugzetten gebeurt uit de tekst die we vooraf lazen, niet

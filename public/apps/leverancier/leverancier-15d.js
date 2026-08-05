@@ -21,12 +21,12 @@
             .catch(function(e){ wvData = { error: e.message }; })
             .then(function(){ wvBusy = false; renderStation(); });
         }
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.kop','Werkvloer')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('wv.kop','Werkvloer')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (wvData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.kop','Werkvloer')+'</h3><div class="tkc-who">'+wvData.error+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('wv.kop','Werkvloer')+'</h3><div class="tkc-who">'+wvData.error+'</div></div>';
       } else {
         const tabs = [['koppel', T('wv.t1','Het andere scherm')], ['tafels', T('wv.t2','Tafels & allergenen')], ['chk', T('wv.t3','Checklijsten')]];
-        html += '<div class="tkc" style="grid-column:1/-1;"><div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+        html += '<div class="tkc h-volbreed"><div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
           tabs.map(function(t){ return '<button class="obtn'+(wvTab===t[0]?' primary':'')+'" data-wvtab="'+t[0]+'">'+escT(t[1])+'</button>'; }).join('')+'</div></div>';
 
         if (wvTab === 'koppel'){
@@ -42,7 +42,7 @@
             '<input class="st-in" id="wvBedrag" type="number" min="0" step="0.01" placeholder="'+T('wv.bedrag','Bedrag (alleen bij betalen)')+'" style="flex:1;min-width:120px;">'+
             '<input class="st-in" id="wvRef" placeholder="'+T('wv.ref','Bon- of factuurnummer')+'" style="flex:1;min-width:120px;">'+
             '<button class="obtn primary" id="wvMaak">'+T('wv.zet','Zet klaar')+'</button></div></div>';
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.open','Openstaand en afgerond')+' ('+k.open+' '+T('wv.openn','open')+')</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>'+T('wv.open','Openstaand en afgerond')+' ('+k.open+' '+T('wv.openn','open')+')</h3>'+
             (k.verzoeken.length ? k.verzoeken.map(function(v){
               const st = v.status === 'open' ? T('wv.st.open','wacht op het andere scherm')
                 : v.status === 'getekend' ? T('wv.st.get','getekend')
@@ -68,7 +68,7 @@
                 '<span class="sub">'+T('wv.optafels','op tafel')+' '+escT(r.tafels.join(', '))+'</span></span><b>'+r.aantal+'x</b></div>';
             }).join('') : '<div class="tkc-who">'+T('wv.geentafels','Nog geen tafels op de lijst.')+'</div>')+
             '<div class="tkc-who">'+escT(kb.regel)+'</div></div>';
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.tafels','De tafels')+'</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>'+T('wv.tafels','De tafels')+'</h3>'+
             kb.tafels.map(function(t){
               return '<div class="st-row"><span><b>'+T('wv.tafel','Tafel')+' '+escT(t.tafel)+'</b>'+(t.event?' · '+escT(t.event):'')+' · '+t.aantalGasten+' '+T('wv.pers','personen')+
                 '<span class="sub">'+(t.telling.length ? t.telling.map(function(r){ return escT(r.wat)+' '+r.aantal+'x'; }).join(' · ') : T('wv.geenbijz','geen bijzonderheden'))+'</span></span>'+
@@ -84,7 +84,7 @@
 
         if (wvTab === 'chk'){
           const c = wvData.chk;
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.chk','Checklijsten')+'</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>'+T('wv.chk','Checklijsten')+'</h3>'+
             '<div class="tkc-who">'+escT(c.uitleg)+'</div>'+
             (c.lijsten.length ? c.lijsten.map(function(l){
               return '<div class="st-row"><span><b>'+escT(l.titel)+'</b>'+(l.event?' · '+escT(l.event):'')+

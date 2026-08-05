@@ -32,7 +32,7 @@
         const swRows = rijen.map(r =>
           '<div class="st-row"><span>'+r[1]+'<span class="sub">'+r[2]+'</span></span>'+
           '<button class="obtn'+(r[3]?' primary':' warn')+'" data-kopt="'+r[0]+'" data-val="'+(r[3]?'0':'1')+'">'+(r[3]?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>').join('');
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('sw.h','Baas over uw zaak')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('sw.h','Baas over uw zaak')+'</h3>'+
           '<div class="tkc-who">'+T('sw.s','Zet elke functie aan of uit wanneer u dat wilt. Alleen betalen via de app staat altijd aan; het moment (vooraf of achteraf) bepaalt u zelf.')+'</div>'+
           funcBlok(T('sw.blok','Schakelaars'), rijen.map(r => ({ aan: r[3] })), swRows)+
           '<div class="st-row"><span>'+T('sw.apppay','Betalen via de app')+'<span class="sub">'+T('sw.apppay.s','Vast onderdeel van elk RTG-partnerschap')+'</span></span>'+

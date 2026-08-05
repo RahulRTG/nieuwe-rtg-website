@@ -23,32 +23,32 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de groepen: aanmelden en ophalen (alleen door de aangemelde ouder)
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('op.groepen','De groepen')+'</div>'+
-      '<div class="row-gap"><select id="opGroep" class="st-in" style="flex:2;">'+d.groepen.map(g=>'<option value="'+g.id+'">'+esc(g.naam)+' · '+g.aanwezig.length+' van '+g.capaciteit+'</option>').join('')+'</select>'+
-      '<input id="opKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" style="flex:1;"><input id="opOuder" class="st-in" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60" style="flex:1;">'+
+    h += '<div class="st-sec h-mt100">'+T('op.groepen','De groepen')+'</div>'+
+      '<div class="row-gap"><select id="opGroep" class="st-in h-flex2">'+d.groepen.map(g=>'<option value="'+g.id+'">'+esc(g.naam)+' · '+g.aanwezig.length+' van '+g.capaciteit+'</option>').join('')+'</select>'+
+      '<input id="opKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" class="h-flex1"><input id="opOuder" class="st-in" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60" class="h-flex1">'+
       '<button id="opMeld" style="flex:1;'+vzGoud+'">'+T('op.meld','Meld aan')+'</button></div>';
     h += d.groepen.map(g=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<b style="font-size:0.85rem;">'+esc(g.naam)+'</b>'+
       (g.aanwezig.length?g.aanwezig.map(kd=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.3rem 0;">'+
         '<span style="flex:1;font-size:0.82rem;">'+esc(kd.voornaam)+'</span>'+
         '<input data-opoud="'+g.id+':'+kd.id+'" class="st-in" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60" style="flex:0 0 9rem;">'+
-        vzKnop('data-ophaal', g.id+':'+kd.id, T('op.haal','Ophalen'), true)+'</div>').join(''):'<p class="sub" style="margin-top:0.3rem;">'+T('op.leeg','Nog niemand aangemeld.')+'</p>')+'</div>').join('');
+        vzKnop('data-ophaal', g.id+':'+kd.id, T('op.haal','Ophalen'), true)+'</div>').join(''):'<p class="sub h-mt30">'+T('op.leeg','Nog niemand aangemeld.')+'</p>')+'</div>').join('');
 
     // de nanny-service: aanvraag, en een mens bevestigt met een gescreende nanny
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('op.nanny','Nanny-service')+'</div>'+
-      '<div class="row-gap"><input id="opGezin" class="st-in" placeholder="'+T('op.gezin','Gezin')+'" maxlength="60" style="flex:1;"><input id="opNDatum" class="st-in" type="date" style="flex:1;"><input id="opNVan" class="st-in" type="time" style="flex:1;"><input id="opNTot" class="st-in" type="time" style="flex:1;">'+
+    h += '<div class="st-sec h-mt100">'+T('op.nanny','Nanny-service')+'</div>'+
+      '<div class="row-gap"><input id="opGezin" class="st-in" placeholder="'+T('op.gezin','Gezin')+'" maxlength="60" class="h-flex1"><input id="opNDatum" class="st-in" type="date" class="h-flex1"><input id="opNVan" class="st-in" type="time" class="h-flex1"><input id="opNTot" class="st-in" type="time" class="h-flex1">'+
       '<button id="opNVraag" style="flex:1;'+vzGoud+'">'+T('op.vraag','Vraag aan')+'</button></div>';
     h += (d.nannyBoekingen||[]).map(a=>'<div style="border:1px solid '+(a.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(a.gezin)+' · '+esc(a.datum)+' '+esc(a.van)+' tot '+esc(a.tot)+'</b><span class="sub">'+esc(a.status)+(a.nanny?' · '+esc(a.nanny):'')+'</span></div>'+
-      (a.status==='aangevraagd'?'<div class="row-gap" style="margin-top:0.45rem;"><select data-opnn="'+a.id+'" class="st-in" style="flex:2;">'+d.nannies.map(n=>'<option value="'+n.id+'">'+esc(n.naam)+' (gescreend)</option>').join('')+'</select>'+vzKnop('data-opnb', a.id, T('op.bevestig','Bevestig'), true)+'</div>':
+      (a.status==='aangevraagd'?'<div class="row-gap" style="margin-top:0.45rem;"><select data-opnn="'+a.id+'" class="st-in h-flex2">'+d.nannies.map(n=>'<option value="'+n.id+'">'+esc(n.naam)+' (gescreend)</option>').join('')+'</select>'+vzKnop('data-opnb', a.id, T('op.bevestig','Bevestig'), true)+'</div>':
         a.status==='bevestigd'?'<div style="margin-top:0.45rem;">'+vzKnop('data-opna', a.id, T('op.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
 
     // dagverslagjes met alleen voornamen
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('op.verslag','Dagverslagjes')+'</div>'+
-      '<div class="row-gap"><input id="opVKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" style="flex:1;"><input id="opVTekst" class="st-in" placeholder="'+T('op.vtekst','Wat is er vandaag beleefd?')+'" maxlength="240" style="flex:3;">'+
+    h += '<div class="st-sec h-mt100">'+T('op.verslag','Dagverslagjes')+'</div>'+
+      '<div class="row-gap"><input id="opVKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" class="h-flex1"><input id="opVTekst" class="st-in" placeholder="'+T('op.vtekst','Wat is er vandaag beleefd?')+'" maxlength="240" style="flex:3;">'+
       '<button id="opVMaak" style="flex:1;'+vzGoud+'">'+T('op.schrijf','Schrijf')+'</button></div>';
     h += (d.verslagen||[]).slice(0,6).map(v=>'<div class="sub" style="padding:0.3rem 0;"><b>'+esc(v.voornaam)+'</b> · '+esc(v.tekst)+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+esc(d.regel||'')+'</p>';
+    h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {

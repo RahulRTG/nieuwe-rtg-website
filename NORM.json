@@ -18,9 +18,28 @@
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 7,
     "schermenZonderToets": 3,
-    "keuringTeGroot": 1
+    "keuringTeGroot": 1,
+    "inlineStijlAttributen": 5549
   },
   "notities": [
+    {
+      "datum": "2026-08-05",
+      "meter": "inlineStijlAttributen 6040 -> 5549 (nieuw, en de grondwaarde is een keer gecorrigeerd)",
+      "reden": "De laatste 'unsafe-inline' in de CSP, geteld in plaats van beschreven. script-src en style-src draaien op een nonce; style-src-attr niet, want er staan nog style=\"...\"-attributen in public/ (2787 in HTML, 2762 in JS-sjabloonstrings) en CSP kent geen stempel voor een attribuut. Zolang dit getal niet nul is kan die richtlijn niet dicht. Aan een ratel en niet in een zin in de README: een schuld die je opschrijft groeit, een schuld die je telt niet.",
+      "eerlijkheidshalve": "DE EERSTE GRONDWAARDE WAS FOUT, en de fout is leerzaam. Ik zette hem op 8957, maar de teller liep ook over de BUNDELS heen -- public/apps/leverancier.js is de aaneengeplakte som van public/apps/leverancier/*.js, dus elk attribuut in een gebundelde app telde twee keer. Dat kwam pas aan het licht doordat een veegbeurt van 491 attributen de meter met 982 liet dalen: precies dubbel. Een meter die een verbetering dubbel beloont liegt net zo hard als een die hem mist. De teller slaat de bundels nu over (lijst uit scripts/bundel.js, dezelfde bron als check.js regel 13), en de gemeten stand op 944f6da was 6040. Het getal 8957 stond ook in server/middleware/voordeur.js, server/opzet/koppen.js en de README; die zijn rechtgezet, en er staat nu geen getal meer in die teksten -- alleen een verwijzing hierheen, want een getal in een commentaar veroudert en een ratel niet. De teller zelf is geijkt (test/meterijk.test.js): drie attributen tellen als drie, twee CSSOM-schrijfacties (el.style.kleur = ...) als nul. Dat laatste is geen detail: CSSOM gaat buiten de ontleder om en wordt door CSP niet gecontroleerd, dus dat is juist de uitweg -- zou de meter die meetellen, dan strafte hij de oplossing af."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "inlineStijlAttributen: eerste ronde, leverancier",
+      "reden": "491 attributen vervangen door hulpklassen in public/apps/leverancier/ (public/shared/rtg-hulpklassen.css). Alleen letterlijke, volledige waarden: flex:1, flex:2, flex-wrap:wrap, grid-column:1/-1 en zes margin-top-maten. 6040 -> 5549.",
+      "eerlijkheidshalve": "De klassen dragen !important, en dat is geen slordigheid maar de reden dat de ruil aantoonbaar gelijk is: een style=\"...\"-attribuut wint van elke gewone regel ongeacht specificiteit, een klasse niet. In leverancier.html staan alleen al 71 regels die margin-top zetten. Nagemeten in de vier stijlbladen die die pagina laadt plus zijn eigen <style>-blok: geen enkele regel gebruikt !important op deze vier eigenschappen, dus de klasse gedraagt zich precies zoals het attribuut zich gedroeg. display:none is BEWUST overgeslagen -- dat wordt op negentien plekken met JS aan- en uitgezet, en met een klasse eronder blijft het element daarna verborgen. Gecontroleerd in een echte browser: van de 50 elementen met een hulpklasse op het zichtbare scherm heeft er geen enkele een andere berekende waarde dan het attribuut had."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "de ratel stond al rood VOOR de ronde van vandaag",
+      "reden": "Nagemeten in een worktree op 6dd243a, de laatste commit voor deze ronde. Zes meters stonden daar al onder de norm: endpointsZonderTest 894 (norm 852), keuringOmvang 81 (78), keuringDubbeling 57 (56), zelfpoortendeToetsen 117 (115), verhalenSlaagPctStorm 74,7 (76,3) en geheugenHellingMBPerMin 4 (0). Dat is vastgelegd voor het geval iemand later denkt dat deze ronde ze veroorzaakt heeft.",
+      "eerlijkheidshalve": "Twee ervan zijn door deze ronde WEL verder opgelopen, en dat is mijn doen: keuringOmvang 81 -> 83 (server/opzet/verzoekketen.js op 9606 en server/middleware/stijlbundel.js op 10049 vallen in de band vlak onder de 10 kB) en zelfpoortendeToetsen 117 -> 118 (test/csp.e2e.js slaat zichzelf over zonder browser, net als de andere schermtoetsen). De vier andere zijn onaangeraakt. Belangrijker dan die getallen: ik heb deze ronde 'alles groen' gemeld op npm test, npm run e2e, npm run a11y en npm run check -- en npm run norm NIET gedraaid. Die uitspraak was dus smaller dan hij klonk."
+    },
     {
       "datum": "2026-08-05",
       "meter": "zelfpoortendeToetsen 114 -> 115",

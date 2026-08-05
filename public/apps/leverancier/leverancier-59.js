@@ -63,12 +63,12 @@
     try { plan = await API.call('/supplier/tafelplan', {}); } catch(e){ plan = { reserveringen: [], tafels: [], verwachtePersonen: 0, openAanvragen: 0, zonderTafel: 0 }; }
     if (!plan.reserveringen.length && !later.length && !plan.tafels.length){ wrap.innerHTML = ''; return; }
     const chips = plan.tafels.length
-      ? '<div class="pos-chips" style="margin-top:0.5rem;">'+plan.tafels.map(t =>
+      ? '<div class="pos-chips h-mt50">'+plan.tafels.map(t =>
           t.status==='vrij'
             ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
             : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>'
         ).join('')+'</div>'+
-        '<div class="softline" style="margin-top:0.3rem;">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>'
+        '<div class="softline h-mt30">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>'
       : '';
     // de open rekeningen: alles wat de kassa op de tafel zette, hier afrekenen
     const rekeningen = plan.tafels.filter(t => t.rekening);
@@ -82,12 +82,12 @@
         '</div>').join('')
       : '';
     wrap.innerHTML = '<div class="card"><div class="tt-h">'+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
-      '<div class="pos-chips" style="margin-top:0.4rem;">'+
+      '<div class="pos-chips h-mt40">'+
         '<span>'+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
         (plan.openAanvragen?'<span>'+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
         (plan.zonderTafel?'<span>'+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
       '</div>'+chips+rekBlok+
-      (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
+      (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline h-mt50">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
       '</div>'+
       (later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
     // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij

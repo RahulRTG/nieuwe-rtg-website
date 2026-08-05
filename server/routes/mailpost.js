@@ -16,7 +16,7 @@
    de To-kop van het bericht zelf. Een poort die de ontvanger uit een parameter
    haalt, is een open relay met extra stappen. */
 module.exports = (kern) => {
-  const { app, officeAuth, mailQ, mailIn, rtmail, werkmail } = kern;
+  const { app, officeAuth, mailQ, mailIn, mailAuth, rtmail, werkmail } = kern;
   const body = (req) => (req && req.body) || {};
 
   /* ---- beheer van de wachtrij (backoffice) ---- */
@@ -41,14 +41,27 @@ module.exports = (kern) => {
      PUBLIEK met opzet: een vreemde mailserver heeft geen inlog. De rem staat
      hieronder en de baan is altijd de onbetrouwde. */
   let venster = 0, teller = 0;
-  app.post('/api/mail/binnen', (req, res) => {
+  app.post('/api/mail/binnen', async (req, res) => {
     const min = Math.floor(Date.now() / 60000);
     if (min !== venster) { venster = min; teller = 0; }
     if (++teller > 120) return res.status(429).json({ error: 'De buitenpoort staat even dicht; probeer het over een minuut.' });
 
     const ruw = String(body(req).bericht || '');
-    const d = mailIn.ontleed(ruw, { publiekeSleutel: body(req).publiekeSleutel, ip: req.ip });
+    const ip = String(body(req).ip || '') || req.ip;
+    const d = mailIn.ontleed(ruw, { publiekeSleutel: body(req).publiekeSleutel, ip });
     if (d.error) return res.status(400).json({ error: d.error });
+
+    /* SPF en DMARC ECHT opzoeken. Dit is de enige plek waar de buitenpoort het
+       netwerk op gaat, en een storing daar mag de bezorging niet tegenhouden:
+       de uitslag valt dan terug op wat er zonder DNS te zeggen valt. Post die
+       binnen is, hoort bezorgd te worden -- de uitslag is een STEMPEL, geen
+       poortwachter. */
+    try {
+      d.controles = await mailIn.stempelVol(d.koppen, ruw.slice(ruw.search(/\r?\n\r?\n/)).replace(/^\r?\n\r?\n/, ''),
+        { publiekeSleutel: body(req).publiekeSleutel, ip, envelopeVan: body(req).envelopeVan, helo: body(req).helo, auth: mailAuth });
+    } catch (e) {
+      d.controles.let = 'De SPF- en DMARC-controle liep vast (' + (e && e.message) + '); het bericht is wel bezorgd.';
+    }
 
     /* Het origineel eerst, de afgeleide daarna. In die volgorde: gaat de
        bezorging mis, dan hebben we de bytes nog steeds. */

@@ -28,83 +28,8 @@
       we het niet. */
 'use strict';
 
-const MAX = 2 * 1024 * 1024;   // een binnenkomend bericht boven 2 MB nemen we niet aan
-
-// een kop-blok naar een object; doorgevouwen regels (RFC 5322) worden hersteld
-function koppenVan(kop) {
-  const uit = {};
-  const regels = String(kop).split(/\r?\n/);
-  let huidig = null;
-  for (const r of regels) {
-    if (/^[ \t]/.test(r) && huidig) { uit[huidig] += ' ' + r.trim(); continue; }
-    const i = r.indexOf(':');
-    if (i < 0) continue;
-    huidig = r.slice(0, i).toLowerCase().trim();
-    uit[huidig] = (uit[huidig] ? uit[huidig] + ', ' : '') + r.slice(i + 1).trim();
-  }
-  return uit;
-}
-
-// =?UTF-8?B?...?= en =?...?Q?...?= terugvertalen; onbekend blijft staan zoals het is
-function ontcijferKop(s) {
-  return String(s == null ? '' : s).replace(/=\?([^?]+)\?([BbQq])\?([^?]*)\?=/g, (heel, set, wijze, data) => {
-    try {
-      if (/^b$/i.test(wijze)) return Buffer.from(data, 'base64').toString(/utf-?8/i.test(set) ? 'utf8' : 'latin1');
-      const q = data.replace(/_/g, ' ').replace(/=([0-9A-Fa-f]{2})/g, (m, h) => String.fromCharCode(parseInt(h, 16)));
-      return Buffer.from(q, 'binary').toString(/utf-?8/i.test(set) ? 'utf8' : 'latin1');
-    } catch (e) { return heel; }
-  });
-}
-
-function ontcijferLijf(data, codering, charset) {
-  const c = String(codering || '').toLowerCase();
-  const set = /utf-?8/i.test(charset || '') ? 'utf8' : 'latin1';
-  try {
-    if (c === 'base64') return { ok: true, tekst: Buffer.from(data.replace(/\s+/g, ''), 'base64').toString(set) };
-    if (c === 'quoted-printable') {
-      const q = data.replace(/=\r?\n/g, '').replace(/=([0-9A-Fa-f]{2})/g, (m, h) => String.fromCharCode(parseInt(h, 16)));
-      return { ok: true, tekst: Buffer.from(q, 'binary').toString(set) };
-    }
-    if (!c || c === '7bit' || c === '8bit' || c === 'binary') return { ok: true, tekst: data };
-  } catch (e) { /* valt hieronder door */ }
-  return { ok: false, waarom: 'de codering "' + c + '" begrijpt deze laag niet; de tekst is niet omgezet' };
-}
-
-const grensVan = (ct) => (/boundary\s*=\s*"?([^";]+)"?/i.exec(ct || '') || [])[1] || null;
-const charsetVan = (ct) => (/charset\s*=\s*"?([^";]+)"?/i.exec(ct || '') || [])[1] || null;
-const adresVan = (s) => (/<([^>]+)>/.exec(s || '') || [null, String(s || '').trim()])[1] || '';
-
-/* Een MIME-boom platslaan tot: de beste tekst, en een lijst bijlagen. "Beste"
-   is text/plain boven text/html -- niet uit smaak maar omdat RTMAIL platte
-   tekst rendert en HTML hier nooit wordt uitgevoerd. */
-function delen(kop, lijf, diep) {
-  const ct = kop['content-type'] || 'text/plain';
-  const grens = grensVan(ct);
-  if (!grens || (diep || 0) > 4) {
-    const uit = ontcijferLijf(lijf, kop['content-transfer-encoding'], charsetVan(ct));
-    const naam = (/filename\s*=\s*"?([^";]+)"?/i.exec(kop['content-disposition'] || '') || [])[1] || null;
-    if (naam || /^application\//i.test(ct)) {
-      return { tekst: '', bijlagen: [{ naam: naam || '(zonder naam)', soort: ct.split(';')[0].trim(), bytes: lijf.length }] };
-    }
-    return { tekst: uit.ok ? uit.tekst : '[' + uit.waarom + ']', bijlagen: [], html: /^text\/html/i.test(ct) };
-  }
-  const stukken = String(lijf).split(new RegExp('--' + grens.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  let plat = '', html = '';
-  const bijlagen = [];
-  for (const s of stukken) {
-    const t = s.replace(/^\r?\n/, '');
-    if (!t.trim() || /^--/.test(t)) continue;
-    const scheiding = t.search(/\r?\n\r?\n/);
-    if (scheiding < 0) continue;
-    const k = koppenVan(t.slice(0, scheiding));
-    const l = t.slice(scheiding).replace(/^\r?\n\r?\n/, '');
-    const d = delen(k, l, (diep || 0) + 1);
-    bijlagen.push(...d.bijlagen);
-    if (d.html) html = html || d.tekst;
-    else plat = plat || d.tekst;
-  }
-  return { tekst: plat || html, bijlagen };
-}
+const mime = require('./mailmime');
+const { MAX, koppenVan, ontcijferKop, ontcijferLijf, adresVan, delen } = mime;
 
 module.exports = ({ db, save, crypto, dkim }) => {
   const nu = () => new Date().toISOString();
@@ -116,9 +41,10 @@ module.exports = ({ db, save, crypto, dkim }) => {
   }
 
   /* De uitslag van de drie controles. DKIM rekenen we ECHT na als er een
-     publieke sleutel wordt meegegeven; SPF en DMARC vragen DNS en een IP en
-     worden hier dus als "niet gecontroleerd" gemeld in plaats van als "goed".
-     Dat verschil is het hele punt: een systeem dat niet-gecontroleerd als
+     publieke sleutel wordt meegegeven. SPF en DMARC vragen DNS, en daarom komt
+     er hieronder een tweede, ASYNCHRONE functie: `stempelVol`. Deze eerste
+     blijft bestaan voor wie geen netwerk wil of kan doen, en zegt dan eerlijk
+     "niet gecontroleerd" -- want een systeem dat niet-gecontroleerd als
      geslaagd toont, is misleidender dan een systeem dat niets toont. */
   function stempel(koppen, lijf, { publiekeSleutel, ip } = {}) {
     const uit = { dkim: 'geen', spf: 'niet gecontroleerd', dmarc: 'niet gecontroleerd', ip: ip || null };
@@ -175,5 +101,38 @@ module.exports = ({ db, save, crypto, dkim }) => {
   }
   const origineel = (id) => O().originelen.find(r => r.id === id || r.bericht === id) || null;
 
-  return { ontleed, stempel, bewaarOrigineel, origineel, koppenVan, ontcijferKop, ontcijferLijf, delen, adresVan };
+  /* De VOLLEDIGE stempel: DKIM zoals hierboven, plus SPF en DMARC echt
+     opgezocht. Vraagt een `auth` (kern/mailauth.js) en het IP van de
+     verzendende server; zonder een van beide valt hij terug op de gewone
+     stempel in plaats van iets te beweren.
+
+     Het DKIM-domein komt uit de handtekening zelf (d=), want DMARC moet weten
+     OP WELK DOMEIN de handtekening slaagde -- niet dat hij slaagde. Dat
+     onderscheid is de hele reden dat uitlijning bestaat. */
+  async function stempelVol(koppen, lijf, { publiekeSleutel, ip, envelopeVan, helo, auth } = {}) {
+    const basis = stempel(koppen, lijf, { publiekeSleutel, ip });
+    if (!auth || !ip) {
+      basis.let = !ip ? 'Zonder het IP van de verzendende server zijn SPF en DMARC niet te controleren.'
+                      : 'Er is geen controlelaag meegegeven; SPF en DMARC zijn niet opgezocht.';
+      return basis;
+    }
+    const s = await auth.spf(ip, envelopeVan || koppen.from, helo);
+    basis.spf = s.uitslag + (s.waarom ? ' (' + s.waarom + ')' : '');
+    basis.spfUitslag = s.uitslag;
+
+    const veld = koppen['dkim-signature'] || '';
+    const dkimDomein = (/(?:^|;)\s*d\s*=\s*([^;\s]+)/.exec(veld) || [])[1] || null;
+    const dkimUitslag = /^geslaagd/.test(basis.dkim) ? 'geslaagd' : 'gezakt';
+
+    const d = await auth.dmarc({ vanKop: koppen.from, spfUitslag: s.uitslag,
+      spfDomein: auth.domeinVan(envelopeVan || koppen.from), dkimUitslag, dkimDomein });
+    basis.dmarc = d.uitslag + (d.beleid ? ' (beleid: ' + d.beleid + ')' : '');
+    basis.dmarcUitslag = d.uitslag;
+    basis.dmarcBeleid = d.beleid || null;
+    basis.uitlijning = d.uitlijning || null;
+    if (d.let) basis.let = d.let;
+    return basis;
+  }
+
+  return { ontleed, stempel, stempelVol, bewaarOrigineel, origineel, koppenVan, ontcijferKop, ontcijferLijf, delen, adresVan };
 };

@@ -47,7 +47,7 @@ const wacht = require('../kern/wacht')({ db, save, beveilig, lees: schild.signal
    kilobyte gaat -- en omdat de BOUWVOLGORDE daar iets betekent: de haak na de
    bezorging kan pas gezet worden als de regels en de klok bestaan. */
 const post = require('./postlaag')({ db, save, crypto, findSupplier });
-const { mailQ, mailIn, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels,
+const { mailQ, mailIn, mailAuth, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels,
   rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar } = post;
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
 const automatisering = require('../kern/automatisering')({ rtmail });
@@ -140,6 +140,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, mailQ, mailIn, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, scanNet, wacht, werkmail
+    resolveSession, mailQ, mailIn, mailAuth, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, scanNet, wacht, werkmail
   };
 };

@@ -184,14 +184,27 @@ test('de buitenpoort pakt MIME uit, bewaart het origineel en levert onbetrouwd a
   assert.ok(m.links.aantal >= 1, 'de link is herkend, zodat het scherm hem onklikbaar kan tonen');
 });
 
-test('de controles worden gemeld als "niet gecontroleerd" in plaats van als geslaagd', async () => {
-  const r = await post('/api/mail/binnen', { bericht: BERICHT(lidAdres) });
+test('SPF en DMARC worden ECHT opgezocht, en een domein zonder record heet "geen"', async () => {
+  /* buiten.test bestaat niet in het DNS, dus SPF en DMARC leveren allebei
+     "geen" op -- en dat is wat ze horen te zeggen. Waar het hier om gaat is
+     dat het GEEN "niet gecontroleerd" meer is: er is echt gekeken. */
+  const r = await post('/api/mail/binnen', { bericht: BERICHT(lidAdres), ip: '203.0.113.7' });
   assert.equal(r.controles.dkim, 'geen', 'dit bericht draagt geen handtekening');
-  assert.equal(r.controles.spf, 'niet gecontroleerd');
-  assert.equal(r.controles.dmarc, 'niet gecontroleerd');
+  assert.equal(r.controles.spfUitslag, 'geen', 'SPF is opgezocht: ' + r.controles.spf);
+  assert.match(r.controles.spf, /geen SPF-record|tijdelijke fout/);
+  assert.ok(r.controles.dmarcUitslag, 'DMARC heeft een uitslag: ' + r.controles.dmarc);
+  assert.ok(!/niet gecontroleerd/.test(r.controles.spf + r.controles.dmarc),
+    'de oude "niet gecontroleerd"-melding hoort weg te zijn');
   const vak = await post('/api/member/rtmail/vak', {}, lidTok);
   const m = vak.berichten.find(x => x.id === r.id);
-  assert.match(m.tekst, /DKIM geen; SPF niet gecontroleerd/, 'en dat staat ook in het bericht zelf');
+  assert.match(m.tekst, /Controles: DKIM geen; SPF /, 'de uitslag staat ook in het bericht zelf');
+});
+
+test('zonder IP zegt de poort dat SPF niet te controleren viel, in plaats van te gokken', async () => {
+  const mailIn = require('../server/kern/mailinkomend')({ db: { data: {} }, save: () => {}, crypto: require('crypto') });
+  const u = await mailIn.stempelVol({ from: 'a@b.test' }, 'lijf', { auth: {} });
+  assert.equal(u.spf, 'niet gecontroleerd');
+  assert.match(u.let, /Zonder het IP/);
 });
 
 test('bij tekst en HTML naast elkaar wint de PLATTE tekst', async () => {

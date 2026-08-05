@@ -72,6 +72,12 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
   const mailQ = require('../kern/mailwachtrij')({ db, save, crypto,
     verzend: (rij) => require('../mail').bezorgNu(rij.naar, rij.onderwerp, rij.tekst) });
   const mailIn = require('../kern/mailinkomend')({ db, save, crypto, dkim: require('../dkim') });
+  /* SPF en DMARC echt opzoeken. Het DNS komt van buiten binnen zodat deze laag
+     te beproeven is zonder van het internet af te hangen -- en dat moet, want
+     de belangrijkste beweringen gaan over wat er gebeurt als het MISGAAT: een
+     domein zonder record, een DNS-storing, een SPF die slaagt op een domein dat
+     de lezer nooit ziet. */
+  const mailAuth = require('../kern/mailauth')({ dns: require('dns').promises });
 
   /* De AI-hulp bij een gesprek: samenvatten, actiepunten, en uitleggen waarom
      iets op phishing lijkt. Leest en vat samen, meer niet -- elk gevolg blijft
@@ -80,6 +86,6 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
      geen hulp. */
   const rtmailAi = require('../kern/rtmail-ai')({ rtmail, vak: rtmailVak });
 
-  return { mailQ, mailIn, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
+  return { mailQ, mailIn, mailAuth, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
     rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar };
 };

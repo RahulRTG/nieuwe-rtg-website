@@ -100,15 +100,169 @@ test('wat de laag niet begrijpt, weigert hij met een reden', () => {
   assert.equal(v.ok, false);
   assert.match(v.waarom, /versleuteld/i);
 
-  const objstm = Buffer.from('%PDF-1.5\n1 0 obj\n<< /Type /ObjStm /N 3 >>\nendobj\n', 'latin1');
-  assert.match(pdf.lees(objstm).waarom, /objectstream/i);
-
-  const xrefstm = Buffer.from('%PDF-1.5\n1 0 obj\n<< /Type /XRef /W [1 2 1] >>\nendobj\n', 'latin1');
-  assert.match(pdf.lees(xrefstm).waarom, /cross-reference stream/i);
+  /* Objectstreams en cross-reference streams stonden hier tot 5 augustus ook
+     bij, met als reden dat een halve ontleding erger is dan een weigering. Die
+     reden klopt nog steeds -- maar de ontleding is nu heel (kern/pdf-xref.js),
+     dus horen ze hier niet meer thuis. Wat er WEL nog staat: een moderne
+     kruisverwijzing waar geen enkel object uitkomt, is nog steeds een fout. */
+  const leegModern = Buffer.from('%PDF-1.5\n1 0 obj\n<< /Type /XRef /W [1 2 1] >>\nendobj\n', 'latin1');
+  const lm = pdf.lees(leegModern);
+  assert.equal(lm.ok, true, 'een xref-stream alleen is geen reden meer om te weigeren');
+  assert.equal(lm.modern, true);
 
   // en redigeren doet er dan ook niets mee
   const r = redigeer(versleuteld, ['Jan']);
   assert.equal(r.ok, false, 'een document dat we niet begrijpen wordt niet half bewerkt');
+});
+
+/* Een PDF 1.5 met een OBJECTSTREAM en een CROSS-REFERENCE STREAM, met de hand
+   gebouwd. Dat is meer werk dan een klassiek bestand, en dat is precies waarom
+   het moet: zonder zo'n bestand is "wij lezen moderne PDF's" een bewering
+   zonder dekking, en de vorige versie van deze toets bewees alleen dat ze
+   GEWEIGERD werden.
+
+   De opbouw volgt de regel die het formaat zelf stelt: een stream kan NIET in
+   een objectstream zitten (die draagt alleen woordenboeken), dus de catalogus,
+   de paginaboom en de pagina gaan erin, en de inhoudsstroom blijft los. */
+function maakPdf15(regels) {
+  const zlib = require('node:zlib');
+  const stukken = [];
+  let uit = '%PDF-1.5\n';
+  const plek = {};
+
+  // 4: de inhoudsstroom, los want een stream mag niet in een objectstream
+  const inhoud = 'BT /F1 12 Tf 72 720 Td ' + regels.map(r => '(' + r + ') Tj T*').join(' ') + ' ET';
+  plek[4] = uit.length;
+  uit += '4 0 obj\n<< /Length ' + inhoud.length + ' >>\nstream\n' + inhoud + '\nendstream\nendobj\n';
+
+  // 1, 2, 3 gaan samen in objectstream 5
+  const leden = [
+    [1, '<< /Type /Catalog /Pages 2 0 R >>'],
+    [2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>'],
+    [3, '<< /Type /Page /Parent 2 0 R /Contents 4 0 R /MediaBox [0 0 595 842] >>']
+  ];
+  let lijf = '', koppen = [];
+  for (const [nr, tekst] of leden) { koppen.push(nr + ' ' + lijf.length); lijf += tekst + ' '; }
+  const voor = koppen.join(' ') + '\n';
+  const objstm = zlib.deflateSync(Buffer.from(voor + lijf, 'latin1'));
+  plek[5] = uit.length;
+  uit += '5 0 obj\n<< /Type /ObjStm /N ' + leden.length + ' /First ' + voor.length +
+    ' /Length ' + objstm.length + ' /Filter /FlateDecode >>\nstream\n' + objstm.toString('latin1') + '\nendstream\nendobj\n';
+
+  // 6: de cross-reference stream. /W [1 4 2]: soort, plek-of-streamnummer, generatie-of-index
+  const rijen = [];
+  const rij = (soort, a, b) => {
+    const buf = Buffer.alloc(7);
+    buf[0] = soort; buf.writeUInt32BE(a, 1); buf.writeUInt16BE(b, 5);
+    rijen.push(buf);
+  };
+  rij(0, 0, 65535);                 // object 0, altijd vrij
+  for (const nr of [1, 2, 3]) rij(2, 5, [1, 2, 3].indexOf(nr));   // type 2: in objectstream 5
+  rij(1, plek[4], 0);
+  rij(1, plek[5], 0);
+  const xrefPlek = uit.length;
+  rij(1, xrefPlek, 0);
+  const tabel = zlib.deflateSync(Buffer.concat(rijen));
+  uit += '6 0 obj\n<< /Type /XRef /Size 7 /W [1 4 2] /Root 1 0 R /Length ' + tabel.length +
+    ' /Filter /FlateDecode >>\nstream\n' + tabel.toString('latin1') + '\nendstream\nendobj\n';
+  uit += 'startxref\n' + xrefPlek + '\n%%EOF\n';
+  return Buffer.from(uit, 'latin1');
+}
+
+test('een PDF 1.5 met objectstream en xref-stream wordt GELEZEN, niet geweigerd', () => {
+  const doc = maakPdf15(['Factuur 2026-08', 'Bedrag: 1250 euro']);
+  const d = pdf.lees(doc);
+  assert.equal(d.ok, true, 'gelezen: ' + d.waarom);
+  assert.equal(d.modern, true, 'hij wordt als modern herkend');
+  assert.equal(d.paginas, 1, 'de pagina zit IN de objectstream en wordt toch geteld');
+  assert.equal(d.wortel, '1 0', 'de catalogus is gevonden via de xref-stream');
+  assert.ok(!d.fouten, 'geen halve ontleding: ' + JSON.stringify(d.fouten));
+
+  const t = pdf.tekstVan(doc);
+  assert.ok(t.ok);
+  assert.match(t.tekst, /Factuur 2026-08/);
+  assert.match(t.tekst, /Bedrag: 1250 euro/);
+
+  /* De zwaarste: perPagina loopt de OBJECTGRAAF af (catalogus -> /Pages ->
+     /Kids -> /Contents). Die weg gaat hier dwars door de objectstream heen, dus
+     als het uitpakken half is gelukt, valt hij hier om en niet bij tekstVan. */
+  const p = pdf.perPagina(doc);
+  assert.equal(p.ok, true, p.waarom);
+  assert.equal(p.paginas.length, 1);
+  assert.match(p.paginas[0].tekst, /Factuur 2026-08/);
+
+  /* En de GRENZEN van de uitgepakte objecten kloppen. Zonder deze assertie
+     overleeft de laag een verkeerde plek-berekening gewoon: de regexen die de
+     graaf aflopen (/Pages, /Contents) vinden hun match ook als er per ongeluk
+     de halve stream omheen staat. Een mutatie op /First beet daardoor niet --
+     dit is wat hem laat bijten. */
+  const cat = d.objecten.find(o => o.nummer === 1);
+  assert.ok(cat, 'de catalogus komt uit de objectstream');
+  assert.match(cat.lijf.trim(), /^<< \/Type \/Catalog/, 'zijn lijf begint bij zijn eigen woordenboek: ' + JSON.stringify(cat.lijf.slice(0, 40)));
+  assert.ok(!/\/Type \/Pages/.test(cat.lijf), 'en loopt niet door in het volgende object');
+  const pag = d.objecten.find(o => o.nummer === 3);
+  assert.match(pag.lijf.trim(), /^<< \/Type \/Page /);
+});
+
+test('een notitie wordt ACHTER het bestand geschreven; het origineel blijft byte voor byte staan', () => {
+  const doc = maakPdf(['Contract tussen partijen', 'Artikel 1: de looptijd is een jaar']);
+  const uit = require('../server/kern/pdf-notitie')().annoteer(doc,
+    { pagina: 1, tekst: 'Klopt de looptijd wel?', wie: 'Vera', rechthoek: [100, 700, 130, 720] });
+  assert.equal(uit.ok, true, uit.waarom);
+
+  /* DE ZWAARSTE BEWERING VAN DEZE LAAG. Wie een opmerking op een contract zet,
+     wil dat de rest onaangeraakt blijft -- de handtekening van een ander, de
+     opmaak, de metadata. Dat is hier letterlijk te controleren. */
+  assert.ok(uit.bestand.length > doc.length, 'er is iets bijgekomen');
+  assert.ok(uit.bestand.subarray(0, doc.length).equals(doc),
+    'de eerste ' + doc.length + ' bytes zijn nog exact het origineel');
+
+  // en de update is leesbaar: de notitie komt er weer uit
+  const na = require('../server/kern/pdf-notitie')().notities(uit.bestand);
+  assert.equal(na.aantal, 1);
+  assert.equal(na.notities[0].tekst, 'Klopt de looptijd wel?');
+  assert.equal(na.notities[0].wie, 'Vera');
+
+  // het document zelf blijft leesbaar, met dezelfde tekst en dezelfde pagina
+  const d = pdf.lees(uit.bestand);
+  assert.equal(d.ok, true, d.waarom);
+  assert.equal(d.paginas, 1);
+  assert.match(pdf.tekstVan(uit.bestand).tekst, /Artikel 1: de looptijd/);
+  const per = pdf.perPagina(uit.bestand);
+  assert.equal(per.ok, true, per.waarom);
+  assert.match(per.paginas[0].tekst, /Contract tussen partijen/);
+
+  // de tweede kruisverwijzing wijst met /Prev naar de eerste
+  const staart = uit.bestand.toString('latin1').slice(doc.length);
+  assert.match(staart, /\/Prev \d+/, 'de nieuwe tabel verwijst terug: ' + staart.slice(-200));
+  assert.match(staart, /\/Type \/Annot/);
+});
+
+test('een tweede notitie gooit de eerste niet weg', () => {
+  const laag = require('../server/kern/pdf-notitie')();
+  const doc = maakPdf(['Een blad met ruimte voor twee opmerkingen']);
+  const een = laag.annoteer(doc, { pagina: 1, tekst: 'eerste opmerking', wie: 'A' });
+  const twee = laag.annoteer(een.bestand, { pagina: 1, tekst: 'tweede opmerking', wie: 'B' });
+  assert.equal(twee.ok, true, twee.waarom);
+  const na = laag.notities(twee.bestand);
+  assert.equal(na.aantal, 2, 'beide notities staan er: ' + JSON.stringify(na.notities));
+  assert.deepEqual(na.notities.map(n => n.wie).sort(), ['A', 'B']);
+  assert.ok(twee.bestand.subarray(0, een.bestand.length).equals(een.bestand),
+    'ook de tweede laag laat alles ervoor met rust');
+});
+
+test('een notitie op een pagina die niet bestaat, wordt geweigerd met de reden', () => {
+  const laag = require('../server/kern/pdf-notitie')();
+  const doc = maakPdf(['Een pagina']);
+  const weg = laag.annoteer(doc, { pagina: 9, tekst: 'hallo' });
+  assert.equal(weg.ok, false);
+  assert.match(weg.waarom, /1 pagina\(s\); pagina 9 bestaat niet/);
+  const leeg = laag.annoteer(doc, { pagina: 1, tekst: '   ' });
+  assert.equal(leeg.ok, false);
+  assert.match(leeg.waarom, /wat moet er in de notitie staan/);
+  const geen = laag.annoteer(Buffer.from('geen pdf'), { pagina: 1, tekst: 'x' });
+  assert.equal(geen.ok, false);
+  assert.match(geen.waarom, /geen PDF/i);
 });
 
 test('een geredigeerde passage is UIT de bytes, niet afgedekt', () => {

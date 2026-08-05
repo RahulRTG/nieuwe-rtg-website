@@ -75,6 +75,32 @@ module.exports = (kern) => {
       let: uit.let + ' Het bronbestand blijft staan; wie een deel van een dossier deelt, wil het geheel houden.' });
   });
 
+  /* Een notitie op een pagina. Dit is de ENIGE PDF-ingang die het bestand niet
+     opnieuw opbouwt maar er iets ACHTER schrijft (kern/pdf-notitie.js): het
+     origineel blijft byte voor byte staan, met een tweede kruisverwijzing die
+     met /Prev naar de eerste wijst. Wie iets echt weg wil hebben, gebruikt de
+     redactie hieronder. */
+  app.post('/api/bestanden/pdf/notitie', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    const bron = pdfBytes(req.session.key, b.id);
+    if (bron.error) return stuur(res, bron);
+    const uit = require('../kern/pdf-notitie')().annoteer(bron.buf,
+      { pagina: b.pagina, tekst: b.tekst, wie: b.wie, rechthoek: b.rechthoek });
+    if (!uit.ok) return res.status(422).json({ error: uit.waarom });
+    const naam = String(bron.naam || 'document.pdf').replace(/(\.pdf)?$/i, '') + ' (met notitie).pdf';
+    bewaar(req, res, naam, uit.bestand, { pagina: uit.pagina, let: uit.let });
+  });
+
+  app.post('/api/bestanden/pdf/notities', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const bron = pdfBytes(req.session.key, (req.body || {}).id);
+    if (bron.error) return stuur(res, bron);
+    const uit = require('../kern/pdf-notitie')().notities(bron.buf);
+    if (!uit.ok) return res.status(422).json({ error: uit.waarom });
+    res.json(uit);
+  });
+
   app.post('/api/bestanden/pdf/redigeer', auth, (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};

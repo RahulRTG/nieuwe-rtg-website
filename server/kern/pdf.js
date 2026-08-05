@@ -93,18 +93,41 @@ function lees(buf) {
   const tekst = buf.toString('latin1');
   if (/\/Encrypt\b/.test(tekst))
     return { ok: false, waarom: 'deze PDF is versleuteld; redactie heeft geen betekenis zolang de inhoud niet te lezen is' };
-  if (/\/Type\s*\/ObjStm/.test(tekst))
-    return { ok: false, waarom: 'deze PDF draagt zijn objecten in een objectstream (PDF 1.5+); die laag begrijpt dit bestand niet en bewerkt hem daarom niet' };
-  if (/\/Type\s*\/XRef/.test(tekst))
-    return { ok: false, waarom: 'deze PDF gebruikt een cross-reference stream; die laag begrijpt dit bestand niet en bewerkt hem daarom niet' };
-  const objs = objecten(buf);
+  /* PDF 1.5 EN LATER. Hier stond een weigering voor objectstreams en
+     cross-reference streams, met als reden dat een halve ontleding een bestand
+     oplevert dat opent maar stiekem stuk is. Die reden klopt nog steeds -- maar
+     de ontleding is nu HEEL: ./pdf-xref.js pakt beide uit, en wat daar misgaat
+     komt hieronder als een gewone fout terug in plaats van als een gok. */
+  const xref = require('./pdf-xref')({ objecten, kopVan, streamVan, pakUit });
+  let objs, fouten = [];
+  if (xref.modern(tekst)) {
+    const r = xref.alleObjecten(buf);
+    objs = r.objecten;
+    fouten = r.fouten;
+    if (!objs.length) return { ok: false, waarom: 'deze PDF gebruikt een moderne kruisverwijzing, maar er kwam geen enkel object uit' };
+  } else {
+    objs = objecten(buf);
+  }
   if (!objs.length) return { ok: false, waarom: 'er staan geen objecten in dit bestand' };
 
+  /* EEN INCREMENTELE UPDATE SCHRIJFT HETZELFDE OBJECTNUMMER OPNIEUW, achteraan
+     in het bestand (zie ./pdf-notitie.js). De scanner hierboven vindt dan beide
+     versies, en dan telt een document met een notitie ineens twee pagina's --
+     precies wat deze toets ving. De LAATSTE versie wint, want dat is wat een
+     incrementele update betekent: wie later schreef, heeft gelijk. De volgorde
+     blijft verder zoals hij was. */
+  const laatste = new Map();
+  for (const o of objs) laatste.set(o.nummer, o);
+  if (laatste.size !== objs.length) objs = objs.filter(o => laatste.get(o.nummer) === o);
+
+  /* /Root staat in de trailer OF in het woordenboek van de xref-stream; in
+     beide gevallen als "N G R", dus dezelfde zoekactie vindt hem. */
   const wortel = /\/Root\s+(\d+)\s+(\d+)\s+R/.exec(tekst);
   const paginas = objs.filter(o => /\/Type\s*\/Page\b/.test(kopVan(o.lijf))).length;
   const versie = (tekst.slice(5, 8) || '').trim();
   return { ok: true, versie, objecten: objs, paginas, wortel: wortel ? wortel[1] + ' ' + wortel[2] : null,
-    heeftTrailer: /\btrailer\b/.test(tekst) };
+    heeftTrailer: /\btrailer\b/.test(tekst), modern: xref.modern(tekst),
+    fouten: fouten.length ? fouten : undefined };
 }
 
 /* De tekst die in dit document GETEKEND wordt: alles tussen haakjes in een

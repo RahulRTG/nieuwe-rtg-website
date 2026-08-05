@@ -80,6 +80,35 @@ async function minifyGedeeld() {
   console.log(`[build] geminificeerd: ${bronnen.length} bestanden, ${voor} -> ${na} bytes (${Math.round((1 - na / voor) * 100)}% kleiner)`);
 }
 
+/* De bouwstempel: app.html en app-main.js krijgen hetzelfde getal.
+
+   Waarom dit bestaat: een browser, CDN of service worker kan de pagina vers
+   hebben en het script nog uren oud. Die mix bouwt het beginscherm niet meer op
+   en levert een zwart scherm zonder foutmelding. Met een gedeelde stempel ziet
+   het script zelf dat het niet bij deze pagina hoort, en haalt het zich eenmalig
+   vers op (zie app-main-01.js). De stempel is de inhoud van de bundel, dus hij
+   verandert precies wanneer het script verandert en niet vaker. */
+function stempelBouw() {
+  const html = path.join(PUB, 'apps', 'app.html');
+  const js = path.join(PUB, 'apps', 'app-main.js');
+  if (!fs.existsSync(html) || !fs.existsSync(js)) return;
+  let s = fs.readFileSync(js, 'utf8');
+  const hash = crypto.createHash('sha256').update(s.replace(/var RTG_BOUW = '[^']*';/, '')).digest('hex').slice(0, 8);
+  let h = fs.readFileSync(html, 'utf8');
+  const nieuwJs = s.replace(/var RTG_BOUW = '[^']*';/, "var RTG_BOUW = '" + hash + "';");
+  const nieuwH = h.replace(/<meta name="rtg-bouw" content="[^"]*">/, '<meta name="rtg-bouw" content="' + hash + '">');
+  if (nieuwJs !== s) fs.writeFileSync(js, nieuwJs);
+  if (nieuwH !== h) fs.writeFileSync(html, nieuwH);
+  // ook het deel bijwerken, anders draait de volgende build de bundel terug
+  const deel = path.join(PUB, 'apps', 'app-main', 'app-main-01.js');
+  if (fs.existsSync(deel)) {
+    const d = fs.readFileSync(deel, 'utf8');
+    const nd = d.replace(/var RTG_BOUW = '[^']*';/, "var RTG_BOUW = '" + hash + "';");
+    if (nd !== d) fs.writeFileSync(deel, nd);
+  }
+  console.log('[build] bouwstempel: ' + hash);
+}
+
 function stempelServiceWorkers() {
   for (const sw of ['sw.js', 'apps/foundation/sw.js']) {
     const p = path.join(PUB, sw);
@@ -106,6 +135,7 @@ function stempelServiceWorkers() {
   console.log('[build] gebundeld: ' + (gebundeld.length ? gebundeld.join(', ') : 'bundels al actueel'));
   await minifyGedeeld();
   await minifyServe();
+  stempelBouw();
   stempelServiceWorkers();
   console.log('[build] klaar.');
 })().catch((e) => { console.error('[build] mislukt:', e); process.exit(1); });

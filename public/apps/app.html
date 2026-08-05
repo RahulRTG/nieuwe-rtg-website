@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
+<!-- De bouwstempel. npm run build zet hier en in app-main.js hetzelfde getal;
+     wijken ze af, dan draait er nieuwe html naast een oud script (of andersom)
+     en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
+     foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
+     keer vers op. -->
+<meta name="rtg-bouw" content="6307d041">
 <meta charset="UTF-8">
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>

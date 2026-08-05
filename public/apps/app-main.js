@@ -1,4 +1,32 @@
 (function(){
+/* HTML EN SCRIPT MOETEN VAN DEZELFDE BOUW ZIJN.
+
+   Een browser, een CDN of een service worker kan de pagina vers hebben en dit
+   script nog uren oud (of omgekeerd). Die mix bouwt het beginscherm niet meer
+   op: de gebruiker ziet zwart, en niets in de console legt uit waarom. Dat is
+   hier echt gebeurd, meer dan eens, en elke keer duurde het lang voordat
+   iemand doorhad dat de code al gerepareerd was.
+
+   npm run build zet in beide bestanden dezelfde stempel. Wijken ze af, dan
+   haalt de app zichzelf EEN keer vers op -- met een merk in sessionStorage,
+   zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
+   wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
+   dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
+var RTG_BOUW = '6307d041';
+(function bouwWacht(){
+  try {
+    var m = document.querySelector('meta[name="rtg-bouw"]');
+    var html = m ? m.getAttribute('content') : null;
+    if (!html || html === RTG_BOUW) return;
+    if (sessionStorage.getItem('rtg_bouw_ververst') === html) {
+      console.warn('[rtg] html-bouw ' + html + ' naast script-bouw ' + RTG_BOUW + '; verversen hielp niet, we gaan door.');
+      return;
+    }
+    sessionStorage.setItem('rtg_bouw_ververst', html);
+    console.warn('[rtg] html-bouw ' + html + ' naast script-bouw ' + RTG_BOUW + '; eenmalig vers ophalen.');
+    location.reload();
+  } catch (e) { /* geen sessionStorage: dan liever doorgaan dan omvallen */ }
+})();
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');

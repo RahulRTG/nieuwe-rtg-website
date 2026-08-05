@@ -111,3 +111,37 @@ test('Rahul staat nergens overheen: de pagina houdt ruimte voor hem vrij', () =>
   assert.ok(!/body\.style\.paddingBottom/.test(bron), 'en dat gaat niet via de marge van de pagina');
   assert.ok(!/maakSleepbaar\(sheet/.test(bron), 'een venster dat op zijn plek staat hoeft niet versleepbaar te zijn');
 });
+
+test('html en script van dezelfde bouw, en een mismatch herstelt zichzelf een keer', () => {
+  /* Het zwarte scherm waar dit vandaan komt: de browser had de pagina vers en
+     het script nog uren oud (of andersom). Zo'n mix bouwt het beginscherm niet
+     op en zegt niets -- geen fout in de console, alleen zwart. Het is hier
+     meer dan eens gebeurd, en elke keer duurde het lang voor iemand doorhad
+     dat de code al gerepareerd was.
+
+     Drie dingen moeten waar blijven: beide bestanden dragen DEZELFDE stempel
+     (anders herlaadt elke bezoeker meteen), het script vergelijkt ze, en het
+     doet dat met een merk in sessionStorage zodat een blijvend verschil geen
+     herlaadlus wordt. Die laatste is de gevaarlijkste: een lus is erger dan
+     het zwarte scherm dat we repareren. */
+  const html = lees('public/apps/app.html');
+  const js = lees('public/apps/app-main.js');
+  const inHtml = /<meta name="rtg-bouw" content="([^"]+)">/.exec(html);
+  const inJs = /var RTG_BOUW = '([^']+)';/.exec(js);
+  assert.ok(inHtml, 'app.html draagt een bouwstempel');
+  assert.ok(inJs, 'app-main.js draagt een bouwstempel');
+  assert.equal(inHtml[1], inJs[1], 'html en script komen uit dezelfde bouw');
+  assert.notEqual(inHtml[1], '0', 'npm run build heeft de stempel echt gezet');
+  assert.match(js, /sessionStorage\.setItem\('rtg_bouw_ververst'/, 'een tweede poging wordt onthouden');
+  assert.match(js, /verversen hielp niet, we gaan door/, 'en dan gaat de app door in plaats van te blijven herladen');
+});
+
+test('de service worker vraagt na bij de server, ook als de browser denkt vers te zijn', () => {
+  /* "Network-first" stond in de kop, maar fetch(e.request) mag gewoon uit de
+     browsercache komen. Een script dat daar nog uren als vers in ligt werd dus
+     zonder navragen geserveerd, terwijl de pagina er wel vers doorheen kwam --
+     precies de mix hierboven. */
+  const sw = lees('public/sw.js');
+  assert.match(sw, /new Request\(e\.request, \{ cache: 'no-cache' \}\)/,
+    'de service worker vraagt na in plaats van de browsercache te geloven');
+});

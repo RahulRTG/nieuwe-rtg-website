@@ -2,7 +2,7 @@
    (kern/rtmail-team.js). Staat los van routes/rtmail.js omdat het een eigen
    begrip is -- daar gaat het over JOUW postvak, hier over dat van een functie. */
 module.exports = (kern) => {
-  const { app, auth, rtmail, rtmailTeam, codenaamVan, db, keyVanCodenaam } = kern;
+  const { app, auth, rtmail, rtmailTeam, rtmailDossier, rtmailSla, codenaamVan, db, keyVanCodenaam } = kern;
   const lidCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
   const lidSoort = (req) => rtmail.soortVoor({ tier: req.session.tier,
     rollen: ((db && db.data && db.data.accountRollen) || {})[req.session.key] || [] });
@@ -28,6 +28,24 @@ module.exports = (kern) => {
   app.post('/api/member/rtmail/team/af', auth, teamOp((s, b) => rtmailTeam.afhandel(s, String(b.id || ''), b.bericht, b.aan !== false)));
   app.post('/api/member/rtmail/team/stuur', auth, teamOp((s, b) => rtmailTeam.stuur(s, String(b.id || ''), b)));
   app.post('/api/member/rtmail/team/verlaat', auth, teamOp((s, b) => rtmailTeam.verlaat(s, String(b.id || ''))));
+
+  /* Het DOSSIER op een bericht in een gedeeld postvak (kern/rtmail-dossier.js):
+     status, prioriteit, interne notities, de klok en de koppeling aan een klant
+     of ticket. Zelfde poort als hierboven -- alleen teamleden, en de laag
+     eronder toetst het nog een keer. */
+  const dos = (fn) => (req, res) => {
+    if (!rtmailDossier) return res.status(503).json({ error: 'Teams staan niet aan.' });
+    const r = fn(teamSess(req), req.body || {});
+    if (r && r.error) return res.status(400).json({ error: r.error });
+    res.json(r);
+  };
+  app.post('/api/member/rtmail/team/overzicht', auth, dos((s, b) => rtmailDossier.overzicht(s, String(b.id || ''))));
+  app.post('/api/member/rtmail/team/dossier', auth, dos((s, b) => rtmailDossier.dossier(s, String(b.id || ''), String(b.bericht || ''))));
+  app.post('/api/member/rtmail/team/status', auth, dos((s, b) => rtmailDossier.zetStatus(s, String(b.id || ''), String(b.bericht || ''), String(b.status || ''))));
+  app.post('/api/member/rtmail/team/prioriteit', auth, dos((s, b) => rtmailDossier.zetPrioriteit(s, String(b.id || ''), String(b.bericht || ''), String(b.prioriteit || ''))));
+  app.post('/api/member/rtmail/team/notitie', auth, dos((s, b) => rtmailDossier.notitie(s, String(b.id || ''), String(b.bericht || ''), String(b.tekst || ''))));
+  app.post('/api/member/rtmail/team/koppel', auth, dos((s, b) => rtmailDossier.koppel(s, String(b.id || ''), String(b.bericht || ''), { klantId: b.klantId, ticketId: b.ticketId })));
+  app.post('/api/member/rtmail/team/bevestiging', auth, dos((s, b) => rtmailSla.zetBevestiging(s, String(b.id || ''), String(b.tekst || ''))));
 
   /* Iemand erbij of eruit gaat op CODENAAM, niet op sleutel: een sleutel is een
      intern gegeven dat nooit over de lijn hoort, en de codenaam is precies wat

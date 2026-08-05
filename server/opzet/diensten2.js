@@ -48,6 +48,9 @@ const rtmail = require('../kern/rtmail')({ db, save, crypto });
    is -- een team mag nooit het postvak van een persoon of zaak kapen. */
 const rtmailTeam = require('../kern/rtmail-team')({ db, save, crypto, rtmail, findSupplier,
   CODENAMES: require('../accounts/kluis').CODENAMES });
+/* Het postvak van een team staat apart van het team zelf: dat eerste gaat over
+   post, dit tweede over wie erin zit. Ze raken elkaar op teamMet en isLid. */
+Object.assign(rtmailTeam, require('../kern/rtmail-teampost')({ save, rtmail, team: rtmailTeam }));
 /* Het postvak zelf: mappen, etiketten, favorieten, sluimeren en zoeken. Staat
    apart omdat de toestand PER BUS hangt en niet op het bericht -- anders
    verdwijnt post uit de verzonden-map van de afzender zodra de ontvanger hem
@@ -63,7 +66,16 @@ const rtmailVrij = require('../kern/rtmail-vrij')({ rtmail, findSupplier,
   CODENAMES: require('../accounts/kluis').CODENAMES });
 const rtmailSchrijf = require('../kern/rtmail-schrijf')({ db, save, crypto, rtmail, vrij: rtmailVrij });
 const rtmailRegels = require('../kern/rtmail-regels')({ db, save, crypto, rtmail, vak: rtmailVak, schrijf: rtmailSchrijf });
-rtmail.zetNaBezorging(rtmailRegels.naBezorging);
+
+/* Het dossier op een bericht in een gedeeld postvak: status, prioriteit,
+   interne notities, de klok en de koppeling aan klant of ticket. */
+const rtmailSla = require('../kern/rtmail-sla')({ db, save, rtmail, team: rtmailTeam });
+const rtmailDossier = require('../kern/rtmail-dossier')({ db, save, crypto, rtmail, team: rtmailTeam, sla: rtmailSla });
+/* De haak na elke bezorging draagt drie dingen, in deze volgorde: de regels van
+   de ontvanger, zijn afwezigheidsbericht, en de ontvangstbevestiging van een
+   gedeeld postvak. Een fout in een van de drie mag de bezorging niet ongedaan
+   maken -- kern/rtmail.js vangt hem daarom af en logt hem. */
+rtmail.zetNaBezorging((m) => { rtmailRegels.naBezorging(m); rtmailSla.naBezorging(m); });
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
 const automatisering = require('../kern/automatisering')({ rtmail });
 // Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
@@ -155,6 +167,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, scanNet, wacht, werkmail
+    resolveSession, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, scanNet, wacht, werkmail
   };
 };

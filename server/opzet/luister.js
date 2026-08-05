@@ -1,0 +1,140 @@
+/* ============================================================================
+   LUISTEREN, EN WEER NETJES DICHTGAAN.
+
+   Waar de server op gaat staan, wat er gebeurt als dat niet lukt, de poorten
+   die er naast staan (IMAP, STUN), het eigen TLS-certificaat via ACME, en de
+   afsluiter op SIGTERM/SIGINT.
+   ========================================================================== */
+'use strict';
+
+module.exports = function luister(deps) {
+  const { app, log, db, accounts, save, webpush, kern, DATA_DIR, flushBijAfsluiten } = deps;
+
+  const PORT = process.env.PORT || 3000;
+  /* Waar luisteren we? Draait deze server achter een poortwachter -- als kind
+     van server/trio.js (RTG_CLUSTER_KEY) of van de vloot (RTG_DOMAINS) -- dan
+     hoort hij ALLEEN op de loopback te staan. Twee redenen:
+
+     1. Veiligheid. Zonder host bindt node op alle interfaces. Dan staat elke
+        reserveserver open op het netwerk en kan iedereen in het pand de
+        poortwachter overslaan: geen doorstuurregels, geen X-Forwarded-For,
+        geen enkele laag ertussen. Alleen de poortwachter hoort naar buiten.
+
+     2. Bereikbaarheid, en die kostte een avond. Zonder host luistert node op
+        :: (IPv6). Op een macOS waar net.inet6.ip6.v6only aan staat komt een
+        verbinding naar 127.0.0.1 daar nooit aan. De poortwachter gebruikt
+        127.0.0.1 en concludeerde dus dat er geen enkele server leefde --
+        terwijl alle drie keurig stonden te luisteren. lsof laat ze zien op
+        *:3001 tot *:3003, en de site geeft ondertussen "alle servers zijn
+        tijdelijk onbereikbaar".
+
+     RTG_BIND overschrijft dit als iemand het bewust anders wil. Draait de
+     server los (npm run single), dan blijft hij gewoon op alle interfaces --
+     dan is hij zelf de voordeur. */
+  const HOST = process.env.RTG_BIND ||
+    ((process.env.RTG_CLUSTER_KEY || process.env.RTG_DOMAINS) ? '127.0.0.1' : '');
+  function gestart() {
+    if (process.env.RTG_SERVER) {
+      console.log(`klaar op poort ${PORT}, rol: ${db.writable ? 'actief' : 'standby'}`);
+    } else {
+      console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/app.html`);
+    }
+    console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
+  }
+  const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
+
+  /* IMAP: een externe mailclient laten meelezen (server/imap.js). Staat UIT
+     tenzij IMAP_POORT is gezet, en dat is met opzet: een mailpoort die vanzelf
+     openstaat op elke machine waar dit draait, is een deur die niemand heeft
+     besloten open te zetten. Zonder TLS-sleutel praat hij plat, en dan hoort hij
+     alleen achter een eigen doorgeefluik -- er wordt niet gedaan alsof dat
+     veilig is. */
+  if (process.env.IMAP_POORT) {
+    try {
+      const fsI = require('fs');
+      const tlsOpties = process.env.IMAP_KEY && process.env.IMAP_CERT
+        ? { key: fsI.readFileSync(process.env.IMAP_KEY), cert: fsI.readFileSync(process.env.IMAP_CERT) } : null;
+      require('../imap-server')({ vak: kern.rtmailVak, rtmail: kern.rtmail, sleutels: kern.mailSleutel,
+        poort: Number(process.env.IMAP_POORT), host: process.env.IMAP_HOST || '127.0.0.1', tlsOpties })
+        .start().then(() => console.log('[imap] luistert op ' + (process.env.IMAP_HOST || '127.0.0.1') + ':' +
+          process.env.IMAP_POORT + (tlsOpties ? ' (TLS)' : ' -- PLAT, zet er een doorgeefluik met TLS voor')));
+    } catch (e) { console.warn('[imap] niet gestart:', e && e.message); }
+  }
+  /* EEN BEZETTE POORT IS EEN STARTFOUT, GEEN SERVERFOUT.
+
+     app.listen meldt een mislukking (EADDRINUSE als de poort bezet is, EACCES
+     onder 1024 zonder rechten) via een 'error'-gebeurtenis op de server. Er
+     luisterde niemand, dus viel hij door naar het uncaughtException-vangnet.
+
+     Het proces STOPTE daar wel netjes op, met exitcode 1 -- ik had eerst
+     opgeschreven dat het bleef hangen, en dat was niet waar; nagemeten doet de
+     oude code precies wat hij hoort te doen. Wat er wel misging zit in de
+     BENOEMING. De regel die er dan in het log verschijnt draagt
+     "bron":"uncaughtException" en "fataal":true, en test/helper.js rekent
+     uitgerekend dat patroon af als een serverfout die de hele testrun laat
+     falen. De helper legt in zijn eigen commentaar uit dat een poort-race
+     voorkomt en dat hij daarom opnieuw probeert -- maar de geslaagde herkansing
+     nam de valse "server-uitzondering" niet meer weg. Een testrun kon zo rood
+     worden door een poortbotsing die keurig was opgevangen.
+
+     Een startfout hoort ook een startfout te heten. Deze luisteraar noemt hem bij
+     naam ("poort ... is al in gebruik") onder bron "listen", en stopt meteen met
+     een foutcode zodat een proces-manager ons herstart. */
+  server.on('error', (err) => {
+    const waar = (HOST || '0.0.0.0') + ':' + PORT;
+    const uitleg = err && err.code === 'EADDRINUSE'
+      ? 'poort ' + waar + ' is al in gebruik -- draait er al een RTG-server?'
+      : (err && err.code === 'EACCES'
+        ? 'geen rechten om op ' + waar + ' te luisteren (poorten onder 1024 vragen root of CAP_NET_BIND_SERVICE)'
+        : 'kon niet op ' + waar + ' luisteren: ' + (err && err.message));
+    console.error('[start] ' + uitleg);
+    try { log.uitzondering(err instanceof Error ? err : new Error(String(err)), { bron: 'listen', fataal: true }); } catch (e) {}
+    process.exit(1);
+  });
+  // Eigen STUN-server (RFC 5389) voor (video)bellen: geen leun meer op de publieke
+  // STUN van Google. Draait op UDP (STUN_PORT, standaard 3478); STUN_UIT=1 zet uit.
+  // De socket is unref'd, dus dit houdt het afsluiten nooit tegen.
+  const stunServer = require('../stun').start({ log });
+  /* Satellietvriendelijk: op hoge-latency verbindingen (satelliet, traag mobiel)
+     duurt een nieuwe TLS-handshake al snel seconden. Houd bestaande verbindingen
+     daarom ruim open, dan wordt hij hergebruikt in plaats van opnieuw opgezet.
+     headersTimeout hoort boven keepAliveTimeout te blijven (Node-vereiste). */
+  server.keepAliveTimeout = 75000;
+  server.headersTimeout = 90000;
+
+  /* Native TLS + eigen ACME: als de app zelf TLS termineert (RTG_TLS=1) EN ACME aan
+     staat (RTG_ACME=1 + RTG_TLS_DOMAIN + RTG_TLS_EMAIL), haalt en vernieuwt ze zelf
+     een echt Let's Encrypt-certificaat en laadt dat live in -- geen certbot, geen
+     reverse proxy. Volledig gated; standaard uit, en het mag de app nooit laten
+     vallen (mislukt de uitgifte, dan blijven we op het self-signed cert draaien).
+     Zet RTG_ACME_STAGING=1 om eerst tegen de staging-CA te oefenen (geen rate-limit). */
+  if (process.env.RTG_TLS === '1' && process.env.RTG_ACME === '1' && server && typeof server.herlaadCert === 'function') {
+    const domeinen = String(process.env.RTG_TLS_DOMAIN || '').split(',').map(s => s.trim()).filter(Boolean);
+    const email = String(process.env.RTG_TLS_EMAIL || '').trim();
+    if (domeinen.length && email) {
+      require('../lib/tls-acme').startAcme({ server, domains: domeinen, email, dataDir: DATA_DIR, staging: process.env.RTG_ACME_STAGING === '1', log: (m) => log.info(m) })
+        .then(() => log.info('[tls] ACME actief voor ' + domeinen.join(', ')))
+        .catch((e) => log.warn('[tls] ACME-start mislukt; app draait door op het self-signed cert: ' + e.message));
+    } else {
+      log.warn('[tls] RTG_ACME=1 maar RTG_TLS_DOMAIN/RTG_TLS_EMAIL ontbreekt; ACME overgeslagen.');
+    }
+  }
+
+  // Netjes afsluiten: data wegschrijven, verbindingen sluiten, dan pas stoppen.
+  for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
+    console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
+    try { save(); } catch (e) {}
+    // Bij Postgres: nog een laatste flush zodat niets in de write-behind hangt.
+    Promise.allSettled([Promise.resolve(flushBijAfsluiten()), Promise.resolve(accounts.flushBijAfsluiten())]).finally(() => {
+      server.close(() => process.exit(0));
+    });
+    // Vangnet als de flush hangt. Bij write-behind (Postgres) kan een laatste
+    // flush op grote schaal seconden duren; 3 s kapte hem af en verloor de laatste
+    // write-behind-staat. Ruimer nu, zodat een normale afsluit-flush kan afronden;
+    // de klein-eerst-volgorde (server/pg/sync.js) borgt dat geld sowieso als eerste
+    // landt, ook als dit vangnet toch nog vuurt.
+    setTimeout(() => process.exit(0), Number(process.env.RTG_STOP_GRACE_MS || 20000)).unref();
+  });
+
+  return { server, stunServer, PORT, HOST };
+};

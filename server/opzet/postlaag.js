@@ -63,6 +63,16 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
      maken -- kern/rtmail.js vangt hem daarom af en logt hem. */
   rtmail.zetNaBezorging((m) => { rtmailRegels.naBezorging(m); rtmailSla.naBezorging(m); });
 
-  return { rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
+  /* De INFRASTRUCTUUR eronder: de verzendwachtrij (herproberen met oplopende
+     wachttijd, dead-letter, dubbele aflevering herkennen) en de ontleding van
+     post die van buiten binnenkomt (MIME uitpakken, het origineel bewaren, de
+     controles stempelen). De wachtrij krijgt de verzender mee die
+     server/mail.js ook gebruikt; die geeft { ok, soort } terug, en op dat
+     onderscheid tussen tijdelijk en permanent draait de hele lade. */
+  const mailQ = require('../kern/mailwachtrij')({ db, save, crypto,
+    verzend: (rij) => require('../mail').bezorgNu(rij.naar, rij.onderwerp, rij.tekst) });
+  const mailIn = require('../kern/mailinkomend')({ db, save, crypto, dkim: require('../dkim') });
+
+  return { mailQ, mailIn, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
     rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar };
 };

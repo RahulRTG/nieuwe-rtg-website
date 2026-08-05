@@ -122,6 +122,39 @@ function stuurDirect(to, subject, text) {
     .catch(e => { console.warn('[mail] eigen bezorging mislukt:', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
 }
 
+/* DEZELFDE VERZENDING, MAAR MET EEN ANTWOORD. `send()` hierboven is
+   fire-and-forget: goed genoeg voor een bevestigingsmail, maar onbruikbaar voor
+   een wachtrij, want die moet WETEN wat er gebeurde. Deze variant geeft
+   { ok, soort } terug -- bezorgd, tijdelijk of permanent -- en dat onderscheid
+   is waar kern/mailwachtrij.js zijn hele gedrag op baseert: bij tijdelijk
+   opnieuw proberen, bij permanent nooit meer.
+
+   De outbox telt hier als BEZORGD, met `via: 'outbox'` erbij. Dat is eerlijker
+   dan hem als mislukking tellen: zonder SMTP-instellingen is de outbox de
+   afgesproken bestemming, en een wachtrij die daar eindeloos op blijft
+   herproberen doet alsof er iets stuk is. */
+async function bezorgNu(to, subject, text) {
+  if (!to || !/@/.test(String(to))) return { ok: false, soort: 'permanent', waarom: 'dat is geen e-mailadres' };
+  if (transporter) {
+    try {
+      await transporter.sendMail({ from: FROM, to, subject, text });
+      return { ok: true, soort: 'bezorgd', via: 'smarthost' };
+    } catch (e) {
+      const m = String((e && e.message) || '');
+      // een 5xx van de smarthost is net zo permanent als een 5xx van de ontvanger
+      return { ok: false, soort: /\b5\d\d\b/.test(m) ? 'permanent' : 'tijdelijk', waarom: m };
+    }
+  }
+  if (DIRECT) {
+    const { rauw } = bouwBericht(to, subject, text);
+    const van = (/<([^>]+)>/.exec(FROM) || [null, FROM])[1];
+    try { return await require('./smtp-direct').bezorg({ van, naar: to, bericht: rauw }); }
+    catch (e) { return { ok: false, soort: 'tijdelijk', waarom: (e && e.message) || 'onbekende fout' }; }
+  }
+  try { toOutbox(to, subject, text); return { ok: true, soort: 'bezorgd', via: 'outbox' }; }
+  catch (e) { return { ok: false, soort: 'tijdelijk', waarom: (e && e.message) || 'de outbox is niet te schrijven' }; }
+}
+
 function send(to, subject, text) {
   if (!to || !/@/.test(String(to))) return;
   if (transporter) {
@@ -134,4 +167,4 @@ function send(to, subject, text) {
   try { toOutbox(to, subject, text); } catch (e) { console.warn('[mail] mislukt:', e.message); }
 }
 
-module.exports = { send, configured: CONFIGURED || DIRECT, direct: DIRECT, bouwBericht };
+module.exports = { send, bezorgNu, configured: CONFIGURED || DIRECT, direct: DIRECT, bouwBericht };

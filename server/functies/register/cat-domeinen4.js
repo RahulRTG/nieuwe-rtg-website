@@ -69,5 +69,14 @@ module.exports = [
   { id: 'ov-kantoorgesprek', categorie: 'Werk (zaken en personeel)', naam: 'Kantoorgesprek', standaard: true, doelgroepen: ['leverancier', 'personeel'],
     uitleg: 'Het gesprek waarmee een zaak zijn kantoor inricht.', paden: ['/api/kantoor'] },
   { id: 'ov-werkmail', categorie: 'Werk (zaken en personeel)', naam: 'Werkmail bezorgen', standaard: true, doelgroepen: ['leverancier', 'personeel'],
-    uitleg: 'De bezorging van interne werkmail.', paden: ['/api/werkmail'] }
+    uitleg: 'De bezorging van interne werkmail.', paden: ['/api/werkmail'] },
+  /* De buitenpoort van RTG Mail. Deze hoort NAAR ZIJN AARD in de kast: hij is
+     publiek (een vreemde mailserver heeft geen inlog bij ons), en als er ooit
+     iets misgaat -- een stroom rommel, een lek in de ontleding -- moet hij
+     vanuit de boardroom dicht kunnen zonder dat er iemand bij de code hoeft.
+     Dat is precies waar de schakelkast voor bestaat. */
+  { id: 'ov-mail-binnen', categorie: 'Werk (zaken en personeel)', naam: 'RTG Mail: post van buiten aannemen',
+    standaard: true, doelgroepen: ['leverancier', 'personeel'],
+    uitleg: 'De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert. Uit betekent: post van buiten komt niet meer binnen.',
+    paden: ['/api/mail/binnen'] }
 ];

@@ -140,17 +140,29 @@
   });
 
   /* ---- gps: snelheid en positie ---- */
-  // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
-  // (rtg_os_gps) wint; zonder plek blijft het demo-startpunt staan
-  let gpsUit = false;
-  try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
-  if (!gpsUit && 'geolocation' in navigator) {
+  /* De schakelaar blijft de baas, maar zwijgen is hier geen optie: een
+     snelheidsmeter zonder je positie meet niets. shared/plek.js vraagt het een
+     keer met de reden erbij; zeg je nee, dan blijft het demo-startpunt staan en
+     vraagt hij deze sessie niet opnieuw. De rauwe watchPosition blijft, want we
+     hebben coords.speed nodig en niet alleen de plek. */
+  async function gpsStart() {
+    if (!('geolocation' in navigator)) return;
+    if (window.RTGPlek && !RTGPlek.aan()) {
+      const ja = await RTGPlek.vraag({ waarom: 'Voor je snelheid en de flitspalen om je heen moet ik weten waar je bent. Je locatie blijft op je toestel.' });
+      if (!ja) return;
+    } else if (!window.RTGPlek) {
+      let uit = true; try { uit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
+      if (uit) return;
+    }
+    {
     navigator.geolocation.watchPosition(p => {
       hier = { lat: p.coords.latitude, lng: p.coords.longitude };
       const kmu = p.coords.speed != null ? Math.max(0, Math.round(p.coords.speed * 3.6)) : null;
       if (kmu != null) $('#snelheid').textContent = kmu;
     }, () => {}, { enableHighAccuracy: true });
+    }
   }
+  document.addEventListener('DOMContentLoaded', gpsStart);
 
   /* ---- het rondom-beeld en de naderingswaarschuwing ---- */
   function toonAlarm(m) {

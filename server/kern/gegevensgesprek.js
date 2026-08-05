@@ -14,13 +14,41 @@
    Wat waar landt: het telefoonnummer in de kluis (enc_phone, gebonden aan de rij),
    het adres in het ledendossier (member_state.adres, versleuteld en gebonden).
    Identiteit loopt NIET hier maar via de bestaande verificatie; dit gesprek wijst
-   er alleen naar. */
+   er alleen naar.
+
+   EN DE WOONPLAATS GAAT MEE, want die had nog een tweede lezer. Het
+   ledenregister van het kantoor toont leden per stad en haalt die stad uit het
+   onboardingprofiel (kern/ledenregister.js leest p.velden.woonplaats). De intake
+   vroeg hem vroeger; sinds de velden een moment dragen doet hij dat niet meer, en
+   daarmee is DEZE stap de enige voeding die er nog is. Schrijft hij de woonplaats
+   niet mee, dan valt elk nieuw lid stil in de bak "Onbekend" en klaagt niets --
+   precies de stille soort van LAT.md regel 5. Hij wordt geschreven met dezelfde
+   functie waarmee de intake dat deed (onboarding.slaOp), zodat er maar een
+   schrijver is. */
 
 const TTL_MS = 20 * 60 * 1000;
 const MAX_GESPREKKEN = 500;
 const MAX_BEURTEN = 30;
 
-function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemberState, schoon }) {
+/* De plaats uit wat het lid ZELF typte: een letterlijk stuk van zijn eigen zin,
+   nooit iets bijgeschaafd of aangevuld. Twee vormen die zeker zijn -- achter een
+   Nederlandse postcode, of het laatste stuk achter een komma als daar alleen
+   letters in staan. Twijfel is geen uitkomst: kunnen we hem niet met zekerheid
+   aanwijzen (een buitenlands adres, "Damstraat 5 Berlijn"), dan RADEN we niet
+   maar vragen we het gewoon. Een verzonnen woonplaats is erger dan een lege. */
+const PLAATS_KERN = "[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'. -]{1,38}";   // een plaatsnaam, een keer beschreven
+const PLAATS = new RegExp('^' + PLAATS_KERN + '$');
+const NA_POSTCODE = new RegExp('\\b[1-9]\\d{3}\\s*[A-Za-z]{2}\\b[,\\s]+(' + PLAATS_KERN + ')$');
+function plaatsUit(adres) {
+  const s = String(adres || '').trim();
+  const m = NA_POSTCODE.exec(s);
+  if (m) return m[1].trim();
+  const delen = s.split(',');
+  const laatste = delen.length > 1 ? delen[delen.length - 1].trim() : '';
+  return PLAATS.test(laatste) ? laatste : null;
+}
+
+function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemberState, schoon, onboarding }) {
   const gesprekken = new Map();   // id -> { key, userId, soort, wachtrij, at, beurten }
   const nu = () => Date.now();
 
@@ -42,6 +70,10 @@ function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemb
     if (m.veld === 'reisdocument') return 'Voor deze vlucht wil de maatschappij je paspoortgegevens: nummer, geldigheid, nationaliteit en geboortedatum. Dat is hun eis, niet de onze. Scan je paspoort een keer, dan staat het er meteen goed.';
     return 'Hiervoor moet je identiteit geverifieerd zijn. Dat doe je met je identiteitsbewijs in je profiel; daarna kan dit gewoon.';
   };
+
+  // het adreswerk staat apart: zie ./gegevensgesprek/adres.js
+  const { maakAdreshulp } = require('./gegevensgesprek/adres');
+  const { bewaarAdres } = maakAdreshulp({ onboarding });
 
   /* Start: kijk wat er voor deze soort handeling ontbreekt en vraag het eerste. */
   function gegevensStart(sessie, soort) {
@@ -83,15 +115,30 @@ function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemb
       if (g.userId == null || !accounts.setPhone) return { status: 500, error: 'Kon het nummer niet bewaren.' };
       accounts.setPhone(g.userId, nummer);
     } else if (huidig.veld === 'adres') {
-      const adres = schoon(tekst, 120);
-      // een adres heeft op zijn minst een cijfer (huisnummer) en wat letters
-      if (adres.length < 8 || !/\d/.test(adres) || !/[A-Za-zÀ-ÿ]/.test(adres)) {
-        return { status: 200, tekst: 'Daar kan ik geen adres uit halen. Straat, huisnummer, postcode en plaats?', veld: 'adres' };
+      if (g.wachtPlaats) {
+        /* De tweede helft van de adresstap: de plaats, omdat we hem niet met
+           zekerheid uit de vorige zin konden halen. */
+        const plaats = schoon(tekst, 40);
+        if (!PLAATS.test(plaats)) return { status: 200, tekst: 'Daar lees ik geen plaatsnaam in. Alleen de plaats?', veld: 'adres' };
+        g.wachtPlaats = false;
+        bewaarAdres(sessie, g.adres, plaats);
+      } else {
+        const adres = schoon(tekst, 120);
+        // een adres heeft op zijn minst een cijfer (huisnummer) en wat letters
+        if (adres.length < 8 || !/\d/.test(adres) || !/[A-Za-zÀ-ÿ]/.test(adres)) {
+          return { status: 200, tekst: 'Daar kan ik geen adres uit halen. Straat, huisnummer, postcode en plaats?', veld: 'adres' };
+        }
+        if (g.userId == null) return { status: 500, error: 'Kon het adres niet bewaren.' };
+        const md = getMemberState(g.userId) || {};
+        md.adres = adres;
+        saveMemberState(g.userId, md);
+        const plaats = plaatsUit(adres);
+        if (!plaats) {
+          g.adres = adres; g.wachtPlaats = true;
+          return { status: 200, tekst: 'Genoteerd. In welke plaats is dat?', veld: 'adres' };
+        }
+        bewaarAdres(sessie, adres, plaats);
       }
-      if (g.userId == null) return { status: 500, error: 'Kon het adres niet bewaren.' };
-      const md = getMemberState(g.userId) || {};
-      md.adres = adres;
-      saveMemberState(g.userId, md);
     } else if (huidig.veld === 'reisdocument') {
       /* Dit gesprek lost het reisdocument niet op, en dat is met opzet: getypte
          paspoortgegevens zijn precies het soort veld waar een tikfout je aan de

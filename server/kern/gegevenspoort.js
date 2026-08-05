@@ -18,7 +18,19 @@
      identiteit  de BESTAANDE verificatie (/api/verify/upload). Hier komt met
                  opzet geen tweede paspoort-intake naast: een document uploaden en
                  laten goedkeuren is een eigen weg, en die is er al. Deze poort
-                 wijst er alleen naar. */
+                 wijst er alleen naar.
+
+   De adresstap schrijft daarnaast de WOONPLAATS bij in het onboardingprofiel
+   (kern/gegevensgesprek.js): de intake vraagt hem niet meer, en het ledenregister
+   van het kantoor is de lezer die anders stil zijn stad-facet kwijt was.
+
+   EN WAT HIER NIET STAAT, EN WAAROM NIET. Nationaliteit hoort hier zodra iets hem
+   werkelijk leest -- een maatschappij die een passagier aanmeldt, bijvoorbeeld.
+   Vandaag is dat niet zo: in de hele vlucht- en grensstapel (kern/luchthaven/*,
+   kern/marechaussee.js) komt md.nationaliteit niet voor. Een poort die iets eist
+   wat niemand opvraagt is geen dataminimalisatie maar een extra drempel, dus hij
+   staat er niet. Komt die lezer er, dan is DIT het bestand waar hij bij hoort,
+   met een waarom dat je hardop kunt uitspreken. */
 
 const VELDEN = {
   telefoon: {

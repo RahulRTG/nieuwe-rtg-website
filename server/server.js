@@ -2472,9 +2472,12 @@ Object.assign(kern, require('./kern/kantoorgesprek').maakKantoorgesprek({
   const poort = require('./kern/gegevenspoort').maakGegevenspoort({
     accounts, getMemberState: accounts.getMemberState
   });
+  /* `onboarding` gaat mee omdat de adresstap de woonplaats bijschrijft in het
+     onboardingprofiel: dat is sinds de momenten de enige voeding van het
+     stad-facet in kern/ledenregister.js. */
   const gesprek = require('./kern/gegevensgesprek').maakGegevensgesprek({
     accounts, gegevenspoort: poort, saveMemberState: accounts.saveMemberState,
-    getMemberState: accounts.getMemberState, schoon
+    getMemberState: accounts.getMemberState, schoon, onboarding
   });
   Object.assign(kern, {
     gegevensPoort: poort.poort, gegevensNodig: poort.ontbreekt, gegevensStop: poort.stop,

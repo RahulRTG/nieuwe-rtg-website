@@ -95,6 +95,17 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
     const bezorg2 = await api(base, '/api/gegevens/nodig', { soort: 'bezorging' }, token);
     assert.deepEqual(bezorg2.body.ontbreekt, [], 'nu kan de bezorging ook');
 
+    /* 5b) EN DE WOONPLAATS IS MEEGESCHREVEN. De intake vraagt geen adres meer,
+       dus deze stap is de enige voeding van het stad-facet in het ledenregister
+       (kern/ledenregister.js leest p.velden.woonplaats). Zonder deze regel valt
+       elk nieuw lid stil in de bak "Onbekend"; test/woonplaats-poort.test.js
+       meet dat helemaal door tot wat de boardroom te zien krijgt, hier staat de
+       bewering in een ECHT draaiende server. */
+    const naAdres = await api(base, '/api/onboarding/status', {}, token);
+    const woon = (naAdres.body.laterVelden || []).find(v => v.id === 'woonplaats');
+    assert.ok(woon, 'de woonplaats bestaat als later-veld');
+    assert.equal(woon.waarde, 'Amsterdam', 'en is gevuld uit de zin die het lid zelf typte');
+
     // 6) afbreken mag altijd, en dan gaat het gewoon niet door
     const s3 = await api(base, '/api/gegevens/start', { soort: 'identiteit' }, token);
     assert.equal(s3.body.veld, 'identiteit');

@@ -5,15 +5,21 @@
 module.exports = (ctx) => {
   const { db, save, crypto, accounts, anthropic, schoon,
     ALLE_WIE, PAS_WIE, VELD_TYPES, DEFAULT_CONTRACT,
-    nu, standaardVelden, standaardScope, store, scopeVan, profielVan, profielId } = ctx;
+    nu, standaardVelden, standaardMoment, standaardScope, store, scopeVan, profielVan, profielId } = ctx;
+  /* Het moment ('nu' of 'later') reist overal mee. Dat is geen sierlijkheid: een
+     voorstel dat het veld niet kent, zou elk veld weer op 'nu' zetten en dan
+     staat de hele intake stilletjes terug in de poort na het inloggen. */
   function publiekeConfig(sc) {
-    return { velden: sc.velden.map(v => ({ id: v.id, label: v.label, type: v.type, voorWie: [...(v.voorWie || [])] })),
+    return { velden: sc.velden.map(v => ({ id: v.id, label: v.label, type: v.type, voorWie: [...(v.voorWie || [])], moment: v.moment || 'nu' })),
       contract: { versie: sc.contract.versie, titel: sc.contract.titel, tekst: sc.contract.tekst, bijgewerkt: sc.contract.bijgewerkt } };
   }
   function config(scope) { return publiekeConfig(scopeVan(scope)); }
 
-  // Een voorgestelde config valideren/normaliseren voordat we hem toepassen.
-  function normaliseerVelden(lijst) {
+  /* Een voorgestelde config valideren/normaliseren voordat we hem toepassen.
+     `huidig` is de scope zoals hij nu is: daaruit komt het moment terug als het
+     voorstel er geen noemt. */
+  function normaliseerVelden(lijst, huidig) {
+    const nuMoment = new Map(((huidig && huidig.velden) || []).map(v => [v.id, v.moment]));
     const uit = [];
     const gezien = new Set();
     for (const v of (Array.isArray(lijst) ? lijst : []).slice(0, 40)) {
@@ -24,14 +30,22 @@ module.exports = (ctx) => {
       const type = VELD_TYPES.includes(v.type) ? v.type : 'text';
       let voorWie = Array.isArray(v.voorWie) ? v.voorWie.filter(w => ALLE_WIE.includes(w)) : [...ALLE_WIE];
       if (!voorWie.length) voorWie = [...ALLE_WIE];
-      uit.push({ id, label: schoon(String(v.label || id), 60) || id, type, voorWie });
+      /* Noemt het voorstel geen moment (een oudere client, of een AI-antwoord dat
+         het veld vergat), dan houden we het moment dat het veld nu heeft, en
+         anders dat van het standaardveld. Zonder die terugval zou een enkele
+         beheeractie telefoon, adres en paspoort weer naar de voordeur trekken.
+         Een nieuw veld van de eigenaar kennen we niet en hoort bij de intake,
+         tenzij hij zelf 'later' meegeeft. */
+      const moment = v.moment === 'later' || v.moment === 'nu' ? v.moment
+        : (nuMoment.get(id) || standaardMoment(id) || 'nu');
+      uit.push({ id, label: schoon(String(v.label || id), 60) || id, type, voorWie, moment });
     }
     return uit.length ? uit : null;
   }
   // De config (deels) overschrijven; contracttekst-wijziging = nieuwe versie.
   function zetConfig(scope, voorstel) {
     const sc = scopeVan(scope);
-    if (voorstel && voorstel.velden) { const v = normaliseerVelden(voorstel.velden); if (v) sc.velden = v; }
+    if (voorstel && voorstel.velden) { const v = normaliseerVelden(voorstel.velden, sc); if (v) sc.velden = v; }
     if (voorstel && voorstel.contract) {
       const c = voorstel.contract;
       if (c.titel != null) sc.contract.titel = schoon(String(c.titel), 100) || sc.contract.titel;
@@ -59,8 +73,10 @@ module.exports = (ctx) => {
         const sys = 'Je beheert de verplichte intake (vereiste velden) en het contract van een reisplatform. ' +
           'Pas de config aan volgens de opdracht van de beheerder. Veldtypes: ' + VELD_TYPES.join(', ') + '. ' +
           'voorWie is een deelverzameling van ' + ALLE_WIE.join(', ') + ' (guest = gratis gast). ' +
+          'moment is "nu" (bij de intake) of "later" (pas als een handeling erom vraagt); ' +
+          'houd het moment van bestaande velden ongewijzigd tenzij de opdracht er expliciet om vraagt. ' +
           'Antwoord met een korte uitleg in het Nederlands en DAARNA exact EEN codeblok:\n' +
-          '```json\n{"velden":[{"id":"..","label":"..","type":"..","voorWie":["guest","rtg"]}],"contract":{"titel":"..","tekst":".."}}\n```';
+          '```json\n{"velden":[{"id":"..","label":"..","type":"..","voorWie":["guest","rtg"],"moment":"nu"}],"contract":{"titel":"..","tekst":".."}}\n```';
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 2000, system: sys,
           messages: [{ role: 'user', content: 'Huidige config:\n' + JSON.stringify(huidig) + '\n\nOpdracht: ' + String(opdracht || '') }] });
         const txt = (r && r.content && r.content[0] && r.content[0].text) || '';
@@ -78,7 +94,7 @@ module.exports = (ctx) => {
   // Ingebouwde regel-parser (zonder AI-sleutel): dekt de meest gevraagde acties.
   function cannedVoorstel(sc, opdracht) {
     const t = opdracht.toLowerCase();
-    const velden = sc.velden.map(v => ({ id: v.id, label: v.label, type: v.type, voorWie: [...(v.voorWie || [])] }));
+    const velden = sc.velden.map(v => ({ id: v.id, label: v.label, type: v.type, voorWie: [...(v.voorWie || [])], moment: v.moment || 'nu' }));
     const contract = { titel: sc.contract.titel, tekst: sc.contract.tekst };
     let uitleg = 'Aangepast op basis van uw instructie.';
     const noemt = (w) => t.includes(w);

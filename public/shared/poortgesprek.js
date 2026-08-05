@@ -16,6 +16,11 @@
    mee, dus dit werkt zowel in de leden-app (API.call) als op de losse pagina's
    met hun eigen fetch-helper.
 
+   DE ADRESSTAP MAG KORTER, MAAR NOOIT STILLER. Postcode plus huisnummer levert
+   een VOORSTEL (shared/adresvoorstel.js, waar het waarom staat): eerst in beeld
+   met een ja en een nee, en pas op het ja gaat er iets naar de server. Al het
+   andere gaat ongewijzigd door, en die stap kan twee beurten kosten.
+
    HIJ HEET RTGGegevensPoort EN NIET RTGPoort. Die naam was al bezet door
    shared/rahulpoort.js -- de INLOGpoort, met een heel andere vorm
    (.gesprek() in plaats van .vang()). Twee sessies kwamen los van elkaar op
@@ -71,12 +76,14 @@
 
   function toon(tekst, veld, uitleg) {
     var invoer = veld && veld !== 'identiteit';
-    if (huidig) huidig.vraag = tekst;
+    // het veld blijft bij de vraag: stuur() moet de adresstap herkennen
+    if (huidig) { huidig.vraag = tekst; huidig.veld = veld || null; }
     kaart.innerHTML =
       '<h2>Nog een ding</h2>' +
       '<p class="rp-vraag">' + esc(tekst) + '</p>' +
       (invoer ? '<input type="text" class="rp-in" autocomplete="' + (veld === 'telefoon' ? 'tel' : 'street-address') +
-        '" inputmode="' + (veld === 'telefoon' ? 'tel' : 'text') + '">' : '') +
+        '" inputmode="' + (veld === 'telefoon' ? 'tel' : 'text') + '"' +
+        (veld === 'adres' ? ' placeholder="Postcode en huisnummer mag ook"' : '') + '>' : '') +
       (uitleg ? '<p class="rp-uitleg">' + esc(uitleg) + '</p>' :
         (invoer ? '<button type="button" class="rp-waarom">Waarom vraag je dit?</button>' : '')) +
       '<div class="rp-rij">' +
@@ -93,8 +100,42 @@
     kaart.querySelector('.rp-stop').addEventListener('click', function () { klaar(false); });
   }
 
+  // Een getypt antwoord. Bij de adresstap kan er een opzoeking tussen; de VORM
+  // van het antwoord bepaalt dat, en niets anders.
   function stuur(tekst, isWaarom) {
     if (!huidig || !String(tekst || '').trim()) return;
+    if (!isWaarom && huidig.veld === 'adres' && w.RTGAdresvoorstel) {
+      var gel = w.RTGAdresvoorstel.lees(tekst);
+      if (gel) return opzoeken(gel);
+    }
+    verzend(tekst, isWaarom);
+  }
+
+  // Lukt het opzoeken niet, dan blijft dezelfde vraag staan met de zin van de
+  // server eronder, en is er niets bewaard.
+  function opzoeken(gel) {
+    var vraag = huidig.vraag;
+    var knop = kaart.querySelector('.rp-door'); if (knop) knop.disabled = true;
+    w.RTGAdresvoorstel.zoek(huidig.call, gel).then(function (r) {
+      if (!huidig) return;
+      if (!r.voorstel) return toon(vraag, 'adres', r.tekst);
+      bevestig(r.voorstel, vraag);
+    });
+  }
+
+  /* Op ja gaat PRECIES deze zin naar de server: in de kluis komt letterlijk wat
+     er in beeld stond. Op nee gaat er niets heen en staat de vraag er weer. */
+  /* De bevestigkaart zelf staat in shared/adresvoorstel.js: dat is de module
+     over het adresvoorstel, en dit bestand ging met die kaart erbij over de
+     10 KB-lat -- het teken dat er een tweede onderwerp in zat. */
+  function bevestig(zin, vraag) {
+    RTGAdresvoorstel.kaart(kaart, esc, zin,
+      function () { verzend(zin); },
+      function () { toon(vraag, 'adres', ''); });
+  }
+
+  function verzend(tekst, isWaarom) {
+    if (!huidig) return;
     var knop = kaart.querySelector('.rp-door'); if (knop) knop.disabled = true;
     var vraag = huidig.vraag;
     huidig.call('/api/gegevens/zeg', { id: huidig.id, tekst: String(tekst) }).then(function (d) {

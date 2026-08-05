@@ -35,10 +35,46 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
   const koppelen = require('./eenaccount/koppelen')({ accounts, findSupplier, checkCred, hasCred,
     DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu });
 
+  /* ---- de eigenaar heeft de kantoordeur al, en hoort hem ook te ZIEN ----
+
+     server/eigenaar.js legt vast dat de eigenaar overal bij de beheeromgevingen
+     kan, met zoveel woorden: "de RTG-Backoffice (met zijn eigen accountlogin,
+     zonder aparte code)". Achter de deur klopte dat ook -- boardroomWie() kent
+     hem, en accStart munt voor de rol 'kantoor' netjes een office-sessie. Maar
+     de sleutelbos zelf kende alleen GEKOPPELDE rollen, en koppelen vraagt om
+     de backoffice-code. Gevolg: de eigenaar kreeg in de Werk-kiezer op zijn
+     telefoon "Nog geen werkplek gekoppeld" -- een belofte in de tekst die de
+     code niet nakwam.
+
+     Daarom hangt de kantoorrol hier als een AFGELEIDE sleutel aan de bos: niet
+     opgeslagen (er valt niets te koppelen of te ontkoppelen aan iets wat je al
+     bent), en hij verdwijnt vanzelf zodra het eigenaarschap wordt overgedragen.
+     De controle staat server-side en gaat via dezelfde ene bron als de rest
+     van het huis (eigenaar.isEigenaar), zodat een overdracht overal tegelijk
+     telt. De algemene pin blijft gewoon gelden: bevoegdheid is het account,
+     bewijs is de pin. */
+  const eigenaar = require('../eigenaar');
+  function eigenaarKantoor(key) {
+    const m = /^user-(\d+)$/.exec(String(key || ''));
+    if (!m) return null;
+    let user = null;
+    try { user = accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    if (!user || !eigenaar.isEigenaar(accounts, user)) return null;
+    return { rol: 'kantoor', code: null, staffId: null, naam: 'RTG-Backoffice',
+      zaakNaam: null, at: null, viaEigenaar: true };
+  }
+
   /* ---- de sleutelbos van dit account ---- */
   function accRollen(key) {
-    return { status: 200, rollen: lijst(key).map(r => ({ rol: r.rol, code: r.code || null,
-      staffId: r.staffId || null, naam: r.naam || null, zaakNaam: r.zaakNaam || null, sinds: r.at })) };
+    const rollen = lijst(key).map(r => ({ rol: r.rol, code: r.code || null,
+      staffId: r.staffId || null, naam: r.naam || null, zaakNaam: r.zaakNaam || null, sinds: r.at }));
+    // de afgeleide kantoorsleutel van de eigenaar, tenzij hij hem al koppelde
+    const eig = eigenaarKantoor(key);
+    if (eig && !rollen.some(r => r.rol === 'kantoor')) {
+      rollen.push({ rol: 'kantoor', code: null, staffId: null, naam: eig.naam,
+        zaakNaam: null, sinds: null, viaEigenaar: true });
+    }
+    return { status: 200, rollen };
   }
 
   /* ---- een rol koppelen: altijd eerst de bestaande werk-inlog bewijzen ---- */
@@ -59,8 +95,10 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
   async function accStart(key, body, req) {
     const wens = { rol: String((body || {}).rol || ''), code: body && body.code ? String(body.code).toUpperCase() : '',
       staffId: body && body.staffId != null ? Number(body.staffId) : null };
-    const r = lijst(key).find(x => x.rol === wens.rol && (!wens.code || x.code === wens.code)
+    let r = lijst(key).find(x => x.rol === wens.rol && (!wens.code || x.code === wens.code)
       && (wens.staffId == null || x.staffId === wens.staffId));
+    // de eigenaar opent de kantoordeur zonder koppeling; zie eigenaarKantoor()
+    if (!r && wens.rol === 'kantoor' && !wens.code) r = eigenaarKantoor(key);
     if (!r) return { status: 404, error: 'Deze rol is niet aan uw account gekoppeld.' };
     // de algemene pin: heeft dit lid er een gezet, dan opent er geen werk-app
     // zonder (bevoegdheid = het ene account, bewijs = de pin). Zonder pin in

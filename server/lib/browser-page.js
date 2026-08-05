@@ -39,22 +39,23 @@ class Page {
     this._fetchAan = false;
     conn.on('sessie:' + sessionId, (m) => {
       if (m.method === 'Runtime.exceptionThrown') {
+        /* Zelfde vorm als Playwright: .message is alleen de melding, de rest
+           gaat mee als .stack. CDP plakt in `description` de stacktrace achter
+           de melding, en wie dat geheel als message doorgaf brak stil elke
+           toets die op de melding kijkt: paginas.e2e.js herkent de bewuste
+           stop met /(^|: )geen sessie$/, en dat einde-anker viel achter de
+           stack -- veertig RTF-pagina's telden als kapot terwijl ze deden wat
+           ze horen te doen. */
         const d = m.params.exceptionDetails || {};
-        const msg = (d.exception && (d.exception.description || d.exception.value)) || d.text || 'pagina-fout';
-        for (const cb of this._errCbs) { try { cb({ message: String(msg) }); } catch (e) {} }
+        const vol = String((d.exception && (d.exception.description || d.exception.value)) || d.text || 'pagina-fout');
+        const melding = vol.split('\n')[0];
+        for (const cb of this._errCbs) { try { cb({ message: melding, stack: vol }); } catch (e) {} }
       } else if (m.method === 'Fetch.requestPaused') {
         this._opVerzoek(m.params);
       }
     });
   }
   on(gebeurtenis, cb) { if (gebeurtenis === 'pageerror') this._errCbs.push(cb); return this; }
-  /* Wie een luisteraar aanzet moet hem ook kunnen afzetten. Zonder off()
-     struikelde test/leven.e2e.js -- de wachter over ALLE schermen -- meteen op
-     een TypeError in plaats van op een bewering. */
-  off(gebeurtenis, cb) {
-    if (gebeurtenis === 'pageerror') this._errCbs = this._errCbs.filter((f) => f !== cb);
-    return this;
-  }
   // Roep een CONSTANTE functie aan in de pagina met de waarden als echte CDP-
   // argumenten (Runtime.callFunctionOn). Zo wordt er nooit een waarde in de uit
   // te voeren code geplakt (geen code-injectie); het gedrag blijft identiek.
@@ -96,11 +97,10 @@ class Page {
   async goto(url, opts) {
     const waitUntil = (opts && opts.waitUntil) || 'load';
     const gebeurtenis = waitUntil === 'domcontentloaded' ? 'Page.domContentEventFired' : 'Page.loadEventFired';
-    /* De noodrem van 30 seconden werd nooit opgeruimd zodra de pagina wel
-       gewoon laadde. Een geslaagde goto liet dus een levende timer achter, en
-       die houdt het proces in de lucht: elke toetsronde bleef na de laatste
-       navigatie nog een halve minuut stilstaan zonder dat er iets gebeurde.
-       Nu wist de gebeurtenis zijn eigen wachter. */
+    /* De noodrem van 30 s werd nooit opgeruimd als de pagina gewoon laadde: de
+       levende timer hield het proces in de lucht, en elke toetsronde stond na
+       de laatste navigatie een halve minuut stil. De gebeurtenis wist nu zijn
+       eigen wachter. */
     const klaar = new Promise((res) => {
       let rem = null;
       const h = (m) => {

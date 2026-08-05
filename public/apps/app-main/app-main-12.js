@@ -83,13 +83,22 @@
     loadCv();
     loadVacatures();
     laadOntmoet();
-    /* Terug waar je was: binnen een half uur na de laatste activiteit herstelt
-       de app de tab waar je zat (zie openTab). Ouder dan dat -- of een tab die
-       voor deze pas niet zichtbaar is -- dan gewoon het beginscherm. */
+    /* Terug waar je was, maar KORT. Dit venster stond op een half uur, en dat
+       was te ver doorgeschoten: openTab schrijft de tijd bij elke schermwissel
+       bij, dus het venster schoof steeds mee en in gewoon gebruik landde je
+       vrijwel altijd weer in de app waar je was. Het beginscherm -- de tegels,
+       de klok, het gezicht van het huis -- kreeg je dan nooit meer te zien.
+
+       Waar dit voor bedoeld is, is de app die ONDER je vandaan wordt gedood:
+       iOS ruimt een app in de achtergrond op, of je herlaadt per ongeluk, en
+       dan hoor je niet je plek kwijt te raken. Dat gebeurt binnen seconden,
+       niet binnen een half uur. Twee minuten dekt dat ruim, en alles wat
+       later komt is een NIEUWE keer openen -- en die begint thuis. */
+    const PLEK_VENSTER = 2 * 60000;
     let beginTab = 'home';
     try {
       const b = JSON.parse(localStorage.getItem('rtg_actieve_tab') || 'null');
-      if (b && b.tab && Date.now() - (b.t || 0) < 30 * 60000){
+      if (b && b.tab && Date.now() - (b.t || 0) < PLEK_VENSTER){
         const knop = document.querySelector('.tabbar button[data-tab="' + b.tab + '"]');
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }

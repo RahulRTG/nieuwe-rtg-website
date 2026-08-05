@@ -82,6 +82,14 @@ function rustUit(Page) {
       [sel, waarde, label]);
   };
 
+  /* Wie een luisteraar aanzet moet hem ook kunnen afzetten. Zonder off()
+     struikelde test/leven.e2e.js -- de wachter over ALLE schermen -- meteen op
+     een TypeError in plaats van op een bewering. */
+  Page.prototype.off = function (gebeurtenis, cb) {
+    if (gebeurtenis === 'pageerror') this._errCbs = this._errCbs.filter((f) => f !== cb);
+    return this;
+  };
+
   /* Het adres en de inhoud van de pagina, en hem sluiten. Drie kleine
      methoden waar toetsen op vielen zodra ze eindelijk zover kwamen: close()
      bij vijf, url() en content() elk bij een. content() geeft de HTML zoals

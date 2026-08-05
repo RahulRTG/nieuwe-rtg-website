@@ -425,3 +425,64 @@ test('Leden-app: het vak van de klok op het beginscherm is vierkant, dus de scha
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* Het beginscherm mag niet verdwijnen doordat de app je plek onthoudt.
+
+   Deze twee horen bij elkaar en daarom in een toets. "Terug waar je was" is
+   bedoeld voor de app die ONDER je vandaan wordt gedood -- iOS ruimt een app in
+   de achtergrond op, of je herlaadt per ongeluk -- en dat gebeurt binnen
+   seconden. Het venster stond op een half uur, en omdat elke schermwissel de
+   tijd bijschrijft schoof dat venster steeds mee: in gewoon gebruik landde je
+   dus vrijwel altijd weer in de app waar je was, en kreeg je het beginscherm
+   met de tegels en de klok nooit meer te zien. Dat is precies wat er gemeld
+   werd ("ik zie geen iOS meer").
+
+   De toets meet allebei de kanten, want een reparatie die alleen de ene kant
+   vastlegt kan de andere stilletjes weer stukmaken. */
+test('Leden-app: een verse start begint thuis, een onderbreking van seconden niet',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const reg = await api(base, '/api/auth/register', { name: 'Plek Lid', email: 'plek@x.nl', phone: '0612345703',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    assert.ok(reg.token, 'lid-registratie geeft een token');
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const actieveView = async (page) => page.evaluate(() => {
+      const v = document.querySelector('.view.active');
+      return v ? v.getAttribute('data-view') : null;
+    });
+
+    // 1. een onderbreking van seconden: je plek hoort terug te komen
+    const ctxKort = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await ctxKort.addInitScript(([t]) => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_lang', 'nl');
+      localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab: 'salon', t: Date.now() - 20000 }));
+    }, [reg.token]);
+    const pKort = await ctxKort.newPage();
+    await pKort.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await pKort.waitForSelector('.view.active', { timeout: 15000 });
+    assert.equal(await actieveView(pKort), 'salon',
+      'na een onderbreking van seconden staat u weer waar u was');
+
+    // 2. een verse start later op de dag: het beginscherm
+    const ctxVers = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await ctxVers.addInitScript(([t]) => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_lang', 'nl');
+      localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab: 'salon', t: Date.now() - 5 * 60000 }));
+    }, [reg.token]);
+    const pVers = await ctxVers.newPage();
+    await pVers.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await pVers.waitForSelector('.view.active', { timeout: 15000 });
+    assert.equal(await actieveView(pVers), 'home',
+      'een verse start toont het beginscherm, niet de app waar u het laatst was');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

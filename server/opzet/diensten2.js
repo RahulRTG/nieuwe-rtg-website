@@ -41,41 +41,14 @@ const beveilig = require('../beveiliging')({
    ~10 s een momentopname voor de grafiek. `wacht` is hierboven al gedeclareerd
    (het schild raadpleegt hem voor de quarantaine). */
 const wacht = require('../kern/wacht')({ db, save, beveilig, lees: schild.signalen });
-// RTMAIL: het interne postsysteem (de rail voor de automatiseringen)
-const rtmail = require('../kern/rtmail')({ db, save, crypto });
-/* Teams: een adres dat meerderen samen lezen (receptie@partner.rtg). Krijgt de
-   codenaam-lijst en het zaakregister mee om te toetsen of een adres nog vrij
-   is -- een team mag nooit het postvak van een persoon of zaak kapen. */
-const rtmailTeam = require('../kern/rtmail-team')({ db, save, crypto, rtmail, findSupplier,
-  CODENAMES: require('../accounts/kluis').CODENAMES });
-/* Het postvak van een team staat apart van het team zelf: dat eerste gaat over
-   post, dit tweede over wie erin zit. Ze raken elkaar op teamMet en isLid. */
-Object.assign(rtmailTeam, require('../kern/rtmail-teampost')({ save, rtmail, team: rtmailTeam }));
-/* Het postvak zelf: mappen, etiketten, favorieten, sluimeren en zoeken. Staat
-   apart omdat de toestand PER BUS hangt en niet op het bericht -- anders
-   verdwijnt post uit de verzonden-map van de afzender zodra de ontvanger hem
-   opbergt. En de draad (het gesprek), die daarop leunt. */
-const rtmailVak = require('../kern/rtmail-vak')({ db, save, rtmail });
-const rtmailDraad = require('../kern/rtmail-draad')({ db, rtmail, vak: rtmailVak });
-/* De schrijfkant (concepten, uitgesteld verzenden, handtekening, afwezigheid,
-   aliassen) en de regels die BIJ DE BEZORGING draaien. De regels hangen aan de
-   haak in kern/rtmail.js, zodat ze langs elke bezorging komen -- ook langs post
-   die 's nachts uit een automatisering of van buiten binnenvalt, en dat is nu
-   juist de post waarvoor iemand een regel maakt. */
-const rtmailVrij = require('../kern/rtmail-vrij')({ rtmail, findSupplier,
-  CODENAMES: require('../accounts/kluis').CODENAMES });
-const rtmailSchrijf = require('../kern/rtmail-schrijf')({ db, save, crypto, rtmail, vrij: rtmailVrij });
-const rtmailRegels = require('../kern/rtmail-regels')({ db, save, crypto, rtmail, vak: rtmailVak, schrijf: rtmailSchrijf });
-
-/* Het dossier op een bericht in een gedeeld postvak: status, prioriteit,
-   interne notities, de klok en de koppeling aan klant of ticket. */
-const rtmailSla = require('../kern/rtmail-sla')({ db, save, rtmail, team: rtmailTeam });
-const rtmailDossier = require('../kern/rtmail-dossier')({ db, save, crypto, rtmail, team: rtmailTeam, sla: rtmailSla });
-/* De haak na elke bezorging draagt drie dingen, in deze volgorde: de regels van
-   de ontvanger, zijn afwezigheidsbericht, en de ontvangstbevestiging van een
-   gedeeld postvak. Een fout in een van de drie mag de bezorging niet ongedaan
-   maken -- kern/rtmail.js vangt hem daarom af en logt hem. */
-rtmail.zetNaBezorging((m) => { rtmailRegels.naBezorging(m); rtmailSla.naBezorging(m); });
+/* DE POSTLAAG. Elf modules die samen RTG Mail zijn: bezorgen, adressen, teams,
+   postvakken, gesprekken, schrijven, regels, dossiers, klok, rechten en
+   bewaarbeleid. Ze staan in ./postlaag.js omdat dit bestand anders over de tien
+   kilobyte gaat -- en omdat de BOUWVOLGORDE daar iets betekent: de haak na de
+   bezorging kan pas gezet worden als de regels en de klok bestaan. */
+const post = require('./postlaag')({ db, save, crypto, findSupplier });
+const { rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels,
+  rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar } = post;
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
 const automatisering = require('../kern/automatisering')({ rtmail });
 // Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
@@ -167,6 +140,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, scanNet, wacht, werkmail
+    resolveSession, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, scanNet, wacht, werkmail
   };
 };

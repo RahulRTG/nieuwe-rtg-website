@@ -78,6 +78,7 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/rtmail')(kern);
   require('../routes/rtmail-vak')(kern);
   require('../routes/rtmail-schrijf')(kern);
+  require('../routes/rtmail-bestuur')(kern);
   require('../routes/rtmail-team')(kern);
   require('../routes/werkmail')(kern);
   require('../routes/payroll')(kern);

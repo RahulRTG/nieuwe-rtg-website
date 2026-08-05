@@ -183,6 +183,7 @@
         v.appendChild(eigen);
       } else if (staat.keuze[i]) {
         var f = document.createElement('iframe');
+        window.RTGMedia.kader(f);   // camera/microfoon doorgeven; tekst in shared/media.js
         f.src = staat.keuze[i];
         f.title = 'Scherm in vlak ' + (i + 1);
         v.appendChild(f);

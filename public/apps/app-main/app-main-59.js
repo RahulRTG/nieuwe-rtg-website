@@ -87,7 +87,7 @@
     if (ontmoetSosPc) return;
     try {
       await haalIce();
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: 'environment' } });
+      const stream = await RTGMedia.camera({ achter: true, audio: true });
       const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
       ontmoetSosPc = pc; ontmoetSosDate = dateId;
       stream.getTracks().forEach(t => pc.addTrack(t, stream));

@@ -57,8 +57,9 @@
   }
   $('#opneem').addEventListener('click', function () {
     if (rec) { rec.stop(); return; }
-    if (!navigator.mediaDevices || !window.MediaRecorder) return meld('Opnemen kan niet op dit toestel.');
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+    if (!window.MediaRecorder) return meld('Opnemen kan niet op dit toestel: deze browser heeft geen MediaRecorder.');
+    // shared/media.js meldt zelf waarom de microfoon niet opengaat
+    window.RTGMedia.microfoon().then(function (stream) {
       delen = []; transcript = '';
       rec = new MediaRecorder(stream);
       rec.ondataavailable = function (e) { if (e.data && e.data.size) delen.push(e.data); };
@@ -88,7 +89,7 @@
           sr.start();
         } catch (e) { sr = null; }
       }
-    }).catch(function () { meld('Geen toegang tot de microfoon.'); });
+    }).catch(function (e) { meld((e.rtg && e.rtg.kort) || 'Geen toegang tot de microfoon.'); });
   });
 
   function bewaar(blob) {

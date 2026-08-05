@@ -107,6 +107,10 @@
   .appterug:hover{border-color:color-mix(in srgb, var(--goud) 55%, transparent);}
   .appterug svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
 </style>
+<!-- de mediapoort: camera en microfoon door een deur, met de reden erbij als het niet gaat.
+     Niet defer en hier in de kop: elk kader en elk scherm eronder moet RTGMedia al hebben. -->
+<link rel="stylesheet" href="/shared/media.css">
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <a href="#hoofd" class="skip">Naar het bureaublad</a>
@@ -412,7 +416,6 @@ window.I18N = { en: {
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-label', 'Geopende app');
   var frame = document.createElement('iframe');
-  frame.setAttribute('allow', 'fullscreen; geolocation; camera; microphone; clipboard-write');
   frame.title = 'RTG-app';
   overlay.appendChild(frame);
 
@@ -428,6 +431,10 @@ window.I18N = { en: {
     if (f && !(document.fullscreenElement || document.webkitFullscreenElement)) { try { f.call(e); } catch (x) {} }
   }
   function open(url, naam) {
+    // hier en niet bij het maken van het kader: dit script staat in de body en
+    // draait dus VOOR de defer-scripts, waaronder shared/media.js. Op het moment
+    // dat een tegel wordt aangeklikt staat die er wel.
+    window.RTGMedia.kader(frame);
     frame.src = url;
     frame.title = naam || 'RTG-app';
     overlay.classList.add('open');

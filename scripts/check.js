@@ -1992,5 +1992,124 @@ console.log('\n37) elke pagina die een hulpklasse gebruikt, laadt ook rtg-hulpkl
   }
 }
 
+/* 38) camera en microfoon gaan door EEN deur, en elk kader geeft het recht door.
+
+   WAAR DIT UIT KOMT. De klacht was "op mijn telefoon doet niks het" -- geen
+   camera, geen microfoon, en nergens een melding. De oorzaak zit niet in de
+   camera maar in het ADRES: buiten https (en localhost) bestaat
+   navigator.mediaDevices niet. Alle zeventien losse getUserMedia-aanroepen
+   liepen daar op een rauwe TypeError, en zeven ervan gaven `null` terug of
+   lieten de fout lopen. Er gebeurde dus niets, zonder melding -- en op een
+   laptop op localhost werkte het, want dat vindt de browser wel beveiligd.
+   test/media.e2e.js meet dat op een echt LAN-adres.
+
+   Daarom loopt alles nu via public/shared/media.js: die stelt de diagnose,
+   noemt de oorzaak hardop op het moment van gebruik, en geeft nooit stil een
+   null terug. Deze regel houdt drie dingen vast: de deur, het kaderrecht, en de
+   pagina die de module ook echt binnenhaalt. Dat laatste is niet formeel --
+   laadt een pagina media.js niet, dan is RTGMedia er niet en breekt elk scherm
+   dat hem gebruikt.
+
+   OVER HET KADERRECHT, EERLIJK. Bij het bouwen was de aanname dat een iframe
+   allow="camera; microphone" nodig heeft en dat vijf van de zes kaders hier dus
+   stil stuk waren. Die aanname is nagemeten en klopt NIET voor een same-origin
+   kader: featurePolicy.allowsFeature('camera') is daar true zonder allow en de
+   camera gaat gewoon open. Voor een kader naar een andere origin is het wel
+   verplicht, en dit huis heeft die niet (frame-ancestors 'self'). Onderdeel
+   38b repareert hier dus niets -- het houdt de bedoeling expliciet en op EEN
+   plek. Dat het er staat is een keuze, geen bugfix, en zo hoort het te lezen. */
+console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door');
+{
+  const PUB = path.join(ROOT, 'public');
+  const web = (p) => '/' + path.relative(PUB, p).split(path.sep).join('/');
+  const lees = (f) => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
+  const DEUR = 'public/shared/media.js';
+  if (!fs.existsSync(path.join(ROOT, DEUR))) {
+    fout(DEUR + ' ontbreekt; dan is er geen deur en meet deze regel niets');
+  } else {
+    /* Bestanden: alles in public behalve de uitvoer (dist) en de deur zelf.
+       Bundels tellen mee als bestand maar niet als bron -- regel 6 bewaakt dat
+       een bundel gelijk is aan zijn delen, dus een fout daar staat al in de
+       delen en dubbel melden helpt niemand. */
+    const { bundels } = require('./bundel');
+    const bundelPaden = new Set(Object.keys(bundels).map(k => '/' + k));
+    const bronnen = [];
+    loop(PUB, /\.(js|html)$/, f => {
+      const p = web(f);
+      if (p.startsWith('/dist/') || p === '/shared/media.js') return;
+      bronnen.push(f);
+    });
+
+    // 38a) niemand anders raakt getUserMedia aan.
+    let stiekem = 0;
+    for (const f of bronnen) {
+      if (bundelPaden.has(web(f))) continue;
+      const s = zonderCommentaar(lees(f));
+      if (!/\.getUserMedia\s*\(/.test(s)) continue;
+      stiekem++;
+      fout(web(f) + ' roept getUserMedia rechtstreeks aan; dat hoort via RTGMedia (shared/media.js)');
+    }
+    if (!stiekem) ok('geen enkel bestand buiten de mediapoort roept getUserMedia rechtstreeks aan');
+
+    /* 38b) wie een iframe MAAKT, geeft het recht door. Alleen createElement en
+       een <iframe> in een string tellen: een iframe in een stijlblad
+       (`#split iframe{...}`) maakt niets. Een statisch <iframe>-element in de
+       markup mag ook zijn eigen allow= dragen -- dat is dezelfde doorgifte,
+       alleen met de hand. */
+    let kaderloos = 0, kaders = 0;
+    for (const f of bronnen) {
+      if (bundelPaden.has(web(f))) continue;
+      const s = zonderCommentaar(lees(f));
+      const maakt = /createElement\(\s*['"]iframe['"]\s*\)/.test(s) || /['"`][^'"`]*<iframe\b/.test(s);
+      const statisch = /^\s*<iframe\b/m.test(s) || />\s*<iframe\b/.test(s);
+      if (!maakt && !statisch) continue;
+      kaders++;
+      if (/RTGMedia\.kader\s*\(/.test(s)) continue;
+      // een statisch kader met eigen allow= is ook doorgifte
+      if (statisch && !maakt && /<iframe\b[^>]*\ballow=/.test(s)) continue;
+      kaderloos++;
+      fout(web(f) + ' maakt een iframe zonder RTGMedia.kader(); camera en microfoon vallen daarin stil weg');
+    }
+    if (!kaderloos) ok(kaders + ' plekken maken een kader, en alle ' + kaders + ' geven het recht door');
+
+    /* 38c) een pagina die RTGMedia gebruikt, laadt shared/media.js ook. Net als
+       regel 37: het gebruik kan in de pagina zelf staan of in een script (of
+       bundeldeel) dat hij laadt.
+
+       WAT DIT NIET ZIET: een module die met createElement('script') wordt
+       binnengehaald. Op dit moment gebruikt geen van die modules (mond, sterren,
+       glyf, handenvrij-bureau, palet, wauw) de mediapoort -- nagekeken -- maar
+       als er ooit een bijkomt, valt hij hier niet op. */
+    const gebruikt = (s) => /\bRTGMedia\b/.test(s);
+    const paginas = [];
+    loop(PUB, /\.html$/, f => { if (!web(f).startsWith('/dist/')) paginas.push(f); });
+    let misDeur = 0, metDeur = 0;
+    for (const p of paginas) {
+      const s = lees(p);
+      let raakt = gebruikt(zonderCommentaar(s));
+      if (!raakt) {
+        for (const m of s.matchAll(/<script[^>]*src="(\/[^"]+\.js)"/g)) {
+          if (m[1] === '/shared/media.js') continue;
+          const f = path.join(PUB, m[1].slice(1));
+          if (gebruikt(zonderCommentaar(lees(f)))) { raakt = true; break; }
+          const delen = f.replace(/\.js$/, '');
+          let namen = []; try { namen = fs.readdirSync(delen); } catch (e) { namen = []; }
+          if (namen.some(n => n.endsWith('.js') && gebruikt(zonderCommentaar(lees(path.join(delen, n)))))) { raakt = true; break; }
+        }
+      }
+      if (!raakt) continue;
+      metDeur++;
+      if (!s.includes('/shared/media.js')) {
+        misDeur++;
+        fout(web(p) + ' gebruikt RTGMedia maar laadt /shared/media.js niet');
+      } else if (!s.includes('/shared/media.css')) {
+        misDeur++;
+        fout(web(p) + ' laadt de mediapoort maar niet /shared/media.css; de melding staat er dan zonder vorm');
+      }
+    }
+    if (!misDeur) ok(metDeur + ' pagina\'s gebruiken de mediapoort, en alle ' + metDeur + ' laden module en blad');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

@@ -240,6 +240,42 @@ volledig op het toestel en verlaat er geen beeld het apparaat. Dat is de
 werkvloer, waar een camera de hele dag aan staat; zwijgend meekijken zou daar
 een surveillancesysteem zijn. Hier richt het lid zelf, tikt zelf en vraagt zelf.
 
+### De mediapoort: waarom de camera niet opengaat (`shared/media.js`)
+
+Camera en microfoon lopen door **één deur**. Niet als opruiming, maar omdat de
+zeventien losse `getUserMedia`-aanroepen die er stonden allemaal iets anders
+deden bij een fout — zeven gaven stil `null` terug, drie lieten de fout lopen.
+En de belangrijkste oorzaak is er een die je niet ziet: **buiten https (en
+localhost) bestaat `navigator.mediaDevices` niet.** Een telefoon die de server
+op `http://192.168.x.x` opent heeft dus geen camera-API, terwijl exact dezelfde
+code op `http://localhost` werkt. Er gebeurde dan niets, en niemand zei waarom.
+
+`RTGMedia` stelt de diagnose vóórdat hij het de browser vraagt en noemt de
+oorzaak hardop, op het moment van gebruik. Vijf oorzaken, vijf verschillende
+handelingen: **onveilig** (het adres), **kader** (een iframe dat het recht niet
+doorgeeft), **geweigerd** (het slotje in de adresbalk), **geenapparaat**,
+**bezet**. Eén melding voor alle vijf — "geen toegang tot de camera" — stuurt de
+gebruiker naar een knop die er niet is.
+
+```js
+const stroom = await RTGMedia.camera({ achter: true });   // scannen
+const mic    = await RTGMedia.microfoon();
+if (!RTGMedia.kan()) toon(RTGMedia.teksten[RTGMedia.reden()].uitleg);
+```
+
+De belofte breekt met een `Error` die `fout.rtg = { code, kort, uitleg }`
+draagt, zodat een scherm de tekst ook zelf kan plaatsen (`{ stil: true }`).
+Regel 38 van `npm run keuring` houdt vast dat niemand er langs gaat, dat elk
+iframe het recht doorgeeft (`RTGMedia.kader(el)`, één tekst op één plek), en dat
+elke pagina die de poort gebruikt hem ook laadt. `test/media.e2e.js` meet het in
+een echte browser op een echt LAN-adres.
+
+**Op een telefoon draait het dus op https.** `RTG_TLS=1 npm start` geeft meteen
+https met een self-signed certificaat (genoeg om te proberen; je accepteert op
+het toestel één keer de waarschuwing). Staat de server plat op het netwerk, dan
+zegt hij dat bij het opstarten met het adres erbij
+(`server/opzet/veiligadres.js`) — en zwijgt hij zodra het niet meer speelt.
+
 ### Het salongesprek: Rahul kletst met de Rahul van je vriend
 
 Een gimmick, en we noemen het ook zo (`server/kern/kletspraat/`). Twee AI's die

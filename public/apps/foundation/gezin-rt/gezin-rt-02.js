@@ -2,7 +2,9 @@
   function seinNaar(naar, kind, payload, video) { post('/gezin/bel', { naar: naar, kind: kind, payload: payload || null, video: !!video }).catch(function () {}); }
   function belUI(open) { var s = document.getElementById('grt-call'); if (s) s.style.display = open ? 'flex' : 'none'; if (!open) { var r = document.getElementById('grt-remote'), l = document.getElementById('grt-local'); if (r) r.srcObject = null; if (l) l.srcObject = null; } }
   function tijdTik() { if (!call) return; var s = Math.round((Date.now() - call.t0) / 1000); var el = document.getElementById('grt-tijd'); if (el) el.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
-  function pakMedia(video) { return navigator.mediaDevices.getUserMedia({ audio: true, video: video ? { facingMode: 'user' } : false }).catch(function () { return null; }); }
+  // shared/media.js meldt zelf waarom het niet gaat; hier bleef anders een
+  // stille null over, en dan gebeurde er bij "bellen" gewoon niets.
+  function pakMedia(video) { return window.RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }).catch(function () { return null; }); }
   var iceConfig = null;
   // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
   function haalIce() { return fetch('/api/ice').then(function (r) { return r.json(); }).then(function (d) { iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }

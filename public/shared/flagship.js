@@ -80,6 +80,7 @@
     // het ROS-scherm zelf, ingeladen als klein kader; werkt en beweegt mee
     body.style.padding = '0';
     var f = d.createElement('iframe');
+    window.RTGMedia.kader(f);   // camera/microfoon doorgeven; tekst in shared/media.js
     f.src = wd.app || '/apps/index.html';
     f.setAttribute('title', wd.naam || 'RTG-app');
     f.setAttribute('loading', 'lazy');

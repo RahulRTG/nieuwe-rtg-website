@@ -184,6 +184,10 @@
   #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:var(--knop);color:var(--knop-txt);font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
 </style>
+<!-- de mediapoort: camera en microfoon door een deur, met de reden erbij als het niet gaat.
+     Niet defer en hier in de kop: elk kader en elk scherm eronder moet RTGMedia al hebben. -->
+<link rel="stylesheet" href="/shared/media.css">
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#content">Naar de inhoud</a>
@@ -342,7 +346,9 @@
         let geladen=false;
         sw.addEventListener('scroll',()=>{
           const prive=sw.scrollLeft>sw.clientWidth/2;
-          if(prive&&!geladen){ geladen=true; fr.src='/apps/berichten.html'; }
+          // camera/microfoon doorgeven aan het kader (shared/media.js); zonder
+          // dat weigert de browser ze in de ingesloten Berichten-app
+          if(prive&&!geladen){ geladen=true; RTGMedia.kader(fr); fr.src='/apps/berichten.html'; }
           w.classList.toggle('aan',!prive); p.classList.toggle('aan',prive);
           p.textContent=prive?'Privé':'Privé · swipe ←';
         },{passive:true});

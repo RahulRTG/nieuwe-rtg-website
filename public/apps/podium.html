@@ -78,6 +78,10 @@
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 </style>
+<!-- de mediapoort: camera en microfoon door een deur, met de reden erbij als het niet gaat.
+     Niet defer en hier in de kop: elk kader en elk scherm eronder moet RTGMedia al hebben. -->
+<link rel="stylesheet" href="/shared/media.css">
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#inhoud">Naar inhoud</a>
@@ -381,8 +385,8 @@
   /* ---------- de studio (makerkant: de bron van de boom) ---------- */
   let stream = null, studioLive = false;
   async function studioStart() {
-    try { stream = stream || await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: true }); }
-    catch (e) { return zeg('Camera en microfoon zijn nodig om uit te zenden.'); }
+    try { stream = stream || await RTGMedia.vraag({ video: { width: 1280, height: 720 }, audio: true }, { stil: true }); }
+    catch (e) { return zeg((e.rtg && (e.rtg.kort + '. ' + e.rtg.uitleg)) || 'Camera en microfoon zijn nodig om uit te zenden.'); }
     bronStream = stream;   // de maker is de wortel: zijn camera is de stream die de boom in gaat
     $('#studioVideo').srcObject = stream;
     const m = zaal && zaal.mijn;

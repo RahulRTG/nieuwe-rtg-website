@@ -34,12 +34,20 @@ module.exports = function luister(deps) {
   const HOST = process.env.RTG_BIND ||
     ((process.env.RTG_CLUSTER_KEY || process.env.RTG_DOMAINS) ? '127.0.0.1' : '');
   function gestart() {
+    /* Het protocol uit de werkelijkheid en niet uit een aanname. Met RTG_TLS=1
+       termineert de app zelf TLS (web/index.js), en dan stond hier tot nu toe
+       http:// -- juist in de stand die je zet omdat je https nodig hebt voor
+       camera en microfoon. Een adres dat niet werkt is erger dan geen adres. */
+    const schema = process.env.RTG_TLS === '1' ? 'https' : 'http';
     if (process.env.RTG_SERVER) {
       console.log(`klaar op poort ${PORT}, rol: ${db.writable ? 'actief' : 'standby'}`);
     } else {
-      console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/app.html`);
+      console.log(`RTG-portaal draait op ${schema}://localhost:${PORT}, open ${schema}://localhost:${PORT}/apps/app.html`);
     }
     console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
+    // camera en microfoon werken op een telefoon alleen op https; opzet/
+    // veiligadres.js waarschuwt op http en wijst op https de weg naar het toestel
+    require('./veiligadres')({ PORT, HOST });
   }
   const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
 

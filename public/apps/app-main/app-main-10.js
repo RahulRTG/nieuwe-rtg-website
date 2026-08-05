@@ -70,8 +70,9 @@
     return pc;
   }
   async function pakMedia(video){
-    try { return await navigator.mediaDevices.getUserMedia({ audio: true, video: video ? { facingMode: 'user' } : false }); }
-    catch(e){ toast(T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
+    // shared/media.js noemt de oorzaak en plaatst de volle uitleg zelf
+    try { return await RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }); }
+    catch(e){ toast((e.rtg && e.rtg.kort) || T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
   }
   function toonGesprek(naam, video){
     $('#csNaam').textContent = naam; $('#csNaam2').textContent = naam;

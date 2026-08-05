@@ -33,8 +33,10 @@
   }
   async function pakMedia(){
     if (stream) return stream;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: 'user' } }); return stream; }
-    catch (e) { toast(T('tc.geenmedia', 'Geen toegang tot camera of microfoon.')); return null; }
+    // shared/media.js noemt de oorzaak; de toast krijgt de korte regel en de
+    // volle uitleg staat in de eigen melding van die laag.
+    try { stream = await RTGMedia.camera({ voor: true, audio: true }); return stream; }
+    catch (e) { toast((e.rtg && e.rtg.kort) || T('tc.geenmedia', 'Geen toegang tot camera of microfoon.')); return null; }
   }
 
   /* ---------- de gespreks-UI: een raster van tegels ---------- */

@@ -77,11 +77,24 @@
     hint.addEventListener('click', function (e) { if (e.target.tagName === 'A') toonHand(); });
 
     var Scanner = root.RTGScanner;
-    if (!Scanner || !root.navigator || !root.navigator.mediaDevices) {
-      toonHand(opties.geenCamera || 'Camera niet beschikbaar op dit toestel; typ de code hieronder.'); return { sluit: sluit };
+    if (!Scanner) {
+      toonHand('De scanner-module is niet geladen; typ de code hieronder.'); return { sluit: sluit };
+    }
+    /* Wat de mediapoort zonder te vragen al weet, zeggen we voordat we de knop
+       aanbieden. Anders staat er een camerabeeld-podium te wachten op iets dat
+       nooit komt. */
+    var vooraf = root.RTGMedia && root.RTGMedia.reden('camera');
+    if (vooraf) {
+      var t = root.RTGMedia.teksten[vooraf];
+      toonHand(t.kort + '. ' + t.uitleg); return { sluit: sluit };
     }
     scanner = new Scanner.Scanner({ video: video, onCode: function (c) { treffer(c.tekst, c.formaat); }, onFout: function () {} });
-    scanner.start().catch(function () { toonHand(opties.geenToegang || 'De camera kon niet starten. Typ de code hieronder.'); });
+    // de reden uit de mediapoort erbij: "kon niet starten" laat de gebruiker
+    // zoeken, "dit adres is http" vertelt hem wat hij moet doen
+    scanner.start().catch(function (e) {
+      var r = e && e.rtg;
+      toonHand(r ? r.kort + '. ' + r.uitleg : (opties.geenToegang || 'De camera kon niet starten. Typ de code hieronder.'));
+    });
     return { sluit: sluit };
   }
 

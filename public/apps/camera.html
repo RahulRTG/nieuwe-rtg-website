@@ -111,6 +111,10 @@
   .aknop.goud{border-color:var(--gold);color:var(--gold);}
   .aknop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 </style>
+<!-- de mediapoort: camera en microfoon door een deur, met de reden erbij als het niet gaat.
+     Niet defer en hier in de kop: elk kader en elk scherm eronder moet RTGMedia al hebben. -->
+<link rel="stylesheet" href="/shared/media.css">
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <h1 class="vis-verborgen">RTG Camera</h1>
@@ -454,18 +458,14 @@ window.Studio = (function () {
   /* ---------- de camera: hoogste kwaliteit die het toestel geeft ---------- */
   let stroom = null, kant = 'environment', spoor = null;
   async function start() {
-    /* Buiten een beveiligde context (https of localhost) BESTAAT
-       navigator.mediaDevices niet; "geef toegang" is dan een misleidende
-       raad, want er valt niets toe te staan. Eerst de echte oorzaak. */
-    if (!window.isSecureContext || !navigator.mediaDevices) {
-      $('#geenCamTekst').textContent = 'Dit adres is onbeveiligd (http), en een browser geeft de camera alleen vrij op een beveiligd adres. Open de app via het https-adres; Rahul’s fototips werken ondertussen gewoon.';
-      $('#geenCam').classList.add('aan');
-      return;
-    }
     if (stroom) stroom.getTracks().forEach(t => t.stop());
     try {
-      stroom = await navigator.mediaDevices.getUserMedia({ audio: false, video: {
-        facingMode: kant, width: { ideal: 4096 }, height: { ideal: 2160 } } });
+      /* Via de mediapoort (shared/media.js): die stelt de diagnose -- onveilig
+         adres, kader dat het recht niet doorgeeft, geweigerd, geen apparaat,
+         bezet -- en geeft de reden mee. Dit scherm heeft er zelf een plek voor
+         (#geenCamTekst), dus vragen we hem stil en zetten we hem daar neer. */
+      stroom = await RTGMedia.vraag({ audio: false, video: {
+        facingMode: kant, width: { ideal: 4096 }, height: { ideal: 2160 } } }, { stil: true });
       beeld.srcObject = stroom;
       spoor = stroom.getVideoTracks()[0];
       zoeker.classList.toggle('spiegel', kant === 'user');
@@ -473,7 +473,11 @@ window.Studio = (function () {
       // de lamp (torch) alleen tonen als dit toestel hem echt heeft
       const kan = spoor.getCapabilities ? spoor.getCapabilities() : {};
       $('#flitsKnop').hidden = !kan.torch;
-    } catch (e) { $('#geenCam').classList.add('aan'); }
+    } catch (e) {
+      const r = e.rtg || { kort: 'Camera gaat niet open', uitleg: e.message };
+      $('#geenCamTekst').textContent = r.kort + '. ' + r.uitleg + ' Rahul’s fototips werken ondertussen gewoon.';
+      $('#geenCam').classList.add('aan');
+    }
   }
   $('#wisselKnop').addEventListener('click', () => { kant = kant === 'user' ? 'environment' : 'user'; start(); });
   let lamp = false;

@@ -18,6 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const crypto = require('crypto');
+const { herschrijfHtml: stijlbundelHtml } = require('./stijlbundel');
 
 /* STIJL: EEN NONCE VOOR DE BLOKKEN, EN unsafe-inline ALLEEN NOG VOOR ATTRIBUTEN.
 
@@ -119,6 +120,10 @@ function cspNonce(publicDir, aan) {
       if (err) return next(); // bestaat niet: laat de statische laag/404 het doen
       if (paginaHaak) { try { paginaHaak(rel); } catch (e) {} }
       const nonce = crypto.randomBytes(16).toString('base64');
+      /* Een rij opeenvolgende stijlbladen wordt EEN verwijzing. Dit gaat voor de
+         stempels uit: wat hier verdwijnt hoeft geen nonce meer. Zie
+         ./stijlbundel.js voor wat er wel en niet in mag. */
+      html = stijlbundelHtml(html);
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       // dezelfde behandeling voor de stijlblokken: sinds style-src een nonce
       // draagt, komt een ongestempeld blok er niet meer doorheen

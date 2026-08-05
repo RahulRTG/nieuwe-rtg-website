@@ -30,6 +30,7 @@ module.exports = function poortwachters(deps) {
   const { schakelaars } = require('../middleware/functieschakelaars');
   const { jsonGzip, statischGzip } = require('../middleware/compressie');
   const { bureaublad, cspNonce } = require('../middleware/voordeur');
+  const { stijlbundel, PAD: stijlbundelPad } = require('../middleware/stijlbundel');
 
   const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
   const functies = require('../functies');
@@ -68,6 +69,11 @@ module.exports = function poortwachters(deps) {
 
   bureaublad(app);
   app.use(cspNonce(PUBLIC_DIR, CSP_NONCE));
+  /* De gebundelde stijlbladen. Staat NA cspNonce: die laag schrijft de
+     verwijzing in de pagina, deze laag levert hem uit. Zie
+     ../middleware/stijlbundel.js voor waarom dit wel bij CSS mag en niet bij
+     scripts. */
+  app.get(stijlbundelPad, stijlbundel(PUBLIC_DIR));
   app.get(/\.(?:js|css|svg|json|webmanifest)$/, statischGzip(PUBLIC_DIR));
   /* Zelfde cache-regel als statischGzip (zie compressie.js): script en stijl
      altijd laten navragen (ETag/304), anders serveert een tussenlaag na een

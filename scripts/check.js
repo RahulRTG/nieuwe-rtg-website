@@ -1938,5 +1938,59 @@ console.log('\n36) geen proefrestant in de laatste commit');
   }
 }
 
+/* 37) een pagina die een hulpklasse gebruikt, laadt ook het blad waar hij in staat.
+
+   De hulpklassen (public/shared/rtg-hulpklassen.css) vervangen style="..."-
+   attributen, zodat style-src-attr ooit dicht kan. Dat werkt alleen als de
+   pagina dat blad ook binnenhaalt -- en als hij dat NIET doet, breekt er niets
+   zichtbaar op de plek waar je kijkt: het element verliest gewoon zijn marge of
+   zijn kleur. Precies het soort stille breuk waar deze lijst voor bestaat.
+
+   De klassen komen uit het blad zelf en niet uit een lijst hier: een tweede
+   lijst loopt binnen een week uit de pas (LAT.md regel 4). Een pagina "gebruikt"
+   een klasse als hij hem zelf draagt, of als een script of bundel die hij laadt
+   hem draagt. */
+console.log('\n37) elke pagina die een hulpklasse gebruikt, laadt ook rtg-hulpklassen.css');
+{
+  const BLAD = path.join(ROOT, 'public/shared/rtg-hulpklassen.css');
+  if (!fs.existsSync(BLAD)) {
+    fout('public/shared/rtg-hulpklassen.css ontbreekt, dus deze regel is niet vast te stellen');
+  } else {
+    const klassen = Array.from(fs.readFileSync(BLAD, 'utf8').matchAll(/^\.(h-[a-z0-9]+)\s*\{/gm)).map(m => m[1]);
+    if (!klassen.length) {
+      fout('geen enkele .h-klasse gevonden in rtg-hulpklassen.css; dan meet deze regel niets');
+    } else {
+      const draagt = new RegExp('class="[^"]*\\b(?:' + klassen.join('|') + ')\\b');
+      const PUB = path.join(ROOT, 'public');
+      const web = (p) => '/' + path.relative(PUB, p).split(path.sep).join('/');
+      const paginas = [];
+      loop(PUB, /\.html$/, f => { if (!web(f).startsWith('/dist/')) paginas.push(f); });
+      const lees = (f) => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
+      let mis = 0, met = 0;
+      for (const p of paginas) {
+        const s = lees(p);
+        let gebruikt = draagt.test(s);
+        if (!gebruikt) {
+          for (const m of s.matchAll(/<script[^>]*src="(\/[^"]+\.js)"/g)) {
+            const f = path.join(PUB, m[1].slice(1));
+            if (draagt.test(lees(f))) { gebruikt = true; break; }
+            // een bundel: de delen staan in een map met dezelfde naam
+            const delen = f.replace(/\.js$/, '');
+            let namen = []; try { namen = fs.readdirSync(delen); } catch (e) { namen = []; }
+            if (namen.some(n => n.endsWith('.js') && draagt.test(lees(path.join(delen, n))))) { gebruikt = true; break; }
+          }
+        }
+        if (!gebruikt) continue;
+        met++;
+        if (!s.includes('rtg-hulpklassen.css')) {
+          mis++;
+          fout(web(p) + ' gebruikt een hulpklasse maar laadt rtg-hulpklassen.css niet');
+        }
+      }
+      if (!mis) ok(met + ' pagina\'s gebruiken een hulpklasse, en alle ' + met + ' laden het blad (' + klassen.length + ' klassen)');
+    }
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

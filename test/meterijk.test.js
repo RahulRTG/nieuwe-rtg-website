@@ -390,48 +390,50 @@ const IJKINGEN = {
      is de scherpste: cijfers van een run die zijn eigen drempels niet haalde,
      zijn geen lat om aan vast te houden -- en een meter die ze toch overneemt,
      legt een slechte dag vast als de nieuwe standaard. */
-  ...prestatieIjkingen(),
+  /* DE ZES STAAN UITGESCHREVEN, en dat is geen slordigheid. Ze stonden eerst
+     als `...prestatieIjkingen()` -- korter, maar scripts/check.js LEEST deze
+     registratie als tekst en kon de sleutels dan niet vinden. Terecht: een
+     registratie waarvan je moet uitvoeren om te weten wat erin staat, is voor
+     wie hem naleest geen registratie. De proef zelf staat wel op EEN plek. */
+  p99Ms: { proef: () => prestatieIjking('p99Ms') },
+  doorvoerPerSec: { proef: () => prestatieIjking('doorvoerPerSec') },
+  eventLoopP99Ms: { proef: () => prestatieIjking('eventLoopP99Ms') },
+  herstelSeconden: { proef: () => prestatieIjking('herstelSeconden') },
+  verhalenSlaagPctStorm: { proef: () => prestatieIjking('verhalenSlaagPctStorm') },
+  geheugenHellingMBPerMin: { proef: () => prestatieIjking('geheugenHellingMBPerMin') }
 };
 
-/* De zes proeven in een lus: ze verschillen alleen in hun sleutel en in een
-   cijfer, en zes keer hetzelfde uitschrijven is zes kansen om er een te
-   vergeten bij te werken. */
-function prestatieIjkingen() {
-  const uit = {};
-  for (const m of norm.PRESTATIEMETERS) {
-    uit[m.sleutel] = {
-      proef: () => {
-        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-prestatie-ijk-'));
-        const pad = path.join(dir, 'BEPROEVING.json');
-        const schrijf = (oordeel, waarde) => fs.writeFileSync(pad, JSON.stringify({
-          oordeel, gezakteDrempels: oordeel === 'PASS' ? 0 : 2, gedraaid: '2026-01-01T00:00:00.000Z',
-          machine: { cpus: 4, geheugenGB: 17, platform: 'linux' }, opslag: 'sqlite',
-          meters: { [m.sleutel]: waarde } }));
-        try {
-          // 1. een geslaagde ronde levert het cijfer dat erin staat
-          schrijf('PASS', 4242);
-          const goed = norm.leesPrestatie(pad);
-          assert.ok(goed.cijfers, 'een geslaagde beproeving levert cijfers: ' + goed.reden);
-          assert.equal(goed.cijfers[m.sleutel], 4242, 'de meter leest wat er in het bestand staat');
-          assert.ok(goed.bron, 'en zegt op welke machine het gemeten is');
+/* De proef achter alle zes. Ze verschillen alleen in hun sleutel, dus staat de
+   inhoud op EEN plek -- zes kopieen zijn zes kansen om er een te vergeten bij
+   te werken. */
+function prestatieIjking(sleutel) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-prestatie-ijk-'));
+  const pad = path.join(dir, 'BEPROEVING.json');
+  const schrijf = (oordeel, waarde) => fs.writeFileSync(pad, JSON.stringify({
+    oordeel, gezakteDrempels: oordeel === 'PASS' ? 0 : 2, gedraaid: '2026-01-01T00:00:00.000Z',
+    machine: { cpus: 4, geheugenGB: 17, platform: 'linux' }, opslag: 'sqlite',
+    meters: { [sleutel]: waarde } }));
+  try {
+    // 1. een geslaagde ronde levert het cijfer dat erin staat
+    schrijf('PASS', 4242);
+    const goed = norm.leesPrestatie(pad);
+    assert.ok(goed.cijfers, 'een geslaagde beproeving levert cijfers: ' + goed.reden);
+    assert.equal(goed.cijfers[sleutel], 4242, 'de meter leest wat er in het bestand staat');
+    assert.ok(goed.bron, 'en zegt op welke machine het gemeten is');
 
-          // 2. een GEZAKTE ronde levert er GEEN, met de reden erbij
-          schrijf('FAIL', 4242);
-          const slecht = norm.leesPrestatie(pad);
-          assert.ok(!slecht.cijfers, 'een gezakte beproeving levert geen norm');
-          assert.match(slecht.reden, /GEZAKT/);
+    // 2. een GEZAKTE ronde levert er GEEN, met de reden erbij
+    schrijf('FAIL', 4242);
+    const slecht = norm.leesPrestatie(pad);
+    assert.ok(!slecht.cijfers, 'een gezakte beproeving levert geen norm');
+    assert.match(slecht.reden, /GEZAKT/);
 
-          // 3. een onleesbaar of ontbrekend bestand zegt WAT er mis is
-          fs.writeFileSync(pad, 'geen json');
-          assert.match(norm.leesPrestatie(pad).reden, /onleesbaar/);
-          fs.rmSync(pad);
-          assert.match(norm.leesPrestatie(pad).reden, /ontbreekt/);
-          return 1;   // alle drie de foute invoeren zijn gezien
-        } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
-      }
-    };
-  }
-  return uit;
+    // 3. een onleesbaar of ontbrekend bestand zegt WAT er mis is
+    fs.writeFileSync(pad, 'geen json');
+    assert.match(norm.leesPrestatie(pad).reden, /onleesbaar/);
+    fs.rmSync(pad);
+    assert.match(norm.leesPrestatie(pad).reden, /ontbreekt/);
+    return 1;   // alle drie de foute invoeren zijn gezien
+  } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
 }
 
 test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {

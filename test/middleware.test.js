@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
 const path = require('path');
 
 const { herschrijf, cspNonce, bureaublad, CSP } = require('../server/middleware/voordeur');
-const { jsonGzip, statischGzip, wilGzip } = require('../server/middleware/compressie');
+const { jsonGzip, statischGzip, wilGzip, wilBrotli } = require('../server/middleware/compressie');
 const { opslagPoort, hoofdzekering } = require('../server/middleware/remmen');
 const { natieNaarLand, ZIN } = require('../server/middleware/functieschakelaars');
 
@@ -124,12 +124,44 @@ test('5. de compressielaag laat kleine antwoorden met rust', async () => {
   assert.equal(await proef(klein, 'gzip'), 'geen', 'onder een kilobyte kost gzip meer dan het oplevert');
   assert.equal(await proef(groot, 'gzip'), 'gzip', 'een groot antwoord gaat wel gecomprimeerd');
   assert.equal(await proef(groot, null), 'geen', 'en nooit als de client er niet om vraagt');
+  // brotli waar de client hem aanbiedt, en hij WINT van gzip als beide mogen
+  assert.equal(await proef(groot, 'br'), 'br');
+  assert.equal(await proef(groot, 'gzip, deflate, br'), 'br');
+  assert.equal(await proef(groot, 'deflate'), 'geen', 'deflate vragen is geen gzip vragen');
 });
 
-test('6. wilGzip leest de accept-encoding zorgvuldig', () => {
+test('5b. brotli levert echt kleinere bytes, en alleen aan wie erom vraagt', async () => {
+  /* Het punt van brotli is niet dat de kop anders is maar dat er MINDER over
+     de lijn gaat. Een laag die de kop op "br" zet en gzip-bytes stuurt, zou
+     hier groen blijven als we alleen de kop controleerden -- en bij de client
+     gewoon stuk gaan. */
+  const groot = { rij: new Array(400).fill('een tamelijk lange tekst per element') };
+  const meet = async (encoding) => {
+    const req = nepReq('/api/iets', { 'accept-encoding': encoding });
+    const res = nepRes();
+    await draai(jsonGzip(), req, res);
+    res.json(groot);
+    return { kop: res.kop['content-encoding'], bytes: Buffer.from(res.body) };
+  };
+  const g = await meet('gzip'), b = await meet('br');
+  assert.equal(g.kop, 'gzip'); assert.equal(b.kop, 'br');
+  assert.ok(b.bytes.length < g.bytes.length, 'brotli is kleiner dan gzip: ' + b.bytes.length + ' vs ' + g.bytes.length);
+  // en de bytes zijn ECHT brotli: ze pakken uit tot precies het antwoord
+  const zlib = require('zlib');
+  assert.deepEqual(JSON.parse(zlib.brotliDecompressSync(b.bytes).toString()), groot);
+  assert.deepEqual(JSON.parse(zlib.gunzipSync(g.bytes).toString()), groot);
+});
+
+test('6. wilGzip en wilBrotli lezen de accept-encoding zorgvuldig', () => {
   assert.equal(wilGzip({ headers: { 'accept-encoding': 'gzip, deflate, br' } }), true);
   assert.equal(wilGzip({ headers: { 'accept-encoding': 'br' } }), false);
   assert.equal(wilGzip({ headers: {} }), false);
+  assert.equal(wilBrotli({ headers: { 'accept-encoding': 'gzip, deflate, br' } }), true);
+  assert.equal(wilBrotli({ headers: { 'accept-encoding': 'gzip' } }), false);
+  assert.equal(wilBrotli({ headers: {} }), false);
+  /* "brotli" is geen "br", en een woord dat toevallig br bevat ook niet -- de
+     kop is een lijst van tokens en geen zoekopdracht. */
+  assert.equal(wilBrotli({ headers: { 'accept-encoding': 'brotli-achtig' } }), false);
 });
 
 test('7. de statische laag comprimeert, cachet en laat de rest gaan', async () => {
@@ -146,6 +178,21 @@ test('7. de statische laag comprimeert, cachet en laat de rest gaan', async () =
   const twee = await draai(laag, nepReq('/shared/qr.js', gz), nepRes());
   assert.ok(Buffer.compare(Buffer.from(een.res.body), Buffer.from(twee.res.body)) === 0,
     'de cache levert precies hetzelfde');
+
+  /* DEZELFDE BESTANDEN, ANDERE VORM. Beide vormen staan in dezelfde cache-rij,
+     dus dit is de plek waar een verwisseling zou ontstaan: brotli-bytes onder
+     een gzip-kop, of andersom. Daarom wordt hier niet alleen de kop maar ook
+     de INHOUD nagerekend -- en de ETag moet verschillen, anders geeft een
+     tussenliggende cache het verkeerde antwoord aan de verkeerde client. */
+  const zlib = require('zlib');
+  const brRes = await draai(laag, nepReq('/shared/qr.js', { 'accept-encoding': 'br' }), nepRes());
+  assert.equal(brRes.res.kop['content-encoding'], 'br');
+  assert.ok(brRes.res.body.length < een.res.body.length,
+    'brotli is kleiner: ' + brRes.res.body.length + ' vs ' + een.res.body.length);
+  const uitBr = zlib.brotliDecompressSync(Buffer.from(brRes.res.body));
+  const uitGz = zlib.gunzipSync(Buffer.from(een.res.body));
+  assert.ok(Buffer.compare(uitBr, uitGz) === 0, 'beide vormen leveren hetzelfde bestand op');
+  assert.notEqual(brRes.res.kop['etag'], een.res.kop['etag'], 'een andere vorm hoort een andere ETag te hebben');
 
   // wie niet om gzip vraagt, een onbekende soort, of een pad omhoog: doorgeven
   assert.equal((await draai(laag, nepReq('/shared/qr.js'), nepRes())).door, true);

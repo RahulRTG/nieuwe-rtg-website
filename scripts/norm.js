@@ -139,6 +139,30 @@ const METERS = [
      nieuwe. Hij hoort op nul te blijven staan: elke stijging is een kop die
      opnieuw breder is dan het bestand. */
   { sleutel: 'kernOngebruikt', richting: 'omlaag', wat: 'namen die een routebestand uit kern PAKT en nergens gebruikt' },
+  /* KAN DEZE TOETS EIGENLIJK ZAKKEN? (scripts/mutatie.js -> MUTATIES.json)
+
+     LAT.md regel 9 zegt dat een toets die niet kan zakken erger is dan geen
+     toets. BEWIJS.md liet zien hoe groot dat gat hier was: van de 612
+     toetsbestanden noemden er 586 geen enkele mutatie. Dat is geen bewijs dat ze
+     niets waard zijn -- het is bewijs dat niemand het WEET, en dat is precies wat
+     een meter moet oplossen.
+
+     De motor probeert het per bestand. Pure toetsen krijgen een mechanische
+     mutatie in de module die ze laden; servertoetsen krijgen de liegpoort over
+     alle /api/-paden. Zakt de toets: bewezen gevoelig. Blijft hij groen: hij legt
+     het gedrag dat de motor kan raken niet vast.
+
+     TWEE METERS EN GEEN EEN, want dat zijn twee verschillende dingen:
+
+       toetsenOverleefdeMutatie  gemeten EN groen gebleven. Dit is de echte
+                                 schuld: hier weet je nu dat er iets mist.
+       toetsenNietGemeten        de motor is er nog niet langs geweest. Dit is de
+                                 dekking van het INSTRUMENT, niet van de code.
+
+     Ze samentellen zou de tweede voor de eerste laten doorgaan -- dezelfde fout
+     als de geblende teller hieronder, die om die reden is opgeknipt. */
+  { sleutel: 'toetsenOverleefdeMutatie', richting: 'omlaag', wat: 'toetsen die een mutatie in hun eigen bron overleefden (bewezen ongevoelig)' },
+  { sleutel: 'toetsenNietGemeten', richting: 'omlaag', wat: 'toetsen waar de mutatiemotor nog niet langs is geweest' },
   /* DEZE METER WAS EEN GEBLENDE TELLER, precies zoals keuringBeter dat was, en
      hij liep om dezelfde reden vast: hij telde twee onvergelijkbare dingen bij
      elkaar op, en de ene groep botste met een ANDERE meter in deze lijst.
@@ -381,6 +405,25 @@ function meet() {
   const zelfpoortendeToetsen = skips.dienst;
   const browserpoortToetsen = skips.browser;
 
+  /* De mutatie-uitslag. Ontbreekt MUTATIES.json, dan hoort dit te ZAKKEN en niet
+     stilzwijgend nul te melden (LAT.md regel 3): nul overlevers zou dan als
+     perfect scoren terwijl er niets is gemeten. */
+  const mutaties = (() => {
+    const p = path.join(WORTEL, 'MUTATIES.json');
+    let rauw;
+    try { rauw = JSON.parse(fs.readFileSync(p, 'utf8')).toetsen || {}; }
+    catch (e) { throw new Error('MUTATIES.json is er niet of onleesbaar (' + e.message + '); draai npm run mutatie -- twee meters hebben hem als invoer'); }
+    const alle = inMap.filter(n => /\.(test|e2e)\.js$/.test(n));
+    let overleefd = 0, nietGemeten = 0;
+    for (const n of alle) {
+      const m = rauw[n];
+      if (!m) { nietGemeten++; continue; }
+      if (m.staat === 'overleefd') overleefd++;
+      else if (m.staat !== 'gezakt') nietGemeten++;   // 'al rood', 'geen module gevonden', ...
+    }
+    return { overleefd, nietGemeten };
+  })();
+
   /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
   const PUB = path.join(WORTEL, 'public');
   const bundelPaden = new Set(Object.keys(require('./bundel').bundels).map(k => path.join(PUB, k)));
@@ -458,6 +501,8 @@ function meet() {
     kernBreedte: grenzen.kernBreedte, kernGedeeld: grenzen.kernGedeeld,
     kernBreedsteBestand: grenzen.kernBreedsteBestand,
     kernOngebruikt: grenzen.kernOngebruikt,
+    toetsenOverleefdeMutatie: mutaties.overleefd,
+    toetsenNietGemeten: mutaties.nietGemeten,
     dependencies: deps, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen
   };

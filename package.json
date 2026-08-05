@@ -50,6 +50,7 @@
     "kaart": "node scripts/kaart.js",
     "bewijs": "node scripts/bewijs.js",
     "grenzen": "node scripts/grenzen.js",
-    "leugens": "node --experimental-sqlite scripts/leugendetector.js"
+    "leugens": "node --experimental-sqlite scripts/leugendetector.js",
+    "mutatie": "node --experimental-sqlite scripts/mutatie.js"
   }
 }

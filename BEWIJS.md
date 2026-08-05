@@ -15,17 +15,21 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 612 |
 | losse beweringen (`test(...)`) | 3341 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 3 |
-| bestanden die geen mutatie noemen | 586 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 0 |
+| **overleefd**: geen mutatie kreeg hem rood | 0 |
+| niet te meten (al rood, geen module gevonden, ...) | 0 |
+| alleen in de kop *genoemd*, nog niet gemeten | 26 |
+| niets van beide | 586 |
 
-Die laatste twee getallen zijn de werkvoorraad, niet een verwijt. Een bestand dat
-geen mutatie noemt kan prima kloppen -- er is alleen niets vastgelegd waaruit blijkt
-dat het kan zakken. En de kolom leest een WOORD in commentaar: wie "mutatie"
-opschrijft zonder er een te draaien, komt hier als groen door. Het omgekeerde is
-hard, en dat is waar deze kolom voor is.
+De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
+toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
+niet vast. Zie `scripts/mutatie.js` voor wat de motor wel en niet probeert -- een
+module die niets teruggeeft en alleen in de database schrijft, blijft daar terecht
+groen. Zakken is bewezen GEVOELIG, niet bewezen goed.
 
-Het sterke antwoord op "kijkt er iemand naar de inhoud" staat niet hier maar in
-`LEUGENS.json` (`npm run leugens`): die laat een groep endpoints met opzet liegen en
-kijkt of er een domeinspecifieke toets omvalt.
+Voor endpointgroepen is er een grovere maat op een hoger niveau: `LEUGENS.json`
+(`npm run leugens`) laat een heel domein liegen en kijkt of er een domeinspecifieke
+toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
@@ -45,7 +49,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `agenda-pro.test.js` | 5 | -- | De pro-laag van de agenda: herhalingen die goed uitrollen, uitnodigen op codenaam (nooit een echte naam in beeld), ja/nee dat bij de organisator terugkomt, ICS-export met RRULE, en de eerlijke sluitregels. Draai los:... |
 | `agenda.test.js` | 5 | -- | Tests voor de persoonlijke AI-agenda (kern/agenda.js): leden en leveranciers hebben een eigen agenda; de AI zet gewone taal om naar datum + tijd; de telling voedt de ballon-badge. Draai: npm test |
 | `agent.test.js` | 4 | -- | De AI-bedrijfsagent: vaste leverancier koppelen, inkoopvoorstellen met goedkeuring door de gemachtigde (pas dan een echte bestelling bij de groothandel), automatisch een voorstel na de MEP-voorspelling, en het... |
-| `ai-cache.test.js` | 10 | ja | Prompt caching in de Claude-client (server/anthropic.js, verrijkMetCache). De verrijking zet cache_control-markeringen op de juiste blokken, met drempels (een cache-schrijf kost 1,25x; klein werk markeren is verlies)... |
+| `ai-cache.test.js` | 10 | genoemd | Prompt caching in de Claude-client (server/anthropic.js, verrijkMetCache). De verrijking zet cache_control-markeringen op de juiste blokken, met drempels (een cache-schrijf kost 1,25x; klein werk markeren is verlies)... |
 | `ai-oproepen.test.js` | 5 | -- | De AI-ingang-scanner toetsen. Poort 21 in check.js leunt op scan(): die vindt elke plek die het model aanroept en zegt of de gedeelde toegangsregel eronder ligt. |
 | `ai-regie.test.js` | 4 | -- | De AI-regie van de boardroom: het kantoor vult Rahuls karakter en verhaal AAN (nooit vervangen: de vaste kern staat in de code en wordt door test/rahul-eerlijk.test.js bewaakt). De aanvulling komt live mee in elke... |
 | `ai-uitwijk.test.js` | 6 | -- | De AI-uitwijk: onze eigen dunne clients voor Claude, OpenAI en Gemini (allemaal in de Claude-vorm: messages.create in, Claude-vormig antwoord uit) plus server/ai.js die naar de volgende aanbieder overstapt als er een... |
@@ -75,7 +79,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `bank.test.js` | 17 | -- | RTG Bank: de eigen bank op het RTG Pay-grootboek, met de 3-standen knop van de boardroom (partner -> hybride -> eigen). Getest: de leden-bank die pas open gaat als de boardroom hem live zet + akkoord (opt-in) die de... |
 | `bankbeveiliging.test.js` | 3 | -- | De bank-laag: tijd-veilige vergelijkingen, de TOTP-tweede factor op de backoffice en het inlog-auditlog. |
 | `bankdeuren.test.js` | 6 | -- | ACHTER WELKE DEUR STAAT RTG BANK? De keuring telde 649 endpoints zonder toets. |
-| `bankhart.test.js` | 8 | ja | Het financiele hart: de Regelwacht (belastingen en regels automatisch bij, streng gevalideerd, in place op de gedeelde landtabel), het verenigde hart-afschrift (RTG Bank + RTG Pay + de derde-partij-kaartnaad met een... |
+| `bankhart.test.js` | 8 | genoemd | Het financiele hart: de Regelwacht (belastingen en regels automatisch bij, streng gevalideerd, in place op de gedeelde landtabel), het verenigde hart-afschrift (RTG Bank + RTG Pay + de derde-partij-kaartnaad met een... |
 | `bedrijfbeeld.test.js` | 4 | -- | RTG Werk OS, deel 6: het directiebeeld en de aansluitingen. Vier beweringen: - HET BEELD MAAKT VAN NIETS GEEN NUL. |
 | `bedrijfbouw.test.js` | 6 | -- | RTG Werk OS, deel 4: de bouwlaag en het IT-beheer. Zes beweringen, en ze gaan allemaal over een systeem dat weigert: - NAAR PRODUCTIE MET GROENE TOETSEN EN EEN MENS. |
 | `bedrijfeigenaar.test.js` | 3 | -- | RTG Werk OS: de weg van een ledenaccount naar een werkruimte. Dit bestand bestaat om een gat dat een gebruiker meldde: de laag was volledig en toch onbereikbaar. |
@@ -96,7 +100,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `beveiliging.test.js` | 11 | -- | Tests voor de beveiligingsmeldingen (server/beveiliging.js): melden, samenvoegen, samenvatting, afhandelen en escalatie naar de eigenaar. Zuiver, met een nagemaakte db. |
 | `beveiligingsteam.test.js` | 13 | -- | Het beveiligings-commandocentrum voor topbeveiligingsteams: de manager plant het rooster (of laat de AI het overnemen), bewaakt het budget, beheert posten en handelt inzetaanvragen af; de bewaker gebruikt de PDA (op... |
 | `bewaartermijnen.test.js` | 8 | -- | BEWAARTERMIJNEN -- houden we niet langer dan mag, en niet korter dan moet? Twee kanten die allebei fout kunnen gaan, en die elkaars tegenpool zijn: te LANG bewaren -> overtreding van opslagbeperking (AVG art. |
-| `bewaarveger.test.js` | 11 | ja | De bewaarveger: de wisregels uit het papierwerkregister als code (server/bewaarveger.js). Elke regel heeft een eigen toets en is met een mutatie geverifieerd; de klok is geinjecteerd, dus niets slaapt echt. |
+| `bewaarveger.test.js` | 11 | genoemd | De bewaarveger: de wisregels uit het papierwerkregister als code (server/bewaarveger.js). Elke regel heeft een eigen toets en is met een mutatie geverifieerd; de klok is geinjecteerd, dus niets slaapt echt. |
 | `bewaarwacht.test.js` | 7 | -- | DE BEWAARWACHT -- kijkt vanzelf, en houdt zich in. Een bewaarbeleid faalt op twee manieren die allebei stil zijn: niemand kijkt ooit -> de termijn staat op papier en nergens anders de wacht wist zelf -> data... |
 | `bezorg.test.js` | 5 | -- | De ophaal/bezorgdienst, van assortiment tot bezorgd: de zaak zet producten en de dienst aan; het lid bestelt (ophalen of bezorgen) en betaalt vooraf; de bezorger neemt meerdere leveringen op eigen naam, deelt GPS... |
 | `bezorging.test.js` | 1 | -- | DE BEZORGING -- van assortiment tot voordeur, met GPS. WAAROM DIT ER IS De bezorgketen raakt vier mensen achter elkaar: de manager richt de dienst in, een lid bestelt en betaalt, een bezorger neemt de rit aan, en de... |
@@ -113,7 +117,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `boot-smoke.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `borden.test.js` | 4 | -- | Borden: het gedeelde werkbord. De zaak maakt borden met lijsten en kaarten, kiest per bord de collega's (leeg = hele team), en alleen bord-leden zien een besloten bord. |
 | `bouw.test.js` | 4 | -- | Het bouw-genre (timmerman, loodgieter, elektricien op de vakwerk-motor) en het Dienstenplein in de RTG Mall: elke dienstverlener biedt er zijn aanbod aan, elk leverancier-genre heeft een plek in de gids, en boeken... |
-| `bugjacht.test.js` | 28 | ja | De bugjacht: de defecten die uit de gerichte doorlichting kwamen, elk met een toets die ZAKT als de reparatie eruit gaat. Ze staan hier bij elkaar en niet verspreid over de bestaande bestanden, omdat ze een... |
+| `bugjacht.test.js` | 28 | genoemd | De bugjacht: de defecten die uit de gerichte doorlichting kwamen, elk met een toets die ZAKT als de reparatie eruit gaat. Ze staan hier bij elkaar en niet verspreid over de bestaande bestanden, omdat ze een... |
 | `ca.test.js` | 4 | -- | Bewijst onze eigen interne CA (server/lib/ca.js): een root-CA die als CA geldt, server- en client-certificaten uitgeeft die via ONS CA-cert vertrouwd worden (niet via rejectUnauthorized:false),... |
 | `cache.test.js` | 6 | -- | De eigen in-memory cache (server/lib/cache.js): TTL-verval, LRU-uitzetting, treffer/misser-telling, en de response-cache-middleware die een publiek JSON- antwoord memoiseert (miss -> hit) en een niet-200 juist NIET... |
 | `care.test.js` | 8 | -- | Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en veilige intake-deling per aanbieder, en Rahul die het in gewone taal regelt. |
@@ -192,7 +196,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `gezinskeuken.test.js` | 5 | -- | Integratietests voor de Gezinskeuken (RTFoundation-gezin): het weekmenu (wat eten we, wie kookt), de "verras me"-ideeen, en de gedeelde boodschappenlijst waar iedereen op afvinkt. Gedeeld per gezin, dicht voor gasten... |
 | `gezinzorg.test.js` | 4 | -- | HET GEZIN: DE GEVOELIGE KANT. Dit zijn de scherpste routes van het hele huis, en ze hadden geen van drieen een eigen toets: 1. |
 | `gezondheid.test.js` | 6 | -- | Integratietests voor het Gezondheidsmaatje (RTFoundation-gezin): medicijnen met afvink-per-dag, medische afspraken (aankomend), de groeicurve, en de allergiekaart die uit het zorgprofiel (oppasinfo) komt. Medische... |
-| `ghost.test.js` | 4 | ja | De Ghost Driver: de vooruitkijkende verkeersleider. Hij bouwt zijn voorspelling uit echte demo-data (evenement-uitloop van verkochte tickets, het vaste dagritme, de eigen rittenhistorie en het deterministische... |
+| `ghost.test.js` | 4 | genoemd | De Ghost Driver: de vooruitkijkende verkeersleider. Hij bouwt zijn voorspelling uit echte demo-data (evenement-uitloop van verkochte tickets, het vaste dagritme, de eigen rittenhistorie en het deterministische... |
 | `golive.test.js` | 3 | -- | De generale repetitie voor live gaan: start de server ECHT in productiestand en bewijs dat hij zich dan ook zo gedraagt (demo dicht, geen dev-lekken, registreren en de technische pagina werken), dat een onveilige... |
 | `grand-integratie.pg.test.js` | 1 | -- | De zwaarste integratietest tot nu toe: TWEE server-instances (A en B) die één echte PostgreSQL-store én één Redis-bus delen, en samen een volledige, gelijktijdige reis over meerdere genres afhandelen. Bewijst in één... |
 | `grens-sweep.test.js` | 5 | -- | DE GRENS-SWEEP -- elk endpoint een keer echt aangeroepen, met twee harde eisen. WAT DIT WEL IS Er zijn ruim duizend endpoints die in geen enkele test voorkwamen. |
@@ -259,7 +263,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `leerstofvo.test.js` | 3 | -- | RTG School golf 3: het voortgezet en vervolgonderwijs op de leerstof-motor. Vakken per fase (vmbo t/m wo), examentraining die pas aan het eind terugkijkt (zoals een echt examen), en het niveau-advies dat adviseert en... |
 | `leren-leden.test.js` | 11 | -- | DE LEERLAAG VANAF DE LEDEN-APP -- 28 endpoints, en een uitnodiging als spil. Deze achtentwintig wees de waargenomen dekkingsmeting aan als nooit aangeroepen. |
 | `leren.test.js` | 5 | -- | Integratietests voor de leerlaag: overhoorlijsten (zelf en via de AI-demo), het overhoorduel via de vriendenlaag (zonder automatische vriendschap), samen-projecten met taken/notities/AI-plan, en schrijven met... |
-| `levensloop.test.js` | 1 | ja | DE LEVENSLOOP -- een mens van aanmelding tot tweede baan. WAAROM DIT ER IS De andere twee toetsen kijken in de breedte: 157 mensen kunnen bij hun werk (menselijkebanen) en mensen doen dingen met elkaar... |
+| `levensloop.test.js` | 1 | genoemd | DE LEVENSLOOP -- een mens van aanmelding tot tweede baan. WAAROM DIT ER IS De andere twee toetsen kijken in de breedte: 157 mensen kunnen bij hun werk (menselijkebanen) en mensen doen dingen met elkaar... |
 | `lib.test.js` | 7 | -- | Unit-tests voor de zuivere hulplibs (server/lib). Geen server nodig. |
 | `lidboard.test.js` | 21 | -- | De eigen boardroom van elk lid (kern/lidboard/ + routes): 1. een lid ziet zijn bord met vier groepen en zet er functies aan/uit; de stand blijft server-side bewaard. |
 | `lifestyle.test.js` | 7 | -- | Integratietests voor De Rechterhand: de premium Lifestyle Pass-suite. Het Concierge-bureau (verzoeken + voorkeuren), het Bezittingenregister met attentiepunten, en Gezondheid & welzijn (afspraken + prive-dossier). |
@@ -270,7 +274,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `luchthaven.test.js` | 9 | -- | RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie. Getest: de passagiersketen (boeken -> inchecken -> boarding pass + koffertags), de operationele grendels (een kist boardt pas als de draai rond is;... |
 | `luchtzijde-taal.test.js` | 5 | -- | De luchtzijde-stand voor partners (boarding pass aan de deur, dubbele prijzen op de kassa, de vertaalknop) + de moedertaal van het account (iedereen praat de eigen taal, de ander leest de zijne in de vriendenchat). |
 | `mail-eigen.test.js` | 18 | -- | Eigen post: DKIM-ondertekening (server/dkim.js) en directe bezorging bij de mailserver van de ontvanger (server/smtp-direct.js), plus de koppeling in server/mail.js. Waar dit op let, in volgorde van belang: 1. |
-| `mailauth.test.js` | 14 | ja | SPF en DMARC: de twee controles die RTG Mail tot vandaag als "niet gecontroleerd" meldde. ALLES HIER DRAAIT ZONDER NETWERK. |
+| `mailauth.test.js` | 14 | genoemd | SPF en DMARC: de twee controles die RTG Mail tot vandaag als "niet gecontroleerd" meldde. ALLES HIER DRAAIT ZONDER NETWERK. |
 | `mailbijlage.test.js` | 7 | -- | Bijlagen van buiten: door de scanner, en pas dan te openen. Vier beweringen, en de eerste is de enige die er echt toe doet: 1. |
 | `mailpost-kantoor.test.js` | 9 | -- | DE DERTIEN LAATSTE MAILENDPOINTS ZONDER TOETS -- de kantoorkant, de IMAP-sleutels en de PDF-notities. Ze zijn samen genomen omdat ze samen de rest van de mailronde van vandaag vormen: alles wat erbij kwam en waar de... |
 | `mailpost.test.js` | 11 | -- | De MAILINFRASTRUCTUUR: de verzendwachtrij en de buitenpoort. Vier beweringen, en ze gaan alle vier over wat er gebeurt als het MISGAAT -- want dat is waar een mailsysteem zich onderscheidt van een verzendknop: 1. |
@@ -284,8 +288,8 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `memo.test.js` | 3 | -- | RTG Memo: de memo-flow door de Bestanden-kluis (map Memo's, upload, lijst, prullenbak) en de eerlijke Rahul-samenvatting van het transcript -- zonder AI-sleutel een demo die zegt wat hij is, nooit neptekst. |
 | `menselijkebanen.test.js` | 4 | -- | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |
 | `menselijkverkeer.test.js` | 5 | -- | HET MENSELIJKE VERKEER -- wat mensen hier met elkaar doen. WAAROM DIT ER NAAST test/menselijkebanen.test.js STAAT Die toets bewijst dat 157 mensen bij hun werk kunnen. |
-| `merge3.property.test.js` | 5 | ja | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |
-| `meterijk.test.js` | 7 | ja | De ijking van de meters: regel 10 van LAT.md, met een handhaver. "Een meter die je niet hebt zien uitslaan, meet niets." Dat stond opgeschreven, en op een dag bleken zeven meters te liegen -- geen van allen in de... |
+| `merge3.property.test.js` | 5 | genoemd | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |
+| `meterijk.test.js` | 7 | genoemd | De ijking van de meters: regel 10 van LAT.md, met een handhaver. "Een meter die je niet hebt zien uitslaan, meet niets." Dat stond opgeschreven, en op een dag bleken zeven meters te liegen -- geen van allen in de... |
 | `metier.test.js` | 13 | -- | Métier (kern/metier/*, routes/member/metier.js): de beroepsapp. Het zwaartepunt van deze toetsen ligt op het ontwerp dat Métier anders maakt dan een gewoon netwerk: - een profiel toont NOOIT een echte naam, alleen... |
 | `meting.test.js` | 10 | -- | De meting: tellen zonder de monitoring om te leggen en zonder iets over een persoon vast te leggen. |
 | `metingpoort.test.js` | 7 | -- | DE DEUR VOOR /api/metrics, van drie kanten. WAAROM DIT BESTAND ER MOEST KOMEN. |
@@ -343,7 +347,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `payroll.test.js` | 3 | -- | RTG Payroll: het loonkantoor draait de personeelsbetalingen op de data die het platform al heeft (klok, rollen, fiscale landtabellen), en de matchtafel linkt medewerkers en bedrijven -- maar alleen wie zichzelf "open... |
 | `pda-aanmelden.test.js` | 5 | -- | 1x aanmelden voor de personeels-app: log één keer in met het eigen RTG-account en land meteen op de juiste bedrijfspagina. Wie bij meer bedrijven op het rooster staat, wisselt met één tik van werkplek, zonder opnieuw... |
 | `pda-netwerk.test.js` | 3 | -- | Personeelsnetwerk + service-uitmuntendheid. 1) PDA's van verschillende zaken praten met elkaar, maar alleen na wederzijdse toestemming (manager vraagt, andere manager keurt goed); daarna mag al het personeel in die... |
-| `pdf.test.js` | 14 | ja | PDF: lezen, en redactie die de passage ECHT uit de bytes haalt. De maat die TAKEN 5.9 stelde staat in de derde toets: zoeken op de geredigeerde tekst in het RESULTAAT vindt hem niet meer -- niet in de tekstlaag en... |
+| `pdf.test.js` | 14 | genoemd | PDF: lezen, en redactie die de passage ECHT uit de bytes haalt. De maat die TAKEN 5.9 stelde staat in de derde toets: zoeken op de geredigeerde tekst in het RESULTAAT vindt hem niet meer -- niet in de tekstlaag en... |
 | `pestgrens.test.js` | 3 | -- | De pestgrens van Rahul: drie waarschuwingen bij pesten, daarna een vurig slotantwoord (waarin hij zegt dat hij hier zelf geen behoefte aan had) en 24 uur weg; na die 24 uur opent alleen een oprecht excuus de deur, en... |
 | `pg-snapshot.test.js` | 1 | -- | DE REM OP DE LOKALE SNAPSHOT ZAT MAAR OP EEN VAN DE TWEE PADEN. In de Postgres-stand is Postgres de duurzame waarheid en is db.json alleen een warme-start-cache. |
 | `pg-wachten.test.js` | 1 | -- | EEN SERVER DIE WACHT OP ZIJN DATABASE, IN PLAATS VAN VOORGOED OP 503. In de Postgres-stand houdt de opslagpoortwachter ELKE API tegen met 503 tot de opslag echt geladen is -- terecht: liever niets serveren dan... |
@@ -412,7 +416,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `rtgcode.test.js` | 3 | -- | RTG scan-codes (public/shared/rtgcode.js): het vaste formaat achter de QR's. We toetsen dat bouwen + lezen elkaars omgekeerde zijn, dat tafelnamen met dubbele punt en spatie heel terugkomen, en dat vreemde tekst... |
 | `rtghorloge.test.js` | 5 | -- | Het RTG-signatuurhorloge (public/shared/rtghorloge.js): de pure meetkunde -- het plaatsen op een klok-hoek, het achthoekige cassement en de uur-hoeken -- draait ook in Node en is hier los getoetst. Het tekenen (SVG +... |
 | `rtgid.test.js` | 6 | -- | RTG iD: de DigiD-vervanger op de eigen identiteitskluis. Bewaakt de koppelflow (code, bevestigen, weigeren, eenmalig token), de selectieve gegevensdeling (18plus zonder geboortedatum, alleen wat gevraagd is), het... |
-| `rtgjson.test.js` | 6 | ja | De eigen JSON-motor (server/lib/rtgjson): in huis gecodeerd in plaats van de ingebouwde JSON, en op de grenzen ingebouwd (HTTP-body in, res.json uit, db-snapshots). Bewijs in drie lagen: (1) spec-randgevallen en een... |
+| `rtgjson.test.js` | 6 | genoemd | De eigen JSON-motor (server/lib/rtgjson): in huis gecodeerd in plaats van de ingebouwde JSON, en op de grenzen ingebouwd (HTTP-body in, res.json uit, db-snapshots). Bewijs in drie lagen: (1) spec-randgevallen en een... |
 | `rtmail-ai.test.js` | 8 | -- | De AI-hulp bij een gesprek: samenvatten, actiepunten en het uitleggen van phishing-risico. Drie beweringen, en de eerste is de voorwaarde waaronder de andere twee mogen bestaan: 1. |
 | `rtmail-bestuur.test.js` | 12 | -- | RTMAIL, het bestuur: rechten, delegatie, journaal, bewaartermijn, juridische bewaring, aantoonbare vernietiging en export. De zes beweringen die deze laag draagt, en ze zijn allemaal van het soort waar een... |
 | `rtmail-lid.test.js` | 5 | -- | RTMAIL aan de lid-kant: elk nieuw lid krijgt een welkom in zijn eigen postvak, dat als kanaal in de verenigde Berichten-app verschijnt en te lezen is. End-to-end tegen een echte server. |
@@ -420,7 +424,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `rtmail-team.test.js` | 9 | -- | RTMAIL-teams: een adres dat meerdere mensen samen lezen (receptie@partner.rtg). Toetst de vier beloftes van kern/rtmail-team.js: het adres volgt de oprichter, een team kaapt nooit een bestaand postvak, toewijzen... |
 | `rtmail-vak.test.js` | 10 | -- | RTMAIL, het postvak zelf: mappen, etiketten, favorieten, sluimeren, zoeken en gesprekken. End-to-end tegen een echte server, met twee leden zodat er ook echt post HEEN EN WEER gaat -- de meeste fouten in een postvak... |
 | `rtmail-werk.test.js` | 11 | -- | RTG Mail x RTG Werk OS: het gedeelde postvak met een dossier, en de brug van een BERICHT naar een taak, ticket of kans. Dit is de bewering die het hele idee draagt -- "e-mail is geen los eiland" -- en dus wordt hij... |
-| `rtmail-zaak.test.js` | 5 | ja | RTMAIL AAN DE ZAAKKANT -- de tweede deur, die nooit was opengedaan. WAAROM DIT BESTAND ER IS. |
+| `rtmail-zaak.test.js` | 5 | genoemd | RTMAIL AAN DE ZAAKKANT -- de tweede deur, die nooit was opengedaan. WAAROM DIT BESTAND ER IS. |
 | `rtmail.test.js` | 11 | -- | RTMAIL: het interne postsysteem (de rail voor de automatiseringen). Unit-test op de motor met een nep-db, zodat we send/postvak/ongelezen/lees los kunnen bewijzen zonder de server te starten. |
 | `rust.test.js` | 6 | -- | Versleuteling in rust, gemeten in plaats van beloofd. De belofte is: met RTG_ENC_KEY staat er niets leesbaars van een lid op schijf. |
 | `salon-app.test.js` | 14 | -- | De Salon als volwaardige app (kern/salon/*, routes/member/salonapp.js). Wat hier bewezen wordt is precies wat er in deze ronde veranderde: leden kunnen zelf plaatsen, de muur van 60 posts is weg en vervangen door... |
@@ -444,7 +448,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `schooldirectie.test.js` | 1 | -- | Golf 3: de directie-cockpit van de schoolpartner op kantoren-niveau, met de onderwijsregels leidend. Getoetst: signalen op organisatieniveau (wachtend personeel, klas zonder rooster), de schoolbrede mededeling die in... |
 | `schoolenterprise.test.js` | 7 | -- | De enterprise-laag van RTG School, deel 1: rollen en rechten, het inzagejournaal, en de leerlingadministratie (aanmelding -> wachtlijst -> plaatsing -> uitschrijving -> overstap). Wat hier bewezen wordt, zijn... |
 | `schoolexcursie.test.js` | 3 | -- | RTF School, de exclusieve laag: de vrijwillige ouderbijdrage, de excursie met tijdelijke GPS (toestemming vooraf, kijklog voor het gezin, wissen bij de stop) en de telefoonboom. |
-| `schoolgeld.test.js` | 9 | ja | De enterprise-laag van RTG School, deel 3: geld en personeelszaken. De belofte die deze toets bewaakt, is de belangrijkste van de hele financiele laag: GELD RAAKT NOOIT HET ONDERWIJS. |
+| `schoolgeld.test.js` | 9 | genoemd | De enterprise-laag van RTG School, deel 3: geld en personeelszaken. De belofte die deze toets bewaakt, is de belangrijkste van de hele financiele laag: GELD RAAKT NOOIT HET ONDERWIJS. |
 | `schoolhulplijn.test.js` | 3 | -- | RTG School golf 4: de hulplijn en de leercurve-sync -- veiligheid als een keten, zonder surveillance. De ene knop is van het kind; toestemming bepaalt wie meeleest (vertrouwelijk = alleen de mentor); en aankomende... |
 | `schoolkoppel.test.js` | 9 | -- | De drie punten die na de enterprise-ronde openstonden, nu gebouwd en nagetrokken: de webhookbezorging, het machtigingenregister en de anonieme tevredenheidspeiling. Wat hier bewezen wordt: - een gebeurtenis wordt... |
 | `schoolniveau.test.js` | 3 | -- | RTF School: het niveau van een klas komt van de officiele ladder. Een klas had alleen een vrije naam ("3B", "Meester Jan"), en die naam ging als "niveau" de AI-bijles in en liet de toets-bibliotheek aan elke leraar... |
@@ -501,10 +505,10 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `training.test.js` | 9 | -- | Training & tips in de PDA: micro-learning voor het personeel. 1) De zuivere tip-bibliotheek is rol-bewust en zonder dubbelingen. |
 | `transfer.test.js` | 5 | -- | De eigen transferdienst van een activiteitenzaak: alleen met een geldig ticket, prijs 0 (inclusief) of het afgesproken bedrag, en iedereen ziet elkaar: de zaak de rit en de chauffeur, de chauffeur de klant, en de... |
 | `txgeld.test.js` | 6 | -- | DE TWEE GELDCOLLECTIES IN HET GROOTBOEK. directBetalingen en betaalVerzoeken werden bijgehouden met db.data.X.unshift(item); db.data.X = db.data.X.slice(0, N); Dat is precies waar boeking 50.001 aan verdween (zie... |
-| `txindex.test.js` | 2 | ja | Transactie-index: bewijs dat de O(1)-helpers exact hetzelfde antwoorden als de naieve scans die ze vervangen, ook na mutaties, vervanging van de array (archief/venster/pg-sync) en schrijven BUITEN de helpers om... |
+| `txindex.test.js` | 2 | genoemd | Transactie-index: bewijs dat de O(1)-helpers exact hetzelfde antwoorden als de naieve scans die ze vervangen, ook na mutaties, vervanging van de array (archief/venster/pg-sync) en schrijven BUITEN de helpers om... |
 | `txkap.test.js` | 4 | -- | DE GRENS OP DE BOEKINGEN: WAT ERBUITEN VALT, VALT NIET WEG. De levende boekingen-collectie heeft een plafond (50000). |
-| `txledger-sqlite.test.js` | 2 | ja | Het transactie-grootboek op de SQLITE-opslag -- de standaardopslag. Het grootboek bestond al, maar alleen voor Postgres ("zonder Postgres is dit inert"). |
-| `txledger.pg.test.js` | 1 | ja | Integratietest voor het transactie-grootboek (tx_ledger) tegen een ECHTE Postgres. Zonder DATABASE_URL skipt hij expliciet (geen valse groen): de json/sqlite-suite kan dit pad per definitie niet dekken, dus deze test... |
+| `txledger-sqlite.test.js` | 2 | genoemd | Het transactie-grootboek op de SQLITE-opslag -- de standaardopslag. Het grootboek bestond al, maar alleen voor Postgres ("zonder Postgres is dit inert"). |
+| `txledger.pg.test.js` | 1 | genoemd | Integratietest voor het transactie-grootboek (tx_ledger) tegen een ECHTE Postgres. Zonder DATABASE_URL skipt hij expliciet (geen valse groen): de json/sqlite-suite kan dit pad per definitie niet dekken, dus deze test... |
 | `uitgeven-inwisselen.test.js` | 5 | -- | WAT EEN ZAAK UITGEEFT EN EEN LID INWISSELT -- 6 endpoints. Deze zes wees de waargenomen dekkingsmeting aan als nooit aangeroepen: giftcard/sell, giftcard/redeem, salon/deal, salon/deal/redeem, salon/poll en salon/stats. |
 | `uitgifte.test.js` | 5 | -- | De documentenuitgifte (kern/uitgifte.js): met een druk op de knop de officiele documentatie naar oude apparatuur of een harde schijf, altijd achter het 4- of 6-ogenprincipe. Getest voor de drie huizen: de zaak... |
 | `uitloggen.test.js` | 4 | -- | UITLOGGEN MOET ECHT UITLOGGEN. Gevonden in aanvalsronde 2 (scripts/aanval.js, punt 14), en het is het soort gat dat je alleen vindt door het te DOEN in plaats van te lezen: POST /api/logout -> { ok: true } POST... |
@@ -529,7 +533,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `verzoek-intrekken.test.js` | 4 | -- | EEN BETAALVERZOEK INTREKKEN -- 2 endpoints, aan beide kanten van het huis. De dekkingsmeting wees /api/pay/verzoek/intrek (lid vraagt een vriend) en /api/supplier/betaalverzoek/intrek (zaak vraagt een klant) aan als... |
 | `verzorging.test.js` | 8 | -- | RTG Verzorging: de beauty-salon en barbier (Velvet & Blade), petcare (Amics) en de kinderopvang met nanny-service (Nido). Bewaakt de agenda zonder dubbele stoelen, de stoel-soortregel, de walk-in rij, het pension met... |
 | `villa.test.js` | 4 | -- | Villa's & fincas als volwaardig verblijf-genre: net als een appartement draait een villa op verblijven met datums, een receptiebord, de check-in/check-out-keten en slimme deuren. Deze test bewaakt dat het villa-genre... |
-| `vloerwerk.test.js` | 6 | ja | DE WERKVLOER VAN EEN ZAAK -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: table/add, table/remove, table/status, minibar/count, minibar/item/add,... |
+| `vloerwerk.test.js` | 6 | genoemd | DE WERKVLOER VAN EEN ZAAK -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: table/add, table/remove, table/status, minibar/count, minibar/item/add,... |
 | `vloot.test.js` | 2 | -- | Integratietests voor de foutisolatie: elke app draait als eigen proces in de vloot (server/vloot.js) achter de poortwachter. Een bug in een route raakt alleen die ene aanvraag; een crash van een groep raakt alleen... |
 | `vonk.test.js` | 5 | -- | RTG Vonk: dating op codenaam met de Salon-veiligheidslat. 18+ met een geverifieerd paspoort, een eindige dagselectie die wederzijds bij de wensen past, wederzijdse like = match + chatlijn + automatisch een tafel rond... |
 | `voorspel.test.js` | 12 | -- | De voorspeller: RTG leert het ritme van leden en zaken uit het Pay-grootboek en voorspelt eerlijk (bij te weinig data: zeggen dat het nog niet kan). Draai los: node --experimental-sqlite --test test/voorspel.test.js |
@@ -541,7 +545,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `wauw.test.js` | 4 | -- | De wauw-laag (kern/wauw.js): de dag-stemming (vaste 9+-lijst) en de verjaardagsglans die overal naast de codenaam meereizen (Pulse, Berichten), het Moment van de week in de Pulse-feed en De Terugblik op je sociale week. |
 | `wbw.test.js` | 4 | -- | Wie betaalt wat: het gedeelde uitgavenlijstje van Salon-vrienden. Uitgaven worden sluitend verdeeld in centen; de balans klopt altijd op nul; wie rood staat betaalt het eigen deel in een tik via RTG Pay (idempotent);... |
 | `web.test.js` | 8 | -- | Eigen web-framework (server/web.js), dat express verving. We toetsen de deelverzameling die de server echt gebruikt, tegen een echte http-server: routing + :params + RegExp-pad, middleware-keten + next(err) naar de... |
-| `webauthn-ceremonie.test.js` | 1 | ja | DE HELE PASSKEY-CEREMONIE, OVER DE ECHTE ROUTES. test/webauthn.test.js toetst de randen: rommel eruit, geen enumeratie, poorten dicht, remmen aan. |
+| `webauthn-ceremonie.test.js` | 1 | genoemd | DE HELE PASSKEY-CEREMONIE, OVER DE ECHTE ROUTES. test/webauthn.test.js toetst de randen: rommel eruit, geen enumeratie, poorten dicht, remmen aan. |
 | `webauthn-eigen.test.js` | 5 | -- | Eigen WebAuthn-laag (server/webauthn.js), die @simplewebauthn/server verving. We spelen een volledige ceremonie na met een ECHTE EC P-256-sleutel uit node:crypto: bouwen zelf een authenticatorData + attestationObject... |
 | `webauthn.test.js` | 5 | -- | Passkeys (WebAuthn): de servermechanieken. Dit bestand toetst de RANDEN -- opties-vorm, anti-enumeratie, poorten, remmen en beheer. |
 | `webpush.test.js` | 5 | -- | Test voor onze eigen web-push (server/webpush.js), die het pakket `web-push` verving. Twee harde ijkpunten: 1. |
@@ -562,10 +566,10 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `zaak-balie.test.js` | 7 | -- | DE BALIE VAN EEN ZAAK -- 7 endpoints uit de supplier-groep. agenda/toevoegen, agenda/wijzig, agenda/verwijder, ticket/add, ticket/status, lost/add en lost/done stonden als nooit aangeroepen in de waargenomen... |
 | `zaak-en-mensen.test.js` | 6 | -- | DE ZAAK EN HAAR MENSEN -- 6 endpoints achter de leverancier-inlog. Deze zes wees de waargenomen dekkingsmeting aan als nooit aangeroepen: werkbeleid, werkbeleid/zet, leave/decide, team/message, team/buzz en... |
 | `zaak-export.test.js` | 3 | -- | WAT EEN ZAAK EXPORTEERT -- 2 endpoints uit de supplier-groep. rides.csv en dagrapport.csv stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
-| `zaak-inrichting.test.js` | 6 | ja | DE INRICHTING VAN EEN ZAAK -- 6 endpoints uit de supplier-groep. room/remove, photo/remove, service, location, voorraad en menu/recipe stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
+| `zaak-inrichting.test.js` | 6 | genoemd | DE INRICHTING VAN EEN ZAAK -- 6 endpoints uit de supplier-groep. room/remove, photo/remove, service, location, voorraad en menu/recipe stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `zaak-kantoor.test.js` | 5 | -- | HET KANTOOR VAN EEN ZAAK -- 6 endpoints uit de supplier-groep. finance, backoffice, wensen/klaar, werkmail/lees, keten/status en onboarding/zet stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
-| `zaak-loket-en-dossier.test.js` | 4 | ja | HET LOKET EN HET DOSSIER -- 5 endpoints uit de supplier-groep. overheid/bekendmakingen, gemeente/bekendmakingen, overheid/kvk/mijn, advies/dossier/status en apply/chat/send stonden als nooit aangeroepen in de... |
-| `zaak-vloot-en-facturen.test.js` | 5 | ja | VLOOT, FACTUREN EN OPROEPEN -- 5 endpoints uit de supplier-groep. fleet, auto, facturen/maak, samenwerking/oproep/sluit en guest/connect stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
+| `zaak-loket-en-dossier.test.js` | 4 | genoemd | HET LOKET EN HET DOSSIER -- 5 endpoints uit de supplier-groep. overheid/bekendmakingen, gemeente/bekendmakingen, overheid/kvk/mijn, advies/dossier/status en apply/chat/send stonden als nooit aangeroepen in de... |
+| `zaak-vloot-en-facturen.test.js` | 5 | genoemd | VLOOT, FACTUREN EN OPROEPEN -- 5 endpoints uit de supplier-groep. fleet, auto, facturen/maak, samenwerking/oproep/sluit en guest/connect stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `zaak.test.js` | 3 | -- | De eigen mini-boardroom per zaak: elke leverancier zet zijn eigen functies aan/uit en ziet een HR- en marketing-momentopname. Een uitgezette functie werkt echt (bijv. |
 | `zaakdoos.test.js` | 10 | -- | De Zaakdoos end-to-end: een cloudserver en een doos-kastje ernaast. 1. |
 | `zaaktools.test.js` | 2 | -- | De gereedschappen die elke zaak krijgt: reageren op reviews (met melding aan de gast) en de lichte voorraad met drempelmeldingen. |
@@ -574,7 +578,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `zegelcheck.test.js` | 4 | -- | RTG Zegel offline controleren (public/shared/zegelcheck.js): dezelfde WebCrypto- verificatie die de leverancier-app op het toestel draait. We maken een echt Zegel met de uitgevende kant (server/lib/zegel.js), en... |
 | `zegelroute.test.js` | 4 | -- | RTG Zegel-routes (server.js): een lid maakt een zegel voor een partner, de partner haalt de publieke sleutel op en verifieert OFFLINE (met server/lib/ zegel.controleer). Getoetst: selectieve onthulling (alleen ware,... |
 | `zelfzorg.test.js` | 7 | -- | De zelfzorg van het platform: opruimen, beschermen, repareren en upgraden, met de knoppen achter de kantoor-inlog. De automaat doet alleen het veilige werk; alles wat geld raakt wordt een advies, nooit een ingreep. |
-| `zinnencache.test.js` | 6 | ja | DE ZINNENCACHE (server/accounts/state.js -> S.zin). node:sqlite is SYNCHROON. |
+| `zinnencache.test.js` | 6 | genoemd | DE ZINNENCACHE (server/accounts/state.js -> S.zin). node:sqlite is SYNCHROON. |
 | `zorgketen.test.js` | 6 | -- | De zorgketen (laag twee op de hulpdiensten): recepten van de spreekkamer naar de apotheek, de eerste hulp met triagekleuren, verwijzingen naar de medisch specialist en beauty medical (intake verplicht), en de agenda's. |
 | `zorgwallet.test.js` | 7 | -- | De zorgpas en de RTG Wallet: Segur (de verzekeraar) schrijft een lid in op codenaam en de zorgpas ligt direct in de wallet van het lid; de declaratieketen (een mens beslist, afwijzen alleen met reden); de... |
 
@@ -593,8 +597,8 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `browserpoort.e2e.js` | 1 | -- | DE BROWSERPOORT -- de enige schermtoets die ZICHZELF niet mag overslaan. Elke andere e2e in deze map begint met dezelfde regel: { skip: pw ? |
 | `clips-studio.e2e.js` | 1 | -- | Scherm-test voor de Clips-studio: knippen, geluid en ondertitels, en het toegangsfilter in de kop. test/clips.test.js bewijst de server-kant; deze bewijst dat de studio op het scherm werkt en dat de feed de standen... |
 | `csp.e2e.js` | 1 | -- | DE CSP ZOALS EEN BROWSER HEM ERVAART. Een Content-Security-Policy is de enige beveiliging in dit huis die je niet kunt aantonen door de code te lezen. |
-| `deelmenu.e2e.js` | 2 | ja | Scherm-test voor het deelmenu (shared/deelmenu.js): een app met veel delen wordt een menu met een deel tegelijk, in plaats van een lange rol. Het contract, op de eerste pagina die meedoet (rtgschool.html): 1. |
-| `deelmenuwacht.e2e.js` | 2 | ja | DE WACHT VAN HET DEELMENU, OP EEN PAGINA DIE VERDER NIETS DOET. WAAROM DEZE TOETS ER IS -- eerlijkheidspunt 6.2 `shared/deelmenu.js` kijkt met een MutationObserver of een app zijn schermen alsnog neerzet. |
+| `deelmenu.e2e.js` | 2 | genoemd | Scherm-test voor het deelmenu (shared/deelmenu.js): een app met veel delen wordt een menu met een deel tegelijk, in plaats van een lange rol. Het contract, op de eerste pagina die meedoet (rtgschool.html): 1. |
+| `deelmenuwacht.e2e.js` | 2 | genoemd | DE WACHT VAN HET DEELMENU, OP EEN PAGINA DIE VERDER NIETS DOET. WAAROM DEZE TOETS ER IS -- eerlijkheidspunt 6.2 `shared/deelmenu.js` kijkt met een MutationObserver of een app zijn schermen alsnog neerzet. |
 | `deur.e2e.js` | 2 | -- | Scherm-test voor de gedeelde poort (shared/deur.js). Veertien apps toonden aan wie er niet in mag precies een zin -- "Alleen met de Lifestyle Pass" -- zonder knop, zonder uitleg, zonder weg vooruit. |
 | `eigensessieschermen.e2e.js` | 3 | -- | DE SCHERMEN MET EEN EIGEN SESSIESOORT, EN DE TWEE DOORVERWIJSSTUBS. Twaalf van de vijftien schermen die na TAKEN 4.9 nog geen eigen toets hadden. |
 | `galerij.e2e.js` | 1 | -- | Scherm-test voor RTG Galerij: de tijdlijn met beelden uit twee bronnen (De Salon en RTG Bestanden), de kijker met favoriet, en een album bouwen. Draait alleen waar een browser beschikbaar is. |
@@ -612,7 +616,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `klankwerk.e2e.js` | 1 | -- | Scherm-test voor RTG Klankwerk. test/muziek.test.js bewijst de server-kant; deze bewijst dat het instrument werkt: een stuk openen, een stap aanzetten, een noot in de notenrol zetten, Rahul om een voorstel vragen en... |
 | `laatstedrie.e2e.js` | 1 | -- | De laatste drie schermen zonder eigen toets: RTG Camera, RTG Eye en het tweede scherm. WAAROM DEZE DRIE OVERBLEVEN, en waarom dat geen toeval is: twee ervan vragen de CAMERA (`getUserMedia`) en de derde is een tweede... |
 | `ledenschermen.e2e.js` | 3 | -- | DE LEDENSCHERMEN: WAT HET HUIS OVER ZICHZELF ZEGT. Achttien schermen uit de lijst van TAKEN 4.9, en ze hebben iets gemeen dat de andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar doet dit... |
-| `leven.e2e.js` | 1 | ja | LEEFT ELK SCHERM, OF STAAT HET ER ALLEEN MAAR? test/paginas.e2e.js vraagt: gaat deze pagina open zonder te klagen. |
+| `leven.e2e.js` | 1 | genoemd | LEEFT ELK SCHERM, OF STAAT HET ER ALLEEN MAAR? test/paginas.e2e.js vraagt: gaat deze pagina open zonder te klagen. |
 | `lifestyleschermen.e2e.js` | 2 | -- | DE TWAALF LIFESTYLE-SCHERMEN: LEGT EEN TOETS DE WEG ECHT AF? WAAROM JUIST DEZE TWAALF Bij het afsluiten van TAKEN 4.1 heb ik zelf de openstaande rest opgeschreven: "wat er nog steeds niet is: dezelfde weg door het... |
 | `media.e2e.js` | 1 | -- | CAMERA EN MICROFOON ZOALS EEN BROWSER ZE ERVAART. WAAROM DEZE TOETS BESTAAT. |
 | `meet.e2e.js` | 1 | -- | Scherm-test voor RTG Meet: A maakt een kamer, B komt binnen op de code, de WebRTC-mesh verbindt echt (nepcamera's van Chromium) en de hand opsteken komt bij de ander aan. Twee aparte browser-contexten, zodat beide... |
@@ -649,7 +653,7 @@ kijkt of er een domeinspecifieke toets omvalt.
 | `werkblad.e2e.js` | 1 | -- | Het werkblad en de middenconsole in een echte browser. Twee dingen die alleen daar te zien zijn: 1. |
 | `werkscherm.e2e.js` | 3 | -- | Het Werk OS-scherm in een echte browser: /apps/werk.html. Drie beweringen die van buiten NIET te zien zijn aan een groene API-toets: 1. |
 | `werkschermen.e2e.js` | 4 | -- | DE WERKSCHERMEN: WIE ZIT ER ACHTER, EN WAT MAG DIE ZIEN. De laatste grote groep uit TAKEN 4.9. |
-| `wings.e2e.js` | 1 | ja | DE WINGS van de leden-app: de werkbank naast de console. Op de computer kan de middenconsole niet groter -- dat is gemeten, niet gekozen: --e wordt begrensd door 1.48cqh omdat het beginscherm in EEN scherm past... |
+| `wings.e2e.js` | 1 | genoemd | DE WINGS van de leden-app: de werkbank naast de console. Op de computer kan de middenconsole niet groter -- dat is gemeten, niet gekozen: --e wordt begrensd door 1.48cqh omdat het beginscherm in EEN scherm past... |
 | `zaal.e2e.js` | 1 | -- | Scherm-test voor de hele keten van deze ronde: een LIED laten neerzetten met een eigen zin erin, het samen produceren, uitgeven, en het in DE ZAAL horen. De zwaarste bewering die hier op het scherm getoetst wordt: de... |
 | `zegel-ui.e2e.js` | 1 | -- | Scherm-test: "Toon je Zegel" in de leden-app. Het lid opent de Zegel-knop, kiest een feit (18+ staat standaard aan) en toont het. |
 

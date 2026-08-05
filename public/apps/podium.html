@@ -18,6 +18,9 @@
 <script src="/shared/uitvoer.js"></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
     --soft:var(--rtg-soft);--gold:#C9A24B;--rood:#DE6E92;--rood-diep:#C23A5E;--groen:#4C9A75;}
@@ -78,9 +81,7 @@
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 </style>
-<!-- de mediapoort: camera en microfoon door een deur, met de reden erbij als het niet gaat.
-     Niet defer en hier in de kop: elk kader en elk scherm eronder moet RTGMedia al hebben. -->
-<link rel="stylesheet" href="/shared/media.css">
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">

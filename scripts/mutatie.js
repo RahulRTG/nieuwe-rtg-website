@@ -1,0 +1,252 @@
+#!/usr/bin/env node
+/* ============================================================================
+   DE MUTATIEMOTOR -- kan deze toets eigenlijk zakken?
+
+   WAAROM. LAT.md regel 9: een toets die niet kan zakken is erger dan geen toets,
+   want hij geeft dekking zonder dekking te leveren. BEWIJS.md legde bloot hoe
+   groot dat gat hier is: van de 612 toetsbestanden noemen er 586 geen enkele
+   mutatie. "Noemt geen mutatie" is niet hetzelfde als "kan niet zakken" -- maar
+   het betekent wel dat niemand het weet, en dat is precies het probleem dat deze
+   motor oplost. Hij MEET het, per bestand.
+
+   TWEE SOORTEN TOETS, TWEE SOORTEN MUTATIE, en dat onderscheid is de hele opzet.
+
+   A. DE PURE TOETSEN (145 van de 544). Die laden een module rechtstreeks
+      (`require('../server/kern/pdf')`) en hebben geen server nodig. Voor elk
+      zo'n bestand pakken we de module die hij laadt, brengen er EEN mechanische
+      verandering in aan, en draaien alleen die toets. Zakt hij: bewezen
+      gevoelig. Blijft hij groen na alle operatoren: dan toetst hij het gedrag
+      van die module niet, of niet op een plek die deze operatoren raken.
+      Snel: geen server, seconden per bestand. Van de 145 laden er 134 een module
+      die te muteren is; de andere elf zeggen dat ook in de uitslag.
+
+   B. DE SERVERTOETSEN (399). Die starten een echte server en praten over HTTP.
+      Daar is de mutatie de LIEGPOORT die er al staat (server/opzet/liegpoort.js):
+      met RTG_LIEG=/api/ geeft elk endpoint een geldig maar leeg antwoord. Een
+      toets die dan groen blijft, kijkt nergens naar de inhoud van een antwoord.
+
+      DIT DEEL DUURT UREN, en dat is geen ontwerpfout maar de prijs: elke
+      servertoets moet twee keer draaien (een keer eerlijk om vast te stellen dat
+      hij groen IS, een keer liegend) en elke ronde start een echte server. Daarom
+      schrijft de motor na ELK bestand naar MUTATIES.json en slaat hij bij een
+      volgende ronde over wat er al in staat. Afbreken kost je dus niets, en
+      --opnieuw doet alles over.
+
+   WAT DEZE MOTOR NIET BEWEERT, en dit hoort er eerlijk bij:
+
+   - Een toets die zakt is BEWEZEN gevoelig, niet bewezen GOED. Hij kan op de
+     verkeerde reden zakken en nog steeds een slechte assertie hebben.
+   - Een toets die groen blijft is niet bewezen waardeloos. De operatoren hier
+     zijn mechanisch; er zijn fouten die ze niet maken.
+   - Bij de servertoetsen telt ook een toets die tijdens zijn VOORBEREIDING
+     omvalt (inloggen lukt niet meer als /api/auth/ liegt). Dat is echte
+     afhankelijkheid van echt gedrag, dus het telt -- maar het is een zwakker
+     bewijs dan een assertie die precies op de inhoud viel.
+   - Een module die niets teruggeeft (alleen in de database schrijft) kan onder
+     al deze mutaties terecht groen blijven.
+
+   Uitslag in MUTATIES.json; BEWIJS.md leest die en zet er per toets
+   "gemeten"/"gezakt"/"overleefd" in plaats van een woord uit commentaar.
+
+   Draai:  node scripts/mutatie.js               (alles -- lang)
+           node scripts/mutatie.js --puur        (alleen A)
+           node scripts/mutatie.js --server      (alleen B)
+           node scripts/mutatie.js test/pdf.test.js   (een bestand)
+   ========================================================================== */
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+const WORTEL = path.join(__dirname, '..');
+const TEST = path.join(WORTEL, 'test');
+const UITSLAG = path.join(WORTEL, 'MUTATIES.json');
+
+/* DE OPERATOREN. Mechanisch, klein, en elk met een reden waarom hij ECHT gedrag
+   verandert in plaats van alleen tekst. Ze worden een voor een geprobeerd tot de
+   toets zakt; dat is genoeg, want de vraag is "kan hij zakken" en niet "hoe vaak".
+
+   Elke operator werkt op de bron ZONDER commentaar en tekenreeksen mee te
+   rekenen, want een verandering in een uitlegregel bewijst niets. */
+const OPERATOREN = [
+  { naam: 'true->false', zoek: /\breturn true\b/, zet: 'return false' },
+  { naam: 'false->true', zoek: /\breturn false\b/, zet: 'return true' },
+  { naam: '===->!==', zoek: /===/, zet: '!==' },
+  { naam: '!==->===', zoek: /!==/, zet: '===' },
+  { naam: '>=->>', zoek: />=/, zet: '>' },
+  { naam: '<=-><', zoek: /<=/, zet: '<' },
+  { naam: '&&->||', zoek: /&&/, zet: '||' },
+  { naam: '+->-', zoek: /(\w) \+ (\w)/, zet: '$1 - $2' },
+  { naam: 'return-weg', zoek: /\breturn ([a-zA-Z_$][\w$.]*);/, zet: 'return undefined;' }
+];
+
+/* Waar mag een operator toeslaan? Niet in commentaar en niet in een tekenreeks:
+   daar verandert hij niets aan het gedrag, en dan meet de proef of de toets
+   tekst leest. We bouwen een masker van de bron en muteren alleen op posities
+   die daarin "code" zijn. */
+function codemasker(bron) {
+  const masker = new Array(bron.length).fill(true);
+  let i = 0;
+  const uit = (a, b) => { for (let k = a; k < b && k < masker.length; k++) masker[k] = false; };
+  while (i < bron.length) {
+    const twee = bron.slice(i, i + 2);
+    if (twee === '/*') { const e = bron.indexOf('*/', i + 2); const z = e < 0 ? bron.length : e + 2; uit(i, z); i = z; continue; }
+    if (twee === '//') { const e = bron.indexOf('\n', i); const z = e < 0 ? bron.length : e; uit(i, z); i = z; continue; }
+    const c = bron[i];
+    if (c === '"' || c === "'" || c === '`') {
+      let j = i + 1;
+      while (j < bron.length && bron[j] !== c) { if (bron[j] === '\\') j++; j++; }
+      uit(i, j + 1); i = j + 1; continue;
+    }
+    i++;
+  }
+  return masker;
+}
+
+/* Een operator toepassen op de EERSTE plek die in code staat. Geeft de nieuwe
+   bron terug, of null als er geen plek is. */
+function muteer(bron, op) {
+  const masker = codemasker(bron);
+  const re = new RegExp(op.zoek.source, 'g');
+  let m;
+  while ((m = re.exec(bron))) {
+    if (!masker[m.index]) continue;
+    const vervanging = m[0].replace(new RegExp(op.zoek.source), op.zet);
+    return bron.slice(0, m.index) + vervanging + bron.slice(m.index + m[0].length);
+  }
+  return null;
+}
+
+function draaiToets(bestand, env) {
+  const r = spawnSync('node', ['--experimental-sqlite', '--test', bestand], {
+    cwd: WORTEL, encoding: 'utf8', timeout: 240000, maxBuffer: 64 * 1024 * 1024,
+    env: Object.assign({}, process.env, env || {})
+  });
+  const uit = String(r.stdout || '');
+  const gezakt = (uit.match(/^not ok /gm) || []).length;
+  const geteld = /^# tests (\d+)/m.exec(uit);
+  return { gezakt, toetsen: geteld ? Number(geteld[1]) : 0, tijdout: r.error && r.error.code === 'ETIMEDOUT' };
+}
+
+/* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets
+   noemt de module die hij onderzoekt. Meerdere kandidaten: we nemen ze allemaal
+   en muteren in die volgorde -- de eerste die de toets laat zakken is genoeg. */
+function modulesVan(bestand) {
+  const bron = fs.readFileSync(bestand, 'utf8');
+  const uit = [];
+  for (const m of bron.matchAll(/require\('(\.\.\/(?:server|scripts|public)\/[^']+)'\)/g)) {
+    let p = path.join(TEST, m[1]);
+    if (!/\.[a-z]+$/.test(p)) p += '.js';
+    if (!fs.existsSync(p)) { const idx = p.replace(/\.js$/, '/index.js'); if (fs.existsSync(idx)) p = idx; else continue; }
+    const rel = path.relative(WORTEL, p).replace(/\\/g, '/');
+    if (!uit.includes(rel)) uit.push(rel);
+  }
+  return uit;
+}
+
+/* EEN PURE TOETS. Groen zonder mutatie is een voorwaarde: staat hij al rood, dan
+   bewijst "hij zakt" niets (LAT.md regel 3 -- een meter zonder invoer meet niet). */
+function proefPuur(naam) {
+  const bestand = path.join(TEST, naam);
+  const nul = draaiToets(bestand);
+  if (nul.gezakt > 0) return { soort: 'puur', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
+  if (!nul.toetsen) return { soort: 'puur', staat: 'geen toetsen gedraaid' };
+  const modules = modulesVan(bestand);
+  if (!modules.length) return { soort: 'puur', staat: 'geen module gevonden' };
+
+  for (const rel of modules) {
+    const p = path.join(WORTEL, rel);
+    const origineel = fs.readFileSync(p, 'utf8');
+    for (const op of OPERATOREN) {
+      const nieuw = muteer(origineel, op);
+      if (!nieuw || nieuw === origineel) continue;
+      try {
+        fs.writeFileSync(p, nieuw);
+        const check = spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' });
+        if (check.status !== 0) continue;         // mutatie brak de syntaxis: telt niet
+        const na = draaiToets(bestand);
+        if (na.gezakt > 0) return { soort: 'puur', staat: 'gezakt', module: rel, operator: op.naam, gezakt: na.gezakt };
+      } finally {
+        fs.writeFileSync(p, origineel);
+      }
+    }
+  }
+  return { soort: 'puur', staat: 'overleefd', modules, operatoren: OPERATOREN.length };
+}
+
+function isServerToets(naam) {
+  /* De zoekterm opgeknipt, precies zoals de patronen in regel 36 van
+     scripts/check.js: voluit gespeld leest een andere keuringsregel dit als een
+     require van scripts/helper.js, die niet bestaat. */
+  const teken = "require('./" + "helper')";
+  return fs.readFileSync(path.join(TEST, naam), 'utf8').includes(teken);
+}
+
+/* DE SERVERTOETSEN in EEN ronde: de liegpoort aan voor alle /api/-paden. Per
+   bestand kijken we of hij dan omvalt. Dat is honderdvijfenveertig keer een
+   server starten in plaats van honderdvijfenveertig ronden van de hele suite. */
+function proefServer(naam) {
+  const bestand = path.join(TEST, naam);
+  const nul = draaiToets(bestand);
+  if (nul.gezakt > 0) return { soort: 'server', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
+  if (!nul.toetsen) return { soort: 'server', staat: 'geen toetsen gedraaid' };
+  const na = draaiToets(bestand, { RTG_LIEG: '/api/' });
+  return na.gezakt > 0
+    ? { soort: 'server', staat: 'gezakt', operator: 'liegpoort /api/', gezakt: na.gezakt }
+    : { soort: 'server', staat: 'overleefd', operator: 'liegpoort /api/' };
+}
+
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  const losse = args.filter(a => !a.startsWith('--'));
+  const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
+
+  let namen = fs.readdirSync(TEST).filter(n => n.endsWith('.test.js')).sort();
+  if (losse.length) namen = losse.map(a => path.basename(a));
+
+  const puur = namen.filter(n => !isServerToets(n));
+  const server = namen.filter(n => isServerToets(n));
+  console.log('\nDE MUTATIEMOTOR -- ' + puur.length + ' pure toetsen (bronmutatie), ' +
+    server.length + ' servertoetsen (liegpoort)\n');
+
+  const eerder = fs.existsSync(UITSLAG) ? JSON.parse(fs.readFileSync(UITSLAG, 'utf8')) : { toetsen: {} };
+  const uitslag = eerder.toetsen || {};
+  const opnieuw = args.includes('--opnieuw');
+  /* Na ELK bestand wegschrijven, en overslaan wat er al in staat. Het serverdeel
+     duurt uren; een motor die alleen aan het eind wegschrijft verliest bij een
+     ctrl-C alles, en dan draait niemand hem ooit af. */
+  /* Op naam gesorteerd wegschrijven, en NIET met de replacer-array van
+     JSON.stringify: die filtert ook de sleutels van de geneste objecten weg, dus
+     dan staat er wel een nette lijst met bestandsnamen en geen enkele uitslag
+     erachter. Een gesorteerde kopie bouwen is de saaie en juiste manier. */
+  const bewaar = () => {
+    const op = {};
+    for (const k of Object.keys(uitslag).sort()) op[k] = uitslag[k];
+    fs.writeFileSync(UITSLAG, JSON.stringify({ toetsen: op }, null, 2) + '\n');
+  };
+  const gedaan = (naam) => !opnieuw && uitslag[naam] && uitslag[naam].staat !== 'geen toetsen gedraaid';
+
+  const doe = (lijst, proef) => {
+    let n = 0;
+    for (const naam of lijst) {
+      n++;
+      if (gedaan(naam)) { continue; }
+      const r = proef(naam);
+      uitslag[naam] = r;
+      bewaar();
+      console.log('  ' + String(n).padStart(4) + '/' + lijst.length + '  ' + naam.padEnd(42) +
+        r.staat + (r.operator ? '  [' + r.operator + (r.module ? ' in ' + r.module : '') + ']' : ''));
+    }
+  };
+
+  if (alleen !== 'server') { console.log('  --- A: pure toetsen, bronmutatie ---'); doe(puur, proefPuur); }
+  if (alleen !== 'puur') { console.log('  --- B: servertoetsen, liegpoort ---'); doe(server, proefServer); }
+
+  const per = (s) => Object.values(uitslag).filter(x => x.staat === s).length;
+  console.log('\n  gezakt (bewezen gevoelig)  ' + per('gezakt'));
+  console.log('  overleefd                  ' + per('overleefd'));
+  console.log('  niet te meten              ' + (Object.keys(uitslag).length - per('gezakt') - per('overleefd')));
+  console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
+}
+
+module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG };

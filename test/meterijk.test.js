@@ -307,6 +307,43 @@ const IJKINGEN = {
     }
   },
 
+  /* DE TWEE MUTATIEMETERS. Hun bron is MUTATIES.json, de uitslag van
+     scripts/mutatie.js. We zetten er kortstondig een verzonnen uitslag in en
+     kijken of het getal meebeweegt -- dezelfde vorm als de dependencies-proef
+     hieronder, en om dezelfde reden: een meter die zijn eigen bestand niet echt
+     leest, meet of hij draait en niet of hij ziet. */
+  toetsenOverleefdeMutatie: {
+    proef: (voor) => {
+      const p = path.join(WORTEL, 'MUTATIES.json');
+      const oud = fs.readFileSync(p, 'utf8');
+      try {
+        const j = JSON.parse(oud);
+        /* Een BESTAAND toetsbestand op "overleefd" zetten, want de meter loopt de
+           echte testmap af; een verzonnen naam zou hij terecht negeren. */
+        const naam = fs.readdirSync(path.join(WORTEL, 'test')).filter(n => n.endsWith('.test.js')).sort()[0];
+        j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
+        fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
+        return norm.meet().toetsenOverleefdeMutatie - voor.toetsenOverleefdeMutatie;
+      } finally { fs.writeFileSync(p, oud); }
+    }
+  },
+  toetsenNietGemeten: {
+    proef: (voor) => {
+      const p = path.join(WORTEL, 'MUTATIES.json');
+      const oud = fs.readFileSync(p, 'utf8');
+      try {
+        const j = JSON.parse(oud);
+        /* Een gemeten toets uit de uitslag halen: dan is hij niet gemeten, en
+           hoort het getal precies een omhoog te gaan. Slaat deze proef af, dan
+           telt de meter iets anders dan wat er in het bestand staat. */
+        const gemeten = Object.keys(j.toetsen).filter(k => j.toetsen[k].staat === 'gezakt' || j.toetsen[k].staat === 'overleefd');
+        if (!gemeten.length) throw new Error('MUTATIES.json bevat geen enkele gemeten toets, dus deze ijking kan niets aanwijzen');
+        delete j.toetsen[gemeten[0]];
+        fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
+        return norm.meet().toetsenNietGemeten - voor.toetsenNietGemeten;
+      } finally { fs.writeFileSync(p, oud); }
+    }
+  },
   dependencies: {
     /* De enige meter waarvan de bron een bestand is dat we ook echt even
        veranderen. Terugzetten gebeurt uit de tekst die we vooraf lazen, niet

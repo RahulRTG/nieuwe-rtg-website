@@ -802,8 +802,10 @@ geen documentatie maar reclame.
 - **De randcontrole: alles wat buiten de code ligt.** `npm run rand -- https://uwadres`
   meet aan een draaiende installatie wat de testsuite per definitie niet ziet:
   certificaat en TLS-versie, HSTS, de CSP zoals hij echt wordt uitgeserveerd
-  (met onderscheid tussen `script-src` en `style-src` — alleen het eerste is een
-  gat), of `http` doorstuurt, of `.env`/`.git`/`server/data` op straat liggen, en
+  (met onderscheid tussen `script-src`, `style-src` en `style-src-attr`: de
+  eerste twee draaien op een nonce zonder `unsafe-inline`, de derde houdt hem
+  nog — 8957 `style="…"`-attributen in `public/`, benoemd als openstaande post
+  in `middleware/voordeur.js`), of `http` doorstuurt, of `.env`/`.git`/`server/data` op straat liggen, en
   of een verzonnen `X-Forwarded-For` de snelheidslimiet omzeilt. Die laatste
   vond een echt gat: `trust proxy` stond vast op 1 en `verrijk.js` las het
   **linkse** adres uit de kop — het deel dat de bezoeker zelf verzint. Daarmee

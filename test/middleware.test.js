@@ -249,10 +249,20 @@ test('10. de functieschakelaars leggen per reden een andere zin klaar', () => {
   assert.equal(natieNaarLand('Marsbewoner'), null, 'onbekend is null, geen gok');
 });
 
-test('11. de CSP noemt geen unsafe-inline voor scripts', () => {
+test('11. de CSP noemt geen unsafe-inline voor scripts, en voor stijlblokken evenmin', () => {
   const c = CSP('abc123');
   assert.match(c, /script-src 'self' 'nonce-abc123'/);
   assert.ok(!/script-src[^;]*unsafe-inline/.test(c), 'scripts nooit op unsafe-inline');
+  /* Stijlblokken werken sinds kort ook op de nonce. De losse richtlijn moet
+     exact matchen: `style-src` is ook het begin van `style-src-attr`, en die
+     laatste MAG 'unsafe-inline' houden (de 8957 style="..."-attributen in
+     public/, zie de kop van middleware/voordeur.js). Zonder die woordgrens
+     leest deze toets de verkeerde regel en kan hij nooit falen. */
+  const richtlijn = (naam) => (new RegExp('(?:^|;)\\s*' + naam + '(\\s[^;]*)').exec(c) || [, ''])[1] || '';
+  assert.match(richtlijn('style-src'), /'nonce-abc123'/, 'stijlblokken op dezelfde nonce als de scripts');
+  assert.ok(!/unsafe-inline/.test(richtlijn('style-src')), 'stijlblokken niet meer op unsafe-inline');
+  assert.match(richtlijn('style-src-attr'), /'unsafe-inline'/,
+    'de attributen mogen nog wel: benoemde schuld, geen vergissing');
   assert.match(c, /object-src 'none'/);
   assert.match(c, /frame-ancestors 'self'/);
   assert.match(c, /base-uri 'self'/);

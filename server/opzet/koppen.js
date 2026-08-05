@@ -47,8 +47,20 @@ module.exports = function koppen({ app }) {
        zwakste bescherming kreeg. Een terugval die stiller is dan het origineel
        is de verkeerde kant op falen. Zonder unsafe-inline breekt zo'n pagina
        zichtbaar in plaats van dat ze haar bescherming stilletjes verliest. */
+    /* En style-src evenmin. Een nonce kan hier niet -- dit antwoord kan een
+       JSON-blob of een bestand zijn, er is geen pagina om te stempelen -- dus
+       staat er alleen 'self'. Een HTML-pagina die hier terechtkomt, verliest
+       daarmee de opmaak uit haar eigen <style>-blokken. Dat is met opzet: dat is
+       precies het geval dat hierboven wordt beschreven, en het hoort ZICHTBAAR
+       te zijn in plaats van een pagina die er goed uitziet met de zwakste regel
+       van het huis. test/csp.e2e.js loopt de vlaggenschepen langs en eist nul
+       blokkades, dus zo'n terugval valt op.
+
+       style-src-attr houdt wel 'unsafe-inline' -- zie de uitleg in
+       middleware/voordeur.js: er staan 8957 style="..."-attributen in public/,
+       en CSP kent geen stempel voor een attribuut. */
     res.set('Content-Security-Policy',
-      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+      "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; " +
       "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
       "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
     next();

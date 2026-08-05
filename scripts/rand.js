@@ -71,14 +71,27 @@ async function koppen() {
      is vervelend maar van een andere orde. Een controle die die twee op één
      hoop gooit, leert je af om naar de uitslag te kijken. */
   const csp = k('content-security-policy');
-  const deel = (naam) => (new RegExp(naam + '([^;]*)').exec(csp) || [, ''])[1];
+  /* De richtlijnnaam moet EXACT eindigen waar hij eindigt. Zonder de
+     woordgrens vond `style-src` ook `style-src-attr`, en dan las deze controle
+     de verkeerde regel voor -- precies het soort meting dat je aanleert weg te
+     kijken. */
+  const deel = (naam) => (new RegExp('(?:^|;)\\s*' + naam + '(\\s[^;]*)').exec(csp) || [, ''])[1] || '';
   if (!csp) blokkeer('Geen Content-Security-Policy op de hoofdpagina.');
   else {
     const script = deel('script-src');
     if (/unsafe-inline|unsafe-eval/.test(script)) blokkeer("script-src staat 'unsafe-inline' of 'unsafe-eval' toe: dat is het gat waar cross-site scripting doorheen komt.");
     else if (/nonce-/.test(script)) goed('CSP: script-src werkt met een nonce, zonder unsafe-inline.');
     else goed('CSP: script-src zonder unsafe-inline.');
-    if (/unsafe-inline/.test(deel('style-src'))) waarschuw("style-src staat 'unsafe-inline' toe. Lager risico dan bij scripts, maar het kan strakker met een nonce.");
+    const stijl = deel('style-src');
+    if (/unsafe-inline/.test(stijl)) waarschuw("style-src staat 'unsafe-inline' toe. Lager risico dan bij scripts, maar het kan strakker met een nonce.");
+    else if (/nonce-/.test(stijl)) goed('CSP: style-src werkt met een nonce; een ingespoten <style>-blok draait niet.');
+    /* En dan het eerlijke deel: de attributen. style-src-attr valt terug op
+       style-src, dus als hij er NIET staat is dat geen versoepeling. Staat hij
+       er wel met 'unsafe-inline', dan is dat een bewuste openstaande post en
+       hoort hij als zodanig in de uitslag -- niet verzwegen omdat de regel
+       ernaast er goed uitziet. */
+    if (/unsafe-inline/.test(deel('style-src-attr')))
+      waarschuw("style-src-attr staat 'unsafe-inline' toe: style=\"...\"-attributen mogen nog. Openstaande post, geen vergissing.");
     if (!/frame-ancestors/.test(csp)) waarschuw('De CSP noemt geen frame-ancestors: clickjacking is dan niet afgedekt.');
   }
 

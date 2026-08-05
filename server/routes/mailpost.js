@@ -16,7 +16,8 @@
    de To-kop van het bericht zelf. Een poort die de ontvanger uit een parameter
    haalt, is een open relay met extra stappen. */
 module.exports = (kern) => {
-  const { app, officeAuth, mailQ, mailIn, mailAuth, rtmail, werkmail } = kern;
+  const { app, officeAuth, auth, supplierAuth, db, mailQ, mailIn, mailAuth, mailBijlage, rtmail, rtmailRecht, codenaamVan } = kern;
+  const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
   const body = (req) => (req && req.body) || {};
 
   /* ---- beheer van de wachtrij (backoffice) ---- */
@@ -69,22 +70,61 @@ module.exports = (kern) => {
     const naar = d.naar || '';
     if (!naar) return res.status(400).json({ error: 'Dit bericht heeft geen ontvanger in de To-kop.', origineel: bewaard.id });
 
-    /* Alles van buiten valt in de onbetrouwde baan -- links onklikbaar, geen
-       bijlagen. De bijlagen die er WEL in zaten worden benoemd, niet bewaard:
-       er is geen malwarelaag, dus wordt er niets opgeslagen dat te openen valt. */
-    const bijlagenLijst = d.bijlagen.length
-      ? '\n\n[Dit bericht had ' + d.bijlagen.length + ' bijlage(n): ' +
-        d.bijlagen.map(b => b.naam).join(', ') + '. RTG Mail bewaart nooit een te openen bijlage.]'
-      : '';
+    /* Alles van buiten valt in de onbetrouwde baan -- links blijven onklikbaar.
+       BIJLAGEN GAAN NU WEL DOOR, maar alleen langs de scanner: wat schoon is
+       wordt bewaard, wat dat niet is verdwijnt MET de reden erbij. De regel is
+       niet veranderd, alleen de weg ernaartoe bestaat nu (kern/mailbijlage.js).
+       Dat gebeurt hieronder pas, want een bijlage hangt aan een bericht en dat
+       moet er dus eerst zijn. */
     const controles = '\n\n[Controles: DKIM ' + d.controles.dkim + '; SPF ' + d.controles.spf + '; DMARC ' + d.controles.dmarc + '.]';
     const m = rtmail.stuur({ van: d.van, naar, onderwerp: d.onderwerp,
-      tekst: d.tekst + bijlagenLijst + controles, soort: 'extern', bron: 'extern' });
+      tekst: d.tekst + controles, soort: 'extern', bron: 'extern' });
     if (m && m.error) return res.status(400).json({ error: m.error, origineel: bewaard.id });
 
+    const bijlagen = mailBijlage.verwerk(m.id, d.bijlagen, { van: d.van });
+    const geweigerd = bijlagen.filter(b => !b.bewaard);
+    if (bijlagen.length) {
+      /* De uitkomst gaat in de TEKST van het bericht, niet alleen in het
+         antwoord aan de mailserver. Die server leest dit nooit; de ontvanger
+         wel, en die hoort te weten dat er iets bij zat en wat ermee gebeurd
+         is -- juist als het geweigerd werd. */
+      m.tekst += '\n\n[Bijlagen: ' + bijlagen.map(b => b.naam + (b.bewaard ? '' : ' -- GEWEIGERD: ' + b.waarom)).join('; ') + ']';
+    }
+
     res.json({ ok: true, id: m.id, origineel: bewaard.id, controles: d.controles,
-      bijlagen: d.bijlagen.map(b => ({ naam: b.naam, soort: b.soort, bytes: b.bytes })),
-      let: 'Het originele bericht is onveranderd bewaard; wat in het postvak staat is een afgeleide.' });
+      bijlagen, geweigerd: geweigerd.length,
+      let: 'Het originele bericht is onveranderd bewaard; wat in het postvak staat is een afgeleide. Bijlagen zijn door de scanner gegaan; alleen wat schoon was, is bewaard.' });
   });
+
+  /* EEN BIJLAGE OPENEN. Twee ingangen (lid en zaak), en beide toetsen eerst of
+     deze inlog het BERICHT mag lezen -- de bijlage hoort bij het bericht, niet
+     bij de gebruiker. kern/mailbijlage.js kent de post niet en oordeelt daar
+     dus ook niet over; die scheiding is met opzet. */
+  for (const p of [{ pad: '/api/member/rtmail', poort: auth, adres: (req) => wie.lidAdres(req) },
+                   { pad: '/api/supplier/rtmail', poort: supplierAuth, adres: (req) => wie.zaakAdres(req) }]) {
+    app.post(p.pad + '/bijlagen', p.poort, (req, res) => {
+      const a = p.adres(req);
+      if (!a) return res.status(404).json({ error: 'Geen postvak voor deze inlog.' });
+      const m = ((db.data.rtmail || {}).berichten || []).find(x => x.id === String(body(req).id || ''));
+      if (!m) return res.status(404).json({ error: 'Dat bericht bestaat niet.' });
+      const g = rtmailRecht.poort(a, m.naar, 'lezen');
+      if (!g.ok) return res.status(403).json({ error: g.waarom });
+      res.json({ ok: true, bijlagen: mailBijlage.bij(m.id) });
+    });
+
+    app.post(p.pad + '/bijlage', p.poort, (req, res) => {
+      const a = p.adres(req);
+      if (!a) return res.status(404).json({ error: 'Geen postvak voor deze inlog.' });
+      const b = mailBijlage.open(String(body(req).id || ''));
+      if (b.error) return res.status(404).json(b);
+      const m = ((db.data.rtmail || {}).berichten || []).find(x => x.id === b.bericht);
+      if (!m) return res.status(404).json({ error: 'Het bericht van deze bijlage bestaat niet meer.' });
+      const g = rtmailRecht.poort(a, m.naar, 'lezen');
+      if (!g.ok) return res.status(403).json({ error: g.waarom });
+      res.json({ ok: true, naam: b.naam, soort: b.soort, bytes: b.bytes,
+        inhoud: 'data:' + b.soort + ';base64,' + b.inhoud.toString('base64') });
+    });
+  }
 
   /* Het origineel terugvragen. Achter de backoffice-inlog, want dit is de ruwe
      post van iemand anders. */

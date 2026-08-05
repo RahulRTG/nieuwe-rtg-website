@@ -18,7 +18,7 @@
    belangrijkste helft. */
 'use strict';
 
-module.exports = ({ db, save, crypto, findSupplier }) => {
+module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
   const CODENAMES = require('../accounts/kluis').CODENAMES;
 
   // RTMAIL: het interne postsysteem (de rail voor de automatiseringen)
@@ -78,6 +78,11 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
      domein zonder record, een DNS-storing, een SPF die slaagt op een domein dat
      de lezer nooit ziet. */
   const mailAuth = require('../kern/mailauth')({ dns: require('dns').promises });
+  /* Bijlagen van buiten: eerst door de scanner die er al stond (kern/antivirus,
+     dezelfde die de bestandenkluis bewaakt), en alleen wat schoon is wordt
+     bewaard. Er is hier GEEN tweede scanner gebouwd -- wat ontbrak was de weg
+     ernaartoe. */
+  const mailBijlage = require('../kern/mailbijlage')({ db, save, crypto, antivirus, dir: DATA_DIR });
 
   /* De AI-hulp bij een gesprek: samenvatten, actiepunten, en uitleggen waarom
      iets op phishing lijkt. Leest en vat samen, meer niet -- elk gevolg blijft
@@ -86,6 +91,6 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
      geen hulp. */
   const rtmailAi = require('../kern/rtmail-ai')({ rtmail, vak: rtmailVak });
 
-  return { mailQ, mailIn, mailAuth, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
+  return { mailQ, mailIn, mailAuth, mailBijlage, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
     rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar };
 };

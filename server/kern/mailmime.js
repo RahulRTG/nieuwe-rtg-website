@@ -71,7 +71,15 @@ function delen(kop, lijf, diep) {
     const uit = ontcijferLijf(lijf, kop['content-transfer-encoding'], charsetVan(ct));
     const naam = (/filename\s*=\s*"?([^";]+)"?/i.exec(kop['content-disposition'] || '') || [])[1] || null;
     if (naam || /^application\//i.test(ct)) {
-      return { tekst: '', bijlagen: [{ naam: naam || '(zonder naam)', soort: ct.split(';')[0].trim(), bytes: lijf.length }] };
+      /* DE BYTES GAAN MEE, en dat is nieuw. Tot nu toe werd van een bijlage
+         alleen de naam en de lengte bewaard, omdat er geen scanner achter zat
+         en opslaan zonder scanner erger is dan weigeren. Die scanner is er wel
+         (kern/antivirus) -- hij stond alleen niet op deze weg. De bytes worden
+         hier UITGEPAKT maar nergens opgeslagen; wat ermee gebeurt beslist
+         kern/mailbijlage.js, en dat is de enige plek die ze mag bewaren. */
+      const rauw = uit.ok ? Buffer.from(uit.tekst, 'latin1') : Buffer.alloc(0);
+      return { tekst: '', bijlagen: [{ naam: naam || '(zonder naam)', soort: ct.split(';')[0].trim(),
+        bytes: rauw.length, inhoud: rauw }] };
     }
     return { tekst: uit.ok ? uit.tekst : '[' + uit.waarom + ']', bijlagen: [], html: /^text\/html/i.test(ct) };
   }

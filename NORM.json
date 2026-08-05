@@ -1,8 +1,8 @@
 {
   "vastgelegd": "2026-08-05",
   "meters": {
-    "endpointsZonderTest": 852,
-    "dekkingPct": 69,
+    "endpointsZonderTest": 844,
+    "dekkingPct": 70,
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
@@ -22,6 +22,12 @@
     "inlineStijlAttributen": 5549
   },
   "notities": [
+    {
+      "datum": "2026-08-05",
+      "meter": "de vier rode meters die deze ronde zijn gedicht",
+      "reden": "endpointsZonderTest 894 -> 844 (norm 852, nu eronder), dekkingPct 69 -> 70, keuringDubbeling 57 -> 56, keuringOmvang 83 -> 81. Vijftig endpoints stonden zonder toets, alle vijftig uit de mailronde van vandaag: 37 aan de ZAAKkant van RTmail (test/rtmail-zaak.test.js), 5 in de postkamer, 3 IMAP-sleutels, 3 ledenknoppen en 2 PDF-notities (test/mailpost-kantoor.test.js).",
+      "eerlijkheidshalve": "DRIE DINGEN DIE DEZE RONDE AAN HET LICHT BRACHT EN DIE GEEN VAN DE ANDERE POORTEN ZAG. (1) De zaakkant van RTmail was volledig ongetoetst: zeven toetsbestanden dekten de ledenkant, en de tweede deur -- dezelfde code, andere poort, ander adres -- had er geen een. Precies het patroon waar dit huis al eerder op struikelde. Een mutatie (p.poort weggehaald bij /zoek) laat de nieuwe toets nu vallen. (2) server/kern/mailbijlage.js en server/kern/mailwachtrij.js droegen LETTERLIJKE stuurtekens in hun bron (een NUL en een 0x1f in een tekenklasse, een NUL als scheidingsteken in een hash). Daardoor zag `file` ze als binair en SLOEG grep -r ze over -- dus elke tekstgebaseerde controle in deze repo, inclusief de geheimenscan, keek er stilzwijgend langs. Nu \\x00 en \\x1f als ontsnapping: zelfde gedrag, weer gewone tekst. (3) De dekkingsmeting zoekt de LETTERLIJKE padtekst in een toets. Mijn eerste versie van test/rtmail-zaak.test.js bouwde de adressen op uit een voorvoegsel, en dekte daarmee volgens de meter nul endpoints terwijl hij ze alle 37 aanriep. De paden staan nu voluit."
+    },
     {
       "datum": "2026-08-05",
       "meter": "inlineStijlAttributen 6040 -> 5549 (nieuw, en de grondwaarde is een keer gecorrigeerd)",

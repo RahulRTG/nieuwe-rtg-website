@@ -73,6 +73,13 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
     verzend: (rij) => require('../mail').bezorgNu(rij.naar, rij.onderwerp, rij.tekst) });
   const mailIn = require('../kern/mailinkomend')({ db, save, crypto, dkim: require('../dkim') });
 
-  return { mailQ, mailIn, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
+  /* De AI-hulp bij een gesprek: samenvatten, actiepunten, en uitleggen waarom
+     iets op phishing lijkt. Leest en vat samen, meer niet -- elk gevolg blijft
+     een handeling van een mens langs de gewone poorten. Werkt zonder taalmodel;
+     een hulp die alleen bestaat als er een sleutel in de omgeving staat, is
+     geen hulp. */
+  const rtmailAi = require('../kern/rtmail-ai')({ rtmail, vak: rtmailVak });
+
+  return { mailQ, mailIn, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailVrij, rtmailSchrijf,
     rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar };
 };

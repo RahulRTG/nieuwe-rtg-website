@@ -93,6 +93,13 @@
   .etiket{color:var(--gold);font-size:.7rem;letter-spacing:.03em;}
   .draadje{border-top:1px solid var(--line);padding-top:.8rem;margin-top:.9rem;}
   .draadje:first-of-type{border-top:0;padding-top:0;margin-top:.4rem;}
+  .draadje.aangewezen{outline:1px solid var(--gold);outline-offset:6px;}
+  .hulpblok{margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line);}
+  .hulprij{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);
+    color:var(--muted);font:inherit;font-size:.8rem;padding:.5rem 0;cursor:pointer;}
+  .hulprij:hover{color:var(--txt);}
+  .hulplijst{margin:.5rem 0 0;padding-left:1.1rem;font-size:.82rem;color:var(--muted);}
+  .hulplijst li.zwaar{color:var(--txt);}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/desktopframe.css" rel="stylesheet">
@@ -395,12 +402,46 @@ async function toonDraad(m){
     '<div class="kaart"><h2>Gesprek</h2>'+
     '<div class="meta">'+d.berichten.length+' bericht(en), oudste eerst</div>'+
     d.berichten.map(b=>{ const band=bandVan(b);
-      return '<div class="draadje"><div class="band '+band.cls+'">'+(band.cls==='no'?SLOT:SCHILD)+'<span>'+esc(band.t)+'</span></div>'+
+      return '<div class="draadje" id="b-'+esc(b.id)+'"><div class="band '+band.cls+'">'+(band.cls==='no'?SLOT:SCHILD)+'<span>'+esc(band.t)+'</span></div>'+
         '<div class="meta">'+esc(b.van)+' · '+esc(langTijd(b.at))+'</div>'+
         '<div class="body">'+veiligBody(b.tekst, !!b.vertrouwd)+'</div></div>'; }).join('')+
-    (d.let?'<div class="noot" style="text-align:left;">'+esc(d.let)+'</div>':'')+'</div>';
+    (d.let?'<div class="noot" style="text-align:left;">'+esc(d.let)+'</div>':'')+
+    '<div class="acties">'+
+      '<button class="knp" data-hulp="samenvatting">Vat dit gesprek samen</button>'+
+      '<button class="knp" data-hulp="acties">Wat wordt er van mij gevraagd?</button>'+
+      '<button class="knp" data-hulp="risico">Is dit te vertrouwen?</button>'+
+    '</div><div id="hulpUit"></div></div>';
   $('#main').querySelectorAll('.body').forEach(bindLinks);
   $('#terug').addEventListener('click', laadInbox);
+  $('#main').querySelectorAll('[data-hulp]').forEach(b=>b.addEventListener('click',()=>hulp(m, b.dataset.hulp)));
+}
+
+/* De hulp bij een gesprek. Elke regel die terugkomt draagt het bericht waar hij
+   vandaan komt, en is aanklikbaar: een samenvatting waar je niet op terug kunt
+   springen, is een tweede versie van de waarheid. */
+async function hulp(m, wat){
+  const uit=$('#hulpUit'); if(!uit) return;
+  uit.innerHTML='<div class="noot" style="text-align:left;">Even kijken…</div>';
+  let d; try{ d=await api('hulp',{id:m.id,wat:wat}); }catch(e){ uit.innerHTML='<div class="fout">'+esc(e.message)+'</div>'; return; }
+  const naar=(id,tekst)=>'<button class="hulprij" data-spring="'+esc(id)+'">'+tekst+'</button>';
+  if(wat==='acties'){
+    uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' actiepunt(en)</b>'+
+      d.acties.map(a=>naar(a.bericht, esc(a.zin)+(a.datums.length?' <span class="etiket">'+esc(a.datums.join(', '))+'</span>':''))).join('')+
+      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+  } else if(wat==='risico'){
+    uit.innerHTML='<div class="hulpblok"><b>'+esc(d.oordeel)+'</b>'+
+      (d.redenen.length?'<ul class="hulplijst">'+d.redenen.map(r=>'<li'+(r.zwaar?' class="zwaar"':'')+'>'+esc(r.uitleg)+'</li>').join('')+'</ul>':'')+
+      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+  } else {
+    uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' bericht(en), '+esc(d.deelnemers.join(' en '))+'</b>'+
+      '<div class="meta">Aan zet: '+esc(d.aanZet)+'</div>'+
+      d.punten.map(p=>naar(p.bericht, (p.vanMij?'<span class="etiket">u</span> ':'')+esc(p.zin))).join('')+
+      '<div class="noot" style="text-align:left;">'+esc(d.let)+'</div></div>';
+  }
+  uit.querySelectorAll('[data-spring]').forEach(b=>b.addEventListener('click',()=>{
+    const el=$('#b-'+b.dataset.spring);
+    if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('aangewezen'); setTimeout(()=>el.classList.remove('aangewezen'),1600); }
+  }));
 }
 laadInbox();
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !$('#terug')) laadInbox(); });

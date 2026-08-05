@@ -102,10 +102,26 @@ test('postvak op het scherm: mappen, opbergen, ster, zoeken en het gesprek',
     await page.click('.rij:has-text("Factuur augustus")');
     await page.waitForSelector('[data-act="draad"]', { timeout: 10000 });
 
-    // het gesprek van een bericht
+    // het gesprek van een bericht, met de hulp erbij
     await page.click('[data-act="draad"]');
     await page.waitForSelector('.draadje', { timeout: 10000 });
     assert.equal(await page.locator('.draadje').count(), 1, 'dit gesprek heeft een bericht');
+
+    /* De hulp moet TERUG kunnen wijzen. Een samenvatting waarop je niet kunt
+       doorklikken naar het oorspronkelijke bericht, is een tweede versie van de
+       waarheid -- dus toetsen we niet alleen dat er tekst verschijnt, maar dat
+       elke regel een bericht aanwijst dat op deze pagina staat. */
+    await page.click('[data-hulp="samenvatting"]');
+    await page.waitForSelector('.hulpblok .hulprij', { timeout: 10000 });
+    const springt = await page.$$eval('.hulprij', ns => ns.map(n => n.dataset.spring));
+    assert.ok(springt.length >= 1, 'de samenvatting heeft regels');
+    for (const id of springt) {
+      assert.equal(await page.locator('#b-' + id).count(), 1, 'regel wijst naar bericht ' + id + ' op deze pagina');
+    }
+    await page.click('[data-hulp="risico"]');
+    await page.waitForSelector('.hulpblok b', { timeout: 10000 });
+    assert.match(await page.textContent('.hulpblok'), /geen score/, 'het risico komt met redenen, niet met een cijfer');
+
     await page.click('#terug');
     await page.waitForSelector('.mapbalk', { timeout: 10000 });
 

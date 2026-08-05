@@ -9,7 +9,7 @@
    Alle antwoorden gaan door dezelfde vorm: { ok, ... } of { error } met een
    uitleg die een mens verder helpt. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, db, rtmail, rtmailVak, rtmailDraad, codenaamVan } = kern;
+  const { app, auth, supplierAuth, db, rtmail, rtmailVak, rtmailDraad, rtmailAi, codenaamVan } = kern;
   const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
 
   const lid = (req) => wie.lidAdres(req);
@@ -98,6 +98,29 @@ module.exports = (kern) => {
       const r = rtmailVak.zoek(a, String(b.vraag || ''), { map: b.map, limit: b.limit });
       if (r.error) return res.status(400).json(r);
       res.json(r);
+    });
+
+    /* De AI-hulp op EEN gesprek. Drie vragen, en alle drie geven ze het
+       bericht-id mee waar het antwoord vandaan komt -- zonder die verwijzing
+       is een samenvatting een tweede versie van de waarheid.
+
+       Deze ingang LEEST alleen. Hij verstuurt niets, verplaatst niets en
+       besluit niets; dat blijft bij de gewone poorten hierboven. */
+    app.post(p.pad + '/hulp', p.poort, (req, res) => {
+      const a = p.adres(req);
+      if (!a) return geenPostvak(res);
+      const b = body(req);
+      const d = rtmailDraad.draad(a, String(b.id || ''));
+      if (d.error) return res.status(404).json(d);
+      const wat = String(b.wat || 'samenvatting');
+      if (wat === 'acties') return res.json(rtmailAi.acties(d.berichten, a));
+      if (wat === 'risico') {
+        const m = d.berichten.find(x => x.id === String(b.id));
+        return res.json(rtmailAi.risico(m));
+      }
+      const s = rtmailAi.samenvatting(d.berichten, a);
+      if (s.error) return res.status(400).json(s);
+      res.json(Object.assign(s, { buitenBeeld: d.buitenBeeld }));
     });
 
     // antwoorden binnen een gesprek: de ontvanger volgt uit het bericht

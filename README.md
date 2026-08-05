@@ -853,6 +853,8 @@ De toestand van een bericht hangt **per bus** en niet op het bericht. Dat is gee
 
 **De infrastructuur.** `kern/mailwachtrij.js` legt uitgaande post in een lade met oplopende wachttijden (1, 5, 15, 60, 240 minuten), herhaalt een permanente fout nooit, houdt een dead-letter lade bij en herkent dubbele aflevering. `kern/mailinkomend.js` pakt echte RFC 5322-post uit (doorgevouwen koppen, encoded-words, MIME, base64, quoted-printable, platte tekst boven HTML), bewaart het **origineel ongewijzigd** en stempelt de uitslag van de controles -- ook als die "niet gecontroleerd" is. Alles van buiten blijft onbetrouwd: links onklikbaar, bijlagen benoemd maar nooit opgeslagen als iets dat te openen valt.
 
+**AI-hulp bij een gesprek** (`kern/rtmail-ai.js`): samenvatten, actiepunten herkennen en uitleggen waarom iets op phishing lijkt. Eén regel vormt dat hele bestand: **elke bewering draagt de herkomst mee** -- elk punt, elk actiepunt en elke risicomelding noemt het bericht-id waar het vandaan komt, en op het scherm springt u er met een klik naartoe. Een samenvatting zonder verwijzing is een tweede versie van de waarheid. Risico komt als *redenen*, niet als cijfer: "risico 7,4" zegt een lezer niets, "dit bericht vraagt om een wachtwoord" wel. De laag leest en vat samen; antwoorden, betalen en opbergen blijven handelingen van een mens langs de gewone poorten, en er is geen taalmodel voor nodig -- een hulp die alleen bestaat als er een sleutel in de omgeving staat, is geen hulp.
+
 Wat er bewust **niet** in zit: een regel die post doorstuurt naar een ander adres (de kortste weg naar post die ongemerkt het huis verlaat, en naar lussen), een teller wie het meest afhandelt, en een prullenbak die echt wist.
 
 ## Partner worden & e-mail

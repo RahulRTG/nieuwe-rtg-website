@@ -1936,11 +1936,13 @@ console.log('\n36) geen proefrestant in de laatste commit');
     }
     /* EN DE BLINDE VLEK DIE DEZE REGEL ZELF HAD, gevonden doordat hij hem miste.
 
-       Op 2026-08-05 kwamen drie ijkbestanden mee in een commit
-       (server/kern/zz-ijk-tijdelijk-a/b/c.js) en deze regel gaf groen. De reden:
-       hij grep't in de INHOUD, en de inhoud van zo'n bestand is
-       `function zzIjkTijdelijkeNaam(x)` -- camelCase, zonder streepjes. De marker
-       zat alleen in de BESTANDSNAAM, en daar keek niemand.
+       Op 2026-08-05 kwamen drie ijkbestanden mee in een commit (drie keer de
+       tijdelijke naam onder server/kern/, met -a, -b en -c erachter) en deze regel
+       gaf groen. De reden: hij grep't in de INHOUD, en de inhoud van zo'n bestand
+       is `function zzIjkTijdelijkeNaam(x)` -- camelCase, zonder streepjes. De
+       marker zat alleen in de BESTANDSNAAM, en daar keek niemand.
+       (De naam staat hier niet voluit, om precies de reden die hierboven bij de
+       opgeknipte patronen staat: dan klaagt deze regel over zijn eigen uitleg.)
 
        Dat is precies de vorm die de rest van deze lijst probeert te voorkomen: een
        handhaver die iets net niet dekt is gevaarlijker dan geen handhaver, want

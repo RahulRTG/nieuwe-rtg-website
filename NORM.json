@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
-    "testbestanden": 544,
+    "testbestanden": 545,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 68,
@@ -25,8 +25,8 @@
     "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenOverleefdeMutatie": 6,
-    "toetsenNietGemeten": 568
+    "toetsenNietGemeten": 553,
+    "toetsenOngevoeligPct": 13.3
   },
   "notities": [
     {
@@ -252,6 +252,12 @@
       "meter": "kernBreedte 944 -> 947 en kernGedeeld 141 -> 142 (met de hand VERHOOGD)",
       "reden": "Die 944 en 141 zijn vastgelegd na de EERSTE knip van de ongebruikte kern-namen, en die knip was fout: hij haalde drie namen weg die wel gebruikt worden, omdat de meting `{ ...publicSupplier(s) }` als een punt-toegang las (zie TAKEN.md 6.9). De app gaf daarop een 500 en test/allergie.test.js viel om. Na de reparatie blijven die drie namen staan, en dan zijn de echte getallen 947 en 142. De oude grondwaarde was dus nooit een geldige stand van dit huis maar de stand van een kapotte meting.",
       "eerlijkheidshalve": "Een ratel omhoog zetten is precies wat je niet hoort te doen, dus dit hoort met naam en reden vast te liggen. Wat het NIET is: een verslechtering wegpoetsen. De vergelijking die telt is met de stand VOOR deze ronde -- daar stond kernBreedsteBestand op 139 en kernGedeeld op 145, en die zijn nu 71 en 142. Wat het WEL is: ik heb een grondwaarde vastgelegd voordat de suite een keer schoon was gedraaid, en dat was te vroeg. Een norm vastleggen hoort na de toetsen, niet ervoor."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "toetsenOverleefdeMutatie vervangen door toetsenOngevoeligPct",
+      "reden": "Het absolute aantal overlevers stijgt zodra je MEER meet, dus stond de ratel rood (8 tegen norm 6) terwijl er niets slechter was geworden -- er waren alleen vier toetsen bijgemeten. Een meter die rood wordt omdat je hem gebruikt, leert iedereen om te stoppen met meten. Als aandeel van de gemeten toetsen is hij onafhankelijk van hoe ver de motor is.",
+      "eerlijkheidshalve": "Dit is de tweede keer vandaag dat ik een grondwaarde te vroeg heb vastgelegd: de eerste keer bij kernBreedte/kernGedeeld (uit een kapotte meting), nu bij een meter waarvan de VORM verkeerd was voor wat hij moest bewaken. De les is dezelfde en staat er nu twee keer: leg een norm pas vast als je de meter een keer hebt zien bewegen om de goede reden."
     }
   ],
   "prestatie": {

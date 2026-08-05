@@ -312,18 +312,22 @@ const IJKINGEN = {
      kijken of het getal meebeweegt -- dezelfde vorm als de dependencies-proef
      hieronder, en om dezelfde reden: een meter die zijn eigen bestand niet echt
      leest, meet of hij draait en niet of hij ziet. */
-  toetsenOverleefdeMutatie: {
+  toetsenOngevoeligPct: {
     proef: (voor) => {
       const p = path.join(WORTEL, 'MUTATIES.json');
       const oud = fs.readFileSync(p, 'utf8');
       try {
         const j = JSON.parse(oud);
-        /* Een BESTAAND toetsbestand op "overleefd" zetten, want de meter loopt de
-           echte testmap af; een verzonnen naam zou hij terecht negeren. */
-        const naam = fs.readdirSync(path.join(WORTEL, 'test')).filter(n => n.endsWith('.test.js')).sort()[0];
-        j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
+        /* Drie BESTAANDE toetsbestanden op "overleefd" zetten, want de meter loopt
+           de echte testmap af; een verzonnen naam zou hij terecht negeren. Drie en
+           niet een, omdat het een percentage is: bij zestig metingen schuift een
+           enkele overlever het getal met 1,6 procentpunt en dat kan door afronding
+           net onder de zichtbaarheid blijven. */
+        const namen = fs.readdirSync(path.join(WORTEL, 'test'))
+          .filter(n => n.endsWith('.test.js')).sort().slice(0, 3);
+        for (const naam of namen) j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
         fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        return norm.meet().toetsenOverleefdeMutatie - voor.toetsenOverleefdeMutatie;
+        return norm.meet().toetsenOngevoeligPct - voor.toetsenOngevoeligPct;
       } finally { fs.writeFileSync(p, oud); }
     }
   },

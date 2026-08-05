@@ -151,9 +151,21 @@ function muteer(bron, op, index) {
    ongemerkt in een commit kunnen zitten.
 
    Dus houdt de motor bij wat er OP DIT MOMENT gemuteerd is, en zet hij dat terug
-   bij SIGINT, SIGTERM en een onverwachte uitzondering. Regel 36 van
+   bij SIGINT, SIGTERM, SIGHUP en een onverwachte uitzondering. Regel 36 van
    scripts/check.js vangt zo'n restant in een COMMIT; deze wacht voorkomt dat hij
-   er ooit komt. */
+   er ooit komt.
+
+   WAT DE WACHT NIET DEKT, en dat is geen slordigheid maar een grens van het
+   besturingssysteem: SIGKILL (kill -9) is niet te vangen. Nagemeten en het klopt:
+   een kill -9 midden in de ronde liet test/zz-ijk-tijdelijk.test.js staan -- een
+   ijkbestand van meterijk.test.js, dat de motor op dat moment aan het draaien was.
+   Wie de motor met -9 afbreekt, hoort daarna `git status` te lezen. Regel 36 is
+   het net eronder.
+
+   EN EEN GEVOLG WAAR JE OP MOET REKENEN: zolang de motor draait, staat er ALTIJD
+   een bronbestand gemuteerd in de werkboom. Dat is geen vervuiling maar het werk
+   zelf. Een mutatieronde en "de werkboom moet schoon zijn" gaan dus niet samen;
+   committen doe je tussen de fases, niet tijdens. */
 const open = new Map();                  // pad -> originele inhoud
 function zetTerug() {
   for (const [p, bron] of open) { try { fs.writeFileSync(p, bron); } catch (e) { /* niets meer aan te doen */ } }

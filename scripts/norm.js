@@ -154,14 +154,22 @@ const METERS = [
 
      TWEE METERS EN GEEN EEN, want dat zijn twee verschillende dingen:
 
-       toetsenOverleefdeMutatie  gemeten EN groen gebleven. Dit is de echte
-                                 schuld: hier weet je nu dat er iets mist.
-       toetsenNietGemeten        de motor is er nog niet langs geweest. Dit is de
-                                 dekking van het INSTRUMENT, niet van de code.
+       toetsenOngevoeligPct  van de GEMETEN toetsen: welk deel bleef groen. Dit is
+                             de echte schuld.
+       toetsenNietGemeten    de motor is er nog niet langs geweest. Dit is de
+                             dekking van het INSTRUMENT, niet van de code.
 
      Ze samentellen zou de tweede voor de eerste laten doorgaan -- dezelfde fout
-     als de geblende teller hieronder, die om die reden is opgeknipt. */
-  { sleutel: 'toetsenOverleefdeMutatie', richting: 'omlaag', wat: 'toetsen die een mutatie in hun eigen bron overleefden (bewezen ongevoelig)' },
+     als de geblende teller hieronder, die om die reden is opgeknipt.
+
+     EN WAAROM DE EERSTE EEN PERCENTAGE IS EN GEEN AANTAL. Hij stond eerst als
+     `toetsenOverleefdeMutatie`, een absoluut getal, met een grondwaarde van 6 na
+     de eerste zestig metingen. Vier metingen later stond hij op 8 en was de ratel
+     rood -- terwijl er niets slechter was geworden: er was alleen MEER gemeten.
+     Een meter die rood wordt omdat je hem gebruikt, leert iedereen om te stoppen
+     met meten. Als aandeel van wat er gemeten is, is hij onafhankelijk van hoe
+     ver de motor gekomen is, en dan betekent een stijging wat hij zegt. */
+  { sleutel: 'toetsenOngevoeligPct', richting: 'omlaag', wat: 'aandeel van de GEMETEN toetsen dat een mutatie in eigen bron overleefde (%)' },
   { sleutel: 'toetsenNietGemeten', richting: 'omlaag', wat: 'toetsen waar de mutatiemotor nog niet langs is geweest' },
   /* DEZE METER WAS EEN GEBLENDE TELLER, precies zoals keuringBeter dat was, en
      hij liep om dezelfde reden vast: hij telde twee onvergelijkbare dingen bij
@@ -414,14 +422,20 @@ function meet() {
     try { rauw = JSON.parse(fs.readFileSync(p, 'utf8')).toetsen || {}; }
     catch (e) { throw new Error('MUTATIES.json is er niet of onleesbaar (' + e.message + '); draai npm run mutatie -- twee meters hebben hem als invoer'); }
     const alle = inMap.filter(n => /\.(test|e2e)\.js$/.test(n));
-    let overleefd = 0, nietGemeten = 0;
+    let overleefd = 0, gezakt = 0, nietGemeten = 0;
     for (const n of alle) {
       const m = rauw[n];
       if (!m) { nietGemeten++; continue; }
       if (m.staat === 'overleefd') overleefd++;
-      else if (m.staat !== 'gezakt') nietGemeten++;   // 'al rood', 'geen module gevonden', ...
+      else if (m.staat === 'gezakt') gezakt++;
+      else nietGemeten++;      // 'al rood', 'geen module gevonden', 'slaat zichzelf over', ...
     }
-    return { overleefd, nietGemeten };
+    const gemeten = overleefd + gezakt;
+    /* Een percentage over nul metingen is geen nul maar ONBEKEND, en dat mag geen
+       perfecte score worden (LAT.md regel 3). Zonder metingen hoort de meter niet
+       te bestaan; norm.js noemt hem dan als nieuw zonder grondwaarde. */
+    if (!gemeten) throw new Error('MUTATIES.json bevat geen enkele gemeten toets; draai npm run mutatie voordat deze meter iets kan zeggen');
+    return { ongevoeligPct: Math.round(1000 * overleefd / gemeten) / 10, nietGemeten, overleefd, gezakt };
   })();
 
   /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
@@ -501,7 +515,7 @@ function meet() {
     kernBreedte: grenzen.kernBreedte, kernGedeeld: grenzen.kernGedeeld,
     kernBreedsteBestand: grenzen.kernBreedsteBestand,
     kernOngebruikt: grenzen.kernOngebruikt,
-    toetsenOverleefdeMutatie: mutaties.overleefd,
+    toetsenOngevoeligPct: mutaties.ongevoeligPct,
     toetsenNietGemeten: mutaties.nietGemeten,
     dependencies: deps, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen

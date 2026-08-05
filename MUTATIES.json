@@ -405,6 +405,63 @@
       ],
       "geprobeerd": 1,
       "posities": 1
+    },
+    "ledenregister.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ledenregister.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "leerstofbreed.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/leerstof-gen.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 8
+    },
+    "lib.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/geo.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "lokaal-tls.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lokaal-tls.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "mail-eigen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/dkim.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "mailauth.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/mailauth.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "merge3.property.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/db/index.js"
+      ],
+      "geprobeerd": 6,
+      "posities": 1
     }
   }
 }

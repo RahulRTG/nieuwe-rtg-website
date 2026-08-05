@@ -1,3 +1,337 @@
 {
-  "toetsen": {}
+  "toetsen": {
+    "a11ykeuring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/a11ykeuring.js",
+      "operator": "true->false",
+      "gezakt": 1
+    },
+    "aanmeldingen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen.js",
+      "operator": "false->true",
+      "gezakt": 1
+    },
+    "accounts-os.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/accounts-os.js",
+      "operator": "===->!==",
+      "gezakt": 8
+    },
+    "accounts.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg",
+      "gezakt": 5
+    },
+    "ai-cache.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/anthropic.js",
+      "operator": "===->!==",
+      "gezakt": 1
+    },
+    "ai-oproepen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ai-oproepen.js",
+      "operator": "return-weg",
+      "gezakt": 2
+    },
+    "ai-uitwijk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/openai.js",
+      "operator": "===->!==",
+      "gezakt": 2
+    },
+    "aipoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aipoort.js",
+      "operator": "true->false",
+      "gezakt": 1
+    },
+    "alarmweg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foutmelder.js",
+      "operator": "===->!==",
+      "gezakt": 5
+    },
+    "anthropic.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/anthropic.js"
+      ],
+      "operatoren": 9
+    },
+    "antivirus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/antivirus/index.js",
+      "operator": "true->false",
+      "gezakt": 1
+    },
+    "ast-grens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ast/parser.js",
+      "operator": "===->!==",
+      "gezakt": 1
+    },
+    "ast-scan.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ast/parser.js",
+      "operator": "===->!==",
+      "gezakt": 12
+    },
+    "automatisering.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtmail.js",
+      "operator": "return-weg",
+      "gezakt": 8
+    },
+    "bestand-binding.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kluis.js"
+      ],
+      "operatoren": 9
+    },
+    "betaalstore.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal.js",
+      "operator": "===->!==",
+      "gezakt": 1
+    },
+    "beveiliging.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/beveiliging.js",
+      "operator": "===->!==",
+      "gezakt": 7
+    },
+    "bewaartermijnen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bewaartermijnen.js",
+      "operator": "false->true",
+      "gezakt": 1
+    },
+    "bewaarveger.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bewaarveger.js",
+      "operator": "+->-",
+      "gezakt": 1
+    },
+    "bewaarwacht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bewaarwacht.js",
+      "operator": "===->!==",
+      "gezakt": 2
+    },
+    "blindevlek.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "boot-smoke.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "ca.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/ca.js",
+      "operator": "===->!==",
+      "gezakt": 2
+    },
+    "cache.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/cache.js",
+      "operator": "===->!==",
+      "gezakt": 2
+    },
+    "chaos.pg.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/db/index.js",
+        "server/pg/index.js",
+        "server/kluis.js"
+      ],
+      "operatoren": 9
+    },
+    "doos-journaal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zaakdoos/index.js",
+      "operator": "true->false",
+      "gezakt": 2
+    },
+    "drie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/drie.js",
+      "operator": "!==->===",
+      "gezakt": 9
+    },
+    "dyncode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/dyncode.js",
+      "operator": "!==->===",
+      "gezakt": 2
+    },
+    "eu-naleving.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "eventloop.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/meting.js",
+        "server/meting-lus.js"
+      ],
+      "operatoren": 9
+    },
+    "fout-aggregatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/log.js",
+      "operator": "&&->||",
+      "gezakt": 2
+    },
+    "foutmelder.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foutmelder.js",
+      "operator": "===->!==",
+      "gezakt": 3
+    },
+    "functies.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/functies.js"
+      ],
+      "operatoren": 9
+    },
+    "geheugen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/geheugen.js",
+      "operator": "===->!==",
+      "gezakt": 6
+    },
+    "gereedschap.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rekenkern.js",
+      "operator": "===->!==",
+      "gezakt": 1
+    },
+    "golive.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "handenvrij.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/handenvrij.js",
+      "operator": "false->true",
+      "gezakt": 1
+    },
+    "horlogewerk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/horlogewerk.js",
+      "operator": "!==->===",
+      "gezakt": 11
+    },
+    "http1.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/http1.js",
+      "operator": "===->!==",
+      "gezakt": 1
+    },
+    "http2.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||",
+      "gezakt": 1
+    },
+    "imap.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/mailsleutel.js",
+      "operator": "!==->===",
+      "gezakt": 9
+    },
+    "inzagelog.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/inzagelog.js",
+      "operator": "===->!==",
+      "gezakt": 8
+    },
+    "kaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/kaart.js",
+      "operator": "===->!==",
+      "gezakt": 2
+    },
+    "kern-afgeleid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/afgeleid.js",
+      "operator": "===->!==",
+      "gezakt": 1
+    },
+    "kern-events.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/events.js"
+      ],
+      "operatoren": 9
+    },
+    "kern-fiscaal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/fiscaal/index.js",
+      "operator": "===->!==",
+      "gezakt": 1
+    },
+    "kern-live.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/live.js",
+      "operator": "===->!==",
+      "gezakt": 1
+    },
+    "kern-util.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/util.js",
+      "operator": "!==->===",
+      "gezakt": 1
+    }
+  }
 }

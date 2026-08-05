@@ -21,10 +21,12 @@
     "keuringTeGroot": 1,
     "inlineStijlAttributen": 5549,
     "browserpoortToetsen": 102,
-    "kernBreedte": 944,
-    "kernGedeeld": 141,
+    "kernBreedte": 947,
+    "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
-    "kernOngebruikt": 0
+    "kernOngebruikt": 0,
+    "toetsenOverleefdeMutatie": 6,
+    "toetsenNietGemeten": 568
   },
   "notities": [
     {
@@ -244,6 +246,12 @@
       "meter": "verhalenSlaagPctStorm: opnieuw NIET op 76,4 gezet",
       "reden": "--vastleggen wilde hem voor de tweede keer vandaag van 76,3 naar 76,4 tillen, op basis van DEZELFDE meting uit BEPROEVING.json (14:32) als de eerste keer. Er is geen nieuwe ronde gedraaid, dus er is ook geen nieuwe informatie; met de hand teruggezet op 76,3.",
       "eerlijkheidshalve": "Dit is de tweede keer dat ik deze hand-correctie maak, en dat is een teken. Zolang --vastleggen alles-of-niets is, tilt elke ronde die deze noisy meter aanraakt hem opnieuw op, en moet iemand het met de hand terugdraaien. Dat is een pleister op de gereedschapskist en hij staat hier met naam: een schakelaar om EEN meter over te slaan bij het vastleggen zou dit oplossen. Zolang die er niet is, hoort iemand na elke --vastleggen de diff van NORM.json te lezen -- en dat is een voornemen, met precies de waarde die LAT.md daaraan geeft."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "kernBreedte 944 -> 947 en kernGedeeld 141 -> 142 (met de hand VERHOOGD)",
+      "reden": "Die 944 en 141 zijn vastgelegd na de EERSTE knip van de ongebruikte kern-namen, en die knip was fout: hij haalde drie namen weg die wel gebruikt worden, omdat de meting `{ ...publicSupplier(s) }` als een punt-toegang las (zie TAKEN.md 6.9). De app gaf daarop een 500 en test/allergie.test.js viel om. Na de reparatie blijven die drie namen staan, en dan zijn de echte getallen 947 en 142. De oude grondwaarde was dus nooit een geldige stand van dit huis maar de stand van een kapotte meting.",
+      "eerlijkheidshalve": "Een ratel omhoog zetten is precies wat je niet hoort te doen, dus dit hoort met naam en reden vast te liggen. Wat het NIET is: een verslechtering wegpoetsen. De vergelijking die telt is met de stand VOOR deze ronde -- daar stond kernBreedsteBestand op 139 en kernGedeeld op 145, en die zijn nu 71 en 142. Wat het WEL is: ik heb een grondwaarde vastgelegd voordat de suite een keer schoon was gedraaid, en dat was te vroeg. Een norm vastleggen hoort na de toetsen, niet ervoor."
     }
   ],
   "prestatie": {

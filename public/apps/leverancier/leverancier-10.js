@@ -28,12 +28,12 @@
       }).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
       // de spoedbon: een enkel gerecht komt als gewone bon op de lijn en telt
       // gewoon mee in de maak-nu- en all-day-tellingen; geen bel, geen flits
-      html += '<div class="tkc st-hulp" style="grid-column:1/-1;"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
+      html += '<div class="tkc st-hulp h-volbreed"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
         '<div class="tkc-who">'+T('spoed.deck','Gerecht gevallen of vergeten? Zet het als gewone bon op de lijn; de keuken ziet gewoon een bon erbij.')+'</div>'+
-        '<div class="row-gap"><select class="st-in" id="spGerecht" style="flex:2;">'+
+        '<div class="row-gap"><select class="st-in" id="spGerecht" class="h-flex2">'+
           (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
         '<input class="st-in" id="spAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
-        '<select class="st-in" id="spTafel" style="flex:1;"><option value="">'+T('spoed.geentafel','geen tafel')+'</option>'+
+        '<select class="st-in" id="spTafel" class="h-flex1"><option value="">'+T('spoed.geentafel','geen tafel')+'</option>'+
           (state.tables||[]).map(t=>'<option value="'+t.name+'">'+t.name+'</option>').join('')+'</select></div>'+
         '<div class="tkc-act"><button class="tkc-ready" id="spGo">\u26A1 '+T('spoed.go','Zet op de lijn')+'</button></div></div>';
       html += overschotBlok();
@@ -54,8 +54,8 @@
       if (tables.length){
         html += '<div class="st-sec">'+T('st.tables','Tafels, tik om te wisselen')+'</div><div class="st-tblgrid">'+
           tables.map(t=>'<button class="tbl tbl-'+t.status+'" data-sttbl="'+t.id+'" data-cur="'+t.status+'"><b>'+t.name+'</b><span>'+t.seats+' '+T('tbl.pers','pers.')+'</span><i>'+tTbl(t.status)+'</i></button>').join('')+'</div>'+
-          '<button class="obtn" data-tblqr style="margin-top:0.5rem;">'+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>'+
-          '<button class="obtn" data-tafelticket style="margin-top:0.5rem;">'+T('st.tafelticket','Tafel op één ticket (samenvoegen + afrekenen)')+'</button>';
+          '<button class="obtn" data-tblqr class="h-mt50">'+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>'+
+          '<button class="obtn" data-tafelticket class="h-mt50">'+T('st.tafelticket','Tafel op één ticket (samenvoegen + afrekenen)')+'</button>';
       }
       html += '<div class="st-sec">'+T('st.more','Meer')+'</div>'+
         '<button class="obtn" data-aanwezig style="width:100%;margin-bottom:0.5rem;">\u{1F465} '+T('st.aanwezig','Aanwezigheid (binnen + man/vrouw)')+'</button>'+
@@ -96,6 +96,6 @@
       html += '<div class="st-sec">'+T('ch.mijn','Mijn rit')+' ('+actief.length+')</div>';
       html += actief.length ? actief.map(r => {
         const nxt = NEXT_RIDE[r.status];
-        return '<div class="tkc" style="grid-column:1/-1;">'+
+        return '<div class="tkc h-volbreed">'+
           '<div class="tkc-top"><span class="tkc-code" style="font-size:1.3rem;">'+r.customerCodename+'</span><span class="tkc-age">'+tStatus(r.status)+'</span></div>'+
           '<div class="tkc-who" style="font-size:0.95rem;">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+

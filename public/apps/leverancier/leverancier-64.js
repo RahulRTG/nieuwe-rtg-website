@@ -80,13 +80,13 @@
       acts.map(a => '<div class="mitem"><div class="r1"><span class="nm">'+esc(a.name)+'</span><span class="row-mid-gap"><span class="pr">'+eur(a.prijs)+'</span>'+
         (canEdit?'<button class="rr-del" data-tkdel="'+a.id+'">\u2715</button>':'')+'</span></div>'+
         '<div class="ds">'+(a.desc?esc(a.desc)+' \u00B7 ':'')+T('tk2.cap','cap.')+' '+a.capaciteit+' \u00B7 '+(a.tijden||[]).join(', ')+(a.duur?' \u00B7 '+esc(a.duur):'')+'</div></div>').join('')+
-      (canEdit ? '<div style="margin-top:1rem;">'+
+      (canEdit ? '<div class="h-mt100">'+
         '<div class="field"><label>'+T('tk2.f.naam','Activiteit')+'</label><input id="tkName" placeholder="'+T('tk2.f.naamph','Bijv. sunset cruise')+'"></div>'+
         '<div class="field"><label>'+T('tk2.f.desc','Omschrijving')+'</label><input id="tkDesc"></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('tk2.f.prijs','Prijs p.p. (\u20AC)')+'</label><input id="tkPrijs" type="number" inputmode="decimal"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('tk2.f.cap','Capaciteit')+'</label><input id="tkCap" type="number" inputmode="numeric"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('tk2.f.duur','Duur')+'</label><input id="tkDuur" placeholder="2 uur"></div></div>'+
+        '<div class="field h-flex1"><label>'+T('tk2.f.prijs','Prijs p.p. (\u20AC)')+'</label><input id="tkPrijs" type="number" inputmode="decimal"></div>'+
+        '<div class="field h-flex1"><label>'+T('tk2.f.cap','Capaciteit')+'</label><input id="tkCap" type="number" inputmode="numeric"></div>'+
+        '<div class="field h-flex1"><label>'+T('tk2.f.duur','Duur')+'</label><input id="tkDuur" placeholder="2 uur"></div></div>'+
         '<div class="field"><label>'+T('tk2.f.tijden','Tijdsloten (komma\'s)')+'</label><input id="tkTijden" placeholder="10:00, 14:00, 17:30"></div>'+
         '<button class="obtn primary" id="tkAdd">'+T('tk2.f.voeg','Toevoegen')+'</button></div>' : '')+'</div>';
     el.innerHTML = html;

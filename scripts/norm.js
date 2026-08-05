@@ -103,8 +103,52 @@ const METERS = [
      twee), dus het hoort aan een ratel. scripts/schakelbaar.js meet het. */
   { sleutel: 'routesNietSchakelbaar', richting: 'omlaag', wat: 'API-routes die niet vanuit de boardroom te schakelen zijn' },
   { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan als een dienst ontbreekt' },
-  { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' }
+  { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' },
+  /* DE LAATSTE unsafe-inline IN DE CSP, geteld in plaats van beschreven.
+
+     script-src en style-src draaien op een nonce. style-src-attr niet: daar
+     staat nog 'unsafe-inline', en dat is geen vergetelheid maar een openstaande
+     post -- er staan duizenden style="..."-attributen in public/, en CSP kent
+     geen stempel voor een attribuut. Zolang dat getal niet nul is, kan die
+     richtlijn niet dicht.
+
+     Waarom dit aan een RATEL hangt en niet in een zin in de README: een schuld
+     die je opschrijft groeit, een schuld die je telt niet. Elke nieuwe
+     style="..." in een sjabloon zou de dag verlengen waarop die richtlijn dicht
+     kan, zonder dat iemand er een besluit over neemt. Nu kan het getal alleen
+     omlaag.
+
+     Wat NIET meetelt: el.style.kleur = '...' en andere CSSOM-schrijfacties. Die
+     gaan buiten de ontleder om en worden door CSP niet gecontroleerd -- ze zijn
+     dus geen schuld maar juist de uitweg. */
+  { sleutel: 'inlineStijlAttributen', richting: 'omlaag', wat: 'style="..."-attributen in public/ (houden style-src-attr open)' }
 ];
+
+/* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
+   test/meterijk.test.js hem met een verzonnen bestand kan voeden en de meter
+   echt kan zien uitslaan. Een meter die alleen zijn eigen repo kan lezen, is
+   niet te ijken.
+
+   WAT ER NIET IN DE LIJST HOORT, en dat is hier twee keer misgegaan voordat het
+   klopte:
+
+   1. public/dist/ -- geminificeerde bouwuitvoer.
+   2. DE BUNDELS. public/apps/leverancier.js is de aaneengeplakte som van
+      public/apps/leverancier/*.js. Tel je allebei, dan staat elk attribuut er
+      twee keer in. Dat viel op omdat een veegbeurt van 491 attributen de meter
+      982 liet dalen: precies twee keer zoveel. Een meter die een verbetering
+      dubbel beloont, liegt net zo hard als een die hem mist -- en het getal
+      8957 dat ik in de CSP-uitleg en de README heb gezet, was daarmee ook te
+      hoog. De echte stand staat in NORM.json, met een notitie erover.
+
+      De lijst van bundels komt uit scripts/bundel.js, dezelfde bron die
+      check.js regel 13 gebruikt. Een tweede lijst zou binnen een week
+      uiteenlopen (LAT.md regel 4). */
+function telInlineStijl(lees, bestanden) {
+  let n = 0;
+  for (const b of bestanden) n += (String(lees(b)).match(/style="/g) || []).length;
+  return n;
+}
 
 /* ============================================================================
    DE PRESTATIEMETERS -- de tweede helft van de ratel.
@@ -256,6 +300,20 @@ function meet() {
     zelfpoortendeToetsen += (bron.match(/\b(?:test|it)\.skip\s*\(/g) || []).length;
   }
 
+  /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
+  const PUB = path.join(WORTEL, 'public');
+  const bundelPaden = new Set(Object.keys(require('./bundel').bundels).map(k => path.join(PUB, k)));
+  const stijlBestanden = [];
+  (function loop(map) {
+    for (const naam of fs.readdirSync(map)) {
+      const p = path.join(map, naam);
+      let st; try { st = fs.statSync(p); } catch (e) { continue; }
+      if (st.isDirectory()) { if (naam !== 'dist') loop(p); continue; }
+      if (/\.(html|js)$/.test(naam) && !bundelPaden.has(p)) stijlBestanden.push(p);
+    }
+  })(PUB);
+  const inlineStijlAttributen = telInlineStijl(p => fs.readFileSync(p, 'utf8'), stijlBestanden);
+
   /* De schakelbaarheid uit dezelfde bron als het losse script: een tweede
      implementatie zou binnen een week uiteenlopen (regel 4). */
   let routesNietSchakelbaar = 0;
@@ -310,7 +368,8 @@ function meet() {
     keuringStuk: k.stuk, keuringScheef: k.scheef,
     keuringTeGroot: (k.cijfers.uitschieters || {}).teGroot || 0,
     ...telPerGroep(k),
-    dependencies: deps, testbestanden, zelfpoortendeToetsen, e2eBestanden
+    dependencies: deps, testbestanden, zelfpoortendeToetsen, e2eBestanden,
+    inlineStijlAttributen
   };
 }
 
@@ -514,4 +573,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt };
+module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl };

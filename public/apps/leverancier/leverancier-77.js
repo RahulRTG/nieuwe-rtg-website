@@ -2,7 +2,7 @@
     html += '<div class="card"><div class="tt-h">'+T('wv.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
       (pk.length ? pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikelNaam)+' · '+esc(v.maat)+'</span></div>'+
         '<div class="ds">'+esc(v.codenaam||'Gast')+' · '+esc(v.kleur)+(v.paskamer?' · '+esc(v.paskamer):'')+'</div>'+
-        '<button class="obtn primary" data-wvbreng="'+v.id+'" style="margin-top:0.35rem;">'+T('wv.breng','Gebracht')+'</button></div>').join('')
+        '<button class="obtn primary" data-wvbreng="'+v.id+'" class="h-mt35">'+T('wv.breng','Gebracht')+'</button></div>').join('')
         : '<div class="empty">'+T('wv.geenpk','Geen open verzoeken.')+'</div>')+'</div>';
     const ap = wvRetail.apart || [];
     if (ap.length) html += '<div class="card"><div class="tt-h">'+T('wv.apart','Apart gelegd')+' ('+ap.length+')</div>'+
@@ -98,7 +98,7 @@
           (a.zorg ? '<div class="ds" style="color:#E2B93B;">'+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
           (a.intake ? '<div class="ds" style="color:#E2B93B;">'+esc(a.intake)+'</div>' : '')+
           (a.status === 'afgerond' ? '<div class="ds" style="color:var(--green,#4C9A75);">'+T('zb.klaar','Afgerond')+'</div>'
-            : '<button class="obtn primary" data-zblevklaar="'+esc(a.ref)+'" style="margin-top:0.35rem;">'+T('zb.afronden','Afronden')+'</button>')+
+            : '<button class="obtn primary" data-zblevklaar="'+esc(a.ref)+'" class="h-mt35">'+T('zb.afronden','Afronden')+'</button>')+
           '</div>').join('')
         : '<div class="empty">'+T('zb.leeg','Geen afspraken op deze dag.')+'</div>')+
       '</div>';

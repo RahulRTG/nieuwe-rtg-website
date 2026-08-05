@@ -251,7 +251,7 @@
     ov = document.createElement('div'); ov.id='apchat';
     ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;';
     ov.innerHTML='<div style="background:var(--bg,#12100f);border:1px solid var(--line,#2a2622);border-radius:16px 16px 0 0;width:min(100%,34rem);max-height:80vh;display:flex;flex-direction:column;">'+
-      '<div style="display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;border-bottom:1px solid var(--line,#2a2622);"><b id="apchatWie" style="flex:1;"></b><button id="apchatX" style="background:none;border:none;color:var(--soft,#9a938c);font-size:1.2rem;cursor:pointer;">✕</button></div>'+
+      '<div style="display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;border-bottom:1px solid var(--line,#2a2622);"><b id="apchatWie" class="h-flex1"></b><button id="apchatX" style="background:none;border:none;color:var(--soft,#9a938c);font-size:1.2rem;cursor:pointer;">✕</button></div>'+
       '<div id="apchatMsgs" style="flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>'+
       '<div style="display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--line,#2a2622);"><input id="apchatIn" placeholder="'+T('ap.chat.ph','Bericht (bijv. Kun je donderdag om 15u?)')+'" style="flex:1;background:var(--card2,#1b1817);border:1px solid var(--line,#2a2622);border-radius:12px;padding:.55rem .8rem;color:var(--txt,#fff);"><button id="apchatSend" class="obtn primary">'+T('ap.chat.send','Stuur')+'</button></div>'+
       '</div>';
@@ -518,7 +518,7 @@
     spH2().textContent = T('sp.applyh','Solliciteren');
     spDeck().textContent = T('sp.applydeck','Bij elke RTG-partner solliciteert u op dezelfde manier. Het bedrijf ziet uw sollicitatie direct in de app.');
     $('#spList').innerHTML =
-      '<div class="field" style="margin-top:0.4rem;"><label>'+T('sp.a.name','Uw naam')+'</label><input id="apName"></div>'+
+      '<div class="field h-mt40"><label>'+T('sp.a.name','Uw naam')+'</label><input id="apName"></div>'+
       '<div class="field"><label>'+T('sp.a.func','Functie')+'</label><select id="apFunc" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
         (FUNCS[type]||[]).map(f=>'<option>'+f+'</option>').join('')+'</select></div>'+
       '<div class="field"><label>'+T('sp.a.contact','Telefoon of e-mail')+'</label><input id="apContact"></div>'+
@@ -882,9 +882,9 @@
   // de melder voor de pas-schermen: is over, gebruikt of afschrijven
   function overschotBlok(){
     const l = overschotLijst();
-    return '<div class="tkc st-hulp" style="grid-column:1/-1;"><h3>'+T('over.h','Op de pas over')+'</h3>'+
+    return '<div class="tkc st-hulp h-volbreed"><h3>'+T('over.h','Op de pas over')+'</h3>'+
       '<div class="tkc-who">'+T('over.deck','Te veel gemaakt? Meld het hier; elk scherm telt het van de maaklijst af en de coach zegt: gebruik eerst wat er ligt.')+'</div>'+
-      '<div class="row-gap"><select class="st-in" id="ovGerecht" style="flex:2;">'+
+      '<div class="row-gap"><select class="st-in" id="ovGerecht" class="h-flex2">'+
         (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
       '<input class="st-in" id="ovAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
       '<button class="tkc-start" id="ovBij" style="flex:1;border-radius:10px;">'+T('over.is','Is over')+'</button></div>'+
@@ -1002,7 +1002,7 @@
     if (!rows.length) return '';
     const today = new Date().toISOString().slice(0, 10);
     return '<div class="st-sec">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' & '+T('rs.mep','mise en place')+'</div>'+
-      '<div class="tkc" style="grid-column:1/-1;">'+rows.map(r =>
+      '<div class="tkc h-volbreed">'+rows.map(r =>
         '<div class="st-row'+(r.it.done?'" style="opacity:0.5;':'"')+'">'+
         '<span>'+
         '<span style="display:inline-block;min-width:5.4rem;margin-right:0.5rem;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:'+(r.due===today?'var(--burgundy)':'var(--soft)')+';">'+dueLabel(r.due, r.it.daysBefore)+'</span>'+
@@ -1069,12 +1069,12 @@
       }).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
       // de spoedbon: een enkel gerecht komt als gewone bon op de lijn en telt
       // gewoon mee in de maak-nu- en all-day-tellingen; geen bel, geen flits
-      html += '<div class="tkc st-hulp" style="grid-column:1/-1;"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
+      html += '<div class="tkc st-hulp h-volbreed"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
         '<div class="tkc-who">'+T('spoed.deck','Gerecht gevallen of vergeten? Zet het als gewone bon op de lijn; de keuken ziet gewoon een bon erbij.')+'</div>'+
-        '<div class="row-gap"><select class="st-in" id="spGerecht" style="flex:2;">'+
+        '<div class="row-gap"><select class="st-in" id="spGerecht" class="h-flex2">'+
           (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
         '<input class="st-in" id="spAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
-        '<select class="st-in" id="spTafel" style="flex:1;"><option value="">'+T('spoed.geentafel','geen tafel')+'</option>'+
+        '<select class="st-in" id="spTafel" class="h-flex1"><option value="">'+T('spoed.geentafel','geen tafel')+'</option>'+
           (state.tables||[]).map(t=>'<option value="'+t.name+'">'+t.name+'</option>').join('')+'</select></div>'+
         '<div class="tkc-act"><button class="tkc-ready" id="spGo">\u26A1 '+T('spoed.go','Zet op de lijn')+'</button></div></div>';
       html += overschotBlok();
@@ -1095,8 +1095,8 @@
       if (tables.length){
         html += '<div class="st-sec">'+T('st.tables','Tafels, tik om te wisselen')+'</div><div class="st-tblgrid">'+
           tables.map(t=>'<button class="tbl tbl-'+t.status+'" data-sttbl="'+t.id+'" data-cur="'+t.status+'"><b>'+t.name+'</b><span>'+t.seats+' '+T('tbl.pers','pers.')+'</span><i>'+tTbl(t.status)+'</i></button>').join('')+'</div>'+
-          '<button class="obtn" data-tblqr style="margin-top:0.5rem;">'+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>'+
-          '<button class="obtn" data-tafelticket style="margin-top:0.5rem;">'+T('st.tafelticket','Tafel op één ticket (samenvoegen + afrekenen)')+'</button>';
+          '<button class="obtn" data-tblqr class="h-mt50">'+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>'+
+          '<button class="obtn" data-tafelticket class="h-mt50">'+T('st.tafelticket','Tafel op één ticket (samenvoegen + afrekenen)')+'</button>';
       }
       html += '<div class="st-sec">'+T('st.more','Meer')+'</div>'+
         '<button class="obtn" data-aanwezig style="width:100%;margin-bottom:0.5rem;">\u{1F465} '+T('st.aanwezig','Aanwezigheid (binnen + man/vrouw)')+'</button>'+
@@ -1137,7 +1137,7 @@
       html += '<div class="st-sec">'+T('ch.mijn','Mijn rit')+' ('+actief.length+')</div>';
       html += actief.length ? actief.map(r => {
         const nxt = NEXT_RIDE[r.status];
-        return '<div class="tkc" style="grid-column:1/-1;">'+
+        return '<div class="tkc h-volbreed">'+
           '<div class="tkc-top"><span class="tkc-code" style="font-size:1.3rem;">'+r.customerCodename+'</span><span class="tkc-age">'+tStatus(r.status)+'</span></div>'+
           '<div class="tkc-who" style="font-size:0.95rem;">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+
           '<div class="tkc-who">'+ritRegel(r)+(r.vehicle?' ·  '+r.vehicle.name+' ('+(r.vehicle.plate||'')+')':'')+'</div>'+
@@ -1179,7 +1179,7 @@
       const vandaagB = new Date().toISOString().slice(0, 10);
       const klaarB = bs.filter(b => b.status === 'afgerond' && String(b.finishedAt || b.at).slice(0, 10) === vandaagB);
       const omzetB = klaarB.reduce((x, b) => x + (b.price || 0), 0);
-      const kaartB = (b, acties) => '<div class="tkc" style="grid-column:1/-1;">'+
+      const kaartB = (b, acties) => '<div class="tkc h-volbreed">'+
         '<div class="tkc-top"><span class="tkc-code" style="font-size:1.2rem;">'+b.customerCodename+'</span><span class="tkc-age">'+(b.wanneer || timeAgo(b.at))+'</span></div>'+
         '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'':'')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--gold);">'+eur(b.price)+'</b></div>'+
         (b.note?'<div class="tkc-alg">'+b.note+'</div>':'')+
@@ -1257,7 +1257,7 @@
           const dmsK = (state.dailyMeps||{})[new Date().toISOString().slice(0,10)];
           const mepOpen = dmsK ? (dmsK.tasks||[]).filter(x=>!x.done).slice(0,3) : [];
           if (straksRows.length || mepOpen.length || !actief.length)
-            html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('lijn.tussendoor','Tussendoor')+'</h3>'+
+            html += '<div class="tkc h-volbreed"><h3>'+T('lijn.tussendoor','Tussendoor')+'</h3>'+
               straksRows.map(([naam,r])=>'<div class="st-row"><span>'+T('lijn.zetklaar','Zet vast klaar: ')+'<b>'+r.n+'×</b> '+naam+'<span class="sub">'+T('lijn.startover','start over ~')+r.min+' min</span></span></div>').join('')+
               mepOpen.map(x=>'<div class="st-row"><span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.5rem;">'+x.time+'</b>'+x.task+'<span class="sub">'+T('lijn.mep','mise en place van vandaag')+'</span></span></div>').join('')+
               (!straksRows.length && !mepOpen.length ? '<div class="tkc-who">'+T('lijn.hygiene','Rustig moment: werkbank afnemen, koeling en parstock checken, garnituur bijvullen.')+'</div>' : '')+
@@ -1325,7 +1325,7 @@
         html += '<div class="st-sec">\uD83D\uDCC5 '+T('dm.h','Dagelijkse mise en place (\u00e0 la carte)')+'</div>';
         const dmCard = (plan, label) => {
           const open = plan.tasks.filter(x=>!x.done).length;
-          return '<div class="tkc" style="grid-column:1/-1;">'+
+          return '<div class="tkc h-volbreed">'+
             '<div class="tkc-top"><span style="font-weight:600;">'+label+' \u00b7 \u00b1'+plan.covers+' couverts</span><span class="tkc-age">'+plan.factorLabel+' \u00b7 '+T('dm.by','voorspeld door')+' '+plan.by+'</span></div>'+
             '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+plan.portions.map(p=>'<span class="st-badge">'+p.name+' \u00b7 <b style="color:var(--gold);">'+p.n+'\u00d7</b></span>').join('')+'</div>'+
             plan.tasks.map(x=>'<div class="st-row'+(x.done?'" style="opacity:0.5;':'"')+'"><span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+x.time+'</b>'+(x.done?'<s>'+x.task+'</s>':x.task)+(x.done&&x.doneBy?'<span class="sub">\u2713 '+x.doneBy+'</span>':'')+'</span>'+
@@ -1697,12 +1697,12 @@
       // RTG-controlecentrum maar dan uitsluitend over dit bedrijf
       if (!boData){
         laadBackoffice();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.bo','Backoffice')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.bo','Backoffice')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (boData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.bo','Backoffice')+'</h3><div class="tkc-who">'+boData.error+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.bo','Backoffice')+'</h3><div class="tkc-who">'+boData.error+'</div></div>';
       } else {
         const b = boData;
-        html += '<div class="tkc" style="grid-column:1/-1;">'+
+        html += '<div class="tkc h-volbreed">'+
           '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:0.55rem;">'+
           [[T('bz.today','Omzet vandaag'), eur(b.stats.omzetVandaag)],
            [T('bz.trans','Transacties'), b.stats.transactiesVandaag],
@@ -1713,24 +1713,24 @@
           .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;">'+
             '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--gold);margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
-          '<div class="tkc-who" style="margin-top:0.5rem;">'+T('bz.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div>'+
+          '<div class="tkc-who h-mt50">'+T('bz.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div>'+
           '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;">'+
           '<button class="obtn" id="boBrief">'+T('bz.brief','Dagbriefing')+'</button>'+
           '<button class="obtn ghost" id="boRapport">'+T('z3.rapport','Weekrapport')+' (print)</button>'+
           '<button class="obtn ghost" id="boPresent">'+T('z3.pres','Presentatie')+'</button></div>'+
           '<div id="boBriefTxt" style="display:none;border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;"></div></div>';
         // de kantoorvleugel: de week als 3D-skyline op de huiseigen Drie-motor
-        html += '<div class="tkc" id="zaak3dKaart" style="grid-column:1/-1;"><h3>'+T('z3.h','De zaak in 3D')+'</h3>'+
+        html += '<div class="tkc" id="zaak3dKaart" class="h-volbreed"><h3>'+T('z3.h','De zaak in 3D')+'</h3>'+
           '<canvas id="zaak3d" style="display:block;width:100%;border-radius:10px;touch-action:none;cursor:grab;" aria-label="'+T('z3.aria','Een draaibare 3D-skyline van uw omzet per dag: hoe hoger het blok, hoe meer omzet; vandaag in bordeaux en een gouden pin op de beste dag.')+'"></canvas>'+
           '<div class="tkc-who" id="zaak3dUitleg"></div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('bz.actie','Actiecentrum van de zaak')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('bz.actie','Actiecentrum van de zaak')+'</h3>'+
           (b.alerts.length ? b.alerts.map(a =>
             '<div class="st-row"><span>'+(a.level==='rood'?'':a.level==='amber'?'':'')+' '+a.text+'</span></div>').join('')
             : '<div class="tkc-who">✓ '+T('bz.niks','Alles loopt. Vastgelopen bestellingen, wachtende gasten en open personeelszaken verschijnen hier vanzelf.')+'</div>')+'</div>';
         // de voorspeller: eerlijk vooruitkijken op basis van het eigen ritme
         if (vwData && vwData.ok){
           const m = vwData.morgen;
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vw.h','Verwachting voor morgen')+'</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>'+T('vw.h','Verwachting voor morgen')+'</h3>'+
             (m
               ? '<div class="tkc-who">'+T('vw.d','Op basis van uw eigen ritme van de afgelopen weken')+' ('+vwData.weken+' '+T('vw.weken','weken geschiedenis')+'): '+
                   '<b>'+m.verwachtTransacties+'</b> '+T('vw.trans','transacties')+' · <b>'+eur(m.verwachtCenten)+'</b> '+T('vw.omzet','omzet')+' ('+m.dagNaam+').'+
@@ -1744,7 +1744,7 @@
         const mijnCode = (S && S.code) || '';
         const synDeals = (synData && synData.deals) || [];
         const kansen = (vwData && vwData.dealkansen) || [];
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('sy.h','Synergie: samen deals maken')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('sy.h','Synergie: samen deals maken')+'</h3>'+
           '<div class="tkc-who">'+T('sy.d','Stel met een andere RTG-zaak een pakket samen met een prijs; elke deelnemer tekent voor zijn aandeel en pas dan staat het live voor leden. RTG Pay splitst elke aankoop exact volgens de afspraak.')+'</div>'+
           kansen.map((k,i) =>
             '<div class="st-row"><span>'+esc(k.tekst)+
@@ -1786,7 +1786,7 @@
         const swRows = rijen.map(r =>
           '<div class="st-row"><span>'+r[1]+'<span class="sub">'+r[2]+'</span></span>'+
           '<button class="obtn'+(r[3]?' primary':' warn')+'" data-kopt="'+r[0]+'" data-val="'+(r[3]?'0':'1')+'">'+(r[3]?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>').join('');
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('sw.h','Baas over uw zaak')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('sw.h','Baas over uw zaak')+'</h3>'+
           '<div class="tkc-who">'+T('sw.s','Zet elke functie aan of uit wanneer u dat wilt. Alleen betalen via de app staat altijd aan; het moment (vooraf of achteraf) bepaalt u zelf.')+'</div>'+
           funcBlok(T('sw.blok','Schakelaars'), rijen.map(r => ({ aan: r[3] })), swRows)+
           '<div class="st-row"><span>'+T('sw.apppay','Betalen via de app')+'<span class="sub">'+T('sw.apppay.s','Vast onderdeel van elk RTG-partnerschap')+'</span></span>'+
@@ -1811,9 +1811,9 @@
       // klokuren en een boekhoudkundig correcte cadeaukaartenadministratie
       if (!finData){
         laadFinance();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (finData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+finData.error+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+finData.error+'</div></div>';
       } else {
         const f = finData;
         if (finMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+finMsg+'</div>'; }
@@ -1831,7 +1831,7 @@
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">'+
           '<button class="obtn" id="fnPdf">⤓ '+T('fn.exportpdf','Overzicht (PDF)')+'</button>'+
           '<button class="obtn" id="fnCsv">⤓ '+T('fn.exportcsv','Boekhouding (CSV)')+'</button></div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.land','Land & uurloon')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('fn.land','Land & uurloon')+'</h3>'+
           '<div class="tkc-who">'+T('fn.land.s','Het land bepaalt de btw-tarieven, werkgeverslasten en aangifteregels; het uurloon voedt de personeelskosten.')+'</div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">'+
           '<select class="st-in" id="fnLand" style="flex:2;min-width:130px;">'+f.landen.map(l=>'<option value="'+l.code+'"'+(l.code===f.land?' selected':'')+'>'+l.naam+'</option>').join('')+'</select>'+
@@ -1849,7 +1849,7 @@
           (f.personeel.vakantiegeld ? '<div class="st-row"><span>'+T('fn.vak','Vakantiegeldreserve')+'<span class="sub">'+f.personeel.vakantiegeldPct+'%</span></span><b>'+eur(f.personeel.vakantiegeld)+'</b></div>' : '')+
           '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.totaal','Totale loonkosten')+'</b></span><b style="color:var(--gold);">'+eur(f.personeel.totaal)+'</b></div>'+
           '<div class="tkc-who">'+T('fn.minuur','Indicatie minimumuurloon')+': € '+f.personeel.uurloonMin+'</div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.gc','Cadeaukaarten')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('fn.gc','Cadeaukaarten')+'</h3>'+
           '<div class="st-row"><span>'+T('fn.gcverkocht','Verkocht deze maand')+'<span class="sub">'+T('fn.gcv.s','nog geen omzet, geen btw')+'</span></span><b>'+eur(f.giftcards.verkocht)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcin','Ingewisseld deze maand')+'<span class="sub">'+T('fn.gci.s','omzet + btw-moment')+'</span></span><b>'+eur(f.giftcards.ingewisseld)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcopen','Openstaand saldo')+'<span class="sub">'+T('fn.gco.s','verplichting op de balans')+' · '+f.giftcards.aantal+' '+T('fn.kaarten','kaart(en)')+'</span></span><b style="color:var(--gold);">'+eur(f.giftcards.open)+'</b></div>'+
@@ -1869,7 +1869,7 @@
           API.call('/supplier/bank/zakelijk', {}).then(d => { zakData = d; zakBusy = false; renderStation(); })
             .catch(e => { zakData = { error: e.message }; zakBusy = false; renderStation(); });
         }
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.zak','Zakelijke rekening (RTG Rekening)')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('fn.zak','Zakelijke rekening (RTG Rekening)')+'</h3>'+
           (!zakData ? '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>'
            : zakData.error ? '<div class="tkc-who">'+zakData.error+'</div>'
            : '<div class="st-row"><span>'+escT(zakData.rekening.naam)+'<span class="sub">'+escT(zakData.rekening.iban)+'</span></span>'+
@@ -1877,10 +1877,10 @@
              ((zakData.afschrift||[]).slice(0,6).map(r=>'<div class="st-row"><span class="sub">'+escT(r.oms||r.soort)+'</span><span class="sub">'+(r.af?'− ':'+ ')+eur(r.centen/100)+'</span></div>').join('')||'<div class="tkc-who">'+T('fn.zak.leeg','Nog geen boekingen.')+'</div>')+
              '<div class="tkc-who">'+T('fn.zak.s','Hoort gratis bij het financiele hart: elke zaak bankiert onder de eigen vlag, naast de betalingen die via de kaart-rails lopen.')+'</div>')+
           '</div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.ai','AI-boekhouder')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('fn.ai','AI-boekhouder')+'</h3>'+
           '<div class="tkc-who">'+T('fn.ai.s2','Kent uw branche, uw cijfers en de regels. Stel een vraag, of laat hem u proactief bijsturen met adviezen op uw eigen cijfers.')+'</div>'+
           '<div id="accVragen" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.5rem 0;"></div>'+
-          '<div class="row-gap"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" style="flex:1;">'+
+          '<div class="row-gap"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" class="h-flex1">'+
           '<button class="obtn primary" id="accGo">'+T('fn.vraag','Vraag')+'</button></div>'+
           '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
           '<button class="obtn" id="accAdvies" style="margin-top:0.6rem;">'+T('fn.adviezen','Stuur mij bij, geef adviezen')+'</button>'+
@@ -1898,9 +1898,9 @@
             .catch(function(e){ thuisData = { error: e.message }; })
             .then(function(){ thuisBusy = false; renderStation(); });
         }
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.kop','RTG Thuis')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('th.kop','RTG Thuis')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (thuisData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.kop','RTG Thuis')+'</h3><div class="tkc-who">'+thuisData.error+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('th.kop','RTG Thuis')+'</h3><div class="tkc-who">'+thuisData.error+'</div></div>';
       } else {
         const bord = thuisData.bord;
         html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);"><h3>'+T('th.bord','Het host-dashboard')+'</h3>'+
@@ -1909,13 +1909,13 @@
           '<div class="st-row"><span>'+T('th.bez','Bezetting komende 30 dagen')+'</span><b>'+bord.bezettingPct+'%</b></div>'+
           '<div class="st-row"><span>Superhost</span><b>'+(bord.superhost ? '★ '+T('th.ja','ja') : T('th.nog','nog niet (3 verblijven, gemiddeld 4,8+)'))+'</b></div>'+
           '<div class="tkc-who">'+T('th.uitbet','Uitbetalingen staan gepland naar de zakelijke RTG Rekening; RTG houdt 0% in. Gasten zien uw zaaknaam als host.')+'</div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.aanvragen','Aanvragen')+' ('+bord.aanvragen.length+')</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('th.aanvragen','Aanvragen')+' ('+bord.aanvragen.length+')</h3>'+
           (bord.aanvragen.length ? bord.aanvragen.map(function(a){
             return '<div class="st-row"><span><b>'+escT(a.titel)+'</b> · '+escT(a.van)+' → '+escT(a.tot)+' · '+a.gasten+' '+T('th.gasten','gasten')+
               '<span class="sub">'+T('th.gast','gast')+' '+escT(a.gast)+(a.gastRating ? ' · ★ '+a.gastRating : '')+' · '+eur(a.prijsopbouw.totaal)+'</span></span>'+
               '<span><button class="obtn primary" data-thok="'+escT(a.ref)+'">'+T('th.ok','Accepteer')+'</button> <button class="obtn" data-thnee="'+escT(a.ref)+'">'+T('th.nee','Wijs af')+'</button></span></div>';
           }).join('') : '<div class="tkc-who">'+T('th.geenaanvr','Geen openstaande aanvragen.')+'</div>')+'</div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.komend','Komende en lopende verblijven')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('th.komend','Komende en lopende verblijven')+'</h3>'+
           (bord.komend.length ? bord.komend.map(function(k){
             return '<div class="st-row"><span>'+escT(k.titel)+' · '+escT(k.van)+' → '+escT(k.tot)+'<span class="sub">'+escT(k.status)+' · '+T('th.gast','gast')+' '+escT(k.gast)+'</span></span>'+
               (k.status === 'ingecheckt' ? '<button class="obtn" data-thuit="'+escT(k.ref)+'">'+T('th.uit','Check uit')+'</button>' : '')+'</div>';
@@ -1933,7 +1933,7 @@
           '<div class="st-row"><span>'+T('th.zcomm','Partnercommissie')+' ('+(zb.commissiePct||0)+'%)</span><b>'+eur(zb.commissie||0)+'</b></div>'+
           '<div class="st-row"><span>'+T('th.znetto','Netto uitbetaling (gepland)')+'</span><b style="color:var(--gold);">'+eur(zb.nettoUitbetaling||0)+'</b></div>'+
           '<div class="tkc-who">'+escT(zb.uitleg || T('th.zuit','Zet een huis commercieel om er beroepsmatig mee te verhuren: logies-btw uit de landtabel, langverblijf op maandtarief en boeken op factuur.'))+'</div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.huizen','Ons aanbod op RTG Thuis')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('th.huizen','Ons aanbod op RTG Thuis')+'</h3>'+
           (thuisData.huizen.length ? thuisData.huizen.map(function(h){
             const zk = zVan(h.id);
             return '<div class="st-row"><span><b>'+escT(h.titel)+'</b> · '+escT(h.plaats)+' · '+eur(h.prijs)+'/'+T('th.nacht','nacht')+
@@ -1943,7 +1943,7 @@
               '<span><button class="obtn" data-thzak="'+escT(h.id)+'" data-thzaan="'+(zk?'1':'0')+'">'+(zk?T('th.zuitzet','Terug naar prive'):T('th.zaanzet','Maak commercieel'))+'</button> '+
               '<button class="obtn" data-thadv="'+escT(h.id)+'">'+T('th.advies','AI-prijsadvies')+'</button> <button class="obtn" data-thblok="'+escT(h.id)+'">'+T('th.blok','Blokkeer')+'</button></span></div>';
           }).join('') : '<div class="tkc-who">'+T('th.geenhuizen','Nog geen huizen; zet er hieronder een live.')+'</div>')+'</div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('th.nieuw','Zet een huis live (manager)')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('th.nieuw','Zet een huis live (manager)')+'</h3>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'+
           '<input class="st-in" id="thTitel" placeholder="'+T('th.titel','Titel')+'" style="flex:2;min-width:150px;">'+
           '<input class="st-in" id="thPlaats" placeholder="'+T('th.plaats','Plaats')+'" style="flex:1;min-width:110px;">'+
@@ -1979,12 +1979,12 @@
             .catch(function(e){ wvData = { error: e.message }; })
             .then(function(){ wvBusy = false; renderStation(); });
         }
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.kop','Werkvloer')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('wv.kop','Werkvloer')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (wvData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.kop','Werkvloer')+'</h3><div class="tkc-who">'+wvData.error+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('wv.kop','Werkvloer')+'</h3><div class="tkc-who">'+wvData.error+'</div></div>';
       } else {
         const tabs = [['koppel', T('wv.t1','Het andere scherm')], ['tafels', T('wv.t2','Tafels & allergenen')], ['chk', T('wv.t3','Checklijsten')]];
-        html += '<div class="tkc" style="grid-column:1/-1;"><div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+        html += '<div class="tkc h-volbreed"><div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
           tabs.map(function(t){ return '<button class="obtn'+(wvTab===t[0]?' primary':'')+'" data-wvtab="'+t[0]+'">'+escT(t[1])+'</button>'; }).join('')+'</div></div>';
 
         if (wvTab === 'koppel'){
@@ -2000,7 +2000,7 @@
             '<input class="st-in" id="wvBedrag" type="number" min="0" step="0.01" placeholder="'+T('wv.bedrag','Bedrag (alleen bij betalen)')+'" style="flex:1;min-width:120px;">'+
             '<input class="st-in" id="wvRef" placeholder="'+T('wv.ref','Bon- of factuurnummer')+'" style="flex:1;min-width:120px;">'+
             '<button class="obtn primary" id="wvMaak">'+T('wv.zet','Zet klaar')+'</button></div></div>';
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.open','Openstaand en afgerond')+' ('+k.open+' '+T('wv.openn','open')+')</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>'+T('wv.open','Openstaand en afgerond')+' ('+k.open+' '+T('wv.openn','open')+')</h3>'+
             (k.verzoeken.length ? k.verzoeken.map(function(v){
               const st = v.status === 'open' ? T('wv.st.open','wacht op het andere scherm')
                 : v.status === 'getekend' ? T('wv.st.get','getekend')
@@ -2026,7 +2026,7 @@
                 '<span class="sub">'+T('wv.optafels','op tafel')+' '+escT(r.tafels.join(', '))+'</span></span><b>'+r.aantal+'x</b></div>';
             }).join('') : '<div class="tkc-who">'+T('wv.geentafels','Nog geen tafels op de lijst.')+'</div>')+
             '<div class="tkc-who">'+escT(kb.regel)+'</div></div>';
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.tafels','De tafels')+'</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>'+T('wv.tafels','De tafels')+'</h3>'+
             kb.tafels.map(function(t){
               return '<div class="st-row"><span><b>'+T('wv.tafel','Tafel')+' '+escT(t.tafel)+'</b>'+(t.event?' · '+escT(t.event):'')+' · '+t.aantalGasten+' '+T('wv.pers','personen')+
                 '<span class="sub">'+(t.telling.length ? t.telling.map(function(r){ return escT(r.wat)+' '+r.aantal+'x'; }).join(' · ') : T('wv.geenbijz','geen bijzonderheden'))+'</span></span>'+
@@ -2042,7 +2042,7 @@
 
         if (wvTab === 'chk'){
           const c = wvData.chk;
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('wv.chk','Checklijsten')+'</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>'+T('wv.chk','Checklijsten')+'</h3>'+
             '<div class="tkc-who">'+escT(c.uitleg)+'</div>'+
             (c.lijsten.length ? c.lijsten.map(function(l){
               return '<div class="st-row"><span><b>'+escT(l.titel)+'</b>'+(l.event?' · '+escT(l.event):'')+
@@ -2070,7 +2070,7 @@
       // het AI-weekrooster: voorstel op de verwachte drukte, de gemachtigde stelt vast
       if (!agentData) laadAgent();
       const rp = agentData && agentData.rooster;
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('ag2.rooster','AI-weekrooster')+'</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('ag2.rooster','AI-weekrooster')+'</h3>'+
         '<div class="tkc-who">'+T('ag2.rooster.deck','De AI plant de week op de verwachte drukte per dag: drukke dagen iedereen op de vloer, rustige dagen om de beurt vrij.')+'</div>'+
         (rp ? rp.days.map(d=>'<div class="st-row"><span><b>'+d.label+'</b> <span class="sub">'+d.date+'</span></span>'+
             '<span class="sub" style="text-align:right;">'+d.staff.map(m=>m.name.split(' ')[0]+': '+m.shift.split(' ')[0]).join(' · ')+'</span></div>').join('')+
@@ -2081,7 +2081,7 @@
       // urenregistratie: wie is binnen, wie werkte wanneer en hoelang
       if (!klokOverzicht) laadKlok();
       const tijd = iso => new Date(iso).toLocaleString(lang()==='en'?'en-GB':'nl-NL', { weekday:'short', hour:'2-digit', minute:'2-digit' });
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.uren','Urenregistratie')+'</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('kt.uren','Urenregistratie')+'</h3>'+
         '<div class="tkc-who">'+T('kt.uren.deck','Iedereen klokt via de PDA; hier staat precies wie wanneer en hoelang werkt.')+'</div>'+
         (klokOverzicht && klokOverzicht.length ? klokOverzicht.map(r =>
           '<div class="st-row"><span>'+(r.binnen?'':'')+r.name+'<span class="sub">'+(r.func||(r.role==='manager'?'Manager':''))+
@@ -2094,14 +2094,14 @@
           '<span class="acts"><button class="obtn primary" data-khire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-kno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button></span></div>').join('')
         : '<div class="tkc-who">'+T('kt.noapps','Geen open sollicitaties.')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.team','Team & uitnodigingen')+'</h3>'+
-        (state.staff||[]).map(m=>'<div class="st-row" style="flex-wrap:wrap;"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
+        (state.staff||[]).map(m=>'<div class="st-row h-wrap"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
           '<span class="acts">'+(m.id!==actor().staffId
             ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset code')+'</button><button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
             : '')+'</span></div>').join('')+
         '<div class="tkc-who" style="margin-top:0.55rem;line-height:1.5;">'+T('kt.invite.intro','Nodig uit; de medewerker meldt zich zelf aan met bedrijfsnaam + kassacode en een eigen RTG-account.')+'</div>'+
         '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
-        '<button class="bigbtn" id="ktInvite" style="margin-top:0.2rem;">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
+        '<button class="bigbtn" id="ktInvite" class="h-mt20">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
       // open kassacodes: teruglezen en intrekken
       if (!invData) laadInvites();
       const openInv = (invData && invData.invites) || [];
@@ -2114,13 +2114,13 @@
             : '<div class="tkc-who">'+T('kt.geeninv','Geen open uitnodigingen.')+'</div>')
           : '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
-        '<button class="obtn" id="ktBuzz" style="margin-top:0.4rem;">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
+        '<button class="obtn" id="ktBuzz" class="h-mt40">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
       // personeelszaken: verlofaanvragen beslissen en zien wie er nu is ingeklokt
       const verlofOpen = (state.verlof || []).filter(v => v.status === 'nieuw');
       const verlofRest = (state.verlof || []).filter(v => v.status !== 'nieuw').slice(0, 8);
       html += '<div class="tkc"><h3>\uD83C\uDF34 '+T('kt.verlof','Verlof & ziek')+(verlofOpen.length ? ' ('+verlofOpen.length+')' : '')+'</h3>'+
         (verlofOpen.length ? verlofOpen.map(v =>
-          '<div class="st-row" style="flex-wrap:wrap;"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+(v.reden?' \u00B7 '+v.reden:'')+'</span></span>'+
+          '<div class="st-row h-wrap"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+(v.reden?' \u00B7 '+v.reden:'')+'</span></span>'+
           '<span class="acts"><button class="obtn primary" data-kvja="'+v.id+'">'+T('kt.vja','Goedkeuren')+'</button><button class="obtn warn" data-kvnee="'+v.id+'">'+T('kt.vnee','Afwijzen')+'</button></span></div>').join('')
           : '<div class="tkc-who">'+T('kt.geenverlof','Geen open aanvragen. Personeel vraagt verlof aan via de PDA; ziekmeldingen komen hier ook binnen.')+'</div>')+
         (verlofRest.length ? verlofRest.map(v =>
@@ -2130,7 +2130,7 @@
       html += '<div class="tkc"><h3>\u23F1 '+T('kt.klok','Nu ingeklokt')+' ('+klok2.binnen.length+')</h3>'+
         (klok2.binnen.length ? klok2.binnen.map(n => '<div class="st-row"><span>\uD83D\uDFE2 '+n+'</span></div>').join('')
           : '<div class="tkc-who">'+T('kt.niemandin','Niemand is nu ingeklokt.')+'</div>')+
-        (klok2.vandaag.length ? '<div class="tkc-who" style="margin-top:0.4rem;">'+T('kt.klokv','Vandaag geklokt')+': '+klok2.vandaag.length+' '+T('kt.klokr','registratie(s)')+' \u00B7 '+[...new Set(klok2.vandaag.map(e=>e.name))].length+' '+T('kt.klokp','personen')+'</div>' : '')+'</div>';
+        (klok2.vandaag.length ? '<div class="tkc-who h-mt40">'+T('kt.klokv','Vandaag geklokt')+': '+klok2.vandaag.length+' '+T('kt.klokr','registratie(s)')+' \u00B7 '+[...new Set(klok2.vandaag.map(e=>e.name))].length+' '+T('kt.klokp','personen')+'</div>' : '')+'</div>';
     }
     if (kantoorSec === 'hr'){
       // hr-plus (los script leverancier-hr.js): inwerktrajecten,
@@ -2145,42 +2145,42 @@
       // de kaart-bewerker: de chef past alles per gerecht aan, ook het vuurplan
       const bewerker = x => '<div class="st-form" data-kedit-form="'+x.id+'" style="border:1px solid var(--line);border-radius:12px;padding:0.7rem;margin:0.3rem 0 0.5rem;">'+
         '<input class="st-in" data-kf="name" value="'+escT(x.name)+'" placeholder="'+T('menu.name','Naam')+'">'+
-        '<div class="row-gap"><input class="st-in" data-kf="cat" value="'+escT(x.cat||'')+'" placeholder="'+T('menu.cat','Categorie')+'" style="flex:2;"><input class="st-in" data-kf="price" type="number" inputmode="decimal" value="'+x.price+'" placeholder="\u20ac" style="flex:1;"></div>'+
+        '<div class="row-gap"><input class="st-in" data-kf="cat" value="'+escT(x.cat||'')+'" placeholder="'+T('menu.cat','Categorie')+'" class="h-flex2"><input class="st-in" data-kf="price" type="number" inputmode="decimal" value="'+x.price+'" placeholder="\u20ac" class="h-flex1"></div>'+
         '<input class="st-in" data-kf="desc" value="'+escT(x.desc||'')+'" placeholder="'+T('kt.m.desc','Omschrijving (voor gast en keuken)')+'">'+
         (stn==='keuken'
-          ? '<div class="row-gap"><select class="st-in" data-kf="sectie" style="flex:2;">'+Object.keys(KANTEN).map(k=>'<option value="'+k+'"'+((x.sectie||'warm')===k?' selected':'')+'>'+T('ks.'+k, KANTEN[k])+'</option>').join('')+'</select>'+
-            '<input class="st-in" data-kf="prepMin" type="number" inputmode="numeric" value="'+(x.prepMin||'')+'" placeholder="'+T('kt.m.vuur','vuurplan-min')+'" style="flex:1;" title="'+T('kt.m.vuur.t','Bereidingstijd in minuten voor het vuurplan; leeg = de standaardtijd van de kant')+'"></div>'
+          ? '<div class="row-gap"><select class="st-in" data-kf="sectie" class="h-flex2">'+Object.keys(KANTEN).map(k=>'<option value="'+k+'"'+((x.sectie||'warm')===k?' selected':'')+'>'+T('ks.'+k, KANTEN[k])+'</option>').join('')+'</select>'+
+            '<input class="st-in" data-kf="prepMin" type="number" inputmode="numeric" value="'+(x.prepMin||'')+'" placeholder="'+T('kt.m.vuur','vuurplan-min')+'" class="h-flex1" title="'+T('kt.m.vuur.t','Bereidingstijd in minuten voor het vuurplan; leeg = de standaardtijd van de kant')+'"></div>'
           : '')+
         '<input class="st-in" data-kf="allergens" value="'+escT((x.allergens||[]).join(', '))+'" placeholder="'+T('kt.m.alg','Allergenen, met komma ertussen')+'">'+
-        '<div class="row-gap"><button class="bigbtn" data-ksave="'+x.id+'" style="flex:1;">'+T('kt.m.save','Opslaan')+'</button>'+
+        '<div class="row-gap"><button class="bigbtn" data-ksave="'+x.id+'" class="h-flex1">'+T('kt.m.save','Opslaan')+'</button>'+
         '<button class="obtn" data-kedit="'+x.id+'">'+T('kt.m.klaar','Klaar')+'</button></div></div>';
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(stn==='bar'?'\uD83C\uDF78 Bar':'\uD83D\uDD25 '+T('kt.keuken','Keuken'))+' \u00b7 '+items.length+' '+T('kt.items','items op de kaart')+'</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+(stn==='bar'?'\uD83C\uDF78 Bar':'\uD83D\uDD25 '+T('kt.keuken','Keuken'))+' \u00b7 '+items.length+' '+T('kt.items','items op de kaart')+'</h3>'+
         (items.length ? items.map(x=>'<div class="st-row"><span>'+x.name+(x.uitverkocht?' <b style="color:#FF8589;">86</b>':'')+
           '<span class="sub">'+x.cat+' \u00b7 '+eur(x.price)+(stn==='keuken'?' \u00b7 '+T('ks.'+(x.sectie||'warm'), KANTEN[x.sectie||'warm'])+(x.prepMin?' \u00b7 \uD83D\uDD25 '+x.prepMin+' min':''):'')+'</span></span>'+
           '<span class="acts"><button class="obtn'+(kantoorEdit===x.id?' primary':'')+'" data-kedit="'+x.id+'">\u270E</button><button class="obtn" data-kst="'+x.id+'">\u21c4 '+(stn==='bar'?T('kt.tokeuken','naar keuken'):T('kt.tobar','naar bar'))+'</button><button class="obtn warn" data-kmdel="'+x.id+'">\u2715</button></span></div>'+
           (kantoorEdit===x.id ? bewerker(x) : '')).join('')
         : '<div class="tkc-who">'+T('kt.noitems','Nog niets op de kaart voor deze werkplek.')+'</div>')+
-        '<div class="st-form"><input class="st-in" id="ktMn" placeholder="'+T('menu.name','Naam')+'"><div class="row-gap"><input class="st-in" id="ktMc" placeholder="'+T('menu.cat','Categorie')+'" style="flex:2;"><input class="st-in" id="ktMp" type="number" inputmode="decimal" placeholder="\u20ac" style="flex:1;"></div>'+
-        '<button class="bigbtn" id="ktMAdd" style="margin-top:0.2rem;">'+T('kt.addcard','Zet op de kaart bij ')+(stn==='bar'?'de bar':T('kt.dekitchen','de keuken'))+'</button></div></div>';
+        '<div class="st-form"><input class="st-in" id="ktMn" placeholder="'+T('menu.name','Naam')+'"><div class="row-gap"><input class="st-in" id="ktMc" placeholder="'+T('menu.cat','Categorie')+'" class="h-flex2"><input class="st-in" id="ktMp" type="number" inputmode="decimal" placeholder="\u20ac" class="h-flex1"></div>'+
+        '<button class="bigbtn" id="ktMAdd" class="h-mt20">'+T('kt.addcard','Zet op de kaart bij ')+(stn==='bar'?'de bar':T('kt.dekitchen','de keuken'))+'</button></div></div>';
       if (stn === 'keuken'){
         // de AI-inkoop: vaste leverancier koppelen, voorstellen goedkeuren of aanpassen
         if (!agentData){
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>\ud83e\udde0 '+T('ag2.h','AI-inkoop')+'</h3><div class="tkc-who">\u2026</div></div>';
+          html += '<div class="tkc h-volbreed"><h3>\ud83e\udde0 '+T('ag2.h','AI-inkoop')+'</h3><div class="tkc-who">\u2026</div></div>';
           laadAgent();
         } else {
           const A = agentData;
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>\ud83e\udde0 '+T('ag2.h','AI-inkoop')+'</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>\ud83e\udde0 '+T('ag2.h','AI-inkoop')+'</h3>'+
             '<div class="tkc-who">'+T('ag2.deck','De AI stelt de inkoop voor op de verkoop, de mise en place en de verwachte drukte. De gemachtigde keurt goed, past aan of wijst af; pas dan wordt er echt besteld bij de vaste leverancier.')+'</div>'+
             // meerdere groothandels: elke gekoppelde staat als chip met een weg-knop
             ((A.partners||[]).length ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.4rem;">'+
               A.partners.map(p=>'<span style="display:inline-flex;align-items:center;gap:0.4rem;border:1px solid var(--gold);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.74rem;">\ud83d\udce6 '+p.naam+
                 '<button data-agweg="'+p.code+'" style="background:none;border:none;color:var(--soft);cursor:pointer;font-size:0.8rem;" title="'+T('ag2.weg','loskoppelen')+'">\u2715</button></span>').join('')+'</div>' : '')+
-            '<div class="row-gap"><select class="st-in" id="agGh" style="flex:2;"><option value="">'+T('ag2.kies2','Groothandel erbij...')+'</option>'+
+            '<div class="row-gap"><select class="st-in" id="agGh" class="h-flex2"><option value="">'+T('ag2.kies2','Groothandel erbij...')+'</option>'+
               (agentMarkt||[]).filter(g=>!(A.partners||[]).find(p=>p.code===g.code)).map(g=>'<option value="'+g.code+'">'+g.name+'</option>').join('')+'</select>'+
               '<label style="display:flex;align-items:center;gap:0.35rem;font-size:0.72rem;color:var(--muted);"><input type="checkbox" id="agAuto"'+(A.auto?' checked':'')+'>'+T('ag2.auto','automatisch na de MEP-voorspelling')+'</label></div>'+
             '<div class="tkc-act"><button class="tkc-start" id="agKoppel">'+T('ag2.koppel2','Koppel erbij')+'</button>'+
             ((A.partners||[]).length?'<button class="tkc-ready" id="agStel">\u2728 '+T('ag2.stel','Stel inkoop voor')+'</button>':'')+'</div>'+
-            ((A.partners||[]).length>1?'<div class="tkc-who" style="margin-top:0.3rem;">'+T('ag2.multi','De AI vergelijkt de gekoppelde groothandels per bestelling en kiest de beste dekking en prijs.')+'</div>':'')+
+            ((A.partners||[]).length>1?'<div class="tkc-who h-mt30">'+T('ag2.multi','De AI vergelijkt de gekoppelde groothandels per bestelling en kiest de beste dekking en prijs.')+'</div>':'')+
             (A.voorstellen||[]).slice(0,3).map(v=>{
               const wacht = v.status === 'wacht-op-goedkeuring';
               return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem;margin-top:0.5rem;">'+
@@ -2202,24 +2202,24 @@
       html += '<div class="tkc"><h3>'+T('kt.tafels','Tafelindeling')+'</h3>'+
         (state.tables||[]).map(t=>'<div class="st-row"><span>'+t.name+'<span class="sub">'+t.seats+' '+T('tbl.pers','pers.')+' \u00b7 '+tTbl(t.status)+'</span></span>'+
           '<span class="acts"><button class="obtn" data-sttbl="'+t.id+'" data-cur="'+t.status+'">\u21bb</button><button class="obtn warn" data-ktdel="'+t.id+'">\u2715</button></span></div>').join('')+
-        '<div class="st-form"><div class="row-gap"><input class="st-in" id="ktTn" placeholder="'+T('kt.tafelnaam','Tafelnaam')+'" style="flex:2;"><input class="st-in" id="ktTs" type="number" placeholder="4" style="flex:1;"></div>'+
-        '<button class="bigbtn" id="ktTAdd" style="margin-top:0.2rem;">'+T('kt.tafeladd','Tafel toevoegen')+'</button></div></div>';
+        '<div class="st-form"><div class="row-gap"><input class="st-in" id="ktTn" placeholder="'+T('kt.tafelnaam','Tafelnaam')+'" class="h-flex2"><input class="st-in" id="ktTs" type="number" placeholder="4" class="h-flex1"></div>'+
+        '<button class="bigbtn" id="ktTAdd" class="h-mt20">'+T('kt.tafeladd','Tafel toevoegen')+'</button></div></div>';
     }
     if (kantoorSec === 'events'){
       const evs = state.events || [];
       html += '<div class="tkc"><h3>'+T('kt.newevent','Nieuw event')+'</h3><div class="st-form">'+
         '<input class="st-in" id="kEvName" placeholder="'+T('kt.ev.name','Naam, bijv. Jazz & sake night')+'">'+
-        '<div class="row-gap"><input class="st-in" id="kEvDate" type="date" style="flex:2;"><input class="st-in" id="kEvTime" type="time" style="flex:1;"></div>'+
+        '<div class="row-gap"><input class="st-in" id="kEvDate" type="date" class="h-flex2"><input class="st-in" id="kEvTime" type="time" class="h-flex1"></div>'+
         '<input class="st-in" id="kEvDesc" placeholder="'+T('kt.ev.desc','Korte omschrijving')+'">'+
-        '<div class="row-gap"><input class="st-in" id="kEvCap" type="number" placeholder="'+T('kt.ev.cap','Capaciteit')+'" style="flex:1;"><input class="st-in" id="kEvPrice" type="number" placeholder="'+T('kt.ev.price','Prijs p.p. (0 = gratis)')+'" style="flex:1;"></div>'+
-        '<button class="bigbtn" id="kEvAdd" style="margin-top:0.2rem;">'+T('kt.ev.add','Maak aan als concept')+'</button></div></div>';
+        '<div class="row-gap"><input class="st-in" id="kEvCap" type="number" placeholder="'+T('kt.ev.cap','Capaciteit')+'" class="h-flex1"><input class="st-in" id="kEvPrice" type="number" placeholder="'+T('kt.ev.price','Prijs p.p. (0 = gratis)')+'" class="h-flex1"></div>'+
+        '<button class="bigbtn" id="kEvAdd" class="h-mt20">'+T('kt.ev.add','Maak aan als concept')+'</button></div></div>';
       html += evs.map(e=>{
         const taken=(e.guests||[]).reduce((n,g)=>n+g.qty,0);
         const rs = e.runsheet || [];
         const stOpts = [['keuken','\uD83D\uDD25 '+T('kt.keuken','Keuken')],['bar','\uD83C\uDF78 Bar'],['bediening','\uD83E\uDDFE '+T('kt.bediening','Bediening')],['party','\uD83C\uDF9F Party manager'],['alle','\uD83D\uDCE2 '+T('rs.all','Iedereen')]];
-        return '<div class="tkc'+(e.published?'':' dim')+'" style="grid-column:1/-1;"><div class="tkc-top"><span style="font-weight:600;">'+e.name+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
+        return '<div class="tkc'+(e.published?'':' dim')+' h-volbreed"><div class="tkc-top"><span style="font-weight:600;">'+e.name+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
         '<div class="tkc-who">'+taken+' / '+e.capacity+' '+T('ev.signedup','aangemeld')+(e.price?' \u00b7 '+eur(e.price)+' p.p.':'')+(e.published?'':' \u00b7 '+T('ev.concept','concept'))+'</div>'+
-        '<h3 style="margin-top:0.4rem;">\uD83D\uDC68\u200D\uD83C\uDF73 '+T('ek.h','Event-keuken')+'</h3>'+
+        '<h3 class="h-mt40">\uD83D\uDC68\u200D\uD83C\uDF73 '+T('ek.h','Event-keuken')+'</h3>'+
         '<div class="st-form"><select class="st-in" id="kcm'+e.id+'">'+
           '<option value="geen"'+(e.catering.mode==='geen'?' selected':'')+'>'+T('ek.none','Geen eten / n.v.t.')+'</option>'+
           '<option value="menu"'+(e.catering.mode==='menu'?' selected':'')+'>'+T('ek.menu','Vast menu')+'</option>'+
@@ -2227,20 +2227,20 @@
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+(state.menu||[]).filter(m=>m.station!=='bar').map(m=>
           '<button class="mn-station'+(e.catering.itemIds.includes(m.id)?'" style="border-color:var(--gold);color:var(--gold);':'"')+'" data-kdish="'+m.id+'" data-ev="'+e.id+'">'+m.name+'</button>').join('')+'</div>'+
         '<button class="obtn" data-kcat="'+e.id+'">'+T('ek.save','Bewaar de eventkeuken')+'</button></div>'+
-        '<div class="st-form" style="margin-top:0.5rem;">'+
+        '<div class="st-form h-mt50">'+
         ((e.allergies||[]).map(a=>'<div class="st-row"><span>\u26a0 '+a.allergen+' ('+a.count+'\u00d7)'+
           (a.alternative?'<span class="sub">\u2192 '+a.alternative.name+'</span>':'')+'</span>'+
           '<span class="acts">'+(!a.alternative?'<button class="obtn primary" data-kalt="'+e.id+'" data-al="'+a.id+'">\u2728 '+T('ek.alt','Vervangend gerecht')+'</button>':'')+
           '<button class="obtn warn" data-kaldel="'+e.id+'" data-al="'+a.id+'">\u2715</button></span></div>').join(''))+
-        '<div class="row-gap"><input class="st-in" id="kaN'+e.id+'" placeholder="'+T('ek.allergen','Allergeen, bijv. noten')+'" style="flex:2;"><input class="st-in" id="kaC'+e.id+'" type="number" placeholder="1\u00d7" style="flex:1;"></div>'+
+        '<div class="row-gap"><input class="st-in" id="kaN'+e.id+'" placeholder="'+T('ek.allergen','Allergeen, bijv. noten')+'" class="h-flex2"><input class="st-in" id="kaC'+e.id+'" type="number" placeholder="1\u00d7" class="h-flex1"></div>'+
         '<button class="obtn" data-kaladd="'+e.id+'">'+T('ek.addal','Allergeen registreren')+'</button>'+
         '<button class="obtn primary" data-kmep="'+e.id+'">\u2728 '+T('ek.mep','Organiseer de mise en place')+'</button></div>'+
         '<h3 style="margin-top:0.6rem;">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' ('+rs.length+')</h3>'+
         (rs.length ? rs.map(it=>'<div class="st-row"><span>'+(it.daysBefore?'<span style="font-size:0.6rem;letter-spacing:0.06em;color:var(--soft);margin-right:0.4rem;">D-'+it.daysBefore+'</span>':'')+'<b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+it.time+'</b>'+(RUN_ICON[it.station]||'')+' '+it.text+(it.done?' <span class="sub" style="display:inline;">\u2713 '+(it.doneBy||'')+'</span>':'')+'</span>'+
           '<button class="obtn warn" data-krdel="'+e.id+'" data-item="'+it.id+'">\u2715</button></div>').join('')
           : '<div class="tkc-who">'+T('rs.none','Nog geen draaiboek. Voer regels in, plak een bestaand draaiboek, of laat de AI er een opstellen.')+'</div>')+
-        '<div class="st-form"><div class="row-gap"><input class="st-in" type="time" id="krT'+e.id+'" style="flex:1;">'+
-        '<select class="st-in" id="krD'+e.id+'" style="flex:1;"><option value="0">'+T('rs.d0','Dag zelf')+'</option><option value="1">D-1</option><option value="2">D-2</option><option value="3">D-3</option></select>'+
+        '<div class="st-form"><div class="row-gap"><input class="st-in" type="time" id="krT'+e.id+'" class="h-flex1">'+
+        '<select class="st-in" id="krD'+e.id+'" class="h-flex1"><option value="0">'+T('rs.d0','Dag zelf')+'</option><option value="1">D-1</option><option value="2">D-2</option><option value="3">D-3</option></select>'+
         '<select class="st-in" id="krS'+e.id+'" style="flex:1.4;">'+stOpts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></div>'+
         '<input class="st-in" id="krX'+e.id+'" placeholder="'+T('rs.what','Wat moet er gebeuren?')+'">'+
         '<button class="obtn" data-kradd="'+e.id+'">'+T('rs.add','Regel toevoegen')+'</button></div>'+
@@ -2258,7 +2258,7 @@
       const rooms = state.rooms || [];
       const verblijfGenre = type === 'apartment' || type === 'villa';
       const unit = verblijfGenre ? T('kt.unit','verblijf') : T('kt.kamer','kamer');
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(verblijfGenre?''+T('kt.units','Verblijven'):''+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+(verblijfGenre?''+T('kt.units','Verblijven'):''+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
         (rooms.length ? rooms.map(r => {
           const hk = (r.hk && r.hk.status) || 'schoon';
           return '<div class="st-row"><span>'+r.name+(r.available?'':' · '+T('kt.offline','offline'))+
@@ -2267,23 +2267,23 @@
             '<button class="obtn" data-kmhk="'+r.id+'" data-cur="'+hk+'">'+tHk(hk)+'</button>'+
             '<button class="obtn warn" data-kmrd="'+r.id+'">✕</button></span></div>';
         }).join('') : '<div class="tkc-who">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>')+
-        '<div class="st-form"><div class="row-gap"><input class="st-in" id="kRmN" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;"><input class="st-in" id="kRmP" type="number" inputmode="decimal" placeholder="€" style="flex:1;"></div>'+
-        '<button class="bigbtn" id="kRmAdd" style="margin-top:0.2rem;">'+(verblijfGenre?T('kt.unitadd','Verblijf toevoegen'):T('kt.kameradd','Kamer toevoegen'))+'</button></div>'+
+        '<div class="st-form"><div class="row-gap"><input class="st-in" id="kRmN" placeholder="'+T('sup.roomname','Kamernaam')+'" class="h-flex2"><input class="st-in" id="kRmP" type="number" inputmode="decimal" placeholder="€" class="h-flex1"></div>'+
+        '<button class="bigbtn" id="kRmAdd" class="h-mt20">'+(verblijfGenre?T('kt.unitadd','Verblijf toevoegen'):T('kt.kameradd','Kamer toevoegen'))+'</button></div>'+
         '<div class="tkc-who">'+T('kt.hknote','Tik op de bezem om de housekeeping-status door te schakelen; Dicht = direct onzichtbaar voor gasten.')+'</div></div>';
     }
     if (kantoorSec === 'minibar'){
       const cat = (state.minibar && state.minibar.catalog) || [];
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.mbcat','Minibar-catalogus')+' ('+cat.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('kt.mbcat','Minibar-catalogus')+' ('+cat.length+')</h3>'+
         (cat.length ? cat.map(m=>'<div class="st-row"><span>'+m.name+'<span class="sub">'+eur(m.price)+'</span></span>'+
           '<button class="obtn warn" data-kmbd="'+m.id+'">✕</button></div>').join('')
         : '<div class="tkc-who">'+T('kt.nomb','Nog geen artikelen in de minibar.')+'</div>')+
-        '<div class="st-form"><div class="row-gap"><input class="st-in" id="kMbN" placeholder="'+T('mb.newitem','Nieuw artikel')+'" style="flex:2;"><input class="st-in" id="kMbP" type="number" inputmode="decimal" placeholder="€" style="flex:1;"></div>'+
-        '<button class="bigbtn" id="kMbAdd" style="margin-top:0.2rem;">'+T('team.add','Toevoegen')+'</button></div>'+
+        '<div class="st-form"><div class="row-gap"><input class="st-in" id="kMbN" placeholder="'+T('mb.newitem','Nieuw artikel')+'" class="h-flex2"><input class="st-in" id="kMbP" type="number" inputmode="decimal" placeholder="€" class="h-flex1"></div>'+
+        '<button class="bigbtn" id="kMbAdd" class="h-mt20">'+T('team.add','Toevoegen')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.mbnote','De telling per kamer doet housekeeping in het tabblad Minibar; hier beheert u het assortiment en de prijzen.')+'</div></div>';
     }
     if (kantoorSec === 'deuren'){
       const doors = state.doors || [];
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.deuren','Deuren')+'</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('kt.deuren','Deuren')+'</h3>'+
         (doors.length ? doors.map(d=>'<div class="st-row"><span>'+(d.locked?'':'')+' '+d.name+
           '<span class="sub">'+(d.locked?T('door.locked','Vergrendeld'):T('door.open','OPEN, vergrendelt zichzelf'))+(d.lastBy?' · '+T('door.lastby','laatst:')+' '+d.lastBy:'')+'</span></span>'+
           '<button class="obtn'+(d.locked?' primary':' warn')+'" data-kdoor="'+d.id+'">'+(d.locked?T('door.openbtn','Open 10 sec'):T('door.lockbtn','Vergrendel nu'))+'</button></div>').join('')
@@ -2300,25 +2300,25 @@
       const bezig = ritten.filter(r => !RIT_KLAAR(r.status) && (r.driver || r.status !== 'aangevraagd'));
       const chauffeurs = (state.staff||[]);
       const wagens = (state.fleet||[]).filter(v=>v.active);
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.openritten','Open aanvragen')+' ('+open.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('kt.openritten','Open aanvragen')+' ('+open.length+')</h3>'+
         (open.length ? open.map(r =>
-          '<div class="st-row" style="flex-wrap:wrap;"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+r.when+'</span></span>'+
-          '<span class="acts" style="flex-wrap:wrap;">'+
+          '<div class="st-row h-wrap"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+r.when+'</span></span>'+
+          '<span class="acts h-wrap">'+
             '<select class="st-in" data-ktch="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
             '<select class="st-in" data-ktvg="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
             '<button class="obtn primary" data-ktwijs="'+r.ref+'">'+T('kt.wijs','Wijs toe')+'</button>'+
             '<button class="obtn" data-ktslim="'+r.ref+'">'+T('kt.slim','Slim')+'</button></span></div>'
         ).join('') : '<div class="tkc-who">'+T('kt.geenopen','Geen open aanvragen.')+'</div>')+'</div>';
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.gepland','Gepland')+' ('+geplandK.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('kt.gepland','Gepland')+' ('+geplandK.length+')</h3>'+
         (geplandK.length ? geplandK.map(r =>
-          '<div class="st-row" style="flex-wrap:wrap;"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · <b>'+r.when+'</b></span></span>'+
-          '<span class="acts" style="flex-wrap:wrap;">'+
+          '<div class="st-row h-wrap"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · <b>'+r.when+'</b></span></span>'+
+          '<span class="acts h-wrap">'+
             '<select class="st-in" data-ktch="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
             '<select class="st-in" data-ktvg="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
             '<button class="obtn primary" data-ktwijs="'+r.ref+'">'+T('kt.wijs','Wijs toe')+'</button>'+
             '<button class="obtn" data-ktslim="'+r.ref+'">'+T('kt.slim','Slim')+'</button></span></div>'
         ).join('') : '<div class="tkc-who">'+T('kt.nietsgepland','Geen geplande ritten. Leden kunnen ritten dagen vooruit boeken.')+'</div>')+'</div>';
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.lopend','Lopend')+' ('+bezig.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('kt.lopend','Lopend')+' ('+bezig.length+')</h3>'+
         (bezig.length ? bezig.map(r =>
           '<div class="st-row"><span>'+r.customerCodename+' · '+tStatus(r.status)+
           '<span class="sub">'+(r.driver?r.driver.name:'?')+(r.vehicle?' · '+r.vehicle.name:'')+' · '+(r.to||'?')+' · '+(r.quote?eur(r.quote):'')+'</span></span></div>'
@@ -2329,12 +2329,12 @@
       // scherm er hetzelfde uitziet met tien of tien miljoen afgeronde ritten
       if (!histData){
         laadHistorie();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.historie','Historie')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.historie','Historie')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else {
         const h = histData;
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.historie','Historie')+' ('+h.total+')</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.historie','Historie')+' ('+h.total+')</h3>'+
           '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b style="color:var(--gold);">'+eur(h.omzet)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
-          '<div style="display:flex;gap:0.5rem;margin:0.5rem 0;"><input class="st-in" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'" style="flex:1;">'+
+          '<div style="display:flex;gap:0.5rem;margin:0.5rem 0;"><input class="st-in" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'" class="h-flex1">'+
           '<button class="obtn" id="ktHzGo">'+T('kt.zoek','Zoek')+'</button></div>'+
           (h.items.length ? h.items.map(r =>
             '<div class="st-row"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+String(r.finishedAt||r.at).slice(0,16).replace('T',' ')+(r.driver?' · '+r.driver.name:'')+'</span></span>'+
@@ -2349,15 +2349,15 @@
     }
     if (kantoorSec === 'vloot'){
       const wagens = state.fleet || [];
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(type==='jet'?''+T('kt.vloot','Vloot'):''+T('kt.vloot','Vloot'))+' ('+wagens.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+(type==='jet'?''+T('kt.vloot','Vloot'):''+T('kt.vloot','Vloot'))+' ('+wagens.length+')</h3>'+
         (wagens.length ? wagens.map(v =>
           '<div class="st-row"><span>'+v.name+(v.active?'':' · '+T('kt.offline','offline'))+'<span class="sub">'+(v.plate||'')+' · '+v.seats+' '+T('tbl.pers','pers.')+'</span></span>'+
           '<span class="acts"><button class="obtn'+(v.active?' primary':' warn')+'" data-ktvt="'+v.id+'">'+(v.active?T('kt.isopen','Open'):T('kt.isclosed','Dicht'))+'</button>'+
           '<button class="obtn warn" data-ktvd="'+v.id+'">✕</button></span></div>'
         ).join('') : '<div class="tkc-who">'+T('kt.geenvloot','Nog geen voertuigen.')+'</div>')+
         '<div class="st-form"><input class="st-in" id="ktVn" placeholder="'+T('kt.vnaam','Naam, bijv. Mercedes S-klasse')+'">'+
-        '<div class="row-gap"><input class="st-in" id="ktVp" placeholder="'+T('kt.kenteken','Kenteken / registratie')+'" style="flex:2;"><input class="st-in" id="ktVs" type="number" placeholder="4" style="flex:1;"></div>'+
-        '<button class="bigbtn" id="ktVAdd" style="margin-top:0.2rem;">'+T('kt.vadd','Voertuig toevoegen')+'</button></div></div>';
+        '<div class="row-gap"><input class="st-in" id="ktVp" placeholder="'+T('kt.kenteken','Kenteken / registratie')+'" class="h-flex2"><input class="st-in" id="ktVs" type="number" placeholder="4" class="h-flex1"></div>'+
+        '<button class="bigbtn" id="ktVAdd" class="h-mt20">'+T('kt.vadd','Voertuig toevoegen')+'</button></div></div>';
     }
     if (kantoorSec === 'tarief'){
       const t2 = (state.settings && state.settings.tarief) || {};
@@ -2367,22 +2367,22 @@
         '<label class="soft-xs">'+T('kt.start','Starttarief (€)')+'</label><input class="st-in" id="ktTa" type="number" step="0.1" value="'+(t2.start||0)+'">'+
         '<label class="soft-xs">'+T('kt.perkm','Per kilometer (€)')+'</label><input class="st-in" id="ktTb" type="number" step="0.1" value="'+(t2.perKm||0)+'">'+
         '<label class="soft-xs">'+T('kt.min','Minimumprijs (€)')+'</label><input class="st-in" id="ktTc" type="number" step="1" value="'+(t2.minimum||0)+'">'+
-        '<button class="bigbtn" id="ktTSave" style="margin-top:0.2rem;">'+T('kt.tsave','Tarief opslaan')+'</button></div></div>';
+        '<button class="bigbtn" id="ktTSave" class="h-mt20">'+T('kt.tsave','Tarief opslaan')+'</button></div></div>';
     }
     if (kantoorSec === 'vandaag'){
       // het slimme vandaag-bord van de dienstverlener (zzp, chef, wellness)
       if (!vakData){
         laadVakwerk();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (vakData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+vakData.error+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+vakData.error+'</div></div>';
       } else {
         const v = vakData, k = v.kpi;
         const rij = (b, knop) => '<div class="st-row"><span>'+(b.soort==='product'?'':'')+' '+b.dienst+
           '<span class="sub">'+b.klant+(b.tijd?' · '+b.tijd:(b.datum?' · '+b.datum:' · '+T('kt.geendatum','nog geen datum')))+(b.duurMin?' · '+b.duurMin+' min':'')+'</span></span>'+
           '<span class="acts"><b style="color:var(--gold);margin-right:0.4rem;">'+eur(b.prijs)+'</b>'+(knop||'')+'</span></div>';
         // KPI-strip
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.vandaag','Vandaag')+' · '+v.label+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.vandaag','Vandaag')+' · '+v.label+'</h3>'+
           '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:0.55rem;">'+
           [[T('vk.omzetvd','Omzet vandaag'), eur(k.omzetVandaag)],
            [T('vk.omzetwk','Deze week'), eur(k.omzetWeek)],
@@ -2393,34 +2393,34 @@
           .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;">'+
             '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--gold);margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
-          '<div class="tkc-who" style="margin-top:0.5rem;">'+T('vk.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div></div>';
+          '<div class="tkc-who h-mt50">'+T('vk.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div></div>';
         // aanvragen die op bevestiging wachten
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.tebev','Wacht op bevestiging')+' ('+v.teBevestigen.length+')</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('vk.tebev','Wacht op bevestiging')+' ('+v.teBevestigen.length+')</h3>'+
           (v.teBevestigen.length ? v.teBevestigen.map(b => rij(b, '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>')).join('')
             : '<div class="tkc-who">'+T('vk.geentebev','Geen openstaande aanvragen.')+'</div>')+'</div>';
         // het vandaag-bord
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.vandaaglijst','Vandaag')+' ('+v.vandaag.length+')</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('vk.vandaaglijst','Vandaag')+' ('+v.vandaag.length+')</h3>'+
           (v.vandaag.length ? v.vandaag.map(b => rij(b, b.status==='bevestigd' ? '<button class="obtn" data-vakaf="'+b.ref+'">'+T('vk.afronden','Afronden')+'</button>' : '')).join('')
             : '<div class="tkc-who">'+T('vk.geenvandaag','Vandaag staat er niets in de agenda.')+'</div>')+'</div>';
         // de eerstvolgende afspraken
-        if (v.binnenkort.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.binnenkort','Binnenkort')+' ('+v.binnenkort.length+')</h3>'+
+        if (v.binnenkort.length) html += '<div class="tkc h-volbreed"><h3>'+T('vk.binnenkort','Binnenkort')+' ('+v.binnenkort.length+')</h3>'+
           v.binnenkort.slice(0,12).map(b => rij(b, '')).join('')+'</div>';
         // boekingen zonder datum die nog gepland moeten worden
-        if (v.zonderDatum.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.zonderdatum','Nog te plannen')+' ('+v.zonderDatum.length+')</h3>'+
+        if (v.zonderDatum.length) html += '<div class="tkc h-volbreed"><h3>'+T('vk.zonderdatum','Nog te plannen')+' ('+v.zonderDatum.length+')</h3>'+
           v.zonderDatum.map(b => rij(b, b.status==='aangevraagd' ? '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>' : '')).join('')+'</div>';
         // de beschikbaarheid: werkdagen en openingstijden waarin leden boeken
         if (vakUren){
           const dagNamen = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
-          html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.beschik','Beschikbaarheid')+'</h3>'+
+          html += '<div class="tkc h-volbreed"><h3>'+T('vk.beschik','Beschikbaarheid')+'</h3>'+
             '<div class="tkc-who" style="margin-top:0;">'+T('vk.beschik.s','Leden boeken alleen binnen deze werkdagen en tijden; de app biedt vrije tijdvakken aan op basis van de duur van de dienst.')+'</div>'+
             '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin:0.5rem 0;">'+
             dagNamen.map((d,i)=>'<button class="obtn'+(vakUren.dagen[i]?' primary':'')+'" data-vakdag="'+i+'">'+d+'</button>').join('')+'</div>'+
-            '<div class="row-gap"><label class="soft-xs" style="align-self:center;">'+T('vk.van','Van')+'</label><input class="st-in" id="vakVan" type="time" value="'+vakUren.van+'" style="flex:1;">'+
-            '<label class="soft-xs" style="align-self:center;">'+T('vk.tot','Tot')+'</label><input class="st-in" id="vakTot" type="time" value="'+vakUren.tot+'" style="flex:1;"></div>'+
-            '<button class="bigbtn" id="vakUrenSave" style="margin-top:0.4rem;">'+T('vk.urenopslaan','Beschikbaarheid opslaan')+'</button></div>';
+            '<div class="row-gap"><label class="soft-xs" style="align-self:center;">'+T('vk.van','Van')+'</label><input class="st-in" id="vakVan" type="time" value="'+vakUren.van+'" class="h-flex1">'+
+            '<label class="soft-xs" style="align-self:center;">'+T('vk.tot','Tot')+'</label><input class="st-in" id="vakTot" type="time" value="'+vakUren.tot+'" class="h-flex1"></div>'+
+            '<button class="bigbtn" id="vakUrenSave" class="h-mt40">'+T('vk.urenopslaan','Beschikbaarheid opslaan')+'</button></div>';
         }
         // de genre-bewuste AI-assistent
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
           '<div class="st-form"><input class="st-in" id="vakQ" placeholder="'+T('vk.aiplace','Bijv. waar moet ik me vandaag op richten?')+'">'+
           '<button class="bigbtn" id="vakAi"'+(vakAiBusy?' disabled':'')+'>'+(vakAiBusy?T('vk.aidenkt','De assistent denkt na...'):T('vk.aivraag','Vraag advies'))+'</button></div>'+
           (vakAiMsg ? '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;">'+vakAiMsg+'</div>' : '')+'</div>';
@@ -2429,17 +2429,17 @@
     if (kantoorSec === 'diensten'){
       // het aanbod van de zelfstandige: diensten en producten, eigen beheer
       const sv = state.services || [];
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.aanbod','Uw diensten en producten')+' ('+sv.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('kt.aanbod','Uw diensten en producten')+' ('+sv.length+')</h3>'+
         (sv.length ? sv.map(x =>
           '<div class="st-row"><span>'+(x.soort==='product'?'':'')+' '+x.name+'<span class="sub">'+(x.desc||'')+(x.duurMin?' · '+x.duurMin+' min':'')+'</span></span>'+
           '<span class="acts"><b style="color:var(--gold);margin-right:0.4rem;">'+eur(x.price)+'</b><button class="obtn warn" data-svdel="'+x.id+'">✕</button></span></div>').join('')
           : '<div class="tkc-who">'+T('kt.geenaanbod','Nog geen aanbod. Voeg hieronder uw eerste dienst of product toe.')+'</div>')+
         '<div class="st-form"><input class="st-in" id="svNaam" placeholder="'+T('kt.svnaam','Naam, bijv. Personal styling')+'">'+
         '<input class="st-in" id="svDesc" placeholder="'+T('kt.svdesc','Korte omschrijving')+'">'+
-        '<div class="row-gap"><input class="st-in" id="svPrijs" type="number" placeholder="€" style="flex:1;">'+
-        '<input class="st-in" id="svDuur" type="number" placeholder="'+T('kt.svduur','min.')+'" style="flex:1;">'+
-        '<select class="st-in" id="svSoort" style="flex:1;"><option value="dienst">'+T('kt.svdienst','Dienst')+'</option><option value="product">'+T('kt.svproduct','Product')+'</option></select></div>'+
-        '<button class="bigbtn" id="svAdd" style="margin-top:0.2rem;">'+T('kt.svadd','Zet in de RTG-app')+'</button></div>'+
+        '<div class="row-gap"><input class="st-in" id="svPrijs" type="number" placeholder="€" class="h-flex1">'+
+        '<input class="st-in" id="svDuur" type="number" placeholder="'+T('kt.svduur','min.')+'" class="h-flex1">'+
+        '<select class="st-in" id="svSoort" class="h-flex1"><option value="dienst">'+T('kt.svdienst','Dienst')+'</option><option value="product">'+T('kt.svproduct','Product')+'</option></select></div>'+
+        '<button class="bigbtn" id="svAdd" class="h-mt20">'+T('kt.svadd','Zet in de RTG-app')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.svnote','Leden zien dit direct in de app en boeken met datum en tijd; u houdt 100% van de prijs.')+'</div></div>';
     }
     /* Vakwerk Pro op het vandaag-bord: de functies waar vakbedrijven elders
@@ -2448,10 +2448,10 @@
     if (kantoorSec === 'vandaag' && vakData && !vakData.error && vakPro && vakPro.ok){
       const open = vakPro.offertes.filter(o => o.status === 'aangevraagd');
       const gedaan = vakPro.offertes.filter(o => o.status !== 'aangevraagd').slice(0, 5);
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.offertes','Offertes')+' ('+open.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('vp.offertes','Offertes')+' ('+open.length+')</h3>'+
         '<div class="tkc-who" style="margin-top:0;">'+T('vp.offertes.s','Leden vragen vrije klussen aan; u antwoordt met een prijs. Bij akkoord staat de klus direct als bevestigde boeking in de agenda.')+'</div>'+
         (open.length ? open.map(o =>
-          '<div class="st-row" style="flex-wrap:wrap;"><span style="flex:1 1 100%;">'+o.omschrijving+
+          '<div class="st-row h-wrap"><span style="flex:1 1 100%;">'+o.omschrijving+
             '<span class="sub">'+o.klant+(o.wens?' · '+T('vp.wens','gewenst')+' '+o.wens:'')+' · '+o.at.slice(0,10)+'</span></span>'+
           '<span class="acts" style="flex:1 1 100%;display:flex;gap:0.35rem;align-items:center;">'+
             '<input class="st-in" type="number" placeholder="€" data-vpprijs="'+o.id+'" style="flex:1;min-width:4rem;">'+
@@ -2459,27 +2459,27 @@
             '<button class="obtn primary" data-vpbied="'+o.id+'">'+T('vp.bied','Bied aan')+'</button>'+
             '<button class="obtn warn" data-vpwei="'+o.id+'">✕</button></span></div>').join('')
           : '<div class="tkc-who">'+T('vp.geenoff','Geen open offerte-aanvragen.')+'</div>')+
-        (gedaan.length ? '<div class="tkc-who" style="margin-top:0.4rem;">'+gedaan.map(o => o.status+': '+o.omschrijving.slice(0,40)+(o.prijs?' ('+eur(o.prijs)+')':'')).join(' · ')+'</div>' : '')+'</div>';
+        (gedaan.length ? '<div class="tkc-who h-mt40">'+gedaan.map(o => o.status+': '+o.omschrijving.slice(0,40)+(o.prijs?' ('+eur(o.prijs)+')':'')).join(' · ')+'</div>' : '')+'</div>';
       // werkbonnen: afgeronde klussen netjes afsluiten voor de klant
-      if (vakPro.werkbonOpen.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.werkbon','Werkbonnen')+' ('+vakPro.werkbonOpen.length+')</h3>'+
+      if (vakPro.werkbonOpen.length) html += '<div class="tkc h-volbreed"><h3>'+T('vp.werkbon','Werkbonnen')+' ('+vakPro.werkbonOpen.length+')</h3>'+
         '<div class="tkc-who" style="margin-top:0;">'+T('vp.werkbon.s','Sluit een afgeronde klus af met een digitale werkbon; het lid ziet hem bij de boeking.')+'</div>'+
         vakPro.werkbonOpen.map(b =>
-          '<div class="st-row" style="flex-wrap:wrap;"><span style="flex:1 1 100%;">'+b.dienst+'<span class="sub">'+b.klant+(b.datum?' · '+b.datum:'')+'</span></span>'+
+          '<div class="st-row h-wrap"><span style="flex:1 1 100%;">'+b.dienst+'<span class="sub">'+b.klant+(b.datum?' · '+b.datum:'')+'</span></span>'+
           '<span class="acts" style="flex:1 1 100%;display:flex;gap:0.35rem;">'+
             '<input class="st-in" placeholder="'+T('vp.wbwerk','Uitgevoerd werk')+'" data-vpwbw="'+b.ref+'" style="flex:2;min-width:7rem;">'+
             '<input class="st-in" placeholder="'+T('vp.wbmat','Materiaal (optioneel)')+'" data-vpwbm="'+b.ref+'" style="flex:2;min-width:6rem;">'+
             '<button class="obtn primary" data-vpwb="'+b.ref+'">'+T('vp.wbdoe','Werkbon')+'</button></span></div>').join('')+'</div>';
       // het klantenboek: vaste klanten op codenaam, met een eigen notitie
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.klanten','Klantenboek')+' ('+vakPro.klanten.length+')</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('vp.klanten','Klantenboek')+' ('+vakPro.klanten.length+')</h3>'+
         '<div class="tkc-who" style="margin-top:0;">'+T('vp.klanten.s','Uw klanten op codenaam: historie, omzet en uw eigen notitie. Echte namen kent dit boek bewust niet.')+'</div>'+
         (vakPro.klanten.length ? vakPro.klanten.slice(0,8).map(k =>
-          '<div class="st-row" style="flex-wrap:wrap;"><span>'+k.codenaam+'<span class="sub">'+k.aantal+' '+(vakData.werkMv||'boekingen')+' · '+eur(k.omzet)+(k.laatste?' · '+T('vp.laatst','laatst')+' '+k.laatste:'')+'</span></span>'+
+          '<div class="st-row h-wrap"><span>'+k.codenaam+'<span class="sub">'+k.aantal+' '+(vakData.werkMv||'boekingen')+' · '+eur(k.omzet)+(k.laatste?' · '+T('vp.laatst','laatst')+' '+k.laatste:'')+'</span></span>'+
           '<span class="acts" style="flex:1 1 100%;display:flex;gap:0.35rem;">'+
-            '<input class="st-in" placeholder="'+T('vp.notitie','Eigen notitie, bijv. sleutel bij de buren')+'" value="'+(k.notitie||'').replace(/"/g,'&quot;')+'" data-vpnin="'+k.codenaam+'" style="flex:1;">'+
+            '<input class="st-in" placeholder="'+T('vp.notitie','Eigen notitie, bijv. sleutel bij de buren')+'" value="'+(k.notitie||'').replace(/"/g,'&quot;')+'" data-vpnin="'+k.codenaam+'" class="h-flex1">'+
             '<button class="obtn" data-vpnzet="'+k.codenaam+'">'+T('vp.bewaar','Bewaar')+'</button></span></div>').join('')
           : '<div class="tkc-who">'+T('vp.geenklant','Nog geen klanten; na de eerste boeking vult dit boek zichzelf.')+'</div>')+'</div>';
       // onderhoud: wie op basis van het herhaal-interval weer aan de beurt is
-      if (vakPro.onderhoud.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.onderhoud','Onderhoud verlopen')+' ('+vakPro.onderhoud.length+')</h3>'+
+      if (vakPro.onderhoud.length) html += '<div class="tkc h-volbreed"><h3>'+T('vp.onderhoud','Onderhoud verlopen')+' ('+vakPro.onderhoud.length+')</h3>'+
         '<div class="tkc-who" style="margin-top:0;">'+T('vp.onderhoud.s','Deze klanten zijn volgens het herhaal-interval weer aan de beurt; een herinnering sturen kan een keer per 30 dagen.')+'</div>'+
         vakPro.onderhoud.map(o =>
           '<div class="st-row"><span>'+o.codenaam+'<span class="sub">'+o.dienst+' · '+T('vp.laatst','laatst')+' '+o.laatst+' · '+o.mndGeleden+' '+T('vp.mnd','mnd geleden')+'</span></span>'+
@@ -2488,7 +2488,7 @@
     if (kantoorSec === 'diensten'){
       // herhaal-onderhoud: een interval per dienst (bijv. APK: 12 maanden)
       const svv = (state.services || []).filter(x => (x.soort||'dienst') === 'dienst');
-      if (svv.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.herhaal','Herhaal-onderhoud')+'</h3>'+
+      if (svv.length) html += '<div class="tkc h-volbreed"><h3>'+T('vp.herhaal','Herhaal-onderhoud')+'</h3>'+
         '<div class="tkc-who" style="margin-top:0;">'+T('vp.herhaal.s','Geef een dienst een herhaal-interval in maanden; klanten die aan de beurt zijn verschijnen op het vandaag-bord.')+'</div>'+
         svv.map(x =>
           '<div class="st-row"><span>'+x.name+'<span class="sub">'+(x.herhaalMnd?T('vp.elke','elke')+' '+x.herhaalMnd+' '+T('vp.mnd2','maanden'):T('vp.geenherhaal','geen herhaling'))+'</span></span>'+
@@ -2499,23 +2499,23 @@
        en de team-capaciteit -- ook dit elders betaalde functies. */
     if (kantoorSec === 'vandaag' && vakData && !vakData.error && vakPro && vakPro.ok){
       // vaste afspraken: het ritme per klant; de motor plant, u bevestigt
-      if ((vakPro.ritmes || []).length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.ritmes','Vaste afspraken')+' ('+vakPro.ritmes.length+')</h3>'+
+      if ((vakPro.ritmes || []).length) html += '<div class="tkc h-volbreed"><h3>'+T('vp.ritmes','Vaste afspraken')+' ('+vakPro.ritmes.length+')</h3>'+
         '<div class="tkc-who" style="margin-top:0;">'+T('vp.ritmes.s','Terugkerende klussen: de app plant telkens de volgende afspraak als aanvraag in; u bevestigt gewoon. Stoppen kan door beide kanten.')+'</div>'+
         vakPro.ritmes.map(r =>
           '<div class="st-row"><span>'+r.klant+'<span class="sub">'+r.dienst+' · '+(r.intervalWeken===1?T('vp.elkeweek','elke week'):T('vp.elke','elke')+' '+r.intervalWeken+' '+T('vp.weken','weken'))+' · '+r.tijd+' · '+T('vp.laatst','laatst')+' '+r.laatst+'</span></span>'+
           '<span class="acts"><button class="obtn warn" data-vprstop="'+r.id+'">'+T('vp.stop','Stop')+'</button></span></div>').join('')+'</div>';
       // de wachtlijst: wie wacht op een plek; uitnodigen is een seintje, geen boeking
-      if ((vakPro.wachtlijst || []).length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.wacht','Wachtlijst')+' ('+vakPro.wachtlijst.length+')</h3>'+
+      if ((vakPro.wachtlijst || []).length) html += '<div class="tkc h-volbreed"><h3>'+T('vp.wacht','Wachtlijst')+' ('+vakPro.wachtlijst.length+')</h3>'+
         '<div class="tkc-who" style="margin-top:0;">'+T('vp.wacht.s','Bij een geweigerde of vrijgevallen afspraak krijgt de eerste wachtende vanzelf bericht; uitnodigen kan ook met de hand. Het lid boekt altijd zelf.')+'</div>'+
         vakPro.wachtlijst.map(w =>
           '<div class="st-row"><span>'+w.klant+'<span class="sub">'+w.datum+(w.dienst?' · '+w.dienst:'')+'</span></span>'+
           '<span class="acts">'+(w.uitgenodigd?'<span class="sub">'+T('vp.uitgenodigd','uitgenodigd')+'</span>':'<button class="obtn" data-vpwnodig="'+w.id+'">'+T('vp.nodig','Nodig uit')+'</button>')+'</span></div>').join('')+'</div>';
       // beoordelingen: het gemiddelde en de laatste woorden van klanten
-      if (vakPro.beoordelingen && vakPro.beoordelingen.score) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.reviews','Beoordelingen')+' · ✶ '+vakPro.beoordelingen.score.score+' ('+vakPro.beoordelingen.score.aantal+')</h3>'+
+      if (vakPro.beoordelingen && vakPro.beoordelingen.score) html += '<div class="tkc h-volbreed"><h3>'+T('vp.reviews','Beoordelingen')+' · ✶ '+vakPro.beoordelingen.score.score+' ('+vakPro.beoordelingen.score.aantal+')</h3>'+
         vakPro.beoordelingen.recent.map(r =>
           '<div class="st-row"><span>✶ '+r.sterren+' · '+r.klant+'<span class="sub">'+r.dienst+(r.tekst?' · "'+r.tekst+'"':'')+' · '+r.datum+'</span></span></div>').join('')+'</div>';
       // team-capaciteit: zoveel vaklieden tegelijk, zoveel boekingen naast elkaar
-      if (vakUren) html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('vp.cap','Team-capaciteit')+'</h3>'+
+      if (vakUren) html += '<div class="tkc h-volbreed"><h3>'+T('vp.cap','Team-capaciteit')+'</h3>'+
         '<div class="tkc-who" style="margin-top:0;">'+T('vp.cap.s','Hoeveel vaklieden werken er tegelijk? Zoveel boekingen mogen elkaar overlappen in de tijdvakken (1 = eenmanszaak).')+'</div>'+
         '<div class="row-gap"><input class="st-in" id="vpCap" type="number" min="1" max="20" value="'+(vakUren.capaciteit||1)+'" style="width:5.5rem;">'+
         '<button class="obtn" id="vpCapZet">'+T('vp.bewaar','Bewaar')+'</button></div></div>';
@@ -2525,7 +2525,7 @@
       html += '<div class="tkc"><h3>'+T('kt.newprice','Prijs doorgeven aan RTG')+'</h3>'+
         '<div class="st-form"><input class="st-in" id="kPrS" placeholder="'+T('kt.service','Dienst, bijv. Luchthaven, centrum')+'">'+
         '<input class="st-in" id="kPrP" type="number" inputmode="decimal" placeholder="€">'+
-        '<button class="bigbtn" id="kPrSend" style="margin-top:0.2rem;">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
+        '<button class="bigbtn" id="kPrSend" class="h-mt20">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.pricenote','RTG-leden betalen uw nettoprijs; u ontvangt altijd het volledige bedrag, RTG rekent 0% commissie.')+'</div></div>';
       html += '<div class="tkc"><h3>'+T('sup.pricehist','Eerder doorgegeven')+'</h3>'+
         (h.length ? h.slice(0,10).map(p=>'<div class="st-row"><span>'+p.service+'<span class="sub">'+timeAgo(p.at)+'</span></span><b style="color:var(--gold);">'+eur(p.price)+'</b></div>').join('')
@@ -2534,7 +2534,7 @@
     if (kantoorSec === 'marketing'){
       const photos = state.photos || [];
       html += '<div class="tkc"><h3>'+T('sup.photos','Foto\'s op uw pagina')+' ('+photos.length+'/6)</h3>'+
-        '<div class="ph-grid" style="margin-top:0.5rem;">'+
+        '<div class="ph-grid h-mt50">'+
         photos.map((p,i)=>'<div class="ph"><img src="'+p+'" alt=""><button data-kphd="'+i+'">✕</button></div>').join('')+
         (photos.length<6?'<label class="ph add">+<input type="file" id="kPhFile" accept="image/jpeg,image/png,image/webp" style="display:none;"></label>':'')+
         '</div><div class="tkc-who">'+T('sup.photonote','Gasten zien deze foto\'s in de RTG-app bij uw pagina, direct na plaatsen.')+'</div></div>';
@@ -2546,13 +2546,13 @@
       // het verplichte Salon-bedrijfsaccount met marketinggereedschap en cijfers
       if (!mktData){
         laadMarketing();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (mktData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3><div class="tkc-who">'+mktData.error+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3><div class="tkc-who">'+mktData.error+'</div></div>';
       } else {
         const mk = mktData;
         if (mktMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+mktMsg+'</div>'; }
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3>'+
           '<div class="tkc-who">'+T('mk.salon.s','Vast onderdeel van uw RTG-partnerschap: leden volgen uw zaak en krijgen een melding bij elk bericht.')+'</div>'+
           '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;">'+
           [[T('mk.volgers','Volgers'), mk.volgers], [T('mk.posts','Berichten'), mk.posts], ['Likes', mk.likes], [T('mk.reacties','Reacties'), mk.reacties]]
@@ -2569,7 +2569,7 @@
           '<button class="bigbtn" id="mkDealGo">'+T('mk.dealgo','Zet op De Salon')+'</button></div>'+
           (mk.deals.length ? mk.deals.map(d2 =>
             '<div class="st-row"><span>'+d2.titel+'<span class="sub">'+(d2.geldigTot?'t/m '+d2.geldigTot+' · ':'')+d2.claims+' '+T('mk.claims','geclaimd')+' · '+d2.verzilverd+' '+T('mk.verzilverd','verzilverd')+'</span></span></div>').join('') : '')+
-          '<div style="display:flex;gap:0.5rem;margin-top:0.4rem;"><input class="st-in" id="mkCode" placeholder="RTG-D-XXXXXX" style="flex:1;">'+
+          '<div style="display:flex;gap:0.5rem;margin-top:0.4rem;"><input class="st-in" id="mkCode" placeholder="RTG-D-XXXXXX" class="h-flex1">'+
           '<button class="obtn" id="mkRedeem">'+T('mk.innen','Verzilver')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('mk.poll','Vraag het uw leden (poll)')+'</h3>'+
           '<div class="tkc-who">'+T('mk.poll.s','Marketinginzicht: laat leden kiezen en zie live de uitslag.')+'</div>'+
@@ -2577,7 +2577,7 @@
           '<input class="st-in" id="mkP1" placeholder="'+T('mk.optie','Optie')+' 1"><input class="st-in" id="mkP2" placeholder="'+T('mk.optie','Optie')+' 2"><input class="st-in" id="mkP3" placeholder="'+T('mk.optie','Optie')+' 3 ('+T('mk.optioneel','optioneel')+')">'+
           '<button class="bigbtn" id="mkPollGo">'+T('mk.pollgo','Plaats de poll')+'</button></div>'+
           (mk.polls.length ? mk.polls.map(pl =>
-            '<div style="margin-top:0.4rem;"><div class="tkc-who" style="color:var(--txt);">'+pl.vraag+'</div>'+
+            '<div class="h-mt40"><div class="tkc-who" style="color:var(--txt);">'+pl.vraag+'</div>'+
             pl.opties.map(o => '<div class="st-row" style="padding:0.3rem 0;"><span class="sub">'+o.tekst+'</span><b style="color:var(--gold);">'+o.stemmen+'</b></div>').join('')+'</div>').join('') : '')+'</div>';
       }
       // pr-plus (los script leverancier-pr.js): planner, nieuwsbrief, bereik
@@ -3312,7 +3312,7 @@
       '<button class="obtn'+(wv.aan?' primary':' warn')+'" id="wvAan" data-val="'+(wv.aan?'0':'1')+'">'+(wv.aan?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>'+
       rows+plekBlok+psBlok+
       '<div style="margin-top:0.5rem;text-align:right;"><button class="obtn primary" id="wvSave">'+T('wv.bewaar','Venster bewaren')+'</button></div>'+
-      '<div class="tkc-who" style="margin-top:0.4rem;">'+T('wv.leeg','Een dag zonder tijden is gewoon open; "Dicht" sluit de hele dag.')+'</div></div>';
+      '<div class="tkc-who h-mt40">'+T('wv.leeg','Een dag zonder tijden is gewoon open; "Dicht" sluit de hele dag.')+'</div></div>';
   }
   function bindWerkvenster(el){
     const aan = el.querySelector('#wvAan');
@@ -3468,15 +3468,15 @@
           '<button class="obtn" data-vgfoto="'+p.id+'">\uD83D\uDCF7 '+T('vg.foto','Foto')+'</button>'+
           '<button class="obtn" data-vgcontract="'+p.id+'" data-titel="'+escAttr(p.titel)+'">\uD83D\uDCDD '+T('vg.contract','Contract')+'</button>'+
           '<button class="rr-del" data-vgdel="'+p.id+'">\u2715</button></div>':'')+'</div>').join('')+
-      (canEdit ? '<details style="margin-top:1rem;"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('vg.nieuw','Pand toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
+      (canEdit ? '<details class="h-mt100"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('vg.nieuw','Pand toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
         '<div class="field"><label>'+T('vg.f.titel','Titel')+'</label><input id="vgTitel" placeholder="Villa met zeezicht"></div>'+
-        '<div class="row-gap"><div class="field" style="flex:1;"><label>'+T('vg.f.soort','Soort')+'</label><select id="vgSoort" '+sel+'><option value="woning">woning</option><option value="appartement">appartement</option><option value="villa">villa</option><option value="commercieel">commercieel</option><option value="grond">grond</option></select></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vg.f.trans','Koop/huur')+'</label><select id="vgTrans" '+sel+'><option value="koop">koop</option><option value="huur">huur (p/mnd)</option></select></div></div>'+
-        '<div class="row-gap"><div class="field" style="flex:2;"><label>'+T('vg.f.plaats','Plaats')+'</label><input id="vgPlaats"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vg.f.prijs','Prijs \u20AC')+'</label><input id="vgPrijs" type="number" inputmode="numeric"></div></div>'+
-        '<div class="row-gap"><div class="field" style="flex:1;"><label>'+T('vg.f.slk','Slaapk.')+'</label><input id="vgSlk" type="number" value="3"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vg.f.bdk','Badk.')+'</label><input id="vgBdk" type="number" value="2"></div>'+
-        '<div class="field" style="flex:1;"><label>m\u00B2</label><input id="vgOpp" type="number"></div></div>'+
+        '<div class="row-gap"><div class="field h-flex1"><label>'+T('vg.f.soort','Soort')+'</label><select id="vgSoort" '+sel+'><option value="woning">woning</option><option value="appartement">appartement</option><option value="villa">villa</option><option value="commercieel">commercieel</option><option value="grond">grond</option></select></div>'+
+        '<div class="field h-flex1"><label>'+T('vg.f.trans','Koop/huur')+'</label><select id="vgTrans" '+sel+'><option value="koop">koop</option><option value="huur">huur (p/mnd)</option></select></div></div>'+
+        '<div class="row-gap"><div class="field h-flex2"><label>'+T('vg.f.plaats','Plaats')+'</label><input id="vgPlaats"></div>'+
+        '<div class="field h-flex1"><label>'+T('vg.f.prijs','Prijs \u20AC')+'</label><input id="vgPrijs" type="number" inputmode="numeric"></div></div>'+
+        '<div class="row-gap"><div class="field h-flex1"><label>'+T('vg.f.slk','Slaapk.')+'</label><input id="vgSlk" type="number" value="3"></div>'+
+        '<div class="field h-flex1"><label>'+T('vg.f.bdk','Badk.')+'</label><input id="vgBdk" type="number" value="2"></div>'+
+        '<div class="field h-flex1"><label>m\u00B2</label><input id="vgOpp" type="number"></div></div>'+
         '<div class="field"><label>'+T('vg.f.oms','Omschrijving')+'</label><textarea id="vgOms" rows="2" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem;color:var(--txt);outline:none;font-family:inherit;"></textarea></div>'+
         '<label class="field" style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="vgKeyless" checked style="accent-color:var(--gold);"> '+T('vg.f.keyless','Keyless toegang mogelijk')+'</label>'+
         '<button class="obtn primary" id="vgAdd">'+T('vg.f.voeg','Toevoegen')+'</button></div></details>' : '')+'</div>'+
@@ -3551,8 +3551,8 @@
     let h = '';
     if (canEdit) h += '<div class="card" style="border-color:var(--gold);"><div class="tt-h">\u2728 '+T('onb.ai','Aanpassen met AI')+'</div>'+
       '<p class="sub">'+T('onb.ai.s','Beschrijf in gewone taal wat u wilt. Bijv. "voeg het veld BSN toe" of "zet in het contract dat annuleren tot 24 uur vooraf kan".')+'</p>'+
-      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="onbAiIn" class="st-in" style="flex:1;" placeholder="'+T('onb.ai.ph','Wat wilt u aanpassen?')+'"><button class="obtn primary" id="onbAiGo">'+T('onb.ai.go','Aanpassen')+'</button></div>'+
-      '<div id="onbAiUit" class="sub" style="margin-top:0.5rem;"></div></div>';
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="onbAiIn" class="st-in h-flex1" placeholder="'+T('onb.ai.ph','Wat wilt u aanpassen?')+'"><button class="obtn primary" id="onbAiGo">'+T('onb.ai.go','Aanpassen')+'</button></div>'+
+      '<div id="onbAiUit" class="sub h-mt50"></div></div>';
     h += '<div class="card"><div class="tt-h">\ud83d\udccb '+T('onb.velden','Verplichte gegevens')+'</div>'+
       c.velden.map(v => '<div class="st-row"><span>'+esc(v.label)+'<span class="sub">'+esc(v.type)+' \u00b7 '+(v.voorWie||[]).map(w=>ONB_WIE[w]||w).join(', ')+'</span></span></div>').join('')+'</div>';
     h += '<div class="card"><div class="tt-h">\ud83d\udcc4 '+esc(c.contract.titel)+' <span class="sub">v'+c.contract.versie+'</span></div>'+
@@ -3582,8 +3582,8 @@
         return '<div class="mitem"><div class="r1"><span class="nm">'+esc(c.titel)+'</span><span class="pr" style="font-size:0.7rem;">'+T('ct.st.'+c.status, CON_ST[c.status]||c.status)+'</span></div>'+
           '<div class="ds">'+T('ct.soort.'+c.soort, c.soort)+' \u00B7 '+esc(ontv)+' \u00B7 '+(zaakGetekend?'\u2705':'\u25CB')+' '+T('ct.zaak','zaak')+' / '+(partijGetekend?'\u2705':'\u25CB')+' '+T('ct.partij','ontvanger')+'</div>'+
           (c.velden && c.velden.length ? '<div class="ds">'+c.velden.map(v=>esc(v.label)+': '+esc(v.waarde)).join(' \u00B7 ')+'</div>' : '')+
-          '<details style="margin-top:0.3rem;"><summary style="cursor:pointer;font-size:0.72rem;color:var(--gold);">'+T('ct.tekst','Voorwaarden')+'</summary><div style="font-size:0.78rem;color:var(--muted);white-space:pre-wrap;margin-top:0.3rem;">'+esc(c.tekst)+'</div></details>'+
-          ((magZaakTekenen||magIkTekenen)?'<div style="margin-top:0.5rem;"><button class="obtn primary" data-cteken="'+c.ref+'">'+T('ct.teken','Onderteken')+'</button></div>':'')+
+          '<details class="h-mt30"><summary style="cursor:pointer;font-size:0.72rem;color:var(--gold);">'+T('ct.tekst','Voorwaarden')+'</summary><div style="font-size:0.78rem;color:var(--muted);white-space:pre-wrap;margin-top:0.3rem;">'+esc(c.tekst)+'</div></details>'+
+          ((magZaakTekenen||magIkTekenen)?'<div class="h-mt50"><button class="obtn primary" data-cteken="'+c.ref+'">'+T('ct.teken','Onderteken')+'</button></div>':'')+
           '</div>';
       }).join('') : '<div class="empty">'+T('ct.geen','Nog geen contracten.')+'</div>')+'</div>';
     if (canEdit){
@@ -3649,7 +3649,7 @@
     const br = o.briefing || { punten:[] };
     html += '<div class="card"><div class="tt-h">'+T('boer.vandaag','Vandaag')+' · '+esc(br.seizoenLabel||'')+'</div>'+
       (br.punten.length ? br.punten.map(p => '<div class="mitem" style="border-left:3px solid '+(URG_KL[p.urgentie]||'var(--soft)')+';"><div class="ds" style="color:var(--txt);">'+esc(p.tekst)+'</div></div>').join('')
-        : '<div class="ds" style="margin-top:0.5rem;">'+T('boer.rustig','Niets dringends. Mooie dag om vooruit te werken.')+'</div>')+'</div>';
+        : '<div class="ds h-mt50">'+T('boer.rustig','Niets dringends. Mooie dag om vooruit te werken.')+'</div>')+'</div>';
     // stats
     const tiles = [[st.percelen||0, T('boer.percelen','percelen')],[ (st.hectare||0)+' ha', T('boer.opp','oppervlak')],[st.teOogsten||0, T('boer.oogstklaar','oogstklaar')],[st.dieren||0, T('boer.dieren','dieren')]];
     if (isDier){ tiles.push([st.melkPerDag||0, T('boer.melk','L melk/dag')]); tiles.push([st.eierenPerDag||0, T('boer.eieren','eieren/dag')]); tiles.push([(st.voerPerDag||0)+' kg', T('boer.voer','voer/dag')]); }
@@ -3693,7 +3693,7 @@
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><input id="boerTkWat" placeholder="'+T('boer.tkwat','Nieuwe taak')+'" style="flex:1;min-width:9rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><input id="boerTkVoor" type="date" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><button class="obtn primary" id="boerTkAdd">+</button></div>' : '')+'</div>';
     // Verkoop: producten (oogst vult de voorraad) en verkopen via de Salon
     html += '<div class="card"><div class="tt-h">'+T('boer.verkoop','Verkoop via de Salon')+'</div>'+
-      '<p class="sub" style="margin-top:0.2rem;">'+T('boer.verkoop.sub','Uw oogst komt hier automatisch in de voorraad. Zet een prijs en plaats het in de Salon; leden claimen en halen op.')+'</p>'+
+      '<p class="sub h-mt20">'+T('boer.verkoop.sub','Uw oogst komt hier automatisch in de voorraad. Zet een prijs en plaats het in de Salon; leden claimen en halen op.')+'</p>'+
       ((o.producten||[]).length ? (o.producten||[]).map(pr => '<div class="mitem"><div class="r1"><span class="nm">'+esc(pr.naam)+'</span><span class="pr">'+pr.voorraad+' '+esc(pr.eenheid)+'</span></div>'+
         '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+
           '<span style="font-size:0.78rem;color:var(--soft);">€</span><input type="number" min="0" step="0.1" value="'+(pr.prijs||'')+'" data-prijsin="'+pr.id+'" style="width:5rem;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0.35rem 0.5rem;color:var(--txt);"><span style="font-size:0.78rem;color:var(--soft);">/'+esc(pr.eenheid)+'</span>'+
@@ -3701,13 +3701,13 @@
           (canEdit?'<button class="obtn primary" data-naarsalon="'+pr.id+'">'+(pr.inSalon?''+T('boer.opnieuwsalon','Opnieuw in Salon'):'✦ '+T('boer.insalon','In de Salon'))+'</button>':'')+
           (canEdit?'<button class="rr-del" data-proddel="'+pr.id+'">✕</button>':'')+
         '</div></div>').join('')
-        : '<div class="ds" style="margin-top:0.5rem;">'+T('boer.geenprod','Nog geen producten. Oogst een perceel of voeg er hieronder een toe.')+'</div>')+
+        : '<div class="ds h-mt50">'+T('boer.geenprod','Nog geen producten. Oogst een perceel of voeg er hieronder een toe.')+'</div>')+
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><input id="boerPrNaam" placeholder="'+T('boer.prnaam','Product')+'" style="flex:1;min-width:7rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><input id="boerPrEenh" placeholder="'+T('boer.preenh','kg')+'" style="width:4rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><input id="boerPrPrijs" type="number" min="0" step="0.1" placeholder="€" style="width:5rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><button class="obtn primary" id="boerPrAdd">+</button></div>' : '')+'</div>';
     // AI-adviseur
     if (canEdit){
       html += '<div class="card"><div class="tt-h">'+T('boer.ai','AI-adviseur')+'</div>'+
-        '<p class="sub" style="margin-top:0.3rem;">'+T('boer.ai.sub','Vraag advies of geef een opdracht, bijv. "zaai tomaat op Kasblok 1" of "voeg 20 melkkoeien toe".')+'</p>'+
-        '<div id="boerAiOut" style="margin-top:0.5rem;"></div>'+
+        '<p class="sub h-mt30">'+T('boer.ai.sub','Vraag advies of geef een opdracht, bijv. "zaai tomaat op Kasblok 1" of "voeg 20 melkkoeien toe".')+'</p>'+
+        '<div id="boerAiOut" class="h-mt50"></div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="boerAiIn" placeholder="'+T('boer.ai.ph','Uw vraag of opdracht...')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);"><button class="obtn primary" id="boerAiGo">'+T('boer.ai.go','Vraag')+'</button></div></div>';
     }
     el.innerHTML = html;
@@ -3760,7 +3760,7 @@
     // profiel
     html += '<div class="card"><div class="tt-h">'+T('cr.profiel','Profiel')+'</div>'+
       (canEdit ? '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;"><input id="crNiche" placeholder="'+T('cr.niche','Niche (bijv. Reizen & lifestyle)')+'" value="'+escAttr(o.niche||'')+'" '+inp+'><textarea id="crBio" placeholder="'+T('cr.bio','Korte bio')+'" '+inp+' rows="2">'+esc(o.bio||'')+'</textarea><button class="obtn primary" id="crProfielOp" style="align-self:flex-start;">'+T('cr.opslaan','Opslaan')+'</button></div>'
-        : '<div style="margin-top:0.4rem;"><b>'+esc(o.niche||'')+'</b><div class="ds">'+esc(o.bio||'')+'</div></div>')+'</div>';
+        : '<div class="h-mt40"><b>'+esc(o.niche||'')+'</b><div class="ds">'+esc(o.bio||'')+'</div></div>')+'</div>';
     // stats
     const tiles = [[kort(st.bereik||0), T('cr.bereik','totaal bereik')],[st.platforms||0, T('cr.platforms','platforms')],[st.teProduceren||0, T('cr.productie','in productie')],[st.gepost||0, T('cr.gepost','gepost')],['€ '+(st.gemTarief||0), T('cr.gemtarief','gem. tarief')],[st.portfolio||0, T('cr.portfolio','portfolio')]];
     html += '<div class="card"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">'+
@@ -3788,9 +3788,9 @@
     // AI content-helper
     if (canEdit){
       html += '<div class="card"><div class="tt-h">'+T('cr.ai','AI content-helper')+'</div>'+
-        '<p class="sub" style="margin-top:0.3rem;">'+T('cr.ai.sub','Vraag om ideeen of een kant-en-klaar script, bijv. "schrijf een script voor een reel over een strandclub" of "voeg idee ... toe aan de kalender".')+'</p>'+
-        '<div id="crAiOut" style="margin-top:0.5rem;"></div>'+
-        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="crAiIn" placeholder="'+T('cr.ai.ph','Vraag of opdracht...')+'" '+inp+' style="flex:1;"><button class="obtn primary" id="crAiGo">'+T('cr.ai.go','Vraag')+'</button></div></div>';
+        '<p class="sub h-mt30">'+T('cr.ai.sub','Vraag om ideeen of een kant-en-klaar script, bijv. "schrijf een script voor een reel over een strandclub" of "voeg idee ... toe aan de kalender".')+'</p>'+
+        '<div id="crAiOut" class="h-mt50"></div>'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="crAiIn" placeholder="'+T('cr.ai.ph','Vraag of opdracht...')+'" '+inp+' class="h-flex1"><button class="obtn primary" id="crAiGo">'+T('cr.ai.go','Vraag')+'</button></div></div>';
     }
     el.innerHTML = html;
     // wiring
@@ -3839,7 +3839,7 @@
         (x.bericht?'<div class="ds">'+esc(x.bericht)+(x.budget?' · € '+x.budget:'')+(x.soort?' · '+esc(x.soort):'')+'</div>':'')+
         (x.richting==='in'&&x.status==='voorgesteld'&&canEdit ? '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;"><button class="obtn primary" data-swja="'+x.id+'">'+T('sw.accept','Accepteren')+'</button><button class="obtn" data-swnee="'+x.id+'">'+T('sw.afwijs','Afwijzen')+'</button></div>' : '')+
         '</div>').join('')
-        : '<div class="ds" style="margin-top:0.5rem;">'+T('sw.geen','Nog geen samenwerkingen. Start er hieronder een.')+'</div>')+'</div>';
+        : '<div class="ds h-mt50">'+T('sw.geen','Nog geen samenwerkingen. Start er hieronder een.')+'</div>')+'</div>';
 
     if (mk){
       // CREATOR: leveranciers vinden + open oproepen
@@ -3851,7 +3851,7 @@
         (oproepen.length ? oproepen.map(op => '<div class="mitem"><div class="r1"><span class="nm">'+esc(op.titel)+'</span><span class="pr">'+(op.budget?'€ '+op.budget:'')+'</span></div>'+
           '<div class="ds">'+(op.van?esc(op.van.name)+' · ':'')+esc(op.omschrijving||'')+(op.soort?' · '+esc(op.soort):'')+'</div>'+
           (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.reactie','Jouw reactie...')+'" data-swreactie="'+op.id+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swreageer="'+op.id+'">'+T('sw.reageer','Reageer')+'</button></div>':'')+'</div>').join('')
-          : '<div class="ds" style="margin-top:0.5rem;">'+T('sw.geenoproep','Nu geen open oproepen.')+'</div>')+'</div>';
+          : '<div class="ds h-mt50">'+T('sw.geenoproep','Nu geen open oproepen.')+'</div>')+'</div>';
     } else {
       // LEVERANCIER: creators oproepen + reacties + creators direct benaderen
       if (canEdit) html += '<div class="card"><div class="tt-h">'+T('sw.roepop','Roep content creators op')+'</div>'+
@@ -3862,9 +3862,9 @@
           '<div class="ds" style="margin-bottom:0.4rem;">'+esc(op.omschrijving||'')+(op.budget?' · € '+op.budget:'')+'</div>'+
           ((op.reacties||[]).length ? (op.reacties||[]).map(r => '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.creator.name)+(r.creator.bereik?' · '+kortN(r.creator.bereik):'')+'</span>'+(r.status==='gekozen'?'<span class="pr" style="color:#7EE0A3;">'+T('sw.gekozen','gekozen')+'</span>':'')+'</div>'+
             (r.bericht?'<div class="ds">'+esc(r.bericht)+'</div>':'')+
-            (canEdit&&r.status!=='gekozen'&&op.open?'<div style="margin-top:0.35rem;"><button class="obtn primary" data-swkies="'+op.id+'" data-creator="'+r.creatorCode+'">'+T('sw.kiesdeze','Kies deze creator')+'</button></div>':'')+'</div>').join('')
+            (canEdit&&r.status!=='gekozen'&&op.open?'<div class="h-mt35"><button class="obtn primary" data-swkies="'+op.id+'" data-creator="'+r.creatorCode+'">'+T('sw.kiesdeze','Kies deze creator')+'</button></div>':'')+'</div>').join('')
             : '<div class="ds">'+T('sw.geenreacties','Nog geen reacties.')+'</div>')+
-          (canEdit&&op.open?'<button class="obtn" data-swsluit="'+op.id+'" style="margin-top:0.5rem;">'+T('sw.sluit','Oproep sluiten')+'</button>':'')+'</div>';
+          (canEdit&&op.open?'<button class="obtn" data-swsluit="'+op.id+'" class="h-mt50">'+T('sw.sluit','Oproep sluiten')+'</button>':'')+'</div>';
       });
       // creators direct benaderen
       html += '<div class="card"><div class="tt-h">'+T('sw.vindcreator','Benader een creator direct')+'</div>'+
@@ -3892,7 +3892,7 @@
   function factRij(f, kant){
     return '<div class="mitem"><div class="r1"><span class="nm">'+esc(f.nummer)+' · '+esc(kant==='in'?f.verkoper:f.koper)+'</span><span class="pr">'+geld(f.totaal)+'</span></div>'+
       '<div class="ds">'+esc(f.datum)+' · '+T('fact.soort.'+f.soort, f.soort)+' · '+T('fact.btw','btw')+' '+geld(f.btwBedrag)+(f.methode?' · '+esc(f.methode):'')+'</div>'+
-      '<div style="margin-top:0.35rem;"><button class="obtn" data-factpdf="'+f.id+'" data-nr="'+escAttr(f.nummer)+'">PDF</button></div></div>';
+      '<div class="h-mt35"><button class="obtn" data-factpdf="'+f.id+'" data-nr="'+escAttr(f.nummer)+'">PDF</button></div></div>';
   }
   function renderFacturen(){
     const el = $('#factWrap'); if (!el) return;
@@ -3904,12 +3904,12 @@
       .map(c => '<div style="background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.6rem;text-align:center;"><div style="font-size:1.05rem;font-weight:700;color:var(--gold);">'+c[0]+'</div><div style="font-size:0.6rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.05em;">'+c[1]+'</div></div>').join('')+'</div></div>';
     if (canEdit){
       html += '<div class="card"><div class="tt-h">'+T('fact.ai','AI-factuurtool')+'</div>'+
-        '<p class="sub" style="margin-top:0.3rem;">'+T('fact.ai.sub','Vraag iets, of maak een factuur in gewone taal: "maak een factuur voor [codenaam], 3 uur advies a 90 euro".')+'</p>'+
-        '<div id="factAiOut" style="margin-top:0.5rem;"></div>'+
+        '<p class="sub h-mt30">'+T('fact.ai.sub','Vraag iets, of maak een factuur in gewone taal: "maak een factuur voor [codenaam], 3 uur advies a 90 euro".')+'</p>'+
+        '<div id="factAiOut" class="h-mt50"></div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="factAiIn" placeholder="'+T('fact.ai.ph','Vraag of opdracht...')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);"><button class="obtn primary" id="factAiGo">'+T('fact.ai.go','Vraag')+'</button></div></div>';
     }
     html += '<div class="card"><div class="tt-h">'+T('fact.uit','Verstuurde facturen')+' ('+(fact.verkocht||[]).length+')</div>'+
-      ((fact.verkocht||[]).length ? (fact.verkocht||[]).slice(0,60).map(f => factRij(f,'uit')).join('') : '<div class="ds" style="margin-top:0.5rem;">'+T('fact.geenuit','Nog geen facturen. Bij elke kassaverkoop komt hier automatisch een factuur.')+'</div>')+'</div>';
+      ((fact.verkocht||[]).length ? (fact.verkocht||[]).slice(0,60).map(f => factRij(f,'uit')).join('') : '<div class="ds h-mt50">'+T('fact.geenuit','Nog geen facturen. Bij elke kassaverkoop komt hier automatisch een factuur.')+'</div>')+'</div>';
     if ((fact.gekocht||[]).length) html += '<div class="card"><div class="tt-h">'+T('fact.in','Ontvangen facturen')+' ('+fact.gekocht.length+')</div>'+
       fact.gekocht.slice(0,60).map(f => factRij(f,'in')).join('')+'</div>';
     el.innerHTML = html;
@@ -3958,16 +3958,16 @@
           '<button class="obtn" id="mktAiPrijs">'+T('mkt.aiprijs','AI-prijs')+'</button>'+
         '</div>'+
         '<div id="mktAiUit" class="sub" style="margin-top:0.35rem;color:var(--gold);"></div>'+
-        '<label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.8rem;color:var(--soft);margin:0.6rem 0;"><input type="checkbox" id="mktAkkoord" style="margin-top:0.2rem;"><span>'+T('mkt.akkoord','Ik bied alleen toegestane waar aan en houd het netjes en respectvol.')+'</span></label>'+
+        '<label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.8rem;color:var(--soft);margin:0.6rem 0;"><input type="checkbox" id="mktAkkoord" class="h-mt20"><span>'+T('mkt.akkoord','Ik bied alleen toegestane waar aan en houd het netjes en respectvol.')+'</span></label>'+
         '<button class="obtn primary" id="mktPlaatsBtn" style="width:100%;">'+T('mkt.plaatsbtn','Zet in De Salon')+'</button>'+
-        '<div id="mktMelding" class="sub" style="margin-top:0.4rem;"></div></div>';
+        '<div id="mktMelding" class="sub h-mt40"></div></div>';
     }
     const ads = rtfmData.ads || [];
     html += '<div class="card"><div class="tt-h">'+T('mkt.mijn','Mijn advertenties')+' ('+ads.length+')</div>'+
       (ads.length ? ads.map(a =>
         '<div class="mitem" style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;"><div><b>'+esc(a.titel)+'</b><div class="ds">'+(a.prijs>0?'€ '+a.prijs:'Gratis')+' · '+a.status+(a.meldingen?' · '+a.meldingen+' melding(en)':'')+'</div></div>'+
         '<div style="display:flex;gap:0.3rem;">'+(canEdit?(a.status!=='verkocht'?'<button class="obtn" data-mktverk="'+a.id+'">'+T('mkt.verkocht','Verkocht')+'</button>':'<button class="obtn" data-mktheropen="'+a.id+'">'+T('mkt.heropen','Te koop')+'</button>')+'<button class="obtn warn" data-mktdel="'+a.id+'">'+T('mkt.del','Verwijder')+'</button>':'')+'</div></div>'
-      ).join('') : '<div class="ds" style="margin-top:0.5rem;">'+T('mkt.geen','Nog niets geplaatst. Zet uw eerste advertentie hierboven.')+'</div>')+'</div>';
+      ).join('') : '<div class="ds h-mt50">'+T('mkt.geen','Nog niets geplaatst. Zet uw eerste advertentie hierboven.')+'</div>')+'</div>';
     const pv = rtfmData.postvak || [];
     if (pv.length) html += '<div class="card"><div class="tt-h">'+T('mkt.berichten','Berichten')+' ('+pv.length+')</div>'+
       pv.map(c => '<div class="mitem"><b>'+esc(c.adTitel)+'</b><div class="ds">'+esc(c.metNaam)+': '+esc(c.laatste)+'</div></div>').join('')+'</div>';
@@ -4035,7 +4035,7 @@
     // bestsellers
     const bs = st.bestsellers || [];
     html += '<div class="card"><div class="tt-h">'+T('rt.bestsellers','Bestsellers')+'</div>'+
-      (bs.length ? '<div style="margin-top:0.5rem;">'+bs.map((b,i) => '<div class="mitem"><div class="r1"><span class="nm">'+(i+1)+'. '+esc(b.naam)+'</span><span class="pr">'+b.aantal+'×</span></div></div>').join('') + '</div>'
+      (bs.length ? '<div class="h-mt50">'+bs.map((b,i) => '<div class="mitem"><div class="r1"><span class="nm">'+(i+1)+'. '+esc(b.naam)+'</span><span class="pr">'+b.aantal+'×</span></div></div>').join('') + '</div>'
         : '<div class="empty">'+T('rt.geenverkoop','Nog geen verkopen vandaag.')+'</div>')+'</div>';
     // sell-through per collectie (balkjes)
     const sthr = st.sellThrough || [];
@@ -4043,24 +4043,24 @@
       '<div style="margin-top:0.5rem;display:grid;gap:0.6rem;">'+sthr.map(c =>
         '<div><div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>'+esc(c.collectie)+'</span><span style="color:var(--gold);">'+c.pct+'%</span></div>'+
         '<div style="height:7px;background:var(--card2);border-radius:999px;margin-top:0.3rem;overflow:hidden;"><div style="height:100%;width:'+c.pct+'%;background:var(--gold);"></div></div>'+
-        '<div class="tt-h" style="margin-top:0.2rem;">'+c.verkocht+' '+T('rt.verkocht','verkocht')+' · '+c.voorraad+' '+T('rt.opvoorraad','op voorraad')+'</div></div>').join('')+'</div></div>';
+        '<div class="tt-h h-mt20">'+c.verkocht+' '+T('rt.verkocht','verkocht')+' · '+c.voorraad+' '+T('rt.opvoorraad','op voorraad')+'</div></div>').join('')+'</div></div>';
     // lage voorraad / bijbestellen
     const laag = st.laag || [];
     html += '<div class="card"><div class="tt-h">'+T('rt.bijbestel','Bijbestellen (lage voorraad)')+'</div>'+
-      (laag.length ? '<div style="margin-top:0.5rem;">'+laag.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikel)+'</span><span class="pr" style="color:'+(v.voorraad<=0?'var(--burgundy)':'var(--amber)')+';">'+v.voorraad+'</span></div><div class="ds">'+esc(v.kleur)+' · '+T('rt.maat','maat')+' '+esc(v.maat)+' · '+esc(v.vsku)+'</div></div>').join('')+'</div>'
+      (laag.length ? '<div class="h-mt50">'+laag.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikel)+'</span><span class="pr" style="color:'+(v.voorraad<=0?'var(--burgundy)':'var(--amber)')+';">'+v.voorraad+'</span></div><div class="ds">'+esc(v.kleur)+' · '+T('rt.maat','maat')+' '+esc(v.maat)+' · '+esc(v.vsku)+'</div></div>').join('')+'</div>'
         : '<div class="empty">'+T('rt.voorraadok','Alle maten ruim op voorraad.')+'</div>')+'</div>';
     // open paskamerverzoeken (ook af te handelen vanuit de backoffice)
     const pk = retailData.paskamer || [];
     if (pk.length) html += '<div class="card"><div class="tt-h">'+T('rt.paskamer','Paskamerverzoeken')+'</div>'+
-      '<div style="margin-top:0.5rem;">'+pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikelNaam)+'</span><span class="pr">'+esc(v.maat)+'</span></div>'+
+      '<div class="h-mt50">'+pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikelNaam)+'</span><span class="pr">'+esc(v.maat)+'</span></div>'+
         '<div class="ds">'+esc(v.codenaam||'Gast')+' · '+esc(v.kleur)+(v.paskamer?' · '+esc(v.paskamer):'')+'</div>'+
-        '<div style="margin-top:0.4rem;"><button class="obtn primary" data-rpkbreng="'+v.id+'">'+T('rt.breng','Breng gebracht')+'</button></div></div>').join('')+'</div></div>';
+        '<div class="h-mt40"><button class="obtn primary" data-rpkbreng="'+v.id+'">'+T('rt.breng','Breng gebracht')+'</button></div></div>').join('')+'</div></div>';
     // artikelen met een aangekondigde drop (release)
     if (canEdit){
       const drops = (retailData.artikelen||[]).filter(a => a.drop && !a.drop.gereleased);
       if (drops.length) html += '<div class="card"><div class="tt-h">'+T('rt.drops','Aangekondigde drops')+'</div>'+
-        '<div style="margin-top:0.5rem;">'+drops.map(a => '<div class="mitem"><div class="r1"><span class="nm">'+esc(a.naam)+'</span><span class="pr">'+esc(a.drop.datum)+' '+esc(a.drop.tijd)+'</span></div>'+
-          '<div style="margin-top:0.4rem;"><button class="obtn primary" data-rrelease="'+a.id+'">'+T('rt.release','Nu vrijgeven')+'</button></div></div>').join('')+'</div></div>';
+        '<div class="h-mt50">'+drops.map(a => '<div class="mitem"><div class="r1"><span class="nm">'+esc(a.naam)+'</span><span class="pr">'+esc(a.drop.datum)+' '+esc(a.drop.tijd)+'</span></div>'+
+          '<div class="h-mt40"><button class="obtn primary" data-rrelease="'+a.id+'">'+T('rt.release','Nu vrijgeven')+'</button></div></div>').join('')+'</div></div>';
     }
     return html;
   }
@@ -4069,8 +4069,8 @@
     // collecties
     const cols = retailData.collecties || [];
     html += '<div class="card"><div class="tt-h">'+T('rt.collecties','Collecties')+'</div>'+
-      (cols.length ? '<div style="margin-top:0.5rem;">'+cols.map(c => '<div class="mitem"><div class="r1"><span class="nm">'+esc(c.naam)+'</span><span class="pr">'+esc(c.seizoen)+' '+c.jaar+'</span></div>'+
-        (canEdit?'<div style="margin-top:0.4rem;"><button class="obtn warn" data-rcoldel="'+c.id+'">'+T('rt.verwijder','Verwijder')+'</button></div>':'')+'</div>').join('')+'</div>'
+      (cols.length ? '<div class="h-mt50">'+cols.map(c => '<div class="mitem"><div class="r1"><span class="nm">'+esc(c.naam)+'</span><span class="pr">'+esc(c.seizoen)+' '+c.jaar+'</span></div>'+
+        (canEdit?'<div class="h-mt40"><button class="obtn warn" data-rcoldel="'+c.id+'">'+T('rt.verwijder','Verwijder')+'</button></div>':'')+'</div>').join('')+'</div>'
         : '<div class="empty">'+T('rt.geencoll','Nog geen collecties.')+'</div>')+
       (canEdit ? '<div style="margin-top:0.7rem;display:grid;grid-template-columns:1fr auto auto auto;gap:0.4rem;align-items:end;">'+
         '<div class="field" style="margin:0;"><label>'+T('rt.f.collnaam','Naam')+'</label><input id="rColNaam" placeholder="'+T('rt.f.collnaamph','Bijv. Riviera')+'"></div>'+
@@ -4127,7 +4127,7 @@
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="rZoek" placeholder="'+T('rt.zoekph','Naam, kleur of maat…')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.9rem;color:var(--txt);outline:none;"><button class="obtn primary" id="rZoekBtn">'+T('rt.zoek','Zoek')+'</button></div>'+
       '<div id="rZoekUit" style="margin-top:0.6rem;"></div></div>';
     // alle varianten met snelle bijstelknoppen
-    html += '<div class="card"><div class="tt-h">'+T('rt.allevoorraad','Alle voorraad')+'</div><div style="margin-top:0.5rem;">'+
+    html += '<div class="card"><div class="tt-h">'+T('rt.allevoorraad','Alle voorraad')+'</div><div class="h-mt50">'+
       (retailData.artikelen||[]).map(a => '<div style="margin-bottom:0.7rem;"><div style="font-size:0.85rem;font-weight:600;margin-bottom:0.3rem;">'+esc(a.naam)+'</div>'+
         (a.varianten||[]).map(v => retailVariantRij(v)).join('')+'</div>').join('') + '</div></div>';
     return html;
@@ -4165,11 +4165,11 @@
         : '<div class="empty">'+T('rt.geenverlang','Nog niets op de verlanglijst.')+'</div>')+'</div>';
     // historie
     html += '<div class="card"><div class="tt-h">'+T('rt.historie','Aankoophistorie')+'</div>'+
-      ((k.historie&&k.historie.length) ? '<div style="margin-top:0.5rem;">'+k.historie.slice().reverse().map(h => '<div class="mitem"><div class="r1"><span class="nm">'+esc(h.naam)+'</span><span class="pr">'+geld(h.bedrag)+'</span></div><div class="ds">'+esc(String(h.at).slice(0,10))+'</div></div>').join('')+'</div>'
+      ((k.historie&&k.historie.length) ? '<div class="h-mt50">'+k.historie.slice().reverse().map(h => '<div class="mitem"><div class="r1"><span class="nm">'+esc(h.naam)+'</span><span class="pr">'+geld(h.bedrag)+'</span></div><div class="ds">'+esc(String(h.at).slice(0,10))+'</div></div>').join('')+'</div>'
         : '<div class="empty">'+T('rt.geenhist','Nog geen aankopen.')+'</div>')+'</div>';
     // notities
     html += '<div class="card"><div class="tt-h">'+T('rt.notities','Stylist-notities')+'</div>'+
-      ((k.notities&&k.notities.length) ? '<div style="margin-top:0.5rem;">'+k.notities.slice().reverse().map(n => '<div class="mitem"><div class="ds" style="color:var(--txt);">'+esc(n.tekst)+'</div><div class="ds">'+esc(n.door||'Team')+' · '+esc(String(n.at).slice(0,10))+'</div></div>').join('')+'</div>' : '')+
+      ((k.notities&&k.notities.length) ? '<div class="h-mt50">'+k.notities.slice().reverse().map(n => '<div class="mitem"><div class="ds" style="color:var(--txt);">'+esc(n.tekst)+'</div><div class="ds">'+esc(n.door||'Team')+' · '+esc(String(n.at).slice(0,10))+'</div></div>').join('')+'</div>' : '')+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="rNotitie" placeholder="'+T('rt.notitieph','Nieuwe notitie…')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.85rem;color:var(--txt);outline:none;"><button class="obtn primary" id="rNotitieAdd">'+T('rt.voegtoe','Voeg toe')+'</button></div></div>';
     // stylingvoorstel sturen
     html += '<div class="card"><div class="tt-h">'+T('rt.styling','Stylingvoorstel sturen')+'</div>'+
@@ -4306,7 +4306,7 @@
     html += '<div class="card"><div class="tt-h">'+T('pn.verzoeken','Mijn verzoeken')+'</div>'+
       (vz.length ? '<div style="margin-top:0.5rem;display:grid;gap:0.4rem;">'+vz.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.codenaam||'\u2013')+'</span>'+pnBadge(v.status)+'</div>'+
         '<div class="ds">'+T('pn.niveau.'+v.niveau, v.niveau)+(v.incident?' · '+T('pn.viaIncident','via incident'):'')+(v.reden?' · '+esc(v.reden):'')+'</div>'+
-        (v.status==='goedgekeurd'?'<div style="margin-top:0.4rem;"><button class="obtn primary" data-pnbekijk="'+v.id+'">'+T('pn.bekijk','Inzage openen')+'</button>'+(v.vervalt?' <span class="ds">'+T('pn.tot','geldig tot')+' '+new Date(v.vervalt).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span>':'')+'</div>':'')+
+        (v.status==='goedgekeurd'?'<div class="h-mt40"><button class="obtn primary" data-pnbekijk="'+v.id+'">'+T('pn.bekijk','Inzage openen')+'</button>'+(v.vervalt?' <span class="ds">'+T('pn.tot','geldig tot')+' '+new Date(v.vervalt).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span>':'')+'</div>':'')+
         '</div>').join('')+'</div>'
         : '<div class="empty">'+T('pn.geenverzoek','Nog geen verzoeken.')+'</div>')+'</div>';
     // incident melden
@@ -4319,7 +4319,7 @@
     // eigen incidenten
     const inc = paspoortData.incidenten || [];
     if (inc.length) html += '<div class="card"><div class="tt-h">'+T('pn.incidenten','Mijn incidenten')+'</div>'+
-      '<div style="margin-top:0.5rem;">'+inc.map(i => '<div class="mitem"><div class="r1"><span class="nm">'+esc(i.codenaam||'\u2013')+'</span>'+pnBadge(i.status)+'</div><div class="ds">'+esc(i.reden)+'</div></div>').join('')+'</div></div>';
+      '<div class="h-mt50">'+inc.map(i => '<div class="mitem"><div class="r1"><span class="nm">'+esc(i.codenaam||'\u2013')+'</span>'+pnBadge(i.status)+'</div><div class="ds">'+esc(i.reden)+'</div></div>').join('')+'</div></div>';
     el.innerHTML = html;
     paspoortBind(el);
   }
@@ -4336,7 +4336,7 @@
         '<div class="ds" style="margin-top:0.3rem;color:var(--green);">'+(inh.geverifieerd?''+T('pn.geverifieerd','RTG-geverifieerd'):'')+(inh.gezichtGecontroleerd?' · '+T('pn.gezicht','gezicht gecontroleerd'):'')+'</div></div></div>'+
         (inh.scan?'<div style="margin-top:0.6rem;"><div class="tt-h">'+T('pn.scan','Paspoortscan')+'</div><img src="'+esc(inh.scan)+'" alt="'+T('pn.scan','Paspoortscan')+'" style="width:100%;border-radius:10px;margin-top:0.4rem;"></div>':'');
     }
-    return '<div class="card" style="border-color:var(--gold);"><div class="tt-h" style="color:var(--gold);">'+T('pn.inzage','Inzage')+' · '+T('pn.niveau.'+inh.niveau, inh.niveau)+'</div><div style="margin-top:0.5rem;">'+body+'</div>'+
+    return '<div class="card" style="border-color:var(--gold);"><div class="tt-h" style="color:var(--gold);">'+T('pn.inzage','Inzage')+' · '+T('pn.niveau.'+inh.niveau, inh.niveau)+'</div><div class="h-mt50">'+body+'</div>'+
       '<button class="obtn" id="pnSluit" style="margin-top:0.7rem;">'+T('pn.sluit','Sluiten')+'</button></div>';
   }
   function paspoortBind(el){
@@ -4392,11 +4392,11 @@
     h += ink.open.length ? ink.open.map(o => ghOrderKaart(o, true)).join('') : '<p class="sub">'+T('gh.geenorders','Geen openstaande bestellingen.')+'</p>';
     if (ink.afgerond.length) h += '<details style="margin-top:0.6rem;"><summary class="sub" style="cursor:pointer;">'+T('gh.afgerond','Afgerond')+' ('+ink.afgerond.length+')</summary>'+ink.afgerond.map(o=>ghOrderKaart(o,false)).join('')+'</details>';
     // assortiment
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('gh.assortiment','Assortiment')+' <button class="js-ghnew" style="float:right;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;font-family:inherit;">+ '+T('gh.nieuw','Nieuw product')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('gh.assortiment','Assortiment')+' <button class="js-ghnew" style="float:right;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;font-family:inherit;">+ '+T('gh.nieuw','Nieuw product')+'</button></div>';
     h += '<div id="ghForm"></div>';
-    h += '<div style="margin-top:0.5rem;">'+(d.producten||[]).map(p =>
+    h += '<div class="h-mt50">'+(d.producten||[]).map(p =>
       '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-top:1px solid var(--line);">'+
-      '<div style="flex:1;"><b style="font-size:0.85rem;">'+esc(p.naam)+'</b><span class="sub"> · '+esc(p.categorie)+' · '+T('gh.per','per')+' '+esc(p.eenheid)+'</span>'+
+      '<div class="h-flex1"><b style="font-size:0.85rem;">'+esc(p.naam)+'</b><span class="sub"> · '+esc(p.categorie)+' · '+T('gh.per','per')+' '+esc(p.eenheid)+'</span>'+
       '<div class="sub">'+T('gh.inkoop','inkoop')+' '+eur(p.inkoopPrijs)+' · '+T('gh.consument','consument')+' '+eur(p.consumentPrijs)+' · '+T('gh.voorraad','voorraad')+' '+p.voorraad+(p.actief?'':' · <span style="color:var(--gold);">'+T('gh.uit','uit')+'</span>')+'</div></div>'+
       '<button class="js-ghedit" data-id="'+p.id+'" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.3rem 0.6rem;color:var(--txt);font-size:0.72rem;font-family:inherit;">'+T('gh.bewerk','Bewerk')+'</button></div>').join('');
     el.innerHTML = h;
@@ -4427,10 +4427,10 @@
     const el = $('#ghForm'); if (!el) return; const p = ghEdit || {};
     el.innerHTML = '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.8rem;margin-top:0.5rem;">'+
       '<input id="ghNaam" class="st-in" placeholder="'+T('gh.f.naam','Productnaam')+'" value="'+esc(p.naam||'')+'" style="width:100%;margin-bottom:0.4rem;">'+
-      '<div class="row-gap"><select id="ghCat" class="st-in" style="flex:1;">'+cats.map(c=>'<option'+(p.categorie===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'+
-      '<input id="ghEen" class="st-in" placeholder="'+T('gh.f.eenheid','Eenheid')+'" value="'+esc(p.eenheid||'stuk')+'" style="flex:1;"></div>'+
-      '<div class="row-gap"><input id="ghIn" class="st-in" type="number" step="0.01" placeholder="'+T('gh.f.inkoop','Inkoopprijs')+'" value="'+(p.inkoopPrijs!=null?p.inkoopPrijs:'')+'" style="flex:1;"><input id="ghCon" class="st-in" type="number" step="0.01" placeholder="'+T('gh.f.consument','Consumentprijs')+'" value="'+(p.consumentPrijs!=null?p.consumentPrijs:'')+'" style="flex:1;"></div>'+
-      '<div class="row-gap"><input id="ghVoor" class="st-in" type="number" placeholder="'+T('gh.f.voorraad','Voorraad')+'" value="'+(p.voorraad!=null?p.voorraad:'')+'" style="flex:1;"><input id="ghMin" class="st-in" type="number" placeholder="'+T('gh.f.min','Min. bestel')+'" value="'+(p.minBestel!=null?p.minBestel:1)+'" style="flex:1;"></div>'+
+      '<div class="row-gap"><select id="ghCat" class="st-in h-flex1">'+cats.map(c=>'<option'+(p.categorie===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'+
+      '<input id="ghEen" class="st-in" placeholder="'+T('gh.f.eenheid','Eenheid')+'" value="'+esc(p.eenheid||'stuk')+'" class="h-flex1"></div>'+
+      '<div class="row-gap"><input id="ghIn" class="st-in" type="number" step="0.01" placeholder="'+T('gh.f.inkoop','Inkoopprijs')+'" value="'+(p.inkoopPrijs!=null?p.inkoopPrijs:'')+'" class="h-flex1"><input id="ghCon" class="st-in" type="number" step="0.01" placeholder="'+T('gh.f.consument','Consumentprijs')+'" value="'+(p.consumentPrijs!=null?p.consumentPrijs:'')+'" class="h-flex1"></div>'+
+      '<div class="row-gap"><input id="ghVoor" class="st-in" type="number" placeholder="'+T('gh.f.voorraad','Voorraad')+'" value="'+(p.voorraad!=null?p.voorraad:'')+'" class="h-flex1"><input id="ghMin" class="st-in" type="number" placeholder="'+T('gh.f.min','Min. bestel')+'" value="'+(p.minBestel!=null?p.minBestel:1)+'" class="h-flex1"></div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><button id="ghSave" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gh.opslaan','Opslaan')+'</button>'+
       '<button id="ghCancel" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.45rem 0.8rem;color:var(--soft);font-family:inherit;">'+T('gh.annuleer','Annuleer')+'</button></div></div>';
     $('#ghCancel').addEventListener('click', () => { ghEdit = null; renderGroothandel(); });
@@ -4451,11 +4451,11 @@
     let h = '';
     for (const g of (markt.groothandels||[])){
       h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">'+
-        '<div style="display:flex;gap:0.5rem;align-items:center;"><b style="flex:1;">'+esc(g.naam)+'</b>'+
+        '<div style="display:flex;gap:0.5rem;align-items:center;"><b class="h-flex1">'+esc(g.naam)+'</b>'+
         '<button class="js-inkai" data-code="'+g.code+'" style="background:var(--card2);border:1px solid var(--gold);border-radius:8px;padding:0.3rem 0.6rem;color:var(--gold);font-size:0.72rem;font-weight:600;font-family:inherit;">'+T('ink.ai','AI-bijbestellen')+'</button></div>'+
         '<div id="inkai-'+g.code+'"></div>'+
         g.producten.slice(0,60).map(p => '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-top:1px solid var(--line);">'+
-          '<div style="flex:1;"><span style="font-size:0.83rem;">'+esc(p.naam)+'</span><span class="sub"> · '+eur(p.prijs)+'/'+esc(p.eenheid)+'</span></div>'+
+          '<div class="h-flex1"><span style="font-size:0.83rem;">'+esc(p.naam)+'</span><span class="sub"> · '+eur(p.prijs)+'/'+esc(p.eenheid)+'</span></div>'+
           '<input class="st-in js-inkq" data-code="'+g.code+'" data-pid="'+p.id+'" type="number" min="0" placeholder="0" style="width:4rem;text-align:center;"></div>').join('')+
         '<button class="js-inkbestel" data-code="'+g.code+'" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.5rem;font-weight:600;font-family:inherit;">'+T('ink.bestel','Bestellen')+'</button></div>';
     }
@@ -4505,12 +4505,12 @@
     let h = '<div class="st-sec" style="margin-top:1.4rem;">'+T('mb.h','Veilige bezorgdienst')+'</div>';
     h += '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;margin-bottom:0.8rem;">'+
       '<label style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;"><input type="checkbox" id="mbAan"'+(ins.aan?' checked':'')+'> '+T('mb.aan','Bezorgen aan (met bezorgcode, foto-bewijs en live volgen)')+'</label>'+
-      '<div class="row-gap" style="margin-top:0.5rem;"><input id="mbKosten" class="st-in" type="number" step="0.5" placeholder="'+T('mb.kosten','Kosten €')+'" value="'+(ins.kosten!=null?ins.kosten:'')+'" style="flex:1;"><input id="mbGratis" class="st-in" type="number" placeholder="'+T('mb.gratis','Gratis vanaf €')+'" value="'+(ins.gratisVanaf!=null?ins.gratisVanaf:'')+'" style="flex:1;"><input id="mbId" class="st-in" type="number" placeholder="'+T('mb.idgrens','ID vanaf €')+'" value="'+(ins.waardegrensId!=null?ins.waardegrensId:'')+'" style="flex:1;"></div>'+
+      '<div class="row-gap h-mt50"><input id="mbKosten" class="st-in" type="number" step="0.5" placeholder="'+T('mb.kosten','Kosten €')+'" value="'+(ins.kosten!=null?ins.kosten:'')+'" class="h-flex1"><input id="mbGratis" class="st-in" type="number" placeholder="'+T('mb.gratis','Gratis vanaf €')+'" value="'+(ins.gratisVanaf!=null?ins.gratisVanaf:'')+'" class="h-flex1"><input id="mbId" class="st-in" type="number" placeholder="'+T('mb.idgrens','ID vanaf €')+'" value="'+(ins.waardegrensId!=null?ins.waardegrensId:'')+'" class="h-flex1"></div>'+
       '<button id="mbSave" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.5rem;font-weight:600;font-family:inherit;">'+T('mb.opslaan','Opslaan')+'</button></div>';
     // bezorgbord
     h += '<div class="st-sec">'+T('mb.bord','Bezorgingen')+' · '+T('mb.omzet','omzet')+' '+eur(d.omzet||0)+'</div>';
     h += (d.open||[]).length ? (d.open||[]).map(mbKaart).join('') : '<p class="sub">'+T('mb.geen','Geen open bezorgingen.')+'</p>';
-    if ((d.afgerond||[]).length) h += '<details style="margin-top:0.5rem;"><summary class="sub" style="cursor:pointer;">'+T('mb.afgerond','Afgerond')+' ('+d.afgerond.length+')</summary>'+d.afgerond.map(mbKaart).join('')+'</details>';
+    if ((d.afgerond||[]).length) h += '<details class="h-mt50"><summary class="sub" style="cursor:pointer;">'+T('mb.afgerond','Afgerond')+' ('+d.afgerond.length+')</summary>'+d.afgerond.map(mbKaart).join('')+'</details>';
     el.innerHTML = h;
     const save = $('#mbSave'); if (save) save.addEventListener('click', async () => {
       try { await API.call('/supplier/mode/bezorg/setup', { aan: $('#mbAan').checked, kosten:$('#mbKosten').value, gratisVanaf:$('#mbGratis').value, waardegrensId:$('#mbId').value }); toast(T('mb.opgeslagen','Bezorgdienst bijgewerkt.')); renderModeBezorg(); } catch(e){ toast(e.message); }
@@ -4546,9 +4546,9 @@
     h += '<div class="st-sec">'+T('vk.aanvragen','Aanvragen')+'</div>';
     h += (d.open||[]).length ? (d.open||[]).map(vkDeal).join('') : '<p class="sub">'+T('vk.geen','Geen open aanvragen.')+'</p>';
     // showroom
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('vk.showroom','Showroom')+' <button class="js-vknew" style="float:right;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;font-family:inherit;">+ '+T('vk.nieuw','Auto toevoegen')+'</button></div><div id="vkForm"></div>';
+    h += '<div class="st-sec h-mt100">'+T('vk.showroom','Showroom')+' <button class="js-vknew" style="float:right;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;font-family:inherit;">+ '+T('vk.nieuw','Auto toevoegen')+'</button></div><div id="vkForm"></div>';
     h += (d.showroom||[]).map(a => '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-top:1px solid var(--line);">'+
-      '<div style="flex:1;"><b style="font-size:0.85rem;">'+(a.vip?'':'')+esc(a.naam)+'</b><span class="sub"> · '+eur(a.prijs)+' · '+a.km.toLocaleString('nl-NL')+' km · '+esc(a.brandstof)+'</span>'+
+      '<div class="h-flex1"><b style="font-size:0.85rem;">'+(a.vip?'':'')+esc(a.naam)+'</b><span class="sub"> · '+eur(a.prijs)+' · '+a.km.toLocaleString('nl-NL')+' km · '+esc(a.brandstof)+'</span>'+
       '<div class="sub">'+esc(a.status)+(a.garantieMnd?' · '+a.garantieMnd+' mnd garantie':'')+'</div></div>'+
       '<button class="js-vkedit" data-id="'+a.id+'" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.3rem 0.6rem;color:var(--txt);font-size:0.72rem;font-family:inherit;">'+T('vk.bewerk','Bewerk')+'</button></div>').join('');
     el.innerHTML = h;
@@ -4582,9 +4582,9 @@
   function vkForm(brandstoffen){
     const el = $('#vkForm'); if (!el) return; const a = vkAutoBewerk || {};
     el.innerHTML = '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.8rem;margin-top:0.5rem;">'+
-      '<div class="row-gap"><input id="vkMerk" class="st-in" placeholder="'+T('vk.f.merk','Merk')+'" value="'+esc(a.merk||'')+'" style="flex:1;"><input id="vkModel" class="st-in" placeholder="'+T('vk.f.model','Model')+'" value="'+esc(a.model||'')+'" style="flex:1;"></div>'+
-      '<div class="row-gap"><input id="vkJaar" class="st-in" type="number" placeholder="'+T('vk.f.jaar','Jaar')+'" value="'+(a.jaar||'')+'" style="flex:1;"><input id="vkKm" class="st-in" type="number" placeholder="'+T('vk.f.km','Km')+'" value="'+(a.km!=null?a.km:'')+'" style="flex:1;"><input id="vkPrijs" class="st-in" type="number" placeholder="'+T('vk.f.prijs','Prijs €')+'" value="'+(a.prijs!=null?a.prijs:'')+'" style="flex:1;"></div>'+
-      '<div class="row-gap"><select id="vkBr" class="st-in" style="flex:1;">'+(brandstoffen||['Benzine']).map(b=>'<option'+(a.brandstof===b?' selected':'')+'>'+esc(b)+'</option>').join('')+'</select><input id="vkPk" class="st-in" type="number" placeholder="'+T('vk.f.pk','Pk')+'" value="'+(a.vermogenPk||'')+'" style="flex:1;"><input id="vkGar" class="st-in" type="number" placeholder="'+T('vk.f.garantie','Garantie mnd')+'" value="'+(a.garantieMnd!=null?a.garantieMnd:12)+'" style="flex:1;"></div>'+
+      '<div class="row-gap"><input id="vkMerk" class="st-in" placeholder="'+T('vk.f.merk','Merk')+'" value="'+esc(a.merk||'')+'" class="h-flex1"><input id="vkModel" class="st-in" placeholder="'+T('vk.f.model','Model')+'" value="'+esc(a.model||'')+'" class="h-flex1"></div>'+
+      '<div class="row-gap"><input id="vkJaar" class="st-in" type="number" placeholder="'+T('vk.f.jaar','Jaar')+'" value="'+(a.jaar||'')+'" class="h-flex1"><input id="vkKm" class="st-in" type="number" placeholder="'+T('vk.f.km','Km')+'" value="'+(a.km!=null?a.km:'')+'" class="h-flex1"><input id="vkPrijs" class="st-in" type="number" placeholder="'+T('vk.f.prijs','Prijs €')+'" value="'+(a.prijs!=null?a.prijs:'')+'" class="h-flex1"></div>'+
+      '<div class="row-gap"><select id="vkBr" class="st-in h-flex1">'+(brandstoffen||['Benzine']).map(b=>'<option'+(a.brandstof===b?' selected':'')+'>'+esc(b)+'</option>').join('')+'</select><input id="vkPk" class="st-in" type="number" placeholder="'+T('vk.f.pk','Pk')+'" value="'+(a.vermogenPk||'')+'" class="h-flex1"><input id="vkGar" class="st-in" type="number" placeholder="'+T('vk.f.garantie','Garantie mnd')+'" value="'+(a.garantieMnd!=null?a.garantieMnd:12)+'" class="h-flex1"></div>'+
       '<input id="vkHist" class="st-in" placeholder="'+T('vk.f.historie','Historie / bijzonderheden')+'" value="'+esc(a.historie||'')+'" style="width:100%;">'+
       '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin:0.3rem 0;"><input type="checkbox" id="vkVip"'+(a.vip?' checked':'')+'> '+T('vk.f.vip','VIP / exclusief (bovenaan)')+'</label>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;"><button id="vkSave" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('vk.opslaan','Opslaan')+'</button>'+
@@ -4619,8 +4619,8 @@
     return vrEtappes.map((e,i) =>
       '<div class="row-gap" style="margin-top:0.35rem;align-items:center;">'+
       '<select class="st-in js-vrmod" data-i="'+i+'" style="flex:0 0 9rem;">'+vrModOpties(e.modaliteit)+'</select>'+
-      '<input class="st-in js-vrvan" data-i="'+i+'" placeholder="'+T('vr.et.van','Van (haven, airport, depot)')+'" value="'+escAttr(e.van)+'" maxlength="60" style="flex:1;">'+
-      '<input class="st-in js-vrnaar" data-i="'+i+'" placeholder="'+T('vr.et.naar','Naar')+'" value="'+escAttr(e.naar)+'" maxlength="60" style="flex:1;">'+
+      '<input class="st-in js-vrvan" data-i="'+i+'" placeholder="'+T('vr.et.van','Van (haven, airport, depot)')+'" value="'+escAttr(e.van)+'" maxlength="60" class="h-flex1">'+
+      '<input class="st-in js-vrnaar" data-i="'+i+'" placeholder="'+T('vr.et.naar','Naar')+'" value="'+escAttr(e.naar)+'" maxlength="60" class="h-flex1">'+
       (vrEtappes.length>1 ? '<button class="js-vretweg" data-i="'+i+'" aria-label="'+T('vr.et.weg','Etappe weghalen')+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.35rem 0.6rem;color:var(--soft);font-family:inherit;">✕</button>' : '')+
       '</div>').join('');
   }
@@ -4644,8 +4644,8 @@
       '<div class="sub">'+esc(z.inhoud)+' · '+z.gewichtKg.toLocaleString('nl-NL')+' kg · '+z.colli+' colli · '+esc(z.incoterm)+'</div>'+
       '<div class="sub">'+esc(z.van.plaats)+' ('+esc(z.van.land)+') → '+esc(z.naar.plaats)+' ('+esc(z.naar.land)+') · ETA '+esc(z.eta)+'</div>'+
       vrTijdlijn(z)+
-      '<div class="sub" style="margin-top:0.4rem;">'+T('vr.docs','Documenten')+': '+docs+' · '+T('vr.volgcode','volgcode voor de klant')+': <b>'+esc(z.volgcode)+'</b></div>'+
-      (z.gebeurtenissen.length ? '<details style="margin-top:0.35rem;"><summary class="sub" style="cursor:pointer;">'+T('vr.logboek','Logboek')+' ('+z.gebeurtenissen.length+')</summary>'+
+      '<div class="sub h-mt40">'+T('vr.docs','Documenten')+': '+docs+' · '+T('vr.volgcode','volgcode voor de klant')+': <b>'+esc(z.volgcode)+'</b></div>'+
+      (z.gebeurtenissen.length ? '<details class="h-mt35"><summary class="sub" style="cursor:pointer;">'+T('vr.logboek','Logboek')+' ('+z.gebeurtenissen.length+')</summary>'+
         z.gebeurtenissen.map(g=>'<div class="sub">'+new Date(g.at).toLocaleString('nl-NL')+' · '+esc(g.tekst)+'</div>').join('')+'</details>' : '')+
       (acties ? '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">'+acties+'</div>' : '')+'</div>';
   }
@@ -4658,15 +4658,15 @@
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
       [[k.onderweg, T('vr.k.onderweg','onderweg')],[k.douane, T('vr.k.douane','bij douane')],[k.afgeleverd, T('vr.k.af','afgeleverd')],[k.kilosOnderweg.toLocaleString('nl-NL')+' kg', T('vr.k.kg','onderweg in kilo’s')]]
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
-    h += '<div class="sub" style="margin-top:0.5rem;">'+T('vr.permod','Actieve etappes per modaliteit')+': '+Object.keys(VR_MOD).map(m=>T('vr.mod.'+m, VR_MOD[m].label)+' '+(k.perModaliteit[m]||0)).join(' · ')+'</div>';
+    h += '<div class="sub h-mt50">'+T('vr.permod','Actieve etappes per modaliteit')+': '+Object.keys(VR_MOD).map(m=>T('vr.mod.'+m, VR_MOD[m].label)+' '+(k.perModaliteit[m]||0)).join(' · ')+'</div>';
 
     // nieuwe zending: klant, lading, herkomst/bestemming en de etappe-bouwer
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('vr.nieuw','Nieuwe zending')+'</div>'+
+    h += '<div class="st-sec h-mt100">'+T('vr.nieuw','Nieuwe zending')+'</div>'+
       '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
-      '<div class="row-gap"><input id="vrKlant" class="st-in" placeholder="'+T('vr.klant','Klant')+'" maxlength="60" style="flex:2;"><input id="vrInhoud" class="st-in" placeholder="'+T('vr.inhoud','Wat gaat er mee (lading)')+'" maxlength="120" style="flex:3;"></div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="vrGewicht" class="st-in" type="number" min="1" placeholder="'+T('vr.gewicht','Gewicht (kg)')+'" style="flex:1;"><input id="vrColli" class="st-in" type="number" min="1" placeholder="'+T('vr.colli','Colli')+'" style="flex:1;">'+
-      '<select id="vrIncoterm" class="st-in" style="flex:1;">'+(d.incoterms||[]).map(t=>'<option'+(t==='DAP'?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="vrVanPlaats" class="st-in" placeholder="'+T('vr.vanplaats','Van: plaats')+'" maxlength="60" style="flex:1;"><input id="vrVanLand" class="st-in" placeholder="'+T('vr.vanland','Van: land')+'" maxlength="40" style="flex:1;"><input id="vrNaarPlaats" class="st-in" placeholder="'+T('vr.naarplaats','Naar: plaats')+'" maxlength="60" style="flex:1;"><input id="vrNaarLand" class="st-in" placeholder="'+T('vr.naarland','Naar: land')+'" maxlength="40" style="flex:1;"></div>'+
+      '<div class="row-gap"><input id="vrKlant" class="st-in" placeholder="'+T('vr.klant','Klant')+'" maxlength="60" class="h-flex2"><input id="vrInhoud" class="st-in" placeholder="'+T('vr.inhoud','Wat gaat er mee (lading)')+'" maxlength="120" style="flex:3;"></div>'+
+      '<div class="row-gap h-mt40"><input id="vrGewicht" class="st-in" type="number" min="1" placeholder="'+T('vr.gewicht','Gewicht (kg)')+'" class="h-flex1"><input id="vrColli" class="st-in" type="number" min="1" placeholder="'+T('vr.colli','Colli')+'" class="h-flex1">'+
+      '<select id="vrIncoterm" class="st-in h-flex1">'+(d.incoterms||[]).map(t=>'<option'+(t==='DAP'?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'+
+      '<div class="row-gap h-mt40"><input id="vrVanPlaats" class="st-in" placeholder="'+T('vr.vanplaats','Van: plaats')+'" maxlength="60" class="h-flex1"><input id="vrVanLand" class="st-in" placeholder="'+T('vr.vanland','Van: land')+'" maxlength="40" class="h-flex1"><input id="vrNaarPlaats" class="st-in" placeholder="'+T('vr.naarplaats','Naar: plaats')+'" maxlength="60" class="h-flex1"><input id="vrNaarLand" class="st-in" placeholder="'+T('vr.naarland','Naar: land')+'" maxlength="40" class="h-flex1"></div>'+
       '<div class="sub" style="margin-top:0.55rem;">'+T('vr.route','De route, etappe voor etappe; het juiste vervoersdocument (AWB, B/L, CMR, CIM, CMNI) regelt de app per etappe:')+'</div>'+
       '<div id="vrEtappes">'+vrEtappeRijen()+'</div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+
@@ -4675,7 +4675,7 @@
 
     // de zendingen zelf: lopend eerst, afgeleverd inklapbaar
     const lopend = d.zendingen.filter(z=>z.status!=='afgeleverd'), af = d.zendingen.filter(z=>z.status==='afgeleverd');
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('vr.lopend','Lopende zendingen')+'</div>';
+    h += '<div class="st-sec h-mt100">'+T('vr.lopend','Lopende zendingen')+'</div>';
     h += lopend.length ? lopend.map(vrKaart).join('') : '<p class="sub">'+T('vr.geen','Geen lopende zendingen.')+'</p>';
     if (af.length) h += '<details style="margin-top:0.6rem;"><summary class="sub" style="cursor:pointer;">'+T('vr.afgeleverd','Afgeleverd')+' ('+af.length+')</summary>'+af.map(vrKaart).join('')+'</details>';
     el.innerHTML = h;
@@ -4733,47 +4733,47 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de stapeling: huurders per verdieping, van boven naar beneden
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('gb.toren',(d.naam||'De toren')+' · '+d.vloeren+' verdiepingen')+'</div>';
+    h += '<div class="st-sec h-mt100">'+T('gb.toren',(d.naam||'De toren')+' · '+d.vloeren+' verdiepingen')+'</div>';
     h += d.huurders.map(x => '<div style="display:flex;gap:0.6rem;align-items:baseline;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 5.5rem;">'+T('gb.verd','verdieping')+' '+x.verdiepingen.join(' + ')+'</span><b style="flex:1;font-size:0.85rem;">'+esc(x.naam)+'</b><span class="sub">'+x.badges+' '+T('gb.passen','passen')+'</span></div>').join('');
 
     // vergaderzalen: boeken zonder dubbele boekingen
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('gb.zalen','Vergaderzalen')+'</div>'+
+    h += '<div class="st-sec h-mt100">'+T('gb.zalen','Vergaderzalen')+'</div>'+
       '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
-      '<div class="row-gap"><select id="gbZaal" class="st-in" style="flex:2;">'+d.zalen.map(z=>'<option value="'+z.id+'">'+esc(z.naam)+' · vd '+z.verdieping+' · '+z.capaciteit+'p · '+eur(z.uurprijs)+'/u</option>').join('')+'</select>'+
-      '<input id="gbHuurder" class="st-in" placeholder="'+T('gb.huurder','Huurder')+'" maxlength="60" style="flex:2;"></div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="gbDatum" class="st-in" type="date" style="flex:1;"><input id="gbVan" class="st-in" type="time" style="flex:1;"><input id="gbTot" class="st-in" type="time" style="flex:1;">'+
+      '<div class="row-gap"><select id="gbZaal" class="st-in h-flex2">'+d.zalen.map(z=>'<option value="'+z.id+'">'+esc(z.naam)+' · vd '+z.verdieping+' · '+z.capaciteit+'p · '+eur(z.uurprijs)+'/u</option>').join('')+'</select>'+
+      '<input id="gbHuurder" class="st-in" placeholder="'+T('gb.huurder','Huurder')+'" maxlength="60" class="h-flex2"></div>'+
+      '<div class="row-gap h-mt40"><input id="gbDatum" class="st-in" type="date" class="h-flex1"><input id="gbVan" class="st-in" type="time" class="h-flex1"><input id="gbTot" class="st-in" type="time" class="h-flex1">'+
       '<button id="gbBoek" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.boek','Boek')+'</button></div>'+
-      ((d.boekingen||[]).length ? d.boekingen.slice(0,8).map(b=>'<div class="sub" style="margin-top:0.35rem;">'+esc(b.datum)+' '+esc(b.van)+' tot '+esc(b.tot)+' · '+esc(b.zaal)+' · '+esc(b.huurder)+' · '+eur(b.prijs)+' <button data-gbzweg="'+b.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></div>').join('') : '<p class="sub" style="margin-top:0.4rem;">'+T('gb.geenboek','Nog geen boekingen.')+'</p>')+'</div>';
+      ((d.boekingen||[]).length ? d.boekingen.slice(0,8).map(b=>'<div class="sub h-mt35">'+esc(b.datum)+' '+esc(b.van)+' tot '+esc(b.tot)+' · '+esc(b.zaal)+' · '+esc(b.huurder)+' · '+eur(b.prijs)+' <button data-gbzweg="'+b.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></div>').join('') : '<p class="sub h-mt40">'+T('gb.geenboek','Nog geen boekingen.')+'</p>')+'</div>';
 
     // receptie: de bezoekersstroom
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('gb.receptie','Receptie · bezoekers')+'</div>'+
-      '<div class="row-gap"><input id="gbBezNaam" class="st-in" placeholder="'+T('gb.bez.naam','Naam bezoeker')+'" maxlength="60" style="flex:2;"><input id="gbBezVoor" class="st-in" placeholder="'+T('gb.bez.voor','Voor welke huurder')+'" maxlength="60" style="flex:2;"><button id="gbBezMeld" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.bez.meld','Aanmelden')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('gb.receptie','Receptie · bezoekers')+'</div>'+
+      '<div class="row-gap"><input id="gbBezNaam" class="st-in" placeholder="'+T('gb.bez.naam','Naam bezoeker')+'" maxlength="60" class="h-flex2"><input id="gbBezVoor" class="st-in" placeholder="'+T('gb.bez.voor','Voor welke huurder')+'" maxlength="60" class="h-flex2"><button id="gbBezMeld" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.bez.meld','Aanmelden')+'</button></div>';
     h += (d.bezoekers||[]).slice(0,8).map(b=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<b style="flex:1;font-size:0.85rem;">'+esc(b.naam)+'</b><span class="sub">'+esc(b.voorWie)+' · '+esc(b.status)+(b.badge?' · '+esc(b.badge):'')+'</span>'+
       (b.status==='verwacht'?gbKnop('data-gbbin', b.id, T('gb.bez.binnen','Binnen'), true):b.status==='binnen'?gbKnop('data-gbweg', b.id, T('gb.bez.weg','Vertrokken')):'')+'</div>').join('') || '<p class="sub">'+T('gb.bez.geen','Nog geen bezoekers aangemeld.')+'</p>';
 
     // facilitair: meldingen door het gebouw
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('gb.fac','Facilitair · meldingen')+'</div>'+
-      '<div class="row-gap"><select id="gbMSoort" class="st-in" style="flex:1;">'+Object.keys(GB_MELD).map(s=>'<option value="'+s+'">'+GB_MELD[s]+'</option>').join('')+'</select>'+
+    h += '<div class="st-sec h-mt100">'+T('gb.fac','Facilitair · meldingen')+'</div>'+
+      '<div class="row-gap"><select id="gbMSoort" class="st-in h-flex1">'+Object.keys(GB_MELD).map(s=>'<option value="'+s+'">'+GB_MELD[s]+'</option>').join('')+'</select>'+
       '<input id="gbMVerd" class="st-in" type="number" min="1" max="'+d.vloeren+'" placeholder="'+T('gb.m.verd','Verd.')+'" style="flex:0 0 5rem;"><input id="gbMTekst" class="st-in" placeholder="'+T('gb.m.tekst','Wat is er nodig?')+'" maxlength="160" style="flex:3;"><button id="gbMeld" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.m.meld','Meld')+'</button></div>';
     h += (d.meldingen||[]).filter(m=>m.status!=='klaar').map(m=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 7rem;">'+GB_MELD[m.soort]+' · vd '+m.verdieping+'</span><b style="flex:1;font-size:0.82rem;">'+esc(m.tekst)+'</b><span class="sub">'+esc(m.status)+'</span>'+
       (m.status==='open'?gbKnop('data-gbmb', m.id, T('gb.m.pak','Oppakken'), true):gbKnop('data-gbmk', m.id, T('gb.m.klaar','Klaar'), true))+'</div>').join('') || '<p class="sub">'+T('gb.m.geen','Geen open meldingen; het huis is op orde.')+'</p>';
 
     // valet + de jetset-laag
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('gb.jetset','Valet en de jetset-diensten')+'</div>'+
-      '<div class="row-gap"><input id="gbValetWie" class="st-in" placeholder="'+T('gb.valet.wie','Valet: voor wie?')+'" maxlength="60" style="flex:2;"><button id="gbValet" style="flex:1;background:none;border:1px solid var(--line);border-radius:8px;padding:0.45rem;color:var(--txt);font-family:inherit;">'+T('gb.valet.vraag','Wagen voorrijden')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('gb.jetset','Valet en de jetset-diensten')+'</div>'+
+      '<div class="row-gap"><input id="gbValetWie" class="st-in" placeholder="'+T('gb.valet.wie','Valet: voor wie?')+'" maxlength="60" class="h-flex2"><button id="gbValet" style="flex:1;background:none;border:1px solid var(--line);border-radius:8px;padding:0.45rem;color:var(--txt);font-family:inherit;">'+T('gb.valet.vraag','Wagen voorrijden')+'</button></div>';
     h += (d.valet||[]).filter(v=>v.status!=='klaar').map(v=>'<div class="sub" style="padding:0.3rem 0;">'+esc(v.wie)+' · '+esc(v.wagen)+' · '+esc(v.status)+' '+
       (v.status==='gevraagd'?gbKnop('data-gbvv', v.id, T('gb.valet.voor','Voorgereden'), true):gbKnop('data-gbvk', v.id, T('gb.valet.klaar','Klaar'), true))+'</div>').join('');
-    h += '<div class="row-gap" style="margin-top:0.5rem;"><select id="gbJSoort" class="st-in" style="flex:1;">'+Object.keys(GB_JET).map(s=>'<option value="'+s+'">'+GB_JET[s]+'</option>').join('')+'</select>'+
-      '<input id="gbJVoor" class="st-in" placeholder="'+T('gb.j.voor','Voor wie')+'" maxlength="60" style="flex:1;"><input id="gbJWens" class="st-in" placeholder="'+T('gb.j.wens','De wens (bijv. wagen naar Schiphol om 16:00)')+'" maxlength="160" style="flex:3;"><button id="gbJVraag" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.j.vraag','Vraag aan')+'</button></div>';
+    h += '<div class="row-gap h-mt50"><select id="gbJSoort" class="st-in h-flex1">'+Object.keys(GB_JET).map(s=>'<option value="'+s+'">'+GB_JET[s]+'</option>').join('')+'</select>'+
+      '<input id="gbJVoor" class="st-in" placeholder="'+T('gb.j.voor','Voor wie')+'" maxlength="60" class="h-flex1"><input id="gbJWens" class="st-in" placeholder="'+T('gb.j.wens','De wens (bijv. wagen naar Schiphol om 16:00)')+'" maxlength="160" style="flex:3;"><button id="gbJVraag" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.j.vraag','Vraag aan')+'</button></div>';
     h += (d.jetset||[]).map(j=>'<div style="border:1px solid '+(j.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+GB_JET[j.soort]+' · '+esc(j.voorWie)+'</b><span class="sub">'+esc(j.status)+'</span></div>'+
       '<div class="sub">'+esc(j.wens)+' · '+esc(j.moment)+(j.notitie?' · '+esc(j.notitie):'')+'</div>'+
       (j.status!=='afgerond'?'<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
         (j.status==='aangevraagd'?gbKnop('data-gbjb', j.id, T('gb.j.bevestig','Bevestig'), true):'')+gbKnop('data-gbja', j.id, T('gb.j.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+T('gb.j.regel','Een jet-transfer is een dienstverzoek aan RTG Aviation; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
+    h += '<p class="sub h-mt50">'+T('gb.j.regel','Een jet-transfer is een dienstverzoek aan RTG Aviation; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
@@ -4814,33 +4814,33 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de baan zelf: status van de greenkeeper
-    h += '<div class="st-sec" style="margin-top:1rem;">'+esc(d.naam)+' · '+d.holes+' holes · par '+d.par+'</div>'+
-      '<div class="row-gap" style="align-items:center;"><span class="sub" style="flex:1;">'+T('golf.baan','Baanstatus')+': <b>'+esc(d.baanStatus)+'</b> · greenfee '+eur(d.greenfee)+' '+T('golf.pp','p.p.')+'</span>'+
+    h += '<div class="st-sec h-mt100">'+esc(d.naam)+' · '+d.holes+' holes · par '+d.par+'</div>'+
+      '<div class="row-gap" style="align-items:center;"><span class="sub h-flex1">'+T('golf.baan','Baanstatus')+': <b>'+esc(d.baanStatus)+'</b> · greenfee '+eur(d.greenfee)+' '+T('golf.pp','p.p.')+'</span>'+
       ['open','onderhoud','gesloten'].filter(s=>s!==d.baanStatus).map(s=>clKnop('data-gfbaan', s, s)).join(' ')+'</div>';
 
     // teetimes: een flight boeken zonder dubbele starttijden
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('golf.tee','Teetimes')+'</div>'+
+    h += '<div class="st-sec h-mt100">'+T('golf.tee','Teetimes')+'</div>'+
       '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
-      '<div class="row-gap"><input id="gfNaam" class="st-in" placeholder="'+T('golf.tee.naam','Naam flight')+'" maxlength="60" style="flex:2;"><select id="gfSpelers" class="st-in" style="flex:0 0 6rem;">'+[1,2,3,4].map(n=>'<option value="'+n+'"'+(n===2?' selected':'')+'>'+n+' '+(n===1?T('golf.speler','speler'):T('golf.spelers','spelers'))+'</option>').join('')+'</select></div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="gfDatum" class="st-in" type="date" style="flex:1;"><input id="gfTijd" class="st-in" type="time" style="flex:1;">'+
+      '<div class="row-gap"><input id="gfNaam" class="st-in" placeholder="'+T('golf.tee.naam','Naam flight')+'" maxlength="60" class="h-flex2"><select id="gfSpelers" class="st-in" style="flex:0 0 6rem;">'+[1,2,3,4].map(n=>'<option value="'+n+'"'+(n===2?' selected':'')+'>'+n+' '+(n===1?T('golf.speler','speler'):T('golf.spelers','spelers'))+'</option>').join('')+'</select></div>'+
+      '<div class="row-gap h-mt40"><input id="gfDatum" class="st-in" type="date" class="h-flex1"><input id="gfTijd" class="st-in" type="time" class="h-flex1">'+
       '<button id="gfBoek" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('golf.boek','Boek')+'</button></div>'+
-      ((d.teetimes||[]).length ? d.teetimes.slice(0,10).map(t=>'<div class="sub" style="margin-top:0.35rem;">'+esc(t.datum)+' '+esc(t.tijd)+' · '+esc(t.naam)+' · '+t.spelers+' '+T('golf.spelers','spelers')+' · '+eur(t.prijs)+' <button data-gfweg="'+t.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></div>').join('') : '<p class="sub" style="margin-top:0.4rem;">'+T('golf.geen','De tee sheet is nog leeg.')+'</p>')+'</div>';
+      ((d.teetimes||[]).length ? d.teetimes.slice(0,10).map(t=>'<div class="sub h-mt35">'+esc(t.datum)+' '+esc(t.tijd)+' · '+esc(t.naam)+' · '+t.spelers+' '+T('golf.spelers','spelers')+' · '+eur(t.prijs)+' <button data-gfweg="'+t.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></div>').join('') : '<p class="sub h-mt40">'+T('golf.geen','De tee sheet is nog leeg.')+'</p>')+'</div>';
 
     // de pro's: lessen boeken
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('golf.pros','De pro\'s · lessen')+'</div>'+
-      '<div class="row-gap"><select id="gfPro" class="st-in" style="flex:2;">'+d.pros.map(p=>'<option value="'+p.id+'">'+esc(p.naam)+' · '+esc(p.les)+' · '+eur(p.prijs)+'</option>').join('')+'</select>'+
-      '<input id="gfLesNaam" class="st-in" placeholder="'+T('golf.les.naam','Voor wie')+'" maxlength="60" style="flex:2;"></div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="gfLesDatum" class="st-in" type="date" style="flex:1;"><input id="gfLesTijd" class="st-in" type="time" style="flex:1;">'+
+    h += '<div class="st-sec h-mt100">'+T('golf.pros','De pro\'s · lessen')+'</div>'+
+      '<div class="row-gap"><select id="gfPro" class="st-in h-flex2">'+d.pros.map(p=>'<option value="'+p.id+'">'+esc(p.naam)+' · '+esc(p.les)+' · '+eur(p.prijs)+'</option>').join('')+'</select>'+
+      '<input id="gfLesNaam" class="st-in" placeholder="'+T('golf.les.naam','Voor wie')+'" maxlength="60" class="h-flex2"></div>'+
+      '<div class="row-gap h-mt40"><input id="gfLesDatum" class="st-in" type="date" class="h-flex1"><input id="gfLesTijd" class="st-in" type="time" class="h-flex1">'+
       '<button id="gfLes" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('golf.les.boek','Plan les')+'</button></div>';
     h += (d.lessen||[]).map(l=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+'</b><span class="sub">'+esc(l.pro)+' · '+esc(l.datum)+' '+esc(l.tijd)+' · '+eur(l.prijs)+'</span>'+clKnop('data-gflk', l.id, T('golf.les.klaar','Gegeven'), true)+'</div>').join('') || '<p class="sub">'+T('golf.les.geen','Geen lessen gepland.')+'</p>';
 
     // wedstrijden: de maandbeker
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('golf.wed','Wedstrijden')+'</div>';
+    h += '<div class="st-sec h-mt100">'+T('golf.wed','Wedstrijden')+'</div>';
     h += d.wedstrijden.map(w=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(w.naam)+' · '+esc(w.datum)+'</b><span class="sub">'+esc(w.vorm)+' · '+w.inschrijvingen.length+' '+T('golf.van','van')+' '+w.max+'</span></div>'+
-      (w.inschrijvingen.length?'<div class="sub" style="margin-top:0.3rem;">'+w.inschrijvingen.slice(0,12).map(i=>esc(i.naam)+(i.handicap!=null?' (hcp '+i.handicap+')':'')).join(' · ')+'</div>':'')+
-      '<div class="row-gap" style="margin-top:0.45rem;"><input data-gfwn="'+w.id+'" class="st-in" placeholder="'+T('golf.wed.naam','Naam speler')+'" maxlength="60" style="flex:2;"><input data-gfwh="'+w.id+'" class="st-in" type="number" step="0.1" placeholder="hcp" style="flex:0 0 5rem;">'+
+      (w.inschrijvingen.length?'<div class="sub h-mt30">'+w.inschrijvingen.slice(0,12).map(i=>esc(i.naam)+(i.handicap!=null?' (hcp '+i.handicap+')':'')).join(' · ')+'</div>':'')+
+      '<div class="row-gap" style="margin-top:0.45rem;"><input data-gfwn="'+w.id+'" class="st-in" placeholder="'+T('golf.wed.naam','Naam speler')+'" maxlength="60" class="h-flex2"><input data-gfwh="'+w.id+'" class="st-in" type="number" step="0.1" placeholder="hcp" style="flex:0 0 5rem;">'+
       '<button data-gfwin="'+w.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('golf.wed.in','Schrijf in')+'</button></div></div>').join('');
     el.innerHTML = h;
 
@@ -4872,33 +4872,33 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de receptie: leden en check-in
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('fit.leden','Leden · check-in')+'</div>'+
-      '<div class="row-gap"><input id="ftNaam" class="st-in" placeholder="'+T('fit.lid.naam','Naam nieuw lid')+'" maxlength="60" style="flex:2;"><select id="ftSoort" class="st-in" style="flex:1;">'+Object.keys(d.lidSoorten).map(s=>'<option value="'+s+'">'+s+' · '+eur(d.lidSoorten[s])+'</option>').join('')+'</select>'+
+    h += '<div class="st-sec h-mt100">'+T('fit.leden','Leden · check-in')+'</div>'+
+      '<div class="row-gap"><input id="ftNaam" class="st-in" placeholder="'+T('fit.lid.naam','Naam nieuw lid')+'" maxlength="60" class="h-flex2"><select id="ftSoort" class="st-in h-flex1">'+Object.keys(d.lidSoorten).map(s=>'<option value="'+s+'">'+s+' · '+eur(d.lidSoorten[s])+'</option>').join('')+'</select>'+
       '<button id="ftLid" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('fit.lid.maak','Schrijf in')+'</button></div>';
     h += (d.leden||[]).slice(0,10).map(l=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+'</b><span class="sub">'+esc(l.pas)+' · '+esc(l.soort)+' · '+(l.binnen?T('fit.binnen','binnen'):T('fit.buiten','buiten'))+'</span>'+
       (l.binnen?clKnop('data-ftuit', l.id, T('fit.uit','Check uit')):clKnop('data-ftin', l.id, T('fit.in','Check in'), true))+'</div>').join('');
 
     // groepslessen met capaciteit
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('fit.lessen','Groepslessen vandaag')+'</div>';
+    h += '<div class="st-sec h-mt100">'+T('fit.lessen','Groepslessen vandaag')+'</div>';
     h += d.lessen.map(l=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+' · '+esc(l.tijd)+'</b><span class="sub">'+l.deelnemers.length+' '+T('golf.van','van')+' '+l.capaciteit+'</span></div>'+
-      (l.deelnemers.length?'<div class="sub" style="margin-top:0.3rem;">'+l.deelnemers.slice(0,12).map(esc).join(' · ')+'</div>':'')+
-      '<div class="row-gap" style="margin-top:0.45rem;"><input data-ftln="'+l.id+'" class="st-in" placeholder="'+T('fit.les.naam','Naam deelnemer')+'" maxlength="60" style="flex:2;">'+
+      (l.deelnemers.length?'<div class="sub h-mt30">'+l.deelnemers.slice(0,12).map(esc).join(' · ')+'</div>':'')+
+      '<div class="row-gap" style="margin-top:0.45rem;"><input data-ftln="'+l.id+'" class="st-in" placeholder="'+T('fit.les.naam','Naam deelnemer')+'" maxlength="60" class="h-flex2">'+
       '<button data-ftlin="'+l.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('fit.les.in','Meld aan')+'</button></div></div>').join('');
 
     // padel- en tennisbanen zonder dubbele boekingen
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('fit.banen','Banen')+' · '+eur(d.baanUurprijs)+' '+T('fit.peruur','per uur')+'</div>'+
+    h += '<div class="st-sec h-mt100">'+T('fit.banen','Banen')+' · '+eur(d.baanUurprijs)+' '+T('fit.peruur','per uur')+'</div>'+
       '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
-      '<div class="row-gap"><select id="ftBaan" class="st-in" style="flex:2;">'+d.banen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+'</option>').join('')+'</select>'+
-      '<input id="ftBNaam" class="st-in" placeholder="'+T('fit.baan.naam','Op naam van')+'" maxlength="60" style="flex:2;"></div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="ftBDatum" class="st-in" type="date" style="flex:1;"><input id="ftBVan" class="st-in" type="time" style="flex:1;"><input id="ftBTot" class="st-in" type="time" style="flex:1;">'+
+      '<div class="row-gap"><select id="ftBaan" class="st-in h-flex2">'+d.banen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+'</option>').join('')+'</select>'+
+      '<input id="ftBNaam" class="st-in" placeholder="'+T('fit.baan.naam','Op naam van')+'" maxlength="60" class="h-flex2"></div>'+
+      '<div class="row-gap h-mt40"><input id="ftBDatum" class="st-in" type="date" class="h-flex1"><input id="ftBVan" class="st-in" type="time" class="h-flex1"><input id="ftBTot" class="st-in" type="time" class="h-flex1">'+
       '<button id="ftBBoek" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('golf.boek','Boek')+'</button></div>'+
-      ((d.baanboekingen||[]).length ? d.baanboekingen.slice(0,8).map(b=>'<div class="sub" style="margin-top:0.35rem;">'+esc(b.datum)+' '+esc(b.van)+' tot '+esc(b.tot)+' · '+esc(b.baan)+' · '+esc(b.naam)+' · '+eur(b.prijs)+'</div>').join('') : '<p class="sub" style="margin-top:0.4rem;">'+T('fit.baan.geen','Nog geen baanboekingen.')+'</p>')+'</div>';
+      ((d.baanboekingen||[]).length ? d.baanboekingen.slice(0,8).map(b=>'<div class="sub h-mt35">'+esc(b.datum)+' '+esc(b.van)+' tot '+esc(b.tot)+' · '+esc(b.baan)+' · '+esc(b.naam)+' · '+eur(b.prijs)+'</div>').join('') : '<p class="sub h-mt40">'+T('fit.baan.geen','Nog geen baanboekingen.')+'</p>')+'</div>';
 
     // personal training: aanvragen en inplannen
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('fit.pt','Personal training')+'</div>'+
-      '<div class="row-gap"><input id="ftPtNaam" class="st-in" placeholder="'+T('fit.pt.naam','Wie wil trainen')+'" maxlength="60" style="flex:1;"><input id="ftPtDoel" class="st-in" placeholder="'+T('fit.pt.doel','Het doel (bijv. marathon in oktober)')+'" maxlength="160" style="flex:2;">'+
+    h += '<div class="st-sec h-mt100">'+T('fit.pt','Personal training')+'</div>'+
+      '<div class="row-gap"><input id="ftPtNaam" class="st-in" placeholder="'+T('fit.pt.naam','Wie wil trainen')+'" maxlength="60" class="h-flex1"><input id="ftPtDoel" class="st-in" placeholder="'+T('fit.pt.doel','Het doel (bijv. marathon in oktober)')+'" maxlength="160" class="h-flex2">'+
       '<button id="ftPt" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('fit.pt.vraag','Vraag aan')+'</button></div>';
     h += (d.pt||[]).map(p=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<b style="flex:1;font-size:0.85rem;">'+esc(p.naam)+'</b><span class="sub">'+esc(p.doel)+' · '+esc(p.status)+'</span>'+
@@ -4937,18 +4937,18 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de agenda: behandeling op de juiste stoel, zonder dubbele bezetting
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('bs.agenda','De agenda')+'</div>'+
+    h += '<div class="st-sec h-mt100">'+T('bs.agenda','De agenda')+'</div>'+
       '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
-      '<div class="row-gap"><select id="bsBeh" class="st-in" style="flex:2;">'+d.behandelingen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+' · '+b.duurMin+' min · '+eur(b.prijs)+'</option>').join('')+'</select>'+
-      '<select id="bsStoel" class="st-in" style="flex:2;">'+d.stoelen.map(s=>'<option value="'+s.id+'">'+esc(s.naam)+'</option>').join('')+'</select></div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="bsNaam" class="st-in" placeholder="'+T('bs.naam','Op naam van')+'" maxlength="60" style="flex:2;"><input id="bsDatum" class="st-in" type="date" style="flex:1;"><input id="bsTijd" class="st-in" type="time" style="flex:1;">'+
+      '<div class="row-gap"><select id="bsBeh" class="st-in h-flex2">'+d.behandelingen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+' · '+b.duurMin+' min · '+eur(b.prijs)+'</option>').join('')+'</select>'+
+      '<select id="bsStoel" class="st-in h-flex2">'+d.stoelen.map(s=>'<option value="'+s.id+'">'+esc(s.naam)+'</option>').join('')+'</select></div>'+
+      '<div class="row-gap h-mt40"><input id="bsNaam" class="st-in" placeholder="'+T('bs.naam','Op naam van')+'" maxlength="60" class="h-flex2"><input id="bsDatum" class="st-in" type="date" class="h-flex1"><input id="bsTijd" class="st-in" type="time" class="h-flex1">'+
       '<button id="bsBoek" style="flex:1;'+vzGoud+'">'+T('bs.boek','Boek')+'</button></div>'+
-      ((d.afspraken||[]).length ? d.afspraken.slice(0,10).map(a=>'<div class="sub" style="margin-top:0.35rem;">'+esc(a.datum)+' '+esc(a.van)+' tot '+esc(a.tot)+' · '+esc(a.stoel)+' · '+esc(a.naam)+' · '+esc(a.behandeling)+' · '+eur(a.prijs)+' '+
-        (a.status==='gepland'?vzKnop('data-bsk', a.id, T('bs.klaar','Klaar'), true)+' '+vzKnop('data-bsw', a.id, T('bs.weg','Weg')):'· '+esc(a.status))+'</div>').join('') : '<p class="sub" style="margin-top:0.4rem;">'+T('bs.geen','De agenda is nog leeg.')+'</p>')+'</div>';
+      ((d.afspraken||[]).length ? d.afspraken.slice(0,10).map(a=>'<div class="sub h-mt35">'+esc(a.datum)+' '+esc(a.van)+' tot '+esc(a.tot)+' · '+esc(a.stoel)+' · '+esc(a.naam)+' · '+esc(a.behandeling)+' · '+eur(a.prijs)+' '+
+        (a.status==='gepland'?vzKnop('data-bsk', a.id, T('bs.klaar','Klaar'), true)+' '+vzKnop('data-bsw', a.id, T('bs.weg','Weg')):'· '+esc(a.status))+'</div>').join('') : '<p class="sub h-mt40">'+T('bs.geen','De agenda is nog leeg.')+'</p>')+'</div>';
 
     // de walk-in rij aan de deur
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('bs.rij','Walk-in wachtrij')+'</div>'+
-      '<div class="row-gap"><input id="bsWNaam" class="st-in" placeholder="'+T('bs.rij.naam','Wie loopt er binnen')+'" maxlength="60" style="flex:2;"><select id="bsWBeh" class="st-in" style="flex:2;">'+d.behandelingen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+'</option>').join('')+'</select>'+
+    h += '<div class="st-sec h-mt100">'+T('bs.rij','Walk-in wachtrij')+'</div>'+
+      '<div class="row-gap"><input id="bsWNaam" class="st-in" placeholder="'+T('bs.rij.naam','Wie loopt er binnen')+'" maxlength="60" class="h-flex2"><select id="bsWBeh" class="st-in h-flex2">'+d.behandelingen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+'</option>').join('')+'</select>'+
       '<button id="bsWalk" style="flex:1;'+vzGoud+'">'+T('bs.rij.in','In de rij')+'</button></div>';
     h += (d.wachtrij||[]).map(w=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 3rem;">nr '+w.nr+'</span><b style="flex:1;font-size:0.85rem;">'+esc(w.naam)+'</b><span class="sub">'+esc(w.behandeling)+' · '+esc(w.status)+'</span>'+
@@ -4978,29 +4978,29 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // het pension: check-in met dieet, notities en check-uit
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('pc.pension','Het pension')+'</div>'+
+    h += '<div class="st-sec h-mt100">'+T('pc.pension','Het pension')+'</div>'+
       '<div class="row-gap"><select id="pcDier" class="st-in" style="flex:0 0 6rem;"><option value="hond">hond</option><option value="kat">kat</option><option value="anders">anders</option></select>'+
-      '<input id="pcNaam" class="st-in" placeholder="'+T('pc.naam','Naam dier')+'" maxlength="40" style="flex:1;"><input id="pcBaas" class="st-in" placeholder="'+T('pc.baas','Baasje')+'" maxlength="60" style="flex:1;">'+
-      '<input id="pcDieet" class="st-in" placeholder="'+T('pc.dieet','Dieet of bijzonderheden')+'" maxlength="120" style="flex:2;"><button id="pcIn" style="flex:1;'+vzGoud+'">'+T('pc.in','Check in')+'</button></div>';
+      '<input id="pcNaam" class="st-in" placeholder="'+T('pc.naam','Naam dier')+'" maxlength="40" class="h-flex1"><input id="pcBaas" class="st-in" placeholder="'+T('pc.baas','Baasje')+'" maxlength="60" class="h-flex1">'+
+      '<input id="pcDieet" class="st-in" placeholder="'+T('pc.dieet','Dieet of bijzonderheden')+'" maxlength="120" class="h-flex2"><button id="pcIn" style="flex:1;'+vzGoud+'">'+T('pc.in','Check in')+'</button></div>';
     h += (d.gasten||[]).map(g=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(g.naam)+' ('+esc(g.dier)+') · hok '+g.hok+'</b><span class="sub">'+esc(g.baasje)+(g.tot?' · tot '+esc(g.tot):'')+'</span>'+vzKnop('data-pcuit', g.id, T('pc.uit','Check uit'))+'</div>'+
       (g.dieet?'<div class="sub" style="margin-top:0.25rem;">'+esc(g.dieet)+'</div>':'')+
       (g.notities&&g.notities.length?'<div class="sub" style="margin-top:0.25rem;">'+esc(g.notities[0].tekst)+'</div>':'')+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input data-pcnt="'+g.id+'" class="st-in" placeholder="'+T('pc.notitie','Notitie voor het baasje')+'" maxlength="160" style="flex:3;">'+vzKnop('data-pcnb', g.id, T('pc.noteer','Noteer'), true)+'</div></div>').join('');
+      '<div class="row-gap h-mt40"><input data-pcnt="'+g.id+'" class="st-in" placeholder="'+T('pc.notitie','Notitie voor het baasje')+'" maxlength="160" style="flex:3;">'+vzKnop('data-pcnb', g.id, T('pc.noteer','Noteer'), true)+'</div></div>').join('');
 
     // de uitlaatrondes
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('pc.rondes','Uitlaatrondes')+'</div>'+
-      '<div class="row-gap"><input id="pcRTijd" class="st-in" type="time" style="flex:1;"><button id="pcRonde" style="flex:1;'+vzGoud+'">'+T('pc.ronde.maak','Nieuwe ronde')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('pc.rondes','Uitlaatrondes')+'</div>'+
+      '<div class="row-gap"><input id="pcRTijd" class="st-in" type="time" class="h-flex1"><button id="pcRonde" style="flex:1;'+vzGoud+'">'+T('pc.ronde.maak','Nieuwe ronde')+'</button></div>';
     h += (d.rondes||[]).map(r=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;flex-wrap:wrap;">'+
-      '<b style="flex:0 0 4rem;font-size:0.85rem;">'+esc(r.tijd)+'</b><span class="sub" style="flex:1;">'+(r.honden.length?r.honden.map(esc).join(' · '):T('pc.ronde.leeg','nog geen honden'))+' · '+esc(r.status)+'</span>'+
+      '<b style="flex:0 0 4rem;font-size:0.85rem;">'+esc(r.tijd)+'</b><span class="sub h-flex1">'+(r.honden.length?r.honden.map(esc).join(' · '):T('pc.ronde.leeg','nog geen honden'))+' · '+esc(r.status)+'</span>'+
       (r.status==='gepland'?'<input data-pcrh="'+r.id+'" class="st-in" placeholder="'+T('pc.ronde.hond','Hond erbij')+'" maxlength="40" style="flex:0 0 8rem;">'+vzKnop('data-pcrb', r.id, T('pc.ronde.bij','Erbij'), true)+vzKnop('data-pcrk', r.id, T('pc.ronde.klaar','Gelopen')):'')+'</div>').join('');
 
     // de trimsalon
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('pc.trim','De trimsalon')+'</div>'+
-      '<div class="row-gap"><input id="pcTNaam" class="st-in" placeholder="'+T('pc.naam','Naam dier')+'" maxlength="40" style="flex:1;"><input id="pcTBaas" class="st-in" placeholder="'+T('pc.baas','Baasje')+'" maxlength="60" style="flex:1;">'+
-      '<input id="pcTDatum" class="st-in" type="date" style="flex:1;"><input id="pcTTijd" class="st-in" type="time" style="flex:1;"><button id="pcTrim" style="flex:1;'+vzGoud+'">'+T('bs.boek','Boek')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('pc.trim','De trimsalon')+'</div>'+
+      '<div class="row-gap"><input id="pcTNaam" class="st-in" placeholder="'+T('pc.naam','Naam dier')+'" maxlength="40" class="h-flex1"><input id="pcTBaas" class="st-in" placeholder="'+T('pc.baas','Baasje')+'" maxlength="60" class="h-flex1">'+
+      '<input id="pcTDatum" class="st-in" type="date" class="h-flex1"><input id="pcTTijd" class="st-in" type="time" class="h-flex1"><button id="pcTrim" style="flex:1;'+vzGoud+'">'+T('bs.boek','Boek')+'</button></div>';
     h += (d.trim||[]).map(t=>'<div class="sub" style="padding:0.3rem 0;">'+esc(t.datum)+' '+esc(t.tijd)+' · '+esc(t.naam)+' van '+esc(t.baasje)+' '+vzKnop('data-pctk', t.id, T('bs.klaar','Klaar'), true)+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+esc(d.verwijzing||'')+'</p>';
+    h += '<p class="sub h-mt50">'+esc(d.verwijzing||'')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
@@ -5028,32 +5028,32 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de groepen: aanmelden en ophalen (alleen door de aangemelde ouder)
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('op.groepen','De groepen')+'</div>'+
-      '<div class="row-gap"><select id="opGroep" class="st-in" style="flex:2;">'+d.groepen.map(g=>'<option value="'+g.id+'">'+esc(g.naam)+' · '+g.aanwezig.length+' van '+g.capaciteit+'</option>').join('')+'</select>'+
-      '<input id="opKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" style="flex:1;"><input id="opOuder" class="st-in" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60" style="flex:1;">'+
+    h += '<div class="st-sec h-mt100">'+T('op.groepen','De groepen')+'</div>'+
+      '<div class="row-gap"><select id="opGroep" class="st-in h-flex2">'+d.groepen.map(g=>'<option value="'+g.id+'">'+esc(g.naam)+' · '+g.aanwezig.length+' van '+g.capaciteit+'</option>').join('')+'</select>'+
+      '<input id="opKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" class="h-flex1"><input id="opOuder" class="st-in" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60" class="h-flex1">'+
       '<button id="opMeld" style="flex:1;'+vzGoud+'">'+T('op.meld','Meld aan')+'</button></div>';
     h += d.groepen.map(g=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<b style="font-size:0.85rem;">'+esc(g.naam)+'</b>'+
       (g.aanwezig.length?g.aanwezig.map(kd=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.3rem 0;">'+
         '<span style="flex:1;font-size:0.82rem;">'+esc(kd.voornaam)+'</span>'+
         '<input data-opoud="'+g.id+':'+kd.id+'" class="st-in" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60" style="flex:0 0 9rem;">'+
-        vzKnop('data-ophaal', g.id+':'+kd.id, T('op.haal','Ophalen'), true)+'</div>').join(''):'<p class="sub" style="margin-top:0.3rem;">'+T('op.leeg','Nog niemand aangemeld.')+'</p>')+'</div>').join('');
+        vzKnop('data-ophaal', g.id+':'+kd.id, T('op.haal','Ophalen'), true)+'</div>').join(''):'<p class="sub h-mt30">'+T('op.leeg','Nog niemand aangemeld.')+'</p>')+'</div>').join('');
 
     // de nanny-service: aanvraag, en een mens bevestigt met een gescreende nanny
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('op.nanny','Nanny-service')+'</div>'+
-      '<div class="row-gap"><input id="opGezin" class="st-in" placeholder="'+T('op.gezin','Gezin')+'" maxlength="60" style="flex:1;"><input id="opNDatum" class="st-in" type="date" style="flex:1;"><input id="opNVan" class="st-in" type="time" style="flex:1;"><input id="opNTot" class="st-in" type="time" style="flex:1;">'+
+    h += '<div class="st-sec h-mt100">'+T('op.nanny','Nanny-service')+'</div>'+
+      '<div class="row-gap"><input id="opGezin" class="st-in" placeholder="'+T('op.gezin','Gezin')+'" maxlength="60" class="h-flex1"><input id="opNDatum" class="st-in" type="date" class="h-flex1"><input id="opNVan" class="st-in" type="time" class="h-flex1"><input id="opNTot" class="st-in" type="time" class="h-flex1">'+
       '<button id="opNVraag" style="flex:1;'+vzGoud+'">'+T('op.vraag','Vraag aan')+'</button></div>';
     h += (d.nannyBoekingen||[]).map(a=>'<div style="border:1px solid '+(a.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(a.gezin)+' · '+esc(a.datum)+' '+esc(a.van)+' tot '+esc(a.tot)+'</b><span class="sub">'+esc(a.status)+(a.nanny?' · '+esc(a.nanny):'')+'</span></div>'+
-      (a.status==='aangevraagd'?'<div class="row-gap" style="margin-top:0.45rem;"><select data-opnn="'+a.id+'" class="st-in" style="flex:2;">'+d.nannies.map(n=>'<option value="'+n.id+'">'+esc(n.naam)+' (gescreend)</option>').join('')+'</select>'+vzKnop('data-opnb', a.id, T('op.bevestig','Bevestig'), true)+'</div>':
+      (a.status==='aangevraagd'?'<div class="row-gap" style="margin-top:0.45rem;"><select data-opnn="'+a.id+'" class="st-in h-flex2">'+d.nannies.map(n=>'<option value="'+n.id+'">'+esc(n.naam)+' (gescreend)</option>').join('')+'</select>'+vzKnop('data-opnb', a.id, T('op.bevestig','Bevestig'), true)+'</div>':
         a.status==='bevestigd'?'<div style="margin-top:0.45rem;">'+vzKnop('data-opna', a.id, T('op.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
 
     // dagverslagjes met alleen voornamen
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('op.verslag','Dagverslagjes')+'</div>'+
-      '<div class="row-gap"><input id="opVKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" style="flex:1;"><input id="opVTekst" class="st-in" placeholder="'+T('op.vtekst','Wat is er vandaag beleefd?')+'" maxlength="240" style="flex:3;">'+
+    h += '<div class="st-sec h-mt100">'+T('op.verslag','Dagverslagjes')+'</div>'+
+      '<div class="row-gap"><input id="opVKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" class="h-flex1"><input id="opVTekst" class="st-in" placeholder="'+T('op.vtekst','Wat is er vandaag beleefd?')+'" maxlength="240" style="flex:3;">'+
       '<button id="opVMaak" style="flex:1;'+vzGoud+'">'+T('op.schrijf','Schrijf')+'</button></div>';
     h += (d.verslagen||[]).slice(0,6).map(v=>'<div class="sub" style="padding:0.3rem 0;"><b>'+esc(v.voornaam)+'</b> · '+esc(v.tekst)+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+esc(d.regel||'')+'</p>';
+    h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
@@ -5086,43 +5086,43 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // het havenoverzicht: elke steiger een regel
-    h += '<div class="st-sec" style="margin-top:1rem;">'+esc(d.naam)+' · '+T('mr.plaatsen','de ligplaatsen')+'</div>';
+    h += '<div class="st-sec h-mt100">'+esc(d.naam)+' · '+T('mr.plaatsen','de ligplaatsen')+'</div>';
     h += d.ligplaatsen.map(p=>'<div style="display:flex;gap:0.6rem;align-items:baseline;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 3.2rem;">'+p.id+'</span><span class="sub" style="flex:0 0 6.5rem;">tot '+p.lengteMax+' m · '+eur(p.dagprijs)+'/n</span>'+
       (p.boot?'<b style="flex:1;font-size:0.85rem;">'+esc(p.boot.naam)+' ('+p.boot.lengte+' m)</b><span class="sub">'+esc(p.boot.eigenaar)+(p.vast?' · '+T('mr.vast','vaste ligger'):' · tot '+esc(p.boot.tot||''))+'</span>'+(p.vast?'':knop('data-mrweg', p.id, T('mr.vertrek','Vertrek')))
-        :'<span class="sub" style="flex:1;">'+T('mr.vrij','vrij')+'</span>')+'</div>').join('');
+        :'<span class="sub h-flex1">'+T('mr.vrij','vrij')+'</span>')+'</div>').join('');
 
     // een passant binnenmelden: de eerste passende plaats
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('mr.passant','Passant binnenmelden')+'</div>'+
-      '<div class="row-gap"><input id="mrBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" style="flex:2;"><input id="mrEig" class="st-in" placeholder="'+T('mr.eig','Eigenaar')+'" maxlength="60" style="flex:2;">'+
+    h += '<div class="st-sec h-mt100">'+T('mr.passant','Passant binnenmelden')+'</div>'+
+      '<div class="row-gap"><input id="mrBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><input id="mrEig" class="st-in" placeholder="'+T('mr.eig','Eigenaar')+'" maxlength="60" class="h-flex2">'+
       '<input id="mrLen" class="st-in" type="number" step="0.5" min="1" placeholder="m" style="flex:0 0 4.5rem;"><input id="mrNacht" class="st-in" type="number" min="1" value="1" style="flex:0 0 4.5rem;">'+
       '<button id="mrMeld" style="flex:1;'+goud+'">'+T('mr.meld','Wijs plaats toe')+'</button></div>';
 
     // de brandstofsteiger
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('mr.brandstof','De brandstofsteiger')+'</div>'+
-      '<div class="row-gap"><input id="mrBBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" style="flex:2;"><select id="mrBSoort" class="st-in" style="flex:1;"><option value="diesel">diesel</option><option value="benzine">benzine</option></select>'+
-      '<input id="mrBLiters" class="st-in" type="number" min="1" placeholder="liters" style="flex:1;"><button id="mrBVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('mr.brandstof','De brandstofsteiger')+'</div>'+
+      '<div class="row-gap"><input id="mrBBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><select id="mrBSoort" class="st-in h-flex1"><option value="diesel">diesel</option><option value="benzine">benzine</option></select>'+
+      '<input id="mrBLiters" class="st-in" type="number" min="1" placeholder="liters" class="h-flex1"><button id="mrBVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
     h += (d.brandstof||[]).filter(b=>b.status==='gevraagd').map(b=>'<div class="sub" style="padding:0.3rem 0;">'+esc(b.boot)+' · '+esc(b.soort)+' · '+b.liters+' l '+knop('data-mrbk', b.id, T('mr.getankt','Getankt'), true)+'</div>').join('');
 
     // service en de hellingbaan
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('mr.service','Service en de helling')+'</div>'+
-      '<div class="row-gap"><input id="mrSBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" style="flex:2;"><select id="mrSSoort" class="st-in" style="flex:1;">'+Object.keys(MR_SVC).map(s=>'<option value="'+s+'">'+MR_SVC[s]+'</option>').join('')+'</select>'+
+    h += '<div class="st-sec h-mt100">'+T('mr.service','Service en de helling')+'</div>'+
+      '<div class="row-gap"><input id="mrSBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><select id="mrSSoort" class="st-in h-flex1">'+Object.keys(MR_SVC).map(s=>'<option value="'+s+'">'+MR_SVC[s]+'</option>').join('')+'</select>'+
       '<input id="mrSWens" class="st-in" placeholder="'+T('mr.wens','Wat moet er gebeuren?')+'" maxlength="160" style="flex:3;"><button id="mrSVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
     h += (d.service||[]).filter(s=>s.status!=='klaar').map(s=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 7rem;">'+MR_SVC[s.soort]+'</span><b style="flex:1;font-size:0.82rem;">'+esc(s.boot)+' · '+esc(s.wens)+'</b><span class="sub">'+esc(s.status)+'</span>'+
       (s.status==='open'?knop('data-mrsb', s.id, T('mr.pak','Oppakken'), true):knop('data-mrsk', s.id, T('mr.klaar','Klaar'), true))+'</div>').join('') || '<p class="sub">'+T('mr.svc.geen','Geen open verzoeken op de werf.')+'</p>';
 
     // de marina-concierge: de jetset op het water
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('mr.concierge','De marina-concierge')+'</div>'+
-      '<div class="row-gap"><select id="mrCSoort" class="st-in" style="flex:1;">'+Object.keys(MR_CON).map(s=>'<option value="'+s+'">'+MR_CON[s]+'</option>').join('')+'</select>'+
-      '<input id="mrCVoor" class="st-in" placeholder="'+T('mr.voor','Voor wie')+'" maxlength="60" style="flex:1;"><input id="mrCWens" class="st-in" placeholder="'+T('mr.cwens','De wens (bijv. tender om 12:00 naar de baai)')+'" maxlength="160" style="flex:3;">'+
+    h += '<div class="st-sec h-mt100">'+T('mr.concierge','De marina-concierge')+'</div>'+
+      '<div class="row-gap"><select id="mrCSoort" class="st-in h-flex1">'+Object.keys(MR_CON).map(s=>'<option value="'+s+'">'+MR_CON[s]+'</option>').join('')+'</select>'+
+      '<input id="mrCVoor" class="st-in" placeholder="'+T('mr.voor','Voor wie')+'" maxlength="60" class="h-flex1"><input id="mrCWens" class="st-in" placeholder="'+T('mr.cwens','De wens (bijv. tender om 12:00 naar de baai)')+'" maxlength="160" style="flex:3;">'+
       '<button id="mrCVraag" style="flex:1;'+goud+'">'+T('mr.vraag','Vraag aan')+'</button></div>';
     h += (d.concierge||[]).map(c=>'<div style="border:1px solid '+(c.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+MR_CON[c.soort]+' · '+esc(c.voorWie)+'</b><span class="sub">'+esc(c.status)+'</span></div>'+
       '<div class="sub">'+esc(c.wens)+' · '+esc(c.moment)+(c.notitie?' · '+esc(c.notitie):'')+'</div>'+
       (c.status!=='afgerond'?'<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
         (c.status==='aangevraagd'?knop('data-mrcb', c.id, T('mr.bevestig','Bevestig'), true):'')+knop('data-mrca', c.id, T('mr.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+T('mr.regel','Een charter-transfer is een dienstverzoek aan RTG Charter; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
+    h += '<p class="sub h-mt50">'+T('mr.regel','Een charter-transfer is een dienstverzoek aan RTG Charter; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
@@ -5156,10 +5156,10 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // een nieuwe dag aannemen
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('wd.nieuw','Nieuwe dag aannemen')+'</div>'+
-      '<div class="row-gap"><input id="wdKlant" class="st-in" placeholder="'+T('wd.klant','Voor wie (bijv. Sophie en Milan)')+'" maxlength="60" style="flex:2;"><select id="wdSoort" class="st-in" style="flex:1;"><option value="bruiloft">bruiloft</option><option value="prive-event">prive-event</option></select>'+
-      '<select id="wdLoc" class="st-in" style="flex:2;">'+d.locaties.map(l=>'<option value="'+escAttr(l)+'">'+esc(l)+'</option>').join('')+'</select></div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="wdDatum" class="st-in" type="date" style="flex:1;"><input id="wdGasten" class="st-in" type="number" min="2" placeholder="'+T('wd.gasten','gasten')+'" style="flex:1;"><input id="wdBudget" class="st-in" type="number" min="0" placeholder="'+T('wd.budget','budget')+'" style="flex:1;">'+
+    h += '<div class="st-sec h-mt100">'+T('wd.nieuw','Nieuwe dag aannemen')+'</div>'+
+      '<div class="row-gap"><input id="wdKlant" class="st-in" placeholder="'+T('wd.klant','Voor wie (bijv. Sophie en Milan)')+'" maxlength="60" class="h-flex2"><select id="wdSoort" class="st-in h-flex1"><option value="bruiloft">bruiloft</option><option value="prive-event">prive-event</option></select>'+
+      '<select id="wdLoc" class="st-in h-flex2">'+d.locaties.map(l=>'<option value="'+escAttr(l)+'">'+esc(l)+'</option>').join('')+'</select></div>'+
+      '<div class="row-gap h-mt40"><input id="wdDatum" class="st-in" type="date" class="h-flex1"><input id="wdGasten" class="st-in" type="number" min="2" placeholder="'+T('wd.gasten','gasten')+'" class="h-flex1"><input id="wdBudget" class="st-in" type="number" min="0" placeholder="'+T('wd.budget','budget')+'" class="h-flex1">'+
       '<button id="wdMaak" style="flex:1;'+PL_GOUD+'">'+T('wd.aannemen','Neem aan')+'</button></div>';
 
     // de draaiboeken zelf
@@ -5170,7 +5170,7 @@
         '<span style="flex:1;font-size:0.8rem;">'+esc(t.tekst)+'</span><span class="sub">'+esc(t.partner)+'</span>'+
         (t.status==='open'?plKnop('data-wdtk', e.id+':'+t.id, T('wd.klaar','Klaar'), true):'<span class="sub">'+T('wd.klaar','Klaar').toLowerCase()+'</span>')+'</div>').join(''):'')+
       (e.status!=='gedraaid'?'<div class="row-gap" style="margin-top:0.45rem;"><input data-wdtt="'+e.id+'" class="st-in" placeholder="'+T('wd.taak','Nieuwe taak')+'" maxlength="160" style="flex:3;">'+
-        '<select data-wdtp="'+e.id+'" class="st-in" style="flex:2;">'+d.keten.map(p=>'<option value="'+escAttr(p)+'">'+esc(p)+'</option>').join('')+'</select>'+plKnop('data-wdta', e.id, T('wd.voeg','Voeg toe'), true)+'</div>'+
+        '<select data-wdtp="'+e.id+'" class="st-in h-flex2">'+d.keten.map(p=>'<option value="'+escAttr(p)+'">'+esc(p)+'</option>').join('')+'</select>'+plKnop('data-wdta', e.id, T('wd.voeg','Voeg toe'), true)+'</div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+(e.status==='intake'?plKnop('data-wdsp', e.id, T('wd.plan','Zet op gepland'), true):'')+plKnop('data-wdsg', e.id, T('wd.draai','Dag gedraaid'))+'</div>':'')+'</div>').join('');
     el.innerHTML = h;
 
@@ -5195,26 +5195,26 @@
       [[k.dossiers, T('lx.k.dossiers','dossiers')],[k.lopend, T('lx.k.lopend','lopend')],[k.afspraken, T('lx.k.afspraken','afspraken')]]
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('lx.team','De adviseurs')+'</div>';
+    h += '<div class="st-sec h-mt100">'+T('lx.team','De adviseurs')+'</div>';
     h += d.adviseurs.map(a=>'<div style="display:flex;gap:0.6rem;align-items:baseline;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<b style="flex:1;font-size:0.85rem;">'+esc(a.naam)+'</b><span class="sub">'+esc(a.vak)+' · '+eur(a.uurtarief)+' '+T('lx.peruur','per uur')+'</span></div>').join('');
 
     // een dossier openen
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('lx.dossiers','Dossiers')+'</div>'+
-      '<div class="row-gap"><input id="lxKlant" class="st-in" placeholder="'+T('lx.klant','Client')+'" maxlength="60" style="flex:1;"><select id="lxVak" class="st-in" style="flex:1;"><option value="advocaat">advocaat</option><option value="notaris">notaris</option><option value="fiscalist">fiscalist</option></select>'+
-      '<input id="lxOms" class="st-in" placeholder="'+T('lx.oms','Waar gaat het over (kort)')+'" maxlength="160" style="flex:2;"><button id="lxMaak" style="flex:1;'+PL_GOUD+'">'+T('lx.open','Open dossier')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('lx.dossiers','Dossiers')+'</div>'+
+      '<div class="row-gap"><input id="lxKlant" class="st-in" placeholder="'+T('lx.klant','Client')+'" maxlength="60" class="h-flex1"><select id="lxVak" class="st-in h-flex1"><option value="advocaat">advocaat</option><option value="notaris">notaris</option><option value="fiscalist">fiscalist</option></select>'+
+      '<input id="lxOms" class="st-in" placeholder="'+T('lx.oms','Waar gaat het over (kort)')+'" maxlength="160" class="h-flex2"><button id="lxMaak" style="flex:1;'+PL_GOUD+'">'+T('lx.open','Open dossier')+'</button></div>';
     h += (d.dossiers||[]).map(x=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 4.5rem;">'+esc(x.id)+'</span><b style="flex:1;font-size:0.82rem;">'+esc(x.klant)+' · '+esc(x.omschrijving)+'</b><span class="sub">'+esc(x.vak)+' · '+esc(x.status)+'</span>'+
       (x.status!=='afgerond'?plKnop('data-lxaf', x.id, T('lx.afgerond','Afgerond')):'')+'</div>').join('');
 
     // een afspraak in de agenda van de adviseur
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('lx.agenda','Afspraak plannen')+'</div>'+
-      '<div class="row-gap"><select id="lxAdv" class="st-in" style="flex:2;">'+d.adviseurs.map(a=>'<option value="'+a.id+'">'+esc(a.naam)+' ('+esc(a.vak)+')</option>').join('')+'</select>'+
-      '<select id="lxDos" class="st-in" style="flex:1;">'+(d.dossiers||[]).map(x=>'<option value="'+x.id+'">'+esc(x.id)+' · '+esc(x.klant)+'</option>').join('')+'</select>'+
-      '<input id="lxDatum" class="st-in" type="date" style="flex:1;"><input id="lxTijd" class="st-in" type="time" style="flex:1;">'+
+    h += '<div class="st-sec h-mt100">'+T('lx.agenda','Afspraak plannen')+'</div>'+
+      '<div class="row-gap"><select id="lxAdv" class="st-in h-flex2">'+d.adviseurs.map(a=>'<option value="'+a.id+'">'+esc(a.naam)+' ('+esc(a.vak)+')</option>').join('')+'</select>'+
+      '<select id="lxDos" class="st-in h-flex1">'+(d.dossiers||[]).map(x=>'<option value="'+x.id+'">'+esc(x.id)+' · '+esc(x.klant)+'</option>').join('')+'</select>'+
+      '<input id="lxDatum" class="st-in" type="date" class="h-flex1"><input id="lxTijd" class="st-in" type="time" class="h-flex1">'+
       '<button id="lxBoek" style="flex:1;'+PL_GOUD+'">'+T('lx.boek','Plan')+'</button></div>';
     h += (d.afspraken||[]).slice(0,8).map(f=>'<div class="sub" style="padding:0.3rem 0;">'+esc(f.datum)+' '+esc(f.tijd)+' · '+esc(f.adviseur)+' · '+esc(f.dossier)+' · '+esc(f.klant)+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+esc(d.regel||'')+'</p>';
+    h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
@@ -5236,15 +5236,15 @@
       [[k.open, T('sg.k.open','aanvragen open')],[k.geadviseerd, T('sg.k.klaar','advies klaar')],[k.doorverwezen, T('sg.k.door','doorverwezen')]]
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('sg.vraag','Nieuwe adviesvraag')+'</div>'+
-      '<div class="row-gap"><input id="sgKlant" class="st-in" placeholder="'+T('sg.klant','Voor wie')+'" maxlength="60" style="flex:1;"><select id="sgProd" class="st-in" style="flex:2;">'+d.producten.map(p=>'<option value="'+p.id+'">'+esc(p.naam)+' · '+esc(p.indicatie)+'</option>').join('')+'</select>'+
+    h += '<div class="st-sec h-mt100">'+T('sg.vraag','Nieuwe adviesvraag')+'</div>'+
+      '<div class="row-gap"><input id="sgKlant" class="st-in" placeholder="'+T('sg.klant','Voor wie')+'" maxlength="60" class="h-flex1"><select id="sgProd" class="st-in h-flex2">'+d.producten.map(p=>'<option value="'+p.id+'">'+esc(p.naam)+' · '+esc(p.indicatie)+'</option>').join('')+'</select>'+
       '<input id="sgSit" class="st-in" placeholder="'+T('sg.sit','De situatie (bijv. drie weken Ibiza met de boot)')+'" maxlength="200" style="flex:3;"><button id="sgVraag" style="flex:1;'+PL_GOUD+'">'+T('sg.aanvraag','Vraag advies')+'</button></div>';
     h += (d.aanvragen||[]).map(a=>'<div style="border:1px solid '+(a.status==='doorverwezen'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(a.klant)+' · '+esc(a.product)+'</b><span class="sub">'+esc(a.status)+'</span></div>'+
       '<div class="sub">'+esc(a.situatie)+(a.advies?' · '+T('sg.advies','advies')+': '+esc(a.advies):'')+'</div>'+
       (a.status==='aangevraagd'?'<div class="row-gap" style="margin-top:0.45rem;"><input data-sgat="'+a.id+'" class="st-in" placeholder="'+T('sg.schrijf','Het advies, geschreven door de adviseur')+'" maxlength="240" style="flex:3;">'+plKnop('data-sgak', a.id, T('sg.klaarzet','Advies klaar'), true)+'</div>':
         a.status==='advies-klaar'?'<div style="margin-top:0.45rem;">'+plKnop('data-sgdw', a.id, T('sg.verwijs','Doorverwijzen naar de verzekeraar'))+'</div>':'')+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+esc(d.regel||'')+'</p>';
+    h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
@@ -5269,47 +5269,47 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de berg: pistes, liften en het lawineniveau van de berggids
-    h += '<div class="st-sec" style="margin-top:1rem;">'+esc(d.naam)+' · '+esc(d.hoogte)+'</div>';
+    h += '<div class="st-sec h-mt100">'+esc(d.naam)+' · '+esc(d.hoogte)+'</div>';
     h += d.pistes.map(p=>'<div style="display:flex;gap:0.6rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 4.2rem;">'+esc(p.kleur)+'</span><b style="flex:1;font-size:0.85rem;">'+esc(p.naam)+'</b><span class="sub">'+esc(p.status)+'</span>'+
       knop('data-alp', p.id+':'+(p.status==='open'?'dicht':'open'), p.status==='open'?T('al.dicht','Sluit'):T('al.open','Open'), p.status!=='open')+'</div>').join('');
     h += d.liften.map(l=>'<div style="display:flex;gap:0.6rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 4.2rem;">'+esc(l.soort)+'</span><b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+'</b><span class="sub">'+esc(l.status)+'</span>'+
       knop('data-all', l.id+':'+(l.status==='open'?'dicht':'open'), l.status==='open'?T('al.dicht','Sluit'):T('al.open','Open'), l.status!=='open')+'</div>').join('');
-    h += '<div class="row-gap" style="margin-top:0.5rem;align-items:center;"><span class="sub" style="flex:1;">'+T('al.lawine','Lawineniveau (zet de berggids)')+': <b>'+k.lawine+'</b></span>'+
+    h += '<div class="row-gap" style="margin-top:0.5rem;align-items:center;"><span class="sub h-flex1">'+T('al.lawine','Lawineniveau (zet de berggids)')+': <b>'+k.lawine+'</b></span>'+
       [1,2,3,4,5].filter(n=>n!==k.lawine).map(n=>knop('data-alw', String(n), String(n))).join(' ')+'</div>';
 
     // skipassen
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('al.passen','Skipassen')+' · '+eur(d.dagpas)+' '+T('al.perdag','per dag')+'</div>'+
-      '<div class="row-gap"><input id="alPNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" style="flex:2;"><input id="alPDagen" class="st-in" type="number" min="1" max="14" value="6" style="flex:0 0 4.5rem;">'+
+    h += '<div class="st-sec h-mt100">'+T('al.passen','Skipassen')+' · '+eur(d.dagpas)+' '+T('al.perdag','per dag')+'</div>'+
+      '<div class="row-gap"><input id="alPNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" class="h-flex2"><input id="alPDagen" class="st-in" type="number" min="1" max="14" value="6" style="flex:0 0 4.5rem;">'+
       '<button id="alPas" style="flex:1;'+goud+'">'+T('al.pas','Maak pas')+'</button></div>';
     h += (d.passen||[]).slice(0,6).map(p=>'<div class="sub" style="padding:0.3rem 0;">'+esc(p.id)+' · '+esc(p.naam)+' · '+p.dagen+' '+T('al.dagen','dagen')+' · tot '+esc(p.tot)+' · '+eur(p.prijs)+'</div>').join('');
 
     // materiaalverhuur
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('al.verhuur','Materiaalverhuur')+'</div>'+
-      '<div class="row-gap" style="flex-wrap:wrap;">'+d.materiaal.map(m=>'<label class="sub" style="display:flex;gap:0.3rem;align-items:center;"><input type="checkbox" data-alhm="'+m.id+'">'+esc(m.naam)+' · '+eur(m.dagprijs)+'/d</label>').join('')+'</div>'+
-      '<div class="row-gap" style="margin-top:0.4rem;"><input id="alHNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" style="flex:2;"><input id="alHDagen" class="st-in" type="number" min="1" max="21" value="6" style="flex:0 0 4.5rem;">'+
+    h += '<div class="st-sec h-mt100">'+T('al.verhuur','Materiaalverhuur')+'</div>'+
+      '<div class="row-gap h-wrap">'+d.materiaal.map(m=>'<label class="sub" style="display:flex;gap:0.3rem;align-items:center;"><input type="checkbox" data-alhm="'+m.id+'">'+esc(m.naam)+' · '+eur(m.dagprijs)+'/d</label>').join('')+'</div>'+
+      '<div class="row-gap h-mt40"><input id="alHNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" class="h-flex2"><input id="alHDagen" class="st-in" type="number" min="1" max="21" value="6" style="flex:0 0 4.5rem;">'+
       '<button id="alHuur" style="flex:1;'+goud+'">'+T('al.huur','Verhuur')+'</button></div>';
     h += (d.verhuur||[]).map(v=>'<div class="sub" style="padding:0.3rem 0;">'+esc(v.naam)+' · '+v.items.map(esc).join(' + ')+' · '+v.dagen+' d · '+eur(v.prijs)+' '+knop('data-alhi', v.id, T('al.inleveren','Ingeleverd'), true)+'</div>').join('');
 
     // de skischool
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('al.school','De skischool')+'</div>';
+    h += '<div class="st-sec h-mt100">'+T('al.school','De skischool')+'</div>';
     h += d.groepslessen.map(l=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+' · '+esc(l.tijd)+'</b><span class="sub">'+l.deelnemers.length+' van '+l.capaciteit+'</span></div>'+
-      (l.deelnemers.length?'<div class="sub" style="margin-top:0.3rem;">'+l.deelnemers.slice(0,10).map(esc).join(' · ')+'</div>':'')+
-      '<div class="row-gap" style="margin-top:0.45rem;"><input data-algn="'+l.id+'" class="st-in" placeholder="'+T('al.deelnemer','Naam deelnemer')+'" maxlength="60" style="flex:2;">'+knop('data-algi', l.id, T('al.meld','Meld aan'), true)+'</div></div>').join('');
-    h += '<div class="row-gap" style="margin-top:0.5rem;"><select id="alIns" class="st-in" style="flex:2;">'+d.instructeurs.map(i=>'<option value="'+i.id+'">'+esc(i.naam)+' · priveles '+eur(i.prijs)+'</option>').join('')+'</select>'+
-      '<input id="alLNaam" class="st-in" placeholder="'+T('al.voorwie','Voor wie')+'" maxlength="60" style="flex:1;"><input id="alLDatum" class="st-in" type="date" style="flex:1;"><input id="alLTijd" class="st-in" type="time" style="flex:1;">'+
+      (l.deelnemers.length?'<div class="sub h-mt30">'+l.deelnemers.slice(0,10).map(esc).join(' · ')+'</div>':'')+
+      '<div class="row-gap" style="margin-top:0.45rem;"><input data-algn="'+l.id+'" class="st-in" placeholder="'+T('al.deelnemer','Naam deelnemer')+'" maxlength="60" class="h-flex2">'+knop('data-algi', l.id, T('al.meld','Meld aan'), true)+'</div></div>').join('');
+    h += '<div class="row-gap h-mt50"><select id="alIns" class="st-in h-flex2">'+d.instructeurs.map(i=>'<option value="'+i.id+'">'+esc(i.naam)+' · priveles '+eur(i.prijs)+'</option>').join('')+'</select>'+
+      '<input id="alLNaam" class="st-in" placeholder="'+T('al.voorwie','Voor wie')+'" maxlength="60" class="h-flex1"><input id="alLDatum" class="st-in" type="date" class="h-flex1"><input id="alLTijd" class="st-in" type="time" class="h-flex1">'+
       '<button id="alPrive" style="flex:1;'+goud+'">'+T('al.plan','Plan')+'</button></div>';
     h += (d.privelessen||[]).map(l=>'<div class="sub" style="padding:0.3rem 0;">'+esc(l.datum)+' '+esc(l.tijd)+' · '+esc(l.instructeur)+' · '+esc(l.naam)+' '+knop('data-allk', l.id, T('al.gegeven','Gegeven'), true)+'</div>').join('');
 
     // de chalets
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('al.chalets','De chalets')+'</div>'+
-      '<div class="row-gap"><select id="alCh" class="st-in" style="flex:2;">'+d.chalets.map(c=>'<option value="'+c.id+'">'+esc(c.naam)+' · '+c.bedden+' bedden · '+eur(c.nachtprijs)+'/n</option>').join('')+'</select>'+
-      '<input id="alCNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" style="flex:1;"><input id="alCVan" class="st-in" type="date" style="flex:1;"><input id="alCNachten" class="st-in" type="number" min="1" max="28" value="7" style="flex:0 0 4.5rem;">'+
+    h += '<div class="st-sec h-mt100">'+T('al.chalets','De chalets')+'</div>'+
+      '<div class="row-gap"><select id="alCh" class="st-in h-flex2">'+d.chalets.map(c=>'<option value="'+c.id+'">'+esc(c.naam)+' · '+c.bedden+' bedden · '+eur(c.nachtprijs)+'/n</option>').join('')+'</select>'+
+      '<input id="alCNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" class="h-flex1"><input id="alCVan" class="st-in" type="date" class="h-flex1"><input id="alCNachten" class="st-in" type="number" min="1" max="28" value="7" style="flex:0 0 4.5rem;">'+
       '<button id="alChalet" style="flex:1;'+goud+'">'+T('al.boek','Boek')+'</button></div>';
     h += (d.chaletBoekingen||[]).map(b=>'<div class="sub" style="padding:0.3rem 0;">'+esc(b.chalet)+' · '+esc(b.naam)+' · '+esc(b.van)+' tot '+esc(b.tot)+' · '+eur(b.prijs)+'</div>').join('');
-    h += '<p class="sub" style="margin-top:0.5rem;">'+esc(d.regel||'')+'</p>';
+    h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
@@ -5346,29 +5346,29 @@
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // inschrijven: op codenaam, door een mens; de pas landt in de wallet
-    h += '<div class="row-gap" style="margin-top:0.7rem;"><input id="zpCode" class="st-in" placeholder="'+T('zp.codenaam','Codenaam van het lid')+'" maxlength="60" style="flex:2;">'+
-      '<select id="zpPakket" class="st-in" style="flex:1;">'+Object.keys(d.pakketten).map(p=>'<option value="'+p+'">'+p+' · '+eur(d.pakketten[p])+' p/m</option>').join('')+'</select>'+
+    h += '<div class="row-gap" style="margin-top:0.7rem;"><input id="zpCode" class="st-in" placeholder="'+T('zp.codenaam','Codenaam van het lid')+'" maxlength="60" class="h-flex2">'+
+      '<select id="zpPakket" class="st-in h-flex1">'+Object.keys(d.pakketten).map(p=>'<option value="'+p+'">'+p+' · '+eur(d.pakketten[p])+' p/m</option>').join('')+'</select>'+
       '<button id="zpIn" style="flex:1;'+goud+'">'+T('zp.schrijfin','Schrijf in')+'</button></div>'+
-      '<p class="sub" style="margin-top:0.3rem;">'+T('zp.regel','Inschrijven doet altijd een medewerker, op codenaam; de zorgpas verschijnt direct in de RTG Wallet van het lid.')+'</p>';
+      '<p class="sub h-mt30">'+T('zp.regel','Inschrijven doet altijd een medewerker, op codenaam; de zorgpas verschijnt direct in de RTG Wallet van het lid.')+'</p>';
     h += (d.verzekerden||[]).slice(0,10).map(v=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 4.5rem;">'+esc(v.pas)+'</span><b style="flex:1;font-size:0.85rem;">'+esc(v.codenaam)+'</b><span class="sub">'+esc(v.pakket)+' · '+esc(v.status)+'</span>'+
       (v.status==='actief'?knop('data-zpstop', v.id, T('zp.stop','Stop polis')):'')+'</div>').join('');
 
     // declaraties: invoeren en beslissen (mens beslist; afwijzen met reden)
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('zp.decl','Declaraties')+'</div>'+
+    h += '<div class="st-sec h-mt100">'+T('zp.decl','Declaraties')+'</div>'+
       '<div class="row-gap"><input id="zpDPas" class="st-in" placeholder="'+T('zp.pasnr','Pasnummer (ZP-XXXX)')+'" maxlength="12" style="flex:1;text-transform:uppercase;">'+
-      '<input id="zpDOms" class="st-in" placeholder="'+T('zp.oms','Waar gaat het over?')+'" maxlength="160" style="flex:2;"><input id="zpDBedrag" class="st-in" type="number" min="1" step="0.01" placeholder="EUR" style="flex:0 0 6rem;">'+
+      '<input id="zpDOms" class="st-in" placeholder="'+T('zp.oms','Waar gaat het over?')+'" maxlength="160" class="h-flex2"><input id="zpDBedrag" class="st-in" type="number" min="1" step="0.01" placeholder="EUR" style="flex:0 0 6rem;">'+
       '<button id="zpDIn" style="flex:1;'+goud+'">'+T('zp.dien','Dien in')+'</button></div>';
     h += (d.declaraties||[]).map(x=>'<div style="border:1px solid '+(x.status==='ingediend'?'var(--gold)':'var(--line)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(x.codenaam)+' · '+esc(x.omschrijving)+'</b><span class="sub">'+eur(x.bedrag)+' · '+esc(x.status)+'</span></div>'+
       (x.reden?'<div class="sub">'+T('zp.reden','Reden')+': '+esc(x.reden)+'</div>':'')+
       (x.status==='ingediend'?'<div class="row-gap" style="margin-top:0.45rem;">'+knop('data-zpgoed', x.id, T('zp.goed','Keur goed'), true)+
-        '<input data-zpredin="'+x.id+'" class="st-in" placeholder="'+T('zp.redenwaarom','Reden bij afwijzen')+'" maxlength="160" style="flex:2;">'+knop('data-zpaf', x.id, T('zp.af','Wijs af'))+'</div>':'')+'</div>').join('');
+        '<input data-zpredin="'+x.id+'" class="st-in" placeholder="'+T('zp.redenwaarom','Reden bij afwijzen')+'" maxlength="160" class="h-flex2">'+knop('data-zpaf', x.id, T('zp.af','Wijs af'))+'</div>':'')+'</div>').join('');
 
     // de pas-controle: alleen actief, pakket en codenaam
-    h += '<div class="st-sec" style="margin-top:1rem;">'+T('zp.check','Pas-controle')+'</div>'+
+    h += '<div class="st-sec h-mt100">'+T('zp.check','Pas-controle')+'</div>'+
       '<div class="row-gap"><input id="zpCPas" class="st-in" placeholder="'+T('zp.pasnr','Pasnummer (ZP-XXXX)')+'" maxlength="12" style="flex:2;text-transform:uppercase;">'+
-      '<button id="zpCGo" style="flex:1;'+goud+'">'+T('zp.controle','Controleer')+'</button></div><div id="zpCUit" class="sub" style="margin-top:0.4rem;"></div>';
+      '<button id="zpCGo" style="flex:1;'+goud+'">'+T('zp.controle','Controleer')+'</button></div><div id="zpCUit" class="sub h-mt40"></div>';
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
@@ -5410,9 +5410,9 @@
     return '<div class="card"><div class="tt-h">'+T('ag.titel','Agenda')+(o.telling?' <span style="color:#E0736A;">('+o.telling+')</span>':'')+'</div>'+
       (items.length ? items.map(i => '<div class="mitem" data-agitem="'+i.id+'" style="opacity:'+(i.gedaan?'0.55':'1')+';"><div class="r1"><span class="nm">'+(i.gedaan?'✓ ':'')+esc(i.titel)+'</span><span class="pr" style="color:var(--soft);">'+esc(dagLbl(i.datum))+(i.tijd?' · '+esc(i.tijd):'')+'</span></div>'+
         (canEdit?'<div style="margin-top:0.35rem;display:flex;gap:0.4rem;">'+(!i.gedaan?'<button class="obtn" data-'+prefix+'done="'+i.id+'">'+T('ag.gedaan','Gedaan')+'</button>':'')+'<button class="rr-del" data-'+prefix+'del="'+i.id+'">✕</button></div>':'')+'</div>').join('')
-        : '<div class="ds" style="margin-top:0.5rem;">'+T('ag.leeg','Nog niets gepland. Typ hieronder of laat de AI het inplannen.')+'</div>')+
+        : '<div class="ds h-mt50">'+T('ag.leeg','Nog niets gepland. Typ hieronder of laat de AI het inplannen.')+'</div>')+
       (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><input id="'+prefix+'Titel" placeholder="'+T('ag.wat','Afspraak')+'" '+inp+' style="flex:1;min-width:8rem;"><input id="'+prefix+'Datum" type="date" '+inp+'><input id="'+prefix+'Tijd" type="time" '+inp+'><button class="obtn primary" id="'+prefix+'Add">+</button></div>'+
-        '<div style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;"><div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.3rem;">'+T('ag.aihint','Of typ het in gewone taal:')+'</div><div id="'+prefix+'AiOut"></div><div style="display:flex;gap:0.4rem;margin-top:0.4rem;"><input id="'+prefix+'AiIn" placeholder="'+T('ag.aiph','bijv. vergadering morgen om 15u')+'" '+inp+' style="flex:1;"><button class="obtn primary" id="'+prefix+'AiGo">'+T('ag.plan','Plan')+'</button></div></div>' : '')+'</div>';
+        '<div style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;"><div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.3rem;">'+T('ag.aihint','Of typ het in gewone taal:')+'</div><div id="'+prefix+'AiOut"></div><div style="display:flex;gap:0.4rem;margin-top:0.4rem;"><input id="'+prefix+'AiIn" placeholder="'+T('ag.aiph','bijv. vergadering morgen om 15u')+'" '+inp+' class="h-flex1"><button class="obtn primary" id="'+prefix+'AiGo">'+T('ag.plan','Plan')+'</button></div></div>' : '')+'</div>';
   }
   function renderAgendaSup(){
     const el = $('#agendaSupCard'); if (!el) return;
@@ -5616,8 +5616,8 @@
         '<div class="card" style="margin-bottom:1rem;">'+
         '<div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;"><span>'+b.urenGepland+' / '+b.budgetUren+' '+T('bev.uur','uur')+' ('+b.maand+')</span><b>€ '+b.bestedBedrag+' / € '+b.budgetBedrag+'</b></div>'+
         '<div style="height:8px;border-radius:99px;background:var(--card2);overflow:hidden;"><div style="height:100%;width:'+Math.min(100,b.pct)+'%;background:'+kleur+';"></div></div>'+
-        '<div class="sub" style="margin-top:0.4rem;">'+esc(b.advies)+'</div>'+
-        (b.perPost&&b.perPost.length? '<div class="sub" style="margin-top:0.4rem;">'+b.perPost.map(p=>esc(p.naam)+': '+p.uren+' u (€ '+p.bedrag+')').join(' · ')+'</div>':'')+
+        '<div class="sub h-mt40">'+esc(b.advies)+'</div>'+
+        (b.perPost&&b.perPost.length? '<div class="sub h-mt40">'+b.perPost.map(p=>esc(p.naam)+': '+p.uren+' u (€ '+p.bedrag+')').join(' · ')+'</div>':'')+
         '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;"><input id="bevBudUren" type="number" min="0" placeholder="'+T('bev.buduren','budget-uren/mnd')+'" value="'+b.budgetUren+'" style="width:9rem;">'+
         '<input id="bevBudTarief" type="number" min="0" placeholder="'+T('bev.tarief','tarief/uur')+'" value="'+b.tariefUur+'" style="width:8rem;">'+
         '<button class="abtn" id="bevBudSave">'+T('bev.opslaan','Opslaan')+'</button></div>'+
@@ -5633,7 +5633,7 @@
       h += '<div class="card" style="margin-bottom:1rem;">'+ (dag.posten.length? dag.posten.map(p =>
         '<div style="border-bottom:1px solid var(--line);padding:0.5rem 0;">'+
           '<div style="display:flex;justify-content:space-between;"><b>'+esc(p.post)+'</b>'+(p.open?'<span style="color:var(--rood);font-size:0.72rem;">'+p.open+' '+T('bev.open','open')+'</span>':'<span style="color:#7EE0A3;font-size:0.72rem;">'+T('bev.gedekt','gedekt')+'</span>')+'</div>'+
-          p.shifts.map(sl => '<div class="sub" style="margin-top:0.2rem;">'+esc(sl.shift)+': '+
+          p.shifts.map(sl => '<div class="sub h-mt20">'+esc(sl.shift)+': '+
             (sl.bezet.length? sl.bezet.map(d=>'<span class="bev-chip'+(d.status==='ingeklokt'?' on':'')+'">'+esc(d.guardNaam||'?')+(d.status==='ingeklokt'?' ●':'')+' <a data-schrap="'+d.id+'">✕</a></span>').join(' ') : '')+
             (sl.open? ' <button class="bev-plan" data-post="'+p.postId+'" data-shift="'+sl.shiftId+'">+ '+T('bev.plan','plan')+'</button>':'')+
           '</div>').join('')+
@@ -5708,7 +5708,7 @@
       '<span><b>'+esc(a.klant)+'</b> · '+esc(a.object)+' · '+esc(a.datum)+' · '+a.aantal+'× '+esc(a.shiftId)+'</span>'+
       '<span style="display:flex;gap:0.3rem;"><button class="abtn" data-avplan="'+a.ref+'">'+T('bev.avplan','Inplannen')+'</button>'+
       '<button class="abtn ghost" data-avweg="'+a.ref+'">'+T('bev.avweg','Afwijzen')+'</button></span></div>').join('')+
-      (d.afgerond.length? '<div class="sub" style="margin-top:0.4rem;">'+d.afgerond.slice(0,5).map(a=>esc(a.object)+' ('+esc(a.status)+')').join(' · ')+'</div>':'');
+      (d.afgerond.length? '<div class="sub h-mt40">'+d.afgerond.slice(0,5).map(a=>esc(a.object)+' ('+esc(a.status)+')').join(' · ')+'</div>':'');
     el.querySelectorAll('[data-avplan]').forEach(x => x.addEventListener('click', async () => {
       try { const r = await API.call('/supplier/beveiliging/aanvraag/beslis', { ref:x.dataset.avplan, actie:'plan' }); toast(T('bev.ingepland','Ingepland en op het rooster gezet.')); renderBeveiliging(); } catch(e){ toast(e.message); }
     }));
@@ -5917,12 +5917,12 @@
     try { plan = await API.call('/supplier/tafelplan', {}); } catch(e){ plan = { reserveringen: [], tafels: [], verwachtePersonen: 0, openAanvragen: 0, zonderTafel: 0 }; }
     if (!plan.reserveringen.length && !later.length && !plan.tafels.length){ wrap.innerHTML = ''; return; }
     const chips = plan.tafels.length
-      ? '<div class="pos-chips" style="margin-top:0.5rem;">'+plan.tafels.map(t =>
+      ? '<div class="pos-chips h-mt50">'+plan.tafels.map(t =>
           t.status==='vrij'
             ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
             : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>'
         ).join('')+'</div>'+
-        '<div class="softline" style="margin-top:0.3rem;">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>'
+        '<div class="softline h-mt30">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>'
       : '';
     // de open rekeningen: alles wat de kassa op de tafel zette, hier afrekenen
     const rekeningen = plan.tafels.filter(t => t.rekening);
@@ -5936,12 +5936,12 @@
         '</div>').join('')
       : '';
     wrap.innerHTML = '<div class="card"><div class="tt-h">'+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
-      '<div class="pos-chips" style="margin-top:0.4rem;">'+
+      '<div class="pos-chips h-mt40">'+
         '<span>'+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
         (plan.openAanvragen?'<span>'+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
         (plan.zonderTafel?'<span>'+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
       '</div>'+chips+rekBlok+
-      (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
+      (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline h-mt50">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
       '</div>'+
       (later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
     // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij
@@ -6067,8 +6067,8 @@
     if (canEdit){
       html += '<div class="card" style="margin-top:1.2rem;"><div class="tt-h">'+T('menu.add','Gerecht toevoegen')+'</div>'+
         '<div class="field"><label>'+T('menu.name','Naam')+'</label><input id="mnName" placeholder="'+T('menu.nameph','Bijv. gegrilde octopus')+'"></div>'+
-        '<div class="row-gap"><div class="field" style="flex:2;"><label>'+T('menu.cat','Categorie')+'</label><input id="mnCat" placeholder="'+T('menu.catph','Bijv. Voorgerechten')+'"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('menu.price','Prijs (€)')+'</label><input id="mnPrice" type="number" inputmode="decimal" placeholder="45"></div></div>'+
+        '<div class="row-gap"><div class="field h-flex2"><label>'+T('menu.cat','Categorie')+'</label><input id="mnCat" placeholder="'+T('menu.catph','Bijv. Voorgerechten')+'"></div>'+
+        '<div class="field h-flex1"><label>'+T('menu.price','Prijs (€)')+'</label><input id="mnPrice" type="number" inputmode="decimal" placeholder="45"></div></div>'+
         '<div class="field"><label>'+T('menu.desc','Omschrijving')+'</label><input id="mnDesc" placeholder="'+T('menu.descph','Kort en smakelijk')+'"></div>'+
         '<div class="field"><label>'+T('menu.alg','Allergenen (komma\'s)')+'</label><input id="mnAlg" placeholder="vis, soja"></div>'+
         '<div class="field"><label>'+T('menu.station','Werkplek')+'</label><select id="mnStation" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
@@ -6197,23 +6197,23 @@
     const heeftGasten = r.gasten.reserveringen || r.gasten.walkIns || r.gasten.noShows;
     if (!r.bonnen && !heeftGasten) { el.innerHTML = ''; return; }
     el.innerHTML = '<div class="card"><div class="tt-h">'+T('shift.h','Shift-samenvatting')+'</div>'+
-      (heeftGasten?'<div class="pos-chips" style="margin-top:0.4rem;">'+
+      (heeftGasten?'<div class="pos-chips h-mt40">'+
         '<span>'+r.gasten.personen+' '+T('shift.gasten','gasten aan tafel')+'</span>'+
         '<span>'+r.gasten.reserveringen+' '+T('shift.res','reservering(en)')+'</span>'+
         (r.gasten.walkIns?'<span>'+r.gasten.walkIns+' walk-in(s)</span>':'')+
         (r.gasten.noShows?'<span style="color:var(--burgundy);">✗ '+r.gasten.noShows+' no-show(s)</span>':'')+
       '</div>':'')+
-      (r.verblijf?'<div class="pos-chips" style="margin-top:0.4rem;">'+
+      (r.verblijf?'<div class="pos-chips h-mt40">'+
         '<span>'+r.verblijf.bezet+' / '+r.verblijf.totaal+' '+T('rc.bezet','bezet')+'</span>'+
         (r.verblijf.aankomsten?'<span>'+r.verblijf.aankomsten+' '+T('shift.aank','check-in(s)')+'</span>':'')+
         (r.verblijf.vertrekken?'<span>'+r.verblijf.vertrekken+' '+T('shift.vertr','check-out(s)')+'</span>':'')+
         (r.verblijf.noShows?'<span style="color:var(--burgundy);">✗ '+r.verblijf.noShows+' no-show(s)</span>':'')+
         (r.verblijf.adr?'<span>ADR '+eur(r.verblijf.adr)+'</span>':'')+
       '</div>':'')+
-      ((r.toppers||[]).length?'<div class="st-row" style="margin-top:0.4rem;"><span>'+T('shift.toppers','Toppers')+'</span><span class="sub">'+r.toppers.map(t=>t.aantal+'× '+esc(t.naam)).join(' · ')+'</span></div>':'')+
+      ((r.toppers||[]).length?'<div class="st-row h-mt40"><span>'+T('shift.toppers','Toppers')+'</span><span class="sub">'+r.toppers.map(t=>t.aantal+'× '+esc(t.naam)).join(' · ')+'</span></div>':'')+
       (r.derving?'<div class="st-row"><span>'+T('shift.derving','Derving (kostprijs)')+'</span><b style="color:var(--burgundy);">'+eur(r.derving)+'</b></div>':'')+
       ((r.team||[]).length?'<div class="st-row"><span>'+T('shift.team','Op de kassa')+'</span><span class="sub">'+r.team.map(t=>esc(t.naam)+' '+eur(t.omzet)).join(' · ')+'</span></div>':'')+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('shift.s','Samen met het Z-rapport hierboven is dit de briefing voor morgen.')+'</div></div>';
+      '<div class="softline h-mt30">'+T('shift.s','Samen met het Z-rapport hierboven is dit de briefing voor morgen.')+'</div></div>';
   }
 
   /* De dagafsluiting (Z-rapport): omzet, bonnen, fooien en de btw-splitsing
@@ -6227,8 +6227,8 @@
       (r.fooien?'<div class="st-row"><span>'+T('pos.fooien','Fooien')+'</span><b>'+eur(r.fooien)+'</b></div>':'')+
       (r.btw||[]).map(b => '<div class="st-row"><span>'+esc(b.label)+' · '+b.tarief+'% btw</span><b>'+eur(b.omzet)+' <span class="sub">'+T('pos.z.waarvanbtw','waarvan btw')+' '+eur(b.btw)+'</span></b></div>').join('')+
       Object.entries(r.betaalwijzen||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.ontv','Ontvangsten')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
-      '<button class="bigbtn" id="zCsv" style="margin-top:0.5rem;">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
+      '<button class="bigbtn" id="zCsv" class="h-mt50">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
+      '<div class="softline h-mt30">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
     const k = el.querySelector('#zCsv');
     if (k) k.addEventListener('click', () => { API.download('/supplier/dagrapport.csv', { datum: r.datum }, 'dagrapport-' + r.datum + '.csv').catch(() => {}); });
   }
@@ -6254,7 +6254,7 @@
         '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
         '<button class="obtn js-pay" data-method="contant"'+(total?'':' disabled')+'>'+T('pos.cash','Contant')+'</button>'+
       '</div>'+
-      ((state.tables||[]).length ? '<div class="pos-pay" style="margin-top:0.4rem;">'+
+      ((state.tables||[]).length ? '<div class="pos-pay h-mt40">'+
         '<select id="posTafel" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;">'+
           '<option value="">'+T('pos.tafelkies','Tafel...')+'</option>'+
           (state.tables||[]).map(t=>'<option value="'+t.name.replace(/"/g,'&quot;')+'">'+t.name+'</option>').join('')+'</select>'+
@@ -6487,13 +6487,13 @@
       acts.map(a => '<div class="mitem"><div class="r1"><span class="nm">'+esc(a.name)+'</span><span class="row-mid-gap"><span class="pr">'+eur(a.prijs)+'</span>'+
         (canEdit?'<button class="rr-del" data-tkdel="'+a.id+'">\u2715</button>':'')+'</span></div>'+
         '<div class="ds">'+(a.desc?esc(a.desc)+' \u00B7 ':'')+T('tk2.cap','cap.')+' '+a.capaciteit+' \u00B7 '+(a.tijden||[]).join(', ')+(a.duur?' \u00B7 '+esc(a.duur):'')+'</div></div>').join('')+
-      (canEdit ? '<div style="margin-top:1rem;">'+
+      (canEdit ? '<div class="h-mt100">'+
         '<div class="field"><label>'+T('tk2.f.naam','Activiteit')+'</label><input id="tkName" placeholder="'+T('tk2.f.naamph','Bijv. sunset cruise')+'"></div>'+
         '<div class="field"><label>'+T('tk2.f.desc','Omschrijving')+'</label><input id="tkDesc"></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('tk2.f.prijs','Prijs p.p. (\u20AC)')+'</label><input id="tkPrijs" type="number" inputmode="decimal"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('tk2.f.cap','Capaciteit')+'</label><input id="tkCap" type="number" inputmode="numeric"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('tk2.f.duur','Duur')+'</label><input id="tkDuur" placeholder="2 uur"></div></div>'+
+        '<div class="field h-flex1"><label>'+T('tk2.f.prijs','Prijs p.p. (\u20AC)')+'</label><input id="tkPrijs" type="number" inputmode="decimal"></div>'+
+        '<div class="field h-flex1"><label>'+T('tk2.f.cap','Capaciteit')+'</label><input id="tkCap" type="number" inputmode="numeric"></div>'+
+        '<div class="field h-flex1"><label>'+T('tk2.f.duur','Duur')+'</label><input id="tkDuur" placeholder="2 uur"></div></div>'+
         '<div class="field"><label>'+T('tk2.f.tijden','Tijdsloten (komma\'s)')+'</label><input id="tkTijden" placeholder="10:00, 14:00, 17:30"></div>'+
         '<button class="obtn primary" id="tkAdd">'+T('tk2.f.voeg','Toevoegen')+'</button></div>' : '')+'</div>';
     el.innerHTML = html;
@@ -6578,7 +6578,7 @@
           (h.inname ? '<div class="ds" style="color:'+(h.inname.meerkosten>0?'var(--gold)':'var(--green)')+';">'+
             (h.inname.meerkosten>0 ? T('vh.meer','Meerkosten')+': '+eur(h.inname.meerkosten)+' ('+h.inname.gereden+' km, '+h.inname.extraKm+' extra'+(h.inname.tankKosten>0?', tank '+eur(h.inname.tankKosten):'')+')'
               : '\u2713 '+h.inname.gereden+' km, '+T('vh.geenmeer','geen meerkosten \u2013 borg vrij'))+'</div>' : '')+
-          (knop ? '<div style="margin-top:0.5rem;">'+knop+'</div>' : '')+'</div>';
+          (knop ? '<div class="h-mt50">'+knop+'</div>' : '')+'</div>';
       }).join('') : '<div class="empty">'+T('vh.geen','Nog geen huren. Betaalde boekingen verschijnen hier live.')+'</div>')+'</div>';
     // de vloot
     const autos = state.autos || [];
@@ -6588,24 +6588,24 @@
         (canEdit?'<button class="rr-del" data-vhdel="'+a.id+'">\u2715</button>':'')+'</span></div>'+
         '<div class="ds">'+esc(a.categorie||'')+' \u00B7 '+(a.transmissie==='automaat'?T('vh.aut','automaat'):T('vh.hand','handgeschakeld'))+' \u00B7 '+esc(a.brandstof||'')+' \u00B7 \uD83D\uDC65 '+(a.stoelen||'-')+' \u00B7 \uD83E\uDDF3 '+(a.bagage||0)+(a.airco?' \u00B7 \u2744\uFE0F':'')+
         ' \u00B7 '+(a.kmPerDag?a.kmPerDag+' km/'+T('vh.dag','dag')+' (+'+eur(a.meerKm||0)+'/km)':T('vh.onbeperkt','onbeperkt km'))+' \u00B7 '+T('vh.borg','borg')+' '+eur(a.borg||0)+' \u00B7 '+T('vh.vanaf','vanaf')+' '+(a.minLeeftijd||21)+' jr</div></div>').join('')+
-      (canEdit ? '<details style="margin-top:1rem;"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('vh.f.nieuw','Auto toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
-        '<div class="row-gap"><div class="field" style="flex:2;"><label>'+T('vh.f.auto','Auto')+'</label><input id="vhName" placeholder="Fiat 500 Cabrio"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.kenteken','Kenteken')+'</label><input id="vhPlate"></div></div>'+
+      (canEdit ? '<details class="h-mt100"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('vh.f.nieuw','Auto toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
+        '<div class="row-gap"><div class="field h-flex2"><label>'+T('vh.f.auto','Auto')+'</label><input id="vhName" placeholder="Fiat 500 Cabrio"></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.kenteken','Kenteken')+'</label><input id="vhPlate"></div></div>'+
         '<div class="field"><label>'+T('vh.f.cat','Categorie')+'</label><input id="vhCat" placeholder="Compact cabrio"></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.trans','Schakeling')+'</label><select id="vhTrans" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"><option value="handgeschakeld">'+T('vh.hand','handgeschakeld')+'</option><option value="automaat">'+T('vh.aut','automaat')+'</option></select></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.brand','Brandstof')+'</label><select id="vhBrand" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"><option value="benzine">benzine</option><option value="diesel">diesel</option><option value="elektrisch">elektrisch</option><option value="hybride">hybride</option></select></div></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.trans','Schakeling')+'</label><select id="vhTrans" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"><option value="handgeschakeld">'+T('vh.hand','handgeschakeld')+'</option><option value="automaat">'+T('vh.aut','automaat')+'</option></select></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.brand','Brandstof')+'</label><select id="vhBrand" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"><option value="benzine">benzine</option><option value="diesel">diesel</option><option value="elektrisch">elektrisch</option><option value="hybride">hybride</option></select></div></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.stoelen','Stoelen')+'</label><input id="vhStoelen" type="number" inputmode="numeric" value="5"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.deuren','Deuren')+'</label><input id="vhDeuren" type="number" inputmode="numeric" value="4"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.bagage','Koffers')+'</label><input id="vhBagage" type="number" inputmode="numeric" value="2"></div></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.stoelen','Stoelen')+'</label><input id="vhStoelen" type="number" inputmode="numeric" value="5"></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.deuren','Deuren')+'</label><input id="vhDeuren" type="number" inputmode="numeric" value="4"></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.bagage','Koffers')+'</label><input id="vhBagage" type="number" inputmode="numeric" value="2"></div></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.prijs','\u20AC/dag')+'</label><input id="vhPrijs" type="number" inputmode="numeric"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.borg','Borg \u20AC')+'</label><input id="vhBorg" type="number" inputmode="numeric" value="300"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.leeftijd','Min. lft')+'</label><input id="vhLft" type="number" inputmode="numeric" value="21"></div></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.prijs','\u20AC/dag')+'</label><input id="vhPrijs" type="number" inputmode="numeric"></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.borg','Borg \u20AC')+'</label><input id="vhBorg" type="number" inputmode="numeric" value="300"></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.leeftijd','Min. lft')+'</label><input id="vhLft" type="number" inputmode="numeric" value="21"></div></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.km','Km/dag (0=onbep.)')+'</label><input id="vhKm" type="number" inputmode="numeric" value="200"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('vh.f.meerkm','\u20AC per extra km')+'</label><input id="vhMeerkm" type="number" inputmode="decimal" value="0.25"></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.km','Km/dag (0=onbep.)')+'</label><input id="vhKm" type="number" inputmode="numeric" value="200"></div>'+
+        '<div class="field h-flex1"><label>'+T('vh.f.meerkm','\u20AC per extra km')+'</label><input id="vhMeerkm" type="number" inputmode="decimal" value="0.25"></div>'+
         '<label class="field" style="flex:1;display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="vhAirco" checked style="accent-color:var(--gold);"> '+T('vh.f.airco','Airco')+'</label></div>'+
         '<button class="obtn primary" id="vhAdd">'+T('vh.f.voeg','Toevoegen')+'</button></div></details>' : '')+'</div>'+
       '<input type="file" id="vhFile" accept="image/*" capture="environment" style="display:none;">';
@@ -6692,7 +6692,7 @@
           (c.teruggave ? '<div class="ds" style="color:'+(c.teruggave.meerkosten>0?'var(--gold)':'var(--green)')+';">'+
             (c.teruggave.meerkosten>0 ? T('ch.meer','Meerkosten')+': '+eur(c.teruggave.meerkosten)+' ('+c.teruggave.gevaren+' '+T('ch.uur','mu')+(c.teruggave.brandstofKosten>0?', '+T('ch.brandstof','brandstof')+' '+eur(c.teruggave.brandstofKosten):'')+')'
               : '✓ '+c.teruggave.gevaren+' '+T('ch.uur','mu')+', '+T('ch.geenmeer','geen meerkosten, borg vrij'))+'</div>' : '')+
-          (knop ? '<div style="margin-top:0.5rem;">'+knop+'</div>' : '')+'</div>';
+          (knop ? '<div class="h-mt50">'+knop+'</div>' : '')+'</div>';
       }).join('') : '<div class="empty">'+T('ch.geen','Nog geen charters. Betaalde boekingen verschijnen hier live.')+'</div>')+'</div>';
     // de vloot
     const boten = state.boten || [];
@@ -6703,21 +6703,21 @@
         '<div class="ds">'+esc(b.type||'')+' · '+(b.lengte||0)+'m ·  '+(b.gasten||0)+(b.hutten?' ·  '+b.hutten+' '+T('ch.hutten','hutten'):'')+' · '+esc(b.brandstof||'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+
         ' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+' · '+(b.skipperVerplicht?''+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs vereist'):T('ch.vrij','vrij te huren')))+
         (b.skipperPrijsPerDag?' (+'+eur(b.skipperPrijsPerDag)+'/'+T('ch.dag','dag')+')':'')+'</div></div>').join('')+
-      (canEdit ? '<details style="margin-top:1rem;"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('ch.f.nieuw','Vaartuig toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
-        '<div class="row-gap"><div class="field" style="flex:2;"><label>'+T('ch.f.naam','Naam')+'</label><input id="chNaam" placeholder="Serenidad"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.type','Type')+'</label><select id="chType" '+selCss+'>'+BOOT_TYPES.map(t=>'<option>'+t+'</option>').join('')+'</select></div></div>'+
+      (canEdit ? '<details class="h-mt100"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('ch.f.nieuw','Vaartuig toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
+        '<div class="row-gap"><div class="field h-flex2"><label>'+T('ch.f.naam','Naam')+'</label><input id="chNaam" placeholder="Serenidad"></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.type','Type')+'</label><select id="chType" '+selCss+'>'+BOOT_TYPES.map(t=>'<option>'+t+'</option>').join('')+'</select></div></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.lengte','Lengte (m)')+'</label><input id="chLengte" type="number" inputmode="decimal" value="14"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.gasten','Gasten')+'</label><input id="chGasten" type="number" inputmode="numeric" value="10"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.hutten','Hutten')+'</label><input id="chHutten" type="number" inputmode="numeric" value="2"></div></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.lengte','Lengte (m)')+'</label><input id="chLengte" type="number" inputmode="decimal" value="14"></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.gasten','Gasten')+'</label><input id="chGasten" type="number" inputmode="numeric" value="10"></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.hutten','Hutten')+'</label><input id="chHutten" type="number" inputmode="numeric" value="2"></div></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.brand','Brandstof')+'</label><select id="chBrand" '+selCss+'><option value="diesel">diesel</option><option value="benzine">benzine</option><option value="elektrisch">elektrisch</option><option value="geen">geen</option></select></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.snelheid','Snelheid (kn)')+'</label><input id="chSnelheid" type="number" inputmode="numeric" value="24"></div></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.brand','Brandstof')+'</label><select id="chBrand" '+selCss+'><option value="diesel">diesel</option><option value="benzine">benzine</option><option value="elektrisch">elektrisch</option><option value="geen">geen</option></select></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.snelheid','Snelheid (kn)')+'</label><input id="chSnelheid" type="number" inputmode="numeric" value="24"></div></div>'+
         '<div class="field"><label>'+T('ch.f.ligplaats','Ligplaats')+'</label><input id="chLig" placeholder="Marina Botafoch"></div>'+
         '<div class="row-gap">'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.prijs','€/dag')+'</label><input id="chPrijs" type="number" inputmode="numeric"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.borg','Borg €')+'</label><input id="chBorg" type="number" inputmode="numeric" value="2000"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('ch.f.skipperprijs','Schipper €/dag')+'</label><input id="chSkPrijs" type="number" inputmode="numeric" value="300"></div></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.prijs','€/dag')+'</label><input id="chPrijs" type="number" inputmode="numeric"></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.borg','Borg €')+'</label><input id="chBorg" type="number" inputmode="numeric" value="2000"></div>'+
+        '<div class="field h-flex1"><label>'+T('ch.f.skipperprijs','Schipper €/dag')+'</label><input id="chSkPrijs" type="number" inputmode="numeric" value="300"></div></div>'+
         '<label class="field" style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="chSkV" style="accent-color:var(--gold);"> '+T('ch.f.skipperv','Schipper verplicht')+'</label>'+
         '<label class="field" style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="chVb" checked style="accent-color:var(--gold);"> '+T('ch.f.vaarbewijs','Vaarbewijs vereist bij bareboat')+'</label>'+
         '<button class="obtn primary" id="chAdd">'+T('ch.f.voeg','Toevoegen')+'</button></div></details>' : '')+'</div>'+
@@ -6798,7 +6798,7 @@
         else if (o.status === 'onderweg') knop = '<button class="obtn primary" data-bzlev="'+o.ref+'" data-st="bezorgd">'+T('bz.bezorgd','Bezorgd')+'</button>';
         return '<div class="mitem"><div class="r1"><span class="nm">'+(o.levering==='bezorgen'?'\uD83D\uDEF5':'\uD83E\uDDFA')+' '+esc(o.customerCodename)+' \u00B7 '+T('bz.st.'+o.status, BZ_ST[o.status]||o.status)+wie+eta+'</span><span class="pr">'+eur(o.total)+'</span></div>'+
           '<div class="ds">'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+(o.levering==='bezorgen'&&o.adres?' \u00B7 \uD83D\uDCCD '+esc(o.adres):' \u00B7 '+T('bz.code','code')+' <b>'+o.pickup+'</b>')+'</div>'+
-          (knop?'<div style="margin-top:0.5rem;">'+knop+'</div>':'')+'</div>';
+          (knop?'<div class="h-mt50">'+knop+'</div>':'')+'</div>';
       }).join('') : '<div class="empty">'+T('bz.geen','Nog geen lopende leveringen. Betaalde bestellingen verschijnen hier live.')+'</div>')+'</div>';
     // assortiment
     const prods = b.producten || [];
@@ -6808,10 +6808,10 @@
         (canEdit?'<button class="rr-del" data-bzdel="'+p.id+'">\u2715</button>':'')+'</span></div>'+
         (p.desc?'<div class="ds">'+esc(p.desc)+'</div>':'')+'</div>'
       ).join('') : '<div class="empty">'+T('bz.leeg','Nog geen producten. Voeg ze hieronder toe; dan kan de dienst open.')+'</div>')+
-      (canEdit ? '<div style="margin-top:1rem;">'+
+      (canEdit ? '<div class="h-mt100">'+
         '<div class="field"><label>'+T('bz.f.naam','Product')+'</label><input id="bzName" placeholder="'+T('bz.f.naamph','Bijv. paella om mee te nemen')+'"></div>'+
-        '<div class="row-gap"><div class="field" style="flex:2;"><label>'+T('bz.f.desc','Omschrijving')+'</label><input id="bzDesc" placeholder="'+T('bz.f.descph','Kort en duidelijk')+'"></div>'+
-        '<div class="field" style="flex:1;"><label>'+T('bz.f.prijs','Prijs (\u20AC)')+'</label><input id="bzPrice" type="number" inputmode="decimal" placeholder="24"></div></div>'+
+        '<div class="row-gap"><div class="field h-flex2"><label>'+T('bz.f.desc','Omschrijving')+'</label><input id="bzDesc" placeholder="'+T('bz.f.descph','Kort en duidelijk')+'"></div>'+
+        '<div class="field h-flex1"><label>'+T('bz.f.prijs','Prijs (\u20AC)')+'</label><input id="bzPrice" type="number" inputmode="decimal" placeholder="24"></div></div>'+
         '<button class="obtn primary" id="bzAdd">'+T('bz.f.voeg','Toevoegen')+'</button></div>' : '')+'</div>';
     el.innerHTML = html;
     // acties
@@ -6855,7 +6855,7 @@
       (knoppen?'<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+knoppen+'</span>':'')+
     '</div>';
     el.innerHTML = '<div class="card"><div class="tt-h">'+T('rc.h','Receptie vandaag')+'</div>'+
-      '<div class="pos-chips" style="margin-top:0.4rem;">'+
+      '<div class="pos-chips h-mt40">'+
         '<span>'+r.bezetting.bezet+' / '+r.bezetting.totaal+' '+T('rc.bezet','bezet')+'</span>'+
         (r.bezetting.vuil?'<span>'+r.bezetting.vuil+' '+T('rc.vuil','voor housekeeping')+'</span>':'')+
         (r.aanvragen.length?'<span>'+r.aanvragen.length+' '+T('rc.aanvragen','aanvraag(en)')+'</span>':'')+
@@ -6869,7 +6869,7 @@
         '<button class="obtn js-vbuit">'+T('rc.checkout','Check-out')+'</button>',
         T('rc.tot','tot')+' '+v.vertrek+(v.vertrek<=r.datum?' · <b style="color:var(--gold);">'+T('rc.vandaagweg','vertrekt vandaag')+'</b>':'')+(v.openLast?' · '+T('rc.open','rekening')+' <b>'+eur(v.openLast)+'</b>':''))).join(''):'')+
       (r.komend.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.komend','Komende dagen')+'</div>'+r.komend.map(v => rij(v, '')).join(''):'')+
-      (leeg?'<div class="softline" style="margin-top:0.5rem;">'+T('rc.leeg','Nog geen verblijven. Zodra een gast boekt, staat het hier.')+'</div>':'')+
+      (leeg?'<div class="softline h-mt50">'+T('rc.leeg','Nog geen verblijven. Zodra een gast boekt, staat het hier.')+'</div>':'')+
       '</div>';
     el.querySelectorAll('[data-vb]').forEach(elv => {
       const id = elv.dataset.vb;
@@ -6892,7 +6892,7 @@
     let html = '<div id="receptieWrap"></div><div id="planWrap"></div><div class="card">';
     html += rooms.length ? rooms.map(r => {
       const hk = (r.hk && r.hk.status) || 'schoon';
-      return '<div class="room-row'+(r.available?'':' off')+'" style="flex-wrap:wrap;">'+
+      return '<div class="room-row'+(r.available?'':' off')+' h-wrap">'+
         '<div class="rr-t"><b>'+r.name+' <span class="hk-pill hk-'+hk+'">'+tHk(hk)+'</span>'+
           (r.vroegVrij ? ' <span class="hk-pill hk-schoon">'+T('hk.vroegvrij','vroege check-in')+'</span>' : '')+'</b>'+
           '<span>'+(r.desc||'')+' · '+eur(r.price)+' '+T('sup.pernight','p.n.')+
@@ -6906,7 +6906,7 @@
         (hkDefectFor===r.id ? '<div class="tt-add" style="width:100%;"><input id="hkNote" placeholder="'+T('hk.noteph','Wat is er kapot?')+'"><button id="hkNoteOk">'+T('hk.report','Meld defect')+'</button></div>' : '')+
       '</div>';
     }).join('') : '<div class="softline">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>';
-    html += '<div class="tt-add" style="flex-wrap:wrap;">'+
+    html += '<div class="tt-add h-wrap">'+
       '<input id="rmName" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;min-width:120px;">'+
       '<input id="rmPrice" type="number" inputmode="decimal" placeholder="€" style="flex:1;min-width:70px;">'+
       '<button id="rmAdd">'+T('team.add','Toevoegen')+'</button></div>';
@@ -6988,23 +6988,23 @@
     // de gereedschapskist: generieke widgets (cijfers, lijst, knoppen, actie, meter)
     let toolsBlok = '';
     if (tools && Array.isArray(tools.tools)) toolsBlok = tools.tools.map(w => {
-      if (w.type === 'cijfers') return kop(esc(w.titel))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
+      if (w.type === 'cijfers') return kop(esc(w.titel))+'<div class="pos-chips h-mt35">'+
         w.items.map(i => '<span>'+esc(i.label)+' · <b>'+esc(String(i.waarde))+'</b></span>').join('')+'</div>';
       if (w.type === 'lijst') return kop(esc(w.titel))+((w.rijen||[]).length ? w.rijen.map(r =>
         '<div class="st-row"><span>'+(r.icoon?r.icoon+' ':'')+esc(r.tekst)+(r.sub?'<span class="sub" style="display:block;">'+esc(r.sub)+'</span>':'')+'</span>'+
         (r.rechts?'<b style="color:'+(r.rood?'var(--burgundy)':'var(--gold)')+';white-space:nowrap;">'+esc(r.rechts)+'</b>':'')+'</div>').join('')
-        : '<div class="softline" style="margin-top:0.35rem;">'+esc(w.leeg||'')+'</div>');
-      if (w.type === 'knoppen') return kop(esc(w.titel))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
+        : '<div class="softline h-mt35">'+esc(w.leeg||'')+'</div>');
+      if (w.type === 'knoppen') return kop(esc(w.titel))+'<div class="pos-chips h-mt35">'+
         w.knoppen.map(k => '<span><button class="obtn js-dsnel" data-snel="'+esc(k)+'" style="padding:0.15rem 0.55rem;">'+esc(k)+'</button></span>').join('')+'</div>';
-      if (w.type === 'actie') return kop(esc(w.titel))+'<button class="obtn primary js-dactie" data-tekst="'+esc(w.tekst)+'" style="margin-top:0.35rem;">'+esc(w.knop)+'</button>';
-      if (w.type === 'meter') return kop(esc(w.titel))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
+      if (w.type === 'actie') return kop(esc(w.titel))+'<button class="obtn primary js-dactie" data-tekst="'+esc(w.tekst)+'" class="h-mt35">'+esc(w.knop)+'</button>';
+      if (w.type === 'meter') return kop(esc(w.titel))+'<div class="pos-chips h-mt35">'+
         w.opties.map(o => '<span><button class="obtn'+(w.stand&&w.stand.stand===o?' primary':'')+'" data-meter="'+esc(o)+'" style="padding:0.15rem 0.55rem;">'+esc(o)+'</button></span>').join('')+'</div>'+
         (w.stand?'<div class="softline" style="margin-top:0.25rem;">'+T('gy.nu','Nu')+' '+esc(w.stand.stand)+' · '+esc(w.stand.door)+', '+timeAgo(w.stand.at)+'</div>':'');
       // de leeftijdscheck aan de deur: ja/nee op codenaam, zonder gegevens
       if (w.type === 'leeftijd') return kop(esc(w.titel))+
         '<div class="tt-add" style="margin-top:0.35rem;flex-wrap:wrap;"><input id="dorpLftIn" placeholder="'+T('dorp.lft.ph','Codenaam van de gast')+'" style="flex:2;min-width:140px;">'+
         '<button class="obtn js-dlft" data-min="18">18+?</button><button class="obtn js-dlft" data-min="21">21+?</button></div>'+
-        '<div id="dorpLftUit" class="softline" style="margin-top:0.3rem;">'+esc(w.hint||'')+'</div>';
+        '<div id="dorpLftUit" class="softline h-mt30">'+esc(w.hint||'')+'</div>';
       return '';
     }).join('');
     // de buurt op het conciergescherm: partners om de hoek, op afstand gesorteerd
@@ -7014,16 +7014,16 @@
         try { renderDorp.buurt = (await API.call('/supplier/dorp/buurt', {})).buurt || []; } catch(e){ renderDorp.buurt = []; }
       }
       if (renderDorp.buurt.length) buurtBlok = '<div style="margin-top:0.7rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('dorp.buurt','In de buurt')+'</div>'+
-        '<div class="pos-chips" style="margin-top:0.35rem;">'+renderDorp.buurt.map(b =>
+        '<div class="pos-chips h-mt35">'+renderDorp.buurt.map(b =>
           '<span><button class="obtn js-dbuurt" data-naam="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'" style="padding:0.15rem 0.5rem;">'+RTGGlyf.tekst(b.icon)+' '+esc(b.naam)+' · '+b.km+' km</button></span>').join('')+'</div>'+
-        '<div class="softline" style="margin-top:0.3rem;">'+T('dorp.buurt.s','Een tik zet de naam alvast in de wens.')+'</div>';
+        '<div class="softline h-mt30">'+T('dorp.buurt.s','Een tik zet de naam alvast in de wens.')+'</div>';
     }
     el.innerHTML =
       '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+d.afdelingen.map(a =>
         '<button class="obtn'+(a.key===dorpKant?' primary':'')+'" data-dkant="'+a.key+'">'+RTGGlyf.tekst(a.icon)+' '+esc(a.label)+(a.openAantal?' · '+a.openAantal:'')+'</button>').join('')+'</div>'+
       '<div class="card"><div class="tt-h">'+RTGGlyf.tekst(afd.icon)+' '+esc(afd.label)+' <span class="sub">('+afd.keten.join(' · ')+')</span></div>'+
         toolsBlok+
-        (afd.open.length ? afd.open.map(rij).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
+        (afd.open.length ? afd.open.map(rij).join('') : '<div class="softline h-mt50">'+T('dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
         buurtBlok+
         (afd.klaar.length ? '<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('dorp.klaar','Net afgerond')+'</div>'+afd.klaar.map(rij).join('') : '')+
         '<div class="tt-add" style="flex-wrap:wrap;margin-top:0.7rem;">'+
@@ -7228,7 +7228,7 @@
       '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);line-height:1.7;">'+T('bh.tips','Menukaart bewerken doet u onder Menu. Tafels onder Tafels. Kamers en prijzen onder Kamers. Personeel en pincodes onder Team.')+'</div></div>'+
       '<div class="card"><div class="tt-h">'+T('ug.h','Officiele documentatie overschrijven')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);line-height:1.6;">'+T('ug.sub','Met een druk op de knop naar uw oude apparatuur of een harde schijf, altijd achter het vier- of zes-ogenprincipe: 4 ogen = twee collega\'s tekenen, 6 ogen = drie. De bundel komt een keer vrij; daarna start u een nieuwe uitgifte.')+'</div>'+
-      '<div class="tt-add" style="flex-wrap:wrap;"><select id="ugBron" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"></select>'+
+      '<div class="tt-add h-wrap"><select id="ugBron" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"></select>'+
       '<select id="ugOgen" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="4">4 ogen (2 pers.)</option><option value="6">6 ogen (3 pers.)</option></select>'+
       '<input id="ugDoel" placeholder="'+T('ug.doel','Doel, bijv. harde schijf archief')+'" style="flex:1;min-width:110px;">'+
       '<button id="ugStart">'+T('ug.start','Start uitgifte')+'</button></div>'+
@@ -7292,10 +7292,10 @@
         : '<button class="obtn primary" data-tk="' + t.id + '" data-tkst="klaar">' + T('tk.done','Klaar') + '</button>') +
       '</div>'
     ).join('') : '<div style="font-size:0.82rem;color:var(--green);padding:0.6rem 0;">✓ ' + T('tk.none','Geen openstaande klussen.') + '</div>';
-    html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="tkText" placeholder="' + T('tk.newph','Nieuwe klus, bijv. lamp vervangen') + '" style="flex:2;min-width:140px;">' +
+    html += '<div class="tt-add h-wrap"><input id="tkText" placeholder="' + T('tk.newph','Nieuwe klus, bijv. lamp vervangen') + '" style="flex:2;min-width:140px;">' +
       '<select id="tkRoom" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="">' + T('tk.noroom','Algemeen') + '</option>' + roomOpts + '</select>' +
       '<button id="tkAdd">' + T('team.add','Toevoegen') + '</button></div>';
-    if (done.length) html += '<div class="tt-h" style="margin-top:1rem;">' + T('tk.donelist','Afgerond') + '</div>' + done.map(t =>
+    if (done.length) html += '<div class="tt-h h-mt100">' + T('tk.donelist','Afgerond') + '</div>' + done.map(t =>
       '<div class="tk-row done"><div class="tk-t"><b>' + t.text + '</b><span>' + (t.doneBy || '') + (t.doneAt ? ' · ' + timeAgo(t.doneAt) : '') + '</span></div><span class="pill klaar">✓</span></div>').join('');
     html += '</div>';
 
@@ -7305,7 +7305,7 @@
       '<div class="tk-row"><div class="tk-t"><b>' + l.item + '</b><span>' + (l.room ? l.room + ' · ' : '') + (l.storage ? T('lf.at','ligt bij') + ' ' + l.storage + ' · ' : '') + l.by + ' · ' + timeAgo(l.at) + '</span></div>' +
       '<button class="obtn" data-lf="' + l.id + '">' + T('lf.picked','Opgehaald') + '</button></div>'
     ).join('') : '<div class="softline">' + T('lf.none','Niets in bewaring.') + '</div>';
-    html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="lfItem" placeholder="' + T('lf.itemph','Voorwerp, bijv. zonnebril') + '" style="flex:2;min-width:120px;">' +
+    html += '<div class="tt-add h-wrap"><input id="lfItem" placeholder="' + T('lf.itemph','Voorwerp, bijv. zonnebril') + '" style="flex:2;min-width:120px;">' +
       '<input id="lfStorage" placeholder="' + T('lf.storageph','Bewaarplek') + '" style="flex:1;min-width:90px;">' +
       '<select id="lfRoom" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="">' + T('lf.noroom','Elders') + '</option>' + roomOpts + '</select>' +
       '<button id="lfAdd">' + T('team.add','Toevoegen') + '</button></div></div>';
@@ -7574,7 +7574,7 @@
       '<div class="field"><label>'+T('sn.f.fotos','Foto\'s')+'</label><div id="snFdFotos" style="display:flex;gap:0.4rem;flex-wrap:wrap;"></div>'+
         '<label class="obtn" style="cursor:pointer;margin-top:0.4rem;display:inline-block;">'+T('sn.f.fotoadd','Foto toevoegen')+'<input type="file" id="snFdFoto" accept="image/*" style="display:none;"></label></div>'+
       '<div class="field"><label>'+T('sn.f.items','Producten')+'</label><div id="snFdItems"></div>'+
-        '<button class="obtn" id="snFdItemAdd" style="margin-top:0.4rem;">+ '+T('sn.f.itemadd','Product toevoegen')+'</button></div>'+
+        '<button class="obtn" id="snFdItemAdd" class="h-mt40">+ '+T('sn.f.itemadd','Product toevoegen')+'</button></div>'+
       '<button class="obtn primary" id="snFdPlaats" style="margin-top:0.7rem;">'+T('sn.f.plaats','Folder plaatsen')+'</button></div>';
 
     el.innerHTML = html;
@@ -7716,9 +7716,9 @@
     let html = '';
     html += '<div class="card"><div class="tt-h" style="display:flex;justify-content:space-between;align-items:center;">'+T('wv.kassa','Mobiele kassa')+
       (wvKlant?'<span style="color:var(--gold);font-size:0.7rem;">'+esc(wvKlant.codenaam||wvKlant.key)+'</span>':'')+'</div>'+
-      (wvCart.length ? '<div style="margin-top:0.5rem;">'+wvCart.map((r,i) =>
+      (wvCart.length ? '<div class="h-mt50">'+wvCart.map((r,i) =>
         '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.naam)+' · '+esc(r.kleur)+' · '+esc(r.maat)+'</span><span class="pr">'+eur(r.price)+' × '+r.aantal+'</span></div>'+
-        '<button class="obtn" data-wvdel="'+i+'" style="margin-top:0.3rem;">✕ '+T('wv.weg','Weg')+'</button></div>').join('')+
+        '<button class="obtn" data-wvdel="'+i+'" class="h-mt30">✕ '+T('wv.weg','Weg')+'</button></div>').join('')+
         '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.6rem;"><span>'+T('wv.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;"><button class="obtn primary" data-wvbetaal="rtgpay">RTG Pay</button>'+
         '<button class="obtn" data-wvbetaal="contant">'+T('wv.contant','Contant')+'</button>'+
@@ -7726,12 +7726,12 @@
         : '<div class="empty">'+T('wv.leegbon','Zoek een artikel en tik + om het op de bon te zetten.')+'</div>')+'</div>';
     html += '<div class="card"><div class="tt-h">'+T('wv.zoek','Voorraad opzoeken')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+wvInput('wvZoek', T('wv.zoekph','Naam, kleur of maat…'))+'<button class="obtn primary" id="wvZoekBtn">'+T('wv.zoekbtn','Zoek')+'</button></div>'+
-      '<div id="wvZoekUit" style="margin-top:0.5rem;"></div></div>';
+      '<div id="wvZoekUit" class="h-mt50"></div></div>';
     const pk = wvRetail.paskamer || [];
     html += '<div class="card"><div class="tt-h">'+T('wv.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
       (pk.length ? pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikelNaam)+' · '+esc(v.maat)+'</span></div>'+
         '<div class="ds">'+esc(v.codenaam||'Gast')+' · '+esc(v.kleur)+(v.paskamer?' · '+esc(v.paskamer):'')+'</div>'+
-        '<button class="obtn primary" data-wvbreng="'+v.id+'" style="margin-top:0.35rem;">'+T('wv.breng','Gebracht')+'</button></div>').join('')
+        '<button class="obtn primary" data-wvbreng="'+v.id+'" class="h-mt35">'+T('wv.breng','Gebracht')+'</button></div>').join('')
         : '<div class="empty">'+T('wv.geenpk','Geen open verzoeken.')+'</div>')+'</div>';
     const ap = wvRetail.apart || [];
     if (ap.length) html += '<div class="card"><div class="tt-h">'+T('wv.apart','Apart gelegd')+' ('+ap.length+')</div>'+
@@ -7827,7 +7827,7 @@
           (a.zorg ? '<div class="ds" style="color:#E2B93B;">'+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
           (a.intake ? '<div class="ds" style="color:#E2B93B;">'+esc(a.intake)+'</div>' : '')+
           (a.status === 'afgerond' ? '<div class="ds" style="color:var(--green,#4C9A75);">'+T('zb.klaar','Afgerond')+'</div>'
-            : '<button class="obtn primary" data-zblevklaar="'+esc(a.ref)+'" style="margin-top:0.35rem;">'+T('zb.afronden','Afronden')+'</button>')+
+            : '<button class="obtn primary" data-zblevklaar="'+esc(a.ref)+'" class="h-mt35">'+T('zb.afronden','Afronden')+'</button>')+
           '</div>').join('')
         : '<div class="empty">'+T('zb.leeg','Geen afspraken op deze dag.')+'</div>')+
       '</div>';
@@ -8106,7 +8106,7 @@
       return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+(m.func? m.func+' · ':'')+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+bel+dm+buzz+rm+'</div>';
     }).join('') || '<div class="softline">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
     if (a.manager){
-      html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="ttName" placeholder="'+T('team.name','Naam')+'" style="flex:2;min-width:110px;"><input id="ttFunc" placeholder="'+T('team.func','Functie')+'" style="flex:1;min-width:90px;"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.invite','Nodig uit')+'</button></div>';
+      html += '<div class="tt-add h-wrap"><input id="ttName" placeholder="'+T('team.name','Naam')+'" style="flex:2;min-width:110px;"><input id="ttFunc" placeholder="'+T('team.func','Functie')+'" style="flex:1;min-width:90px;"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.invite','Nodig uit')+'</button></div>';
       if (lastPin) html += '<div class="tt-pinbox">'+T('team.invintro','Uitnodiging voor')+' '+escT(lastPin.name)+' · '+T('kt.invite.biz','Bedrijfsnaam')+': <b>'+escT(lastPin.bedrijf)+'</b> · '+T('kt.invite.code','Kassacode')+': <b>'+escT(lastPin.kassacode)+'</b><br>'+T('team.invnote','Eenmalige code; aanmelden met eigen RTG-account.')+'</div>';
     }
     html += '</div>';
@@ -8148,7 +8148,7 @@
       return '<div style="flex-basis:100%;font-size:0.72rem;color:var(--muted);line-height:1.5;margin-top:0.35rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;">'+parts.join('<br>')+'</div>';
     };
     html += apps.length ? apps.map(x =>
-      '<div class="tk-row" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+
+      '<div class="tk-row h-wrap"><div class="tk-t"><b>'+x.name+' · '+x.func+
       (x.viaRTG?' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</i>':'')+
       '</b><span>'+x.contact+(x.note?' · "'+x.note.slice(0,60)+'"':'')+' · '+timeAgo(x.at)+'</span></div>'+
       (a.manager ? '<button class="obtn" data-apinvite="'+x.id+'">'+T('ap.invite','Uitnodigen')+'</button><button class="obtn primary" data-aphire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-apno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button>' : '')+
@@ -8158,7 +8158,7 @@
     html += decided.map(x => {
       const kanChat = x.status === 'uitgenodigd' || x.status === 'aangenomen';
       const stLabel = x.status === 'uitgenodigd' ? T('ap.st.invited','uitgenodigd') : x.status === 'aangenomen' ? T('ap.st.hired','aangenomen') : T('ap.st.rejected','afgewezen');
-      return '<div class="tk-row done" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+stLabel+'</span></div>'+
+      return '<div class="tk-row done h-wrap"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+stLabel+'</span></div>'+
         (kanChat && a.manager ? '<button class="obtn primary" data-apchat="'+x.id+'" data-apname="'+encodeURIComponent(x.name)+'">'+T('ap.chat','Chat')+'</button>' : '')+'</div>';
     }).join('');
     html += '</div>';
@@ -8320,14 +8320,14 @@
     let h = '<div class="card"><div class="tt-h">'+T('rev2.score','Uw reputatie')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:1.4rem;font-family:\'Bodoni Moda\',serif;">'+
       (rating ? rating.score+' <span style="font-size:0.8rem;color:var(--soft);">/ 5 · '+rating.aantal+' '+T('rev2.stuks','review(s)')+'</span>' : T('rev2.geen','Nog geen reviews'))+'</div>'+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('rev2.deck','Een snel, persoonlijk antwoord weegt zwaar: gasten lezen mee, en de schrijver krijgt uw reactie direct als melding.')+'</div></div>';
+      '<div class="softline h-mt30">'+T('rev2.deck','Een snel, persoonlijk antwoord weegt zwaar: gasten lezen mee, en de schrijver krijgt uw reactie direct als melding.')+'</div></div>';
     h += revs.length ? revs.map(r =>
       '<div class="card">'+
       '<div class="tt-top" style="display:flex;justify-content:space-between;gap:0.5rem;"><b>'+''.repeat(r.score)+'<span style="opacity:0.25;">'+''.repeat(5-r.score)+'</span> · '+esc(r.codename||'gast')+'</b><time style="color:var(--soft);font-size:0.7rem;">'+timeAgo(r.at)+'</time></div>'+
       (r.tekst ? '<div style="margin-top:0.35rem;font-size:0.86rem;">'+esc(r.tekst)+'</div>' : '')+
       (r.reactie
         ? '<div style="margin-top:0.5rem;border-left:3px solid var(--gold);padding:0.4rem 0.7rem;font-size:0.82rem;"><b style="color:var(--gold);">'+T('rev2.uw','Uw reactie')+'</b> · '+timeAgo(r.reactie.at)+'<br>'+esc(r.reactie.tekst)+'</div>'
-        : '<div class="tt-compose" style="margin-top:0.5rem;"><input id="rv-'+r.id+'" placeholder="'+T('rev2.ph','Schrijf een persoonlijke reactie...')+'">'+
+        : '<div class="tt-compose h-mt50"><input id="rv-'+r.id+'" placeholder="'+T('rev2.ph','Schrijf een persoonlijke reactie...')+'">'+
           '<button class="obtn ghost" data-rvai="'+r.id+'"></button><button data-rvsend="'+r.id+'">'+T('team.send','Stuur')+'</button></div>')+
       '</div>').join('')
       : '<div class="card softline">'+T('rev2.leeg','Nog geen reviews. Na elke afgeronde dienst kan de gast er een achterlaten.')+'</div>';
@@ -8361,8 +8361,8 @@
     // het inkoopadvies: aanvullen tot twee keer het minimum
     if ((d.advies||[]).length) h += '<div class="card" style="border-left:4px solid var(--gold,#A98F1C);"><div class="tt-h">'+T('vr.advies','Inkoopadvies')+'</div>'+
       d.advies.map(a => '<div class="st-row"><span>'+esc(a.naam)+' <span class="sub">'+a.aantal+' '+esc(a.eenheid)+', min '+a.min+'</span></span><b>+ '+a.advies+' '+esc(a.eenheid)+(a.kosten?' <span class="sub">'+geld(a.kosten)+'</span>':'')+'</b></div>').join('')+
-      (mgr?'<button class="bigbtn" id="vrBestel" style="margin-top:0.5rem;">'+T('vr.bestel','Bestel dit advies bij de groothandel')+'</button>':'')+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('vr.advies.s','Geleverd = automatisch bijgeboekt, met de inkoopprijs als nieuwe kostprijs.')+'</div></div>';
+      (mgr?'<button class="bigbtn" id="vrBestel" class="h-mt50">'+T('vr.bestel','Bestel dit advies bij de groothandel')+'</button>':'')+
+      '<div class="softline h-mt30">'+T('vr.advies.s','Geleverd = automatisch bijgeboekt, met de inkoopprijs als nieuwe kostprijs.')+'</div></div>';
     // de artikelen zelf, met kostprijs en de vloerhandelingen
     h += '<div class="card">'+(vs.length ? vs.map(v =>
       '<div class="st-row" style="align-items:center;"><span'+(v.min>0&&v.aantal<=v.min?' style="color:#FF8589;"':'')+'>'+esc(v.naam)+
@@ -8381,7 +8381,7 @@
         (mgr?'<button class="obtn ghost" data-vrec="'+r.id+'">'+(r.regels.length?T('vr.rbew','Recept'):T('vr.rzet','+ Recept'))+'</button>':'')+'</div>'+
         (r.regels.length?'<div class="sub">'+r.regels.map(x=>x.hoeveelheid+' '+esc(x.eenheid)+' '+esc(x.naam)).join(' · ')+'</div>':'')+
         '</div>').join('')+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('vr.rec.s','Elke kassabon en betaalde bestelling boekt de ingredienten automatisch af via het recept.')+'</div></div>';
+      '<div class="softline h-mt30">'+T('vr.rec.s','Elke kassabon en betaalde bestelling boekt de ingredienten automatisch af via het recept.')+'</div></div>';
     // menu-engineering: volume maal marge, in de klassieke kwadranten
     if (ma && (ma.rijen||[]).some(r => r.verkocht > 0 || r.heeftRecept)){
       const KLASSE = { ster: ['', '#D8B940'], werkpaard: ['', '#69B98B'], puzzel: ['', '#7FA6D9'], hond: ['', '#FF8589'], onbekend: ['·', 'var(--soft)'] };
@@ -8390,18 +8390,18 @@
           '<div class="st-row"><span><b style="color:'+KLASSE[r.klasse][1]+';">'+KLASSE[r.klasse][0]+' '+esc(r.klasse)+'</b> '+esc(r.naam)+'</span>'+
           '<span class="sub">'+r.verkocht+'× · '+T('vr.marge','marge')+' '+geld(r.marge)+' · '+T('vr.winst','winst')+' '+geld(r.brutowinst)+'</span></div>'+
           '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+
-        (mgr?'<button class="bigbtn" id="vrPlan" style="margin-top:0.5rem;">'+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
+        (mgr?'<button class="bigbtn" id="vrPlan" class="h-mt50">'+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
     }
     // het logboek: elke beweging herleidbaar
     if ((d.logboek||[]).length) h += '<div class="card"><div class="tt-h">'+T('vr.log','Laatste bewegingen')+'</div>'+
       d.logboek.slice(0,8).map(l => '<div class="st-row"><span>'+esc(l.artikel)+' <span class="sub">'+esc(l.soort)+' · '+esc(l.oms||'')+' · '+esc(l.wie||'')+'</span></span><b'+(l.delta<0?' style="color:#FF8589;"':' style="color:#69B98B;"')+'>'+(l.delta>0?'+':'')+l.delta+'</b></div>').join('')+'</div>';
     if (mgr) h += '<div class="card"><div class="tt-h">'+T('vr.nieuw','Nieuw item')+'</div>'+
-      '<div class="row-gap" style="margin-top:0.5rem;"><input class="st-in" id="vrNaam" placeholder="'+T('vr.naam','Naam, bijv. Cava brut')+'" style="flex:2;">'+
-      '<input class="st-in" id="vrAantal" type="number" min="0" placeholder="'+T('vr.aantal','aantal')+'" style="flex:1;">'+
-      '<input class="st-in" id="vrMin" type="number" min="0" placeholder="'+T('vr.mindr','min.')+'" style="flex:1;">'+
-      '<input class="st-in" id="vrEenheid" placeholder="'+T('vr.eenheid','eenheid (fles, kg...)')+'" style="flex:1;">'+
-      '<input class="st-in" id="vrKost" type="number" min="0" step="0.01" placeholder="'+T('vr.kostph','€/eenheid')+'" style="flex:1;"></div>'+
-      '<button class="bigbtn" id="vrAdd" style="margin-top:0.5rem;">'+T('vr.voeg','Zet op de lijst')+'</button></div>';
+      '<div class="row-gap h-mt50"><input class="st-in" id="vrNaam" placeholder="'+T('vr.naam','Naam, bijv. Cava brut')+'" class="h-flex2">'+
+      '<input class="st-in" id="vrAantal" type="number" min="0" placeholder="'+T('vr.aantal','aantal')+'" class="h-flex1">'+
+      '<input class="st-in" id="vrMin" type="number" min="0" placeholder="'+T('vr.mindr','min.')+'" class="h-flex1">'+
+      '<input class="st-in" id="vrEenheid" placeholder="'+T('vr.eenheid','eenheid (fles, kg...)')+'" class="h-flex1">'+
+      '<input class="st-in" id="vrKost" type="number" min="0" step="0.01" placeholder="'+T('vr.kostph','€/eenheid')+'" class="h-flex1"></div>'+
+      '<button class="bigbtn" id="vrAdd" class="h-mt50">'+T('vr.voeg','Zet op de lijst')+'</button></div>';
     el.innerHTML = h;
     const doe = async (pad, body) => { try { await API.call(pad, body); renderVoorraad(); } catch(e){ toast(e.message); } };
     // een knop: het advies wordt een echte groothandelsbestelling
@@ -8424,10 +8424,10 @@
     // het actieplan van de chef-adviseur: kwadranten plus derving, in euro's
     const vp = el.querySelector('#vrPlan'); if (vp) vp.addEventListener('click', async () => {
       const uit = el.querySelector('#vrPlanUit');
-      uit.innerHTML = '<div class="softline" style="margin-top:0.4rem;">'+T('vr.plan.laden','De adviseur rekent...')+'</div>';
+      uit.innerHTML = '<div class="softline h-mt40">'+T('vr.plan.laden','De adviseur rekent...')+'</div>';
       try {
         const p = await API.call('/supplier/keuken/menu-advies', {});
-        uit.innerHTML = '<div class="sub" style="margin-top:0.5rem;">'+esc(p.samenvatting)+'</div>'+
+        uit.innerHTML = '<div class="sub h-mt50">'+esc(p.samenvatting)+'</div>'+
           (p.acties||[]).map(x => '<div style="border-top:1px solid var(--line);padding:0.35rem 0;font-size:0.82rem;">'+
             (x.impact?'<b style="color:var(--gold);">'+geld(x.impact)+'</b> · ':'')+esc(x.tekst)+'</div>').join('');
       } catch(e){ uit.innerHTML = ''; toast(e.message); }

@@ -32,12 +32,15 @@ const { herschrijfHtml: stijlbundelHtml } = require('./stijlbundel');
    stempelen komt erdoorheen. Een ingespoten blok draait niet.
 
    style-src-attr HOUDT 'unsafe-inline', en dat is een bewuste, benoemde schuld:
-   er staan 8957 style="..."-attributen in public/. Een nonce bestaat daar niet
-   voor -- CSP kent geen stempel op een attribuut -- dus dat is niet af te
-   dwingen zonder ze allemaal weg te halen. Dat is echt werk en het staat op de
-   lijst; het hoort hier te staan als getal en niet als stilte. Wat een attribuut
-   kan aanrichten is bovendien kleiner: het geldt alleen voor het element waar
-   het op staat, en om er een op te hangen moet je al HTML kunnen injecteren.
+   er staan style="..."-attributen in public/. Een nonce bestaat daar niet voor
+   -- CSP kent geen stempel op een attribuut -- dus dat is niet af te dwingen
+   zonder ze allemaal weg te halen. Hoeveel het er nog zijn staat op EEN plek en
+   niet in dit commentaar: NORM.json telt ze (inlineStijlAttributen) en die
+   ratel laat het getal alleen omlaag. Hier stond eerst 8957, en dat was fout --
+   de teller telde de bundels dubbel; de echte stand stond op 6040. Een getal in
+   een commentaar veroudert, een ratel niet. Wat een attribuut kan aanrichten is
+   bovendien kleiner: het geldt alleen voor het element waar het op staat, en om
+   er een op te hangen moet je al HTML kunnen injecteren.
 
    Wat een CSS-lek naar buiten betreft: img-src en connect-src staan op 'self',
    dus de klassieke truc (een attribuutselector die een achtergrondplaatje bij

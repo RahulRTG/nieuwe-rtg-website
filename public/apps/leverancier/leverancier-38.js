@@ -22,11 +22,11 @@
         : '<div class="empty">'+T('rt.geenverlang','Nog niets op de verlanglijst.')+'</div>')+'</div>';
     // historie
     html += '<div class="card"><div class="tt-h">'+T('rt.historie','Aankoophistorie')+'</div>'+
-      ((k.historie&&k.historie.length) ? '<div style="margin-top:0.5rem;">'+k.historie.slice().reverse().map(h => '<div class="mitem"><div class="r1"><span class="nm">'+esc(h.naam)+'</span><span class="pr">'+geld(h.bedrag)+'</span></div><div class="ds">'+esc(String(h.at).slice(0,10))+'</div></div>').join('')+'</div>'
+      ((k.historie&&k.historie.length) ? '<div class="h-mt50">'+k.historie.slice().reverse().map(h => '<div class="mitem"><div class="r1"><span class="nm">'+esc(h.naam)+'</span><span class="pr">'+geld(h.bedrag)+'</span></div><div class="ds">'+esc(String(h.at).slice(0,10))+'</div></div>').join('')+'</div>'
         : '<div class="empty">'+T('rt.geenhist','Nog geen aankopen.')+'</div>')+'</div>';
     // notities
     html += '<div class="card"><div class="tt-h">'+T('rt.notities','Stylist-notities')+'</div>'+
-      ((k.notities&&k.notities.length) ? '<div style="margin-top:0.5rem;">'+k.notities.slice().reverse().map(n => '<div class="mitem"><div class="ds" style="color:var(--txt);">'+esc(n.tekst)+'</div><div class="ds">'+esc(n.door||'Team')+' · '+esc(String(n.at).slice(0,10))+'</div></div>').join('')+'</div>' : '')+
+      ((k.notities&&k.notities.length) ? '<div class="h-mt50">'+k.notities.slice().reverse().map(n => '<div class="mitem"><div class="ds" style="color:var(--txt);">'+esc(n.tekst)+'</div><div class="ds">'+esc(n.door||'Team')+' · '+esc(String(n.at).slice(0,10))+'</div></div>').join('')+'</div>' : '')+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="rNotitie" placeholder="'+T('rt.notitieph','Nieuwe notitie…')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.85rem;color:var(--txt);outline:none;"><button class="obtn primary" id="rNotitieAdd">'+T('rt.voegtoe','Voeg toe')+'</button></div></div>';
     // stylingvoorstel sturen
     html += '<div class="card"><div class="tt-h">'+T('rt.styling','Stylingvoorstel sturen')+'</div>'+

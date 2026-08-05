@@ -9,23 +9,23 @@
     const heeftGasten = r.gasten.reserveringen || r.gasten.walkIns || r.gasten.noShows;
     if (!r.bonnen && !heeftGasten) { el.innerHTML = ''; return; }
     el.innerHTML = '<div class="card"><div class="tt-h">'+T('shift.h','Shift-samenvatting')+'</div>'+
-      (heeftGasten?'<div class="pos-chips" style="margin-top:0.4rem;">'+
+      (heeftGasten?'<div class="pos-chips h-mt40">'+
         '<span>'+r.gasten.personen+' '+T('shift.gasten','gasten aan tafel')+'</span>'+
         '<span>'+r.gasten.reserveringen+' '+T('shift.res','reservering(en)')+'</span>'+
         (r.gasten.walkIns?'<span>'+r.gasten.walkIns+' walk-in(s)</span>':'')+
         (r.gasten.noShows?'<span style="color:var(--burgundy);">✗ '+r.gasten.noShows+' no-show(s)</span>':'')+
       '</div>':'')+
-      (r.verblijf?'<div class="pos-chips" style="margin-top:0.4rem;">'+
+      (r.verblijf?'<div class="pos-chips h-mt40">'+
         '<span>'+r.verblijf.bezet+' / '+r.verblijf.totaal+' '+T('rc.bezet','bezet')+'</span>'+
         (r.verblijf.aankomsten?'<span>'+r.verblijf.aankomsten+' '+T('shift.aank','check-in(s)')+'</span>':'')+
         (r.verblijf.vertrekken?'<span>'+r.verblijf.vertrekken+' '+T('shift.vertr','check-out(s)')+'</span>':'')+
         (r.verblijf.noShows?'<span style="color:var(--burgundy);">✗ '+r.verblijf.noShows+' no-show(s)</span>':'')+
         (r.verblijf.adr?'<span>ADR '+eur(r.verblijf.adr)+'</span>':'')+
       '</div>':'')+
-      ((r.toppers||[]).length?'<div class="st-row" style="margin-top:0.4rem;"><span>'+T('shift.toppers','Toppers')+'</span><span class="sub">'+r.toppers.map(t=>t.aantal+'× '+esc(t.naam)).join(' · ')+'</span></div>':'')+
+      ((r.toppers||[]).length?'<div class="st-row h-mt40"><span>'+T('shift.toppers','Toppers')+'</span><span class="sub">'+r.toppers.map(t=>t.aantal+'× '+esc(t.naam)).join(' · ')+'</span></div>':'')+
       (r.derving?'<div class="st-row"><span>'+T('shift.derving','Derving (kostprijs)')+'</span><b style="color:var(--burgundy);">'+eur(r.derving)+'</b></div>':'')+
       ((r.team||[]).length?'<div class="st-row"><span>'+T('shift.team','Op de kassa')+'</span><span class="sub">'+r.team.map(t=>esc(t.naam)+' '+eur(t.omzet)).join(' · ')+'</span></div>':'')+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('shift.s','Samen met het Z-rapport hierboven is dit de briefing voor morgen.')+'</div></div>';
+      '<div class="softline h-mt30">'+T('shift.s','Samen met het Z-rapport hierboven is dit de briefing voor morgen.')+'</div></div>';
   }
 
   /* De dagafsluiting (Z-rapport): omzet, bonnen, fooien en de btw-splitsing
@@ -39,8 +39,8 @@
       (r.fooien?'<div class="st-row"><span>'+T('pos.fooien','Fooien')+'</span><b>'+eur(r.fooien)+'</b></div>':'')+
       (r.btw||[]).map(b => '<div class="st-row"><span>'+esc(b.label)+' · '+b.tarief+'% btw</span><b>'+eur(b.omzet)+' <span class="sub">'+T('pos.z.waarvanbtw','waarvan btw')+' '+eur(b.btw)+'</span></b></div>').join('')+
       Object.entries(r.betaalwijzen||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.ontv','Ontvangsten')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
-      '<button class="bigbtn" id="zCsv" style="margin-top:0.5rem;">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
+      '<button class="bigbtn" id="zCsv" class="h-mt50">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
+      '<div class="softline h-mt30">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
     const k = el.querySelector('#zCsv');
     if (k) k.addEventListener('click', () => { API.download('/supplier/dagrapport.csv', { datum: r.datum }, 'dagrapport-' + r.datum + '.csv').catch(() => {}); });
   }
@@ -66,7 +66,7 @@
         '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
         '<button class="obtn js-pay" data-method="contant"'+(total?'':' disabled')+'>'+T('pos.cash','Contant')+'</button>'+
       '</div>'+
-      ((state.tables||[]).length ? '<div class="pos-pay" style="margin-top:0.4rem;">'+
+      ((state.tables||[]).length ? '<div class="pos-pay h-mt40">'+
         '<select id="posTafel" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;">'+
           '<option value="">'+T('pos.tafelkies','Tafel...')+'</option>'+
           (state.tables||[]).map(t=>'<option value="'+t.name.replace(/"/g,'&quot;')+'">'+t.name+'</option>').join('')+'</select>'+

@@ -11,9 +11,9 @@
      5. het schild en De Wacht    -- ./schildwacht.js
      6. security-headers          -- ./koppen.js, inclusief de terugval-CSP
      7. de AI-meelezer            -- telt mee, doet niets
-     8. de betaal-webhooks        -- VOOR express.json(), want rauwe body
-     9. express.json + dieptewacht
-    10. het zaakdoos-journaal     -- alleen in lokale modus
+     8. de lijfpoort              -- ./lijfpoort.js: de webhooks (VOOR
+                                     express.json(), want rauwe body), express.json
+                                     zelf, de dieptewacht en het zaakdoos-journaal
 
    TWEE DINGEN DIE HIER LAAT GEBONDEN ZIJN, en dat is geen slordigheid maar de
    enige volgorde die kan: het schild raadpleegt De Wacht, en de meelezer is de
@@ -23,23 +23,6 @@
    een schild dat nog niets weet.
    ========================================================================== */
 'use strict';
-
-const MAX_DIEPTE = 40;
-/* Grenswacht tegen pathologisch diep geneste invoer. Een echte API-body is een
-   handvol niveaus diep; een 20.000-diep geneste array is geen gebruiker maar
-   een aanval: elke String()/Number()-coercie erop laat de stack overlopen
-   (Array.toString -> join -> recursie). We keuren de diepte ITERATIEF (met een
-   eigen stack, dus zelf niet te laten overlopen). */
-function teDiep(wortel) {
-  const stapel = [[wortel, 1]];
-  while (stapel.length) {
-    const [v, d] = stapel.pop();
-    if (!v || typeof v !== 'object') continue;
-    if (d > MAX_DIEPTE) return true;
-    for (const k in v) if (Object.prototype.hasOwnProperty.call(v, k)) stapel.push([v[k], d + 1]);
-  }
-  return false;
-}
 
 module.exports = function verzoekketen(deps) {
   const { app, express, log, logboek, db, save, betaal, muntbetaal, opslagKlaar,
@@ -137,37 +120,8 @@ module.exports = function verzoekketen(deps) {
     next();
   });
 
-  /* De twee betaal-webhooks staan in ./webhooks.js. Ze horen HIER en niet in de
-     gewone routebedrading: een handtekening wordt over de RAUWE body berekend,
-     dus ze moeten voor express.json() gemount zijn. Welke poortwachters ze wel
-     en niet krijgen -- en waarom de hoofdzekering er bewust niet bij zit --
-     staat in de kop van dat bestand. */
-  require('./webhooks')({
-    app, express, db, save, log, betaal, muntbetaal,
-    opslagKlaar: () => opslagKlaar(),
-    // pas verderop in server.js gebouwd; zie de uitleg in webhooks.js
-    muntenVan, settleFactuurVan
-  });
-
-  app.use(express.json({ limit: '8mb' }));
-  app.use((req, res, next) => {
-    if (req.body && typeof req.body === 'object' && teDiep(req.body))
-      return res.status(400).json({ error: 'Ongeldige invoer: te diep genest.' });
-    next();
-  });
-
-  /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
-     journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.
-     Inloggen en de livestream horen bij de doos zelf en spelen we niet na. */
-  if (zaakdoos.actief) {
-    app.use((req, res, next) => {
-      if (zaakdoos.modusVan() !== 'lokaal' || req.method !== 'POST') return next();
-      if (!req.path.startsWith('/api/supplier/') || req.path === '/api/supplier/login' || req.path.startsWith('/api/supplier/stream')) return next();
-      const echteJson = res.json.bind(res);
-      res.json = (d) => { if (res.statusCode < 300) zaakdoos.schrijfJournaal(req.path, req.body, d); return echteJson(d); };
-      next();
-    });
-  }
+  require('./lijfpoort')({ app, express, db, save, log, betaal, muntbetaal,
+    opslagKlaar, zaakdoos, muntenVan, settleFactuurVan });
 
   return {
     schild, zetWacht,
@@ -175,5 +129,7 @@ module.exports = function verzoekketen(deps) {
     zetRtgai: (r) => { rtgaiMeelezer = r; }
   };
 };
-module.exports.teDiep = teDiep;
-module.exports.MAX_DIEPTE = MAX_DIEPTE;
+// de dieptewacht woont in ./lijfpoort.js; hier alleen doorgegeven voor wie hem
+// als losse functie wil toetsen
+module.exports.teDiep = require('./lijfpoort').teDiep;
+module.exports.MAX_DIEPTE = require('./lijfpoort').MAX_DIEPTE;

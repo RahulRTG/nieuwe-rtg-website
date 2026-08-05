@@ -2,7 +2,7 @@
       // het AI-weekrooster: voorstel op de verwachte drukte, de gemachtigde stelt vast
       if (!agentData) laadAgent();
       const rp = agentData && agentData.rooster;
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('ag2.rooster','AI-weekrooster')+'</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('ag2.rooster','AI-weekrooster')+'</h3>'+
         '<div class="tkc-who">'+T('ag2.rooster.deck','De AI plant de week op de verwachte drukte per dag: drukke dagen iedereen op de vloer, rustige dagen om de beurt vrij.')+'</div>'+
         (rp ? rp.days.map(d=>'<div class="st-row"><span><b>'+d.label+'</b> <span class="sub">'+d.date+'</span></span>'+
             '<span class="sub" style="text-align:right;">'+d.staff.map(m=>m.name.split(' ')[0]+': '+m.shift.split(' ')[0]).join(' · ')+'</span></div>').join('')+
@@ -13,7 +13,7 @@
       // urenregistratie: wie is binnen, wie werkte wanneer en hoelang
       if (!klokOverzicht) laadKlok();
       const tijd = iso => new Date(iso).toLocaleString(lang()==='en'?'en-GB':'nl-NL', { weekday:'short', hour:'2-digit', minute:'2-digit' });
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.uren','Urenregistratie')+'</h3>'+
+      html += '<div class="tkc h-volbreed"><h3>'+T('kt.uren','Urenregistratie')+'</h3>'+
         '<div class="tkc-who">'+T('kt.uren.deck','Iedereen klokt via de PDA; hier staat precies wie wanneer en hoelang werkt.')+'</div>'+
         (klokOverzicht && klokOverzicht.length ? klokOverzicht.map(r =>
           '<div class="st-row"><span>'+(r.binnen?'':'')+r.name+'<span class="sub">'+(r.func||(r.role==='manager'?'Manager':''))+
@@ -26,14 +26,14 @@
           '<span class="acts"><button class="obtn primary" data-khire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-kno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button></span></div>').join('')
         : '<div class="tkc-who">'+T('kt.noapps','Geen open sollicitaties.')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.team','Team & uitnodigingen')+'</h3>'+
-        (state.staff||[]).map(m=>'<div class="st-row" style="flex-wrap:wrap;"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
+        (state.staff||[]).map(m=>'<div class="st-row h-wrap"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
           '<span class="acts">'+(m.id!==actor().staffId
             ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset code')+'</button><button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
             : '')+'</span></div>').join('')+
         '<div class="tkc-who" style="margin-top:0.55rem;line-height:1.5;">'+T('kt.invite.intro','Nodig uit; de medewerker meldt zich zelf aan met bedrijfsnaam + kassacode en een eigen RTG-account.')+'</div>'+
         '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
-        '<button class="bigbtn" id="ktInvite" style="margin-top:0.2rem;">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
+        '<button class="bigbtn" id="ktInvite" class="h-mt20">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
       // open kassacodes: teruglezen en intrekken
       if (!invData) laadInvites();
       const openInv = (invData && invData.invites) || [];
@@ -46,13 +46,13 @@
             : '<div class="tkc-who">'+T('kt.geeninv','Geen open uitnodigingen.')+'</div>')
           : '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
-        '<button class="obtn" id="ktBuzz" style="margin-top:0.4rem;">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
+        '<button class="obtn" id="ktBuzz" class="h-mt40">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
       // personeelszaken: verlofaanvragen beslissen en zien wie er nu is ingeklokt
       const verlofOpen = (state.verlof || []).filter(v => v.status === 'nieuw');
       const verlofRest = (state.verlof || []).filter(v => v.status !== 'nieuw').slice(0, 8);
       html += '<div class="tkc"><h3>\uD83C\uDF34 '+T('kt.verlof','Verlof & ziek')+(verlofOpen.length ? ' ('+verlofOpen.length+')' : '')+'</h3>'+
         (verlofOpen.length ? verlofOpen.map(v =>
-          '<div class="st-row" style="flex-wrap:wrap;"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+(v.reden?' \u00B7 '+v.reden:'')+'</span></span>'+
+          '<div class="st-row h-wrap"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+(v.reden?' \u00B7 '+v.reden:'')+'</span></span>'+
           '<span class="acts"><button class="obtn primary" data-kvja="'+v.id+'">'+T('kt.vja','Goedkeuren')+'</button><button class="obtn warn" data-kvnee="'+v.id+'">'+T('kt.vnee','Afwijzen')+'</button></span></div>').join('')
           : '<div class="tkc-who">'+T('kt.geenverlof','Geen open aanvragen. Personeel vraagt verlof aan via de PDA; ziekmeldingen komen hier ook binnen.')+'</div>')+
         (verlofRest.length ? verlofRest.map(v =>
@@ -62,5 +62,5 @@
       html += '<div class="tkc"><h3>\u23F1 '+T('kt.klok','Nu ingeklokt')+' ('+klok2.binnen.length+')</h3>'+
         (klok2.binnen.length ? klok2.binnen.map(n => '<div class="st-row"><span>\uD83D\uDFE2 '+n+'</span></div>').join('')
           : '<div class="tkc-who">'+T('kt.niemandin','Niemand is nu ingeklokt.')+'</div>')+
-        (klok2.vandaag.length ? '<div class="tkc-who" style="margin-top:0.4rem;">'+T('kt.klokv','Vandaag geklokt')+': '+klok2.vandaag.length+' '+T('kt.klokr','registratie(s)')+' \u00B7 '+[...new Set(klok2.vandaag.map(e=>e.name))].length+' '+T('kt.klokp','personen')+'</div>' : '')+'</div>';
+        (klok2.vandaag.length ? '<div class="tkc-who h-mt40">'+T('kt.klokv','Vandaag geklokt')+': '+klok2.vandaag.length+' '+T('kt.klokr','registratie(s)')+' \u00B7 '+[...new Set(klok2.vandaag.map(e=>e.name))].length+' '+T('kt.klokp','personen')+'</div>' : '')+'</div>';
     }

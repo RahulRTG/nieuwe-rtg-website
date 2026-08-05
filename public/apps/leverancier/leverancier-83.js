@@ -4,7 +4,7 @@
         (mgr?'<button class="obtn ghost" data-vrec="'+r.id+'">'+(r.regels.length?T('vr.rbew','Recept'):T('vr.rzet','+ Recept'))+'</button>':'')+'</div>'+
         (r.regels.length?'<div class="sub">'+r.regels.map(x=>x.hoeveelheid+' '+esc(x.eenheid)+' '+esc(x.naam)).join(' · ')+'</div>':'')+
         '</div>').join('')+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('vr.rec.s','Elke kassabon en betaalde bestelling boekt de ingredienten automatisch af via het recept.')+'</div></div>';
+      '<div class="softline h-mt30">'+T('vr.rec.s','Elke kassabon en betaalde bestelling boekt de ingredienten automatisch af via het recept.')+'</div></div>';
     // menu-engineering: volume maal marge, in de klassieke kwadranten
     if (ma && (ma.rijen||[]).some(r => r.verkocht > 0 || r.heeftRecept)){
       const KLASSE = { ster: ['', '#D8B940'], werkpaard: ['', '#69B98B'], puzzel: ['', '#7FA6D9'], hond: ['', '#FF8589'], onbekend: ['·', 'var(--soft)'] };
@@ -13,18 +13,18 @@
           '<div class="st-row"><span><b style="color:'+KLASSE[r.klasse][1]+';">'+KLASSE[r.klasse][0]+' '+esc(r.klasse)+'</b> '+esc(r.naam)+'</span>'+
           '<span class="sub">'+r.verkocht+'× · '+T('vr.marge','marge')+' '+geld(r.marge)+' · '+T('vr.winst','winst')+' '+geld(r.brutowinst)+'</span></div>'+
           '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+
-        (mgr?'<button class="bigbtn" id="vrPlan" style="margin-top:0.5rem;">'+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
+        (mgr?'<button class="bigbtn" id="vrPlan" class="h-mt50">'+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
     }
     // het logboek: elke beweging herleidbaar
     if ((d.logboek||[]).length) h += '<div class="card"><div class="tt-h">'+T('vr.log','Laatste bewegingen')+'</div>'+
       d.logboek.slice(0,8).map(l => '<div class="st-row"><span>'+esc(l.artikel)+' <span class="sub">'+esc(l.soort)+' · '+esc(l.oms||'')+' · '+esc(l.wie||'')+'</span></span><b'+(l.delta<0?' style="color:#FF8589;"':' style="color:#69B98B;"')+'>'+(l.delta>0?'+':'')+l.delta+'</b></div>').join('')+'</div>';
     if (mgr) h += '<div class="card"><div class="tt-h">'+T('vr.nieuw','Nieuw item')+'</div>'+
-      '<div class="row-gap" style="margin-top:0.5rem;"><input class="st-in" id="vrNaam" placeholder="'+T('vr.naam','Naam, bijv. Cava brut')+'" style="flex:2;">'+
-      '<input class="st-in" id="vrAantal" type="number" min="0" placeholder="'+T('vr.aantal','aantal')+'" style="flex:1;">'+
-      '<input class="st-in" id="vrMin" type="number" min="0" placeholder="'+T('vr.mindr','min.')+'" style="flex:1;">'+
-      '<input class="st-in" id="vrEenheid" placeholder="'+T('vr.eenheid','eenheid (fles, kg...)')+'" style="flex:1;">'+
-      '<input class="st-in" id="vrKost" type="number" min="0" step="0.01" placeholder="'+T('vr.kostph','€/eenheid')+'" style="flex:1;"></div>'+
-      '<button class="bigbtn" id="vrAdd" style="margin-top:0.5rem;">'+T('vr.voeg','Zet op de lijst')+'</button></div>';
+      '<div class="row-gap h-mt50"><input class="st-in" id="vrNaam" placeholder="'+T('vr.naam','Naam, bijv. Cava brut')+'" class="h-flex2">'+
+      '<input class="st-in" id="vrAantal" type="number" min="0" placeholder="'+T('vr.aantal','aantal')+'" class="h-flex1">'+
+      '<input class="st-in" id="vrMin" type="number" min="0" placeholder="'+T('vr.mindr','min.')+'" class="h-flex1">'+
+      '<input class="st-in" id="vrEenheid" placeholder="'+T('vr.eenheid','eenheid (fles, kg...)')+'" class="h-flex1">'+
+      '<input class="st-in" id="vrKost" type="number" min="0" step="0.01" placeholder="'+T('vr.kostph','€/eenheid')+'" class="h-flex1"></div>'+
+      '<button class="bigbtn" id="vrAdd" class="h-mt50">'+T('vr.voeg','Zet op de lijst')+'</button></div>';
     el.innerHTML = h;
     const doe = async (pad, body) => { try { await API.call(pad, body); renderVoorraad(); } catch(e){ toast(e.message); } };
     // een knop: het advies wordt een echte groothandelsbestelling
@@ -47,10 +47,10 @@
     // het actieplan van de chef-adviseur: kwadranten plus derving, in euro's
     const vp = el.querySelector('#vrPlan'); if (vp) vp.addEventListener('click', async () => {
       const uit = el.querySelector('#vrPlanUit');
-      uit.innerHTML = '<div class="softline" style="margin-top:0.4rem;">'+T('vr.plan.laden','De adviseur rekent...')+'</div>';
+      uit.innerHTML = '<div class="softline h-mt40">'+T('vr.plan.laden','De adviseur rekent...')+'</div>';
       try {
         const p = await API.call('/supplier/keuken/menu-advies', {});
-        uit.innerHTML = '<div class="sub" style="margin-top:0.5rem;">'+esc(p.samenvatting)+'</div>'+
+        uit.innerHTML = '<div class="sub h-mt50">'+esc(p.samenvatting)+'</div>'+
           (p.acties||[]).map(x => '<div style="border-top:1px solid var(--line);padding:0.35rem 0;font-size:0.82rem;">'+
             (x.impact?'<b style="color:var(--gold);">'+geld(x.impact)+'</b> · ':'')+esc(x.tekst)+'</div>').join('');
       } catch(e){ uit.innerHTML = ''; toast(e.message); }

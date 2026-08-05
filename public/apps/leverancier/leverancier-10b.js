@@ -37,7 +37,7 @@
       const vandaagB = new Date().toISOString().slice(0, 10);
       const klaarB = bs.filter(b => b.status === 'afgerond' && String(b.finishedAt || b.at).slice(0, 10) === vandaagB);
       const omzetB = klaarB.reduce((x, b) => x + (b.price || 0), 0);
-      const kaartB = (b, acties) => '<div class="tkc" style="grid-column:1/-1;">'+
+      const kaartB = (b, acties) => '<div class="tkc h-volbreed">'+
         '<div class="tkc-top"><span class="tkc-code" style="font-size:1.2rem;">'+b.customerCodename+'</span><span class="tkc-age">'+(b.wanneer || timeAgo(b.at))+'</span></div>'+
         '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'':'')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--gold);">'+eur(b.price)+'</b></div>'+
         (b.note?'<div class="tkc-alg">'+b.note+'</div>':'')+

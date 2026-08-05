@@ -3,9 +3,9 @@
       // klokuren en een boekhoudkundig correcte cadeaukaartenadministratie
       if (!finData){
         laadFinance();
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       } else if (finData.error){
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+finData.error+'</div></div>';
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+finData.error+'</div></div>';
       } else {
         const f = finData;
         if (finMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+finMsg+'</div>'; }
@@ -23,7 +23,7 @@
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">'+
           '<button class="obtn" id="fnPdf">⤓ '+T('fn.exportpdf','Overzicht (PDF)')+'</button>'+
           '<button class="obtn" id="fnCsv">⤓ '+T('fn.exportcsv','Boekhouding (CSV)')+'</button></div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.land','Land & uurloon')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('fn.land','Land & uurloon')+'</h3>'+
           '<div class="tkc-who">'+T('fn.land.s','Het land bepaalt de btw-tarieven, werkgeverslasten en aangifteregels; het uurloon voedt de personeelskosten.')+'</div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">'+
           '<select class="st-in" id="fnLand" style="flex:2;min-width:130px;">'+f.landen.map(l=>'<option value="'+l.code+'"'+(l.code===f.land?' selected':'')+'>'+l.naam+'</option>').join('')+'</select>'+
@@ -41,7 +41,7 @@
           (f.personeel.vakantiegeld ? '<div class="st-row"><span>'+T('fn.vak','Vakantiegeldreserve')+'<span class="sub">'+f.personeel.vakantiegeldPct+'%</span></span><b>'+eur(f.personeel.vakantiegeld)+'</b></div>' : '')+
           '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.totaal','Totale loonkosten')+'</b></span><b style="color:var(--gold);">'+eur(f.personeel.totaal)+'</b></div>'+
           '<div class="tkc-who">'+T('fn.minuur','Indicatie minimumuurloon')+': € '+f.personeel.uurloonMin+'</div></div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.gc','Cadeaukaarten')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('fn.gc','Cadeaukaarten')+'</h3>'+
           '<div class="st-row"><span>'+T('fn.gcverkocht','Verkocht deze maand')+'<span class="sub">'+T('fn.gcv.s','nog geen omzet, geen btw')+'</span></span><b>'+eur(f.giftcards.verkocht)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcin','Ingewisseld deze maand')+'<span class="sub">'+T('fn.gci.s','omzet + btw-moment')+'</span></span><b>'+eur(f.giftcards.ingewisseld)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcopen','Openstaand saldo')+'<span class="sub">'+T('fn.gco.s','verplichting op de balans')+' · '+f.giftcards.aantal+' '+T('fn.kaarten','kaart(en)')+'</span></span><b style="color:var(--gold);">'+eur(f.giftcards.open)+'</b></div>'+
@@ -61,7 +61,7 @@
           API.call('/supplier/bank/zakelijk', {}).then(d => { zakData = d; zakBusy = false; renderStation(); })
             .catch(e => { zakData = { error: e.message }; zakBusy = false; renderStation(); });
         }
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.zak','Zakelijke rekening (RTG Rekening)')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('fn.zak','Zakelijke rekening (RTG Rekening)')+'</h3>'+
           (!zakData ? '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>'
            : zakData.error ? '<div class="tkc-who">'+zakData.error+'</div>'
            : '<div class="st-row"><span>'+escT(zakData.rekening.naam)+'<span class="sub">'+escT(zakData.rekening.iban)+'</span></span>'+
@@ -69,10 +69,10 @@
              ((zakData.afschrift||[]).slice(0,6).map(r=>'<div class="st-row"><span class="sub">'+escT(r.oms||r.soort)+'</span><span class="sub">'+(r.af?'− ':'+ ')+eur(r.centen/100)+'</span></div>').join('')||'<div class="tkc-who">'+T('fn.zak.leeg','Nog geen boekingen.')+'</div>')+
              '<div class="tkc-who">'+T('fn.zak.s','Hoort gratis bij het financiele hart: elke zaak bankiert onder de eigen vlag, naast de betalingen die via de kaart-rails lopen.')+'</div>')+
           '</div>';
-        html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('fn.ai','AI-boekhouder')+'</h3>'+
+        html += '<div class="tkc h-volbreed"><h3>'+T('fn.ai','AI-boekhouder')+'</h3>'+
           '<div class="tkc-who">'+T('fn.ai.s2','Kent uw branche, uw cijfers en de regels. Stel een vraag, of laat hem u proactief bijsturen met adviezen op uw eigen cijfers.')+'</div>'+
           '<div id="accVragen" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.5rem 0;"></div>'+
-          '<div class="row-gap"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" style="flex:1;">'+
+          '<div class="row-gap"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" class="h-flex1">'+
           '<button class="obtn primary" id="accGo">'+T('fn.vraag','Vraag')+'</button></div>'+
           '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
           '<button class="obtn" id="accAdvies" style="margin-top:0.6rem;">'+T('fn.adviezen','Stuur mij bij, geef adviezen')+'</button>'+

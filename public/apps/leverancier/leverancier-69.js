@@ -1,5 +1,5 @@
     el.innerHTML = '<div class="card"><div class="tt-h">'+T('rc.h','Receptie vandaag')+'</div>'+
-      '<div class="pos-chips" style="margin-top:0.4rem;">'+
+      '<div class="pos-chips h-mt40">'+
         '<span>'+r.bezetting.bezet+' / '+r.bezetting.totaal+' '+T('rc.bezet','bezet')+'</span>'+
         (r.bezetting.vuil?'<span>'+r.bezetting.vuil+' '+T('rc.vuil','voor housekeeping')+'</span>':'')+
         (r.aanvragen.length?'<span>'+r.aanvragen.length+' '+T('rc.aanvragen','aanvraag(en)')+'</span>':'')+
@@ -13,7 +13,7 @@
         '<button class="obtn js-vbuit">'+T('rc.checkout','Check-out')+'</button>',
         T('rc.tot','tot')+' '+v.vertrek+(v.vertrek<=r.datum?' · <b style="color:var(--gold);">'+T('rc.vandaagweg','vertrekt vandaag')+'</b>':'')+(v.openLast?' · '+T('rc.open','rekening')+' <b>'+eur(v.openLast)+'</b>':''))).join(''):'')+
       (r.komend.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.komend','Komende dagen')+'</div>'+r.komend.map(v => rij(v, '')).join(''):'')+
-      (leeg?'<div class="softline" style="margin-top:0.5rem;">'+T('rc.leeg','Nog geen verblijven. Zodra een gast boekt, staat het hier.')+'</div>':'')+
+      (leeg?'<div class="softline h-mt50">'+T('rc.leeg','Nog geen verblijven. Zodra een gast boekt, staat het hier.')+'</div>':'')+
       '</div>';
     el.querySelectorAll('[data-vb]').forEach(elv => {
       const id = elv.dataset.vb;
@@ -36,7 +36,7 @@
     let html = '<div id="receptieWrap"></div><div id="planWrap"></div><div class="card">';
     html += rooms.length ? rooms.map(r => {
       const hk = (r.hk && r.hk.status) || 'schoon';
-      return '<div class="room-row'+(r.available?'':' off')+'" style="flex-wrap:wrap;">'+
+      return '<div class="room-row'+(r.available?'':' off')+' h-wrap">'+
         '<div class="rr-t"><b>'+r.name+' <span class="hk-pill hk-'+hk+'">'+tHk(hk)+'</span>'+
           (r.vroegVrij ? ' <span class="hk-pill hk-schoon">'+T('hk.vroegvrij','vroege check-in')+'</span>' : '')+'</b>'+
           '<span>'+(r.desc||'')+' · '+eur(r.price)+' '+T('sup.pernight','p.n.')+
@@ -50,7 +50,7 @@
         (hkDefectFor===r.id ? '<div class="tt-add" style="width:100%;"><input id="hkNote" placeholder="'+T('hk.noteph','Wat is er kapot?')+'"><button id="hkNoteOk">'+T('hk.report','Meld defect')+'</button></div>' : '')+
       '</div>';
     }).join('') : '<div class="softline">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>';
-    html += '<div class="tt-add" style="flex-wrap:wrap;">'+
+    html += '<div class="tt-add h-wrap">'+
       '<input id="rmName" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;min-width:120px;">'+
       '<input id="rmPrice" type="number" inputmode="decimal" placeholder="€" style="flex:1;min-width:70px;">'+
       '<button id="rmAdd">'+T('team.add','Toevoegen')+'</button></div>';

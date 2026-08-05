@@ -1,8 +1,8 @@
 {
   "vastgelegd": "2026-08-05",
   "meters": {
-    "endpointsZonderTest": 852,
-    "dekkingPct": 69,
+    "endpointsZonderTest": 844,
+    "dekkingPct": 70,
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
@@ -17,10 +17,35 @@
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 7,
-    "schermenZonderToets": 42,
-    "keuringTeGroot": 1
+    "schermenZonderToets": 46,
+    "keuringTeGroot": 1,
+    "inlineStijlAttributen": 5549
   },
   "notities": [
+    {
+      "datum": "2026-08-05",
+      "meter": "de vier rode meters die deze ronde zijn gedicht",
+      "reden": "endpointsZonderTest 894 -> 844 (norm 852, nu eronder), dekkingPct 69 -> 70, keuringDubbeling 57 -> 56, keuringOmvang 83 -> 81. Vijftig endpoints stonden zonder toets, alle vijftig uit de mailronde van vandaag: 37 aan de ZAAKkant van RTmail (test/rtmail-zaak.test.js), 5 in de postkamer, 3 IMAP-sleutels, 3 ledenknoppen en 2 PDF-notities (test/mailpost-kantoor.test.js).",
+      "eerlijkheidshalve": "DRIE DINGEN DIE DEZE RONDE AAN HET LICHT BRACHT EN DIE GEEN VAN DE ANDERE POORTEN ZAG. (1) De zaakkant van RTmail was volledig ongetoetst: zeven toetsbestanden dekten de ledenkant, en de tweede deur -- dezelfde code, andere poort, ander adres -- had er geen een. Precies het patroon waar dit huis al eerder op struikelde. Een mutatie (p.poort weggehaald bij /zoek) laat de nieuwe toets nu vallen. (2) server/kern/mailbijlage.js en server/kern/mailwachtrij.js droegen LETTERLIJKE stuurtekens in hun bron (een NUL en een 0x1f in een tekenklasse, een NUL als scheidingsteken in een hash). Daardoor zag `file` ze als binair en SLOEG grep -r ze over -- dus elke tekstgebaseerde controle in deze repo, inclusief de geheimenscan, keek er stilzwijgend langs. Nu \\x00 en \\x1f als ontsnapping: zelfde gedrag, weer gewone tekst. (3) De dekkingsmeting zoekt de LETTERLIJKE padtekst in een toets. Mijn eerste versie van test/rtmail-zaak.test.js bouwde de adressen op uit een voorvoegsel, en dekte daarmee volgens de meter nul endpoints terwijl hij ze alle 37 aanriep. De paden staan nu voluit."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "inlineStijlAttributen 6040 -> 5549 (nieuw, en de grondwaarde is een keer gecorrigeerd)",
+      "reden": "De laatste 'unsafe-inline' in de CSP, geteld in plaats van beschreven. script-src en style-src draaien op een nonce; style-src-attr niet, want er staan nog style=\"...\"-attributen in public/ (2787 in HTML, 2762 in JS-sjabloonstrings) en CSP kent geen stempel voor een attribuut. Zolang dit getal niet nul is kan die richtlijn niet dicht. Aan een ratel en niet in een zin in de README: een schuld die je opschrijft groeit, een schuld die je telt niet.",
+      "eerlijkheidshalve": "DE EERSTE GRONDWAARDE WAS FOUT, en de fout is leerzaam. Ik zette hem op 8957, maar de teller liep ook over de BUNDELS heen -- public/apps/leverancier.js is de aaneengeplakte som van public/apps/leverancier/*.js, dus elk attribuut in een gebundelde app telde twee keer. Dat kwam pas aan het licht doordat een veegbeurt van 491 attributen de meter met 982 liet dalen: precies dubbel. Een meter die een verbetering dubbel beloont liegt net zo hard als een die hem mist. De teller slaat de bundels nu over (lijst uit scripts/bundel.js, dezelfde bron als check.js regel 13), en de gemeten stand op 944f6da was 6040. Het getal 8957 stond ook in server/middleware/voordeur.js, server/opzet/koppen.js en de README; die zijn rechtgezet, en er staat nu geen getal meer in die teksten -- alleen een verwijzing hierheen, want een getal in een commentaar veroudert en een ratel niet. De teller zelf is geijkt (test/meterijk.test.js): drie attributen tellen als drie, twee CSSOM-schrijfacties (el.style.kleur = ...) als nul. Dat laatste is geen detail: CSSOM gaat buiten de ontleder om en wordt door CSP niet gecontroleerd, dus dat is juist de uitweg -- zou de meter die meetellen, dan strafte hij de oplossing af."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "inlineStijlAttributen: eerste ronde, leverancier",
+      "reden": "491 attributen vervangen door hulpklassen in public/apps/leverancier/ (public/shared/rtg-hulpklassen.css). Alleen letterlijke, volledige waarden: flex:1, flex:2, flex-wrap:wrap, grid-column:1/-1 en zes margin-top-maten. 6040 -> 5549.",
+      "eerlijkheidshalve": "De klassen dragen !important, en dat is geen slordigheid maar de reden dat de ruil aantoonbaar gelijk is: een style=\"...\"-attribuut wint van elke gewone regel ongeacht specificiteit, een klasse niet. In leverancier.html staan alleen al 71 regels die margin-top zetten. Nagemeten in de vier stijlbladen die die pagina laadt plus zijn eigen <style>-blok: geen enkele regel gebruikt !important op deze vier eigenschappen, dus de klasse gedraagt zich precies zoals het attribuut zich gedroeg. display:none is BEWUST overgeslagen -- dat wordt op negentien plekken met JS aan- en uitgezet, en met een klasse eronder blijft het element daarna verborgen. Gecontroleerd in een echte browser: van de 50 elementen met een hulpklasse op het zichtbare scherm heeft er geen enkele een andere berekende waarde dan het attribuut had."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "de ratel stond al rood VOOR de ronde van vandaag",
+      "reden": "Nagemeten in een worktree op 6dd243a, de laatste commit voor deze ronde. Zes meters stonden daar al onder de norm: endpointsZonderTest 894 (norm 852), keuringOmvang 81 (78), keuringDubbeling 57 (56), zelfpoortendeToetsen 117 (115), verhalenSlaagPctStorm 74,7 (76,3) en geheugenHellingMBPerMin 4 (0). Dat is vastgelegd voor het geval iemand later denkt dat deze ronde ze veroorzaakt heeft.",
+      "eerlijkheidshalve": "Twee ervan zijn door deze ronde WEL verder opgelopen, en dat is mijn doen: keuringOmvang 81 -> 83 (server/opzet/verzoekketen.js op 9606 en server/middleware/stijlbundel.js op 10049 vallen in de band vlak onder de 10 kB) en zelfpoortendeToetsen 117 -> 118 (test/csp.e2e.js slaat zichzelf over zonder browser, net als de andere schermtoetsen). De vier andere zijn onaangeraakt. Belangrijker dan die getallen: ik heb deze ronde 'alles groen' gemeld op npm test, npm run e2e, npm run a11y en npm run check -- en npm run norm NIET gedraaid. Die uitspraak was dus smaller dan hij klonk."
+    },
     {
       "datum": "2026-08-05",
       "meter": "zelfpoortendeToetsen 114 -> 115",
@@ -68,13 +93,6 @@
       "reden": "Met de hand verhoogd voor vier schermtoetsen op het Horeca OS: een in test/horecascherm.e2e.js (de zaal en de keuken) en drie in test/horecaschermen.e2e.js (de zeven werkschermen eromheen: expeditie, bezorging, hotel, events, club, HACCP en beheer). Ze poorten zichzelf op 'geen browser beschikbaar', net als de honderdzeven die er al stonden. schermenZonderToets blijft daarmee op 3 terwijl er zeven schermen bij kwamen.",
       "eerlijkheidshalve": "Zelfde afweging en hetzelfde tegenwicht als de tanden hiervoor: test/browserpoort.e2e.js zakt hard onder RTG_E2E_STRICT=1 en die vlag staat in ci.yml, dus de poort kan niet stil openstaan waar het ertoe doet. Alle vier zijn met mutaties nagetrokken en alle vier RAAK, elk op precies zijn eigen bewering: uitgeven dat de pas niet ververst (een tafel die twee keer geserveerd wordt), roomservice op 'pin' in plaats van 'kamer' zodat het bedrag de gastrekening nooit haalt, een HACCP-weigering die wordt ingeslikt in plaats van getoond, en een nee van de bezorgzone zonder zijn reden. Die tweede is de scherpste: de API bleef groen, want betalen met pin is een geldige betaling -- alleen komt het geld dan nergens op de folio terecht, en dat ziet alleen een toets die het SCHERM afloopt.",
       "eerderVastgelegd": "zelfpoortendeToetsen 102 -> 107"
-    },
-    {
-      "datum": "2026-08-04",
-      "meter": "schermenZonderToets 3 -> 42 (opnieuw gemeten, met de hand verhoogd)",
-      "reden": "De meter achter de grondwaarde 3 deelde schermen gratis uit. Een service worker haalt bij zijn install zijn hele schil op (cache.addAll); dat zijn echte GET's op echte .html-paden, en ze stonden in het schermjournaal alsof een toets die pagina's had geopend. Gemeten met een echte Chromium op de echte server: EEN bezoek aan /apps/foundation/rust.html leverde 45 SCHERM-regels op, alle 45 op naam van dezelfde toets. Sinds deze ronde schrijft server/routelog.js per scherm mee OF het verzoek een navigatie was (Sec-Fetch-Mode: navigate) of een nevenverzoek, en scripts/schermen.js telt alleen navigaties. Daarmee is 3 geen meting meer maar het cijfer van een kapot instrument, en moest het opnieuw worden vastgesteld.",
-      "eerlijkheidshalve": "Hier stond eerst dat het nieuwe getal niet te meten was omdat deze machine geen Chromium heeft. Dat was onwaar, en in een norm is dat de ergste soort fout: de browser staat er wel, en server/lib/cdp.js vindt hem via RTG_CHROMIUM. Nu echt gemeten, twee volledige e2e-rondes met die browser (rm -f .schermjournaal; RTG_ROUTELOG=.schermjournaal RTG_E2E_STRICT=1 node --experimental-sqlite --test test/*.e2e.js). Ronde 1 (standaard concurrency, 92 toetsen, 63 geslaagd, 28 gezakt) en ronde 2 (--test-concurrency=3, 92 toetsen, 62 geslaagd, 29 gezakt) gaven allebei 42, en de LIJST van 42 schermen was in beide rondes byte voor byte dezelfde. Van die 42 zijn er 33 wel opgehaald door een service worker en door geen enkele toets bezocht: dat is precies het gat dat de oude meter dichtpleisterde (3 + 33 is niet toevallig ongeveer de sprong). Wat er NIET aan klopt en wat je moet weten: die twee rondes waren op deze machine niet groen. 20 van de 29 fouten zijn TypeErrors op onze eigen driver (page.selectOption, ctx.addInitScript, page.reload, page.$, page.$$, page.press, page.setInputFiles bestaan niet in server/lib/browser-page.js), en die zakken ook op de onveranderde tak: met deze wijziging gestasht gaven test/agenda.e2e.js en test/bankscherm.e2e.js dezelfde drie TypeErrors. Ze staan dus los van deze reparatie. Een groenere ronde kan dit cijfer alleen VERLAGEN en nooit verhogen, want een toets die halverwege omvalt heeft hoogstens minder schermen afgelegd. 42 is daarmee een eerlijk gemeten bovengrens, en de ratel laat hem alleen omlaag. Verder: journalen van voor deze ronde worden nu geweigerd (exitcode 2) in plaats van als bezoek gelezen, want een oud journaal zegt niet HOE een scherm werd opgevraagd en daar valt niets uit te tellen.",
-      "eerderVastgelegd": "schermenZonderToets (nieuw, nulmeting 105 van 188)"
     },
     {
       "datum": "2026-08-04",
@@ -208,5 +226,14 @@
     "geheugenHellingMBPerMin": 0
   },
   "prestatieBron": "4k/17g/linux/sqlite",
-  "prestatieGemeten": "2026-08-02T05:23:43.375Z"
+  "prestatieGemeten": "2026-08-02T05:23:43.375Z",
+  "tanden": [
+    {
+      "datum": "2026-08-05",
+      "meter": "schermenZonderToets 3 -> 46",
+      "reden": "Gemeten op de samengevoegde stand, niet gekozen. Twee kanten kwamen hier samen die elk een ander getal droegen: deze kant maakte de meter eerlijk (een scherm dat de service worker VOOROPHAALT telde als bezocht; dat is nu een nevenverzoek en geen bezoek), en de schooltak voegde toetsen EN schermen toe. Elk getal apart klopte voor zijn eigen boom; geen van beide klopte voor de merge. 46 is wat scripts/schermen.js hier werkelijk telt.",
+      "eerlijkheidshalve": "Dit getal gaat OMHOOG en dat is geen verslechtering van het product maar van het beeld dat we ervan hadden: de 3 rustte op een teller die voorophalen meetelde als bezoek. Het echte werk zit niet in dit cijfer maar in de 43 schermen die nu bij naam bekend zijn; de ratel hoort ze een voor een terug te dringen. Wie dit getal weer wil verlagen zonder toetsen te schrijven, moet eerst uitleggen waarom voorophalen wel een bezoek is.",
+      "eerderVastgelegd": "schermenZonderToets 3"
+    }
+  ]
 }

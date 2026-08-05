@@ -28,9 +28,8 @@
       DIT DEEL DUURT UREN, en dat is geen ontwerpfout maar de prijs: elke
       servertoets moet twee keer draaien (een keer eerlijk om vast te stellen dat
       hij groen IS, een keer liegend) en elke ronde start een echte server. Daarom
-      schrijft de motor na ELK bestand naar MUTATIES.json en slaat hij bij een
-      volgende ronde over wat er al in staat. Afbreken kost je dus niets, en
-      --opnieuw doet alles over.
+      houdt de motor zijn voortgang buiten de repo bij (zie VOORTGANG) en slaat
+      hij over wat al gemeten is. Afbreken kost niets; --opnieuw doet alles over.
 
    WAT DEZE MOTOR NIET BEWEERT, en dit hoort er eerlijk bij:
 
@@ -45,8 +44,13 @@
    - Een module die niets teruggeeft (alleen in de database schrijft) kan onder
      al deze mutaties terecht groen blijven.
 
-   Uitslag in MUTATIES.json; BEWIJS.md leest die en zet er per toets
-   "gemeten"/"gezakt"/"overleefd" in plaats van een woord uit commentaar.
+   - Een bestand dat zichzelf HELEMAAL overslaat (chaos.pg.test.js zonder
+     Postgres) meldt ook met een mutatie in de bron netjes "0 gezakt". Dat heet
+     hier "slaat zichzelf over" en niet "overleefd": de motor beschuldigt geen
+     toets van iets wat hij niet gedaan heeft -- hij heeft niets gedaan.
+
+   Uitslag in MUTATIES.json; BEWIJS.md leest die en zet er per toets de gemeten
+   stand in plaats van een woord uit commentaar.
 
    Draai:  node scripts/mutatie.js               (alles -- lang)
            node scripts/mutatie.js --puur        (alleen A)
@@ -147,7 +151,16 @@ function draaiToets(bestand, env) {
   const uit = String(r.stdout || '');
   const gezakt = (uit.match(/^not ok /gm) || []).length;
   const geteld = /^# tests (\d+)/m.exec(uit);
-  return { gezakt, toetsen: geteld ? Number(geteld[1]) : 0, tijdout: r.error && r.error.code === 'ETIMEDOUT' };
+  /* OOK DE OVERGESLAGEN TOETSEN TELLEN, en dat is geen bijzaak. Een bestand dat
+     zichzelf helemaal overslaat (chaos.pg.test.js zonder Postgres, een e2e zonder
+     browser) meldt netjes "0 gezakt" -- ook met een mutatie in de bron. Zonder
+     deze telling heet dat "overleefd", en dan beschuldigt de motor een toets van
+     iets wat hij niet heeft gedaan: hij heeft niets gedaan. */
+  const over = /^# skipped (\d+)/m.exec(uit);
+  const toetsen = geteld ? Number(geteld[1]) : 0;
+  const overgeslagen = over ? Number(over[1]) : 0;
+  return { gezakt, toetsen, overgeslagen, alGeslagen: toetsen > 0 && overgeslagen >= toetsen,
+    tijdout: r.error && r.error.code === 'ETIMEDOUT' };
 }
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets
@@ -178,6 +191,7 @@ function proefPuur(naam, posities) {
   if (nul.tijdout) return { soort: 'puur', staat: 'te langzaam' };
   if (nul.gezakt > 0) return { soort: 'puur', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
   if (!nul.toetsen) return { soort: 'puur', staat: 'geen toetsen gedraaid' };
+  if (nul.alGeslagen) return { soort: 'puur', staat: 'slaat zichzelf over', overgeslagen: nul.overgeslagen };
   const modules = modulesVan(bestand);
   if (!modules.length) return { soort: 'puur', staat: 'geen module gevonden' };
 
@@ -223,6 +237,7 @@ function proefServer(naam) {
   if (nul.tijdout) return { soort: 'server', staat: 'te langzaam' };
   if (nul.gezakt > 0) return { soort: 'server', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
   if (!nul.toetsen) return { soort: 'server', staat: 'geen toetsen gedraaid' };
+  if (nul.alGeslagen) return { soort: 'server', staat: 'slaat zichzelf over', overgeslagen: nul.overgeslagen };
   const na = draaiToets(bestand, { RTG_LIEG: '/api/' });
   return na.gezakt > 0
     ? { soort: 'server', staat: 'gezakt', operator: 'liegpoort /api/', gezakt: na.gezakt }

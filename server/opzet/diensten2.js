@@ -48,6 +48,22 @@ const rtmail = require('../kern/rtmail')({ db, save, crypto });
    is -- een team mag nooit het postvak van een persoon of zaak kapen. */
 const rtmailTeam = require('../kern/rtmail-team')({ db, save, crypto, rtmail, findSupplier,
   CODENAMES: require('../accounts/kluis').CODENAMES });
+/* Het postvak zelf: mappen, etiketten, favorieten, sluimeren en zoeken. Staat
+   apart omdat de toestand PER BUS hangt en niet op het bericht -- anders
+   verdwijnt post uit de verzonden-map van de afzender zodra de ontvanger hem
+   opbergt. En de draad (het gesprek), die daarop leunt. */
+const rtmailVak = require('../kern/rtmail-vak')({ db, save, rtmail });
+const rtmailDraad = require('../kern/rtmail-draad')({ db, rtmail, vak: rtmailVak });
+/* De schrijfkant (concepten, uitgesteld verzenden, handtekening, afwezigheid,
+   aliassen) en de regels die BIJ DE BEZORGING draaien. De regels hangen aan de
+   haak in kern/rtmail.js, zodat ze langs elke bezorging komen -- ook langs post
+   die 's nachts uit een automatisering of van buiten binnenvalt, en dat is nu
+   juist de post waarvoor iemand een regel maakt. */
+const rtmailVrij = require('../kern/rtmail-vrij')({ rtmail, findSupplier,
+  CODENAMES: require('../accounts/kluis').CODENAMES });
+const rtmailSchrijf = require('../kern/rtmail-schrijf')({ db, save, crypto, rtmail, vrij: rtmailVrij });
+const rtmailRegels = require('../kern/rtmail-regels')({ db, save, crypto, rtmail, vak: rtmailVak, schrijf: rtmailSchrijf });
+rtmail.zetNaBezorging(rtmailRegels.naBezorging);
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
 const automatisering = require('../kern/automatisering')({ rtmail });
 // Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
@@ -139,6 +155,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, rtmail, rtmailTeam, scanNet, wacht, werkmail
+    resolveSession, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, scanNet, wacht, werkmail
   };
 };

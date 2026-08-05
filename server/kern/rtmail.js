@@ -89,7 +89,7 @@ module.exports = ({ db, save, crypto }) => {
      worden -- niet door de client. Een bijlage bestaat niet: wat er ook binnenkomt,
      er wordt niets opgeslagen dat te openen valt. Geeft het bezorgde bericht terug
      (of een { error } bij een leeg adres). */
-  function stuur({ van, naar, onderwerp, tekst, soort, bron } = {}) {
+  function stuur({ van, naar, onderwerp, tekst, soort, bron, antwoordOp } = {}) {
     const naarA = normAdres(naar);
     if (!naarA) return { error: 'Geen geldig ontvang-adres.' };
     const vanA = normAdres(van) || SYSTEEM;
@@ -111,11 +111,35 @@ module.exports = ({ db, save, crypto }) => {
       gelezen: false
     };
     const s = store();
+    /* De DRAAD (het gesprek). Een antwoord erft de draad van het bericht waarop
+       het antwoordt; een nieuw bericht begint zijn eigen draad met zijn eigen
+       id. Bewust GEEN groepering op onderwerp: "Re: vraag" van twee losse
+       klanten zou dan in een gesprek belanden, en in een gedeeld postvak zie je
+       zo andermans post. Liever een draad te veel dan een verkeerde. */
+    if (antwoordOp) {
+      const ouder = s.berichten.find(x => x.id === antwoordOp);
+      if (ouder) { msg.draad = ouder.draad || ouder.id; msg.antwoordOp = ouder.id; }
+    }
+    if (!msg.draad) msg.draad = msg.id;
     s.berichten.unshift(msg);
     if (s.berichten.length > MAX) s.berichten.length = MAX;
     save();
+    /* NA DE BEZORGING. De regels van een postvak en het afwezigheidsbericht
+       horen te draaien voor ELKE bezorging, niet alleen voor post die
+       toevallig via de app binnenkomt -- een automatisering, de werkmail-poort
+       en een antwoord komen alle drie hier langs. De haak wordt door
+       opzet/diensten2.js gezet zodra kern/rtmail-regels.js bestaat; blijft hij
+       leeg, dan gedraagt RTMAIL zich precies als voorheen.
+       Een fout in een regel mag de BEZORGING nooit ongedaan maken: het bericht
+       is dan al bezorgd, en dat is de belangrijkste helft. */
+    if (naBezorging) {
+      try { naBezorging(msg); } catch (e) { console.warn('[rtmail] regel mislukt na bezorging:', e && e.message); }
+    }
     return msg;
   }
+
+  let naBezorging = null;
+  const zetNaBezorging = (fn) => { naBezorging = typeof fn === 'function' ? fn : null; };
 
   // De rail voor de automatiseringen: het platform stuurt vanuit "rtg@rtmail"
   // (bron 'systeem', altijd vertrouwd).
@@ -129,6 +153,7 @@ module.exports = ({ db, save, crypto }) => {
     vertrouwd: m.vertrouwd != null ? !!m.vertrouwd : (m.van === SYSTEEM),
     links: m.links || scanLinks(m.tekst),
     bijlagen: [],
+    draad: m.draad || m.id, antwoordOp: m.antwoordOp || null,
     at: m.at, gelezen: !!m.gelezen
   });
 
@@ -156,6 +181,7 @@ module.exports = ({ db, save, crypto }) => {
   }
 
   return { SYSTEEM, VERTROUWDE_BRONNEN, normAdres, scanLinks, stuur, systeemStuur, postvak, verzonden, ongelezen, lees,
+    zetNaBezorging,
     // de adreslaag doorgeven, zodat routes en tests er maar een bron voor hebben
     DOMEINEN: adresLaag.DOMEINEN, adresVoor: adresLaag.adresVoor, ontleed: adresLaag.ontleed,
     soortVoor: adresLaag.soortVoor, zelfdeBus };

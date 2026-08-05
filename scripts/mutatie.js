@@ -103,14 +103,24 @@ function codemasker(bron) {
   return masker;
 }
 
-/* Een operator toepassen op de EERSTE plek die in code staat. Geeft de nieuwe
-   bron terug, of null als er geen plek is. */
-function muteer(bron, op) {
+/* Een operator toepassen op de n-DE plek die in code staat (n vanaf 0). Geeft de
+   nieuwe bron terug, of null als die plek niet bestaat.
+
+   WAAROM ER EEN INDEX IN ZIT, en dat is een correctie op de eerste versie. Die
+   muteerde alleen de EERSTE plek per operator. Uitkomst: `anthropic.test.js`
+   heette "overleefd" terwijl `ai-cache.test.js` diezelfde module
+   (server/anthropic.js) met `===->!==` prima liet omvallen -- mijn negen schoten
+   hadden alleen geen code geraakt die die ene toets aanroept. "Overleefd" betekende
+   toen deels "de motor mikte mis", en dat is een uitslag die de verkeerde partij
+   de schuld geeft. Nu gaat de motor bij een overlever DIEPER: meer plekken per
+   operator. Zie proefPuur. */
+function muteer(bron, op, index) {
   const masker = codemasker(bron);
   const re = new RegExp(op.zoek.source, 'g');
-  let m;
+  let m, n = 0;
   while ((m = re.exec(bron))) {
     if (!masker[m.index]) continue;
+    if (n++ < (index || 0)) continue;
     const vervanging = m[0].replace(new RegExp(op.zoek.source), op.zet);
     return bron.slice(0, m.index) + vervanging + bron.slice(m.index + m[0].length);
   }
@@ -146,7 +156,8 @@ function modulesVan(bestand) {
 
 /* EEN PURE TOETS. Groen zonder mutatie is een voorwaarde: staat hij al rood, dan
    bewijst "hij zakt" niets (LAT.md regel 3 -- een meter zonder invoer meet niet). */
-function proefPuur(naam) {
+function proefPuur(naam, posities) {
+  const diep = posities || 1;
   const bestand = path.join(TEST, naam);
   const nul = draaiToets(bestand);
   if (nul.gezakt > 0) return { soort: 'puur', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
@@ -154,24 +165,29 @@ function proefPuur(naam) {
   const modules = modulesVan(bestand);
   if (!modules.length) return { soort: 'puur', staat: 'geen module gevonden' };
 
+  let geprobeerd = 0;
   for (const rel of modules) {
     const p = path.join(WORTEL, rel);
     const origineel = fs.readFileSync(p, 'utf8');
-    for (const op of OPERATOREN) {
-      const nieuw = muteer(origineel, op);
-      if (!nieuw || nieuw === origineel) continue;
-      try {
-        fs.writeFileSync(p, nieuw);
-        const check = spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' });
-        if (check.status !== 0) continue;         // mutatie brak de syntaxis: telt niet
-        const na = draaiToets(bestand);
-        if (na.gezakt > 0) return { soort: 'puur', staat: 'gezakt', module: rel, operator: op.naam, gezakt: na.gezakt };
-      } finally {
-        fs.writeFileSync(p, origineel);
+    for (let i = 0; i < diep; i++) {
+      for (const op of OPERATOREN) {
+        const nieuw = muteer(origineel, op, i);
+        if (!nieuw || nieuw === origineel) continue;
+        try {
+          fs.writeFileSync(p, nieuw);
+          const check = spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' });
+          if (check.status !== 0) continue;       // mutatie brak de syntaxis: telt niet
+          geprobeerd++;
+          const na = draaiToets(bestand);
+          if (na.gezakt > 0) return { soort: 'puur', staat: 'gezakt', module: rel,
+            operator: op.naam + '#' + i, gezakt: na.gezakt, geprobeerd };
+        } finally {
+          fs.writeFileSync(p, origineel);
+        }
       }
     }
   }
-  return { soort: 'puur', staat: 'overleefd', modules, operatoren: OPERATOREN.length };
+  return { soort: 'puur', staat: 'overleefd', modules, geprobeerd, posities: diep };
 }
 
 function isServerToets(naam) {
@@ -239,7 +255,26 @@ if (require.main === module) {
     }
   };
 
-  if (alleen !== 'server') { console.log('  --- A: pure toetsen, bronmutatie ---'); doe(puur, proefPuur); }
+  if (alleen !== 'server') {
+    console.log('  --- A: pure toetsen, bronmutatie (eerste plek per operator) ---');
+    doe(puur, (n) => proefPuur(n, 1));
+    /* DE DIEPE RONDE, alleen over de overlevers. Een overlever kan twee dingen
+       betekenen -- de toets legt het gedrag niet vast, of de motor heeft geen code
+       geraakt die deze toets aanroept -- en die twee mag je niet op een hoop
+       gooien. Meer plekken per operator, en alleen voor de minderheid die het
+       nodig heeft; anders kost de eerste ronde al uren. */
+    const overlevers = puur.filter(n => uitslag[n] && uitslag[n].staat === 'overleefd');
+    if (overlevers.length) {
+      console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, acht plekken per operator ---');
+      for (const naam of overlevers) {
+        const r = proefPuur(naam, 8);
+        uitslag[naam] = r;
+        bewaar();
+        console.log('        ' + naam.padEnd(42) + r.staat +
+          (r.operator ? '  [' + r.operator + ' in ' + r.module + ']' : '  (' + (r.geprobeerd || 0) + ' mutaties geprobeerd)'));
+      }
+    }
+  }
   if (alleen !== 'puur') { console.log('  --- B: servertoetsen, liegpoort ---'); doe(server, proefServer); }
 
   const per = (s) => Object.values(uitslag).filter(x => x.staat === s).length;

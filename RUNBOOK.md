@@ -116,6 +116,7 @@ Voor een datalek is er een eigen draaiboek met de 72-uursklok: `DATALEK.md`.
 | is er iets slechter geworden? | `npm run norm` |
 | wat is de architectuur nu? | `npm run kaart` (schrijft `ARCHITECTUUR.md`) |
 | wat bewijst welke toets? | `npm run bewijs` (schrijft `BEWIJS.md`) |
+| kan een toets eigenlijk zakken? | `npm run mutatie` (schrijft `MUTATIES.json`; het serverdeel duurt uren en is hervatbaar) |
 | hoe breed reikt een domein in de kern? | `npm run grenzen` |
 | welke endpointgroepen kunnen liegen zonder dat een toets omvalt? | `npm run leugens` (lang: een volle suite per groep) |
 | hoe houdt hij het onder last? | `npm run beproeving` |

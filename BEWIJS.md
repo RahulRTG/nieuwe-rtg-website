@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 612 bestanden en 3341 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 613 bestanden en 3344 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 612 |
-| losse beweringen (`test(...)`) | 3341 |
+| toetsbestanden | 613 |
+| losse beweringen (`test(...)`) | 3344 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 3 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 46 |
 | **overleefd**: geen mutatie kreeg hem rood | 7 |
 | niet te meten (al rood, geen module gevonden, ...) | 4 |
-| alleen in de kop *genoemd*, nog niet gemeten | 24 |
+| alleen in de kop *genoemd*, nog niet gemeten | 25 |
 | niets van beide | 531 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-544 bestanden, 3238 beweringen.
+545 bestanden, 3241 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -303,6 +303,7 @@ toets omvalt.
 | `mrz.test.js` | 5 | -- | De MRZ-lezer (de twee <<<-regels onderaan een paspoort): pure ontleding + ICAO-controlecijfers (7-3-1). We toetsen met het officiele ICAO-voorbeeld ("ANNA MARIA ERIKSSON") en met opzettelijk foute controlecijfers,... |
 | `multi-instance-sqlite.test.js` | 1 | -- | Multi-instance: twee losse serverprocessen achter dezelfde gedeelde SQLite- opslag (store.db), zoals achter de poortwachter draaien. Elke top-level collectie is een rij met een oplopend versienummer; een korte... |
 | `munten.test.js` | 4 | -- | Munten ontvangen en omzetten. RTG accepteert crypto voor zijn eigen diensten en zet ze meteen om naar euro's via een aanbieder-naad; zelf nooit crypto in bezit. |
+| `mutatiewacht.test.js` | 3 | genoemd | DE OPRUIMWACHT VAN DE MUTATIEMOTOR: zet hij de bron ook terug bij een KILL? WAAR DIT UIT KOMT. |
 | `muziek-lied.test.js` | 6 | -- | RTG Klankwerk: van een lus een LIED maken. Wat hier getoetst wordt is de belofte "echte liedjes zonder er eerst voor te studeren": er komt een VORM uit (intro, couplet, refrein), een ZANGLIJN met lettergrepen... |
 | `muziek-uitgave.test.js` | 9 | -- | RTG Klankwerk: zang, samen produceren en uitgeven. De zwaarste belofte die hier getoetst wordt: DE RTG-NAAM KOMT ER NOOIT VANZELF ONDER. |
 | `muziek.test.js` | 9 | -- | RTG Studio: zelf muziek maken. Toetst de drie beloftes van kern/muziek.js -- alles wordt opgewekt en niets geleend (dus mag je eigen stuk onder je eigen clip), Rahul zet neer maar jij bent de maker, en het stuk is... |

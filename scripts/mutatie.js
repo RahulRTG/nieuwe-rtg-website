@@ -143,6 +143,28 @@ function muteer(bron, op, index) {
   return null;
 }
 
+/* DE OPRUIMWACHT, en die komt uit een echte breuk. Een `finally` zet de bron
+   netjes terug bij een normale afloop, maar NIET als het proces wordt afgebroken:
+   ik heb de motor met een kill gestopt terwijl hij `server/lokaal-tls.js`
+   gemuteerd had staan, en die mutatie (`return true` -> `false` in het
+   CA-certificaat-loket) bleef in de werkboom achter. Een uur later had die
+   ongemerkt in een commit kunnen zitten.
+
+   Dus houdt de motor bij wat er OP DIT MOMENT gemuteerd is, en zet hij dat terug
+   bij SIGINT, SIGTERM en een onverwachte uitzondering. Regel 36 van
+   scripts/check.js vangt zo'n restant in een COMMIT; deze wacht voorkomt dat hij
+   er ooit komt. */
+const open = new Map();                  // pad -> originele inhoud
+function zetTerug() {
+  for (const [p, bron] of open) { try { fs.writeFileSync(p, bron); } catch (e) { /* niets meer aan te doen */ } }
+  open.clear();
+}
+for (const sein of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+  process.on(sein, () => { zetTerug(); process.exit(130); });
+}
+process.on('uncaughtException', (e) => { zetTerug(); console.error(e); process.exit(1); });
+process.on('exit', zetTerug);
+
 function draaiToets(bestand, env) {
   const r = spawnSync('node', ['--experimental-sqlite', '--test', bestand], {
     cwd: WORTEL, encoding: 'utf8', timeout: 240000, maxBuffer: 64 * 1024 * 1024,
@@ -204,6 +226,7 @@ function proefPuur(naam, posities) {
         const nieuw = muteer(origineel, op, i);
         if (!nieuw || nieuw === origineel) continue;
         try {
+          open.set(p, origineel);                 // de opruimwacht weet er nu van
           fs.writeFileSync(p, nieuw);
           const check = spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' });
           if (check.status !== 0) continue;       // mutatie brak de syntaxis: telt niet
@@ -213,6 +236,7 @@ function proefPuur(naam, posities) {
             operator: op.naam + '#' + i, gezakt: na.gezakt, geprobeerd };
         } finally {
           fs.writeFileSync(p, origineel);
+          open.delete(p);
         }
       }
     }
@@ -327,4 +351,10 @@ if (require.main === module) {
   console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
 }
 
-module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG };
+module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG,
+  /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
+     ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js
+     meldt een bestand aan, muteert het, stuurt SIGTERM en kijkt of het terugstaat. */
+  aanmelden: (pad, bron) => open.set(pad, bron),
+  afmelden: (pad) => open.delete(pad),
+  zetTerug };

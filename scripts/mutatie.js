@@ -55,6 +55,7 @@
    Draai:  node scripts/mutatie.js               (alles -- lang)
            node scripts/mutatie.js --puur        (alleen A)
            node scripts/mutatie.js --server      (alleen B)
+           node scripts/mutatie.js --opruimen    (zet een blijven staan mutatie terug)
            node scripts/mutatie.js test/pdf.test.js   (een bestand)
    ========================================================================== */
 'use strict';
@@ -193,9 +194,78 @@ function muteer(bron, op, index) {
    zelf. Een mutatieronde en "de werkboom moet schoon zijn" gaan dus niet samen;
    committen doe je tussen de fases, niet tijdens. */
 const open = new Map();                  // pad -> originele inhoud
+const SPOOR = path.join(WORTEL, 'server', 'data', 'mutatie-open.json');
+
+/* WAAROM ER EEN SPOOR OP SCHIJF STAAT, en niet alleen een lijst in het geheugen.
+
+   De eerste versie vertrouwde op signaalhandlers, en die zijn hier grotendeels
+   NUTTELOOS: deze motor draait zijn toetsen met spawnSync, en dat blokkeert de
+   event-loop. Node levert een signaal pas af tussen twee loop-slagen, dus een
+   SIGTERM tijdens een proef -- precies wanneer er een mutatie openstaat -- doet
+   niets. Nagemeten: de motor bleef staan met server/redis.js gemuteerd en
+   reageerde op geen enkele SIGTERM; alleen kill -9 hielp, en dan is er niets
+   opgeruimd. Dat de wacht eerder WEL werkte op server/lokaal-tls.js was geluk:
+   die kill landde tussen twee spawnSync-aanroepen.
+
+   Dus staat er nu vóór elke mutatie een spoor op schijf met het pad en de
+   originele inhoud, buiten de repo. Elke volgende start ruimt dat eerst op. Dat
+   werkt ook na kill -9, na een stroomstoring en na een crash in een kindproces --
+   gevallen waarin geen enkele handler nog aan de bak komt. De handlers blijven
+   staan voor het geval de motor wel idle is, maar ze zijn niet meer de dekking. */
+function schrijfSpoor() {
+  try {
+    /* Niets open = GEEN bestand, en niet een bestand met een lege lijst erin. Dat
+       is geen kosmetiek: "er ligt een spoor" moet hetzelfde betekenen als "er staat
+       iets gemuteerd", anders moet elke lezer eerst de inhoud interpreteren en gaat
+       dat op een dag mis. */
+    if (!open.size) { try { fs.unlinkSync(SPOOR); } catch (e) { /* was er niet */ } return; }
+    fs.mkdirSync(path.dirname(SPOOR), { recursive: true });
+    fs.writeFileSync(SPOOR, JSON.stringify([...open.entries()].map(([p, b]) => ({ pad: p, bron: b }))));
+  } catch (e) { /* dan valt de opruiming terug op git status, en dat zeggen we ook */ }
+}
 function zetTerug() {
   for (const [p, bron] of open) { try { fs.writeFileSync(p, bron); } catch (e) { /* niets meer aan te doen */ } }
   open.clear();
+  try { fs.unlinkSync(SPOOR); } catch (e) { /* was er niet */ }
+}
+/* DE ENIGE PLEK DIE EEN MUTATIE OP SCHIJF ZET. Aanmelden, spoor schrijven,
+   muteren, en in een finally alles terugdraaien -- alle vier bij elkaar, want
+   losgeknipt vergeet een lus er een van.
+
+   Waarom dit een eigen functie is en niet drie regels in de lus: mijn eerste
+   toets op het spoor kon niet zakken. Hij riep schrijfSpoor() zelf aan, dus toen
+   ik die aanroep UIT de lus van de motor haalde bleef de toets groen -- hij
+   bewees dat de twee helften samenwerken en niet dat de motor ze gebruikt. Met
+   een enkele functie is er iets om te toetsen dat WEL omvalt als de bedrading
+   weg is (test/mutatiewacht.test.js). */
+function metMutatie(pad, nieuweBron, doe) {
+  const origineel = fs.readFileSync(pad, 'utf8');
+  try {
+    open.set(pad, origineel);
+    schrijfSpoor();
+    fs.writeFileSync(pad, nieuweBron);
+    return doe();
+  } finally {
+    fs.writeFileSync(pad, origineel);
+    open.delete(pad);
+    schrijfSpoor();
+  }
+}
+
+/* Opruimen wat een eerdere ronde heeft laten staan. Geeft terug wat er is
+   teruggezet, zodat de motor dat HARDOP kan zeggen: een stille opruiming laat
+   niemand weten dat er iets was blijven liggen. */
+function ruimEerderOp() {
+  let lijst;
+  try { lijst = JSON.parse(fs.readFileSync(SPOOR, 'utf8')); } catch (e) { return []; }
+  const terug = [];
+  for (const { pad, bron } of lijst || []) {
+    try {
+      if (fs.readFileSync(pad, 'utf8') !== bron) { fs.writeFileSync(pad, bron); terug.push(pad); }
+    } catch (e) { /* bestand is weg: dan valt er niets terug te zetten */ }
+  }
+  try { fs.unlinkSync(SPOOR); } catch (e) {}
+  return terug;
 }
 for (const sein of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
   process.on(sein, () => { zetTerug(); process.exit(130); });
@@ -264,19 +334,18 @@ function proefPuur(naam, posities) {
       for (const op of OPERATOREN) {
         const nieuw = muteer(origineel, op, i);
         if (!nieuw || nieuw === origineel) continue;
-        try {
-          open.set(p, origineel);                 // de opruimwacht weet er nu van
-          fs.writeFileSync(p, nieuw);
+        /* Alles wat met de mutatie op schijf te maken heeft, gaat door metMutatie:
+           aanmelden, spoor schrijven, terugzetten. Eén plek, dus geen lus die er
+           een van vergeet. */
+        const uit = metMutatie(p, nieuw, () => {
           const check = spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' });
-          if (check.status !== 0) continue;       // mutatie brak de syntaxis: telt niet
+          if (check.status !== 0) return null;    // mutatie brak de syntaxis: telt niet
           geprobeerd++;
           const na = draaiToets(bestand);
-          if (na.gezakt > 0) return { soort: 'puur', staat: 'gezakt', module: rel,
-            operator: op.naam + '#' + i, gezakt: na.gezakt, geprobeerd };
-        } finally {
-          fs.writeFileSync(p, origineel);
-          open.delete(p);
-        }
+          return na.gezakt > 0 ? { soort: 'puur', staat: 'gezakt', module: rel,
+            operator: op.naam + '#' + i, gezakt: na.gezakt, geprobeerd } : null;
+        });
+        if (uit) return uit;
       }
     }
   }
@@ -312,6 +381,18 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   const losse = args.filter(a => !a.startsWith('--'));
   const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
+
+  /* EERST OPRUIMEN WAT EEN VORIGE RONDE HEEFT LATEN STAAN, en het HARDOP zeggen.
+     Een stille opruiming laat niemand weten dat er iets was blijven liggen, en dan
+     mist iedereen het patroon dat de motor wordt afgebroken op een manier die zijn
+     handlers niet halen (kill -9, of een SIGTERM tijdens spawnSync). */
+  const opgeruimd = ruimEerderOp();
+  if (opgeruimd.length) {
+    console.log('  LET OP: een vorige ronde is afgebroken met een mutatie open. Teruggezet:');
+    for (const p of opgeruimd) console.log('    ' + path.relative(WORTEL, p));
+    console.log('');
+  }
+  if (args.includes('--opruimen')) { console.log(opgeruimd.length ? '' : '  niets om op te ruimen\n'); process.exit(0); }
 
   let namen = fs.readdirSync(TEST).filter(n => n.endsWith('.test.js')).sort();
   if (losse.length) namen = losse.map(a => path.basename(a));
@@ -392,6 +473,7 @@ if (require.main === module) {
 }
 
 module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
+  SPOOR, ruimEerderOp, schrijfSpoor, metMutatie,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js
      meldt een bestand aan, muteert het, stuurt SIGTERM en kijkt of het terugstaat. */

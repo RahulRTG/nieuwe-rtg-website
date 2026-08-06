@@ -462,6 +462,256 @@
       ],
       "geprobeerd": 6,
       "posities": 1
+    },
+    "meterijk.test.js": {
+      "soort": "puur",
+      "staat": "muteert zelf",
+      "reden": "muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken"
+    },
+    "meting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/meting.js",
+      "operator": ">=->>#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "middleware.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/voordeur.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "migraties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/migraties/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "minify.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ast/parser.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "mond.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/mond.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "motor-vingerafdruk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pay/vingerafdruk.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "mrz.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/mrz.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "mutatiewacht.test.js": {
+      "soort": "puur",
+      "staat": "muteert zelf",
+      "reden": "toetst de opruimwacht van deze motor; die twee om elkaar heen draaien zegt niets"
+    },
+    "navigatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/geo.js",
+      "operator": "+->-#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
+    "normprestatie.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "scripts/norm.js"
+      ],
+      "geprobeerd": 0,
+      "posities": 1
+    },
+    "office-blad.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "ondernemerpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ondernemerpoort.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "opslag-voorcheck.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "opslagblokkade.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/keuze.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "opslagpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/keuze.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "pakket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pakketten.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "pasprijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pasprijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "pestgrens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pestgrens.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
+    "pgaccounts.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
+    "pgsync-voorrang.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/pg/sync.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
+    "pgwire.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/pgwire/scram.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "poortrace.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "poortwacht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "productie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "proxykop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/verrijk.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "qr.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/qr.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "qrscan.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/qr.js",
+      "operator": ">=->>#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "rahul-eerlijk.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/rahul.js",
+        "server/kern/ai/prompt.js",
+        "server/kern/stuur.js"
+      ],
+      "geprobeerd": 9,
+      "posities": 1
+    },
+    "rahul-hart.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/rahul.js"
+      ],
+      "geprobeerd": 2,
+      "posities": 1
+    },
+    "rahul-mens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rahul/taal.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "rahul-omgang.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/rahul.js"
+      ],
+      "geprobeerd": 2,
+      "posities": 1
+    },
+    "randen.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     }
   }
 }

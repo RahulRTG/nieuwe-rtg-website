@@ -25,8 +25,7 @@
     "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 553,
-    "toetsenOngevoeligPct": 13.3
+    "toetsenNietGemeten": 527
   },
   "notities": [
     {
@@ -258,6 +257,12 @@
       "meter": "toetsenOverleefdeMutatie vervangen door toetsenOngevoeligPct",
       "reden": "Het absolute aantal overlevers stijgt zodra je MEER meet, dus stond de ratel rood (8 tegen norm 6) terwijl er niets slechter was geworden -- er waren alleen vier toetsen bijgemeten. Een meter die rood wordt omdat je hem gebruikt, leert iedereen om te stoppen met meten. Als aandeel van de gemeten toetsen is hij onafhankelijk van hoe ver de motor is.",
       "eerlijkheidshalve": "Dit is de tweede keer vandaag dat ik een grondwaarde te vroeg heb vastgelegd: de eerste keer bij kernBreedte/kernGedeeld (uit een kapotte meting), nu bij een meter waarvan de VORM verkeerd was voor wat hij moest bewaken. De les is dezelfde en staat er nu twee keer: leg een norm pas vast als je de meter een keer hebt zien bewegen om de goede reden."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "toetsenOngevoeligPct: GEEN grondwaarde zolang de meting loopt",
+      "reden": "Vastgelegd op 13,3% bij 60 gemeten toetsen; bij 86 gemeten stond hij op 14,0% en was de ratel rood -- terwijl er niets slechter was geworden. Ook als AANDEEL wandelt hij zolang de steekproef groeit: elke nieuwe partij toetsen verschuift hem. De grondwaarde is dus weggehaald tot toetsenNietGemeten op nul staat; tot die tijd is DAT de meter die iets betekent.",
+      "eerlijkheidshalve": "Dit is de DERDE keer op deze twee dagen dat ik een grondwaarde te vroeg heb vastgelegd: eerst kernBreedte/kernGedeeld uit een kapotte meting, toen deze meter als absoluut aantal, en nu dezelfde meter als percentage. Drie keer dezelfde fout in een andere vermomming, en de algemene regel is pas nu scherp: je kunt geen getal rattelen dat je nog aan het VERZAMELEN bent. Een ratel hoort op een stand die af is. Wie hier een grondwaarde zet voordat npm run mutatie een keer helemaal is doorgelopen, herhaalt dit."
     }
   ],
   "prestatie": {

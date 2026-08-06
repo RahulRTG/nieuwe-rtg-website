@@ -341,7 +341,35 @@ const EIGEN_MODULE = new Map([
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */
-  ['domeinalleen.test.js', ['server/opzet/routes.js']]
+  ['domeinalleen.test.js', ['server/opzet/routes.js']],
+  /* Boot de echte server en kijkt of de root de ROS-poort geeft. */
+  ['boot-smoke.test.js', ['server/server.js']],
+  /* Start de server naast een bezette poort; de bewering gaat over hoe
+     server.js een EADDRINUSE benoemt. */
+  ['poortrace.test.js', ['server/server.js']],
+  /* Elke app als eigen proces achter de poortwachter. */
+  ['vloot.test.js', ['server/vloot.js']],
+  /* Productiestand: demo dicht, geen dev-lekken, registreren werkt. */
+  ['golive.test.js', ['server/routes/auth/account.js', 'server/server.js']],
+  /* De voorcheck van de SQLite-opslag; de toets noemt de module in zijn kop. */
+  ['opslag-voorcheck.test.js', ['server/db/sqlite.js']],
+  /* Het grootboek op sqlite. De toets draait een rit-bestand als kindproces,
+     en dat requiret server/db -- vandaar dat de scanner niets zag. */
+  ['txledger-sqlite.test.js', ['server/db/tx/index.js', 'server/db/index.js']],
+  /* De rekenmotor van RTG Office draait in de BROWSER; de toets laadt de
+     bestanden los in met een uitgerekend pad, dus zonder require-regel. */
+  ['office-blad.test.js', ['public/shared/rekenmotor.js', 'public/shared/rekenfuncties.js']],
+  /* De randen van het scherm, ook browsercode. */
+  ['randen.test.js', ['public/shared/randen.js', 'public/shared/rahul-mond.js']],
+  /* De pinnen onder EU.md: beweringen die naar echte code wijzen. */
+  ['eu-naleving.test.js', ['server/routes/aanmeldingen.js', 'server/kern/appgids-data/deel1.js']],
+  /* De blinde vlek zoekt structuurfouten in de PAGINA'S en niet in een module.
+     Hij staat er met een kandidaat en niet met een reden, omdat ik niet ga
+     beweren dat het onmeetbaar is voordat de motor het heeft geprobeerd:
+     routing.js bepaalt welk bestand een URL oplevert, en dat is het dichtste
+     bij een module die deze toets echt nodig heeft. Blijft hij overleven, dan
+     is dat de uitslag en hoort er een reden te komen in plaats van een gok. */
+  ['blindevlek.test.js', ['server/web/routing.js']]
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets

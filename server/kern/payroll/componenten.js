@@ -75,6 +75,13 @@ const BASIS = [
   { sleutel: 'vakantiegeld', naam: 'Vakantiegeld', soort: 'bruto', belast: true, bijzonder: true,
     grondslagen: ['loonheffing', 'premies', 'zvw'], pensioengevend: false, vakantiegeldgevend: false,
     invoerbron: 'motor', goedkeuring: 'geen', grootboek: '4020' },
+  /* Loondoorbetaling bij verzuim: ziekte, zwangerschap, zorgverlof. Een eigen
+     component en niet "minder basissalaris", want op de strook hoort te staan
+     WAAROM er een ander bedrag staat. Het percentage komt uit de verlofsoort
+     (kern/payroll/verzuim.js), niet van hier -- deze rij zegt wat het IS. */
+  { sleutel: 'loondoorbetaling', naam: 'Loondoorbetaling bij verzuim', soort: 'bruto', belast: true,
+    grondslagen: ['loonheffing', 'premies', 'zvw'], pensioengevend: true, vakantiegeldgevend: true,
+    invoerbron: 'motor', goedkeuring: 'geen', grootboek: '4050' },
   { sleutel: 'fooi', naam: 'Fooi', soort: 'bruto', belast: true,
     grondslagen: ['loonheffing'], pensioengevend: false, vakantiegeldgevend: false,
     invoerbron: 'handmatig', goedkeuring: 'manager', grootboek: '4030' },

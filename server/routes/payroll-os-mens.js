@@ -74,16 +74,26 @@ module.exports = (kern) => {
   /* "Je nettoloon is deze periode hoger door 12 nachturen en vakantiegeld."
      Een loonstrook die alleen bedragen toont, laat mensen raden; een zin die
      zegt WAAROM is het verschil tussen een pdf en een antwoord. */
+  /* TWEE SOORTEN BASIS, want er zijn twee soorten contract. Wie op uren werkt
+     leest "160 gewerkte uren"; wie een maandsalaris heeft leest "uw vaste
+     loon". Hier stond alleen de eerste, en toen de loonrun eindelijk ook vast
+     loon ging uitbetalen las een vaste kracht: "Dit bedrag komt uit uw vaste
+     loon, plus basissalaris (2400,00)" -- zijn salaris twee keer genoemd, een
+     keer als naam en een keer als bedrag. */
+  const BASISSEN = ['gewerkte_uren', 'basissalaris'];
+
   function legUit(strook) {
     const zinnen = [];
     for (const r of strook.regels) {
-      if (r.soort !== 'bruto' || r.component === 'gewerkte_uren') continue;
+      if (r.soort !== 'bruto' || BASISSEN.includes(r.component)) continue;
       zinnen.push(r.aantal != null
         ? r.aantal + ' ' + r.naam.toLowerCase() + ' (' + (r.centen / 100).toFixed(2) + ')'
         : r.naam.toLowerCase() + ' (' + (r.centen / 100).toFixed(2) + ')');
     }
-    const basis = strook.regels.find(r => r.component === 'gewerkte_uren');
-    const kop = basis ? basis.aantal + ' gewerkte uren' : 'uw vaste loon';
+    const uren = strook.regels.find(r => r.component === 'gewerkte_uren');
+    const salaris = strook.regels.find(r => r.component === 'basissalaris');
+    const kop = uren ? uren.aantal + ' gewerkte uren'
+      : salaris ? 'uw vaste loon' : 'uw loon';
     return zinnen.length
       ? 'Dit bedrag komt uit ' + kop + ', plus ' + zinnen.join(' en ') + '. Daarvan gaat de loonheffing af.'
       : 'Dit bedrag komt uit ' + kop + '. Daarvan gaat de loonheffing af.';

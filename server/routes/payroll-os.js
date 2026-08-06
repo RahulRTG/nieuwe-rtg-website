@@ -87,36 +87,35 @@ module.exports = (kern) => {
   /* ---------- de loonrun ---------- */
   /* Openen doet het kantoor: het draait de administratie. De uren komen uit de
      klok van de zaak zelf, dus de client levert ze NIET aan -- anders is de
-     invoer van een loonrun iets wat je kunt meesturen. */
+     invoer van een loonrun iets wat je kunt meesturen.
+
+     DE INVOER BEGINT BIJ HET CONTRACT EN NIET BIJ DE KLOK, en die regel stond
+     hier niet. Deze route liep over de geklokte feiten heen, dus wie niet
+     prikte kwam niet in de run: iedereen met een maandsalaris viel er stil uit.
+     Het samenstellen staat nu in kern/payroll/samenstellen.js -- daar is het te
+     toetsen zonder server, en daar staat ook waarom ziekte doorbetaald hoort te
+     worden in plaats van het loon te verlagen. */
   app.post('/api/office/payroll/run/open', officeAuth, (req, res) => {
     const b = req.body || {};
     const s = findSupplier(b.code);
     if (!s) return res.status(404).json({ error: 'Zaak niet gevonden.' });
     const periode = String(b.periode || '');
+    if (!/^\d{4}-\d{2}$/.test(periode)) return res.status(400).json({ error: 'Kies een periode als 2026-07.' });
 
-    const meting = payrollOS.uren.meet(s.code, periode);
-    const regels = [];
-    for (const feit of meting.feiten) {
-      const dag = periode + '-01';
-      const contract = payrollOS.contracten.opDatum(s.code, feit.staffId, dag);
-      if (!contract) continue; // de controlelaag meldt het; hier niets verzinnen
-      const gewogen = payrollOS.uren.weeg(feit, contract, b.toeslagen);
-      regels.push({ staffId: feit.staffId, naam: feit.naam, contract,
-        invoer: gewogen.invoer, gewerkteUren: gewogen.gewerkteUren, leeftijdsgroep: b.leeftijdsgroep || '21+' });
-    }
+    const personeel = accounts.listStaff(s.code).map(m => ({ id: m.id, naam: m.name }));
+    const opzet = payrollOS.samenstellen.stel({ code: s.code, periode, personeel,
+      toeslagen: b.toeslagen, leeftijdsgroep: b.leeftijdsgroep });
+
     const r = payrollOS.run.open({ code: s.code, zaak: s.name, periode,
-      land: (s.settings && s.settings.land) || 'NL', regels, door: wie(req) });
+      land: (s.settings && s.settings.land) || 'NL', regels: opzet.regels, door: wie(req) });
     if (r.error) return res.status(r.status || 400).json(r);
 
     /* Meteen nalopen: een run zonder bevindingenlijst nodigt uit om hem over te
        slaan. De contracten gaan mee, zodat "loon zonder contract" echt gemeten
        wordt en niet als vals alarm afgaat (zie kern/payroll/controles.js). */
-    const contracten = {};
-    for (const feit of meting.feiten) contracten[feit.staffId] =
-      payrollOS.contracten.opDatum(s.code, feit.staffId, periode + '-01');
     const vorige = payrollOS.run.lijst(s.code).find(x => x.periode !== periode && x.stand === 'definitief');
     const bev = payrollOS.controles.loop(payrollOS.run.haal(r.run.id), {
-      urenBevindingen: meting.bevindingen, contracten,
+      urenBevindingen: opzet.bevindingen, contracten: opzet.contracten,
       vorigeRun: vorige ? payrollOS.run.haal(vorige.id) : null });
     res.json(Object.assign(r, { bevindingen: bev.bevindingen, hoogOpen: bev.hoogOpen }));
   });

@@ -12,6 +12,7 @@
      aangifte     de loonaangifte: dezelfde run, derde uitgang
      uren         de klok vertaald naar meetbare feiten, en die gewogen tot
                   componenten (meten en wegen apart, zie ./uren.js)
+     samenstellen van contract + klok + verzuim naar de invoer van een run
      controles    de automatische controles; hoog blokkeert tot het verklaard is
      verzuim      verlof en ziekte, met de scheiding die de AP eist
      dekking      per land: kan hier loon draaien, en zo nee wat ontbreekt er
@@ -44,6 +45,7 @@ const { maakDekking } = require('./dekking');
 const { maakDossier } = require('./dossier');
 const { LANDEN } = require('../fiscaal/landen');
 const { maakUren } = require('./uren');
+const { maakSamenstellen } = require('./samenstellen');
 const { maakControles } = require('./controles');
 const motor = require('./motor');
 
@@ -64,6 +66,11 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
   const dekking = maakDekking({ db, save, nu, regelpakket: regels, LANDEN, accounts });
   const bijwerken = maakBijwerken({ regelpakket: regels, db, save, nu, log, dekking });
   const uren = maakUren({ db });
+  /* De invoer van een loonrun begint bij het CONTRACT en niet bij de klok.
+     Stond die samenstelling in de route, dan was hij niet te toetsen zonder
+     server -- en dan kon een maandsalaris eruit vallen zonder dat iets het zei.
+     Zie ./samenstellen.js voor wat daar mis ging. */
+  const samenstellen = maakSamenstellen({ contracten, uren, verzuim });
   const controles = maakControles({ db, save, nu });
 
   /* De meegeleverde jaargang een keer binnenhalen. Hij komt binnen langs
@@ -84,7 +91,7 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
 
   return {
     payrollOS: {
-      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, controles, dekking, dossier,
+      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, samenstellen, controles, dekking, dossier,
       bijwerken, urlBron, laadMeegeleverd
     }
   };

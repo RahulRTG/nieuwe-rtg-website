@@ -131,16 +131,23 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     const vol = (await post(base, '/api/office/payroll/run/een', { runId }, kantoor)).data;
     const mijn = vol.run.stroken.find(x => x.staffId === staffId);
     assert.ok(mijn, 'de medewerker met een contract staat in de run');
-    /* 20 diensten van 8 uur zijn 160 uur, en die worden GEWOGEN: bij een
-       contract van 32 uur per week ligt de drempel op 32 x 4,33 = 138,6 uur, de
-       rest zijn overuren met hun eigen tarief. Vandaar de optelling en niet een
-       vast getal -- de splitsing is juist het werk dat we willen zien. */
-    const uren = mijn.strook.regels
-      .filter(r => ['gewerkte_uren', 'overuren_125'].includes(r.component))
-      .reduce((s, r) => s + r.aantal, 0);
-    assert.equal(Math.round(uren), 160, '20 diensten van 8 uur zijn samen 160 uur');
-    assert.ok(mijn.strook.regels.some(r => r.component === 'overuren_125'),
-      'wat boven de contracturen uitkomt staat als overuren op de strook, niet als gewoon loon');
+    /* TIMO HEEFT EEN VAST CONTRACT, dus hij krijgt een MAANDSALARIS en niet zijn
+       geklokte uren. Deze toets eiste eerst 160 gewerkte uren, en dat was het
+       oude model: de loonrun betaalde alleen wat er geklokt was, waardoor
+       iedereen met een maandsalaris die niet prikt helemaal geen strook kreeg.
+
+       Wat er nu hoort te staan: het contractloon plus wat hij BOVEN zijn
+       contracturen werkte. 20 diensten van 8 uur is 160 uur; bij 32 uur per
+       week ligt de drempel op 32 x 4,33 = 138,6, dus 21,4 uur overwerk. Zijn
+       eerste 138,6 uur zitten in zijn salaris en komen er niet nog eens bij --
+       dat zou dubbel betalen zijn. */
+    assert.ok(mijn.strook.regels.some(r => r.component === 'basissalaris'),
+      'een vaste kracht krijgt zijn contractloon: ' + mijn.strook.regels.map(r => r.component).join(', '));
+    assert.ok(!mijn.strook.regels.some(r => r.component === 'gewerkte_uren'),
+      'en zijn geklokte uren komen daar niet bovenop');
+    const over = mijn.strook.regels.find(r => r.component === 'overuren_125');
+    assert.ok(over, 'wat boven de contracturen uitkomt staat wel als overuren op de strook');
+    assert.equal(Math.round(over.aantal * 10) / 10, 21.4, '160 uur min de drempel van 138,6');
 
     // vier ogen: de manager bij de zaak, de administrateur bij het kantoor
     assert.equal((await post(base, '/api/supplier/payroll/keur', { runId }, zaakTok)).status, 200);
@@ -192,7 +199,9 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     /* De uitleg is het punt van dit scherm: een strook die alleen bedragen
        toont laat mensen raden. Hij hoort de uren te noemen waar het bedrag uit
        komt, in gewone taal. */
-    assert.match(strook.uitleg, /\d[\d,.]* gewerkte uren/, 'de uitleg noemt waar het bedrag vandaan komt');
+    assert.match(strook.uitleg, /uw vaste loon/, 'de uitleg noemt waar het bedrag vandaan komt');
+    assert.ok(!/basissalaris/.test(strook.uitleg),
+      'en noemt zijn salaris niet twee keer -- een keer als "vaste loon" en een keer als regelnaam');
     assert.match(strook.uitleg, /overuren/i, 'en noemt het onderdeel dat deze periode anders maakt');
     assert.match(strook.uitleg, /loonheffing/i, 'en wat eraf gaat');
 

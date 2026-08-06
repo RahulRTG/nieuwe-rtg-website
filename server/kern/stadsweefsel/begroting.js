@@ -48,19 +48,31 @@ module.exports = (ctx) => {
   /* Een project onder een doel, met een budget en -- als het kan -- een
      nulmeting. Die nulmeting wordt NU vastgelegd en niet achteraf gereconstrueerd:
      achteraf is elke startwaarde de waarde die het beste uitkomt. */
-  function projectMaak({ doelId, naam, budget, gebied, indicator, wie }) {
+  function projectMaak({ doelId, naam, budget, gebied, indicator, besluitId, wie }) {
     const dl = doel(doelId);
     if (!dl) return { status: 404, error: 'Onbekend doel.' };
     const n = schoon(naam, 100);
     if (!n) return { status: 400, error: 'Hoe heet het project?' };
     const b = euro(budget);
     if (!b) return { status: 400, error: 'Wat is het budget?' };
+    /* HET MANDAAT BIJT HIER. Boven de ambtelijke grens is een uitgave geen
+       uitgave meer maar een besluit, en dan moet er een AANGENOMEN besluit van
+       het juiste orgaan onder liggen dat het bedrag ook echt dekt. Een mandaat
+       dat alleen in een beleidsstuk staat en nergens een deur dichthoudt, is
+       een mening (kern/stadsweefsel/bestuur.js). */
+    const eis = ctx.bes.mandaat({ bedrag: b });
+    if (eis.besluitNodig) {
+      if (!besluitId) return { status: 403, error: 'EUR ' + b + ' valt buiten het ambtelijk mandaat: ' + eis.reden + ' Geef het kenmerk van dat besluit mee.' };
+      const dek = ctx.bes.dekt(besluitId, { orgaan: eis.orgaan, bedrag: b });
+      if (!dek.ok) return { status: 403, error: dek.reden };
+    }
     const g = gebied ? geo.gebied(gebied) : null;
     if (gebied && !g) return { status: 404, error: 'Onbekend gebied.' };
     const ind = schoon(indicator, 40) || dl.indicator || null;
     const p = {
       id: 'P-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
       doelId: dl.id, naam: n, budget: b, gebied: g ? g.id : null, indicator: ind,
+      besluitId: besluitId ? String(besluitId) : null, mandaat: eis.rol,
       nulmeting: ind ? meetIndicator(ind, g ? g.id : null) : null,
       werkorders: [], status: 'loopt', door: schoon(wie, 60) || 'kantoor', at: nu(),
       eindmeting: null, afgeslotenAt: null, afgeslotenDoor: null, evaluatie: null

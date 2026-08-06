@@ -66,7 +66,7 @@ module.exports = (ctx) => {
   }));
   app.post('/api/office/weefsel/project/maak', officeAuth, (req, res) => veilig(res, () => {
     const r = w.weefselProjectMaak({ doelId: req.body.doelId, naam: req.body.projectNaam, budget: req.body.budget,
-      gebied: req.body.gebied, indicator: req.body.indicator, wie: naam(req) });
+      gebied: req.body.gebied, indicator: req.body.indicator, besluitId: req.body.besluitId, wie: naam(req) });
     if (r.ok) afdelingen.audit(naam(req), 'Project "' + r.project.naam + '" met budget EUR ' + r.project.budget +
       (r.project.nulmeting ? ' (nulmeting ' + r.project.indicator + ': ' + r.project.nulmeting.waarde + ')' : ' (zonder nulmeting)'));
     return r;

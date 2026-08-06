@@ -69,7 +69,9 @@ module.exports = (deps) => {
   const con = require('./contracten')(ctx); ctx.con = con;      // zet ctx.slaVoorWerk
   const ond = require('./onderhoud')(ctx); ctx.ond = ond;
   const ind = require('./indicatoren')(ctx); ctx.ind = ind;
+  const bes = require('./bestuur')(ctx); ctx.bes = bes;        // het mandaat, vóór de begroting die het leest
   const beg = require('./begroting')(ctx); ctx.beg = beg;
+  const insp = require('./inspraak')(ctx); ctx.insp = insp;
   const ene = require('./energie')(ctx); ctx.ene = ene;
   const kli = require('./klimaat')(ctx); ctx.kli = kli;
   const sim = require('./simulatie')(ctx); ctx.sim = sim;
@@ -157,6 +159,6 @@ module.exports = (deps) => {
     weefselKoppelEconomie: (bronnen) => kan.koppel(bronnen || {})
   };
   Object.assign(api, geo.api, obj.api, rel.api, afh.api, tr.api, zkn.api, werk.api,
-    con.api, ond.api, ind.api, beg.api, ene.api, kli.api, sim.api, kan.api, alg.api);
+    con.api, ond.api, ind.api, bes.api, beg.api, insp.api, ene.api, kli.api, sim.api, kan.api, alg.api);
   return { weefsel: api };
 };

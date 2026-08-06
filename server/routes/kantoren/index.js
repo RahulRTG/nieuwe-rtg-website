@@ -83,6 +83,7 @@ module.exports = (kern) => {
   require('./stad')(ctx);
   require('./weefsel')(ctx);
   require('./weefsel2')(ctx);
+  require('./weefsel3')(ctx);
   require('./techniek')(ctx);
   require('./zelfzorg')(ctx);
 };

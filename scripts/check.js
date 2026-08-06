@@ -1426,6 +1426,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        geen persoonsgegevens, geen bedrijfsgevoelige data, alleen wat er
        meerekent en wat het mag beslissen. */
     ['/api/stad/algoritmes', 'het openbare algoritmeregister: beschrijft regels, geen personen'],
+    ['/api/stad/besluiten', 'het openbare besluitenregister: wat de stad besloot, met welke stemverhouding; fracties stemmen met zetels, geen personen'],
     ['/api/fout/client', 'een fout uit de browser: JUIST zonder poort, want een fout die het ' +
       'inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt ' +
       'niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden ' +

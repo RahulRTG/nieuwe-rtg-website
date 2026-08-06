@@ -30,4 +30,25 @@ module.exports = (kern) => {
      staat, is dus geen versoepeling maar de bedoeling. */
   app.post('/api/stad/algoritmes', (req, res) => stuur(res, kern.weefsel.weefselAlgoritmes()));
   app.get('/api/stad/algoritmes', (req, res) => stuur(res, kern.weefsel.weefselAlgoritmes()));
+
+  /* HET BESLUITENREGISTER, om dezelfde reden openbaar als het
+     algoritmeregister. Wat een stad besluit, met welke stemverhouding, tegen
+     welk advies in en voor hoeveel geld, is geen bedrijfsinformatie maar de
+     kern van waarom een inwoner er iets over te zeggen heeft. Er staan geen
+     personen in: fracties stemmen met zetels, en een collegestem draagt een
+     functie en geen dossier. */
+  app.post('/api/stad/besluiten', (req, res) => stuur(res, kern.weefsel.weefselBesluiten({
+    orgaan: req.body && req.body.orgaan, status: req.body && req.body.status })));
+  app.get('/api/stad/besluiten', (req, res) => stuur(res, kern.weefsel.weefselBesluiten({})));
+
+  /* Meepraten. Kijken mag met elke sessie; REAGEREN vraagt een RTG-profiel,
+     want een raadpleging waarin dezelfde persoon twintig keer kan antwoorden
+     meet niets. Eén reactie per codenaam, te wijzigen zolang hij loopt. */
+  app.post('/api/stad/raadplegingen', auth, (req, res) => stuur(res, kern.weefsel.weefselRaadplegingen({
+    codenaam: cn(req), alleenOpen: req.body.alleenOpen === true })));
+  app.post('/api/stad/raadpleging/reageer', auth, (req, res) => {
+    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Meepraten kan met een RTG-profiel; meelezen mag altijd.' });
+    stuur(res, kern.weefsel.weefselReageer({ raadplegingId: req.body.id, codenaam: cn(req),
+      keuze: req.body.keuze, tekst: req.body.tekst, zone: req.body.zone }));
+  });
 };

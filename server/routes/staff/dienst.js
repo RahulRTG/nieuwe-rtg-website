@@ -129,31 +129,36 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
   res.json({ ok: true, entry });
 });
 
-app.post('/api/staff/trust/send', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const text = schoon(req.body.text, 800);
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  let t = db.data.trustLine.find(x => x.code === req.supplier.code && x.staffId === req.actor.staffId);
-  if (!t) {
-    t = { id: crypto.randomBytes(4).toString('hex'), code: req.supplier.code, company: req.supplier.name,
-          staffId: req.actor.staffId, anon: !!req.body.anon, name: req.actor.name, messages: [], open: true, lastAt: null };
-    db.data.trustLine.unshift(t);
-    db.data.trustLine = db.data.trustLine.slice(0, 2000);
-  }
-  if (req.body.anon != null) t.anon = !!req.body.anon;
-  t.messages.push({ from: 'staff', text, at: new Date().toISOString() });
-  t.messages = t.messages.slice(-60);
-  t.open = true;
-  t.lastAt = new Date().toISOString();
-  save();
-  // bewust GEEN logActivity en GEEN notifySupplier: dit blijft buiten de werkgever om
-  sseToOffice('sync', { scope: 'trust' });
-  res.json({ ok: true, trust: trustVan(req.supplier.code, req.actor.staffId) });
-});
+/* WAT KAN IK NOG WEL. Dit is de andere helft van een ziekmelding, en hij
+   ontbrak: de melding legde vast DAT je er niet bent, en `inzetbaarheid` bleef
+   staan op "niets" omdat niemand hem ooit kon veranderen. Daardoor kwam er uit
+   de planningslaag nooit iets bruikbaars -- en die laag is juist gebouwd om je
+   leidinggevende te laten plannen zonder te weten wat je hebt.
 
-app.post('/api/staff/trust/thread', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  res.json({ trust: trustVan(req.supplier.code, req.actor.staffId) });
-});
+   JIJ ZEGT HET, NIET JE WERKGEVER. Dit is de enige plek waar deze waarde wordt
+   gezet, en het is jouw eigen route. Een manager die kan invullen dat jij
+   "deels inzetbaar" bent, heeft een oordeel over je gezondheid gegeven; dat
+   hoort bij jou en de arbodienst.
 
+   En er is nog steeds GEEN veld voor waarom. Vier standen, meer niet. */
+app.post('/api/staff/inzetbaarheid', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
+  if (!payrollOS || !payrollOS.verzuim)
+    return res.status(503).json({ error: 'De verzuimlaag draait niet in dit proces.' });
+  const b = req.body || {};
+  const stand = String(b.inzetbaarheid || '');
+  if (!payrollOS.verzuim.INZETBAARHEID.includes(stand))
+    return res.status(400).json({ error: 'Kies wat je nog kunt: ' + payrollOS.verzuim.INZETBAARHEID.join(', ') + '.' });
+  if (schoon(b.toelichting, 200))
+    return res.status(422).json({ error: 'Ook hier geen omschrijving. Wat je hebt hoort bij de arbodienst; hier staat alleen wat je nog kunt.' });
+  const r = payrollOS.verzuim.zetInzetbaarheid(req.supplier.code, req.actor.staffId,
+    String(b.van || '').slice(0, 10), stand, req.actor.name);
+  if (r.error) return res.status(r.status || 400).json(r);
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });
+  res.json(r);
+});
+/* DE VERTROUWENSPERSOON staat in ./dienst-vertrouwen.js. Een eigen onderwerp
+   met een eigen belofte -- wat daar wordt gezegd komt niet bij de werkgever --
+   en dit bestand ging over de 10 KB. */
+require('./dienst-vertrouwen')(actx);
 };

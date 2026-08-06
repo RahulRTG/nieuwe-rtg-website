@@ -101,6 +101,16 @@
     </div>
 
     <div class="kaart">
+      <div class="sec">Looncomponenten</div>
+      <div class="noot" style="margin-bottom:.5rem;">Een looncomponent is een <b>regel</b>, geen veld: fooien voor de horeca, wachttijd voor een vervoerder, een eindejaarsuitkering voor een school. Wat je hier vastlegt bepaalt welke grondslagen een bedrag raakt -- telt hij mee voor de loonheffing, de premies, het vakantiegeld. Een component vervalt wel, maar verdwijnt nooit: oude stroken moeten leesbaar blijven.</div>
+      <div class="rij" style="margin-bottom:.5rem;">
+        <button class="knop" id="cpLaad">Toon het register</button>
+        <button class="knop" id="cpNieuw">Voeg een component toe</button>
+      </div>
+      <div id="cpLijst"></div>
+    </div>
+
+    <div class="kaart">
       <div class="sec">Contracten</div>
       <div class="noot" style="margin-bottom:.5rem;">Zonder contract staat iemand niet op de loonrun -- er wordt geen uurloon geraden. Een wijziging <b>overschrijft niet</b>: er komt een versie bij met een ingangsdatum, zodat een oude periode blijft rekenen met wat er toen gold.</div>
       <div class="rij">
@@ -366,6 +376,67 @@ async function laadOs(){
     $('#ctZaak').innerHTML = opties;
   }
 }
+
+/* ---------- het looncomponentenregister ----------
+   HIER ZAT DEZELFDE SOORT GAT als bij de contracten: de laag bestond, de
+   belofte stond in de kop van componenten.js ("een component is een regel, geen
+   veld"), en er was geen route en geen scherm. De elf uit de basisset waren
+   alles wat er ooit zou zijn. */
+const SOORTUITLEG = { bruto: 'verhoogt het brutoloon', inhouding: 'gaat er bruto af',
+  netto: 'raakt alleen het nettoloon', werkgever: 'kost de werkgever geld, staat niet op het nettoloon' };
+
+async function laadComponenten(){
+  const d = await api('componenten', {});
+  $('#cpLijst').innerHTML = (d.componenten || []).map(c =>
+    '<div class="regel"><b>' + esc(c.naam) + '</b>' +
+    '<span class="kpi">' + esc(c.sleutel) + ' · ' + esc(c.soort) + ' (' + esc(SOORTUITLEG[c.soort] || '') + ')' +
+    ' · ' + (c.belast ? 'belast' : 'onbelast') + (c.bijzonder ? ' · bijzonder tarief' : '') +
+    (c.grondslagen && c.grondslagen.length ? ' · grondslagen: ' + c.grondslagen.map(esc).join(', ') : '') +
+    (c.vakantiegeldgevend ? ' · vakantiegeldgevend' : '') +
+    (c.grootboek ? ' · grootboek ' + esc(c.grootboek) : ' · <b>geen grootboek</b>') +
+    ' · uit ' + esc(c.invoerbron) +
+    (c.geldigTot ? ' · vervalt ' + esc(c.geldigTot) : '') +
+    (c.basis ? '' : ' · toegevoegd door ' + esc(c.door || '?')) +
+    '</span><span class="r"><button class="knop" data-cp="' + esc(c.sleutel) + '">Wijzig</button></span></div>').join('')
+    || '<div class="leeg">Nog geen componenten.</div>';
+  $('#cpLijst').querySelectorAll('[data-cp]').forEach(b =>
+    b.addEventListener('click', () => componentForm((d.componenten || []).find(c => c.sleutel === b.dataset.cp))));
+}
+
+/* Bewust met prompts: dit is het kantoorscherm en de keuring aan de serverkant
+   zegt precies wat er mis is (belast zonder grondslagen, onbelast mét, een
+   sleutel met een spatie). Die bezwaren komen hieronder in beeld -- een half
+   formulier bouwen dat er als een echt formulier uitziet, is erger. */
+async function componentForm(bestaand){
+  const b = bestaand || {};
+  const sleutel = b.sleutel || prompt('Sleutel (kleine letters, cijfers en _; blijft voor altijd staan):');
+  if (!sleutel) return;
+  const naam = prompt('Naam zoals hij op de loonstrook komt:', b.naam || '');
+  if (!naam) return;
+  const soort = prompt('Soort?\nbruto = verhoogt het brutoloon\ninhouding = gaat er bruto af\nnetto = raakt alleen het nettoloon\nwerkgever = kost de werkgever geld', b.soort || 'bruto');
+  if (!soort) return;
+  const belast = confirm('Telt deze component mee voor de loonheffing?\n\nOK = belast, Annuleren = onbelast');
+  const grondslagen = belast
+    ? (prompt('Welke grondslagen precies? (komma\'s)\nloonheffing, premies, zvw',
+        (b.grondslagen || ['loonheffing', 'premies', 'zvw']).join(', ')) || '')
+      .split(',').map(x => x.trim()).filter(Boolean)
+    : [];
+  const bijzonder = belast && confirm('Is dit BIJZONDER loon (vakantiegeld, bonus, dertiende maand)?\n\nDan gaat het tegen het bijzondere tarief en wordt het niet meegeherleid naar een jaarloon.\n\nOK = bijzonder, Annuleren = gewoon periodeloon');
+  const vakantiegeldgevend = confirm('Bouwt hij vakantiegeld op?\n\nOK = ja, Annuleren = nee');
+  const grootboek = prompt('Grootboekrekening (zonder deze kan het loonjournaal niet zeggen waar het bedrag heen gaat):', b.grootboek || '');
+  const invoerbron = prompt('Waar mag de waarde vandaan komen?\nklok, contract, rooster, handmatig, motor, koppeling', b.invoerbron || 'handmatig');
+  const goedkeuring = prompt('Wie moet hem aftekenen?\ngeen, manager, administrateur', b.goedkeuring || 'manager');
+  const geldigTot = prompt('Vervalt hij op een datum? (JJJJ-MM-DD, leeg = blijft gelden)', b.geldigTot || '') || null;
+  try {
+    await api('component', { sleutel, naam, soort, belast, bijzonder, grondslagen,
+      pensioengevend: !!b.pensioengevend, vakantiegeldgevend, grootboek, invoerbron, goedkeuring,
+      geldigVan: b.geldigVan || null, geldigTot });
+    meld('Component vastgelegd.');
+    await laadComponenten();
+  } catch (e) { meld(e.message); }
+}
+$('#cpLaad').addEventListener('click', () => laadComponenten().catch(e => meld(e.message)));
+$('#cpNieuw').addEventListener('click', () => componentForm(null));
 
 /* ---------- contracten ----------
    HIER ZAT HET GAT. De loonrun slaat iedereen zonder contract over, en er was

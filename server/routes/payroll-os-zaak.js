@@ -97,6 +97,30 @@ module.exports = (kern) => {
     res.json({ ok: true, aangiftes: payrollOS.aangifte.vanZaak(req.supplier.code,
       (req.body || {}).periode || null) }));
 
+  /* ---------- verzuim voor de PLANNING ----------
+     `voorPlanning()` stond in kern/payroll/verzuim.js en werd door niemand
+     aangeroepen. Dat is precies de functie waar die hele module voor is
+     gebouwd: een leidinggevende mag weten DAT iemand er niet is en WAT hij nog
+     kan, en niet WAT hij heeft.
+
+     Het verschil zit in het antwoord: bij ziekte staat er "afwezig" en niet
+     "ziek", en er staat bij wat iemand nog wel kan (niets / aangepast / deels /
+     volledig). Dat tweede is wat een rooster nodig heeft en wat nergens te zien
+     was -- terwijl het al die tijd werd vastgelegd. */
+  app.post('/api/supplier/verzuim/planning', supplierAuth, (req, res) => {
+    const b = req.body || {};
+    const van = String(b.van || '').slice(0, 10), tot = String(b.tot || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(van) || !/^\d{4}-\d{2}-\d{2}$/.test(tot))
+      return res.status(400).json({ error: 'Geef een begin- en einddatum (JJJJ-MM-DD).' });
+    const uit = [];
+    for (const m of accounts.listStaff(req.supplier.code)) {
+      const regels = payrollOS.verzuim.voorPlanning(req.supplier.code, m.id, van, tot);
+      if (regels.length) uit.push({ staffId: m.id, naam: m.name, func: m.func || null, regels });
+    }
+    res.json({ ok: true, van, tot, afwezig: uit,
+      let: 'Bij ziekte staat er "afwezig" en niet wat iemand heeft. Wat iemand nog wel kan, staat er wel: daar plant u mee.' });
+  });
+
   /* De identiteit van het eigen personeel: standaard alleen ja/nee. */
   app.post('/api/supplier/identiteit', supplierAuth, (req, res) =>
     res.json({ ok: true, standen: payrollOS.identiteit.standen(accounts.listStaff(req.supplier.code)) }));

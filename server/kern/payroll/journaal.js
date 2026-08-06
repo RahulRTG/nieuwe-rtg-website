@@ -6,10 +6,10 @@
    ./run.js; hier gaat het geld het huis uit.
 
    TWEE UITGANGEN, EN ZE MOETEN OP ELKAAR KLOPPEN. Uit dezelfde definitieve run
-   komt een BOEKING (naar het grootboek) en een BETAALBESTAND (naar de bank).
-   Lopen die twee uiteen, dan klopt de boekhouding niet met de bankafschriften
-   en merkt niemand dat tot de accountant komt. Daarom rekent elke uitgang terug
-   naar het totaal van de run, en weigert hij als dat niet uitkomt.
+   komt een BOEKING (hier) en een BETAALBESTAND (./journaal-betalen.js). Lopen
+   die twee uiteen, dan klopt de boekhouding niet met de bankafschriften en
+   merkt niemand dat tot de accountant komt. Het bestand controleert zichzelf
+   daarom tegen deze boeking VOORDAT het wordt bewaard.
 
    DE BOEKING TELT OP TOT NUL. Dat is geen stijlkeuze maar de enige controle die
    werkt: elke cent aan loonkosten staat tegenover een schuld (aan de
@@ -28,8 +28,6 @@
    module waar per ongeluk geld uit komt. */
 'use strict';
 
-const valuta = require('./valuta');
-
 /* Waar de tegenrekeningen staan. Bewust met namen: een grootboekschema per
    land of per bedrijf hoort configureerbaar te zijn, maar de ROLLEN liggen
    vast, anders weet de boeking niet wat waar tegenover staat. */
@@ -39,8 +37,6 @@ const TEGENREKENINGEN = {
   inhoudingen: '1620',      // pensioen, loonbeslag: schuld aan derden
   werkgeverslasten: '1630'  // premies en Zvw: schuld aan de Belastingdienst
 };
-
-const IBAN_VORM = /^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/;
 
 function maakJournaal({ db, save, nu, crypto }) {
   const tijd = nu || (() => new Date().toISOString());
@@ -100,75 +96,13 @@ function maakJournaal({ db, save, nu, crypto }) {
       regelversie: run.regelversie, regels, somDebet, somCredit, at: tijd() };
   }
 
-  /* ---------- het betaalbestand ---------- */
-  /* Een SEPA-overboeking per medewerker. Geen XML hier: dat is een vorm, en de
-     vorm hoort bij de bankkoppeling. Wat hier gemaakt wordt is de INHOUD, met
-     de controle die ertoe doet -- het totaal moet exact het nettoloon van de
-     run zijn. Dat is de controle die de gebruiker zelf noemde: "betaalbestand
-     wijkt af van definitieve loonrun". */
-  function betaalbestand(run, rekeningen) {
-    if (!run) return { status: 404, error: 'Deze loonrun kennen we niet.' };
-    if (run.stand !== 'definitief')
-      return { status: 409, error: 'Een betaalbestand komt alleen uit een definitieve loonrun.' };
-
-    /* SEPA IS EURO, EN DAT IS GEEN DETAIL. Dit bestand draagt IBANs en bedragen
-       zonder muntaanduiding, want in SEPA is de munt de euro. Er yen in zetten
-       levert geen foutmelding op bij de bank maar een BETALING: de getallen
-       worden als euro's gelezen, en 300.000 yen wordt dan 300.000 euro.
-
-       Daarom stopt het hier. Een betaalbestand voor een andere munt is een
-       ander formaat (SWIFT, een lokale koppeling) en dat bouwen we als het er
-       is -- niet door dit bestand te laten alsof het klopt. */
-    const munt = ((run.stroken[0] || {}).strook || {}).valuta;
-    if (munt && !valuta.isSepa(munt.code))
-      return { status: 422, error: 'Deze loonrun staat in ' + munt.code +
-        ' en een SEPA-betaalbestand kent alleen euro\'s. Er is nog geen betaalweg voor ' + munt.code +
-        '; maak de betaling buiten RTG om en leg het bewijs vast.', valuta: munt.code };
-
-    const posten = [];
-    const zonderRekening = [];
-    for (const s of run.stroken) {
-      const iban = String((rekeningen || {})[s.staffId] || '').replace(/\s+/g, '').toUpperCase();
-      if (!IBAN_VORM.test(iban)) { zonderRekening.push({ staffId: s.staffId, naam: s.naam }); continue; }
-      if (s.strook.nettoCenten <= 0) continue; // niets te betalen (of een correctie die inhoudt)
-      posten.push({ staffId: s.staffId, naam: s.naam, iban,
-        centen: s.strook.nettoCenten,
-        omschrijving: 'Salaris ' + run.periode + ' ' + run.zaak });
-    }
-    if (zonderRekening.length)
-      return { status: 422, error: 'Van deze medewerkers ontbreekt een geldig rekeningnummer.', medewerkers: zonderRekening };
-
-    const totaal = posten.reduce((s, p) => s + p.centen, 0);
-    const verwacht = run.stroken.reduce((s, x) => s + Math.max(0, x.strook.nettoCenten), 0);
-    if (totaal !== verwacht)
-      return { status: 422, error: 'Het betaalbestand (' + totaal + ' cent) wijkt af van de loonrun (' + verwacht + ' cent).',
-        totaal, verwacht };
-
-    const best = { id: 'bet_' + crypto.randomBytes(4).toString('hex'), runId: run.id,
-      periode: run.periode, zaak: run.zaak, posten, totaalCenten: totaal, aantal: posten.length,
-      gemaaktOp: tijd(), verzonden: false };
-    const rij = (db.data.payrollBetaalbestanden = db.data.payrollBetaalbestanden || []);
-    rij.unshift(best);
-    if (rij.length > 500) rij.length = 500;
-    save();
-    return { ok: true, bestand: best };
-  }
-
-  /* Boeken en betalen zijn twee uitgangen uit dezelfde run; deze controle
-     bewaakt dat ze elkaar niet tegenspreken. Hij hoort bij de automatische
-     controles uit de opzet ("aangifte wijkt af van loonjournaal"). */
-  function sluitAan(run, rekeningen) {
-    const b = boeking(run);
-    if (b.error) return b;
-    const bet = betaalbestand(run, rekeningen);
-    if (bet.error) return bet;
-    const nettoInBoeking = b.regels.filter(r => r.rekening === TEGENREKENINGEN.nettoloon)
-      .reduce((s, r) => s + r.creditCenten, 0);
-    if (nettoInBoeking !== bet.bestand.totaalCenten)
-      return { status: 422, error: 'Het loonjournaal (' + nettoInBoeking + ' cent netto) en het betaalbestand (' +
-        bet.bestand.totaalCenten + ' cent) spreken elkaar tegen.' };
-    return { ok: true, boeking: b, bestand: bet.bestand };
-  }
+  /* Het BETAALBESTAND staat in ./journaal-betalen.js: een eigen onderwerp (hier
+     gaat geld het huis uit, daar wordt geboekt) en dit bestand ging over de
+     10 KB. Het krijgt de boeking mee, want het moet ertegen kloppen voordat er
+     iets wordt bewaard. */
+  const { betaalbestand, sluitAan } = require('./journaal-betalen')({
+    db, save, tijd, crypto, boeking, bestandenVan: (id) => bestandenVan(id),
+    tegenrekeningNetto: TEGENREKENINGEN.nettoloon });
 
   /* Welke betaalbestanden zijn er voor deze run gemaakt? Lezen, niet maken --
      het openen van een dossier hoort geen geld in beweging te zetten. */
@@ -178,4 +112,7 @@ function maakJournaal({ db, save, nu, crypto }) {
   return { boeking, betaalbestand, sluitAan, bestandenVan, TEGENREKENINGEN };
 }
 
+/* IBAN_VORM hoort bij het betaalbestand en wordt hier alleen doorgegeven, zodat
+   wie journaal.js gebruikt hem niet uit een tweede bestand hoeft te halen. */
+const IBAN_VORM = /^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/;
 module.exports = { maakJournaal, TEGENREKENINGEN, IBAN_VORM };

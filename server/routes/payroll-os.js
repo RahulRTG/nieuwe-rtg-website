@@ -44,6 +44,11 @@ module.exports = (kern) => {
     catch (e) { res.status(500).json({ error: 'De bijwerkronde liep vast: ' + e.message }); }
   });
 
+  /* Het LOONCOMPONENTENREGISTER staat in ./payroll-os-register.js -- een eigen
+     onderwerp (wat IS een looncomponent) naast het draaien van een run, en dit
+     bestand ging over de 10 KB. */
+  require('./payroll-os-register')(kern);
+
   /* De DEKKING (waar kan er wereldwijd loon draaien, en welke bron levert het
      regelpakket van welk land) staat in ./payroll-os-dekking.js -- een eigen
      onderwerp, en dit bestand ging over de 10 KB. */

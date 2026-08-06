@@ -94,6 +94,30 @@ function maakVerzuim({ db, save, nu }) {
   const inPeriode = (code, staffId, van, tot) => rijVan(code, staffId)
     .filter(m => m.van <= tot && (!m.tot || m.tot >= van));
 
+  /* Wat iemand nog wel kan, bijgesteld terwijl het verzuim loopt. Ziek zijn is
+     geen toestand die op dag een vaststaat: na een week kan iemand aangepast
+     werk doen, en dat is precies wat een rooster moet weten.
+
+     ALLEEN DEZE VIER STANDEN, en nog steeds geen veld voor waarom. De melding
+     zelf verandert niet -- soort, van en tot blijven staan -- want dit is een
+     bijstelling en geen nieuwe melding. */
+  function zetInzetbaarheid(code, staffId, van, stand, door) {
+    if (!INZETBAARHEID.includes(stand))
+      return { status: 400, error: 'inzetbaarheid moet een van ' + INZETBAARHEID.join(', ') + ' zijn.' };
+    if (!door) return { status: 400, error: 'Noteer wie dit bijstelt.' };
+    const rij = rijVan(code, staffId);
+    /* Zonder datum: de melding die vandaag loopt. Met een datum: die ene. Wie
+       niets meegeeft bedoelt "waar ik nu in zit", en dat is bijna altijd zo. */
+    const m = van ? rij.find(x => x.van === van)
+      : rij.slice().reverse().find(x => !x.tot || x.tot >= (van || ''));
+    if (!m) return { status: 404, error: 'Er loopt geen verzuimmelding om bij te stellen.' };
+    m.inzetbaarheid = stand;
+    m.inzetbaarheidDoor = door;
+    m.inzetbaarheidOp = tijd();
+    save();
+    return { ok: true, melding: { van: m.van, tot: m.tot, inzetbaarheid: m.inzetbaarheid } };
+  }
+
   /* Wat een leidinggevende ziet: er is afwezigheid, en dit kan iemand nog.
      Geen soort bij ziekte -- "ziek" is al een gezondheidsgegeven, dus dat wordt
      "afwezig". Bij verlof mag de soort er wel bij: dat is geen medisch gegeven
@@ -118,7 +142,7 @@ function maakVerzuim({ db, save, nu }) {
     });
   }
 
-  return { meld, voorPlanning, voorPayroll, keur, SOORTEN, INZETBAARHEID };
+  return { meld, zetInzetbaarheid, voorPlanning, voorPayroll, keur, SOORTEN, INZETBAARHEID };
 }
 
 module.exports = { maakVerzuim, keur, SOORTEN, INZETBAARHEID };

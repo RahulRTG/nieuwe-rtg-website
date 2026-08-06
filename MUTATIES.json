@@ -11,13 +11,15 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "aanmeldgesprek.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "aanmeldingen.test.js": {
       "soort": "puur",
@@ -30,7 +32,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "accounts-os.test.js": {
       "soort": "puur",
@@ -50,31 +53,36 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "administratie.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "agenda-pro.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "agenda.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "agent.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "ai-cache.test.js": {
       "soort": "puur",
@@ -94,7 +102,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "ai-uitwijk.test.js": {
       "soort": "puur",
@@ -107,7 +116,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "aipoort.test.js": {
       "soort": "puur",
@@ -127,19 +137,22 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "allergie.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "alpine.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7
+      "gezakt": 7,
+      "scherp": "gezakt"
     },
     "anthropic.test.js": {
       "soort": "puur",
@@ -159,37 +172,43 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "appbieb.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "archief.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "architect.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "arena.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "assets.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 9
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "ast-grens.test.js": {
       "soort": "puur",
@@ -209,13 +228,15 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "auth-rol.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "automatisering.test.js": {
       "soort": "puur",
@@ -228,25 +249,29 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "baby.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "balans.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "bank-beheer.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 13
+      "gezakt": 13,
+      "scherp": "gezakt"
     },
     "bank.test.js": {
       "soort": "server",

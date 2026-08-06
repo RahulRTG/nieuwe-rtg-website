@@ -5,7 +5,7 @@
 module.exports = (actx) => {
   const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
     fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
-    werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = actx;
+    werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN, payrollOS } = actx;
 /* Fluister voor de vloer staat in ./dienst-fluister.js: dat stuk praat met een
    modelaanbieder en de rest van deze laag niet, dus de vraag wat er naar buiten
    gaat hoort daar bij elkaar. */
@@ -70,6 +70,22 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
   const geldig = d => /^\d{4}-\d{2}-\d{2}$/.test(d);
   if (soort === 'verlof' && (!geldig(van) || !geldig(tot) || tot < van))
     return res.status(400).json({ error: 'Kies een geldige begin- en einddatum.' });
+
+  /* EEN ZIEKMELDING DRAAGT GEEN REDEN. Die stond hier wel: `reden` werd
+     gewoon overgenomen en het HR-scherm van de werkgever toonde hem achter de
+     naam. Dat is een gezondheidsgegeven van een werknemer in een
+     personeelssysteem, zichtbaar voor de leidinggevende -- precies de lijn die
+     de Autoriteit Persoonsgegevens trekt, en precies waar
+     kern/payroll/verzuim.js voor is gebouwd. Die laag weigerde het al; deze
+     route wist er niets van.
+
+     WEIGEREN EN NIET OPSCHONEN. Wie het veld stilzwijgend leegmaakt, laat de
+     invoerder denken dat het is aangekomen -- en de volgende keer probeert hij
+     het opnieuw, of belt hij het door. De melding hoort te stuiten, met de
+     reden erbij. De app stuurt bij een ziekmelding sowieso geen reden mee, dus
+     dit breekt niets; het sluit een deur die openstond. */
+  if (soort === 'ziek' && schoon(req.body.reden, 140))
+    return res.status(422).json({ error: 'Een ziekmelding draagt geen omschrijving. Wat je hebt, hoort bij de arbodienst; hier staat alleen dat je er niet bent en wat je nog kunt.' });
   const lijst = db.data.verlof[req.supplier.code] = db.data.verlof[req.supplier.code] || [];
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
@@ -82,6 +98,25 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
   };
   lijst.unshift(entry);
   db.data.verlof[req.supplier.code] = lijst.slice(0, 2000);
+
+  /* Dezelfde melding ook naar de verzuimlaag van Payroll OS. Die kent de
+     doorbetalingspercentages per verlofsoort en weet wanneer het UWV eraan te
+     pas komt; zonder deze regel wist de loonrun niet dat iemand ziek was en
+     betaalde hij honderd procent door.
+
+     EEN SCHRIJFPAD, TWEE GEZICHTEN -- en dat is met opzet geen tweede invoer.
+     `db.data.verlof` hierboven is de goedkeuringsstroom van de zaak-app (nieuw
+     -> goedgekeurd/afgewezen); de verzuimlaag is wat de payroll ervan moet
+     weten. Zou een mens ze allebei moeten invullen, dan lopen ze uiteen en
+     klopt de loondoorbetaling niet met het rooster. */
+  if (payrollOS && payrollOS.verzuim) {
+    const v = payrollOS.verzuim.meld(req.supplier.code, req.actor.staffId, {
+      soort: soort === 'ziek' ? 'ziek' : 'vakantie', van: entry.van, tot: entry.tot
+    }, req.actor.name);
+    // een bezwaar hier is een fout in ONZE vertaling, niet in de invoer van de
+    // medewerker; hij hoort zichtbaar te zijn en de melding niet te blokkeren
+    if (v && v.error) console.error('[verzuim] melding niet vastgelegd:', v.error, v.bezwaren || '');
+  }
   save();
   if (soort === 'ziek') {
     logActivity(req.supplier.code, req.actor, 'meldde zich ziek');

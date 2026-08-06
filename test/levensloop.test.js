@@ -160,8 +160,18 @@ test('de levensloop: van aanmelding tot tweede baan, en er weer uit', async () =
     assert.equal(klok.status, 200, 'ze klokt in: ' + JSON.stringify(klok.body).slice(0, 160));
 
     /* ---- 10. ZIEK MELDEN. De werkgever hoort het te weten; een ziekmelding
-       die niemand bereikt is geen ziekmelding. ---- */
-    const ziek = await P('/api/staff/leave/request', { soort: 'ziek', reden: 'Griep' }, werk1.token);
+       die niemand bereikt is geen ziekmelding.
+
+       ZONDER "Griep". Hier stond `reden: 'Griep'`, en de route nam dat gewoon
+       aan -- een gezondheidsgegeven van een werknemer in het dossier van zijn
+       werkgever. Dat is dichtgezet (zie test/ziekmelding-privacy.test.js); wat
+       de werkgever te weten komt is DAT ze er niet is, niet WAT ze heeft. Deze
+       toets liep hier langs en legde het oude gedrag vast; dat is precies hoe
+       een fout een afspraak wordt. ---- */
+    const metReden = await P('/api/staff/leave/request', { soort: 'ziek', reden: 'Griep' }, werk1.token);
+    assert.equal(metReden.status, 422, 'een ziekmelding met een omschrijving stuit');
+
+    const ziek = await P('/api/staff/leave/request', { soort: 'ziek' }, werk1.token);
     assert.equal(ziek.status, 200, 'ze meldt zich ziek: ' + JSON.stringify(ziek.body).slice(0, 160));
     assert.equal(ziek.body.entry.soort, 'ziek', 'het staat als ziekmelding genoteerd');
     assert.equal(ziek.body.entry.status, 'gemeld', 'met de juiste status');

@@ -4,14 +4,21 @@ module.exports = (kern) => {
   const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
     fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
     werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
-    oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht } = kern;
+    oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht,
+    payrollOS } = kern;
 
   /* De collega-, dienst- en ooglaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const actx = { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
     fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
     werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
-    oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht };
+    oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht,
+    /* payrollOS gaat mee omdat een ziekmelding twee kanten heeft: de bezetting
+       van vandaag (die laag hier) en de loondoorbetaling (kern/payroll/verzuim).
+       Die tweede stond klaar en werd door niets aangeroepen -- de loonrun wist
+       niet dat iemand ziek was. Hij mag ontbreken (een kaal testproces mount de
+       payrolllaag niet), dus elke aanroep hieronder checkt dat. */
+    payrollOS };
   require('./staff/collega')(actx);
   require('./staff/dienst')(actx);
   require('./staff/oog')(actx);

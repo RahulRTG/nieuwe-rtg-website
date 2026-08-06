@@ -37,7 +37,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopNet } = require('./helper');
 
 const KANTOOR = 'KANTOOR-LOONSTROOK-1';
 const ZAAK = 'MERIDIAAN';   // Meridiaan Toren, de NL-zaak in de demo
@@ -88,7 +88,11 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
       { kassacode: invite.data.invite.kassacode }, reg.data.token);
     assert.equal(verbind.status, 200, JSON.stringify(verbind.data));
     const staffId = verbind.data.staffId;
-    await stop(s.child);
+    /* stopNet en niet stop: stop() is SIGKILL en dan spoelt de write-behind van
+       de json-opslag zijn laatste staat niet weg -- we lezen db.json hierna van
+       schijf en schrijven hem terug, dus alles wat nog in de wachtrij stond
+       zouden we overschrijven met een oudere stand. */
+    await stopNet(s.child);
 
     /* ---- de klok vullen, zoals de vloer hem zou hebben gevuld ---- */
     const dbPad = path.join(TMP, 'db.json');

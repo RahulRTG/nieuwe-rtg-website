@@ -3016,6 +3016,14 @@ var RTG_BOUW = 'c2cfc539';
     stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Clips',        url: '/apps/clips.html' },
     office:      { naam: 'RTG Office',   url: '/apps/office.html' },
+    /* De werkplek zelf. Deze stond alleen op het oude bureaublad
+       (/apps/index.html) en werd daarmee onbereikbaar: geen enkele pagina
+       linkte er nog naartoe. Een app die alleen bestaat als je het adres kent,
+       bestaat voor een gebruiker niet. De naam is die van het bureaublad.
+       Let op het verschil met 'os:werk' hiernaast: dat is de KIEZER die je
+       gekoppelde werkplekken toont (personeel, leverancier, backoffice); dit
+       is de Werk OS-app zelf. */
+    werk:        { naam: 'Werk OS',      url: '/apps/werk.html' },
     sitemaker:   { naam: 'Website-maker', url: '/apps/sitemaker.html' },
     browser:     { naam: 'RTG Browser',  url: '/apps/browser.html' },
     vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
@@ -3091,7 +3099,7 @@ var RTG_BOUW = 'c2cfc539';
       'link:attenties', 'link:table', 'link:cellier', 'link:garderobe'] },
     { sleutel: 'map-huis', naam: 'Het Huis', items: [
       'link:ontdek', 'os:rtf', 'link:school', 'tab:zorg', 'tab:gezin', 'link:rechterhand',
-      'link:office', 'link:browser', 'link:sitemaker', 'link:juridisch', 'link:passkeys',
+      'link:office', 'link:werk', 'link:browser', 'link:sitemaker', 'link:juridisch', 'link:passkeys',
       'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:vitaal', 'link:thuisrust', 'os:werk'] }
   ];
 

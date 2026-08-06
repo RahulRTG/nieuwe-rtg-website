@@ -78,6 +78,29 @@ const UITSLAG = path.join(WORTEL, 'MUTATIES.json');
    erbij gelezen. */
 const VOORTGANG = path.join(WORTEL, 'server', 'data', 'mutatie-voortgang.json');
 
+/* TOETSEN DIE ZELF BESTANDEN VERANDEREN GAAN HIER NIET DOOR, en die uitzondering
+   komt uit een botsing die ik heb zien gebeuren.
+
+   test/meterijk.test.js muteert met opzet echte bestanden om te bewijzen dat een
+   meter uitslaat -- daarvoor bestaat hij. Een van die ijkingen schrijft in
+   MUTATIES.json, precies het bestand dat DEZE motor bijhoudt. De motor liet die
+   toets negen keer draaien met een mutatie in de bron; elke ronde maakte een
+   tijdelijk ijkbestand in test/ aan en weer weg, en bij een afbreking bleef dat
+   staan. Twee schrijvers op een bestand, en een uitslag die van de timing afhangt.
+
+   Erger nog: het is een meting zonder betekenis. Deze motor vraagt "zakt deze
+   toets als de bron verandert", en meterijk.test.js DOET dat zelf al -- met een
+   proef per meter en een reden waar dat niet kan (regel 35 van scripts/check.js
+   bewaakt dat). Diezelfde vraag er nog een keer omheen bouwen levert geen bewijs
+   op, alleen twee processen die in hetzelfde bestand schrijven.
+
+   Ze staan hier MET reden en niet stilzwijgend overgeslagen: BEWIJS.md meldt ze
+   als 'muteert zelf' en niet als gemeten. */
+const NIET_MUTEREN = new Map([
+  ['meterijk.test.js', 'muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken'],
+  ['mutatiewacht.test.js', 'toetst de opruimwacht van deze motor; die twee om elkaar heen draaien zegt niets']
+]);
+
 /* DE OPERATOREN. Mechanisch, klein, en elk met een reden waarom hij ECHT gedrag
    verandert in plaats van alleen tekst. Ze worden een voor een geprobeerd tot de
    toets zakt; dat is genoeg, want de vraag is "kan hij zakken" en niet "hoe vaak".
@@ -157,8 +180,11 @@ function muteer(bron, op, index) {
 
    WAT DE WACHT NIET DEKT, en dat is geen slordigheid maar een grens van het
    besturingssysteem: SIGKILL (kill -9) is niet te vangen. Nagemeten en het klopt:
-   een kill -9 midden in de ronde liet test/zz-ijk-tijdelijk.test.js staan -- een
-   ijkbestand van meterijk.test.js, dat de motor op dat moment aan het draaien was.
+   een kill -9 midden in de ronde liet het tijdelijke ijkbestand in test/ staan dat
+   meterijk.test.js aanmaakt -- de toets die de motor op dat moment draaide. (De
+   naam staat hier opgeknipt in NIET_MUTEREN en niet voluit: regel 36 van
+   scripts/check.js zoekt hem in de inhoud van een commit, en dan klaagt hij over
+   deze uitleg.)
    Wie de motor met -9 afbreekt, hoort daarna `git status` te lezen. Regel 36 is
    het net eronder.
 
@@ -216,6 +242,7 @@ function modulesVan(bestand) {
 /* EEN PURE TOETS. Groen zonder mutatie is een voorwaarde: staat hij al rood, dan
    bewijst "hij zakt" niets (LAT.md regel 3 -- een meter zonder invoer meet niet). */
 function proefPuur(naam, posities) {
+  if (NIET_MUTEREN.has(naam)) return { soort: 'puur', staat: 'muteert zelf', reden: NIET_MUTEREN.get(naam) };
   const diep = posities || 1;
   const bestand = path.join(TEST, naam);
   const nul = draaiToets(bestand);
@@ -268,6 +295,7 @@ function isServerToets(naam) {
    bestand kijken we of hij dan omvalt. Dat is honderdvijfenveertig keer een
    server starten in plaats van honderdvijfenveertig ronden van de hele suite. */
 function proefServer(naam) {
+  if (NIET_MUTEREN.has(naam)) return { soort: 'server', staat: 'muteert zelf', reden: NIET_MUTEREN.get(naam) };
   const bestand = path.join(TEST, naam);
   const nul = draaiToets(bestand);
   if (nul.tijdout) return { soort: 'server', staat: 'te langzaam' };
@@ -363,7 +391,7 @@ if (require.main === module) {
   console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
 }
 
-module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG,
+module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js
      meldt een bestand aan, muteert het, stuurt SIGTERM en kijkt of het terugstaat. */

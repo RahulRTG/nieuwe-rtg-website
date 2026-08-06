@@ -196,6 +196,38 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     assert.match(strook.uitleg, /overuren/i, 'en noemt het onderdeel dat deze periode anders maakt');
     assert.match(strook.uitleg, /loonheffing/i, 'en wat eraf gaat');
 
+    /* ---- de vier vragen, over echte HTTP ----
+       De afgesproken maatstaf: iedere euro moet kunnen zeggen waarom hij is
+       berekend, met welke regel en versie, wie tekende, en waar hij daarna
+       heen ging. Hier is de betaling nog niet gemaakt, dus het dossier hoort
+       NIET volledig te zijn -- en dat eerlijk te zeggen. */
+    const dosOpen = await post(base, '/api/office/payroll/dossier', { runId, staffId }, kantoor);
+    assert.equal(dosOpen.status, 200, JSON.stringify(dosOpen.data));
+    assert.equal(dosOpen.data.antwoorden.waarheen.betaald.stand, 'open',
+      'er is nog geen betaalbestand, en dat staat er als open');
+    assert.equal(dosOpen.data.volledig, false, 'dus het dossier is nog niet volledig');
+
+    const betaal = await post(base, '/api/office/payroll/betaalbestand',
+      { runId, rekeningen: { [staffId]: 'NL91ABNA0417164300' } }, kantoor);
+    assert.equal(betaal.status, 200, JSON.stringify(betaal.data));
+
+    const dos = await post(base, '/api/office/payroll/dossier', { runId, staffId }, kantoor);
+    assert.equal(dos.data.volledig, true, 'nu wel: ' + JSON.stringify(dos.data.antwoorden.waarheen));
+    for (const vraag of ['waarom', 'welkeRegel', 'wieKeurde', 'waarheen'])
+      assert.equal(dos.data.antwoorden[vraag].stand, 'beantwoord', vraag + ' is beantwoord');
+    assert.equal(dos.data.antwoorden.welkeRegel.goedgekeurdDoor != null, true,
+      'met de naam van wie het regelpakket aanmerkte');
+
+    // en de medewerker kan diezelfde vier vragen over zijn EIGEN bedrag stellen
+    const mijnDos = await post(base, '/api/member/dossier', { runId }, lid.token);
+    assert.equal(mijnDos.status, 200, JSON.stringify(mijnDos.data));
+    assert.equal(mijnDos.data.medewerker.staffId, staffId);
+    assert.equal(mijnDos.data.volledig, true);
+
+    // en niet over die van een ander: een vreemde run levert niets
+    const vreemd = await post(base, '/api/member/dossier', { runId: 'run_bestaatniet' }, lid.token);
+    assert.equal(vreemd.status, 404, 'andermans dossier is geen kwestie van een ander getal invullen');
+
     // en het inzagespoor van de andere kant: leeg, maar de route antwoordt
     const spoor = await post(base, '/api/member/identiteit/verzoeken', {}, lid.token);
     assert.equal(spoor.status, 200);

@@ -170,7 +170,12 @@ function maakJournaal({ db, save, nu, crypto }) {
     return { ok: true, boeking: b, bestand: bet.bestand };
   }
 
-  return { boeking, betaalbestand, sluitAan, TEGENREKENINGEN };
+  /* Welke betaalbestanden zijn er voor deze run gemaakt? Lezen, niet maken --
+     het openen van een dossier hoort geen geld in beweging te zetten. */
+  const bestandenVan = (runId) => (db.data.payrollBetaalbestanden || [])
+    .filter(b => b.runId === runId);
+
+  return { boeking, betaalbestand, sluitAan, bestandenVan, TEGENREKENINGEN };
 }
 
 module.exports = { maakJournaal, TEGENREKENINGEN, IBAN_VORM };

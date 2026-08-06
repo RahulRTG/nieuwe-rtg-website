@@ -110,62 +110,9 @@ module.exports = (kern) => {
       doorRol: req.actor.manager ? 'manager' : 'staff' }));
   });
 
-  /* ---------- de medewerker ---------- */
-  /* Zijn eigen stroken, en de uitleg erbij. Het personeelsnummer komt uit de
-     koppeling met het RTG-account, niet uit het verzoek. */
-  app.post('/api/member/loonstroken', auth, (req, res) => {
-    const lid = req.session && req.session.account ? req.session.account : null;
-    if (!lid) return res.status(403).json({ error: 'Meld u aan met uw eigen RTG-account.' });
-    const uit = [];
-    for (const s of (accounts.staffPositions ? accounts.staffPositions(lid.id) : [])) {
-      /* De naam van de zaak komt uit findSupplier en niet uit de personeelsrij:
-         die draagt alleen supplier_code. Er stond `s.supplier_naam`, en dat veld
-         bestaat niet -- dus viel het altijd terug op de code en las de
-         medewerker "MERIDIAAN" boven zijn loonstrook in plaats van
-         "Meridiaan Toren". Stil fout, want een code IS een string. */
-      const zaak = findSupplier ? findSupplier(s.supplier_code) : null;
-      for (const st of payrollOS.run.strokenVan(s.supplier_code, s.id)) {
-        uit.push(Object.assign({ zaak: (zaak && zaak.name) || s.supplier_code }, st,
-          { uitleg: legUit(st.strook) }));
-      }
-    }
-    res.json({ ok: true, stroken: uit });
-  });
-
-  /* WIE HEEFT ER IN MIJN PAPIEREN GEKEKEN. De opvraagkant bestond al (de
-     werkgever ziet ja/nee en kan om gegevens of een kopie vragen, met reden),
-     en elke opvraag werd genoteerd -- maar de betrokkene kon er nergens bij.
-     Een spoor dat alleen de aanvrager kan lezen is geen spoor maar een archief.
-
-     De reden gaat mee, en dat is met opzet: "er is naar uw paspoort gekeken"
-     zonder waarom is alleen verontrustend. */
-  app.post('/api/member/identiteit/verzoeken', auth, (req, res) => {
-    const lid = req.session && req.session.account ? req.session.account : null;
-    if (!lid) return res.status(403).json({ error: 'Meld u aan met uw eigen RTG-account.' });
-    /* De code omzetten naar de naam van de zaak. Een medewerker herkent
-       "Bistro Nova", niet "SUP-4471". */
-    const verzoeken = payrollOS.identiteit.mijnVerzoeken(lid.id).map(v => {
-      const z = findSupplier ? findSupplier(v.bedrijf) : null;
-      return Object.assign({}, v, { bedrijfNaam: (z && z.name) || v.bedrijf });
-    });
-    res.json({ ok: true, verzoeken });
-  });
-
-  /* "Je nettoloon is deze periode hoger door 12 nachturen en vakantiegeld."
-     Een loonstrook die alleen bedragen toont, laat mensen raden; een zin die
-     zegt WAAROM is het verschil tussen een pdf en een antwoord. */
-  function legUit(strook) {
-    const zinnen = [];
-    for (const r of strook.regels) {
-      if (r.soort !== 'bruto' || r.component === 'gewerkte_uren') continue;
-      zinnen.push(r.aantal != null
-        ? r.aantal + ' ' + r.naam.toLowerCase() + ' (' + (r.centen / 100).toFixed(2) + ')'
-        : r.naam.toLowerCase() + ' (' + (r.centen / 100).toFixed(2) + ')');
-    }
-    const basis = strook.regels.find(r => r.component === 'gewerkte_uren');
-    const kop = basis ? basis.aantal + ' gewerkte uren' : 'uw vaste loon';
-    return zinnen.length
-      ? 'Dit bedrag komt uit ' + kop + ', plus ' + zinnen.join(' en ') + '. Daarvan gaat de loonheffing af.'
-      : 'Dit bedrag komt uit ' + kop + '. Daarvan gaat de loonheffing af.';
-  }
+  /* De MEDEWERKERSKANT (zijn eigen stroken, zijn eigen dossier, zijn eigen
+     inzagespoor) staat in ./payroll-os-mens.js. Een eigen onderwerp met een
+     eigen poort -- daar komt niets uit een zaakcode maar alles uit de koppeling
+     met zijn RTG-account -- en dit bestand ging over de 10 KB. */
+  require('./payroll-os-mens')(kern);
 };

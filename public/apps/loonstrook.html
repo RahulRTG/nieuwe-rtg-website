@@ -148,8 +148,39 @@
         inh.map(regelRij).join('') +
         net.map(regelRij).join('') +
         '<div class="rij dik"><span class="lbl">Netto</span><span>' + eur(st.nettoCenten) + '</span></div>' +
-        '</div>' + stappen(st) + '</div>';
+        '</div>' + stappen(st) +
+        /* WIE HEEFT DIT GOEDGEKEURD, EN WAAR IS HET HEEN GEGAAN. Dezelfde vier
+           vragen die het loonkantoor kan stellen, maar dan over jouw bedrag.
+           Lui geladen: het is een vraag die je stelt, geen tekst die je elke
+           keer voorbij hoort te scrollen. */
+        '<details data-dossier="' + esc(s.runId) + '"><summary>Wie keurde dit goed, en waar ging het heen?</summary>' +
+        '<div class="stap">Laden…</div></details>' +
+        '</div>';
     }).join('');
+
+    document.querySelectorAll('[data-dossier]').forEach((el) => {
+      el.addEventListener('toggle', async function () {
+        if (!this.open || this.dataset.geladen) return;
+        this.dataset.geladen = '1';
+        const vak = this.querySelector('.stap');
+        try {
+          const d = await api('/member/dossier', { runId: this.dataset.dossier });
+          const a = d.antwoorden, w = a.waarheen;
+          vak.innerHTML =
+            '<b>Goedgekeurd door</b><br>' +
+            (a.wieKeurde.goedkeuringen || []).map((g) => esc(g.rol) + ': ' + esc(g.door)).join('<br>') +
+            (a.wieKeurde.contractVastgelegdDoor
+              ? '<br>uw contract is vastgelegd door ' + esc(a.wieKeurde.contractVastgelegdDoor) : '') +
+            '<br><br><b>Gerekend met</b><br>regelpakket ' + esc(a.welkeRegel.versie || '?') +
+            (a.welkeRegel.goedgekeurdDoor ? ', aangemerkt door ' + esc(a.welkeRegel.goedgekeurdDoor) : '') +
+            '<br><br><b>Daarna</b><br>' +
+            'aangegeven: ' + (w.aangegeven.stand === 'beantwoord'
+              ? 'ja, kenmerk ' + esc(w.aangegeven.kenmerk) : esc(w.aangegeven.uitleg)) + '<br>' +
+            'uitbetaald: ' + (w.betaald.stand === 'beantwoord'
+              ? 'ja, in ' + w.betaald.bestanden.length + ' betaalopdracht(en)' : esc(w.betaald.uitleg));
+        } catch (e) { vak.textContent = e.message; }
+      });
+    });
   }
 
   const NIVEAU = { gegevens: 'uw gegevens (soort, laatste vier cijfers, geldigheid)',

@@ -21,6 +21,18 @@ module.exports = (kern) => {
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
   const wie = (req) => (req.actor && req.actor.name) || 'onbekend';
 
+  /* ---------- het dossier ----------
+     De vier vragen op een plek. Niet omdat de antwoorden er niet waren -- ze
+     stonden verspreid over vier schermen -- maar omdat verspreid niet hetzelfde
+     is als beschikbaar. Wie bij een controle zelf moet optellen, verzint op een
+     gegeven moment een antwoord. Zie kern/payroll/dossier.js. */
+  app.post('/api/office/payroll/dossier', officeAuth, (req, res) => {
+    const b = req.body || {};
+    antwoord(res, b.staffId != null
+      ? payrollOS.dossier.vanMedewerker(String(b.runId || ''), Number(b.staffId))
+      : payrollOS.dossier.vanRun(String(b.runId || '')));
+  });
+
   /* ---------- journaal en betaalbestand ---------- */
   app.post('/api/office/payroll/journaal', officeAuth, (req, res) => {
     const r = payrollOS.run.haal(String((req.body || {}).runId || ''));

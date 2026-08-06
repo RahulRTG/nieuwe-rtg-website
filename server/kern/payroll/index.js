@@ -15,6 +15,7 @@
      controles    de automatische controles; hoog blokkeert tot het verklaard is
      verzuim      verlof en ziekte, met de scheiding die de AP eist
      dekking      per land: kan hier loon draaien, en zo nee wat ontbreekt er
+     dossier      de vier vragen per bedrag, op een plek
      identiteit   ja/nee voor de werkgever, opvragen met reden en journaal
 
    NAAST DE OUDE kern/payroll.js EN NIET ERIN. Die draait de bestaande
@@ -40,6 +41,7 @@ const { maakVerzuim } = require('./verzuim');
 const { maakIdentiteit } = require('./identiteit');
 const { maakBijwerken, urlBron } = require('./bijwerken');
 const { maakDekking } = require('./dekking');
+const { maakDossier } = require('./dossier');
 const { LANDEN } = require('../fiscaal/landen');
 const { maakUren } = require('./uren');
 const { maakControles } = require('./controles');
@@ -52,6 +54,9 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
   const run = maakRun({ db, save, nu, crypto, motor, regelpakket: regels, componenten });
   const journaal = maakJournaal({ db, save, nu, crypto });
   const aangifte = maakAangifte({ db, save, nu, crypto, run });
+  /* Het dossier verzamelt alleen; het rekent niets opnieuw uit en vult geen
+     gaten. Daarom krijgt het de andere lagen mee in plaats van de database. */
+  const dossier = maakDossier({ run, journaal, aangifte, regelpakket: regels, contracten });
   const verzuim = maakVerzuim({ db, save, nu });
   const identiteit = maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity });
   /* De dekking eerst: de bijwerklaag leest er zijn bronnen uit, per land. Zo is
@@ -79,7 +84,7 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
 
   return {
     payrollOS: {
-      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, controles, dekking,
+      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, controles, dekking, dossier,
       bijwerken, urlBron, laadMeegeleverd
     }
   };

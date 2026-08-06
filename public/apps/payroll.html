@@ -131,6 +131,7 @@
         <button class="knop" id="osDef">Definitief maken</button>
         <button class="knop" id="osJournaal">Loonjournaal</button>
         <button class="knop" id="osAangifte">Loonaangifte</button>
+        <button class="knop" id="osDossier">Dossier (vier vragen)</button>
       </div>
       <div class="noot" style="margin-top:.45rem;">Definitief kan pas als de manager van de zaak ook heeft getekend, de bevindingen met ernst <b>hoog</b> zijn afgehandeld, en het regelpakket is aangemerkt.</div>
       <div id="osNaRun" style="margin-top:.6rem;"></div>
@@ -536,6 +537,88 @@ async function toonAangifte(a){
     catch (e) { meld(e.message); }
   });
 }
+
+/* ---------- het dossier: de vier vragen ----------
+   De maatstaf die is afgesproken, op een scherm. Elk antwoord stond er al,
+   verspreid over vier plekken -- en verspreid is niet hetzelfde als
+   beschikbaar: wie bij een controle zelf moet optellen, verzint op een gegeven
+   moment een antwoord.
+
+   Wat hier NIET gebeurt is een gat opvullen. "Nog niet aangegeven" staat er als
+   OPEN, en `volledig` wordt pas groen als het echt waar is. */
+const DSTAND = { beantwoord: ['beantwoord', ''], open: ['nog te doen', ' goud'],
+  onbekend: ['ontbreekt', ' rood'] };
+const dPil = s => '<span class="pil' + (DSTAND[s] || ['', ''])[1] + '">' + esc((DSTAND[s] || [s])[0]) + '</span>';
+
+function toonDossier(d){
+  const a = d.antwoorden, m = d.medewerker, v = (d.bedrag && d.bedrag.valuta && d.bedrag.valuta.code) || runMunt();
+  const w = a.waarheen;
+  $('#osNaRun').innerHTML =
+    '<div class="sec">Dossier · ' + esc(m.naam) + ' · ' + esc(d.run.periode) + ' · ' +
+      (d.volledig ? '<span class="pil">volledig</span>' : '<span class="pil rood">' + d.open + ' vraag/vragen open</span>') + '</div>' +
+
+    '<div class="regel"><b>' + dPil(a.waarom.stand) + ' 1. Waarom is dit bedrag berekend?</b>' +
+    '<span class="kpi">' + a.waarom.invoer.map(i => esc(i.component) + (i.aantal != null ? ' ' + i.aantal : '')).join(' · ') +
+      ' → netto ' + bedrag(a.waarom.totalen.nettoCenten, v) + '</span>' +
+    '<span class="r"><button class="knop" id="dsStappen">Rekenstappen</button></span></div>' +
+
+    '<div class="regel"><b>' + dPil(a.welkeRegel.stand) + ' 2. Welke regel en versie?</b>' +
+    '<span class="kpi">' + esc(a.welkeRegel.versie || '?') + ' · ' + esc(a.welkeRegel.land || '') +
+      (a.welkeRegel.bron ? ' · bron ' + esc(a.welkeRegel.bron.naam || a.welkeRegel.bron.soort || 'onbekend') : '') +
+      (a.welkeRegel.goedgekeurdDoor ? ' · aangemerkt door ' + esc(a.welkeRegel.goedgekeurdDoor) : '') +
+      (a.welkeRegel.let ? '<br><b>' + esc(a.welkeRegel.let) + '</b>' : '') + '</span></div>' +
+
+    '<div class="regel"><b>' + dPil(a.wieKeurde.stand) + ' 3. Wie heeft goedgekeurd?</b>' +
+    '<span class="kpi">' + (a.wieKeurde.goedkeuringen || []).map(g =>
+      esc(g.rol) + ': ' + esc(g.door)).join(' · ') +
+      (a.wieKeurde.contractVastgelegdDoor ? ' · contract: ' + esc(a.wieKeurde.contractVastgelegdDoor) : '') +
+      (a.wieKeurde.definitiefDoor ? ' · definitief: ' + esc(a.wieKeurde.definitiefDoor) : '') +
+      (a.wieKeurde.ontbreekt.length ? '<br>ontbreekt: <b>' + a.wieKeurde.ontbreekt.map(esc).join(', ') + '</b>' : '') +
+      '</span></div>' +
+
+    '<div class="regel"><b>' + dPil(w.stand) + ' 4. Waar geboekt, aangegeven, betaald?</b>' +
+    '<span class="kpi">' +
+      'geboekt: ' + (w.geboekt.stand === 'beantwoord'
+        ? (w.geboekt.sluitAan ? 'ja, sluit op nul' : 'ja, maar sluit NIET') : esc(w.geboekt.uitleg)) + '<br>' +
+      'aangegeven: ' + (w.aangegeven.stand === 'beantwoord'
+        ? 'kenmerk ' + esc(w.aangegeven.kenmerk) + ' door ' + esc(w.aangegeven.ingediendDoor)
+        : esc(w.aangegeven.uitleg)) + '<br>' +
+      'betaald: ' + (w.betaald.stand === 'beantwoord'
+        ? w.betaald.bestanden.map(x => bedrag(x.totaalCenten, v) + ' (' + x.aantal + ' post(en))').join(', ')
+        : esc(w.betaald.uitleg)) +
+      '</span></div>';
+
+  const knop = document.getElementById('dsStappen');
+  if (knop) knop.addEventListener('click', () => {
+    knop.disabled = true;
+    knop.insertAdjacentHTML('afterend', '<div class="kpi" style="width:100%;margin-top:.4rem;">' +
+      a.waarom.stappen.map(s => esc(s.stap) +
+        (s.uitleg ? ' · ' + esc(s.uitleg) : '') +
+        (s.tarief != null ? ' · tarief ' + esc(s.tarief) : '') +
+        (s.centen != null ? ' → ' + bedrag(s.centen, v) : '')).join('<br>') + '</div>');
+  });
+}
+
+$('#osDossier').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try {
+    const kort = await api('dossier', { runId: OSRUN.id });
+    /* Eerst de run, dan de mens: het dossier gaat over EEN bedrag, en niemand
+       vraagt "waarom is deze loonrun 84.000 euro" -- ze vragen "waarom kreeg
+       ik dit". Staat er maar een medewerker in, dan slaan we de keuze over. */
+    const mensen = kort.medewerkers || [];
+    if (!mensen.length) return meld('Deze loonrun heeft geen stroken.');
+    let staffId = mensen[0].staffId;
+    if (mensen.length > 1) {
+      const keuze = prompt('Van wie wilt u het dossier?\n\n' +
+        mensen.map(m => m.staffId + ' = ' + m.naam + (m.volledig ? '' : ' (' + m.open + ' open)')).join('\n'),
+        String(staffId));
+      if (!keuze) return;
+      staffId = Number(keuze);
+    }
+    toonDossier(await api('dossier', { runId: OSRUN.id, staffId }));
+  } catch (e) { $('#osNaRun').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
 
 /* ================= wereldwijd =================
    HET SCHERM DAT DE STILTE WEGHAALT. Zonder dit overzicht merkt niemand dat er

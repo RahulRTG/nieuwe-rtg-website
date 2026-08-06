@@ -28,6 +28,9 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/seizoen-pas.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   :root{
     --bg:var(--rtg-bg);
@@ -1519,6 +1522,8 @@
 </style>
 <link href="/shared/vensters.css" rel="stylesheet">
 <script src="/shared/vensters.js" defer></script>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#content">Naar de inhoud</a>

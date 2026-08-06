@@ -3,11 +3,8 @@
    (kern/fluister.js) en de Shared Assets (kern/assets.js). Alleen routes;
    de logica woont in de kern-modules. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, verdienPunten, pestgrens, bus, noteerBeurt,
-    zorgVan, zorgZet, locDeel, locStopKlant, locMijn,
-    fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, stuurLus,
-    sparLijst, sparParkeer, sparStatus,
-    assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap } = kern;
+  const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, zorgVan, zorgZet, locDeel, locStopKlant, locMijn, stuurLus, assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap } = kern;
+  const { fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, sparLijst, sparParkeer, sparStatus } = kern.fluister;
 
 /* ---- de zorgvolle keten (kern/gastzorg.js) ----
    Het zorgprofiel: allergenen, dieet en medische aandachtspunten. Reist

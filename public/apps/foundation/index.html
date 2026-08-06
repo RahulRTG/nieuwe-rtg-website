@@ -11,6 +11,9 @@
 <link rel="stylesheet" href="stijl.css">
 <script src="palet.js"></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   .wrap{max-width:52rem;margin:0 auto;padding:1.2rem 1.2rem 3rem;}
   .hero{text-align:center;padding:1rem 0 1.4rem;}
@@ -117,6 +120,8 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/vensters.css" rel="stylesheet">
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>

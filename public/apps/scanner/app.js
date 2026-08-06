@@ -64,8 +64,8 @@
       naarPagina($('#beeld'), $('#beeld').videoWidth, $('#beeld').videoHeight);
       return;
     }
-    if (!navigator.mediaDevices) return meld('Geen camera op dit toestel; kies gerust foto\'s hieronder.');
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 } }, audio: false })
+    // shared/media.js noemt de oorzaak; foto's kiezen blijft altijd een uitweg
+    window.RTGMedia.camera({ achter: true, video: { width: { ideal: 1920 } }, stil: true })
       .then(function (s) {
         stream = s;
         $('#beeld').srcObject = s; $('#beeld').play();
@@ -73,7 +73,10 @@
         $('#cameraKnop').textContent = 'Leg deze pagina vast';
         $('#cameraStop').style.display = '';
       })
-      .catch(function () { meld('Geen toegang tot de camera; kies gerust foto\'s hieronder.'); });
+      .catch(function (e) {
+        meld(((e.rtg && (e.rtg.kort + '. ' + e.rtg.uitleg)) || 'Geen toegang tot de camera') +
+          ' Kies gerust foto\'s hieronder.');
+      });
   });
   $('#cameraStop').addEventListener('click', function () {
     if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }

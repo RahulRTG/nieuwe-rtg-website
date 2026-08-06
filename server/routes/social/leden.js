@@ -3,7 +3,10 @@
    routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding, lidBoard, lidBoardZet } = kern;
+  const { app, express, auth, geenGast, db, save, socialZoek, socialVerbind, socialAntwoord,
+          socialConnecties, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan,
+          sseToCustomer, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor,
+          verhaalBekijken, dagOpdracht, isGeblokkeerd } = kern;
 
 // leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam).
 // De eigen naamlaag zoekt mee: wie zijn vriend een eigen naam gaf, vindt

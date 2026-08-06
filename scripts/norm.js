@@ -102,7 +102,101 @@ const METERS = [
      groeit vanzelf (routes schrijven is stap een, de catalogus bijwerken stap
      twee), dus het hoort aan een ratel. scripts/schakelbaar.js meet het. */
   { sleutel: 'routesNietSchakelbaar', richting: 'omlaag', wat: 'API-routes die niet vanuit de boardroom te schakelen zijn' },
-  { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan als een dienst ontbreekt' },
+  /* DE GRENZEN TUSSEN DE DOMEINEN (scripts/grenzen.js).
+
+     server.js geeft elke router hetzelfde object `kern` met ruim driehonderd
+     eigenschappen. Er is dus geen grens: elk domein kan bij alles van elk ander.
+     Dat is niet op te lossen door code te verplaatsen -- server.js ging van 183
+     naar 103 kB en de verstrengeling bleef exact gelijk. Wat ontbrak was een
+     getal.
+
+     Wat de meting liet zien, en waarom dit oplosbaar is: van de 951 aangeraakte
+     eigenschappen wordt 85% door PRECIES EEN domein gebruikt. Slechts 26 door
+     vijf of meer -- app, auth, supplierAuth, db, save, crypto. Dat laatste
+     lijstje is een echte interface. De zak is gedeeld, de inhoud niet.
+
+     `kernGedeeld` is de meter die telt: eigenschappen die meer dan een domein
+     aanraakt. Omlaag brengen betekent dat een domein iets van zichzelf
+     terugneemt, en dat is precies wat "een domein kan als eigen proces draaien"
+     waar moet maken. `kernBreedsteBestand` pakt de andere kant: een routebestand
+     dat honderdnegenendertig namen nodig heeft, weet niet wat het is. */
+  { sleutel: 'kernBreedte', richting: 'omlaag', wat: 'kern-eigenschappen die routes aanraken' },
+  { sleutel: 'kernGedeeld', richting: 'omlaag', wat: 'kern-eigenschappen die MEER dan een domein aanraakt (de echte koppeling)' },
+  { sleutel: 'kernBreedsteBestand', richting: 'omlaag', wat: 'namen die het breedste enkele routebestand uit kern haalt' },
+  /* EN TOEN BLEEK DE HELFT VAN DIE BREEDTE NEP. De twaalf breedste
+     routebestanden reikten alle twaalf naar 134-139 namen. Dat waren geen twaalf
+     brede domeinen: het was EEN destructurering die twaalf keer was overgenomen.
+     server/routes/supplier/kamers.js pakte honderdvierendertig namen uit de kern,
+     gebruikte er NUL van, en riep daarna twee submodules aan -- twintig regels
+     bestand, negen regels kop.
+
+     Over server/routes samen: 3929 namen gepakt en nergens gebruikt, over 62
+     bestanden. Zo'n kop zegt niet wat een bestand nodig heeft maar wat een
+     broertje ooit nodig had, en dan is er geen grens meer, ook niet op papier.
+     Ze zijn alle 3929 weg; wat er nu in een kop staat, wordt ook echt gebruikt.
+
+     Deze meter houdt dat vast, en regel 39 in scripts/check.js weigert een
+     nieuwe. Hij hoort op nul te blijven staan: elke stijging is een kop die
+     opnieuw breder is dan het bestand. */
+  { sleutel: 'kernOngebruikt', richting: 'omlaag', wat: 'namen die een routebestand uit kern PAKT en nergens gebruikt' },
+  /* KAN DEZE TOETS EIGENLIJK ZAKKEN? (scripts/mutatie.js -> MUTATIES.json)
+
+     LAT.md regel 9 zegt dat een toets die niet kan zakken erger is dan geen
+     toets. BEWIJS.md liet zien hoe groot dat gat hier was: van de 612
+     toetsbestanden noemden er 586 geen enkele mutatie. Dat is geen bewijs dat ze
+     niets waard zijn -- het is bewijs dat niemand het WEET, en dat is precies wat
+     een meter moet oplossen.
+
+     De motor probeert het per bestand. Pure toetsen krijgen een mechanische
+     mutatie in de module die ze laden; servertoetsen krijgen de liegpoort over
+     alle /api/-paden. Zakt de toets: bewezen gevoelig. Blijft hij groen: hij legt
+     het gedrag dat de motor kan raken niet vast.
+
+     TWEE METERS EN GEEN EEN, want dat zijn twee verschillende dingen:
+
+       toetsenOngevoeligPct  van de GEMETEN toetsen: welk deel bleef groen. Dit is
+                             de echte schuld.
+       toetsenNietGemeten    de motor is er nog niet langs geweest. Dit is de
+                             dekking van het INSTRUMENT, niet van de code.
+
+     Ze samentellen zou de tweede voor de eerste laten doorgaan -- dezelfde fout
+     als de geblende teller hieronder, die om die reden is opgeknipt.
+
+     EN WAAROM DE EERSTE EEN PERCENTAGE IS EN GEEN AANTAL. Hij stond eerst als
+     `toetsenOverleefdeMutatie`, een absoluut getal, met een grondwaarde van 6 na
+     de eerste zestig metingen. Vier metingen later stond hij op 8 en was de ratel
+     rood -- terwijl er niets slechter was geworden: er was alleen MEER gemeten.
+     Een meter die rood wordt omdat je hem gebruikt, leert iedereen om te stoppen
+     met meten. Als aandeel van wat er gemeten is, is hij onafhankelijk van hoe
+     ver de motor gekomen is, en dan betekent een stijging wat hij zegt. */
+  { sleutel: 'toetsenOngevoeligPct', richting: 'omlaag', wat: 'aandeel van de GEMETEN toetsen dat een mutatie in eigen bron overleefde (%)' },
+  { sleutel: 'toetsenNietGemeten', richting: 'omlaag', wat: 'toetsen waar de mutatiemotor nog niet langs is geweest' },
+  /* DEZE METER WAS EEN GEBLENDE TELLER, precies zoals keuringBeter dat was, en
+     hij liep om dezelfde reden vast: hij telde twee onvergelijkbare dingen bij
+     elkaar op, en de ene groep botste met een ANDERE meter in deze lijst.
+
+     Een toets kan zichzelf om twee heel verschillende redenen overslaan:
+
+     1. ER MIST EEN DIENST (Postgres, Redis, openssl). Dat is het gat waar deze
+        meter voor is gemaakt: acht pg-toetsbestanden telden maandenlang mee als
+        dekking zonder ooit te draaien. Zeventien aanroepen, allemaal in
+        *.test.js, en dit getal mag alleen omlaag.
+     2. ER MIST EEN BROWSER. Elke *.e2e.js begint met `{ skip: pw ? false : ... }`.
+        Honderdeen aanroepen. Die staan er niet uit slordigheid maar zodat wie
+        de suite zonder Playwright draait geen muur van rood krijgt -- en het
+        risico dat daarbij hoort is AL gedekt: test/browserpoort.e2e.js slaat
+        zichzelf nooit over en zakt hard zodra RTG_E2E_STRICT=1 staat en er geen
+        browser is. Dat staat in CI aan.
+
+     Samen geteld werkte de ratel tegen zichzelf: een schermtoets toevoegen liet
+     e2eBestanden stijgen (goed, want die moet omhoog) EN zelfpoortendeToetsen
+     stijgen (fout, want die moet omlaag). Twee tanden die tegengesteld
+     reageren op dezelfde verbetering.
+
+     Apart geteld is dit niet losser maar STRAKKER: de dienstgroep ratelt nu op
+     17 in plaats van te mogen wegvallen tegen de honderdeen browsergevallen. */
+  { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan omdat een DIENST ontbreekt (Postgres, Redis, openssl)' },
+  { sleutel: 'browserpoortToetsen', richting: 'omhoog', wat: 'schermtoetsen achter de browserpoort (bewaakt door test/browserpoort.e2e.js)' },
   { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' },
   /* DE LAATSTE unsafe-inline IN DE CSP, geteld in plaats van beschreven.
 
@@ -190,12 +284,27 @@ const PRESTATIEMETERS = [
    te kijken of dat klopt of dat de groep gewoon verdwenen is. */
 function telPerGroep(k) {
   const uit = { keuringOmvang: 0, keuringDubbeling: 0, keuringDekkingAdvies: 0 };
-  const naar = { omvang: 'keuringOmvang', dubbeling: 'keuringDubbeling', dekking: 'keuringDekkingAdvies' };
+  const naar = { omvang: 'keuringOmvang', dubbeling: 'keuringDubbeling' };
   for (const b of (k.bevindingen || [])) {
     if (b.soort !== 'beter') continue;
     const sleutel = naar[b.groep];
     if (sleutel) uit[sleutel]++;
   }
+  /* DE DEKKINGSMETER LEEST EEN GETAL EN GEEN MELDINGEN, en dat is de reparatie.
+
+     Hij telde de dekking-meldingen van de keuring, en die zijn afgekapt op acht
+     zodat het rapport leesbaar blijft. Er waren acht domeinen met gaten, dus
+     stond de meter op zijn plafond en kon hij niet stijgen -- en dat stond in
+     test/meterijk.test.js als REDEN waarom hij niet te ijken viel. Een meter die
+     niet kan bewegen is geen meter; hij mat de slice.
+
+     scripts/keuring.js geeft nu cijfers.dekking.domeinenMetGaten terug: alle
+     domeinen, niet de eerste acht. Ontbreekt dat getal (een oudere keuring), dan
+     vallen we terug op de oude telling en niet op nul -- nul zou als de beste
+     score ooit gelden en de ratel zou dat vastleggen (LAT.md regel 3). */
+  const echt = k.cijfers && k.cijfers.dekking && k.cijfers.dekking.domeinenMetGaten;
+  if (typeof echt === 'number') uit.keuringDekkingAdvies = echt;
+  else uit.keuringDekkingAdvies = (k.bevindingen || []).filter(b => b.soort === 'beter' && b.groep === 'dekking').length;
   return uit;
 }
 
@@ -226,13 +335,56 @@ function telOngeijkt(ijkBron, extraSleutels) {
      telde nul, terwijl er dertien stonden -- een meter die nul teruggeeft
      omdat zijn patroon niet past, is precies de vorm waar deze meter over
      gaat. Redenen bevatten nooit geneste accolades, dus [^{}] volstaat. */
+  /* EN DE TEKENREEKSEN ERUIT, want anders telt deze meter zijn EIGEN IJKING mee.
+
+     Dat is precies wat er gebeurde. In de registratie staat bij `metersOngeijkt`
+     een proef die telOngeijkt een VERZONNEN registratie voedt, en die verzonnen
+     tekst bevat letterlijk `p99Ms: { reden: '...' }`. Die staat in het bestand
+     vóór de echte regel `p99Ms: { proef: ... }`, en .exec() pakt de eerste
+     treffer -- dus meldde de meter p99Ms als ongeijkt terwijl hij een proef
+     heeft. Uitkomst: 2 in plaats van 1, en de echte proef werd nooit gezien.
+
+     Het is de derde keer dat een teller in dit huis over zijn eigen ijking
+     struikelt (zie de kop van de skip-teller hierboven: eerst commentaar, toen
+     een tekenreeks). De oplossing is dezelfde en staat hier daarom niet als
+     uitzondering maar als dezelfde wringer: wat tussen aanhalingstekens staat is
+     TEKST en geen code, en een teller die code telt hoort er niet in te kijken. */
+  const zonderTekst = String(blok[1])
+    .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
   return sleutels.filter(s => {
-    const m = new RegExp('(^|[^a-zA-Z0-9])' + s + '\\s*:\\s*\\{([^{}]*)\\}').exec(blok[1]);
+    const m = new RegExp('(^|[^a-zA-Z0-9])' + s + '\\s*:\\s*\\{([^{}]*)\\}').exec(zonderTekst);
     return m && /reden:/.test(m[2]);
   }).length;
 }
 
-function meet() {
+/* De skips geteld en meteen in twee bakken gesorteerd. Losse functie met de
+   bestandslijst en een lezer als invoer, zodat test/meterijk.test.js hem met een
+   verzonnen bestand kan voeden -- een meter die alleen zijn eigen testmap kan
+   lezen, is niet te ijken.
+
+   De sortering gaat op BESTANDSSOORT en niet op de tekst van de reden, en dat is
+   geen luiheid: de reden staat in een tekenreeks, en die is er bij het tellen al
+   uitgewassen (zie zonderTekst hieronder -- dat moest, anders telde de ijking
+   zijn eigen voorbeeldregel mee). Nagemeten over de hele testmap: alle
+   honderdeen browsergevallen staan in *.e2e.js en alle zeventien dienstgevallen
+   in *.test.js. De grens loopt daar dus precies. */
+function telSkips(bestanden, lees) {
+  const uit = { dienst: 0, browser: 0 };
+  for (const f of bestanden) {
+    const bron = String(lees(f));
+    let n = 0;
+    for (const m of bron.matchAll(/\{\s*skip\s*:\s*([^}]+)\}/g)) if (!/^false\s*$/.test(m[1])) n++;
+    // test.skip(...) / it.skip(...): de harde vorm, altijd overgeslagen
+    n += (bron.match(/\b(?:test|it)\.skip\s*\(/g) || []).length;
+    if (f.endsWith('.e2e.js')) uit.browser += n; else uit.dienst += n;
+  }
+  return uit;
+}
+
+/* `bronnen` is er alleen voor de IJKING (test/meterijk.test.js) en is optioneel:
+   zonder argument leest deze meter alles van schijf zoals altijd. Zie de uitleg
+   bij `mutaties` hieronder voor waarom dat er is. */
+function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
      moment dat er iets te meten viel -- de meetketen brak als de meting niet
@@ -290,15 +442,57 @@ function meet() {
      de hele testmap: alleen meterijk.test.js verandert, 78 -> 77). */
   const zonderTekst = (b) => String(b)
     .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
-  let zelfpoortendeToetsen = 0;
-  for (const f of inMap.filter(n => /\.(test|e2e)\.js$/.test(n))) {
-    const bron = zonderTekst(zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8')));
-    for (const m of bron.matchAll(/\{\s*skip\s*:\s*([^}]+)\}/g)) {
-      if (!/^false\s*$/.test(m[1])) zelfpoortendeToetsen++;
+  const skips = telSkips(inMap.filter(n => /\.(test|e2e)\.js$/.test(n)),
+    (f) => zonderTekst(zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8'))));
+  const zelfpoortendeToetsen = skips.dienst;
+  const browserpoortToetsen = skips.browser;
+
+  /* De mutatie-uitslag. Ontbreekt MUTATIES.json, dan hoort dit te ZAKKEN en niet
+     stilzwijgend nul te melden (LAT.md regel 3): nul overlevers zou dan als
+     perfect scoren terwijl er niets is gemeten. */
+  /* DE BRON IS INJECTEERBAAR, EN DAT IS EEN REPARATIE EN GEEN NETHEID.
+
+     test/meterijk.test.js ijkte deze twee meters door een verzonnen uitslag in
+     het ECHTE MUTATIES.json te schrijven en het in een finally terug te zetten.
+     Dat werkte, en het was een val met twee monden. (1) Wie in dat venster van
+     een paar seconden `git add -A` doet, commit een uitslag waarin toetsen
+     "overleefd" staan en alle details weg zijn -- eerlijkheidspunt 6.4, voor de
+     derde keer. (2) Een kill in dat venster laat de finally NIET lopen, en dat
+     is hier geen theorie: deze sessie bleef server/lokaal-tls.js zo gemuteerd
+     staan. Dan is de uitslag van een campagne van 540 toetsen weg en vervangen
+     door "alles overleefd" -- het slechtst mogelijke verlies, want het ziet
+     eruit als een meting.
+
+     Wat er wordt meegegeven is de LEZER en niet de uitkomst. Zou de ijking een
+     kant-en-klaar geteld resultaat mogen aanleveren, dan bewijst ze dat het
+     tellen werkt en niet dat DEZE meter het leest -- precies het onderscheid uit
+     de kop van deze functie ("meet of hij draait en niet of hij ziet"). Nu loopt
+     de hele weg (lezen, parsen, tellen, drempels) nog steeds door de meter.
+
+     Wat hiermee NIET is bewezen: dat de standaardlezer naar het juiste pad
+     wijst. Dat is die ene regel hieronder, en die staat er onbedekt bij. */
+  const mutaties = (() => {
+    const p = path.join(WORTEL, 'MUTATIES.json');
+    const lees = (bronnen && bronnen.leesMutaties) || (() => fs.readFileSync(p, 'utf8'));
+    let rauw;
+    try { rauw = JSON.parse(lees()).toetsen || {}; }
+    catch (e) { throw new Error('MUTATIES.json is er niet of onleesbaar (' + e.message + '); draai npm run mutatie -- twee meters hebben hem als invoer'); }
+    const alle = inMap.filter(n => /\.(test|e2e)\.js$/.test(n));
+    let overleefd = 0, gezakt = 0, nietGemeten = 0;
+    for (const n of alle) {
+      const m = rauw[n];
+      if (!m) { nietGemeten++; continue; }
+      if (m.staat === 'overleefd') overleefd++;
+      else if (m.staat === 'gezakt') gezakt++;
+      else nietGemeten++;      // 'al rood', 'geen module gevonden', 'slaat zichzelf over', ...
     }
-    // test.skip(...) / it.skip(...): de harde vorm, altijd overgeslagen
-    zelfpoortendeToetsen += (bron.match(/\b(?:test|it)\.skip\s*\(/g) || []).length;
-  }
+    const gemeten = overleefd + gezakt;
+    /* Een percentage over nul metingen is geen nul maar ONBEKEND, en dat mag geen
+       perfecte score worden (LAT.md regel 3). Zonder metingen hoort de meter niet
+       te bestaan; norm.js noemt hem dan als nieuw zonder grondwaarde. */
+    if (!gemeten) throw new Error('MUTATIES.json bevat geen enkele gemeten toets; draai npm run mutatie voordat deze meter iets kan zeggen');
+    return { ongevoeligPct: Math.round(1000 * overleefd / gemeten) / 10, nietGemeten, overleefd, gezakt };
+  })();
 
   /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
   const PUB = path.join(WORTEL, 'public');
@@ -313,6 +507,12 @@ function meet() {
     }
   })(PUB);
   const inlineStijlAttributen = telInlineStijl(p => fs.readFileSync(p, 'utf8'), stijlBestanden);
+
+  /* De grenzen uit dezelfde bron als het losse script (regel 4: geen tweede
+     implementatie). Faalt hij, dan zakt de meter in plaats van stil nul te geven. */
+  let grenzen;
+  try { grenzen = require('./grenzen').meet(); }
+  catch (e) { throw new Error('de grenzen konden niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
 
   /* De schakelbaarheid uit dezelfde bron als het losse script: een tweede
      implementatie zou binnen een week uiteenlopen (regel 4). */
@@ -368,7 +568,12 @@ function meet() {
     keuringStuk: k.stuk, keuringScheef: k.scheef,
     keuringTeGroot: (k.cijfers.uitschieters || {}).teGroot || 0,
     ...telPerGroep(k),
-    dependencies: deps, testbestanden, zelfpoortendeToetsen, e2eBestanden,
+    kernBreedte: grenzen.kernBreedte, kernGedeeld: grenzen.kernGedeeld,
+    kernBreedsteBestand: grenzen.kernBreedsteBestand,
+    kernOngebruikt: grenzen.kernOngebruikt,
+    toetsenOngevoeligPct: mutaties.ongevoeligPct,
+    toetsenNietGemeten: mutaties.nietGemeten,
+    dependencies: deps, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen
   };
 }
@@ -573,4 +778,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl };
+module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };

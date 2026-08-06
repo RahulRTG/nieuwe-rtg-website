@@ -69,15 +69,17 @@
     ov.querySelector('#pscanAf').addEventListener('click', afbreken);
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { document.removeEventListener('keydown', esc); afbreken(); } });
 
-    if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
-      ov.querySelector('#pscanSub').textContent = tekst('scan.geen', 'Dit toestel heeft geen camera-toegang. Kies dan een foto.');
-      ov.querySelector('#pscanMaak').style.display = 'none';
-      return;
-    }
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 } }, audio: false })
+    /* Via shared/media.js. De oude versie had twee meldingen -- "geen
+       camera-toegang" en "geen toegang" -- en beide stuurden de gebruiker naar
+       een instelling. De echte oorzaak is meestal het adres (http) of het
+       venster waarin dit scherm staat; die staat nu in de melding. */
+    window.RTGMedia.camera({ achter: true, video: { width: { ideal: 1920 } }, stil: true })
       .then(function (s) { stream = s; vid.srcObject = s; })
-      .catch(function () {
-        ov.querySelector('#pscanSub').textContent = tekst('scan.geenrecht', 'Geen toegang tot de camera. Kies anders een foto.');
+      .catch(function (e) {
+        var r = e.rtg || {};
+        ov.querySelector('#pscanSub').textContent =
+          (r.kort ? r.kort + '. ' + r.uitleg + ' ' : tekst('scan.geenrecht', 'Geen toegang tot de camera. ')) +
+          tekst('scan.kiesfoto', 'Kies anders een foto.');
         ov.querySelector('#pscanMaak').style.display = 'none';
       });
 

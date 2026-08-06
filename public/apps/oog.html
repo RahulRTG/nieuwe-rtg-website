@@ -12,6 +12,9 @@
 <script src="/apps/rtg-protect.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
     --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
@@ -64,6 +67,8 @@
   .melding.zien{opacity:1;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 </style>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <header class="kop">
@@ -351,9 +356,9 @@
     if (!token) { $('#vPoort').classList.remove('weg'); return; }
     if (!(await laadStand())) return;
     try {
-      video.srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: 1280 }, audio: false });
+      video.srcObject = await RTGMedia.camera({ achter: true, video: { width: 1280 }, stil: true });
       status('Richt op het voertuig en schouw.');
-    } catch (e) { status('Camera niet beschikbaar; geef toestemming.'); }
+    } catch (e) { status(((e.rtg && (e.rtg.kort + '. ' + e.rtg.uitleg)) || e.message)); }
     toonSchouwen();
     setInterval(vloerTik, 450);
   })();

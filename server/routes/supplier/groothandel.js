@@ -6,10 +6,8 @@
       met de AI die op basis van verkoop + mise-en-place een bijbestelling
       voorstelt. */
 module.exports = (kern) => {
-  const { app, db, express, managerOnly, supplierAuth,
-    ghIsGroothandel, ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghDefaults,
-    ghMarkt, ghPlaatsBestelling, ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend,
-    ghBijbestelVoorstel, GROOTHANDEL_CATEGORIEEN } = kern;
+  const { app, express, managerOnly, supplierAuth } = kern;
+  const { ghIsGroothandel, ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghDefaults, ghMarkt, ghPlaatsBestelling, ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel, GROOTHANDEL_CATEGORIEEN } = kern.groothandel;
 
   function eisGroothandel(req, res) {
     if (!ghIsGroothandel(req.supplier)) { res.status(409).json({ error: 'Dit is geen groothandel.' }); return false; }

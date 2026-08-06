@@ -4,12 +4,11 @@
    (op staffId): eigen diensten, inklokken op post, patrouillerondes, incidenten
    melden en de SOS-noodknop. Draait op kern/beveiliging. */
 module.exports = (kern) => {
-  const { app, express, supplierAuth, managerOnly,
-    bevIsBeveiliging, bevCommand, bevFunctieLijst, bevZetFunctie, bevZetPost, bevVerwijderPost,
-    bevBudget, bevZetBudget, bevRooster, bevZetDienst, bevSchrapDienst, bevPlanAuto,
-    bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag, bevBeslisIncident,
-    bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
-    bevMeldIncident, bevSos, BEVEILIGING_SHIFTS, BEVEILIGING_ERNST } = kern;
+  const { app, express, supplierAuth, managerOnly, bevIsBeveiliging, bevCommand, bevZetFunctie,
+          bevZetPost, bevVerwijderPost, bevBudget, bevZetBudget, bevRooster, bevZetDienst,
+          bevSchrapDienst, bevPlanAuto, bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
+          bevBeslisIncident, bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint,
+          bevRondeKlaar, bevMeldIncident, bevSos, BEVEILIGING_SHIFTS, BEVEILIGING_ERNST } = kern;
 
   // alle endpoints gelden alleen voor een beveiligingsteam
   function eisBeveiliging(req, res) {

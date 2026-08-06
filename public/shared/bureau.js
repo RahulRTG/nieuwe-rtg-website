@@ -123,6 +123,7 @@
   function bouwApp(body, w) {
     body.style.padding = '0';
     var f = document.createElement('iframe');
+    window.RTGMedia.kader(f);   // camera/microfoon doorgeven; tekst in shared/media.js
     f.src = w.app || '/apps/index.html';
     f.setAttribute('title', w.naam || 'RTG-app');
     f.setAttribute('loading', 'lazy');

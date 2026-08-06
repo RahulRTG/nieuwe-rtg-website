@@ -1338,8 +1338,9 @@ var RTG_BOUW = 'c2cfc539';
     return pc;
   }
   async function pakMedia(video){
-    try { return await navigator.mediaDevices.getUserMedia({ audio: true, video: video ? { facingMode: 'user' } : false }); }
-    catch(e){ toast(T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
+    // shared/media.js noemt de oorzaak en plaatst de volle uitleg zelf
+    try { return await RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }); }
+    catch(e){ toast((e.rtg && e.rtg.kort) || T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
   }
   function toonGesprek(naam, video){
     $('#csNaam').textContent = naam; $('#csNaam2').textContent = naam;
@@ -7724,7 +7725,7 @@ var RTG_BOUW = 'c2cfc539';
     if (ontmoetSosPc) return;
     try {
       await haalIce();
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: 'environment' } });
+      const stream = await RTGMedia.camera({ achter: true, audio: true });
       const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
       ontmoetSosPc = pc; ontmoetSosDate = dateId;
       stream.getTracks().forEach(t => pc.addTrack(t, stream));

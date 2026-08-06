@@ -18,6 +18,9 @@
 <script src="/shared/rosapps.js" defer></script>
 <script src="/shared/flagship.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -153,6 +156,8 @@
   .wlegenda span{display:flex;gap:.35rem;align-items:center;}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
 </head>
 <body data-osbar="Kantoren" data-oswereld="kantoor" data-flagship class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>

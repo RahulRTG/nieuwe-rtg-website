@@ -13,6 +13,9 @@
 <script src="/apps/rtg-protect.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
     --soft:var(--rtg-soft);--gold:#C9A24B;--rood:#DE6E92;--groen:#69B891;}
@@ -68,6 +71,8 @@
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 </style>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <header class="kop">
@@ -228,9 +233,9 @@
     if (rec && rec.state === 'recording') { rec.stop(); return; }
     try {
       // bioscoopniveau: vraag het maximale dat de camera kan, met hoge bitrate
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 3840 }, height: { ideal: 2160 }, frameRate: { ideal: 30 } }, audio: true });
-    } catch (e) { return zeg('Camera en microfoon zijn nodig om op te nemen.'); }
+      stream = await RTGMedia.vraag({
+        video: { width: { ideal: 3840 }, height: { ideal: 2160 }, frameRate: { ideal: 30 } }, audio: true }, { stil: true });
+    } catch (e) { return zeg((e.rtg && (e.rtg.kort + '. ' + e.rtg.uitleg)) || 'Camera en microfoon zijn nodig om op te nemen.'); }
     vb.style.display = 'block'; vb.srcObject = stream; vb.play().catch(() => {});
     const soort = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']
       .find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';

@@ -3,8 +3,8 @@
    met munten (crypto via een vergunninghoudende aanbieder, meteen omgezet naar
    euro) en facturen/jaaroverzichten als PDF. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, save, accounts, memberTemplate, betaal, fonds, munten, factuur,
-    broadcastSync, stateFor, findSupplier, liveCodename } = kern;
+  const { app, auth, db, save, accounts, memberTemplate, betaal, fonds, factuur, broadcastSync, stateFor,
+          liveCodename } = kern;
 
   /* Het dossier van dit lid: een echt account heeft een eigen ledenstaat, een
      demo-sessie deelt de gedeelde demo. Deze twee regels stonden op DRIE

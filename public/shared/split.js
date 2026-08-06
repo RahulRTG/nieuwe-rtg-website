@@ -77,7 +77,9 @@
   function paneel(kant) {
     var p = d.createElement('div'); p.className = 'sp-paneel'; p.dataset.kant = kant;
     var kop = d.createElement('div'); kop.className = 'sp-kop'; kop.appendChild(kies(staat[kant], kant));
-    var f = d.createElement('iframe'); f.src = staat[kant];
+    var f = d.createElement('iframe');
+    window.RTGMedia.kader(f);   // camera/microfoon doorgeven; tekst in shared/media.js
+    f.src = staat[kant];
     f.setAttribute('title', kant === 'a' ? 'Linkerscherm' : 'Rechterscherm');
     p.appendChild(kop); p.appendChild(f);
     return p;

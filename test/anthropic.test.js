@@ -8,11 +8,73 @@ const assert = require('node:assert');
 const http = require('node:http');
 const Anthropic = require('../server/anthropic');
 
+/* SLUITEN DAT OOK DE OPEN VERBINDINGEN MEENEEMT.
+
+   Dit bestand stond als `vastgelopen` in MUTATIES.json, en het opruimen zat hier
+   al netjes in een finally -- dus dat was niet het gat. `sluitServer(srv)` stopt alleen
+   het AANNEMEN van nieuwe verbindingen; een socket die nog open staat houdt node
+   in leven, en onder een mutatie blijft er een halfopen staan. Dan zakken de
+   toetsen wel, maar het proces sluit niet af: de motor noteert `vastgelopen` en
+   een echte fout kost een time-out in plaats van een rode regel.
+
+   Sluiten mag nooit zelf gooien: een fout in het opruimen verdringt de assertie
+   die de toets liet zakken. */
+function sluitServer(srv) {
+  if (!srv) return;
+  try { if (typeof srv.closeAllConnections === 'function') srv.closeAllConnections(); } catch (e) { /* oudere node */ }
+  try { sluitServer(srv); } catch (e) { /* al dicht */ }
+  try { srv.unref(); } catch (e) { /* geen unref */ }
+}
+
+/* EN EEN DEADLINE OM ELKE AANROEP, want sluiten alleen was niet genoeg.
+
+   Na de sluitreparatie hierboven bleef de diepe ronde van de mutatiemotor op EEN
+   plek vastlopen (`return-weg#3`): een weggehaalde return laat de aanroep nooit
+   settelen, en dan staat de toets vast BINNEN de try -- waar een finally nooit aan
+   te pas komt. Sluiten helpt tegen een handle die openblijft, een deadline tegen
+   een belofte die nooit antwoordt. Dat zijn twee verschillende lekken en ze hebben
+   allebei een eigen reparatie nodig; ik heb ze in deze ronde in die volgorde
+   gevonden, elk door de mutatie opnieuw te draaien.
+
+   Vijftien seconden is ruim: de nepserver antwoordt in milliseconden, en de
+   herprobeer-logica die hier wordt getoetst wacht bewust even. */
+function metDeadline(belofte, wat) {
+  let t = null;
+  const klok = new Promise((_, af) => {
+    t = setTimeout(() => af(new Error('geen antwoord binnen 15s: ' + wat +
+      ' -- een aanroep die niet antwoordt hoort deze toets te laten zakken, niet te laten hangen')), 15000);
+  });
+  return Promise.race([belofte, klok]).finally(() => clearTimeout(t));
+}
+
+/* DE NEPSERVER MAG NIET CRASHEN OP ONVERWACHTE INVOER, en dat was de laatste
+   vastloper in dit bestand.
+
+   Gemeten: onder de mutatie die `return uit` uit verrijkMetCache haalt, gaat er
+   geen body meer mee. De handler hieronder doet dan JSON.parse op een lege
+   tekenreeks, en die fout viel BUITEN de belofteketen -- node meldde
+   `uncaughtException: Unexpected end of JSON input` na 19 ms. Gevolg: de toets
+   werd wel rood, maar het antwoord werd nooit afgemaakt, de socket bleef hangen en
+   het proces sloot niet af (exit 124). De motor noteert dat als `vastgelopen` en
+   dus NIET als gezakt, terwijl er wel een toets zakte.
+
+   Een testdubbel die op onverwachte invoer omvalt, verandert een nette rode regel
+   in een time-out. Hij hoort te antwoorden met een fout die de toets kan LEZEN.
+   Dat is geen verzachting van de toets: de assertie over wat de server ontving
+   zakt nog steeds, alleen nu met een naam en zonder te blijven staan. */
 function nepApi(handler) {
   const srv = http.createServer((req, res) => {
     const brok = [];
     req.on('data', c => brok.push(c));
-    req.on('end', () => handler(req, Buffer.concat(brok).toString(), res));
+    req.on('end', () => {
+      try { handler(req, Buffer.concat(brok).toString(), res); }
+      catch (e) {
+        try {
+          if (!res.headersSent) res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'nepserver viel om op deze invoer: ' + e.message }));
+        } catch (e2) { try { res.destroy(); } catch (e3) { /* al weg */ } }
+      }
+    });
   });
   return new Promise(resolve => srv.listen(0, '127.0.0.1', () => resolve({ srv, poort: srv.address().port })));
 }
@@ -27,7 +89,7 @@ test('messages.create stuurt de juiste headers + body en geeft het antwoord teru
   });
   try {
     const a = client(poort);
-    const msg = await a.messages.create({ model: 'claude-opus-4-8', max_tokens: 100, messages: [{ role: 'user', content: 'hoi' }] });
+    const msg = await metDeadline(a.messages.create({ model: 'claude-opus-4-8', max_tokens: 100, messages: [{ role: 'user', content: 'hoi' }] }), 'messages.create');
     assert.strictEqual(msg.content[0].text, 'Hallo');
     assert.strictEqual(msg.stop_reason, 'end_turn');
     assert.strictEqual(gezien.method, 'POST');
@@ -37,7 +99,7 @@ test('messages.create stuurt de juiste headers + body en geeft het antwoord teru
     assert.strictEqual(gezien.headers['content-type'], 'application/json');
     assert.strictEqual(gezien.body.model, 'claude-opus-4-8');
     assert.strictEqual(gezien.body.messages[0].content, 'hoi');
-  } finally { srv.close(); }
+  } finally { sluitServer(srv); }
 });
 
 test('429 wordt herprobeerd en daarna slaagt het', async () => {
@@ -49,20 +111,20 @@ test('429 wordt herprobeerd en daarna slaagt het', async () => {
     res.end(JSON.stringify({ content: [{ type: 'text', text: 'eindelijk' }], stop_reason: 'end_turn' }));
   });
   try {
-    const msg = await client(poort).messages.create({ model: 'x', max_tokens: 10, messages: [] });
+    const msg = await metDeadline(client(poort).messages.create({ model: 'x', max_tokens: 10, messages: [] }), 'messages.create met herproberen');
     assert.strictEqual(msg.content[0].text, 'eindelijk');
     assert.strictEqual(n, 3, 'twee keer geprobeerd, derde keer raak');
-  } finally { srv.close(); }
+  } finally { sluitServer(srv); }
 });
 
 test('een 400 gooit met .status (aanroeper valt terug op demo)', async () => {
   const { srv, poort } = await nepApi((req, body, res) => { res.writeHead(400); res.end('{"error":"bad request"}'); });
   try {
     await assert.rejects(
-      () => client(poort).messages.create({ model: 'x', max_tokens: 10, messages: [] }),
+      () => metDeadline(client(poort).messages.create({ model: 'x', max_tokens: 10, messages: [] }), 'messages.create bij 400'),
       (e) => { assert.strictEqual(e.status, 400); return true; }
     );
-  } finally { srv.close(); }
+  } finally { sluitServer(srv); }
 });
 
 test('apiKey en baseURL komen uit de omgeving als ze niet worden meegegeven', () => {

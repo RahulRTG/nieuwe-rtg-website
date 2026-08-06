@@ -13,6 +13,9 @@
 <script src="/shared/schermrust.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
     --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
@@ -77,6 +80,8 @@
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} #feed{scroll-behavior:auto;} }
 </style>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
 </head>
 <body class="rtg-stijl">
 <header class="kop">
@@ -385,17 +390,13 @@
   let stroom = null, recorder = null, brokken = [], opnameBlob = null, opnameT = null, opnameStart = 0;
   $('#studioOpen').addEventListener('click', async () => {
     $('#studio').classList.add('open');
-    // buiten een beveiligde context bestaat mediaDevices niet; zonder deze
-    // controle kwam hier een rauwe TypeError in beeld te staan
-    if (!window.isSecureContext || !navigator.mediaDevices) {
-      $('#studioStatus').textContent = 'Opnemen kan hier niet: dit adres is onbeveiligd (http), en een browser geeft de camera alleen vrij op een beveiligd (https-)adres.';
-      return;
-    }
     try {
-      stroom = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
+      // shared/media.js stelt de diagnose (onveilig adres, kader, weigering,
+      // geen apparaat, bezet); wij zetten de reden in de statusregel.
+      stroom = await RTGMedia.camera({ achter: true, audio: true, stil: true });
       $('#studioDoek').srcObject = stroom;
       $('#studioStatus').textContent = 'Klaar om op te nemen (max 60 seconden).';
-    } catch (e) { $('#studioStatus').textContent = 'Geen camera beschikbaar: ' + e.message; }
+    } catch (e) { $('#studioStatus').textContent = (e.rtg && (e.rtg.kort + '. ' + e.rtg.uitleg)) || ('Geen camera beschikbaar: ' + e.message); }
   });
   $('#studioDicht').addEventListener('click', () => {
     $('#studio').classList.remove('open');

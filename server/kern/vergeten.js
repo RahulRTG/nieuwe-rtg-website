@@ -29,7 +29,10 @@
    pas apart, want een Lifestyle-lid heeft takken die een RTG-lid niet heeft. */
 module.exports = function maakVergeten(kern) {
   const { db, save, accounts, sessions, forgetSession, fs, path, UPLOAD_DIR,
-    broadcastSync, gidsWeg, liveCodename, lidBoardLogWis, media, bestanden } = kern;
+    broadcastSync, gidsWeg, liveCodename, media, bestanden } = kern;
+  /* Het lidboard staat onder een eigen naam op de kern; alleen het wissen van
+     het logboek is hier nodig. */
+  const { lidBoardLogWis } = kern.lidboard || {};
   /* De vierde soort, en die stond hier niet: WAT ALLEEN ALS VERWIJZING IN
      db.data STAAT. De foto's, snaps, verhalen, site-beelden en kluisbestanden
      liggen als losse versleutelde bestanden op schijf; hier stond alleen het

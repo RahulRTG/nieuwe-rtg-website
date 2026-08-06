@@ -6,12 +6,9 @@ const { coord } = require('../../../kern/util');
 const { servicekostenVoor } = require('../../../kern/servicekosten');
 const bezorgvolg = require('../../../kern/bezorgvolg');
 module.exports = (kern) => {
-  const { PERSONAS, app, auth, betaal, centen,
-    crypto, db, findPartner, findSupplier, magBezorgen,
-    liveCodename, notifySupplier, pickupCode, publicPartner, save,
-    schoon, sseToOffice, sseToSupplier, salonZichtbaar, zorgVoor,
-    koopTicketVoor, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek,
-    orderMetRef, ordersVoegToe, gegevensStop } = kern;
+  const { PERSONAS, app, auth, crypto, db, findPartner, findSupplier, magBezorgen, pickupCode,
+          publicPartner, save, schoon, salonZichtbaar, zorgVoor, orderMetRef, ordersVoegToe,
+          gegevensStop } = kern;
 app.post('/api/partner', (req, res) => {
   const partner = findPartner(req.body.code);
   if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });

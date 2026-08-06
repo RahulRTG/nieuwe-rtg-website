@@ -7,6 +7,15 @@
    zaal die iedereen ziet.
    Draait alleen waar een browser beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
+/* WAAROM DE WACHTGRENZEN HIER RUIM STAAN. Deze toets wacht op een TOESTAND en
+   niet op een tijd -- waitForFunction op een echte voorwaarde in de pagina, dus
+   hij gaat door zodra het klaar is. De grens is alleen het geduld. Hij stond op
+   8 en 10 seconden en dat is genoeg als hij alleen draait, maar in de volle
+   schermsuite staan er zestig browsers op vier kernen en dan valt hij om op een
+   voorwaarde die een seconde later wel klopt. Een krappe grens koopt geen
+   snelheid (een geslaagde wacht eindigt meteen), alleen een valse rode toets.
+   Nagemeten: los slaagt hij, in de volle suite viel hij om, met deze grenzen
+   slaagt hij in beide. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, letOpFouten } = require('./helper');
@@ -51,7 +60,7 @@ async function naarDeel(page, zoek) {
     if (!id) return false;
     RTGDeel.open(id);
     return id;
-  }, zoek, { timeout: 10000 }).then(h => h.jsonValue()).catch(() => null);
+  }, zoek, { timeout: 20000 }).then(h => h.jsonValue()).catch(() => null);
   assert.ok(gelukt, 'het deel "' + zoek + '" is te openen (delen: ' +
     JSON.stringify(await page.evaluate(() => window.RTGDeel ? RTGDeel.delen() : 'geen menu')) + ')');
   await page.waitForTimeout(150);
@@ -83,7 +92,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     await page.waitForSelector('#nieuw', { timeout: 15000 });
     await page.click('#nieuw');
     await page.waitForFunction(() => document.querySelectorAll('#rack .kanaal').length >= 3,
-      null, { timeout: 8000 });
+      null, { timeout: 20000 });
 
     /* ---- een heel lied, met een eigen zin ---- */
     await naarDeel(page, 'rahul-zet-iets-neer');
@@ -93,7 +102,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     await page.waitForSelector('#rZet', { timeout: 20000 });
     await page.click('#rZet');
     await page.waitForFunction(() => document.querySelectorAll('#secties .deel').length >= 4,
-      null, { timeout: 8000 });
+      null, { timeout: 20000 });
     const delen = await page.evaluate(() =>
       Array.from(document.querySelectorAll('#secties .deel .dn')).map(e => e.textContent));
     assert.ok(delen.includes('Refrein'), 'er staat een refrein in de vorm: ' + delen.join(','));
@@ -106,7 +115,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     });
     /* De zanglijn woont in de notenrol, weer een ander deel. */
     await naarDeel(page, 'de-notenrol');
-    await page.waitForSelector('.lettergrepen .lg input', { timeout: 8000 });
+    await page.waitForSelector('.lettergrepen .lg input', { timeout: 20000 });
     const grepen = await page.evaluate(() =>
       Array.from(document.querySelectorAll('.lettergrepen .lg input')).map(e => e.value));
     assert.ok(grepen.includes('zon'), 'de getypte woorden staan onder de noten: ' + grepen.slice(0, 8).join(','));
@@ -119,7 +128,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     await page.fill('#mCode', maatCode);
     await page.click('#mNodig');
     await page.waitForFunction((code) => document.querySelector('#makers').textContent.includes(code),
-      maatCode, { timeout: 8000 });
+      maatCode, { timeout: 20000 });
     const makers = await page.evaluate(() => document.querySelector('#makers').textContent);
     assert.ok(!/Zaal Maat/.test(makers), 'de echte naam staat er niet bij; die blijft in de kluis');
 
@@ -128,14 +137,14 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     await naarDeel(page, 'uitgeven');
     await page.click('#bewaar');
     await page.waitForFunction(() => /Bewaard/.test(document.querySelector('#melding').textContent),
-      null, { timeout: 8000 });
-    await page.waitForSelector('#uitgaveVlak input', { timeout: 8000 });
+      null, { timeout: 20000 });
+    await page.waitForSelector('#uitgaveVlak input', { timeout: 20000 });
     await page.evaluate(() => {
       const knoppen = Array.from(document.querySelectorAll('#uitgaveVlak button'));
       knoppen.find(b => /RTG-naam aanvragen/.test(b.textContent)).click();
     });
     await page.waitForFunction(() => /bij het kantoor/.test(document.querySelector('#uitgaveVlak').textContent),
-      null, { timeout: 10000 });
+      null, { timeout: 20000 });
 
     /* ---- de zaal: wat iedereen ziet staat op de codenaam ---- */
     await page.goto(base + '/apps/zaal.html', { waitUntil: 'domcontentloaded' });
@@ -152,7 +161,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
       Array.from(document.querySelectorAll('#zaal .knop')).find(b => b.textContent === 'Luister').click();
     });
     await page.waitForFunction(() => /Speelt/.test(document.querySelector('#melding').textContent),
-      null, { timeout: 10000 });
+      null, { timeout: 20000 });
 
     // "mooi" is een schouderklop, geen score: hij telt op en gaat er weer af
     const mooiKnop = () => page.evaluate(() =>
@@ -162,7 +171,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
       Array.from(document.querySelectorAll('#zaal .knop')).find(b => /^Mooi/.test(b.textContent)).click();
     });
     await page.waitForFunction(() => /u ook/.test(document.querySelector('#zaal').textContent),
-      null, { timeout: 8000 });
+      null, { timeout: 20000 });
 
     // en er staat een bodem onder de lijst, geen oneindige scroll
     const bodem = await page.evaluate(() => document.querySelector('#zaal .bodem').textContent);

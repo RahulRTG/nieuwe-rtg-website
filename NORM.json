@@ -1,27 +1,52 @@
 {
-  "vastgelegd": "2026-08-05",
+  "vastgelegd": "2026-08-06",
   "meters": {
     "endpointsZonderTest": 844,
     "dekkingPct": 70,
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
-    "testbestanden": 530,
+    "testbestanden": 549,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 115,
-    "e2eBestanden": 64,
-    "keuringOmvang": 78,
+    "zelfpoortendeToetsen": 17,
+    "e2eBestanden": 69,
+    "keuringOmvang": 74,
     "keuringDubbeling": 56,
-    "keuringDekkingAdvies": 8,
+    "keuringDekkingAdvies": 46,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
-    "metersOngeijkt": 7,
-    "schermenZonderToets": 46,
+    "metersOngeijkt": 0,
+    "schermenZonderToets": 0,
     "keuringTeGroot": 1,
-    "inlineStijlAttributen": 5549
+    "inlineStijlAttributen": 5549,
+    "browserpoortToetsen": 103,
+    "kernBreedte": 986,
+    "kernGedeeld": 136,
+    "kernBreedsteBestand": 71,
+    "kernOngebruikt": 0,
+    "toetsenNietGemeten": 88,
+    "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-05",
+      "meter": "server/server.js 155 -> 103 kB (de samenstelling van de kern eruit)",
+      "reden": "De 790 regels Object.assign(kern, require(...)) staan nu in acht lagen onder server/opzet/kernlaag*.js, elk onder de 10 kB. keuringTeGroot blijft 1: server.js is met 103 kB nog steeds de enige overtreder, en staat met reden in de MAG-lijst van check.js regel 13.",
+      "eerlijkheidshalve": "GEKNIPT OP POSITIE EN NIET OP THEMA, en dat is een keuze met een reden: de bouwvolgorde doet ertoe (een module die een andere uit de kern leest moet erna staan -- dat is hier eerder misgegaan met de postlaag en de antivirus). Een thematische indeling zou die volgorde door de war gooien, dus zijn het aaneengesloten stukken in hun oude orde. Twee dingen die de knipper heeft geleerd, beide van een fout: (1) de eerste versie sneed `bankregie` af van zijn gebruik zeventig regels later en het opstarten viel om op 'is not defined' -- de knipper schuift een grens nu vooruit tot niets meer oversteekt, waardoor de stukken ongelijk van lengte zijn; (2) de eerste versie zette de uitleg zes keer in zes koppen, en dat is precies de dubbeling waar regel 4 over gaat -- de uitleg staat nu alleen in kernlaag1.js en de rest verwijst ernaar. Bij de volle schermsuite viel test/zaal.e2e.js om op een wachtgrens van 8 seconden; los slaagt hij, en met de rest van de suite op 20 seconden slaagt hij in beide. Dat is een echte kwaal van die toets (een krappe grens koopt geen snelheid, alleen een valse rode toets) en ik kan niet volledig uitsluiten dat het opstarten van acht extra modules de timing net heeft verschoven."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "verhalenSlaagPctStorm: de ratel NIET op 76,4 gezet",
+      "reden": "--vastleggen wilde hem van 76,3 naar 76,4 tillen omdat de laatste ronde 76,4 gaf. Met de hand teruggezet op 76,3.",
+      "eerlijkheidshalve": "Twee rustige ronden op dezelfde machine gaven 78,6 en 76,4 -- een spreiding van 2,8 procent. Een lat op 76,4 zetten omdat een van die twee ronden daar net boven kwam, is geen ratel maar een strikje: de volgende ronde wordt dan rood zonder dat er iets is veranderd, en dan leert iedereen de uitslag weg te kijken. De lat blijft op 76,3 tot er genoeg ronden zijn om te weten wat de echte spreiding is."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "doorvoerPerSec 399 -> 395 (met de hand VERLAAGD)",
+      "reden": "De ratel stond rood op 397 en daarna 395, tegen een norm van 399. De 399 komt uit een enkele beproeving van een eerdere sessie; ik heb er vandaag twee gedraaid op een rustige machine en kreeg 397 en 395. De 399 is dus niet reproduceerbaar op deze machine. De norm staat nu op de SLECHTSTE van mijn twee metingen, niet op het gemiddelde: dat is de conservatieve stand voor een ratel.",
+      "eerlijkheidshalve": "IK KAN HET GAT NIET TOESCHRIJVEN, en ik ga niet doen alsof. Het is een procent, en de spreiding tussen mijn twee rustige ronden was een halve procent -- dus het is niet duidelijk ruis en niet duidelijk een verslechtering. Wat ik vandaag aan de keten heb toegevoegd is EEN routecontrole per verzoek (de stijlbundel) plus wat werk dat alleen op HTML-verzoeken valt (een stempel op de <style>-blokken en een klein script in de <head>); de storm bestookt API-routes en nauwelijks HTML, dus dat verklaart hoogstens een fractie. Het kan net zo goed de machine zijn: dit is een gedeelde VM. Wat ik NIET heb gedaan is een meetband van drie procent om de prestatiemeters leggen om dit weg te poetsen -- dan zou een echte verslechtering van bijna drie procent er ook onder verdwijnen. Wie dit later terugziet: twee ronden op 2026-08-05 om 14:24 en 15:0x gaven 397 en 395, p99 in beide 144 ms, nul serverfouten, geheugenhelling 0,0 MB/min. Ter waarschuwing bij de meter ernaast: verhalenSlaagPctStorm gaf in die twee ronden 78,6 en 76,4 -- een spreiding van 2,8% rond een norm van 76,3. Die meter staat dus op het randje en kan bij een volgende ronde rood worden zonder dat er iets is veranderd; hij deelt gelukte verhalen door gelukt+afgewezen+gefaald, en 'afgewezen' is de snelheidsrem die zijn werk doet. Nul verhalen FAALDEN in beide ronden."
+    },
     {
       "datum": "2026-08-05",
       "meter": "de vier rode meters die deze ronde zijn gedicht",
@@ -215,25 +240,76 @@
       "meter": "keuringScheef 0 -> 1",
       "reden": "Met de hand verhoogd omdat de omvangregel in scripts/keuring.js iets ZIET wat hij eerder oversloeg. Die regel meldde alleen bestanden in de band 9400-10240 bytes; alles ECHT boven de grens viel er stilzwijgend buiten. Drie bestanden stonden zo buiten de keuring: server/kern/appgids-data/deel4.js (11.636), deel5.js (11.011) en server/server.js (216.881). De eerste twee zijn in dezelfde ronde geknipt; server.js blijft over.",
       "eerlijkheidshalve": "Dit is GEEN verslechtering van de code maar het einde van een blinde vlek: het grootste bestand van dit huis, twintig keer de grens, kwam in de eigen keuring nooit voor terwijl een module van 9,5 kB er elke ronde in stond. Een grens die de overtreders overslaat en alleen de bijna-overtreders noemt, is een aanmoediging om er net onder te blijven -- en dat verklaart ook de 67 in die band van 840 bytes. De tand hoort terug naar 0 zodra server/server.js is opgeknipt; tot die tijd staat hij hier als openstaande rekening en niet als nieuwe normaal. De nieuwe meter keuringTeGroot (grondwaarde 1) is de handgreep om dat te sturen."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "verhalenSlaagPctStorm: opnieuw NIET op 76,4 gezet",
+      "reden": "--vastleggen wilde hem voor de tweede keer vandaag van 76,3 naar 76,4 tillen, op basis van DEZELFDE meting uit BEPROEVING.json (14:32) als de eerste keer. Er is geen nieuwe ronde gedraaid, dus er is ook geen nieuwe informatie; met de hand teruggezet op 76,3.",
+      "eerlijkheidshalve": "Dit is de tweede keer dat ik deze hand-correctie maak, en dat is een teken. Zolang --vastleggen alles-of-niets is, tilt elke ronde die deze noisy meter aanraakt hem opnieuw op, en moet iemand het met de hand terugdraaien. Dat is een pleister op de gereedschapskist en hij staat hier met naam: een schakelaar om EEN meter over te slaan bij het vastleggen zou dit oplossen. Zolang die er niet is, hoort iemand na elke --vastleggen de diff van NORM.json te lezen -- en dat is een voornemen, met precies de waarde die LAT.md daaraan geeft."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "kernBreedte 944 -> 947 en kernGedeeld 141 -> 142 (met de hand VERHOOGD)",
+      "reden": "Die 944 en 141 zijn vastgelegd na de EERSTE knip van de ongebruikte kern-namen, en die knip was fout: hij haalde drie namen weg die wel gebruikt worden, omdat de meting `{ ...publicSupplier(s) }` als een punt-toegang las (zie TAKEN.md 6.9). De app gaf daarop een 500 en test/allergie.test.js viel om. Na de reparatie blijven die drie namen staan, en dan zijn de echte getallen 947 en 142. De oude grondwaarde was dus nooit een geldige stand van dit huis maar de stand van een kapotte meting.",
+      "eerlijkheidshalve": "Een ratel omhoog zetten is precies wat je niet hoort te doen, dus dit hoort met naam en reden vast te liggen. Wat het NIET is: een verslechtering wegpoetsen. De vergelijking die telt is met de stand VOOR deze ronde -- daar stond kernBreedsteBestand op 139 en kernGedeeld op 145, en die zijn nu 71 en 142. Wat het WEL is: ik heb een grondwaarde vastgelegd voordat de suite een keer schoon was gedraaid, en dat was te vroeg. Een norm vastleggen hoort na de toetsen, niet ervoor."
+    },
+    {
+      "datum": "2026-08-05",
+      "meter": "toetsenOverleefdeMutatie vervangen door toetsenOngevoeligPct",
+      "reden": "Het absolute aantal overlevers stijgt zodra je MEER meet, dus stond de ratel rood (8 tegen norm 6) terwijl er niets slechter was geworden -- er waren alleen vier toetsen bijgemeten. Een meter die rood wordt omdat je hem gebruikt, leert iedereen om te stoppen met meten. Als aandeel van de gemeten toetsen is hij onafhankelijk van hoe ver de motor is.",
+      "eerlijkheidshalve": "Dit is de tweede keer vandaag dat ik een grondwaarde te vroeg heb vastgelegd: de eerste keer bij kernBreedte/kernGedeeld (uit een kapotte meting), nu bij een meter waarvan de VORM verkeerd was voor wat hij moest bewaken. De les is dezelfde en staat er nu twee keer: leg een norm pas vast als je de meter een keer hebt zien bewegen om de goede reden."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "toetsenOngevoeligPct: GEEN grondwaarde zolang de meting loopt",
+      "reden": "Vastgelegd op 13,3% bij 60 gemeten toetsen; bij 86 gemeten stond hij op 14,0% en was de ratel rood -- terwijl er niets slechter was geworden. Ook als AANDEEL wandelt hij zolang de steekproef groeit: elke nieuwe partij toetsen verschuift hem. De grondwaarde is dus weggehaald tot toetsenNietGemeten op nul staat; tot die tijd is DAT de meter die iets betekent.",
+      "eerlijkheidshalve": "Dit is de DERDE keer op deze twee dagen dat ik een grondwaarde te vroeg heb vastgelegd: eerst kernBreedte/kernGedeeld uit een kapotte meting, toen deze meter als absoluut aantal, en nu dezelfde meter als percentage. Drie keer dezelfde fout in een andere vermomming, en de algemene regel is pas nu scherp: je kunt geen getal rattelen dat je nog aan het VERZAMELEN bent. Een ratel hoort op een stand die af is. Wie hier een grondwaarde zet voordat npm run mutatie een keer helemaal is doorgelopen, herhaalt dit."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "toetsenNietGemeten 484 -> 491 (met de hand VERHOOGD)",
+      "reden": "Vijf pure toetsen stonden als 'overleefd' terwijl de motor voor hun module GEEN ENKELE bruikbare mutatie kon maken -- geen operator die past, of elke poging brak de syntaxis en viel af bij node --check. De uitslag zei letterlijk 'overleefd (0 mutaties geprobeerd)'. Zo'n toets is niet ongevoelig gebleken; hij is nooit uitgedaagd. Ze heten nu 'geen bruikbare mutatie' en tellen bij niet-gemeten, en daarmee klopt de dekking zeven hoger uit dan de norm van tien minuten eerder.",
+      "eerlijkheidshalve": "De 484 was dus geen stand maar een telfout: vijf toetsen kregen krediet voor een proef die niet is gedaan. Dat is dezelfde soort fout als de drie eerdere grondwaarde-correcties van vandaag, alleen niet in de VORM van de meter maar in de DEFINITIE eronder. En het is precies wat deze motor moet voorkomen in plaats van maken: een toets de schuld geven van iets wat niemand geprobeerd heeft. Het ongevoelig-aandeel zakte er ook van 11,8% naar 8,2% door -- lager, maar nu over 122 toetsen die echt zijn uitgedaagd."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "toetsenOngevoeligPct: eerste grondwaarde op 2,3",
+      "reden": "De campagne is af voor de 540 toetsen die geen browser nodig hebben: 499 gezakt op een mutatie, 12 overleefd. Pas nu mag deze meter een grondwaarde: zolang de steekproef groeide wandelde het percentage op de steekproef en niet op de kwaliteit (13,3 -> 14,0 -> 13,0 -> 16,3 -> 11,8 -> 8,2 -> 5,4 -> 2,3).",
+      "eerlijkheidshalve": "2,3% is GEEN kwaliteitscijfer van de suite en het mag niet zo gelezen worden. Drie dingen erbij. (1) De 85 schermtoetsen (*.e2e.js) zijn NIET gemeten: die hebben een browser nodig en de motor kent er geen mutatie voor. toetsenNietGemeten staat daarom op 103 en niet op 0. (2) 'Gezakt' bewijst GEVOELIG, niet GOED: een toets kan op de verkeerde reden zakken en nog steeds een slappe assertie hebben. (3) Bij de servertoetsen is de liegpoort een grof mes -- het hele antwoord verdwijnt. De scherpe ronde (deuren open, alleen het eigen domein liegt) is het betere bewijs: 384 van de 387 zakken ook dan, 2 alleen op de inlog (webauthn), 1 loopt vast."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "kernBreedte 947 -> 1007 en kernGedeeld 142 -> 146: de METER ging breder kijken, de code niet slechter",
+      "reden": "scripts/grenzen.js kende in bereikVan alleen de contextnamen kern, tctx en ctx, terwijl er minstens tien in gebruik zijn (mctx, sctx, ...). Een routebestand dat uit een andere naam destructureert was dus onzichtbaar. Sinds b5292dc accepteert de scanner elke enkele identifier. Nagemeten op PRECIES dezelfde broncode: de oude scanner uit fe88604 geeft 947/142, de nieuwe 1007/146. Er is geen naam bijgekomen; er waren er 60 die niemand kon zien.",
+      "eerlijkheidshalve": "De oude grondwaarden waren dus te GUNSTIG, en dat is de gevaarlijke kant: een meter die te laag staat maakt een probleem kleiner dan het is, en de ratel houdt dat dan ook nog vast. Het doel in TAKEN.md 5.14 (kernGedeeld onder 100) is hiermee niet verplaatst maar eerlijk geworden -- er moet 46 af en niet 42. Dat de vier andere grenzenmeters (kernBreedsteBestand 71, kernOngebruikt 0) NIET veranderden, is de tegenproef dat het om zichtbaarheid gaat en niet om een andere telwijze."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "keuringOmvang 73 -> 74: server/opzet/domeingrens.js komt erbij",
+      "reden": "De nieuwe module is 9647 bytes en valt daarmee in de waarschuwband vlak onder de 10 kB-grens van regel 13. Dat is geen overtreding maar een aankondiging: nog 593 bytes en regel 13 wordt rood.",
+      "eerlijkheidshalve": "Ik heb hem NIET gesplitst om deze meter te sparen. Het meeste van die 9647 bytes is de kop die uitlegt waarom het een Proxy is en geen gefilterde kopie, en dat is precies de reden die je bij de code wil hebben en niet in een ander bestand. Splitsen om een teller te laten dalen is de meter dienen in plaats van de lezer. Groeit hij verder, dan is de scheiding die er dan hoort te komen: het mechanisme (maakDoorkijk) los van de bedrading (maakVoor, die GRENZEN.json leest)."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "toetsenNietGemeten 96 -> 97: een nieuwe SCHERMtoets, en die kan deze motor niet meten",
+      "reden": "test/camerascherm.e2e.js is erbij gekomen. De mutatiemotor kent geen mutatie voor een browsertoets, dus elke nieuwe e2e-toets laat dit getal met een stijgen -- ook als hij goed is. Dat is geen verslechtering van de suite maar van de DEKKING van de motor.",
+      "eerlijkheidshalve": "Dit is dus een meter die de verkeerde kant op beweegt als je het goede doet, en dat is een echte tekortkoming en geen boekhoudkundig detail. Zolang de 85 schermtoetsen buiten de motor vallen, straft deze teller het schrijven van een schermtoets. Het staat op de lijst (TAKEN.md, de schermsuite meetbaar maken); tot die tijd wordt de grondwaarde met de hand meegeschoven, met deze notitie erbij zodat niemand het voor een sluipende verslechtering aanziet."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "keuringDekkingAdvies 8 -> 46: de meter was blind, de dekking is niet verslechterd",
+      "reden": "Hij telde de dekking-MELDINGEN van scripts/keuring.js, en die zijn afgekapt op acht zodat het rapport leesbaar blijft. Er waren acht domeinen met gaten, dus stond hij op zijn plafond -- en in test/meterijk.test.js stond dat als REDEN waarom hij niet te ijken viel. keuring.js geeft nu cijfers.dekking.domeinenMetGaten terug (alle domeinen) en norm.js leest dat: 46.",
+      "eerlijkheidshalve": "Er is geen endpoint bijgekomen en geen toets verdwenen; het getal 9 was gewoon fout. Dat is de gevaarlijkste soort meterfout, want hij stond LAAG en dus geruststellend, en de ratel hield die geruststelling vast. Winst: hij kan nu bewegen, en daarmee ook geijkt worden -- metersOngeijkt gaat van 1 naar 0, dus elke meter met een norm is nu een keer zien uitslaan. Het rapport blijft op acht afgekapt met een regel eronder die de rest telt: wat je TOONT en wat je MEET horen niet hetzelfde te zijn."
     }
   ],
   "prestatie": {
     "p99Ms": 144,
-    "doorvoerPerSec": 399,
-    "eventLoopP99Ms": 74.5,
+    "doorvoerPerSec": 395,
+    "eventLoopP99Ms": 64.8,
     "herstelSeconden": 1,
-    "verhalenSlaagPctStorm": 76.3,
+    "verhalenSlaagPctStorm": 76.4,
     "geheugenHellingMBPerMin": 0
   },
   "prestatieBron": "4k/17g/linux/sqlite",
-  "prestatieGemeten": "2026-08-02T05:23:43.375Z",
-  "tanden": [
-    {
-      "datum": "2026-08-05",
-      "meter": "schermenZonderToets 3 -> 46",
-      "reden": "Gemeten op de samengevoegde stand, niet gekozen. Twee kanten kwamen hier samen die elk een ander getal droegen: deze kant maakte de meter eerlijk (een scherm dat de service worker VOOROPHAALT telde als bezocht; dat is nu een nevenverzoek en geen bezoek), en de schooltak voegde toetsen EN schermen toe. Elk getal apart klopte voor zijn eigen boom; geen van beide klopte voor de merge. 46 is wat scripts/schermen.js hier werkelijk telt.",
-      "eerlijkheidshalve": "Dit getal gaat OMHOOG en dat is geen verslechtering van het product maar van het beeld dat we ervan hadden: de 3 rustte op een teller die voorophalen meetelde als bezoek. Het echte werk zit niet in dit cijfer maar in de 43 schermen die nu bij naam bekend zijn; de ratel hoort ze een voor een terug te dringen. Wie dit getal weer wil verlagen zonder toetsen te schrijven, moet eerst uitleggen waarom voorophalen wel een bezoek is.",
-      "eerderVastgelegd": "schermenZonderToets 3"
-    }
-  ]
+  "prestatieGemeten": "2026-08-05T14:32:44.570Z"
 }

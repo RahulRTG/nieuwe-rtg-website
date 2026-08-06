@@ -2,7 +2,8 @@
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, talen, trChat, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, totpOk, veiligGelijk, logInlog, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
+  const { accounts, app, appUrl, db, ensureSupplierDefaults, mail, makeSupplierCode, officeAuth, save,
+          schoon, sseToOffice, sseToSupplier } = kern;
 app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
   const a = db.data.partnerApplications.find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });

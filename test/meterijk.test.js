@@ -87,7 +87,12 @@ function metIjkRoutes(voor) {
   extra += '};\n';
   const na = metAanbouw('server/routes/klok.js', extra, () => norm.meet());
   _routeGat = { zonderTest: na.endpointsZonderTest - voor.endpointsZonderTest,
-    pctVal: voor.dekkingPct - na.dekkingPct };
+    pctVal: voor.dekkingPct - na.dekkingPct,
+    /* De honderd ijkroutes zitten onder /api/zzijkproef/, dus ze vormen een NIEUW
+       domein met gaten. keuringDekkingAdvies hoort daarmee precies een omhoog te
+       gaan -- en dat kon pas sinds die meter het echte aantal leest in plaats van
+       de acht meldingen die het rapport toont. */
+    dekkingAdvies: na.keuringDekkingAdvies - voor.keuringDekkingAdvies };
   return _routeGat;
 }
 
@@ -149,6 +154,24 @@ const IJKINGEN = {
       "test('ijk', { skip: aan ? false : 'geen dienst' }, () => {});\n",
       () => norm.meet().zelfpoortendeToetsen - voor.zelfpoortendeToetsen)
   },
+  browserpoortToetsen: {
+    /* DE TWEEDE HELFT VAN DEZELFDE TELLING, en de proef staat er vooral om de
+       GRENS te bewijzen: dezelfde skip-regel hoort in een *.e2e.js in de
+       browserbak te vallen en in een *.test.js in de dienstbak. Zonder deze
+       proef zou een verschuiving van die grens ongemerkt de ene meter leeghalen
+       en de andere vullen -- en dan ratelt er niets meer. */
+    proef: () => {
+      const regel = "test('ijk', { skip: pw ? false : 'geen browser' }, () => {});";
+      const alsE2e = norm.telSkips(['x.e2e.js'], () => regel);
+      const alsToets = norm.telSkips(['x.test.js'], () => regel);
+      assert.deepEqual(alsE2e, { dienst: 0, browser: 1 }, 'in een *.e2e.js telt hij als browsergepoort');
+      assert.deepEqual(alsToets, { dienst: 1, browser: 0 }, 'in een *.test.js als dienstgepoort');
+      // en skip: false is geen poort maar een open deur
+      assert.deepEqual(norm.telSkips(['y.e2e.js'], () => "test('x', { skip: false }, () => {});"),
+        { dienst: 0, browser: 0 }, 'skip: false telt niet mee');
+      return alsE2e.browser;
+    }
+  },
   keuringOmvang: {
     // een productbestand vlak onder de 10 kB-grens hoort opgemerkt te worden
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
@@ -192,6 +215,150 @@ const IJKINGEN = {
     }
   },
 
+  /* DE DRIE GRENSMETERS. Geijkt op een VERZONNEN bron en niet op de repo: de
+     teller krijgt een stukje code te lezen dat ik zelf schrijf, dus ik weet het
+     antwoord vooraf. Een meter die alleen zijn eigen routemap kan lezen, is niet
+     te ijken -- dan meet je of hij draait en niet of hij ziet. */
+  kernBreedte: {
+    proef: () => {
+      const grenzen = require('../scripts/grenzen');
+      const een = grenzen.bereikVan('module.exports = (kern) => { const { app, db, save } = kern; };');
+      assert.deepEqual([...een].sort(), ['app', 'db', 'save'], 'een destructurering wordt geteld');
+      const twee = grenzen.bereikVan('module.exports = (kern) => { kern.app.get("/x", () => kern.db); };');
+      assert.deepEqual([...twee].sort(), ['app', 'db'], 'losse kern.x-toegang ook');
+      /* En de wringer: een naam die alleen in COMMENTAAR of in een TEKENREEKS
+         staat, telt niet mee. Precies deze fout zat al drie keer in een meter
+         van dit huis. */
+      const drie = grenzen.bereikVan('/* kern.geheim */ const s = "kern.ooknietecht";\nmodule.exports = (kern) => { const { app } = kern; };');
+      assert.deepEqual([...drie], ['app'], 'commentaar en tekst tellen niet mee: ' + [...drie].join(','));
+      return een.size;
+    }
+  },
+  kernGedeeld: {
+    /* Twee verzonnen domeinen die EEN naam delen. Dat is het hele begrip: een
+       eigenschap die meer dan een domein aanraakt is koppeling; een die maar
+       een domein aanraakt hoort in dat domein. */
+    proef: () => {
+      const grenzen = require('../scripts/grenzen');
+      const a = grenzen.bereikVan('const { app, eigenA } = kern;');
+      const b = grenzen.bereikVan('const { app, eigenB } = kern;');
+      const samen = new Map();
+      for (const [d, set] of [['a', a], ['b', b]]) for (const n of set) {
+        if (!samen.has(n)) samen.set(n, new Set());
+        samen.get(n).add(d);
+      }
+      const gedeeld = [...samen.entries()].filter(([, ds]) => ds.size > 1).map(([n]) => n);
+      assert.deepEqual(gedeeld, ['app'], 'alleen de gedeelde naam telt als koppeling');
+      return gedeeld.length;
+    }
+  },
+  kernBreedsteBestand: {
+    proef: () => {
+      const grenzen = require('../scripts/grenzen');
+      const namen = Array.from({ length: 42 }, (_, i) => 'n' + i);
+      const breed = grenzen.bereikVan('const { ' + namen.join(', ') + ' } = kern;');
+      assert.equal(breed.size, 42, 'een breed bestand wordt op zijn volle breedte geteld');
+      const smal = grenzen.bereikVan('const { app } = kern;');
+      assert.equal(smal.size, 1, 'en een smal bestand op een');
+      return breed.size - smal.size;
+    }
+  },
+  kernOngebruikt: {
+    /* De scherpste van de vier, en de enige die een ECHTE fout aanwijst in plaats
+       van een maat: een naam die een bestand uit de kern pakt en nooit gebruikt.
+       Drie beweringen, en de derde is degene die telt. */
+    proef: () => {
+      const grenzen = require('../scripts/grenzen');
+      const dood = grenzen.pakVsGebruik('const { app, db, save } = kern;\napp.get("/x", () => 1);');
+      assert.deepEqual(dood.ongebruikt.sort(), ['db', 'save'],
+        'gepakt en niet gebruikt: db en save; app wordt wel gebruikt');
+
+      /* Een naam achter een PUNT is geen gebruik van die naam. Zonder deze
+         controle zou `req.save` de naam `save` levend houden en zag de meter
+         niets. */
+      /* DE SPREAD, en deze bewering staat hier omdat het echt is misgegaan. De
+         eerste versie van deze meter sloeg een naam over als er een punt voor
+         stond -- `req.save` is geen gebruik van `save`. Maar in
+         `{ ...publicSupplier(s) }` staat er ook een punt voor de naam. Dus heette
+         publicSupplier ongebruikt, is hij in server/routes/supplier/menukaart.js
+         weggehaald, en gaf /api/supplier/menu/get een 500 met "publicSupplier is
+         not defined". test/allergie.test.js vond het; deze meter had het moeten
+         vinden. Zonder de regel hieronder bijt niets. */
+      const spread = grenzen.pakVsGebruik('const { publicSupplier } = kern;\nres.json({ ...publicSupplier(s) });');
+      assert.deepEqual(spread.ongebruikt, [],
+        'een naam achter de spread-punten is WEL gebruikt: ' + spread.ongebruikt.join(','));
+
+      /* En de prijs van die reparatie, hier vastgelegd zodat niemand hem voor
+         scherpte aanziet: de meter kent geen punt-logica meer, dus `req.save`
+         houdt `save` in leven terwijl niemand hem gebruikt. Over server/routes
+         kost dat 13 van de 3924 namen. Wie deze meter ooit "slimmer" wil maken,
+         leest eerst de regel hierboven. */
+      const punt = grenzen.pakVsGebruik('const { save } = kern;\nfoo(req.save);');
+      assert.deepEqual(punt.ongebruikt, [],
+        'req.save houdt save in leven -- bewust te ruim, zie de spread hierboven');
+
+      /* EN DE KANT DIE HET GEVAARLIJKST IS. Een naam die alleen binnen een
+         template-string staat MOET als gebruikt gelden: wie hem op grond van
+         deze meter weghaalt, bouwt een ReferenceError die pas bij het eerste
+         verzoek valt. Deze bewering is de reden dat pakVsGebruik een eigen,
+         mildere wringer heeft dan de rest van scripts/grenzen.js. */
+      const sjabloon = grenzen.pakVsGebruik('const { naam } = kern;\nconst t = `hallo ${naam}`;');
+      assert.deepEqual(sjabloon.ongebruikt, [],
+        'een naam in ${...} binnen een template geldt als gebruikt');
+
+      const rename = grenzen.pakVsGebruik('const { a: b, c: d } = kern;\nb();');
+      assert.deepEqual(rename.ongebruikt, ['d'], 'bij { a: b } gaat het om de gebonden naam');
+      return dood.ongebruikt.length;
+    }
+  },
+
+  /* DE TWEE MUTATIEMETERS. Hun bron is MUTATIES.json, de uitslag van
+     scripts/mutatie.js. We zetten er kortstondig een verzonnen uitslag in en
+     kijken of het getal meebeweegt -- dezelfde vorm als de dependencies-proef
+     hieronder, en om dezelfde reden: een meter die zijn eigen bestand niet echt
+     leest, meet of hij draait en niet of hij ziet. */
+  /* GEEN SCHRIJFACTIE MEER OP HET ECHTE MUTATIES.json, en dat is een reparatie.
+
+     Deze twee proeven zetten de verzonnen uitslag eerst IN het echte bestand en
+     schreven het in een finally terug. Twee dingen konden daar misgaan: een
+     `git add -A` in dat venster commit een uitslag waarin toetsen "overleefd"
+     staan, en een kill in dat venster laat de finally niet lopen -- dan is de
+     campagne van 540 toetsen weg en vervangen door iets dat op een meting lijkt.
+     Beide zijn in dit huis al gebeurd (eerlijkheidspunt 6.4 en, deze sessie,
+     server/lokaal-tls.js dat gemuteerd bleef staan na een kill).
+
+     norm.meet() neemt nu een LEZER aan. De verzonnen uitslag gaat er als tekst
+     in, dus de meter doet nog steeds alles zelf: lezen, parsen, tellen. Wat er
+     niet meer gebeurt, is op schijf schrijven -- en dus is er ook niets meer om
+     terug te zetten of te verliezen. */
+  toetsenOngevoeligPct: {
+    proef: (voor) => {
+      const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8'));
+      /* Drie BESTAANDE toetsbestanden op "overleefd" zetten, want de meter loopt
+         de echte testmap af; een verzonnen naam zou hij terecht negeren. Drie en
+         niet een, omdat het een percentage is: bij zestig metingen schuift een
+         enkele overlever het getal met 1,6 procentpunt en dat kan door afronding
+         net onder de zichtbaarheid blijven. */
+      const namen = fs.readdirSync(path.join(WORTEL, 'test'))
+        .filter(n => n.endsWith('.test.js')).sort().slice(0, 3);
+      for (const naam of namen) j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
+      const na = norm.meet({ leesMutaties: () => JSON.stringify(j) });
+      return na.toetsenOngevoeligPct - voor.toetsenOngevoeligPct;
+    }
+  },
+  toetsenNietGemeten: {
+    proef: (voor) => {
+      const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8'));
+      /* Een gemeten toets uit de uitslag halen: dan is hij niet gemeten, en
+         hoort het getal precies een omhoog te gaan. Slaat deze proef af, dan
+         telt de meter iets anders dan wat er in het bestand staat. */
+      const gemeten = Object.keys(j.toetsen).filter(k => j.toetsen[k].staat === 'gezakt' || j.toetsen[k].staat === 'overleefd');
+      if (!gemeten.length) throw new Error('MUTATIES.json bevat geen enkele gemeten toets, dus deze ijking kan niets aanwijzen');
+      delete j.toetsen[gemeten[0]];
+      const na = norm.meet({ leesMutaties: () => JSON.stringify(j) });
+      return na.toetsenNietGemeten - voor.toetsenNietGemeten;
+    }
+  },
   dependencies: {
     /* De enige meter waarvan de bron een bestand is dat we ook echt even
        veranderen. Terugzetten gebeurt uit de tekst die we vooraf lazen, niet
@@ -359,7 +526,18 @@ const IJKINGEN = {
 
   /* Hieronder: meters die je in een toets niet eerlijk kunt voeden. De reden
      staat erbij en telt mee in `metersOngeijkt`, die alleen omlaag mag. */
-  keuringDekkingAdvies: { reden: 'zit op zijn plafond: scripts/keuring.js meldt met .slice(0, 8) hooguit acht domeinen en er zijn er acht, dus omhoog kan hij niet en omlaag alleen door echte gaten te dichten' },
+  /* HIER STOND EEN REDEN EN DAT WAS EEN GEBREK, geen reden. Er stond: "zit op zijn
+     plafond -- keuring.js meldt met .slice(0, 8) hooguit acht domeinen en er zijn
+     er acht". Dat is geen eigenschap van de dekking maar van het RAPPORT: de
+     meter telde de meldingen, en die zijn afgekapt om leesbaar te blijven. Hij mat
+     dus de slice. Nagemeten: er zijn 46 domeinen met endpoints zonder toets, niet
+     acht.
+
+     scripts/keuring.js geeft nu cijfers.dekking.domeinenMetGaten terug (alle
+     domeinen) en scripts/norm.js leest dat. Daarmee KAN hij bewegen, en dus ook
+     geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
+     toets, en dan hoort dit getal precies een omhoog te gaan. */
+  keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
   routesNietSchakelbaar: {
     /* Een route die nergens in het schakelbord staat. Dat is precies wat deze
        meter telt, en het blijkt met een tijdelijk routebestand gewoon te
@@ -558,6 +736,40 @@ test('elke registratie heeft OF een proef OF een reden, nooit allebei leeg', () 
     if (ijk.reden) assert.ok(ijk.reden.length > 25,
       'de reden bij "' + sleutel + '" is te kort om iets uit te leggen');
   }
+});
+
+test('een onbruikbaar MUTATIES.json laat de meter ZAKKEN en niet stil nul melden', () => {
+  /* LAT.md regel 3: een meter zonder invoer die toch een getal geeft, is erger
+     dan geen meter. Bij deze twee is nul de GEVAARLIJKE kant -- nul overlevers
+     leest als een perfecte suite terwijl er niets is gemeten.
+
+     Deze bewering bestond nog niet, en ze kon ook niet bestaan: het enige gat om
+     het bestand onbruikbaar te maken was het echt overschrijven, en dat is precies
+     wat hier is weggehaald. Met een injecteerbare lezer is het drie regels.
+
+     Drie soorten onbruikbaar, want ze komen op drie plekken in de meter uit:
+     onleesbaar (de lezer gooit), geen json, en geldige json zonder een enkele
+     gemeten toets -- dat laatste is de stilste van de drie, want daar is er wel
+     een bestand en klopt de vorm. */
+  for (const [wat, lezer] of [
+    ['onleesbaar', () => { throw new Error('ENOENT'); }],
+    ['geen json', () => 'dit is geen json'],
+    ['geen enkele meting', () => JSON.stringify({ toetsen: {} })],
+    ['alleen niet-gemeten uitslagen', () => JSON.stringify({ toetsen: { 'a11ykeuring.test.js': { staat: 'geen module gevonden' } } })]
+  ]) {
+    assert.throws(() => norm.meet({ leesMutaties: lezer }), /MUTATIES\.json/,
+      'met "' + wat + '" hoort norm.meet() te gooien in plaats van een getal te geven');
+  }
+});
+
+test('DE TEGENPROEF: een BRUIKBARE lezer laat de meter gewoon meten', () => {
+  /* Zonder deze zou de toets hierboven ook groen blijven als norm.meet() ALTIJD
+     gooit, en dan bewijst hij dat een kapotte meter goed gebouwd is. */
+  const echt = fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8');
+  const na = norm.meet({ leesMutaties: () => echt });
+  assert.equal(typeof na.toetsenOngevoeligPct, 'number');
+  assert.equal(na.toetsenNietGemeten, norm.meet().toetsenNietGemeten,
+    'dezelfde inhoud via de lezer hoort hetzelfde getal te geven als van schijf');
 });
 
 module.exports = { IJKINGEN };

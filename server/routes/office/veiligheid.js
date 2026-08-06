@@ -2,7 +2,8 @@
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, talen, trChat, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, totpOk, veiligGelijk, logInlog, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
+  const { app, db, officeAuth, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf,
+          ontmoetSignaalLid } = kern;
 
   /* Salon-ontmoetingen: het RTG-veiligheidsteam ziet de lopende afspraken met
      live-locatie, handelt SOS-en af en kan bij een SOS live meekijken (WebRTC). */

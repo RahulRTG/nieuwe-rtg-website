@@ -79,7 +79,12 @@
   /* ---- scherm delen: de videotrack omruilen, verbindingen blijven staan ---- */
   function deelScherm() {
     if (scherm) { stopScherm(); return; }
-    if (!navigator.mediaDevices.getDisplayMedia) return meld('Scherm delen kan niet op dit toestel.');
+    /* Scherm delen loopt niet via getUserMedia maar heeft dezelfde twee stille
+       oorzaken: een onveilig adres (dan bestaat mediaDevices niet) en een kader
+       dat display-capture niet doorgeeft. De reden komt uit dezelfde poort. */
+    var vooraf = window.RTGMedia.reden('display-capture');
+    if (vooraf) return meld(window.RTGMedia.teksten[vooraf].kort + '. ' + window.RTGMedia.teksten[vooraf].uitleg);
+    if (!navigator.mediaDevices.getDisplayMedia) return meld('Scherm delen kan niet op dit toestel: deze browser heeft getDisplayMedia niet.');
     navigator.mediaDevices.getDisplayMedia({ video: true }).then(function (s) {
       scherm = s;
       var track = s.getVideoTracks()[0];
@@ -146,12 +151,19 @@
     $('#kamer').style.display = 'flex';
     $('#tegels').innerHTML = '';
     return haalIce().then(function () {
-      return navigator.mediaDevices.getUserMedia({ audio: true, video: true }).catch(function () { return null; });
-    }).then(function (s) {
-      stream = s;
+      /* shared/media.js zegt WAAROM het niet gaat. Zonder die reden bleef hier
+         een stille null over en zag de gebruiker alleen een lege tegel -- de
+         kamer werkte, alleen wist niemand waarom hij zelf niet in beeld kwam. */
+      return window.RTGMedia.vraag({ audio: true, video: true }, { stil: true })
+        .then(function (s) { return { stroom: s, waarom: null }; },
+              function (e) { return { stroom: null, waarom: e }; });
+    }).then(function (uit) {
+      stream = uit.stroom;
+      var r = uit.waarom && uit.waarom.rtg;
       var eigen = tegel(ik);
       if (stream) eigen.srcObject = stream;
-      else meld('Geen camera of microfoon; u kijkt en luistert niet mee, de kamer ziet u wel.');
+      else meld((r ? r.kort : 'Geen camera of microfoon') +
+        '; u kijkt en luistert niet mee, de kamer ziet u wel.' + (r ? ' ' + r.uitleg : ''));
       // ik ben de nieuwkomer: ik bel iedereen die er al zit, nu mijn media klaar is
       (kamer.aanwezig || []).forEach(function (naam) {
         if (naam === ik || peers[naam]) return;

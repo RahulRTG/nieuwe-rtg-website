@@ -80,7 +80,11 @@
         $('#invoer').value = e.results[0][0].transcript;
         vertaal();
       };
-      r.onerror = function () { meld('Spreken lukte niet; typ het gerust.'); };
+      // shared/media.js noemt de oorzaak (onveilig adres, kader, weigering)
+      r.onerror = function (e) {
+        var m = window.RTGMedia.spraak(e && e.error);
+        meld(m ? m.kort + '. ' + m.uitleg : 'Spreken lukte niet; typ het gerust.');
+      };
       r.start();
       meld('Spreek maar.');
     } catch (e) { meld('Spreken kan niet op dit toestel.'); }

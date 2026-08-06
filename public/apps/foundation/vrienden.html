@@ -15,6 +15,9 @@
 <link rel="stylesheet" href="/shared/osmenu.css">
 <script src="palet.js"></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
@@ -86,6 +89,8 @@
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
 </head>
 <body data-osbar="Vrienden" data-oswereld="foundation" class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -603,7 +608,10 @@ function belSein(toKey, kind, extra){ return soc('/call', Object.assign({ toKey,
 // Elke oproep verse ICE-servers halen: een TURN-server met kort geldige
 // inloggegevens werkt dan altijd (die roteren elke keer).
 async function haalIce(){ try{ iceConfig=(await (await fetch('/api/ice')).json()).iceServers; }catch(e){ iceConfig=[{urls:'stun:stun.l.google.com:19302'}]; } return iceConfig; }
-async function pakMedia(video){ try{ return await navigator.mediaDevices.getUserMedia({ audio:true, video: video?{facingMode:'user'}:false }); }catch(e){ meld('Geen toegang tot microfoon of camera.'); return null; } }
+// via shared/media.js: die noemt de echte oorzaak (onveilig adres, kader dat
+// het recht niet doorgeeft, weigering, geen apparaat, bezet) in plaats van een
+// melding die de gebruiker naar een knop stuurt die er niet is.
+async function pakMedia(video){ try{ return await RTGMedia.vraag({ audio:true, video: video?{facingMode:'user'}:false }, { stil:true }); }catch(e){ meld((e.rtg && (e.rtg.kort+'. '+e.rtg.uitleg)) || 'Geen toegang tot microfoon of camera.'); return null; } }
 function belUI(open){ $('#belOv').classList.toggle('open', !!open); if(!open){ $('#belRemote').srcObject=null; $('#belLocal').srcObject=null; } }
 function belTimer(){ if(!call) return; const n=Math.round((Date.now()-call.t0)/1000); $('#belTijd').textContent=Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
 function toonBel(naam, video){ $('#belNaam').textContent=naam; $('#belAv').textContent=initcn(naam); $('#belAudio').style.display=video?'none':'flex'; $('#belLocal').style.display=video?'':'none'; $('#belCam').style.display=video?'':'none'; $('#belTijd').textContent='belt...'; belUI(true); }

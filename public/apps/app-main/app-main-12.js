@@ -57,6 +57,26 @@
     }
   }
 
+  /* EEN KAPOTTE KAART MAG NIET HET HELE SCHERM MEENEMEN.
+
+     renderAll() riep twintig opbouwfuncties na elkaar aan, zonder vangnet.
+     Struikelde de eerste, dan stierf de rest mee en bleef er van het
+     beginscherm niets over dan wat er vast in de HTML staat -- de balk van
+     Rahul. Dat is precies het beeld dat gemeld werd: "ik zie alleen de AI-balk".
+     Een zwart scherm is bovendien de slechtste foutmelding die er is: hij zegt
+     niet wat er stuk is, en niet dat de rest het nog zou doen.
+
+     stap() draait elk onderdeel apart. Gaat er een mis, dan gaat de rest
+     gewoon door en zegt de console WELKE het was. Dat is geen doekje voor het
+     bloeden: een lid dat zijn tegels, klok en wallet ziet terwijl een van de
+     twintig kaarten ontbreekt, heeft een werkende app -- en wij een spoor. */
+  function stap(naam, fn) {
+    try { fn(); } catch (e) {
+      console.error('[rtg] onderdeel "' + naam + '" van het beginscherm ging mis:', e);
+      try { if (window.RTGMeldFout) RTGMeldFout(naam, e); } catch (x) {}
+    }
+  }
+
   function renderAll(){
     $('#codeChipTxt').textContent = user.codename;
     // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
@@ -65,24 +85,27 @@
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
     // van Rahul, want allebei zijn ze voor leden
     document.getElementById('app').classList.toggle('os-gast', guest);
-    renderHome();
+    stap('renderHome', renderHome);
     // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
     if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent();
-    if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); renderFluister(); }
-    renderSalon();
-    renderTerPlaatse();
-    laadBestellen();
-    laadBoodschappen();
-    laadShowroom();
-    laadTickets();
-    laadVerhuur();
-    laadCharter();
-    laadContracten();
-    laadVastgoed();
+    if (!guest){
+      stap('renderTrip', renderTrip); stap('renderPay', renderPay); stap('renderAI', renderAI);
+      stap('renderAssets', renderAssets); stap('renderFluister', renderFluister);
+    }
+    stap('renderSalon', renderSalon);
+    stap('renderTerPlaatse', renderTerPlaatse);
+    stap('laadBestellen', laadBestellen);
+    stap('laadBoodschappen', laadBoodschappen);
+    stap('laadShowroom', laadShowroom);
+    stap('laadTickets', laadTickets);
+    stap('laadVerhuur', laadVerhuur);
+    stap('laadCharter', laadCharter);
+    stap('laadContracten', laadContracten);
+    stap('laadVastgoed', laadVastgoed);
     if (!guest) laadCare();
-    loadCv();
-    loadVacatures();
-    laadOntmoet();
+    stap('loadCv', loadCv);
+    stap('loadVacatures', loadVacatures);
+    stap('laadOntmoet', laadOntmoet);
     /* Terug waar je was, maar KORT. Dit venster stond op een half uur, en dat
        was te ver doorgeschoten: openTab schrijft de tijd bij elke schermwissel
        bij, dus het venster schoof steeds mee en in gewoon gebruik landde je
@@ -109,45 +132,3 @@
 
   /* ---------- tickets: activiteiten, tours en musea ---------- */
   let tkPartners = [], tkOpen = null, tkKeuze = null;
-  async function laadTickets(){
-    if (!API.live) return;
-    try { tkPartners = (await API.call('/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
-    let mijn = [];
-    try { mijn = (await API.call('/tickets/mijn')).tickets || []; } catch(e){}
-    const mijnEl = $('#tkMijn');
-    if (mijnEl) mijnEl.innerHTML = mijn.filter(t => !t.gebruikt || t.datum >= new Date().toISOString().slice(0, 10)).map(t =>
-      '<div class="card" style="border-color:rgba(208,172,87,0.35);">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">\uD83C\uDF9F\uFE0F '+T('tk.ticket','Ticket')+' \u00B7 '+esc(t.supplierName)+'</div>'+
-      '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(t.naam)+'</b> \u00B7 '+t.datum+' '+t.tijd+' \u00B7 '+t.personen+'p</div>'+
-      (t.gebruikt
-        ? '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--green);">\u2705 '+T('tk.gebruikt','Binnen; ingecheckt door ')+esc(t.checkin.door)+'</div>'
-        : '<div style="margin-top:0.5rem;text-align:center;background:rgba(208,172,87,0.12);border:1px dashed rgba(208,172,87,0.5);border-radius:12px;padding:0.55rem;">'+
-          '<span style="font-size:1.3rem;letter-spacing:0.35em;color:var(--gold);font-weight:700;">'+esc(t.code)+'</span>'+
-          '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.2rem;">'+T('tk.laatzien','Laat deze code zien aan de deur')+'</div></div>')+
-      // de eigen transferdienst van de zaak: aanvragen, of live zien wie er komt
-      (t.transfer
-        ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted);">\uD83D\uDE90 '+T('tk.tr','Transfer')+': <b style="color:var(--txt);">'+
-          ({ 'wacht-op-betaling': T('tk.tr.betalen','nog betalen'), 'aangevraagd': T('tk.tr.aangevraagd','aangevraagd'), 'geaccepteerd': T('tk.tr.geacc','bevestigd'), 'onderweg': T('tk.tr.onderweg','onderweg naar u') }[t.transfer.status] || t.transfer.status)+'</b>'+
-          (t.transfer.chauffeur ? ' \u00B7 '+esc(t.transfer.chauffeur) : '')+(t.transfer.etaMin ? ' \u00B7 \u23F1 '+t.transfer.etaMin+' min' : '')+
-          (t.transfer.prijs ? ' \u00B7 '+eur(t.transfer.prijs) : ' \u00B7 '+T('tk.tr.incl','inclusief'))+'</div>'
-        : (t.transferAan && !t.gebruikt
-          ? '<div style="margin-top:0.55rem;display:flex;gap:0.4rem;">'+
-            '<input id="trVan-'+t.ref+'" placeholder="'+T('tk.tr.vanph','Ophaaladres')+'" style="flex:1;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;">'+
-            '<button class="bz-btn" data-trvraag="'+t.ref+'" data-trprijs="'+t.transferPrijs+'">\uD83D\uDE90 '+(t.transferPrijs ? eur(t.transferPrijs) : T('tk.tr.gratis','Gratis'))+'</button></div>'
-          : ''))+
-      '</div>').join('');
-    document.querySelectorAll('[data-trvraag]').forEach(b => b.addEventListener('click', async () => {
-      const veld = document.getElementById('trVan-' + b.dataset.trvraag);
-      try {
-        const r = await API.call('/transfer/aanvraag', { ticketRef: b.dataset.trvraag, van: veld ? veld.value : '' });
-        if (Number(b.dataset.trprijs) > 0) await API.call('/ride/pay', { ref: r.ride.ref });
-        toast(T('tk.tr.ok','Transfer aangevraagd. U ziet hier wie u komt halen.'));
-        laadTickets();
-      } catch(e){ toast(e.message); }
-    }));
-    renderTkAanbod();
-  }
-  function renderTkAanbod(){
-    const el = $('#tkAanbod'); if (!el) return;
-    if (!tkPartners.length){ el.innerHTML = ''; return; }
-    let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('tk.kop','Activiteiten, tours en musea')+'</div>';

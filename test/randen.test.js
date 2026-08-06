@@ -145,3 +145,28 @@ test('de service worker vraagt na bij de server, ook als de browser denkt vers t
   assert.match(sw, /new Request\(e\.request, \{ cache: 'no-cache' \}\)/,
     'de service worker vraagt na in plaats van de browsercache te geloven');
 });
+
+test('een kapotte kaart maakt het beginscherm niet zwart', () => {
+  /* Het gemelde beeld was: "ik zie alleen de AI-balk". Dat is geen balk die te
+     veel doet maar een scherm dat niet gebouwd wordt. renderAll() riep twintig
+     opbouwfuncties na elkaar aan zonder vangnet; struikelde de eerste, dan
+     stierf de rest mee en bleef alleen over wat vast in de HTML staat.
+
+     Een zwart scherm is bovendien de slechtste foutmelding die er is: het zegt
+     niet wat er stuk is en niet dat de rest het nog zou doen. Elke stap loopt
+     nu door stap(), die de fout bij naam noemt en doorgaat. In een echte
+     browser nagemeten met een expres stukgemaakte renderHome: tien tabbladen,
+     Salon en Betalen gewoon gevuld, en in de console "onderdeel renderHome van
+     het beginscherm ging mis". */
+  const bron = lees('public/apps/app-main.js');
+  assert.match(bron, /function stap\(naam, fn\) \{\s*try \{ fn\(\); \} catch/,
+    'stap() vangt een struikelende kaart op');
+  assert.match(bron, /console\.error\('\[rtg\] onderdeel "' \+ naam/,
+    'en noemt hem bij naam, anders is het nog steeds een raadsel');
+  for (const stap of ['renderHome', 'renderSalon', 'renderTerPlaatse', 'laadBestellen']) {
+    assert.match(bron, new RegExp("stap\\('" + stap + "', " + stap + "\\)"),
+      stap + ' loopt door het vangnet');
+  }
+  assert.ok(!/\n\s+renderHome\(\);/.test(bron),
+    'en niet meer kaal, want dan neemt hij de rest weer mee');
+});

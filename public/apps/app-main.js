@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '6307d041';
+var RTG_BOUW = '9ad1898a';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1654,6 +1654,26 @@ var RTG_BOUW = '6307d041';
     }
   }
 
+  /* EEN KAPOTTE KAART MAG NIET HET HELE SCHERM MEENEMEN.
+
+     renderAll() riep twintig opbouwfuncties na elkaar aan, zonder vangnet.
+     Struikelde de eerste, dan stierf de rest mee en bleef er van het
+     beginscherm niets over dan wat er vast in de HTML staat -- de balk van
+     Rahul. Dat is precies het beeld dat gemeld werd: "ik zie alleen de AI-balk".
+     Een zwart scherm is bovendien de slechtste foutmelding die er is: hij zegt
+     niet wat er stuk is, en niet dat de rest het nog zou doen.
+
+     stap() draait elk onderdeel apart. Gaat er een mis, dan gaat de rest
+     gewoon door en zegt de console WELKE het was. Dat is geen doekje voor het
+     bloeden: een lid dat zijn tegels, klok en wallet ziet terwijl een van de
+     twintig kaarten ontbreekt, heeft een werkende app -- en wij een spoor. */
+  function stap(naam, fn) {
+    try { fn(); } catch (e) {
+      console.error('[rtg] onderdeel "' + naam + '" van het beginscherm ging mis:', e);
+      try { if (window.RTGMeldFout) RTGMeldFout(naam, e); } catch (x) {}
+    }
+  }
+
   function renderAll(){
     $('#codeChipTxt').textContent = user.codename;
     // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
@@ -1662,24 +1682,27 @@ var RTG_BOUW = '6307d041';
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
     // van Rahul, want allebei zijn ze voor leden
     document.getElementById('app').classList.toggle('os-gast', guest);
-    renderHome();
+    stap('renderHome', renderHome);
     // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
     if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent();
-    if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); renderFluister(); }
-    renderSalon();
-    renderTerPlaatse();
-    laadBestellen();
-    laadBoodschappen();
-    laadShowroom();
-    laadTickets();
-    laadVerhuur();
-    laadCharter();
-    laadContracten();
-    laadVastgoed();
+    if (!guest){
+      stap('renderTrip', renderTrip); stap('renderPay', renderPay); stap('renderAI', renderAI);
+      stap('renderAssets', renderAssets); stap('renderFluister', renderFluister);
+    }
+    stap('renderSalon', renderSalon);
+    stap('renderTerPlaatse', renderTerPlaatse);
+    stap('laadBestellen', laadBestellen);
+    stap('laadBoodschappen', laadBoodschappen);
+    stap('laadShowroom', laadShowroom);
+    stap('laadTickets', laadTickets);
+    stap('laadVerhuur', laadVerhuur);
+    stap('laadCharter', laadCharter);
+    stap('laadContracten', laadContracten);
+    stap('laadVastgoed', laadVastgoed);
     if (!guest) laadCare();
-    loadCv();
-    loadVacatures();
-    laadOntmoet();
+    stap('loadCv', loadCv);
+    stap('loadVacatures', loadVacatures);
+    stap('laadOntmoet', laadOntmoet);
     /* Terug waar je was, maar KORT. Dit venster stond op een half uur, en dat
        was te ver doorgeschoten: openTab schrijft de tijd bij elke schermwissel
        bij, dus het venster schoof steeds mee en in gewoon gebruik landde je
@@ -1706,6 +1729,11 @@ var RTG_BOUW = '6307d041';
 
   /* ---------- tickets: activiteiten, tours en musea ---------- */
   let tkPartners = [], tkOpen = null, tkKeuze = null;
+  /* De tickets van het lid: het aanbod en wat hij al heeft. Apart deel omdat
+     app-main-12.js met deze twee functies erbij op 10,9 KB kwam en
+     keuringsregel 13 op 10 staat. De regel heeft gelijk over de reden: de rest
+     van dat deel is de schil van de app (meldingen, tabbladen, opbouw), en dit
+     gaat over tickets. */
   async function laadTickets(){
     if (!API.live) return;
     try { tkPartners = (await API.call('/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }

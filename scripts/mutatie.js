@@ -465,6 +465,19 @@ if (require.main === module) {
   const vastleggen = () => schrijf(UITSLAG);    // na een fase: in de repo
   const gedaan = (naam) => !opnieuw && uitslag[naam] && uitslag[naam].staat !== 'geen toetsen gedraaid';
 
+  /* OM DE VIJFENTWINTIG OOK IN DE REPO, en die regel kostte honderdtachtig
+     metingen om te leren. De voortgang stond buiten de repo (server/data/, in
+     .gitignore) zodat de werkboom niet uren openstond. Toen werd de container
+     opnieuw opgebouwd: /tmp weg, de worktree weg, server/data/ weg. Wat er
+     overbleef was wat er GECOMMIT stond -- 141 van de 320 metingen.
+
+     Duurzaamheid komt hier dus niet van een bestand op schijf maar van pushen.
+     Een fase van 399 bestanden is te lang om als eenheid te bewaren, dus legt de
+     motor nu elke 25 bestanden tussentijds vast. Dat is een open werkboom van
+     een paar minuten in ruil voor werk dat een herstart overleeft. */
+  const OM_DE = 25;
+  let sindsVastleggen = 0;
+
   const doe = (lijst, proef) => {
     let n = 0;
     for (const naam of lijst) {
@@ -473,6 +486,7 @@ if (require.main === module) {
       const r = proef(naam);
       uitslag[naam] = r;
       bewaar();
+      if (++sindsVastleggen >= OM_DE) { vastleggen(); sindsVastleggen = 0; console.log('        (tussenstand vastgelegd in MUTATIES.json)'); }
       console.log('  ' + String(n).padStart(4) + '/' + lijst.length + '  ' + naam.padEnd(42) +
         r.staat + (r.operator ? '  [' + r.operator + (r.module ? ' in ' + r.module : '') + ']' : ''));
     }

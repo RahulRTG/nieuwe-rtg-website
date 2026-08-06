@@ -3027,6 +3027,11 @@ var RTG_BOUW = 'c2cfc539';
     browser:     { naam: 'RTG Browser',  url: '/apps/browser.html' },
     vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
     balans:      { naam: 'Balans',       url: '/apps/balans.html' },
+    /* Mijn loon staat bij Geld en niet bij Werk: het is uw geld, niet iets van
+       uw werkgever. Wie nergens werkt vindt een lege lijst met de zin die dat
+       uitlegt -- dat is beter dan een tegel die verdwijnt zodra u van baan
+       wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
+    loonstrook:  { naam: 'Mijn loon',    url: '/apps/loonstrook.html' },
     rechterhand: { naam: 'De Rechterhand', url: '/apps/lifestyle.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
@@ -3090,7 +3095,8 @@ var RTG_BOUW = 'c2cfc539';
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie', 'link:maison'] },
     { sleutel: 'map-geld', naam: 'Geld', items: [
       'tab:betalen', 'tab:bestellen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
-      'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat', 'link:nalatenschap', 'link:logboek'] },
+      'link:balans', 'link:loonstrook', 'tab:assets', 'link:labfonds', 'link:mecenaat',
+      'link:nalatenschap', 'link:logboek'] },
     { sleutel: 'map-salon', naam: 'De Salon', items: [
       'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
       'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
@@ -3109,6 +3115,11 @@ var RTG_BOUW = 'c2cfc539';
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
 
+
+  /* Afgesplitst van app-main-24.js, dat over de 10 KB ging toen "Mijn loon"
+     erbij kwam. De snede loopt langs een echte grens: hierboven staat WAT er
+     op het OS staat (de registry, de mappen), hieronder staat hoe je WERK
+     opent. Twee onderwerpen die elkaar niet nodig hebben. */
   /* ---------- Werk op het OS + de algemene pin ----------
      De werk-apps zijn gewone apps op het RTG-OS: een tik op "Mijn werkplekken"
      toont de
@@ -3127,7 +3138,7 @@ var RTG_BOUW = 'c2cfc539';
   OSAPPS.werk = { naam: 'Mijn werkplekken' };
   // Werk staat in de map "Het Huis" en opent met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
-  for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
+  for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw', 'loonstrook']) { if (LINKS[pk]) LINKS[pk].prive = true; }
 
   let pinOkTot = 0; // de pin blijft vijf minuten geldig, zoals op een telefoon
   // de werkplek-zone kan om een positie vragen: dan een keer ophalen en

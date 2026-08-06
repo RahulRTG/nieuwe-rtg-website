@@ -100,6 +100,17 @@
     </div>
 
     <div class="kaart">
+      <div class="sec">Contracten</div>
+      <div class="noot" style="margin-bottom:.5rem;">Zonder contract staat iemand niet op de loonrun -- er wordt geen uurloon geraden. Een wijziging <b>overschrijft niet</b>: er komt een versie bij met een ingangsdatum, zodat een oude periode blijft rekenen met wat er toen gold.</div>
+      <div class="rij">
+        <select class="veld" id="ctZaak" style="flex:2;min-width:12rem;"></select>
+        <input class="veld" id="ctDatum" style="flex:1;min-width:8rem;" placeholder="peildatum 2026-07-01">
+        <button class="knop" id="ctLaad">Toon personeel</button>
+      </div>
+      <div id="ctLijst" style="margin-top:.6rem;"></div>
+    </div>
+
+    <div class="kaart">
       <div class="sec">Loonrun openen</div>
       <div class="rij">
         <select class="veld" id="osZaak" style="flex:2;min-width:12rem;"></select>
@@ -155,7 +166,13 @@ function uitgelogd(){
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/office/payroll/' + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
-  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+  /* De bezwaren gaan MEE in de melding. De keuringslagen hieronder geven een
+     lijst terug ("uurloonCenten ontbreekt", "een tijdelijk contract heeft een
+     einddatum") en die viel er hier af: dan las het scherm alleen "afgekeurd"
+     en stond je te raden welk veld het was. */
+  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd();
+    const bez = Array.isArray(d.bezwaren) && d.bezwaren.length ? ' ' + d.bezwaren.join(' ') : '';
+    throw new Error((d.error || 'Er ging iets mis.') + bez); } return d; });
 const pastPil = p => '<span class="pil' + (p === 'overbelast' ? ' rood' : p === 'rustig' ? ' goud' : '') + '">' + esc(p) + '</span>';
 
 /* Meenemen (shared/uitvoer.js): dit loonkantoor houdt twee registers vast. Wat
@@ -281,9 +298,59 @@ async function laadOs(){
     catch (e) { meld(e.message); }
   }));
   // dezelfde zakenlijst als de andere tab; STAND is al geladen
-  if (STAND) $('#osZaak').innerHTML = STAND.zaken.map(z =>
-    '<option value="' + esc(z.code) + '">' + esc(z.naam) + '</option>').join('');
+  if (STAND) {
+    const opties = STAND.zaken.map(z =>
+      '<option value="' + esc(z.code) + '">' + esc(z.naam) + '</option>').join('');
+    $('#osZaak').innerHTML = opties;
+    $('#ctZaak').innerHTML = opties;
+  }
 }
+
+/* ---------- contracten ----------
+   HIER ZAT HET GAT. De loonrun slaat iedereen zonder contract over, en er was
+   geen scherm en geen route om er een vast te leggen -- dus elke run was leeg,
+   terwijl elk onderdeel eronder groen stond. Dit blok is het ontbrekende begin
+   van de keten: pas hierna heeft "160 uur maal het uurloon" een uurloon. */
+async function laadContracten(){
+  const code = $('#ctZaak').value;
+  const opDatum = $('#ctDatum').value.trim();
+  const d = await api('personeel', { code, opDatum });
+  $('#ctLijst').innerHTML = (d.staff || []).map(m => {
+    const c = m.contract;
+    return '<div class="regel"><b>' + esc(m.naam) + '</b>' +
+      '<span class="kpi">' + esc(m.func || (m.manager ? 'Manager' : 'Medewerker')) + ' · ' +
+      (c ? esc(c.soort) + ' · ' + eurC(c.uurloonCenten) + ' per uur · vanaf ' + esc(c.vanaf) +
+           (c.urenPerWeek != null ? ' · ' + c.urenPerWeek + ' u/week' : '') +
+           (c.terugwerkend ? ' · <b>terugwerkend vastgelegd</b>' : '')
+         : (opDatum ? '<b>geen contract op ' + esc(opDatum) + '</b>' : 'vul een peildatum in om het contract te zien')) +
+      '</span><span class="r"><button class="knop" data-ct="' + m.id + '" data-naam="' + esc(m.naam) + '">' +
+      (c ? 'Wijzig' : 'Leg vast') + '</button></span></div>';
+  }).join('') || '<div class="leeg">Deze zaak heeft geen personeel.</div>';
+
+  $('#ctLijst').querySelectorAll('[data-ct]').forEach(b => b.addEventListener('click', async () => {
+    /* Bewust met prompts en niet met een formulier in een blad: dit is het
+       kantoorscherm en het gaat om vier velden. Een half formulier bouwen dat
+       er als een echt formulier uitziet, is erger dan dit. */
+    const vanaf = prompt('Vanaf welke datum geldt dit contract voor ' + b.dataset.naam + '? (JJJJ-MM-DD)\n\nEen bestaand contract wordt NIET overschreven; dit wordt een nieuwe versie.');
+    if (!vanaf) return;
+    const soort = prompt('Soort contract?\nvast, tijdelijk, oproep, nuluren, minmax, stage, uitzend of freelance', 'vast');
+    if (!soort) return;
+    const tot = soort === 'tijdelijk' ? prompt('Einddatum (JJJJ-MM-DD) -- een tijdelijk contract heeft er een:') : null;
+    const loon = prompt('Uurloon in euro\'s (bijv. 18,00):');
+    if (!loon) return;
+    const uren = prompt('Contracturen per week (leeg = geen vaste omvang):', '32');
+    const centen = Math.round(Number(String(loon).replace(',', '.')) * 100);
+    if (!Number.isFinite(centen) || centen <= 0) return meld('Dat uurloon kon ik niet lezen.');
+    try {
+      const r = await api('contract', { code: $('#ctZaak').value, staffId: Number(b.dataset.ct),
+        vanaf, tot: tot || null, soort, uurloonCenten: centen,
+        urenPerWeek: uren ? Number(String(uren).replace(',', '.')) : null });
+      meld(r.let || 'Contractversie vastgelegd.');
+      await laadContracten();
+    } catch (e) { meld(e.message); }
+  }));
+}
+$('#ctLaad').addEventListener('click', () => laadContracten().catch(e => meld(e.message)));
 
 $('#osHaal').addEventListener('click', async () => {
   try { const d = await api('regels/haal'); meld('Bijwerkronde: ' + d.uitslag.nieuw.length + ' nieuw, ' +

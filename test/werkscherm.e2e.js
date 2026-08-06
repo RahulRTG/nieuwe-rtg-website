@@ -182,7 +182,15 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
 
        We kijken daarom naar het scherm en niet naar de bron: een sleutel in
        LINKS zetten is niet genoeg, hij moet ook in de indeling van een map
-       staan, anders tekent het springboard hem nooit. */
+       staan, anders tekent het springboard hem nooit.
+
+       DE TEGEL HEET NIET MEER "WERK OS". Er stonden twee tegels met hetzelfde
+       koffertje naast elkaar -- "Werk OS" (de werkplek-app) en "Mijn
+       werkplekken" (de kiezer) -- en erger: twee inlogs. Die zijn samengevoegd
+       tot een deur: Mijn werkplekken. Deze toets zocht daarna nog op de oude
+       naam en stond sindsdien rood, wat pas opviel toen hij weer werd
+       gedraaid. De EIS is niet veranderd -- de werkplek moet vindbaar zijn op
+       de homescreen -- alleen de naam waaronder je hem vindt. */
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
     const tegels = await page.evaluate(() => {
@@ -193,7 +201,7 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
         Array.from(document.querySelectorAll('#osMapGrid .os-app')).map(a => (a.textContent || '').trim())
       ), 400));
     });
-    assert.ok(tegels.some(t => /werk os/i.test(t)),
+    assert.ok(tegels.some(t => /mijn werkplekken/i.test(t)),
       'de werkplek heeft een tegel op de homescreen; gevonden: ' + tegels.join(', '));
     assert.ok(tegels.some(t => /rtg office/i.test(t)),
       'en RTG Office ook; die had er nooit een. Gevonden: ' + tegels.join(', '));

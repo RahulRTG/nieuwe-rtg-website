@@ -289,10 +289,24 @@
        is in plaats van het te vervangen.
        We meten het blok in plaats van een vaste hoogte te kiezen: hij groeit
        met een antwoord mee en krimpt als je hem klein klapt. */
+    /* MAAR NIET OP EEN BODY DIE ZELF EEN INDELING IS. Op de leverancier-app is
+       de body een flexrij met de app-schil erin. Een extra kind van 100% breed
+       is daar geen tussenstuk maar een tweede KOLOM: de schil kreeg nul breedte
+       en het hele scherm bleef leeg. Geen foutmelding, geen kapotte regel --
+       alleen een lege app, en dat is precies het soort stilte waar dit huis
+       niet tegen kan.
+
+       Zo'n pagina scrollt zijn body ook helemaal niet (de inhoud scrollt binnen
+       de schil), dus het tussenstuk had daar sowieso niets te reserveren. De
+       maat komt wel gewoon in --rtg-rahul-h te staan; wie ruimte wil maken,
+       gebruikt die. */
+    var indeling = getComputedStyle(document.body).display;
+    var eigenIndeling = indeling === 'flex' || indeling === 'inline-flex' ||
+      indeling === 'grid' || indeling === 'inline-grid';
     var ruimte = document.createElement('div');
     ruimte.className = 'mgz-ruimte';
     ruimte.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(ruimte);
+    if (!eigenIndeling) document.body.appendChild(ruimte);
     function meetRuimte() {
       var h = blok.hidden ? 0 : blok.getBoundingClientRect().height;
       var px = h ? Math.round(h + 18) : 0;   // 18px lucht tussen inhoud en blok

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn loon</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<script src="/shared/toestelkluis.js" defer></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
+    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:720px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.3rem 0 0.5rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .strookkop{display:flex;align-items:baseline;justify-content:space-between;gap:0.8rem;}
+  .strookkop b{font-size:0.95rem;}
+  .netto{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
+  .uitleg{margin-top:0.55rem;font-size:0.86rem;line-height:1.6;}
+  .rij{display:flex;justify-content:space-between;gap:0.8rem;font-size:0.82rem;padding:0.32rem 0;border-bottom:1px solid var(--line);}
+  .rij:last-child{border-bottom:0;}
+  .rij .lbl{color:var(--soft);}
+  .rij.dik{font-weight:600;color:var(--txt);}
+  .rij.dik .lbl{color:var(--txt);}
+  .knop{background:none;border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font:inherit;font-size:0.8rem;padding:0.5rem 0.85rem;cursor:pointer;margin-top:0.7rem;}
+  .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .merk{display:inline-block;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--soft);border:1px solid var(--line);border-radius:99px;padding:0.12rem 0.5rem;}
+  .spoor{font-size:0.8rem;line-height:1.55;padding:0.5rem 0;border-bottom:1px solid var(--line);}
+  .spoor:last-child{border-bottom:0;}
+  details{margin-top:0.7rem;}
+  summary{font-size:0.8rem;color:var(--soft);cursor:pointer;}
+  summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .stap{font-size:0.76rem;color:var(--soft);line-height:1.6;padding:0.22rem 0;}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>Mijn loon</h1>
+</header>
+<main id="inhoud">
+  <p class="stil">Uw loonstroken van alle bedrijven waar u werkt, met per strook in gewone taal waar het bedrag vandaan komt. Alleen definitieve loonruns staan hier; een proefberekening van uw werkgever is nog geen loonstrook.</p>
+
+  <section aria-label="Loonstroken">
+    <h2>Loonstroken</h2>
+    <div id="stroken"><p class="stil">Laden…</p></div>
+  </section>
+
+  <section aria-label="Inzage in mijn identiteitsbewijs">
+    <h2>Wie keek er in mijn papieren</h2>
+    <div class="kaart" id="inzage"><p class="stil">Laden…</p></div>
+  </section>
+</main>
+<script src="/shared/uitvoer.js"></script>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* Alles komt in CENTEN binnen en blijft dat tot hier. Een bedrag dat
+     onderweg door een float gaat, gaat een keer op de honderdste mis, en dan
+     staat er een loonstrook die niet klopt met de betaling. */
+  const eur = (c) => '€ ' + (Number(c || 0) / 100).toFixed(2).replace('.', ',');
+
+  let STROKEN = [];
+  /* Meenemen (shared/uitvoer.js): de stroken als tabel, want dit is precies
+     het overzicht waar een hypotheekadviseur of de gemeente om vraagt. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!STROKEN.length) return null;
+    return {
+      naam: 'loonstroken',
+      kolommen: ['periode', 'werkgever', 'bruto', 'loonheffing', 'netto', 'regelversie'],
+      rijen: STROKEN.map((s) => [s.periode, s.zaak, (s.strook.brutoCenten / 100).toFixed(2),
+        (s.strook.loonheffingCenten / 100).toFixed(2), (s.strook.nettoCenten / 100).toFixed(2), s.regelversie])
+    };
+  });
+
+  function api(pad) {
+    return fetch('/api' + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
+      .then(async (r) => { const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+  }
+
+  const regelRij = (r) => '<div class="rij"><span class="lbl">' + esc(r.naam) +
+    (r.aantal != null ? ' <span class="stil">(' + esc(r.aantal) + ')</span>' : '') +
+    '</span><span>' + eur(r.centen) + '</span></div>';
+
+  /* DE REKENSTAPPEN, UITKLAPBAAR. Niet omdat iedereen ze leest, maar omdat de
+     een die het vraagt hier antwoord hoort te krijgen zonder te hoeven bellen.
+     Dat is vraag 1 van de vier: waarom is dit bedrag berekend? */
+  function stappen(strook) {
+    const s = (strook.stappen || []).map((st) => {
+      const stukken = [];
+      if (st.uitleg) stukken.push(esc(st.uitleg));
+      if (st.tarief != null) stukken.push('tarief ' + esc(st.tarief));
+      if (st.grondslag != null) stukken.push('over ' + eur(st.grondslag));
+      if (st.regel) stukken.push('regel ' + esc(st.regel));
+      return '<div class="stap"><b>' + esc(st.stap) + '</b>' +
+        (stukken.length ? ' · ' + stukken.join(' · ') : '') +
+        (st.centen != null ? ' → ' + eur(st.centen) : '') + '</div>';
+    }).join('');
+    return '<details><summary>Hoe is dit uitgerekend?</summary>' + s +
+      '<div class="stap" style="margin-top:0.4rem;">Gerekend met regelpakket ' +
+      esc(strook.regelpakket ? strook.regelpakket.versie : '?') + ' (' +
+      esc(strook.regelpakket ? strook.regelpakket.land : '') + ').' +
+      (strook.regelpakket && strook.regelpakket.stand !== 'goedgekeurd'
+        ? ' Let op: dat pakket staat als ' + esc(strook.regelpakket.stand) + '.' : '') +
+      '</div></details>';
+  }
+
+  function tekenStroken(lijst) {
+    if (!lijst.length) {
+      $('#stroken').innerHTML = '<div class="kaart"><p class="stil">U heeft nog geen definitieve loonstrook. Zodra uw werkgever een loonrun afrondt, staat hij hier, met de uitleg erbij.</p></div>';
+      return;
+    }
+    $('#stroken').innerHTML = lijst.map((s) => {
+      const st = s.strook;
+      const bruto = (st.regels || []).filter((r) => r.soort === 'bruto');
+      const inh = (st.regels || []).filter((r) => r.soort === 'inhouding');
+      const net = (st.regels || []).filter((r) => r.soort === 'netto');
+      return '<div class="kaart">' +
+        '<div class="strookkop"><b>' + esc(s.periode) + '<br><span class="stil">' + esc(s.zaak) + '</span></b>' +
+        '<span class="netto">' + eur(st.nettoCenten) + '</span></div>' +
+        (s.correctieVan ? '<p class="stil" style="margin-top:0.4rem;">Dit is een correctie op een eerdere periode. De oorspronkelijke strook blijft staan; deze zet het verschil recht.</p>' : '') +
+        '<p class="uitleg">' + esc(s.uitleg) + '</p>' +
+        '<div style="margin-top:0.7rem;">' +
+        bruto.map(regelRij).join('') +
+        '<div class="rij dik"><span class="lbl">Bruto</span><span>' + eur(st.brutoCenten) + '</span></div>' +
+        '<div class="rij"><span class="lbl">Loonheffing</span><span>− ' + eur(st.loonheffingCenten) + '</span></div>' +
+        inh.map(regelRij).join('') +
+        net.map(regelRij).join('') +
+        '<div class="rij dik"><span class="lbl">Netto</span><span>' + eur(st.nettoCenten) + '</span></div>' +
+        '</div>' + stappen(st) + '</div>';
+    }).join('');
+  }
+
+  const NIVEAU = { gegevens: 'uw gegevens (soort, laatste vier cijfers, geldigheid)',
+    kopie: 'een kopie van het document zelf' };
+
+  /* Het spoor van de andere kant. De werkgever ziet standaard alleen ja/nee;
+     vraagt hij meer op, dan moet hij een reden noteren -- en die reden hoort
+     de betrokkene te lezen. Een spoor dat alleen de aanvrager kan inzien, is
+     geen spoor. */
+  function tekenInzage(v) {
+    if (!v.length) {
+      $('#inzage').innerHTML = '<p class="stil">Niemand heeft uw identiteitsgegevens opgevraagd. Uw werkgever ziet standaard alleen of uw identiteit is vastgesteld: ja of nee. Meer opvragen kan alleen met een reden, en dat komt hier te staan.</p>';
+      return;
+    }
+    $('#inzage').innerHTML = v.map((x) =>
+      '<div class="spoor"><b>' + esc(x.bedrijfNaam) + '</b> vroeg ' +
+      esc(NIVEAU[x.niveau] || x.niveau) + ' op' + (x.door ? ', door ' + esc(x.door) : '') + '.<br>' +
+      '<span class="stil">Reden: ' + esc(x.reden) + ' · ' + esc(String(x.at).slice(0, 10)) + '</span></div>').join('');
+  }
+
+  async function laad() {
+    if (!tok) {
+      $('#stroken').innerHTML = '<div class="kaart"><p class="stil">Log eerst in via de leden-app.</p></div>';
+      $('#inzage').innerHTML = '<p class="stil">Log eerst in via de leden-app.</p>';
+      return;
+    }
+    try {
+      const d = await api('/member/loonstroken');
+      STROKEN = d.stroken || [];
+      tekenStroken(STROKEN);
+    } catch (e) { $('#stroken').innerHTML = '<div class="kaart"><p class="stil">' + esc(e.message) + '</p></div>'; }
+    try {
+      const d = await api('/member/identiteit/verzoeken');
+      tekenInzage(d.verzoeken || []);
+    } catch (e) { $('#inzage').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+  }
+  laad();
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

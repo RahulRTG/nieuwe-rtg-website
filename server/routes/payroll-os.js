@@ -44,6 +44,41 @@ module.exports = (kern) => {
     catch (e) { res.status(500).json({ error: 'De bijwerkronde liep vast: ' + e.message }); }
   });
 
+  /* ---------- contracten (kantoor) ----------
+     Het kantoor voert de loonadministratie voor de zaken; daar hoort het
+     overtypen van een arbeidscontract bij. De zaakcode staat hier WEL in het
+     verzoek, anders dan aan de werkgeverskant: een kantoormedewerker zit niet
+     aan een zaak vast, dat is nu juist zijn werk. De poort is officeAuth.
+
+     De medewerkerslijst zit erbij, want een contract vastleggen begint met het
+     kiezen van een persoon, en een personeelsnummer uit het hoofd intypen is
+     hoe je het contract van de verkeerde persoon wijzigt. */
+  app.post('/api/office/payroll/personeel', officeAuth, (req, res) => {
+    const s = findSupplier((req.body || {}).code);
+    if (!s) return res.status(404).json({ error: 'Zaak niet gevonden.' });
+    const dag = String((req.body || {}).opDatum || '').slice(0, 10);
+    res.json({ ok: true, code: s.code, zaak: s.name, land: (s.settings && s.settings.land) || 'NL',
+      staff: accounts.listStaff(s.code).map(m => ({ id: m.id, naam: m.name, func: m.func || null,
+        manager: m.role === 'manager',
+        contract: dag ? payrollOS.contracten.opDatum(s.code, m.id, dag) : null })) });
+  });
+
+  app.post('/api/office/payroll/contract', officeAuth, (req, res) => {
+    const b = req.body || {};
+    const s = findSupplier(b.code);
+    if (!s) return res.status(404).json({ error: 'Zaak niet gevonden.' });
+    const staff = accounts.getStaffById(Number(b.staffId));
+    if (!staff || String(staff.supplier_code).toUpperCase() !== s.code.toUpperCase())
+      return res.status(404).json({ error: 'Deze medewerker werkt niet bij deze zaak.' });
+    antwoord(res, payrollOS.contracten.leg(s.code, staff.id, {
+      vanaf: String(b.vanaf || ''), tot: b.tot ? String(b.tot) : null,
+      soort: String(b.soort || ''), betaling: b.betaling ? String(b.betaling) : 'maand',
+      uurloonCenten: Number(b.uurloonCenten),
+      urenPerWeek: b.urenPerWeek != null ? Number(b.urenPerWeek) : null,
+      functie: schoon(b.functie, 80) || null
+    }, wie(req), b.nr != null ? Number(b.nr) : 1));
+  });
+
   /* ---------- de loonrun ---------- */
   /* Openen doet het kantoor: het draait de administratie. De uren komen uit de
      klok van de zaak zelf, dus de client levert ze NIET aan -- anders is de

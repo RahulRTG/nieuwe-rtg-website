@@ -45,7 +45,14 @@
       '.ag-doos{display:flex;flex-direction:column;width:100%;}' +
       // geen chatbubbels: alleen Rahuls zin, groot en stil in Bodoni, en
       // daaronder de ene regel van de gebruiker; verder niets
-      ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:var(--txt);" +
+      /* VASTE KLEUR, GEEN MEEBEWEGENDE. Deze zin is het enige wat je aan de
+         poort te lezen krijgt, op een donkere sterrenhemel. Hij stond op
+         var(--txt), en die schuift mee met de dagkleur: afhankelijk van het
+         tijdstip werd hij warmer en doffer, en een gebruiker meldde dat de
+         letters bij hem niet zo wit waren. Leesbaarheid van de enige tekst op
+         het scherm hoort niet van het uur van de dag af te hangen. CLAUDE.md
+         is hier ook duidelijk over: op zwart is de tekstkleur wit. */
+      ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:#FBFAF8;" +
         'text-align:center;min-height:4.6rem;display:flex;align-items:center;justify-content:center;' +
         'padding:0.9rem 0.4rem 1.1rem;text-wrap:balance;animation:agZin 0.5s ease;}' +
       '@keyframes agZin{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}' +

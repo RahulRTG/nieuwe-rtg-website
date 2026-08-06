@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'e23f7ee7';
+var RTG_BOUW = 'c2cfc539';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -469,7 +469,14 @@ var RTG_BOUW = 'e23f7ee7';
       '.ag-doos{display:flex;flex-direction:column;width:100%;}' +
       // geen chatbubbels: alleen Rahuls zin, groot en stil in Bodoni, en
       // daaronder de ene regel van de gebruiker; verder niets
-      ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:var(--txt);" +
+      /* VASTE KLEUR, GEEN MEEBEWEGENDE. Deze zin is het enige wat je aan de
+         poort te lezen krijgt, op een donkere sterrenhemel. Hij stond op
+         var(--txt), en die schuift mee met de dagkleur: afhankelijk van het
+         tijdstip werd hij warmer en doffer, en een gebruiker meldde dat de
+         letters bij hem niet zo wit waren. Leesbaarheid van de enige tekst op
+         het scherm hoort niet van het uur van de dag af te hangen. CLAUDE.md
+         is hier ook duidelijk over: op zwart is de tekstkleur wit. */
+      ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:#FBFAF8;" +
         'text-align:center;min-height:4.6rem;display:flex;align-items:center;justify-content:center;' +
         'padding:0.9rem 0.4rem 1.1rem;text-wrap:balance;animation:agZin 0.5s ease;}' +
       '@keyframes agZin{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}' +
@@ -569,10 +576,13 @@ var RTG_BOUW = 'e23f7ee7';
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
-      // Rahul typt zijn zin letter voor letter en de mond beweegt mee
-      if (window.RTGTyp){ RTGTyp.schrijf(zin, tekst, { praat: praat }); return; }
+      /* De zin staat er METEEN, niet letter voor letter. Dat typen was mooi
+         bedoeld, maar aan de poort staat iemand die naar binnen wil: die leest
+         sneller dan de machine tikt, en zit dan te wachten op tekst die er al
+         is. De mond beweegt wel gewoon mee -- dat is Rahuls gezicht, geen
+         leesvertraging. */
       zin.style.animation = 'none';
-      void zin.offsetWidth; // de fade opnieuw laten lopen
+      void zin.offsetWidth;              // de fade opnieuw laten lopen
       zin.style.animation = '';
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));
@@ -913,14 +923,15 @@ var RTG_BOUW = 'e23f7ee7';
      bedraad; de gespreksfuncties staan hier. */
   let onbBezig = false, onbSt = null, onbRij = [], onbStap = null, onbHuidig = null, onbGeopend = false, onbMond = null;
   function onbEl(id){ return document.getElementById(id); }
-  // Rahuls signatuurmond boven de onboarding, dezelfde als op de poort; en zijn
-  // woorden verschijnen letter voor letter (RTGTyp) terwijl de mond meebeweegt.
+  // Rahuls signatuurmond boven de onboarding, dezelfde als op de poort. De
+  // zin staat er meteen volledig; alleen de mond beweegt mee.
   function onbMondMaak(){ const c = onbEl('onbMond'); if (c && !onbMond && window.RTGMond) onbMond = RTGMond.maak(c); }
   function onbZeg(t){
     const z = onbEl('onbTitel'); if (!z) return;
     const praat = onbMond ? function(ms){ onbMond.praat(ms); } : null;
-    if (window.RTGTyp) RTGTyp.schrijf(z, t, { praat: praat });
-    else { z.textContent = t; if (praat) praat(400); }
+    /* Ook hier meteen de hele zin; zie app-main-05.js voor waarom. */
+    z.textContent = t;
+    if (praat) praat(Math.min(2600, 500 + t.length * 28));
   }
   function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
   function onbOpenVelden(){ return ((onbSt && onbSt.velden) || []).filter(function(v){ return !v.ingevuld; }); }

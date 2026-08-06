@@ -63,4 +63,36 @@ module.exports = (ctx) => {
      en met opzet geen "goedkeuring": wat eruit komt is een feitenblad. */
   app.post('/api/office/weefsel/onderzoek', officeAuth, (req, res) => veilig(res, () => w.weefselOnderzoek({ projectId: req.body.projectId })));
   app.post('/api/office/weefsel/jaarbeeld', officeAuth, (req, res) => veilig(res, () => w.weefselJaarbeeld({ jaar: req.body.jaar })));
+
+  /* ---- noodbediening: wat doet de stad als wij er niet zijn ----
+     De noodkaart is bewust ook hier een gewone kijk-route: hij rekent niets uit
+     en is bedoeld om afgedrukt te worden. */
+  app.post('/api/office/weefsel/noodkaart', officeAuth, (req, res) => veilig(res, () => w.weefselNoodkaart()));
+  app.post('/api/office/weefsel/vertrouwenszones', officeAuth, (req, res) => veilig(res, () => w.weefselVertrouwenszones()));
+  app.post('/api/office/weefsel/terugval/zet', officeAuth, (req, res) => veilig(res, () => {
+    const r = w.weefselTerugvalZet({ soort: req.body.soort, terugval: req.body.terugval, lokaal: req.body.lokaal,
+      papier: req.body.papier, notitie: req.body.notitie, wie: naam(req) });
+    if (r.ok) afdelingen.audit(naam(req), 'Terugvalstand voor ' + r.terugval.soort + ' vastgelegd');
+    return r;
+  }));
+  app.post('/api/office/weefsel/oefening', officeAuth, (req, res) => veilig(res, () => {
+    const r = w.weefselOefening({ soort: req.body.soort, wie: naam(req), notitie: req.body.notitie, gelukt: req.body.gelukt });
+    if (r.ok) afdelingen.audit(naam(req), 'Noodoefening ' + r.terugval.soort + ': ' +
+      (req.body.gelukt === false ? 'MISLUKT -- telt niet als geoefend' : 'geslaagd'));
+    return r;
+  }));
+
+  /* ---- het sociaal domein: voorzieningen en tellingen, nooit personen ---- */
+  app.post('/api/office/weefsel/voorzieningen', officeAuth, (req, res) => veilig(res, () => w.weefselVoorzieningen({ maanden: req.body.maanden })));
+  app.post('/api/office/weefsel/voorziening/maak', officeAuth, (req, res) => veilig(res, () => {
+    const r = w.weefselVoorzieningMaak({ soort: req.body.soort, naam: req.body.voorzieningNaam, lat: req.body.lat, lng: req.body.lng,
+      plekken: req.body.plekken, wachtDagen: req.body.wachtDagen, doelgroep: req.body.doelgroep, organisatie: req.body.organisatie, wie: naam(req) });
+    if (r.ok) afdelingen.audit(naam(req), 'Voorziening toegevoegd: ' + r.voorziening.naam + ' (' + r.voorziening.soortLabel + ')');
+    return r;
+  }));
+  app.post('/api/office/weefsel/voorziening/zet', officeAuth, (req, res) => veilig(res, () => w.weefselVoorzieningZet({
+    id: req.body.id, plekken: req.body.plekken, wachtDagen: req.body.wachtDagen, open: req.body.open, wie: naam(req) })));
+  app.post('/api/office/weefsel/telling', officeAuth, (req, res) => veilig(res, () => w.weefselTelling({
+    stroom: req.body.stroom, gebied: req.body.gebied, aantal: req.body.aantal, maand: req.body.maand, wie: naam(req) })));
+  app.post('/api/office/weefsel/sociaalgrenzen', officeAuth, (req, res) => veilig(res, () => w.weefselSociaalGrenzen()));
 };

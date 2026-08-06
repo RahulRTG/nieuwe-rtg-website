@@ -63,6 +63,12 @@ module.exports = (deps) => {
   ctx.DOMEINEN = dom.DOMEINEN; ctx.standVan = dom.standVan; ctx.alerts = dom.alerts;
   const vloot = require('./nodes')(ctx);
   ctx.zorgBasis = vloot.zorgBasis; ctx.simuleer = vloot.simuleer;
+  /* De productkant van de Stadsdoos (levenscyclus, paspoort, sleutelrotatie,
+     ondertekende updates, kalibratie, sabotage) staat in ./apparaat.js. Hij
+     wordt NA nodes gemount omdat de poort daar woont, en nodes gebruikt hem via
+     de ctx -- late binding, want de hartslag van een doos komt pas als beide
+     delen er allang staan. */
+  const app = require('./apparaat')(ctx); ctx.apparaat = app;
   const sce = require('./scenario')(ctx);
   ctx.SCENARIOS = sce.SCENARIOS;
   /* Het live seintje naar een melder ("je melding is opgepakt") hangt nu aan de
@@ -103,6 +109,6 @@ module.exports = (deps) => {
   }
 
   const api = { stadBeeld: beeld, stadKoppelVerkeer: koppelVerkeer };
-  Object.assign(api, vloot.api, dom.api, sce.api, adv, bew.api, veld.api);
+  Object.assign(api, vloot.api, app.api, dom.api, sce.api, adv, bew.api, veld.api);
   return { stad: api };
 };

@@ -76,6 +76,8 @@ module.exports = (deps) => {
   const kli = require('./klimaat')(ctx); ctx.kli = kli;
   const sim = require('./simulatie')(ctx); ctx.sim = sim;
   const kan = require('./kansen')(ctx); ctx.kan = kan;
+  const ter = require('./terugval')(ctx); ctx.ter = ter;
+  const vzn = require('./voorzieningen')(ctx); ctx.vzn = vzn;
   const alg = require('./algoritmeregister')(ctx); ctx.alg = alg;
 
   const seintje = () => { try { if (sseToOffice) sseToOffice('sync', { scope: 'weefsel' }); } catch (e) { stil('sse', e); } };
@@ -159,6 +161,6 @@ module.exports = (deps) => {
     weefselKoppelEconomie: (bronnen) => kan.koppel(bronnen || {})
   };
   Object.assign(api, geo.api, obj.api, rel.api, afh.api, tr.api, zkn.api, werk.api,
-    con.api, ond.api, ind.api, bes.api, beg.api, insp.api, ene.api, kli.api, sim.api, kan.api, alg.api);
+    con.api, ond.api, ind.api, bes.api, beg.api, insp.api, ene.api, kli.api, sim.api, kan.api, ter.api, vzn.api, alg.api);
   return { weefsel: api };
 };

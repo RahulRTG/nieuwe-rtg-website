@@ -56,11 +56,41 @@ module.exports = (ctx) => {
     } catch (e) { console.error('[stad]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
+  /* De PRODUCTKANT van de Stadsdoos: levensloop, paspoort, sleutelrotatie,
+     kalibratie en het uitgeven van een ondertekende update. Alles met naam in
+     het auditlog, want dit zijn handelingen aan hardware die buiten hangt. */
+  app.post('/api/office/stad/vloot', officeAuth, (req, res) => veilig(res, () => stad.stadVloot()));
+  app.post('/api/office/stad/paspoort', officeAuth, (req, res) => veilig(res, () => stad.stadPaspoort({ serial: req.body.serial })));
+  app.post('/api/office/stad/fase', officeAuth, (req, res) => veilig(res, () => {
+    const r = stad.stadFaseZet({ serial: req.body.serial, fase: req.body.fase, wie: naam(req), notitie: req.body.notitie });
+    if (r.ok) afdelingen.audit(naam(req), 'Stadsdoos ' + req.body.serial + ' -> fase ' + r.paspoort.fase);
+    return r;
+  }));
+  app.post('/api/office/stad/sleutel', officeAuth, (req, res) => veilig(res, () => {
+    const r = stad.stadSleutelNieuw({ serial: req.body.serial, wie: naam(req) });
+    if (r.ok) afdelingen.audit(naam(req), 'Nieuwe apparaatsleutel voor ' + r.serial + '; de oude blijft nog even geldig');
+    return r;
+  }));
+  app.post('/api/office/stad/kalibreer', officeAuth, (req, res) => veilig(res, () => {
+    const r = stad.stadKalibreer({ serial: req.body.serial, sens: req.body.sens, offset: req.body.offset,
+      factor: req.body.factor, wie: naam(req), notitie: req.body.notitie });
+    if (r.ok) afdelingen.audit(naam(req), 'Kalibratie ' + r.serial + '/' + r.sens + ': nulpunt ' + r.kalibratie.offset + ', factor ' + r.kalibratie.factor);
+    return r;
+  }));
+  app.post('/api/office/stad/update', officeAuth, (req, res) => veilig(res, () => {
+    const r = stad.stadUpdateUit({ versie: req.body.versie, sha256: req.body.sha256, notitie: req.body.notitie, wie: naam(req) });
+    if (r.ok) afdelingen.audit(naam(req), 'Firmware ' + r.update.versie + ' uitgegeven (terugval: ' + (r.update.terugval || 'geen') + ')');
+    return r;
+  }));
+
   /* De hardware-poorten: de Stadsdoos zelf meldt zich met serienummer +
      apparaat-sleutel. Geen office-inlog (het kastje hangt buiten), wel een
-     eigen sleutel per doos; alles wat niet klopt wordt geweigerd. */
+     eigen sleutel per doos; alles wat niet klopt wordt geweigerd. De hartslag
+     draagt ook de firmware, de accu en een eventuele sabotagemelding, en geeft
+     een ondertekend updatemanifest terug als er iets nieuws is. */
   app.post('/api/stad/doos/hartslag', (req, res) => veilig(res, () =>
-    stad.stadDoosHartslag({ serial: req.body.serial, sleutel: String(req.body.sleutel || '') })));
+    stad.stadDoosHartslag({ serial: req.body.serial, sleutel: String(req.body.sleutel || ''),
+      firmware: req.body.firmware, sabotage: req.body.sabotage, accu: req.body.accu })));
   app.post('/api/stad/doos/meting', (req, res) => veilig(res, () =>
     stad.stadDoosMeting({ serial: req.body.serial, sleutel: String(req.body.sleutel || ''), metingen: req.body.metingen })));
 };

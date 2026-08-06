@@ -45,6 +45,11 @@ module.exports = (ctx) => {
   /* Wat is dit kaartje nu waard? Geldig, opgebruikt of verlopen -- uitgerekend
      uit het venster en de validaties, nooit uit een bewaard vlaggetje. */
   function kaartStand(k) {
+    /* Een abonnement rekent zijn eigen stand uit (geen ritlimiet, wel een
+       looptijd) en woont in dezelfde voorraad. Via ctx, want ./abonnement wordt
+       NA deze module gemount. Zonder deze aftakking viel een abonnement terug
+       op de regels van een enkeltje en was het na een rit "gebruikt". */
+    if (k.product === 'abonnement' && ctx.aboStand) return ctx.aboStand(k);
     /* Alleen een VOLLEDIGE teruggave maakt het kaartje ongeldig. Bij een
        vertraging krijgt de reiziger een deel terug als vergoeding en rijdt hij
        gewoon mee -- hier stond eerst dat elke teruggave het kaartje afsloot, en

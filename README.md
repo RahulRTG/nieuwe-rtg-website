@@ -724,6 +724,22 @@ conducteur is de enige plek waar een kaartje opgaat, en hij ziet het bewijs en
 niet de persoon: product, lijn, geldigheid en de codenaam, geen e-mailadres en
 geen wallet.
 
+**Abonnementen** zijn hetzelfde ding met een ander product: een periodekaart
+wordt bewaard als een kaartje met product `abonnement`, in dezelfde voorraad en
+met dezelfde code, zodat de conducteur langs precies één weg controleert. Wat er
+anders aan is staat in code: onbeperkt reizen binnen de looptijd (het aantal
+ritten wordt geteld maar niet begrensd, en dat staat er ook bij), een prijs die
+uit de **overeenkomst** komt en niet uit een formule -- wat een maandkaart kost
+is een commerciële afspraak, geen som -- en bij een storing een teruggave op
+**dagbasis**. Een maandkaarthouder de helft van zijn maand teruggeven omdat de
+bus een uur uitviel, is geen compensatie maar een weggevertje, en het komt van
+de vervoerder af.
+
+Het kaartje is te **tonen als scanbare QR** (`shared/qr.js` + `qrteken.js`, onze
+eigen codec) met de code in leesbare tekens eronder voor als de camera niet
+meewerkt; de conducteur scant hem op de dienst-PDA met dezelfde overlay als de
+kassa en de pas. Hij ziet het bewijs en niet de persoon.
+
 **Vertraging komt van de vervoerder, niet van ons.** Wij hebben live posities
 maar geen dienstregeling per halte, dus "hoeveel te laat" kunnen wij niet
 berekenen -- en een teruggave op een geraden getal is erger dan geen teruggave.

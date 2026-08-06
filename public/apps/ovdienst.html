@@ -103,6 +103,21 @@
         <p class="stil" style="margin-top:0.5rem;">Reizigers met de GPS-tik checken zichzelf in; die ziet u vanzelf in
           de teller verschijnen.</p>
       </div>
+
+      <h2>Vervoerbewijs controleren</h2>
+      <div class="kaart codeIn">
+        <p class="stil">Scan de QR op het scherm van de reiziger, of tik de code in. Het antwoord is kort:
+          geldig of niet, en waarom niet.</p>
+        <div class="rij" style="margin-top:0.6rem;">
+          <button class="knop vol" id="scanKnop" type="button">Scan een kaartje</button>
+        </div>
+        <form class="rij" id="bewijsForm" style="margin-top:0.5rem;">
+          <label for="bewijsVeld" style="position:absolute;left:-999px;">Code van het vervoerbewijs</label>
+          <input id="bewijsVeld" maxlength="40" autocomplete="off" placeholder="Of tik de code in">
+          <button class="knop" type="submit">Controleer</button>
+        </form>
+        <div id="bewijsUit" class="weg" style="margin-top:0.7rem;"></div>
+      </div>
     </div>
   </section>
 </main>
@@ -153,13 +168,20 @@
     const sel = $('#dLijn'); sel.innerHTML = '';
     for (const l of r.body.lijnen || []) { const o = document.createElement('option'); o.value = l.id; o.textContent = l.icoon + ' ' + l.naam; sel.appendChild(o); }
     $('#vDienst').classList.remove('weg');
+    // liep er al een dienst? dan meteen terug in het werkscherm
+    const st = await api('stand');
+    if (st.status === 200 && st.body.aan) dienstLoopt((st.body.lijn && st.body.lijn.naam) || 'Dienst');
   }
 
-  $('#dStart').addEventListener('click', async () => {
-    const r = await api('dienst', { lijnId: $('#dLijn').value, voertuigNaam: $('#dNaam').value });
-    if (r.body.error) return zeg(r.body.error);
+  /* Het scherm van een LOPENDE dienst. Aparte functie omdat er twee wegen naar
+     toe leiden: de knop hieronder, en het herladen van de pagina terwijl de
+     dienst gewoon doorloopt. Die tweede weg ontbrak, en dan zag een chauffeur na
+     een hapering zijn startscherm terug met zijn dienst nog actief -- geen
+     tellers, geen GPS, en geen kaartcontrole. */
+  function dienstLoopt(lijnNaam) {
     $('#kies').classList.add('weg'); $('#loopt').classList.remove('weg');
-    $('#dienstBadge').textContent = r.body.lijn.naam + ' · live';
+    $('#dienstBadge').textContent = lijnNaam + ' · live';
+    clearInterval(posTimer); clearInterval(standTimer);
     const deel = async () => {
       const p = await api('pos', hier);
       $('#gpsStatus').textContent = p.body.error ? p.body.error : 'GPS gedeeld om ' + new Date().toLocaleTimeString('nl-NL').slice(0, 5) + '; leden zien u live.';
@@ -170,6 +192,11 @@
       if (s.status === 200) { $('#tAanBoord').textContent = s.body.aanBoord; $('#tVandaag').textContent = s.body.vandaag; }
     };
     stand(); standTimer = setInterval(stand, 8000);
+  }
+  $('#dStart').addEventListener('click', async () => {
+    const r = await api('dienst', { lijnId: $('#dLijn').value, voertuigNaam: $('#dNaam').value });
+    if (r.body.error) return zeg(r.body.error);
+    dienstLoopt(r.body.lijn.naam);
   });
   $('#dStop').addEventListener('click', async () => {
     await api('dienst', { aan: false });
@@ -189,8 +216,59 @@
   });
 
   start();
+  /* ---- vervoerbewijzen controleren ----
+     De conducteur ziet het BEWIJS en niet de persoon: product, lijn, geldigheid
+     en de codenaam. Geen e-mailadres, geen wallet, geen reisgeschiedenis -- hij
+     controleert een kaartje, hij doet geen persoonsonderzoek. */
+  async function bewijsCheck(code) {
+    const uit = $('#bewijsUit');
+    uit.classList.remove('weg');
+    uit.textContent = 'Even kijken…';
+    const r = await fetch('/api/staff/mob/kaart/controle', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ code: code, lijnId: $('#dLijn').value || undefined }) })
+      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
+    uit.innerHTML = '';
+    const kop = document.createElement('p');
+    kop.style.fontSize = '1rem';
+    kop.style.fontWeight = '600';
+    kop.style.color = r.body.geldig ? 'var(--groen)' : 'var(--rood)';
+    kop.textContent = r.body.geldig ? 'Geldig' : 'Niet geldig';
+    uit.appendChild(kop);
+    const sub = document.createElement('p'); sub.className = 'stil';
+    sub.textContent = r.body.geldig ? (r.body.melding || '') : (r.body.error || 'Onbekende code.');
+    uit.appendChild(sub);
+    const k = r.body.kaartje;
+    if (k) {
+      const det = document.createElement('p'); det.className = 'stil';
+      det.textContent = [k.product, k.lijnNaam, k.van ? k.van + ' → ' + k.naar : null, k.codenaam]
+        .filter(Boolean).join(' · ');
+      uit.appendChild(det);
+    }
+    zeg(r.body.geldig ? 'Geldig vervoerbewijs.' : (r.body.error || 'Niet geldig.'));
+  }
+  $('#bewijsForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const c = $('#bewijsVeld').value.trim();
+    if (!c) return zeg('Vul een code in.');
+    bewijsCheck(c);
+    $('#bewijsVeld').value = '';
+  });
+  /* Scannen via de gedeelde overlay (shared/scanknop.js): dezelfde camera-laag
+     als de kassa en de pas. Zonder camera valt die zelf terug op typen, dus een
+     scan is nooit een doodlopende weg. */
+  $('#scanKnop').addEventListener('click', () => {
+    if (!window.RTGScanknop) return zeg('Scannen kan hier niet; tik de code in.');
+    RTGScanknop.open({ titel: 'Vervoerbewijs scannen',
+      hint: 'Laat de reiziger de QR van zijn kaartje tonen.',
+      onCode: c => bewijsCheck(String((c && c.tekst) || c || '').trim()) });
+  });
 })();
+
 </script>
+<script src="/shared/qr.js" defer></script>
+<script src="/shared/qrscan.js" defer></script>
+<script src="/shared/scanknop.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

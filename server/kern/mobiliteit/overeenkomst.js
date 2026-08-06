@@ -26,7 +26,7 @@
    andere RTG-betaling. */
 
 // wat een overeenkomst kan toestaan; een product dat hier niet staat bestaat niet
-const PRODUCTEN = ['enkel', 'retour', 'dagkaart', 'zitplaats'];
+const PRODUCTEN = ['enkel', 'retour', 'dagkaart', 'zitplaats', 'abonnement'];
 
 module.exports = (ctx) => {
   const { db, save, id, schoon, nu, findSupplier } = ctx;
@@ -127,11 +127,24 @@ module.exports = (ctx) => {
     const tekenaar = schoon(body.getekendDoor, 80);
     if (!tekenaar) return { status: 400, error: 'Noteer wie de overeenkomst namens de vervoerder heeft getekend.' };
 
+    /* De abonnementsprijs staat in de OVEREENKOMST en wordt nergens berekend.
+       Een losse rit volgt het kilometertarief van de lijn, maar wat een
+       maandkaart kost is een commerciele afspraak met de vervoerder -- dat
+       verzinnen wij niet, en een abonnement zonder afgesproken prijs is dus
+       geen aanbod maar een gat. */
+    const abo = Math.round(Number(body.abonnementPrijs) || 0);
+    if (producten.includes('abonnement') && !(abo > 0))
+      return { status: 400, error: 'Noteer wat het abonnement per periode kost (abonnementPrijs, in centen).' };
+    const dagen = Math.round(Number(body.abonnementDagen) || 30);
+    if (producten.includes('abonnement') && (dagen < 1 || dagen > 366))
+      return { status: 400, error: 'De abonnementsperiode telt 1 tot 366 dagen.' };
+
     const o = bestaand || { id: id('ok'), vervoerder: code, gemaakt: nu() };
     Object.assign(o, { vervoerderNaam: zaak.name, van, tot, producten, lijnen,
       getekendDoor: tekenaar, vastgelegdDoor: schoon(door, 60) || 'kantoor',
       // de afspraak over het geld; verplaatsen gebeurt in kern/pay, niet hier
       afdrachtDeel: Math.min(1, Math.max(0, Number(body.afdrachtDeel) || 1)),
+      abonnementPrijs: abo || null, abonnementDagen: producten.includes('abonnement') ? dagen : null,
       ingetrokken: null, gewijzigd: nu() });
     if (!bestaand) db.data.mobOvereenkomsten.push(o);
     save();
@@ -143,7 +156,8 @@ module.exports = (ctx) => {
     return { id: o.id, vervoerder: o.vervoerder, vervoerderNaam: o.vervoerderNaam,
       van: o.van, tot: o.tot, producten: o.producten, lijnen: o.lijnen,
       getekendDoor: o.getekendDoor, vastgelegdDoor: o.vastgelegdDoor,
-      afdrachtDeel: o.afdrachtDeel, ingetrokken: o.ingetrokken || null,
+      afdrachtDeel: o.afdrachtDeel, abonnementPrijs: o.abonnementPrijs || null,
+      abonnementDagen: o.abonnementDagen || null, ingetrokken: o.ingetrokken || null,
       geldigNu: g.geldig, reden: g.reden };
   }
 

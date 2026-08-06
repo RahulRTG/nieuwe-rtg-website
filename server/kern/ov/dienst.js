@@ -45,7 +45,17 @@ module.exports = (ctx) => {
     const vid = 'v-' + s.code + '-' + (actor && actor.staffId || 'pda');
     const vandaag = nu().slice(0, 10);
     const ritten = db.data.ovRitten.filter(r => r.voertuigId === vid && String(r.in.at).slice(0, 10) === vandaag);
-    return { status: 200, aanBoord: ritten.filter(r => r.status === 'in').length, vandaag: ritten.length };
+    /* Of er een dienst LOOPT hoorde hier ook bij te staan, en stond er niet.
+       Gevolg: wie de PDA herlaadde -- na een telefoontje, een schermvergrendeling
+       of gewoon een hapering -- kreeg het startscherm terug terwijl zijn dienst
+       gewoon doorliep. Hij zag zijn tellers niet meer, deelde geen GPS meer, en
+       de kaartcontrole (die in de lopende dienst zit) was weg. De dienst IS het
+       live voertuigrecord; dat kunnen we gewoon zeggen. */
+    const v = db.data.ovVoertuigen.find(x => x.id === vid && versVoertuig(x)) || null;
+    const lijn = v ? lijnVan(s, v.lijnId) : null;
+    return { status: 200, aanBoord: ritten.filter(r => r.status === 'in').length, vandaag: ritten.length,
+      aan: !!v, voertuigNaam: v ? v.naam : null,
+      lijn: lijn ? { id: lijn.id, naam: lijn.naam, soort: lijn.soort } : null };
   }
 
   /* ---- de routetekenaar: de zaak zet zelf lijnen en haltes op de kaart ----

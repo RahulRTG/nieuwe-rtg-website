@@ -213,6 +213,16 @@
       <p class="stil" id="kaartReden">Even kijken wat er te koop is&hellip;</p>
     </div>
 
+    <h2>Abonnement</h2>
+    <div class="kaart">
+      <div id="aboVorm" class="weg">
+        <p class="stil" id="aboUitleg"></p>
+        <div style="margin-top:0.7rem;"><button class="knop vol" id="aboKoop" type="button">Abonnement nemen</button></div>
+      </div>
+      <p class="stil" id="aboReden">Even kijken of er een abonnement is&hellip;</p>
+      <div id="aboLijst"></div>
+    </div>
+
     <h2>Uw vervoerbewijzen</h2>
     <div class="kaart"><div id="kaartLijst"><p class="stil">U heeft nog geen kaartjes.</p></div></div>
   </section>
@@ -238,6 +248,12 @@
   <div class="code" id="codeTekst" aria-live="polite"></div>
   <p class="stil" id="codeTijd"></p>
   <button class="knop" id="codeDicht" type="button">Sluiten</button>
+</div>
+<div class="codeScherm" id="qrScherm" role="dialog" aria-label="Uw vervoerbewijs">
+  <p class="stil" id="qrTitel"></p>
+  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" style="width:min(70vw,300px);height:auto;border-radius:12px;background:#fff;padding:0.6rem;">
+  <p class="stil" id="qrCode" style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;"></p>
+  <button class="knop" id="qrDicht" type="button">Sluiten</button>
 </div>
 <div class="melding" id="melding" role="status"></div>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
@@ -651,10 +667,76 @@
       l.innerHTML = '<strong></strong><span class="sub" style="display:block;font-size:0.72rem;color:var(--soft);"></span>';
       l.querySelector('strong').textContent = k.productNaam + ' · ' + k.lijnNaam;
       l.querySelector('.sub').textContent = k.reden + (k.stand === 'geldig' ? ' · code ' + k.code : '');
-      const st = document.createElement('span'); st.className = 'stil'; st.textContent = k.stand;
-      d.appendChild(l); d.appendChild(st); lijst.appendChild(d);
+      d.appendChild(l);
+      /* Een geldig kaartje kun je TONEN. De QR is de code zelf; de conducteur
+         scant hem met dezelfde overlay als de kassa. Zonder de tekenmodule
+         blijft de code als tekst staan -- tonen mag nooit een doodlopende weg
+         zijn omdat een script niet laadde. */
+      if (k.stand === 'geldig') {
+        const b = document.createElement('button'); b.className = 'knop';
+        b.textContent = 'Toon';
+        b.addEventListener('click', () => toonQr(k.productNaam + ' · ' + k.lijnNaam, k.code));
+        d.appendChild(b);
+      } else {
+        const st = document.createElement('span'); st.className = 'stil'; st.textContent = k.stand;
+        d.appendChild(st);
+      }
+      lijst.appendChild(d);
+    }
+    await verversAbo();
+  }
+
+  /* Het toonscherm: de code als echte, scanbare QR (shared/qr.js + qrteken.js),
+     met de code er in cijfers onder voor het geval de camera niet meewerkt. */
+  function toonQr(titel, code) {
+    $('#qrTitel').textContent = titel;
+    $('#qrCode').textContent = code;
+    const img = $('#qrBeeld');
+    try {
+      if (window.RTGQRteken) { img.src = RTGQRteken.dataURL(code, { schaal: 6, quiet: 3 }); img.hidden = false; }
+      else img.hidden = true;
+    } catch (e) { img.hidden = true; }
+    $('#qrScherm').classList.add('zien');
+  }
+  $('#qrDicht').addEventListener('click', () => $('#qrScherm').classList.remove('zien'));
+
+  /* ---- het abonnement ---- */
+  async function verversAbo() {
+    const a = await mob('abo/aanbod', { vervoerder: 'TRANSIT' });
+    const aanbod = a.body && a.body.aanbod;
+    $('#aboVorm').classList.toggle('weg', !aanbod);
+    $('#aboReden').textContent = aanbod ? '' : ((a.body && a.body.reden) || 'Er is hier geen abonnement.');
+    if (aanbod) $('#aboUitleg').textContent = 'Onbeperkt reizen op ' + aanbod.lijnen.length +
+      ' lijn(en) van ' + aanbod.vervoerderNaam + ' voor ' + eur(aanbod.prijs) + ' per ' + aanbod.dagen + ' dagen.';
+
+    const mijn = await mob('abo/mijn');
+    const lijst = $('#aboLijst'); lijst.innerHTML = '';
+    for (const ab of ((mijn.body && mijn.body.abonnementen) || []).slice(0, 4)) {
+      const d = document.createElement('div'); d.className = 'rijtje';
+      const l = document.createElement('span');
+      l.innerHTML = '<strong></strong><span class="sub" style="display:block;font-size:0.72rem;color:var(--soft);"></span>';
+      l.querySelector('strong').textContent = 'Abonnement ' + ab.vervoerderNaam;
+      l.querySelector('.sub').textContent = ab.reden + ' · ' + ab.ritten + ' ritten (' + ab.rittenUitleg + ')';
+      d.appendChild(l);
+      if (ab.stand === 'geldig') {
+        const b = document.createElement('button'); b.className = 'knop'; b.textContent = 'Toon';
+        b.addEventListener('click', () => toonQr('Abonnement ' + ab.vervoerderNaam, ab.code));
+        d.appendChild(b);
+      } else {
+        const st = document.createElement('span'); st.className = 'stil'; st.textContent = ab.stand;
+        d.appendChild(st);
+      }
+      lijst.appendChild(d);
     }
   }
+  $('#aboKoop').addEventListener('click', async () => {
+    $('#aboKoop').disabled = true;
+    const r = await mob('abo/koop', { vervoerder: 'TRANSIT', idem: RTGIdem('abo') });
+    $('#aboKoop').disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Abonnement genomen tot ' + r.body.abonnement.geldigTot.slice(0, 10) + '.');
+    verversKaart();
+  });
 
   function vulHaltes() {
     const x = aanbodLijst[Number($('#kaartAanbod').value) || 0];
@@ -733,6 +815,8 @@
   setInterval(() => { if ($('#tabRit').getAttribute('aria-selected') === 'true') verversRit(); else verversOv(); }, 15000);
 })();
 </script>
+<script src="/shared/qr.js" defer></script>
+<script src="/shared/qrteken.js" defer></script>
 <script src="/shared/poortgesprek.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

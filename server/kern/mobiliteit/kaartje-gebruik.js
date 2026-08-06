@@ -31,10 +31,18 @@ module.exports = (ctx) => {
 
     /* Een lijn mag meegegeven worden (de conducteur zit op lijn X); staat het
        kaartje op een andere lijn, dan is het hier niet geldig. Zonder deze
-       controle is een goedkoop kaartje op de stadslijn ook geldig op de ferry. */
+       controle is een goedkoop kaartje op de stadslijn ook geldig op de ferry.
+       Een ABONNEMENT hangt niet aan een lijn maar aan de lijnen die de
+       overeenkomst dekte toen het werd gekocht; die lijst beslist. */
     const lijnId = schoon(body.lijnId, 40);
-    if (lijnId && lijnId !== k.lijnId)
-      return { status: 409, error: 'Dit kaartje geldt voor ' + k.lijnNaam + ', niet voor deze lijn.', geldig: false, kaartje: kort(k, st) };
+    const past = k.product === 'abonnement'
+      ? (!lijnId || (ctx.aboGeldtOp && ctx.aboGeldtOp(k, lijnId)))
+      : (!lijnId || lijnId === k.lijnId);
+    if (!past)
+      return { status: 409, error: k.product === 'abonnement'
+        ? 'Dit abonnement geldt niet op deze lijn.'
+        : 'Dit kaartje geldt voor ' + k.lijnNaam + ', niet voor deze lijn.',
+        geldig: false, kaartje: kort(k, st) };
 
     k.validaties = (k.validaties || []).concat([{ at: nu(), door: schoon(actor, 60) || 'personeel',
       lijnId: k.lijnId, lijnNaam: k.lijnNaam }]);
@@ -42,7 +50,9 @@ module.exports = (ctx) => {
     const na = kaartStand(k);
     logActivity(supplier.code, actor, 'controleerde een ' + k.product + ' op ' + k.lijnNaam);
     return { ok: true, geldig: true, kaartje: kort(k, na),
-      melding: 'Geldig. ' + (na.rittenOver ? na.rittenOver + ' rit(ten) over.' : 'Dit was de laatste rit op dit kaartje.') };
+      melding: k.product === 'abonnement'
+        ? 'Geldig abonnement. ' + na.reden + '.'
+        : 'Geldig. ' + (na.rittenOver ? na.rittenOver + ' rit(ten) over.' : 'Dit was de laatste rit op dit kaartje.') };
   }
 
   // wat de conducteur ziet: het bewijs, niet de persoon

@@ -71,6 +71,7 @@ function maakMobiliteit(state) {
   Object.assign(ctx, require('./kaartje')(ctx));
   Object.assign(ctx, require('./kaartje-beeld')(ctx));
   Object.assign(ctx, require('./kaartje-gebruik')(ctx));
+  Object.assign(ctx, require('./abonnement')(ctx));   // leunt op de kaartjesvoorraad
   Object.assign(ctx, require('./storing')(ctx));
   // de multimodale planner: leunt op de lijnen, de tarieven en de kaartverkoop
   Object.assign(ctx, require('./reisfactoren')(ctx));

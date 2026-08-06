@@ -76,7 +76,9 @@ module.exports = (ctx) => {
     const deel = TERUGGAVE[s.soort].deel;
     const vanMs = new Date(s.van).getTime(), totMs = new Date(s.tot).getTime();
     // wie had een kaartje voor DEZE lijn dat in het venster geldig was?
-    const geraakt = db.data.mobKaartjes.filter(k => k.vervoerder === s.vervoerder && k.lijnId === s.lijnId &&
+    const geraakt = db.data.mobKaartjes.filter(k => k.vervoerder === s.vervoerder &&
+      // een abonnement hangt niet aan een lijn maar aan een lijstje lijnen
+      (k.product === 'abonnement' ? (k.lijnen || []).includes(s.lijnId) : k.lijnId === s.lijnId) &&
       !(k.terugbetaald && k.terugbetaald.volledig) &&
       new Date(k.geldigVan).getTime() <= totMs && new Date(k.geldigTot).getTime() >= vanMs);
 
@@ -88,7 +90,13 @@ module.exports = (ctx) => {
          niet ziet. Er wordt daarom naar een DOEL gerekend (welk deel hoort deze
          reiziger in totaal terug te hebben) en alleen het verschil geboekt. */
       const alGegeven = (k.terugbetaald && k.terugbetaald.centen) || 0;
-      const doel = Math.round(k.prijs * deel);
+      /* De basis van een teruggave is wat DEZE reis kostte. Voor een los
+         kaartje is dat de kaartprijs; voor een abonnement de DAGPRIJS -- een
+         maandkaarthouder de helft van zijn maand teruggeven omdat de bus een uur
+         te laat was, is geen compensatie maar een weggevertje, en het komt van
+         de vervoerder af. */
+      const basis = k.product === 'abonnement' ? (k.dagPrijs || Math.round(k.prijs / (k.dagen || 30))) : k.prijs;
+      const doel = Math.round(basis * deel);
       const centen = doel - alGegeven;
       if (centen <= 0) continue;                  // deze reiziger heeft al genoeg terug
       const b = await pay.boekAsync({ van: 'partner:' + s.vervoerder, naar: 'lid:' + k.codenaam, centen,
@@ -102,7 +110,8 @@ module.exports = (ctx) => {
          gereden en is het geld helemaal terug; bij vertraging is het een
          vergoeding en blijft de reiziger gewoon meerijden. */
       k.terugbetaald = { at: nu(), centen: doel, laatste: centen, storing: s.id, soort: s.soort,
-        volledig: doel >= k.prijs };
+        // een abonnement vervalt NOOIT door een storingsteruggave: er zijn nog dagen over
+        volledig: k.product !== 'abonnement' && doel >= k.prijs };
       gedaan.push({ codenaam: k.codenaam, centen });
       notify(k.key, { icon: 'ticket', title: 'RTG OV',
         body: 'Uw reis op ' + s.lijnNaam + ' had een ' + TERUGGAVE[s.soort].naam + '. U krijgt automatisch geld terug.',

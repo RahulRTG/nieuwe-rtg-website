@@ -19,6 +19,7 @@
 module.exports = (kern, hulp) => {
   const { app, auth, supplierAuth, managerOnly, officeAuth, schoon, gegevensStop,
     kaartKoop, kaartMijn, kaartAanbod, kaartControle,
+    aboKoop, aboMijn, aboAanbod,
     storingMeld, storingLijst, storingTeruggave,
     overeenkomstZet, overeenkomstLijst,
     reisPlan, reisBoek, reisMijn, reisAnnuleer,
@@ -51,6 +52,22 @@ module.exports = (kern, hulp) => {
   app.post('/api/mob/kaart/mijn', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, kaartMijn(req.session));
+  });
+
+  /* Het abonnement. Zelfde poort als een los kaartje: het is een doorlopende
+     afspraak met een DERDE partij, en die moet u kunnen bereiken. */
+  app.post('/api/mob/abo/aanbod', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, aboAanbod(req.session, req.body || {}));
+  });
+  app.post('/api/mob/abo/koop', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    if (gegevensStop(req, res, 'reservering')) return;
+    stuur(res, await aboKoop(req.session, req.body || {}));
+  });
+  app.post('/api/mob/abo/mijn', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, aboMijn(req.session));
   });
 
   /* ---------------- de multimodale reis ---------------- */

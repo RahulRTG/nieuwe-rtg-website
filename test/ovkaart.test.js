@@ -307,3 +307,99 @@ test('9. de deuren: een gast koopt niets, een lid controleert niets, een vreemde
   assert.equal((await api('/api/staff/mob/kaart/controle', { code: 'X' }, taxi)).status, 409,
     'kaartcontrole hoort bij een OV-vervoerder');
 });
+
+/* ---------------------------------------------------------------------------
+   Het abonnement. Het wordt bewaard als een kaartje met product 'abonnement',
+   in dezelfde voorraad en met dezelfde code -- zodat de conducteur langs
+   precies EEN weg controleert. Deze toetsen bewaken wat daar anders aan is:
+   onbeperkt reizen, een prijs die uit de OVEREENKOMST komt, en een teruggave
+   op DAGBASIS in plaats van de hele periode.
+   ------------------------------------------------------------------------- */
+
+test('10. een abonnement bestaat alleen als de overeenkomst hem noemt, met een prijs', async () => {
+  const lidC = await lid();
+  // de overeenkomst uit toets 2/8 dekt geen abonnement
+  const zonder = await api('/api/mob/abo/koop', { vervoerder: 'TRANSIT', idem: 'a1' }, lidC);
+  assert.equal(zonder.status, 409);
+  const aanbod0 = await api('/api/mob/abo/aanbod', { vervoerder: 'TRANSIT' }, lidC);
+  assert.equal(aanbod0.body.aanbod, null, 'er is niets te koop');
+  assert.ok(aanbod0.body.reden, 'en er staat een reden bij');
+
+  // een overeenkomst MET abonnement maar ZONDER prijs is geen aanbod maar een gat
+  const geenPrijs = await api('/api/office/mob/overeenkomst', { vervoerder: 'TRANSIT',
+    van: '2020-01-01', tot: '2099-12-31', producten: ['enkel', 'abonnement'], lijnen: ['L1'],
+    getekendDoor: 'J. Directeur' }, kantoor);
+  assert.equal(geenPrijs.status, 400);
+  assert.match(geenPrijs.body.error, /abonnementPrijs/);
+
+  const goed = await api('/api/office/mob/overeenkomst', { vervoerder: 'TRANSIT',
+    van: '2020-01-01', tot: '2099-12-31', producten: ['enkel', 'abonnement'], lijnen: ['L1', 'M1'],
+    getekendDoor: 'J. Directeur', abonnementPrijs: 6000, abonnementDagen: 30 }, kantoor);
+  assert.equal(goed.status, 200, goed.body.error || '');
+  assert.equal(goed.body.overeenkomst.abonnementPrijs, 6000);
+
+  // de module `subscriptions` staat standaard uit en is de tweede poort
+  const modUit = await api('/api/mob/abo/koop', { vervoerder: 'TRANSIT', idem: 'a2' }, lidC);
+  assert.equal(modUit.status, 409);
+  assert.equal(modUit.body.module, 'subscriptions', 'de abonnementenmodule houdt hem tegen');
+  assert.equal((await api('/api/office/mob/module/zet', { id: 'subscriptions', aan: true }, kantoor)).status, 200);
+});
+
+test('11. een abonnement: prijs uit het contract, onbeperkt reizen, een per vervoerder', async () => {
+  const lidD = await lid();
+  const r = await api('/api/mob/abo/koop', { vervoerder: 'TRANSIT', idem: 'a3' }, lidD);
+  assert.equal(r.status, 200, r.body.error || '');
+  const ab = r.body.abonnement;
+  assert.equal(ab.prijs, 6000, 'de prijs komt uit de overeenkomst, niet uit een formule');
+  assert.equal(ab.dagen, 30);
+  assert.equal(ab.dagPrijs, 200, 'de dagprijs is de periodeprijs gedeeld door de dagen');
+  assert.deepEqual(ab.lijnen, ['L1', 'M1'], 'hij geldt op de lijnen uit de overeenkomst');
+  assert.equal(ab.stand, 'geldig');
+  assert.ok(ab.code && ab.code.length >= 12);
+
+  const dubbel = await api('/api/mob/abo/koop', { vervoerder: 'TRANSIT', idem: 'a4' }, lidD);
+  assert.equal(dubbel.status, 409, 'twee lopende abonnementen bij dezelfde vervoerder kan niet');
+
+  /* Onbeperkt is echt onbeperkt: drie controles achter elkaar en hij blijft
+     geldig. Een enkeltje was na de eerste op. */
+  for (let i = 1; i <= 3; i++) {
+    const c = await api('/api/staff/mob/kaart/controle', { code: ab.code, lijnId: 'L1' }, pda);
+    assert.equal(c.status, 200, 'rit ' + i + ': ' + (c.body.error || ''));
+    assert.equal(c.body.geldig, true);
+    assert.match(c.body.melding, /abonnement/i);
+  }
+  const mijn = await api('/api/mob/abo/mijn', {}, lidD);
+  assert.equal(mijn.body.abonnementen[0].ritten, 3, 'de ritten worden geteld');
+  assert.equal(mijn.body.abonnementen[0].stand, 'geldig', 'maar er hangt geen limiet aan');
+
+  // en niet op een lijn die de overeenkomst niet dekt
+  const ferry = await api('/api/staff/mob/kaart/controle', { code: ab.code, lijnId: 'F1' }, pda);
+  assert.equal(ferry.status, 409, 'de ferry staat niet in de overeenkomst');
+  assert.match(ferry.body.error, /niet op deze lijn/);
+});
+
+test('12. de teruggave bij een storing rekent een abonnement op DAGbasis af', async () => {
+  const lidE = await lid();
+  const ab = (await api('/api/mob/abo/koop', { vervoerder: 'TRANSIT', idem: 'a5' }, lidE)).body.abonnement;
+  assert.ok(ab, 'het abonnement staat');
+
+  const van = new Date(Date.now() - 3600e3).toISOString();
+  const tot = new Date(Date.now() + 3600e3).toISOString();
+  const st = await api('/api/staff/mob/kaart/storing', { lijnId: 'L1', soort: 'uitval',
+    oorzaak: 'geen chauffeur', van, tot }, pda);
+  assert.equal(st.status, 200, st.body.error || '');
+  const uit = await api('/api/supplier/mob/kaart/teruggave', { id: st.body.storing.id }, baas);
+  assert.equal(uit.status, 200, uit.body.error || '');
+
+  const na = (await api('/api/mob/abo/mijn', {}, lidE)).body.abonnementen[0];
+  assert.ok(na.terugbetaald, 'er is iets terugbetaald');
+  /* DE KERN. Een maandkaarthouder de helft van zijn maand teruggeven omdat de
+     bus een uur uitviel, is geen compensatie maar een weggevertje -- en het
+     komt van de vervoerder af. De basis is een DAG, niet de periode. */
+  assert.equal(na.terugbetaald.centen, ab.dagPrijs,
+    'de teruggave is een dagprijs (' + ab.dagPrijs + '), niet de periodeprijs (' + ab.prijs + ')');
+  assert.equal(na.stand, 'geldig', 'en het abonnement loopt gewoon door');
+
+  const nog = await api('/api/staff/mob/kaart/controle', { code: ab.code, lijnId: 'L1' }, pda);
+  assert.equal(nog.status, 200, 'de reiziger mag er nog steeds mee reizen');
+});

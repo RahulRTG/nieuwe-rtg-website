@@ -269,3 +269,100 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
     child.kill();
   }
 });
+
+/* De QR-keten in beeld: het lid TOONT een vervoerbewijs als scanbare code, en
+   de conducteur controleert hem op zijn eigen scherm. Dit is precies het stuk
+   dat een API-toets niet kan zien -- daar is een code een string, hier moet er
+   een leesbare QR staan en moet een tweede scherm er een oordeel over geven. */
+test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-QR-1' } });
+  let browser;
+  try {
+    // kaartverkoop mogelijk maken en een kaartje kopen
+    const token = await nieuwLid(base);
+    const kantoor = (await post(base, '/api/office/login', { code: 'KANTOOR-QR-1' })).token;
+    for (const m of ['partner_contracts', 'public_transport_ticketing'])
+      await post(base, '/api/office/mob/module/zet', { id: m, aan: true }, kantoor);
+    await post(base, '/api/office/mob/overeenkomst', { vervoerder: 'TRANSIT',
+      van: '2020-01-01', tot: '2099-12-31', producten: ['enkel'], lijnen: ['L1'],
+      getekendDoor: 'J. Directeur' }, kantoor);
+    const koop = await post(base, '/api/mob/kaart/koop', { vervoerder: 'TRANSIT', lijnId: 'L1',
+      van: 'h-stad', naar: 'h-tal', product: 'enkel', idem: 'qr1' }, token);
+    assert.ok(koop.kaartje, 'het kaartje staat: ' + JSON.stringify(koop).slice(0, 140));
+
+    const s = await open(base, '/apps/ov.html', 'rtg_member_token', token);
+    browser = s.browser;
+    const page = s.page;
+    await page.evaluate(() => { document.querySelector('#tabOv').click(); });
+    await page.waitForFunction(() => {
+      const l = document.querySelector('#kaartLijst');
+      return l && /geldig/.test(l.textContent);
+    }, null, { timeout: 20000 });
+
+    /* De toonknop moet een ECHTE afbeelding opleveren. Een leeg src-attribuut
+       of een verborgen beeld betekent dat de reiziger niets te tonen heeft, en
+       dan is de hele scanketen een dode letter. */
+    await page.evaluate(() => {
+      const b = [...document.querySelectorAll('#kaartLijst button')].find(x => x.textContent === 'Toon');
+      if (b) b.click();
+    });
+    await page.waitForFunction(() => {
+      const sc = document.querySelector('#qrScherm');
+      return sc && sc.classList.contains('zien');
+    }, null, { timeout: 20000 });
+    const qr = await page.$eval('#qrBeeld', el => ({ src: el.src, verborgen: el.hidden, breed: el.naturalWidth }));
+    assert.ok(qr.src.startsWith('data:image/png'), 'de QR is een echte afbeelding, kreeg: ' + qr.src.slice(0, 40));
+    assert.equal(qr.verborgen, false, 'en hij staat in beeld');
+    assert.ok(qr.breed > 40, 'met een leesbaar formaat (' + qr.breed + 'px)');
+    // de code staat er ook als tekst bij: zonder camera moet het nog kunnen
+    const tekst = await page.textContent('#qrCode');
+    assert.equal(tekst, koop.kaartje.code, 'de code staat er in leesbare tekens onder');
+
+    /* En dan de andere kant: de conducteur op de dienst-PDA. Hij tikt dezelfde
+       code in en krijgt een oordeel -- met het bewijs erbij en niet de persoon. */
+    const roster = await post(base, '/api/supplier/roster', { code: 'TRANSIT' });
+    const ch = (roster.staff || []).find(x => x.role !== 'manager');
+    const pda = (await post(base, '/api/supplier/login', { code: 'TRANSIT', staffId: ch.id, pin: '5678' })).token;
+    assert.ok(pda, 'de chauffeur logt in op de PDA');
+    /* Eerst een dienst starten. Het controleblok zit in de LOPENDE dienst, en
+       dat is geen toevalligheid van de opmaak: je controleert kaartjes terwijl
+       je rijdt, en de lijn waarop je rijdt bepaalt of een kaartje hier geldt. */
+    const dienst = await post(base, '/api/staff/ov/dienst', { lijnId: 'L1', voertuigNaam: 'Bus 4' }, pda);
+    assert.ok(!dienst.error, 'de dienst loopt: ' + JSON.stringify(dienst).slice(0, 120));
+
+    const d = await open(base, '/apps/ovdienst.html', 'rtg_pda_token', pda);
+    const pg = d.page;
+    try {
+      await pg.waitForFunction(() => {
+        const v = document.querySelector('#bewijsVeld');
+        return v && v.offsetParent !== null;
+      }, null, { timeout: 20000 });
+      await pg.fill('#bewijsVeld', koop.kaartje.code);
+      await pg.evaluate(() => { document.querySelector('#bewijsForm').requestSubmit(); });
+      await pg.waitForFunction(() => {
+        const u = document.querySelector('#bewijsUit');
+        return u && !u.classList.contains('weg') && /Geldig|Niet geldig/.test(u.textContent);
+      }, null, { timeout: 20000 });
+      const uit = await pg.textContent('#bewijsUit');
+      assert.match(uit, /^Geldig/, 'de conducteur ziet dat het bewijs deugt, kreeg: ' + uit.slice(0, 120));
+      assert.match(uit, /Kustlijn 1/, 'met de lijn erbij');
+      assert.ok(!/@/.test(uit), 'en geen e-mailadres: hij controleert een kaartje, geen persoon');
+
+      // een tweede keer is het enkeltje op, en dat zegt hij ook
+      await pg.fill('#bewijsVeld', koop.kaartje.code);
+      await pg.evaluate(() => { document.querySelector('#bewijsForm').requestSubmit(); });
+      await pg.waitForFunction(() => /Niet geldig/.test(document.querySelector('#bewijsUit').textContent),
+        null, { timeout: 20000 });
+      assert.match(await pg.textContent('#bewijsUit'), /gebruikt/,
+        'en hij zegt waarom niet: het enkeltje was op');
+
+      assert.deepEqual(d.fouten, [], 'paginafouten op de PDA: ' + d.fouten.join(' | '));
+    } finally { await d.browser.close(); }
+
+    assert.deepEqual(s.fouten, [], 'paginafouten in de leden-app: ' + s.fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});

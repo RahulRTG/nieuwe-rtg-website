@@ -312,40 +312,46 @@ const IJKINGEN = {
      kijken of het getal meebeweegt -- dezelfde vorm als de dependencies-proef
      hieronder, en om dezelfde reden: een meter die zijn eigen bestand niet echt
      leest, meet of hij draait en niet of hij ziet. */
+  /* GEEN SCHRIJFACTIE MEER OP HET ECHTE MUTATIES.json, en dat is een reparatie.
+
+     Deze twee proeven zetten de verzonnen uitslag eerst IN het echte bestand en
+     schreven het in een finally terug. Twee dingen konden daar misgaan: een
+     `git add -A` in dat venster commit een uitslag waarin toetsen "overleefd"
+     staan, en een kill in dat venster laat de finally niet lopen -- dan is de
+     campagne van 540 toetsen weg en vervangen door iets dat op een meting lijkt.
+     Beide zijn in dit huis al gebeurd (eerlijkheidspunt 6.4 en, deze sessie,
+     server/lokaal-tls.js dat gemuteerd bleef staan na een kill).
+
+     norm.meet() neemt nu een LEZER aan. De verzonnen uitslag gaat er als tekst
+     in, dus de meter doet nog steeds alles zelf: lezen, parsen, tellen. Wat er
+     niet meer gebeurt, is op schijf schrijven -- en dus is er ook niets meer om
+     terug te zetten of te verliezen. */
   toetsenOngevoeligPct: {
     proef: (voor) => {
-      const p = path.join(WORTEL, 'MUTATIES.json');
-      const oud = fs.readFileSync(p, 'utf8');
-      try {
-        const j = JSON.parse(oud);
-        /* Drie BESTAANDE toetsbestanden op "overleefd" zetten, want de meter loopt
-           de echte testmap af; een verzonnen naam zou hij terecht negeren. Drie en
-           niet een, omdat het een percentage is: bij zestig metingen schuift een
-           enkele overlever het getal met 1,6 procentpunt en dat kan door afronding
-           net onder de zichtbaarheid blijven. */
-        const namen = fs.readdirSync(path.join(WORTEL, 'test'))
-          .filter(n => n.endsWith('.test.js')).sort().slice(0, 3);
-        for (const naam of namen) j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
-        fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        return norm.meet().toetsenOngevoeligPct - voor.toetsenOngevoeligPct;
-      } finally { fs.writeFileSync(p, oud); }
+      const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8'));
+      /* Drie BESTAANDE toetsbestanden op "overleefd" zetten, want de meter loopt
+         de echte testmap af; een verzonnen naam zou hij terecht negeren. Drie en
+         niet een, omdat het een percentage is: bij zestig metingen schuift een
+         enkele overlever het getal met 1,6 procentpunt en dat kan door afronding
+         net onder de zichtbaarheid blijven. */
+      const namen = fs.readdirSync(path.join(WORTEL, 'test'))
+        .filter(n => n.endsWith('.test.js')).sort().slice(0, 3);
+      for (const naam of namen) j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
+      const na = norm.meet({ leesMutaties: () => JSON.stringify(j) });
+      return na.toetsenOngevoeligPct - voor.toetsenOngevoeligPct;
     }
   },
   toetsenNietGemeten: {
     proef: (voor) => {
-      const p = path.join(WORTEL, 'MUTATIES.json');
-      const oud = fs.readFileSync(p, 'utf8');
-      try {
-        const j = JSON.parse(oud);
-        /* Een gemeten toets uit de uitslag halen: dan is hij niet gemeten, en
-           hoort het getal precies een omhoog te gaan. Slaat deze proef af, dan
-           telt de meter iets anders dan wat er in het bestand staat. */
-        const gemeten = Object.keys(j.toetsen).filter(k => j.toetsen[k].staat === 'gezakt' || j.toetsen[k].staat === 'overleefd');
-        if (!gemeten.length) throw new Error('MUTATIES.json bevat geen enkele gemeten toets, dus deze ijking kan niets aanwijzen');
-        delete j.toetsen[gemeten[0]];
-        fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        return norm.meet().toetsenNietGemeten - voor.toetsenNietGemeten;
-      } finally { fs.writeFileSync(p, oud); }
+      const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8'));
+      /* Een gemeten toets uit de uitslag halen: dan is hij niet gemeten, en
+         hoort het getal precies een omhoog te gaan. Slaat deze proef af, dan
+         telt de meter iets anders dan wat er in het bestand staat. */
+      const gemeten = Object.keys(j.toetsen).filter(k => j.toetsen[k].staat === 'gezakt' || j.toetsen[k].staat === 'overleefd');
+      if (!gemeten.length) throw new Error('MUTATIES.json bevat geen enkele gemeten toets, dus deze ijking kan niets aanwijzen');
+      delete j.toetsen[gemeten[0]];
+      const na = norm.meet({ leesMutaties: () => JSON.stringify(j) });
+      return na.toetsenNietGemeten - voor.toetsenNietGemeten;
     }
   },
   dependencies: {
@@ -678,6 +684,40 @@ test('elke registratie heeft OF een proef OF een reden, nooit allebei leeg', () 
     if (ijk.reden) assert.ok(ijk.reden.length > 25,
       'de reden bij "' + sleutel + '" is te kort om iets uit te leggen');
   }
+});
+
+test('een onbruikbaar MUTATIES.json laat de meter ZAKKEN en niet stil nul melden', () => {
+  /* LAT.md regel 3: een meter zonder invoer die toch een getal geeft, is erger
+     dan geen meter. Bij deze twee is nul de GEVAARLIJKE kant -- nul overlevers
+     leest als een perfecte suite terwijl er niets is gemeten.
+
+     Deze bewering bestond nog niet, en ze kon ook niet bestaan: het enige gat om
+     het bestand onbruikbaar te maken was het echt overschrijven, en dat is precies
+     wat hier is weggehaald. Met een injecteerbare lezer is het drie regels.
+
+     Drie soorten onbruikbaar, want ze komen op drie plekken in de meter uit:
+     onleesbaar (de lezer gooit), geen json, en geldige json zonder een enkele
+     gemeten toets -- dat laatste is de stilste van de drie, want daar is er wel
+     een bestand en klopt de vorm. */
+  for (const [wat, lezer] of [
+    ['onleesbaar', () => { throw new Error('ENOENT'); }],
+    ['geen json', () => 'dit is geen json'],
+    ['geen enkele meting', () => JSON.stringify({ toetsen: {} })],
+    ['alleen niet-gemeten uitslagen', () => JSON.stringify({ toetsen: { 'a11ykeuring.test.js': { staat: 'geen module gevonden' } } })]
+  ]) {
+    assert.throws(() => norm.meet({ leesMutaties: lezer }), /MUTATIES\.json/,
+      'met "' + wat + '" hoort norm.meet() te gooien in plaats van een getal te geven');
+  }
+});
+
+test('DE TEGENPROEF: een BRUIKBARE lezer laat de meter gewoon meten', () => {
+  /* Zonder deze zou de toets hierboven ook groen blijven als norm.meet() ALTIJD
+     gooit, en dan bewijst hij dat een kapotte meter goed gebouwd is. */
+  const echt = fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8');
+  const na = norm.meet({ leesMutaties: () => echt });
+  assert.equal(typeof na.toetsenOngevoeligPct, 'number');
+  assert.equal(na.toetsenNietGemeten, norm.meet().toetsenNietGemeten,
+    'dezelfde inhoud via de lezer hoort hetzelfde getal te geven als van schijf');
 });
 
 module.exports = { IJKINGEN };

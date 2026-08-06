@@ -700,6 +700,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "domeinalleen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/routes.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "domeingrens.test.js": {
       "soort": "puur",
       "staat": "gezakt",

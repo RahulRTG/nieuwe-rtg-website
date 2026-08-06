@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 616 bestanden en 3364 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 616 bestanden en 3366 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,12 +13,12 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 616 |
-| losse beweringen (`test(...)`) | 3364 |
+| losse beweringen (`test(...)`) | 3366 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 4 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 501 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 502 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 29 |
-| alleen in de kop *genoemd*, nog niet gemeten | 5 |
+| alleen in de kop *genoemd*, nog niet gemeten | 4 |
 | niets van beide | 69 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-548 bestanden, 3261 beweringen.
+548 bestanden, 3263 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -138,7 +138,7 @@ toets omvalt.
 | `deavond.test.js` | 5 | gezakt op `liegpoort /api/` | EEN AVOND IN HET HUIS -- de keuken, een event, het hotel en de gasten. WAAROM DIT ER IS De vorige toetsen volgen een mens (levensloop) of een bestelling (bezorging). |
 | `defensie.test.js` | 7 | gezakt op `liegpoort /api/` | De defensie-toren: paraatheid, materieel en onderhoud, bevoorrading, de oefenagenda en de staf-AI. Uitdrukkelijk logistiek en organisatie: de AI weigert alles wat richting wapeninzet of doelbestrijding gaat. |
 | `directpay.test.js` | 7 | gezakt op `liegpoort /api/` | Rechtstreeks betalen van klant naar leverancier, met Face ID, via de AI en de Salon. Het lid betaalt zelf of rekent een betaalverzoek van de partner af; het geld gaat rechtstreeks naar de leverancier (ontvangst-teller). |
-| `domeinalleen.test.js` | 2 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `domeinalleen.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `domeingrens.test.js` | 8 | gezakt op `===->!==#0` | DE DOMEINGRENS: laat hij door wat mag, en houdt hij tegen wat niet mag? Waar dit over gaat: server.js geeft elke router hetzelfde object `kern` met ruim negenhonderd eigenschappen, dus kan elk domein bij alles van... |
 | `doos-journaal.test.js` | 3 | gezakt op `true->false` | Zaakdoos-journaal, beveiliging: het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de doos. Daarom is het gezegeld (HMAC), genummerd (seq) en padgebonden. |
 | `doos-regie.test.js` | 5 | gezakt op `liegpoort /api/` | De doos-regie: het beheer op afstand van de Zaakdoos-vloot. Het kantoor zet een doelversie en per doos een netwerkrol (accesspoint, versterker, gastwifi); de doos haalt beide zelf op bij zijn eigen melding en meldt... |
@@ -292,7 +292,7 @@ toets omvalt.
 | `menselijkebanen.test.js` | 4 | gezakt op `liegpoort /api/` | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |
 | `menselijkverkeer.test.js` | 5 | gezakt op `liegpoort /api/` | HET MENSELIJKE VERKEER -- wat mensen hier met elkaar doen. WAAROM DIT ER NAAST test/menselijkebanen.test.js STAAT Die toets bewijst dat 157 mensen bij hun werk kunnen. |
 | `merge3.property.test.js` | 5 | overleefd | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |
-| `meterijk.test.js` | 7 | muteert zelf | De ijking van de meters: regel 10 van LAT.md, met een handhaver. "Een meter die je niet hebt zien uitslaan, meet niets." Dat stond opgeschreven, en op een dag bleken zeven meters te liegen -- geen van allen in de... |
+| `meterijk.test.js` | 9 | muteert zelf | De ijking van de meters: regel 10 van LAT.md, met een handhaver. "Een meter die je niet hebt zien uitslaan, meet niets." Dat stond opgeschreven, en op een dag bleken zeven meters te liegen -- geen van allen in de... |
 | `metier.test.js` | 13 | gezakt op `liegpoort /api/` | Métier (kern/metier/*, routes/member/metier.js): de beroepsapp. Het zwaartepunt van deze toetsen ligt op het ontwerp dat Métier anders maakt dan een gewoon netwerk: - een profiel toont NOOIT een echte naam, alleen... |
 | `meting.test.js` | 10 | gezakt op `>=->>#0` | De meting: tellen zonder de monitoring om te leggen en zonder iets over een persoon vast te leggen. |
 | `metingpoort.test.js` | 7 | gezakt op `liegpoort /api/` | DE DEUR VOOR /api/metrics, van drie kanten. WAAROM DIT BESTAND ER MOEST KOMEN. |

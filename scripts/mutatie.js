@@ -317,10 +317,39 @@ function draaiToets(bestand, env, wacht) {
     tijdout: r.error && r.error.code === 'ETIMEDOUT' };
 }
 
+/* TOETSEN DIE DE SERVER STARTEN IN PLAATS VAN HEM TE REQUIREN, en waarom die een
+   handgeschreven koppeling nodig hebben.
+
+   modulesVan() leest de requires van een toets, en dat werkt voor een pure toets
+   die zijn module noemt. Een toets die de server als KINDPROCES opstart en er
+   verzoeken naartoe stuurt, noemt die module nergens -- hij kent alleen een poort.
+   De motor meldt dan "geen module gevonden", en dat is geen fout maar een grens
+   van deze vindwijze.
+
+   Het gevolg was wel dat zo'n toets ONMEETBAAR bleef: elf toetsen stonden zo,
+   waaronder de zwaarste die er zijn (boot-smoke, golive, vloot). Dat is precies
+   het soort toets waarvan je het meest wil weten of hij kan zakken.
+
+   Hier staat daarom per toets de module die hij ECHT op de proef stelt. Elke
+   regel is een bewering die met een mutatie is nagetrokken en niet een gok: staat
+   hier een module die de toets niet raakt, dan komt hij als 'overleefd' terug en
+   krijgt de toets de schuld van iets wat de lijst fout heeft.
+
+   De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
+   vergeten hoekje. */
+const EIGEN_MODULE = new Map([
+  /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
+     nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
+     module, en beide gezakt. */
+  ['domeinalleen.test.js', ['server/opzet/routes.js']]
+]);
+
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets
    noemt de module die hij onderzoekt. Meerdere kandidaten: we nemen ze allemaal
    en muteren in die volgorde -- de eerste die de toets laat zakken is genoeg. */
 function modulesVan(bestand) {
+  const eigen = EIGEN_MODULE.get(path.basename(bestand));
+  if (eigen) return eigen.filter(p => fs.existsSync(path.join(WORTEL, p)));
   const bron = fs.readFileSync(bestand, 'utf8');
   const uit = [];
   for (const m of bron.matchAll(/require\('(\.\.\/(?:server|scripts|public)\/[^']+)'\)/g)) {

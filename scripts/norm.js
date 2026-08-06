@@ -350,7 +350,10 @@ function telSkips(bestanden, lees) {
   return uit;
 }
 
-function meet() {
+/* `bronnen` is er alleen voor de IJKING (test/meterijk.test.js) en is optioneel:
+   zonder argument leest deze meter alles van schijf zoals altijd. Zie de uitleg
+   bij `mutaties` hieronder voor waarom dat er is. */
+function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
      moment dat er iets te meten viel -- de meetketen brak als de meting niet
@@ -416,10 +419,32 @@ function meet() {
   /* De mutatie-uitslag. Ontbreekt MUTATIES.json, dan hoort dit te ZAKKEN en niet
      stilzwijgend nul te melden (LAT.md regel 3): nul overlevers zou dan als
      perfect scoren terwijl er niets is gemeten. */
+  /* DE BRON IS INJECTEERBAAR, EN DAT IS EEN REPARATIE EN GEEN NETHEID.
+
+     test/meterijk.test.js ijkte deze twee meters door een verzonnen uitslag in
+     het ECHTE MUTATIES.json te schrijven en het in een finally terug te zetten.
+     Dat werkte, en het was een val met twee monden. (1) Wie in dat venster van
+     een paar seconden `git add -A` doet, commit een uitslag waarin toetsen
+     "overleefd" staan en alle details weg zijn -- eerlijkheidspunt 6.4, voor de
+     derde keer. (2) Een kill in dat venster laat de finally NIET lopen, en dat
+     is hier geen theorie: deze sessie bleef server/lokaal-tls.js zo gemuteerd
+     staan. Dan is de uitslag van een campagne van 540 toetsen weg en vervangen
+     door "alles overleefd" -- het slechtst mogelijke verlies, want het ziet
+     eruit als een meting.
+
+     Wat er wordt meegegeven is de LEZER en niet de uitkomst. Zou de ijking een
+     kant-en-klaar geteld resultaat mogen aanleveren, dan bewijst ze dat het
+     tellen werkt en niet dat DEZE meter het leest -- precies het onderscheid uit
+     de kop van deze functie ("meet of hij draait en niet of hij ziet"). Nu loopt
+     de hele weg (lezen, parsen, tellen, drempels) nog steeds door de meter.
+
+     Wat hiermee NIET is bewezen: dat de standaardlezer naar het juiste pad
+     wijst. Dat is die ene regel hieronder, en die staat er onbedekt bij. */
   const mutaties = (() => {
     const p = path.join(WORTEL, 'MUTATIES.json');
+    const lees = (bronnen && bronnen.leesMutaties) || (() => fs.readFileSync(p, 'utf8'));
     let rauw;
-    try { rauw = JSON.parse(fs.readFileSync(p, 'utf8')).toetsen || {}; }
+    try { rauw = JSON.parse(lees()).toetsen || {}; }
     catch (e) { throw new Error('MUTATIES.json is er niet of onleesbaar (' + e.message + '); draai npm run mutatie -- twee meters hebben hem als invoer'); }
     const alle = inMap.filter(n => /\.(test|e2e)\.js$/.test(n));
     let overleefd = 0, gezakt = 0, nietGemeten = 0;

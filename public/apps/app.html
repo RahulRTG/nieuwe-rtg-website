@@ -287,7 +287,27 @@
 
        De 1.5 is gemeten, niet geschat: het eerste blad (klok, groet, pas,
        drie rijen apps, dockzone) beslaat ongeveer 66 keer --e. */
-    --e:min(clamp(11px, 3.85cqi, 19.5px), 1.48cqh);
+    /* DE ONDERGRENS IS GEEN SMAAK MAAR EEN VANGRAIL.
+
+       Gemeten op een iPhone (iOS 18.7, Safari) die meldde "na inloggen zie je
+       niks meer": venster 375x669, shell 669, thuisscherm 603, acht tegels
+       aanwezig -- en tegelbreedte NUL. Alles eromheen klopte; alleen de tegels
+       waren onzichtbaar, want hun maat is calc(var(--e) * 3.87) en --e was daar
+       nul geworden. Nul maal wat dan ook blijft nul, dus tekende de app zichzelf
+       weg zonder een fout te maken. Er viel niets te vangen: geen uitzondering,
+       geen mislukt verzoek, alleen een leeg scherm.
+
+       De nul komt uit 1.48cqh: die hoogte-eenheid heeft een container nodig die
+       zijn hoogte kent (container-type:size, hieronder pas gezet als de app
+       zichtbaar is). Rekent een browser hem uit op een moment dat die hoogte er
+       nog niet is, dan is de uitkomst nul en blijft dat zo.
+
+       max(10px, ...) maakt dat onmogelijk. Het is bewust geen exacte reparatie
+       van de volgorde waarin Safari rekent -- die kunnen we hier niet afdwingen
+       -- maar een bodem: hoe de rekensom ook uitpakt, een tegel is nooit
+       onzichtbaar. Tien is de kleinste maat waarop het beginscherm nog leesbaar
+       is; daarboven wint gewoon de normale berekening. */
+    --e:max(10px, min(clamp(11px, 3.85cqi, 19.5px), 1.48cqh));
     --os-kolom:calc(var(--e) * 34);
   }
   #app.active{display:flex;}
